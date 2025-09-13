@@ -21,7 +21,8 @@ public class CommandXboxController extends CommandGenericHID {
   private final XboxController m_hid;
 
   /**
-   * Construct an instance of a controller.
+   * Construct an instance of a controller. Commands bound to buttons on the controller will be
+   * scheduled on the {@link Scheduler#getDefault() default scheduler} using its default event loop.
    *
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
@@ -31,7 +32,8 @@ public class CommandXboxController extends CommandGenericHID {
   }
 
   /**
-   * Construct an instance of a controller.
+   * Construct an instance of a controller. Commands bound to buttons on the controller will be
+   * scheduled on the given scheduler using its default event loop.
    *
    * @param scheduler The scheduler that should execute the triggered commands.
    * @param port The port index on the Driver Station that the controller is plugged into.
@@ -55,7 +57,9 @@ public class CommandXboxController extends CommandGenericHID {
    * Constructs a Trigger instance around the A button's digital signal.
    *
    * @return a Trigger instance representing the A button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #a(EventLoop)
    */
   public Trigger a() {
@@ -77,7 +81,9 @@ public class CommandXboxController extends CommandGenericHID {
    * Constructs a Trigger instance around the B button's digital signal.
    *
    * @return a Trigger instance representing the B button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #b(EventLoop)
    */
   public Trigger b() {
@@ -99,7 +105,9 @@ public class CommandXboxController extends CommandGenericHID {
    * Constructs a Trigger instance around the X button's digital signal.
    *
    * @return a Trigger instance representing the X button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #x(EventLoop)
    */
   public Trigger x() {
@@ -121,7 +129,9 @@ public class CommandXboxController extends CommandGenericHID {
    * Constructs a Trigger instance around the Y button's digital signal.
    *
    * @return a Trigger instance representing the Y button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #y(EventLoop)
    */
   public Trigger y() {
@@ -143,7 +153,9 @@ public class CommandXboxController extends CommandGenericHID {
    * Constructs a Trigger instance around the left bumper button's digital signal.
    *
    * @return a Trigger instance representing the left bumper button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #leftBumper(EventLoop)
    */
   public Trigger leftBumper() {
@@ -165,7 +177,9 @@ public class CommandXboxController extends CommandGenericHID {
    * Constructs a Trigger instance around the right bumper button's digital signal.
    *
    * @return a Trigger instance representing the right bumper button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #rightBumper(EventLoop)
    */
   public Trigger rightBumper() {
@@ -187,7 +201,9 @@ public class CommandXboxController extends CommandGenericHID {
    * Constructs a Trigger instance around the back button's digital signal.
    *
    * @return a Trigger instance representing the back button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #back(EventLoop)
    */
   public Trigger back() {
@@ -209,7 +225,9 @@ public class CommandXboxController extends CommandGenericHID {
    * Constructs a Trigger instance around the start button's digital signal.
    *
    * @return a Trigger instance representing the start button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #start(EventLoop)
    */
   public Trigger start() {
@@ -231,7 +249,9 @@ public class CommandXboxController extends CommandGenericHID {
    * Constructs a Trigger instance around the left stick button's digital signal.
    *
    * @return a Trigger instance representing the left stick button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #leftStick(EventLoop)
    */
   public Trigger leftStick() {
@@ -253,7 +273,9 @@ public class CommandXboxController extends CommandGenericHID {
    * Constructs a Trigger instance around the right stick button's digital signal.
    *
    * @return a Trigger instance representing the right stick button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #rightStick(EventLoop)
    */
   public Trigger rightStick() {
@@ -292,8 +314,9 @@ public class CommandXboxController extends CommandGenericHID {
    * @param threshold the minimum axis value for the returned {@link Trigger} to be true. This value
    *     should be in the range [0, 1] where 0 is the unpressed state of the axis.
    * @return a Trigger instance that is true when the left trigger's axis exceeds the provided
-   *     threshold, attached to the {@link Scheduler#getDefaultEventLoop() default scheduler
-   *     button loop}.
+   *     threshold, attached to the {@link Scheduler#getDefaultEventLoop() default scheduler event
+   *     loop} on the scheduler passed to the controller's constructor, or the {@link
+   *     Scheduler#getDefault default scheduler} if a scheduler was not explicitly provided.
    */
   public Trigger leftTrigger(double threshold) {
     return leftTrigger(threshold, getScheduler().getDefaultEventLoop());
@@ -304,7 +327,9 @@ public class CommandXboxController extends CommandGenericHID {
    * will be true when the axis value is greater than 0.5.
    *
    * @return a Trigger instance that is true when the left trigger's axis exceeds 0.5, attached to
-   *     the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    */
   public Trigger leftTrigger() {
     return leftTrigger(0.5);
@@ -331,8 +356,9 @@ public class CommandXboxController extends CommandGenericHID {
    * @param threshold the minimum axis value for the returned {@link Trigger} to be true. This value
    *     should be in the range [0, 1] where 0 is the unpressed state of the axis.
    * @return a Trigger instance that is true when the right trigger's axis exceeds the provided
-   *     threshold, attached to the {@link Scheduler#getDefaultEventLoop() default scheduler
-   *     button loop}.
+   *     threshold, attached to the {@link Scheduler#getDefaultEventLoop() default scheduler event
+   *     loop} on the scheduler passed to the controller's constructor, or the {@link
+   *     Scheduler#getDefault default scheduler} if a scheduler was not explicitly provided.
    */
   public Trigger rightTrigger(double threshold) {
     return rightTrigger(threshold, getScheduler().getDefaultEventLoop());
@@ -343,7 +369,9 @@ public class CommandXboxController extends CommandGenericHID {
    * will be true when the axis value is greater than 0.5.
    *
    * @return a Trigger instance that is true when the right trigger's axis exceeds 0.5, attached to
-   *     the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    */
   public Trigger rightTrigger() {
     return rightTrigger(0.5);

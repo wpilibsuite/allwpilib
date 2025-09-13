@@ -23,7 +23,8 @@ public class Command{{ ConsoleName }}Controller extends CommandGenericHID {
   private final {{ ConsoleName }}Controller m_hid;
 
   /**
-   * Construct an instance of a controller.
+   * Construct an instance of a controller. Commands bound to buttons on the controller will be
+   * scheduled on the {@link Scheduler#getDefault() default scheduler} using its default event loop.
    *
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
@@ -33,7 +34,8 @@ public class Command{{ ConsoleName }}Controller extends CommandGenericHID {
   }
 
   /**
-   * Construct an instance of a controller.
+   * Construct an instance of a controller. Commands bound to buttons on the controller will be
+   * scheduled on the given scheduler using its default event loop.
    *
    * @param scheduler The scheduler that should execute the triggered commands.
    * @param port The port index on the Driver Station that the controller is plugged into.
@@ -57,7 +59,9 @@ public class Command{{ ConsoleName }}Controller extends CommandGenericHID {
    * Constructs a Trigger instance around the {{ button.DocName|default(button.name) }} button's digital signal.
    *
    * @return a Trigger instance representing the {{ button.DocName|default(button.name) }} button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #{{ button.name }}(EventLoop)
    */
   public Trigger {{ button.name }}() {
@@ -98,8 +102,9 @@ public class Command{{ ConsoleName }}Controller extends CommandGenericHID {
    * @param threshold the minimum axis value for the returned {@link Trigger} to be true. This value
    *     should be in the range [0, 1] where 0 is the unpressed state of the axis.
    * @return a Trigger instance that is true when the {{ trigger.DocName }}'s axis exceeds the provided
-   *     threshold, attached to the {@link Scheduler#getDefaultEventLoop() default scheduler
-   *     button loop}.
+   *     threshold, attached to the {@link Scheduler#getDefaultEventLoop() default scheduler event
+   *     loop} on the scheduler passed to the controller's constructor, or the {@link
+   *     Scheduler#getDefault default scheduler} if a scheduler was not explicitly provided.
    */
   public Trigger {{ trigger.name }}(double threshold) {
     return {{ trigger.name }}(threshold, getScheduler().getDefaultEventLoop());
@@ -110,7 +115,9 @@ public class Command{{ ConsoleName }}Controller extends CommandGenericHID {
    * will be true when the axis value is greater than 0.5.
    *
    * @return a Trigger instance that is true when the {{ trigger.DocName }}'s axis exceeds 0.5, attached to
-   *     the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    */
   public Trigger {{ trigger.name }}() {
     return {{ trigger.name }}(0.5);

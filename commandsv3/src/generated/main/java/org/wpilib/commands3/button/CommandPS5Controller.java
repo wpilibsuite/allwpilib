@@ -21,7 +21,8 @@ public class CommandPS5Controller extends CommandGenericHID {
   private final PS5Controller m_hid;
 
   /**
-   * Construct an instance of a controller.
+   * Construct an instance of a controller. Commands bound to buttons on the controller will be
+   * scheduled on the {@link Scheduler#getDefault() default scheduler} using its default event loop.
    *
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
@@ -31,7 +32,8 @@ public class CommandPS5Controller extends CommandGenericHID {
   }
 
   /**
-   * Construct an instance of a controller.
+   * Construct an instance of a controller. Commands bound to buttons on the controller will be
+   * scheduled on the given scheduler using its default event loop.
    *
    * @param scheduler The scheduler that should execute the triggered commands.
    * @param port The port index on the Driver Station that the controller is plugged into.
@@ -55,7 +57,9 @@ public class CommandPS5Controller extends CommandGenericHID {
    * Constructs a Trigger instance around the square button's digital signal.
    *
    * @return a Trigger instance representing the square button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #square(EventLoop)
    */
   public Trigger square() {
@@ -77,7 +81,9 @@ public class CommandPS5Controller extends CommandGenericHID {
    * Constructs a Trigger instance around the cross button's digital signal.
    *
    * @return a Trigger instance representing the cross button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #cross(EventLoop)
    */
   public Trigger cross() {
@@ -99,7 +105,9 @@ public class CommandPS5Controller extends CommandGenericHID {
    * Constructs a Trigger instance around the circle button's digital signal.
    *
    * @return a Trigger instance representing the circle button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #circle(EventLoop)
    */
   public Trigger circle() {
@@ -121,7 +129,9 @@ public class CommandPS5Controller extends CommandGenericHID {
    * Constructs a Trigger instance around the triangle button's digital signal.
    *
    * @return a Trigger instance representing the triangle button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #triangle(EventLoop)
    */
   public Trigger triangle() {
@@ -143,7 +153,9 @@ public class CommandPS5Controller extends CommandGenericHID {
    * Constructs a Trigger instance around the left trigger 1 button's digital signal.
    *
    * @return a Trigger instance representing the left trigger 1 button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #L1(EventLoop)
    */
   public Trigger L1() {
@@ -165,7 +177,9 @@ public class CommandPS5Controller extends CommandGenericHID {
    * Constructs a Trigger instance around the right trigger 1 button's digital signal.
    *
    * @return a Trigger instance representing the right trigger 1 button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #R1(EventLoop)
    */
   public Trigger R1() {
@@ -187,7 +201,9 @@ public class CommandPS5Controller extends CommandGenericHID {
    * Constructs a Trigger instance around the left trigger 2 button's digital signal.
    *
    * @return a Trigger instance representing the left trigger 2 button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #L2(EventLoop)
    */
   public Trigger L2() {
@@ -209,7 +225,9 @@ public class CommandPS5Controller extends CommandGenericHID {
    * Constructs a Trigger instance around the right trigger 2 button's digital signal.
    *
    * @return a Trigger instance representing the right trigger 2 button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #R2(EventLoop)
    */
   public Trigger R2() {
@@ -231,7 +249,9 @@ public class CommandPS5Controller extends CommandGenericHID {
    * Constructs a Trigger instance around the create button's digital signal.
    *
    * @return a Trigger instance representing the create button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #create(EventLoop)
    */
   public Trigger create() {
@@ -253,7 +273,9 @@ public class CommandPS5Controller extends CommandGenericHID {
    * Constructs a Trigger instance around the options button's digital signal.
    *
    * @return a Trigger instance representing the options button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #options(EventLoop)
    */
   public Trigger options() {
@@ -275,7 +297,9 @@ public class CommandPS5Controller extends CommandGenericHID {
    * Constructs a Trigger instance around the L3 (left stick) button's digital signal.
    *
    * @return a Trigger instance representing the L3 (left stick) button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #L3(EventLoop)
    */
   public Trigger L3() {
@@ -297,7 +321,9 @@ public class CommandPS5Controller extends CommandGenericHID {
    * Constructs a Trigger instance around the R3 (right stick) button's digital signal.
    *
    * @return a Trigger instance representing the R3 (right stick) button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #R3(EventLoop)
    */
   public Trigger R3() {
@@ -319,7 +345,9 @@ public class CommandPS5Controller extends CommandGenericHID {
    * Constructs a Trigger instance around the PlayStation button's digital signal.
    *
    * @return a Trigger instance representing the PlayStation button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #PS(EventLoop)
    */
   public Trigger PS() {
@@ -341,7 +369,9 @@ public class CommandPS5Controller extends CommandGenericHID {
    * Constructs a Trigger instance around the touchpad button's digital signal.
    *
    * @return a Trigger instance representing the touchpad button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #touchpad(EventLoop)
    */
   public Trigger touchpad() {

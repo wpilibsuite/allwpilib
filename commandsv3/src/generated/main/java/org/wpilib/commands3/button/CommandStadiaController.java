@@ -21,7 +21,8 @@ public class CommandStadiaController extends CommandGenericHID {
   private final StadiaController m_hid;
 
   /**
-   * Construct an instance of a controller.
+   * Construct an instance of a controller. Commands bound to buttons on the controller will be
+   * scheduled on the {@link Scheduler#getDefault() default scheduler} using its default event loop.
    *
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
@@ -31,7 +32,8 @@ public class CommandStadiaController extends CommandGenericHID {
   }
 
   /**
-   * Construct an instance of a controller.
+   * Construct an instance of a controller. Commands bound to buttons on the controller will be
+   * scheduled on the given scheduler using its default event loop.
    *
    * @param scheduler The scheduler that should execute the triggered commands.
    * @param port The port index on the Driver Station that the controller is plugged into.
@@ -55,7 +57,9 @@ public class CommandStadiaController extends CommandGenericHID {
    * Constructs a Trigger instance around the A button's digital signal.
    *
    * @return a Trigger instance representing the A button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #a(EventLoop)
    */
   public Trigger a() {
@@ -77,7 +81,9 @@ public class CommandStadiaController extends CommandGenericHID {
    * Constructs a Trigger instance around the B button's digital signal.
    *
    * @return a Trigger instance representing the B button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #b(EventLoop)
    */
   public Trigger b() {
@@ -99,7 +105,9 @@ public class CommandStadiaController extends CommandGenericHID {
    * Constructs a Trigger instance around the X button's digital signal.
    *
    * @return a Trigger instance representing the X button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #x(EventLoop)
    */
   public Trigger x() {
@@ -121,7 +129,9 @@ public class CommandStadiaController extends CommandGenericHID {
    * Constructs a Trigger instance around the Y button's digital signal.
    *
    * @return a Trigger instance representing the Y button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #y(EventLoop)
    */
   public Trigger y() {
@@ -143,7 +153,9 @@ public class CommandStadiaController extends CommandGenericHID {
    * Constructs a Trigger instance around the left bumper button's digital signal.
    *
    * @return a Trigger instance representing the left bumper button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #leftBumper(EventLoop)
    */
   public Trigger leftBumper() {
@@ -165,7 +177,9 @@ public class CommandStadiaController extends CommandGenericHID {
    * Constructs a Trigger instance around the right bumper button's digital signal.
    *
    * @return a Trigger instance representing the right bumper button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #rightBumper(EventLoop)
    */
   public Trigger rightBumper() {
@@ -187,7 +201,9 @@ public class CommandStadiaController extends CommandGenericHID {
    * Constructs a Trigger instance around the left stick button's digital signal.
    *
    * @return a Trigger instance representing the left stick button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #leftStick(EventLoop)
    */
   public Trigger leftStick() {
@@ -209,7 +225,9 @@ public class CommandStadiaController extends CommandGenericHID {
    * Constructs a Trigger instance around the right stick button's digital signal.
    *
    * @return a Trigger instance representing the right stick button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #rightStick(EventLoop)
    */
   public Trigger rightStick() {
@@ -231,7 +249,9 @@ public class CommandStadiaController extends CommandGenericHID {
    * Constructs a Trigger instance around the ellipses button's digital signal.
    *
    * @return a Trigger instance representing the ellipses button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #ellipses(EventLoop)
    */
   public Trigger ellipses() {
@@ -253,7 +273,9 @@ public class CommandStadiaController extends CommandGenericHID {
    * Constructs a Trigger instance around the hamburger button's digital signal.
    *
    * @return a Trigger instance representing the hamburger button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #hamburger(EventLoop)
    */
   public Trigger hamburger() {
@@ -275,7 +297,9 @@ public class CommandStadiaController extends CommandGenericHID {
    * Constructs a Trigger instance around the stadia button's digital signal.
    *
    * @return a Trigger instance representing the stadia button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #stadia(EventLoop)
    */
   public Trigger stadia() {
@@ -297,7 +321,9 @@ public class CommandStadiaController extends CommandGenericHID {
    * Constructs a Trigger instance around the right trigger button's digital signal.
    *
    * @return a Trigger instance representing the right trigger button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #rightTrigger(EventLoop)
    */
   public Trigger rightTrigger() {
@@ -319,7 +345,9 @@ public class CommandStadiaController extends CommandGenericHID {
    * Constructs a Trigger instance around the left trigger button's digital signal.
    *
    * @return a Trigger instance representing the left trigger button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #leftTrigger(EventLoop)
    */
   public Trigger leftTrigger() {
@@ -341,7 +369,9 @@ public class CommandStadiaController extends CommandGenericHID {
    * Constructs a Trigger instance around the google button's digital signal.
    *
    * @return a Trigger instance representing the google button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #google(EventLoop)
    */
   public Trigger google() {
@@ -363,7 +393,9 @@ public class CommandStadiaController extends CommandGenericHID {
    * Constructs a Trigger instance around the frame button's digital signal.
    *
    * @return a Trigger instance representing the frame button's digital signal attached
-   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   *     to the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the
+   *     scheduler passed to the controller's constructor, or the {@link Scheduler#getDefault
+   *     default scheduler} if a scheduler was not explicitly provided.
    * @see #frame(EventLoop)
    */
   public Trigger frame() {
