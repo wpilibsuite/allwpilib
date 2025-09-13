@@ -106,6 +106,7 @@ javadoc(
     deps = [
         "//apriltag:apriltag-java",
         "//cameraserver:cameraserver-java",
+        "//commandsv3:commandsv3-java",
         "//cscore:cscore-java",
         "//epilogue-runtime:epilogue-java",
         "//hal:hal-java",
