@@ -93,7 +93,7 @@ import org.wpilib.commands3.proto.SchedulerProto;
  * detect lifecycle events for all commands, including one-shots that would be invisible to the
  * protobuf serializer. However, it is up to the user to log those events themselves.
  */
-public class Scheduler implements ProtobufSerializable {
+public final class Scheduler implements ProtobufSerializable {
   private final Map<Mechanism, Command> m_defaultCommands = new LinkedHashMap<>();
 
   /** The set of commands scheduled since the start of the previous run. */
@@ -151,7 +151,12 @@ public class Scheduler implements ProtobufSerializable {
    * default instance for convenience; however, new scheduler instances can be useful for unit
    * tests.
    */
-  public Scheduler() {}
+  public static Scheduler createIndependentScheduler() {
+    return new Scheduler();
+  }
+
+  /** Private constructor. Use static factory methods or the default scheduler instance. */
+  private Scheduler() {}
 
   /**
    * Sets the default command for a mechanism. The command must require that mechanism, and cannot

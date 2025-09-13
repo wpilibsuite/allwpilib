@@ -23,7 +23,7 @@ class StagedCommandBuilderTest {
 
   @BeforeEach
   void setUp() {
-    Scheduler scheduler = new Scheduler();
+    Scheduler scheduler = Scheduler.createIndependentScheduler();
     m_mech1 = new Mechanism("Mech 1", scheduler);
     m_mech2 = new Mechanism("Mech 2", scheduler);
   }
@@ -44,7 +44,7 @@ class StagedCommandBuilderTest {
 
   @Test
   void allOptions() {
-    var mech = new Mechanism("Mech", new Scheduler());
+    var mech = new Mechanism("Mech", Scheduler.createIndependentScheduler());
 
     Command command =
         new StagedCommandBuilder()
