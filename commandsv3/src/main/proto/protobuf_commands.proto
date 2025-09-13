@@ -5,9 +5,13 @@ package wpi.proto;
 option java_package = "org.wpilib.commands3.proto";
 
 /*
-allwpilib $ protoc-quickbuf \
-              --quickbuf_out=gen_descriptors=true:commandsv3/src/generated/main/java \
-              commandsv3/src/main/proto/protobuf_commands.proto
+Or use the generate_files.py script:
+
+# macOS
+allwpilib $ ./commandsv3/generate_files.py --protoc=protoc-quickbuf
+
+# Linux
+allwpilib $ ./commandsv3/generate_files.py --quickbuf_plugin protoc-gen-quickbuf-1.3.3-linux-x86_64.exe
  */
 
 message ProtobufMechanism {

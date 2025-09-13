@@ -44,15 +44,16 @@ def generate_quickbuf(
     proto_files = proto_dir.glob("*.proto")
     for path in proto_files:
         absolute_filename = path.absolute()
-        subprocess.check_call(
-            [
-                protoc,
-                f"--plugin=protoc-gen-quickbuf={quickbuf_plugin}",
-                f"--quickbuf_out=gen_descriptors=true:{output_directory.absolute()}",
-                f"-I{absolute_filename.parent}",
-                absolute_filename,
-            ]
-        )
+        args = [protoc]
+        if quickbuf_plugin:
+            # Optional on macOS if using protoc-quickbuf
+            args += [f"--plugin=protoc-gen-quickbuf={quickbuf_plugin}"]
+        args += [
+            f"--quickbuf_out=gen_descriptors=true:{output_directory.absolute()}",
+            f"-I{absolute_filename.parent}",
+            absolute_filename,
+        ]
+        subprocess.check_call(args)
     java_files = (output_directory / "org/wpilib/commands3/proto").glob("*.java")
     for java_file in java_files:
         with (java_file).open(encoding="utf-8") as f:
@@ -97,7 +98,6 @@ def main():
     parser.add_argument(
         "--quickbuf_plugin",
         help="Path to the quickbuf protoc plugin",
-        required=True,
     )
     parser.add_argument(
         "--proto_directory",
