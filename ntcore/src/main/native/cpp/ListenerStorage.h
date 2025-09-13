@@ -113,9 +113,9 @@ class ListenerStorage final : public IListenerStorage {
     void Main() final;
 
     // Stops running callbacks.
+    //
     // Returns true if successful, or false if the caller should wait for the
     // queue to empty. Assumes the mutex is already held.
-
     bool Shutdown();
 
     NT_ListenerPoller m_poller;
@@ -125,6 +125,7 @@ class ListenerStorage final : public IListenerStorage {
 
    private:
     bool m_shutdown;
+    bool m_inCallback;
   };
   wpi::SafeThreadOwner<Thread> m_thread;
 };
