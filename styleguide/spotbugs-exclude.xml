@@ -208,12 +208,4 @@
   <Match>
     <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE" />
   </Match>
-  <Match>
-    <Bug pattern="SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR" />
-    <Class name="edu.wpi.first.wpilibj2.command.CommandScheduler" />
-  </Match>
-  <Match>
-    <Bug pattern="SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR" />
-    <Class name="~edu.wpi.first.math.geometry.Coordinate\w+" />
-  </Match>
 </FindBugsFilter>
