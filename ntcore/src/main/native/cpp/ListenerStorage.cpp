@@ -50,8 +50,7 @@ void ListenerStorage::Thread::Main() {
 }
 
 bool ListenerStorage::Thread::Shutdown() {
-  if (m_active && !m_shutdown) {
-    m_shutdown = true;
+  if (m_active && !m_shutdown.exchange(true)) {
     return !m_inCallback;
   }
   return true;
