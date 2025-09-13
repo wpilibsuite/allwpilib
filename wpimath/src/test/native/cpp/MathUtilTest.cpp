@@ -186,90 +186,90 @@ TEST(MathUtilTest, CopySignPowWithUnits) {
           .value());
 }
 
-TEST(MathUtilTest, CopySignPow2d) {
+TEST(MathUtilTest, CopyDirectionPow2d) {
   EXPECT_EQ((Eigen::Vector2d{{0.5}, {0.0}}),
-            frc::CopySignPow(Eigen::Vector2d{{0.5}, {0.0}}, 1.0));
+            frc::CopyDirectionPow(Eigen::Vector2d{{0.5}, {0.0}}, 1.0));
   EXPECT_EQ((Eigen::Vector2d{{-0.5}, {0.0}}),
-            frc::CopySignPow(Eigen::Vector2d{{-0.5}, {0.0}}, 1.0));
+            frc::CopyDirectionPow(Eigen::Vector2d{{-0.5}, {0.0}}, 1.0));
 
   EXPECT_EQ((Eigen::Vector2d{{0.25}, {0.0}}),
-            frc::CopySignPow(Eigen::Vector2d{{0.5}, {0.0}}, 2.0));
+            frc::CopyDirectionPow(Eigen::Vector2d{{0.5}, {0.0}}, 2.0));
   EXPECT_EQ((Eigen::Vector2d{{-0.25}, {0.0}}),
-            frc::CopySignPow(Eigen::Vector2d{{-0.5}, {0.0}}, 2.0));
+            frc::CopyDirectionPow(Eigen::Vector2d{{-0.5}, {0.0}}, 2.0));
 
   EXPECT_EQ((Eigen::Vector2d{{std::sqrt(0.5)}, {0.0}}),
-            frc::CopySignPow(Eigen::Vector2d{{0.5}, {0.0}}, 0.5));
+            frc::CopyDirectionPow(Eigen::Vector2d{{0.5}, {0.0}}, 0.5));
   EXPECT_EQ((Eigen::Vector2d{{-std::sqrt(0.5)}, {0.0}}),
-            frc::CopySignPow(Eigen::Vector2d{{-0.5}, {0.0}}, 0.5));
+            frc::CopyDirectionPow(Eigen::Vector2d{{-0.5}, {0.0}}, 0.5));
 
   EXPECT_EQ((Eigen::Vector2d{{0.0}, {0.0}}),
-            frc::CopySignPow(Eigen::Vector2d{{0.0}, {0.0}}, 2.0));
+            frc::CopyDirectionPow(Eigen::Vector2d{{0.0}, {0.0}}, 2.0));
 
   EXPECT_EQ((Eigen::Vector2d{{1.0}, {0.0}}),
-            frc::CopySignPow(Eigen::Vector2d{{1.0}, {0.0}}, 2.0));
+            frc::CopyDirectionPow(Eigen::Vector2d{{1.0}, {0.0}}, 2.0));
   EXPECT_EQ((Eigen::Vector2d{{-1.0}, {0.0}}),
-            frc::CopySignPow(Eigen::Vector2d{{-1.0}, {0.0}}, 2.0));
+            frc::CopyDirectionPow(Eigen::Vector2d{{-1.0}, {0.0}}, 2.0));
   EXPECT_EQ((Eigen::Vector2d{{0.0}, {1.0}}),
-            frc::CopySignPow(Eigen::Vector2d{{0.0}, {1.0}}, 2.0));
+            frc::CopyDirectionPow(Eigen::Vector2d{{0.0}, {1.0}}, 2.0));
   EXPECT_EQ((Eigen::Vector2d{{0.0}, {-1.0}}),
-            frc::CopySignPow(Eigen::Vector2d{{0.0}, {-1.0}}, 2.0));
+            frc::CopyDirectionPow(Eigen::Vector2d{{0.0}, {-1.0}}, 2.0));
 
   EXPECT_EQ((Eigen::Vector2d{{0.0}, {std::pow(0.8, 0.3)}}),
-            frc::CopySignPow(Eigen::Vector2d{{0.0}, {0.8}}, 0.3));
+            frc::CopyDirectionPow(Eigen::Vector2d{{0.0}, {0.8}}, 0.3));
   EXPECT_EQ((Eigen::Vector2d{{0.0}, {-std::pow(0.8, 0.3)}}),
-            frc::CopySignPow(Eigen::Vector2d{{0.0}, {-0.8}}, 0.3));
+            frc::CopyDirectionPow(Eigen::Vector2d{{0.0}, {-0.8}}, 0.3));
 }
 
-TEST(MathUtilTest, CopySignPow2dMaxDistance) {
+TEST(MathUtilTest, CopyDirectionPow2dMaxDistance) {
   EXPECT_EQ((Eigen::Vector2d{{5.0}, {0.0}}),
-            frc::CopySignPow(Eigen::Vector2d{{5.0}, {0.0}}, 1.0, 10.0));
+            frc::CopyDirectionPow(Eigen::Vector2d{{5.0}, {0.0}}, 1.0, 10.0));
   EXPECT_EQ((Eigen::Vector2d{{-5.0}, {0.0}}),
-            frc::CopySignPow(Eigen::Vector2d{{-5.0}, {0.0}}, 1.0, 10.0));
+            frc::CopyDirectionPow(Eigen::Vector2d{{-5.0}, {0.0}}, 1.0, 10.0));
 
   EXPECT_EQ((Eigen::Vector2d{{2.5}, {0.0}}),
-            frc::CopySignPow(Eigen::Vector2d{{5.0}, {0.0}}, 2.0, 10.0));
+            frc::CopyDirectionPow(Eigen::Vector2d{{5.0}, {0.0}}, 2.0, 10.0));
   EXPECT_EQ((Eigen::Vector2d{{-2.5}, {0.0}}),
-            frc::CopySignPow(Eigen::Vector2d{{-5.0}, {0.0}}, 2.0, 10.0));
+            frc::CopyDirectionPow(Eigen::Vector2d{{-5.0}, {0.0}}, 2.0, 10.0));
 
   EXPECT_EQ((Eigen::Vector2d{{std::sqrt(0.5) * 10.0}, {0.0}}),
-            frc::CopySignPow(Eigen::Vector2d{{5.0}, {0.0}}, 0.5, 10.0));
+            frc::CopyDirectionPow(Eigen::Vector2d{{5.0}, {0.0}}, 0.5, 10.0));
   EXPECT_EQ((Eigen::Vector2d{{-std::sqrt(0.5) * 10.0}, {0.0}}),
-            frc::CopySignPow(Eigen::Vector2d{{-5.0}, {0.0}}, 0.5, 10.0));
+            frc::CopyDirectionPow(Eigen::Vector2d{{-5.0}, {0.0}}, 0.5, 10.0));
 
   EXPECT_EQ((Eigen::Vector2d{{0.0}, {0.0}}),
-            frc::CopySignPow(Eigen::Vector2d{{0.0}, {0.0}}, 2.0, 5.0));
+            frc::CopyDirectionPow(Eigen::Vector2d{{0.0}, {0.0}}, 2.0, 5.0));
   EXPECT_EQ((Eigen::Vector2d{{5.0}, {0.0}}),
-            frc::CopySignPow(Eigen::Vector2d{{5.0}, {0.0}}, 2.0, 5.0));
+            frc::CopyDirectionPow(Eigen::Vector2d{{5.0}, {0.0}}, 2.0, 5.0));
   EXPECT_EQ((Eigen::Vector2d{{-5.0}, {0.0}}),
-            frc::CopySignPow(Eigen::Vector2d{{-5.0}, {0.0}}, 2.0, 5.0));
+            frc::CopyDirectionPow(Eigen::Vector2d{{-5.0}, {0.0}}, 2.0, 5.0));
 
   EXPECT_EQ((Eigen::Vector2d{{0.0}, {std::pow(0.8, 0.3) * 100.0}}),
-            frc::CopySignPow(Eigen::Vector2d{{0.0}, {80.0}}, 0.3, 100.0));
+            frc::CopyDirectionPow(Eigen::Vector2d{{0.0}, {80.0}}, 0.3, 100.0));
   EXPECT_EQ((Eigen::Vector2d{{0.0}, {-std::pow(0.8, 0.3) * 100.0}}),
-            frc::CopySignPow(Eigen::Vector2d{{0.0}, {-80.0}}, 0.3, 100.0));
+            frc::CopyDirectionPow(Eigen::Vector2d{{0.0}, {-80.0}}, 0.3, 100.0));
 }
 
-TEST(MathUtilTest, CopySignPow2dUnits) {
+TEST(MathUtilTest, CopyDirectionPow2dUnits) {
   EXPECT_EQ(
       (Eigen::Vector<units::meters_per_second_t, 2>(1_mps, 0_mps)),
-      frc::CopySignPow(
+      frc::CopyDirectionPow(
           Eigen::Vector<units::meters_per_second_t, 2>(1_mps, 0_mps), 2.0));
   EXPECT_EQ(
       (Eigen::Vector<units::meters_per_second_t, 2>(-1_mps, 0_mps)),
-      frc::CopySignPow(
+      frc::CopyDirectionPow(
           Eigen::Vector<units::meters_per_second_t, 2>(-1_mps, 0_mps), 2.0));
 
   EXPECT_EQ((Eigen::Vector<units::meters_per_second_t, 2>(0_mps, 0_mps)),
-            frc::CopySignPow(
+            frc::CopyDirectionPow(
                 Eigen::Vector<units::meters_per_second_t, 2>(0_mps, 0_mps), 2.0,
                 5_mps));
 
   EXPECT_EQ((Eigen::Vector<units::meters_per_second_t, 2>(5_mps, 0_mps)),
-            frc::CopySignPow(
+            frc::CopyDirectionPow(
                 Eigen::Vector<units::meters_per_second_t, 2>(5_mps, 0_mps), 2.0,
                 5_mps));
   EXPECT_EQ((Eigen::Vector<units::meters_per_second_t, 2>(-5_mps, 0_mps)),
-            frc::CopySignPow(
+            frc::CopyDirectionPow(
                 Eigen::Vector<units::meters_per_second_t, 2>(-5_mps, 0_mps),
                 2.0, 5_mps));
 }

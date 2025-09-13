@@ -176,7 +176,7 @@ constexpr T CopySignPow(T value, double exponent, T maxMagnitude = T{1.0}) {
  */
 template <typename T, int N>
   requires std::is_arithmetic_v<T> || units::traits::is_unit_t_v<T>
-Eigen::Vector<T, N> CopySignPow(const Eigen::Vector<T, N>& value,
+Eigen::Vector<T, N> CopyDirectionPow(const Eigen::Vector<T, N>& value,
                                 double exponent, T maxMagnitude = T{1.0}) {
   if constexpr (std::is_arithmetic_v<T>) {
     if (value.norm() < T{1e-9}) {
@@ -187,7 +187,7 @@ Eigen::Vector<T, N> CopySignPow(const Eigen::Vector<T, N>& value,
   } else {
     Eigen::Vector<double, N> doubleValue = value.template cast<double>();
     Eigen::Vector<double, N> processedDoubleValue =
-        CopySignPow(doubleValue, exponent, maxMagnitude.value());
+        CopyDirectionPow(doubleValue, exponent, maxMagnitude.value());
     return processedDoubleValue.template cast<T>();
   }
 }

@@ -165,64 +165,64 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
   }
 
   @Test
-  void testCopySignPow2d() {
-    assertEquals(VecBuilder.fill(0.5, 0.0), MathUtil.copySignPow(VecBuilder.fill(0.5, 0.0), 1.0));
-    assertEquals(VecBuilder.fill(-0.5, 0.0), MathUtil.copySignPow(VecBuilder.fill(-0.5, 0.0), 1.0));
+  void testCopyDirectionPow2d() {
+    assertEquals(VecBuilder.fill(0.5, 0.0), MathUtil.CopyDirectionPow(VecBuilder.fill(0.5, 0.0), 1.0));
+    assertEquals(VecBuilder.fill(-0.5, 0.0), MathUtil.CopyDirectionPow(VecBuilder.fill(-0.5, 0.0), 1.0));
 
-    assertEquals(VecBuilder.fill(0.25, 0.0), MathUtil.copySignPow(VecBuilder.fill(0.5, 0.0), 2.0));
+    assertEquals(VecBuilder.fill(0.25, 0.0), MathUtil.CopyDirectionPow(VecBuilder.fill(0.5, 0.0), 2.0));
     assertEquals(
-        VecBuilder.fill(-0.25, 0.0), MathUtil.copySignPow(VecBuilder.fill(-0.5, 0.0), 2.0));
+        VecBuilder.fill(-0.25, 0.0), MathUtil.CopyDirectionPow(VecBuilder.fill(-0.5, 0.0), 2.0));
 
     assertEquals(
-        VecBuilder.fill(Math.sqrt(0.5), 0.0), MathUtil.copySignPow(VecBuilder.fill(0.5, 0.0), 0.5));
+        VecBuilder.fill(Math.sqrt(0.5), 0.0), MathUtil.CopyDirectionPow(VecBuilder.fill(0.5, 0.0), 0.5));
     assertEquals(
         VecBuilder.fill(-Math.sqrt(0.5), 0.0),
-        MathUtil.copySignPow(VecBuilder.fill(-0.5, 0.0), 0.5));
+        MathUtil.CopyDirectionPow(VecBuilder.fill(-0.5, 0.0), 0.5));
 
-    assertEquals(VecBuilder.fill(0.0, 0.0), MathUtil.copySignPow(VecBuilder.fill(0.0, 0.0), 2.0));
-    assertEquals(VecBuilder.fill(1.0, 0.0), MathUtil.copySignPow(VecBuilder.fill(1.0, 0.0), 2.0));
-    assertEquals(VecBuilder.fill(-1.0, 0.0), MathUtil.copySignPow(VecBuilder.fill(-1.0, 0.0), 2.0));
+    assertEquals(VecBuilder.fill(0.0, 0.0), MathUtil.CopyDirectionPow(VecBuilder.fill(0.0, 0.0), 2.0));
+    assertEquals(VecBuilder.fill(1.0, 0.0), MathUtil.CopyDirectionPow(VecBuilder.fill(1.0, 0.0), 2.0));
+    assertEquals(VecBuilder.fill(-1.0, 0.0), MathUtil.CopyDirectionPow(VecBuilder.fill(-1.0, 0.0), 2.0));
 
     assertEquals(
         VecBuilder.fill(0.0, Math.pow(0.8, 0.3)),
-        MathUtil.copySignPow(VecBuilder.fill(0.0, 0.8), 0.3));
+        MathUtil.CopyDirectionPow(VecBuilder.fill(0.0, 0.8), 0.3));
     assertEquals(
         VecBuilder.fill(0.0, -Math.pow(0.8, 0.3)),
-        MathUtil.copySignPow(VecBuilder.fill(0.0, -0.8), 0.3));
+        MathUtil.CopyDirectionPow(VecBuilder.fill(0.0, -0.8), 0.3));
   }
 
   @Test
-  void testCopySignPow2dMaxDistance() {
+  void testCopyDirectionPow2dMaxDistance() {
     assertEquals(
-        VecBuilder.fill(5.0, 0.0), MathUtil.copySignPow(VecBuilder.fill(5.0, 0.0), 1.0, 10.0));
+        VecBuilder.fill(5.0, 0.0), MathUtil.CopyDirectionPow(VecBuilder.fill(5.0, 0.0), 1.0, 10.0));
     assertEquals(
-        VecBuilder.fill(-5.0, 0.0), MathUtil.copySignPow(VecBuilder.fill(-5.0, 0.0), 1.0, 10.0));
+        VecBuilder.fill(-5.0, 0.0), MathUtil.CopyDirectionPow(VecBuilder.fill(-5.0, 0.0), 1.0, 10.0));
 
     assertEquals(
-        VecBuilder.fill(2.5, 0.0), MathUtil.copySignPow(VecBuilder.fill(5.0, 0.0), 2.0, 10.0));
+        VecBuilder.fill(2.5, 0.0), MathUtil.CopyDirectionPow(VecBuilder.fill(5.0, 0.0), 2.0, 10.0));
     assertEquals(
-        VecBuilder.fill(-2.5, 0.0), MathUtil.copySignPow(VecBuilder.fill(-5.0, 0.0), 2.0, 10.0));
+        VecBuilder.fill(-2.5, 0.0), MathUtil.CopyDirectionPow(VecBuilder.fill(-5.0, 0.0), 2.0, 10.0));
 
     assertEquals(
         VecBuilder.fill(Math.sqrt(0.5) * 10, 0.0),
-        MathUtil.copySignPow(VecBuilder.fill(5.0, 0.0), 0.5, 10.0));
+        MathUtil.CopyDirectionPow(VecBuilder.fill(5.0, 0.0), 0.5, 10.0));
     assertEquals(
         VecBuilder.fill(-Math.sqrt(0.5) * 10, 0.0),
-        MathUtil.copySignPow(VecBuilder.fill(-5.0, 0.0), 0.5, 10.0));
+        MathUtil.CopyDirectionPow(VecBuilder.fill(-5.0, 0.0), 0.5, 10.0));
 
     assertEquals(
-        VecBuilder.fill(0.0, 0.0), MathUtil.copySignPow(VecBuilder.fill(0.0, 0.0), 2.0, 5.0));
+        VecBuilder.fill(0.0, 0.0), MathUtil.CopyDirectionPow(VecBuilder.fill(0.0, 0.0), 2.0, 5.0));
     assertEquals(
-        VecBuilder.fill(5.0, 0.0), MathUtil.copySignPow(VecBuilder.fill(5.0, 0.0), 2.0, 5.0));
+        VecBuilder.fill(5.0, 0.0), MathUtil.CopyDirectionPow(VecBuilder.fill(5.0, 0.0), 2.0, 5.0));
     assertEquals(
-        VecBuilder.fill(-5.0, 0.0), MathUtil.copySignPow(VecBuilder.fill(-5.0, 0.0), 2.0, 5.0));
+        VecBuilder.fill(-5.0, 0.0), MathUtil.CopyDirectionPow(VecBuilder.fill(-5.0, 0.0), 2.0, 5.0));
 
     assertEquals(
         VecBuilder.fill(0.0, Math.pow(0.8, 0.3) * 100),
-        MathUtil.copySignPow(VecBuilder.fill(0.0, 80.0), 0.3, 100.0));
+        MathUtil.CopyDirectionPow(VecBuilder.fill(0.0, 80.0), 0.3, 100.0));
     assertEquals(
         VecBuilder.fill(0.0, -Math.pow(0.8, 0.3) * 100),
-        MathUtil.copySignPow(VecBuilder.fill(0.0, -80.0), 0.3, 100.0));
+        MathUtil.CopyDirectionPow(VecBuilder.fill(0.0, -80.0), 0.3, 100.0));
   }
 
   @Test
