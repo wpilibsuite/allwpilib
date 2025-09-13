@@ -191,7 +191,7 @@ public final class MathUtil {
    * @param <R> The number of rows in the vector.
    * @return The transformed value with the same direction and norm scaled to the input range.
    */
-  public static <R extends Num> Vector<R> CopyDirectionPow(
+  public static <R extends Num> Vector<R> copyDirectionPow(
       Vector<R> value, double exponent, double maxMagnitude) {
     if (value.norm() < 1e-9) {
       return value.times(0);
@@ -209,7 +209,7 @@ public final class MathUtil {
    * @return The transformed value with the same direction.
    */
   public static <R extends Num> Vector<R> CopyDirectionPow(Vector<R> value, double exponent) {
-    return CopyDirectionPow(value, exponent, 1);
+    return copyDirectionPow(value, exponent, 1);
   }
 
   /**
