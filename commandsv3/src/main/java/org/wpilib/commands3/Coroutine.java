@@ -154,7 +154,7 @@ public final class Coroutine {
    * @param commands The commands to fork.
    * @throws IllegalStateException if called anywhere other than the coroutine's running command
    */
-  public void forkAll(Collection<Command> commands) {
+  public void fork(Collection<Command> commands) {
     requireMounted();
 
     ConflictDetector.throwIfConflicts(commands);

@@ -71,7 +71,7 @@ public final class ParallelGroup implements Command {
 
   @Override
   public void run(Coroutine coroutine) {
-    coroutine.forkAll(m_optionalCommands);
+    coroutine.fork(m_optionalCommands);
 
     if (m_requiredCommands.isEmpty()) {
       // No required commands - just wait for the first optional command to finish
