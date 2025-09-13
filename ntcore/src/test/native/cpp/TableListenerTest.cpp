@@ -161,7 +161,7 @@ TEST_F(TableListenerTest, DestroyInstanceWhileInCallack) {
   SCOPED_TRACE("[Test thread] Received destroyerThreadReadyEvent");
 
   // Wait long enough to ensure destroyerThread is blocked inside Destroy()
-  std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  std::this_thread::sleep_for(std::chrono::milliseconds(4));
   SCOPED_TRACE("[Test thread] Sending exitListenerEvent");
   wpi::SetEvent(exitListenerEvent);
 
