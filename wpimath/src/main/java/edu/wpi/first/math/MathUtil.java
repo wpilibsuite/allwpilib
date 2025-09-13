@@ -208,7 +208,7 @@ public final class MathUtil {
    * @param <R> The number of rows in the vector.
    * @return The transformed value with the same direction.
    */
-  public static <R extends Num> Vector<R> CopyDirectionPow(Vector<R> value, double exponent) {
+  public static <R extends Num> Vector<R> copyDirectionPow(Vector<R> value, double exponent) {
     return copyDirectionPow(value, exponent, 1);
   }
 
