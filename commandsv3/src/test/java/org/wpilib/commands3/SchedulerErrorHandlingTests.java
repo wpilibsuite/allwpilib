@@ -56,8 +56,7 @@ class SchedulerErrorHandlingTests extends CommandTestBase {
                                             .executing(
                                                 c3 -> {
                                                   // Throws IndexOutOfBoundsException
-                                                  var obj = new ArrayList<>(0).get(-1);
-                                                  System.out.println(obj); // not reached
+                                                  var unused = new ArrayList<>(0).get(-1);
                                                 })
                                             .named("Throws IndexOutOfBounds"));
                                 c2.park();
