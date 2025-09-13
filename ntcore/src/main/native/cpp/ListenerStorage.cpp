@@ -34,9 +34,11 @@ void ListenerStorage::Thread::Main() {
         auto callbackIt = m_callbacks.find(event.listener);
         if (callbackIt != m_callbacks.end()) {
           auto callback = callbackIt->second;
+          m_inCallback = true;
           lock.unlock();
           callback(event);
           lock.lock();
+          m_inCallback = false;
         }
       }
     }
@@ -50,9 +52,9 @@ void ListenerStorage::Thread::Main() {
 bool ListenerStorage::Thread::Shutdown() {
   if (m_active && !m_shutdown) {
     m_shutdown = true;
-    return true;
+    return !m_inCallback;
   }
-  return false;
+  return true;
 }
 
 void ListenerStorage::Activate(NT_Listener listenerHandle, unsigned int mask,
@@ -375,9 +377,7 @@ void ListenerStorage::Stop() {
   {
     std::scoped_lock lock{m_mutex};
     if (auto thr = m_thread.GetThread()) {
-      if (!thr->Shutdown()) {
-        // Thread was stopped or shutdown was already initiated;
-        // m_waitQueueWaiter might never be signaled.
+      if (thr->Shutdown()) {
         return;
       }
 
