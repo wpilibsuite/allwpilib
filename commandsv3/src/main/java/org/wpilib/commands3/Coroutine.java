@@ -154,7 +154,7 @@ public final class Coroutine {
    * @param commands The commands to fork.
    * @throws IllegalStateException if called anywhere other than the coroutine's running command
    */
-  public void fork(Collection<Command> commands) {
+  public void fork(Collection<? extends Command> commands) {
     requireMounted();
 
     ConflictDetector.throwIfConflicts(commands);
@@ -206,7 +206,7 @@ public final class Coroutine {
    * @throws IllegalArgumentException if any of the commands conflict with each other
    * @throws IllegalStateException if called anywhere other than the coroutine's running command
    */
-  public void awaitAll(Collection<Command> commands) {
+  public void awaitAll(Collection<? extends Command> commands) {
     requireMounted();
 
     requireNonNullParam(commands, "commands", "Coroutine.awaitAll");
@@ -247,7 +247,7 @@ public final class Coroutine {
    * @throws IllegalArgumentException if any of the commands conflict with each other
    * @throws IllegalStateException if called anywhere other than the coroutine's running command
    */
-  public void awaitAny(Collection<Command> commands) {
+  public void awaitAny(Collection<? extends Command> commands) {
     requireMounted();
 
     requireNonNullParam(commands, "commands", "Coroutine.awaitAny");
