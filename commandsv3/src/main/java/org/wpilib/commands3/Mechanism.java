@@ -69,8 +69,8 @@ public class Mechanism {
    * Sets the default command to run on the mechanism when no other command is scheduled. The
    * default command's priority is effectively the minimum allowable priority for any command
    * requiring a mechanism. For this reason, it's recommended that a default command have a priority
-   * less than{@link Command#DEFAULT_PRIORITY} to prevent it from blocking other, non-default
-   * commands from running.
+   * less than {@link Command#DEFAULT_PRIORITY} so it doesn't prevent low-priority commands from
+   * running.
    *
    * <p>The default command is initially an idle command that only owns the mechanism without doing
    * anything. This command has the lowest possible priority to allow any other command to run.
