@@ -8,7 +8,6 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDevice.Direction;
 import edu.wpi.first.hal.SimDouble;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -81,7 +80,7 @@ public class Servo implements Sendable, AutoCloseable {
    * @param value Position from 0.0 to 1.0.
    */
   public void set(double value) {
-    value = MathUtil.clamp(value, 0.0, 1.0);
+    value = Math.clamp(value, 0.0, 1.0);
 
     if (m_simPosition != null) {
       m_simPosition.set(value);

@@ -39,7 +39,7 @@ class QuinticHermiteSplineTest {
       var p1 = poses.get(i + 1);
 
       // Make sure the twist is under the tolerance defined by the Spline class.
-      var twist = p0.pose.log(p1.pose);
+      var twist = p1.pose.minus(p0.pose).log();
       assertAll(
           () -> assertTrue(Math.abs(twist.dx) < kMaxDx),
           () -> assertTrue(Math.abs(twist.dy) < kMaxDy),
@@ -48,20 +48,22 @@ class QuinticHermiteSplineTest {
 
     // Check first point
     assertAll(
-        () -> assertEquals(a.getX(), poses.get(0).pose.getX(), 1E-9),
-        () -> assertEquals(a.getY(), poses.get(0).pose.getY(), 1E-9),
+        () -> assertEquals(a.getX(), poses.getFirst().pose.getX(), 1E-9),
+        () -> assertEquals(a.getY(), poses.getFirst().pose.getY(), 1E-9),
         () ->
             assertEquals(
-                a.getRotation().getRadians(), poses.get(0).pose.getRotation().getRadians(), 1E-9));
+                a.getRotation().getRadians(),
+                poses.getFirst().pose.getRotation().getRadians(),
+                1E-9));
 
     // Check last point
     assertAll(
-        () -> assertEquals(b.getX(), poses.get(poses.size() - 1).pose.getX(), 1E-9),
-        () -> assertEquals(b.getY(), poses.get(poses.size() - 1).pose.getY(), 1E-9),
+        () -> assertEquals(b.getX(), poses.getLast().pose.getX(), 1E-9),
+        () -> assertEquals(b.getY(), poses.getLast().pose.getY(), 1E-9),
         () ->
             assertEquals(
                 b.getRotation().getRadians(),
-                poses.get(poses.size() - 1).pose.getRotation().getRadians(),
+                poses.getLast().pose.getRotation().getRadians(),
                 1E-9));
   }
 

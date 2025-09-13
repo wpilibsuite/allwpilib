@@ -14,6 +14,7 @@
 namespace frc {
 
 class Pose2d;
+struct Twist2d;
 
 /**
  * Represents a transformation for a Pose2d in the pose's frame.
@@ -110,6 +111,14 @@ class WPILIB_DLLEXPORT Transform2d {
   constexpr const Rotation2d& Rotation() const { return m_rotation; }
 
   /**
+   * Returns a Twist2d of the current transform (pose delta). If b is the output
+   * of {@code a.Log()}, then {@code b.Exp()} would yield a.
+   *
+   * @return The twist that maps the current transform.
+   */
+  constexpr Twist2d Log() const;
+
+  /**
    * Invert the transformation. This is useful for undoing a transformation.
    *
    * @return The inverted transformation.
@@ -163,6 +172,7 @@ class WPILIB_DLLEXPORT Transform2d {
 }  // namespace frc
 
 #include "frc/geometry/Pose2d.h"
+#include "frc/geometry/Twist2d.h"
 
 namespace frc {
 
@@ -178,6 +188,27 @@ constexpr Transform2d::Transform2d(const Pose2d& initial, const Pose2d& final) {
 
 constexpr Transform2d Transform2d::operator+(const Transform2d& other) const {
   return Transform2d{Pose2d{}, Pose2d{}.TransformBy(*this).TransformBy(other)};
+}
+
+constexpr Twist2d Transform2d::Log() const {
+  const auto dtheta = m_rotation.Radians().value();
+  const auto halfDtheta = dtheta / 2.0;
+
+  const auto cosMinusOne = m_rotation.Cos() - 1;
+
+  double halfThetaByTanOfHalfDtheta;
+
+  if (gcem::abs(cosMinusOne) < 1E-9) {
+    halfThetaByTanOfHalfDtheta = 1.0 - 1.0 / 12.0 * dtheta * dtheta;
+  } else {
+    halfThetaByTanOfHalfDtheta = -(halfDtheta * m_rotation.Sin()) / cosMinusOne;
+  }
+
+  const Translation2d translationPart =
+      m_translation.RotateBy({halfThetaByTanOfHalfDtheta, -halfDtheta}) *
+      gcem::hypot(halfThetaByTanOfHalfDtheta, halfDtheta);
+
+  return {translationPart.X(), translationPart.Y(), units::radian_t{dtheta}};
 }
 
 }  // namespace frc

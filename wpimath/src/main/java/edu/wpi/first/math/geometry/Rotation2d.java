@@ -12,7 +12,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.MathSharedStore;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.geometry.proto.Rotation2dProto;
@@ -364,7 +363,7 @@ public class Rotation2d
 
   @Override
   public Rotation2d interpolate(Rotation2d endValue, double t) {
-    return plus(endValue.minus(this).times(MathUtil.clamp(t, 0, 1)));
+    return plus(endValue.minus(this).times(Math.clamp(t, 0, 1)));
   }
 
   /** Rotation2d protobuf for serialization. */

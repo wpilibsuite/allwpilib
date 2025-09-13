@@ -20,6 +20,9 @@ modifiableFileExclude {
 generatedFileExclude {
   src/main/native/thirdparty/
 
+  src/main/python/
+  src/test/python/
+
   src/main/native/include/wpi/fs\.h$
   src/main/native/include/wpi/FastQueue\.h$
   src/main/native/cpp/fs\.cpp$
@@ -42,10 +45,11 @@ repoRootNameOverride {
 }
 
 includeOtherLibs {
+  ^catch2/
   ^fmt/
-  ^google/
   ^gmock/
   ^gtest/
+  ^upb/
 }
 
 includeGuardRoots {

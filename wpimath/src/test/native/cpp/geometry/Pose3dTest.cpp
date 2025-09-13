@@ -170,8 +170,8 @@ TEST(Pose3dTest, ComplexTwists) {
     auto start = initial_poses[i];
     auto end = final_poses[i];
 
-    auto twist = start.Log(end);
-    auto start_exp = start.Exp(twist);
+    auto twist = (end - start).Log();
+    auto start_exp = start + twist.Exp();
 
     auto eps = 1E-5;
 
@@ -211,7 +211,7 @@ TEST(Pose3dTest, TwistNaN) {
   for (size_t i = 0; i < initial_poses.size(); i++) {
     auto start = initial_poses[i];
     auto end = final_poses[i];
-    auto twist = start.Log(end);
+    auto twist = (end - start).Log();
 
     EXPECT_FALSE(std::isnan(twist.dx.value()));
     EXPECT_FALSE(std::isnan(twist.dy.value()));

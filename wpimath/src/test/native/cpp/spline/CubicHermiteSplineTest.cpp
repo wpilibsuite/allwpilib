@@ -42,7 +42,7 @@ class CubicHermiteSplineTest : public ::testing::Test {
       auto& p1 = poses[i + 1];
 
       // Make sure the twist is under the tolerance defined by the Spline class.
-      auto twist = p0.first.Log(p1.first);
+      auto twist = (p1.first - p0.first).Log();
       EXPECT_LT(std::abs(twist.dx.value()),
                 SplineParameterizer::kMaxDx.value());
       EXPECT_LT(std::abs(twist.dy.value()),

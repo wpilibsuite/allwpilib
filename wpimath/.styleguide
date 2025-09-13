@@ -39,7 +39,6 @@ includeOtherLibs {
   ^Eigen/
   ^fmt/
   ^gcem/
-  ^google/
   ^gtest/
   ^unsupported/
   ^wpi/

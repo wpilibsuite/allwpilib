@@ -152,7 +152,7 @@ public final class StateSpaceUtil {
       Matrix<I, N1> u, Matrix<I, N1> umin, Matrix<I, N1> umax) {
     var result = new Matrix<I, N1>(new SimpleMatrix(u.getNumRows(), 1));
     for (int i = 0; i < u.getNumRows(); i++) {
-      result.set(i, 0, MathUtil.clamp(u.get(i, 0), umin.get(i, 0), umax.get(i, 0)));
+      result.set(i, 0, Math.clamp(u.get(i, 0), umin.get(i, 0), umax.get(i, 0)));
     }
     return result;
   }

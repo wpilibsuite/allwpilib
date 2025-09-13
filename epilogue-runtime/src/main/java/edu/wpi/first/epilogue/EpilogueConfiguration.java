@@ -20,7 +20,7 @@ public class EpilogueConfiguration {
   /**
    * The backend implementation for Epilogue to use. By default, this will log data directly to
    * NetworkTables. NetworkTable data can be mirrored to a log file on disk by calling {@code
-   * DataLogManager.start()} in your {@code robotInit} method.
+   * DataLogManager.start()} in your robot class constructor.
    */
   public EpilogueBackend backend = new NTEpilogueBackend(NetworkTableInstance.getDefault());
 
