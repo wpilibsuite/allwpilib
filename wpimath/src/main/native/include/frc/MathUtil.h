@@ -116,10 +116,10 @@ Eigen::Vector<T, N> ApplyDeadband(const Eigen::Vector<T, N>& value, T deadband,
     return value.normalized() *
            ApplyDeadband(value.norm(), deadband, maxMagnitude);
   } else {
-    Eigen::Vector<double, N> doubleValue = value.template cast<double>();
-    Eigen::Vector<double, N> processedDoubleValue =
-        ApplyDeadband(doubleValue, deadband.value(), maxMagnitude.value());
-    return processedDoubleValue.template cast<T>();
+    const Eigen::Vector<double, N> asDouble = value.template cast<double>();
+    const Eigen::Vector<double, N> processed =
+        ApplyDeadband(asDouble, deadband.value(), maxMagnitude.value());
+    return processed.template cast<T>();
   }
 }
 
@@ -185,10 +185,10 @@ Eigen::Vector<T, N> CopyDirectionPow(const Eigen::Vector<T, N>& value,
     return value.normalized() *
            CopySignPow(value.norm(), exponent, maxMagnitude);
   } else {
-    Eigen::Vector<double, N> doubleValue = value.template cast<double>();
-    Eigen::Vector<double, N> processedDoubleValue =
-        CopyDirectionPow(doubleValue, exponent, maxMagnitude.value());
-    return processedDoubleValue.template cast<T>();
+    const Eigen::Vector<double, N> asDouble = value.template cast<double>();
+    const Eigen::Vector<double, N> processed =
+        CopyDirectionPow(asDouble, exponent, maxMagnitude.value());
+    return processed.template cast<T>();
   }
 }
 
