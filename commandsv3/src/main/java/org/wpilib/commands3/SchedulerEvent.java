@@ -67,7 +67,9 @@ public sealed interface SchedulerEvent {
       implements SchedulerEvent {}
 
   /**
-   * An event marking when a command was canceled.
+   * An event marking when a command was canceled. If the command was canceled because it was
+   * interrupted by another command, an {@link Interrupted} will be emitted immediately prior to the
+   * cancellation event.
    *
    * @param command The command that was canceled
    * @param timestampMicros When the command was canceled
