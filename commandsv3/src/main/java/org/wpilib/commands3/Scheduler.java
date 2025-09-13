@@ -150,6 +150,8 @@ public final class Scheduler implements ProtobufSerializable {
    * they were explicitly constructed with a different scheduler instance. Teams should use the
    * default instance for convenience; however, new scheduler instances can be useful for unit
    * tests.
+   *
+   * @return a new scheduler instance that is independent of the default scheduler instance.
    */
   public static Scheduler createIndependentScheduler() {
     return new Scheduler();

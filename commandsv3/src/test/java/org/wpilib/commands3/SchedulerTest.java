@@ -42,7 +42,7 @@ class SchedulerTest extends CommandTestBase {
   }
 
   @Test
-  @SuppressWarnings({"PMD.RedundantFieldInitializer", "PMD.ImmutableField"}) // PMD bugs
+  @SuppressWarnings("PMD.ImmutableField") // PMD bugs
   void atomicity() {
     var mechanism =
         new Mechanism("X", m_scheduler) {
@@ -79,7 +79,7 @@ class SchedulerTest extends CommandTestBase {
   }
 
   @Test
-  @SuppressWarnings({"PMD.RedundantFieldInitializer", "PMD.ImmutableField"}) // PMD bugs
+  @SuppressWarnings("PMD.ImmutableField") // PMD bugs
   void runMechanism() {
     var example =
         new Mechanism("Counting", m_scheduler) {
