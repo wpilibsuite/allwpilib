@@ -115,7 +115,7 @@ class ListenerStorage final : public IListenerStorage {
     // Stops running callbacks.
     //
     // Returns true if successful, or false if the caller should wait for the
-    // queue to empty. Assumes the mutex is already held.
+    // queue to empty.
     bool Shutdown();
 
     NT_ListenerPoller m_poller;
@@ -124,8 +124,8 @@ class ListenerStorage final : public IListenerStorage {
     wpi::Event m_waitQueueWaiter;
 
    private:
-    bool m_shutdown;
-    bool m_inCallback;
+    std::atomic_bool m_shutdown;
+    std::atomic_bool m_inCallback;
   };
   wpi::SafeThreadOwner<Thread> m_thread;
 };
