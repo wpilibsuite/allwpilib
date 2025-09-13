@@ -66,13 +66,12 @@ class ParallelGroupTest extends CommandTestBase {
       assertEquals(5, c1Count.get());
       assertEquals(i, c2Count.get());
     }
-    // one final run() should unschedule the c2 command
+
+    // one final run() should unschedule the c2 command and end the group
+    assertTrue(m_scheduler.isRunning(parallel));
     m_scheduler.run();
     assertFalse(m_scheduler.isRunning(c1));
     assertFalse(m_scheduler.isRunning(c2));
-
-    // the next run should complete the group
-    m_scheduler.run();
     assertFalse(m_scheduler.isRunning(parallel));
 
     // and final counts should be 5 and 10

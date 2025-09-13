@@ -8,14 +8,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 
 class SchedulerErrorHandlingTests extends CommandTestBase {
   @Test
-  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   void errorDetection() {
     var mechanism = new Mechanism("X", m_scheduler);
 
@@ -29,23 +27,17 @@ class SchedulerErrorHandlingTests extends CommandTestBase {
 
     new Trigger(m_scheduler, () -> true).onTrue(command);
 
-    try {
-      m_scheduler.run();
-      fail("An exception should have been thrown");
-    } catch (RuntimeException e) {
-      assertEquals("The exception", e.getMessage());
+    var e = assertThrows(RuntimeException.class, m_scheduler::run);
+    assertEquals("The exception", e.getMessage());
 
-      assertEquals(
-          "org.wpilib.commands3.SchedulerErrorHandlingTests", e.getStackTrace()[0].getClassName());
-      assertEquals("lambda$errorDetection$0", e.getStackTrace()[0].getMethodName());
+    assertEquals(
+        "org.wpilib.commands3.SchedulerErrorHandlingTests", e.getStackTrace()[0].getClassName());
+    assertEquals("lambda$errorDetection$0", e.getStackTrace()[0].getMethodName());
 
-      assertEquals("=== Command Binding Trace ===", e.getStackTrace()[2].getClassName());
+    assertEquals("=== Command Binding Trace ===", e.getStackTrace()[2].getClassName());
 
-      assertEquals(getClass().getName(), e.getStackTrace()[3].getClassName());
-      assertEquals("errorDetection", e.getStackTrace()[3].getMethodName());
-    } catch (Throwable t) {
-      fail("Expected a RuntimeException to be thrown, but got " + t);
-    }
+    assertEquals(getClass().getName(), e.getStackTrace()[3].getClassName());
+    assertEquals("errorDetection", e.getStackTrace()[3].getMethodName());
   }
 
   @Test
@@ -80,32 +72,26 @@ class SchedulerErrorHandlingTests extends CommandTestBase {
     // The second run will fire the trigger and cause the inner command to run and throw
     m_scheduler.run();
 
-    try {
-      m_scheduler.run();
-      fail("Index OOB exception expected");
-    } catch (IndexOutOfBoundsException e) {
-      StackTraceElement[] stackTrace = e.getStackTrace();
+    var e = assertThrows(IndexOutOfBoundsException.class, m_scheduler::run);
+    StackTraceElement[] stackTrace = e.getStackTrace();
 
-      assertEquals("Index -1 out of bounds for length 0", e.getMessage());
-      int nestedIndex = 0;
-      for (; nestedIndex < stackTrace.length; nestedIndex++) {
-        if (stackTrace[nestedIndex].getClassName().equals(getClass().getName())) {
-          break;
-        }
+    assertEquals("Index -1 out of bounds for length 0", e.getMessage());
+    int nestedIndex = 0;
+    for (; nestedIndex < stackTrace.length; nestedIndex++) {
+      if (stackTrace[nestedIndex].getClassName().equals(getClass().getName())) {
+        break;
       }
-
-      // user code trace for the scheduler run invocation (to `scheduler.run()` in the try block)
-      assertEquals("lambda$nestedErrorDetection$3", stackTrace[nestedIndex].getMethodName());
-      assertEquals("nestedErrorDetection", stackTrace[nestedIndex + 1].getMethodName());
-
-      // user code trace for where the command was scheduled (the `.onTrue()` line)
-      assertEquals("=== Command Binding Trace ===", stackTrace[nestedIndex + 2].getClassName());
-      assertEquals("lambda$nestedErrorDetection$4", stackTrace[nestedIndex + 3].getMethodName());
-      assertEquals("lambda$nestedErrorDetection$5", stackTrace[nestedIndex + 4].getMethodName());
-      assertEquals("nestedErrorDetection", stackTrace[nestedIndex + 5].getMethodName());
-    } catch (Throwable unexpected) {
-      fail("Expected an IndexOutOfBoundsException to have been thrown, but got" + unexpected);
     }
+
+    // user code trace for the scheduler run invocation (to `scheduler.run()` in the try block)
+    assertEquals("lambda$nestedErrorDetection$3", stackTrace[nestedIndex].getMethodName());
+    assertEquals("assertThrows", stackTrace[nestedIndex + 1].getMethodName());
+
+    // user code trace for where the command was scheduled (the `.onTrue()` line)
+    assertEquals("=== Command Binding Trace ===", stackTrace[nestedIndex + 2].getClassName());
+    assertEquals("lambda$nestedErrorDetection$4", stackTrace[nestedIndex + 3].getMethodName());
+    assertEquals("lambda$nestedErrorDetection$5", stackTrace[nestedIndex + 4].getMethodName());
+    assertEquals("nestedErrorDetection", stackTrace[nestedIndex + 5].getMethodName());
   }
 
   @Test

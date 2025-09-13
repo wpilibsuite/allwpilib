@@ -5,8 +5,8 @@
 package org.wpilib.commands3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -59,16 +59,12 @@ class CoroutineTest extends CommandTestBase {
 
     m_scheduler.schedule(yieldInSynchronized);
 
-    try {
-      m_scheduler.run();
-      fail("Monitor pinned exception should have been thrown");
-    } catch (IllegalStateException expected) {
-      assertEquals(
-          "Coroutine.yield() cannot be called inside a synchronized block or method. "
-              + "Consider using a Lock instead of synchronized, "
-              + "or rewrite your code to avoid locks and mutexes altogether.",
-          expected.getMessage());
-    }
+    var error = assertThrows(IllegalStateException.class, m_scheduler::run);
+    assertEquals(
+        "Coroutine.yield() cannot be called inside a synchronized block or method. "
+            + "Consider using a Lock instead of synchronized, "
+            + "or rewrite your code to avoid locks and mutexes altogether.",
+        error.getMessage());
   }
 
   @Test
@@ -112,13 +108,8 @@ class CoroutineTest extends CommandTestBase {
     m_scheduler.schedule(badCommand);
     m_scheduler.run();
 
-    try {
-      escapeeCallback.get().run();
-      fail("Calling coroutine.yield() outside of a command should error");
-    } catch (IllegalStateException expected) {
-      assertEquals(
-          "Coroutines can only be used by the command bound to them", expected.getMessage());
-    }
+    var error = assertThrows(IllegalStateException.class, escapeeCallback.get()::run);
+    assertEquals("Coroutines can only be used by the command bound to them", error.getMessage());
   }
 
   @Test
@@ -138,13 +129,8 @@ class CoroutineTest extends CommandTestBase {
             .named("Parent");
 
     m_scheduler.schedule(parent);
-    try {
-      m_scheduler.run();
-      fail("Calling parentCoroutine.yield() in a child command should error");
-    } catch (IllegalStateException expected) {
-      assertEquals(
-          "Coroutines can only be used by the command bound to them", expected.getMessage());
-    }
+    var error = assertThrows(IllegalStateException.class, m_scheduler::run);
+    assertEquals("Coroutines can only be used by the command bound to them", error.getMessage());
   }
 
   @Test
