@@ -9,7 +9,6 @@ import static java.util.Objects.requireNonNull;
 /** Represents the state of a command as it is executed by the scheduler. */
 final class CommandState {
   // Two billion unique IDs should be enough for anybody.
-  @SuppressWarnings("PMD.RedundantFieldInitializer") // we're explicitly counting up from zero
   private static int s_lastId = 0;
 
   private final Command m_command;
