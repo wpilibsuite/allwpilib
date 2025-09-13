@@ -155,24 +155,7 @@ public final class Coroutine {
    * @throws IllegalStateException if called anywhere other than the coroutine's running command
    */
   public void fork(Collection<? extends Command> commands) {
-    requireMounted();
-
-    ConflictDetector.throwIfConflicts(commands);
-
-    requireNonNullParam(commands, "commands", "Coroutine.fork");
-    int i = 0;
-    for (Command command : commands) {
-      requireNonNullParam(command, "commands[" + i + "]", "Coroutine.fork");
-      i++;
-    }
-
-    // Check for user error; there's no reason to fork conflicting commands simultaneously
-    ConflictDetector.throwIfConflicts(commands);
-
-    // Shorthand; this is handy for user-defined compositions
-    for (var command : commands) {
-      m_scheduler.schedule(command);
-    }
+    fork(commands.toArray(Command[]::new));
   }
 
   /**
