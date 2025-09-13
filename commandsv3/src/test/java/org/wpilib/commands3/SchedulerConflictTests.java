@@ -14,8 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("checkstyle:TypeName")
-class SchedulerTest_Conflicts extends CommandTestBase {
+class SchedulerConflictTests extends CommandTestBase {
   @Test
   void compositionsCannotAwaitConflictingCommands() {
     var mech = new Mechanism("The Mechanism", m_scheduler);

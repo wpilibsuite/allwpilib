@@ -8,8 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("checkstyle:TypeName")
-class SchedulerTest_Telemetry extends CommandTestBase {
+class SchedulerTelemetryTests extends CommandTestBase {
   @Test
   void protobuf() {
     var mech = new Mechanism("The mechanism", m_scheduler);

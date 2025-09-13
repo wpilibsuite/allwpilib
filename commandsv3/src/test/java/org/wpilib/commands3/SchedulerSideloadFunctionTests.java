@@ -13,8 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("checkstyle:TypeName")
-class SchedulerTest_Sideloads extends CommandTestBase {
+class SchedulerSideloadFunctionTests extends CommandTestBase {
   @Test
   void sideloadThrowingException() {
     m_scheduler.sideload(

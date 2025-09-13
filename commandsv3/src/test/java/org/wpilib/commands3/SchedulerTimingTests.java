@@ -18,8 +18,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("checkstyle:TypeName")
-class SchedulerTest_Timing extends CommandTestBase {
+class SchedulerTimingTests extends CommandTestBase {
   @Test
   void commandAwaitingItself() {
     // This command deadlocks on itself. It's calling yield() in an infinite loop, which is

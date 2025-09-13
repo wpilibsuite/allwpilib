@@ -18,8 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("checkstyle:TypeName")
-class SchedulerTest_Cancellation extends CommandTestBase {
+class SchedulerCancellationTests extends CommandTestBase {
   @Test
   void cancelOnInterruptDoesNotResume() {
     var count = new AtomicInteger(0);

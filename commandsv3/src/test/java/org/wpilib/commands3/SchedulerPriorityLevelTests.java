@@ -10,8 +10,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("checkstyle:TypeName")
-class SchedulerTest_Priorities extends CommandTestBase {
+class SchedulerPriorityLevelTests extends CommandTestBase {
   @Test
   void higherPriorityCancels() {
     final var subsystem = new Mechanism("Subsystem", m_scheduler);

@@ -13,8 +13,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("checkstyle:TypeName")
-class SchedulerTest_Errors extends CommandTestBase {
+class SchedulerErrorHandlingTests extends CommandTestBase {
   @Test
   @SuppressWarnings("PMD.AvoidCatchingGenericException")
   void errorDetection() {
@@ -37,7 +36,7 @@ class SchedulerTest_Errors extends CommandTestBase {
       assertEquals("The exception", e.getMessage());
 
       assertEquals(
-          "org.wpilib.commands3.SchedulerTest_Errors", e.getStackTrace()[0].getClassName());
+          "org.wpilib.commands3.SchedulerErrorHandlingTests", e.getStackTrace()[0].getClassName());
       assertEquals("lambda$errorDetection$0", e.getStackTrace()[0].getMethodName());
 
       assertEquals("=== Command Binding Trace ===", e.getStackTrace()[2].getClassName());
