@@ -6,7 +6,9 @@ package org.wpilib.commands3.proto;
 
 import edu.wpi.first.util.protobuf.Protobuf;
 import org.wpilib.commands3.Command;
+import org.wpilib.commands3.Mechanism;
 import org.wpilib.commands3.Scheduler;
+import org.wpilib.commands3.proto.ProtobufCommands.ProtobufCommand;
 import us.hebi.quickbuf.Descriptors;
 
 /** Protobuf serde for running commands. */
@@ -40,6 +42,8 @@ public class CommandProto implements Protobuf<Command, ProtobufCommand> {
 
   @Override
   public void pack(ProtobufCommand msg, Command command) {
+    msg.clear();
+
     msg.setId(m_scheduler.runId(command));
     Command parent = m_scheduler.getParentOf(command);
     if (parent != null) {
@@ -48,12 +52,10 @@ public class CommandProto implements Protobuf<Command, ProtobufCommand> {
     msg.setName(command.name());
     msg.setPriority(command.priority());
 
-    for (var requirement : command.requirements()) {
-      var rrp = new MechanismProto();
-      ProtobufMechanism requirementMessage = rrp.createMessage();
-      rrp.pack(requirementMessage, requirement);
-      msg.addRequirements(requirementMessage);
-    }
+    Protobuf.packArray(
+        msg.getMutableRequirements(),
+        command.requirements().toArray(new Mechanism[0]),
+        new MechanismProto());
 
     if (m_scheduler.isRunning(command)) {
       msg.setLastTimeMs(m_scheduler.lastCommandRuntimeMs(command));

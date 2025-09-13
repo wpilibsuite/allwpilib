@@ -36,11 +36,13 @@ class SchedulerTest_Telemetry extends CommandTestBase {
           "queuedCommands": [{
             "priority": 0,
             "id": %s,
-            "name": "Command 1"
+            "name": "Command 1",
+            "requirements": []
           }, {
             "priority": 0,
             "id": %s,
-            "name": "Command 2"
+            "name": "Command 2",
+            "requirements": []
           }],
           "runningCommands": [{
             "lastTimeMs": %s,

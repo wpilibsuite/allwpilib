@@ -5,7 +5,9 @@
 package org.wpilib.commands3.proto;
 
 import edu.wpi.first.util.protobuf.Protobuf;
+import org.wpilib.commands3.Command;
 import org.wpilib.commands3.Scheduler;
+import org.wpilib.commands3.proto.ProtobufCommands.ProtobufScheduler;
 import us.hebi.quickbuf.Descriptors;
 
 /**
@@ -37,19 +39,19 @@ public class SchedulerProto implements Protobuf<Scheduler, ProtobufScheduler> {
 
   @Override
   public void pack(ProtobufScheduler msg, Scheduler scheduler) {
-    var cp = new CommandProto(scheduler);
+    msg.clear();
 
-    for (var command : scheduler.getQueuedCommands()) {
-      ProtobufCommand commandMessage = cp.createMessage();
-      cp.pack(commandMessage, command);
-      msg.addQueuedCommands(commandMessage);
-    }
+    var commandProto = new CommandProto(scheduler);
 
-    for (var command : scheduler.getRunningCommands()) {
-      ProtobufCommand commandMessage = cp.createMessage();
-      cp.pack(commandMessage, command);
-      msg.addRunningCommands(commandMessage);
-    }
+    Protobuf.packArray(
+        msg.getMutableQueuedCommands(),
+        scheduler.getQueuedCommands().toArray(new Command[0]),
+        commandProto);
+
+    Protobuf.packArray(
+        msg.getMutableRunningCommands(),
+        scheduler.getRunningCommands().toArray(new Command[0]),
+        commandProto);
 
     msg.setLastTimeMs(scheduler.lastRuntimeMs());
   }

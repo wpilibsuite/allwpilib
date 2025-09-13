@@ -6,6 +6,7 @@ package org.wpilib.commands3.proto;
 
 import edu.wpi.first.util.protobuf.Protobuf;
 import org.wpilib.commands3.Mechanism;
+import org.wpilib.commands3.proto.ProtobufCommands.ProtobufMechanism;
 import us.hebi.quickbuf.Descriptors;
 
 public class MechanismProto implements Protobuf<Mechanism, ProtobufMechanism> {
@@ -31,6 +32,7 @@ public class MechanismProto implements Protobuf<Mechanism, ProtobufMechanism> {
 
   @Override
   public void pack(ProtobufMechanism msg, Mechanism value) {
+    msg.clear();
     msg.setName(value.getName());
   }
 }
