@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.opmode.Teleoperated;
 import edu.wpi.first.wpilibj.opmode.TestOpMode;
 import edu.wpi.first.wpilibj.util.Color;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -229,7 +230,6 @@ public abstract class OpModeRobot extends RobotBase {
   }
 
   /** Provide an alternate "main loop" via startCompetition(). */
-  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   @Override
   public void startCompetition() {
     System.out.println("********** Robot program startup complete **********");
@@ -239,8 +239,7 @@ public abstract class OpModeRobot extends RobotBase {
 
     try {
       // Implement the opmode lifecycle
-      long lastMode = -1;
-      OpMode opMode = null;
+      long lastModeId = -1;
       while (true) {
         // Wait for new data from the driver station
         try {
@@ -251,70 +250,79 @@ public abstract class OpModeRobot extends RobotBase {
         }
 
         // Get the latest control word and opmode
+        boolean prevEnabled = m_word.isEnabled();
         m_word.refresh();
-        long mode = DriverStation.getOpModeId();
+        long modeId = DriverStation.getOpModeId();
 
-        if (mode != lastMode && mode != 0) {
-          // New opmode selected
-          Class<?> cls = m_opModes.get(mode);
+        if (modeId != 0
+            && (modeId != lastModeId
+                || (!prevEnabled && m_word.isEnabled() && m_activeOpMode.get() == null))) {
+          // New opmode selected, or re-enabled after running once
+
+          OpMode opMode = m_activeOpMode.getAndSet(null);
+          if (opMode != null) {
+            // Close the previous opmode
+            opMode.opmodeClose();
+          }
+
+          Class<?> cls = m_opModes.get(modeId);
           if (cls == null) {
-            DriverStation.reportError("No OpMode found for mode " + mode, false);
+            DriverStation.reportError("No OpMode found for mode " + modeId, false);
             continue;
           }
 
           // Instantiate the opmode
           System.out.println("********** Starting OpMode " + cls.getSimpleName() + " **********");
+          Constructor<?> constructor;
+          boolean hasThis;
           try {
+            constructor = cls.getConstructor(getClass());
+            hasThis = true;
+          } catch (NoSuchMethodException e) {
             try {
-              opMode = (OpMode) cls.getConstructor(getClass()).newInstance(this);
-            } catch (NoSuchMethodException e) {
-              opMode = (OpMode) cls.getConstructor().newInstance();
+              constructor = cls.getConstructor();
+            } catch (NoSuchMethodException e2) {
+              DriverStation.reportError(
+                  "Could not instantiate OpMode " + cls.getSimpleName(), e2.getStackTrace());
+              continue;
+            }
+            hasThis = false;
+          }
+          try {
+            if (hasThis) {
+              opMode = (OpMode) constructor.newInstance(this);
+            } else {
+              opMode = (OpMode) constructor.newInstance();
             }
           } catch (ReflectiveOperationException e) {
             DriverStation.reportError(
                 "Could not instantiate OpMode " + cls.getSimpleName(), e.getStackTrace());
-            opMode = null;
             continue;
           }
           m_activeOpMode.set(opMode);
-          if (lastMode == -1) {
+          if (lastModeId == -1) {
             // Tell the DS that the robot is ready
             DriverStationJNI.observeUserProgramStarting();
           }
-          lastMode = mode;
+          lastModeId = modeId;
         }
 
+        OpMode opMode = m_activeOpMode.get();
         if (opMode == null) {
           continue;
         }
 
+        DriverStationJNI.observeUserProgramOpMode(modeId, m_word.isEnabled());
         if (m_word.isEnabled()) {
           // When enabled, call the opmode run function, then close and clear
-          try {
-            opMode.opmodeRun();
-          } catch (Exception e) {
-            DriverStation.reportError(
-                "Exception in OpMode.loop() for " + opMode.getClass().getSimpleName(),
-                e.getStackTrace());
+          opMode.opmodeRun(lastModeId);
+          opMode = m_activeOpMode.getAndSet(null);
+          if (opMode != null) {
+            opMode.opmodeClose();
           }
-          try {
-            opMode.close();
-          } catch (Exception ex) {
-            DriverStation.reportError(
-                "Exception in OpMode.stop() for " + opMode.getClass().getSimpleName(),
-                ex.getStackTrace());
-          }
-          opMode = null;
-          m_activeOpMode.set(null);
         } else {
           // When disabled, call the disabledPeriodic function
-          try {
-            opMode.disabledPeriodic();
-          } catch (Exception e) {
-            DriverStation.reportError(
-                "Exception in OpMode.disabledPeriodic() for " + opMode.getClass().getSimpleName(),
-                e.getStackTrace());
-          }
+          opMode.disabledPeriodic();
         }
       }
     } finally {
@@ -324,25 +332,11 @@ public abstract class OpModeRobot extends RobotBase {
   }
 
   /** Ends the main loop in startCompetition(). */
-  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   @Override
   public void endCompetition() {
-    OpMode opMode = m_activeOpMode.get();
+    OpMode opMode = m_activeOpMode.getAndSet(null);
     if (opMode != null) {
-      try {
-        opMode.opmodeStop();
-      } catch (Exception e) {
-        DriverStation.reportError(
-            "Exception in OpMode.opmodeStop() for " + opMode.getClass().getSimpleName(),
-            e.getStackTrace());
-      }
-      try {
-        opMode.close();
-      } catch (Exception e) {
-        DriverStation.reportError(
-            "Exception while closing OpMode " + opMode.getClass().getSimpleName(),
-            e.getStackTrace());
-      }
+      opMode.opmodeStop();
     }
   }
 }

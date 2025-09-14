@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj.opmode;
 
 import static edu.wpi.first.units.Units.Seconds;
 
+import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.NotifierJNI;
 import edu.wpi.first.units.measure.Time;
@@ -85,11 +86,8 @@ public abstract class PeriodicOpMode implements OpMode {
     // this code is called periodically while the opmode is selected on the DS (robot is disabled)
   }
 
-  @Override
   public void close() {
     // this code is called when the opmode is de-selected on the DS
-    NotifierJNI.stopNotifier(m_notifier);
-    NotifierJNI.cleanNotifier(m_notifier);
   }
 
   public void start() {
@@ -173,7 +171,7 @@ public abstract class PeriodicOpMode implements OpMode {
 
   // implements OpMode interface
   @Override
-  public void opmodeRun() {
+  public final void opmodeRun(long opModeId) {
     start();
     while (true) {
       // We don't have to check there's an element in the queue first because
@@ -189,6 +187,8 @@ public abstract class PeriodicOpMode implements OpMode {
       }
 
       m_loopStartTimeUs = RobotController.getFPGATime();
+
+      DriverStationJNI.observeUserProgramOpMode(opModeId, true);
 
       callback.func.run();
 
@@ -217,7 +217,14 @@ public abstract class PeriodicOpMode implements OpMode {
   }
 
   @Override
-  public void opmodeStop() {
+  public final void opmodeStop() {
     NotifierJNI.stopNotifier(m_notifier);
+  }
+
+  @Override
+  public final void opmodeClose() {
+    NotifierJNI.stopNotifier(m_notifier);
+    NotifierJNI.cleanNotifier(m_notifier);
+    close();
   }
 }

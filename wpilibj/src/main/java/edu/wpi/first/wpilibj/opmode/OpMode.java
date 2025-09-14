@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.opmode;
 
-public interface OpMode extends AutoCloseable {
+public interface OpMode {
   /**
    * This function is called periodically while the opmode is selected on the DS (robot is
    * disabled). Code that should only run once when the opmode is selected should go in the opmode
@@ -13,18 +13,21 @@ public interface OpMode extends AutoCloseable {
   default void disabledPeriodic() {}
 
   /**
-   * This function is called when the opmode is no longer selected on the DS. The object will not be
-   * reused after this is called.
+   * This function is called when the opmode starts (robot is enabled).
+   *
+   * @param opModeId opmode unique ID
    */
-  @Override
-  void close();
-
-  /** This function is called when the opmode starts (robot is enabled). */
-  void opmodeRun();
+  void opmodeRun(long opModeId);
 
   /**
    * This function is called asynchronously when the robot is disabled, to request the opmode return
    * from opmodeRun().
    */
   void opmodeStop();
+
+  /**
+   * This function is called when the opmode is no longer selected on the DS or after opmodeRun()
+   * returns. The object will not be reused after this is called.
+   */
+  void opmodeClose();
 }

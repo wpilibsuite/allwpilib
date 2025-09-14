@@ -191,11 +191,9 @@ User implementations of opmode classes may have either a no-parameter constructo
 The library will use escalating steps to attempt to terminate a opmode if `opmodeRun()` does not return within a reasonable timeframe after `opmodeStop()` is called, up to and including termination of the robot executable process (which will result in an automatic restart of it at the system level).
 
 ```java
-public interface OpMode extends AutoCloseable {
+public interface OpMode {
   // this function is called periodically while the opmode is selected on the DS (robot is disabled)
   void disabledPeriodic();
-
-  // void close(); // inherited from AutoCloseable
 
   // this function is called when the opmode starts (robot is enabled)
   void opmodeRun();
@@ -203,6 +201,10 @@ public interface OpMode extends AutoCloseable {
   // this function is called asynchronously when the robot is disabled,
   // to request the opmode return from opmodeRun()
   void opmodeStop();
+
+  // this function is called when the opmode is de-selected on the DS or after
+  // opmodeRun() returns
+  void opmodeClose();
 }
 ```
 
@@ -234,15 +236,20 @@ public abstract class LinearOpMode implements OpMode {
 
   // implements OpMode interface
   @Override
-  public void opmodeRun() {
+  public final void opmodeRun() {
     start();
     run();
     end();
   }
 
   @Override
-  public void opmodeEnd() {
+  public final void opmodeEnd() {
     // tries various things to "encourage" the run() function to return
+  }
+
+  @Override
+  public final void opmodeClose() {
+    close();
   }
 }
 ```
@@ -286,7 +293,7 @@ public abstract class PeriodicOpMode implements OpMode {
 
   // implements OpMode interface
   @Override
-  public void opmodeRun() {
+  public final void opmodeRun() {
     // psuedo-code
     start();
     while (isRunning) {
@@ -298,9 +305,14 @@ public abstract class PeriodicOpMode implements OpMode {
   }
 
   @Override
-  public void opmodeStop() {
+  public final void opmodeStop() {
     // pseudo-code
     isRunning = false;
+  }
+
+  @Override
+  public final void opmodeClose() {
+    close();
   }
 }
 ```
