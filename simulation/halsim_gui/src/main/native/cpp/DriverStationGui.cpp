@@ -1222,13 +1222,15 @@ static void DriverStationExecute() {
       }
     }
     // Enable/Disable
-    if (ImGui::Selectable("Disable", isAttached && !isEnabled,
-                          isAttached ? 0 : ImGuiSelectableFlags_Disabled) ||
+    if (ImGui::Selectable(
+            "Disable", isAttached && !isEnabled && opMode != 0,
+            isAttached && opMode != 0 ? 0 : ImGuiSelectableFlags_Disabled) ||
         disableHotkey) {
       DriverStationSetEnabled(false);
     }
-    if (ImGui::Selectable("Enable", isAttached && isEnabled,
-                          isAttached ? 0 : ImGuiSelectableFlags_Disabled) ||
+    if (ImGui::Selectable(
+            "Enable", isAttached && isEnabled && opMode != 0,
+            isAttached && opMode != 0 ? 0 : ImGuiSelectableFlags_Disabled) ||
         enableHotkey) {
       DriverStationSetEnabled(true);
     }

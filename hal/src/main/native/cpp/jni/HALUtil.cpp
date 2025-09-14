@@ -243,12 +243,12 @@ HAL_OpModeOption CreateOpModeOptionFromJava(JNIEnv* env, jobject option) {
       env, static_cast<jstring>(env->GetObjectField(option, groupField))};
   JLocal<jstring> description{
       env, static_cast<jstring>(env->GetObjectField(option, descriptionField))};
-  jint textColor = env->GetIntField(option, textColorField);
-  jint backgroundColor = env->GetIntField(option, backgroundColorField);
+  int32_t textColor = env->GetIntField(option, textColorField);
+  int32_t backgroundColor = env->GetIntField(option, backgroundColorField);
   return {id,
-          wpi::make_string(JStringRef{env, name}),
-          wpi::make_string(JStringRef{env, group}),
-          wpi::make_string(JStringRef{env, description}),
+          wpi::alloc_wpi_string(JStringRef{env, name}),
+          wpi::alloc_wpi_string(JStringRef{env, group}),
+          wpi::alloc_wpi_string(JStringRef{env, description}),
           textColor,
           backgroundColor};
 }

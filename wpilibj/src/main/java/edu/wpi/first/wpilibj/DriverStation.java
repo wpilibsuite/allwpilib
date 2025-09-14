@@ -1105,8 +1105,8 @@ public final class DriverStation {
       String description,
       Color textColor,
       Color backgroundColor) {
-    if (name.isEmpty()) {
-      throw new IllegalArgumentException("OpMode name must be non-empty");
+    if (name.isBlank()) {
+      throw new IllegalArgumentException("OpMode name must be non-blank");
     }
     // find unique ID
     m_opModesMutex.lock();
@@ -1129,7 +1129,7 @@ public final class DriverStation {
         }
         if (existing.getMode() == mode && existing.name.equals(name)) {
           // already exists
-          throw new IllegalArgumentException("OpMode " + name + " already exists");
+          throw new IllegalArgumentException("OpMode " + name + " already exists for mode " + mode);
         }
         // collision, try again with space appended
         nameCopy += ' ';
@@ -1211,6 +1211,9 @@ public final class DriverStation {
   public static void publishOpModes() {
     m_opModesMutex.lock();
     try {
+      for (OpModeOption o : m_opModes.values()) {
+        System.out.println("Option " + o.name + " ID " + o.id);
+      }
       OpModeOption[] options = new OpModeOption[m_opModes.size()];
       DriverStationJNI.setOpModeOptions(m_opModes.values().toArray(options));
     } finally {
