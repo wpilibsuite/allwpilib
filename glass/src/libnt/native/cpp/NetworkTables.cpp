@@ -416,7 +416,7 @@ static void UpdateProtobufValueSource(NetworkTablesModel& model,
     // Ensure null dereferences don't occur. All other types will just be
     // defaulted to zero or empty.
     bool isEmptyArray =
-        upb_FieldDef_IsRepeated(field) && value.msg_val == nullptr;
+        upb_FieldDef_IsRepeated(field) && !value.array_val;
     // https://protobuf.dev/programming-guides/field_presence/#semantic-differences
     // If the field was marked optional (or it's a submessage, which is always
     // optional), we should display a blank space if the field hasn't been set.
