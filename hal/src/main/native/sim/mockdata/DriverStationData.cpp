@@ -16,6 +16,12 @@
 
 using namespace hal;
 
+static void FreeOpModeOption(HAL_OpModeOption& option) {
+  WPI_FreeString(&option.name);
+  WPI_FreeString(&option.group);
+  WPI_FreeString(&option.description);
+}
+
 namespace hal::init {
 void InitializeDriverStationData() {
   static DriverStationData dsd;
@@ -30,7 +36,9 @@ DriverStationData::DriverStationData() {
 }
 
 DriverStationData::~DriverStationData() {
-  HALSIM_FreeOpModeOptionsArray(m_opModeOptions.data(), m_opModeOptions.size());
+  for (auto&& option : m_opModeOptions) {
+    FreeOpModeOption(option);
+  }
 }
 
 void DriverStationData::ResetData() {
@@ -76,7 +84,9 @@ void DriverStationData::SetOpModeOptions(
     std::span<const HAL_OpModeOption> options) {
   std::scoped_lock lock{m_opModeMutex};
 
-  HALSIM_FreeOpModeOptionsArray(m_opModeOptions.data(), m_opModeOptions.size());
+  for (auto&& option : m_opModeOptions) {
+    FreeOpModeOption(option);
+  }
   m_opModeOptions.clear();
   m_opModeOptions.reserve(options.size());
   for (const auto& option : options) {
