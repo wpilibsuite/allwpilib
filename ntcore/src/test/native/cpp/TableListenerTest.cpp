@@ -76,12 +76,12 @@ TEST_F(TableListenerTest, DestroyInstanceWhileInCallack) {
   std::atomic_bool callbackWokeUp;
   std::atomic_bool callbackSuccessful;
   std::atomic_bool destroyerSuccessful;
-  auto listenerCalledEvent = wpi::CreateEvent();
-  auto listenerDoneEvent = wpi::CreateEvent();
-  auto destroyerThreadStartedEvent = wpi::CreateEvent();
-  auto destroyerThreadReadyEvent = wpi::CreateEvent();
-  auto destroyerThreadDoneEvent = wpi::CreateEvent();
-  auto exitListenerEvent = wpi::CreateEvent();
+  auto listenerCalledEvent = WPI_CreateEvent(false, false);
+  auto listenerDoneEvent = WPI_CreateEvent(false, false);
+  auto destroyerThreadStartedEvent = WPI_CreateEvent(false, false);
+  auto destroyerThreadReadyEvent = WPI_CreateEvent(false, false);
+  auto destroyerThreadDoneEvent = WPI_CreateEvent(false, false);
+  auto exitListenerEvent = WPI_CreateEvent(false, false);
   auto table = m_inst.GetTable("/Preferences");
 
   table->AddListener(
