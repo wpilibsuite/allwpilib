@@ -413,15 +413,19 @@ static void UpdateProtobufValueSource(NetworkTablesModel& model,
     const upb_FieldDef* field = upb_MessageDef_Field(msgDef, fieldNum);
     auto& child = *outIt++;
     auto value = upb_Message_GetFieldByDef(msg, field);
-    // Ensure null dereferences don't occur. All other types will just be
-    // defaulted to zero or empty.
-    bool isEmptyArray =
-        upb_FieldDef_IsRepeated(field) && !value.array_val;
+    // Ensure null dereferences don't occur. Non-repeated types will just be
+    // defaulted to zero or empty. Submessages are always optional and are
+    // covered in the next check.
+    bool isEmptyArray = upb_FieldDef_IsRepeated(field) && !value.array_val;
+    // https://protobuf.dev/programming-guides/proto3/#field-labels
     // https://protobuf.dev/programming-guides/field_presence/#semantic-differences
-    // If the field was marked optional (or it's a submessage, which is always
-    // optional), we should display a blank space if the field hasn't been set.
-    // If it wasn't marked optional, always display the default value. That
-    // should be semantically correct for all of our types.
+    // If the field was marked optional (which means it has explicit presence,
+    // checkable via HasPresence), it differentiates between not being set, and
+    // having a default zero value. If the field hasn't been set (checked via
+    // HasFieldByDef), we should display a blank space to indicate that it
+    // wasn't set, as opposed to displaying the default value. If it wasn't
+    // marked optional, always display the value, which might be the default
+    // value, but that should be semantically correct for all of our types.
     bool isEmptyOptional = upb_FieldDef_HasPresence(field) &&
                            !upb_Message_HasFieldByDef(msg, field);
     if (isEmptyArray || isEmptyOptional) {
