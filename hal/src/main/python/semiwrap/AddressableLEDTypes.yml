@@ -1,0 +1,14 @@
+strip_prefixes:
+- HAL_
+
+classes:
+  HAL_AddressableLEDData:
+    attributes:
+      b:
+      g:
+      r:
+enums:
+  HAL_AddressableLEDColorOrder:
+functions:
+  format_as:
+    ignore: true

@@ -1,0 +1,109 @@
+extra_includes:
+- wpi/sendable/SendableBuilder.h
+- frc/motorcontrol/MotorController.h
+
+classes:
+  frc::DifferentialDrive:
+    ignored_bases:
+    - wpi::SendableHelper<DifferentialDrive>
+    methods:
+      DifferentialDrive:
+        overloads:
+          MotorController&, MotorController&:
+            keepalive:
+            - [1, 2]
+            - [1, 3]
+          std::function<void (double)>, std::function<void (double)>:
+      ArcadeDrive:
+      CurvatureDrive:
+      TankDrive:
+      ArcadeDriveIK:
+      CurvatureDriveIK:
+      TankDriveIK:
+      StopMotor:
+      GetDescription:
+      InitSendable:
+    doc: |
+      A class for driving differential drive/skid-steer drive platforms such as
+      the Kit of Parts drive base, "tank drive", or West Coast Drive.
+
+      These drive bases typically have drop-center / skid-steer with two or more
+      wheels per side (e.g., 6WD or 8WD). This class takes a MotorController per
+      side. For four and six motor drivetrains, construct and pass in
+      :class:`MotorControllerGroup` instances as follows.
+
+      Four motor drivetrain::
+
+        import wpilib.drive
+
+        class Robot(wpilib.TimedRobot):
+            def robotInit(self):
+                self.front_left = wpilib.PWMVictorSPX(1)
+                self.rear_left = wpilib.PWMVictorSPX(2)
+                self.left = wpilib.MotorControllerGroup(self.front_left, self.rear_left)
+
+                self.front_right = wpilib.PWMVictorSPX(3)
+                self.rear_right = wpilib.PWMVictorSPX(4)
+                self.right = wpilib.MotorControllerGroup(self.front_right, self.rear_right)
+
+                self.drive = wpilib.drive.DifferentialDrive(self.left, self.right)
+
+      Six motor drivetrain::
+
+        import wpilib.drive
+
+        class Robot(wpilib.TimedRobot):
+            def robotInit(self):
+                self.front_left = wpilib.PWMVictorSPX(1)
+                self.mid_left = wpilib.PWMVictorSPX(2)
+                self.rear_left = wpilib.PWMVictorSPX(3)
+                self.left = wpilib.MotorControllerGroup(self.front_left, self.mid_left, self.rear_left)
+
+                self.front_right = wpilib.PWMVictorSPX(4)
+                self.mid_right = wpilib.PWMVictorSPX(5)
+                self.rear_right = wpilib.PWMVictorSPX(6)
+                self.right = wpilib.MotorControllerGroup(self.front_right, self.mid_right, self.rear_right)
+
+                self.drive = wpilib.drive.DifferentialDrive(self.left, self.right)
+
+      A differential drive robot has left and right wheels separated by an
+      arbitrary width.
+
+      Drive base diagram::
+
+        |_______|
+        | |   | |
+          |   |
+        |_|___|_|
+        |       |
+
+      Each Drive() function provides different inverse kinematic relations for a
+      differential drive robot. Motor outputs for the right side are negated, so
+      motor direction inversion by the user is usually unnecessary.
+
+      This library uses the NED axes convention (North-East-Down as external
+      reference in the world frame):
+      http://www.nuclearprojects.com/ins/images/axis_big.png.
+
+      The positive X axis points ahead, the positive Y axis points to the right,
+      and the positive Z axis points down. Rotations follow the right-hand rule,
+      so clockwise rotation around the Z axis is positive.
+
+      Inputs smaller then 0.02 will be set to 0, and larger values will be scaled
+      so that the full range is still used. This deadband value can be changed
+      with SetDeadband().
+
+      RobotDrive porting guide:
+
+      * :meth:`tankDrive` is equivalent to ``RobotDrive.tankDrive``
+        if a deadband of 0 is used.
+      * :meth:`arcadeDrive` is equivalent to ``RobotDrive.arcadeDrive``
+        if a deadband of 0 is used and the the rotation input is inverted,
+        e.g. ``arcadeDrive(y, -rotation, squareInputs=False)``
+      * :meth:`curvatureDrive` is similar in concept to
+        ``RobotDrive.drive`` with the addition of a quick turn
+        mode. However, it is not designed to give exactly the same response.
+  frc::DifferentialDrive::WheelSpeeds:
+    attributes:
+      left:
+      right:

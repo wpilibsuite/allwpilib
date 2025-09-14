@@ -1,0 +1,25 @@
+extra_includes:
+- frc/trajectory/Trajectory.h
+
+classes:
+  frc::FieldObject2d:
+    nodelete: true
+    methods:
+      FieldObject2d:
+        ignore: true
+      SetPose:
+        overloads:
+          const Pose2d&:
+          units::meter_t, units::meter_t, Rotation2d:
+      GetPose:
+      SetPoses:
+        overloads:
+          std::span<const Pose2d>:
+          std::initializer_list<Pose2d>:
+            ignore: true
+      SetTrajectory:
+      GetPoses:
+        overloads:
+          '[const]':
+          wpi::SmallVectorImpl<Pose2d>& [const]:
+            ignore: true

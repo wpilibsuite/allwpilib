@@ -1,0 +1,10 @@
+classes:
+  frc::CubicHermiteSpline:
+    force_no_trampoline: true
+    methods:
+      CubicHermiteSpline:
+      Coefficients:
+        # otherwise we have to depend on numpy
+        ignore: true
+      GetInitialControlVector:
+      GetFinalControlVector:

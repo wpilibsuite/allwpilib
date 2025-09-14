@@ -1,0 +1,30 @@
+extra_includes:
+- networktables/NTSendableBuilder.h
+
+classes:
+  frc::ADXL345_I2C:
+    constants:
+    - frc::ADXL345_I2C::Range::kRange_2G
+    ignored_bases:
+    - wpi::SendableHelper<ADXL345_I2C>
+    enums:
+      Axes:
+      Range:
+    attributes:
+      kAddress:
+    methods:
+      ADXL345_I2C:
+      GetI2CPort:
+      GetI2CDeviceAddress:
+      SetRange:
+      GetX:
+      GetY:
+      GetZ:
+      GetAcceleration:
+      GetAccelerations:
+      InitSendable:
+  frc::ADXL345_I2C::AllAxes:
+    attributes:
+      XAxis:
+      YAxis:
+      ZAxis:

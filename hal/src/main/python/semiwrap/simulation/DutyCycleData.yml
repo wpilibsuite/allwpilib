@@ -1,0 +1,23 @@
+strip_prefixes:
+- HALSIM_
+
+functions:
+  HALSIM_ResetDutyCycleData:
+  HALSIM_RegisterDutyCycleInitializedCallback:
+    ignore: true
+  HALSIM_CancelDutyCycleInitializedCallback:
+  HALSIM_GetDutyCycleInitialized:
+  HALSIM_SetDutyCycleInitialized:
+  HALSIM_GetDutyCycleSimDevice:
+  HALSIM_RegisterDutyCycleOutputCallback:
+    ignore: true
+  HALSIM_CancelDutyCycleOutputCallback:
+  HALSIM_GetDutyCycleOutput:
+  HALSIM_SetDutyCycleOutput:
+  HALSIM_RegisterDutyCycleFrequencyCallback:
+    ignore: true
+  HALSIM_CancelDutyCycleFrequencyCallback:
+  HALSIM_GetDutyCycleFrequency:
+  HALSIM_SetDutyCycleFrequency:
+  HALSIM_RegisterDutyCycleAllCallbacks:
+    ignore: true

@@ -1,0 +1,29 @@
+functions:
+  to_json:
+    ignore: true
+  from_json:
+    ignore: true
+  LoadAprilTagLayoutField:
+    ignore: true
+classes:
+  frc::AprilTagFieldLayout:
+    enums:
+      OriginPosition:
+    methods:
+      AprilTagFieldLayout:
+        overloads:
+          '':
+          std::string_view:
+          std::vector<AprilTag>, units::meter_t, units::meter_t:
+      LoadField:
+      GetFieldLength:
+      GetFieldWidth:
+      GetTags:
+      SetOrigin:
+        overloads:
+          OriginPosition:
+          const Pose3d&:
+      GetOrigin:
+      GetTagPose:
+      Serialize:
+      operator==:

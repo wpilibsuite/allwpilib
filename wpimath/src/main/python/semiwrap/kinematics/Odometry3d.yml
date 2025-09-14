@@ -1,0 +1,53 @@
+extra_includes:
+- frc/kinematics/DifferentialDriveWheelPositions.h
+- frc/kinematics/DifferentialDriveWheelSpeeds.h
+- frc/kinematics/MecanumDriveWheelPositions.h
+- frc/kinematics/MecanumDriveWheelSpeeds.h
+- frc/kinematics/SwerveDriveKinematics.h
+
+classes:
+  frc::Odometry3d:
+    template_params:
+    - WheelSpeeds
+    - WheelPositions
+    methods:
+      Odometry3d:
+      ResetPosition:
+      ResetPose:
+      ResetTranslation:
+      ResetRotation:
+      GetPose:
+      Update:
+
+
+templates:
+  DifferentialDriveOdometry3dBase:
+    qualname: frc::Odometry3d
+    params:
+    - frc::DifferentialDriveWheelSpeeds
+    - frc::DifferentialDriveWheelPositions
+  MecanumDriveOdometry3dBase:
+    qualname: frc::Odometry3d
+    params:
+    - frc::MecanumDriveWheelSpeeds
+    - frc::MecanumDriveWheelPositions
+  SwerveDrive2Odometry3dBase:
+    qualname: frc::Odometry3d
+    params:
+    - wpi::array<frc::SwerveModuleState,2>
+    - wpi::array<frc::SwerveModulePosition,2>
+  SwerveDrive3Odometry3dBase:
+    qualname: frc::Odometry3d
+    params:
+    - wpi::array<frc::SwerveModuleState,3>
+    - wpi::array<frc::SwerveModulePosition,3>
+  SwerveDrive4Odometry3dBase:
+    qualname: frc::Odometry3d
+    params:
+    - wpi::array<frc::SwerveModuleState,4>
+    - wpi::array<frc::SwerveModulePosition,4>
+  SwerveDrive6Odometry3dBase:
+    qualname: frc::Odometry3d
+    params:
+    - wpi::array<frc::SwerveModuleState,6>
+    - wpi::array<frc::SwerveModulePosition,6>

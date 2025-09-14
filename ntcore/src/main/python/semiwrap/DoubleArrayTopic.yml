@@ -1,0 +1,115 @@
+classes:
+  nt::DoubleArraySubscriber:
+    methods:
+      DoubleArraySubscriber:
+        overloads:
+          '':
+            ignore: true
+          NT_Subscriber, ParamType:
+            ignore: true
+      Get:
+        overloads:
+          '[const]':
+          ParamType [const]:
+          wpi::SmallVectorImpl<SmallElemType>& [const]:
+            ignore: true
+          wpi::SmallVectorImpl<SmallElemType>&, ParamType [const]:
+            ignore: true
+      GetAtomic:
+        overloads:
+          '[const]':
+          ParamType [const]:
+          wpi::SmallVectorImpl<SmallElemType>& [const]:
+            ignore: true
+          wpi::SmallVectorImpl<SmallElemType>&, ParamType [const]:
+            ignore: true
+      ReadQueue:
+      GetTopic:
+    inline_code: |
+      .def("close", [](DoubleArraySubscriber *self) {
+        py::gil_scoped_release release;
+        *self = DoubleArraySubscriber();
+      }, py::doc("Destroys the subscriber"))
+      .def("__enter__", [](DoubleArraySubscriber *self) {
+        return self;
+      })
+      .def("__exit__", [](DoubleArraySubscriber *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = DoubleArraySubscriber();
+      })
+  nt::DoubleArrayPublisher:
+    methods:
+      DoubleArrayPublisher:
+        overloads:
+          '':
+            ignore: true
+          NT_Publisher:
+            ignore: true
+      Set:
+      SetDefault:
+      GetTopic:
+    inline_code: |
+      .def("close", [](DoubleArrayPublisher *self) {
+        py::gil_scoped_release release;
+        *self = DoubleArrayPublisher();
+      }, py::doc("Destroys the publisher"))
+      .def("__enter__", [](DoubleArrayPublisher *self) {
+        return self;
+      })
+      .def("__exit__", [](DoubleArrayPublisher *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = DoubleArrayPublisher();
+      })
+  nt::DoubleArrayEntry:
+    methods:
+      DoubleArrayEntry:
+        overloads:
+          '':
+            ignore: true
+          NT_Entry, ParamType:
+            ignore: true
+      GetHandle:
+        ignore: true
+      GetTopic:
+      Unpublish:
+    inline_code: |
+      .def("close", [](DoubleArrayEntry *self) {
+        py::gil_scoped_release release;
+        *self = DoubleArrayEntry();
+      }, py::doc("Destroys the entry"))
+      .def("__enter__", [](DoubleArrayEntry *self) {
+        return self;
+      })
+      .def("__exit__", [](DoubleArrayEntry *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = DoubleArrayEntry();
+      })
+  nt::DoubleArrayTopic:
+    attributes:
+      kTypeString:
+    methods:
+      DoubleArrayTopic:
+        overloads:
+          '':
+            ignore: true
+          NT_Topic:
+            ignore: true
+          Topic:
+      Subscribe:
+      SubscribeEx:
+      Publish:
+      PublishEx:
+      GetEntry:
+      GetEntryEx:
+    inline_code: |-
+      .def("close", [](DoubleArrayTopic *self) {
+        py::gil_scoped_release release;
+        *self = DoubleArrayTopic();
+      }, py::doc("Destroys the topic"))
+      .def("__enter__", [](DoubleArrayTopic *self) {
+        return self;
+      })
+      .def("__exit__", [](DoubleArrayTopic *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = DoubleArrayTopic();
+      })

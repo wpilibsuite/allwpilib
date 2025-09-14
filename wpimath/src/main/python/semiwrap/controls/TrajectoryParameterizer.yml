@@ -1,0 +1,10 @@
+defaults:
+  subpackage: trajectory
+
+classes:
+  frc::TrajectoryParameterizer:
+    force_type_casters:
+    - units::unit_t
+    - units::curvature_t
+    methods:
+      TimeParameterizeTrajectory:

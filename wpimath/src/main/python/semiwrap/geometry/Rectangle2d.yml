@@ -1,0 +1,45 @@
+extra_includes:
+- rpy/geometryToString.h
+- wpystruct.h
+
+classes:
+  frc::Rectangle2d:
+    force_type_casters:
+    - units::foot_t
+    - units::meter_t
+    methods:
+      Rectangle2d:
+        overloads:
+          const Pose2d&, units::meter_t, units::meter_t:
+          const Translation2d&, const Translation2d&:
+      Center:
+      Rotation:
+      XWidth:
+        ignore: true
+      YWidth:
+        ignore: true
+      TransformBy:
+      RotateBy:
+      Intersects:
+      Contains:
+      Distance:
+      operator==:
+      Nearest:
+
+inline_code: |-
+  cls_Rectangle2d
+    .def_static("fromFeet", [](const Pose2d& center, units::foot_t xWidth, units::foot_t yWidth) {
+      return std::make_unique<Rectangle2d>(center, xWidth, yWidth);
+    }, py::arg("center"), py::arg("xWidth"), py::arg("yWidth"))
+    .def_property_readonly("xwidth", &Rectangle2d::XWidth)
+    .def_property_readonly("ywidth", &Rectangle2d::YWidth)
+    .def_property_readonly("xwidth_feet", [](Rectangle2d &self) -> units::foot_t {
+      return self.XWidth();
+    })
+    .def_property_readonly("ywidth_feet", [](Rectangle2d &self) -> units::foot_t {
+      return self.YWidth();
+    })
+    .def("__repr__", py::overload_cast<const Rectangle2d&>(&rpy::toString));
+
+
+  SetupWPyStruct<frc::Rectangle2d>(cls_Rectangle2d);

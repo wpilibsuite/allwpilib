@@ -1,0 +1,38 @@
+classes:
+  frc::sim::SingleJointedArmSim:
+    typealias:
+    - frc::DCMotor
+    - template <int S, int I, int O> using LinearSystem = frc::LinearSystem<S, I, O>
+    - template <int I> using Vectord = frc::Vectord<I>
+    methods:
+      SingleJointedArmSim:
+        overloads:
+          ? const LinearSystem<2, 1, 2>&, const DCMotor&, double, units::meter_t, units::radian_t, units::radian_t, bool, units::radian_t, const std::array<double, 2>&
+          : param_override:
+              measurementStdDevs:
+                default: std::array<double, 2>{0.0, 0.0}
+          ? const DCMotor&, double, units::kilogram_square_meter_t, units::meter_t, units::radian_t, units::radian_t, bool, units::radian_t, const std::array<double, 2>&
+          : param_override:
+              measurementStdDevs:
+                default: std::array<double, 2>{0.0, 0.0}
+      SetState:
+      WouldHitLowerLimit:
+      WouldHitUpperLimit:
+      HasHitLowerLimit:
+      HasHitUpperLimit:
+      GetAngle:
+      GetVelocity:
+      GetCurrentDraw:
+      SetInputVoltage:
+      EstimateMOI:
+      UpdateX:
+
+inline_code: |-
+  cls_SingleJointedArmSim
+    .def("getAngleDegrees", [](SingleJointedArmSim * self) -> units::degree_t {
+      return self->GetAngle();
+    })
+    .def("getVelocityDps", [](SingleJointedArmSim * self) -> units::degrees_per_second_t {
+      return self->GetVelocity();
+    })
+  ;
