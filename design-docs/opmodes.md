@@ -298,7 +298,7 @@ public abstract class PeriodicOpMode implements OpMode {
   }
 
   @Override
-  public void opmodeEnd() {
+  public void opmodeStop() {
     // pseudo-code
     isRunning = false;
   }
