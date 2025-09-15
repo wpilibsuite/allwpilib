@@ -4,12 +4,14 @@
 
 package edu.wpi.first.epilogue.logging;
 
+import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import us.hebi.quickbuf.ProtoMessage;
 
 @SuppressWarnings("PMD.TestClassWithoutTestCases") // This is not a test class!
 public class TestBackend implements EpilogueBackend {
@@ -112,6 +114,14 @@ public class TestBackend implements EpilogueBackend {
       serialized[i] = buffer.get();
     }
 
+    m_entries.add(new LogEntry<>(identifier, serialized));
+  }
+
+  @Override
+  public <P, M extends ProtoMessage<M>> void log(String identifier, P value, Protobuf<P, M> proto) {
+    var msg = proto.createMessage();
+    proto.pack(msg, value);
+    var serialized = msg.toByteArray();
     m_entries.add(new LogEntry<>(identifier, serialized));
   }
 }

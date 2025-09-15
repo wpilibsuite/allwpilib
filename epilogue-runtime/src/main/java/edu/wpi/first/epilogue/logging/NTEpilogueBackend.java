@@ -13,18 +13,21 @@ import edu.wpi.first.networktables.FloatPublisher;
 import edu.wpi.first.networktables.IntegerArrayPublisher;
 import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.ProtobufPublisher;
 import edu.wpi.first.networktables.Publisher;
 import edu.wpi.first.networktables.RawPublisher;
 import edu.wpi.first.networktables.StringArrayPublisher;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.struct.Struct;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import us.hebi.quickbuf.ProtoMessage;
 
 /**
  * A backend implementation that sends data over network tables. Be careful when using this, since
@@ -36,6 +39,7 @@ public class NTEpilogueBackend implements EpilogueBackend {
   private final Map<String, Publisher> m_publishers = new HashMap<>();
   private final Map<String, NestedBackend> m_nestedBackends = new HashMap<>();
   private final Set<Struct<?>> m_seenSchemas = new HashSet<>();
+  private final Set<Protobuf<?, ?>> m_seenProtos = new HashSet<>();
   private final Function<String, IntegerPublisher> m_createIntPublisher;
   private final Function<String, FloatPublisher> m_createFloatPublisher;
   private final Function<String, DoublePublisher> m_createDoublePublisher;
@@ -194,6 +198,23 @@ public class NTEpilogueBackend implements EpilogueBackend {
       ((StructArrayPublisher<S>) m_publishers.get(identifier)).set(value);
     } else {
       StructArrayPublisher<S> publisher = m_nt.getStructArrayTopic(identifier, struct).publish();
+      m_publishers.put(identifier, publisher);
+      publisher.set(value);
+    }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <P, M extends ProtoMessage<M>> void log(String identifier, P value, Protobuf<P, M> proto) {
+    // NetworkTableInstance.addSchema has checks that we're able to skip, avoiding allocations
+    if (m_seenProtos.add(proto)) {
+      m_nt.addSchema(proto);
+    }
+
+    if (m_publishers.containsKey(identifier)) {
+      ((ProtobufPublisher<P>) m_publishers.get(identifier)).set(value);
+    } else {
+      ProtobufPublisher<P> publisher = m_nt.getProtobufTopic(identifier, proto).publish();
       m_publishers.put(identifier, publisher);
       publisher.set(value);
     }
