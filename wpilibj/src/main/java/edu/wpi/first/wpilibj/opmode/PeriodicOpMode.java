@@ -10,7 +10,9 @@ import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.NotifierJNI;
 import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.PriorityQueue;
 
 public abstract class PeriodicOpMode implements OpMode {
@@ -75,7 +77,7 @@ public abstract class PeriodicOpMode implements OpMode {
 
   protected PeriodicOpMode(double period) {
     m_startTimeUs = RobotController.getFPGATime();
-    addPeriodic(this::periodic, period);
+    addPeriodic(this::loopFunc, period);
     NotifierJNI.setNotifierName(m_notifier, "TimedRobot");
 
     HAL.reportUsage("Framework", "TimedRobot");
@@ -169,11 +171,48 @@ public abstract class PeriodicOpMode implements OpMode {
     addPeriodic(callback, period.in(Seconds), offset.in(Seconds));
   }
 
+  /** Loop function. */
+  protected void loopFunc() {
+    DriverStation.refreshData();
+    // m_watchdog.reset();
+    if (!DriverStation.isEnabled() || DriverStation.getOpModeId() != m_opModeId) {
+      m_running = false;
+      return;
+    }
+
+    periodic();
+    // m_watchdog.addEpoch("periodic()");
+
+    SmartDashboard.updateValues();
+    // m_watchdog.addEpoch("SmartDashboard.updateValues()");
+
+    // if (isSimulation()) {
+    //  HAL.simPeriodicBefore();
+    //  simulationPeriodic();
+    //  HAL.simPeriodicAfter();
+    //  m_watchdog.addEpoch("simulationPeriodic()");
+    // }
+
+    // m_watchdog.disable();
+
+    // Flush NetworkTables
+    // if (m_ntFlushEnabled) {
+    //  NetworkTableInstance.getDefault().flushLocal();
+    // }
+
+    // Warn on loop time overruns
+    // if (m_watchdog.isExpired()) {
+    //  m_watchdog.printEpochs();
+    // }
+  }
+
   // implements OpMode interface
   @Override
   public final void opmodeRun(long opModeId) {
+    m_opModeId = opModeId;
+
     start();
-    while (true) {
+    while (m_running) {
       // We don't have to check there's an element in the queue first because
       // there's always at least one (the constructor adds one). It's reenqueued
       // at the end of the loop.
@@ -227,4 +266,7 @@ public abstract class PeriodicOpMode implements OpMode {
     NotifierJNI.cleanNotifier(m_notifier);
     close();
   }
+
+  private long m_opModeId;
+  private boolean m_running = true;
 }
