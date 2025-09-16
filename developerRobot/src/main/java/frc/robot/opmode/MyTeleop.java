@@ -28,8 +28,18 @@ public class MyTeleop extends PeriodicOpMode {
   }
 
   @Override
+  public void start() {
+    System.out.println("MyTeleop start");
+  }
+
+  @Override
   public void periodic() {
     System.out.println("MyTeleop periodic " + m_periodicCount);
     m_periodicCount++;
+  }
+
+  @Override
+  public void end() {
+    System.out.println("MyTeleop end");
   }
 }
