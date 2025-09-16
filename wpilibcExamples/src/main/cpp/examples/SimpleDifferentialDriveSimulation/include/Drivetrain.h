@@ -6,8 +6,8 @@
 
 #include <numbers>
 
-#include <frc/AnalogGyro.h>
 #include <frc/Encoder.h>
+#include <frc/OnboardIMU.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/kinematics/DifferentialDriveKinematics.h>
@@ -29,7 +29,7 @@
 class Drivetrain {
  public:
   Drivetrain() {
-    m_gyro.Reset();
+    m_imu.ResetYaw();
 
     m_leftLeader.AddFollower(m_leftFollower);
     m_rightLeader.AddFollower(m_rightFollower);
@@ -87,11 +87,11 @@ class Drivetrain {
   frc::PIDController m_leftPIDController{8.5, 0.0, 0.0};
   frc::PIDController m_rightPIDController{8.5, 0.0, 0.0};
 
-  frc::AnalogGyro m_gyro{0};
+  frc::OnboardIMU m_imu{frc::OnboardIMU::kFlat};
 
   frc::DifferentialDriveKinematics m_kinematics{kTrackwidth};
   frc::DifferentialDriveOdometry m_odometry{
-      m_gyro.GetRotation2d(), units::meter_t{m_leftEncoder.GetDistance()},
+      m_imu.GetRotation2d(), units::meter_t{m_leftEncoder.GetDistance()},
       units::meter_t{m_rightEncoder.GetDistance()}};
 
   // Gains are for example purposes only - must be determined for your own
