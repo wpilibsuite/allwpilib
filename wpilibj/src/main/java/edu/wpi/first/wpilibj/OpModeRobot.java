@@ -162,7 +162,8 @@ public abstract class OpModeRobot extends RobotBase {
     }
   }
 
-  private void addAnnotatedOpModeClassesDir(java.io.File root, java.io.File dir, String packagePath) {
+  private void addAnnotatedOpModeClassesDir(
+      java.io.File root, java.io.File dir, String packagePath) {
     for (java.io.File file : dir.listFiles()) {
       if (file.isDirectory()) {
         addAnnotatedOpModeClassesDir(root, file, packagePath);
