@@ -17,11 +17,6 @@ public class MyTeleop extends PeriodicOpMode {
   }
 
   @Override
-  public void close() {
-    System.out.println("MyTeleop closed");
-  }
-
-  @Override
   public void disabledPeriodic() {
     System.out.println("MyTeleop disabled periodic " + m_disabledCount);
     m_disabledCount++;
@@ -41,5 +36,10 @@ public class MyTeleop extends PeriodicOpMode {
   @Override
   public void end() {
     System.out.println("MyTeleop end");
+  }
+
+  @Override
+  public void close() {
+    System.out.println("MyTeleop closed");
   }
 }
