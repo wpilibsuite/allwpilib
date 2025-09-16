@@ -4,15 +4,16 @@
 
 package edu.wpi.first.wpilibj;
 
-import static edu.wpi.first.units.Units.Seconds;
-
 import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.NotifierJNI;
+import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.Time;
 import java.util.PriorityQueue;
+
+import static edu.wpi.first.units.Units.Seconds;
 
 /**
  * TimedRobot implements the IterativeRobotBase robot program framework.
@@ -93,6 +94,24 @@ public class TimedRobot extends IterativeRobotBase {
     NotifierJNI.setNotifierName(m_notifier, "TimedRobot");
 
     HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Timed);
+  }
+
+  /**
+   * Constructor for TimedRobot.
+   *
+   * @param period Period in units.
+   */
+  protected TimedRobot(Time period) {
+    this(period.in(Seconds));
+  }
+
+  /**
+   * Constructor for TimedRobot.
+   *
+   * @param frequency Frequency in units.
+   */
+  protected TimedRobot(Frequency frequency) {
+    this(frequency.asPeriod());
   }
 
   @Override

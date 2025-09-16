@@ -9,9 +9,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.networktables.DoubleArrayEntry;
+import edu.wpi.first.units.measure.Distance;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static edu.wpi.first.units.Units.Meters;
 
 /** Game field object on a Field2d. */
 public class FieldObject2d implements AutoCloseable {
@@ -49,6 +53,17 @@ public class FieldObject2d implements AutoCloseable {
    */
   public synchronized void setPose(double xMeters, double yMeters, Rotation2d rotation) {
     setPose(new Pose2d(xMeters, yMeters, rotation));
+  }
+
+  /**
+   * Set the pose from x, y, and rotation.
+   *
+   * @param x X location
+   * @param y Y location
+   * @param rotation rotation
+   */
+  public synchronized void setPose(Distance x, Distance y, Rotation2d rotation) {
+    setPose(new Pose2d(x.in(Meters), y.in(Meters), rotation));
   }
 
   /**

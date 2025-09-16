@@ -4,6 +4,11 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.units.measure.Frequency;
+import edu.wpi.first.units.measure.Time;
+
+import static edu.wpi.first.units.Units.Seconds;
+
 /**
  * A timer class.
  *
@@ -47,15 +52,39 @@ public class Timer {
 
   /**
    * Pause the thread for a specified time. Pause the execution of the thread for a specified period
+   * of time. Motors will continue to run at their last assigned values, and
+   * sensors will continue to update. Only the task containing the wait will pause until the wait
+   * time is expired.
+   *
+   * @param period Length of time to pause
+   */
+  public static void delay(final Time period) {
+    delay(period.in(Seconds));
+  }
+
+  /**
+   * Pause the thread for a specified time. Pause the execution of the thread for a specified period
+   * of time. Motors will continue to run at their last assigned values, and
+   * sensors will continue to update. Only the task containing the wait will pause until the wait
+   * time is expired.
+   *
+   * @param frequency Length of time to pause
+   */
+  public static void delay(final Frequency frequency) {
+    delay(frequency.asPeriod());
+  }
+
+  /**
+   * Pause the thread for a specified time. Pause the execution of the thread for a specified period
    * of time given in seconds. Motors will continue to run at their last assigned values, and
    * sensors will continue to update. Only the task containing the wait will pause until the wait
    * time is expired.
    *
-   * @param seconds Length of time to pause
+   * @param period Length of time to pause in seconds
    */
-  public static void delay(final double seconds) {
+  public static void delay(final double period) {
     try {
-      Thread.sleep((long) (seconds * 1e3));
+      Thread.sleep((long) (period * 1e3));
     } catch (final InterruptedException ex) {
       Thread.currentThread().interrupt();
     }
@@ -137,11 +166,31 @@ public class Timer {
   /**
    * Check if the period specified has passed.
    *
-   * @param seconds The period to check.
+   * @param period The period to check.
    * @return Whether the period has passed.
    */
-  public boolean hasElapsed(double seconds) {
-    return get() >= seconds;
+  public boolean hasElapsed(Time period) {
+    return hasElapsed(period.in(Seconds));
+  }
+
+  /**
+   * Check if the period specified has passed.
+   *
+   * @param frequency The frequency to check.
+   * @return Whether the period has passed.
+   */
+  public boolean hasElapsed(Frequency frequency) {
+    return hasElapsed(frequency.asPeriod());
+  }
+
+  /**
+   * Check if the period specified has passed.
+   *
+   * @param period The period to check in seconds.
+   * @return Whether the period has passed.
+   */
+  public boolean hasElapsed(double period) {
+    return get() >= period;
   }
 
   /**
