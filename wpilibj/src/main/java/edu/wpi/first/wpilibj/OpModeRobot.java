@@ -42,14 +42,9 @@ public abstract class OpModeRobot extends RobotBase {
     if (name == null || name.isBlank()) {
       name = cls.getSimpleName();
     }
-    long id =
-        DriverStation.addOpMode(
-            mode,
-            name,
-            description,
-            group,
-            Color.fromString(textColor),
-            Color.fromString(backgroundColor));
+    Color tColor = textColor.isBlank() ? null : Color.fromString(textColor);
+    Color bColor = backgroundColor.isBlank() ? null : Color.fromString(backgroundColor);
+    long id = DriverStation.addOpMode(mode, name, description, group, tColor, bColor);
     m_opModes.put(id, cls);
   }
 
@@ -145,6 +140,42 @@ public abstract class OpModeRobot extends RobotBase {
     addAnnotatedOpModeImpl(cls, auto, teleop, test);
   }
 
+  private void addAnnotatedOpModeClass(String name) {
+    String className = name.replace('/', '.').substring(0, name.length() - 6);
+    System.out.println("adding " + className);
+    Class<?> cls;
+    try {
+      cls = Class.forName(className);
+    } catch (ClassNotFoundException e) {
+      return;
+    }
+    Autonomous auto = cls.getAnnotation(Autonomous.class);
+    Teleoperated teleop = cls.getAnnotation(Teleoperated.class);
+    TestOpMode test = cls.getAnnotation(TestOpMode.class);
+    if (auto == null && teleop == null && test == null) {
+      return;
+    }
+    try {
+      addAnnotatedOpModeImpl(cls, auto, teleop, test);
+    } catch (IllegalArgumentException e) {
+      reportAddOpModeError(cls, e.getMessage());
+    }
+  }
+
+  private void addAnnotatedOpModeClassesDir(java.io.File dir, String packagePath) {
+    for (java.io.File file : dir.listFiles()) {
+      if (file.isDirectory()) {
+        addAnnotatedOpModeClassesDir(file, packagePath);
+      } else if (file.getName().endsWith(".class")) {
+        String absPath = file.getAbsolutePath().replace('\\', '/');
+        int idx = absPath.indexOf(packagePath);
+        if (idx < 0) continue;
+        String relPath = absPath.substring(idx);
+        addAnnotatedOpModeClass(relPath);
+      }
+    }
+  }
+
   /**
    * Scans for classes in the specified package and all nested packages that are annotated with
    * Autonomous, Teleoperated, or TestOpMode and registers them.
@@ -155,40 +186,31 @@ public abstract class OpModeRobot extends RobotBase {
     String packageName = pkg.getName();
     String packagePath = packageName.replace('.', '/');
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    System.out.println("Scanning " + packageName + " " + packagePath);
 
     try {
       Enumeration<URL> resources = classLoader.getResources(packagePath);
       while (resources.hasMoreElements()) {
         URL resource = resources.nextElement();
-        if (!"jar".equals(resource.getProtocol())) {
-          continue;
-        }
-        String jarPath = resource.getPath().substring(5, resource.getPath().indexOf('!'));
-        try (JarFile jar = new JarFile(jarPath)) {
-          Enumeration<JarEntry> entries = jar.entries();
-          while (entries.hasMoreElements()) {
-            String name = entries.nextElement().getName();
-            if (!name.startsWith(packagePath) || !name.endsWith(".class")) {
-              continue;
+        System.out.println("resource " + resource);
+        if ("jar".equals(resource.getProtocol())) {
+          String jarPath = resource.getPath().substring(5, resource.getPath().indexOf('!'));
+          try (JarFile jar = new JarFile(jarPath)) {
+            Enumeration<JarEntry> entries = jar.entries();
+            while (entries.hasMoreElements()) {
+              String name = entries.nextElement().getName();
+              System.out.println(name);
+              if (!name.startsWith(packagePath) || !name.endsWith(".class")) {
+                continue;
+              }
+              addAnnotatedOpModeClass(name);
             }
-            String className = name.replace('/', '.').substring(0, name.length() - 6);
-            Class<?> cls;
-            try {
-              cls = Class.forName(className);
-            } catch (ClassNotFoundException e) {
-              continue;
-            }
-            Autonomous auto = cls.getAnnotation(Autonomous.class);
-            Teleoperated teleop = cls.getAnnotation(Teleoperated.class);
-            TestOpMode test = cls.getAnnotation(TestOpMode.class);
-            if (auto == null && teleop == null && test == null) {
-              continue;
-            }
-            try {
-              addAnnotatedOpModeImpl(cls, auto, teleop, test);
-            } catch (IllegalArgumentException e) {
-              reportAddOpModeError(cls, e.getMessage());
-            }
+          }
+        } else if ("file".equals(resource.getProtocol())) {
+          // Handle .class files in directories
+          java.io.File dir = new java.io.File(resource.getPath());
+          if (dir.exists() && dir.isDirectory()) {
+            addAnnotatedOpModeClassesDir(dir, packagePath);
           }
         }
       }
@@ -202,6 +224,7 @@ public abstract class OpModeRobot extends RobotBase {
   public OpModeRobot() {
     // Scan for annotated opmode classes within the derived class's package and subpackages
     addAnnotatedOpModeClasses(getClass().getPackage());
+    DriverStation.publishOpModes();
   }
 
   /** Provide an alternate "main loop" via startCompetition(). */
