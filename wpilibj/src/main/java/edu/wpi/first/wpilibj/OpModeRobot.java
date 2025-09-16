@@ -245,6 +245,7 @@ public abstract class OpModeRobot extends RobotBase {
         }
 
         // Get the latest control word and opmode
+        DriverStation.refreshData();
         boolean prevEnabled = m_word.isEnabled();
         m_word.refresh();
         long modeId = DriverStation.getOpModeId();
