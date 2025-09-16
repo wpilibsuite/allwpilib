@@ -1112,8 +1112,8 @@ public final class DriverStation {
       String description,
       Color textColor,
       Color backgroundColor) {
-    if (name.isEmpty()) {
-      throw new IllegalArgumentException("OpMode name must be non-empty");
+    if (name.isBlank()) {
+      throw new IllegalArgumentException("OpMode name must be non-blank");
     }
     // find unique ID
     m_opModesMutex.lock();
@@ -1136,7 +1136,7 @@ public final class DriverStation {
         }
         if (existing.getMode() == mode && existing.name.equals(name)) {
           // already exists
-          throw new IllegalArgumentException("OpMode " + name + " already exists");
+          throw new IllegalArgumentException("OpMode " + name + " already exists for mode " + mode);
         }
         // collision, try again with space appended
         nameCopy += ' ';

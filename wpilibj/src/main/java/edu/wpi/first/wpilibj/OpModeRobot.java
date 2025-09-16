@@ -31,50 +31,6 @@ public abstract class OpModeRobot extends RobotBase {
     DriverStation.reportError("Error adding OpMode " + cls.getSimpleName() + ": " + message, false);
   }
 
-  private Color colorFromString(String str) {
-    if (str == null || str.isEmpty()) {
-      return null;
-    }
-
-    // #RRGGBB style
-    if (str.charAt(0) == '#') {
-      return new Color(str);
-    }
-
-    // RGB style
-    if (str.startsWith("rgb(") && str.endsWith(")")) {
-      String[] components = str.substring(4, str.length() - 1).split(",");
-      if (components.length != 3) {
-        return null;
-      }
-      try {
-        int r = Integer.parseInt(components[0].trim());
-        int g = Integer.parseInt(components[1].trim());
-        int b = Integer.parseInt(components[2].trim());
-        return new Color(r / 255.0, g / 255.0, b / 255.0);
-      } catch (NumberFormatException e) {
-        return null;
-      }
-    }
-
-    // try to parse as a named color by matching against k-prefixed static constants in the Color
-    // class
-    String search = str.startsWith("k") ? str : "k" + str;
-    for (var field : Color.class.getFields()) {
-      if (java.lang.reflect.Modifier.isStatic(field.getModifiers())
-          && Color.class.isAssignableFrom(field.getType())
-          && field.getName().equalsIgnoreCase(search)) {
-        try {
-          return (Color) field.get(null);
-        } catch (IllegalAccessException e) {
-          // Ignore and continue
-        }
-      }
-    }
-
-    return null;
-  }
-
   private void addOpMode(
       RobotMode mode,
       Class<?> cls,
@@ -86,20 +42,14 @@ public abstract class OpModeRobot extends RobotBase {
     if (name == null || name.isBlank()) {
       name = cls.getSimpleName();
     }
-    long id;
-    try {
-      id =
-          DriverStation.addOpMode(
-              mode,
-              name,
-              description,
-              group,
-              colorFromString(textColor),
-              colorFromString(backgroundColor));
-    } catch (IllegalArgumentException e) {
-      reportAddOpModeError(cls, "duplicate name");
-      return;
-    }
+    long id =
+        DriverStation.addOpMode(
+            mode,
+            name,
+            description,
+            group,
+            Color.fromString(textColor),
+            Color.fromString(backgroundColor));
     m_opModes.put(id, cls);
   }
 
@@ -110,27 +60,24 @@ public abstract class OpModeRobot extends RobotBase {
    *
    * @param cls class to add
    */
-  public void addAnnotatedOpMode(Class<?> cls) {
+  private void addAnnotatedOpModeImpl(
+      Class<?> cls, Autonomous auto, Teleoperated teleop, TestOpMode test) {
     // the class must be a subclass of OpMode
     if (!OpMode.class.isAssignableFrom(cls)) {
-      reportAddOpModeError(cls, "not a subclass of OpMode");
-      return;
+      throw new IllegalArgumentException("not a subclass of OpMode");
     }
     int modifiers = cls.getModifiers();
     // it cannot be abstract
     if (java.lang.reflect.Modifier.isAbstract(modifiers)) {
-      reportAddOpModeError(cls, "is abstract");
-      return;
+      throw new IllegalArgumentException("is abstract");
     }
     // it must be public
     if (!java.lang.reflect.Modifier.isPublic(modifiers)) {
-      reportAddOpModeError(cls, "not public");
-      return;
+      throw new IllegalArgumentException("not public");
     }
     // it must not be a non-static inner class
     if (cls.getEnclosingClass() != null && !java.lang.reflect.Modifier.isStatic(modifiers)) {
-      reportAddOpModeError(cls, "is a non-static inner class");
-      return;
+      throw new IllegalArgumentException("is a non-static inner class");
     }
     // it must have a public no-arg constructor or a public constructor that accepts this class as
     // an argument
@@ -140,18 +87,13 @@ public abstract class OpModeRobot extends RobotBase {
       try {
         cls.getConstructor();
       } catch (NoSuchMethodException ex) {
-        reportAddOpModeError(
-            cls,
+        throw new IllegalArgumentException(
             "missing public no-arg constructor or constructor accepting "
                 + getClass().getSimpleName());
-        return;
       }
     }
 
     // add an opmode for each annotation
-    Autonomous auto = cls.getAnnotation(Autonomous.class);
-    Teleoperated teleop = cls.getAnnotation(Teleoperated.class);
-    TestOpMode test = cls.getAnnotation(TestOpMode.class);
     if (auto != null) {
       addOpMode(
           RobotMode.AUTONOMOUS,
@@ -185,6 +127,25 @@ public abstract class OpModeRobot extends RobotBase {
   }
 
   /**
+   * Adds an opmode for an opmode class annotated with Autonomous, Teleoperated, or TestOpMode. The
+   * class must be a public, non-abstract subclass of OpMode with a public constructor that either
+   * takes no arguments or accepts a single argument of this class's type.
+   *
+   * @param cls class to add
+   * @throws IllegalArgumentException if class does not meet criteria
+   */
+  public void addAnnotatedOpMode(Class<? extends OpMode> cls) {
+    Autonomous auto = cls.getAnnotation(Autonomous.class);
+    Teleoperated teleop = cls.getAnnotation(Teleoperated.class);
+    TestOpMode test = cls.getAnnotation(TestOpMode.class);
+    if (auto == null && teleop == null && test == null) {
+      throw new IllegalArgumentException(
+          "must be annotated with Autonomous, Teleoperated, or TestOpMode");
+    }
+    addAnnotatedOpModeImpl(cls, auto, teleop, test);
+  }
+
+  /**
    * Scans for classes in the specified package and all nested packages that are annotated with
    * Autonomous, Teleoperated, or TestOpMode and registers them.
    *
@@ -199,20 +160,34 @@ public abstract class OpModeRobot extends RobotBase {
       Enumeration<URL> resources = classLoader.getResources(packagePath);
       while (resources.hasMoreElements()) {
         URL resource = resources.nextElement();
-        if ("jar".equals(resource.getProtocol())) {
-          String jarPath = resource.getPath().substring(5, resource.getPath().indexOf('!'));
-          try (JarFile jar = new JarFile(jarPath)) {
-            Enumeration<JarEntry> entries = jar.entries();
-            while (entries.hasMoreElements()) {
-              String name = entries.nextElement().getName();
-              if (name.startsWith(packagePath) && name.endsWith(".class")) {
-                String className = name.replace('/', '.').substring(0, name.length() - 6);
-                try {
-                  addAnnotatedOpMode(Class.forName(className));
-                } catch (ClassNotFoundException e) {
-                  // Ignore
-                }
-              }
+        if (!"jar".equals(resource.getProtocol())) {
+          continue;
+        }
+        String jarPath = resource.getPath().substring(5, resource.getPath().indexOf('!'));
+        try (JarFile jar = new JarFile(jarPath)) {
+          Enumeration<JarEntry> entries = jar.entries();
+          while (entries.hasMoreElements()) {
+            String name = entries.nextElement().getName();
+            if (!name.startsWith(packagePath) || !name.endsWith(".class")) {
+              continue;
+            }
+            String className = name.replace('/', '.').substring(0, name.length() - 6);
+            Class<?> cls;
+            try {
+              cls = Class.forName(className);
+            } catch (ClassNotFoundException e) {
+              continue;
+            }
+            Autonomous auto = cls.getAnnotation(Autonomous.class);
+            Teleoperated teleop = cls.getAnnotation(Teleoperated.class);
+            TestOpMode test = cls.getAnnotation(TestOpMode.class);
+            if (auto == null && teleop == null && test == null) {
+              continue;
+            }
+            try {
+              addAnnotatedOpModeImpl(cls, auto, teleop, test);
+            } catch (IllegalArgumentException e) {
+              reportAddOpModeError(cls, e.getMessage());
             }
           }
         }
@@ -256,7 +231,7 @@ public abstract class OpModeRobot extends RobotBase {
 
         if (modeId != 0
             && (modeId != lastModeId
-                || (!prevEnabled && m_word.isEnabled() && m_activeOpMode.get() == null))) {
+                || !prevEnabled && m_word.isEnabled() && m_activeOpMode.get() == null)) {
           // New opmode selected, or re-enabled after running once
 
           OpMode opMode = m_activeOpMode.getAndSet(null);

@@ -10,17 +10,35 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/** Annotation for automatic registration of test opmode classes. */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented
 public @interface TestOpMode {
+  /**
+   * Name. This is shown as the selection name in the Driver Station, and must be unique across all
+   * test opmodes in the project. If not specified, defaults to the name of the class.
+   */
   String name() default "";
 
+  /**
+   * Group. All opmodes with the same group are grouped together for selection. If not specified,
+   * defaults to ungrouped.
+   */
   String group() default "";
 
+  /** Extended description. Optional. */
   String description() default "";
 
+  /**
+   * Text color. Optional. Supports all formats supported by {@link
+   * edu.wpi.first.wpilibj.util.Color#fromString(String)}.
+   */
   String textColor() default "";
 
+  /**
+   * Text background color. Optional. Supports all formats supported by {@link
+   * edu.wpi.first.wpilibj.util.Color#fromString(String)}.
+   */
   String backgroundColor() default "";
 }

@@ -196,7 +196,7 @@ public interface OpMode {
   void disabledPeriodic();
 
   // this function is called when the opmode starts (robot is enabled)
-  void opmodeRun();
+  void opmodeRun(long opModeId);
 
   // this function is called asynchronously when the robot is disabled,
   // to request the opmode return from opmodeRun()
@@ -236,7 +236,7 @@ public abstract class LinearOpMode implements OpMode {
 
   // implements OpMode interface
   @Override
-  public final void opmodeRun() {
+  public final void opmodeRun(long opModeId) {
     start();
     run();
     end();
@@ -293,7 +293,7 @@ public abstract class PeriodicOpMode implements OpMode {
 
   // implements OpMode interface
   @Override
-  public final void opmodeRun() {
+  public final void opmodeRun(long opModeId) {
     // psuedo-code
     start();
     while (isRunning) {
