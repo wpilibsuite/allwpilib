@@ -162,16 +162,13 @@ public abstract class OpModeRobot extends RobotBase {
     }
   }
 
-  private void addAnnotatedOpModeClassesDir(java.io.File dir, String packagePath) {
+  private void addAnnotatedOpModeClassesDir(java.io.File root, java.io.File dir, String packagePath) {
     for (java.io.File file : dir.listFiles()) {
       if (file.isDirectory()) {
-        addAnnotatedOpModeClassesDir(file, packagePath);
+        addAnnotatedOpModeClassesDir(root, file, packagePath);
       } else if (file.getName().endsWith(".class")) {
-        String absPath = file.getAbsolutePath().replace('\\', '/');
-        int idx = absPath.indexOf(packagePath);
-        if (idx < 0) continue;
-        String relPath = absPath.substring(idx);
-        addAnnotatedOpModeClass(relPath);
+        String relPath = root.toPath().relativize(file.toPath()).toString().replace('\\', '/');
+        addAnnotatedOpModeClass(packagePath + "." + relPath);
       }
     }
   }
@@ -210,7 +207,7 @@ public abstract class OpModeRobot extends RobotBase {
           // Handle .class files in directories
           java.io.File dir = new java.io.File(resource.getPath());
           if (dir.exists() && dir.isDirectory()) {
-            addAnnotatedOpModeClassesDir(dir, packagePath);
+            addAnnotatedOpModeClassesDir(dir, dir, packagePath);
           }
         }
       }
