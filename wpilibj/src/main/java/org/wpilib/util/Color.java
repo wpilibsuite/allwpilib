@@ -81,19 +81,61 @@ public class Color {
   }
 
   /**
-   * Constructs a Color from a hex string.
+   * Makes a Color from a string.
    *
-   * @param hexString a string of the format <code>#RRGGBB</code>
-   * @throws IllegalArgumentException if the hex string is invalid.
+   * @param str a string of the format <code>#RRGGBB</code>, <code>rgb(R, G, B)</code>, or <code>
+   *     ConstantName</code>
+   * @return the Color
+   * @throws IllegalArgumentException if the string is invalid.
    */
-  public Color(String hexString) {
-    if (hexString.length() != 7 || !hexString.startsWith("#")) {
-      throw new IllegalArgumentException("Invalid hex string \"" + hexString + "\"");
+  public static Color fromString(String str) {
+    if (str == null || str.isBlank()) {
+      throw new IllegalArgumentException("Invalid color string \"" + str + "\"");
     }
 
-    this.red = Integer.valueOf(hexString.substring(1, 3), 16) / 255.0;
-    this.green = Integer.valueOf(hexString.substring(3, 5), 16) / 255.0;
-    this.blue = Integer.valueOf(hexString.substring(5, 7), 16) / 255.0;
+    // #RRGGBB style
+    if (str.charAt(0) == '#') {
+      if (str.length() != 7) {
+        throw new IllegalArgumentException("Invalid hex string \"" + str + "\"");
+      }
+      return new Color(
+          Integer.parseInt(str.substring(1, 3), 16),
+          Integer.parseInt(str.substring(3, 5), 16),
+          Integer.parseInt(str.substring(5, 7), 16));
+    }
+
+    // RGB style
+    if (str.startsWith("rgb(") && str.endsWith(")")) {
+      String[] components = str.substring(4, str.length() - 1).split(",");
+      if (components.length != 3) {
+        throw new IllegalArgumentException("Invalid RGB string \"" + str + "\"");
+      }
+      try {
+        return new Color(
+            Integer.parseInt(components[0].trim()),
+            Integer.parseInt(components[1].trim()),
+            Integer.parseInt(components[2].trim()));
+      } catch (NumberFormatException e) {
+        throw new IllegalArgumentException("Invalid RGB string \"" + str + "\"");
+      }
+    }
+
+    // try to parse as a named color by matching against k-prefixed static constants in the Color
+    // class
+    String search = str.startsWith("k") ? str : "k" + str;
+    for (var field : Color.class.getFields()) {
+      if (java.lang.reflect.Modifier.isStatic(field.getModifiers())
+          && Color.class.isAssignableFrom(field.getType())
+          && field.getName().equalsIgnoreCase(search)) {
+        try {
+          return (Color) field.get(null);
+        } catch (IllegalAccessException e) {
+          // Ignore and continue
+        }
+      }
+    }
+
+    throw new IllegalArgumentException("Invalid color string \"" + str + "\"");
   }
 
   /**
