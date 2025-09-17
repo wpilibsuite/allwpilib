@@ -99,7 +99,7 @@ public class TimedRobot extends IterativeRobotBase {
   /**
    * Constructor for TimedRobot.
    *
-   * @param period Period in units.
+   * @param period The period of the robot loop function.
    */
   protected TimedRobot(Time period) {
     this(period.in(Seconds));
