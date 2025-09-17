@@ -297,7 +297,8 @@ class Trigger {
    *
    * @return A std::function<bool()> representing the condition of this trigger.
    */
-  /* implicit */ operator std::function<bool()>() const { return m_condition; } // NOLINT
+  // NOLINTNEXTLINE
+  /* implicit */ operator std::function<bool()>() const { return m_condition; }
 
  private:
   /**
