@@ -193,11 +193,11 @@ public class BooleanEvent implements BooleanSupplier {
    * Creates a new debounced event from this event - it will become active when this event has been
    * active for longer than the specified period.
    *
-   * @param period The debounce period in seconds.
+   * @param seconds The debounce period in seconds.
    * @return The debounced event (rising edges debounced only).
    */
-  public BooleanEvent debounce(double period) {
-    return debounce(period, Debouncer.DebounceType.kRising);
+  public BooleanEvent debounce(double seconds) {
+    return debounce(seconds, Debouncer.DebounceType.kRising);
   }
 
   /**
