@@ -5,6 +5,7 @@
 package edu.wpi.first.math.trajectory;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.trajectory.proto.TrajectoryProto;
@@ -46,18 +47,6 @@ public class Trajectory implements ProtobufSerializable {
     }
 
     m_totalTime = m_states.get(m_states.size() - 1).time;
-  }
-
-  /**
-   * Linearly interpolates between two values.
-   *
-   * @param startValue The start value.
-   * @param endValue The end value.
-   * @param t The fraction for interpolation.
-   * @return The interpolated value.
-   */
-  private static double lerp(double startValue, double endValue, double t) {
-    return startValue + (endValue - startValue) * t;
   }
 
   /**
@@ -317,7 +306,7 @@ public class Trajectory implements ProtobufSerializable {
      */
     State interpolate(State endValue, double i) {
       // Find the new t value.
-      final double newT = lerp(time, endValue.time, i);
+      final double newT = MathUtil.lerp(time, endValue.time, i);
 
       // Find the delta time between the current state and the interpolated state.
       final double deltaT = newT - time;
@@ -351,7 +340,7 @@ public class Trajectory implements ProtobufSerializable {
           newV,
           acceleration,
           lerp(pose, endValue.pose, interpolationFrac),
-          lerp(curvature, endValue.curvature, interpolationFrac));
+          MathUtil.lerp(curvature, endValue.curvature, interpolationFrac));
     }
 
     @Override

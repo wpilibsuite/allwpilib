@@ -358,8 +358,8 @@ public class Translation2d
   @Override
   public Translation2d interpolate(Translation2d endValue, double t) {
     return new Translation2d(
-        MathUtil.interpolate(this.getX(), endValue.getX(), t),
-        MathUtil.interpolate(this.getY(), endValue.getY(), t));
+        MathUtil.lerp(this.getX(), endValue.getX(), t),
+        MathUtil.lerp(this.getY(), endValue.getY(), t));
   }
 
   /** Translation2d protobuf for serialization. */
