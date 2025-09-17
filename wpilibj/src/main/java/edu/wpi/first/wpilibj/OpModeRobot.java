@@ -239,7 +239,7 @@ public abstract class OpModeRobot extends RobotBase {
       while (true) {
         // Wait for new data from the driver station
         try {
-          WPIUtilJNI.waitForObject(event);
+          WPIUtilJNI.waitForObjectTimeout(event, 0.2);
         } catch (InterruptedException ex) {
           Thread.currentThread().interrupt();
           break;
@@ -247,14 +247,22 @@ public abstract class OpModeRobot extends RobotBase {
 
         // Get the latest control word and opmode
         DriverStation.refreshData();
-        boolean prevEnabled = m_word.isEnabled();
         m_word.refresh();
         long modeId = DriverStation.getOpModeId();
 
-        if (modeId != 0
-            && (modeId != lastModeId
-                || !prevEnabled && m_word.isEnabled() && m_activeOpMode.get() == null)) {
-          // New opmode selected, or re-enabled after running once
+        if ((!DriverStation.isDSAttached() || modeId == 0) && m_activeOpMode.get() != null) {
+          // no opmode selected but we're currently running one; close it
+          OpMode opMode = m_activeOpMode.getAndSet(null);
+          if (opMode != null) {
+            // Close the previous opmode
+            opMode.opmodeClose();
+          }
+          continue;
+        }
+
+        if (DriverStation.isDSAttached() && modeId != 0
+            && (modeId != lastModeId || m_activeOpMode.get() == null)) {
+          // New opmode selected, or closed after running once
 
           OpMode opMode = m_activeOpMode.getAndSet(null);
           if (opMode != null) {
