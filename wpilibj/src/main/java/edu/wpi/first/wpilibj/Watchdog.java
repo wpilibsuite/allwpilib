@@ -70,16 +70,6 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     this(timeout.in(Seconds), callback);
   }
 
-  /**
-   * Watchdog constructor.
-   *
-   * @param timeout The watchdog's timeout with microsecond resolution.
-   * @param callback This function is called when the timeout expires.
-   */
-  public Watchdog(Frequency timeout, Runnable callback) {
-    this(timeout.asPeriod(), callback);
-  }
-
   @Override
   public void close() {
     disable();
