@@ -51,7 +51,7 @@ public class Timer {
   }
 
   /**
-   * Pause the thread for a specified time. Pause the execution of the thread for a specified period
+   * Pause the execution of the thread for a specified period
    * of time. Motors will continue to run at their last assigned values, and
    * sensors will continue to update. Only the task containing the wait will pause until the wait
    * time is expired.
@@ -63,7 +63,7 @@ public class Timer {
   }
 
   /**
-   * Pause the thread for a specified time. Pause the execution of the thread for a specified period
+   * Pause the execution of the thread for a specified period
    * of time. Motors will continue to run at their last assigned values, and
    * sensors will continue to update. Only the task containing the wait will pause until the wait
    * time is expired.
@@ -75,7 +75,7 @@ public class Timer {
   }
 
   /**
-   * Pause the thread for a specified time. Pause the execution of the thread for a specified period
+   * Pause the execution of the thread for a specified period
    * of time given in seconds. Motors will continue to run at their last assigned values, and
    * sensors will continue to update. Only the task containing the wait will pause until the wait
    * time is expired.
