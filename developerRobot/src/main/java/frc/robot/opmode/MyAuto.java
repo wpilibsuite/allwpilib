@@ -8,6 +8,7 @@ import frc.robot.Robot;
 public class MyAuto extends PeriodicOpMode {
   private Robot m_robot;
 
+  /** Can pass the Robot instance into an opmode via the constructor. */
   public MyAuto(Robot robot) {
     m_robot = robot;
   }
