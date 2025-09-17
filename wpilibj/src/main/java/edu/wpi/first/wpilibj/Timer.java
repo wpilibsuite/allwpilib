@@ -68,11 +68,11 @@ public class Timer {
    * sensors will continue to update. Only the task containing the wait will pause until the wait
    * time is expired.
    *
-   * @param period Length of time to pause in seconds
+   * @param seconds Length of time to pause in seconds
    */
-  public static void delay(final double period) {
+  public static void delay(final double seconds) {
     try {
-      Thread.sleep((long) (period * 1e3));
+      Thread.sleep((long) (seconds * 1e3));
     } catch (final InterruptedException ex) {
       Thread.currentThread().interrupt();
     }
