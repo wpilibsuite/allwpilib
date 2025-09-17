@@ -164,16 +164,6 @@ public class Timer {
   /**
    * Check if the period specified has passed.
    *
-   * @param frequency The frequency to check.
-   * @return Whether the period has passed.
-   */
-  public boolean hasElapsed(Frequency frequency) {
-    return hasElapsed(frequency.asPeriod());
-  }
-
-  /**
-   * Check if the period specified has passed.
-   *
    * @param period The period to check in seconds.
    * @return Whether the period has passed.
    */
