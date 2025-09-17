@@ -108,7 +108,7 @@ public class TimedRobot extends IterativeRobotBase {
   /**
    * Constructor for TimedRobot.
    *
-   * @param frequency Frequency in units.
+   * @param frequency The frequency of the robot loop function.
    */
   protected TimedRobot(Frequency frequency) {
     this(frequency.asPeriod());
