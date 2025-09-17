@@ -64,18 +64,6 @@ public class Timer {
 
   /**
    * Pause the execution of the thread for a specified period
-   * of time. Motors will continue to run at their last assigned values, and
-   * sensors will continue to update. Only the task containing the wait will pause until the wait
-   * time is expired.
-   *
-   * @param frequency Length of time to pause
-   */
-  public static void delay(final Frequency frequency) {
-    delay(frequency.asPeriod());
-  }
-
-  /**
-   * Pause the execution of the thread for a specified period
    * of time given in seconds. Motors will continue to run at their last assigned values, and
    * sensors will continue to update. Only the task containing the wait will pause until the wait
    * time is expired.
