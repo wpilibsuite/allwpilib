@@ -200,15 +200,6 @@ public class Notifier implements AutoCloseable {
   }
 
   /**
-   * Run the callback once after the given delay.
-   *
-   * @param delay Frequency to wait before the callback is called.
-   */
-  public void startSingle(Frequency delay) {
-    startSingle(delay.asPeriod());
-  }
-
-  /**
    * Run the callback periodically with the given period.
    *
    * <p>The user-provided callback should be written so that it completes before the next time it's
