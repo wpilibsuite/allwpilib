@@ -164,11 +164,11 @@ public class Timer {
   /**
    * Check if the period specified has passed.
    *
-   * @param period The period to check in seconds.
+   * @param seconds The period to check in seconds.
    * @return Whether the period has passed.
    */
-  public boolean hasElapsed(double period) {
-    return get() >= period;
+  public boolean hasElapsed(double seconds) {
+    return get() >= seconds;
   }
 
   /**
