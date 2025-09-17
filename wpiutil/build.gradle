@@ -128,32 +128,6 @@ ext {
                     }
                 }
             }
-        } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
-            it.sources {
-                wpiutilmacOSCpp(CppSourceSet) {
-                    source {
-                        srcDirs 'src/main/native/macOS'
-                        include '**/*.cpp'
-                    }
-                    exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/nanopb/include'
-                        include '**/*.h'
-                    }
-                }
-            }
-        } else {
-            it.sources {
-                wpiutilLinuxCpp(CppSourceSet) {
-                    source {
-                        srcDirs 'src/main/native/linux'
-                        include '**/*.cpp'
-                    }
-                    exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/nanopb/include'
-                        include '**/*.h'
-                    }
-                }
-            }
         }
     }
 }
