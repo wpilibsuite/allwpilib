@@ -214,7 +214,7 @@ public class BooleanEvent implements BooleanSupplier {
 
   /**
    * Creates a new debounced event from this event - it will become active when this event has been
-   * active for longer than the specified period.
+   * active for longer than the specified frequency.
    *
    * @param frequency The debounce frequency.
    * @param type The debounce type.
