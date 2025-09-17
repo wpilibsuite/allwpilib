@@ -239,7 +239,7 @@ public class Notifier implements AutoCloseable {
    * <p>The user-provided callback should be written so that it completes before the next time it's
    * scheduled to run.
    *
-   * @param frequency Frequency after which to call the callback starting one period
+   * @param frequency Frequency at which to call the callback, starting one period
    *     after the call to this method.
    */
   public void startPeriodic(Frequency frequency) {
