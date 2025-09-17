@@ -234,7 +234,7 @@ public class Notifier implements AutoCloseable {
   }
 
   /**
-   * Run the callback periodically with the given period.
+   * Run the callback periodically with the given frequency.
    *
    * <p>The user-provided callback should be written so that it completes before the next time it's
    * scheduled to run.
