@@ -4,18 +4,17 @@
 
 package edu.wpi.first.wpilibj.smartdashboard;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NTSendable;
 import edu.wpi.first.networktables.NTSendableBuilder;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.units.DistanceUnit;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import java.util.ArrayList;
 import java.util.List;
-
-import static edu.wpi.first.units.Units.Meters;
 
 /**
  * 2D representation of game field for dashboards.

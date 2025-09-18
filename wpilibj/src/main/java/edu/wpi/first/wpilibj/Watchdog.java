@@ -4,15 +4,13 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.hal.NotifierJNI;
-import edu.wpi.first.units.measure.Frequency;
-import edu.wpi.first.units.measure.Time;
+import static edu.wpi.first.units.Units.Seconds;
 
+import edu.wpi.first.hal.NotifierJNI;
+import edu.wpi.first.units.measure.Time;
 import java.io.Closeable;
 import java.util.PriorityQueue;
 import java.util.concurrent.locks.ReentrantLock;
-
-import static edu.wpi.first.units.Units.Seconds;
 
 /**
  * A class that's a wrapper around a watchdog timer.

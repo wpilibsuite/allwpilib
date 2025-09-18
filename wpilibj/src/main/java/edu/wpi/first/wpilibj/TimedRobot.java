@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj;
 
+import static edu.wpi.first.units.Units.Seconds;
+
 import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -12,8 +14,6 @@ import edu.wpi.first.hal.NotifierJNI;
 import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.Time;
 import java.util.PriorityQueue;
-
-import static edu.wpi.first.units.Units.Seconds;
 
 /**
  * TimedRobot implements the IterativeRobotBase robot program framework.

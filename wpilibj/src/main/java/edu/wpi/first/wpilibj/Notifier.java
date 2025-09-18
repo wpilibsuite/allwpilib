@@ -10,7 +10,6 @@ import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 import edu.wpi.first.hal.NotifierJNI;
 import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.Time;
-
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 

@@ -4,10 +4,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.units.measure.Frequency;
-import edu.wpi.first.units.measure.Time;
-
 import static edu.wpi.first.units.Units.Seconds;
+
+import edu.wpi.first.units.measure.Time;
 
 /**
  * A timer class.
