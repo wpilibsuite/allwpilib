@@ -235,7 +235,7 @@
 #define EIGEN_VECTORIZE_SSE4_2
 #endif
 #ifdef __AVX__
-#ifndef EIGEN_USE_SYCL
+#if !defined(EIGEN_USE_SYCL) && !EIGEN_COMP_EMSCRIPTEN
 #define EIGEN_VECTORIZE_AVX
 #endif
 #define EIGEN_VECTORIZE_SSE3

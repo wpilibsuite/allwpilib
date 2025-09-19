@@ -497,16 +497,56 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC half& operator/=(half& a, const half& b) {
   a = half(float(a) / float(b));
   return a;
 }
+
+// Non-negative floating point numbers have a monotonic mapping to non-negative integers.
+// This property allows floating point numbers to be reinterpreted as integers for comparisons, which is useful if there
+// is no native floating point comparison operator. Floating point signedness is handled by the sign-magnitude
+// representation, whereas integers typically use two's complement. Converting the bit pattern from sign-magnitude to
+// two's complement allows the transformed bit patterns be compared as signed integers. All edge cases (+/-0 and +/-
+// infinity) are handled automatically, except NaN.
+//
+// fp16 uses 1 sign bit, 5 exponent bits, and 10 mantissa bits. The bit pattern conveys NaN when all the exponent
+// bits (5) are set, and at least one mantissa bit is set. The sign bit is irrelevant for determining NaN. To check for
+// NaN, clear the sign bit and check if the integral representation is greater than 01111100000000. To test
+// for non-NaN, clear the sign bit and check if the integeral representation is less than or equal to 01111100000000.
+
+// convert sign-magnitude representation to two's complement
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC int16_t mapToSigned(uint16_t a) {
+  constexpr uint16_t kAbsMask = (1 << 15) - 1;
+  // If the sign bit is set, clear the sign bit and return the (integer) negation. Otherwise, return the input.
+  return (a >> 15) ? -(a & kAbsMask) : a;
+}
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool isOrdered(const half& a, const half& b) {
+  constexpr uint16_t kInf = ((1 << 5) - 1) << 10;
+  constexpr uint16_t kAbsMask = (1 << 15) - 1;
+  return numext::maxi(a.x & kAbsMask, b.x & kAbsMask) <= kInf;
+}
 EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool operator==(const half& a, const half& b) {
-  return numext::equal_strict(float(a), float(b));
+  bool result = mapToSigned(a.x) == mapToSigned(b.x);
+  result &= isOrdered(a, b);
+  return result;
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool operator!=(const half& a, const half& b) {
-  return numext::not_equal_strict(float(a), float(b));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool operator!=(const half& a, const half& b) { return !(a == b); }
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool operator<(const half& a, const half& b) {
+  bool result = mapToSigned(a.x) < mapToSigned(b.x);
+  result &= isOrdered(a, b);
+  return result;
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool operator<(const half& a, const half& b) { return float(a) < float(b); }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool operator<=(const half& a, const half& b) { return float(a) <= float(b); }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool operator>(const half& a, const half& b) { return float(a) > float(b); }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool operator>=(const half& a, const half& b) { return float(a) >= float(b); }
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool operator<=(const half& a, const half& b) {
+  bool result = mapToSigned(a.x) <= mapToSigned(b.x);
+  result &= isOrdered(a, b);
+  return result;
+}
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool operator>(const half& a, const half& b) {
+  bool result = mapToSigned(a.x) > mapToSigned(b.x);
+  result &= isOrdered(a, b);
+  return result;
+}
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool operator>=(const half& a, const half& b) {
+  bool result = mapToSigned(a.x) >= mapToSigned(b.x);
+  result &= isOrdered(a, b);
+  return result;
+}
 
 #if EIGEN_COMP_CLANG && defined(EIGEN_GPUCC)
 #pragma pop_macro("EIGEN_DEVICE_FUNC")
@@ -706,7 +746,11 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool(isnan)(const half& a) {
 #endif
 }
 EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool(isfinite)(const half& a) {
-  return !(isinf EIGEN_NOT_A_MACRO(a)) && !(isnan EIGEN_NOT_A_MACRO(a));
+#if defined(EIGEN_HAS_ARM64_FP16_SCALAR_ARITHMETIC) || defined(EIGEN_HAS_BUILTIN_FLOAT16)
+  return (numext::bit_cast<numext::uint16_t>(a.x) & 0x7fff) < 0x7c00;
+#else
+  return (a.x & 0x7fff) < 0x7c00;
+#endif
 }
 
 EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC half abs(const half& a) {
@@ -909,6 +953,12 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC Eigen::half bit_cast<Eigen::half, uint16_t
 template <>
 EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC uint16_t bit_cast<uint16_t, Eigen::half>(const Eigen::half& src) {
   return Eigen::half_impl::raw_half_as_uint16(src);
+}
+
+// Specialize multiply-add to match packet operations and reduce conversions to/from float.
+template<>
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC Eigen::half madd<Eigen::half>(const Eigen::half& x, const Eigen::half& y, const Eigen::half& z) {
+  return Eigen::half(static_cast<float>(x) * static_cast<float>(y) + static_cast<float>(z));
 }
 
 }  // namespace numext

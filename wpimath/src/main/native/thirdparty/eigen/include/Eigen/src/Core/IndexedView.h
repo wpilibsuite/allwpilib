@@ -308,6 +308,12 @@ struct unary_evaluator<IndexedView<ArgType, RowIndices, ColIndices>, IndexBased>
   const XprType& m_xpr;
 };
 
+// Catch assignments to an IndexedView.
+template <typename ArgType, typename RowIndices, typename ColIndices>
+struct evaluator_assume_aliasing<IndexedView<ArgType, RowIndices, ColIndices>> {
+  static const bool value = true;
+};
+
 }  // end namespace internal
 
 }  // end namespace Eigen
