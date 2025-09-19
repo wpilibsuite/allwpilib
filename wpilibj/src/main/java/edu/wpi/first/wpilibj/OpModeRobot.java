@@ -225,9 +225,25 @@ public abstract class OpModeRobot extends RobotBase {
     DriverStation.publishOpModes();
   }
 
+  /**
+   * Function called exactly once after the DS is connected.
+   *
+   * <p>Code that needs to know the DS state should go here.
+   *
+   * <p>Users should override this method for initialization that needs to occur after the DS is
+   * connected, such as needing the alliance information.
+   */
+  public void driverStationConnected() {}
+
+  /**
+   * Function called periodically anytime when no opmode is selected, including when the Driver
+   * Station is disconnected.
+   */
+  public void nonePeriodic() {}
+
   /** Provide an alternate "main loop" via startCompetition(). */
   @Override
-  public void startCompetition() {
+  public final void startCompetition() {
     System.out.println("********** Robot program startup complete **********");
 
     int event = WPIUtilJNI.createEvent(false, false);
@@ -236,10 +252,11 @@ public abstract class OpModeRobot extends RobotBase {
     try {
       // Implement the opmode lifecycle
       long lastModeId = -1;
+      boolean calledDriverStationConnected = false;
       while (true) {
         // Wait for new data from the driver station
         try {
-          WPIUtilJNI.waitForObjectTimeout(event, 0.2);
+          WPIUtilJNI.waitForObjectTimeout(event, 0.05);
         } catch (InterruptedException ex) {
           Thread.currentThread().interrupt();
           break;
@@ -250,6 +267,11 @@ public abstract class OpModeRobot extends RobotBase {
         m_word.refresh();
         long modeId = DriverStation.getOpModeId();
 
+        if (!calledDriverStationConnected && m_word.isDSAttached()) {
+          calledDriverStationConnected = true;
+          driverStationConnected();
+        }
+
         if ((!DriverStation.isDSAttached() || modeId == 0) && m_activeOpMode.get() != null) {
           // no opmode selected but we're currently running one; close it
           OpMode opMode = m_activeOpMode.getAndSet(null);
@@ -257,10 +279,7 @@ public abstract class OpModeRobot extends RobotBase {
             // Close the previous opmode
             opMode.opmodeClose();
           }
-          continue;
-        }
-
-        if (DriverStation.isDSAttached() && modeId != 0
+        } else if (DriverStation.isDSAttached() && modeId != 0
             && (modeId != lastModeId || m_activeOpMode.get() == null)) {
           // New opmode selected, or closed after running once
 
@@ -314,6 +333,7 @@ public abstract class OpModeRobot extends RobotBase {
 
         OpMode opMode = m_activeOpMode.get();
         if (opMode == null) {
+          nonePeriodic();
           continue;
         }
 
@@ -338,7 +358,7 @@ public abstract class OpModeRobot extends RobotBase {
 
   /** Ends the main loop in startCompetition(). */
   @Override
-  public void endCompetition() {
+  public final void endCompetition() {
     OpMode opMode = m_activeOpMode.getAndSet(null);
     if (opMode != null) {
       opMode.opmodeStop();
