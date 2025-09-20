@@ -10,30 +10,30 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 /**
- * Supports struct serializable types. Struct-serializable types are loggable if they have a public
- * static final {@code struct} field of a type that inherits from {@code Struct}.
+ * Supports protobuf serializable types. Protobuf-serializable types are loggable if they have a
+ * public static final {@code proto} field of a type that inherits from {@code Protobuf}.
  */
-public class StructHandler extends ElementHandler {
+public class ProtobufHandler extends ElementHandler {
   private final TypeMirror m_serializable;
-  private final TypeElement m_structType;
+  private final TypeElement m_protobufType;
   private final Types m_typeUtils;
   private final Elements m_elementUtils;
 
-  protected StructHandler(ProcessingEnvironment processingEnv) {
+  protected ProtobufHandler(ProcessingEnvironment processingEnv) {
     super(processingEnv);
+
     m_serializable =
         processingEnv
             .getElementUtils()
-            .getTypeElement("edu.wpi.first.util.struct.StructSerializable")
+            .getTypeElement("edu.wpi.first.util.protobuf.ProtobufSerializable")
             .asType();
-    m_structType =
-        processingEnv.getElementUtils().getTypeElement("edu.wpi.first.util.struct.Struct");
+    m_protobufType =
+        processingEnv.getElementUtils().getTypeElement("edu.wpi.first.util.protobuf.Protobuf");
     m_typeUtils = processingEnv.getTypeUtils();
     m_elementUtils = processingEnv.getElementUtils();
   }
@@ -44,60 +44,59 @@ public class StructHandler extends ElementHandler {
   }
 
   /**
-   * Checks if a type is struct-serializable: implements the StructSerializable marker interface and
-   * has a `public static final struct` field of a type that inherits from Struct with a compatible
-   * generic type bound.
+   * Checks if a type is protobuf-serializable: implements the ProtobufSerializable marker interface
+   * and has a `public static final proto` field of a type that inherits from Protobuf with a
+   * compatible generic type bound.
    *
    * @param type The type to check
-   * @return true if the type is struct-serializable, false otherwise
+   * @return true if the type is protobuf-serializable, false otherwise
    */
   public boolean isLoggableType(TypeMirror type) {
-    TypeMirror serializableType;
-    if (type instanceof ArrayType arr) {
-      serializableType = arr.getComponentType();
-    } else {
-      serializableType = m_typeUtils.erasure(type);
-    }
+    var serializableType = m_typeUtils.erasure(type);
     var typeElement = m_elementUtils.getTypeElement(serializableType.toString());
     if (typeElement == null) {
       return false;
     }
 
-    // eg `Struct<Rotation2d>` instead of the raw `Struct` type
-    var sharpStructType = m_typeUtils.getDeclaredType(m_structType, typeElement.asType());
+    // eg `Protobuf<Rotation2d, ?>` instead of the raw `Protobuf` type. The message type doesn't
+    // really matter here; we can leave it as a wildcard.
+    var sharpProtobufType =
+        m_typeUtils.getDeclaredType(
+            m_protobufType,
+            typeElement.asType(), // the serializable type
+            m_typeUtils.getWildcardType(
+                m_elementUtils.getTypeElement("us.hebi.quickbuf.ProtoMessage").asType(), null));
 
-    boolean hasStruct =
+    boolean hasProto =
         typeElement.getEnclosedElements().stream()
             .filter(e -> e instanceof VariableElement)
             .map(e -> (VariableElement) e)
             .anyMatch(
                 field -> {
-                  var nameMatch = field.getSimpleName().contentEquals("struct");
+                  var nameMatch = field.getSimpleName().contentEquals("proto");
                   var modifiersMatch =
                       field
                           .getModifiers()
                           .containsAll(Set.of(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL));
                   var typeMatch =
                       m_typeUtils.isAssignable(
-                          m_typeUtils.erasure(field.asType()), sharpStructType);
+                          m_typeUtils.erasure(field.asType()), sharpProtobufType);
                   return nameMatch && modifiersMatch && typeMatch;
                 });
-    return m_typeUtils.isAssignable(type, m_serializable) && hasStruct;
+    return m_typeUtils.isAssignable(type, m_serializable) && hasProto;
   }
 
-  public String structAccess(TypeMirror serializableType) {
+  public String protoAccess(TypeMirror serializableType) {
     var className = m_typeUtils.erasure(serializableType).toString();
-    return className + ".struct";
+    return className + ".proto";
   }
 
   @Override
   public String logInvocation(Element element, TypeElement loggedClass) {
-    return "backend.log(\""
-        + loggedName(element)
-        + "\", "
-        + elementAccess(element, loggedClass)
-        + ", "
-        + structAccess(dataType(element))
-        + ")";
+    return "backend.log(\"%s\", %s, %s)"
+        .formatted(
+            loggedName(element),
+            elementAccess(element, loggedClass),
+            protoAccess(dataType(element)));
   }
 }

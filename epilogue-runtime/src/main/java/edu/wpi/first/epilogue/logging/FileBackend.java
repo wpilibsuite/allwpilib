@@ -16,17 +16,20 @@ import edu.wpi.first.util.datalog.FloatArrayLogEntry;
 import edu.wpi.first.util.datalog.FloatLogEntry;
 import edu.wpi.first.util.datalog.IntegerArrayLogEntry;
 import edu.wpi.first.util.datalog.IntegerLogEntry;
+import edu.wpi.first.util.datalog.ProtobufLogEntry;
 import edu.wpi.first.util.datalog.RawLogEntry;
 import edu.wpi.first.util.datalog.StringArrayLogEntry;
 import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.util.datalog.StructArrayLogEntry;
 import edu.wpi.first.util.datalog.StructLogEntry;
+import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.struct.Struct;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiFunction;
+import us.hebi.quickbuf.ProtoMessage;
 
 /** A backend implementation that saves information to a WPILib {@link DataLog} file on disk. */
 public class FileBackend implements EpilogueBackend {
@@ -34,6 +37,7 @@ public class FileBackend implements EpilogueBackend {
   private final Map<String, DataLogEntry> m_entries = new HashMap<>();
   private final Map<String, NestedBackend> m_subLoggers = new HashMap<>();
   private final Set<Struct<?>> m_seenSchemas = new HashSet<>();
+  private final Set<Protobuf<?, ?>> m_seenProtos = new HashSet<>();
 
   /**
    * Creates a new file-based backend.
@@ -165,5 +169,20 @@ public class FileBackend implements EpilogueBackend {
     }
 
     ((StructArrayLogEntry<S>) m_entries.get(identifier)).append(value);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <P, M extends ProtoMessage<M>> void log(String identifier, P value, Protobuf<P, M> proto) {
+    // DataLog.addSchema has checks that we're able to skip, avoiding allocations
+    if (m_seenProtos.add(proto)) {
+      m_dataLog.addSchema(proto);
+    }
+
+    if (!m_entries.containsKey(identifier)) {
+      m_entries.put(identifier, ProtobufLogEntry.create(m_dataLog, identifier, proto));
+    }
+
+    ((ProtobufLogEntry<P>) m_entries.get(identifier)).append(value);
   }
 }

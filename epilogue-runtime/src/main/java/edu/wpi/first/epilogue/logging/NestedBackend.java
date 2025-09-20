@@ -4,9 +4,11 @@
 
 package edu.wpi.first.epilogue.logging;
 
+import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.struct.Struct;
 import java.util.HashMap;
 import java.util.Map;
+import us.hebi.quickbuf.ProtoMessage;
 
 /**
  * A backend that logs to an underlying backend, prepending all logged data with a specific prefix.
@@ -146,5 +148,10 @@ public class NestedBackend implements EpilogueBackend {
   @Override
   public <S> void log(String identifier, S[] value, Struct<S> struct) {
     m_impl.log(withPrefix(identifier), value, struct);
+  }
+
+  @Override
+  public <P, M extends ProtoMessage<M>> void log(String identifier, P value, Protobuf<P, M> proto) {
+    m_impl.log(m_prefix + identifier, value, proto);
   }
 }
