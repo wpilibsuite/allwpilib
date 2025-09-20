@@ -1,0 +1,11 @@
+load("@rules_java//java:defs.bzl", "java_plugin")
+
+java_plugin(
+    name = "plugin",
+    srcs = glob(["src/main/java/**/*.java"]),
+    resources = glob(["src/main/resources/**"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//wpiannotations",
+    ],
+)
