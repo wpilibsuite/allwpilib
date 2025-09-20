@@ -18,9 +18,11 @@ import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Deque;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -185,7 +187,21 @@ public class LoggerGenerator {
     var loggerFile = m_processingEnv.getFiler().createSourceFile(loggerClassName);
 
     var varHandleFields =
-        loggableFields.stream().filter(e -> !e.getModifiers().contains(Modifier.PUBLIC)).toList();
+        loggableFields.stream()
+            .filter(
+                e -> {
+                  if (e.getEnclosingElement().equals(clazz)) {
+                    // The generated logger is in the same package as the logged class, so the
+                    // only fields it can't read are private ones.
+                    return e.getModifiers().contains(Modifier.PRIVATE);
+                  } else {
+                    // Logging from a superclass. Can only read public fields, unless the superclass
+                    // is in the same package, in which case protected and package-private fields
+                    // are also readable.
+                    return !e.getModifiers().contains(Modifier.PUBLIC);
+                  }
+                })
+            .toList();
     boolean requiresVarHandles = !varHandleFields.isEmpty();
 
     try (var out = new PrintWriter(loggerFile.openWriter())) {
@@ -214,41 +230,67 @@ public class LoggerGenerator {
               + "> {");
 
       if (requiresVarHandles) {
-        for (var varHandleField : varHandleFields) {
+        for (var privateField : varHandleFields) {
           // This field needs a VarHandle to access.
           // Cache it in the class to avoid lookups
-          out.println("  private static final VarHandle $" + varHandleField.getSimpleName() + ";");
+          out.printf(
+              "  // Accesses private or superclass field %s.%s%n",
+              privateField.getEnclosingElement(), privateField.getSimpleName());
+          out.printf("  private static final VarHandle %s;%n", varHandleName(privateField));
         }
         out.println();
+      }
 
-        var classReference = simpleClassName + ".class";
-
+      // Static initializer block to load VarHandles and reflection fields
+      if (requiresVarHandles) {
         out.println("  static {");
-        out.println("    try {");
-        out.println(
-            "      var lookup = MethodHandles.privateLookupIn("
-                + classReference
-                + ", MethodHandles.lookup());");
 
-        for (var varHandleField : varHandleFields) {
-          var fieldName = varHandleField.getSimpleName();
-          out.println(
-              "      $"
-                  + fieldName
-                  + " = lookup.findVarHandle("
-                  + classReference
-                  + ", \""
-                  + fieldName
-                  + "\", "
-                  + m_processingEnv.getTypeUtils().erasure(varHandleField.asType())
-                  + ".class);");
-        }
+        out.println("    try {");
+
+        out.println("      var rootLookup = MethodHandles.lookup();");
+
+        // Group private fields by class, then generate a private lookup for each class
+        // and a VarHandle for each field using that lookup. Sorting and then collecting into a
+        // LinkedHashMap gives deterministic output ordering (mostly for tests, which check exact
+        // file contents, but also results in less churn when regenerating files for users who like
+        // to read the generated logger classes).
+        //
+        // This lets us read private fields from superclasses.
+        Map<Element, List<VariableElement>> privateFieldsByClass =
+            varHandleFields.stream()
+                .sorted(Comparator.comparing(e -> e.getSimpleName().toString()))
+                .collect(
+                    Collectors.groupingBy(
+                        VariableElement::getEnclosingElement,
+                        LinkedHashMap::new,
+                        Collectors.toList()));
+
+        privateFieldsByClass.forEach(
+            (enclosingClass, fields) -> {
+              String className = enclosingClass.toString();
+              String lookupName = "lookup$$" + className.replace(".", "_");
+              out.printf(
+                  "      var %s = MethodHandles.privateLookupIn(%s.class, rootLookup);%n",
+                  lookupName, className);
+
+              for (var field : fields) {
+                var fieldname = field.getSimpleName();
+                out.printf(
+                    "      %s = %s.findVarHandle(%s.class, \"%s\", %s.class);%n",
+                    varHandleName(field),
+                    lookupName,
+                    className,
+                    fieldname,
+                    m_processingEnv.getTypeUtils().erasure(field.asType()));
+              }
+            });
 
         out.println("    } catch (ReflectiveOperationException e) {");
         out.println(
             "      throw new RuntimeException("
                 + "\"[EPILOGUE] Could not load private fields for logging!\", e);");
         out.println("    }");
+
         out.println("  }");
         out.println();
       }
@@ -300,7 +342,7 @@ public class LoggerGenerator {
                     // to be logged. For example, the sendable handler consumes all sendable types
                     // but does not log commands or subsystems, to prevent excessive warnings about
                     // unloggable commands.
-                    var logInvocation = h.logInvocation(loggableElement);
+                    var logInvocation = h.logInvocation(loggableElement, clazz);
                     if (logInvocation != null) {
                       out.println(logInvocation.indent(6).stripTrailing() + ";");
                     }
@@ -313,6 +355,18 @@ public class LoggerGenerator {
       out.println("  }");
       out.println("}");
     }
+  }
+
+  /**
+   * Generates the name of a VarHandle for access to the given field. The VarHandle variable's name
+   * is guaranteed to be unique.
+   *
+   * @param field The field to generate a VarHandle for
+   * @return The name of the generated VarHandle variable
+   */
+  public static String varHandleName(VariableElement field) {
+    return "$%s_%s"
+        .formatted(field.getEnclosingElement().toString().replace(".", "_"), field.getSimpleName());
   }
 
   private void collectLoggables(

@@ -12,23 +12,23 @@ file(GLOB wpiutil_jni_src src/main/native/cpp/jni/WPIUtilJNI.cpp)
 if(WITH_JAVA)
     include(UseJava)
 
-    if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/jackson-core-2.15.2.jar")
+    if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/jackson-core-2.19.2.jar")
         set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
         set(JAR_ROOT "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson")
 
         message(STATUS "Downloading Jackson jarfiles...")
 
         download_and_check(
-            "${BASE_URL}com/fasterxml/jackson/core/jackson-core/2.15.2/jackson-core-2.15.2.jar"
-            "${JAR_ROOT}/jackson-core-2.15.2.jar"
+            "${BASE_URL}com/fasterxml/jackson/core/jackson-core/2.19.2/jackson-core-2.19.2.jar"
+            "${JAR_ROOT}/jackson-core-2.19.2.jar"
         )
         download_and_check(
-            "${BASE_URL}com/fasterxml/jackson/core/jackson-databind/2.15.2/jackson-databind-2.15.2.jar"
-            "${JAR_ROOT}/jackson-databind-2.15.2.jar"
+            "${BASE_URL}com/fasterxml/jackson/core/jackson-databind/2.19.2/jackson-databind-2.19.2.jar"
+            "${JAR_ROOT}/jackson-databind-2.19.2.jar"
         )
         download_and_check(
-            "${BASE_URL}com/fasterxml/jackson/core/jackson-annotations/2.15.2/jackson-annotations-2.15.2.jar"
-            "${JAR_ROOT}/jackson-annotations-2.15.2.jar"
+            "${BASE_URL}com/fasterxml/jackson/core/jackson-annotations/2.19.2/jackson-annotations-2.19.2.jar"
+            "${JAR_ROOT}/jackson-annotations-2.19.2.jar"
         )
 
         message(STATUS "All files downloaded.")
@@ -36,14 +36,14 @@ if(WITH_JAVA)
 
     file(GLOB JACKSON_JARS ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar)
 
-    if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/quickbuf-runtime-1.3.3.jar")
+    if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/quickbuf-runtime-1.4.jar")
         set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
         set(JAR_ROOT "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf")
 
         message(STATUS "Downloading Quickbuf jarfile...")
         download_and_check(
-            "${BASE_URL}us/hebi/quickbuf/quickbuf-runtime/1.3.3/quickbuf-runtime-1.3.3.jar"
-            "${JAR_ROOT}/quickbuf-runtime-1.3.3.jar"
+            "${BASE_URL}us/hebi/quickbuf/quickbuf-runtime/1.4/quickbuf-runtime-1.4.jar"
+            "${JAR_ROOT}/quickbuf-runtime-1.4.jar"
         )
 
         message(STATUS "Downloaded.")

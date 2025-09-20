@@ -12,7 +12,7 @@ namespace frc {
 
 TEST(DifferentialDriveAccelerationLimiterTest, LowLimits) {
   constexpr auto trackwidth = 0.9_m;
-  constexpr auto dt = 5_ms;
+  constexpr units::second_t dt = 5_ms;
   constexpr auto maxA = 2_mps_sq;
   constexpr auto maxAlpha = 2_rad_per_s_sq;
 
@@ -105,7 +105,7 @@ TEST(DifferentialDriveAccelerationLimiterTest, LowLimits) {
 
 TEST(DifferentialDriveAccelerationLimiterTest, HighLimits) {
   constexpr auto trackwidth = 0.9_m;
-  constexpr auto dt = 5_ms;
+  constexpr units::second_t dt = 5_ms;
 
   using Kv_t = decltype(1_V / 1_mps);
   using Ka_t = decltype(1_V / 1_mps_sq);
@@ -173,7 +173,7 @@ TEST(DifferentialDriveAccelerationLimiterTest, HighLimits) {
 
 TEST(DifferentialDriveAccelerationLimiterTest, SeparateMinMaxLowLimits) {
   constexpr auto trackwidth = 0.9_m;
-  constexpr auto dt = 5_ms;
+  constexpr units::second_t dt = 5_ms;
   constexpr auto minA = -1_mps_sq;
   constexpr auto maxA = 2_mps_sq;
   constexpr auto maxAlpha = 2_rad_per_s_sq;
