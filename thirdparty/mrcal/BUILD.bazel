@@ -7,6 +7,7 @@ cc_library(
     hdrs = glob([
         "src/main/native/include/*",
     ]),
+    visibility = ["//visibility:public"],
     strip_include_prefix = "src/main/native/include",
     deps = [
         ":headers-libdogleg",
@@ -148,7 +149,7 @@ wpilib_cc_library(
 wpilib_jni_cc_library(
     name = "mrcaljni",
     srcs = glob(["src/main/native/src/jni/**"]),
-    java_dep = ":cscore-java",
+    java_dep = ":mrcal-java",
     visibility = ["//visibility:public"],
     deps = [
         ":headers-mrcal-jni",
