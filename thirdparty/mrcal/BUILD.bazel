@@ -1,0 +1,169 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
+load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
+
+cc_library(
+    name = "headers",
+    hdrs = glob([
+        "src/main/native/include/*",
+    ]),
+    strip_include_prefix = "src/main/native/include",
+    deps = [
+        ":headers-libdogleg",
+        ":headers-mrcal",
+        ":headers-mrcal-generated",
+        ":headers-mrcal-java",
+    ],
+)
+
+cc_library(
+    name = "headers-mrcal-jni",
+    hdrs = glob([
+        "src/main/native/include/jni/*",
+    ]),
+    strip_include_prefix = "src/main/native/include/jni",
+)
+
+cc_library(
+    name = "headers-libdogleg",
+    hdrs = glob([
+        "src/main/native/thirdparty/libdogleg/include/**/*",
+    ]),
+    strip_include_prefix = "src/main/native/thirdparty/libdogleg/include",
+)
+
+cc_library(
+    name = "headers-mrcal-generated",
+    hdrs = glob([
+        "src/main/native/thirdparty/generated/**/*",
+    ]),
+    strip_include_prefix = "src/main/native/thirdparty/generated/",
+)
+
+cc_library(
+    name = "headers-mrcal",
+    hdrs = glob([
+        "src/main/native/thirdparty/include/**/*",
+    ]),
+    strip_include_prefix = "src/main/native/thirdparty/include/",
+)
+
+cc_library(
+    name = "headers-mrcal-java",
+    hdrs = glob([
+        "src/main/native/include/**/*",
+    ]),
+    strip_include_prefix = "src/main/native/include/",
+)
+
+unix_copts = [
+    "-Wno-pedantic",
+    "-Wno-format-nonliteral",
+    "-Wno-unused-variable",
+    "-Wno-unused-function",
+    "-Wno-sign-compare",
+]
+
+osx_copts = unix_copts
+
+copts = select({
+    "@platforms//os:linux": unix_copts + [
+        "-Wno-maybe-uninitialized",
+    ],
+    "@platforms//os:osx": osx_copts,
+    "@platforms//os:windows": [
+        "/wd4047",
+        "/wd4098",
+        "/wd4267",
+    ],
+})
+
+unix_cxxopts = [
+    "-Wno-missing-field-initializers",
+    "-Wno-pedantic",
+    "-fpermissive",
+    "-Wno-deprecated-declarations",
+    "-Wno-return-type",
+    "-Wno-missing-braces",
+    "-Wno-null-conversion",
+    "-Wno-unused-but-set-variable",
+]
+
+osx_cxxopts = unix_cxxopts + [
+    "-Wno-unused-variable",
+    "-Wno-unused-function",
+    "-Wno-sign-compare",
+    "-Wno-sometimes-uninitialized",
+]
+
+cxxopts = select({
+    "@platforms//os:linux": unix_cxxopts + [
+        "-Wno-deprecated-enum-enum-conversion",
+    ],
+    "@platforms//os:osx": osx_cxxopts,
+    "@platforms//os:windows": [
+        "/wd4068",
+        "/wd4101",
+        "/wd4200",
+        "/wd4576",
+        "/wd4715",
+    ],
+})
+
+linkopts = select({
+    "@platforms//os:linux": [],
+    "@platforms//os:osx": [
+        "-framework",
+        "Accelerate",
+    ],
+    "@platforms//os:windows": [],
+})
+
+wpilib_cc_library(
+    name = "mrcal",
+    srcs = glob(
+        [
+            "src/main/native/thirdparty/libdogleg/src/**/*.cpp",
+            "src/main/native/thirdparty/src/**/*.cpp",
+            "src/main/native/thirdparty/src/**/*.c",
+            "src/main/native/src/*.cpp",
+        ],
+    ),
+    copts = copts,
+    cxxopts = cxxopts,
+    defines = ["OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT"],
+    include_license_files = True,
+    linkopts = linkopts,
+    linkstatic = True,
+    srcs_pkg_root = "src/main/native",
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":headers",
+        "//thirdparty/ceres",
+        "@bzlmodrio-opencv//libraries/cpp/opencv",
+    ],
+)
+
+wpilib_jni_cc_library(
+    name = "mrcaljni",
+    srcs = glob(["src/main/native/src/jni/**"]),
+    java_dep = ":cscore-java",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":headers-mrcal-jni",
+        ":mrcal",
+    ],
+)
+
+wpilib_jni_java_library(
+    name = "mrcal-java",
+    srcs = glob(["src/main/java/**/*.java"]),
+    maven_artifact_name = "mrcal-java",
+    maven_group_id = "edu.wpi.first.mrcal",
+    native_libs = [":mrcaljni"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@bzlmodrio-opencv//libraries/java/opencv",
+    ],
+)
