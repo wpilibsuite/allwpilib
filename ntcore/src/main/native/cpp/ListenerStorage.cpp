@@ -28,12 +28,17 @@ void ListenerStorage::Thread::Main() {
     if (!events.empty()) {
       std::unique_lock lock{m_mutex};
       for (auto&& event : events) {
+        if (m_shutdown) {
+          break;
+        }
         auto callbackIt = m_callbacks.find(event.listener);
         if (callbackIt != m_callbacks.end()) {
           auto callback = callbackIt->second;
+          m_inCallback = true;
           lock.unlock();
           callback(event);
           lock.lock();
+          m_inCallback = false;
         }
       }
     }
@@ -42,6 +47,13 @@ void ListenerStorage::Thread::Main() {
       m_waitQueueWaiter.Set();
     }
   }
+}
+
+bool ListenerStorage::Thread::Shutdown() {
+  if (m_active && !m_shutdown.exchange(true)) {
+    return !m_inCallback;
+  }
+  return true;
 }
 
 void ListenerStorage::Activate(NT_Listener listenerHandle, unsigned int mask,
@@ -347,6 +359,8 @@ bool ListenerStorage::WaitForListenerQueue(double timeout) {
 }
 
 void ListenerStorage::Reset() {
+  Stop();  // If a callback is currently running, wait for it to complete.
+
   std::scoped_lock lock{m_mutex};
   m_pollers.clear();
   m_listeners.clear();
@@ -355,9 +369,27 @@ void ListenerStorage::Reset() {
   m_valueListeners.clear();
   m_logListeners.clear();
   m_timeSyncListeners.clear();
-  if (m_thread) {
-    m_thread.Stop();
+}
+
+void ListenerStorage::Stop() {
+  WPI_EventHandle h;
+  {
+    std::scoped_lock lock{m_mutex};
+    if (auto thr = m_thread.GetThread()) {
+      if (thr->Shutdown()) {
+        return;
+      }
+
+      // Signal the thread and wait for the queue.
+      h = thr->m_waitQueueWaiter.GetHandle();
+      thr->m_waitQueueWakeup.Set();
+    } else {
+      return;
+    }
   }
+
+  wpi::WaitForObject(h, 0.02, NULL);
+  m_thread.Stop();
 }
 
 std::vector<std::pair<NT_Listener, unsigned int>>
