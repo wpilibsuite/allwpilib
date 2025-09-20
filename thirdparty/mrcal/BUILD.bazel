@@ -154,6 +154,7 @@ wpilib_jni_cc_library(
     deps = [
         ":headers-mrcal-jni",
         ":mrcal",
+        "//wpiutil",
     ],
 )
 
