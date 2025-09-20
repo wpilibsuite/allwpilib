@@ -39,7 +39,7 @@ public final class MathUtil {
     // q = a + (b − a)t
     // (b − a)t = q − a
     // t = (q − a)/(b − a)
-    if (a == b) {
+    if (Math.abs(a - b) < 1e-9) {
       return 0.0;
     } else {
       return (q - a) / (b - a);
