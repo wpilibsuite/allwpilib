@@ -2,7 +2,6 @@
 
 #include "sleipnir/optimization/solver/sqp.hpp"
 
-#include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <functional>
@@ -232,8 +231,7 @@ ExitStatus sqp(const SQPMatrixCallbacks& matrix_callbacks,
     Eigen::SparseMatrix<double> lhs(
         num_decision_variables + num_equality_constraints,
         num_decision_variables + num_equality_constraints);
-    lhs.setFromSortedTriplets(triplets.begin(), triplets.end(),
-                              [](const auto&, const auto& b) { return b; });
+    lhs.setFromSortedTriplets(triplets.begin(), triplets.end());
 
     // rhs = −[∇f − Aₑᵀy]
     //        [   cₑ    ]
@@ -407,7 +405,6 @@ ExitStatus sqp(const SQPMatrixCallbacks& matrix_callbacks,
         trial_x = x + α_max * step.p_x;
         trial_y = y + α_max * step.p_y;
 
-        trial_f = matrices.f(trial_x);
         trial_c_e = matrices.c_e(trial_x);
 
         double next_kkt_error = kkt_error(
