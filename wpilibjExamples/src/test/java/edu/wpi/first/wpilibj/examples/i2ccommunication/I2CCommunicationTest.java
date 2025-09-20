@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.RobotMode;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.CallbackStore;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
@@ -99,7 +100,7 @@ class I2CCommunicationTest {
   @ValueSource(booleans = {true, false})
   @ParameterizedTest(name = "autonomous[{index}]: {0}")
   void autonomousTest(boolean autonomous) {
-    DriverStationSim.setAutonomous(autonomous);
+    DriverStationSim.setRobotMode(autonomous ? RobotMode.AUTONOMOUS : RobotMode.TELEOPERATED);
     DriverStationSim.notifyNewData();
 
     assertTrue(m_i2c.getInitialized());

@@ -12,6 +12,9 @@
 #include "hal/Types.h"
 #include "hal/simulation/NotifyListener.h"
 
+typedef void (*HAL_OpModeOptionsCallback)(const char* name, void* param,
+                                          const HAL_OpModeOption* opmodes,
+                                          int32_t count);
 typedef void (*HAL_JoystickAxesCallback)(const char* name, void* param,
                                          int32_t joystickNum,
                                          const HAL_JoystickAxes* axes);
@@ -36,6 +39,7 @@ extern "C" {
 #endif
 
 void HALSIM_ResetDriverStationData(void);
+
 int32_t HALSIM_RegisterDriverStationEnabledCallback(HAL_NotifyCallback callback,
                                                     void* param,
                                                     HAL_Bool initialNotify);
@@ -43,18 +47,11 @@ void HALSIM_CancelDriverStationEnabledCallback(int32_t uid);
 HAL_Bool HALSIM_GetDriverStationEnabled(void);
 void HALSIM_SetDriverStationEnabled(HAL_Bool enabled);
 
-int32_t HALSIM_RegisterDriverStationAutonomousCallback(
+int32_t HALSIM_RegisterDriverStationRobotModeCallback(
     HAL_NotifyCallback callback, void* param, HAL_Bool initialNotify);
-void HALSIM_CancelDriverStationAutonomousCallback(int32_t uid);
-HAL_Bool HALSIM_GetDriverStationAutonomous(void);
-void HALSIM_SetDriverStationAutonomous(HAL_Bool autonomous);
-
-int32_t HALSIM_RegisterDriverStationTestCallback(HAL_NotifyCallback callback,
-                                                 void* param,
-                                                 HAL_Bool initialNotify);
-void HALSIM_CancelDriverStationTestCallback(int32_t uid);
-HAL_Bool HALSIM_GetDriverStationTest(void);
-void HALSIM_SetDriverStationTest(HAL_Bool test);
+void HALSIM_CancelDriverStationRobotModeCallback(int32_t uid);
+HAL_RobotMode HALSIM_GetDriverStationRobotMode(void);
+void HALSIM_SetDriverStationRobotMode(HAL_RobotMode mode);
 
 int32_t HALSIM_RegisterDriverStationEStopCallback(HAL_NotifyCallback callback,
                                                   void* param,
@@ -87,6 +84,21 @@ int32_t HALSIM_RegisterDriverStationMatchTimeCallback(
 void HALSIM_CancelDriverStationMatchTimeCallback(int32_t uid);
 double HALSIM_GetDriverStationMatchTime(void);
 void HALSIM_SetDriverStationMatchTime(double matchTime);
+
+int32_t HALSIM_RegisterDriverStationOpModeCallback(HAL_NotifyCallback callback,
+                                                   void* param,
+                                                   HAL_Bool initialNotify);
+void HALSIM_CancelDriverStationOpModeCallback(int32_t uid);
+int64_t HALSIM_GetDriverStationOpMode(void);
+void HALSIM_SetDriverStationOpMode(int64_t opmode);
+
+int32_t HALSIM_RegisterOpModeOptionsCallback(HAL_OpModeOptionsCallback callback,
+                                             void* param,
+                                             HAL_Bool initialNotify);
+void HALSIM_CancelOpModeOptionsCallback(int32_t uid);
+struct HAL_OpModeOption* HALSIM_GetOpModeOptions(int32_t* len);
+
+void HALSIM_FreeOpModeOptionsArray(struct HAL_OpModeOption* arr, size_t length);
 
 int32_t HALSIM_RegisterJoystickAxesCallback(int32_t joystickNum,
                                             HAL_JoystickAxesCallback callback,

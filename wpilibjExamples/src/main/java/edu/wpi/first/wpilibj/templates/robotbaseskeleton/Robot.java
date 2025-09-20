@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj.templates.robotbaseskeleton;
 
 import edu.wpi.first.hal.DriverStationJNI;
+import edu.wpi.first.hal.RobotMode;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -29,6 +30,12 @@ public class Robot extends RobotBase {
 
   @Override
   public void startCompetition() {
+    // Create an opmode per robot mode
+    DriverStation.addOpMode(RobotMode.AUTONOMOUS, "Auto");
+    DriverStation.addOpMode(RobotMode.TELEOPERATED, "Teleop");
+    DriverStation.addOpMode(RobotMode.TEST, "Test");
+    DriverStation.publishOpModes();
+
     DriverStationModeThread modeThread = new DriverStationModeThread();
 
     int event = WPIUtilJNI.createEvent(false, false);
@@ -39,10 +46,11 @@ public class Robot extends RobotBase {
     DriverStationJNI.observeUserProgramStarting();
 
     while (!Thread.currentThread().isInterrupted() && !m_exit) {
+      long opMode = DriverStation.getOpModeId();
+      boolean enabled = DriverStation.isEnabled();
+      modeThread.inOpMode(opMode, enabled);
       if (isDisabled()) {
-        modeThread.inDisabled(true);
         disabled();
-        modeThread.inDisabled(false);
         while (isDisabled()) {
           try {
             WPIUtilJNI.waitForObject(event);
@@ -51,9 +59,7 @@ public class Robot extends RobotBase {
           }
         }
       } else if (isAutonomous()) {
-        modeThread.inAutonomous(true);
         autonomous();
-        modeThread.inAutonomous(false);
         while (isAutonomousEnabled()) {
           try {
             WPIUtilJNI.waitForObject(event);
@@ -62,9 +68,7 @@ public class Robot extends RobotBase {
           }
         }
       } else if (isTest()) {
-        modeThread.inTest(true);
         test();
-        modeThread.inTest(false);
         while (isTest() && isEnabled()) {
           try {
             WPIUtilJNI.waitForObject(event);
@@ -73,9 +77,7 @@ public class Robot extends RobotBase {
           }
         }
       } else {
-        modeThread.inTeleop(true);
         teleop();
-        modeThread.inTeleop(false);
         while (isTeleopEnabled()) {
           try {
             WPIUtilJNI.waitForObject(event);
