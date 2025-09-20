@@ -4,9 +4,12 @@
 
 package edu.wpi.first.wpilibj.event;
 
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.units.measure.Frequency;
+import edu.wpi.first.units.measure.Time;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 import java.util.function.BooleanSupplier;
@@ -167,7 +170,29 @@ public class BooleanEvent implements BooleanSupplier {
    * Creates a new debounced event from this event - it will become active when this event has been
    * active for longer than the specified period.
    *
-   * @param seconds The debounce period.
+   * @param period The debounce period.
+   * @return The debounced event (rising edges debounced only).
+   */
+  public BooleanEvent debounce(Time period) {
+    return debounce(period.in(Seconds));
+  }
+
+  /**
+   * Creates a new debounced event from this event - it will become active when this event has been
+   * active for longer than the specified frequency.
+   *
+   * @param frequency The debounce frequency.
+   * @return The debounced event (rising edges debounced only).
+   */
+  public BooleanEvent debounce(Frequency frequency) {
+    return debounce(frequency.asPeriod());
+  }
+
+  /**
+   * Creates a new debounced event from this event - it will become active when this event has been
+   * active for longer than the specified period.
+   *
+   * @param seconds The debounce period in seconds.
    * @return The debounced event (rising edges debounced only).
    */
   public BooleanEvent debounce(double seconds) {
@@ -178,7 +203,31 @@ public class BooleanEvent implements BooleanSupplier {
    * Creates a new debounced event from this event - it will become active when this event has been
    * active for longer than the specified period.
    *
-   * @param seconds The debounce period.
+   * @param period The debounce period.
+   * @param type The debounce type.
+   * @return The debounced event.
+   */
+  public BooleanEvent debounce(Time period, Debouncer.DebounceType type) {
+    return debounce(period.in(Seconds), type);
+  }
+
+  /**
+   * Creates a new debounced event from this event - it will become active when this event has been
+   * active for longer than the specified frequency.
+   *
+   * @param frequency The debounce frequency.
+   * @param type The debounce type.
+   * @return The debounced event.
+   */
+  public BooleanEvent debounce(Frequency frequency, Debouncer.DebounceType type) {
+    return debounce(frequency.asPeriod(), type);
+  }
+
+  /**
+   * Creates a new debounced event from this event - it will become active when this event has been
+   * active for longer than the specified period.
+   *
+   * @param seconds The debounce period in seconds.
    * @param type The debounce type.
    * @return The debounced event.
    */
