@@ -12,6 +12,7 @@ cppSrcFileInclude {
 modifiableFileExclude {
   cmake/toolchains/
   thirdparty/benchmark
+  thirdparty/catch2
   thirdparty/eigen
   thirdparty/apriltag
   thirdparty/googletest
