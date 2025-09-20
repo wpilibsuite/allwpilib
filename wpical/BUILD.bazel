@@ -34,7 +34,7 @@ cc_library(
     ]),
     strip_include_prefix = "src/main/native/include",
     deps = [
-        "//thirdparty/mrcal:headers"
+        "//thirdparty/mrcal:headers",
     ],
 )
 

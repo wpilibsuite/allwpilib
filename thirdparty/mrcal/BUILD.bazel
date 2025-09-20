@@ -7,8 +7,8 @@ cc_library(
     hdrs = glob([
         "src/main/native/include/*",
     ]),
-    visibility = ["//visibility:public"],
     strip_include_prefix = "src/main/native/include",
+    visibility = ["//visibility:public"],
     deps = [
         ":headers-libdogleg",
         ":headers-mrcal",
