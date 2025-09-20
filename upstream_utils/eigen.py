@@ -77,6 +77,7 @@ def eigen_inclusions(dp: Path, f: str):
         "SparseLU",
         "SparseQR",
         "StdVector",
+        "Version",
         "misc",
         "plugins",
     ]
@@ -144,8 +145,7 @@ def copy_upstream_src(wpilib_root: Path):
 def main():
     name = "eigen"
     url = "https://gitlab.com/libeigen/eigen.git"
-    # master on 2025-09-08
-    tag = "e0a59e5a66e6d16fa93ab4f5e48bf539205e837f"
+    tag = "5.0.0"
 
     eigen = Lib(name, url, tag, copy_upstream_src)
     eigen.main()
