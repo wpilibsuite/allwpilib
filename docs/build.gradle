@@ -166,6 +166,7 @@ doxygen.sourceSets.main {
 
 tasks.register("zipCppDocs", Zip) {
     archiveBaseName = zipBaseNameCpp
+    archiveVersion = ""
     destinationDirectory = outputsFolder
     dependsOn doxygenDox
     from ("$buildDir/docs/doxygen/html")
@@ -204,6 +205,7 @@ task generateJavaDocs(type: Javadoc) {
             "-edu.wpi.first.math.system.plant.proto," +
             "-edu.wpi.first.math.system.plant.struct," +
             "-edu.wpi.first.math.trajectory.proto," +
+            "-edu.wpi.first.math.trajectory.struct," +
             "-org.wpilib.commands3.proto," +
             // The .measure package contains generated source files for which automatic javadoc
             // generation is very difficult to do meaningfully.
@@ -246,6 +248,7 @@ task generateJavaDocs(type: Javadoc) {
 
 tasks.register("zipJavaDocs", Zip) {
     archiveBaseName = zipBaseNameJava
+    archiveVersion = ""
     destinationDirectory = outputsFolder
     dependsOn generateJavaDocs
     from ("$buildDir/docs/javadoc")

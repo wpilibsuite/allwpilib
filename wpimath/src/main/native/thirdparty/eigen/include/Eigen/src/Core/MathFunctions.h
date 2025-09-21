@@ -182,10 +182,6 @@ struct imag_ref_retval {
   typedef typename NumTraits<Scalar>::Real& type;
 };
 
-// implementation in MathFunctionsImpl.h
-template <typename Mask, bool is_built_in_float = std::is_floating_point<Mask>::value>
-struct scalar_select_mask;
-
 }  // namespace internal
 
 namespace numext {
@@ -211,9 +207,9 @@ EIGEN_DEVICE_FUNC inline EIGEN_MATHFUNC_RETVAL(imag, Scalar) imag(const Scalar& 
   return EIGEN_MATHFUNC_IMPL(imag, Scalar)::run(x);
 }
 
-template <typename Scalar, typename Mask>
-EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar select(const Mask& mask, const Scalar& a, const Scalar& b) {
-  return internal::scalar_select_mask<Mask>::run(mask) ? b : a;
+template <typename Scalar>
+EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar select(const Scalar& mask, const Scalar& a, const Scalar& b) {
+  return numext::is_exactly_zero(mask) ? b : a;
 }
 
 }  // namespace numext
@@ -945,23 +941,43 @@ struct nearest_integer_impl<Scalar, true> {
   static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar run_trunc(const Scalar& x) { return x; }
 };
 
+// Extra namespace to prevent leaking std::fma into Eigen::internal.
+namespace has_fma_detail {
+
+template <typename T, typename EnableIf = void>
+struct has_fma_impl : public std::false_type {};
+
+using std::fma;
+
+template <typename T>
+struct has_fma_impl<
+    T, std::enable_if_t<std::is_same<T, decltype(fma(std::declval<T>(), std::declval<T>(), std::declval<T>()))>::value>>
+    : public std::true_type {};
+
+}  // namespace has_fma_detail
+
+template <typename T>
+struct has_fma : public has_fma_detail::has_fma_impl<T> {};
+
 // Default implementation.
-template <typename Scalar, typename Enable = void>
+template <typename T, typename Enable = void>
 struct fma_impl {
-  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar run(const Scalar& a, const Scalar& b, const Scalar& c) {
-    return a * b + c;
+  static_assert(has_fma<T>::value, "No function fma(...) for type.  Please provide an implementation.");
+};
+
+// STD or ADL version if it exists.
+template <typename T>
+struct fma_impl<T, std::enable_if_t<has_fma<T>::value>> {
+  static EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE T run(const T& a, const T& b, const T& c) {
+    using std::fma;
+    return fma(a, b, c);
   }
 };
 
-// ADL version if it exists.
-template <typename T>
-struct fma_impl<
-    T,
-    std::enable_if_t<std::is_same<T, decltype(fma(std::declval<T>(), std::declval<T>(), std::declval<T>()))>::value>> {
-  static T run(const T& a, const T& b, const T& c) { return fma(a, b, c); }
-};
-
 #if defined(EIGEN_GPUCC)
+template <>
+struct has_fma<float> : public true_type {};
+
 template <>
 struct fma_impl<float, void> {
   static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE float run(const float& a, const float& b, const float& c) {
@@ -970,9 +986,30 @@ struct fma_impl<float, void> {
 };
 
 template <>
+struct has_fma<double> : public true_type {};
+
+template <>
 struct fma_impl<double, void> {
   static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE double run(const double& a, const double& b, const double& c) {
     return ::fma(a, b, c);
+  }
+};
+#endif
+
+// Basic multiply-add.
+template <typename Scalar, typename EnableIf = void>
+struct madd_impl {
+  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar run(const Scalar& x, const Scalar& y, const Scalar& z) {
+    return x * y + z;
+  }
+};
+
+// Use FMA if there is a single CPU instruction.
+#ifdef EIGEN_VECTORIZE_FMA
+template <typename Scalar>
+struct madd_impl<Scalar, std::enable_if_t<has_fma<Scalar>::value>> {
+  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar run(const Scalar& x, const Scalar& y, const Scalar& z) {
+    return fma_impl<Scalar>::run(x, y, z);
   }
 };
 #endif
@@ -1890,13 +1927,16 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar arithmetic_shift_right(const Scalar
   return bit_cast<Scalar, SignedScalar>(bit_cast<SignedScalar, Scalar>(a) >> n);
 }
 
-// Use std::fma if available.
-using std::fma;
-
 // Otherwise, rely on template implementation.
 template <typename Scalar>
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar fma(const Scalar& x, const Scalar& y, const Scalar& z) {
   return internal::fma_impl<Scalar>::run(x, y, z);
+}
+
+// Multiply-add.
+template <typename Scalar>
+EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar madd(const Scalar& x, const Scalar& y, const Scalar& z) {
+  return internal::madd_impl<Scalar>::run(x, y, z);
 }
 
 }  // end namespace numext
