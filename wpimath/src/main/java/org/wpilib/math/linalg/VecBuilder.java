@@ -14,6 +14,8 @@ import org.wpilib.math.numbers.N6;
 import org.wpilib.math.numbers.N7;
 import org.wpilib.math.numbers.N8;
 import org.wpilib.math.numbers.N9;
+import org.wpilib.math.util.Nat;
+import org.wpilib.math.util.Num;
 import java.util.Objects;
 import org.ejml.simple.SimpleMatrix;
 

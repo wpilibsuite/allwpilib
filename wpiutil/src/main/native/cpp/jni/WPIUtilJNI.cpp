@@ -32,7 +32,7 @@ static const JExceptionInit exceptions[] = {
     {"java/lang/InterruptedException", &interruptedEx},
     {"java/io/IOException", &ioEx},
     {"java/lang/NullPointerException", &nullPointerEx},
-    {"org/wpilib/util/MsvcRuntimeException", &msvcRuntimeEx}};
+    {"org/wpilib/util/runtime/MsvcRuntimeException", &msvcRuntimeEx}};
 
 void wpi::ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg) {
   illegalArgEx.Throw(env, msg);

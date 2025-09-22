@@ -4,6 +4,8 @@
 
 package org.wpilib.system;
 
+import org.wpilib.UtilityClassTest;
+
 @SuppressWarnings("PMD.TestClassWithoutTestCases")
 class RobotControllerTest extends UtilityClassTest<RobotController> {
   RobotControllerTest() {

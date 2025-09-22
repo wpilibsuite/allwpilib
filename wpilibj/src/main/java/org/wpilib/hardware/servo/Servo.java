@@ -4,6 +4,7 @@
 
 package org.wpilib.hardware.servo;
 
+import org.wpilib.hardware.discrete.PWM;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.SimDevice;
 import org.wpilib.hardware.hal.SimDevice.Direction;

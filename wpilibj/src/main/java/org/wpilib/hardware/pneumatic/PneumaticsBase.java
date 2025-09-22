@@ -4,6 +4,8 @@
 
 package org.wpilib.hardware.pneumatic;
 
+import org.wpilib.SensorUtil;
+
 /** Interface for pneumatics devices. */
 public interface PneumaticsBase extends AutoCloseable {
   /**
