@@ -12,7 +12,7 @@ load("//shared/bazel/rules:packaging.bzl", "package_minimal_jni_project")
 filegroup(
     name = "doxygen-files",
     srcs = glob([
-        "src/main/native/include/**/*.h",
+        "src/main/native/include/**/*.hpp",
         "src/mrc/include/**/*.h",
     ]),
     visibility = ["//visibility:public"],
@@ -221,8 +221,8 @@ cc_binary(
 
 java_binary(
     name = "DevMain-Java",
-    srcs = ["src/dev/java/edu/wpi/first/hal/DevMain.java"],
-    main_class = "edu.wpi.first.hal.DevMain",
+    srcs = ["src/dev/java/org/wpilib/hardware/hal/DevMain.java"],
+    main_class = "org.wpilib.hardware.hal.DevMain",
     deps = [
     ],
 )

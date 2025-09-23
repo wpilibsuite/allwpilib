@@ -257,8 +257,8 @@ cc_binary(
 
 java_binary(
     name = "DevMain-java",
-    srcs = ["src/dev/java/edu/wpi/first/net/DevMain.java"],
-    main_class = "edu.wpi.first.net.DevMain",
+    srcs = ["src/dev/java/org/wpilib/net/DevMain.java"],
+    main_class = "org.wpilib.net.DevMain",
     deps = [
         ":wpinet-java",
         "//wpiutil:wpiutil-java",
