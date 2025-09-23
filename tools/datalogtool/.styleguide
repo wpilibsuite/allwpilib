@@ -21,10 +21,11 @@ repoRootNameOverride {
 includeOtherLibs {
   ^GLFW
   ^fmt/
-  ^glass/
   ^imgui
   ^libssh/
   ^portable-file-dialog
-  ^wpi/
-  ^wpigui
+  ^wpi/datalog/
+  ^wpi/glass/
+  ^wpi/util/
+  ^wpi/gui
 }
