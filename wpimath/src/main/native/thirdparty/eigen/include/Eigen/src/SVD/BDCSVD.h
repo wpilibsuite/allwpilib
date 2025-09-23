@@ -155,7 +155,8 @@ class BDCSVD : public SVDBase<BDCSVD<MatrixType_, Options_> > {
    * \deprecated Will be removed in the next major Eigen version. Options should
    * be specified in the \a Options template parameter.
    */
-  EIGEN_DEPRECATED BDCSVD(Index rows, Index cols, unsigned int computationOptions) : m_algoswap(16), m_numIters(0) {
+  EIGEN_DEPRECATED_WITH_REASON("Options should be specified using the class template parameter.")
+  BDCSVD(Index rows, Index cols, unsigned int computationOptions) : m_algoswap(16), m_numIters(0) {
     internal::check_svd_options_assertions<MatrixType, Options>(computationOptions, rows, cols);
     allocate(rows, cols, computationOptions);
   }
@@ -183,8 +184,8 @@ class BDCSVD : public SVDBase<BDCSVD<MatrixType_, Options_> > {
    * be specified in the \a Options template parameter.
    */
   template <typename Derived>
-  EIGEN_DEPRECATED BDCSVD(const MatrixBase<Derived>& matrix, unsigned int computationOptions)
-      : m_algoswap(16), m_numIters(0) {
+  EIGEN_DEPRECATED_WITH_REASON("Options should be specified using the class template parameter.")
+  BDCSVD(const MatrixBase<Derived>& matrix, unsigned int computationOptions) : m_algoswap(16), m_numIters(0) {
     internal::check_svd_options_assertions<MatrixType, Options>(computationOptions, matrix.rows(), matrix.cols());
     compute_impl(matrix, computationOptions);
   }
@@ -211,7 +212,8 @@ class BDCSVD : public SVDBase<BDCSVD<MatrixType_, Options_> > {
    * be specified in the \a Options template parameter.
    */
   template <typename Derived>
-  EIGEN_DEPRECATED BDCSVD& compute(const MatrixBase<Derived>& matrix, unsigned int computationOptions) {
+  EIGEN_DEPRECATED_WITH_REASON("Options should be specified using the class template parameter.")
+  BDCSVD& compute(const MatrixBase<Derived>& matrix, unsigned int computationOptions) {
     internal::check_svd_options_assertions<MatrixType, Options>(computationOptions, matrix.rows(), matrix.cols());
     return compute_impl(matrix, computationOptions);
   }

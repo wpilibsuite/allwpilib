@@ -373,12 +373,14 @@ class MatrixBase : public DenseBase<Derived> {
   template <int Options = 0>
   inline JacobiSVD<PlainObject, Options> jacobiSvd() const;
   template <int Options = 0>
-  EIGEN_DEPRECATED inline JacobiSVD<PlainObject, Options> jacobiSvd(unsigned int computationOptions) const;
+  EIGEN_DEPRECATED_WITH_REASON("Options should be specified using method's template parameter.")
+  inline JacobiSVD<PlainObject, Options> jacobiSvd(unsigned int computationOptions) const;
 
   template <int Options = 0>
   inline BDCSVD<PlainObject, Options> bdcSvd() const;
   template <int Options = 0>
-  EIGEN_DEPRECATED inline BDCSVD<PlainObject, Options> bdcSvd(unsigned int computationOptions) const;
+  EIGEN_DEPRECATED_WITH_REASON("Options should be specified using method's template parameter.")
+  inline BDCSVD<PlainObject, Options> bdcSvd(unsigned int computationOptions) const;
 
   /////////// Geometry module ///////////
 
@@ -391,7 +393,8 @@ class MatrixBase : public DenseBase<Derived> {
 
   EIGEN_DEVICE_FUNC inline PlainObject unitOrthogonal(void) const;
 
-  EIGEN_DEPRECATED EIGEN_DEVICE_FUNC inline Matrix<Scalar, 3, 1> eulerAngles(Index a0, Index a1, Index a2) const;
+  EIGEN_DEPRECATED_WITH_REASON("Use .canonicalEulerAngles() instead.")
+  EIGEN_DEVICE_FUNC inline Matrix<Scalar, 3, 1> eulerAngles(Index a0, Index a1, Index a2) const;
 
   EIGEN_DEVICE_FUNC inline Matrix<Scalar, 3, 1> canonicalEulerAngles(Index a0, Index a1, Index a2) const;
 
