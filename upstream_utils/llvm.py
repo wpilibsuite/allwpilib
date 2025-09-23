@@ -16,9 +16,9 @@ def run_global_replacements(wpiutil_llvm_files: list[Path]):
         content = content.replace("llvm:", "wpi:")
 
         # Fix #includes
-        content = content.replace('include "llvm/ADT', 'include "wpi')
-        content = content.replace('include "llvm/Config', 'include "wpi')
-        content = content.replace('include "llvm/Support', 'include "wpi')
+        content = content.replace('include "llvm/ADT', 'include "wpi/util')
+        content = content.replace('include "llvm/Config', 'include "wpi/util')
+        content = content.replace('include "llvm/Support', 'include "wpi/util')
 
         # Fix uses of span
         content = content.replace("span", "std::span")
@@ -43,21 +43,21 @@ def run_global_replacements(wpiutil_llvm_files: list[Path]):
 
         # Remove unused headers
         content = content.replace('#include "llvm-c/ErrorHandling.h"\n', "")
-        content = content.replace('#include "wpi/Debug.h"\n', "")
-        content = content.replace('#include "wpi/Error.h"\n', "")
-        content = content.replace('#include "wpi/Format.h"\n', "")
-        content = content.replace('#include "wpi/FormatVariadic.h"\n', "")
-        content = content.replace('#include "wpi/Hashing.h"\n', "")
-        content = content.replace('#include "wpi/NativeFormatting.h"\n', "")
-        content = content.replace('#include "wpi/Threading.h"\n', "")
-        content = content.replace('#include "wpi/DataTypes.h"\n', "")
-        content = content.replace('#include "wpi/llvm-config.h"\n', "")
-        content = content.replace('#include "wpi/abi-breaking.h"\n', "")
-        content = content.replace('#include "wpi/config.h"\n', "")
-        content = content.replace('#include "wpi/Signals.h"\n', "")
-        content = content.replace('#include "wpi/Process.h"\n', "")
-        content = content.replace('#include "wpi/Path.h"\n', "")
-        content = content.replace('#include "wpi/Program.h"\n', "")
+        content = content.replace('#include "wpi/util/Debug.h"\n', "")
+        content = content.replace('#include "wpi/util/Error.h"\n', "")
+        content = content.replace('#include "wpi/util/Format.h"\n', "")
+        content = content.replace('#include "wpi/util/FormatVariadic.h"\n', "")
+        content = content.replace('#include "wpi/util/Hashing.h"\n', "")
+        content = content.replace('#include "wpi/util/NativeFormatting.h"\n', "")
+        content = content.replace('#include "wpi/util/Threading.h"\n', "")
+        content = content.replace('#include "wpi/util/DataTypes.h"\n', "")
+        content = content.replace('#include "wpi/util/llvm-config.h"\n', "")
+        content = content.replace('#include "wpi/util/abi-breaking.h"\n', "")
+        content = content.replace('#include "wpi/util/config.h"\n', "")
+        content = content.replace('#include "wpi/util/Signals.h"\n', "")
+        content = content.replace('#include "wpi/util/Process.h"\n', "")
+        content = content.replace('#include "wpi/util/Path.h"\n', "")
+        content = content.replace('#include "wpi/util/Program.h"\n', "")
 
         # Fix include guards
         content = content.replace("LLVM_ADT_", "WPIUTIL_WPI_")
@@ -70,7 +70,9 @@ def run_global_replacements(wpiutil_llvm_files: list[Path]):
         content = content.replace("sys::fs::", "fs::")
 
         # Replace wpi/FileSystem.h with wpi/fs.h
-        content = content.replace('include "wpi/FileSystem.h"', 'include "wpi/fs.h"')
+        content = content.replace(
+            'include "wpi/util/FileSystem.h"', 'include "wpi/util/fs.hpp"'
+        )
 
         # Replace llvm_unreachable() with wpi_unreachable()
         content = content.replace("llvm_unreachable", "wpi_unreachable")

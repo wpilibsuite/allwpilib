@@ -37,7 +37,7 @@ def copy_upstream_src(wpilib_root: Path):
 
 #pragma once
 
-#include <wpi/SmallVector.h>
+#include <wpi/util/SmallVector.h>
 
 namespace gch {
 

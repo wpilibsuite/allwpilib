@@ -20,7 +20,7 @@ def copy_upstream_src(wpilib_root: Path):
     os.chdir("include/nlohmann")
     files = walk_if(Path("."), lambda dp, f: True)
     src_include_files = [f.absolute() for f in files]
-    wpiutil_json_root = wpiutil / "src/main/native/thirdparty/json/include/wpi"
+    wpiutil_json_root = wpiutil / "src/main/native/thirdparty/json/include/wpi/util"
     dest_include_files = [wpiutil_json_root / f.with_suffix(".h") for f in files]
 
     # Copy json header files into allwpilib
@@ -40,7 +40,7 @@ def copy_upstream_src(wpilib_root: Path):
 
         # Fix internal includes
         content = content.replace(".hpp>", ".h>")
-        content = content.replace("include <nlohmann/", "include <wpi/")
+        content = content.replace("include <nlohmann/", "include <wpi/util/")
 
         # Fix include guards and other #defines
         content = content.replace("NLOHMANN_", "WPI_")
