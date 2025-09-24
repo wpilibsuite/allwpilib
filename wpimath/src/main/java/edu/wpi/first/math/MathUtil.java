@@ -6,6 +6,8 @@ package edu.wpi.first.math;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Unit;
 
 /** Math utility functions. */
 public final class MathUtil {
