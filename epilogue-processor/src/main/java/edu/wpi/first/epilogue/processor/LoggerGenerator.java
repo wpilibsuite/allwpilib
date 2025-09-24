@@ -11,6 +11,7 @@ import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.ReturnTree;
 import com.sun.source.util.SimpleTreeVisitor;
 import com.sun.source.util.Trees;
+import edu.wpi.first.epilogue.DependsOn;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import java.io.IOException;
@@ -344,7 +345,14 @@ public class LoggerGenerator {
                     // unloggable commands.
                     var logInvocation = h.logInvocation(loggableElement, clazz);
                     if (logInvocation != null) {
+                      // Generate log invocation for the main element
                       out.println(logInvocation.indent(6).stripTrailing() + ";");
+
+                      // Generate log invocations for dependencies if any
+                      var dependencyInvocations = generateDependencyLogging(loggableElement, clazz);
+                      for (var dependencyInvocation : dependencyInvocations) {
+                        out.println(dependencyInvocation.indent(6).stripTrailing() + ";");
+                      }
                     }
                   });
             }
@@ -473,5 +481,109 @@ public class LoggerGenerator {
           }
         },
         null);
+  }
+
+  /**
+   * Generates logging calls for dependencies of an element marked with @DependsOn annotations.
+   *
+   * @param element the element that has @DependsOn annotations
+   * @param clazz the class containing the element
+   * @return a list of log invocation strings for the dependencies
+   */
+  private List<String> generateDependencyLogging(Element element, TypeElement clazz) {
+    List<String> dependencyInvocations = new ArrayList<>();
+
+    // Check for @DependsOn annotations (both single and multiple via @DependsOn.Container)
+    List<DependsOn> dependencies = new ArrayList<>();
+
+    // Get single @DependsOn annotation
+    DependsOn singleDependency = element.getAnnotation(DependsOn.class);
+    if (singleDependency != null) {
+      dependencies.add(singleDependency);
+    }
+
+    // Get multiple @DependsOn annotations via container
+    DependsOn.Container containerDependency = element.getAnnotation(DependsOn.Container.class);
+    if (containerDependency != null) {
+      dependencies.addAll(List.of(containerDependency.value()));
+    }
+
+    if (dependencies.isEmpty()) {
+      return dependencyInvocations;
+    }
+
+    // For each dependency, find the corresponding element and generate logging
+    for (DependsOn dependency : dependencies) {
+      String dependencyName = dependency.value();
+      Element dependencyElement = findDependencyElement(clazz, dependencyName);
+
+      if (dependencyElement != null && isLoggable(dependencyElement)) {
+        // Generate logging call for the dependency
+        var handler = m_handlers.stream().filter(h -> h.isLoggable(dependencyElement)).findFirst();
+
+        if (handler.isPresent()) {
+          var logInvocation = handler.get().logInvocation(dependencyElement, clazz);
+          if (logInvocation != null) {
+            dependencyInvocations.add(logInvocation);
+          }
+        }
+      }
+    }
+
+    return dependencyInvocations;
+  }
+
+  /**
+   * Finds an element (field or method) in a class by name.
+   *
+   * @param clazz the class to search in
+   * @param name the name of the element to find (method names should include parentheses)
+   * @return the found element, or null if not found
+   */
+  private Element findDependencyElement(TypeElement clazz, String name) {
+    boolean isMethod = name.contains("(");
+    String elementName = isMethod ? name.replace("()", "") : name;
+
+    return searchInClassHierarchy(clazz, elementName, isMethod);
+  }
+
+  private Element searchInClassHierarchy(TypeElement clazz, String elementName, boolean isMethod) {
+    TypeElement currentClass = clazz;
+    while (currentClass != null
+        && !"java.lang.Object".equals(currentClass.getQualifiedName().toString())) {
+      Element found = searchInClass(currentClass, elementName, isMethod);
+      if (found != null) {
+        return found;
+      }
+      currentClass = getSuperclass(currentClass);
+    }
+    return null;
+  }
+
+  private Element searchInClass(TypeElement clazz, String elementName, boolean isMethod) {
+    for (Element element : clazz.getEnclosedElements()) {
+      if (isMethod
+          && element instanceof ExecutableElement method
+          && method.getSimpleName().toString().equals(elementName)
+          && method.getParameters().isEmpty()) {
+        return method;
+      } else if (!isMethod
+          && element instanceof VariableElement field
+          && field.getSimpleName().toString().equals(elementName)) {
+        return field;
+      }
+    }
+    return null;
+  }
+
+  private TypeElement getSuperclass(TypeElement clazz) {
+    var superclassMirror = clazz.getSuperclass();
+    if (superclassMirror instanceof javax.lang.model.type.DeclaredType declaredType) {
+      var superclassElement = declaredType.asElement();
+      if (superclassElement instanceof TypeElement superclass) {
+        return superclass;
+      }
+    }
+    return null;
   }
 }
