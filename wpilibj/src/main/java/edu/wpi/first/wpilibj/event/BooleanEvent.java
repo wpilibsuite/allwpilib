@@ -179,17 +179,6 @@ public class BooleanEvent implements BooleanSupplier {
 
   /**
    * Creates a new debounced event from this event - it will become active when this event has been
-   * active for longer than the specified frequency.
-   *
-   * @param frequency The debounce frequency.
-   * @return The debounced event (rising edges debounced only).
-   */
-  public BooleanEvent debounce(Frequency frequency) {
-    return debounce(frequency.asPeriod());
-  }
-
-  /**
-   * Creates a new debounced event from this event - it will become active when this event has been
    * active for longer than the specified period.
    *
    * @param seconds The debounce period in seconds.
@@ -209,18 +198,6 @@ public class BooleanEvent implements BooleanSupplier {
    */
   public BooleanEvent debounce(Time period, Debouncer.DebounceType type) {
     return debounce(period.in(Seconds), type);
-  }
-
-  /**
-   * Creates a new debounced event from this event - it will become active when this event has been
-   * active for longer than the specified frequency.
-   *
-   * @param frequency The debounce frequency.
-   * @param type The debounce type.
-   * @return The debounced event.
-   */
-  public BooleanEvent debounce(Frequency frequency, Debouncer.DebounceType type) {
-    return debounce(frequency.asPeriod(), type);
   }
 
   /**
