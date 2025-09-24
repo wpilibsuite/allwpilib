@@ -45,15 +45,4 @@ public interface Interpolator<T> {
   static <U extends Unit, M extends Measure<U>> Interpolator<M> forMeasure() {
     return MathUtil::interpolate;
   }
-
-  /**
-   * Returns interpolator for a Measure.
-   *
-   * @param <U> The unit of the Measure.
-   * @param <M> The type of the Measure.
-   * @return Interpolator for a Measure.
-   */
-  static <U extends Unit, M extends Measure<U>> Interpolator<M> forMeasure() {
-    return MathUtil::interpolate;
-  }
 }

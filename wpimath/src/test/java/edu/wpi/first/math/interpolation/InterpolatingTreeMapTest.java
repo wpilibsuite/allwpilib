@@ -50,15 +50,13 @@ class InterpolatingTreeMapTest {
 
   @Test
   void testMeasureInterpolation() {
-    InterpolatingTreeMap<Distance, Distance> table = new InterpolatingTreeMap<>(
-        InverseInterpolator.forMeasure(),
-        Interpolator.forMeasure());
+    InterpolatingTreeMap<Distance, Distance> table =
+        new InterpolatingTreeMap<>(InverseInterpolator.forMeasure(), Interpolator.forMeasure());
 
     table.put(Units.Inches.of(Units.Meters.of(125.0).in(Units.Inches)), Units.Meters.of(450.0));
     table.put(Units.Meters.of(200.0), Units.Feet.of(Units.Meters.of(510.0).in(Units.Feet)));
     table.put(
-        Units.Centimeters.of(Units.Meters.of(268.0).in(Units.Centimeters)),
-        Units.Meters.of(525.0));
+        Units.Centimeters.of(Units.Meters.of(268.0).in(Units.Centimeters)), Units.Meters.of(525.0));
     table.put(
         Units.Inches.of(Units.Meters.of(312.0).in(Units.Inches)),
         Units.Feet.of(Units.Meters.of(550.0).in(Units.Feet)));
