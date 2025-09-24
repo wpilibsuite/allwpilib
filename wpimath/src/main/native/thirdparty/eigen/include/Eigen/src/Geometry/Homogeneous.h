@@ -80,14 +80,12 @@ class Homogeneous : public MatrixBase<Homogeneous<MatrixType, Direction_> >, int
 
   template <typename Rhs>
   EIGEN_DEVICE_FUNC inline const Product<Homogeneous, Rhs> operator*(const MatrixBase<Rhs>& rhs) const {
-    eigen_assert(int(Direction) == Horizontal);
     return Product<Homogeneous, Rhs>(*this, rhs.derived());
   }
 
   template <typename Lhs>
   friend EIGEN_DEVICE_FUNC inline const Product<Lhs, Homogeneous> operator*(const MatrixBase<Lhs>& lhs,
                                                                             const Homogeneous& rhs) {
-    eigen_assert(int(Direction) == Vertical);
     return Product<Lhs, Homogeneous>(lhs.derived(), rhs);
   }
 

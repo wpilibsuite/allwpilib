@@ -354,40 +354,40 @@ class SparseVector : public SparseCompressedBase<SparseVector<Scalar_, Options_,
 
  public:
   /** \internal \deprecated use setZero() and reserve() */
-  EIGEN_DEPRECATED void startFill(Index reserve) {
+  EIGEN_DEPRECATED_WITH_REASON("Use .setZero() and .reserve() instead.") void startFill(Index reserve) {
     setZero();
     m_data.reserve(reserve);
   }
 
   /** \internal \deprecated use insertBack(Index,Index) */
-  EIGEN_DEPRECATED Scalar& fill(Index r, Index c) {
+  EIGEN_DEPRECATED_WITH_REASON("Use .insertBack() instead.") Scalar& fill(Index r, Index c) {
     eigen_assert(r == 0 || c == 0);
     return fill(IsColVector ? r : c);
   }
 
   /** \internal \deprecated use insertBack(Index) */
-  EIGEN_DEPRECATED Scalar& fill(Index i) {
+  EIGEN_DEPRECATED_WITH_REASON("Use .insertBack() instead.") Scalar& fill(Index i) {
     m_data.append(0, i);
     return m_data.value(m_data.size() - 1);
   }
 
   /** \internal \deprecated use insert(Index,Index) */
-  EIGEN_DEPRECATED Scalar& fillrand(Index r, Index c) {
+  EIGEN_DEPRECATED_WITH_REASON("Use .insert() instead.") Scalar& fillrand(Index r, Index c) {
     eigen_assert(r == 0 || c == 0);
     return fillrand(IsColVector ? r : c);
   }
 
   /** \internal \deprecated use insert(Index) */
-  EIGEN_DEPRECATED Scalar& fillrand(Index i) { return insert(i); }
+  EIGEN_DEPRECATED_WITH_REASON("Use .insert() instead.") Scalar& fillrand(Index i) { return insert(i); }
 
   /** \internal \deprecated use finalize() */
-  EIGEN_DEPRECATED void endFill() {}
+  EIGEN_DEPRECATED_WITH_REASON("Use .finalize() instead.") void endFill() {}
 
   // These two functions were here in the 3.1 release, so let's keep them in case some code rely on them.
   /** \internal \deprecated use data() */
-  EIGEN_DEPRECATED Storage& _data() { return m_data; }
+  EIGEN_DEPRECATED_WITH_REASON("Use .data() instead.") Storage& _data() { return m_data; }
   /** \internal \deprecated use data() */
-  EIGEN_DEPRECATED const Storage& _data() const { return m_data; }
+  EIGEN_DEPRECATED_WITH_REASON("Use .data() instead.") const Storage& _data() const { return m_data; }
 
 #ifdef EIGEN_SPARSEVECTOR_PLUGIN
 #include EIGEN_SPARSEVECTOR_PLUGIN
