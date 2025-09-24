@@ -2316,6 +2316,59 @@ class AnnotationProcessorTest {
         () -> assertEquals(col, diagnostic.getColumnNumber(), "column number mismatch"));
   }
 
+  @Test
+  void dependsOnAnnotation() {
+    String source =
+        """
+      package edu.wpi.first.epilogue;
+
+      @Logged
+      class Example {
+        double position;
+        double target;
+        double tolerance;
+
+        @DependsOn("position")
+        @DependsOn("target")
+        @DependsOn("tolerance")
+        public boolean isAtTarget() {
+          return Math.abs(position - target) < tolerance;
+        }
+      }
+      """;
+
+    String expectedGeneratedSource =
+        """
+      package edu.wpi.first.epilogue;
+
+      import edu.wpi.first.epilogue.Logged;
+      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("position", object.position);
+            backend.log("target", object.target);
+            backend.log("tolerance", object.tolerance);
+            backend.log("isAtTarget", object.isAtTarget());
+            backend.log("position", object.position);
+            backend.log("target", object.target);
+            backend.log("tolerance", object.tolerance);
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
   private void assertLoggerGenerates(String loggedClassContent, String loggerClassContent) {
     Compilation compilation =
         javac()
