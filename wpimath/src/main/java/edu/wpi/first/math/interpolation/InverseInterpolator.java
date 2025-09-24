@@ -43,6 +43,6 @@ public interface InverseInterpolator<T> {
    * @return Inverse interpolator for a Measure.
    */
   static <U extends Unit, M extends Measure<U>> InverseInterpolator<M> forMeasure() {
-    return MathUtil::inverseInterpolate;
+    return MathUtil::inverseLerp;
   }
 }

@@ -37,7 +37,7 @@ public final class MathUtil {
    * @return The interpolated value.
    */
   @SuppressWarnings("unchecked")
-  public static <U extends Unit, M extends Measure<U>> M interpolate(
+  public static <U extends Unit, M extends Measure<U>> M lerp(
       M startValue, M endValue, double t) {
     return (M) startValue.plus(endValue.minus(startValue).times(MathUtil.clamp(t, 0, 1)));
   }
@@ -70,7 +70,7 @@ public final class MathUtil {
    * @param q Query.
    * @return Interpolant in range [0, 1].
    */
-  public static <U extends Unit, M extends Measure<U>> double inverseInterpolate(
+  public static <U extends Unit, M extends Measure<U>> double inverseLerp(
       M startValue, M endValue, M q) {
     double totalRange = endValue.minus(startValue).in(startValue.unit());
     if (totalRange <= 0) {

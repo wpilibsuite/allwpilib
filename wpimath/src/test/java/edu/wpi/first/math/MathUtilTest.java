@@ -54,25 +54,25 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
   }
 
   @Test
-  void testInterpolateWithSameUnits() {
-    assertEquals(Meters.of(50), MathUtil.interpolate(Meters.of(0), Meters.of(100), 0.5));
-    assertEquals(Meters.of(-50), MathUtil.interpolate(Meters.of(0), Meters.of(-100), 0.5));
-    assertEquals(Meters.of(0), MathUtil.interpolate(Meters.of(-50), Meters.of(50), 0.5));
-    assertEquals(Meters.of(-25), MathUtil.interpolate(Meters.of(-50), Meters.of(50), 0.25));
-    assertEquals(Meters.of(25), MathUtil.interpolate(Meters.of(-50), Meters.of(50), 0.75));
+  void testLerpWithSameUnits() {
+    assertEquals(Meters.of(50), MathUtil.lerp(Meters.of(0), Meters.of(100), 0.5));
+    assertEquals(Meters.of(-50), MathUtil.lerp(Meters.of(0), Meters.of(-100), 0.5));
+    assertEquals(Meters.of(0), MathUtil.lerp(Meters.of(-50), Meters.of(50), 0.5));
+    assertEquals(Meters.of(-25), MathUtil.lerp(Meters.of(-50), Meters.of(50), 0.25));
+    assertEquals(Meters.of(25), MathUtil.lerp(Meters.of(-50), Meters.of(50), 0.75));
 
-    assertEquals(Meters.of(0), MathUtil.interpolate(Meters.of(0), Meters.of(-100), -0.5));
+    assertEquals(Meters.of(0), MathUtil.lerp(Meters.of(0), Meters.of(-100), -0.5));
   }
 
   @Test
-  void testInterpolateWithDifferentUnits() {
-    assertEquals(Inches.of(6), MathUtil.interpolate(Meters.of(0), Feet.of(1), 0.5));
-    assertEquals(Inches.of(-6), MathUtil.interpolate(Meters.of(0), Feet.of(-1), 0.5));
-    assertEquals(Inches.of(0), MathUtil.interpolate(Centimeters.of(-500), Meters.of(5), 0.5));
-    assertEquals(Inches.of(-6), MathUtil.interpolate(Feet.of(-1), Inches.of(12), 0.25));
-    assertEquals(Inches.of(6), MathUtil.interpolate(Feet.of(-1), Inches.of(12), 0.75));
+  void testLerpWithDifferentUnits() {
+    assertEquals(Inches.of(6), MathUtil.lerp(Meters.of(0), Feet.of(1), 0.5));
+    assertEquals(Inches.of(-6), MathUtil.lerp(Meters.of(0), Feet.of(-1), 0.5));
+    assertEquals(Inches.of(0), MathUtil.lerp(Centimeters.of(-500), Meters.of(5), 0.5));
+    assertEquals(Inches.of(-6), MathUtil.lerp(Feet.of(-1), Inches.of(12), 0.25));
+    assertEquals(Inches.of(6), MathUtil.lerp(Feet.of(-1), Inches.of(12), 0.75));
 
-    assertEquals(Inches.of(0), MathUtil.interpolate(Inches.of(0), Feet.of(-1), -0.5));
+    assertEquals(Inches.of(0), MathUtil.lerp(Inches.of(0), Feet.of(-1), -0.5));
   }
 
   @Test

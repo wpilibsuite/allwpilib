@@ -43,6 +43,6 @@ public interface Interpolator<T> {
    * @return Interpolator for a Measure.
    */
   static <U extends Unit, M extends Measure<U>> Interpolator<M> forMeasure() {
-    return MathUtil::interpolate;
+    return MathUtil::lerp;
   }
 }
