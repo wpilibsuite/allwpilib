@@ -38,7 +38,8 @@ import javax.tools.Diagnostic;
 
 @SupportedAnnotationTypes({
   "edu.wpi.first.epilogue.CustomLoggerFor",
-  "edu.wpi.first.epilogue.Logged"
+  "edu.wpi.first.epilogue.Logged",
+  "edu.wpi.first.epilogue.DependsOn"
 })
 @SupportedSourceVersion(SourceVersion.RELEASE_17)
 public class AnnotationProcessor extends AbstractProcessor {
