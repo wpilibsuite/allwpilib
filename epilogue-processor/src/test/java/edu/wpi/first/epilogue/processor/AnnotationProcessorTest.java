@@ -2348,6 +2348,13 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.logging.LogMetadata;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
+        // Cached LogMetadata for element isAtTarget with @DependsOn annotations
+        private static final LogMetadata $metadata_edu_wpi_first_epilogue_Example_isAtTarget;
+
+        static {
+          $metadata_edu_wpi_first_epilogue_Example_isAtTarget = new edu.wpi.first.epilogue.logging.LogMetadata(java.util.List.of("position", "target", "tolerance"));
+        }
+
         public ExampleLogger() {
           super(Example.class);
         }
@@ -2358,7 +2365,7 @@ class AnnotationProcessorTest {
             backend.log("position", object.position);
             backend.log("target", object.target);
             backend.log("tolerance", object.tolerance);
-            backend.log("isAtTarget", object.isAtTarget(), new edu.wpi.first.epilogue.logging.LogMetadata(java.util.List.of("position", "target", "tolerance")));
+            backend.log("isAtTarget", object.isAtTarget(), $metadata_edu_wpi_first_epilogue_Example_isAtTarget);
           }
         }
       }
