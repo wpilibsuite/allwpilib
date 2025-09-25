@@ -44,7 +44,7 @@ static O* ConvertToC(std::vector<I>&& in, int* count) {
   // retain vector at end of returned array
   alignas(T) unsigned char buf[sizeof(T)];
   new (buf) T(std::move(in));
-  std::memcpy(out + size * sizeof(O), buf, sizeof(T));
+  std::memcpy(out + size, buf, sizeof(T));
 
   return out;
 }
@@ -392,7 +392,7 @@ void CS_FreeEvents(CS_Event* arr, int count) {
   // destroy vector saved at end of array
   using T = std::vector<cs::RawEvent>;
   alignas(T) unsigned char buf[sizeof(T)];
-  std::memcpy(buf, arr + count * sizeof(CS_Event), sizeof(T));
+  std::memcpy(buf, arr + count, sizeof(T));
   reinterpret_cast<T*>(buf)->~T();
 
   std::free(arr);

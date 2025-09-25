@@ -5,7 +5,6 @@
 #include <opencv2/core/core.hpp>
 #include <wpi/print.h>
 
-#include "cscore.h"
 #include "cscore_cv.h"
 
 int main() {
