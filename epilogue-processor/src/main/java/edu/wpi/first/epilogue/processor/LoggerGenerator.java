@@ -205,6 +205,11 @@ public class LoggerGenerator {
             .toList();
     boolean requiresVarHandles = !varHandleFields.isEmpty();
 
+    // Check if any element has @DependsOn annotations to determine if LogMetadata import is needed
+    boolean needsLogMetadataImport = Stream.concat(loggableFields.stream(), loggableMethods.stream())
+        .anyMatch(element -> element.getAnnotation(DependsOn.class) != null || 
+                           element.getAnnotation(DependsOn.Container.class) != null);
+
     try (var out = new PrintWriter(loggerFile.openWriter())) {
       if (packageName != null) {
         // package com.example;
@@ -216,6 +221,9 @@ public class LoggerGenerator {
       out.println("import edu.wpi.first.epilogue.Epilogue;");
       out.println("import edu.wpi.first.epilogue.logging.ClassSpecificLogger;");
       out.println("import edu.wpi.first.epilogue.logging.EpilogueBackend;");
+      if (needsLogMetadataImport) {
+        out.println("import edu.wpi.first.epilogue.logging.LogMetadata;");
+      }
       if (requiresVarHandles) {
         out.println("import java.lang.invoke.MethodHandles;");
         out.println("import java.lang.invoke.VarHandle;");
@@ -346,12 +354,12 @@ public class LoggerGenerator {
                     var logInvocation = h.logInvocation(loggableElement, clazz);
                     if (logInvocation != null) {
                       // Generate log invocation for the main element
-                      out.println(logInvocation.indent(6).stripTrailing() + ";");
-
-                      // Generate log invocations for dependencies if any
-                      var dependencyInvocations = generateDependencyLogging(loggableElement, clazz);
-                      for (var dependencyInvocation : dependencyInvocations) {
-                        out.println(dependencyInvocation.indent(6).stripTrailing() + ";");
+                      var metadata = generateLogMetadata(loggableElement, clazz);
+                      if (metadata != null) {
+                        var modifiedInvocation = logInvocation.replaceFirst("\\)$", ", " + metadata + ")");
+                        out.println(modifiedInvocation.indent(6).stripTrailing() + ";");
+                      } else {
+                        out.println(logInvocation.indent(6).stripTrailing() + ";");
                       }
                     }
                   });
@@ -484,15 +492,13 @@ public class LoggerGenerator {
   }
 
   /**
-   * Generates logging calls for dependencies of an element marked with @DependsOn annotations.
+   * Creates LogMetadata for dependencies of an element marked with @DependsOn annotations.
    *
    * @param element the element that has @DependsOn annotations
    * @param clazz the class containing the element
-   * @return a list of log invocation strings for the dependencies
+   * @return LogMetadata containing dependency names, or null if no valid dependencies
    */
-  private List<String> generateDependencyLogging(Element element, TypeElement clazz) {
-    List<String> dependencyInvocations = new ArrayList<>();
-
+  private String generateLogMetadata(Element element, TypeElement clazz) {
     // Check for @DependsOn annotations (both single and multiple via @DependsOn.Container)
     List<DependsOn> dependencies = new ArrayList<>();
 
@@ -509,28 +515,30 @@ public class LoggerGenerator {
     }
 
     if (dependencies.isEmpty()) {
-      return dependencyInvocations;
+      return null;
     }
 
-    // For each dependency, find the corresponding element and generate logging
+    // Collect valid dependency names
+    List<String> validDependencyNames = new ArrayList<>();
     for (DependsOn dependency : dependencies) {
       String dependencyName = dependency.value();
       Element dependencyElement = findDependencyElement(clazz, dependencyName);
 
       if (dependencyElement != null && isLoggable(dependencyElement)) {
-        // Generate logging call for the dependency
-        var handler = m_handlers.stream().filter(h -> h.isLoggable(dependencyElement)).findFirst();
-
-        if (handler.isPresent()) {
-          var logInvocation = handler.get().logInvocation(dependencyElement, clazz);
-          if (logInvocation != null) {
-            dependencyInvocations.add(logInvocation);
-          }
-        }
+        validDependencyNames.add(dependencyName);
       }
     }
 
-    return dependencyInvocations;
+    if (validDependencyNames.isEmpty()) {
+      return null;
+    }
+
+    // Create LogMetadata construction code
+    String dependencyList = validDependencyNames.stream()
+        .map(name -> "\"" + name + "\"")
+        .collect(java.util.stream.Collectors.joining(", "));
+    
+    return "new edu.wpi.first.epilogue.logging.LogMetadata(java.util.List.of(" + dependencyList + "))";
   }
 
   /**
