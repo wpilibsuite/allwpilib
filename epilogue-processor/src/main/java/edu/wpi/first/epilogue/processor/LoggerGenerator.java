@@ -27,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -323,7 +324,7 @@ public class LoggerGenerator {
 
         // Initialize static final LogMetadata fields
         for (var element : logMetadataElements) {
-          String metadataInitialization = generateLogMetadata(element, clazz, false); // Use inline construction for static field initialization
+          String metadataInitialization = generateLogMetadata(element, loggableFields, loggableMethods, false); // Use inline construction for static field initialization
           out.printf("    %s = %s;%n", logMetadataFieldName(element), metadataInitialization);
         }
 
@@ -381,7 +382,7 @@ public class LoggerGenerator {
                     var logInvocation = h.logInvocation(loggableElement, clazz);
                     if (logInvocation != null) {
                       // Generate log invocation for the main element
-                      var metadata = generateLogMetadata(loggableElement, clazz);
+                      var metadata = generateLogMetadata(loggableElement, loggableFields, loggableMethods);
                       if (metadata != null) {
                         var modifiedInvocation = logInvocation.replaceFirst("\\)$", java.util.regex.Matcher.quoteReplacement(", " + metadata + ")"));
                         out.println(modifiedInvocation.indent(6).stripTrailing() + ";");
@@ -534,22 +535,24 @@ public class LoggerGenerator {
    * Creates LogMetadata for dependencies of an element marked with @DependsOn annotations.
    *
    * @param element the element that has @DependsOn annotations
-   * @param clazz the class containing the element
+   * @param fieldsToLog the list of fields that will be logged
+   * @param methodsToLog the list of methods that will be logged
    * @return LogMetadata containing dependency names, or null if no valid dependencies
    */
-  private String generateLogMetadata(Element element, TypeElement clazz) {
-    return generateLogMetadata(element, clazz, true);
+  private String generateLogMetadata(Element element, List<VariableElement> fieldsToLog, List<ExecutableElement> methodsToLog) {
+    return generateLogMetadata(element, fieldsToLog, methodsToLog, true);
   }
 
   /**
    * Creates LogMetadata for dependencies of an element marked with @DependsOn annotations.
    *
    * @param element the element that has @DependsOn annotations
-   * @param clazz the class containing the element
+   * @param fieldsToLog the list of fields that will be logged
+   * @param methodsToLog the list of methods that will be logged
    * @param useStaticField if true, return static field reference; if false, return inline construction
    * @return LogMetadata construction code or field reference, or null if no valid dependencies
    */
-  private String generateLogMetadata(Element element, TypeElement clazz, boolean useStaticField) {
+  private String generateLogMetadata(Element element, List<VariableElement> fieldsToLog, List<ExecutableElement> methodsToLog, boolean useStaticField) {
     // Check for @DependsOn annotations (both single and multiple via @DependsOn.Container)
     List<DependsOn> dependencies = new ArrayList<>();
 
@@ -569,13 +572,16 @@ public class LoggerGenerator {
       return null;
     }
 
-    // Collect valid dependency names
+    // Precompute set of logged names for efficient lookup
+    Set<String> loggedNames = Stream.concat(fieldsToLog.stream(), methodsToLog.stream())
+        .map(ElementHandler::loggedName)
+        .collect(Collectors.toSet());
+
+    // Collect valid dependency names by checking against logged elements
     List<String> validDependencyNames = new ArrayList<>();
     for (DependsOn dependency : dependencies) {
       String dependencyName = dependency.value();
-      Element dependencyElement = findDependencyElement(clazz, dependencyName);
-
-      if (dependencyElement != null && isLoggable(dependencyElement)) {
+      if (loggedNames.contains(dependencyName)) {
         validDependencyNames.add(dependencyName);
       }
     }
@@ -603,50 +609,4 @@ public class LoggerGenerator {
    * @param name the name of the element to find (method names should include parentheses)
    * @return the found element, or null if not found
    */
-  private Element findDependencyElement(TypeElement clazz, String name) {
-    boolean isMethod = name.contains("(");
-    String elementName = isMethod ? name.replace("()", "") : name;
-
-    return searchInClassHierarchy(clazz, elementName, isMethod);
-  }
-
-  private Element searchInClassHierarchy(TypeElement clazz, String elementName, boolean isMethod) {
-    TypeElement currentClass = clazz;
-    while (currentClass != null
-        && !"java.lang.Object".equals(currentClass.getQualifiedName().toString())) {
-      Element found = searchInClass(currentClass, elementName, isMethod);
-      if (found != null) {
-        return found;
-      }
-      currentClass = getSuperclass(currentClass);
-    }
-    return null;
-  }
-
-  private Element searchInClass(TypeElement clazz, String elementName, boolean isMethod) {
-    for (Element element : clazz.getEnclosedElements()) {
-      if (isMethod
-          && element instanceof ExecutableElement method
-          && method.getSimpleName().toString().equals(elementName)
-          && method.getParameters().isEmpty()) {
-        return method;
-      } else if (!isMethod
-          && element instanceof VariableElement field
-          && field.getSimpleName().toString().equals(elementName)) {
-        return field;
-      }
-    }
-    return null;
-  }
-
-  private TypeElement getSuperclass(TypeElement clazz) {
-    var superclassMirror = clazz.getSuperclass();
-    if (superclassMirror instanceof javax.lang.model.type.DeclaredType declaredType) {
-      var superclassElement = declaredType.asElement();
-      if (superclassElement instanceof TypeElement superclass) {
-        return superclass;
-      }
-    }
-    return null;
-  }
 }
