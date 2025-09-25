@@ -2345,6 +2345,7 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import edu.wpi.first.epilogue.logging.LogMetadata;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -2357,10 +2358,7 @@ class AnnotationProcessorTest {
             backend.log("position", object.position);
             backend.log("target", object.target);
             backend.log("tolerance", object.tolerance);
-            backend.log("isAtTarget", object.isAtTarget());
-            backend.log("position", object.position);
-            backend.log("target", object.target);
-            backend.log("tolerance", object.tolerance);
+            backend.log("isAtTarget", object.isAtTarget(), new edu.wpi.first.epilogue.logging.LogMetadata(java.util.List.of("position", "target", "tolerance")));
           }
         }
       }
