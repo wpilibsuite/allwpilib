@@ -238,5 +238,225 @@ public interface EpilogueBackend {
     log(identifier, value.name());
   }
 
+  // Overloaded log methods with metadata for dependency tracking
+
+  /**
+   * Logs a 32-bit integer data point with metadata.
+   *
+   * @param identifier the identifier of the data point
+   * @param value the value of the data point
+   * @param metadata the metadata containing dependency information
+   */
+  default void log(String identifier, int value, LogMetadata metadata) {
+    log(identifier, value);
+  }
+
+  /**
+   * Logs a 64-bit integer data point with metadata.
+   *
+   * @param identifier the identifier of the data point
+   * @param value the value of the data point
+   * @param metadata the metadata containing dependency information
+   */
+  default void log(String identifier, long value, LogMetadata metadata) {
+    log(identifier, value);
+  }
+
+  /**
+   * Logs a 32-bit floating point data point with metadata.
+   *
+   * @param identifier the identifier of the data point
+   * @param value the value of the data point
+   * @param metadata the metadata containing dependency information
+   */
+  default void log(String identifier, float value, LogMetadata metadata) {
+    log(identifier, value);
+  }
+
+  /**
+   * Logs a 64-bit floating point data point with metadata.
+   *
+   * @param identifier the identifier of the data point
+   * @param value the value of the data point
+   * @param metadata the metadata containing dependency information
+   */
+  default void log(String identifier, double value, LogMetadata metadata) {
+    log(identifier, value);
+  }
+
+  /**
+   * Logs a boolean data point with metadata.
+   *
+   * @param identifier the identifier of the data point
+   * @param value the value of the data point
+   * @param metadata the metadata containing dependency information
+   */
+  default void log(String identifier, boolean value, LogMetadata metadata) {
+    log(identifier, value);
+  }
+
+  /**
+   * Logs a raw byte array data point with metadata.
+   *
+   * @param identifier the identifier of the data point
+   * @param value the value of the data point
+   * @param metadata the metadata containing dependency information
+   */
+  default void log(String identifier, byte[] value, LogMetadata metadata) {
+    log(identifier, value);
+  }
+
+  /**
+   * Logs a 32-bit integer array data point with metadata.
+   *
+   * @param identifier the identifier of the data point
+   * @param value the value of the data point
+   * @param metadata the metadata containing dependency information
+   */
+  default void log(String identifier, int[] value, LogMetadata metadata) {
+    log(identifier, value);
+  }
+
+  /**
+   * Logs a 64-bit integer array data point with metadata.
+   *
+   * @param identifier the identifier of the data point
+   * @param value the value of the data point
+   * @param metadata the metadata containing dependency information
+   */
+  default void log(String identifier, long[] value, LogMetadata metadata) {
+    log(identifier, value);
+  }
+
+  /**
+   * Logs a 32-bit floating point array data point with metadata.
+   *
+   * @param identifier the identifier of the data point
+   * @param value the value of the data point
+   * @param metadata the metadata containing dependency information
+   */
+  default void log(String identifier, float[] value, LogMetadata metadata) {
+    log(identifier, value);
+  }
+
+  /**
+   * Logs a 64-bit floating point array data point with metadata.
+   *
+   * @param identifier the identifier of the data point
+   * @param value the value of the data point
+   * @param metadata the metadata containing dependency information
+   */
+  default void log(String identifier, double[] value, LogMetadata metadata) {
+    log(identifier, value);
+  }
+
+  /**
+   * Logs a boolean array data point with metadata.
+   *
+   * @param identifier the identifier of the data point
+   * @param value the value of the data point
+   * @param metadata the metadata containing dependency information
+   */
+  default void log(String identifier, boolean[] value, LogMetadata metadata) {
+    log(identifier, value);
+  }
+
+  /**
+   * Logs a text data point with metadata.
+   *
+   * @param identifier the identifier of the data point
+   * @param value the value of the data point
+   * @param metadata the metadata containing dependency information
+   */
+  default void log(String identifier, String value, LogMetadata metadata) {
+    log(identifier, value);
+  }
+
+  /**
+   * Logs a string array data point with metadata.
+   *
+   * @param identifier the identifier of the data point
+   * @param value the value of the data point
+   * @param metadata the metadata containing dependency information
+   */
+  default void log(String identifier, String[] value, LogMetadata metadata) {
+    log(identifier, value);
+  }
+
+  /**
+   * Logs a struct-serializable object with metadata.
+   *
+   * @param identifier the identifier of the data point
+   * @param value the value of the data point
+   * @param struct the struct to use to serialize the data
+   * @param metadata the metadata containing dependency information
+   * @param <S> the serializable type
+   */
+  default <S> void log(String identifier, S value, Struct<S> struct, LogMetadata metadata) {
+    log(identifier, value, struct);
+  }
+
+  /**
+   * Logs an array of struct-serializable objects with metadata.
+   *
+   * @param identifier the identifier of the data point
+   * @param value the value of the data point
+   * @param struct the struct to use to serialize the objects
+   * @param metadata the metadata containing dependency information
+   * @param <S> the serializable type
+   */
+  default <S> void log(String identifier, S[] value, Struct<S> struct, LogMetadata metadata) {
+    log(identifier, value, struct);
+  }
+
+  /**
+   * Logs a protobuf-serializable object with metadata.
+   *
+   * @param identifier the identifier of the data point
+   * @param value the value of the data point
+   * @param proto the protobuf to use to serialize the data
+   * @param metadata the metadata containing dependency information
+   * @param <P> the protobuf-serializable type
+   * @param <M> the protobuf message type
+   */
+  default <P, M extends ProtoMessage<M>> void log(String identifier, P value, Protobuf<P, M> proto, LogMetadata metadata) {
+    log(identifier, value, proto);
+  }
+
+  /**
+   * Logs a measurement's value in terms of its base unit with metadata.
+   *
+   * @param identifier the identifier of the data field
+   * @param value the new value of the data field
+   * @param metadata the metadata containing dependency information
+   */
+  default void log(String identifier, Measure<?> value, LogMetadata metadata) {
+    log(identifier, value);
+  }
+
+  /**
+   * Logs a measurement's value in terms of another unit with metadata.
+   *
+   * @param identifier the identifier of the data field
+   * @param value the new value of the data field
+   * @param unit the unit to log the measurement in
+   * @param metadata the metadata containing dependency information
+   * @param <U> the dimension of the unit
+   */
+  default <U extends Unit> void log(String identifier, Measure<U> value, U unit, LogMetadata metadata) {
+    log(identifier, value, unit);
+  }
+
+  /**
+   * Logs an enum value with metadata. The value will appear as a string entry using the name of the enum.
+   *
+   * @param identifier the identifier of the data field
+   * @param value the new value of the data field
+   * @param metadata the metadata containing dependency information
+   */
+  default void log(String identifier, Enum<?> value, LogMetadata metadata) {
+    log(identifier, value);
+  }
+
   // TODO: Add default methods to support common no-struct no-sendable types like joysticks?
 }
