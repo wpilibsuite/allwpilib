@@ -51,7 +51,7 @@ class SchedulerCancellationTests extends CommandTestBase {
   }
 
   @Test
-  void scheduleOverDefaultDoesNotRescheduleDefault() {
+  void defaultCommandResumesAfterInterruption() {
     var count = new AtomicInteger(0);
 
     var mechanism = new Mechanism("mechanism", m_scheduler);
@@ -78,7 +78,8 @@ class SchedulerCancellationTests extends CommandTestBase {
     assertEquals(1, count.get(), "Default command should have run once");
 
     m_scheduler.run();
-    assertTrue(m_scheduler.isRunning(defaultCmd));
+    assertTrue(m_scheduler.isRunning(defaultCmd), "Default command should have resumed");
+    assertEquals(2, count.get());
   }
 
   @Test
@@ -185,13 +186,7 @@ class SchedulerCancellationTests extends CommandTestBase {
     // Then ticking the scheduler once to fully remove the command and schedule the defaults
     m_scheduler.run();
 
-    // Then one more tick to start running the scheduled defaults
-    m_scheduler.run();
-
-    if (m_scheduler.isRunning(command)) {
-      System.err.println(m_scheduler.getRunningCommands());
-      fail(command.name() + " was not canceled by cancelAll()");
-    }
+    assertFalse(m_scheduler.isRunning(command), "Command was not canceled by cancelAll()");
 
     for (var mechanism : mechanisms) {
       var runningCommands = m_scheduler.getRunningCommandsFor(mechanism);

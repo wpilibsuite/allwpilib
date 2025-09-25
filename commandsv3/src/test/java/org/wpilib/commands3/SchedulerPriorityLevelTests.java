@@ -6,7 +6,6 @@ package org.wpilib.commands3;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import org.junit.jupiter.api.Test;
 
@@ -41,12 +40,9 @@ class SchedulerPriorityLevelTests extends CommandTestBase {
 
     m_scheduler.schedule(lower);
     m_scheduler.run();
-    if (!m_scheduler.isRunning(higher)) {
-      fail("Higher priority command should still be running");
-    }
-    if (m_scheduler.isRunning(lower)) {
-      fail("Lower priority command should not be running");
-    }
+    assertTrue(m_scheduler.isRunning(higher), "Higher priority command should still be running");
+    assertFalse(
+        m_scheduler.isScheduledOrRunning(lower), "Lower priority command should not be running");
   }
 
   @Test

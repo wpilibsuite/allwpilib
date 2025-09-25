@@ -40,7 +40,7 @@ class SchedulerConflictTests extends CommandTestBase {
   }
 
   @Test
-  void siblingsInCompositionCanShareRequirements() {
+  void innerCommandMayInterruptOtherInnerCommand() {
     var mechanism = new Mechanism("The mechanism", m_scheduler);
     var firstRan = new AtomicBoolean(false);
     var secondRan = new AtomicBoolean(false);
@@ -146,8 +146,8 @@ class SchedulerConflictTests extends CommandTestBase {
     var mechanism = new Mechanism("mechanism", m_scheduler);
     var top = mechanism.run(Coroutine::park).withPriority(-10).named("Top");
 
-    // Child conflicts with and is lower priority than the Top command
-    // It should not be scheduled, and the parent command should exit immediately
+    // Child conflicts with and is higher priority than the Top command
+    // It should be scheduled, and the top command should be interrupted
     var child = mechanism.run(Coroutine::park).named("Child");
     var parent = Command.noRequirements().executing(co -> co.await(child)).named("Parent");
 

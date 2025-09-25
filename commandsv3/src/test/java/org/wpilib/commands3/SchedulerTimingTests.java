@@ -36,27 +36,74 @@ class SchedulerTimingTests extends CommandTestBase {
 
   @Test
   void commandDeadlock() {
+    AtomicReference<Command> parentRef = new AtomicReference<>();
+    AtomicReference<Command> childRef = new AtomicReference<>();
+
+    // Deadlock scenario:
+    // parent starts, schedules child, then waits for child to exit
+    // child starts, waits for parent to exit
+    //
+    // Each successive run sees parent mount, check for child, then yield.
+    // Then sees child mount, check for parent, then also yield.
+    // This is like two threads spinwaiting for the other to exit.
+    //
+    // Externally canceling child allows parent to continue
+    // Externally canceling parent cancels both
+    var parent = Command.noRequirements().executing(co -> co.await(childRef.get())).named("Parent");
+    var child = Command.noRequirements().executing(co -> co.await(parentRef.get())).named("Child");
+    parentRef.set(parent);
+    childRef.set(child);
+
+    m_scheduler.schedule(parent);
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(parent));
+    assertTrue(m_scheduler.isRunning(child));
+
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(parent));
+    assertTrue(m_scheduler.isRunning(child));
+
+    m_scheduler.cancel(parent);
+    m_scheduler.run();
+    assertFalse(m_scheduler.isRunning(parent));
+    assertFalse(m_scheduler.isRunning(child));
+  }
+
+  @Test
+  void delayedCommandDeadlock() {
     AtomicReference<Command> ref1 = new AtomicReference<>();
     AtomicReference<Command> ref2 = new AtomicReference<>();
 
     // Deadlock scenario:
-    // command1 starts, schedules command2, then waits for command2 to exit
+    // command1 starts, waits for command2 to exit
     // command2 starts, waits for command1 to exit
     //
     // Each successive run sees command1 mount, check for command2, then yield.
     // Then sees command2 mount, check for command1, then also yield.
     // This is like two threads spinwaiting for the other to exit.
     //
-    // Externally canceling command2 allows command1 to continue
-    // Externally canceling command1 cancels both
+    // Externally canceling either command allows the other to exit
     var command1 =
-        Command.noRequirements().executing(co -> co.await(ref2.get())).named("Command 1");
+        Command.noRequirements()
+            .executing(
+                co -> {
+                  co.yield();
+                  co.await(ref2.get());
+                })
+            .named("Command 1");
     var command2 =
-        Command.noRequirements().executing(co -> co.await(ref1.get())).named("Command 2");
+        Command.noRequirements()
+            .executing(
+                co -> {
+                  co.yield();
+                  co.await(ref1.get());
+                })
+            .named("Command 2");
     ref1.set(command1);
     ref2.set(command2);
 
     m_scheduler.schedule(command1);
+    m_scheduler.schedule(command2);
     m_scheduler.run();
     assertTrue(m_scheduler.isRunning(command1));
     assertTrue(m_scheduler.isRunning(command2));
@@ -65,7 +112,7 @@ class SchedulerTimingTests extends CommandTestBase {
     assertTrue(m_scheduler.isRunning(command1));
     assertTrue(m_scheduler.isRunning(command2));
 
-    m_scheduler.cancel(command1);
+    m_scheduler.cancel(command2);
     m_scheduler.run();
     assertFalse(m_scheduler.isRunning(command1));
     assertFalse(m_scheduler.isRunning(command2));

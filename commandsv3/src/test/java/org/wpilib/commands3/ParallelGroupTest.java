@@ -210,4 +210,24 @@ class ParallelGroupTest extends CommandTestBase {
     var group = new ParallelGroupBuilder().requiring(a).optional(b, c).withAutomaticName();
     assertEquals("[(A) * (B | C)]", group.name());
   }
+
+  @Test
+  void inheritsRequirements() {
+    var mech1 = new Mechanism("Mech 1", m_scheduler);
+    var mech2 = new Mechanism("Mech 2", m_scheduler);
+    var command1 = mech1.run(Coroutine::park).named("Command 1");
+    var command2 = mech2.run(Coroutine::park).named("Command 2");
+    var group = new ParallelGroup("Group", Set.of(command1, command2), Set.of());
+    assertEquals(Set.of(mech1, mech2), group.requirements(), "Requirements were not inherited");
+  }
+
+  @Test
+  void inheritsPriority() {
+    var mech1 = new Mechanism("Mech 1", m_scheduler);
+    var mech2 = new Mechanism("Mech 2", m_scheduler);
+    var command1 = mech1.run(Coroutine::park).withPriority(100).named("Command 1");
+    var command2 = mech2.run(Coroutine::park).withPriority(200).named("Command 2");
+    var group = new ParallelGroup("Group", Set.of(command1, command2), Set.of());
+    assertEquals(200, group.priority(), "Priority was not inherited");
+  }
 }

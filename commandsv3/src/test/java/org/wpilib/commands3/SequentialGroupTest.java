@@ -4,10 +4,12 @@
 
 package org.wpilib.commands3;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class SequentialGroupTest extends CommandTestBase {
@@ -56,5 +58,25 @@ class SequentialGroupTest extends CommandTestBase {
     m_scheduler.run();
     assertFalse(m_scheduler.isRunning(sequence));
     assertFalse(m_scheduler.isRunning(c2), "Second command should have started");
+  }
+
+  @Test
+  void inheritsRequirements() {
+    var mech1 = new Mechanism("Mech 1", m_scheduler);
+    var mech2 = new Mechanism("Mech 2", m_scheduler);
+    var command1 = mech1.run(Coroutine::park).named("Command 1");
+    var command2 = mech2.run(Coroutine::park).named("Command 2");
+    var sequence = new SequentialGroup("Sequence", List.of(command1, command2));
+    assertEquals(Set.of(mech1, mech2), sequence.requirements(), "Requirements were not inherited");
+  }
+
+  @Test
+  void inheritsPriority() {
+    var mech1 = new Mechanism("Mech 1", m_scheduler);
+    var mech2 = new Mechanism("Mech 2", m_scheduler);
+    var command1 = mech1.run(Coroutine::park).withPriority(100).named("Command 1");
+    var command2 = mech2.run(Coroutine::park).withPriority(200).named("Command 2");
+    var sequence = new SequentialGroup("Sequence", List.of(command1, command2));
+    assertEquals(200, sequence.priority(), "Priority was not inherited");
   }
 }
