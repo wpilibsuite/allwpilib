@@ -17,10 +17,13 @@
 #include <wpi/util/SmallVector.h>
 #include <wpi/util/mutex.hpp>
 
-namespace wpi {
+namespace wpi::math {
 
 class Field2d;
-class wpi::math::Trajectory;
+class Trajectory;
+}
+
+namespace wpi {
 
 /**
  * Game field object on a Field2d.

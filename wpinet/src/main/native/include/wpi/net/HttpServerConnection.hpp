@@ -12,9 +12,11 @@
 #include "wpi/net/HttpParser.hpp"
 #include "wpi/net/uv/Stream.hpp"
 
-namespace wpi::net {
-
+namespace wpi::util {
 class raw_ostream;
+}
+
+namespace wpi::net {
 
 class HttpServerConnection {
  public:

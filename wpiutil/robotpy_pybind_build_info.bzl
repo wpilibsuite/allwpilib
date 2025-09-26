@@ -38,7 +38,7 @@ def wpiutil_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/sendable/Sendable.hpp",
             tmpl_class_names = [],
             trampolines = [
-                ("wpi::Sendable", "wpi__Sendable.hpp"),
+                ("wpi::util::Sendable", "wpi__util__Sendable.hpp"),
             ],
         ),
         struct(
@@ -48,7 +48,7 @@ def wpiutil_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/sendable/SendableBuilder.hpp",
             tmpl_class_names = [],
             trampolines = [
-                ("wpi::SendableBuilder", "wpi__SendableBuilder.hpp"),
+                ("wpi::util::SendableBuilder", "wpi__util__SendableBuilder.hpp"),
             ],
         ),
         struct(
@@ -58,7 +58,7 @@ def wpiutil_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/sendable/SendableRegistry.hpp",
             tmpl_class_names = [],
             trampolines = [
-                ("wpi::SendableRegistry", "wpi__SendableRegistry.hpp"),
+                ("wpi::util::SendableRegistry", "wpi__util__SendableRegistry.hpp"),
             ],
         ),
         struct(

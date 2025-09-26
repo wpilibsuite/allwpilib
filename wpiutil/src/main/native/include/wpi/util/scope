@@ -6,7 +6,7 @@
 
 #include <utility>
 
-namespace wpi {
+namespace wpi::util {
 
 template <typename F>
 class scope_exit {
@@ -34,4 +34,4 @@ class scope_exit {
   bool m_active = true;
 };
 
-}  // namespace wpi
+}  // namespace wpi::util

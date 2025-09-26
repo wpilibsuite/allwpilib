@@ -4,6 +4,8 @@
 
 #include "wpi/smartdashboard/MechanismRoot2d.hpp"
 
+#include <memory>
+
 #include <wpi/util/Color8Bit.hpp>
 
 using namespace wpi;

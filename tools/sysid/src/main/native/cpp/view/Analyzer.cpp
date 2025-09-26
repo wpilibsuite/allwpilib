@@ -612,9 +612,9 @@ void Analyzer::DisplayFeedbackGains() {
   sysid::CreateTooltip(
       "Gain presets represent how feedback gains are calculated for your "
       "specific feedback controller:\n\n"
-      "Default, WPILib (2020-): For use with the new WPILib wpi::math::PIDController "
+      "Default, WPILib (2020-): For use with the new WPILib PIDController "
       "class.\n"
-      "WPILib (Pre-2020): For use with the old WPILib wpi::math::PIDController class.\n"
+      "WPILib (Pre-2020): For use with the old WPILib PIDController class.\n"
       "CTRE: For use with CTRE units. These are the default units that ship "
       "with CTRE motor controllers.\n"
       "REV (Brushless): For use with NEO and NEO 550 motors on a SPARK MAX.\n"

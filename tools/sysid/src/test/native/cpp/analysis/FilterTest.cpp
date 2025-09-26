@@ -13,7 +13,7 @@
 #include "sysid/analysis/FilteringUtils.h"
 #include "sysid/analysis/Storage.h"
 
-TEST(FilterTest, wpi::math::MedianFilter) {
+TEST(FilterTest, MedianFilter) {
   std::vector<sysid::PreparedData> testData{
       sysid::PreparedData{0_s, 0, 0, 0},    sysid::PreparedData{0_s, 0, 0, 1},
       sysid::PreparedData{0_s, 0, 0, 10},   sysid::PreparedData{0_s, 0, 0, 5},

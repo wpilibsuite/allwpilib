@@ -10,7 +10,7 @@
 
 #include "wpi/command/CommandPtr.hpp"
 
-using namespace frc;
+using namespace wpi;
 using namespace wpi::cmd;
 
 Trigger::Trigger(const Trigger& other) = default;
