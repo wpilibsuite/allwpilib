@@ -102,8 +102,6 @@ public class TimedRobot extends IterativeRobotBase {
   /** Provide an alternate "main loop" via startCompetition(). */
   @Override
   public void startCompetition() {
-    robotInit();
-
     if (isSimulation()) {
       simulationInit();
     }

@@ -29,3 +29,7 @@ build:linux --host_cxxopt=-Wno-missing-requires
 build:linux --host_cxxopt=-Wno-implicit-fallthrough
 
 build:linux --host_per_file_copt=external/zlib/.*\.c@-Wno-deprecated-non-prototype
+
+# Set soname. Needed for robotpy
+build:linux --features=set_soname
+build:linux --host_features=set_soname

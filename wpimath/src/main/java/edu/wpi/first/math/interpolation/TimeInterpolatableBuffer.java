@@ -65,7 +65,7 @@ public final class TimeInterpolatableBuffer<T> {
    * @return The new TimeInterpolatableBuffer.
    */
   public static TimeInterpolatableBuffer<Double> createDoubleBuffer(double historySize) {
-    return new TimeInterpolatableBuffer<>(MathUtil::interpolate, historySize);
+    return new TimeInterpolatableBuffer<>(MathUtil::lerp, historySize);
   }
 
   /**

@@ -210,6 +210,33 @@ public class Transform2d implements ProtobufSerializable, StructSerializable {
   }
 
   /**
+   * Returns a Twist2d of the current transform (pose delta). If b is the output of {@code a.log()},
+   * then {@code b.exp()} would yield a.
+   *
+   * @return The twist that maps the current transform.
+   */
+  public Twist2d log() {
+    final double dtheta = m_rotation.getRadians();
+    final double halfDtheta = dtheta / 2.0;
+
+    final double cosMinusOne = m_rotation.getCos() - 1;
+
+    double halfThetaByTanOfHalfDtheta;
+    if (Math.abs(cosMinusOne) < 1E-9) {
+      halfThetaByTanOfHalfDtheta = 1.0 - 1.0 / 12.0 * dtheta * dtheta;
+    } else {
+      halfThetaByTanOfHalfDtheta = -(halfDtheta * m_rotation.getSin()) / cosMinusOne;
+    }
+
+    Translation2d translationPart =
+        m_translation
+            .rotateBy(new Rotation2d(halfThetaByTanOfHalfDtheta, -halfDtheta))
+            .times(Math.hypot(halfThetaByTanOfHalfDtheta, halfDtheta));
+
+    return new Twist2d(translationPart.getX(), translationPart.getY(), dtheta);
+  }
+
+  /**
    * Invert the transformation. This is useful for undoing a transformation.
    *
    * @return The inverted transformation.

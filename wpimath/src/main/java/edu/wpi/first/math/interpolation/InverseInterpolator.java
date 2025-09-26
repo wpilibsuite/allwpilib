@@ -30,6 +30,6 @@ public interface InverseInterpolator<T> {
    * @return Inverse interpolator for Double.
    */
   static InverseInterpolator<Double> forDouble() {
-    return MathUtil::inverseInterpolate;
+    return MathUtil::inverseLerp;
   }
 }

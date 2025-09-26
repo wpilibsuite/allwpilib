@@ -77,7 +77,6 @@ public class DifferentialDriveWheelPositions
   public DifferentialDriveWheelPositions interpolate(
       DifferentialDriveWheelPositions endValue, double t) {
     return new DifferentialDriveWheelPositions(
-        MathUtil.interpolate(this.left, endValue.left, t),
-        MathUtil.interpolate(this.right, endValue.right, t));
+        MathUtil.lerp(this.left, endValue.left, t), MathUtil.lerp(this.right, endValue.right, t));
   }
 }

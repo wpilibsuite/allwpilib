@@ -124,7 +124,8 @@ public final class LinearSystemId {
    * @param kA The acceleration gain, in volts/(unit/sec²)
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if kV &lt; 0 or kA &lt;= 0.
-   * @see <a href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
+   * @see <a
+   *     href="https://github.com/wpilibsuite/allwpilib/tree/main/sysid">https://github.com/wpilibsuite/allwpilib/tree/main/sysid</a>
    */
   public static LinearSystem<N2, N1, N2> createDCMotorSystem(double kV, double kA) {
     if (kV < 0.0) {
@@ -235,7 +236,8 @@ public final class LinearSystemId {
    * @param kA The acceleration gain, in volts/(unit/sec²)
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if kV &lt; 0 or kA &lt;= 0.
-   * @see <a href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
+   * @see <a
+   *     href="https://github.com/wpilibsuite/allwpilib/tree/main/sysid">https://github.com/wpilibsuite/allwpilib/tree/main/sysid</a>
    */
   public static LinearSystem<N1, N1, N1> identifyVelocitySystem(double kV, double kA) {
     if (kV < 0.0) {
@@ -268,7 +270,8 @@ public final class LinearSystemId {
    * @param kA The acceleration gain, in volts/(unit/sec²)
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if kV &lt; 0 or kA &lt;= 0.
-   * @see <a href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
+   * @see <a
+   *     href="https://github.com/wpilibsuite/allwpilib/tree/main/sysid">https://github.com/wpilibsuite/allwpilib/tree/main/sysid</a>
    */
   public static LinearSystem<N2, N1, N2> identifyPositionSystem(double kV, double kA) {
     if (kV < 0.0) {
@@ -301,7 +304,8 @@ public final class LinearSystemId {
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if kVLinear &lt;= 0, kALinear &lt;= 0, kVAngular &lt;= 0, or
    *     kAAngular &lt;= 0.
-   * @see <a href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
+   * @see <a
+   *     href="https://github.com/wpilibsuite/allwpilib/tree/main/sysid">https://github.com/wpilibsuite/allwpilib/tree/main/sysid</a>
    */
   public static LinearSystem<N2, N2, N2> identifyDrivetrainSystem(
       double kVLinear, double kALinear, double kVAngular, double kAAngular) {
@@ -348,7 +352,8 @@ public final class LinearSystemId {
    * @return A LinearSystem representing the given characterized constants.
    * @throws IllegalArgumentException if kVLinear &lt;= 0, kALinear &lt;= 0, kVAngular &lt;= 0,
    *     kAAngular &lt;= 0, or trackwidth &lt;= 0.
-   * @see <a href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
+   * @see <a
+   *     href="https://github.com/wpilibsuite/allwpilib/tree/main/sysid">https://github.com/wpilibsuite/allwpilib/tree/main/sysid</a>
    */
   public static LinearSystem<N2, N2, N2> identifyDrivetrainSystem(
       double kVLinear, double kALinear, double kVAngular, double kAAngular, double trackwidth) {

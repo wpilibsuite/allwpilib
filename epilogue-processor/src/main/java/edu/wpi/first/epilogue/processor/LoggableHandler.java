@@ -39,7 +39,7 @@ public class LoggableHandler extends ElementHandler {
   }
 
   @Override
-  public String logInvocation(Element element) {
+  public String logInvocation(Element element, TypeElement loggedClass) {
     TypeMirror dataType = dataType(element);
     var declaredType =
         m_processingEnv
@@ -61,7 +61,7 @@ public class LoggableHandler extends ElementHandler {
 
     // If there are no known loggable subtypes, return just the single logger call
     if (size == 1) {
-      return generateLoggerCall(element, declaredType, elementAccess(element));
+      return generateLoggerCall(element, declaredType, elementAccess(element, loggedClass));
     }
 
     // Otherwise, generate an if-else chain to compare the element with its known loggable subtypes
@@ -73,7 +73,7 @@ public class LoggableHandler extends ElementHandler {
     StringBuilder builder = new StringBuilder();
 
     // Cache the value in a variable so it's only read once
-    builder.append("var %s = %s;\n".formatted(varName, elementAccess(element)));
+    builder.append("var %s = %s;\n".formatted(varName, elementAccess(element, loggedClass)));
 
     for (int i = 0; i < size; i++) {
       TypeElement type = loggableSubtypes.get(i);

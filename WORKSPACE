@@ -80,6 +80,27 @@ http_archive(
 )
 
 http_archive(
+    name = "pybind11_bazel",
+    integrity = "sha256-iwRj1wuX2pDS6t6DqiCfhIXisv4y+7CvxSJtZoSAzGw=",
+    strip_prefix = "pybind11_bazel-2b6082a4d9d163a52299718113fa41e4b7978db5",
+    urls = ["https://github.com/pybind/pybind11_bazel/archive/2b6082a4d9d163a52299718113fa41e4b7978db5.tar.gz"],
+)
+
+http_archive(
+    name = "pybind11",
+    build_file = "@pybind11_bazel//:pybind11-BUILD.bazel",
+    strip_prefix = "pybind11-dfe7e65b4527eeb11036402aac3a394130960bb2",
+    urls = ["https://github.com/pybind/pybind11/archive/dfe7e65b4527eeb11036402aac3a394130960bb2.zip"],
+)
+
+http_archive(
+    name = "rules_python_pytest",
+    sha256 = "e2556404ef56ea3ec938597616afc51d78e1832cfe511b196e9f2b8fd7f8f149",
+    strip_prefix = "rules_python_pytest-1.1.1",
+    url = "https://github.com/caseyduquettesc/rules_python_pytest/releases/download/v1.1.1/rules_python_pytest-v1.1.1.tar.gz",
+)
+
+http_archive(
     name = "bazel_skylib",
     sha256 = "51b5105a760b353773f904d2bbc5e664d0987fbaf22265164de65d43e910d8ac",
     urls = [
@@ -138,6 +159,7 @@ pip_parse(
     name = "allwpilib_pip_deps",
     python_interpreter_target = "@python_3_10_host//:python",
     requirements_lock = "//:requirements_lock.txt",
+    requirements_windows = "//:requirements_windows_lock.txt",
 )
 
 load("@allwpilib_pip_deps//:requirements.bzl", "install_deps")
@@ -156,12 +178,12 @@ load("@rules_jvm_external//:defs.bzl", "maven_install")
 load("@rules_jvm_external//:specs.bzl", "maven")
 
 maven_artifacts = [
-    "org.ejml:ejml-simple:0.43.1",
-    "com.fasterxml.jackson.core:jackson-annotations:2.15.2",
-    "com.fasterxml.jackson.core:jackson-core:2.15.2",
-    "com.fasterxml.jackson.core:jackson-databind:2.15.2",
-    "us.hebi.quickbuf:quickbuf-runtime:1.3.3",
-    "com.google.code.gson:gson:2.10.1",
+    "org.ejml:ejml-simple:0.44.0",
+    "com.fasterxml.jackson.core:jackson-annotations:2.19.2",
+    "com.fasterxml.jackson.core:jackson-core:2.19.2",
+    "com.fasterxml.jackson.core:jackson-databind:2.19.2",
+    "us.hebi.quickbuf:quickbuf-runtime:1.4",
+    "com.google.code.gson:gson:2.13.1",
     "edu.wpi.first.thirdparty.frc2025.opencv:opencv-java:4.10.0-3",
     maven.artifact(
         "org.junit.jupiter",
@@ -370,6 +392,10 @@ rules_proto_setup()
 load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
 
 rules_pkg_dependencies()
+
+load("@rules_python_pytest//python_pytest:repositories.bzl", "rules_python_pytest_dependencies")
+
+rules_python_pytest_dependencies()
 
 # Capture the repository environmental variables which specify the filter list for what architectures to build in CI.
 load("//shared/bazel/rules:publishing_rule.bzl", "publishing_repo")

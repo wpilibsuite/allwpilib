@@ -15,6 +15,7 @@
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/RawTopic.h>
 
+#include "AddressableLEDSimd.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
@@ -43,6 +44,35 @@ struct AddressableLEDs {
 
 static AddressableLEDs* leds;
 
+void ConvertAndCopyLEDData(void* dst, const struct HAL_AddressableLEDData* src,
+                           int32_t len, HAL_AddressableLEDColorOrder order) {
+  using namespace hal::detail;
+  switch (order) {
+    case HAL_ALED_RGB:
+      std::memcpy(dst, src, len * sizeof(HAL_AddressableLEDData));
+      break;
+    case HAL_ALED_RBG:
+      ConvertPixels<HAL_ALED_RBG>(reinterpret_cast<const uint8_t*>(src),
+                                  reinterpret_cast<uint8_t*>(dst), len);
+      break;
+    case HAL_ALED_BGR:
+      ConvertPixels<HAL_ALED_BGR>(reinterpret_cast<const uint8_t*>(src),
+                                  reinterpret_cast<uint8_t*>(dst), len);
+      break;
+    case HAL_ALED_BRG:
+      ConvertPixels<HAL_ALED_BRG>(reinterpret_cast<const uint8_t*>(src),
+                                  reinterpret_cast<uint8_t*>(dst), len);
+      break;
+    case HAL_ALED_GBR:
+      ConvertPixels<HAL_ALED_GBR>(reinterpret_cast<const uint8_t*>(src),
+                                  reinterpret_cast<uint8_t*>(dst), len);
+      break;
+    case HAL_ALED_GRB:
+      ConvertPixels<HAL_ALED_GRB>(reinterpret_cast<const uint8_t*>(src),
+                                  reinterpret_cast<uint8_t*>(dst), len);
+      break;
+  }
+}
 }  // namespace
 
 namespace hal::init {
@@ -148,8 +178,7 @@ void HAL_SetAddressableLEDData(int32_t start, int32_t length,
     *status = PARAMETER_OUT_OF_RANGE;
     return;
   }
-  // TODO: handle color order
-  std::memcpy(&leds->s_buffer[start * 3], data, length * 3);
+  ConvertAndCopyLEDData(&leds->s_buffer[start * 3], data, length, colorOrder);
   leds->rawPub.Set(leds->s_buffer);
 }
 }  // extern "C"

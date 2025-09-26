@@ -8,8 +8,8 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.interpolation.Interpolatable;
@@ -104,11 +104,11 @@ public class ChassisSpeeds
   public ChassisSpeeds discretize(double dt) {
     // Construct the desired pose after a timestep, relative to the current pose. The desired pose
     // has decoupled translation and rotation.
-    var desiredDeltaPose = new Pose2d(vx * dt, vy * dt, new Rotation2d(omega * dt));
+    var desiredTransform = new Transform2d(vx * dt, vy * dt, new Rotation2d(omega * dt));
 
     // Find the chassis translation/rotation deltas in the robot frame that move the robot from its
     // current pose to the desired pose
-    var twist = Pose2d.kZero.log(desiredDeltaPose);
+    var twist = desiredTransform.log();
 
     // Turn the chassis translation/rotation deltas into average velocities
     return new ChassisSpeeds(twist.dx / dt, twist.dy / dt, twist.dtheta / dt);

@@ -46,6 +46,10 @@ void Subsystem::Register() {
   return CommandScheduler::GetInstance().RegisterSubsystem(this);
 }
 
+CommandPtr Subsystem::Idle() {
+  return cmd::Idle({this});
+}
+
 CommandPtr Subsystem::RunOnce(std::function<void()> action) {
   return cmd::RunOnce(std::move(action), {this});
 }

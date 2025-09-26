@@ -455,7 +455,7 @@ public class PIDController implements Sendable, AutoCloseable {
       m_totalError = 0;
     } else if (m_ki != 0) {
       m_totalError =
-          MathUtil.clamp(
+          Math.clamp(
               m_totalError + m_error * m_period,
               m_minimumIntegral / m_ki,
               m_maximumIntegral / m_ki);
