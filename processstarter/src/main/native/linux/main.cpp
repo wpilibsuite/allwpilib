@@ -72,8 +72,9 @@ int StartJavaTool(std::filesystem::path& exePath) {
 
   std::string data = jarPath;
   std::string jarArg = "-jar";
-  char* const arguments[] = {Java.generic_string().data(), jarArg.data(),
-                             data.data(), nullptr};
+  auto javaGenericStr = Java.generic_string();
+  char* const arguments[] = {javaGenericStr.data(), jarArg.data(), data.data(),
+                             nullptr};
 
   int status =
       posix_spawn(&pid, Java.c_str(), nullptr, nullptr, arguments, environ);
