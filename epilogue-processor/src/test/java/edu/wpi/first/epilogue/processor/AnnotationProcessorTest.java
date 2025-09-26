@@ -501,7 +501,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       @Logged
-      class BaseExample {
+      class BaseClass {
         public double a;
         protected double b;
         private double c;
@@ -509,7 +509,7 @@ class AnnotationProcessorTest {
       }
 
       @Logged
-      class Example extends BaseExample {
+      class Example extends BaseClass {
         double e;
       }
     """;
@@ -526,20 +526,20 @@ class AnnotationProcessorTest {
       import java.lang.invoke.VarHandle;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
-        // Accesses private or superclass field edu.wpi.first.epilogue.BaseExample.b
-        private static final VarHandle $edu_wpi_first_epilogue_BaseExample_b;
-        // Accesses private or superclass field edu.wpi.first.epilogue.BaseExample.c
-        private static final VarHandle $edu_wpi_first_epilogue_BaseExample_c;
-        // Accesses private or superclass field edu.wpi.first.epilogue.BaseExample.d
-        private static final VarHandle $edu_wpi_first_epilogue_BaseExample_d;
+        // Accesses private or superclass field edu.wpi.first.epilogue.BaseClass.b
+        private static final VarHandle $edu_wpi_first_epilogue_BaseClass_b;
+        // Accesses private or superclass field edu.wpi.first.epilogue.BaseClass.c
+        private static final VarHandle $edu_wpi_first_epilogue_BaseClass_c;
+        // Accesses private or superclass field edu.wpi.first.epilogue.BaseClass.d
+        private static final VarHandle $edu_wpi_first_epilogue_BaseClass_d;
 
         static {
           try {
             var rootLookup = MethodHandles.lookup();
-            var lookup$$edu_wpi_first_epilogue_BaseExample = MethodHandles.privateLookupIn(edu.wpi.first.epilogue.BaseExample.class, rootLookup);
-            $edu_wpi_first_epilogue_BaseExample_b = lookup$$edu_wpi_first_epilogue_BaseExample.findVarHandle(edu.wpi.first.epilogue.BaseExample.class, "b", double.class);
-            $edu_wpi_first_epilogue_BaseExample_c = lookup$$edu_wpi_first_epilogue_BaseExample.findVarHandle(edu.wpi.first.epilogue.BaseExample.class, "c", double.class);
-            $edu_wpi_first_epilogue_BaseExample_d = lookup$$edu_wpi_first_epilogue_BaseExample.findVarHandle(edu.wpi.first.epilogue.BaseExample.class, "d", double.class);
+            var lookup$$edu_wpi_first_epilogue_BaseClass = MethodHandles.privateLookupIn(edu.wpi.first.epilogue.BaseClass.class, rootLookup);
+            $edu_wpi_first_epilogue_BaseClass_b = lookup$$edu_wpi_first_epilogue_BaseClass.findVarHandle(edu.wpi.first.epilogue.BaseClass.class, "b", double.class);
+            $edu_wpi_first_epilogue_BaseClass_c = lookup$$edu_wpi_first_epilogue_BaseClass.findVarHandle(edu.wpi.first.epilogue.BaseClass.class, "c", double.class);
+            $edu_wpi_first_epilogue_BaseClass_d = lookup$$edu_wpi_first_epilogue_BaseClass.findVarHandle(edu.wpi.first.epilogue.BaseClass.class, "d", double.class);
           } catch (ReflectiveOperationException e) {
             throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
           }
@@ -554,9 +554,9 @@ class AnnotationProcessorTest {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             backend.log("e", object.e);
             backend.log("a", object.a);
-            backend.log("b", ((double) $edu_wpi_first_epilogue_BaseExample_b.get(object)));
-            backend.log("c", ((double) $edu_wpi_first_epilogue_BaseExample_c.get(object)));
-            backend.log("d", ((double) $edu_wpi_first_epilogue_BaseExample_d.get(object)));
+            backend.log("b", ((double) $edu_wpi_first_epilogue_BaseClass_b.get(object)));
+            backend.log("c", ((double) $edu_wpi_first_epilogue_BaseClass_c.get(object)));
+            backend.log("d", ((double) $edu_wpi_first_epilogue_BaseClass_d.get(object)));
           }
         }
       }
@@ -579,7 +579,7 @@ class AnnotationProcessorTest {
       }
 
       @Logged
-      class BaseExample extends Grandparent {
+      class BaseClass extends Grandparent {
         protected double d;
         public double e;
         private double f;
@@ -589,7 +589,7 @@ class AnnotationProcessorTest {
       }
 
       @Logged
-      class Example extends BaseExample {
+      class Example extends BaseClass {
         double h;
         private double i;
       }
@@ -609,20 +609,20 @@ class AnnotationProcessorTest {
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         // Accesses private or superclass field edu.wpi.first.epilogue.Example.i
         private static final VarHandle $edu_wpi_first_epilogue_Example_i;
-        // Accesses private or superclass field edu.wpi.first.epilogue.BaseExample.d
-        private static final VarHandle $edu_wpi_first_epilogue_BaseExample_d;
-        // Accesses private or superclass field edu.wpi.first.epilogue.BaseExample.f
-        private static final VarHandle $edu_wpi_first_epilogue_BaseExample_f;
-        // Accesses private or superclass field edu.wpi.first.epilogue.BaseExample.g
-        private static final VarHandle $edu_wpi_first_epilogue_BaseExample_g;
+        // Accesses private or superclass field edu.wpi.first.epilogue.BaseClass.d
+        private static final VarHandle $edu_wpi_first_epilogue_BaseClass_d;
+        // Accesses private or superclass field edu.wpi.first.epilogue.BaseClass.f
+        private static final VarHandle $edu_wpi_first_epilogue_BaseClass_f;
+        // Accesses private or superclass field edu.wpi.first.epilogue.BaseClass.g
+        private static final VarHandle $edu_wpi_first_epilogue_BaseClass_g;
 
         static {
           try {
             var rootLookup = MethodHandles.lookup();
-            var lookup$$edu_wpi_first_epilogue_BaseExample = MethodHandles.privateLookupIn(edu.wpi.first.epilogue.BaseExample.class, rootLookup);
-            $edu_wpi_first_epilogue_BaseExample_d = lookup$$edu_wpi_first_epilogue_BaseExample.findVarHandle(edu.wpi.first.epilogue.BaseExample.class, "d", double.class);
-            $edu_wpi_first_epilogue_BaseExample_f = lookup$$edu_wpi_first_epilogue_BaseExample.findVarHandle(edu.wpi.first.epilogue.BaseExample.class, "f", double.class);
-            $edu_wpi_first_epilogue_BaseExample_g = lookup$$edu_wpi_first_epilogue_BaseExample.findVarHandle(edu.wpi.first.epilogue.BaseExample.class, "g", double.class);
+            var lookup$$edu_wpi_first_epilogue_BaseClass = MethodHandles.privateLookupIn(edu.wpi.first.epilogue.BaseClass.class, rootLookup);
+            $edu_wpi_first_epilogue_BaseClass_d = lookup$$edu_wpi_first_epilogue_BaseClass.findVarHandle(edu.wpi.first.epilogue.BaseClass.class, "d", double.class);
+            $edu_wpi_first_epilogue_BaseClass_f = lookup$$edu_wpi_first_epilogue_BaseClass.findVarHandle(edu.wpi.first.epilogue.BaseClass.class, "f", double.class);
+            $edu_wpi_first_epilogue_BaseClass_g = lookup$$edu_wpi_first_epilogue_BaseClass.findVarHandle(edu.wpi.first.epilogue.BaseClass.class, "g", double.class);
             var lookup$$edu_wpi_first_epilogue_Example = MethodHandles.privateLookupIn(edu.wpi.first.epilogue.Example.class, rootLookup);
             $edu_wpi_first_epilogue_Example_i = lookup$$edu_wpi_first_epilogue_Example.findVarHandle(edu.wpi.first.epilogue.Example.class, "i", double.class);
           } catch (ReflectiveOperationException e) {
@@ -639,10 +639,10 @@ class AnnotationProcessorTest {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             backend.log("h", object.h);
             backend.log("i", ((double) $edu_wpi_first_epilogue_Example_i.get(object)));
-            backend.log("d", ((double) $edu_wpi_first_epilogue_BaseExample_d.get(object)));
+            backend.log("d", ((double) $edu_wpi_first_epilogue_BaseClass_d.get(object)));
             backend.log("e", object.e);
-            backend.log("f", ((double) $edu_wpi_first_epilogue_BaseExample_f.get(object)));
-            backend.log("g", ((double) $edu_wpi_first_epilogue_BaseExample_g.get(object)));
+            backend.log("f", ((double) $edu_wpi_first_epilogue_BaseClass_f.get(object)));
+            backend.log("g", ((double) $edu_wpi_first_epilogue_BaseClass_g.get(object)));
             backend.log("a", object.a);
             backend.log("getValue", object.getValue());
             backend.log("getB", object.getB());
