@@ -2316,6 +2316,64 @@ class AnnotationProcessorTest {
         () -> assertEquals(col, diagnostic.getColumnNumber(), "column number mismatch"));
   }
 
+  @Test
+  void dependsOnAnnotation() {
+    String source =
+        """
+      package edu.wpi.first.epilogue;
+
+      @Logged
+      class Example {
+        double position;
+        double target;
+        double tolerance;
+
+        @DependsOn("position")
+        @DependsOn("target")
+        @DependsOn("tolerance")
+        public boolean isAtTarget() {
+          return Math.abs(position - target) < tolerance;
+        }
+      }
+      """;
+
+    String expectedGeneratedSource =
+        """
+      package edu.wpi.first.epilogue;
+
+      import edu.wpi.first.epilogue.Logged;
+      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import edu.wpi.first.epilogue.logging.LogMetadata;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        // Cached LogMetadata for element isAtTarget with @DependsOn annotations
+        private static final LogMetadata $metadata_edu_wpi_first_epilogue_Example_isAtTarget;
+
+        static {
+          $metadata_edu_wpi_first_epilogue_Example_isAtTarget = new edu.wpi.first.epilogue.logging.LogMetadata(java.util.List.of("position", "target", "tolerance"));
+        }
+
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("position", object.position);
+            backend.log("target", object.target);
+            backend.log("tolerance", object.tolerance);
+            backend.log("isAtTarget", object.isAtTarget(), $metadata_edu_wpi_first_epilogue_Example_isAtTarget);
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
   private void assertLoggerGenerates(String loggedClassContent, String loggerClassContent) {
     Compilation compilation =
         javac()

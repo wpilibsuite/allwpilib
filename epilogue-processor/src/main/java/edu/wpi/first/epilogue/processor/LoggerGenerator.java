@@ -11,6 +11,7 @@ import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.ReturnTree;
 import com.sun.source.util.SimpleTreeVisitor;
 import com.sun.source.util.Trees;
+import edu.wpi.first.epilogue.DependsOn;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import java.io.IOException;
@@ -26,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -204,6 +206,11 @@ public class LoggerGenerator {
             .toList();
     boolean requiresVarHandles = !varHandleFields.isEmpty();
 
+    // Check if any element has @DependsOn annotations to determine if LogMetadata import is needed
+    boolean needsLogMetadataImport = Stream.concat(loggableFields.stream(), loggableMethods.stream())
+        .anyMatch(element -> element.getAnnotation(DependsOn.class) != null || 
+                           element.getAnnotation(DependsOn.Container.class) != null);
+
     try (var out = new PrintWriter(loggerFile.openWriter())) {
       if (packageName != null) {
         // package com.example;
@@ -215,6 +222,9 @@ public class LoggerGenerator {
       out.println("import edu.wpi.first.epilogue.Epilogue;");
       out.println("import edu.wpi.first.epilogue.logging.ClassSpecificLogger;");
       out.println("import edu.wpi.first.epilogue.logging.EpilogueBackend;");
+      if (needsLogMetadataImport) {
+        out.println("import edu.wpi.first.epilogue.logging.LogMetadata;");
+      }
       if (requiresVarHandles) {
         out.println("import java.lang.invoke.MethodHandles;");
         out.println("import java.lang.invoke.VarHandle;");
@@ -241,13 +251,32 @@ public class LoggerGenerator {
         out.println();
       }
 
-      // Static initializer block to load VarHandles and reflection fields
-      if (requiresVarHandles) {
+      // Generate static final LogMetadata fields for elements with @DependsOn annotations
+      List<Element> logMetadataElements = Stream.concat(loggableFields.stream(), loggableMethods.stream())
+          .filter(element -> element.getAnnotation(DependsOn.class) != null || 
+                           element.getAnnotation(DependsOn.Container.class) != null)
+          .sorted(Comparator.comparing(e -> e.getSimpleName().toString()))
+          .collect(Collectors.toList());
+
+      if (!logMetadataElements.isEmpty()) {
+        for (var element : logMetadataElements) {
+          // Generate static final LogMetadata field for caching
+          out.printf(
+              "  // Cached LogMetadata for element %s with @DependsOn annotations%n",
+              element.getSimpleName());
+          out.printf("  private static final LogMetadata %s;%n", logMetadataFieldName(element));
+        }
+        out.println();
+      }
+
+      // Static initializer block to load VarHandles and initialize LogMetadata fields
+      if (requiresVarHandles || !logMetadataElements.isEmpty()) {
         out.println("  static {");
 
-        out.println("    try {");
-
-        out.println("      var rootLookup = MethodHandles.lookup();");
+        if (requiresVarHandles) {
+          out.println("    try {");
+          out.println("      var rootLookup = MethodHandles.lookup();");
+        }
 
         // Group private fields by class, then generate a private lookup for each class
         // and a VarHandle for each field using that lookup. Sorting and then collecting into a
@@ -285,11 +314,19 @@ public class LoggerGenerator {
               }
             });
 
-        out.println("    } catch (ReflectiveOperationException e) {");
-        out.println(
-            "      throw new RuntimeException("
-                + "\"[EPILOGUE] Could not load private fields for logging!\", e);");
-        out.println("    }");
+        if (requiresVarHandles) {
+          out.println("    } catch (ReflectiveOperationException e) {");
+          out.println(
+              "      throw new RuntimeException("
+                  + "\"[EPILOGUE] Could not load private fields for logging!\", e);");
+          out.println("    }");
+        }
+
+        // Initialize static final LogMetadata fields
+        for (var element : logMetadataElements) {
+          String metadataInitialization = generateLogMetadata(element, loggableFields, loggableMethods, false); // Use inline construction for static field initialization
+          out.printf("    %s = %s;%n", logMetadataFieldName(element), metadataInitialization);
+        }
 
         out.println("  }");
         out.println();
@@ -344,7 +381,14 @@ public class LoggerGenerator {
                     // unloggable commands.
                     var logInvocation = h.logInvocation(loggableElement, clazz);
                     if (logInvocation != null) {
-                      out.println(logInvocation.indent(6).stripTrailing() + ";");
+                      // Generate log invocation for the main element
+                      var metadata = generateLogMetadata(loggableElement, loggableFields, loggableMethods);
+                      if (metadata != null) {
+                        var modifiedInvocation = logInvocation.replaceFirst("\\)$", java.util.regex.Matcher.quoteReplacement(", " + metadata + ")"));
+                        out.println(modifiedInvocation.indent(6).stripTrailing() + ";");
+                      } else {
+                        out.println(logInvocation.indent(6).stripTrailing() + ";");
+                      }
                     }
                   });
             }
@@ -367,6 +411,18 @@ public class LoggerGenerator {
   public static String varHandleName(VariableElement field) {
     return "$%s_%s"
         .formatted(field.getEnclosingElement().toString().replace(".", "_"), field.getSimpleName());
+  }
+
+  /**
+   * Generates the name of a static final LogMetadata field for the given element. The field name
+   * is guaranteed to be unique.
+   *
+   * @param element The element to generate a LogMetadata field for
+   * @return The name of the generated LogMetadata field
+   */
+  public static String logMetadataFieldName(Element element) {
+    return "$metadata_%s_%s"
+        .formatted(element.getEnclosingElement().toString().replace(".", "_"), element.getSimpleName());
   }
 
   private void collectLoggables(
@@ -474,4 +530,83 @@ public class LoggerGenerator {
         },
         null);
   }
+
+  /**
+   * Creates LogMetadata for dependencies of an element marked with @DependsOn annotations.
+   *
+   * @param element the element that has @DependsOn annotations
+   * @param fieldsToLog the list of fields that will be logged
+   * @param methodsToLog the list of methods that will be logged
+   * @return LogMetadata containing dependency names, or null if no valid dependencies
+   */
+  private String generateLogMetadata(Element element, List<VariableElement> fieldsToLog, List<ExecutableElement> methodsToLog) {
+    return generateLogMetadata(element, fieldsToLog, methodsToLog, true);
+  }
+
+  /**
+   * Creates LogMetadata for dependencies of an element marked with @DependsOn annotations.
+   *
+   * @param element the element that has @DependsOn annotations
+   * @param fieldsToLog the list of fields that will be logged
+   * @param methodsToLog the list of methods that will be logged
+   * @param useStaticField if true, return static field reference; if false, return inline construction
+   * @return LogMetadata construction code or field reference, or null if no valid dependencies
+   */
+  private String generateLogMetadata(Element element, List<VariableElement> fieldsToLog, List<ExecutableElement> methodsToLog, boolean useStaticField) {
+    // Check for @DependsOn annotations (both single and multiple via @DependsOn.Container)
+    List<DependsOn> dependencies = new ArrayList<>();
+
+    // Get single @DependsOn annotation
+    DependsOn singleDependency = element.getAnnotation(DependsOn.class);
+    if (singleDependency != null) {
+      dependencies.add(singleDependency);
+    }
+
+    // Get multiple @DependsOn annotations via container
+    DependsOn.Container containerDependency = element.getAnnotation(DependsOn.Container.class);
+    if (containerDependency != null) {
+      dependencies.addAll(List.of(containerDependency.value()));
+    }
+
+    if (dependencies.isEmpty()) {
+      return null;
+    }
+
+    // Precompute set of logged names for efficient lookup
+    Set<String> loggedNames = Stream.concat(fieldsToLog.stream(), methodsToLog.stream())
+        .map(ElementHandler::loggedName)
+        .collect(Collectors.toSet());
+
+    // Collect valid dependency names by checking against logged elements
+    List<String> validDependencyNames = new ArrayList<>();
+    for (DependsOn dependency : dependencies) {
+      String dependencyName = dependency.value();
+      if (loggedNames.contains(dependencyName)) {
+        validDependencyNames.add(dependencyName);
+      }
+    }
+
+    if (validDependencyNames.isEmpty()) {
+      return null;
+    }
+
+    if (useStaticField) {
+      // Return reference to static final field
+      return logMetadataFieldName(element);
+    } else {
+      // Create LogMetadata construction code for static field initialization
+      String dependencyList = validDependencyNames.stream()
+          .map(name -> "\"" + name + "\"")
+          .collect(java.util.stream.Collectors.joining(", "));
+      return "new edu.wpi.first.epilogue.logging.LogMetadata(java.util.List.of(" + dependencyList + "))";
+    }
+  }
+
+  /**
+   * Finds an element (field or method) in a class by name.
+   *
+   * @param clazz the class to search in
+   * @param name the name of the element to find (method names should include parentheses)
+   * @return the found element, or null if not found
+   */
 }
