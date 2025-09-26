@@ -175,9 +175,9 @@ public class ChassisAccelerations
       return endValue;
     } else {
       return new ChassisAccelerations(
-          MathUtil.interpolate(this.ax, endValue.ax, t),
-          MathUtil.interpolate(this.ay, endValue.ay, t),
-          MathUtil.interpolate(this.alpha, endValue.alpha, t));
+          MathUtil.lerp(this.ax, endValue.ax, t),
+          MathUtil.lerp(this.ay, endValue.ay, t),
+          MathUtil.lerp(this.alpha, endValue.alpha, t));
     }
   }
 

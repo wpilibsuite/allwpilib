@@ -210,9 +210,9 @@ public class ChassisSpeeds
       return endValue;
     } else {
       return new ChassisSpeeds(
-          MathUtil.interpolate(this.vx, endValue.vx, t),
-          MathUtil.interpolate(this.vy, endValue.vy, t),
-          MathUtil.interpolate(this.omega, endValue.omega, t));
+          MathUtil.lerp(this.vx, endValue.vx, t),
+          MathUtil.lerp(this.vy, endValue.vy, t),
+          MathUtil.lerp(this.omega, endValue.omega, t));
     }
   }
 
