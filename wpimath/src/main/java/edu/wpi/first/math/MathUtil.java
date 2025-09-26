@@ -37,9 +37,8 @@ public final class MathUtil {
    * @return The interpolated value.
    */
   @SuppressWarnings("unchecked")
-  public static <U extends Unit, M extends Measure<U>> M lerp(
-      M startValue, M endValue, double t) {
-    return (M) startValue.plus(endValue.minus(startValue).times(MathUtil.clamp(t, 0, 1)));
+  public static <U extends Unit, M extends Measure<U>> M lerp(M startValue, M endValue, double t) {
+    return (M) startValue.plus(endValue.minus(startValue).times(Math.clamp(t, 0, 1)));
   }
 
   /**
@@ -81,30 +80,6 @@ public final class MathUtil {
       return 0.0;
     }
     return queryToStart / totalRange;
-  }
-
-  /**
-   * Returns value clamped between low and high boundaries.
-   *
-   * @param value Value to clamp.
-   * @param low The lower boundary to which to clamp value.
-   * @param high The higher boundary to which to clamp value.
-   * @return The clamped value.
-   */
-  public static int clamp(int value, int low, int high) {
-    return Math.max(low, Math.min(value, high));
-  }
-
-  /**
-   * Returns value clamped between low and high boundaries.
-   *
-   * @param value Value to clamp.
-   * @param low The lower boundary to which to clamp value.
-   * @param high The higher boundary to which to clamp value.
-   * @return The clamped value.
-   */
-  public static double clamp(double value, double low, double high) {
-    return Math.max(low, Math.min(value, high));
   }
 
   /**
