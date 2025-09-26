@@ -20,5 +20,6 @@ wpilib_java_junit5_test(
     deps = [
         ":epilogue-java",
         "//wpiutil:wpiutil-java",
+        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
 )

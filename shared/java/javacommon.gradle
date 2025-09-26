@@ -39,11 +39,13 @@ task outputJavadocJar(type: Jar, dependsOn: javadoc) {
 }
 
 artifacts {
-    archives sourcesJar
-    archives javadocJar
-    archives outputJar
-    archives outputSourcesJar
-    archives outputJavadocJar
+    tasks.named("assemble") {
+        dependsOn(sourcesJar)
+        dependsOn(javadocJar)
+        dependsOn(outputJar)
+        dependsOn(outputSourcesJar)
+        dependsOn(outputJavadocJar)
+    }
 }
 
 addTaskToCopyAllOutputs(outputSourcesJar)

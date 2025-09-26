@@ -50,8 +50,10 @@ task cppHeadersZip(type: Zip) {
 }
 
 artifacts {
-    archives cppHeadersZip
-    archives cppSourcesZip
+    tasks.named("assemble") {
+        dependsOn(cppHeadersZip)
+        dependsOn(cppSourcesZip)
+    }
 }
 
 addTaskToCopyAllOutputs(cppSourcesZip)
