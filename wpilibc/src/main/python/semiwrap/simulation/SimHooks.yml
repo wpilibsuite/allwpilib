@@ -1,0 +1,11 @@
+functions:
+  SetRuntimeType:
+  WaitForProgramStart:
+  SetProgramStarted:
+  GetProgramStarted:
+  RestartTiming:
+  PauseTiming:
+  ResumeTiming:
+  IsTimingPaused:
+  StepTiming:
+  StepTimingAsync:

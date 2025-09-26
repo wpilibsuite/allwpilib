@@ -1,0 +1,25 @@
+classes:
+  frc::SwerveDriveOdometry3d:
+    force_no_trampoline: true
+    template_params:
+    - size_t NumModules
+    methods:
+      SwerveDriveOdometry3d:
+
+templates:
+  SwerveDrive2Odometry3d:
+    qualname: frc::SwerveDriveOdometry3d
+    params:
+    - 2
+  SwerveDrive3Odometry3d:
+    qualname: frc::SwerveDriveOdometry3d
+    params:
+    - 3
+  SwerveDrive4Odometry3d:
+    qualname: frc::SwerveDriveOdometry3d
+    params:
+    - 4
+  SwerveDrive6Odometry3d:
+    qualname: frc::SwerveDriveOdometry3d
+    params:
+    - 6

@@ -1,0 +1,45 @@
+extra_includes:
+- frc/Encoder.h
+
+classes:
+  frc::sim::EncoderSim:
+    force_type_casters:
+    - std::function
+    methods:
+      EncoderSim:
+        overloads:
+          const Encoder&:
+      CreateForChannel:
+      CreateForIndex:
+      RegisterInitializedCallback:
+      GetInitialized:
+      SetInitialized:
+      RegisterCountCallback:
+      GetCount:
+      SetCount:
+      RegisterPeriodCallback:
+      GetPeriod:
+      SetPeriod:
+      RegisterResetCallback:
+      GetReset:
+      SetReset:
+      RegisterMaxPeriodCallback:
+      GetMaxPeriod:
+      SetMaxPeriod:
+      RegisterDirectionCallback:
+      GetDirection:
+      SetDirection:
+      RegisterReverseDirectionCallback:
+      GetReverseDirection:
+      SetReverseDirection:
+      RegisterSamplesToAverageCallback:
+      GetSamplesToAverage:
+      SetSamplesToAverage:
+      RegisterDistancePerPulseCallback:
+      GetDistancePerPulse:
+      SetDistancePerPulse:
+      ResetData:
+      SetDistance:
+      GetDistance:
+      SetRate:
+      GetRate:

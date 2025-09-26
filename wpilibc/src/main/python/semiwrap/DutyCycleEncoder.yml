@@ -1,0 +1,38 @@
+extra_includes:
+- wpi/sendable/SendableBuilder.h
+- frc/DutyCycle.h
+
+classes:
+  frc::DutyCycleEncoder:
+    ignored_bases:
+    - wpi::SendableHelper<DutyCycleEncoder>
+    methods:
+      DutyCycleEncoder:
+        overloads:
+          int:
+          DutyCycle&:
+            ignore: true
+          DutyCycle*:
+            ignore: true
+          std::shared_ptr<DutyCycle>:
+          int, double, double:
+          DutyCycle&, double, double:
+            ignore: true
+          DutyCycle*, double, double:
+            ignore: true
+          std::shared_ptr<DutyCycle>, double, double:
+      GetFrequency:
+      IsConnected:
+      SetConnectedFrequencyThreshold:
+      Get:
+      SetDutyCycleRange:
+      GetSourceChannel:
+      SetAssumedFrequency:
+      SetInverted:
+      InitSendable:
+
+inline_code: |
+  cls_DutyCycleEncoder
+    .def("__repr__", [](const DutyCycleEncoder &self) {
+      return py::str("<DutyCycleEncoder {}>").format(self.GetSourceChannel());
+    });

@@ -1,0 +1,60 @@
+strip_prefixes:
+- HALSIM_
+
+functions:
+  HALSIM_FindEncoderForChannel:
+  HALSIM_ResetEncoderData:
+  HALSIM_GetEncoderDigitalChannelA:
+  HALSIM_GetEncoderDigitalChannelB:
+  HALSIM_RegisterEncoderInitializedCallback:
+    ignore: true
+  HALSIM_CancelEncoderInitializedCallback:
+  HALSIM_GetEncoderInitialized:
+  HALSIM_SetEncoderInitialized:
+  HALSIM_GetEncoderSimDevice:
+  HALSIM_RegisterEncoderCountCallback:
+    ignore: true
+  HALSIM_CancelEncoderCountCallback:
+  HALSIM_GetEncoderCount:
+  HALSIM_SetEncoderCount:
+  HALSIM_RegisterEncoderPeriodCallback:
+    ignore: true
+  HALSIM_CancelEncoderPeriodCallback:
+  HALSIM_GetEncoderPeriod:
+  HALSIM_SetEncoderPeriod:
+  HALSIM_RegisterEncoderResetCallback:
+    ignore: true
+  HALSIM_CancelEncoderResetCallback:
+  HALSIM_GetEncoderReset:
+  HALSIM_SetEncoderReset:
+  HALSIM_RegisterEncoderMaxPeriodCallback:
+    ignore: true
+  HALSIM_CancelEncoderMaxPeriodCallback:
+  HALSIM_GetEncoderMaxPeriod:
+  HALSIM_SetEncoderMaxPeriod:
+  HALSIM_RegisterEncoderDirectionCallback:
+    ignore: true
+  HALSIM_CancelEncoderDirectionCallback:
+  HALSIM_GetEncoderDirection:
+  HALSIM_SetEncoderDirection:
+  HALSIM_RegisterEncoderReverseDirectionCallback:
+    ignore: true
+  HALSIM_CancelEncoderReverseDirectionCallback:
+  HALSIM_GetEncoderReverseDirection:
+  HALSIM_SetEncoderReverseDirection:
+  HALSIM_RegisterEncoderSamplesToAverageCallback:
+    ignore: true
+  HALSIM_CancelEncoderSamplesToAverageCallback:
+  HALSIM_GetEncoderSamplesToAverage:
+  HALSIM_SetEncoderSamplesToAverage:
+  HALSIM_RegisterEncoderDistancePerPulseCallback:
+    ignore: true
+  HALSIM_CancelEncoderDistancePerPulseCallback:
+  HALSIM_GetEncoderDistancePerPulse:
+  HALSIM_SetEncoderDistancePerPulse:
+  HALSIM_RegisterEncoderAllCallbacks:
+    ignore: true
+  HALSIM_SetEncoderDistance:
+  HALSIM_GetEncoderDistance:
+  HALSIM_SetEncoderRate:
+  HALSIM_GetEncoderRate:

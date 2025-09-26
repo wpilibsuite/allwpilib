@@ -1,0 +1,30 @@
+extra_includes:
+- frc/smartdashboard/MechanismLigament2d.h
+
+classes:
+  frc::MechanismRoot2d:
+    force_type_casters:
+    - units::degree_t
+    methods:
+      MechanismRoot2d:
+        ignore: true
+      SetPosition:
+      GetName:
+        ignore: true
+      Append:
+        ignore: true
+
+# keep this in sync with MechanismRoot2d.h
+inline_code: |-
+  cls_MechanismRoot2d
+    .def("getName", [](MechanismRoot2d *self) { return self->GetName(); }, release_gil())
+    .def("appendLigament", [](MechanismRoot2d *self,
+      std::string_view name, double length, units::degree_t angle,
+      double lineWidth, const frc::Color8Bit& color) {
+        return self->Append<MechanismLigament2d>(name, length, angle, lineWidth, color);
+      },
+      py::arg("name"), py::arg("length"), py::arg("angle"),
+      py::arg("lineWidth") = 6, py::arg("color") = frc::Color8Bit{235, 137, 52},
+      release_gil(), "Append a ligament node",
+      py::return_value_policy::reference_internal)
+    ;

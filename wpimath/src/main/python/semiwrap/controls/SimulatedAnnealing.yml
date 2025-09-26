@@ -1,0 +1,19 @@
+defaults:
+  subpackage: optimization
+
+extra_includes:
+- gilsafe_object.h
+
+classes:
+  frc::SimulatedAnnealing:
+    template_params:
+    - State
+    methods:
+      SimulatedAnnealing:
+      Solve:
+
+templates:
+  SimulatedAnnealing:
+    qualname: frc::SimulatedAnnealing
+    params:
+    - semiwrap::gilsafe_object

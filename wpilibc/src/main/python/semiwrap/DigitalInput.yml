@@ -1,0 +1,13 @@
+extra_includes:
+- wpi/sendable/SendableBuilder.h
+
+classes:
+  frc::DigitalInput:
+    ignored_bases:
+    - wpi::SendableHelper<DigitalInput>
+    methods:
+      DigitalInput:
+      Get:
+      GetChannel:
+      SetSimDevice:
+      InitSendable:

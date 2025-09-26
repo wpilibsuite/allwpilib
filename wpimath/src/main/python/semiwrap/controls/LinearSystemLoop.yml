@@ -1,0 +1,79 @@
+defaults:
+  subpackage: system
+
+classes:
+  frc::LinearSystemLoop:
+    template_params:
+    - int States
+    - int Inputs
+    - int Outputs
+    methods:
+      LinearSystemLoop:
+        overloads:
+          ? LinearSystem<States, Inputs, Outputs>&, LinearQuadraticRegulator<States, Inputs>&, KalmanFilter<States, Inputs, Outputs>&, units::volt_t, units::second_t
+          :
+          ? LinearSystem<States, Inputs, Outputs>&, LinearQuadraticRegulator<States, Inputs>&, KalmanFilter<States, Inputs, Outputs>&, std::function<InputVector (const InputVector&)>, units::second_t
+          :
+          ? LinearQuadraticRegulator<States, Inputs>&, const LinearPlantInversionFeedforward<States, Inputs>&, KalmanFilter<States, Inputs, Outputs>&, units::volt_t
+          :
+          ? LinearQuadraticRegulator<States, Inputs>&, const LinearPlantInversionFeedforward<States, Inputs>&, KalmanFilter<States, Inputs, Outputs>&, std::function<InputVector (const InputVector&)>
+          :
+      Xhat:
+        overloads:
+          '[const]':
+          int [const]:
+      NextR:
+        overloads:
+          '[const]':
+          int [const]:
+      U:
+        overloads:
+          '[const]':
+          int [const]:
+      SetXhat:
+        overloads:
+          const StateVector&:
+          int, double:
+      SetNextR:
+      Controller:
+        ignore: true # TODO
+      Feedforward:
+        ignore: true # TODO
+      Observer:
+        ignore: true # TODO
+      Reset:
+      Error:
+      Correct:
+      Predict:
+      ClampInput:
+templates:
+  LinearSystemLoop_1_1_1:
+    qualname: frc::LinearSystemLoop
+    params:
+    - 1
+    - 1
+    - 1
+  LinearSystemLoop_2_1_1:
+    qualname: frc::LinearSystemLoop
+    params:
+    - 2
+    - 1
+    - 1
+  LinearSystemLoop_2_1_2:
+    qualname: frc::LinearSystemLoop
+    params:
+    - 2
+    - 1
+    - 2
+  LinearSystemLoop_2_2_2:
+    qualname: frc::LinearSystemLoop
+    params:
+    - 2
+    - 2
+    - 2
+  LinearSystemLoop_3_2_3:
+    qualname: frc::LinearSystemLoop
+    params:
+    - 3
+    - 2
+    - 3

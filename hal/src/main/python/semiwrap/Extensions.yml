@@ -1,0 +1,16 @@
+strip_prefixes:
+- HAL_
+
+functions:
+  HAL_LoadOneExtension:
+    ifndef: __FRC_SYSTEMCORE__
+  HAL_LoadExtensions:
+    ifndef: __FRC_SYSTEMCORE__
+  HAL_RegisterExtension:
+    ignore: true
+  HAL_RegisterExtensionListener:
+    ignore: true
+  HAL_SetShowExtensionsNotFoundMessages:
+    ifndef: __FRC_SYSTEMCORE__
+  HAL_OnShutdown:
+    ignore: true

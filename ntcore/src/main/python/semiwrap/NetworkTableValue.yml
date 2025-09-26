@@ -1,0 +1,184 @@
+extra_includes:
+- networktables/NetworkTableType.h
+- src/py2value.h
+
+functions:
+  Now:
+    ignore: true
+
+classes:
+  nt::Value:
+    methods:
+      Value:
+        overloads:
+          '':
+            ignore: true
+          NT_Type, size_t, int64_t, const private_init&:
+            ignore: true
+          NT_Type, size_t, int64_t, int64_t, const private_init&:
+            ignore: true
+      type:
+        cpp_code: |
+          [](Value *t) {
+            return (NetworkTableType)t->type();
+          }
+      value:
+        cpp_code: |
+          [](const Value &self) -> py::object {
+            return pyntcore::ntvalue2py(self);
+          }
+      last_change:
+      time:
+      size:
+      SetTime:
+      server_time:
+      SetServerTime:
+      IsValid:
+      IsBoolean:
+      IsInteger:
+      IsFloat:
+      IsDouble:
+      IsString:
+      IsRaw:
+      IsBooleanArray:
+      IsIntegerArray:
+      IsFloatArray:
+      IsDoubleArray:
+      IsStringArray:
+      GetBoolean:
+        cpp_code: |
+          [](Value *self) {
+            pyntcore::ensure_value_is(NT_BOOLEAN, self);
+            return self->GetBoolean();
+          }
+      GetInteger:
+        cpp_code: |
+          [](Value *self) {
+            pyntcore::ensure_value_is(NT_INTEGER, self);
+            return self->GetInteger();
+          }
+      GetFloat:
+        cpp_code: |
+          [](Value *self) {
+            pyntcore::ensure_value_is(NT_FLOAT, self);
+            return self->GetFloat();
+          }
+      GetDouble:
+        cpp_code: |
+          [](Value *self) {
+            pyntcore::ensure_value_is(NT_DOUBLE, self);
+            return self->GetDouble();
+          }
+      GetString:
+        cpp_code: |
+          [](Value *self) {
+            pyntcore::ensure_value_is(NT_STRING, self);
+            return self->GetString();
+          }
+      GetRaw:
+        cpp_code: |
+          [](Value *self) {
+            pyntcore::ensure_value_is(NT_RAW, self);
+            return self->GetRaw();
+          }
+      GetBooleanArray:
+        cpp_code: |
+          [](Value *self) -> py::object {
+            pyntcore::ensure_value_is(NT_BOOLEAN_ARRAY, self);
+            auto v = self->value();
+            py::list l(v.data.arr_boolean.size);
+            for (size_t i = 0; i < v.data.arr_boolean.size; i++) {
+              auto b = py::bool_(v.data.arr_boolean.arr[i]);
+              PyList_SET_ITEM(l.ptr(), i, b.release().ptr());
+            }
+            return std::move(l);
+          }
+      GetIntegerArray:
+        cpp_code: |
+          [](Value *self) {
+            pyntcore::ensure_value_is(NT_INTEGER_ARRAY, self);
+            return self->GetIntegerArray();
+          }
+      GetFloatArray:
+        cpp_code: |
+          [](Value *self) {
+            pyntcore::ensure_value_is(NT_FLOAT_ARRAY, self);
+            return self->GetFloatArray();
+          }
+      GetDoubleArray:
+        cpp_code: |
+          [](Value *self) {
+            pyntcore::ensure_value_is(NT_DOUBLE_ARRAY, self);
+            return self->GetDoubleArray();
+          }
+      GetStringArray:
+        cpp_code: |
+          [](Value *self) {
+            pyntcore::ensure_value_is(NT_STRING_ARRAY, self);
+            return self->GetStringArray();
+          }
+      MakeBoolean:
+      MakeInteger:
+      MakeFloat:
+      MakeDouble:
+      MakeString:
+        overloads:
+          std::string_view, int64_t:
+          T&&, int64_t:
+            ignore: true
+      MakeRaw:
+        overloads:
+          std::span<const uint8_t>, int64_t:
+          T&&, int64_t:
+            ignore: true
+      MakeBooleanArray:
+        overloads:
+          std::span<const bool>, int64_t:
+          std::initializer_list<bool>, int64_t:
+            ignore: true
+          std::span<const int>, int64_t:
+            ignore: true
+          std::initializer_list<int>, int64_t:
+            ignore: true
+          std::vector<int>&&, int64_t:
+            ignore: true
+      MakeIntegerArray:
+        overloads:
+          std::span<const int64_t>, int64_t:
+            ignore: true
+          std::initializer_list<int64_t>, int64_t:
+            ignore: true
+          std::vector<int64_t>&&, int64_t:
+      MakeFloatArray:
+        overloads:
+          std::span<const float>, int64_t:
+            ignore: true
+          std::initializer_list<float>, int64_t:
+            ignore: true
+          std::vector<float>&&, int64_t:
+      MakeDoubleArray:
+        overloads:
+          std::span<const double>, int64_t:
+            ignore: true
+          std::initializer_list<double>, int64_t:
+            ignore: true
+          std::vector<double>&&, int64_t:
+      MakeStringArray:
+        overloads:
+          std::span<const std::string>, int64_t:
+            ignore: true
+          std::initializer_list<std::string>, int64_t:
+            ignore: true
+          std::vector<std::string>&&, int64_t:
+    inline_code: |-
+      .def_static("makeValue", [](py::handle value) {
+          return pyntcore::py2ntvalue(value);
+        }, py::arg("value"))
+      .def_static("getFactoryByType", [](nt::NetworkTableType type) {
+        return pyntcore::valueFactoryByType(type);
+      }, py::arg("type"))
+      .def("__repr__", [](const Value &self) -> py::str {
+          auto typestr = pyntcore::nttype2str(self.type());
+          auto valrepr = py::repr(pyntcore::ntvalue2py(self));
+          return py::str("<Value type={} value={}>").format(typestr, valrepr);
+      })

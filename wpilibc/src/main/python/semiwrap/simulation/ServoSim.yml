@@ -1,0 +1,9 @@
+classes:
+  frc::sim::ServoSim:
+    methods:
+      ServoSim:
+        overloads:
+          const Servo&:
+          int:
+      GetPosition:
+      GetAngle:

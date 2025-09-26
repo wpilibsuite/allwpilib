@@ -1,0 +1,41 @@
+extra_includes:
+- wpystruct.h
+
+classes:
+  frc::SwerveModuleState:
+    force_no_default_constructor: true
+    attributes:
+      speed:
+      angle:
+    methods:
+      operator==:
+      Optimize:
+        overloads:
+          const Rotation2d&:
+          const SwerveModuleState&, const Rotation2d&:
+            ignore: true
+      CosineScale:
+
+inline_code: |
+  cls_SwerveModuleState
+    .def(
+      py::init<
+        units::meters_per_second_t, frc::Rotation2d
+      >(),
+      py::arg("speed") = 0, py::arg("angle") = frc::Rotation2d()
+    )
+    .def_property("speed_fps",
+      [](SwerveModuleState * self) -> units::feet_per_second_t {
+        return self->speed;
+      },
+      [](SwerveModuleState * self, units::feet_per_second_t speed) {
+        self->speed = speed;
+      }
+    )
+    .def("__repr__", [](const SwerveModuleState &ss) -> std::string {
+      return "SwerveModuleState(speed=" + std::to_string(ss.speed()) + ", "
+                               "angle=" + std::to_string(ss.angle.Radians()()) + ")";
+    })
+  ;
+
+  SetupWPyStruct<frc::SwerveModuleState>(cls_SwerveModuleState);

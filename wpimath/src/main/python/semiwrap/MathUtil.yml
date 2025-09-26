@@ -1,0 +1,47 @@
+functions:
+  InputModulus:
+    template_impls:
+    - [double]
+  AngleModulus:
+  FloorDiv:
+    template_impls:
+    - [int64_t, int64_t]
+    # work around GCC 10 issue on raspbian
+    cpp_code: |
+      [](int64_t x, int64_t y) -> int64_t {
+        return frc::FloorDiv(x, y);
+      }
+  FloorMod:
+    template_impls:
+    - [int64_t, int64_t]
+    # work around GCC 10 issue on raspbian
+    cpp_code: |
+      [](int64_t x, int64_t y) -> int64_t {
+        return frc::FloorMod(x, y);
+      }
+  ApplyDeadband:
+    param_override:
+      maxMagnitude:
+        default: '1.0'
+    template_impls:
+    - [double]
+  CopySignPow:
+    param_override:
+      maxMagnitude:
+        default: '1.0'
+    template_impls:
+    - [double]
+  IsNear:
+    overloads:
+      T, T, T:
+        ignore: true
+        template_impls:
+        - [double]
+      T, T, T, T, T:
+        ignore: true
+        template_impls:
+        - [double]
+  SlewRateLimit:
+    overloads:
+      const Translation2d&, const Translation2d&, units::second_t, units::meters_per_second_t:
+      const Translation3d&, const Translation3d&, units::second_t, units::meters_per_second_t:
