@@ -13,6 +13,7 @@
 #include <hal/Types.h>
 #include <units/math.h>
 #include <units/time.h>
+#include <units/frequency.h>
 #include <wpi/priority_queue.h>
 
 #include "frc/IterativeRobotBase.h"
@@ -81,6 +82,9 @@ class TimedRobot : public IterativeRobotBase {
    */
   void AddPeriodic(std::function<void()> callback, units::second_t period,
                    units::second_t offset = 0_s);
+
+  void AddPeriodic(std::function<void()> callback, units::hertz_t period,
+                   units::hertz_t offset = 0_s);
 
  private:
   class Callback {

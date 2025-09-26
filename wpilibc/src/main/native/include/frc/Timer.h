@@ -5,6 +5,7 @@
 #pragma once
 
 #include <units/time.h>
+#include <units/frequency.h>
 
 namespace frc {
 
@@ -100,6 +101,8 @@ class Timer {
    * @return       True if the period has passed.
    */
   bool HasElapsed(units::second_t period) const;
+
+  bool HasElapsed(units::hertz_t period) const;
 
   /**
    * Check if the period specified has passed and if it has, advance the start
