@@ -31,6 +31,8 @@ public final class MathUtil {
   /**
    * Perform linear interpolation between two values with units.
    *
+   * @param <U> The unit of the Measure.
+   * @param <M> The type of the Measure.
    * @param startValue The value to start at.
    * @param endValue The value to end at.
    * @param t How far between the two values to interpolate. This is clamped to [0, 1].
@@ -64,6 +66,8 @@ public final class MathUtil {
   /**
    * Return where within interpolation range [0, 1] q is between startValue and endValue.
    *
+   * @param <U> The unit of the Measure.
+   * @param <M> The type of the Measure.
    * @param startValue Lower part of interpolation range.
    * @param endValue Upper part of interpolation range.
    * @param q Query.
