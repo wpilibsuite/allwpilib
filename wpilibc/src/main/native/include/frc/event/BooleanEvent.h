@@ -10,6 +10,7 @@
 #include <memory>
 
 #include <units/time.h>
+#include <units/frequency.h>
 #include <wpi/FunctionExtras.h>
 
 #include "EventLoop.h"
@@ -125,6 +126,10 @@ class BooleanEvent {
    * @return The debounced event.
    */
   BooleanEvent Debounce(units::second_t debounceTime,
+                        frc::Debouncer::DebounceType type =
+                            frc::Debouncer::DebounceType::kRising);
+
+  BooleanEvent Debounce(units::hertz_t debounceTime,
                         frc::Debouncer::DebounceType type =
                             frc::Debouncer::DebounceType::kRising);
 

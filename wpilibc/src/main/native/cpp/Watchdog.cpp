@@ -135,6 +135,9 @@ void Watchdog::Impl::Main() {
 Watchdog::Watchdog(units::second_t timeout, std::function<void()> callback)
     : m_timeout(timeout), m_callback(std::move(callback)), m_impl(GetImpl()) {}
 
+Watchdog::Watchdog(units::hertz_t timeout, std::function<void()> callback)
+    : m_timeout(timeout), m_callback(std::move(callback)), m_impl(GetImpl()) {}
+
 Watchdog::~Watchdog() {
   try {
     Disable();
@@ -170,6 +173,20 @@ units::second_t Watchdog::GetTime() const {
 }
 
 void Watchdog::SetTimeout(units::second_t timeout) {
+  m_startTime = Timer::GetFPGATimestamp();
+  m_tracer.ClearEpochs();
+
+  std::scoped_lock lock(m_impl->m_mutex);
+  m_timeout = timeout;
+  m_isExpired = false;
+
+  m_impl->m_watchdogs.remove(this);
+  m_expirationTime = m_startTime + m_timeout;
+  m_impl->m_watchdogs.emplace(this);
+  m_impl->UpdateAlarm();
+}
+
+void Watchdog::SetTimeout(units::hertz_t timeout) {
   m_startTime = Timer::GetFPGATimestamp();
   m_tracer.ClearEpochs();
 

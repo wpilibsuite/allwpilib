@@ -9,6 +9,7 @@
 #include <utility>
 
 #include <units/time.h>
+#include <units/frequency.h>
 
 #include "frc/Tracer.h"
 
@@ -34,8 +35,16 @@ class Watchdog {
    */
   Watchdog(units::second_t timeout, std::function<void()> callback);
 
+  Watchdog(units::hertz_t timeout, std::function<void()> callback);
+
   template <typename Callable, typename Arg, typename... Args>
   Watchdog(units::second_t timeout, Callable&& f, Arg&& arg, Args&&... args)
+      : Watchdog(timeout,
+                 std::bind(std::forward<Callable>(f), std::forward<Arg>(arg),
+                           std::forward<Args>(args)...)) {}
+
+  template <typename Callable, typename Arg, typename... Args>
+  Watchdog(units::hertz_t timeout, Callable&& f, Arg&& arg, Args&&... args)
       : Watchdog(timeout,
                  std::bind(std::forward<Callable>(f), std::forward<Arg>(arg),
                            std::forward<Args>(args)...)) {}
@@ -57,6 +66,8 @@ class Watchdog {
    *                resolution.
    */
   void SetTimeout(units::second_t timeout);
+
+  void SetTimeout(units::hertz_t timeout);
 
   /**
    * Returns the watchdog's timeout.
