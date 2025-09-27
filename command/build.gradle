@@ -1,5 +1,5 @@
 ext {
-    nativeName = 'wpilibNewCommands'
+    nativeName = 'command'
     devMain = 'edu.wpi.first.wpilibj2.commands.DevMain'
 }
 
@@ -28,7 +28,7 @@ dependencies {
 sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
 
 nativeUtils.exportsConfigs {
-    wpilibNewCommands {
+    command {
     }
 }
 

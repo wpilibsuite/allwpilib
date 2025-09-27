@@ -12,7 +12,7 @@ wpilib_java_library(
     resources = glob(["src/main/resources/**"]),
     visibility = ["//visibility:public"],
     runtime_deps = [
-        "//wpilibNewCommands:wpilibNewCommands-java",
+        "//command:command-java",
     ],
     deps = [
         "//epilogue-runtime:epilogue-java",
