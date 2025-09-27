@@ -199,8 +199,10 @@ class SwerveDriveKinematicsTest {
     var moduleStates = m_kinematics.toSwerveModuleStates(speeds, m_fl);
 
     // This one is a bit trickier. Because we are rotating about the front-left wheel,
-    // it should be parked at 0 degrees and 0 speed. The front-right and back-left wheels both travel
-    // an arc with radius 24 (and circumference 150.796), and the back-right wheel travels an arc with
+    // it should be parked at 0 degrees and 0 speed. The front-right and back-left wheels both
+    // travel
+    // an arc with radius 24 (and circumference 150.796), and the back-right wheel travels an arc
+    // with
     // radius √(24² + 24²) and circumference 213.2584. As for angles, the front-right wheel
     // should be pointing straight forward, the back-left wheel should be pointing straight right,
     // and the back-right wheel should be at a -45 degree angle
@@ -225,7 +227,8 @@ class SwerveDriveKinematicsTest {
 
     var chassisSpeeds = m_kinematics.toChassisSpeeds(flState, frState, blState, brState);
 
-    // We already know that our omega should be 2π from the previous test. Next, we need to determine
+    // We already know that our omega should be 2π from the previous test. Next, we need to
+    // determine
     // the vx and vy of our chassis center. Because our COR is at a 45 degree angle from the center,
     // we know that vx and vy must be the same. Furthermore, we know that the center of mass makes
     // a full revolution about the center of revolution once every second. Therefore, the center of
@@ -247,7 +250,8 @@ class SwerveDriveKinematicsTest {
 
     var twist = m_kinematics.toTwist2d(flDelta, frDelta, blDelta, brDelta);
 
-    // We already know that our omega should be 2π from the previous test. Next, we need to determine
+    // We already know that our omega should be 2π from the previous test. Next, we need to
+    // determine
     // the vx and vy of our chassis center. Because our COR is at a 45 degree angle from the center,
     // we know that vx and vy must be the same. Furthermore, we know that the center of mass makes
     // a full revolution about the center of revolution once every second. Therefore, the center of
@@ -405,7 +409,8 @@ class SwerveDriveKinematicsTest {
 
     // For turn-in-place with angular acceleration of 2π rad/s² and angular velocity of 2π rad/s,
     // each module has both tangential acceleration (from angular acceleration) and centripetal
-    // acceleration (from angular velocity). The total acceleration magnitude is approximately 678.4.
+    // acceleration (from angular velocity). The total acceleration magnitude is approximately
+    // 678.4.
     //
     // For each swerve module at position (x, y) relative to the robot center:
     // - Distance from center: r = √(x² + y²) = √(12² + 12²) = 16.97 m
@@ -424,10 +429,14 @@ class SwerveDriveKinematicsTest {
     //                                         = √(106.63² + 668.7²) = 678.4 m/s²
     //
     // For module positions:
-    // FL (12, 12):   radius angle = 135°, tangential = 45°,  centripetal = -135° → total angle = -144°
-    // FR (12, -12):  radius angle = 45°,  tangential = -45°, centripetal = -135° → total angle = 126°
-    // BL (-12, 12):  radius angle = 135°, tangential = 45°,  centripetal = 45°   → total angle = -54°
-    // BR (-12, -12): radius angle = -45°, tangential = 45°,  centripetal = 135°  → total angle = 36°
+    // FL (12, 12):   radius angle = 135°, tangential = 45°,  centripetal = -135° → total angle =
+    // -144°
+    // FR (12, -12):  radius angle = 45°,  tangential = -45°, centripetal = -135° → total angle =
+    // 126°
+    // BL (-12, 12):  radius angle = 135°, tangential = 45°,  centripetal = 45°   → total angle =
+    // -54°
+    // BR (-12, -12): radius angle = -45°, tangential = 45°,  centripetal = 135°  → total angle =
+    // 36°
     //
     // The acceleration angles are not simply tangential because the centripetal component
     // from the existing angular velocity dominates and affects the direction.
