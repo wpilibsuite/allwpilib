@@ -60,5 +60,5 @@ cc_test(
 package_binary_cc_project(
     name = "sysid",
     maven_artifact_name = "SysId",
-    maven_group_id = "edu.wpi.first.tools",
+    maven_group_id = "org.wpilib.tools",
 )

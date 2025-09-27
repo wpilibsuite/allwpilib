@@ -78,7 +78,7 @@ wpilib_java_library(
     ] + glob(["src/main/java/**/*.java"]),
     extra_source_pkgs = ["generated_version_files"],
     maven_artifact_name = "wpilibj-java",
-    maven_group_id = "edu.wpi.first.wpilibj",
+    maven_group_id = "org.wpilib.wpilibj",
     visibility = ["//visibility:public"],
     deps = [
         "//cameraserver:cameraserver-java",

@@ -105,7 +105,7 @@ wpilib_java_library(
     name = "command-java",
     srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
     maven_artifact_name = "command-java",
-    maven_group_id = "edu.wpi.first.command",
+    maven_group_id = "org.wpilib.command",
     visibility = ["//visibility:public"],
     deps = [
         "//cscore:cscore-java",
@@ -175,5 +175,5 @@ java_binary(
 package_minimal_cc_project(
     name = "command",
     maven_artifact_name = "command-cpp",
-    maven_group_id = "edu.wpi.first.command",
+    maven_group_id = "org.wpilib.command",
 )
