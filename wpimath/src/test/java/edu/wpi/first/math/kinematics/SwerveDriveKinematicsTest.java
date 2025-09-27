@@ -9,9 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import org.junit.jupiter.api.Test;
-
 import java.util.Arrays;
+import org.junit.jupiter.api.Test;
 
 class SwerveDriveKinematicsTest {
   private static final double kEpsilon = 1E-9;
@@ -452,37 +451,47 @@ class SwerveDriveKinematicsTest {
     double centripetalAccel = centerRadius * angularVelocity * angularVelocity; // ω² * r
     double totalAccel = Math.hypot(tangentialAccel, centripetalAccel);
 
-    Rotation2d[] expectedAngles = Arrays.stream(m_kinematics.getModules())
-        .map(m -> {
-          Rotation2d radiusAngle = m.getAngle();
+    Rotation2d[] expectedAngles =
+        Arrays.stream(m_kinematics.getModules())
+            .map(
+                m -> {
+                  Rotation2d radiusAngle = m.getAngle();
 
-          // Tangential acceleration: perpendicular to radius (90° CCW from radius)
-          Rotation2d tangentialDirection = radiusAngle.rotateBy(Rotation2d.kCCW_Pi_2);
-          double tangentialX = tangentialAccel * tangentialDirection.getCos();
-          double tangentialY = tangentialAccel * tangentialDirection.getSin();
+                  // Tangential acceleration: perpendicular to radius (90° CCW from radius)
+                  Rotation2d tangentialDirection = radiusAngle.rotateBy(Rotation2d.kCCW_Pi_2);
+                  double tangentialX = tangentialAccel * tangentialDirection.getCos();
+                  double tangentialY = tangentialAccel * tangentialDirection.getSin();
 
-          // Centripetal acceleration: toward center (opposite of radius)
-          Rotation2d centripetalDirection = radiusAngle.rotateBy(Rotation2d.kPi);
-          double centripetalX = centripetalAccel * centripetalDirection.getCos();
-          double centripetalY = centripetalAccel * centripetalDirection.getSin();
+                  // Centripetal acceleration: toward center (opposite of radius)
+                  Rotation2d centripetalDirection = radiusAngle.rotateBy(Rotation2d.kPi);
+                  double centripetalX = centripetalAccel * centripetalDirection.getCos();
+                  double centripetalY = centripetalAccel * centripetalDirection.getSin();
 
-          // Vector sum of tangential and centripetal accelerations
-          double totalX = tangentialX + centripetalX;
-          double totalY = tangentialY + centripetalY;
+                  // Vector sum of tangential and centripetal accelerations
+                  double totalX = tangentialX + centripetalX;
+                  double totalY = tangentialY + centripetalY;
 
-          return new Rotation2d(totalX, totalY);
-        })
-        .toArray(Rotation2d[]::new);
+                  return new Rotation2d(totalX, totalY);
+                })
+            .toArray(Rotation2d[]::new);
 
     assertAll(
         () -> assertEquals(totalAccel, moduleAccelerations[0].acceleration, 0.1),
         () -> assertEquals(totalAccel, moduleAccelerations[1].acceleration, 0.1),
         () -> assertEquals(totalAccel, moduleAccelerations[2].acceleration, 0.1),
         () -> assertEquals(totalAccel, moduleAccelerations[3].acceleration, 0.1),
-        () -> assertEquals(expectedAngles[0].getDegrees(), moduleAccelerations[0].angle.getDegrees(), 0.1),
-        () -> assertEquals(expectedAngles[1].getDegrees(), moduleAccelerations[1].angle.getDegrees(), 0.1),
-        () -> assertEquals(expectedAngles[2].getDegrees(), moduleAccelerations[2].angle.getDegrees(), 0.1),
-        () -> assertEquals(expectedAngles[3].getDegrees(), moduleAccelerations[3].angle.getDegrees(), 0.1));
+        () ->
+            assertEquals(
+                expectedAngles[0].getDegrees(), moduleAccelerations[0].angle.getDegrees(), 0.1),
+        () ->
+            assertEquals(
+                expectedAngles[1].getDegrees(), moduleAccelerations[1].angle.getDegrees(), 0.1),
+        () ->
+            assertEquals(
+                expectedAngles[2].getDegrees(), moduleAccelerations[2].angle.getDegrees(), 0.1),
+        () ->
+            assertEquals(
+                expectedAngles[3].getDegrees(), moduleAccelerations[3].angle.getDegrees(), 0.1));
   }
 
   @Test
@@ -533,58 +542,70 @@ class SwerveDriveKinematicsTest {
        Direction: toward center of rotation
     */
 
-    double[] expectedAccelerations = Arrays.stream(m_kinematics.getModules())
-        .mapToDouble(m -> {
-              Translation2d relativePos = m.minus(m_fl);
-              double r = relativePos.getNorm();
+    double[] expectedAccelerations =
+        Arrays.stream(m_kinematics.getModules())
+            .mapToDouble(
+                m -> {
+                  Translation2d relativePos = m.minus(m_fl);
+                  double r = relativePos.getNorm();
 
-              if (r < 1e-9) {
-                return 0.0; // No acceleration at center of rotation
-              }
+                  if (r < 1e-9) {
+                    return 0.0; // No acceleration at center of rotation
+                  }
 
-              double tangentialAccel = r * accelerations.alpha; // α * r = 1 * r
-              double centripetalAccel = r * angularVelocity * angularVelocity; // ω² * r = 1 * r
-              return Math.hypot(tangentialAccel, centripetalAccel);
-            })
-        .toArray();
+                  double tangentialAccel = r * accelerations.alpha; // α * r = 1 * r
+                  double centripetalAccel = r * angularVelocity * angularVelocity; // ω² * r = 1 * r
+                  return Math.hypot(tangentialAccel, centripetalAccel);
+                })
+            .toArray();
 
-    Rotation2d[] expectedAngles = Arrays.stream(m_kinematics.getModules())
-        .map(m -> {
-          Translation2d relativePos = m.minus(m_fl);
-          double r = relativePos.getNorm();
+    Rotation2d[] expectedAngles =
+        Arrays.stream(m_kinematics.getModules())
+            .map(
+                m -> {
+                  Translation2d relativePos = m.minus(m_fl);
+                  double r = relativePos.getNorm();
 
-          if (r < 1e-9) {
-            return Rotation2d.kZero; // Angle is undefined at center of rotation
-          }
+                  if (r < 1e-9) {
+                    return Rotation2d.kZero; // Angle is undefined at center of rotation
+                  }
 
-          Rotation2d radiusAngle = new Rotation2d(relativePos.getX(), relativePos.getY());
+                  Rotation2d radiusAngle = new Rotation2d(relativePos.getX(), relativePos.getY());
 
-          // Tangential acceleration: perpendicular to radius (90° CCW from radius)
-          Rotation2d tangentialDirection = radiusAngle.rotateBy(Rotation2d.kCCW_Pi_2);
-          double tangentialX = tangentialDirection.getCos() * r; // α * r = 1 * r
-          double tangentialY = tangentialDirection.getSin() * r;
+                  // Tangential acceleration: perpendicular to radius (90° CCW from radius)
+                  Rotation2d tangentialDirection = radiusAngle.rotateBy(Rotation2d.kCCW_Pi_2);
+                  double tangentialX = tangentialDirection.getCos() * r; // α * r = 1 * r
+                  double tangentialY = tangentialDirection.getSin() * r;
 
-          // Centripetal acceleration: toward center (opposite of radius)
-          Rotation2d centripetalDirection = radiusAngle.rotateBy(Rotation2d.kPi);
-          double centripetalX = centripetalDirection.getCos() * r; // ω² * r = 1 * r
-          double centripetalY = centripetalDirection.getSin() * r;
+                  // Centripetal acceleration: toward center (opposite of radius)
+                  Rotation2d centripetalDirection = radiusAngle.rotateBy(Rotation2d.kPi);
+                  double centripetalX = centripetalDirection.getCos() * r; // ω² * r = 1 * r
+                  double centripetalY = centripetalDirection.getSin() * r;
 
-          // Vector sum of tangential and centripetal accelerations
-          double totalX = tangentialX + centripetalX;
-          double totalY = tangentialY + centripetalY;
+                  // Vector sum of tangential and centripetal accelerations
+                  double totalX = tangentialX + centripetalX;
+                  double totalY = tangentialY + centripetalY;
 
-          return new Rotation2d(totalX, totalY);
-        })
-        .toArray(Rotation2d[]::new);
+                  return new Rotation2d(totalX, totalY);
+                })
+            .toArray(Rotation2d[]::new);
 
     assertAll(
         () -> assertEquals(expectedAccelerations[0], moduleAccelerations[0].acceleration, 0.1),
         () -> assertEquals(expectedAccelerations[1], moduleAccelerations[1].acceleration, 0.1),
         () -> assertEquals(expectedAccelerations[2], moduleAccelerations[2].acceleration, 0.1),
         () -> assertEquals(expectedAccelerations[3], moduleAccelerations[3].acceleration, 0.1),
-        () -> assertEquals(expectedAngles[0].getDegrees(), moduleAccelerations[0].angle.getDegrees(), 0.1),
-        () -> assertEquals(expectedAngles[1].getDegrees(), moduleAccelerations[1].angle.getDegrees(), 0.1),
-        () -> assertEquals(expectedAngles[2].getDegrees(), moduleAccelerations[2].angle.getDegrees(), 0.1),
-        () -> assertEquals(expectedAngles[3].getDegrees(), moduleAccelerations[3].angle.getDegrees(), 0.1));
+        () ->
+            assertEquals(
+                expectedAngles[0].getDegrees(), moduleAccelerations[0].angle.getDegrees(), 0.1),
+        () ->
+            assertEquals(
+                expectedAngles[1].getDegrees(), moduleAccelerations[1].angle.getDegrees(), 0.1),
+        () ->
+            assertEquals(
+                expectedAngles[2].getDegrees(), moduleAccelerations[2].angle.getDegrees(), 0.1),
+        () ->
+            assertEquals(
+                expectedAngles[3].getDegrees(), moduleAccelerations[3].angle.getDegrees(), 0.1));
   }
 }
