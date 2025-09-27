@@ -1,6 +1,6 @@
 {
-  "game": "Barrel Racing Path",
-  "field-image": "2021-barrel.png",
+  "game": "2021 FRC Galactic Search A",
+  "field-image": "frc/2021-galacticsearcha.png",
   "field-corners": {
     "top-left": [
       20,
@@ -15,5 +15,5 @@
     30,
     15
   ],
-  "field-unit": "feet"
+  "field-unit": "foot"
 }
