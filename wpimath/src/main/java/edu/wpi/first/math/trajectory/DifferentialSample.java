@@ -188,7 +188,7 @@ public class DifferentialSample extends TrajectorySample<DifferentialSample>
   @Override
   public DifferentialSample interpolate(DifferentialSample endValue, double t) {
     double interpTime =
-        MathUtil.interpolate(this.timestamp.in(Seconds), endValue.timestamp.in(Seconds), t);
+        MathUtil.lerp(this.timestamp.in(Seconds), endValue.timestamp.in(Seconds), t);
 
     double interpDt = interpTime - this.timestamp.in(Seconds);
 
@@ -217,9 +217,9 @@ public class DifferentialSample extends TrajectorySample<DifferentialSample>
     double vy = 0.0;
     double omega = endState.get(5, 0);
 
-    double ax = MathUtil.interpolate(this.acceleration.ax, endValue.acceleration.ax, t);
-    double ay = MathUtil.interpolate(this.acceleration.ay, endValue.acceleration.ay, t);
-    double alpha = MathUtil.interpolate(this.acceleration.alpha, endValue.acceleration.alpha, t);
+    double ax = MathUtil.lerp(this.acceleration.ax, endValue.acceleration.ax, t);
+    double ay = MathUtil.lerp(this.acceleration.ay, endValue.acceleration.ay, t);
+    double alpha = MathUtil.lerp(this.acceleration.alpha, endValue.acceleration.alpha, t);
 
     return new DifferentialSample(
         Seconds.of(interpTime),

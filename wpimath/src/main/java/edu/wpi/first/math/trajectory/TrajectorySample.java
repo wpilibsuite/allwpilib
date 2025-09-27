@@ -106,7 +106,7 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
             velocity.vy + acceleration.ay * dts,
             velocity.omega + acceleration.alpha * dts);
 
-    var newPose = pose.exp(new Twist2d(newVel.vx * dts, newVel.vy * dts, newVel.omega * dts));
+    var newPose = pose.plus(new Twist2d(newVel.vx * dts, newVel.vy * dts, newVel.omega * dts).exp());
 
     return new Base(timestamp.plus(dt), newPose, newVel, acceleration);
   }
@@ -127,13 +127,13 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
       return new Base(end);
     }
 
-    var interpDt = MathUtil.interpolate(start.timestamp.in(Seconds), end.timestamp.in(Seconds), t);
+    var interpDt = MathUtil.lerp(start.timestamp.in(Seconds), end.timestamp.in(Seconds), t);
 
     var newAccel =
         new ChassisAccelerations(
-            MathUtil.interpolate(start.acceleration.ax, end.acceleration.ax, t),
-            MathUtil.interpolate(start.acceleration.ay, end.acceleration.ay, t),
-            MathUtil.interpolate(start.acceleration.alpha, end.acceleration.alpha, t));
+            MathUtil.lerp(start.acceleration.ax, end.acceleration.ax, t),
+            MathUtil.lerp(start.acceleration.ay, end.acceleration.ay, t),
+            MathUtil.lerp(start.acceleration.alpha, end.acceleration.alpha, t));
 
     // vₖ₊₁ = vₖ + aₖΔt
     var newVel =

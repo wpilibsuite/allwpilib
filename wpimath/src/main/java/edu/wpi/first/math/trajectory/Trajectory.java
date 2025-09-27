@@ -41,7 +41,7 @@ public class Trajectory<SampleType extends TrajectorySample<SampleType>> {
     this.sampleMap =
         new InterpolatingTreeMap<>(
             (start, end, q) ->
-                MathUtil.inverseInterpolate(start.in(Seconds), end.in(Seconds), q.in(Seconds)),
+                MathUtil.inverseLerp(start.in(Seconds), end.in(Seconds), q.in(Seconds)),
             SampleType::interpolate);
 
     this.samples.forEach(

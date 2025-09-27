@@ -107,15 +107,15 @@ public class MecanumSample extends TrajectorySample<MecanumSample> {
   public MecanumSample interpolate(MecanumSample endValue, double t) {
     return new MecanumSample(
         Seconds.of(
-            MathUtil.interpolate(this.timestamp.in(Seconds), endValue.timestamp.in(Seconds), t)),
+            MathUtil.lerp(this.timestamp.in(Seconds), endValue.timestamp.in(Seconds), t)),
         this.pose.interpolate(endValue.pose, t),
         this.velocity.interpolate(endValue.velocity, t),
         this.acceleration.interpolate(endValue.acceleration, t),
         new MecanumDriveWheelSpeeds(
-            MathUtil.interpolate(this.speeds.frontLeft, endValue.speeds.frontLeft, t),
-            MathUtil.interpolate(this.speeds.frontRight, endValue.speeds.frontRight, t),
-            MathUtil.interpolate(this.speeds.rearLeft, endValue.speeds.rearLeft, t),
-            MathUtil.interpolate(this.speeds.rearRight, endValue.speeds.rearRight, t)));
+            MathUtil.lerp(this.speeds.frontLeft, endValue.speeds.frontLeft, t),
+            MathUtil.lerp(this.speeds.frontRight, endValue.speeds.frontRight, t),
+            MathUtil.lerp(this.speeds.rearLeft, endValue.speeds.rearLeft, t),
+            MathUtil.lerp(this.speeds.rearRight, endValue.speeds.rearRight, t)));
   }
 
   @Override

@@ -91,7 +91,7 @@ public class SwerveSample extends TrajectorySample<SwerveSample> {
       newStates[i] = this.states[i].interpolate(endValue.states[i], t);
     }
     return new SwerveSample(
-        Seconds.of(MathUtil.interpolate(timestamp.in(Seconds), endValue.timestamp.in(Seconds), t)),
+        Seconds.of(MathUtil.lerp(timestamp.in(Seconds), endValue.timestamp.in(Seconds), t)),
         pose.interpolate(endValue.pose, t),
         velocity.interpolate(endValue.velocity, t),
         acceleration.interpolate(endValue.acceleration, t),

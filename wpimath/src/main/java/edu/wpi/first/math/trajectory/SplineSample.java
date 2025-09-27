@@ -51,7 +51,7 @@ public class SplineSample extends TrajectorySample<SplineSample> {
   public SplineSample interpolate(SplineSample endValue, double t) {
     // Find the new t value.
     final double newT =
-        MathUtil.interpolate(timestamp.in(Seconds), endValue.timestamp.in(Seconds), t);
+        MathUtil.lerp(timestamp.in(Seconds), endValue.timestamp.in(Seconds), t);
 
     // Find the delta time between the current state and the interpolated state.
     final double deltaT = newT - timestamp.in(Seconds);
@@ -87,7 +87,7 @@ public class SplineSample extends TrajectorySample<SplineSample> {
         pose.plus(endValue.pose.minus(this.pose).times(interpolationFrac)),
         newV,
         acceleration.ax + (endValue.acceleration.ax - acceleration.ax) * t,
-        MathUtil.interpolate(curvature, endValue.curvature, t));
+        MathUtil.lerp(curvature, endValue.curvature, t));
   }
 
   @Override
