@@ -25,7 +25,7 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::SwerveModuleAccelerations> {
   static void Pack(std::span<uint8_t> data,
                    const frc::SwerveModuleAccelerations& value);
   static void ForEachNested(
-    std::invocable<std::string_view, std::string_view> auto fn) {
+      std::invocable<std::string_view, std::string_view> auto fn) {
     wpi::ForEachStructSchema<frc::Rotation2d>(fn);
   }
 };
