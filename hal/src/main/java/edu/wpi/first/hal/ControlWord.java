@@ -8,6 +8,14 @@ import edu.wpi.first.hal.struct.ControlWordStruct;
 
 /** A wrapper for the HALControlWord bitfield. */
 public class ControlWord {
+  private static final long OPMODE_HASH_MASK = 0x00FFFFFFFFFFFFFFL;
+  private static final long ROBOT_MODE_MASK = 0x0300000000000000L;
+  private static final long ROBOT_MODE_SHIFT = 56;
+  private static final long ENABLED_MASK = 0x0400000000000000L;
+  private static final long ESTOP_MASK = 0x0800000000000000L;
+  private static final long FMS_ATTACHED_MASK = 0x1000000000000000L;
+  private static final long DS_ATTACHED_MASK = 0x2000000000000000L;
+
   private long m_word;
   private RobotMode m_robotMode = RobotMode.UNKNOWN;
   private boolean m_enabled;
@@ -36,12 +44,12 @@ public class ControlWord {
       boolean fmsAttached,
       boolean dsAttached) {
     m_word =
-        (opModeHash & 0x00FFFFFFFFFFFFFFL)
-            | ((long) robotMode.getValue() << 56)
-            | (enabled ? 0x0400000000000000L : 0)
-            | (emergencyStop ? 0x0800000000000000L : 0)
-            | (fmsAttached ? 0x1000000000000000L : 0)
-            | (dsAttached ? 0x2000000000000000L : 0);
+        (opModeHash & OPMODE_HASH_MASK)
+            | ((long) robotMode.getValue() << ROBOT_MODE_SHIFT)
+            | (enabled ? ENABLED_MASK : 0)
+            | (emergencyStop ? ESTOP_MASK : 0)
+            | (fmsAttached ? FMS_ATTACHED_MASK : 0)
+            | (dsAttached ? DS_ATTACHED_MASK : 0);
     m_robotMode = robotMode;
     m_enabled = enabled;
     m_emergencyStop = emergencyStop;
@@ -56,11 +64,11 @@ public class ControlWord {
    */
   public void update(long word) {
     m_word = word;
-    m_robotMode = RobotMode.fromInt((int) ((word >> 56) & 3));
-    m_enabled = (word & 0x0400000000000000L) != 0;
-    m_emergencyStop = (word & 0x0800000000000000L) != 0;
-    m_fmsAttached = (word & 0x1000000000000000L) != 0;
-    m_dsAttached = (word & 0x2000000000000000L) != 0;
+    m_robotMode = RobotMode.fromInt((int) ((word & ROBOT_MODE_MASK) >> ROBOT_MODE_SHIFT));
+    m_enabled = (word & ENABLED_MASK) != 0;
+    m_emergencyStop = (word & ESTOP_MASK) != 0;
+    m_fmsAttached = (word & FMS_ATTACHED_MASK) != 0;
+    m_dsAttached = (word & DS_ATTACHED_MASK) != 0;
   }
 
   /**
@@ -102,11 +110,11 @@ public class ControlWord {
    */
   public long getOpModeId() {
     // if the hash portion is zero, return 0
-    if ((m_word & 0x00FFFFFFFFFFFFFFL) == 0) {
+    if ((m_word & OPMODE_HASH_MASK) == 0) {
       return 0;
     }
     // otherwise return the full ID (which includes the robot mode)
-    return m_word & 0x03FFFFFFFFFFFFFFL;
+    return m_word & (OPMODE_HASH_MASK | ROBOT_MODE_MASK);
   }
 
   /**
@@ -115,10 +123,10 @@ public class ControlWord {
    * @param id opmode ID
    */
   public void setOpModeId(long id) {
-    m_word &= ~0x03FFFFFFFFFFFFFFL;
-    m_word |= id & 0x03FFFFFFFFFFFFFFL;
+    m_word &= ~(OPMODE_HASH_MASK | ROBOT_MODE_MASK);
+    m_word |= id & (OPMODE_HASH_MASK | ROBOT_MODE_MASK);
     // keep robot mode in sync
-    m_robotMode = RobotMode.fromInt((int) ((m_word >> 56) & 3));
+    m_robotMode = RobotMode.fromInt((int) ((m_word & ROBOT_MODE_MASK) >> ROBOT_MODE_SHIFT));
   }
 
   /**
