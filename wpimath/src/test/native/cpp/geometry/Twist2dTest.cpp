@@ -13,7 +13,7 @@ using namespace frc;
 
 TEST(Twist2dTest, Straight) {
   const Twist2d straight{5_m, 0_m, 0_rad};
-  const auto straightPose = Pose2d{}.Exp(straight);
+  const auto straightPose = straight.Exp();
 
   EXPECT_DOUBLE_EQ(5.0, straightPose.X().value());
   EXPECT_DOUBLE_EQ(0.0, straightPose.Y().value());
@@ -23,7 +23,7 @@ TEST(Twist2dTest, Straight) {
 TEST(Twist2dTest, QuarterCircle) {
   const Twist2d quarterCircle{5_m / 2.0 * std::numbers::pi, 0_m,
                               units::radian_t{std::numbers::pi / 2.0}};
-  const auto quarterCirclePose = Pose2d{}.Exp(quarterCircle);
+  const auto quarterCirclePose = quarterCircle.Exp();
 
   EXPECT_DOUBLE_EQ(5.0, quarterCirclePose.X().value());
   EXPECT_DOUBLE_EQ(5.0, quarterCirclePose.Y().value());
@@ -32,7 +32,7 @@ TEST(Twist2dTest, QuarterCircle) {
 
 TEST(Twist2dTest, DiagonalNoDtheta) {
   const Twist2d diagonal{2_m, 2_m, 0_deg};
-  const auto diagonalPose = Pose2d{}.Exp(diagonal);
+  const auto diagonalPose = diagonal.Exp();
 
   EXPECT_DOUBLE_EQ(2.0, diagonalPose.X().value());
   EXPECT_DOUBLE_EQ(2.0, diagonalPose.Y().value());
@@ -55,14 +55,14 @@ TEST(Twist2dTest, Pose2dLog) {
   const Pose2d end{5_m, 5_m, 90_deg};
   const Pose2d start;
 
-  const auto twist = start.Log(end);
+  const auto twist = (end - start).Log();
 
   Twist2d expected{units::meter_t{5.0 / 2.0 * std::numbers::pi}, 0_m,
                    units::radian_t{std::numbers::pi / 2.0}};
   EXPECT_EQ(expected, twist);
 
   // Make sure computed twist gives back original end pose
-  const auto reapplied = start.Exp(twist);
+  const auto reapplied = start + twist.Exp();
   EXPECT_EQ(end, reapplied);
 }
 

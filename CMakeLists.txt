@@ -90,7 +90,6 @@ option(WITH_EXAMPLES "Build examples" OFF)
 option(WITH_TESTS "Build unit tests (requires internet connection)" ON)
 option(WITH_GUI "Build GUI items" ON)
 option(WITH_SIMULATION_MODULES "Build simulation modules" ON)
-option(WITH_PROTOBUF "Build protobuf support" ON)
 option(WITH_BENCHMARK "Build the benchmark project" ON)
 
 # Options for using a package manager (e.g., vcpkg) for certain dependencies.
@@ -150,14 +149,6 @@ if(WITH_WPICAL)
 endif()
 
 find_package(LIBSSH CONFIG 0.7.1)
-
-set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
-if(WITH_PROTOBUF)
-    set(protobuf_MODULE_COMPATIBLE ON CACHE BOOL "" FORCE)
-    find_package(Protobuf REQUIRED)
-    find_program(PROTOC_COMPILER protoc REQUIRED)
-endif()
-set(CMAKE_FIND_PACKAGE_PREFER_CONFIG OFF)
 
 get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 
@@ -276,6 +267,9 @@ if(WITH_TESTS)
     enable_testing()
     add_subdirectory(thirdparty/googletest)
     include(GoogleTest)
+    list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/catch2/extras")
+    add_subdirectory(thirdparty/catch2)
+    include(Catch)
 endif()
 
 if(USE_SYSTEM_LIBUV)

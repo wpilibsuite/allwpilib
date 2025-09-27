@@ -11,6 +11,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.geometry.proto.Transform3dProto;
 import edu.wpi.first.math.geometry.struct.Transform3dStruct;
+import edu.wpi.first.math.jni.Transform3dJNI;
 import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
@@ -249,6 +250,32 @@ public class Transform3d implements ProtobufSerializable, StructSerializable {
    */
   public Rotation3d getRotation() {
     return m_rotation;
+  }
+
+  /**
+   * Returns a Twist3d of the current transform (pose delta). If b is the output of {@code a.log()},
+   * then {@code b.exp()} would yield a.
+   *
+   * @return The twist that maps the current transform.
+   */
+  public Twist3d log() {
+    var thisQuaternion = m_rotation.getQuaternion();
+    double[] resultArray =
+        Transform3dJNI.log(
+            this.getX(),
+            this.getY(),
+            this.getZ(),
+            thisQuaternion.getW(),
+            thisQuaternion.getX(),
+            thisQuaternion.getY(),
+            thisQuaternion.getZ());
+    return new Twist3d(
+        resultArray[0],
+        resultArray[1],
+        resultArray[2],
+        resultArray[3],
+        resultArray[4],
+        resultArray[5]);
   }
 
   /**

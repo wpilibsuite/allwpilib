@@ -7,12 +7,10 @@ package edu.wpi.first.math.kinematics;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
-import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.kinematics.proto.ChassisSpeedsProto;
 import edu.wpi.first.math.kinematics.struct.ChassisSpeedsStruct;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -30,8 +28,7 @@ import java.util.Objects;
  * component because it can never move sideways. Holonomic drivetrains such as swerve and mecanum
  * will often have all three components.
  */
-public class ChassisSpeeds
-    implements ProtobufSerializable, StructSerializable, Interpolatable<ChassisSpeeds> {
+public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
   /** Velocity along the x-axis in meters per second. (Fwd is +) */
   public double vx;
 
@@ -104,11 +101,11 @@ public class ChassisSpeeds
   public ChassisSpeeds discretize(double dt) {
     // Construct the desired pose after a timestep, relative to the current pose. The desired pose
     // has decoupled translation and rotation.
-    var desiredDeltaPose = new Pose2d(vx * dt, vy * dt, new Rotation2d(omega * dt));
+    var desiredTransform = new Transform2d(vx * dt, vy * dt, new Rotation2d(omega * dt));
 
     // Find the chassis translation/rotation deltas in the robot frame that move the robot from its
     // current pose to the desired pose
-    var twist = Pose2d.kZero.log(desiredDeltaPose);
+    var twist = desiredTransform.log();
 
     // Turn the chassis translation/rotation deltas into average velocities
     return new ChassisSpeeds(twist.dx / dt, twist.dy / dt, twist.dtheta / dt);
@@ -200,20 +197,6 @@ public class ChassisSpeeds
    */
   public ChassisSpeeds div(double scalar) {
     return new ChassisSpeeds(vx / scalar, vy / scalar, omega / scalar);
-  }
-
-  @Override
-  public ChassisSpeeds interpolate(ChassisSpeeds endValue, double t) {
-    if (t <= 0) {
-      return this;
-    } else if (t >= 1) {
-      return endValue;
-    } else {
-      return new ChassisSpeeds(
-          MathUtil.interpolate(this.vx, endValue.vx, t),
-          MathUtil.interpolate(this.vy, endValue.vy, t),
-          MathUtil.interpolate(this.omega, endValue.omega, t));
-    }
   }
 
   @Override

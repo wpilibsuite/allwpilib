@@ -6,6 +6,7 @@ package edu.wpi.first.math.geometry;
 
 import edu.wpi.first.math.geometry.proto.Twist3dProto;
 import edu.wpi.first.math.geometry.struct.Twist3dStruct;
+import edu.wpi.first.math.jni.Twist3dJNI;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
@@ -55,6 +56,31 @@ public class Twist3d implements ProtobufSerializable, StructSerializable {
     this.rx = rx;
     this.ry = ry;
     this.rz = rz;
+  }
+
+  /**
+   * Obtain a new Transform3d from a (constant curvature) velocity.
+   *
+   * <p>See <a href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">Controls
+   * Engineering in the FIRST Robotics Competition</a> section 10.2 "Pose exponential" for a
+   * derivation.
+   *
+   * <p>The twist is a change in pose in the robot's coordinate frame since the previous pose
+   * update. When the user runs exp() on the twist, the user will receive the pose delta.
+   *
+   * <p>"Exp" represents the pose exponential, which is solving a differential equation moving the
+   * pose forward in time.
+   *
+   * @return The pose delta of the robot.
+   */
+  public Transform3d exp() {
+    double[] resultArray = Twist3dJNI.exp(dx, dy, dz, rx, ry, rz);
+    return new Transform3d(
+        resultArray[0],
+        resultArray[1],
+        resultArray[2],
+        new Rotation3d(
+            new Quaternion(resultArray[3], resultArray[4], resultArray[5], resultArray[6])));
   }
 
   @Override

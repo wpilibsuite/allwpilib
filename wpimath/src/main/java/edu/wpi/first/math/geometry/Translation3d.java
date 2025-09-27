@@ -393,9 +393,9 @@ public class Translation3d
   @Override
   public Translation3d interpolate(Translation3d endValue, double t) {
     return new Translation3d(
-        MathUtil.interpolate(this.getX(), endValue.getX(), t),
-        MathUtil.interpolate(this.getY(), endValue.getY(), t),
-        MathUtil.interpolate(this.getZ(), endValue.getZ(), t));
+        MathUtil.lerp(this.getX(), endValue.getX(), t),
+        MathUtil.lerp(this.getY(), endValue.getY(), t),
+        MathUtil.lerp(this.getZ(), endValue.getZ(), t));
   }
 
   /** Translation3d protobuf for serialization. */

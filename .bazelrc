@@ -35,6 +35,7 @@ build:build_java --test_tag_filters=allwpilib-build-java --build_tag_filters=all
 build:build_cpp --test_tag_filters=+allwpilib-build-cpp --build_tag_filters=+allwpilib-build-cpp
 build:no_example --test_tag_filters=-wpi-example --build_tag_filters=-wpi-example
 test:no_example --test_tag_filters=-wpi-example --build_tag_filters=-wpi-example
+common:skip_robotpy --test_tag_filters=-robotpy --build_tag_filters=-robotpy
 
 # Build Buddy Cache Setup
 build:build_buddy --bes_results_url=https://app.buildbuddy.io/invocation/

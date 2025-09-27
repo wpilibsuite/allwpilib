@@ -5,7 +5,7 @@ model {
             def systemArch = getCurrentArch()
             def found = false
             ts.each {
-                if (it in GoogleTestTestSuiteSpec && it.name == "${nativeName}Test") {
+                if (it in GoogleTestTestSuiteSpec && (it.name == "${nativeName}Test" || it.name == "${nativeName}Catch2Test")) {
                     it.binaries.each {
                         if (found) return
                             def arch = it.targetPlatform.name

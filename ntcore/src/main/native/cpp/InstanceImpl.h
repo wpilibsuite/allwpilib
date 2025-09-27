@@ -75,6 +75,19 @@ class InstanceImpl {
   static std::atomic<InstanceImpl*> s_instances[kNumInstances];
   static wpi::mutex s_mutex;
 
+  struct Cleanup {
+    ~Cleanup() {
+      for (auto&& inst : s_instances) {
+        // don't actually destroy (due to undefined global destruction order),
+        // but stop all listener threads
+        if (auto i = inst.load()) {
+          i->listenerStorage.Reset();
+        }
+      }
+    }
+  };
+  static Cleanup s_cleanup;
+
   wpi::mutex m_mutex;
   std::shared_ptr<NetworkServer> m_networkServer;
   std::shared_ptr<INetworkClient> m_networkClient;

@@ -30,6 +30,6 @@ public interface Interpolator<T> {
    * @return Interpolator for Double.
    */
   static Interpolator<Double> forDouble() {
-    return MathUtil::interpolate;
+    return MathUtil::lerp;
   }
 }

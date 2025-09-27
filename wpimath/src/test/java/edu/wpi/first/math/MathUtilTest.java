@@ -19,18 +19,34 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
   }
 
   @Test
-  void testClamp() {
-    // int
-    assertEquals(5, MathUtil.clamp(10, 1, 5));
+  void testLerp() {
+    // 0%
+    assertEquals(2.0, MathUtil.lerp(2.0, 3.0, 0.0));
+    assertEquals(1.0, MathUtil.lerp(1.0, 5.0, 0.0));
 
-    // double
-    assertEquals(5.5, MathUtil.clamp(10.5, 1.5, 5.5));
+    // 25%
+    assertEquals(2.25, MathUtil.lerp(2.0, 3.0, 0.25));
+    assertEquals(2.0, MathUtil.lerp(1.0, 5.0, 0.25));
 
-    // negative int
-    assertEquals(-5, MathUtil.clamp(-10, -5, -1));
+    // 50%
+    assertEquals(2.5, MathUtil.lerp(2.0, 3.0, 0.5));
+    assertEquals(3.0, MathUtil.lerp(1.0, 5.0, 0.5));
 
-    // negative double
-    assertEquals(-5.5, MathUtil.clamp(-10.5, -5.5, -1.5));
+    // 75%
+    assertEquals(2.75, MathUtil.lerp(2.0, 3.0, 0.75));
+    assertEquals(4.0, MathUtil.lerp(1.0, 5.0, 0.75));
+
+    // 100%
+    assertEquals(3.0, MathUtil.lerp(2.0, 3.0, 1.0));
+    assertEquals(5.0, MathUtil.lerp(1.0, 5.0, 1.0));
+
+    // Below minimum
+    assertEquals(0.0, MathUtil.lerp(2.0, 3.0, -2.0));
+    assertEquals(-7.0, MathUtil.lerp(1.0, 5.0, -2.0));
+
+    // Above maximum
+    assertEquals(4.0, MathUtil.lerp(2.0, 3.0, 2.0));
+    assertEquals(9.0, MathUtil.lerp(1.0, 5.0, 2.0));
   }
 
   @Test
@@ -149,17 +165,6 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
     assertEquals(MathUtil.angleModulus(-5 * Math.PI), Math.PI);
     assertEquals(MathUtil.angleModulus(Math.PI / 2), Math.PI / 2);
     assertEquals(MathUtil.angleModulus(-Math.PI / 2), -Math.PI / 2);
-  }
-
-  @Test
-  void testInterpolate() {
-    assertEquals(50, MathUtil.interpolate(0, 100, 0.5));
-    assertEquals(-50, MathUtil.interpolate(0, -100, 0.5));
-    assertEquals(0, MathUtil.interpolate(-50, 50, 0.5));
-    assertEquals(-25, MathUtil.interpolate(-50, 50, 0.25));
-    assertEquals(25, MathUtil.interpolate(-50, 50, 0.75));
-
-    assertEquals(0, MathUtil.interpolate(0, -100, -0.5));
   }
 
   @Test

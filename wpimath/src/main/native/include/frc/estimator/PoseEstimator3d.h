@@ -272,7 +272,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
 
     // Step 4: Measure the twist between the old pose estimate and the vision
     // pose.
-    auto twist = visionSample.value().Log(visionRobotPose);
+    auto twist = (visionRobotPose - visionSample.value()).Log();
 
     // Step 5: We should not trust the twist entirely, so instead we scale this
     // twist by a Kalman gain matrix representing how much we trust vision
@@ -289,7 +289,8 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
         units::radian_t{k_times_twist(4)}, units::radian_t{k_times_twist(5)}};
 
     // Step 7: Calculate and record the vision update.
-    VisionUpdate visionUpdate{visionSample->Exp(scaledTwist), *odometrySample};
+    VisionUpdate visionUpdate{visionSample.value() + scaledTwist.Exp(),
+                              *odometrySample};
     m_visionUpdates[timestamp] = visionUpdate;
 
     // Step 8: Remove later vision measurements. (Matches previous behavior)

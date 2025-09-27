@@ -14,27 +14,36 @@ public final class MathUtil {
   }
 
   /**
-   * Returns value clamped between low and high boundaries.
+   * Computes the linear interpolation between a and b if t ∈ [0, 1) and the linear extrapolation
+   * otherwise.
    *
-   * @param value Value to clamp.
-   * @param low The lower boundary to which to clamp value.
-   * @param high The higher boundary to which to clamp value.
-   * @return The clamped value.
+   * @param a The start value.
+   * @param b The end value.
+   * @param t The fraction for interpolation.
+   * @return The interpolated value.
    */
-  public static int clamp(int value, int low, int high) {
-    return Math.max(low, Math.min(value, high));
+  public static double lerp(double a, double b, double t) {
+    return a + (b - a) * t;
   }
 
   /**
-   * Returns value clamped between low and high boundaries.
+   * Returns the interpolant t that reflects where q is with respect to the range (a, b). In other
+   * words, returns t such that q = a + (b - a)t. If a = b, then returns 0.
    *
-   * @param value Value to clamp.
-   * @param low The lower boundary to which to clamp value.
-   * @param high The higher boundary to which to clamp value.
-   * @return The clamped value.
+   * @param a Lower part of interpolation range.
+   * @param b Upper part of interpolation range.
+   * @param q Query.
+   * @return Interpolant.
    */
-  public static double clamp(double value, double low, double high) {
-    return Math.max(low, Math.min(value, high));
+  public static double inverseLerp(double a, double b, double q) {
+    // q = a + (b − a)t
+    // (b − a)t = q − a
+    // t = (q − a)/(b − a)
+    if (Math.abs(a - b) < 1e-9) {
+      return 0.0;
+    } else {
+      return (q - a) / (b - a);
+    }
   }
 
   /**
@@ -173,38 +182,6 @@ public final class MathUtil {
    */
   public static double angleModulus(double angleRadians) {
     return inputModulus(angleRadians, -Math.PI, Math.PI);
-  }
-
-  /**
-   * Perform linear interpolation between two values.
-   *
-   * @param startValue The value to start at.
-   * @param endValue The value to end at.
-   * @param t How far between the two values to interpolate. This is clamped to [0, 1].
-   * @return The interpolated value.
-   */
-  public static double interpolate(double startValue, double endValue, double t) {
-    return startValue + (endValue - startValue) * MathUtil.clamp(t, 0, 1);
-  }
-
-  /**
-   * Return where within interpolation range [0, 1] q is between startValue and endValue.
-   *
-   * @param startValue Lower part of interpolation range.
-   * @param endValue Upper part of interpolation range.
-   * @param q Query.
-   * @return Interpolant in range [0, 1].
-   */
-  public static double inverseInterpolate(double startValue, double endValue, double q) {
-    double totalRange = endValue - startValue;
-    if (totalRange <= 0) {
-      return 0.0;
-    }
-    double queryToStart = q - startValue;
-    if (queryToStart <= 0) {
-      return 0.0;
-    }
-    return queryToStart / totalRange;
   }
 
   /**

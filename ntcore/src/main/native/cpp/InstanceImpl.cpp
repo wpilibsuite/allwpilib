@@ -13,6 +13,7 @@ using namespace nt;
 std::atomic<int> InstanceImpl::s_default{-1};
 std::atomic<InstanceImpl*> InstanceImpl::s_instances[kNumInstances];
 wpi::mutex InstanceImpl::s_mutex;
+InstanceImpl::Cleanup InstanceImpl::s_cleanup;
 
 using namespace std::placeholders;
 

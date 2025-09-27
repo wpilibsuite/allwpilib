@@ -7,7 +7,6 @@ package edu.wpi.first.wpilibj.motorcontrol;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDevice.Direction;
 import edu.wpi.first.hal.SimDouble;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -99,7 +98,7 @@ public abstract class PWMMotorController extends MotorSafety
    */
   protected final void setSpeed(double speed) {
     if (Double.isFinite(speed)) {
-      speed = MathUtil.clamp(speed, -1.0, 1.0);
+      speed = Math.clamp(speed, -1.0, 1.0);
     } else {
       speed = 0.0;
     }

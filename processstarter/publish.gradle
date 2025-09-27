@@ -42,6 +42,7 @@ model {
                             }
 
                             from(applicationPath)
+                            into(nativeUtils.getPlatformPath(binary))
                         }
 
                         task.dependsOn binary.tasks.link

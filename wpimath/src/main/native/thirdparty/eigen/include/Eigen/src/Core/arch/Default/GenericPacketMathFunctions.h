@@ -1689,7 +1689,8 @@ EIGEN_DEFINE_FUNCTION_ALLOWING_MULTIPLE_DEFINITIONS Packet phypot_complex(const 
 }
 
 template <typename Packet>
-struct psign_impl<Packet, std::enable_if_t<!NumTraits<typename unpacket_traits<Packet>::type>::IsComplex &&
+struct psign_impl<Packet, std::enable_if_t<!is_scalar<Packet>::value &&
+                                           !NumTraits<typename unpacket_traits<Packet>::type>::IsComplex &&
                                            !NumTraits<typename unpacket_traits<Packet>::type>::IsInteger>> {
   static EIGEN_DEVICE_FUNC inline Packet run(const Packet& a) {
     using Scalar = typename unpacket_traits<Packet>::type;
@@ -1705,7 +1706,8 @@ struct psign_impl<Packet, std::enable_if_t<!NumTraits<typename unpacket_traits<P
 };
 
 template <typename Packet>
-struct psign_impl<Packet, std::enable_if_t<!NumTraits<typename unpacket_traits<Packet>::type>::IsComplex &&
+struct psign_impl<Packet, std::enable_if_t<!is_scalar<Packet>::value &&
+                                           !NumTraits<typename unpacket_traits<Packet>::type>::IsComplex &&
                                            NumTraits<typename unpacket_traits<Packet>::type>::IsSigned &&
                                            NumTraits<typename unpacket_traits<Packet>::type>::IsInteger>> {
   static EIGEN_DEVICE_FUNC inline Packet run(const Packet& a) {
@@ -1724,7 +1726,8 @@ struct psign_impl<Packet, std::enable_if_t<!NumTraits<typename unpacket_traits<P
 };
 
 template <typename Packet>
-struct psign_impl<Packet, std::enable_if_t<!NumTraits<typename unpacket_traits<Packet>::type>::IsComplex &&
+struct psign_impl<Packet, std::enable_if_t<!is_scalar<Packet>::value &&
+                                           !NumTraits<typename unpacket_traits<Packet>::type>::IsComplex &&
                                            !NumTraits<typename unpacket_traits<Packet>::type>::IsSigned &&
                                            NumTraits<typename unpacket_traits<Packet>::type>::IsInteger>> {
   static EIGEN_DEVICE_FUNC inline Packet run(const Packet& a) {
@@ -1739,7 +1742,8 @@ struct psign_impl<Packet, std::enable_if_t<!NumTraits<typename unpacket_traits<P
 
 // \internal \returns the the sign of a complex number z, defined as z / abs(z).
 template <typename Packet>
-struct psign_impl<Packet, std::enable_if_t<NumTraits<typename unpacket_traits<Packet>::type>::IsComplex &&
+struct psign_impl<Packet, std::enable_if_t<!is_scalar<Packet>::value &&
+                                           NumTraits<typename unpacket_traits<Packet>::type>::IsComplex &&
                                            unpacket_traits<Packet>::vectorizable>> {
   static EIGEN_DEVICE_FUNC inline Packet run(const Packet& a) {
     typedef typename unpacket_traits<Packet>::type Scalar;
@@ -2176,7 +2180,8 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Packet generic_pow_impl(const Packet& x, c
 
 // Generic implementation of pow(x,y).
 template <typename Packet>
-EIGEN_DEFINE_FUNCTION_ALLOWING_MULTIPLE_DEFINITIONS Packet generic_pow(const Packet& x, const Packet& y) {
+EIGEN_DEFINE_FUNCTION_ALLOWING_MULTIPLE_DEFINITIONS std::enable_if_t<!is_scalar<Packet>::value, Packet> generic_pow(
+    const Packet& x, const Packet& y) {
   typedef typename unpacket_traits<Packet>::type Scalar;
 
   const Packet cst_inf = pset1<Packet>(NumTraits<Scalar>::infinity());
@@ -2266,6 +2271,12 @@ EIGEN_DEFINE_FUNCTION_ALLOWING_MULTIPLE_DEFINITIONS Packet generic_pow(const Pac
   return pow;
 }
 
+template <typename Scalar>
+EIGEN_DEFINE_FUNCTION_ALLOWING_MULTIPLE_DEFINITIONS std::enable_if_t<is_scalar<Scalar>::value, Scalar> generic_pow(
+    const Scalar& x, const Scalar& y) {
+  return numext::pow(x, y);
+}
+
 namespace unary_pow {
 
 template <typename ScalarExponent, bool IsInteger = NumTraits<ScalarExponent>::IsInteger>
@@ -2347,10 +2358,16 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Packet int_pow(const Packet& x, const Scal
 }
 
 template <typename Packet>
-EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Packet gen_pow(const Packet& x,
-                                                     const typename unpacket_traits<Packet>::type& exponent) {
+EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE std::enable_if_t<!is_scalar<Packet>::value, Packet> gen_pow(
+    const Packet& x, const typename unpacket_traits<Packet>::type& exponent) {
   const Packet exponent_packet = pset1<Packet>(exponent);
   return generic_pow_impl(x, exponent_packet);
+}
+
+template <typename Scalar>
+EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE std::enable_if_t<is_scalar<Scalar>::value, Scalar> gen_pow(
+    const Scalar& x, const Scalar& exponent) {
+  return numext::pow(x, exponent);
 }
 
 template <typename Packet, typename ScalarExponent>
@@ -2359,23 +2376,18 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Packet handle_nonint_nonint_errors(const P
   using Scalar = typename unpacket_traits<Packet>::type;
 
   // non-integer base and exponent case
-
-  const Scalar pos_zero = Scalar(0);
-  const Scalar all_ones = ptrue<Scalar>(Scalar());
-  const Scalar pos_one = Scalar(1);
-  const Scalar pos_inf = NumTraits<Scalar>::infinity();
-
   const Packet cst_pos_zero = pzero(x);
-  const Packet cst_pos_one = pset1<Packet>(pos_one);
-  const Packet cst_pos_inf = pset1<Packet>(pos_inf);
+  const Packet cst_pos_one = pset1<Packet>(Scalar(1));
+  const Packet cst_pos_inf = pset1<Packet>(NumTraits<Scalar>::infinity());
+  const Packet cst_true = ptrue<Packet>(x);
 
   const bool exponent_is_not_fin = !(numext::isfinite)(exponent);
   const bool exponent_is_neg = exponent < ScalarExponent(0);
   const bool exponent_is_pos = exponent > ScalarExponent(0);
 
-  const Packet exp_is_not_fin = pset1<Packet>(exponent_is_not_fin ? all_ones : pos_zero);
-  const Packet exp_is_neg = pset1<Packet>(exponent_is_neg ? all_ones : pos_zero);
-  const Packet exp_is_pos = pset1<Packet>(exponent_is_pos ? all_ones : pos_zero);
+  const Packet exp_is_not_fin = exponent_is_not_fin ? cst_true : cst_pos_zero;
+  const Packet exp_is_neg = exponent_is_neg ? cst_true : cst_pos_zero;
+  const Packet exp_is_pos = exponent_is_pos ? cst_true : cst_pos_zero;
   const Packet exp_is_inf = pand(exp_is_not_fin, por(exp_is_neg, exp_is_pos));
   const Packet exp_is_nan = pandnot(exp_is_not_fin, por(exp_is_neg, exp_is_pos));
 
@@ -2411,22 +2423,15 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Packet handle_negative_exponent(const Pack
 
   // This routine handles negative exponents.
   // The return value is either 0, 1, or -1.
-
-  const Scalar pos_zero = Scalar(0);
-  const Scalar all_ones = ptrue<Scalar>(Scalar());
-  const Scalar pos_one = Scalar(1);
-
-  const Packet cst_pos_one = pset1<Packet>(pos_one);
-
+  const Packet cst_pos_one = pset1<Packet>(Scalar(1));
   const bool exponent_is_odd = exponent % ScalarExponent(2) != ScalarExponent(0);
-
-  const Packet exp_is_odd = pset1<Packet>(exponent_is_odd ? all_ones : pos_zero);
+  const Packet exp_is_odd = exponent_is_odd ? ptrue<Packet>(x) : pzero<Packet>(x);
 
   const Packet abs_x = pabs(x);
   const Packet abs_x_is_one = pcmp_eq(abs_x, cst_pos_one);
 
   Packet result = pselect(exp_is_odd, x, abs_x);
-  result = pand(abs_x_is_one, result);
+  result = pselect(abs_x_is_one, result, pzero<Packet>(x));
   return result;
 }
 
