@@ -5,6 +5,8 @@
 package edu.wpi.first.math.interpolation;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Unit;
 
 /**
  * An interpolation function that returns a value interpolated between an upper and lower bound.
@@ -30,6 +32,17 @@ public interface Interpolator<T> {
    * @return Interpolator for Double.
    */
   static Interpolator<Double> forDouble() {
+    return MathUtil::lerp;
+  }
+
+  /**
+   * Returns interpolator for a Measure.
+   *
+   * @param <U> The unit of the Measure.
+   * @param <M> The type of the Measure.
+   * @return Interpolator for a Measure.
+   */
+  static <U extends Unit, M extends Measure<U>> Interpolator<M> forMeasure() {
     return MathUtil::lerp;
   }
 }
