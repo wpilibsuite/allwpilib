@@ -32,7 +32,7 @@ jobs:
           token: ${{ secrets.BUILDBUDDY_API_KEY }}
 
       - name: bazel ${{ matrix.action }}
-        run: bazel --output_user_root=C:\\bazelroot ${{ matrix.action }} -k ...   --config=ci ${{ matrix.config }} --verbose_failures
+        run: bazel ${{ matrix.action }} -k ...   --config=ci ${{ matrix.config }} --verbose_failures
         shell: bash
 
   build-mac:
