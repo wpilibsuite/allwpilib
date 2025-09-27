@@ -1,0 +1,1155 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Fri, 26 Sep 2025 23:38:43 -0400
+Subject: [PATCH 22/24] HAND FIXES: Update maven info
+
+---
+ apriltag/BUILD.bazel                    |  4 ++--
+ cameraserver/BUILD.bazel                |  4 ++--
+ cameraserver/build.gradle               |  2 +-
+ command/BUILD.bazel                     |  4 ++--
+ command/build.gradle                    |  2 +-
+ cscore/BUILD.bazel                      |  4 ++--
+ cscore/build.gradle                     |  2 +-
+ datalog/BUILD.bazel                     |  4 ++--
+ datalog/build.gradle                    |  4 ++--
+ docs/BUILD.bazel                        |  4 ++--
+ docs/build.gradle                       |  8 ++++----
+ epilogue-processor/BUILD.bazel          |  2 +-
+ epilogue-processor/build.gradle         |  2 +-
+ epilogue-runtime/BUILD.bazel            |  2 +-
+ epilogue-runtime/build.gradle           |  2 +-
+ fields/BUILD.bazel                      |  4 ++--
+ fields/build.gradle                     |  4 ++--
+ fields/publish.gradle                   |  2 +-
+ glass/BUILD.bazel                       |  6 +++---
+ glass/publish.gradle                    | 12 ++++++------
+ hal/BUILD.bazel                         |  4 ++--
+ msvcruntime/build.gradle                |  4 ++--
+ ntcore/BUILD.bazel                      |  4 ++--
+ ntcoreffi/BUILD.bazel                   |  2 +-
+ ntcoreffi/build.gradle                  |  4 ++--
+ romiVendordep/BUILD.bazel               |  4 ++--
+ romiVendordep/build.gradle              |  2 +-
+ shared/javacpp/publish.gradle           |  4 ++--
+ shared/javacpp/setupBuild.gradle        |  2 +-
+ shared/jni/publish.gradle               |  6 +++---
+ shared/jni/setupBuild.gradle            |  2 +-
+ shared/plugins/publish.gradle           |  4 ++--
+ simulation/halsim_ds_socket/BUILD.bazel |  2 +-
+ simulation/halsim_gui/BUILD.bazel       |  2 +-
+ simulation/halsim_ws_client/BUILD.bazel |  2 +-
+ simulation/halsim_ws_core/BUILD.bazel   |  2 +-
+ simulation/halsim_ws_server/BUILD.bazel |  2 +-
+ simulation/halsim_xrp/BUILD.bazel       |  2 +-
+ tools/datalogtool/BUILD.bazel           |  2 +-
+ tools/datalogtool/publish.gradle        |  4 ++--
+ tools/outlineviewer/BUILD.bazel         |  2 +-
+ tools/outlineviewer/publish.gradle      |  4 ++--
+ tools/processstarter/BUILD.bazel        |  2 +-
+ tools/processstarter/publish.gradle     |  4 ++--
+ tools/sysid/BUILD.bazel                 |  2 +-
+ tools/sysid/publish.gradle              |  4 ++--
+ tools/wpical/BUILD.bazel                |  2 +-
+ tools/wpical/publish.gradle             |  4 ++--
+ wpigui/BUILD.bazel                      |  2 +-
+ wpigui/publish.gradle                   |  4 ++--
+ wpilibc/BUILD.bazel                     |  2 +-
+ wpilibc/publish.gradle                  |  4 ++--
+ wpilibcExamples/BUILD.bazel             |  6 +++---
+ wpilibcExamples/publish.gradle          |  8 ++++----
+ wpilibj/BUILD.bazel                     |  2 +-
+ wpilibj/build.gradle                    |  4 ++--
+ wpilibjExamples/BUILD.bazel             |  6 +++---
+ wpilibjExamples/publish.gradle          |  8 ++++----
+ wpimath/BUILD.bazel                     |  4 ++--
+ wpimath/build.gradle                    |  2 +-
+ wpinet/BUILD.bazel                      |  4 ++--
+ wpinet/build.gradle                     |  4 ++--
+ wpiunits/BUILD.bazel                    |  2 +-
+ wpiunits/build.gradle                   |  4 ++--
+ wpiutil/BUILD.bazel                     |  4 ++--
+ wpiutil/build.gradle                    |  2 +-
+ xrpVendordep/BUILD.bazel                |  4 ++--
+ xrpVendordep/build.gradle               |  2 +-
+ 68 files changed, 120 insertions(+), 120 deletions(-)
+
+diff --git a/apriltag/BUILD.bazel b/apriltag/BUILD.bazel
+index b0d3c1e19a252165e5b729966af6fcc04d42f90d..01f771c83fa5fdbd6dcc36fe774b1e98df18858a 100644
+--- a/apriltag/BUILD.bazel
++++ b/apriltag/BUILD.bazel
+@@ -133,7 +133,7 @@ wpilib_jni_java_library(
+     srcs = glob(["src/main/java/**/*.java"]),
+     extra_source_pkgs = ["resources"],
+     maven_artifact_name = "apriltag-java",
+-    maven_group_id = "edu.wpi.first.apriltag",
++    maven_group_id = "org.wpilib.apriltag",
+     native_libs = [":apriltagjni"],
+     resource_strip_prefix = "apriltag/src/main/native/resources",
+     resources = glob(["src/main/native/resources/**"]),
+@@ -210,5 +210,5 @@ py_binary(
+ package_minimal_jni_project(
+     name = "apriltag",
+     maven_artifact_name = "apriltag-cpp",
+-    maven_group_id = "edu.wpi.first.apriltag",
++    maven_group_id = "org.wpilib.apriltag",
+ )
+diff --git a/cameraserver/BUILD.bazel b/cameraserver/BUILD.bazel
+index 7bc46e247cffbf27dbcf09f5444b55107fb71313..50bedb393e97737979a0029f1a9328745d528b10 100644
+--- a/cameraserver/BUILD.bazel
++++ b/cameraserver/BUILD.bazel
+@@ -54,7 +54,7 @@ wpilib_java_library(
+     name = "cameraserver-java",
+     srcs = glob(["src/main/java/**/*.java"]),
+     maven_artifact_name = "cameraserver-java",
+-    maven_group_id = "edu.wpi.first.cameraserver",
++    maven_group_id = "org.wpilib.cameraserver",
+     visibility = ["//visibility:public"],
+     deps = [
+         "//cscore:cscore-java",
+@@ -96,5 +96,5 @@ java_binary(
+ package_minimal_cc_project(
+     name = "cameraserver",
+     maven_artifact_name = "cameraserver-cpp",
+-    maven_group_id = "edu.wpi.first.cameraserver",
++    maven_group_id = "org.wpilib.cameraserver",
+ )
+diff --git a/cameraserver/build.gradle b/cameraserver/build.gradle
+index 92925c65646a980c07df2079a8b5f556565618c1..654397184449d9dd54873750341182c7037e9678 100644
+--- a/cameraserver/build.gradle
++++ b/cameraserver/build.gradle
+@@ -1,6 +1,6 @@
+ ext {
+     nativeName = 'cameraserver'
+-    devMain = 'edu.wpi.first.cameraserver.DevMain'
++    devMain = 'org.wpilib.cameraserver.DevMain'
+ }
+ 
+ evaluationDependsOn(':ntcore')
+diff --git a/command/BUILD.bazel b/command/BUILD.bazel
+index 60268cf68ae1888be499f2ec745ac1709e269977..ca5bfb4f591576599c5834c438e350cd251d7d1d 100644
+--- a/command/BUILD.bazel
++++ b/command/BUILD.bazel
+@@ -105,7 +105,7 @@ wpilib_java_library(
+     name = "command-java",
+     srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
+     maven_artifact_name = "command-java",
+-    maven_group_id = "edu.wpi.first.command",
++    maven_group_id = "org.wpilib.command",
+     visibility = ["//visibility:public"],
+     deps = [
+         "//cscore:cscore-java",
+@@ -175,5 +175,5 @@ java_binary(
+ package_minimal_cc_project(
+     name = "command",
+     maven_artifact_name = "command-cpp",
+-    maven_group_id = "edu.wpi.first.command",
++    maven_group_id = "org.wpilib.command",
+ )
+diff --git a/command/build.gradle b/command/build.gradle
+index c6353b8fb0b53e16f56ed014753cc82660152495..7bfc074b4c6c13be543e76fde2e684917f88cf04 100644
+--- a/command/build.gradle
++++ b/command/build.gradle
+@@ -1,6 +1,6 @@
+ ext {
+     nativeName = 'command'
+-    devMain = 'edu.wpi.first.wpilibj2.commands.DevMain'
++    devMain = 'org.wpilib.commands.DevMain'
+ }
+ 
+ evaluationDependsOn(':ntcore')
+diff --git a/cscore/BUILD.bazel b/cscore/BUILD.bazel
+index dd0f0daaaeca090f387e7bef241f1bb7939ce3d9..6b469a46bff752f9b5073021a3b1cd16de579f10 100644
+--- a/cscore/BUILD.bazel
++++ b/cscore/BUILD.bazel
+@@ -210,7 +210,7 @@ wpilib_jni_java_library(
+     name = "cscore-java",
+     srcs = glob(["src/main/java/**/*.java"]),
+     maven_artifact_name = "cscore-java",
+-    maven_group_id = "edu.wpi.first.cscore",
++    maven_group_id = "org.wpilib.cscore",
+     native_libs = [":cscorejni"],
+     visibility = ["//visibility:public"],
+     deps = [
+@@ -281,7 +281,7 @@ java_binary(
+ package_minimal_jni_project(
+     name = "cscore",
+     maven_artifact_name = "cscore-cpp",
+-    maven_group_id = "edu.wpi.first.cscore",
++    maven_group_id = "org.wpilib.cscore",
+ )
+ 
+ alias(
+diff --git a/cscore/build.gradle b/cscore/build.gradle
+index ffbdb9d063b2f95f223299e7319207f18df84edd..2f98aa800dd49ac7ecf1ae16b944c96dc6d2e5f4 100644
+--- a/cscore/build.gradle
++++ b/cscore/build.gradle
+@@ -2,7 +2,7 @@ import org.gradle.internal.os.OperatingSystem
+ 
+ ext {
+     nativeName = 'cscore'
+-    devMain = 'edu.wpi.first.cscore.DevMain'
++    devMain = 'org.wpilib.cscore.DevMain'
+ }
+ 
+ // Removed because having the objective-cpp plugin added breaks
+diff --git a/datalog/BUILD.bazel b/datalog/BUILD.bazel
+index 0b10834dcdcb4e9baa336066b3017df77054c8d1..510e3564fe0496d7dd86c555e729f71820ba4c99 100644
+--- a/datalog/BUILD.bazel
++++ b/datalog/BUILD.bazel
+@@ -69,7 +69,7 @@ wpilib_jni_java_library(
+     name = "datalog-java",
+     srcs = glob(["src/main/java/**/*.java"]),
+     maven_artifact_name = "datalog-java",
+-    maven_group_id = "edu.wpi.first.datalog",
++    maven_group_id = "org.wpilib.datalog",
+     native_libs = [":datalogjni"],
+     visibility = ["//visibility:public"],
+     deps = [
+@@ -144,5 +144,5 @@ wpilib_java_junit5_test(
+ package_minimal_jni_project(
+     name = "datalog",
+     maven_artifact_name = "datalog-cpp",
+-    maven_group_id = "edu.wpi.first.datalog",
++    maven_group_id = "org.wpilib.datalog",
+ )
+diff --git a/datalog/build.gradle b/datalog/build.gradle
+index 55a23c227a65947a9b5e404af645d8114bf7ce75..d6746c43ff8b32c659ac7f5c500b0cc3de116f9d 100644
+--- a/datalog/build.gradle
++++ b/datalog/build.gradle
+@@ -2,10 +2,10 @@ ext {
+     useJava = true
+     useCpp = true
+     baseId = 'datalog'
+-    groupId = 'edu.wpi.first.datalog'
++    groupId = 'org.wpilib.datalog'
+ 
+     nativeName = 'datalog'
+-    devMain = 'edu.wpi.first.datalog.DevMain'
++    devMain = 'org.wpilib.datalog.DevMain'
+ }
+ 
+ apply from: "${rootDir}/shared/jni/setupBuild.gradle"
+diff --git a/docs/BUILD.bazel b/docs/BUILD.bazel
+index 7f5001bfdc2c0d0d3d58ce9bd122595cdeab3d89..621af9518067b42e4d0e3084b95cf465660de0ac 100644
+--- a/docs/BUILD.bazel
++++ b/docs/BUILD.bazel
+@@ -96,7 +96,7 @@ pkg_zip(
+ 
+ maven_export(
+     name = "wpilibc_publish",
+-    maven_coordinates = "edu.wpi.first.wpilibc:documentation:$(WPILIB_VERSION)",
++    maven_coordinates = "org.wpilib.wpilibc:documentation:$(WPILIB_VERSION)",
+     target = ":doxygen-zip",
+     visibility = ["//visibility:public"],
+ )
+@@ -129,7 +129,7 @@ copy_file(
+ 
+ maven_export(
+     name = "wpilibj_publish",
+-    maven_coordinates = "edu.wpi.first.wpilibj:documentation:$(WPILIB_VERSION)",
++    maven_coordinates = "org.wpilib.wpilibj:documentation:$(WPILIB_VERSION)",
+     target = ":javadoc-zip",
+     visibility = ["//visibility:public"],
+ )
+diff --git a/docs/build.gradle b/docs/build.gradle
+index e735bb55baff6941b9a100aae084111bf0add8fb..b9fb16b139e7a91943439350e194a76af196656e 100644
+--- a/docs/build.gradle
++++ b/docs/build.gradle
+@@ -20,12 +20,12 @@ evaluationDependsOn(':romiVendordep')
+ evaluationDependsOn(':xrpVendordep')
+ 
+ def baseArtifactIdCpp = 'documentation'
+-def artifactGroupIdCpp = 'edu.wpi.first.wpilibc'
+-def zipBaseNameCpp = '_GROUP_edu_wpi_first_wpilibc_ID_documentation_CLS'
++def artifactGroupIdCpp = 'org.wpilib.wpilibc'
++def zipBaseNameCpp = '_GROUP_org_wpilib_wpilibc_ID_documentation_CLS'
+ 
+ def baseArtifactIdJava = 'documentation'
+-def artifactGroupIdJava = 'edu.wpi.first.wpilibj'
+-def zipBaseNameJava = '_GROUP_edu_wpi_first_wpilibj_ID_documentation_CLS'
++def artifactGroupIdJava = 'org.wpilib.wpilibj'
++def zipBaseNameJava = '_GROUP_org_wpilib_wpilibj_ID_documentation_CLS'
+ 
+ def outputsFolder = file("$project.buildDir/outputs")
+ 
+diff --git a/epilogue-processor/BUILD.bazel b/epilogue-processor/BUILD.bazel
+index cdbdc359ad5680222f6ec5eee2196a120ba8006f..9fb84efb83dd26f87418458c5bb0903dff7c8fae 100644
+--- a/epilogue-processor/BUILD.bazel
++++ b/epilogue-processor/BUILD.bazel
+@@ -7,7 +7,7 @@ wpilib_java_library(
+     srcs = glob(["src/main/java/**/*.java"]),
+     extra_source_pkgs = ["resources"],
+     maven_artifact_name = "epilogue-processor-java",
+-    maven_group_id = "edu.wpi.first.epilogue",
++    maven_group_id = "org.wpilib.epilogue",
+     resource_strip_prefix = "epilogue-processor/src/main/resources/",
+     resources = glob(["src/main/resources/**"]),
+     visibility = ["//visibility:public"],
+diff --git a/epilogue-processor/build.gradle b/epilogue-processor/build.gradle
+index c2c6f30156360dd4d1950c09fd11419096a929a5..ab24a4b894d6d30d6ebe4f031dbfcc4b957ca773 100644
+--- a/epilogue-processor/build.gradle
++++ b/epilogue-processor/build.gradle
+@@ -2,7 +2,7 @@ ext {
+     useJava = true
+     useCpp = false
+     baseId = 'epilogue-processor'
+-    groupId = 'edu.wpi.first.epilogue'
++    groupId = 'org.wpilib.epilogue'
+ 
+     devMain = ''
+ }
+diff --git a/epilogue-runtime/BUILD.bazel b/epilogue-runtime/BUILD.bazel
+index 51a7d42076c03aa9bacfbb8ef58b4d2bf938036c..ecb690f2e0db9bff3f41de96aba1ac82542bf6b3 100644
+--- a/epilogue-runtime/BUILD.bazel
++++ b/epilogue-runtime/BUILD.bazel
+@@ -4,7 +4,7 @@ wpilib_java_library(
+     name = "epilogue-java",
+     srcs = glob(["src/main/java/**/*.java"]),
+     maven_artifact_name = "epilogue-runtime-java",
+-    maven_group_id = "edu.wpi.first.epilogue",
++    maven_group_id = "org.wpilib.epilogue",
+     visibility = ["//visibility:public"],
+     deps = [
+         "//datalog:datalog-java",
+diff --git a/epilogue-runtime/build.gradle b/epilogue-runtime/build.gradle
+index 020c0d86b8578f02055aa9c286c992d3107469c7..66ee1e6e75020f9333b761de6954ad41b4a86bb9 100644
+--- a/epilogue-runtime/build.gradle
++++ b/epilogue-runtime/build.gradle
+@@ -2,7 +2,7 @@ ext {
+     useJava = true
+     useCpp = false
+     baseId = 'epilogue-runtime'
+-    groupId = 'edu.wpi.first.epilogue'
++    groupId = 'org.wpilib.epilogue'
+ 
+     devMain = ''
+ }
+diff --git a/fields/BUILD.bazel b/fields/BUILD.bazel
+index 3531ee8491b4b6fa569a417794fd82f88f20a1b0..9104cbff330a9b40b6ef4ea7323614e4c14d0fbb 100644
+--- a/fields/BUILD.bazel
++++ b/fields/BUILD.bazel
+@@ -37,7 +37,7 @@ wpilib_java_library(
+     srcs = glob(["src/main/java/**/*.java"]),
+     extra_source_pkgs = ["resources"],
+     maven_artifact_name = "fields-java",
+-    maven_group_id = "edu.wpi.first.fields",
++    maven_group_id = "org.wpilib.fields",
+     resource_strip_prefix = "fields/src/main/native/resources",
+     resources = glob(["src/main/native/resources/**"]),
+     visibility = ["//visibility:public"],
+@@ -64,5 +64,5 @@ wpilib_java_junit5_test(
+ package_minimal_cc_project(
+     name = "fields",
+     maven_artifact_name = "fields-cpp",
+-    maven_group_id = "edu.wpi.first.fields",
++    maven_group_id = "org.wpilib.fields",
+ )
+diff --git a/fields/build.gradle b/fields/build.gradle
+index 1a509099e2068c59a9d164113d86fa51114c1ef7..7ef7e339b6dcbafb57c3cdbcc62150c9008ef448 100644
+--- a/fields/build.gradle
++++ b/fields/build.gradle
+@@ -22,8 +22,8 @@ dependencies {
+ ext {
+     nativeName = 'fields'
+     baseId = nativeName
+-    groupId = 'edu.wpi.first.fields'
+-    devMain = "edu.wpi.first.fields.DevMain"
++    groupId = 'org.wpilib.fields'
++    devMain = "org.wpilib.fields.DevMain"
+ }
+ 
+ apply from: "${rootDir}/shared/resources.gradle"
+diff --git a/fields/publish.gradle b/fields/publish.gradle
+index 9f6307e35fabfb137f157eab18e00ab415c921c6..15cfb4cf5a60a41c32d5f6303da66e5bbb1bfd26 100644
+--- a/fields/publish.gradle
++++ b/fields/publish.gradle
+@@ -2,7 +2,7 @@ apply plugin: 'maven-publish'
+ 
+ def baseArtifactId = project.nativeName
+ def artifactGroupId = project.groupId
+-def cppZipBaseName = "_GROUP_edu_wpi_first_fields_ID_${baseArtifactId}-cpp_CLS"
++def cppZipBaseName = "_GROUP_org_wpilib_fields_ID_${baseArtifactId}-cpp_CLS"
+ 
+ def outputsFolder = file("$project.buildDir/outputs")
+ 
+diff --git a/glass/BUILD.bazel b/glass/BUILD.bazel
+index e176dfb025ca00139daef6fd14cd138594d89ed0..f645a242df7f2da82fc4a77b89b16778f8465c16 100644
+--- a/glass/BUILD.bazel
++++ b/glass/BUILD.bazel
+@@ -102,19 +102,19 @@ cc_binary(
+ package_minimal_cc_project(
+     name = "glass",
+     maven_artifact_name = "libglass",
+-    maven_group_id = "edu.wpi.first.glass",
++    maven_group_id = "org.wpilib.glass",
+ )
+ 
+ package_minimal_cc_project(
+     name = "glassnt",
+     maven_artifact_name = "libglassnt",
+-    maven_group_id = "edu.wpi.first.glass",
++    maven_group_id = "org.wpilib.glass",
+ )
+ 
+ package_binary_cc_project(
+     name = "glassapp",
+     maven_artifact_name = "Glass",
+-    maven_group_id = "edu.wpi.first.tools",
++    maven_group_id = "org.wpilib.tools",
+     renames = {
+         "glassapp": "glass",
+     },
+diff --git a/glass/publish.gradle b/glass/publish.gradle
+index a29ad2401cb067ac9d3e492a510eeaac30f4515d..383ad319548c978b1e52871cbdda502d8f5e5881 100644
+--- a/glass/publish.gradle
++++ b/glass/publish.gradle
+@@ -1,16 +1,16 @@
+ apply plugin: 'maven-publish'
+ 
+ def baseArtifactId = 'Glass'
+-def artifactGroupId = 'edu.wpi.first.tools'
+-def zipBaseName = '_GROUP_edu_wpi_first_tools_ID_Glass_CLS'
++def artifactGroupId = 'org.wpilib.tools'
++def zipBaseName = '_GROUP_org_wpilib_tools_ID_Glass_CLS'
+ 
+ def libBaseArtifactId = 'libglass'
+-def libArtifactGroupId = 'edu.wpi.first.glass'
+-def libZipBaseName = '_GROUP_edu_wpi_first_glass_ID_libglass_CLS'
++def libArtifactGroupId = 'org.wpilib.glass'
++def libZipBaseName = '_GROUP_org_wpilib_glass_ID_libglass_CLS'
+ 
+ def libntBaseArtifactId = 'libglassnt'
+-def libntArtifactGroupId = 'edu.wpi.first.glass'
+-def libntZipBaseName = '_GROUP_edu_wpi_first_glass_ID_libglassnt_CLS'
++def libntArtifactGroupId = 'org.wpilib.glass'
++def libntZipBaseName = '_GROUP_org_wpilib_glass_ID_libglassnt_CLS'
+ 
+ def outputsFolder = file("$project.buildDir/outputs")
+ 
+diff --git a/hal/BUILD.bazel b/hal/BUILD.bazel
+index 34fa423ecfa8bcdc444cc1a3620fd635f3c9c334..ee3196239f0a67319b2f46cd308da9ae9dbaabdc 100644
+--- a/hal/BUILD.bazel
++++ b/hal/BUILD.bazel
+@@ -183,7 +183,7 @@ wpilib_jni_java_library(
+     name = "hal-java",
+     srcs = glob(["src/main/java/**/*.java"]),
+     maven_artifact_name = "hal-java",
+-    maven_group_id = "edu.wpi.first.hal",
++    maven_group_id = "org.wpilib.hal",
+     native_libs = [":wpiHaljni"],
+     visibility = ["//visibility:public"],
+     deps = [
+@@ -230,5 +230,5 @@ java_binary(
+ package_minimal_jni_project(
+     name = "wpiHal",
+     maven_artifact_name = "hal-cpp",
+-    maven_group_id = "edu.wpi.first.hal",
++    maven_group_id = "org.wpilib.hal",
+ )
+diff --git a/msvcruntime/build.gradle b/msvcruntime/build.gradle
+index 732652db66d9b12664e0726e7ed8343f16aaddaf..d09a54ed7dbfadd4d199241a695a6f156689f350 100644
+--- a/msvcruntime/build.gradle
++++ b/msvcruntime/build.gradle
+@@ -10,8 +10,8 @@ if (OperatingSystem.current().isWindows()) {
+     def outputsFolder = file("$buildDir/outputs")
+ 
+     def baseArtifactId = 'runtime'
+-    def artifactGroupId = "edu.wpi.first.msvc"
+-    def zipBaseName = "_GROUP_edu_wpi_first_msvc_ID_runtime_CLS"
++    def artifactGroupId = "org.wpilib.msvc"
++    def zipBaseName = "_GROUP_org_wpilib_msvc_ID_runtime_CLS"
+ 
+     def vsLocator = gradle.services.get(VisualStudioLocator)
+ 
+diff --git a/ntcore/BUILD.bazel b/ntcore/BUILD.bazel
+index 7ccd91fb1a982c074ac2572f9864e25e3500207e..a8f7380df2a127e2cf3b1da9647b1bd84baae1ad 100644
+--- a/ntcore/BUILD.bazel
++++ b/ntcore/BUILD.bazel
+@@ -161,7 +161,7 @@ wpilib_jni_java_library(
+     name = "ntcore-java",
+     srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
+     maven_artifact_name = "ntcore-java",
+-    maven_group_id = "edu.wpi.first.ntcore",
++    maven_group_id = "org.wpilib.ntcore",
+     native_libs = [":ntcorejni"],
+     visibility = ["//visibility:public"],
+     deps = [
+@@ -221,5 +221,5 @@ java_binary(
+ package_default_jni_project(
+     name = "ntcore",
+     maven_artifact_name = "ntcore-cpp",
+-    maven_group_id = "edu.wpi.first.ntcore",
++    maven_group_id = "org.wpilib.ntcore",
+ )
+diff --git a/ntcoreffi/BUILD.bazel b/ntcoreffi/BUILD.bazel
+index 05029aa0c0286a4cd35ce764d67fe08c7136becc..f40d1d48e2713a5fcca1a959d6bbc53827b2f79d 100644
+--- a/ntcoreffi/BUILD.bazel
++++ b/ntcoreffi/BUILD.bazel
+@@ -55,5 +55,5 @@ wpilib_cc_shared_library(
+ package_shared_cc_project(
+     name = "ntcoreffi",
+     maven_artifact_name = "ntcoreffi-cpp",
+-    maven_group_id = "edu.wpi.first.ntcoreffi",
++    maven_group_id = "org.wpilib.ntcoreffi",
+ )
+diff --git a/ntcoreffi/build.gradle b/ntcoreffi/build.gradle
+index 42645d8aaf04a04571af84f352f77668fd87c734..5855715b8d277dace0f8aaabb712f9464de77396 100644
+--- a/ntcoreffi/build.gradle
++++ b/ntcoreffi/build.gradle
+@@ -81,8 +81,8 @@ model {
+ 
+ def nativeName = 'ntcoreffi'
+ def baseArtifactId = nativeName
+-def artifactGroupId = "edu.wpi.first.${nativeName}"
+-def zipBaseName = "_GROUP_edu_wpi_first_${nativeName}_ID_${nativeName}-cpp_CLS"
++def artifactGroupId = "org.wpilib.${nativeName}"
++def zipBaseName = "_GROUP_org_wpilib_${nativeName}_ID_${nativeName}-cpp_CLS"
+ def outputsFolder = file("$project.buildDir/outputs")
+ 
+ evaluationDependsOn(':ntcore')
+diff --git a/romiVendordep/BUILD.bazel b/romiVendordep/BUILD.bazel
+index 7f65bb689d77c94f585cd915425fede37955f5f5..5692046935fc4f9726c415271a85fd320f07ae9b 100644
+--- a/romiVendordep/BUILD.bazel
++++ b/romiVendordep/BUILD.bazel
+@@ -59,7 +59,7 @@ wpilib_java_library(
+     name = "romiVendordep-java",
+     srcs = glob(["src/main/java/**/*.java"]),
+     maven_artifact_name = "romiVendordep-java",
+-    maven_group_id = "edu.wpi.first.romiVendordep",
++    maven_group_id = "org.wpilib.romiVendordep",
+     visibility = ["//visibility:public"],
+     deps = [
+         "//hal:hal-java",
+@@ -99,5 +99,5 @@ java_binary(
+ package_minimal_cc_project(
+     name = "romiVendordep",
+     maven_artifact_name = "romiVendordep-cpp",
+-    maven_group_id = "edu.wpi.first.romiVendordep",
++    maven_group_id = "org.wpilib.romiVendordep",
+ )
+diff --git a/romiVendordep/build.gradle b/romiVendordep/build.gradle
+index b891c4de406b3f4fcf57eba7af1ac87dd0f8e93d..c93103a36a5e8d5df0742395c49a3a5172a05eaa 100644
+--- a/romiVendordep/build.gradle
++++ b/romiVendordep/build.gradle
+@@ -1,6 +1,6 @@
+ ext {
+     nativeName = 'romiVendordep'
+-    devMain = 'edu.wpi.first.wpilibj.romi.DevMain'
++    devMain = 'org.wpilib.romi.DevMain'
+ }
+ 
+ evaluationDependsOn(":ntcore")
+diff --git a/shared/javacpp/publish.gradle b/shared/javacpp/publish.gradle
+index 5a83be582a17278ef6d41354af5aa93ab973ca02..1b5a8f3347db7b308110df16be846425b9a2d8b7 100644
+--- a/shared/javacpp/publish.gradle
++++ b/shared/javacpp/publish.gradle
+@@ -3,8 +3,8 @@ apply plugin: 'maven-publish'
+ def outputsFolder = file("$buildDir/outputs")
+ 
+ def baseArtifactId = nativeName
+-def artifactGroupId = "edu.wpi.first.${nativeName}"
+-def zipBaseName = "_GROUP_edu_wpi_first_${nativeName}_ID_${nativeName}-cpp_CLS"
++def artifactGroupId = "org.wpilib.${nativeName}"
++def zipBaseName = "_GROUP_org_wpilib_${nativeName}_ID_${nativeName}-cpp_CLS"
+ 
+ def licenseFile = file("$rootDir/license.md")
+ 
+diff --git a/shared/javacpp/setupBuild.gradle b/shared/javacpp/setupBuild.gradle
+index c13fc214def599c0a1b976c4f8fec7c2ad28fc7e..192aced55e9df1a12c651ab3302c394644003f56 100644
+--- a/shared/javacpp/setupBuild.gradle
++++ b/shared/javacpp/setupBuild.gradle
+@@ -9,7 +9,7 @@ apply from: "${rootDir}/shared/config.gradle"
+ 
+ ext {
+     baseId = nativeName
+-    groupId = "edu.wpi.first.${nativeName}"
++    groupId = "org.wpilib.${nativeName}"
+ }
+ 
+ apply from: "${rootDir}/shared/java/javacommon.gradle"
+diff --git a/shared/jni/publish.gradle b/shared/jni/publish.gradle
+index 0705fa2a980670b314695188879bd1b0d0142914..95927770f30ddf4b8b73aa5d3391e0c24ef7ad47 100644
+--- a/shared/jni/publish.gradle
++++ b/shared/jni/publish.gradle
+@@ -4,10 +4,10 @@ apply plugin: 'maven-publish'
+ def outputsFolder = file("$buildDir/outputs")
+ 
+ def baseArtifactId = nativeName
+-def artifactGroupId = "edu.wpi.first.${nativeName}"
+-def zipBaseName = "_GROUP_edu_wpi_first_${nativeName}_ID_${nativeName}-cpp_CLS"
++def artifactGroupId = "org.wpilib.${nativeName}"
++def zipBaseName = "_GROUP_org_wpilib_${nativeName}_ID_${nativeName}-cpp_CLS"
+ ext.zipBaseName = zipBaseName
+-def jniCvStaticBaseName = "_GROUP_edu_wpi_first_${nativeName}_ID_${nativeName}-jnicvstatic_CLS"
++def jniCvStaticBaseName = "_GROUP_org_wpilib_${nativeName}_ID_${nativeName}-jnicvstatic_CLS"
+ 
+ def licenseFile = file("$rootDir/license.md")
+ 
+diff --git a/shared/jni/setupBuild.gradle b/shared/jni/setupBuild.gradle
+index b267da06de708778cb2561003f37203234ad53a0..ade87e7d9b437c024a727c5a23ecfc393a8fcc10 100644
+--- a/shared/jni/setupBuild.gradle
++++ b/shared/jni/setupBuild.gradle
+@@ -10,7 +10,7 @@ apply from: "${rootDir}/shared/config.gradle"
+ 
+ ext {
+     baseId = nativeName
+-    groupId = "edu.wpi.first.${nativeName}"
++    groupId = "org.wpilib.${nativeName}"
+ }
+ 
+ apply from: "${rootDir}/shared/java/javacommon.gradle"
+diff --git a/shared/plugins/publish.gradle b/shared/plugins/publish.gradle
+index 7c7a980b556271cc219e0eea7e04ec529ed8b063..6db2b4d584c471eb339c1784c3239c616409f56b 100644
+--- a/shared/plugins/publish.gradle
++++ b/shared/plugins/publish.gradle
+@@ -1,8 +1,8 @@
+ apply plugin: 'maven-publish'
+ 
+ def baseArtifactId = pluginName
+-def artifactGroupId = 'edu.wpi.first.halsim'
+-def zipBaseName = "_GROUP_edu_wpi_first_halsim_ID_${pluginName}_CLS"
++def artifactGroupId = 'org.wpilib.halsim'
++def zipBaseName = "_GROUP_org_wpilib_halsim_ID_${pluginName}_CLS"
+ 
+ def outputsFolder = file("$project.buildDir/outputs")
+ 
+diff --git a/simulation/halsim_ds_socket/BUILD.bazel b/simulation/halsim_ds_socket/BUILD.bazel
+index 7349c7bab1fe76505a4582ebfebb7838a97978a5..212090b3c683382f565faaefe68d2298348928da 100644
+--- a/simulation/halsim_ds_socket/BUILD.bazel
++++ b/simulation/halsim_ds_socket/BUILD.bazel
+@@ -88,5 +88,5 @@ cc_binary(
+ package_minimal_cc_project(
+     name = "halsim_ds_socket",
+     maven_artifact_name = "halsim_ds_socket",
+-    maven_group_id = "edu.wpi.first.halsim",
++    maven_group_id = "org.wpilib.halsim",
+ )
+diff --git a/simulation/halsim_gui/BUILD.bazel b/simulation/halsim_gui/BUILD.bazel
+index f14ad8a1c677c63bac1bd33e2e04698f0344376f..5b3148730d41a668c7659bbd2cc4a403a3a36dc0 100644
+--- a/simulation/halsim_gui/BUILD.bazel
++++ b/simulation/halsim_gui/BUILD.bazel
+@@ -144,5 +144,5 @@ cc_binary(
+ package_minimal_cc_project(
+     name = "halsim_gui",
+     maven_artifact_name = "halsim_gui",
+-    maven_group_id = "edu.wpi.first.halsim",
++    maven_group_id = "org.wpilib.halsim",
+ )
+diff --git a/simulation/halsim_ws_client/BUILD.bazel b/simulation/halsim_ws_client/BUILD.bazel
+index b582d07d001b4132cb5eb8fa1fcb937b60509bfa..fe1650defd1846d2541fd3c4f15921eedb5562a7 100644
+--- a/simulation/halsim_ws_client/BUILD.bazel
++++ b/simulation/halsim_ws_client/BUILD.bazel
+@@ -66,5 +66,5 @@ cc_binary(
+ package_minimal_cc_project(
+     name = "halsim_ws_client",
+     maven_artifact_name = "halsim_ws_client",
+-    maven_group_id = "edu.wpi.first.halsim",
++    maven_group_id = "org.wpilib.halsim",
+ )
+diff --git a/simulation/halsim_ws_core/BUILD.bazel b/simulation/halsim_ws_core/BUILD.bazel
+index 7092ce11b137e247d42863878e272dcd4ca17fac..4d2e37267ee2acfb3e3b0b1b5e8deab93c091ea2 100644
+--- a/simulation/halsim_ws_core/BUILD.bazel
++++ b/simulation/halsim_ws_core/BUILD.bazel
+@@ -50,5 +50,5 @@ wpilib_cc_static_library(
+ package_minimal_cc_project(
+     name = "halsim_ws_core",
+     maven_artifact_name = "halsim_ws_core",
+-    maven_group_id = "edu.wpi.first.halsim",
++    maven_group_id = "org.wpilib.halsim",
+ )
+diff --git a/simulation/halsim_ws_server/BUILD.bazel b/simulation/halsim_ws_server/BUILD.bazel
+index a0ca0249e79fe997c4c387f1cbc71554ebbddc50..1fedfd261324011a8bd3097af6bde9385ec6175f 100644
+--- a/simulation/halsim_ws_server/BUILD.bazel
++++ b/simulation/halsim_ws_server/BUILD.bazel
+@@ -103,5 +103,5 @@ cc_binary(
+ package_minimal_cc_project(
+     name = "halsim_ws_server",
+     maven_artifact_name = "halsim_ws_server",
+-    maven_group_id = "edu.wpi.first.halsim",
++    maven_group_id = "org.wpilib.halsim",
+ )
+diff --git a/simulation/halsim_xrp/BUILD.bazel b/simulation/halsim_xrp/BUILD.bazel
+index 94edec015821ee8dd33f5afeda7091bc1aacfa80..8e97e648b0074f7f686bf858aeef9c8030de6ed7 100644
+--- a/simulation/halsim_xrp/BUILD.bazel
++++ b/simulation/halsim_xrp/BUILD.bazel
+@@ -79,5 +79,5 @@ cc_binary(
+ package_minimal_cc_project(
+     name = "halsim_xrp",
+     maven_artifact_name = "halsim_xrp",
+-    maven_group_id = "edu.wpi.first.halsim",
++    maven_group_id = "org.wpilib.halsim",
+ )
+diff --git a/tools/datalogtool/BUILD.bazel b/tools/datalogtool/BUILD.bazel
+index dbabfdace02ee7ace9b1408e82309b8da4b50047..15497fcd0775fb8862d1208f1e52169f269151a7 100644
+--- a/tools/datalogtool/BUILD.bazel
++++ b/tools/datalogtool/BUILD.bazel
+@@ -60,5 +60,5 @@ cc_binary(
+ package_binary_cc_project(
+     name = "datalogtool",
+     maven_artifact_name = "DataLogTool",
+-    maven_group_id = "edu.wpi.first.tools",
++    maven_group_id = "org.wpilib.tools",
+ )
+diff --git a/tools/datalogtool/publish.gradle b/tools/datalogtool/publish.gradle
+index 4f433961a9898fbfbeea16a9b22f8c738c15b049..40d8fdb19843313ef71e7e05977dbcd162b44374 100644
+--- a/tools/datalogtool/publish.gradle
++++ b/tools/datalogtool/publish.gradle
+@@ -1,8 +1,8 @@
+ apply plugin: 'maven-publish'
+ 
+ def baseArtifactId = 'DataLogTool'
+-def artifactGroupId = 'edu.wpi.first.tools'
+-def zipBaseName = '_GROUP_edu_wpi_first_tools_ID_DataLogTool_CLS'
++def artifactGroupId = 'org.wpilib.tools'
++def zipBaseName = '_GROUP_org_wpilib_tools_ID_DataLogTool_CLS'
+ 
+ def outputsFolder = file("$project.buildDir/outputs")
+ 
+diff --git a/tools/outlineviewer/BUILD.bazel b/tools/outlineviewer/BUILD.bazel
+index b66832d7d6543524c7d9e9a4baf9893ca48ca0c4..d67f2edcfd2e3e16377912b4fe5f3da3f2ab6054 100644
+--- a/tools/outlineviewer/BUILD.bazel
++++ b/tools/outlineviewer/BUILD.bazel
+@@ -43,5 +43,5 @@ cc_binary(
+ package_binary_cc_project(
+     name = "outlineviewer",
+     maven_artifact_name = "OutlineViewer",
+-    maven_group_id = "edu.wpi.first.tools",
++    maven_group_id = "org.wpilib.tools",
+ )
+diff --git a/tools/outlineviewer/publish.gradle b/tools/outlineviewer/publish.gradle
+index 824962e6904f6fd431c300e145787629dee93510..4e29617b003576f417a3fee023e71e5152648bc6 100644
+--- a/tools/outlineviewer/publish.gradle
++++ b/tools/outlineviewer/publish.gradle
+@@ -1,8 +1,8 @@
+ apply plugin: 'maven-publish'
+ 
+ def baseArtifactId = 'OutlineViewer'
+-def artifactGroupId = 'edu.wpi.first.tools'
+-def zipBaseName = '_GROUP_edu_wpi_first_tools_ID_OutlineViewer_CLS'
++def artifactGroupId = 'org.wpilib.tools'
++def zipBaseName = '_GROUP_org_wpilib_tools_ID_OutlineViewer_CLS'
+ 
+ def outputsFolder = file("$project.buildDir/outputs")
+ 
+diff --git a/tools/processstarter/BUILD.bazel b/tools/processstarter/BUILD.bazel
+index 656a0bf5c2a428298f7fb3119c288d953d2eb54c..500ac56c9abcbc993041cc078884f64291cffd72 100644
+--- a/tools/processstarter/BUILD.bazel
++++ b/tools/processstarter/BUILD.bazel
+@@ -50,5 +50,5 @@ cc_binary(
+ package_binary_cc_project(
+     name = "processstarter",
+     maven_artifact_name = "processstarter",
+-    maven_group_id = "edu.wpi.first.tools",
++    maven_group_id = "org.wpilib.tools",
+ )
+diff --git a/tools/processstarter/publish.gradle b/tools/processstarter/publish.gradle
+index 1fca11019c7f9c1420e53e420445385f4e46bc11..b6e292a4d2347f193da4a130ee1bb08382e782ae 100644
+--- a/tools/processstarter/publish.gradle
++++ b/tools/processstarter/publish.gradle
+@@ -1,8 +1,8 @@
+ apply plugin: 'maven-publish'
+ 
+ def baseArtifactId = 'processstarter'
+-def artifactGroupId = 'edu.wpi.first.tools'
+-def zipBaseName = '_GROUP_edu_wpi_first_tools_ID_processstarter_CLS'
++def artifactGroupId = 'org.wpilib.tools'
++def zipBaseName = '_GROUP_org_wpilib_tools_ID_processstarter_CLS'
+ 
+ def outputsFolder = file("$project.buildDir/outputs")
+ 
+diff --git a/tools/sysid/BUILD.bazel b/tools/sysid/BUILD.bazel
+index 9b2fd1d320c1907c70964bbbb4d37fd8d8c45b34..27f682ee9a799ce41f524c3d920486c3470afe1a 100644
+--- a/tools/sysid/BUILD.bazel
++++ b/tools/sysid/BUILD.bazel
+@@ -60,5 +60,5 @@ cc_test(
+ package_binary_cc_project(
+     name = "sysid",
+     maven_artifact_name = "SysId",
+-    maven_group_id = "edu.wpi.first.tools",
++    maven_group_id = "org.wpilib.tools",
+ )
+diff --git a/tools/sysid/publish.gradle b/tools/sysid/publish.gradle
+index a891b138d993a1a8a99c9f8d3b8ff95bc098e598..ea0ed704d9e50bab3931f88b69d8f6e55c107e37 100644
+--- a/tools/sysid/publish.gradle
++++ b/tools/sysid/publish.gradle
+@@ -1,8 +1,8 @@
+ apply plugin: 'maven-publish'
+ 
+ def baseArtifactId = 'SysId'
+-def artifactGroupId = 'edu.wpi.first.tools'
+-def zipBaseName = '_GROUP_edu_wpi_first_tools_ID_SysId_CLS'
++def artifactGroupId = 'org.wpilib.tools'
++def zipBaseName = '_GROUP_org_wpilib_tools_ID_SysId_CLS'
+ 
+ def outputsFolder = file("$project.buildDir/outputs")
+ 
+diff --git a/tools/wpical/BUILD.bazel b/tools/wpical/BUILD.bazel
+index 35c8a64705aa31c5c4a116ca641132d13b79dc99..9d3e6a30f08ac1345ba85cd23afbc048da7c4b8b 100644
+--- a/tools/wpical/BUILD.bazel
++++ b/tools/wpical/BUILD.bazel
+@@ -243,5 +243,5 @@ package_binary_cc_project(
+     name = "wpical",
+     extra_files = [":licenses"],
+     maven_artifact_name = "wpical",
+-    maven_group_id = "edu.wpi.first.tools",
++    maven_group_id = "org.wpilib.tools",
+ )
+diff --git a/tools/wpical/publish.gradle b/tools/wpical/publish.gradle
+index 16875347b8d5ca381279c198b8b1917be401c210..e324f3f4a3246dba580922ad5df6b0138798bb93 100644
+--- a/tools/wpical/publish.gradle
++++ b/tools/wpical/publish.gradle
+@@ -1,8 +1,8 @@
+ apply plugin: 'maven-publish'
+ 
+ def baseArtifactId = 'wpical'
+-def artifactGroupId = 'edu.wpi.first.tools'
+-def zipBaseName = '_GROUP_edu_wpi_first_tools_ID_wpical_CLS'
++def artifactGroupId = 'org.wpilib.tools'
++def zipBaseName = '_GROUP_org_wpilib_tools_ID_wpical_CLS'
+ 
+ def outputsFolder = file("$project.buildDir/outputs")
+ 
+diff --git a/wpigui/BUILD.bazel b/wpigui/BUILD.bazel
+index cf8e6d3f386bd79b71ecf003b42df64520aa9782..b40adec1417e9b481d390287992446d4fe65eaa9 100644
+--- a/wpigui/BUILD.bazel
++++ b/wpigui/BUILD.bazel
+@@ -86,5 +86,5 @@ wpilib_cc_static_library(
+ package_minimal_cc_project(
+     name = "wpigui",
+     maven_artifact_name = "wpigui-cpp",
+-    maven_group_id = "edu.wpi.first.wpigui",
++    maven_group_id = "org.wpilib.wpigui",
+ )
+diff --git a/wpigui/publish.gradle b/wpigui/publish.gradle
+index 6c102cc3892b2f1e5378fe7549e3bea6e7484d26..9e0270e566c6d2601ac718e66e60a5207372cd58 100644
+--- a/wpigui/publish.gradle
++++ b/wpigui/publish.gradle
+@@ -1,8 +1,8 @@
+ apply plugin: 'maven-publish'
+ 
+ def baseArtifactId = 'wpigui-cpp'
+-def artifactGroupId = 'edu.wpi.first.wpigui'
+-def zipBaseName = '_GROUP_edu_wpi_first_wpigui_ID_wpigui-cpp_CLS'
++def artifactGroupId = 'org.wpilib.wpigui'
++def zipBaseName = '_GROUP_org_wpilib_wpigui_ID_wpigui-cpp_CLS'
+ 
+ def outputsFolder = file("$project.buildDir/outputs")
+ 
+diff --git a/wpilibc/BUILD.bazel b/wpilibc/BUILD.bazel
+index 9f428c7a886bfc6ff44f933a8604c9b539fcf5c4..c8a8da971ceaccaac0fd875fe56377c92e9b2617 100644
+--- a/wpilibc/BUILD.bazel
++++ b/wpilibc/BUILD.bazel
+@@ -197,5 +197,5 @@ cc_binary(
+ package_minimal_cc_project(
+     name = "wpilibc",
+     maven_artifact_name = "wpilibc-cpp",
+-    maven_group_id = "edu.wpi.first.wpilibc",
++    maven_group_id = "org.wpilib.wpilibc",
+ )
+diff --git a/wpilibc/publish.gradle b/wpilibc/publish.gradle
+index 9d72ba602481363cc66619b5247f5c612a236d6f..b3b2dbf11274de296bb139b34398fc82aab63f93 100644
+--- a/wpilibc/publish.gradle
++++ b/wpilibc/publish.gradle
+@@ -1,8 +1,8 @@
+ apply plugin: 'maven-publish'
+ 
+ def baseArtifactId = 'wpilibc-cpp'
+-def artifactGroupId = 'edu.wpi.first.wpilibc'
+-def zipBaseName = '_GROUP_edu_wpi_first_wpilibc_ID_wpilibc-cpp_CLS'
++def artifactGroupId = 'org.wpilib.wpilibc'
++def zipBaseName = '_GROUP_org_wpilib_wpilibc_ID_wpilibc-cpp_CLS'
+ 
+ def outputsFolder = file("$project.buildDir/outputs")
+ 
+diff --git a/wpilibcExamples/BUILD.bazel b/wpilibcExamples/BUILD.bazel
+index 04881260ab296f03b0d2ed723f7df22685a7bcde..9f8ed500f78332b8dbcb9b38c8d3cf954aa04bc2 100644
+--- a/wpilibcExamples/BUILD.bazel
++++ b/wpilibcExamples/BUILD.bazel
+@@ -52,21 +52,21 @@ build_tests()
+ 
+ maven_export(
+     name = "examples_publish",
+-    maven_coordinates = "edu.wpi.first.wpilibc:examples:$(WPILIB_VERSION)",
++    maven_coordinates = "org.wpilib.wpilibc:examples:$(WPILIB_VERSION)",
+     target = ":examples-zip",
+     visibility = ["//visibility:public"],
+ )
+ 
+ maven_export(
+     name = "commands_publish",
+-    maven_coordinates = "edu.wpi.first.wpilibc:commands:$(WPILIB_VERSION)",
++    maven_coordinates = "org.wpilib.wpilibc:commands:$(WPILIB_VERSION)",
+     target = ":commands-zip",
+     visibility = ["//visibility:public"],
+ )
+ 
+ maven_export(
+     name = "templates_publish",
+-    maven_coordinates = "edu.wpi.first.wpilibc:templates:$(WPILIB_VERSION)",
++    maven_coordinates = "org.wpilib.wpilibc:templates:$(WPILIB_VERSION)",
+     target = ":templates-zip",
+     visibility = ["//visibility:public"],
+ )
+diff --git a/wpilibcExamples/publish.gradle b/wpilibcExamples/publish.gradle
+index 0918ea6921fe72dc59a05e98bcd889d9ec598e71..49a157f56d1873fa01edfa9f353425f6af2430ca 100644
+--- a/wpilibcExamples/publish.gradle
++++ b/wpilibcExamples/publish.gradle
+@@ -3,11 +3,11 @@ apply plugin: 'maven-publish'
+ def baseExamplesArtifactId = 'examples'
+ def baseTemplatesArtifactId = 'templates'
+ def baseCommandsArtifactId = 'commands'
+-def artifactGroupId = 'edu.wpi.first.wpilibc'
++def artifactGroupId = 'org.wpilib.wpilibc'
+ 
+-def examplesZipBaseName = '_GROUP_edu_wpi_first_wpilibc_ID_examples_CLS'
+-def templatesZipBaseName = '_GROUP_edu_wpi_first_wpilibc_ID_templates_CLS'
+-def commandsZipBaseName = '_GROUP_edu_wpi_first_wpilibc_ID_commands_CLS'
++def examplesZipBaseName = '_GROUP_org_wpilib_wpilibc_ID_examples_CLS'
++def templatesZipBaseName = '_GROUP_org_wpilib_wpilibc_ID_templates_CLS'
++def commandsZipBaseName = '_GROUP_org_wpilib_wpilibc_ID_commands_CLS'
+ 
+ def outputsFolder = file("$project.buildDir/outputs")
+ 
+diff --git a/wpilibj/BUILD.bazel b/wpilibj/BUILD.bazel
+index 30d28579d208423977779022712658dd8a49f959..89c065bde8018021d795161918e6c4dcfb9f5ded 100644
+--- a/wpilibj/BUILD.bazel
++++ b/wpilibj/BUILD.bazel
+@@ -78,7 +78,7 @@ wpilib_java_library(
+     ] + glob(["src/main/java/**/*.java"]),
+     extra_source_pkgs = ["generated_version_files"],
+     maven_artifact_name = "wpilibj-java",
+-    maven_group_id = "edu.wpi.first.wpilibj",
++    maven_group_id = "org.wpilib.wpilibj",
+     visibility = ["//visibility:public"],
+     deps = [
+         "//cameraserver:cameraserver-java",
+diff --git a/wpilibj/build.gradle b/wpilibj/build.gradle
+index 0e5620c10d180a1591d74596e319f3e907f486c2..1e7ce9c2059df2880ff329fcfca248115d06a57c 100644
+--- a/wpilibj/build.gradle
++++ b/wpilibj/build.gradle
+@@ -5,8 +5,8 @@ evaluationDependsOn(':cameraserver')
+ 
+ ext {
+     baseId = 'wpilibj'
+-    groupId = 'edu.wpi.first.wpilibj'
+-    devMain = 'edu.wpi.first.wpilibj.DevMain'
++    groupId = 'org.wpilib.wpilibj'
++    devMain = 'org.wpilib.wpilibj.DevMain'
+ }
+ 
+ apply from: "${rootDir}/shared/java/javacommon.gradle"
+diff --git a/wpilibjExamples/BUILD.bazel b/wpilibjExamples/BUILD.bazel
+index bd65719aaf312be9603617ccc1418a45a05aacd2..2ddedb44523d5f17cc493bc59b7bd85f0399945e 100644
+--- a/wpilibjExamples/BUILD.bazel
++++ b/wpilibjExamples/BUILD.bazel
+@@ -50,21 +50,21 @@ build_tests()
+ 
+ maven_export(
+     name = "examples_publish",
+-    maven_coordinates = "edu.wpi.first.wpilibj:examples:$(WPILIB_VERSION)",
++    maven_coordinates = "org.wpilib.wpilibj:examples:$(WPILIB_VERSION)",
+     target = ":examples-zip",
+     visibility = ["//visibility:public"],
+ )
+ 
+ maven_export(
+     name = "commands_publish",
+-    maven_coordinates = "edu.wpi.first.wpilibj:commands:$(WPILIB_VERSION)",
++    maven_coordinates = "org.wpilib.wpilibj:commands:$(WPILIB_VERSION)",
+     target = ":commands-zip",
+     visibility = ["//visibility:public"],
+ )
+ 
+ maven_export(
+     name = "templates_publish",
+-    maven_coordinates = "edu.wpi.first.wpilibj:templates:$(WPILIB_VERSION)",
++    maven_coordinates = "org.wpilib.wpilibj:templates:$(WPILIB_VERSION)",
+     target = ":templates-zip",
+     visibility = ["//visibility:public"],
+ )
+diff --git a/wpilibjExamples/publish.gradle b/wpilibjExamples/publish.gradle
+index 02c82ca847c0267dd1136eda66e795af89a2f5b5..30ea83a293e64ba754893b623b36b85279e539c5 100644
+--- a/wpilibjExamples/publish.gradle
++++ b/wpilibjExamples/publish.gradle
+@@ -3,11 +3,11 @@ apply plugin: 'maven-publish'
+ def baseExamplesArtifactId = 'examples'
+ def baseTemplatesArtifactId = 'templates'
+ def baseCommandsArtifactId = 'commands'
+-def artifactGroupId = 'edu.wpi.first.wpilibj'
++def artifactGroupId = 'org.wpilib.wpilibj'
+ 
+-def examplesZipBaseName = '_GROUP_edu_wpi_first_wpilibj_ID_examples_CLS'
+-def templatesZipBaseName = '_GROUP_edu_wpi_first_wpilibj_ID_templates_CLS'
+-def commandsZipBaseName = '_GROUP_edu_wpi_first_wpilibj_ID_commands_CLS'
++def examplesZipBaseName = '_GROUP_org_wpilib_wpilibj_ID_examples_CLS'
++def templatesZipBaseName = '_GROUP_org_wpilib_wpilibj_ID_templates_CLS'
++def commandsZipBaseName = '_GROUP_org_wpilib_wpilibj_ID_commands_CLS'
+ 
+ def outputsFolder = file("$project.buildDir/outputs")
+ 
+diff --git a/wpimath/BUILD.bazel b/wpimath/BUILD.bazel
+index 09d4ff1601fa3f1bee75aca8fff4fef317f38acd..8b2e7b54962f2cec9275f88a42b826c0b9bf0af7 100644
+--- a/wpimath/BUILD.bazel
++++ b/wpimath/BUILD.bazel
+@@ -227,7 +227,7 @@ wpilib_jni_java_library(
+     name = "wpimath-java",
+     srcs = [":generated_java"] + glob(["src/main/java/**/*.java"]),
+     maven_artifact_name = "wpimath-java",
+-    maven_group_id = "edu.wpi.first.wpimath",
++    maven_group_id = "org.wpilib.wpimath",
+     native_libs = [":wpimathjni"],
+     resource_strip_prefix = "wpimath/src/main/proto",
+     resources = glob(["src/main/proto/**"]),
+@@ -312,5 +312,5 @@ py_binary(
+ package_default_jni_project(
+     name = "wpimath",
+     maven_artifact_name = "wpimath-cpp",
+-    maven_group_id = "edu.wpi.first.wpimath",
++    maven_group_id = "org.wpilib.wpimath",
+ )
+diff --git a/wpimath/build.gradle b/wpimath/build.gradle
+index b16e9e28265a7d9bd95be488f6fc44c776d6ef65..e797ab482ec6f10660329c71ac1a1ed5a4d8dca3 100644
+--- a/wpimath/build.gradle
++++ b/wpimath/build.gradle
+@@ -2,7 +2,7 @@ ext {
+     useJava = true
+     useCpp = true
+     baseId = 'wpimath'
+-    groupId = 'edu.wpi.first.wpimath'
++    groupId = 'org.wpilib.wpimath'
+ 
+     nativeName = 'wpimath'
+     devMain = 'org.wpilib.math.DevMain'
+diff --git a/wpinet/BUILD.bazel b/wpinet/BUILD.bazel
+index 7814d5555f60fd61c0f08e8372b9d889bdf6487b..832e63376a73ff30e0af92e5236890629d133016 100644
+--- a/wpinet/BUILD.bazel
++++ b/wpinet/BUILD.bazel
+@@ -216,7 +216,7 @@ wpilib_jni_java_library(
+     name = "wpinet-java",
+     srcs = glob(["src/main/java/**/*.java"]),
+     maven_artifact_name = "wpinet-java",
+-    maven_group_id = "edu.wpi.first.wpinet",
++    maven_group_id = "org.wpilib.wpinet",
+     native_libs = [":wpinetjni"],
+     visibility = ["//visibility:public"],
+     deps = [
+@@ -361,5 +361,5 @@ robotpy_py_test(
+ package_minimal_jni_project(
+     name = "wpinet",
+     maven_artifact_name = "wpinet-cpp",
+-    maven_group_id = "edu.wpi.first.wpinet",
++    maven_group_id = "org.wpilib.wpinet",
+ )
+diff --git a/wpinet/build.gradle b/wpinet/build.gradle
+index f2a10bfb153a08484f687d789c51109ddbd1155a..4701ac9b6af6f8faa0a54ec1da61ef980e50a9af 100644
+--- a/wpinet/build.gradle
++++ b/wpinet/build.gradle
+@@ -2,10 +2,10 @@ apply from: "${rootDir}/shared/resources.gradle"
+ 
+ ext {
+     baseId = 'wpinet'
+-    groupId = 'edu.wpi.first.net'
++    groupId = 'org.wpilib.net'
+ 
+     nativeName = 'wpinet'
+-    devMain = 'edu.wpi.first.net.DevMain'
++    devMain = 'org.wpilib.net.DevMain'
+     def generateTask = createGenerateResourcesTask('main', 'WPI', 'wpi', project)
+ 
+     splitSetup = {
+diff --git a/wpiunits/BUILD.bazel b/wpiunits/BUILD.bazel
+index db0d7deba759ab0e6e8f5524e99248b287d01325..b97e0e60cebc22928f2705a298eef69f4de80447 100644
+--- a/wpiunits/BUILD.bazel
++++ b/wpiunits/BUILD.bazel
+@@ -34,7 +34,7 @@ wpilib_java_library(
+     name = "wpiunits-java",
+     srcs = glob(["src/main/java/**/*.java"]) + glob(["src/generated/main/java/**/*.java"]),
+     maven_artifact_name = "wpiunits-java",
+-    maven_group_id = "edu.wpi.first.wpiunits",
++    maven_group_id = "org.wpilib.wpiunits",
+     visibility = ["//visibility:public"],
+     deps = [],
+ )
+diff --git a/wpiunits/build.gradle b/wpiunits/build.gradle
+index e6b2338575761694070cebb2e7345098abc4b615..bd57203ff3f04cbfcf587fe7430dd259b22a4bdb 100644
+--- a/wpiunits/build.gradle
++++ b/wpiunits/build.gradle
+@@ -2,10 +2,10 @@ ext {
+     useJava = true
+     useCpp = false
+     baseId = 'wpiunits'
+-    groupId = 'edu.wpi.first.wpiunits'
++    groupId = 'org.wpilib.wpiunits'
+ 
+     nativeName = 'wpiunits'
+-    devMain = 'edu.wpi.first.units.DevMain'
++    devMain = 'org.wpilib.units.DevMain'
+ }
+ 
+ apply from: "${rootDir}/shared/java/javacommon.gradle"
+diff --git a/wpiutil/BUILD.bazel b/wpiutil/BUILD.bazel
+index b6c9ecdec8a93b7cf8d224f7dd2a87a64eee8a91..670944f25f316864d7f3565e1684e952996b5ddb 100644
+--- a/wpiutil/BUILD.bazel
++++ b/wpiutil/BUILD.bazel
+@@ -253,7 +253,7 @@ wpilib_jni_java_library(
+     name = "wpiutil-java",
+     srcs = glob(["src/main/java/**/*.java"]),
+     maven_artifact_name = "wpiutil-java",
+-    maven_group_id = "edu.wpi.first.wpiutil",
++    maven_group_id = "org.wpilib.wpiutil",
+     native_libs = [":wpiutiljni"],
+     visibility = ["//visibility:public"],
+     deps = [
+@@ -433,5 +433,5 @@ robotpy_py_test(
+ package_default_jni_project(
+     name = "wpiutil",
+     maven_artifact_name = "wpiutil-cpp",
+-    maven_group_id = "edu.wpi.first.wpiutil",
++    maven_group_id = "org.wpilib.wpiutil",
+ )
+diff --git a/wpiutil/build.gradle b/wpiutil/build.gradle
+index ddeb8f178483526bb2976a61cde119c6c2cb0723..4c7a5c659b24fdebf344dbf3093b766577ac25cb 100644
+--- a/wpiutil/build.gradle
++++ b/wpiutil/build.gradle
+@@ -7,7 +7,7 @@ ext {
+         'Java_org_wpilib_util_CombinedRuntimeLoader_setDllDirectory'
+     ]
+     baseId = 'wpiutil'
+-    groupId = 'edu.wpi.first.wpiutil'
++    groupId = 'org.wpilib.wpiutil'
+ 
+     nativeName = 'wpiutil'
+     devMain = 'org.wpilib.util.DevMain'
+diff --git a/xrpVendordep/BUILD.bazel b/xrpVendordep/BUILD.bazel
+index 0e84c6cabb333af328584f0778f1658cd5beaecb..9c13c1df64eef8eafa100fe42f6001cbe34f8839 100644
+--- a/xrpVendordep/BUILD.bazel
++++ b/xrpVendordep/BUILD.bazel
+@@ -56,7 +56,7 @@ wpilib_java_library(
+     name = "xrpVendordep-java",
+     srcs = glob(["src/main/java/**/*.java"]),
+     maven_artifact_name = "xrpVendordep-java",
+-    maven_group_id = "edu.wpi.first.xrpVendordep",
++    maven_group_id = "org.wpilib.xrpVendordep",
+     visibility = ["//visibility:public"],
+     deps = [
+         "//hal:hal-java",
+@@ -97,5 +97,5 @@ java_binary(
+ package_minimal_cc_project(
+     name = "xrpVendordep",
+     maven_artifact_name = "xrpVendordep-cpp",
+-    maven_group_id = "edu.wpi.first.xrpVendordep",
++    maven_group_id = "org.wpilib.xrpVendordep",
+ )
+diff --git a/xrpVendordep/build.gradle b/xrpVendordep/build.gradle
+index 21278f55deeb21483913be9c1caf869bde2df408..e0af934544a0ba3e465fd968ac95b3353e604e0f 100644
+--- a/xrpVendordep/build.gradle
++++ b/xrpVendordep/build.gradle
+@@ -1,6 +1,6 @@
+ ext {
+     nativeName = 'xrpVendordep'
+-    devMain = 'edu.wpi.first.wpilibj.xrp.DevMain'
++    devMain = 'org.wpilib.xrp.DevMain'
+ }
+ 
+ evaluationDependsOn(":ntcore")
