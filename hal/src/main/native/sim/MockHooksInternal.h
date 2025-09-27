@@ -6,9 +6,9 @@
 
 #include <stdint.h>
 
-#include "hal/simulation/MockHooks.h"
+#include "wpi/hal/simulation/MockHooks.hpp"
 
-namespace hal {
+namespace wpi::hal {
 void RestartTiming();
 
 void PauseTiming();
@@ -24,4 +24,4 @@ uint64_t GetFPGATime();
 double GetFPGATimestamp();
 
 void SetProgramStarted();
-}  // namespace hal
+}  // namespace wpi::hal

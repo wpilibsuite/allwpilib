@@ -23,13 +23,13 @@
  * IN THE SOFTWARE.
  */
 
-#include "wpinet/uv/GetNameInfo.h"  // NOLINT(build/include_order)
+#include "wpi/net/uv/GetNameInfo.hpp"  // NOLINT(build/include_order)
 
 #include <gtest/gtest.h>
 
-#include "wpinet/uv/Loop.h"
+#include "wpi/net/uv/Loop.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 TEST(UvGetNameInfoTest, BasicIp4) {
   int getnameinfo_cbs = 0;
@@ -71,4 +71,4 @@ TEST(UvGetNameInfoTest, BasicIp6) {
   ASSERT_EQ(getnameinfo_cbs, 1);
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

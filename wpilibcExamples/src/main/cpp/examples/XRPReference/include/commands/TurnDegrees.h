@@ -4,14 +4,14 @@
 
 #pragma once
 
-#include <frc2/command/Command.h>
-#include <frc2/command/CommandHelper.h>
-#include <units/angle.h>
-#include <units/length.h>
+#include <wpi/command/Command.hpp>
+#include <wpi/command/CommandHelper.hpp>
+#include <wpi/units/angle.hpp>
+#include <wpi/units/length.hpp>
 
 #include "subsystems/Drivetrain.h"
 
-class TurnDegrees : public frc2::CommandHelper<frc2::Command, TurnDegrees> {
+class TurnDegrees : public wpi::cmd::CommandHelper<wpi::cmd::Command, TurnDegrees> {
  public:
   /**
    * Creates a new TurnDegrees. This command will turn your robot for a desired
@@ -21,7 +21,7 @@ class TurnDegrees : public frc2::CommandHelper<frc2::Command, TurnDegrees> {
    * @param angle Degrees to turn. Leverages encoders to compare distance.
    * @param drive The drive subsystem on which this command will run
    */
-  TurnDegrees(double speed, units::degree_t angle, Drivetrain* drive)
+  TurnDegrees(double speed, wpi::units::degree_t angle, Drivetrain* drive)
       : m_speed(speed), m_angle(angle), m_drive(drive) {
     AddRequirements(m_drive);
   }
@@ -33,8 +33,8 @@ class TurnDegrees : public frc2::CommandHelper<frc2::Command, TurnDegrees> {
 
  private:
   double m_speed;
-  units::degree_t m_angle;
+  wpi::units::degree_t m_angle;
   Drivetrain* m_drive;
 
-  units::meter_t GetAverageTurningDistance();
+  wpi::units::meter_t GetAverageTurningDistance();
 };

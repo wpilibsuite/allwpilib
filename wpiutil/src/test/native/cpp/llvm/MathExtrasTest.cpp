@@ -6,11 +6,11 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/MathExtras.h"
+#include "wpi/util/MathExtras.h"
 #include "gtest/gtest.h"
 #include <limits>
 
-using namespace wpi;
+using namespace wpi::util;
 
 namespace {
 

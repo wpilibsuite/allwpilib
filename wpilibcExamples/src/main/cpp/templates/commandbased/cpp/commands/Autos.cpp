@@ -4,11 +4,11 @@
 
 #include "commands/Autos.h"
 
-#include <frc2/command/Commands.h>
+#include <wpi/command/Commands.hpp>
 
 #include "commands/ExampleCommand.h"
 
-frc2::CommandPtr autos::ExampleAuto(ExampleSubsystem* subsystem) {
-  return frc2::cmd::Sequence(subsystem->ExampleMethodCommand(),
+wpi::cmd::CommandPtr autos::ExampleAuto(ExampleSubsystem* subsystem) {
+  return wpi::cmd::cmd::Sequence(subsystem->ExampleMethodCommand(),
                              ExampleCommand(subsystem).ToPtr());
 }

@@ -4,9 +4,9 @@
 
 #include "MulticastHandleManager.h"
 
-using namespace wpi;
+using namespace wpi::net;
 
-MulticastHandleManager& wpi::GetMulticastManager() {
+MulticastHandleManager& wpi::net::GetMulticastManager() {
   static MulticastHandleManager manager;
   return manager;
 }

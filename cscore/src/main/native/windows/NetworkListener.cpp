@@ -22,13 +22,13 @@
 
 #pragma comment(lib, "Iphlpapi.lib")
 
-using namespace cs;
+using namespace wpi::cs;
 
 class NetworkListener::Impl {
  public:
-  Impl(wpi::Logger& logger, Notifier& notifier)
+  Impl(wpi::util::Logger& logger, Notifier& notifier)
       : m_logger(logger), m_notifier(notifier) {}
-  wpi::Logger& m_logger;
+  wpi::util::Logger& m_logger;
   Notifier& m_notifier;
   HANDLE eventHandle = 0;
 };
@@ -41,7 +41,7 @@ static void WINAPI OnInterfaceChange(PVOID callerContext,
   notifier->NotifyNetworkInterfacesChanged();
 }
 
-NetworkListener::NetworkListener(wpi::Logger& logger, Notifier& notifier)
+NetworkListener::NetworkListener(wpi::util::Logger& logger, Notifier& notifier)
     : m_impl(std::make_unique<Impl>(logger, notifier)) {}
 
 NetworkListener::~NetworkListener() {

@@ -7,15 +7,15 @@
 
 #include <memory>
 
-#include <wpi/Logger.h>
+#include <wpi/util/Logger.hpp>
 
-namespace cs {
+namespace wpi::cs {
 
 class Notifier;
 
 class NetworkListener {
  public:
-  NetworkListener(wpi::Logger& logger, Notifier& notifier);
+  NetworkListener(wpi::util::Logger& logger, Notifier& notifier);
   ~NetworkListener();
 
   void Start();
@@ -26,6 +26,6 @@ class NetworkListener {
   std::unique_ptr<Impl> m_impl;
 };
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_NETWORKLISTENER_H_

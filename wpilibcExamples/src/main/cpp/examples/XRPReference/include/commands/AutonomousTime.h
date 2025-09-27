@@ -4,15 +4,15 @@
 
 #pragma once
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/SequentialCommandGroup.h>
+#include <wpi/command/CommandHelper.hpp>
+#include <wpi/command/SequentialCommandGroup.hpp>
 
 #include "commands/DriveTime.h"
 #include "commands/TurnTime.h"
 #include "subsystems/Drivetrain.h"
 
 class AutonomousTime
-    : public frc2::CommandHelper<frc2::SequentialCommandGroup, AutonomousTime> {
+    : public wpi::cmd::CommandHelper<wpi::cmd::SequentialCommandGroup, AutonomousTime> {
  public:
   /**
    * Creates a new Autonomous Drive based on time. This will drive out for a

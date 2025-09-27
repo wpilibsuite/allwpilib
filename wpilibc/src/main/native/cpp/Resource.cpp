@@ -2,21 +2,21 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/Resource.h"
+#include "wpi/system/Resource.hpp"
 
 #include <limits>
 #include <memory>
 #include <string>
 #include <vector>
 
-#include <wpi/deprecated.h>
+#include <wpi/util/deprecated.hpp>
 
-#include "frc/Errors.h"
+#include "wpi/Errors.hpp"
 
 WPI_IGNORE_DEPRECATED
-using namespace frc;
+using namespace wpi;
 
-wpi::mutex Resource::m_createMutex;
+wpi::util::mutex Resource::m_createMutex;
 
 void Resource::CreateResourceObject(std::unique_ptr<Resource>& r,
                                     uint32_t elements) {

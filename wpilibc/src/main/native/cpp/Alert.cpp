@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/Alert.h"
+#include "wpi/Alert.hpp"
 
 #include <set>
 #include <string>
@@ -10,17 +10,17 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <networktables/NTSendable.h>
-#include <networktables/NTSendableBuilder.h>
-#include <wpi/StringMap.h>
-#include <wpi/sendable/SendableHelper.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include <wpi/ntcore/NTSendable.hpp>
+#include <wpi/ntcore/NTSendableBuilder.hpp>
+#include <wpi/util/StringMap.hpp>
+#include <wpi/util/sendable/SendableHelper.hpp>
+#include <wpi/util/sendable/SendableRegistry.hpp>
 
-#include "frc/Errors.h"
-#include "frc/RobotController.h"
-#include "frc/smartdashboard/SmartDashboard.h"
+#include "wpi/Errors.hpp"
+#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/system/RobotController.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 class Alert::PublishedAlert {
  public:
@@ -37,12 +37,12 @@ class Alert::PublishedAlert {
   }
 };
 
-class Alert::SendableAlerts : public nt::NTSendable,
-                              public wpi::SendableHelper<SendableAlerts> {
+class Alert::SendableAlerts : public wpi::nt::NTSendable,
+                              public wpi::util::SendableHelper<SendableAlerts> {
  public:
   SendableAlerts() { m_alerts.fill({}); }
 
-  void InitSendable(nt::NTSendableBuilder& builder) override {
+  void InitSendable(wpi::nt::NTSendableBuilder& builder) override {
     builder.SetSmartDashboardType("Alerts");
     builder.AddStringArrayProperty(
         "errors", [this]() { return GetStrings(AlertType::kError); }, nullptr);
@@ -70,7 +70,7 @@ class Alert::SendableAlerts : public nt::NTSendable,
       case AlertType::kError:
         return m_alerts[static_cast<int32_t>(type)];
       default:
-        throw FRC_MakeError(frc::err::InvalidParameter,
+        throw FRC_MakeError(wpi::err::InvalidParameter,
                             "Invalid Alert Type: {}", type);
     }
   }
@@ -84,14 +84,14 @@ class Alert::SendableAlerts : public nt::NTSendable,
   static SendableAlerts& ForGroup(std::string_view group) {
     SendableAlerts* salert = nullptr;
     try {
-      auto* sendable = frc::SmartDashboard::GetData(group);
+      auto* sendable = wpi::SmartDashboard::GetData(group);
       salert = dynamic_cast<SendableAlerts*>(sendable);
-    } catch (frc::RuntimeError&) {
+    } catch (wpi::RuntimeError&) {
     }
     if (!salert) {
       // this leaks if ResetSmartDashboardInstance is called, but that's fine
       salert = new Alert::SendableAlerts;
-      frc::SmartDashboard::PutData(group, salert);
+      wpi::SmartDashboard::PutData(group, salert);
     }
     return *salert;
   }
@@ -150,7 +150,7 @@ void Alert::Set(bool active) {
   }
 
   if (active) {
-    m_activeStartTime = frc::RobotController::GetTime();
+    m_activeStartTime = wpi::RobotController::GetTime();
     m_activeAlerts->emplace(m_activeStartTime, m_text);
   } else {
     m_activeAlerts->erase({m_activeStartTime, m_text});
@@ -173,7 +173,7 @@ void Alert::SetText(std::string_view text) {
   }
 }
 
-std::string frc::format_as(Alert::AlertType type) {
+std::string wpi::format_as(Alert::AlertType type) {
   switch (type) {
     case Alert::AlertType::kInfo:
       return "kInfo";

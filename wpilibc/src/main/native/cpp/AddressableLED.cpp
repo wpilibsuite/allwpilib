@@ -2,21 +2,21 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/AddressableLED.h"
+#include "wpi/hardware/led/AddressableLED.hpp"
 
 #include <algorithm>
 
-#include <hal/AddressableLED.h>
-#include <hal/HALBase.h>
-#include <hal/PWM.h>
-#include <hal/Ports.h>
-#include <hal/UsageReporting.h>
-#include <wpi/StackTrace.h>
+#include <wpi/hal/AddressableLED.hpp>
+#include <wpi/hal/HALBase.hpp>
+#include <wpi/hal/PWM.hpp>
+#include <wpi/hal/Ports.hpp>
+#include <wpi/hal/UsageReporting.h>
+#include <wpi/util/StackTrace.hpp>
 
-#include "frc/Errors.h"
-#include "frc/SensorUtil.h"
+#include "wpi/Errors.hpp"
+#include "wpi/SensorUtil.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 AddressableLED::AddressableLED(int channel) : m_channel{channel} {
   if (!SensorUtil::CheckDigitalChannel(channel)) {
@@ -24,7 +24,7 @@ AddressableLED::AddressableLED(int channel) : m_channel{channel} {
   }
 
   int32_t status = 0;
-  auto stack = wpi::GetStackTrace(1);
+  auto stack = wpi::util::GetStackTrace(1);
   m_handle = HAL_InitializeAddressableLED(channel, stack.c_str(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", channel);
 

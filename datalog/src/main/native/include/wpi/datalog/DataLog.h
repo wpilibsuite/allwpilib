@@ -19,18 +19,18 @@
 #include <vector>
 #include <version>
 
-#include <wpi/DenseMap.h>
-#include <wpi/SmallVector.h>
-#include <wpi/StringMap.h>
-#include <wpi/mutex.h>
-#include <wpi/protobuf/Protobuf.h>
-#include <wpi/string.h>
-#include <wpi/struct/Struct.h>
-#include <wpi/timestamp.h>
+#include <wpi/util/DenseMap.h>
+#include <wpi/util/SmallVector.h>
+#include <wpi/util/StringMap.hpp>
+#include <wpi/util/mutex.hpp>
+#include <wpi/util/protobuf/Protobuf.hpp>
+#include <wpi/util/string.hpp>
+#include <wpi/util/struct/Struct.hpp>
+#include <wpi/util/timestamp.hpp>
 
 #include "wpi/datalog/DataLog_c.h"
 
-namespace wpi {
+namespace wpi::util {
 class Logger;
 }  // namespace wpi
 
@@ -159,10 +159,10 @@ class DataLog {
    * @param msg protobuf message
    * @param timestamp Time stamp (0 to indicate now)
    */
-  template <ProtobufSerializable T>
-  void AddProtobufSchema(ProtobufMessage<T>& msg, int64_t timestamp = 0) {
+  template <wpi::util::ProtobufSerializable T>
+  void AddProtobufSchema(wpi::util::ProtobufMessage<T>& msg, int64_t timestamp = 0) {
     if (timestamp == 0) {
-      timestamp = Now();
+      timestamp = wpi::util::Now();
     }
     msg.ForEachProtobufDescriptor(
         [this](auto typeString) { return HasSchema(typeString); },
@@ -180,12 +180,12 @@ class DataLog {
    * @param timestamp Time stamp (0 to indicate now)
    */
   template <typename T, typename... I>
-    requires StructSerializable<T, I...>
+    requires wpi::util::StructSerializable<T, I...>
   void AddStructSchema(const I&... info, int64_t timestamp = 0) {
     if (timestamp == 0) {
-      timestamp = Now();
+      timestamp = wpi::util::Now();
     }
-    ForEachStructSchema<T>(
+    wpi::util::ForEachStructSchema<T>(
         [this, timestamp](auto typeString, auto schema) {
           this->AddSchema(typeString, "structschema", schema, timestamp);
         },
@@ -382,7 +382,7 @@ class DataLog {
 
  protected:
   static constexpr size_t kBlockSize = 16 * 1024;
-  static wpi::Logger s_defaultMessageLog;
+  static wpi::util::Logger s_defaultMessageLog;
 
   class Buffer {
    public:
@@ -442,7 +442,7 @@ class DataLog {
    * @param msglog message logger (will be called from separate thread)
    * @param extraHeader extra header metadata
    */
-  explicit DataLog(wpi::Logger& msglog, std::string_view extraHeader = "")
+  explicit DataLog(wpi::util::Logger& msglog, std::string_view extraHeader = "")
       : m_msglog{msglog}, m_extraHeader{extraHeader} {}
 
   /**
@@ -504,10 +504,10 @@ class DataLog {
   void DoReleaseBufs(std::vector<Buffer>* bufs);
 
  protected:
-  wpi::Logger& m_msglog;
+  wpi::util::Logger& m_msglog;
 
  private:
-  mutable wpi::mutex m_mutex;
+  mutable wpi::util::mutex m_mutex;
   bool m_active = false;
   bool m_paused = false;
   std::string m_extraHeader;
@@ -517,17 +517,17 @@ class DataLog {
     std::string type;
     int id{0};
   };
-  wpi::StringMap<EntryInfo> m_entries;
+  wpi::util::StringMap<EntryInfo> m_entries;
   struct SchemaInfo {
     std::vector<uint8_t> data;
     int id{0};
   };
-  wpi::StringMap<SchemaInfo> m_schemas;
+  wpi::util::StringMap<SchemaInfo> m_schemas;
   struct EntryInfo2 {
     std::string metadata;
     unsigned int count;
   };
-  wpi::DenseMap<int, EntryInfo2> m_entryIds;
+  wpi::util::DenseMap<int, EntryInfo2> m_entryIds;
   int m_lastId = 0;
 };
 
@@ -628,7 +628,7 @@ class DataLogValueEntryImpl : public DataLogEntry {
   }
 
  protected:
-  mutable wpi::mutex m_mutex;
+  mutable wpi::util::mutex m_mutex;
   std::optional<T> m_lastValue;
 };
 
@@ -1300,9 +1300,9 @@ class StringArrayLogEntry
  * Log raw struct serializable objects.
  */
 template <typename T, typename... I>
-  requires StructSerializable<T, I...>
+  requires wpi::util::StructSerializable<T, I...>
 class StructLogEntry : public DataLogEntry {
-  using S = Struct<T, I...>;
+  using S = wpi::util::Struct<T, I...>;
 
  public:
   StructLogEntry() = default;
@@ -1315,7 +1315,7 @@ class StructLogEntry : public DataLogEntry {
     m_log = &log;
     log.AddStructSchema<T, I...>(info..., timestamp);
     m_entry =
-        log.Start(name, GetStructTypeString<T>(info...), metadata, timestamp);
+        log.Start(name, wpi::util::GetStructTypeString<T>(info...), metadata, timestamp);
   }
 
   StructLogEntry(StructLogEntry&& rhs)
@@ -1339,14 +1339,14 @@ class StructLogEntry : public DataLogEntry {
    */
   void Append(const T& data, int64_t timestamp = 0) {
     if constexpr (sizeof...(I) == 0) {
-      if constexpr (wpi::is_constexpr([] { S::GetSize(); })) {
+      if constexpr (wpi::util::is_constexpr([] { S::GetSize(); })) {
         uint8_t buf[S::GetSize()];
         S::Pack(buf, data);
         m_log->AppendRaw(m_entry, buf, timestamp);
         return;
       }
     }
-    wpi::SmallVector<uint8_t, 128> buf;
+    wpi::util::SmallVector<uint8_t, 128> buf;
     buf.resize_for_overwrite(std::apply(S::GetSize, m_info));
     std::apply([&](const I&... info) { S::Pack(buf, data, info...); }, m_info);
     m_log->AppendRaw(m_entry, buf, timestamp);
@@ -1364,7 +1364,7 @@ class StructLogEntry : public DataLogEntry {
    */
   void Update(const T& data, int64_t timestamp = 0) {
     if constexpr (sizeof...(I) == 0) {
-      if constexpr (wpi::is_constexpr([] { S::GetSize(); })) {
+      if constexpr (wpi::util::is_constexpr([] { S::GetSize(); })) {
         uint8_t buf[S::GetSize()];
         S::Pack(buf, data);
         std::scoped_lock lock{m_mutex};
@@ -1377,7 +1377,7 @@ class StructLogEntry : public DataLogEntry {
         return;
       }
     }
-    wpi::SmallVector<uint8_t, 128> buf;
+    wpi::util::SmallVector<uint8_t, 128> buf;
     buf.resize_for_overwrite(std::apply(S::GetSize, m_info));
     std::apply([&](const I&... info) { S::Pack(buf, data, info...); }, m_info);
     std::scoped_lock lock{m_mutex};
@@ -1418,7 +1418,7 @@ class StructLogEntry : public DataLogEntry {
   }
 
  private:
-  mutable wpi::mutex m_mutex;
+  mutable wpi::util::mutex m_mutex;
   std::vector<uint8_t> m_lastValue;
   [[no_unique_address]]
   std::tuple<I...> m_info;
@@ -1428,9 +1428,9 @@ class StructLogEntry : public DataLogEntry {
  * Log raw struct serializable array of objects.
  */
 template <typename T, typename... I>
-  requires StructSerializable<T, I...>
+  requires wpi::util::StructSerializable<T, I...>
 class StructArrayLogEntry : public DataLogEntry {
-  using S = Struct<T, I...>;
+  using S = wpi::util::Struct<T, I...>;
 
  public:
   StructArrayLogEntry() = default;
@@ -1444,7 +1444,7 @@ class StructArrayLogEntry : public DataLogEntry {
     m_log = &log;
     log.AddStructSchema<T, I...>(info..., timestamp);
     m_entry = log.Start(
-        name, MakeStructArrayTypeString<T, std::dynamic_extent>(info...),
+        name, wpi::util::MakeStructArrayTypeString<T, std::dynamic_extent>(info...),
         metadata, timestamp);
   }
 
@@ -1575,8 +1575,8 @@ class StructArrayLogEntry : public DataLogEntry {
   }
 
  private:
-  mutable wpi::mutex m_mutex;
-  StructArrayBuffer<T, I...> m_buf;
+  mutable wpi::util::mutex m_mutex;
+  wpi::util::StructArrayBuffer<T, I...> m_buf;
   std::optional<std::vector<uint8_t>> m_lastValue;
   [[no_unique_address]]
   std::tuple<I...> m_info;
@@ -1585,9 +1585,9 @@ class StructArrayLogEntry : public DataLogEntry {
 /**
  * Log protobuf serializable objects.
  */
-template <ProtobufSerializable T>
+template <wpi::util::ProtobufSerializable T>
 class ProtobufLogEntry : public DataLogEntry {
-  using P = Protobuf<T>;
+  using P = wpi::util::Protobuf<T>;
 
  public:
   ProtobufLogEntry() = default;
@@ -1607,7 +1607,7 @@ class ProtobufLogEntry : public DataLogEntry {
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   void Append(const T& data, int64_t timestamp = 0) {
-    SmallVector<uint8_t, 128> buf;
+    wpi::util::SmallVector<uint8_t, 128> buf;
     {
       std::scoped_lock lock{m_mutex};
       m_msg.Pack(buf, data);
@@ -1627,7 +1627,7 @@ class ProtobufLogEntry : public DataLogEntry {
    */
   void Update(const T& data, int64_t timestamp = 0) {
     std::scoped_lock lock{m_mutex};
-    wpi::SmallVector<uint8_t, 128> buf;
+    wpi::util::SmallVector<uint8_t, 128> buf;
     m_msg.Pack(buf, data);
     if (!m_lastValue.has_value()) {
       m_lastValue = std::vector(buf.begin(), buf.end());
@@ -1666,8 +1666,8 @@ class ProtobufLogEntry : public DataLogEntry {
   }
 
  private:
-  mutable wpi::mutex m_mutex;
-  ProtobufMessage<T> m_msg;
+  mutable wpi::util::mutex m_mutex;
+  wpi::util::ProtobufMessage<T> m_msg;
   std::optional<std::vector<uint8_t>> m_lastValue;
 };
 

@@ -6,13 +6,13 @@
 
 #include <memory>
 
-#include <wpi/json_fwd.h>
+#include <wpi/util/json_fwd.h>
 
 namespace wpilibws {
 
 class HALSimBaseWebSocketConnection {
  public:
-  virtual void OnSimValueChanged(const wpi::json& msg) = 0;
+  virtual void OnSimValueChanged(const wpi::util::json& msg) = 0;
 
  protected:
   virtual ~HALSimBaseWebSocketConnection() = default;

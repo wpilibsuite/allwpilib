@@ -18,7 +18,7 @@
 #include <utility>
 
 #include <fmt/format.h>
-#include <wpi/StringExtras.h>
+#include <wpi/util/StringExtras.h>
 
 namespace wpi::log {
 FileLogger::FileLogger(std::string_view file,
@@ -87,12 +87,12 @@ FileLogger::~FileLogger() {
 std::function<void(std::string_view)> FileLogger::Buffer(
     std::function<void(std::string_view)> callback) {
   return [callback,
-          buf = wpi::SmallVector<char, 64>{}](std::string_view data) mutable {
+          buf = wpi::util::SmallVector<char, 64>{}](std::string_view data) mutable {
     buf.append(data.begin(), data.end());
-    if (!wpi::contains({data.data(), data.size()}, "\n")) {
+    if (!wpi::util::contains({data.data(), data.size()}, "\n")) {
       return;
     }
-    auto [wholeData, extra] = wpi::rsplit({buf.data(), buf.size()}, "\n");
+    auto [wholeData, extra] = wpi::util::rsplit({buf.data(), buf.size()}, "\n");
     std::string leftover{extra};
 
     callback(wholeData);

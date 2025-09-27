@@ -4,9 +4,9 @@
 
 #include <gtest/gtest.h>
 
-#include "cscore.h"
+#include "wpi/cscore/cscore.hpp"
 
-namespace cs {
+namespace wpi::cs {
 
 class CameraSourceTest : public ::testing::Test {
  protected:
@@ -15,7 +15,7 @@ class CameraSourceTest : public ::testing::Test {
 
 TEST_F(CameraSourceTest, HTTPCamera) {
   auto source = HttpCamera("axis", "http://localhost:8000");
-  cs::Shutdown();
+  wpi::cs::Shutdown();
 }
 
-}  // namespace cs
+}  // namespace wpi::cs

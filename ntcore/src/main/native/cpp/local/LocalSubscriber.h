@@ -6,7 +6,7 @@
 
 #include <utility>
 
-#include <wpi/Synchronization.h>
+#include <wpi/util/Synchronization.hpp>
 
 #include "Handle.h"
 #include "Types_internal.h"
@@ -14,9 +14,9 @@
 #include "VectorSet.h"
 #include "local/LocalTopic.h"
 #include "local/PubSubConfig.h"
-#include "ntcore_c.h"
+#include "wpi/ntcore/ntcore_c.h"
 
-namespace nt::local {
+namespace wpi::nt::local {
 
 struct LocalSubscriber {
   static constexpr auto kType = Handle::kSubscriber;
@@ -36,7 +36,7 @@ struct LocalSubscriber {
   }
 
   // invariants
-  wpi::SignalObject<NT_Subscriber> handle;
+  wpi::util::SignalObject<NT_Subscriber> handle;
   LocalTopic* topic;
   PubSubConfig config;
 
@@ -50,4 +50,4 @@ struct LocalSubscriber {
   VectorSet<NT_Listener> valueListeners;
 };
 
-}  // namespace nt::local
+}  // namespace wpi::nt::local

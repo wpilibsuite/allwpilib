@@ -2,22 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/DigitalOutput.h"
+#include "wpi/hardware/discrete/DigitalOutput.hpp"
 
 #include <string>
 
-#include <hal/DIO.h>
-#include <hal/HALBase.h>
-#include <hal/Ports.h>
-#include <hal/UsageReporting.h>
-#include <wpi/StackTrace.h>
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include <wpi/hal/DIO.hpp>
+#include <wpi/hal/HALBase.hpp>
+#include <wpi/hal/Ports.hpp>
+#include <wpi/hal/UsageReporting.h>
+#include <wpi/util/StackTrace.hpp>
+#include <wpi/util/sendable/SendableBuilder.hpp>
+#include <wpi/util/sendable/SendableRegistry.hpp>
 
-#include "frc/Errors.h"
-#include "frc/SensorUtil.h"
+#include "wpi/Errors.hpp"
+#include "wpi/SensorUtil.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 DigitalOutput::DigitalOutput(int channel) {
   m_pwmGenerator = HAL_kInvalidHandle;
@@ -27,12 +27,12 @@ DigitalOutput::DigitalOutput(int channel) {
   m_channel = channel;
 
   int32_t status = 0;
-  std::string stackTrace = wpi::GetStackTrace(1);
+  std::string stackTrace = wpi::util::GetStackTrace(1);
   m_handle = HAL_InitializeDIOPort(channel, false, stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", channel);
 
   HAL_ReportUsage("IO", channel, "DigitalOutput");
-  wpi::SendableRegistry::Add(this, "DigitalOutput", channel);
+  wpi::util::SendableRegistry::Add(this, "DigitalOutput", channel);
 }
 
 DigitalOutput::~DigitalOutput() {
@@ -63,7 +63,7 @@ int DigitalOutput::GetChannel() const {
   return m_channel;
 }
 
-void DigitalOutput::Pulse(units::second_t pulseLength) {
+void DigitalOutput::Pulse(wpi::units::second_t pulseLength) {
   int32_t status = 0;
   HAL_Pulse(m_handle, pulseLength.value(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
@@ -143,7 +143,7 @@ void DigitalOutput::SetSimDevice(HAL_SimDeviceHandle device) {
   HAL_SetDIOSimDevice(m_handle, device);
 }
 
-void DigitalOutput::InitSendable(wpi::SendableBuilder& builder) {
+void DigitalOutput::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Digital Output");
   builder.AddBooleanProperty(
       "Value", [=, this] { return Get(); },

@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include <frc2/command/CommandPtr.h>
+#include <wpi/command/CommandPtr.hpp>
 
 class RobotContainer {
  public:
   RobotContainer();
 
-  frc2::CommandPtr GetAutonomousCommand();
+  wpi::cmd::CommandPtr GetAutonomousCommand();
 
  private:
   void ConfigureBindings();

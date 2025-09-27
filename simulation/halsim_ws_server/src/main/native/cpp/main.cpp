@@ -5,7 +5,7 @@
 #include <cstdio>
 #include <memory>
 
-#include <hal/Extensions.h>
+#include <wpi/hal/Extensions.hpp>
 
 #include "HALSimWSServer.h"
 

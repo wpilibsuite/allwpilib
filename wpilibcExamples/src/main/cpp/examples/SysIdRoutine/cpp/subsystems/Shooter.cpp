@@ -4,34 +4,34 @@
 
 #include "subsystems/Shooter.h"
 
-#include <frc2/command/Commands.h>
-#include <units/angle.h>
-#include <units/voltage.h>
+#include <wpi/command/Commands.hpp>
+#include <wpi/units/angle.hpp>
+#include <wpi/units/voltage.hpp>
 
 Shooter::Shooter() {
   m_shooterEncoder.SetDistancePerPulse(
       constants::shooter::kEncoderDistancePerPulse.value());
 }
 
-frc2::CommandPtr Shooter::RunShooterCommand(
+wpi::cmd::CommandPtr Shooter::RunShooterCommand(
     std::function<double()> shooterSpeed) {
-  return frc2::cmd::Run(
+  return wpi::cmd::cmd::Run(
              [this, shooterSpeed] {
                m_shooterMotor.SetVoltage(
-                   units::volt_t{m_shooterFeedback.Calculate(
+                   wpi::units::volt_t{m_shooterFeedback.Calculate(
                        m_shooterEncoder.GetRate(), shooterSpeed())} +
                    m_shooterFeedforward.Calculate(
-                       units::turns_per_second_t{shooterSpeed()}));
+                       wpi::units::turns_per_second_t{shooterSpeed()}));
                m_feederMotor.Set(constants::shooter::kFeederSpeed);
              },
              {this})
       .WithName("Set Shooter Speed");
 }
 
-frc2::CommandPtr Shooter::SysIdQuasistatic(frc2::sysid::Direction direction) {
+wpi::cmd::CommandPtr Shooter::SysIdQuasistatic(wpi::cmd::sysid::Direction direction) {
   return m_sysIdRoutine.Quasistatic(direction);
 }
 
-frc2::CommandPtr Shooter::SysIdDynamic(frc2::sysid::Direction direction) {
+wpi::cmd::CommandPtr Shooter::SysIdDynamic(wpi::cmd::sysid::Direction direction) {
   return m_sysIdRoutine.Dynamic(direction);
 }

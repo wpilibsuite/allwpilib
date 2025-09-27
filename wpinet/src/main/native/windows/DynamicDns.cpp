@@ -4,7 +4,7 @@
 
 #include "DynamicDns.h"
 
-using namespace wpi;
+using namespace wpi::net;
 
 DynamicDns& DynamicDns::GetDynamicDns() {
   static DynamicDns dns;

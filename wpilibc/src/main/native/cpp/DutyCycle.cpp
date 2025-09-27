@@ -2,22 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/DutyCycle.h"
+#include "wpi/hardware/rotation/DutyCycle.hpp"
 
 #include <string>
 #include <utility>
 
-#include <hal/DutyCycle.h>
-#include <hal/HALBase.h>
-#include <hal/UsageReporting.h>
-#include <wpi/NullDeleter.h>
-#include <wpi/StackTrace.h>
-#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/hal/DutyCycle.hpp>
+#include <wpi/hal/HALBase.hpp>
+#include <wpi/hal/UsageReporting.h>
+#include <wpi/util/NullDeleter.hpp>
+#include <wpi/util/StackTrace.hpp>
+#include <wpi/util/sendable/SendableBuilder.hpp>
 
-#include "frc/Errors.h"
-#include "frc/SensorUtil.h"
+#include "wpi/Errors.hpp"
+#include "wpi/SensorUtil.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 DutyCycle::DutyCycle(int channel) : m_channel{channel} {
   if (!SensorUtil::CheckDigitalChannel(channel)) {
@@ -28,18 +28,18 @@ DutyCycle::DutyCycle(int channel) : m_channel{channel} {
 
 void DutyCycle::InitDutyCycle() {
   int32_t status = 0;
-  std::string stackTrace = wpi::GetStackTrace(1);
+  std::string stackTrace = wpi::util::GetStackTrace(1);
   m_handle = HAL_InitializeDutyCycle(m_channel, stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
   HAL_ReportUsage("IO", m_channel, "DutyCycle");
-  wpi::SendableRegistry::Add(this, "Duty Cycle", m_channel);
+  wpi::util::SendableRegistry::Add(this, "Duty Cycle", m_channel);
 }
 
-units::hertz_t DutyCycle::GetFrequency() const {
+wpi::units::hertz_t DutyCycle::GetFrequency() const {
   int32_t status = 0;
   auto retVal = HAL_GetDutyCycleFrequency(m_handle, &status);
   FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
-  return units::hertz_t{retVal};
+  return wpi::units::hertz_t{retVal};
 }
 
 double DutyCycle::GetOutput() const {
@@ -49,18 +49,18 @@ double DutyCycle::GetOutput() const {
   return retVal;
 }
 
-units::second_t DutyCycle::GetHighTime() const {
+wpi::units::second_t DutyCycle::GetHighTime() const {
   int32_t status = 0;
   auto retVal = HAL_GetDutyCycleHighTime(m_handle, &status);
   FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
-  return units::nanosecond_t{static_cast<double>(retVal)};
+  return wpi::units::nanosecond_t{static_cast<double>(retVal)};
 }
 
 int DutyCycle::GetSourceChannel() const {
   return m_channel;
 }
 
-void DutyCycle::InitSendable(wpi::SendableBuilder& builder) {
+void DutyCycle::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Duty Cycle");
   builder.AddDoubleProperty(
       "Frequency", [this] { return this->GetFrequency().value(); }, nullptr);

@@ -11,9 +11,9 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/json.h"
+#include "wpi/util/json.h"
 
-namespace wpi {
+namespace wpi::util {
 
 inline void PrintTo(std::string_view str, ::std::ostream* os) {
   ::testing::internal::PrintStringTo(std::string{str}, os);
@@ -38,4 +38,4 @@ inline void PrintTo(const json& val, ::std::ostream* os) {
   *os << val.dump();
 }
 
-}  // namespace wpi
+}  // namespace wpi::util

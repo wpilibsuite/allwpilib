@@ -6,13 +6,13 @@
 #	define WIN32_LEAN_AND_MEAN
 #	include <Windows.h>
 
-namespace wpi {
+namespace wpi::util {
 
 bool is_debugger_present() noexcept
 {
 	return ::IsDebuggerPresent();
 }
 
-} // namespace wpi
+} // namespace wpi::util
 
 #endif

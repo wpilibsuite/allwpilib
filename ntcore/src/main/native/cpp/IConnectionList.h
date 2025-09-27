@@ -6,9 +6,9 @@
 
 #include <vector>
 
-#include "ntcore_cpp.h"
+#include "wpi/ntcore/ntcore_cpp.hpp"
 
-namespace nt {
+namespace wpi::nt {
 
 class IConnectionList {
  public:
@@ -21,4 +21,4 @@ class IConnectionList {
   virtual bool IsConnected() const = 0;
 };
 
-}  // namespace nt
+}  // namespace wpi::nt

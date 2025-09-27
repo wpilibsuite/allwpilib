@@ -2,20 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/TimedRobot.h"
+#include "wpi/opmode/TimedRobot.hpp"
 
 #include <stdint.h>
 
 #include <cstdio>
 #include <utility>
 
-#include <hal/DriverStation.h>
-#include <hal/Notifier.h>
-#include <hal/UsageReporting.h>
+#include <wpi/hal/DriverStation.hpp>
+#include <wpi/hal/Notifier.hpp>
+#include <wpi/hal/UsageReporting.h>
 
-#include "frc/Errors.h"
+#include "wpi/Errors.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 void TimedRobot::StartCompetition() {
   if constexpr (IsSimulation()) {
@@ -76,7 +76,7 @@ void TimedRobot::EndCompetition() {
   HAL_StopNotifier(m_notifier, &status);
 }
 
-TimedRobot::TimedRobot(units::second_t period) : IterativeRobotBase(period) {
+TimedRobot::TimedRobot(wpi::units::second_t period) : IterativeRobotBase(period) {
   m_startTime = std::chrono::microseconds{RobotController::GetFPGATime()};
   AddPeriodic([=, this] { LoopFunc(); }, period);
 
@@ -101,7 +101,7 @@ uint64_t TimedRobot::GetLoopStartTime() {
 }
 
 void TimedRobot::AddPeriodic(std::function<void()> callback,
-                             units::second_t period, units::second_t offset) {
+                             wpi::units::second_t period, wpi::units::second_t offset) {
   m_callbacks.emplace(
       callback, m_startTime,
       std::chrono::microseconds{static_cast<int64_t>(period.value() * 1e6)},

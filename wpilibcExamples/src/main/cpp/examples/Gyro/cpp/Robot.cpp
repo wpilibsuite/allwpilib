@@ -4,18 +4,18 @@
 
 #include <cmath>
 
-#include <frc/AnalogGyro.h>
-#include <frc/Joystick.h>
-#include <frc/TimedRobot.h>
-#include <frc/drive/DifferentialDrive.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
+#include <wpi/AnalogGyro.hpp>
+#include <wpi/drive/DifferentialDrive.hpp>
+#include <wpi/driverstation/Joystick.hpp>
+#include <wpi/hardware/motor/PWMSparkMax.hpp>
+#include <wpi/opmode/TimedRobot.hpp>
 
 /**
  * This is a sample program to demonstrate how to use a gyro sensor to make a
  * robot drive straight. This program uses a joystick to drive forwards and
  * backwards while the gyro is used for direction keeping.
  */
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   Robot() {
     m_gyro.SetSensitivity(kVoltsPerDegreePerSecond);
@@ -24,8 +24,8 @@ class Robot : public frc::TimedRobot {
     // gearbox is constructed, you might have to invert the left side instead.
     m_right.SetInverted(true);
 
-    wpi::SendableRegistry::AddChild(&m_drive, &m_left);
-    wpi::SendableRegistry::AddChild(&m_drive, &m_right);
+    wpi::util::SendableRegistry::AddChild(&m_drive, &m_left);
+    wpi::util::SendableRegistry::AddChild(&m_drive, &m_right);
   }
 
   /**
@@ -51,17 +51,17 @@ class Robot : public frc::TimedRobot {
   static constexpr int kGyroPort = 0;
   static constexpr int kJoystickPort = 0;
 
-  frc::PWMSparkMax m_left{kLeftMotorPort};
-  frc::PWMSparkMax m_right{kRightMotorPort};
-  frc::DifferentialDrive m_drive{[&](double output) { m_left.Set(output); },
+  wpi::PWMSparkMax m_left{kLeftMotorPort};
+  wpi::PWMSparkMax m_right{kRightMotorPort};
+  wpi::DifferentialDrive m_drive{[&](double output) { m_left.Set(output); },
                                  [&](double output) { m_right.Set(output); }};
 
-  frc::AnalogGyro m_gyro{kGyroPort};
-  frc::Joystick m_joystick{kJoystickPort};
+  wpi::AnalogGyro m_gyro{kGyroPort};
+  wpi::Joystick m_joystick{kJoystickPort};
 };
 
 #ifndef RUNNING_FRC_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

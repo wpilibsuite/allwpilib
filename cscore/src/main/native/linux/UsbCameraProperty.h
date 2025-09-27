@@ -10,11 +10,11 @@
 #include <memory>
 #include <string_view>
 
-#include <wpi/mutex.h>
+#include <wpi/util/mutex.hpp>
 
 #include "PropertyImpl.h"
 
-namespace cs {
+namespace wpi::cs {
 
 // Property data
 class UsbCameraProperty : public PropertyImpl {
@@ -53,9 +53,9 @@ class UsbCameraProperty : public PropertyImpl {
 
   static std::unique_ptr<UsbCameraProperty> DeviceQuery(int fd, __u32* id);
 
-  bool DeviceGet(std::unique_lock<wpi::mutex>& lock, int fd);
-  bool DeviceSet(std::unique_lock<wpi::mutex>& lock, int fd) const;
-  bool DeviceSet(std::unique_lock<wpi::mutex>& lock, int fd, int newValue,
+  bool DeviceGet(std::unique_lock<wpi::util::mutex>& lock, int fd);
+  bool DeviceSet(std::unique_lock<wpi::util::mutex>& lock, int fd) const;
+  bool DeviceSet(std::unique_lock<wpi::util::mutex>& lock, int fd, int newValue,
                  std::string_view newValueStr) const;
 
   // If this is a device (rather than software) property
@@ -74,6 +74,6 @@ class UsbCameraProperty : public PropertyImpl {
   bool intMenu{false};
 };
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_USBCAMERAPROPERTY_H_

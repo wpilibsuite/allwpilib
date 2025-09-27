@@ -8,9 +8,9 @@
 #include <string_view>
 
 #include "PubSubOptions.h"
-#include "ntcore_c.h"
+#include "wpi/ntcore/ntcore_c.h"
 
-namespace nt::local {
+namespace wpi::nt::local {
 
 struct PubSubConfig : public PubSubOptionsImpl {
   PubSubConfig() = default;
@@ -24,4 +24,4 @@ struct PubSubConfig : public PubSubOptionsImpl {
   std::string typeStr;
 };
 
-}  // namespace nt::local
+}  // namespace wpi::nt::local

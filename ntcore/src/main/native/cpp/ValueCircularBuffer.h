@@ -7,13 +7,13 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/circular_buffer.h>
+#include <wpi/util/circular_buffer.hpp>
 
 #include "Value_internal.h"
-#include "networktables/NetworkTableValue.h"
-#include "ntcore_cpp_types.h"
+#include "wpi/ntcore/NetworkTableValue.hpp"
+#include "wpi/ntcore/ntcore_cpp_types.hpp"
 
-namespace nt {
+namespace wpi::nt {
 
 class ValueCircularBuffer {
  public:
@@ -29,7 +29,7 @@ class ValueCircularBuffer {
   std::vector<Timestamped<typename TypeInfo<T>::Value>> Read();
 
  private:
-  wpi::circular_buffer<Value> m_storage;
+  wpi::util::circular_buffer<Value> m_storage;
 };
 
 template <ValidType T>
@@ -46,4 +46,4 @@ ValueCircularBuffer::Read() {
   return rv;
 }
 
-}  // namespace nt
+}  // namespace wpi::nt

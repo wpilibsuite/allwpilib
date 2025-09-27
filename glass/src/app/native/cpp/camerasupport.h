@@ -4,6 +4,6 @@
 
 #pragma once
 
-namespace glass {
+namespace wpi::glass {
 bool HasCameraSupport();
-}  // namespace glass
+}  // namespace wpi::glass

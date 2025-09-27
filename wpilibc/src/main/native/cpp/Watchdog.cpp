@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/Watchdog.h"
+#include "wpi/system/Watchdog.hpp"
 
 #include <atomic>
 #include <thread>
@@ -10,14 +10,14 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <hal/Notifier.h>
-#include <wpi/mutex.h>
-#include <wpi/priority_queue.h>
+#include <wpi/hal/Notifier.hpp>
+#include <wpi/util/mutex.hpp>
+#include <wpi/util/priority_queue.hpp>
 
-#include "frc/Errors.h"
-#include "frc/Timer.h"
+#include "wpi/Errors.hpp"
+#include "wpi/system/Timer.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 class Watchdog::Impl {
  public:
@@ -31,9 +31,9 @@ class Watchdog::Impl {
     }
   };
 
-  wpi::mutex m_mutex;
+  wpi::util::mutex m_mutex;
   std::atomic<HAL_NotifierHandle> m_notifier;
-  wpi::priority_queue<Watchdog*, std::vector<Watchdog*>,
+  wpi::util::priority_queue<Watchdog*, std::vector<Watchdog*>,
                       DerefGreater<Watchdog*>>
       m_watchdogs;
 
@@ -110,7 +110,7 @@ void Watchdog::Impl::Main() {
     // has occurred, so call its timeout function.
     auto watchdog = m_watchdogs.pop();
 
-    units::second_t now{curTime * 1e-6};
+    wpi::units::second_t now{curTime * 1e-6};
     if (now - watchdog->m_lastTimeoutPrintTime > kMinPrintPeriod) {
       watchdog->m_lastTimeoutPrintTime = now;
       if (!watchdog->m_suppressTimeoutMessage) {
@@ -132,7 +132,7 @@ void Watchdog::Impl::Main() {
   }
 }
 
-Watchdog::Watchdog(units::second_t timeout, std::function<void()> callback)
+Watchdog::Watchdog(wpi::units::second_t timeout, std::function<void()> callback)
     : m_timeout(timeout), m_callback(std::move(callback)), m_impl(GetImpl()) {}
 
 Watchdog::~Watchdog() {
@@ -165,11 +165,11 @@ Watchdog& Watchdog::operator=(Watchdog&& rhs) {
   return *this;
 }
 
-units::second_t Watchdog::GetTime() const {
+wpi::units::second_t Watchdog::GetTime() const {
   return Timer::GetFPGATimestamp() - m_startTime;
 }
 
-void Watchdog::SetTimeout(units::second_t timeout) {
+void Watchdog::SetTimeout(wpi::units::second_t timeout) {
   m_startTime = Timer::GetFPGATimestamp();
   m_tracer.ClearEpochs();
 
@@ -183,7 +183,7 @@ void Watchdog::SetTimeout(units::second_t timeout) {
   m_impl->UpdateAlarm();
 }
 
-units::second_t Watchdog::GetTimeout() const {
+wpi::units::second_t Watchdog::GetTimeout() const {
   std::scoped_lock lock(m_impl->m_mutex);
   return m_timeout;
 }

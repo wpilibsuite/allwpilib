@@ -30,7 +30,7 @@ functions:
           [](std::span<const WPI_Handle> handles) {
             py::gil_scoped_release release;
             std::vector<WPI_Handle> signaled(handles.size());
-            auto result = wpi::WaitForObjects(handles, signaled);
+            auto result = wpi::util::WaitForObjects(handles, signaled);
             signaled.resize(result.size());
             return signaled;
           }
@@ -47,7 +47,7 @@ functions:
             py::gil_scoped_release release;
             std::vector<WPI_Handle> signaled(handles.size());
             bool timedOut = false;
-            auto result = wpi::WaitForObjects(handles, signaled, timeout, &timedOut);
+            auto result = wpi::util::WaitForObjects(handles, signaled, timeout, &timedOut);
             signaled.resize(result.size());
             return std::make_tuple(signaled, timedOut);
           }

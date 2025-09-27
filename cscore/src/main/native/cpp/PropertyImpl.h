@@ -9,11 +9,11 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/Signal.h>
+#include <wpi/util/Signal.h>
 
-#include "cscore_c.h"
+#include "wpi/cscore/cscore_c.h"
 
-namespace cs {
+namespace wpi::cs {
 
 // Property data
 class PropertyImpl {
@@ -46,9 +46,9 @@ class PropertyImpl {
   bool valueSet{false};
 
   // emitted when value changes
-  wpi::sig::Signal<> changed;
+  wpi::util::sig::Signal<> changed;
 };
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_PROPERTYIMPL_H_

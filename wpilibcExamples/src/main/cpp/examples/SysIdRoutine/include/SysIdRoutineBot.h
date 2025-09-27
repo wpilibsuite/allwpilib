@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <frc2/command/CommandPtr.h>
-#include <frc2/command/button/CommandXboxController.h>
+#include <wpi/command/CommandPtr.hpp>
+#include <wpi/command/button/CommandXboxController.hpp>
 
 #include "Constants.h"
 #include "subsystems/Drive.h"
@@ -15,11 +15,11 @@ class SysIdRoutineBot {
  public:
   SysIdRoutineBot();
 
-  frc2::CommandPtr GetAutonomousCommand();
+  wpi::cmd::CommandPtr GetAutonomousCommand();
 
  private:
   void ConfigureBindings();
-  frc2::CommandXboxController m_driverController{
+  wpi::cmd::CommandXboxController m_driverController{
       constants::oi::kDriverControllerPort};
   Drive m_drive;
   Shooter m_shooter;

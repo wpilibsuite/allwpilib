@@ -2,10 +2,10 @@ ext {
     useJava = true
     useCpp = true
     baseId = 'wpimath'
-    groupId = 'edu.wpi.first.wpimath'
+    groupId = 'org.wpilib.wpimath'
 
     nativeName = 'wpimath'
-    devMain = 'edu.wpi.first.math.DevMain'
+    devMain = 'org.wpilib.math.DevMain'
 
     splitSetup = {
         it.sources {

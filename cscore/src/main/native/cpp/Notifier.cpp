@@ -11,7 +11,7 @@
 #include "SinkImpl.h"
 #include "SourceImpl.h"
 
-using namespace cs;
+using namespace wpi::cs;
 
 Notifier::Notifier() {}
 

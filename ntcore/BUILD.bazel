@@ -73,8 +73,8 @@ filegroup(
 cc_library(
     name = "ntcore_c_headers",
     hdrs = [
-        "src/generated/main/native/include/ntcore_c_types.h",
-        "src/main/native/include/ntcore_c.h",
+        "src/generated/main/native/include/wpi/ntcore/ntcore_c_types.h",
+        "src/main/native/include/wpi/ntcore/ntcore_c.h",
     ],
     includes = [
         "src/generated/main/native/include",
@@ -161,7 +161,7 @@ wpilib_jni_java_library(
     name = "ntcore-java",
     srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
     maven_artifact_name = "ntcore-java",
-    maven_group_id = "edu.wpi.first.ntcore",
+    maven_group_id = "org.wpilib.ntcore",
     native_libs = [":ntcorejni"],
     visibility = ["//visibility:public"],
     deps = [
@@ -210,8 +210,8 @@ cc_binary(
 
 java_binary(
     name = "DevMain-Java",
-    srcs = ["src/dev/java/edu/wpi/first/ntcore/DevMain.java"],
-    main_class = "edu.wpi.first.ntcore.DevMain",
+    srcs = ["src/dev/java/org/wpilib/networktables/DevMain.java"],
+    main_class = "org.wpilib.networktables.DevMain",
     deps = [
         "ntcore-java",
         "//wpiutil:wpiutil-java",
@@ -221,5 +221,5 @@ java_binary(
 package_default_jni_project(
     name = "ntcore",
     maven_artifact_name = "ntcore-cpp",
-    maven_group_id = "edu.wpi.first.ntcore",
+    maven_group_id = "org.wpilib.ntcore",
 )

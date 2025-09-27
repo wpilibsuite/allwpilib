@@ -6,18 +6,18 @@
 
 #include <functional>
 
-#include <frc/Encoder.h>
-#include <frc/controller/PIDController.h>
-#include <frc/controller/SimpleMotorFeedforward.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc2/command/CommandPtr.h>
-#include <frc2/command/SubsystemBase.h>
-#include <units/angle.h>
-#include <units/angular_velocity.h>
+#include <wpi/command/CommandPtr.hpp>
+#include <wpi/command/SubsystemBase.hpp>
+#include <wpi/hardware/motor/PWMSparkMax.hpp>
+#include <wpi/hardware/rotation/Encoder.hpp>
+#include <wpi/math/controller/PIDController.hpp>
+#include <wpi/math/controller/SimpleMotorFeedforward.hpp>
+#include <wpi/units/angle.hpp>
+#include <wpi/units/angular_velocity.hpp>
 
 #include "Constants.h"
 
-class Shooter : public frc2::SubsystemBase {
+class Shooter : public wpi::cmd::SubsystemBase {
  public:
   Shooter();
 
@@ -28,16 +28,16 @@ class Shooter : public frc2::SubsystemBase {
    *
    * @param setpointRotationsPerSecond The desired shooter velocity
    */
-  frc2::CommandPtr ShootCommand(units::turns_per_second_t setpoint);
+  wpi::cmd::CommandPtr ShootCommand(wpi::units::turns_per_second_t setpoint);
 
  private:
-  frc::PWMSparkMax m_shooterMotor{ShooterConstants::kShooterMotorPort};
-  frc::PWMSparkMax m_feederMotor{ShooterConstants::kFeederMotorPort};
+  wpi::PWMSparkMax m_shooterMotor{ShooterConstants::kShooterMotorPort};
+  wpi::PWMSparkMax m_feederMotor{ShooterConstants::kFeederMotorPort};
 
-  frc::Encoder m_shooterEncoder{ShooterConstants::kEncoderPorts[0],
+  wpi::Encoder m_shooterEncoder{ShooterConstants::kEncoderPorts[0],
                                 ShooterConstants::kEncoderPorts[1],
                                 ShooterConstants::kEncoderReversed};
-  frc::SimpleMotorFeedforward<units::radians> m_shooterFeedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::radians> m_shooterFeedforward{
       ShooterConstants::kS, ShooterConstants::kV};
-  frc::PIDController m_shooterFeedback{ShooterConstants::kP, 0.0, 0.0};
+  wpi::math::PIDController m_shooterFeedback{ShooterConstants::kP, 0.0, 0.0};
 };

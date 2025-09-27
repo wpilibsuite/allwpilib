@@ -6,11 +6,11 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Translation2d.h"
-#include "frc/kinematics/MecanumDriveKinematics.h"
-#include "units/angular_velocity.h"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
+#include "wpi/units/angular_velocity.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 class MecanumDriveKinematicsTest : public ::testing::Test {
  protected:
@@ -80,7 +80,7 @@ TEST_F(MecanumDriveKinematicsTest, StrafeForwardKinematicsWithDeltas) {
 
 TEST_F(MecanumDriveKinematicsTest, RotationInverseKinematics) {
   ChassisSpeeds speeds{0_mps, 0_mps,
-                       units::radians_per_second_t{2 * std::numbers::pi}};
+                       wpi::units::radians_per_second_t{2 * std::numbers::pi}};
   auto moduleStates = kinematics.ToWheelSpeeds(speeds);
 
   EXPECT_NEAR(-150.79644737, moduleStates.frontLeft.value(), 0.1);

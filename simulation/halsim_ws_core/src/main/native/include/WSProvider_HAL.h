@@ -17,7 +17,7 @@ class HALSimWSProviderHAL : public HALSimWSHalProvider {
   using HALSimWSHalProvider::HALSimWSHalProvider;
   ~HALSimWSProviderHAL() override;
 
-  void OnNetValueChanged(const wpi::json& json) override;
+  void OnNetValueChanged(const wpi::util::json& json) override;
 
  protected:
   void RegisterCallbacks() override;

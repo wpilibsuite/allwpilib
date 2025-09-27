@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <frc2/command/Command.h>
-#include <frc2/command/CommandHelper.h>
+#include <wpi/command/Command.hpp>
+#include <wpi/command/CommandHelper.hpp>
 
 #include "subsystems/HatchSubsystem.h"
 
@@ -16,7 +16,7 @@
  *
  * @see InstantCommand
  */
-class ReleaseHatch : public frc2::CommandHelper<frc2::Command, ReleaseHatch> {
+class ReleaseHatch : public wpi::cmd::CommandHelper<wpi::cmd::Command, ReleaseHatch> {
  public:
   explicit ReleaseHatch(HatchSubsystem* subsystem);
 

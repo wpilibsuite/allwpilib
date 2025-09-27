@@ -6,14 +6,14 @@
 
 #include <array>
 
-#include <frc/DigitalOutput.h>
-#include <frc/TimedRobot.h>
+#include <wpi/hardware/discrete/DigitalOutput.hpp>
+#include <wpi/opmode/TimedRobot.hpp>
 
 /**
  * This is a sample program demonstrating how to communicate to a light
  * controller from the robot code using the roboRIO's DIO ports.
  */
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   // define ports for communication with light controller
   static constexpr int kAlliancePort = 0;
@@ -24,8 +24,8 @@ class Robot : public frc::TimedRobot {
   void RobotPeriodic() override;
 
  private:
-  frc::DigitalOutput m_allianceOutput{kAlliancePort};
-  frc::DigitalOutput m_enabledOutput{kEnabledPort};
-  frc::DigitalOutput m_autonomousOutput{kAutonomousPort};
-  frc::DigitalOutput m_alertOutput{kAlertPort};
+  wpi::DigitalOutput m_allianceOutput{kAlliancePort};
+  wpi::DigitalOutput m_enabledOutput{kEnabledPort};
+  wpi::DigitalOutput m_autonomousOutput{kAutonomousPort};
+  wpi::DigitalOutput m_alertOutput{kAlertPort};
 };

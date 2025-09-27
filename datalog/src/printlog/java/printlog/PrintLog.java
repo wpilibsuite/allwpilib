@@ -4,8 +4,6 @@
 
 package printlog;
 
-import edu.wpi.first.datalog.DataLogReader;
-import edu.wpi.first.datalog.DataLogRecord;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -14,6 +12,8 @@ import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Map;
+import org.wpilib.datalog.DataLogReader;
+import org.wpilib.datalog.DataLogRecord;
 
 public final class PrintLog {
   private static final DateTimeFormatter m_timeFormatter =

@@ -4,15 +4,15 @@
 
 #pragma once
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/SequentialCommandGroup.h>
+#include <wpi/command/CommandHelper.hpp>
+#include <wpi/command/SequentialCommandGroup.hpp>
 
 #include "commands/DriveDistance.h"
 #include "commands/TurnDegrees.h"
 #include "subsystems/Drivetrain.h"
 
 class AutonomousDistance
-    : public frc2::CommandHelper<frc2::SequentialCommandGroup,
+    : public wpi::cmd::CommandHelper<wpi::cmd::SequentialCommandGroup,
                                  AutonomousDistance> {
  public:
   /**

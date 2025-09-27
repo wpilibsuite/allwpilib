@@ -10,10 +10,10 @@
 
 #include <opencv2/core/core.hpp>
 
-#include "cscore_cpp.h"
 #include "default_init_allocator.h"
+#include "wpi/cscore/cscore_cpp.hpp"
 
-namespace cs {
+namespace wpi::cs {
 
 class Frame;
 
@@ -129,6 +129,6 @@ class Image {
   int jpegQuality{-1};
 };
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_IMAGE_H_

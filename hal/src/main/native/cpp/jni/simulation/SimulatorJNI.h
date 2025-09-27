@@ -4,15 +4,15 @@
 
 #pragma once
 
-#include "hal/Types.h"
 #include "jni.h"
+#include "wpi/hal/Types.hpp"
 
 using SIM_JniHandle = HAL_Handle;  // NOLINT
 
-namespace hal::sim {
+namespace wpi::hal::sim {
 JavaVM* GetJVM();
 
 jmethodID GetNotifyCallback();
 jmethodID GetBufferCallback();
 jmethodID GetConstBufferCallback();
-}  // namespace hal::sim
+}  // namespace wpi::hal::sim

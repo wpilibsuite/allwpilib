@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpimath/MathShared.h"
+#include "wpi/math/util/MathShared.hpp"
 
 #include <memory>
 #include <utility>
 
-#include <wpi/mutex.h>
-#include <wpi/timestamp.h>
+#include <wpi/util/mutex.hpp>
+#include <wpi/util/timestamp.hpp>
 
-#include "units/time.h"
+#include "wpi/units/time.hpp"
 
 using namespace wpi::math;
 
@@ -21,14 +21,14 @@ class DefaultMathShared : public MathShared {
   void ReportWarningV(fmt::string_view format, fmt::format_args args) override {
   }
   void ReportUsage(std::string_view resource, std::string_view data) override {}
-  units::second_t GetTimestamp() override {
-    return units::second_t{wpi::Now() * 1.0e-6};
+  wpi::units::second_t GetTimestamp() override {
+    return wpi::units::second_t{wpi::util::Now() * 1.0e-6};
   }
 };
 }  // namespace
 
 static std::unique_ptr<MathShared> mathShared;
-static wpi::mutex setLock;
+static wpi::util::mutex setLock;
 
 MathShared& MathSharedStore::GetMathShared() {
   std::scoped_lock lock(setLock);

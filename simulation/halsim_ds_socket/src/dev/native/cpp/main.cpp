@@ -4,8 +4,8 @@
 
 #include <thread>
 
-#include <hal/DriverStation.h>
-#include <hal/HALBase.h>
+#include <wpi/hal/DriverStation.hpp>
+#include <wpi/hal/HALBase.hpp>
 
 extern "C" int HALSIM_InitExtension(void);
 

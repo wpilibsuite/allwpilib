@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "hal/simulation/DIOData.h"
-#include "hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/DIOData.hpp"
+#include "wpi/hal/simulation/SimDataValue.hpp"
 
-namespace hal {
+namespace wpi::hal {
 class DIOData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(Value)
@@ -27,4 +27,4 @@ class DIOData {
   virtual void ResetData();
 };
 extern DIOData* SimDIOData;
-}  // namespace hal
+}  // namespace wpi::hal

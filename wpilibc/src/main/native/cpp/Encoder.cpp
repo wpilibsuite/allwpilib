@@ -2,21 +2,21 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/Encoder.h"
+#include "wpi/hardware/rotation/Encoder.hpp"
 
 #include <memory>
 #include <utility>
 
-#include <hal/Encoder.h>
-#include <hal/UsageReporting.h>
-#include <wpi/NullDeleter.h>
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include <wpi/hal/Encoder.hpp>
+#include <wpi/hal/UsageReporting.h>
+#include <wpi/util/NullDeleter.hpp>
+#include <wpi/util/sendable/SendableBuilder.hpp>
+#include <wpi/util/sendable/SendableRegistry.hpp>
 
-#include "frc/DigitalInput.h"
-#include "frc/Errors.h"
+#include "wpi/Errors.hpp"
+#include "wpi/hardware/discrete/DigitalInput.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 Encoder::Encoder(int aChannel, int bChannel, bool reverseDirection,
                  EncodingType encodingType) {
@@ -36,14 +36,14 @@ void Encoder::Reset() {
   FRC_CheckErrorStatus(status, "Reset");
 }
 
-units::second_t Encoder::GetPeriod() const {
+wpi::units::second_t Encoder::GetPeriod() const {
   int32_t status = 0;
   double value = HAL_GetEncoderPeriod(m_encoder, &status);
   FRC_CheckErrorStatus(status, "GetPeriod");
-  return units::second_t{value};
+  return wpi::units::second_t{value};
 }
 
-void Encoder::SetMaxPeriod(units::second_t maxPeriod) {
+void Encoder::SetMaxPeriod(wpi::units::second_t maxPeriod) {
   int32_t status = 0;
   HAL_SetEncoderMaxPeriod(m_encoder, maxPeriod.value(), &status);
   FRC_CheckErrorStatus(status, "SetMaxPeriod");
@@ -146,7 +146,7 @@ int Encoder::GetFPGAIndex() const {
   return val;
 }
 
-void Encoder::InitSendable(wpi::SendableBuilder& builder) {
+void Encoder::InitSendable(wpi::util::SendableBuilder& builder) {
   int32_t status = 0;
   HAL_EncoderEncodingType type = HAL_GetEncoderEncodingType(m_encoder, &status);
   FRC_CheckErrorStatus(status, "GetEncodingType");
@@ -185,7 +185,7 @@ void Encoder::InitEncoder(int aChannel, int bChannel, bool reverseDirection,
       break;
   }
   HAL_ReportUsage(fmt::format("IO[{},{}]", aChannel, bChannel), type);
-  // wpi::SendableRegistry::Add(this, "Encoder", m_aSource->GetChannel());
+  // wpi::util::SendableRegistry::Add(this, "Encoder", m_aSource->GetChannel());
 }
 
 double Encoder::DecodingScaleFactor() const {

@@ -56,7 +56,7 @@ wpilib_java_library(
     name = "xrpVendordep-java",
     srcs = glob(["src/main/java/**/*.java"]),
     maven_artifact_name = "xrpVendordep-java",
-    maven_group_id = "edu.wpi.first.xrpVendordep",
+    maven_group_id = "org.wpilib.xrpVendordep",
     visibility = ["//visibility:public"],
     deps = [
         "//hal:hal-java",
@@ -85,8 +85,8 @@ cc_binary(
 
 java_binary(
     name = "DevMain-Java",
-    srcs = ["src/dev/java/edu/wpi/first/wpilibj/xrp/DevMain.java"],
-    main_class = "edu.wpi.first.wpilibj.xrp.DevMain",
+    srcs = ["src/dev/java/org/wpilib/xrp/DevMain.java"],
+    main_class = "org.wpilib.xrp.DevMain",
     deps = [
         "//hal:hal-java",
         "//ntcore:ntcore-java",
@@ -97,5 +97,5 @@ java_binary(
 package_minimal_cc_project(
     name = "xrpVendordep",
     maven_artifact_name = "xrpVendordep-cpp",
-    maven_group_id = "edu.wpi.first.xrpVendordep",
+    maven_group_id = "org.wpilib.xrpVendordep",
 )

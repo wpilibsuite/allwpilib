@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <frc/TimedRobot.h>
-#include <frc2/command/Command.h>
+#include <wpi/command/Command.hpp>
+#include <wpi/opmode/TimedRobot.hpp>
 
 #include "RobotContainer.h"
 
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   Robot();
   void RobotPeriodic() override;
@@ -24,7 +24,7 @@ class Robot : public frc::TimedRobot {
  private:
   // Have it null by default so that if testing teleop it
   // doesn't have undefined behavior and potentially crash.
-  frc2::Command* m_autonomousCommand = nullptr;
+  wpi::cmd::Command* m_autonomousCommand = nullptr;
 
   RobotContainer m_container;
 };

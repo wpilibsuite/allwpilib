@@ -2,19 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/Notifier.h"
+#include "wpi/Notifier.hpp"
 
 #include <utility>
 
 #include <fmt/format.h>
-#include <hal/DriverStation.h>
-#include <hal/Notifier.h>
-#include <hal/Threads.h>
+#include <wpi/hal/DriverStation.hpp>
+#include <wpi/hal/Notifier.hpp>
+#include <wpi/hal/Threads.hpp>
 
-#include "frc/Errors.h"
-#include "frc/Timer.h"
+#include "wpi/Errors.hpp"
+#include "wpi/system/Timer.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 Notifier::Notifier(std::function<void()> callback) {
   if (!callback) {
@@ -97,7 +97,7 @@ Notifier::Notifier(int priority, std::function<void()> callback) {
       if (callback) {
         try {
           callback();
-        } catch (const frc::RuntimeError& e) {
+        } catch (const wpi::RuntimeError& e) {
           e.Report();
           FRC_ReportError(
               err::Error,
@@ -165,7 +165,7 @@ void Notifier::SetCallback(std::function<void()> callback) {
   m_callback = callback;
 }
 
-void Notifier::StartSingle(units::second_t delay) {
+void Notifier::StartSingle(wpi::units::second_t delay) {
   std::scoped_lock lock(m_processMutex);
   m_periodic = false;
   m_period = delay;
@@ -173,7 +173,7 @@ void Notifier::StartSingle(units::second_t delay) {
   UpdateAlarm();
 }
 
-void Notifier::StartPeriodic(units::second_t period) {
+void Notifier::StartPeriodic(wpi::units::second_t period) {
   std::scoped_lock lock(m_processMutex);
   m_periodic = true;
   m_period = period;

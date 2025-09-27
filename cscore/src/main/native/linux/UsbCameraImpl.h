@@ -15,24 +15,24 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/SmallVector.h>
-#include <wpi/condition_variable.h>
-#include <wpi/mutex.h>
-#include <wpi/raw_istream.h>
-#include <wpi/raw_ostream.h>
+#include <wpi/util/SmallVector.h>
+#include <wpi/util/condition_variable.hpp>
+#include <wpi/util/mutex.hpp>
+#include <wpi/util/raw_istream.hpp>
+#include <wpi/util/raw_ostream.h>
 
 #include "SourceImpl.h"
 #include "UsbCameraBuffer.h"
 #include "UsbCameraProperty.h"
 
-namespace cs {
+namespace wpi::cs {
 
 class Notifier;
 class Telemetry;
 
 class UsbCameraImpl : public SourceImpl {
  public:
-  UsbCameraImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
+  UsbCameraImpl(std::string_view name, wpi::util::Logger& logger, Notifier& notifier,
                 Telemetry& telemetry, std::string_view path);
   ~UsbCameraImpl() override;
 
@@ -124,13 +124,13 @@ class UsbCameraImpl : public SourceImpl {
   void DeviceCacheVideoModes();
 
   // Command helper functions
-  CS_StatusValue DeviceProcessCommand(std::unique_lock<wpi::mutex>& lock,
+  CS_StatusValue DeviceProcessCommand(std::unique_lock<wpi::util::mutex>& lock,
                                       const Message& msg);
-  CS_StatusValue DeviceCmdSetMode(std::unique_lock<wpi::mutex>& lock,
+  CS_StatusValue DeviceCmdSetMode(std::unique_lock<wpi::util::mutex>& lock,
                                   const Message& msg);
-  CS_StatusValue DeviceCmdSetProperty(std::unique_lock<wpi::mutex>& lock,
+  CS_StatusValue DeviceCmdSetProperty(std::unique_lock<wpi::util::mutex>& lock,
                                       const Message& msg);
-  CS_StatusValue DeviceCmdSetPath(std::unique_lock<wpi::mutex>& lock,
+  CS_StatusValue DeviceCmdSetPath(std::unique_lock<wpi::util::mutex>& lock,
                                   const Message& msg);
 
   // Property helper functions
@@ -171,12 +171,12 @@ class UsbCameraImpl : public SourceImpl {
   // Message queues
   mutable std::vector<Message> m_commands;
   mutable std::vector<std::pair<std::thread::id, CS_StatusValue>> m_responses;
-  mutable wpi::condition_variable m_responseCv;
+  mutable wpi::util::condition_variable m_responseCv;
 
   // Path
   std::string m_path;
 };
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_USBCAMERAIMPL_H_

@@ -10,9 +10,9 @@
 #include <utility>
 
 #include <fmt/format.h>
-#include <hal/simulation/NotifyListener.h>
-#include <wpi/json_fwd.h>
-#include <wpi/mutex.h>
+#include <wpi/hal/simulation/NotifyListener.hpp>
+#include <wpi/util/json_fwd.h>
+#include <wpi/util/mutex.hpp>
 
 #include "WSBaseProvider.h"
 
@@ -33,7 +33,7 @@ class HALSimWSHalProvider : public HALSimWSBaseProvider {
       std::shared_ptr<HALSimBaseWebSocketConnection> ws) override;
   void OnNetworkDisconnected() override;
 
-  void ProcessHalCallback(const wpi::json& payload);
+  void ProcessHalCallback(const wpi::util::json& payload);
 
  protected:
   virtual void RegisterCallbacks() = 0;

@@ -6,14 +6,14 @@
 {% macro capitalize_first(string) -%}
 {{ string[0]|capitalize + string[1:] }}
 {%- endmacro %}
-#include "frc/{{ ConsoleName }}Controller.h"
+#include "wpi/driverstation/{{ ConsoleName }}Controller.hpp"
 
-#include <hal/UsageReporting.h>
-#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/hal/UsageReporting.h>
+#include <wpi/util/sendable/SendableBuilder.hpp>
 
-#include "frc/event/BooleanEvent.h"
+#include "wpi/event/BooleanEvent.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 {{ ConsoleName }}Controller::{{ ConsoleName }}Controller(int port) : GenericHID(port) {
   HAL_ReportUsage("HID", port, "{{ ConsoleName }}Controller");
@@ -92,7 +92,7 @@ bool {{ ConsoleName }}Controller::GetTouchpadReleased() {
 }
 {%- endif %}
 
-void {{ ConsoleName }}Controller::InitSendable(wpi::SendableBuilder& builder) {
+void {{ ConsoleName }}Controller::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("HID");
   builder.PublishConstString("ControllerType", "{{ ConsoleName }}");
 {%- for trigger in triggers %}

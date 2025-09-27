@@ -2,22 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/uv/Udp.h"
+#include "wpi/net/uv/Udp.hpp"
 
 #include <cstring>
 #include <functional>
 #include <memory>
 #include <utility>
 
-#include <wpi/SmallString.h>
-#include <wpi/SmallVector.h>
+#include <wpi/util/SmallString.h>
+#include <wpi/util/SmallVector.h>
 
-#include "wpinet/uv/util.h"
+#include "wpi/net/uv/util.hpp"
 
 namespace {
 
-using namespace wpi;
-using namespace wpi::uv;
+using namespace wpi::net;
+using namespace wpi::net::uv;
 
 class CallbackUdpSendReq : public UdpSendReq {
  public:
@@ -29,12 +29,12 @@ class CallbackUdpSendReq : public UdpSendReq {
   }
 
  private:
-  SmallVector<Buffer, 4> m_bufs;
+  wpi::util::SmallVector<Buffer, 4> m_bufs;
 };
 
 }  // namespace
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 UdpSendReq::UdpSendReq() {
   error = [this](Error err) { GetUdp().error(err); };
@@ -117,8 +117,8 @@ sockaddr_storage Udp::GetSock() {
 void Udp::SetMembership(std::string_view multicastAddr,
                         std::string_view interfaceAddr,
                         uv_membership membership) {
-  SmallString<128> multicastAddrBuf{multicastAddr};
-  SmallString<128> interfaceAddrBuf{interfaceAddr};
+  wpi::util::SmallString<128> multicastAddrBuf{multicastAddr};
+  wpi::util::SmallString<128> interfaceAddrBuf{interfaceAddr};
   Invoke(&uv_udp_set_membership, GetRaw(), multicastAddrBuf.c_str(),
          interfaceAddrBuf.c_str(), membership);
 }
@@ -127,15 +127,15 @@ void Udp::SetSourceMembership(std::string_view multicastAddr,
                               std::string_view interfaceAddr,
                               std::string_view sourceAddr,
                               uv_membership membership) {
-  SmallString<128> multicastAddrBuf{multicastAddr};
-  SmallString<128> interfaceAddrBuf{interfaceAddr};
-  SmallString<128> sourceAddrBuf{sourceAddr};
+  wpi::util::SmallString<128> multicastAddrBuf{multicastAddr};
+  wpi::util::SmallString<128> interfaceAddrBuf{interfaceAddr};
+  wpi::util::SmallString<128> sourceAddrBuf{sourceAddr};
   Invoke(&uv_udp_set_source_membership, GetRaw(), multicastAddrBuf.c_str(),
          interfaceAddrBuf.c_str(), sourceAddrBuf.c_str(), membership);
 }
 
 void Udp::SetMulticastInterface(std::string_view interfaceAddr) {
-  SmallString<128> interfaceAddrBuf{interfaceAddr};
+  wpi::util::SmallString<128> interfaceAddrBuf{interfaceAddr};
   Invoke(&uv_udp_set_multicast_interface, GetRaw(), interfaceAddrBuf.c_str());
 }
 
@@ -214,4 +214,4 @@ void Udp::StartRecv() {
          });
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

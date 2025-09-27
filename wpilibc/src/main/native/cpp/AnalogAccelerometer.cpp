@@ -2,24 +2,24 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/AnalogAccelerometer.h"
+#include "wpi/hardware/accelerometer/AnalogAccelerometer.hpp"
 
-#include <hal/UsageReporting.h>
-#include <wpi/NullDeleter.h>
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include <wpi/hal/UsageReporting.h>
+#include <wpi/util/NullDeleter.hpp>
+#include <wpi/util/sendable/SendableBuilder.hpp>
+#include <wpi/util/sendable/SendableRegistry.hpp>
 
-#include "frc/Errors.h"
+#include "wpi/Errors.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 AnalogAccelerometer::AnalogAccelerometer(int channel)
     : AnalogAccelerometer(std::make_shared<AnalogInput>(channel)) {
-  wpi::SendableRegistry::AddChild(this, m_analogInput.get());
+  wpi::util::SendableRegistry::AddChild(this, m_analogInput.get());
 }
 
 AnalogAccelerometer::AnalogAccelerometer(AnalogInput* channel)
-    : m_analogInput(channel, wpi::NullDeleter<AnalogInput>()) {
+    : m_analogInput(channel, wpi::util::NullDeleter<AnalogInput>()) {
   if (!channel) {
     throw FRC_MakeError(err::NullParameter, "channel");
   }
@@ -46,7 +46,7 @@ void AnalogAccelerometer::SetZero(double zero) {
   m_zeroGVoltage = zero;
 }
 
-void AnalogAccelerometer::InitSendable(wpi::SendableBuilder& builder) {
+void AnalogAccelerometer::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Accelerometer");
   builder.AddDoubleProperty(
       "Value", [=, this] { return GetAcceleration(); }, nullptr);
@@ -55,6 +55,6 @@ void AnalogAccelerometer::InitSendable(wpi::SendableBuilder& builder) {
 void AnalogAccelerometer::InitAccelerometer() {
   HAL_ReportUsage("IO", m_analogInput->GetChannel(), "Accelerometer");
 
-  wpi::SendableRegistry::Add(this, "Accelerometer",
+  wpi::util::SendableRegistry::Add(this, "Accelerometer",
                              m_analogInput->GetChannel());
 }

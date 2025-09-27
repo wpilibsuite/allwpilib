@@ -4,8 +4,8 @@
 
 #include "WSProvider_Analog.h"
 
-#include <hal/Ports.h>
-#include <hal/simulation/AnalogInData.h>
+#include <wpi/hal/Ports.hpp>
+#include <wpi/hal/simulation/AnalogInData.hpp>
 
 #define REGISTER_AIN(halsim, jsonid, ctype, haltype)                       \
   HALSIM_RegisterAnalogIn##halsim##Callback(                               \
@@ -53,8 +53,8 @@ void HALSimWSProviderAnalogIn::DoCancelCallbacks() {
   m_voltageCbKey = 0;
 }
 
-void HALSimWSProviderAnalogIn::OnNetValueChanged(const wpi::json& json) {
-  wpi::json::const_iterator it;
+void HALSimWSProviderAnalogIn::OnNetValueChanged(const wpi::util::json& json) {
+  wpi::util::json::const_iterator it;
   if ((it = json.find(">voltage")) != json.end()) {
     HALSIM_SetAnalogInVoltage(m_channel, it.value());
   }

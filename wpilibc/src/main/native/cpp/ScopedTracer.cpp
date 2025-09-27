@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/ScopedTracer.h"
+#include "wpi/system/ScopedTracer.hpp"
 
-#include <wpi/raw_ostream.h>
+#include <wpi/util/raw_ostream.h>
 
-using namespace frc;
+using namespace wpi;
 
-ScopedTracer::ScopedTracer(std::string_view name, wpi::raw_ostream& os)
+ScopedTracer::ScopedTracer(std::string_view name, wpi::util::raw_ostream& os)
     : m_name(name), m_os(os) {
   m_tracer.ResetTimer();
 }

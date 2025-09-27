@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/SerialPort.h"
+#include "wpi/hardware/bus/SerialPort.hpp"
 
 #include <string>
 
-#include <hal/SerialPort.h>
-#include <hal/UsageReporting.h>
+#include <wpi/hal/SerialPort.hpp>
+#include <wpi/hal/UsageReporting.h>
 
-#include "frc/Errors.h"
+#include "wpi/Errors.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 SerialPort::SerialPort(int baudRate, Port port, int dataBits,
                        SerialPort::Parity parity,
@@ -117,7 +117,7 @@ int SerialPort::Write(std::string_view buffer) {
   return retVal;
 }
 
-void SerialPort::SetTimeout(units::second_t timeout) {
+void SerialPort::SetTimeout(wpi::units::second_t timeout) {
   int32_t status = 0;
   HAL_SetSerialTimeout(m_portHandle, timeout.value(), &status);
   FRC_CheckErrorStatus(status, "SetTimeout");

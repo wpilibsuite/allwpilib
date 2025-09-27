@@ -6,7 +6,7 @@
 
 Pneumatics::Pneumatics() {}
 
-frc2::CommandPtr Pneumatics::DisableCompressorCommand() {
+wpi::cmd::CommandPtr Pneumatics::DisableCompressorCommand() {
   return StartEnd(
       [&] {
         // Disable closed-loop mode on the compressor.
@@ -20,8 +20,8 @@ frc2::CommandPtr Pneumatics::DisableCompressorCommand() {
       });
 }
 
-units::pounds_per_square_inch_t Pneumatics::GetPressure() {
+wpi::units::pounds_per_square_inch_t Pneumatics::GetPressure() {
   // Get the pressure (in PSI) from an analog pressure sensor connected to
   // the RIO.
-  return units::pounds_per_square_inch_t{m_pressureTransducer.Get()};
+  return wpi::units::pounds_per_square_inch_t{m_pressureTransducer.Get()};
 }

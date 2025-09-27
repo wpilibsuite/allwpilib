@@ -7,9 +7,9 @@
 #include <functional>
 #include <string_view>
 
-#include <hal/Value.h>
+#include <wpi/hal/Value.hpp>
 
-namespace frc::sim {
+namespace wpi::sim {
 
 template <typename ValueType>
 class BaseCallbackHelper {
@@ -61,4 +61,4 @@ class DoubleCallback : public BaseCallbackHelper<double> {
   void HandleCallback(std::string_view name, const HAL_Value* value) override;
 };
 
-}  // namespace frc::sim
+}  // namespace wpi::sim

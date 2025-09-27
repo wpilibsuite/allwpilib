@@ -2,23 +2,23 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/AnalogInput.h"
+#include "wpi/hardware/discrete/AnalogInput.hpp"
 
 #include <string>
 
-#include <hal/AnalogInput.h>
-#include <hal/HALBase.h>
-#include <hal/Ports.h>
-#include <hal/UsageReporting.h>
-#include <wpi/StackTrace.h>
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include <wpi/hal/AnalogInput.hpp>
+#include <wpi/hal/HALBase.hpp>
+#include <wpi/hal/Ports.hpp>
+#include <wpi/hal/UsageReporting.h>
+#include <wpi/util/StackTrace.hpp>
+#include <wpi/util/sendable/SendableBuilder.hpp>
+#include <wpi/util/sendable/SendableRegistry.hpp>
 
-#include "frc/Errors.h"
-#include "frc/SensorUtil.h"
-#include "frc/Timer.h"
+#include "wpi/Errors.hpp"
+#include "wpi/SensorUtil.hpp"
+#include "wpi/system/Timer.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 AnalogInput::AnalogInput(int channel) {
   if (!SensorUtil::CheckAnalogInputChannel(channel)) {
@@ -27,13 +27,13 @@ AnalogInput::AnalogInput(int channel) {
 
   m_channel = channel;
   int32_t status = 0;
-  std::string stackTrace = wpi::GetStackTrace(1);
+  std::string stackTrace = wpi::util::GetStackTrace(1);
   m_port = HAL_InitializeAnalogInputPort(channel, stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", channel);
 
   HAL_ReportUsage("IO", channel, "AnalogInput");
 
-  wpi::SendableRegistry::Add(this, "AnalogInput", channel);
+  wpi::util::SendableRegistry::Add(this, "AnalogInput", channel);
 }
 
 int AnalogInput::GetValue() const {
@@ -125,7 +125,7 @@ void AnalogInput::SetSimDevice(HAL_SimDeviceHandle device) {
   HAL_SetAnalogInputSimDevice(m_port, device);
 }
 
-void AnalogInput::InitSendable(wpi::SendableBuilder& builder) {
+void AnalogInput::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Analog Input");
   builder.AddDoubleProperty(
       "Value", [=, this] { return GetAverageVoltage(); }, nullptr);
