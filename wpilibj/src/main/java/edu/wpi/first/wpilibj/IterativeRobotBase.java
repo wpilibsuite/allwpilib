@@ -4,8 +4,10 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.hal.ControlWord;
 import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.RobotMode;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -52,16 +54,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * </ul>
  */
 public abstract class IterativeRobotBase extends RobotBase {
-  private enum Mode {
-    kNone,
-    kDisabled,
-    kAutonomous,
-    kTeleop,
-    kTest
-  }
-
-  private final DSControlWord m_word = new DSControlWord();
-  private Mode m_lastMode = Mode.kNone;
+  private final ControlWord m_word = new ControlWord();
+  private RobotMode m_lastMode;
   private final double m_period;
   private final Watchdog m_watchdog;
   private boolean m_ntFlushEnabled = true;
@@ -253,21 +247,12 @@ public abstract class IterativeRobotBase extends RobotBase {
   /** Loop function. */
   protected void loopFunc() {
     DriverStation.refreshData();
+    DriverStation.refreshControlWordFromCache(m_word);
     m_watchdog.reset();
 
-    m_word.refresh();
-
-    // Get current mode
-    Mode mode = Mode.kNone;
-    if (m_word.isDisabled()) {
-      mode = Mode.kDisabled;
-    } else if (m_word.isAutonomous()) {
-      mode = Mode.kAutonomous;
-    } else if (m_word.isTeleop()) {
-      mode = Mode.kTeleop;
-    } else if (m_word.isTest()) {
-      mode = Mode.kTest;
-    }
+    // Get current mode; treat disabled as unknown
+    boolean enabled = m_word.isEnabled();
+    RobotMode mode = enabled ? m_word.getRobotMode() : RobotMode.UNKNOWN;
 
     if (!m_calledDsConnected && m_word.isDSAttached()) {
       m_calledDsConnected = true;
@@ -276,32 +261,34 @@ public abstract class IterativeRobotBase extends RobotBase {
 
     // If mode changed, call mode exit and entry functions
     if (m_lastMode != mode) {
-      // Call last mode's exit function
-      switch (m_lastMode) {
-        case kDisabled -> disabledExit();
-        case kAutonomous -> autonomousExit();
-        case kTeleop -> teleopExit();
-        case kTest -> testExit();
-        default -> {
-          // NOP
+      if (m_lastMode != null) {
+        // Call last mode's exit function
+        switch (m_lastMode) {
+          case UNKNOWN -> disabledExit();
+          case AUTONOMOUS -> autonomousExit();
+          case TELEOPERATED -> teleopExit();
+          case TEST -> testExit();
+          default -> {
+            // NOP
+          }
         }
       }
 
       // Call current mode's entry function
       switch (mode) {
-        case kDisabled -> {
+        case UNKNOWN -> {
           disabledInit();
           m_watchdog.addEpoch("disabledInit()");
         }
-        case kAutonomous -> {
+        case AUTONOMOUS -> {
           autonomousInit();
           m_watchdog.addEpoch("autonomousInit()");
         }
-        case kTeleop -> {
+        case TELEOPERATED -> {
           teleopInit();
           m_watchdog.addEpoch("teleopInit()");
         }
-        case kTest -> {
+        case TEST -> {
           testInit();
           m_watchdog.addEpoch("testInit()");
         }
@@ -314,24 +301,21 @@ public abstract class IterativeRobotBase extends RobotBase {
     }
 
     // Call the appropriate function depending upon the current robot mode
+    DriverStationJNI.observeUserProgram(m_word.getNative());
     switch (mode) {
-      case kDisabled -> {
-        DriverStationJNI.observeUserProgramDisabled();
+      case UNKNOWN -> {
         disabledPeriodic();
         m_watchdog.addEpoch("disabledPeriodic()");
       }
-      case kAutonomous -> {
-        DriverStationJNI.observeUserProgramAutonomous();
+      case AUTONOMOUS -> {
         autonomousPeriodic();
         m_watchdog.addEpoch("autonomousPeriodic()");
       }
-      case kTeleop -> {
-        DriverStationJNI.observeUserProgramTeleop();
+      case TELEOPERATED -> {
         teleopPeriodic();
         m_watchdog.addEpoch("teleopPeriodic()");
       }
-      case kTest -> {
-        DriverStationJNI.observeUserProgramTest();
+      case TEST -> {
         testPeriodic();
         m_watchdog.addEpoch("testPeriodic()");
       }

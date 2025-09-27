@@ -6,6 +6,12 @@
 
 #include <stdint.h>
 
+#include <wpi/string.h>
+
+#ifdef __cplusplus
+#include <wpi/struct/Struct.h>
+#endif  // __cplusplus
+
 #include "hal/Types.h"
 
 /**
@@ -14,14 +20,16 @@
  * @{
  */
 
+#define HAL_CONTROLWORD_OPMODE_HASH_MASK 0x00FFFFFFFFFFFFFFLL
+#define HAL_CONTROLWORD_ROBOT_MODE_MASK 0x0300000000000000LL
+#define HAL_CONTROLWORD_ROBOT_MODE_SHIFT 56
+#define HAL_CONTROLWORD_ENABLED_MASK 0x0400000000000000LL
+#define HAL_CONTROLWORD_ESTOP_MASK 0x0800000000000000LL
+#define HAL_CONTROLWORD_FMS_ATTACHED_MASK 0x1000000000000000LL
+#define HAL_CONTROLWORD_DS_ATTACHED_MASK 0x2000000000000000LL
+
 struct HAL_ControlWord {
-  uint32_t enabled : 1;
-  uint32_t autonomous : 1;
-  uint32_t test : 1;
-  uint32_t eStop : 1;
-  uint32_t fmsAttached : 1;
-  uint32_t dsAttached : 1;
-  uint32_t control_reserved : 26;
+  int64_t value;
 };
 typedef struct HAL_ControlWord HAL_ControlWord;
 
@@ -47,6 +55,13 @@ HAL_ENUM(HAL_MatchType) {
   HAL_kMatchType_practice,
   HAL_kMatchType_qualification,
   HAL_kMatchType_elimination,
+};
+
+HAL_ENUM(HAL_RobotMode) {
+  HAL_ROBOTMODE_UNKNOWN = 0,
+  HAL_ROBOTMODE_AUTONOMOUS,
+  HAL_ROBOTMODE_TELEOPERATED,
+  HAL_ROBOTMODE_TEST,
 };
 
 /**
@@ -126,4 +141,126 @@ struct HAL_MatchInfo {
   uint16_t gameSpecificMessageSize;
 };
 typedef struct HAL_MatchInfo HAL_MatchInfo;
+
+#define HAL_OPMODE_HASH_MASK HAL_CONTROLWORD_OPMODE_HASH_MASK
+#define HAL_OPMODE_ROBOT_MODE_MASK HAL_CONTROLWORD_ROBOT_MODE_MASK
+#define HAL_OPMODE_ROBOT_MODE_SHIFT HAL_CONTROLWORD_ROBOT_MODE_SHIFT
+
+struct HAL_OpModeOption {
+  int64_t id;  // encodes robot mode in bits 57-56, LSB 56 bits is hash of name
+  struct WPI_String name;
+  struct WPI_String group;
+  struct WPI_String description;
+  int32_t textColor;        // 0x00RRGGBB or -1 for default
+  int32_t backgroundColor;  // 0x00RRGGBB or -1 for default
+};
+typedef struct HAL_OpModeOption HAL_OpModeOption;
+
+#ifdef __cplusplus
+extern "C" {
+#endif  // __cplusplus
+
+inline HAL_ControlWord HAL_MakeControlWord(int64_t opModeHash,
+                                           HAL_RobotMode robotMode,
+                                           HAL_Bool enabled, HAL_Bool eStop,
+                                           HAL_Bool fmsAttached,
+                                           HAL_Bool dsAttached) {
+  HAL_ControlWord word;
+  word.value =
+      (opModeHash & HAL_CONTROLWORD_OPMODE_HASH_MASK) |
+      (((uint64_t)(robotMode) << HAL_CONTROLWORD_ROBOT_MODE_SHIFT) &  // NOLINT
+       HAL_CONTROLWORD_ROBOT_MODE_MASK) |
+      (enabled ? HAL_CONTROLWORD_ENABLED_MASK : 0) |
+      (eStop ? HAL_CONTROLWORD_ESTOP_MASK : 0) |
+      (fmsAttached ? HAL_CONTROLWORD_FMS_ATTACHED_MASK : 0) |
+      (dsAttached ? HAL_CONTROLWORD_DS_ATTACHED_MASK : 0);
+  return word;
+}
+
+inline int64_t HAL_ControlWord_GetOpModeHash(HAL_ControlWord word) {
+  return word.value & HAL_CONTROLWORD_OPMODE_HASH_MASK;
+}
+
+inline int64_t HAL_ControlWord_GetOpModeId(HAL_ControlWord word) {
+  // if the hash portion is zero, return 0
+  if ((word.value & HAL_CONTROLWORD_OPMODE_HASH_MASK) == 0) {
+    return 0;
+  }
+  // otherwise return the full ID (which includes the robot mode)
+  return word.value &
+         (HAL_CONTROLWORD_OPMODE_HASH_MASK | HAL_CONTROLWORD_ROBOT_MODE_MASK);
+}
+
+inline HAL_RobotMode HAL_ControlWord_GetRobotMode(HAL_ControlWord word) {
+  // NOLINTBEGIN
+  return (HAL_RobotMode)((word.value & HAL_CONTROLWORD_ROBOT_MODE_MASK) >>
+                         HAL_CONTROLWORD_ROBOT_MODE_SHIFT);
+  // NOLINTEND
+}
+
+inline HAL_Bool HAL_ControlWord_IsEnabled(HAL_ControlWord word) {
+  return (word.value & HAL_CONTROLWORD_ENABLED_MASK) != 0;
+}
+
+inline HAL_Bool HAL_ControlWord_IsEStopped(HAL_ControlWord word) {
+  return (word.value & HAL_CONTROLWORD_ESTOP_MASK) != 0;
+}
+
+inline HAL_Bool HAL_ControlWord_IsFMSAttached(HAL_ControlWord word) {
+  return (word.value & HAL_CONTROLWORD_FMS_ATTACHED_MASK) != 0;
+}
+
+inline HAL_Bool HAL_ControlWord_IsDSAttached(HAL_ControlWord word) {
+  return (word.value & HAL_CONTROLWORD_DS_ATTACHED_MASK) != 0;
+}
+
+// NOLINTBEGIN
+// for use at compile time
+#define HAL_MAKE_OPMODEID(mode, hash)                  \
+  ((((int64_t)(mode) << HAL_OPMODE_ROBOT_MODE_SHIFT) & \
+    HAL_OPMODE_ROBOT_MODE_MASK) |                      \
+   ((hash) & HAL_OPMODE_HASH_MASK))
+// NOLINTEND
+
+inline int64_t HAL_MakeOpModeId(HAL_RobotMode mode, int64_t hash) {
+  return (((int64_t)(mode) << HAL_OPMODE_ROBOT_MODE_SHIFT) &  // NOLINT
+          HAL_OPMODE_ROBOT_MODE_MASK) |
+         (hash & HAL_OPMODE_HASH_MASK);
+}
+
+inline HAL_RobotMode HAL_OpMode_GetRobotMode(int64_t id) {
+  return (HAL_RobotMode)((id & HAL_OPMODE_ROBOT_MODE_MASK) >>  // NOLINT
+                         HAL_OPMODE_ROBOT_MODE_SHIFT);
+}
+
+inline int64_t HAL_OpMode_GetHash(int64_t id) {
+  return id & HAL_OPMODE_HASH_MASK;
+}
+#ifdef __cplusplus
+}  // extern "C"
+#endif  // __cplusplus
+
 /** @} */
+
+#ifdef __cplusplus
+template <>
+struct wpi::Struct<HAL_ControlWord> {
+  static constexpr std::string_view GetTypeName() { return "ControlWord"; }
+  static constexpr size_t GetSize() { return 8; }
+  static constexpr std::string_view GetSchema() {
+    return "uint64 opModeHash:56;"
+           "enum{unknown=0,autonomous=1,teleoperated=2,test=3}"
+           "uint64 robotMode:2;"
+           "bool enabled:1;bool eStop:1;bool fmsAttached:1;bool dsAttached:1;";
+  }
+
+  static inline HAL_ControlWord Unpack(std::span<const uint8_t> data) {
+    return {.value = wpi::UnpackStruct<int64_t>(data)};
+  }
+  static inline void Pack(std::span<uint8_t> data, HAL_ControlWord value) {
+    wpi::PackStruct(data, value.value);
+  }
+};
+
+static_assert(wpi::StructSerializable<HAL_ControlWord>);
+#endif  // __cplusplus
