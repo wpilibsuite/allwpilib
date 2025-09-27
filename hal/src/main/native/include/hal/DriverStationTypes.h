@@ -182,9 +182,11 @@ inline int64_t HAL_ControlWord_GetOpModeHash(HAL_ControlWord word) {
 }
 
 inline int64_t HAL_ControlWord_GetOpModeId(HAL_ControlWord word) {
+  // if the hash portion is zero, return 0
   if ((word.value & HAL_CONTROLWORD_OPMODE_HASH_MASK) == 0) {
     return 0;
   }
+  // otherwise return the full ID (which includes the robot mode)
   return word.value &
          (HAL_CONTROLWORD_OPMODE_HASH_MASK | HAL_CONTROLWORD_ROBOT_MODE_MASK);
 }

@@ -101,9 +101,11 @@ public class ControlWord {
    * @return the opmode ID
    */
   public long getOpModeId() {
+    // if the hash portion is zero, return 0
     if ((m_word & 0x00FFFFFFFFFFFFFFL) == 0) {
       return 0;
     }
+    // otherwise return the full ID (which includes the robot mode)
     return m_word & 0x03FFFFFFFFFFFFFFL;
   }
 
