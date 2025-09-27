@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.templates.commandbasedskeleton;
+package org.wpilib.templates.commandbasedskeleton;
 
-import edu.wpi.first.wpilibj.RobotBase;
+import org.wpilib.opmode.RobotBase;
 
 public final class Main {
   private Main() {}

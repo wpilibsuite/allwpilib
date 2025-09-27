@@ -9,7 +9,7 @@
 #include <wpi/jni_util.h>
 
 #include "HALUtil.h"
-#include "edu_wpi_first_hal_PWMJNI.h"
+#include "org_wpilib_hardware_hal_PWMJNI.h"
 #include "hal/DIO.h"
 #include "hal/PWM.h"
 #include "hal/Ports.h"
@@ -20,12 +20,12 @@ using namespace hal;
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_hal_PWMJNI
+ * Class:     org_wpilib_hardware_hal_PWMJNI
  * Method:    initializePWMPort
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PWMJNI_initializePWMPort
+Java_org_wpilib_hardware_hal_PWMJNI_initializePWMPort
   (JNIEnv* env, jclass, jint channel)
 {
   int32_t status = 0;
@@ -36,24 +36,24 @@ Java_edu_wpi_first_hal_PWMJNI_initializePWMPort
 }
 
 /*
- * Class:     edu_wpi_first_hal_PWMJNI
+ * Class:     org_wpilib_hardware_hal_PWMJNI
  * Method:    checkPWMChannel
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_PWMJNI_checkPWMChannel
+Java_org_wpilib_hardware_hal_PWMJNI_checkPWMChannel
   (JNIEnv* env, jclass, jint channel)
 {
   return HAL_CheckPWMChannel(channel);
 }
 
 /*
- * Class:     edu_wpi_first_hal_PWMJNI
+ * Class:     org_wpilib_hardware_hal_PWMJNI
  * Method:    freePWMPort
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_PWMJNI_freePWMPort
+Java_org_wpilib_hardware_hal_PWMJNI_freePWMPort
   (JNIEnv* env, jclass, jint id)
 {
   if (id != HAL_kInvalidHandle) {
@@ -62,24 +62,24 @@ Java_edu_wpi_first_hal_PWMJNI_freePWMPort
 }
 
 /*
- * Class:     edu_wpi_first_hal_PWMJNI
+ * Class:     org_wpilib_hardware_hal_PWMJNI
  * Method:    setPWMSimDevice
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_PWMJNI_setPWMSimDevice
+Java_org_wpilib_hardware_hal_PWMJNI_setPWMSimDevice
   (JNIEnv* env, jclass, jint handle, jint device)
 {
   HAL_SetPWMSimDevice((HAL_DigitalHandle)handle, (HAL_SimDeviceHandle)device);
 }
 
 /*
- * Class:     edu_wpi_first_hal_PWMJNI
+ * Class:     org_wpilib_hardware_hal_PWMJNI
  * Method:    setPulseTimeMicroseconds
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_PWMJNI_setPulseTimeMicroseconds
+Java_org_wpilib_hardware_hal_PWMJNI_setPulseTimeMicroseconds
   (JNIEnv* env, jclass, jint id, jint value)
 {
   int32_t status = 0;
@@ -88,12 +88,12 @@ Java_edu_wpi_first_hal_PWMJNI_setPulseTimeMicroseconds
 }
 
 /*
- * Class:     edu_wpi_first_hal_PWMJNI
+ * Class:     org_wpilib_hardware_hal_PWMJNI
  * Method:    getPulseTimeMicroseconds
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PWMJNI_getPulseTimeMicroseconds
+Java_org_wpilib_hardware_hal_PWMJNI_getPulseTimeMicroseconds
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
@@ -104,12 +104,12 @@ Java_edu_wpi_first_hal_PWMJNI_getPulseTimeMicroseconds
 }
 
 /*
- * Class:     edu_wpi_first_hal_PWMJNI
+ * Class:     org_wpilib_hardware_hal_PWMJNI
  * Method:    setPWMOutputPeriod
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_PWMJNI_setPWMOutputPeriod
+Java_org_wpilib_hardware_hal_PWMJNI_setPWMOutputPeriod
   (JNIEnv* env, jclass, jint id, jint value)
 {
   int32_t status = 0;

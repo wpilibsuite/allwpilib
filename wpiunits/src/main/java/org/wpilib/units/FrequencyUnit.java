@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.units;
+package org.wpilib.units;
 
-import static edu.wpi.first.units.Units.Value;
+import static org.wpilib.units.Units.Value;
 
-import edu.wpi.first.units.measure.Frequency;
+import org.wpilib.units.measure.Frequency;
 
-/** A unit of frequency like {@link edu.wpi.first.units.Units#Hertz}. */
+/** A unit of frequency like {@link org.wpilib.units.Units#Hertz}. */
 public final class FrequencyUnit extends PerUnit<DimensionlessUnit, TimeUnit> {
   private static final CombinatoryUnitCache<DimensionlessUnit, TimeUnit, FrequencyUnit> cache =
       new CombinatoryUnitCache<>(FrequencyUnit::new);

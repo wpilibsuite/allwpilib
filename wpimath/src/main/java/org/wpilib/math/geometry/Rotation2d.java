@@ -2,26 +2,26 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.geometry;
+package org.wpilib.math.geometry;
 
-import static edu.wpi.first.units.Units.Radians;
+import static org.wpilib.units.Units.Radians;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import edu.wpi.first.math.MatBuilder;
-import edu.wpi.first.math.MathSharedStore;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.geometry.proto.Rotation2dProto;
-import edu.wpi.first.math.geometry.struct.Rotation2dStruct;
-import edu.wpi.first.math.interpolation.Interpolatable;
-import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.util.protobuf.ProtobufSerializable;
-import edu.wpi.first.util.struct.StructSerializable;
+import org.wpilib.math.linalg.MatBuilder;
+import org.wpilib.math.util.MathSharedStore;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.util.Nat;
+import org.wpilib.math.geometry.proto.Rotation2dProto;
+import org.wpilib.math.geometry.struct.Rotation2dStruct;
+import org.wpilib.math.interpolation.Interpolatable;
+import org.wpilib.math.numbers.N2;
+import org.wpilib.math.util.Units;
+import org.wpilib.units.measure.Angle;
+import org.wpilib.util.protobuf.ProtobufSerializable;
+import org.wpilib.util.struct.StructSerializable;
 import java.util.Objects;
 
 /**

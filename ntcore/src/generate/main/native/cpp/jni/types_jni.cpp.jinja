@@ -8,7 +8,7 @@
 
 #include <wpi/jni_util.h>
 
-#include "edu_wpi_first_networktables_NetworkTablesJNI.h"
+#include "org_wpilib_networktables_NetworkTablesJNI.h"
 #include "ntcore.h"
 
 using namespace wpi::java;
@@ -30,7 +30,7 @@ static JException nullPointerEx;
 
 static const JClassInit classes[] = {
 {%- for t in types %}
-    {"edu/wpi/first/networktables/Timestamped{{ t.TypeName }}", &timestamped{{ t.TypeName }}Cls},
+    {"org/wpilib/networktables/Timestamped{{ t.TypeName }}", &timestamped{{ t.TypeName }}Cls},
 {%- endfor %}
 {%- for t in types %}
 {%- if t.jni.ToJavaArray == "MakeJObjectArray" %}
@@ -160,48 +160,48 @@ static jobjectArray MakeJObjectArray(JNIEnv* env, std::span<const {{ t.cpp.Value
 extern "C" {
 {% for t in types %}
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getAtomic{{ t.TypeName }}
- * Signature: (I{{ t.jni.jtypestr }})Ledu/wpi/first/networktables/Timestamped{{ t.TypeName }};
+ * Signature: (I{{ t.jni.jtypestr }})Lorg/wpilib/networktables/Timestamped{{ t.TypeName }};
  */
 JNIEXPORT jobject JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getAtomic{{ t.TypeName }}
+Java_org_wpilib_networktables_NetworkTablesJNI_getAtomic{{ t.TypeName }}
   (JNIEnv* env, jclass, jint subentry, {{ t.jni.jtype }} defaultValue)
 {
   return MakeJObject(env, nt::GetAtomic{{ t.TypeName }}(subentry, {{ t.jni.FromJavaBegin }}defaultValue{{ t.jni.FromJavaEnd }}));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    readQueue{{ t.TypeName }}
- * Signature: (I)[Ledu/wpi/first/networktables/Timestamped{{ t.TypeName }};
+ * Signature: (I)[Lorg/wpilib/networktables/Timestamped{{ t.TypeName }};
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readQueue{{ t.TypeName }}
+Java_org_wpilib_networktables_NetworkTablesJNI_readQueue{{ t.TypeName }}
   (JNIEnv* env, jclass, jint subentry)
 {
   return MakeJObject(env, nt::ReadQueue{{ t.TypeName }}(subentry));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    readQueueValues{{ t.TypeName }}
  * Signature: (I)[{{ t.jni.jtypestr }}
  */
 JNIEXPORT {% if t.jni.JavaObject %}jobject{% else %}{{ t.jni.jtype }}{% endif %}Array JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readQueueValues{{ t.TypeName }}
+Java_org_wpilib_networktables_NetworkTablesJNI_readQueueValues{{ t.TypeName }}
   (JNIEnv* env, jclass, jint subentry)
 {
   return {{ t.jni.ToJavaArray }}(env, nt::ReadQueueValues{{ t.TypeName }}(subentry));
 }
 {% if t.TypeName == "Raw" %}
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setRaw
  * Signature: (IJ[BII)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setRaw
+Java_org_wpilib_networktables_NetworkTablesJNI_setRaw
   (JNIEnv* env, jclass, jint entry, jlong time, jbyteArray value, jint start, jint len)
 {
   if (!value) {
@@ -225,12 +225,12 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setRaw
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setRawBuffer
  * Signature: (IJLjava/nio/ByteBuffer;II)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setRawBuffer
+Java_org_wpilib_networktables_NetworkTablesJNI_setRawBuffer
   (JNIEnv* env, jclass, jint entry, jlong time, jobject value, jint start, jint len)
 {
   if (!value) {
@@ -254,12 +254,12 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setRawBuffer
 }
 {% else %}
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    set{{ t.TypeName }}
  * Signature: (IJ{{ t.jni.jtypestr }})Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_set{{ t.TypeName }}
+Java_org_wpilib_networktables_NetworkTablesJNI_set{{ t.TypeName }}
   (JNIEnv*{% if t.jni.JavaObject %} env{% endif %}, jclass, jint entry, jlong time, {{ t.jni.jtype }} value)
 {
 {%- if t.jni.JavaObject %}
@@ -272,12 +272,12 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_set{{ t.TypeName }}
 }
 {% endif %}
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    get{{ t.TypeName }}
  * Signature: (I{{ t.jni.jtypestr }}){{ t.jni.jtypestr }}
  */
 JNIEXPORT {{ t.jni.jtype }} JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_get{{ t.TypeName }}
+Java_org_wpilib_networktables_NetworkTablesJNI_get{{ t.TypeName }}
   (JNIEnv*{% if t.jni.JavaObject %} env{% endif %}, jclass, jint entry, {{ t.jni.jtype }} defaultValue)
 {
 {%- if t.jni.JavaObject %}
@@ -292,12 +292,12 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_get{{ t.TypeName }}
 }
 {% if t.TypeName == "Raw" %}
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setDefaultRaw
  * Signature: (IJ[BII)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultRaw
+Java_org_wpilib_networktables_NetworkTablesJNI_setDefaultRaw
   (JNIEnv* env, jclass, jint entry, jlong, jbyteArray defaultValue, jint start, jint len)
 {
   if (!defaultValue) {
@@ -321,12 +321,12 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultRaw
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setDefaultRawBuffer
  * Signature: (IJLjava/nio/ByteBuffer;II)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultRawBuffer
+Java_org_wpilib_networktables_NetworkTablesJNI_setDefaultRawBuffer
   (JNIEnv* env, jclass, jint entry, jlong, jobject defaultValue, jint start, jint len)
 {
   if (!defaultValue) {
@@ -350,12 +350,12 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefaultRawBuffer
 }
 {% else %}
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setDefault{{ t.TypeName }}
  * Signature: (IJ{{ t.jni.jtypestr }})Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setDefault{{ t.TypeName }}
+Java_org_wpilib_networktables_NetworkTablesJNI_setDefault{{ t.TypeName }}
   (JNIEnv*{% if t.jni.JavaObject %} env{% endif %}, jclass, jint entry, jlong, {{ t.jni.jtype }} defaultValue)
 {
 {%- if t.jni.JavaObject %}

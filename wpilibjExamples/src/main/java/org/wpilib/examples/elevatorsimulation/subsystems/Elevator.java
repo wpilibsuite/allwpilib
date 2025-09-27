@@ -2,25 +2,25 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.elevatorsimulation.subsystems;
+package org.wpilib.examples.elevatorsimulation.subsystems;
 
-import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.examples.elevatorsimulation.Constants;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj.simulation.BatterySim;
-import edu.wpi.first.wpilibj.simulation.ElevatorSim;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
-import edu.wpi.first.wpilibj.simulation.PWMMotorControllerSim;
-import edu.wpi.first.wpilibj.simulation.RoboRioSim;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.wpilib.math.controller.ElevatorFeedforward;
+import org.wpilib.math.controller.ProfiledPIDController;
+import org.wpilib.math.system.plant.DCMotor;
+import org.wpilib.math.trajectory.TrapezoidProfile;
+import org.wpilib.hardware.rotation.Encoder;
+import org.wpilib.system.RobotController;
+import org.wpilib.examples.elevatorsimulation.Constants;
+import org.wpilib.hardware.motor.PWMSparkMax;
+import org.wpilib.simulation.BatterySim;
+import org.wpilib.simulation.ElevatorSim;
+import org.wpilib.simulation.EncoderSim;
+import org.wpilib.simulation.PWMMotorControllerSim;
+import org.wpilib.simulation.RoboRioSim;
+import org.wpilib.smartdashboard.Mechanism2d;
+import org.wpilib.smartdashboard.MechanismLigament2d;
+import org.wpilib.smartdashboard.MechanismRoot2d;
+import org.wpilib.smartdashboard.SmartDashboard;
 
 public class Elevator implements AutoCloseable {
   // This gearbox represents a gearbox containing 4 Vex 775pro motors.

@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.simulation;
+package org.wpilib.simulation;
 
-import edu.wpi.first.hal.simulation.AnalogInDataJNI;
-import edu.wpi.first.hal.simulation.NotifyCallback;
-import edu.wpi.first.wpilibj.AnalogInput;
+import org.wpilib.hardware.hal.simulation.AnalogInDataJNI;
+import org.wpilib.hardware.hal.simulation.NotifyCallback;
+import org.wpilib.hardware.discrete.AnalogInput;
 
 /** Class to control a simulated analog input. */
 public class AnalogInputSim {

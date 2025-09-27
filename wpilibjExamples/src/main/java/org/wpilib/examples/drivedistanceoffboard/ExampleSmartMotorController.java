@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.drivedistanceoffboard;
+package org.wpilib.examples.drivedistanceoffboard;
 
 /**
  * A simplified stub class that simulates the API of a common "smart" motor controller.

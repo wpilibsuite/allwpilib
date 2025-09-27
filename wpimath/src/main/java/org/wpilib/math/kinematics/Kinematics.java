@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.kinematics;
+package org.wpilib.math.kinematics;
 
-import edu.wpi.first.math.geometry.Twist2d;
-import edu.wpi.first.math.interpolation.Interpolator;
+import org.wpilib.math.geometry.Twist2d;
+import org.wpilib.math.interpolation.Interpolator;
 
 /**
  * Helper class that converts a chassis velocity (dx and dtheta components) into wheel speeds. Robot

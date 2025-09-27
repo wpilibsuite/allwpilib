@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.trajectory;
+package org.wpilib.math.trajectory;
 
-import edu.wpi.first.math.MathSharedStore;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.spline.PoseWithCurvature;
-import edu.wpi.first.math.spline.Spline;
-import edu.wpi.first.math.spline.SplineHelper;
-import edu.wpi.first.math.spline.SplineParameterizer;
-import edu.wpi.first.math.spline.SplineParameterizer.MalformedSplineException;
+import org.wpilib.math.util.MathSharedStore;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Transform2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.spline.PoseWithCurvature;
+import org.wpilib.math.spline.Spline;
+import org.wpilib.math.spline.SplineHelper;
+import org.wpilib.math.spline.SplineParameterizer;
+import org.wpilib.math.spline.SplineParameterizer.MalformedSplineException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

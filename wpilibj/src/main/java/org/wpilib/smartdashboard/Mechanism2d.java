@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.smartdashboard;
+package org.wpilib.smartdashboard;
 
-import edu.wpi.first.networktables.DoubleArrayPublisher;
-import edu.wpi.first.networktables.NTSendable;
-import edu.wpi.first.networktables.NTSendableBuilder;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.StringPublisher;
-import edu.wpi.first.wpilibj.util.Color8Bit;
+import org.wpilib.networktables.DoubleArrayPublisher;
+import org.wpilib.networktables.NTSendable;
+import org.wpilib.networktables.NTSendableBuilder;
+import org.wpilib.networktables.NetworkTable;
+import org.wpilib.networktables.StringPublisher;
+import org.wpilib.util.Color8Bit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;

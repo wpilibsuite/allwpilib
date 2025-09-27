@@ -7,30 +7,30 @@
 #include <wpi/jni_util.h>
 
 #include "HALUtil.h"
-#include "edu_wpi_first_hal_PowerDistributionJNI.h"
+#include "org_wpilib_hardware_hal_PowerDistributionJNI.h"
 #include "hal/Ports.h"
 #include "hal/PowerDistribution.h"
 
 using namespace hal;
 
-static_assert(edu_wpi_first_hal_PowerDistributionJNI_AUTOMATIC_TYPE ==
+static_assert(org_wpilib_hardware_hal_PowerDistributionJNI_AUTOMATIC_TYPE ==
               HAL_PowerDistributionType::HAL_PowerDistributionType_kAutomatic);
-static_assert(edu_wpi_first_hal_PowerDistributionJNI_CTRE_TYPE ==
+static_assert(org_wpilib_hardware_hal_PowerDistributionJNI_CTRE_TYPE ==
               HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE);
-static_assert(edu_wpi_first_hal_PowerDistributionJNI_REV_TYPE ==
+static_assert(org_wpilib_hardware_hal_PowerDistributionJNI_REV_TYPE ==
               HAL_PowerDistributionType::HAL_PowerDistributionType_kRev);
-static_assert(edu_wpi_first_hal_PowerDistributionJNI_DEFAULT_MODULE ==
+static_assert(org_wpilib_hardware_hal_PowerDistributionJNI_DEFAULT_MODULE ==
               HAL_DEFAULT_POWER_DISTRIBUTION_MODULE);
 
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Class:     org_wpilib_hardware_hal_PowerDistributionJNI
  * Method:    initialize
  * Signature: (III)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_initialize
+Java_org_wpilib_hardware_hal_PowerDistributionJNI_initialize
   (JNIEnv* env, jclass, jint busId, jint module, jint type)
 {
   int32_t status = 0;
@@ -43,12 +43,12 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_initialize
 }
 
 /*
- * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Class:     org_wpilib_hardware_hal_PowerDistributionJNI
  * Method:    free
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_free
+Java_org_wpilib_hardware_hal_PowerDistributionJNI_free
   (JNIEnv*, jclass, jint handle)
 {
   if (handle != HAL_kInvalidHandle) {
@@ -57,12 +57,12 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_free
 }
 
 /*
- * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Class:     org_wpilib_hardware_hal_PowerDistributionJNI
  * Method:    getModuleNumber
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_getModuleNumber
+Java_org_wpilib_hardware_hal_PowerDistributionJNI_getModuleNumber
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -72,24 +72,24 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getModuleNumber
 }
 
 /*
- * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Class:     org_wpilib_hardware_hal_PowerDistributionJNI
  * Method:    checkChannel
  * Signature: (II)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_checkChannel
+Java_org_wpilib_hardware_hal_PowerDistributionJNI_checkChannel
   (JNIEnv* env, jclass, jint handle, jint channel)
 {
   return HAL_CheckPowerDistributionChannel(handle, channel);
 }
 
 /*
- * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Class:     org_wpilib_hardware_hal_PowerDistributionJNI
  * Method:    checkModule
  * Signature: (II)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_checkModule
+Java_org_wpilib_hardware_hal_PowerDistributionJNI_checkModule
   (JNIEnv* env, jclass, jint module, jint type)
 {
   return HAL_CheckPowerDistributionModule(
@@ -97,12 +97,12 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_checkModule
 }
 
 /*
- * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Class:     org_wpilib_hardware_hal_PowerDistributionJNI
  * Method:    getType
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_getType
+Java_org_wpilib_hardware_hal_PowerDistributionJNI_getType
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -112,12 +112,12 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getType
 }
 
 /*
- * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Class:     org_wpilib_hardware_hal_PowerDistributionJNI
  * Method:    getNumChannels
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_getNumChannels
+Java_org_wpilib_hardware_hal_PowerDistributionJNI_getNumChannels
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -127,12 +127,12 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getNumChannels
 }
 
 /*
- * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Class:     org_wpilib_hardware_hal_PowerDistributionJNI
  * Method:    getTemperature
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_getTemperature
+Java_org_wpilib_hardware_hal_PowerDistributionJNI_getTemperature
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -142,12 +142,12 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getTemperature
 }
 
 /*
- * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Class:     org_wpilib_hardware_hal_PowerDistributionJNI
  * Method:    getVoltage
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_getVoltage
+Java_org_wpilib_hardware_hal_PowerDistributionJNI_getVoltage
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -157,12 +157,12 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getVoltage
 }
 
 /*
- * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Class:     org_wpilib_hardware_hal_PowerDistributionJNI
  * Method:    getChannelCurrent
  * Signature: (II)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_getChannelCurrent
+Java_org_wpilib_hardware_hal_PowerDistributionJNI_getChannelCurrent
   (JNIEnv* env, jclass, jint handle, jint channel)
 {
   int32_t status = 0;
@@ -173,12 +173,12 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getChannelCurrent
 }
 
 /*
- * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Class:     org_wpilib_hardware_hal_PowerDistributionJNI
  * Method:    getAllCurrents
  * Signature: (I[D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_getAllCurrents
+Java_org_wpilib_hardware_hal_PowerDistributionJNI_getAllCurrents
   (JNIEnv* env, jclass, jint handle, jdoubleArray jarr)
 {
   int32_t status = 0;
@@ -196,12 +196,12 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getAllCurrents
 }
 
 /*
- * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Class:     org_wpilib_hardware_hal_PowerDistributionJNI
  * Method:    getTotalCurrent
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_getTotalCurrent
+Java_org_wpilib_hardware_hal_PowerDistributionJNI_getTotalCurrent
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -211,12 +211,12 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getTotalCurrent
 }
 
 /*
- * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Class:     org_wpilib_hardware_hal_PowerDistributionJNI
  * Method:    getTotalPower
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_getTotalPower
+Java_org_wpilib_hardware_hal_PowerDistributionJNI_getTotalPower
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -226,12 +226,12 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getTotalPower
 }
 
 /*
- * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Class:     org_wpilib_hardware_hal_PowerDistributionJNI
  * Method:    getTotalEnergy
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_getTotalEnergy
+Java_org_wpilib_hardware_hal_PowerDistributionJNI_getTotalEnergy
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -241,12 +241,12 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getTotalEnergy
 }
 
 /*
- * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Class:     org_wpilib_hardware_hal_PowerDistributionJNI
  * Method:    resetTotalEnergy
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_resetTotalEnergy
+Java_org_wpilib_hardware_hal_PowerDistributionJNI_resetTotalEnergy
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -255,12 +255,12 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_resetTotalEnergy
 }
 
 /*
- * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Class:     org_wpilib_hardware_hal_PowerDistributionJNI
  * Method:    clearStickyFaults
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_clearStickyFaults
+Java_org_wpilib_hardware_hal_PowerDistributionJNI_clearStickyFaults
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -269,12 +269,12 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_clearStickyFaults
 }
 
 /*
- * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Class:     org_wpilib_hardware_hal_PowerDistributionJNI
  * Method:    setSwitchableChannel
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_setSwitchableChannel
+Java_org_wpilib_hardware_hal_PowerDistributionJNI_setSwitchableChannel
   (JNIEnv* env, jclass, jint handle, jboolean enabled)
 {
   int32_t status = 0;
@@ -283,12 +283,12 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_setSwitchableChannel
 }
 
 /*
- * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Class:     org_wpilib_hardware_hal_PowerDistributionJNI
  * Method:    getSwitchableChannel
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_getSwitchableChannel
+Java_org_wpilib_hardware_hal_PowerDistributionJNI_getSwitchableChannel
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -298,12 +298,12 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getSwitchableChannel
 }
 
 /*
- * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Class:     org_wpilib_hardware_hal_PowerDistributionJNI
  * Method:    getVoltageNoError
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_getVoltageNoError
+Java_org_wpilib_hardware_hal_PowerDistributionJNI_getVoltageNoError
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -312,12 +312,12 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getVoltageNoError
 }
 
 /*
- * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Class:     org_wpilib_hardware_hal_PowerDistributionJNI
  * Method:    getChannelCurrentNoError
  * Signature: (II)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_getChannelCurrentNoError
+Java_org_wpilib_hardware_hal_PowerDistributionJNI_getChannelCurrentNoError
   (JNIEnv* env, jclass, jint handle, jint channel)
 {
   int32_t status = 0;
@@ -327,12 +327,12 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getChannelCurrentNoError
 }
 
 /*
- * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Class:     org_wpilib_hardware_hal_PowerDistributionJNI
  * Method:    getTotalCurrentNoError
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_getTotalCurrentNoError
+Java_org_wpilib_hardware_hal_PowerDistributionJNI_getTotalCurrentNoError
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -341,12 +341,12 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getTotalCurrentNoError
 }
 
 /*
- * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Class:     org_wpilib_hardware_hal_PowerDistributionJNI
  * Method:    setSwitchableChannelNoError
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_setSwitchableChannelNoError
+Java_org_wpilib_hardware_hal_PowerDistributionJNI_setSwitchableChannelNoError
   (JNIEnv* env, jclass, jint handle, jboolean enabled)
 {
   int32_t status = 0;
@@ -354,12 +354,12 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_setSwitchableChannelNoError
 }
 
 /*
- * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Class:     org_wpilib_hardware_hal_PowerDistributionJNI
  * Method:    getSwitchableChannelNoError
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_getSwitchableChannelNoError
+Java_org_wpilib_hardware_hal_PowerDistributionJNI_getSwitchableChannelNoError
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -368,12 +368,12 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getSwitchableChannelNoError
 }
 
 /*
- * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Class:     org_wpilib_hardware_hal_PowerDistributionJNI
  * Method:    getStickyFaultsNative
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_getStickyFaultsNative
+Java_org_wpilib_hardware_hal_PowerDistributionJNI_getStickyFaultsNative
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -388,12 +388,12 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getStickyFaultsNative
 }
 
 /*
- * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Class:     org_wpilib_hardware_hal_PowerDistributionJNI
  * Method:    getFaultsNative
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_getFaultsNative
+Java_org_wpilib_hardware_hal_PowerDistributionJNI_getFaultsNative
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -408,12 +408,12 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getFaultsNative
 }
 
 /*
- * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Class:     org_wpilib_hardware_hal_PowerDistributionJNI
  * Method:    getVersion
  * Signature: (I)Ljava/lang/Object;
  */
 JNIEXPORT jobject JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_getVersion
+Java_org_wpilib_hardware_hal_PowerDistributionJNI_getVersion
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;

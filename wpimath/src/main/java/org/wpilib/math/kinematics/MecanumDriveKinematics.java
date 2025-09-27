@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.kinematics;
+package org.wpilib.math.kinematics;
 
-import edu.wpi.first.math.MathSharedStore;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Twist2d;
-import edu.wpi.first.math.kinematics.proto.MecanumDriveKinematicsProto;
-import edu.wpi.first.math.kinematics.struct.MecanumDriveKinematicsStruct;
-import edu.wpi.first.util.protobuf.ProtobufSerializable;
-import edu.wpi.first.util.struct.StructSerializable;
+import org.wpilib.math.util.MathSharedStore;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.geometry.Twist2d;
+import org.wpilib.math.kinematics.proto.MecanumDriveKinematicsProto;
+import org.wpilib.math.kinematics.struct.MecanumDriveKinematicsStruct;
+import org.wpilib.util.protobuf.ProtobufSerializable;
+import org.wpilib.util.struct.StructSerializable;
 import org.ejml.simple.SimpleMatrix;
 
 /**

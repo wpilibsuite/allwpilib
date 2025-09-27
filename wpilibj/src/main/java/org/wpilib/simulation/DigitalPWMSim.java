@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.simulation;
+package org.wpilib.simulation;
 
-import edu.wpi.first.hal.simulation.DigitalPWMDataJNI;
-import edu.wpi.first.hal.simulation.NotifyCallback;
-import edu.wpi.first.wpilibj.DigitalOutput;
+import org.wpilib.hardware.hal.simulation.DigitalPWMDataJNI;
+import org.wpilib.hardware.hal.simulation.NotifyCallback;
+import org.wpilib.hardware.discrete.DigitalOutput;
 import java.util.NoSuchElementException;
 
 /**

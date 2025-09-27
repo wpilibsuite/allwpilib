@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.drive;
+package org.wpilib.drive;
 
-import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import org.wpilib.hardware.hal.HAL;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.util.sendable.Sendable;
+import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.hardware.motor.MotorController;
 import java.util.function.DoubleConsumer;
 
 /**
@@ -21,7 +21,7 @@ import java.util.function.DoubleConsumer;
  * <p>These drive bases typically have drop-center / skid-steer with two or more wheels per side
  * (e.g., 6WD or 8WD). This class takes a setter per side. For four and six motor drivetrains, use
  * CAN motor controller followers or {@link
- * edu.wpi.first.wpilibj.motorcontrol.PWMMotorController#addFollower(PWMMotorController)}.
+ * org.wpilib.hardware.motor.PWMMotorController#addFollower(PWMMotorController)}.
  *
  * <p>A differential drive robot has left and right wheels separated by an arbitrary width.
  *
@@ -43,11 +43,11 @@ import java.util.function.DoubleConsumer;
  * positive Z axis points up. Rotations follow the right-hand rule, so counterclockwise rotation
  * around the Z axis is positive.
  *
- * <p>Inputs smaller then {@value edu.wpi.first.wpilibj.drive.RobotDriveBase#kDefaultDeadband} will
+ * <p>Inputs smaller then {@value org.wpilib.drive.RobotDriveBase#kDefaultDeadband} will
  * be set to 0, and larger values will be scaled so that the full range is still used. This deadband
  * value can be changed with {@link #setDeadband}.
  *
- * <p>{@link edu.wpi.first.wpilibj.MotorSafety} is enabled by default. The tankDrive, arcadeDrive,
+ * <p>{@link org.wpilib.hardware.motor.MotorSafety} is enabled by default. The tankDrive, arcadeDrive,
  * or curvatureDrive methods should be called periodically to avoid Motor Safety timeouts.
  */
 public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoCloseable {
@@ -94,7 +94,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * Construct a DifferentialDrive.
    *
    * <p>To pass multiple motors per side, use CAN motor controller followers or {@link
-   * edu.wpi.first.wpilibj.motorcontrol.PWMMotorController#addFollower(PWMMotorController)}. If a
+   * org.wpilib.hardware.motor.PWMMotorController#addFollower(PWMMotorController)}. If a
    * motor needs to be inverted, do so before passing it in.
    *
    * @param leftMotor Left motor.
@@ -111,7 +111,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * Construct a DifferentialDrive.
    *
    * <p>To pass multiple motors per side, use CAN motor controller followers or {@link
-   * edu.wpi.first.wpilibj.motorcontrol.PWMMotorController#addFollower(PWMMotorController)}. If a
+   * org.wpilib.hardware.motor.PWMMotorController#addFollower(PWMMotorController)}. If a
    * motor needs to be inverted, do so before passing it in.
    *
    * @param leftMotor Left motor setter.
