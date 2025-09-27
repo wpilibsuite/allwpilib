@@ -11,9 +11,8 @@
 #include <wpi/hal/AddressableLEDTypes.hpp>
 #include <wpi/hal/Types.hpp>
 #include <wpi/units/time.hpp>
-
-#include "wpi/util/Color.hpp"
-#include "wpi/util/Color8Bit.hpp"
+#include <wpi/util/Color.hpp>
+#include <wpi/util/Color8Bit.hpp>
 
 namespace frc {
 

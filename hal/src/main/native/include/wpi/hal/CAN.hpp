@@ -4,9 +4,10 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include <wpi/hal/CANAPITypes.hpp>
 #include <wpi/hal/Types.hpp>
-#include <stdint.h>
 
 /**
  * @defgroup hal_can CAN Functions

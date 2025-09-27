@@ -8,8 +8,8 @@
 
 #include <wpi/hal/DriverStation.hpp>
 
-#include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/Errors.hpp"
+#include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/event/BooleanEvent.hpp"
 
 using namespace frc;

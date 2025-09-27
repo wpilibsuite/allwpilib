@@ -11,8 +11,8 @@
 #include <wpi/util/SafeThread.hpp>
 #include <wpi/util/SmallPtrSet.h>
 
-#include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/Errors.hpp"
+#include "wpi/driverstation/DriverStation.hpp"
 
 using namespace frc;
 

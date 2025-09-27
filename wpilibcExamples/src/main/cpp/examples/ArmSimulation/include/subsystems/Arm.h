@@ -4,10 +4,10 @@
 
 #pragma once
 
+#include <wpi/hardware/motor/PWMSparkMax.hpp>
 #include <wpi/hardware/rotation/Encoder.hpp>
 #include <wpi/math/controller/ArmFeedforward.hpp>
 #include <wpi/math/controller/PIDController.hpp>
-#include <wpi/hardware/motor/PWMSparkMax.hpp>
 #include <wpi/simulation/BatterySim.hpp>
 #include <wpi/simulation/EncoderSim.hpp>
 #include <wpi/simulation/PWMSim.hpp>

@@ -11,12 +11,12 @@
 
 #include <WSProviderContainer.h>
 #include <WSProvider_SimDevice.h>
-#include <wpi/util/StringMap.hpp>
-#include <wpi/util/json_fwd.h>
 #include <wpi/net/uv/Async.hpp>
 #include <wpi/net/uv/Loop.hpp>
 #include <wpi/net/uv/Tcp.hpp>
 #include <wpi/net/uv/Timer.hpp>
+#include <wpi/util/StringMap.hpp>
+#include <wpi/util/json_fwd.h>
 
 namespace wpilibws {
 

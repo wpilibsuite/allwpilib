@@ -9,8 +9,8 @@
 #include <span>
 #include <string>
 
-#include <wpi/util/json_fwd.h>
 #include <wpi/net/raw_uv_ostream.hpp>
+#include <wpi/util/json_fwd.h>
 
 #define XRP_TAG_MOTOR 0x12
 #define XRP_TAG_SERVO 0x13

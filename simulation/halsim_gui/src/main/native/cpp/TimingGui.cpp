@@ -9,12 +9,12 @@
 #include <memory>
 #include <vector>
 
+#include <imgui.h>
 #include <wpi/glass/Model.hpp>
 #include <wpi/glass/View.hpp>
 #include <wpi/hal/HALBase.hpp>
 #include <wpi/hal/simulation/MockHooks.hpp>
 #include <wpi/hal/simulation/NotifierData.hpp>
-#include <imgui.h>
 
 #include "HALSimGui.h"
 

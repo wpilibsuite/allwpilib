@@ -8,8 +8,8 @@
 #include <utility>
 
 #include <imgui.h>
-#include <wpi/util/StringExtras.h>
 #include <wpi/gui/wpigui.hpp>
+#include <wpi/util/StringExtras.h>
 
 #include "wpi/glass/Context.hpp"
 #include "wpi/glass/ContextInternal.hpp"

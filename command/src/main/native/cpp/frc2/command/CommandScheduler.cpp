@@ -10,13 +10,13 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/opmode/RobotBase.hpp>
-#include <wpi/opmode/RobotState.hpp>
-#include <wpi/opmode/TimedRobot.hpp>
 #include <wpi/hal/HALBase.hpp>
 #include <wpi/hal/UsageReporting.h>
 #include <wpi/ntcore/IntegerArrayTopic.hpp>
 #include <wpi/ntcore/StringArrayTopic.hpp>
+#include <wpi/opmode/RobotBase.hpp>
+#include <wpi/opmode/RobotState.hpp>
+#include <wpi/opmode/TimedRobot.hpp>
 #include <wpi/util/DenseMap.h>
 #include <wpi/util/SmallVector.h>
 #include <wpi/util/sendable/SendableBuilder.hpp>

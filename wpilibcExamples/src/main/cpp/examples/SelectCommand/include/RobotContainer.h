@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <wpi/smartdashboard/SendableChooser.hpp>
 #include <wpi/command/Command.hpp>
 #include <wpi/command/CommandPtr.hpp>
 #include <wpi/command/Commands.hpp>
+#include <wpi/smartdashboard/SendableChooser.hpp>
 
 /**
  * This class is where the bulk of the robot should be declared.  Since

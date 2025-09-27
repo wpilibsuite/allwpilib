@@ -27,11 +27,7 @@ if(WITH_JAVA)
     )
     set_property(TARGET field_images_jar PROPERTY FOLDER "java")
     install_jar(field_images_jar DESTINATION ${java_lib_dest})
-    install_jar_exports(
-        TARGETS field_images_jar
-        FILE fields_jar.cmake
-        DESTINATION share/fields
-    )
+    install_jar_exports(TARGETS field_images_jar FILE fields_jar.cmake DESTINATION share/fields)
 endif()
 
 generate_resources(

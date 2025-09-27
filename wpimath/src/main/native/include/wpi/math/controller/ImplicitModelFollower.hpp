@@ -4,9 +4,8 @@
 
 #pragma once
 
-#include <wpi/math/system/LinearSystem.hpp>
-
 #include <Eigen/QR>
+#include <wpi/math/system/LinearSystem.hpp>
 
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/units/time.hpp"

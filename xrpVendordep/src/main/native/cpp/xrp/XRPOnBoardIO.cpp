@@ -4,9 +4,9 @@
 
 #include "wpi/xrp/XRPOnBoardIO.hpp"
 
+#include <wpi/Errors.hpp>
 #include <wpi/hardware/discrete/DigitalInput.hpp>
 #include <wpi/hardware/discrete/DigitalOutput.hpp>
-#include <wpi/Errors.hpp>
 #include <wpi/system/Timer.hpp>
 
 using namespace frc;

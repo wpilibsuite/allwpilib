@@ -8,8 +8,8 @@
 
 #include <wpi/util/timestamp.hpp>
 
-#include "wpi/units/time.hpp"
 #include "wpi/math/util/MathShared.hpp"
+#include "wpi/units/time.hpp"
 
 namespace frc {
 /**

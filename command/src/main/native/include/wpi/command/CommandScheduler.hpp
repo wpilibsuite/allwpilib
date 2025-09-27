@@ -13,8 +13,8 @@
 #include <utility>
 
 #include <wpi/Errors.hpp>
-#include <wpi/system/Watchdog.hpp>
 #include <wpi/event/EventLoop.hpp>
+#include <wpi/system/Watchdog.hpp>
 #include <wpi/units/time.hpp>
 #include <wpi/util/FunctionExtras.h>
 #include <wpi/util/sendable/Sendable.hpp>

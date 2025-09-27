@@ -14,6 +14,12 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/net/HttpUtil.hpp>
+#include <wpi/net/HttpWebSocketServerConnection.hpp>
+#include <wpi/net/UrlParser.hpp>
+#include <wpi/net/uv/Tcp.hpp>
+#include <wpi/net/uv/Work.hpp>
+#include <wpi/net/uv/util.hpp>
 #include <wpi/util/MemoryBuffer.h>
 #include <wpi/util/SmallString.h>
 #include <wpi/util/StringExtras.h>
@@ -21,12 +27,6 @@
 #include <wpi/util/mutex.hpp>
 #include <wpi/util/raw_ostream.h>
 #include <wpi/util/timestamp.hpp>
-#include <wpi/net/HttpUtil.hpp>
-#include <wpi/net/HttpWebSocketServerConnection.hpp>
-#include <wpi/net/UrlParser.hpp>
-#include <wpi/net/uv/Tcp.hpp>
-#include <wpi/net/uv/Work.hpp>
-#include <wpi/net/uv/util.hpp>
 
 #include "IConnectionList.h"
 #include "InstanceImpl.h"

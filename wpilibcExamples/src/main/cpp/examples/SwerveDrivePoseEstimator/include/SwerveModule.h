@@ -6,13 +6,13 @@
 
 #include <numbers>
 
+#include <wpi/hardware/motor/PWMSparkMax.hpp>
 #include <wpi/hardware/rotation/Encoder.hpp>
 #include <wpi/math/controller/PIDController.hpp>
 #include <wpi/math/controller/ProfiledPIDController.hpp>
 #include <wpi/math/controller/SimpleMotorFeedforward.hpp>
 #include <wpi/math/kinematics/SwerveModulePosition.hpp>
 #include <wpi/math/kinematics/SwerveModuleState.hpp>
-#include <wpi/hardware/motor/PWMSparkMax.hpp>
 #include <wpi/units/angular_velocity.hpp>
 #include <wpi/units/time.hpp>
 #include <wpi/units/velocity.hpp>

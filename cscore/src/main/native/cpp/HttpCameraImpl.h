@@ -15,10 +15,10 @@
 #include <thread>
 #include <vector>
 
+#include <wpi/net/HttpUtil.hpp>
 #include <wpi/util/StringMap.hpp>
 #include <wpi/util/condition_variable.hpp>
 #include <wpi/util/raw_istream.hpp>
-#include <wpi/net/HttpUtil.hpp>
 
 #include "SourceImpl.h"
 #include "wpi/cscore/cscore_cpp.hpp"

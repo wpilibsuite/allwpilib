@@ -5,16 +5,16 @@
 #include <string>
 #include <thread>
 
-#include <wpi/system/RobotController.hpp>
+#include <gtest/gtest.h>
+#include <wpi/hal/simulation/MockHooks.hpp>
+#include <wpi/math/system/plant/DCMotor.hpp>
 #include <wpi/simulation/AnalogInputSim.hpp>
 #include <wpi/simulation/DriverStationSim.hpp>
 #include <wpi/simulation/ElevatorSim.hpp>
 #include <wpi/simulation/JoystickSim.hpp>
 #include <wpi/simulation/PWMMotorControllerSim.hpp>
 #include <wpi/simulation/SimHooks.hpp>
-#include <wpi/math/system/plant/DCMotor.hpp>
-#include <gtest/gtest.h>
-#include <wpi/hal/simulation/MockHooks.hpp>
+#include <wpi/system/RobotController.hpp>
 #include <wpi/units/length.hpp>
 #include <wpi/units/mass.hpp>
 #include <wpi/units/time.hpp>

@@ -29,11 +29,7 @@ if(WITH_JAVA)
     set_property(TARGET command_jar PROPERTY FOLDER "java")
 
     install_jar(command_jar DESTINATION ${java_lib_dest})
-    install_jar_exports(
-        TARGETS command_jar
-        FILE command_jar.cmake
-        DESTINATION share/command
-    )
+    install_jar_exports(TARGETS command_jar FILE command_jar.cmake DESTINATION share/command)
 endif()
 
 if(WITH_JAVA_SOURCE)
@@ -52,11 +48,7 @@ if(WITH_JAVA_SOURCE)
     install_jar(command_src_jar DESTINATION ${java_lib_dest})
 endif()
 
-file(
-    GLOB_RECURSE command_native_src
-    src/main/native/cpp/*.cpp
-    src/generated/main/native/cpp/*.cpp
-)
+file(GLOB_RECURSE command_native_src src/main/native/cpp/*.cpp src/generated/main/native/cpp/*.cpp)
 add_library(command ${command_native_src})
 set_target_properties(command PROPERTIES DEBUG_POSTFIX "d")
 set_property(TARGET command PROPERTY FOLDER "libraries")
@@ -76,19 +68,10 @@ target_include_directories(
 install(TARGETS command EXPORT command)
 export(TARGETS command FILE command.cmake NAMESPACE command::)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/command")
-install(
-    DIRECTORY src/generated/main/native/include/
-    DESTINATION "${include_dest}/command"
-)
+install(DIRECTORY src/generated/main/native/include/ DESTINATION "${include_dest}/command")
 
-configure_file(
-    command-config.cmake.in
-    ${WPILIB_BINARY_DIR}/command-config.cmake
-)
-install(
-    FILES ${WPILIB_BINARY_DIR}/command-config.cmake
-    DESTINATION share/command
-)
+configure_file(command-config.cmake.in ${WPILIB_BINARY_DIR}/command-config.cmake)
+install(FILES ${WPILIB_BINARY_DIR}/command-config.cmake DESTINATION share/command)
 install(EXPORT command DESTINATION share/command)
 
 if(WITH_TESTS)

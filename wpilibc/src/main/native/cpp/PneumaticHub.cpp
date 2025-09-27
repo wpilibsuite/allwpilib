@@ -16,12 +16,12 @@
 #include <wpi/util/NullDeleter.hpp>
 #include <wpi/util/StackTrace.hpp>
 
+#include "wpi/Errors.hpp"
+#include "wpi/SensorUtil.hpp"
 #include "wpi/hardware/pneumatic/Compressor.hpp"
 #include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
-#include "wpi/Errors.hpp"
-#include "wpi/opmode/RobotBase.hpp"
-#include "wpi/SensorUtil.hpp"
 #include "wpi/hardware/pneumatic/Solenoid.hpp"
+#include "wpi/opmode/RobotBase.hpp"
 
 using namespace frc;
 

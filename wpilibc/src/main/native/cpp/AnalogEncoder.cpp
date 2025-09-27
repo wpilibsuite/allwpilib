@@ -7,11 +7,11 @@
 #include <utility>
 
 #include <wpi/hal/UsageReporting.h>
+#include <wpi/math/util/MathUtil.hpp>
 #include <wpi/util/NullDeleter.hpp>
 #include <wpi/util/sendable/SendableBuilder.hpp>
 
 #include "wpi/hardware/discrete/AnalogInput.hpp"
-#include "wpi/math/util/MathUtil.hpp"
 #include "wpi/system/RobotController.hpp"
 
 using namespace frc;

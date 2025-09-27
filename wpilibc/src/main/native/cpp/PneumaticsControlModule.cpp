@@ -14,10 +14,10 @@
 #include <wpi/util/NullDeleter.hpp>
 #include <wpi/util/StackTrace.hpp>
 
-#include "wpi/hardware/pneumatic/Compressor.hpp"
-#include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
 #include "wpi/Errors.hpp"
 #include "wpi/SensorUtil.hpp"
+#include "wpi/hardware/pneumatic/Compressor.hpp"
+#include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
 #include "wpi/hardware/pneumatic/Solenoid.hpp"
 
 using namespace frc;

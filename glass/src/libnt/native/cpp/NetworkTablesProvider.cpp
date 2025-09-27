@@ -9,10 +9,10 @@
 #include <utility>
 
 #include <fmt/format.h>
+#include <wpi/gui/wpigui.hpp>
 #include <wpi/ntcore/ntcore_cpp.hpp>
 #include <wpi/util/SmallString.h>
 #include <wpi/util/StringExtras.h>
-#include <wpi/gui/wpigui.hpp>
 
 #include "wpi/glass/Storage.hpp"
 

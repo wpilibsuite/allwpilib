@@ -11,8 +11,8 @@
 
 #include "Exceptions.h"
 #include "org_wpilib_math_jni_DAREJNI.h"
-#include "wpi/math/linalg/DARE.hpp"
 #include "wpi/math/fmt/Eigen.hpp"
+#include "wpi/math/linalg/DARE.hpp"
 
 using namespace wpi::java;
 

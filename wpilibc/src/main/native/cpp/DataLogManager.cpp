@@ -4,8 +4,6 @@
 
 #include "wpi/system/DataLogManager.hpp"
 
-#include <wpi/Errors.hpp>
-
 #include <algorithm>
 #include <ctime>
 #include <random>
@@ -13,20 +11,21 @@
 #include <vector>
 
 #include <fmt/chrono.h>
+#include <wpi/Errors.hpp>
+#include <wpi/datalog/DataLog.h>
+#include <wpi/datalog/DataLogBackgroundWriter.h>
+#include <wpi/datalog/FileLogger.h>
 #include <wpi/hal/UsageReporting.h>
 #include <wpi/ntcore/NetworkTableInstance.hpp>
 #include <wpi/util/SafeThread.hpp>
 #include <wpi/util/StringExtras.h>
-#include <wpi/datalog/DataLog.h>
-#include <wpi/datalog/DataLogBackgroundWriter.h>
-#include <wpi/datalog/FileLogger.h>
 #include <wpi/util/fs.hpp>
 #include <wpi/util/print.hpp>
 #include <wpi/util/timestamp.hpp>
 
 #include "wpi/driverstation/DriverStation.hpp"
-#include "wpi/system/Filesystem.hpp"
 #include "wpi/opmode/RobotBase.hpp"
+#include "wpi/system/Filesystem.hpp"
 #include "wpi/system/RobotController.hpp"
 
 using namespace frc;

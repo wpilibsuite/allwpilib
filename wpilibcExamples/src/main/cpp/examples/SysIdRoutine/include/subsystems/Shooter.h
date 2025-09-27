@@ -6,13 +6,13 @@
 
 #include <functional>
 
-#include <wpi/hardware/rotation/Encoder.hpp>
-#include <wpi/system/RobotController.hpp>
-#include <wpi/math/controller/PIDController.hpp>
-#include <wpi/math/controller/SimpleMotorFeedforward.hpp>
-#include <wpi/hardware/motor/PWMSparkMax.hpp>
 #include <wpi/command/SubsystemBase.hpp>
 #include <wpi/command/sysid/SysIdRoutine.hpp>
+#include <wpi/hardware/motor/PWMSparkMax.hpp>
+#include <wpi/hardware/rotation/Encoder.hpp>
+#include <wpi/math/controller/PIDController.hpp>
+#include <wpi/math/controller/SimpleMotorFeedforward.hpp>
+#include <wpi/system/RobotController.hpp>
 
 #include "Constants.h"
 

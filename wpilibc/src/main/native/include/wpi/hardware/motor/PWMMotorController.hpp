@@ -18,9 +18,9 @@
 #include <wpi/util/sendable/Sendable.hpp>
 #include <wpi/util/sendable/SendableHelper.hpp>
 
-#include "wpi/hardware/motor/MotorSafety.hpp"
 #include "wpi/hardware/discrete/PWM.hpp"
 #include "wpi/hardware/motor/MotorController.hpp"
+#include "wpi/hardware/motor/MotorSafety.hpp"
 
 namespace frc {
 

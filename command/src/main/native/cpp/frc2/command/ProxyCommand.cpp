@@ -4,10 +4,11 @@
 
 #include "wpi/command/ProxyCommand.hpp"
 
+#include <fmt/format.h>
+
 #include <string>
 #include <utility>
 
-#include <fmt/format.h>
 #include <wpi/util/deprecated.hpp>
 #include <wpi/util/sendable/SendableBuilder.hpp>
 

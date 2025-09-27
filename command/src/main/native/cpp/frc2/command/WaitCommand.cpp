@@ -5,6 +5,7 @@
 #include "wpi/command/WaitCommand.hpp"
 
 #include <fmt/format.h>
+
 #include <wpi/util/sendable/SendableBuilder.hpp>
 
 using namespace frc2;

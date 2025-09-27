@@ -10,8 +10,8 @@
 #include <thread>
 #include <vector>
 
-#include <wpi/glass/View.hpp>
 #include <implot.h>
+#include <wpi/glass/View.hpp>
 #include <wpi/gui/portable-file-dialogs.hpp>
 #include <wpi/units/time.hpp>
 #include <wpi/units/voltage.hpp>

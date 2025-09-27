@@ -6,8 +6,8 @@
 
 #include <utility>
 
-#include <wpi/system/RobotController.hpp>
 #include <wpi/command/Commands.hpp>
+#include <wpi/system/RobotController.hpp>
 
 Drive::Drive() {
   wpi::SendableRegistry::AddChild(&m_drive, &m_leftLeader);

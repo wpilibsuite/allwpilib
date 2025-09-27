@@ -4,8 +4,8 @@
 
 #include <utility>
 
-#include <wpi/simulation/SimHooks.hpp>
 #include <gtest/gtest.h>
+#include <wpi/simulation/SimHooks.hpp>
 
 #include "../CommandTestBase.h"
 #include "wpi/command/CommandPtr.hpp"

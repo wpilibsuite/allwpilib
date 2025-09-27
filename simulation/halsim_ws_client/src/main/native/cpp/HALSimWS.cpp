@@ -8,10 +8,10 @@
 #include <memory>
 #include <string>
 
+#include <wpi/net/uv/util.hpp>
 #include <wpi/util/SmallString.h>
 #include <wpi/util/StringExtras.h>
 #include <wpi/util/print.hpp>
-#include <wpi/net/uv/util.hpp>
 
 #include "HALSimWSClientConnection.h"
 

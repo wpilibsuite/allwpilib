@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <stdint.h>
+#include <wpi/SpanMatcher.h>
 
 #include <concepts>
 #include <span>
@@ -11,7 +12,6 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include <wpi/SpanMatcher.h>
 
 #include "../MockLogger.h"
 #include "../PubSubOptionsMatcher.h"
@@ -24,9 +24,9 @@
 #include "gmock/gmock.h"
 #include "net/Message.h"
 #include "net/WireEncoder.h"
+#include "server/ServerImpl.h"
 #include "wpi/ntcore/ntcore_c.h"
 #include "wpi/ntcore/ntcore_cpp.hpp"
-#include "server/ServerImpl.h"
 
 using ::testing::_;
 using ::testing::AllOf;

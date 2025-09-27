@@ -12,9 +12,9 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/datalog/DataLogReaderThread.h>
 #include <wpi/glass/View.hpp>
 #include <wpi/util/StringMap.hpp>
-#include <wpi/datalog/DataLogReaderThread.h>
 
 #include "sysid/analysis/Storage.h"
 

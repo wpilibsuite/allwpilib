@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include <wpi/hardware/rotation/Encoder.hpp>
+#include <wpi/command/SubsystemBase.hpp>
 #include <wpi/drive/DifferentialDrive.hpp>
 #include <wpi/hardware/motor/Spark.hpp>
+#include <wpi/hardware/rotation/Encoder.hpp>
 #include <wpi/romi/RomiGyro.hpp>
-#include <wpi/command/SubsystemBase.hpp>
 #include <wpi/units/acceleration.hpp>
 #include <wpi/units/angle.hpp>
 #include <wpi/units/length.hpp>

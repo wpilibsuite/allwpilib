@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include <wpi/hardware/discrete/DigitalInput.hpp>
-#include <wpi/hardware/motor/PWMSparkMax.hpp>
 #include <wpi/command/CommandPtr.hpp>
 #include <wpi/command/SubsystemBase.hpp>
 #include <wpi/command/button/Trigger.hpp>
+#include <wpi/hardware/discrete/DigitalInput.hpp>
+#include <wpi/hardware/motor/PWMSparkMax.hpp>
 
 #include "Constants.h"
 

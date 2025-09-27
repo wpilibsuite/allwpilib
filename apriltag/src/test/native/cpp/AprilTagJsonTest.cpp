@@ -5,11 +5,11 @@
 #include <vector>
 
 #include <gtest/gtest.h>
+#include <wpi/math/geometry/Pose3d.hpp>
 #include <wpi/util/json.h>
 
 #include "wpi/apriltag/AprilTag.hpp"
 #include "wpi/apriltag/AprilTagFieldLayout.hpp"
-#include "wpi/math/geometry/Pose3d.hpp"
 
 using namespace frc;
 

@@ -12,8 +12,8 @@
 
 #include <wpi/hal/SimDevice.hpp>
 #include <wpi/hal/simulation/SimDeviceData.hpp>
-#include <wpi/util/StringMap.hpp>
 #include <wpi/net/uv/AsyncFunction.hpp>
+#include <wpi/util/StringMap.hpp>
 
 #include "WSBaseProvider.h"
 #include "WSProviderContainer.h"

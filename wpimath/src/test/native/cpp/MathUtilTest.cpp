@@ -7,9 +7,9 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/math/util/MathUtil.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/geometry/Translation3d.hpp"
+#include "wpi/math/util/MathUtil.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"

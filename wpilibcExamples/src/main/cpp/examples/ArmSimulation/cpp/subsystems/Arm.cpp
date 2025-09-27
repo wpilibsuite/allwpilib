@@ -5,9 +5,9 @@
 #include "subsystems/Arm.h"
 
 #include <wpi/Preferences.hpp>
-#include <wpi/system/RobotController.hpp>
 #include <wpi/math/util/StateSpaceUtil.hpp>
 #include <wpi/smartdashboard/SmartDashboard.hpp>
+#include <wpi/system/RobotController.hpp>
 
 Arm::Arm() {
   m_encoder.SetDistancePerPulse(kArmEncoderDistPerPulse);

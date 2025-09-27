@@ -317,8 +317,8 @@ bool InitializeSimDeviceDataJNI(JNIEnv* env) {
     return false;
   }
 
-  simValueInfoCls =
-      JClass(env, "org/wpilib/hardware/hal/simulation/SimDeviceDataJNI$SimValueInfo");
+  simValueInfoCls = JClass(
+      env, "org/wpilib/hardware/hal/simulation/SimDeviceDataJNI$SimValueInfo");
   if (!simValueInfoCls) {
     return false;
   }

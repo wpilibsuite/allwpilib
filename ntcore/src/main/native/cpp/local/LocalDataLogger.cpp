@@ -5,8 +5,8 @@
 #include "LocalDataLogger.h"
 
 #include <fmt/format.h>
-#include <wpi/util/StringExtras.h>
 #include <wpi/datalog/DataLog.h>
+#include <wpi/util/StringExtras.h>
 
 using namespace nt::local;
 

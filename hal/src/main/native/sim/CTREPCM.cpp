@@ -9,9 +9,9 @@
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
+#include "mockdata/CTREPCMDataInternal.h"
 #include "wpi/hal/Errors.hpp"
 #include "wpi/hal/handles/IndexedHandleResource.hpp"
-#include "mockdata/CTREPCMDataInternal.h"
 
 using namespace hal;
 

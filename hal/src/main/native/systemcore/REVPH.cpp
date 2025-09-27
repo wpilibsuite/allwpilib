@@ -12,10 +12,10 @@
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
+#include "rev/PHFrames.h"
 #include "wpi/hal/CANAPI.hpp"
 #include "wpi/hal/Errors.hpp"
 #include "wpi/hal/handles/IndexedHandleResource.hpp"
-#include "rev/PHFrames.h"
 
 using namespace hal;
 

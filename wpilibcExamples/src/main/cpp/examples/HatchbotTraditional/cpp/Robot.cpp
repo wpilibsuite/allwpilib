@@ -4,10 +4,10 @@
 
 #include "Robot.h"
 
-#include <wpi/system/DataLogManager.hpp>
+#include <wpi/command/CommandScheduler.hpp>
 #include <wpi/driverstation/DriverStation.hpp>
 #include <wpi/smartdashboard/SmartDashboard.hpp>
-#include <wpi/command/CommandScheduler.hpp>
+#include <wpi/system/DataLogManager.hpp>
 
 Robot::Robot() {
   // Start recording to data log

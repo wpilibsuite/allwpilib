@@ -5,13 +5,13 @@
 #include <string>
 #include <thread>
 
+#include <gtest/gtest.h>
 #include <wpi/Preferences.hpp>
+#include <wpi/hal/simulation/MockHooks.hpp>
 #include <wpi/simulation/DriverStationSim.hpp>
 #include <wpi/simulation/JoystickSim.hpp>
 #include <wpi/simulation/PWMMotorControllerSim.hpp>
 #include <wpi/simulation/SimHooks.hpp>
-#include <gtest/gtest.h>
-#include <wpi/hal/simulation/MockHooks.hpp>
 #include <wpi/units/length.hpp>
 #include <wpi/units/time.hpp>
 

@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include <wpi/hardware/rotation/Encoder.hpp>
-#include <wpi/system/Timer.hpp>
-#include <wpi/math/controller/SimpleMotorFeedforward.hpp>
-#include <wpi/drive/DifferentialDrive.hpp>
-#include <wpi/math/trajectory/TrapezoidProfile.hpp>
 #include <wpi/command/CommandPtr.hpp>
 #include <wpi/command/SubsystemBase.hpp>
+#include <wpi/drive/DifferentialDrive.hpp>
+#include <wpi/hardware/rotation/Encoder.hpp>
+#include <wpi/math/controller/SimpleMotorFeedforward.hpp>
+#include <wpi/math/trajectory/TrapezoidProfile.hpp>
+#include <wpi/system/Timer.hpp>
 #include <wpi/units/length.hpp>
 
 #include "Constants.h"

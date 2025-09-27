@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <wpi/hardware/rotation/AnalogPotentiometer.hpp>
+#include <wpi/driverstation/Joystick.hpp>
 #include <wpi/hardware/pneumatic/Compressor.hpp>
 #include <wpi/hardware/pneumatic/DoubleSolenoid.hpp>
-#include <wpi/driverstation/Joystick.hpp>
 #include <wpi/hardware/pneumatic/PneumaticsControlModule.hpp>
 #include <wpi/hardware/pneumatic/Solenoid.hpp>
+#include <wpi/hardware/rotation/AnalogPotentiometer.hpp>
 #include <wpi/opmode/TimedRobot.hpp>
 
 /**

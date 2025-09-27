@@ -3,11 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
+#include <wpi/math/util/MathUtil.hpp>
 #include <wpi/util/MathExtras.h>
 #include <wpi/util/timestamp.hpp>
 
 #include "wpi/hardware/led/LEDPattern.hpp"
-#include "wpi/math/util/MathUtil.hpp"
 
 namespace frc {
 

@@ -13,8 +13,8 @@
 #include <wpi/util/sendable/SendableBuilder.hpp>
 #include <wpi/util/sendable/SendableRegistry.hpp>
 
-#include "wpi/hardware/discrete/DigitalInput.hpp"
 #include "wpi/Errors.hpp"
+#include "wpi/hardware/discrete/DigitalInput.hpp"
 
 using namespace frc;
 

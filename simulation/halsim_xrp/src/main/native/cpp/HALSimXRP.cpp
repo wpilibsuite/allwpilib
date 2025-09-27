@@ -7,12 +7,12 @@
 #include <cstdio>
 #include <string>
 
+#include <wpi/net/raw_uv_ostream.hpp>
+#include <wpi/net/uv/util.hpp>
 #include <wpi/util/Endian.h>
 #include <wpi/util/MathExtras.h>
 #include <wpi/util/SmallString.h>
 #include <wpi/util/print.hpp>
-#include <wpi/net/raw_uv_ostream.hpp>
-#include <wpi/net/uv/util.hpp>
 
 namespace uv = wpi::uv;
 

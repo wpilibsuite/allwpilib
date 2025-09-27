@@ -6,8 +6,8 @@
 
 #include <optional>
 
-#include <wpi/opmode/TimedRobot.hpp>
 #include <wpi/command/CommandPtr.hpp>
+#include <wpi/opmode/TimedRobot.hpp>
 
 #include "SysIdRoutineBot.h"
 

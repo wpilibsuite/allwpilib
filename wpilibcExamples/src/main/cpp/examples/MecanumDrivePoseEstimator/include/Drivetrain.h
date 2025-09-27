@@ -7,6 +7,7 @@
 #include <numbers>
 
 #include <wpi/AnalogGyro.hpp>
+#include <wpi/hardware/motor/PWMSparkMax.hpp>
 #include <wpi/hardware/rotation/Encoder.hpp>
 #include <wpi/math/controller/PIDController.hpp>
 #include <wpi/math/controller/SimpleMotorFeedforward.hpp>
@@ -15,7 +16,6 @@
 #include <wpi/math/kinematics/MecanumDriveKinematics.hpp>
 #include <wpi/math/kinematics/MecanumDriveOdometry.hpp>
 #include <wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp>
-#include <wpi/hardware/motor/PWMSparkMax.hpp>
 
 /**
  * Represents a mecanum drive style drivetrain.

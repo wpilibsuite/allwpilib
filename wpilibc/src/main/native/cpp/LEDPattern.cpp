@@ -11,10 +11,9 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/math/util/MathUtil.hpp>
 #include <wpi/util/MathExtras.h>
 #include <wpi/util/timestamp.hpp>
-
-#include "wpi/math/util/MathUtil.hpp"
 
 using namespace frc;
 

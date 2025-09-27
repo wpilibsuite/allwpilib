@@ -12,13 +12,13 @@
 #include <thread>
 #include <vector>
 
+#include <wpi/net/NetworkAcceptor.hpp>
+#include <wpi/net/NetworkStream.hpp>
+#include <wpi/net/raw_socket_ostream.hpp>
 #include <wpi/util/SafeThread.hpp>
 #include <wpi/util/SmallVector.h>
 #include <wpi/util/raw_istream.hpp>
 #include <wpi/util/raw_ostream.h>
-#include <wpi/net/NetworkAcceptor.hpp>
-#include <wpi/net/NetworkStream.hpp>
-#include <wpi/net/raw_socket_ostream.hpp>
 
 #include "SinkImpl.h"
 

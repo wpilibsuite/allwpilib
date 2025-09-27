@@ -14,8 +14,9 @@
 #include "wpi/hal/DriverStation.hpp"
 #include "wpi/hal/HALBase.hpp"
 
-static_assert(org_wpilib_hardware_hal_DriverStationJNI_kUnknownAllianceStation ==
-              HAL_AllianceStationID_kUnknown);
+static_assert(
+    org_wpilib_hardware_hal_DriverStationJNI_kUnknownAllianceStation ==
+    HAL_AllianceStationID_kUnknown);
 static_assert(org_wpilib_hardware_hal_DriverStationJNI_kRed1AllianceStation ==
               HAL_AllianceStationID_kRed1);
 static_assert(org_wpilib_hardware_hal_DriverStationJNI_kRed2AllianceStation ==

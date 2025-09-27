@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <wpi/driverstation/Joystick.hpp>
-#include <wpi/romi/OnBoardIO.hpp>
-#include <wpi/smartdashboard/SendableChooser.hpp>
 #include <wpi/command/Command.hpp>
 #include <wpi/command/CommandPtr.hpp>
 #include <wpi/command/button/Trigger.hpp>
+#include <wpi/driverstation/Joystick.hpp>
+#include <wpi/romi/OnBoardIO.hpp>
+#include <wpi/smartdashboard/SendableChooser.hpp>
 
 #include "Constants.h"
 #include "commands/AutonomousDistance.h"

@@ -9,9 +9,9 @@
 #include <wpi/hal/REVPH.hpp>
 
 #include "wpi/Errors.hpp"
+#include "wpi/SensorUtil.hpp"
 #include "wpi/hardware/pneumatic/PneumaticHub.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsControlModule.hpp"
-#include "wpi/SensorUtil.hpp"
 
 using namespace frc;
 

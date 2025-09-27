@@ -13,15 +13,15 @@
 #include <wpi/util/SymbolExports.hpp>
 #include <wpi/util/array.hpp>
 
-#include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/interpolation/TimeInterpolatableBuffer.hpp"
 #include "wpi/math/kinematics/Kinematics.hpp"
 #include "wpi/math/kinematics/Odometry3d.hpp"
-#include "wpi/units/time.hpp"
+#include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/util/MathShared.hpp"
+#include "wpi/units/time.hpp"
 
 namespace frc {
 

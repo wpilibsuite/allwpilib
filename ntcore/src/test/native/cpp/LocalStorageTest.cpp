@@ -2,11 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <wpi/SpanMatcher.h>
+
 #include <string>
 #include <vector>
 
 #include <gtest/gtest.h>
-#include <wpi/SpanMatcher.h>
 
 #include "LocalStorage.h"
 #include "MockListenerStorage.h"

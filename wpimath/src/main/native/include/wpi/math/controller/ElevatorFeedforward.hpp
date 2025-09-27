@@ -6,13 +6,13 @@
 
 #include <wpi/util/MathExtras.h>
 
-#include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
+#include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/math/util/MathShared.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/voltage.hpp"
-#include "wpi/math/util/MathShared.hpp"
 
 namespace frc {
 /**

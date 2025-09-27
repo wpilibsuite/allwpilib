@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <wpi/system/Timer.hpp>
 #include <wpi/command/Command.hpp>
 #include <wpi/command/CommandHelper.hpp>
+#include <wpi/system/Timer.hpp>
 #include <wpi/units/time.hpp>
 
 #include "subsystems/Drivetrain.h"

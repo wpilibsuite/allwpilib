@@ -4,7 +4,7 @@
 
 #include "wpi/smartdashboard/MechanismRoot2d.hpp"
 
-#include "wpi/util/Color8Bit.hpp"
+#include <wpi/util/Color8Bit.hpp>
 
 using namespace frc;
 

@@ -7,12 +7,10 @@
 #include <numbers>
 
 #include <wpi/AnalogGyro.hpp>
-#include <wpi/math/util/ComputerVisionUtil.hpp>
-#include <wpi/hardware/rotation/Encoder.hpp>
-#include <wpi/system/RobotController.hpp>
-#include <wpi/system/Timer.hpp>
 #include <wpi/apriltag/AprilTagFieldLayout.hpp>
 #include <wpi/apriltag/AprilTagFields.hpp>
+#include <wpi/hardware/motor/PWMSparkMax.hpp>
+#include <wpi/hardware/rotation/Encoder.hpp>
 #include <wpi/math/controller/PIDController.hpp>
 #include <wpi/math/controller/SimpleMotorFeedforward.hpp>
 #include <wpi/math/estimator/DifferentialDrivePoseEstimator.hpp>
@@ -21,14 +19,16 @@
 #include <wpi/math/geometry/Quaternion.hpp>
 #include <wpi/math/geometry/Transform3d.hpp>
 #include <wpi/math/kinematics/DifferentialDriveKinematics.hpp>
-#include <wpi/hardware/motor/PWMSparkMax.hpp>
+#include <wpi/math/system/plant/LinearSystemId.hpp>
+#include <wpi/math/util/ComputerVisionUtil.hpp>
+#include <wpi/ntcore/DoubleArrayTopic.hpp>
+#include <wpi/ntcore/NetworkTableInstance.hpp>
 #include <wpi/simulation/DifferentialDrivetrainSim.hpp>
 #include <wpi/simulation/EncoderSim.hpp>
 #include <wpi/smartdashboard/Field2d.hpp>
 #include <wpi/smartdashboard/SmartDashboard.hpp>
-#include <wpi/math/system/plant/LinearSystemId.hpp>
-#include <wpi/ntcore/DoubleArrayTopic.hpp>
-#include <wpi/ntcore/NetworkTableInstance.hpp>
+#include <wpi/system/RobotController.hpp>
+#include <wpi/system/Timer.hpp>
 #include <wpi/units/angle.hpp>
 #include <wpi/units/angular_velocity.hpp>
 #include <wpi/units/length.hpp>

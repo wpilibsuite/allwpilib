@@ -8,11 +8,11 @@
 #include <utility>
 
 #include <HALSimBaseWebSocketConnection.h>
-#include <wpi/util/json_fwd.h>
-#include <wpi/util/mutex.hpp>
 #include <wpi/net/WebSocket.hpp>
 #include <wpi/net/uv/Buffer.hpp>
 #include <wpi/net/uv/Stream.hpp>
+#include <wpi/util/json_fwd.h>
+#include <wpi/util/mutex.hpp>
 
 #include "HALSimWS.h"
 

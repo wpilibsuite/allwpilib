@@ -20,10 +20,10 @@
 #include <wpi/util/mutex.hpp>
 
 #include "HALInitializer.h"
+#include "mockdata/DriverStationDataInternal.h"
 #include "wpi/hal/Errors.hpp"
 #include "wpi/hal/cpp/fpga_clock.hpp"
 #include "wpi/hal/simulation/MockHooks.hpp"
-#include "mockdata/DriverStationDataInternal.h"
 
 static wpi::mutex msgMutex;
 static std::atomic<HALSIM_SendErrorHandler> sendErrorHandler{nullptr};

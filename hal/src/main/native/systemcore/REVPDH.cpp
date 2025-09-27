@@ -4,18 +4,17 @@
 
 #include "REVPDH.h"
 
+#include <cstring>
+#include <string>
+#include <thread>
+
+#include <fmt/format.h>
 #include <wpi/hal/CAN.hpp>
 #include <wpi/hal/CANAPI.hpp>
 #include <wpi/hal/CANAPITypes.hpp>
 #include <wpi/hal/Errors.hpp>
 #include <wpi/hal/handles/HandlesInternal.hpp>
 #include <wpi/hal/handles/IndexedHandleResource.hpp>
-
-#include <cstring>
-#include <string>
-#include <thread>
-
-#include <fmt/format.h>
 
 #include "HALInitializer.h"
 #include "HALInternal.h"

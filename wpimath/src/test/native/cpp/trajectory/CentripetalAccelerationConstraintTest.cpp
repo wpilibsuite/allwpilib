@@ -7,9 +7,9 @@
 
 #include <gtest/gtest.h>
 
+#include "trajectory/TestTrajectory.h"
 #include "wpi/math/trajectory/constraint/CentripetalAccelerationConstraint.hpp"
 #include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
-#include "trajectory/TestTrajectory.h"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/math.hpp"

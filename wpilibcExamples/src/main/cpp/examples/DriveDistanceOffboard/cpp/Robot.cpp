@@ -4,8 +4,8 @@
 
 #include "Robot.h"
 
-#include <wpi/smartdashboard/SmartDashboard.hpp>
 #include <wpi/command/CommandScheduler.hpp>
+#include <wpi/smartdashboard/SmartDashboard.hpp>
 
 Robot::Robot() {}
 

@@ -13,11 +13,11 @@
 #include <utility>
 #include <vector>
 
+#include <upb/mem/arena.h>
+#include <upb/reflection/def.h>
 #include <wpi/ntcore/NetworkTableInstance.hpp>
 #include <wpi/ntcore/NetworkTableListener.hpp>
 #include <wpi/ntcore/ntcore_cpp.hpp>
-#include <upb/mem/arena.h>
-#include <upb/reflection/def.h>
 #include <wpi/util/DenseMap.h>
 #include <wpi/util/json.h>
 #include <wpi/util/struct/DynamicStruct.hpp>

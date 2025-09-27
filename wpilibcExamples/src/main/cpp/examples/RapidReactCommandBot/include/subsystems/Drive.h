@@ -7,13 +7,13 @@
 #include <functional>
 
 #include <wpi/AnalogGyro.hpp>
+#include <wpi/command/CommandPtr.hpp>
+#include <wpi/command/SubsystemBase.hpp>
+#include <wpi/drive/DifferentialDrive.hpp>
+#include <wpi/hardware/motor/PWMSparkMax.hpp>
 #include <wpi/hardware/rotation/Encoder.hpp>
 #include <wpi/math/controller/ProfiledPIDController.hpp>
 #include <wpi/math/controller/SimpleMotorFeedforward.hpp>
-#include <wpi/drive/DifferentialDrive.hpp>
-#include <wpi/hardware/motor/PWMSparkMax.hpp>
-#include <wpi/command/CommandPtr.hpp>
-#include <wpi/command/SubsystemBase.hpp>
 #include <wpi/units/angle.hpp>
 #include <wpi/units/length.hpp>
 

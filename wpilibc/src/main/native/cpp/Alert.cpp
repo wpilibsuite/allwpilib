@@ -17,8 +17,8 @@
 #include <wpi/util/sendable/SendableRegistry.hpp>
 
 #include "wpi/Errors.hpp"
-#include "wpi/system/RobotController.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/system/RobotController.hpp"
 
 using namespace frc;
 

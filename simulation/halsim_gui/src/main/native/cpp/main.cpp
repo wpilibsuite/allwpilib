@@ -6,14 +6,14 @@
 #include <memory>
 #include <string_view>
 
+#include <imgui.h>
 #include <wpi/glass/Context.hpp>
 #include <wpi/glass/Storage.hpp>
 #include <wpi/glass/hardware/Pneumatic.hpp>
 #include <wpi/glass/other/Plot.hpp>
+#include <wpi/gui/wpigui.hpp>
 #include <wpi/hal/Extensions.hpp>
 #include <wpi/hal/Main.hpp>
-#include <imgui.h>
-#include <wpi/gui/wpigui.hpp>
 
 #include "AddressableLEDGui.h"
 #include "AnalogInputSimGui.h"

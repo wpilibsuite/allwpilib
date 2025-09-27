@@ -4,11 +4,11 @@
 
 #include "wpi/simulation/ElevatorSim.hpp"
 
+#include <wpi/math/system/NumericalIntegration.hpp>
+#include <wpi/math/system/plant/LinearSystemId.hpp>
 #include <wpi/util/MathExtras.h>
 
 #include "wpi/system/RobotController.hpp"
-#include "wpi/math/system/NumericalIntegration.hpp"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
 
 using namespace frc;
 using namespace frc::sim;

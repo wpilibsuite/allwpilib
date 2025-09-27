@@ -11,8 +11,8 @@
 #include <wpi/hal/HALBase.hpp>
 #include <wpi/hal/Main.hpp>
 #include <wpi/hal/simulation/DIOData.hpp>
-#include <wpi/util/print.hpp>
 #include <wpi/net/uv/Loop.hpp>
+#include <wpi/util/print.hpp>
 
 #include "HALSimWSServer.h"
 #include "WebServerClientTest.h"

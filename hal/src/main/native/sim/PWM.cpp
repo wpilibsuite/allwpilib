@@ -12,8 +12,8 @@
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
-#include "wpi/hal/handles/HandlesInternal.hpp"
 #include "mockdata/PWMDataInternal.h"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 
 using namespace hal;
 

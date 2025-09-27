@@ -5,7 +5,6 @@
 #include "wpi/opmode/IterativeRobotBase.hpp"
 
 #include <wpi/driverstation/DriverStation.hpp>
-
 #include <wpi/hal/DriverStation.hpp>
 #include <wpi/ntcore/NetworkTableInstance.hpp>
 #include <wpi/util/print.hpp>

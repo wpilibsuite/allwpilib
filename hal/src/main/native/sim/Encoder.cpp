@@ -10,10 +10,10 @@
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
+#include "mockdata/EncoderDataInternal.h"
 #include "wpi/hal/Errors.hpp"
 #include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/hal/handles/LimitedHandleResource.hpp"
-#include "mockdata/EncoderDataInternal.h"
 
 using namespace hal;
 

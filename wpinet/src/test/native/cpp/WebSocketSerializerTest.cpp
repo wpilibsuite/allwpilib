@@ -4,6 +4,8 @@
 
 #include "WebSocketSerializer.h"  // NOLINT(build/include_order)
 
+#include <wpi/SpanMatcher.h>
+
 #include <algorithm>
 #include <array>
 #include <functional>
@@ -14,7 +16,6 @@
 #include <vector>
 
 #include <gmock/gmock.h>
-#include <wpi/SpanMatcher.h>
 
 #include "WebSocketTest.h"
 #include "wpi/net/uv/Buffer.hpp"

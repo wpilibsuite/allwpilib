@@ -4,13 +4,14 @@
 
 #pragma once
 
+#include <wpi/TestPrinters.h>
+
 #include <ostream>
 #include <span>
 #include <string>
 #include <string_view>
 
 #include <gtest/gtest.h>
-#include <wpi/TestPrinters.h>
 
 namespace nt {
 

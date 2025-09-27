@@ -18,8 +18,8 @@
 
 #include "net/ClientMessageQueue.h"
 #include "net/Message.h"
-#include "wpi/ntcore/ntcore_cpp.hpp"
 #include "server/ServerImpl.h"
+#include "wpi/ntcore/ntcore_cpp.hpp"
 
 namespace wpi {
 class Logger;

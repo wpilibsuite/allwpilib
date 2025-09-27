@@ -19,8 +19,8 @@
 #include <fmt/format.h>
 #include <imgui.h>
 #include <wpi/gui/portable-file-dialogs.hpp>
-#include <wpi/util/json.h>
 #include <wpi/gui/wpigui.hpp>
+#include <wpi/util/json.h>
 
 #include "tagpose.h"
 
