@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/rotated_span.h"  // NOLINT(build/include_order)
+#include "wpi/util/rotated_span.hpp"  // NOLINT(build/include_order)
 
 #include <array>
 #include <vector>

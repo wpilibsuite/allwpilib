@@ -14,12 +14,12 @@
 
 #include <imgui.h>
 #include <imgui_stdlib.h>
-#include <portable-file-dialogs.h>
-#include <wpi/SmallVector.h>
-#include <wpi/SpanExtras.h>
-#include <wpi/StringExtras.h>
+#include <wpi/gui/portable-file-dialogs.hpp>
+#include <wpi/util/SmallVector.h>
+#include <wpi/util/SpanExtras.hpp>
+#include <wpi/util/StringExtras.h>
 #include <wpi/datalog/DataLogReaderThread.h>
-#include <wpi/fs.h>
+#include <wpi/util/fs.hpp>
 
 using namespace sysid;
 

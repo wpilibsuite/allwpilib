@@ -7,11 +7,11 @@
 #include <memory>
 #include <utility>
 
-#include <wpi/Compiler.h>
-#include <wpi/UidVector.h>
-#include <wpi/spinlock.h>
+#include <wpi/util/Compiler.h>
+#include <wpi/util/UidVector.hpp>
+#include <wpi/util/spinlock.hpp>
 
-#include "hal/simulation/NotifyListener.h"
+#include "wpi/hal/simulation/NotifyListener.hpp"
 
 namespace hal {
 

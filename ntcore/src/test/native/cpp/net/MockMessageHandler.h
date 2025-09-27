@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include <wpi/json.h>
+#include <wpi/util/json.h>
 
 #include "PubSubOptions.h"
 #include "gmock/gmock.h"

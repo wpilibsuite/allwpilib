@@ -6,12 +6,12 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/MathUtil.h"
-#include "frc/controller/LTVDifferentialDriveController.h"
-#include "frc/system/NumericalIntegration.h"
-#include "frc/system/plant/LinearSystemId.h"
-#include "frc/trajectory/TrajectoryGenerator.h"
-#include "units/math.h"
+#include "wpi/math/util/MathUtil.hpp"
+#include "wpi/math/controller/LTVDifferentialDriveController.hpp"
+#include "wpi/math/system/NumericalIntegration.hpp"
+#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
+#include "wpi/units/math.hpp"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(units::math::abs(val1 - val2), eps)

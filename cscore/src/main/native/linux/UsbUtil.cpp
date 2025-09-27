@@ -11,11 +11,11 @@
 #include <string>
 
 #include <fmt/format.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringExtras.h>
-#include <wpi/fs.h>
-#include <wpi/raw_istream.h>
-#include <wpi/raw_ostream.h>
+#include <wpi/util/SmallString.h>
+#include <wpi/util/StringExtras.h>
+#include <wpi/util/fs.hpp>
+#include <wpi/util/raw_istream.hpp>
+#include <wpi/util/raw_ostream.h>
 
 #include "Instance.h"
 

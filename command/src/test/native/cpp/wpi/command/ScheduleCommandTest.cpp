@@ -5,9 +5,9 @@
 #include <regex>
 
 #include "CommandTestBase.h"
-#include "frc2/command/InstantCommand.h"
-#include "frc2/command/ScheduleCommand.h"
-#include "frc2/command/SequentialCommandGroup.h"
+#include "wpi/command/InstantCommand.hpp"
+#include "wpi/command/ScheduleCommand.hpp"
+#include "wpi/command/SequentialCommandGroup.hpp"
 
 using namespace frc2;
 class ScheduleCommandTest : public CommandTestBase {};

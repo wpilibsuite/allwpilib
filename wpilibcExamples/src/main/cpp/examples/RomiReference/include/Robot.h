@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <frc/TimedRobot.h>
-#include <frc2/command/Command.h>
+#include <wpi/opmode/TimedRobot.hpp>
+#include <wpi/command/Command.hpp>
 
 #include "RobotContainer.h"
 

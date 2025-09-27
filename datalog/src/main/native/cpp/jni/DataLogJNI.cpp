@@ -11,7 +11,7 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/jni_util.h>
+#include <wpi/util/jni_util.hpp>
 
 #include "org_wpilib_datalog_DataLogJNI.h"
 #include "wpi/datalog/DataLog.h"

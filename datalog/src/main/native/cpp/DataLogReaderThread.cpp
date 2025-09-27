@@ -7,8 +7,8 @@
 #include <string>
 #include <utility>
 
-#include <wpi/StringExtras.h>
-#include <wpi/print.h>
+#include <wpi/util/StringExtras.h>
+#include <wpi/util/print.hpp>
 
 using namespace wpi::log;
 

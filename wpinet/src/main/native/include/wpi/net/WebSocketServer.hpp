@@ -13,12 +13,12 @@
 #include <string_view>
 #include <utility>
 
-#include <wpi/Signal.h>
-#include <wpi/SmallString.h>
-#include <wpi/SmallVector.h>
+#include <wpi/util/Signal.h>
+#include <wpi/util/SmallString.h>
+#include <wpi/util/SmallVector.h>
 
-#include "wpinet/HttpParser.h"
-#include "wpinet/WebSocket.h"
+#include "wpi/net/HttpParser.hpp"
+#include "wpi/net/WebSocket.hpp"
 
 namespace wpi {
 

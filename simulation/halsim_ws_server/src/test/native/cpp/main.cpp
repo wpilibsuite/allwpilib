@@ -7,12 +7,12 @@
 #include <thread>
 
 #include <gtest/gtest.h>
-#include <hal/DriverStation.h>
-#include <hal/HALBase.h>
-#include <hal/Main.h>
-#include <hal/simulation/DIOData.h>
-#include <wpi/print.h>
-#include <wpinet/uv/Loop.h>
+#include <wpi/hal/DriverStation.hpp>
+#include <wpi/hal/HALBase.hpp>
+#include <wpi/hal/Main.hpp>
+#include <wpi/hal/simulation/DIOData.hpp>
+#include <wpi/util/print.hpp>
+#include <wpi/net/uv/Loop.hpp>
 
 #include "HALSimWSServer.h"
 #include "WebServerClientTest.h"

@@ -5,8 +5,8 @@
 #include <string>
 
 #include <gtest/gtest.h>
-#include <wpi/SmallString.h>
-#include <wpi/raw_ostream.h>
+#include <wpi/util/SmallString.h>
+#include <wpi/util/raw_ostream.h>
 
 #include "../MockLogger.h"
 #include "../PubSubOptionsMatcher.h"
@@ -16,7 +16,7 @@
 #include "gmock/gmock.h"
 #include "net/MessageHandler.h"
 #include "net/WireDecoder.h"
-#include "networktables/NetworkTableValue.h"
+#include "wpi/ntcore/NetworkTableValue.hpp"
 
 using namespace std::string_view_literals;
 using testing::_;

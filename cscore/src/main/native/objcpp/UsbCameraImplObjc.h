@@ -12,7 +12,7 @@
 #import "UsbCameraDelegate.h"
 #import "UvcControlImpl.h"
 
-#include "cscore_cpp.h"
+#include "wpi/cscore/cscore_cpp.hpp"
 
 // Quirk: exposure auto is 3 for on, 1 for off
 #define kPropertyAutoExposureOn 3

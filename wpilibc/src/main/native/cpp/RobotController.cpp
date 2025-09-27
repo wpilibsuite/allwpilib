@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/RobotController.h"
+#include "wpi/system/RobotController.hpp"
 
 #include <functional>
 #include <string>
 
-#include <hal/CAN.h>
-#include <hal/HALBase.h>
-#include <hal/Power.h>
+#include <wpi/hal/CAN.hpp>
+#include <wpi/hal/HALBase.hpp>
+#include <wpi/hal/Power.hpp>
 
-#include "frc/Errors.h"
+#include "wpi/Errors.hpp"
 
 using namespace frc;
 

@@ -10,7 +10,7 @@
 #include <string_view>
 
 #include "Handle.h"
-#include "ntcore_c.h"
+#include "wpi/ntcore/ntcore_c.h"
 
 namespace wpi::log {
 class DataLog;

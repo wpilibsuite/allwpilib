@@ -18,13 +18,13 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <glass/Storage.h>
+#include <wpi/glass/Storage.hpp>
 #include <imgui.h>
 #include <imgui_stdlib.h>
 #include <libssh/sftp.h>
-#include <portable-file-dialogs.h>
-#include <wpi/StringExtras.h>
-#include <wpi/fs.h>
+#include <wpi/gui/portable-file-dialogs.hpp>
+#include <wpi/util/StringExtras.h>
+#include <wpi/util/fs.hpp>
 
 #include "Sftp.h"
 

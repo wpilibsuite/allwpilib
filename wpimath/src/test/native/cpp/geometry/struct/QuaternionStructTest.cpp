@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Quaternion.h"
+#include "wpi/math/geometry/Quaternion.hpp"
 
 using namespace frc;
 

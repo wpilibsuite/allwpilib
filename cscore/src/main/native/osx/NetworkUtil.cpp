@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "cscore_cpp.h"
+#include "wpi/cscore/cscore_cpp.hpp"
 
 namespace cs {
 

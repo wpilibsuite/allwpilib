@@ -6,8 +6,8 @@
 
 #include <vector>
 
-#include <hal/Ports.h>
-#include <hal/simulation/AddressableLEDData.h>
+#include <wpi/hal/Ports.hpp>
+#include <wpi/hal/simulation/AddressableLEDData.hpp>
 
 #define REGISTER(halsim, jsonid, ctype, haltype)                          \
   HALSIM_RegisterAddressableLED##halsim##Callback(                        \

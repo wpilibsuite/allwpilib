@@ -18,7 +18,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#include "wpinet/http_parser.h"
+#include "wpi/net/http_parser.hpp"
 #include <assert.h>
 #include <stddef.h>
 #include <ctype.h>

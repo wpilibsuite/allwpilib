@@ -6,12 +6,12 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/trajectory/Trajectory.h"
-#include "frc/trajectory/TrajectoryGenerator.h"
-#include "frc/trajectory/constraint/CentripetalAccelerationConstraint.h"
-#include "frc/trajectory/constraint/TrajectoryConstraint.h"
+#include "wpi/math/trajectory/Trajectory.hpp"
+#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/constraint/CentripetalAccelerationConstraint.hpp"
+#include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
 #include "trajectory/TestTrajectory.h"
-#include "units/math.h"
+#include "wpi/units/math.hpp"
 
 using namespace frc;
 

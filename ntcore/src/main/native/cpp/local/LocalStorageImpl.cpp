@@ -11,8 +11,8 @@
 
 #include <fmt/format.h>
 #include <fmt/ranges.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringExtras.h>
+#include <wpi/util/SmallString.h>
+#include <wpi/util/StringExtras.h>
 #include <wpi/datalog/DataLog.h>
 
 #include "IListenerStorage.h"

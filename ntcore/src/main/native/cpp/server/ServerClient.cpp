@@ -6,7 +6,7 @@
 
 #include <utility>
 
-#include <wpi/MessagePack.h>
+#include <wpi/util/MessagePack.hpp>
 
 #include "server/MessagePackWriter.h"
 #include "server/ServerPublisher.h"

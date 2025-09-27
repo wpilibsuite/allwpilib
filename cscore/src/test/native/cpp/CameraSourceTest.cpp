@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "cscore.h"
+#include "wpi/cscore/cscore.hpp"
 
 namespace cs {
 

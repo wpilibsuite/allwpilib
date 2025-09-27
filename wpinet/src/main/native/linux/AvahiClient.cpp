@@ -4,7 +4,7 @@
 
 #include "AvahiClient.h"
 
-#include <wpi/mutex.h>
+#include <wpi/util/mutex.hpp>
 
 #include <thread>
 

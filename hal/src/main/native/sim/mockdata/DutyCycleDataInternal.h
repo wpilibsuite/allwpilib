@@ -7,8 +7,8 @@
 #include <atomic>
 #include <limits>
 
-#include "hal/simulation/DutyCycleData.h"
-#include "hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/DutyCycleData.hpp"
+#include "wpi/hal/simulation/SimDataValue.hpp"
 
 namespace hal {
 class DutyCycleData {

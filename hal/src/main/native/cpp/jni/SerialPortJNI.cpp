@@ -6,11 +6,11 @@
 
 #include <cassert>
 
-#include <wpi/jni_util.h>
+#include <wpi/util/jni_util.hpp>
 
 #include "HALUtil.h"
 #include "org_wpilib_hardware_hal_SerialPortJNI.h"
-#include "hal/SerialPort.h"
+#include "wpi/hal/SerialPort.hpp"
 
 using namespace hal;
 using namespace wpi::java;

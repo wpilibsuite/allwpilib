@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/ComputerVisionUtil.h"
+#include "wpi/math/util/ComputerVisionUtil.hpp"
 
 TEST(ComputerVisionUtilTest, ObjectToRobotPose) {
   frc::Pose3d robot{1_m, 2_m, 0_m, frc::Rotation3d{0_deg, 0_deg, 30_deg}};

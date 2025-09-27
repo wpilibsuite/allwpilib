@@ -30,9 +30,9 @@
 
 #include <gcem.hpp>
 
-#include "units/angle.h"
-#include "units/base.h"
-#include "units/dimensionless.h"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/base.hpp"
+#include "wpi/units/dimensionless.hpp"
 
 //----------------------------------
 // UNIT-ENABLED CMATH FUNCTIONS

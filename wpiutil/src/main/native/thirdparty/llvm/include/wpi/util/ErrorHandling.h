@@ -14,7 +14,7 @@
 #ifndef WPIUTIL_WPI_ERRORHANDLING_H
 #define WPIUTIL_WPI_ERRORHANDLING_H
 
-#include "wpi/Compiler.h"
+#include "wpi/util/Compiler.h"
 #include <string>
 #include <string_view>
 

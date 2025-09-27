@@ -10,11 +10,11 @@
 #include <memory>
 #include <vector>
 
-#include <wpi/mutex.h>
+#include <wpi/util/mutex.hpp>
 
-#include "hal/Errors.h"
-#include "hal/Types.h"
-#include "hal/handles/HandlesInternal.h"
+#include "wpi/hal/Errors.hpp"
+#include "wpi/hal/Types.hpp"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 
 namespace hal {
 

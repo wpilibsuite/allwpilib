@@ -16,7 +16,7 @@
 #include <algorithm>
 #include <cerrno>
 
-#include <wpi/SafeThread.h>
+#include <wpi/util/SafeThread.hpp>
 
 #include "Log.h"
 #include "Notifier.h"

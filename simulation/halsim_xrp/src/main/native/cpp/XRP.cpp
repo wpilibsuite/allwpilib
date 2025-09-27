@@ -8,8 +8,8 @@
 #include <string>
 
 #include <fmt/format.h>
-#include <wpi/Endian.h>
-#include <wpi/json.h>
+#include <wpi/util/Endian.h>
+#include <wpi/util/json.h>
 
 using namespace wpilibxrp;
 

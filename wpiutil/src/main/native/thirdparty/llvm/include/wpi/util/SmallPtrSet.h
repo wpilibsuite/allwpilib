@@ -15,10 +15,10 @@
 #ifndef WPIUTIL_WPI_SMALLPTRSET_H
 #define WPIUTIL_WPI_SMALLPTRSET_H
 
-#include "wpi/EpochTracker.h"
-#include "wpi/MathExtras.h"
-#include "wpi/ReverseIteration.h"
-#include "wpi/type_traits.h"
+#include "wpi/util/EpochTracker.h"
+#include "wpi/util/MathExtras.h"
+#include "wpi/util/ReverseIteration.h"
+#include "wpi/util/type_traits.h"
 #include <algorithm>
 #include <cassert>
 #include <cstddef>

@@ -4,16 +4,16 @@
 
 #include <utility>
 
-#include <frc/simulation/SimHooks.h>
+#include <wpi/simulation/SimHooks.hpp>
 #include <gtest/gtest.h>
 
 #include "../CommandTestBase.h"
-#include "frc2/command/CommandPtr.h"
-#include "frc2/command/CommandScheduler.h"
-#include "frc2/command/Commands.h"
-#include "frc2/command/RunCommand.h"
-#include "frc2/command/WaitUntilCommand.h"
-#include "frc2/command/button/Trigger.h"
+#include "wpi/command/CommandPtr.hpp"
+#include "wpi/command/CommandScheduler.hpp"
+#include "wpi/command/Commands.hpp"
+#include "wpi/command/RunCommand.hpp"
+#include "wpi/command/WaitUntilCommand.hpp"
+#include "wpi/command/button/Trigger.hpp"
 
 using namespace frc2;
 class TriggerTest : public CommandTestBase {};

@@ -14,10 +14,10 @@
 
 #include <fmt/format.h>
 #include <fmt/ranges.h>
-#include <frc/filter/LinearFilter.h>
-#include <units/time.h>
-#include <wpi/StringMap.h>
-#include <wpi/array.h>
+#include <wpi/math/filter/LinearFilter.hpp>
+#include <wpi/units/time.hpp>
+#include <wpi/util/StringMap.hpp>
+#include <wpi/util/array.hpp>
 
 #include "sysid/analysis/AnalysisManager.h"
 #include "sysid/analysis/Storage.h"

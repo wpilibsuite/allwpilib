@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include <wpi/timestamp.h>
+#include <wpi/util/timestamp.hpp>
 
 #include "Log.h"
 #include "net/WireDecoder.h"

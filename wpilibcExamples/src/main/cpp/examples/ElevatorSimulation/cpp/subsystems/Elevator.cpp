@@ -4,9 +4,9 @@
 
 #include "subsystems/Elevator.h"
 
-#include <frc/RobotController.h>
-#include <frc/StateSpaceUtil.h>
-#include <frc/smartdashboard/SmartDashboard.h>
+#include <wpi/system/RobotController.hpp>
+#include <wpi/math/util/StateSpaceUtil.hpp>
+#include <wpi/smartdashboard/SmartDashboard.hpp>
 
 Elevator::Elevator() {
   m_encoder.SetDistancePerPulse(Constants::kArmEncoderDistPerPulse);

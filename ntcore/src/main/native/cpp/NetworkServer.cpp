@@ -14,19 +14,19 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/MemoryBuffer.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringExtras.h>
-#include <wpi/fs.h>
-#include <wpi/mutex.h>
-#include <wpi/raw_ostream.h>
-#include <wpi/timestamp.h>
-#include <wpinet/HttpUtil.h>
-#include <wpinet/HttpWebSocketServerConnection.h>
-#include <wpinet/UrlParser.h>
-#include <wpinet/uv/Tcp.h>
-#include <wpinet/uv/Work.h>
-#include <wpinet/uv/util.h>
+#include <wpi/util/MemoryBuffer.h>
+#include <wpi/util/SmallString.h>
+#include <wpi/util/StringExtras.h>
+#include <wpi/util/fs.hpp>
+#include <wpi/util/mutex.hpp>
+#include <wpi/util/raw_ostream.h>
+#include <wpi/util/timestamp.hpp>
+#include <wpi/net/HttpUtil.hpp>
+#include <wpi/net/HttpWebSocketServerConnection.hpp>
+#include <wpi/net/UrlParser.hpp>
+#include <wpi/net/uv/Tcp.hpp>
+#include <wpi/net/uv/Work.hpp>
+#include <wpi/net/uv/util.hpp>
 
 #include "IConnectionList.h"
 #include "InstanceImpl.h"

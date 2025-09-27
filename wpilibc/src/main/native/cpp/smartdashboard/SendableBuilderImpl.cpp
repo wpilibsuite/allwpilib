@@ -2,25 +2,25 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/smartdashboard/SendableBuilderImpl.h"
+#include "wpi/smartdashboard/SendableBuilderImpl.hpp"
 
 #include <memory>
 #include <string>
 #include <utility>
 
-#include <networktables/BooleanArrayTopic.h>
-#include <networktables/BooleanTopic.h>
-#include <networktables/DoubleArrayTopic.h>
-#include <networktables/DoubleTopic.h>
-#include <networktables/FloatArrayTopic.h>
-#include <networktables/FloatTopic.h>
-#include <networktables/IntegerArrayTopic.h>
-#include <networktables/IntegerTopic.h>
-#include <networktables/RawTopic.h>
-#include <networktables/StringArrayTopic.h>
-#include <ntcore_cpp.h>
-#include <wpi/SmallVector.h>
-#include <wpi/json.h>
+#include <wpi/ntcore/BooleanArrayTopic.hpp>
+#include <wpi/ntcore/BooleanTopic.hpp>
+#include <wpi/ntcore/DoubleArrayTopic.hpp>
+#include <wpi/ntcore/DoubleTopic.hpp>
+#include <wpi/ntcore/FloatArrayTopic.hpp>
+#include <wpi/ntcore/FloatTopic.hpp>
+#include <wpi/ntcore/IntegerArrayTopic.hpp>
+#include <wpi/ntcore/IntegerTopic.hpp>
+#include <wpi/ntcore/RawTopic.hpp>
+#include <wpi/ntcore/StringArrayTopic.hpp>
+#include <wpi/ntcore/ntcore_cpp.hpp>
+#include <wpi/util/SmallVector.h>
+#include <wpi/util/json.h>
 
 using namespace frc;
 

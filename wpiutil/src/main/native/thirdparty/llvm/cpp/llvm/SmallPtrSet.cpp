@@ -11,10 +11,10 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/SmallPtrSet.h"
-#include "wpi/DenseMapInfo.h"
-#include "wpi/MathExtras.h"
-#include "wpi/MemAlloc.h"
+#include "wpi/util/SmallPtrSet.h"
+#include "wpi/util/DenseMapInfo.h"
+#include "wpi/util/MathExtras.h"
+#include "wpi/util/MemAlloc.h"
 #include <algorithm>
 #include <cassert>
 #include <cstdlib>

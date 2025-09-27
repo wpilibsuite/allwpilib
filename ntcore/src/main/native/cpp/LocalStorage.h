@@ -12,15 +12,15 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/Logger.h>
-#include <wpi/SmallVector.h>
-#include <wpi/json.h>
-#include <wpi/mutex.h>
+#include <wpi/util/Logger.hpp>
+#include <wpi/util/SmallVector.h>
+#include <wpi/util/json.h>
+#include <wpi/util/mutex.hpp>
 
 #include "local/LocalStorageImpl.h"
 #include "net/MessageHandler.h"
 #include "net/NetworkInterface.h"
-#include "ntcore_cpp.h"
+#include "wpi/ntcore/ntcore_cpp.hpp"
 
 namespace wpi {
 class Logger;

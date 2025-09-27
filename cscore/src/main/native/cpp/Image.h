@@ -10,7 +10,7 @@
 
 #include <opencv2/core/core.hpp>
 
-#include "cscore_cpp.h"
+#include "wpi/cscore/cscore_cpp.hpp"
 #include "default_init_allocator.h"
 
 namespace cs {

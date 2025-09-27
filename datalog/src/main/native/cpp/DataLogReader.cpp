@@ -7,7 +7,7 @@
 #include <bit>
 #include <utility>
 
-#include <wpi/Endian.h>
+#include <wpi/util/Endian.h>
 
 #include "wpi/datalog/DataLog.h"
 

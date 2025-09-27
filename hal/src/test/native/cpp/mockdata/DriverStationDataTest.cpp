@@ -6,10 +6,10 @@
 #include <string>
 
 #include <gtest/gtest.h>
-#include <wpi/StringExtras.h>
+#include <wpi/util/StringExtras.h>
 
-#include "hal/HAL.h"
-#include "hal/simulation/DriverStationData.h"
+#include "wpi/hal/HAL.hpp"
+#include "wpi/hal/simulation/DriverStationData.hpp"
 
 namespace hal {
 

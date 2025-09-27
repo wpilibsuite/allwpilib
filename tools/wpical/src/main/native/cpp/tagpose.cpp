@@ -4,7 +4,7 @@
 
 #include "tagpose.h"
 
-#include <wpi/deprecated.h>
+#include <wpi/util/deprecated.hpp>
 
 WPI_IGNORE_DEPRECATED
 namespace tag {

@@ -14,9 +14,9 @@
 #ifndef WPIUTIL_WPI_SMALLSET_H
 #define WPIUTIL_WPI_SMALLSET_H
 
-#include "wpi/SmallPtrSet.h"
-#include "wpi/SmallVector.h"
-#include "wpi/iterator.h"
+#include "wpi/util/SmallPtrSet.h"
+#include "wpi/util/SmallVector.h"
+#include "wpi/util/iterator.h"
 #include <cstddef>
 #include <functional>
 #include <initializer_list>

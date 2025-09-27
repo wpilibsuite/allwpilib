@@ -13,9 +13,9 @@
 
 #include <imgui.h>
 #include <implot.h>
-#include <units/time.h>
-#include <wpi/Logger.h>
-#include <wpi/spinlock.h>
+#include <wpi/units/time.hpp>
+#include <wpi/util/Logger.hpp>
+#include <wpi/util/spinlock.hpp>
 
 #include "sysid/analysis/AnalysisManager.h"
 #include "sysid/analysis/AnalysisType.h"

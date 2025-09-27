@@ -9,14 +9,14 @@
 #include <string>
 #include <utility>
 
-#include <wpi/SmallString.h>
-#include <wpi/StringExtras.h>
-#include <wpi/fmt/raw_ostream.h>
-#include <wpi/print.h>
-#include <wpinet/HttpUtil.h>
-#include <wpinet/TCPAcceptor.h>
-#include <wpinet/raw_socket_istream.h>
-#include <wpinet/raw_socket_ostream.h>
+#include <wpi/util/SmallString.h>
+#include <wpi/util/StringExtras.h>
+#include <wpi/util/fmt/raw_ostream.hpp>
+#include <wpi/util/print.hpp>
+#include <wpi/net/HttpUtil.hpp>
+#include <wpi/net/TCPAcceptor.h>
+#include <wpi/net/raw_socket_istream.hpp>
+#include <wpi/net/raw_socket_ostream.hpp>
 
 #include "Instance.h"
 #include "JpegUtil.h"
@@ -24,7 +24,7 @@
 #include "Notifier.h"
 #include "SourceImpl.h"
 #include "c_util.h"
-#include "cscore_cpp.h"
+#include "wpi/cscore/cscore_cpp.hpp"
 
 using namespace cs;
 

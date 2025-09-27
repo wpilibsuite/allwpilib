@@ -13,7 +13,7 @@
 #include <cstdint> // uint8_t
 #include <string> // string
 
-#include <wpi/detail/macro_scope.h>
+#include <wpi/util/detail/macro_scope.h>
 #if JSON_HAS_THREE_WAY_COMPARISON
     #include <compare> // partial_ordering
 #endif

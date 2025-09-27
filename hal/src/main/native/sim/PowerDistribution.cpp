@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/PowerDistribution.h"
+#include "wpi/hal/PowerDistribution.hpp"
 
 #include <fmt/format.h>
 
@@ -10,8 +10,8 @@
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
-#include "hal/CANAPI.h"
-#include "hal/Errors.h"
+#include "wpi/hal/CANAPI.hpp"
+#include "wpi/hal/Errors.hpp"
 #include "mockdata/PowerDistributionDataInternal.h"
 
 using namespace hal;

@@ -6,10 +6,10 @@
 
 #include <gtest/gtest.h>
 
-#include "hal/CTREPCM.h"
-#include "hal/HAL.h"
-#include "hal/handles/HandlesInternal.h"
-#include "hal/simulation/CTREPCMData.h"
+#include "wpi/hal/CTREPCM.hpp"
+#include "wpi/hal/HAL.hpp"
+#include "wpi/hal/handles/HandlesInternal.hpp"
+#include "wpi/hal/simulation/CTREPCMData.hpp"
 
 namespace hal {
 

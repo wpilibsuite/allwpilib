@@ -13,11 +13,11 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/Endian.h>
-#include <wpi/Logger.h>
-#include <wpi/SmallString.h>
-#include <wpi/print.h>
-#include <wpi/timestamp.h>
+#include <wpi/util/Endian.h>
+#include <wpi/util/Logger.hpp>
+#include <wpi/util/SmallString.h>
+#include <wpi/util/print.hpp>
+#include <wpi/util/timestamp.hpp>
 
 using namespace wpi::log;
 

@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <frc/smartdashboard/SendableChooser.h>
-#include <frc2/command/Command.h>
-#include <frc2/command/Commands.h>
-#include <frc2/command/button/CommandPS4Controller.h>
+#include <wpi/smartdashboard/SendableChooser.hpp>
+#include <wpi/command/Command.hpp>
+#include <wpi/command/Commands.hpp>
+#include <wpi/command/button/CommandPS4Controller.hpp>
 
 #include "Constants.h"
 #include "commands/Autos.h"

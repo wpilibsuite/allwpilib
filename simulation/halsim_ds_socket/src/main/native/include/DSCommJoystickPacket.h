@@ -6,7 +6,7 @@
 
 #include <cstring>
 
-#include <hal/DriverStationTypes.h>
+#include <wpi/hal/DriverStationTypes.hpp>
 
 namespace halsim {
 

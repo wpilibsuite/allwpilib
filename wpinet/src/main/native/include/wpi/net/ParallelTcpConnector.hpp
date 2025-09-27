@@ -13,7 +13,7 @@
 #include <utility>
 #include <vector>
 
-#include "wpinet/uv/Timer.h"
+#include "wpi/net/uv/Timer.hpp"
 
 namespace wpi {
 

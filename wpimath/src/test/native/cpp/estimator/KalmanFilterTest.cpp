@@ -8,11 +8,11 @@
 #include <Eigen/Core>
 #include <gtest/gtest.h>
 
-#include "frc/estimator/KalmanFilter.h"
-#include "frc/system/plant/DCMotor.h"
-#include "frc/system/plant/LinearSystemId.h"
-#include "units/moment_of_inertia.h"
-#include "units/time.h"
+#include "wpi/math/estimator/KalmanFilter.hpp"
+#include "wpi/math/system/plant/DCMotor.hpp"
+#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/units/moment_of_inertia.hpp"
+#include "wpi/units/time.hpp"
 
 TEST(KalmanFilterTest, Flywheel) {
   auto motor = frc::DCMotor::NEO();

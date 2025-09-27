@@ -6,10 +6,10 @@
 
 #include <memory>
 
-#include <wpi/StringExtras.h>
-#include <wpinet/EventLoopRunner.h>
-#include <wpinet/uv/FsEvent.h>
-#include <wpinet/uv/Timer.h>
+#include <wpi/util/StringExtras.h>
+#include <wpi/net/EventLoopRunner.hpp>
+#include <wpi/net/uv/FsEvent.hpp>
+#include <wpi/net/uv/Timer.hpp>
 
 #include "Notifier.h"
 

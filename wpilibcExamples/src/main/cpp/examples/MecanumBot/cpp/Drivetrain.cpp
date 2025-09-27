@@ -4,7 +4,7 @@
 
 #include "Drivetrain.h"
 
-#include <frc/kinematics/ChassisSpeeds.h>
+#include <wpi/math/kinematics/ChassisSpeeds.hpp>
 
 frc::MecanumDriveWheelSpeeds Drivetrain::GetCurrentState() const {
   return {units::meters_per_second_t{m_frontLeftEncoder.GetRate()},

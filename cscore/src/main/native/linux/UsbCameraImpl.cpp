@@ -26,12 +26,12 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/MemAlloc.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringExtras.h>
-#include <wpi/fs.h>
-#include <wpi/raw_ostream.h>
-#include <wpi/timestamp.h>
+#include <wpi/util/MemAlloc.h>
+#include <wpi/util/SmallString.h>
+#include <wpi/util/StringExtras.h>
+#include <wpi/util/fs.hpp>
+#include <wpi/util/raw_ostream.h>
+#include <wpi/util/timestamp.hpp>
 
 #include "Instance.h"
 #include "JpegUtil.h"
@@ -39,7 +39,7 @@
 #include "Notifier.h"
 #include "Telemetry.h"
 #include "UsbUtil.h"
-#include "cscore_cpp.h"
+#include "wpi/cscore/cscore_cpp.hpp"
 
 using namespace cs;
 

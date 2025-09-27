@@ -12,7 +12,7 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <units/math.h>
+#include <wpi/units/math.hpp>
 
 #include "sysid/Util.h"
 #include "sysid/analysis/AnalysisManager.h"

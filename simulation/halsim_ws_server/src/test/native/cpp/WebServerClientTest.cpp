@@ -9,10 +9,10 @@
 #include <string>
 
 #include <fmt/format.h>
-#include <wpi/SmallString.h>
-#include <wpi/print.h>
-#include <wpinet/raw_uv_ostream.h>
-#include <wpinet/uv/util.h>
+#include <wpi/util/SmallString.h>
+#include <wpi/util/print.hpp>
+#include <wpi/net/raw_uv_ostream.hpp>
+#include <wpi/net/uv/util.hpp>
 
 static constexpr int kTcpConnectAttemptTimeout = 1000;
 

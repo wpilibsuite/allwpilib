@@ -6,7 +6,7 @@
 
 #include <string_view>
 
-#include "glass/Model.h"
+#include "wpi/glass/Model.hpp"
 
 namespace wpi {
 template <typename T>

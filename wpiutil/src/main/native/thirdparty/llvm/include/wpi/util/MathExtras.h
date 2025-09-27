@@ -13,8 +13,8 @@
 #ifndef WPIUTIL_WPI_MATHEXTRAS_H
 #define WPIUTIL_WPI_MATHEXTRAS_H
 
-#include "wpi/bit.h"
-#include "wpi/Compiler.h"
+#include "wpi/util/bit.h"
+#include "wpi/util/Compiler.h"
 #include <bit>
 #include <cassert>
 #include <climits>

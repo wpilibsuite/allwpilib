@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "units/angle.h"
-#include "units/base.h"
-#include "units/length.h"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/base.hpp"
+#include "wpi/units/length.hpp"
 
 namespace units {
 using curvature_t = units::unit_t<

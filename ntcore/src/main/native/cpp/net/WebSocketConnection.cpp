@@ -7,13 +7,13 @@
 #include <algorithm>
 #include <span>
 
-#include <wpi/Endian.h>
-#include <wpi/Logger.h>
-#include <wpi/SpanExtras.h>
-#include <wpi/raw_ostream.h>
-#include <wpi/timestamp.h>
-#include <wpinet/WebSocket.h>
-#include <wpinet/raw_uv_ostream.h>
+#include <wpi/util/Endian.h>
+#include <wpi/util/Logger.hpp>
+#include <wpi/util/SpanExtras.hpp>
+#include <wpi/util/raw_ostream.h>
+#include <wpi/util/timestamp.hpp>
+#include <wpi/net/WebSocket.hpp>
+#include <wpi/net/raw_uv_ostream.hpp>
 
 using namespace nt;
 using namespace nt::net;

@@ -15,15 +15,15 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/ConvertUTF.h"
-#include "wpi/SafeThread.h"
-#include "wpi/SmallString.h"
-#include "wpi/SmallVector.h"
-#include "wpi/StringExtras.h"
-#include "wpi/mutex.h"
-#include "wpi/print.h"
-#include "wpi/raw_ostream.h"
-#include "wpi/string.h"
+#include "wpi/util/ConvertUTF.h"
+#include "wpi/util/SafeThread.hpp"
+#include "wpi/util/SmallString.h"
+#include "wpi/util/SmallVector.h"
+#include "wpi/util/StringExtras.h"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/print.hpp"
+#include "wpi/util/raw_ostream.h"
+#include "wpi/util/string.hpp"
 
 /** Java Native Interface (JNI) utility functions */
 namespace wpi::java {

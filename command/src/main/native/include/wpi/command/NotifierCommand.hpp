@@ -6,12 +6,12 @@
 
 #include <functional>
 
-#include <frc/Notifier.h>
-#include <units/time.h>
+#include <wpi/Notifier.hpp>
+#include <wpi/units/time.hpp>
 
-#include "frc2/command/Command.h"
-#include "frc2/command/CommandHelper.h"
-#include "frc2/command/Requirements.h"
+#include "wpi/command/Command.hpp"
+#include "wpi/command/CommandHelper.hpp"
+#include "wpi/command/Requirements.hpp"
 
 namespace frc2 {
 /**

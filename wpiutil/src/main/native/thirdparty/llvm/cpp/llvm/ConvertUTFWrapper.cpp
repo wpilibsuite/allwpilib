@@ -6,10 +6,10 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/ConvertUTF.h"
-#include "wpi/SmallVector.h"
-#include "wpi/ErrorHandling.h"
-#include "wpi/SwapByteOrder.h"
+#include "wpi/util/ConvertUTF.h"
+#include "wpi/util/SmallVector.h"
+#include "wpi/util/ErrorHandling.h"
+#include "wpi/util/SwapByteOrder.h"
 #include <span>
 #include <string>
 #include <string_view>

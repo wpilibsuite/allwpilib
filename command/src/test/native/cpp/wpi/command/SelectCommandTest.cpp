@@ -8,8 +8,8 @@
 
 #include "CommandTestBase.h"
 #include "CompositionTestBase.h"
-#include "frc2/command/InstantCommand.h"
-#include "frc2/command/SelectCommand.h"
+#include "wpi/command/InstantCommand.hpp"
+#include "wpi/command/SelectCommand.hpp"
 
 using namespace frc2;
 class SelectCommandTest : public CommandTestBase {};

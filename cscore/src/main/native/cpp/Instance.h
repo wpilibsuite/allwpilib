@@ -8,8 +8,8 @@
 #include <memory>
 #include <utility>
 
-#include <wpi/Logger.h>
-#include <wpinet/EventLoopRunner.h>
+#include <wpi/util/Logger.hpp>
+#include <wpi/net/EventLoopRunner.hpp>
 
 #include "Log.h"
 #include "NetworkListener.h"

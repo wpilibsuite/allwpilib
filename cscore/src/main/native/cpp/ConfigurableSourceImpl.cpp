@@ -7,7 +7,7 @@
 #include <memory>
 #include <string>
 
-#include <wpi/timestamp.h>
+#include <wpi/util/timestamp.hpp>
 
 #include "Handle.h"
 #include "Instance.h"

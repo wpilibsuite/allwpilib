@@ -6,11 +6,11 @@
 
 #include <vector>
 
-#include <wpi/spinlock.h>
+#include <wpi/util/spinlock.hpp>
 
-#include "hal/simulation/AddressableLEDData.h"
-#include "hal/simulation/SimCallbackRegistry.h"
-#include "hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/AddressableLEDData.hpp"
+#include "wpi/hal/simulation/SimCallbackRegistry.hpp"
+#include "wpi/hal/simulation/SimDataValue.hpp"
 
 namespace hal {
 class AddressableLEDData {

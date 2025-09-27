@@ -9,15 +9,15 @@
 #include <string>
 #include <string_view>
 
-#include <wpi/SmallVector.h>
-#include <wpi/Synchronization.h>
-#include <wpi/json.h>
+#include <wpi/util/SmallVector.h>
+#include <wpi/util/Synchronization.hpp>
+#include <wpi/util/json.h>
 
 #include "Handle.h"
 #include "VectorSet.h"
 #include "local/LocalDataLogger.h"
 #include "local/LocalDataLoggerEntry.h"
-#include "ntcore_cpp.h"
+#include "wpi/ntcore/ntcore_cpp.hpp"
 
 namespace nt::local {
 

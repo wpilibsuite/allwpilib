@@ -15,13 +15,13 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/StringExtras.h"
+#include "wpi/util/StringExtras.h"
 
 #include <algorithm>
 #include <cstdlib>
 #include <string_view>
 
-#include "wpi/SmallString.h"
+#include "wpi/util/SmallString.h"
 
 // strncasecmp() is not available on non-POSIX systems, so define an
 // alternative function here.

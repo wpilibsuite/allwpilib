@@ -6,13 +6,13 @@
 
 #include <jni.h>
 
-#include <wpi/jni_util.h>
+#include <wpi/util/jni_util.hpp>
 
 #include "SimulatorJNI.h"
-#include "hal/Types.h"
-#include "hal/Value.h"
-#include "hal/handles/UnlimitedHandleResource.h"
-#include "hal/simulation/NotifyListener.h"
+#include "wpi/hal/Types.hpp"
+#include "wpi/hal/Value.hpp"
+#include "wpi/hal/handles/UnlimitedHandleResource.hpp"
+#include "wpi/hal/simulation/NotifyListener.hpp"
 
 namespace hal::sim {
 class CallbackStore {

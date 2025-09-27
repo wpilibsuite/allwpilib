@@ -9,7 +9,7 @@
 #include <string>
 #include <string_view>
 
-#include <wpi/json_fwd.h>
+#include <wpi/util/json_fwd.h>
 
 namespace nt {
 class PubSubOptionsImpl;

@@ -6,7 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/SwapByteOrder.h"
+#include "wpi/util/SwapByteOrder.h"
 #include "gtest/gtest.h"
 #include <cstdlib>
 #include <ctime>

@@ -6,7 +6,7 @@
 
 #include <numbers>
 
-#include <units/math.h>
+#include <wpi/units/math.hpp>
 
 void TurnDegrees::Initialize() {
   // Set motors to stop, read encoder values for starting point

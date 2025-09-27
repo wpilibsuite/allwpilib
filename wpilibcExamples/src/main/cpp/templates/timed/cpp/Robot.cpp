@@ -4,8 +4,8 @@
 
 #include "Robot.h"
 
-#include <frc/smartdashboard/SmartDashboard.h>
-#include <wpi/print.h>
+#include <wpi/smartdashboard/SmartDashboard.hpp>
+#include <wpi/util/print.hpp>
 
 Robot::Robot() {
   m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);

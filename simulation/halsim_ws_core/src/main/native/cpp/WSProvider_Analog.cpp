@@ -4,8 +4,8 @@
 
 #include "WSProvider_Analog.h"
 
-#include <hal/Ports.h>
-#include <hal/simulation/AnalogInData.h>
+#include <wpi/hal/Ports.hpp>
+#include <wpi/hal/simulation/AnalogInData.hpp>
 
 #define REGISTER_AIN(halsim, jsonid, ctype, haltype)                       \
   HALSIM_RegisterAnalogIn##halsim##Callback(                               \

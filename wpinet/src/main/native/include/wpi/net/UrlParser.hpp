@@ -7,9 +7,9 @@
 
 #include <string_view>
 
-#include <wpi/StringExtras.h>
+#include <wpi/util/StringExtras.h>
 
-#include "wpinet/http_parser.h"
+#include "wpi/net/http_parser.hpp"
 
 namespace wpi {
 

@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/TimedRobot.h>
-#include <frc/XboxController.h>
-#include <frc/filter/SlewRateLimiter.h>
+#include <wpi/opmode/TimedRobot.hpp>
+#include <wpi/driverstation/XboxController.hpp>
+#include <wpi/math/filter/SlewRateLimiter.hpp>
 
 #include "Drivetrain.h"
 

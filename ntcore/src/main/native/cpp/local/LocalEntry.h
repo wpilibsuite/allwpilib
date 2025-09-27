@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/Synchronization.h>
+#include <wpi/util/Synchronization.hpp>
 
 #include "Handle.h"
 #include "local/LocalSubscriber.h"

@@ -8,11 +8,11 @@
 #include <string>
 #include <string_view>
 
-#include <hal/DriverStation.h>
-#include <hal/Extensions.h>
-#include <hal/Ports.h>
-#include <hal/simulation/DriverStationData.h>
-#include <wpi/raw_ostream.h>
+#include <wpi/hal/DriverStation.hpp>
+#include <wpi/hal/Extensions.hpp>
+#include <wpi/hal/Ports.hpp>
+#include <wpi/hal/simulation/DriverStationData.hpp>
+#include <wpi/util/raw_ostream.h>
 
 #define REGISTER(halsim, jsonid, ctype, haltype)                          \
   HALSIM_RegisterDriverStation##halsim##Callback(                         \

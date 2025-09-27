@@ -6,10 +6,10 @@
 #include <cstdio>
 #include <thread>
 
-#include <wpi/StringExtras.h>
-#include <wpi/print.h>
+#include <wpi/util/StringExtras.h>
+#include <wpi/util/print.hpp>
 
-#include "cscore.h"
+#include "wpi/cscore/cscore.hpp"
 
 int main(int argc, char** argv) {
   if (argc < 2) {

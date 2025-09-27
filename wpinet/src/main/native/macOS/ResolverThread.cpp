@@ -11,7 +11,7 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/mutex.h>
+#include <wpi/util/mutex.hpp>
 
 using namespace wpi;
 

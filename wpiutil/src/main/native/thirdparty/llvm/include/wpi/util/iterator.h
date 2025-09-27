@@ -9,7 +9,7 @@
 #ifndef WPIUTIL_WPI_ITERATOR_H
 #define WPIUTIL_WPI_ITERATOR_H
 
-#include "wpi/iterator_range.h"
+#include "wpi/util/iterator_range.h"
 #include <cstddef>
 #include <iterator>
 #include <type_traits>

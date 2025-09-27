@@ -6,7 +6,7 @@
 
 #include <utility>
 
-#include <wpi/Synchronization.h>
+#include <wpi/util/Synchronization.hpp>
 
 #include "Handle.h"
 #include "local/LocalTopic.h"

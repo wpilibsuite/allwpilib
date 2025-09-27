@@ -12,7 +12,7 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/DenseMap.h>
+#include <wpi/util/DenseMap.h>
 
 #include "MessageHandler.h"
 #include "NetworkOutgoingQueue.h"

@@ -7,9 +7,9 @@
 #include <string>
 #include <utility>
 
-#include <glass/Model.h>
-#include <glass/Storage.h>
-#include <hal/simulation/DriverStationData.h>
+#include <wpi/glass/Model.hpp>
+#include <wpi/glass/Storage.hpp>
+#include <wpi/hal/simulation/DriverStationData.hpp>
 
 using namespace halsimgui;
 

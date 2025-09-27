@@ -4,14 +4,14 @@
 
 #pragma once
 
-#include <frc/Encoder.h>
-#include <frc/Timer.h>
-#include <frc/controller/SimpleMotorFeedforward.h>
-#include <frc/drive/DifferentialDrive.h>
-#include <frc/trajectory/TrapezoidProfile.h>
-#include <frc2/command/CommandPtr.h>
-#include <frc2/command/SubsystemBase.h>
-#include <units/length.h>
+#include <wpi/hardware/rotation/Encoder.hpp>
+#include <wpi/system/Timer.hpp>
+#include <wpi/math/controller/SimpleMotorFeedforward.hpp>
+#include <wpi/drive/DifferentialDrive.hpp>
+#include <wpi/math/trajectory/TrapezoidProfile.hpp>
+#include <wpi/command/CommandPtr.hpp>
+#include <wpi/command/SubsystemBase.hpp>
+#include <wpi/units/length.hpp>
 
 #include "Constants.h"
 #include "ExampleSmartMotorController.h"

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/WebSocket.h"
+#include "wpi/net/WebSocket.hpp"
 
 #include <functional>
 #include <memory>
@@ -12,19 +12,19 @@
 #include <string_view>
 #include <utility>
 
-#include <wpi/Base64.h>
-#include <wpi/SmallString.h>
-#include <wpi/SmallVector.h>
-#include <wpi/StringExtras.h>
-#include <wpi/print.h>
-#include <wpi/raw_ostream.h>
-#include <wpi/sha1.h>
+#include <wpi/util/Base64.hpp>
+#include <wpi/util/SmallString.h>
+#include <wpi/util/SmallVector.h>
+#include <wpi/util/StringExtras.h>
+#include <wpi/util/print.hpp>
+#include <wpi/util/raw_ostream.h>
+#include <wpi/util/sha1.hpp>
 
 #include "WebSocketDebug.h"
 #include "WebSocketSerializer.h"
-#include "wpinet/HttpParser.h"
-#include "wpinet/raw_uv_ostream.h"
-#include "wpinet/uv/Stream.h"
+#include "wpi/net/HttpParser.hpp"
+#include "wpi/net/raw_uv_ostream.hpp"
+#include "wpi/net/uv/Stream.hpp"
 
 using namespace wpi;
 

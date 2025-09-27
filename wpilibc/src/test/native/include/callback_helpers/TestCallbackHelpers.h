@@ -7,7 +7,7 @@
 #include <functional>
 #include <string_view>
 
-#include <hal/Value.h>
+#include <wpi/hal/Value.hpp>
 
 namespace frc::sim {
 

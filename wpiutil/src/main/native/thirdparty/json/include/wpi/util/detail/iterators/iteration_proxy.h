@@ -18,9 +18,9 @@
     #include <ranges> // enable_borrowed_range
 #endif
 
-#include <wpi/detail/abi_macros.h>
-#include <wpi/detail/meta/type_traits.h>
-#include <wpi/detail/value_t.h>
+#include <wpi/util/detail/abi_macros.h>
+#include <wpi/util/detail/meta/type_traits.h>
+#include <wpi/util/detail/value_t.h>
 
 WPI_JSON_NAMESPACE_BEGIN
 namespace detail

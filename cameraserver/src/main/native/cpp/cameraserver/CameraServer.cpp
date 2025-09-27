@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "cameraserver/CameraServer.h"
+#include "wpi/cameraserver/CameraServer.hpp"
 
 #include <atomic>
 #include <memory>
@@ -11,20 +11,20 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <networktables/BooleanTopic.h>
-#include <networktables/IntegerTopic.h>
-#include <networktables/NetworkTable.h>
-#include <networktables/NetworkTableInstance.h>
-#include <networktables/StringArrayTopic.h>
-#include <networktables/StringTopic.h>
-#include <wpi/DenseMap.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringExtras.h>
-#include <wpi/StringMap.h>
-#include <wpi/mutex.h>
+#include <wpi/ntcore/BooleanTopic.hpp>
+#include <wpi/ntcore/IntegerTopic.hpp>
+#include <wpi/ntcore/NetworkTable.hpp>
+#include <wpi/ntcore/NetworkTableInstance.hpp>
+#include <wpi/ntcore/StringArrayTopic.hpp>
+#include <wpi/ntcore/StringTopic.hpp>
+#include <wpi/util/DenseMap.h>
+#include <wpi/util/SmallString.h>
+#include <wpi/util/StringExtras.h>
+#include <wpi/util/StringMap.hpp>
+#include <wpi/util/mutex.hpp>
 
-#include "cameraserver/CameraServerShared.h"
-#include "ntcore_cpp.h"
+#include "wpi/cameraserver/CameraServerShared.hpp"
+#include "wpi/ntcore/ntcore_cpp.hpp"
 
 using namespace frc;
 

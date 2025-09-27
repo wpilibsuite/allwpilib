@@ -8,11 +8,11 @@
 #include <memory>
 #include <vector>
 
-#include <glass/hardware/Pneumatic.h>
-#include <glass/other/DeviceTree.h>
-#include <hal/Ports.h>
-#include <hal/Value.h>
-#include <hal/simulation/REVPHData.h>
+#include <wpi/glass/hardware/Pneumatic.hpp>
+#include <wpi/glass/other/DeviceTree.hpp>
+#include <wpi/hal/Ports.hpp>
+#include <wpi/hal/Value.hpp>
+#include <wpi/hal/simulation/REVPHData.hpp>
 
 #include "HALDataSource.h"
 #include "HALSimGui.h"

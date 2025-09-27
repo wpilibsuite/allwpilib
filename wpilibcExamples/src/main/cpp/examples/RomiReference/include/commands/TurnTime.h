@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <frc/Timer.h>
-#include <frc2/command/Command.h>
-#include <frc2/command/CommandHelper.h>
-#include <units/time.h>
+#include <wpi/system/Timer.hpp>
+#include <wpi/command/Command.hpp>
+#include <wpi/command/CommandHelper.hpp>
+#include <wpi/units/time.hpp>
 
 #include "subsystems/Drivetrain.h"
 

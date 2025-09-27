@@ -11,8 +11,8 @@
 #include <utility>
 #include <vector>
 
-#include "frc2/command/Command.h"
-#include "frc2/command/Requirements.h"
+#include "wpi/command/Command.hpp"
+#include "wpi/command/Requirements.hpp"
 
 namespace frc2 {
 /**

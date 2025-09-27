@@ -24,8 +24,8 @@
 
 #include <fmt/format.h>
 
-#include "wpi/Logger.h"
-#include "wpi/fs.h"
+#include "wpi/util/Logger.hpp"
+#include "wpi/util/fs.hpp"
 
 using namespace wpi::log;
 

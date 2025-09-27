@@ -34,7 +34,7 @@
 #include <shellapi.h>
 #include <shlobj.h>
 
-#include "wpi/WindowsError.h"
+#include "wpi/util/WindowsError.h"
 
 #else  // _WIN32
 
@@ -43,10 +43,10 @@
 
 #endif  // _WIN32
 
-#include "wpi/Errno.h"
-#include "wpi/ErrorHandling.h"
-#include "wpi/WindowsError.h"
-#include "wpi/fs.h"
+#include "wpi/util/Errno.h"
+#include "wpi/util/ErrorHandling.h"
+#include "wpi/util/WindowsError.h"
+#include "wpi/util/fs.hpp"
 
 namespace fs {
 

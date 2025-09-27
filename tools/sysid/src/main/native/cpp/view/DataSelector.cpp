@@ -12,8 +12,8 @@
 
 #include <fmt/format.h>
 #include <imgui.h>
-#include <wpi/Logger.h>
-#include <wpi/StringExtras.h>
+#include <wpi/util/Logger.hpp>
+#include <wpi/util/StringExtras.h>
 #include <wpi/datalog/DataLogReader.h>
 #include <wpi/datalog/DataLogReaderThread.h>
 

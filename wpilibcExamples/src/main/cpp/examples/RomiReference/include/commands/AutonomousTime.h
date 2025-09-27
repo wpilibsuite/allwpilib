@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/SequentialCommandGroup.h>
+#include <wpi/command/CommandHelper.hpp>
+#include <wpi/command/SequentialCommandGroup.hpp>
 
 #include "commands/DriveTime.h"
 #include "commands/TurnTime.h"

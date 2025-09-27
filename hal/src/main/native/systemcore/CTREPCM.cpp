@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/CTREPCM.h"
+#include "wpi/hal/CTREPCM.hpp"
 
 #include <string>
 
@@ -11,9 +11,9 @@
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
-#include "hal/CANAPI.h"
-#include "hal/Errors.h"
-#include "hal/handles/IndexedHandleResource.h"
+#include "wpi/hal/CANAPI.hpp"
+#include "wpi/hal/Errors.hpp"
+#include "wpi/hal/handles/IndexedHandleResource.hpp"
 
 using namespace hal;
 

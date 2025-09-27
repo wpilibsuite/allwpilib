@@ -19,22 +19,22 @@
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 #include <fmt/ranges.h>
-#include <glass/Storage.h>
+#include <wpi/glass/Storage.hpp>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
-#include <portable-file-dialogs.h>
-#include <wpi/DenseMap.h>
-#include <wpi/MemoryBuffer.h>
-#include <wpi/SmallVector.h>
-#include <wpi/SpanExtras.h>
-#include <wpi/StringExtras.h>
+#include <wpi/gui/portable-file-dialogs.hpp>
+#include <wpi/util/DenseMap.h>
+#include <wpi/util/MemoryBuffer.h>
+#include <wpi/util/SmallVector.h>
+#include <wpi/util/SpanExtras.hpp>
+#include <wpi/util/StringExtras.h>
 #include <wpi/datalog/DataLogReaderThread.h>
-#include <wpi/fmt/raw_ostream.h>
-#include <wpi/fs.h>
-#include <wpi/mutex.h>
-#include <wpi/print.h>
-#include <wpi/raw_ostream.h>
+#include <wpi/util/fmt/raw_ostream.hpp>
+#include <wpi/util/fs.hpp>
+#include <wpi/util/mutex.hpp>
+#include <wpi/util/print.hpp>
+#include <wpi/util/raw_ostream.h>
 
 #include "App.h"
 

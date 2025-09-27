@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <networktables/NetworkTableInstance.h>
+#include <wpi/ntcore/NetworkTableInstance.hpp>
 
 namespace frc {
 

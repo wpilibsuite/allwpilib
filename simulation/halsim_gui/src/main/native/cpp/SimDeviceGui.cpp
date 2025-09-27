@@ -10,11 +10,11 @@
 #include <utility>
 
 #include <fmt/format.h>
-#include <glass/other/DeviceTree.h>
-#include <hal/SimDevice.h>
-#include <hal/simulation/SimDeviceData.h>
-#include <wpi/DenseMap.h>
-#include <wpi/StringExtras.h>
+#include <wpi/glass/other/DeviceTree.hpp>
+#include <wpi/hal/SimDevice.hpp>
+#include <wpi/hal/simulation/SimDeviceData.hpp>
+#include <wpi/util/DenseMap.h>
+#include <wpi/util/StringExtras.h>
 
 #include "HALDataSource.h"
 #include "HALSimGui.h"

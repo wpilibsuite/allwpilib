@@ -10,7 +10,7 @@
 #include <shared_mutex>
 #include <string_view>
 
-#include <wpi/StringMap.h>
+#include <wpi/util/StringMap.hpp>
 
 #include "WSBaseProvider.h"
 

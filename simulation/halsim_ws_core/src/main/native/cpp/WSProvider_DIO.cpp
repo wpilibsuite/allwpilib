@@ -4,8 +4,8 @@
 
 #include "WSProvider_DIO.h"
 
-#include <hal/Ports.h>
-#include <hal/simulation/DIOData.h>
+#include <wpi/hal/Ports.hpp>
+#include <wpi/hal/simulation/DIOData.hpp>
 
 #define REGISTER(halsim, jsonid, ctype, haltype)                         \
   HALSIM_RegisterDIO##halsim##Callback(                                  \

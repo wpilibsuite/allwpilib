@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/ServoSim.h"
+#include "wpi/simulation/ServoSim.hpp"
 
-#include <hal/SimDevice.h>
-#include <units/length.h>
+#include <wpi/hal/SimDevice.hpp>
+#include <wpi/units/length.hpp>
 
-#include "frc/simulation/SimDeviceSim.h"
+#include "wpi/simulation/SimDeviceSim.hpp"
 
 using namespace frc;
 using namespace frc::sim;

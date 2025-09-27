@@ -6,10 +6,10 @@
 
 #include <functional>
 
-#include <units/time.h>
+#include <wpi/units/time.hpp>
 
-#include "frc2/command/Command.h"
-#include "frc2/command/CommandHelper.h"
+#include "wpi/command/Command.hpp"
+#include "wpi/command/CommandHelper.hpp"
 
 namespace frc2 {
 /**

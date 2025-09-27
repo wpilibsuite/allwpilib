@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <frc/DoubleSolenoid.h>
-#include <frc/PneumaticsControlModule.h>
-#include <frc2/command/CommandPtr.h>
-#include <frc2/command/SubsystemBase.h>
+#include <wpi/hardware/pneumatic/DoubleSolenoid.hpp>
+#include <wpi/hardware/pneumatic/PneumaticsControlModule.hpp>
+#include <wpi/command/CommandPtr.hpp>
+#include <wpi/command/SubsystemBase.hpp>
 
 #include "Constants.h"
 

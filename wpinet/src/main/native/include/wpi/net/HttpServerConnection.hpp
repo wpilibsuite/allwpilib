@@ -9,8 +9,8 @@
 #include <span>
 #include <string_view>
 
-#include "wpinet/HttpParser.h"
-#include "wpinet/uv/Stream.h"
+#include "wpi/net/HttpParser.hpp"
+#include "wpi/net/uv/Stream.hpp"
 
 namespace wpi {
 

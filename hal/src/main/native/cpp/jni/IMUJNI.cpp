@@ -10,7 +10,7 @@
 
 #include "HALUtil.h"
 #include "org_wpilib_hardware_hal_IMUJNI.h"
-#include "hal/IMU.h"
+#include "wpi/hal/IMU.hpp"
 
 using namespace hal;
 

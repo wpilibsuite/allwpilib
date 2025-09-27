@@ -4,12 +4,12 @@
 
 #include "REVPDH.h"
 
-#include <hal/CAN.h>
-#include <hal/CANAPI.h>
-#include <hal/CANAPITypes.h>
-#include <hal/Errors.h>
-#include <hal/handles/HandlesInternal.h>
-#include <hal/handles/IndexedHandleResource.h>
+#include <wpi/hal/CAN.hpp>
+#include <wpi/hal/CANAPI.hpp>
+#include <wpi/hal/CANAPITypes.hpp>
+#include <wpi/hal/Errors.hpp>
+#include <wpi/hal/handles/HandlesInternal.hpp>
+#include <wpi/hal/handles/IndexedHandleResource.hpp>
 
 #include <cstring>
 #include <string>

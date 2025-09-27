@@ -4,7 +4,7 @@
 
 #include "Drivetrain.h"
 
-#include <frc/RobotController.h>
+#include <wpi/system/RobotController.hpp>
 
 void Drivetrain::SetSpeeds(const frc::DifferentialDriveWheelSpeeds& speeds) {
   auto leftFeedforward = m_feedforward.Calculate(speeds.left);

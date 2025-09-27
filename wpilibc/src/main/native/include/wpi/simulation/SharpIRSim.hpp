@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <hal/SimDevice.h>
-#include <units/length.h>
+#include <wpi/hal/SimDevice.hpp>
+#include <wpi/units/length.hpp>
 
-#include "frc/SharpIR.h"
+#include "wpi/SharpIR.hpp"
 
 namespace frc {
 

@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/ParallelDeadlineGroup.h>
+#include <wpi/command/CommandHelper.hpp>
+#include <wpi/command/ParallelDeadlineGroup.hpp>
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.
 // For more information, see:

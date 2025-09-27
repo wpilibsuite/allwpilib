@@ -17,7 +17,7 @@
 #include <wpi/SpanMatcher.h>
 
 #include "WebSocketTest.h"
-#include "wpinet/uv/Buffer.h"
+#include "wpi/net/uv/Buffer.hpp"
 
 using ::testing::_;
 using ::testing::AnyOf;

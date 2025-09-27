@@ -4,8 +4,8 @@
 
 #include "CommandTestBase.h"
 #include "CompositionTestBase.h"
-#include "frc2/command/FunctionalCommand.h"
-#include "frc2/command/RepeatCommand.h"
+#include "wpi/command/FunctionalCommand.hpp"
+#include "wpi/command/RepeatCommand.hpp"
 
 using namespace frc2;
 class RepeatCommandTest : public CommandTestBase {};

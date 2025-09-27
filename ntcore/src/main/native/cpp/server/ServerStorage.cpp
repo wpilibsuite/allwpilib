@@ -10,9 +10,9 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/Base64.h>
-#include <wpi/MessagePack.h>
-#include <wpi/json.h>
+#include <wpi/util/Base64.hpp>
+#include <wpi/util/MessagePack.hpp>
+#include <wpi/util/json.h>
 
 #include "Log.h"
 #include "server/MessagePackWriter.h"

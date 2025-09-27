@@ -10,15 +10,15 @@
 #include <string>
 #include <string_view>
 
-#include <wpi/MemoryBuffer.h>
-#include <wpi/SmallVector.h>
-#include <wpi/StringExtras.h>
-#include <wpi/fs.h>
-#include <wpi/print.h>
-#include <wpinet/MimeTypes.h>
-#include <wpinet/UrlParser.h>
-#include <wpinet/raw_uv_ostream.h>
-#include <wpinet/uv/Request.h>
+#include <wpi/util/MemoryBuffer.h>
+#include <wpi/util/SmallVector.h>
+#include <wpi/util/StringExtras.h>
+#include <wpi/util/fs.hpp>
+#include <wpi/util/print.hpp>
+#include <wpi/net/MimeTypes.hpp>
+#include <wpi/net/UrlParser.hpp>
+#include <wpi/net/raw_uv_ostream.hpp>
+#include <wpi/net/uv/Request.hpp>
 
 namespace uv = wpi::uv;
 

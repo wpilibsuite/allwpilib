@@ -8,7 +8,7 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/print.h>
+#include <wpi/util/print.hpp>
 
 #include "wpi/datalog/DataLogBackgroundWriter.h"
 

@@ -6,10 +6,10 @@
 
 #include <string>
 
-#include <wpi/Logger.h>
-#include <wpi/SmallVector.h>
-#include <wpi/fs.h>
-#include <wpi/print.h>
+#include <wpi/util/Logger.hpp>
+#include <wpi/util/SmallVector.h>
+#include <wpi/util/fs.hpp>
+#include <wpi/util/print.hpp>
 
 #include "IListenerStorage.h"
 

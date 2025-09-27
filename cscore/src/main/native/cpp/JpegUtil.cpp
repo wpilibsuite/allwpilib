@@ -6,8 +6,8 @@
 
 #include <string>
 
-#include <wpi/StringExtras.h>
-#include <wpi/raw_istream.h>
+#include <wpi/util/StringExtras.h>
+#include <wpi/util/raw_istream.hpp>
 
 namespace cs {
 

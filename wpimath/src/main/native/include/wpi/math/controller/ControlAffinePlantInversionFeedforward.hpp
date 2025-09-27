@@ -9,9 +9,9 @@
 
 #include <Eigen/QR>
 
-#include "frc/EigenCore.h"
-#include "frc/system/NumericalJacobian.h"
-#include "units/time.h"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/system/NumericalJacobian.hpp"
+#include "wpi/units/time.hpp"
 
 namespace frc {
 

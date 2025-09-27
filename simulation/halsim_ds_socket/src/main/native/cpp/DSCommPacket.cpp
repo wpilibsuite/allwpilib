@@ -11,8 +11,8 @@
 #include <thread>
 #include <vector>
 
-#include <hal/simulation/DriverStationData.h>
-#include <hal/simulation/MockHooks.h>
+#include <wpi/hal/simulation/DriverStationData.hpp>
+#include <wpi/hal/simulation/MockHooks.hpp>
 
 using namespace halsim;
 

@@ -5,8 +5,8 @@
 #pragma once
 
 #include "../PortsInternal.h"
-#include "hal/simulation/PowerDistributionData.h"
-#include "hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/PowerDistributionData.hpp"
+#include "wpi/hal/simulation/SimDataValue.hpp"
 
 namespace hal {
 

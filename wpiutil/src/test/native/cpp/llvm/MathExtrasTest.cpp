@@ -6,7 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/MathExtras.h"
+#include "wpi/util/MathExtras.h"
 #include "gtest/gtest.h"
 #include <limits>
 

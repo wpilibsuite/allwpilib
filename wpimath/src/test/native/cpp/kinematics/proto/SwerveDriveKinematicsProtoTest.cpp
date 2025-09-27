@@ -5,8 +5,8 @@
 #include <gtest/gtest.h>
 
 #include "../../ProtoTestBase.h"
-#include "frc/kinematics/SwerveDriveKinematics.h"
-#include "frc/kinematics/proto/SwerveDriveKinematicsProto.h"
+#include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
+#include "wpi/math/kinematics/proto/SwerveDriveKinematicsProto.hpp"
 
 using namespace frc;
 

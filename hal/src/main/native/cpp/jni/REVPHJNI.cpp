@@ -4,13 +4,13 @@
 
 #include <jni.h>
 
-#include <wpi/jni_util.h>
+#include <wpi/util/jni_util.hpp>
 
 #include "HALUtil.h"
 #include "org_wpilib_hardware_hal_REVPHJNI.h"
-#include "hal/Ports.h"
-#include "hal/REVPH.h"
-#include "hal/handles/HandlesInternal.h"
+#include "wpi/hal/Ports.hpp"
+#include "wpi/hal/REVPH.hpp"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 
 static_assert(
     org_wpilib_hardware_hal_REVPHJNI_COMPRESSOR_CONFIG_TYPE_DISABLED ==

@@ -5,7 +5,7 @@
 #import "UsbCameraDelegate.h"
 #include "UsbCameraImpl.h"
 
-#include <wpi/timestamp.h>
+#include <wpi/util/timestamp.hpp>
 
 @implementation UsbCameraDelegate
 

@@ -11,10 +11,10 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/Logger.h>
-#include <wpi/SpanExtras.h>
-#include <wpi/json.h>
-#include <wpi/mpack.h>
+#include <wpi/util/Logger.hpp>
+#include <wpi/util/SpanExtras.hpp>
+#include <wpi/util/json.h>
+#include <wpi/util/mpack.h>
 
 #include "Message.h"
 #include "MessageHandler.h"

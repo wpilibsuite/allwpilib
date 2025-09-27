@@ -6,10 +6,10 @@
 
 #include <stdint.h>
 
-#include <hal/AnalogInput.h>
-#include <hal/Types.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/hal/AnalogInput.hpp>
+#include <wpi/hal/Types.hpp>
+#include <wpi/util/sendable/Sendable.hpp>
+#include <wpi/util/sendable/SendableHelper.hpp>
 
 namespace frc {
 

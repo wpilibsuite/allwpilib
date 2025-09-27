@@ -11,9 +11,9 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/StringExtras.h>
-#include <wpi/json.h>
-#include <wpi/timestamp.h>
+#include <wpi/util/StringExtras.h>
+#include <wpi/util/json.h>
+#include <wpi/util/timestamp.hpp>
 
 #include "Log.h"
 #include "Notifier.h"

@@ -2,27 +2,27 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc2/command/Commands.h"
+#include "wpi/command/Commands.hpp"
 
 #include <utility>
 #include <vector>
 
-#include <wpi/FunctionExtras.h>
-#include <wpi/deprecated.h>
+#include <wpi/util/FunctionExtras.h>
+#include <wpi/util/deprecated.hpp>
 
-#include "frc2/command/ConditionalCommand.h"
-#include "frc2/command/DeferredCommand.h"
-#include "frc2/command/FunctionalCommand.h"
-#include "frc2/command/InstantCommand.h"
-#include "frc2/command/ParallelCommandGroup.h"
-#include "frc2/command/ParallelDeadlineGroup.h"
-#include "frc2/command/ParallelRaceGroup.h"
-#include "frc2/command/PrintCommand.h"
-#include "frc2/command/ProxyCommand.h"
-#include "frc2/command/RunCommand.h"
-#include "frc2/command/SequentialCommandGroup.h"
-#include "frc2/command/WaitCommand.h"
-#include "frc2/command/WaitUntilCommand.h"
+#include "wpi/command/ConditionalCommand.hpp"
+#include "wpi/command/DeferredCommand.hpp"
+#include "wpi/command/FunctionalCommand.hpp"
+#include "wpi/command/InstantCommand.hpp"
+#include "wpi/command/ParallelCommandGroup.hpp"
+#include "wpi/command/ParallelDeadlineGroup.hpp"
+#include "wpi/command/ParallelRaceGroup.hpp"
+#include "wpi/command/PrintCommand.hpp"
+#include "wpi/command/ProxyCommand.hpp"
+#include "wpi/command/RunCommand.hpp"
+#include "wpi/command/SequentialCommandGroup.hpp"
+#include "wpi/command/WaitCommand.hpp"
+#include "wpi/command/WaitUntilCommand.hpp"
 
 using namespace frc2;
 

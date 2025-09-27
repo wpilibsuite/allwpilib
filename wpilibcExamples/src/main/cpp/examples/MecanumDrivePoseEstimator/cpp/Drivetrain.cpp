@@ -4,7 +4,7 @@
 
 #include "Drivetrain.h"
 
-#include <frc/Timer.h>
+#include <wpi/system/Timer.hpp>
 
 #include "ExampleGlobalMeasurementSensor.h"
 

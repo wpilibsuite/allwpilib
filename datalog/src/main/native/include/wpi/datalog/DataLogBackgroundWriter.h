@@ -12,8 +12,8 @@
 #include <string_view>
 #include <thread>
 
-#include <wpi/condition_variable.h>
-#include <wpi/mutex.h>
+#include <wpi/util/condition_variable.hpp>
+#include <wpi/util/mutex.hpp>
 
 #include "wpi/datalog/DataLog.h"
 

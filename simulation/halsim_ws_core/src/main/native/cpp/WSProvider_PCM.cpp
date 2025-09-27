@@ -4,8 +4,8 @@
 
 #include "WSProvider_PCM.h"
 
-#include <hal/Ports.h>
-#include <hal/simulation/CTREPCMData.h>
+#include <wpi/hal/Ports.hpp>
+#include <wpi/hal/simulation/CTREPCMData.hpp>
 
 #define REGISTER_CTREPCM(halsim, jsonid, ctype, haltype)                 \
   HALSIM_RegisterCTREPCM##halsim##Callback(                              \

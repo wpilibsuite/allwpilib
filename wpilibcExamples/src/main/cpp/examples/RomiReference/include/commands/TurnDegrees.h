@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <frc2/command/Command.h>
-#include <frc2/command/CommandHelper.h>
-#include <units/angle.h>
-#include <units/length.h>
+#include <wpi/command/Command.hpp>
+#include <wpi/command/CommandHelper.hpp>
+#include <wpi/units/angle.hpp>
+#include <wpi/units/length.hpp>
 
 #include "subsystems/Drivetrain.h"
 

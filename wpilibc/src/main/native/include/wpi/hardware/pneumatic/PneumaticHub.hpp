@@ -6,12 +6,12 @@
 
 #include <memory>
 
-#include <hal/Types.h>
-#include <units/pressure.h>
-#include <wpi/DenseMap.h>
-#include <wpi/mutex.h>
+#include <wpi/hal/Types.hpp>
+#include <wpi/units/pressure.hpp>
+#include <wpi/util/DenseMap.h>
+#include <wpi/util/mutex.hpp>
 
-#include "PneumaticsBase.h"
+#include "PneumaticsBase.hpp"
 
 namespace frc {
 /** Module class for controlling a REV Robotics Pneumatic Hub. */

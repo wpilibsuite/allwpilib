@@ -4,7 +4,7 @@
 
 #include "Robot.h"
 
-#include <frc2/command/CommandScheduler.h>
+#include <wpi/command/CommandScheduler.hpp>
 
 Robot::Robot() {}
 

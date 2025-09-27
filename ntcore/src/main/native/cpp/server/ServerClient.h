@@ -13,7 +13,7 @@
 #include <string_view>
 #include <utility>
 
-#include <wpi/json_fwd.h>
+#include <wpi/util/json_fwd.h>
 
 #include "net/NetworkOutgoingQueue.h"
 #include "server/Functions.h"

@@ -7,9 +7,9 @@
 #include <string>
 #include <vector>
 
-#include <units/time.h>
-#include <units/voltage.h>
-#include <wpi/StringMap.h>
+#include <wpi/units/time.hpp>
+#include <wpi/units/voltage.hpp>
+#include <wpi/util/StringMap.hpp>
 
 #include "sysid/analysis/AnalysisType.h"
 

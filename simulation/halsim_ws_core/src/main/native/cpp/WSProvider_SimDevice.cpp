@@ -11,8 +11,8 @@
 #include <utility>
 
 #include <fmt/format.h>
-#include <hal/Ports.h>
-#include <wpi/StringExtras.h>
+#include <wpi/hal/Ports.hpp>
+#include <wpi/util/StringExtras.h>
 
 namespace wpilibws {
 

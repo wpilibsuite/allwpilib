@@ -8,8 +8,8 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include <wpi/Logger.h>
-#include <wpi/raw_ostream.h>
+#include <wpi/util/Logger.hpp>
+#include <wpi/util/raw_ostream.h>
 
 #include "wpi/datalog/DataLogWriter.h"
 

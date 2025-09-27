@@ -9,7 +9,7 @@
 #include <string>
 
 #include "PortsInternal.h"
-#include "hal/handles/DigitalHandleResource.h"
+#include "wpi/hal/handles/DigitalHandleResource.hpp"
 
 namespace hal {
 /**

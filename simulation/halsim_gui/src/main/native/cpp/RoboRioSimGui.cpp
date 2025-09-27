@@ -6,8 +6,8 @@
 
 #include <memory>
 
-#include <glass/hardware/RoboRio.h>
-#include <hal/simulation/RoboRioData.h>
+#include <wpi/glass/hardware/RoboRio.hpp>
+#include <wpi/hal/simulation/RoboRioData.hpp>
 
 #include "HALDataSource.h"
 #include "HALSimGui.h"

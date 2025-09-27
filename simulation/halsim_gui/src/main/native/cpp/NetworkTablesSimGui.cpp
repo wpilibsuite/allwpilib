@@ -6,10 +6,10 @@
 
 #include <memory>
 
-#include <glass/Context.h>
-#include <glass/Storage.h>
-#include <glass/networktables/NetworkTables.h>
-#include <wpigui.h>
+#include <wpi/glass/Context.hpp>
+#include <wpi/glass/Storage.hpp>
+#include <wpi/glass/networktables/NetworkTables.hpp>
+#include <wpi/gui/wpigui.hpp>
 
 #include "HALSimGui.h"
 

@@ -9,7 +9,7 @@
 #include <vector>
 
 #include <Eigen/Core>
-#include <wpi/json.h>
+#include <wpi/util/json.h>
 
 namespace cameracalibration {
 struct CameraModel {

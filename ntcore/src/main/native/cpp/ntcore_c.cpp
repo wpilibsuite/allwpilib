@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "ntcore_c.h"
+#include "wpi/ntcore/ntcore_c.h"
 
 #include <stdint.h>
 
@@ -13,14 +13,14 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/MemAlloc.h>
-#include <wpi/SmallVector.h>
-#include <wpi/json.h>
-#include <wpi/timestamp.h>
+#include <wpi/util/MemAlloc.h>
+#include <wpi/util/SmallVector.h>
+#include <wpi/util/json.h>
+#include <wpi/util/timestamp.hpp>
 
 #include "Value_internal.h"
-#include "ntcore.h"
-#include "ntcore_cpp.h"
+#include "wpi/ntcore/ntcore.hpp"
+#include "wpi/ntcore/ntcore_cpp.hpp"
 
 using namespace nt;
 

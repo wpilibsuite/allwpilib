@@ -11,8 +11,8 @@
 
 #include <fmt/format.h>
 #include <gcem.hpp>
-#include <wpi/StringExtras.h>
-#include <wpi/ct_string.h>
+#include <wpi/util/StringExtras.h>
+#include <wpi/util/ct_string.hpp>
 
 namespace frc {
 

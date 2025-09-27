@@ -7,9 +7,9 @@
 #include <memory>
 #include <vector>
 
-#include <glass/hardware/LEDDisplay.h>
-#include <hal/Ports.h>
-#include <hal/simulation/AddressableLEDData.h>
+#include <wpi/glass/hardware/LEDDisplay.hpp>
+#include <wpi/hal/Ports.hpp>
+#include <wpi/hal/simulation/AddressableLEDData.hpp>
 #include <imgui.h>
 
 #include "HALSimGui.h"

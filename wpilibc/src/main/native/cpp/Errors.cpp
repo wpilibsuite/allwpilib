@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/Errors.h"
+#include "wpi/Errors.hpp"
 
 #include <string>
 #include <utility>
 
-#include <hal/DriverStation.h>
-#include <hal/HALBase.h>
-#include <wpi/StackTrace.h>
-#include <wpi/fs.h>
+#include <wpi/hal/DriverStation.hpp>
+#include <wpi/hal/HALBase.hpp>
+#include <wpi/util/StackTrace.hpp>
+#include <wpi/util/fs.hpp>
 
 using namespace frc;
 
@@ -41,12 +41,12 @@ const char* frc::GetErrorMessage(int32_t* code) {
 #define S(label, offset, message) \
   case err::label:                \
     return message;
-#include "frc/WPIErrors.mac"
+#include "wpi/WPIErrors.mac"
 #undef S
 #define S(label, offset, message) \
   case warn::label:               \
     return message;
-#include "frc/WPIWarnings.mac"
+#include "wpi/WPIWarnings.mac"
 #undef S
     default:
       return HAL_GetLastError(code);

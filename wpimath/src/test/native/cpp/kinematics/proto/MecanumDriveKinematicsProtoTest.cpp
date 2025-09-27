@@ -3,9 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <wpi/SmallVector.h>
+#include <wpi/util/SmallVector.h>
 
-#include "frc/kinematics/MecanumDriveKinematics.h"
+#include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
 
 using namespace frc;
 

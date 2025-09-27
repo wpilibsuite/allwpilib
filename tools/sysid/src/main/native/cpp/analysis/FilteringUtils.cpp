@@ -14,11 +14,11 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <frc/filter/LinearFilter.h>
-#include <frc/filter/MedianFilter.h>
-#include <units/math.h>
-#include <wpi/MathExtras.h>
-#include <wpi/StringExtras.h>
+#include <wpi/math/filter/LinearFilter.hpp>
+#include <wpi/math/filter/MedianFilter.hpp>
+#include <wpi/units/math.hpp>
+#include <wpi/util/MathExtras.h>
+#include <wpi/util/StringExtras.h>
 
 using namespace sysid;
 

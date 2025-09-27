@@ -6,9 +6,9 @@
 
 #include <cmath>
 
-#include <frc/StateSpaceUtil.h>
-#include <frc/system/NumericalIntegration.h>
-#include <wpi/MathExtras.h>
+#include <wpi/math/util/StateSpaceUtil.hpp>
+#include <wpi/math/system/NumericalIntegration.hpp>
+#include <wpi/util/MathExtras.h>
 
 using namespace sysid;
 

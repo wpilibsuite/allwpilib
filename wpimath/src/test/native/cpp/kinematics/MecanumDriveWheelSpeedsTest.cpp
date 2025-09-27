@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/kinematics/MecanumDriveWheelSpeeds.h"
+#include "wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp"
 
 TEST(MecanumDriveWheelSpeedsTest, Plus) {
   const frc::MecanumDriveWheelSpeeds left{1.0_mps, 0.5_mps, 2.0_mps, 1.5_mps};

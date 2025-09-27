@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <hal/DriverStationTypes.h>
+#include <wpi/hal/DriverStationTypes.hpp>
 
 namespace frc {
 

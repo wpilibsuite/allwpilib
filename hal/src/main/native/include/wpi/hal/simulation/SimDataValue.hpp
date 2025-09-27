@@ -6,12 +6,12 @@
 
 #include <memory>
 
-#include <wpi/Compiler.h>
-#include <wpi/UidVector.h>
-#include <wpi/spinlock.h>
+#include <wpi/util/Compiler.h>
+#include <wpi/util/UidVector.hpp>
+#include <wpi/util/spinlock.hpp>
 
-#include "hal/simulation/NotifyListener.h"
-#include "hal/simulation/SimCallbackRegistry.h"
+#include "wpi/hal/simulation/NotifyListener.hpp"
+#include "wpi/hal/simulation/SimCallbackRegistry.hpp"
 
 namespace hal {
 

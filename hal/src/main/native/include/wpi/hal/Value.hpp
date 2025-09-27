@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "hal/Types.h"
+#include "wpi/hal/Types.hpp"
 
 /** HAL data types. */
 enum HAL_Type {

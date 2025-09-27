@@ -11,7 +11,7 @@
 
 #include <wpi/datalog/DataLog.h>
 
-#include "ntcore_c.h"
+#include "wpi/ntcore/ntcore_c.h"
 
 namespace wpi::log {
 class DataLog;

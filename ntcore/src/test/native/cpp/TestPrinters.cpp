@@ -7,8 +7,8 @@
 #include "Handle.h"
 #include "PubSubOptions.h"
 #include "net/Message.h"
-#include "networktables/NetworkTableValue.h"
-#include "ntcore_cpp.h"
+#include "wpi/ntcore/NetworkTableValue.hpp"
+#include "wpi/ntcore/ntcore_cpp.hpp"
 
 namespace nt {
 

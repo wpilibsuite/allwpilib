@@ -4,11 +4,11 @@
 
 #include <utility>
 
-#include <frc/Errors.h>
+#include <wpi/Errors.hpp>
 
 #include "CommandTestBase.h"
-#include "frc2/command/CommandScheduler.h"
-#include "frc2/command/FunctionalCommand.h"
+#include "wpi/command/CommandScheduler.hpp"
+#include "wpi/command/FunctionalCommand.hpp"
 
 using namespace frc2;
 class CommandRequirementsTest : public CommandTestBase {};

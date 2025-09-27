@@ -6,8 +6,8 @@
 
 #include <gtest/gtest.h>
 
-#include "hal/PowerDistribution.h"
-#include "hal/simulation/PowerDistributionData.h"
+#include "wpi/hal/PowerDistribution.hpp"
+#include "wpi/hal/simulation/PowerDistributionData.hpp"
 
 namespace hal {
 

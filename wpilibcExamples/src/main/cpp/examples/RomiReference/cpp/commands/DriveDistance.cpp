@@ -4,7 +4,7 @@
 
 #include "commands/DriveDistance.h"
 
-#include <units/math.h>
+#include <wpi/units/math.hpp>
 
 void DriveDistance::Initialize() {
   m_drive->ArcadeDrive(0, 0);

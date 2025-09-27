@@ -8,7 +8,7 @@
 #include <string>
 
 #include <gtest/gtest.h>
-#include <wpi/json.h>
+#include <wpi/util/json.h>
 
 #include "path_lookup.h"
 

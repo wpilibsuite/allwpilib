@@ -3,12 +3,12 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "CommandTestBase.h"
-#include "frc2/command/ConditionalCommand.h"
-#include "frc2/command/ParallelCommandGroup.h"
-#include "frc2/command/ParallelDeadlineGroup.h"
-#include "frc2/command/ParallelRaceGroup.h"
-#include "frc2/command/SelectCommand.h"
-#include "frc2/command/SequentialCommandGroup.h"
+#include "wpi/command/ConditionalCommand.hpp"
+#include "wpi/command/ParallelCommandGroup.hpp"
+#include "wpi/command/ParallelDeadlineGroup.hpp"
+#include "wpi/command/ParallelRaceGroup.hpp"
+#include "wpi/command/SelectCommand.hpp"
+#include "wpi/command/SequentialCommandGroup.hpp"
 
 using namespace frc2;
 class RobotDisabledCommandTest : public CommandTestBase {};

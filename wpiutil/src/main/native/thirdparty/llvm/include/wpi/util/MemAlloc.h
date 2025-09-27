@@ -16,8 +16,8 @@
 #ifndef WPIUTIL_WPI_MEMALLOC_H
 #define WPIUTIL_WPI_MEMALLOC_H
 
-#include "wpi/Compiler.h"
-#include "wpi/ErrorHandling.h"
+#include "wpi/util/Compiler.h"
+#include "wpi/util/ErrorHandling.h"
 #include <cstdlib>
 
 namespace wpi {

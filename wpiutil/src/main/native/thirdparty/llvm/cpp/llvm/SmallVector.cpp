@@ -10,8 +10,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/SmallVector.h"
-#include "wpi/MemAlloc.h"
+#include "wpi/util/SmallVector.h"
+#include "wpi/util/MemAlloc.h"
 #include <cstdint>
 #ifdef LLVM_ENABLE_EXCEPTIONS
 #include <stdexcept>

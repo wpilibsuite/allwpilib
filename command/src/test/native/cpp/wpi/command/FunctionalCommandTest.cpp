@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "CommandTestBase.h"
-#include "frc2/command/FunctionalCommand.h"
+#include "wpi/command/FunctionalCommand.hpp"
 
 using namespace frc2;
 class FunctionalCommandTest : public CommandTestBase {};

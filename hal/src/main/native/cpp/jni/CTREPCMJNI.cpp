@@ -4,13 +4,13 @@
 
 #include <jni.h>
 
-#include <wpi/jni_util.h>
+#include <wpi/util/jni_util.hpp>
 
 #include "HALUtil.h"
 #include "org_wpilib_hardware_hal_CTREPCMJNI.h"
-#include "hal/CTREPCM.h"
-#include "hal/Ports.h"
-#include "hal/handles/HandlesInternal.h"
+#include "wpi/hal/CTREPCM.hpp"
+#include "wpi/hal/Ports.hpp"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 
 using namespace hal;
 

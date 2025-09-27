@@ -10,10 +10,10 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/MemAlloc.h>
-#include <wpi/StringExtras.h>
-#include <wpi/timestamp.h>
-#include <wpinet/TCPConnector.h>
+#include <wpi/util/MemAlloc.h>
+#include <wpi/util/StringExtras.h>
+#include <wpi/util/timestamp.hpp>
+#include <wpi/net/TCPConnector.h>
 
 #include "Instance.h"
 #include "JpegUtil.h"

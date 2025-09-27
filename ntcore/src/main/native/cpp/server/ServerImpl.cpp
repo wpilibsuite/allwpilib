@@ -12,7 +12,7 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/MessagePack.h>
+#include <wpi/util/MessagePack.hpp>
 
 #include "Log.h"
 #include "server/MessagePackWriter.h"

@@ -4,9 +4,9 @@
 
 #include "RapidReactCommandBot.h"
 
-#include <frc2/command/Command.h>
-#include <frc2/command/Commands.h>
-#include <frc2/command/button/Trigger.h>
+#include <wpi/command/Command.hpp>
+#include <wpi/command/Commands.hpp>
+#include <wpi/command/button/Trigger.hpp>
 
 #include "Constants.h"
 

@@ -15,7 +15,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/MemoryBuffer.h"
+#include "wpi/util/MemoryBuffer.h"
 
 #ifdef _MSC_VER
 // no matching operator delete
@@ -46,16 +46,16 @@
 #include <new>
 #include <system_error>
 
-#include "wpi/Errc.h"
-#include "wpi/Errno.h"
-#include "wpi/MappedFileRegion.h"
-#include "wpi/MathExtras.h"
-#include "wpi/SmallVector.h"
-#include "wpi/SmallVectorMemoryBuffer.h"
-#include "wpi/fs.h"
+#include "wpi/util/Errc.h"
+#include "wpi/util/Errno.h"
+#include "wpi/util/MappedFileRegion.hpp"
+#include "wpi/util/MathExtras.h"
+#include "wpi/util/SmallVector.h"
+#include "wpi/util/SmallVectorMemoryBuffer.h"
+#include "wpi/util/fs.hpp"
 
 #ifdef _WIN32
-#include "wpi/WindowsError.h"
+#include "wpi/util/WindowsError.h"
 #endif
 
 using namespace wpi;

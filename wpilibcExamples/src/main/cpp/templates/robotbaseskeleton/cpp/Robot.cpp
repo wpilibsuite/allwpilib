@@ -4,10 +4,10 @@
 
 #include "Robot.h"
 
-#include <frc/DriverStation.h>
-#include <frc/internal/DriverStationModeThread.h>
-#include <hal/DriverStation.h>
-#include <networktables/NetworkTable.h>
+#include <wpi/driverstation/DriverStation.hpp>
+#include <wpi/internal/DriverStationModeThread.hpp>
+#include <wpi/hal/DriverStation.hpp>
+#include <wpi/ntcore/NetworkTable.hpp>
 
 Robot::Robot() {}
 

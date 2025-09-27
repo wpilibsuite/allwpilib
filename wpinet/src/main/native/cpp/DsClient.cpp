@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/DsClient.h"
+#include "wpi/net/DsClient.hpp"
 
 #include <memory>
 
 #include <fmt/format.h>
-#include <wpi/Logger.h>
-#include <wpi/StringExtras.h>
-#include <wpi/json.h>
+#include <wpi/util/Logger.hpp>
+#include <wpi/util/StringExtras.h>
+#include <wpi/util/json.h>
 
-#include "wpinet/uv/Tcp.h"
-#include "wpinet/uv/Timer.h"
+#include "wpi/net/uv/Tcp.hpp"
+#include "wpi/net/uv/Timer.hpp"
 
 using namespace wpi;
 

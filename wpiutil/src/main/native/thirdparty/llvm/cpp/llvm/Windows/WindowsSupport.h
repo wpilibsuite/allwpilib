@@ -31,12 +31,12 @@
 #define NOMINMAX
 #endif
 
-#include "wpi/SmallVector.h"
-#include "wpi/StringExtras.h"
-#include "wpi/Chrono.h"
-#include "wpi/Compiler.h"
-#include "wpi/ErrorHandling.h"
-#include "wpi/VersionTuple.h"
+#include "wpi/util/SmallVector.h"
+#include "wpi/util/StringExtras.h"
+#include "wpi/util/Chrono.h"
+#include "wpi/util/Compiler.h"
+#include "wpi/util/ErrorHandling.h"
+#include "wpi/util/VersionTuple.h"
 #include <cassert>
 #include <string>
 #include <system_error>

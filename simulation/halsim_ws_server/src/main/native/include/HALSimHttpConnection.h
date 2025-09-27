@@ -10,11 +10,11 @@
 #include <utility>
 
 #include <HALSimBaseWebSocketConnection.h>
-#include <wpi/json_fwd.h>
-#include <wpi/mutex.h>
-#include <wpinet/HttpWebSocketServerConnection.h>
-#include <wpinet/uv/AsyncFunction.h>
-#include <wpinet/uv/Buffer.h>
+#include <wpi/util/json_fwd.h>
+#include <wpi/util/mutex.hpp>
+#include <wpi/net/HttpWebSocketServerConnection.hpp>
+#include <wpi/net/uv/AsyncFunction.hpp>
+#include <wpi/net/uv/Buffer.hpp>
 
 #include "HALSimWeb.h"
 

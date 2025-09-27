@@ -9,9 +9,9 @@
 #include <memory>
 #include <vector>
 
-#include <glass/hardware/PowerDistribution.h>
-#include <hal/Ports.h>
-#include <hal/simulation/PowerDistributionData.h>
+#include <wpi/glass/hardware/PowerDistribution.hpp>
+#include <wpi/hal/Ports.hpp>
+#include <wpi/hal/simulation/PowerDistributionData.hpp>
 
 #include "HALDataSource.h"
 #include "HALSimGui.h"

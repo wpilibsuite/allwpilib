@@ -3,8 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "CommandTestBase.h"
-#include "frc2/command/Commands.h"
-#include "frc2/command/InstantCommand.h"
+#include "wpi/command/Commands.hpp"
+#include "wpi/command/InstantCommand.hpp"
 
 using namespace frc2;
 class InstantCommandTest : public CommandTestBase {};

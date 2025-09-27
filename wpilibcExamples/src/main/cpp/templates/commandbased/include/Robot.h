@@ -6,8 +6,8 @@
 
 #include <optional>
 
-#include <frc/TimedRobot.h>
-#include <frc2/command/CommandPtr.h>
+#include <wpi/opmode/TimedRobot.hpp>
+#include <wpi/command/CommandPtr.hpp>
 
 #include "RobotContainer.h"
 

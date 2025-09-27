@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include <hal/SimDevice.h>
-#include <networktables/NTSendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/hal/SimDevice.hpp>
+#include <wpi/ntcore/NTSendable.hpp>
+#include <wpi/util/sendable/SendableHelper.hpp>
 
-#include "frc/I2C.h"
+#include "wpi/hardware/bus/I2C.hpp"
 
 namespace frc {
 

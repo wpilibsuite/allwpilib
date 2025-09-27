@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/kinematics/SwerveModulePosition.h"
+#include "wpi/math/kinematics/SwerveModulePosition.hpp"
 
 using namespace frc;
 

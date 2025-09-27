@@ -8,8 +8,8 @@
 #include <string>
 
 #include <fmt/format.h>
-#include <wpi/print.h>
-#include <wpinet/raw_uv_ostream.h>
+#include <wpi/util/print.hpp>
+#include <wpi/net/raw_uv_ostream.hpp>
 
 #include "HALSimWS.h"
 

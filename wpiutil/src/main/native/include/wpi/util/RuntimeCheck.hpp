@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-#include "wpi/string.h"
+#include "wpi/util/string.hpp"
 
 #ifdef __cplusplus
 extern "C" {

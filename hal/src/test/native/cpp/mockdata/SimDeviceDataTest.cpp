@@ -4,8 +4,8 @@
 
 #include <gtest/gtest.h>
 
-#include "hal/SimDevice.h"
-#include "hal/simulation/SimDeviceData.h"
+#include "wpi/hal/SimDevice.hpp"
+#include "wpi/hal/simulation/SimDeviceData.hpp"
 
 namespace hal {
 

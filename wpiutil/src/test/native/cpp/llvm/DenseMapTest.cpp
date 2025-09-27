@@ -10,10 +10,10 @@
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
 
-#include "wpi/DenseMap.h"
+#include "wpi/util/DenseMap.h"
 #include "CountCopyAndMove.h"
-#include "wpi/DenseMapInfo.h"
-#include "wpi/DenseMapInfoVariant.h"
+#include "wpi/util/DenseMapInfo.h"
+#include "wpi/util/DenseMapInfoVariant.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include <map>

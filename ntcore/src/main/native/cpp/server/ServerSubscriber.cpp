@@ -6,8 +6,8 @@
 
 #include <utility>
 
-#include <wpi/MessagePack.h>
-#include <wpi/StringExtras.h>
+#include <wpi/util/MessagePack.hpp>
+#include <wpi/util/StringExtras.h>
 
 #include "PubSubOptions.h"
 #include "server/MessagePackWriter.h"

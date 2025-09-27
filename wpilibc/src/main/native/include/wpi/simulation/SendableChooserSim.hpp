@@ -6,10 +6,10 @@
 
 #include <string_view>
 
-#include <networktables/NetworkTableInstance.h>
-#include <networktables/StringTopic.h>
+#include <wpi/ntcore/NetworkTableInstance.hpp>
+#include <wpi/ntcore/StringTopic.hpp>
 
-#include "frc/RobotBase.h"
+#include "wpi/opmode/RobotBase.hpp"
 
 namespace frc::sim {
 

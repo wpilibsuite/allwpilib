@@ -6,8 +6,8 @@
 
 #include <string>
 
-#include <wpi/SmallString.h>
-#include <wpi/json.h>
+#include <wpi/util/SmallString.h>
+#include <wpi/util/json.h>
 
 #include "Instance.h"
 #include "Notifier.h"

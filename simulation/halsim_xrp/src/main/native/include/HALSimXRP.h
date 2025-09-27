@@ -12,12 +12,12 @@
 #include <HALSimBaseWebSocketConnection.h>
 #include <WSProviderContainer.h>
 #include <WSProvider_SimDevice.h>
-#include <wpi/json_fwd.h>
-#include <wpinet/uv/Async.h>
-#include <wpinet/uv/Buffer.h>
-#include <wpinet/uv/Loop.h>
-#include <wpinet/uv/Timer.h>
-#include <wpinet/uv/Udp.h>
+#include <wpi/util/json_fwd.h>
+#include <wpi/net/uv/Async.hpp>
+#include <wpi/net/uv/Buffer.hpp>
+#include <wpi/net/uv/Loop.hpp>
+#include <wpi/net/uv/Timer.hpp>
+#include <wpi/net/uv/Udp.hpp>
 
 #include "XRP.h"
 

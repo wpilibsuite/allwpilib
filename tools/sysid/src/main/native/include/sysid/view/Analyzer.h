@@ -10,13 +10,13 @@
 #include <thread>
 #include <vector>
 
-#include <glass/View.h>
+#include <wpi/glass/View.hpp>
 #include <implot.h>
-#include <portable-file-dialogs.h>
-#include <units/time.h>
-#include <units/voltage.h>
-#include <wpi/Logger.h>
-#include <wpi/StringMap.h>
+#include <wpi/gui/portable-file-dialogs.hpp>
+#include <wpi/units/time.hpp>
+#include <wpi/units/voltage.hpp>
+#include <wpi/util/Logger.hpp>
+#include <wpi/util/StringMap.hpp>
 
 #include "sysid/analysis/AnalysisManager.h"
 #include "sysid/analysis/FeedbackAnalysis.h"

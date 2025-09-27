@@ -4,8 +4,8 @@
 
 #include "WSProvider_RoboRIO.h"
 
-#include <hal/Ports.h>
-#include <hal/simulation/RoboRioData.h>
+#include <wpi/hal/Ports.hpp>
+#include <wpi/hal/simulation/RoboRioData.hpp>
 
 #define REGISTER(halsim, jsonid, ctype, haltype)                          \
   HALSIM_RegisterRoboRio##halsim##Callback(                               \

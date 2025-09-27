@@ -7,11 +7,11 @@
 #include <memory>
 #include <vector>
 
-#include <glass/View.h>
-#include <glass/hardware/AnalogInput.h>
-#include <hal/Ports.h>
-#include <hal/simulation/AnalogInData.h>
-#include <hal/simulation/SimDeviceData.h>
+#include <wpi/glass/View.hpp>
+#include <wpi/glass/hardware/AnalogInput.hpp>
+#include <wpi/hal/Ports.hpp>
+#include <wpi/hal/simulation/AnalogInData.hpp>
+#include <wpi/hal/simulation/SimDeviceData.hpp>
 
 #include "HALDataSource.h"
 #include "HALSimGui.h"

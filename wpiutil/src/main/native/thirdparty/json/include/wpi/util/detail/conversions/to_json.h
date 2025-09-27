@@ -17,12 +17,12 @@
 #include <valarray> // valarray
 #include <vector> // vector
 
-#include <wpi/detail/iterators/iteration_proxy.h>
-#include <wpi/detail/macro_scope.h>
-#include <wpi/detail/meta/cpp_future.h>
-#include <wpi/detail/meta/std_fs.h>
-#include <wpi/detail/meta/type_traits.h>
-#include <wpi/detail/value_t.h>
+#include <wpi/util/detail/iterators/iteration_proxy.h>
+#include <wpi/util/detail/macro_scope.h>
+#include <wpi/util/detail/meta/cpp_future.h>
+#include <wpi/util/detail/meta/std_fs.h>
+#include <wpi/util/detail/meta/type_traits.h>
+#include <wpi/util/detail/value_t.h>
 
 WPI_JSON_NAMESPACE_BEGIN
 namespace detail

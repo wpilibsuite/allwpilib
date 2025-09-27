@@ -13,12 +13,12 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <glass/Context.h>
-#include <glass/Storage.h>
+#include <wpi/glass/Context.hpp>
+#include <wpi/glass/Storage.hpp>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
-#include <wpi/json.h>
+#include <wpi/util/json.h>
 
 #include "sysid/Util.h"
 #include "sysid/analysis/AnalysisManager.h"

@@ -13,7 +13,7 @@
 #include <WSProvider_Encoder.h>
 #include <WSProvider_HAL.h>
 #include <WSProvider_SimDevice.h>
-#include <wpinet/EventLoopRunner.h>
+#include <wpi/net/EventLoopRunner.hpp>
 
 using namespace wpilibxrp;
 using namespace wpilibws;

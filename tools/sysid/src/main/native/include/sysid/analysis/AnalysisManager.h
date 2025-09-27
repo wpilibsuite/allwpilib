@@ -13,10 +13,10 @@
 #include <string_view>
 #include <vector>
 
-#include <units/time.h>
-#include <wpi/Logger.h>
-#include <wpi/StringMap.h>
-#include <wpi/json.h>
+#include <wpi/units/time.hpp>
+#include <wpi/util/Logger.hpp>
+#include <wpi/util/StringMap.hpp>
+#include <wpi/util/json.h>
 
 #include "sysid/analysis/AnalysisType.h"
 #include "sysid/analysis/FeedbackAnalysis.h"

@@ -6,10 +6,10 @@
 
 #include <numbers>
 
-#include <frc/AnalogGyro.h>
-#include <frc/geometry/Translation2d.h>
-#include <frc/kinematics/SwerveDriveKinematics.h>
-#include <frc/kinematics/SwerveDriveOdometry.h>
+#include <wpi/AnalogGyro.hpp>
+#include <wpi/math/geometry/Translation2d.hpp>
+#include <wpi/math/kinematics/SwerveDriveKinematics.hpp>
+#include <wpi/math/kinematics/SwerveDriveOdometry.hpp>
 
 #include "SwerveModule.h"
 

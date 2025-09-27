@@ -7,14 +7,14 @@
 #include <memory>
 #include <string>
 
-#include <wpi/SmallString.h>
-#include <wpi/fs.h>
-#include <wpi/print.h>
-#include <wpinet/UrlParser.h>
-#include <wpinet/WebSocketServer.h>
-#include <wpinet/raw_uv_ostream.h>
-#include <wpinet/uv/Loop.h>
-#include <wpinet/uv/Tcp.h>
+#include <wpi/util/SmallString.h>
+#include <wpi/util/fs.hpp>
+#include <wpi/util/print.hpp>
+#include <wpi/net/UrlParser.hpp>
+#include <wpi/net/WebSocketServer.hpp>
+#include <wpi/net/raw_uv_ostream.hpp>
+#include <wpi/net/uv/Loop.hpp>
+#include <wpi/net/uv/Tcp.hpp>
 
 #include "HALSimHttpConnection.h"
 

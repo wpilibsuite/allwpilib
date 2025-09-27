@@ -10,10 +10,10 @@
 #include <string_view>
 #include <vector>
 
-#include <hal/SimDevice.h>
-#include <hal/simulation/SimDeviceData.h>
-#include <wpi/StringMap.h>
-#include <wpinet/uv/AsyncFunction.h>
+#include <wpi/hal/SimDevice.hpp>
+#include <wpi/hal/simulation/SimDeviceData.hpp>
+#include <wpi/util/StringMap.hpp>
+#include <wpi/net/uv/AsyncFunction.hpp>
 
 #include "WSBaseProvider.h"
 #include "WSProviderContainer.h"

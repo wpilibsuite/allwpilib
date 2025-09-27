@@ -12,17 +12,17 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/Logger.h>
-#include <wpi/RawFrame.h>
-#include <wpi/condition_variable.h>
-#include <wpi/json_fwd.h>
-#include <wpi/mutex.h>
+#include <wpi/util/Logger.hpp>
+#include <wpi/util/RawFrame.hpp>
+#include <wpi/util/condition_variable.hpp>
+#include <wpi/util/json_fwd.h>
+#include <wpi/util/mutex.hpp>
 
 #include "Frame.h"
 #include "Handle.h"
 #include "Image.h"
 #include "PropertyContainer.h"
-#include "cscore_cpp.h"
+#include "wpi/cscore/cscore_cpp.hpp"
 
 namespace cs {
 

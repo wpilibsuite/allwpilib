@@ -9,9 +9,9 @@
 #include <string>
 #include <utility>
 
-#include <wpi/FunctionExtras.h>
+#include <wpi/util/FunctionExtras.h>
 
-#include "frc2/command/CommandScheduler.h"
+#include "wpi/command/CommandScheduler.hpp"
 
 namespace frc2 {
 class Command;

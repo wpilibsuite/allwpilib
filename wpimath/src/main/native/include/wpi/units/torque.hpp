@@ -26,10 +26,10 @@
 
 #pragma once
 
-#include "units/base.h"
-#include "units/energy.h"
-#include "units/force.h"
-#include "units/length.h"
+#include "wpi/units/base.hpp"
+#include "wpi/units/energy.hpp"
+#include "wpi/units/force.hpp"
+#include "wpi/units/length.hpp"
 
 namespace units {
 /**

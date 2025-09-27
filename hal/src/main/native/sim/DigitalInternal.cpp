@@ -5,9 +5,9 @@
 #include "DigitalInternal.h"
 
 #include "PortsInternal.h"
-#include "hal/Errors.h"
-#include "hal/handles/DigitalHandleResource.h"
-#include "hal/handles/HandlesInternal.h"
+#include "wpi/hal/Errors.hpp"
+#include "wpi/hal/handles/DigitalHandleResource.hpp"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 
 namespace hal {
 

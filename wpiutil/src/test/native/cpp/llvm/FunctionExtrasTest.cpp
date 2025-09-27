@@ -6,7 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/FunctionExtras.h"
+#include "wpi/util/FunctionExtras.h"
 #include "CountCopyAndMove.h"
 #include "gtest/gtest.h"
 

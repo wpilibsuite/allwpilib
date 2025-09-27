@@ -4,7 +4,7 @@
 
 #include "ReplaceMeParallelDeadlineGroup.h"
 
-#include <frc2/command/InstantCommand.h>
+#include <wpi/command/InstantCommand.hpp>
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.
 // For more information, see:

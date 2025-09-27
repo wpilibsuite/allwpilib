@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <hal/SimDevice.h>
-#include <units/angle.h>
+#include <wpi/hal/SimDevice.hpp>
+#include <wpi/units/angle.hpp>
 
-#include "frc/PWM.h"
+#include "wpi/hardware/discrete/PWM.hpp"
 
 namespace frc {
 

@@ -6,10 +6,10 @@
 
 #include <span>
 
-#include <wpi/SmallSet.h>
+#include <wpi/util/SmallSet.h>
 
-#include "frc2/command/Command.h"
-#include "frc2/command/CommandHelper.h"
+#include "wpi/command/Command.hpp"
+#include "wpi/command/CommandHelper.hpp"
 
 namespace frc2 {
 /**

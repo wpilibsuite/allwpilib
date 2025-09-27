@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "networktables/NetworkTable.h"
+#include "wpi/ntcore/NetworkTable.hpp"
 
 #include <algorithm>
 #include <memory>
@@ -11,24 +11,24 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringExtras.h>
-#include <wpi/StringMap.h>
+#include <wpi/util/SmallString.h>
+#include <wpi/util/StringExtras.h>
+#include <wpi/util/StringMap.hpp>
 
-#include "networktables/BooleanArrayTopic.h"
-#include "networktables/BooleanTopic.h"
-#include "networktables/DoubleArrayTopic.h"
-#include "networktables/DoubleTopic.h"
-#include "networktables/FloatArrayTopic.h"
-#include "networktables/FloatTopic.h"
-#include "networktables/IntegerArrayTopic.h"
-#include "networktables/IntegerTopic.h"
-#include "networktables/NetworkTableInstance.h"
-#include "networktables/RawTopic.h"
-#include "networktables/StringArrayTopic.h"
-#include "networktables/StringTopic.h"
-#include "ntcore.h"
-#include "ntcore_cpp.h"
+#include "wpi/ntcore/BooleanArrayTopic.hpp"
+#include "wpi/ntcore/BooleanTopic.hpp"
+#include "wpi/ntcore/DoubleArrayTopic.hpp"
+#include "wpi/ntcore/DoubleTopic.hpp"
+#include "wpi/ntcore/FloatArrayTopic.hpp"
+#include "wpi/ntcore/FloatTopic.hpp"
+#include "wpi/ntcore/IntegerArrayTopic.hpp"
+#include "wpi/ntcore/IntegerTopic.hpp"
+#include "wpi/ntcore/NetworkTableInstance.hpp"
+#include "wpi/ntcore/RawTopic.hpp"
+#include "wpi/ntcore/StringArrayTopic.hpp"
+#include "wpi/ntcore/StringTopic.hpp"
+#include "wpi/ntcore/ntcore.hpp"
+#include "wpi/ntcore/ntcore_cpp.hpp"
 
 using namespace nt;
 

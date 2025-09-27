@@ -4,8 +4,8 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/controller/ImplicitModelFollower.h"
-#include "frc/system/plant/LinearSystemId.h"
+#include "wpi/math/controller/ImplicitModelFollower.hpp"
+#include "wpi/math/system/plant/LinearSystemId.hpp"
 
 namespace frc {
 

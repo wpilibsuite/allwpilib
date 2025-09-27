@@ -7,15 +7,15 @@
 #include <string>
 
 #include <fmt/format.h>
-#include <wpi/mutex.h>
+#include <wpi/util/mutex.hpp>
 
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
-#include "hal/CAN.h"
-#include "hal/CANAPI.h"
-#include "hal/Errors.h"
-#include "hal/handles/IndexedHandleResource.h"
+#include "wpi/hal/CAN.hpp"
+#include "wpi/hal/CANAPI.hpp"
+#include "wpi/hal/Errors.hpp"
+#include "wpi/hal/handles/IndexedHandleResource.hpp"
 
 using namespace hal;
 

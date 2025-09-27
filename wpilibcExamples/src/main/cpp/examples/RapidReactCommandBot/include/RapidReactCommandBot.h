@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <frc2/command/CommandPtr.h>
-#include <frc2/command/button/CommandXboxController.h>
+#include <wpi/command/CommandPtr.hpp>
+#include <wpi/command/button/CommandXboxController.hpp>
 
 #include "Constants.h"
 #include "subsystems/Drive.h"

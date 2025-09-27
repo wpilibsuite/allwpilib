@@ -17,10 +17,10 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/util/sendable/SendableBuilder.hpp>
 
-#include "frc2/command/Command.h"
-#include "frc2/command/PrintCommand.h"
+#include "wpi/command/Command.hpp"
+#include "wpi/command/PrintCommand.hpp"
 
 namespace frc2 {
 /**

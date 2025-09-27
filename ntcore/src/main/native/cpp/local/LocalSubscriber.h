@@ -6,7 +6,7 @@
 
 #include <utility>
 
-#include <wpi/Synchronization.h>
+#include <wpi/util/Synchronization.hpp>
 
 #include "Handle.h"
 #include "Types_internal.h"
@@ -14,7 +14,7 @@
 #include "VectorSet.h"
 #include "local/LocalTopic.h"
 #include "local/PubSubConfig.h"
-#include "ntcore_c.h"
+#include "wpi/ntcore/ntcore_c.h"
 
 namespace nt::local {
 

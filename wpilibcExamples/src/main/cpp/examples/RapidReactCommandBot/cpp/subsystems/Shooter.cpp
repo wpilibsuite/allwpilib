@@ -4,7 +4,7 @@
 
 #include "subsystems/Shooter.h"
 
-#include <frc2/command/Commands.h>
+#include <wpi/command/Commands.hpp>
 
 Shooter::Shooter() {
   m_shooterFeedback.SetTolerance(ShooterConstants::kShooterTolerance.value());

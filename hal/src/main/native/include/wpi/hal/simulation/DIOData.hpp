@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "hal/Types.h"
-#include "hal/simulation/NotifyListener.h"
+#include "wpi/hal/Types.hpp"
+#include "wpi/hal/simulation/NotifyListener.hpp"
 
 #ifdef __cplusplus
 extern "C" {

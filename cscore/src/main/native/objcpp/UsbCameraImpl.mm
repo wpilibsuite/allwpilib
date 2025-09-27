@@ -9,7 +9,7 @@
 
 #include <vector>
 #include <string>
-#include <wpi/timestamp.h>
+#include <wpi/util/timestamp.hpp>
 
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "Handle.h"
@@ -17,7 +17,7 @@
 #include "Notifier.h"
 #include "Instance.h"
 #include "c_util.h"
-#include "cscore_cpp.h"
+#include "wpi/cscore/cscore_cpp.hpp"
 #include "UsbCameraImpl.h"
 
 namespace cs {

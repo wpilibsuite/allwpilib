@@ -8,7 +8,7 @@
 #include <span>
 #include <vector>
 
-#include "frc2/command/Subsystem.h"
+#include "wpi/command/Subsystem.hpp"
 
 namespace frc2 {
 

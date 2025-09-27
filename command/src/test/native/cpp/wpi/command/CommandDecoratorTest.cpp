@@ -5,14 +5,14 @@
 #include <string>
 #include <utility>
 
-#include <frc/simulation/SimHooks.h>
+#include <wpi/simulation/SimHooks.hpp>
 
 #include "CommandTestBase.h"
-#include "frc2/command/Commands.h"
-#include "frc2/command/FunctionalCommand.h"
-#include "frc2/command/InstantCommand.h"
-#include "frc2/command/RunCommand.h"
-#include "frc2/command/WaitUntilCommand.h"
+#include "wpi/command/Commands.hpp"
+#include "wpi/command/FunctionalCommand.hpp"
+#include "wpi/command/InstantCommand.hpp"
+#include "wpi/command/RunCommand.hpp"
+#include "wpi/command/WaitUntilCommand.hpp"
 
 using namespace frc2;
 class CommandDecoratorTest : public CommandTestBase {};

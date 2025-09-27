@@ -4,7 +4,7 @@
 
 #if defined(__APPLE__)
 
-#include "wpinet/MulticastServiceResolver.h"
+#include "wpi/net/MulticastServiceResolver.hpp"
 
 #include <netinet/in.h>
 #include <poll.h>
@@ -16,7 +16,7 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/SmallVector.h>
+#include <wpi/util/SmallVector.h>
 
 #include "ResolverThread.h"
 #include "dns_sd.h"

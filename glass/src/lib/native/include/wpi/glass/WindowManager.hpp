@@ -8,9 +8,9 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/FunctionExtras.h>
+#include <wpi/util/FunctionExtras.h>
 
-#include "glass/Window.h"
+#include "wpi/glass/Window.hpp"
 
 namespace glass {
 

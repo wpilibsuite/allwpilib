@@ -7,13 +7,13 @@
 #include <optional>
 #include <string>
 
-#include <wpi/json.h>
-#include <wpi/mpack.h>
-#include <wpi/raw_ostream.h>
+#include <wpi/util/json.h>
+#include <wpi/util/mpack.h>
+#include <wpi/util/raw_ostream.h>
 
 #include "Message.h"
 #include "PubSubOptions.h"
-#include "networktables/NetworkTableValue.h"
+#include "wpi/ntcore/NetworkTableValue.hpp"
 
 using namespace nt;
 using namespace nt::net;

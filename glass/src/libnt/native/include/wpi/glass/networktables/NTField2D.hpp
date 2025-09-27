@@ -10,13 +10,13 @@
 #include <utility>
 #include <vector>
 
-#include <networktables/MultiSubscriber.h>
-#include <networktables/NetworkTableInstance.h>
-#include <networktables/NetworkTableListener.h>
-#include <networktables/StringTopic.h>
-#include <ntcore_cpp.h>
+#include <wpi/ntcore/MultiSubscriber.hpp>
+#include <wpi/ntcore/NetworkTableInstance.hpp>
+#include <wpi/ntcore/NetworkTableListener.hpp>
+#include <wpi/ntcore/StringTopic.hpp>
+#include <wpi/ntcore/ntcore_cpp.hpp>
 
-#include "glass/other/Field2D.h"
+#include "wpi/glass/other/Field2D.hpp"
 
 namespace glass {
 

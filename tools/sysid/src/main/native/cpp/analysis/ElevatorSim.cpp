@@ -4,9 +4,9 @@
 
 #include "sysid/analysis/ElevatorSim.h"
 
-#include <frc/StateSpaceUtil.h>
-#include <frc/system/Discretization.h>
-#include <wpi/MathExtras.h>
+#include <wpi/math/util/StateSpaceUtil.hpp>
+#include <wpi/math/system/Discretization.hpp>
+#include <wpi/util/MathExtras.h>
 
 using namespace sysid;
 

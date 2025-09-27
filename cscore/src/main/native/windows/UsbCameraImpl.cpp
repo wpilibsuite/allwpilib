@@ -22,11 +22,11 @@
 #include <Dbt.h>
 #include <Dshow.h>
 #include <Windows.h>
-#include <wpi/ConvertUTF.h>
-#include <wpi/MemAlloc.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringExtras.h>
-#include <wpi/timestamp.h>
+#include <wpi/util/ConvertUTF.h>
+#include <wpi/util/MemAlloc.h>
+#include <wpi/util/SmallString.h>
+#include <wpi/util/StringExtras.h>
+#include <wpi/util/timestamp.hpp>
 
 #include "COMCreators.h"
 #include "ComPtr.h"
@@ -39,7 +39,7 @@
 #include "Telemetry.h"
 #include "WindowsMessagePump.h"
 #include "c_util.h"
-#include "cscore_cpp.h"
+#include "wpi/cscore/cscore_cpp.hpp"
 
 #pragma comment(lib, "Mfplat.lib")
 #pragma comment(lib, "Mf.lib")

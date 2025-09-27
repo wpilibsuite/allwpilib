@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/Notifier.h"
+#include "wpi/Notifier.hpp"
 
 #include <utility>
 
 #include <fmt/format.h>
-#include <hal/DriverStation.h>
-#include <hal/Notifier.h>
-#include <hal/Threads.h>
+#include <wpi/hal/DriverStation.hpp>
+#include <wpi/hal/Notifier.hpp>
+#include <wpi/hal/Threads.hpp>
 
-#include "frc/Errors.h"
-#include "frc/Timer.h"
+#include "wpi/Errors.hpp"
+#include "wpi/system/Timer.hpp"
 
 using namespace frc;
 

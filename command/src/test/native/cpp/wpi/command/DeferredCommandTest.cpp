@@ -3,9 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "CommandTestBase.h"
-#include "frc2/command/Commands.h"
-#include "frc2/command/DeferredCommand.h"
-#include "frc2/command/FunctionalCommand.h"
+#include "wpi/command/Commands.hpp"
+#include "wpi/command/DeferredCommand.hpp"
+#include "wpi/command/FunctionalCommand.hpp"
 
 using namespace frc2;
 

@@ -9,7 +9,7 @@
 #include <vector>
 
 #include <fmt/ranges.h>
-#include <wpi/SpanExtras.h>
+#include <wpi/util/SpanExtras.hpp>
 
 #include "Log.h"
 #include "server/ServerImpl.h"

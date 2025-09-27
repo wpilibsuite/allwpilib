@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/smartdashboard/MechanismLigament2d.h"
+#include "wpi/smartdashboard/MechanismLigament2d.hpp"
 
 #include <cstdio>
 #include <memory>
 
-#include <wpi/StringExtras.h>
-#include <wpi/json.h>
+#include <wpi/util/StringExtras.h>
+#include <wpi/util/json.h>
 
 using namespace frc;
 

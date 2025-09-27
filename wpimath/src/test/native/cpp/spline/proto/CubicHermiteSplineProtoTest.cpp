@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 
 #include "../../ProtoTestBase.h"
-#include "frc/spline/CubicHermiteSpline.h"
+#include "wpi/math/spline/CubicHermiteSpline.hpp"
 
 using namespace frc;
 

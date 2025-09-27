@@ -11,9 +11,9 @@
 
 #include <gtest/gtest.h>
 
-#include "wpinet/uv/Loop.h"
-#include "wpinet/uv/Pipe.h"
-#include "wpinet/uv/Timer.h"
+#include "wpi/net/uv/Loop.hpp"
+#include "wpi/net/uv/Pipe.hpp"
+#include "wpi/net/uv/Timer.hpp"
 
 namespace wpi {
 

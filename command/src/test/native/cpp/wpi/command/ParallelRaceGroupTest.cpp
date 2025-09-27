@@ -7,10 +7,10 @@
 
 #include "CommandTestBase.h"
 #include "CompositionTestBase.h"
-#include "frc2/command/InstantCommand.h"
-#include "frc2/command/ParallelRaceGroup.h"
-#include "frc2/command/SequentialCommandGroup.h"
-#include "frc2/command/WaitUntilCommand.h"
+#include "wpi/command/InstantCommand.hpp"
+#include "wpi/command/ParallelRaceGroup.hpp"
+#include "wpi/command/SequentialCommandGroup.hpp"
+#include "wpi/command/WaitUntilCommand.hpp"
 
 using namespace frc2;
 class ParallelRaceGroupTest : public CommandTestBase {};

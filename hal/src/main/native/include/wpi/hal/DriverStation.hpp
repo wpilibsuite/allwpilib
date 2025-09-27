@@ -8,11 +8,11 @@
 
 #include <stddef.h>  //NOLINT
 
-#include <wpi/Synchronization.h>
-#include <wpi/string.h>
+#include <wpi/util/Synchronization.hpp>
+#include <wpi/util/string.hpp>
 
-#include "hal/DriverStationTypes.h"
-#include "hal/Types.h"
+#include "wpi/hal/DriverStationTypes.hpp"
+#include "wpi/hal/Types.hpp"
 
 /**
  * @defgroup hal_driverstation Driver Station Functions

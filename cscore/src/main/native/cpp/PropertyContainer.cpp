@@ -8,10 +8,10 @@
 #include <string>
 #include <vector>
 
-#include <wpi/Logger.h>
-#include <wpi/SmallString.h>
-#include <wpi/SmallVector.h>
-#include <wpi/json.h>
+#include <wpi/util/Logger.hpp>
+#include <wpi/util/SmallString.h>
+#include <wpi/util/SmallVector.h>
+#include <wpi/util/json.h>
 
 using namespace cs;
 

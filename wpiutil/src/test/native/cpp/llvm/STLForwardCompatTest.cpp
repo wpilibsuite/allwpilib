@@ -6,7 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/STLForwardCompat.h"
+#include "wpi/util/STLForwardCompat.h"
 #include "CountCopyAndMove.h"
 #include "gtest/gtest.h"
 

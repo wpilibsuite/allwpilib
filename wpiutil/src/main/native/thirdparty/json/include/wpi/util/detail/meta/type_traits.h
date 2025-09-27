@@ -14,13 +14,13 @@
 #include <tuple> // tuple
 #include <string> // char_traits
 
-#include <wpi/detail/iterators/iterator_traits.h>
-#include <wpi/detail/macro_scope.h>
-#include <wpi/detail/meta/call_std/begin.h>
-#include <wpi/detail/meta/call_std/end.h>
-#include <wpi/detail/meta/cpp_future.h>
-#include <wpi/detail/meta/detected.h>
-#include <wpi/json_fwd.h>
+#include <wpi/util/detail/iterators/iterator_traits.h>
+#include <wpi/util/detail/macro_scope.h>
+#include <wpi/util/detail/meta/call_std/begin.h>
+#include <wpi/util/detail/meta/call_std/end.h>
+#include <wpi/util/detail/meta/cpp_future.h>
+#include <wpi/util/detail/meta/detected.h>
+#include <wpi/util/json_fwd.h>
 
 WPI_JSON_NAMESPACE_BEGIN
 /*!

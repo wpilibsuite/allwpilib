@@ -5,19 +5,19 @@
 #include <string>
 #include <thread>
 
-#include <frc/RobotController.h>
-#include <frc/simulation/AnalogInputSim.h>
-#include <frc/simulation/DriverStationSim.h>
-#include <frc/simulation/ElevatorSim.h>
-#include <frc/simulation/JoystickSim.h>
-#include <frc/simulation/PWMMotorControllerSim.h>
-#include <frc/simulation/SimHooks.h>
-#include <frc/system/plant/DCMotor.h>
+#include <wpi/system/RobotController.hpp>
+#include <wpi/simulation/AnalogInputSim.hpp>
+#include <wpi/simulation/DriverStationSim.hpp>
+#include <wpi/simulation/ElevatorSim.hpp>
+#include <wpi/simulation/JoystickSim.hpp>
+#include <wpi/simulation/PWMMotorControllerSim.hpp>
+#include <wpi/simulation/SimHooks.hpp>
+#include <wpi/math/system/plant/DCMotor.hpp>
 #include <gtest/gtest.h>
-#include <hal/simulation/MockHooks.h>
-#include <units/length.h>
-#include <units/mass.h>
-#include <units/time.h>
+#include <wpi/hal/simulation/MockHooks.hpp>
+#include <wpi/units/length.hpp>
+#include <wpi/units/mass.hpp>
+#include <wpi/units/time.hpp>
 
 #include "Robot.h"
 

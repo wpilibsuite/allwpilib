@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "frc/EigenCore.h"
+#include "wpi/math/linalg/EigenCore.hpp"
 
 namespace frc {
 

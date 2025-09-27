@@ -8,8 +8,8 @@
 
 #include "HALInitializer.h"
 #include "SystemServerInternal.h"
-#include "hal/AddressableLEDTypes.h"
-#include "hal/Errors.h"
+#include "wpi/hal/AddressableLEDTypes.hpp"
+#include "wpi/hal/Errors.hpp"
 
 namespace hal {
 

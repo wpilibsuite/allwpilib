@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/Notifier.h"
+#include "wpi/hal/Notifier.hpp"
 
 #include <atomic>
 #include <chrono>
@@ -12,18 +12,18 @@
 #include <string>
 #include <utility>
 
-#include <wpi/SmallVector.h>
-#include <wpi/StringExtras.h>
-#include <wpi/condition_variable.h>
-#include <wpi/mutex.h>
+#include <wpi/util/SmallVector.h>
+#include <wpi/util/StringExtras.h>
+#include <wpi/util/condition_variable.hpp>
+#include <wpi/util/mutex.hpp>
 
 #include "HALInitializer.h"
 #include "NotifierInternal.h"
-#include "hal/Errors.h"
-#include "hal/HALBase.h"
-#include "hal/cpp/fpga_clock.h"
-#include "hal/handles/UnlimitedHandleResource.h"
-#include "hal/simulation/NotifierData.h"
+#include "wpi/hal/Errors.hpp"
+#include "wpi/hal/HALBase.hpp"
+#include "wpi/hal/cpp/fpga_clock.hpp"
+#include "wpi/hal/handles/UnlimitedHandleResource.hpp"
+#include "wpi/hal/simulation/NotifierData.hpp"
 
 namespace {
 struct Notifier {

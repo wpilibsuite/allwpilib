@@ -17,8 +17,8 @@
 #include "gmock/gmock.h"
 #include "net/MockMessageHandler.h"
 #include "net/MockNetworkInterface.h"
-#include "ntcore_c.h"
-#include "ntcore_cpp.h"
+#include "wpi/ntcore/ntcore_c.h"
+#include "wpi/ntcore/ntcore_cpp.hpp"
 
 using ::testing::_;
 using ::testing::AllOf;

@@ -5,10 +5,10 @@
 #include <stdint.h>
 
 #include <fmt/format.h>
-#include <networktables/NetworkTableInstance.h>
-#include <networktables/StringTopic.h>
-#include <wpi/StringMap.h>
-#include <wpi/string.h>
+#include <wpi/ntcore/NetworkTableInstance.hpp>
+#include <wpi/ntcore/StringTopic.hpp>
+#include <wpi/util/StringMap.hpp>
+#include <wpi/util/string.hpp>
 
 #include "SystemServerInternal.h"
 

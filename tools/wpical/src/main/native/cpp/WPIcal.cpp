@@ -18,9 +18,9 @@
 #include <GLFW/glfw3.h>
 #include <fmt/format.h>
 #include <imgui.h>
-#include <portable-file-dialogs.h>
-#include <wpi/json.h>
-#include <wpigui.h>
+#include <wpi/gui/portable-file-dialogs.hpp>
+#include <wpi/util/json.h>
+#include <wpi/gui/wpigui.hpp>
 
 #include "tagpose.h"
 

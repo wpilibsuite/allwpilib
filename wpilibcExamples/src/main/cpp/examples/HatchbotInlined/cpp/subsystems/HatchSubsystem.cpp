@@ -4,7 +4,7 @@
 
 #include "subsystems/HatchSubsystem.h"
 
-#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/util/sendable/SendableBuilder.hpp>
 
 using namespace HatchConstants;
 

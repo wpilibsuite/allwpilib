@@ -6,13 +6,13 @@
 
 #include <cassert>
 
-#include <wpi/jni_util.h>
+#include <wpi/util/jni_util.hpp>
 
 #include "HALUtil.h"
 #include "org_wpilib_hardware_hal_AnalogJNI.h"
-#include "hal/AnalogInput.h"
-#include "hal/Ports.h"
-#include "hal/handles/HandlesInternal.h"
+#include "wpi/hal/AnalogInput.hpp"
+#include "wpi/hal/Ports.hpp"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 
 using namespace hal;
 

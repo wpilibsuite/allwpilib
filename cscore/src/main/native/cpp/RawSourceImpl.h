@@ -14,7 +14,7 @@
 
 #include "ConfigurableSourceImpl.h"
 #include "SourceImpl.h"
-#include "cscore_raw.h"
+#include "wpi/cscore/cscore_raw.hpp"
 
 namespace cs {
 

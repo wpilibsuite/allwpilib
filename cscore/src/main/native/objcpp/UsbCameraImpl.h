@@ -12,7 +12,7 @@
 #include <string>
 #include <optional>
 
-#include <wpi/StringMap.h>
+#include <wpi/util/StringMap.hpp>
 
 #include "SourceImpl.h"
 

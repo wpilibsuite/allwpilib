@@ -9,15 +9,15 @@
 #include <utility>
 #include <vector>
 
-#include <networktables/NetworkTableInstance.h>
-#include <wpi/MemoryBuffer.h>
-#include <wpi/StringExtras.h>
-#include <wpi/fmt/raw_ostream.h>
-#include <wpi/json.h>
-#include <wpi/print.h>
-#include <wpi/raw_ostream.h>
+#include <wpi/ntcore/NetworkTableInstance.hpp>
+#include <wpi/util/MemoryBuffer.h>
+#include <wpi/util/StringExtras.h>
+#include <wpi/util/fmt/raw_ostream.hpp>
+#include <wpi/util/json.h>
+#include <wpi/util/print.hpp>
+#include <wpi/util/raw_ostream.h>
 
-#include "cameraserver/CameraServer.h"
+#include "wpi/cameraserver/CameraServer.hpp"
 
 /*
    JSON format:

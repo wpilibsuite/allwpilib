@@ -7,14 +7,14 @@
 #include <memory>
 #include <vector>
 
-#include <glass/hardware/DIO.h>
-#include <glass/hardware/Encoder.h>
-#include <hal/Ports.h>
-#include <hal/simulation/DIOData.h>
-#include <hal/simulation/DigitalPWMData.h>
-#include <hal/simulation/DutyCycleData.h>
-#include <hal/simulation/EncoderData.h>
-#include <hal/simulation/SimDeviceData.h>
+#include <wpi/glass/hardware/DIO.hpp>
+#include <wpi/glass/hardware/Encoder.hpp>
+#include <wpi/hal/Ports.hpp>
+#include <wpi/hal/simulation/DIOData.hpp>
+#include <wpi/hal/simulation/DigitalPWMData.hpp>
+#include <wpi/hal/simulation/DutyCycleData.hpp>
+#include <wpi/hal/simulation/EncoderData.hpp>
+#include <wpi/hal/simulation/SimDeviceData.hpp>
 
 #include "EncoderSimGui.h"
 #include "HALDataSource.h"

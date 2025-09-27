@@ -12,11 +12,11 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <glass/DataSource.h>
-#include <glass/hardware/Encoder.h>
-#include <hal/Ports.h>
-#include <hal/simulation/EncoderData.h>
-#include <hal/simulation/SimDeviceData.h>
+#include <wpi/glass/DataSource.hpp>
+#include <wpi/glass/hardware/Encoder.hpp>
+#include <wpi/hal/Ports.hpp>
+#include <wpi/hal/simulation/EncoderData.hpp>
+#include <wpi/hal/simulation/SimDeviceData.hpp>
 
 #include "HALSimGui.h"
 

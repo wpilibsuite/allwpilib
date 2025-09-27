@@ -5,10 +5,10 @@
 #include <gtest/gtest.h>
 
 #include "../../StructTestBase.h"
-#include "frc/controller/SimpleMotorFeedforward.h"
-#include "frc/controller/struct/SimpleMotorFeedforwardStruct.h"
-#include "units/acceleration.h"
-#include "units/velocity.h"
+#include "wpi/math/controller/SimpleMotorFeedforward.hpp"
+#include "wpi/math/controller/struct/SimpleMotorFeedforwardStruct.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/velocity.hpp"
 
 using namespace frc;
 

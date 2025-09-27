@@ -8,8 +8,8 @@
 #include <atomic>
 #include <vector>
 
-#include <hal/Ports.h>
-#include <hal/simulation/DriverStationData.h>
+#include <wpi/hal/Ports.hpp>
+#include <wpi/hal/simulation/DriverStationData.hpp>
 
 namespace wpilibws {
 

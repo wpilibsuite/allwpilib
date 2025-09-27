@@ -10,8 +10,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/SmallVector.h"
-#include "wpi/Compiler.h"
+#include "wpi/util/SmallVector.h"
+#include "wpi/util/Compiler.h"
 #include "gtest/gtest.h"
 #include <array>
 #include <list>

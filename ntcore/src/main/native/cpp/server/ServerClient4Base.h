@@ -7,7 +7,7 @@
 #include <string>
 #include <string_view>
 
-#include <wpi/DenseMap.h>
+#include <wpi/util/DenseMap.h>
 
 #include "net/ClientMessageQueue.h"
 #include "server/Functions.h"

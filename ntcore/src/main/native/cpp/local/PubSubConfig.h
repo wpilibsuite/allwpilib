@@ -8,7 +8,7 @@
 #include <string_view>
 
 #include "PubSubOptions.h"
-#include "ntcore_c.h"
+#include "wpi/ntcore/ntcore_c.h"
 
 namespace nt::local {
 

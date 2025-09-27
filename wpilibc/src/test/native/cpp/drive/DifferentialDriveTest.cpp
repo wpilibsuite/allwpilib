@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/drive/DifferentialDrive.h"
+#include "wpi/drive/DifferentialDrive.hpp"
 #include "motorcontrol/MockPWMMotorController.h"
 
 TEST(DifferentialDriveTest, ArcadeDriveIK) {

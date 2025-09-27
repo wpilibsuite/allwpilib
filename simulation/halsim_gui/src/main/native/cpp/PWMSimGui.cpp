@@ -7,10 +7,10 @@
 #include <memory>
 #include <vector>
 
-#include <glass/hardware/PWM.h>
-#include <hal/Ports.h>
-#include <hal/simulation/AddressableLEDData.h>
-#include <hal/simulation/PWMData.h>
+#include <wpi/glass/hardware/PWM.hpp>
+#include <wpi/hal/Ports.hpp>
+#include <wpi/hal/simulation/AddressableLEDData.hpp>
+#include <wpi/hal/simulation/PWMData.hpp>
 
 #include "HALDataSource.h"
 #include "HALSimGui.h"

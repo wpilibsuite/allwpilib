@@ -8,7 +8,7 @@
 
 #include <stdint.h>
 
-#include "ntcore_c.h"
+#include "wpi/ntcore/ntcore_c.h"
 
 #ifdef __cplusplus
 extern "C" {

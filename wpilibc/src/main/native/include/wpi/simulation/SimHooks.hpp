@@ -6,8 +6,8 @@
 
 #include <stdint.h>
 
-#include <hal/HALBase.h>
-#include <units/time.h>
+#include <wpi/hal/HALBase.hpp>
+#include <wpi/units/time.hpp>
 
 namespace frc::sim {
 

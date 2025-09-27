@@ -4,8 +4,8 @@
 
 #include "commands/Autos.h"
 
-#include <frc2/command/Commands.h>
-#include <frc2/command/FunctionalCommand.h>
+#include <wpi/command/Commands.hpp>
+#include <wpi/command/FunctionalCommand.hpp>
 
 #include "Constants.h"
 
