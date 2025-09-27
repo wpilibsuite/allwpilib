@@ -2320,7 +2320,8 @@ class AnnotationProcessorTest {
   private void assertLoggerGenerates(String loggedClassContent, String loggerClassContent) {
     // Extract the expected logger file name from the class declaration so we can find the correct
     // generated file.
-    var pattern = Pattern.compile(".*public class (.*) extends ClassSpecificLogger.*", Pattern.DOTALL);
+    var pattern =
+        Pattern.compile(".*public class (.*) extends ClassSpecificLogger.*", Pattern.DOTALL);
     var matcher = pattern.matcher(loggerClassContent);
     var className = "ExampleLogger";
     if (matcher.matches()) {
