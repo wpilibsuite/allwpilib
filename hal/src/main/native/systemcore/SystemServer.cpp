@@ -7,15 +7,15 @@
 #include "SystemServerInternal.h"
 #include "mrc/NtNetComm.h"
 
-namespace hal {
+namespace wpi::hal {
 
-static nt::NetworkTableInstance ServerInstance;
+static wpi::nt::NetworkTableInstance ServerInstance;
 
 void InitializeSystemServer() {
   if (ServerInstance) {
     return;
   }
-  ServerInstance = nt::NetworkTableInstance::Create();
+  ServerInstance = wpi::nt::NetworkTableInstance::Create();
   ServerInstance.SetServer("localhost", ROBOT_SYSTEM_SERVER_NT_PORT);
   ServerInstance.StartClient("RobotProgram");
 }
@@ -26,18 +26,18 @@ void ShutdownSystemServer() {
   }
 
   ServerInstance.StopClient();
-  nt::NetworkTableInstance::Destroy(ServerInstance);
+  wpi::nt::NetworkTableInstance::Destroy(ServerInstance);
 }
 
-nt::NetworkTableInstance GetSystemServer() {
+wpi::nt::NetworkTableInstance GetSystemServer() {
   return ServerInstance;
 }
 
-}  // namespace hal
+}  // namespace wpi::hal
 
 extern "C" {
 
 NT_Inst HAL_GetSystemServerHandle(void) {
-  return hal::ServerInstance.GetHandle();
+  return wpi::hal::ServerInstance.GetHandle();
 }
 }  // extern "C"

@@ -16,7 +16,7 @@
  * backward.
  */
 class ComplexAuto
-    : public frc2::CommandHelper<frc2::SequentialCommandGroup, ComplexAuto> {
+    : public wpi::cmd::CommandHelper<wpi::cmd::SequentialCommandGroup, ComplexAuto> {
  public:
   /**
    * Creates a new ComplexAuto.

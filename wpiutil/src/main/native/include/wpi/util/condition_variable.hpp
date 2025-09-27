@@ -8,7 +8,7 @@
 
 #include "wpi/util/priority_mutex.hpp"
 
-namespace wpi {
+namespace wpi::util {
 
 #if defined(__linux__) && defined(WPI_HAVE_PRIORITY_MUTEX)
 using condition_variable = ::std::condition_variable_any;
@@ -16,4 +16,4 @@ using condition_variable = ::std::condition_variable_any;
 using condition_variable = ::std::condition_variable;
 #endif
 
-}  // namespace wpi
+}  // namespace wpi::util

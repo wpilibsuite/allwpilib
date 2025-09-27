@@ -9,7 +9,7 @@
 
 #include "wpi/hardware/discrete/PWM.hpp"
 
-namespace frc {
+namespace wpi {
 
 namespace sim {
 class ServoSim;
@@ -21,9 +21,9 @@ class ServoSim;
  * The range parameters default to the appropriate values for the Hitec HS-322HD
  * servo provided in the FIRST Kit of Parts in 2008.
  */
-class Servo : public wpi::Sendable, public wpi::SendableHelper<Servo> {
+class Servo : public wpi::util::Sendable, public wpi::util::SendableHelper<Servo> {
  public:
-  friend class frc::sim::ServoSim;
+  friend class wpi::sim::ServoSim;
 
   /**
    * Constructor.
@@ -88,25 +88,25 @@ class Servo : public wpi::Sendable, public wpi::SendableHelper<Servo> {
 
   int GetChannel() const;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
   static double GetServoAngleRange();
-  units::microsecond_t GetFullRangeScaleFactor() const;
+  wpi::units::microsecond_t GetFullRangeScaleFactor() const;
 
   static constexpr double kMaxServoAngle = 180.0;
   static constexpr double kMinServoAngle = 0.0;
 
-  static constexpr units::millisecond_t kDefaultMaxServoPWM = 2.4_ms;
-  static constexpr units::millisecond_t kDefaultMinServoPWM = 0.6_ms;
+  static constexpr wpi::units::millisecond_t kDefaultMaxServoPWM = 2.4_ms;
+  static constexpr wpi::units::millisecond_t kDefaultMinServoPWM = 0.6_ms;
 
-  units::millisecond_t m_maxPwm = kDefaultMaxServoPWM;
-  units::millisecond_t m_minPwm = kDefaultMinServoPWM;
+  wpi::units::millisecond_t m_maxPwm = kDefaultMaxServoPWM;
+  wpi::units::millisecond_t m_minPwm = kDefaultMinServoPWM;
 
-  hal::SimDevice m_simDevice;
-  hal::SimDouble m_simPosition;
+  wpi::hal::SimDevice m_simDevice;
+  wpi::hal::SimDouble m_simPosition;
 
   PWM m_pwm;
 };
 
-}  // namespace frc
+}  // namespace wpi

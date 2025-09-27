@@ -8,9 +8,9 @@
 #include "wpi/units/base.hpp"
 #include "wpi/units/time.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::angular_jerk
+ * @namespace wpi::units::angular_jerk
  * @brief namespace for unit types and containers representing angular
  *        jerk values
  * @details The SI unit for angular jerk is
@@ -20,7 +20,7 @@ namespace units {
  * @sa See unit_t for more information on unit type containers.
  */
 UNIT_ADD(angular_jerk, radians_per_second_cubed, radians_per_second_cubed,
-         rad_per_s_cu, unit<std::ratio<1>, units::category::angular_jerk_unit>)
+         rad_per_s_cu, unit<std::ratio<1>, wpi::units::category::angular_jerk_unit>)
 UNIT_ADD(angular_jerk, degrees_per_second_cubed, degrees_per_second_cubed,
          deg_per_s_cu,
          compound_unit<angle::degrees, inverse<cubed<time::seconds>>>)
@@ -31,4 +31,4 @@ UNIT_ADD(angular_jerk, turns_per_second_cubed, turns_per_second_cubed,
 UNIT_ADD_CATEGORY_TRAIT(angular_jerk)
 
 using namespace angular_jerk;
-}  // namespace units
+}  // namespace wpi::units

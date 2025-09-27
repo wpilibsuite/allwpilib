@@ -12,7 +12,7 @@
 #include "wpi/glass/Storage.hpp"
 #include "wpi/glass/support/ExtraGuiWidgets.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 namespace {
 struct IndicatorData {
@@ -21,8 +21,8 @@ struct IndicatorData {
 };
 }  // namespace
 
-void glass::DisplayLEDDisplay(LEDDisplayModel* model, int index) {
-  wpi::SmallVector<LEDDisplayModel::Data, 64> dataBuf;
+void wpi::glass::DisplayLEDDisplay(LEDDisplayModel* model, int index) {
+  wpi::util::SmallVector<LEDDisplayModel::Data, 64> dataBuf;
   auto data = model->GetData(dataBuf);
   int length = data.size();
   auto& storage = GetStorage();
@@ -76,7 +76,7 @@ void glass::DisplayLEDDisplay(LEDDisplayModel* model, int index) {
            config);
 }
 
-void glass::DisplayLEDDisplays(LEDDisplaysModel* model) {
+void wpi::glass::DisplayLEDDisplays(LEDDisplaysModel* model) {
   bool hasAny = false;
 
   model->ForEachLEDDisplay([&](LEDDisplayModel& display, int i) {

@@ -12,7 +12,7 @@
 
 #include "wpi/net/uv/Loop.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 std::shared_ptr<FsEvent> FsEvent::Create(Loop& loop) {
   if (loop.IsClosing()) {
@@ -29,7 +29,7 @@ std::shared_ptr<FsEvent> FsEvent::Create(Loop& loop) {
 }
 
 void FsEvent::Start(std::string_view path, unsigned int flags) {
-  SmallString<128> pathBuf{path};
+  wpi::util::SmallString<128> pathBuf{path};
   Invoke(
       &uv_fs_event_start, GetRaw(),
       [](uv_fs_event_t* handle, const char* filename, int events, int status) {
@@ -66,4 +66,4 @@ std::string FsEvent::GetPath() {
   return std::string{};
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

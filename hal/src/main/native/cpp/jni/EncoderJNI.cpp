@@ -11,7 +11,7 @@
 #include "wpi/hal/Encoder.hpp"
 #include "wpi/hal/Errors.hpp"
 
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
 

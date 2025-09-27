@@ -9,7 +9,7 @@
 #include <wpi/hal/PWM.hpp>
 #include <wpi/hal/Ports.hpp>
 
-using namespace frc;
+using namespace wpi;
 
 int SensorUtil::GetDefaultCTREPCMModule() {
   return 0;

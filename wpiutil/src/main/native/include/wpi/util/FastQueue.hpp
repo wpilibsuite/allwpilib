@@ -53,7 +53,7 @@
 // Allocates memory sparingly, and only once if the original maximum size
 // estimate is never exceeded.
 
-namespace wpi {
+namespace wpi::util {
 
 template<typename T, size_t MAX_BLOCK_SIZE = 512>
 class FastQueue
@@ -554,4 +554,4 @@ private:
 	size_t largestBlockSize;
 };
 
-}    // end namespace wpi
+}    // end namespace wpi::util

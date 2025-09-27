@@ -13,7 +13,7 @@
 
 #include "wpi/drive/RobotDriveBase.hpp"
 
-namespace frc {
+namespace wpi {
 
 class MotorController;
 
@@ -56,8 +56,8 @@ class MotorController;
  * Safety timeouts.
  */
 class DifferentialDrive : public RobotDriveBase,
-                          public wpi::Sendable,
-                          public wpi::SendableHelper<DifferentialDrive> {
+                          public wpi::util::Sendable,
+                          public wpi::util::SendableHelper<DifferentialDrive> {
  public:
   /**
    * Wheel speeds for a differential drive.
@@ -198,7 +198,7 @@ class DifferentialDrive : public RobotDriveBase,
   void StopMotor() override;
   std::string GetDescription() const override;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
   std::function<void(double)> m_leftMotor;
@@ -209,4 +209,4 @@ class DifferentialDrive : public RobotDriveBase,
   double m_rightOutput = 0.0;
 };
 
-}  // namespace frc
+}  // namespace wpi

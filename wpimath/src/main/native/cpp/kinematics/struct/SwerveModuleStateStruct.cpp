@@ -9,17 +9,17 @@ constexpr size_t kSpeedOff = 0;
 constexpr size_t kAngleOff = kSpeedOff + 8;
 }  // namespace
 
-using StructType = wpi::Struct<frc::SwerveModuleState>;
+using StructType = wpi::util::Struct<wpi::math::SwerveModuleState>;
 
-frc::SwerveModuleState StructType::Unpack(std::span<const uint8_t> data) {
-  return frc::SwerveModuleState{
-      units::meters_per_second_t{wpi::UnpackStruct<double, kSpeedOff>(data)},
-      wpi::UnpackStruct<frc::Rotation2d, kAngleOff>(data),
+wpi::math::SwerveModuleState StructType::Unpack(std::span<const uint8_t> data) {
+  return wpi::math::SwerveModuleState{
+      wpi::units::meters_per_second_t{wpi::util::UnpackStruct<double, kSpeedOff>(data)},
+      wpi::util::UnpackStruct<wpi::math::Rotation2d, kAngleOff>(data),
   };
 }
 
 void StructType::Pack(std::span<uint8_t> data,
-                      const frc::SwerveModuleState& value) {
-  wpi::PackStruct<kSpeedOff>(data, value.speed.value());
-  wpi::PackStruct<kAngleOff>(data, value.angle);
+                      const wpi::math::SwerveModuleState& value) {
+  wpi::util::PackStruct<kSpeedOff>(data, value.speed.value());
+  wpi::util::PackStruct<kAngleOff>(data, value.angle);
 }

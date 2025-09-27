@@ -7,7 +7,7 @@
 #include "CommandTestBase.h"
 #include "wpi/command/WaitUntilCommand.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 class WaitUntilCommandTest : public CommandTestBase {};
 
 TEST_F(WaitUntilCommandTest, WaitUntilCommandSchedule) {

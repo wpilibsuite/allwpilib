@@ -15,7 +15,7 @@
 #include "wpi/command/WaitUntilCommand.hpp"
 #include "wpi/command/button/Trigger.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 class TriggerTest : public CommandTestBase {};
 
 TEST_F(TriggerTest, OnTrue) {
@@ -242,7 +242,7 @@ TEST_F(TriggerTest, Debounce) {
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(&command));
 
-  frc::sim::StepTiming(300_ms);
+  wpi::sim::StepTiming(300_ms);
 
   scheduler.Run();
   EXPECT_TRUE(scheduler.IsScheduled(&command));

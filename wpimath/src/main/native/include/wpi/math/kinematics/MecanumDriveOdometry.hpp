@@ -14,7 +14,7 @@
 #include "wpi/math/kinematics/Odometry.hpp"
 #include "wpi/units/time.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * Class for mecanum drive odometry. Odometry allows you to track the robot's
@@ -45,4 +45,4 @@ class WPILIB_DLLEXPORT MecanumDriveOdometry
   MecanumDriveKinematics m_kinematicsImpl;
 };
 
-}  // namespace frc
+}  // namespace wpi::math

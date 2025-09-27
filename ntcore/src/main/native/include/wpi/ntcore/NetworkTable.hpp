@@ -21,7 +21,7 @@
 #include "wpi/ntcore/Topic.hpp"
 #include "wpi/ntcore/ntcore_c.h"
 
-namespace nt {
+namespace wpi::nt {
 
 class BooleanArrayTopic;
 class BooleanTopic;
@@ -32,16 +32,16 @@ class FloatTopic;
 class IntegerArrayTopic;
 class IntegerTopic;
 class NetworkTableInstance;
-template <wpi::ProtobufSerializable T>
+template <wpi::util::ProtobufSerializable T>
 class ProtobufTopic;
 class RawTopic;
 class StringArrayTopic;
 class StringTopic;
 template <typename T, typename... I>
-  requires wpi::StructSerializable<T, I...>
+  requires wpi::util::StructSerializable<T, I...>
 class StructArrayTopic;
 template <typename T, typename... I>
-  requires wpi::StructSerializable<T, I...>
+  requires wpi::util::StructSerializable<T, I...>
 class StructTopic;
 class Topic;
 
@@ -59,8 +59,8 @@ class NetworkTable final {
  private:
   NT_Inst m_inst;
   std::string m_path;
-  mutable wpi::mutex m_mutex;
-  mutable wpi::StringMap<NT_Entry> m_entries;
+  mutable wpi::util::mutex m_mutex;
+  mutable wpi::util::StringMap<NT_Entry> m_entries;
 
   struct private_init {};
   friend class NetworkTableInstance;
@@ -95,7 +95,7 @@ class NetworkTable final {
                                   bool withLeadingSlash = true);
 
   static std::string_view NormalizeKey(std::string_view key,
-                                       wpi::SmallVectorImpl<char>& buf,
+                                       wpi::util::SmallVectorImpl<char>& buf,
                                        bool withLeadingSlash = true);
 
   /**
@@ -237,7 +237,7 @@ class NetworkTable final {
    * @param name topic name
    * @return Topic
    */
-  template <wpi::ProtobufSerializable T>
+  template <wpi::util::ProtobufSerializable T>
   ProtobufTopic<T> GetProtobufTopic(std::string_view name) const {
     return ProtobufTopic<T>{GetTopic(name)};
   }
@@ -250,7 +250,7 @@ class NetworkTable final {
    * @return Topic
    */
   template <typename T, typename... I>
-    requires wpi::StructSerializable<T, I...>
+    requires wpi::util::StructSerializable<T, I...>
   StructTopic<T, I...> GetStructTopic(std::string_view name, I... info) const {
     return StructTopic<T, I...>{GetTopic(name), std::move(info)...};
   }
@@ -263,7 +263,7 @@ class NetworkTable final {
    * @return Topic
    */
   template <typename T, typename... I>
-    requires wpi::StructSerializable<T, I...>
+    requires wpi::util::StructSerializable<T, I...>
   StructArrayTopic<T, I...> GetStructArrayTopic(std::string_view name,
                                                 I... info) const {
     return StructArrayTopic<T, I...>{GetTopic(name), std::move(info)...};
@@ -675,4 +675,4 @@ class NetworkTable final {
   void RemoveListener(NT_Listener listener);
 };
 
-}  // namespace nt
+}  // namespace wpi::nt

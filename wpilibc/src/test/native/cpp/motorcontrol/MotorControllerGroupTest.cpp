@@ -12,7 +12,7 @@
 
 #include "motorcontrol/MockMotorController.h"
 
-using namespace frc;
+using namespace wpi;
 
 enum MotorControllerGroupTestType { TEST_ONE, TEST_TWO, TEST_THREE };
 

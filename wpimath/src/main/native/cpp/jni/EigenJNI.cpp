@@ -12,7 +12,7 @@
 
 #include "org_wpilib_math_jni_EigenJNI.h"
 
-using namespace wpi::java;
+using namespace wpi::util::java;
 
 extern "C" {
 

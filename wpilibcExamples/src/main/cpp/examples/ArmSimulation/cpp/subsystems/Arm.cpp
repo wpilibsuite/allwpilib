@@ -13,19 +13,19 @@ Arm::Arm() {
   m_encoder.SetDistancePerPulse(kArmEncoderDistPerPulse);
 
   // Put Mechanism 2d to SmartDashboard
-  frc::SmartDashboard::PutData("Arm Sim", &m_mech2d);
+  wpi::SmartDashboard::PutData("Arm Sim", &m_mech2d);
 
   // Set the Arm position setpoint and P constant to Preferences if the keys
   // don't already exist
-  frc::Preferences::InitDouble(kArmPositionKey, m_armSetpoint.value());
-  frc::Preferences::InitDouble(kArmPKey, m_armKp);
+  wpi::Preferences::InitDouble(kArmPositionKey, m_armSetpoint.value());
+  wpi::Preferences::InitDouble(kArmPKey, m_armKp);
 }
 
 void Arm::SimulationPeriodic() {
   // In this method, we update our simulation of what our arm is doing
   // First, we set our "inputs" (voltages)
   m_armSim.SetInput(
-      frc::Vectord<1>{m_motor.Get() * frc::RobotController::GetInputVoltage()});
+      wpi::math::Vectord<1>{m_motor.Get() * wpi::RobotController::GetInputVoltage()});
 
   // Next, we update it. The standard loop time is 20ms.
   m_armSim.Update(20_ms);
@@ -34,8 +34,8 @@ void Arm::SimulationPeriodic() {
   // voltage
   m_encoderSim.SetDistance(m_armSim.GetAngle().value());
   // SimBattery estimates loaded battery voltages
-  frc::sim::RoboRioSim::SetVInVoltage(
-      frc::sim::BatterySim::Calculate({m_armSim.GetCurrentDraw()}));
+  wpi::sim::RoboRioSim::SetVInVoltage(
+      wpi::sim::BatterySim::Calculate({m_armSim.GetCurrentDraw()}));
 
   // Update the Mechanism Arm angle based on the simulated arm angle
   m_arm->SetAngle(m_armSim.GetAngle());
@@ -43,10 +43,10 @@ void Arm::SimulationPeriodic() {
 
 void Arm::LoadPreferences() {
   // Read Preferences for Arm setpoint and kP on entering Teleop
-  m_armSetpoint = units::degree_t{
-      frc::Preferences::GetDouble(kArmPositionKey, m_armSetpoint.value())};
-  if (m_armKp != frc::Preferences::GetDouble(kArmPKey, m_armKp)) {
-    m_armKp = frc::Preferences::GetDouble(kArmPKey, m_armKp);
+  m_armSetpoint = wpi::units::degree_t{
+      wpi::Preferences::GetDouble(kArmPositionKey, m_armSetpoint.value())};
+  if (m_armKp != wpi::Preferences::GetDouble(kArmPKey, m_armKp)) {
+    m_armKp = wpi::Preferences::GetDouble(kArmPKey, m_armKp);
     m_controller.SetP(m_armKp);
   }
 }
@@ -55,8 +55,8 @@ void Arm::ReachSetpoint() {
   // Here, we run PID control like normal, with a setpoint read from
   // preferences in degrees.
   double pidOutput = m_controller.Calculate(
-      m_encoder.GetDistance(), (units::radian_t{m_armSetpoint}.value()));
-  m_motor.SetVoltage(units::volt_t{pidOutput});
+      m_encoder.GetDistance(), (wpi::units::radian_t{m_armSetpoint}.value()));
+  m_motor.SetVoltage(wpi::units::volt_t{pidOutput});
 }
 
 void Arm::Stop() {

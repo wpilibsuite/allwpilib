@@ -12,15 +12,15 @@
 
 #include "wpi/glass/ContextInternal.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
-wpi::sig::Signal<const char*, DataSource*> DataSource::sourceCreated;
+wpi::util::sig::Signal<const char*, DataSource*> DataSource::sourceCreated;
 
-std::string glass::MakeSourceId(std::string_view id, int index) {
+std::string wpi::glass::MakeSourceId(std::string_view id, int index) {
   return fmt::format("{}[{}]", id, index);
 }
 
-std::string glass::MakeSourceId(std::string_view id, int index, int index2) {
+std::string wpi::glass::MakeSourceId(std::string_view id, int index, int index2) {
   return fmt::format("{}[{},{}]", id, index, index2);
 }
 

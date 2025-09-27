@@ -6,7 +6,7 @@
 
 #include "wpi/ntcore/ntcore_c.h"
 
-namespace nt {
+namespace wpi::nt {
 
 /**
  * NetworkTable entry type.
@@ -39,4 +39,4 @@ enum class NetworkTableType {
   kFloatArray = NT_FLOAT_ARRAY
 };
 
-}  // namespace nt
+}  // namespace wpi::nt

@@ -84,7 +84,7 @@ struct EntryTreeNode {
 
 static std::map<std::string, std::unique_ptr<InputFile>, std::less<>>
     gInputFiles;
-static wpi::mutex gEntriesMutex;
+static wpi::util::mutex gEntriesMutex;
 static std::map<std::string, std::unique_ptr<Entry>, std::less<>> gEntries;
 static std::vector<EntryTreeNode> gEntryTree;
 std::atomic_int gExportCount{0};
@@ -92,17 +92,17 @@ std::atomic_int gExportCount{0};
 // must be called with gEntriesMutex held
 static void RebuildEntryTree() {
   gEntryTree.clear();
-  wpi::SmallVector<std::string_view, 16> parts;
+  wpi::util::SmallVector<std::string_view, 16> parts;
   for (auto& kv : gEntries) {
     parts.clear();
     // split on first : if one is present
-    auto [prefix, mainpart] = wpi::split(kv.first, ':');
-    if (mainpart.empty() || wpi::contains(prefix, '/')) {
+    auto [prefix, mainpart] = wpi::util::split(kv.first, ':');
+    if (mainpart.empty() || wpi::util::contains(prefix, '/')) {
       mainpart = kv.first;
     } else {
       parts.emplace_back(prefix);
     }
-    wpi::split(mainpart, '/', -1, false,
+    wpi::util::split(mainpart, '/', -1, false,
                [&](auto part) { parts.emplace_back(part); });
 
     // ignore a raw "/" key
@@ -112,7 +112,7 @@ static void RebuildEntryTree() {
 
     // get to leaf
     auto nodes = &gEntryTree;
-    for (auto part : wpi::drop_back(std::span{parts.begin(), parts.end()})) {
+    for (auto part : wpi::util::drop_back(std::span{parts.begin(), parts.end()})) {
       auto it =
           std::find_if(nodes->begin(), nodes->end(),
                        [&](const auto& node) { return node.name == part; });
@@ -183,7 +183,7 @@ InputFile::~InputFile() {
 }
 
 static std::unique_ptr<InputFile> LoadDataLog(std::string_view filename) {
-  auto fileBuffer = wpi::MemoryBuffer::GetFile(filename);
+  auto fileBuffer = wpi::util::MemoryBuffer::GetFile(filename);
   if (!fileBuffer) {
     return std::make_unique<InputFile>(
         filename,
@@ -436,46 +436,46 @@ void DisplayEntries() {
   ImGui::End();
 }
 
-static wpi::mutex gExportMutex;
+static wpi::util::mutex gExportMutex;
 static std::vector<std::string> gExportErrors;
 
-static void PrintEscapedCsvString(wpi::raw_ostream& os, std::string_view str) {
+static void PrintEscapedCsvString(wpi::util::raw_ostream& os, std::string_view str) {
   auto s = str;
   while (!s.empty()) {
     std::string_view fragment;
-    std::tie(fragment, s) = wpi::split(s, '"');
+    std::tie(fragment, s) = wpi::util::split(s, '"');
     os << fragment;
     if (!s.empty()) {
       os << '"' << '"';
     }
   }
-  if (wpi::ends_with(str, '"')) {
+  if (wpi::util::ends_with(str, '"')) {
     os << '"' << '"';
   }
 }
 
-static void ValueToCsv(wpi::raw_ostream& os, const Entry& entry,
+static void ValueToCsv(wpi::util::raw_ostream& os, const Entry& entry,
                        const wpi::log::DataLogRecord& record) {
   // handle systemTime specially
   if (entry.name == "systemTime" && entry.type == "int64") {
     int64_t val;
     if (record.GetInteger(&val)) {
       std::time_t timeval = val / 1000000;
-      wpi::print(os, "{:%Y-%m-%d %H:%M:%S}.{:06}", *std::localtime(&timeval),
+      wpi::util::print(os, "{:%Y-%m-%d %H:%M:%S}.{:06}", *std::localtime(&timeval),
                  val % 1000000);
       return;
     }
   } else if (entry.type == "double") {
     double val;
     if (record.GetDouble(&val)) {
-      wpi::print(os, "{}", val);
+      wpi::util::print(os, "{}", val);
       return;
     }
   } else if (entry.type == "int64" || entry.type == "int") {
     // support "int" for compatibility with old NT4 datalogs
     int64_t val;
     if (record.GetInteger(&val)) {
-      wpi::print(os, "{}", val);
+      wpi::util::print(os, "{}", val);
       return;
     }
   } else if (entry.type == "string" || entry.type == "json") {
@@ -488,31 +488,31 @@ static void ValueToCsv(wpi::raw_ostream& os, const Entry& entry,
   } else if (entry.type == "boolean") {
     bool val;
     if (record.GetBoolean(&val)) {
-      wpi::print(os, "{}", val);
+      wpi::util::print(os, "{}", val);
       return;
     }
   } else if (entry.type == "boolean[]") {
     std::vector<int> val;
     if (record.GetBooleanArray(&val)) {
-      wpi::print(os, "{}", fmt::join(val, ";"));
+      wpi::util::print(os, "{}", fmt::join(val, ";"));
       return;
     }
   } else if (entry.type == "double[]") {
     std::vector<double> val;
     if (record.GetDoubleArray(&val)) {
-      wpi::print(os, "{}", fmt::join(val, ";"));
+      wpi::util::print(os, "{}", fmt::join(val, ";"));
       return;
     }
   } else if (entry.type == "float[]") {
     std::vector<float> val;
     if (record.GetFloatArray(&val)) {
-      wpi::print(os, "{}", fmt::join(val, ";"));
+      wpi::util::print(os, "{}", fmt::join(val, ";"));
       return;
     }
   } else if (entry.type == "int64[]") {
     std::vector<int64_t> val;
     if (record.GetIntegerArray(&val)) {
-      wpi::print(os, "{}", fmt::join(val, ";"));
+      wpi::util::print(os, "{}", fmt::join(val, ";"));
       return;
     }
   } else if (entry.type == "string[]") {
@@ -531,10 +531,10 @@ static void ValueToCsv(wpi::raw_ostream& os, const Entry& entry,
       return;
     }
   }
-  wpi::print(os, "<invalid>");
+  wpi::util::print(os, "<invalid>");
 }
 
-static void ExportCsvFile(InputFile& f, wpi::raw_ostream& os, int style) {
+static void ExportCsvFile(InputFile& f, wpi::util::raw_ostream& os, int style) {
   // header
   if (style == 0) {
     os << "Timestamp,Name,Value\n";
@@ -556,7 +556,7 @@ static void ExportCsvFile(InputFile& f, wpi::raw_ostream& os, int style) {
     os << '\n';
   }
 
-  wpi::DenseMap<int, Entry*> nameMap;
+  wpi::util::DenseMap<int, Entry*> nameMap;
   for (auto&& record : f.datalog->GetReader()) {
     if (record.IsStart()) {
       wpi::log::StartRecordData data;
@@ -579,13 +579,13 @@ static void ExportCsvFile(InputFile& f, wpi::raw_ostream& os, int style) {
       Entry* entry = entryIt->second;
 
       if (style == 0) {
-        wpi::print(os, "{},\"", record.GetTimestamp() / 1000000.0);
+        wpi::util::print(os, "{},\"", record.GetTimestamp() / 1000000.0);
         PrintEscapedCsvString(os, entry->name);
         os << '"' << ',';
         ValueToCsv(os, *entry, record);
         os << '\n';
       } else if (style == 1 && entry->column != -1) {
-        wpi::print(os, "{},", record.GetTimestamp() / 1000000.0);
+        wpi::util::print(os, "{},", record.GetTimestamp() / 1000000.0);
         for (int i = 0; i < entry->column; ++i) {
           os << ',';
         }
@@ -611,14 +611,14 @@ static void ExportCsv(std::string_view outputFolder, int style) {
         ++gExportCount;
         continue;
       }
-      wpi::raw_fd_ostream os{fs::FileToFd(of, ec, fs::OF_Text), true};
+      wpi::util::raw_fd_ostream os{fs::FileToFd(of, ec, fs::OF_Text), true};
       ExportCsvFile(*f.second, os, style);
     }
     ++gExportCount;
   }
 }
 
-void DisplayOutput(glass::Storage& storage) {
+void DisplayOutput(wpi::glass::Storage& storage) {
   static std::string& outputFolder = storage.GetString("outputFolder");
   static std::unique_ptr<pfd::select_folder> outputFolderSelector;
 

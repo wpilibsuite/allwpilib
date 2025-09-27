@@ -32,7 +32,7 @@
 
 struct sockaddr_in;
 
-namespace wpi {
+namespace wpi::net {
 
 class TCPStream : public NetworkStream {
   int m_sd;
@@ -67,6 +67,6 @@ class TCPStream : public NetworkStream {
   TCPStream() = delete;
 };
 
-}  // namespace wpi
+}  // namespace wpi::net
 
 #endif  // WPINET_TCPSTREAM_H_

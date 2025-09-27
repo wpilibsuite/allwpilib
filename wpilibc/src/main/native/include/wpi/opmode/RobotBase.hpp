@@ -19,7 +19,7 @@
 #include "wpi/Errors.hpp"
 #include "wpi/RuntimeType.hpp"
 
-namespace frc {
+namespace wpi {
 
 int RunHALInitialization();
 
@@ -29,7 +29,7 @@ void ResetMotorSafety();
 #endif
 
 template <class Robot>
-void RunRobot(wpi::mutex& m, Robot** robot) {
+void RunRobot(wpi::util::mutex& m, Robot** robot) {
   try {
     static Robot theRobot;
     {
@@ -37,7 +37,7 @@ void RunRobot(wpi::mutex& m, Robot** robot) {
       *robot = &theRobot;
     }
     theRobot.StartCompetition();
-  } catch (const frc::RuntimeError& e) {
+  } catch (const wpi::RuntimeError& e) {
     e.Report();
     FRC_ReportError(
         err::Error,
@@ -76,8 +76,8 @@ int StartRobot() {
     return halInit;
   }
 
-  static wpi::mutex m;
-  static wpi::condition_variable cv;
+  static wpi::util::mutex m;
+  static wpi::util::condition_variable cv;
   static Robot* robot = nullptr;
   static bool exited = false;
 
@@ -125,7 +125,7 @@ int StartRobot() {
   }
 
 #ifndef __FRC_SYSTEMCORE__
-  frc::impl::ResetMotorSafety();
+  wpi::impl::ResetMotorSafety();
 #endif
   HAL_Shutdown();
 
@@ -278,4 +278,4 @@ class RobotBase {
   NT_Listener connListenerHandle;
 };
 
-}  // namespace frc
+}  // namespace wpi

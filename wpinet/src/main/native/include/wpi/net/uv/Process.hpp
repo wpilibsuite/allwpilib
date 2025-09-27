@@ -18,7 +18,7 @@
 
 #include "wpi/net/uv/Handle.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 class Loop;
 class Pipe;
@@ -71,7 +71,7 @@ class Process final : public HandleImpl<Process, uv_process_t> {
       m_data.str = m_strData.c_str();
     }
 
-    /*implicit*/ Option(const SmallVectorImpl<char>& arg)  // NOLINT
+    /*implicit*/ Option(const wpi::util::SmallVectorImpl<char>& arg)  // NOLINT
         : m_strData(arg.data(), arg.size()) {
       m_data.str = m_strData.c_str();
     }
@@ -303,9 +303,9 @@ class Process final : public HandleImpl<Process, uv_process_t> {
    * Signal generated when the process exits.  The parameters are the exit
    * status and the signal that caused the process to terminate, if any.
    */
-  sig::Signal<int64_t, int> exited;
+  wpi::util::sig::Signal<int64_t, int> exited;
 };
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_PROCESS_HPP_

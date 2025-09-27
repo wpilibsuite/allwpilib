@@ -6,10 +6,10 @@
 
 #include <wpi/hal/SystemServer.hpp>
 
-namespace frc {
+namespace wpi {
 
-nt::NetworkTableInstance SystemServer::GetSystemServer() {
-  return nt::NetworkTableInstance{HAL_GetSystemServerHandle()};
+wpi::nt::NetworkTableInstance SystemServer::GetSystemServer() {
+  return wpi::nt::NetworkTableInstance{HAL_GetSystemServerHandle()};
 }
 
-}  // namespace frc
+}  // namespace wpi

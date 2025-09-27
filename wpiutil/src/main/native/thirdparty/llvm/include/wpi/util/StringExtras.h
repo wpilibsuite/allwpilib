@@ -28,7 +28,7 @@
 
 #include <fmt/format.h>
 
-namespace wpi {
+namespace wpi::util {
 
 template <typename T>
 class SmallVectorImpl;
@@ -823,4 +823,4 @@ inline void format_to_n_c_str(OutputIt out, std::iter_difference_t<OutputIt> n,
   *result.out = '\0';
 }
 
-}  // namespace wpi
+}  // namespace wpi::util

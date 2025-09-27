@@ -12,7 +12,7 @@
 
 #include "wpi/ntcore/NetworkTableValue.hpp"
 
-using namespace nt::local;
+using namespace wpi::nt::local;
 
 std::string LocalDataLoggerEntry::MakeMetadata(std::string_view properties) {
   return fmt::format("{{\"properties\":{},\"source\":\"NT\"}}", properties);

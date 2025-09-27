@@ -39,7 +39,7 @@ SOFTWARE.
 
 #include <gtest/gtest.h>
 
-using namespace wpi::sig;
+using namespace wpi::util::sig;
 
 namespace {
 
@@ -66,7 +66,7 @@ void connect_emit(Signal_mt<int>& sig) {
 
 }  // namespace
 
-namespace wpi {
+namespace wpi::util {
 
 TEST(SignalTest, ThreadedMix) {
   sum = 0;
@@ -101,4 +101,4 @@ TEST(SignalTest, ThreadedEmission) {
   ASSERT_EQ(sum, 100000);
 }
 
-}  // namespace wpi
+}  // namespace wpi::util

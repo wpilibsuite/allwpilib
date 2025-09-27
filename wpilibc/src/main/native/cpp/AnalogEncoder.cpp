@@ -14,7 +14,7 @@
 #include "wpi/hardware/discrete/AnalogInput.hpp"
 #include "wpi/system/RobotController.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 AnalogEncoder::~AnalogEncoder() {}
 
@@ -22,12 +22,12 @@ AnalogEncoder::AnalogEncoder(int channel)
     : AnalogEncoder(std::make_shared<AnalogInput>(channel)) {}
 
 AnalogEncoder::AnalogEncoder(AnalogInput& analogInput)
-    : m_analogInput{&analogInput, wpi::NullDeleter<AnalogInput>{}} {
+    : m_analogInput{&analogInput, wpi::util::NullDeleter<AnalogInput>{}} {
   Init(1.0, 0.0);
 }
 
 AnalogEncoder::AnalogEncoder(AnalogInput* analogInput)
-    : m_analogInput{analogInput, wpi::NullDeleter<AnalogInput>{}} {
+    : m_analogInput{analogInput, wpi::util::NullDeleter<AnalogInput>{}} {
   Init(1.0, 0.0);
 }
 
@@ -42,13 +42,13 @@ AnalogEncoder::AnalogEncoder(int channel, double fullRange, double expectedZero)
 
 AnalogEncoder::AnalogEncoder(AnalogInput& analogInput, double fullRange,
                              double expectedZero)
-    : m_analogInput{&analogInput, wpi::NullDeleter<AnalogInput>{}} {
+    : m_analogInput{&analogInput, wpi::util::NullDeleter<AnalogInput>{}} {
   Init(fullRange, expectedZero);
 }
 
 AnalogEncoder::AnalogEncoder(AnalogInput* analogInput, double fullRange,
                              double expectedZero)
-    : m_analogInput{analogInput, wpi::NullDeleter<AnalogInput>{}} {
+    : m_analogInput{analogInput, wpi::util::NullDeleter<AnalogInput>{}} {
   Init(fullRange, expectedZero);
 }
 
@@ -59,7 +59,7 @@ AnalogEncoder::AnalogEncoder(std::shared_ptr<AnalogInput> analogInput,
 }
 
 void AnalogEncoder::Init(double fullRange, double expectedZero) {
-  m_simDevice = hal::SimDevice{"AnalogEncoder", m_analogInput->GetChannel()};
+  m_simDevice = wpi::hal::SimDevice{"AnalogEncoder", m_analogInput->GetChannel()};
 
   if (m_simDevice) {
     m_simPosition = m_simDevice.CreateDouble("Position", false, 0.0);
@@ -70,7 +70,7 @@ void AnalogEncoder::Init(double fullRange, double expectedZero) {
 
   HAL_ReportUsage("IO", m_analogInput->GetChannel(), "AnalogEncoder");
 
-  wpi::SendableRegistry::Add(this, "Analog Encoder",
+  wpi::util::SendableRegistry::Add(this, "Analog Encoder",
                              m_analogInput->GetChannel());
 }
 
@@ -89,7 +89,7 @@ double AnalogEncoder::Get() const {
   pos = pos * m_fullRange - m_expectedZero;
 
   // Map from 0 - Full Range
-  double result = InputModulus(pos, 0.0, m_fullRange);
+  double result = wpi::math::InputModulus(pos, 0.0, m_fullRange);
   // Invert if necessary
   if (m_isInverted) {
     return m_fullRange - result;
@@ -121,7 +121,7 @@ double AnalogEncoder::MapSensorRange(double pos) const {
   return pos;
 }
 
-void AnalogEncoder::InitSendable(wpi::SendableBuilder& builder) {
+void AnalogEncoder::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("AbsoluteEncoder");
   builder.AddDoubleProperty(
       "Position", [this] { return this->Get(); }, nullptr);

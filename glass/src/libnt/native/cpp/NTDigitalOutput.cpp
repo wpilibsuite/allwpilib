@@ -8,12 +8,12 @@
 
 #include <fmt/format.h>
 
-using namespace glass;
+using namespace wpi::glass;
 
 NTDigitalOutputModel::NTDigitalOutputModel(std::string_view path)
-    : NTDigitalOutputModel{nt::NetworkTableInstance::GetDefault(), path} {}
+    : NTDigitalOutputModel{wpi::nt::NetworkTableInstance::GetDefault(), path} {}
 
-NTDigitalOutputModel::NTDigitalOutputModel(nt::NetworkTableInstance inst,
+NTDigitalOutputModel::NTDigitalOutputModel(wpi::nt::NetworkTableInstance inst,
                                            std::string_view path)
     : m_inst{inst},
       m_value{

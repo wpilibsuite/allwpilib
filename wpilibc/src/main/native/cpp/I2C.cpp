@@ -11,7 +11,7 @@
 
 #include "wpi/Errors.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 I2C::I2C(Port port, int deviceAddress)
     : m_port(static_cast<HAL_I2CPort>(port)), m_deviceAddress(deviceAddress) {

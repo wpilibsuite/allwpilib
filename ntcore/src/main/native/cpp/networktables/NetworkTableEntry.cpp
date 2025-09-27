@@ -7,12 +7,12 @@
 #include "wpi/ntcore/NetworkTableInstance.hpp"
 #include "wpi/ntcore/Topic.hpp"
 
-using namespace nt;
+using namespace wpi::nt;
 
 NetworkTableInstance NetworkTableEntry::GetInstance() const {
   return NetworkTableInstance{GetInstanceFromHandle(m_handle)};
 }
 
 Topic NetworkTableEntry::GetTopic() const {
-  return Topic{::nt::GetTopicFromHandle(m_handle)};
+  return Topic{::wpi::nt::GetTopicFromHandle(m_handle)};
 }

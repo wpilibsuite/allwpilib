@@ -23,9 +23,9 @@ namespace wpilibws {
 class HALSimWeb : public std::enable_shared_from_this<HALSimWeb> {
  public:
   using LoopFunc = std::function<void()>;
-  using UvExecFunc = wpi::uv::Async<LoopFunc>;
+  using UvExecFunc = wpi::net::uv::Async<LoopFunc>;
 
-  HALSimWeb(wpi::uv::Loop& loop, ProviderContainer& providers,
+  HALSimWeb(wpi::net::uv::Loop& loop, ProviderContainer& providers,
             HALSimWSProviderSimDevices& simDevicesProvider);
 
   HALSimWeb(const HALSimWeb&) = delete;
@@ -38,7 +38,7 @@ class HALSimWeb : public std::enable_shared_from_this<HALSimWeb> {
   void CloseWebsocket(std::shared_ptr<HALSimBaseWebSocketConnection> hws);
 
   // network -> sim
-  void OnNetValueChanged(const wpi::json& msg);
+  void OnNetValueChanged(const wpi::util::json& msg);
 
   bool CanSendMessage(std::string_view type);
 
@@ -46,7 +46,7 @@ class HALSimWeb : public std::enable_shared_from_this<HALSimWeb> {
   const std::string& GetWebrootUser() const { return m_webroot_user; }
   const std::string& GetServerUri() const { return m_uri; }
   int GetServerPort() const { return m_port; }
-  wpi::uv::Loop& GetLoop() { return m_loop; }
+  wpi::net::uv::Loop& GetLoop() { return m_loop; }
 
   UvExecFunc& GetExec() { return *m_exec; }
 
@@ -54,8 +54,8 @@ class HALSimWeb : public std::enable_shared_from_this<HALSimWeb> {
   // connected http connection that contains active websocket
   std::weak_ptr<HALSimBaseWebSocketConnection> m_hws;
 
-  wpi::uv::Loop& m_loop;
-  std::shared_ptr<wpi::uv::Tcp> m_server;
+  wpi::net::uv::Loop& m_loop;
+  std::shared_ptr<wpi::net::uv::Tcp> m_server;
   std::shared_ptr<UvExecFunc> m_exec;
 
   // list of providers
@@ -72,7 +72,7 @@ class HALSimWeb : public std::enable_shared_from_this<HALSimWeb> {
   int m_port;
 
   bool m_useMsgFiltering;
-  wpi::StringMap<bool> m_msgFilters;
+  wpi::util::StringMap<bool> m_msgFilters;
 };
 
 }  // namespace wpilibws

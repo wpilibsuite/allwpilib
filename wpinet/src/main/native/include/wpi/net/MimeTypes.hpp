@@ -7,10 +7,10 @@
 
 #include <string_view>
 
-namespace wpi {
+namespace wpi::net {
 
 std::string_view MimeTypeFromPath(std::string_view path);
 
-}  // namespace wpi
+}  // namespace wpi::net
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_MIMETYPES_HPP_

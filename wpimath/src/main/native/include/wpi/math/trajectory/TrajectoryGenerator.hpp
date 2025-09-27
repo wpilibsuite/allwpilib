@@ -17,13 +17,13 @@
 #include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
 #include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
 
-namespace frc {
+namespace wpi::math {
 /**
  * Helper class used to generate trajectories with various constraints.
  */
 class WPILIB_DLLEXPORT TrajectoryGenerator {
  public:
-  using PoseWithCurvature = std::pair<Pose2d, units::curvature_t>;
+  using PoseWithCurvature = std::pair<Pose2d, wpi::units::curvature_t>;
 
   /**
    * Generates a trajectory from the given control vectors and config. This
@@ -127,4 +127,4 @@ class WPILIB_DLLEXPORT TrajectoryGenerator {
   static const Trajectory kDoNothingTrajectory;
   static std::function<void(const char*)> s_errorFunc;
 };
-}  // namespace frc
+}  // namespace wpi::math

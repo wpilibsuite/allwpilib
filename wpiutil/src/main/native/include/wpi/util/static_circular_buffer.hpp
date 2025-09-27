@@ -8,7 +8,7 @@
 #include <cstddef>
 #include <iterator>
 
-namespace wpi {
+namespace wpi::util {
 
 /**
  * This is a simple circular buffer so we don't need to "bucket brigade" copy
@@ -87,7 +87,7 @@ class static_circular_buffer {
    * Returns end iterator.
    */
   constexpr iterator end() {
-    return iterator(this, ::wpi::static_circular_buffer<T, N>::size());
+    return iterator(this, ::wpi::util::static_circular_buffer<T, N>::size());
   }
 
   /**
@@ -99,7 +99,7 @@ class static_circular_buffer {
    * Returns end iterator.
    */
   constexpr const_iterator end() const {
-    return const_iterator(this, ::wpi::static_circular_buffer<T, N>::size());
+    return const_iterator(this, ::wpi::util::static_circular_buffer<T, N>::size());
   }
 
   /**
@@ -111,7 +111,7 @@ class static_circular_buffer {
    * Returns end iterator.
    */
   constexpr const_iterator cend() const {
-    return const_iterator(this, ::wpi::static_circular_buffer<T, N>::size());
+    return const_iterator(this, ::wpi::util::static_circular_buffer<T, N>::size());
   }
 
   /**
@@ -289,4 +289,4 @@ class static_circular_buffer {
   }
 };
 
-}  // namespace wpi
+}  // namespace wpi::util

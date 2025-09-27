@@ -8,7 +8,7 @@
 
 #include "wpi/simulation/CallbackStore.hpp"
 
-namespace frc {
+namespace wpi {
 
 class DigitalInput;
 class DigitalOutput;
@@ -178,4 +178,4 @@ class DIOSim {
   int m_index;
 };
 }  // namespace sim
-}  // namespace frc
+}  // namespace wpi

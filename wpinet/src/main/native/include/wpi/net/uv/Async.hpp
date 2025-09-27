@@ -19,7 +19,7 @@
 #include "wpi/net/uv/Handle.hpp"
 #include "wpi/net/uv/Loop.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 /**
  * Async handle.
@@ -122,10 +122,10 @@ class Async final : public HandleImpl<Async<T...>, uv_async_t> {
   /**
    * Signal generated (on event loop thread) when the async event occurs.
    */
-  sig::Signal<T...> wakeup;
+  wpi::util::sig::Signal<T...> wakeup;
 
  private:
-  wpi::mutex m_mutex;
+  wpi::util::mutex m_mutex;
   std::vector<std::tuple<T...>> m_data;
   std::weak_ptr<Loop> m_loop;
 };
@@ -191,12 +191,12 @@ class Async<> final : public HandleImpl<Async<>, uv_async_t> {
   /**
    * Signal generated (on event loop thread) when the async event occurs.
    */
-  sig::Signal<> wakeup;
+  wpi::util::sig::Signal<> wakeup;
 
  private:
   std::weak_ptr<Loop> m_loop;
 };
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_ASYNC_HPP_

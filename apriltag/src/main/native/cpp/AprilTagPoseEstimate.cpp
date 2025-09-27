@@ -6,7 +6,7 @@
 
 #include <algorithm>
 
-using namespace frc;
+using namespace wpi::apriltag;
 
 double AprilTagPoseEstimate::GetAmbiguity() const {
   auto min = (std::min)(error1, error2);

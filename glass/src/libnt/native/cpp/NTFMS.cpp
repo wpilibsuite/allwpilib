@@ -12,12 +12,12 @@
 #include <wpi/util/SmallVector.h>
 #include <wpi/util/timestamp.hpp>
 
-using namespace glass;
+using namespace wpi::glass;
 
 NTFMSModel::NTFMSModel(std::string_view path)
-    : NTFMSModel{nt::NetworkTableInstance::GetDefault(), path} {}
+    : NTFMSModel{wpi::nt::NetworkTableInstance::GetDefault(), path} {}
 
-NTFMSModel::NTFMSModel(nt::NetworkTableInstance inst, std::string_view path)
+NTFMSModel::NTFMSModel(wpi::nt::NetworkTableInstance inst, std::string_view path)
     : m_inst{inst},
       m_gameSpecificMessage{
           inst.GetStringTopic(fmt::format("{}/GameSpecificMessage", path))

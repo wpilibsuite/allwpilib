@@ -36,7 +36,7 @@ void HALSimWSProviderEncoder::RegisterCallbacks() {
         auto provider = static_cast<HALSimWSProviderEncoder*>(param);
         bool init = static_cast<bool>(value->data.v_boolean);
 
-        wpi::json payload = {{"<init", init}};
+        wpi::util::json payload = {{"<init", init}};
 
         if (init) {
           payload["<channel_a"] =
@@ -95,8 +95,8 @@ void HALSimWSProviderEncoder::DoCancelCallbacks() {
   m_samplesCbKey = 0;
 }
 
-void HALSimWSProviderEncoder::OnNetValueChanged(const wpi::json& json) {
-  wpi::json::const_iterator it;
+void HALSimWSProviderEncoder::OnNetValueChanged(const wpi::util::json& json) {
+  wpi::util::json::const_iterator it;
   if ((it = json.find(">count")) != json.end()) {
     HALSIM_SetEncoderCount(m_channel,
                            static_cast<int32_t>(it.value()) - m_countOffset);

@@ -11,7 +11,7 @@
 #include "wpi/math/geometry/Transform2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 TEST(Transform2dTest, ToMatrix) {
   Transform2d before{1_m, 2_m, 20_deg};

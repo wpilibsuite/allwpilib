@@ -6,21 +6,21 @@
 
 #include "wpimath/protobuf/kinematics.npb.h"
 
-std::optional<frc::DifferentialDriveWheelSpeeds>
-wpi::Protobuf<frc::DifferentialDriveWheelSpeeds>::Unpack(InputStream& stream) {
+std::optional<wpi::math::DifferentialDriveWheelSpeeds>
+wpi::util::Protobuf<wpi::math::DifferentialDriveWheelSpeeds>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufDifferentialDriveWheelSpeeds msg;
   if (!stream.Decode(msg)) {
     return {};
   }
 
-  return frc::DifferentialDriveWheelSpeeds{
-      units::meters_per_second_t{msg.left},
-      units::meters_per_second_t{msg.right},
+  return wpi::math::DifferentialDriveWheelSpeeds{
+      wpi::units::meters_per_second_t{msg.left},
+      wpi::units::meters_per_second_t{msg.right},
   };
 }
 
-bool wpi::Protobuf<frc::DifferentialDriveWheelSpeeds>::Pack(
-    OutputStream& stream, const frc::DifferentialDriveWheelSpeeds& value) {
+bool wpi::util::Protobuf<wpi::math::DifferentialDriveWheelSpeeds>::Pack(
+    OutputStream& stream, const wpi::math::DifferentialDriveWheelSpeeds& value) {
   wpi_proto_ProtobufDifferentialDriveWheelSpeeds msg{
       .left = value.left.value(),
       .right = value.right.value(),

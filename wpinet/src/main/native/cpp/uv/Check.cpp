@@ -8,7 +8,7 @@
 
 #include "wpi/net/uv/Loop.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 std::shared_ptr<Check> Check::Create(Loop& loop) {
   if (loop.IsClosing()) {
@@ -34,4 +34,4 @@ void Check::Start() {
   });
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

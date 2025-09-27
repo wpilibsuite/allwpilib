@@ -10,7 +10,7 @@
 #include "wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Struct<frc::DifferentialDriveWheelSpeeds> {
+struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::DifferentialDriveWheelSpeeds> {
   static constexpr std::string_view GetTypeName() {
     return "DifferentialDriveWheelSpeeds";
   }
@@ -19,10 +19,10 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::DifferentialDriveWheelSpeeds> {
     return "double left;double right";
   }
 
-  static frc::DifferentialDriveWheelSpeeds Unpack(
+  static wpi::math::DifferentialDriveWheelSpeeds Unpack(
       std::span<const uint8_t> data);
   static void Pack(std::span<uint8_t> data,
-                   const frc::DifferentialDriveWheelSpeeds& value);
+                   const wpi::math::DifferentialDriveWheelSpeeds& value);
 };
 
-static_assert(wpi::StructSerializable<frc::DifferentialDriveWheelSpeeds>);
+static_assert(wpi::util::StructSerializable<wpi::math::DifferentialDriveWheelSpeeds>);

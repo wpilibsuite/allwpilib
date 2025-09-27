@@ -28,9 +28,9 @@
 
 #include "wpi/units/base.hpp"
 
-namespace units {
+namespace wpi::units {
 using dimensionless::dB_t;
 using dimensionless::dimensionless_t;
 using dimensionless::scalar;
 using dimensionless::scalar_t;
-}  // namespace units
+}  // namespace wpi::units

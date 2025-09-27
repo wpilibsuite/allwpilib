@@ -6,6 +6,6 @@
 
 #include <stdint.h>
 
-namespace hal {
+namespace wpi::hal {
 constexpr int32_t kSystemClockTicksPerMicrosecond = 40;
-}  // namespace hal
+}  // namespace wpi::hal

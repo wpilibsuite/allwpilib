@@ -9,12 +9,12 @@
 #include <fmt/format.h>
 #include <wpi/util/StringExtras.h>
 
-using namespace glass;
+using namespace wpi::glass;
 
 NTPIDControllerModel::NTPIDControllerModel(std::string_view path)
-    : NTPIDControllerModel(nt::NetworkTableInstance::GetDefault(), path) {}
+    : NTPIDControllerModel(wpi::nt::NetworkTableInstance::GetDefault(), path) {}
 
-NTPIDControllerModel::NTPIDControllerModel(nt::NetworkTableInstance inst,
+NTPIDControllerModel::NTPIDControllerModel(wpi::nt::NetworkTableInstance inst,
                                            std::string_view path)
     : m_inst{inst},
       m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
@@ -31,7 +31,7 @@ NTPIDControllerModel::NTPIDControllerModel(nt::NetworkTableInstance inst,
       m_dData{fmt::format("NTPIDCtrlD:{}", path)},
       m_setpointData{fmt::format("NTPIDCtrlStpt:{}", path)},
       m_iZoneData{fmt::format("NTPIDCtrlIZone:{}", path)},
-      m_nameValue{wpi::rsplit(path, '/').second} {}
+      m_nameValue{wpi::util::rsplit(path, '/').second} {}
 
 void NTPIDControllerModel::SetP(double value) {
   m_p.Set(value);

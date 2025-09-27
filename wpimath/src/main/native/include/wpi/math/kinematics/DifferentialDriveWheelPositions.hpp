@@ -9,7 +9,7 @@
 
 #include "wpi/units/length.hpp"
 
-namespace frc {
+namespace wpi::math {
 /**
  * Represents the wheel positions for a differential drive drivetrain.
  */
@@ -17,12 +17,12 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelPositions {
   /**
    * Distance driven by the left side.
    */
-  units::meter_t left = 0_m;
+  wpi::units::meter_t left = 0_m;
 
   /**
    * Distance driven by the right side.
    */
-  units::meter_t right = 0_m;
+  wpi::units::meter_t right = 0_m;
 
   /**
    * Checks equality between this DifferentialDriveWheelPositions and another
@@ -36,11 +36,11 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelPositions {
 
   constexpr DifferentialDriveWheelPositions Interpolate(
       const DifferentialDriveWheelPositions& endValue, double t) const {
-    return {wpi::Lerp(left, endValue.left, t),
-            wpi::Lerp(right, endValue.right, t)};
+    return {wpi::util::Lerp(left, endValue.left, t),
+            wpi::util::Lerp(right, endValue.right, t)};
   }
 };
-}  // namespace frc
+}  // namespace wpi::math
 
 #include "wpi/math/kinematics/proto/DifferentialDriveWheelPositionsProto.hpp"
 #include "wpi/math/kinematics/struct/DifferentialDriveWheelPositionsStruct.hpp"

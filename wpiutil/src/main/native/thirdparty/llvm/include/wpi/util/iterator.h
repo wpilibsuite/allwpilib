@@ -15,7 +15,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace wpi {
+namespace wpi::util {
 
 /// CRTP base class which implements the entire standard iterator facade
 /// in terms of a minimal subset of the interface.
@@ -373,6 +373,6 @@ template <typename WrappedIteratorT,
 using raw_pointer_iterator =
     pointer_iterator<pointee_iterator<WrappedIteratorT, T1>, T2>;
 
-} // end namespace wpi
+} // end namespace wpi::util
 
 #endif // WPIUTIL_WPI_ITERATOR_H

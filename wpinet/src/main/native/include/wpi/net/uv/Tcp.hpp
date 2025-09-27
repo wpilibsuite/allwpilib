@@ -15,7 +15,7 @@
 
 #include "wpi/net/uv/NetworkStream.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 class Loop;
 class TcpConnectReq;
@@ -366,6 +366,6 @@ class TcpConnectReq : public ConnectReq {
   }
 };
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_TCP_HPP_

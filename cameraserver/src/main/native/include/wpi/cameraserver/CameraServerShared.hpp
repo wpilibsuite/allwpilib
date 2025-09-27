@@ -11,7 +11,7 @@
 
 #include <fmt/format.h>
 
-namespace frc {
+namespace wpi {
 class CameraServerShared {
  public:
   virtual ~CameraServerShared() = default;
@@ -42,9 +42,9 @@ class CameraServerShared {
 };
 
 CameraServerShared* GetCameraServerShared();
-}  // namespace frc
+}  // namespace wpi
 
 extern "C" {
 // Takes ownership
-void CameraServer_SetCameraServerShared(frc::CameraServerShared* shared);
+void CameraServer_SetCameraServerShared(wpi::CameraServerShared* shared);
 }  // extern "C"

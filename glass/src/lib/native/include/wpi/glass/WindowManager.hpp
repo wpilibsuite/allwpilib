@@ -12,7 +12,7 @@
 
 #include "wpi/glass/Window.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 class Storage;
 
@@ -65,7 +65,7 @@ class WindowManager {
    * @param display window contents display function
    * @param defaultVisibility default window visibility
    */
-  Window* AddWindow(std::string_view id, wpi::unique_function<void()> display,
+  Window* AddWindow(std::string_view id, wpi::util::unique_function<void()> display,
                     Window::Visibility defaultVisibility = Window::kShow);
 
   /**
@@ -143,4 +143,4 @@ class WindowManager {
   void DisplayWindows();
 };
 
-}  // namespace glass
+}  // namespace wpi::glass

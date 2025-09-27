@@ -1,4 +1,4 @@
-//===- llvm/Support/Errc.h - Defines the wpi::errc enum --------*- C++ -*-===//
+//===- llvm/Support/Errc.h - Defines the wpi::util::errc enum --------*- C++ -*-===//
 //
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
 // See https://llvm.org/LICENSE.txt for license information.
@@ -31,7 +31,7 @@
 
 #include <system_error>
 
-namespace wpi {
+namespace wpi::util {
 enum class errc {
   argument_list_too_long = int(std::errc::argument_list_too_long),
   argument_out_of_domain = int(std::errc::argument_out_of_domain),
@@ -85,6 +85,6 @@ inline std::error_code make_error_code(errc E) {
 }
 
 namespace std {
-template <> struct is_error_code_enum<wpi::errc> : std::true_type {};
+template <> struct is_error_code_enum<wpi::util::errc> : std::true_type {};
 }
 #endif

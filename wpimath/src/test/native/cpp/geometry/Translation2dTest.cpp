@@ -8,7 +8,7 @@
 
 #include "wpi/math/geometry/Translation2d.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 TEST(Translation2dTest, Sum) {
   const Translation2d one{1_m, 3_m};

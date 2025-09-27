@@ -6,11 +6,11 @@
 
 #include "wpi/math/geometry/Twist2d.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 namespace {
 
-using StructType = wpi::Struct<frc::Twist2d>;
+using StructType = wpi::util::Struct<wpi::math::Twist2d>;
 const Twist2d kExpectedData{Twist2d{2.29_m, 35.04_m, 35.04_rad}};
 }  // namespace
 

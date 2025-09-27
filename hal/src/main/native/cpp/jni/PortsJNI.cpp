@@ -10,7 +10,7 @@
 #include "org_wpilib_hardware_hal_PortsJNI.h"
 #include "wpi/hal/Ports.hpp"
 
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
 /*

@@ -24,7 +24,7 @@
 #include "wpi/command/WaitCommand.hpp"
 #include "wpi/command/WaitUntilCommand.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 // Factories
 
@@ -74,7 +74,7 @@ CommandPtr cmd::Print(std::string_view msg) {
   return PrintCommand(msg).ToPtr();
 }
 
-CommandPtr cmd::DeferredProxy(wpi::unique_function<Command*()> supplier) {
+CommandPtr cmd::DeferredProxy(wpi::util::unique_function<Command*()> supplier) {
   return Defer(
       [supplier = std::move(supplier)]() mutable {
         // There is no non-owning version of AsProxy(), so use the non-owning
@@ -84,13 +84,13 @@ CommandPtr cmd::DeferredProxy(wpi::unique_function<Command*()> supplier) {
       {});
 }
 
-CommandPtr cmd::DeferredProxy(wpi::unique_function<CommandPtr()> supplier) {
+CommandPtr cmd::DeferredProxy(wpi::util::unique_function<CommandPtr()> supplier) {
   return Defer([supplier = std::move(
                     supplier)]() mutable { return supplier().AsProxy(); },
                {});
 }
 
-CommandPtr cmd::Wait(units::second_t duration) {
+CommandPtr cmd::Wait(wpi::units::second_t duration) {
   return WaitCommand(duration).ToPtr();
 }
 
@@ -105,7 +105,7 @@ CommandPtr cmd::Either(CommandPtr&& onTrue, CommandPtr&& onFalse,
       .ToPtr();
 }
 
-CommandPtr cmd::Defer(wpi::unique_function<CommandPtr()> supplier,
+CommandPtr cmd::Defer(wpi::util::unique_function<CommandPtr()> supplier,
                       Requirements requirements) {
   return DeferredCommand(std::move(supplier), requirements).ToPtr();
 }

@@ -9,12 +9,12 @@
 #include <fmt/format.h>
 #include <wpi/util/json.h>
 
-using namespace glass;
+using namespace wpi::glass;
 
 NTStringChooserModel::NTStringChooserModel(std::string_view path)
-    : NTStringChooserModel{nt::NetworkTableInstance::GetDefault(), path} {}
+    : NTStringChooserModel{wpi::nt::NetworkTableInstance::GetDefault(), path} {}
 
-NTStringChooserModel::NTStringChooserModel(nt::NetworkTableInstance inst,
+NTStringChooserModel::NTStringChooserModel(wpi::nt::NetworkTableInstance inst,
                                            std::string_view path)
     : m_inst{inst},
       m_default{
@@ -23,7 +23,7 @@ NTStringChooserModel::NTStringChooserModel(nt::NetworkTableInstance inst,
                      .Subscribe("")},
       m_selectedPub{
           m_inst.GetStringTopic(fmt::format("{}/selected", path))
-              .PublishEx(nt::StringTopic::kTypeString, {{"retained", true}})},
+              .PublishEx(wpi::nt::StringTopic::kTypeString, {{"retained", true}})},
       m_active{
           m_inst.GetStringTopic(fmt::format("{}/active", path)).Subscribe("")},
       m_options{m_inst.GetStringArrayTopic(fmt::format("{}/options", path))

@@ -14,22 +14,22 @@
 #include "wpimath/protobuf/wpimath.npb.h"
 
 template <int Size, int Options, int MaxRows, int MaxCols>
-struct wpi::Protobuf<frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>> {
+struct wpi::util::Protobuf<wpi::math::Matrixd<Size, 1, Options, MaxRows, MaxCols>> {
   using MessageStruct = wpi_proto_ProtobufVector;
   using InputStream =
-      wpi::ProtoInputStream<frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>>;
+      wpi::util::ProtoInputStream<wpi::math::Matrixd<Size, 1, Options, MaxRows, MaxCols>>;
   using OutputStream =
-      wpi::ProtoOutputStream<frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>>;
+      wpi::util::ProtoOutputStream<wpi::math::Matrixd<Size, 1, Options, MaxRows, MaxCols>>;
 
-  static std::optional<frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>> Unpack(
+  static std::optional<wpi::math::Matrixd<Size, 1, Options, MaxRows, MaxCols>> Unpack(
       InputStream& stream) {
     constexpr bool isSmall = Size * sizeof(double) < 256;
     using UnpackType =
-        std::conditional_t<isSmall, wpi::UnpackCallback<double, Size>,
-                           wpi::StdVectorUnpackCallback<double, Size>>;
+        std::conditional_t<isSmall, wpi::util::UnpackCallback<double, Size>,
+                           wpi::util::StdVectorUnpackCallback<double, Size>>;
     UnpackType rows;
     rows.Vec().reserve(Size);
-    rows.SetLimits(wpi::DecodeLimits::Fail);
+    rows.SetLimits(wpi::util::DecodeLimits::Fail);
     wpi_proto_ProtobufVector msg{
         .rows = rows.Callback(),
     };
@@ -43,7 +43,7 @@ struct wpi::Protobuf<frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>> {
       return {};
     }
 
-    frc::Matrixd<Size, 1, Options, MaxRows, MaxCols> mat;
+    wpi::math::Matrixd<Size, 1, Options, MaxRows, MaxCols> mat;
     for (int i = 0; i < Size; i++) {
       mat(i) = items[i];
     }
@@ -53,9 +53,9 @@ struct wpi::Protobuf<frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>> {
 
   static bool Pack(
       OutputStream& stream,
-      const frc::Matrixd<Size, 1, Options, MaxRows, MaxCols>& value) {
+      const wpi::math::Matrixd<Size, 1, Options, MaxRows, MaxCols>& value) {
     std::span<const double> rowsSpan{value.data(), static_cast<size_t>(Size)};
-    wpi::PackCallback<double> rows{rowsSpan};
+    wpi::util::PackCallback<double> rows{rowsSpan};
     wpi_proto_ProtobufVector msg{
         .rows = rows.Callback(),
     };

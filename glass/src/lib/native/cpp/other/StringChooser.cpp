@@ -6,9 +6,9 @@
 
 #include <imgui.h>
 
-using namespace glass;
+using namespace wpi::glass;
 
-void glass::DisplayStringChooser(StringChooserModel* model) {
+void wpi::glass::DisplayStringChooser(StringChooserModel* model) {
   auto& defaultValue = model->GetDefault();
   auto& selected = model->GetSelected();
   auto& active = model->GetActive();

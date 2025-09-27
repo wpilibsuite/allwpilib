@@ -10,7 +10,7 @@
 #include "wpi/glass/hardware/Encoder.hpp"
 #include "wpi/glass/support/NameSetting.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 static void LabelSimDevice(const char* name, const char* simDeviceName) {
   ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
@@ -99,13 +99,13 @@ void DisplayDIOImpl(DIOModel* model, int index, bool outputsEnabled) {
   }
 }
 
-void glass::DisplayDIO(DIOModel* model, int index, bool outputsEnabled) {
+void wpi::glass::DisplayDIO(DIOModel* model, int index, bool outputsEnabled) {
   ImGui::PushItemWidth(ImGui::GetFontSize() * 8);
   DisplayDIOImpl(model, index, outputsEnabled);
   ImGui::PopItemWidth();
 }
 
-void glass::DisplayDIOs(DIOsModel* model, bool outputsEnabled,
+void wpi::glass::DisplayDIOs(DIOsModel* model, bool outputsEnabled,
                         std::string_view noneMsg) {
   bool hasAny = false;
 

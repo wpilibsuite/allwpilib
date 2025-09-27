@@ -122,13 +122,13 @@ void HALSimWSProviderDriverStation::DoCancelCallbacks() {
   m_matchTimeCbKey = 0;
 }
 
-void HALSimWSProviderDriverStation::OnNetValueChanged(const wpi::json& json) {
+void HALSimWSProviderDriverStation::OnNetValueChanged(const wpi::util::json& json) {
   // ignore if DS connected
   if (gDSSocketConnected && *gDSSocketConnected) {
     return;
   }
 
-  wpi::json::const_iterator it;
+  wpi::util::json::const_iterator it;
   if ((it = json.find(">enabled")) != json.end()) {
     HALSIM_SetDriverStationEnabled(it.value());
   }
@@ -170,7 +170,7 @@ void HALSimWSProviderDriverStation::OnNetValueChanged(const wpi::json& json) {
   }
   if ((it = json.find(">game_data")) != json.end()) {
     std::string message = it.value().get_ref<const std::string&>();
-    auto str = wpi::make_string(message);
+    auto str = wpi::util::make_string(message);
     HALSIM_SetGameSpecificMessage(&str);
   }
 

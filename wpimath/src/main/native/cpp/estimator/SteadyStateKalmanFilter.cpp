@@ -4,11 +4,11 @@
 
 #include "wpi/math/estimator/SteadyStateKalmanFilter.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT)
     SteadyStateKalmanFilter<1, 1, 1>;
 template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT)
     SteadyStateKalmanFilter<2, 1, 1>;
 
-}  // namespace frc
+}  // namespace wpi::math

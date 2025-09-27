@@ -11,7 +11,7 @@
  * ADXL346, 362 Accelerometer snippets for frc-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/accelerometers-software.html
  */
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   Robot() {}
 
@@ -27,12 +27,12 @@ class Robot : public frc::TimedRobot {
  private:
   // Creates an ADXL345 accelerometer object on the MXP I2C port
   // with a measurement range from -8 to 8 G's
-  frc::ADXL345_I2C m_accelerometer{frc::I2C::Port::kPort0,
-                                   frc::ADXL345_I2C::Range::kRange_8G};
+  wpi::ADXL345_I2C m_accelerometer{wpi::I2C::Port::kPort0,
+                                   wpi::ADXL345_I2C::Range::kRange_8G};
 };
 
 #ifndef RUNNING_FRC_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

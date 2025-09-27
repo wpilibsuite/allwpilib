@@ -7,7 +7,7 @@
 
 #include "wpi/command/button/Trigger.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 /**
  * A class used to bind command scheduling to joystick button presses.  Can be
  * composed with other buttons with the operators in Trigger.
@@ -24,9 +24,9 @@ class JoystickButton : public Trigger {
    * @param joystick The joystick on which the button is located.
    * @param buttonNumber The number of the button on the joystick.
    */
-  explicit JoystickButton(frc::GenericHID* joystick, int buttonNumber)
+  explicit JoystickButton(wpi::GenericHID* joystick, int buttonNumber)
       : Trigger([joystick, buttonNumber] {
           return joystick->GetRawButton(buttonNumber);
         }) {}
 };
-}  // namespace frc2
+}  // namespace wpi::cmd

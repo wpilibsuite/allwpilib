@@ -105,7 +105,7 @@ void DataSelector::Display() {
         continue;
       }
       for (auto it2 = it->second.begin(); it2 != it->second.end();) {
-        auto direction = wpi::rsplit(it2->first, '-').second;
+        auto direction = wpi::util::rsplit(it2->first, '-').second;
         if (direction != "forward" && direction != "reverse") {
           WPI_WARNING(m_logger, "Unrecognized direction {}, removing",
                       direction);
@@ -220,7 +220,7 @@ DataSelector::Tests DataSelector::LoadTests(
         continue;
       }
 
-      auto [testName, direction] = wpi::rsplit(testState, '-');
+      auto [testName, direction] = wpi::util::rsplit(testState, '-');
       auto testIt = tests.find(testName);
       if (testIt == tests.end()) {
         testIt = tests.emplace(std::string{testName}, State{}).first;
@@ -252,7 +252,7 @@ static void AddSamples(std::vector<MotorData::Run::Sample<T>>& samples,
       [](const auto& datapoint, double val) { return datapoint.first < val; });
 
   for (auto it = begin; it != end; ++it) {
-    samples.emplace_back(units::second_t{it->first * 1.0e-6}, T{it->second});
+    samples.emplace_back(wpi::units::second_t{it->first * 1.0e-6}, T{it->second});
   }
 }
 

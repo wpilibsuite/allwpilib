@@ -9,7 +9,7 @@
 #include "wpi/glass/Context.hpp"
 #include "wpi/glass/DataSource.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 static void DisplayRail(RoboRioRailModel& rail, const char* name) {
   if (CollapsingHeader(name)) {
@@ -46,7 +46,7 @@ static void DisplayRail(RoboRioRailModel& rail, const char* name) {
   }
 }
 
-void glass::DisplayRoboRio(RoboRioModel* model) {
+void wpi::glass::DisplayRoboRio(RoboRioModel* model) {
   ImGui::PushItemWidth(ImGui::GetFontSize() * 8);
 
   if (CollapsingHeader("RoboRIO Input")) {

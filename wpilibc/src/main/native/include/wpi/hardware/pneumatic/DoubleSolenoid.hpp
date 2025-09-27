@@ -13,7 +13,7 @@
 #include "wpi/hardware/pneumatic/PneumaticsBase.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * DoubleSolenoid class for running 2 channels of high voltage Digital Output
@@ -22,8 +22,8 @@ namespace frc {
  * The DoubleSolenoid class is typically used for pneumatics solenoids that
  * have two positions controlled by two separate channels.
  */
-class DoubleSolenoid : public wpi::Sendable,
-                       public wpi::SendableHelper<DoubleSolenoid> {
+class DoubleSolenoid : public wpi::util::Sendable,
+                       public wpi::util::SendableHelper<DoubleSolenoid> {
  public:
   /**
    * Possible values for a DoubleSolenoid.
@@ -126,7 +126,7 @@ class DoubleSolenoid : public wpi::Sendable,
    */
   bool IsRevSolenoidDisabled() const;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
   std::shared_ptr<PneumaticsBase> m_module;
@@ -137,4 +137,4 @@ class DoubleSolenoid : public wpi::Sendable,
   int m_mask;
 };
 
-}  // namespace frc
+}  // namespace wpi

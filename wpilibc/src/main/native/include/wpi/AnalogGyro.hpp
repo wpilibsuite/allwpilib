@@ -11,7 +11,7 @@
 #include <wpi/util/sendable/Sendable.hpp>
 #include <wpi/util/sendable/SendableHelper.hpp>
 
-namespace frc {
+namespace wpi {
 
 class AnalogInput;
 
@@ -28,8 +28,8 @@ class AnalogInput;
  *
  * This class is for gyro sensors that connect to an analog input.
  */
-class AnalogGyro : public wpi::Sendable,
-                   public wpi::SendableHelper<AnalogGyro> {
+class AnalogGyro : public wpi::util::Sendable,
+                   public wpi::util::SendableHelper<AnalogGyro> {
  public:
   /**
    * %Gyro constructor using the Analog Input channel number.
@@ -188,7 +188,7 @@ class AnalogGyro : public wpi::Sendable,
   void Calibrate() {}
 
   /**
-   * Return the heading of the robot as a Rotation2d.
+   * Return the heading of the robot as a wpi::math::Rotation2d.
    *
    * The angle is continuous, that is it will continue from 360 to 361 degrees.
    * This allows algorithms that wouldn't want to see a discontinuity in the
@@ -197,10 +197,10 @@ class AnalogGyro : public wpi::Sendable,
    * The angle is expected to increase as the gyro turns counterclockwise when
    * looked at from the top. It needs to follow the NWU axis convention.
    *
-   * @return the current heading of the robot as a Rotation2d. This heading is
+   * @return the current heading of the robot as a wpi::math::Rotation2d. This heading is
    *         based on integration of the returned rate from the gyro.
    */
-  Rotation2d GetRotation2d() const { return {}; }
+  wpi::math::Rotation2d GetRotation2d() const { return {}; }
 
   /**
    * Gets the analog input for the gyro.
@@ -209,7 +209,7 @@ class AnalogGyro : public wpi::Sendable,
    */
   std::shared_ptr<AnalogInput> GetAnalogInput() const { return nullptr; }
 
-  void InitSendable(wpi::SendableBuilder& builder) override {}
+  void InitSendable(wpi::util::SendableBuilder& builder) override {}
 };
 
-}  // namespace frc
+}  // namespace wpi

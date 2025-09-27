@@ -20,7 +20,7 @@
 
 using namespace sysid;
 
-static double Lerp(units::second_t time,
+static double Lerp(wpi::units::second_t time,
                    std::vector<MotorData::Run::Sample<double>>& data) {
   auto next = std::find_if(data.begin(), data.end(), [&](const auto& entry) {
     return entry.time > time;
@@ -36,7 +36,7 @@ static double Lerp(units::second_t time,
 
   const auto prev = next - 1;
 
-  return wpi::Lerp(prev->measurement, next->measurement,
+  return wpi::util::Lerp(prev->measurement, next->measurement,
                    (time - prev->time) / (next->time - prev->time));
 }
 
@@ -79,21 +79,21 @@ static std::vector<PreparedData> ConvertToPrepared(const MotorData& data) {
 
 /**
  * To preserve a raw copy of the data, this method saves a raw version
- * in the dataset StringMap where the key of the raw data starts with "raw-"
+ * in the dataset wpi::util::StringMap where the key of the raw data starts with "raw-"
  * before the name of the original data.
  *
  * @tparam S The size of the array data that's being used
  *
  * @param dataset A reference to the dataset being used
  */
-static void CopyRawData(wpi::StringMap<MotorData>* dataset) {
+static void CopyRawData(wpi::util::StringMap<MotorData>* dataset) {
   auto& data = *dataset;
   // Loads the Raw Data
   for (auto& it : data) {
     auto& key = it.first;
     auto& motorData = it.second;
 
-    if (!wpi::contains(key, "raw")) {
+    if (!wpi::util::contains(key, "raw")) {
       data[fmt::format("raw-{}", key)] = motorData;
       data[fmt::format("original-raw-{}", key)] = motorData;
     }
@@ -116,7 +116,7 @@ static Storage CombineDatasets(const std::vector<PreparedData>& slowForward,
 }
 
 void AnalysisManager::PrepareGeneralData() {
-  wpi::StringMap<std::vector<PreparedData>> preparedData;
+  wpi::util::StringMap<std::vector<PreparedData>> preparedData;
 
   WPI_INFO(m_logger, "{}", "Preprocessing raw data.");
 
@@ -167,11 +167,11 @@ void AnalysisManager::PrepareGeneralData() {
                   preparedData["raw-dynamic-reverse"][0].timestamp};
 }
 
-AnalysisManager::AnalysisManager(Settings& settings, wpi::Logger& logger)
+AnalysisManager::AnalysisManager(Settings& settings, wpi::util::Logger& logger)
     : m_logger{logger}, m_settings{settings} {}
 
 AnalysisManager::AnalysisManager(TestData data, Settings& settings,
-                                 wpi::Logger& logger)
+                                 wpi::util::Logger& logger)
     : m_data{std::move(data)}, m_logger{logger}, m_settings{settings} {
   // Reset settings for Dynamic Test Limits
   m_settings.stepTestDuration = 0_s;

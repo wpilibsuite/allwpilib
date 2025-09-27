@@ -8,7 +8,7 @@
 
 #include "wpi/math/linalg/EigenCore.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * Generates sigma points and weights according to Van der Merwe's 2004
@@ -125,4 +125,4 @@ class MerweScaledSigmaPoints {
   }
 };
 
-}  // namespace frc
+}  // namespace wpi::math

@@ -28,9 +28,9 @@
 
 #include "wpi/units/base.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::inductance
+ * @namespace wpi::units::inductance
  * @brief namespace for unit types and containers representing inductance values
  * @details The SI unit for inductance is `henrys`, and the corresponding
  *          `base_unit` category is `inductance_unit`.
@@ -41,10 +41,10 @@ namespace units {
     defined(ENABLE_PREDEFINED_INDUCTANCE_UNITS)
 UNIT_ADD_WITH_METRIC_PREFIXES(
     inductance, henry, henries, H,
-    unit<std::ratio<1>, units::category::inductance_unit>)
+    unit<std::ratio<1>, wpi::units::category::inductance_unit>)
 
 UNIT_ADD_CATEGORY_TRAIT(inductance)
 #endif
 
 using namespace inductance;
-}  // namespace units
+}  // namespace wpi::units

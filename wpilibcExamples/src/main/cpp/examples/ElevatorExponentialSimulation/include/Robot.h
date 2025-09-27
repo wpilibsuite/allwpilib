@@ -12,7 +12,7 @@
 /**
  * This is a sample program to demonstrate the use of elevator simulation.
  */
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   Robot() {}
   void RobotPeriodic() override;
@@ -22,6 +22,6 @@ class Robot : public frc::TimedRobot {
   void DisabledInit() override;
 
  private:
-  frc::Joystick m_joystick{Constants::kJoystickPort};
+  wpi::Joystick m_joystick{Constants::kJoystickPort};
   Elevator m_elevator;
 };

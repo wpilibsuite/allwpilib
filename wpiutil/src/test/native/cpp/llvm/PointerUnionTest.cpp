@@ -8,7 +8,7 @@
 
 #include "wpi/util/PointerUnion.h"
 #include "gtest/gtest.h"
-using namespace wpi;
+using namespace wpi::util;
 
 namespace {
 

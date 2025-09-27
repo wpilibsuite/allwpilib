@@ -9,7 +9,7 @@
 #include <utility>
 #include <vector>
 
-namespace wpi {
+namespace wpi::util {
 
 namespace impl {
 template <typename It>
@@ -154,6 +154,6 @@ class UidVector {
   size_type m_active_count{0};
 };
 
-}  // namespace wpi
+}  // namespace wpi::util
 
 #endif  // WPIUTIL_WPI_UTIL_UIDVECTOR_HPP_

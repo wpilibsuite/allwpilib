@@ -13,7 +13,7 @@
 
 #include "wpi/hardware/discrete/CounterBase.hpp"
 
-namespace frc {
+namespace wpi {
 /**
  * Class to read quad encoders.
  *
@@ -30,8 +30,8 @@ namespace frc {
  * to be zeroed before use.
  */
 class Encoder : public CounterBase,
-                public wpi::Sendable,
-                public wpi::SendableHelper<Encoder> {
+                public wpi::util::Sendable,
+                public wpi::util::SendableHelper<Encoder> {
  public:
   /**
    * Encoder constructor.
@@ -96,7 +96,7 @@ class Encoder : public CounterBase,
    * @deprecated Use getRate() in favor of this method.
    */
   [[deprecated("Use GetRate() in favor of this method")]]
-  units::second_t GetPeriod() const override;
+  wpi::units::second_t GetPeriod() const override;
 
   /**
    * Sets the maximum period for stopped detection.
@@ -116,7 +116,7 @@ class Encoder : public CounterBase,
   [[deprecated(
       "Use SetMinRate() in favor of this method.  This takes unscaled periods "
       "and SetMinRate() scales using value from SetDistancePerPulse().")]]
-  void SetMaxPeriod(units::second_t maxPeriod) override;
+  void SetMaxPeriod(wpi::units::second_t maxPeriod) override;
 
   /**
    * Determine if the encoder is stopped.
@@ -247,7 +247,7 @@ class Encoder : public CounterBase,
 
   int GetFPGAIndex() const;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
   /**
@@ -277,7 +277,7 @@ class Encoder : public CounterBase,
    */
   double DecodingScaleFactor() const;
 
-  hal::Handle<HAL_EncoderHandle, HAL_FreeEncoder> m_encoder;
+  wpi::hal::Handle<HAL_EncoderHandle, HAL_FreeEncoder> m_encoder;
 };
 
-}  // namespace frc
+}  // namespace wpi

@@ -46,7 +46,7 @@
 #include "wpi/net/SocketError.hpp"
 #include "wpi/net/TCPStream.h"
 
-using namespace wpi;
+using namespace wpi::net;
 
 static int ResolveHostName(const char* hostname, struct in_addr* addr) {
   struct addrinfo hints;
@@ -71,7 +71,7 @@ static int ResolveHostName(const char* hostname, struct in_addr* addr) {
 }
 
 std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
-                                                     int port, Logger& logger,
+                                                     int port, wpi::util::Logger& logger,
                                                      int timeout) {
 #ifdef _WIN32
   struct WSAHelper {
@@ -90,7 +90,7 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
   address.sin_family = AF_INET;
   if (ResolveHostName(server, &(address.sin_addr)) != 0) {
 #ifdef _WIN32
-    SmallString<128> addr_copy(server);
+    wpi::util::SmallString<128> addr_copy(server);
     addr_copy.push_back('\0');
     int res = InetPton(PF_INET, addr_copy.data(), &(address.sin_addr));
 #else

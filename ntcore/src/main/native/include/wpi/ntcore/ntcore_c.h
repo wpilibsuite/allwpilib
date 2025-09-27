@@ -198,7 +198,7 @@ struct NT_ConnectionInfo {
 
   /**
    * The last time any update was received from the remote node (same scale as
-   * returned by nt::Now()).
+   * returned by wpi::nt::Now()).
    */
   uint64_t last_update;
 
@@ -1364,7 +1364,7 @@ void NT_SetNow(int64_t timestamp);
 /** @} */
 
 /**
- * @defgroup ntcore_data_logger_cfunc Data Logger Functions
+ * @defgroup ntcore_data_logger_cfunc Data wpi::util::Logger Functions
  * @{
  */
 
@@ -1412,7 +1412,7 @@ void NT_StopConnectionDataLog(NT_ConnectionDataLogger logger);
 /** @} */
 
 /**
- * @defgroup ntcore_logger_cfunc Logger Functions
+ * @defgroup ntcore_logger_cfunc wpi::util::Logger Functions
  * @{
  */
 

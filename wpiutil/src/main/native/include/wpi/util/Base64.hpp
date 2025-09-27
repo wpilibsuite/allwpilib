@@ -13,7 +13,7 @@
 #include <string_view>
 #include <vector>
 
-namespace wpi {
+namespace wpi::util {
 template <typename T>
 class SmallVectorImpl;
 class raw_ostream;
@@ -44,6 +44,6 @@ void Base64Encode(std::span<const uint8_t> plain, std::string* encoded);
 std::string_view Base64Encode(std::span<const uint8_t> plain,
                               SmallVectorImpl<char>& buf);
 
-}  // namespace wpi
+}  // namespace wpi::util
 
 #endif  // WPIUTIL_WPI_UTIL_BASE64_HPP_

@@ -14,9 +14,9 @@ namespace {
 class MyTestClass {};
 }  // namespace
 
-namespace hal {
+namespace wpi::hal {
 TEST(HandleTest, ClassedHandle) {
-  hal::IndexedClassedHandleResource<HAL_TestHandle, MyTestClass, 8,
+  wpi::hal::IndexedClassedHandleResource<HAL_TestHandle, MyTestClass, 8,
                                     HAL_HandleEnum::Vendor>
       testClass;
   int32_t status = 0;
@@ -24,4 +24,4 @@ TEST(HandleTest, ClassedHandle) {
   EXPECT_EQ(0, status);
 }
 
-}  // namespace hal
+}  // namespace wpi::hal

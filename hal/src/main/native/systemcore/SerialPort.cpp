@@ -24,16 +24,16 @@
 #include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/hal/handles/IndexedHandleResource.hpp"
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeSerialPort() {}
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
 HAL_SerialPortHandle HAL_InitializeSerialPort(HAL_SerialPort port,
                                               int32_t* status) {
-  // hal::init::CheckInit();
+  // wpi::hal::init::CheckInit();
 
   *status = HAL_HANDLE_ERROR;
   return HAL_kInvalidHandle;

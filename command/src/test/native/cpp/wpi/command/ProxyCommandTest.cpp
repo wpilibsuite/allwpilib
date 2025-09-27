@@ -12,7 +12,7 @@
 #include "wpi/command/ProxyCommand.hpp"
 #include "wpi/command/WaitUntilCommand.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 class ProxyCommandTest : public CommandTestBase {};
 
 TEST_F(ProxyCommandTest, NonOwningCommandSchedule) {

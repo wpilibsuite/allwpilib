@@ -8,18 +8,18 @@
 #include <wpi/util/sendable/SendableBuilder.hpp>
 #include <wpi/util/sendable/SendableRegistry.hpp>
 
-using namespace frc;
+using namespace wpi;
 
 Servo::Servo(int channel) : m_pwm(channel, false) {
-  wpi::SendableRegistry::Add(this, "Servo", channel);
+  wpi::util::SendableRegistry::Add(this, "Servo", channel);
 
   // Assign defaults for period multiplier for the servo PWM control signal
   m_pwm.SetOutputPeriod(PWM::kOutputPeriod_20Ms);
 
   HAL_ReportUsage("IO", channel, "Servo");
-  wpi::SendableRegistry::SetName(this, "Servo", channel);
+  wpi::util::SendableRegistry::SetName(this, "Servo", channel);
 
-  m_simDevice = hal::SimDevice{"Servo", channel};
+  m_simDevice = wpi::hal::SimDevice{"Servo", channel};
   if (m_simDevice) {
     m_simPosition = m_simDevice.CreateDouble("Position", true, 0.0);
     m_pwm.SetSimDevice(m_simDevice);
@@ -32,14 +32,14 @@ void Servo::Set(double value) {
     m_simPosition.Set(value);
   }
 
-  units::microsecond_t rawValue =
+  wpi::units::microsecond_t rawValue =
       (value * GetFullRangeScaleFactor()) + m_minPwm;
 
   m_pwm.SetPulseTime(rawValue);
 }
 
 double Servo::Get() const {
-  units::microsecond_t rawValue = m_pwm.GetPulseTime();
+  wpi::units::microsecond_t rawValue = m_pwm.GetPulseTime();
 
   if (rawValue < m_minPwm) {
     return 0.0;
@@ -64,7 +64,7 @@ double Servo::GetAngle() const {
   return Get() * GetServoAngleRange() + kMinServoAngle;
 }
 
-void Servo::InitSendable(wpi::SendableBuilder& builder) {
+void Servo::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Servo");
   builder.AddDoubleProperty(
       "Value", [=, this] { return Get(); },
@@ -75,7 +75,7 @@ double Servo::GetServoAngleRange() {
   return kMaxServoAngle - kMinServoAngle;
 }
 
-units::microsecond_t Servo::GetFullRangeScaleFactor() const {
+wpi::units::microsecond_t Servo::GetFullRangeScaleFactor() const {
   return m_maxPwm - m_minPwm;
 }
 

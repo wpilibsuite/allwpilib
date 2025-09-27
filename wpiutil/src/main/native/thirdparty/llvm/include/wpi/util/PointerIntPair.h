@@ -22,7 +22,7 @@
 #include <cstring>
 #include <limits>
 
-namespace wpi {
+namespace wpi::util {
 
 namespace detail {
 template <typename Ptr> struct PunnedPointer {
@@ -275,19 +275,19 @@ get(const PointerIntPair<PointerTy, IntBits, IntType, PtrTraits, Info> &Pair) {
     return Pair.getInt();
 }
 
-} // end namespace wpi
+} // end namespace wpi::util
 
 namespace std {
 template <typename PointerTy, unsigned IntBits, typename IntType,
           typename PtrTraits, typename Info>
 struct tuple_size<
-    wpi::PointerIntPair<PointerTy, IntBits, IntType, PtrTraits, Info>>
+    wpi::util::PointerIntPair<PointerTy, IntBits, IntType, PtrTraits, Info>>
     : std::integral_constant<std::size_t, 2> {};
 
 template <std::size_t I, typename PointerTy, unsigned IntBits, typename IntType,
           typename PtrTraits, typename Info>
 struct tuple_element<
-    I, wpi::PointerIntPair<PointerTy, IntBits, IntType, PtrTraits, Info>>
+    I, wpi::util::PointerIntPair<PointerTy, IntBits, IntType, PtrTraits, Info>>
     : std::conditional<I == 0, PointerTy, IntType> {};
 } // namespace std
 

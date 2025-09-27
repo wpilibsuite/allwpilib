@@ -6,7 +6,7 @@
 #include "wpi/command/Commands.hpp"
 #include "wpi/command/InstantCommand.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 class InstantCommandTest : public CommandTestBase {};
 
 TEST_F(InstantCommandTest, InstantCommandSchedule) {

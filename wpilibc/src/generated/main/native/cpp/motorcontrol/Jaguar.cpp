@@ -8,7 +8,7 @@
 
 #include <wpi/hal/UsageReporting.h>
 
-using namespace frc;
+using namespace wpi;
 
 Jaguar::Jaguar(int channel) : PWMMotorController("Jaguar", channel) {
   SetBounds(2.31_ms, 1.55_ms, 1.507_ms, 1.454_ms, 0.697_ms);

@@ -4,7 +4,7 @@
 
 #pragma once
 
-namespace wpi {
+namespace wpi::util {
 
 // A struct to use as a deleter when a std::shared_ptr must wrap a raw pointer
 // that is being deleted by someone else.
@@ -13,4 +13,4 @@ struct NullDeleter {
   void operator()(T*) const noexcept {};
 };
 
-}  // namespace wpi
+}  // namespace wpi::util

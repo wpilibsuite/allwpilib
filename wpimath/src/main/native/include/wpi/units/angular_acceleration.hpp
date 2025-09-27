@@ -8,9 +8,9 @@
 #include "wpi/units/base.hpp"
 #include "wpi/units/time.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::angular_acceleration
+ * @namespace wpi::units::angular_acceleration
  * @brief namespace for unit types and containers representing angular
  *        acceleration values
  * @details The SI unit for angular acceleration is
@@ -21,7 +21,7 @@ namespace units {
  */
 UNIT_ADD(angular_acceleration, radians_per_second_squared,
          radians_per_second_squared, rad_per_s_sq,
-         unit<std::ratio<1>, units::category::angular_acceleration_unit>)
+         unit<std::ratio<1>, wpi::units::category::angular_acceleration_unit>)
 UNIT_ADD(angular_acceleration, degrees_per_second_squared,
          degrees_per_second_squared, deg_per_s_sq,
          compound_unit<angle::degrees, inverse<squared<time::seconds>>>)
@@ -39,4 +39,4 @@ UNIT_ADD(angular_acceleration, revolutions_per_minute_per_second,
 UNIT_ADD_CATEGORY_TRAIT(angular_acceleration)
 
 using namespace angular_acceleration;
-}  // namespace units
+}  // namespace wpi::units

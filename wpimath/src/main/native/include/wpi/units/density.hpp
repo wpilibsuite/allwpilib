@@ -30,9 +30,9 @@
 #include "wpi/units/mass.hpp"
 #include "wpi/units/volume.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::density
+ * @namespace wpi::units::density
  * @brief namespace for unit types and containers representing density values
  * @details The SI unit for density is `kilograms_per_cubic_meter`, and the
  *          corresponding `base_unit` category is `density_unit`.
@@ -42,7 +42,7 @@ namespace units {
 #if !defined(DISABLE_PREDEFINED_UNITS) || \
     defined(ENABLE_PREDEFINED_DENSITY_UNITS)
 UNIT_ADD(density, kilograms_per_cubic_meter, kilograms_per_cubic_meter,
-         kg_per_cu_m, unit<std::ratio<1>, units::category::density_unit>)
+         kg_per_cu_m, unit<std::ratio<1>, wpi::units::category::density_unit>)
 UNIT_ADD(density, grams_per_milliliter, grams_per_milliliter, g_per_mL,
          compound_unit<mass::grams, inverse<volume::milliliter>>)
 UNIT_ADD(density, kilograms_per_liter, kilograms_per_liter, kg_per_L,
@@ -67,4 +67,4 @@ UNIT_ADD_CATEGORY_TRAIT(density)
 #endif
 
 using namespace density;
-}  // namespace units
+}  // namespace wpi::units

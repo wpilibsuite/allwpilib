@@ -7,7 +7,7 @@
 
 #include <uv.h>
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 /**
  * Error code.
@@ -41,6 +41,6 @@ class Error {
   int m_err{0};
 };
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_ERROR_HPP_

@@ -7,7 +7,7 @@
 #include "wpi/hal/simulation/PWMData.hpp"
 #include "wpi/hal/simulation/SimDataValue.hpp"
 
-namespace hal {
+namespace wpi::hal {
 class PWMData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(PulseMicrosecond)
@@ -24,4 +24,4 @@ class PWMData {
   virtual void ResetData();
 };
 extern PWMData* SimPWMData;
-}  // namespace hal
+}  // namespace wpi::hal

@@ -8,9 +8,9 @@
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 
 TEST(TrajectoryConcatenateTest, States) {
-  auto t1 = frc::TrajectoryGenerator::GenerateTrajectory(
+  auto t1 = wpi::math::TrajectoryGenerator::GenerateTrajectory(
       {}, {}, {1_m, 1_m, 0_deg}, {2_mps, 2_mps_sq});
-  auto t2 = frc::TrajectoryGenerator::GenerateTrajectory(
+  auto t2 = wpi::math::TrajectoryGenerator::GenerateTrajectory(
       {1_m, 1_m, 0_deg}, {}, {2_m, 2_m, 45_deg}, {2_mps, 2_mps_sq});
 
   auto t = t1 + t2;

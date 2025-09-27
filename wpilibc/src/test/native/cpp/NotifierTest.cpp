@@ -9,7 +9,7 @@
 #include "wpi/Notifier.hpp"
 #include "wpi/simulation/SimHooks.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 namespace {
 

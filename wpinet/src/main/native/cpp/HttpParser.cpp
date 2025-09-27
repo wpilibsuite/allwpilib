@@ -4,7 +4,7 @@
 
 #include "wpi/net/HttpParser.hpp"
 
-using namespace wpi;
+using namespace wpi::net;
 
 uint32_t HttpParser::GetParserVersion() {
   return static_cast<uint32_t>(http_parser_version());

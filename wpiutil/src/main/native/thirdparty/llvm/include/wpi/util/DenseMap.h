@@ -33,7 +33,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace wpi {
+namespace wpi::util {
 
 namespace detail {
 
@@ -53,7 +53,7 @@ struct DenseMapPair : public std::pair<KeyT, ValueT> {
 
 template <typename KeyT, typename ValueT,
           typename KeyInfoT = DenseMapInfo<KeyT>,
-          typename Bucket = wpi::detail::DenseMapPair<KeyT, ValueT>,
+          typename Bucket = wpi::util::detail::DenseMapPair<KeyT, ValueT>,
           bool IsConst = false>
 class DenseMapIterator;
 
@@ -723,7 +723,7 @@ bool operator!=(
 
 template <typename KeyT, typename ValueT,
           typename KeyInfoT = DenseMapInfo<KeyT>,
-          typename BucketT = wpi::detail::DenseMapPair<KeyT, ValueT>>
+          typename BucketT = wpi::util::detail::DenseMapPair<KeyT, ValueT>>
 class DenseMap : public DenseMapBase<DenseMap<KeyT, ValueT, KeyInfoT, BucketT>,
                                      KeyT, ValueT, KeyInfoT, BucketT> {
   friend class DenseMapBase<DenseMap, KeyT, ValueT, KeyInfoT, BucketT>;
@@ -877,7 +877,7 @@ private:
 
 template <typename KeyT, typename ValueT, unsigned InlineBuckets = 4,
           typename KeyInfoT = DenseMapInfo<KeyT>,
-          typename BucketT = wpi::detail::DenseMapPair<KeyT, ValueT>>
+          typename BucketT = wpi::util::detail::DenseMapPair<KeyT, ValueT>>
 class SmallDenseMap
     : public DenseMapBase<
           SmallDenseMap<KeyT, ValueT, InlineBuckets, KeyInfoT, BucketT>, KeyT,
@@ -1303,6 +1303,6 @@ inline size_t capacity_in_bytes(const DenseMap<KeyT, ValueT, KeyInfoT> &X) {
   return X.getMemorySize();
 }
 
-} // end namespace wpi
+} // end namespace wpi::util
 
 #endif // WPIUTIL_WPI_DENSEMAP_H

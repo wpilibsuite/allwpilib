@@ -9,8 +9,8 @@
 #include "wpi/util/Chrono.h"
 #include "gtest/gtest.h"
 
-using namespace wpi;
-using namespace wpi::sys;
+using namespace wpi::util;
+using namespace wpi::util::sys;
 using namespace std::chrono;
 
 namespace {

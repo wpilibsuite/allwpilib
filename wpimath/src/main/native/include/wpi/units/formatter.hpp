@@ -19,7 +19,7 @@
  */
 template <typename Unit, typename CharT>
 struct fmt::formatter<Unit, CharT,
-                      std::enable_if_t<units::traits::is_unit_t_v<Unit>>> {
+                      std::enable_if_t<wpi::units::traits::is_unit_t_v<Unit>>> {
   template <typename ParseContext>
   constexpr auto parse(ParseContext& ctx) {
     return m_underlying.parse(ctx);
@@ -35,182 +35,182 @@ struct fmt::formatter<Unit, CharT,
   auto format(const Unit& obj, FmtContext& ctx) const {
     using Units = typename Unit::unit_type;
     using BaseUnits =
-        units::unit<std::ratio<1>,
-                    typename units::traits::unit_traits<Units>::base_unit_type>;
+        wpi::units::unit<std::ratio<1>,
+                    typename wpi::units::traits::unit_traits<Units>::base_unit_type>;
 
     auto out = ctx.out();
 
-    out = m_underlying.format(units::convert<Units, BaseUnits>(obj()), ctx);
+    out = m_underlying.format(wpi::units::convert<Units, BaseUnits>(obj()), ctx);
 
-    if constexpr (units::traits::unit_traits<
+    if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::meter_ratio::num != 0) {
       out = fmt::format_to(out, " m");
     }
-    if constexpr (units::traits::unit_traits<
+    if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::meter_ratio::num != 0 &&
-                  units::traits::unit_traits<
+                  wpi::units::traits::unit_traits<
                       Units>::base_unit_type::meter_ratio::num != 1) {
       out = fmt::format_to(
           out, "^{}",
-          units::traits::unit_traits<Units>::base_unit_type::meter_ratio::num);
+          wpi::units::traits::unit_traits<Units>::base_unit_type::meter_ratio::num);
     }
-    if constexpr (units::traits::unit_traits<
+    if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::meter_ratio::den != 1) {
       out = fmt::format_to(
           out, "/{}",
-          units::traits::unit_traits<Units>::base_unit_type::meter_ratio::den);
+          wpi::units::traits::unit_traits<Units>::base_unit_type::meter_ratio::den);
     }
 
-    if constexpr (units::traits::unit_traits<
+    if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::kilogram_ratio::num != 0) {
       out = fmt::format_to(out, " kg");
     }
-    if constexpr (units::traits::unit_traits<
+    if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::kilogram_ratio::num != 0 &&
-                  units::traits::unit_traits<
+                  wpi::units::traits::unit_traits<
                       Units>::base_unit_type::kilogram_ratio::num != 1) {
       out = fmt::format_to(out, "^{}",
-                           units::traits::unit_traits<
+                           wpi::units::traits::unit_traits<
                                Units>::base_unit_type::kilogram_ratio::num);
     }
-    if constexpr (units::traits::unit_traits<
+    if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::kilogram_ratio::den != 1) {
       out = fmt::format_to(out, "/{}",
-                           units::traits::unit_traits<
+                           wpi::units::traits::unit_traits<
                                Units>::base_unit_type::kilogram_ratio::den);
     }
 
-    if constexpr (units::traits::unit_traits<
+    if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::second_ratio::num != 0) {
       out = fmt::format_to(out, " s");
     }
-    if constexpr (units::traits::unit_traits<
+    if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::second_ratio::num != 0 &&
-                  units::traits::unit_traits<
+                  wpi::units::traits::unit_traits<
                       Units>::base_unit_type::second_ratio::num != 1) {
       out = fmt::format_to(
           out, "^{}",
-          units::traits::unit_traits<Units>::base_unit_type::second_ratio::num);
+          wpi::units::traits::unit_traits<Units>::base_unit_type::second_ratio::num);
     }
-    if constexpr (units::traits::unit_traits<
+    if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::second_ratio::den != 1) {
       out = fmt::format_to(
           out, "/{}",
-          units::traits::unit_traits<Units>::base_unit_type::second_ratio::den);
+          wpi::units::traits::unit_traits<Units>::base_unit_type::second_ratio::den);
     }
 
-    if constexpr (units::traits::unit_traits<
+    if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::ampere_ratio::num != 0) {
       out = fmt::format_to(out, " A");
     }
-    if constexpr (units::traits::unit_traits<
+    if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::ampere_ratio::num != 0 &&
-                  units::traits::unit_traits<
+                  wpi::units::traits::unit_traits<
                       Units>::base_unit_type::ampere_ratio::num != 1) {
       out = fmt::format_to(
           out, "^{}",
-          units::traits::unit_traits<Units>::base_unit_type::ampere_ratio::num);
+          wpi::units::traits::unit_traits<Units>::base_unit_type::ampere_ratio::num);
     }
-    if constexpr (units::traits::unit_traits<
+    if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::ampere_ratio::den != 1) {
       out = fmt::format_to(
           out, "/{}",
-          units::traits::unit_traits<Units>::base_unit_type::ampere_ratio::den);
+          wpi::units::traits::unit_traits<Units>::base_unit_type::ampere_ratio::den);
     }
 
-    if constexpr (units::traits::unit_traits<
+    if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::kelvin_ratio::num != 0) {
       out = fmt::format_to(out, " K");
     }
-    if constexpr (units::traits::unit_traits<
+    if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::kelvin_ratio::num != 0 &&
-                  units::traits::unit_traits<
+                  wpi::units::traits::unit_traits<
                       Units>::base_unit_type::kelvin_ratio::num != 1) {
       out = fmt::format_to(
           out, "^{}",
-          units::traits::unit_traits<Units>::base_unit_type::kelvin_ratio::num);
+          wpi::units::traits::unit_traits<Units>::base_unit_type::kelvin_ratio::num);
     }
-    if constexpr (units::traits::unit_traits<
+    if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::kelvin_ratio::den != 1) {
       out = fmt::format_to(
           out, "/{}",
-          units::traits::unit_traits<Units>::base_unit_type::kelvin_ratio::den);
+          wpi::units::traits::unit_traits<Units>::base_unit_type::kelvin_ratio::den);
     }
 
-    if constexpr (units::traits::unit_traits<
+    if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::mole_ratio::num != 0) {
       out = fmt::format_to(out, " mol");
     }
-    if constexpr (units::traits::unit_traits<
+    if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::mole_ratio::num != 0 &&
-                  units::traits::unit_traits<
+                  wpi::units::traits::unit_traits<
                       Units>::base_unit_type::mole_ratio::num != 1) {
       out = fmt::format_to(
           out, "^{}",
-          units::traits::unit_traits<Units>::base_unit_type::mole_ratio::num);
+          wpi::units::traits::unit_traits<Units>::base_unit_type::mole_ratio::num);
     }
-    if constexpr (units::traits::unit_traits<
+    if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::mole_ratio::den != 1) {
       out = fmt::format_to(
           out, "/{}",
-          units::traits::unit_traits<Units>::base_unit_type::mole_ratio::den);
+          wpi::units::traits::unit_traits<Units>::base_unit_type::mole_ratio::den);
     }
 
-    if constexpr (units::traits::unit_traits<
+    if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::candela_ratio::num != 0) {
       out = fmt::format_to(out, " cd");
     }
-    if constexpr (units::traits::unit_traits<
+    if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::candela_ratio::num != 0 &&
-                  units::traits::unit_traits<
+                  wpi::units::traits::unit_traits<
                       Units>::base_unit_type::candela_ratio::num != 1) {
       out = fmt::format_to(out, "^{}",
-                           units::traits::unit_traits<
+                           wpi::units::traits::unit_traits<
                                Units>::base_unit_type::candela_ratio::num);
     }
-    if constexpr (units::traits::unit_traits<
+    if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::candela_ratio::den != 1) {
       out = fmt::format_to(out, "/{}",
-                           units::traits::unit_traits<
+                           wpi::units::traits::unit_traits<
                                Units>::base_unit_type::candela_ratio::den);
     }
 
-    if constexpr (units::traits::unit_traits<
+    if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::radian_ratio::num != 0) {
       out = fmt::format_to(out, " rad");
     }
-    if constexpr (units::traits::unit_traits<
+    if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::radian_ratio::num != 0 &&
-                  units::traits::unit_traits<
+                  wpi::units::traits::unit_traits<
                       Units>::base_unit_type::radian_ratio::num != 1) {
       out = fmt::format_to(
           out, "^{}",
-          units::traits::unit_traits<Units>::base_unit_type::radian_ratio::num);
+          wpi::units::traits::unit_traits<Units>::base_unit_type::radian_ratio::num);
     }
-    if constexpr (units::traits::unit_traits<
+    if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::radian_ratio::den != 1) {
       out = fmt::format_to(
           out, "/{}",
-          units::traits::unit_traits<Units>::base_unit_type::radian_ratio::den);
+          wpi::units::traits::unit_traits<Units>::base_unit_type::radian_ratio::den);
     }
 
-    if constexpr (units::traits::unit_traits<
+    if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::byte_ratio::num != 0) {
       out = fmt::format_to(out, " b");
     }
-    if constexpr (units::traits::unit_traits<
+    if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::byte_ratio::num != 0 &&
-                  units::traits::unit_traits<
+                  wpi::units::traits::unit_traits<
                       Units>::base_unit_type::byte_ratio::num != 1) {
       out = fmt::format_to(
           out, "^{}",
-          units::traits::unit_traits<Units>::base_unit_type::byte_ratio::num);
+          wpi::units::traits::unit_traits<Units>::base_unit_type::byte_ratio::num);
     }
-    if constexpr (units::traits::unit_traits<
+    if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::byte_ratio::den != 1) {
       out = fmt::format_to(
           out, "/{}",
-          units::traits::unit_traits<Units>::base_unit_type::byte_ratio::den);
+          wpi::units::traits::unit_traits<Units>::base_unit_type::byte_ratio::den);
     }
 
     return out;

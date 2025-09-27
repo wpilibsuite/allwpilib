@@ -13,7 +13,7 @@
 
 #include "wpi/net/uv/Handle.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 class Loop;
 
@@ -67,9 +67,9 @@ class Idle final : public HandleImpl<Idle, uv_idle_t> {
   /**
    * Signal generated once per loop iteration prior to Prepare signals.
    */
-  sig::Signal<> idle;
+  wpi::util::sig::Signal<> idle;
 };
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_IDLE_HPP_

@@ -11,8 +11,8 @@
 #include "wpi/simulation/CTREPCMSim.hpp"
 #include "wpi/simulation/REVPHSim.hpp"
 
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 std::shared_ptr<PneumaticsBaseSim> PneumaticsBaseSim::GetForType(
     int module, PneumaticsModuleType type) {

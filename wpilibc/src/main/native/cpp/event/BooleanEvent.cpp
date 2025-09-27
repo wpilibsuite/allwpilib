@@ -7,7 +7,7 @@
 #include <memory>
 #include <utility>
 
-using namespace frc;
+using namespace wpi;
 
 BooleanEvent::BooleanEvent(EventLoop* loop, std::function<bool()> condition)
     : m_loop(loop), m_signal(std::move(condition)) {
@@ -67,10 +67,10 @@ BooleanEvent BooleanEvent::Falling() {
                       });
 }
 
-BooleanEvent BooleanEvent::Debounce(units::second_t debounceTime,
-                                    frc::Debouncer::DebounceType type) {
+BooleanEvent BooleanEvent::Debounce(wpi::units::second_t debounceTime,
+                                    wpi::math::Debouncer::DebounceType type) {
   return BooleanEvent(
       this->m_loop,
-      [debouncer = frc::Debouncer(debounceTime, type),
+      [debouncer = wpi::math::Debouncer(debounceTime, type),
        state = m_state]() mutable { return debouncer.Calculate(*state); });
 }

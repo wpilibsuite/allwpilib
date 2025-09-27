@@ -8,7 +8,7 @@
 
 #include "wpi/hardware/motor/PWMMotorController.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Digilent DMC 60 Motor Controller with PWM control.
@@ -40,4 +40,4 @@ class DMC60 : public PWMMotorController {
   DMC60& operator=(DMC60&&) = default;
 };
 
-}  // namespace frc
+}  // namespace wpi

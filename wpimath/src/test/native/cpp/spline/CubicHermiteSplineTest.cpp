@@ -14,9 +14,9 @@
 #include "wpi/math/spline/SplineParameterizer.hpp"
 #include "wpi/units/length.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
-namespace frc {
+namespace wpi::math {
 class CubicHermiteSplineTest : public ::testing::Test {
  protected:
   static void Run(const Pose2d& a, const std::vector<Translation2d>& waypoints,
@@ -79,7 +79,7 @@ class CubicHermiteSplineTest : public ::testing::Test {
                 b.Rotation().Radians().value(), 1E-9);
   }
 };
-}  // namespace frc
+}  // namespace wpi::math
 
 TEST_F(CubicHermiteSplineTest, StraightLine) {
   Run(Pose2d{}, std::vector<Translation2d>(), Pose2d{3_m, 0_m, 0_deg});

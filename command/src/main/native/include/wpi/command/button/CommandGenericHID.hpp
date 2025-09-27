@@ -10,10 +10,10 @@
 #include "wpi/command/CommandScheduler.hpp"
 #include "wpi/command/button/Trigger.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 
 /**
- * A version of {@link frc::GenericHID} with {@link Trigger} factories for
+ * A version of {@link wpi::GenericHID} with {@link Trigger} factories for
  * command-based.
  *
  * @see GenericHID
@@ -33,7 +33,7 @@ class CommandGenericHID {
    *
    * @return the wrapped GenericHID object
    */
-  frc::GenericHID& GetHID();
+  wpi::GenericHID& GetHID();
 
   /**
    * Constructs an event instance around this button's digital signal.
@@ -45,7 +45,7 @@ class CommandGenericHID {
    * to the given loop.
    */
   Trigger Button(int button,
-                 frc::EventLoop* loop = CommandScheduler::GetInstance()
+                 wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                             .GetDefaultButtonLoop()) const;
 
   /**
@@ -57,8 +57,8 @@ class CommandGenericHID {
    * @param angle POV angle.
    * @return a Trigger instance based around this angle of a POV on the HID.
    */
-  Trigger POV(frc::DriverStation::POVDirection angle,
-              frc::EventLoop* loop =
+  Trigger POV(wpi::DriverStation::POVDirection angle,
+              wpi::EventLoop* loop =
                   CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 
   /**
@@ -71,8 +71,8 @@ class CommandGenericHID {
    * @param angle POV angle.
    * @return a Trigger instance based around this angle of a POV on the HID.
    */
-  Trigger POV(int pov, frc::DriverStation::POVDirection angle,
-              frc::EventLoop* loop =
+  Trigger POV(int pov, wpi::DriverStation::POVDirection angle,
+              wpi::EventLoop* loop =
                   CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 
   /**
@@ -85,7 +85,7 @@ class CommandGenericHID {
    * @return a Trigger instance based around the up direction of a POV on the
    * HID.
    */
-  Trigger POVUp(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger POVUp(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                            .GetDefaultButtonLoop()) const;
 
   /**
@@ -98,7 +98,7 @@ class CommandGenericHID {
    * @return a Trigger instance based around the up right direction of a POV on
    * the HID.
    */
-  Trigger POVUpRight(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger POVUpRight(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 
   /**
@@ -111,7 +111,7 @@ class CommandGenericHID {
    * @return a Trigger instance based around the right direction of a POV on the
    * HID.
    */
-  Trigger POVRight(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger POVRight(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                               .GetDefaultButtonLoop()) const;
 
   /**
@@ -122,7 +122,7 @@ class CommandGenericHID {
    * on the HID.
    */
   Trigger POVDownRight(
-      frc::EventLoop* loop =
+      wpi::EventLoop* loop =
           CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 
   /**
@@ -135,7 +135,7 @@ class CommandGenericHID {
    * @return a Trigger instance based around the down direction of a POV on
    * the HID.
    */
-  Trigger POVDown(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger POVDown(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                              .GetDefaultButtonLoop()) const;
 
   /**
@@ -148,7 +148,7 @@ class CommandGenericHID {
    * @return a Trigger instance based around the down left direction of a POV on
    * the HID.
    */
-  Trigger POVDownLeft(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger POVDownLeft(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                  .GetDefaultButtonLoop()) const;
 
   /**
@@ -161,7 +161,7 @@ class CommandGenericHID {
    * @return a Trigger instance based around the left direction of a POV on
    * the HID.
    */
-  Trigger POVLeft(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger POVLeft(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                              .GetDefaultButtonLoop()) const;
 
   /**
@@ -174,7 +174,7 @@ class CommandGenericHID {
    * @return a Trigger instance based around the up left direction of a POV on
    * the HID.
    */
-  Trigger POVUpLeft(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger POVUpLeft(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                .GetDefaultButtonLoop()) const;
 
   /**
@@ -187,7 +187,7 @@ class CommandGenericHID {
    * @return a Trigger instance based around the center position of a POV on the
    * HID.
    */
-  Trigger POVCenter(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger POVCenter(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                .GetDefaultButtonLoop()) const;
 
   /**
@@ -205,7 +205,7 @@ class CommandGenericHID {
    */
   Trigger AxisLessThan(
       int axis, double threshold,
-      frc::EventLoop* loop =
+      wpi::EventLoop* loop =
           CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 
   /**
@@ -223,7 +223,7 @@ class CommandGenericHID {
    */
   Trigger AxisGreaterThan(
       int axis, double threshold,
-      frc::EventLoop* loop =
+      wpi::EventLoop* loop =
           CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 
   /**
@@ -238,7 +238,7 @@ class CommandGenericHID {
    */
   Trigger AxisMagnitudeGreaterThan(
       int axis, double threshold,
-      frc::EventLoop* loop =
+      wpi::EventLoop* loop =
           CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 
   /**
@@ -249,7 +249,7 @@ class CommandGenericHID {
    * @param type  Which rumble value to set
    * @param value The normalized value (0 to 1) to set the rumble to
    */
-  void SetRumble(frc::GenericHID::RumbleType type, double value);
+  void SetRumble(wpi::GenericHID::RumbleType type, double value);
 
   /**
    * Get if the HID is connected.
@@ -259,6 +259,6 @@ class CommandGenericHID {
   bool IsConnected() const;
 
  private:
-  frc::GenericHID m_hid;
+  wpi::GenericHID m_hid;
 };
-}  // namespace frc2
+}  // namespace wpi::cmd

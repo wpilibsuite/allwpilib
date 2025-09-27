@@ -19,7 +19,7 @@
 
 #include <cstdint>
 
-namespace wpi {
+namespace wpi::util {
 
 #ifndef NDEBUG //ifndef LLVM_ENABLE_ABI_BREAKING_CHECKS
 #define LLVM_DEBUGEPOCHBASE_HANDLEBASE_EMPTYBASE
@@ -99,6 +99,6 @@ public:
 
 #endif // LLVM_ENABLE_ABI_BREAKING_CHECKS
 
-} // namespace wpi
+} // namespace wpi::util
 
 #endif

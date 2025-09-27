@@ -11,7 +11,7 @@
 
 #include "wpi/event/BooleanEvent.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 XboxController::XboxController(int port) : GenericHID(port) {
   HAL_ReportUsage("HID", port, "XboxController");
@@ -241,7 +241,7 @@ bool XboxController::GetRightBumperReleased() {
   return GetRawButtonReleased(Button::kRightBumper);
 }
 
-void XboxController::InitSendable(wpi::SendableBuilder& builder) {
+void XboxController::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("HID");
   builder.PublishConstString("ControllerType", "Xbox");
   builder.AddDoubleProperty("LeftTrigger Axis", [this] { return GetLeftTriggerAxis(); }, nullptr);

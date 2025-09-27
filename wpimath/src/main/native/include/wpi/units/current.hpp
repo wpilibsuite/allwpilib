@@ -28,9 +28,9 @@
 
 #include "wpi/units/base.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::current
+ * @namespace wpi::units::current
  * @brief namespace for unit types and containers representing current values
  * @details The SI unit for current is `amperes`, and the corresponding
  *          `base_unit` category is `current_unit`.
@@ -41,10 +41,10 @@ namespace units {
     defined(ENABLE_PREDEFINED_CURRENT_UNITS)
 UNIT_ADD_WITH_METRIC_PREFIXES(
     current, ampere, amperes, A,
-    unit<std::ratio<1>, units::category::current_unit>)
+    unit<std::ratio<1>, wpi::units::category::current_unit>)
 
 UNIT_ADD_CATEGORY_TRAIT(current)
 #endif
 
 using namespace current;
-}  // namespace units
+}  // namespace wpi::units

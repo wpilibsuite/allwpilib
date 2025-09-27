@@ -43,14 +43,14 @@ void HALSimWSProviderAddressableLED::RegisterCallbacks() {
         const HAL_AddressableLEDData* data =
             reinterpret_cast<const HAL_AddressableLEDData*>(buffer);
 
-        std::vector<wpi::json> jsonData;
+        std::vector<wpi::util::json> jsonData;
 
         for (size_t i = 0; i < numLeds; ++i) {
           jsonData.push_back(
               {{"r", data[i].r}, {"g", data[i].g}, {"b", data[i].b}});
         }
 
-        wpi::json payload;
+        wpi::util::json payload;
         payload["<data"] = jsonData;
 
         provider->ProcessHalCallback(payload);

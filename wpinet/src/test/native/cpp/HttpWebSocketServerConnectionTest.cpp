@@ -8,7 +8,7 @@
 
 #include <gtest/gtest.h>
 
-namespace wpi {
+namespace wpi::net {
 
 class HttpWebSocketServerConnectionTest
     : public HttpWebSocketServerConnection<HttpWebSocketServerConnectionTest> {
@@ -24,4 +24,4 @@ class HttpWebSocketServerConnectionTest
   int gotUpgrade = 0;
 };
 
-}  // namespace wpi
+}  // namespace wpi::net

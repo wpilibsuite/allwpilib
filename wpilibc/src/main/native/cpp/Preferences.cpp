@@ -17,7 +17,7 @@
 #include <wpi/ntcore/StringTopic.hpp>
 #include <wpi/util/json.h>
 
-using namespace frc;
+using namespace wpi;
 
 // The Preferences table name
 static constexpr std::string_view kTableName{"Preferences"};
@@ -26,13 +26,13 @@ namespace {
 struct Instance {
   Instance();
 
-  std::shared_ptr<nt::NetworkTable> table{
-      nt::NetworkTableInstance::GetDefault().GetTable(kTableName)};
-  nt::StringPublisher typePublisher{table->GetStringTopic(".type").PublishEx(
-      nt::StringTopic::kTypeString, {{"SmartDashboard", kSmartDashboardType}})};
-  nt::MultiSubscriber tableSubscriber{nt::NetworkTableInstance::GetDefault(),
+  std::shared_ptr<wpi::nt::NetworkTable> table{
+      wpi::nt::NetworkTableInstance::GetDefault().GetTable(kTableName)};
+  wpi::nt::StringPublisher typePublisher{table->GetStringTopic(".type").PublishEx(
+      wpi::nt::StringTopic::kTypeString, {{"SmartDashboard", kSmartDashboardType}})};
+  wpi::nt::MultiSubscriber tableSubscriber{wpi::nt::NetworkTableInstance::GetDefault(),
                                       {{fmt::format("{}/", table->GetPath())}}};
-  nt::NetworkTableListener listener;
+  wpi::nt::NetworkTableListener listener;
 };
 }  // namespace
 
@@ -42,11 +42,11 @@ static Instance& GetInstance() {
 }
 
 #ifndef __FRC_SYSTEMCORE__
-namespace frc::impl {
+namespace wpi::impl {
 void ResetPreferencesInstance() {
   GetInstance() = Instance();
 }
-}  // namespace frc::impl
+}  // namespace wpi::impl
 #endif
 
 std::vector<std::string> Preferences::GetKeys() {
@@ -170,12 +170,12 @@ void Preferences::RemoveAll() {
 
 Instance::Instance() {
   typePublisher.Set(kSmartDashboardType);
-  listener = nt::NetworkTableListener::CreateListener(
+  listener = wpi::nt::NetworkTableListener::CreateListener(
       tableSubscriber, NT_EVENT_PUBLISH | NT_EVENT_IMMEDIATE,
       [typeTopic = typePublisher.GetTopic().GetHandle()](auto& event) {
         if (auto topicInfo = event.GetTopicInfo()) {
           if (topicInfo->topic != typeTopic) {
-            nt::SetTopicPersistent(topicInfo->topic, true);
+            wpi::nt::SetTopicPersistent(topicInfo->topic, true);
           }
         }
       });

@@ -13,7 +13,7 @@
 
 #include "wpi/net/uv/Handle.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 class Loop;
 
@@ -58,9 +58,9 @@ class Prepare final : public HandleImpl<Prepare, uv_prepare_t> {
   /**
    * Signal generated once per loop iteration prior to polling for I/O.
    */
-  sig::Signal<> prepare;
+  wpi::util::sig::Signal<> prepare;
 };
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_PREPARE_HPP_

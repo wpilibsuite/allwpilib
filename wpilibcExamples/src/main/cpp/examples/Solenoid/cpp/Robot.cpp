@@ -9,9 +9,9 @@
 
 Robot::Robot() {
   // Publish elements to shuffleboard.
-  frc::SmartDashboard::PutData("Single Solenoid", &m_solenoid);
-  frc::SmartDashboard::PutData("Double Solenoid", &m_doubleSolenoid);
-  frc::SmartDashboard::PutData("Compressor", &m_compressor);
+  wpi::SmartDashboard::PutData("Single Solenoid", &m_solenoid);
+  wpi::SmartDashboard::PutData("Double Solenoid", &m_doubleSolenoid);
+  wpi::SmartDashboard::PutData("Compressor", &m_compressor);
 }
 
 void Robot::TeleopPeriodic() {
@@ -20,17 +20,17 @@ void Robot::TeleopPeriodic() {
   // Get the pressure (in PSI) from the analog sensor connected to the PH.
   // This function is supported only on the PH!
   // On a PCM, this function will return 0.
-  frc::SmartDashboard::PutNumber("PH Pressure [PSI]",
+  wpi::SmartDashboard::PutNumber("PH Pressure [PSI]",
                                  m_compressor.GetPressure().value());
   // Get compressor current draw.
-  frc::SmartDashboard::PutNumber("Compressor Current",
+  wpi::SmartDashboard::PutNumber("Compressor Current",
                                  m_compressor.GetCurrent().value());
   // Get whether the compressor is active.
-  frc::SmartDashboard::PutBoolean("Compressor Active",
+  wpi::SmartDashboard::PutBoolean("Compressor Active",
                                   m_compressor.IsEnabled());
   // Get the digital pressure switch connected to the PCM/PH.
   // The switch is open when the pressure is over ~120 PSI.
-  frc::SmartDashboard::PutBoolean("Pressure Switch",
+  wpi::SmartDashboard::PutBoolean("Pressure Switch",
                                   m_compressor.GetPressureSwitchValue());
 
   /*
@@ -45,9 +45,9 @@ void Robot::TeleopPeriodic() {
    * If a button is pressed, set the solenoid to the respective channel.
    */
   if (m_stick.GetRawButtonPressed(kDoubleSolenoidForward)) {
-    m_doubleSolenoid.Set(frc::DoubleSolenoid::kForward);
+    m_doubleSolenoid.Set(wpi::DoubleSolenoid::kForward);
   } else if (m_stick.GetRawButtonPressed(kDoubleSolenoidReverse)) {
-    m_doubleSolenoid.Set(frc::DoubleSolenoid::kReverse);
+    m_doubleSolenoid.Set(wpi::DoubleSolenoid::kReverse);
   }
 
   // On button press, toggle the compressor with the mode selected from the
@@ -89,6 +89,6 @@ void Robot::TeleopPeriodic() {
 
 #ifndef RUNNING_FRC_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

@@ -9,7 +9,7 @@
 
 #include "wpi/hardware/servo/Servo.hpp"
 
-namespace frc {
+namespace wpi {
 
 class Servo;
 
@@ -25,7 +25,7 @@ class ServoSim {
   double GetAngle() const;
 
  private:
-  hal::SimDouble m_simPosition;
+  wpi::hal::SimDouble m_simPosition;
 };
 }  // namespace sim
-}  // namespace frc
+}  // namespace wpi

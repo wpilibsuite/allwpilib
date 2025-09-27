@@ -13,7 +13,7 @@
 #include "org_wpilib_hardware_hal_SimDeviceJNI.h"
 #include "wpi/hal/SimDevice.hpp"
 
-using namespace wpi::java;
+using namespace wpi::util::java;
 
 static HAL_Value ValueFromJava(jint type, jlong value1, jdouble value2) {
   HAL_Value value;
@@ -115,7 +115,7 @@ Java_org_wpilib_hardware_hal_SimDeviceJNI_createSimValueEnum
     }
     arr.emplace_back(JStringRef{env, elem}.str());
   }
-  wpi::SmallVector<const char*, 8> carr;
+  wpi::util::SmallVector<const char*, 8> carr;
   for (auto&& val : arr) {
     carr.push_back(val.c_str());
   }
@@ -149,7 +149,7 @@ Java_org_wpilib_hardware_hal_SimDeviceJNI_createSimValueEnumDouble
     arr.emplace_back(JStringRef{env, elem}.str());
   }
 
-  wpi::SmallVector<const char*, 8> carr;
+  wpi::util::SmallVector<const char*, 8> carr;
   for (auto&& val : arr) {
     carr.push_back(val.c_str());
   }
@@ -167,7 +167,7 @@ JNIEXPORT jobject JNICALL
 Java_org_wpilib_hardware_hal_SimDeviceJNI_getSimValue
   (JNIEnv* env, jclass, jint handle)
 {
-  return hal::CreateHALValue(env, HAL_GetSimValue(handle));
+  return wpi::hal::CreateHALValue(env, HAL_GetSimValue(handle));
 }
 
 /*

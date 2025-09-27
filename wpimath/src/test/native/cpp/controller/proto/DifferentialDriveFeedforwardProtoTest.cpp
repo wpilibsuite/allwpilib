@@ -7,7 +7,7 @@
 #include "../../ProtoTestBase.h"
 #include "wpi/math/controller/DifferentialDriveFeedforward.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 struct DifferentialDriveFeedforwardProtoTestData {
   using Type = DifferentialDriveFeedforward;

@@ -18,7 +18,7 @@
 #include "wpi/fields/2024-crescendo.hpp"
 #include "wpi/fields/2025-reefscape.hpp"
 
-using namespace fields;
+using namespace wpi::fields;
 
 static const Field kFields[] = {
     {"2025 Reefscape", GetResource_2025_reefscape_json,
@@ -49,6 +49,6 @@ static const Field kFields[] = {
      GetResource_2018_field_jpg},
 };
 
-std::span<const Field> fields::GetFields() {
+std::span<const Field> wpi::fields::GetFields() {
   return kFields;
 }

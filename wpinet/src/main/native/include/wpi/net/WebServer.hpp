@@ -10,7 +10,7 @@
 #include <memory>
 #include <string_view>
 
-namespace wpi {
+namespace wpi::net {
 
 /**
  * A web server using the HTTP protocol.
@@ -53,6 +53,6 @@ class WebServer {
   std::unique_ptr<Impl> m_impl;
 };
 
-}  // namespace wpi
+}  // namespace wpi::net
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_WEBSERVER_HPP_

@@ -6,11 +6,11 @@
 
 #include "wpi/math/controller/ElevatorFeedforward.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 namespace {
 
-using StructType = wpi::Struct<frc::ElevatorFeedforward>;
+using StructType = wpi::util::Struct<wpi::math::ElevatorFeedforward>;
 
 static constexpr auto Ks = 1.91_V;
 static constexpr auto Kg = 2.29_V;

@@ -23,9 +23,9 @@ class SwerveModule {
   SwerveModule(int driveMotorChannel, int turningMotorChannel,
                int driveEncoderChannelA, int driveEncoderChannelB,
                int turningEncoderChannelA, int turningEncoderChannelB);
-  frc::SwerveModuleState GetState() const;
-  frc::SwerveModulePosition GetPosition() const;
-  void SetDesiredState(frc::SwerveModuleState& state);
+  wpi::math::SwerveModuleState GetState() const;
+  wpi::math::SwerveModulePosition GetPosition() const;
+  void SetDesiredState(wpi::math::SwerveModuleState& state);
 
  private:
   static constexpr double kWheelRadius = 0.0508;
@@ -36,21 +36,21 @@ class SwerveModule {
   static constexpr auto kModuleMaxAngularAcceleration =
       std::numbers::pi * 2_rad_per_s / 1_s;  // radians per second^2
 
-  frc::PWMSparkMax m_driveMotor;
-  frc::PWMSparkMax m_turningMotor;
+  wpi::PWMSparkMax m_driveMotor;
+  wpi::PWMSparkMax m_turningMotor;
 
-  frc::Encoder m_driveEncoder;
-  frc::Encoder m_turningEncoder;
+  wpi::Encoder m_driveEncoder;
+  wpi::Encoder m_turningEncoder;
 
-  frc::PIDController m_drivePIDController{1.0, 0, 0};
-  frc::ProfiledPIDController<units::radians> m_turningPIDController{
+  wpi::math::PIDController m_drivePIDController{1.0, 0, 0};
+  wpi::math::ProfiledPIDController<wpi::units::radians> m_turningPIDController{
       1.0,
       0.0,
       0.0,
       {kModuleMaxAngularVelocity, kModuleMaxAngularAcceleration}};
 
-  frc::SimpleMotorFeedforward<units::meters> m_driveFeedforward{1_V,
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_driveFeedforward{1_V,
                                                                 3_V / 1_mps};
-  frc::SimpleMotorFeedforward<units::radians> m_turnFeedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::radians> m_turnFeedforward{
       1_V, 0.5_V / 1_rad_per_s};
 };

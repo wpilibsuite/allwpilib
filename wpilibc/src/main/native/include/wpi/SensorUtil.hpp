@@ -4,7 +4,7 @@
 
 #pragma once
 
-namespace frc {
+namespace wpi {
 
 /**
  * Stores most recent status information as well as containing utility functions
@@ -63,4 +63,4 @@ class SensorUtil final {
   static int GetNumPwmChannels();
 };
 
-}  // namespace frc
+}  // namespace wpi

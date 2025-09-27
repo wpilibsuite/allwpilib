@@ -23,7 +23,7 @@ class DSCommPacket {
   void DecodeTCP(std::span<const uint8_t> packet);
   void DecodeUDP(std::span<const uint8_t> packet);
   void SendUDPToHALSim(void);
-  void SetupSendBuffer(wpi::raw_uv_ostream& buf);
+  void SetupSendBuffer(wpi::net::raw_uv_ostream& buf);
 
   /* TCP Tags */
   static const uint8_t kGameDataTag = 0x0e;
@@ -51,8 +51,8 @@ class DSCommPacket {
   void SendJoysticks(void);
   void SetControl(uint8_t control, uint8_t request);
   void SetAlliance(uint8_t station_code);
-  void SetupSendHeader(wpi::raw_uv_ostream& buf);
-  void SetupJoystickTag(wpi::raw_uv_ostream& buf);
+  void SetupSendHeader(wpi::net::raw_uv_ostream& buf);
+  void SetupJoystickTag(wpi::net::raw_uv_ostream& buf);
   void ReadMatchtimeTag(std::span<const uint8_t> tagData);
   void ReadJoystickTag(std::span<const uint8_t> data, int index);
   void ReadNewMatchInfoTag(std::span<const uint8_t> data);

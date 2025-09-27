@@ -12,8 +12,8 @@
 #include "wpi/hal/simulation/DriverStationData.hpp"
 #include "wpi/hal/simulation/MockHooks.hpp"
 
-using namespace hal;
-using namespace wpi::java;
+using namespace wpi::hal;
+using namespace wpi::util::java;
 
 extern "C" {
 
@@ -538,9 +538,9 @@ Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setMatchInfo
   JStringRef gameSpecificMessageRef{env, gameSpecificMessage};
 
   HAL_MatchInfo halMatchInfo;
-  wpi::format_to_n_c_str(halMatchInfo.eventName, sizeof(halMatchInfo.eventName),
+  wpi::util::format_to_n_c_str(halMatchInfo.eventName, sizeof(halMatchInfo.eventName),
                          "{}", eventNameRef.str());
-  wpi::format_to_n_c_str(
+  wpi::util::format_to_n_c_str(
       reinterpret_cast<char*>(halMatchInfo.gameSpecificMessage),
       sizeof(halMatchInfo.gameSpecificMessage), "{}",
       gameSpecificMessageRef.str());
@@ -733,7 +733,7 @@ Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setJoystickName
   (JNIEnv* env, jclass, jint stick, jstring name)
 {
   JStringRef nameJString{env, name};
-  auto str = wpi::make_string(nameJString);
+  auto str = wpi::util::make_string(nameJString);
   HALSIM_SetJoystickName(stick, &str);
 }
 
@@ -759,7 +759,7 @@ Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setGameSpecificMess
   (JNIEnv* env, jclass, jstring message)
 {
   JStringRef messageJString{env, message};
-  auto str = wpi::make_string(messageJString);
+  auto str = wpi::util::make_string(messageJString);
   HALSIM_SetGameSpecificMessage(&str);
 }
 
@@ -773,7 +773,7 @@ Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setEventName
   (JNIEnv* env, jclass, jstring name)
 {
   JStringRef nameJString{env, name};
-  auto str = wpi::make_string(nameJString);
+  auto str = wpi::util::make_string(nameJString);
   HALSIM_SetEventName(&str);
 }
 

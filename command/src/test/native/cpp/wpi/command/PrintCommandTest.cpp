@@ -9,7 +9,7 @@
 #include "CommandTestBase.h"
 #include "wpi/command/PrintCommand.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 class PrintCommandTest : public CommandTestBase {};
 
 TEST_F(PrintCommandTest, PrintCommandSchedule) {

@@ -11,7 +11,7 @@
 
 #include "wpi/Errors.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 SerialPort::SerialPort(int baudRate, Port port, int dataBits,
                        SerialPort::Parity parity,
@@ -117,7 +117,7 @@ int SerialPort::Write(std::string_view buffer) {
   return retVal;
 }
 
-void SerialPort::SetTimeout(units::second_t timeout) {
+void SerialPort::SetTimeout(wpi::units::second_t timeout) {
   int32_t status = 0;
   HAL_SetSerialTimeout(m_portHandle, timeout.value(), &status);
   FRC_CheckErrorStatus(status, "SetTimeout");

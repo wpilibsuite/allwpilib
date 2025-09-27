@@ -6,6 +6,6 @@
 
 #include "wpi/hal/Types.hpp"
 
-namespace hal::can {
+namespace wpi::hal::can {
 int32_t GetCANModuleFromHandle(HAL_CANHandle handle, int32_t* status);
-}  // namespace hal::can
+}  // namespace wpi::hal::can

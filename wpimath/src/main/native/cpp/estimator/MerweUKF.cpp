@@ -4,11 +4,11 @@
 
 #include "wpi/math/estimator/MerweUKF.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT)
     UnscentedKalmanFilter<3, 3, 1, MerweScaledSigmaPoints<3>>;
 template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT)
     UnscentedKalmanFilter<5, 3, 3, MerweScaledSigmaPoints<5>>;
 
-}  // namespace frc
+}  // namespace wpi::math

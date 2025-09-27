@@ -9,13 +9,13 @@
 
 #include "wpi/simulation/SimDeviceSim.hpp"
 
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 ServoSim::ServoSim(const Servo& servo) : ServoSim(servo.GetChannel()) {}
 
 ServoSim::ServoSim(int channel) {
-  frc::sim::SimDeviceSim deviceSim{"Servo", channel};
+  wpi::sim::SimDeviceSim deviceSim{"Servo", channel};
   m_simPosition = deviceSim.GetDouble("Position");
 }
 

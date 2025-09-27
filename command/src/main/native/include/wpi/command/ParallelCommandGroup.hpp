@@ -18,7 +18,7 @@
 
 #include "wpi/command/CommandHelper.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 /**
  * A command composition that runs a set of commands in parallel, ending when
  * the last command ends.
@@ -52,7 +52,7 @@ class ParallelCommandGroup
    *
    * @param commands the commands to include in this composition.
    */
-  template <wpi::DecayedDerivedFrom<Command>... Commands>
+  template <wpi::util::DecayedDerivedFrom<Command>... Commands>
   explicit ParallelCommandGroup(Commands&&... commands) {
     AddCommands(std::forward<Commands>(commands)...);
   }
@@ -70,7 +70,7 @@ class ParallelCommandGroup
    *
    * @param commands Commands to add to the group.
    */
-  template <wpi::DecayedDerivedFrom<Command>... Commands>
+  template <wpi::util::DecayedDerivedFrom<Command>... Commands>
   void AddCommands(Commands&&... commands) {
     std::vector<std::unique_ptr<Command>> foo;
     ((void)foo.emplace_back(std::make_unique<std::decay_t<Commands>>(
@@ -100,7 +100,7 @@ class ParallelCommandGroup
       Command::InterruptionBehavior::kCancelIncoming};
   bool isRunning = false;
 };
-}  // namespace frc2
+}  // namespace wpi::cmd
 
 #ifdef _WIN32
 #pragma warning(pop)

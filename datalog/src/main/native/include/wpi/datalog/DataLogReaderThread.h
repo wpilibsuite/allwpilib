@@ -85,27 +85,27 @@ class DataLogReaderThread {
     return it->second;
   }
 
-  wpi::StructDescriptorDatabase& GetStructDatabase() { return m_structDb; }
+  wpi::util::StructDescriptorDatabase& GetStructDatabase() { return m_structDb; }
   upb_DefPool* GetProtobufDatabase() { return m_protoPool; }
   upb_Arena* GetProtobufArena() { return m_arena; }
 
   const wpi::log::DataLogReader& GetReader() const { return m_reader; }
 
   // note: these are called on separate thread
-  wpi::sig::Signal_mt<const DataLogReaderEntry&> sigEntryAdded;
-  wpi::sig::Signal_mt<> sigDone;
+  wpi::util::sig::Signal_mt<const DataLogReaderEntry&> sigEntryAdded;
+  wpi::util::sig::Signal_mt<> sigDone;
 
  private:
   void ReadMain();
 
   wpi::log::DataLogReader m_reader;
-  mutable wpi::mutex m_mutex;
+  mutable wpi::util::mutex m_mutex;
   std::atomic_bool m_active{true};
   std::atomic_bool m_done{false};
   std::atomic<unsigned int> m_numRecords{0};
   std::map<std::string, DataLogReaderEntry, std::less<>> m_entriesByName;
-  wpi::DenseMap<int, DataLogReaderEntry*> m_entriesById;
-  wpi::StructDescriptorDatabase m_structDb;
+  wpi::util::DenseMap<int, DataLogReaderEntry*> m_entriesById;
+  wpi::util::StructDescriptorDatabase m_structDb;
   upb_DefPool* m_protoPool = upb_DefPool_New();
   upb_Arena* m_arena = upb_Arena_New();
   std::thread m_thread;

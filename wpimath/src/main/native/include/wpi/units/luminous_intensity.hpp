@@ -28,9 +28,9 @@
 
 #include "wpi/units/base.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::luminous_intensity
+ * @namespace wpi::units::luminous_intensity
  * @brief namespace for unit types and containers representing
  *        luminous_intensity values
  * @details The SI unit for luminous_intensity is `candelas`, and the
@@ -42,10 +42,10 @@ namespace units {
     defined(ENABLE_PREDEFINED_LUMINOUS_INTENSITY_UNITS)
 UNIT_ADD_WITH_METRIC_PREFIXES(
     luminous_intensity, candela, candelas, cd,
-    unit<std::ratio<1>, units::category::luminous_intensity_unit>)
+    unit<std::ratio<1>, wpi::units::category::luminous_intensity_unit>)
 
 UNIT_ADD_CATEGORY_TRAIT(luminous_intensity)
 #endif
 
 using namespace luminous_intensity;
-}  // namespace units
+}  // namespace wpi::units

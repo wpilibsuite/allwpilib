@@ -28,9 +28,9 @@
 
 #include "wpi/units/base.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::frequency
+ * @namespace wpi::units::frequency
  * @brief namespace for unit types and containers representing frequency values
  * @details The SI unit for frequency is `hertz`, and the corresponding
  *          `base_unit` category is `frequency_unit`.
@@ -41,10 +41,10 @@ namespace units {
     defined(ENABLE_PREDEFINED_FREQUENCY_UNITS)
 UNIT_ADD_WITH_METRIC_PREFIXES(
     frequency, hertz, hertz, Hz,
-    unit<std::ratio<1>, units::category::frequency_unit>)
+    unit<std::ratio<1>, wpi::units::category::frequency_unit>)
 
 UNIT_ADD_CATEGORY_TRAIT(frequency)
 #endif
 
 using namespace frequency;
-}  // namespace units
+}  // namespace wpi::units

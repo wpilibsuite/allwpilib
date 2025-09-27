@@ -14,7 +14,7 @@
 
 #include "wpi/net/uv/Handle.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 class Loop;
 
@@ -106,7 +106,7 @@ class Poll final : public HandleImpl<Poll, uv_poll_t> {
   /**
    * Signal generated when a poll event occurs.
    */
-  sig::Signal<int> pollEvent;
+  wpi::util::sig::Signal<int> pollEvent;
 
  private:
   struct ReuseData {
@@ -118,6 +118,6 @@ class Poll final : public HandleImpl<Poll, uv_poll_t> {
   std::unique_ptr<ReuseData> m_reuseData;
 };
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_POLL_HPP_

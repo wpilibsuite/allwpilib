@@ -11,7 +11,7 @@
 
 #include "wpi/event/BooleanEvent.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 PS4Controller::PS4Controller(int port) : GenericHID(port) {
   HAL_ReportUsage("HID", port, "PS4Controller");
@@ -277,7 +277,7 @@ bool PS4Controller::GetTouchpadReleased() {
   return GetRawButtonReleased(Button::kTouchpad);
 }
 
-void PS4Controller::InitSendable(wpi::SendableBuilder& builder) {
+void PS4Controller::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("HID");
   builder.PublishConstString("ControllerType", "PS4");
   builder.AddDoubleProperty("L2 Axis", [this] { return GetL2Axis(); }, nullptr);

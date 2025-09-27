@@ -26,7 +26,7 @@ class RobotContainer {
  public:
   RobotContainer();
 
-  frc2::Command* GetAutonomousCommand();
+  wpi::cmd::Command* GetAutonomousCommand();
 
  private:
   // The robot's subsystems and commands are defined here...
@@ -41,10 +41,10 @@ class RobotContainer {
   ComplexAuto m_complexAuto{&m_drive, &m_hatch};
 
   // The chooser for the autonomous routines
-  frc::SendableChooser<frc2::Command*> m_chooser;
+  wpi::SendableChooser<wpi::cmd::Command*> m_chooser;
 
   // The driver's controller
-  frc::XboxController m_driverController{OIConstants::kDriverControllerPort};
+  wpi::XboxController m_driverController{OIConstants::kDriverControllerPort};
 
   void ConfigureButtonBindings();
 };

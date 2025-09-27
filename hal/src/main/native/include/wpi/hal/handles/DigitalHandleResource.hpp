@@ -15,7 +15,7 @@
 #include "wpi/hal/Types.hpp"
 #include "wpi/hal/handles/HandlesInternal.hpp"
 
-namespace hal {
+namespace wpi::hal {
 
 /**
  * The DigitalHandleResource class is a way to track handles. This version
@@ -49,7 +49,7 @@ class DigitalHandleResource : public HandleBase {
 
  private:
   std::array<std::shared_ptr<TStruct>, size> m_structures;
-  std::array<wpi::mutex, size> m_handleMutexes;
+  std::array<wpi::util::mutex, size> m_handleMutexes;
 };
 
 template <typename THandle, typename TStruct, int16_t size>
@@ -71,7 +71,7 @@ DigitalHandleResource<THandle, TStruct, size>::Allocate(
   }
   m_structures[index] = std::make_shared<TStruct>();
   *handle =
-      static_cast<THandle>(hal::createHandle(index, enumValue, m_version));
+      static_cast<THandle>(wpi::hal::createHandle(index, enumValue, m_version));
   *status = HAL_SUCCESS;
   return m_structures[index];
 }
@@ -111,4 +111,4 @@ void DigitalHandleResource<THandle, TStruct, size>::ResetHandles() {
   }
   HandleBase::ResetHandles();
 }
-}  // namespace hal
+}  // namespace wpi::hal

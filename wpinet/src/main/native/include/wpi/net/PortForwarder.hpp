@@ -10,7 +10,7 @@
 #include <memory>
 #include <string_view>
 
-namespace wpi {
+namespace wpi::net {
 
 /**
  * Forward ports to another host.  This is primarily useful for accessing
@@ -54,6 +54,6 @@ class PortForwarder {
   std::unique_ptr<Impl> m_impl;
 };
 
-}  // namespace wpi
+}  // namespace wpi::net
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_PORTFORWARDER_HPP_

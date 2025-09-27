@@ -13,7 +13,7 @@
 #include <cstring>
 #endif
 
-namespace wpi {
+namespace wpi::net {
 
 int SocketErrno() {
 #ifdef _WIN32
@@ -36,4 +36,4 @@ std::string SocketStrerror(int code) {
 #endif
 }
 
-}  // namespace wpi
+}  // namespace wpi::net

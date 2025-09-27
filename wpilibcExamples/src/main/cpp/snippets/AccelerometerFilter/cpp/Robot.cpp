@@ -12,27 +12,27 @@
  * Accelerometer filtering snippets for frc-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/accelerometers-software.html
  */
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   void RobotPeriodic() override {
-    units::meters_per_second_squared_t XAccel = m_accelerometer.GetAccelX();
+    wpi::units::meters_per_second_squared_t XAccel = m_accelerometer.GetAccelX();
     // Get the filtered X acceleration
-    units::meters_per_second_squared_t filteredXAccel =
+    wpi::units::meters_per_second_squared_t filteredXAccel =
         m_xAccelFilter.Calculate(XAccel);
 
-    frc::SmartDashboard::PutNumber("X Acceleration", XAccel.value());
-    frc::SmartDashboard::PutNumber("Filtered X Acceleration",
+    wpi::SmartDashboard::PutNumber("X Acceleration", XAccel.value());
+    wpi::SmartDashboard::PutNumber("Filtered X Acceleration",
                                    filteredXAccel.value());
   }
 
  private:
-  frc::OnboardIMU m_accelerometer{frc::OnboardIMU::MountOrientation::kFlat};
-  frc::LinearFilter<units::meters_per_second_squared_t> m_xAccelFilter =
-      frc::LinearFilter<units::meters_per_second_squared_t>::MovingAverage(10);
+  wpi::OnboardIMU m_accelerometer{wpi::OnboardIMU::MountOrientation::kFlat};
+  wpi::math::LinearFilter<wpi::units::meters_per_second_squared_t> m_xAccelFilter =
+      wpi::math::LinearFilter<wpi::units::meters_per_second_squared_t>::MovingAverage(10);
 };
 
 #ifndef RUNNING_FRC_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

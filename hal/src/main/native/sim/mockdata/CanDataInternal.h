@@ -7,7 +7,7 @@
 #include "wpi/hal/simulation/CanData.hpp"
 #include "wpi/hal/simulation/SimCallbackRegistry.hpp"
 
-namespace hal {
+namespace wpi::hal {
 
 class CanData {
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(SendMessage)
@@ -36,4 +36,4 @@ class CanData {
 
 extern CanData* SimCanData;
 
-}  // namespace hal
+}  // namespace wpi::hal

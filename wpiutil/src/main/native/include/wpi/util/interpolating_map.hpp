@@ -7,7 +7,7 @@
 #include <map>
 #include <utility>
 
-namespace wpi {
+namespace wpi::util {
 
 /**
  * Implements a table of key-value pairs with linear interpolation between
@@ -84,4 +84,4 @@ class interpolating_map {
   std::map<Key, Value> m_container;
 };
 
-}  // namespace wpi
+}  // namespace wpi::util

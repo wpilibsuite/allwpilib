@@ -6,7 +6,7 @@
 
 #include <atomic>
 
-namespace hal::init {
+namespace wpi::hal::init {
 extern std::atomic_bool HAL_IsInitialized;
 extern void RunInitialize();
 inline void CheckInit() {
@@ -59,4 +59,4 @@ extern void InitializeSerialPort();
 extern void InitializeSimDevice();
 extern void InitializeThreads();
 
-}  // namespace hal::init
+}  // namespace wpi::hal::init

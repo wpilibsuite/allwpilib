@@ -6,7 +6,7 @@
 
 #include <utility>
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 RunCommand::RunCommand(std::function<void()> toRun, Requirements requirements)
     : CommandHelper([] {}, std::move(toRun), [](bool interrupted) {},

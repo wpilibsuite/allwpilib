@@ -12,10 +12,10 @@
 #include "mrc/NetComm.h"
 
 template <>
-struct wpi::Protobuf<mrc::JoystickDescriptor> {
+struct wpi::util::Protobuf<mrc::JoystickDescriptor> {
   using MessageStruct = mrc_proto_ProtobufJoystickDescriptor;
-  using InputStream = wpi::ProtoInputStream<mrc::JoystickDescriptor>;
-  using OutputStream = wpi::ProtoOutputStream<mrc::JoystickDescriptor>;
+  using InputStream = wpi::util::ProtoInputStream<mrc::JoystickDescriptor>;
+  using OutputStream = wpi::util::ProtoOutputStream<mrc::JoystickDescriptor>;
   static std::optional<mrc::JoystickDescriptor> Unpack(InputStream& Stream);
   static bool Pack(OutputStream& Stream, const mrc::JoystickDescriptor& Value);
 };

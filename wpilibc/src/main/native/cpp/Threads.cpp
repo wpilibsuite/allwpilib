@@ -8,7 +8,7 @@
 
 #include "wpi/Errors.hpp"
 
-namespace frc {
+namespace wpi {
 
 int GetThreadPriority(std::thread& thread, bool* isRealTime) {
   int32_t status = 0;
@@ -44,4 +44,4 @@ bool SetCurrentThreadPriority(bool realTime, int priority) {
   return ret;
 }
 
-}  // namespace frc
+}  // namespace wpi

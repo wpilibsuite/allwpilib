@@ -6,11 +6,11 @@
 
 #include "mockdata/RoboRioDataInternal.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializePower() {}
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 // TODO: Fix the naming in here
 extern "C" {

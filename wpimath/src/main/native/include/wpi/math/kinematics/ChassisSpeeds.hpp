@@ -11,7 +11,7 @@
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/velocity.hpp"
 
-namespace frc {
+namespace wpi::math {
 /**
  * Represents the speed of a robot chassis. Although this struct contains
  * similar members compared to a Twist2d, they do NOT represent the same thing.
@@ -26,17 +26,17 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
   /**
    * Velocity along the x-axis. (Fwd is +)
    */
-  units::meters_per_second_t vx = 0_mps;
+  wpi::units::meters_per_second_t vx = 0_mps;
 
   /**
    * Velocity along the y-axis. (Left is +)
    */
-  units::meters_per_second_t vy = 0_mps;
+  wpi::units::meters_per_second_t vy = 0_mps;
 
   /**
    * Represents the angular velocity of the robot frame. (CCW is +)
    */
-  units::radians_per_second_t omega = 0_rad_per_s;
+  wpi::units::radians_per_second_t omega = 0_rad_per_s;
 
   /**
    * Creates a Twist2d from ChassisSpeeds.
@@ -45,7 +45,7 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
    *
    * @return Twist2d.
    */
-  constexpr Twist2d ToTwist2d(units::second_t dt) const {
+  constexpr Twist2d ToTwist2d(wpi::units::second_t dt) const {
     return Twist2d{vx * dt, vy * dt, omega * dt};
   }
 
@@ -68,7 +68,7 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
    * @param dt The duration of the timestep the speeds should be applied for.
    * @return Discretized ChassisSpeeds.
    */
-  constexpr ChassisSpeeds Discretize(units::second_t dt) const {
+  constexpr ChassisSpeeds Discretize(wpi::units::second_t dt) const {
     // Construct the desired pose after a timestep, relative to the current
     // pose. The desired pose has decoupled translation and rotation.
     Transform2d desiredTransform{vx * dt, vy * dt, omega * dt};
@@ -95,10 +95,10 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
   constexpr ChassisSpeeds ToRobotRelative(const Rotation2d& robotAngle) const {
     // CW rotation into chassis frame
     auto rotated =
-        Translation2d{units::meter_t{vx.value()}, units::meter_t{vy.value()}}
+        Translation2d{wpi::units::meter_t{vx.value()}, wpi::units::meter_t{vy.value()}}
             .RotateBy(-robotAngle);
-    return {units::meters_per_second_t{rotated.X().value()},
-            units::meters_per_second_t{rotated.Y().value()}, omega};
+    return {wpi::units::meters_per_second_t{rotated.X().value()},
+            wpi::units::meters_per_second_t{rotated.Y().value()}, omega};
   }
 
   /**
@@ -115,10 +115,10 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
   constexpr ChassisSpeeds ToFieldRelative(const Rotation2d& robotAngle) const {
     // CCW rotation out of chassis frame
     auto rotated =
-        Translation2d{units::meter_t{vx.value()}, units::meter_t{vy.value()}}
+        Translation2d{wpi::units::meter_t{vx.value()}, wpi::units::meter_t{vy.value()}}
             .RotateBy(robotAngle);
-    return {units::meters_per_second_t{rotated.X().value()},
-            units::meters_per_second_t{rotated.Y().value()}, omega};
+    return {wpi::units::meters_per_second_t{rotated.X().value()},
+            wpi::units::meters_per_second_t{rotated.Y().value()}, omega};
   }
 
   /**
@@ -195,7 +195,7 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
    */
   constexpr bool operator==(const ChassisSpeeds& other) const = default;
 };
-}  // namespace frc
+}  // namespace wpi::math
 
 #include "wpi/math/kinematics/proto/ChassisSpeedsProto.hpp"
 #include "wpi/math/kinematics/struct/ChassisSpeedsStruct.hpp"

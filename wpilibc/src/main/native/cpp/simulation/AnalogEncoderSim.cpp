@@ -7,10 +7,10 @@
 #include "wpi/hardware/rotation/AnalogEncoder.hpp"
 #include "wpi/simulation/SimDeviceSim.hpp"
 
-using namespace frc::sim;
+using namespace wpi::sim;
 
-AnalogEncoderSim::AnalogEncoderSim(const frc::AnalogEncoder& encoder) {
-  frc::sim::SimDeviceSim deviceSim{"AnalogEncoder", encoder.GetChannel()};
+AnalogEncoderSim::AnalogEncoderSim(const wpi::AnalogEncoder& encoder) {
+  wpi::sim::SimDeviceSim deviceSim{"AnalogEncoder", encoder.GetChannel()};
   m_positionSim = deviceSim.GetDouble("Position");
 }
 

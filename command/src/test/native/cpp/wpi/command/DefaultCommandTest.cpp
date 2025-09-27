@@ -8,7 +8,7 @@
 #include "wpi/command/Commands.hpp"
 #include "wpi/command/RunCommand.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 class DefaultCommandTest : public CommandTestBase {};
 
 TEST_F(DefaultCommandTest, DefaultCommandSchedule) {

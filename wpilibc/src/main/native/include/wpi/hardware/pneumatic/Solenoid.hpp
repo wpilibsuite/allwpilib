@@ -14,7 +14,7 @@
 #include "wpi/hardware/pneumatic/PneumaticsBase.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Solenoid class for running high voltage Digital Output on a pneumatics
@@ -23,7 +23,7 @@ namespace frc {
  * The Solenoid class is typically used for pneumatics solenoids, but could be
  * used for any device within the current spec of the module.
  */
-class Solenoid : public wpi::Sendable, public wpi::SendableHelper<Solenoid> {
+class Solenoid : public wpi::util::Sendable, public wpi::util::SendableHelper<Solenoid> {
  public:
   /**
    * Constructs a solenoid for a specified module and type.
@@ -101,7 +101,7 @@ class Solenoid : public wpi::Sendable, public wpi::SendableHelper<Solenoid> {
    *
    * @see startPulse()
    */
-  void SetPulseDuration(units::second_t duration);
+  void SetPulseDuration(wpi::units::second_t duration);
 
   /**
    * %Trigger the pneumatics module to generate a pulse of the duration set in
@@ -111,7 +111,7 @@ class Solenoid : public wpi::Sendable, public wpi::SendableHelper<Solenoid> {
    */
   void StartPulse();
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
   std::shared_ptr<PneumaticsBase> m_module;
@@ -119,4 +119,4 @@ class Solenoid : public wpi::Sendable, public wpi::SendableHelper<Solenoid> {
   int m_channel;
 };
 
-}  // namespace frc
+}  // namespace wpi

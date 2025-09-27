@@ -24,7 +24,7 @@
 #include "PropertyContainer.h"
 #include "wpi/cscore/cscore_cpp.hpp"
 
-namespace cs {
+namespace wpi::cs {
 
 class Notifier;
 class Telemetry;
@@ -33,7 +33,7 @@ class SourceImpl : public PropertyContainer {
   friend class Frame;
 
  public:
-  SourceImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
+  SourceImpl(std::string_view name, wpi::util::Logger& logger, Notifier& notifier,
              Telemetry& telemetry);
   ~SourceImpl() override;
   SourceImpl(const SourceImpl& oth) = delete;
@@ -44,7 +44,7 @@ class SourceImpl : public PropertyContainer {
   std::string_view GetName() const { return m_name; }
 
   void SetDescription(std::string_view description);
-  std::string_view GetDescription(wpi::SmallVectorImpl<char>& buf) const;
+  std::string_view GetDescription(wpi::util::SmallVectorImpl<char>& buf) const;
 
   void SetConnectionStrategy(CS_ConnectionStrategy strategy) {
     m_strategy = static_cast<int>(strategy);
@@ -127,9 +127,9 @@ class SourceImpl : public PropertyContainer {
   virtual bool SetFPS(int fps, CS_Status* status);
 
   bool SetConfigJson(std::string_view config, CS_Status* status);
-  virtual bool SetConfigJson(const wpi::json& config, CS_Status* status);
+  virtual bool SetConfigJson(const wpi::util::json& config, CS_Status* status);
   std::string GetConfigJson(CS_Status* status);
-  virtual wpi::json GetConfigJsonObject(CS_Status* status);
+  virtual wpi::util::json GetConfigJsonObject(CS_Status* status);
 
   std::vector<VideoMode> EnumerateVideoModes(CS_Status* status) const;
 
@@ -160,7 +160,7 @@ class SourceImpl : public PropertyContainer {
   // Current video mode
   mutable VideoMode m_mode;
 
-  wpi::Logger& m_logger;
+  wpi::util::Logger& m_logger;
   Notifier& m_notifier;
   Telemetry& m_telemetry;
 
@@ -175,13 +175,13 @@ class SourceImpl : public PropertyContainer {
   std::atomic_int m_strategy{CS_CONNECTION_AUTO_MANAGE};
   std::atomic_int m_numSinksEnabled{0};
 
-  wpi::mutex m_frameMutex;
-  wpi::condition_variable m_frameCv;
+  wpi::util::mutex m_frameMutex;
+  wpi::util::condition_variable m_frameCv;
 
   bool m_destroyFrames{false};
 
   // Pool of frames/images to reduce malloc traffic.
-  wpi::mutex m_poolMutex;
+  wpi::util::mutex m_poolMutex;
   std::vector<std::unique_ptr<Frame::Impl>> m_framesAvail;
   std::vector<std::unique_ptr<Image>> m_imagesAvail;
 
@@ -194,6 +194,6 @@ class SourceImpl : public PropertyContainer {
   Frame m_frame;
 };
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_SOURCEIMPL_H_

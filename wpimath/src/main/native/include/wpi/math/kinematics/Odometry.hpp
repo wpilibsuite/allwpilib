@@ -11,7 +11,7 @@
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/kinematics/Kinematics.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * Class for odometry. Robot code should not use this directly- Instead, use the
@@ -140,4 +140,4 @@ class WPILIB_DLLEXPORT Odometry {
   Rotation2d m_gyroOffset;
 };
 
-}  // namespace frc
+}  // namespace wpi::math

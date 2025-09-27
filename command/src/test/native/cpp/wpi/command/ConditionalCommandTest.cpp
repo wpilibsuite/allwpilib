@@ -10,7 +10,7 @@
 #include "wpi/command/ConditionalCommand.hpp"
 #include "wpi/command/InstantCommand.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 class ConditionalCommandTest : public CommandTestBase {};
 
 TEST_F(ConditionalCommandTest, ConditionalCommandSchedule) {

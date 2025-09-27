@@ -7,28 +7,28 @@
 namespace {
 constexpr size_t kFrontLeftOff = 0;
 constexpr size_t kFrontRightOff =
-    kFrontLeftOff + wpi::GetStructSize<frc::Translation2d>();
+    kFrontLeftOff + wpi::util::GetStructSize<wpi::math::Translation2d>();
 constexpr size_t kRearLeftOff =
-    kFrontRightOff + wpi::GetStructSize<frc::Translation2d>();
+    kFrontRightOff + wpi::util::GetStructSize<wpi::math::Translation2d>();
 constexpr size_t kRearRightOff =
-    kRearLeftOff + wpi::GetStructSize<frc::Translation2d>();
+    kRearLeftOff + wpi::util::GetStructSize<wpi::math::Translation2d>();
 }  // namespace
 
-using StructType = wpi::Struct<frc::MecanumDriveKinematics>;
+using StructType = wpi::util::Struct<wpi::math::MecanumDriveKinematics>;
 
-frc::MecanumDriveKinematics StructType::Unpack(std::span<const uint8_t> data) {
-  return frc::MecanumDriveKinematics{
-      wpi::UnpackStruct<frc::Translation2d, kFrontLeftOff>(data),
-      wpi::UnpackStruct<frc::Translation2d, kFrontRightOff>(data),
-      wpi::UnpackStruct<frc::Translation2d, kRearLeftOff>(data),
-      wpi::UnpackStruct<frc::Translation2d, kRearRightOff>(data),
+wpi::math::MecanumDriveKinematics StructType::Unpack(std::span<const uint8_t> data) {
+  return wpi::math::MecanumDriveKinematics{
+      wpi::util::UnpackStruct<wpi::math::Translation2d, kFrontLeftOff>(data),
+      wpi::util::UnpackStruct<wpi::math::Translation2d, kFrontRightOff>(data),
+      wpi::util::UnpackStruct<wpi::math::Translation2d, kRearLeftOff>(data),
+      wpi::util::UnpackStruct<wpi::math::Translation2d, kRearRightOff>(data),
   };
 }
 
 void StructType::Pack(std::span<uint8_t> data,
-                      const frc::MecanumDriveKinematics& value) {
-  wpi::PackStruct<kFrontLeftOff>(data, value.GetFrontLeft());
-  wpi::PackStruct<kFrontRightOff>(data, value.GetFrontRight());
-  wpi::PackStruct<kRearLeftOff>(data, value.GetRearLeft());
-  wpi::PackStruct<kRearRightOff>(data, value.GetRearRight());
+                      const wpi::math::MecanumDriveKinematics& value) {
+  wpi::util::PackStruct<kFrontLeftOff>(data, value.GetFrontLeft());
+  wpi::util::PackStruct<kFrontRightOff>(data, value.GetFrontRight());
+  wpi::util::PackStruct<kRearLeftOff>(data, value.GetRearLeft());
+  wpi::util::PackStruct<kRearRightOff>(data, value.GetRearRight());
 }

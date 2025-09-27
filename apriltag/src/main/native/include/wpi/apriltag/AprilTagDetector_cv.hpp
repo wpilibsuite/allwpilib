@@ -8,11 +8,11 @@
 
 #include "wpi/apriltag/AprilTagDetector.hpp"
 
-namespace frc {
+namespace wpi::apriltag {
 
 inline AprilTagDetector::Results AprilTagDetect(AprilTagDetector& detector,
                                                 cv::Mat& image) {
   return detector.Detect(image.cols, image.rows, image.data);
 }
 
-}  // namespace frc
+}  // namespace wpi::apriltag

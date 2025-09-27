@@ -21,8 +21,8 @@
 #include "wpi/hal/DriverStation.hpp"
 #include "wpi/hal/Main.hpp"
 
-using namespace hal;
-using namespace wpi::java;
+using namespace wpi::hal;
+using namespace wpi::util::java;
 
 extern "C" {
 

@@ -7,7 +7,7 @@
 #include "CommandTestBase.h"
 #include "wpi/command/RunCommand.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 class RunCommandTest : public CommandTestBase {};
 
 TEST_F(RunCommandTest, RunCommandSchedule) {

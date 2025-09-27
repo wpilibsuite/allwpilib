@@ -29,7 +29,7 @@ class RapidReactCommandBot {
    *
    * <p>Should be called in the robot class constructor.
    *
-   * <p>Event binding methods are available on the frc2::Trigger class.
+   * <p>Event binding methods are available on the wpi::cmd::Trigger class.
    */
   void ConfigureBindings();
 
@@ -38,7 +38,7 @@ class RapidReactCommandBot {
    *
    * <p>Scheduled during Robot::AutonomousInit().
    */
-  frc2::CommandPtr GetAutonomousCommand();
+  wpi::cmd::CommandPtr GetAutonomousCommand();
 
  private:
   // The robot's subsystems
@@ -49,6 +49,6 @@ class RapidReactCommandBot {
   Pneumatics m_pneumatics;
 
   // The driver's controller
-  frc2::CommandXboxController m_driverController{
+  wpi::cmd::CommandXboxController m_driverController{
       OIConstants::kDriverControllerPort};
 };

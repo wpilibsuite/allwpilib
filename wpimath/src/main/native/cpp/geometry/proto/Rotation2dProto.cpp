@@ -6,20 +6,20 @@
 
 #include "wpimath/protobuf/geometry2d.npb.h"
 
-std::optional<frc::Rotation2d> wpi::Protobuf<frc::Rotation2d>::Unpack(
+std::optional<wpi::math::Rotation2d> wpi::util::Protobuf<wpi::math::Rotation2d>::Unpack(
     InputStream& stream) {
   wpi_proto_ProtobufRotation2d msg;
   if (!stream.Decode(msg)) {
     return {};
   }
 
-  return frc::Rotation2d{
-      units::radian_t{msg.value},
+  return wpi::math::Rotation2d{
+      wpi::units::radian_t{msg.value},
   };
 }
 
-bool wpi::Protobuf<frc::Rotation2d>::Pack(OutputStream& stream,
-                                          const frc::Rotation2d& value) {
+bool wpi::util::Protobuf<wpi::math::Rotation2d>::Pack(OutputStream& stream,
+                                          const wpi::math::Rotation2d& value) {
   wpi_proto_ProtobufRotation2d msg{
       .value = value.Radians().value(),
   };

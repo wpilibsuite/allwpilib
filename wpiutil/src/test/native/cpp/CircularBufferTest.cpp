@@ -19,7 +19,7 @@ static const std::array<double, 8> pushBackOut = {
     {342.657, 234.252, 716.126, 132.344, 445.697, 22.727, 421.125, 799.913}};
 
 TEST(CircularBufferTest, PushFront) {
-  wpi::circular_buffer<double> queue(8);
+  wpi::util::circular_buffer<double> queue(8);
 
   for (auto& value : values) {
     queue.push_front(value);
@@ -31,7 +31,7 @@ TEST(CircularBufferTest, PushFront) {
 }
 
 TEST(CircularBufferTest, PushBack) {
-  wpi::circular_buffer<double> queue(8);
+  wpi::util::circular_buffer<double> queue(8);
 
   for (auto& value : values) {
     queue.push_back(value);
@@ -43,7 +43,7 @@ TEST(CircularBufferTest, PushBack) {
 }
 
 TEST(CircularBufferTest, EmplaceFront) {
-  wpi::circular_buffer<double> queue(8);
+  wpi::util::circular_buffer<double> queue(8);
 
   for (auto& value : values) {
     queue.emplace_front(value);
@@ -55,7 +55,7 @@ TEST(CircularBufferTest, EmplaceFront) {
 }
 
 TEST(CircularBufferTest, EmplaceBack) {
-  wpi::circular_buffer<double> queue(8);
+  wpi::util::circular_buffer<double> queue(8);
 
   for (auto& value : values) {
     queue.emplace_back(value);
@@ -67,7 +67,7 @@ TEST(CircularBufferTest, EmplaceBack) {
 }
 
 TEST(CircularBufferTest, PushPop) {
-  wpi::circular_buffer<double> queue(3);
+  wpi::util::circular_buffer<double> queue(3);
 
   // Insert three elements into the buffer
   queue.push_back(1.0);
@@ -110,7 +110,7 @@ TEST(CircularBufferTest, PushPop) {
 }
 
 TEST(CircularBufferTest, Reset) {
-  wpi::circular_buffer<double> queue(5);
+  wpi::util::circular_buffer<double> queue(5);
 
   for (size_t i = 1; i < 6; ++i) {
     queue.push_back(i);
@@ -122,7 +122,7 @@ TEST(CircularBufferTest, Reset) {
 }
 
 TEST(CircularBufferTest, Resize) {
-  wpi::circular_buffer<double> queue(5);
+  wpi::util::circular_buffer<double> queue(5);
 
   /* Buffer contains {1, 2, 3, _, _}
    *                  ^ front
@@ -228,7 +228,7 @@ TEST(CircularBufferTest, Resize) {
 }
 
 TEST(CircularBufferTest, Iterator) {
-  wpi::circular_buffer<double> queue(3);
+  wpi::util::circular_buffer<double> queue(3);
 
   queue.push_back(1.0);
   queue.push_back(2.0);

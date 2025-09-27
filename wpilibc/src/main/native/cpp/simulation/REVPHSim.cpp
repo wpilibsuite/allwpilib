@@ -10,8 +10,8 @@
 
 #include "wpi/SensorUtil.hpp"
 
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 REVPHSim::REVPHSim() : PneumaticsBaseSim{SensorUtil::GetDefaultREVPHModule()} {}
 

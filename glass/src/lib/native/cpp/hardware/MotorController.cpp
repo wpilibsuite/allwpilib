@@ -9,9 +9,9 @@
 
 #include "wpi/glass/DataSource.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
-void glass::DisplayMotorController(MotorControllerModel* m) {
+void wpi::glass::DisplayMotorController(MotorControllerModel* m) {
   // Get duty cycle data from the model and do not display anything if the data
   // is null.
   auto dc = m->GetPercentData();

@@ -13,7 +13,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace wpi {
+namespace wpi::util {
 
 /**
  * StringMap is a sorted associative container that contains key-value pairs
@@ -767,11 +767,11 @@ class StringMap : public std::map<std::string, T, std::less<>, Allocator> {
   }
 };
 
-}  // namespace wpi
+}  // namespace wpi::util
 
 namespace std {
 template <typename T>
-inline void swap(wpi::StringMap<T>& lhs, wpi::StringMap<T>& rhs) {
+inline void swap(wpi::util::StringMap<T>& lhs, wpi::util::StringMap<T>& rhs) {
   lhs.swap(rhs);
 }
 }  // namespace std

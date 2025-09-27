@@ -14,8 +14,8 @@
 #include "wpi/hal/CANAPI.hpp"
 #include "wpi/hal/Errors.hpp"
 
-using namespace hal;
-using namespace wpi::java;
+using namespace wpi::hal;
+using namespace wpi::util::java;
 
 extern "C" {
 

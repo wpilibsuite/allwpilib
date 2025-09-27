@@ -5,7 +5,7 @@
 #include "wpi/apriltag/AprilTagDetector.hpp"
 
 int main() {
-  frc::AprilTagDetector detector;
+  wpi::apriltag::AprilTagDetector detector;
   detector.AddFamily("tag16h5");
   detector.SetConfig({.refineEdges = false});
 }

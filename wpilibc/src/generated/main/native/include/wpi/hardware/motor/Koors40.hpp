@@ -8,7 +8,7 @@
 
 #include "wpi/hardware/motor/PWMMotorController.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * AndyMark Koors40 Motor Controller with PWM control.
@@ -40,4 +40,4 @@ class Koors40 : public PWMMotorController {
   Koors40& operator=(Koors40&&) = default;
 };
 
-}  // namespace frc
+}  // namespace wpi

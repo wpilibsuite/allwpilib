@@ -19,7 +19,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace wpi {
+namespace wpi::util {
 
 /// An efficient, type-erasing, non-owning reference to a callable. This is
 /// intended for use as the type of a function parameter that is not used
@@ -61,6 +61,6 @@ class function_ref<Ret(Params...)> {
   explicit operator bool() const { return callback; }
 };
 
-}  // namespace wpi
+}  // namespace wpi::util
 
 #endif  // WPIUTIL_WPI_FUNCTION_REF_H_

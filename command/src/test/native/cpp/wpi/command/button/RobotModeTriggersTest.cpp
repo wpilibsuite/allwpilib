@@ -9,8 +9,8 @@
 #include "wpi/command/button/RobotModeTriggers.hpp"
 #include "wpi/command/button/Trigger.hpp"
 
-using namespace frc2;
-using namespace frc::sim;
+using namespace wpi::cmd;
+using namespace wpi::sim;
 class RobotModeTriggersTest : public CommandTestBase {};
 
 TEST(RobotModeTriggersTest, Autonomous) {

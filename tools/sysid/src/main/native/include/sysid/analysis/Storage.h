@@ -23,14 +23,14 @@ struct MotorData {
   // Timestamps are not necessarily aligned!
   struct Run {
     template <typename T>
-      requires std::is_arithmetic_v<T> || units::traits::is_unit_t_v<T>
+      requires std::is_arithmetic_v<T> || wpi::units::traits::is_unit_t_v<T>
     struct Sample {
-      Sample(units::second_t time, T measurement)
+      Sample(wpi::units::second_t time, T measurement)
           : time{time}, measurement{measurement} {}
-      units::second_t time;
+      wpi::units::second_t time;
       T measurement;
     };
-    std::vector<Sample<units::volt_t>> voltage;
+    std::vector<Sample<wpi::units::volt_t>> voltage;
     std::vector<Sample<double>> position;
     std::vector<Sample<double>> velocity;
   };
@@ -41,7 +41,7 @@ struct MotorData {
 struct TestData {
   std::string distanceUnit;
   AnalysisType mechanismType;
-  wpi::StringMap<MotorData> motorData;
+  wpi::util::StringMap<MotorData> motorData;
 };
 
 /**
@@ -52,7 +52,7 @@ struct PreparedData {
   /**
    * The timestamp of the data point.
    */
-  units::second_t timestamp;
+  wpi::units::second_t timestamp;
 
   /**
    * The voltage of the data point.
@@ -72,7 +72,7 @@ struct PreparedData {
   /**
    * The difference in timestamps between this point and the next point.
    */
-  units::second_t dt = 0_s;
+  wpi::units::second_t dt = 0_s;
 
   /**
    * The acceleration of the data point

@@ -12,7 +12,7 @@
  * Onboard IMU snippets for frc-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/accelerometers-software.html
  */
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   void TeleopPeriodic() override {
     // Gets the current acceleration in the X axis
@@ -35,11 +35,11 @@ class Robot : public frc::TimedRobot {
 
  private:
   // Creates an object for the Systemcore IMU
-  frc::OnboardIMU m_IMU{frc::OnboardIMU::MountOrientation::kFlat};
+  wpi::OnboardIMU m_IMU{wpi::OnboardIMU::MountOrientation::kFlat};
 };
 
 #ifndef RUNNING_FRC_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

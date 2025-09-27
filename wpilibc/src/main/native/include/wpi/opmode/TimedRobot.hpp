@@ -18,7 +18,7 @@
 #include "wpi/opmode/IterativeRobotBase.hpp"
 #include "wpi/system/RobotController.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * TimedRobot implements the IterativeRobotBase robot program framework.
@@ -49,7 +49,7 @@ class TimedRobot : public IterativeRobotBase {
    *
    * @param period Period.
    */
-  explicit TimedRobot(units::second_t period = kDefaultPeriod);
+  explicit TimedRobot(wpi::units::second_t period = kDefaultPeriod);
 
   TimedRobot(TimedRobot&&) = default;
   TimedRobot& operator=(TimedRobot&&) = default;
@@ -79,8 +79,8 @@ class TimedRobot : public IterativeRobotBase {
    *                 for scheduling a callback in a different timeslot relative
    *                 to TimedRobot.
    */
-  void AddPeriodic(std::function<void()> callback, units::second_t period,
-                   units::second_t offset = 0_s);
+  void AddPeriodic(std::function<void()> callback, wpi::units::second_t period,
+                   wpi::units::second_t offset = 0_s);
 
  private:
   class Callback {
@@ -103,7 +103,7 @@ class TimedRobot : public IterativeRobotBase {
           period{period},
           expirationTime(
               startTime + offset + period +
-              (std::chrono::microseconds{frc::RobotController::GetFPGATime()} -
+              (std::chrono::microseconds{wpi::RobotController::GetFPGATime()} -
                startTime) /
                   period * period) {}
 
@@ -112,12 +112,12 @@ class TimedRobot : public IterativeRobotBase {
     }
   };
 
-  hal::Handle<HAL_NotifierHandle, HAL_CleanNotifier> m_notifier;
+  wpi::hal::Handle<HAL_NotifierHandle, HAL_CleanNotifier> m_notifier;
   std::chrono::microseconds m_startTime;
   uint64_t m_loopStartTimeUs = 0;
 
-  wpi::priority_queue<Callback, std::vector<Callback>, std::greater<Callback>>
+  wpi::util::priority_queue<Callback, std::vector<Callback>, std::greater<Callback>>
       m_callbacks;
 };
 
-}  // namespace frc
+}  // namespace wpi

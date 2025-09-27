@@ -10,7 +10,7 @@
 
 #include "WebSocketTest.h"
 
-namespace wpi {
+namespace wpi::net {
 
 class WebSocketIntegrationTest : public WebSocketTest {};
 
@@ -200,4 +200,4 @@ TEST_F(WebSocketIntegrationTest, ServerSendPing) {
   ASSERT_EQ(gotData, 2);
 }
 
-}  // namespace wpi
+}  // namespace wpi::net

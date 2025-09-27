@@ -9,7 +9,7 @@
 #include "wpi/command/ScheduleCommand.hpp"
 #include "wpi/command/SequentialCommandGroup.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 class ScheduleCommandTest : public CommandTestBase {};
 
 TEST_F(ScheduleCommandTest, ScheduleCommandSchedule) {

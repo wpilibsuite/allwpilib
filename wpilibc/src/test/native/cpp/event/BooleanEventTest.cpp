@@ -9,7 +9,7 @@
 #include "wpi/event/BooleanEvent.hpp"
 #include "wpi/event/EventLoop.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 TEST(BooleanEventTest, BinaryCompositions) {
   EventLoop loop;

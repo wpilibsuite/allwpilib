@@ -11,7 +11,7 @@
 
 #include "wpi/opmode/RobotBase.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 
 /**
  * Class that facilitates control of a SendableChooser's selected option in
@@ -32,7 +32,7 @@ class SendableChooserSim {
    * @param inst The NetworkTables instance.
    * @param path The path where the SendableChooser is published.
    */
-  SendableChooserSim(nt::NetworkTableInstance inst, std::string_view path);
+  SendableChooserSim(wpi::nt::NetworkTableInstance inst, std::string_view path);
 
   /**
    * Set the selected option.
@@ -41,6 +41,6 @@ class SendableChooserSim {
   void SetSelected(std::string_view option);
 
  private:
-  nt::StringPublisher m_publisher;
+  wpi::nt::StringPublisher m_publisher;
 };
-}  // namespace frc::sim
+}  // namespace wpi::sim

@@ -13,7 +13,7 @@
 #include "wpi/math/system/NumericalJacobian.hpp"
 #include "wpi/units/time.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * Constructs a control-affine plant inversion model-based feedforward from
@@ -55,7 +55,7 @@ class ControlAffinePlantInversionFeedforward {
    */
   ControlAffinePlantInversionFeedforward(
       std::function<StateVector(const StateVector&, const InputVector&)> f,
-      units::second_t dt)
+      wpi::units::second_t dt)
       : m_dt(dt), m_f(f) {
     m_B = NumericalJacobianU<States, States, Inputs>(f, StateVector::Zero(),
                                                      InputVector::Zero());
@@ -74,7 +74,7 @@ class ControlAffinePlantInversionFeedforward {
    */
   ControlAffinePlantInversionFeedforward(
       std::function<StateVector(const StateVector&)> f,
-      const Matrixd<States, Inputs>& B, units::second_t dt)
+      const Matrixd<States, Inputs>& B, wpi::units::second_t dt)
       : m_B(B), m_dt(dt) {
     m_f = [=](const StateVector& x, const InputVector& u) -> StateVector {
       return f(x);
@@ -178,7 +178,7 @@ class ControlAffinePlantInversionFeedforward {
  private:
   Matrixd<States, Inputs> m_B;
 
-  units::second_t m_dt;
+  wpi::units::second_t m_dt;
 
   /**
    * The model dynamics.
@@ -192,4 +192,4 @@ class ControlAffinePlantInversionFeedforward {
   InputVector m_uff;
 };
 
-}  // namespace frc
+}  // namespace wpi::math

@@ -16,7 +16,7 @@
 #include "wpi/glass/Context.hpp"
 #include "wpi/glass/Storage.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 class DataSource;
 
@@ -32,10 +32,10 @@ class Context {
   std::string storageLoadDir = ".";
   std::string storageAutoSaveDir = ".";
   std::string storageName = "imgui";
-  wpi::SmallVector<Storage*, 32> storageStack;
-  wpi::StringMap<Storage> storageRoots;
-  wpi::StringMap<bool> deviceHidden;
-  wpi::StringMap<DataSource*> sources;
+  wpi::util::SmallVector<Storage*, 32> storageStack;
+  wpi::util::StringMap<Storage> storageRoots;
+  wpi::util::StringMap<bool> deviceHidden;
+  wpi::util::StringMap<DataSource*> sources;
   Storage& sourceNameStorage;
   uint64_t zeroTime = 0;
   bool isPlatformSaveDir = false;
@@ -43,4 +43,4 @@ class Context {
 
 extern Context* gContext;
 
-}  // namespace glass
+}  // namespace wpi::glass
