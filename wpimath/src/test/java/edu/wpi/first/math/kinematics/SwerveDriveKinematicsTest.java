@@ -415,36 +415,35 @@ class SwerveDriveKinematicsTest {
     var moduleAccelerations =
         m_kinematics.toSwerveModuleAccelerations(accelerations, angularVelocity);
 
-    /*
-    For turn-in-place with angular acceleration of 2π rad/s² and angular velocity of 2π rad/s,
-    each module has both tangential acceleration (from angular acceleration) and centripetal
-    acceleration (from angular velocity). The total acceleration magnitude is approximately 678.4.
-
-    For each swerve module at position (x, y) relative to the robot center:
-    - Distance from center: r = √(x² + y²) = √(12² + 12²) = 16.97 m
-    - Current tangential velocity: v_t = ω × r = 2π × 16.97 = 106.63 m/s
-
-    Two acceleration components:
-    1) Tangential acceleration (from angular acceleration α = 2π rad/s²):
-       a_tangential = α × r = 2π × 16.97 = 106.63 m/s²
-       Direction: perpendicular to radius vector
-
-    2) Centripetal acceleration (from angular velocity ω = 2π rad/s):
-       a_centripetal = ω² × r = (2π)² × 16.97 = 668.7 m/s²
-       Direction: toward center of rotation
-
-    Total acceleration magnitude: |a_total| = √(a_tangential² + a_centripetal²)
-                                            = √(106.63² + 668.7²) = 678.4 m/s²
-
-    For module positions:
-    FL (12, 12):   radius angle = 135°, tangential = 45°,  centripetal = -135° → total angle = -144°
-    FR (12, -12):  radius angle = 45°,  tangential = -45°, centripetal = -135° → total angle = 126°
-    BL (-12, 12):  radius angle = 135°, tangential = 45°,  centripetal = 45°   → total angle = -54°
-    BR (-12, -12): radius angle = -45°, tangential = 45°,  centripetal = 135°  → total angle = 36°
-
-    The acceleration angles are not simply tangential because the centripetal component
-    from the existing angular velocity dominates and affects the direction.
-    */
+    //    For turn-in-place with angular acceleration of 2π rad/s² and angular velocity of 2π rad/s,
+    //    each module has both tangential acceleration (from angular acceleration) and centripetal
+    //    acceleration (from angular velocity). The total acceleration magnitude is approximately 678.4.
+    //
+    //    For each swerve module at position (x, y) relative to the robot center:
+    //    - Distance from center: r = √(x² + y²) = √(12² + 12²) = 16.97 m
+    //    - Current tangential velocity: v_t = ω × r = 2π × 16.97 = 106.63 m/s
+    //
+    //    Two acceleration components:
+    //    1) Tangential acceleration (from angular acceleration α = 2π rad/s²):
+    //       a_tangential = α × r = 2π × 16.97 = 106.63 m/s²
+    //       Direction: perpendicular to radius vector
+    //
+    //    2) Centripetal acceleration (from angular velocity ω = 2π rad/s):
+    //       a_centripetal = ω² × r = (2π)² × 16.97 = 668.7 m/s²
+    //       Direction: toward center of rotation
+    //
+    //    Total acceleration magnitude: |a_total| = √(a_tangential² + a_centripetal²)
+    //                                            = √(106.63² + 668.7²) = 678.4 m/s²
+    //
+    //    For module positions:
+    //    FL (12, 12):   radius angle = 135°, tangential = 45°,  centripetal = -135° → total angle = -144°
+    //    FR (12, -12):  radius angle = 45°,  tangential = -45°, centripetal = -135° → total angle = 126°
+    //    BL (-12, 12):  radius angle = 135°, tangential = 45°,  centripetal = 45°   → total angle = -54°
+    //    BR (-12, -12): radius angle = -45°, tangential = 45°,  centripetal = 135°  → total angle = 36°
+    //
+    //    The acceleration angles are not simply tangential because the centripetal component
+    //    from the existing angular velocity dominates and affects the direction.
+    //
 
     double centerRadius = m_kinematics.getModules()[0].getNorm();
     double tangentialAccel = centerRadius * accelerations.alpha; // α * r
@@ -522,25 +521,23 @@ class SwerveDriveKinematicsTest {
     var moduleAccelerations =
         m_kinematics.toSwerveModuleAccelerations(accelerations, angularVelocity, m_fl);
 
-    /*
-    When rotating about the front-left module position with both angular acceleration (1 rad/s²)
-    and angular velocity (1 rad/s), each module experiences both tangential and centripetal
-    accelerations that combine vectorially.
-
-    Center of rotation: FL module at (12, 12) inches
-    Module positions relative to center of rotation:
-    - FL: (0, 0) - at center of rotation
-    - FR: (0, -24) - 24 m south of center
-    - BL: (-24, 0) - 24 m west of center
-    - BR: (-24, -24) - distance = √(24² + 24²) = 33.94 m southwest
-
-    For each module at distance r from center of rotation:
-    1) Tangential acceleration: a_t = α × r = 1 × r
-       Direction: perpendicular to radius vector (90° CCW from radius)
-
-    2) Centripetal acceleration: a_c = ω² × r = 1² × r = r
-       Direction: toward center of rotation
-    */
+    //    When rotating about the front-left module position with both angular acceleration (1 rad/s²)
+    //    and angular velocity (1 rad/s), each module experiences both tangential and centripetal
+    //    accelerations that combine vectorially.
+    //
+    //    Center of rotation: FL module at (12, 12) inches
+    //    Module positions relative to center of rotation:
+    //    - FL: (0, 0) - at center of rotation
+    //    - FR: (0, -24) - 24 m south of center
+    //    - BL: (-24, 0) - 24 m west of center
+    //    - BR: (-24, -24) - distance = √(24² + 24²) = 33.94 m southwest
+    //
+    //    For each module at distance r from center of rotation:
+    //    1) Tangential acceleration: a_t = α × r = 1 × r
+    //       Direction: perpendicular to radius vector (90° CCW from radius)
+    //
+    //    2) Centripetal acceleration: a_c = ω² × r = 1² × r = r
+    //       Direction: toward center of rotation
 
     double[] expectedAccelerations =
         Arrays.stream(m_kinematics.getModules())
