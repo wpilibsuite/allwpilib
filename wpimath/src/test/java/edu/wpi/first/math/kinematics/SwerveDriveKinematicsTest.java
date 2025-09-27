@@ -147,12 +147,10 @@ class SwerveDriveKinematicsTest {
     ChassisSpeeds speeds = new ChassisSpeeds(0, 0, 2 * Math.PI);
     var moduleStates = m_kinematics.toSwerveModuleStates(speeds);
 
-    /*
-    The circumference of the wheels about the COR is π * diameter, or 2π * radius
-    the radius is the √(12²in + 12²in), or 16.9706in, so the circumference the wheels
-    trace out is 106.629190516in. since we want our robot to rotate at 1 rotation per second,
-    our wheels must trace out 1 rotation (or 106.63 inches) per second.
-      */
+    // The circumference of the wheels about the COR is π * diameter, or 2π * radius
+    // the radius is the √(12²in + 12²in), or 16.9706in, so the circumference the wheels
+    // trace out is 106.629190516in. since we want our robot to rotate at 1 rotation per second,
+    // our wheels must trace out 1 rotation (or 106.63 inches) per second.
 
     assertAll(
         () -> assertEquals(106.63, moduleStates[0].speed, 0.1),
@@ -200,14 +198,12 @@ class SwerveDriveKinematicsTest {
     ChassisSpeeds speeds = new ChassisSpeeds(0, 0, 2 * Math.PI);
     var moduleStates = m_kinematics.toSwerveModuleStates(speeds, m_fl);
 
-    /*
-    This one is a bit trickier. Because we are rotating about the front-left wheel,
-    it should be parked at 0 degrees and 0 speed. The front-right and back-left wheels both travel
-    an arc with radius 24 (and circumference 150.796), and the back-right wheel travels an arc with
-    radius √(24² + 24²) and circumference 213.2584. As for angles, the front-right wheel
-    should be pointing straight forward, the back-left wheel should be pointing straight right,
-    and the back-right wheel should be at a -45 degree angle
-    */
+    // This one is a bit trickier. Because we are rotating about the front-left wheel,
+    // it should be parked at 0 degrees and 0 speed. The front-right and back-left wheels both travel
+    // an arc with radius 24 (and circumference 150.796), and the back-right wheel travels an arc with
+    // radius √(24² + 24²) and circumference 213.2584. As for angles, the front-right wheel
+    // should be pointing straight forward, the back-left wheel should be pointing straight right,
+    // and the back-right wheel should be at a -45 degree angle
 
     assertAll(
         () -> assertEquals(0.0, moduleStates[0].speed, 0.1),
@@ -229,14 +225,12 @@ class SwerveDriveKinematicsTest {
 
     var chassisSpeeds = m_kinematics.toChassisSpeeds(flState, frState, blState, brState);
 
-    /*
-    We already know that our omega should be 2π from the previous test. Next, we need to determine
-    the vx and vy of our chassis center. Because our COR is at a 45 degree angle from the center,
-    we know that vx and vy must be the same. Furthermore, we know that the center of mass makes
-    a full revolution about the center of revolution once every second. Therefore, the center of
-    mass must be moving at 106.629in/sec. Recalling that the ratios of a 45/45/90 triangle are
-    1:√(2)/2:√(2)/2, we find that the COM vx is -75.398, and vy is 75.398.
-    */
+    // We already know that our omega should be 2π from the previous test. Next, we need to determine
+    // the vx and vy of our chassis center. Because our COR is at a 45 degree angle from the center,
+    // we know that vx and vy must be the same. Furthermore, we know that the center of mass makes
+    // a full revolution about the center of revolution once every second. Therefore, the center of
+    // mass must be moving at 106.629in/sec. Recalling that the ratios of a 45/45/90 triangle are
+    // 1:√(2)/2:√(2)/2, we find that the COM vx is -75.398, and vy is 75.398.
 
     assertAll(
         () -> assertEquals(75.398, chassisSpeeds.vx, 0.1),
@@ -253,14 +247,12 @@ class SwerveDriveKinematicsTest {
 
     var twist = m_kinematics.toTwist2d(flDelta, frDelta, blDelta, brDelta);
 
-    /*
-    We already know that our omega should be 2π from the previous test. Next, we need to determine
-    the vx and vy of our chassis center. Because our COR is at a 45 degree angle from the center,
-    we know that vx and vy must be the same. Furthermore, we know that the center of mass makes
-    a full revolution about the center of revolution once every second. Therefore, the center of
-    mass must be moving at 106.629in/sec. Recalling that the ratios of a 45/45/90 triangle are
-    1:√(2)/2:√(2)/2, we find that the COM vx is -75.398, and vy is 75.398.
-    */
+    // We already know that our omega should be 2π from the previous test. Next, we need to determine
+    // the vx and vy of our chassis center. Because our COR is at a 45 degree angle from the center,
+    // we know that vx and vy must be the same. Furthermore, we know that the center of mass makes
+    // a full revolution about the center of revolution once every second. Therefore, the center of
+    // mass must be moving at 106.629in/sec. Recalling that the ratios of a 45/45/90 triangle are
+    // 1:√(2)/2:√(2)/2, we find that the COM vx is -75.398, and vy is 75.398.
 
     assertAll(
         () -> assertEquals(75.398, twist.dx, 0.1),
@@ -313,14 +305,12 @@ class SwerveDriveKinematicsTest {
 
     var chassisSpeeds = m_kinematics.toChassisSpeeds(flState, frState, blState, brState);
 
-    /*
-    From equation (13.17), we know that chassis motion is th dot product of the
-    pseudoinverse of the inverseKinematics matrix (with the center of rotation at
-    (0,0) -- we don't want the motion of the center of rotation, we want it of
-    the center of the robot). These above SwerveModuleStates are known to be from
-    a velocity of [[0][3][1.5]] about (0, 24), and the expected numbers have been
-    calculated using Numpy's linalg.pinv function.
-    */
+    // From equation (13.17), we know that chassis motion is th dot product of the
+    // pseudoinverse of the inverseKinematics matrix (with the center of rotation at
+    // (0,0) -- we don't want the motion of the center of rotation, we want it of
+    // the center of the robot). These above SwerveModuleStates are known to be from
+    // a velocity of [[0][3][1.5]] about (0, 24), and the expected numbers have been
+    // calculated using Numpy's linalg.pinv function.
 
     assertAll(
         () -> assertEquals(0.0, chassisSpeeds.vx, 0.1),
@@ -337,14 +327,12 @@ class SwerveDriveKinematicsTest {
 
     var twist = m_kinematics.toTwist2d(flDelta, frDelta, blDelta, brDelta);
 
-    /*
-    From equation (13.17), we know that chassis motion is th dot product of the
-    pseudoinverse of the inverseKinematics matrix (with the center of rotation at
-    (0,0) -- we don't want the motion of the center of rotation, we want it of
-    the center of the robot). These above SwerveModuleStates are known to be from
-    a velocity of [[0][3][1.5]] about (0, 24), and the expected numbers have been
-    calculated using Numpy's linalg.pinv function.
-    */
+    // From equation (13.17), we know that chassis motion is th dot product of the
+    // pseudoinverse of the inverseKinematics matrix (with the center of rotation at
+    // (0,0) -- we don't want the motion of the center of rotation, we want it of
+    // the center of the robot). These above SwerveModuleStates are known to be from
+    // a velocity of [[0][3][1.5]] about (0, 24), and the expected numbers have been
+    // calculated using Numpy's linalg.pinv function.
 
     assertAll(
         () -> assertEquals(0.0, twist.dx, 0.1),
@@ -415,35 +403,34 @@ class SwerveDriveKinematicsTest {
     var moduleAccelerations =
         m_kinematics.toSwerveModuleAccelerations(accelerations, angularVelocity);
 
-    //    For turn-in-place with angular acceleration of 2π rad/s² and angular velocity of 2π rad/s,
-    //    each module has both tangential acceleration (from angular acceleration) and centripetal
-    //    acceleration (from angular velocity). The total acceleration magnitude is approximately 678.4.
+    // For turn-in-place with angular acceleration of 2π rad/s² and angular velocity of 2π rad/s,
+    // each module has both tangential acceleration (from angular acceleration) and centripetal
+    // acceleration (from angular velocity). The total acceleration magnitude is approximately 678.4.
     //
-    //    For each swerve module at position (x, y) relative to the robot center:
-    //    - Distance from center: r = √(x² + y²) = √(12² + 12²) = 16.97 m
-    //    - Current tangential velocity: v_t = ω × r = 2π × 16.97 = 106.63 m/s
+    // For each swerve module at position (x, y) relative to the robot center:
+    // - Distance from center: r = √(x² + y²) = √(12² + 12²) = 16.97 m
+    // - Current tangential velocity: v_t = ω × r = 2π × 16.97 = 106.63 m/s
     //
-    //    Two acceleration components:
-    //    1) Tangential acceleration (from angular acceleration α = 2π rad/s²):
-    //       a_tangential = α × r = 2π × 16.97 = 106.63 m/s²
-    //       Direction: perpendicular to radius vector
+    // Two acceleration components:
+    // 1) Tangential acceleration (from angular acceleration α = 2π rad/s²):
+    //    a_tangential = α × r = 2π × 16.97 = 106.63 m/s²
+    //    Direction: perpendicular to radius vector
     //
-    //    2) Centripetal acceleration (from angular velocity ω = 2π rad/s):
-    //       a_centripetal = ω² × r = (2π)² × 16.97 = 668.7 m/s²
-    //       Direction: toward center of rotation
+    // 2) Centripetal acceleration (from angular velocity ω = 2π rad/s):
+    //    a_centripetal = ω² × r = (2π)² × 16.97 = 668.7 m/s²
+    //    Direction: toward center of rotation
     //
-    //    Total acceleration magnitude: |a_total| = √(a_tangential² + a_centripetal²)
-    //                                            = √(106.63² + 668.7²) = 678.4 m/s²
+    // Total acceleration magnitude: |a_total| = √(a_tangential² + a_centripetal²)
+    //                                         = √(106.63² + 668.7²) = 678.4 m/s²
     //
-    //    For module positions:
-    //    FL (12, 12):   radius angle = 135°, tangential = 45°,  centripetal = -135° → total angle = -144°
-    //    FR (12, -12):  radius angle = 45°,  tangential = -45°, centripetal = -135° → total angle = 126°
-    //    BL (-12, 12):  radius angle = 135°, tangential = 45°,  centripetal = 45°   → total angle = -54°
-    //    BR (-12, -12): radius angle = -45°, tangential = 45°,  centripetal = 135°  → total angle = 36°
+    // For module positions:
+    // FL (12, 12):   radius angle = 135°, tangential = 45°,  centripetal = -135° → total angle = -144°
+    // FR (12, -12):  radius angle = 45°,  tangential = -45°, centripetal = -135° → total angle = 126°
+    // BL (-12, 12):  radius angle = 135°, tangential = 45°,  centripetal = 45°   → total angle = -54°
+    // BR (-12, -12): radius angle = -45°, tangential = 45°,  centripetal = 135°  → total angle = 36°
     //
-    //    The acceleration angles are not simply tangential because the centripetal component
-    //    from the existing angular velocity dominates and affects the direction.
-    //
+    // The acceleration angles are not simply tangential because the centripetal component
+    // from the existing angular velocity dominates and affects the direction.
 
     double centerRadius = m_kinematics.getModules()[0].getNorm();
     double tangentialAccel = centerRadius * accelerations.alpha; // α * r
@@ -521,23 +508,23 @@ class SwerveDriveKinematicsTest {
     var moduleAccelerations =
         m_kinematics.toSwerveModuleAccelerations(accelerations, angularVelocity, m_fl);
 
-    //    When rotating about the front-left module position with both angular acceleration (1 rad/s²)
-    //    and angular velocity (1 rad/s), each module experiences both tangential and centripetal
-    //    accelerations that combine vectorially.
+    // When rotating about the front-left module position with both angular acceleration (1 rad/s²)
+    // and angular velocity (1 rad/s), each module experiences both tangential and centripetal
+    // accelerations that combine vectorially.
     //
-    //    Center of rotation: FL module at (12, 12) inches
-    //    Module positions relative to center of rotation:
-    //    - FL: (0, 0) - at center of rotation
-    //    - FR: (0, -24) - 24 m south of center
-    //    - BL: (-24, 0) - 24 m west of center
-    //    - BR: (-24, -24) - distance = √(24² + 24²) = 33.94 m southwest
+    // Center of rotation: FL module at (12, 12) inches
+    // Module positions relative to center of rotation:
+    // - FL: (0, 0) - at center of rotation
+    // - FR: (0, -24) - 24 m south of center
+    // - BL: (-24, 0) - 24 m west of center
+    // - BR: (-24, -24) - distance = √(24² + 24²) = 33.94 m southwest
     //
-    //    For each module at distance r from center of rotation:
-    //    1) Tangential acceleration: a_t = α × r = 1 × r
-    //       Direction: perpendicular to radius vector (90° CCW from radius)
+    // For each module at distance r from center of rotation:
+    // 1) Tangential acceleration: a_t = α × r = 1 × r
+    //    Direction: perpendicular to radius vector (90° CCW from radius)
     //
-    //    2) Centripetal acceleration: a_c = ω² × r = 1² × r = r
-    //       Direction: toward center of rotation
+    // 2) Centripetal acceleration: a_c = ω² × r = 1² × r = r
+    //    Direction: toward center of rotation
 
     double[] expectedAccelerations =
         Arrays.stream(m_kinematics.getModules())
