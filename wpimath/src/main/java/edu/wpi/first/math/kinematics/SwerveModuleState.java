@@ -6,7 +6,6 @@ package edu.wpi.first.math.kinematics;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.kinematics.proto.SwerveModuleStateProto;
@@ -18,10 +17,10 @@ import java.util.Objects;
 
 /** Represents the state of one swerve module. */
 public class SwerveModuleState
-    implements Comparable<SwerveModuleState>,
+    implements Interpolatable<SwerveModuleState>,
+        Comparable<SwerveModuleState>,
         ProtobufSerializable,
-        StructSerializable,
-        Interpolatable<SwerveModuleState> {
+        StructSerializable {
   /** Speed of the wheel of the module in meters per second. */
   public double speed;
 
@@ -125,6 +124,28 @@ public class SwerveModuleState
   }
 
   /**
+   * Returns the linear interpolation of this SwerveModuleState and another. The angle is
+   * interpolated using the shortest path between the two angles.
+   *
+   * @param endValue The end value for the interpolation.
+   * @param t How far between the two values to interpolate. This is clamped to [0, 1].
+   * @return The interpolated value.
+   */
+  @Override
+  public SwerveModuleState interpolate(SwerveModuleState endValue, double t) {
+    // Clamp t to [0, 1]
+    t = Math.max(0.0, Math.min(1.0, t));
+
+    // Interpolate speed linearly
+    double interpolatedSpeed = speed + t * (endValue.speed - speed);
+
+    // Interpolate angle using the shortest path
+    Rotation2d interpolatedAngle = angle.interpolate(endValue.angle, t);
+
+    return new SwerveModuleState(interpolatedSpeed, interpolatedAngle);
+  }
+
+  /**
    * Scales speed by cosine of angle error. This scales down movement perpendicular to the desired
    * direction of travel that can occur when modules change directions. This results in smoother
    * driving.
@@ -133,18 +154,5 @@ public class SwerveModuleState
    */
   public void cosineScale(Rotation2d currentAngle) {
     speed *= angle.minus(currentAngle).getCos();
-  }
-
-  @Override
-  public SwerveModuleState interpolate(SwerveModuleState endValue, double t) {
-    if (t <= 0) {
-      return this;
-    } else if (t >= 1) {
-      return endValue;
-    } else {
-      return new SwerveModuleState(
-          MathUtil.interpolate(this.speed, endValue.speed, t),
-          this.angle.interpolate(endValue.angle, t));
-    }
   }
 }

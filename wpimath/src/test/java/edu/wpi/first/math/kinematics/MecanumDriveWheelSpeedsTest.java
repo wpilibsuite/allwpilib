@@ -70,4 +70,58 @@ class MecanumDriveWheelSpeedsTest {
         () -> assertEquals(1.0, wheelSpeeds.rearLeft),
         () -> assertEquals(0.75, wheelSpeeds.rearRight));
   }
+
+  @Test
+  void testInterpolate() {
+    final var start = new MecanumDriveWheelSpeeds(1.0, 2.0, 3.0, 4.0);
+    final var end = new MecanumDriveWheelSpeeds(5.0, 6.0, 7.0, 8.0);
+
+    // Test interpolation at t=0 (should return start)
+    final var atStart = start.interpolate(end, 0.0);
+    assertAll(
+        () -> assertEquals(1.0, atStart.frontLeft, 1e-9),
+        () -> assertEquals(2.0, atStart.frontRight, 1e-9),
+        () -> assertEquals(3.0, atStart.rearLeft, 1e-9),
+        () -> assertEquals(4.0, atStart.rearRight, 1e-9));
+
+    // Test interpolation at t=1 (should return end)
+    final var atEnd = start.interpolate(end, 1.0);
+    assertAll(
+        () -> assertEquals(5.0, atEnd.frontLeft, 1e-9),
+        () -> assertEquals(6.0, atEnd.frontRight, 1e-9),
+        () -> assertEquals(7.0, atEnd.rearLeft, 1e-9),
+        () -> assertEquals(8.0, atEnd.rearRight, 1e-9));
+
+    // Test interpolation at t=0.5 (should return midpoint)
+    final var atMidpoint = start.interpolate(end, 0.5);
+    assertAll(
+        () -> assertEquals(3.0, atMidpoint.frontLeft, 1e-9),
+        () -> assertEquals(4.0, atMidpoint.frontRight, 1e-9),
+        () -> assertEquals(5.0, atMidpoint.rearLeft, 1e-9),
+        () -> assertEquals(6.0, atMidpoint.rearRight, 1e-9));
+
+    // Test interpolation at t=0.25
+    final var atQuarter = start.interpolate(end, 0.25);
+    assertAll(
+        () -> assertEquals(2.0, atQuarter.frontLeft, 1e-9),
+        () -> assertEquals(3.0, atQuarter.frontRight, 1e-9),
+        () -> assertEquals(4.0, atQuarter.rearLeft, 1e-9),
+        () -> assertEquals(5.0, atQuarter.rearRight, 1e-9));
+
+    // Test clamping: t < 0 should clamp to 0
+    final var belowRange = start.interpolate(end, -0.5);
+    assertAll(
+        () -> assertEquals(1.0, belowRange.frontLeft, 1e-9),
+        () -> assertEquals(2.0, belowRange.frontRight, 1e-9),
+        () -> assertEquals(3.0, belowRange.rearLeft, 1e-9),
+        () -> assertEquals(4.0, belowRange.rearRight, 1e-9));
+
+    // Test clamping: t > 1 should clamp to 1
+    final var aboveRange = start.interpolate(end, 1.5);
+    assertAll(
+        () -> assertEquals(5.0, aboveRange.frontLeft, 1e-9),
+        () -> assertEquals(6.0, aboveRange.frontRight, 1e-9),
+        () -> assertEquals(7.0, aboveRange.rearLeft, 1e-9),
+        () -> assertEquals(8.0, aboveRange.rearRight, 1e-9));
+  }
 }
