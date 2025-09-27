@@ -58,7 +58,9 @@ void Drivetrain::Drive(units::meters_per_second_t xSpeed,
 }
 
 void Drivetrain::UpdateOdometry() {
-  m_poseEstimator.Update(m_gyro.GetRotation2d(), GetCurrentDistances());
+  m_poseEstimator.Update(
+      m_imu.GetRotation2d(),
+      GetCurrentDistances());  // TODO(Ryan): fixup when sim implemented
 
   // Also apply vision measurements. We use 0.3 seconds in the past as an
   // example -- on a real robot, this must be calculated based either on latency

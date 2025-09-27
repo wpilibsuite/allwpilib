@@ -55,12 +55,12 @@ void Drivetrain::Drive(units::meters_per_second_t xSpeed,
                        units::second_t period) {
   frc::ChassisSpeeds chassisSpeeds{xSpeed, ySpeed, rot};
   if (fieldRelative) {
-    chassisSpeeds = chassisSpeeds.ToRobotRelative(m_gyro.GetRotation2d());
+    chassisSpeeds = chassisSpeeds.ToRobotRelative(m_imu.GetRotation2d());
   }
   SetSpeeds(m_kinematics.ToWheelSpeeds(chassisSpeeds.Discretize(period))
                 .Desaturate(kMaxSpeed));
 }
 
 void Drivetrain::UpdateOdometry() {
-  m_odometry.Update(m_gyro.GetRotation2d(), GetCurrentWheelDistances());
+  m_odometry.Update(m_imu.GetRotation2d(), GetCurrentWheelDistances());
 }

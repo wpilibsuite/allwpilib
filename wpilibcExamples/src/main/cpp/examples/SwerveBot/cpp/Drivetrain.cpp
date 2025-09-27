@@ -10,7 +10,7 @@ void Drivetrain::Drive(units::meters_per_second_t xSpeed,
                        units::second_t period) {
   frc::ChassisSpeeds chassisSpeeds{xSpeed, ySpeed, rot};
   if (fieldRelative) {
-    chassisSpeeds = chassisSpeeds.ToRobotRelative(m_gyro.GetRotation2d());
+    chassisSpeeds = chassisSpeeds.ToRobotRelative(m_imu.GetRotation2d());
   }
   chassisSpeeds = chassisSpeeds.Discretize(period);
 
@@ -25,7 +25,7 @@ void Drivetrain::Drive(units::meters_per_second_t xSpeed,
 }
 
 void Drivetrain::UpdateOdometry() {
-  m_odometry.Update(m_gyro.GetRotation2d(),
+  m_odometry.Update(m_imu.GetRotation2d(),
                     {m_frontLeft.GetPosition(), m_frontRight.GetPosition(),
                      m_backLeft.GetPosition(), m_backRight.GetPosition()});
 }

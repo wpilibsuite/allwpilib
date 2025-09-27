@@ -15,7 +15,7 @@ Drivetrain::Drivetrain() {
   // gearbox is constructed, you might have to invert the left side instead.
   m_rightLeader.SetInverted(true);
 
-  m_gyro.Reset();
+  m_imu.ResetYaw();
 
   // Set the distance per pulse for the drive encoders. We can simply use the
   // distance traveled for one rotation of the wheel divided by the encoder
@@ -84,7 +84,7 @@ frc::Pose3d Drivetrain::ObjectToRobotPose(
 }
 
 void Drivetrain::UpdateOdometry() {
-  m_poseEstimator.Update(m_gyro.GetRotation2d(),
+  m_poseEstimator.Update(m_imu.GetRotation2d(),
                          units::meter_t{m_leftEncoder.GetDistance()},
                          units::meter_t{m_rightEncoder.GetDistance()});
 
@@ -125,6 +125,7 @@ void Drivetrain::SimulationPeriodic() {
       m_drivetrainSimulator.GetRightPosition().value());
   m_rightEncoderSim.SetRate(m_drivetrainSimulator.GetRightVelocity().value());
   // m_gyroSim.SetAngle(-m_drivetrainSimulator.GetHeading().Degrees().value());
+  // // TODO(Ryan): fixup when sim implemented
 }
 
 void Drivetrain::Periodic() {
