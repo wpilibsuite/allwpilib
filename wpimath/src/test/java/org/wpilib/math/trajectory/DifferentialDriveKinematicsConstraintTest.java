@@ -7,12 +7,12 @@ package org.wpilib.math.trajectory;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Collections;
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.kinematics.ChassisSpeeds;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import org.wpilib.math.trajectory.constraint.DifferentialDriveKinematicsConstraint;
 import org.wpilib.math.util.Units;
-import java.util.Collections;
-import org.junit.jupiter.api.Test;
 
 class DifferentialDriveKinematicsConstraintTest {
   @Test

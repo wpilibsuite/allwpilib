@@ -7,12 +7,12 @@ package org.wpilib.smartdashboard;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.wpilib.networktables.NetworkTable;
-import org.wpilib.networktables.NetworkTableInstance;
-import org.wpilib.UtilityClassTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.wpilib.UtilityClassTest;
+import org.wpilib.networktables.NetworkTable;
+import org.wpilib.networktables.NetworkTableInstance;
 
 class SmartDashboardTest extends UtilityClassTest<SmartDashboard> {
   private NetworkTableInstance m_inst;

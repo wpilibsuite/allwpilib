@@ -4,11 +4,11 @@
 
 package org.wpilib.math.spline;
 
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Translation2d;
 import java.util.Arrays;
 import java.util.List;
 import org.ejml.simple.SimpleMatrix;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Translation2d;
 
 /** Helper class that is used to generate cubic and quintic splines from user provided waypoints. */
 public final class SplineHelper {

@@ -4,9 +4,9 @@
 
 package org.wpilib.math.controller;
 
+import org.wpilib.math.trajectory.TrapezoidProfile;
 import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.util.MathUtil;
-import org.wpilib.math.trajectory.TrapezoidProfile;
 import org.wpilib.util.sendable.Sendable;
 import org.wpilib.util.sendable.SendableBuilder;
 import org.wpilib.util.sendable.SendableRegistry;

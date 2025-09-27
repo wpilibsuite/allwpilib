@@ -4,14 +4,14 @@
 
 package org.wpilib.examples.rapidreactcommandbot.subsystems;
 
-import org.wpilib.epilogue.Logged;
-import org.wpilib.epilogue.NotLogged;
-import org.wpilib.hardware.discrete.DigitalInput;
-import org.wpilib.examples.rapidreactcommandbot.Constants.StorageConstants;
-import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.command.Command;
 import org.wpilib.command.SubsystemBase;
 import org.wpilib.command.button.Trigger;
+import org.wpilib.epilogue.Logged;
+import org.wpilib.epilogue.NotLogged;
+import org.wpilib.examples.rapidreactcommandbot.Constants.StorageConstants;
+import org.wpilib.hardware.discrete.DigitalInput;
+import org.wpilib.hardware.motor.PWMSparkMax;
 
 @Logged
 public class Storage extends SubsystemBase {

@@ -6,9 +6,9 @@ package org.wpilib.math.controller.proto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.controller.ArmFeedforward;
 import org.wpilib.math.proto.Controller.ProtobufArmFeedforward;
-import org.junit.jupiter.api.Test;
 
 class ArmFeedforwardProtoTest {
   private static final ArmFeedforward DATA = new ArmFeedforward(0.174, 0.229, 4.4, 4.4);

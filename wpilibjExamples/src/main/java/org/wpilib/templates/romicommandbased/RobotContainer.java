@@ -4,10 +4,10 @@
 
 package org.wpilib.templates.romicommandbased;
 
+import org.wpilib.command.Command;
 import org.wpilib.driverstation.XboxController;
 import org.wpilib.templates.romicommandbased.commands.ExampleCommand;
 import org.wpilib.templates.romicommandbased.subsystems.RomiDrivetrain;
-import org.wpilib.command.Command;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a

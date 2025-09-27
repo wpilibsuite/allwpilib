@@ -4,6 +4,8 @@
 
 package org.wpilib.hardware.accelerometer;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import org.wpilib.hardware.bus.I2C;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.SimDevice;
@@ -14,8 +16,6 @@ import org.wpilib.networktables.DoubleTopic;
 import org.wpilib.networktables.NTSendable;
 import org.wpilib.networktables.NTSendableBuilder;
 import org.wpilib.util.sendable.SendableRegistry;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 /** ADXL345 I2C Accelerometer. */
 @SuppressWarnings("TypeName")

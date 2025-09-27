@@ -4,9 +4,9 @@
 
 package org.wpilib.math.controller.struct;
 
+import java.nio.ByteBuffer;
 import org.wpilib.math.controller.DifferentialDriveFeedforward;
 import org.wpilib.util.struct.Struct;
-import java.nio.ByteBuffer;
 
 public final class DifferentialDriveFeedforwardStruct
     implements Struct<DifferentialDriveFeedforward> {

@@ -4,9 +4,9 @@
 
 package org.wpilib.math.controller;
 
-import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.controller.proto.DifferentialDriveFeedforwardProto;
 import org.wpilib.math.controller.struct.DifferentialDriveFeedforwardStruct;
+import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N2;
 import org.wpilib.math.system.LinearSystem;
 import org.wpilib.math.system.plant.LinearSystemId;

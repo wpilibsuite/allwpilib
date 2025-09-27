@@ -4,15 +4,15 @@
 
 package org.wpilib.smartdashboard;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import org.wpilib.networktables.DoubleArrayPublisher;
 import org.wpilib.networktables.NTSendable;
 import org.wpilib.networktables.NTSendableBuilder;
 import org.wpilib.networktables.NetworkTable;
 import org.wpilib.networktables.StringPublisher;
 import org.wpilib.util.Color8Bit;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * Visual 2D representation of arms, elevators, and general mechanisms through a node-based API.

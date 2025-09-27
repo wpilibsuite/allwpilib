@@ -4,14 +4,13 @@
 
 package org.wpilib.examples.armsimulation.subsystems;
 
+import org.wpilib.Preferences;
+import org.wpilib.examples.armsimulation.Constants;
+import org.wpilib.hardware.motor.PWMSparkMax;
+import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.system.plant.DCMotor;
 import org.wpilib.math.util.Units;
-import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.Preferences;
-import org.wpilib.system.RobotController;
-import org.wpilib.examples.armsimulation.Constants;
-import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.simulation.BatterySim;
 import org.wpilib.simulation.EncoderSim;
 import org.wpilib.simulation.RoboRioSim;
@@ -20,6 +19,7 @@ import org.wpilib.smartdashboard.Mechanism2d;
 import org.wpilib.smartdashboard.MechanismLigament2d;
 import org.wpilib.smartdashboard.MechanismRoot2d;
 import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.system.RobotController;
 import org.wpilib.util.Color;
 import org.wpilib.util.Color8Bit;
 

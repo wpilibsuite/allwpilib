@@ -6,9 +6,9 @@ package org.wpilib.command.button;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.wpilib.simulation.DriverStationSim;
-import org.wpilib.command.CommandTestBase;
 import org.junit.jupiter.api.Test;
+import org.wpilib.command.CommandTestBase;
+import org.wpilib.simulation.DriverStationSim;
 
 class RobotModeTriggersTest extends CommandTestBase {
   @Test

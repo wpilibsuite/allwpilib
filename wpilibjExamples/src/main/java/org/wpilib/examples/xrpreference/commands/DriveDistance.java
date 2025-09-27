@@ -4,8 +4,8 @@
 
 package org.wpilib.examples.xrpreference.commands;
 
-import org.wpilib.examples.xrpreference.subsystems.Drivetrain;
 import org.wpilib.command.Command;
+import org.wpilib.examples.xrpreference.subsystems.Drivetrain;
 
 public class DriveDistance extends Command {
   private final Drivetrain m_drive;

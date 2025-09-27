@@ -4,18 +4,18 @@
 
 package org.wpilib.math.estimator;
 
+import java.util.function.BiFunction;
+import org.ejml.dense.row.decomposition.qr.QRDecompositionHouseholder_DDRM;
+import org.ejml.simple.SimpleMatrix;
 import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Nat;
-import org.wpilib.math.util.Num;
-import org.wpilib.math.util.Pair;
-import org.wpilib.math.util.StateSpaceUtil;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.system.Discretization;
 import org.wpilib.math.system.NumericalIntegration;
 import org.wpilib.math.system.NumericalJacobian;
-import java.util.function.BiFunction;
-import org.ejml.dense.row.decomposition.qr.QRDecompositionHouseholder_DDRM;
-import org.ejml.simple.SimpleMatrix;
+import org.wpilib.math.util.Nat;
+import org.wpilib.math.util.Num;
+import org.wpilib.math.util.Pair;
+import org.wpilib.math.util.StateSpaceUtil;
 
 /**
  * A Kalman filter combines predictions from a model and measurements to give an estimate of the

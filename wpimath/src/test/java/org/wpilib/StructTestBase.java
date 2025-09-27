@@ -4,10 +4,10 @@
 
 package org.wpilib;
 
-import org.wpilib.util.struct.Struct;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
+import org.wpilib.util.struct.Struct;
 
 public abstract class StructTestBase<T> {
   private final T m_testData;

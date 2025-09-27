@@ -6,12 +6,12 @@ package org.wpilib.math.geometry;
 
 import static org.wpilib.units.Units.Meters;
 
+import java.util.Objects;
 import org.wpilib.math.geometry.proto.Rectangle2dProto;
 import org.wpilib.math.geometry.struct.Rectangle2dStruct;
 import org.wpilib.units.measure.Distance;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
-import java.util.Objects;
 
 /**
  * Represents a 2d rectangular space containing translational, rotational, and scaling components.

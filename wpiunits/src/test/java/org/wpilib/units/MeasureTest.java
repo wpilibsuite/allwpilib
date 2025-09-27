@@ -11,13 +11,13 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.units.measure.Angle;
 import org.wpilib.units.measure.AngularMomentum;
 import org.wpilib.units.measure.Distance;
 import org.wpilib.units.measure.LinearVelocity;
 import org.wpilib.units.measure.Per;
 import org.wpilib.units.measure.Time;
-import org.junit.jupiter.api.Test;
 
 class MeasureTest {
   @Test

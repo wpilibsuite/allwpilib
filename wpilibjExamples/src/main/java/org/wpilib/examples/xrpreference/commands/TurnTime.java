@@ -4,8 +4,8 @@
 
 package org.wpilib.examples.xrpreference.commands;
 
-import org.wpilib.examples.xrpreference.subsystems.Drivetrain;
 import org.wpilib.command.Command;
+import org.wpilib.examples.xrpreference.subsystems.Drivetrain;
 
 /*
  * Creates a new TurnTime command. This command will turn your robot for a

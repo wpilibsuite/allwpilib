@@ -4,6 +4,15 @@
 
 package org.wpilib.smartdashboard;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
+import java.util.function.DoubleConsumer;
+import java.util.function.DoubleSupplier;
+import java.util.function.LongConsumer;
+import java.util.function.LongSupplier;
+import java.util.function.Supplier;
 import org.wpilib.networktables.BooleanArrayPublisher;
 import org.wpilib.networktables.BooleanArraySubscriber;
 import org.wpilib.networktables.BooleanArrayTopic;
@@ -43,19 +52,10 @@ import org.wpilib.networktables.StringSubscriber;
 import org.wpilib.networktables.StringTopic;
 import org.wpilib.networktables.Subscriber;
 import org.wpilib.networktables.Topic;
+import org.wpilib.system.RobotController;
 import org.wpilib.util.function.BooleanConsumer;
 import org.wpilib.util.function.FloatConsumer;
 import org.wpilib.util.function.FloatSupplier;
-import org.wpilib.system.RobotController;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
-import java.util.function.DoubleConsumer;
-import java.util.function.DoubleSupplier;
-import java.util.function.LongConsumer;
-import java.util.function.LongSupplier;
-import java.util.function.Supplier;
 
 /** Implementation detail for SendableBuilder. */
 public class SendableBuilderImpl implements NTSendableBuilder {

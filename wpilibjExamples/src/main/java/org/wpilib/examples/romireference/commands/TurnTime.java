@@ -4,8 +4,8 @@
 
 package org.wpilib.examples.romireference.commands;
 
-import org.wpilib.examples.romireference.subsystems.Drivetrain;
 import org.wpilib.command.Command;
+import org.wpilib.examples.romireference.subsystems.Drivetrain;
 
 /*
  * Creates a new TurnTime command. This command will turn your robot for a

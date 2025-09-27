@@ -4,9 +4,9 @@
 
 package org.wpilib.epilogue.logging.errors;
 
-import org.wpilib.epilogue.logging.ClassSpecificLogger;
 import java.util.HashMap;
 import java.util.Map;
+import org.wpilib.epilogue.logging.ClassSpecificLogger;
 
 /**
  * An error handler that disables loggers after too many exceptions are raised. Useful when playing

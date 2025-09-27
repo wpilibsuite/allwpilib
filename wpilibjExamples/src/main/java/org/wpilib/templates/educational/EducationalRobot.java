@@ -4,11 +4,11 @@
 
 package org.wpilib.templates.educational;
 
-import org.wpilib.hardware.hal.DriverStationJNI;
-import org.wpilib.util.WPIUtilJNI;
 import org.wpilib.driverstation.DriverStation;
-import org.wpilib.opmode.RobotBase;
+import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.internal.DriverStationModeThread;
+import org.wpilib.opmode.RobotBase;
+import org.wpilib.util.WPIUtilJNI;
 
 /** Educational robot base class. */
 public class EducationalRobot extends RobotBase {

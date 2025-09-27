@@ -6,8 +6,8 @@ package org.wpilib.epilogue.processor;
 
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
-import static org.wpilib.epilogue.processor.CompileTestOptions.kJavaVersionOptions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.wpilib.epilogue.processor.CompileTestOptions.kJavaVersionOptions;
 
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;

@@ -6,10 +6,10 @@ package org.wpilib.can;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.can.CANJNI;
 import org.wpilib.hardware.hal.can.CANStatus;
-import org.junit.jupiter.api.Test;
 
 class CANStatusTest {
   @Test

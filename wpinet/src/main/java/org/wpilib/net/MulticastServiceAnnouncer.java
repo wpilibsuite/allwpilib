@@ -4,9 +4,9 @@
 
 package org.wpilib.net;
 
-import org.wpilib.util.cleanup.WPICleaner;
 import java.lang.ref.Cleaner.Cleanable;
 import java.util.Map;
+import org.wpilib.util.cleanup.WPICleaner;
 
 /** Class to announce over mDNS that a service is available. */
 public class MulticastServiceAnnouncer implements AutoCloseable {

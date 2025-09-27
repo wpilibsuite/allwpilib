@@ -4,10 +4,10 @@
 
 package org.wpilib.math.kinematics.struct;
 
+import java.nio.ByteBuffer;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.kinematics.MecanumDriveKinematics;
 import org.wpilib.util.struct.Struct;
-import java.nio.ByteBuffer;
 
 public class MecanumDriveKinematicsStruct implements Struct<MecanumDriveKinematics> {
   @Override

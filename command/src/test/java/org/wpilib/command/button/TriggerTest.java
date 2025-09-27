@@ -10,7 +10,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import org.wpilib.simulation.SimHooks;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BooleanSupplier;
+import org.junit.jupiter.api.Test;
 import org.wpilib.command.Command;
 import org.wpilib.command.CommandScheduler;
 import org.wpilib.command.CommandTestBase;
@@ -18,10 +21,7 @@ import org.wpilib.command.FunctionalCommand;
 import org.wpilib.command.RunCommand;
 import org.wpilib.command.StartEndCommand;
 import org.wpilib.command.WaitUntilCommand;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BooleanSupplier;
-import org.junit.jupiter.api.Test;
+import org.wpilib.simulation.SimHooks;
 
 class TriggerTest extends CommandTestBase {
   @Test

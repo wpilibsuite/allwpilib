@@ -6,9 +6,9 @@ package org.wpilib.math.geometry.proto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Translation3d;
 import org.wpilib.math.proto.Geometry3D.ProtobufTranslation3d;
-import org.junit.jupiter.api.Test;
 
 class Translation3dProtoTest {
   private static final Translation3d DATA = new Translation3d(35.04, 22.9, 3.504);

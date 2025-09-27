@@ -6,9 +6,9 @@ package org.wpilib.math.system.plant.proto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.proto.Plant.ProtobufDCMotor;
 import org.wpilib.math.system.plant.DCMotor;
-import org.junit.jupiter.api.Test;
 
 class DCMotorProtoTest {
   private static final DCMotor DATA = new DCMotor(1.91, 19.1, 1.74, 1.74, 22.9, 3);

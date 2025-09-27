@@ -6,15 +6,15 @@ package org.wpilib.math.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.linalg.MatBuilder;
 import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Nat;
-import org.wpilib.math.util.Num;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.system.Discretization;
 import org.wpilib.math.system.plant.DCMotor;
 import org.wpilib.math.system.plant.LinearSystemId;
-import org.junit.jupiter.api.Test;
+import org.wpilib.math.util.Nat;
+import org.wpilib.math.util.Num;
 
 class LinearQuadraticRegulatorTest {
   @Test

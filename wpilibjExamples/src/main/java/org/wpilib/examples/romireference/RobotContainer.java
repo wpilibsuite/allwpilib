@@ -4,6 +4,9 @@
 
 package org.wpilib.examples.romireference;
 
+import org.wpilib.command.Command;
+import org.wpilib.command.PrintCommand;
+import org.wpilib.command.button.Trigger;
 import org.wpilib.driverstation.GenericHID;
 import org.wpilib.driverstation.Joystick;
 import org.wpilib.driverstation.XboxController;
@@ -15,9 +18,6 @@ import org.wpilib.romi.OnBoardIO;
 import org.wpilib.romi.OnBoardIO.ChannelMode;
 import org.wpilib.smartdashboard.SendableChooser;
 import org.wpilib.smartdashboard.SmartDashboard;
-import org.wpilib.command.Command;
-import org.wpilib.command.PrintCommand;
-import org.wpilib.command.button.Trigger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a

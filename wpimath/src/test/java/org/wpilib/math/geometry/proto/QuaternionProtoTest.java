@@ -6,9 +6,9 @@ package org.wpilib.math.geometry.proto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Quaternion;
 import org.wpilib.math.proto.Geometry3D.ProtobufQuaternion;
-import org.junit.jupiter.api.Test;
 
 class QuaternionProtoTest {
   private static final Quaternion DATA = new Quaternion(1.1, 0.191, 35.04, 19.1);

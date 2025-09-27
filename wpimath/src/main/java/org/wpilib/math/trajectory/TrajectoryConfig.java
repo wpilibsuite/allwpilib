@@ -7,6 +7,8 @@ package org.wpilib.math.trajectory;
 import static org.wpilib.units.Units.MetersPerSecond;
 import static org.wpilib.units.Units.MetersPerSecondPerSecond;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import org.wpilib.math.kinematics.MecanumDriveKinematics;
 import org.wpilib.math.kinematics.SwerveDriveKinematics;
@@ -16,8 +18,6 @@ import org.wpilib.math.trajectory.constraint.SwerveDriveKinematicsConstraint;
 import org.wpilib.math.trajectory.constraint.TrajectoryConstraint;
 import org.wpilib.units.measure.LinearAcceleration;
 import org.wpilib.units.measure.LinearVelocity;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Represents the configuration for generating a trajectory. This class stores the start velocity,

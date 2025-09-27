@@ -9,11 +9,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.spline.SplineParameterizer.MalformedSplineException;
-import java.util.List;
-import org.junit.jupiter.api.Test;
 
 class QuinticHermiteSplineTest {
   private static final double kMaxDx = 0.127;

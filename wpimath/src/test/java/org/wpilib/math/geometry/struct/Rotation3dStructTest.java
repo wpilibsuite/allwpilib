@@ -6,11 +6,11 @@ package org.wpilib.math.geometry.struct;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.math.geometry.Quaternion;
-import org.wpilib.math.geometry.Rotation3d;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.geometry.Quaternion;
+import org.wpilib.math.geometry.Rotation3d;
 
 class Rotation3dStructTest {
   private static final Rotation3d DATA = new Rotation3d(new Quaternion(2.29, 0.191, 0.191, 17.4));

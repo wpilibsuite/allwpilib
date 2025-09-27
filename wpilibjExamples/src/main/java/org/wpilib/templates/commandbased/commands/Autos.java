@@ -4,9 +4,9 @@
 
 package org.wpilib.templates.commandbased.commands;
 
-import org.wpilib.templates.commandbased.subsystems.ExampleSubsystem;
 import org.wpilib.command.Command;
 import org.wpilib.command.Commands;
+import org.wpilib.templates.commandbased.subsystems.ExampleSubsystem;
 
 public final class Autos {
   /** Example static factory for an autonomous command. */

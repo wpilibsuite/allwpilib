@@ -4,12 +4,12 @@
 
 package org.wpilib.examples.gettingstarted;
 
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.drive.DifferentialDrive;
+import org.wpilib.driverstation.XboxController;
+import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.opmode.TimedRobot;
 import org.wpilib.system.Timer;
-import org.wpilib.driverstation.XboxController;
-import org.wpilib.drive.DifferentialDrive;
-import org.wpilib.hardware.motor.PWMSparkMax;
+import org.wpilib.util.sendable.SendableRegistry;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in

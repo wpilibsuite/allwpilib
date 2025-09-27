@@ -4,12 +4,12 @@
 
 package org.wpilib.units;
 
-import static org.wpilib.units.Units.Degrees;
-import static org.wpilib.units.Units.Foot;
-import static org.wpilib.units.Units.Inches;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.wpilib.units.Units.Degrees;
+import static org.wpilib.units.Units.Foot;
+import static org.wpilib.units.Units.Inches;
 
 import org.junit.jupiter.api.Test;
 

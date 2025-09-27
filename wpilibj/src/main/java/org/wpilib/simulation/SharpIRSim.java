@@ -4,8 +4,8 @@
 
 package org.wpilib.simulation;
 
-import org.wpilib.hardware.hal.SimDouble;
 import org.wpilib.SharpIR;
+import org.wpilib.hardware.hal.SimDouble;
 
 /** Simulation class for Sharp IR sensors. */
 public class SharpIRSim {

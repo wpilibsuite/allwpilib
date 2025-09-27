@@ -8,14 +8,14 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.function.BiFunction;
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.linalg.MatBuilder;
 import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Nat;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N2;
 import org.wpilib.math.system.NumericalIntegration;
-import java.util.function.BiFunction;
-import org.junit.jupiter.api.Test;
+import org.wpilib.math.util.Nat;
 
 class ArmFeedforwardTest {
   /**

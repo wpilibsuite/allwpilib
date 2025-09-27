@@ -4,10 +4,10 @@
 
 package org.wpilib.snippets.encoderdrive;
 
-import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.opmode.TimedRobot;
 import org.wpilib.drive.DifferentialDrive;
 import org.wpilib.hardware.motor.Spark;
+import org.wpilib.hardware.rotation.Encoder;
+import org.wpilib.opmode.TimedRobot;
 
 /**
  * Encoder drive to distance snippets for frc-docs.

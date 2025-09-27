@@ -7,11 +7,11 @@ package org.wpilib.simulation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.simulation.testutils.DoubleCallback;
 import org.wpilib.simulation.testutils.IntCallback;
-import org.junit.jupiter.api.Test;
 
 class EncoderSimTest {
   private static final double DEFAULT_DISTANCE_PER_PULSE = 0.0005;

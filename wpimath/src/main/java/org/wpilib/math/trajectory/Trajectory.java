@@ -5,16 +5,16 @@
 package org.wpilib.math.trajectory;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.wpilib.math.util.MathUtil;
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Transform2d;
-import org.wpilib.math.trajectory.proto.TrajectoryProto;
-import org.wpilib.math.trajectory.proto.TrajectoryStateProto;
-import org.wpilib.util.protobuf.ProtobufSerializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Transform2d;
+import org.wpilib.math.trajectory.proto.TrajectoryProto;
+import org.wpilib.math.trajectory.proto.TrajectoryStateProto;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.util.protobuf.ProtobufSerializable;
 
 /**
  * Represents a time-parameterized trajectory. The trajectory contains of various States that

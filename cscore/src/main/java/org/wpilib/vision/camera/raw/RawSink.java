@@ -4,9 +4,9 @@
 
 package org.wpilib.vision.camera.raw;
 
+import org.wpilib.util.RawFrame;
 import org.wpilib.vision.camera.CameraServerJNI;
 import org.wpilib.vision.camera.ImageSink;
-import org.wpilib.util.RawFrame;
 
 /**
  * A sink for user code to accept video frames as raw bytes.

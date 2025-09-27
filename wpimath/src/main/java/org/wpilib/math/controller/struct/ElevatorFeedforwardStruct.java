@@ -4,9 +4,9 @@
 
 package org.wpilib.math.controller.struct;
 
+import java.nio.ByteBuffer;
 import org.wpilib.math.controller.ElevatorFeedforward;
 import org.wpilib.util.struct.Struct;
-import java.nio.ByteBuffer;
 
 public class ElevatorFeedforwardStruct implements Struct<ElevatorFeedforward> {
   @Override

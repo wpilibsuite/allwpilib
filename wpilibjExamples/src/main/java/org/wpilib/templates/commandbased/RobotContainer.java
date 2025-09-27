@@ -4,13 +4,13 @@
 
 package org.wpilib.templates.commandbased;
 
+import org.wpilib.command.Command;
+import org.wpilib.command.button.CommandXboxController;
+import org.wpilib.command.button.Trigger;
 import org.wpilib.templates.commandbased.Constants.OperatorConstants;
 import org.wpilib.templates.commandbased.commands.Autos;
 import org.wpilib.templates.commandbased.commands.ExampleCommand;
 import org.wpilib.templates.commandbased.subsystems.ExampleSubsystem;
-import org.wpilib.command.Command;
-import org.wpilib.command.button.CommandXboxController;
-import org.wpilib.command.button.Trigger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -35,11 +35,10 @@ public class RobotContainer {
   /**
    * Use this method to define your trigger->command mappings. Triggers can be created via the
    * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
-   * predicate, or via the named factories in {@link
-   * org.wpilib.command.button.CommandGenericHID}'s subclasses for {@link
-   * CommandXboxController Xbox}/{@link org.wpilib.command.button.CommandPS4Controller
-   * PS4} controllers or {@link org.wpilib.command.button.CommandJoystick Flight
-   * joysticks}.
+   * predicate, or via the named factories in {@link org.wpilib.command.button.CommandGenericHID}'s
+   * subclasses for {@link CommandXboxController Xbox}/{@link
+   * org.wpilib.command.button.CommandPS4Controller PS4} controllers or {@link
+   * org.wpilib.command.button.CommandJoystick Flight joysticks}.
    */
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`

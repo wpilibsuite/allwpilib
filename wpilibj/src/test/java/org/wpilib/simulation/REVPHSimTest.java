@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.pneumatic.CompressorConfigType;
 import org.wpilib.hardware.pneumatic.DoubleSolenoid;
@@ -17,7 +18,6 @@ import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
 import org.wpilib.simulation.testutils.BooleanCallback;
 import org.wpilib.simulation.testutils.DoubleCallback;
 import org.wpilib.simulation.testutils.EnumCallback;
-import org.junit.jupiter.api.Test;
 
 class REVPHSimTest {
   @Test

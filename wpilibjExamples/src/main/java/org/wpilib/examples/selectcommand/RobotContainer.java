@@ -4,12 +4,12 @@
 
 package org.wpilib.examples.selectcommand;
 
-import org.wpilib.driverstation.GenericHID;
-import org.wpilib.driverstation.XboxController;
+import java.util.Map;
 import org.wpilib.command.Command;
 import org.wpilib.command.PrintCommand;
 import org.wpilib.command.SelectCommand;
-import java.util.Map;
+import org.wpilib.driverstation.GenericHID;
+import org.wpilib.driverstation.XboxController;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a

@@ -4,8 +4,8 @@
 
 package org.wpilib.opmode;
 
-import org.wpilib.vision.stream.CameraServerShared;
-import org.wpilib.vision.stream.CameraServerSharedStore;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 import org.wpilib.Notifier;
 import org.wpilib.RuntimeType;
 import org.wpilib.driverstation.DriverStation;
@@ -17,10 +17,10 @@ import org.wpilib.networktables.MultiSubscriber;
 import org.wpilib.networktables.NetworkTableEvent;
 import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.system.Timer;
-import org.wpilib.util.WPIUtilJNI;
 import org.wpilib.system.WPILibVersion;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Supplier;
+import org.wpilib.util.WPIUtilJNI;
+import org.wpilib.vision.stream.CameraServerShared;
+import org.wpilib.vision.stream.CameraServerSharedStore;
 
 /**
  * Implement a Robot Program framework. The RobotBase class is intended to be subclassed to create a

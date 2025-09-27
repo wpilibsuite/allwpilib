@@ -7,13 +7,13 @@ package org.wpilib.math.controller;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.math.linalg.MatBuilder;
-import org.wpilib.math.util.MathUtil;
-import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Nat;
-import org.wpilib.math.linalg.VecBuilder;
+import java.util.ArrayList;
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.linalg.MatBuilder;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N2;
 import org.wpilib.math.numbers.N5;
@@ -22,8 +22,8 @@ import org.wpilib.math.system.NumericalIntegration;
 import org.wpilib.math.system.plant.LinearSystemId;
 import org.wpilib.math.trajectory.TrajectoryConfig;
 import org.wpilib.math.trajectory.TrajectoryGenerator;
-import java.util.ArrayList;
-import org.junit.jupiter.api.Test;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.math.util.Nat;
 
 class LTVDifferentialDriveControllerTest {
   private static final double kTolerance = 1 / 12.0;

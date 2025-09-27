@@ -10,19 +10,19 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.wpilib.math.linalg.MatBuilder;
-import org.wpilib.math.util.MathSharedStore;
-import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Nat;
+import java.util.Objects;
 import org.wpilib.math.geometry.proto.Rotation2dProto;
 import org.wpilib.math.geometry.struct.Rotation2dStruct;
 import org.wpilib.math.interpolation.Interpolatable;
+import org.wpilib.math.linalg.MatBuilder;
+import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N2;
+import org.wpilib.math.util.MathSharedStore;
+import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Units;
 import org.wpilib.units.measure.Angle;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
-import java.util.Objects;
 
 /**
  * A rotation in a 2D coordinate frame represented by a point on the unit circle (cosine and sine).

@@ -4,6 +4,8 @@
 
 package org.wpilib.units;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.wpilib.units.Units.Amps;
 import static org.wpilib.units.Units.Celsius;
 import static org.wpilib.units.Units.Centimeters;
@@ -39,8 +41,6 @@ import static org.wpilib.units.Units.Seconds;
 import static org.wpilib.units.Units.Value;
 import static org.wpilib.units.Units.Volts;
 import static org.wpilib.units.Units.Watts;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.function.DoubleFunction;
 import org.junit.jupiter.api.Test;

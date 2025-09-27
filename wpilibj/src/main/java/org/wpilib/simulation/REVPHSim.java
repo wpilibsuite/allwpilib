@@ -4,10 +4,10 @@
 
 package org.wpilib.simulation;
 
+import org.wpilib.SensorUtil;
 import org.wpilib.hardware.hal.simulation.NotifyCallback;
 import org.wpilib.hardware.hal.simulation.REVPHDataJNI;
 import org.wpilib.hardware.pneumatic.PneumaticHub;
-import org.wpilib.SensorUtil;
 
 /** Class to control a simulated PneumaticHub (PH). */
 public class REVPHSim extends PneumaticsBaseSim {

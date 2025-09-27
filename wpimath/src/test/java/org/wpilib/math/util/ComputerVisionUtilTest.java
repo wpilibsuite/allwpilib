@@ -6,13 +6,12 @@ package org.wpilib.math.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Test;
+import org.wpilib.UtilityClassTest;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Transform3d;
 import org.wpilib.math.geometry.Translation3d;
-import org.wpilib.math.util.Units;
-import org.wpilib.UtilityClassTest;
-import org.junit.jupiter.api.Test;
 
 class ComputerVisionUtilTest extends UtilityClassTest<ComputerVisionUtil> {
   ComputerVisionUtilTest() {

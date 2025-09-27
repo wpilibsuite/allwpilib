@@ -7,13 +7,13 @@ package org.wpilib.opmode;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.wpilib.simulation.DriverStationSim;
-import org.wpilib.simulation.SimHooks;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
+import org.wpilib.simulation.DriverStationSim;
+import org.wpilib.simulation.SimHooks;
 
 class TimesliceRobotTest {
   static class MockRobot extends TimesliceRobot {

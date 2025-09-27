@@ -6,10 +6,10 @@ package org.wpilib.math.kinematics.proto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.kinematics.MecanumDriveKinematics;
 import org.wpilib.math.proto.Kinematics.ProtobufMecanumDriveKinematics;
-import org.junit.jupiter.api.Test;
 
 class MecanumDriveKinematicsProtoTest {
   private static final MecanumDriveKinematics DATA =

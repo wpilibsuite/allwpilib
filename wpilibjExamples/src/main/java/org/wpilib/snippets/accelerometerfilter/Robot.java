@@ -4,9 +4,9 @@
 
 package org.wpilib.snippets.accelerometerfilter;
 
-import org.wpilib.math.filter.LinearFilter;
 import org.wpilib.OnboardIMU;
 import org.wpilib.OnboardIMU.MountOrientation;
+import org.wpilib.math.filter.LinearFilter;
 import org.wpilib.opmode.TimedRobot;
 import org.wpilib.smartdashboard.SmartDashboard;
 

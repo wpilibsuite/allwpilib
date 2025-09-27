@@ -6,8 +6,8 @@ package org.wpilib.vision.apriltag;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.util.PixelFormat;
 import org.junit.jupiter.api.Test;
+import org.wpilib.util.PixelFormat;
 
 class AprilTagGenerationTest {
   @Test

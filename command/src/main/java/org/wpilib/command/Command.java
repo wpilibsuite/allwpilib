@@ -7,15 +7,15 @@ package org.wpilib.command;
 import static org.wpilib.units.Units.Seconds;
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.BooleanSupplier;
 import org.wpilib.units.measure.Time;
 import org.wpilib.util.function.BooleanConsumer;
 import org.wpilib.util.sendable.Sendable;
 import org.wpilib.util.sendable.SendableBuilder;
 import org.wpilib.util.sendable.SendableRegistry;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.function.BooleanSupplier;
 
 /**
  * A state machine representing a complete action to be performed by the robot. Commands are run by

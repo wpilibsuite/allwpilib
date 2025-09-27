@@ -4,9 +4,9 @@
 
 package org.wpilib.simulation;
 
+import org.wpilib.hardware.discrete.PWM;
 import org.wpilib.hardware.hal.simulation.NotifyCallback;
 import org.wpilib.hardware.hal.simulation.PWMDataJNI;
-import org.wpilib.hardware.discrete.PWM;
 
 /** Class to control a simulated PWM output. */
 public class PWMSim {

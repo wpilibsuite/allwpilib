@@ -6,8 +6,8 @@ package org.wpilib.math.controller.struct;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.math.controller.DifferentialDriveFeedforward;
 import org.wpilib.StructTestBase;
+import org.wpilib.math.controller.DifferentialDriveFeedforward;
 
 @SuppressWarnings("PMD.TestClassWithoutTestCases")
 class DifferentialDriveFeedforwardStructTest extends StructTestBase<DifferentialDriveFeedforward> {

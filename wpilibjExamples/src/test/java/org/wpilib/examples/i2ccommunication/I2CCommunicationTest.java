@@ -8,13 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.wpilib.hardware.hal.AllianceStationID;
-import org.wpilib.hardware.hal.HAL;
-import org.wpilib.driverstation.DriverStation;
-import org.wpilib.simulation.CallbackStore;
-import org.wpilib.simulation.DriverStationSim;
-import org.wpilib.simulation.I2CSim;
-import org.wpilib.simulation.SimHooks;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.AfterEach;
@@ -23,6 +16,13 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.wpilib.driverstation.DriverStation;
+import org.wpilib.hardware.hal.AllianceStationID;
+import org.wpilib.hardware.hal.HAL;
+import org.wpilib.simulation.CallbackStore;
+import org.wpilib.simulation.DriverStationSim;
+import org.wpilib.simulation.I2CSim;
+import org.wpilib.simulation.SimHooks;
 
 @ResourceLock("timing")
 class I2CCommunicationTest {

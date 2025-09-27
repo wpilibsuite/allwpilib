@@ -6,13 +6,13 @@ package org.wpilib.drive;
 
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
+import java.util.function.DoubleConsumer;
 import org.wpilib.hardware.hal.HAL;
+import org.wpilib.hardware.motor.MotorController;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.util.sendable.Sendable;
 import org.wpilib.util.sendable.SendableBuilder;
 import org.wpilib.util.sendable.SendableRegistry;
-import org.wpilib.hardware.motor.MotorController;
-import java.util.function.DoubleConsumer;
 
 /**
  * A class for driving differential drive/skid-steer drive platforms such as the Kit of Parts drive
@@ -43,12 +43,13 @@ import java.util.function.DoubleConsumer;
  * positive Z axis points up. Rotations follow the right-hand rule, so counterclockwise rotation
  * around the Z axis is positive.
  *
- * <p>Inputs smaller then {@value org.wpilib.drive.RobotDriveBase#kDefaultDeadband} will
- * be set to 0, and larger values will be scaled so that the full range is still used. This deadband
- * value can be changed with {@link #setDeadband}.
+ * <p>Inputs smaller then {@value org.wpilib.drive.RobotDriveBase#kDefaultDeadband} will be set to
+ * 0, and larger values will be scaled so that the full range is still used. This deadband value can
+ * be changed with {@link #setDeadband}.
  *
- * <p>{@link org.wpilib.hardware.motor.MotorSafety} is enabled by default. The tankDrive, arcadeDrive,
- * or curvatureDrive methods should be called periodically to avoid Motor Safety timeouts.
+ * <p>{@link org.wpilib.hardware.motor.MotorSafety} is enabled by default. The tankDrive,
+ * arcadeDrive, or curvatureDrive methods should be called periodically to avoid Motor Safety
+ * timeouts.
  */
 public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   private static int instances;
@@ -94,8 +95,8 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * Construct a DifferentialDrive.
    *
    * <p>To pass multiple motors per side, use CAN motor controller followers or {@link
-   * org.wpilib.hardware.motor.PWMMotorController#addFollower(PWMMotorController)}. If a
-   * motor needs to be inverted, do so before passing it in.
+   * org.wpilib.hardware.motor.PWMMotorController#addFollower(PWMMotorController)}. If a motor needs
+   * to be inverted, do so before passing it in.
    *
    * @param leftMotor Left motor.
    * @param rightMotor Right motor.
@@ -111,8 +112,8 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * Construct a DifferentialDrive.
    *
    * <p>To pass multiple motors per side, use CAN motor controller followers or {@link
-   * org.wpilib.hardware.motor.PWMMotorController#addFollower(PWMMotorController)}. If a
-   * motor needs to be inverted, do so before passing it in.
+   * org.wpilib.hardware.motor.PWMMotorController#addFollower(PWMMotorController)}. If a motor needs
+   * to be inverted, do so before passing it in.
    *
    * @param leftMotor Left motor setter.
    * @param rightMotor Right motor setter.

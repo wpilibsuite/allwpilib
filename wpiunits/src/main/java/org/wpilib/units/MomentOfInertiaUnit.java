@@ -7,8 +7,8 @@ package org.wpilib.units;
 import org.wpilib.units.measure.MomentOfInertia;
 
 /**
- * A unit of moment of inertia, like {@link org.wpilib.units.Units#KilogramSquareMeters}. Moments
- * of inertia describe how much an object resists being rotated, analogous to mass's resistance to
+ * A unit of moment of inertia, like {@link org.wpilib.units.Units#KilogramSquareMeters}. Moments of
+ * inertia describe how much an object resists being rotated, analogous to mass's resistance to
  * being accelerated along a line.
  */
 public final class MomentOfInertiaUnit extends PerUnit<AngularMomentumUnit, AngularVelocityUnit> {

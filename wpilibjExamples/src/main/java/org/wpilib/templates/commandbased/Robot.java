@@ -4,9 +4,9 @@
 
 package org.wpilib.templates.commandbased;
 
-import org.wpilib.opmode.TimedRobot;
 import org.wpilib.command.Command;
 import org.wpilib.command.CommandScheduler;
+import org.wpilib.opmode.TimedRobot;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in

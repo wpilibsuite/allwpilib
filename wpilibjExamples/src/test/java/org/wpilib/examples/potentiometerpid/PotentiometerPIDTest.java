@@ -7,21 +7,21 @@ package org.wpilib.examples.potentiometerpid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.HAL.SimPeriodicBeforeCallback;
 import org.wpilib.math.system.plant.DCMotor;
 import org.wpilib.math.util.Units;
-import org.wpilib.system.RobotController;
 import org.wpilib.simulation.AnalogInputSim;
 import org.wpilib.simulation.DriverStationSim;
 import org.wpilib.simulation.ElevatorSim;
 import org.wpilib.simulation.JoystickSim;
 import org.wpilib.simulation.PWMMotorControllerSim;
 import org.wpilib.simulation.SimHooks;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.parallel.ResourceLock;
+import org.wpilib.system.RobotController;
 
 @ResourceLock("timing")
 class PotentiometerPIDTest {

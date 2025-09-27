@@ -6,11 +6,11 @@ package org.wpilib.command.button;
 
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import org.wpilib.math.filter.Debouncer;
-import org.wpilib.event.EventLoop;
+import java.util.function.BooleanSupplier;
 import org.wpilib.command.Command;
 import org.wpilib.command.CommandScheduler;
-import java.util.function.BooleanSupplier;
+import org.wpilib.event.EventLoop;
+import org.wpilib.math.filter.Debouncer;
 
 /**
  * This class provides an easy way to link commands to conditions.

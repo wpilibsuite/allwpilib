@@ -4,10 +4,10 @@
 
 package org.wpilib.hardware.motor;
 
+import java.util.Arrays;
 import org.wpilib.util.sendable.Sendable;
 import org.wpilib.util.sendable.SendableBuilder;
 import org.wpilib.util.sendable.SendableRegistry;
-import java.util.Arrays;
 
 /**
  * Allows multiple {@link MotorController} objects to be linked together.

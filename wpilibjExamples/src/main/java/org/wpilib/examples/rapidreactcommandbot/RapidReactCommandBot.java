@@ -6,6 +6,9 @@ package org.wpilib.examples.rapidreactcommandbot;
 
 import static org.wpilib.command.Commands.parallel;
 
+import org.wpilib.command.Command;
+import org.wpilib.command.button.CommandXboxController;
+import org.wpilib.command.button.Trigger;
 import org.wpilib.epilogue.Logged;
 import org.wpilib.examples.rapidreactcommandbot.Constants.AutoConstants;
 import org.wpilib.examples.rapidreactcommandbot.Constants.OIConstants;
@@ -15,9 +18,6 @@ import org.wpilib.examples.rapidreactcommandbot.subsystems.Intake;
 import org.wpilib.examples.rapidreactcommandbot.subsystems.Pneumatics;
 import org.wpilib.examples.rapidreactcommandbot.subsystems.Shooter;
 import org.wpilib.examples.rapidreactcommandbot.subsystems.Storage;
-import org.wpilib.command.Command;
-import org.wpilib.command.button.CommandXboxController;
-import org.wpilib.command.button.Trigger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
