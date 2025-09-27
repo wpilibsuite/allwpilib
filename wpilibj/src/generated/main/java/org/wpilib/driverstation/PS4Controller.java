@@ -6,11 +6,11 @@
 
 package org.wpilib.driverstation;
 
+import org.wpilib.event.BooleanEvent;
+import org.wpilib.event.EventLoop;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.util.sendable.Sendable;
 import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.event.BooleanEvent;
-import org.wpilib.event.EventLoop;
 
 /**
  * Handle input from PS4 controllers connected to the Driver Station.
