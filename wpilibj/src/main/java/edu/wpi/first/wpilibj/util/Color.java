@@ -85,6 +85,7 @@ public class Color {
    *
    * @param str a string of the format <code>#RRGGBB</code>, <code>rgb(R, G, B)</code>, or <code>
    *     ConstantName</code>
+   * @return the Color
    * @throws IllegalArgumentException if the string is invalid.
    */
   public static Color fromString(String str) {
