@@ -12,6 +12,7 @@ import java.util.Collection;
 import us.hebi.quickbuf.ProtoMessage;
 
 /** A backend is a generic interface for Epilogue to log discrete data points. */
+@SuppressWarnings("PMD.ImplicitFunctionalInterface")
 public interface EpilogueBackend {
   /**
    * Creates a backend that logs to multiple backends at once. Data reads will still only occur
@@ -52,7 +53,9 @@ public interface EpilogueBackend {
    * @param identifier the identifier of the data point
    * @param value the value of the data point
    */
-  void log(String identifier, int value);
+  default void log(String identifier, int value) {
+    log(identifier, value, LogMetadata.kEmpty);
+  }
 
   /**
    * Logs a 64-bit integer data point.
@@ -60,7 +63,9 @@ public interface EpilogueBackend {
    * @param identifier the identifier of the data point
    * @param value the value of the data point
    */
-  void log(String identifier, long value);
+  default void log(String identifier, long value) {
+    log(identifier, value, LogMetadata.kEmpty);
+  }
 
   /**
    * Logs a 32-bit floating point data point.
@@ -68,7 +73,9 @@ public interface EpilogueBackend {
    * @param identifier the identifier of the data point
    * @param value the value of the data point
    */
-  void log(String identifier, float value);
+  default void log(String identifier, float value) {
+    log(identifier, value, LogMetadata.kEmpty);
+  }
 
   /**
    * Logs a 64-bit floating point data point.
@@ -76,7 +83,9 @@ public interface EpilogueBackend {
    * @param identifier the identifier of the data point
    * @param value the value of the data point
    */
-  void log(String identifier, double value);
+  default void log(String identifier, double value) {
+    log(identifier, value, LogMetadata.kEmpty);
+  }
 
   /**
    * Logs a boolean data point.
@@ -84,16 +93,20 @@ public interface EpilogueBackend {
    * @param identifier the identifier of the data point
    * @param value the value of the data point
    */
-  void log(String identifier, boolean value);
+  default void log(String identifier, boolean value) {
+    log(identifier, value, LogMetadata.kEmpty);
+  }
 
   /**
    * Logs a raw byte array data point. <strong>NOTE:</strong> serializable data should be logged
-   * using {@link #log(String, Object, Struct)}.
+   * using struct or protobuf serializers to ensure compatibility with analysis tools.
    *
    * @param identifier the identifier of the data point
    * @param value the value of the data point
    */
-  void log(String identifier, byte[] value);
+  default void log(String identifier, byte[] value) {
+    log(identifier, value, LogMetadata.kEmpty);
+  }
 
   /**
    * Logs a 32-bit integer array data point.
@@ -101,7 +114,9 @@ public interface EpilogueBackend {
    * @param identifier the identifier of the data point
    * @param value the value of the data point
    */
-  void log(String identifier, int[] value);
+  default void log(String identifier, int[] value) {
+    log(identifier, value, LogMetadata.kEmpty);
+  }
 
   /**
    * Logs a 64-bit integer array data point.
@@ -109,7 +124,9 @@ public interface EpilogueBackend {
    * @param identifier the identifier of the data point
    * @param value the value of the data point
    */
-  void log(String identifier, long[] value);
+  default void log(String identifier, long[] value) {
+    log(identifier, value, LogMetadata.kEmpty);
+  }
 
   /**
    * Logs a 32-bit floating point array data point.
@@ -117,7 +134,9 @@ public interface EpilogueBackend {
    * @param identifier the identifier of the data point
    * @param value the value of the data point
    */
-  void log(String identifier, float[] value);
+  default void log(String identifier, float[] value) {
+    log(identifier, value, LogMetadata.kEmpty);
+  }
 
   /**
    * Logs a 64-bit floating point array data point.
@@ -125,7 +144,9 @@ public interface EpilogueBackend {
    * @param identifier the identifier of the data point
    * @param value the value of the data point
    */
-  void log(String identifier, double[] value);
+  default void log(String identifier, double[] value) {
+    log(identifier, value, LogMetadata.kEmpty);
+  }
 
   /**
    * Logs a boolean array data point.
@@ -133,7 +154,9 @@ public interface EpilogueBackend {
    * @param identifier the identifier of the data point
    * @param value the value of the data point
    */
-  void log(String identifier, boolean[] value);
+  default void log(String identifier, boolean[] value) {
+    log(identifier, value, LogMetadata.kEmpty);
+  }
 
   /**
    * Logs a text data point.
@@ -141,7 +164,9 @@ public interface EpilogueBackend {
    * @param identifier the identifier of the data point
    * @param value the value of the data point
    */
-  void log(String identifier, String value);
+  default void log(String identifier, String value) {
+    log(identifier, value, LogMetadata.kEmpty);
+  }
 
   /**
    * Logs a string array data point.
@@ -149,7 +174,9 @@ public interface EpilogueBackend {
    * @param identifier the identifier of the data point
    * @param value the value of the data point
    */
-  void log(String identifier, String[] value);
+  default void log(String identifier, String[] value) {
+    log(identifier, value, LogMetadata.kEmpty);
+  }
 
   /**
    * Logs a collection of strings data point.
@@ -169,7 +196,9 @@ public interface EpilogueBackend {
    * @param struct the struct to use to serialize the data
    * @param <S> the serializable type
    */
-  <S> void log(String identifier, S value, Struct<S> struct);
+  default <S> void log(String identifier, S value, Struct<S> struct) {
+    log(identifier, value, struct, LogMetadata.kEmpty);
+  }
 
   /**
    * Logs an array of struct-serializable objects.
@@ -179,7 +208,9 @@ public interface EpilogueBackend {
    * @param struct the struct to use to serialize the objects
    * @param <S> the serializable type
    */
-  <S> void log(String identifier, S[] value, Struct<S> struct);
+  default <S> void log(String identifier, S[] value, Struct<S> struct) {
+    log(identifier, value, struct, LogMetadata.kEmpty);
+  }
 
   /**
    * Logs a collection of struct-serializable objects.
@@ -204,7 +235,19 @@ public interface EpilogueBackend {
    * @param <P> the protobuf-serializable type
    * @param <M> the protobuf message type
    */
-  <P, M extends ProtoMessage<M>> void log(String identifier, P value, Protobuf<P, M> proto);
+  /**
+   * Logs a protobuf-serializable object.
+   *
+   * @param identifier the identifier of the data point
+   * @param value the value of the data point
+   * @param proto the protobuf to use to serialize the data
+   * @param <P> the protobuf-serializable type
+   * @param <M> the protobuf message type
+   */
+  default <P, M extends ProtoMessage<M>> void log(
+      String identifier, P value, Protobuf<P, M> proto) {
+    log(identifier, value, proto, LogMetadata.kEmpty);
+  }
 
   /**
    * Logs a measurement's value in terms of its base unit.
@@ -419,7 +462,8 @@ public interface EpilogueBackend {
    * @param <P> the protobuf-serializable type
    * @param <M> the protobuf message type
    */
-  default <P, M extends ProtoMessage<M>> void log(String identifier, P value, Protobuf<P, M> proto, LogMetadata metadata) {
+  default <P, M extends ProtoMessage<M>> void log(
+      String identifier, P value, Protobuf<P, M> proto, LogMetadata metadata) {
     log(identifier, value, proto);
   }
 
@@ -443,12 +487,14 @@ public interface EpilogueBackend {
    * @param metadata the metadata containing dependency information
    * @param <U> the dimension of the unit
    */
-  default <U extends Unit> void log(String identifier, Measure<U> value, U unit, LogMetadata metadata) {
+  default <U extends Unit> void log(
+      String identifier, Measure<U> value, U unit, LogMetadata metadata) {
     log(identifier, value, unit);
   }
 
   /**
-   * Logs an enum value with metadata. The value will appear as a string entry using the name of the enum.
+   * Logs an enum value with metadata. The value will appear as a string entry using the name of the
+   * enum.
    *
    * @param identifier the identifier of the data field
    * @param value the new value of the data field

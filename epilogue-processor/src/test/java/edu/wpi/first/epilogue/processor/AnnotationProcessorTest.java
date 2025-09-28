@@ -2349,14 +2349,11 @@ class AnnotationProcessorTest {
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         // Cached LogMetadata for element isAtTarget with @DependsOn annotations
-        private static final LogMetadata $metadata_edu_wpi_first_epilogue_Example_isAtTarget;
-
-        static {
-          $metadata_edu_wpi_first_epilogue_Example_isAtTarget = new edu.wpi.first.epilogue.logging.LogMetadata(java.util.List.of("position", "target", "tolerance"));
-        }
+        private final LogMetadata $metadata_edu_wpi_first_epilogue_Example_isAtTarget;
 
         public ExampleLogger() {
           super(Example.class);
+          $metadata_edu_wpi_first_epilogue_Example_isAtTarget = new edu.wpi.first.epilogue.logging.LogMetadata(java.util.List.of("position", "target", "tolerance"));
         }
 
         @Override

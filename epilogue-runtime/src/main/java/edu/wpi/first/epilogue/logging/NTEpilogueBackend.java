@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import us.hebi.quickbuf.ProtoMessage;
 
 /**
@@ -215,6 +216,259 @@ public class NTEpilogueBackend implements EpilogueBackend {
       ((ProtobufPublisher<P>) m_publishers.get(identifier)).set(value);
     } else {
       ProtobufPublisher<P> publisher = m_nt.getProtobufTopic(identifier, proto).publish();
+      m_publishers.put(identifier, publisher);
+      publisher.set(value);
+    }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <P, M extends ProtoMessage<M>> void log(
+      String identifier, P value, Protobuf<P, M> proto, LogMetadata metadata) {
+    // NetworkTableInstance.addSchema has checks that we're able to skip, avoiding allocations
+    if (m_seenProtos.add(proto)) {
+      m_nt.addSchema(proto);
+    }
+
+    if (m_publishers.containsKey(identifier)) {
+      ((ProtobufPublisher<P>) m_publishers.get(identifier)).set(value);
+    } else {
+      var topic = m_nt.getProtobufTopic(identifier, proto);
+      applyMetadata(topic, metadata);
+      var publisher = topic.publish();
+      m_publishers.put(identifier, publisher);
+      publisher.set(value);
+    }
+  }
+
+  // Helper method for applying metadata to topics
+  private void applyMetadata(edu.wpi.first.networktables.Topic topic, LogMetadata metadata) {
+    if (!metadata.dependencies().isEmpty()) {
+      var dependenciesJson =
+          metadata.dependencies().stream()
+              .map(d -> '"' + d + '"')
+              .collect(Collectors.joining(", ", "[", "]"));
+      String metadataJson =
+          """
+          { "dependencies": %s }
+          """
+              .trim()
+              .formatted(dependenciesJson);
+      topic.setProperties(metadataJson);
+    }
+  }
+
+  // Metadata-aware log methods
+  @Override
+  public void log(String identifier, int value, LogMetadata metadata) {
+    if (m_publishers.containsKey(identifier)) {
+      ((IntegerPublisher) m_publishers.get(identifier)).set(value);
+    } else {
+      var topic = m_nt.getIntegerTopic(identifier);
+      applyMetadata(topic, metadata);
+      var publisher = topic.publish();
+      m_publishers.put(identifier, publisher);
+      publisher.set(value);
+    }
+  }
+
+  @Override
+  public void log(String identifier, long value, LogMetadata metadata) {
+    if (m_publishers.containsKey(identifier)) {
+      ((IntegerPublisher) m_publishers.get(identifier)).set(value);
+    } else {
+      var topic = m_nt.getIntegerTopic(identifier);
+      applyMetadata(topic, metadata);
+      var publisher = topic.publish();
+      m_publishers.put(identifier, publisher);
+      publisher.set(value);
+    }
+  }
+
+  @Override
+  public void log(String identifier, float value, LogMetadata metadata) {
+    if (m_publishers.containsKey(identifier)) {
+      ((FloatPublisher) m_publishers.get(identifier)).set(value);
+    } else {
+      var topic = m_nt.getFloatTopic(identifier);
+      applyMetadata(topic, metadata);
+      var publisher = topic.publish();
+      m_publishers.put(identifier, publisher);
+      publisher.set(value);
+    }
+  }
+
+  @Override
+  public void log(String identifier, double value, LogMetadata metadata) {
+    if (m_publishers.containsKey(identifier)) {
+      ((DoublePublisher) m_publishers.get(identifier)).set(value);
+    } else {
+      var topic = m_nt.getDoubleTopic(identifier);
+      applyMetadata(topic, metadata);
+      var publisher = topic.publish();
+      m_publishers.put(identifier, publisher);
+      publisher.set(value);
+    }
+  }
+
+  @Override
+  public void log(String identifier, boolean value, LogMetadata metadata) {
+    if (m_publishers.containsKey(identifier)) {
+      ((BooleanPublisher) m_publishers.get(identifier)).set(value);
+    } else {
+      var topic = m_nt.getBooleanTopic(identifier);
+      applyMetadata(topic, metadata);
+      var publisher = topic.publish();
+      m_publishers.put(identifier, publisher);
+      publisher.set(value);
+    }
+  }
+
+  @Override
+  public void log(String identifier, byte[] value, LogMetadata metadata) {
+    if (m_publishers.containsKey(identifier)) {
+      ((RawPublisher) m_publishers.get(identifier)).set(value);
+    } else {
+      var topic = m_nt.getRawTopic(identifier);
+      applyMetadata(topic, metadata);
+      var publisher = topic.publish("raw");
+      m_publishers.put(identifier, publisher);
+      publisher.set(value);
+    }
+  }
+
+  @Override
+  @SuppressWarnings("PMD.UnnecessaryCastRule")
+  public void log(String identifier, int[] value, LogMetadata metadata) {
+    // NT backend only supports int64[], so we have to manually widen to 64 bits before sending
+    long[] widened = new long[value.length];
+
+    for (int i = 0; i < value.length; i++) {
+      widened[i] = (long) value[i];
+    }
+
+    if (m_publishers.containsKey(identifier)) {
+      ((IntegerArrayPublisher) m_publishers.get(identifier)).set(widened);
+    } else {
+      var topic = m_nt.getIntegerArrayTopic(identifier);
+      applyMetadata(topic, metadata);
+      var publisher = topic.publish();
+      m_publishers.put(identifier, publisher);
+      publisher.set(widened);
+    }
+  }
+
+  @Override
+  public void log(String identifier, long[] value, LogMetadata metadata) {
+    if (m_publishers.containsKey(identifier)) {
+      ((IntegerArrayPublisher) m_publishers.get(identifier)).set(value);
+    } else {
+      var topic = m_nt.getIntegerArrayTopic(identifier);
+      applyMetadata(topic, metadata);
+      var publisher = topic.publish();
+      m_publishers.put(identifier, publisher);
+      publisher.set(value);
+    }
+  }
+
+  @Override
+  public void log(String identifier, float[] value, LogMetadata metadata) {
+    if (m_publishers.containsKey(identifier)) {
+      ((FloatArrayPublisher) m_publishers.get(identifier)).set(value);
+    } else {
+      var topic = m_nt.getFloatArrayTopic(identifier);
+      applyMetadata(topic, metadata);
+      var publisher = topic.publish();
+      m_publishers.put(identifier, publisher);
+      publisher.set(value);
+    }
+  }
+
+  @Override
+  public void log(String identifier, double[] value, LogMetadata metadata) {
+    if (m_publishers.containsKey(identifier)) {
+      ((DoubleArrayPublisher) m_publishers.get(identifier)).set(value);
+    } else {
+      var topic = m_nt.getDoubleArrayTopic(identifier);
+      applyMetadata(topic, metadata);
+      var publisher = topic.publish();
+      m_publishers.put(identifier, publisher);
+      publisher.set(value);
+    }
+  }
+
+  @Override
+  public void log(String identifier, boolean[] value, LogMetadata metadata) {
+    if (m_publishers.containsKey(identifier)) {
+      ((BooleanArrayPublisher) m_publishers.get(identifier)).set(value);
+    } else {
+      var topic = m_nt.getBooleanArrayTopic(identifier);
+      applyMetadata(topic, metadata);
+      var publisher = topic.publish();
+      m_publishers.put(identifier, publisher);
+      publisher.set(value);
+    }
+  }
+
+  @Override
+  public void log(String identifier, String value, LogMetadata metadata) {
+    if (m_publishers.containsKey(identifier)) {
+      ((StringPublisher) m_publishers.get(identifier)).set(value);
+    } else {
+      var topic = m_nt.getStringTopic(identifier);
+      applyMetadata(topic, metadata);
+      var publisher = topic.publish();
+      m_publishers.put(identifier, publisher);
+      publisher.set(value);
+    }
+  }
+
+  @Override
+  public void log(String identifier, String[] value, LogMetadata metadata) {
+    if (m_publishers.containsKey(identifier)) {
+      ((StringArrayPublisher) m_publishers.get(identifier)).set(value);
+    } else {
+      var topic = m_nt.getStringArrayTopic(identifier);
+      applyMetadata(topic, metadata);
+      var publisher = topic.publish();
+      m_publishers.put(identifier, publisher);
+      publisher.set(value);
+    }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <S> void log(String identifier, S value, Struct<S> struct, LogMetadata metadata) {
+    // NetworkTableInstance.addSchema has checks that we're able to skip, avoiding allocations
+    if (m_seenSchemas.add(struct)) {
+      m_nt.addSchema(struct);
+    }
+
+    if (m_publishers.containsKey(identifier)) {
+      ((StructPublisher<S>) m_publishers.get(identifier)).set(value);
+    } else {
+      var topic = m_nt.getStructTopic(identifier, struct);
+      applyMetadata(topic, metadata);
+      var publisher = topic.publish();
+      m_publishers.put(identifier, publisher);
+      publisher.set(value);
+    }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <S> void log(String identifier, S[] value, Struct<S> struct, LogMetadata metadata) {
+    // NetworkTableInstance.addSchema has checks that we're able to skip, avoiding allocations
+    if (m_seenSchemas.add(struct)) {
+      m_nt.addSchema(struct);
+    }
+
+    if (m_publishers.containsKey(identifier)) {
+      ((StructArrayPublisher<S>) m_publishers.get(identifier)).set(value);
+    } else {
+      var topic = m_nt.getStructArrayTopic(identifier, struct);
+      applyMetadata(topic, metadata);
+      var publisher = topic.publish();
       m_publishers.put(identifier, publisher);
       publisher.set(value);
     }
