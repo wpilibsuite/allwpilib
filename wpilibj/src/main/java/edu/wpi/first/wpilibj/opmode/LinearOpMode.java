@@ -25,6 +25,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * is indicated
  */
 public abstract class LinearOpMode implements OpMode {
+  /** Constructor. */
+  public LinearOpMode() {}
+
   /** Called periodically while the opmode is selected on the DS and the robot is disabled. */
   @Override
   public void disabledPeriodic() {}

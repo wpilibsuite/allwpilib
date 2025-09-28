@@ -95,11 +95,19 @@ public abstract class PeriodicOpMode implements OpMode {
 
   private final PriorityQueue<Callback> m_callbacks = new PriorityQueue<>();
 
-  // periodic opmodes may specify their period; if unspecified, a default period of 20 ms is used
+  /**
+   * Constructor. Periodic opmodes may specify the period used for the periodic() function; the
+   * no-argument constructor uses a default period of 20 ms.
+   */
   protected PeriodicOpMode() {
     this(kDefaultPeriod);
   }
 
+  /**
+   * Constructor. Periodic opmodes may specify the period used for the periodic() function.
+   *
+   * @param period period (in seconds) for callbacks to the periodic() function
+   */
   protected PeriodicOpMode(double period) {
     m_startTimeUs = RobotController.getFPGATime();
     addPeriodic(this::loopFunc, period);
