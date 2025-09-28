@@ -4,6 +4,11 @@
 
 package edu.wpi.first.wpilibj.opmode;
 
+/**
+ * Top-level interface for opmode classes. Users should generally extend one of the abstract
+ * implementations of this interface (e.g. {@link PeriodicOpMode} or {@link LinearOpMode}) rather
+ * than directly implementing this interface.
+ */
 public interface OpMode {
   /**
    * This function is called periodically while the opmode is selected on the DS (robot is
