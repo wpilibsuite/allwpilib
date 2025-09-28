@@ -18,27 +18,39 @@ public @interface Autonomous {
   /**
    * Name. This is shown as the selection name in the Driver Station, and must be unique across all
    * autonomous opmodes in the project. If not specified, defaults to the name of the class.
+   *
+   * @return Name
    */
   String name() default "";
 
   /**
    * Group. All opmodes with the same group are grouped together for selection. If not specified,
    * defaults to ungrouped.
+   *
+   * @return Group
    */
   String group() default "";
 
-  /** Extended description. Optional. */
+  /**
+   * Extended description. Optional.
+   *
+   * @return Description
+   */
   String description() default "";
 
   /**
    * Text color. Optional. Supports all formats supported by {@link
    * edu.wpi.first.wpilibj.util.Color#fromString(String)}.
+   *
+   * @return Text color
    */
   String textColor() default "";
 
   /**
    * Text background color. Optional. Supports all formats supported by {@link
    * edu.wpi.first.wpilibj.util.Color#fromString(String)}.
+   *
+   * @return Text background color
    */
   String backgroundColor() default "";
 }
