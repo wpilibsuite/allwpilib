@@ -24,14 +24,21 @@ import java.util.PriorityQueue;
  * Additional periodic callbacks with different intervals can be added using the addPeriodic() set
  * of functions.
  *
- * <p>Lifecycle: - constructed when opmode selected on driver station - disabledPeriodic() called
- * periodically as long as DS is disabled. Note this is not called on a set time interval (it does
- * not use the same time interval as periodic()) - when DS transitions from disabled to enabled,
- * start() is called once - while DS is enabled, periodic() is called periodically on the time
- * interval set by the constructor - when DS transitions from enabled to disabled, or a different
- * opmode is selected on the driver station when the DS is enabled, end() is called, followed by
- * close(); the object is not reused - if a different opmode is selected on the driver station when
- * the DS is disabled, only close() is called; the object is not reused
+ * <p>Lifecycle:
+ *
+ * <ul>
+ *   <li>constructed when opmode selected on driver station
+ *   <li>disabledPeriodic() called periodically as long as DS is disabled. Note this is not called
+ *       on a set time interval (it does not use the same time interval as periodic())
+ *   <li>when DS transitions from disabled to enabled, start() is called once
+ *   <li>while DS is enabled, periodic() is called periodically on the time interval set by the
+ *       constructor
+ *   <li>when DS transitions from enabled to disabled, or a different opmode is selected on the
+ *       driver station when the DS is enabled, end() is called, followed by close(); the object is
+ *       not reused
+ *   <li>if a different opmode is selected on the driver station when the DS is disabled, only
+ *       close() is called; the object is not reused
+ * </ul>
  */
 public abstract class PeriodicOpMode implements OpMode {
   @SuppressWarnings("MemberName")
