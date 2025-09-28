@@ -5,9 +5,9 @@
 package frc.robot.opmode;
 
 import edu.wpi.first.wpilibj.opmode.PeriodicOpMode;
-import edu.wpi.first.wpilibj.opmode.Teleoperated;
+import edu.wpi.first.wpilibj.opmode.Teleop;
 
-@Teleoperated
+@Teleop
 public class HangTeleop extends PeriodicOpMode {
   @Override
   public void periodic() {
