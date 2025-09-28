@@ -25,7 +25,8 @@ HAL_RobotMode getDSMode(void) {
 
   // We send the observes, otherwise the DS disables
   HAL_ObserveUserProgram(word);
-  return HAL_ControlWord_IsEnabled(word) ? HAL_ControlWord_GetRobotMode(word) : HAL_ROBOTMODE_UNKNOWN;
+  return HAL_ControlWord_IsEnabled(word) ? HAL_ControlWord_GetRobotMode(word)
+                                         : HAL_ROBOTMODE_UNKNOWN;
 }
 
 int main(void) {
