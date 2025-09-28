@@ -16,6 +16,7 @@ public interface OpMode {
    * This function is called when the opmode starts (robot is enabled).
    *
    * @param opModeId opmode unique ID
+   * @throws InterruptedException when interrupted
    */
   void opmodeRun(long opModeId) throws InterruptedException;
 

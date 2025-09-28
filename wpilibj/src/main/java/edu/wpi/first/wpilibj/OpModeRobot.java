@@ -25,6 +25,21 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+/**
+ * OpModeRobot implements the opmode-based robot program framework.
+ *
+ * <p>The OpModeRobot class is intended to be subclassed by a user creating a robot program.
+ *
+ * <p>Classes annotated with {@link edu.wpi.first.wpilibj.opmode.Autonomous}, {@link
+ * edu.wpi.first.wpilibj.opmode.Teleop}, and {@link edu.wpi.first.wpilibj.opmode.TestOpMode} in the
+ * same package or subpackages as the user's subclass will be automatically registered as
+ * autonomous, teleop, and test opmodes respectively.
+ *
+ * <p>Opmodes are constructed when selected on the driver station, and closed/no longer used when
+ * the robot is disabled after being enabled or a different opmode is selected. When no opmode is
+ * selected, nonePeriodic() is called. The driverStationConnected() function is called the first
+ * time the driver station connects to the robot.
+ */
 public abstract class OpModeRobot extends RobotBase {
   private final ControlWord m_word = new ControlWord();
   private final Map<Long, Class<?>> m_opModes = new HashMap<>();
