@@ -5,13 +5,10 @@
 #include "DSCommPacket.h"
 
 #include <algorithm>
-#include <chrono>
 #include <cstring>
 #include <span>
-#include <thread>
-#include <vector>
-#include "hal/DriverStationTypes.h"
 
+#include <hal/DriverStationTypes.h>
 #include <hal/simulation/DriverStationData.h>
 #include <hal/simulation/MockHooks.h>
 
