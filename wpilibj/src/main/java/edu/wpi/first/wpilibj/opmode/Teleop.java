@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented
-public @interface Teleoperated {
+public @interface Teleop {
   /**
    * Name. This is shown as the selection name in the Driver Station, and must be unique across all
    * teleoperated opmodes in the project. If not specified, defaults to the name of the class.

@@ -11,7 +11,7 @@ import edu.wpi.first.hal.RobotMode;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.opmode.Autonomous;
 import edu.wpi.first.wpilibj.opmode.OpMode;
-import edu.wpi.first.wpilibj.opmode.Teleoperated;
+import edu.wpi.first.wpilibj.opmode.Teleop;
 import edu.wpi.first.wpilibj.opmode.TestOpMode;
 import edu.wpi.first.wpilibj.util.Color;
 import java.io.File;
@@ -52,14 +52,14 @@ public abstract class OpModeRobot extends RobotBase {
   }
 
   /**
-   * Adds an opmode for an opmode class annotated with Autonomous, Teleoperated, or TestOpMode. The
-   * class must be a public, non-abstract subclass of OpMode with a public constructor that either
-   * takes no arguments or accepts a single argument of this class's type.
+   * Adds an opmode for an opmode class annotated with Autonomous, Teleop, or TestOpMode. The class
+   * must be a public, non-abstract subclass of OpMode with a public constructor that either takes
+   * no arguments or accepts a single argument of this class's type.
    *
    * @param cls class to add
    */
   private void addAnnotatedOpModeImpl(
-      Class<?> cls, Autonomous auto, Teleoperated teleop, TestOpMode test) {
+      Class<?> cls, Autonomous auto, Teleop teleop, TestOpMode test) {
     // the class must be a subclass of OpMode
     if (!OpMode.class.isAssignableFrom(cls)) {
       throw new IllegalArgumentException("not a subclass of OpMode");
@@ -134,7 +134,7 @@ public abstract class OpModeRobot extends RobotBase {
    */
   public void addAnnotatedOpMode(Class<? extends OpMode> cls) {
     Autonomous auto = cls.getAnnotation(Autonomous.class);
-    Teleoperated teleop = cls.getAnnotation(Teleoperated.class);
+    Teleop teleop = cls.getAnnotation(Teleop.class);
     TestOpMode test = cls.getAnnotation(TestOpMode.class);
     if (auto == null && teleop == null && test == null) {
       throw new IllegalArgumentException(
@@ -153,7 +153,7 @@ public abstract class OpModeRobot extends RobotBase {
       return;
     }
     Autonomous auto = cls.getAnnotation(Autonomous.class);
-    Teleoperated teleop = cls.getAnnotation(Teleoperated.class);
+    Teleop teleop = cls.getAnnotation(Teleop.class);
     TestOpMode test = cls.getAnnotation(TestOpMode.class);
     if (auto == null && teleop == null && test == null) {
       return;
