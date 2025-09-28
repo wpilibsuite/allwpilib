@@ -227,6 +227,7 @@ public class LoggerGenerator {
       out.println("import edu.wpi.first.epilogue.logging.EpilogueBackend;");
       if (needsLogMetadataImport) {
         out.println("import edu.wpi.first.epilogue.logging.LogMetadata;");
+        out.println("import java.util.List;");
       }
       if (requiresVarHandles) {
         out.println("import java.lang.invoke.MethodHandles;");
@@ -427,15 +428,18 @@ public class LoggerGenerator {
 
   /**
    * Generates the name of a static final LogMetadata field for the given element. The field name is
-   * guaranteed to be unique.
+   * guaranteed to be unique, with disambiguation between fields and methods.
    *
    * @param element The element to generate a LogMetadata field for
    * @return The name of the generated LogMetadata field
    */
   public static String logMetadataFieldName(Element element) {
-    return "$metadata_%s_%s"
+    String suffix = element instanceof javax.lang.model.element.VariableElement ? "_field" : "_method";
+    return "$metadata_%s_%s%s"
         .formatted(
-            element.getEnclosingElement().toString().replace(".", "_"), element.getSimpleName());
+            element.getEnclosingElement().toString().replace(".", "_"), 
+            element.getSimpleName(),
+            suffix);
   }
 
   private void collectLoggables(
@@ -619,17 +623,11 @@ public class LoggerGenerator {
           validDependencyNames.stream()
               .map(name -> "\"" + name + "\"")
               .collect(java.util.stream.Collectors.joining(", "));
-      return "new edu.wpi.first.epilogue.logging.LogMetadata(java.util.List.of("
+      return "new LogMetadata(List.of("
           + dependencyList
           + "))";
     }
   }
 
-  /**
-   * Finds an element (field or method) in a class by name.
-   *
-   * @param clazz the class to search in
-   * @param name the name of the element to find (method names should include parentheses)
-   * @return the found element, or null if not found
-   */
+
 }
