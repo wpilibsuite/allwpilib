@@ -6,9 +6,9 @@
 
 #include <string_view>
 
-#include "ntcore_c.h"
+#include "wpi/ntcore/ntcore_c.h"
 
-namespace nt {
+namespace wpi::nt {
 
 std::string_view TypeToString(NT_Type type);
 NT_Type StringToType(std::string_view typeStr);
@@ -27,4 +27,4 @@ constexpr bool IsNumericCompatible(NT_Type a, NT_Type b) {
          (IsNumericArray(a) && IsNumericArray(b));
 }
 
-}  // namespace nt
+}  // namespace wpi::nt

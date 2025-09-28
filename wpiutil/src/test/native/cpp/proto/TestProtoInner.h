@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <wpi/protobuf/Protobuf.h>
-
 #include <string>
+
+#include <wpi/util/protobuf/Protobuf.hpp>
 
 #include "wpiutil.npb.h"
 
@@ -15,10 +15,10 @@ struct TestProtoInner {
 };
 
 template <>
-struct wpi::Protobuf<TestProtoInner> {
+struct wpi::util::Protobuf<TestProtoInner> {
   using MessageStruct = wpi_proto_TestProtoInner;
-  using InputStream = wpi::ProtoInputStream<TestProtoInner>;
-  using OutputStream = wpi::ProtoOutputStream<TestProtoInner>;
+  using InputStream = wpi::util::ProtoInputStream<TestProtoInner>;
+  using OutputStream = wpi::util::ProtoOutputStream<TestProtoInner>;
   static std::optional<TestProtoInner> Unpack(InputStream& stream);
   static bool Pack(OutputStream& stream, const TestProtoInner& value);
 };

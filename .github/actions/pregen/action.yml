@@ -33,7 +33,7 @@ runs:
       run: |
         ./wpilibc/generate_hids.py
         ./wpilibj/generate_hids.py
-        ./wpilibNewCommands/generate_hids.py
+        ./command/generate_hids.py
       shell: bash
 
     - name: Regenerate PWM motor controllers
@@ -43,7 +43,7 @@ runs:
       shell: bash
 
     - name: Regenerate mrcal minimath
-      run: ./wpical/generate_mrcal.py
+      run: ./tools/wpical/generate_mrcal.py
       shell: bash
 
     - name: Regenerate wpimath

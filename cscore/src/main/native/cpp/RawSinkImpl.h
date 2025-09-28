@@ -12,20 +12,20 @@
 #include <string_view>
 #include <thread>
 
-#include <wpi/condition_variable.h>
+#include <wpi/util/condition_variable.hpp>
 
 #include "Frame.h"
 #include "SinkImpl.h"
-#include "cscore_raw.h"
+#include "wpi/cscore/cscore_raw.hpp"
 
-namespace cs {
+namespace wpi::cs {
 class SourceImpl;
 
 class RawSinkImpl : public SinkImpl {
  public:
-  RawSinkImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
+  RawSinkImpl(std::string_view name, wpi::util::Logger& logger, Notifier& notifier,
               Telemetry& telemetry);
-  RawSinkImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
+  RawSinkImpl(std::string_view name, wpi::util::Logger& logger, Notifier& notifier,
               Telemetry& telemetry,
               std::function<void(uint64_t time)> processFrame);
   ~RawSinkImpl() override;
@@ -49,6 +49,6 @@ class RawSinkImpl : public SinkImpl {
   std::thread m_thread;
   std::function<void(uint64_t time)> m_processFrame;
 };
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_RAWSINKIMPL_H_

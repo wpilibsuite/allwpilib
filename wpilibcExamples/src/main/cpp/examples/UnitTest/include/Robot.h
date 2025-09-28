@@ -4,17 +4,17 @@
 
 #pragma once
 
-#include <frc/Joystick.h>
-#include <frc/TimedRobot.h>
+#include <wpi/driverstation/Joystick.hpp>
+#include <wpi/opmode/TimedRobot.hpp>
 
 #include "Constants.h"
 #include "subsystems/Intake.h"
 
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   void TeleopPeriodic() override;
 
  private:
   Intake m_intake;
-  frc::Joystick m_joystick{OperatorConstants::kJoystickIndex};
+  wpi::Joystick m_joystick{OperatorConstants::kJoystickIndex};
 };

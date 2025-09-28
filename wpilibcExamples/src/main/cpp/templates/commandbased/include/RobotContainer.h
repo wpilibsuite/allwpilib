@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <frc2/command/CommandPtr.h>
-#include <frc2/command/button/CommandXboxController.h>
+#include <wpi/command/CommandPtr.hpp>
+#include <wpi/command/button/CommandXboxController.hpp>
 
 #include "Constants.h"
 #include "subsystems/ExampleSubsystem.h"
@@ -21,11 +21,11 @@ class RobotContainer {
  public:
   RobotContainer();
 
-  frc2::CommandPtr GetAutonomousCommand();
+  wpi::cmd::CommandPtr GetAutonomousCommand();
 
  private:
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  frc2::CommandXboxController m_driverController{
+  wpi::cmd::CommandXboxController m_driverController{
       OperatorConstants::kDriverControllerPort};
 
   // The robot's subsystems are defined here...

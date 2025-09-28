@@ -6,8 +6,8 @@
 
 #include <vector>
 
-#include <hal/Ports.h>
-#include <hal/simulation/AddressableLEDData.h>
+#include <wpi/hal/Ports.hpp>
+#include <wpi/hal/simulation/AddressableLEDData.hpp>
 
 #define REGISTER(halsim, jsonid, ctype, haltype)                          \
   HALSIM_RegisterAddressableLED##halsim##Callback(                        \
@@ -43,14 +43,14 @@ void HALSimWSProviderAddressableLED::RegisterCallbacks() {
         const HAL_AddressableLEDData* data =
             reinterpret_cast<const HAL_AddressableLEDData*>(buffer);
 
-        std::vector<wpi::json> jsonData;
+        std::vector<wpi::util::json> jsonData;
 
         for (size_t i = 0; i < numLeds; ++i) {
           jsonData.push_back(
               {{"r", data[i].r}, {"g", data[i].g}, {"b", data[i].b}});
         }
 
-        wpi::json payload;
+        wpi::util::json payload;
         payload["<data"] = jsonData;
 
         provider->ProcessHalCallback(payload);

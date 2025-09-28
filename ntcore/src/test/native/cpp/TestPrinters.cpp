@@ -7,10 +7,10 @@
 #include "Handle.h"
 #include "PubSubOptions.h"
 #include "net/Message.h"
-#include "networktables/NetworkTableValue.h"
-#include "ntcore_cpp.h"
+#include "wpi/ntcore/NetworkTableValue.hpp"
+#include "wpi/ntcore/ntcore_cpp.hpp"
 
-namespace nt {
+namespace wpi::nt {
 
 void PrintTo(const Event& event, std::ostream* os) {
   *os << "Event{listener=";
@@ -105,4 +105,4 @@ void PrintTo(const PubSubOptionsImpl& options, std::ostream* os) {
       << ", keepDuplicates=" << options.keepDuplicates << '}';
 }
 
-}  // namespace nt
+}  // namespace wpi::nt

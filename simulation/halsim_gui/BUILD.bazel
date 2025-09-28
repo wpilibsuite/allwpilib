@@ -144,5 +144,5 @@ cc_binary(
 package_minimal_cc_project(
     name = "halsim_gui",
     maven_artifact_name = "halsim_gui",
-    maven_group_id = "edu.wpi.first.halsim",
+    maven_group_id = "org.wpilib.halsim",
 )

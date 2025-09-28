@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/Errors.h"
+#include "wpi/Errors.hpp"
 
 #include <string>
 #include <utility>
 
-#include <hal/DriverStation.h>
-#include <hal/HALBase.h>
-#include <wpi/StackTrace.h>
-#include <wpi/fs.h>
+#include <wpi/hal/DriverStation.hpp>
+#include <wpi/hal/HALBase.hpp>
+#include <wpi/util/StackTrace.hpp>
+#include <wpi/util/fs.hpp>
 
-using namespace frc;
+using namespace wpi;
 
 RuntimeError::RuntimeError(int32_t code, std::string&& loc, std::string&& stack,
                            std::string&& message)
@@ -36,24 +36,24 @@ void RuntimeError::Report() const {
                 m_data->stack.c_str(), 1);
 }
 
-const char* frc::GetErrorMessage(int32_t* code) {
+const char* wpi::GetErrorMessage(int32_t* code) {
   switch (*code) {
 #define S(label, offset, message) \
   case err::label:                \
     return message;
-#include "frc/WPIErrors.mac"
+#include "wpi/WPIErrors.mac"
 #undef S
 #define S(label, offset, message) \
   case warn::label:               \
     return message;
-#include "frc/WPIWarnings.mac"
+#include "wpi/WPIWarnings.mac"
 #undef S
     default:
       return HAL_GetLastError(code);
   }
 }
 
-void frc::ReportErrorV(int32_t status, const char* fileName, int lineNumber,
+void wpi::ReportErrorV(int32_t status, const char* fileName, int lineNumber,
                        const char* funcName, fmt::string_view format,
                        fmt::format_args args) {
   if (status == 0) {
@@ -64,10 +64,10 @@ void frc::ReportErrorV(int32_t status, const char* fileName, int lineNumber,
   fmt::vformat_to(fmt::appender{out}, format, args);
   out.push_back('\0');
   HAL_SendError(status < 0, status, 0, out.data(), funcName,
-                wpi::GetStackTrace(2).c_str(), 1);
+                wpi::util::GetStackTrace(2).c_str(), 1);
 }
 
-RuntimeError frc::MakeErrorV(int32_t status, const char* fileName,
+RuntimeError wpi::MakeErrorV(int32_t status, const char* fileName,
                              int lineNumber, const char* funcName,
                              fmt::string_view format, fmt::format_args args) {
   fmt::memory_buffer out;
@@ -77,6 +77,6 @@ RuntimeError frc::MakeErrorV(int32_t status, const char* fileName,
                       fileName,
                       lineNumber,
                       funcName,
-                      wpi::GetStackTrace(2),
+                      wpi::util::GetStackTrace(2),
                       fmt::to_string(out)};
 }

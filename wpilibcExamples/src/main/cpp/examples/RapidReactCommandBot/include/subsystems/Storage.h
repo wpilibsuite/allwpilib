@@ -4,24 +4,24 @@
 
 #pragma once
 
-#include <frc/DigitalInput.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc2/command/CommandPtr.h>
-#include <frc2/command/SubsystemBase.h>
-#include <frc2/command/button/Trigger.h>
+#include <wpi/command/CommandPtr.hpp>
+#include <wpi/command/SubsystemBase.hpp>
+#include <wpi/command/button/Trigger.hpp>
+#include <wpi/hardware/discrete/DigitalInput.hpp>
+#include <wpi/hardware/motor/PWMSparkMax.hpp>
 
 #include "Constants.h"
 
-class Storage : frc2::SubsystemBase {
+class Storage : wpi::cmd::SubsystemBase {
  public:
   Storage();
   /** Returns a command that runs the storage motor indefinitely. */
-  frc2::CommandPtr RunCommand();
+  wpi::cmd::CommandPtr RunCommand();
 
   /** Whether the ball storage is full. */
-  frc2::Trigger HasCargo{[this] { return m_ballSensor.Get(); }};
+  wpi::cmd::Trigger HasCargo{[this] { return m_ballSensor.Get(); }};
 
  private:
-  frc::PWMSparkMax m_motor{StorageConstants::kMotorPort};
-  frc::DigitalInput m_ballSensor{StorageConstants::kBallSensorPort};
+  wpi::PWMSparkMax m_motor{StorageConstants::kMotorPort};
+  wpi::DigitalInput m_ballSensor{StorageConstants::kBallSensorPort};
 };

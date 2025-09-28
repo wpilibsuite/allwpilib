@@ -12,7 +12,7 @@
 
 #include <WinDNS.h>
 
-namespace wpi {
+namespace wpi::net {
 class DynamicDns {
  public:
   using DnsServiceFreeInstanceFunc =
@@ -56,4 +56,4 @@ class DynamicDns {
  private:
   DynamicDns();
 };
-}  // namespace wpi
+}  // namespace wpi::net

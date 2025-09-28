@@ -8,14 +8,14 @@
 #include <memory>
 #include <utility>
 
-#include <wpi/SmallVector.h>
-#include <wpi/SpanExtras.h>
+#include <wpi/util/SmallVector.h>
+#include <wpi/util/SpanExtras.hpp>
 
 #include "WebSocketDebug.h"
-#include "wpinet/WebSocket.h"
-#include "wpinet/uv/Buffer.h"
+#include "wpi/net/WebSocket.hpp"
+#include "wpi/net/uv/Buffer.hpp"
 
-namespace wpi::detail {
+namespace wpi::net::detail {
 
 class SerializedFrames {
  public:
@@ -42,8 +42,8 @@ class SerializedFrames {
     m_allocBufs.clear();
   }
 
-  SmallVector<uv::Buffer, 4> m_allocBufs;
-  SmallVector<uv::Buffer, 4> m_bufs;
+  wpi::util::SmallVector<uv::Buffer, 4> m_allocBufs;
+  wpi::util::SmallVector<uv::Buffer, 4> m_bufs;
   size_t m_allocBufPos = 0;
 };
 
@@ -52,9 +52,9 @@ class WebSocketWriteReqBase {
   template <typename Stream, typename Req>
   int Continue(Stream& stream, std::shared_ptr<Req> req);
 
-  SmallVector<uv::Buffer, 4> m_userBufs;
+  wpi::util::SmallVector<uv::Buffer, 4> m_userBufs;
   SerializedFrames m_frames;
-  SmallVector<int, 0> m_continueFrameOffs;
+  wpi::util::SmallVector<int, 0> m_continueFrameOffs;
   size_t m_continueBufPos = 0;
   size_t m_continueFramePos = 0;
 };
@@ -95,7 +95,7 @@ int WebSocketWriteReqBase::Continue(Stream& stream, std::shared_ptr<Req> req) {
   assert(offIt != offEnd);
 
   // build a list of buffers to send as a normal write:
-  SmallVector<uv::Buffer, 4> writeBufs;
+  wpi::util::SmallVector<uv::Buffer, 4> writeBufs;
   auto bufIt = bufs.begin();
   auto bufEnd = bufs.end();
 
@@ -106,7 +106,7 @@ int WebSocketWriteReqBase::Continue(Stream& stream, std::shared_ptr<Req> req) {
   }
   if (bufIt != bufs.begin() && pos != sentBytes) {
     writeBufs.emplace_back(
-        wpi::take_back((bufIt - 1)->bytes(), pos - sentBytes));
+        wpi::util::take_back((bufIt - 1)->bytes(), pos - sentBytes));
   }
 
   // continue through the last buffer of the last partial frame
@@ -154,7 +154,7 @@ std::span<const WebSocket::Frame> TrySendFrames(
 
     // build buffers to send
     SerializedFrames sendFrames;
-    SmallVector<int, 32> frameOffs;
+    wpi::util::SmallVector<int, 32> frameOffs;
     int numBytes = 0;
     while (frameIt != frameEnd) {
       numBytes += sendFrames.AddFrame(*frameIt++, server);
@@ -174,7 +174,7 @@ std::span<const WebSocket::Frame> TrySendFrames(
     if (sentBytes == 0) {
       // we haven't started a frame yet; clean up any bufs that have actually
       // sent, and return unsent frames
-      SmallVector<uv::Buffer, 4> bufs;
+      wpi::util::SmallVector<uv::Buffer, 4> bufs;
       for (auto it = frames.begin(); it != frameStart; ++it) {
         bufs.append(it->data.begin(), it->data.end());
       }
@@ -188,7 +188,7 @@ std::span<const WebSocket::Frame> TrySendFrames(
 #endif
     } else if (sentBytes < 0) {
       // error
-      SmallVector<uv::Buffer, 4> bufs;
+      wpi::util::SmallVector<uv::Buffer, 4> bufs;
       for (auto&& frame : frames) {
         bufs.append(frame.data.begin(), frame.data.end());
       }
@@ -209,7 +209,7 @@ std::span<const WebSocket::Frame> TrySendFrames(
       if (offIt != offEnd && *offIt == sentBytes && isFin) {
         // we finished at a normal FIN frame boundary; no need for a Write()
         ++frameStart;
-        SmallVector<uv::Buffer, 4> bufs;
+        wpi::util::SmallVector<uv::Buffer, 4> bufs;
         for (auto it = frames.begin(); it != frameStart; ++it) {
           bufs.append(it->data.begin(), it->data.end());
         }
@@ -224,7 +224,7 @@ std::span<const WebSocket::Frame> TrySendFrames(
       }
 
       // build a list of buffers to send as a normal write:
-      SmallVector<uv::Buffer, 4> writeBufs;
+      wpi::util::SmallVector<uv::Buffer, 4> writeBufs;
       auto bufIt = sendFrames.m_bufs.begin();
       auto bufEnd = sendFrames.m_bufs.end();
 
@@ -235,7 +235,7 @@ std::span<const WebSocket::Frame> TrySendFrames(
       }
       if (bufIt != sendFrames.m_bufs.begin() && pos != sentBytes) {
         writeBufs.emplace_back(
-            wpi::take_back((bufIt - 1)->bytes(), pos - sentBytes));
+            wpi::util::take_back((bufIt - 1)->bytes(), pos - sentBytes));
       }
 
       // continue through the last buffer of the last partial frame
@@ -294,7 +294,7 @@ std::span<const WebSocket::Frame> TrySendFrames(
   }
 
   // nothing left to send
-  SmallVector<uv::Buffer, 4> bufs;
+  wpi::util::SmallVector<uv::Buffer, 4> bufs;
   for (auto&& frame : frames) {
     bufs.append(frame.data.begin(), frame.data.end());
   }
@@ -302,4 +302,4 @@ std::span<const WebSocket::Frame> TrySendFrames(
   return {};
 }
 
-}  // namespace wpi::detail
+}  // namespace wpi::net::detail

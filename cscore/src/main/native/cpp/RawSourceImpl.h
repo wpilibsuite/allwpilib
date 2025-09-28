@@ -14,13 +14,13 @@
 
 #include "ConfigurableSourceImpl.h"
 #include "SourceImpl.h"
-#include "cscore_raw.h"
+#include "wpi/cscore/cscore_raw.hpp"
 
-namespace cs {
+namespace wpi::cs {
 
 class RawSourceImpl : public ConfigurableSourceImpl {
  public:
-  RawSourceImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
+  RawSourceImpl(std::string_view name, wpi::util::Logger& logger, Notifier& notifier,
                 Telemetry& telemetry, const VideoMode& mode);
   ~RawSourceImpl() override;
 
@@ -31,6 +31,6 @@ class RawSourceImpl : public ConfigurableSourceImpl {
   std::atomic_bool m_connected{true};
 };
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_RAWSOURCEIMPL_H_

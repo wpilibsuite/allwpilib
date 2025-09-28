@@ -2,22 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/networktables/NTFMS.h"
+#include "wpi/glass/networktables/NTFMS.hpp"
 
 #include <stdint.h>
 
 #include <utility>
 
 #include <fmt/format.h>
-#include <wpi/SmallVector.h>
-#include <wpi/timestamp.h>
+#include <wpi/util/SmallVector.h>
+#include <wpi/util/timestamp.hpp>
 
-using namespace glass;
+using namespace wpi::glass;
 
 NTFMSModel::NTFMSModel(std::string_view path)
-    : NTFMSModel{nt::NetworkTableInstance::GetDefault(), path} {}
+    : NTFMSModel{wpi::nt::NetworkTableInstance::GetDefault(), path} {}
 
-NTFMSModel::NTFMSModel(nt::NetworkTableInstance inst, std::string_view path)
+NTFMSModel::NTFMSModel(wpi::nt::NetworkTableInstance inst, std::string_view path)
     : m_inst{inst},
       m_gameSpecificMessage{
           inst.GetStringTopic(fmt::format("{}/GameSpecificMessage", path))

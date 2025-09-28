@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/ServoSim.h"  // NOLINT(build/include_order)
+#include "wpi/simulation/ServoSim.hpp"  // NOLINT(build/include_order)
 
 #include <gtest/gtest.h>
-#include <hal/HAL.h>
+#include <wpi/hal/HAL.hpp>
 
-#include "frc/Servo.h"
+#include "wpi/hardware/servo/Servo.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 TEST(ServoSimTest, TestServo) {
-  frc::Servo servo{0};
-  frc::sim::ServoSim sim{servo};
+  wpi::Servo servo{0};
+  wpi::sim::ServoSim sim{servo};
 
   servo.Set(0);
   EXPECT_EQ(0, sim.GetPosition());
@@ -29,4 +29,4 @@ TEST(ServoSimTest, TestServo) {
   servo.SetAngle(170);
   EXPECT_EQ(170, sim.GetAngle());
 }
-}  // namespace frc::sim
+}  // namespace wpi::sim

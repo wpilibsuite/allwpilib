@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <frc2/command/Command.h>
-#include <frc2/command/CommandHelper.h>
+#include <wpi/command/Command.hpp>
+#include <wpi/command/CommandHelper.hpp>
 
 /**
  * An example command.
@@ -15,7 +15,7 @@
  * Command will *not* work!
  */
 class ReplaceMeCommand2
-    : public frc2::CommandHelper<frc2::Command, ReplaceMeCommand2> {
+    : public wpi::cmd::CommandHelper<wpi::cmd::Command, ReplaceMeCommand2> {
  public:
   /* You should consider using the more terse Command factories API instead
    * https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands

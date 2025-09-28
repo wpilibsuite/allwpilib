@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <frc2/command/Command.h>
-#include <frc2/command/CommandHelper.h>
+#include <wpi/command/Command.hpp>
+#include <wpi/command/CommandHelper.hpp>
 
 #include "subsystems/ExampleSubsystem.h"
 
@@ -17,7 +17,7 @@
  * Command will *not* work!
  */
 class ExampleCommand
-    : public frc2::CommandHelper<frc2::Command, ExampleCommand> {
+    : public wpi::cmd::CommandHelper<wpi::cmd::Command, ExampleCommand> {
  public:
   /**
    * Creates a new ExampleCommand.

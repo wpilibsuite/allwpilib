@@ -19,13 +19,13 @@
 #include <WSProvider_SimDevice.h>
 #include <WSProvider_Solenoid.h>
 #include <WSProvider_dPWM.h>
-#include <wpinet/EventLoopRunner.h>
+#include <wpi/net/EventLoopRunner.hpp>
 
 using namespace wpilibws;
 
 bool HALSimWSClient::Initialize() {
   bool result = true;
-  runner.ExecSync([&](wpi::uv::Loop& loop) {
+  runner.ExecSync([&](wpi::net::uv::Loop& loop) {
     simws = std::make_shared<HALSimWS>(loop, providers, simDevices);
 
     if (!simws->Initialize()) {

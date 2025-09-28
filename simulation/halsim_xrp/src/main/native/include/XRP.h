@@ -9,8 +9,8 @@
 #include <span>
 #include <string>
 
-#include <wpi/json_fwd.h>
-#include <wpinet/raw_uv_ostream.h>
+#include <wpi/net/raw_uv_ostream.hpp>
+#include <wpi/util/json_fwd.h>
 
 #define XRP_TAG_MOTOR 0x12
 #define XRP_TAG_SERVO 0x13
@@ -22,7 +22,7 @@
 
 namespace wpilibxrp {
 
-using WPILibUpdateFunc = std::function<void(const wpi::json&)>;
+using WPILibUpdateFunc = std::function<void(const wpi::util::json&)>;
 
 class XRP {
  public:
@@ -32,25 +32,25 @@ class XRP {
     m_wpilib_update_func = func;
   }
 
-  void HandleWPILibUpdate(const wpi::json& data);
+  void HandleWPILibUpdate(const wpi::util::json& data);
   void HandleXRPUpdate(std::span<const uint8_t> packet);
 
-  void SetupXRPSendBuffer(wpi::raw_uv_ostream& buf);
+  void SetupXRPSendBuffer(wpi::net::raw_uv_ostream& buf);
 
  private:
   // To XRP Methods
-  void SetupSendHeader(wpi::raw_uv_ostream& buf);
-  void SetupMotorTag(wpi::raw_uv_ostream& buf);
-  void SetupServoTag(wpi::raw_uv_ostream& buf);
-  void SetupDigitalOutTag(wpi::raw_uv_ostream& buf);
+  void SetupSendHeader(wpi::net::raw_uv_ostream& buf);
+  void SetupMotorTag(wpi::net::raw_uv_ostream& buf);
+  void SetupServoTag(wpi::net::raw_uv_ostream& buf);
+  void SetupDigitalOutTag(wpi::net::raw_uv_ostream& buf);
 
   // WPILib Sim Update Handlers
-  void HandleDriverStationSimValueChanged(const wpi::json& data);
-  void HandleMotorSimValueChanged(const wpi::json& data);
-  void HandleServoSimValueChanged(const wpi::json& data);
-  void HandleDIOSimValueChanged(const wpi::json& data);
-  void HandleGyroSimValueChanged(const wpi::json& data);
-  void HandleEncoderSimValueChanged(const wpi::json& data);
+  void HandleDriverStationSimValueChanged(const wpi::util::json& data);
+  void HandleMotorSimValueChanged(const wpi::util::json& data);
+  void HandleServoSimValueChanged(const wpi::util::json& data);
+  void HandleDIOSimValueChanged(const wpi::util::json& data);
+  void HandleGyroSimValueChanged(const wpi::util::json& data);
+  void HandleEncoderSimValueChanged(const wpi::util::json& data);
 
   // XRP Packet Update Handlers
   void ReadGyroTag(std::span<const uint8_t> packet);

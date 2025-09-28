@@ -6,13 +6,13 @@
 
 #include <functional>
 
-#include <frc2/command/Command.h>
-#include <frc2/command/CommandHelper.h>
+#include <wpi/command/Command.hpp>
+#include <wpi/command/CommandHelper.hpp>
 
 #include "subsystems/Drivetrain.h"
 
 class TeleopArcadeDrive
-    : public frc2::CommandHelper<frc2::Command, TeleopArcadeDrive> {
+    : public wpi::cmd::CommandHelper<wpi::cmd::Command, TeleopArcadeDrive> {
  public:
   /**
    * Creates a new ArcadeDrive. This command will drive your robot according to

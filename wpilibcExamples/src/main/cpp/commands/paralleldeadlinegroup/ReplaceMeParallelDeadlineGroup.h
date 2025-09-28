@@ -4,14 +4,14 @@
 
 #pragma once
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/ParallelDeadlineGroup.h>
+#include <wpi/command/CommandHelper.hpp>
+#include <wpi/command/ParallelDeadlineGroup.hpp>
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.
 // For more information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 class ReplaceMeParallelDeadlineGroup
-    : public frc2::CommandHelper<frc2::ParallelDeadlineGroup,
+    : public wpi::cmd::CommandHelper<wpi::cmd::ParallelDeadlineGroup,
                                  ReplaceMeParallelDeadlineGroup> {
  public:
   ReplaceMeParallelDeadlineGroup();

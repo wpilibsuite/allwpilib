@@ -9,8 +9,8 @@
 #include <utility>
 
 #include <fmt/format.h>
-#include <hal/Ports.h>
-#include <hal/simulation/CTREPCMData.h>
+#include <wpi/hal/Ports.hpp>
+#include <wpi/hal/simulation/CTREPCMData.hpp>
 
 #define REGISTER_SOLENOID(halsim, jsonid, ctype, haltype)                  \
   HALSIM_RegisterCTREPCMSolenoid##halsim##Callback(                        \

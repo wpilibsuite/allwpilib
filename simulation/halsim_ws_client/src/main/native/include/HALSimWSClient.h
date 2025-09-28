@@ -8,7 +8,7 @@
 
 #include <WSProviderContainer.h>
 #include <WSProvider_SimDevice.h>
-#include <wpinet/EventLoopRunner.h>
+#include <wpi/net/EventLoopRunner.hpp>
 
 #include "HALSimWS.h"
 
@@ -24,7 +24,7 @@ class HALSimWSClient {
 
   ProviderContainer providers;
   HALSimWSProviderSimDevices simDevices{providers};
-  wpi::EventLoopRunner runner;
+  wpi::net::EventLoopRunner runner;
   std::shared_ptr<HALSimWS> simws;
 };
 

@@ -2,22 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/DigitalInput.h"
+#include "wpi/hardware/discrete/DigitalInput.hpp"
 
 #include <string>
 
-#include <hal/DIO.h>
-#include <hal/HALBase.h>
-#include <hal/Ports.h>
-#include <hal/UsageReporting.h>
-#include <wpi/StackTrace.h>
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include <wpi/hal/DIO.hpp>
+#include <wpi/hal/HALBase.hpp>
+#include <wpi/hal/Ports.hpp>
+#include <wpi/hal/UsageReporting.h>
+#include <wpi/util/StackTrace.hpp>
+#include <wpi/util/sendable/SendableBuilder.hpp>
+#include <wpi/util/sendable/SendableRegistry.hpp>
 
-#include "frc/Errors.h"
-#include "frc/SensorUtil.h"
+#include "wpi/Errors.hpp"
+#include "wpi/SensorUtil.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 DigitalInput::DigitalInput(int channel) {
   if (!SensorUtil::CheckDigitalChannel(channel)) {
@@ -26,12 +26,12 @@ DigitalInput::DigitalInput(int channel) {
   m_channel = channel;
 
   int32_t status = 0;
-  std::string stackTrace = wpi::GetStackTrace(1);
+  std::string stackTrace = wpi::util::GetStackTrace(1);
   m_handle = HAL_InitializeDIOPort(channel, true, stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", channel);
 
   HAL_ReportUsage("IO", channel, "DigitalInput");
-  wpi::SendableRegistry::Add(this, "DigitalInput", channel);
+  wpi::util::SendableRegistry::Add(this, "DigitalInput", channel);
 }
 
 bool DigitalInput::Get() const {
@@ -49,7 +49,7 @@ int DigitalInput::GetChannel() const {
   return m_channel;
 }
 
-void DigitalInput::InitSendable(wpi::SendableBuilder& builder) {
+void DigitalInput::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Digital Input");
   builder.AddBooleanProperty("Value", [=, this] { return Get(); }, nullptr);
 }

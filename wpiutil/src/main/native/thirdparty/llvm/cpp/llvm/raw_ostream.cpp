@@ -14,14 +14,14 @@
 #define _CRT_NONSTDC_NO_WARNINGS
 #endif
 
-#include "wpi/raw_ostream.h"
-#include "wpi/SmallString.h"
-#include "wpi/SmallVector.h"
-#include "wpi/StringExtras.h"
-#include "wpi/Compiler.h"
-#include "wpi/ErrorHandling.h"
-#include "wpi/fs.h"
-#include "wpi/MathExtras.h"
+#include "wpi/util/raw_ostream.h"
+#include "wpi/util/SmallString.h"
+#include "wpi/util/SmallVector.h"
+#include "wpi/util/StringExtras.h"
+#include "wpi/util/Compiler.h"
+#include "wpi/util/ErrorHandling.h"
+#include "wpi/util/fs.hpp"
+#include "wpi/util/MathExtras.h"
 #include <algorithm>
 #include <cerrno>
 #include <cstdio>
@@ -53,11 +53,11 @@
 #endif
 
 #ifdef _WIN32
-#include "wpi/ConvertUTF.h"
+#include "wpi/util/ConvertUTF.h"
 #include "Windows/WindowsSupport.h"
 #endif
 
-using namespace wpi;
+using namespace wpi::util;
 
 constexpr raw_ostream::Colors raw_ostream::BLACK;
 constexpr raw_ostream::Colors raw_ostream::RED;
@@ -593,7 +593,7 @@ void raw_fd_ostream::anchor() {}
 //  outs(), errs(), nulls()
 //===----------------------------------------------------------------------===//
 
-raw_fd_ostream &wpi::outs() {
+raw_fd_ostream &wpi::util::outs() {
   // Set buffer settings to model stdout behavior.
   std::error_code EC;
   static raw_fd_ostream* S = new raw_fd_ostream("-", EC, fs::OF_None);
@@ -601,14 +601,14 @@ raw_fd_ostream &wpi::outs() {
   return *S;
 }
 
-raw_fd_ostream &wpi::errs() {
+raw_fd_ostream &wpi::util::errs() {
   // Set standard error to be unbuffered and tied to outs() by default.
   static raw_fd_ostream* S = new raw_fd_ostream(STDERR_FILENO, false, true);
   return *S;
 }
 
 /// nulls() - This returns a reference to a raw_ostream which discards output.
-raw_ostream &wpi::nulls() {
+raw_ostream &wpi::util::nulls() {
   static raw_null_ostream S;
   return S;
 }

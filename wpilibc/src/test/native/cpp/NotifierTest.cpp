@@ -6,10 +6,10 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/Notifier.h"
-#include "frc/simulation/SimHooks.h"
+#include "wpi/Notifier.hpp"
+#include "wpi/simulation/SimHooks.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 namespace {
 

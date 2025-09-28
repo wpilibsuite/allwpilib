@@ -2,21 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/IterativeRobotBase.h"
+#include "wpi/opmode/IterativeRobotBase.hpp"
 
-#include <frc/DriverStation.h>
+#include <wpi/driverstation/DriverStation.hpp>
+#include <wpi/hal/DriverStation.hpp>
+#include <wpi/ntcore/NetworkTableInstance.hpp>
+#include <wpi/util/print.hpp>
 
-#include <hal/DriverStation.h>
-#include <networktables/NetworkTableInstance.h>
-#include <wpi/print.h>
+#include "wpi/DSControlWord.hpp"
+#include "wpi/Errors.hpp"
+#include "wpi/smartdashboard/SmartDashboard.hpp"
 
-#include "frc/DSControlWord.h"
-#include "frc/Errors.h"
-#include "frc/smartdashboard/SmartDashboard.h"
+using namespace wpi;
 
-using namespace frc;
-
-IterativeRobotBase::IterativeRobotBase(units::second_t period)
+IterativeRobotBase::IterativeRobotBase(wpi::units::second_t period)
     : m_period(period),
       m_watchdog(period, [this] { PrintLoopOverrunMessage(); }) {}
 
@@ -35,7 +34,7 @@ void IterativeRobotBase::TestInit() {}
 void IterativeRobotBase::RobotPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    wpi::print("Default {}() method... Override me!\n", __FUNCTION__);
+    wpi::util::print("Default {}() method... Override me!\n", __FUNCTION__);
     firstRun = false;
   }
 }
@@ -43,7 +42,7 @@ void IterativeRobotBase::RobotPeriodic() {
 void IterativeRobotBase::SimulationPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    wpi::print("Default {}() method... Override me!\n", __FUNCTION__);
+    wpi::util::print("Default {}() method... Override me!\n", __FUNCTION__);
     firstRun = false;
   }
 }
@@ -51,7 +50,7 @@ void IterativeRobotBase::SimulationPeriodic() {
 void IterativeRobotBase::DisabledPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    wpi::print("Default {}() method... Override me!\n", __FUNCTION__);
+    wpi::util::print("Default {}() method... Override me!\n", __FUNCTION__);
     firstRun = false;
   }
 }
@@ -59,7 +58,7 @@ void IterativeRobotBase::DisabledPeriodic() {
 void IterativeRobotBase::AutonomousPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    wpi::print("Default {}() method... Override me!\n", __FUNCTION__);
+    wpi::util::print("Default {}() method... Override me!\n", __FUNCTION__);
     firstRun = false;
   }
 }
@@ -67,7 +66,7 @@ void IterativeRobotBase::AutonomousPeriodic() {
 void IterativeRobotBase::TeleopPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    wpi::print("Default {}() method... Override me!\n", __FUNCTION__);
+    wpi::util::print("Default {}() method... Override me!\n", __FUNCTION__);
     firstRun = false;
   }
 }
@@ -75,7 +74,7 @@ void IterativeRobotBase::TeleopPeriodic() {
 void IterativeRobotBase::TestPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    wpi::print("Default {}() method... Override me!\n", __FUNCTION__);
+    wpi::util::print("Default {}() method... Override me!\n", __FUNCTION__);
     firstRun = false;
   }
 }
@@ -92,7 +91,7 @@ void IterativeRobotBase::SetNetworkTablesFlushEnabled(bool enabled) {
   m_ntFlushEnabled = enabled;
 }
 
-units::second_t IterativeRobotBase::GetPeriod() const {
+wpi::units::second_t IterativeRobotBase::GetPeriod() const {
   return m_period;
 }
 
@@ -185,7 +184,7 @@ void IterativeRobotBase::LoopFunc() {
 
   // Flush NetworkTables
   if (m_ntFlushEnabled) {
-    nt::NetworkTableInstance::GetDefault().FlushLocal();
+    wpi::nt::NetworkTableInstance::GetDefault().FlushLocal();
   }
 
   // Warn on loop time overruns

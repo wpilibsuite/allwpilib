@@ -4,8 +4,8 @@
 
 #include "WSProvider_RoboRIO.h"
 
-#include <hal/Ports.h>
-#include <hal/simulation/RoboRioData.h>
+#include <wpi/hal/Ports.hpp>
+#include <wpi/hal/simulation/RoboRioData.hpp>
 
 #define REGISTER(halsim, jsonid, ctype, haltype)                          \
   HALSIM_RegisterRoboRio##halsim##Callback(                               \
@@ -53,8 +53,8 @@ void HALSimWSProviderRoboRIO::DoCancelCallbacks() {
   m_3v3VoltageCbKey = 0;
 }
 
-void HALSimWSProviderRoboRIO::OnNetValueChanged(const wpi::json& json) {
-  wpi::json::const_iterator it;
+void HALSimWSProviderRoboRIO::OnNetValueChanged(const wpi::util::json& json) {
+  wpi::util::json::const_iterator it;
   if ((it = json.find(">vin_voltage")) != json.end()) {
     HALSIM_SetRoboRioVInVoltage(it.value());
   }

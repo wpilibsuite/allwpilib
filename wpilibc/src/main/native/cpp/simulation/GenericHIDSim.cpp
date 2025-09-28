@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/GenericHIDSim.h"
+#include "wpi/simulation/GenericHIDSim.hpp"
 
-#include "frc/DriverStation.h"
-#include "frc/GenericHID.h"
-#include "frc/simulation/DriverStationSim.h"
+#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/GenericHID.hpp"
+#include "wpi/simulation/DriverStationSim.hpp"
 
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 GenericHIDSim::GenericHIDSim(const GenericHID& joystick)
     : m_port{joystick.GetPort()} {}

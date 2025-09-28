@@ -7,9 +7,9 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Pose2d.h"
+#include "wpi/math/geometry/Pose2d.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 TEST(Twist2dTest, Straight) {
   const Twist2d straight{5_m, 0_m, 0_rad};
@@ -22,7 +22,7 @@ TEST(Twist2dTest, Straight) {
 
 TEST(Twist2dTest, QuarterCircle) {
   const Twist2d quarterCircle{5_m / 2.0 * std::numbers::pi, 0_m,
-                              units::radian_t{std::numbers::pi / 2.0}};
+                              wpi::units::radian_t{std::numbers::pi / 2.0}};
   const auto quarterCirclePose = quarterCircle.Exp();
 
   EXPECT_DOUBLE_EQ(5.0, quarterCirclePose.X().value());
@@ -57,8 +57,8 @@ TEST(Twist2dTest, Pose2dLog) {
 
   const auto twist = (end - start).Log();
 
-  Twist2d expected{units::meter_t{5.0 / 2.0 * std::numbers::pi}, 0_m,
-                   units::radian_t{std::numbers::pi / 2.0}};
+  Twist2d expected{wpi::units::meter_t{5.0 / 2.0 * std::numbers::pi}, 0_m,
+                   wpi::units::radian_t{std::numbers::pi / 2.0}};
   EXPECT_EQ(expected, twist);
 
   // Make sure computed twist gives back original end pose

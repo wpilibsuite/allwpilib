@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <frc2/command/SubsystemBase.h>
+#include <wpi/command/SubsystemBase.hpp>
 
-class ReplaceMeSubsystem2 : public frc2::SubsystemBase {
+class ReplaceMeSubsystem2 : public wpi::cmd::SubsystemBase {
  public:
   ReplaceMeSubsystem2();
 

@@ -6,12 +6,12 @@
 
 #include <optional>
 
-#include <frc/TimedRobot.h>
-#include <frc2/command/CommandPtr.h>
+#include <wpi/command/CommandPtr.hpp>
+#include <wpi/opmode/TimedRobot.hpp>
 
 #include "SysIdRoutineBot.h"
 
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   Robot();
   void RobotPeriodic() override;
@@ -29,7 +29,7 @@ class Robot : public frc::TimedRobot {
   void TestExit() override;
 
  private:
-  std::optional<frc2::CommandPtr> m_autonomousCommand;
+  std::optional<wpi::cmd::CommandPtr> m_autonomousCommand;
 
   SysIdRoutineBot m_container;
 };

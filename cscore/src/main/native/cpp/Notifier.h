@@ -8,19 +8,19 @@
 #include <functional>
 #include <utility>
 
-#include <wpi/CallbackManager.h>
+#include <wpi/util/CallbackManager.hpp>
 
 #include "Handle.h"
-#include "cscore_cpp.h"
+#include "wpi/cscore/cscore_cpp.hpp"
 
-namespace cs {
+namespace wpi::cs {
 
 class SinkImpl;
 class SourceImpl;
 
 namespace impl {
 
-struct ListenerData : public wpi::CallbackListenerData<
+struct ListenerData : public wpi::util::CallbackListenerData<
                           std::function<void(const RawEvent& event)>> {
   ListenerData() = default;
   ListenerData(std::function<void(const RawEvent& event)> callback_,
@@ -33,7 +33,7 @@ struct ListenerData : public wpi::CallbackListenerData<
 };
 
 class NotifierThread
-    : public wpi::CallbackThread<NotifierThread, RawEvent, ListenerData> {
+    : public wpi::util::CallbackThread<NotifierThread, RawEvent, ListenerData> {
  public:
   NotifierThread(std::function<void()> on_start, std::function<void()> on_exit)
       : CallbackThread(std::move(on_start), std::move(on_exit)) {}
@@ -54,7 +54,7 @@ class NotifierThread
 
 }  // namespace impl
 
-class Notifier : public wpi::CallbackManager<Notifier, impl::NotifierThread> {
+class Notifier : public wpi::util::CallbackManager<Notifier, impl::NotifierThread> {
   friend class NotifierTest;
 
  public:
@@ -88,6 +88,6 @@ class Notifier : public wpi::CallbackManager<Notifier, impl::NotifierThread> {
   void NotifyUsbCamerasChanged();
 };
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_NOTIFIER_H_

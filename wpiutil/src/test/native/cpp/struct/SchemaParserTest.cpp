@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/struct/SchemaParser.h"  // NOLINT(build/include_order)
+#include "wpi/util/struct/SchemaParser.hpp"  // NOLINT(build/include_order)
 
 #include <gtest/gtest.h>
 
-using namespace wpi::structparser;
+using namespace wpi::util::structparser;
 
 TEST(StructParserTest, Empty) {
   Parser p{""};

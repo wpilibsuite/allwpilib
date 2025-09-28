@@ -8,11 +8,11 @@
 #include <atomic>
 #include <string_view>
 
-#include <hal/Extensions.h>
-#include <hal/HAL.h>
-#include <hal/Ports.h>
-#include <hal/simulation/MockHooks.h>
-#include <wpi/raw_ostream.h>
+#include <wpi/hal/Extensions.hpp>
+#include <wpi/hal/HAL.hpp>
+#include <wpi/hal/Ports.hpp>
+#include <wpi/hal/simulation/MockHooks.hpp>
+#include <wpi/util/raw_ostream.h>
 
 namespace wpilibws {
 
@@ -52,7 +52,7 @@ void HALSimWSProviderHAL::DoCancelCallbacks() {
   m_simPeriodicAfterCbKey = 0;
 }
 
-void HALSimWSProviderHAL::OnNetValueChanged(const wpi::json& json) {
+void HALSimWSProviderHAL::OnNetValueChanged(const wpi::util::json& json) {
   // no-op. This is all one way
 }
 

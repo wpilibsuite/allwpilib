@@ -6,12 +6,12 @@
 
 #include <utility>
 
-#include <wpi/MessagePack.h>
+#include <wpi/util/MessagePack.hpp>
 
 #include "server/MessagePackWriter.h"
 #include "server/ServerTopic.h"
 
-using namespace nt::server;
+using namespace wpi::nt::server;
 using namespace mpack;
 
 void ServerPublisher::UpdateMeta() {

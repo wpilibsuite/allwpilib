@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/SystemServer.h"
+#include "wpi/SystemServer.hpp"
 
-#include <hal/SystemServer.h>
+#include <wpi/hal/SystemServer.hpp>
 
-namespace frc {
+namespace wpi {
 
-nt::NetworkTableInstance SystemServer::GetSystemServer() {
-  return nt::NetworkTableInstance{HAL_GetSystemServerHandle()};
+wpi::nt::NetworkTableInstance SystemServer::GetSystemServer() {
+  return wpi::nt::NetworkTableInstance{HAL_GetSystemServerHandle()};
 }
 
-}  // namespace frc
+}  // namespace wpi

@@ -6,12 +6,12 @@
 
 #include <numbers>
 
-#include <units/angle.h>
-#include <units/length.h>
-#include <units/mass.h>
-#include <units/time.h>
-#include <units/velocity.h>
-#include <units/voltage.h>
+#include <wpi/units/angle.hpp>
+#include <wpi/units/length.hpp>
+#include <wpi/units/mass.hpp>
+#include <wpi/units/time.hpp>
+#include <wpi/units/velocity.hpp>
+#include <wpi/units/voltage.hpp>
 
 /**
  * The Constants header provides a convenient place for teams to hold robot-wide
@@ -31,14 +31,14 @@ inline constexpr std::string_view kArmPositionKey = "ArmPosition";
 inline constexpr std::string_view kArmPKey = "ArmP";
 
 inline constexpr double kDefaultArmKp = 50.0;
-inline constexpr units::degree_t kDefaultArmSetpoint = 75.0_deg;
+inline constexpr wpi::units::degree_t kDefaultArmSetpoint = 75.0_deg;
 
-inline constexpr units::radian_t kMinAngle = -75.0_deg;
-inline constexpr units::radian_t kMaxAngle = 255.0_deg;
+inline constexpr wpi::units::radian_t kMinAngle = -75.0_deg;
+inline constexpr wpi::units::radian_t kMaxAngle = 255.0_deg;
 
 inline constexpr double kArmReduction = 200.0;
-inline constexpr units::kilogram_t kArmMass = 8.0_kg;
-inline constexpr units::meter_t kArmLength = 30.0_in;
+inline constexpr wpi::units::kilogram_t kArmMass = 8.0_kg;
+inline constexpr wpi::units::meter_t kArmLength = 30.0_in;
 
 // distance per pulse = (angle per revolution) / (pulses per revolution)
 //  = (2 * PI rads) / (4096 pulses)

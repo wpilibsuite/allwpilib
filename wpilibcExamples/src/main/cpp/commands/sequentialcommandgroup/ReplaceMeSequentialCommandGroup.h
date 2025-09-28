@@ -4,14 +4,14 @@
 
 #pragma once
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/SequentialCommandGroup.h>
+#include <wpi/command/CommandHelper.hpp>
+#include <wpi/command/SequentialCommandGroup.hpp>
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.
 // For more information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 class ReplaceMeSequentialCommandGroup
-    : public frc2::CommandHelper<frc2::SequentialCommandGroup,
+    : public wpi::cmd::CommandHelper<wpi::cmd::SequentialCommandGroup,
                                  ReplaceMeSequentialCommandGroup> {
  public:
   ReplaceMeSequentialCommandGroup();

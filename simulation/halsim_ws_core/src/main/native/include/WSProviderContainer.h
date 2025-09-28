@@ -10,7 +10,7 @@
 #include <shared_mutex>
 #include <string_view>
 
-#include <wpi/StringMap.h>
+#include <wpi/util/StringMap.hpp>
 
 #include "WSBaseProvider.h"
 
@@ -52,7 +52,7 @@ class ProviderContainer {
 
  private:
   std::shared_mutex m_mutex;
-  wpi::StringMap<std::shared_ptr<HALSimWSBaseProvider>> m_providers;
+  wpi::util::StringMap<std::shared_ptr<HALSimWSBaseProvider>> m_providers;
 };
 
 }  // namespace wpilibws

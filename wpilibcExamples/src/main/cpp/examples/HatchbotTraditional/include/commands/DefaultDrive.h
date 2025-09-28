@@ -6,8 +6,8 @@
 
 #include <functional>
 
-#include <frc2/command/Command.h>
-#include <frc2/command/CommandHelper.h>
+#include <wpi/command/Command.hpp>
+#include <wpi/command/CommandHelper.hpp>
 
 #include "subsystems/DriveSubsystem.h"
 
@@ -18,7 +18,7 @@
  *
  * @see RunCommand
  */
-class DefaultDrive : public frc2::CommandHelper<frc2::Command, DefaultDrive> {
+class DefaultDrive : public wpi::cmd::CommandHelper<wpi::cmd::Command, DefaultDrive> {
  public:
   /**
    * Creates a new DefaultDrive.

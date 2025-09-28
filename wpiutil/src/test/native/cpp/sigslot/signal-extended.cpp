@@ -31,11 +31,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-#include "wpi/Signal.h"  // NOLINT(build/include_order)
+#include "wpi/util/Signal.h"  // NOLINT(build/include_order)
 
 #include <gtest/gtest.h>
 
-using namespace wpi::sig;
+using namespace wpi::util::sig;
 
 namespace {
 
@@ -66,7 +66,7 @@ struct o {
 
 }  // namespace
 
-namespace wpi {
+namespace wpi::util {
 
 TEST(SignalExtendedTest, FreeConnection) {
   sum = 0;
@@ -134,4 +134,4 @@ TEST(SignalExtendedTest, LambdaConnection) {
   ASSERT_EQ(sum, 3);
 }
 
-}  // namespace wpi
+}  // namespace wpi::util

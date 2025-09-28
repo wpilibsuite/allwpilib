@@ -12,12 +12,12 @@
 #include <string_view>
 #include <thread>
 
-#include <wpi/condition_variable.h>
-#include <wpi/mutex.h>
+#include <wpi/util/condition_variable.hpp>
+#include <wpi/util/mutex.hpp>
 
 #include "wpi/datalog/DataLog.h"
 
-namespace wpi {
+namespace wpi::util {
 class Logger;
 }  // namespace wpi
 
@@ -66,7 +66,7 @@ class DataLogBackgroundWriter final : public DataLog {
    *               this is a time/storage tradeoff
    * @param extraHeader extra header data
    */
-  explicit DataLogBackgroundWriter(wpi::Logger& msglog,
+  explicit DataLogBackgroundWriter(wpi::util::Logger& msglog,
                                    std::string_view dir = "",
                                    std::string_view filename = "",
                                    double period = 0.25,
@@ -100,7 +100,7 @@ class DataLogBackgroundWriter final : public DataLog {
    * @param extraHeader extra header data
    */
   explicit DataLogBackgroundWriter(
-      wpi::Logger& msglog,
+      wpi::util::Logger& msglog,
       std::function<void(std::span<const uint8_t> data)> write,
       double period = 0.25, std::string_view extraHeader = "");
 
@@ -153,8 +153,8 @@ class DataLogBackgroundWriter final : public DataLog {
   void WriterThreadMain(
       std::function<void(std::span<const uint8_t> data)> write);
 
-  mutable wpi::mutex m_mutex;
-  wpi::condition_variable m_cond;
+  mutable wpi::util::mutex m_mutex;
+  wpi::util::condition_variable m_cond;
   bool m_doFlush{false};
   bool m_shutdown{false};
   enum State {

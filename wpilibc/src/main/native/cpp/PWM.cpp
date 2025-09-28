@@ -2,29 +2,29 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/PWM.h"
+#include "wpi/hardware/discrete/PWM.hpp"
 
 #include <utility>
 
-#include <hal/HALBase.h>
-#include <hal/PWM.h>
-#include <hal/Ports.h>
-#include <hal/UsageReporting.h>
-#include <wpi/StackTrace.h>
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include <wpi/hal/HALBase.hpp>
+#include <wpi/hal/PWM.hpp>
+#include <wpi/hal/Ports.hpp>
+#include <wpi/hal/UsageReporting.h>
+#include <wpi/util/StackTrace.hpp>
+#include <wpi/util/sendable/SendableBuilder.hpp>
+#include <wpi/util/sendable/SendableRegistry.hpp>
 
-#include "frc/Errors.h"
-#include "frc/SensorUtil.h"
+#include "wpi/Errors.hpp"
+#include "wpi/SensorUtil.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 PWM::PWM(int channel, bool registerSendable) {
   if (!SensorUtil::CheckPWMChannel(channel)) {
     throw FRC_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
   }
 
-  auto stack = wpi::GetStackTrace(1);
+  auto stack = wpi::util::GetStackTrace(1);
   int32_t status = 0;
   m_handle = HAL_InitializePWMPort(channel, stack.c_str(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", channel);
@@ -35,7 +35,7 @@ PWM::PWM(int channel, bool registerSendable) {
 
   HAL_ReportUsage("IO", channel, "PWM");
   if (registerSendable) {
-    wpi::SendableRegistry::Add(this, "PWM", channel);
+    wpi::util::SendableRegistry::Add(this, "PWM", channel);
   }
 }
 
@@ -45,18 +45,18 @@ PWM::~PWM() {
   }
 }
 
-void PWM::SetPulseTime(units::microsecond_t time) {
+void PWM::SetPulseTime(wpi::units::microsecond_t time) {
   int32_t status = 0;
   HAL_SetPWMPulseTimeMicroseconds(m_handle, time.value(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
-units::microsecond_t PWM::GetPulseTime() const {
+wpi::units::microsecond_t PWM::GetPulseTime() const {
   int32_t status = 0;
   double value = HAL_GetPWMPulseTimeMicroseconds(m_handle, &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 
-  return units::microsecond_t{value};
+  return wpi::units::microsecond_t{value};
 }
 
 void PWM::SetDisabled() {
@@ -97,10 +97,10 @@ void PWM::SetSimDevice(HAL_SimDeviceHandle device) {
   HAL_SetPWMSimDevice(m_handle, device);
 }
 
-void PWM::InitSendable(wpi::SendableBuilder& builder) {
+void PWM::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("PWM");
   builder.SetActuator(true);
   builder.AddDoubleProperty(
       "Value", [=, this] { return GetPulseTime().value(); },
-      [=, this](double value) { SetPulseTime(units::millisecond_t{value}); });
+      [=, this](double value) { SetPulseTime(wpi::units::millisecond_t{value}); });
 }

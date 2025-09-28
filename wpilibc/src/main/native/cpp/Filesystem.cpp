@@ -2,27 +2,27 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/Filesystem.h"
+#include "wpi/system/Filesystem.hpp"
 
 #include <string>
 
-#include <wpi/fs.h>
+#include <wpi/util/fs.hpp>
 
-#include "frc/RobotBase.h"
+#include "wpi/opmode/RobotBase.hpp"
 
-std::string frc::filesystem::GetLaunchDirectory() {
+std::string wpi::filesystem::GetLaunchDirectory() {
   return fs::current_path().string();
 }
 
-std::string frc::filesystem::GetOperatingDirectory() {
+std::string wpi::filesystem::GetOperatingDirectory() {
   if constexpr (!RobotBase::IsSimulation()) {
     return "/home/systemcore";
   } else {
-    return frc::filesystem::GetLaunchDirectory();
+    return wpi::filesystem::GetLaunchDirectory();
   }
 }
 
-std::string frc::filesystem::GetDeployDirectory() {
+std::string wpi::filesystem::GetDeployDirectory() {
   if constexpr (!RobotBase::IsSimulation()) {
     return "/home/systemcore/deploy";
   } else {

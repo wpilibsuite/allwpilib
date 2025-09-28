@@ -8,11 +8,11 @@
 #include <string_view>
 
 #include <fmt/format.h>
-#include <wpi/StringExtras.h>
+#include <wpi/util/StringExtras.h>
 
-#include "networktables/NetworkTableValue.h"
+#include "wpi/ntcore/NetworkTableValue.hpp"
 
-using namespace nt::local;
+using namespace wpi::nt::local;
 
 std::string LocalDataLoggerEntry::MakeMetadata(std::string_view properties) {
   return fmt::format("{{\"properties\":{},\"source\":\"NT\"}}", properties);

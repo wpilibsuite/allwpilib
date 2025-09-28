@@ -9,7 +9,7 @@ evaluationDependsOn(':cscore')
 evaluationDependsOn(':epilogue-runtime')
 evaluationDependsOn(':hal')
 evaluationDependsOn(':ntcore')
-evaluationDependsOn(':wpilibNewCommands')
+evaluationDependsOn(':command')
 evaluationDependsOn(':wpilibc')
 evaluationDependsOn(':wpilibj')
 evaluationDependsOn(':wpimath')
@@ -20,12 +20,12 @@ evaluationDependsOn(':romiVendordep')
 evaluationDependsOn(':xrpVendordep')
 
 def baseArtifactIdCpp = 'documentation'
-def artifactGroupIdCpp = 'edu.wpi.first.wpilibc'
-def zipBaseNameCpp = '_GROUP_edu_wpi_first_wpilibc_ID_documentation_CLS'
+def artifactGroupIdCpp = 'org.wpilib.wpilibc'
+def zipBaseNameCpp = '_GROUP_org_wpilib_wpilibc_ID_documentation_CLS'
 
 def baseArtifactIdJava = 'documentation'
-def artifactGroupIdJava = 'edu.wpi.first.wpilibj'
-def zipBaseNameJava = '_GROUP_edu_wpi_first_wpilibj_ID_documentation_CLS'
+def artifactGroupIdJava = 'org.wpilib.wpilibj'
+def zipBaseNameJava = '_GROUP_org_wpilib_wpilibj_ID_documentation_CLS'
 
 def outputsFolder = file("$project.buildDir/outputs")
 
@@ -37,7 +37,7 @@ cppProjectZips.add(project(':cameraserver').cppHeadersZip)
 cppProjectZips.add(project(':cscore').cppHeadersZip)
 cppProjectZips.add(project(':hal').cppHeadersZip)
 cppProjectZips.add(project(':ntcore').cppHeadersZip)
-cppProjectZips.add(project(':wpilibNewCommands').cppHeadersZip)
+cppProjectZips.add(project(':command').cppHeadersZip)
 cppProjectZips.add(project(':wpilibc').cppHeadersZip)
 cppProjectZips.add(project(':wpimath').cppHeadersZip)
 cppProjectZips.add(project(':wpinet').cppHeadersZip)
@@ -82,42 +82,42 @@ doxygen.sourceSets.main {
         exclude 'unsupported/**'
 
         // LLVM
-        exclude 'wpi/AlignOf.h'
-        exclude 'wpi/Casting.h'
-        exclude 'wpi/Chrono.h'
-        exclude 'wpi/Compiler.h'
-        exclude 'wpi/ConvertUTF.h'
-        exclude 'wpi/DenseMap.h'
-        exclude 'wpi/DenseMapInfo.h'
-        exclude 'wpi/Endian.h'
-        exclude 'wpi/EpochTracker.h'
-        exclude 'wpi/Errc.h'
-        exclude 'wpi/Errno.h'
-        exclude 'wpi/ErrorHandling.h'
-        exclude 'wpi/bit.h'
-        exclude 'wpi/fs.h'
-        exclude 'wpi/FunctionExtras.h'
-        exclude 'wpi/function_ref.h'
-        exclude 'wpi/iterator.h'
-        exclude 'wpi/iterator_range.h'
-        exclude 'wpi/ManagedStatic.h'
-        exclude 'wpi/MathExtras.h'
-        exclude 'wpi/MemAlloc.h'
-        exclude 'wpi/PointerIntPair.h'
-        exclude 'wpi/PointerLikeTypeTraits.h'
-        exclude 'wpi/PointerUnion.h'
-        exclude 'wpi/raw_os_ostream.h'
-        exclude 'wpi/raw_ostream.h'
-        exclude 'wpi/SmallPtrSet.h'
-        exclude 'wpi/SmallSet.h'
-        exclude 'wpi/SmallString.h'
-        exclude 'wpi/SmallVector.h'
-        exclude 'wpi/StringExtras.h'
-        exclude 'wpi/StringMap.h'
-        exclude 'wpi/SwapByteOrder.h'
-        exclude 'wpi/type_traits.h'
-        exclude 'wpi/VersionTuple.h'
-        exclude 'wpi/WindowsError.h'
+        exclude 'wpi/util/AlignOf.h'
+        exclude 'wpi/util/Casting.h'
+        exclude 'wpi/util/Chrono.h'
+        exclude 'wpi/util/Compiler.h'
+        exclude 'wpi/util/ConvertUTF.h'
+        exclude 'wpi/util/DenseMap.h'
+        exclude 'wpi/util/DenseMapInfo.h'
+        exclude 'wpi/util/Endian.h'
+        exclude 'wpi/util/EpochTracker.h'
+        exclude 'wpi/util/Errc.h'
+        exclude 'wpi/util/Errno.h'
+        exclude 'wpi/util/ErrorHandling.h'
+        exclude 'wpi/util/bit.h'
+        exclude 'wpi/util/fs.h'
+        exclude 'wpi/util/FunctionExtras.h'
+        exclude 'wpi/util/function_ref.h'
+        exclude 'wpi/util/iterator.h'
+        exclude 'wpi/util/iterator_range.h'
+        exclude 'wpi/util/ManagedStatic.h'
+        exclude 'wpi/util/MathExtras.h'
+        exclude 'wpi/util/MemAlloc.h'
+        exclude 'wpi/util/PointerIntPair.h'
+        exclude 'wpi/util/PointerLikeTypeTraits.h'
+        exclude 'wpi/util/PointerUnion.h'
+        exclude 'wpi/util/raw_os_ostream.h'
+        exclude 'wpi/util/raw_ostream.h'
+        exclude 'wpi/util/SmallPtrSet.h'
+        exclude 'wpi/util/SmallSet.h'
+        exclude 'wpi/util/SmallString.h'
+        exclude 'wpi/util/SmallVector.h'
+        exclude 'wpi/util/StringExtras.h'
+        exclude 'wpi/util/StringMap.h'
+        exclude 'wpi/util/SwapByteOrder.h'
+        exclude 'wpi/util/type_traits.h'
+        exclude 'wpi/util/VersionTuple.h'
+        exclude 'wpi/util/WindowsError.h'
 
         // fmtlib
         exclude 'fmt/**'
@@ -125,22 +125,22 @@ doxygen.sourceSets.main {
         // libuv
         exclude 'uv.h'
         exclude 'uv/**'
-        exclude 'wpinet/uv/**'
+        exclude 'wpi/net/uv/**'
 
         // json
-        exclude 'wpi/adl_serializer.h'
-        exclude 'wpi/byte_container_with_subtype.h'
-        exclude 'wpi/detail/**'
-        exclude 'wpi/json.h'
-        exclude 'wpi/json_fwd.h'
-        exclude 'wpi/ordered_map.h'
+        exclude 'wpi/util/adl_serializer.h'
+        exclude 'wpi/util/byte_container_with_subtype.h'
+        exclude 'wpi/util/detail/**'
+        exclude 'wpi/util/json.h'
+        exclude 'wpi/util/json_fwd.h'
+        exclude 'wpi/util/ordered_map.h'
         exclude 'wpi/thirdparty/**'
 
         // mpack
-        exclude 'wpi/mpack.h'
+        exclude 'wpi/util/mpack.h'
 
         // units
-        exclude 'units/**'
+        exclude 'wpi/units/**'
     }
 
     exclude '*.pb.h'
@@ -186,28 +186,28 @@ task generateJavaDocs(type: Javadoc) {
     options.addStringOption("tag", "pre:a:Pre-Condition")
     options.addBooleanOption("Xdoclint/package:" +
             // TODO: v Document these, then remove them from the list
-            "-edu.wpi.first.hal," +
-            "-edu.wpi.first.hal.simulation," +
+            "-org.wpilib.hardware.hal," +
+            "-org.wpilib.hardware.hal.simulation," +
             // TODO: ^ Document these, then remove them from the list
-            "-edu.wpi.first.math.proto," +
-            "-edu.wpi.first.math.struct," +
-            "-edu.wpi.first.math.controller.proto," +
-            "-edu.wpi.first.math.controller.struct," +
-            "-edu.wpi.first.math.geometry.proto," +
-            "-edu.wpi.first.math.geometry.struct," +
-            "-edu.wpi.first.math.kinematics.proto," +
-            "-edu.wpi.first.math.kinematics.struct," +
-            "-edu.wpi.first.math.spline.proto," +
-            "-edu.wpi.first.math.spline.struct," +
-            "-edu.wpi.first.math.system.proto," +
-            "-edu.wpi.first.math.system.struct," +
-            "-edu.wpi.first.math.system.plant.proto," +
-            "-edu.wpi.first.math.system.plant.struct," +
-            "-edu.wpi.first.math.trajectory.proto," +
-            "-edu.wpi.first.math.trajectory.struct," +
+            "-org.wpilib.math.proto," +
+            "-org.wpilib.math.struct," +
+            "-org.wpilib.math.controller.proto," +
+            "-org.wpilib.math.controller.struct," +
+            "-org.wpilib.math.geometry.proto," +
+            "-org.wpilib.math.geometry.struct," +
+            "-org.wpilib.math.kinematics.proto," +
+            "-org.wpilib.math.kinematics.struct," +
+            "-org.wpilib.math.spline.proto," +
+            "-org.wpilib.math.spline.struct," +
+            "-org.wpilib.math.system.proto," +
+            "-org.wpilib.math.system.struct," +
+            "-org.wpilib.math.system.plant.proto," +
+            "-org.wpilib.math.system.plant.struct," +
+            "-org.wpilib.math.trajectory.proto," +
+            "-org.wpilib.math.trajectory.struct," +
             // The .measure package contains generated source files for which automatic javadoc
             // generation is very difficult to do meaningfully.
-            "-edu.wpi.first.units.measure", true)
+            "-org.wpilib.units.measure", true)
     options.addBooleanOption("Xdoclint:html,missing,reference,syntax", true)
     options.addBooleanOption('html5', true)
     options.linkSource(true)
@@ -218,7 +218,7 @@ task generateJavaDocs(type: Javadoc) {
     source project(':epilogue-runtime').sourceSets.main.java
     source project(':hal').sourceSets.main.java
     source project(':ntcore').sourceSets.main.java
-    source project(':wpilibNewCommands').sourceSets.main.java
+    source project(':command').sourceSets.main.java
     source project(':wpilibj').sourceSets.main.java
     source project(':wpimath').sourceSets.main.java
     source project(':wpinet').sourceSets.main.java

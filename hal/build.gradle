@@ -9,7 +9,7 @@ ext {
 
     nativeName = 'hal'
     setBaseName = 'wpiHal'
-    devMain = 'edu.wpi.first.hal.DevMain'
+    devMain = 'org.wpilib.hardware.hal.DevMain'
     generatedHeaders = "src/generated/main/native/include"
     splitSetup = {
         if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {

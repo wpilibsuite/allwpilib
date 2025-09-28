@@ -4,10 +4,10 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/SmallString.h"
-#include "wpi/StringExtras.h"
+#include "wpi/util/SmallString.h"
+#include "wpi/util/StringExtras.h"
 
-using namespace wpi;
+using namespace wpi::util;
 
 namespace {
 

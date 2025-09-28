@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <frc/TimesliceRobot.h>
+#include <wpi/opmode/TimesliceRobot.hpp>
 
-class Robot : public frc::TimesliceRobot {
+class Robot : public wpi::TimesliceRobot {
  public:
   Robot();
 

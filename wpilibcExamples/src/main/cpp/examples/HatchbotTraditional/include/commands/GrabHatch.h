@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <frc2/command/Command.h>
-#include <frc2/command/CommandHelper.h>
+#include <wpi/command/Command.hpp>
+#include <wpi/command/CommandHelper.hpp>
 
 #include "subsystems/HatchSubsystem.h"
 
@@ -16,7 +16,7 @@
  *
  * @see InstantCommand
  */
-class GrabHatch : public frc2::CommandHelper<frc2::Command, GrabHatch> {
+class GrabHatch : public wpi::cmd::CommandHelper<wpi::cmd::Command, GrabHatch> {
  public:
   explicit GrabHatch(HatchSubsystem* subsystem);
 

@@ -51,7 +51,7 @@ dependencies {
     implementation project(':hal')
     implementation project(':ntcore')
     implementation project(':wpilibj')
-    implementation project(':wpilibNewCommands')
+    implementation project(':command')
     implementation project(':wpimath')
     implementation project(':wpinet')
     implementation project(':wpiunits')
@@ -217,7 +217,7 @@ model {
                 project(':ntcore').addNtcoreDependency(binary, 'shared')
                 project(':ntcore').addNtcoreJniDependency(binary)
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
-                lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
+                lib project: ':command', library: 'command', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimathJNIShared', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
@@ -268,7 +268,7 @@ model {
                 project(':hal').addHalDependency(binary, 'static')
                 project(':ntcore').addNtcoreDependency(binary, 'static')
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'static'
-                lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'static'
+                lib project: ':command', library: 'command', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'

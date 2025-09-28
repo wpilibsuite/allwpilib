@@ -5,10 +5,10 @@
 #include <gtest/gtest.h>
 
 #include "../StructTestBase.h"
-#include "frc/EigenCore.h"
-#include "frc/struct/VectorStruct.h"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/struct/VectorStruct.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 struct VectorStructTestData {
   using Type = Vectord<2>;

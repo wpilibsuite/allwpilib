@@ -4,14 +4,14 @@
 
 #pragma once
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/ParallelRaceGroup.h>
+#include <wpi/command/CommandHelper.hpp>
+#include <wpi/command/ParallelRaceGroup.hpp>
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.
 // For more information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 class ReplaceMeParallelRaceGroup
-    : public frc2::CommandHelper<frc2::ParallelRaceGroup,
+    : public wpi::cmd::CommandHelper<wpi::cmd::ParallelRaceGroup,
                                  ReplaceMeParallelRaceGroup> {
  public:
   ReplaceMeParallelRaceGroup();

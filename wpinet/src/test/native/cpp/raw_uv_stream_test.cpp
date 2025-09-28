@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/raw_uv_ostream.h"  // NOLINT(build/include_order)
+#include "wpi/net/raw_uv_ostream.hpp"  // NOLINT(build/include_order)
 
 #include <gtest/gtest.h>
 
-namespace wpi {
+namespace wpi::net {
 
 TEST(RawUvStreamTest, BasicWrite) {
-  SmallVector<uv::Buffer, 4> bufs;
+  wpi::util::SmallVector<uv::Buffer, 4> bufs;
   raw_uv_ostream os(bufs, 1024);
   os << "12";
   os << "34";
@@ -26,7 +26,7 @@ TEST(RawUvStreamTest, BasicWrite) {
 }
 
 TEST(RawUvStreamTest, BoundaryWrite) {
-  SmallVector<uv::Buffer, 4> bufs;
+  wpi::util::SmallVector<uv::Buffer, 4> bufs;
   raw_uv_ostream os(bufs, 4);
   ASSERT_EQ(bufs.size(), 0u);
   os << "12";
@@ -42,7 +42,7 @@ TEST(RawUvStreamTest, BoundaryWrite) {
 }
 
 TEST(RawUvStreamTest, LargeWrite) {
-  SmallVector<uv::Buffer, 4> bufs;
+  wpi::util::SmallVector<uv::Buffer, 4> bufs;
   raw_uv_ostream os(bufs, 4);
   os << "123456";
   ASSERT_EQ(bufs.size(), 2u);
@@ -55,7 +55,7 @@ TEST(RawUvStreamTest, LargeWrite) {
 }
 
 TEST(RawUvStreamTest, PrevDataWrite) {
-  SmallVector<uv::Buffer, 4> bufs;
+  wpi::util::SmallVector<uv::Buffer, 4> bufs;
   bufs.emplace_back(uv::Buffer::Allocate(1024));
   raw_uv_ostream os(bufs, 1024);
   os << "1234";
@@ -68,4 +68,4 @@ TEST(RawUvStreamTest, PrevDataWrite) {
   }
 }
 
-}  // namespace wpi
+}  // namespace wpi::net

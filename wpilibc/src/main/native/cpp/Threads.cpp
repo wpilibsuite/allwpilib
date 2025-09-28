@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/Threads.h"
+#include "wpi/system/Threads.hpp"
 
-#include <hal/Threads.h>
+#include <wpi/hal/Threads.hpp>
 
-#include "frc/Errors.h"
+#include "wpi/Errors.hpp"
 
-namespace frc {
+namespace wpi {
 
 int GetThreadPriority(std::thread& thread, bool* isRealTime) {
   int32_t status = 0;
@@ -44,4 +44,4 @@ bool SetCurrentThreadPriority(bool realTime, int priority) {
   return ret;
 }
 
-}  // namespace frc
+}  // namespace wpi

@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/Solenoid.h"
+#include "wpi/hardware/pneumatic/Solenoid.hpp"
 
 #include <utility>
 
-#include <wpi/NullDeleter.h>
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include <wpi/util/NullDeleter.hpp>
+#include <wpi/util/sendable/SendableBuilder.hpp>
+#include <wpi/util/sendable/SendableRegistry.hpp>
 
-#include "frc/Errors.h"
-#include "frc/SensorUtil.h"
+#include "wpi/Errors.hpp"
+#include "wpi/SensorUtil.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 Solenoid::Solenoid(int busId, int module, PneumaticsModuleType moduleType,
                    int channel)
@@ -29,7 +29,7 @@ Solenoid::Solenoid(int busId, int module, PneumaticsModuleType moduleType,
   }
 
   m_module->ReportUsage(fmt::format("Solenoid[{}]", m_channel), "Solenoid");
-  wpi::SendableRegistry::Add(this, "Solenoid", m_module->GetModuleNumber(),
+  wpi::util::SendableRegistry::Add(this, "Solenoid", m_module->GetModuleNumber(),
                              m_channel);
 }
 
@@ -65,7 +65,7 @@ bool Solenoid::IsDisabled() const {
   return (m_module->GetSolenoidDisabledList() & m_mask) != 0;
 }
 
-void Solenoid::SetPulseDuration(units::second_t duration) {
+void Solenoid::SetPulseDuration(wpi::units::second_t duration) {
   m_module->SetOneShotDuration(m_channel, duration);
 }
 
@@ -73,7 +73,7 @@ void Solenoid::StartPulse() {
   m_module->FireOneShot(m_channel);
 }
 
-void Solenoid::InitSendable(wpi::SendableBuilder& builder) {
+void Solenoid::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Solenoid");
   builder.SetActuator(true);
   builder.AddBooleanProperty(

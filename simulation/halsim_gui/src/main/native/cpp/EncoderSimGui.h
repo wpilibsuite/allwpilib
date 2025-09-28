@@ -4,7 +4,7 @@
 
 #pragma once
 
-namespace glass {
+namespace wpi::glass {
 class EncodersModel;
 }  // namespace glass
 
@@ -13,7 +13,7 @@ namespace halsimgui {
 class EncoderSimGui {
  public:
   static void Initialize();
-  static glass::EncodersModel& GetEncodersModel();
+  static wpi::glass::EncodersModel& GetEncodersModel();
 };
 
 }  // namespace halsimgui

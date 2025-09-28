@@ -7,13 +7,13 @@
 #include <memory>
 #include <string_view>
 
-#include <glass/WindowManager.h>
+#include <wpi/glass/WindowManager.hpp>
 
 namespace halsimgui {
 
-class DSManager : public glass::WindowManager {
+class DSManager : public wpi::glass::WindowManager {
  public:
-  explicit DSManager(glass::Storage& storage) : WindowManager{storage} {}
+  explicit DSManager(wpi::glass::Storage& storage) : WindowManager{storage} {}
 
   void DisplayMenu() override;
 };

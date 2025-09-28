@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <hal/SimDevice.h>
+#include <wpi/hal/SimDevice.hpp>
 
-namespace glass {
+namespace wpi::glass {
 class DataSource;
 class DeviceTreeModel;
 }  // namespace glass
@@ -16,8 +16,8 @@ namespace halsimgui {
 class SimDeviceGui {
  public:
   static void Initialize();
-  static glass::DataSource* GetValueSource(HAL_SimValueHandle handle);
-  static glass::DeviceTreeModel& GetDeviceTree();
+  static wpi::glass::DataSource* GetValueSource(HAL_SimValueHandle handle);
+  static wpi::glass::DeviceTreeModel& GetDeviceTree();
 };
 
 }  // namespace halsimgui

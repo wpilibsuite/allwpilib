@@ -105,7 +105,7 @@ If opening from a fresh clone, generated java dependencies will not exist. Most 
 - `cscore`
 - `hal`
 - `ntcore`
-- `wpilibNewCommands`
+- `command`
 - `wpimath`
 - `wpinet`
 - `wpiunits`

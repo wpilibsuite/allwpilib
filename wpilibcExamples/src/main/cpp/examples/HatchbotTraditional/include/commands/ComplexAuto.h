@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/SequentialCommandGroup.h>
+#include <wpi/command/CommandHelper.hpp>
+#include <wpi/command/SequentialCommandGroup.hpp>
 
 #include "Constants.h"
 #include "commands/DriveDistance.h"
@@ -16,7 +16,7 @@
  * backward.
  */
 class ComplexAuto
-    : public frc2::CommandHelper<frc2::SequentialCommandGroup, ComplexAuto> {
+    : public wpi::cmd::CommandHelper<wpi::cmd::SequentialCommandGroup, ComplexAuto> {
  public:
   /**
    * Creates a new ComplexAuto.

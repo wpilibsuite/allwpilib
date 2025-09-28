@@ -13,13 +13,13 @@
 #include <type_traits>
 #include <vector>
 
-#include <wpi/MemAlloc.h>
+#include <wpi/util/MemAlloc.h>
 
-#include "networktables/NetworkTableValue.h"
-#include "ntcore_c.h"
-#include "ntcore_cpp_types.h"
+#include "wpi/ntcore/NetworkTableValue.hpp"
+#include "wpi/ntcore/ntcore_c.h"
+#include "wpi/ntcore/ntcore_cpp_types.hpp"
 
-namespace nt {
+namespace wpi::nt {
 
 template <typename T>
 struct TypeInfo {};
@@ -357,7 +357,7 @@ inline typename TypeInfo<T>::Value CopyValue(typename TypeInfo<T>::View value) {
 template <SmallArrayType T>
 inline typename TypeInfo<T>::SmallRet CopyValue(
     typename TypeInfo<T>::View arr,
-    wpi::SmallVectorImpl<typename TypeInfo<T>::SmallElem>& buf) {
+    wpi::util::SmallVectorImpl<typename TypeInfo<T>::SmallElem>& buf) {
   buf.assign(arr.begin(), arr.end());
   return {buf.data(), buf.size()};
 }
@@ -376,7 +376,7 @@ inline typename TypeInfo<T>::Value GetValueCopy(const Value& value) {
 template <SmallArrayType T, bool ConvertNumeric>
 inline typename TypeInfo<T>::SmallRet GetValueCopy(
     const Value& value,
-    wpi::SmallVectorImpl<typename TypeInfo<T>::SmallElem>& buf) {
+    wpi::util::SmallVectorImpl<typename TypeInfo<T>::SmallElem>& buf) {
   if constexpr (ConvertNumeric && NumericArrayType<T>) {
     if (value.IsIntegerArray()) {
       auto arr = value.GetIntegerArray();
@@ -408,7 +408,7 @@ inline Timestamped<typename TypeInfo<T>::Value> GetTimestamped(
 template <SmallArrayType T, bool ConvertNumeric>
 inline Timestamped<typename TypeInfo<T>::SmallRet> GetTimestamped(
     const Value& value,
-    wpi::SmallVectorImpl<typename TypeInfo<T>::SmallElem>& buf) {
+    wpi::util::SmallVectorImpl<typename TypeInfo<T>::SmallElem>& buf) {
   return {value.time(), value.server_time(),
           GetValueCopy<T, ConvertNumeric>(value, buf)};
 }
@@ -435,7 +435,7 @@ O* ConvertToC(const std::vector<I>& in, size_t* out_len) {
   if (in.empty()) {
     return nullptr;
   }
-  O* out = static_cast<O*>(wpi::safe_malloc(sizeof(O) * in.size()));
+  O* out = static_cast<O*>(wpi::util::safe_malloc(sizeof(O) * in.size()));
   for (size_t i = 0; i < in.size(); ++i) {
     ConvertToC(in[i], &out[i]);
   }
@@ -444,7 +444,7 @@ O* ConvertToC(const std::vector<I>& in, size_t* out_len) {
 
 template <typename O, typename I>
 O* ConvertToC(const std::basic_string<I>& in, size_t* out_len) {
-  char* out = static_cast<char*>(wpi::safe_malloc(in.size() + 1));
+  char* out = static_cast<char*>(wpi::util::safe_malloc(in.size() + 1));
   std::memmove(out, in.data(), in.size());  // NOLINT
   out[in.size()] = '\0';
   *out_len = in.size();
@@ -453,4 +453,4 @@ O* ConvertToC(const std::basic_string<I>& in, size_t* out_len) {
 
 Value ConvertNumericValue(const Value& value, NT_Type type);
 
-}  // namespace nt
+}  // namespace wpi::nt

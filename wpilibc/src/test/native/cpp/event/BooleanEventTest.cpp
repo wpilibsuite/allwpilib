@@ -6,10 +6,10 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/event/BooleanEvent.h"
-#include "frc/event/EventLoop.h"
+#include "wpi/event/BooleanEvent.hpp"
+#include "wpi/event/EventLoop.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 TEST(BooleanEventTest, BinaryCompositions) {
   EventLoop loop;

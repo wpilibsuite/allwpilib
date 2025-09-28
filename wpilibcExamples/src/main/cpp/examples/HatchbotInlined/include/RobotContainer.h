@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <frc/smartdashboard/SendableChooser.h>
-#include <frc2/command/Command.h>
-#include <frc2/command/Commands.h>
-#include <frc2/command/button/CommandPS4Controller.h>
+#include <wpi/command/Command.hpp>
+#include <wpi/command/Commands.hpp>
+#include <wpi/command/button/CommandPS4Controller.hpp>
+#include <wpi/smartdashboard/SendableChooser.hpp>
 
 #include "Constants.h"
 #include "commands/Autos.h"
@@ -27,11 +27,11 @@ class RobotContainer {
  public:
   RobotContainer();
 
-  frc2::Command* GetAutonomousCommand();
+  wpi::cmd::Command* GetAutonomousCommand();
 
  private:
   // The driver's controller
-  frc2::CommandPS4Controller m_driverController{
+  wpi::cmd::CommandPS4Controller m_driverController{
       OIConstants::kDriverControllerPort};
 
   // The robot's subsystems and commands are defined here...
@@ -43,11 +43,11 @@ class RobotContainer {
   // Commands owned by RobotContainer
 
   // The autonomous routines
-  frc2::CommandPtr m_simpleAuto = autos::SimpleAuto(&m_drive);
-  frc2::CommandPtr m_complexAuto = autos::ComplexAuto(&m_drive, &m_hatch);
+  wpi::cmd::CommandPtr m_simpleAuto = autos::SimpleAuto(&m_drive);
+  wpi::cmd::CommandPtr m_complexAuto = autos::ComplexAuto(&m_drive, &m_hatch);
 
   // The chooser for the autonomous routines
-  frc::SendableChooser<frc2::Command*> m_chooser;
+  wpi::SendableChooser<wpi::cmd::Command*> m_chooser;
 
   void ConfigureButtonBindings();
 };
