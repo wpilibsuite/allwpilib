@@ -335,8 +335,19 @@ public abstract class RobotBase implements AutoCloseable {
       }
       String robotName = "Unknown";
       StackTraceElement[] elements = throwable.getStackTrace();
-      if (elements.length > 0) {
-        robotName = elements[0].getClassName();
+      for (int i = elements.length - 1; i >= 0; i--) {
+        StackTraceElement element = elements[i];
+        try {
+          if (RobotBase.class.equals(Class.forName(element.getClassName()))) {
+            continue;
+          }
+          if (RobotBase.class.isAssignableFrom(Class.forName(element.getClassName()))) {
+            robotName = element.getClassName();
+            break;
+          }
+        } catch (ClassNotFoundException e) {
+          // Unreachable
+        }
       }
       DriverStationErrors.reportError(
           "Unhandled exception instantiating robot " + robotName + " " + throwable, elements);
