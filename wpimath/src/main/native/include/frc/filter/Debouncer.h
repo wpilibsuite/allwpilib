@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include <wpi/SymbolExports.h>
 #include <wpi/timestamp.h>
 
@@ -49,6 +51,13 @@ class WPILIB_DLLEXPORT Debouncer {
   bool Calculate(bool input);
 
   /**
+   * Resets the debouncer such that it will now behave as if enough time has
+   * passed, even if the actual elapsed time is below the limit. This is helpful
+   * if you want to clear the internal "memory" or state.
+   */
+  void Reset();
+
+  /**
    * Sets the time to debounce.
    *
    * @param time The number of seconds the value must change from baseline
@@ -89,7 +98,7 @@ class WPILIB_DLLEXPORT Debouncer {
   bool m_baseline;
   DebounceType m_debounceType;
 
-  units::second_t m_prevTime;
+  std::optional<units::second_t> m_prevTime;
 
   void ResetTimer();
 
