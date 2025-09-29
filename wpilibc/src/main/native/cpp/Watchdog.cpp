@@ -135,9 +135,6 @@ void Watchdog::Impl::Main() {
 Watchdog::Watchdog(units::second_t timeout, std::function<void()> callback)
     : m_timeout(timeout), m_callback(std::move(callback)), m_impl(GetImpl()) {}
 
-Watchdog::Watchdog(units::hertz_t timeout, std::function<void()> callback)
-    : m_timeout(timeout), m_callback(std::move(callback)), m_impl(GetImpl()) {}
-
 Watchdog::~Watchdog() {
   try {
     Disable();

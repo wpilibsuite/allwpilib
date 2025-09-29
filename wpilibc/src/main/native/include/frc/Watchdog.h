@@ -35,16 +35,8 @@ class Watchdog {
    */
   Watchdog(units::second_t timeout, std::function<void()> callback);
 
-  Watchdog(units::hertz_t timeout, std::function<void()> callback);
-
   template <typename Callable, typename Arg, typename... Args>
   Watchdog(units::second_t timeout, Callable&& f, Arg&& arg, Args&&... args)
-      : Watchdog(timeout,
-                 std::bind(std::forward<Callable>(f), std::forward<Arg>(arg),
-                           std::forward<Args>(args)...)) {}
-
-  template <typename Callable, typename Arg, typename... Args>
-  Watchdog(units::hertz_t timeout, Callable&& f, Arg&& arg, Args&&... args)
       : Watchdog(timeout,
                  std::bind(std::forward<Callable>(f), std::forward<Arg>(arg),
                            std::forward<Args>(args)...)) {}

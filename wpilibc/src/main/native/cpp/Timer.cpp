@@ -73,8 +73,8 @@ bool Timer::HasElapsed(units::second_t period) const {
   return Get() >= period;
 }
 
-bool Timer::HasElapsed(units::hertz_t period) const {
-  return Get() >= period;
+bool Timer::HasElapsed(units::hertz_t frequency) const {
+  return Get() >= 1 / frequency;
 }
 
 bool Timer::AdvanceIfElapsed(units::second_t period) {

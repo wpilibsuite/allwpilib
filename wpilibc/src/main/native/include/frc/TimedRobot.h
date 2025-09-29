@@ -83,9 +83,6 @@ class TimedRobot : public IterativeRobotBase {
   void AddPeriodic(std::function<void()> callback, units::second_t period,
                    units::second_t offset = 0_s);
 
-  void AddPeriodic(std::function<void()> callback, units::hertz_t period,
-                   units::hertz_t offset = 0_s);
-
  private:
   class Callback {
    public:

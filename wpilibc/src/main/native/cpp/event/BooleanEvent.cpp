@@ -75,10 +75,7 @@ BooleanEvent BooleanEvent::Debounce(units::second_t debounceTime,
        state = m_state]() mutable { return debouncer.Calculate(*state); });
 }
 
-BooleanEvent BooleanEvent::Debounce(units::hertz_t debounceTime,
+BooleanEvent BooleanEvent::Debounce(units::hertz_t debounceFrequency,
                                     frc::Debouncer::DebounceType type) {
-  return BooleanEvent(
-      this->m_loop,
-      [debouncer = frc::Debouncer(debounceTime, type),
-       state = m_state]() mutable { return debouncer.Calculate(*state); });
+  return Debounce(1 / debounceFrequency, type);
 }
