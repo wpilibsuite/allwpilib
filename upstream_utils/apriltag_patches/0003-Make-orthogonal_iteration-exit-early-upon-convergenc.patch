@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Tue, 10 Jan 2023 18:36:36 -0800
-Subject: [PATCH 3/8] Make orthogonal_iteration() exit early upon convergence
+Subject: [PATCH 03/17] Make orthogonal_iteration() exit early upon convergence
 
 The current approach wastes iterations doing no work. Exiting early can
 give lower latencies and higher FPS.

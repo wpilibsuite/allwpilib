@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GGreenix <76048260+GGreenix@users.noreply.github.com>
+Date: Thu, 2 Jan 2025 00:20:01 +0200
+Subject: [PATCH 12/17] test
+
+---
+ apriltag.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/apriltag.c b/apriltag.c
+index e08b0f9cbabe325380f5ff64eca9fa09788cd18e..1288d1468f98d1ea77956512d34abcc95ee01431 100644
+--- a/apriltag.c
++++ b/apriltag.c
+@@ -1053,7 +1053,8 @@ zarray_t *apriltag_detector_detect(apriltag_detector_t *td, image_u8_t *im_orig)
+                 // SHARPEN the image by subtracting the low frequency components.
+                 image_u8_t *orig = image_u8_copy(quad_im);
+                 image_u8_gaussian_blur(quad_im, sigma, ksz);
+-
++                
++                //TO-DO add check of roiX and roiY
+                 for (int y = td->roiY; y < td->roiHeight; y++) {
+                     for (int x = td->roiX; x < td->roiWidth; x++) {
+                         int vorig = orig->buf[y*orig->stride + x];
