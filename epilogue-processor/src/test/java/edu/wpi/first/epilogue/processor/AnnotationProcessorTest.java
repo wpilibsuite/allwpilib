@@ -16,6 +16,7 @@ import com.google.testing.compile.JavaFileObjects;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import org.junit.jupiter.api.Test;
@@ -2317,6 +2318,18 @@ class AnnotationProcessorTest {
   }
 
   private void assertLoggerGenerates(String loggedClassContent, String loggerClassContent) {
+    // Extract the expected logger file name from the class declaration so we can find the correct
+    // generated file.
+    var pattern =
+        Pattern.compile(".*public class (.*) extends ClassSpecificLogger.*", Pattern.DOTALL);
+    var matcher = pattern.matcher(loggerClassContent);
+    var className = "ExampleLogger";
+    if (matcher.matches()) {
+      var result = matcher.toMatchResult();
+      className = result.group(1);
+    }
+    var loggerFileName = "/" + className + ".java";
+
     Compilation compilation =
         javac()
             .withOptions(kJavaVersionOptions)
@@ -2329,7 +2342,7 @@ class AnnotationProcessorTest {
     var generatedFiles = compilation.generatedSourceFiles();
     var generatedFile =
         generatedFiles.stream()
-            .filter(jfo -> jfo.getName().contains("Example"))
+            .filter(jfo -> jfo.toUri().getPath().endsWith(loggerFileName))
             .findFirst()
             .orElseThrow(() -> new IllegalStateException("Logger file was not generated!"));
     try {
