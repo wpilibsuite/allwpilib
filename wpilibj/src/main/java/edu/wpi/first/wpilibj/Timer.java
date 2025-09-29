@@ -67,7 +67,7 @@ public class Timer {
    * sensors will continue to update. Only the task containing the wait will pause until the wait
    * time is expired.
    *
-   * @param seconds Length of time to pause in seconds
+   * @param seconds Length of time to pause
    */
   public static void delay(final double seconds) {
     try {
