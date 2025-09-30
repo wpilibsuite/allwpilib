@@ -1,0 +1,84 @@
+extra_includes:
+- wpystruct.h
+
+classes:
+  frc::ChassisSpeeds:
+    force_no_default_constructor: true
+    attributes:
+      vx:
+      vy:
+      omega:
+    methods:
+      ToTwist2d:
+      Discretize:
+        overloads:
+          units::meters_per_second_t, units::meters_per_second_t, units::radians_per_second_t, units::second_t:
+          const ChassisSpeeds&, units::second_t:
+      operator+:
+      operator-:
+        overloads:
+          const ChassisSpeeds& [const]:
+          '[const]':
+      operator*:
+      operator/:
+      operator==:
+      ToRobotRelative:
+      ToFieldRelative:
+
+inline_code: |
+  cls_ChassisSpeeds
+    .def(
+      py::init<
+        units::meters_per_second_t, units::meters_per_second_t,
+        units::radians_per_second_t
+      >(),
+      py::arg("vx") = 0, py::arg("vy") = 0, py::arg("omega") = 0
+    )
+    .def_static("fromFeet", [](units::feet_per_second_t vx, units::feet_per_second_t vy, units::radians_per_second_t omega){
+      return ChassisSpeeds{vx, vy, omega};
+    }, py::arg("vx") = 0, py::arg("vy") = 0, py::arg("omega") = 0)
+    .def_property("vx_fps",
+      [](ChassisSpeeds * self) -> units::feet_per_second_t {
+        return self->vx;
+      },
+      [](ChassisSpeeds * self, units::feet_per_second_t vx) {
+        self->vx = vx;
+      }
+    )
+    .def_property("vy_fps", 
+      [](ChassisSpeeds * self) -> units::feet_per_second_t {
+        return self->vy;
+      },
+      [](ChassisSpeeds * self, units::feet_per_second_t vy) {
+        self->vy = vy;
+      }
+    )
+    .def_property("omega_dps", 
+      [](ChassisSpeeds * self) -> units::degrees_per_second_t {
+        return self->omega;
+      },
+      [](ChassisSpeeds * self, units::degrees_per_second_t omega) {
+        self->omega = omega;
+      }
+    )
+    .def("__len__", [](const ChassisSpeeds &self) { return 3; })
+    .def("__getitem__", [](const ChassisSpeeds &self, int index) {
+      switch (index) {
+        case 0:
+          return self.vx();
+        case 1:
+          return self.vy();
+        case 2:
+          return self.omega();
+        default:
+          throw std::out_of_range("ChassisSpeeds index out of range");
+      }
+    })
+    .def("__repr__", [](const ChassisSpeeds &cs) -> std::string {
+      return "ChassisSpeeds(vx=" + std::to_string(cs.vx()) + ", "
+                           "vy=" + std::to_string(cs.vy()) + ", "
+                           "omega=" + std::to_string(cs.omega()) + ")";
+    })
+  ;
+
+  SetupWPyStruct<frc::ChassisSpeeds>(cls_ChassisSpeeds);

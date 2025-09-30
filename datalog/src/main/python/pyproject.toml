@@ -1,0 +1,63 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [
+    "semiwrap~=0.1.7",
+    "hatch-meson~=0.1.0b2",
+    "hatchling",
+    "robotpy-native-datalog==2027.0.0a2",
+    "robotpy-wpiutil==2027.0.0a2"
+]
+
+[project]
+name = "robotpy-wpilog"
+version = "2027.0.0a2"
+description = "Binary wrapper for FRC wpilog library"
+authors = [
+    {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
+]
+license = "BSD-3-Clause"
+dependencies = [
+    "robotpy-native-datalog==2027.0.0a2",
+    "robotpy-wpiutil==2027.0.0a2"
+]
+
+[project.urls]
+"Source code" = "https://github.com/robotpy/mostrobotpy"
+
+
+[tool.hatch.build.hooks.robotpy]
+version_file = "wpilog/version.py"
+
+[tool.hatch.build.hooks.semiwrap]
+
+[tool.hatch.build.hooks.meson]
+
+[tool.hatch.build.targets.wheel]
+packages = ["wpilog"]
+
+
+[tool.semiwrap]
+update_init = [
+    "wpilog"
+]
+scan_headers_ignore = [
+    # wpi/datalog
+    "wpi/datalog/DataLog_c.h",
+    "wpi/datalog/DataLogReaderThread.h",
+    "wpi/datalog/FileLogger.h",
+]
+
+[tool.semiwrap.extension_modules."wpilog._wpilog"]
+name = "wpilog"
+wraps = ["robotpy-native-datalog"]
+depends = ["wpiutil"]
+
+[tool.semiwrap.extension_modules."wpilog._wpilog".headers]
+# wpi/datalog
+DataLog = "wpi/datalog/DataLog.h"
+DataLogBackgroundWriter = "wpi/datalog/DataLogBackgroundWriter.h"
+DataLogReader = "wpi/datalog/DataLogReader.h"
+# DataLogReaderThread = "wpi/datalog/DataLogReaderThread.h"
+DataLogWriter = "wpi/datalog/DataLogWriter.h"
+# DataLog_c = "wpi/datalog/DataLog_c.h"
+# FileLogger = "wpi/datalog/FileLogger.h"

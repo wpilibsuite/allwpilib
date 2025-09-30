@@ -1,0 +1,46 @@
+extra_includes:
+- frc/DriverStation.h
+
+classes:
+  frc::Joystick:
+    attributes:
+      kDefaultXChannel:
+      kDefaultYChannel:
+      kDefaultZChannel:
+      kDefaultTwistChannel:
+      kDefaultThrottleChannel:
+    enums:
+      AxisType:
+      ButtonType:
+    methods:
+      Joystick:
+      SetXChannel:
+      SetYChannel:
+      SetZChannel:
+      SetTwistChannel:
+      SetThrottleChannel:
+      GetXChannel:
+      GetYChannel:
+      GetZChannel:
+      GetTwistChannel:
+      GetThrottleChannel:
+      GetX:
+      GetY:
+      GetZ:
+      GetTwist:
+      GetThrottle:
+      GetTrigger:
+      GetTriggerPressed:
+      GetTriggerReleased:
+      Trigger:
+      GetTop:
+      GetTopPressed:
+      GetTopReleased:
+      Top:
+      GetMagnitude:
+      GetDirection:
+        rename: getDirectionRadians
+    inline_code: |
+      .def("getDirectionDegrees", [](const Joystick &self) -> units::degree_t {
+        return self.GetDirection();
+      })

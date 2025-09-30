@@ -1,0 +1,13 @@
+classes:
+  frc::sim::BatterySim:
+    force_type_casters:
+    - units::ampere_t
+    methods:
+      Calculate:
+        overloads:
+          units::volt_t, units::ohm_t, std::span<const units::ampere_t>:
+          units::volt_t, units::ohm_t, std::initializer_list<units::ampere_t>:
+            ignore: true
+          std::span<const units::ampere_t>:
+          std::initializer_list<units::ampere_t>:
+            ignore: true

@@ -1,0 +1,43 @@
+extra_includes:
+- wpi/sendable/SendableBuilder.h
+- pybind11/stl.h
+
+classes:
+  frc::PyMotorControllerGroup:
+    rename: MotorControllerGroup
+    ignored_bases:
+    - wpi::SendableHelper<PyMotorControllerGroup>
+    methods:
+      PyMotorControllerGroup:
+        cpp_code: |
+          [](py::args args) {
+            if (args.size() < 1) {
+              throw py::type_error("requires 1+ arguments");
+            }
+            std::vector<std::shared_ptr<MotorController>> v;
+            v.reserve(args.size());
+            int i = 1;
+            for (auto &arg: args) {
+              try {
+                auto mc = arg.cast<std::shared_ptr<MotorController>>();
+                if (!mc) throw py::cast_error();
+                v.push_back(mc);
+              } catch (py::cast_error &e) {
+                throw py::type_error(py::str("Argument {} must be a MotorController (got '{}')").format(i, py::repr(arg)));
+              }
+              i++;
+            }
+            return std::make_shared<PyMotorControllerGroup>(std::move(v));
+          }
+        keepalive: []
+        param_override:
+          args:
+            ignore: true
+      Set:
+      SetVoltage:
+      Get:
+      SetInverted:
+      GetInverted:
+      Disable:
+      StopMotor:
+      InitSendable:

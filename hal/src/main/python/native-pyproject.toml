@@ -1,0 +1,41 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [
+    "hatchling",
+    "hatch-nativelib~=0.2.0",
+    "hatch-robotpy~=0.2.1",
+    "robotpy-native-wpiutil==2027.0.0a2",
+    "robotpy-native-ntcore==2027.0.0a2",
+]
+
+[project]
+name = "robotpy-native-wpihal"
+version = "2027.0.0a2"
+description = "WPILib HAL implementation"
+license = "BSD-3-Clause"
+
+dependencies = [
+    "robotpy-native-wpiutil==2027.0.0a2",
+    "robotpy-native-ntcore==2027.0.0a2",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/native"]
+
+[[tool.hatch.build.hooks.robotpy.maven_lib_download]]
+artifact_id = "hal-cpp"
+group_id = "edu.wpi.first.hal"
+repo_url = "https://frcmaven.wpi.edu/artifactory/release-2027"
+version = "2027.0.0-alpha-2"
+
+extract_to = "src/native/wpihal"
+libs = ["wpiHal"]
+
+[[tool.hatch.build.hooks.nativelib.pcfile]]
+pcfile = "src/native/wpihal/robotpy-native-wpihal.pc"
+name = "wpihal"
+
+includedir = "src/native/wpihal/include"
+libdir = "src/native/wpihal/lib"
+shared_libraries = ["wpiHal"]
+requires = ["robotpy-native-wpiutil", "robotpy-native-ntcore"]

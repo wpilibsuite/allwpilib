@@ -1,0 +1,46 @@
+defaults:
+  subpackage: controller
+
+classes:
+  frc::ControlAffinePlantInversionFeedforward:
+    template_params:
+    - int States
+    - int Inputs
+    methods:
+      ControlAffinePlantInversionFeedforward:
+        overloads:
+          std::function<StateVector (const StateVector&, const InputVector&)>, units::second_t:
+          std::function<StateVector (const StateVector&)>, const Matrixd<States, Inputs>&, units::second_t:
+      Uff:
+        overloads:
+          '[const]':
+          int [const]:
+      R:
+        overloads:
+          '[const]':
+          int [const]:
+      Reset:
+        overloads:
+          const StateVector&:
+          '':
+      Calculate:
+        overloads:
+          const StateVector&:
+          const StateVector&, const StateVector&:
+
+templates:
+  ControlAffinePlantInversionFeedforward_1_1:
+    qualname: frc::ControlAffinePlantInversionFeedforward
+    params:
+    - 1
+    - 1
+  ControlAffinePlantInversionFeedforward_2_1:
+    qualname: frc::ControlAffinePlantInversionFeedforward
+    params:
+    - 2
+    - 1
+  ControlAffinePlantInversionFeedforward_2_2:
+    qualname: frc::ControlAffinePlantInversionFeedforward
+    params:
+    - 2
+    - 2

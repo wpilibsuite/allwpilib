@@ -1,0 +1,12 @@
+strip_prefixes:
+- HAL_
+
+functions:
+  HAL_InitializeNotifier:
+  HAL_SetNotifierName:
+  HAL_StopNotifier:
+  HAL_CleanNotifier:
+  HAL_UpdateNotifierAlarm:
+  HAL_CancelNotifierAlarm:
+  HAL_WaitForNotifierAlarm:
+  HAL_SetNotifierThreadPriority:

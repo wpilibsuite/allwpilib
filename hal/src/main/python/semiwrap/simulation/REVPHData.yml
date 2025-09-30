@@ -1,0 +1,41 @@
+strip_prefixes:
+- HALSIM_
+
+functions:
+  HALSIM_ResetREVPHData:
+  HALSIM_RegisterREVPHInitializedCallback:
+    ignore: true
+  HALSIM_CancelREVPHInitializedCallback:
+  HALSIM_GetREVPHInitialized:
+  HALSIM_SetREVPHInitialized:
+  HALSIM_RegisterREVPHSolenoidOutputCallback:
+    ignore: true
+  HALSIM_CancelREVPHSolenoidOutputCallback:
+  HALSIM_GetREVPHSolenoidOutput:
+  HALSIM_SetREVPHSolenoidOutput:
+  HALSIM_RegisterREVPHCompressorOnCallback:
+    ignore: true
+  HALSIM_CancelREVPHCompressorOnCallback:
+  HALSIM_GetREVPHCompressorOn:
+  HALSIM_SetREVPHCompressorOn:
+  HALSIM_RegisterREVPHCompressorConfigTypeCallback:
+    ignore: true
+  HALSIM_CancelREVPHCompressorConfigTypeCallback:
+  HALSIM_GetREVPHCompressorConfigType:
+  HALSIM_SetREVPHCompressorConfigType:
+  HALSIM_RegisterREVPHPressureSwitchCallback:
+    ignore: true
+  HALSIM_CancelREVPHPressureSwitchCallback:
+  HALSIM_GetREVPHPressureSwitch:
+  HALSIM_SetREVPHPressureSwitch:
+  HALSIM_RegisterREVPHCompressorCurrentCallback:
+    ignore: true
+  HALSIM_CancelREVPHCompressorCurrentCallback:
+  HALSIM_GetREVPHCompressorCurrent:
+  HALSIM_SetREVPHCompressorCurrent:
+  HALSIM_GetREVPHAllSolenoids:
+  HALSIM_SetREVPHAllSolenoids:
+  HALSIM_RegisterREVPHAllNonSolenoidCallbacks:
+    ignore: true
+  HALSIM_RegisterREVPHAllSolenoidCallbacks:
+    ignore: true

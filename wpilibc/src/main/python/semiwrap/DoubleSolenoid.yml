@@ -1,0 +1,22 @@
+extra_includes:
+- wpi/sendable/SendableBuilder.h
+
+classes:
+  frc::DoubleSolenoid:
+    ignored_bases:
+    - wpi::SendableHelper<DoubleSolenoid>
+    enums:
+      Value:
+    methods:
+      DoubleSolenoid:
+        overloads:
+          int, PneumaticsModuleType, int, int:
+          int, int, PneumaticsModuleType, int, int:
+      Set:
+      Get:
+      Toggle:
+      GetFwdChannel:
+      GetRevChannel:
+      IsFwdSolenoidDisabled:
+      IsRevSolenoidDisabled:
+      InitSendable:

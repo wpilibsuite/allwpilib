@@ -1,0 +1,16 @@
+classes:
+  wpi::log::DataLogBackgroundWriter:
+    methods:
+      DataLogBackgroundWriter:
+        overloads:
+          std::string_view, std::string_view, double, std::string_view:
+          wpi::Logger&, std::string_view, std::string_view, double, std::string_view:
+            ignore: true
+          std::function<void (std::span<const uint8_t> data)>, double, std::string_view:
+          wpi::Logger&, std::function<void (std::span<const uint8_t> data)>, double, std::string_view:
+            ignore: true
+      SetFilename:
+      Flush:
+      Pause:
+      Resume:
+      Stop:
