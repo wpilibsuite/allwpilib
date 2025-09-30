@@ -1992,7 +1992,7 @@ namespace units
 		 * @param[in]	rhs unit to copy.
 		 */
 		template<class UnitsRhs, typename Ty, template<typename> class NlsRhs>
-			requires (traits::is_unit<UnitsRhs>::value && traits::is_unit<Units>::value && traits::is_convertible_unit<UnitsRhs, Units>::value)
+			requires traits::is_unit_v<UnitsRhs> && traits::is_unit_v<Units> && traits::is_convertible_unit_v<UnitsRhs, Units>
 		constexpr unit_t(const unit_t<UnitsRhs, Ty, NlsRhs>& rhs) noexcept :
 		nls(units::convert<UnitsRhs, Units, T>(rhs.m_value), std::true_type() /*store linear value*/)
 		{
