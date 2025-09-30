@@ -60,6 +60,7 @@ include 'epilogue-runtime'
 include 'thirdparty:catch2'
 include 'thirdparty:googletest'
 include 'thirdparty:imgui_suite'
+include 'thirdparty:mrcal'
 include 'wpical'
 include 'datalog'
 

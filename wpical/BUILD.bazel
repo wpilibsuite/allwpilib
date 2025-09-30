@@ -34,43 +34,8 @@ cc_library(
     ]),
     strip_include_prefix = "src/main/native/include",
     deps = [
-        ":headers-libdogleg",
-        ":headers-mrcal",
-        ":headers-mrcal-generated",
-        ":headers-mrcal-java",
+        "//thirdparty/mrcal:headers",
     ],
-)
-
-cc_library(
-    name = "headers-libdogleg",
-    hdrs = glob([
-        "src/main/native/thirdparty/libdogleg/include/**/*",
-    ]),
-    strip_include_prefix = "src/main/native/thirdparty/libdogleg/include",
-)
-
-cc_library(
-    name = "headers-mrcal-generated",
-    hdrs = glob([
-        "src/main/native/thirdparty/mrcal/generated/**/*",
-    ]),
-    strip_include_prefix = "src/main/native/thirdparty/mrcal/generated/",
-)
-
-cc_library(
-    name = "headers-mrcal",
-    hdrs = glob([
-        "src/main/native/thirdparty/mrcal/include/**/*",
-    ]),
-    strip_include_prefix = "src/main/native/thirdparty/mrcal/include/",
-)
-
-cc_library(
-    name = "headers-mrcal-java",
-    hdrs = glob([
-        "src/main/native/thirdparty/mrcal_java/include/**/*",
-    ]),
-    strip_include_prefix = "src/main/native/thirdparty/mrcal_java/include/",
 )
 
 unix_copts = [
@@ -169,10 +134,6 @@ wpilib_cc_library(
     srcs = glob(
         [
             "src/main/native/cpp/**/*.cpp",
-            "src/main/native/thirdparty/libdogleg/src/**/*.cpp",
-            "src/main/native/thirdparty/mrcal/src/**/*.cpp",
-            "src/main/native/thirdparty/mrcal/src/**/*.c",
-            "src/main/native/thirdparty/mrcal_java/src/**/*.cpp",
         ],
         exclude = ["src/main/native/cpp/WPIcal.cpp"],
     ) + [
@@ -190,6 +151,7 @@ wpilib_cc_library(
         ":headers",
         "//apriltag",
         "//thirdparty/ceres",
+        "//thirdparty/mrcal",
         "//wpigui",
         "//wpiutil",
         "@bzlmodrio-opencv//libraries/cpp/opencv",
