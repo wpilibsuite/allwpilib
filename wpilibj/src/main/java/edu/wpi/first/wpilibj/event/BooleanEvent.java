@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.Time;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
