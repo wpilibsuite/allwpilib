@@ -11,9 +11,9 @@
 
 #include <hal/Notifier.h>
 #include <hal/Types.h>
+#include <units/frequency.h>
 #include <units/math.h>
 #include <units/time.h>
-#include <units/frequency.h>
 #include <wpi/priority_queue.h>
 
 #include "frc/IterativeRobotBase.h"
