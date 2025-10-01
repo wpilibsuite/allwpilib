@@ -10,7 +10,6 @@
 #include <memory>
 
 #include <units/time.h>
-#include <units/frequency.h>
 #include <wpi/FunctionExtras.h>
 
 #include "EventLoop.h"

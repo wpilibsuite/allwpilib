@@ -9,7 +9,6 @@
 #include <utility>
 
 #include <units/time.h>
-#include <units/frequency.h>
 
 #include "frc/Tracer.h"
 

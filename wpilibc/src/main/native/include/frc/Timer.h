@@ -5,7 +5,6 @@
 #pragma once
 
 #include <units/time.h>
-#include <units/frequency.h>
 
 namespace frc {
 
