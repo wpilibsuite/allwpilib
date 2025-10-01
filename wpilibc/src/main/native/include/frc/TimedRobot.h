@@ -57,7 +57,7 @@ class TimedRobot : public IterativeRobotBase {
    *
    * @param frequency Frequency.
    */
-  explicit TimedRobot(units::hertz_t frequency = 1 / kDefaultPeriod);
+  explicit TimedRobot(units::hertz_t frequency);
 
   TimedRobot(TimedRobot&&) = default;
   TimedRobot& operator=(TimedRobot&&) = default;
