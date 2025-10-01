@@ -102,8 +102,6 @@ class Timer {
    */
   bool HasElapsed(units::second_t period) const;
 
-  bool HasElapsed(units::hertz_t period) const;
-
   /**
    * Check if the period specified has passed and if it has, advance the start
    * time by that period. This is useful to decide if it's time to do periodic

@@ -183,10 +183,6 @@ void Watchdog::SetTimeout(units::second_t timeout) {
   m_impl->UpdateAlarm();
 }
 
-void Watchdog::SetTimeout(units::hertz_t timeout) {
-  SetTimeout(1 / timeout);
-}
-
 units::second_t Watchdog::GetTimeout() const {
   std::scoped_lock lock(m_impl->m_mutex);
   return m_timeout;

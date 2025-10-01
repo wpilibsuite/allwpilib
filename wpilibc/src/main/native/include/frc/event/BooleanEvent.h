@@ -129,10 +129,6 @@ class BooleanEvent {
                         frc::Debouncer::DebounceType type =
                             frc::Debouncer::DebounceType::kRising);
 
-  BooleanEvent Debounce(units::hertz_t debounceFrequency,
-                        frc::Debouncer::DebounceType type =
-                            frc::Debouncer::DebounceType::kRising);
-
  private:
   /// Poller loop.
   EventLoop* m_loop;

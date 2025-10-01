@@ -59,8 +59,6 @@ class Watchdog {
    */
   void SetTimeout(units::second_t timeout);
 
-  void SetTimeout(units::hertz_t timeout);
-
   /**
    * Returns the watchdog's timeout.
    */
