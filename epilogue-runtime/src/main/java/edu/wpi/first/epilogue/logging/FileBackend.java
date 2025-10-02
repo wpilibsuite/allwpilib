@@ -195,18 +195,8 @@ public class FileBackend implements EpilogueBackend {
 
     if (!m_entries.containsKey(identifier)) {
       var entry = ProtobufLogEntry.create(m_dataLog, identifier, proto);
-      if (!metadata.dependencies().isEmpty()) {
-        var dependenciesJson =
-            metadata.dependencies().stream()
-                .map(d -> '"' + d + '"')
-                .collect(Collectors.joining(", ", "[", "]"));
-        String metadataJson =
-            """
-            { "dependencies": %s }
-            """
-                .trim()
-                .formatted(dependenciesJson);
-        entry.setMetadata(metadataJson);
+      if (!metadata.isEmpty()) {
+        entry.setMetadata(metadata.toJson());
       }
       m_entries.put(identifier, entry);
     }
@@ -223,18 +213,8 @@ public class FileBackend implements EpilogueBackend {
     }
 
     var entry = ctor.apply(m_dataLog, identifier);
-    if (!metadata.dependencies().isEmpty()) {
-      var dependenciesJson =
-          metadata.dependencies().stream()
-              .map(d -> '"' + d + '"')
-              .collect(Collectors.joining(", ", "[", "]"));
-      String metadataJson =
-          """
-          { "dependencies": %s }
-          """
-              .trim()
-              .formatted(dependenciesJson);
-      entry.setMetadata(metadataJson);
+    if (!metadata.isEmpty()) {
+      entry.setMetadata(metadata.toJson());
     }
     m_entries.put(identifier, entry);
     return entry;
@@ -272,9 +252,12 @@ public class FileBackend implements EpilogueBackend {
   }
 
   @Override
+  @SuppressWarnings("PMD.UnnecessaryCastRule")
   public void log(String identifier, int[] value, LogMetadata metadata) {
     long[] widened = new long[value.length];
-    java.util.Arrays.setAll(widened, i -> value[i]);
+    for (int i = 0; i < value.length; i++) {
+      widened[i] = (long) value[i];
+    }
     getEntry(identifier, IntegerArrayLogEntry::new, metadata).append(widened);
   }
 
@@ -318,18 +301,8 @@ public class FileBackend implements EpilogueBackend {
 
     if (!m_entries.containsKey(identifier)) {
       var entry = StructLogEntry.create(m_dataLog, identifier, struct);
-      if (!metadata.dependencies().isEmpty()) {
-        var dependenciesJson =
-            metadata.dependencies().stream()
-                .map(d -> '"' + d + '"')
-                .collect(Collectors.joining(", ", "[", "]"));
-        String metadataJson =
-            """
-            { "dependencies": %s }
-            """
-                .trim()
-                .formatted(dependenciesJson);
-        entry.setMetadata(metadataJson);
+      if (!metadata.isEmpty()) {
+        entry.setMetadata(metadata.toJson());
       }
       m_entries.put(identifier, entry);
     }

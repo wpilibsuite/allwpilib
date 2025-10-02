@@ -5,6 +5,7 @@
 package edu.wpi.first.epilogue.logging;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Metadata associated with a logged data point that provides context about dependencies or
@@ -24,5 +25,31 @@ public record LogMetadata(List<String> dependencies) {
    */
   public LogMetadata(List<String> dependencies) {
     this.dependencies = List.copyOf(dependencies); // Create immutable copy
+  }
+
+  /**
+   * Checks if this metadata is empty (has no dependencies).
+   *
+   * @return true if there are no dependencies, false otherwise
+   */
+  public boolean isEmpty() {
+    return dependencies.isEmpty();
+  }
+
+  /**
+   * Converts this metadata to a JSON string representation.
+   *
+   * @return JSON string containing the metadata
+   */
+  public String toJson() {
+    var dependenciesJson =
+        dependencies.stream()
+            .map(d -> '"' + d + '"')
+            .collect(Collectors.joining(", ", "[", "]"));
+    return """
+        { "dependencies": %s }
+        """
+        .trim()
+        .formatted(dependenciesJson);
   }
 }

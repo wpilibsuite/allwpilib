@@ -2350,11 +2350,10 @@ class AnnotationProcessorTest {
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         // Cached LogMetadata for element isAtTarget with @DependsOn annotations
-        private final LogMetadata $metadata_edu_wpi_first_epilogue_Example_isAtTarget_method;
+        private static final LogMetadata $metadata_edu_wpi_first_epilogue_Example_isAtTarget_method = new LogMetadata(List.of("position", "target", "tolerance"));
 
         public ExampleLogger() {
           super(Example.class);
-          $metadata_edu_wpi_first_epilogue_Example_isAtTarget_method = new LogMetadata(List.of("position", "target", "tolerance"));
         }
 
         @Override

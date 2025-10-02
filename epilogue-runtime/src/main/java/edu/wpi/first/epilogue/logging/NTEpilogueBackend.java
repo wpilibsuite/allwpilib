@@ -20,6 +20,7 @@ import edu.wpi.first.networktables.StringArrayPublisher;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.networktables.Topic;
 import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.struct.Struct;
 import java.util.HashMap;
@@ -27,7 +28,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import us.hebi.quickbuf.ProtoMessage;
 
 /**
@@ -242,19 +242,9 @@ public class NTEpilogueBackend implements EpilogueBackend {
   }
 
   // Helper method for applying metadata to topics
-  private void applyMetadata(edu.wpi.first.networktables.Topic topic, LogMetadata metadata) {
-    if (!metadata.dependencies().isEmpty()) {
-      var dependenciesJson =
-          metadata.dependencies().stream()
-              .map(d -> '"' + d + '"')
-              .collect(Collectors.joining(", ", "[", "]"));
-      String metadataJson =
-          """
-          { "dependencies": %s }
-          """
-              .trim()
-              .formatted(dependenciesJson);
-      topic.setProperties(metadataJson);
+  private void applyMetadata(Topic topic, LogMetadata metadata) {
+    if (!metadata.isEmpty()) {
+      topic.setProperties(metadata.toJson());
     }
   }
 
