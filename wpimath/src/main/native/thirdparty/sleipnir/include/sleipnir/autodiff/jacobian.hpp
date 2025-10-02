@@ -10,6 +10,7 @@
 #include "sleipnir/autodiff/adjoint_expression_graph.hpp"
 #include "sleipnir/autodiff/variable.hpp"
 #include "sleipnir/autodiff/variable_matrix.hpp"
+#include "sleipnir/util/assert.hpp"
 #include "sleipnir/util/concepts.hpp"
 #include "sleipnir/util/symbol_exports.hpp"
 
@@ -30,7 +31,7 @@ class SLEIPNIR_DLLEXPORT Jacobian {
    * @param variable Variable of which to compute the Jacobian.
    * @param wrt Variable with respect to which to compute the Jacobian.
    */
-  Jacobian(Variable variable, Variable wrt) noexcept
+  Jacobian(Variable variable, Variable wrt)
       : Jacobian{VariableMatrix{std::move(variable)},
                  VariableMatrix{std::move(wrt)}} {}
 
@@ -41,8 +42,11 @@ class SLEIPNIR_DLLEXPORT Jacobian {
    * @param wrt Vector of variables with respect to which to compute the
    *   Jacobian.
    */
-  Jacobian(VariableMatrix variables, SleipnirMatrixLike auto wrt) noexcept
+  Jacobian(VariableMatrix variables, SleipnirMatrixLike auto wrt)
       : m_variables{std::move(variables)}, m_wrt{std::move(wrt)} {
+    slp_assert(m_variables.cols() == 1);
+    slp_assert(m_wrt.cols() == 1);
+
     // Initialize column each expression's adjoint occupies in the Jacobian
     for (size_t col = 0; col < m_wrt.size(); ++col) {
       m_wrt[col].expr->col = col;
@@ -128,13 +132,7 @@ class SLEIPNIR_DLLEXPORT Jacobian {
       m_graphs[row].append_adjoint_triplets(triplets, row, m_wrt);
     }
 
-    if (!triplets.empty()) {
-      m_J.setFromTriplets(triplets.begin(), triplets.end());
-    } else {
-      // setFromTriplets() is a no-op on empty triplets, so explicitly zero out
-      // the storage
-      m_J.setZero();
-    }
+    m_J.setFromTriplets(triplets.begin(), triplets.end());
 
     return m_J;
   }

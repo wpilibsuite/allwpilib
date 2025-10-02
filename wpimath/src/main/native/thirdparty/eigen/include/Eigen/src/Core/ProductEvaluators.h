@@ -1264,6 +1264,14 @@ struct generic_product_impl<Lhs, Rhs, SkewSymmetricShape, SkewSymmetricShape, Pr
   }
 };
 
+template <typename Lhs, typename Rhs, int ProductTag, typename MatrixShape>
+struct generic_product_impl<Lhs, Rhs, MatrixShape, HomogeneousShape, ProductTag>
+    : generic_product_impl<Lhs, typename Rhs::PlainObject, MatrixShape, DenseShape, ProductTag> {};
+
+template <typename Lhs, typename Rhs, int ProductTag, typename MatrixShape>
+struct generic_product_impl<Lhs, Rhs, HomogeneousShape, MatrixShape, ProductTag>
+    : generic_product_impl<typename Lhs::PlainObject, Rhs, DenseShape, MatrixShape, ProductTag> {};
+
 }  // end namespace internal
 
 }  // end namespace Eigen

@@ -306,12 +306,12 @@ class DenseBase
   EIGEN_DEVICE_FUNC static const ConstantReturnType Constant(Index size, const Scalar& value);
   EIGEN_DEVICE_FUNC static const ConstantReturnType Constant(const Scalar& value);
 
-  EIGEN_DEPRECATED EIGEN_DEVICE_FUNC static const RandomAccessLinSpacedReturnType LinSpaced(Sequential_t, Index size,
-                                                                                            const Scalar& low,
-                                                                                            const Scalar& high);
-  EIGEN_DEPRECATED EIGEN_DEVICE_FUNC static const RandomAccessLinSpacedReturnType LinSpaced(Sequential_t,
-                                                                                            const Scalar& low,
-                                                                                            const Scalar& high);
+  EIGEN_DEPRECATED_WITH_REASON("The method may result in accuracy loss. Use .EqualSpaced() instead.")
+  EIGEN_DEVICE_FUNC static const RandomAccessLinSpacedReturnType LinSpaced(Sequential_t, Index size, const Scalar& low,
+                                                                           const Scalar& high);
+  EIGEN_DEPRECATED_WITH_REASON("The method may result in accuracy loss. Use .EqualSpaced() instead.")
+  EIGEN_DEVICE_FUNC static const RandomAccessLinSpacedReturnType LinSpaced(Sequential_t, const Scalar& low,
+                                                                           const Scalar& high);
 
   EIGEN_DEVICE_FUNC static const RandomAccessLinSpacedReturnType LinSpaced(Index size, const Scalar& low,
                                                                            const Scalar& high);

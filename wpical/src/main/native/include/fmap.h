@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <fieldmap.h>
-
-#include <tagpose.h>
 #include <wpi/json.h>
+
+#include "fieldmap.h"
+#include "tagpose.h"
 
 namespace fmap {
 wpi::json singleTag(int tag, const tag::Pose& tagpose);

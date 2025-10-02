@@ -322,6 +322,7 @@ class JSpanBase {
     }
   }
 
+  // NOLINTNEXTLINE(google-explicit-constructor)
   operator std::span<T, Size>() const { return array(); }
 
   std::span<T, Size> array() const {
