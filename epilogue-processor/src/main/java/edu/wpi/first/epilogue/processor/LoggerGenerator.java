@@ -431,7 +431,7 @@ public class LoggerGenerator {
    * @return The name of the generated LogMetadata field
    */
   public static String logMetadataFieldName(Element element) {
-    String suffix = element instanceof javax.lang.model.element.VariableElement ? "_field" : "_method";
+    String suffix = element instanceof VariableElement ? "_field" : "_method";
     return "$metadata_%s_%s%s"
         .formatted(
             element.getEnclosingElement().toString().replace(".", "_"), 
