@@ -37,8 +37,8 @@ cc_library(
 java_library(
     name = "wpilibNewCommands-java",
     srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
-    exported_plugins = ["//wpilibjJavacPlugin:plugin"],
-    plugins = ["//wpilibjJavacPlugin:plugin"],
+    exported_plugins = ["//javacPlugin:plugin"],
+    plugins = ["//javacPlugin:plugin"],
     visibility = ["//visibility:public"],
     deps = [
         "//cscore:cscore-java",
