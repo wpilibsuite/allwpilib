@@ -60,6 +60,27 @@ export(TARGETS libglassnt FILE libglassnt.cmake NAMESPACE libglassnt::)
 install(DIRECTORY src/libnt/native/include/ DESTINATION "${include_dest}/glass")
 
 #
+# libglasscs
+#
+file(GLOB_RECURSE libglasscs_src src/libcs/native/cpp/*.cpp)
+
+add_library(libglasscs STATIC ${libglasscs_src})
+set_target_properties(libglasscs PROPERTIES DEBUG_POSTFIX "d" OUTPUT_NAME "glasscs")
+set_property(TARGET libglasscs PROPERTY POSITION_INDEPENDENT_CODE ON)
+
+set_property(TARGET libglasscs PROPERTY FOLDER "libraries")
+
+wpilib_target_warnings(libglasscs)
+target_link_libraries(libglasscs PUBLIC cscore libglassnt)
+
+target_include_directories(libglasscs PUBLIC
+                           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/libcs/native/include>
+                           $<INSTALL_INTERFACE:${include_dest}/glass>)
+
+install(TARGETS libglasscs EXPORT libglasscs DESTINATION "${main_lib_dest}")
+install(DIRECTORY src/libcs/native/include/ DESTINATION "${include_dest}/glass")
+
+#
 # glass application
 #
 
@@ -79,7 +100,7 @@ endif()
 add_executable(glass ${glass_src} ${glass_resources_src} ${glass_rc} ${APP_ICON_MACOSX})
 wpilib_link_macos_gui(glass)
 wpilib_target_warnings(glass)
-target_link_libraries(glass libglassnt libglass)
+target_link_libraries(glass libglasscs libglassnt libglass)
 
 if(WIN32)
     set_target_properties(glass PROPERTIES WIN32_EXECUTABLE YES)

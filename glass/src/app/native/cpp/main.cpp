@@ -8,6 +8,7 @@
 #include <GLFW/glfw3.h>
 #include <fmt/format.h>
 #include <imgui.h>
+#include <cscore_cpp.h>
 #include <ntcore_cpp.h>
 #include <wpi/StringExtras.h>
 #include <wpigui.h>
@@ -17,6 +18,10 @@
 #include "glass/MainMenuBar.h"
 #include "glass/Storage.h"
 #include "glass/View.h"
+#include "glass/Window.h"
+#include "glass/camera/Camera.h"
+#include "glass/camera/NTCameraProvider.h"
+#include "glass/camera/UsbCameraList.h"
 #include "glass/networktables/NetworkTables.h"
 #include "glass/networktables/NetworkTablesProvider.h"
 #include "glass/networktables/NetworkTablesSettings.h"
@@ -39,6 +44,8 @@ std::string_view GetResource_glass_512_png();
 
 static std::unique_ptr<glass::PlotProvider> gPlotProvider;
 static std::unique_ptr<glass::NetworkTablesProvider> gNtProvider;
+static std::unique_ptr<glass::NTCameraProvider> gNtCameraProvider;
+static std::unique_ptr<glass::UsbCameraList> gUsbCameraList;
 
 static std::unique_ptr<glass::NetworkTablesModel> gNetworkTablesModel;
 static std::unique_ptr<glass::NetworkTablesSettings> gNetworkTablesSettings;
@@ -47,6 +54,8 @@ static std::unique_ptr<glass::Window> gNetworkTablesWindow;
 static std::unique_ptr<glass::Window> gNetworkTablesInfoWindow;
 static std::unique_ptr<glass::Window> gNetworkTablesSettingsWindow;
 static std::unique_ptr<glass::Window> gNetworkTablesLogWindow;
+
+static glass::Window* gCameraListWindow;
 
 static glass::MainMenuBar gMainMenu;
 static bool gAbout = false;
@@ -192,6 +201,41 @@ static void NtInitialize() {
   });
 }
 
+static void CsInitialize() {
+  cs::SetTelemetryPeriod(1.0);
+  cs::SetLogger([](unsigned int level, const char* file, unsigned int line,
+                   const char* msg) { fmt::print("CS: {}\n", msg); },
+                CS_LOG_INFO);
+
+  gNtCameraProvider = std::make_unique<glass::NTCameraProvider>(
+      glass::GetStorageRoot().GetChild("NT Cameras"));
+  gNtCameraProvider->GlobalInit();
+
+  gUsbCameraList = std::make_unique<glass::UsbCameraList>();
+
+  gCameraListWindow =
+      glass::imm::CreateWindow("Camera List", false, glass::Window::kHide);
+  gCameraListWindow->SetDefaultPos(250, 250);
+  gCameraListWindow->SetDefaultSize(500, 200);
+  gCameraListWindow->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
+  gui::AddWindowScaler(
+      [](float scale) { gCameraListWindow->ScaleDefault(scale); });
+
+  gui::AddEarlyExecute([] {
+    glass::Storage& cameras = glass::GetStorageRoot().GetChild("cameras");
+    for (auto&& storage : cameras.GetChildren()) {
+      glass::CameraModel* model = glass::GetCameraModel(cameras, storage.key());
+      if (!model) {
+        model = glass::GetOrNewCameraModel(cameras, storage.key());
+        model->Start();
+      }
+      model->Update();
+    }
+
+    gUsbCameraList->Update();
+  });
+}
+
 #ifdef _WIN32
 int __stdcall WinMain(void* hInstance, void* hPrevInstance, char* pCmdLine,
                       int nCmdShow) {
@@ -233,6 +277,7 @@ int main(int argc, char** argv) {
   gui::AddInit([] { glass::ResetTime(); });
   gNtProvider->GlobalInit();
   NtInitialize();
+  CsInitialize();
 
   glass::AddStandardNetworkTablesViews(*gNtProvider);
 
@@ -267,6 +312,27 @@ int main(int argc, char** argv) {
       gNtProvider->DisplayMenu();
       ImGui::EndMenu();
     }
+    if (ImGui::BeginMenu("Camera")) {
+      gCameraListWindow->DisplayMenuItem();
+      if (ImGui::MenuItem("New Camera View")) {
+        auto& viewsStorage = glass::GetStorageRoot().GetChild("camera views");
+        auto& views = viewsStorage.GetValues();
+        // this is an inefficient algorithm, but the number of windows is small
+        char id[32];
+        size_t numViews = views.size();
+        for (size_t i = 0; i <= numViews; ++i) {
+          wpi::format_to_n_c_str(id, sizeof(id), "Camera View <{}>",
+                                 static_cast<int>(i));
+          if (!views.contains(id)) {
+            break;
+          }
+        }
+        if (auto win = glass::imm::CreateWindow(viewsStorage, id)) {
+          win->SetDefaultSize(700, 400);
+        }
+      }
+      ImGui::EndMenu();
+    }
     if (ImGui::BeginMenu("Plot")) {
       bool paused = gPlotProvider->IsPaused();
       if (ImGui::MenuItem("Pause All Plots", nullptr, &paused)) {
@@ -295,6 +361,8 @@ int main(int argc, char** argv) {
   });
 
   gui::AddLateExecute([] {
+    glass::Storage& cameras = glass::GetStorageRoot().GetChild("cameras");
+
     if (gAbout) {
       ImGui::OpenPopup("About");
       gAbout = false;
@@ -362,6 +430,11 @@ int main(int argc, char** argv) {
   gNetworkTablesSettingsWindow.reset();
   gNetworkTablesLogWindow.reset();
   gNetworkTablesWindow.reset();
+
+  // cs::Shutdown();
+  gUsbCameraList.reset();
+  gNtCameraProvider.reset();
+
   gNetworkTablesModel.reset();
   gNtProvider.reset();
   gPlotProvider.reset();
