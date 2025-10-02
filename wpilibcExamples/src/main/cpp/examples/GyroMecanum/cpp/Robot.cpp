@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/AnalogGyro.h>
 #include <frc/Joystick.h>
+#include <frc/OnboardIMU.h>
 #include <frc/TimedRobot.h>
 #include <frc/drive/MecanumDrive.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
@@ -25,8 +25,6 @@ class Robot : public frc::TimedRobot {
     // match your robot.
     m_frontRight.SetInverted(true);
     m_rearRight.SetInverted(true);
-
-    m_gyro.SetSensitivity(kVoltsPerDegreePerSecond);
   }
 
   /**
@@ -34,19 +32,16 @@ class Robot : public frc::TimedRobot {
    */
   void TeleopPeriodic() override {
     m_robotDrive.DriveCartesian(-m_joystick.GetY(), -m_joystick.GetX(),
-                                -m_joystick.GetZ(), m_gyro.GetRotation2d());
+                                -m_joystick.GetZ(), m_imu.GetRotation2d());
   }
 
  private:
-  // Gyro calibration constant, may need to be adjusted. Gyro value of 360 is
-  // set to correspond to one full revolution.
-  static constexpr double kVoltsPerDegreePerSecond = 0.0128;
-
   static constexpr int kFrontLeftMotorPort = 0;
   static constexpr int kRearLeftMotorPort = 1;
   static constexpr int kFrontRightMotorPort = 2;
   static constexpr int kRearRightMotorPort = 3;
-  static constexpr int kGyroPort = 0;
+  static constexpr frc::OnboardIMU::MountOrientation kIMUMountOrientation =
+      frc::OnboardIMU::kFlat;
   static constexpr int kJoystickPort = 0;
 
   frc::PWMSparkMax m_frontLeft{kFrontLeftMotorPort};
@@ -59,7 +54,7 @@ class Robot : public frc::TimedRobot {
       [&](double output) { m_frontRight.Set(output); },
       [&](double output) { m_rearRight.Set(output); }};
 
-  frc::AnalogGyro m_gyro{kGyroPort};
+  frc::OnboardIMU m_imu{kIMUMountOrientation};
   frc::Joystick m_joystick{kJoystickPort};
 };
 

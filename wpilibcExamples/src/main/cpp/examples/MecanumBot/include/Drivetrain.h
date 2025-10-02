@@ -6,8 +6,8 @@
 
 #include <numbers>
 
-#include <frc/AnalogGyro.h>
 #include <frc/Encoder.h>
+#include <frc/OnboardIMU.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/geometry/Translation2d.h>
@@ -22,7 +22,7 @@
 class Drivetrain {
  public:
   Drivetrain() {
-    m_gyro.Reset();
+    m_imu.ResetYaw();
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
@@ -64,13 +64,13 @@ class Drivetrain {
   frc::PIDController m_backLeftPIDController{1.0, 0.0, 0.0};
   frc::PIDController m_backRightPIDController{1.0, 0.0, 0.0};
 
-  frc::AnalogGyro m_gyro{0};
+  frc::OnboardIMU m_imu{frc::OnboardIMU::kFlat};
 
   frc::MecanumDriveKinematics m_kinematics{
       m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation,
       m_backRightLocation};
 
-  frc::MecanumDriveOdometry m_odometry{m_kinematics, m_gyro.GetRotation2d(),
+  frc::MecanumDriveOdometry m_odometry{m_kinematics, m_imu.GetRotation2d(),
                                        GetCurrentWheelDistances()};
 
   // Gains are for example purposes only - must be determined for your own
