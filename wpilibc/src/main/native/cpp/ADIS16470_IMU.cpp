@@ -79,9 +79,9 @@ ADIS16470_IMU::ADIS16470_IMU(IMUAxis yaw_axis, IMUAxis pitch_axis,
         "IMUAxis.kZ as arguments.");
     REPORT_ERROR(
         "Constructing ADIS with default axes. (IMUAxis.kZ is defined as Yaw)");
-    yaw_axis = kZ;
-    pitch_axis = kY;
-    roll_axis = kX;
+    m_yaw_axis = kZ;
+    m_pitch_axis = kY;
+    m_roll_axis = kX;
   }
 
   if (m_simDevice) {

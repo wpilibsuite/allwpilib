@@ -422,6 +422,12 @@ struct Expression {
   }
 };
 
+inline ExpressionPtr cbrt(const ExpressionPtr& x);
+inline ExpressionPtr exp(const ExpressionPtr& x);
+inline ExpressionPtr sin(const ExpressionPtr& x);
+inline ExpressionPtr sinh(const ExpressionPtr& x);
+inline ExpressionPtr sqrt(const ExpressionPtr& x);
+
 /**
  * Derived expression type for binary minus operator.
  *
@@ -503,6 +509,58 @@ struct BinaryPlusExpression final : Expression {
     return parent_adjoint;
   }
 };
+
+/**
+ * Derived expression type for std::cbrt().
+ */
+struct CbrtExpression final : Expression {
+  /**
+   * Constructs an unary expression (an operator with one argument).
+   *
+   * @param lhs Unary operator's operand.
+   */
+  explicit constexpr CbrtExpression(ExpressionPtr lhs)
+      : Expression{std::move(lhs)} {}
+
+  double value(double x, double) const override { return std::cbrt(x); }
+
+  ExpressionType type() const override { return ExpressionType::NONLINEAR; }
+
+  double grad_l(double x, double, double parent_adjoint) const override {
+    double c = std::cbrt(x);
+    return parent_adjoint / (3.0 * c * c);
+  }
+
+  ExpressionPtr grad_expr_l(
+      const ExpressionPtr& x, const ExpressionPtr&,
+      const ExpressionPtr& parent_adjoint) const override {
+    auto c = slp::detail::cbrt(x);
+    return parent_adjoint / (make_expression_ptr<ConstExpression>(3.0) * c * c);
+  }
+};
+
+/**
+ * std::cbrt() for Expressions.
+ *
+ * @param x The argument.
+ */
+inline ExpressionPtr cbrt(const ExpressionPtr& x) {
+  using enum ExpressionType;
+
+  // Evaluate constant
+  if (x->type() == CONSTANT) {
+    if (x->val == 0.0) {
+      // Return zero
+      return x;
+    } else if (x->val == -1.0 || x->val == 1.0) {
+      return x;
+    } else {
+      return make_expression_ptr<ConstExpression>(std::cbrt(x->val));
+    }
+  }
+
+  return make_expression_ptr<CbrtExpression>(x);
+}
 
 /**
  * Derived expression type for constant.
@@ -660,11 +718,6 @@ struct UnaryMinusExpression final : Expression {
     return -parent_adjoint;
   }
 };
-
-inline ExpressionPtr exp(const ExpressionPtr& x);
-inline ExpressionPtr sin(const ExpressionPtr& x);
-inline ExpressionPtr sinh(const ExpressionPtr& x);
-inline ExpressionPtr sqrt(const ExpressionPtr& x);
 
 /**
  * Refcount increment for intrusive shared pointer.

@@ -762,7 +762,7 @@ void swap(scoped_array<T>& a, scoped_array<T>& b) {
  * This is accomplished through alloca if this later is supported and if the required number of bytes
  * is below EIGEN_STACK_ALLOCATION_LIMIT.
  */
-#ifdef EIGEN_ALLOCA
+#if defined(EIGEN_ALLOCA) && !defined(EIGEN_NO_ALLOCA)
 
 #if EIGEN_DEFAULT_ALIGN_BYTES > 0
 // We always manually re-align the result of EIGEN_ALLOCA.
@@ -785,14 +785,14 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void* eigen_aligned_alloca_helper(void* pt
 #define EIGEN_ALIGNED_ALLOCA(SIZE) EIGEN_ALLOCA(SIZE)
 #endif
 
-#define ei_declare_aligned_stack_constructed_variable(TYPE, NAME, SIZE, BUFFER)                                     \
-  Eigen::internal::check_size_for_overflow<TYPE>(SIZE);                                                             \
-  TYPE* NAME = (BUFFER) != 0 ? (BUFFER)                                                                             \
-                             : reinterpret_cast<TYPE*>((sizeof(TYPE) * SIZE <= EIGEN_STACK_ALLOCATION_LIMIT)        \
-                                                           ? EIGEN_ALIGNED_ALLOCA(sizeof(TYPE) * SIZE)              \
-                                                           : Eigen::internal::aligned_malloc(sizeof(TYPE) * SIZE)); \
-  Eigen::internal::aligned_stack_memory_handler<TYPE> EIGEN_CAT(NAME, _stack_memory_destructor)(                    \
-      (BUFFER) == 0 ? NAME : 0, SIZE, sizeof(TYPE) * SIZE > EIGEN_STACK_ALLOCATION_LIMIT)
+#define ei_declare_aligned_stack_constructed_variable(TYPE, NAME, SIZE, BUFFER)                                       \
+  Eigen::internal::check_size_for_overflow<TYPE>(SIZE);                                                               \
+  TYPE* NAME = (BUFFER) != 0 ? (BUFFER)                                                                               \
+                             : reinterpret_cast<TYPE*>((sizeof(TYPE) * (SIZE) <= EIGEN_STACK_ALLOCATION_LIMIT)        \
+                                                           ? EIGEN_ALIGNED_ALLOCA(sizeof(TYPE) * (SIZE))              \
+                                                           : Eigen::internal::aligned_malloc(sizeof(TYPE) * (SIZE))); \
+  Eigen::internal::aligned_stack_memory_handler<TYPE> EIGEN_CAT(NAME, _stack_memory_destructor)(                      \
+      (BUFFER) == 0 ? NAME : 0, SIZE, sizeof(TYPE) * (SIZE) > EIGEN_STACK_ALLOCATION_LIMIT)
 
 #define ei_declare_local_nested_eval(XPR_T, XPR, N, NAME)                                        \
   Eigen::internal::local_nested_eval_wrapper<XPR_T, N> EIGEN_CAT(NAME, _wrapper)(                \
@@ -805,10 +805,11 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void* eigen_aligned_alloca_helper(void* pt
 
 #else
 
-#define ei_declare_aligned_stack_constructed_variable(TYPE, NAME, SIZE, BUFFER)                                        \
-  Eigen::internal::check_size_for_overflow<TYPE>(SIZE);                                                                \
-  TYPE* NAME = (BUFFER) != 0 ? BUFFER : reinterpret_cast<TYPE*>(Eigen::internal::aligned_malloc(sizeof(TYPE) * SIZE)); \
-  Eigen::internal::aligned_stack_memory_handler<TYPE> EIGEN_CAT(NAME, _stack_memory_destructor)(                       \
+#define ei_declare_aligned_stack_constructed_variable(TYPE, NAME, SIZE, BUFFER)                                 \
+  Eigen::internal::check_size_for_overflow<TYPE>(SIZE);                                                         \
+  TYPE* NAME =                                                                                                  \
+      (BUFFER) != 0 ? BUFFER : reinterpret_cast<TYPE*>(Eigen::internal::aligned_malloc(sizeof(TYPE) * (SIZE))); \
+  Eigen::internal::aligned_stack_memory_handler<TYPE> EIGEN_CAT(NAME, _stack_memory_destructor)(                \
       (BUFFER) == 0 ? NAME : 0, SIZE, true)
 
 #define ei_declare_local_nested_eval(XPR_T, XPR, N, NAME) \
@@ -1336,6 +1337,21 @@ template <class T>
 EIGEN_DEVICE_FUNC void destroy_at(T* p) {
   p->~T();
 }
+#endif
+
+/** \internal
+ * This informs the implementation that PTR is aligned to at least ALIGN_BYTES
+ */
+#ifndef EIGEN_ASSUME_ALIGNED
+#if defined(__cpp_lib_assume_aligned) && (__cpp_lib_assume_aligned >= 201811L)
+#define EIGEN_ASSUME_ALIGNED(PTR, ALIGN_BYTES) \
+  { PTR = std::assume_aligned<8 * (ALIGN_BYTES)>(PTR); }
+#elif EIGEN_HAS_BUILTIN(__builtin_assume_aligned)
+#define EIGEN_ASSUME_ALIGNED(PTR, ALIGN_BYTES) \
+  { PTR = static_cast<decltype(PTR)>(__builtin_assume_aligned(PTR, (ALIGN_BYTES))); }
+#else
+#define EIGEN_ASSUME_ALIGNED(PTR, ALIGN_BYTES) /* do nothing */
+#endif
 #endif
 
 }  // end namespace internal

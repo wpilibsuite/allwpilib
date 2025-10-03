@@ -274,6 +274,10 @@ struct simpl_chol_helper {
   }
 };
 
+// Symbol is ODR-used, so we need a definition.
+template <typename Scalar, typename StorageIndex>
+constexpr StorageIndex simpl_chol_helper<Scalar, StorageIndex>::kEmpty;
+
 }  // namespace internal
 
 template <typename Derived>

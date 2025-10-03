@@ -27,7 +27,7 @@ model {
                         // We are now in the binary that we want.
                         // This is the default application path for the ZIP task.
                         def applicationPath = binary.executable.file
-                        def icon = file("$project.projectDir/src/main/native/mac/ov.icns")
+                        def icon = file("$project.projectDir/src/main/native/mac/sysid.icns")
 
                         // Create the macOS bundle.
                         def bundleTask = project.tasks.create("bundleSysIdOsxApp" + binary.targetPlatform.architecture.name, Copy) {

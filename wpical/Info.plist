@@ -11,7 +11,7 @@
 	<key>CFBundleIdentifier</key>
 	<string>edu.wpi.first.tools.WPIcal</string>
 	<key>CFBundleIconFile</key>
-	<string>ov.icns</string>
+	<string>wpical.icns</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleSupportedPlatforms</key>
