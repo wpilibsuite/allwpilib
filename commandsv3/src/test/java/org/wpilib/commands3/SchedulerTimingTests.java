@@ -74,6 +74,9 @@ class SchedulerTimingTests extends CommandTestBase {
     AtomicReference<Command> ref1 = new AtomicReference<>();
     AtomicReference<Command> ref2 = new AtomicReference<>();
 
+    AtomicBoolean command1CompletedNormally = new AtomicBoolean(false);
+    AtomicBoolean command2CompletedNormally = new AtomicBoolean(false);
+
     // Deadlock scenario:
     // command1 starts, waits for command2 to exit
     // command2 starts, waits for command1 to exit
@@ -89,6 +92,7 @@ class SchedulerTimingTests extends CommandTestBase {
                 co -> {
                   co.yield();
                   co.await(ref2.get());
+                  command1CompletedNormally.set(true);
                 })
             .named("Command 1");
     var command2 =
@@ -97,6 +101,7 @@ class SchedulerTimingTests extends CommandTestBase {
                 co -> {
                   co.yield();
                   co.await(ref1.get());
+                  command2CompletedNormally.set(true);
                 })
             .named("Command 2");
     ref1.set(command1);
@@ -116,6 +121,12 @@ class SchedulerTimingTests extends CommandTestBase {
     m_scheduler.run();
     assertFalse(m_scheduler.isRunning(command1));
     assertFalse(m_scheduler.isRunning(command2));
+    assertTrue(
+        command1CompletedNormally.get(),
+        "Command 1 should have completed normally after command 2 stopped");
+    assertFalse(
+        command2CompletedNormally.get(),
+        "Canceling command 2 should have stopped it before completing");
   }
 
   @Test
