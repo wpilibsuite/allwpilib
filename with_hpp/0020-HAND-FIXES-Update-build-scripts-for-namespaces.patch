@@ -1,0 +1,134 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Fri, 26 Sep 2025 18:56:59 -0400
+Subject: [PATCH 20/24] HAND FIXES: Update build scripts for namespaces
+
+---
+ apriltag/BUILD.bazel    | 2 +-
+ apriltag/CMakeLists.txt | 2 +-
+ apriltag/build.gradle   | 2 +-
+ fields/BUILD.bazel      | 2 +-
+ fields/CMakeLists.txt   | 2 +-
+ fields/build.gradle     | 2 +-
+ glass/BUILD.bazel       | 2 +-
+ glass/CMakeLists.txt    | 2 +-
+ glass/build.gradle      | 2 +-
+ 9 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/apriltag/BUILD.bazel b/apriltag/BUILD.bazel
+index 5390f266b1122a4953987572ecdd888fd9d4c047..b0d3c1e19a252165e5b729966af6fcc04d42f90d 100644
+--- a/apriltag/BUILD.bazel
++++ b/apriltag/BUILD.bazel
+@@ -55,7 +55,7 @@ cc_library(
+ 
+ generate_resources(
+     name = "generate-resources",
+-    namespace = "frc",
++    namespace = "wpi::apriltag",
+     prefix = "APRILTAG",
+     resource_files = glob(["src/main/native/resources/**"]),
+ )
+diff --git a/apriltag/CMakeLists.txt b/apriltag/CMakeLists.txt
+index bbafaebf713135bb0e2d5a60982b78dc9d5440c4..223d055bb1fa1b3f5ded8729e78282e80a2ed688 100644
+--- a/apriltag/CMakeLists.txt
++++ b/apriltag/CMakeLists.txt
+@@ -110,7 +110,7 @@ generate_resources(
+     src/main/native/resources/org/wpilib/vision/apriltag
+     generated/main/cpp
+     APRILTAG
+-    frc
++    wpi::apriltag
+     apriltag_resources_src
+ )
+ 
+diff --git a/apriltag/build.gradle b/apriltag/build.gradle
+index b6322f7360eadb5b840521ebed82636766410b11..909bf1df74eaab3b21ba02a9a0ae557a26c55a67 100644
+--- a/apriltag/build.gradle
++++ b/apriltag/build.gradle
+@@ -12,7 +12,7 @@ ext {
+         apriltagTest: []]
+     staticCvConfigs = []
+ 
+-    def generateTask = createGenerateResourcesTask('main', 'APRILTAG', 'frc', project)
++    def generateTask = createGenerateResourcesTask('main', 'APRILTAG', 'wpi::apriltag', project)
+ 
+     tasks.withType(CppCompile) {
+         dependsOn generateTask
+diff --git a/fields/BUILD.bazel b/fields/BUILD.bazel
+index b99c66c8e0175cd2d8a7e31869064abf5e6b7903..3531ee8491b4b6fa569a417794fd82f88f20a1b0 100644
+--- a/fields/BUILD.bazel
++++ b/fields/BUILD.bazel
+@@ -6,7 +6,7 @@ load("//shared/bazel/rules/gen:gen-resources.bzl", "generate_resources")
+ 
+ generate_resources(
+     name = "generate-resources",
+-    namespace = "fields",
++    namespace = "wpi::fields",
+     prefix = "FIELDS",
+     resource_files = glob(["src/main/native/resources/**"]),
+ )
+diff --git a/fields/CMakeLists.txt b/fields/CMakeLists.txt
+index 39e170903e45659bbdd09470a2b751cc51667064..7ecf62e5acbb2dffa97b603150356f46c3acb0ac 100644
+--- a/fields/CMakeLists.txt
++++ b/fields/CMakeLists.txt
+@@ -34,7 +34,7 @@ generate_resources(
+     src/main/native/resources/org/wpilib/fields
+     ${CMAKE_CURRENT_BINARY_DIR}/generated/main/cpp
+     FIELDS
+-    fields
++    wpi::fields
+     field_images_resources_src
+ )
+ 
+diff --git a/fields/build.gradle b/fields/build.gradle
+index 696b35fb4409795995a7c0a248ab6147d5c777ed..1a509099e2068c59a9d164113d86fa51114c1ef7 100644
+--- a/fields/build.gradle
++++ b/fields/build.gradle
+@@ -30,7 +30,7 @@ apply from: "${rootDir}/shared/resources.gradle"
+ apply from: "${rootDir}/shared/config.gradle"
+ apply from: "${rootDir}/shared/java/javacommon.gradle"
+ 
+-def generateTask = createGenerateResourcesTask('main', 'FIELDS', 'fields', project)
++def generateTask = createGenerateResourcesTask('main', 'FIELDS', 'wpi::fields', project)
+ 
+ project(':').libraryBuild.dependsOn build
+ tasks.withType(CppCompile) {
+diff --git a/glass/BUILD.bazel b/glass/BUILD.bazel
+index 817c549517a31466110c1260b7e64faef383bfcf..e176dfb025ca00139daef6fd14cd138594d89ed0 100644
+--- a/glass/BUILD.bazel
++++ b/glass/BUILD.bazel
+@@ -76,7 +76,7 @@ generate_version_file(
+ 
+ generate_resources(
+     name = "generate-resources",
+-    namespace = "glass",
++    namespace = "wpi::glass",
+     prefix = "GLASS",
+     resource_files = glob(["src/app/native/resources/*"]),
+ )
+diff --git a/glass/CMakeLists.txt b/glass/CMakeLists.txt
+index 428af951c85852c29b2e5934f5024b7864d9527f..be58821577bb4a829728d79b0b099a4e8aba7586 100644
+--- a/glass/CMakeLists.txt
++++ b/glass/CMakeLists.txt
+@@ -64,7 +64,7 @@ install(DIRECTORY src/libnt/native/include/ DESTINATION "${include_dest}/glass")
+ #
+ 
+ configure_file(src/app/generate/WPILibVersion.cpp.in WPILibVersion.cpp)
+-generate_resources(src/app/native/resources generated/app/cpp GLASS glass glass_resources_src)
++generate_resources(src/app/native/resources generated/app/cpp GLASS wpi::glass glass_resources_src)
+ 
+ file(GLOB glass_src src/app/native/cpp/*.cpp ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp)
+ 
+diff --git a/glass/build.gradle b/glass/build.gradle
+index 51733ffd055ef2b75bbcb742a72716345312ea1a..d09e7d68fbbedc5b655f11f51b09d7d06e61c91c 100644
+--- a/glass/build.gradle
++++ b/glass/build.gradle
+@@ -59,7 +59,7 @@ gradle.taskGraph.addTaskExecutionGraphListener { graph ->
+     }
+ }
+ 
+-def generateTask = createGenerateResourcesTask('app', 'GLASS', 'glass', project)
++def generateTask = createGenerateResourcesTask('app', 'GLASS', 'wpi::glass', project)
+ 
+ project(':').libraryBuild.dependsOn build
+ tasks.withType(CppCompile) {

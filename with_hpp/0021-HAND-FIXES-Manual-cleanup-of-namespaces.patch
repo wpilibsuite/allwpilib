@@ -1,0 +1,626 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Fri, 26 Sep 2025 19:02:55 -0400
+Subject: [PATCH 21/24] HAND FIXES: Manual cleanup of namespaces
+
+---
+ .../src/main/native/cpp/vision/VisionRunner.cpp      |  4 ++--
+ .../main/native/cpp/frc2/command/button/Trigger.cpp  |  2 +-
+ .../src/main/native/include/wpi/datalog/DataLog.h    |  4 ++--
+ tools/sysid/src/main/native/cpp/view/Analyzer.cpp    |  4 ++--
+ .../main/native/include/sysid/view/DataSelector.h    |  4 +++-
+ .../src/main/native/include/sysid/view/LogLoader.h   |  4 +++-
+ .../src/test/native/cpp/analysis/FilterTest.cpp      |  2 +-
+ .../thirdparty/mrcal/src/poseutils-uses-autodiff.cpp |  2 +-
+ .../native/cpp/smartdashboard/MechanismRoot2d.cpp    |  2 ++
+ .../native/include/wpi/event/NetworkBooleanEvent.hpp |  2 +-
+ .../include/wpi/smartdashboard/FieldObject2d.hpp     |  7 +++++--
+ .../include/wpi/smartdashboard/SmartDashboard.hpp    |  2 +-
+ wpimath/src/test/native/cpp/UnitsTest.cpp            |  2 +-
+ wpinet/robotpy_pybind_build_info.bzl                 |  4 ++--
+ wpinet/src/main/native/include/wpi/net/DsClient.hpp  |  5 +++--
+ .../native/include/wpi/net/HttpServerConnection.hpp  |  6 ++++--
+ .../native/include/wpi/net/ParallelTcpConnector.hpp  |  5 +++--
+ wpinet/src/main/native/include/wpi/net/UDPClient.hpp |  5 +++--
+ wpinet/src/main/native/include/wpi/net/hostname.hpp  |  4 +++-
+ wpinet/src/main/native/include/wpi/net/uv/Handle.hpp |  2 +-
+ wpinet/src/main/native/macOS/ResolverThread.cpp      |  2 +-
+ .../tcpsockets/include/wpi/net/TCPAcceptor.h         |  5 +++--
+ .../tcpsockets/include/wpi/net/TCPConnector.h        |  5 +++--
+ wpinet/src/main/python/semiwrap/PortForwarder.yml    |  2 +-
+ wpinet/src/main/python/semiwrap/WebServer.yml        |  2 +-
+ wpinet/src/test/native/cpp/WorkerThreadTest.cpp      |  8 ++++----
+ wpiutil/robotpy_pybind_build_info.bzl                |  6 +++---
+ wpiutil/src/main/native/include/wpi/util/scope       |  4 ++--
+ .../thirdparty/expected/include/wpi/util/expected    | 12 ++++++------
+ wpiutil/src/main/python/semiwrap/Sendable.yml        |  2 +-
+ wpiutil/src/main/python/semiwrap/SendableBuilder.yml |  2 +-
+ .../src/main/python/semiwrap/SendableRegistry.yml    |  2 +-
+ wpiutil/src/main/python/semiwrap/Synchronization.yml |  4 ++--
+ 33 files changed, 73 insertions(+), 55 deletions(-)
+
+diff --git a/cameraserver/src/main/native/cpp/vision/VisionRunner.cpp b/cameraserver/src/main/native/cpp/vision/VisionRunner.cpp
+index 990cb3a14abc0918147d40f2ac9a80196782ec18..a0164a0fbec38a716c0f9b3825ca2fd52decefc0 100644
+--- a/cameraserver/src/main/native/cpp/vision/VisionRunner.cpp
++++ b/cameraserver/src/main/native/cpp/vision/VisionRunner.cpp
+@@ -24,7 +24,7 @@ VisionRunnerBase::VisionRunnerBase(cs::VideoSource videoSource)
+ VisionRunnerBase::~VisionRunnerBase() = default;
+ 
+ void VisionRunnerBase::RunOnce() {
+-  auto csShared = wpi::vision::GetCameraServerShared();
++  auto csShared = wpi::GetCameraServerShared();
+   auto res = csShared->GetRobotMainThreadId();
+   if (res.second && (std::this_thread::get_id() == res.first)) {
+     csShared->SetVisionRunnerError(
+@@ -41,7 +41,7 @@ void VisionRunnerBase::RunOnce() {
+ }
+ 
+ void VisionRunnerBase::RunForever() {
+-  auto csShared = wpi::vision::GetCameraServerShared();
++  auto csShared = wpi::GetCameraServerShared();
+   auto res = csShared->GetRobotMainThreadId();
+   if (res.second && (std::this_thread::get_id() == res.first)) {
+     csShared->SetVisionRunnerError(
+diff --git a/command/src/main/native/cpp/frc2/command/button/Trigger.cpp b/command/src/main/native/cpp/frc2/command/button/Trigger.cpp
+index 3cd9fe6076a516ae1b1af156ad149b2fa77ccf4f..732d1973fab5650e28b767aef7401c95834a6917 100644
+--- a/command/src/main/native/cpp/frc2/command/button/Trigger.cpp
++++ b/command/src/main/native/cpp/frc2/command/button/Trigger.cpp
+@@ -10,7 +10,7 @@
+ 
+ #include "wpi/command/CommandPtr.hpp"
+ 
+-using namespace frc;
++using namespace wpi;
+ using namespace wpi::cmd;
+ 
+ Trigger::Trigger(const Trigger& other) = default;
+diff --git a/datalog/src/main/native/include/wpi/datalog/DataLog.h b/datalog/src/main/native/include/wpi/datalog/DataLog.h
+index 21680a1f058c4527f0871b16a1a4a745cbecd3f5..3739808bf929283a88e6223ad35b2fb5495bdc6c 100644
+--- a/datalog/src/main/native/include/wpi/datalog/DataLog.h
++++ b/datalog/src/main/native/include/wpi/datalog/DataLog.h
+@@ -162,7 +162,7 @@ class DataLog {
+   template <wpi::util::ProtobufSerializable T>
+   void AddProtobufSchema(wpi::util::ProtobufMessage<T>& msg, int64_t timestamp = 0) {
+     if (timestamp == 0) {
+-      timestamp = Now();
++      timestamp = wpi::util::Now();
+     }
+     msg.ForEachProtobufDescriptor(
+         [this](auto typeString) { return HasSchema(typeString); },
+@@ -183,7 +183,7 @@ class DataLog {
+     requires wpi::util::StructSerializable<T, I...>
+   void AddStructSchema(const I&... info, int64_t timestamp = 0) {
+     if (timestamp == 0) {
+-      timestamp = Now();
++      timestamp = wpi::util::Now();
+     }
+     wpi::util::ForEachStructSchema<T>(
+         [this, timestamp](auto typeString, auto schema) {
+diff --git a/tools/sysid/src/main/native/cpp/view/Analyzer.cpp b/tools/sysid/src/main/native/cpp/view/Analyzer.cpp
+index d7b9e8e2d0640c062e716cfa936005b013fbbe93..29cc4cf6c8ebcfff7ab76c66ef331955171d9aa0 100644
+--- a/tools/sysid/src/main/native/cpp/view/Analyzer.cpp
++++ b/tools/sysid/src/main/native/cpp/view/Analyzer.cpp
+@@ -612,9 +612,9 @@ void Analyzer::DisplayFeedbackGains() {
+   sysid::CreateTooltip(
+       "Gain presets represent how feedback gains are calculated for your "
+       "specific feedback controller:\n\n"
+-      "Default, WPILib (2020-): For use with the new WPILib wpi::math::PIDController "
++      "Default, WPILib (2020-): For use with the new WPILib PIDController "
+       "class.\n"
+-      "WPILib (Pre-2020): For use with the old WPILib wpi::math::PIDController class.\n"
++      "WPILib (Pre-2020): For use with the old WPILib PIDController class.\n"
+       "CTRE: For use with CTRE units. These are the default units that ship "
+       "with CTRE motor controllers.\n"
+       "REV (Brushless): For use with NEO and NEO 550 motors on a SPARK MAX.\n"
+diff --git a/tools/sysid/src/main/native/include/sysid/view/DataSelector.h b/tools/sysid/src/main/native/include/sysid/view/DataSelector.h
+index 2a6f2e488163fdd1ba45974bbc7d576bead966a8..3ceac2542f23da136ec161b9c56f87a122b45ca6 100644
+--- a/tools/sysid/src/main/native/include/sysid/view/DataSelector.h
++++ b/tools/sysid/src/main/native/include/sysid/view/DataSelector.h
+@@ -26,7 +26,9 @@ namespace wpi {
+ namespace log {
+ class DataLogReaderEntry;
+ }  // namespace log
+-class wpi::util::Logger;
++namespace util {
++class Logger;
++}
+ }  // namespace wpi
+ 
+ namespace sysid {
+diff --git a/tools/sysid/src/main/native/include/sysid/view/LogLoader.h b/tools/sysid/src/main/native/include/sysid/view/LogLoader.h
+index 2182ae72f44dcd224b8c617a9dbd732b9dd4d921..404ab0315a43e69721f6967afb035d6cd9363b84 100644
+--- a/tools/sysid/src/main/native/include/sysid/view/LogLoader.h
++++ b/tools/sysid/src/main/native/include/sysid/view/LogLoader.h
+@@ -25,7 +25,9 @@ namespace log {
+ class DataLogReaderEntry;
+ class DataLogReaderThread;
+ }  // namespace log
+-class wpi::util::Logger;
++namespace util {
++class Logger;
++}
+ }  // namespace wpi
+ 
+ namespace sysid {
+diff --git a/tools/sysid/src/test/native/cpp/analysis/FilterTest.cpp b/tools/sysid/src/test/native/cpp/analysis/FilterTest.cpp
+index ee5ddf52d4e3ec99c22ee69e0c8a2b9ab854e69d..9da6364bad8fee10e01eaf1b1e6a8b217d748f91 100644
+--- a/tools/sysid/src/test/native/cpp/analysis/FilterTest.cpp
++++ b/tools/sysid/src/test/native/cpp/analysis/FilterTest.cpp
+@@ -13,7 +13,7 @@
+ #include "sysid/analysis/FilteringUtils.h"
+ #include "sysid/analysis/Storage.h"
+ 
+-TEST(FilterTest, wpi::math::MedianFilter) {
++TEST(FilterTest, MedianFilter) {
+   std::vector<sysid::PreparedData> testData{
+       sysid::PreparedData{0_s, 0, 0, 0},    sysid::PreparedData{0_s, 0, 0, 1},
+       sysid::PreparedData{0_s, 0, 0, 10},   sysid::PreparedData{0_s, 0, 0, 5},
+diff --git a/tools/wpical/src/main/native/thirdparty/mrcal/src/poseutils-uses-autodiff.cpp b/tools/wpical/src/main/native/thirdparty/mrcal/src/poseutils-uses-autodiff.cpp
+index 39b31408a8a6ff74baac50929c249dff28e8b598..deb4670887ef8b3d52d2b6de0cd01b4464142914 100644
+--- a/tools/wpical/src/main/native/thirdparty/mrcal/src/poseutils-uses-autodiff.cpp
++++ b/tools/wpical/src/main/native/thirdparty/mrcal/src/poseutils-uses-autodiff.cpp
+@@ -288,7 +288,7 @@ compose_r_core(// output
+ 
+     Described here:
+ 
+-        Altmann, Simon L. "Hamilton, Rodrigues, and the wpi::math::Quaternion Scandal."
++        Altmann, Simon L. "Hamilton, Rodrigues, and the Quaternion Scandal."
+         Mathematics Magazine, vol. 62, no. 5, 1989, pp. 291–308
+ 
+     Available here:
+diff --git a/wpilibc/src/main/native/cpp/smartdashboard/MechanismRoot2d.cpp b/wpilibc/src/main/native/cpp/smartdashboard/MechanismRoot2d.cpp
+index cb40ee8a76fbaf3b377de4dec1fdf82e901769c4..74d3d74c7e1a965463c171d7235c1ac4fc4122a9 100644
+--- a/wpilibc/src/main/native/cpp/smartdashboard/MechanismRoot2d.cpp
++++ b/wpilibc/src/main/native/cpp/smartdashboard/MechanismRoot2d.cpp
+@@ -4,6 +4,8 @@
+ 
+ #include "wpi/smartdashboard/MechanismRoot2d.hpp"
+ 
++#include <memory>
++
+ #include <wpi/util/Color8Bit.hpp>
+ 
+ using namespace wpi;
+diff --git a/wpilibc/src/main/native/include/wpi/event/NetworkBooleanEvent.hpp b/wpilibc/src/main/native/include/wpi/event/NetworkBooleanEvent.hpp
+index 6c938e1adc6f858deb40725fd1abc785402ec644..268b947d91119087d89a98d244b72564adfe7d6b 100644
+--- a/wpilibc/src/main/native/include/wpi/event/NetworkBooleanEvent.hpp
++++ b/wpilibc/src/main/native/include/wpi/event/NetworkBooleanEvent.hpp
+@@ -9,7 +9,7 @@
+ 
+ #include "wpi/event/BooleanEvent.hpp"
+ 
+-namespace nt {
++namespace wpi::nt {
+ class BooleanSubscriber;
+ class BooleanTopic;
+ class NetworkTable;
+diff --git a/wpilibc/src/main/native/include/wpi/smartdashboard/FieldObject2d.hpp b/wpilibc/src/main/native/include/wpi/smartdashboard/FieldObject2d.hpp
+index 4bf2ec270518d9de87cf7eb736117056d7c583e1..b962a2bab4d0196d51f7bb81adb93173593debb6 100644
+--- a/wpilibc/src/main/native/include/wpi/smartdashboard/FieldObject2d.hpp
++++ b/wpilibc/src/main/native/include/wpi/smartdashboard/FieldObject2d.hpp
+@@ -17,10 +17,13 @@
+ #include <wpi/util/SmallVector.h>
+ #include <wpi/util/mutex.hpp>
+ 
+-namespace wpi {
++namespace wpi::math {
+ 
+ class Field2d;
+-class wpi::math::Trajectory;
++class Trajectory;
++}
++
++namespace wpi {
+ 
+ /**
+  * Game field object on a Field2d.
+diff --git a/wpilibc/src/main/native/include/wpi/smartdashboard/SmartDashboard.hpp b/wpilibc/src/main/native/include/wpi/smartdashboard/SmartDashboard.hpp
+index 5127389a38166f17ff89e9675d8cea742954c1cd..4f097faf7bba792f3d69ce4d01e5c437a0bbe651 100644
+--- a/wpilibc/src/main/native/include/wpi/smartdashboard/SmartDashboard.hpp
++++ b/wpilibc/src/main/native/include/wpi/smartdashboard/SmartDashboard.hpp
+@@ -14,7 +14,7 @@
+ #include <wpi/ntcore/NetworkTableEntry.hpp>
+ #include <wpi/ntcore/NetworkTableValue.hpp>
+ 
+-namespace wpi {
++namespace wpi::util {
+ class Sendable;
+ }  // namespace wpi
+ 
+diff --git a/wpimath/src/test/native/cpp/UnitsTest.cpp b/wpimath/src/test/native/cpp/UnitsTest.cpp
+index fc8550cedcbdbe80304ffe18f662dfd7bca71d35..4ba8ee10da31ede8ef775e8cbc726985d9fd9bf4 100644
+--- a/wpimath/src/test/native/cpp/UnitsTest.cpp
++++ b/wpimath/src/test/native/cpp/UnitsTest.cpp
+@@ -87,7 +87,7 @@ using namespace wpi::units::torque;
+ using namespace wpi::units::velocity;
+ using namespace wpi::units::voltage;
+ using namespace wpi::units::volume;
+-using namespace units;
++using namespace wpi::units;
+ 
+ #if !defined(_MSC_VER) || _MSC_VER > 1800
+ using namespace wpi::units::literals;
+diff --git a/wpinet/robotpy_pybind_build_info.bzl b/wpinet/robotpy_pybind_build_info.bzl
+index 322860de28dd9dcc119f3a8cd38dcdd26df5a007..7a6b190cf25336387863a1a74c60eac0d7d41f30 100644
+--- a/wpinet/robotpy_pybind_build_info.bzl
++++ b/wpinet/robotpy_pybind_build_info.bzl
+@@ -13,7 +13,7 @@ def wpinet_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
+             header_file = "$(execpath :robotpy-native-wpinet.copy_headers)/wpi/net/PortForwarder.hpp",
+             tmpl_class_names = [],
+             trampolines = [
+-                ("wpi::PortForwarder", "wpi__PortForwarder.hpp"),
++                ("wpi::net::PortForwarder", "wpi__net__PortForwarder.hpp"),
+             ],
+         ),
+         struct(
+@@ -23,7 +23,7 @@ def wpinet_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
+             header_file = "$(execpath :robotpy-native-wpinet.copy_headers)/wpi/net/WebServer.hpp",
+             tmpl_class_names = [],
+             trampolines = [
+-                ("wpi::WebServer", "wpi__WebServer.hpp"),
++                ("wpi::net::WebServer", "wpi__net__WebServer.hpp"),
+             ],
+         ),
+     ]
+diff --git a/wpinet/src/main/native/include/wpi/net/DsClient.hpp b/wpinet/src/main/native/include/wpi/net/DsClient.hpp
+index b4b3f199e39c671b9184e895fcbe1b6428a05de6..70a6a89b13eb9425ce7bc9c4013f92559e08994a 100644
+--- a/wpinet/src/main/native/include/wpi/net/DsClient.hpp
++++ b/wpinet/src/main/native/include/wpi/net/DsClient.hpp
+@@ -10,10 +10,11 @@
+ 
+ #include <wpi/util/Signal.h>
+ 
+-namespace wpi::net {
+-
++namespace wpi::util {
+ class Logger;
++}
+ 
++namespace wpi::net {
+ namespace uv {
+ class Loop;
+ class Tcp;
+diff --git a/wpinet/src/main/native/include/wpi/net/HttpServerConnection.hpp b/wpinet/src/main/native/include/wpi/net/HttpServerConnection.hpp
+index fca6f23ac7d12b77c957303e950582c155d12e09..2b2d4c7c5c0509cab6a1c14b25df580a128edf20 100644
+--- a/wpinet/src/main/native/include/wpi/net/HttpServerConnection.hpp
++++ b/wpinet/src/main/native/include/wpi/net/HttpServerConnection.hpp
+@@ -12,9 +12,11 @@
+ #include "wpi/net/HttpParser.hpp"
+ #include "wpi/net/uv/Stream.hpp"
+ 
+-namespace wpi::net {
+-
++namespace wpi::util {
+ class raw_ostream;
++}
++
++namespace wpi::net {
+ 
+ class HttpServerConnection {
+  public:
+diff --git a/wpinet/src/main/native/include/wpi/net/ParallelTcpConnector.hpp b/wpinet/src/main/native/include/wpi/net/ParallelTcpConnector.hpp
+index 713c890fc3c7684f971326f671737cd927387f8b..b4d396dd35d7032df7a34b3b980a82f70258865c 100644
+--- a/wpinet/src/main/native/include/wpi/net/ParallelTcpConnector.hpp
++++ b/wpinet/src/main/native/include/wpi/net/ParallelTcpConnector.hpp
+@@ -15,10 +15,11 @@
+ 
+ #include "wpi/net/uv/Timer.hpp"
+ 
+-namespace wpi::net {
+-
++namespace wpi::util {
+ class Logger;
++}
+ 
++namespace wpi::net {
+ namespace uv {
+ class GetAddrInfoReq;
+ class Loop;
+diff --git a/wpinet/src/main/native/include/wpi/net/UDPClient.hpp b/wpinet/src/main/native/include/wpi/net/UDPClient.hpp
+index d1cd56bc05a7ae06e487b36362062b9b100bb598..673e0e2fdbe68bbcf552c67f998141a68aebbb7a 100644
+--- a/wpinet/src/main/native/include/wpi/net/UDPClient.hpp
++++ b/wpinet/src/main/native/include/wpi/net/UDPClient.hpp
+@@ -12,10 +12,11 @@
+ #include <wpi/util/SmallVector.h>
+ #include <wpi/util/mutex.hpp>
+ 
+-namespace wpi::net {
+-
++namespace wpi::util {
+ class Logger;
++}
+ 
++namespace wpi::net {
+ class UDPClient {
+   int m_lsd;
+   int m_port;
+diff --git a/wpinet/src/main/native/include/wpi/net/hostname.hpp b/wpinet/src/main/native/include/wpi/net/hostname.hpp
+index 2dc6b8e628250e54a2f5848838c609b03815afe3..3857059319e098620dfd20dcfdc4bc8c5627ade1 100644
+--- a/wpinet/src/main/native/include/wpi/net/hostname.hpp
++++ b/wpinet/src/main/native/include/wpi/net/hostname.hpp
+@@ -8,10 +8,12 @@
+ #include <string>
+ #include <string_view>
+ 
+-namespace wpi::net {
++namespace wpi::util {
+ template <typename T>
+ class SmallVectorImpl;
++}
+ 
++namespace wpi::net {
+ std::string GetHostname();
+ std::string_view GetHostname(wpi::util::SmallVectorImpl<char>& name);
+ }  // namespace wpi::net
+diff --git a/wpinet/src/main/native/include/wpi/net/uv/Handle.hpp b/wpinet/src/main/native/include/wpi/net/uv/Handle.hpp
+index e540e22a326d583afd692c61c8054815d0ac317d..df40527cf5907bd8435e855e60d34a5d3d7e443a 100644
+--- a/wpinet/src/main/native/include/wpi/net/uv/Handle.hpp
++++ b/wpinet/src/main/native/include/wpi/net/uv/Handle.hpp
+@@ -19,7 +19,7 @@
+ #include "wpi/net/uv/Error.hpp"
+ #include "wpi/net/uv/Loop.hpp"
+ 
+-namespace wpi::net {
++namespace wpi::util {
+ class Logger;
+ }  // namespace wpi::net
+ 
+diff --git a/wpinet/src/main/native/macOS/ResolverThread.cpp b/wpinet/src/main/native/macOS/ResolverThread.cpp
+index a5e6ad8ed781af33dc4c283a6609d7d0cb217f09..2365891680c7d0bb61aef228d4e6760c6c0349d5 100644
+--- a/wpinet/src/main/native/macOS/ResolverThread.cpp
++++ b/wpinet/src/main/native/macOS/ResolverThread.cpp
+@@ -50,7 +50,7 @@ void ResolverThread::RemoveServiceRefInThread(DNSServiceRef serviceRef) {
+ WPI_EventHandle ResolverThread::RemoveServiceRefOutsideThread(
+     DNSServiceRef serviceRef) {
+   std::scoped_lock lock{serviceRefMutex};
+-  WPI_EventHandle handle = CreateEvent(true);
++  WPI_EventHandle handle = wpi::util::CreateEvent(true);
+   serviceRefsToRemove.push_back({serviceRef, handle});
+   return handle;
+ }
+diff --git a/wpinet/src/main/native/thirdparty/tcpsockets/include/wpi/net/TCPAcceptor.h b/wpinet/src/main/native/thirdparty/tcpsockets/include/wpi/net/TCPAcceptor.h
+index 7cad7d2a43efb7d2934698cda4f83e8b9b6c3b47..8706d1cbb116e94f0eba0d62f59b4242416b1ab6 100644
+--- a/wpinet/src/main/native/thirdparty/tcpsockets/include/wpi/net/TCPAcceptor.h
++++ b/wpinet/src/main/native/thirdparty/tcpsockets/include/wpi/net/TCPAcceptor.h
+@@ -32,10 +32,11 @@
+ #include "wpi/net/NetworkAcceptor.hpp"
+ #include "wpi/net/TCPStream.h"
+ 
+-namespace wpi::net {
+-
++namespace wpi::util {
+ class Logger;
++}
+ 
++namespace wpi::net {
+ class TCPAcceptor : public NetworkAcceptor {
+   int m_lsd;
+   int m_port;
+diff --git a/wpinet/src/main/native/thirdparty/tcpsockets/include/wpi/net/TCPConnector.h b/wpinet/src/main/native/thirdparty/tcpsockets/include/wpi/net/TCPConnector.h
+index 1a3e094cc125e4b0d9b7865b0649fa42eca4aa5d..6da49b6cdc6213762eed10e06caf568bbf9fdcfd 100644
+--- a/wpinet/src/main/native/thirdparty/tcpsockets/include/wpi/net/TCPConnector.h
++++ b/wpinet/src/main/native/thirdparty/tcpsockets/include/wpi/net/TCPConnector.h
+@@ -30,10 +30,11 @@
+ 
+ #include "wpi/net/NetworkStream.hpp"
+ 
+-namespace wpi::net {
+-
++namespace wpi::util {
+ class Logger;
++}
+ 
++namespace wpi::net {
+ class TCPConnector {
+  public:
+   static std::unique_ptr<NetworkStream> connect(const char* server, int port,
+diff --git a/wpinet/src/main/python/semiwrap/PortForwarder.yml b/wpinet/src/main/python/semiwrap/PortForwarder.yml
+index 64e172eae9a7759dff282ff840722914bcbec5f3..6c80be7140677cf609f6f9ac981d7026006588c3 100644
+--- a/wpinet/src/main/python/semiwrap/PortForwarder.yml
++++ b/wpinet/src/main/python/semiwrap/PortForwarder.yml
+@@ -1,5 +1,5 @@
+ classes:
+-  wpi::PortForwarder:
++  wpi::net::PortForwarder:
+     nodelete: true
+     methods:
+       GetInstance:
+diff --git a/wpinet/src/main/python/semiwrap/WebServer.yml b/wpinet/src/main/python/semiwrap/WebServer.yml
+index 61ac08875148e5b3aefccbde08734c017528ddbd..192ae179136e6ce254fc8bd42427cf36ebeee146 100644
+--- a/wpinet/src/main/python/semiwrap/WebServer.yml
++++ b/wpinet/src/main/python/semiwrap/WebServer.yml
+@@ -1,5 +1,5 @@
+ classes:
+-  wpi::WebServer:
++  wpi::net::WebServer:
+     nodelete: true
+     methods:
+       GetInstance:
+diff --git a/wpinet/src/test/native/cpp/WorkerThreadTest.cpp b/wpinet/src/test/native/cpp/WorkerThreadTest.cpp
+index fbd58ca19b01a883b73914b1f38fc6942671fe46..637ce3437c38a688807b4d6f2bf438a6e032d09e 100644
+--- a/wpinet/src/test/native/cpp/WorkerThreadTest.cpp
++++ b/wpinet/src/test/native/cpp/WorkerThreadTest.cpp
+@@ -36,8 +36,8 @@ TEST(WorkerThreadTest, FutureVoid) {
+ }
+ 
+ TEST(WorkerThreadTest, Loop) {
+-  mutex m;
+-  condition_variable cv;
++  wpi::util::mutex m;
++  wpi::util::condition_variable cv;
+   int callbacks = 0;
+ 
+   WorkerThread<int(bool)> worker;
+@@ -60,8 +60,8 @@ TEST(WorkerThreadTest, Loop) {
+ }
+ 
+ TEST(WorkerThreadTest, LoopVoid) {
+-  mutex m;
+-  condition_variable cv;
++  wpi::util::mutex m;
++  wpi::util::condition_variable cv;
+   int callbacks = 0;
+ 
+   WorkerThread<void(bool)> worker;
+diff --git a/wpiutil/robotpy_pybind_build_info.bzl b/wpiutil/robotpy_pybind_build_info.bzl
+index 3a182426fcdc08ff0591bce2f6a08747ecf840f2..399600a4752848af1ae1ace5ddc19c62850a36ac 100644
+--- a/wpiutil/robotpy_pybind_build_info.bzl
++++ b/wpiutil/robotpy_pybind_build_info.bzl
+@@ -38,7 +38,7 @@ def wpiutil_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
+             header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/sendable/Sendable.hpp",
+             tmpl_class_names = [],
+             trampolines = [
+-                ("wpi::Sendable", "wpi__Sendable.hpp"),
++                ("wpi::util::Sendable", "wpi__util__Sendable.hpp"),
+             ],
+         ),
+         struct(
+@@ -48,7 +48,7 @@ def wpiutil_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
+             header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/sendable/SendableBuilder.hpp",
+             tmpl_class_names = [],
+             trampolines = [
+-                ("wpi::SendableBuilder", "wpi__SendableBuilder.hpp"),
++                ("wpi::util::SendableBuilder", "wpi__util__SendableBuilder.hpp"),
+             ],
+         ),
+         struct(
+@@ -58,7 +58,7 @@ def wpiutil_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
+             header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/sendable/SendableRegistry.hpp",
+             tmpl_class_names = [],
+             trampolines = [
+-                ("wpi::SendableRegistry", "wpi__SendableRegistry.hpp"),
++                ("wpi::util::SendableRegistry", "wpi__util__SendableRegistry.hpp"),
+             ],
+         ),
+         struct(
+diff --git a/wpiutil/src/main/native/include/wpi/util/scope b/wpiutil/src/main/native/include/wpi/util/scope
+index e25badb617dae1c49d063a7a92811dbb8bcbfa6d..ef8baa6ffd88622bf33c5eb49040560028df6077 100644
+--- a/wpiutil/src/main/native/include/wpi/util/scope
++++ b/wpiutil/src/main/native/include/wpi/util/scope
+@@ -6,7 +6,7 @@
+ 
+ #include <utility>
+ 
+-namespace wpi {
++namespace wpi::util {
+ 
+ template <typename F>
+ class scope_exit {
+@@ -34,4 +34,4 @@ class scope_exit {
+   bool m_active = true;
+ };
+ 
+-}  // namespace wpi
++}  // namespace wpi::util
+diff --git a/wpiutil/src/main/native/thirdparty/expected/include/wpi/util/expected b/wpiutil/src/main/native/thirdparty/expected/include/wpi/util/expected
+index 24b7a26ec789861fd762cfd554f82cef3e3978ad..168f97889ca9972e6198b5e3b7cee54f2e4649b2 100644
+--- a/wpiutil/src/main/native/thirdparty/expected/include/wpi/util/expected
++++ b/wpiutil/src/main/native/thirdparty/expected/include/wpi/util/expected
+@@ -81,7 +81,7 @@
+ #elif (defined(__GNUC__) && __GNUC__ < 8 && !defined(__clang__))
+ #ifndef WPI_GCC_LESS_8_TRIVIALLY_COPY_CONSTRUCTIBLE_MUTEX
+ #define WPI_GCC_LESS_8_TRIVIALLY_COPY_CONSTRUCTIBLE_MUTEX
+-namespace wpi {
++namespace wpi::util {
+ namespace detail_expected {
+ template <class T>
+ struct is_trivially_copy_constructible
+@@ -91,11 +91,11 @@ template <class T, class A>
+ struct is_trivially_copy_constructible<std::vector<T, A>> : std::false_type {};
+ #endif
+ } // namespace detail_expected
+-} // namespace wpi
++} // namespace wpi::util
+ #endif
+ 
+ #define WPI_EXPECTED_IS_TRIVIALLY_COPY_CONSTRUCTIBLE(T)                         \
+-  wpi::detail_expected::is_trivially_copy_constructible<T>
++  wpi::util::detail_expected::is_trivially_copy_constructible<T>
+ #define WPI_EXPECTED_IS_TRIVIALLY_COPY_ASSIGNABLE(T)                            \
+   std::is_trivially_copy_assignable<T>
+ #define WPI_EXPECTED_IS_TRIVIALLY_DESTRUCTIBLE(T)                               \
+@@ -126,7 +126,7 @@ struct is_trivially_copy_constructible<std::vector<T, A>> : std::false_type {};
+ #define WPI_EXPECTED_11_CONSTEXPR constexpr
+ #endif
+ 
+-namespace wpi {
++namespace wpi::util {
+ template <class T, class E> class expected;
+ 
+ #ifndef WPI_MONOSTATE_INPLACE_MUTEX
+@@ -388,7 +388,7 @@ struct is_nothrow_swappable
+ #endif
+ #endif
+ 
+-// Trait for checking if a type is a wpi::expected
++// Trait for checking if a type is a wpi::util::expected
+ template <class T> struct is_expected_impl : std::false_type {};
+ template <class T, class E>
+ struct is_expected_impl<expected<T, E>> : std::true_type {};
+@@ -2439,6 +2439,6 @@ void swap(expected<T, E> &lhs,
+           expected<T, E> &rhs) noexcept(noexcept(lhs.swap(rhs))) {
+   lhs.swap(rhs);
+ }
+-} // namespace wpi
++} // namespace wpi::util
+ 
+ #endif
+diff --git a/wpiutil/src/main/python/semiwrap/Sendable.yml b/wpiutil/src/main/python/semiwrap/Sendable.yml
+index e67fe280dc2af9280bed0ac63d6722a826fa0726..6ec6c43a0d1e74358fca6342dbc2a263b6320d54 100644
+--- a/wpiutil/src/main/python/semiwrap/Sendable.yml
++++ b/wpiutil/src/main/python/semiwrap/Sendable.yml
+@@ -2,7 +2,7 @@ extra_includes:
+ - wpi/util/sendable/SendableBuilder.hpp
+ 
+ classes:
+-  wpi::Sendable:
++  wpi::util::Sendable:
+     methods:
+       InitSendable:
+         virtual_xform: |-
+diff --git a/wpiutil/src/main/python/semiwrap/SendableBuilder.yml b/wpiutil/src/main/python/semiwrap/SendableBuilder.yml
+index 1a52df427d4a58d0085a2d939e66554c97538637..44e621a6e2a037aebcf501c2c92aa2f6817a8cfd 100644
+--- a/wpiutil/src/main/python/semiwrap/SendableBuilder.yml
++++ b/wpiutil/src/main/python/semiwrap/SendableBuilder.yml
+@@ -1,5 +1,5 @@
+ classes:
+-  wpi::SendableBuilder:
++  wpi::util::SendableBuilder:
+     enums:
+       BackendKind:
+     methods:
+diff --git a/wpiutil/src/main/python/semiwrap/SendableRegistry.yml b/wpiutil/src/main/python/semiwrap/SendableRegistry.yml
+index 3c0596b6ea5ffa91689d73bb93c3b43a6637f5e5..dd7822334bf8831a5068c5b95690cbd524a61476 100644
+--- a/wpiutil/src/main/python/semiwrap/SendableRegistry.yml
++++ b/wpiutil/src/main/python/semiwrap/SendableRegistry.yml
+@@ -3,7 +3,7 @@ extra_includes:
+ - wpi/util/sendable/SendableBuilder.hpp
+ 
+ classes:
+-  wpi::SendableRegistry:
++  wpi::util::SendableRegistry:
+     nodelete: true
+     methods:
+       Add:
+diff --git a/wpiutil/src/main/python/semiwrap/Synchronization.yml b/wpiutil/src/main/python/semiwrap/Synchronization.yml
+index 633c7d56ca5375eef423063d4d82ec528a9b81e4..a051b684ca75f60e848b4e5147615da9bb6aad25 100644
+--- a/wpiutil/src/main/python/semiwrap/Synchronization.yml
++++ b/wpiutil/src/main/python/semiwrap/Synchronization.yml
+@@ -30,7 +30,7 @@ functions:
+           [](std::span<const WPI_Handle> handles) {
+             py::gil_scoped_release release;
+             std::vector<WPI_Handle> signaled(handles.size());
+-            auto result = wpi::WaitForObjects(handles, signaled);
++            auto result = wpi::util::WaitForObjects(handles, signaled);
+             signaled.resize(result.size());
+             return signaled;
+           }
+@@ -47,7 +47,7 @@ functions:
+             py::gil_scoped_release release;
+             std::vector<WPI_Handle> signaled(handles.size());
+             bool timedOut = false;
+-            auto result = wpi::WaitForObjects(handles, signaled, timeout, &timedOut);
++            auto result = wpi::util::WaitForObjects(handles, signaled, timeout, &timedOut);
+             signaled.resize(result.size());
+             return std::make_tuple(signaled, timedOut);
+           }
