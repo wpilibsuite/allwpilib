@@ -125,7 +125,7 @@ public class AnalogPotentiometer implements Sendable, AutoCloseable {
     if (m_analogInput == null) {
       return m_offset;
     }
-    return (m_analogInput.getAverageVoltage() / RobotController.getVoltage3V3()) * m_fullRange
+    return (m_analogInput.getVoltage() / RobotController.getVoltage3V3()) * m_fullRange
         + m_offset;
   }
 
