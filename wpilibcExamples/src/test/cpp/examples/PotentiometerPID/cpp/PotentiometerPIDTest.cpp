@@ -14,6 +14,7 @@
 #include <frc/simulation/SimHooks.h>
 #include <frc/system/plant/DCMotor.h>
 #include <gtest/gtest.h>
+#include <hal/DriverStationTypes.h>
 #include <hal/simulation/MockHooks.h>
 #include <units/length.h>
 #include <units/mass.h>
@@ -91,7 +92,7 @@ class PotentiometerPIDTest : public testing::Test {
 TEST_F(PotentiometerPIDTest, Teleop) {
   // teleop init
   {
-    frc::sim::DriverStationSim::SetAutonomous(false);
+    frc::sim::DriverStationSim::SetRobotMode(HAL_ROBOTMODE_TELEOPERATED);
     frc::sim::DriverStationSim::SetEnabled(true);
     frc::sim::DriverStationSim::NotifyNewData();
 

@@ -55,21 +55,21 @@ class ColorTest {
   }
 
   @Test
-  void testConstructFromHexString() {
-    var color = new Color("#FF8040");
+  void testFromHexString() {
+    var color = Color.fromString("#FF8040");
 
     assertEquals(1.0, color.red, 1e-2);
     assertEquals(0.5, color.green, 1e-2);
     assertEquals(0.25, color.blue, 1e-2);
 
     // No leading #
-    assertThrows(IllegalArgumentException.class, () -> new Color("112233"));
+    assertThrows(IllegalArgumentException.class, () -> Color.fromString("112233"));
 
     // Too long
-    assertThrows(IllegalArgumentException.class, () -> new Color("#11223344"));
+    assertThrows(IllegalArgumentException.class, () -> Color.fromString("#11223344"));
 
     // Invalid hex characters
-    assertThrows(IllegalArgumentException.class, () -> new Color("#$$$$$$"));
+    assertThrows(IllegalArgumentException.class, () -> Color.fromString("#$$$$$$"));
   }
 
   @Test

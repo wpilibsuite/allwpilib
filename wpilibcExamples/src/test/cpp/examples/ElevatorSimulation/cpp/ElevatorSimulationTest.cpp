@@ -10,6 +10,7 @@
 #include <frc/simulation/PWMMotorControllerSim.h>
 #include <frc/simulation/SimHooks.h>
 #include <gtest/gtest.h>
+#include <hal/DriverStationTypes.h>
 #include <hal/simulation/MockHooks.h>
 #include <units/length.h>
 #include <units/mass.h>
@@ -50,7 +51,7 @@ class ElevatorSimulationTest : public testing::Test {
 TEST_F(ElevatorSimulationTest, Teleop) {
   // teleop init
   {
-    frc::sim::DriverStationSim::SetAutonomous(false);
+    frc::sim::DriverStationSim::SetRobotMode(HAL_ROBOTMODE_TELEOPERATED);
     frc::sim::DriverStationSim::SetEnabled(true);
     frc::sim::DriverStationSim::NotifyNewData();
 
@@ -110,7 +111,6 @@ TEST_F(ElevatorSimulationTest, Teleop) {
 
   {
     // Disable
-    frc::sim::DriverStationSim::SetAutonomous(false);
     frc::sim::DriverStationSim::SetEnabled(false);
     frc::sim::DriverStationSim::NotifyNewData();
 
