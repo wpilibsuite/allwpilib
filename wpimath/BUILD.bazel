@@ -99,12 +99,10 @@ filegroup(
     srcs = glob(["src/generated/main/java/**/*.java"]),
 )
 
-cc_library(
+alias(
     name = "eigen-headers",
+    actual = "@eigen",
     visibility = ["//visibility:public"],
-    deps = [
-        "@eigen",
-    ],
 )
 
 pkg_files_headers(
