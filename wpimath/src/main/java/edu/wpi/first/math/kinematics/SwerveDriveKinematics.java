@@ -271,16 +271,21 @@ public class SwerveDriveKinematics
     for (SwerveModuleState moduleState : moduleStates) {
       realMaxSpeed = Math.max(realMaxSpeed, Math.abs(moduleState.speed));
     }
+    var states = new SwerveModuleState[moduleStates.length];
     if (realMaxSpeed > attainableMaxSpeed) {
-      var states = new SwerveModuleState[moduleStates.length];
       for (int i = 0; i < states.length; i++) {
         states[i] =
             new SwerveModuleState(
                 moduleStates[i].speed / realMaxSpeed * attainableMaxSpeed, moduleStates[i].angle);
       }
-      return states;
+    } else {
+      // Copy in the event someone wants to mutate the desaturated states but also wants the
+      // original states
+      for (int i = 0; i < states.length; i++) {
+        states[i] = new SwerveModuleState(moduleStates[i].speed, moduleStates[i].angle);
+      }
     }
-    return moduleStates;
+    return states;
   }
 
   /**
@@ -338,10 +343,16 @@ public class SwerveDriveKinematics
       realMaxSpeed = Math.max(realMaxSpeed, Math.abs(moduleState.speed));
     }
 
+    var states = new SwerveModuleState[moduleStates.length];
     if (attainableMaxTranslationalSpeed == 0
         || attainableMaxRotationalVelocity == 0
         || realMaxSpeed == 0) {
-      return moduleStates;
+      // Copy in the event someone wants to mutate the desaturated states but also wants the
+      // original states
+      for (int i = 0; i < states.length; i++) {
+        states[i] = new SwerveModuleState(moduleStates[i].speed, moduleStates[i].angle);
+      }
+      return states;
     }
     double translationalK =
         Math.hypot(desiredChassisSpeed.vx, desiredChassisSpeed.vy)
@@ -349,7 +360,6 @@ public class SwerveDriveKinematics
     double rotationalK = Math.abs(desiredChassisSpeed.omega) / attainableMaxRotationalVelocity;
     double k = Math.max(translationalK, rotationalK);
     double scale = Math.min(k * attainableMaxModuleSpeed / realMaxSpeed, 1);
-    var states = new SwerveModuleState[moduleStates.length];
     for (int i = 0; i < states.length; i++) {
       states[i] = new SwerveModuleState(moduleStates[i].speed * scale, moduleStates[i].angle);
     }

@@ -144,7 +144,7 @@ class SwerveDriveKinematics
    * @return An array containing the module states. Use caution because these
    * module states are not normalized. Sometimes, a user input may cause one of
    * the module speeds to go above the attainable max velocity. Use the
-   * DesaturateWheelSpeeds(wpi::array<SwerveModuleState, NumModules>&,
+   * DesaturateWheelSpeeds(wpi::array<SwerveModuleState, NumModules>,
    * units::meters_per_second_t) function to rectify this issue. In addition,
    * you can leverage the power of C++17 to directly assign the module states to
    * variables:
@@ -353,15 +353,20 @@ class SwerveDriveKinematics
                          })
             ->speed);
 
+    wpi::array<SwerveModuleState, NumModules> states(wpi::empty_array);
     if (realMaxSpeed > attainableMaxSpeed) {
-      wpi::array<SwerveModuleState, NumModules> states(wpi::empty_array);
       for (size_t i = 0; i < NumModules; ++i) {
         states[i] = {moduleStates[i].speed / realMaxSpeed * attainableMaxSpeed,
                      moduleStates[i].angle};
       }
-      return states;
+    } else {
+      // Copy in the event someone wants to mutate the desaturated states but
+      // also wants the original states
+      for (size_t i = 0; i < NumModules; ++i) {
+        states[i] = moduleStates[i];
+      }
     }
-    return moduleStates;
+    return states;
   }
 
   /**
@@ -404,10 +409,16 @@ class SwerveDriveKinematics
                          })
             ->speed);
 
+    wpi::array<SwerveModuleState, NumModules> states(wpi::empty_array);
     if (attainableMaxRobotTranslationSpeed == 0_mps ||
         attainableMaxRobotRotationSpeed == 0_rad_per_s ||
         realMaxSpeed == 0_mps) {
-      return moduleStates;
+      // Copy in the event someone wants to mutate the desaturated states but
+      // also wants the original states
+      for (size_t i = 0; i < NumModules; ++i) {
+        states[i] = moduleStates[i];
+      }
+      return states;
     }
 
     auto translationalK =
@@ -421,7 +432,6 @@ class SwerveDriveKinematics
 
     auto scale = units::math::min(k * attainableMaxModuleSpeed / realMaxSpeed,
                                   units::scalar_t{1});
-    wpi::array<SwerveModuleState, NumModules> states(wpi::empty_array);
     for (size_t i = 0; i < NumModules; ++i) {
       states[i] = {moduleStates[i].speed * scale, moduleStates[i].angle};
     }

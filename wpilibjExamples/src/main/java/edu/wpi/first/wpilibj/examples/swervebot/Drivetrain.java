@@ -63,7 +63,9 @@ public class Drivetrain {
     }
     chassisSpeeds = chassisSpeeds.discretize(period);
 
-    var states = SwerveDriveKinematics.desaturateWheelSpeeds(m_kinematics.toWheelSpeeds(chassisSpeeds), kMaxSpeed);
+    var states =
+        SwerveDriveKinematics.desaturateWheelSpeeds(
+            m_kinematics.toWheelSpeeds(chassisSpeeds), kMaxSpeed);
 
     m_frontLeft.setDesiredState(states[0]);
     m_frontRight.setDesiredState(states[1]);
