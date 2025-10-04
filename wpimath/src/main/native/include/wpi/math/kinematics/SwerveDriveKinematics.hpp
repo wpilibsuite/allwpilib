@@ -362,6 +362,7 @@ class SwerveDriveKinematics
    *     reach.
    * @return The array of desaturated module velocities.
    */
+  [[nodiscard]]
   static wpi::util::array<SwerveModuleVelocity, NumModules>
   DesaturateWheelVelocities(
       wpi::util::array<SwerveModuleVelocity, NumModules> moduleVelocities,
@@ -414,6 +415,7 @@ class SwerveDriveKinematics
    *     robot can reach while rotating
    * @return The array of desaturated module velocities
    */
+  [[nodiscard]]
   static wpi::util::array<SwerveModuleVelocity, NumModules>
   DesaturateWheelVelocities(
       wpi::util::array<SwerveModuleVelocity, NumModules> moduleVelocities,
