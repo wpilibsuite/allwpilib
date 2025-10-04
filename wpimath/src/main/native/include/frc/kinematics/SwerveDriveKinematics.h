@@ -342,6 +342,7 @@ class SwerveDriveKinematics
    * @param attainableMaxSpeed The absolute max speed that a module can reach.
    * @return The array of desaturated module states.
    */
+  [[nodiscard]]
   static wpi::array<SwerveModuleState, NumModules> DesaturateWheelSpeeds(
       wpi::array<SwerveModuleState, NumModules> moduleStates,
       units::meters_per_second_t attainableMaxSpeed) {
@@ -395,6 +396,7 @@ class SwerveDriveKinematics
    * reach while rotating
    * @return The array of desaturated module states
    */
+  [[nodiscard]]
   static wpi::array<SwerveModuleState, NumModules> DesaturateWheelSpeeds(
       wpi::array<SwerveModuleState, NumModules> moduleStates,
       ChassisSpeeds desiredChassisSpeed,
