@@ -19,20 +19,6 @@ std::function<uint64_t()> RobotController::m_timeSource = [] {
   return RobotController::GetFPGATime();
 };
 
-int RobotController::GetFPGAVersion() {
-  int32_t status = 0;
-  int version = HAL_GetFPGAVersion(&status);
-  FRC_CheckErrorStatus(status, "GetFPGAVersion");
-  return version;
-}
-
-int64_t RobotController::GetFPGARevision() {
-  int32_t status = 0;
-  int64_t revision = HAL_GetFPGARevision(&status);
-  FRC_CheckErrorStatus(status, "GetFPGARevision");
-  return revision;
-}
-
 std::string RobotController::GetSerialNumber() {
   WPI_String serialNum;
   HAL_GetSerialNumber(&serialNum);

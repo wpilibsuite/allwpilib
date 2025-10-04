@@ -171,18 +171,6 @@ HAL_RuntimeType HAL_GetRuntimeType(void) {
   return runtimeType;
 }
 
-int32_t HAL_GetFPGAVersion(int32_t* status) {
-  hal::init::CheckInit();
-  *status = HAL_HANDLE_ERROR;
-  return 0;
-}
-
-int64_t HAL_GetFPGARevision(int32_t* status) {
-  hal::init::CheckInit();
-  *status = HAL_HANDLE_ERROR;
-  return 0;
-}
-
 void HAL_GetSerialNumber(struct WPI_String* serialNumber) {
   const char* serialNum = std::getenv("serialnum");
   if (!serialNum) {
