@@ -104,7 +104,7 @@ class AdjointExpressionGraph {
    * @param wrt Vector of variables with respect to which to compute the
    *   Jacobian.
    */
-  void append_adjoint_triplets(
+  void append_gradient_triplets(
       gch::small_vector<Eigen::Triplet<double>>& triplets, int row,
       const VariableMatrix& wrt) const {
     // Read docs/algorithms.md#Reverse_accumulation_automatic_differentiation
