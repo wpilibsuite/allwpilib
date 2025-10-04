@@ -230,13 +230,13 @@ Java_edu_wpi_first_math_optimization_ProblemJNI_inequalityConstraintType
 /*
  * Class:     edu_wpi_first_math_optimization_ProblemJNI
  * Method:    solve
- * Signature: (Ljava/lang/Object;JDIDZZZ)I
+ * Signature: (Ljava/lang/Object;JDIDZZ)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_math_optimization_ProblemJNI_solve
   (JNIEnv* env, jclass, jobject obj, jlong handle, jdouble tolerance,
    jint maxIterations, jdouble timeout, jboolean feasibleIPM,
-   jboolean diagnostics, jboolean spy)
+   jboolean diagnostics)
 {
   auto& problem = *reinterpret_cast<slp::Problem*>(handle);
 
@@ -246,7 +246,7 @@ Java_edu_wpi_first_math_optimization_ProblemJNI_solve
   slp::Options options{
       tolerance, maxIterations, std::chrono::duration<double>{timeout},
       static_cast<bool>(feasibleIPM), static_cast<bool>(diagnostics)};
-  return static_cast<int>(problem.solve(options, spy));
+  return static_cast<int>(problem.solve(options));
 }
 
 }  // extern "C"

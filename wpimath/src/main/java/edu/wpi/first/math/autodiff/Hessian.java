@@ -65,7 +65,7 @@ public class Hessian implements AutoCloseable {
    * @return The Hessian as a VariableMatrix.
    */
   public VariableMatrix get() {
-    return VariableMatrix.fromHandles(m_rows, m_rows, HessianJNI.get(m_handle));
+    return new VariableMatrix(m_rows, m_rows, HessianJNI.get(m_handle));
   }
 
   /**

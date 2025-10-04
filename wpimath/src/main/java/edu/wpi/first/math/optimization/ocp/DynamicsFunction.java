@@ -10,8 +10,11 @@ import edu.wpi.first.math.autodiff.VariableMatrix;
 /**
  * Function representing an explicit or implicit ODE, or a discrete state transition function.
  *
- * <p>- Explicit: dx/dt = f(t, x, u, *) - Implicit: f(t, [x dx/dt]', u, *) = 0 - State transition:
- * xₖ₊₁ = f(t, xₖ, uₖ, dt)
+ * <ul>
+ *   <li>Explicit: dx/dt = f(t, x, u, *)
+ *   <li>Implicit: f(t, [x dx/dt]', u, *) = 0
+ *   <li>State transition: xₖ₊₁ = f(t, xₖ, uₖ, dt)
+ * </ul>
  */
 @FunctionalInterface
 public interface DynamicsFunction {

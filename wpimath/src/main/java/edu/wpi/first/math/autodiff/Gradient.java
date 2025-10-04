@@ -64,7 +64,7 @@ public class Gradient implements AutoCloseable {
    * @return The gradient as a VariableMatrix.
    */
   public VariableMatrix get() {
-    return VariableMatrix.fromHandles(m_rows, 1, GradientJNI.get(m_handle));
+    return new VariableMatrix(m_rows, 1, GradientJNI.get(m_handle));
   }
 
   /**

@@ -63,7 +63,7 @@ public class Problem implements AutoCloseable {
    */
   public Variable decisionVariable() {
     var handles = ProblemJNI.decisionVariable(m_handle, 1, 1);
-    return Variable.fromHandle(handles[0]);
+    return new Variable(Variable.HANDLE, handles[0]);
   }
 
   /**
@@ -84,8 +84,7 @@ public class Problem implements AutoCloseable {
    * @return A matrix of decision variables in the optimization problem.
    */
   public VariableMatrix decisionVariable(int rows, int cols) {
-    return VariableMatrix.fromHandles(
-        rows, cols, ProblemJNI.decisionVariable(m_handle, rows, cols));
+    return new VariableMatrix(rows, cols, ProblemJNI.decisionVariable(m_handle, rows, cols));
   }
 
   /**
@@ -98,8 +97,7 @@ public class Problem implements AutoCloseable {
    * @return A symmetric matrix of decision varaibles in the optimization problem.
    */
   public VariableMatrix symmetricDecisionVariable(int rows) {
-    return VariableMatrix.fromHandles(
-        rows, rows, ProblemJNI.symmetricDecisionVariable(m_handle, rows));
+    return new VariableMatrix(rows, rows, ProblemJNI.symmetricDecisionVariable(m_handle, rows));
   }
 
   /**
@@ -186,7 +184,7 @@ public class Problem implements AutoCloseable {
    * @return The solver status.
    */
   public ExitStatus solve() {
-    return solve(new Options(), false);
+    return solve(new Options());
   }
 
   /**
@@ -197,19 +195,6 @@ public class Problem implements AutoCloseable {
    * @return The solver status.
    */
   public ExitStatus solve(Options options) {
-    return solve(options, false);
-  }
-
-  /**
-   * Solve the optimization problem. The solution will be stored in the original variables used to
-   * construct the problem.
-   *
-   * @param options Solver options.
-   * @param spy Enables writing sparsity patterns of H, Aₑ, and Aᵢ to files named H.spy, A_e.spy,
-   *     and A_i.spy respectively during solve. Use tools/spy.py to plot them.
-   * @return The solver status.
-   */
-  public ExitStatus solve(Options options, boolean spy) {
     return ExitStatus.fromInt(
         ProblemJNI.solve(
             this,
@@ -218,8 +203,7 @@ public class Problem implements AutoCloseable {
             options.maxIterations,
             options.timeout,
             options.feasibleIPM,
-            options.diagnostics,
-            spy));
+            options.diagnostics));
   }
 
   /**

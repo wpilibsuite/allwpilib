@@ -27,11 +27,7 @@ public class VariableBlock implements Iterable<Variable> {
    * @param mat The matrix to which to point.
    */
   public VariableBlock(VariableMatrix mat) {
-    m_mat = mat;
-    m_rowSlice = new Slice(0, mat.rows(), 1);
-    m_rowSliceLength = m_rowSlice.adjust(mat.rows());
-    m_colSlice = new Slice(0, mat.cols(), 1);
-    m_colSliceLength = m_colSlice.adjust(mat.cols());
+    this(mat, 0, 0, mat.rows(), mat.cols());
   }
 
   /**
@@ -89,7 +85,7 @@ public class VariableBlock implements Iterable<Variable> {
   }
 
   /**
-   * Assigns a double to the block.
+   * Assigns a Variable to the block.
    *
    * <p>This only works for blocks with one row and one column.
    *
@@ -111,7 +107,12 @@ public class VariableBlock implements Iterable<Variable> {
    * @return This VariableBlock.
    */
   public VariableBlock set(double[][] values) {
-    assert rows() == values.length && cols() == values[0].length;
+    assert rows() == values.length;
+
+    // Assert all column counts are the same
+    for (var row : values) {
+      assert row.length == cols();
+    }
 
     for (int row = 0; row < rows(); ++row) {
       for (int col = 0; col < cols(); ++col) {
@@ -203,25 +204,24 @@ public class VariableBlock implements Iterable<Variable> {
   }
 
   /**
-   * Sets a scalar subblock at the given row.
+   * Sets a scalar subblock at the given index.
    *
-   * @param row The scalar subblock's row.
+   * @param index The scalar subblock's index.
    * @param value The value.
    */
-  public void set(int row, Variable value) {
-    assert row >= 0 && row < rows() * cols();
-    set(row / cols(), row % cols(), value);
+  public void set(int index, double value) {
+    set(index, new Variable(value));
   }
 
   /**
-   * Sets a scalar subblock at the given row.
+   * Sets a scalar subblock at the given index.
    *
-   * @param row The scalar subblock's row.
+   * @param index The scalar subblock's index.
    * @param value The value.
    */
-  public void set(int row, double value) {
-    assert row >= 0 && row < rows() * cols();
-    set(row / cols(), row % cols(), value);
+  public void set(int index, Variable value) {
+    assert index >= 0 && index < rows() * cols();
+    set(index / cols(), index % cols(), value);
   }
 
   /**
@@ -243,7 +243,12 @@ public class VariableBlock implements Iterable<Variable> {
    * @param values Double array of values.
    */
   public void setValue(double[][] values) {
-    assert rows() == values.length && cols() == values[0].length;
+    assert rows() == values.length;
+
+    // Assert all column counts are the same
+    for (var row : values) {
+      assert row.length == cols();
+    }
 
     for (int row = 0; row < rows(); ++row) {
       for (int col = 0; col < cols(); ++col) {
@@ -282,14 +287,14 @@ public class VariableBlock implements Iterable<Variable> {
   }
 
   /**
-   * Returns a scalar subblock at the given row.
+   * Returns a scalar subblock at the given index.
    *
-   * @param row The scalar subblock's row.
-   * @return A scalar subblock at the given row.
+   * @param index The scalar subblock's index.
+   * @return A scalar subblock at the given index.
    */
-  public Variable get(int row) {
-    assert row >= 0 && row < rows() * cols();
-    return get(row / cols(), row % cols());
+  public Variable get(int index) {
+    assert index >= 0 && index < rows() * cols();
+    return get(index / cols(), index % cols());
   }
 
   /**
@@ -739,10 +744,10 @@ public class VariableBlock implements Iterable<Variable> {
   }
 
   /**
-   * Returns a row of the variable column vector.
+   * Returns an element of the variable block.
    *
    * @param index The index of the element to return.
-   * @return A row of the variable column vector.
+   * @return An element of the variable block.
    */
   public double value(int index) {
     assert index >= 0 && index < rows() * cols();

@@ -88,7 +88,7 @@ class DecisionVariableTest {
     // Segment assignment
     {
       var expected_block = new double[][] {{1.0}, {1.0}};
-      z.segment(0, 2).setValue(expected_block);
+      z.block(0, 0, 3, 1).segment(0, 2).setValue(expected_block);
 
       var expected_result =
           new SimpleMatrix(new double[][] {{1.0, 8.0}, {1.0, 10.0}, {11.0, 12.0}});

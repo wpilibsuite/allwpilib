@@ -121,8 +121,6 @@ final class ProblemJNI extends WPIMathJNI {
    *     (e.g., square root of a negative value). This can slow or prevent progress toward a
    *     solution though, so only enable it if necessary.
    * @param diagnnostics Enables diagnostic prints.
-   * @param spy Enables writing sparsity patterns of H, Aₑ, and Aᵢ to files named H.spy, A_e.spy,
-   *     and A_i.spy respectively during solve. Use tools/spy.py to plot them.
    * @return The solver status.
    */
   static native int solve(
@@ -132,6 +130,5 @@ final class ProblemJNI extends WPIMathJNI {
       int maxIterations,
       double timeout,
       boolean feasibleIPM,
-      boolean diagnostics,
-      boolean spy);
+      boolean diagnostics);
 }

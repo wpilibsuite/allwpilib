@@ -24,16 +24,29 @@ public class VariableMatrix implements Iterable<Variable> {
   public VariableMatrix() {}
 
   /**
-   * Constructs a VariableMatrix column vector with the given rows.
+   * Constructs a VariableMatrix from Variable internal handles.
+   *
+   * <p>This constructor is for internal use only.
+   *
+   * @param rows The number of matrix rows.
+   * @param cols The number of matrix columns.
+   * @param handles Variable handles.
+   */
+  public VariableMatrix(int rows, int cols, long[] handles) {
+    m_rows = rows;
+    m_cols = cols;
+    for (int index = 0; index < rows * cols; ++index) {
+      m_storage.add(new Variable(Variable.HANDLE, handles[index]));
+    }
+  }
+
+  /**
+   * Constructs a zero-initialized VariableMatrix column vector with the given rows.
    *
    * @param rows The number of matrix rows.
    */
   public VariableMatrix(int rows) {
-    m_rows = rows;
-    m_cols = 1;
-    for (int row = 0; row < rows; ++row) {
-      m_storage.add(new Variable());
-    }
+    this(rows, 1);
   }
 
   /**
@@ -63,9 +76,9 @@ public class VariableMatrix implements Iterable<Variable> {
       m_cols = list[0].length;
     }
 
-    // Assert the first and latest column counts are the same
+    // Assert all column counts are the same
     for (var row : list) {
-      assert list[0].length == row.length;
+      assert row.length == m_cols;
     }
 
     for (var row : list) {
@@ -88,9 +101,9 @@ public class VariableMatrix implements Iterable<Variable> {
       m_cols = list[0].length;
     }
 
-    // Assert the first and latest column counts are the same
+    // Assert all column counts are the same
     for (var row : list) {
-      assert list[0].length == row.length;
+      assert row.length == m_cols;
     }
 
     for (var row : list) {
@@ -114,13 +127,44 @@ public class VariableMatrix implements Iterable<Variable> {
   }
 
   /**
+   * Constructs a scalar VariableMatrix from a Variable.
+   *
+   * @param variable Variable.
+   */
+  public VariableMatrix(Variable variable) {
+    m_rows = 1;
+    m_cols = 1;
+    m_storage.add(variable);
+  }
+
+  /**
+   * Constructs a VariableMatrix from a VariableBlock.
+   *
+   * @param values VariableBlock of values.
+   */
+  public VariableMatrix(VariableBlock values) {
+    m_rows = values.rows();
+    m_cols = values.cols();
+    for (int row = 0; row < m_rows; ++row) {
+      for (int col = 0; col < m_cols; ++col) {
+        m_storage.add(values.get(row, col));
+      }
+    }
+  }
+
+  /**
    * Assigns a double array to a VariableMatrix.
    *
    * @param values Double array of values.
    * @return This VariableMatrix.
    */
   public VariableMatrix set(double[][] values) {
-    assert rows() == values.length && cols() == values[0].length;
+    assert rows() == values.length;
+
+    // Assert all column counts are the same
+    for (var row : values) {
+      assert row.length == cols();
+    }
 
     for (int row = 0; row < values.length; ++row) {
       for (int col = 0; col < values[0].length; ++col) {
@@ -194,9 +238,21 @@ public class VariableMatrix implements Iterable<Variable> {
    * @return This VariableMatrix.
    */
   public VariableMatrix set(double value) {
+    return set(new Variable(value));
+  }
+
+  /**
+   * Assigns a Variable to the matrix.
+   *
+   * <p>This only works for matrices with one row and one column.
+   *
+   * @param value Value to assign.
+   * @return This VariableMatrix.
+   */
+  public VariableMatrix set(Variable value) {
     assert rows() == 1 && cols() == 1;
 
-    get(0, 0).setValue(value);
+    m_storage.set(0, value);
 
     return this;
   }
@@ -230,12 +286,22 @@ public class VariableMatrix implements Iterable<Variable> {
   /**
    * Sets an element to the given value.
    *
-   * @param row The row.
+   * @param index The index of the element.
    * @param value The value.
    */
-  public void set(int row, Variable value) {
-    assert row >= 0 && row < rows() * cols();
-    m_storage.set(row, value);
+  public void set(int index, double value) {
+    set(index, new Variable(value));
+  }
+
+  /**
+   * Sets an element to the given value.
+   *
+   * @param index The index of the element.
+   * @param value The value.
+   */
+  public void set(int index, Variable value) {
+    assert index >= 0 && index < rows() * cols();
+    m_storage.set(index, value);
   }
 
   /**
@@ -244,10 +310,15 @@ public class VariableMatrix implements Iterable<Variable> {
    * @param values Double array of values.
    */
   public void setValue(double[][] values) {
-    assert rows() == values.length && cols() == values[0].length;
+    assert rows() == values.length;
 
-    for (int row = 0; row < values.length; ++row) {
-      for (int col = 0; col < values[0].length; ++col) {
+    // Assert all column counts are the same
+    for (var row : values) {
+      assert row.length == cols();
+    }
+
+    for (int row = 0; row < rows(); ++row) {
+      for (int col = 0; col < cols(); ++col) {
         get(row, col).setValue(values[row][col]);
       }
     }
@@ -269,37 +340,11 @@ public class VariableMatrix implements Iterable<Variable> {
   }
 
   /**
-   * Constructs a scalar VariableMatrix from a Variable.
+   * Returns the element at the given row and column.
    *
-   * @param variable Variable.
-   */
-  public VariableMatrix(Variable variable) {
-    m_rows = 1;
-    m_cols = 1;
-    m_storage.add(variable);
-  }
-
-  /**
-   * Constructs a VariableMatrix from a VariableBlock.
-   *
-   * @param values VariableBlock of values.
-   */
-  public VariableMatrix(VariableBlock values) {
-    m_rows = values.rows();
-    m_cols = values.cols();
-    for (int row = 0; row < m_rows; ++row) {
-      for (int col = 0; col < m_cols; ++col) {
-        m_storage.add(values.get(row, col));
-      }
-    }
-  }
-
-  /**
-   * Returns a block pointing to the given row and column.
-   *
-   * @param row The block row.
-   * @param col The block column.
-   * @return A block pointing to the given row and column.
+   * @param row The row.
+   * @param col The column.
+   * @return The element at the given row and column.
    */
   public Variable get(int row, int col) {
     assert row >= 0 && row < rows();
@@ -308,14 +353,14 @@ public class VariableMatrix implements Iterable<Variable> {
   }
 
   /**
-   * Returns a block pointing to the given row.
+   * Returns the element at the given index.
    *
-   * @param row The block row.
-   * @return A block pointing to the given row.
+   * @param index The index.
+   * @return The element at the given index.
    */
-  public Variable get(int row) {
-    assert row >= 0 && row < rows() * cols();
-    return m_storage.get(row);
+  public Variable get(int index) {
+    assert index >= 0 && index < rows() * cols();
+    return m_storage.get(index);
   }
 
   /**
@@ -433,8 +478,9 @@ public class VariableMatrix implements Iterable<Variable> {
    * @return A segment of the variable vector.
    */
   public VariableBlock segment(int offset, int length) {
-    assert offset >= 0 && offset < rows() * cols();
-    assert length >= 0 && length <= rows() * cols() - offset;
+    assert cols() == 1;
+    assert offset >= 0 && offset < rows();
+    assert length >= 0 && length <= rows() - offset;
     return block(offset, 0, length, 1);
   }
 
@@ -750,10 +796,10 @@ public class VariableMatrix implements Iterable<Variable> {
   }
 
   /**
-   * Returns a row of the variable column vector.
+   * Returns an element of the variable matrix.
    *
    * @param index The index of the element to return.
-   * @return A row of the variable column vector.
+   * @return An element of the variable matrix.
    */
   public double value(int index) {
     assert index >= 0 && index < rows() * cols();
@@ -943,7 +989,9 @@ public class VariableMatrix implements Iterable<Variable> {
         result.block(rowOffset, colOffset, elem.rows(), elem.cols()).set(elem);
         colOffset += elem.cols();
       }
-      rowOffset += row[0].rows();
+      if (row.length > 0) {
+        rowOffset += row[0].rows();
+      }
     }
 
     return result;
@@ -960,30 +1008,10 @@ public class VariableMatrix implements Iterable<Variable> {
     // m x n * n x p = m x p
     assert A.rows() == B.rows();
 
-    return fromHandles(
+    return new VariableMatrix(
         A.cols(),
         B.cols(),
         VariableMatrixJNI.solve(A.getHandles(), A.cols(), B.getHandles(), B.cols()));
-  }
-
-  /**
-   * Constructs a VariableMatrix from Variable internal handles.
-   *
-   * <p>This function is for internal use only.
-   *
-   * @param rows The number of matrix rows.
-   * @param cols The number of matrix columns.
-   * @param handles Variable handles.
-   * @return VariableMatrix wrapping handles.
-   */
-  public static VariableMatrix fromHandles(int rows, int cols, long[] handles) {
-    var result = new VariableMatrix();
-    result.m_rows = rows;
-    result.m_cols = cols;
-    for (int index = 0; index < rows * cols; ++index) {
-      result.m_storage.add(Variable.fromHandle(handles[index]));
-    }
-    return result;
   }
 
   /**

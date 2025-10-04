@@ -68,7 +68,7 @@ public class Jacobian implements AutoCloseable {
    * @return The Jacobian as a VariableMatrix.
    */
   public VariableMatrix get() {
-    return VariableMatrix.fromHandles(m_rows, m_cols, JacobianJNI.get(m_handle));
+    return new VariableMatrix(m_rows, m_cols, JacobianJNI.get(m_handle));
   }
 
   /**

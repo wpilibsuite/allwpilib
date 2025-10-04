@@ -166,7 +166,7 @@ Java_edu_wpi_first_math_autodiff_VariableJNI_type
   (JNIEnv* env, jclass, jlong handle)
 {
   auto& lhsVar = *reinterpret_cast<slp::Variable*>(handle);
-  return static_cast<int>(lhsVar.type());
+  return static_cast<jint>(lhsVar.type());
 }
 
 /*

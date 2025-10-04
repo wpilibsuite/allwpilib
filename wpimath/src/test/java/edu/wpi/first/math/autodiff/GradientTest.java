@@ -85,10 +85,8 @@ class GradientTest {
     a.setValue(1.0);
     var b = new Variable();
     b.setValue(2.0);
-    var c = new Variable();
-    c.setValue(3.0);
 
-    c = a.times(-2);
+    var c = a.times(-2);
     assertEquals(-2.0, new Gradient(c, a).value().get(0, 0));
 
     c = a.div(3.0);

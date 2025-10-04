@@ -6,9 +6,14 @@ package edu.wpi.first.math.autodiff;
 
 /** An autodiff variable pointing to an expression node. */
 public class Variable implements AutoCloseable {
-  private static final class Empty {}
+  /** Handle type tag. */
+  public static final class Handle {
+    /** Constructor for Handle. */
+    public Handle() {}
+  }
 
-  private static final Empty EMPTY = new Empty();
+  /** Instance of handle type tag. */
+  public static final Handle HANDLE = new Handle();
 
   private long m_handle;
 
@@ -17,9 +22,18 @@ public class Variable implements AutoCloseable {
     m_handle = VariableJNI.createDefault();
   }
 
-  /** Constructs an empty Variable. */
+  /**
+   * Constructs a Variable from the given handle.
+   *
+   * <p>This constructor is for internal use only.
+   *
+   * @param handleTypeTag Handle type tag.
+   * @param handle Variable handle.
+   */
   @SuppressWarnings("PMD.UnusedFormalParameter")
-  private Variable(Empty empty) {}
+  public Variable(Handle handleTypeTag, long handle) {
+    m_handle = handle;
+  }
 
   /**
    * Constructs a Variable from a floating point type.
@@ -63,7 +77,7 @@ public class Variable implements AutoCloseable {
    * @return Result of multiplication.
    */
   public Variable times(Variable rhs) {
-    return fromHandle(VariableJNI.times(m_handle, rhs.getHandle()));
+    return new Variable(HANDLE, VariableJNI.times(m_handle, rhs.getHandle()));
   }
 
   /**
@@ -83,7 +97,7 @@ public class Variable implements AutoCloseable {
    * @return Result of division.
    */
   public Variable div(Variable rhs) {
-    return fromHandle(VariableJNI.div(m_handle, rhs.getHandle()));
+    return new Variable(HANDLE, VariableJNI.div(m_handle, rhs.getHandle()));
   }
 
   /**
@@ -103,7 +117,7 @@ public class Variable implements AutoCloseable {
    * @return Result of addition.
    */
   public Variable plus(Variable rhs) {
-    return fromHandle(VariableJNI.plus(m_handle, rhs.getHandle()));
+    return new Variable(HANDLE, VariableJNI.plus(m_handle, rhs.getHandle()));
   }
 
   /**
@@ -123,7 +137,7 @@ public class Variable implements AutoCloseable {
    * @return Result of subtraction.
    */
   public Variable minus(Variable rhs) {
-    return fromHandle(VariableJNI.minus(m_handle, rhs.getHandle()));
+    return new Variable(HANDLE, VariableJNI.minus(m_handle, rhs.getHandle()));
   }
 
   /**
@@ -133,7 +147,7 @@ public class Variable implements AutoCloseable {
    * @return Result of subtraction.
    */
   public Variable minus(double rhs) {
-    return fromHandle(VariableJNI.minus(m_handle, new Variable(rhs).getHandle()));
+    return minus(new Variable(rhs));
   }
 
   /**
@@ -142,7 +156,7 @@ public class Variable implements AutoCloseable {
    * @return Result of unary minus.
    */
   public Variable unaryMinus() {
-    return fromHandle(VariableJNI.unaryMinus(m_handle));
+    return new Variable(HANDLE, VariableJNI.unaryMinus(m_handle));
   }
 
   /**
@@ -182,27 +196,13 @@ public class Variable implements AutoCloseable {
   }
 
   /**
-   * Constructs a Variable from an internal handle.
-   *
-   * <p>This function is for internal use only.
-   *
-   * @param handle Variable handle.
-   * @return Variable wrapping handle.
-   */
-  public static Variable fromHandle(long handle) {
-    var result = new Variable(EMPTY);
-    result.m_handle = handle;
-    return result;
-  }
-
-  /**
    * Math.abs() for Variables.
    *
    * @param x The argument.
    * @return Result of abs().
    */
   public static Variable abs(Variable x) {
-    return fromHandle(VariableJNI.abs(x.getHandle()));
+    return new Variable(HANDLE, VariableJNI.abs(x.getHandle()));
   }
 
   /**
@@ -212,7 +212,7 @@ public class Variable implements AutoCloseable {
    * @return Result of acos().
    */
   public static Variable acos(Variable x) {
-    return fromHandle(VariableJNI.acos(x.getHandle()));
+    return new Variable(HANDLE, VariableJNI.acos(x.getHandle()));
   }
 
   /**
@@ -222,7 +222,7 @@ public class Variable implements AutoCloseable {
    * @return Result of asin().
    */
   public static Variable asin(Variable x) {
-    return fromHandle(VariableJNI.asin(x.getHandle()));
+    return new Variable(HANDLE, VariableJNI.asin(x.getHandle()));
   }
 
   /**
@@ -232,7 +232,7 @@ public class Variable implements AutoCloseable {
    * @return Result of atan().
    */
   public static Variable atan(Variable x) {
-    return fromHandle(VariableJNI.atan(x.getHandle()));
+    return new Variable(HANDLE, VariableJNI.atan(x.getHandle()));
   }
 
   /**
@@ -265,7 +265,7 @@ public class Variable implements AutoCloseable {
    * @return Result of atan2().
    */
   public static Variable atan2(Variable y, Variable x) {
-    return fromHandle(VariableJNI.atan2(y.getHandle(), x.getHandle()));
+    return new Variable(HANDLE, VariableJNI.atan2(y.getHandle(), x.getHandle()));
   }
 
   /**
@@ -275,7 +275,7 @@ public class Variable implements AutoCloseable {
    * @return Result of cbrt().
    */
   public static Variable cbrt(Variable x) {
-    return fromHandle(VariableJNI.cbrt(x.getHandle()));
+    return new Variable(HANDLE, VariableJNI.cbrt(x.getHandle()));
   }
 
   /**
@@ -285,7 +285,7 @@ public class Variable implements AutoCloseable {
    * @return Result of cos().
    */
   public static Variable cos(Variable x) {
-    return fromHandle(VariableJNI.cos(x.getHandle()));
+    return new Variable(HANDLE, VariableJNI.cos(x.getHandle()));
   }
 
   /**
@@ -295,7 +295,7 @@ public class Variable implements AutoCloseable {
    * @return Result of cosh().
    */
   public static Variable cosh(Variable x) {
-    return fromHandle(VariableJNI.cosh(x.getHandle()));
+    return new Variable(HANDLE, VariableJNI.cosh(x.getHandle()));
   }
 
   /**
@@ -305,7 +305,7 @@ public class Variable implements AutoCloseable {
    * @return Result of exp().
    */
   public static Variable exp(Variable x) {
-    return fromHandle(VariableJNI.exp(x.getHandle()));
+    return new Variable(HANDLE, VariableJNI.exp(x.getHandle()));
   }
 
   /**
@@ -338,7 +338,7 @@ public class Variable implements AutoCloseable {
    * @return Result of hypot().
    */
   public static Variable hypot(Variable x, Variable y) {
-    return fromHandle(VariableJNI.hypot(x.getHandle(), y.getHandle()));
+    return new Variable(HANDLE, VariableJNI.hypot(x.getHandle(), y.getHandle()));
   }
 
   /**
@@ -455,7 +455,7 @@ public class Variable implements AutoCloseable {
    * @return Result of pow().
    */
   public static Variable pow(Variable base, Variable power) {
-    return fromHandle(VariableJNI.pow(base.getHandle(), power.getHandle()));
+    return new Variable(HANDLE, VariableJNI.pow(base.getHandle(), power.getHandle()));
   }
 
   /**
@@ -465,7 +465,7 @@ public class Variable implements AutoCloseable {
    * @return Result of log().
    */
   public static Variable log(Variable x) {
-    return fromHandle(VariableJNI.log(x.getHandle()));
+    return new Variable(HANDLE, VariableJNI.log(x.getHandle()));
   }
 
   /**
@@ -475,7 +475,7 @@ public class Variable implements AutoCloseable {
    * @return Result of log10().
    */
   public static Variable log10(Variable x) {
-    return fromHandle(VariableJNI.log10(x.getHandle()));
+    return new Variable(HANDLE, VariableJNI.log10(x.getHandle()));
   }
 
   /**
@@ -485,7 +485,7 @@ public class Variable implements AutoCloseable {
    * @return Result of signum().
    */
   public static Variable signum(Variable x) {
-    return fromHandle(VariableJNI.signum(x.getHandle()));
+    return new Variable(HANDLE, VariableJNI.signum(x.getHandle()));
   }
 
   /**
@@ -495,7 +495,7 @@ public class Variable implements AutoCloseable {
    * @return Result of sin().
    */
   public static Variable sin(Variable x) {
-    return fromHandle(VariableJNI.sin(x.getHandle()));
+    return new Variable(HANDLE, VariableJNI.sin(x.getHandle()));
   }
 
   /**
@@ -505,7 +505,7 @@ public class Variable implements AutoCloseable {
    * @return Result of sinh().
    */
   public static Variable sinh(Variable x) {
-    return fromHandle(VariableJNI.sinh(x.getHandle()));
+    return new Variable(HANDLE, VariableJNI.sinh(x.getHandle()));
   }
 
   /**
@@ -515,7 +515,7 @@ public class Variable implements AutoCloseable {
    * @return Result of sqrt().
    */
   public static Variable sqrt(Variable x) {
-    return fromHandle(VariableJNI.sqrt(x.getHandle()));
+    return new Variable(HANDLE, VariableJNI.sqrt(x.getHandle()));
   }
 
   /**
@@ -525,7 +525,7 @@ public class Variable implements AutoCloseable {
    * @return Result of tan().
    */
   public static Variable tan(Variable x) {
-    return fromHandle(VariableJNI.tan(x.getHandle()));
+    return new Variable(HANDLE, VariableJNI.tan(x.getHandle()));
   }
 
   /**
@@ -535,6 +535,6 @@ public class Variable implements AutoCloseable {
    * @return Result of tanh().
    */
   public static Variable tanh(Variable x) {
-    return fromHandle(VariableJNI.tanh(x.getHandle()));
+    return new Variable(HANDLE, VariableJNI.tanh(x.getHandle()));
   }
 }
