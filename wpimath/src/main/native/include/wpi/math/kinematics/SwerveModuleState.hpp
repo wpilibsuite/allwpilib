@@ -14,7 +14,7 @@ namespace wpi::math {
 /**
  * Represents the state of one swerve module.
  */
-struct WPILIB_DLLEXPORT SwerveModuleState {
+struct [[nodiscard]] WPILIB_DLLEXPORT SwerveModuleState {
   /**
    * Speed of the wheel of the module.
    */
