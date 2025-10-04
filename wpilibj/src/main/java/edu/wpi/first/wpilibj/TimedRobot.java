@@ -85,7 +85,7 @@ public class TimedRobot extends IterativeRobotBase {
   /**
    * Constructor for TimedRobot.
    *
-   * @param period The period of the robot loop function.
+   * @param seconds The period of the robot loop function.
    */
   protected TimedRobot(double seconds) {
     super(seconds);
