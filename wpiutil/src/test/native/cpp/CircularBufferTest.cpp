@@ -251,4 +251,18 @@ TEST(CircularBufferTest, Iterator) {
     EXPECT_EQ(values[i], elem);
     ++i;
   }
+
+  // reverse_iterator
+  i = 2;
+  for (auto it = queue.rbegin(); it != queue.rend(); ++it) {
+    EXPECT_EQ(values[i], *it);
+    --i;
+  }
+
+  // const_reverse_iterator
+  i = 2;
+  for (auto it = queue.crbegin(); it != queue.crend(); ++it) {
+    EXPECT_EQ(values[i], *it);
+    --i;
+  }
 }
