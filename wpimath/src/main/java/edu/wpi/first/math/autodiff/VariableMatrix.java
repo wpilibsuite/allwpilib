@@ -33,6 +33,8 @@ public class VariableMatrix implements Iterable<Variable> {
    * @param handles Variable handles.
    */
   public VariableMatrix(int rows, int cols, long[] handles) {
+    assert handles.length == rows * cols;
+
     m_rows = rows;
     m_cols = cols;
     for (int index = 0; index < rows * cols; ++index) {
@@ -663,7 +665,7 @@ public class VariableMatrix implements Iterable<Variable> {
 
     for (int row = 0; row < result.rows(); ++row) {
       for (int col = 0; col < result.cols(); ++col) {
-        result.set(row, col, get(row, col).plus(new Variable(rhs.get(row, col))));
+        result.set(row, col, get(row, col).plus(rhs.get(row, col)));
       }
     }
 
@@ -790,9 +792,7 @@ public class VariableMatrix implements Iterable<Variable> {
    * @return An element of the variable matrix.
    */
   public double value(int row, int col) {
-    assert row >= 0 && row < rows();
-    assert col >= 0 && col < cols();
-    return m_storage.get(row * cols() + col).value();
+    return get(row, col).value();
   }
 
   /**
@@ -802,8 +802,7 @@ public class VariableMatrix implements Iterable<Variable> {
    * @return An element of the variable matrix.
    */
   public double value(int index) {
-    assert index >= 0 && index < rows() * cols();
-    return m_storage.get(index).value();
+    return get(index).value();
   }
 
   /**

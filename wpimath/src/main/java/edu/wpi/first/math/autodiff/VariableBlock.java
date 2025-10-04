@@ -425,8 +425,9 @@ public class VariableBlock implements Iterable<Variable> {
    * @return A segment of the variable vector.
    */
   public VariableBlock segment(int offset, int length) {
-    assert offset >= 0 && offset < rows() * cols();
-    assert length >= 0 && length <= rows() * cols() - offset;
+    assert cols() == 1;
+    assert offset >= 0 && offset < rows();
+    assert length >= 0 && length <= rows() - offset;
     return block(offset, 0, length, 1);
   }
 
@@ -609,7 +610,7 @@ public class VariableBlock implements Iterable<Variable> {
 
     for (int row = 0; row < result.rows(); ++row) {
       for (int col = 0; col < result.cols(); ++col) {
-        result.set(row, col, get(row, col).plus(new Variable(rhs.get(row, col))));
+        result.set(row, col, get(row, col).plus(rhs.get(row, col)));
       }
     }
 
@@ -736,11 +737,7 @@ public class VariableBlock implements Iterable<Variable> {
    * @return An element of the variable matrix.
    */
   public double value(int row, int col) {
-    assert row >= 0 && row < rows();
-    assert col >= 0 && col < cols();
-    return m_mat
-        .get(m_rowSlice.start + row * m_rowSlice.step, m_colSlice.start + col * m_colSlice.step)
-        .value();
+    return get(row, col).value();
   }
 
   /**
@@ -750,8 +747,7 @@ public class VariableBlock implements Iterable<Variable> {
    * @return An element of the variable block.
    */
   public double value(int index) {
-    assert index >= 0 && index < rows() * cols();
-    return value(index / cols(), index % cols());
+    return get(index).value();
   }
 
   /**

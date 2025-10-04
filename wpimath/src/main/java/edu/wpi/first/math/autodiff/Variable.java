@@ -23,19 +23,6 @@ public class Variable implements AutoCloseable {
   }
 
   /**
-   * Constructs a Variable from the given handle.
-   *
-   * <p>This constructor is for internal use only.
-   *
-   * @param handleTypeTag Handle type tag.
-   * @param handle Variable handle.
-   */
-  @SuppressWarnings("PMD.UnusedFormalParameter")
-  public Variable(Handle handleTypeTag, long handle) {
-    m_handle = handle;
-  }
-
-  /**
    * Constructs a Variable from a floating point type.
    *
    * @param value The value of the Variable.
@@ -53,6 +40,19 @@ public class Variable implements AutoCloseable {
     m_handle = VariableJNI.createInt(value);
   }
 
+  /**
+   * Constructs a Variable from the given handle.
+   *
+   * <p>This constructor is for internal use only.
+   *
+   * @param handleTypeTag Handle type tag.
+   * @param handle Variable handle.
+   */
+  @SuppressWarnings("PMD.UnusedFormalParameter")
+  public Variable(Handle handleTypeTag, long handle) {
+    m_handle = handle;
+  }
+
   @Override
   public void close() {
     if (m_handle != 0) {
@@ -68,6 +68,33 @@ public class Variable implements AutoCloseable {
    */
   public void setValue(double value) {
     VariableJNI.setValue(m_handle, value);
+  }
+
+  /**
+   * Returns the value of this variable.
+   *
+   * @return The value of this variable.
+   */
+  public double value() {
+    return VariableJNI.value(m_handle);
+  }
+
+  /**
+   * Returns the type of this expression (constant, linear, quadratic, or nonlinear).
+   *
+   * @return The type of this expression.
+   */
+  public ExpressionType type() {
+    return ExpressionType.fromInt(VariableJNI.type(m_handle));
+  }
+
+  /**
+   * Returns internal handle.
+   *
+   * @return Internal handle.
+   */
+  public long getHandle() {
+    return m_handle;
   }
 
   /**
@@ -166,33 +193,6 @@ public class Variable implements AutoCloseable {
    */
   public Variable unaryPlus() {
     return this;
-  }
-
-  /**
-   * Returns the value of this variable.
-   *
-   * @return The value of this variable.
-   */
-  public double value() {
-    return VariableJNI.value(m_handle);
-  }
-
-  /**
-   * Returns the type of this expression (constant, linear, quadratic, or nonlinear).
-   *
-   * @return The type of this expression.
-   */
-  public ExpressionType type() {
-    return ExpressionType.fromInt(VariableJNI.type(m_handle));
-  }
-
-  /**
-   * Returns internal handle.
-   *
-   * @return Internal handle.
-   */
-  public long getHandle() {
-    return m_handle;
   }
 
   /**
