@@ -48,14 +48,14 @@ class TimedRobot : public IterativeRobotBase {
   /**
    * Constructor for TimedRobot.
    *
-   * @param period Period.
+   * @param period The period of the robot loop function.
    */
   explicit TimedRobot(units::second_t period = kDefaultPeriod);
 
   /**
    * Constructor for TimedRobot.
    *
-   * @param frequency Frequency.
+   * @param frequency The frequency of the robot loop function.
    */
   explicit TimedRobot(units::hertz_t frequency);
 

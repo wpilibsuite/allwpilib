@@ -85,12 +85,12 @@ public class TimedRobot extends IterativeRobotBase {
   /**
    * Constructor for TimedRobot.
    *
-   * @param period Period in seconds.
+   * @param period The period of the robot loop function.
    */
-  protected TimedRobot(double period) {
-    super(period);
+  protected TimedRobot(double seconds) {
+    super(seconds);
     m_startTimeUs = RobotController.getFPGATime();
-    addPeriodic(this::loopFunc, period);
+    addPeriodic(this::loopFunc, seconds);
     NotifierJNI.setNotifierName(m_notifier, "TimedRobot");
 
     HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Timed);
