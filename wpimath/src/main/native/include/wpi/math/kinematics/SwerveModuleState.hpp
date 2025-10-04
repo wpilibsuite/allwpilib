@@ -14,7 +14,7 @@ namespace wpi::math {
 /**
  * Represents the state of one swerve module.
  */
-struct [[nodiscard]] WPILIB_DLLEXPORT SwerveModuleState {
+struct WPILIB_DLLEXPORT SwerveModuleState {
   /**
    * Speed of the wheel of the module.
    */
@@ -45,6 +45,7 @@ struct [[nodiscard]] WPILIB_DLLEXPORT SwerveModuleState {
    * @param currentAngle The current module angle.
    * @return The optimized module state.
    */
+  [[nodiscard]]
   constexpr SwerveModuleState Optimize(const Rotation2d& currentAngle) {
     auto delta = angle - currentAngle;
     if (wpi::units::math::abs(delta.Degrees()) > 90_deg) {
@@ -62,6 +63,7 @@ struct [[nodiscard]] WPILIB_DLLEXPORT SwerveModuleState {
    * @param currentAngle The current module angle.
    * @return The scaled module state.
    */
+  [[nodiscard]]
   constexpr SwerveModuleState CosineScale(const Rotation2d& currentAngle) {
     return {speed * (angle - currentAngle).Cos(), angle};
   }
