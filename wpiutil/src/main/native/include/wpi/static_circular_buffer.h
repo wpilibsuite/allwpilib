@@ -112,24 +112,24 @@ class static_circular_buffer {
   }
 
   /**
-   * Returns begin iterator.
+   * Returns const begin iterator.
    */
   constexpr const_iterator begin() const { return const_iterator(this, 0); }
 
   /**
-   * Returns end iterator.
+   * Returns const end iterator.
    */
   constexpr const_iterator end() const {
     return const_iterator(this, ::wpi::static_circular_buffer<T, N>::size());
   }
 
   /**
-   * Returns begin iterator.
+   * Returns const begin iterator.
    */
   constexpr const_iterator cbegin() const { return const_iterator(this, 0); }
 
   /**
-   * Returns end iterator.
+   * Returns const end iterator.
    */
   constexpr const_iterator cend() const {
     return const_iterator(this, ::wpi::static_circular_buffer<T, N>::size());
@@ -146,14 +146,14 @@ class static_circular_buffer {
   constexpr reverse_iterator rend() { return reverse_iterator(begin()); }
 
   /**
-   * Returns reverse begin iterator.
+   * Returns const reverse begin iterator.
    */
   constexpr const_reverse_iterator rbegin() const {
     return const_reverse_iterator(end());
   }
 
   /**
-   * Returns reverse end iterator.
+   * Returns const reverse end iterator.
    */
   constexpr const_reverse_iterator rend() const {
     return const_reverse_iterator(begin());
