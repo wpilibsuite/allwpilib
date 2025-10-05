@@ -22,7 +22,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * </ul>
  *
  * <p>The user is responsible for exiting run() when the opmode is directed to stop executing. This
- * is indicated
+ * is indicated by isRunning() returning false. All other methods should be written to return as
+ * quickly as possible when isRunning() returns false.
  */
 public abstract class LinearOpMode implements OpMode {
   /** Constructor. */

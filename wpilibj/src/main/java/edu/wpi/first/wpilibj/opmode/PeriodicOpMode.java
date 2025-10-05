@@ -155,7 +155,7 @@ public abstract class PeriodicOpMode implements OpMode {
   /**
    * Add a callback to run at a specific period.
    *
-   * <p>This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback run
+   * <p>This is scheduled on the same Notifier as periodic(), so periodic() and the callback run
    * synchronously. Interactions between them are thread-safe.
    *
    * @param callback The callback to run.
@@ -168,7 +168,7 @@ public abstract class PeriodicOpMode implements OpMode {
   /**
    * Add a callback to run at a specific period with a starting time offset.
    *
-   * <p>This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback run
+   * <p>This is scheduled on the same Notifier as periodic(), so periodic() and the callback run
    * synchronously. Interactions between them are thread-safe.
    *
    * @param callback The callback to run.
@@ -184,7 +184,7 @@ public abstract class PeriodicOpMode implements OpMode {
   /**
    * Add a callback to run at a specific period.
    *
-   * <p>This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback run
+   * <p>This is scheduled on the same Notifier as periodic(), so periodic() and the callback run
    * synchronously. Interactions between them are thread-safe.
    *
    * @param callback The callback to run.
@@ -197,7 +197,7 @@ public abstract class PeriodicOpMode implements OpMode {
   /**
    * Add a callback to run at a specific period with a starting time offset.
    *
-   * <p>This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback run
+   * <p>This is scheduled on the same Notifier as periodic(), so periodic() and the callback run
    * synchronously. Interactions between them are thread-safe.
    *
    * @param callback The callback to run.
