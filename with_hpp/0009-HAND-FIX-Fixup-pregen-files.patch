@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Mon, 22 Sep 2025 23:53:59 -0400
-Subject: [PATCH 09/24] HAND FIX - Fixup pregen files
+Date: Sat, 4 Oct 2025 15:31:37 -0400
+Subject: [PATCH 09/26] HAND FIX - Fixup pregen files
 
 ---
  .github/actions/pregen/action.yml                  |  2 +-
- command/generate_hids.py                           | 10 +++++-----
+ command2/generate_hids.py                          | 10 +++++-----
  .../src/generate/main/java/commandhid.java.jinja   |  4 ++--
- .../cpp/wpi/command/button/commandhid.cpp.jinja    |  2 +-
- .../wpi/command/button/commandhid.hpp.jinja        |  2 +-
+ .../cpp/wpi/command2/button/commandhid.cpp.jinja   |  2 +-
+ .../wpi/command2/button/commandhid.hpp.jinja       |  2 +-
  ntcore/generate_topics.py                          | 14 ++++++++------
  .../main/java/NetworkTableInstance.java.jinja      | 10 +++++-----
  .../generate/main/java/NetworkTablesJNI.java.jinja |  4 ++--
@@ -34,7 +34,7 @@ Subject: [PATCH 09/24] HAND FIX - Fixup pregen files
  27 files changed, 63 insertions(+), 61 deletions(-)
 
 diff --git a/.github/actions/pregen/action.yml b/.github/actions/pregen/action.yml
-index 3f1f52537b481ff3ed945819816d42c686994692..8c9f183f8f4baf4e5d02018221dd0549df5e4216 100644
+index 24e9daaf07c755f77070b0e77f0c0bbd496e691e..81745a8fa0fb9e2b4e126e8fdeabb6f8c5bdd99c 100644
 --- a/.github/actions/pregen/action.yml
 +++ b/.github/actions/pregen/action.yml
 @@ -43,7 +43,7 @@ runs:
@@ -46,16 +46,16 @@ index 3f1f52537b481ff3ed945819816d42c686994692..8c9f183f8f4baf4e5d02018221dd0549
        shell: bash
  
      - name: Regenerate wpimath
-diff --git a/command/generate_hids.py b/command/generate_hids.py
-index f592b75e433a08e4779f592256523b724bd460a1..04c75cf20acd7aaa8cd6577ce61869ffc76605b5 100755
---- a/command/generate_hids.py
-+++ b/command/generate_hids.py
+diff --git a/command2/generate_hids.py b/command2/generate_hids.py
+index f592b75e433a08e4779f592256523b724bd460a1..213fdbb59c1649152dd99102b275754ff7841600 100755
+--- a/command2/generate_hids.py
++++ b/command2/generate_hids.py
 @@ -22,7 +22,7 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
          controllers = json.load(f)
  
      # Java files
 -    java_subdirectory = "main/java/edu/wpi/first/wpilibj2/command/button"
-+    java_subdirectory = "main/java/org/wpilib/command/button"
++    java_subdirectory = "main/java/org/wpilib/command2/button"
      env = Environment(
          loader=FileSystemLoader(template_directory / "main/java"),
          autoescape=False,
@@ -64,7 +64,7 @@ index f592b75e433a08e4779f592256523b724bd460a1..04c75cf20acd7aaa8cd6577ce61869ff
  
      # C++ headers
 -    hdr_subdirectory = "main/native/include/frc2/command/button"
-+    hdr_subdirectory = "main/native/include/wpi/command/button"
++    hdr_subdirectory = "main/native/include/wpi/command2/button"
      env = Environment(
          loader=FileSystemLoader(template_directory / hdr_subdirectory),
          autoescape=False,
@@ -81,43 +81,43 @@ index f592b75e433a08e4779f592256523b724bd460a1..04c75cf20acd7aaa8cd6577ce61869ff
  
      # C++ files
 -    cpp_subdirectory = "main/native/cpp/frc2/command/button"
-+    cpp_subdirectory = "main/native/cpp/wpi/command/button"
++    cpp_subdirectory = "main/native/cpp/wpi/command2/button"
      env = Environment(
          loader=FileSystemLoader(template_directory / cpp_subdirectory),
          autoescape=False,
-diff --git a/command/src/generate/main/java/commandhid.java.jinja b/command/src/generate/main/java/commandhid.java.jinja
-index 6c1b29c220ea7f4ce87800a085fc3123a2e4a9ee..a749b75f76dbfcc0a08b054514bc2446015098c0 100644
---- a/command/src/generate/main/java/commandhid.java.jinja
-+++ b/command/src/generate/main/java/commandhid.java.jinja
+diff --git a/command2/src/generate/main/java/commandhid.java.jinja b/command2/src/generate/main/java/commandhid.java.jinja
+index 5a65f02c9a0ac36f076f9b73f28c44aedc87e7d0..2955f4443e4940861a65479061fa15ca5423bb5e 100644
+--- a/command2/src/generate/main/java/commandhid.java.jinja
++++ b/command2/src/generate/main/java/commandhid.java.jinja
 @@ -8,9 +8,9 @@
  {%- endmacro %}
- package org.wpilib.command.button;
+ package org.wpilib.command2.button;
  
 -import org.wpilib.{{ ConsoleName }}Controller;
 -import org.wpilib.event.EventLoop;
- import org.wpilib.command.CommandScheduler;
+ import org.wpilib.command2.CommandScheduler;
 +import org.wpilib.driverstation.{{ ConsoleName }}Controller;
 +import org.wpilib.event.EventLoop;
  
  /**
   * A version of {@link {{ ConsoleName }}Controller} with {@link Trigger} factories for command-based.
-diff --git a/command/src/generate/main/native/cpp/wpi/command/button/commandhid.cpp.jinja b/command/src/generate/main/native/cpp/wpi/command/button/commandhid.cpp.jinja
-index 55e689736dd1eca1ff3ccf3ad4d8b4b64600e8ce..b3e19cf73d050791555e08f86c2b652439235515 100644
---- a/command/src/generate/main/native/cpp/wpi/command/button/commandhid.cpp.jinja
-+++ b/command/src/generate/main/native/cpp/wpi/command/button/commandhid.cpp.jinja
+diff --git a/command2/src/generate/main/native/cpp/wpi/command2/button/commandhid.cpp.jinja b/command2/src/generate/main/native/cpp/wpi/command2/button/commandhid.cpp.jinja
+index 6c9f91dc16e189129eacd6c0d82a1866061f91e0..7e695f8044c078654343cea18231937c95eae3c0 100644
+--- a/command2/src/generate/main/native/cpp/wpi/command2/button/commandhid.cpp.jinja
++++ b/command2/src/generate/main/native/cpp/wpi/command2/button/commandhid.cpp.jinja
 @@ -6,7 +6,7 @@
  {% macro capitalize_first(string) -%}
  {{ string[0]|capitalize + string[1:] }}
  {%- endmacro %}
 -#include "frc2/command/button/Command{{ ConsoleName }}Controller.h"
-+#include "wpi/command/button/Command{{ ConsoleName }}Controller.hpp"
++#include "wpi/command2/button/Command{{ ConsoleName }}Controller.hpp"
  
  using namespace frc2;
  
-diff --git a/command/src/generate/main/native/include/wpi/command/button/commandhid.hpp.jinja b/command/src/generate/main/native/include/wpi/command/button/commandhid.hpp.jinja
-index 40b75e932d13542c461552e390ff685bcf7d1588..14cabc6cdb36bdf9b9d1f3b14bd463c74f2eea07 100644
---- a/command/src/generate/main/native/include/wpi/command/button/commandhid.hpp.jinja
-+++ b/command/src/generate/main/native/include/wpi/command/button/commandhid.hpp.jinja
+diff --git a/command2/src/generate/main/native/include/wpi/command2/button/commandhid.hpp.jinja b/command2/src/generate/main/native/include/wpi/command2/button/commandhid.hpp.jinja
+index 5be9670530f9b256d3ef9be94d315c929f5ecfdc..929a556762bad4ee93f951e4fce5ba13c3d28b18 100644
+--- a/command2/src/generate/main/native/include/wpi/command2/button/commandhid.hpp.jinja
++++ b/command2/src/generate/main/native/include/wpi/command2/button/commandhid.hpp.jinja
 @@ -7,7 +7,7 @@
  {{ string[0]|capitalize + string[1:] }}
  {%- endmacro %}
@@ -125,8 +125,8 @@ index 40b75e932d13542c461552e390ff685bcf7d1588..14cabc6cdb36bdf9b9d1f3b14bd463c7
 -#include <frc/{{ ConsoleName }}Controller.h>
 +#include <wpi/driverstation/{{ ConsoleName }}Controller.hpp>
  
- #include "wpi/command/button/Trigger.hpp"
- #include "wpi/command/CommandScheduler.hpp"
+ #include "wpi/command2/button/Trigger.hpp"
+ #include "wpi/command2/CommandScheduler.hpp"
 diff --git a/ntcore/generate_topics.py b/ntcore/generate_topics.py
 index e454048d73c74a459d074c191b4aa4266e65c30c..d55bc223ebd3fc26b7e506b85a8be3b2c40df026 100755
 --- a/ntcore/generate_topics.py

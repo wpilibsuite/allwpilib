@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Fri, 26 Sep 2025 23:38:43 -0400
-Subject: [PATCH 22/24] HAND FIXES: Update maven info
+Date: Sat, 4 Oct 2025 15:36:09 -0400
+Subject: [PATCH 22/26] HAND FIXES: Update maven info
 
 ---
  apriltag/BUILD.bazel                    |  4 ++--
  cameraserver/BUILD.bazel                |  4 ++--
  cameraserver/build.gradle               |  2 +-
- command/BUILD.bazel                     |  4 ++--
- command/build.gradle                    |  2 +-
+ command2/BUILD.bazel                    |  4 ++--
+ command2/build.gradle                   |  2 +-
  cscore/BUILD.bazel                      |  4 ++--
  cscore/build.gradle                     |  2 +-
  datalog/BUILD.bazel                     |  4 ++--
@@ -126,40 +126,40 @@ index 92925c65646a980c07df2079a8b5f556565618c1..654397184449d9dd54873750341182c7
  }
  
  evaluationDependsOn(':ntcore')
-diff --git a/command/BUILD.bazel b/command/BUILD.bazel
-index 60268cf68ae1888be499f2ec745ac1709e269977..ca5bfb4f591576599c5834c438e350cd251d7d1d 100644
---- a/command/BUILD.bazel
-+++ b/command/BUILD.bazel
+diff --git a/command2/BUILD.bazel b/command2/BUILD.bazel
+index f6eeac2d786b0c6c7843e1c2f47d4d69f0335339..5a44bf9bf94cb01e9823332359b1a628c43ce615 100644
+--- a/command2/BUILD.bazel
++++ b/command2/BUILD.bazel
 @@ -105,7 +105,7 @@ wpilib_java_library(
-     name = "command-java",
+     name = "command2-java",
      srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
-     maven_artifact_name = "command-java",
--    maven_group_id = "edu.wpi.first.command",
+     maven_artifact_name = "command2-java",
+-    maven_group_id = "edu.wpi.first.command2",
 +    maven_group_id = "org.wpilib.command",
      visibility = ["//visibility:public"],
      deps = [
          "//cscore:cscore-java",
 @@ -175,5 +175,5 @@ java_binary(
  package_minimal_cc_project(
-     name = "command",
-     maven_artifact_name = "command-cpp",
--    maven_group_id = "edu.wpi.first.command",
-+    maven_group_id = "org.wpilib.command",
+     name = "command2",
+     maven_artifact_name = "command2-cpp",
+-    maven_group_id = "edu.wpi.first.command2",
++    maven_group_id = "org.wpilib.command2",
  )
-diff --git a/command/build.gradle b/command/build.gradle
-index c6353b8fb0b53e16f56ed014753cc82660152495..7bfc074b4c6c13be543e76fde2e684917f88cf04 100644
---- a/command/build.gradle
-+++ b/command/build.gradle
+diff --git a/command2/build.gradle b/command2/build.gradle
+index 0e933fb1b752a0edc17630d12fee6329db82e418..4aa78580a13913fe1779a05c3b386308ef637e7f 100644
+--- a/command2/build.gradle
++++ b/command2/build.gradle
 @@ -1,6 +1,6 @@
  ext {
-     nativeName = 'command'
+     nativeName = 'command2'
 -    devMain = 'edu.wpi.first.wpilibj2.commands.DevMain'
 +    devMain = 'org.wpilib.commands.DevMain'
  }
  
  evaluationDependsOn(':ntcore')
 diff --git a/cscore/BUILD.bazel b/cscore/BUILD.bazel
-index dd0f0daaaeca090f387e7bef241f1bb7939ce3d9..6b469a46bff752f9b5073021a3b1cd16de579f10 100644
+index 6da0c35c7e7dca6af5b145490a687fc5769c5b92..420bc3d2f40feb50d8d1e5e3337342d26276a8ac 100644
 --- a/cscore/BUILD.bazel
 +++ b/cscore/BUILD.bazel
 @@ -210,7 +210,7 @@ wpilib_jni_java_library(
@@ -231,7 +231,7 @@ index 55a23c227a65947a9b5e404af645d8114bf7ce75..d6746c43ff8b32c659ac7f5c500b0cc3
  
  apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 diff --git a/docs/BUILD.bazel b/docs/BUILD.bazel
-index 7f5001bfdc2c0d0d3d58ce9bd122595cdeab3d89..621af9518067b42e4d0e3084b95cf465660de0ac 100644
+index 763554a119fb452403d32dacbedbeb2223881e97..25a46d6585e722b829f907e8cee92a89ceb5946e 100644
 --- a/docs/BUILD.bazel
 +++ b/docs/BUILD.bazel
 @@ -96,7 +96,7 @@ pkg_zip(
@@ -253,7 +253,7 @@ index 7f5001bfdc2c0d0d3d58ce9bd122595cdeab3d89..621af9518067b42e4d0e3084b95cf465
      visibility = ["//visibility:public"],
  )
 diff --git a/docs/build.gradle b/docs/build.gradle
-index e735bb55baff6941b9a100aae084111bf0add8fb..b9fb16b139e7a91943439350e194a76af196656e 100644
+index d7c9075e19e166e85182173de71b2178169829aa..890e7866d6d096f9a6d6693a067509ea900b86a3 100644
 --- a/docs/build.gradle
 +++ b/docs/build.gradle
 @@ -20,12 +20,12 @@ evaluationDependsOn(':romiVendordep')
@@ -274,7 +274,7 @@ index e735bb55baff6941b9a100aae084111bf0add8fb..b9fb16b139e7a91943439350e194a76a
  def outputsFolder = file("$project.buildDir/outputs")
  
 diff --git a/epilogue-processor/BUILD.bazel b/epilogue-processor/BUILD.bazel
-index cdbdc359ad5680222f6ec5eee2196a120ba8006f..9fb84efb83dd26f87418458c5bb0903dff7c8fae 100644
+index a9e2583a84d8442b832bc083132ffc833ab961fa..2d5da99e54b288fdaee7565aceb707f4a43e597d 100644
 --- a/epilogue-processor/BUILD.bazel
 +++ b/epilogue-processor/BUILD.bazel
 @@ -7,7 +7,7 @@ wpilib_java_library(
@@ -287,7 +287,7 @@ index cdbdc359ad5680222f6ec5eee2196a120ba8006f..9fb84efb83dd26f87418458c5bb0903d
      resources = glob(["src/main/resources/**"]),
      visibility = ["//visibility:public"],
 diff --git a/epilogue-processor/build.gradle b/epilogue-processor/build.gradle
-index c2c6f30156360dd4d1950c09fd11419096a929a5..ab24a4b894d6d30d6ebe4f031dbfcc4b957ca773 100644
+index dbd2cc688b1f24765274914e8a5926511d41c648..31aae76e00b167da6fcaeadb5d95fb95c427133f 100644
 --- a/epilogue-processor/build.gradle
 +++ b/epilogue-processor/build.gradle
 @@ -2,7 +2,7 @@ ext {
@@ -463,7 +463,7 @@ index 732652db66d9b12664e0726e7ed8343f16aaddaf..d09a54ed7dbfadd4d199241a695a6f15
      def vsLocator = gradle.services.get(VisualStudioLocator)
  
 diff --git a/ntcore/BUILD.bazel b/ntcore/BUILD.bazel
-index 7ccd91fb1a982c074ac2572f9864e25e3500207e..a8f7380df2a127e2cf3b1da9647b1bd84baae1ad 100644
+index b8ca1cc22640b1a52a06b74bd8d48414747d3bb5..87513bbe36ef24912d1180626cf2b225470b4968 100644
 --- a/ntcore/BUILD.bazel
 +++ b/ntcore/BUILD.bazel
 @@ -161,7 +161,7 @@ wpilib_jni_java_library(
@@ -626,7 +626,7 @@ index 7349c7bab1fe76505a4582ebfebb7838a97978a5..212090b3c683382f565faaefe68d2298
 +    maven_group_id = "org.wpilib.halsim",
  )
 diff --git a/simulation/halsim_gui/BUILD.bazel b/simulation/halsim_gui/BUILD.bazel
-index f14ad8a1c677c63bac1bd33e2e04698f0344376f..5b3148730d41a668c7659bbd2cc4a403a3a36dc0 100644
+index c72bd44a3b74ec5dd62f563affd1df5385d214d3..fdec998e6fa6450e5ac6010b3ccd97f82f9c87a1 100644
 --- a/simulation/halsim_gui/BUILD.bazel
 +++ b/simulation/halsim_gui/BUILD.bazel
 @@ -144,5 +144,5 @@ cc_binary(
@@ -637,7 +637,7 @@ index f14ad8a1c677c63bac1bd33e2e04698f0344376f..5b3148730d41a668c7659bbd2cc4a403
 +    maven_group_id = "org.wpilib.halsim",
  )
 diff --git a/simulation/halsim_ws_client/BUILD.bazel b/simulation/halsim_ws_client/BUILD.bazel
-index b582d07d001b4132cb5eb8fa1fcb937b60509bfa..fe1650defd1846d2541fd3c4f15921eedb5562a7 100644
+index 3c485afa71ecde5ce149658f6f31faaea0a107a1..69cc886f0eb84c00f9170d3aa85a65220d8c19e7 100644
 --- a/simulation/halsim_ws_client/BUILD.bazel
 +++ b/simulation/halsim_ws_client/BUILD.bazel
 @@ -66,5 +66,5 @@ cc_binary(
@@ -648,7 +648,7 @@ index b582d07d001b4132cb5eb8fa1fcb937b60509bfa..fe1650defd1846d2541fd3c4f15921ee
 +    maven_group_id = "org.wpilib.halsim",
  )
 diff --git a/simulation/halsim_ws_core/BUILD.bazel b/simulation/halsim_ws_core/BUILD.bazel
-index 7092ce11b137e247d42863878e272dcd4ca17fac..4d2e37267ee2acfb3e3b0b1b5e8deab93c091ea2 100644
+index a148e915b5f8d56d0d89ec83b387328981b3cebe..dd8df3c531aa3e2d49e3118bf6a79edcec8452a4 100644
 --- a/simulation/halsim_ws_core/BUILD.bazel
 +++ b/simulation/halsim_ws_core/BUILD.bazel
 @@ -50,5 +50,5 @@ wpilib_cc_static_library(
@@ -659,7 +659,7 @@ index 7092ce11b137e247d42863878e272dcd4ca17fac..4d2e37267ee2acfb3e3b0b1b5e8deab9
 +    maven_group_id = "org.wpilib.halsim",
  )
 diff --git a/simulation/halsim_ws_server/BUILD.bazel b/simulation/halsim_ws_server/BUILD.bazel
-index a0ca0249e79fe997c4c387f1cbc71554ebbddc50..1fedfd261324011a8bd3097af6bde9385ec6175f 100644
+index 18d3631773e370bdbb4665619579a70b809c1536..0ce6862652dc9680300d918c73d06aca831e4d63 100644
 --- a/simulation/halsim_ws_server/BUILD.bazel
 +++ b/simulation/halsim_ws_server/BUILD.bazel
 @@ -103,5 +103,5 @@ cc_binary(
@@ -670,7 +670,7 @@ index a0ca0249e79fe997c4c387f1cbc71554ebbddc50..1fedfd261324011a8bd3097af6bde938
 +    maven_group_id = "org.wpilib.halsim",
  )
 diff --git a/simulation/halsim_xrp/BUILD.bazel b/simulation/halsim_xrp/BUILD.bazel
-index 94edec015821ee8dd33f5afeda7091bc1aacfa80..8e97e648b0074f7f686bf858aeef9c8030de6ed7 100644
+index 1d3f8cc2511d0052dff0b16da54e75d25dedb099..477dda6bed866f57322719120d56ad34ce2d6d39 100644
 --- a/simulation/halsim_xrp/BUILD.bazel
 +++ b/simulation/halsim_xrp/BUILD.bazel
 @@ -79,5 +79,5 @@ cc_binary(
@@ -733,10 +733,10 @@ index 824962e6904f6fd431c300e145787629dee93510..4e29617b003576f417a3fee023e71e51
  def outputsFolder = file("$project.buildDir/outputs")
  
 diff --git a/tools/processstarter/BUILD.bazel b/tools/processstarter/BUILD.bazel
-index 656a0bf5c2a428298f7fb3119c288d953d2eb54c..500ac56c9abcbc993041cc078884f64291cffd72 100644
+index bf8abb1a3df3193149b2eb243b8a36de325185f6..8ef48b485bf210d9f47be6c8c7bd2933b282bebe 100644
 --- a/tools/processstarter/BUILD.bazel
 +++ b/tools/processstarter/BUILD.bazel
-@@ -50,5 +50,5 @@ cc_binary(
+@@ -47,5 +47,5 @@ cc_binary(
  package_binary_cc_project(
      name = "processstarter",
      maven_artifact_name = "processstarter",
@@ -989,10 +989,10 @@ index 02c82ca847c0267dd1136eda66e795af89a2f5b5..30ea83a293e64ba754893b623b36b852
  def outputsFolder = file("$project.buildDir/outputs")
  
 diff --git a/wpimath/BUILD.bazel b/wpimath/BUILD.bazel
-index 09d4ff1601fa3f1bee75aca8fff4fef317f38acd..8b2e7b54962f2cec9275f88a42b826c0b9bf0af7 100644
+index 1a8a02c0ef235a88ad1fd85da74c09c11cf81659..61f0b905e6d456d7bbf0c0e7b586a807b1155137 100644
 --- a/wpimath/BUILD.bazel
 +++ b/wpimath/BUILD.bazel
-@@ -227,7 +227,7 @@ wpilib_jni_java_library(
+@@ -232,7 +232,7 @@ wpilib_jni_java_library(
      name = "wpimath-java",
      srcs = [":generated_java"] + glob(["src/main/java/**/*.java"]),
      maven_artifact_name = "wpimath-java",
@@ -1001,7 +1001,7 @@ index 09d4ff1601fa3f1bee75aca8fff4fef317f38acd..8b2e7b54962f2cec9275f88a42b826c0
      native_libs = [":wpimathjni"],
      resource_strip_prefix = "wpimath/src/main/proto",
      resources = glob(["src/main/proto/**"]),
-@@ -312,5 +312,5 @@ py_binary(
+@@ -317,5 +317,5 @@ py_binary(
  package_default_jni_project(
      name = "wpimath",
      maven_artifact_name = "wpimath-cpp",
@@ -1022,7 +1022,7 @@ index b16e9e28265a7d9bd95be488f6fc44c776d6ef65..e797ab482ec6f10660329c71ac1a1ed5
      nativeName = 'wpimath'
      devMain = 'org.wpilib.math.DevMain'
 diff --git a/wpinet/BUILD.bazel b/wpinet/BUILD.bazel
-index 7814d5555f60fd61c0f08e8372b9d889bdf6487b..832e63376a73ff30e0af92e5236890629d133016 100644
+index de9fa913798409653d081930d96e7e645ecd179a..19917d9a226ec0086e2126f98a12ec006443c4e7 100644
 --- a/wpinet/BUILD.bazel
 +++ b/wpinet/BUILD.bazel
 @@ -216,7 +216,7 @@ wpilib_jni_java_library(

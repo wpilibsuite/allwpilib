@@ -8,6 +8,7 @@ import shutil
 import subprocess
 from typing import Dict
 import logging
+import collections
 
 """
 This script will refactor wpilib. It does this in multiple steps:
@@ -37,7 +38,7 @@ class RawConfig:
 
     # Bulk project moves.
     PROJECT_RENAMES = [
-        ("wpilibNewCommands/", "command/"),
+        ("wpilibNewCommands/", "command2/"),
         ("fieldImages/", "fields/"),
         ("datalogtool/", "tools/datalogtool/"),
         ("outlineviewer/", "tools/outlineviewer/"),
@@ -59,21 +60,24 @@ class RawConfig:
         ("wpiutil/src/main/native/thirdparty/llvm/include", "wpi", "wpi/util"),
         ("wpiutil/src/main/native/thirdparty/mpack/include", "wpi", "wpi/util"),
         # Leave nanopb alone
+        ("wpiutil/src/test/native/include", "wpi", "wpi/util"),
         ("wpiutil/src/main/native/thirdparty/sigslot/include", "wpi", "wpi/util"),
         # Leave upb alone
         ("wpinet/src/main/native/include", "wpinet", "wpi/net"),
         ("wpinet/src/main/native/thirdparty/tcpsockets/include", "wpinet", "wpi/net"),
-        # No datalog
+        # datalog here for the auto h -> hpp change
+        ("datalog/src/main/native/include", "wpi/datalog", "wpi/datalog"),
         ("ntcore/src/main/native/include", "networktables", "wpi/ntcore"),
         ("ntcore/src/generated/main/native/include", "networktables", "wpi/ntcore"),
         ("hal/src/main/native/include", "hal", "wpi/hal"),
         ("wpimath/src/main/native/include", "frc", "wpi/math"),
         ("wpimath/src/main/native/include", "units", "wpi/units"),
+        ("wpimath/src/test/native/include", "trajectory", "wpi/math/trajectory"),
         ("wpilibc/src/main/native/include", "frc", "wpi"),
         ("wpilibc/src/generated/main/native/include", "frc", "wpi"),
         ("apriltag/src/main/native/include", "frc", "wpi"),
-        ("command/src/main/native/include", "frc2", "wpi"),
-        ("command/src/generated/main/native/include", "frc2", "wpi"),
+        ("command2/src/main/native/include", "frc2/command", "wpi/command2"),
+        ("command2/src/generated/main/native/include", "frc2/command", "wpi/command2"),
         ("fields/src/main/native/include", "fields", "wpi/fields"),
         ("cameraserver/src/main/native/include", "cameraserver", "wpi/cameraserver"),
         ("cameraserver/src/main/native/include", "vision", "wpi/vision"),
@@ -83,6 +87,7 @@ class RawConfig:
         # cscore root handled with CC_FILE_RENAMES
         ("romiVendordep/src/main/native/include", "frc/romi", "wpi/romi"),
         ("xrpVendordep/src/main/native/include", "frc/xrp", "wpi/xrp"),
+        ("tools/sysid/src/main/native/include", "sysid", "wpi/sysid"),
     ]
 
     # Individual C++ file renames. 
@@ -107,10 +112,23 @@ class RawConfig:
             ],
         ),
         (
+            pathlib.Path("fields/src/main/native/include"),
+            [
+                # The script gets messed up with this one
+                ("fields/fields.h", "wpi/fields/fields.hpp"),
+            ],
+        ),
+        (
             pathlib.Path("ntcore/src/generated/main/native/include"),
             [
                 ("ntcore_c_types.h", "wpi/ntcore/ntcore_c_types.h"),
                 ("ntcore_cpp_types.h", "wpi/ntcore/ntcore_cpp_types" + NEW_CC_FILE_SUFFIX),
+            ],
+        ),
+        (
+            pathlib.Path("ntcoreffi/src/main/native/include"),
+            [
+                ("DataLogManager.h", "DataLogManager" + NEW_CC_FILE_SUFFIX),
             ],
         ),
         (
@@ -141,7 +159,7 @@ class RawConfig:
             pathlib.Path("wpigui/src/main/native/include"),
             [
                 ("wpigui_openurl.h", "wpi/gui/wpigui_openurl" + NEW_CC_FILE_SUFFIX),
-                ("portable-file-dialogs.h", "wpi/gui/portable-file-dialogs" + NEW_CC_FILE_SUFFIX),
+                ("portable-file-dialogs.h", "wpi/gui/portable-file-dialogs.h"),
                 ("wpigui_internal.h", "wpi/gui/wpigui_internal" + NEW_CC_FILE_SUFFIX),
                 ("wpigui.h", "wpi/gui/wpigui" + NEW_CC_FILE_SUFFIX),
             ],
@@ -163,6 +181,7 @@ class RawConfig:
                 ("frc/DigitalInput.h", "wpi/hardware/discrete/DigitalInput" + NEW_CC_FILE_SUFFIX),
                 ("frc/DigitalOutput.h", "wpi/hardware/discrete/DigitalOutput" + NEW_CC_FILE_SUFFIX),
                 ("frc/PWM.h", "wpi/hardware/discrete/PWM" + NEW_CC_FILE_SUFFIX),
+                ("frc/OnBoardIMU.h", "wpi/hardware/imu/OnBoardIMU" + NEW_CC_FILE_SUFFIX),
                 ("frc/AddressableLED.h", "wpi/hardware/led/AddressableLED" + NEW_CC_FILE_SUFFIX),
                 ("frc/LEDPattern.h", "wpi/hardware/led/LEDPattern" + NEW_CC_FILE_SUFFIX),
                 ("frc/motorcontrol/MotorController.h", "wpi/hardware/motor/MotorController" + NEW_CC_FILE_SUFFIX),
@@ -191,6 +210,7 @@ class RawConfig:
                 ("frc/TimesliceRobot.h", "wpi/opmode/TimesliceRobot" + NEW_CC_FILE_SUFFIX),
                 ("frc/DataLogManager.h", "wpi/system/DataLogManager" + NEW_CC_FILE_SUFFIX),
                 ("frc/Filesystem.h", "wpi/system/Filesystem" + NEW_CC_FILE_SUFFIX),
+                ("frc/Notifier.h", "wpi/system/Notifier" + NEW_CC_FILE_SUFFIX),
                 ("frc/Resource.h", "wpi/system/Resource" + NEW_CC_FILE_SUFFIX),
                 ("frc/RobotController.h", "wpi/system/RobotController" + NEW_CC_FILE_SUFFIX),
                 ("frc/ScopedTracer.h", "wpi/system/ScopedTracer" + NEW_CC_FILE_SUFFIX),
@@ -199,6 +219,8 @@ class RawConfig:
                 ("frc/Tracer.h", "wpi/system/Tracer" + NEW_CC_FILE_SUFFIX),
                 ("frc/WPILibVersion.h", "wpi/system/WPILibVersion" + NEW_CC_FILE_SUFFIX),
                 ("frc/Watchdog.h", "wpi/system/Watchdog" + NEW_CC_FILE_SUFFIX),
+                ("frc/Alert.h", "wpi/util/Alert" + NEW_CC_FILE_SUFFIX),
+                ("frc/Preferences.h", "wpi/util/Preferences" + NEW_CC_FILE_SUFFIX),
             ],
         ),
         (
@@ -225,6 +247,79 @@ class RawConfig:
                 ("frc/motorcontrol/PWMSparkMax.h", "wpi/hardware/motor/PWMSparkMax" + NEW_CC_FILE_SUFFIX),
             ],
         ),
+        (
+            pathlib.Path("simulation/halsim_ds_socket/src/main/native/include"),
+            [
+                ("DSCommJoystickPacket.h", "wpi/halsim/ds_socket/DSCommJoystickPacket" + NEW_CC_FILE_SUFFIX),
+                ("DSCommPacket.h", "wpi/halsim/ds_socket/DSCommPacket" + NEW_CC_FILE_SUFFIX),
+            ],
+        ),
+        (
+            pathlib.Path("simulation/halsim_gui/src/main/native/include"),
+            [
+                ("HALDataSource.h", "wpi/halsim/gui/HALDataSource" + NEW_CC_FILE_SUFFIX),
+                ("HALProvider.h", "wpi/halsim/gui/HALProvider" + NEW_CC_FILE_SUFFIX),
+                ("HALSimGui.h", "wpi/halsim/gui/HALSimGui" + NEW_CC_FILE_SUFFIX),
+                ("HALSimGuiExt.h", "wpi/halsim/gui/HALSimGuiExt" + NEW_CC_FILE_SUFFIX),
+                ("SimDeviceGui.h", "wpi/halsim/gui/SimDeviceGui" + NEW_CC_FILE_SUFFIX),
+            ],
+        ),
+        (
+            pathlib.Path("simulation/halsim_ws_client/src/main/native/include"),
+            [
+                ("HALSimWS.h", "wpi/halsim/ws_client/HALSimWS" + NEW_CC_FILE_SUFFIX),
+                ("HALSimWSClient.h", "wpi/halsim/ws_client/HALSimWSClient" + NEW_CC_FILE_SUFFIX),
+                ("HALSimWSClientConnection.h", "wpi/halsim/ws_client/HALSimWSClientConnection" + NEW_CC_FILE_SUFFIX),
+            ],
+        ),
+        (
+            pathlib.Path("simulation/halsim_ws_core/src/main/native/include"),
+            [
+                ("HALSimBaseWebSocketConnection.h", "wpi/halsim/ws_core/HALSimBaseWebSocketConnection" + NEW_CC_FILE_SUFFIX),
+                ("WSBaseProvider.h", "wpi/halsim/ws_core/WSBaseProvider" + NEW_CC_FILE_SUFFIX),
+                ("WSHalProviders.h", "wpi/halsim/ws_core/WSHalProviders" + NEW_CC_FILE_SUFFIX),
+                ("WSProviderContainer.h", "wpi/halsim/ws_core/WSProviderContainer" + NEW_CC_FILE_SUFFIX),
+                ("WSProvider_AddressableLED.h", "wpi/halsim/ws_core/WSProvider_AddressableLED" + NEW_CC_FILE_SUFFIX),
+                ("WSProvider_Analog.h", "wpi/halsim/ws_core/WSProvider_Analog" + NEW_CC_FILE_SUFFIX),
+                ("WSProvider_DIO.h", "wpi/halsim/ws_core/WSProvider_DIO" + NEW_CC_FILE_SUFFIX),
+                ("WSProvider_DriverStation.h", "wpi/halsim/ws_core/WSProvider_DriverStation" + NEW_CC_FILE_SUFFIX),
+                ("WSProvider_Encoder.h", "wpi/halsim/ws_core/WSProvider_Encoder" + NEW_CC_FILE_SUFFIX),
+                ("WSProvider_HAL.h", "wpi/halsim/ws_core/WSProvider_HAL" + NEW_CC_FILE_SUFFIX),
+                ("WSProvider_Joystick.h", "wpi/halsim/ws_core/WSProvider_Joystick" + NEW_CC_FILE_SUFFIX),
+                ("WSProvider_PCM.h", "wpi/halsim/ws_core/WSProvider_PCM" + NEW_CC_FILE_SUFFIX),
+                ("WSProvider_PWM.h", "wpi/halsim/ws_core/WSProvider_PWM" + NEW_CC_FILE_SUFFIX),
+                ("WSProvider_RoboRIO.h", "wpi/halsim/ws_core/WSProvider_RoboRIO" + NEW_CC_FILE_SUFFIX),
+                ("WSProvider_SimDevice.h", "wpi/halsim/ws_core/WSProvider_SimDevice" + NEW_CC_FILE_SUFFIX),
+                ("WSProvider_Solenoid.h", "wpi/halsim/ws_core/WSProvider_Solenoid" + NEW_CC_FILE_SUFFIX),
+                ("WSProvider_dPWM.h", "wpi/halsim/ws_core/WSProvider_dPWM" + NEW_CC_FILE_SUFFIX),
+            ],
+        ),
+        (
+            pathlib.Path("simulation/halsim_ws_server/src/main/native/include"),
+            [
+                ("HALSimHttpConnection.h", "wpi/halsim/ws_server/HALSimHttpConnection" + NEW_CC_FILE_SUFFIX),
+                ("HALSimWSServer.h", "wpi/halsim/ws_server/HALSimWSServer" + NEW_CC_FILE_SUFFIX),
+                ("HALSimWeb.h", "wpi/halsim/ws_server/HALSimWeb" + NEW_CC_FILE_SUFFIX),
+            ],
+        ),
+        (
+            pathlib.Path("simulation/halsim_xrp/src/main/native/include"),
+            [
+                ("HALSimXRP.h", "wpi/halsim/xrp/HALSimXRP" + NEW_CC_FILE_SUFFIX),
+                ("HALSimXRPClient.h", "wpi/halsim/xrp/HALSimXRPClient" + NEW_CC_FILE_SUFFIX),
+                ("XRP.h", "wpi/halsim/xrp/XRP" + NEW_CC_FILE_SUFFIX),
+            ],
+        ),
+        (
+            pathlib.Path("tools/wpical/src/main/native/include"),
+            [
+                ("cameracalibration.h", "cameracalibration" + NEW_CC_FILE_SUFFIX),
+                ("fieldcalibration.h", "fieldcalibration" + NEW_CC_FILE_SUFFIX),
+                ("fieldmap.h", "fieldmap" + NEW_CC_FILE_SUFFIX),
+                ("fmap.h", "fmap" + NEW_CC_FILE_SUFFIX),
+                ("tagpose.h", "tagpose" + NEW_CC_FILE_SUFFIX),
+            ],
+        ),
     ]
 
     # Package changes (and therefor folder moves) for java projects.
@@ -234,7 +329,7 @@ class RawConfig:
         ("wpimath", "edu.wpi.first.math", "org.wpilib.math"),
         ("wpinet", "edu.wpi.first.net", "org.wpilib.net"),
         ("datalog", "edu.wpi.first.datalog", "org.wpilib.datalog"),
-        ("command", "edu.wpi.first.wpilibj2.command", "org.wpilib.command"),
+        ("command2", "edu.wpi.first.wpilibj2.command", "org.wpilib.command2"),
         ("ntcore", "edu.wpi.first.networktables", "org.wpilib.networktables"),
         ("fields", "edu.wpi.first.fields", "org.wpilib.fields"),
         ("hal", "edu.wpi.first.hal", "org.wpilib.hardware.hal"),
@@ -273,8 +368,9 @@ class RawConfig:
             ],
         ),
         (
-            pathlib.Path("command"),
+            pathlib.Path("command2"),
             [
+                ("edu/wpi/first/wpilibj2/commands", "org/wpilib/command2", "DevMain"),
                 ("edu/wpi/first/wpilibj2", "org/wpilib", "MockHardwareExtension"),
             ],
         ),
@@ -310,6 +406,7 @@ class RawConfig:
                 ("edu/wpi/first/wpilibj", "org/wpilib/driverstation", "PS5Controller"),
                 ("edu/wpi/first/wpilibj", "org/wpilib/driverstation", "StadiaController"),
                 ("edu/wpi/first/wpilibj", "org/wpilib/driverstation", "XboxController"),
+                ("edu/wpi/first/wpilibj", "org/wpilib/driverstation", "DSControlWord"),
                 ("edu/wpi/first/wpilibj", "org/wpilib/hardware/bus", "CAN"),
                 ("edu/wpi/first/wpilibj", "org/wpilib/hardware/bus", "I2C"),
                 ("edu/wpi/first/wpilibj", "org/wpilib/hardware/bus", "SerialPort"),
@@ -320,6 +417,7 @@ class RawConfig:
                 ("edu/wpi/first/wpilibj", "org/wpilib/hardware/discrete", "DigitalInput"),
                 ("edu/wpi/first/wpilibj", "org/wpilib/hardware/discrete", "DigitalOutput"),
                 ("edu/wpi/first/wpilibj", "org/wpilib/hardware/discrete", "PWM"),
+                ("edu/wpi/first/wpilibj", "org/wpilib/hardware/imu", "OnboardIMU"),
                 ("edu/wpi/first/wpilibj", "org/wpilib/hardware/led", "AddressableLED"),
                 ("edu/wpi/first/wpilibj", "org/wpilib/hardware/led", "AddressableLEDBuffer"),
                 ("edu/wpi/first/wpilibj", "org/wpilib/hardware/led", "AddressableLEDBufferView"),
@@ -361,6 +459,7 @@ class RawConfig:
                 ("edu/wpi/first/wpilibj", "org/wpilib/hardware/pneumatic", "SolenoidTestCTRE"),
                 ("edu/wpi/first/wpilibj", "org/wpilib/hardware/pneumatic", "SolenoidTestREV"),
                 ("edu/wpi/first/wpilibj", "org/wpilib/hardware/power", "PowerDistribution"),
+                ("edu/wpi/first/wpilibj", "org/wpilib/hardware/range", "SharpIR"),
                 ("edu/wpi/first/wpilibj", "org/wpilib/hardware/rotation", "AnalogEncoder"),
                 ("edu/wpi/first/wpilibj", "org/wpilib/hardware/rotation", "AnalogPotentiometer"),
                 ("edu/wpi/first/wpilibj", "org/wpilib/hardware/rotation", "DutyCycle"),
@@ -374,12 +473,18 @@ class RawConfig:
                 ("edu/wpi/first/wpilibj", "org/wpilib/opmode", "TimesliceRobot"),
                 ("edu/wpi/first/wpilibj", "org/wpilib/system", "DataLogManager"),
                 ("edu/wpi/first/wpilibj", "org/wpilib/system", "Filesystem"),
+                ("edu/wpi/first/wpilibj", "org/wpilib/system", "Notifier"),
                 ("edu/wpi/first/wpilibj", "org/wpilib/system", "Resource"),
                 ("edu/wpi/first/wpilibj", "org/wpilib/system", "RobotController"),
+                ("edu/wpi/first/wpilibj", "org/wpilib/system", "RuntimeType"),
+                ("edu/wpi/first/wpilibj", "org/wpilib/system", "SensorUtil"),
+                ("edu/wpi/first/wpilibj", "org/wpilib/system", "SystemServer"),
                 ("edu/wpi/first/wpilibj", "org/wpilib/system", "Threads"),
                 ("edu/wpi/first/wpilibj", "org/wpilib/system", "Timer"),
                 ("edu/wpi/first/wpilibj", "org/wpilib/system", "Tracer"),
                 ("edu/wpi/first/wpilibj", "org/wpilib/system", "Watchdog"),
+                ("edu/wpi/first/wpilibj", "org/wpilib/util", "Alert"),
+                ("edu/wpi/first/wpilibj", "org/wpilib/util", "Preferences"),
             ],
         ),
     ]
@@ -390,18 +495,17 @@ class RawConfig:
     GENERIC_RENAMES = [
         ("apriltag/src/main/native/resources/edu/wpi/first", "apriltag/src/main/native/resources/org/wpilib/vision"),
         ("apriltag/src/test/resources/edu/wpi/first", "apriltag/src/test/resources/org/wpilib/vision"),
-        ("command/src/generate/main/native/cpp/frc2/", "command/src/generate/main/native/cpp/wpi/"),
-        ("command/src/generate/main/native/include/frc2/", "command/src/generate/main/native/include/wpi/"),
-        ("command/wpilibnewcommands-config.cmake.in", "command/command-config.cmake.in"),
-        ("command/src/generated/main/native/cpp/frc2/", "command/src/generated/main/native/cpp/wpi/"),
-        ("command/src/test/native/cpp/frc2/", "command/src/test/native/cpp/wpi/"),
-        ("command/src/generate/main/native/include/wpi/command/button/commandhid.h.jinja", "command/src/generate/main/native/include/wpi/command/button/commandhid.hpp.jinja"),
+        ("command2/src/generate/main/native/cpp/frc2/command/", "command2/src/generate/main/native/cpp/wpi/command2"),
+        ("command2/src/generate/main/native/include/frc2/command/", "command2/src/generate/main/native/include/wpi/command2"),
+        ("command2/wpilibnewcommands-config.cmake.in", "command2/command2-config.cmake.in"),
+        ("command2/src/generated/main/native/cpp/frc2/command", "command2/src/generated/main/native/cpp/wpi/command2"),
+        ("command2/src/test/native/cpp/frc2/", "command2/src/test/native/cpp/wpi/"),
+        ("command2/src/generate/main/native/include/wpi/command2/button/commandhid.h.jinja", "command2/src/generate/main/native/include/wpi/command2/button/commandhid.hpp.jinja"),
         ("fields/fieldimages-config.cmake.in", "fields/fields-config.cmake.in"),
         ("fields/src/main/native/resources/edu/wpi/first", "fields/src/main/native/resources/org/wpilib"),
-        ("fields/src/test/native/resources/edu/wpi/first", "fields/src/test/native/resources/org/wpilib"),
         ("ntcore/src/generate/main/native/include/networktables/Topic.h.jinja", "ntcore/src/generate/main/native/include/wpi/ntcore/Topic" + NEW_CC_FILE_SUFFIX + ".jinja"),
         ("ntcore/src/generate/main/native/include/ntcore_cpp_types.h.jinja", "ntcore/src/generate/main/native/include/ntcore_cpp_types.hpp.jinja"),
-        ("/home/pjreiniger/git/allwpilib/wpilibj/src/test/resources/edu/wpi/first/wpilibj/", "/home/pjreiniger/git/allwpilib/wpilibj/src/test/resources/org/wpilib/"),
+        ("wpilibj/src/test/resources/edu/wpi/first/wpilibj/", "wpilibj/src/test/resources/org/wpilib/util"),
         ("wpilibc/src/generate/main/native/include/frc/", "wpilibc/src/generate/main/native/include/wpi/"),
         ("wpilibc/src/generate/main/native/include/wpi/hid.h.jinja", "wpilibc/src/generate/main/native/include/wpi/driverstation/hid" + NEW_CC_FILE_SUFFIX + ".jinja"),
         ("wpilibc/src/generate/main/native/include/wpi/motorcontroller/pwm_motor_controller.h.jinja", "wpilibc/src/generate/main/native/include/wpi/hardware/motor/pwm_motor_controller" + NEW_CC_FILE_SUFFIX + ".jinja"),
@@ -410,17 +514,21 @@ class RawConfig:
 
 @dataclasses.dataclass
 class PreprocessedConfig:
-    cc_file_renames: int
-    cc_include_replacements: int
-    java_pkg_renames: int
+    cc_file_renames: Dict[str, str]
+    cc_include_replacements: Dict[str, str]
+    java_pkg_renames: Dict[str, str]
     java_file_renames: Dict[str, str]
     java_class_package_overrides: Dict[str, str]
+    cc_private_file_renames: Dict[str, Dict[str, str]]
+    cc_private_include_replacements: Dict[str, Dict[str, str]]
 
     def write_json(self, f):
         return json.dump(
             dict(
                 cc_file_renames=self.cc_file_renames,
                 cc_include_replacements=self.cc_include_replacements,
+                cc_private_file_renames=self.cc_private_file_renames,
+                cc_private_include_replacements=self.cc_private_include_replacements,
                 java_file_renames=self.java_file_renames,
                 java_pkg_renames=self.java_pkg_renames,
                 java_class_package_overrides=self.java_class_package_overrides,
@@ -460,6 +568,7 @@ def maybe_rename_java_file(class_import_renames, class_package_overrides, file_r
         / new_pkg_as_dir
         / (class_name + ".java")
     )
+
     if original_file.exists():
         class_import_renames[old_pkg + "." + class_name] = (
             new_pkg + "." + class_name
@@ -498,6 +607,7 @@ def preprocess_java_renames():
             maybe_rename_java_file(class_import_renames, class_package_overrides, file_renames, project, old_pkg, new_pkg, "src/test/java", class_name)
             maybe_rename_java_file(class_import_renames, class_package_overrides, file_renames, project, old_pkg, new_pkg, "src/test/java", class_name + "Test")
             maybe_rename_java_file(class_import_renames, class_package_overrides, file_renames, project, old_pkg, new_pkg, "src/generated/main/java", class_name)
+            maybe_rename_java_file(class_import_renames, class_package_overrides, file_renames, project, old_pkg, new_pkg, "src/dev/java", class_name)
 
     package_replacements = {}
     package_replacements.update(class_import_renames)
@@ -509,7 +619,7 @@ def preprocess_java_renames():
 def _preprocess_cc_file(original_dir, new_dir, original_file, include_root):
     original_rel = original_file.relative_to(include_root)
     
-    if original_file.suffix == ".h" and "thirdparty" not in str(original_file):
+    if original_file.suffix == ".h" and "thirdparty" not in str(original_file) and not str(original_file).endswith("_c.h"):
         destination_file = include_root / (
             str(original_rel).replace(original_dir, new_dir) + "pp"
         )
@@ -525,6 +635,8 @@ def _preprocess_cc_file(original_dir, new_dir, original_file, include_root):
 def preprocess_cc_renames(preprocessor_file):
     file_renames = {}
     include_replacements = {}
+    private_file_renames = {}
+    private_include_replacements = collections.defaultdict(dict)
 
     for include_root, original, new in RawConfig.CC_FOLDER_RENAMES:
         include_root = pathlib.Path(include_root)
@@ -554,6 +666,50 @@ def preprocess_cc_renames(preprocessor_file):
             file_renames[str(original_file)] = str(destination_file)
             include_replacements[original] = str(new)
 
+    # Crawl for impl headers located in the source directory to rename them to .hpp
+    excluded_dirs = [".venv", ".git", "build", ".gradle"]
+    for root, dirs, files in os.walk("."):
+        dirs[:] = [d for d in dirs if d not in excluded_dirs and "bazel-" not in d]
+        for f in files:
+            full_file = os.path.join(root, f)[2:] # Remove leading ./
+            if f.endswith(".h"):
+                if "thirdparty" in root:
+                    continue
+                if "llvm" in root:
+                    continue
+                if f == "simd.h":
+                    continue
+
+                project_root = pathlib.Path(root).parts[0]
+                if "src/main/native/cpp" in root or \
+                   "src/test/native" in root or \
+                   "src/main/native/linux" in root or \
+                   "src/main/native/windows" in root or \
+                   "src/main/native/osx" in root or \
+                   "src/main/native/macOS" in root or \
+                   "src/main/native/objcpp" in root or \
+                   "src/main/native/systemcore" in root or \
+                   "src/app/native/cpp" in root or \
+                   "src/main/native/sim" in root or \
+                   "wpilibcExamples" in root:                    
+                    if full_file not in file_renames:
+                        private_file_renames[full_file] = full_file + "pp"
+                        private_include_replacements[project_root][f] = f + "pp"
+                        if "ntcore" in root:
+                            private_include_replacements[project_root]["net/" + f] = "net/" + f + "pp"
+                            private_include_replacements[project_root]["local/" + f] = "local/" + f + "pp"
+                            private_include_replacements[project_root]["server/" + f] = "server/" + f + "pp"
+                        elif "hal" in root:
+                            private_include_replacements[project_root]["mockdata/" + f] = "mockdata/" + f + "pp"
+                            private_include_replacements[project_root]["rev/" + f] = "rev/" + f + "pp"
+                        elif "wpilibcExamples" in root:
+                            private_include_replacements[project_root]["commands/" + f] = "commands/" + f + "pp"
+                            private_include_replacements[project_root]["subsystems/" + f] = "subsystems/" + f + "pp"
+                        elif "wpilibc" in root:
+                            private_include_replacements[project_root]["motorcontrol/" + f] = "motorcontrol/" + f + "pp"
+                            private_include_replacements[project_root]["callback_helpers/" + f] = "callback_helpers/" + f + "pp"
+
+
     # These include replacements are mostly due to inculdes that did not have fully qualified names.
     include_replacements["EventLoop.h"] = "EventLoop" + NEW_CC_FILE_SUFFIX
     include_replacements["PneumaticsBase.h"] = "PneumaticsBase" + NEW_CC_FILE_SUFFIX
@@ -572,9 +728,12 @@ def preprocess_cc_renames(preprocessor_file):
     include_replacements["SwerveDriveKinematics.h"] = "wpi/math/kinematics/SwerveDriveKinematics" + NEW_CC_FILE_SUFFIX
     include_replacements["SwerveModulePosition.h"] = "wpi/math/kinematics/SwerveModulePosition" + NEW_CC_FILE_SUFFIX
     include_replacements["SwerveModuleState.h"] = "wpi/math/kinematics/SwerveModuleState" + NEW_CC_FILE_SUFFIX
-    include_replacements["Trigger.h"] = "wpi/command/button/Trigger" + NEW_CC_FILE_SUFFIX
+    include_replacements["Trigger.h"] = "wpi/command2/button/Trigger" + NEW_CC_FILE_SUFFIX
 
-    return file_renames, include_replacements
+    # Windows non-case sensitive
+    include_replacements["ComCreators.h"] = "COMCreators" + NEW_CC_FILE_SUFFIX
+
+    return file_renames, include_replacements, private_file_renames, private_include_replacements
 
 
 
@@ -597,7 +756,7 @@ def crawl_and_replace(dir_to_crawl, file_filter, replacement_callback):
             with open(full_file) as fs:
                 contents = fs.read()
 
-            contents = replacement_callback(contents)
+            contents = replacement_callback(full_file, contents)
 
             with open(full_file, "w") as of:
                 of.write(contents)
@@ -624,9 +783,9 @@ def fixup_project_renames():
         suffix = full_file.split(".")[-1]
         return suffix not in ["pyc", "jar", "gz", "png", "jpg", "icns", "ico", "avi", "mp4", "bat"]
 
-    def fixup_impl(contents):
-        contents = contents.replace("wpilibNewCommands", "command")
-        contents = contents.replace("wpilibnewcommands", "command")
+    def fixup_impl(filename, contents):
+        contents = contents.replace("wpilibNewCommands", "command2")
+        contents = contents.replace("wpilibnewcommands", "command2")
         contents = contents.replace("fieldImages", "fields")
         contents = contents.replace("fieldimages", "fields")
 
@@ -643,6 +802,13 @@ def run_cc_renames(pp_config: PreprocessedConfig):
         new.parent.mkdir(parents=True, exist_ok=True)
         if pathlib.Path(original).exists():
             shutil.move(original, new)
+            
+
+    for original, new in pp_config.cc_private_file_renames.items():
+        new = pathlib.Path(new)
+        new.parent.mkdir(parents=True, exist_ok=True)
+        if pathlib.Path(original).exists():
+            shutil.move(original, new)
 
     _make_commit("SCRIPT Move cc files")
 
@@ -655,10 +821,20 @@ def run_cc_include_fixup(pp_config):
         suffix = full_file.split(".")[-1]
         return suffix in ["c", "cpp", "h", "hpp", "jinja", "mm"]
 
-    def cc_replacement_impl(contents):
+    def cc_replacement_impl(filename, contents):
         for old_pkg, new_pkg in pp_config.cc_include_replacements.items():
             contents = contents.replace(f'"{old_pkg}"', f'"{new_pkg}"')
             contents = contents.replace(f"<{old_pkg}>", f"<{new_pkg}>")
+
+        project_root = pathlib.Path(filename).parts[0]
+        if project_root in pp_config.cc_private_include_replacements:
+            for old_pkg, new_pkg in pp_config.cc_private_include_replacements[project_root].items():
+                contents = contents.replace(f'"{old_pkg}"', f'"{new_pkg}"')
+                contents = contents.replace(f"<{old_pkg}>", f"<{new_pkg}>")
+                
+                contents = contents.replace(f'"../{old_pkg}"', f'"../{new_pkg}"')
+                contents = contents.replace(f'"../../{old_pkg}"', f'"../../{new_pkg}"')
+        
 
         return contents
 
@@ -670,10 +846,12 @@ def run_cc_include_fixup(pp_config):
 def generic_renames():
     logging.info("Running generic renames")
     for original, new in RawConfig.GENERIC_RENAMES:
-        logging.debug(f"  {original} -> {new}")
         if os.path.exists(original):
+            logging.debug(f"  {original} -> {new}")
             pathlib.Path(new).parent.mkdir(parents=True, exist_ok=True)
             shutil.move(original, new)
+        else:
+            logging.warning(f"  Could not move {original} -> {new}!")
 
     _make_commit("SCRIPT Generic Renames")
 
@@ -702,7 +880,7 @@ def run_java_fixup_imports(pp_config: PreprocessedConfig):
         suffix = full_file.split(".")[-1]
         return suffix in ["java", "cpp", "jinja", "proto", "Extension"]
 
-    def java_replacement_impl(contents):
+    def java_replacement_impl(filename, contents):
         for old_pkg, new_pkg in pp_config.java_pkg_renames.items():
             contents = contents.replace(old_pkg, new_pkg)
 
@@ -1208,7 +1386,7 @@ NAMESPACE_PROJECT_REPLACEMENTS = [
     # command
     ##################
     (
-        "command",
+        "command2",
         wpiutil_namespaced_classes_and_functions() + wpiunits_namespaced_classes_and_functions() + wpimath_namespaced_classes_and_functions() + ntcore_namespaced_classes_and_functions() + [
             ("namespace frc2", "namespace wpi::cmd"),
             ("frc2::", "wpi::cmd::"),
@@ -1483,7 +1661,7 @@ def run_namespace_replacements():
         suffix = full_file.split(".")[-1]
         return suffix in ["cpp", "h", "hpp", "mm", "jinja"]
 
-    def namespace_replacement_impl(contents):
+    def namespace_replacement_impl(filename, contents):
         for origin, new in replacements:
             contents = re.sub(origin, new, contents, flags=re.MULTILINE)
 
@@ -1499,14 +1677,61 @@ def run_namespace_replacements():
     _make_commit("SCRIPT namespace replacements")
 
 
+def run_package_stacktrace_replacement():
+    def pkg_replacement_filter(full_file):
+        if "hal/" not in full_file and ("wpilibj/" not in full_file):
+            return False
+        suffix = full_file.split(".")[-1]
+        return suffix in ["java", "cpp"]
+
+    def pkg_replacement_impl(filename, contents):
+        contents = re.sub('"edu.wpi.first"', '"org.wpilib"', contents, flags=re.MULTILINE)
+
+        return contents
+
+
+    crawl_and_replace(
+        ".", pkg_replacement_filter, pkg_replacement_impl
+    )
+
+    _make_commit("SCRIPT: 'edu.wpi.first' replacements")
+
+FRC_CAPS_REPLACEMENTS = [
+    ("FRC_", "WPILIB_"),
+    ("__WPILIB_SYSTEMCORE__", "__FRC_SYSTEMCORE__"), # Undo this change. Requires toolchain update
+]
+
+def run_frc_caps_replacement():
+    def caps_replacement_filter(full_file):
+        suffix = full_file.split(".")[-1]
+        return suffix not in ["pyc", "jar", "gz", "png", "jpg", "icns", "ico", "avi", "mp4", "bat"]
+
+    def caps_replacement_impl(filename, contents):
+        for origin, new in FRC_CAPS_REPLACEMENTS:
+            contents = re.sub(origin, new, contents, flags=re.MULTILINE)
+
+        return contents
+
+
+    crawl_and_replace(
+        ".", caps_replacement_filter, caps_replacement_impl
+    )
+
+    _make_commit("SCRIPT: FRC_ replacements")
+
+
 ##################################
 # Util Functions
 ##################################
 
 
-def _make_commit(msg):
+def _make_commit(msg, allow_empty=False):
     subprocess.check_call(["git", "add", "."])
-    subprocess.check_call(["git", "commit", "-m", msg, "--quiet"])
+
+    commit_args = ["git", "commit", "-m", msg, "--quiet"]
+    if allow_empty:
+        commit_args.append("--allow-empty")
+    subprocess.check_call(commit_args)
     pass
 
 
@@ -1518,6 +1743,8 @@ def load_pp_config(preprocessor_file):
     return PreprocessedConfig(
         cc_file_renames=pp["cc_file_renames"],
         cc_include_replacements=pp["cc_include_replacements"],
+        cc_private_file_renames=pp["cc_private_file_renames"],
+        cc_private_include_replacements=pp["cc_private_include_replacements"],
         java_pkg_renames=pp["java_pkg_renames"],
         java_file_renames=pp["java_file_renames"],
         java_class_package_overrides=pp["java_class_package_overrides"],
@@ -1553,7 +1780,7 @@ def run_upstream_utils():
 
 def run_linters():
     subprocess.check_call(["./gradlew", "spotlessApply"])
-    _make_commit("SCRIPT: Spotless Apply")
+    _make_commit("SCRIPT: Spotless Apply", allow_empty=True)
 
     subprocess.check_call(["wpiformat", "-f", "."])
     _make_commit("SCRIPT: wpiformat")
@@ -1563,11 +1790,11 @@ def apply_patch(patch):
     
     if RUN_WITH_HPP:
         full_patch_file = SCRIPT_DIR + "/with_hpp/" + patch
-    subprocess.check_call(["git", "am", "-3", full_patch_file])
+    subprocess.check_call(["git", "am", "-3", full_patch_file, "--committer-date-is-author-date", "--ignore-date"])
 
 
 def main():
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
 
     os.chdir("../../allwpilib")
     if RUN_WITH_HPP:
@@ -1579,7 +1806,7 @@ def main():
     fixup_project_renames()
 
     if preprocess:
-        cc_file_renames, cc_include_replacements = preprocess_cc_renames(
+        cc_file_renames, cc_include_replacements, cc_private_file_renames, cc_private_include_replacements = preprocess_cc_renames(
             preprocessor_file
         )
         java_pkg_renames, java_file_renames, java_class_package_overrides = (
@@ -1589,6 +1816,8 @@ def main():
         pp_config = PreprocessedConfig(
             cc_file_renames=cc_file_renames,
             cc_include_replacements=cc_include_replacements,
+            cc_private_file_renames=cc_private_file_renames,
+            cc_private_include_replacements=cc_private_include_replacements,
             java_pkg_renames=java_pkg_renames,
             java_file_renames=java_file_renames,
             java_class_package_overrides=java_class_package_overrides,
@@ -1625,6 +1854,12 @@ def main():
     apply_patch("0020-HAND-FIXES-Update-build-scripts-for-namespaces.patch")
     apply_patch("0021-HAND-FIXES-Manual-cleanup-of-namespaces.patch")
     apply_patch("0022-HAND-FIXES-Update-maven-info.patch")
+
+    # Cleanup some extra things
+    run_package_stacktrace_replacement()
+    run_frc_caps_replacement()
+
+    # Finally run one last linter pass
     run_linters()
 
 

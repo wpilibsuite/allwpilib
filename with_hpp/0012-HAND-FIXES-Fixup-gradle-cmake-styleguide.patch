@@ -1,25 +1,26 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Tue, 23 Sep 2025 01:07:42 -0400
-Subject: [PATCH 12/24] HAND FIXES: Fixup gradle / cmake / styleguide
+Date: Sat, 4 Oct 2025 15:32:49 -0400
+Subject: [PATCH 12/26] HAND FIXES: Fixup gradle / cmake / styleguide
 
 ---
  .styleguide                     |  15 ++--
  CMakeLists.txt                  |  10 +--
  apriltag/build.gradle           |   2 +-
  cameraserver/.styleguide        |   6 +-
- command/.styleguide             |  10 +--
- cscore/.styleguide              |   6 +-
+ command2/.styleguide            |  10 +--
+ cscore/.styleguide              |   8 +-
+ datalog/.styleguide             |   1 +
  docs/build.gradle               | 128 ++++++++++++++++----------------
  glass/.styleguide               |  17 ++---
- hal/.styleguide                 |   7 +-
+ hal/.styleguide                 |   9 +--
  hal/build.gradle                |   2 +-
  ntcore/.styleguide              |   6 +-
  settings.gradle                 |  10 +--
- tools/datalogtool/.styleguide   |   7 +-
+ tools/datalogtool/.styleguide   |   8 +-
  tools/outlineviewer/.styleguide |  12 ++-
- tools/sysid/.styleguide         |  14 ++--
- tools/wpical/.styleguide        |   6 +-
+ tools/sysid/.styleguide         |  15 ++--
+ tools/wpical/.styleguide        |   7 +-
  tools/wpical/build.gradle       |   2 +-
  wpigui/.styleguide              |   3 +-
  wpilibj/CMakeLists.txt          |   6 +-
@@ -30,7 +31,7 @@ Subject: [PATCH 12/24] HAND FIXES: Fixup gradle / cmake / styleguide
  wpinet/.styleguide              |   5 +-
  wpiutil/.styleguide             |   8 +-
  wpiutil/build.gradle            |   4 +-
- 26 files changed, 164 insertions(+), 166 deletions(-)
+ 27 files changed, 169 insertions(+), 169 deletions(-)
 
 diff --git a/.styleguide b/.styleguide
 index f5e8ad36c5f7a404bad2a404d6dee4f2f5ae96c9..510daaf302b5f1aaab0c1c32e4ade73a7ff83ea2 100644
@@ -66,7 +67,7 @@ index f5e8ad36c5f7a404bad2a404d6dee4f2f5ae96c9..510daaf302b5f1aaab0c1c32e4ade73a
 +  ^wpi/units/
  }
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index accc51d8eaf09aa1951f821d7b3add33733b62d2..f01aa6864cbd16e38c05c9f5db0d2b5975966240 100644
+index 09239ae31c0ad5ec09c7c49c6b5503fe80afe546..4a36c2205cb8c464b17c7ff01404089670668aab 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -316,13 +316,13 @@ if(WITH_GUI)
@@ -91,8 +92,8 @@ index accc51d8eaf09aa1951f821d7b3add33733b62d2..f01aa6864cbd16e38c05c9f5db0d2b59
      set(APRILTAG_DEP_REPLACE "find_dependency(apriltag)")
      set(WPILIBC_DEP_REPLACE "find_dependency(wpilibc)")
      set(WPILIBJ_DEP_REPLACE "find_dependency(wpilibj)")
--    set(WPILIBNEWCOMMANDS_DEP_REPLACE "find_dependency(command)")
-+    set(COMMAND_DEP_REPLACE "find_dependency(command)")
+-    set(WPILIBNEWCOMMANDS_DEP_REPLACE "find_dependency(command2)")
++    set(COMMAND_DEP_REPLACE "find_dependency(command2)")
      add_subdirectory(apriltag)
      add_subdirectory(wpilibj)
      add_subdirectory(wpilibc)
@@ -134,10 +135,10 @@ index 951f083e2023d252a0cedcaf8acee56fbdd94afe..3d1663b4296c44b559b23a13b2b94dd2
  }
  
  includeGuardRoots {
-diff --git a/command/.styleguide b/command/.styleguide
-index 4d70a08aa42d1318a2a41e7cb35b605781c1f27b..6d62fc15bcef321eb8eec28b1c66471ac62c830f 100644
---- a/command/.styleguide
-+++ b/command/.styleguide
+diff --git a/command2/.styleguide b/command2/.styleguide
+index 8fd7f027d16415bdc393000980ffaad522853710..b19a484512f64128bc96431f5cdc9177a2ffb049 100644
+--- a/command2/.styleguide
++++ b/command2/.styleguide
 @@ -17,19 +17,15 @@ generatedFileExclude {
  }
  
@@ -162,9 +163,18 @@ index 4d70a08aa42d1318a2a41e7cb35b605781c1f27b..6d62fc15bcef321eb8eec28b1c66471a
 +  ^wpi/util/
  }
 diff --git a/cscore/.styleguide b/cscore/.styleguide
-index 2737ace2a78c4ce127dd940068c25fde18d127d0..742dc28d08acf0320efd00fbc08caad367c379cd 100644
+index 2737ace2a78c4ce127dd940068c25fde18d127d0..029503e50f40f07e2828496a5f8e1ea20cb990e6 100644
 --- a/cscore/.styleguide
 +++ b/cscore/.styleguide
+@@ -18,7 +18,7 @@ modifiableFileExclude {
+ }
+ 
+ licenseUpdateExclude {
+-  src/main/native/cpp/default_init_allocator\.h$
++  src/main/native/cpp/default_init_allocator\.hpp$
+ }
+ 
+ includeGuardRoots {
 @@ -41,7 +41,7 @@ includeOtherLibs {
    ^imgui
    ^support/
@@ -176,8 +186,19 @@ index 2737ace2a78c4ce127dd940068c25fde18d127d0..742dc28d08acf0320efd00fbc08caad3
 +  ^wpi/gui/
 +  ^wpi/net/
  }
+diff --git a/datalog/.styleguide b/datalog/.styleguide
+index 718d2404f4289e19a5675558ef508e00ba1c15ad..309041dfd5c13d565538913f34e3cea8e812cfa0 100644
+--- a/datalog/.styleguide
++++ b/datalog/.styleguide
+@@ -1,5 +1,6 @@
+ cppHeaderFileInclude {
+   \.h$
++  \.hpp$
+ }
+ 
+ cppSrcFileInclude {
 diff --git a/docs/build.gradle b/docs/build.gradle
-index a8b49c6378bda666fab58f4164bd143b3021d0c4..e735bb55baff6941b9a100aae084111bf0add8fb 100644
+index 0d8331ddd7868780543b2d461d4f636e78608ea8..d7c9075e19e166e85182173de71b2178169829aa 100644
 --- a/docs/build.gradle
 +++ b/docs/build.gradle
 @@ -82,42 +82,42 @@ doxygen.sourceSets.main {
@@ -376,10 +397,16 @@ index c72e55d59c3149839fc146b6ea2489e8cfc8b0ef..91173004b37f146f980936b1dbe0ceac
 +  ^wpi/math/
  }
 diff --git a/hal/.styleguide b/hal/.styleguide
-index 2386f43145dfd4bc1b4c6b03b6fb5a1c98eac065..85fa79e1d498c1855bc7834b05a222c43ea94e68 100644
+index 2386f43145dfd4bc1b4c6b03b6fb5a1c98eac065..bd3473f2db611cd72430a3b2ee8fcb2d2f5eaec1 100644
 --- a/hal/.styleguide
 +++ b/hal/.styleguide
-@@ -37,12 +37,13 @@ includeOtherLibs {
+@@ -31,18 +31,17 @@ repoRootNameOverride {
+ }
+ 
+ includeOtherLibs {
+-  ^FRC_FPGA_ChipObject/
+-  ^FRC_NetworkCommunication/
+   ^fmt/
    ^gtest/
    ^i2clib/
    ^llvm/
@@ -432,7 +459,7 @@ index 13634e44df6212efcccb0c195470913f6ac27460..f93bd8d1aaee878c7e348d91ac545674
 +  ^wpi/datalog/
  }
 diff --git a/settings.gradle b/settings.gradle
-index 197dc09fd4795a2ffcd8b8d8947b43dbfd058732..04dcba94ffba26cf3aca6390998c600ec8bc29c2 100644
+index 871195b26314ec5bb73f9121f151f72d2c60a499..9a460eeb21b781fb27935bde97ee191ca41510a5 100644
 --- a/settings.gradle
 +++ b/settings.gradle
 @@ -34,9 +34,9 @@ include 'wpilibj'
@@ -465,10 +492,17 @@ index 197dc09fd4795a2ffcd8b8d8947b43dbfd058732..04dcba94ffba26cf3aca6390998c600e
  
  buildCache {
 diff --git a/tools/datalogtool/.styleguide b/tools/datalogtool/.styleguide
-index 886b9305364f2f1d62420f05759ed7e4dcd7c440..bc10b8c33eb913351b70cf486315a48768dd60e3 100644
+index 886b9305364f2f1d62420f05759ed7e4dcd7c440..5c2f639e93c7622d3811bb4ca08129fcc1f5e9c4 100644
 --- a/tools/datalogtool/.styleguide
 +++ b/tools/datalogtool/.styleguide
-@@ -21,10 +21,11 @@ repoRootNameOverride {
+@@ -1,5 +1,6 @@
+ cppHeaderFileInclude {
+   \.h$
++  \.hpp$
+   \.inc$
+   \.inl$
+ }
+@@ -21,10 +22,11 @@ repoRootNameOverride {
  includeOtherLibs {
    ^GLFW
    ^fmt/
@@ -509,10 +543,17 @@ index cdbb90b85f5ef8008743cbff7198827fccb9bd2b..c51897913c38f375f981df7b939eea99
 +  ^wpi/gui
  }
 diff --git a/tools/sysid/.styleguide b/tools/sysid/.styleguide
-index 8506bf193ea04dfaeb417033c192c1cabaa1453b..8b89675b5b92bf7d18914d45b135fd96ea0022ca 100644
+index 8506bf193ea04dfaeb417033c192c1cabaa1453b..e21bc649a5f5b8f446be875fbb01fb6708b1c785 100644
 --- a/tools/sysid/.styleguide
 +++ b/tools/sysid/.styleguide
-@@ -21,15 +21,15 @@ repoRootNameOverride {
+@@ -1,5 +1,6 @@
+ cppHeaderFileInclude {
+   \.h$
++  \.hpp$
+   \.inc$
+   \.inl$
+ }
+@@ -21,15 +22,15 @@ repoRootNameOverride {
  includeOtherLibs {
    ^GLFW
    ^fmt/
@@ -536,10 +577,17 @@ index 8506bf193ea04dfaeb417033c192c1cabaa1453b..8b89675b5b92bf7d18914d45b135fd96
 +  ^wpi/gui
  }
 diff --git a/tools/wpical/.styleguide b/tools/wpical/.styleguide
-index e2401dc33dfc1fc7273ae46c4e5e212cc40aab43..f17720d0d4b65062c426fa4b9613225e0fb074c5 100644
+index e2401dc33dfc1fc7273ae46c4e5e212cc40aab43..738ea1e634eee797c3856bcca6bd1e2bd2a172f9 100644
 --- a/tools/wpical/.styleguide
 +++ b/tools/wpical/.styleguide
-@@ -24,13 +24,13 @@ includeOtherLibs {
+@@ -1,5 +1,6 @@
+ cppHeaderFileInclude {
+   \.h$
++  \.hpp$
+   \.inc$
+   \.inl$
+ }
+@@ -24,13 +25,13 @@ includeOtherLibs {
    ^GLFW
    ^ceres/
    ^fmt/
@@ -570,7 +618,7 @@ index daf85a65957d3a48ed359f9d7562ac09f2372b8b..862ffa5450dd54a4ee5a04e2af916c5f
      components {
          "${nativeName}"(NativeExecutableSpec) {
 diff --git a/wpigui/.styleguide b/wpigui/.styleguide
-index 9a462a3759901348c7631c3e71e291fc75106d47..330bf64d66856842ba296ba7bce9b49675b2848b 100644
+index 9a462a3759901348c7631c3e71e291fc75106d47..a29a3c113c09468fdf99abe10d0653b7955fefa4 100644
 --- a/wpigui/.styleguide
 +++ b/wpigui/.styleguide
 @@ -1,5 +1,6 @@
@@ -585,7 +633,7 @@ index 9a462a3759901348c7631c3e71e291fc75106d47..330bf64d66856842ba296ba7bce9b496
  generatedFileExclude {
    wpigui/src/main/native/cpp/portable-file-dialogs\.cpp$
 -  wpigui/src/main/native/include/portable-file-dialogs\.h$
-+  wpigui/src/main/native/include/wpi/gui/portable-file-dialogs\.hpp$
++  wpigui/src/main/native/include/wpi/gui/portable-file-dialogs\.h$
  }
  
  repoRootNameOverride {
@@ -643,7 +691,7 @@ index 07f5df67dad1dfcf56adabf348c0712025ea5859..0e5620c10d180a1591d74596e319f3e9
  clean {
      delete oldWpilibVersionFile
 diff --git a/wpilibjExamples/build.gradle b/wpilibjExamples/build.gradle
-index de195c51e39523788fdc2e38dee2b33548962789..ccfdaa22388483fadcd6103de61e43162f5ecad4 100644
+index 6ca17d1bec2b51fbe5d1ad4ec2ce4b57ece52ce9..dfc10c3793e117d0169d62e23a0cd85eb984c20f 100644
 --- a/wpilibjExamples/build.gradle
 +++ b/wpilibjExamples/build.gradle
 @@ -66,14 +66,14 @@ tasks.register('buildDesktopJava') {

@@ -1,21 +1,22 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Fri, 26 Sep 2025 19:02:55 -0400
-Subject: [PATCH 21/24] HAND FIXES: Manual cleanup of namespaces
+Date: Sat, 4 Oct 2025 15:36:09 -0400
+Subject: [PATCH 21/26] HAND FIXES: Manual cleanup of namespaces
 
 ---
  .../src/main/native/cpp/vision/VisionRunner.cpp      |  4 ++--
  .../main/native/cpp/frc2/command/button/Trigger.cpp  |  2 +-
- .../src/main/native/include/wpi/datalog/DataLog.h    |  4 ++--
+ .../src/main/native/include/wpi/datalog/DataLog.hpp  |  4 ++--
  tools/sysid/src/main/native/cpp/view/Analyzer.cpp    |  4 ++--
- .../main/native/include/sysid/view/DataSelector.h    |  4 +++-
- .../src/main/native/include/sysid/view/LogLoader.h   |  4 +++-
+ .../native/include/wpi/sysid/view/DataSelector.hpp   |  4 +++-
+ .../main/native/include/wpi/sysid/view/LogLoader.hpp |  4 +++-
  .../src/test/native/cpp/analysis/FilterTest.cpp      |  2 +-
  .../thirdparty/mrcal/src/poseutils-uses-autodiff.cpp |  2 +-
  .../native/cpp/smartdashboard/MechanismRoot2d.cpp    |  2 ++
  .../native/include/wpi/event/NetworkBooleanEvent.hpp |  2 +-
  .../include/wpi/smartdashboard/FieldObject2d.hpp     |  7 +++++--
  .../include/wpi/smartdashboard/SmartDashboard.hpp    |  2 +-
+ .../main/java/org/wpilib/system/DataLogManager.java  |  2 +-
  wpimath/src/test/native/cpp/UnitsTest.cpp            |  2 +-
  wpinet/robotpy_pybind_build_info.bzl                 |  4 ++--
  wpinet/src/main/native/include/wpi/net/DsClient.hpp  |  5 +++--
@@ -37,7 +38,7 @@ Subject: [PATCH 21/24] HAND FIXES: Manual cleanup of namespaces
  wpiutil/src/main/python/semiwrap/SendableBuilder.yml |  2 +-
  .../src/main/python/semiwrap/SendableRegistry.yml    |  2 +-
  wpiutil/src/main/python/semiwrap/Synchronization.yml |  4 ++--
- 33 files changed, 73 insertions(+), 55 deletions(-)
+ 34 files changed, 74 insertions(+), 56 deletions(-)
 
 diff --git a/cameraserver/src/main/native/cpp/vision/VisionRunner.cpp b/cameraserver/src/main/native/cpp/vision/VisionRunner.cpp
 index 990cb3a14abc0918147d40f2ac9a80196782ec18..a0164a0fbec38a716c0f9b3825ca2fd52decefc0 100644
@@ -61,23 +62,23 @@ index 990cb3a14abc0918147d40f2ac9a80196782ec18..a0164a0fbec38a716c0f9b3825ca2fd5
    auto res = csShared->GetRobotMainThreadId();
    if (res.second && (std::this_thread::get_id() == res.first)) {
      csShared->SetVisionRunnerError(
-diff --git a/command/src/main/native/cpp/frc2/command/button/Trigger.cpp b/command/src/main/native/cpp/frc2/command/button/Trigger.cpp
-index 3cd9fe6076a516ae1b1af156ad149b2fa77ccf4f..732d1973fab5650e28b767aef7401c95834a6917 100644
---- a/command/src/main/native/cpp/frc2/command/button/Trigger.cpp
-+++ b/command/src/main/native/cpp/frc2/command/button/Trigger.cpp
+diff --git a/command2/src/main/native/cpp/frc2/command/button/Trigger.cpp b/command2/src/main/native/cpp/frc2/command/button/Trigger.cpp
+index 1ab59302012125f065afec8ae4d4dc8b89706036..89cb9e301f90eb21002404337cfa4e74bdc6d622 100644
+--- a/command2/src/main/native/cpp/frc2/command/button/Trigger.cpp
++++ b/command2/src/main/native/cpp/frc2/command/button/Trigger.cpp
 @@ -10,7 +10,7 @@
  
- #include "wpi/command/CommandPtr.hpp"
+ #include "wpi/command2/CommandPtr.hpp"
  
 -using namespace frc;
 +using namespace wpi;
  using namespace wpi::cmd;
  
  Trigger::Trigger(const Trigger& other) = default;
-diff --git a/datalog/src/main/native/include/wpi/datalog/DataLog.h b/datalog/src/main/native/include/wpi/datalog/DataLog.h
+diff --git a/datalog/src/main/native/include/wpi/datalog/DataLog.hpp b/datalog/src/main/native/include/wpi/datalog/DataLog.hpp
 index 21680a1f058c4527f0871b16a1a4a745cbecd3f5..3739808bf929283a88e6223ad35b2fb5495bdc6c 100644
---- a/datalog/src/main/native/include/wpi/datalog/DataLog.h
-+++ b/datalog/src/main/native/include/wpi/datalog/DataLog.h
+--- a/datalog/src/main/native/include/wpi/datalog/DataLog.hpp
++++ b/datalog/src/main/native/include/wpi/datalog/DataLog.hpp
 @@ -162,7 +162,7 @@ class DataLog {
    template <wpi::util::ProtobufSerializable T>
    void AddProtobufSchema(wpi::util::ProtobufMessage<T>& msg, int64_t timestamp = 0) {
@@ -97,7 +98,7 @@ index 21680a1f058c4527f0871b16a1a4a745cbecd3f5..3739808bf929283a88e6223ad35b2fb5
      wpi::util::ForEachStructSchema<T>(
          [this, timestamp](auto typeString, auto schema) {
 diff --git a/tools/sysid/src/main/native/cpp/view/Analyzer.cpp b/tools/sysid/src/main/native/cpp/view/Analyzer.cpp
-index d7b9e8e2d0640c062e716cfa936005b013fbbe93..29cc4cf6c8ebcfff7ab76c66ef331955171d9aa0 100644
+index ca324bb700c46d973fcac0d27655f40e1f5aa353..c2c69437442652fc9301ec8b47b41f877778ac4b 100644
 --- a/tools/sysid/src/main/native/cpp/view/Analyzer.cpp
 +++ b/tools/sysid/src/main/native/cpp/view/Analyzer.cpp
 @@ -612,9 +612,9 @@ void Analyzer::DisplayFeedbackGains() {
@@ -112,10 +113,10 @@ index d7b9e8e2d0640c062e716cfa936005b013fbbe93..29cc4cf6c8ebcfff7ab76c66ef331955
        "CTRE: For use with CTRE units. These are the default units that ship "
        "with CTRE motor controllers.\n"
        "REV (Brushless): For use with NEO and NEO 550 motors on a SPARK MAX.\n"
-diff --git a/tools/sysid/src/main/native/include/sysid/view/DataSelector.h b/tools/sysid/src/main/native/include/sysid/view/DataSelector.h
-index 2a6f2e488163fdd1ba45974bbc7d576bead966a8..3ceac2542f23da136ec161b9c56f87a122b45ca6 100644
---- a/tools/sysid/src/main/native/include/sysid/view/DataSelector.h
-+++ b/tools/sysid/src/main/native/include/sysid/view/DataSelector.h
+diff --git a/tools/sysid/src/main/native/include/wpi/sysid/view/DataSelector.hpp b/tools/sysid/src/main/native/include/wpi/sysid/view/DataSelector.hpp
+index 23464c51f8d287cb4b26928ee6aae8a5f49ff88a..02d6754dfa80658c95b13223b926a4058543cda5 100644
+--- a/tools/sysid/src/main/native/include/wpi/sysid/view/DataSelector.hpp
++++ b/tools/sysid/src/main/native/include/wpi/sysid/view/DataSelector.hpp
 @@ -26,7 +26,9 @@ namespace wpi {
  namespace log {
  class DataLogReaderEntry;
@@ -127,10 +128,10 @@ index 2a6f2e488163fdd1ba45974bbc7d576bead966a8..3ceac2542f23da136ec161b9c56f87a1
  }  // namespace wpi
  
  namespace sysid {
-diff --git a/tools/sysid/src/main/native/include/sysid/view/LogLoader.h b/tools/sysid/src/main/native/include/sysid/view/LogLoader.h
+diff --git a/tools/sysid/src/main/native/include/wpi/sysid/view/LogLoader.hpp b/tools/sysid/src/main/native/include/wpi/sysid/view/LogLoader.hpp
 index 2182ae72f44dcd224b8c617a9dbd732b9dd4d921..404ab0315a43e69721f6967afb035d6cd9363b84 100644
---- a/tools/sysid/src/main/native/include/sysid/view/LogLoader.h
-+++ b/tools/sysid/src/main/native/include/sysid/view/LogLoader.h
+--- a/tools/sysid/src/main/native/include/wpi/sysid/view/LogLoader.hpp
++++ b/tools/sysid/src/main/native/include/wpi/sysid/view/LogLoader.hpp
 @@ -25,7 +25,9 @@ namespace log {
  class DataLogReaderEntry;
  class DataLogReaderThread;
@@ -143,12 +144,12 @@ index 2182ae72f44dcd224b8c617a9dbd732b9dd4d921..404ab0315a43e69721f6967afb035d6c
  
  namespace sysid {
 diff --git a/tools/sysid/src/test/native/cpp/analysis/FilterTest.cpp b/tools/sysid/src/test/native/cpp/analysis/FilterTest.cpp
-index ee5ddf52d4e3ec99c22ee69e0c8a2b9ab854e69d..9da6364bad8fee10e01eaf1b1e6a8b217d748f91 100644
+index e446cc2a5cb26d88e1cf78b8e9c3163b6393207c..18ac82f3cd5f773bd70076f5de875e9bc2e4727c 100644
 --- a/tools/sysid/src/test/native/cpp/analysis/FilterTest.cpp
 +++ b/tools/sysid/src/test/native/cpp/analysis/FilterTest.cpp
 @@ -13,7 +13,7 @@
- #include "sysid/analysis/FilteringUtils.h"
- #include "sysid/analysis/Storage.h"
+ #include "wpi/sysid/analysis/FilteringUtils.hpp"
+ #include "wpi/sysid/analysis/Storage.hpp"
  
 -TEST(FilterTest, wpi::math::MedianFilter) {
 +TEST(FilterTest, MedianFilter) {
@@ -227,6 +228,19 @@ index 5127389a38166f17ff89e9675d8cea742954c1cd..4f097faf7bba792f3d69ce4d01e5c437
  class Sendable;
  }  // namespace wpi
  
+diff --git a/wpilibj/src/main/java/org/wpilib/system/DataLogManager.java b/wpilibj/src/main/java/org/wpilib/system/DataLogManager.java
+index 337804d041fc56537f9f4060989aba253a5219d8..e1d8bf8ab50205d3c084a84e298c2098849e9a44 100644
+--- a/wpilibj/src/main/java/org/wpilib/system/DataLogManager.java
++++ b/wpilibj/src/main/java/org/wpilib/system/DataLogManager.java
+@@ -271,7 +271,7 @@ public final class DataLogManager {
+       return filenameOverride;
+     }
+     Random rnd = new Random();
+-    StringBuilder filename = new StringBuilder();
++    StringBuilder filename = new StringBuilder(18);
+     filename.append("FRC_TBD_");
+     for (int i = 0; i < 4; i++) {
+       filename.append(String.format("%04x", rnd.nextInt(0x10000)));
 diff --git a/wpimath/src/test/native/cpp/UnitsTest.cpp b/wpimath/src/test/native/cpp/UnitsTest.cpp
 index fc8550cedcbdbe80304ffe18f662dfd7bca71d35..4ba8ee10da31ede8ef775e8cbc726985d9fd9bf4 100644
 --- a/wpimath/src/test/native/cpp/UnitsTest.cpp
@@ -366,7 +380,7 @@ index e540e22a326d583afd692c61c8054815d0ac317d..df40527cf5907bd8435e855e60d34a5d
  }  // namespace wpi::net
  
 diff --git a/wpinet/src/main/native/macOS/ResolverThread.cpp b/wpinet/src/main/native/macOS/ResolverThread.cpp
-index a5e6ad8ed781af33dc4c283a6609d7d0cb217f09..2365891680c7d0bb61aef228d4e6760c6c0349d5 100644
+index 6f698db5b5d9571e76c1f853e3a2b701b84dfe4b..a5cee229d94ca29d9b9b813dbbbb0c15faabc76a 100644
 --- a/wpinet/src/main/native/macOS/ResolverThread.cpp
 +++ b/wpinet/src/main/native/macOS/ResolverThread.cpp
 @@ -50,7 +50,7 @@ void ResolverThread::RemoveServiceRefInThread(DNSServiceRef serviceRef) {

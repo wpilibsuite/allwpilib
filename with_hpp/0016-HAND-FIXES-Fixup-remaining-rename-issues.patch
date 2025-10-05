@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Tue, 23 Sep 2025 01:20:55 -0400
-Subject: [PATCH 16/24] HAND FIXES: Fixup remaining rename issues
+Date: Sat, 4 Oct 2025 15:34:37 -0400
+Subject: [PATCH 16/26] HAND FIXES: Fixup remaining rename issues
 
 ---
  cameraserver/multiCameraServer/BUILD.bazel    |  4 +-
@@ -70,7 +70,7 @@ index 517389600ea6416d7ab885017ee1ec2ea3b4ad7c..0a303b352b3e677549d1b7ed0d08d885
 -edu.wpi.first.epilogue.processor.AnnotationProcessor
 +org.wpilib.epilogue.processor.AnnotationProcessor
 diff --git a/ntcore/BUILD.bazel b/ntcore/BUILD.bazel
-index e5891f18d602cb2a0b8a2b82729eb0730b5a1ca2..7ccd91fb1a982c074ac2572f9864e25e3500207e 100644
+index 88652a6fddb5576eaf4eb89ce31318c9a1886fac..b8ca1cc22640b1a52a06b74bd8d48414747d3bb5 100644
 --- a/ntcore/BUILD.bazel
 +++ b/ntcore/BUILD.bazel
 @@ -210,8 +210,8 @@ cc_binary(

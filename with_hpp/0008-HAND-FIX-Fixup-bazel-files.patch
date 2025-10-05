@@ -1,33 +1,40 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Mon, 22 Sep 2025 23:49:42 -0400
-Subject: [PATCH 08/24] HAND FIX - Fixup bazel files
+Date: Sat, 4 Oct 2025 15:31:37 -0400
+Subject: [PATCH 08/26] HAND FIX - Fixup bazel files
 
 ---
  BUILD.bazel                             | 10 +++++-----
  apriltag/BUILD.bazel                    |  4 ++--
  cameraserver/BUILD.bazel                |  4 ++--
- command/BUILD.bazel                     |  8 ++++----
- cscore/BUILD.bazel                      |  4 ++--
+ command2/BUILD.bazel                    | 10 +++++-----
+ cscore/BUILD.bazel                      | 12 ++++++------
  docs/BUILD.bazel                        |  4 ++--
  epilogue-processor/BUILD.bazel          |  2 +-
  glass/BUILD.bazel                       |  2 +-
  hal/BUILD.bazel                         |  6 +++---
- ntcore/BUILD.bazel                      |  4 ++--
+ ntcore/BUILD.bazel                      |  6 +++---
  romiVendordep/BUILD.bazel               |  4 ++--
+ simulation/halsim_gui/BUILD.bazel       |  4 ++--
+ simulation/halsim_ws_client/BUILD.bazel |  4 ++--
+ simulation/halsim_ws_core/BUILD.bazel   |  2 +-
+ simulation/halsim_ws_server/BUILD.bazel |  2 +-
+ simulation/halsim_xrp/BUILD.bazel       |  4 ++--
+ tools/processstarter/BUILD.bazel        |  9 +++------
  tools/wpical/BUILD.bazel                |  2 +-
+ wpilibcExamples/build_cpp_examples.bzl  |  8 ++++----
  wpilibj/BUILD.bazel                     |  4 ++--
  wpilibjExamples/BUILD.bazel             |  8 ++++----
  wpilibjExamples/build_java_examples.bzl | 20 ++++++++++----------
- wpimath/BUILD.bazel                     |  4 ++--
- wpinet/BUILD.bazel                      |  4 ++--
+ wpimath/BUILD.bazel                     |  6 +++---
+ wpinet/BUILD.bazel                      | 10 +++++-----
  wpiunits/BUILD.bazel                    |  4 ++--
  wpiutil/BUILD.bazel                     |  4 ++--
  xrpVendordep/BUILD.bazel                |  4 ++--
- 20 files changed, 53 insertions(+), 53 deletions(-)
+ 27 files changed, 78 insertions(+), 81 deletions(-)
 
 diff --git a/BUILD.bazel b/BUILD.bazel
-index 845fff46e4a7db1f889e7ed3c071328564f2df96..86ab1b714307942a83179bf3eb1f38997f892450 100644
+index 29537cd9bd7937eedd3a18e9cb06fdb63e9f0d50..54932f9be3877b159000666b8714181bba99f039 100644
 --- a/BUILD.bazel
 +++ b/BUILD.bazel
 @@ -69,7 +69,7 @@ publish_all(
@@ -61,8 +68,8 @@ index 845fff46e4a7db1f889e7ed3c071328564f2df96..86ab1b714307942a83179bf3eb1f3899
 -        "//wpical:wpical_publish.publish",
 +        "//tools/wpical:wpical_publish.publish",
          "//wpigui:wpigui-cpp_publish.publish",
-         "//command:command-cpp_publish.publish",
-         "//command:command-java_publish.publish",
+         "//command2:command2-cpp_publish.publish",
+         "//command2:command2-java_publish.publish",
 diff --git a/apriltag/BUILD.bazel b/apriltag/BUILD.bazel
 index c8bc17c6157a4a32749d126d923d41f7e6ac5ed3..5390f266b1122a4953987572ecdd888fd9d4c047 100644
 --- a/apriltag/BUILD.bazel
@@ -93,29 +100,38 @@ index 1e3fe5ffbbfcac352f45a205ae27fd650458886b..7bc46e247cffbf27dbcf09f5444b5510
      deps = [
      ],
  )
-diff --git a/command/BUILD.bazel b/command/BUILD.bazel
-index 397dccd4af06ac6127c244fb2789d166d4b984f2..60268cf68ae1888be499f2ec745ac1709e269977 100644
---- a/command/BUILD.bazel
-+++ b/command/BUILD.bazel
+diff --git a/command2/BUILD.bazel b/command2/BUILD.bazel
+index 7289608345265aaca0f1635ee970dc6206ddccb2..f6eeac2d786b0c6c7843e1c2f47d4d69f0335339 100644
+--- a/command2/BUILD.bazel
++++ b/command2/BUILD.bazel
 @@ -3,10 +3,10 @@ load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
  load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
  load("@rules_java//java:defs.bzl", "java_binary")
  load("@rules_python//python:defs.bzl", "py_binary")
-+load("//command:generate.bzl", "generate_wpilib_new_commands")
++load("//command2:generate.bzl", "generate_wpilib_new_commands")
  load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
  load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test", "wpilib_java_library")
  load("//shared/bazel/rules:packaging.bzl", "package_minimal_cc_project")
--load("//command:generate.bzl", "generate_wpilib_new_commands")
+-load("//command2:generate.bzl", "generate_wpilib_new_commands")
  
  filegroup(
      name = "doxygen-files",
+@@ -124,7 +124,7 @@ cc_test(
+     size = "small",
+     srcs = glob([
+         "src/test/native/**/*.cpp",
+-        "src/test/native/**/*.h",
++        "src/test/native/**/*.hpp",
+     ]),
+     tags = [
+         "no-tsan",
 @@ -138,7 +138,7 @@ cc_test(
  
  wpilib_java_junit5_test(
-     name = "command-java-test",
+     name = "command2-java-test",
 -    srcs = glob(["**/*.java"]),
 +    srcs = glob(["src/main/java/**/*.java"]),
-     resource_strip_prefix = "command/src/test/resources",
+     resource_strip_prefix = "command2/src/test/resources",
      resources = glob(["src/test/resources/**"]),
      deps = [
 @@ -162,8 +162,8 @@ cc_binary(
@@ -124,15 +140,44 @@ index 397dccd4af06ac6127c244fb2789d166d4b984f2..60268cf68ae1888be499f2ec745ac170
      name = "DevMain-Java",
 -    srcs = ["src/dev/java/edu/wpi/first/wpilibj2/commands/DevMain.java"],
 -    main_class = "edu.wpi.first.wpilibj2.commands.DevMain",
-+    srcs = ["src/dev/java/org/wpilib/commands/DevMain.java"],
++    srcs = ["src/dev/java/org/wpilib/command2/DevMain.java"],
 +    main_class = "org.wpilib.commands.DevMain",
      deps = [
          "//hal:hal-java",
          "//ntcore:ntcore-java",
 diff --git a/cscore/BUILD.bazel b/cscore/BUILD.bazel
-index c94e844b093ec59bc2cde4c27ff5ce7e95b08313..dd0f0daaaeca090f387e7bef241f1bb7939ce3d9 100644
+index c94e844b093ec59bc2cde4c27ff5ce7e95b08313..6da0c35c7e7dca6af5b145490a687fc5769c5b92 100644
 --- a/cscore/BUILD.bazel
 +++ b/cscore/BUILD.bazel
+@@ -17,12 +17,12 @@ filegroup(
+ 
+ WIN_SRCS = glob([
+     "src/main/native/windows/**/*.cpp",
+-    "src/main/native/windows/**/*.h",
++    "src/main/native/windows/**/*.hpp",
+ ])
+ 
+ LINUX_SRCS = glob([
+     "src/main/native/linux/**/*.cpp",
+-    "src/main/native/linux/**/*.h",
++    "src/main/native/linux/**/*.hpp",
+ ])
+ 
+ MAC_SRCS = glob(["src/main/native/osx/**/*.cpp"])
+@@ -40,11 +40,11 @@ wpilib_objc_library(
+     name = "cscore-mac",
+     srcs = glob([
+         "src/main/native/objcpp/**/*.mm",
+-        "src/main/native/cpp/*.h",
++        "src/main/native/cpp/*.hpp",
+     ]),
+     hdrs = glob([
+         "src/main/native/include/**/*",
+-        "src/main/native/objcpp/**/*.h",
++        "src/main/native/objcpp/**/*.hpp",
+     ]),
+     include_arc = False,
+     includes = [
 @@ -248,8 +248,8 @@ cc_binary(
  
  java_binary(
@@ -145,19 +190,19 @@ index c94e844b093ec59bc2cde4c27ff5ce7e95b08313..dd0f0daaaeca090f387e7bef241f1bb7
          ":cscore-java",
          "//wpiutil:wpiutil-java",
 diff --git a/docs/BUILD.bazel b/docs/BUILD.bazel
-index 4c106121326a2ea22fdc556685537263b5804427..7f5001bfdc2c0d0d3d58ce9bd122595cdeab3d89 100644
+index 4e66a54bcd553281d3672264d094af8a0bab56e7..763554a119fb452403d32dacbedbeb2223881e97 100644
 --- a/docs/BUILD.bazel
 +++ b/docs/BUILD.bazel
 @@ -60,11 +60,11 @@ doxygen(
          ":third_party_notices",
          "//apriltag:doxygen-files",
          "//cameraserver:doxygen-files",
-+        "//command:doxygen-files",
++        "//command2:doxygen-files",
          "//cscore:doxygen-files",
          "//hal:doxygen-files",
          "//ntcore:doxygen-files",
          "//romiVendordep:doxygen-files",
--        "//command:doxygen-files",
+-        "//command2:doxygen-files",
          "//wpilibc:doxygen-files",
          "//wpimath:doxygen-files",
          "//wpinet:doxygen-files",
@@ -165,18 +210,18 @@ index 4c106121326a2ea22fdc556685537263b5804427..7f5001bfdc2c0d0d3d58ce9bd122595c
      deps = [
          "//apriltag:apriltag-java",
          "//cameraserver:cameraserver-java",
-+        "//command:command-java",
++        "//command2:command2-java",
          "//cscore:cscore-java",
          "//epilogue-runtime:epilogue-java",
          "//hal:hal-java",
          "//ntcore:ntcore-java",
          "//romiVendordep:romiVendordep-java",
--        "//command:command-java",
+-        "//command2:command2-java",
          "//wpilibj:wpilibj-java",
          "//wpimath:wpimath-java",
          "//wpinet:wpinet-java",
 diff --git a/epilogue-processor/BUILD.bazel b/epilogue-processor/BUILD.bazel
-index cf6c5a97054fd65cf08de6b019fd8f1044435f5d..cdbdc359ad5680222f6ec5eee2196a120ba8006f 100644
+index 7bf77744cd4040c4618f3ad7c92cea30eefcdfcd..a9e2583a84d8442b832bc083132ffc833ab961fa 100644
 --- a/epilogue-processor/BUILD.bazel
 +++ b/epilogue-processor/BUILD.bazel
 @@ -27,7 +27,7 @@ pkg_files(
@@ -226,7 +271,7 @@ index c498706bf1b1cc0d54baae6f0f12c0eff319bb43..34fa423ecfa8bcdc444cc1a3620fd635
      ],
  )
 diff --git a/ntcore/BUILD.bazel b/ntcore/BUILD.bazel
-index cf31240675a663908a77e823e592b06d9caa7bb0..e5891f18d602cb2a0b8a2b82729eb0730b5a1ca2 100644
+index cf31240675a663908a77e823e592b06d9caa7bb0..88652a6fddb5576eaf4eb89ce31318c9a1886fac 100644
 --- a/ntcore/BUILD.bazel
 +++ b/ntcore/BUILD.bazel
 @@ -73,8 +73,8 @@ filegroup(
@@ -240,6 +285,15 @@ index cf31240675a663908a77e823e592b06d9caa7bb0..e5891f18d602cb2a0b8a2b82729eb073
      ],
      includes = [
          "src/generated/main/native/include",
+@@ -176,7 +176,7 @@ cc_test(
+     size = "small",
+     srcs = glob([
+         "src/test/native/**/*.cpp",
+-        "src/test/native/**/*.h",
++        "src/test/native/**/*.hpp",
+     ]),
+     tags = [
+         "exclusive",
 diff --git a/romiVendordep/BUILD.bazel b/romiVendordep/BUILD.bazel
 index 31ae22769fc7146dcd6729161b0ed6922775813d..7f65bb689d77c94f585cd915425fede37955f5f5 100644
 --- a/romiVendordep/BUILD.bazel
@@ -255,6 +309,124 @@ index 31ae22769fc7146dcd6729161b0ed6922775813d..7f65bb689d77c94f585cd915425fede3
      deps = [
          "//hal:hal-java",
          "//ntcore:ntcore-java",
+diff --git a/simulation/halsim_gui/BUILD.bazel b/simulation/halsim_gui/BUILD.bazel
+index f14ad8a1c677c63bac1bd33e2e04698f0344376f..c72bd44a3b74ec5dd62f563affd1df5385d214d3 100644
+--- a/simulation/halsim_gui/BUILD.bazel
++++ b/simulation/halsim_gui/BUILD.bazel
+@@ -6,7 +6,7 @@ wpilib_cc_library(
+     name = "halsim_gui",
+     srcs = glob([
+         "src/main/native/cpp/*",
+-        "src/main/native/include/*.h",
++        "src/main/native/include/**/*.hpp",
+     ]),
+     include_license_files = True,
+     includes = ["src/main/native/include"],
+@@ -32,7 +32,7 @@ wpilib_cc_library(
+     name = "halsim_gui_static",
+     srcs = glob([
+         "src/main/native/cpp/*",
+-        "src/main/native/include/*.h",
++        "src/main/native/include/**/*.hpp",
+     ]),
+     copts = [
+         "-DHALSIM_InitExtension=HALSIM_InitExtension_GUI",
+diff --git a/simulation/halsim_ws_client/BUILD.bazel b/simulation/halsim_ws_client/BUILD.bazel
+index b582d07d001b4132cb5eb8fa1fcb937b60509bfa..3c485afa71ecde5ce149658f6f31faaea0a107a1 100644
+--- a/simulation/halsim_ws_client/BUILD.bazel
++++ b/simulation/halsim_ws_client/BUILD.bazel
+@@ -7,7 +7,7 @@ wpilib_halsim_extension(
+     name = "halsim_ws_client",
+     srcs = glob([
+         "src/main/native/cpp/*.cpp",
+-        "src/main/native/include/*.h",
++        "src/main/native/include/**/*.hpp",
+     ]),
+     deps = [
+         "//simulation/halsim_ws_core",
+@@ -18,7 +18,7 @@ wpilib_halsim_extension(
+     name = "halsim_ws_client_static",
+     srcs = glob([
+         "src/main/native/cpp/*.cpp",
+-        "src/main/native/include/*.h",
++        "src/main/native/include/**/*.hpp",
+     ]),
+     copts = [
+         "-DHALSIM_InitExtension=HALSIM_InitExtension_WS_CLIENT",
+diff --git a/simulation/halsim_ws_core/BUILD.bazel b/simulation/halsim_ws_core/BUILD.bazel
+index 7092ce11b137e247d42863878e272dcd4ca17fac..a148e915b5f8d56d0d89ec83b387328981b3cebe 100644
+--- a/simulation/halsim_ws_core/BUILD.bazel
++++ b/simulation/halsim_ws_core/BUILD.bazel
+@@ -4,7 +4,7 @@ load("//shared/bazel/rules:packaging.bzl", "package_minimal_cc_project")
+ wpilib_cc_library(
+     name = "halsim_ws_core",
+     srcs = glob(["src/main/native/cpp/*.cpp"]),
+-    hdrs = glob(["src/main/native/include/*.h"]),
++    hdrs = glob(["src/main/native/include/**/*.hpp"]),
+     include_license_files = True,
+     strip_include_prefix = "src/main/native/include",
+     target_compatible_with = select({
+diff --git a/simulation/halsim_ws_server/BUILD.bazel b/simulation/halsim_ws_server/BUILD.bazel
+index a0ca0249e79fe997c4c387f1cbc71554ebbddc50..18d3631773e370bdbb4665619579a70b809c1536 100644
+--- a/simulation/halsim_ws_server/BUILD.bazel
++++ b/simulation/halsim_ws_server/BUILD.bazel
+@@ -73,7 +73,7 @@ wpilib_cc_static_library(
+ 
+ cc_library(
+     name = "test_headers",
+-    srcs = glob(["src/test/native/include/*.h"]),
++    srcs = glob(["src/test/native/include/*.hpp"]),
+     includes = ["src/test/native/include"],
+     strip_include_prefix = "src/test/native/include",
+ )
+diff --git a/simulation/halsim_xrp/BUILD.bazel b/simulation/halsim_xrp/BUILD.bazel
+index 94edec015821ee8dd33f5afeda7091bc1aacfa80..1d3f8cc2511d0052dff0b16da54e75d25dedb099 100644
+--- a/simulation/halsim_xrp/BUILD.bazel
++++ b/simulation/halsim_xrp/BUILD.bazel
+@@ -6,7 +6,7 @@ wpilib_cc_library(
+     name = "halsim_xrp",
+     srcs = glob([
+         "src/main/native/cpp/*",
+-        "src/main/native/include/*.h",
++        "src/main/native/include/**/*.hpp",
+     ]),
+     include_license_files = True,
+     includes = ["src/main/native/include"],
+@@ -26,7 +26,7 @@ wpilib_cc_library(
+     name = "halsim_xrp_static",
+     srcs = glob([
+         "src/main/native/cpp/*",
+-        "src/main/native/include/*.h",
++        "src/main/native/include/**/*.hpp",
+     ]),
+     copts = [
+         "-DHALSIM_InitExtension=HALSIM_InitExtension_XRP",
+diff --git a/tools/processstarter/BUILD.bazel b/tools/processstarter/BUILD.bazel
+index 656a0bf5c2a428298f7fb3119c288d953d2eb54c..bf8abb1a3df3193149b2eb243b8a36de325185f6 100644
+--- a/tools/processstarter/BUILD.bazel
++++ b/tools/processstarter/BUILD.bazel
+@@ -3,18 +3,15 @@ load("//shared/bazel/rules:objectivec_rules.bzl", "wpilib_objc_library")
+ load("//shared/bazel/rules:packaging.bzl", "package_binary_cc_project")
+ 
+ WIN_SRCS = glob([
+-    "src/main/native/windows/**/*.cpp",
+-    "src/main/native/windows/**/*.h",
++    "src/main/native/windows/**",
+ ])
+ 
+ LINUX_SRCS = glob([
+-    "src/main/native/linux/**/*.cpp",
+-    "src/main/native/linux/**/*.h",
++    "src/main/native/linux/**",
+ ])
+ 
+ MAC_SRCS = glob([
+-    "src/main/native/osx/**/*.mm",
+-    "src/main/native/osx/**/*.h",
++    "src/main/native/osx/**",
+ ])
+ 
+ filegroup(
 diff --git a/tools/wpical/BUILD.bazel b/tools/wpical/BUILD.bazel
 index 753cb4b14e920f71a017591b119205d1f3084e43..35c8a64705aa31c5c4a116ca641132d13b79dc99 100644
 --- a/tools/wpical/BUILD.bazel
@@ -268,6 +440,46 @@ index 753cb4b14e920f71a017591b119205d1f3084e43..35c8a64705aa31c5c4a116ca641132d1
          "__BAZEL__=1",
      ],
      deps = [
+diff --git a/wpilibcExamples/build_cpp_examples.bzl b/wpilibcExamples/build_cpp_examples.bzl
+index edcb26efda362d4873d51d2fd461e774d9367856..8c5d5a674da7c0784e782cfc66bd5fdaa1ec55e1 100644
+--- a/wpilibcExamples/build_cpp_examples.bzl
++++ b/wpilibcExamples/build_cpp_examples.bzl
+@@ -32,7 +32,7 @@ def build_examples(halsim_deps = []):
+     for folder in EXAMPLE_FOLDERS:
+         cc_library(
+             name = folder + "-examples-headers",
+-            hdrs = native.glob(["src/main/cpp/examples/" + folder + "/include/**/*.h"], allow_empty = True),
++            hdrs = native.glob(["src/main/cpp/examples/" + folder + "/include/**/*.hpp"], allow_empty = True),
+             strip_include_prefix = "src/main/cpp/examples/" + folder + "/include",
+             tags = ["wpi-example"],
+         )
+@@ -57,7 +57,7 @@ def build_commands():
+         cc_library(
+             name = folder + "-command",
+             srcs = native.glob(["src/main/cpp/commands/" + folder + "/**/*.cpp"]),
+-            hdrs = native.glob(["src/main/cpp/commands/" + folder + "/**/*.h"]),
++            hdrs = native.glob(["src/main/cpp/commands/" + folder + "/**/*.hpp"]),
+             deps = [
+                 "//command2",
+             ],
+@@ -72,7 +72,7 @@ def build_snippets():
+         cc_library(
+             name = folder + "-template",
+             srcs = native.glob(["src/main/cpp/snippets/" + folder + "/**/*.cpp"]),
+-            hdrs = native.glob(["src/main/cpp/snippets/" + folder + "/**/*.h"], allow_empty = True),
++            hdrs = native.glob(["src/main/cpp/snippets/" + folder + "/**/*.hpp"], allow_empty = True),
+             deps = [
+                 "//command2",
+             ],
+@@ -87,7 +87,7 @@ def build_templates():
+         cc_library(
+             name = folder + "-template",
+             srcs = native.glob(["src/main/cpp/templates/" + folder + "/**/*.cpp"]),
+-            hdrs = native.glob(["src/main/cpp/templates/" + folder + "/**/*.h"]),
++            hdrs = native.glob(["src/main/cpp/templates/" + folder + "/**/*.hpp"]),
+             deps = [
+                 "//command2",
+             ],
 diff --git a/wpilibj/BUILD.bazel b/wpilibj/BUILD.bazel
 index 035d7a8e7e364fe27311637ccd969d136ea780ef..30d28579d208423977779022712658dd8a49f959 100644
 --- a/wpilibj/BUILD.bazel
@@ -303,7 +515,7 @@ index f98f9692136721904dc0b3d1a3324b440a396209..bd65719aaf312be9603617ccc1418a45
      outs = ["gen/example_projects.bzl"],
      cmd = "$(locations :generate_bazel_files) $(OUTS)",
 diff --git a/wpilibjExamples/build_java_examples.bzl b/wpilibjExamples/build_java_examples.bzl
-index ddf7299740df85f8217a006453ef81619e929d4b..f130c2b884f69ae946bfcfdf6d8695aa75d715c2 100644
+index 85763dc0a57895ec246342b973fb8d1887dbbef9..f1d6c35941a284a0a8c30e1a05381f05eeac6e30 100644
 --- a/wpilibjExamples/build_java_examples.bzl
 +++ b/wpilibjExamples/build_java_examples.bzl
 @@ -7,16 +7,16 @@ load("//wpilibjExamples:example_projects.bzl", "COMMANDS_V2_FOLDERS", "EXAMPLES_
@@ -375,10 +587,19 @@ index ddf7299740df85f8217a006453ef81619e929d4b..f130c2b884f69ae946bfcfdf6d8695aa
                  ":" + folder + "-example",
                  "//hal:hal-java",
 diff --git a/wpimath/BUILD.bazel b/wpimath/BUILD.bazel
-index 9731c7b0f124fd026179eb9337d4eaffcaa655b7..09d4ff1601fa3f1bee75aca8fff4fef317f38acd 100644
+index 37007f3c98a0f935ff73487d84518e90fa62bc10..1a8a02c0ef235a88ad1fd85da74c09c11cf81659 100644
 --- a/wpimath/BUILD.bazel
 +++ b/wpimath/BUILD.bazel
-@@ -293,8 +293,8 @@ cc_binary(
+@@ -263,7 +263,7 @@ cc_test(
+     size = "small",
+     srcs = glob([
+         "src/test/native/cpp/**/*.cpp",
+-        "src/test/native/cpp/**/*.h",
++        "src/test/native/cpp/**/*.hpp",
+     ]),
+     tags = [
+         "no-raspi",
+@@ -298,8 +298,8 @@ cc_binary(
  
  java_binary(
      name = "DevMain-Java",
@@ -390,9 +611,36 @@ index 9731c7b0f124fd026179eb9337d4eaffcaa655b7..09d4ff1601fa3f1bee75aca8fff4fef3
          ":wpimath-java",
      ],
 diff --git a/wpinet/BUILD.bazel b/wpinet/BUILD.bazel
-index df8e3ac5d858c016b23a4a75b77b9b5b64e9dcf1..7814d5555f60fd61c0f08e8372b9d889bdf6487b 100644
+index df8e3ac5d858c016b23a4a75b77b9b5b64e9dcf1..de9fa913798409653d081930d96e7e645ecd179a 100644
 --- a/wpinet/BUILD.bazel
 +++ b/wpinet/BUILD.bazel
+@@ -126,7 +126,7 @@ filegroup(
+ cc_library(
+     name = "private_includes",
+     hdrs = glob([
+-        "src/main/native/cpp/*.h",
++        "src/main/native/cpp/*.hpp",
+     ]),
+     strip_include_prefix = "src/main/native/cpp",
+ )
+@@ -191,7 +191,7 @@ wpilib_jni_cc_library(
+     name = "wpinetjni",
+     srcs = glob([
+         "src/main/native/cpp/jni/**",
+-        "src/main/native/cpp/**/*.h",
++        "src/main/native/cpp/**/*.hpp",
+     ]),
+     java_dep = ":wpinet-java",
+     visibility = ["//visibility:public"],
+@@ -229,7 +229,7 @@ cc_test(
+     size = "small",
+     srcs = glob([
+         "src/test/native/**/*.cpp",
+-        "src/test/native/**/*.h",
++        "src/test/native/**/*.hpp",
+     ]),
+     tags = ["no-asan"],
+     deps = [
 @@ -257,8 +257,8 @@ cc_binary(
  
  java_binary(

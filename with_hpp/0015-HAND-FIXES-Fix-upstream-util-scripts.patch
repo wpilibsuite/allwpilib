@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Mon, 22 Sep 2025 23:22:21 -0400
-Subject: [PATCH 15/24] HAND FIXES: Fix upstream util scripts
+Date: Sat, 4 Oct 2025 15:34:37 -0400
+Subject: [PATCH 15/26] HAND FIXES: Fix upstream util scripts
 
 ---
  upstream_utils/argparse_lib.py                |  2 +-
