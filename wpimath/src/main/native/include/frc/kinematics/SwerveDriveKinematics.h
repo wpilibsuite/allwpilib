@@ -354,20 +354,15 @@ class SwerveDriveKinematics
                          })
             ->speed);
 
-    wpi::array<SwerveModuleState, NumModules> states(wpi::empty_array);
     if (realMaxSpeed > attainableMaxSpeed) {
+      wpi::array<SwerveModuleState, NumModules> states(wpi::empty_array);
       for (size_t i = 0; i < NumModules; ++i) {
         states[i] = {moduleStates[i].speed / realMaxSpeed * attainableMaxSpeed,
                      moduleStates[i].angle};
       }
-    } else {
-      // Copy in the event someone wants to mutate the desaturated states but
-      // also wants the original states
-      for (size_t i = 0; i < NumModules; ++i) {
-        states[i] = moduleStates[i];
-      }
+      return states;
     }
-    return states;
+    return moduleStates;
   }
 
   /**
@@ -411,16 +406,10 @@ class SwerveDriveKinematics
                          })
             ->speed);
 
-    wpi::array<SwerveModuleState, NumModules> states(wpi::empty_array);
     if (attainableMaxRobotTranslationSpeed == 0_mps ||
         attainableMaxRobotRotationSpeed == 0_rad_per_s ||
         realMaxSpeed == 0_mps) {
-      // Copy in the event someone wants to mutate the desaturated states but
-      // also wants the original states
-      for (size_t i = 0; i < NumModules; ++i) {
-        states[i] = moduleStates[i];
-      }
-      return states;
+      return moduleStates;
     }
 
     auto translationalK =
@@ -434,6 +423,7 @@ class SwerveDriveKinematics
 
     auto scale = units::math::min(k * attainableMaxModuleSpeed / realMaxSpeed,
                                   units::scalar_t{1});
+    wpi::array<SwerveModuleState, NumModules> states(wpi::empty_array);
     for (size_t i = 0; i < NumModules; ++i) {
       states[i] = {moduleStates[i].speed * scale, moduleStates[i].angle};
     }
