@@ -8,6 +8,8 @@ if(WITH_JAVA)
     include(UseJava)
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java src/generated/main/java/*.java)
+    file(GLOB QUICKBUF_JAR ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/*.jar)
+
     add_jar(
         commandsv3_jar
         ${JAVA_SOURCES}
@@ -17,10 +19,12 @@ if(WITH_JAVA)
             ntcore_jar
             cscore_jar
             cameraserver_jar
+            wpiannotations_jar
             wpimath_jar
             wpiunits_jar
             wpiutil_jar
             wpilibj_jar
+            ${QUICKBUF_JAR}
         OUTPUT_NAME commandsv3
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
@@ -47,10 +51,3 @@ if(WITH_JAVA_SOURCE)
     set_property(TARGET commandsv3_src_jar PROPERTY FOLDER "java")
     install_jar(commandsv3_src_jar DESTINATION ${java_lib_dest})
 endif()
-
-install(TARGETS commandsv3 EXPORT commandsv3)
-export(TARGETS commandsv3 FILE commandsv3.cmake NAMESPACE commandsv3::)
-
-configure_file(commandsv3-config.cmake.in ${WPILIB_BINARY_DIR}/commandsv3-config.cmake)
-install(FILES ${WPILIB_BINARY_DIR}/commandsv3-config.cmake DESTINATION share/commandsv3)
-install(EXPORT commandsv3 DESTINATION share/commandsv3)
