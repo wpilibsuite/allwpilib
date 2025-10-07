@@ -13,6 +13,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
+import org.wpilib.annotation.NoDiscard;
 
 /**
  * A builder class for commands. Command configuration is done in stages, where later stages have
@@ -52,6 +53,7 @@ import java.util.function.Consumer;
  *     .named("Example Command");
  * }</pre>
  */
+@NoDiscard
 public final class StagedCommandBuilder {
   private final Set<Mechanism> m_requirements = new HashSet<>();
   private Consumer<Coroutine> m_impl;

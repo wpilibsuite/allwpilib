@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
+import org.wpilib.annotation.NoDiscard;
 
 /**
  * A builder class to configure and then create a {@link SequentialGroup}. Like {@link
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
  * #named(String)} method, or with an automatically generated name using {@link
  * #withAutomaticName()}.
  */
+@NoDiscard
 public class SequentialGroupBuilder {
   private final List<Command> m_steps = new ArrayList<>();
   private BooleanSupplier m_endCondition;

@@ -7,6 +7,7 @@ package org.wpilib.commands3;
 import edu.wpi.first.units.measure.Time;
 import java.util.List;
 import java.util.function.Consumer;
+import org.wpilib.annotation.NoDiscard;
 
 /**
  * Generic base class to represent mechanisms on a robot. Commands can require sole ownership of a
@@ -61,6 +62,7 @@ public class Mechanism {
    *
    * @return The name of the mechanism.
    */
+  @NoDiscard
   public String getName() {
     return m_name;
   }
@@ -151,6 +153,7 @@ public class Mechanism {
    *
    * @return The currently running commands that require the mechanism.
    */
+  @NoDiscard
   public List<Command> getRunningCommands() {
     return m_registeredScheduler.getRunningCommandsFor(this);
   }

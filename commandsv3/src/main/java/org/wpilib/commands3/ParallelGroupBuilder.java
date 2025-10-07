@@ -11,6 +11,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
+import org.wpilib.annotation.NoDiscard;
 
 /**
  * A builder class to configure and then create a {@link ParallelGroup}. Like {@link
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
  * #named(String)} method, or with an automatically generated name using {@link
  * #withAutomaticName()}.
  */
+@NoDiscard
 public class ParallelGroupBuilder {
   private final Set<Command> m_commands = new LinkedHashSet<>();
   private final Set<Command> m_requiredCommands = new LinkedHashSet<>();

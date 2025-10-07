@@ -6,6 +6,7 @@ package org.wpilib.commands3;
 
 import java.util.Collection;
 import java.util.function.Consumer;
+import org.wpilib.annotation.NoDiscard;
 
 /**
  * A stage in a command builder where requirements have already been specified and execution details
@@ -13,6 +14,7 @@ import java.util.function.Consumer;
  * #executing(Consumer)}. Additional requirements may still be added before moving on to the next
  * stage.
  */
+@NoDiscard
 public interface NeedsExecutionBuilderStage {
   /**
    * Adds a required mechanism for the command.

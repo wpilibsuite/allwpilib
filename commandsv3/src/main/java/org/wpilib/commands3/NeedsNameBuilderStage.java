@@ -6,12 +6,14 @@ package org.wpilib.commands3;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
+import org.wpilib.annotation.NoDiscard;
 
 /**
  * A stage in a command builder where requirements and main command execution logic have been set.
  * No more changes to requirements or command implementation may happen after this point. This is
  * the final step in command creation
  */
+@NoDiscard
 public interface NeedsNameBuilderStage {
   /**
    * Optionally sets a callback to execute when the command is canceled. The callback will not run

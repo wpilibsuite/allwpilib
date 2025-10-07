@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import org.wpilib.annotation.NoDiscard;
 import org.wpilib.commands3.button.CommandGenericHID;
 import org.wpilib.commands3.proto.SchedulerProto;
 
@@ -140,6 +141,7 @@ public final class Scheduler implements ProtobufSerializable {
    *
    * @return the default scheduler instance.
    */
+  @NoDiscard
   public static Scheduler getDefault() {
     return s_defaultScheduler;
   }
@@ -153,6 +155,7 @@ public final class Scheduler implements ProtobufSerializable {
    *
    * @return a new scheduler instance that is independent of the default scheduler instance.
    */
+  @NoDiscard
   public static Scheduler createIndependentScheduler() {
     return new Scheduler();
   }
@@ -800,6 +803,7 @@ public final class Scheduler implements ProtobufSerializable {
    *
    * @return the default event loop.
    */
+  @NoDiscard
   public EventLoop getDefaultEventLoop() {
     return m_eventLoop;
   }
@@ -809,6 +813,7 @@ public final class Scheduler implements ProtobufSerializable {
    *
    * @return The commands that have been scheduled but not yet started.
    */
+  @NoDiscard
   public Collection<Command> getQueuedCommands() {
     return m_queuedToRun.stream().map(CommandState::command).toList();
   }
@@ -866,6 +871,7 @@ public final class Scheduler implements ProtobufSerializable {
    * @param command The command to get the run ID for
    * @return The run of the command
    */
+  @NoDiscard
   @SuppressWarnings("PMD.CompareObjectsWithEquals")
   public int runId(Command command) {
     if (m_runningCommands.containsKey(command)) {
@@ -888,6 +894,7 @@ public final class Scheduler implements ProtobufSerializable {
    *
    * @return How long, in milliseconds, the scheduler last took to execute.
    */
+  @NoDiscard
   public double lastRuntimeMs() {
     return m_lastRunTimeMs;
   }

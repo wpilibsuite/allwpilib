@@ -17,6 +17,8 @@ evaluationDependsOn(':wpimath')
 evaluationDependsOn(':wpilibj')
 
 dependencies {
+    annotationProcessor project(':javacPlugin')
+    implementation project(':wpiannotations')
     implementation project(':wpiutil')
     implementation project(':wpinet')
     implementation project(':ntcore')
@@ -24,6 +26,7 @@ dependencies {
     implementation project(':wpimath')
     implementation project(':wpilibj')
     api("us.hebi.quickbuf:quickbuf-runtime:1.4")
+    testAnnotationProcessor project(':javacPlugin')
     testImplementation 'org.mockito:mockito-core:4.1.0'
 }
 

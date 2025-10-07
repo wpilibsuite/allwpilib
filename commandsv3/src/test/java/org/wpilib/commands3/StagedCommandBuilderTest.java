@@ -64,7 +64,7 @@ class StagedCommandBuilderTest {
   @Test
   void starting_noRequirements_throwsAfterBuild() {
     var builder = new StagedCommandBuilder();
-    builder.noRequirements().executing(c -> {}).named("cmd");
+    var ignore = builder.noRequirements().executing(c -> {}).named("cmd");
 
     var err = assertThrows(IllegalStateException.class, builder::noRequirements);
     assertEquals("Command builders cannot be reused", err.getMessage());
@@ -73,7 +73,7 @@ class StagedCommandBuilderTest {
   @Test
   void starting_requiringVarargs_throwsAfterBuild() {
     var builder = new StagedCommandBuilder();
-    builder.noRequirements().executing(c -> {}).named("cmd");
+    var ignore = builder.noRequirements().executing(c -> {}).named("cmd");
 
     var err = assertThrows(IllegalStateException.class, () -> builder.requiring(m_mech1, m_mech2));
     assertEquals("Command builders cannot be reused", err.getMessage());
@@ -82,7 +82,7 @@ class StagedCommandBuilderTest {
   @Test
   void starting_requiringCollection_throwsAfterBuild() {
     var builder = new StagedCommandBuilder();
-    builder.noRequirements().executing(c -> {}).named("cmd");
+    var ignore = builder.noRequirements().executing(c -> {}).named("cmd");
 
     var err =
         assertThrows(
@@ -94,7 +94,7 @@ class StagedCommandBuilderTest {
   void requirements_requiringSingle_throwsAfterBuild() {
     var builder = new StagedCommandBuilder();
     var reqStage = builder.noRequirements();
-    reqStage.executing(c -> {}).named("cmd");
+    var ignore = reqStage.executing(c -> {}).named("cmd");
 
     var err = assertThrows(IllegalStateException.class, () -> reqStage.requiring(m_mech1));
     assertEquals("Command builders cannot be reused", err.getMessage());
@@ -104,7 +104,7 @@ class StagedCommandBuilderTest {
   void requirements_requiringVarargs_throwsAfterBuild() {
     var builder = new StagedCommandBuilder();
     var reqStage = builder.noRequirements();
-    reqStage.executing(Coroutine::park).named("cmd");
+    var ignore = reqStage.executing(Coroutine::park).named("cmd");
 
     var err = assertThrows(IllegalStateException.class, () -> reqStage.requiring(m_mech1, m_mech2));
     assertEquals("Command builders cannot be reused", err.getMessage());
@@ -114,7 +114,7 @@ class StagedCommandBuilderTest {
   void requirements_requiringCollection_throwsAfterBuild() {
     var builder = new StagedCommandBuilder();
     var reqStage = builder.noRequirements();
-    reqStage.executing(Coroutine::park).named("cmd");
+    var ignore = reqStage.executing(Coroutine::park).named("cmd");
 
     var err = assertThrows(IllegalStateException.class, () -> reqStage.requiring(List.of(m_mech1)));
     assertEquals("Command builders cannot be reused", err.getMessage());
@@ -124,7 +124,7 @@ class StagedCommandBuilderTest {
   void requirements_executing_throwsAfterBuild() {
     var builder = new StagedCommandBuilder();
     var reqStage = builder.noRequirements();
-    reqStage.executing(c -> {}).named("cmd");
+    var ignore = reqStage.executing(c -> {}).named("cmd");
 
     Consumer<Coroutine> impl = Coroutine::park;
     var err = assertThrows(IllegalStateException.class, () -> reqStage.executing(impl));
@@ -135,7 +135,7 @@ class StagedCommandBuilderTest {
   void execution_whenCanceled_throwsAfterBuild() {
     var builder = new StagedCommandBuilder();
     var execStage = builder.noRequirements().executing(c -> {});
-    execStage.named("cmd");
+    var ignore = execStage.named("cmd");
 
     var err = assertThrows(IllegalStateException.class, () -> execStage.whenCanceled(() -> {}));
     assertEquals("Command builders cannot be reused", err.getMessage());
@@ -145,7 +145,7 @@ class StagedCommandBuilderTest {
   void execution_withPriority_throwsAfterBuild() {
     var builder = new StagedCommandBuilder();
     var execStage = builder.noRequirements().executing(c -> {});
-    execStage.named("cmd");
+    var ignore = execStage.named("cmd");
 
     var err = assertThrows(IllegalStateException.class, () -> execStage.withPriority(7));
     assertEquals("Command builders cannot be reused", err.getMessage());
@@ -155,7 +155,7 @@ class StagedCommandBuilderTest {
   void execution_until_throwsAfterBuild() {
     var builder = new StagedCommandBuilder();
     var execStage = builder.noRequirements().executing(c -> {});
-    execStage.named("cmd");
+    var ignore = execStage.named("cmd");
 
     BooleanSupplier endCondition = () -> true;
     var err = assertThrows(IllegalStateException.class, () -> execStage.until(endCondition));
@@ -166,7 +166,7 @@ class StagedCommandBuilderTest {
   void execution_named_throwsAfterBuild() {
     var builder = new StagedCommandBuilder();
     var execStage = builder.noRequirements().executing(c -> {});
-    execStage.named("cmd");
+    var ignore = execStage.named("cmd");
 
     var err = assertThrows(IllegalStateException.class, () -> execStage.named("other"));
     assertEquals("Command builders cannot be reused", err.getMessage());

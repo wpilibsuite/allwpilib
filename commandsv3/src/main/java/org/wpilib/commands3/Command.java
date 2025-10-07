@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
+import org.wpilib.annotation.NoDiscard;
 
 /**
  * Performs some task using one or more {@link Mechanism mechanisms}. Commands are fundamentally
@@ -93,6 +94,7 @@ import java.util.function.Consumer;
  * }
  * }</pre>
  */
+@NoDiscard("Commands must be used! Did you mean to fork it or bind it to a trigger?")
 public interface Command {
   /** The default command priority. */
   int DEFAULT_PRIORITY = 0;
@@ -136,6 +138,7 @@ public interface Command {
    *
    * @return the name of the command
    */
+  @NoDiscard
   String name();
 
   /**
@@ -145,6 +148,7 @@ public interface Command {
    *
    * @return the set of mechanisms required by the command
    */
+  @NoDiscard
   Set<Mechanism> requirements();
 
   /**
@@ -156,6 +160,7 @@ public interface Command {
    *
    * @return the priority of the command
    */
+  @NoDiscard
   default int priority() {
     return DEFAULT_PRIORITY;
   }
@@ -166,6 +171,7 @@ public interface Command {
    * @param other the command to compare with
    * @return true if this command has a lower priority than the other one, false otherwise
    */
+  @NoDiscard
   default boolean isLowerPriorityThan(Command other) {
     requireNonNullParam(other, "other", "Command.isLowerPriorityThan");
 
@@ -178,6 +184,7 @@ public interface Command {
    * @param mechanism the mechanism to check
    * @return true if the mechanism is required, false if not
    */
+  @NoDiscard
   default boolean requires(Mechanism mechanism) {
     return requirements().contains(mechanism);
   }
@@ -189,6 +196,7 @@ public interface Command {
    * @return true if both commands require at least one of the same mechanism, false if both
    *     commands have completely different requirements
    */
+  @NoDiscard
   default boolean conflictsWith(Command other) {
     requireNonNullParam(other, "other", "Command.conflictsWith");
 
