@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Johnson <johnson.peter@gmail.com>
 Date: Fri, 20 Jan 2023 23:41:56 -0800
-Subject: [PATCH 2/2] Intellisense fix
+Subject: [PATCH 2/3] Intellisense fix
 
 ---
  Eigen/src/Core/util/ConfigureVectorization.h | 7 +++++++

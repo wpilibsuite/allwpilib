@@ -2,6 +2,40 @@ load("@rules_pkg//:mappings.bzl", "pkg_filegroup", "pkg_files")
 load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 load("//shared/bazel/rules:publishing.bzl", "architectures_pkg_zip", "platform_prefix", "wpilib_maven_export")
 
+def _headers_impl(ctx):
+    # Get the CcInfo provider from the dependency.
+    # We only expect one dependency, so we take the first from the list.
+    target_cc_info = ctx.attr.dep[CcInfo]
+
+    # Extract the set of public headers from the compilation context.
+    headers = target_cc_info.compilation_context.headers
+
+    # Return the generated archive as a default output.
+    return [DefaultInfo(files = headers)]
+
+_headers = rule(
+    implementation = _headers_impl,
+    attrs = {
+        "dep": attr.label(
+            providers = [CcInfo],
+            mandatory = True,
+            doc = "The cc_library target whose headers should be extracted.",
+        ),
+    },
+    doc = "Extracts the public headers of a C/C++ library.",
+)
+
+def pkg_files_headers(name, dep):
+    """Makes a pkg_files out of the headers of a cc_library target."""
+    _headers(name = name + "-headers", dep = dep)
+    pkg_files(
+        name = name,
+        srcs = [
+            ":" + name + "-headers",
+        ],
+        strip_prefix = "",
+    )
+
 def pkg_java_src_files(name):
     pkg_files(
         name = name + "-java-srcs",
