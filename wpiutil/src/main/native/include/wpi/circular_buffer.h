@@ -33,7 +33,7 @@ class circular_buffer {
 
   class iterator {
    public:
-    using iterator_category = std::forward_iterator_tag;
+    using iterator_category = std::bidirectional_iterator_tag;
     using value_type = T;
     using difference_type = std::ptrdiff_t;
     using pointer = T*;
@@ -51,6 +51,15 @@ class circular_buffer {
       ++(*this);
       return retval;
     }
+    constexpr iterator& operator--() {
+      --m_index;
+      return *this;
+    }
+    constexpr iterator operator--(int) {
+      iterator retval = *this;
+      --(*this);
+      return retval;
+    }
     constexpr bool operator==(const iterator&) const = default;
     constexpr reference operator*() { return (*m_buffer)[m_index]; }
 
@@ -61,7 +70,7 @@ class circular_buffer {
 
   class const_iterator {
    public:
-    using iterator_category = std::forward_iterator_tag;
+    using iterator_category = std::bidirectional_iterator_tag;
     using value_type = T;
     using difference_type = std::ptrdiff_t;
     using pointer = T*;
@@ -79,6 +88,15 @@ class circular_buffer {
       ++(*this);
       return retval;
     }
+    constexpr const_iterator& operator--() {
+      --m_index;
+      return *this;
+    }
+    constexpr const_iterator operator--(int) {
+      const_iterator retval = *this;
+      --(*this);
+      return retval;
+    }
     constexpr bool operator==(const const_iterator&) const = default;
     constexpr const_reference operator*() const { return (*m_buffer)[m_index]; }
 
@@ -87,19 +105,81 @@ class circular_buffer {
     size_t m_index;
   };
 
+  using reverse_iterator = std::reverse_iterator<iterator>;
+  using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+
+  /**
+   * Returns begin iterator.
+   */
   constexpr iterator begin() { return iterator(this, 0); }
+
+  /**
+   * Returns end iterator.
+   */
   constexpr iterator end() {
     return iterator(this, ::wpi::circular_buffer<T>::size());
   }
 
+  /**
+   * Returns const begin iterator.
+   */
   constexpr const_iterator begin() const { return const_iterator(this, 0); }
+
+  /**
+   * Returns const end iterator.
+   */
   constexpr const_iterator end() const {
     return const_iterator(this, ::wpi::circular_buffer<T>::size());
   }
 
+  /**
+   * Returns const begin iterator.
+   */
   constexpr const_iterator cbegin() const { return const_iterator(this, 0); }
+
+  /**
+   * Returns const end iterator.
+   */
   constexpr const_iterator cend() const {
     return const_iterator(this, ::wpi::circular_buffer<T>::size());
+  }
+
+  /**
+   * Returns reverse begin iterator.
+   */
+  constexpr reverse_iterator rbegin() { return reverse_iterator(end()); }
+
+  /**
+   * Returns reverse end iterator.
+   */
+  constexpr reverse_iterator rend() { return reverse_iterator(begin()); }
+
+  /**
+   * Returns const reverse begin iterator.
+   */
+  constexpr const_reverse_iterator rbegin() const {
+    return const_reverse_iterator(end());
+  }
+
+  /**
+   * Returns const reverse end iterator.
+   */
+  constexpr const_reverse_iterator rend() const {
+    return const_reverse_iterator(begin());
+  }
+
+  /**
+   * Returns const reverse begin iterator.
+   */
+  constexpr const_reverse_iterator crbegin() const {
+    return const_reverse_iterator(cend());
+  }
+
+  /**
+   * Returns const reverse end iterator.
+   */
+  constexpr const_reverse_iterator crend() const {
+    return const_reverse_iterator(cbegin());
   }
 
   /**

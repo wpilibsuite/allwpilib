@@ -23,6 +23,7 @@ if(WITH_JAVA)
             wpiutil_jar
             wpilibj_jar
             datalog_jar
+            wpiannotations_jar
         OUTPUT_NAME wpilibNewCommands
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )

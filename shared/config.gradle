@@ -38,12 +38,14 @@ nativeUtils.platformConfigs.each {
     }
 }
 
-// Compress debug info on Linux
 nativeUtils.platformConfigs.each {
   if (it.name.contains('linux')) {
+    // Compress debug info on Linux
     it.cppCompiler.debugArgs.add("-gz=zlib")
     // Make warning in OpenCV 4.10 from GCC 15 not an error
     it.cppCompiler.args.add("-Wno-error=overloaded-virtual")
+    // Make warning from Google Benchmark not an error
+    it.cppCompiler.args.add("-Wno-error=restrict")
   }
 }
 
