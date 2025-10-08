@@ -22,19 +22,25 @@ public class Robot extends TimedRobot {
   private final Encoder m_encoder = new Encoder(0, 1);
   private final PWMSparkMax m_motor = new PWMSparkMax(0);
 
-  double m_lastSpeed = 0;
+  double m_lastSpeed;
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
     m_encoder.setDistancePerPulse(1.0 / 256.0);
   }
 
-  // Controls a simple motor's position using a SimpleMotorFeedforward
-  // and a ProfiledPIDController
+  /**
+   * Controls a simple motor's position using a SimpleMotorFeedforward and a
+   * ProfiledPIDController.
+   *
+   * @param goalPosition the desired position
+   */
   public void goToPosition(double goalPosition) {
     double pidVal = m_controller.calculate(m_encoder.getDistance(), goalPosition);
     m_motor.setVoltage(
-        pidVal + m_feedforward.calculateWithVelocities(m_lastSpeed, m_controller.getSetpoint().velocity));
+        pidVal
+            + m_feedforward.calculateWithVelocities(
+                m_lastSpeed, m_controller.getSetpoint().velocity));
     m_lastSpeed = m_controller.getSetpoint().velocity;
   }
 
