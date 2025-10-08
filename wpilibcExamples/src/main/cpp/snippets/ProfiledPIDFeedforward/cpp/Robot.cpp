@@ -25,7 +25,7 @@ class Robot : public frc::TimedRobot {
   void GoToPosition(units::meter_t goalPosition) {
     auto pidVal = m_controller.Calculate(
         units::meter_t{m_encoder.GetDistance()}, goalPosition);
-    m_motor.SetVoltage(pidVal +
+    m_motor.SetVoltage(units::volt_t{pidVal} +
                        m_feedforward.Calculate(
                            m_lastSpeed, m_controller.GetSetpoint().velocity));
     m_lastSpeed = m_controller.GetSetpoint().velocity;
