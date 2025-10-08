@@ -159,9 +159,8 @@
     "name": "ProfiledPIDFeedforward",
     "description": "Snippets of ProfiledPIDController with feedforward for frc-docs.",
     "tags": [
-      "Controller",
       "PID",
-      "Feedforward"
+      "Profiled PID"
     ],
     "foldername": "ProfiledPIDFeedforward",
     "gradlebase": "cpp"
