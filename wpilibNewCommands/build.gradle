@@ -25,6 +25,7 @@ dependencies {
     api project(':datalog')
     testImplementation 'org.mockito:mockito-core:4.1.0'
     annotationProcessor project(':javacPlugin')
+    testAnnotationProcessor project(':javacPlugin')
 }
 
 sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
