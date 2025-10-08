@@ -154,5 +154,16 @@
     ],
     "foldername": "AccelerometerFilter",
     "gradlebase": "cpp"
+  },
+  {
+    "name": "ProfiledPIDFeedforward",
+    "description": "Snippets of ProfiledPIDController with feedforward for frc-docs.",
+    "tags": [
+      "Controller",
+      "PID",
+      "Feedforward"
+    ],
+    "foldername": "ProfiledPIDFeedforward",
+    "gradlebase": "cpp"
   }
 ]

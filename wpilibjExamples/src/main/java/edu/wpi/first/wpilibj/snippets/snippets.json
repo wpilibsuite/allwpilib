@@ -169,5 +169,17 @@
     "foldername": "accelerometerfilter",
     "gradlebase": "java",
     "mainclass": "Main"
+  },
+  {
+    "name": "ProfiledPIDFeedforward",
+    "description": "Snippets of ProfiledPIDController with feedforward for frc-docs.",
+    "tags": [
+      "Controller",
+      "PID",
+      "Feedforward"
+    ],
+    "foldername": "profiledpidfeedforward",
+    "gradlebase": "java",
+    "mainclass": "Robot"
   }
 ]
