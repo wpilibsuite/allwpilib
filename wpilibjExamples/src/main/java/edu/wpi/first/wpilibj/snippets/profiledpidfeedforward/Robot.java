@@ -34,8 +34,7 @@ public class Robot extends TimedRobot {
   public void goToPosition(double goalPosition) {
     double pidVal = m_controller.calculate(m_encoder.getDistance(), goalPosition);
     m_motor.setVoltage(
-        pidVal
-            + m_feedforward.calculate(m_lastSpeed, m_controller.getSetpoint().velocity));
+        pidVal + m_feedforward.calculate(m_lastSpeed, m_controller.getSetpoint().velocity));
     m_lastSpeed = m_controller.getSetpoint().velocity;
   }
 

@@ -23,10 +23,11 @@ class Robot : public frc::TimedRobot {
   // Controls a simple motor's position using a SimpleMotorFeedforward
   // and a ProfiledPIDController
   void GoToPosition(units::meter_t goalPosition) {
-    auto pidVal = m_controller.Calculate(units::meter_t{m_encoder.GetDistance()}, goalPosition);
-    m_motor.SetVoltage(
-         pidVal +
-        m_feedforward.Calculate(m_lastSpeed, m_controller.GetSetpoint().velocity));
+    auto pidVal = m_controller.Calculate(
+        units::meter_t{m_encoder.GetDistance()}, goalPosition);
+    m_motor.SetVoltage(pidVal +
+                       m_feedforward.Calculate(
+                           m_lastSpeed, m_controller.GetSetpoint().velocity));
     m_lastSpeed = m_controller.GetSetpoint().velocity;
   }
 
@@ -39,7 +40,7 @@ class Robot : public frc::TimedRobot {
   frc::ProfiledPIDController<units::meters> m_controller{
       1.0, 0.0, 0.0, {5_mps, 10_mps_sq}};
   frc::SimpleMotorFeedforward<units::meters> m_feedforward{0.5_V, 1.5_V / 1_mps,
-                                                            0.3_V / 1_mps_sq};
+                                                           0.3_V / 1_mps_sq};
   frc::Encoder m_encoder{0, 1};
   frc::PWMSparkMax m_motor{0};
 
