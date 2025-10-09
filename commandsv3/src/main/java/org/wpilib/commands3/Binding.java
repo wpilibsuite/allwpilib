@@ -21,5 +21,6 @@ record Binding(BindingScope scope, BindingType type, Command command, StackTrace
     ErrorMessages.requireNonNullParam(scope, "scope", "Binding");
     ErrorMessages.requireNonNullParam(type, "type", "Binding");
     ErrorMessages.requireNonNullParam(command, "command", "Binding");
+    ErrorMessages.requireNonNullParam(frames, "frames", "Binding");
   }
 }
