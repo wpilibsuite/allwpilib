@@ -2371,6 +2371,105 @@ class AnnotationProcessorTest {
     assertLoggerGenerates(source, expectedGeneratedSource);
   }
 
+  @Test
+  void dependsOnAnnotationWithInvalidNames() {
+    String source =
+        """
+      package edu.wpi.first.epilogue;
+
+      @Logged
+      class Example {
+        double position;
+        double target;
+
+        @DependsOn("position")
+        @DependsOn("target")
+        @DependsOn("nonExistentField")
+        @DependsOn("anotherInvalidField")
+        public boolean isAtTarget() {
+          return Math.abs(position - target) < 0.1;
+        }
+      }
+      """;
+
+    String expectedGeneratedSource =
+        """
+      package edu.wpi.first.epilogue;
+
+      import edu.wpi.first.epilogue.Logged;
+      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import edu.wpi.first.epilogue.logging.LogMetadata;
+      import java.util.List;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        // Cached LogMetadata for element isAtTarget with @DependsOn annotations
+        private static final LogMetadata $metadata_edu_wpi_first_epilogue_Example_isAtTarget_method = new LogMetadata(List.of("position", "target"));
+
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("position", object.position);
+            backend.log("target", object.target);
+            backend.log("isAtTarget", object.isAtTarget(), $metadata_edu_wpi_first_epilogue_Example_isAtTarget_method);
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void dependsOnAnnotationWithAllInvalidNames() {
+    String source =
+        """
+      package edu.wpi.first.epilogue;
+
+      @Logged
+      class Example {
+        double position;
+
+        @DependsOn("nonExistentField1")
+        @DependsOn("nonExistentField2")
+        public boolean someMethod() {
+          return position > 0;
+        }
+      }
+      """;
+
+    String expectedGeneratedSource =
+        """
+      package edu.wpi.first.epilogue;
+
+      import edu.wpi.first.epilogue.Logged;
+      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("position", object.position);
+            backend.log("someMethod", object.someMethod());
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
   private void assertLoggerGenerates(String loggedClassContent, String loggerClassContent) {
     Compilation compilation =
         javac()
