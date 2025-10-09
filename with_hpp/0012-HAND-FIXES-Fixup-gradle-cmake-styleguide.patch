@@ -1,37 +1,37 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Sat, 4 Oct 2025 15:32:49 -0400
+Date: Wed, 8 Oct 2025 03:29:02 -0400
 Subject: [PATCH 12/26] HAND FIXES: Fixup gradle / cmake / styleguide
 
 ---
- .styleguide                     |  15 ++--
- CMakeLists.txt                  |  10 +--
- apriltag/build.gradle           |   2 +-
- cameraserver/.styleguide        |   6 +-
- command2/.styleguide            |  10 +--
- cscore/.styleguide              |   8 +-
- datalog/.styleguide             |   1 +
- docs/build.gradle               | 128 ++++++++++++++++----------------
- glass/.styleguide               |  17 ++---
- hal/.styleguide                 |   9 +--
- hal/build.gradle                |   2 +-
- ntcore/.styleguide              |   6 +-
- settings.gradle                 |  10 +--
- tools/datalogtool/.styleguide   |   8 +-
- tools/outlineviewer/.styleguide |  12 ++-
- tools/sysid/.styleguide         |  15 ++--
- tools/wpical/.styleguide        |   7 +-
- tools/wpical/build.gradle       |   2 +-
- wpigui/.styleguide              |   3 +-
- wpilibj/CMakeLists.txt          |   6 +-
- wpilibj/build.gradle            |   4 +-
- wpilibjExamples/build.gradle    |  30 ++++----
- wpimath/.styleguide             |   8 +-
- wpimath/build.gradle            |   2 +-
- wpinet/.styleguide              |   5 +-
- wpiutil/.styleguide             |   8 +-
- wpiutil/build.gradle            |   4 +-
- 27 files changed, 169 insertions(+), 169 deletions(-)
+ .styleguide                     | 15 ++++-----
+ CMakeLists.txt                  | 10 +++---
+ apriltag/build.gradle           |  2 +-
+ cameraserver/.styleguide        |  6 ++--
+ command2/.styleguide            | 10 ++----
+ cscore/.styleguide              |  8 ++---
+ datalog/.styleguide             |  1 +
+ docs/build.gradle               | 56 ++++++++++++++++-----------------
+ glass/.styleguide               | 17 +++++-----
+ hal/.styleguide                 |  9 +++---
+ hal/build.gradle                |  2 +-
+ ntcore/.styleguide              |  6 ++--
+ settings.gradle                 | 10 +++---
+ tools/datalogtool/.styleguide   |  8 +++--
+ tools/outlineviewer/.styleguide | 12 +++----
+ tools/sysid/.styleguide         | 15 ++++-----
+ tools/wpical/.styleguide        |  7 +++--
+ tools/wpical/build.gradle       |  2 +-
+ wpigui/.styleguide              |  3 +-
+ wpilibj/CMakeLists.txt          |  6 ++--
+ wpilibj/build.gradle            |  4 +--
+ wpilibjExamples/build.gradle    | 30 +++++++++---------
+ wpimath/.styleguide             |  8 ++---
+ wpimath/build.gradle            |  2 +-
+ wpinet/.styleguide              |  5 +--
+ wpiutil/.styleguide             |  8 ++---
+ wpiutil/build.gradle            |  4 +--
+ 27 files changed, 133 insertions(+), 133 deletions(-)
 
 diff --git a/.styleguide b/.styleguide
 index f5e8ad36c5f7a404bad2a404d6dee4f2f5ae96c9..510daaf302b5f1aaab0c1c32e4ade73a7ff83ea2 100644
@@ -67,10 +67,10 @@ index f5e8ad36c5f7a404bad2a404d6dee4f2f5ae96c9..510daaf302b5f1aaab0c1c32e4ade73a
 +  ^wpi/units/
  }
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 09239ae31c0ad5ec09c7c49c6b5503fe80afe546..4a36c2205cb8c464b17c7ff01404089670668aab 100644
+index 74634c2233a9f5f70ee71191d35b6ff913b13b7e..cac6b2e73cfea0497de93c14d22f5d5091235328 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -316,13 +316,13 @@ if(WITH_GUI)
+@@ -321,13 +321,13 @@ if(WITH_GUI)
      add_subdirectory(thirdparty/imgui_suite)
      add_subdirectory(wpigui)
      add_subdirectory(glass)
@@ -88,7 +88,7 @@ index 09239ae31c0ad5ec09c7c49c6b5503fe80afe546..4a36c2205cb8c464b17c7ff014040896
      endif()
  endif()
  
-@@ -343,7 +343,7 @@ if(WITH_WPILIB)
+@@ -348,7 +348,7 @@ if(WITH_WPILIB)
      set(APRILTAG_DEP_REPLACE "find_dependency(apriltag)")
      set(WPILIBC_DEP_REPLACE "find_dependency(wpilibc)")
      set(WPILIBJ_DEP_REPLACE "find_dependency(wpilibj)")
@@ -198,109 +198,32 @@ index 718d2404f4289e19a5675558ef508e00ba1c15ad..309041dfd5c13d565538913f34e3cea8
  
  cppSrcFileInclude {
 diff --git a/docs/build.gradle b/docs/build.gradle
-index 0d8331ddd7868780543b2d461d4f636e78608ea8..d7c9075e19e166e85182173de71b2178169829aa 100644
+index e4554630f0f01651d2c1ba47fa93dc9e178f287f..a4f8bfb0310fba691194d1a8db060fabc44f0714 100644
 --- a/docs/build.gradle
 +++ b/docs/build.gradle
-@@ -82,42 +82,42 @@ doxygen.sourceSets.main {
-         exclude 'unsupported/**'
+@@ -79,24 +79,24 @@ doxygen.sourceSets.main {
+         exclude 'apriltag_pose.h'
  
          // LLVM
--        exclude 'wpi/AlignOf.h'
--        exclude 'wpi/Casting.h'
--        exclude 'wpi/Chrono.h'
 -        exclude 'wpi/Compiler.h'
--        exclude 'wpi/ConvertUTF.h'
--        exclude 'wpi/DenseMap.h'
--        exclude 'wpi/DenseMapInfo.h'
--        exclude 'wpi/Endian.h'
--        exclude 'wpi/EpochTracker.h'
--        exclude 'wpi/Errc.h'
--        exclude 'wpi/Errno.h'
 -        exclude 'wpi/ErrorHandling.h'
 -        exclude 'wpi/bit.h'
--        exclude 'wpi/fs.h'
--        exclude 'wpi/FunctionExtras.h'
--        exclude 'wpi/function_ref.h'
--        exclude 'wpi/iterator.h'
--        exclude 'wpi/iterator_range.h'
--        exclude 'wpi/ManagedStatic.h'
--        exclude 'wpi/MathExtras.h'
--        exclude 'wpi/MemAlloc.h'
--        exclude 'wpi/PointerIntPair.h'
--        exclude 'wpi/PointerLikeTypeTraits.h'
--        exclude 'wpi/PointerUnion.h'
--        exclude 'wpi/raw_os_ostream.h'
 -        exclude 'wpi/raw_ostream.h'
--        exclude 'wpi/SmallPtrSet.h'
--        exclude 'wpi/SmallSet.h'
--        exclude 'wpi/SmallString.h'
 -        exclude 'wpi/SmallVector.h'
 -        exclude 'wpi/StringExtras.h'
--        exclude 'wpi/StringMap.h'
--        exclude 'wpi/SwapByteOrder.h'
--        exclude 'wpi/type_traits.h'
--        exclude 'wpi/VersionTuple.h'
--        exclude 'wpi/WindowsError.h'
-+        exclude 'wpi/util/AlignOf.h'
-+        exclude 'wpi/util/Casting.h'
-+        exclude 'wpi/util/Chrono.h'
 +        exclude 'wpi/util/Compiler.h'
-+        exclude 'wpi/util/ConvertUTF.h'
-+        exclude 'wpi/util/DenseMap.h'
-+        exclude 'wpi/util/DenseMapInfo.h'
-+        exclude 'wpi/util/Endian.h'
-+        exclude 'wpi/util/EpochTracker.h'
-+        exclude 'wpi/util/Errc.h'
-+        exclude 'wpi/util/Errno.h'
 +        exclude 'wpi/util/ErrorHandling.h'
 +        exclude 'wpi/util/bit.h'
-+        exclude 'wpi/util/fs.h'
-+        exclude 'wpi/util/FunctionExtras.h'
-+        exclude 'wpi/util/function_ref.h'
-+        exclude 'wpi/util/iterator.h'
-+        exclude 'wpi/util/iterator_range.h'
-+        exclude 'wpi/util/ManagedStatic.h'
-+        exclude 'wpi/util/MathExtras.h'
-+        exclude 'wpi/util/MemAlloc.h'
-+        exclude 'wpi/util/PointerIntPair.h'
-+        exclude 'wpi/util/PointerLikeTypeTraits.h'
-+        exclude 'wpi/util/PointerUnion.h'
-+        exclude 'wpi/util/raw_os_ostream.h'
 +        exclude 'wpi/util/raw_ostream.h'
-+        exclude 'wpi/util/SmallPtrSet.h'
-+        exclude 'wpi/util/SmallSet.h'
-+        exclude 'wpi/util/SmallString.h'
 +        exclude 'wpi/util/SmallVector.h'
 +        exclude 'wpi/util/StringExtras.h'
-+        exclude 'wpi/util/StringMap.h'
-+        exclude 'wpi/util/SwapByteOrder.h'
-+        exclude 'wpi/util/type_traits.h'
-+        exclude 'wpi/util/VersionTuple.h'
-+        exclude 'wpi/util/WindowsError.h'
  
-         // fmtlib
-         exclude 'fmt/**'
-@@ -125,22 +125,22 @@ doxygen.sourceSets.main {
          // libuv
-         exclude 'uv.h'
          exclude 'uv/**'
--        exclude 'wpinet/uv/**'
-+        exclude 'wpi/net/uv/**'
  
          // json
--        exclude 'wpi/adl_serializer.h'
--        exclude 'wpi/byte_container_with_subtype.h'
 -        exclude 'wpi/detail/**'
--        exclude 'wpi/json.h'
--        exclude 'wpi/json_fwd.h'
--        exclude 'wpi/ordered_map.h'
-+        exclude 'wpi/util/adl_serializer.h'
-+        exclude 'wpi/util/byte_container_with_subtype.h'
 +        exclude 'wpi/util/detail/**'
-+        exclude 'wpi/util/json.h'
-+        exclude 'wpi/util/json_fwd.h'
-+        exclude 'wpi/util/ordered_map.h'
-         exclude 'wpi/thirdparty/**'
  
          // mpack
 -        exclude 'wpi/mpack.h'
@@ -312,7 +235,7 @@ index 0d8331ddd7868780543b2d461d4f636e78608ea8..d7c9075e19e166e85182173de71b2178
      }
  
      exclude '*.pb.h'
-@@ -186,28 +186,28 @@ task generateJavaDocs(type: Javadoc) {
+@@ -142,28 +142,28 @@ task generateJavaDocs(type: Javadoc) {
      options.addStringOption("tag", "pre:a:Pre-Condition")
      options.addBooleanOption("Xdoclint/package:" +
              // TODO: v Document these, then remove them from the list
@@ -459,10 +382,10 @@ index 13634e44df6212efcccb0c195470913f6ac27460..f93bd8d1aaee878c7e348d91ac545674
 +  ^wpi/datalog/
  }
 diff --git a/settings.gradle b/settings.gradle
-index 871195b26314ec5bb73f9121f151f72d2c60a499..9a460eeb21b781fb27935bde97ee191ca41510a5 100644
+index 14f1ae7454bf7d9d17531e359a08dcfcf546299c..5750bd4fafc0088834a78e9e6959c7effd6e52b1 100644
 --- a/settings.gradle
 +++ b/settings.gradle
-@@ -34,9 +34,9 @@ include 'wpilibj'
+@@ -36,9 +36,9 @@ include 'wpiannotations'
  include 'wpiunits'
  include 'fields'
  include 'glass'
@@ -475,7 +398,7 @@ index 871195b26314ec5bb73f9121f151f72d2c60a499..9a460eeb21b781fb27935bde97ee191c
  include 'simulation:halsim_ds_socket'
  include 'simulation:halsim_gui'
  include 'simulation:halsim_ws_core'
-@@ -54,13 +54,13 @@ include 'docs'
+@@ -56,13 +56,13 @@ include 'docs'
  include 'msvcruntime'
  include 'ntcoreffi'
  include 'apriltag'

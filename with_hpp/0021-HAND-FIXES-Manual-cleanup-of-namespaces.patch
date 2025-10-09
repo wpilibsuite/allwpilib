@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Sat, 4 Oct 2025 15:36:09 -0400
+Date: Wed, 8 Oct 2025 03:32:45 -0400
 Subject: [PATCH 21/26] HAND FIXES: Manual cleanup of namespaces
 
 ---
@@ -76,7 +76,7 @@ index 1ab59302012125f065afec8ae4d4dc8b89706036..89cb9e301f90eb21002404337cfa4e74
  
  Trigger::Trigger(const Trigger& other) = default;
 diff --git a/datalog/src/main/native/include/wpi/datalog/DataLog.hpp b/datalog/src/main/native/include/wpi/datalog/DataLog.hpp
-index 21680a1f058c4527f0871b16a1a4a745cbecd3f5..3739808bf929283a88e6223ad35b2fb5495bdc6c 100644
+index 3e786a56437a9a91a080aa3537d61c3494752de8..2dd4758f51cdf22250b2df1ea76561078ba8149e 100644
 --- a/datalog/src/main/native/include/wpi/datalog/DataLog.hpp
 +++ b/datalog/src/main/native/include/wpi/datalog/DataLog.hpp
 @@ -162,7 +162,7 @@ class DataLog {
@@ -242,7 +242,7 @@ index 337804d041fc56537f9f4060989aba253a5219d8..e1d8bf8ab50205d3c084a84e298c2098
      for (int i = 0; i < 4; i++) {
        filename.append(String.format("%04x", rnd.nextInt(0x10000)));
 diff --git a/wpimath/src/test/native/cpp/UnitsTest.cpp b/wpimath/src/test/native/cpp/UnitsTest.cpp
-index fc8550cedcbdbe80304ffe18f662dfd7bca71d35..4ba8ee10da31ede8ef775e8cbc726985d9fd9bf4 100644
+index 98eb8c1742dcb7c67378a58dc6466c94abdd8154..6d7d198cc684b4463b0821704610466cae92c2cc 100644
 --- a/wpimath/src/test/native/cpp/UnitsTest.cpp
 +++ b/wpimath/src/test/native/cpp/UnitsTest.cpp
 @@ -87,7 +87,7 @@ using namespace wpi::units::torque;
@@ -477,7 +477,7 @@ index fbd58ca19b01a883b73914b1f38fc6942671fe46..637ce3437c38a688807b4d6f2bf438a6
  
    WorkerThread<void(bool)> worker;
 diff --git a/wpiutil/robotpy_pybind_build_info.bzl b/wpiutil/robotpy_pybind_build_info.bzl
-index 3a182426fcdc08ff0591bce2f6a08747ecf840f2..399600a4752848af1ae1ace5ddc19c62850a36ac 100644
+index 7209a1ecc4282503beba0fb6d98d105bc548c19b..f33899fe6b68ca1d7e1797dd77e24fd77eeaa8a1 100644
 --- a/wpiutil/robotpy_pybind_build_info.bzl
 +++ b/wpiutil/robotpy_pybind_build_info.bzl
 @@ -38,7 +38,7 @@ def wpiutil_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu

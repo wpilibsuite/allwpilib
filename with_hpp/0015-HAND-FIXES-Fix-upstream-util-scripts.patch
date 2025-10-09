@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Sat, 4 Oct 2025 15:34:37 -0400
+Date: Wed, 8 Oct 2025 03:30:37 -0400
 Subject: [PATCH 15/26] HAND FIXES: Fix upstream util scripts
 
 ---
@@ -75,10 +75,10 @@ index 2b83d444864b0cf852db60f8afae3c6338c1c5de..90f0491f83b9ee74b12e72522f857af3
          # Fix include guards and other #defines
          content = content.replace("NLOHMANN_", "WPI_")
 diff --git a/upstream_utils/json_patches/0004-Add-llvm-stream-support.patch b/upstream_utils/json_patches/0004-Add-llvm-stream-support.patch
-index 3548041318aead21b41dfb8947ee4138bd81b34e..71e0648f2233ea66ca1dff6b2f705229795d554c 100644
+index a336e8de4d4a6b16b36900ce6a42b2e9734ca5e3..0f76ee512cd330ecd61b377e2c40ca02043fa242 100644
 --- a/upstream_utils/json_patches/0004-Add-llvm-stream-support.patch
 +++ b/upstream_utils/json_patches/0004-Add-llvm-stream-support.patch
-@@ -10,14 +10,14 @@ Subject: [PATCH 4/4] Add llvm stream support
+@@ -10,14 +10,14 @@ Subject: [PATCH 4/5] Add llvm stream support
   3 files changed, 59 insertions(+), 2 deletions(-)
  
  diff --git a/include/nlohmann/detail/output/output_adapters.hpp b/include/nlohmann/detail/output/output_adapters.hpp

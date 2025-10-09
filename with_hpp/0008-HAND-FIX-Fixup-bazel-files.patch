@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Sat, 4 Oct 2025 15:31:37 -0400
+Date: Wed, 8 Oct 2025 03:28:55 -0400
 Subject: [PATCH 08/26] HAND FIX - Fixup bazel files
 
 ---
@@ -12,7 +12,7 @@ Subject: [PATCH 08/26] HAND FIX - Fixup bazel files
  docs/BUILD.bazel                        |  4 ++--
  epilogue-processor/BUILD.bazel          |  2 +-
  glass/BUILD.bazel                       |  2 +-
- hal/BUILD.bazel                         |  6 +++---
+ hal/BUILD.bazel                         |  4 ++--
  ntcore/BUILD.bazel                      |  6 +++---
  romiVendordep/BUILD.bazel               |  4 ++--
  simulation/halsim_gui/BUILD.bazel       |  4 ++--
@@ -31,7 +31,7 @@ Subject: [PATCH 08/26] HAND FIX - Fixup bazel files
  wpiunits/BUILD.bazel                    |  4 ++--
  wpiutil/BUILD.bazel                     |  4 ++--
  xrpVendordep/BUILD.bazel                |  4 ++--
- 27 files changed, 78 insertions(+), 81 deletions(-)
+ 27 files changed, 77 insertions(+), 80 deletions(-)
 
 diff --git a/BUILD.bazel b/BUILD.bazel
 index 29537cd9bd7937eedd3a18e9cb06fdb63e9f0d50..54932f9be3877b159000666b8714181bba99f039 100644
@@ -101,7 +101,7 @@ index 1e3fe5ffbbfcac352f45a205ae27fd650458886b..7bc46e247cffbf27dbcf09f5444b5510
      ],
  )
 diff --git a/command2/BUILD.bazel b/command2/BUILD.bazel
-index 7289608345265aaca0f1635ee970dc6206ddccb2..f6eeac2d786b0c6c7843e1c2f47d4d69f0335339 100644
+index eb8fd2107c4e4c0c132016d340a683eb970165ba..915d70402225b0d5900dbdf861e43204a3b2b94b 100644
 --- a/command2/BUILD.bazel
 +++ b/command2/BUILD.bazel
 @@ -3,10 +3,10 @@ load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
@@ -116,7 +116,7 @@ index 7289608345265aaca0f1635ee970dc6206ddccb2..f6eeac2d786b0c6c7843e1c2f47d4d69
  
  filegroup(
      name = "doxygen-files",
-@@ -124,7 +124,7 @@ cc_test(
+@@ -127,7 +127,7 @@ cc_test(
      size = "small",
      srcs = glob([
          "src/test/native/**/*.cpp",
@@ -125,7 +125,7 @@ index 7289608345265aaca0f1635ee970dc6206ddccb2..f6eeac2d786b0c6c7843e1c2f47d4d69
      ]),
      tags = [
          "no-tsan",
-@@ -138,7 +138,7 @@ cc_test(
+@@ -141,7 +141,7 @@ cc_test(
  
  wpilib_java_junit5_test(
      name = "command2-java-test",
@@ -134,7 +134,7 @@ index 7289608345265aaca0f1635ee970dc6206ddccb2..f6eeac2d786b0c6c7843e1c2f47d4d69
      resource_strip_prefix = "command2/src/test/resources",
      resources = glob(["src/test/resources/**"]),
      deps = [
-@@ -162,8 +162,8 @@ cc_binary(
+@@ -166,8 +166,8 @@ cc_binary(
  
  java_binary(
      name = "DevMain-Java",
@@ -143,8 +143,8 @@ index 7289608345265aaca0f1635ee970dc6206ddccb2..f6eeac2d786b0c6c7843e1c2f47d4d69
 +    srcs = ["src/dev/java/org/wpilib/command2/DevMain.java"],
 +    main_class = "org.wpilib.commands.DevMain",
      deps = [
+         ":command2-java",
          "//hal:hal-java",
-         "//ntcore:ntcore-java",
 diff --git a/cscore/BUILD.bazel b/cscore/BUILD.bazel
 index c94e844b093ec59bc2cde4c27ff5ce7e95b08313..6da0c35c7e7dca6af5b145490a687fc5769c5b92 100644
 --- a/cscore/BUILD.bazel
@@ -247,18 +247,9 @@ index c2e9fa616af2925466272af6924dc12f16decda8..817c549517a31466110c1260b7e64fae
      include_license_files = True,
      srcs_pkg_root = "src/libnt/native/cpp",
 diff --git a/hal/BUILD.bazel b/hal/BUILD.bazel
-index c498706bf1b1cc0d54baae6f0f12c0eff319bb43..34fa423ecfa8bcdc444cc1a3620fd635f3c9c334 100644
+index c498706bf1b1cc0d54baae6f0f12c0eff319bb43..175c99c2ea344f0c749e8a19b56cb95020167a50 100644
 --- a/hal/BUILD.bazel
 +++ b/hal/BUILD.bazel
-@@ -12,7 +12,7 @@ load("//shared/bazel/rules:packaging.bzl", "package_minimal_jni_project")
- filegroup(
-     name = "doxygen-files",
-     srcs = glob([
--        "src/main/native/include/**/*.h",
-+        "src/main/native/include/**/*.hpp",
-         "src/mrc/include/**/*.h",
-     ]),
-     visibility = ["//visibility:public"],
 @@ -221,8 +221,8 @@ cc_binary(
  
  java_binary(

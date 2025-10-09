@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Sat, 4 Oct 2025 15:31:37 -0400
+Date: Wed, 8 Oct 2025 03:28:55 -0400
 Subject: [PATCH 09/26] HAND FIX - Fixup pregen files
 
 ---
@@ -13,10 +13,10 @@ Subject: [PATCH 09/26] HAND FIX - Fixup pregen files
  .../main/java/NetworkTableInstance.java.jinja      | 10 +++++-----
  .../generate/main/java/NetworkTablesJNI.java.jinja |  4 ++--
  .../mrcal/generated/minimath_generated.h           |  2 +-
- wpilibc/generate_hids.py                           | 12 ++++++------
- wpilibc/generate_pwm_motor_controllers.py          |  8 ++++----
- wpilibc/src/generate/main/native/cpp/hid.cpp.jinja |  2 +-
- .../motorcontroller/pwm_motor_controller.cpp.jinja |  2 +-
+ wpilibc/generate_hids.py                           | 14 +++++++-------
+ wpilibc/generate_pwm_motor_controllers.py          | 12 ++++++------
+ .../native/cpp/{ => driverstation}/hid.cpp.jinja   |  2 +-
+ .../motor}/pwm_motor_controller.cpp.jinja          |  2 +-
  .../main/native/cpp/simulation/hidsim.cpp.jinja    |  4 ++--
  wpilibj/generate_hids.py                           |  4 ++--
  wpilibj/generate_pwm_motor_controllers.py          |  2 +-
@@ -31,7 +31,9 @@ Subject: [PATCH 09/26] HAND FIX - Fixup pregen files
  wpiunits/generate_units.py                         |  2 +-
  wpiutil/src/main/python/semiwrap/Sendable.yml      |  2 +-
  .../src/main/python/semiwrap/SendableRegistry.yml  |  4 ++--
- 27 files changed, 63 insertions(+), 61 deletions(-)
+ 27 files changed, 66 insertions(+), 64 deletions(-)
+ rename wpilibc/src/generate/main/native/cpp/{ => driverstation}/hid.cpp.jinja (98%)
+ rename wpilibc/src/generate/main/native/cpp/{motorcontroller => hardware/motor}/pwm_motor_controller.cpp.jinja (94%)
 
 diff --git a/.github/actions/pregen/action.yml b/.github/actions/pregen/action.yml
 index 24e9daaf07c755f77070b0e77f0c0bbd496e691e..81745a8fa0fb9e2b4e126e8fdeabb6f8c5bdd99c 100644
@@ -234,10 +236,10 @@ index 357be6d69390e0d98ddb03c5a698affed4420aed..2d758c99b6f8d4e8a00a3b93212f6221
  // This contains dot products, norms, basic vector arithmetic and multiplication
  
 diff --git a/wpilibc/generate_hids.py b/wpilibc/generate_hids.py
-index f34c66803ba8f7ca4b580f049656e4b9300fd55d..d13eae57ff8e8fb327ec345e4189525ee0d1df64 100755
+index f34c66803ba8f7ca4b580f049656e4b9300fd55d..5f6f847e95eb6d3872b856d7ecbc9c709caa404f 100755
 --- a/wpilibc/generate_hids.py
 +++ b/wpilibc/generate_hids.py
-@@ -22,16 +22,16 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
+@@ -22,21 +22,21 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
          controllers = json.load(f)
  
      # C++ headers
@@ -257,6 +259,12 @@ index f34c66803ba8f7ca4b580f049656e4b9300fd55d..d13eae57ff8e8fb327ec345e4189525e
          output = template.render(controller)
          write_controller_file(root_path, controllerName, output)
  
+     # C++ files
+-    cpp_subdirectory = "main/native/cpp"
++    cpp_subdirectory = "main/native/cpp/driverstation"
+     env = Environment(
+         loader=FileSystemLoader(template_directory / cpp_subdirectory),
+         autoescape=False,
 @@ -49,16 +49,16 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
          write_controller_file(root_path, controllerName, output)
  
@@ -278,10 +286,10 @@ index f34c66803ba8f7ca4b580f049656e4b9300fd55d..d13eae57ff8e8fb327ec345e4189525e
          write_controller_file(root_path, controllerName, output)
  
 diff --git a/wpilibc/generate_pwm_motor_controllers.py b/wpilibc/generate_pwm_motor_controllers.py
-index 10a81fb0004360a593fe576e1aede503046f93d3..741b309956835f1774c77a669361925247f4c2e3 100755
+index 10a81fb0004360a593fe576e1aede503046f93d3..a99477b6b115d0095993849259560f1acb981f15 100755
 --- a/wpilibc/generate_pwm_motor_controllers.py
 +++ b/wpilibc/generate_pwm_motor_controllers.py
-@@ -26,18 +26,18 @@ def render_template(
+@@ -26,30 +26,30 @@ def render_template(
  def generate_cpp_headers(
      output_root: Path, template_root: Path, pwm_motor_controllers: Dict[str, Any]
  ):
@@ -304,10 +312,27 @@ index 10a81fb0004360a593fe576e1aede503046f93d3..741b309956835f1774c77a6693619252
          render_template(template, root_path, controller_name, controller)
  
  
-diff --git a/wpilibc/src/generate/main/native/cpp/hid.cpp.jinja b/wpilibc/src/generate/main/native/cpp/hid.cpp.jinja
+ def generate_cpp_sources(output_root, template_root, pwm_motor_controllers):
+-    cpp_template_root = str(template_root / "main/native/cpp/motorcontroller")
++    cpp_template_root = str(template_root / "main/native/cpp/hardware/motor")
+     env = Environment(
+         loader=FileSystemLoader(cpp_template_root),
+         autoescape=False,
+         keep_trailing_newline=True,
+     )
+ 
+-    root_path = output_root / "main/native/cpp/motorcontrol"
++    root_path = output_root / "main/native/cpp/hardware/motor"
+     template = env.get_template("pwm_motor_controller.cpp.jinja")
+ 
+     for controller in pwm_motor_controllers:
+diff --git a/wpilibc/src/generate/main/native/cpp/hid.cpp.jinja b/wpilibc/src/generate/main/native/cpp/driverstation/hid.cpp.jinja
+similarity index 98%
+rename from wpilibc/src/generate/main/native/cpp/hid.cpp.jinja
+rename to wpilibc/src/generate/main/native/cpp/driverstation/hid.cpp.jinja
 index 2aeccd858046fad42dd1a61b9db3be263926b605..cea3cd8397224962d83f065a61a169fd15d9760d 100644
 --- a/wpilibc/src/generate/main/native/cpp/hid.cpp.jinja
-+++ b/wpilibc/src/generate/main/native/cpp/hid.cpp.jinja
++++ b/wpilibc/src/generate/main/native/cpp/driverstation/hid.cpp.jinja
 @@ -6,7 +6,7 @@
  {% macro capitalize_first(string) -%}
  {{ string[0]|capitalize + string[1:] }}
@@ -317,10 +342,13 @@ index 2aeccd858046fad42dd1a61b9db3be263926b605..cea3cd8397224962d83f065a61a169fd
  
  #include <wpi/hal/UsageReporting.h>
  #include <wpi/util/sendable/SendableBuilder.hpp>
-diff --git a/wpilibc/src/generate/main/native/cpp/motorcontroller/pwm_motor_controller.cpp.jinja b/wpilibc/src/generate/main/native/cpp/motorcontroller/pwm_motor_controller.cpp.jinja
+diff --git a/wpilibc/src/generate/main/native/cpp/motorcontroller/pwm_motor_controller.cpp.jinja b/wpilibc/src/generate/main/native/cpp/hardware/motor/pwm_motor_controller.cpp.jinja
+similarity index 94%
+rename from wpilibc/src/generate/main/native/cpp/motorcontroller/pwm_motor_controller.cpp.jinja
+rename to wpilibc/src/generate/main/native/cpp/hardware/motor/pwm_motor_controller.cpp.jinja
 index e15fb879c4c9c2af39fd1f4194fa05d35ffc5801..c8d12ae91e04e6a3899738b49018b7d8775d3c9f 100644
 --- a/wpilibc/src/generate/main/native/cpp/motorcontroller/pwm_motor_controller.cpp.jinja
-+++ b/wpilibc/src/generate/main/native/cpp/motorcontroller/pwm_motor_controller.cpp.jinja
++++ b/wpilibc/src/generate/main/native/cpp/hardware/motor/pwm_motor_controller.cpp.jinja
 @@ -4,7 +4,7 @@
  
  // THIS FILE WAS AUTO-GENERATED BY ./wpilibc/generate_pwm_motor_controllers.py. DO NOT MODIFY

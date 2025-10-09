@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Sat, 4 Oct 2025 15:36:09 -0400
+Date: Wed, 8 Oct 2025 03:32:46 -0400
 Subject: [PATCH 22/26] HAND FIXES: Update maven info
 
 ---
@@ -127,19 +127,19 @@ index 92925c65646a980c07df2079a8b5f556565618c1..654397184449d9dd54873750341182c7
  
  evaluationDependsOn(':ntcore')
 diff --git a/command2/BUILD.bazel b/command2/BUILD.bazel
-index f6eeac2d786b0c6c7843e1c2f47d4d69f0335339..5a44bf9bf94cb01e9823332359b1a628c43ce615 100644
+index 915d70402225b0d5900dbdf861e43204a3b2b94b..ee4c0511741bd4840fc15533dd2d9aac2b459f46 100644
 --- a/command2/BUILD.bazel
 +++ b/command2/BUILD.bazel
-@@ -105,7 +105,7 @@ wpilib_java_library(
-     name = "command2-java",
+@@ -106,7 +106,7 @@ wpilib_java_library(
      srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
+     exported_plugins = ["//javacPlugin:plugin"],
      maven_artifact_name = "command2-java",
 -    maven_group_id = "edu.wpi.first.command2",
-+    maven_group_id = "org.wpilib.command",
++    maven_group_id = "org.wpilib.command2",
+     plugins = ["//javacPlugin:plugin"],
      visibility = ["//visibility:public"],
      deps = [
-         "//cscore:cscore-java",
-@@ -175,5 +175,5 @@ java_binary(
+@@ -181,5 +181,5 @@ java_binary(
  package_minimal_cc_project(
      name = "command2",
      maven_artifact_name = "command2-cpp",
@@ -147,7 +147,7 @@ index f6eeac2d786b0c6c7843e1c2f47d4d69f0335339..5a44bf9bf94cb01e9823332359b1a628
 +    maven_group_id = "org.wpilib.command2",
  )
 diff --git a/command2/build.gradle b/command2/build.gradle
-index 0e933fb1b752a0edc17630d12fee6329db82e418..4aa78580a13913fe1779a05c3b386308ef637e7f 100644
+index 0f54c95b4985e0a3408215245f403d4b82d276da..ea129cb4afd75ae95715773e24dc7ff4bcdb65aa 100644
 --- a/command2/build.gradle
 +++ b/command2/build.gradle
 @@ -1,6 +1,6 @@
@@ -253,10 +253,10 @@ index 763554a119fb452403d32dacbedbeb2223881e97..25a46d6585e722b829f907e8cee92a89
      visibility = ["//visibility:public"],
  )
 diff --git a/docs/build.gradle b/docs/build.gradle
-index d7c9075e19e166e85182173de71b2178169829aa..890e7866d6d096f9a6d6693a067509ea900b86a3 100644
+index a4f8bfb0310fba691194d1a8db060fabc44f0714..8454bc526d902683dd123b001c446a4555dd9822 100644
 --- a/docs/build.gradle
 +++ b/docs/build.gradle
-@@ -20,12 +20,12 @@ evaluationDependsOn(':romiVendordep')
+@@ -21,12 +21,12 @@ evaluationDependsOn(':romiVendordep')
  evaluationDependsOn(':xrpVendordep')
  
  def baseArtifactIdCpp = 'documentation'
@@ -428,7 +428,7 @@ index a29ad2401cb067ac9d3e492a510eeaac30f4515d..383ad319548c978b1e52871cbdda502d
  def outputsFolder = file("$project.buildDir/outputs")
  
 diff --git a/hal/BUILD.bazel b/hal/BUILD.bazel
-index 34fa423ecfa8bcdc444cc1a3620fd635f3c9c334..ee3196239f0a67319b2f46cd308da9ae9dbaabdc 100644
+index 175c99c2ea344f0c749e8a19b56cb95020167a50..d80a8a94a6685fbf7798f0be58a6697d004732c5 100644
 --- a/hal/BUILD.bazel
 +++ b/hal/BUILD.bazel
 @@ -183,7 +183,7 @@ wpilib_jni_java_library(
@@ -587,7 +587,7 @@ index 0705fa2a980670b314695188879bd1b0d0142914..95927770f30ddf4b8b73aa5d3391e0c2
  def licenseFile = file("$rootDir/license.md")
  
 diff --git a/shared/jni/setupBuild.gradle b/shared/jni/setupBuild.gradle
-index b267da06de708778cb2561003f37203234ad53a0..ade87e7d9b437c024a727c5a23ecfc393a8fcc10 100644
+index 60dfbe1fab7ed31efdbf3fbc48cc171e63e4fcf9..e9ce7c0ef938fdf88978447850c99006923924d9 100644
 --- a/shared/jni/setupBuild.gradle
 +++ b/shared/jni/setupBuild.gradle
 @@ -10,7 +10,7 @@ apply from: "${rootDir}/shared/config.gradle"

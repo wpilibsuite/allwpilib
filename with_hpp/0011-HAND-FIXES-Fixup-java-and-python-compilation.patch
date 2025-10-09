@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Sat, 4 Oct 2025 14:24:50 -0400
+Date: Wed, 8 Oct 2025 03:29:02 -0400
 Subject: [PATCH 11/26] HAND FIXES: Fixup java and python compilation
 
 ---
@@ -646,7 +646,7 @@ index 94afa96e2484dcecdf42521b47478d289ae50c94..7c4b4d2b1f552a3526c7c0a43fb34d87
  /** A thread-safe container for handling events. */
  public class EventVector {
 diff --git a/wpiutil/src/main/native/cpp/jni/WPIUtilJNI.cpp b/wpiutil/src/main/native/cpp/jni/WPIUtilJNI.cpp
-index 8ee2f740e769f7d68ec900fe027bfe9afb8ce3d8..88118b17edd92d9bc88132f00a53ca9339388a3d 100644
+index 58e619ff2f82ae5e5a6099b5eb2b47ec945af9af..9d0c20874a857a443424e48be302c3412955d0f8 100644
 --- a/wpiutil/src/main/native/cpp/jni/WPIUtilJNI.cpp
 +++ b/wpiutil/src/main/native/cpp/jni/WPIUtilJNI.cpp
 @@ -32,7 +32,7 @@ static const JExceptionInit exceptions[] = {
