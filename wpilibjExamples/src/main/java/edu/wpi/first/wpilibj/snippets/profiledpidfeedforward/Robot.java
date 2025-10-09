@@ -30,8 +30,7 @@ public class Robot extends TimedRobot {
   }
 
   /**
-   * Controls a simple motor's position using a SimpleMotorFeedforward and a
-   * ProfiledPIDController.
+   * Controls a simple motor's position using a SimpleMotorFeedforward and a ProfiledPIDController.
    *
    * @param goalPosition the desired position
    */
