@@ -149,16 +149,18 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
     m_odometry.ResetTranslation(translation);
 
     std::optional<std::pair<units::second_t, VisionUpdate>> latestVisionUpdate =
-      m_visionUpdates.empty() ? std::nullopt : std::optional{*m_visionUpdates.crbegin()};
+        m_visionUpdates.crbegin() != m_visionUpdates.crend()
+            ? std::optional{*m_visionUpdates.crbegin()}
+            : std::nullopt;
     m_odometryPoseBuffer.Clear();
     m_visionUpdates.clear();
 
     if (latestVisionUpdate) {
       // apply vision compensation to the pose rotation
       VisionUpdate const visionUpdate{
-        Pose3d{translation, latestVisionUpdate->second.visionPose.Rotation()},
-        Pose3d{translation, latestVisionUpdate->second.odometryPose.Rotation()}
-      };
+          Pose3d{translation, latestVisionUpdate->second.visionPose.Rotation()},
+          Pose3d{translation,
+                 latestVisionUpdate->second.odometryPose.Rotation()}};
       m_visionUpdates[latestVisionUpdate->first] = visionUpdate;
       m_poseEstimate = visionUpdate.Compensate(m_odometry.GetPose());
     } else {
@@ -175,16 +177,18 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
     m_odometry.ResetRotation(rotation);
 
     std::optional<std::pair<units::second_t, VisionUpdate>> latestVisionUpdate =
-      m_visionUpdates.empty() ? std::nullopt : std::optional{*m_visionUpdates.crbegin()};
+        m_visionUpdates.crbegin() != m_visionUpdates.crend()
+            ? std::optional{*m_visionUpdates.crbegin()}
+            : std::nullopt;
     m_odometryPoseBuffer.Clear();
     m_visionUpdates.clear();
 
     if (latestVisionUpdate) {
       // apply vision compensation to the pose translation
       VisionUpdate const visionUpdate{
-        Pose3d{latestVisionUpdate->second.visionPose.Translation(), rotation},
-        Pose3d{latestVisionUpdate->second.odometryPose.Translation(), rotation}
-      };
+          Pose3d{latestVisionUpdate->second.visionPose.Translation(), rotation},
+          Pose3d{latestVisionUpdate->second.odometryPose.Translation(),
+                 rotation}};
       m_visionUpdates[latestVisionUpdate->first] = visionUpdate;
       m_poseEstimate = visionUpdate.Compensate(m_odometry.GetPose());
     } else {

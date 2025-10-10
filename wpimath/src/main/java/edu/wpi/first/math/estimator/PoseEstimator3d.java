@@ -164,10 +164,10 @@ public class PoseEstimator3d<T> {
 
     if (latestVisionUpdate != null) {
       // apply vision compensation to the pose rotation
-      final var visionUpdate = new VisionUpdate(
-        new Pose3d(translation, latestVisionUpdate.getValue().visionPose.getRotation()),
-        new Pose3d(translation, latestVisionUpdate.getValue().odometryPose.getRotation())
-      );
+      final var visionUpdate =
+          new VisionUpdate(
+              new Pose3d(translation, latestVisionUpdate.getValue().visionPose.getRotation()),
+              new Pose3d(translation, latestVisionUpdate.getValue().odometryPose.getRotation()));
       m_visionUpdates.put(latestVisionUpdate.getKey(), visionUpdate);
       m_poseEstimate = visionUpdate.compensate(m_odometry.getPoseMeters());
     } else {
@@ -189,10 +189,10 @@ public class PoseEstimator3d<T> {
 
     if (latestVisionUpdate != null) {
       // apply vision compensation to the pose translation
-      final var visionUpdate = new VisionUpdate(
-        new Pose3d(latestVisionUpdate.getValue().visionPose.getTranslation(), rotation),
-        new Pose3d(latestVisionUpdate.getValue().odometryPose.getTranslation(), rotation)
-      );
+      final var visionUpdate =
+          new VisionUpdate(
+              new Pose3d(latestVisionUpdate.getValue().visionPose.getTranslation(), rotation),
+              new Pose3d(latestVisionUpdate.getValue().odometryPose.getTranslation(), rotation));
       m_visionUpdates.put(latestVisionUpdate.getKey(), visionUpdate);
       m_poseEstimate = visionUpdate.compensate(m_odometry.getPoseMeters());
     } else {
