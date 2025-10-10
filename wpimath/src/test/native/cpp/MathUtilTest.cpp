@@ -157,7 +157,8 @@ TEST(MathUtilTest, CopyDirectionPowWithMaxMagnitude) {
   EXPECT_DOUBLE_EQ(-0.5 * 0.5 * 10, frc::CopyDirectionPow(-5.0, 2.0, 10.0));
 
   EXPECT_DOUBLE_EQ(std::sqrt(0.5) * 10, frc::CopyDirectionPow(5.0, 0.5, 10.0));
-  EXPECT_DOUBLE_EQ(-std::sqrt(0.5) * 10, frc::CopyDirectionPow(-5.0, 0.5, 10.0));
+  EXPECT_DOUBLE_EQ(-std::sqrt(0.5) * 10,
+                   frc::CopyDirectionPow(-5.0, 0.5, 10.0));
 
   EXPECT_DOUBLE_EQ(0.0, frc::CopyDirectionPow(0.0, 2.0, 5.0));
   EXPECT_DOUBLE_EQ(5.0, frc::CopyDirectionPow(5.0, 2.0, 5.0));
@@ -170,12 +171,12 @@ TEST(MathUtilTest, CopyDirectionPowWithMaxMagnitude) {
 }
 
 TEST(MathUtilTest, CopyDirectionPowWithUnits) {
-  EXPECT_UNITS_EQ(0_mps,
-                  frc::CopyDirectionPow<units::meters_per_second_t>(0_mps, 2.0));
-  EXPECT_UNITS_EQ(1_mps,
-                  frc::CopyDirectionPow<units::meters_per_second_t>(1_mps, 2.0));
-  EXPECT_UNITS_EQ(-1_mps,
-                  frc::CopyDirectionPow<units::meters_per_second_t>(-1_mps, 2.0));
+  EXPECT_UNITS_EQ(
+      0_mps, frc::CopyDirectionPow<units::meters_per_second_t>(0_mps, 2.0));
+  EXPECT_UNITS_EQ(
+      1_mps, frc::CopyDirectionPow<units::meters_per_second_t>(1_mps, 2.0));
+  EXPECT_UNITS_EQ(
+      -1_mps, frc::CopyDirectionPow<units::meters_per_second_t>(-1_mps, 2.0));
 
   EXPECT_UNITS_EQ(
       units::meters_per_second_t{0.5 * 0.5 * 10},
