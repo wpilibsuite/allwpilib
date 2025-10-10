@@ -1272,6 +1272,14 @@ template <typename Lhs, typename Rhs, int ProductTag, typename MatrixShape>
 struct generic_product_impl<Lhs, Rhs, HomogeneousShape, MatrixShape, ProductTag>
     : generic_product_impl<typename Lhs::PlainObject, Rhs, DenseShape, MatrixShape, ProductTag> {};
 
+template <typename Lhs, typename Rhs, int ProductTag>
+struct generic_product_impl<Lhs, Rhs, PermutationShape, HomogeneousShape, ProductTag>
+    : generic_product_impl<Lhs, Rhs, PermutationShape, DenseShape, ProductTag> {};
+
+template <typename Lhs, typename Rhs, int ProductTag>
+struct generic_product_impl<Lhs, Rhs, HomogeneousShape, PermutationShape, ProductTag>
+    : generic_product_impl<Lhs, Rhs, DenseShape, PermutationShape, ProductTag> {};
+
 }  // end namespace internal
 
 }  // end namespace Eigen
