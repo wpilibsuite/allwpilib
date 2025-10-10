@@ -55,8 +55,8 @@ TEST(MathUtilTest, ApplyDeadbandArbitraryScale) {
 
 TEST(MathUtilTest, ApplyDeadbandUnits) {
   // < 0
-  EXPECT_DOUBLE_EQ(
-      -20, frc::ApplyDeadband<units::radian_t>(-20_rad, 1_rad, 20_rad).value());
+  EXPECT_UNITS_EQ(-20_rad,
+                  frc::ApplyDeadband<units::radian_t>(-20_rad, 1_rad, 20_rad));
 }
 
 TEST(MathUtilTest, ApplyDeadbandLargeMaxMagnitude) {
@@ -170,20 +170,19 @@ TEST(MathUtilTest, CopySignPowWithMaxMagnitude) {
 }
 
 TEST(MathUtilTest, CopySignPowWithUnits) {
-  EXPECT_DOUBLE_EQ(
-      0, frc::CopySignPow<units::meters_per_second_t>(0_mps, 2.0).value());
-  EXPECT_DOUBLE_EQ(
-      1, frc::CopySignPow<units::meters_per_second_t>(1_mps, 2.0).value());
-  EXPECT_DOUBLE_EQ(
-      -1, frc::CopySignPow<units::meters_per_second_t>(-1_mps, 2.0).value());
+  EXPECT_UNITS_EQ(0_mps,
+                  frc::CopySignPow<units::meters_per_second_t>(0_mps, 2.0));
+  EXPECT_UNITS_EQ(1_mps,
+                  frc::CopySignPow<units::meters_per_second_t>(1_mps, 2.0));
+  EXPECT_UNITS_EQ(-1_mps,
+                  frc::CopySignPow<units::meters_per_second_t>(-1_mps, 2.0));
 
-  EXPECT_DOUBLE_EQ(
-      0.5 * 0.5 * 10,
-      frc::CopySignPow<units::meters_per_second_t>(5_mps, 2.0, 10_mps).value());
-  EXPECT_DOUBLE_EQ(
-      -0.5 * 0.5 * 10,
-      frc::CopySignPow<units::meters_per_second_t>(-5_mps, 2.0, 10_mps)
-          .value());
+  EXPECT_UNITS_EQ(
+      units::meters_per_second_t{0.5 * 0.5 * 10},
+      frc::CopySignPow<units::meters_per_second_t>(5_mps, 2.0, 10_mps));
+  EXPECT_UNITS_EQ(
+      units::meters_per_second_t{-0.5 * 0.5 * 10},
+      frc::CopySignPow<units::meters_per_second_t>(-5_mps, 2.0, 10_mps));
 }
 
 TEST(MathUtilTest, CopyDirectionPow2d) {
