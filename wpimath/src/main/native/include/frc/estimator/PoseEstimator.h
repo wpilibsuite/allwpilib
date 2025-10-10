@@ -151,7 +151,7 @@ class WPILIB_DLLEXPORT PoseEstimator {
         Pose2d{translation, latestVisionUpdate->second.odometryPose.Rotation()}
       };
       m_visionUpdates[latestVisionUpdate->first] = visionUpdate;
-      m_poseEstimate = visionUpdate.Compensate(m_odometry.Pose());
+      m_poseEstimate = visionUpdate.Compensate(m_odometry.GetPose());
     } else {
       m_poseEstimate = m_odometry.GetPose();
     }
@@ -177,7 +177,7 @@ class WPILIB_DLLEXPORT PoseEstimator {
         Pose2d{latestVisionUpdate->second.odometryPose.Translation(), rotation}
       };
       m_visionUpdates[latestVisionUpdate->first] = visionUpdate;
-      m_poseEstimate = visionUpdate.Compensate(m_odometry.Pose());
+      m_poseEstimate = visionUpdate.Compensate(m_odometry.GetPose());
     } else {
       m_poseEstimate = m_odometry.GetPose();
     }
