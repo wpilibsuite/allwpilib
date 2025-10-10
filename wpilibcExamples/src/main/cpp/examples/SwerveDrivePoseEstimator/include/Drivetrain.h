@@ -6,7 +6,7 @@
 
 #include <numbers>
 
-#include <frc/AnalogGyro.h>
+#include <frc/OnboardIMU.h>
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
@@ -19,7 +19,7 @@
  */
 class Drivetrain {
  public:
-  Drivetrain() { m_gyro.Reset(); }
+  Drivetrain() { m_imu.ResetYaw(); }
 
   void Drive(units::meters_per_second_t xSpeed,
              units::meters_per_second_t ySpeed, units::radians_per_second_t rot,
@@ -41,7 +41,7 @@ class Drivetrain {
   SwerveModule m_backLeft{5, 6, 8, 9, 10, 11};
   SwerveModule m_backRight{7, 8, 12, 13, 14, 15};
 
-  frc::AnalogGyro m_gyro{0};
+  frc::OnboardIMU m_imu{frc::OnboardIMU::kFlat};
 
   frc::SwerveDriveKinematics<4> m_kinematics{
       m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation,

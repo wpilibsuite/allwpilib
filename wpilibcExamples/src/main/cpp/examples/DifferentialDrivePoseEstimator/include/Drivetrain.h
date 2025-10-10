@@ -6,9 +6,9 @@
 
 #include <numbers>
 
-#include <frc/AnalogGyro.h>
 #include <frc/ComputerVisionUtil.h>
 #include <frc/Encoder.h>
+#include <frc/OnboardIMU.h>
 #include <frc/RobotController.h>
 #include <frc/Timer.h>
 #include <frc/apriltag/AprilTagFieldLayout.h>
@@ -144,7 +144,7 @@ class Drivetrain {
   frc::PIDController m_leftPIDController{1.0, 0.0, 0.0};
   frc::PIDController m_rightPIDController{1.0, 0.0, 0.0};
 
-  frc::AnalogGyro m_gyro{0};
+  frc::OnboardIMU m_imu{frc::OnboardIMU::kFlat};
 
   frc::DifferentialDriveKinematics m_kinematics{kTrackwidth};
 
@@ -152,7 +152,7 @@ class Drivetrain {
   // robot!
   frc::DifferentialDrivePoseEstimator m_poseEstimator{
       m_kinematics,
-      m_gyro.GetRotation2d(),
+      m_imu.GetRotation2d(),
       units::meter_t{m_leftEncoder.GetDistance()},
       units::meter_t{m_rightEncoder.GetDistance()},
       frc::Pose2d{},

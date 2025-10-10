@@ -12,8 +12,8 @@ import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
-import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.OnboardIMU;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
 /** Represents a mecanum drive style drivetrain. */
@@ -41,21 +41,21 @@ public class Drivetrain {
   private final PIDController m_backLeftPIDController = new PIDController(1, 0, 0);
   private final PIDController m_backRightPIDController = new PIDController(1, 0, 0);
 
-  private final AnalogGyro m_gyro = new AnalogGyro(0);
+  private final OnboardIMU m_imu = new OnboardIMU(OnboardIMU.MountOrientation.kFlat);
 
   private final MecanumDriveKinematics m_kinematics =
       new MecanumDriveKinematics(
           m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
 
   private final MecanumDriveOdometry m_odometry =
-      new MecanumDriveOdometry(m_kinematics, m_gyro.getRotation2d(), getCurrentDistances());
+      new MecanumDriveOdometry(m_kinematics, m_imu.getRotation2d(), getCurrentDistances());
 
   // Gains are for example purposes only - must be determined for your own robot!
   private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(1, 3);
 
   /** Constructs a MecanumDrive and resets the gyro. */
   public Drivetrain() {
-    m_gyro.reset();
+    m_imu.resetYaw();
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
@@ -127,13 +127,13 @@ public class Drivetrain {
       double xSpeed, double ySpeed, double rot, boolean fieldRelative, double period) {
     var chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, rot);
     if (fieldRelative) {
-      chassisSpeeds = chassisSpeeds.toRobotRelative(m_gyro.getRotation2d());
+      chassisSpeeds = chassisSpeeds.toRobotRelative(m_imu.getRotation2d());
     }
     setSpeeds(m_kinematics.toWheelSpeeds(chassisSpeeds.discretize(period)).desaturate(kMaxSpeed));
   }
 
   /** Updates the field relative position of the robot. */
   public void updateOdometry() {
-    m_odometry.update(m_gyro.getRotation2d(), getCurrentDistances());
+    m_odometry.update(m_imu.getRotation2d(), getCurrentDistances());
   }
 }
