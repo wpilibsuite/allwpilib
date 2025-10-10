@@ -157,9 +157,22 @@ public class PoseEstimator3d<T> {
    */
   public void resetTranslation(Translation3d translation) {
     m_odometry.resetTranslation(translation);
+
+    final var latestVisionUpdate = m_visionUpdates.lastEntry();
     m_odometryPoseBuffer.clear();
     m_visionUpdates.clear();
-    m_poseEstimate = m_odometry.getPoseMeters();
+
+    if (latestVisionUpdate != null) {
+      // apply vision compensation to the pose rotation
+      final var visionUpdate = new VisionUpdate(
+        new Pose3d(translation, latestVisionUpdate.getValue().visionPose.getRotation()),
+        new Pose3d(translation, latestVisionUpdate.getValue().odometryPose.getRotation())
+      );
+      m_visionUpdates.put(latestVisionUpdate.getKey(), visionUpdate);
+      m_poseEstimate = visionUpdate.compensate(m_odometry.getPoseMeters());
+    } else {
+      m_poseEstimate = m_odometry.getPoseMeters();
+    }
   }
 
   /**
@@ -169,9 +182,22 @@ public class PoseEstimator3d<T> {
    */
   public void resetRotation(Rotation3d rotation) {
     m_odometry.resetRotation(rotation);
+
+    final var latestVisionUpdate = m_visionUpdates.lastEntry();
     m_odometryPoseBuffer.clear();
     m_visionUpdates.clear();
-    m_poseEstimate = m_odometry.getPoseMeters();
+
+    if (latestVisionUpdate != null) {
+      // apply vision compensation to the pose translation
+      final var visionUpdate = new VisionUpdate(
+        new Pose3d(latestVisionUpdate.getValue().visionPose.getTranslation(), rotation),
+        new Pose3d(latestVisionUpdate.getValue().odometryPose.getTranslation(), rotation)
+      );
+      m_visionUpdates.put(latestVisionUpdate.getKey(), visionUpdate);
+      m_poseEstimate = visionUpdate.compensate(m_odometry.getPoseMeters());
+    } else {
+      m_poseEstimate = m_odometry.getPoseMeters();
+    }
   }
 
   /**
