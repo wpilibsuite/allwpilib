@@ -5,6 +5,7 @@ plugins {
 
 evaluationDependsOn(':apriltag')
 evaluationDependsOn(':cameraserver')
+evaluationDependsOn(':commandsv3')
 evaluationDependsOn(':cscore')
 evaluationDependsOn(':epilogue-runtime')
 evaluationDependsOn(':hal')
@@ -161,6 +162,7 @@ task generateJavaDocs(type: Javadoc) {
             "-edu.wpi.first.math.system.plant.struct," +
             "-edu.wpi.first.math.trajectory.proto," +
             "-edu.wpi.first.math.trajectory.struct," +
+            "-org.wpilib.commands3.proto," +
             // The .measure package contains generated source files for which automatic javadoc
             // generation is very difficult to do meaningfully.
             "-edu.wpi.first.units.measure", true)
@@ -170,6 +172,7 @@ task generateJavaDocs(type: Javadoc) {
     dependsOn project(':wpilibj').generateJavaVersion
     source project(':apriltag').sourceSets.main.java
     source project(':cameraserver').sourceSets.main.java
+    source project(':commandsv3').sourceSets.main.java
     source project(':cscore').sourceSets.main.java
     source project(':epilogue-runtime').sourceSets.main.java
     source project(':hal').sourceSets.main.java

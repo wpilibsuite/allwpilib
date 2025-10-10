@@ -5,6 +5,7 @@ WPILib is normally built with Gradle, however for some systems, such as Linux ba
 ## Libraries that get built
 * apriltag
 * cameraserver
+* commandsv3
 * cscore
 * fieldImages
 * hal (simulation HAL only)
