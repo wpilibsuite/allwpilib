@@ -116,18 +116,18 @@ TEST(MathUtilTest, ApplyDeadband2dLargeMaxMagnitude) {
 }
 
 TEST(MathUtilTest, ApplyDeadband2dUnits) {
-  EXPECT_EQ((Eigen::Vector<units::meters_per_second_t, 2>(0_mps, 2.5_mps)),
+  EXPECT_EQ((Eigen::Vector<units::meters_per_second_t, 2>{0_mps, 2.5_mps}),
             frc::ApplyDeadband(
-                Eigen::Vector<units::meters_per_second_t, 2>(0_mps, 2.5_mps),
+                Eigen::Vector<units::meters_per_second_t, 2>{0_mps, 2.5_mps},
                 0.02_mps, 2.5_mps));
-  EXPECT_EQ((Eigen::Vector<units::meters_per_second_t, 2>(1_mps, 0_mps)),
+  EXPECT_EQ((Eigen::Vector<units::meters_per_second_t, 2>{1_mps, 0_mps}),
             frc::ApplyDeadband(
-                Eigen::Vector<units::meters_per_second_t, 2>(1_mps, 0_mps),
+                Eigen::Vector<units::meters_per_second_t, 2>{1_mps, 0_mps},
                 0.02_mps));
 
-  EXPECT_EQ((Eigen::Vector<units::meters_per_second_t, 2>(0_mps, 0_mps)),
+  EXPECT_EQ((Eigen::Vector<units::meters_per_second_t, 2>{0_mps, 0_mps}),
             frc::ApplyDeadband(
-                Eigen::Vector<units::meters_per_second_t, 2>(0_mps, 0_mps),
+                Eigen::Vector<units::meters_per_second_t, 2>{0_mps, 0_mps},
                 0.02_mps, 2.5_mps));
 }
 
@@ -251,26 +251,26 @@ TEST(MathUtilTest, CopyDirectionPow2dMaxDistance) {
 
 TEST(MathUtilTest, CopyDirectionPow2dUnits) {
   EXPECT_EQ(
-      (Eigen::Vector<units::meters_per_second_t, 2>(1_mps, 0_mps)),
+      (Eigen::Vector<units::meters_per_second_t, 2>{1_mps, 0_mps}),
       frc::CopyDirectionPow(
-          Eigen::Vector<units::meters_per_second_t, 2>(1_mps, 0_mps), 2.0));
+          Eigen::Vector<units::meters_per_second_t, 2>{1_mps, 0_mps}, 2.0));
   EXPECT_EQ(
-      (Eigen::Vector<units::meters_per_second_t, 2>(-1_mps, 0_mps)),
+      (Eigen::Vector<units::meters_per_second_t, 2>{-1_mps, 0_mps}),
       frc::CopyDirectionPow(
-          Eigen::Vector<units::meters_per_second_t, 2>(-1_mps, 0_mps), 2.0));
+          Eigen::Vector<units::meters_per_second_t, 2>{-1_mps, 0_mps}, 2.0));
 
-  EXPECT_EQ((Eigen::Vector<units::meters_per_second_t, 2>(0_mps, 0_mps)),
+  EXPECT_EQ((Eigen::Vector<units::meters_per_second_t, 2>{0_mps, 0_mps}),
             frc::CopyDirectionPow(
-                Eigen::Vector<units::meters_per_second_t, 2>(0_mps, 0_mps), 2.0,
+                Eigen::Vector<units::meters_per_second_t, 2>{0_mps, 0_mps}, 2.0,
                 5_mps));
 
-  EXPECT_EQ((Eigen::Vector<units::meters_per_second_t, 2>(5_mps, 0_mps)),
+  EXPECT_EQ((Eigen::Vector<units::meters_per_second_t, 2>{5_mps, 0_mps}),
             frc::CopyDirectionPow(
-                Eigen::Vector<units::meters_per_second_t, 2>(5_mps, 0_mps), 2.0,
+                Eigen::Vector<units::meters_per_second_t, 2>{5_mps, 0_mps}, 2.0,
                 5_mps));
-  EXPECT_EQ((Eigen::Vector<units::meters_per_second_t, 2>(-5_mps, 0_mps)),
+  EXPECT_EQ((Eigen::Vector<units::meters_per_second_t, 2>{-5_mps, 0_mps}),
             frc::CopyDirectionPow(
-                Eigen::Vector<units::meters_per_second_t, 2>(-5_mps, 0_mps),
+                Eigen::Vector<units::meters_per_second_t, 2>{-5_mps, 0_mps},
                 2.0, 5_mps));
 }
 
