@@ -1149,7 +1149,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
 SLEIPNIR_DLLEXPORT inline VariableMatrix cwise_reduce(
     const VariableMatrix& lhs, const VariableMatrix& rhs,
     function_ref<Variable(const Variable& x, const Variable& y)> binary_op) {
-  slp_assert(lhs.rows() == rhs.rows() && lhs.rows() == rhs.rows());
+  slp_assert(lhs.rows() == rhs.rows() && lhs.cols() == rhs.cols());
 
   VariableMatrix result{VariableMatrix::empty, lhs.rows(), lhs.cols()};
 

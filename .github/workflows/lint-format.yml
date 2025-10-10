@@ -123,18 +123,3 @@ jobs:
           echo '' >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
         if: ${{ failure() }}
-
-  documentation:
-    name: "Documentation"
-    runs-on: ubuntu-22.04
-    needs: [validation]
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: 21
-      - name: Build with Gradle
-        run: ./gradlew docs:zipDocs -PbuildServer -PdocWarningsAsErrors ${{ env.EXTRA_GRADLE_ARGS }}

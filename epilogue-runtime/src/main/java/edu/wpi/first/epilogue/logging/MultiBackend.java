@@ -4,10 +4,12 @@
 
 package edu.wpi.first.epilogue.logging;
 
+import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.struct.Struct;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import us.hebi.quickbuf.ProtoMessage;
 
 /**
  * A backend implementation that delegates to other backends. Helpful for simultaneous logging to
@@ -24,7 +26,13 @@ public class MultiBackend implements EpilogueBackend {
 
   @Override
   public EpilogueBackend getNested(String path) {
-    return m_nestedBackends.computeIfAbsent(path, k -> new NestedBackend(k, this));
+    if (!m_nestedBackends.containsKey(path)) {
+      var nested = new NestedBackend(path, this);
+      m_nestedBackends.put(path, nested);
+      return nested;
+    }
+
+    return m_nestedBackends.get(path);
   }
 
   @Override
@@ -129,6 +137,13 @@ public class MultiBackend implements EpilogueBackend {
   public <S> void log(String identifier, S[] value, Struct<S> struct) {
     for (EpilogueBackend backend : m_backends) {
       backend.log(identifier, value, struct);
+    }
+  }
+
+  @Override
+  public <P, M extends ProtoMessage<M>> void log(String identifier, P value, Protobuf<P, M> proto) {
+    for (EpilogueBackend backend : m_backends) {
+      backend.log(identifier, value, proto);
     }
   }
 }

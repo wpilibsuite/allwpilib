@@ -11,16 +11,16 @@ This reverts commit f9b2c450bbbf6f14b194b8b81708d032a6431ee0.
  include/sleipnir/autodiff/variable.hpp        |  26 +----
  include/sleipnir/autodiff/variable_block.hpp  |  70 +++++------
  include/sleipnir/autodiff/variable_matrix.hpp | 110 ++++++------------
- include/sleipnir/control/ocp.hpp              |  14 +--
+ include/sleipnir/optimization/ocp.hpp         |  14 +--
  include/sleipnir/optimization/problem.hpp     |   6 +-
  src/autodiff/variable_matrix.cpp              |  66 +++++------
  8 files changed, 118 insertions(+), 182 deletions(-)
 
 diff --git a/include/sleipnir/autodiff/hessian.hpp b/include/sleipnir/autodiff/hessian.hpp
-index 4ad097a8117dac47566a3c6896d281004147be70..8b048ab3ba0d671397cfdadcd137ac67bef1b441 100644
+index fa6d8af0843eca8b674744f02551584dd8d79c21..4f093b7b39ea84e56c4a12ae1b6f645c4f84a1f0 100644
 --- a/include/sleipnir/autodiff/hessian.hpp
 +++ b/include/sleipnir/autodiff/hessian.hpp
-@@ -103,9 +103,9 @@ class SLEIPNIR_DLLEXPORT Hessian {
+@@ -106,9 +106,9 @@ class SLEIPNIR_DLLEXPORT Hessian {
        auto grad = m_graphs[row].generate_gradient_tree(m_wrt);
        for (int col = 0; col < m_wrt.rows(); ++col) {
          if (grad[col].expr != nullptr) {
@@ -33,10 +33,10 @@ index 4ad097a8117dac47566a3c6896d281004147be70..8b048ab3ba0d671397cfdadcd137ac67
        }
      }
 diff --git a/include/sleipnir/autodiff/jacobian.hpp b/include/sleipnir/autodiff/jacobian.hpp
-index 787fca8ccd3fd6e46c5d31ab980704e6a5e99402..7e7e1340d065d35412f43b27fac7d8a719b7e5b5 100644
+index 4515076cde12a2112e1b5711acc3092bd807e250..3662b5e49b93f63b5ccac0e732149bd9178f1aae 100644
 --- a/include/sleipnir/autodiff/jacobian.hpp
 +++ b/include/sleipnir/autodiff/jacobian.hpp
-@@ -95,9 +95,9 @@ class SLEIPNIR_DLLEXPORT Jacobian {
+@@ -99,9 +99,9 @@ class SLEIPNIR_DLLEXPORT Jacobian {
        auto grad = m_graphs[row].generate_gradient_tree(m_wrt);
        for (int col = 0; col < m_wrt.rows(); ++col) {
          if (grad[col].expr != nullptr) {
@@ -49,10 +49,10 @@ index 787fca8ccd3fd6e46c5d31ab980704e6a5e99402..7e7e1340d065d35412f43b27fac7d8a7
        }
      }
 diff --git a/include/sleipnir/autodiff/variable.hpp b/include/sleipnir/autodiff/variable.hpp
-index 17e7eb7cc2c7c7599eaba97d8ec80972524c1599..03b929c778c03186cc5b461a2e855da23034457a 100644
+index 62135a5539308ae69f6b45a64d9337c4c3e96d7b..2fc2119d2dedaa5b4c941ce449b7fb113c641635 100644
 --- a/include/sleipnir/autodiff/variable.hpp
 +++ b/include/sleipnir/autodiff/variable.hpp
-@@ -505,11 +505,7 @@ gch::small_vector<Variable> make_constraints(LHS&& lhs, RHS&& rhs) {
+@@ -512,11 +512,7 @@ gch::small_vector<Variable> make_constraints(LHS&& lhs, RHS&& rhs) {
      for (int row = 0; row < rhs.rows(); ++row) {
        for (int col = 0; col < rhs.cols(); ++col) {
          // Make right-hand side zero
@@ -65,7 +65,7 @@ index 17e7eb7cc2c7c7599eaba97d8ec80972524c1599..03b929c778c03186cc5b461a2e855da2
        }
      }
    } else if constexpr (MatrixLike<LHS> && ScalarLike<RHS>) {
-@@ -518,11 +514,7 @@ gch::small_vector<Variable> make_constraints(LHS&& lhs, RHS&& rhs) {
+@@ -525,11 +521,7 @@ gch::small_vector<Variable> make_constraints(LHS&& lhs, RHS&& rhs) {
      for (int row = 0; row < lhs.rows(); ++row) {
        for (int col = 0; col < lhs.cols(); ++col) {
          // Make right-hand side zero
@@ -78,7 +78,7 @@ index 17e7eb7cc2c7c7599eaba97d8ec80972524c1599..03b929c778c03186cc5b461a2e855da2
        }
      }
    } else if constexpr (MatrixLike<LHS> && MatrixLike<RHS>) {
-@@ -532,19 +524,7 @@ gch::small_vector<Variable> make_constraints(LHS&& lhs, RHS&& rhs) {
+@@ -539,19 +531,7 @@ gch::small_vector<Variable> make_constraints(LHS&& lhs, RHS&& rhs) {
      for (int row = 0; row < lhs.rows(); ++row) {
        for (int col = 0; col < lhs.cols(); ++col) {
          // Make right-hand side zero
@@ -376,7 +376,7 @@ index f1c1ca0dc3fde663c3e74f6fca4b89b119cf377d..632d44beb5b3dae29b9829c52a6168fe
      }
  
 diff --git a/include/sleipnir/autodiff/variable_matrix.hpp b/include/sleipnir/autodiff/variable_matrix.hpp
-index dee43f926d304e1f4900bd57b99cd613e808f58e..4dc2cea00cb9491035a9b4795be3562186991c7a 100644
+index 70bccf4fc078a49e22b6699db1228c765430a121..2ed997819e70c584ce413f639826b6da506e382b 100644
 --- a/include/sleipnir/autodiff/variable_matrix.hpp
 +++ b/include/sleipnir/autodiff/variable_matrix.hpp
 @@ -211,7 +211,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
@@ -708,35 +708,35 @@ index dee43f926d304e1f4900bd57b99cd613e808f58e..4dc2cea00cb9491035a9b4795be35621
      }
    }
  
-diff --git a/include/sleipnir/control/ocp.hpp b/include/sleipnir/control/ocp.hpp
-index 282520fb852d8588b96846eb5b4952bf47d1309f..d9174426669281e68a5c09d298cfd5bcd3be3776 100644
---- a/include/sleipnir/control/ocp.hpp
-+++ b/include/sleipnir/control/ocp.hpp
-@@ -180,7 +180,7 @@ class SLEIPNIR_DLLEXPORT OCP : public Problem {
-     if (m_timestep_method == TimestepMethod::FIXED) {
+diff --git a/include/sleipnir/optimization/ocp.hpp b/include/sleipnir/optimization/ocp.hpp
+index 124224cf5ba6e54c141086e3a21389530198449f..74492a0d756a9d587df6158c7e2ef8548ae22be4 100644
+--- a/include/sleipnir/optimization/ocp.hpp
++++ b/include/sleipnir/optimization/ocp.hpp
+@@ -122,7 +122,7 @@ class SLEIPNIR_DLLEXPORT OCP : public Problem {
+     if (timestep_method == TimestepMethod::FIXED) {
        m_DT = VariableMatrix{1, m_num_steps + 1};
        for (int i = 0; i < num_steps + 1; ++i) {
--        m_DT[0, i] = m_dt.count();
-+        m_DT(0, i) = m_dt.count();
+-        m_DT[0, i] = dt.count();
++        m_DT(0, i) = dt.count();
        }
-     } else if (m_timestep_method == TimestepMethod::VARIABLE_SINGLE) {
-       Variable dt = decision_variable();
-@@ -189,12 +189,12 @@ class SLEIPNIR_DLLEXPORT OCP : public Problem {
+     } else if (timestep_method == TimestepMethod::VARIABLE_SINGLE) {
+       Variable single_dt = decision_variable();
+@@ -131,12 +131,12 @@ class SLEIPNIR_DLLEXPORT OCP : public Problem {
        // Set the member variable matrix to track the decision variable
        m_DT = VariableMatrix{1, m_num_steps + 1};
        for (int i = 0; i < num_steps + 1; ++i) {
--        m_DT[0, i] = dt;
-+        m_DT(0, i) = dt;
+-        m_DT[0, i] = single_dt;
++        m_DT(0, i) = single_dt;
        }
-     } else if (m_timestep_method == TimestepMethod::VARIABLE) {
+     } else if (timestep_method == TimestepMethod::VARIABLE) {
        m_DT = decision_variable(1, m_num_steps + 1);
        for (int i = 0; i < num_steps + 1; ++i) {
--        m_DT[0, i].set_value(m_dt.count());
-+        m_DT(0, i).set_value(m_dt.count());
+-        m_DT[0, i].set_value(dt.count());
++        m_DT(0, i).set_value(dt.count());
        }
      }
  
-@@ -270,7 +270,7 @@ class SLEIPNIR_DLLEXPORT OCP : public Problem {
+@@ -212,7 +212,7 @@ class SLEIPNIR_DLLEXPORT OCP : public Problem {
      for (int i = 0; i < m_num_steps + 1; ++i) {
        auto x = X().col(i);
        auto u = U().col(i);
@@ -745,16 +745,16 @@ index 282520fb852d8588b96846eb5b4952bf47d1309f..d9174426669281e68a5c09d298cfd5bc
        callback(time, x, u, dt);
  
        time += dt;
-@@ -377,7 +377,7 @@ class SLEIPNIR_DLLEXPORT OCP : public Problem {
+@@ -353,7 +353,7 @@ class SLEIPNIR_DLLEXPORT OCP : public Problem {
  
      // Derivation at https://mec560sbu.github.io/2016/09/30/direct_collocation/
      for (int i = 0; i < m_num_steps; ++i) {
 -      Variable h = dt()[0, i];
 +      Variable h = dt()(0, i);
  
-       auto& f = m_dynamics_function;
+       auto& f = m_dynamics;
  
-@@ -412,7 +412,7 @@ class SLEIPNIR_DLLEXPORT OCP : public Problem {
+@@ -391,7 +391,7 @@ class SLEIPNIR_DLLEXPORT OCP : public Problem {
        auto x_begin = X().col(i);
        auto x_end = X().col(i + 1);
        auto u = U().col(i);
@@ -762,8 +762,8 @@ index 282520fb852d8588b96846eb5b4952bf47d1309f..d9174426669281e68a5c09d298cfd5bc
 +      Variable dt = this->dt()(0, i);
  
        if (m_dynamics_type == DynamicsType::EXPLICIT_ODE) {
-         subject_to(x_end == rk4<const decltype(m_dynamics_function)&,
-@@ -433,7 +433,7 @@ class SLEIPNIR_DLLEXPORT OCP : public Problem {
+         subject_to(x_end == rk4<const decltype(m_dynamics)&, VariableMatrix,
+@@ -415,7 +415,7 @@ class SLEIPNIR_DLLEXPORT OCP : public Problem {
        auto x_begin = X().col(i);
        auto x_end = X().col(i + 1);
        auto u = U().col(i);
@@ -771,9 +771,9 @@ index 282520fb852d8588b96846eb5b4952bf47d1309f..d9174426669281e68a5c09d298cfd5bc
 +      Variable dt = this->dt()(0, i);
  
        if (m_dynamics_type == DynamicsType::EXPLICIT_ODE) {
-         x_end = rk4<const decltype(m_dynamics_function)&, VariableMatrix,
+         x_end = rk4<const decltype(m_dynamics)&, VariableMatrix, VariableMatrix,
 diff --git a/include/sleipnir/optimization/problem.hpp b/include/sleipnir/optimization/problem.hpp
-index b7a868657c704487049efaf6b3972b1f7b72bfb4..b484ec08d6c50bf42fbaa1d5b4c66a20cb11a922 100644
+index efde2006397fb7d8ca24651e9a84b47fc879ee15..c996b372311f708153f8c89ef15fa35a097a6171 100644
 --- a/include/sleipnir/optimization/problem.hpp
 +++ b/include/sleipnir/optimization/problem.hpp
 @@ -78,7 +78,7 @@ class SLEIPNIR_DLLEXPORT Problem {
@@ -797,7 +797,7 @@ index b7a868657c704487049efaf6b3972b1f7b72bfb4..b484ec08d6c50bf42fbaa1d5b4c66a20
      }
  
 diff --git a/src/autodiff/variable_matrix.cpp b/src/autodiff/variable_matrix.cpp
-index decdc70809189d309708774ec60603fe73c50ecc..71f8153d345750d79fa41cf7af14ac766fcad2a4 100644
+index 6c3a040e08bdc5009885e762402a8b44434024c3..d9619a39d583e1a29c46602ba61e881531f57e09 100644
 --- a/src/autodiff/variable_matrix.cpp
 +++ b/src/autodiff/variable_matrix.cpp
 @@ -12,17 +12,17 @@ VariableMatrix solve(const VariableMatrix& A, const VariableMatrix& B) {
@@ -821,7 +821,7 @@ index decdc70809189d309708774ec60603fe73c50ecc..71f8153d345750d79fa41cf7af14ac76
 +    const auto& c = A(1, 0);
 +    const auto& d = A(1, 1);
  
-     slp::VariableMatrix adj_A{{d, -b}, {-c, a}};
+     VariableMatrix adj_A{{d, -b}, {-c, a}};
      auto det_A = a * d - b * c;
 @@ -39,15 +39,15 @@ VariableMatrix solve(const VariableMatrix& A, const VariableMatrix& B) {
      //
@@ -905,7 +905,7 @@ index decdc70809189d309708774ec60603fe73c50ecc..71f8153d345750d79fa41cf7af14ac76
      }
  
 @@ -248,7 +248,7 @@ VariableMatrix solve(const VariableMatrix& A, const VariableMatrix& B) {
-     VariableMatrix X{A.cols(), B.cols()};
+     VariableMatrix X{VariableMatrix::empty, A.cols(), B.cols()};
      for (int row = 0; row < X.rows(); ++row) {
        for (int col = 0; col < X.cols(); ++col) {
 -        X[row, col] = eigen_X(row, col);

@@ -69,10 +69,12 @@ TEST_F(DSCommPacketTest, MainJoystickTag) {
     std::array<uint8_t, 12> _buttons{{0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1}};
 
     std::array<uint8_t, 2> _button_bytes{{0, 0}};
-    for (int btn = 0; btn < 8; btn++)
+    for (int btn = 0; btn < 8; btn++) {
       _button_bytes[1] |= _buttons[btn] << btn;
-    for (int btn = 8; btn < 12; btn++)
+    }
+    for (int btn = 8; btn < 12; btn++) {
       _button_bytes[0] |= _buttons[btn] << (btn - 8);
+    }
 
     // 5 for base, 4 joystick, 12 buttons (2 bytes) 3 povs
     uint8_t arr[5 + 4 + 2 + 6] = {// Size, Tag

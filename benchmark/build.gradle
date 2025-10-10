@@ -181,7 +181,11 @@ tasks.register('deployStatic') {
 model {
     components {
         benchmarkCpp(NativeExecutableSpec) {
-            targetBuildTypes 'debug'
+            if (project.hasProperty('ciDebugOnly')) {
+                targetBuildTypes 'debug'
+            } else {
+                targetBuildTypes 'release'
+            }
             sources {
                 cpp {
                     source {
@@ -235,7 +239,11 @@ model {
             }
         }
         benchmarkCppStatic(NativeExecutableSpec) {
-            targetBuildTypes 'debug'
+            if (project.hasProperty('ciDebugOnly')) {
+                targetBuildTypes 'debug'
+            } else {
+                targetBuildTypes 'release'
+            }
             nativeUtils.excludeBinariesFromStrip(it)
             sources {
                 cpp {

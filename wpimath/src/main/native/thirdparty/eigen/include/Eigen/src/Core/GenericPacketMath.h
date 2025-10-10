@@ -65,7 +65,7 @@ struct default_packet_traits {
     HasAbsDiff = 0,
     HasBlend = 0,
     // This flag is used to indicate whether packet comparison is supported.
-    // pcmp_eq, pcmp_lt and pcmp_le should be defined for it to be true.
+    // pcmp_eq and pcmp_lt should be defined for it to be true.
     HasCmp = 0,
 
     HasDiv = 0,
@@ -253,6 +253,12 @@ struct preinterpret_generic<Packet, Packet, true> {
   static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Packet run(const Packet& a) { return a; }
 };
 
+template <typename ComplexPacket>
+struct preinterpret_generic<typename unpacket_traits<ComplexPacket>::as_real, ComplexPacket, false> {
+  using RealPacket = typename unpacket_traits<ComplexPacket>::as_real;
+  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE RealPacket run(const ComplexPacket& a) { return a.v; }
+};
+
 /** \internal \returns reinterpret_cast<Target>(a) */
 template <typename Target, typename Packet>
 EIGEN_DEVICE_FUNC inline Target preinterpret(const Packet& a) {
@@ -375,7 +381,7 @@ EIGEN_DEVICE_FUNC inline bool pdiv(const bool& a, const bool& b) {
   return a && b;
 }
 
-// In the generic case, memset to all one bits.
+// In the generic packet case, memset to all one bits.
 template <typename Packet, typename EnableIf = void>
 struct ptrue_impl {
   static EIGEN_DEVICE_FUNC inline Packet run(const Packet& /*a*/) {
@@ -385,19 +391,16 @@ struct ptrue_impl {
   }
 };
 
+// Use a value of one for scalars.
+template <typename Scalar>
+struct ptrue_impl<Scalar, std::enable_if_t<is_scalar<Scalar>::value>> {
+  static EIGEN_DEVICE_FUNC inline Scalar run(const Scalar&) { return Scalar(1); }
+};
+
 // For booleans, we can only directly set a valid `bool` value to avoid UB.
 template <>
 struct ptrue_impl<bool, void> {
-  static EIGEN_DEVICE_FUNC inline bool run(const bool& /*a*/) { return true; }
-};
-
-// For non-trivial scalars, set to Scalar(1) (i.e. a non-zero value).
-// Although this is technically not a valid bitmask, the scalar path for pselect
-// uses a comparison to zero, so this should still work in most cases. We don't
-// have another option, since the scalar type requires initialization.
-template <typename T>
-struct ptrue_impl<T, std::enable_if_t<is_scalar<T>::value && NumTraits<T>::RequireInitialization>> {
-  static EIGEN_DEVICE_FUNC inline T run(const T& /*a*/) { return T(1); }
+  static EIGEN_DEVICE_FUNC inline bool run(const bool&) { return true; }
 };
 
 /** \internal \returns one bits. */
@@ -406,7 +409,7 @@ EIGEN_DEVICE_FUNC inline Packet ptrue(const Packet& a) {
   return ptrue_impl<Packet>::run(a);
 }
 
-// In the general case, memset to zero.
+// In the general packet case, memset to zero.
 template <typename Packet, typename EnableIf = void>
 struct pzero_impl {
   static EIGEN_DEVICE_FUNC inline Packet run(const Packet& /*a*/) {
@@ -427,30 +430,6 @@ struct pzero_impl<T, std::enable_if_t<is_scalar<T>::value>> {
 template <typename Packet>
 EIGEN_DEVICE_FUNC inline Packet pzero(const Packet& a) {
   return pzero_impl<Packet>::run(a);
-}
-
-/** \internal \returns a <= b as a bit mask */
-template <typename Packet>
-EIGEN_DEVICE_FUNC inline Packet pcmp_le(const Packet& a, const Packet& b) {
-  return a <= b ? ptrue(a) : pzero(a);
-}
-
-/** \internal \returns a < b as a bit mask */
-template <typename Packet>
-EIGEN_DEVICE_FUNC inline Packet pcmp_lt(const Packet& a, const Packet& b) {
-  return a < b ? ptrue(a) : pzero(a);
-}
-
-/** \internal \returns a == b as a bit mask */
-template <typename Packet>
-EIGEN_DEVICE_FUNC inline Packet pcmp_eq(const Packet& a, const Packet& b) {
-  return a == b ? ptrue(a) : pzero(a);
-}
-
-/** \internal \returns a < b or a==NaN or b==NaN as a bit mask */
-template <typename Packet>
-EIGEN_DEVICE_FUNC inline Packet pcmp_lt_or_nan(const Packet& a, const Packet& b) {
-  return a >= b ? pzero(a) : ptrue(a);
 }
 
 template <typename T>
@@ -579,6 +558,30 @@ EIGEN_DEVICE_FUNC inline Packet pandnot(const Packet& a, const Packet& b) {
   return pand(a, pnot(b));
 }
 
+/** \internal \returns a < b as a bit mask */
+template <typename Packet>
+EIGEN_DEVICE_FUNC inline Packet pcmp_lt(const Packet& a, const Packet& b) {
+  return a < b ? ptrue(a) : pzero(a);
+}
+
+/** \internal \returns a == b as a bit mask */
+template <typename Packet>
+EIGEN_DEVICE_FUNC inline Packet pcmp_eq(const Packet& a, const Packet& b) {
+  return a == b ? ptrue(a) : pzero(a);
+}
+
+/** \internal \returns a <= b as a bit mask */
+template <typename Packet>
+EIGEN_DEVICE_FUNC inline Packet pcmp_le(const Packet& a, const Packet& b) {
+  return por(pcmp_eq(a, b), pcmp_lt(a, b));
+}
+
+/** \internal \returns a < b or a==NaN or b==NaN as a bit mask */
+template <typename Packet>
+EIGEN_DEVICE_FUNC inline Packet pcmp_lt_or_nan(const Packet& a, const Packet& b) {
+  return a >= b ? pzero(a) : ptrue(a);
+}
+
 // In the general case, use bitwise select.
 template <typename Packet, bool is_scalar = is_scalar<Packet>::value>
 struct pselect_impl {
@@ -608,7 +611,7 @@ EIGEN_DEVICE_FUNC inline bool pselect<bool>(const bool& cond, const bool& a, con
 
 /** \internal \returns the min or of \a a and \a b (coeff-wise)
     If either \a a or \a b are NaN, the result is implementation defined. */
-template <int NaNPropagation>
+template <int NaNPropagation, bool IsInteger>
 struct pminmax_impl {
   template <typename Packet, typename Op>
   static EIGEN_DEVICE_FUNC inline Packet run(const Packet& a, const Packet& b, Op op) {
@@ -619,7 +622,7 @@ struct pminmax_impl {
 /** \internal \returns the min or max of \a a and \a b (coeff-wise)
     If either \a a or \a b are NaN, NaN is returned. */
 template <>
-struct pminmax_impl<PropagateNaN> {
+struct pminmax_impl<PropagateNaN, false> {
   template <typename Packet, typename Op>
   static EIGEN_DEVICE_FUNC inline Packet run(const Packet& a, const Packet& b, Op op) {
     Packet not_nan_mask_a = pcmp_eq(a, a);
@@ -632,7 +635,7 @@ struct pminmax_impl<PropagateNaN> {
     If both \a a and \a b are NaN, NaN is returned.
     Equivalent to std::fmin(a, b).  */
 template <>
-struct pminmax_impl<PropagateNumbers> {
+struct pminmax_impl<PropagateNumbers, false> {
   template <typename Packet, typename Op>
   static EIGEN_DEVICE_FUNC inline Packet run(const Packet& a, const Packet& b, Op op) {
     Packet not_nan_mask_a = pcmp_eq(a, a);
@@ -641,7 +644,7 @@ struct pminmax_impl<PropagateNumbers> {
   }
 };
 
-#define EIGEN_BINARY_OP_NAN_PROPAGATION(Type, Func) [](const Type& a, const Type& b) { return Func(a, b); }
+#define EIGEN_BINARY_OP_NAN_PROPAGATION(Type, Func) [](const Type& aa, const Type& bb) { return Func(aa, bb); }
 
 /** \internal \returns the min of \a a and \a b  (coeff-wise).
     If \a a or \b b is NaN, the return value is implementation defined. */
@@ -654,7 +657,8 @@ EIGEN_DEVICE_FUNC inline Packet pmin(const Packet& a, const Packet& b) {
     NaNPropagation determines the NaN propagation semantics. */
 template <int NaNPropagation, typename Packet>
 EIGEN_DEVICE_FUNC inline Packet pmin(const Packet& a, const Packet& b) {
-  return pminmax_impl<NaNPropagation>::run(a, b, EIGEN_BINARY_OP_NAN_PROPAGATION(Packet, (pmin<Packet>)));
+  constexpr bool IsInteger = NumTraits<typename unpacket_traits<Packet>::type>::IsInteger;
+  return pminmax_impl<NaNPropagation, IsInteger>::run(a, b, EIGEN_BINARY_OP_NAN_PROPAGATION(Packet, (pmin<Packet>)));
 }
 
 /** \internal \returns the max of \a a and \a b  (coeff-wise)
@@ -668,7 +672,8 @@ EIGEN_DEVICE_FUNC inline Packet pmax(const Packet& a, const Packet& b) {
     NaNPropagation determines the NaN propagation semantics. */
 template <int NaNPropagation, typename Packet>
 EIGEN_DEVICE_FUNC inline Packet pmax(const Packet& a, const Packet& b) {
-  return pminmax_impl<NaNPropagation>::run(a, b, EIGEN_BINARY_OP_NAN_PROPAGATION(Packet, (pmax<Packet>)));
+  constexpr bool IsInteger = NumTraits<typename unpacket_traits<Packet>::type>::IsInteger;
+  return pminmax_impl<NaNPropagation, IsInteger>::run(a, b, EIGEN_BINARY_OP_NAN_PROPAGATION(Packet, (pmax<Packet>)));
 }
 
 /** \internal \returns the absolute value of \a a */
@@ -873,17 +878,29 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Packet plset(const typename unpacket_trait
   return a;
 }
 
+template <typename Packet, typename EnableIf = void>
+struct peven_mask_impl {
+  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Packet run(const Packet&) {
+    typedef typename unpacket_traits<Packet>::type Scalar;
+    const size_t n = unpacket_traits<Packet>::size;
+    EIGEN_ALIGN_TO_BOUNDARY(sizeof(Packet)) Scalar elements[n];
+    for (size_t i = 0; i < n; ++i) {
+      memset(elements + i, ((i & 1) == 0 ? 0xff : 0), sizeof(Scalar));
+    }
+    return ploadu<Packet>(elements);
+  }
+};
+
+template <typename Scalar>
+struct peven_mask_impl<Scalar, std::enable_if_t<is_scalar<Scalar>::value>> {
+  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar run(const Scalar&) { return Scalar(1); }
+};
+
 /** \internal \returns a packet with constant coefficients \a a, e.g.: (x, 0, x, 0),
      where x is the value of all 1-bits. */
 template <typename Packet>
-EIGEN_DEVICE_FUNC inline Packet peven_mask(const Packet& /*a*/) {
-  typedef typename unpacket_traits<Packet>::type Scalar;
-  const size_t n = unpacket_traits<Packet>::size;
-  EIGEN_ALIGN_TO_BOUNDARY(sizeof(Packet)) Scalar elements[n];
-  for (size_t i = 0; i < n; ++i) {
-    memset(elements + i, ((i & 1) == 0 ? 0xff : 0), sizeof(Scalar));
-  }
-  return ploadu<Packet>(elements);
+EIGEN_DEVICE_FUNC inline Packet peven_mask(const Packet& a) {
+  return peven_mask_impl<Packet>::run(a);
 }
 
 /** \internal copy the packet \a from to \a *to, \a to must be properly aligned */
@@ -1244,26 +1261,46 @@ EIGEN_DEVICE_FUNC inline typename unpacket_traits<Packet>::type predux_mul(const
 template <typename Packet>
 EIGEN_DEVICE_FUNC inline typename unpacket_traits<Packet>::type predux_min(const Packet& a) {
   typedef typename unpacket_traits<Packet>::type Scalar;
-  return predux_helper(a, EIGEN_BINARY_OP_NAN_PROPAGATION(Scalar, (pmin<PropagateFast, Scalar>)));
+  return predux_helper(a, EIGEN_BINARY_OP_NAN_PROPAGATION(Scalar, (pmin<Scalar>)));
 }
 
-template <int NaNPropagation, typename Packet>
-EIGEN_DEVICE_FUNC inline typename unpacket_traits<Packet>::type predux_min(const Packet& a) {
-  typedef typename unpacket_traits<Packet>::type Scalar;
-  return predux_helper(a, EIGEN_BINARY_OP_NAN_PROPAGATION(Scalar, (pmin<NaNPropagation, Scalar>)));
-}
-
-/** \internal \returns the min of the elements of \a a */
+/** \internal \returns the max of the elements of \a a */
 template <typename Packet>
 EIGEN_DEVICE_FUNC inline typename unpacket_traits<Packet>::type predux_max(const Packet& a) {
   typedef typename unpacket_traits<Packet>::type Scalar;
-  return predux_helper(a, EIGEN_BINARY_OP_NAN_PROPAGATION(Scalar, (pmax<PropagateFast, Scalar>)));
+  return predux_helper(a, EIGEN_BINARY_OP_NAN_PROPAGATION(Scalar, (pmax<Scalar>)));
+}
+
+template <int NaNPropagation, typename Packet>
+struct predux_min_max_helper_impl {
+  using Scalar = typename unpacket_traits<Packet>::type;
+  static constexpr bool UsePredux_ = NaNPropagation == PropagateFast || NumTraits<Scalar>::IsInteger;
+  template <bool UsePredux = UsePredux_, std::enable_if_t<!UsePredux, bool> = true>
+  static EIGEN_DEVICE_FUNC inline Scalar run_min(const Packet& a) {
+    return predux_helper(a, EIGEN_BINARY_OP_NAN_PROPAGATION(Scalar, (pmin<NaNPropagation, Scalar>)));
+  }
+  template <bool UsePredux = UsePredux_, std::enable_if_t<!UsePredux, bool> = true>
+  static EIGEN_DEVICE_FUNC inline Scalar run_max(const Packet& a) {
+    return predux_helper(a, EIGEN_BINARY_OP_NAN_PROPAGATION(Scalar, (pmax<NaNPropagation, Scalar>)));
+  }
+  template <bool UsePredux = UsePredux_, std::enable_if_t<UsePredux, bool> = true>
+  static EIGEN_DEVICE_FUNC inline Scalar run_min(const Packet& a) {
+    return predux_min(a);
+  }
+  template <bool UsePredux = UsePredux_, std::enable_if_t<UsePredux, bool> = true>
+  static EIGEN_DEVICE_FUNC inline Scalar run_max(const Packet& a) {
+    return predux_max(a);
+  }
+};
+
+template <int NaNPropagation, typename Packet>
+EIGEN_DEVICE_FUNC inline typename unpacket_traits<Packet>::type predux_min(const Packet& a) {
+  return predux_min_max_helper_impl<NaNPropagation, Packet>::run_min(a);
 }
 
 template <int NaNPropagation, typename Packet>
 EIGEN_DEVICE_FUNC inline typename unpacket_traits<Packet>::type predux_max(const Packet& a) {
-  typedef typename unpacket_traits<Packet>::type Scalar;
-  return predux_helper(a, EIGEN_BINARY_OP_NAN_PROPAGATION(Scalar, (pmax<NaNPropagation, Scalar>)));
+  return predux_min_max_helper_impl<NaNPropagation, Packet>::run_max(a);
 }
 
 #undef EIGEN_BINARY_OP_NAN_PROPAGATION
@@ -1313,20 +1350,20 @@ struct pmadd_impl {
 template <typename Scalar>
 struct pmadd_impl<Scalar, std::enable_if_t<is_scalar<Scalar>::value && NumTraits<Scalar>::IsSigned>> {
   static EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE Scalar pmadd(const Scalar& a, const Scalar& b, const Scalar& c) {
-    return numext::fma(a, b, c);
+    return numext::madd<Scalar>(a, b, c);
   }
   static EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE Scalar pmsub(const Scalar& a, const Scalar& b, const Scalar& c) {
-    return numext::fma(a, b, Scalar(-c));
+    return numext::madd<Scalar>(a, b, Scalar(-c));
   }
   static EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE Scalar pnmadd(const Scalar& a, const Scalar& b, const Scalar& c) {
-    return numext::fma(Scalar(-a), b, c);
+    return numext::madd<Scalar>(Scalar(-a), b, c);
   }
   static EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE Scalar pnmsub(const Scalar& a, const Scalar& b, const Scalar& c) {
-    return -Scalar(numext::fma(a, b, c));
+    return -Scalar(numext::madd<Scalar>(a, b, c));
   }
 };
 
-// FMA instructions.
+// Multiply-add instructions.
 /** \internal \returns a * b + c (coeff-wise) */
 template <typename Packet>
 EIGEN_DEVICE_FUNC inline Packet pmadd(const Packet& a, const Packet& b, const Packet& c) {
@@ -1565,9 +1602,10 @@ EIGEN_DEVICE_FUNC inline Packet ploaduSegment(const typename unpacket_traits<Pac
   using Scalar = typename unpacket_traits<Packet>::type;
   constexpr Index PacketSize = unpacket_traits<Packet>::size;
   eigen_assert((begin >= 0 && count >= 0 && begin + count <= PacketSize) && "invalid range");
-  Scalar aux[PacketSize];
-  memset(static_cast<void*>(aux), 0x00, sizeof(Scalar) * PacketSize);
-  smart_copy(from + begin, from + begin + count, aux + begin);
+  Scalar aux[PacketSize] = {};
+  for (Index k = begin; k < begin + count; k++) {
+    aux[k] = from[k];
+  }
   return ploadu<Packet>(aux);
 }
 
@@ -1588,7 +1626,9 @@ EIGEN_DEVICE_FUNC inline void pstoreuSegment(Scalar* to, const Packet& from, Ind
   eigen_assert((begin >= 0 && count >= 0 && begin + count <= PacketSize) && "invalid range");
   Scalar aux[PacketSize];
   pstoreu<Scalar, Packet>(aux, from);
-  smart_copy(aux + begin, aux + begin + count, to + begin);
+  for (Index k = begin; k < begin + count; k++) {
+    to[k] = aux[k];
+  }
 }
 
 /** \internal copy the packet \a from in the range [begin, begin + count) to \a *to.

@@ -306,12 +306,12 @@ class DenseBase
   EIGEN_DEVICE_FUNC static const ConstantReturnType Constant(Index size, const Scalar& value);
   EIGEN_DEVICE_FUNC static const ConstantReturnType Constant(const Scalar& value);
 
-  EIGEN_DEPRECATED EIGEN_DEVICE_FUNC static const RandomAccessLinSpacedReturnType LinSpaced(Sequential_t, Index size,
-                                                                                            const Scalar& low,
-                                                                                            const Scalar& high);
-  EIGEN_DEPRECATED EIGEN_DEVICE_FUNC static const RandomAccessLinSpacedReturnType LinSpaced(Sequential_t,
-                                                                                            const Scalar& low,
-                                                                                            const Scalar& high);
+  EIGEN_DEPRECATED_WITH_REASON("The method may result in accuracy loss. Use .EqualSpaced() instead.")
+  EIGEN_DEVICE_FUNC static const RandomAccessLinSpacedReturnType LinSpaced(Sequential_t, Index size, const Scalar& low,
+                                                                           const Scalar& high);
+  EIGEN_DEPRECATED_WITH_REASON("The method may result in accuracy loss. Use .EqualSpaced() instead.")
+  EIGEN_DEVICE_FUNC static const RandomAccessLinSpacedReturnType LinSpaced(Sequential_t, const Scalar& low,
+                                                                           const Scalar& high);
 
   EIGEN_DEVICE_FUNC static const RandomAccessLinSpacedReturnType LinSpaced(Index size, const Scalar& low,
                                                                            const Scalar& high);
@@ -367,7 +367,12 @@ class DenseBase
   EIGEN_DEVICE_FUNC inline bool allFinite() const;
 
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator*=(const Scalar& other);
+  template <bool Enable = !internal::is_same<Scalar, RealScalar>::value, typename = std::enable_if_t<Enable>>
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator*=(const RealScalar& other);
+
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator/=(const Scalar& other);
+  template <bool Enable = !internal::is_same<Scalar, RealScalar>::value, typename = std::enable_if_t<Enable>>
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator/=(const RealScalar& other);
 
   typedef internal::add_const_on_value_type_t<typename internal::eval<Derived>::type> EvalReturnType;
   /** \returns the matrix or vector obtained by evaluating this expression.
@@ -596,6 +601,13 @@ class DenseBase
   inline iterator end();
   inline const_iterator end() const;
   inline const_iterator cend() const;
+
+  using RealViewReturnType = std::conditional_t<NumTraits<Scalar>::IsComplex, RealView<Derived>, Derived&>;
+  using ConstRealViewReturnType =
+      std::conditional_t<NumTraits<Scalar>::IsComplex, RealView<const Derived>, const Derived&>;
+
+  EIGEN_DEVICE_FUNC RealViewReturnType realView();
+  EIGEN_DEVICE_FUNC ConstRealViewReturnType realView() const;
 
 #define EIGEN_CURRENT_STORAGE_BASE_CLASS Eigen::DenseBase
 #define EIGEN_DOC_BLOCK_ADDONS_NOT_INNER_PANEL

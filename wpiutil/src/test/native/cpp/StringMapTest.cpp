@@ -335,6 +335,7 @@ TEST_F(StringMapTest, MoveConstruct) {
   StringMap<int> A;
   A["x"] = 42;
   StringMap<int> B = std::move(A);
+  // NOLINTNEXTLINE(clang-analyzer-cplusplus.Move)
   ASSERT_EQ(A.size(), 0u);
   ASSERT_EQ(B.size(), 1u);
   ASSERT_EQ(B["x"], 42);
@@ -348,8 +349,10 @@ TEST_F(StringMapTest, MoveAssignment) {
   B["y"] = 117;
   A = std::move(B);
   ASSERT_EQ(A.size(), 1u);
+  // NOLINTNEXTLINE(clang-analyzer-cplusplus.Move)
   ASSERT_EQ(B.size(), 0u);
   ASSERT_EQ(A["y"], 117);
+  // NOLINTNEXTLINE(clang-analyzer-cplusplus.Move)
   ASSERT_EQ(B.count("x"), 0u);
 }
 
