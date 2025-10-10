@@ -127,41 +127,41 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
   }
 
   @Test
-  void testCopySignPow() {
-    assertEquals(0.5, MathUtil.copySignPow(0.5, 1.0));
-    assertEquals(-0.5, MathUtil.copySignPow(-0.5, 1.0));
+  void testCopyDirectionPow() {
+    assertEquals(0.5, MathUtil.copyDirectionPow(0.5, 1.0));
+    assertEquals(-0.5, MathUtil.copyDirectionPow(-0.5, 1.0));
 
-    assertEquals(0.5 * 0.5, MathUtil.copySignPow(0.5, 2.0));
-    assertEquals(-(0.5 * 0.5), MathUtil.copySignPow(-0.5, 2.0));
+    assertEquals(0.5 * 0.5, MathUtil.copyDirectionPow(0.5, 2.0));
+    assertEquals(-(0.5 * 0.5), MathUtil.copyDirectionPow(-0.5, 2.0));
 
-    assertEquals(Math.sqrt(0.5), MathUtil.copySignPow(0.5, 0.5));
-    assertEquals(-Math.sqrt(0.5), MathUtil.copySignPow(-0.5, 0.5));
+    assertEquals(Math.sqrt(0.5), MathUtil.copyDirectionPow(0.5, 0.5));
+    assertEquals(-Math.sqrt(0.5), MathUtil.copyDirectionPow(-0.5, 0.5));
 
-    assertEquals(0.0, MathUtil.copySignPow(0.0, 2.0));
-    assertEquals(1.0, MathUtil.copySignPow(1.0, 2.0));
-    assertEquals(-1.0, MathUtil.copySignPow(-1.0, 2.0));
+    assertEquals(0.0, MathUtil.copyDirectionPow(0.0, 2.0));
+    assertEquals(1.0, MathUtil.copyDirectionPow(1.0, 2.0));
+    assertEquals(-1.0, MathUtil.copyDirectionPow(-1.0, 2.0));
 
-    assertEquals(Math.pow(0.8, 0.3), MathUtil.copySignPow(0.8, 0.3));
-    assertEquals(-Math.pow(0.8, 0.3), MathUtil.copySignPow(-0.8, 0.3));
+    assertEquals(Math.pow(0.8, 0.3), MathUtil.copyDirectionPow(0.8, 0.3));
+    assertEquals(-Math.pow(0.8, 0.3), MathUtil.copyDirectionPow(-0.8, 0.3));
   }
 
   @Test
-  void testCopySignPowMaxMagnitude() {
-    assertEquals(5, MathUtil.copySignPow(5.0, 1.0, 10.0));
-    assertEquals(-5, MathUtil.copySignPow(-5.0, 1.0, 10.0));
+  void testCopyDirectionPowMaxMagnitude() {
+    assertEquals(5, MathUtil.copyDirectionPow(5.0, 1.0, 10.0));
+    assertEquals(-5, MathUtil.copyDirectionPow(-5.0, 1.0, 10.0));
 
-    assertEquals(0.5 * 0.5 * 10, MathUtil.copySignPow(5.0, 2.0, 10.0));
-    assertEquals(-0.5 * 0.5 * 10, MathUtil.copySignPow(-5.0, 2.0, 10.0));
+    assertEquals(0.5 * 0.5 * 10, MathUtil.copyDirectionPow(5.0, 2.0, 10.0));
+    assertEquals(-0.5 * 0.5 * 10, MathUtil.copyDirectionPow(-5.0, 2.0, 10.0));
 
-    assertEquals(Math.sqrt(0.5) * 10, MathUtil.copySignPow(5.0, 0.5, 10.0));
-    assertEquals(-Math.sqrt(0.5) * 10, MathUtil.copySignPow(-5.0, 0.5, 10.0));
+    assertEquals(Math.sqrt(0.5) * 10, MathUtil.copyDirectionPow(5.0, 0.5, 10.0));
+    assertEquals(-Math.sqrt(0.5) * 10, MathUtil.copyDirectionPow(-5.0, 0.5, 10.0));
 
-    assertEquals(0.0, MathUtil.copySignPow(0.0, 2.0, 5.0));
-    assertEquals(5.0, MathUtil.copySignPow(5.0, 2.0, 5.0));
-    assertEquals(-5.0, MathUtil.copySignPow(-5.0, 2.0, 5.0));
+    assertEquals(0.0, MathUtil.copyDirectionPow(0.0, 2.0, 5.0));
+    assertEquals(5.0, MathUtil.copyDirectionPow(5.0, 2.0, 5.0));
+    assertEquals(-5.0, MathUtil.copyDirectionPow(-5.0, 2.0, 5.0));
 
-    assertEquals(Math.pow(0.8, 0.3) * 100, MathUtil.copySignPow(80, 0.3, 100.0));
-    assertEquals(-Math.pow(0.8, 0.3) * 100, MathUtil.copySignPow(-80, 0.3, 100.0));
+    assertEquals(Math.pow(0.8, 0.3) * 100, MathUtil.copyDirectionPow(80, 0.3, 100.0));
+    assertEquals(-Math.pow(0.8, 0.3) * 100, MathUtil.copyDirectionPow(-80, 0.3, 100.0));
   }
 
   @Test

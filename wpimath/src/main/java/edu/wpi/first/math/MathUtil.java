@@ -157,7 +157,7 @@ public final class MathUtil {
    * @param maxMagnitude The maximum expected absolute value of input. Must be positive.
    * @return The transformed value with the same sign and scaled to the input range.
    */
-  public static double copySignPow(double value, double exponent, double maxMagnitude) {
+  public static double copyDirectionPow(double value, double exponent, double maxMagnitude) {
     return Math.copySign(Math.pow(Math.abs(value) / maxMagnitude, exponent), value) * maxMagnitude;
   }
 
@@ -172,8 +172,8 @@ public final class MathUtil {
    *     positive.
    * @return The transformed value with the same sign.
    */
-  public static double copySignPow(double value, double exponent) {
-    return copySignPow(value, exponent, 1);
+  public static double copyDirectionPow(double value, double exponent) {
+    return copyDirectionPow(value, exponent, 1);
   }
 
   /**
@@ -196,7 +196,7 @@ public final class MathUtil {
     if (value.norm() < 1e-9) {
       return value.times(0);
     }
-    return value.unit().times(copySignPow(value.norm(), exponent, maxMagnitude));
+    return value.unit().times(copyDirectionPow(value.norm(), exponent, maxMagnitude));
   }
 
   /**
