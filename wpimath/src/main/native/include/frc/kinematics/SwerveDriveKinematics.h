@@ -523,44 +523,31 @@ class SwerveDriveKinematics
    * module accelerations.
    *
    * @param chassisAccelerations The desired chassis accelerations.
-   * @param angularVelocity The desired robot angular velocity.
-   * @return An array containing the module accelerations.
-   */
-  wpi::array<SwerveModuleAccelerations, NumModules> ToSwerveModuleAccelerations(
-      const ChassisAccelerations& chassisAccelerations,
-      const units::radians_per_second_t angularVelocity) const {
-    return ToSwerveModuleAccelerations(chassisAccelerations, angularVelocity,
-                                       Translation2d{});
-  }
-
-  /**
-   * Performs inverse kinematics to return the module accelerations from a
-   * desired chassis acceleration. This method is often used for dynamics
-   * calculations -- converting desired robot accelerations into individual
-   * module accelerations.
-   *
-   * @param chassisAccelerations The desired chassis accelerations.
-   * @return An array containing the module accelerations.
-   */
-  wpi::array<SwerveModuleAccelerations, NumModules> ToSwerveModuleAccelerations(
-      const ChassisAccelerations& chassisAccelerations) const {
-    return ToSwerveModuleAccelerations(chassisAccelerations, 0.0_rad_per_s,
-                                       Translation2d{});
-  }
-
-  /**
-   * Performs inverse kinematics to return the module accelerations from a
-   * desired chassis acceleration. This method is often used for dynamics
-   * calculations -- converting desired robot accelerations into individual
-   * module accelerations.
-   *
-   * @param chassisAccelerations The desired chassis accelerations.
    * @return An array containing the module accelerations.
    */
   wpi::array<SwerveModuleAccelerations, NumModules> ToWheelAccelerations(
       const ChassisAccelerations& chassisAccelerations) const override {
     return ToSwerveModuleAccelerations(chassisAccelerations, 0.0_rad_per_s,
                                        Translation2d{});
+  }
+
+  /**
+   * Performs forward kinematics to return the resulting chassis accelerations
+   * from the given module accelerations. This method is often used for dynamics
+   * calculations -- determining the robot's acceleration on the field using
+   * data from the real-world acceleration of each module on the robot.
+   *
+   * @param moduleAccelerations The accelerations of the modules as measured
+   * from respective encoders and gyros. The order of the swerve module
+   * accelerations should be same as passed into the constructor of this class.
+   * @return The resulting chassis accelerations.
+   */
+  template <std::convertible_to<SwerveModuleAccelerations>... ModuleAccelerations>
+    requires(sizeof...(ModuleAccelerations) == NumModules)
+  ChassisAccelerations ToChassisAccelerations(
+      ModuleAccelerations&&... moduleAccelerations) const {
+    return this->ToChassisAccelerations(
+        wpi::array<SwerveModuleAccelerations, NumModules>{moduleAccelerations...});
   }
 
   /**
