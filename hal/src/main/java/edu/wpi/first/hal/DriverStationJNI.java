@@ -55,6 +55,31 @@ public class DriverStationJNI extends JNIWrapper {
   }
 
   /**
+   * Gets the current control word of the driver station. Unlike nativeGetControlWord, this
+   * function gets the latest value rather than using the value cached by refreshDSData().
+   *
+   * <p>The control word contains the robot state.
+   *
+   * @return the control word
+   * @see "HAL_GetUncachedControlWord"
+   * @see getUncachedControlWord for a version easier to parse
+   */
+  public static native long nativeGetUncachedControlWord();
+
+  /**
+   * Gets the current control word of the driver station. Unlike getControlWord, this function
+   * gets the latest value rather than using the value cached by refreshDSData().
+   *
+   * <p>The control work contains the robot state.
+   *
+   * @param controlWord the ControlWord to update
+   * @see "HAL_GetControlWord"
+   */
+  public static void getUncachedControlWord(ControlWord controlWord) {
+    controlWord.update(nativeGetUncachedControlWord());
+  }
+
+  /**
    * Sets operating mode options.
    *
    * @param options operating mode options

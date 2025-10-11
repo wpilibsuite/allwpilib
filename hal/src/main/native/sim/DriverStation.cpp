@@ -71,7 +71,7 @@ void JoystickDataCache::Update() {
   allianceStation = SimDriverStationData->allianceStationId;
   matchTime = SimDriverStationData->matchTime;
 
-  this->controlWord = HAL_MakeControlWord(
+  controlWord = HAL_MakeControlWord(
       SimDriverStationData->opMode, SimDriverStationData->robotMode,
       SimDriverStationData->enabled, SimDriverStationData->eStop,
       SimDriverStationData->fmsAttached, SimDriverStationData->dsAttached);
@@ -223,6 +223,23 @@ int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
   }
   std::scoped_lock lock{driverStation->cacheMutex};
   *controlWord = newestControlWord;
+  return 0;
+}
+
+int32_t HAL_GetUncachedControlWord(HAL_ControlWord* controlWord) {
+  if (gShutdown) {
+    controlWord->value = 0;
+    return INCOMPATIBLE_STATE;
+  }
+  bool dsAttached = SimDriverStationData->dsAttached;
+  if (dsAttached) {
+    *controlWord = HAL_MakeControlWord(
+        SimDriverStationData->opMode, SimDriverStationData->robotMode,
+        SimDriverStationData->enabled, SimDriverStationData->eStop,
+        SimDriverStationData->fmsAttached, SimDriverStationData->dsAttached);
+  } else {
+    controlWord->value = 0;
+  }
   return 0;
 }
 
@@ -392,8 +409,7 @@ HAL_Bool HAL_RefreshDSData(void) {
       // Also, when the DS has never been connected the rest of the fields
       // in control word are garbage, so we also need to zero out in that
       // case too
-      std::memset(&currentRead->controlWord, 0,
-                  sizeof(currentRead->controlWord));
+      currentRead->controlWord.value = 0;
     }
     newestControlWord = currentRead->controlWord;
   }

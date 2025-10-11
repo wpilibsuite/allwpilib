@@ -285,8 +285,7 @@ public abstract class OpModeRobot extends RobotBase {
       }
 
       // did the opmode or enable state change?
-      DriverStationJNI.refreshDSData();
-      DriverStationJNI.getControlWord(word);
+      DriverStationJNI.getUncachedControlWord(word);
       if (!word.isEnabled() || word.getOpModeId() != opmode) {
         break;
       }

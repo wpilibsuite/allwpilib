@@ -444,6 +444,23 @@ int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
   return 0;
 }
 
+int32_t HAL_GetUncachedControlWord(HAL_ControlWord* controlWord) {
+  mrc::ControlData data;
+  int64_t dataTime{0};
+  bool dataValid = systemServerDs->GetLastControlData(&data, &dataTime);
+  if (dataValid && data.ControlWord.DsConnected) {
+    *controlWord = HAL_MakeControlWord(
+        data.CurrentOpMode.ToValue(),
+        static_cast<HAL_RobotMode>(data.ControlWord.RobotMode),
+        data.ControlWord.Enabled, data.ControlWord.EStop,
+        data.ControlWord.FmsConnected, data.ControlWord.DsConnected);
+  } else {
+    // DS disconnected. Clear the control word
+    controlWord->value = 0;
+  }
+  return 0;
+}
+
 int32_t HAL_SetOpModeOptions(const struct HAL_OpModeOption* options,
                              int32_t count) {
   if (count < 0 || count > 1000 || (count != 0 && !options)) {
@@ -613,8 +630,7 @@ HAL_Bool HAL_RefreshDSData(void) {
     updatedData = true;
   } else {
     // DS disconnected. Clear the control word
-    std::memset(&cacheToUpdate->controlWord, 0,
-                sizeof(cacheToUpdate->controlWord));
+    cacheToUpdate->controlWord.value = 0;
   }
 
   {

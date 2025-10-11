@@ -67,6 +67,18 @@ int32_t HAL_SendConsoleLine(const char* line);
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord);
 
 /**
+ * Gets the current control word of the driver station. Unlike
+ * HAL_GetControlWord, this function gets the latest value rather than using the
+ * value cached by HAL_RefreshDSData().
+ *
+ * The control word contains the robot state.
+ *
+ * @param controlWord the control word (out)
+ * @return the error code, or 0 for success
+ */
+int32_t HAL_GetUncachedControlWord(HAL_ControlWord* controlWord);
+
+/**
  * Sets operating mode options.
  *
  * @param options array of operating mode options

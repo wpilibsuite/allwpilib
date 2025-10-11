@@ -84,6 +84,22 @@ Java_edu_wpi_first_hal_DriverStationJNI_nativeGetControlWord
 
 /*
  * Class:     edu_wpi_first_hal_DriverStationJNI
+ * Method:    nativeGetUncachedControlWord
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL
+Java_edu_wpi_first_hal_DriverStationJNI_nativeGetUncachedControlWord
+  (JNIEnv*, jclass)
+{
+  static_assert(sizeof(HAL_ControlWord) == sizeof(jlong),
+                "Java int must match the size of control word");
+  HAL_ControlWord controlWord;
+  HAL_GetUncachedControlWord(&controlWord);
+  return controlWord.value;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_DriverStationJNI
  * Method:    setOpModeOptions
  * Signature: ([Ljava/lang/Object;)V
  */
