@@ -18,6 +18,7 @@
 #include "frc/geometry/Twist2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
 #include "frc/kinematics/Kinematics.h"
+#include "frc/kinematics/SwerveModuleAccelerations.h"
 #include "frc/kinematics/SwerveModulePosition.h"
 #include "frc/kinematics/SwerveModuleState.h"
 #include "units/math.h"
@@ -51,7 +52,8 @@ namespace frc {
 template <size_t NumModules>
 class SwerveDriveKinematics
     : public Kinematics<wpi::array<SwerveModuleState, NumModules>,
-                        wpi::array<SwerveModulePosition, NumModules>> {
+                        wpi::array<SwerveModulePosition, NumModules>,
+                        wpi::array<SwerveModuleAccelerations, NumModules>> {
  public:
   /**
    * Constructs a swerve drive kinematics object. This takes in a variable
@@ -70,13 +72,20 @@ class SwerveDriveKinematics
       : m_modules{moduleTranslations...}, m_moduleHeadings(wpi::empty_array) {
     for (size_t i = 0; i < NumModules; i++) {
       // clang-format off
-      m_inverseKinematics.template block<2, 3>(i * 2, 0) <<
+      m_firstOrderInverseKinematics.template block<2, 3>(i * 2, 0) <<
         1, 0, (-m_modules[i].Y()).value(),
         0, 1, (+m_modules[i].X()).value();
+
+      m_secondOrderInverseKinematics.template block<2, 4>(i * 2, 0) <<
+        1, 0, (-m_modules[i].X()).value(), (-m_modules[i].Y()).value(),
+        0, 1, (-m_modules[i].Y()).value(), (+m_modules[i].X()).value();
       // clang-format on
     }
 
-    m_forwardKinematics = m_inverseKinematics.householderQr();
+    m_firstOrderForwardKinematics =
+        m_firstOrderInverseKinematics.householderQr();
+    m_secondOrderForwardKinematics =
+        m_secondOrderInverseKinematics.householderQr();
 
     wpi::math::MathSharedStore::ReportUsage("SwerveDriveKinematics", "");
   }
@@ -86,13 +95,20 @@ class SwerveDriveKinematics
       : m_modules{modules}, m_moduleHeadings(wpi::empty_array) {
     for (size_t i = 0; i < NumModules; i++) {
       // clang-format off
-      m_inverseKinematics.template block<2, 3>(i * 2, 0) <<
+      m_firstOrderInverseKinematics.template block<2, 3>(i * 2, 0) <<
         1, 0, (-m_modules[i].Y()).value(),
         0, 1, (+m_modules[i].X()).value();
+
+      m_secondOrderInverseKinematics.template block<2, 4>(i * 2, 0) <<
+        1, 0, (-m_modules[i].X()).value(), (-m_modules[i].Y()).value(),
+        0, 1, (-m_modules[i].Y()).value(), (+m_modules[i].X()).value();
       // clang-format on
     }
 
-    m_forwardKinematics = m_inverseKinematics.householderQr();
+    m_firstOrderForwardKinematics =
+        m_firstOrderInverseKinematics.householderQr();
+    m_secondOrderForwardKinematics =
+        m_secondOrderInverseKinematics.householderQr();
 
     wpi::math::MathSharedStore::ReportUsage("Kinematics_SwerveDrive", "");
   }
@@ -169,15 +185,7 @@ class SwerveDriveKinematics
 
     // We have a new center of rotation. We need to compute the matrix again.
     if (centerOfRotation != m_previousCoR) {
-      for (size_t i = 0; i < NumModules; i++) {
-        // clang-format off
-      m_inverseKinematics.template block<2, 3>(i * 2, 0) =
-        Matrixd<2, 3>{
-          {1, 0, (-m_modules[i].Y() + centerOfRotation.Y()).value()},
-          {0, 1, (+m_modules[i].X() - centerOfRotation.X()).value()}};
-        // clang-format on
-      }
-      m_previousCoR = centerOfRotation;
+      setInverseKinematics(centerOfRotation);
     }
 
     Eigen::Vector3d chassisSpeedsVector{chassisSpeeds.vx.value(),
@@ -185,7 +193,7 @@ class SwerveDriveKinematics
                                         chassisSpeeds.omega.value()};
 
     Matrixd<NumModules * 2, 1> moduleStateMatrix =
-        m_inverseKinematics * chassisSpeedsVector;
+        m_firstOrderInverseKinematics * chassisSpeedsVector;
 
     for (size_t i = 0; i < NumModules; i++) {
       units::meters_per_second_t x{moduleStateMatrix(i * 2, 0)};
@@ -251,7 +259,7 @@ class SwerveDriveKinematics
     }
 
     Eigen::Vector3d chassisSpeedsVector =
-        m_forwardKinematics.solve(moduleStateMatrix);
+        m_firstOrderForwardKinematics.solve(moduleStateMatrix);
 
     return {units::meters_per_second_t{chassisSpeedsVector(0)},
             units::meters_per_second_t{chassisSpeedsVector(1)},
@@ -304,7 +312,7 @@ class SwerveDriveKinematics
     }
 
     Eigen::Vector3d chassisDeltaVector =
-        m_forwardKinematics.solve(moduleDeltaMatrix);
+        m_firstOrderForwardKinematics.solve(moduleDeltaMatrix);
 
     return {units::meter_t{chassisDeltaVector(0)},
             units::meter_t{chassisDeltaVector(1)},
@@ -441,13 +449,193 @@ class SwerveDriveKinematics
     return m_modules;
   }
 
+  /**
+   * Performs inverse kinematics to return the module accelerations from a
+   * desired chassis acceleration. This method is often used for dynamics
+   * calculations -- converting desired robot accelerations into individual
+   * module accelerations.
+   *
+   * <p>This function also supports variable centers of rotation. During normal
+   * operations, the center of rotation is usually the same as the physical
+   * center of the robot; therefore, the argument is defaulted to that use case.
+   * However, if you wish to change the center of rotation for evasive
+   * maneuvers, vision alignment, or for any other use case, you can do so.
+   *
+   * @param chassisAccelerations The desired chassis accelerations.
+   * @param angularVelocity The desired robot angular velocity.
+   * @param centerOfRotation The center of rotation. For example, if you set the
+   * center of rotation at one corner of the robot and provide a chassis
+   * acceleration that only has a dtheta component, the robot will rotate around
+   * that corner.
+   * @return An array containing the module accelerations.
+   */
+  wpi::array<SwerveModuleAccelerations, NumModules> ToSwerveModuleAccelerations(
+      const ChassisAccelerations& chassisAccelerations,
+      const units::radians_per_second_t angularVelocity = 0.0_rad_per_s,
+      const Translation2d& centerOfRotation = Translation2d{}) const {
+    wpi::array<SwerveModuleAccelerations, NumModules> moduleAccelerations(
+        wpi::empty_array);
+
+    if (chassisAccelerations.ax == 0.0_mps_sq &&
+        chassisAccelerations.ay == 0.0_mps_sq &&
+        chassisAccelerations.alpha == 0.0_rad_per_s_sq) {
+      for (int i = 0; i < NumModules; i++) {
+        moduleAccelerations[i] = {
+            0.0_mps_sq, Rotation2d{0.0, 0.0}};  // maintain previous angle
+      }
+      return moduleAccelerations;
+    }
+
+    if (centerOfRotation != m_previousCoR) {
+      setInverseKinematics(centerOfRotation);
+    }
+
+    Eigen::Vector4d chassisAccelerationsVector{
+        chassisAccelerations.ax.value(), chassisAccelerations.ay.value(),
+        angularVelocity.value() * angularVelocity.value(),
+        chassisAccelerations.alpha.value()};
+
+    Matrixd<NumModules * 2, 1> moduleAccelerationsMatrix =
+        m_secondOrderInverseKinematics * chassisAccelerationsVector;
+
+    for (int i = 0; i < NumModules; i++) {
+      units::meters_per_second_squared_t x{
+          moduleAccelerationsMatrix.get(i * 2, 0)};
+      units::meters_per_second_squared_t y{
+          moduleAccelerationsMatrix.get(i * 2 + 1, 0)};
+
+      // For swerve modules, we need to compute both linear acceleration and
+      // angular acceleration The linear acceleration is the magnitude of the
+      // acceleration vector
+      units::meters_per_second_squared_t linearAcceleration =
+          units::math::hypot(x, y);
+
+      moduleAccelerations[i] = {linearAcceleration,
+                                Rotation2d{(x.value()), y.value()}};
+    }
+
+    return moduleAccelerations;
+  }
+
+  /**
+   * Performs inverse kinematics to return the module accelerations from a
+   * desired chassis acceleration. This method is often used for dynamics
+   * calculations -- converting desired robot accelerations into individual
+   * module accelerations.
+   *
+   * @param chassisAccelerations The desired chassis accelerations.
+   * @param angularVelocity The desired robot angular velocity.
+   * @return An array containing the module accelerations.
+   */
+  wpi::array<SwerveModuleAccelerations, NumModules> ToSwerveModuleAccelerations(
+      const ChassisAccelerations& chassisAccelerations,
+      const units::radians_per_second_t angularVelocity) const {
+    return ToSwerveModuleAccelerations(chassisAccelerations, angularVelocity,
+                                       Translation2d{});
+  }
+
+  /**
+   * Performs inverse kinematics to return the module accelerations from a
+   * desired chassis acceleration. This method is often used for dynamics
+   * calculations -- converting desired robot accelerations into individual
+   * module accelerations.
+   *
+   * @param chassisAccelerations The desired chassis accelerations.
+   * @return An array containing the module accelerations.
+   */
+  wpi::array<SwerveModuleAccelerations, NumModules> ToSwerveModuleAccelerations(
+      const ChassisAccelerations& chassisAccelerations) const {
+    return ToSwerveModuleAccelerations(chassisAccelerations, 0.0_rad_per_s,
+                                       Translation2d{});
+  }
+
+  /**
+   * Performs inverse kinematics to return the module accelerations from a
+   * desired chassis acceleration. This method is often used for dynamics
+   * calculations -- converting desired robot accelerations into individual
+   * module accelerations.
+   *
+   * @param chassisAccelerations The desired chassis accelerations.
+   * @return An array containing the module accelerations.
+   */
+  wpi::array<SwerveModuleAccelerations, NumModules> ToWheelAccelerations(
+      const ChassisAccelerations& chassisAccelerations) const override {
+    return ToSwerveModuleAccelerations(chassisAccelerations, 0.0_rad_per_s,
+                                       Translation2d{});
+  }
+
+  /**
+   * Performs forward kinematics to return the resulting chassis accelerations
+   * from the given module accelerations. This method is often used for dynamics
+   * calculations -- determining the robot's acceleration on the field using
+   * data from the real-world acceleration of each module on the robot.
+   *
+   * @param moduleAccelerations The accelerations of the modules as measured
+   * from respective encoders and gyros. The order of the swerve module
+   * accelerations should be same as passed into the constructor of this class.
+   * @return The resulting chassis accelerations.
+   */
+  ChassisAccelerations ToChassisAccelerations(
+      const wpi::array<SwerveModuleAccelerations, NumModules>&
+          moduleAccelerations) const override {
+    Matrixd<NumModules * 2, 1> moduleAccelerationsMatrix;
+
+    for (int i = 0; i < NumModules; i++) {
+      SwerveModuleAccelerations module = moduleAccelerations[i];
+
+      moduleAccelerationsMatrix(i * 2 + 0, 0) =
+          module.acceleration * module.angle.Cos();
+      moduleAccelerationsMatrix(i * 2 + 1, 0) =
+          module.acceleration * module.angle.Sin();
+    }
+
+    Eigen::Vector4d chassisAccelerationsVector =
+        m_secondOrderForwardKinematics * moduleAccelerationsMatrix;
+
+    // the second order kinematics equation for swerve drive yields a state
+    // vector [aₓ, a_y, ω², α]
+    return {units::meters_per_second_squared_t{chassisAccelerationsVector(0)},
+            units::meters_per_second_squared_t{chassisAccelerationsVector(1)},
+            units::radians_per_second_squared_t{chassisAccelerationsVector(3)}};
+  }
+
  private:
   wpi::array<Translation2d, NumModules> m_modules;
-  mutable Matrixd<NumModules * 2, 3> m_inverseKinematics;
-  Eigen::HouseholderQR<Matrixd<NumModules * 2, 3>> m_forwardKinematics;
+  mutable Matrixd<NumModules * 2, 3> m_firstOrderInverseKinematics;
+  Eigen::HouseholderQR<Matrixd<NumModules * 2, 3>>
+      m_firstOrderForwardKinematics;
+  mutable Matrixd<NumModules * 2, 4> m_secondOrderInverseKinematics;
+  Eigen::HouseholderQR<Matrixd<NumModules * 2, 4>>
+      m_secondOrderForwardKinematics;
   mutable wpi::array<Rotation2d, NumModules> m_moduleHeadings;
 
   mutable Translation2d m_previousCoR;
+
+  /**
+   * Sets both inverse kinematics matrices based on the new center of rotation.
+   * This does not check if the new center of rotation is different from the
+   * previous one, so a check should be included before the call to this
+   * function.
+   *
+   * @param centerOfRotation new center of rotation
+   */
+  void SetInverseKinematics(const Translation2d& centerOfRotation) {
+    for (int i = 0; i < NumModules; i++) {
+      const double rx = m_modules[i].getX() - centerOfRotation.X();
+      const double ry = m_modules[i].getY() - centerOfRotation.Y();
+
+      m_firstOrderInverseKinematics.setRow(i * 2 + 0, 0, /* Start Data */ 1, 0,
+                                           -ry);
+      m_firstOrderInverseKinematics.setRow(i * 2 + 1, 0, /* Start Data */ 0, 1,
+                                           rx);
+
+      m_secondOrderInverseKinematics.setRow(i * 2 + 0, 0, /* Start Data */ 1, 0,
+                                            -rx, -ry);
+      m_secondOrderInverseKinematics.setRow(i * 2 + 1, 0, /* Start Data */ 0, 1,
+                                            -ry, +rx);
+    }
+    m_previousCoR = centerOfRotation;
+  }
 };
 
 template <typename ModuleTranslation, typename... ModuleTranslations>
