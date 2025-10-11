@@ -88,17 +88,19 @@ void MecanumDriveKinematics::SetInverseKinematics(Translation2d fl,
 
 ChassisAccelerations MecanumDriveKinematics::ToChassisAccelerations(
     const MecanumDriveWheelAccelerations& wheelAccelerations) const {
-  Eigen::Vector4d wheelSpeedsVector{wheelAccelerations.frontLeft.value(),
-                                    wheelAccelerations.frontRight.value(),
-                                    wheelAccelerations.rearLeft.value(),
-                                    wheelAccelerations.rearRight.value()};
+  Eigen::Vector4d wheelAccelerationsVector{
+      wheelAccelerations.frontLeft.value(),
+      wheelAccelerations.frontRight.value(),
+      wheelAccelerations.rearLeft.value(),
+      wheelAccelerations.rearRight.value()};
 
-  Eigen::Vector3d chassisSpeedsVector =
-      m_forwardKinematics.solve(wheelSpeedsVector);
+  Eigen::Vector3d chassisAccelerationsVector =
+      m_forwardKinematics.solve(wheelAccelerationsVector);
 
-  return {units::meters_per_second_squared_t{chassisSpeedsVector(0)},  // NOLINT
-          units::meters_per_second_squared_t{chassisSpeedsVector(1)},
-          units::radians_per_second_squared_t{chassisSpeedsVector(2)}};
+  return {units::meters_per_second_squared_t{
+              chassisAccelerationsVector(0)},  // NOLINT
+          units::meters_per_second_squared_t{chassisAccelerationsVector(1)},
+          units::radians_per_second_squared_t{chassisAccelerationsVector(2)}};
 }
 
 MecanumDriveWheelAccelerations MecanumDriveKinematics::ToWheelAccelerations(
@@ -116,16 +118,21 @@ MecanumDriveWheelAccelerations MecanumDriveKinematics::ToWheelAccelerations(
     m_previousCoR = centerOfRotation;
   }
 
-  Eigen::Vector3d chassisSpeedsVector{chassisAccelerations.ax.value(),
-                                      chassisAccelerations.ay.value(),
-                                      chassisAccelerations.alpha.value()};
+  Eigen::Vector3d chassisAccelerationsVector{
+      chassisAccelerations.ax.value(), chassisAccelerations.ay.value(),
+      chassisAccelerations.alpha.value()};
 
-  Eigen::Vector4d wheelsVector = m_inverseKinematics * chassisSpeedsVector;
+  Eigen::Vector4d wheelsVector =
+      m_inverseKinematics * chassisAccelerationsVector;
 
-  MecanumDriveWheelAccelerations wheelAccels;
-  wheelAccels.frontLeft = units::meters_per_second_squared_t{wheelsVector(0)};
-  wheelAccels.frontRight = units::meters_per_second_squared_t{wheelsVector(1)};
-  wheelAccels.rearLeft = units::meters_per_second_squared_t{wheelsVector(2)};
-  wheelAccels.rearRight = units::meters_per_second_squared_t{wheelsVector(3)};
-  return wheelAccels;
+  MecanumDriveWheelAccelerations wheelAccelerations;
+  wheelAccelerations.frontLeft =
+      units::meters_per_second_squared_t{wheelsVector(0)};
+  wheelAccelerations.frontRight =
+      units::meters_per_second_squared_t{wheelsVector(1)};
+  wheelAccelerations.rearLeft =
+      units::meters_per_second_squared_t{wheelsVector(2)};
+  wheelAccelerations.rearRight =
+      units::meters_per_second_squared_t{wheelsVector(3)};
+  return wheelAccelerations;
 }
