@@ -33,8 +33,8 @@ namespace frc {
  * odometry.
  */
 class WPILIB_DLLEXPORT MecanumDrivePoseEstimator
-    : public PoseEstimator<MecanumDriveWheelSpeeds,
-                           MecanumDriveWheelPositions> {
+    : public PoseEstimator<MecanumDriveWheelSpeeds, MecanumDriveWheelPositions,
+                           MecanumDriveWheelAccelerations> {
  public:
   /**
    * Constructs a MecanumDrivePoseEstimator with default standard deviations

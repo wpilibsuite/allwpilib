@@ -38,7 +38,8 @@ namespace frc {
  */
 class WPILIB_DLLEXPORT MecanumDrivePoseEstimator3d
     : public PoseEstimator3d<MecanumDriveWheelSpeeds,
-                             MecanumDriveWheelPositions> {
+                             MecanumDriveWheelPositions,
+                             MecanumDriveWheelAccelerations> {
  public:
   /**
    * Constructs a MecanumDrivePoseEstimator3d with default standard deviations
