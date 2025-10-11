@@ -6,6 +6,10 @@ package edu.wpi.first.wpilibj.opmode;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import edu.wpi.first.hal.DriverStationJNI;
+import edu.wpi.first.util.WPIUtilJNI;
+import edu.wpi.first.wpilibj.DriverStation;
+
 /**
  * An opmode structure for "linear" operation. The user is responsible for implementing any looping
  * behavior; after run() returns it will not be called again on the same object.
@@ -66,9 +70,25 @@ public abstract class LinearOpMode implements OpMode {
   // implements OpMode interface
   @Override
   public final void opmodeRun(long opModeId) throws InterruptedException {
-    start();
-    run();
-    end();
+    int event = WPIUtilJNI.createEvent(false, false);
+    DriverStationJNI.provideNewDataEventHandle(event);
+
+    Thread bgThread = new Thread(() -> { backgroundThreadMain(event); });
+    bgThread.start();
+
+    try {
+      start();
+      run();
+      end();
+    } finally {
+      DriverStationJNI.removeNewDataEventHandle(event);
+      WPIUtilJNI.destroyEvent(event);
+      try {
+        bgThread.join();
+      } catch (InterruptedException ex) {
+        Thread.currentThread().interrupt();
+      }
+    }
   }
 
   @Override
@@ -79,6 +99,19 @@ public abstract class LinearOpMode implements OpMode {
   @Override
   public final void opmodeClose() {
     close();
+  }
+
+  /** Background thread to update driver station data and perform other background tasks. */
+  private void backgroundThreadMain(int event) {
+    while (true) {
+      try {
+        WPIUtilJNI.waitForObject(event);
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        return;
+      }
+      DriverStation.refreshData();
+    }
   }
 
   private final AtomicBoolean m_running = new AtomicBoolean(true);
