@@ -313,9 +313,9 @@ TEST_F(SwerveDriveKinematicsTest, DesaturateNegativeSpeed) {
 }
 
 TEST_F(SwerveDriveKinematicsTest, TurnInPlaceInverseAccelerations) {
-  ChassisAccelerations accelerations{0_mps_sq, 0_mps_sq,
-                                      units::radians_per_second_squared_t{
-                                          2 * std::numbers::pi}};
+  ChassisAccelerations accelerations{
+      0_mps_sq, 0_mps_sq,
+      units::radians_per_second_squared_t{2 * std::numbers::pi}};
   units::radians_per_second_t angularVelocity = 2_rad_per_s * std::numbers::pi;
   auto [flAccel, frAccel, blAccel, brAccel] =
       m_kinematics.ToSwerveModuleAccelerations(accelerations, angularVelocity);
@@ -354,9 +354,9 @@ TEST_F(SwerveDriveKinematicsTest, TurnInPlaceInverseAccelerations) {
   // direction.
 
   double centerRadius = m_kinematics.GetModules()[0].Norm().value();
-  double tangentialAccel =
-      centerRadius * accelerations.alpha.value();                // α * r
-  double centripetalAccel = centerRadius * angularVelocity.value() * angularVelocity.value();  // ω² * r
+  double tangentialAccel = centerRadius * accelerations.alpha.value();  // α * r
+  double centripetalAccel = centerRadius * angularVelocity.value() *
+                            angularVelocity.value();  // ω² * r
   double totalAccel = std::hypot(tangentialAccel, centripetalAccel);
 
   std::array<Rotation2d, 4> expectedAngles;
@@ -414,7 +414,7 @@ TEST_F(SwerveDriveKinematicsTest, OffCenterRotationInverseAccelerations) {
   units::radians_per_second_t angularVelocity = 1.0_rad_per_s;
   auto [flAccel, frAccel, blAccel, brAccel] =
       m_kinematics.ToSwerveModuleAccelerations(accelerations, angularVelocity,
-                                                m_fl);
+                                               m_fl);
 
   // When rotating about the front-left module position with both angular
   // acceleration (1 rad/s²) and angular velocity (1 rad/s), each module
@@ -444,13 +444,17 @@ TEST_F(SwerveDriveKinematicsTest, OffCenterRotationInverseAccelerations) {
 
     if (r < 1e-9) {
       expectedAccelerations[i] = 0.0;  // No acceleration at center of rotation
-      expectedAngles[i] = Rotation2d{};  // Angle is undefined at center of rotation
+      expectedAngles[i] =
+          Rotation2d{};  // Angle is undefined at center of rotation
     } else {
-      double tangentialAccel = r * accelerations.alpha.value();  // α * r = 1 * r
-      double centripetalAccel = r * angularVelocity.value() * angularVelocity.value();  // ω² * r = 1 * r
+      double tangentialAccel =
+          r * accelerations.alpha.value();  // α * r = 1 * r
+      double centripetalAccel = r * angularVelocity.value() *
+                                angularVelocity.value();  // ω² * r = 1 * r
       expectedAccelerations[i] = std::hypot(tangentialAccel, centripetalAccel);
 
-      Rotation2d radiusAngle{(relativePos.X().value()), (relativePos.Y().value())};
+      Rotation2d radiusAngle{(relativePos.X().value()),
+                             (relativePos.Y().value())};
 
       // Tangential acceleration: perpendicular to radius (90° CCW from radius)
       Rotation2d tangentialDirection = radiusAngle + Rotation2d{90_deg};

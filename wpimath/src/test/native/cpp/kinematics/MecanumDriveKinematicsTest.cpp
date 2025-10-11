@@ -242,8 +242,9 @@ TEST_F(MecanumDriveKinematicsTest, StraightLineInverseAccelerations) {
 
 TEST_F(MecanumDriveKinematicsTest, StraightLineForwardAccelerations) {
   MecanumDriveWheelAccelerations wheelAccelerations{3.536_mps_sq, 3.536_mps_sq,
-                                                     3.536_mps_sq, 3.536_mps_sq};
-  auto chassisAccelerations = kinematics.ToChassisAccelerations(wheelAccelerations);
+                                                    3.536_mps_sq, 3.536_mps_sq};
+  auto chassisAccelerations =
+      kinematics.ToChassisAccelerations(wheelAccelerations);
 
   EXPECT_NEAR(3.536, chassisAccelerations.ax.value(), 0.1);
   EXPECT_NEAR(0, chassisAccelerations.ay.value(), 0.1);
@@ -263,7 +264,8 @@ TEST_F(MecanumDriveKinematicsTest, StrafeInverseAccelerations) {
 TEST_F(MecanumDriveKinematicsTest, StrafeForwardAccelerations) {
   MecanumDriveWheelAccelerations wheelAccelerations{
       -2.828427_mps_sq, 2.828427_mps_sq, 2.828427_mps_sq, -2.828427_mps_sq};
-  auto chassisAccelerations = kinematics.ToChassisAccelerations(wheelAccelerations);
+  auto chassisAccelerations =
+      kinematics.ToChassisAccelerations(wheelAccelerations);
 
   EXPECT_NEAR(0, chassisAccelerations.ax.value(), 0.1);
   EXPECT_NEAR(2.8284, chassisAccelerations.ay.value(), 0.1);
@@ -271,9 +273,9 @@ TEST_F(MecanumDriveKinematicsTest, StrafeForwardAccelerations) {
 }
 
 TEST_F(MecanumDriveKinematicsTest, RotationInverseAccelerations) {
-  ChassisAccelerations accelerations{0_mps_sq, 0_mps_sq,
-                                      units::radians_per_second_squared_t{
-                                          2 * std::numbers::pi}};
+  ChassisAccelerations accelerations{
+      0_mps_sq, 0_mps_sq,
+      units::radians_per_second_squared_t{2 * std::numbers::pi}};
   auto wheelAccelerations = kinematics.ToWheelAccelerations(accelerations);
 
   EXPECT_NEAR(-150.79645, wheelAccelerations.frontLeft.value(), 0.1);
@@ -285,7 +287,8 @@ TEST_F(MecanumDriveKinematicsTest, RotationInverseAccelerations) {
 TEST_F(MecanumDriveKinematicsTest, RotationForwardAccelerations) {
   MecanumDriveWheelAccelerations wheelAccelerations{
       -150.79645_mps_sq, 150.79645_mps_sq, -150.79645_mps_sq, 150.79645_mps_sq};
-  auto chassisAccelerations = kinematics.ToChassisAccelerations(wheelAccelerations);
+  auto chassisAccelerations =
+      kinematics.ToChassisAccelerations(wheelAccelerations);
 
   EXPECT_NEAR(0, chassisAccelerations.ax.value(), 0.1);
   EXPECT_NEAR(0, chassisAccelerations.ay.value(), 0.1);
@@ -307,7 +310,8 @@ TEST_F(MecanumDriveKinematicsTest,
        MixedTranslationRotationForwardAccelerations) {
   MecanumDriveWheelAccelerations wheelAccelerations{
       -17.677670_mps_sq, 20.51_mps_sq, -13.44_mps_sq, 16.26_mps_sq};
-  auto chassisAccelerations = kinematics.ToChassisAccelerations(wheelAccelerations);
+  auto chassisAccelerations =
+      kinematics.ToChassisAccelerations(wheelAccelerations);
 
   EXPECT_NEAR(1.413, chassisAccelerations.ax.value(), 0.1);
   EXPECT_NEAR(2.122, chassisAccelerations.ay.value(), 0.1);
@@ -316,11 +320,11 @@ TEST_F(MecanumDriveKinematicsTest,
 
 TEST_F(MecanumDriveKinematicsTest, OffCenterRotationInverseAccelerations) {
   ChassisAccelerations accelerations{0_mps_sq, 0_mps_sq, 1_rad_per_s_sq};
-  auto wheelAccelerations = kinematics.ToWheelAccelerations(accelerations, m_fl);
+  auto wheelAccelerations =
+      kinematics.ToWheelAccelerations(accelerations, m_fl);
 
   EXPECT_NEAR(0, wheelAccelerations.frontLeft.value(), 0.1);
   EXPECT_NEAR(24.0, wheelAccelerations.frontRight.value(), 0.1);
   EXPECT_NEAR(-24.0, wheelAccelerations.rearLeft.value(), 0.1);
   EXPECT_NEAR(48.0, wheelAccelerations.rearRight.value(), 0.1);
 }
-

@@ -102,7 +102,7 @@ TEST(DifferentialDriveKinematicsTest, ForwardAccelerationsForZeros) {
 TEST(DifferentialDriveKinematicsTest, InverseAccelerationsForStraightLine) {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const ChassisAccelerations chassisAccelerations{3.0_mps_sq, 0_mps_sq,
-                                                   0_rad_per_s_sq};
+                                                  0_rad_per_s_sq};
   const auto wheelAccelerations =
       kinematics.ToWheelAccelerations(chassisAccelerations);
 
@@ -113,7 +113,7 @@ TEST(DifferentialDriveKinematicsTest, InverseAccelerationsForStraightLine) {
 TEST(DifferentialDriveKinematicsTest, ForwardAccelerationsForStraightLine) {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const DifferentialDriveWheelAccelerations wheelAccelerations{3.0_mps_sq,
-                                                                3.0_mps_sq};
+                                                               3.0_mps_sq};
   const auto chassisAccelerations =
       kinematics.ToChassisAccelerations(wheelAccelerations);
 

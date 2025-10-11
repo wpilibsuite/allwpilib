@@ -542,12 +542,14 @@ class SwerveDriveKinematics
    * accelerations should be same as passed into the constructor of this class.
    * @return The resulting chassis accelerations.
    */
-  template <std::convertible_to<SwerveModuleAccelerations>... ModuleAccelerations>
+  template <
+      std::convertible_to<SwerveModuleAccelerations>... ModuleAccelerations>
     requires(sizeof...(ModuleAccelerations) == NumModules)
   ChassisAccelerations ToChassisAccelerations(
       ModuleAccelerations&&... moduleAccelerations) const {
     return this->ToChassisAccelerations(
-        wpi::array<SwerveModuleAccelerations, NumModules>{moduleAccelerations...});
+        wpi::array<SwerveModuleAccelerations, NumModules>{
+            moduleAccelerations...});
   }
 
   /**

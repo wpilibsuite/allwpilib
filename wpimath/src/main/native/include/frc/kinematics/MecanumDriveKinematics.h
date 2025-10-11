@@ -174,7 +174,7 @@ class WPILIB_DLLEXPORT MecanumDriveKinematics
   }
 
   ChassisAccelerations ToChassisAccelerations(
-    const MecanumDriveWheelAccelerations& wheelAccelerations) const override;
+      const MecanumDriveWheelAccelerations& wheelAccelerations) const override;
 
   MecanumDriveWheelAccelerations ToWheelAccelerations(
       const ChassisAccelerations& chassisAccelerations,
