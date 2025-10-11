@@ -21,6 +21,7 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -44,6 +45,7 @@ public abstract class OpModeRobot extends RobotBase {
   private final ControlWord m_word = new ControlWord();
   private final Map<Long, Class<?>> m_opModes = new HashMap<>();
   private final AtomicReference<OpMode> m_activeOpMode = new AtomicReference<>(null);
+  private final AtomicBoolean m_running = new AtomicBoolean();
 
   private void reportAddOpModeError(Class<?> cls, String message) {
     DriverStation.reportError("Error adding OpMode " + cls.getSimpleName() + ": " + message, false);
@@ -335,6 +337,7 @@ public abstract class OpModeRobot extends RobotBase {
   public final void startCompetition() {
     System.out.println("********** Robot program startup complete **********");
 
+    m_running.set(true);
     int event = WPIUtilJNI.createEvent(false, false);
     DriverStationJNI.provideNewDataEventHandle(event);
 
@@ -342,7 +345,7 @@ public abstract class OpModeRobot extends RobotBase {
       // Implement the opmode lifecycle
       long lastModeId = -1;
       boolean calledDriverStationConnected = false;
-      while (true) {
+      while (m_running.get()) {
         // Wait for new data from the driver station
         try {
           WPIUtilJNI.waitForObjectTimeout(event, 0.05);
@@ -469,7 +472,8 @@ public abstract class OpModeRobot extends RobotBase {
   /** Ends the main loop in startCompetition(). */
   @Override
   public final void endCompetition() {
-    OpMode opMode = m_activeOpMode.getAndSet(null);
+    m_running.set(false);
+    OpMode opMode = m_activeOpMode.get();
     if (opMode != null) {
       opMode.opmodeStop();
     }
