@@ -206,6 +206,11 @@
     <Class name="edu.wpi.first.epilogue.EpilogueConfiguration" />
   </Match>
   <Match>
+    <!-- PMD will skip variables named `ignore`, but spotbugs isn't as smart -->
+    <Bug pattern="DLS_DEAD_LOCAL_STORE" />
+    <Class name="org.wpilib.commands3.StagedCommandBuilderTest" />
+  </Match>
+  <Match>
     <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE" />
   </Match>
 </FindBugsFilter>

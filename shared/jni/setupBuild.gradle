@@ -149,7 +149,11 @@ model {
         // By default, a development executable will be generated. This is to help the case of
         // testing specific functionality of the library.
         "${nativeName}Dev"(NativeExecutableSpec) {
-            targetBuildTypes 'debug'
+            if (project.hasProperty('ciDebugOnly') || project.hasProperty('debugJNI')) {
+                targetBuildTypes 'debug'
+            } else {
+                targetBuildTypes 'release'
+            }
             sources {
                 cpp {
                     source {

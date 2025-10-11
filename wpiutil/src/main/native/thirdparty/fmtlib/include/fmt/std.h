@@ -60,21 +60,20 @@
 #  endif
 #endif
 
-// For older Xcode versions, __cpp_lib_xxx flags are inaccurately defined.
-#ifndef FMT_CPP_LIB_FILESYSTEM
-#  ifdef __cpp_lib_filesystem
-#    define FMT_CPP_LIB_FILESYSTEM __cpp_lib_filesystem
-#  else
-#    define FMT_CPP_LIB_FILESYSTEM 0
-#  endif
+#ifdef FMT_CPP_LIB_FILESYSTEM
+// Use the provided definition.
+#elif defined(__cpp_lib_filesystem)
+#  define FMT_CPP_LIB_FILESYSTEM __cpp_lib_filesystem
+#else
+#  define FMT_CPP_LIB_FILESYSTEM 0
 #endif
 
-#ifndef FMT_CPP_LIB_VARIANT
-#  ifdef __cpp_lib_variant
-#    define FMT_CPP_LIB_VARIANT __cpp_lib_variant
-#  else
-#    define FMT_CPP_LIB_VARIANT 0
-#  endif
+#ifdef FMT_CPP_LIB_VARIANT
+// Use the provided definition.
+#elif defined(__cpp_lib_variant)
+#  define FMT_CPP_LIB_VARIANT __cpp_lib_variant
+#else
+#  define FMT_CPP_LIB_VARIANT 0
 #endif
 
 FMT_BEGIN_NAMESPACE
@@ -129,9 +128,8 @@ struct is_variant_like_<std::variant<Types...>> : std::true_type {};
 
 template <typename Variant, typename Char> class is_variant_formattable {
   template <size_t... Is>
-  static std::conjunction<
-      is_formattable<std::variant_alternative_t<Is, Variant>, Char>...>
-      check(std::index_sequence<Is...>);
+  static auto check(std::index_sequence<Is...>) -> std::conjunction<
+      is_formattable<std::variant_alternative_t<Is, Variant>, Char>...>;
 
  public:
   static constexpr bool value = decltype(check(
@@ -142,7 +140,7 @@ template <typename Variant, typename Char> class is_variant_formattable {
 
 #if FMT_USE_RTTI
 
-template <typename Char, typename OutputIt>
+template <typename OutputIt>
 auto write_demangled_name(OutputIt out, const std::type_info& ti) -> OutputIt {
 #  ifdef FMT_HAS_ABI_CXA_DEMANGLE
   int status = 0;
@@ -182,7 +180,7 @@ auto write_demangled_name(OutputIt out, const std::type_info& ti) -> OutputIt {
   } else {
     demangled_name_view = string_view(ti.name());
   }
-  return detail::write_bytes<Char>(out, demangled_name_view);
+  return detail::write_bytes<char>(out, demangled_name_view);
 #  elif FMT_MSC_VERSION
   const string_view demangled_name(ti.name());
   for (size_t i = 0; i < demangled_name.size(); ++i) {
@@ -204,7 +202,7 @@ auto write_demangled_name(OutputIt out, const std::type_info& ti) -> OutputIt {
   }
   return out;
 #  else
-  return detail::write_bytes<Char>(out, string_view(ti.name()));
+  return detail::write_bytes<char>(out, string_view(ti.name()));
 #  endif
 }
 
@@ -225,7 +223,7 @@ template <typename T> struct is_bit_reference_like {
 
 // Workaround for libc++ incompatibility with C++ standard.
 // According to the Standard, `bitset::operator[] const` returns bool.
-#ifdef _LIBCPP_VERSION
+#if defined(_LIBCPP_VERSION) && !defined(FMT_IMPORT_STD)
 template <typename C>
 struct is_bit_reference_like<std::__bit_const_reference<C>> {
   static constexpr bool value = true;
@@ -543,31 +541,29 @@ template <> struct formatter<std::error_code> {
 };
 
 #if FMT_USE_RTTI
-template <typename Char>
-struct formatter<std::type_info, Char  // DEPRECATED! Mixing code unit types.
-                 > {
+template <> struct formatter<std::type_info> {
  public:
-  FMT_CONSTEXPR auto parse(parse_context<Char>& ctx) -> const Char* {
+  FMT_CONSTEXPR auto parse(parse_context<>& ctx) -> const char* {
     return ctx.begin();
   }
 
   template <typename Context>
   auto format(const std::type_info& ti, Context& ctx) const
       -> decltype(ctx.out()) {
-    return detail::write_demangled_name<Char>(ctx.out(), ti);
+    return detail::write_demangled_name(ctx.out(), ti);
   }
 };
 #endif  // FMT_USE_RTTI
 
-template <typename T, typename Char>
+template <typename T>
 struct formatter<
-    T, Char,  // DEPRECATED! Mixing code unit types.
+    T, char,
     typename std::enable_if<std::is_base_of<std::exception, T>::value>::type> {
  private:
   bool with_typename_ = false;
 
  public:
-  FMT_CONSTEXPR auto parse(parse_context<Char>& ctx) -> const Char* {
+  FMT_CONSTEXPR auto parse(parse_context<>& ctx) -> const char* {
     auto it = ctx.begin();
     auto end = ctx.end();
     if (it == end || *it == '}') return it;
@@ -584,12 +580,12 @@ struct formatter<
     auto out = ctx.out();
 #if FMT_USE_RTTI
     if (with_typename_) {
-      out = detail::write_demangled_name<Char>(out, typeid(ex));
+      out = detail::write_demangled_name(out, typeid(ex));
       *out++ = ':';
       *out++ = ' ';
     }
 #endif
-    return detail::write_bytes<Char>(out, string_view(ex.what()));
+    return detail::write_bytes<char>(out, string_view(ex.what()));
   }
 };
 

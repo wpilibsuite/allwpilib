@@ -77,6 +77,7 @@ def eigen_inclusions(dp: Path, f: str):
         "SparseLU",
         "SparseQR",
         "StdVector",
+        "Version",
         "misc",
         "plugins",
     ]
@@ -135,17 +136,26 @@ def copy_upstream_src(wpilib_root: Path):
             f, [wpimath / "src/main/native/thirdparty/eigen/include"]
         )
 
-    shutil.copyfile(
+    for f in [
         ".clang-format",
-        wpimath / "src/main/native/thirdparty/eigen/include/.clang-format",
-    )
+        "BUILD.bazel",
+        "COPYING.APACHE",
+        "COPYING.BSD",
+        "COPYING.MINPACK",
+        "COPYING.MPL2",
+        "WORKSPACE",
+    ]:
+        shutil.copyfile(
+            f,
+            wpimath / "src/main/native/thirdparty/eigen/include" / f,
+        )
 
 
 def main():
     name = "eigen"
     url = "https://gitlab.com/libeigen/eigen.git"
-    # master on 2025-09-08
-    tag = "e0a59e5a66e6d16fa93ab4f5e48bf539205e837f"
+    # 5.0.0 release as of 2025-09-23
+    tag = "d65cda87c1a673047b59b20a9f9e165a452f91e9"
 
     eigen = Lib(name, url, tag, copy_upstream_src)
     eigen.main()

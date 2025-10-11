@@ -68,8 +68,8 @@ if (OperatingSystem.current().isWindows()) {
                     artifact x64ZipTask
 
                     artifactId = "${baseArtifactId}"
-                    groupId artifactGroupId
-                    version wpilibVersioning.version.get()
+                    groupId = artifactGroupId
+                    version = wpilibVersioning.version.get()
                 }
             }
         }

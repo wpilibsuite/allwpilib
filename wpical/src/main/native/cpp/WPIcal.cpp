@@ -19,9 +19,10 @@
 #include <fmt/format.h>
 #include <imgui.h>
 #include <portable-file-dialogs.h>
-#include <tagpose.h>
 #include <wpi/json.h>
 #include <wpigui.h>
+
+#include "tagpose.h"
 
 namespace gui = wpi::gui;
 
@@ -140,7 +141,7 @@ static bool EmitEntryTarget(int tag_id, std::string& file) {
   if (ImGui::BeginDragDropTarget()) {
     if (const ImGuiPayload* payload =
             ImGui::AcceptDragDropPayload("FieldCalibration")) {
-      file = *(std::string*)payload->Data;
+      file = *static_cast<std::string*>(payload->Data);
       rv = true;
     }
     ImGui::EndDragDropTarget();

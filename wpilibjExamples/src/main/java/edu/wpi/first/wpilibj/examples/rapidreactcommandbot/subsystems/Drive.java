@@ -10,8 +10,8 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.OnboardIMU;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.DriveConstants;
@@ -49,7 +49,7 @@ public class Drive extends SubsystemBase {
           DriveConstants.kRightEncoderPorts[1],
           DriveConstants.kRightEncoderReversed);
 
-  private final AnalogGyro m_gyro = new AnalogGyro(0);
+  private final OnboardIMU m_imu = new OnboardIMU(OnboardIMU.MountOrientation.kFlat);
   private final ProfiledPIDController m_controller =
       new ProfiledPIDController(
           DriveConstants.kTurnP,
@@ -129,11 +129,11 @@ public class Drive extends SubsystemBase {
    */
   public Command turnToAngleCommand(double angleDeg) {
     return startRun(
-            () -> m_controller.reset(m_gyro.getRotation2d().getDegrees()),
+            () -> m_controller.reset(m_imu.getRotation2d().getDegrees()),
             () ->
                 m_drive.arcadeDrive(
                     0,
-                    m_controller.calculate(m_gyro.getRotation2d().getDegrees(), angleDeg)
+                    m_controller.calculate(m_imu.getRotation2d().getDegrees(), angleDeg)
                         // Divide feedforward voltage by battery voltage to normalize it to [-1, 1]
                         + m_feedforward.calculate(m_controller.getSetpoint().velocity)
                             / RobotController.getBatteryVoltage()))

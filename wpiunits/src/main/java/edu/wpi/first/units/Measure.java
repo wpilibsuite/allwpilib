@@ -649,17 +649,10 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
       return unit().ofBaseUnits(baseUnitResult);
     }
 
-    if (unit() instanceof DimensionlessUnit) {
-      // Numerator is a dimensionless
-      if (divisor.unit() instanceof PerUnit<?, ?> ratio) {
-        // Dividing by a ratio, return its reciprocal scaled by this
-        return ratio.reciprocal().ofBaseUnits(baseUnitResult);
-      }
-      if (divisor.unit() instanceof PerUnit<?, ?> ratio) {
-        // Dividing by a Per<Time, U>, return its reciprocal velocity scaled by this
-        // Note: Per<Time, U>.reciprocal() is coded to return a Velocity<U>
-        return ratio.reciprocal().ofBaseUnits(baseUnitResult);
-      }
+    // Numerator is a dimensionless
+    if (unit() instanceof DimensionlessUnit && divisor.unit() instanceof PerUnit<?, ?> ratio) {
+      // Dividing by a ratio, return its reciprocal scaled by this
+      return ratio.reciprocal().ofBaseUnits(baseUnitResult);
     }
 
     if (divisor.unit() instanceof PerUnit<?, ?> ratio

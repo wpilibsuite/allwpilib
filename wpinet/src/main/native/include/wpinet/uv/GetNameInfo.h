@@ -87,7 +87,6 @@ void GetNameInfo(Loop& loop,
  * @param callback Callback function to call when resolution completes
  * @param addr Initialized `sockaddr_in` or `sockaddr_in6` data structure.
  * @param flags Optional flags to modify the behavior of `getnameinfo`.
- * @return Connection object for the callback
  */
 inline void GetNameInfo(const std::shared_ptr<Loop>& loop,
                         std::function<void(const char*, const char*)> callback,

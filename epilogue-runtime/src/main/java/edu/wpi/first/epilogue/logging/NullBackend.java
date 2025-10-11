@@ -4,7 +4,9 @@
 
 package edu.wpi.first.epilogue.logging;
 
+import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.struct.Struct;
+import us.hebi.quickbuf.ProtoMessage;
 
 /** Null backend implementation that logs nothing. */
 public class NullBackend implements EpilogueBackend {
@@ -62,4 +64,8 @@ public class NullBackend implements EpilogueBackend {
 
   @Override
   public <S> void log(String identifier, S[] value, Struct<S> struct) {}
+
+  @Override
+  public <P, M extends ProtoMessage<M>> void log(
+      String identifier, P value, Protobuf<P, M> proto) {}
 }

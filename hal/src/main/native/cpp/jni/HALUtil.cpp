@@ -364,36 +364,6 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
 
 /*
  * Class:     edu_wpi_first_hal_HALUtil
- * Method:    getFPGAVersion
- * Signature: ()S
- */
-JNIEXPORT jshort JNICALL
-Java_edu_wpi_first_hal_HALUtil_getFPGAVersion
-  (JNIEnv* env, jclass)
-{
-  int32_t status = 0;
-  jshort returnValue = HAL_GetFPGAVersion(&status);
-  CheckStatus(env, status);
-  return returnValue;
-}
-
-/*
- * Class:     edu_wpi_first_hal_HALUtil
- * Method:    getFPGARevision
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_HALUtil_getFPGARevision
-  (JNIEnv* env, jclass)
-{
-  int32_t status = 0;
-  jint returnValue = HAL_GetFPGARevision(&status);
-  CheckStatus(env, status);
-  return returnValue;
-}
-
-/*
- * Class:     edu_wpi_first_hal_HALUtil
  * Method:    getSerialNumber
  * Signature: ()Ljava/lang/String;
  */
