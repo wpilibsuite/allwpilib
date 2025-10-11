@@ -173,6 +173,18 @@ class WPILIB_DLLEXPORT MecanumDriveKinematics
     return start.Interpolate(end, t);
   }
 
+  ChassisAccelerations ToChassisAccelerations(
+    const MecanumDriveWheelAccelerations& wheelAccelerations) const override;
+
+  MecanumDriveWheelAccelerations ToWheelAccelerations(
+      const ChassisAccelerations& chassisAccelerations,
+      const Translation2d& centerOfRotation) const;
+
+  MecanumDriveWheelAccelerations ToWheelAccelerations(
+      const ChassisAccelerations& chassisAccelerations) const override {
+    return ToWheelAccelerations(chassisAccelerations, {});
+  }
+
  private:
   mutable Matrixd<4, 3> m_inverseKinematics;
   Eigen::HouseholderQR<Matrixd<4, 3>> m_forwardKinematics;
@@ -197,18 +209,6 @@ class WPILIB_DLLEXPORT MecanumDriveKinematics
    */
   void SetInverseKinematics(Translation2d fl, Translation2d fr,
                             Translation2d rl, Translation2d rr) const;
-
-  ChassisAccelerations ToChassisAccelerations(
-      const MecanumDriveWheelAccelerations& wheelAccelerations) const override;
-
-  MecanumDriveWheelAccelerations ToWheelAccelerations(
-      const ChassisAccelerations& chassisAccelerations,
-      const Translation2d& centerOfRotation) const;
-
-  MecanumDriveWheelAccelerations ToWheelAccelerations(
-      const ChassisAccelerations& chassisAccelerations) const override {
-    return ToWheelAccelerations(chassisAccelerations, {});
-  }
 };
 
 }  // namespace frc
