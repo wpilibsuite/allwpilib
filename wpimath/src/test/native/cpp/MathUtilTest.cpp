@@ -131,58 +131,59 @@ TEST(MathUtilTest, ApplyDeadband2dUnits) {
                 0.02_mps, 2.5_mps));
 }
 
-TEST(MathUtilTest, CopySignPow) {
-  EXPECT_DOUBLE_EQ(0.5, frc::CopySignPow(0.5, 1.0));
-  EXPECT_DOUBLE_EQ(-0.5, frc::CopySignPow(-0.5, 1.0));
+TEST(MathUtilTest, CopyDirectionPow) {
+  EXPECT_DOUBLE_EQ(0.5, frc::CopyDirectionPow(0.5, 1.0));
+  EXPECT_DOUBLE_EQ(-0.5, frc::CopyDirectionPow(-0.5, 1.0));
 
-  EXPECT_DOUBLE_EQ(0.5 * 0.5, frc::CopySignPow(0.5, 2.0));
-  EXPECT_DOUBLE_EQ(-(0.5 * 0.5), frc::CopySignPow(-0.5, 2.0));
+  EXPECT_DOUBLE_EQ(0.5 * 0.5, frc::CopyDirectionPow(0.5, 2.0));
+  EXPECT_DOUBLE_EQ(-(0.5 * 0.5), frc::CopyDirectionPow(-0.5, 2.0));
 
-  EXPECT_DOUBLE_EQ(std::sqrt(0.5), frc::CopySignPow(0.5, 0.5));
-  EXPECT_DOUBLE_EQ(-std::sqrt(0.5), frc::CopySignPow(-0.5, 0.5));
+  EXPECT_DOUBLE_EQ(std::sqrt(0.5), frc::CopyDirectionPow(0.5, 0.5));
+  EXPECT_DOUBLE_EQ(-std::sqrt(0.5), frc::CopyDirectionPow(-0.5, 0.5));
 
-  EXPECT_DOUBLE_EQ(0.0, frc::CopySignPow(0.0, 2.0));
-  EXPECT_DOUBLE_EQ(1.0, frc::CopySignPow(1.0, 2.0));
-  EXPECT_DOUBLE_EQ(-1.0, frc::CopySignPow(-1.0, 2.0));
+  EXPECT_DOUBLE_EQ(0.0, frc::CopyDirectionPow(0.0, 2.0));
+  EXPECT_DOUBLE_EQ(1.0, frc::CopyDirectionPow(1.0, 2.0));
+  EXPECT_DOUBLE_EQ(-1.0, frc::CopyDirectionPow(-1.0, 2.0));
 
-  EXPECT_DOUBLE_EQ(std::pow(0.8, 0.3), frc::CopySignPow(0.8, 0.3));
-  EXPECT_DOUBLE_EQ(-std::pow(0.8, 0.3), frc::CopySignPow(-0.8, 0.3));
+  EXPECT_DOUBLE_EQ(std::pow(0.8, 0.3), frc::CopyDirectionPow(0.8, 0.3));
+  EXPECT_DOUBLE_EQ(-std::pow(0.8, 0.3), frc::CopyDirectionPow(-0.8, 0.3));
 }
 
-TEST(MathUtilTest, CopySignPowWithMaxMagnitude) {
-  EXPECT_DOUBLE_EQ(5.0, frc::CopySignPow(5.0, 1.0, 10.0));
-  EXPECT_DOUBLE_EQ(-5.0, frc::CopySignPow(-5.0, 1.0, 10.0));
+TEST(MathUtilTest, CopyDirectionPowWithMaxMagnitude) {
+  EXPECT_DOUBLE_EQ(5.0, frc::CopyDirectionPow(5.0, 1.0, 10.0));
+  EXPECT_DOUBLE_EQ(-5.0, frc::CopyDirectionPow(-5.0, 1.0, 10.0));
 
-  EXPECT_DOUBLE_EQ(0.5 * 0.5 * 10, frc::CopySignPow(5.0, 2.0, 10.0));
-  EXPECT_DOUBLE_EQ(-0.5 * 0.5 * 10, frc::CopySignPow(-5.0, 2.0, 10.0));
+  EXPECT_DOUBLE_EQ(0.5 * 0.5 * 10, frc::CopyDirectionPow(5.0, 2.0, 10.0));
+  EXPECT_DOUBLE_EQ(-0.5 * 0.5 * 10, frc::CopyDirectionPow(-5.0, 2.0, 10.0));
 
-  EXPECT_DOUBLE_EQ(std::sqrt(0.5) * 10, frc::CopySignPow(5.0, 0.5, 10.0));
-  EXPECT_DOUBLE_EQ(-std::sqrt(0.5) * 10, frc::CopySignPow(-5.0, 0.5, 10.0));
+  EXPECT_DOUBLE_EQ(std::sqrt(0.5) * 10, frc::CopyDirectionPow(5.0, 0.5, 10.0));
+  EXPECT_DOUBLE_EQ(-std::sqrt(0.5) * 10,
+                   frc::CopyDirectionPow(-5.0, 0.5, 10.0));
 
-  EXPECT_DOUBLE_EQ(0.0, frc::CopySignPow(0.0, 2.0, 5.0));
-  EXPECT_DOUBLE_EQ(5.0, frc::CopySignPow(5.0, 2.0, 5.0));
-  EXPECT_DOUBLE_EQ(-5.0, frc::CopySignPow(-5.0, 2.0, 5.0));
+  EXPECT_DOUBLE_EQ(0.0, frc::CopyDirectionPow(0.0, 2.0, 5.0));
+  EXPECT_DOUBLE_EQ(5.0, frc::CopyDirectionPow(5.0, 2.0, 5.0));
+  EXPECT_DOUBLE_EQ(-5.0, frc::CopyDirectionPow(-5.0, 2.0, 5.0));
 
   EXPECT_DOUBLE_EQ(std::pow(0.8, 0.3) * 100,
-                   frc::CopySignPow(80.0, 0.3, 100.0));
+                   frc::CopyDirectionPow(80.0, 0.3, 100.0));
   EXPECT_DOUBLE_EQ(-std::pow(0.8, 0.3) * 100,
-                   frc::CopySignPow(-80.0, 0.3, 100.0));
+                   frc::CopyDirectionPow(-80.0, 0.3, 100.0));
 }
 
-TEST(MathUtilTest, CopySignPowWithUnits) {
-  EXPECT_UNITS_EQ(0_mps,
-                  frc::CopySignPow<units::meters_per_second_t>(0_mps, 2.0));
-  EXPECT_UNITS_EQ(1_mps,
-                  frc::CopySignPow<units::meters_per_second_t>(1_mps, 2.0));
-  EXPECT_UNITS_EQ(-1_mps,
-                  frc::CopySignPow<units::meters_per_second_t>(-1_mps, 2.0));
+TEST(MathUtilTest, CopyDirectionPowWithUnits) {
+  EXPECT_UNITS_EQ(
+      0_mps, frc::CopyDirectionPow<units::meters_per_second_t>(0_mps, 2.0));
+  EXPECT_UNITS_EQ(
+      1_mps, frc::CopyDirectionPow<units::meters_per_second_t>(1_mps, 2.0));
+  EXPECT_UNITS_EQ(
+      -1_mps, frc::CopyDirectionPow<units::meters_per_second_t>(-1_mps, 2.0));
 
   EXPECT_UNITS_EQ(
       units::meters_per_second_t{0.5 * 0.5 * 10},
-      frc::CopySignPow<units::meters_per_second_t>(5_mps, 2.0, 10_mps));
+      frc::CopyDirectionPow<units::meters_per_second_t>(5_mps, 2.0, 10_mps));
   EXPECT_UNITS_EQ(
       units::meters_per_second_t{-0.5 * 0.5 * 10},
-      frc::CopySignPow<units::meters_per_second_t>(-5_mps, 2.0, 10_mps));
+      frc::CopyDirectionPow<units::meters_per_second_t>(-5_mps, 2.0, 10_mps));
 }
 
 TEST(MathUtilTest, CopyDirectionPow2d) {

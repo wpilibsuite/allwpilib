@@ -143,7 +143,8 @@ Eigen::Vector<T, N> ApplyDeadband(const Eigen::Vector<T, N>& value, T deadband,
  */
 template <typename T>
   requires std::is_arithmetic_v<T> || units::traits::is_unit_t_v<T>
-constexpr T CopySignPow(T value, double exponent, T maxMagnitude = T{1.0}) {
+constexpr T CopyDirectionPow(T value, double exponent,
+                             T maxMagnitude = T{1.0}) {
   if constexpr (std::is_arithmetic_v<T>) {
     return gcem::copysign(
         gcem::pow(gcem::abs(value) / maxMagnitude, exponent) * maxMagnitude,
@@ -183,7 +184,7 @@ Eigen::Vector<T, N> CopyDirectionPow(const Eigen::Vector<T, N>& value,
       return Eigen::Vector<T, N>::Zero();
     }
     return value.normalized() *
-           CopySignPow(value.norm(), exponent, maxMagnitude);
+           CopyDirectionPow(value.norm(), exponent, maxMagnitude);
   } else {
     const Eigen::Vector<double, N> asDouble = value.template cast<double>();
     const Eigen::Vector<double, N> processed =
