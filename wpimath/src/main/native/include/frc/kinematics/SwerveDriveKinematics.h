@@ -185,7 +185,7 @@ class SwerveDriveKinematics
 
     // We have a new center of rotation. We need to compute the matrix again.
     if (centerOfRotation != m_previousCoR) {
-      setInverseKinematics(centerOfRotation);
+      SetInverseKinematics(centerOfRotation);
     }
 
     Eigen::Vector3d chassisSpeedsVector{chassisSpeeds.vx.value(),
@@ -479,7 +479,7 @@ class SwerveDriveKinematics
     if (chassisAccelerations.ax == 0.0_mps_sq &&
         chassisAccelerations.ay == 0.0_mps_sq &&
         chassisAccelerations.alpha == 0.0_rad_per_s_sq) {
-      for (int i = 0; i < NumModules; i++) {
+      for (size_t i = 0; i < NumModules; i++) {
         moduleAccelerations[i] = {
             0.0_mps_sq, Rotation2d{0.0, 0.0}};  // maintain previous angle
       }
@@ -487,7 +487,7 @@ class SwerveDriveKinematics
     }
 
     if (centerOfRotation != m_previousCoR) {
-      setInverseKinematics(centerOfRotation);
+      SetInverseKinematics(centerOfRotation);
     }
 
     Eigen::Vector4d chassisAccelerationsVector{
@@ -498,11 +498,10 @@ class SwerveDriveKinematics
     Matrixd<NumModules * 2, 1> moduleAccelerationsMatrix =
         m_secondOrderInverseKinematics * chassisAccelerationsVector;
 
-    for (int i = 0; i < NumModules; i++) {
-      units::meters_per_second_squared_t x{
-          moduleAccelerationsMatrix.get(i * 2, 0)};
+    for (size_t i = 0; i < NumModules; i++) {
+      units::meters_per_second_squared_t x{moduleAccelerationsMatrix(i * 2, 0)};
       units::meters_per_second_squared_t y{
-          moduleAccelerationsMatrix.get(i * 2 + 1, 0)};
+          moduleAccelerationsMatrix(i * 2 + 1, 0)};
 
       // For swerve modules, we need to compute both linear acceleration and
       // angular acceleration The linear acceleration is the magnitude of the
@@ -580,17 +579,17 @@ class SwerveDriveKinematics
           moduleAccelerations) const override {
     Matrixd<NumModules * 2, 1> moduleAccelerationsMatrix;
 
-    for (int i = 0; i < NumModules; i++) {
+    for (size_t i = 0; i < NumModules; i++) {
       SwerveModuleAccelerations module = moduleAccelerations[i];
 
       moduleAccelerationsMatrix(i * 2 + 0, 0) =
-          module.acceleration * module.angle.Cos();
+          module.acceleration.value() * module.angle.Cos();
       moduleAccelerationsMatrix(i * 2 + 1, 0) =
-          module.acceleration * module.angle.Sin();
+          module.acceleration.value() * module.angle.Sin();
     }
 
     Eigen::Vector4d chassisAccelerationsVector =
-        m_secondOrderForwardKinematics * moduleAccelerationsMatrix;
+        m_secondOrderForwardKinematics.solve(moduleAccelerationsMatrix);
 
     // the second order kinematics equation for swerve drive yields a state
     // vector [aₓ, a_y, ω², α]
@@ -619,20 +618,16 @@ class SwerveDriveKinematics
    *
    * @param centerOfRotation new center of rotation
    */
-  void SetInverseKinematics(const Translation2d& centerOfRotation) {
-    for (int i = 0; i < NumModules; i++) {
-      const double rx = m_modules[i].getX() - centerOfRotation.X();
-      const double ry = m_modules[i].getY() - centerOfRotation.Y();
+  void SetInverseKinematics(const Translation2d& centerOfRotation) const {
+    for (size_t i = 0; i < NumModules; i++) {
+      const double rx = m_modules[i].X().value() - centerOfRotation.X().value();
+      const double ry = m_modules[i].Y().value() - centerOfRotation.Y().value();
 
-      m_firstOrderInverseKinematics.setRow(i * 2 + 0, 0, /* Start Data */ 1, 0,
-                                           -ry);
-      m_firstOrderInverseKinematics.setRow(i * 2 + 1, 0, /* Start Data */ 0, 1,
-                                           rx);
+      m_firstOrderInverseKinematics.row(i * 2 + 0) << 1, 0, -ry;
+      m_firstOrderInverseKinematics.row(i * 2 + 1) << 0, 1, rx;
 
-      m_secondOrderInverseKinematics.setRow(i * 2 + 0, 0, /* Start Data */ 1, 0,
-                                            -rx, -ry);
-      m_secondOrderInverseKinematics.setRow(i * 2 + 1, 0, /* Start Data */ 0, 1,
-                                            -ry, +rx);
+      m_secondOrderInverseKinematics.row(i * 2 + 0) << 1, 0, -rx, -ry;
+      m_secondOrderInverseKinematics.row(i * 2 + 1) << 0, 1, -ry, +rx;
     }
     m_previousCoR = centerOfRotation;
   }

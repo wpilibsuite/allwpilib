@@ -438,7 +438,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
 
   static constexpr units::second_t kBufferDuration = 1.5_s;
 
-  Odometry3d<WheelSpeeds, WheelPositions>& m_odometry;
+  Odometry3d<WheelSpeeds, WheelPositions, WheelAccelerations>& m_odometry;
   wpi::array<double, 4> m_q{wpi::empty_array};
   frc::Matrixd<6, 6> m_visionK = frc::Matrixd<6, 6>::Zero();
 
