@@ -44,7 +44,7 @@ ChassisSpeeds MecanumDriveKinematics::ToChassisSpeeds(
   Eigen::Vector3d chassisSpeedsVector =
       m_forwardKinematics.solve(wheelSpeedsVector);
 
-  return {units::meters_per_second_t{chassisSpeedsVector(0)},  // NOLINT
+  return {units::meters_per_second_t{chassisSpeedsVector(0)},
           units::meters_per_second_t{chassisSpeedsVector(1)},
           units::radians_per_second_t{chassisSpeedsVector(2)}};
 }
@@ -97,8 +97,7 @@ ChassisAccelerations MecanumDriveKinematics::ToChassisAccelerations(
   Eigen::Vector3d chassisAccelerationsVector =
       m_forwardKinematics.solve(wheelAccelerationsVector);
 
-  return {units::meters_per_second_squared_t{
-              chassisAccelerationsVector(0)},  // NOLINT
+  return {units::meters_per_second_squared_t{chassisAccelerationsVector(0)},
           units::meters_per_second_squared_t{chassisAccelerationsVector(1)},
           units::radians_per_second_squared_t{chassisAccelerationsVector(2)}};
 }
