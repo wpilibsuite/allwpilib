@@ -13,14 +13,14 @@ plugins {
     id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '2023.0.1'
     id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2025.0'
     id 'edu.wpi.first.NativeUtils' apply false
-    id 'edu.wpi.first.GradleJni' version '1.1.0'
+    id 'edu.wpi.first.GradleJni' version '1.2.0'
     id 'edu.wpi.first.GradleVsCode'
     id 'idea'
     id 'visual-studio'
     id 'net.ltgt.errorprone' version '4.3.0' apply false
-    id 'com.gradleup.shadow' version '9.0.0' apply false
-    id 'com.diffplug.spotless' version '7.2.1' apply false
-    id 'com.github.spotbugs' version '6.2.3' apply false
+    id 'com.gradleup.shadow' version '9.1.0' apply false
+    id 'com.diffplug.spotless' version '8.0.0' apply false
+    id 'com.github.spotbugs' version '6.4.2' apply false
 }
 
 wpilibVersioning.buildServerMode = project.hasProperty('buildServer')
@@ -40,11 +40,11 @@ allprojects {
     }
 }
 
-buildScan {
-    termsOfServiceUrl = 'https://gradle.com/terms-of-service'
-    termsOfServiceAgree = 'yes'
-
-    publishAlways()
+develocity {
+    buildScan {
+        termsOfUseUrl = "https://gradle.com/help/legal-terms-of-use"
+        termsOfUseAgree = "yes"
+    }
 }
 
 import com.github.spotbugs.snom.Effort

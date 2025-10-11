@@ -73,7 +73,7 @@ class SLEIPNIR_DLLEXPORT Problem {
   VariableMatrix decision_variable(int rows, int cols = 1) {
     m_decision_variables.reserve(m_decision_variables.size() + rows * cols);
 
-    VariableMatrix vars{rows, cols};
+    VariableMatrix vars{VariableMatrix::empty, rows, cols};
 
     for (int row = 0; row < rows; ++row) {
       for (int col = 0; col < cols; ++col) {
@@ -108,7 +108,7 @@ class SLEIPNIR_DLLEXPORT Problem {
     m_decision_variables.reserve(m_decision_variables.size() +
                                  (rows * rows + rows) / 2);
 
-    VariableMatrix vars{rows, rows};
+    VariableMatrix vars{VariableMatrix::empty, rows, rows};
 
     for (int row = 0; row < rows; ++row) {
       for (int col = 0; col <= row; ++col) {
@@ -317,6 +317,24 @@ class SLEIPNIR_DLLEXPORT Problem {
    */
   void clear_callbacks() { m_iteration_callbacks.clear(); }
 
+  /**
+   * Adds a callback to be called at the beginning of each solver iteration.
+   *
+   * Language bindings should call this in the Problem constructor to register
+   * callbacks that shouldn't be removed by clear_callbacks(). Persistent
+   * callbacks run after non-persistent callbacks.
+   *
+   * @param callback The callback. Returning true from the callback causes the
+   *   solver to exit early with the solution it has so far.
+   */
+  template <typename F>
+    requires requires(F callback, const IterationInfo& info) {
+      { callback(info) } -> std::same_as<bool>;
+    }
+  void add_persistent_callback(F&& callback) {
+    m_persistent_iteration_callbacks.emplace_back(std::forward<F>(callback));
+  }
+
  private:
   // The list of decision variables, which are the root of the problem's
   // expression tree
@@ -334,6 +352,8 @@ class SLEIPNIR_DLLEXPORT Problem {
   // The iteration callbacks
   gch::small_vector<std::function<bool(const IterationInfo& info)>>
       m_iteration_callbacks;
+  gch::small_vector<std::function<bool(const IterationInfo& info)>>
+      m_persistent_iteration_callbacks;
 
   void print_exit_conditions([[maybe_unused]] const Options& options);
   void print_problem_analysis();

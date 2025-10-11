@@ -62,10 +62,10 @@ frc2::CommandPtr Drive::DriveDistanceCommand(units::meter_t distance,
 
 frc2::CommandPtr Drive::TurnToAngleCommand(units::degree_t angle) {
   return StartRun(
-             [this] { m_controller.Reset(m_gyro.GetRotation2d().Degrees()); },
+             [this] { m_controller.Reset(m_imu.GetRotation2d().Degrees()); },
              [this, angle] {
                m_drive.ArcadeDrive(
-                   0, m_controller.Calculate(m_gyro.GetRotation2d().Degrees(),
+                   0, m_controller.Calculate(m_imu.GetRotation2d().Degrees(),
                                              angle) +
                           // Divide feedforward voltage by battery voltage to
                           // normalize it to [-1, 1]

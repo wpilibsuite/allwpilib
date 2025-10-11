@@ -16,6 +16,7 @@ import com.google.testing.compile.JavaFileObjects;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import org.junit.jupiter.api.Test;
@@ -1142,6 +1143,76 @@ class AnnotationProcessorTest {
   }
 
   @Test
+  void protobuf() {
+    String source =
+        """
+      package edu.wpi.first.epilogue;
+
+      import edu.wpi.first.util.protobuf.Protobuf;
+      import edu.wpi.first.util.protobuf.ProtobufSerializable;
+      import java.util.List;
+      import us.hebi.quickbuf.*;
+
+      class ProtobufType implements ProtobufSerializable {
+        // Message type is necessary - Epilogue can't log with a wildcard message type in the proto
+        public static final Protobuf<ProtobufType, Message> proto = null; // value doesn't matter
+
+        static class Message extends ProtoMessage<Message> {
+          // Implement stubs for the abstract base class.
+          // This code never runs so actual implementations are unnecessary.
+          @Override
+          public Message copyFrom(Message other) { return null; }
+          @Override
+          public Message clear() { return null; }
+          @Override
+          public int computeSerializedSize() { return 0; }
+          @Override
+          public void writeTo(ProtoSink output) {}
+          @Override
+          public Message mergeFrom(ProtoSource input) { return null; }
+          @Override
+          public boolean equals(Object obj) { return false; }
+          @Override
+          public Message clone() { return null; }
+        }
+      }
+
+      @Logged
+      class Example {
+        ProtobufType x;          // Should be logged
+        ProtobufType[] arr1;     // Should not be logged
+        ProtobufType[][] arr2;   // Should not be logged
+        List<ProtobufType> list; // Should not be logged
+      }
+      """;
+
+    String expectedGeneratedSource =
+        """
+      package edu.wpi.first.epilogue;
+
+      import edu.wpi.first.epilogue.Logged;
+      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("x", object.x, edu.wpi.first.epilogue.ProtobufType.proto);
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
   void lists() {
     String source =
         """
@@ -2247,6 +2318,18 @@ class AnnotationProcessorTest {
   }
 
   private void assertLoggerGenerates(String loggedClassContent, String loggerClassContent) {
+    // Extract the expected logger file name from the class declaration so we can find the correct
+    // generated file.
+    var pattern =
+        Pattern.compile(".*public class (.*) extends ClassSpecificLogger.*", Pattern.DOTALL);
+    var matcher = pattern.matcher(loggerClassContent);
+    var className = "ExampleLogger";
+    if (matcher.matches()) {
+      var result = matcher.toMatchResult();
+      className = result.group(1);
+    }
+    var loggerFileName = "/" + className + ".java";
+
     Compilation compilation =
         javac()
             .withOptions(kJavaVersionOptions)
@@ -2259,7 +2342,7 @@ class AnnotationProcessorTest {
     var generatedFiles = compilation.generatedSourceFiles();
     var generatedFile =
         generatedFiles.stream()
-            .filter(jfo -> jfo.getName().contains("Example"))
+            .filter(jfo -> jfo.toUri().getPath().endsWith(loggerFileName))
             .findFirst()
             .orElseThrow(() -> new IllegalStateException("Logger file was not generated!"));
     try {

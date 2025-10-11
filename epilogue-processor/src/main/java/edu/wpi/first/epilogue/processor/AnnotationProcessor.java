@@ -112,7 +112,8 @@ public class AnnotationProcessor extends AbstractProcessor {
             new MeasureHandler(processingEnv),
             new PrimitiveHandler(processingEnv),
             new SupplierHandler(processingEnv),
-            new StructHandler(processingEnv), // prioritize struct over sendable
+            new StructHandler(processingEnv), // prioritize struct over sendable and protobuf
+            new ProtobufHandler(processingEnv), // then protobuf
             new SendableHandler(processingEnv));
 
     m_epiloguerGenerator = new EpilogueGenerator(processingEnv, customLoggers);

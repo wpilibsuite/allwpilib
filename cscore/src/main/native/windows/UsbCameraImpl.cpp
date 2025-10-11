@@ -707,8 +707,9 @@ void UsbCameraImpl::DeviceCacheProperty(
   }
 
   NotifyPropertyCreated(*rawIndex, *rawPropPtr);
-  if (perPropPtr && perIndex)
+  if (perPropPtr && perIndex) {
     NotifyPropertyCreated(*perIndex, *perPropPtr);
+  }
 }
 
 CS_StatusValue UsbCameraImpl::DeviceProcessCommand(

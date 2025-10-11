@@ -10,6 +10,7 @@
 #include "sleipnir/autodiff/adjoint_expression_graph.hpp"
 #include "sleipnir/autodiff/variable.hpp"
 #include "sleipnir/autodiff/variable_matrix.hpp"
+#include "sleipnir/util/assert.hpp"
 #include "sleipnir/util/concepts.hpp"
 #include "sleipnir/util/symbol_exports.hpp"
 
@@ -34,7 +35,7 @@ class SLEIPNIR_DLLEXPORT Hessian {
    * @param variable Variable of which to compute the Hessian.
    * @param wrt Variable with respect to which to compute the Hessian.
    */
-  Hessian(Variable variable, Variable wrt) noexcept
+  Hessian(Variable variable, Variable wrt)
       : Hessian{std::move(variable), VariableMatrix{std::move(wrt)}} {}
 
   /**
@@ -44,10 +45,12 @@ class SLEIPNIR_DLLEXPORT Hessian {
    * @param wrt Vector of variables with respect to which to compute the
    *   Hessian.
    */
-  Hessian(Variable variable, SleipnirMatrixLike auto wrt) noexcept
+  Hessian(Variable variable, SleipnirMatrixLike auto wrt)
       : m_variables{detail::AdjointExpressionGraph{variable}
                         .generate_gradient_tree(wrt)},
         m_wrt{wrt} {
+    slp_assert(m_wrt.cols() == 1);
+
     // Initialize column each expression's adjoint occupies in the Jacobian
     for (size_t col = 0; col < m_wrt.size(); ++col) {
       m_wrt[col].expr->col = col;
@@ -136,15 +139,9 @@ class SLEIPNIR_DLLEXPORT Hessian {
       m_graphs[row].append_adjoint_triplets(triplets, row, m_wrt);
     }
 
-    if (!triplets.empty()) {
-      m_H.setFromTriplets(triplets.begin(), triplets.end());
-      if constexpr (UpLo == Eigen::Lower) {
-        m_H = m_H.triangularView<Eigen::Lower>();
-      }
-    } else {
-      // setFromTriplets() is a no-op on empty triplets, so explicitly zero out
-      // the storage
-      m_H.setZero();
+    m_H.setFromTriplets(triplets.begin(), triplets.end());
+    if constexpr (UpLo == Eigen::Lower) {
+      m_H = m_H.triangularView<Eigen::Lower>();
     }
 
     return m_H;

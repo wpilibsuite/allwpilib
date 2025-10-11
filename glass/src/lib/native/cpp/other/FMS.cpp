@@ -149,9 +149,14 @@ void glass::DisplayFMSReadOnly(FMSModel* model) {
     }
   }
   if (auto data = model->GetGameSpecificMessageData()) {
-    wpi::SmallString<64> gsmBuf;
-    ImGui::Text("Game Specific: %s",
-                exists ? data->GetValue(gsmBuf).data() : "?");
+    if (exists) {
+      wpi::SmallString<64> gsmBuf;
+      std::string_view gsm = data->GetValue(gsmBuf);
+      ImGui::Text("Game Specific: %.*s", static_cast<int>(gsm.size()),
+                  gsm.data());
+    } else {
+      ImGui::TextUnformatted("Game Specific: ?");
+    }
   }
 
   if (!exists) {

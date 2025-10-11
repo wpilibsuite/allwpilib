@@ -38,8 +38,7 @@ AnalogPotentiometer::AnalogPotentiometer(std::shared_ptr<AnalogInput> input,
 }
 
 double AnalogPotentiometer::Get() const {
-  return (m_analog_input->GetAverageVoltage() /
-          RobotController::GetVoltage3V3()) *
+  return (m_analog_input->GetVoltage() / RobotController::GetVoltage3V3()) *
              m_fullRange +
          m_offset;
 }

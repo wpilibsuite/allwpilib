@@ -6,8 +6,10 @@ package edu.wpi.first.epilogue.logging;
 
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Unit;
+import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.struct.Struct;
 import java.util.Collection;
+import us.hebi.quickbuf.ProtoMessage;
 
 /** A backend is a generic interface for Epilogue to log discrete data points. */
 public interface EpilogueBackend {
@@ -192,6 +194,17 @@ public interface EpilogueBackend {
     S[] array = (S[]) value.toArray(Object[]::new);
     log(identifier, array, struct);
   }
+
+  /**
+   * Logs a protobuf-serializable object.
+   *
+   * @param identifier the identifier of the data point
+   * @param value the value of the data point
+   * @param proto the protobuf to use to serialize the data
+   * @param <P> the protobuf-serializable type
+   * @param <M> the protobuf message type
+   */
+  <P, M extends ProtoMessage<M>> void log(String identifier, P value, Protobuf<P, M> proto);
 
   /**
    * Logs a measurement's value in terms of its base unit.

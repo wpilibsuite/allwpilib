@@ -116,6 +116,14 @@ http_archive(
     url = "https://github.com/TendTo/rules_doxygen/releases/download/2.4.2/rules_doxygen-2.4.2.tar.gz",
 )
 
+# This gives us a repository layout which matches what normal BCR modules expect.
+# The goal here is to make it easier to depend on external projects which already
+# include @eigen without introducing multiple eigen versions.
+local_repository(
+    name = "eigen",
+    path = "wpimath/src/main/native/thirdparty/eigen/include/",
+)
+
 load("@bazel_features//:deps.bzl", "bazel_features_deps")
 
 bazel_features_deps()

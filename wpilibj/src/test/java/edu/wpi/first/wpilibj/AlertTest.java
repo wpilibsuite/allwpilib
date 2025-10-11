@@ -23,11 +23,15 @@ import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
 class AlertTest {
-  String m_groupName;
+  private NetworkTableInstance m_inst;
+  private String m_groupName;
 
   @BeforeEach
   void setup(TestInfo info) {
     m_groupName = "AlertTest_" + info.getDisplayName();
+
+    m_inst = NetworkTableInstance.create();
+    SmartDashboard.setNetworkTableInstance(m_inst);
   }
 
   @AfterEach
@@ -36,6 +40,9 @@ class AlertTest {
     assertEquals(0, getActiveAlerts(AlertType.kError).length);
     assertEquals(0, getActiveAlerts(AlertType.kWarning).length);
     assertEquals(0, getActiveAlerts(AlertType.kInfo).length);
+
+    m_inst.close();
+    SmartDashboard.setNetworkTableInstance(NetworkTableInstance.getDefault());
   }
 
   private String getSubtableName(Alert.AlertType type) {
@@ -52,7 +59,7 @@ class AlertTest {
   }
 
   private StringArraySubscriber getSubscriberForType(Alert.AlertType type) {
-    return NetworkTableInstance.getDefault()
+    return m_inst
         .getStringArrayTopic("/SmartDashboard/" + m_groupName + "/" + getSubtableName(type))
         .subscribe(new String[] {});
   }

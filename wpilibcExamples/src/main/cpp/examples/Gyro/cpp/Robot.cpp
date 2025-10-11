@@ -4,8 +4,8 @@
 
 #include <cmath>
 
-#include <frc/AnalogGyro.h>
 #include <frc/Joystick.h>
+#include <frc/OnboardIMU.h>
 #include <frc/TimedRobot.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
@@ -18,7 +18,6 @@
 class Robot : public frc::TimedRobot {
  public:
   Robot() {
-    m_gyro.SetSensitivity(kVoltsPerDegreePerSecond);
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
@@ -34,7 +33,8 @@ class Robot : public frc::TimedRobot {
    * angle.
    */
   void TeleopPeriodic() override {
-    double turningValue = (kAngleSetpoint - m_gyro.GetAngle()) * kP;
+    double turningValue =
+        (kAngleSetpoint - m_imu.GetRotation2d().Degrees().value()) * kP;
     m_drive.ArcadeDrive(-m_joystick.GetY(), -turningValue);
   }
 
@@ -42,13 +42,10 @@ class Robot : public frc::TimedRobot {
   static constexpr double kAngleSetpoint = 0.0;
   static constexpr double kP = 0.005;  // Proportional turning constant
 
-  // Gyro calibration constant, may need to be adjusted. Gyro value of 360 is
-  // set to correspond to one full revolution.
-  static constexpr double kVoltsPerDegreePerSecond = 0.0128;
-
   static constexpr int kLeftMotorPort = 0;
   static constexpr int kRightMotorPort = 1;
-  static constexpr int kGyroPort = 0;
+  static constexpr frc::OnboardIMU::MountOrientation kIMUMountOrientation =
+      frc::OnboardIMU::kFlat;
   static constexpr int kJoystickPort = 0;
 
   frc::PWMSparkMax m_left{kLeftMotorPort};
@@ -56,7 +53,7 @@ class Robot : public frc::TimedRobot {
   frc::DifferentialDrive m_drive{[&](double output) { m_left.Set(output); },
                                  [&](double output) { m_right.Set(output); }};
 
-  frc::AnalogGyro m_gyro{kGyroPort};
+  frc::OnboardIMU m_imu{kIMUMountOrientation};
   frc::Joystick m_joystick{kJoystickPort};
 };
 

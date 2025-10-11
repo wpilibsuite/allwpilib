@@ -15,8 +15,8 @@ import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.OnboardIMU;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
@@ -45,7 +45,7 @@ public class Drivetrain {
   private final PIDController m_backLeftPIDController = new PIDController(1, 0, 0);
   private final PIDController m_backRightPIDController = new PIDController(1, 0, 0);
 
-  private final AnalogGyro m_gyro = new AnalogGyro(0);
+  private final OnboardIMU m_imu = new OnboardIMU(OnboardIMU.MountOrientation.kFlat);
 
   private final MecanumDriveKinematics m_kinematics =
       new MecanumDriveKinematics(
@@ -56,7 +56,7 @@ public class Drivetrain {
   private final MecanumDrivePoseEstimator m_poseEstimator =
       new MecanumDrivePoseEstimator(
           m_kinematics,
-          m_gyro.getRotation2d(),
+          m_imu.getRotation2d(),
           getCurrentDistances(),
           Pose2d.kZero,
           VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
@@ -67,7 +67,7 @@ public class Drivetrain {
 
   /** Constructs a MecanumDrive and resets the gyro. */
   public Drivetrain() {
-    m_gyro.reset();
+    m_imu.resetYaw();
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
@@ -147,7 +147,7 @@ public class Drivetrain {
 
   /** Updates the field relative position of the robot. */
   public void updateOdometry() {
-    m_poseEstimator.update(m_gyro.getRotation2d(), getCurrentDistances());
+    m_poseEstimator.update(m_imu.getRotation2d(), getCurrentDistances());
 
     // Also apply vision measurements. We use 0.3 seconds in the past as an example -- on
     // a real robot, this must be calculated based either on latency or timestamps.

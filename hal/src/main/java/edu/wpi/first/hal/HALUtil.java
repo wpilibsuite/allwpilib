@@ -47,28 +47,6 @@ public final class HALUtil extends JNIWrapper {
   public static final int RUNTIME_SYSTEMCORE = 3;
 
   /**
-   * Returns the FPGA Version number.
-   *
-   * <p>For now, expect this to be competition year.
-   *
-   * @return FPGA Version number.
-   * @see "HAL_GetFPGAVersion"
-   */
-  public static native short getFPGAVersion();
-
-  /**
-   * Returns the FPGA Revision number.
-   *
-   * <p>The format of the revision is 3 numbers. The 12 most significant bits are the Major
-   * Revision. the next 8 bits are the Minor Revision. The 12 least significant bits are the Build
-   * Number.
-   *
-   * @return FPGA Revision number.
-   * @see "HAL_GetFPGARevision"
-   */
-  public static native int getFPGARevision();
-
-  /**
    * Returns the roboRIO serial number.
    *
    * @return The roboRIO serial number.

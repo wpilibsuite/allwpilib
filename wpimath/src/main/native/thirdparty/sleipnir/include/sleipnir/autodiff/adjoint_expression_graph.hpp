@@ -11,6 +11,7 @@
 #include "sleipnir/autodiff/expression_graph.hpp"
 #include "sleipnir/autodiff/variable.hpp"
 #include "sleipnir/autodiff/variable_matrix.hpp"
+#include "sleipnir/util/assert.hpp"
 
 namespace slp::detail {
 
@@ -50,6 +51,8 @@ class AdjointExpressionGraph {
    * @return The variable's gradient tree.
    */
   VariableMatrix generate_gradient_tree(const VariableMatrix& wrt) const {
+    slp_assert(wrt.cols() == 1);
+
     // Read docs/algorithms.md#Reverse_accumulation_automatic_differentiation
     // for background on reverse accumulation automatic differentiation.
 

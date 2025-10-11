@@ -22,7 +22,7 @@ using namespace frc;
 using enum Alert::AlertType;
 class AlertsTest : public ::testing::Test {
  public:
-  ~AlertsTest() {
+  ~AlertsTest() override {
     // test all destructors
     Update();
     EXPECT_EQ(GetSubscriberForType(kError).Get().size(), 0ul);

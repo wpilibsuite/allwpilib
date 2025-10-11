@@ -15,6 +15,7 @@
   <exclude-pattern>.*/*IntegrationTests.*</exclude-pattern>
   <exclude-pattern>.*/*JNI.*</exclude-pattern>
   <exclude-pattern>.*/math/proto.*</exclude-pattern>
+  <exclude-pattern>.*/commands3/proto.*</exclude-pattern>
 
   <rule ref="category/java/bestpractices.xml">
     <exclude name="AccessorClassGeneration" />
