@@ -7,6 +7,7 @@
 #include <Eigen/QR>
 #include <wpi/SymbolExports.h>
 
+#include "MecanumDriveWheelAccelerations.h"
 #include "frc/EigenCore.h"
 #include "frc/geometry/Translation2d.h"
 #include "frc/geometry/Twist2d.h"
@@ -41,7 +42,8 @@ namespace frc {
  * the robot on the field using encoders and a gyro.
  */
 class WPILIB_DLLEXPORT MecanumDriveKinematics
-    : public Kinematics<MecanumDriveWheelSpeeds, MecanumDriveWheelPositions> {
+    : public Kinematics<MecanumDriveWheelSpeeds, MecanumDriveWheelPositions,
+                        MecanumDriveWheelAccelerations> {
  public:
   /**
    * Constructs a mecanum drive kinematics object.
@@ -169,6 +171,18 @@ class WPILIB_DLLEXPORT MecanumDriveKinematics
       const MecanumDriveWheelPositions& start,
       const MecanumDriveWheelPositions& end, double t) const override {
     return start.Interpolate(end, t);
+  }
+
+  ChassisAccelerations ToChassisAccelerations(
+      const MecanumDriveWheelAccelerations& wheelAccelerations) const override;
+
+  MecanumDriveWheelAccelerations ToWheelAccelerations(
+      const ChassisAccelerations& chassisAccelerations,
+      const Translation2d& centerOfRotation) const;
+
+  MecanumDriveWheelAccelerations ToWheelAccelerations(
+      const ChassisAccelerations& chassisAccelerations) const override {
+    return ToWheelAccelerations(chassisAccelerations, {});
   }
 
  private:

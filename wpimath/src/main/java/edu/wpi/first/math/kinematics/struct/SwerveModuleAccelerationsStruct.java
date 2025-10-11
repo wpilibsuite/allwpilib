@@ -31,6 +31,11 @@ public class SwerveModuleAccelerationsStruct implements Struct<SwerveModuleAccel
   }
 
   @Override
+  public Struct<?>[] getNested() {
+    return new Struct<?>[] {Rotation2d.struct};
+  }
+
+  @Override
   public SwerveModuleAccelerations unpack(ByteBuffer bb) {
     double acceleration = bb.getDouble();
     Rotation2d angle = Rotation2d.struct.unpack(bb);
