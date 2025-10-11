@@ -78,6 +78,8 @@ int InstanceImpl::AllocImpl() {
 void InstanceImpl::Destroy(int inst) {
   if (auto impl = Get(inst)) {
     impl->listenerStorage.Stop();
+
+    std::scoped_lock lock{s_mutex};
     delete s_instances[inst].exchange(nullptr);
   }
 }
