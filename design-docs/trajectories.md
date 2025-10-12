@@ -43,6 +43,12 @@ public abstract class Trajectory<SampleType extends Trajectory.Sample> {
     
     public abstract SampleType interpolate(SampleType start, SampleType end, double t);
     
+    public abstract Trajectory<SampleType> concatenate(Trajectory<SampleType> other);
+    
+    public abstract Trajectory<SampleType> relativeTo(Pose2d other);
+    
+    public abstract Trajectory<SampleType> transformBy(Transform2d other);
+    
     public static abstract class Sample {
         public final Time timestamp;
         public final Pose2d pose;
