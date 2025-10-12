@@ -45,8 +45,7 @@ public class SplineTrajectory extends Trajectory<SplineSample> {
 
     // Check whether the robot is reversing at this stage.
     final boolean reversing =
-        start.velocity.vx < 0
-            || Math.abs(start.velocity.vx) < 1E-9 && start.acceleration.ax < 0;
+        start.velocity.vx < 0 || Math.abs(start.velocity.vx) < 1E-9 && start.acceleration.ax < 0;
 
     // Calculate the new velocity
     // v_f = v_0 + at
@@ -118,4 +117,3 @@ public class SplineTrajectory extends Trajectory<SplineSample> {
     return new SplineTrajectory(reversedSamples);
   }
 }
-

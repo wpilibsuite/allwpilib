@@ -77,4 +77,3 @@ public class BaseTrajectory extends Trajectory<TrajectorySample.Base> {
     return new BaseTrajectory(reversedSamples);
   }
 }
-

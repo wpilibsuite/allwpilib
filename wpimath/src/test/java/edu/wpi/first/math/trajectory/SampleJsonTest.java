@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-public class SampleJsonTest {
+class SampleJsonTest {
   private final Translation2d m_fl = new Translation2d(12, 12);
   private final Translation2d m_fr = new Translation2d(12, -12);
   private final Translation2d m_bl = new Translation2d(-12, 12);

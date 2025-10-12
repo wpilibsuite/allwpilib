@@ -97,4 +97,3 @@ public class SwerveTrajectory extends Trajectory<SwerveSample> {
     return new SwerveTrajectory(reversedSamples);
   }
 }
-

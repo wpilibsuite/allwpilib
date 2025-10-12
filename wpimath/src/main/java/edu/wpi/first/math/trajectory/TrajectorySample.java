@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Twist2d;
-import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.kinematics.ChassisAccelerations;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.struct.TrajectorySampleStruct;
@@ -106,7 +105,8 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
             velocity.vy + acceleration.ay * dts,
             velocity.omega + acceleration.alpha * dts);
 
-    var newPose = pose.plus(new Twist2d(newVel.vx * dts, newVel.vy * dts, newVel.omega * dts).exp());
+    var newPose =
+        pose.plus(new Twist2d(newVel.vx * dts, newVel.vy * dts, newVel.omega * dts).exp());
 
     return new Base(timestamp.plus(dt), newPose, newVel, acceleration);
   }

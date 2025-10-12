@@ -41,9 +41,9 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
    * @return The interpolated sample.
    */
   @Override
-  public DifferentialSample interpolate(DifferentialSample start, DifferentialSample end, double t) {
-    double interpTime =
-        MathUtil.lerp(start.timestamp.in(Seconds), end.timestamp.in(Seconds), t);
+  public DifferentialSample interpolate(
+      DifferentialSample start, DifferentialSample end, double t) {
+    double interpTime = MathUtil.lerp(start.timestamp.in(Seconds), end.timestamp.in(Seconds), t);
 
     double interpDt = interpTime - start.timestamp.in(Seconds);
 
@@ -111,8 +111,7 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
 
   @Override
   public DifferentialTrajectory transformBy(Transform2d transform) {
-    return new DifferentialTrajectory(
-        samples.stream().map(s -> s.transform(transform)).toList());
+    return new DifferentialTrajectory(samples.stream().map(s -> s.transform(transform)).toList());
   }
 
   @Override
@@ -132,8 +131,7 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
 
   @Override
   public DifferentialTrajectory relativeTo(Pose2d other) {
-    return new DifferentialTrajectory(
-        samples.stream().map(s -> s.relativeTo(other)).toList());
+    return new DifferentialTrajectory(samples.stream().map(s -> s.relativeTo(other)).toList());
   }
 
   @Override
@@ -156,4 +154,3 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
     return new DifferentialTrajectory(reversedSamples);
   }
 }
-

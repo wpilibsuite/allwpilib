@@ -2,7 +2,6 @@ package edu.wpi.first.math.trajectory;
 
 import static edu.wpi.first.units.Units.Seconds;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisAccelerations;

@@ -1,16 +1,13 @@
 package edu.wpi.first.math.trajectory;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Seconds;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisAccelerations;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -144,37 +141,6 @@ public class DifferentialSample extends TrajectorySample<DifferentialSample>
    */
   public DifferentialSample(TrajectorySample<?> sample, DifferentialDriveKinematics kinematics) {
     this(sample.timestamp, sample.pose, sample.velocity, sample.acceleration, kinematics);
-  }
-
-  /**
-   * Computes the differential drive dynamics: ẋ = Ax + Bu.
-   *
-   * @param state [x, y, θ, vₗ, vᵣ, ω]
-   * @param input [aₗ, aᵣ, α]
-   * @return the state derivatives [vₗ, vᵣ, ω, aₗ, aᵣ, α]
-   */
-  private Vector<N6> dynamics(Vector<N6> state, Vector<N3> input) {
-    double theta = state.get(2);
-    double vl = state.get(3);
-    double vr = state.get(4);
-    double omega = state.get(5);
-    double leftAccel = input.get(0);
-    double rightAccel = input.get(1);
-    double alpha = input.get(2);
-
-    double v = (vl + vr) / 2.0;
-
-    return VecBuilder.fill(
-        v * Math.cos(theta), v * Math.sin(theta), omega, leftAccel, rightAccel, alpha);
-  }
-
-  /**
-   * Matrix version of {@link #dynamics(Vector, Vector)} for use with {@link NumericalIntegration}'s
-   * rkdp method.
-   */
-  private Matrix<N6, N1> dynamics(Matrix<N6, N1> state, Matrix<N3, N1> input) {
-    return dynamics(
-        new Vector<>(state.extractColumnVector(0)), new Vector<>(input.extractColumnVector(0)));
   }
 
   @Override

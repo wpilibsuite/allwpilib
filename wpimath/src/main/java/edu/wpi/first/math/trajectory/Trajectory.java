@@ -10,7 +10,6 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.units.measure.Time;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -122,8 +121,8 @@ public abstract class Trajectory<SampleType extends TrajectorySample<SampleType>
 
   /**
    * Returns a new trajectory with the direction of travel reversed. All poses, velocities, and
-   * accelerations are negated along the direction of travel. The returned trajectory represents
-   * the same path but traversed in the opposite direction.
+   * accelerations are negated along the direction of travel. The returned trajectory represents the
+   * same path but traversed in the opposite direction.
    *
    * @return a new trajectory with the direction of travel reversed.
    */

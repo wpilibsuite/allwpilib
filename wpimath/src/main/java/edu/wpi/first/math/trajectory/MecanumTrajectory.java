@@ -90,4 +90,3 @@ public class MecanumTrajectory extends Trajectory<MecanumSample> {
     return new MecanumTrajectory(reversedSamples);
   }
 }
-
