@@ -70,4 +70,9 @@ to properly interpolate the samples.
 
 ## Design: Serialization
 
+The trajectory API will be serialized using JSON so that external tools can create
+valid trajectories for use with WPILib.
 
+For each type of trajectory, 
+the JSON file will contain enough information to create the respective `Kinematics` object,
+followed by a list of `SampleType` objects.
