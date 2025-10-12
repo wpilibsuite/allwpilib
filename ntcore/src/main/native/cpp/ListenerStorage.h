@@ -112,20 +112,10 @@ class ListenerStorage final : public IListenerStorage {
 
     void Main() final;
 
-    // Stops running callbacks.
-    //
-    // Returns true if successful, or false if the caller should wait for the
-    // queue to empty.
-    bool Shutdown();
-
     NT_ListenerPoller m_poller;
     wpi::DenseMap<NT_Listener, ListenerCallback> m_callbacks;
     wpi::Event m_waitQueueWakeup;
     wpi::Event m_waitQueueWaiter;
-
-   private:
-    std::atomic_bool m_shutdown;
-    std::atomic_bool m_inCallback;
   };
   wpi::SafeThreadOwner<Thread> m_thread;
 };
