@@ -177,59 +177,6 @@ public class DifferentialSample extends TrajectorySample<DifferentialSample>
         new Vector<>(state.extractColumnVector(0)), new Vector<>(input.extractColumnVector(0)));
   }
 
-  /**
-   * Interpolates between this sample and the given sample using numerical integration of the
-   * differential drive differential equation.
-   *
-   * @param endValue The end sample.
-   * @param t The time between this sample and the end sample. Should be in the range [0, 1].
-   * @return new sample
-   */
-  @Override
-  public DifferentialSample interpolate(DifferentialSample endValue, double t) {
-    double interpTime =
-        MathUtil.lerp(this.timestamp.in(Seconds), endValue.timestamp.in(Seconds), t);
-
-    double interpDt = interpTime - this.timestamp.in(Seconds);
-
-    Matrix<N6, N1> initialState =
-        VecBuilder.fill(
-            pose.getX(),
-            pose.getY(),
-            pose.getRotation().getRadians(),
-            velocity.vx,
-            velocity.vy,
-            velocity.omega);
-
-    Vector<N3> initialInput = VecBuilder.fill(acceleration.ax, acceleration.ay, acceleration.alpha);
-
-    // integrate state derivatives [vₗ, vᵣ, ω, aₗ, aᵣ, α] to new states [x, y, θ, vₗ, vᵣ, ω]
-    Matrix<N6, N1> endState =
-        NumericalIntegration.rkdp(this::dynamics, initialState, initialInput, interpDt);
-
-    double x = endState.get(0, 0);
-    double y = endState.get(1, 0);
-    double theta = endState.get(2, 0);
-
-    double vl = endState.get(3, 0);
-    double vr = endState.get(4, 0);
-    double vx = (vl + vr) / 2.0;
-    double vy = 0.0;
-    double omega = endState.get(5, 0);
-
-    double ax = MathUtil.lerp(this.acceleration.ax, endValue.acceleration.ax, t);
-    double ay = MathUtil.lerp(this.acceleration.ay, endValue.acceleration.ay, t);
-    double alpha = MathUtil.lerp(this.acceleration.alpha, endValue.acceleration.alpha, t);
-
-    return new DifferentialSample(
-        Seconds.of(interpTime),
-        new Pose2d(x, y, Rotation2d.fromRadians(theta)),
-        new ChassisSpeeds(vx, vy, omega),
-        new ChassisAccelerations(ax, ay, alpha),
-        vl,
-        vr);
-  }
-
   @Override
   public DifferentialSample transform(Transform2d transform) {
     return new DifferentialSample(

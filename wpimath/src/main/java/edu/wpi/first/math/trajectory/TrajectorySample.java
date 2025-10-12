@@ -22,7 +22,7 @@ import java.util.Objects;
 /** Represents a single sample in a trajectory. */
 @JsonPropertyOrder({"timestamp", "pose", "vel", "accel"})
 public abstract class TrajectorySample<SampleType extends TrajectorySample<SampleType>>
-    implements Interpolatable<SampleType>, StructSerializable {
+    implements StructSerializable {
   /** The timestamp of the sample relative to the trajectory start. */
   @JsonIgnore public final Time timestamp;
 
@@ -200,19 +200,6 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
 
     public Base(TrajectorySample<?> sample) {
       super(sample.timestamp, sample.pose, sample.velocity, sample.acceleration);
-    }
-
-    /**
-     * Interpolates between this sample and the end sample using constant-acceleratopm kinematic
-     * equations.
-     *
-     * @param endValue The end sample.
-     * @param t The time between this sample and the end sample. Should be in the range [0, 1].
-     * @return new sample
-     */
-    @Override
-    public Base interpolate(Base endValue, double t) {
-      return TrajectorySample.kinematicInterpolate(this, endValue, t);
     }
 
     @Override

@@ -96,28 +96,6 @@ public class MecanumSample extends TrajectorySample<MecanumSample> {
     this(sample.timestamp, sample.pose, sample.velocity, sample.acceleration, kinematics);
   }
 
-  /**
-   * Linearly interpolates between this sample and the given sample.
-   *
-   * @param endValue The end sample.
-   * @param t The time between this sample and the end sample. Should be in the range [0, 1].
-   * @return new sample
-   */
-  @Override
-  public MecanumSample interpolate(MecanumSample endValue, double t) {
-    return new MecanumSample(
-        Seconds.of(
-            MathUtil.lerp(this.timestamp.in(Seconds), endValue.timestamp.in(Seconds), t)),
-        this.pose.interpolate(endValue.pose, t),
-        this.velocity.interpolate(endValue.velocity, t),
-        this.acceleration.interpolate(endValue.acceleration, t),
-        new MecanumDriveWheelSpeeds(
-            MathUtil.lerp(this.speeds.frontLeft, endValue.speeds.frontLeft, t),
-            MathUtil.lerp(this.speeds.frontRight, endValue.speeds.frontRight, t),
-            MathUtil.lerp(this.speeds.rearLeft, endValue.speeds.rearLeft, t),
-            MathUtil.lerp(this.speeds.rearRight, endValue.speeds.rearRight, t)));
-  }
-
   @Override
   public MecanumSample transform(Transform2d transform) {
     return new MecanumSample(

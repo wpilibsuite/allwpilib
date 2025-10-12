@@ -69,35 +69,6 @@ public class SwerveSample extends TrajectorySample<SwerveSample> {
     this(sample.timestamp, sample.pose, sample.velocity, sample.acceleration, kinematics);
   }
 
-  /**
-   * Interpolates between this sample and the given sample using Euler integration on this sample
-   * state.
-   *
-   * @param endValue The end sample.
-   * @param t The time between this sample and the end sample. Should be in the range [0, 1].
-   * @return new sample
-   */
-  @Override
-  public SwerveSample interpolate(SwerveSample endValue, double t) {
-    if (this.states.length != endValue.states.length) {
-      throw new IllegalArgumentException(
-          "Cannot interpolate SwerveSample with different number of states: "
-              + this.states.length
-              + " vs "
-              + endValue.states.length);
-    }
-    SwerveModuleState[] newStates = new SwerveModuleState[this.states.length];
-    for (int i = 0; i < this.states.length; i++) {
-      newStates[i] = this.states[i].interpolate(endValue.states[i], t);
-    }
-    return new SwerveSample(
-        Seconds.of(MathUtil.lerp(timestamp.in(Seconds), endValue.timestamp.in(Seconds), t)),
-        pose.interpolate(endValue.pose, t),
-        velocity.interpolate(endValue.velocity, t),
-        acceleration.interpolate(endValue.acceleration, t),
-        newStates);
-  }
-
   @Override
   public SwerveSample transform(Transform2d transform) {
     return new SwerveSample(timestamp, pose.transformBy(transform), velocity, acceleration, states);
