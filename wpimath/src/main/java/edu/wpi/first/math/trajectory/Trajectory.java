@@ -10,8 +10,8 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.units.measure.Time;
+import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
 
 /**
  * Represents a trajectory consisting of a list of {@link TrajectorySample}s, kinematically
@@ -20,7 +20,7 @@ import java.util.List;
 public abstract class Trajectory<SampleType extends TrajectorySample<SampleType>> {
 
   /** The samples this Trajectory is composed of. */
-  public final List<SampleType> samples;
+  public final SampleType[] samples;
 
   private final InterpolatingTreeMap<Time, SampleType> sampleMap;
 
@@ -33,10 +33,13 @@ public abstract class Trajectory<SampleType extends TrajectorySample<SampleType>
    * @param samples the samples of the trajectory. Order does not matter as they will be ordered
    *     internally.
    */
-  @SuppressWarnings("this-escape")
-  public Trajectory(List<SampleType> samples) {
+  @SuppressWarnings({"this-escape", "unchecked"})
+  public Trajectory(SampleType[] samples) {
     this.samples =
-        samples.stream().sorted(Comparator.comparingDouble(s -> s.timestamp.in(Seconds))).toList();
+        (SampleType[])
+            Arrays.stream(samples)
+                .sorted(Comparator.comparingDouble(s -> s.timestamp.in(Seconds)))
+                .toArray(TrajectorySample[]::new);
 
     this.sampleMap =
         new InterpolatingTreeMap<>(
@@ -44,12 +47,12 @@ public abstract class Trajectory<SampleType extends TrajectorySample<SampleType>
                 MathUtil.inverseLerp(start.in(Seconds), end.in(Seconds), q.in(Seconds)),
             this::interpolate);
 
-    this.samples.forEach(
-        sample -> {
-          this.sampleMap.put(sample.timestamp, sample);
-        });
+    for (var sample : this.samples) {
+      sampleMap.put(sample.timestamp, sample);
+    }
 
-    this.duration = this.samples.getLast().timestamp;
+    this.duration =
+        this.samples.length > 0 ? this.samples[this.samples.length - 1].timestamp : Seconds.of(0.0);
   }
 
   /**
@@ -120,15 +123,6 @@ public abstract class Trajectory<SampleType extends TrajectorySample<SampleType>
   public abstract Trajectory<SampleType> relativeTo(Pose2d other);
 
   /**
-   * Returns a new trajectory with the direction of travel reversed. All poses, velocities, and
-   * accelerations are negated along the direction of travel. The returned trajectory represents the
-   * same path but traversed in the opposite direction.
-   *
-   * @return a new trajectory with the direction of travel reversed.
-   */
-  public abstract Trajectory<SampleType> reversed();
-
-  /**
    * Converts this trajectory to a differential trajectory, allowing for easier following by
    * differential drives.
    *
@@ -136,8 +130,7 @@ public abstract class Trajectory<SampleType extends TrajectorySample<SampleType>
    * @return the trajectory with differential samples.
    */
   public DifferentialTrajectory toDifferentialTrajectory(DifferentialDriveKinematics kinematics) {
-    return new DifferentialTrajectory(
-        samples.stream().map(s -> new DifferentialSample(s, kinematics)).toList());
+    return new DifferentialTrajectory(kinematics, samples);
   }
 
   /**
@@ -148,8 +141,7 @@ public abstract class Trajectory<SampleType extends TrajectorySample<SampleType>
    * @return the trajectory with mecanum samples.
    */
   public MecanumTrajectory toMecanumTrajectory(MecanumDriveKinematics kinematics) {
-    return new MecanumTrajectory(
-        samples.stream().map(s -> new MecanumSample(s, kinematics)).toList());
+    return new MecanumTrajectory(kinematics, samples);
   }
 
   /**
@@ -160,7 +152,6 @@ public abstract class Trajectory<SampleType extends TrajectorySample<SampleType>
    * @return the trajectory with swerve samples.
    */
   public SwerveTrajectory toSwerveTrajectory(SwerveDriveKinematics kinematics) {
-    return new SwerveTrajectory(
-        samples.stream().map(s -> new SwerveSample(s, kinematics)).toList());
+    return new SwerveTrajectory(kinematics, samples);
   }
 }

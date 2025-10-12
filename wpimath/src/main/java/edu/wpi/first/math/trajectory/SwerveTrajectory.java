@@ -1,17 +1,14 @@
 package edu.wpi.first.math.trajectory;
 
-import static edu.wpi.first.units.Units.Seconds;
-
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import java.util.ArrayList;
-import java.util.List;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import java.util.Arrays;
+import java.util.stream.Stream;
 
 /** A trajectory for swerve drive robots with drivetrain-specific interpolation. */
 public class SwerveTrajectory extends Trajectory<SwerveSample> {
+  private final SwerveDriveKinematics kinematics;
 
   /**
    * Constructs a SwerveTrajectory.
@@ -19,8 +16,17 @@ public class SwerveTrajectory extends Trajectory<SwerveSample> {
    * @param samples the samples of the trajectory. Order does not matter as they will be ordered
    *     internally.
    */
-  public SwerveTrajectory(List<SwerveSample> samples) {
+  public SwerveTrajectory(SwerveDriveKinematics kinematics, SwerveSample[] samples) {
     super(samples);
+    this.kinematics = kinematics;
+  }
+
+  public SwerveTrajectory(SwerveDriveKinematics kinematics, TrajectorySample<?>[] samples) {
+    this(
+        kinematics,
+        Arrays.stream(samples)
+            .map(s -> new SwerveSample(s, kinematics))
+            .toArray(SwerveSample[]::new));
   }
 
   /**
@@ -40,60 +46,41 @@ public class SwerveTrajectory extends Trajectory<SwerveSample> {
               + " vs "
               + end.states.length);
     }
-    SwerveModuleState[] newStates = new SwerveModuleState[start.states.length];
-    for (int i = 0; i < start.states.length; i++) {
-      newStates[i] = start.states[i].interpolate(end.states[i], t);
-    }
-    return new SwerveSample(
-        Seconds.of(MathUtil.lerp(start.timestamp.in(Seconds), end.timestamp.in(Seconds), t)),
-        start.pose.interpolate(end.pose, t),
-        start.velocity.interpolate(end.velocity, t),
-        start.acceleration.interpolate(end.acceleration, t),
-        newStates);
+
+    var interpolated = TrajectorySample.kinematicInterpolate(start, end, t);
+
+    return new SwerveSample(interpolated, kinematics);
   }
 
   @Override
   public SwerveTrajectory transformBy(Transform2d transform) {
-    return new SwerveTrajectory(samples.stream().map(s -> s.transform(transform)).toList());
+    return new SwerveTrajectory(
+        kinematics,
+        Arrays.stream(samples).map(s -> s.transform(transform)).toArray(SwerveSample[]::new));
   }
 
   @Override
   public SwerveTrajectory concatenate(Trajectory<SwerveSample> other) {
-    if (other.samples.isEmpty()) {
+    if (other.samples.length < 1) {
       return this;
     }
 
-    var combinedSamples = new ArrayList<>(this.samples);
-    combinedSamples.addAll(
-        other.samples.stream()
+    var withNewTimestamp =
+        Arrays.stream(other.samples)
             .map(s -> s.withNewTimestamp(s.timestamp.plus(this.duration)))
-            .toList());
+            .toArray(SwerveSample[]::new);
 
-    return new SwerveTrajectory(combinedSamples);
+    var combinedSamples =
+        Stream.concat(Arrays.stream(samples), Arrays.stream(withNewTimestamp))
+            .toArray(SwerveSample[]::new);
+
+    return new SwerveTrajectory(kinematics, combinedSamples);
   }
 
   @Override
   public SwerveTrajectory relativeTo(Pose2d other) {
-    return new SwerveTrajectory(samples.stream().map(s -> s.relativeTo(other)).toList());
-  }
-
-  @Override
-  public SwerveTrajectory reversed() {
-    var reversedSamples = new ArrayList<SwerveSample>();
-    var lastTimestamp = this.duration;
-
-    for (int i = samples.size() - 1; i >= 0; i--) {
-      var sample = samples.get(i);
-      var newTimestamp = lastTimestamp.minus(sample.timestamp);
-
-      // Create a transform that rotates 180 degrees to reverse direction
-      var reverseTransform = new Transform2d(0, 0, new Rotation2d(Math.PI));
-
-      // Transform the sample and update timestamp
-      var reversedSample = sample.transform(reverseTransform).withNewTimestamp(newTimestamp);
-      reversedSamples.add(reversedSample);
-    }
-
-    return new SwerveTrajectory(reversedSamples);
+    return new SwerveTrajectory(
+        kinematics,
+        Arrays.stream(samples).map(s -> s.relativeTo(other)).toArray(SwerveSample[]::new));
   }
 }

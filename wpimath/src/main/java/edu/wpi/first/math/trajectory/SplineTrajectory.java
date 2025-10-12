@@ -4,10 +4,10 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 /** A trajectory for spline-based path following. */
 public class SplineTrajectory extends Trajectory<SplineSample> {
@@ -18,8 +18,18 @@ public class SplineTrajectory extends Trajectory<SplineSample> {
    * @param samples the samples of the trajectory. Order does not matter as they will be ordered
    *     internally.
    */
-  public SplineTrajectory(List<SplineSample> samples) {
+  public SplineTrajectory(SplineSample[] samples) {
     super(samples);
+  }
+
+  /**
+   * Constructs a SplineTrajectory.
+   *
+   * @param samples the samples of the trajectory. Order does not matter as they will be ordered
+   *     internally.
+   */
+  public SplineTrajectory(List<SplineSample> samples) {
+    super(samples.toArray(SplineSample[]::new));
   }
 
   /**
@@ -74,46 +84,31 @@ public class SplineTrajectory extends Trajectory<SplineSample> {
 
   @Override
   public SplineTrajectory transformBy(Transform2d transform) {
-    return new SplineTrajectory(samples.stream().map(s -> s.transform(transform)).toList());
+    return new SplineTrajectory(
+        Arrays.stream(samples).map(s -> s.transform(transform)).toArray(SplineSample[]::new));
   }
 
   @Override
   public SplineTrajectory concatenate(Trajectory<SplineSample> other) {
-    if (other.samples.isEmpty()) {
+    if (other.samples.length < 1) {
       return this;
     }
 
-    var combinedSamples = new ArrayList<>(this.samples);
-    combinedSamples.addAll(
-        other.samples.stream()
+    var withNewTimestamp =
+        Arrays.stream(other.samples)
             .map(s -> s.withNewTimestamp(s.timestamp.plus(this.duration)))
-            .toList());
+            .toArray(SplineSample[]::new);
+
+    var combinedSamples =
+        Stream.concat(Arrays.stream(samples), Arrays.stream(withNewTimestamp))
+            .toArray(SplineSample[]::new);
 
     return new SplineTrajectory(combinedSamples);
   }
 
   @Override
   public SplineTrajectory relativeTo(Pose2d other) {
-    return new SplineTrajectory(samples.stream().map(s -> s.relativeTo(other)).toList());
-  }
-
-  @Override
-  public SplineTrajectory reversed() {
-    var reversedSamples = new ArrayList<SplineSample>();
-    var lastTimestamp = this.duration;
-
-    for (int i = samples.size() - 1; i >= 0; i--) {
-      var sample = samples.get(i);
-      var newTimestamp = lastTimestamp.minus(sample.timestamp);
-
-      // Create a transform that rotates 180 degrees to reverse direction
-      var reverseTransform = new Transform2d(0, 0, new Rotation2d(Math.PI));
-
-      // Transform the sample and update timestamp
-      var reversedSample = sample.transform(reverseTransform).withNewTimestamp(newTimestamp);
-      reversedSamples.add(reversedSample);
-    }
-
-    return new SplineTrajectory(reversedSamples);
+    return new SplineTrajectory(
+        Arrays.stream(samples).map(s -> s.relativeTo(other)).toArray(SplineSample[]::new));
   }
 }

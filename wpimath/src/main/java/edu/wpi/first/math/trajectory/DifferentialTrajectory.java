@@ -11,12 +11,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisAccelerations;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N6;
 import edu.wpi.first.math.system.NumericalIntegration;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.stream.Stream;
 
 /** A trajectory for differential drive robots with drivetrain-specific interpolation. */
 public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
@@ -27,8 +28,16 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
    * @param samples the samples of the trajectory. Order does not matter as they will be ordered
    *     internally.
    */
-  public DifferentialTrajectory(List<DifferentialSample> samples) {
+  public DifferentialTrajectory(DifferentialSample[] samples) {
     super(samples);
+  }
+
+  public DifferentialTrajectory(
+      DifferentialDriveKinematics kinematics, TrajectorySample<?>[] samples) {
+    this(
+        Arrays.stream(samples)
+            .map(s -> new DifferentialSample(s, kinematics))
+            .toArray(DifferentialSample[]::new));
   }
 
   /**
@@ -61,8 +70,7 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
 
     // integrate state derivatives [vₗ, vᵣ, ω, aₗ, aᵣ, α] to new states [x, y, θ, vₗ, vᵣ, ω]
     Matrix<N6, N1> endState =
-        NumericalIntegration.rkdp(
-            (state, input) -> dynamics(state, input), initialState, initialInput, interpDt);
+        NumericalIntegration.rkdp(this::dynamics, initialState, initialInput, interpDt);
 
     double x = endState.get(0, 0);
     double y = endState.get(1, 0);
@@ -111,46 +119,31 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
 
   @Override
   public DifferentialTrajectory transformBy(Transform2d transform) {
-    return new DifferentialTrajectory(samples.stream().map(s -> s.transform(transform)).toList());
+    return new DifferentialTrajectory(
+        Arrays.stream(samples).map(s -> s.transform(transform)).toArray(DifferentialSample[]::new));
   }
 
   @Override
   public DifferentialTrajectory concatenate(Trajectory<DifferentialSample> other) {
-    if (other.samples.isEmpty()) {
+    if (other.samples.length < 1) {
       return this;
     }
 
-    var combinedSamples = new ArrayList<>(this.samples);
-    combinedSamples.addAll(
-        other.samples.stream()
+    var withNewTimestamp =
+        Arrays.stream(other.samples)
             .map(s -> s.withNewTimestamp(s.timestamp.plus(this.duration)))
-            .toList());
+            .toArray(DifferentialSample[]::new);
+
+    var combinedSamples =
+        Stream.concat(Arrays.stream(samples), Arrays.stream(withNewTimestamp))
+            .toArray(DifferentialSample[]::new);
 
     return new DifferentialTrajectory(combinedSamples);
   }
 
   @Override
   public DifferentialTrajectory relativeTo(Pose2d other) {
-    return new DifferentialTrajectory(samples.stream().map(s -> s.relativeTo(other)).toList());
-  }
-
-  @Override
-  public DifferentialTrajectory reversed() {
-    var reversedSamples = new ArrayList<DifferentialSample>();
-    var lastTimestamp = this.duration;
-
-    for (int i = samples.size() - 1; i >= 0; i--) {
-      var sample = samples.get(i);
-      var newTimestamp = lastTimestamp.minus(sample.timestamp);
-
-      // Create a transform that rotates 180 degrees to reverse direction
-      var reverseTransform = new Transform2d(0, 0, new Rotation2d(Math.PI));
-
-      // Transform the sample and update timestamp
-      var reversedSample = sample.transform(reverseTransform).withNewTimestamp(newTimestamp);
-      reversedSamples.add(reversedSample);
-    }
-
-    return new DifferentialTrajectory(reversedSamples);
+    return new DifferentialTrajectory(
+        Arrays.stream(samples).map(s -> s.relativeTo(other)).toArray(DifferentialSample[]::new));
   }
 }
