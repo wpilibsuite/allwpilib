@@ -31,13 +31,6 @@ class TableListenerTest : public ::testing::Test {
 
   void PublishTopics();
 
-  // Returns whether the m_inst resolves to an InstanceImpl.
-  //
-  // These tests cannot simply rely on inst.m_handle since
-  // NetworkTableInstance::Destroy() zeroeds it after it calls
-  // DestroyInstance().
-  bool InstanceValid();
-
  protected:
   nt::NetworkTableInstance m_inst;
   nt::DoublePublisher m_foovalue;
@@ -51,12 +44,21 @@ void TableListenerTest::PublishTopics() {
   m_bazvalue = m_inst.GetDoubleTopic("/baz/bazvalue").Publish();
 }
 
-bool TableListenerTest::InstanceValid() {
-  if (auto handle = m_inst.GetHandle()) {
-    int inst = nt::Handle{handle}.GetTypedInst(nt::Handle::kInstance);
-    return nt::InstanceImpl::Get(inst);
+// Matchers for checking the validity of a NetworkTableInstance.
+//
+// Note: These tests cannot simply rely on inst.m_handle since
+// NetworkTableInstance::Destroy() zeroeds it after it calls
+// DestroyInstance().
+MATCHER(HasHandle, "") {
+  return !!arg.GetHandle();
+}
+MATCHER(MapsToInstanceImpl, "") {
+  auto handle = arg.GetHandle();
+  if (!handle) {
+    return true;
   }
-  return false;
+  int inst = nt::Handle{handle}.GetTypedInst(nt::Handle::kInstance);
+  return nt::InstanceImpl::Get(inst) != nullptr;
 }
 
 TEST_F(TableListenerTest, AddListener) {
@@ -87,6 +89,8 @@ TEST_F(TableListenerTest, DestroyInstanceWhileInCallack) {
   table->AddListener(
       NT_EVENT_TOPIC | NT_EVENT_IMMEDIATE,
       [&](auto table, auto key, auto& event) {
+        EXPECT_THAT(m_inst, HasHandle());
+        EXPECT_THAT(m_inst, MapsToInstanceImpl());
         wpi::SetEvent(listenerCalledEvent);
         SCOPED_TRACE(
             "[Listener] Sent listenerCalledEvent; waiting for "
@@ -110,7 +114,8 @@ TEST_F(TableListenerTest, DestroyInstanceWhileInCallack) {
             if (destroyCalled) {
               EXPECT_FALSE(destroyReturned);
               if (!destroyReturned) {
-                EXPECT_TRUE(InstanceValid());
+                EXPECT_THAT(m_inst, HasHandle());
+                EXPECT_THAT(m_inst, MapsToInstanceImpl());
               }
             }
           }
@@ -125,7 +130,8 @@ TEST_F(TableListenerTest, DestroyInstanceWhileInCallack) {
   auto publisher = m_inst.GetIntegerTopic("/Preferences/key").Publish();
   ASSERT_TRUE(wpi::WaitForObject(listenerCalledEvent, 1.0, NULL));
 
-  ASSERT_TRUE(InstanceValid());
+  ASSERT_THAT(m_inst, HasHandle());
+  ASSERT_THAT(m_inst, MapsToInstanceImpl());
 
   // Call Destroy() in a separate thread, in case in hangs.
   // Note: After the thread is created, use EXPECT_*() tests until thread
@@ -139,6 +145,7 @@ TEST_F(TableListenerTest, DestroyInstanceWhileInCallack) {
     SCOPED_TRACE("[Destroyer thread] Calling Destroy()");
 
     nt::NetworkTableInstance::Destroy(m_inst);
+    SCOPED_TRACE("[Destroyer thread] Returned from Destroy()");
     destroyReturned = true;
 
     EXPECT_FALSE(m_inst);
