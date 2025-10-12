@@ -49,13 +49,13 @@ void TableListenerTest::PublishTopics() {
 // Note: These tests cannot simply rely on inst.m_handle since
 // NetworkTableInstance::Destroy() zeroeds it after it calls
 // DestroyInstance().
-MATCHER(HasHandle, "") {
+MATCHER(HasHandle, "a non-zero handle") {
   return !!arg.GetHandle();
 }
-MATCHER(MapsToInstanceImpl, "") {
+MATCHER(MapsToInstanceImpl, "a handle mapping to an InstanceImpl") {
   auto handle = arg.GetHandle();
   if (!handle) {
-    return true;
+    return ExplainMatchResult(HasHandle(), arg, result_listener);
   }
   int inst = nt::Handle{handle}.GetTypedInst(nt::Handle::kInstance);
   return nt::InstanceImpl::Get(inst) != nullptr;
