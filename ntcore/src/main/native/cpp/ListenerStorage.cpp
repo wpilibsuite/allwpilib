@@ -28,17 +28,12 @@ void ListenerStorage::Thread::Main() {
     if (!events.empty()) {
       std::unique_lock lock{m_mutex};
       for (auto&& event : events) {
-        if (m_shutdown) {
-          break;
-        }
         auto callbackIt = m_callbacks.find(event.listener);
         if (callbackIt != m_callbacks.end()) {
           auto callback = callbackIt->second;
-          m_inCallback = true;
           lock.unlock();
           callback(event);
           lock.lock();
-          m_inCallback = false;
         }
       }
     }
@@ -47,13 +42,6 @@ void ListenerStorage::Thread::Main() {
       m_waitQueueWaiter.Set();
     }
   }
-}
-
-bool ListenerStorage::Thread::Shutdown() {
-  if (m_active && !m_shutdown.exchange(true)) {
-    return !m_inCallback;
-  }
-  return true;
 }
 
 void ListenerStorage::Activate(NT_Listener listenerHandle, unsigned int mask,
@@ -372,20 +360,16 @@ void ListenerStorage::Reset() {
 }
 
 void ListenerStorage::Stop() {
-  bool join = false;
   {
     std::scoped_lock lock{m_mutex};
     if (auto thr = m_thread.GetThread()) {
-      if (!thr->Shutdown()) {
-        thr->m_waitQueueWakeup.Set();
-        join = true;
-      }
+      thr->m_waitQueueWakeup.Set();
+    } else {
+      return;
     }
   }
 
-  if (join) {
-    m_thread.Join();
-  }
+  m_thread.Join();
 }
 
 std::vector<std::pair<NT_Listener, unsigned int>>
