@@ -34,6 +34,7 @@ public abstract class Trajectory<SampleType extends TrajectorySample<SampleType>
    * @param samples the samples of the trajectory. Order does not matter as they will be ordered
    *     internally.
    */
+  @SuppressWarnings("this-escape")
   public Trajectory(List<SampleType> samples) {
     this.samples =
         samples.stream().sorted(Comparator.comparingDouble(s -> s.timestamp.in(Seconds))).toList();
