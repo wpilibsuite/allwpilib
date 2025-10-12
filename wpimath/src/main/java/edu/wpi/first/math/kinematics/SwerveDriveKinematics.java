@@ -448,9 +448,6 @@ public class SwerveDriveKinematics
    * argument is defaulted to that use case. However, if you wish to change the center of rotation
    * for evasive maneuvers, vision alignment, or for any other use case, you can do so.
    *
-   * <p>In the case that the desired chassis accelerations are zero (i.e. the robot will be
-   * stationary), the previously calculated module angle will be maintained.
-   *
    * @param chassisAccelerations The desired chassis accelerations.
    * @param angularVelocity The desired robot angular velocity.
    * @param centerOfRotation The center of rotation. For example, if you set the center of rotation
