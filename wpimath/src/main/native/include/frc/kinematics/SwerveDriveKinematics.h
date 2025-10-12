@@ -480,8 +480,7 @@ class SwerveDriveKinematics
         chassisAccelerations.ay == 0.0_mps_sq &&
         chassisAccelerations.alpha == 0.0_rad_per_s_sq) {
       for (size_t i = 0; i < NumModules; i++) {
-        moduleAccelerations[i] = {
-            0.0_mps_sq, Rotation2d{0.0, 0.0}};  // maintain previous angle
+        moduleAccelerations[i] = {0.0_mps_sq, Rotation2d{0.0_rad}};
       }
       return moduleAccelerations;
     }
@@ -510,7 +509,7 @@ class SwerveDriveKinematics
           units::math::hypot(x, y);
 
       moduleAccelerations[i] = {linearAcceleration,
-                                Rotation2d{(x.value()), y.value()}};
+                                Rotation2d{x.value(), y.value()}};
     }
 
     return moduleAccelerations;
@@ -527,8 +526,7 @@ class SwerveDriveKinematics
    */
   wpi::array<SwerveModuleAccelerations, NumModules> ToWheelAccelerations(
       const ChassisAccelerations& chassisAccelerations) const override {
-    return ToSwerveModuleAccelerations(chassisAccelerations, 0.0_rad_per_s,
-                                       Translation2d{});
+    return ToSwerveModuleAccelerations(chassisAccelerations);
   }
 
   /**
