@@ -46,7 +46,7 @@ class LTVUnicycleControllerTest {
     }
 
     final var states = trajectory.samples;
-    final var endPose = states.get(states.size() - 1).pose;
+    final var endPose = states[states.length - 1].pose;
 
     // Java lambdas require local variables referenced from a lambda expression
     // must be final or effectively final.

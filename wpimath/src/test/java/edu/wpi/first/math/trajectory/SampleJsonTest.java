@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +23,7 @@ class SampleJsonTest {
   public void testBaseSample() {
     ObjectMapper mapper = new ObjectMapper();
     Trajectory<SplineSample> trajectory = TrajectoryGeneratorTest.getTrajectory(new ArrayList<>());
-    trajectory.samples.stream()
+    Arrays.stream(trajectory.samples)
         .map(TrajectorySample.Base::new)
         .forEach(
             sample -> {
@@ -41,7 +42,7 @@ class SampleJsonTest {
 
     Trajectory<SplineSample> trajectory = TrajectoryGeneratorTest.getTrajectory(new ArrayList<>());
     List<TrajectorySample.Base> samples =
-        trajectory.samples.stream().map(TrajectorySample.Base::new).toList();
+        Arrays.stream(trajectory.samples).map(TrajectorySample.Base::new).toList();
 
     for (TrajectorySample.Base sample : samples) {
       try {
@@ -61,7 +62,7 @@ class SampleJsonTest {
     Trajectory<DifferentialSample> trajectory =
         TrajectoryGeneratorTest.getTrajectory(new ArrayList<>())
             .toDifferentialTrajectory(new DifferentialDriveKinematics(0.5));
-    trajectory.samples.forEach(
+    Arrays.stream(trajectory.samples).forEach(
         sample -> {
           try {
             String json = mapper.writeValueAsString(sample);
@@ -86,7 +87,7 @@ class SampleJsonTest {
     Trajectory<MecanumSample> trajectory =
         TrajectoryGeneratorTest.getTrajectory(new ArrayList<>())
             .toMecanumTrajectory(new MecanumDriveKinematics(m_fl, m_fr, m_bl, m_br));
-    trajectory.samples.forEach(
+    Arrays.stream(trajectory.samples).forEach(
         sample -> {
           try {
             String json = mapper.writeValueAsString(sample);

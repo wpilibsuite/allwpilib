@@ -33,21 +33,21 @@ class TrajectoryConcatenateTest {
     var t = t1.concatenate(t2);
 
     double time = -1.0;
-    for (int i = 0; i < t.samples.size(); ++i) {
-      var state = t.samples.get(i);
+    for (int i = 0; i < t.samples.length; ++i) {
+      var state = t.samples[i];
 
       // Make sure that the timestamps are strictly increasing.
       assertTrue(state.timestamp.in(Seconds) >= time);
       time = state.timestamp.in(Seconds);
 
       // Ensure that the states in t are the same as those in t1 and t2.
-      if (i < t1.samples.size()) {
-        assertEquals(state, t1.samples.get(i));
+      if (i < t1.samples.length) {
+        assertEquals(state, t1.samples[i]);
       } else {
         // For the second trajectory, we need to account for the offset
-        var originalIndex = i - t1.samples.size();
-        if (originalIndex < t2.samples.size()) {
-          var st = t2.samples.get(originalIndex);
+        var originalIndex = i - t1.samples.length;
+        if (originalIndex < t2.samples.length) {
+          var st = t2.samples[originalIndex];
           // The concatenate method should handle timestamp adjustment automatically
           // We just verify the pose, velocity, and acceleration are preserved
           assertEquals(state.pose, st.pose);

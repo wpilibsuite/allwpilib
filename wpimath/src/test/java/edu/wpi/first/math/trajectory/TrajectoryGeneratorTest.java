@@ -72,7 +72,7 @@ class TrajectoryGeneratorTest {
             List.of(Pose2d.kZero, new Pose2d(1, 0, Rotation2d.kPi)),
             new TrajectoryConfig(feetToMeters(12), feetToMeters(12)));
 
-    assertEquals(traj.samples.size(), 1);
+    assertEquals(traj.samples.length, 1);
     assertEquals(traj.duration.in(Seconds), 0);
   }
 
@@ -88,8 +88,8 @@ class TrajectoryGeneratorTest {
                 new Pose2d(1, 0, Rotation2d.kCCW_Pi_2)),
             new TrajectoryConfig(2, 2));
 
-    for (int i = 1; i < t.samples.size() - 1; ++i) {
-      assertNotEquals(0, t.samples.get(i).curvature);
+    for (int i = 1; i < t.samples.length - 1; ++i) {
+      assertNotEquals(0, t.samples[i].curvature);
     }
   }
 }
