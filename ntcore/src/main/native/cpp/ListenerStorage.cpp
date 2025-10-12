@@ -372,24 +372,20 @@ void ListenerStorage::Reset() {
 }
 
 void ListenerStorage::Stop() {
-  WPI_EventHandle h;
+  bool join = false;
   {
     std::scoped_lock lock{m_mutex};
     if (auto thr = m_thread.GetThread()) {
-      if (thr->Shutdown()) {
-        return;
+      if (!thr->Shutdown()) {
+        thr->m_waitQueueWakeup.Set();
+        join = true;
       }
-
-      // Signal the thread and wait for the queue.
-      h = thr->m_waitQueueWaiter.GetHandle();
-      thr->m_waitQueueWakeup.Set();
-    } else {
-      return;
     }
   }
 
-  wpi::WaitForObject(h, 0.02, NULL);
-  m_thread.Stop();
+  if (join) {
+    m_thread.Join();
+  }
 }
 
 std::vector<std::pair<NT_Listener, unsigned int>>
