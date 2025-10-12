@@ -1190,8 +1190,9 @@ public final class DriverStation {
    *
    * @param mode robot mode
    * @param name name of the operating mode
+   * @return unique ID for the opmode, or 0 if not found
    */
-  public static void removeOpMode(RobotMode mode, String name) {
+  public static long removeOpMode(RobotMode mode, String name) {
     m_opModesMutex.lock();
     try {
       // we have to loop over all entries to find the one with the correct name
@@ -1199,12 +1200,13 @@ public final class DriverStation {
       for (OpModeOption opMode : m_opModes.values()) {
         if (opMode.getMode() == mode && opMode.name.equals(name)) {
           m_opModes.remove(opMode.id);
-          return;
+          return opMode.id;
         }
       }
     } finally {
       m_opModesMutex.unlock();
     }
+    return 0;
   }
 
   /** Publishes the operating mode options to the driver station. */

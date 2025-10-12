@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -43,7 +44,8 @@ import java.util.jar.JarFile;
  */
 public abstract class OpModeRobot extends RobotBase {
   private final ControlWord m_word = new ControlWord();
-  private final Map<Long, Class<?>> m_opModes = new HashMap<>();
+  private record OpModeFactory(String name, Supplier<OpMode> supplier) {}
+  private final Map<Long, OpModeFactory> m_opModes = new HashMap<>();
   private final AtomicReference<OpMode> m_activeOpMode = new AtomicReference<>(null);
   private final AtomicBoolean m_running = new AtomicBoolean();
 
@@ -51,9 +53,38 @@ public abstract class OpModeRobot extends RobotBase {
     DriverStation.reportError("Error adding OpMode " + cls.getSimpleName() + ": " + message, false);
   }
 
-  private void addOpMode(
-      RobotMode mode,
+  private OpMode constructOpModeClass(Class<?> cls) {
+    Constructor<?> constructor;
+    boolean hasThis;
+    try {
+      constructor = cls.getConstructor(getClass());
+      hasThis = true;
+    } catch (NoSuchMethodException e) {
+      try {
+        constructor = cls.getConstructor();
+      } catch (NoSuchMethodException e2) {
+        DriverStation.reportError(
+            "Could not instantiate OpMode " + cls.getSimpleName(), e2.getStackTrace());
+        return null;
+      }
+      hasThis = false;
+    }
+    try {
+      if (hasThis) {
+        return (OpMode) constructor.newInstance(this);
+      } else {
+        return (OpMode) constructor.newInstance();
+      }
+    } catch (ReflectiveOperationException e) {
+      DriverStation.reportError(
+          "Could not instantiate OpMode " + cls.getSimpleName(), e.getStackTrace());
+      return null;
+    }
+  }
+
+  private void addOpModeClassImpl(
       Class<?> cls,
+      RobotMode mode,
       String name,
       String group,
       String description,
@@ -65,18 +96,10 @@ public abstract class OpModeRobot extends RobotBase {
     Color tColor = textColor.isBlank() ? null : Color.fromString(textColor);
     Color bColor = backgroundColor.isBlank() ? null : Color.fromString(backgroundColor);
     long id = DriverStation.addOpMode(mode, name, description, group, tColor, bColor);
-    m_opModes.put(id, cls);
+    m_opModes.put(id, new OpModeFactory(name, () -> constructOpModeClass(cls)));
   }
 
-  /**
-   * Adds an opmode for an opmode class annotated with Autonomous, Teleop, or TestOpMode. The class
-   * must be a public, non-abstract subclass of OpMode with a public constructor that either takes
-   * no arguments or accepts a single argument of this class's type.
-   *
-   * @param cls class to add
-   */
-  private void addAnnotatedOpModeImpl(
-      Class<?> cls, Autonomous auto, Teleop teleop, TestOpMode test) {
+  private void checkOpModeClass(Class<?> cls) {
     // the class must be a subclass of OpMode
     if (!OpMode.class.isAssignableFrom(cls)) {
       throw new IllegalArgumentException("not a subclass of OpMode");
@@ -107,12 +130,17 @@ public abstract class OpModeRobot extends RobotBase {
                 + getClass().getSimpleName());
       }
     }
+  }
+
+  private void addAnnotatedOpModeImpl(
+      Class<?> cls, Autonomous auto, Teleop teleop, TestOpMode test) {
+    checkOpModeClass(cls);
 
     // add an opmode for each annotation
     if (auto != null) {
-      addOpMode(
-          RobotMode.AUTONOMOUS,
+      addOpModeClassImpl(
           cls,
+          RobotMode.AUTONOMOUS,
           auto.name(),
           auto.group(),
           auto.description(),
@@ -120,9 +148,9 @@ public abstract class OpModeRobot extends RobotBase {
           auto.backgroundColor());
     }
     if (teleop != null) {
-      addOpMode(
-          RobotMode.TELEOPERATED,
+      addOpModeClassImpl(
           cls,
+          RobotMode.TELEOPERATED,
           teleop.name(),
           teleop.group(),
           teleop.description(),
@@ -130,9 +158,9 @@ public abstract class OpModeRobot extends RobotBase {
           teleop.backgroundColor());
     }
     if (test != null) {
-      addOpMode(
-          RobotMode.TEST,
+      addOpModeClassImpl(
           cls,
+          RobotMode.TEST,
           test.name(),
           test.group(),
           test.description(),
@@ -142,9 +170,105 @@ public abstract class OpModeRobot extends RobotBase {
   }
 
   /**
+   * Adds an opmode using a factory function that creates the opmode. It's necessary to call
+   * publishOpModes() to make the added mode visible to the driver station.
+   *
+   * @param factory factory function to create the opmode
+   * @param mode robot mode
+   * @param name name of the operating mode
+   * @param group group of the operating mode
+   * @param description description of the operating mode
+   * @param textColor text color, or null for default
+   * @param backgroundColor background color, or null for default
+   * @throws IllegalArgumentException if class does not meet criteria
+   */
+  public void addOpModeFactory(
+      Supplier<OpMode> factory,
+      RobotMode mode,
+      String name,
+      String group,
+      String description,
+      Color textColor,
+      Color backgroundColor) {
+    long id = DriverStation.addOpMode(mode, name, description, group, textColor, backgroundColor);
+    m_opModes.put(id, new OpModeFactory(name, factory));
+  }
+
+  /**
+   * Adds an opmode using a factory function that creates the opmode. It's necessary to call
+   * publishOpModes() to make the added mode visible to the driver station.
+   *
+   * @param factory factory function to create the opmode
+   * @param mode robot mode
+   * @param name name of the operating mode
+   * @param group group of the operating mode
+   * @param description description of the operating mode
+   * @throws IllegalArgumentException if class does not meet criteria
+   */
+  public void addOpModeFactory(
+      Supplier<OpMode> factory,
+      RobotMode mode,
+      String name,
+      String group,
+      String description) {
+    addOpModeFactory(factory, mode, name, group, description, null, null);
+  }
+
+  /**
+   * Adds an opmode for an opmode class. The class must be a public, non-abstract subclass of
+   * OpMode with a public constructor that either takes no arguments or accepts a single argument
+   * of this class's type. It's necessary to call publishOpModes() to make the added mode visible
+   * to the driver station.
+   *
+   * @param cls class to add
+   * @param mode robot mode
+   * @param name name of the operating mode
+   * @param group group of the operating mode
+   * @param description description of the operating mode
+   * @param textColor text color, or null for default
+   * @param backgroundColor background color, or null for default
+   * @throws IllegalArgumentException if class does not meet criteria
+   */
+  public void addOpMode(
+      Class<? extends OpMode> cls,
+      RobotMode mode,
+      String name,
+      String group,
+      String description,
+      Color textColor,
+      Color backgroundColor) {
+    checkOpModeClass(cls);
+    addOpModeFactory(
+        () -> constructOpModeClass(cls), mode, name, group, description, textColor, backgroundColor);
+  }
+
+  /**
+   * Adds an opmode for an opmode class. The class must be a public, non-abstract subclass of
+   * OpMode with a public constructor that either takes no arguments or accepts a single argument
+   * of this class's type. It's necessary to call publishOpModes() to make the added mode visible
+   * to the driver station.
+   *
+   * @param cls class to add
+   * @param mode robot mode
+   * @param name name of the operating mode
+   * @param group group of the operating mode
+   * @param description description of the operating mode
+   * @throws IllegalArgumentException if class does not meet criteria
+   */
+  public void addOpMode(
+      Class<? extends OpMode> cls,
+      RobotMode mode,
+      String name,
+      String group,
+      String description) {
+    addOpMode(cls, mode, name, group, description, null, null);
+  }
+
+  /**
    * Adds an opmode for an opmode class annotated with Autonomous, Teleoperated, or TestOpMode. The
    * class must be a public, non-abstract subclass of OpMode with a public constructor that either
-   * takes no arguments or accepts a single argument of this class's type.
+   * takes no arguments or accepts a single argument of this class's type. It's necessary to call
+   * publishOpModes() to make the added mode visible to the driver station.
    *
    * @param cls class to add
    * @throws IllegalArgumentException if class does not meet criteria
@@ -199,11 +323,12 @@ public abstract class OpModeRobot extends RobotBase {
 
   /**
    * Scans for classes in the specified package and all nested packages that are annotated with
-   * Autonomous, Teleoperated, or TestOpMode and registers them.
+   * Autonomous, Teleoperated, or TestOpMode and registers them. It's necessary to call
+   * publishOpModes() to make the added modes visible to the driver station.
    *
    * @param pkg package to scan
    */
-  private void addAnnotatedOpModeClasses(Package pkg) {
+  public void addAnnotatedOpModeClasses(Package pkg) {
     String packageName = pkg.getName();
     String packagePath = packageName.replace('.', '/');
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -238,6 +363,31 @@ public abstract class OpModeRobot extends RobotBase {
     } catch (IOException e) {
       e.printStackTrace();
     }
+  }
+
+  /**
+   * Removes an operating mode option. It's necessary to call publishOpModes() to make the removed
+   * mode no longer visible to the driver station.
+   *
+   * @param mode robot mode
+   * @param name name of the operating mode
+   */
+  public void removeOpMode(RobotMode mode, String name) {
+    long id = DriverStation.removeOpMode(mode, name);
+    if (id != 0) {
+      m_opModes.remove(id);
+    }
+  }
+
+  /** Publishes the operating mode options to the driver station. */
+  public void publishOpModes() {
+    DriverStation.publishOpModes();
+  }
+
+  /** Clears all operating mode options and publishes an empty list to the driver station. */
+  public void clearOpModes() {
+    DriverStation.clearOpModes();
+    m_opModes.clear();
   }
 
   /** Constructor. */
@@ -382,39 +532,17 @@ public abstract class OpModeRobot extends RobotBase {
             opMode.opmodeClose();
           }
 
-          Class<?> cls = m_opModes.get(modeId);
-          if (cls == null) {
+          OpModeFactory factory = m_opModes.get(modeId);
+          if (factory == null) {
             DriverStation.reportError("No OpMode found for mode " + modeId, false);
             continue;
           }
 
           // Instantiate the opmode
-          System.out.println("********** Starting OpMode " + cls.getSimpleName() + " **********");
-          Constructor<?> constructor;
-          boolean hasThis;
-          try {
-            constructor = cls.getConstructor(getClass());
-            hasThis = true;
-          } catch (NoSuchMethodException e) {
-            try {
-              constructor = cls.getConstructor();
-            } catch (NoSuchMethodException e2) {
-              DriverStation.reportError(
-                  "Could not instantiate OpMode " + cls.getSimpleName(), e2.getStackTrace());
-              continue;
-            }
-            hasThis = false;
-          }
-          try {
-            if (hasThis) {
-              opMode = (OpMode) constructor.newInstance(this);
-            } else {
-              opMode = (OpMode) constructor.newInstance();
-            }
-          } catch (ReflectiveOperationException e) {
-            DriverStation.reportError(
-                "Could not instantiate OpMode " + cls.getSimpleName(), e.getStackTrace());
-            continue;
+          System.out.println("********** Starting OpMode " + factory.name() + " **********");
+          opMode = factory.supplier().get();
+          if (opMode == null) {
+            continue;  // could not construct
           }
           m_activeOpMode.set(opMode);
           if (lastModeId == -1) {
