@@ -4,11 +4,10 @@
 
 package edu.wpi.first.wpilibj.opmode;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import edu.wpi.first.hal.ControlWord;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.internal.DriverStationModeThread;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * An opmode structure for "linear" operation. The user is responsible for implementing any looping

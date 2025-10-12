@@ -44,7 +44,9 @@ import java.util.jar.JarFile;
  */
 public abstract class OpModeRobot extends RobotBase {
   private final ControlWord m_word = new ControlWord();
+
   private record OpModeFactory(String name, Supplier<OpMode> supplier) {}
+
   private final Map<Long, OpModeFactory> m_opModes = new HashMap<>();
   private final AtomicReference<OpMode> m_activeOpMode = new AtomicReference<>(null);
   private final AtomicBoolean m_running = new AtomicBoolean();
@@ -206,19 +208,15 @@ public abstract class OpModeRobot extends RobotBase {
    * @throws IllegalArgumentException if class does not meet criteria
    */
   public void addOpModeFactory(
-      Supplier<OpMode> factory,
-      RobotMode mode,
-      String name,
-      String group,
-      String description) {
+      Supplier<OpMode> factory, RobotMode mode, String name, String group, String description) {
     addOpModeFactory(factory, mode, name, group, description, null, null);
   }
 
   /**
-   * Adds an opmode for an opmode class. The class must be a public, non-abstract subclass of
-   * OpMode with a public constructor that either takes no arguments or accepts a single argument
-   * of this class's type. It's necessary to call publishOpModes() to make the added mode visible
-   * to the driver station.
+   * Adds an opmode for an opmode class. The class must be a public, non-abstract subclass of OpMode
+   * with a public constructor that either takes no arguments or accepts a single argument of this
+   * class's type. It's necessary to call publishOpModes() to make the added mode visible to the
+   * driver station.
    *
    * @param cls class to add
    * @param mode robot mode
@@ -239,14 +237,20 @@ public abstract class OpModeRobot extends RobotBase {
       Color backgroundColor) {
     checkOpModeClass(cls);
     addOpModeFactory(
-        () -> constructOpModeClass(cls), mode, name, group, description, textColor, backgroundColor);
+        () -> constructOpModeClass(cls),
+        mode,
+        name,
+        group,
+        description,
+        textColor,
+        backgroundColor);
   }
 
   /**
-   * Adds an opmode for an opmode class. The class must be a public, non-abstract subclass of
-   * OpMode with a public constructor that either takes no arguments or accepts a single argument
-   * of this class's type. It's necessary to call publishOpModes() to make the added mode visible
-   * to the driver station.
+   * Adds an opmode for an opmode class. The class must be a public, non-abstract subclass of OpMode
+   * with a public constructor that either takes no arguments or accepts a single argument of this
+   * class's type. It's necessary to call publishOpModes() to make the added mode visible to the
+   * driver station.
    *
    * @param cls class to add
    * @param mode robot mode
@@ -256,11 +260,7 @@ public abstract class OpModeRobot extends RobotBase {
    * @throws IllegalArgumentException if class does not meet criteria
    */
   public void addOpMode(
-      Class<? extends OpMode> cls,
-      RobotMode mode,
-      String name,
-      String group,
-      String description) {
+      Class<? extends OpMode> cls, RobotMode mode, String name, String group, String description) {
     addOpMode(cls, mode, name, group, description, null, null);
   }
 
@@ -542,7 +542,7 @@ public abstract class OpModeRobot extends RobotBase {
           System.out.println("********** Starting OpMode " + factory.name() + " **********");
           opMode = factory.supplier().get();
           if (opMode == null) {
-            continue;  // could not construct
+            continue; // could not construct
           }
           m_activeOpMode.set(opMode);
           if (lastModeId == -1) {
