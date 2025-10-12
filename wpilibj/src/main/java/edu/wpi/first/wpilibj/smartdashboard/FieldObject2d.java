@@ -92,7 +92,8 @@ public class FieldObject2d implements AutoCloseable {
    *
    * @param trajectory The trajectory from which the poses should be added.
    */
-  public synchronized <SampleType extends TrajectorySample<SampleType>> void setTrajectory(Trajectory<SampleType> trajectory) {
+  public synchronized <SampleType extends TrajectorySample<SampleType>> void setTrajectory(
+      Trajectory<SampleType> trajectory) {
     m_poses.clear();
     for (SampleType state : trajectory.samples) {
       m_poses.add(state.pose);
