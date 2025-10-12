@@ -4,9 +4,17 @@
 
 #include "frc/opmode/LinearOpMode.h"
 
+#include "frc/internal/DriverStationModeThread.h"
+#include "hal/DriverStation.h"
+
 using namespace frc;
 
 void LinearOpMode::OpmodeRun(int64_t opModeId) {
+  HAL_ControlWord word;
+  HAL_GetControlWord(&word);
+  HAL_ControlWord_SetOpModeId(&word, opModeId);
+
+  internal::DriverStationModeThread bgThread{word};
   Start();
   Run();
   End();

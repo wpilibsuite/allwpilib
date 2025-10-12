@@ -13,36 +13,37 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /** For internal use only. */
 public class DriverStationModeThread implements AutoCloseable {
-  private final AtomicBoolean m_keepAlive = new AtomicBoolean();
-  private final AtomicLong m_userControlWord = new AtomicLong();
+  private final AtomicBoolean m_keepAlive = new AtomicBoolean(true);
+  private final AtomicLong m_userControlWord;
+  private final int m_handle = WPIUtilJNI.createEvent(false, false);
   private final Thread m_thread;
 
-  /** Internal use only. */
-  public DriverStationModeThread() {
-    m_keepAlive.set(true);
+  /**
+   * Internal use only.
+   *
+   * @param word control word
+   */
+  public DriverStationModeThread(ControlWord word) {
+    m_userControlWord = new AtomicLong(word.getNative());
+    DriverStationJNI.provideNewDataEventHandle(m_handle);
     m_thread = new Thread(this::run, "DriverStationMode");
     m_thread.start();
   }
 
   private void run() {
-    int handle = WPIUtilJNI.createEvent(false, false);
-    DriverStationJNI.provideNewDataEventHandle(handle);
-
-    while (m_keepAlive.get()) {
+    while (true) {
       try {
-        WPIUtilJNI.waitForObjectTimeout(handle, 0.1);
+        WPIUtilJNI.waitForObjectTimeout(m_handle, 0.1);
       } catch (InterruptedException e) {
-        DriverStationJNI.removeNewDataEventHandle(handle);
-        WPIUtilJNI.destroyEvent(handle);
         Thread.currentThread().interrupt();
+        return;
+      }
+      if (!m_keepAlive.get()) {
         return;
       }
       DriverStation.refreshData();
       DriverStationJNI.observeUserProgram(m_userControlWord.get());
     }
-
-    DriverStationJNI.removeNewDataEventHandle(handle);
-    WPIUtilJNI.destroyEvent(handle);
   }
 
   /**
@@ -57,6 +58,8 @@ public class DriverStationModeThread implements AutoCloseable {
 
   @Override
   public void close() {
+    DriverStationJNI.removeNewDataEventHandle(m_handle);
+    WPIUtilJNI.destroyEvent(m_handle);
     m_keepAlive.set(false);
     try {
       m_thread.join();

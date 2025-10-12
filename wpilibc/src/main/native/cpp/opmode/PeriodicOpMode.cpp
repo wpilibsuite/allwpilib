@@ -4,7 +4,9 @@
 
 #include "frc/opmode/PeriodicOpMode.h"
 
+#include <hal/DriverStation.h>
 #include <hal/UsageReporting.h>
+#include <networktables/NetworkTableInstance.h>
 
 #include "frc/DriverStation.h"
 #include "frc/Errors.h"
@@ -33,7 +35,9 @@ PeriodicOpMode::~PeriodicOpMode() {
   }
 }
 
-PeriodicOpMode::PeriodicOpMode(units::second_t period) {
+PeriodicOpMode::PeriodicOpMode(units::second_t period)
+    : m_period{period},
+      m_watchdog(period, [this] { PrintLoopOverrunMessage(); }) {
   m_startTime = std::chrono::microseconds{RobotController::GetFPGATime()};
   AddPeriodic([=, this] { LoopFunc(); }, period);
 
@@ -56,7 +60,10 @@ void PeriodicOpMode::AddPeriodic(std::function<void()> callback,
 
 void PeriodicOpMode::LoopFunc() {
   DriverStation::RefreshData();
-  // m_watchdog.Reset();
+  HAL_ControlWord word;
+  HAL_GetControlWord(&word);
+  HAL_ControlWord_SetOpModeId(&word, m_opModeId);
+  HAL_ObserveUserProgram(word);
 
   if (!DriverStation::IsEnabled() ||
       DriverStation::GetOpModeId() != m_opModeId) {
@@ -64,11 +71,12 @@ void PeriodicOpMode::LoopFunc() {
     return;
   }
 
+  m_watchdog.Reset();
   Periodic();
-  // m_watchdog.AddEpoch("Periodic()");
+  m_watchdog.AddEpoch("Periodic()");
 
   SmartDashboard::UpdateValues();
-  // m_watchdog.AddEpoch("SmartDashboard::UpdateValues()");
+  m_watchdog.AddEpoch("SmartDashboard::UpdateValues()");
 
   // if constexpr (IsSimulation()) {
   //   HAL_SimPeriodicBefore();
@@ -77,17 +85,15 @@ void PeriodicOpMode::LoopFunc() {
   //   m_watchdog.AddEpoch("SimulationPeriodic()");
   // }
 
-  // m_watchdog.Disable();
+  m_watchdog.Disable();
 
   // Flush NetworkTables
-  // if (m_ntFlushEnabled) {
-  //  nt::NetworkTableInstance::GetDefault().FlushLocal();
-  //}
+  nt::NetworkTableInstance::GetDefault().FlushLocal();
 
   // Warn on loop time overruns
-  // if (m_watchdog.IsExpired()) {
-  //  m_watchdog.PrintEpochs();
-  //}
+  if (m_watchdog.IsExpired()) {
+    m_watchdog.PrintEpochs();
+  }
 }
 
 void PeriodicOpMode::OpmodeRun(int64_t opModeId) {
@@ -142,4 +148,12 @@ void PeriodicOpMode::OpmodeRun(int64_t opModeId) {
 void PeriodicOpMode::OpmodeStop() {
   int32_t status = 0;
   HAL_StopNotifier(m_notifier, &status);
+}
+
+void PeriodicOpMode::PrintLoopOverrunMessage() {
+  FRC_ReportWarning("Loop time of {:.6f}s overrun", m_period.value());
+}
+
+void PeriodicOpMode::PrintWatchdogEpochs() {
+  m_watchdog.PrintEpochs();
 }

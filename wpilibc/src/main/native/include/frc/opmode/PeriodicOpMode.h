@@ -14,6 +14,7 @@
 #include <units/time.h>
 #include <wpi/priority_queue.h>
 
+#include "frc/Watchdog.h"
 #include "frc/opmode/OpMode.h"
 
 namespace frc {
@@ -113,6 +114,16 @@ class PeriodicOpMode : public OpMode {
   void AddPeriodic(std::function<void()> callback, units::second_t period,
                    units::second_t offset = 0_s);
 
+  /**
+   * Gets time period between calls to Periodic() functions.
+   */
+  units::second_t GetPeriod() const;
+
+  /**
+   * Prints list of epochs added so far and their times.
+   */
+  void PrintWatchdogEpochs();
+
  protected:
   /** Loop function. */
   void LoopFunc();
@@ -153,9 +164,13 @@ class PeriodicOpMode : public OpMode {
   hal::Handle<HAL_NotifierHandle, HAL_CleanNotifier> m_notifier;
   std::chrono::microseconds m_startTime;
   int64_t m_loopStartTimeUs = 0;
+  units::second_t m_period;
+  Watchdog m_watchdog;
 
   wpi::priority_queue<Callback, std::vector<Callback>, std::greater<Callback>>
       m_callbacks;
+
+  void PrintLoopOverrunMessage();
 };
 
 }  // namespace frc

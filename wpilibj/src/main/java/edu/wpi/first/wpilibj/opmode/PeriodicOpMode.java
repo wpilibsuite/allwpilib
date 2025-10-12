@@ -10,9 +10,11 @@ import edu.wpi.first.hal.ControlWord;
 import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.NotifierJNI;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Watchdog;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.PriorityQueue;
 
@@ -93,6 +95,13 @@ public abstract class PeriodicOpMode implements OpMode {
   private long m_startTimeUs;
   private long m_loopStartTimeUs;
 
+  private final ControlWord m_word = new ControlWord();
+  private final double m_period;
+  private final Watchdog m_watchdog;
+
+  private long m_opModeId;
+  private boolean m_running = true;
+
   private final PriorityQueue<Callback> m_callbacks = new PriorityQueue<>();
 
   /**
@@ -110,6 +119,9 @@ public abstract class PeriodicOpMode implements OpMode {
    */
   protected PeriodicOpMode(double period) {
     m_startTimeUs = RobotController.getFPGATime();
+    m_period = period;
+    m_watchdog = new Watchdog(period, this::printLoopOverrunMessage);
+
     addPeriodic(this::loopFunc, period);
     NotifierJNI.setNotifierName(m_notifier, "TimedRobot");
 
@@ -209,20 +221,33 @@ public abstract class PeriodicOpMode implements OpMode {
     addPeriodic(callback, period.in(Seconds), offset.in(Seconds));
   }
 
+  /**
+   * Gets time period between calls to Periodic() functions.
+   *
+   * @return The time period between calls to Periodic() functions.
+   */
+  public double getPeriod() {
+    return m_period;
+  }
+
   /** Loop function. */
   protected void loopFunc() {
     DriverStation.refreshData();
-    // m_watchdog.reset();
+    DriverStation.refreshControlWordFromCache(m_word);
+    m_word.setOpModeId(m_opModeId);
+    DriverStationJNI.observeUserProgram(m_word.getNative());
+
     if (!DriverStation.isEnabled() || DriverStation.getOpModeId() != m_opModeId) {
       m_running = false;
       return;
     }
 
+    m_watchdog.reset();
     periodic();
-    // m_watchdog.addEpoch("periodic()");
+    m_watchdog.addEpoch("periodic()");
 
     SmartDashboard.updateValues();
-    // m_watchdog.addEpoch("SmartDashboard.updateValues()");
+    m_watchdog.addEpoch("SmartDashboard.updateValues()");
 
     // if (isSimulation()) {
     //  HAL.simPeriodicBefore();
@@ -231,24 +256,21 @@ public abstract class PeriodicOpMode implements OpMode {
     //  m_watchdog.addEpoch("simulationPeriodic()");
     // }
 
-    // m_watchdog.disable();
+    m_watchdog.disable();
 
     // Flush NetworkTables
-    // if (m_ntFlushEnabled) {
-    //  NetworkTableInstance.getDefault().flushLocal();
-    // }
+    NetworkTableInstance.getDefault().flushLocal();
 
     // Warn on loop time overruns
-    // if (m_watchdog.isExpired()) {
-    //  m_watchdog.printEpochs();
-    // }
+    if (m_watchdog.isExpired()) {
+      m_watchdog.printEpochs();
+    }
   }
 
   // implements OpMode interface
   @Override
   public final void opmodeRun(long opModeId) {
     m_opModeId = opModeId;
-    final ControlWord word = new ControlWord();
 
     start();
     while (m_running) {
@@ -265,10 +287,6 @@ public abstract class PeriodicOpMode implements OpMode {
       }
 
       m_loopStartTimeUs = RobotController.getFPGATime();
-
-      DriverStation.refreshControlWordFromCache(word);
-      word.setOpModeId(opModeId);
-      DriverStationJNI.observeUserProgram(word.getNative());
 
       callback.func.run();
 
@@ -308,6 +326,12 @@ public abstract class PeriodicOpMode implements OpMode {
     close();
   }
 
-  private long m_opModeId;
-  private boolean m_running = true;
+  /** Prints list of epochs added so far and their times. */
+  public void printWatchdogEpochs() {
+    m_watchdog.printEpochs();
+  }
+
+  private void printLoopOverrunMessage() {
+    DriverStation.reportWarning("Loop time of " + m_period + "s overrun\n", false);
+  }
 }

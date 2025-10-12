@@ -8,6 +8,7 @@
 #include <thread>
 
 #include <hal/DriverStationTypes.h>
+#include <wpi/Synchronization.h>
 
 namespace frc::internal {
 /**
@@ -17,8 +18,10 @@ class DriverStationModeThread {
  public:
   /**
    * For internal use only.
+   *
+   * @param word initial control word
    */
-  DriverStationModeThread();
+  explicit DriverStationModeThread(HAL_ControlWord word);
 
   ~DriverStationModeThread();
 
@@ -38,8 +41,9 @@ class DriverStationModeThread {
 
  private:
   std::atomic_bool m_keepAlive{false};
+  wpi::Event m_event{false, false};
   std::thread m_thread;
   void Run();
-  std::atomic<int64_t> m_userControlWord{0};
+  std::atomic<int64_t> m_userControlWord;
 };
 }  // namespace frc::internal

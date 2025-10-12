@@ -191,6 +191,15 @@ inline int64_t HAL_ControlWord_GetOpModeId(HAL_ControlWord word) {
          (HAL_CONTROLWORD_OPMODE_HASH_MASK | HAL_CONTROLWORD_ROBOT_MODE_MASK);
 }
 
+inline void HAL_ControlWord_SetOpModeId(HAL_ControlWord* word, int64_t id) {
+  // clear out the old hash and robot mode
+  word->value &= ~(HAL_CONTROLWORD_OPMODE_HASH_MASK |
+                   HAL_CONTROLWORD_ROBOT_MODE_MASK);
+  // set the new id
+  word->value |= id & (HAL_CONTROLWORD_OPMODE_HASH_MASK |
+                       HAL_CONTROLWORD_ROBOT_MODE_MASK);
+}
+
 inline HAL_RobotMode HAL_ControlWord_GetRobotMode(HAL_ControlWord word) {
   // NOLINTBEGIN
   return (HAL_RobotMode)((word.value & HAL_CONTROLWORD_ROBOT_MODE_MASK) >>

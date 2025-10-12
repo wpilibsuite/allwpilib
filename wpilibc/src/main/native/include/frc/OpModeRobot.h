@@ -5,8 +5,11 @@
 #pragma once
 
 #include <concepts>
+#include <cstdint>
 #include <functional>
 #include <memory>
+
+#include <wpi/DenseMap.h>
 
 #include "frc/DSControlWord.h"
 #include "frc/RobotBase.h"
@@ -55,12 +58,9 @@ class OpModeRobotBase : public RobotBase {
   void EndCompetition() override;
 
   /**
-   * Constructor for TimedRobot.
-   *
-   * @param period Period.
+   * Constructor.
    */
-  OpModeRobotBase();
-
+  OpModeRobotBase() = default;
   OpModeRobotBase(OpModeRobotBase&&) = default;
   OpModeRobotBase& operator=(OpModeRobotBase&&) = default;
 
@@ -134,6 +134,8 @@ class OpModeRobotBase : public RobotBase {
   void ClearOpModes();
 
  private:
+  wpi::DenseMap<int64_t, OpModeFactory> m_opModes;
+  std::unique_ptr<OpMode> m_activeOpMode;
 };
 
 /**

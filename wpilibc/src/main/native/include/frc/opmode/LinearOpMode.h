@@ -8,6 +8,8 @@
 
 #include <atomic>
 
+#include <wpi/SafeThread.h>
+
 #include "frc/opmode/OpMode.h"
 
 namespace frc {
@@ -71,6 +73,8 @@ class LinearOpMode : public OpMode {
 
  private:
   std::atomic_bool m_running{true};
+  class Thread;
+  wpi::SafeThreadOwner<Thread> m_bgThread;
 };
 
 }  // namespace frc

@@ -21,7 +21,9 @@ void Robot::Teleop() {}
 void Robot::Test() {}
 
 void Robot::StartCompetition() {
-  frc::internal::DriverStationModeThread modeThread;
+  HAL_ControlWord word;
+  HAL_GetControlWord(&word);
+  frc::internal::DriverStationModeThread modeThread{word};
 
   // Create an opmode per robot mode
   frc::DriverStation::AddOpMode(frc::RobotMode::AUTONOMOUS, "Auto");
@@ -36,7 +38,6 @@ void Robot::StartCompetition() {
   HAL_ObserveUserProgramStarting();
 
   while (!m_exit) {
-    HAL_ControlWord word;
     HAL_GetControlWord(&word);
     bool enabled = IsEnabled();
     modeThread.InControl(word);

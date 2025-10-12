@@ -42,7 +42,8 @@ public class EducationalRobot extends RobotBase {
     DriverStation.addOpMode(RobotMode.TEST, "Test");
     DriverStation.publishOpModes();
 
-    DriverStationModeThread modeThread = new DriverStationModeThread();
+    final ControlWord word = new ControlWord();
+    DriverStationModeThread modeThread = new DriverStationModeThread(word);
 
     int event = WPIUtilJNI.createEvent(false, false);
 
@@ -50,7 +51,6 @@ public class EducationalRobot extends RobotBase {
 
     // Tell the DS that the robot is ready to be enabled
     DriverStationJNI.observeUserProgramStarting();
-    final ControlWord word = new ControlWord();
 
     while (!Thread.currentThread().isInterrupted() && !m_exit) {
       DriverStation.refreshControlWordFromCache(word);
