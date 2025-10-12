@@ -33,13 +33,11 @@ public abstract class Trajectory<SampleType extends TrajectorySample<SampleType>
    * @param samples the samples of the trajectory. Order does not matter as they will be ordered
    *     internally.
    */
-  @SuppressWarnings({"this-escape", "unchecked"})
+  @SuppressWarnings({"this-escape"})
   public Trajectory(SampleType[] samples) {
-    this.samples =
-        (SampleType[])
-            Arrays.stream(samples)
-                .sorted(Comparator.comparingDouble(s -> s.timestamp.in(Seconds)))
-                .toArray(TrajectorySample[]::new);
+    this.samples = Arrays.stream(samples)
+        .sorted(Comparator.comparingDouble(s -> s.timestamp.in(Seconds)))
+        .toArray(size -> Arrays.copyOf(samples, size));
 
     this.sampleMap =
         new InterpolatingTreeMap<>(
