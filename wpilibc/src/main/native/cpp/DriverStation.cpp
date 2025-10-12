@@ -588,9 +588,9 @@ int64_t DriverStation::AddOpMode(RobotMode mode, std::string_view name,
   return DoAddOpMode(mode, name, group, description, -1, -1);
 }
 
-void DriverStation::RemoveOpMode(RobotMode mode, std::string_view name) {
+int64_t DriverStation::RemoveOpMode(RobotMode mode, std::string_view name) {
   if (name.empty()) {
-    return;
+    return 0;
   }
 
   auto& inst = ::GetInstance();
@@ -602,10 +602,12 @@ void DriverStation::RemoveOpMode(RobotMode mode, std::string_view name) {
     if (HAL_OpMode_GetRobotMode(it->second.id) ==
             static_cast<HAL_RobotMode>(mode) &&
         wpi::to_string_view(&it->second.name) == name) {
+      int64_t id = it->second.id;
       inst.opModes.erase(it);
-      return;
+      return id;
     }
   }
+  return 0;
 }
 
 void DriverStation::PublishOpModes() {

@@ -355,8 +355,9 @@ class DriverStation final {
    *
    * @param mode robot mode
    * @param name name of the operating mode
+   * @return unique ID for the opmode, or 0 if not found
    */
-  static void RemoveOpMode(RobotMode mode, std::string_view name);
+  static int64_t RemoveOpMode(RobotMode mode, std::string_view name);
 
   /**
    * Publishes the operating mode options to the driver station.
