@@ -54,7 +54,7 @@ public final class TrajectoryParameterizer {
    *     from a -&gt; b -&gt; ... -&gt; z as defined in the waypoints.
    * @return The trajectory.
    */
-  public static Trajectory<SplineSample> timeParameterizeTrajectory(
+  public static SplineTrajectory timeParameterizeTrajectory(
       List<PoseWithCurvature> points,
       List<TrajectoryConstraint> constraints,
       double startVelocity,
@@ -242,7 +242,7 @@ public final class TrajectoryParameterizer {
               state.pose.curvature));
     }
 
-    return new Trajectory<>(states);
+    return new SplineTrajectory(states);
   }
 
   private static void enforceAccelerationLimits(
