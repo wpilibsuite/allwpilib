@@ -448,6 +448,9 @@ public class SwerveDriveKinematics
    * argument is defaulted to that use case. However, if you wish to change the center of rotation
    * for evasive maneuvers, vision alignment, or for any other use case, you can do so.
    *
+   * <p>A derivation for the second-order kinematics can be found
+   * <a href="https://www.chiefdelphi.com/uploads/short-url/qzj4k2LyBs7rLxAem0YajNIlStH.pdf">here</a>.
+   *
    * @param chassisAccelerations The desired chassis accelerations.
    * @param angularVelocity The desired robot angular velocity.
    * @param centerOfRotation The center of rotation. For example, if you set the center of rotation
@@ -524,6 +527,9 @@ public class SwerveDriveKinematics
    * accelerations. This method is often used for dynamics calculations -- determining the robot's
    * acceleration on the field using data from the real-world acceleration of each module on the
    * robot.
+   *
+   * <p>A derivation for the second-order kinematics can be found
+   * <a href="https://www.chiefdelphi.com/uploads/short-url/qzj4k2LyBs7rLxAem0YajNIlStH.pdf">here</a>.
    *
    * @param moduleAccelerations The accelerations of the modules as measured from respective
    *     encoders and gyros. The order of the swerve module accelerations should be same as passed
