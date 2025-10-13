@@ -230,10 +230,13 @@ void InstanceImpl::AddTimeSyncListener(NT_Listener listener,
 }
 
 void InstanceImpl::Reset() {
-  std::scoped_lock lock{m_mutex};
-  // Listeners sometimes call NetworkTables APIs, so reset listenerStorage first
+  // Listeners sometimes call NetworkTables APIs, so reset listenerStorage
+  // first. Note that if there are queued events, this will wait until
+  // listeners are called, and listeners may use this instance, so holding
+  // the lock could result in deadlock.
   listenerStorage.Reset();
 
+  std::scoped_lock lock{m_mutex};
   m_networkServer.reset();
   m_networkClient.reset();
   m_servers.clear();
