@@ -74,7 +74,7 @@ public class CodeAfterCoroutineParkDetector implements TaskListener {
         if (parkInvocation != null) {
           m_trees.printMessage(
               Diagnostic.Kind.ERROR,
-              "Unreachable statement: " + parkInvocation + " will never exit",
+              "Unreachable statement: `" + parkInvocation + "` will never exit",
               statement,
               m_root);
           break;
