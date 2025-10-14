@@ -264,9 +264,11 @@ class CoroutineInLoopListenerTest {
                 JavaFileObjects.forSourceString("org.wpilib.commands3.Coroutine", kCoroutineSource),
                 JavaFileObjects.forSourceString("frc.robot.Example", source));
 
-    // TODO: Should we make it an error to yield (or invoke any methods on) a captured coroutine?
     assertThat(compilation).failed();
-    assertEquals(1, compilation.errors().size());
+
+    // One error for not calling a yielding function on the most local coroutine object,
+    // and another error for calling a method on a captured coroutine (from a different analyzer)
+    assertEquals(2, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals("Missing call to `innerCoroutine.yield()` inside loop", error.getMessage(null));
   }
