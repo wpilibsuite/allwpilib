@@ -9,21 +9,27 @@ import java.util.List;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 
-public final class CompileTestOptions {
+public final class CompileTestUtils {
   public static final int kJavaVersion = 17;
   public static final List<Object> kJavaVersionOptions =
       List.of("-source", kJavaVersion, "-target", kJavaVersion);
 
-  private CompileTestOptions() {
+  private CompileTestUtils() {
     // Utility class
   }
 
+  /**
+   * Gets the source code for a given compiler error.
+   *
+   * @param diagnostic The diagnostic to get the source for.
+   * @return The source code for the given diagnostic.
+   */
   public static String getErrorSource(Diagnostic<? extends JavaFileObject> diagnostic) {
     try (var reader = diagnostic.getSource().openReader(true)) {
       int sourceLength = (int) (diagnostic.getEndPosition() - diagnostic.getStartPosition() + 1);
       char[] buf = new char[sourceLength];
-      long skipCnt = reader.skip(diagnostic.getPosition());
-      if (skipCnt != diagnostic.getPosition()) {
+      long skipCnt = reader.skip(diagnostic.getStartPosition());
+      if (skipCnt != diagnostic.getStartPosition()) {
         // Didn't skip to the expected position; bail
         return "<unknown source>";
       }
