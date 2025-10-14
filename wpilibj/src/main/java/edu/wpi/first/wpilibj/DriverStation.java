@@ -1219,33 +1219,6 @@ public final class DriverStation {
   }
 
   /**
-   * Wait for a DS connection.
-   *
-   * @param timeout timeout in seconds. 0 for infinite.
-   * @return true if connected, false if timeout
-   */
-  public static boolean waitForDsConnection(double timeout) {
-    int event = WPIUtilJNI.createEvent(true, false);
-    DriverStationJNI.provideNewDataEventHandle(event);
-    boolean result;
-    try {
-      if (timeout == 0) {
-        WPIUtilJNI.waitForObject(event);
-        result = true;
-      } else {
-        result = !WPIUtilJNI.waitForObjectTimeout(event, timeout);
-      }
-    } catch (InterruptedException ex) {
-      Thread.currentThread().interrupt();
-      result = false;
-    } finally {
-      DriverStationJNI.removeNewDataEventHandle(event);
-      WPIUtilJNI.destroyEvent(event);
-    }
-    return result;
-  }
-
-  /**
    * Return the approximate match time. The FMS does not send an official match time to the robots,
    * but does send an approximate match time. The value will count down the time remaining in the
    * current period (auto or teleop). Warning: This is not an official time (so it cannot be used to
