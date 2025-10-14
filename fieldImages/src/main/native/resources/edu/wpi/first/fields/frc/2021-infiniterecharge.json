@@ -1,6 +1,6 @@
 {
-  "game": "Infinite Recharge 2021",
-  "field-image": "2021-field.png",
+  "game": "2021 FRC Infinite Recharge",
+  "field-image": "frc/2021-infiniterecharge.png",
   "field-corners": {
     "top-left": [
       127,
