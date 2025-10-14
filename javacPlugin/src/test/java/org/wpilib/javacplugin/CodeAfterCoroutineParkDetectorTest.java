@@ -78,7 +78,8 @@ class CodeAfterCoroutineParkDetectorTest {
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
-    assertEquals("Unreachable statement: `coroutine.park()` will never exit", error.getMessage(null));
+    assertEquals(
+        "Unreachable statement: `coroutine.park()` will never exit", error.getMessage(null));
     assertEquals("System.out.println(\"Unreachable 1\"); ", getErrorSource(error));
   }
 
@@ -141,7 +142,8 @@ class CodeAfterCoroutineParkDetectorTest {
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
-    assertEquals("Unreachable statement: `coroutine.park()` will never exit", error.getMessage(null));
+    assertEquals(
+        "Unreachable statement: `coroutine.park()` will never exit", error.getMessage(null));
     assertEquals("for (;;) {\n    }\n", getErrorSource(error));
   }
 
@@ -173,7 +175,8 @@ class CodeAfterCoroutineParkDetectorTest {
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
-    assertEquals("Unreachable statement: `coroutine.park()` will never exit", error.getMessage(null));
+    assertEquals(
+        "Unreachable statement: `coroutine.park()` will never exit", error.getMessage(null));
     assertEquals("{\n    }\n", getErrorSource(error));
   }
 
@@ -230,7 +233,8 @@ class CodeAfterCoroutineParkDetectorTest {
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
-    assertEquals("Unreachable statement: `coroutine.park()` will never exit", error.getMessage(null));
+    assertEquals(
+        "Unreachable statement: `coroutine.park()` will never exit", error.getMessage(null));
     assertEquals("System.out.println(\"Unreachable\");\n", getErrorSource(error));
   }
 }
