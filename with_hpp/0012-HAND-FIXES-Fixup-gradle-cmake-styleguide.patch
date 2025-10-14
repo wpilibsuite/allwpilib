@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Wed, 8 Oct 2025 03:29:02 -0400
-Subject: [PATCH 12/26] HAND FIXES: Fixup gradle / cmake / styleguide
+Date: Sun, 12 Oct 2025 05:08:06 -0400
+Subject: [PATCH 12/29] HAND FIXES: Fixup gradle / cmake / styleguide
 
 ---
  .styleguide                     | 15 ++++-----
  CMakeLists.txt                  | 10 +++---
  apriltag/build.gradle           |  2 +-
  cameraserver/.styleguide        |  6 ++--
- command2/.styleguide            | 10 ++----
+ commandsv2/.styleguide          | 10 ++----
  cscore/.styleguide              |  8 ++---
  datalog/.styleguide             |  1 +
  docs/build.gradle               | 56 ++++++++++++++++-----------------
@@ -67,7 +67,7 @@ index f5e8ad36c5f7a404bad2a404d6dee4f2f5ae96c9..510daaf302b5f1aaab0c1c32e4ade73a
 +  ^wpi/units/
  }
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 74634c2233a9f5f70ee71191d35b6ff913b13b7e..cac6b2e73cfea0497de93c14d22f5d5091235328 100644
+index 10960e5129e8bdf0faf53d37de05cbe03e4b745b..e9118a6fe1325a2df556c6d2df8c34b8e429b5e4 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -321,13 +321,13 @@ if(WITH_GUI)
@@ -88,12 +88,12 @@ index 74634c2233a9f5f70ee71191d35b6ff913b13b7e..cac6b2e73cfea0497de93c14d22f5d50
      endif()
  endif()
  
-@@ -348,7 +348,7 @@ if(WITH_WPILIB)
-     set(APRILTAG_DEP_REPLACE "find_dependency(apriltag)")
+@@ -349,7 +349,7 @@ if(WITH_WPILIB)
+     set(COMMANDSV3_DEP_REPLACE "find_dependency(commandsv3)")
      set(WPILIBC_DEP_REPLACE "find_dependency(wpilibc)")
      set(WPILIBJ_DEP_REPLACE "find_dependency(wpilibj)")
--    set(WPILIBNEWCOMMANDS_DEP_REPLACE "find_dependency(command2)")
-+    set(COMMAND_DEP_REPLACE "find_dependency(command2)")
+-    set(WPILIBNEWCOMMANDS_DEP_REPLACE "find_dependency(commandsv2)")
++    set(COMMAND_DEP_REPLACE "find_dependency(commandsv2)")
      add_subdirectory(apriltag)
      add_subdirectory(wpilibj)
      add_subdirectory(wpilibc)
@@ -135,10 +135,10 @@ index 951f083e2023d252a0cedcaf8acee56fbdd94afe..3d1663b4296c44b559b23a13b2b94dd2
  }
  
  includeGuardRoots {
-diff --git a/command2/.styleguide b/command2/.styleguide
-index 8fd7f027d16415bdc393000980ffaad522853710..b19a484512f64128bc96431f5cdc9177a2ffb049 100644
---- a/command2/.styleguide
-+++ b/command2/.styleguide
+diff --git a/commandsv2/.styleguide b/commandsv2/.styleguide
+index 7dde46fc2bed160f216588d3f34d9a38c1098557..8c96ddad8f62cea2a6925e6918d5138b3e0fce56 100644
+--- a/commandsv2/.styleguide
++++ b/commandsv2/.styleguide
 @@ -17,19 +17,15 @@ generatedFileExclude {
  }
  
@@ -198,10 +198,10 @@ index 718d2404f4289e19a5675558ef508e00ba1c15ad..309041dfd5c13d565538913f34e3cea8
  
  cppSrcFileInclude {
 diff --git a/docs/build.gradle b/docs/build.gradle
-index e4554630f0f01651d2c1ba47fa93dc9e178f287f..a4f8bfb0310fba691194d1a8db060fabc44f0714 100644
+index 0cd31bae9bc26e6e607c8be7ea3785f4628c761a..24f5dc44b665f05bfe546802033627aba2638a93 100644
 --- a/docs/build.gradle
 +++ b/docs/build.gradle
-@@ -79,24 +79,24 @@ doxygen.sourceSets.main {
+@@ -80,24 +80,24 @@ doxygen.sourceSets.main {
          exclude 'apriltag_pose.h'
  
          // LLVM
@@ -211,12 +211,12 @@ index e4554630f0f01651d2c1ba47fa93dc9e178f287f..a4f8bfb0310fba691194d1a8db060fab
 -        exclude 'wpi/raw_ostream.h'
 -        exclude 'wpi/SmallVector.h'
 -        exclude 'wpi/StringExtras.h'
-+        exclude 'wpi/util/Compiler.h'
-+        exclude 'wpi/util/ErrorHandling.h'
-+        exclude 'wpi/util/bit.h'
-+        exclude 'wpi/util/raw_ostream.h'
-+        exclude 'wpi/util/SmallVector.h'
-+        exclude 'wpi/util/StringExtras.h'
++        exclude 'wpi/util/Compiler.hpp'
++        exclude 'wpi/util/ErrorHandling.hpp'
++        exclude 'wpi/util/bit.hpp'
++        exclude 'wpi/util/raw_ostream.hpp'
++        exclude 'wpi/util/SmallVector.hpp'
++        exclude 'wpi/util/StringExtras.hpp'
  
          // libuv
          exclude 'uv/**'
@@ -235,7 +235,7 @@ index e4554630f0f01651d2c1ba47fa93dc9e178f287f..a4f8bfb0310fba691194d1a8db060fab
      }
  
      exclude '*.pb.h'
-@@ -142,28 +142,28 @@ task generateJavaDocs(type: Javadoc) {
+@@ -143,29 +143,29 @@ task generateJavaDocs(type: Javadoc) {
      options.addStringOption("tag", "pre:a:Pre-Condition")
      options.addBooleanOption("Xdoclint/package:" +
              // TODO: v Document these, then remove them from the list
@@ -276,6 +276,7 @@ index e4554630f0f01651d2c1ba47fa93dc9e178f287f..a4f8bfb0310fba691194d1a8db060fab
 +            "-org.wpilib.math.system.plant.struct," +
 +            "-org.wpilib.math.trajectory.proto," +
 +            "-org.wpilib.math.trajectory.struct," +
+             "-org.wpilib.commands3.proto," +
              // The .measure package contains generated source files for which automatic javadoc
              // generation is very difficult to do meaningfully.
 -            "-edu.wpi.first.units.measure", true)
@@ -382,7 +383,7 @@ index 13634e44df6212efcccb0c195470913f6ac27460..f93bd8d1aaee878c7e348d91ac545674
 +  ^wpi/datalog/
  }
 diff --git a/settings.gradle b/settings.gradle
-index 14f1ae7454bf7d9d17531e359a08dcfcf546299c..5750bd4fafc0088834a78e9e6959c7effd6e52b1 100644
+index be9e14021273a853f0ee5484087807395ae05200..966c22859585189f9fd6cda3db86b65270247f78 100644
 --- a/settings.gradle
 +++ b/settings.gradle
 @@ -36,9 +36,9 @@ include 'wpiannotations'
@@ -398,7 +399,7 @@ index 14f1ae7454bf7d9d17531e359a08dcfcf546299c..5750bd4fafc0088834a78e9e6959c7ef
  include 'simulation:halsim_ds_socket'
  include 'simulation:halsim_gui'
  include 'simulation:halsim_ws_core'
-@@ -56,13 +56,13 @@ include 'docs'
+@@ -57,13 +57,13 @@ include 'docs'
  include 'msvcruntime'
  include 'ntcoreffi'
  include 'apriltag'
@@ -614,7 +615,7 @@ index 07f5df67dad1dfcf56adabf348c0712025ea5859..0e5620c10d180a1591d74596e319f3e9
  clean {
      delete oldWpilibVersionFile
 diff --git a/wpilibjExamples/build.gradle b/wpilibjExamples/build.gradle
-index 6ca17d1bec2b51fbe5d1ad4ec2ce4b57ece52ce9..dfc10c3793e117d0169d62e23a0cd85eb984c20f 100644
+index 5e11e2a5dcff634689f9f55f8a994b90e88d547e..2a6f06a9e633a14a4cfa01e3b2d8ff0bc0222415 100644
 --- a/wpilibjExamples/build.gradle
 +++ b/wpilibjExamples/build.gradle
 @@ -66,14 +66,14 @@ tasks.register('buildDesktopJava') {

@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Wed, 8 Oct 2025 03:32:46 -0400
-Subject: [PATCH 22/26] HAND FIXES: Update maven info
+Date: Sun, 12 Oct 2025 05:12:39 -0400
+Subject: [PATCH 23/29] HAND FIXES: Update maven info
 
 ---
  apriltag/BUILD.bazel                    |  4 ++--
  cameraserver/BUILD.bazel                |  4 ++--
  cameraserver/build.gradle               |  2 +-
- command2/BUILD.bazel                    |  4 ++--
- command2/build.gradle                   |  2 +-
+ commandsv2/BUILD.bazel                  |  4 ++--
+ commandsv2/build.gradle                 |  2 +-
  cscore/BUILD.bazel                      |  4 ++--
  cscore/build.gradle                     |  2 +-
  datalog/BUILD.bazel                     |  4 ++--
@@ -126,35 +126,35 @@ index 92925c65646a980c07df2079a8b5f556565618c1..654397184449d9dd54873750341182c7
  }
  
  evaluationDependsOn(':ntcore')
-diff --git a/command2/BUILD.bazel b/command2/BUILD.bazel
-index 915d70402225b0d5900dbdf861e43204a3b2b94b..ee4c0511741bd4840fc15533dd2d9aac2b459f46 100644
---- a/command2/BUILD.bazel
-+++ b/command2/BUILD.bazel
+diff --git a/commandsv2/BUILD.bazel b/commandsv2/BUILD.bazel
+index 402c2305db64e26e7efb92bb476293cadf0806f5..86be7d837cd76324e513774e4837164023909f64 100644
+--- a/commandsv2/BUILD.bazel
++++ b/commandsv2/BUILD.bazel
 @@ -106,7 +106,7 @@ wpilib_java_library(
      srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
      exported_plugins = ["//javacPlugin:plugin"],
-     maven_artifact_name = "command2-java",
--    maven_group_id = "edu.wpi.first.command2",
-+    maven_group_id = "org.wpilib.command2",
+     maven_artifact_name = "commandsv2-java",
+-    maven_group_id = "edu.wpi.first.commandsv2",
++    maven_group_id = "org.wpilib.commandsv2",
      plugins = ["//javacPlugin:plugin"],
      visibility = ["//visibility:public"],
      deps = [
 @@ -181,5 +181,5 @@ java_binary(
  package_minimal_cc_project(
-     name = "command2",
-     maven_artifact_name = "command2-cpp",
--    maven_group_id = "edu.wpi.first.command2",
-+    maven_group_id = "org.wpilib.command2",
+     name = "commandsv2",
+     maven_artifact_name = "commandsv2-cpp",
+-    maven_group_id = "edu.wpi.first.commandsv2",
++    maven_group_id = "org.wpilib.commandsv2",
  )
-diff --git a/command2/build.gradle b/command2/build.gradle
-index 0f54c95b4985e0a3408215245f403d4b82d276da..ea129cb4afd75ae95715773e24dc7ff4bcdb65aa 100644
---- a/command2/build.gradle
-+++ b/command2/build.gradle
+diff --git a/commandsv2/build.gradle b/commandsv2/build.gradle
+index 0d137721b4ad637752102116c8a0ff210d0e2506..16359c2ce1633f765702542003a32cd3c7130866 100644
+--- a/commandsv2/build.gradle
++++ b/commandsv2/build.gradle
 @@ -1,6 +1,6 @@
  ext {
-     nativeName = 'command2'
+     nativeName = 'commandsv2'
 -    devMain = 'edu.wpi.first.wpilibj2.commands.DevMain'
-+    devMain = 'org.wpilib.commands.DevMain'
++    devMain = 'org.wpilib.commandsv2.DevMain'
  }
  
  evaluationDependsOn(':ntcore')
@@ -231,7 +231,7 @@ index 55a23c227a65947a9b5e404af645d8114bf7ce75..d6746c43ff8b32c659ac7f5c500b0cc3
  
  apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 diff --git a/docs/BUILD.bazel b/docs/BUILD.bazel
-index 763554a119fb452403d32dacbedbeb2223881e97..25a46d6585e722b829f907e8cee92a89ceb5946e 100644
+index 0ecbdedf706a5655e226bb288e7a8ca59f8fa24c..e505e212823d39b3d46d6a2f439630b7d5d10ff4 100644
 --- a/docs/BUILD.bazel
 +++ b/docs/BUILD.bazel
 @@ -96,7 +96,7 @@ pkg_zip(
@@ -243,7 +243,7 @@ index 763554a119fb452403d32dacbedbeb2223881e97..25a46d6585e722b829f907e8cee92a89
      target = ":doxygen-zip",
      visibility = ["//visibility:public"],
  )
-@@ -129,7 +129,7 @@ copy_file(
+@@ -130,7 +130,7 @@ copy_file(
  
  maven_export(
      name = "wpilibj_publish",
@@ -253,10 +253,10 @@ index 763554a119fb452403d32dacbedbeb2223881e97..25a46d6585e722b829f907e8cee92a89
      visibility = ["//visibility:public"],
  )
 diff --git a/docs/build.gradle b/docs/build.gradle
-index a4f8bfb0310fba691194d1a8db060fabc44f0714..8454bc526d902683dd123b001c446a4555dd9822 100644
+index 24f5dc44b665f05bfe546802033627aba2638a93..65040363927460e2e24ad1ead8c0ea61faea0d0e 100644
 --- a/docs/build.gradle
 +++ b/docs/build.gradle
-@@ -21,12 +21,12 @@ evaluationDependsOn(':romiVendordep')
+@@ -22,12 +22,12 @@ evaluationDependsOn(':romiVendordep')
  evaluationDependsOn(':xrpVendordep')
  
  def baseArtifactIdCpp = 'documentation'
@@ -274,7 +274,7 @@ index a4f8bfb0310fba691194d1a8db060fabc44f0714..8454bc526d902683dd123b001c446a45
  def outputsFolder = file("$project.buildDir/outputs")
  
 diff --git a/epilogue-processor/BUILD.bazel b/epilogue-processor/BUILD.bazel
-index a9e2583a84d8442b832bc083132ffc833ab961fa..2d5da99e54b288fdaee7565aceb707f4a43e597d 100644
+index 8db096259076352f767e9eab7ef6df191f042fc8..7c9f4cc41a8c68267351fa90787ae8faf93e9972 100644
 --- a/epilogue-processor/BUILD.bazel
 +++ b/epilogue-processor/BUILD.bazel
 @@ -7,7 +7,7 @@ wpilib_java_library(
@@ -287,7 +287,7 @@ index a9e2583a84d8442b832bc083132ffc833ab961fa..2d5da99e54b288fdaee7565aceb707f4
      resources = glob(["src/main/resources/**"]),
      visibility = ["//visibility:public"],
 diff --git a/epilogue-processor/build.gradle b/epilogue-processor/build.gradle
-index dbd2cc688b1f24765274914e8a5926511d41c648..31aae76e00b167da6fcaeadb5d95fb95c427133f 100644
+index f2efd47b366a78187ba5790a0671fe85d58c72ab..5db590e45905260fc5bc1dcf88ee938e7cfd8b56 100644
 --- a/epilogue-processor/build.gradle
 +++ b/epilogue-processor/build.gradle
 @@ -2,7 +2,7 @@ ext {

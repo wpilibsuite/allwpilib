@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Wed, 8 Oct 2025 03:32:45 -0400
-Subject: [PATCH 21/26] HAND FIXES: Manual cleanup of namespaces
+Date: Sun, 12 Oct 2025 05:12:39 -0400
+Subject: [PATCH 22/29] HAND FIXES: Manual cleanup of namespaces
 
 ---
  .../src/main/native/cpp/vision/VisionRunner.cpp      |  4 ++--
@@ -62,13 +62,13 @@ index 990cb3a14abc0918147d40f2ac9a80196782ec18..a0164a0fbec38a716c0f9b3825ca2fd5
    auto res = csShared->GetRobotMainThreadId();
    if (res.second && (std::this_thread::get_id() == res.first)) {
      csShared->SetVisionRunnerError(
-diff --git a/command2/src/main/native/cpp/frc2/command/button/Trigger.cpp b/command2/src/main/native/cpp/frc2/command/button/Trigger.cpp
-index 1ab59302012125f065afec8ae4d4dc8b89706036..89cb9e301f90eb21002404337cfa4e74bdc6d622 100644
---- a/command2/src/main/native/cpp/frc2/command/button/Trigger.cpp
-+++ b/command2/src/main/native/cpp/frc2/command/button/Trigger.cpp
+diff --git a/commandsv2/src/main/native/cpp/frc2/command/button/Trigger.cpp b/commandsv2/src/main/native/cpp/frc2/command/button/Trigger.cpp
+index 2a1578e36c22aaeff98fc80fb432aac4d8d761f5..c2f19c505fdf64cfaa803f52232c411c4c1fc83f 100644
+--- a/commandsv2/src/main/native/cpp/frc2/command/button/Trigger.cpp
++++ b/commandsv2/src/main/native/cpp/frc2/command/button/Trigger.cpp
 @@ -10,7 +10,7 @@
  
- #include "wpi/command2/CommandPtr.hpp"
+ #include "wpi/commands2/CommandPtr.hpp"
  
 -using namespace frc;
 +using namespace wpi;
@@ -76,7 +76,7 @@ index 1ab59302012125f065afec8ae4d4dc8b89706036..89cb9e301f90eb21002404337cfa4e74
  
  Trigger::Trigger(const Trigger& other) = default;
 diff --git a/datalog/src/main/native/include/wpi/datalog/DataLog.hpp b/datalog/src/main/native/include/wpi/datalog/DataLog.hpp
-index 3e786a56437a9a91a080aa3537d61c3494752de8..2dd4758f51cdf22250b2df1ea76561078ba8149e 100644
+index e74c45bf8da760a80bbe53599978fc8149080da2..fdfc45ec0728ff8f62f79c03f730851230ef128b 100644
 --- a/datalog/src/main/native/include/wpi/datalog/DataLog.hpp
 +++ b/datalog/src/main/native/include/wpi/datalog/DataLog.hpp
 @@ -162,7 +162,7 @@ class DataLog {
@@ -98,7 +98,7 @@ index 3e786a56437a9a91a080aa3537d61c3494752de8..2dd4758f51cdf22250b2df1ea7656107
      wpi::util::ForEachStructSchema<T>(
          [this, timestamp](auto typeString, auto schema) {
 diff --git a/tools/sysid/src/main/native/cpp/view/Analyzer.cpp b/tools/sysid/src/main/native/cpp/view/Analyzer.cpp
-index ca324bb700c46d973fcac0d27655f40e1f5aa353..c2c69437442652fc9301ec8b47b41f877778ac4b 100644
+index dfa18a401d03766d4838add5c2c44c304f177faa..47fd71f632ee4b5ebd4d9e5fddf61e03df9de39d 100644
 --- a/tools/sysid/src/main/native/cpp/view/Analyzer.cpp
 +++ b/tools/sysid/src/main/native/cpp/view/Analyzer.cpp
 @@ -612,9 +612,9 @@ void Analyzer::DisplayFeedbackGains() {
@@ -196,11 +196,11 @@ index 6c938e1adc6f858deb40725fd1abc785402ec644..268b947d91119087d89a98d244b72564
  class BooleanTopic;
  class NetworkTable;
 diff --git a/wpilibc/src/main/native/include/wpi/smartdashboard/FieldObject2d.hpp b/wpilibc/src/main/native/include/wpi/smartdashboard/FieldObject2d.hpp
-index 4bf2ec270518d9de87cf7eb736117056d7c583e1..b962a2bab4d0196d51f7bb81adb93173593debb6 100644
+index 06967260a842034f27fb5d8d4e78e78bd42a57ce..ff45ba68da075da5982d620394cf7e97f3d45a7a 100644
 --- a/wpilibc/src/main/native/include/wpi/smartdashboard/FieldObject2d.hpp
 +++ b/wpilibc/src/main/native/include/wpi/smartdashboard/FieldObject2d.hpp
 @@ -17,10 +17,13 @@
- #include <wpi/util/SmallVector.h>
+ #include <wpi/util/SmallVector.hpp>
  #include <wpi/util/mutex.hpp>
  
 -namespace wpi {
@@ -331,11 +331,11 @@ index 713c890fc3c7684f971326f671737cd927387f8b..b4d396dd35d7032df7a34b3b980a82f7
  class GetAddrInfoReq;
  class Loop;
 diff --git a/wpinet/src/main/native/include/wpi/net/UDPClient.hpp b/wpinet/src/main/native/include/wpi/net/UDPClient.hpp
-index d1cd56bc05a7ae06e487b36362062b9b100bb598..673e0e2fdbe68bbcf552c67f998141a68aebbb7a 100644
+index 0b9115285cc9eeadc11853878817da315bb5f295..cc848f3b38e82a066014db94e0db035f1253c7e7 100644
 --- a/wpinet/src/main/native/include/wpi/net/UDPClient.hpp
 +++ b/wpinet/src/main/native/include/wpi/net/UDPClient.hpp
 @@ -12,10 +12,11 @@
- #include <wpi/util/SmallVector.h>
+ #include <wpi/util/SmallVector.hpp>
  #include <wpi/util/mutex.hpp>
  
 -namespace wpi::net {

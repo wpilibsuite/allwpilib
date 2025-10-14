@@ -38,7 +38,7 @@ class RawConfig:
 
     # Bulk project moves.
     PROJECT_RENAMES = [
-        ("wpilibNewCommands/", "command2/"),
+        ("wpilibNewCommands/", "commandsv2/"),
         ("fieldImages/", "fields/"),
         ("datalogtool/", "tools/datalogtool/"),
         ("outlineviewer/", "tools/outlineviewer/"),
@@ -76,8 +76,8 @@ class RawConfig:
         ("wpilibc/src/main/native/include", "frc", "wpi"),
         ("wpilibc/src/generated/main/native/include", "frc", "wpi"),
         ("apriltag/src/main/native/include", "frc", "wpi"),
-        ("command2/src/main/native/include", "frc2/command", "wpi/command2"),
-        ("command2/src/generated/main/native/include", "frc2/command", "wpi/command2"),
+        ("commandsv2/src/main/native/include", "frc2/command", "wpi/commands2"),
+        ("commandsv2/src/generated/main/native/include", "frc2/command", "wpi/commands2"),
         ("fields/src/main/native/include", "fields", "wpi/fields"),
         ("cameraserver/src/main/native/include", "cameraserver", "wpi/cameraserver"),
         ("cameraserver/src/main/native/include", "vision", "wpi/vision"),
@@ -100,7 +100,7 @@ class RawConfig:
             pathlib.Path("ntcore/src/main/native/include"),
             [
                 ("ntcore_test.h", "wpi/ntcore/ntcore_test" + NEW_CC_FILE_SUFFIX),
-                ("ntcore.h", "wpi/ntcore/ntcore" + NEW_CC_FILE_SUFFIX),
+                ("ntcore.h", "wpi/ntcore/ntcore.h"),
                 ("ntcore_c.h", "wpi/ntcore/ntcore_c.h"),
                 ("ntcore_cpp.h", "wpi/ntcore/ntcore_cpp" + NEW_CC_FILE_SUFFIX),
             ],
@@ -126,18 +126,16 @@ class RawConfig:
             ],
         ),
         (
-            pathlib.Path("ntcoreffi/src/main/native/include"),
-            [
-                ("DataLogManager.h", "DataLogManager" + NEW_CC_FILE_SUFFIX),
-            ],
-        ),
-        (
             pathlib.Path("wpimath/src/main/native/include"),
             [
                 ("wpimath/MathShared.h", "wpi/math/util/MathShared" + NEW_CC_FILE_SUFFIX),
                 ("frc/DARE.h", "wpi/math/linalg/DARE" + NEW_CC_FILE_SUFFIX),
                 ("frc/ct_matrix.h", "wpi/math/linalg/ct_matrix" + NEW_CC_FILE_SUFFIX),
                 ("frc/EigenCore.h", "wpi/math/linalg/EigenCore" + NEW_CC_FILE_SUFFIX),
+                ("frc/proto/MatrixProto.h", "wpi/math/linalg/proto/MatrixProto" + NEW_CC_FILE_SUFFIX),
+                ("frc/proto/VectorProto.h", "wpi/math/linalg/proto/VectorProto" + NEW_CC_FILE_SUFFIX),
+                ("frc/struct/MatrixStruct.h", "wpi/math/linalg/struct/StructProto" + NEW_CC_FILE_SUFFIX),
+                ("frc/struct/VectorStruct.h", "wpi/math/linalg/struct/VectorStruct" + NEW_CC_FILE_SUFFIX),
                 ("frc/ComputerVisionUtil.h", "wpi/math/util/ComputerVisionUtil" + NEW_CC_FILE_SUFFIX),
                 ("frc/MathUtil.h", "wpi/math/util/MathUtil" + NEW_CC_FILE_SUFFIX),
                 ("frc/StateSpaceUtil.h", "wpi/math/util/StateSpaceUtil" + NEW_CC_FILE_SUFFIX),
@@ -148,8 +146,8 @@ class RawConfig:
             [
                 ("cscore_cv.h", "wpi/cscore/cscore_cv" + NEW_CC_FILE_SUFFIX),
                 ("cscore_cpp.h", "wpi/cscore/cscore_cpp" + NEW_CC_FILE_SUFFIX),
-                ("cscore.h", "wpi/cscore/cscore" + NEW_CC_FILE_SUFFIX),
-                ("cscore_raw.h", "wpi/cscore/cscore_raw" + NEW_CC_FILE_SUFFIX),
+                ("cscore.h", "wpi/cscore/cscore.h"),
+                ("cscore_raw.h", "wpi/cscore/cscore_raw.h"),
                 ("cscore_c.h", "wpi/cscore/cscore_c.h"),
                 ("cscore_oo.h", "wpi/cscore/cscore_oo" + NEW_CC_FILE_SUFFIX),
                 ("cscore_runloop.h", "wpi/cscore/cscore_runloop" + NEW_CC_FILE_SUFFIX),
@@ -172,6 +170,7 @@ class RawConfig:
                 ("frc/GenericHID.h", "wpi/driverstation/GenericHID" + NEW_CC_FILE_SUFFIX),
                 ("frc/Joystick.h", "wpi/driverstation/Joystick" + NEW_CC_FILE_SUFFIX),
                 ("frc/ADXL345_I2C.h", "wpi/hardware/accelerometer/ADXL345_I2C" + NEW_CC_FILE_SUFFIX),
+                ("frc/DSControlWord.h", "wpi/driverstation/DSControlWord" + NEW_CC_FILE_SUFFIX),
                 ("frc/AnalogAccelerometer.h", "wpi/hardware/accelerometer/AnalogAccelerometer" + NEW_CC_FILE_SUFFIX),
                 ("frc/CAN.h", "wpi/hardware/bus/CAN" + NEW_CC_FILE_SUFFIX),
                 ("frc/I2C.h", "wpi/hardware/bus/I2C" + NEW_CC_FILE_SUFFIX),
@@ -181,7 +180,14 @@ class RawConfig:
                 ("frc/DigitalInput.h", "wpi/hardware/discrete/DigitalInput" + NEW_CC_FILE_SUFFIX),
                 ("frc/DigitalOutput.h", "wpi/hardware/discrete/DigitalOutput" + NEW_CC_FILE_SUFFIX),
                 ("frc/PWM.h", "wpi/hardware/discrete/PWM" + NEW_CC_FILE_SUFFIX),
-                ("frc/OnBoardIMU.h", "wpi/hardware/imu/OnBoardIMU" + NEW_CC_FILE_SUFFIX),
+                ("frc/Errors.h", "wpi/system/Errors" + NEW_CC_FILE_SUFFIX),
+                ("frc/WPIErrors.mac", "wpi/system/WPIErrors.mac"),
+                ("frc/WPIWarnings.mac", "wpi/system/WPIWarnings.mac"),
+                ("frc/OnboardIMU.h", "wpi/hardware/imu/OnboardIMU" + NEW_CC_FILE_SUFFIX),
+                ("frc/RuntimeType.h", "wpi/system/RuntimeType" + NEW_CC_FILE_SUFFIX),
+                ("frc/SensorUtil.h", "wpi/util/SensorUtil" + NEW_CC_FILE_SUFFIX),
+                ("frc/SharpIR.h", "wpi/hardware/range/SharpIR" + NEW_CC_FILE_SUFFIX),
+                ("frc/SystemServer.h", "wpi/system/SystemServer" + NEW_CC_FILE_SUFFIX),
                 ("frc/AddressableLED.h", "wpi/hardware/led/AddressableLED" + NEW_CC_FILE_SUFFIX),
                 ("frc/LEDPattern.h", "wpi/hardware/led/LEDPattern" + NEW_CC_FILE_SUFFIX),
                 ("frc/motorcontrol/MotorController.h", "wpi/hardware/motor/MotorController" + NEW_CC_FILE_SUFFIX),
@@ -322,6 +328,79 @@ class RawConfig:
         ),
     ]
 
+    CC_SOURCE_MOVES = [
+        ("wpilibc/src/generated/main/native/cpp/PS4Controller.cpp", "wpilibc/src/generated/main/native/cpp/driverstation/PS4Controller.cpp"),
+        ("wpilibc/src/generated/main/native/cpp/PS5Controller.cpp", "wpilibc/src/generated/main/native/cpp/driverstation/PS5Controller.cpp"),
+        ("wpilibc/src/generated/main/native/cpp/StadiaController.cpp", "wpilibc/src/generated/main/native/cpp/driverstation/StadiaController.cpp"),
+        ("wpilibc/src/generated/main/native/cpp/XboxController.cpp", "wpilibc/src/generated/main/native/cpp/driverstation/XboxController.cpp"),
+        ("wpilibc/src/generated/main/native/cpp/motorcontrol/DMC60.cpp", "wpilibc/src/generated/main/native/cpp/hardware/motor/DMC60.cpp"),
+        ("wpilibc/src/generated/main/native/cpp/motorcontrol/Jaguar.cpp", "wpilibc/src/generated/main/native/cpp/hardware/motor/Jaguar.cpp"),
+        ("wpilibc/src/generated/main/native/cpp/motorcontrol/Koors40.cpp", "wpilibc/src/generated/main/native/cpp/hardware/motor/Koors40.cpp"),
+        ("wpilibc/src/generated/main/native/cpp/motorcontrol/PWMSparkFlex.cpp", "wpilibc/src/generated/main/native/cpp/hardware/motor/PWMSparkFlex.cpp"),
+        ("wpilibc/src/generated/main/native/cpp/motorcontrol/PWMSparkMax.cpp", "wpilibc/src/generated/main/native/cpp/hardware/motor/PWMSparkMax.cpp"),
+        ("wpilibc/src/generated/main/native/cpp/motorcontrol/PWMTalonFX.cpp", "wpilibc/src/generated/main/native/cpp/hardware/motor/PWMTalonFX.cpp"),
+        ("wpilibc/src/generated/main/native/cpp/motorcontrol/PWMTalonSRX.cpp", "wpilibc/src/generated/main/native/cpp/hardware/motor/PWMTalonSRX.cpp"),
+        ("wpilibc/src/generated/main/native/cpp/motorcontrol/PWMVenom.cpp", "wpilibc/src/generated/main/native/cpp/hardware/motor/PWMVenom.cpp"),
+        ("wpilibc/src/generated/main/native/cpp/motorcontrol/PWMVictorSPX.cpp", "wpilibc/src/generated/main/native/cpp/hardware/motor/PWMVictorSPX.cpp"),
+        ("wpilibc/src/generated/main/native/cpp/motorcontrol/SD540.cpp", "wpilibc/src/generated/main/native/cpp/hardware/motor/SD540.cpp"),
+        ("wpilibc/src/generated/main/native/cpp/motorcontrol/Spark.cpp", "wpilibc/src/generated/main/native/cpp/hardware/motor/Spark.cpp"),
+        ("wpilibc/src/generated/main/native/cpp/motorcontrol/SparkMini.cpp", "wpilibc/src/generated/main/native/cpp/hardware/motor/SparkMini.cpp"),
+        ("wpilibc/src/generated/main/native/cpp/motorcontrol/Talon.cpp", "wpilibc/src/generated/main/native/cpp/hardware/motor/Talon.cpp"),
+        ("wpilibc/src/generated/main/native/cpp/motorcontrol/Victor.cpp", "wpilibc/src/generated/main/native/cpp/hardware/motor/Victor.cpp"),
+        ("wpilibc/src/generated/main/native/cpp/motorcontrol/VictorSP.cpp", "wpilibc/src/generated/main/native/cpp/hardware/motor/VictorSP.cpp"),
+        ("wpilibc/src/main/native/cpp/DSControlWord.cpp", "wpilibc/src/main/native/cpp/driverstation/DSControlWord.cpp"),
+        ("wpilibc/src/main/native/cpp/DriverStation.cpp", "wpilibc/src/main/native/cpp/driverstation/DriverStation.cpp"),
+        ("wpilibc/src/main/native/cpp/GenericHID.cpp", "wpilibc/src/main/native/cpp/driverstation/GenericHID.cpp"),
+        ("wpilibc/src/main/native/cpp/Joystick.cpp", "wpilibc/src/main/native/cpp/driverstation/Joystick.cpp"),
+        ("wpilibc/src/main/native/cpp/ADXL345_I2C.cpp", "wpilibc/src/main/native/cpp/hardware/accelerometer/ADXL345_I2C.cpp"),
+        ("wpilibc/src/main/native/cpp/AnalogAccelerometer.cpp", "wpilibc/src/main/native/cpp/hardware/accelerometer/AnalogAccelerometer.cpp"),
+        ("wpilibc/src/main/native/cpp/CAN.cpp", "wpilibc/src/main/native/cpp/hardware/bus/CAN.cpp"),
+        ("wpilibc/src/main/native/cpp/I2C.cpp", "wpilibc/src/main/native/cpp/hardware/bus/I2C.cpp"),
+        ("wpilibc/src/main/native/cpp/SerialPort.cpp", "wpilibc/src/main/native/cpp/hardware/bus/SerialPort.cpp"),
+        ("wpilibc/src/main/native/cpp/AnalogInput.cpp", "wpilibc/src/main/native/cpp/hardware/discrete/AnalogInput.cpp"),
+        ("wpilibc/src/main/native/cpp/DigitalInput.cpp", "wpilibc/src/main/native/cpp/hardware/discrete/DigitalInput.cpp"),
+        ("wpilibc/src/main/native/cpp/DigitalOutput.cpp", "wpilibc/src/main/native/cpp/hardware/discrete/DigitalOutput.cpp"),
+        ("wpilibc/src/main/native/cpp/PWM.cpp", "wpilibc/src/main/native/cpp/hardware/discrete/PWM.cpp"),
+        ("wpilibc/src/main/native/cpp/OnboardIMU.cpp", "wpilibc/src/main/native/cpp/hardware/imu/OnboardIMU.cpp"),
+        ("wpilibc/src/main/native/cpp/AddressableLED.cpp", "wpilibc/src/main/native/cpp/hardware/led/AddressableLED.cpp"),
+        ("wpilibc/src/main/native/cpp/LEDPattern.cpp", "wpilibc/src/main/native/cpp/hardware/led/LEDPattern.cpp"),
+        ("wpilibc/src/main/native/cpp/MotorSafety.cpp", "wpilibc/src/main/native/cpp/hardware/motor/MotorSafety.cpp"),
+        ("wpilibc/src/main/native/cpp/Compressor.cpp", "wpilibc/src/main/native/cpp/hardware/pneumatic/Compressor.cpp"),
+        ("wpilibc/src/main/native/cpp/DoubleSolenoid.cpp", "wpilibc/src/main/native/cpp/hardware/pneumatic/DoubleSolenoid.cpp"),
+        ("wpilibc/src/main/native/cpp/PneumaticHub.cpp", "wpilibc/src/main/native/cpp/hardware/pneumatic/PneumaticHub.cpp"),
+        ("wpilibc/src/main/native/cpp/PneumaticsBase.cpp", "wpilibc/src/main/native/cpp/hardware/pneumatic/PneumaticsBase.cpp"),
+        ("wpilibc/src/main/native/cpp/PneumaticsControlModule.cpp", "wpilibc/src/main/native/cpp/hardware/pneumatic/PneumaticsControlModule.cpp"),
+        ("wpilibc/src/main/native/cpp/Solenoid.cpp", "wpilibc/src/main/native/cpp/hardware/pneumatic/Solenoid.cpp"),
+        ("wpilibc/src/main/native/cpp/PowerDistribution.cpp", "wpilibc/src/main/native/cpp/hardware/power/PowerDistribution.cpp"),
+        ("wpilibc/src/main/native/cpp/SharpIR.cpp", "wpilibc/src/main/native/cpp/hardware/range/SharpIR.cpp"),
+        ("wpilibc/src/main/native/cpp/AnalogEncoder.cpp", "wpilibc/src/main/native/cpp/hardware/rotation/AnalogEncoder.cpp"),
+        ("wpilibc/src/main/native/cpp/AnalogPotentiometer.cpp", "wpilibc/src/main/native/cpp/hardware/rotation/AnalogPotentiometer.cpp"),
+        ("wpilibc/src/main/native/cpp/DutyCycle.cpp", "wpilibc/src/main/native/cpp/hardware/rotation/DutyCycle.cpp"),
+        ("wpilibc/src/main/native/cpp/DutyCycleEncoder.cpp", "wpilibc/src/main/native/cpp/hardware/rotation/DutyCycleEncoder.cpp"),
+        ("wpilibc/src/main/native/cpp/Encoder.cpp", "wpilibc/src/main/native/cpp/hardware/rotation/Encoder.cpp"),
+        ("wpilibc/src/main/native/cpp/IterativeRobotBase.cpp", "wpilibc/src/main/native/cpp/opmode/IterativeRobotBase.cpp"),
+        ("wpilibc/src/main/native/cpp/RobotState.cpp", "wpilibc/src/main/native/cpp/opmode/RobotState.cpp"),
+        ("wpilibc/src/main/native/cpp/TimedRobot.cpp", "wpilibc/src/main/native/cpp/opmode/TimedRobot.cpp"),
+        ("wpilibc/src/main/native/cpp/TimesliceRobot.cpp", "wpilibc/src/main/native/cpp/opmode/TimesliceRobot.cpp"),
+        ("wpilibc/src/main/native/cpp/DataLogManager.cpp", "wpilibc/src/main/native/cpp/system/DataLogManager.cpp"),
+        ("wpilibc/src/main/native/cpp/Errors.cpp", "wpilibc/src/main/native/cpp/system/Errors.cpp"),
+        ("wpilibc/src/main/native/cpp/Filesystem.cpp", "wpilibc/src/main/native/cpp/system/Filesystem.cpp"),
+        ("wpilibc/src/main/native/cpp/Notifier.cpp", "wpilibc/src/main/native/cpp/system/Notifier.cpp"),
+        ("wpilibc/src/main/native/cpp/Resource.cpp", "wpilibc/src/main/native/cpp/system/Resource.cpp"),
+        ("wpilibc/src/main/native/cpp/RobotController.cpp", "wpilibc/src/main/native/cpp/system/RobotController.cpp"),
+        ("wpilibc/src/main/native/cpp/ScopedTracer.cpp", "wpilibc/src/main/native/cpp/system/ScopedTracer.cpp"),
+        ("wpilibc/src/main/native/cpp/SystemServer.cpp", "wpilibc/src/main/native/cpp/system/SystemServer.cpp"),
+        ("wpilibc/src/main/native/cpp/Threads.cpp", "wpilibc/src/main/native/cpp/system/Threads.cpp"),
+        ("wpilibc/src/main/native/cpp/Timer.cpp", "wpilibc/src/main/native/cpp/system/Timer.cpp"),
+        ("wpilibc/src/main/native/cpp/Tracer.cpp", "wpilibc/src/main/native/cpp/system/Tracer.cpp"),
+        ("wpilibc/src/main/native/cpp/Watchdog.cpp", "wpilibc/src/main/native/cpp/system/Watchdog.cpp"),
+        ("wpilibc/src/main/native/cpp/Alert.cpp", "wpilibc/src/main/native/cpp/util/Alert.cpp"),
+        ("wpilibc/src/main/native/cpp/Preferences.cpp", "wpilibc/src/main/native/cpp/util/Preferences.cpp"),
+        ("wpilibc/src/main/native/cpp/SensorUtil.cpp", "wpilibc/src/main/native/cpp/util/SensorUtil.cpp"),
+        ("wpimath/src/main/native/cpp/MathShared.cpp", "wpimath/src/main/native/cpp/util/MathShared.cpp"),
+        ("wpimath/src/main/native/cpp/StateSpaceUtil.cpp", "wpimath/src/main/native/cpp/util/StateSpaceUtil.cpp"),
+    ]
+
     # Package changes (and therefor folder moves) for java projects.
     # Format: (project, original package, new package)
     JAVA_PROJECT_REPLACMENTS = [
@@ -329,7 +408,7 @@ class RawConfig:
         ("wpimath", "edu.wpi.first.math", "org.wpilib.math"),
         ("wpinet", "edu.wpi.first.net", "org.wpilib.net"),
         ("datalog", "edu.wpi.first.datalog", "org.wpilib.datalog"),
-        ("command2", "edu.wpi.first.wpilibj2.command", "org.wpilib.command2"),
+        ("commandsv2", "edu.wpi.first.wpilibj2.command", "org.wpilib.commands2"),
         ("ntcore", "edu.wpi.first.networktables", "org.wpilib.networktables"),
         ("fields", "edu.wpi.first.fields", "org.wpilib.fields"),
         ("hal", "edu.wpi.first.hal", "org.wpilib.hardware.hal"),
@@ -368,9 +447,9 @@ class RawConfig:
             ],
         ),
         (
-            pathlib.Path("command2"),
+            pathlib.Path("commandsv2"),
             [
-                ("edu/wpi/first/wpilibj2/commands", "org/wpilib/command2", "DevMain"),
+                ("edu/wpi/first/wpilibj2/commands", "org/wpilib/commands2", "DevMain"),
                 ("edu/wpi/first/wpilibj2", "org/wpilib", "MockHardwareExtension"),
             ],
         ),
@@ -382,6 +461,10 @@ class RawConfig:
                 ("edu/wpi/first/math", "org/wpilib/math/linalg", "Vector"),
                 ("edu/wpi/first/math", "org/wpilib/math/linalg", "Matrix"),
                 ("edu/wpi/first/math", "org/wpilib/math/linalg", "MatBuilder"),
+                ("edu/wpi/first/math/proto", "org/wpilib/math/linalg/proto", "VectorProto"),
+                ("edu/wpi/first/math/proto", "org/wpilib/math/linalg/proto", "MatrixProto"),
+                ("edu/wpi/first/math/struct", "org/wpilib/math/linalg/struct", "VectorStruct"),
+                ("edu/wpi/first/math/struct", "org/wpilib/math/linalg/struct", "MatrixStruct"),
                 ("edu/wpi/first/math", "org/wpilib/math/util", "MathUtil"),
                 ("edu/wpi/first/math", "org/wpilib/math/util", "StateSpaceUtil"),
                 ("edu/wpi/first/math", "org/wpilib/math/util", "ComputerVisionUtil"),
@@ -495,12 +578,12 @@ class RawConfig:
     GENERIC_RENAMES = [
         ("apriltag/src/main/native/resources/edu/wpi/first", "apriltag/src/main/native/resources/org/wpilib/vision"),
         ("apriltag/src/test/resources/edu/wpi/first", "apriltag/src/test/resources/org/wpilib/vision"),
-        ("command2/src/generate/main/native/cpp/frc2/command/", "command2/src/generate/main/native/cpp/wpi/command2"),
-        ("command2/src/generate/main/native/include/frc2/command/", "command2/src/generate/main/native/include/wpi/command2"),
-        ("command2/wpilibnewcommands-config.cmake.in", "command2/command2-config.cmake.in"),
-        ("command2/src/generated/main/native/cpp/frc2/command", "command2/src/generated/main/native/cpp/wpi/command2"),
-        ("command2/src/test/native/cpp/frc2/", "command2/src/test/native/cpp/wpi/"),
-        ("command2/src/generate/main/native/include/wpi/command2/button/commandhid.h.jinja", "command2/src/generate/main/native/include/wpi/command2/button/commandhid.hpp.jinja"),
+        ("commandsv2/src/generate/main/native/cpp/frc2/command/", "commandsv2/src/generate/main/native/cpp/wpi/commands2"),
+        ("commandsv2/src/generate/main/native/include/frc2/command/", "commandsv2/src/generate/main/native/include/wpi/commands2"),
+        ("commandsv2/wpilibnewcommands-config.cmake.in", "commandsv2/commandsv2-config.cmake.in"),
+        ("commandsv2/src/generated/main/native/cpp/frc2/command", "commandsv2/src/generated/main/native/cpp/wpi/commands2"),
+        ("commandsv2/src/test/native/cpp/frc2/", "commandsv2/src/test/native/cpp/wpi/"),
+        ("commandsv2/src/generate/main/native/include/wpi/commands2/button/commandhid.h.jinja", "commandsv2/src/generate/main/native/include/wpi/commands2/button/commandhid.hpp.jinja"),
         ("fields/fieldimages-config.cmake.in", "fields/fields-config.cmake.in"),
         ("fields/src/main/native/resources/edu/wpi/first", "fields/src/main/native/resources/org/wpilib"),
         ("ntcore/src/generate/main/native/include/networktables/Topic.h.jinja", "ntcore/src/generate/main/native/include/wpi/ntcore/Topic" + NEW_CC_FILE_SUFFIX + ".jinja"),
@@ -616,10 +699,29 @@ def preprocess_java_renames():
     return package_replacements, file_renames, class_package_overrides
 
 
+def _should_rename_to_hpp(original_file):
+    original_file_str = str(original_file)
+
+    if "thirdparty" in original_file_str:
+        return "/llvm/" in original_file_str or "/json/" in original_file_str or "/argparse/" in original_file_str
+    if original_file_str.endswith("_c.h"):
+        return False
+    if original_file.suffix != ".h":
+        return False
+    if "/hal/" in original_file_str:
+        return False
+
+    contents = original_file.read_text()
+    if "#ifdef __cplusplus" in contents:
+        return False
+
+    return True
+
+
 def _preprocess_cc_file(original_dir, new_dir, original_file, include_root):
     original_rel = original_file.relative_to(include_root)
     
-    if original_file.suffix == ".h" and "thirdparty" not in str(original_file) and not str(original_file).endswith("_c.h"):
+    if _should_rename_to_hpp(original_file):
         destination_file = include_root / (
             str(original_rel).replace(original_dir, new_dir) + "pp"
         )
@@ -674,10 +776,13 @@ def preprocess_cc_renames(preprocessor_file):
             full_file = os.path.join(root, f)[2:] # Remove leading ./
             if f.endswith(".h"):
                 if "thirdparty" in root:
-                    continue
-                if "llvm" in root:
-                    continue
+                    if "/llvm/" not in root:
+                        continue
                 if f == "simd.h":
+                    continue
+
+                # Skip all of hal
+                if "hal/" in full_file:
                     continue
 
                 project_root = pathlib.Path(root).parts[0]
@@ -691,6 +796,7 @@ def preprocess_cc_renames(preprocessor_file):
                    "src/main/native/systemcore" in root or \
                    "src/app/native/cpp" in root or \
                    "src/main/native/sim" in root or \
+                   "llvm/cpp" in root or \
                    "wpilibcExamples" in root:                    
                     if full_file not in file_renames:
                         private_file_renames[full_file] = full_file + "pp"
@@ -709,13 +815,11 @@ def preprocess_cc_renames(preprocessor_file):
                             private_include_replacements[project_root]["motorcontrol/" + f] = "motorcontrol/" + f + "pp"
                             private_include_replacements[project_root]["callback_helpers/" + f] = "callback_helpers/" + f + "pp"
 
-
     # These include replacements are mostly due to inculdes that did not have fully qualified names.
     include_replacements["EventLoop.h"] = "EventLoop" + NEW_CC_FILE_SUFFIX
     include_replacements["PneumaticsBase.h"] = "PneumaticsBase" + NEW_CC_FILE_SUFFIX
     include_replacements["EdgeConfiguration.h"] = "EdgeConfiguration" + NEW_CC_FILE_SUFFIX
 
-    include_replacements["HandlesInternal.h"] = "HandlesInternal" + NEW_CC_FILE_SUFFIX
     include_replacements["util/Color.h"] = "wpi/util/Color" + NEW_CC_FILE_SUFFIX
     include_replacements["Color.h"] = "wpi/util/Color" + NEW_CC_FILE_SUFFIX
     include_replacements["util/Color8Bit.h"] = "wpi/util/Color8Bit" + NEW_CC_FILE_SUFFIX
@@ -728,7 +832,7 @@ def preprocess_cc_renames(preprocessor_file):
     include_replacements["SwerveDriveKinematics.h"] = "wpi/math/kinematics/SwerveDriveKinematics" + NEW_CC_FILE_SUFFIX
     include_replacements["SwerveModulePosition.h"] = "wpi/math/kinematics/SwerveModulePosition" + NEW_CC_FILE_SUFFIX
     include_replacements["SwerveModuleState.h"] = "wpi/math/kinematics/SwerveModuleState" + NEW_CC_FILE_SUFFIX
-    include_replacements["Trigger.h"] = "wpi/command2/button/Trigger" + NEW_CC_FILE_SUFFIX
+    include_replacements["Trigger.h"] = "wpi/commands2/button/Trigger" + NEW_CC_FILE_SUFFIX
 
     # Windows non-case sensitive
     include_replacements["ComCreators.h"] = "COMCreators" + NEW_CC_FILE_SUFFIX
@@ -784,8 +888,8 @@ def fixup_project_renames():
         return suffix not in ["pyc", "jar", "gz", "png", "jpg", "icns", "ico", "avi", "mp4", "bat"]
 
     def fixup_impl(filename, contents):
-        contents = contents.replace("wpilibNewCommands", "command2")
-        contents = contents.replace("wpilibnewcommands", "command2")
+        contents = contents.replace("wpilibNewCommands", "commandsv2")
+        contents = contents.replace("wpilibnewcommands", "commandsv2")
         contents = contents.replace("fieldImages", "fields")
         contents = contents.replace("fieldimages", "fields")
 
@@ -805,6 +909,12 @@ def run_cc_renames(pp_config: PreprocessedConfig):
             
 
     for original, new in pp_config.cc_private_file_renames.items():
+        new = pathlib.Path(new)
+        new.parent.mkdir(parents=True, exist_ok=True)
+        if pathlib.Path(original).exists():
+            shutil.move(original, new)
+
+    for original, new in RawConfig.CC_SOURCE_MOVES:
         new = pathlib.Path(new)
         new.parent.mkdir(parents=True, exist_ok=True)
         if pathlib.Path(original).exists():
@@ -1386,7 +1496,7 @@ NAMESPACE_PROJECT_REPLACEMENTS = [
     # command
     ##################
     (
-        "command2",
+        "commandsv2",
         wpiutil_namespaced_classes_and_functions() + wpiunits_namespaced_classes_and_functions() + wpimath_namespaced_classes_and_functions() + ntcore_namespaced_classes_and_functions() + [
             ("namespace frc2", "namespace wpi::cmd"),
             ("frc2::", "wpi::cmd::"),
@@ -1751,12 +1861,6 @@ def load_pp_config(preprocessor_file):
     )
 
 
-
-def run_java_spotless():
-    subprocess.check_call(["./gradlew", "spotlessApply"])
-
-
-
 def pregenerate_files():
     subprocess.check_call(["bazel", "run", "//wpiutil:robotpy-wpiutil-generator.generate_build_info"])
     subprocess.check_call(["bazel", "run", "//wpinet:robotpy-wpinet-generator.generate_build_info"])
@@ -1766,7 +1870,7 @@ def pregenerate_files():
 
 
 def run_upstream_utils():
-    libraries = ["llvm", "json"]
+    libraries = ["llvm", "json", "sleipnir"]
 
     # python_exe = sys.executable
     python_exe = "python3.12" # TODO
@@ -1843,21 +1947,26 @@ def main():
     run_linters()
     
     apply_patch("0015-HAND-FIXES-Fix-upstream-util-scripts.patch")
-    apply_patch("0016-HAND-FIXES-Fixup-remaining-rename-issues.patch")
+    run_upstream_utils()
+
+    apply_patch("0017-HAND-FIXES-Fixup-remaining-rename-issues.patch")
 
     # At this point the code should compile cleanly with just the file moves
     # The next phase of refactoring is running the more complicated namespace
     # replacements
-    apply_patch("0017-HAND-FIXES-Update-upstream-for-namespace-changes.patch")
+    apply_patch("0018-HAND-FIXES-Update-upstream-for-namespace-changes.patch")
     run_namespace_replacements()
     run_upstream_utils()
-    apply_patch("0020-HAND-FIXES-Update-build-scripts-for-namespaces.patch")
-    apply_patch("0021-HAND-FIXES-Manual-cleanup-of-namespaces.patch")
-    apply_patch("0022-HAND-FIXES-Update-maven-info.patch")
+    apply_patch("0021-HAND-FIXES-Update-build-scripts-for-namespaces.patch")
+    apply_patch("0022-HAND-FIXES-Manual-cleanup-of-namespaces.patch")
+    apply_patch("0023-HAND-FIXES-Update-maven-info.patch")
 
     # Cleanup some extra things
     run_package_stacktrace_replacement()
     run_frc_caps_replacement()
+    
+    apply_patch("0026-HAND-FIX-final-frc-replacements.patch")
+    apply_patch("0027-HAND-FIX-final-java-package-changes.patch")
 
     # Finally run one last linter pass
     run_linters()

@@ -1,10 +1,9 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Wed, 8 Oct 2025 03:29:02 -0400
-Subject: [PATCH 11/26] HAND FIXES: Fixup java and python compilation
+Date: Sun, 12 Oct 2025 03:40:41 -0400
+Subject: [PATCH 11/29] HAND FIXES: Fixup java and python compilation
 
 ---
- wpilibj/src/main/java/org/wpilib/AnalogGyro.java            | 1 +
  .../main/java/org/wpilib/driverstation/DSControlWord.java   | 1 +
  .../main/java/org/wpilib/driverstation/DriverStation.java   | 1 +
  .../java/org/wpilib/hardware/accelerometer/ADXL345_I2C.java | 1 +
@@ -52,20 +51,8 @@ Subject: [PATCH 11/26] HAND FIXES: Fixup java and python compilation
  wpiutil/src/main/native/cpp/jni/WPIUtilJNI.cpp              | 2 +-
  wpiutil/src/main/python/semiwrap/Sendable.yml               | 2 +-
  wpiutil/src/main/python/semiwrap/SendableRegistry.yml       | 4 ++--
- 48 files changed, 77 insertions(+), 5 deletions(-)
+ 47 files changed, 76 insertions(+), 5 deletions(-)
 
-diff --git a/wpilibj/src/main/java/org/wpilib/AnalogGyro.java b/wpilibj/src/main/java/org/wpilib/AnalogGyro.java
-index cbc2c30a36db0cffac689fb7ffea43fbc1bea315..fc5e5531f8bef7fa248e18c83c68f5543a6b0842 100644
---- a/wpilibj/src/main/java/org/wpilib/AnalogGyro.java
-+++ b/wpilibj/src/main/java/org/wpilib/AnalogGyro.java
-@@ -6,6 +6,7 @@ package org.wpilib;
- 
- import static org.wpilib.util.ErrorMessages.requireNonNullParam;
- 
-+import org.wpilib.hardware.discrete.AnalogInput;
- import org.wpilib.hardware.hal.HAL;
- import org.wpilib.math.geometry.Rotation2d;
- import org.wpilib.util.sendable.Sendable;
 diff --git a/wpilibj/src/main/java/org/wpilib/driverstation/DSControlWord.java b/wpilibj/src/main/java/org/wpilib/driverstation/DSControlWord.java
 index 0b68001c0f6567cce5beaab86d01f5c179a33f5b..0a70aacfd41334449afa57c6b5a81413964d1b96 100644
 --- a/wpilibj/src/main/java/org/wpilib/driverstation/DSControlWord.java
@@ -518,13 +505,13 @@ index 75c619e1d6400e683c4ae2fa1d7980aa47acf06d..89690a36e11994a1aee6dcb5b48e9cea
  /** A class for constructing arbitrary RxC matrices. */
  public final class MatBuilder {
 diff --git a/wpimath/src/main/java/org/wpilib/math/linalg/Matrix.java b/wpimath/src/main/java/org/wpilib/math/linalg/Matrix.java
-index d19a304824ca66db0a7d2b6271818371cbd3743f..5acde5a716a3913332823196192f382ad0587299 100644
+index c2c7e77db082b106e78b3955c55b9f0a08a103be..d88d145a79b082aa74cd8c28b89a07c8f658bcec 100644
 --- a/wpimath/src/main/java/org/wpilib/math/linalg/Matrix.java
 +++ b/wpimath/src/main/java/org/wpilib/math/linalg/Matrix.java
 @@ -8,6 +8,8 @@ import org.wpilib.math.jni.EigenJNI;
  import org.wpilib.math.numbers.N1;
- import org.wpilib.math.proto.MatrixProto;
- import org.wpilib.math.struct.MatrixStruct;
+ import org.wpilib.math.linalg.proto.MatrixProto;
+ import org.wpilib.math.linalg.struct.MatrixStruct;
 +import org.wpilib.math.util.Nat;
 +import org.wpilib.math.util.Num;
  import org.wpilib.util.protobuf.Protobuf;
@@ -544,13 +531,13 @@ index e0290c35c2a6acad608f901772de1ab4cd3d5cb3..9f7240f332e3c17d190431534bc92e2e
  import org.ejml.simple.SimpleMatrix;
  
 diff --git a/wpimath/src/main/java/org/wpilib/math/linalg/Vector.java b/wpimath/src/main/java/org/wpilib/math/linalg/Vector.java
-index 03efd9ee19e5fd8141cfca7c21629efa63f7107f..5ba3db149776528bc2350ee23ca6750f1a199e3d 100644
+index 364cfcbd2f04dcdb7e7d0af3521f6efba8ee685a..2e5e849e8f13d230c340becd162f92f206183d9f 100644
 --- a/wpimath/src/main/java/org/wpilib/math/linalg/Vector.java
 +++ b/wpimath/src/main/java/org/wpilib/math/linalg/Vector.java
 @@ -8,6 +8,8 @@ import org.wpilib.math.numbers.N1;
  import org.wpilib.math.numbers.N3;
- import org.wpilib.math.proto.VectorProto;
- import org.wpilib.math.struct.VectorStruct;
+ import org.wpilib.math.linalg.proto.VectorProto;
+ import org.wpilib.math.linalg.struct.VectorStruct;
 +import org.wpilib.math.util.Nat;
 +import org.wpilib.math.util.Num;
  import org.wpilib.util.protobuf.Protobuf;

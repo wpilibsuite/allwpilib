@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Wed, 8 Oct 2025 03:30:37 -0400
-Subject: [PATCH 17/26] HAND FIXES: Update upstream for namespace changes
+Date: Sun, 12 Oct 2025 05:10:20 -0400
+Subject: [PATCH 18/29] HAND FIXES: Update upstream for namespace changes
 
 ---
  upstream_utils/argparse_lib.py                     |  4 ++--
@@ -15,11 +15,11 @@ Subject: [PATCH 17/26] HAND FIXES: Update upstream for namespace changes
  .../0021-Remove-unused-functions.patch             |  2 +-
  .../llvm_patches/0022-OS-specific-changes.patch    |  4 ++--
  upstream_utils/sleipnir.py                         |  2 +-
- .../sleipnir_patches/0003-Use-wpi-byteswap.patch   |  4 ++--
- 12 files changed, 33 insertions(+), 33 deletions(-)
+ .../sleipnir_patches/0003-Use-wpi-byteswap.patch   |  2 +-
+ 12 files changed, 32 insertions(+), 32 deletions(-)
 
 diff --git a/upstream_utils/argparse_lib.py b/upstream_utils/argparse_lib.py
-index 03982fe02b5fe4a7aa1db0e4425076a5475a7130..b6113c0c546e241fd11a2b613dc3451235019c5d 100755
+index 2c6c077637e0550e842735f4765eaf959909f0e1..62668667ff5fe95dbe42413bca793f24c3017d6b 100755
 --- a/upstream_utils/argparse_lib.py
 +++ b/upstream_utils/argparse_lib.py
 @@ -17,8 +17,8 @@ def copy_upstream_src(wpilib_root: Path):
@@ -82,7 +82,7 @@ index 4b1bfcfcb193e19b202724718d7388846e24417f..9c990cd9b299fed680ad5151ff599394
      content = content.replace("namespace detail", "namespace detail_expected")
      content = content.replace("detail::", "detail_expected::")
 diff --git a/upstream_utils/json.py b/upstream_utils/json.py
-index 90f0491f83b9ee74b12e72522f857af39fb3d036..3927b17c407286cd1aaf65f8960aaeb8f2854520 100755
+index 72ffb8e8c57a637e71ca17936d7c7b753571f312..751646d8f23860924e8b22360a9b985d2e5a317c 100755
 --- a/upstream_utils/json.py
 +++ b/upstream_utils/json.py
 @@ -35,8 +35,8 @@ def copy_upstream_src(wpilib_root: Path):
@@ -95,12 +95,12 @@ index 90f0491f83b9ee74b12e72522f857af39fb3d036..3927b17c407286cd1aaf65f8960aaeb8
 +        content = content.replace("nlohmann::", "wpi::util::")
  
          # Fix internal includes
-         content = content.replace(".hpp>", ".h>")
+         content = content.replace("include <nlohmann/", "include <wpi/util/")
 diff --git a/upstream_utils/llvm.py b/upstream_utils/llvm.py
-index 63b68a80141598e419590863ff9a126db49b53bc..1368c287a602912c887c9f96d1886b0fbd1a90d8 100755
+index 5fdb3dfe3ad98374760fb319f8fe9e67b26ce137..6f7786c00772e57534e085e0db0ab66f18c184b8 100755
 --- a/upstream_utils/llvm.py
 +++ b/upstream_utils/llvm.py
-@@ -12,8 +12,8 @@ def run_global_replacements(wpiutil_llvm_files: list[Path]):
+@@ -13,8 +13,8 @@ def run_global_replacements(wpiutil_llvm_files: list[Path]):
              content = f.read()
  
          # Rename namespace from llvm to wpi
@@ -111,7 +111,7 @@ index 63b68a80141598e419590863ff9a126db49b53bc..1368c287a602912c887c9f96d1886b0f
  
          # Fix #includes
          content = content.replace('include "llvm/ADT', 'include "wpi/util')
-@@ -80,10 +80,10 @@ def run_global_replacements(wpiutil_llvm_files: list[Path]):
+@@ -83,10 +83,10 @@ def run_global_replacements(wpiutil_llvm_files: list[Path]):
          content = content.replace("llvm_is_multithreaded()", "1")
  
          # Revert message in copyright header
@@ -127,19 +127,19 @@ index 63b68a80141598e419590863ff9a126db49b53bc..1368c287a602912c887c9f96d1886b0f
          content = content.replace("fs::openFileForRead", "fs::OpenFileForRead")
  
 diff --git a/upstream_utils/llvm_patches/0017-Windows-support.patch b/upstream_utils/llvm_patches/0017-Windows-support.patch
-index 44e0795a5fbdc3ecfc4e91f99f98f07bd0db05c7..25f8cd4604ff13bb7a2c527e7d917d5da32234a6 100644
+index d5f1ff36e56b1c5d3038e21b7be1e4388ca9e871..137dcf7b52f59f1b9dc95e1bf5afdf2085c5545e 100644
 --- a/upstream_utils/llvm_patches/0017-Windows-support.patch
 +++ b/upstream_utils/llvm_patches/0017-Windows-support.patch
 @@ -91,7 +91,7 @@ index 83d5586ae8a77ec585e7e59df3075ca59cfb9d0c..395965bc6fc969ed9a2d92743a0010dd
   } // end namespace llvm.
   
  diff --git a/llvm/lib/Support/ConvertUTF.cpp b/llvm/lib/Support/ConvertUTF.cpp
--index bc04c5ab5113563fb82d7b3b168985369b611f4b..14fb61ff3465f08a931981f560ea5b176ca888b8 100644
+-index bc04c5ab5113563fb82d7b3b168985369b611f4b..15e9a4e5b4cba5802c053e22e0536b0820615dd2 100644
 +index bc04c5ab5113563fb82d7b3b168985369b611f4b..b1012d896bd8ba9e07221f87a358b90fe203b172 100644
  --- a/llvm/lib/Support/ConvertUTF.cpp
  +++ b/llvm/lib/Support/ConvertUTF.cpp
  @@ -67,6 +67,11 @@
-@@ -116,7 +116,7 @@ index bc04c5ab5113563fb82d7b3b168985369b611f4b..14fb61ff3465f08a931981f560ea5b17
+@@ -116,7 +116,7 @@ index bc04c5ab5113563fb82d7b3b168985369b611f4b..15e9a4e5b4cba5802c053e22e0536b08
  +namespace windows {
  +std::error_code CodePageToUTF16(unsigned codepage,
  +                                std::string_view original,
@@ -148,7 +148,7 @@ index 44e0795a5fbdc3ecfc4e91f99f98f07bd0db05c7..25f8cd4604ff13bb7a2c527e7d917d5d
  +  if (!original.empty()) {
  +    int len = ::MultiByteToWideChar(codepage, MB_ERR_INVALID_CHARS, original.data(),
  +                                    original.size(), utf16.begin(), 0);
-@@ -144,19 +144,19 @@ index bc04c5ab5113563fb82d7b3b168985369b611f4b..14fb61ff3465f08a931981f560ea5b17
+@@ -144,19 +144,19 @@ index bc04c5ab5113563fb82d7b3b168985369b611f4b..15e9a4e5b4cba5802c053e22e0536b08
  +}
  +
  +std::error_code UTF8ToUTF16(std::string_view utf8,
@@ -171,7 +171,7 @@ index 44e0795a5fbdc3ecfc4e91f99f98f07bd0db05c7..25f8cd4604ff13bb7a2c527e7d917d5d
  +  if (utf16_len) {
  +    // Get length.
  +    int len = ::WideCharToMultiByte(codepage, 0, utf16, utf16_len, converted.begin(),
-@@ -186,12 +186,12 @@ index bc04c5ab5113563fb82d7b3b168985369b611f4b..14fb61ff3465f08a931981f560ea5b17
+@@ -186,12 +186,12 @@ index bc04c5ab5113563fb82d7b3b168985369b611f4b..15e9a4e5b4cba5802c053e22e0536b08
  +}
  +
  +std::error_code UTF16ToUTF8(const wchar_t *utf16, size_t utf16_len,
@@ -226,7 +226,7 @@ index cd0fbacf424f9523ccbdd0c55bd70ce97b4a118a..6574605f037c3ab412acfd05e640ba68
   #ifdef LLVM_BUILTIN_UNREACHABLE
     // Windows systems and possibly others don't declare abort() to be noreturn,
 diff --git a/upstream_utils/llvm_patches/0021-Remove-unused-functions.patch b/upstream_utils/llvm_patches/0021-Remove-unused-functions.patch
-index 099a7448c04645fd3f1a55782d67c687ff6bb913..04e8654d3a6b1225a22a3ef3ce361ee580edd0dd 100644
+index 48f0b1811ddbea38fc5f45d699685bdd99e1a183..4161c4e7896f86ce511048e8dce0278a0e78bdf0 100644
 --- a/upstream_utils/llvm_patches/0021-Remove-unused-functions.patch
 +++ b/upstream_utils/llvm_patches/0021-Remove-unused-functions.patch
 @@ -48,7 +48,7 @@ index 990d3e4cfe53e025df6ce797f46f9de5af8ca6dc..264b8192a0473b94363765995517851c
@@ -257,7 +257,7 @@ index 98407fe271dce77ef100df3a655bdcce85ce9c22..92def1c7c16905e40898a5cb7d4b25e1
   
  -  // If we reached here, we are failing ungracefully. Run the interrupt handlers
 diff --git a/upstream_utils/sleipnir.py b/upstream_utils/sleipnir.py
-index 9d25f22e0194a271b4af98d3860a230c8aa2fa59..37ecee8b5cd238ae4115be1c47226ebbc59e4f07 100755
+index 9c202f32bc8464d69ce813530a2b6fe19fbc4ec0..84a425c3cf524465eb934fd822c4a4258ed16913 100755
 --- a/upstream_utils/sleipnir.py
 +++ b/upstream_utils/sleipnir.py
 @@ -42,7 +42,7 @@ def copy_upstream_src(wpilib_root: Path):
@@ -270,19 +270,10 @@ index 9d25f22e0194a271b4af98d3860a230c8aa2fa59..37ecee8b5cd238ae4115be1c47226ebb
  }  // namespace gch
  """
 diff --git a/upstream_utils/sleipnir_patches/0003-Use-wpi-byteswap.patch b/upstream_utils/sleipnir_patches/0003-Use-wpi-byteswap.patch
-index 10e46e64adf8815f09418fb33064c5b96bd371ce..d662ca146d8898c58740f821e8cc76dac5711e40 100644
+index 03d9cd5f704e74d85b410f8b6cf83a9e844ec1d0..f14e42ed1f59848953cfe9f2abba9ea5d8e9db36 100644
 --- a/upstream_utils/sleipnir_patches/0003-Use-wpi-byteswap.patch
 +++ b/upstream_utils/sleipnir_patches/0003-Use-wpi-byteswap.patch
-@@ -19,7 +19,7 @@ index 4f4c76204071f90bf49eddb8c2aceb583b5e09ba..03938557c2600a7a1f72c6b93c935602
- +  ^wpi/
-  }
- diff --git a/include/sleipnir/util/spy.hpp b/include/sleipnir/util/spy.hpp
--index a2f94803e3744cee771669210d1af883160e9896..3eaafb9748a9076eb9ede1d3979ec222c9a10e44 100644
-+index a2f94803e3744cee771669210d1af883160e9896..40fafc563542e3ab405f5465c976cfbf0bcb9e08 100644
- --- a/include/sleipnir/util/spy.hpp
- +++ b/include/sleipnir/util/spy.hpp
- @@ -12,6 +12,7 @@
-@@ -35,7 +35,7 @@ index a2f94803e3744cee771669210d1af883160e9896..3eaafb9748a9076eb9ede1d3979ec222
+@@ -35,7 +35,7 @@ index a2f94803e3744cee771669210d1af883160e9896..43dcc748b679eac89986b154b26a1c02
     void write32le(int32_t num) {
       if constexpr (std::endian::native != std::endian::little) {
  -      num = std::byteswap(num);
