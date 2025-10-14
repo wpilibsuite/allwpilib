@@ -303,11 +303,8 @@ public class CoroutineYieldInLoopDetector implements TaskListener {
   }
 
   private boolean isPermittedCoroutineFunction(MemberSelectTree tree) {
-    /*
-     * Loops MUST either call yield() or a blocking coroutine function like await() or waitFor()
-     * that call yield() internally. Nonblocking coroutine functions like fork() aren't enough.
-     */
-
+    // Loops MUST either call yield() or a blocking coroutine function like await() or waitFor()
+    // that call yield() internally. Nonblocking coroutine functions like fork() aren't enough.
     var identifier = tree.getIdentifier();
     return identifier.contentEquals("yield")
         || identifier.contentEquals("park")
