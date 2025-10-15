@@ -4,7 +4,7 @@
 
 package org.wpilib.commands3.proto;
 
-import edu.wpi.first.util.protobuf.Protobuf;
+import org.wpilib.util.protobuf.Protobuf;
 import org.wpilib.commands3.Command;
 import org.wpilib.commands3.Scheduler;
 import org.wpilib.commands3.proto.ProtobufCommands.ProtobufScheduler;

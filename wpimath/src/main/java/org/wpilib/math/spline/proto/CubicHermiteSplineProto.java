@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.spline.proto;
+package org.wpilib.math.spline.proto;
 
-import edu.wpi.first.math.proto.Spline.ProtobufCubicHermiteSpline;
-import edu.wpi.first.math.spline.CubicHermiteSpline;
-import edu.wpi.first.util.protobuf.Protobuf;
+import org.wpilib.math.proto.Spline.ProtobufCubicHermiteSpline;
+import org.wpilib.math.spline.CubicHermiteSpline;
+import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
 public final class CubicHermiteSplineProto

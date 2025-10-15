@@ -7,7 +7,7 @@
 #include <Eigen/Core>
 #include <wpi/jni_util.h>
 
-#include "edu_wpi_first_math_jni_StateSpaceUtilJNI.h"
+#include "org_wpilib_math_jni_StateSpaceUtilJNI.h"
 #include "frc/StateSpaceUtil.h"
 
 using namespace wpi::java;
@@ -15,12 +15,12 @@ using namespace wpi::java;
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_math_jni_StateSpaceUtilJNI
+ * Class:     org_wpilib_math_jni_StateSpaceUtilJNI
  * Method:    isStabilizable
  * Signature: (II[D[D)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_math_jni_StateSpaceUtilJNI_isStabilizable
+Java_org_wpilib_math_jni_StateSpaceUtilJNI_isStabilizable
   (JNIEnv* env, jclass, jint states, jint inputs, jdoubleArray aSrc,
    jdoubleArray bSrc)
 {

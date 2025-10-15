@@ -20,7 +20,7 @@ if(WITH_JAVA)
         field_images_jar
         SOURCES ${JAVA_SOURCES}
         RESOURCES
-        NAMESPACE "edu/wpi/first/fields" ${JAVA_RESOURCES}
+        NAMESPACE "org/wpilib/fields" ${JAVA_RESOURCES}
         INCLUDE_JARS ${JACKSON_JARS}
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         OUTPUT_NAME fields
@@ -35,7 +35,7 @@ if(WITH_JAVA)
 endif()
 
 generate_resources(
-    src/main/native/resources/edu/wpi/first/fields
+    src/main/native/resources/org/wpilib/fields
     ${CMAKE_CURRENT_BINARY_DIR}/generated/main/cpp
     FIELDS
     fields

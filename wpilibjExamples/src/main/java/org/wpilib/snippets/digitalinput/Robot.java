@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.snippets.digitalinput;
+package org.wpilib.snippets.digitalinput;
 
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.TimedRobot;
+import org.wpilib.hardware.discrete.DigitalInput;
+import org.wpilib.opmode.TimedRobot;
 
 /**
  * DigitalInput snippets for frc-docs.

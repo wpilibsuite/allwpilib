@@ -5,7 +5,7 @@
 #include <jni.h>
 
 #include "CallbackStore.h"
-#include "edu_wpi_first_hal_simulation_PWMDataJNI.h"
+#include "org_wpilib_hardware_hal_simulation_PWMDataJNI.h"
 #include "hal/simulation/PWMData.h"
 
 using namespace hal;
@@ -13,12 +13,12 @@ using namespace hal;
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_PWMDataJNI
  * Method:    registerInitializedCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_PWMDataJNI_registerInitializedCallback
+Java_org_wpilib_hardware_hal_simulation_PWMDataJNI_registerInitializedCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(env, index, callback, initialNotify,
@@ -26,12 +26,12 @@ Java_edu_wpi_first_hal_simulation_PWMDataJNI_registerInitializedCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_PWMDataJNI
  * Method:    cancelInitializedCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_PWMDataJNI_cancelInitializedCallback
+Java_org_wpilib_hardware_hal_simulation_PWMDataJNI_cancelInitializedCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
@@ -39,36 +39,36 @@ Java_edu_wpi_first_hal_simulation_PWMDataJNI_cancelInitializedCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_PWMDataJNI
  * Method:    getInitialized
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_simulation_PWMDataJNI_getInitialized
+Java_org_wpilib_hardware_hal_simulation_PWMDataJNI_getInitialized
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetPWMInitialized(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_PWMDataJNI
  * Method:    setInitialized
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_PWMDataJNI_setInitialized
+Java_org_wpilib_hardware_hal_simulation_PWMDataJNI_setInitialized
   (JNIEnv*, jclass, jint index, jboolean value)
 {
   HALSIM_SetPWMInitialized(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_PWMDataJNI
  * Method:    registerPulseMicrosecondCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_PWMDataJNI_registerPulseMicrosecondCallback
+Java_org_wpilib_hardware_hal_simulation_PWMDataJNI_registerPulseMicrosecondCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(env, index, callback, initialNotify,
@@ -76,12 +76,12 @@ Java_edu_wpi_first_hal_simulation_PWMDataJNI_registerPulseMicrosecondCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_PWMDataJNI
  * Method:    cancelPulseMicrosecondCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_PWMDataJNI_cancelPulseMicrosecondCallback
+Java_org_wpilib_hardware_hal_simulation_PWMDataJNI_cancelPulseMicrosecondCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
@@ -89,36 +89,36 @@ Java_edu_wpi_first_hal_simulation_PWMDataJNI_cancelPulseMicrosecondCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_PWMDataJNI
  * Method:    getPulseMicrosecond
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_PWMDataJNI_getPulseMicrosecond
+Java_org_wpilib_hardware_hal_simulation_PWMDataJNI_getPulseMicrosecond
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetPWMPulseMicrosecond(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_PWMDataJNI
  * Method:    setPulseMicrosecond
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_PWMDataJNI_setPulseMicrosecond
+Java_org_wpilib_hardware_hal_simulation_PWMDataJNI_setPulseMicrosecond
   (JNIEnv*, jclass, jint index, jint value)
 {
   HALSIM_SetPWMPulseMicrosecond(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_PWMDataJNI
  * Method:    registerOutputPeriodCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_PWMDataJNI_registerOutputPeriodCallback
+Java_org_wpilib_hardware_hal_simulation_PWMDataJNI_registerOutputPeriodCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(env, index, callback, initialNotify,
@@ -126,12 +126,12 @@ Java_edu_wpi_first_hal_simulation_PWMDataJNI_registerOutputPeriodCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_PWMDataJNI
  * Method:    cancelOutputPeriodCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_PWMDataJNI_cancelOutputPeriodCallback
+Java_org_wpilib_hardware_hal_simulation_PWMDataJNI_cancelOutputPeriodCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
@@ -139,36 +139,36 @@ Java_edu_wpi_first_hal_simulation_PWMDataJNI_cancelOutputPeriodCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_PWMDataJNI
  * Method:    getOutputPeriod
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_PWMDataJNI_getOutputPeriod
+Java_org_wpilib_hardware_hal_simulation_PWMDataJNI_getOutputPeriod
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetPWMOutputPeriod(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_PWMDataJNI
  * Method:    setOutputPeriod
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_PWMDataJNI_setOutputPeriod
+Java_org_wpilib_hardware_hal_simulation_PWMDataJNI_setOutputPeriod
   (JNIEnv*, jclass, jint index, jint value)
 {
   HALSIM_SetPWMOutputPeriod(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_PWMDataJNI
  * Method:    resetData
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_PWMDataJNI_resetData
+Java_org_wpilib_hardware_hal_simulation_PWMDataJNI_resetData
   (JNIEnv*, jclass, jint index)
 {
   HALSIM_ResetPWMData(index);

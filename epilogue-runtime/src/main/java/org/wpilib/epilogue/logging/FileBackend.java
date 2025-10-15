@@ -2,28 +2,28 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.epilogue.logging;
+package org.wpilib.epilogue.logging;
 
-import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.datalog.BooleanArrayLogEntry;
-import edu.wpi.first.datalog.BooleanLogEntry;
-import edu.wpi.first.datalog.DataLog;
-import edu.wpi.first.datalog.DataLogEntry;
-import edu.wpi.first.datalog.DoubleArrayLogEntry;
-import edu.wpi.first.datalog.DoubleLogEntry;
-import edu.wpi.first.datalog.FloatArrayLogEntry;
-import edu.wpi.first.datalog.FloatLogEntry;
-import edu.wpi.first.datalog.IntegerArrayLogEntry;
-import edu.wpi.first.datalog.IntegerLogEntry;
-import edu.wpi.first.datalog.ProtobufLogEntry;
-import edu.wpi.first.datalog.RawLogEntry;
-import edu.wpi.first.datalog.StringArrayLogEntry;
-import edu.wpi.first.datalog.StringLogEntry;
-import edu.wpi.first.datalog.StructArrayLogEntry;
-import edu.wpi.first.datalog.StructLogEntry;
-import edu.wpi.first.util.protobuf.Protobuf;
-import edu.wpi.first.util.struct.Struct;
+import org.wpilib.datalog.BooleanArrayLogEntry;
+import org.wpilib.datalog.BooleanLogEntry;
+import org.wpilib.datalog.DataLog;
+import org.wpilib.datalog.DataLogEntry;
+import org.wpilib.datalog.DoubleArrayLogEntry;
+import org.wpilib.datalog.DoubleLogEntry;
+import org.wpilib.datalog.FloatArrayLogEntry;
+import org.wpilib.datalog.FloatLogEntry;
+import org.wpilib.datalog.IntegerArrayLogEntry;
+import org.wpilib.datalog.IntegerLogEntry;
+import org.wpilib.datalog.ProtobufLogEntry;
+import org.wpilib.datalog.RawLogEntry;
+import org.wpilib.datalog.StringArrayLogEntry;
+import org.wpilib.datalog.StringLogEntry;
+import org.wpilib.datalog.StructArrayLogEntry;
+import org.wpilib.datalog.StructLogEntry;
+import org.wpilib.util.protobuf.Protobuf;
+import org.wpilib.util.struct.Struct;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;

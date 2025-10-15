@@ -4,9 +4,9 @@
 
 package org.wpilib.commands3;
 
-import edu.wpi.first.hal.HALUtil;
-import edu.wpi.first.networktables.NetworkTablesJNI;
-import edu.wpi.first.util.CombinedRuntimeLoader;
+import org.wpilib.hardware.hal.HALUtil;
+import org.wpilib.networktables.NetworkTablesJNI;
+import org.wpilib.util.runtime.CombinedRuntimeLoader;
 
 /** Dev main. */
 public final class DevMain {

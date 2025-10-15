@@ -2,30 +2,30 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.cameraserver;
+package org.wpilib.vision.stream;
 
-import edu.wpi.first.cscore.CameraServerJNI;
-import edu.wpi.first.cscore.CvSink;
-import edu.wpi.first.cscore.CvSource;
-import edu.wpi.first.cscore.MjpegServer;
-import edu.wpi.first.cscore.UsbCamera;
-import edu.wpi.first.cscore.VideoEvent;
-import edu.wpi.first.cscore.VideoException;
-import edu.wpi.first.cscore.VideoListener;
-import edu.wpi.first.cscore.VideoMode;
-import edu.wpi.first.cscore.VideoSink;
-import edu.wpi.first.cscore.VideoSource;
-import edu.wpi.first.networktables.BooleanEntry;
-import edu.wpi.first.networktables.BooleanPublisher;
-import edu.wpi.first.networktables.IntegerEntry;
-import edu.wpi.first.networktables.IntegerPublisher;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StringArrayPublisher;
-import edu.wpi.first.networktables.StringArrayTopic;
-import edu.wpi.first.networktables.StringEntry;
-import edu.wpi.first.networktables.StringPublisher;
-import edu.wpi.first.util.PixelFormat;
+import org.wpilib.vision.camera.CameraServerJNI;
+import org.wpilib.vision.camera.CvSink;
+import org.wpilib.vision.camera.CvSource;
+import org.wpilib.vision.camera.MjpegServer;
+import org.wpilib.vision.camera.UsbCamera;
+import org.wpilib.vision.camera.VideoEvent;
+import org.wpilib.vision.camera.VideoException;
+import org.wpilib.vision.camera.VideoListener;
+import org.wpilib.vision.camera.VideoMode;
+import org.wpilib.vision.camera.VideoSink;
+import org.wpilib.vision.camera.VideoSource;
+import org.wpilib.networktables.BooleanEntry;
+import org.wpilib.networktables.BooleanPublisher;
+import org.wpilib.networktables.IntegerEntry;
+import org.wpilib.networktables.IntegerPublisher;
+import org.wpilib.networktables.NetworkTable;
+import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.networktables.StringArrayPublisher;
+import org.wpilib.networktables.StringArrayTopic;
+import org.wpilib.networktables.StringEntry;
+import org.wpilib.networktables.StringPublisher;
+import org.wpilib.util.PixelFormat;
 import java.lang.ref.Reference;
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -17,7 +17,7 @@
 #include <wpi/jni_util.h>
 
 #include "HALUtil.h"
-#include "edu_wpi_first_hal_HAL.h"
+#include "org_wpilib_hardware_hal_HAL.h"
 #include "hal/DriverStation.h"
 #include "hal/Main.h"
 
@@ -27,72 +27,72 @@ using namespace wpi::java;
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_hal_HAL
+ * Class:     org_wpilib_hardware_hal_HAL
  * Method:    initialize
  * Signature: (II)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_HAL_initialize
+Java_org_wpilib_hardware_hal_HAL_initialize
   (JNIEnv*, jclass, jint timeout, jint mode)
 {
   return HAL_Initialize(timeout, mode);
 }
 
 /*
- * Class:     edu_wpi_first_hal_HAL
+ * Class:     org_wpilib_hardware_hal_HAL
  * Method:    shutdown
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_HAL_shutdown
+Java_org_wpilib_hardware_hal_HAL_shutdown
   (JNIEnv*, jclass)
 {
   return HAL_Shutdown();
 }
 
 /*
- * Class:     edu_wpi_first_hal_HAL
+ * Class:     org_wpilib_hardware_hal_HAL
  * Method:    hasMain
  * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_HAL_hasMain
+Java_org_wpilib_hardware_hal_HAL_hasMain
   (JNIEnv*, jclass)
 {
   return HAL_HasMain();
 }
 
 /*
- * Class:     edu_wpi_first_hal_HAL
+ * Class:     org_wpilib_hardware_hal_HAL
  * Method:    runMain
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_HAL_runMain
+Java_org_wpilib_hardware_hal_HAL_runMain
   (JNIEnv*, jclass)
 {
   HAL_RunMain();
 }
 
 /*
- * Class:     edu_wpi_first_hal_HAL
+ * Class:     org_wpilib_hardware_hal_HAL
  * Method:    exitMain
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_HAL_exitMain
+Java_org_wpilib_hardware_hal_HAL_exitMain
   (JNIEnv*, jclass)
 {
   HAL_ExitMain();
 }
 
 /*
- * Class:     edu_wpi_first_hal_HAL
+ * Class:     org_wpilib_hardware_hal_HAL
  * Method:    terminate
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_HAL_terminate
+Java_org_wpilib_hardware_hal_HAL_terminate
   (JNIEnv*, jclass)
 {
 #ifdef __FRC_SYSTEMCORE__
@@ -101,36 +101,36 @@ Java_edu_wpi_first_hal_HAL_terminate
 }
 
 /*
- * Class:     edu_wpi_first_hal_HAL
+ * Class:     org_wpilib_hardware_hal_HAL
  * Method:    simPeriodicBeforeNative
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_HAL_simPeriodicBeforeNative
+Java_org_wpilib_hardware_hal_HAL_simPeriodicBeforeNative
   (JNIEnv*, jclass)
 {
   HAL_SimPeriodicBefore();
 }
 
 /*
- * Class:     edu_wpi_first_hal_HAL
+ * Class:     org_wpilib_hardware_hal_HAL
  * Method:    simPeriodicAfterNative
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_HAL_simPeriodicAfterNative
+Java_org_wpilib_hardware_hal_HAL_simPeriodicAfterNative
   (JNIEnv*, jclass)
 {
   HAL_SimPeriodicAfter();
 }
 
 /*
- * Class:     edu_wpi_first_hal_HAL
+ * Class:     org_wpilib_hardware_hal_HAL
  * Method:    getSystemActive
  * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_HAL_getSystemActive
+Java_org_wpilib_hardware_hal_HAL_getSystemActive
   (JNIEnv* env, jclass)
 {
   int32_t status = 0;
@@ -140,12 +140,12 @@ Java_edu_wpi_first_hal_HAL_getSystemActive
 }
 
 /*
- * Class:     edu_wpi_first_hal_HAL
+ * Class:     org_wpilib_hardware_hal_HAL
  * Method:    getBrownedOut
  * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_HAL_getBrownedOut
+Java_org_wpilib_hardware_hal_HAL_getBrownedOut
   (JNIEnv* env, jclass)
 {
   int32_t status = 0;
@@ -155,12 +155,12 @@ Java_edu_wpi_first_hal_HAL_getBrownedOut
 }
 
 /*
- * Class:     edu_wpi_first_hal_HAL
+ * Class:     org_wpilib_hardware_hal_HAL
  * Method:    getCommsDisableCount
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_HAL_getCommsDisableCount
+Java_org_wpilib_hardware_hal_HAL_getCommsDisableCount
   (JNIEnv* env, jclass)
 {
   int32_t status = 0;
@@ -170,12 +170,12 @@ Java_edu_wpi_first_hal_HAL_getCommsDisableCount
 }
 
 /*
- * Class:     edu_wpi_first_hal_HAL
+ * Class:     org_wpilib_hardware_hal_HAL
  * Method:    getRSLState
  * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_HAL_getRSLState
+Java_org_wpilib_hardware_hal_HAL_getRSLState
   (JNIEnv* env, jclass)
 {
   int32_t status = 0;
@@ -185,12 +185,12 @@ Java_edu_wpi_first_hal_HAL_getRSLState
 }
 
 /*
- * Class:     edu_wpi_first_hal_HAL
+ * Class:     org_wpilib_hardware_hal_HAL
  * Method:    getSystemTimeValid
  * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_HAL_getSystemTimeValid
+Java_org_wpilib_hardware_hal_HAL_getSystemTimeValid
   (JNIEnv* env, jclass)
 {
   int32_t status = 0;

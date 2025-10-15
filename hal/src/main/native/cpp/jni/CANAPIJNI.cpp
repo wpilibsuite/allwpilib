@@ -9,7 +9,7 @@
 #include <wpi/jni_util.h>
 
 #include "HALUtil.h"
-#include "edu_wpi_first_hal_CANAPIJNI.h"
+#include "org_wpilib_hardware_hal_CANAPIJNI.h"
 #include "hal/CAN.h"
 #include "hal/CANAPI.h"
 #include "hal/Errors.h"
@@ -20,12 +20,12 @@ using namespace wpi::java;
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_hal_CANAPIJNI
+ * Class:     org_wpilib_hardware_hal_CANAPIJNI
  * Method:    initializeCAN
  * Signature: (IIII)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_CANAPIJNI_initializeCAN
+Java_org_wpilib_hardware_hal_CANAPIJNI_initializeCAN
   (JNIEnv* env, jclass, jint busId, jint manufacturer, jint deviceId,
    jint deviceType)
 {
@@ -41,12 +41,12 @@ Java_edu_wpi_first_hal_CANAPIJNI_initializeCAN
 }
 
 /*
- * Class:     edu_wpi_first_hal_CANAPIJNI
+ * Class:     org_wpilib_hardware_hal_CANAPIJNI
  * Method:    cleanCAN
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_CANAPIJNI_cleanCAN
+Java_org_wpilib_hardware_hal_CANAPIJNI_cleanCAN
   (JNIEnv* env, jclass, jint handle)
 {
   if (handle != HAL_kInvalidHandle) {
@@ -85,12 +85,12 @@ static bool PackCANMessage(JNIEnv* env, jbyteArray data, jint dataLength,
 }
 
 /*
- * Class:     edu_wpi_first_hal_CANAPIJNI
+ * Class:     org_wpilib_hardware_hal_CANAPIJNI
  * Method:    writeCANPacket
  * Signature: (II[BII)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_CANAPIJNI_writeCANPacket
+Java_org_wpilib_hardware_hal_CANAPIJNI_writeCANPacket
   (JNIEnv* env, jclass, jint handle, jint apiId, jbyteArray data,
    jint dataLength, jint flags)
 {
@@ -106,12 +106,12 @@ Java_edu_wpi_first_hal_CANAPIJNI_writeCANPacket
 }
 
 /*
- * Class:     edu_wpi_first_hal_CANAPIJNI
+ * Class:     org_wpilib_hardware_hal_CANAPIJNI
  * Method:    writeCANPacketRepeating
  * Signature: (II[BIII)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_CANAPIJNI_writeCANPacketRepeating
+Java_org_wpilib_hardware_hal_CANAPIJNI_writeCANPacketRepeating
   (JNIEnv* env, jclass, jint handle, jint apiId, jbyteArray data,
    jint dataLength, jint flags, jint repeatMs)
 {
@@ -127,12 +127,12 @@ Java_edu_wpi_first_hal_CANAPIJNI_writeCANPacketRepeating
 }
 
 /*
- * Class:     edu_wpi_first_hal_CANAPIJNI
+ * Class:     org_wpilib_hardware_hal_CANAPIJNI
  * Method:    writeCANRTRFrame
  * Signature: (II[BII)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_CANAPIJNI_writeCANRTRFrame
+Java_org_wpilib_hardware_hal_CANAPIJNI_writeCANRTRFrame
   (JNIEnv* env, jclass, jint handle, jint apiId, jbyteArray data,
    jint dataLength, jint flags)
 {
@@ -163,12 +163,12 @@ Java_edu_wpi_first_hal_CANAPIJNI_writeCANRTRFrame
 }
 
 /*
- * Class:     edu_wpi_first_hal_CANAPIJNI
+ * Class:     org_wpilib_hardware_hal_CANAPIJNI
  * Method:    writeCANPacketNoThrow
  * Signature: (II[BII)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_CANAPIJNI_writeCANPacketNoThrow
+Java_org_wpilib_hardware_hal_CANAPIJNI_writeCANPacketNoThrow
   (JNIEnv* env, jclass, jint handle, jint apiId, jbyteArray data,
    jint dataLength, jint flags)
 {
@@ -184,12 +184,12 @@ Java_edu_wpi_first_hal_CANAPIJNI_writeCANPacketNoThrow
 }
 
 /*
- * Class:     edu_wpi_first_hal_CANAPIJNI
+ * Class:     org_wpilib_hardware_hal_CANAPIJNI
  * Method:    writeCANPacketRepeatingNoThrow
  * Signature: (II[BIII)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_CANAPIJNI_writeCANPacketRepeatingNoThrow
+Java_org_wpilib_hardware_hal_CANAPIJNI_writeCANPacketRepeatingNoThrow
   (JNIEnv* env, jclass, jint handle, jint apiId, jbyteArray data,
    jint dataLength, jint flags, jint repeatMs)
 {
@@ -205,12 +205,12 @@ Java_edu_wpi_first_hal_CANAPIJNI_writeCANPacketRepeatingNoThrow
 }
 
 /*
- * Class:     edu_wpi_first_hal_CANAPIJNI
+ * Class:     org_wpilib_hardware_hal_CANAPIJNI
  * Method:    writeCANRTRFrameNoThrow
  * Signature: (II[BII)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_CANAPIJNI_writeCANRTRFrameNoThrow
+Java_org_wpilib_hardware_hal_CANAPIJNI_writeCANRTRFrameNoThrow
   (JNIEnv* env, jclass, jint handle, jint apiId, jbyteArray data,
    jint dataLength, jint flags)
 {
@@ -241,12 +241,12 @@ Java_edu_wpi_first_hal_CANAPIJNI_writeCANRTRFrameNoThrow
 }
 
 /*
- * Class:     edu_wpi_first_hal_CANAPIJNI
+ * Class:     org_wpilib_hardware_hal_CANAPIJNI
  * Method:    stopCANPacketRepeating
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_CANAPIJNI_stopCANPacketRepeating
+Java_org_wpilib_hardware_hal_CANAPIJNI_stopCANPacketRepeating
   (JNIEnv* env, jclass, jint handle, jint apiId)
 {
   auto halHandle = static_cast<HAL_CANHandle>(handle);
@@ -256,12 +256,12 @@ Java_edu_wpi_first_hal_CANAPIJNI_stopCANPacketRepeating
 }
 
 /*
- * Class:     edu_wpi_first_hal_CANAPIJNI
+ * Class:     org_wpilib_hardware_hal_CANAPIJNI
  * Method:    readCANPacketNew
  * Signature: (IILjava/lang/Object;)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_CANAPIJNI_readCANPacketNew
+Java_org_wpilib_hardware_hal_CANAPIJNI_readCANPacketNew
   (JNIEnv* env, jclass, jint handle, jint apiId, jobject data)
 {
   auto halHandle = static_cast<HAL_CANHandle>(handle);
@@ -291,12 +291,12 @@ Java_edu_wpi_first_hal_CANAPIJNI_readCANPacketNew
 }
 
 /*
- * Class:     edu_wpi_first_hal_CANAPIJNI
+ * Class:     org_wpilib_hardware_hal_CANAPIJNI
  * Method:    readCANPacketLatest
  * Signature: (IILjava/lang/Object;)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_CANAPIJNI_readCANPacketLatest
+Java_org_wpilib_hardware_hal_CANAPIJNI_readCANPacketLatest
   (JNIEnv* env, jclass, jint handle, jint apiId, jobject data)
 {
   auto halHandle = static_cast<HAL_CANHandle>(handle);
@@ -326,12 +326,12 @@ Java_edu_wpi_first_hal_CANAPIJNI_readCANPacketLatest
 }
 
 /*
- * Class:     edu_wpi_first_hal_CANAPIJNI
+ * Class:     org_wpilib_hardware_hal_CANAPIJNI
  * Method:    readCANPacketTimeout
  * Signature: (IILjava/lang/Object;I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_CANAPIJNI_readCANPacketTimeout
+Java_org_wpilib_hardware_hal_CANAPIJNI_readCANPacketTimeout
   (JNIEnv* env, jclass, jint handle, jint apiId, jobject data, jint timeoutMs)
 {
   auto halHandle = static_cast<HAL_CANHandle>(handle);

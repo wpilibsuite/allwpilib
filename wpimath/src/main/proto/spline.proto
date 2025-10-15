@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package wpi.proto;
 
-option java_package = "edu.wpi.first.math.proto";
+option java_package = "org.wpilib.math.proto";
 
 message ProtobufCubicHermiteSpline {
   repeated double x_initial = 1;

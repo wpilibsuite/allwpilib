@@ -1,1 +1,1 @@
-edu.wpi.first.wpilibj.MockHardwareExtension
+org.wpilib.MockHardwareExtension

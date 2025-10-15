@@ -10,7 +10,7 @@
 #include <wpi/jni_util.h>
 
 #include "Exceptions.h"
-#include "edu_wpi_first_math_jni_DAREJNI.h"
+#include "org_wpilib_math_jni_DAREJNI.h"
 #include "frc/DARE.h"
 #include "frc/fmt/Eigen.h"
 
@@ -19,12 +19,12 @@ using namespace wpi::java;
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_math_jni_DAREJNI
+ * Class:     org_wpilib_math_jni_DAREJNI
  * Method:    dareNoPrecondABQR
  * Signature: ([D[D[D[DII[D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_math_jni_DAREJNI_dareNoPrecondABQR
+Java_org_wpilib_math_jni_DAREJNI_dareNoPrecondABQR
   (JNIEnv* env, jclass, jdoubleArray A, jdoubleArray B, jdoubleArray Q,
    jdoubleArray R, jint states, jint inputs, jdoubleArray S)
 {
@@ -54,12 +54,12 @@ Java_edu_wpi_first_math_jni_DAREJNI_dareNoPrecondABQR
 }
 
 /*
- * Class:     edu_wpi_first_math_jni_DAREJNI
+ * Class:     org_wpilib_math_jni_DAREJNI
  * Method:    dareNoPrecondABQRN
  * Signature: ([D[D[D[D[DII[D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_math_jni_DAREJNI_dareNoPrecondABQRN
+Java_org_wpilib_math_jni_DAREJNI_dareNoPrecondABQRN
   (JNIEnv* env, jclass, jdoubleArray A, jdoubleArray B, jdoubleArray Q,
    jdoubleArray R, jdoubleArray N, jint states, jint inputs, jdoubleArray S)
 {
@@ -93,12 +93,12 @@ Java_edu_wpi_first_math_jni_DAREJNI_dareNoPrecondABQRN
 }
 
 /*
- * Class:     edu_wpi_first_math_jni_DAREJNI
+ * Class:     org_wpilib_math_jni_DAREJNI
  * Method:    dareABQR
  * Signature: ([D[D[D[DII[D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_math_jni_DAREJNI_dareABQR
+Java_org_wpilib_math_jni_DAREJNI_dareABQR
   (JNIEnv* env, jclass, jdoubleArray A, jdoubleArray B, jdoubleArray Q,
    jdoubleArray R, jint states, jint inputs, jdoubleArray S)
 {
@@ -142,12 +142,12 @@ Java_edu_wpi_first_math_jni_DAREJNI_dareABQR
 }
 
 /*
- * Class:     edu_wpi_first_math_jni_DAREJNI
+ * Class:     org_wpilib_math_jni_DAREJNI
  * Method:    dareABQRN
  * Signature: ([D[D[D[D[DII[D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_math_jni_DAREJNI_dareABQRN
+Java_org_wpilib_math_jni_DAREJNI_dareABQRN
   (JNIEnv* env, jclass, jdoubleArray A, jdoubleArray B, jdoubleArray Q,
    jdoubleArray R, jdoubleArray N, jint states, jint inputs, jdoubleArray S)
 {

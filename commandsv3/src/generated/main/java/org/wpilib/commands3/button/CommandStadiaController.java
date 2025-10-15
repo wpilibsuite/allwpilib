@@ -6,8 +6,8 @@
 
 package org.wpilib.commands3.button;
 
-import edu.wpi.first.wpilibj.StadiaController;
-import edu.wpi.first.wpilibj.event.EventLoop;
+import org.wpilib.driverstation.StadiaController;
+import org.wpilib.event.EventLoop;
 import org.wpilib.commands3.Scheduler;
 import org.wpilib.commands3.Trigger;
 

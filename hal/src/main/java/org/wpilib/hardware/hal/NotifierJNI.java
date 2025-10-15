@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.hal;
+package org.wpilib.hardware.hal;
 
 /**
  * The NotifierJNI class directly wraps the C++ HAL Notifier.
  *
- * <p>This class is not meant for direct use by teams. Instead, the edu.wpi.first.wpilibj.Notifier
+ * <p>This class is not meant for direct use by teams. Instead, the org.wpilib.system.Notifier
  * class, which corresponds to the C++ Notifier class, should be used.
  *
  * @see "hal/Notifier.h"

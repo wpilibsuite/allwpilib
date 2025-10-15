@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.units;
+package org.wpilib.units;
 
-import edu.wpi.first.units.measure.Velocity;
+import org.wpilib.units.measure.Velocity;
 
 /**
  * Unit of velocity dimension that is a combination of a distance unit (numerator) and a time unit

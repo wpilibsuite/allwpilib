@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.epilogue.processor;
+package org.wpilib.epilogue.processor;
 
-import edu.wpi.first.epilogue.EpilogueConfiguration;
+import org.wpilib.epilogue.EpilogueConfiguration;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collection;
@@ -19,7 +19,7 @@ import javax.lang.model.type.TypeMirror;
  * Generates the {@code Epilogue} file used as the main entry point to logging with Epilogue in a
  * robot program. {@code Epilogue} has instances of every generated logger class, a {@link
  * EpilogueConfiguration config} object, and (if the main robot class inherits from {@link
- * edu.wpi.first.wpilibj.TimedRobot TimedRobot}) a {@code bind()} method to automatically add a
+ * org.wpilib.opmode.TimedRobot TimedRobot}) a {@code bind()} method to automatically add a
  * periodic logging call to the robot.
  */
 public class EpilogueGenerator {
@@ -46,16 +46,16 @@ public class EpilogueGenerator {
       List<String> loggerClassNames, Collection<TypeElement> mainRobotClasses) {
     try {
       var centralStore =
-          m_processingEnv.getFiler().createSourceFile("edu.wpi.first.epilogue.Epilogue");
+          m_processingEnv.getFiler().createSourceFile("org.wpilib.epilogue.Epilogue");
 
       try (var out = new PrintWriter(centralStore.openOutputStream())) {
-        out.println("package edu.wpi.first.epilogue;");
+        out.println("package org.wpilib.epilogue;");
         out.println();
 
-        out.println("import static edu.wpi.first.units.Units.Seconds;");
+        out.println("import static org.wpilib.units.Units.Seconds;");
         out.println();
 
-        out.println("import edu.wpi.first.hal.HAL;");
+        out.println("import org.wpilib.hardware.hal.HAL;");
         out.println();
 
         loggerClassNames.stream()

@@ -2,23 +2,23 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.flywheelbangbangcontroller;
+package org.wpilib.examples.flywheelbangbangcontroller;
 
-import edu.wpi.first.math.controller.BangBangController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
-import edu.wpi.first.wpilibj.simulation.FlywheelSim;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.wpilib.math.controller.BangBangController;
+import org.wpilib.math.controller.SimpleMotorFeedforward;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.system.LinearSystem;
+import org.wpilib.math.system.plant.DCMotor;
+import org.wpilib.math.system.plant.LinearSystemId;
+import org.wpilib.math.util.Units;
+import org.wpilib.hardware.rotation.Encoder;
+import org.wpilib.driverstation.Joystick;
+import org.wpilib.system.RobotController;
+import org.wpilib.opmode.TimedRobot;
+import org.wpilib.hardware.motor.PWMSparkMax;
+import org.wpilib.simulation.EncoderSim;
+import org.wpilib.simulation.FlywheelSim;
+import org.wpilib.smartdashboard.SmartDashboard;
 
 /**
  * This is a sample program to demonstrate the use of a BangBangController with a flywheel to

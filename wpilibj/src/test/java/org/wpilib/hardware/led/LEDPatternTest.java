@@ -2,33 +2,33 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.hardware.led;
 
-import static edu.wpi.first.units.Units.Centimeters;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Microsecond;
-import static edu.wpi.first.units.Units.Microseconds;
-import static edu.wpi.first.units.Units.Percent;
-import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.units.Units.Value;
-import static edu.wpi.first.wpilibj.LEDPattern.GradientType.kContinuous;
-import static edu.wpi.first.wpilibj.LEDPattern.GradientType.kDiscontinuous;
-import static edu.wpi.first.wpilibj.util.Color.kBlack;
-import static edu.wpi.first.wpilibj.util.Color.kBlue;
-import static edu.wpi.first.wpilibj.util.Color.kGreen;
-import static edu.wpi.first.wpilibj.util.Color.kLime;
-import static edu.wpi.first.wpilibj.util.Color.kMagenta;
-import static edu.wpi.first.wpilibj.util.Color.kMidnightBlue;
-import static edu.wpi.first.wpilibj.util.Color.kPurple;
-import static edu.wpi.first.wpilibj.util.Color.kRed;
-import static edu.wpi.first.wpilibj.util.Color.kWhite;
-import static edu.wpi.first.wpilibj.util.Color.kYellow;
+import static org.wpilib.units.Units.Centimeters;
+import static org.wpilib.units.Units.Meters;
+import static org.wpilib.units.Units.MetersPerSecond;
+import static org.wpilib.units.Units.Microsecond;
+import static org.wpilib.units.Units.Microseconds;
+import static org.wpilib.units.Units.Percent;
+import static org.wpilib.units.Units.Seconds;
+import static org.wpilib.units.Units.Value;
+import static org.wpilib.hardware.led.LEDPattern.GradientType.kContinuous;
+import static org.wpilib.hardware.led.LEDPattern.GradientType.kDiscontinuous;
+import static org.wpilib.util.Color.kBlack;
+import static org.wpilib.util.Color.kBlue;
+import static org.wpilib.util.Color.kGreen;
+import static org.wpilib.util.Color.kLime;
+import static org.wpilib.util.Color.kMagenta;
+import static org.wpilib.util.Color.kMidnightBlue;
+import static org.wpilib.util.Color.kPurple;
+import static org.wpilib.util.Color.kRed;
+import static org.wpilib.util.Color.kWhite;
+import static org.wpilib.util.Color.kYellow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color8Bit;
+import org.wpilib.util.Color;
+import org.wpilib.util.Color8Bit;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;

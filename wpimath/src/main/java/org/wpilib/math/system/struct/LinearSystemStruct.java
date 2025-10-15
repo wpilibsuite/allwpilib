@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.system.struct;
+package org.wpilib.math.system.struct;
 
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.Num;
-import edu.wpi.first.math.struct.MatrixStruct;
-import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.util.struct.Struct;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.util.Nat;
+import org.wpilib.math.util.Num;
+import org.wpilib.math.linalg.struct.MatrixStruct;
+import org.wpilib.math.system.LinearSystem;
+import org.wpilib.util.struct.Struct;
 import java.nio.ByteBuffer;
 
 public final class LinearSystemStruct<States extends Num, Inputs extends Num, Outputs extends Num>

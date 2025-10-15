@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.util.struct;
+package org.wpilib.util.struct;
 
-import static edu.wpi.first.util.struct.StructGenerator.genEnum;
-import static edu.wpi.first.util.struct.StructGenerator.genRecord;
+import static org.wpilib.util.struct.StructGenerator.genEnum;
+import static org.wpilib.util.struct.StructGenerator.genRecord;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.nio.ByteBuffer;

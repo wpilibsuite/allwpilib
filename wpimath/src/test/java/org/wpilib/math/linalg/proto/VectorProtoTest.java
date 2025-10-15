@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.proto;
+package org.wpilib.math.linalg.proto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.Vector;
-import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.math.proto.Wpimath.ProtobufVector;
-import edu.wpi.first.wpilibj.ProtoTestBase;
+import org.wpilib.math.util.Nat;
+import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.math.linalg.Vector;
+import org.wpilib.math.numbers.N2;
+import org.wpilib.math.proto.Wpimath.ProtobufVector;
+import org.wpilib.ProtoTestBase;
 
 @SuppressWarnings("PMD.TestClassWithoutTestCases")
 class VectorProtoTest extends ProtoTestBase<Vector<N2>, ProtobufVector> {
