@@ -189,9 +189,9 @@ public class ChassisAccelerations
   @Override
   public boolean equals(Object o) {
     return o == this
-        || o instanceof ChassisAccelerations c 
-            && Double.compare(ax, c.ax) == 0 
-            && Double.compare(ay, c.ay) == 0 
+        || o instanceof ChassisAccelerations c
+            && Double.compare(ax, c.ax) == 0
+            && Double.compare(ay, c.ay) == 0
             && Double.compare(alpha, c.alpha) == 0;
   }
 

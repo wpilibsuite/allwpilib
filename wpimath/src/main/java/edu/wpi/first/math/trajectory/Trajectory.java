@@ -36,9 +36,10 @@ public abstract class Trajectory<SampleType extends TrajectorySample<SampleType>
    */
   @SuppressWarnings({"this-escape"})
   public Trajectory(SampleType[] samples) {
-    this.samples = Arrays.stream(samples)
-        .sorted(Comparator.comparingDouble(s -> s.timestamp.in(Seconds)))
-        .toArray(size -> Arrays.copyOf(samples, size));
+    this.samples =
+        Arrays.stream(samples)
+            .sorted(Comparator.comparingDouble(s -> s.timestamp.in(Seconds)))
+            .toArray(size -> Arrays.copyOf(samples, size));
 
     this.sampleMap =
         new InterpolatingTreeMap<>(

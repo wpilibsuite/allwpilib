@@ -1,18 +1,17 @@
 package edu.wpi.first.math.trajectory;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class SampleJsonTest {
   private final Translation2d m_fl = new Translation2d(12, 12);
@@ -63,23 +62,24 @@ class SampleJsonTest {
     Trajectory<DifferentialSample> trajectory =
         TrajectoryGeneratorTest.getTrajectory(new ArrayList<>())
             .toDifferentialTrajectory(new DifferentialDriveKinematics(0.5));
-    Arrays.stream(trajectory.samples).forEach(
-        sample -> {
-          try {
-            String json = mapper.writeValueAsString(sample);
-            DifferentialSample deserializedSample =
-                mapper.readValue(json, DifferentialSample.class);
-            assertAll(
-                () -> assertEquals(sample.timestamp, deserializedSample.timestamp),
-                () -> assertEquals(sample.pose, deserializedSample.pose),
-                () -> assertEquals(sample.velocity, deserializedSample.velocity),
-                () -> assertEquals(sample.acceleration, deserializedSample.acceleration),
-                () -> assertEquals(sample.leftSpeed, deserializedSample.leftSpeed),
-                () -> assertEquals(sample.rightSpeed, deserializedSample.rightSpeed));
-          } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-          }
-        });
+    Arrays.stream(trajectory.samples)
+        .forEach(
+            sample -> {
+              try {
+                String json = mapper.writeValueAsString(sample);
+                DifferentialSample deserializedSample =
+                    mapper.readValue(json, DifferentialSample.class);
+                assertAll(
+                    () -> assertEquals(sample.timestamp, deserializedSample.timestamp),
+                    () -> assertEquals(sample.pose, deserializedSample.pose),
+                    () -> assertEquals(sample.velocity, deserializedSample.velocity),
+                    () -> assertEquals(sample.acceleration, deserializedSample.acceleration),
+                    () -> assertEquals(sample.leftSpeed, deserializedSample.leftSpeed),
+                    () -> assertEquals(sample.rightSpeed, deserializedSample.rightSpeed));
+              } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+              }
+            });
   }
 
   @Test
@@ -88,24 +88,29 @@ class SampleJsonTest {
     Trajectory<MecanumSample> trajectory =
         TrajectoryGeneratorTest.getTrajectory(new ArrayList<>())
             .toMecanumTrajectory(new MecanumDriveKinematics(m_fl, m_fr, m_bl, m_br));
-    Arrays.stream(trajectory.samples).forEach(
-        sample -> {
-          try {
-            String json = mapper.writeValueAsString(sample);
-            MecanumSample deserializedSample = mapper.readValue(json, MecanumSample.class);
-            assertAll(
-                () -> assertEquals(sample.timestamp, deserializedSample.timestamp),
-                () -> assertEquals(sample.pose, deserializedSample.pose),
-                () -> assertEquals(sample.velocity, deserializedSample.velocity),
-                () -> assertEquals(sample.acceleration, deserializedSample.acceleration),
-                () -> assertEquals(sample.speeds.frontLeft, deserializedSample.speeds.frontLeft),
-                () -> assertEquals(sample.speeds.frontRight, deserializedSample.speeds.frontRight),
-                () -> assertEquals(sample.speeds.rearLeft, deserializedSample.speeds.rearLeft),
-                () -> assertEquals(sample.speeds.rearRight, deserializedSample.speeds.rearRight));
-          } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-          }
-        });
+    Arrays.stream(trajectory.samples)
+        .forEach(
+            sample -> {
+              try {
+                String json = mapper.writeValueAsString(sample);
+                MecanumSample deserializedSample = mapper.readValue(json, MecanumSample.class);
+                assertAll(
+                    () -> assertEquals(sample.timestamp, deserializedSample.timestamp),
+                    () -> assertEquals(sample.pose, deserializedSample.pose),
+                    () -> assertEquals(sample.velocity, deserializedSample.velocity),
+                    () -> assertEquals(sample.acceleration, deserializedSample.acceleration),
+                    () ->
+                        assertEquals(sample.speeds.frontLeft, deserializedSample.speeds.frontLeft),
+                    () ->
+                        assertEquals(
+                            sample.speeds.frontRight, deserializedSample.speeds.frontRight),
+                    () -> assertEquals(sample.speeds.rearLeft, deserializedSample.speeds.rearLeft),
+                    () ->
+                        assertEquals(sample.speeds.rearRight, deserializedSample.speeds.rearRight));
+              } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+              }
+            });
   }
 
   @Test
@@ -114,20 +119,21 @@ class SampleJsonTest {
     Trajectory<SwerveSample> trajectory =
         TrajectoryGeneratorTest.getTrajectory(new ArrayList<>())
             .toSwerveTrajectory(new SwerveDriveKinematics(m_fl, m_fr, m_bl, m_br));
-    Arrays.stream(trajectory.samples).forEach(
-        sample -> {
-          try {
-            String json = mapper.writeValueAsString(sample);
-            SwerveSample deserializedSample = mapper.readValue(json, SwerveSample.class);
-            assertAll(
-                () -> assertEquals(sample.timestamp, deserializedSample.timestamp),
-                () -> assertEquals(sample.pose, deserializedSample.pose),
-                () -> assertEquals(sample.velocity, deserializedSample.velocity),
-                () -> assertEquals(sample.acceleration, deserializedSample.acceleration),
-                () -> assertArrayEquals(sample.states, deserializedSample.states));
-          } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-          }
-        });
+    Arrays.stream(trajectory.samples)
+        .forEach(
+            sample -> {
+              try {
+                String json = mapper.writeValueAsString(sample);
+                SwerveSample deserializedSample = mapper.readValue(json, SwerveSample.class);
+                assertAll(
+                    () -> assertEquals(sample.timestamp, deserializedSample.timestamp),
+                    () -> assertEquals(sample.pose, deserializedSample.pose),
+                    () -> assertEquals(sample.velocity, deserializedSample.velocity),
+                    () -> assertEquals(sample.acceleration, deserializedSample.acceleration),
+                    () -> assertArrayEquals(sample.states, deserializedSample.states));
+              } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+              }
+            });
   }
 }

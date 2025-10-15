@@ -31,8 +31,7 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
    *     internally.
    */
   @JsonCreator
-  public DifferentialTrajectory(
-      @JsonProperty("samples") DifferentialSample[] samples) {
+  public DifferentialTrajectory(@JsonProperty("samples") DifferentialSample[] samples) {
     super(samples);
   }
 

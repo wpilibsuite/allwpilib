@@ -60,16 +60,28 @@ class TrajectoryTransformTest {
 
       var expectedRel = a2.relativeTo(a1);
       var actualRel = b2.relativeTo(b1);
-      
+
       // Use more appropriate tolerances for floating point precision
       // Position tolerance increased to account for accumulated transformation errors
-      assertEquals(expectedRel.getX(), actualRel.getX(), 1e-1,
-        String.format("X mismatch at index %d: expected %s, actual %s", i, expectedRel, actualRel));
-      assertEquals(expectedRel.getY(), actualRel.getY(), 1e-1,
-        String.format("Y mismatch at index %d: expected %s, actual %s", i, expectedRel, actualRel));
+      assertEquals(
+          expectedRel.getX(),
+          actualRel.getX(),
+          1e-1,
+          String.format(
+              "X mismatch at index %d: expected %s, actual %s", i, expectedRel, actualRel));
+      assertEquals(
+          expectedRel.getY(),
+          actualRel.getY(),
+          1e-1,
+          String.format(
+              "Y mismatch at index %d: expected %s, actual %s", i, expectedRel, actualRel));
       // Rotation tolerance increased to account for transformation errors
-      assertEquals(expectedRel.getRotation().getRadians(), actualRel.getRotation().getRadians(), 1e-3,
-        String.format("Rotation mismatch at index %d: expected %s, actual %s", i, expectedRel, actualRel));
+      assertEquals(
+          expectedRel.getRotation().getRadians(),
+          actualRel.getRotation().getRadians(),
+          1e-3,
+          String.format(
+              "Rotation mismatch at index %d: expected %s, actual %s", i, expectedRel, actualRel));
     }
   }
 }
