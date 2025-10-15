@@ -19,7 +19,7 @@ index 4f4c76204071f90bf49eddb8c2aceb583b5e09ba..03938557c2600a7a1f72c6b93c935602
 +  ^wpi/
  }
 diff --git a/include/sleipnir/util/spy.hpp b/include/sleipnir/util/spy.hpp
-index a2f94803e3744cee771669210d1af883160e9896..43dcc748b679eac89986b154b26a1c0282345d82 100644
+index a2f94803e3744cee771669210d1af883160e9896..74dd7990b03783ce805a186920d5142caeb178c6 100644
 --- a/include/sleipnir/util/spy.hpp
 +++ b/include/sleipnir/util/spy.hpp
 @@ -12,6 +12,7 @@
