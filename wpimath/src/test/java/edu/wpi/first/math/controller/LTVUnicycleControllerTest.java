@@ -45,8 +45,8 @@ class LTVUnicycleControllerTest {
       robotPose = robotPose.plus(new Twist2d(output.vx * kDt, 0, output.omega * kDt).exp());
     }
 
-    final var states = trajectory.samples;
-    final var endPose = states[states.length - 1].pose;
+    final var states = trajectory.getSamples();
+    final var endPose = states.getLast().pose;
 
     // Java lambdas require local variables referenced from a lambda expression
     // must be final or effectively final.

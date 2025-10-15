@@ -13,6 +13,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.units.measure.Time;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * Represents a trajectory consisting of a list of {@link TrajectorySample}s, kinematically
@@ -21,7 +22,7 @@ import java.util.Comparator;
 public abstract class Trajectory<SampleType extends TrajectorySample<SampleType>> {
 
   /** The samples this Trajectory is composed of. */
-  public final SampleType[] samples;
+  protected final SampleType[] samples;
 
   private final InterpolatingTreeMap<Time, SampleType> sampleMap;
 
@@ -53,6 +54,15 @@ public abstract class Trajectory<SampleType extends TrajectorySample<SampleType>
 
     this.duration =
         this.samples.length > 0 ? this.samples[this.samples.length - 1].timestamp : Seconds.of(0.0);
+  }
+
+  /**
+   * Gets the samples of the trajectory.
+   *
+   * @return the samples of the trajectory as an unmodifiable list.
+   */
+  public List<SampleType> getSamples() {
+    return List.of(samples);
   }
 
   /**
