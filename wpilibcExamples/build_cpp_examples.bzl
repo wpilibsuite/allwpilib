@@ -40,7 +40,7 @@ def build_examples(halsim_deps = []):
             name = folder + "-example",
             srcs = native.glob(["src/main/cpp/examples/" + folder + "/cpp/**/*.cpp", "src/main/cpp/examples/" + folder + "/c/**/*.c"], allow_empty = True),
             deps = [
-                "//wpilibNewCommands",
+                "//commandsv2",
                 "//apriltag",
                 "//romiVendordep",
                 "//xrpVendordep",
@@ -59,7 +59,7 @@ def build_commands():
             srcs = native.glob(["src/main/cpp/commands/" + folder + "/**/*.cpp"]),
             hdrs = native.glob(["src/main/cpp/commands/" + folder + "/**/*.h"]),
             deps = [
-                "//wpilibNewCommands",
+                "//commandsv2",
             ],
             strip_include_prefix = "src/main/cpp/commands/" + folder,
             tags = ["wpi-example"],
@@ -74,7 +74,7 @@ def build_snippets():
             srcs = native.glob(["src/main/cpp/snippets/" + folder + "/**/*.cpp"]),
             hdrs = native.glob(["src/main/cpp/snippets/" + folder + "/**/*.h"], allow_empty = True),
             deps = [
-                "//wpilibNewCommands",
+                "//commandsv2",
             ],
             strip_include_prefix = "src/main/cpp/snippets/" + folder + "/include",
             tags = ["wpi-example"],
@@ -89,7 +89,7 @@ def build_templates():
             srcs = native.glob(["src/main/cpp/templates/" + folder + "/**/*.cpp"]),
             hdrs = native.glob(["src/main/cpp/templates/" + folder + "/**/*.h"]),
             deps = [
-                "//wpilibNewCommands",
+                "//commandsv2",
             ],
             strip_include_prefix = "src/main/cpp/templates/" + folder + "/include",
             tags = ["wpi-example"],
@@ -104,7 +104,7 @@ def build_tests():
             size = "small",
             srcs = native.glob([example_test_folder + "/**/*.cpp", example_src_folder + "/cpp/**/*.cpp", example_src_folder + "/c/**/*.c"], allow_empty = True),
             deps = [
-                "//wpilibNewCommands",
+                "//commandsv2",
                 ":{}-examples-headers".format(folder),
                 "//thirdparty/googletest",
             ],
