@@ -1,8 +1,5 @@
 package edu.wpi.first.math.trajectory;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -11,7 +8,11 @@ import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class SampleJsonTest {
   private final Translation2d m_fl = new Translation2d(12, 12);
@@ -101,6 +102,29 @@ class SampleJsonTest {
                 () -> assertEquals(sample.speeds.frontRight, deserializedSample.speeds.frontRight),
                 () -> assertEquals(sample.speeds.rearLeft, deserializedSample.speeds.rearLeft),
                 () -> assertEquals(sample.speeds.rearRight, deserializedSample.speeds.rearRight));
+          } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+          }
+        });
+  }
+
+  @Test
+  public void testSwerveSample() {
+    ObjectMapper mapper = new ObjectMapper();
+    Trajectory<SwerveSample> trajectory =
+        TrajectoryGeneratorTest.getTrajectory(new ArrayList<>())
+            .toSwerveTrajectory(new SwerveDriveKinematics(m_fl, m_fr, m_bl, m_br));
+    Arrays.stream(trajectory.samples).forEach(
+        sample -> {
+          try {
+            String json = mapper.writeValueAsString(sample);
+            SwerveSample deserializedSample = mapper.readValue(json, SwerveSample.class);
+            assertAll(
+                () -> assertEquals(sample.timestamp, deserializedSample.timestamp),
+                () -> assertEquals(sample.pose, deserializedSample.pose),
+                () -> assertEquals(sample.velocity, deserializedSample.velocity),
+                () -> assertEquals(sample.acceleration, deserializedSample.acceleration),
+                () -> assertArrayEquals(sample.states, deserializedSample.states));
           } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
           }
