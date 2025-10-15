@@ -50,5 +50,5 @@ wpilib_cc_static_library(
 package_minimal_cc_project(
     name = "halsim_ws_core",
     maven_artifact_name = "halsim_ws_core",
-    maven_group_id = "edu.wpi.first.halsim",
+    maven_group_id = "org.wpilib.halsim",
 )

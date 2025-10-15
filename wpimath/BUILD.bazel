@@ -232,7 +232,7 @@ wpilib_jni_java_library(
     name = "wpimath-java",
     srcs = [":generated_java"] + glob(["src/main/java/**/*.java"]),
     maven_artifact_name = "wpimath-java",
-    maven_group_id = "edu.wpi.first.wpimath",
+    maven_group_id = "org.wpilib.wpimath",
     native_libs = [":wpimathjni"],
     resource_strip_prefix = "wpimath/src/main/proto",
     resources = glob(["src/main/proto/**"]),
@@ -317,5 +317,5 @@ py_binary(
 package_default_jni_project(
     name = "wpimath",
     maven_artifact_name = "wpimath-cpp",
-    maven_group_id = "edu.wpi.first.wpimath",
+    maven_group_id = "org.wpilib.wpimath",
 )

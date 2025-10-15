@@ -47,5 +47,5 @@ cc_binary(
 package_binary_cc_project(
     name = "processstarter",
     maven_artifact_name = "processstarter",
-    maven_group_id = "edu.wpi.first.tools",
+    maven_group_id = "org.wpilib.tools",
 )

@@ -56,7 +56,7 @@ wpilib_java_library(
     name = "xrpVendordep-java",
     srcs = glob(["src/main/java/**/*.java"]),
     maven_artifact_name = "xrpVendordep-java",
-    maven_group_id = "edu.wpi.first.xrpVendordep",
+    maven_group_id = "org.wpilib.xrpVendordep",
     visibility = ["//visibility:public"],
     deps = [
         "//hal:hal-java",
@@ -97,5 +97,5 @@ java_binary(
 package_minimal_cc_project(
     name = "xrpVendordep",
     maven_artifact_name = "xrpVendordep-cpp",
-    maven_group_id = "edu.wpi.first.xrpVendordep",
+    maven_group_id = "org.wpilib.xrpVendordep",
 )

@@ -1,6 +1,6 @@
 ext {
     nativeName = 'xrpVendordep'
-    devMain = 'edu.wpi.first.wpilibj.xrp.DevMain'
+    devMain = 'org.wpilib.xrp.DevMain'
 }
 
 evaluationDependsOn(":ntcore")
