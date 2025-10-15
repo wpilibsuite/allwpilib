@@ -191,8 +191,8 @@ cc_binary(
 
 java_binary(
     name = "DevMain-Java",
-    srcs = ["src/dev/java/edu/wpi/first/apriltag/DevMain.java"],
-    main_class = "edu.wpi.first.apriltag.DevMain",
+    srcs = ["src/dev/java/org/wpilib/vision/apriltag/DevMain.java"],
+    main_class = "org.wpilib.vision.apriltag.DevMain",
     deps = [
         ":apriltag-java",
     ],
