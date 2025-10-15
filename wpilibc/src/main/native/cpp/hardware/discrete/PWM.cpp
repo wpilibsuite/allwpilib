@@ -10,12 +10,12 @@
 #include <wpi/hal/PWM.h>
 #include <wpi/hal/Ports.h>
 #include <wpi/hal/UsageReporting.h>
+#include <wpi/util/SensorUtil.hpp>
 #include <wpi/util/StackTrace.hpp>
 #include <wpi/util/sendable/SendableBuilder.hpp>
 #include <wpi/util/sendable/SendableRegistry.hpp>
 
 #include "wpi/system/Errors.hpp"
-#include "wpi/util/SensorUtil.hpp"
 
 using namespace frc;
 

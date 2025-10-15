@@ -11,9 +11,9 @@
 
 #include <fmt/format.h>
 #include <fmt/ranges.h>
+#include <wpi/datalog/DataLog.hpp>
 #include <wpi/util/SmallString.hpp>
 #include <wpi/util/StringExtras.hpp>
-#include <wpi/datalog/DataLog.hpp>
 
 #include "IListenerStorage.hpp"
 #include "Log.hpp"

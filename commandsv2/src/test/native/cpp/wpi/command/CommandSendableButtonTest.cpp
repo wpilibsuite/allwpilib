@@ -3,10 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <wpi/commands2/Commands.hpp>
-
-#include <wpi/smartdashboard/SmartDashboard.hpp>
 #include <wpi/ntcore/BooleanTopic.hpp>
 #include <wpi/ntcore/NetworkTableInstance.hpp>
+#include <wpi/smartdashboard/SmartDashboard.hpp>
 
 #include "CommandTestBase.hpp"
 

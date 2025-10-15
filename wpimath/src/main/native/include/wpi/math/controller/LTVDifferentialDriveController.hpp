@@ -10,11 +10,11 @@
 #include <wpi/util/SymbolExports.hpp>
 #include <wpi/util/array.hpp>
 
-#include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/math/controller/DifferentialDriveWheelVoltages.hpp"
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/math/trajectory/Trajectory.hpp"
+#include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"

@@ -14,8 +14,8 @@
 #include <wpi/util/json_fwd.hpp>
 
 #include "wpi/math/linalg/ct_matrix.hpp"
-#include "wpi/units/angle.hpp"
 #include "wpi/math/util/MathShared.hpp"
+#include "wpi/units/angle.hpp"
 
 namespace frc {
 

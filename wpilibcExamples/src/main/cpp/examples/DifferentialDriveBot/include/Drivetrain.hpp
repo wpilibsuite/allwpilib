@@ -6,13 +6,13 @@
 
 #include <numbers>
 
-#include <wpi/hardware/rotation/Encoder.hpp>
 #include <wpi/hardware/imu/OnboardIMU.hpp>
+#include <wpi/hardware/motor/PWMSparkMax.hpp>
+#include <wpi/hardware/rotation/Encoder.hpp>
 #include <wpi/math/controller/PIDController.hpp>
 #include <wpi/math/controller/SimpleMotorFeedforward.hpp>
 #include <wpi/math/kinematics/DifferentialDriveKinematics.hpp>
 #include <wpi/math/kinematics/DifferentialDriveOdometry.hpp>
-#include <wpi/hardware/motor/PWMSparkMax.hpp>
 #include <wpi/units/angle.hpp>
 #include <wpi/units/angular_velocity.hpp>
 #include <wpi/units/length.hpp>

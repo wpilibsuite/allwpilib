@@ -9,8 +9,8 @@
 #include <string_view>
 #include <utility>
 
-#include <wpi/system/Timer.hpp>
 #include <wpi/sysid/SysIdRoutineLog.hpp>
+#include <wpi/system/Timer.hpp>
 
 #include "wpi/commands2/CommandPtr.hpp"
 #include "wpi/commands2/Subsystem.hpp"

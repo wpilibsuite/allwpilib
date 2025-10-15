@@ -5,10 +5,10 @@
 #include <string>
 #include <thread>
 
+#include <gtest/gtest.h>
 #include <wpi/simulation/DIOSim.hpp>
 #include <wpi/simulation/DriverStationSim.hpp>
 #include <wpi/simulation/SimHooks.hpp>
-#include <gtest/gtest.h>
 #include <wpi/units/time.hpp>
 
 #include "Robot.hpp"

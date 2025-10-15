@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_CONFIGURABLESOURCEIMPL_H_
-#define CSCORE_CONFIGURABLESOURCEIMPL_H_
+#ifndef CSCORE_CONFIGURABLESOURCEIMPL_HPP_
+#define CSCORE_CONFIGURABLESOURCEIMPL_HPP_
 
 #include <atomic>
 #include <functional>
@@ -50,4 +50,4 @@ class ConfigurableSourceImpl : public SourceImpl {
 
 }  // namespace cs
 
-#endif  // CSCORE_CONFIGURABLESOURCEIMPL_H_
+#endif  // CSCORE_CONFIGURABLESOURCEIMPL_HPP_

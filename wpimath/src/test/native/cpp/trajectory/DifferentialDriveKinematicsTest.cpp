@@ -8,8 +8,8 @@
 #include <gtest/gtest.h>
 
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
-#include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
 #include "wpi/math/trajectory/TestTrajectory.hpp"
+#include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
 #include "wpi/units/time.hpp"
 
 using namespace frc;

@@ -6,8 +6,8 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/system/Notifier.hpp"
 #include "wpi/simulation/SimHooks.hpp"
+#include "wpi/system/Notifier.hpp"
 
 using namespace frc;
 

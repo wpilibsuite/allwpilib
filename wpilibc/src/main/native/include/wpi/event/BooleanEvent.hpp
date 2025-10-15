@@ -4,11 +4,10 @@
 
 #pragma once
 
-#include <wpi/math/filter/Debouncer.hpp>
-
 #include <functional>
 #include <memory>
 
+#include <wpi/math/filter/Debouncer.hpp>
 #include <wpi/units/time.hpp>
 #include <wpi/util/FunctionExtras.hpp>
 

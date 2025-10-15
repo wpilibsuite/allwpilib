@@ -7,8 +7,8 @@
 #include <wpi/driverstation/DriverStation.hpp>
 #include <wpi/driverstation/GenericHID.hpp>
 
-#include "wpi/commands2/button/Trigger.hpp"
 #include "wpi/commands2/CommandScheduler.hpp"
+#include "wpi/commands2/button/Trigger.hpp"
 
 namespace frc2 {
 

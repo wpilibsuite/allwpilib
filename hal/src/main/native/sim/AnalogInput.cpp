@@ -8,8 +8,8 @@
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
-#include "wpi/hal/handles/HandlesInternal.h"
 #include "mockdata/AnalogInDataInternal.h"
+#include "wpi/hal/handles/HandlesInternal.h"
 
 using namespace hal;
 

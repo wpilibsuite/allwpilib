@@ -8,18 +8,18 @@
 #include <thread>
 #include <vector>
 
-#include <wpi/cameraserver/CameraServer.hpp>
 #include <fmt/format.h>
-#include <wpi/opmode/TimedRobot.hpp>
-#include <wpi/apriltag/AprilTagDetection.hpp>
-#include <wpi/apriltag/AprilTagDetector.hpp>
-#include <wpi/apriltag/AprilTagPoseEstimator.hpp>
-#include <wpi/math/geometry/Transform3d.hpp>
-#include <wpi/ntcore/IntegerArrayTopic.hpp>
-#include <wpi/ntcore/NetworkTableInstance.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/types.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <wpi/apriltag/AprilTagDetection.hpp>
+#include <wpi/apriltag/AprilTagDetector.hpp>
+#include <wpi/apriltag/AprilTagPoseEstimator.hpp>
+#include <wpi/cameraserver/CameraServer.hpp>
+#include <wpi/math/geometry/Transform3d.hpp>
+#include <wpi/ntcore/IntegerArrayTopic.hpp>
+#include <wpi/ntcore/NetworkTableInstance.hpp>
+#include <wpi/opmode/TimedRobot.hpp>
 #include <wpi/units/angle.hpp>
 #include <wpi/units/length.hpp>
 

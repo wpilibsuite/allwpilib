@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef WPIUTIL_WPI_RAW_ISTREAM_H_
-#define WPIUTIL_WPI_RAW_ISTREAM_H_
+#ifndef WPIUTIL_WPI_UTIL_RAW_ISTREAM_HPP_
+#define WPIUTIL_WPI_UTIL_RAW_ISTREAM_HPP_
 
 #include <stdint.h>
 
@@ -173,4 +173,4 @@ class raw_fd_istream : public raw_istream {
 
 }  // namespace wpi
 
-#endif  // WPIUTIL_WPI_RAW_ISTREAM_H_
+#endif  // WPIUTIL_WPI_UTIL_RAW_ISTREAM_HPP_

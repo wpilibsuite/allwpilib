@@ -26,12 +26,12 @@ NtQueryTimerResolution(PULONG MinimumResolution, PULONG MaximumResolution,
 #include "ErrorsInternal.h"
 #include "HALInitializer.h"
 #include "MockHooksInternal.h"
+#include "mockdata/RoboRioDataInternal.h"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/Extensions.h"
 #include "wpi/hal/handles/HandlesInternal.h"
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/hal/simulation/SimCallbackRegistry.h"
-#include "mockdata/RoboRioDataInternal.h"
 
 using namespace hal;
 

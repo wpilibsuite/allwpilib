@@ -6,9 +6,9 @@
 
 #include <wpi/hardware/discrete/DigitalInput.hpp>
 #include <wpi/hardware/discrete/DigitalOutput.hpp>
+#include <wpi/romi/OnBoardIO.hpp>
 #include <wpi/system/Errors.hpp>
 #include <wpi/system/Timer.hpp>
-#include <wpi/romi/OnBoardIO.hpp>
 
 using namespace frc;
 

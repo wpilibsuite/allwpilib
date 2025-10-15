@@ -3,5 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <wpi/cscore/cscore.h>
+
 #include <wpi/hal/HAL.h>
 #include <wpi/ntcore/ntcore.h>

@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_INSTANCE_H_
-#define CSCORE_INSTANCE_H_
+#ifndef CSCORE_INSTANCE_HPP_
+#define CSCORE_INSTANCE_HPP_
 
 #include <memory>
 #include <utility>
 
-#include <wpi/util/Logger.hpp>
 #include <wpi/net/EventLoopRunner.hpp>
+#include <wpi/util/Logger.hpp>
 
 #include "Log.hpp"
 #include "NetworkListener.hpp"
@@ -112,4 +112,4 @@ class Instance {
 
 }  // namespace cs
 
-#endif  // CSCORE_INSTANCE_H_
+#endif  // CSCORE_INSTANCE_HPP_

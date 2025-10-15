@@ -13,9 +13,9 @@
 #include <wpi/util/json.hpp>
 
 #include "net/NetworkOutgoingQueue.hpp"
-#include "wpi/ntcore/NetworkTableValue.hpp"
 #include "server/ServerPublisher.hpp"
 #include "server/ServerSubscriber.hpp"
+#include "wpi/ntcore/NetworkTableValue.hpp"
 
 namespace wpi {
 class Logger;

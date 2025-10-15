@@ -11,8 +11,8 @@
 #include <wpi/units/temperature.hpp>
 #include <wpi/units/voltage.hpp>
 
-#include "wpi/system/RobotController.hpp"
 #include "wpi/simulation/CallbackStore.hpp"
+#include "wpi/system/RobotController.hpp"
 
 namespace frc::sim {
 

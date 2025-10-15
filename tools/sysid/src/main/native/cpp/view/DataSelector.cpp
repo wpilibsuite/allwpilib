@@ -12,10 +12,10 @@
 
 #include <fmt/format.h>
 #include <imgui.h>
-#include <wpi/util/Logger.hpp>
-#include <wpi/util/StringExtras.hpp>
 #include <wpi/datalog/DataLogReader.hpp>
 #include <wpi/datalog/DataLogReaderThread.hpp>
+#include <wpi/util/Logger.hpp>
+#include <wpi/util/StringExtras.hpp>
 
 #include "wpi/sysid/Util.hpp"
 #include "wpi/sysid/analysis/AnalysisType.hpp"

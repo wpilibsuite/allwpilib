@@ -4,9 +4,9 @@
 
 #pragma once
 
+#include <wpi/commands2/Command.hpp>
 #include <wpi/driverstation/XboxController.hpp>
 #include <wpi/smartdashboard/SendableChooser.hpp>
-#include <wpi/commands2/Command.hpp>
 
 #include "Constants.hpp"
 #include "commands/ComplexAuto.hpp"

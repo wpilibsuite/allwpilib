@@ -6,11 +6,11 @@
 
 #include <array>
 
-#include <wpi/hardware/rotation/AnalogPotentiometer.hpp>
 #include <wpi/driverstation/Joystick.hpp>
-#include <wpi/opmode/TimedRobot.hpp>
-#include <wpi/math/controller/PIDController.hpp>
 #include <wpi/hardware/motor/PWMSparkMax.hpp>
+#include <wpi/hardware/rotation/AnalogPotentiometer.hpp>
+#include <wpi/math/controller/PIDController.hpp>
+#include <wpi/opmode/TimedRobot.hpp>
 #include <wpi/units/length.hpp>
 
 /**

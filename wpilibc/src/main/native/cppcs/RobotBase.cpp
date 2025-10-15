@@ -16,17 +16,17 @@
 #include <wpi/cameraserver/CameraServerShared.hpp>
 #include <wpi/hal/HALBase.h>
 #include <wpi/hal/UsageReporting.h>
+#include <wpi/math/util/MathShared.hpp>
 #include <wpi/ntcore/NetworkTable.hpp>
 #include <wpi/ntcore/NetworkTableInstance.hpp>
 #include <wpi/util/print.hpp>
 #include <wpi/util/timestamp.h>
-#include <wpi/math/util/MathShared.hpp>
 
-#include "wpi/system/WPILibVersion.hpp"
 #include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/smartdashboard/SmartDashboard.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/Notifier.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/system/WPILibVersion.hpp"
 
 static_assert(frc::RuntimeType::kRoboRIO ==
               static_cast<frc::RuntimeType>(HAL_Runtime_RoboRIO));

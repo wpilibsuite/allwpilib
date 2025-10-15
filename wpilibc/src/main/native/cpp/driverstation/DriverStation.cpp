@@ -14,6 +14,7 @@
 #include <string_view>
 
 #include <fmt/format.h>
+#include <wpi/datalog/DataLog.hpp>
 #include <wpi/hal/DriverStation.h>
 #include <wpi/hal/DriverStationTypes.h>
 #include <wpi/hal/HALBase.h>
@@ -25,7 +26,6 @@
 #include <wpi/ntcore/StringTopic.hpp>
 #include <wpi/util/EventVector.hpp>
 #include <wpi/util/condition_variable.hpp>
-#include <wpi/datalog/DataLog.hpp>
 #include <wpi/util/json.hpp>
 #include <wpi/util/mutex.hpp>
 #include <wpi/util/timestamp.h>

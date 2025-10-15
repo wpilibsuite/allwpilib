@@ -8,10 +8,10 @@
 #include <GLFW/glfw3.h>
 #include <fmt/format.h>
 #include <imgui.h>
-#include <wpi/ntcore/ntcore_cpp.hpp>
-#include <wpi/util/StringExtras.hpp>
 #include <wpi/gui/wpigui.hpp>
 #include <wpi/gui/wpigui_openurl.hpp>
+#include <wpi/ntcore/ntcore_cpp.hpp>
+#include <wpi/util/StringExtras.hpp>
 
 #include "wpi/glass/Context.hpp"
 #include "wpi/glass/MainMenuBar.hpp"

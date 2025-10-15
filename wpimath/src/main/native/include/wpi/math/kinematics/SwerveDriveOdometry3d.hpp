@@ -11,11 +11,11 @@
 #include <wpi/util/SymbolExports.hpp>
 #include <wpi/util/timestamp.h>
 
+#include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/kinematics/Odometry3d.hpp"
 #include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
 #include "wpi/math/kinematics/SwerveModulePosition.hpp"
 #include "wpi/math/kinematics/SwerveModuleState.hpp"
-#include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/units/time.hpp"
 
 namespace frc {

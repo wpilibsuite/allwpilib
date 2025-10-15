@@ -10,9 +10,9 @@
 #include <wpi/ntcore/DoubleTopic.hpp>
 #include <wpi/ntcore/StringTopic.hpp>
 #include <wpi/units/angle.hpp>
+#include <wpi/util/Color8Bit.hpp>
 
 #include "wpi/smartdashboard/MechanismObject2d.hpp"
-#include "wpi/util/Color8Bit.hpp"
 
 namespace frc {
 

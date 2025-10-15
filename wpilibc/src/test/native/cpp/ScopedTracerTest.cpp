@@ -9,8 +9,8 @@
 #include <wpi/util/StringExtras.hpp>
 #include <wpi/util/raw_ostream.hpp>
 
-#include "wpi/system/ScopedTracer.hpp"
 #include "wpi/simulation/SimHooks.hpp"
+#include "wpi/system/ScopedTracer.hpp"
 
 TEST(ScopedTracerTest, Timing) {
   wpi::SmallString<128> buf;

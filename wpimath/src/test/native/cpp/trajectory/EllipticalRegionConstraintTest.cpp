@@ -4,9 +4,9 @@
 
 #include <gtest/gtest.h>
 
+#include "wpi/math/trajectory/TestTrajectory.hpp"
 #include "wpi/math/trajectory/constraint/EllipticalRegionConstraint.hpp"
 #include "wpi/math/trajectory/constraint/MaxVelocityConstraint.hpp"
-#include "wpi/math/trajectory/TestTrajectory.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"

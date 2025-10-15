@@ -2,8 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/util/Alert.hpp"
-
 #include <set>
 #include <string>
 #include <utility>
@@ -12,13 +10,14 @@
 #include <fmt/format.h>
 #include <wpi/ntcore/NTSendable.hpp>
 #include <wpi/ntcore/NTSendableBuilder.hpp>
+#include <wpi/util/Alert.hpp>
 #include <wpi/util/StringMap.hpp>
 #include <wpi/util/sendable/SendableHelper.hpp>
 #include <wpi/util/sendable/SendableRegistry.hpp>
 
+#include "wpi/smartdashboard/SmartDashboard.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/RobotController.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
 
 using namespace frc;
 

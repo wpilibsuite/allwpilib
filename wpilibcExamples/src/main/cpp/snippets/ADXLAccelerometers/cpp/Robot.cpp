@@ -3,8 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <wpi/hardware/accelerometer/ADXL345_I2C.hpp>
-#include <wpi/hardware/discrete/AnalogInput.hpp>
 #include <wpi/hardware/bus/I2C.hpp>
+#include <wpi/hardware/discrete/AnalogInput.hpp>
 #include <wpi/opmode/TimedRobot.hpp>
 
 /**

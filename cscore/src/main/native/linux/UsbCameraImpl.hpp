@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_USBCAMERAIMPL_H_
-#define CSCORE_USBCAMERAIMPL_H_
+#ifndef CSCORE_USBCAMERAIMPL_HPP_
+#define CSCORE_USBCAMERAIMPL_HPP_
 
 #include <linux/videodev2.h>
 
@@ -179,4 +179,4 @@ class UsbCameraImpl : public SourceImpl {
 
 }  // namespace cs
 
-#endif  // CSCORE_USBCAMERAIMPL_H_
+#endif  // CSCORE_USBCAMERAIMPL_HPP_

@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef WPINET_WORKERTHREAD_H_
-#define WPINET_WORKERTHREAD_H_
+#ifndef WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_WORKERTHREAD_HPP_
+#define WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_WORKERTHREAD_HPP_
 
 #include <functional>
 #include <memory>
@@ -283,4 +283,4 @@ class WorkerThread<R(T...)> final {
 
 }  // namespace wpi
 
-#endif  // WPINET_WORKERTHREAD_H_
+#endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_WORKERTHREAD_HPP_

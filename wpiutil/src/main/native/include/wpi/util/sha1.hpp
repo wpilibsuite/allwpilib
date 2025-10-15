@@ -17,8 +17,8 @@
         -- Eugene Hopkinson <slowriot at voxelstorm dot com>
 */
 
-#ifndef WPIUTIL_WPI_SHA1_H_
-#define WPIUTIL_WPI_SHA1_H_
+#ifndef WPIUTIL_WPI_UTIL_SHA1_HPP_
+#define WPIUTIL_WPI_UTIL_SHA1_HPP_
 
 #include <stdint.h>
 
@@ -49,4 +49,4 @@ class SHA1 {
 
 }  // namespace wpi
 
-#endif  // WPIUTIL_WPI_SHA1_H_
+#endif  // WPIUTIL_WPI_UTIL_SHA1_HPP_

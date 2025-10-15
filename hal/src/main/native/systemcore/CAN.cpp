@@ -17,6 +17,9 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/net/EventLoopRunner.hpp>
+#include <wpi/net/uv/Poll.hpp>
+#include <wpi/net/uv/Timer.hpp>
 #include <wpi/util/DenseMap.hpp>
 #include <wpi/util/circular_buffer.hpp>
 #include <wpi/util/mutex.hpp>
@@ -27,9 +30,6 @@
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/Threads.h"
 #include "wpi/hal/handles/UnlimitedHandleResource.h"
-#include "wpi/net/EventLoopRunner.hpp"
-#include "wpi/net/uv/Poll.hpp"
-#include "wpi/net/uv/Timer.hpp"
 
 using namespace hal;
 
