@@ -6,9 +6,9 @@
 
 package org.wpilib.commands2.button;
 
+import org.wpilib.commands2.CommandScheduler;
 import org.wpilib.driverstation.StadiaController;
 import org.wpilib.event.EventLoop;
-import org.wpilib.commands2.CommandScheduler;
 
 /**
  * A version of {@link StadiaController} with {@link Trigger} factories for command-based.

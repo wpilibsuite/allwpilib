@@ -6,10 +6,10 @@
 
 package org.wpilib.commands3.button;
 
-import org.wpilib.driverstation.PS5Controller;
-import org.wpilib.event.EventLoop;
 import org.wpilib.commands3.Scheduler;
 import org.wpilib.commands3.Trigger;
+import org.wpilib.driverstation.PS5Controller;
+import org.wpilib.event.EventLoop;
 
 /**
  * A version of {@link PS5Controller} with {@link Trigger} factories for command-based.
