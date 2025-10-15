@@ -1,6 +1,8 @@
 package edu.wpi.first.math.trajectory;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,7 +22,7 @@ class SampleJsonTest {
   private final Translation2d m_br = new Translation2d(-12, -12);
 
   @Test
-  public void testBaseSample() {
+  void testBaseSample() {
     ObjectMapper mapper = new ObjectMapper();
     Trajectory<SplineSample> trajectory = TrajectoryGeneratorTest.getTrajectory(new ArrayList<>());
     Arrays.stream(trajectory.samples)
@@ -37,7 +39,7 @@ class SampleJsonTest {
   }
 
   @Test
-  public void testFromJson() {
+  void testFromJson() {
     ObjectMapper mapper = new ObjectMapper();
 
     Trajectory<SplineSample> trajectory = TrajectoryGeneratorTest.getTrajectory(new ArrayList<>());
@@ -57,7 +59,7 @@ class SampleJsonTest {
   }
 
   @Test
-  public void testDifferentialSamples() {
+  void testDifferentialSamples() {
     ObjectMapper mapper = new ObjectMapper();
     Trajectory<DifferentialSample> trajectory =
         TrajectoryGeneratorTest.getTrajectory(new ArrayList<>())
@@ -83,7 +85,7 @@ class SampleJsonTest {
   }
 
   @Test
-  public void testMecanumSample() {
+  void testMecanumSample() {
     ObjectMapper mapper = new ObjectMapper();
     Trajectory<MecanumSample> trajectory =
         TrajectoryGeneratorTest.getTrajectory(new ArrayList<>())
@@ -114,7 +116,7 @@ class SampleJsonTest {
   }
 
   @Test
-  public void testSwerveSample() {
+  void testSwerveSample() {
     ObjectMapper mapper = new ObjectMapper();
     Trajectory<SwerveSample> trajectory =
         TrajectoryGeneratorTest.getTrajectory(new ArrayList<>())
