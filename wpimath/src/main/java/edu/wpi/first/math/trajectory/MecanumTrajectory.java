@@ -1,5 +1,7 @@
 package edu.wpi.first.math.trajectory;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
@@ -16,7 +18,10 @@ public class MecanumTrajectory extends Trajectory<MecanumSample> {
    * @param samples the samples of the trajectory. Order does not matter as they will be ordered
    *     internally.
    */
-  public MecanumTrajectory(MecanumDriveKinematics kinematics, MecanumSample[] samples) {
+  @JsonCreator
+  public MecanumTrajectory(
+      @JsonProperty("kinematics") MecanumDriveKinematics kinematics,
+      @JsonProperty("samples") MecanumSample[] samples) {
     super(samples);
     this.kinematics = kinematics;
   }

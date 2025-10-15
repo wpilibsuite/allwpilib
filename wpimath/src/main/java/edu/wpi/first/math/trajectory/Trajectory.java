@@ -2,6 +2,7 @@ package edu.wpi.first.math.trajectory;
 
 import static edu.wpi.first.units.Units.Seconds;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -25,7 +26,7 @@ public abstract class Trajectory<SampleType extends TrajectorySample<SampleType>
   private final InterpolatingTreeMap<Time, SampleType> sampleMap;
 
   /** The total duration of the trajectory. */
-  public final Time duration;
+  @JsonIgnore public final Time duration;
 
   /**
    * Constructs a Trajectory.

@@ -2,6 +2,8 @@ package edu.wpi.first.math.trajectory;
 
 import static edu.wpi.first.units.Units.Seconds;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -28,7 +30,9 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
    * @param samples the samples of the trajectory. Order does not matter as they will be ordered
    *     internally.
    */
-  public DifferentialTrajectory(DifferentialSample[] samples) {
+  @JsonCreator
+  public DifferentialTrajectory(
+      @JsonProperty("samples") DifferentialSample[] samples) {
     super(samples);
   }
 

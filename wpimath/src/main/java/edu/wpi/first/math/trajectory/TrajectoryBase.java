@@ -1,5 +1,7 @@
 package edu.wpi.first.math.trajectory;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import java.util.Arrays;
@@ -14,7 +16,8 @@ public class TrajectoryBase extends Trajectory<TrajectorySample.Base> {
    * @param samples the samples of the trajectory. Order does not matter as they will be ordered
    *     internally.
    */
-  public TrajectoryBase(TrajectorySample.Base[] samples) {
+  @JsonCreator
+  public TrajectoryBase(@JsonProperty("samples") TrajectorySample.Base[] samples) {
     super(samples);
   }
 

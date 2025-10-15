@@ -1,5 +1,7 @@
 package edu.wpi.first.math.trajectory;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -16,7 +18,10 @@ public class SwerveTrajectory extends Trajectory<SwerveSample> {
    * @param samples the samples of the trajectory. Order does not matter as they will be ordered
    *     internally.
    */
-  public SwerveTrajectory(SwerveDriveKinematics kinematics, SwerveSample[] samples) {
+  @JsonCreator
+  public SwerveTrajectory(
+      @JsonProperty("kinematics") SwerveDriveKinematics kinematics,
+      @JsonProperty("samples") SwerveSample[] samples) {
     super(samples);
     this.kinematics = kinematics;
   }
