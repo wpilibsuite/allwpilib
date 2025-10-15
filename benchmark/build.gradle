@@ -37,6 +37,11 @@ application {
 
 apply plugin: 'com.gradleup.shadow'
 
+shadowJar {
+    mergeServiceFiles()
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
 repositories {
     maven {
         url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'

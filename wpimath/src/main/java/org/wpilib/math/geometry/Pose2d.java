@@ -38,9 +38,9 @@ public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, Str
    */
   public static final Pose2d kZero = new Pose2d();
 
-  @Json.Property("translation")
+  @Json.Ignore
   private final Translation2d m_translation;
-  @Json.Property("rotation")
+  @Json.Ignore
   private final Rotation2d m_rotation;
 
   /** Constructs a pose at the origin facing toward the positive X axis. */
@@ -134,7 +134,7 @@ public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, Str
    *
    * @return The translational component of the pose.
    */
-  @JsonProperty
+  @JsonProperty(value = "translation")
   public Translation2d getTranslation() {
     return m_translation;
   }
@@ -180,7 +180,7 @@ public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, Str
    *
    * @return The rotational component of the pose.
    */
-  @JsonProperty
+  @ JsonProperty(value = "rotation")
   public Rotation2d getRotation() {
     return m_rotation;
   }

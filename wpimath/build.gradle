@@ -89,11 +89,11 @@ nativeUtils.exportsConfigs {
 
 dependencies {
     api project(":wpiunits")
+    api libs.avaje.jsonb
     api libs.bundles.ejml
     api libs.bundles.jackson
     api libs.quickbuf.runtime
-    api "io.avaje:avaje-jsonb:3.7"
-    annotationProcessor "io.avaje:avaje-jsonb-generator:3.7"
+    annotationProcessor libs.avaje.jsonb.generator
 }
 
 sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"

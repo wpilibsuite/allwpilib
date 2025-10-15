@@ -1,4 +1,5 @@
 [versions]
+avaje = "3.11"
 ejml = "0.44.0"
 jackson = "2.19.2"
 jmh = "1.37"
@@ -8,6 +9,8 @@ quickbuf = "1.4"
 
 [libraries]
 # General runtime dependencies
+avaje-jsonb = { module = "io.avaje:avaje-jsonb", version.ref = "avaje" }
+avaje-jsonb-generator = { module = "io.avaje:avaje-jsonb-generator", version.ref = "avaje" }
 ejml-simple = { module = "org.ejml:ejml-simple", version.ref = "ejml" } # also pulls in other EJML modules as transitive dependencies
 gson = { module = "com.google.code.gson:gson", version = "2.13.1" }
 jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "jackson" }

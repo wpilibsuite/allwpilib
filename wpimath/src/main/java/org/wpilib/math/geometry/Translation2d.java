@@ -44,9 +44,11 @@ public class Translation2d
    */
   public static final Translation2d kZero = new Translation2d();
 
-  @Json.Property("x")
+  @Json.Ignore
+  @com.squareup.moshi.Json(name = "x")
   private final double m_x;
-  @Json.Property("y")
+  @Json.Ignore
+  @com.squareup.moshi.Json(name = "y")
   private final double m_y;
 
   /** Constructs a Translation2d with X and Y components equal to zero. */
@@ -135,7 +137,7 @@ public class Translation2d
    *
    * @return The X component of the translation.
    */
-  @JsonProperty
+  @JsonProperty(value = "x")
   public double getX() {
     return m_x;
   }
@@ -145,7 +147,7 @@ public class Translation2d
    *
    * @return The Y component of the translation.
    */
-  @JsonProperty
+  @JsonProperty(value = "y")
   public double getY() {
     return m_y;
   }

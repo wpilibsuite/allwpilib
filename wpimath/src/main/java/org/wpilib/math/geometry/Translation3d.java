@@ -45,11 +45,11 @@ public class Translation3d
    */
   public static final Translation3d kZero = new Translation3d();
 
-  @Json.Property("x")
+  @Json.Ignore
   private final double m_x;
-  @Json.Property("y")
+  @Json.Ignore
   private final double m_y;
-  @Json.Property("z")
+  @Json.Ignore
   private final double m_z;
 
   /** Constructs a Translation3d with X, Y, and Z components equal to zero. */
@@ -158,7 +158,7 @@ public class Translation3d
    *
    * @return The X component of the translation.
    */
-  @JsonProperty
+  @JsonProperty(value = "x")
   public double getX() {
     return m_x;
   }
@@ -168,7 +168,7 @@ public class Translation3d
    *
    * @return The Y component of the translation.
    */
-  @JsonProperty
+  @JsonProperty(value = "y")
   public double getY() {
     return m_y;
   }
@@ -178,7 +178,7 @@ public class Translation3d
    *
    * @return The Z component of the translation.
    */
-  @JsonProperty
+  @JsonProperty(value = "z")
   public double getZ() {
     return m_z;
   }

@@ -60,7 +60,7 @@ public class AprilTagFieldLayout {
   private final Map<Integer, AprilTag> m_apriltags = new HashMap<>();
 
   @JsonProperty(value = "field")
-  @Json.Ignore
+  @Json.Property("field")
   FieldDimensions m_fieldDimensions;
 
   @Json.Ignore
@@ -104,8 +104,8 @@ public class AprilTagFieldLayout {
   @JsonCreator
   @Json.Creator
   AprilTagFieldLayout(
-      @JsonProperty(required = true, value = "tags") List<AprilTag> apriltags,
-      @JsonProperty(required = true, value = "field") FieldDimensions fieldDimensions) {
+      @JsonProperty(required = true, value = "tags") @Json.Alias("tags") List<AprilTag> apriltags,
+      @JsonProperty(required = true, value = "field") @Json.Alias("field") FieldDimensions fieldDimensions) {
     // To ensure the underlying semantics don't change with what kind of list is passed in
     for (AprilTag tag : apriltags) {
       m_apriltags.put(tag.ID, tag);
@@ -120,7 +120,6 @@ public class AprilTagFieldLayout {
    * @return The {@link AprilTag AprilTags} used in this layout.
    */
   @JsonProperty("tags")
-  @Json.Property("tags")
   public List<AprilTag> getTags() {
     return new ArrayList<>(m_apriltags.values());
   }

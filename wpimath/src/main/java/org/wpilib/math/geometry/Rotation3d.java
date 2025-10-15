@@ -81,8 +81,6 @@ public class Rotation3d
    */
   public static final Rotation3d kZero = new Rotation3d();
 
-  // @Json.Property("quaternion")
-  // @Json.Alias("quaternion")
   @Json.Ignore
   private final Quaternion m_q;
 
