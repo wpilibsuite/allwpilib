@@ -10,7 +10,7 @@ struct ImGuiContext;
 
 namespace wpi::glass {
 class Context;
-}  // namespace glass
+}  // namespace wpi::glass
 
 namespace wpi::gui {
 struct Context;

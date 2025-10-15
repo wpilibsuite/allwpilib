@@ -67,7 +67,8 @@ class SwerveDriveKinematics
   template <std::convertible_to<Translation2d>... ModuleTranslations>
     requires(sizeof...(ModuleTranslations) == NumModules)
   explicit SwerveDriveKinematics(ModuleTranslations&&... moduleTranslations)
-      : m_modules{moduleTranslations...}, m_moduleHeadings(wpi::util::empty_array) {
+      : m_modules{moduleTranslations...},
+        m_moduleHeadings(wpi::util::empty_array) {
     for (size_t i = 0; i < NumModules; i++) {
       // clang-format off
       m_inverseKinematics.template block<2, 3>(i * 2, 0) <<
@@ -145,9 +146,9 @@ class SwerveDriveKinematics
    * module states are not normalized. Sometimes, a user input may cause one of
    * the module speeds to go above the attainable max velocity. Use the
    * DesaturateWheelSpeeds(wpi::util::array<SwerveModuleState, NumModules>*,
-   * wpi::units::meters_per_second_t) function to rectify this issue. In addition,
-   * you can leverage the power of C++17 to directly assign the module states to
-   * variables:
+   * wpi::units::meters_per_second_t) function to rectify this issue. In
+   * addition, you can leverage the power of C++17 to directly assign the module
+   * states to variables:
    *
    * @code{.cpp}
    * auto [fl, fr, bl, br] = kinematics.ToSwerveModuleStates(chassisSpeeds);
@@ -156,7 +157,8 @@ class SwerveDriveKinematics
   wpi::util::array<SwerveModuleState, NumModules> ToSwerveModuleStates(
       const ChassisSpeeds& chassisSpeeds,
       const Translation2d& centerOfRotation = Translation2d{}) const {
-    wpi::util::array<SwerveModuleState, NumModules> moduleStates(wpi::util::empty_array);
+    wpi::util::array<SwerveModuleState, NumModules> moduleStates(
+        wpi::util::empty_array);
 
     if (chassisSpeeds.vx == 0_mps && chassisSpeeds.vy == 0_mps &&
         chassisSpeeds.omega == 0_rad_per_s) {
@@ -239,8 +241,9 @@ class SwerveDriveKinematics
    *
    * @return The resulting chassis speed.
    */
-  ChassisSpeeds ToChassisSpeeds(const wpi::util::array<SwerveModuleState, NumModules>&
-                                    moduleStates) const override {
+  ChassisSpeeds ToChassisSpeeds(
+      const wpi::util::array<SwerveModuleState, NumModules>& moduleStates)
+      const override {
     Matrixd<NumModules * 2, 1> moduleStateMatrix;
 
     for (size_t i = 0; i < NumModules; ++i) {
@@ -313,9 +316,10 @@ class SwerveDriveKinematics
 
   Twist2d ToTwist2d(
       const wpi::util::array<SwerveModulePosition, NumModules>& start,
-      const wpi::util::array<SwerveModulePosition, NumModules>& end) const override {
-    auto result =
-        wpi::util::array<SwerveModulePosition, NumModules>(wpi::util::empty_array);
+      const wpi::util::array<SwerveModulePosition, NumModules>& end)
+      const override {
+    auto result = wpi::util::array<SwerveModulePosition, NumModules>(
+        wpi::util::empty_array);
     for (size_t i = 0; i < NumModules; i++) {
       result[i] = {end[i].distance - start[i].distance, end[i].angle};
     }
@@ -346,13 +350,13 @@ class SwerveDriveKinematics
       wpi::util::array<SwerveModuleState, NumModules>* moduleStates,
       wpi::units::meters_per_second_t attainableMaxSpeed) {
     auto& states = *moduleStates;
-    auto realMaxSpeed =
-        wpi::units::math::abs(std::max_element(states.begin(), states.end(),
-                                          [](const auto& a, const auto& b) {
-                                            return wpi::units::math::abs(a.speed) <
-                                                   wpi::units::math::abs(b.speed);
-                                          })
-                             ->speed);
+    auto realMaxSpeed = wpi::units::math::abs(
+        std::max_element(states.begin(), states.end(),
+                         [](const auto& a, const auto& b) {
+                           return wpi::units::math::abs(a.speed) <
+                                  wpi::units::math::abs(b.speed);
+                         })
+            ->speed);
 
     if (realMaxSpeed > attainableMaxSpeed) {
       for (auto& module : states) {
@@ -395,13 +399,13 @@ class SwerveDriveKinematics
       wpi::units::radians_per_second_t attainableMaxRobotRotationSpeed) {
     auto& states = *moduleStates;
 
-    auto realMaxSpeed =
-        wpi::units::math::abs(std::max_element(states.begin(), states.end(),
-                                          [](const auto& a, const auto& b) {
-                                            return wpi::units::math::abs(a.speed) <
-                                                   wpi::units::math::abs(b.speed);
-                                          })
-                             ->speed);
+    auto realMaxSpeed = wpi::units::math::abs(
+        std::max_element(states.begin(), states.end(),
+                         [](const auto& a, const auto& b) {
+                           return wpi::units::math::abs(a.speed) <
+                                  wpi::units::math::abs(b.speed);
+                         })
+            ->speed);
 
     if (attainableMaxRobotTranslationSpeed == 0_mps ||
         attainableMaxRobotRotationSpeed == 0_rad_per_s ||
@@ -409,17 +413,17 @@ class SwerveDriveKinematics
       return;
     }
 
-    auto translationalK =
-        wpi::units::math::hypot(desiredChassisSpeed.vx, desiredChassisSpeed.vy) /
-        attainableMaxRobotTranslationSpeed;
+    auto translationalK = wpi::units::math::hypot(desiredChassisSpeed.vx,
+                                                  desiredChassisSpeed.vy) /
+                          attainableMaxRobotTranslationSpeed;
 
     auto rotationalK = wpi::units::math::abs(desiredChassisSpeed.omega) /
                        attainableMaxRobotRotationSpeed;
 
     auto k = wpi::units::math::max(translationalK, rotationalK);
 
-    auto scale = wpi::units::math::min(k * attainableMaxModuleSpeed / realMaxSpeed,
-                                  wpi::units::scalar_t{1});
+    auto scale = wpi::units::math::min(
+        k * attainableMaxModuleSpeed / realMaxSpeed, wpi::units::scalar_t{1});
     for (auto& module : states) {
       module.speed = module.speed * scale;
     }
@@ -429,8 +433,8 @@ class SwerveDriveKinematics
       const wpi::util::array<SwerveModulePosition, NumModules>& start,
       const wpi::util::array<SwerveModulePosition, NumModules>& end,
       double t) const override {
-    auto result =
-        wpi::util::array<SwerveModulePosition, NumModules>(wpi::util::empty_array);
+    auto result = wpi::util::array<SwerveModulePosition, NumModules>(
+        wpi::util::empty_array);
     for (size_t i = 0; i < NumModules; ++i) {
       result[i] = start[i].Interpolate(end[i], t);
     }

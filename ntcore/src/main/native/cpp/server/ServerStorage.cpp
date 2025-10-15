@@ -372,8 +372,8 @@ void ServerStorage::DumpPersistent(wpi::util::raw_ostream& os) {
   os << "\n]\n";
 }
 
-static std::string* ObjGetString(wpi::util::json::object_t& obj, std::string_view key,
-                                 std::string* error) {
+static std::string* ObjGetString(wpi::util::json::object_t& obj,
+                                 std::string_view key, std::string* error) {
   auto it = obj.find(key);
   if (it == obj.end()) {
     *error = fmt::format("no {} key", key);

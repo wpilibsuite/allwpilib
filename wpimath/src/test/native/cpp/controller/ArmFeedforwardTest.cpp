@@ -35,18 +35,20 @@ using Kg_unit = decltype(1_V);
  * @param dt The simulation time.
  * @return The final state as a 2-vector of angle and angular velocity.
  */
-wpi::math::Matrixd<2, 1> Simulate(Ks_unit Ks, Kv_unit Kv, Ka_unit Ka, Kg_unit Kg,
-                            wpi::units::radian_t currentAngle,
-                            wpi::units::radians_per_second_t currentVelocity,
-                            wpi::units::volt_t input, wpi::units::second_t dt) {
+wpi::math::Matrixd<2, 1> Simulate(
+    Ks_unit Ks, Kv_unit Kv, Ka_unit Ka, Kg_unit Kg,
+    wpi::units::radian_t currentAngle,
+    wpi::units::radians_per_second_t currentVelocity, wpi::units::volt_t input,
+    wpi::units::second_t dt) {
   wpi::math::Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -Kv.value() / Ka.value()}};
   wpi::math::Matrixd<2, 1> B{{0.0}, {1.0 / Ka.value()}};
 
   return wpi::math::RK4(
       [&](const wpi::math::Matrixd<2, 1>& x,
           const wpi::math::Matrixd<1, 1>& u) -> wpi::math::Matrixd<2, 1> {
-        wpi::math::Matrixd<2, 1> c{0.0, -Ks.value() / Ka.value() * wpi::util::sgn(x(1)) -
-                                      Kg.value() / Ka.value() * std::cos(x(0))};
+        wpi::math::Matrixd<2, 1> c{
+            0.0, -Ks.value() / Ka.value() * wpi::util::sgn(x(1)) -
+                     Kg.value() / Ka.value() * std::cos(x(0))};
         return A * x + B * u + c;
       },
       wpi::math::Matrixd<2, 1>{currentAngle.value(), currentVelocity.value()},

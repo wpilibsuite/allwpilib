@@ -35,10 +35,11 @@ class DriveSubsystem : public wpi::cmd::SubsystemBase {
    * @param nextLeft The next left wheel state.
    * @param nextRight The next right wheel state.
    */
-  void SetDriveStates(wpi::math::TrapezoidProfile<wpi::units::meters>::State currentLeft,
-                      wpi::math::TrapezoidProfile<wpi::units::meters>::State currentRight,
-                      wpi::math::TrapezoidProfile<wpi::units::meters>::State nextLeft,
-                      wpi::math::TrapezoidProfile<wpi::units::meters>::State nextRight);
+  void SetDriveStates(
+      wpi::math::TrapezoidProfile<wpi::units::meters>::State currentLeft,
+      wpi::math::TrapezoidProfile<wpi::units::meters>::State currentRight,
+      wpi::math::TrapezoidProfile<wpi::units::meters>::State nextLeft,
+      wpi::math::TrapezoidProfile<wpi::units::meters>::State nextRight);
 
   /**
    * Drives the robot using arcade controls.
@@ -91,7 +92,8 @@ class DriveSubsystem : public wpi::cmd::SubsystemBase {
    * @param distance The distance to drive forward.
    * @return A command.
    */
-  wpi::cmd::CommandPtr DynamicProfiledDriveDistance(wpi::units::meter_t distance);
+  wpi::cmd::CommandPtr DynamicProfiledDriveDistance(
+      wpi::units::meter_t distance);
 
  private:
   wpi::math::TrapezoidProfile<wpi::units::meters> m_profile{

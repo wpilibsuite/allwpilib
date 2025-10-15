@@ -19,7 +19,8 @@ Shooter::Shooter() {
                         .WithName("Idle"));
 }
 
-wpi::cmd::CommandPtr Shooter::ShootCommand(wpi::units::turns_per_second_t setpoint) {
+wpi::cmd::CommandPtr Shooter::ShootCommand(
+    wpi::units::turns_per_second_t setpoint) {
   return wpi::cmd::cmd::Parallel(
              // Run the shooter flywheel at the desired setpoint using
              // feedforward and feedback

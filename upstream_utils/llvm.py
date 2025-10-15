@@ -20,8 +20,12 @@ def run_global_replacements(wpiutil_llvm_files: list[Path]):
         content = content.replace('include "llvm/ADT', 'include "wpi/util')
         content = content.replace('include "llvm/Config', 'include "wpi/util')
         content = content.replace('include "llvm/Support', 'include "wpi/util')
-        content = content.replace('include "CountCopyAndMove.h"', 'include "CountCopyAndMove.hpp"')
-        content = content.replace('include "Windows/WindowsSupport.h"', 'include "Windows/WindowsSupport.hpp"')
+        content = content.replace(
+            'include "CountCopyAndMove.h"', 'include "CountCopyAndMove.hpp"'
+        )
+        content = content.replace(
+            'include "Windows/WindowsSupport.h"', 'include "Windows/WindowsSupport.hpp"'
+        )
 
         # Fix uses of span
         content = content.replace("span", "std::span")
@@ -83,7 +87,9 @@ def run_global_replacements(wpiutil_llvm_files: list[Path]):
         content = content.replace("llvm_is_multithreaded()", "1")
 
         # Revert message in copyright header
-        content = content.replace("/// Defines the wpi::util::", "/// Defines the llvm::")
+        content = content.replace(
+            "/// Defines the wpi::util::", "/// Defines the llvm::"
+        )
         content = content.replace("// end llvm namespace", "// end wpi::util namespace")
         content = content.replace("// end namespace llvm", "// end namespace wpi::util")
         content = content.replace("// End llvm namespace", "// End wpi::util namespace")
@@ -91,7 +97,9 @@ def run_global_replacements(wpiutil_llvm_files: list[Path]):
         content = content.replace("fs::openFileForRead", "fs::OpenFileForRead")
 
         # Handle move from .h -> .hpp
-        content = re.sub('#include "wpi/util/(.*).h"', r'#include "wpi/util/\1.hpp"', content)
+        content = re.sub(
+            '#include "wpi/util/(.*).h"', r'#include "wpi/util/\1.hpp"', content
+        )
 
         with open(wpi_file, "w") as f:
             f.write(content)
@@ -137,7 +145,7 @@ def overwrite_files(wpiutil_files: list[Path], llvm_files: dict[str, Path]):
         wpi_base_name = wpi_file.name
         if wpi_file.suffix == ".hpp":
             wpi_base_name = wpi_file.with_suffix(".h").name
-    
+
         if wpi_base_name in llvm_files:
             if wpi_file.suffix == ".h":
                 shutil.copyfile(llvm_files[wpi_base_name], wpi_file.with_suffix(".hpp"))

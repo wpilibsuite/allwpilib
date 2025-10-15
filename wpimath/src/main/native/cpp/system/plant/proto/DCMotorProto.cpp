@@ -8,8 +8,8 @@
 
 #include "wpimath/protobuf/plant.npb.h"
 
-std::optional<wpi::math::DCMotor> wpi::util::Protobuf<wpi::math::DCMotor>::Unpack(
-    InputStream& stream) {
+std::optional<wpi::math::DCMotor>
+wpi::util::Protobuf<wpi::math::DCMotor>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufDCMotor msg;
   if (!stream.Decode(msg)) {
     return {};
@@ -24,8 +24,8 @@ std::optional<wpi::math::DCMotor> wpi::util::Protobuf<wpi::math::DCMotor>::Unpac
   };
 }
 
-bool wpi::util::Protobuf<wpi::math::DCMotor>::Pack(OutputStream& stream,
-                                       const wpi::math::DCMotor& value) {
+bool wpi::util::Protobuf<wpi::math::DCMotor>::Pack(
+    OutputStream& stream, const wpi::math::DCMotor& value) {
   wpi_proto_ProtobufDCMotor msg{
       .nominal_voltage = value.nominalVoltage.value(),
       .stall_torque = value.stallTorque.value(),

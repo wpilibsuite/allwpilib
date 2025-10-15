@@ -150,7 +150,8 @@ inline cameracalibration::CameraModel load_camera_model(std::string path) {
   return camera_model;
 }
 
-inline cameracalibration::CameraModel load_camera_model(wpi::util::json json_data) {
+inline cameracalibration::CameraModel load_camera_model(
+    wpi::util::json json_data) {
   // Camera matrix
   Eigen::Matrix<double, 3, 3> camera_matrix;
 

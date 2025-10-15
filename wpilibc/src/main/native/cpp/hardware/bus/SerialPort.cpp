@@ -26,10 +26,11 @@ SerialPort::SerialPort(int baudRate, Port port, int dataBits,
   HAL_SetSerialDataBits(m_portHandle, dataBits, &status);
   WPILIB_CheckErrorStatus(status, "SetSerialDataBits {}", dataBits);
   HAL_SetSerialParity(m_portHandle, parity, &status);
-  WPILIB_CheckErrorStatus(status, "SetSerialParity {}", static_cast<int>(parity));
+  WPILIB_CheckErrorStatus(status, "SetSerialParity {}",
+                          static_cast<int>(parity));
   HAL_SetSerialStopBits(m_portHandle, stopBits, &status);
   WPILIB_CheckErrorStatus(status, "SetSerialStopBits {}",
-                       static_cast<int>(stopBits));
+                          static_cast<int>(stopBits));
 
   // Set the default timeout to 5 seconds.
   SetTimeout(5_s);
@@ -56,10 +57,11 @@ SerialPort::SerialPort(int baudRate, std::string_view portName, Port port,
   HAL_SetSerialDataBits(m_portHandle, dataBits, &status);
   WPILIB_CheckErrorStatus(status, "SetSerialDataBits {}", dataBits);
   HAL_SetSerialParity(m_portHandle, parity, &status);
-  WPILIB_CheckErrorStatus(status, "SetSerialParity {}", static_cast<int>(parity));
+  WPILIB_CheckErrorStatus(status, "SetSerialParity {}",
+                          static_cast<int>(parity));
   HAL_SetSerialStopBits(m_portHandle, stopBits, &status);
   WPILIB_CheckErrorStatus(status, "SetSerialStopBits {}",
-                       static_cast<int>(stopBits));
+                          static_cast<int>(stopBits));
 
   // Set the default timeout to 5 seconds.
   SetTimeout(5_s);
@@ -76,7 +78,7 @@ void SerialPort::SetFlowControl(SerialPort::FlowControl flowControl) {
   int32_t status = 0;
   HAL_SetSerialFlowControl(m_portHandle, flowControl, &status);
   WPILIB_CheckErrorStatus(status, "SetFlowControl {}",
-                       static_cast<int>(flowControl));
+                          static_cast<int>(flowControl));
 }
 
 void SerialPort::EnableTermination(char terminator) {
@@ -138,7 +140,8 @@ void SerialPort::SetWriteBufferSize(int size) {
 void SerialPort::SetWriteBufferMode(SerialPort::WriteBufferMode mode) {
   int32_t status = 0;
   HAL_SetSerialWriteMode(m_portHandle, mode, &status);
-  WPILIB_CheckErrorStatus(status, "SetWriteBufferMode {}", static_cast<int>(mode));
+  WPILIB_CheckErrorStatus(status, "SetWriteBufferMode {}",
+                          static_cast<int>(mode));
 }
 
 void SerialPort::Flush() {

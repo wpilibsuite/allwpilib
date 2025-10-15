@@ -26,10 +26,11 @@ TEST(ArrayTest, CopyableTypeCompiles) {
 
 TEST(ArrayTest, MoveOnlyTypeCompiles) {
   [[maybe_unused]]
-  constexpr wpi::util::array<MoveOnlyType, 3> arr1{MoveOnlyType{}, MoveOnlyType{},
-                                             MoveOnlyType{}};
+  constexpr wpi::util::array<MoveOnlyType, 3> arr1{
+      MoveOnlyType{}, MoveOnlyType{}, MoveOnlyType{}};
 
   // Test deduction guide
   [[maybe_unused]]
-  constexpr wpi::util::array arr2{MoveOnlyType{}, MoveOnlyType{}, MoveOnlyType{}};
+  constexpr wpi::util::array arr2{MoveOnlyType{}, MoveOnlyType{},
+                                  MoveOnlyType{}};
 }

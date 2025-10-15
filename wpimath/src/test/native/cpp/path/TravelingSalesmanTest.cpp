@@ -26,7 +26,8 @@ bool IsMatchingCycle(std::span<const wpi::math::Pose2d> expected,
   assert(expected.size() == actual.size());
 
   // Check actual has expected cycle (forward)
-  wpi::util::circular_buffer<wpi::math::Pose2d> actualBufferForward{expected.size()};
+  wpi::util::circular_buffer<wpi::math::Pose2d> actualBufferForward{
+      expected.size()};
   for (size_t i = 0; i < actual.size(); ++i) {
     actualBufferForward.push_back(actual[i % actual.size()]);
   }
@@ -36,7 +37,8 @@ bool IsMatchingCycle(std::span<const wpi::math::Pose2d> expected,
   }
 
   // Check actual has expected cycle (reverse)
-  wpi::util::circular_buffer<wpi::math::Pose2d> actualBufferReverse{expected.size()};
+  wpi::util::circular_buffer<wpi::math::Pose2d> actualBufferReverse{
+      expected.size()};
   for (size_t i = 0; i < actual.size(); ++i) {
     actualBufferReverse.push_front(actual[(1 + i) % actual.size()]);
   }
@@ -64,8 +66,8 @@ TEST(TravelingSalesmanTest, FiveLengthStaticPathWithDistanceCost) {
   wpi::math::TravelingSalesman traveler;
   wpi::util::array<wpi::math::Pose2d, 5> solution = traveler.Solve(poses, 500);
 
-  wpi::util::array<wpi::math::Pose2d, 5> expected{poses[0], poses[2], poses[4], poses[1],
-                                      poses[3]};
+  wpi::util::array<wpi::math::Pose2d, 5> expected{poses[0], poses[2], poses[4],
+                                                  poses[1], poses[3]};
 
   EXPECT_TRUE(IsMatchingCycle(expected, solution));
 }
@@ -87,8 +89,8 @@ TEST(TravelingSalesmanTest, FiveLengthDynamicPathWithDistanceCost) {
       traveler.Solve(std::span<const wpi::math::Pose2d>{poses}, 500);
 
   ASSERT_EQ(5u, solution.size());
-  wpi::util::array<wpi::math::Pose2d, 5> expected{poses[0], poses[2], poses[4], poses[1],
-                                      poses[3]};
+  wpi::util::array<wpi::math::Pose2d, 5> expected{poses[0], poses[2], poses[4],
+                                                  poses[1], poses[3]};
 
   EXPECT_TRUE(IsMatchingCycle(expected, solution));
 }
@@ -110,9 +112,9 @@ TEST(TravelingSalesmanTest, TenLengthStaticPathWithDistanceCost) {
   wpi::math::TravelingSalesman traveler;
   wpi::util::array<wpi::math::Pose2d, 10> solution = traveler.Solve(poses, 500);
 
-  wpi::util::array<wpi::math::Pose2d, 10> expected{poses[0], poses[4], poses[6], poses[3],
-                                       poses[1], poses[2], poses[9], poses[8],
-                                       poses[5], poses[7]};
+  wpi::util::array<wpi::math::Pose2d, 10> expected{
+      poses[0], poses[4], poses[6], poses[3], poses[1],
+      poses[2], poses[9], poses[8], poses[5], poses[7]};
 
   EXPECT_TRUE(IsMatchingCycle(expected, solution));
 }
@@ -136,9 +138,9 @@ TEST(TravelingSalesmanTest, TenLengthDynamicPathWithDistanceCost) {
       traveler.Solve(std::span<const wpi::math::Pose2d>{poses}, 500);
 
   ASSERT_EQ(10u, solution.size());
-  wpi::util::array<wpi::math::Pose2d, 10> expected{poses[0], poses[4], poses[6], poses[3],
-                                       poses[1], poses[2], poses[9], poses[8],
-                                       poses[5], poses[7]};
+  wpi::util::array<wpi::math::Pose2d, 10> expected{
+      poses[0], poses[4], poses[6], poses[3], poses[1],
+      poses[2], poses[9], poses[8], poses[5], poses[7]};
 
   EXPECT_TRUE(IsMatchingCycle(expected, solution));
 }

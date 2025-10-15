@@ -14,7 +14,7 @@ class BooleanSubscriber;
 class BooleanTopic;
 class NetworkTable;
 class NetworkTableInstance;
-}  // namespace nt
+}  // namespace wpi::nt
 
 namespace wpi {
 /**
@@ -50,7 +50,8 @@ class NetworkBooleanEvent : public BooleanEvent {
    * @param table The NetworkTable that contains the topic
    * @param topicName The topic name within the table that contains the value
    */
-  NetworkBooleanEvent(EventLoop* loop, std::shared_ptr<wpi::nt::NetworkTable> table,
+  NetworkBooleanEvent(EventLoop* loop,
+                      std::shared_ptr<wpi::nt::NetworkTable> table,
                       std::string_view topicName);
 
   /**

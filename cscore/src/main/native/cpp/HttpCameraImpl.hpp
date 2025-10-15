@@ -28,7 +28,8 @@ namespace wpi::cs {
 class HttpCameraImpl : public SourceImpl {
  public:
   HttpCameraImpl(std::string_view name, CS_HttpCameraKind kind,
-                 wpi::util::Logger& logger, Notifier& notifier, Telemetry& telemetry);
+                 wpi::util::Logger& logger, Notifier& notifier,
+                 Telemetry& telemetry);
   ~HttpCameraImpl() override;
 
   void Start() override;
@@ -146,8 +147,8 @@ class HttpCameraImpl : public SourceImpl {
 
 class AxisCameraImpl : public HttpCameraImpl {
  public:
-  AxisCameraImpl(std::string_view name, wpi::util::Logger& logger, Notifier& notifier,
-                 Telemetry& telemetry)
+  AxisCameraImpl(std::string_view name, wpi::util::Logger& logger,
+                 Notifier& notifier, Telemetry& telemetry)
       : HttpCameraImpl{name, CS_HTTP_AXIS, logger, notifier, telemetry} {}
 #if 0
   void SetProperty(int property, int value, CS_Status* status) override;

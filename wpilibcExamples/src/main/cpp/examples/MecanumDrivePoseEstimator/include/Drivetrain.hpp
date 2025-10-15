@@ -35,8 +35,9 @@ class Drivetrain {
   wpi::math::MecanumDriveWheelPositions GetCurrentDistances() const;
   void SetSpeeds(const wpi::math::MecanumDriveWheelSpeeds& wheelSpeeds);
   void Drive(wpi::units::meters_per_second_t xSpeed,
-             wpi::units::meters_per_second_t ySpeed, wpi::units::radians_per_second_t rot,
-             bool fieldRelative, wpi::units::second_t period);
+             wpi::units::meters_per_second_t ySpeed,
+             wpi::units::radians_per_second_t rot, bool fieldRelative,
+             wpi::units::second_t period);
   void UpdateOdometry();
 
   static constexpr auto kMaxSpeed = 3.0_mps;  // 3 meters per second
@@ -72,11 +73,12 @@ class Drivetrain {
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
-  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_feedforward{1_V, 3_V / 1_mps};
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_feedforward{
+      1_V, 3_V / 1_mps};
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
   wpi::math::MecanumDrivePoseEstimator m_poseEstimator{
-      m_kinematics,  m_imu.GetRotation2d(), GetCurrentDistances(),
+      m_kinematics,        m_imu.GetRotation2d(), GetCurrentDistances(),
       wpi::math::Pose2d{}, {0.1, 0.1, 0.1},       {0.1, 0.1, 0.1}};
 };

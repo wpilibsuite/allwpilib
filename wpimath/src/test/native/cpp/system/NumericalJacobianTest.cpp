@@ -6,11 +6,13 @@
 
 #include "wpi/math/system/NumericalJacobian.hpp"
 
-wpi::math::Matrixd<4, 4> A{{1, 2, 4, 1}, {5, 2, 3, 4}, {5, 1, 3, 2}, {1, 1, 3, 7}};
+wpi::math::Matrixd<4, 4> A{
+    {1, 2, 4, 1}, {5, 2, 3, 4}, {5, 1, 3, 2}, {1, 1, 3, 7}};
 wpi::math::Matrixd<4, 2> B{{1, 1}, {2, 1}, {3, 2}, {3, 7}};
 
 // Function from which to recover A and B
-wpi::math::Vectord<4> AxBuFn(const wpi::math::Vectord<4>& x, const wpi::math::Vectord<2>& u) {
+wpi::math::Vectord<4> AxBuFn(const wpi::math::Vectord<4>& x,
+                             const wpi::math::Vectord<2>& u) {
   return A * x + B * u;
 }
 
@@ -36,14 +38,16 @@ Eigen::VectorXd AxBuFn_DynamicSize(const Eigen::VectorXd& x,
 // Test that we can recover A from AxBuFn() pretty accurately
 TEST(NumericalJacobianTest, Ax_DynamicSize) {
   Eigen::MatrixXd newA = wpi::math::NumericalJacobianX(
-      AxBuFn_DynamicSize, wpi::math::Vectord<4>::Zero(), wpi::math::Vectord<2>::Zero());
+      AxBuFn_DynamicSize, wpi::math::Vectord<4>::Zero(),
+      wpi::math::Vectord<2>::Zero());
   EXPECT_TRUE(newA.isApprox(A));
 }
 
 // Test that we can recover B from AxBuFn() pretty accurately
 TEST(NumericalJacobianTest, Bu_DynamicSize) {
   Eigen::MatrixXd newB = wpi::math::NumericalJacobianU(
-      AxBuFn_DynamicSize, wpi::math::Vectord<4>::Zero(), wpi::math::Vectord<2>::Zero());
+      AxBuFn_DynamicSize, wpi::math::Vectord<4>::Zero(),
+      wpi::math::Vectord<2>::Zero());
   EXPECT_TRUE(newB.isApprox(B));
 }
 
@@ -51,7 +55,8 @@ wpi::math::Matrixd<3, 4> C{{1, 2, 4, 1}, {5, 2, 3, 4}, {5, 1, 3, 2}};
 wpi::math::Matrixd<3, 2> D{{1, 1}, {2, 1}, {3, 2}};
 
 // Function from which to recover C and D
-wpi::math::Vectord<3> CxDuFn(const wpi::math::Vectord<4>& x, const wpi::math::Vectord<2>& u) {
+wpi::math::Vectord<3> CxDuFn(const wpi::math::Vectord<4>& x,
+                             const wpi::math::Vectord<2>& u) {
   return C * x + D * u;
 }
 

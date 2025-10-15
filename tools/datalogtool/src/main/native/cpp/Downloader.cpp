@@ -286,7 +286,8 @@ void Downloader::ThreadMain() {
     try {
       switch (m_state) {
         case kConnecting:
-          if (auto team = wpi::util::parse_integer<unsigned int>(m_serverTeam, 10)) {
+          if (auto team =
+                  wpi::util::parse_integer<unsigned int>(m_serverTeam, 10)) {
             // team number
             session = std::make_unique<sftp::Session>(
                 fmt::format("roborio-{}-frc.local", team.value()), 22,

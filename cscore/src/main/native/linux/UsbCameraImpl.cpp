@@ -207,13 +207,17 @@ static bool GetVendorProduct(int dev, int* vendor, int* product) {
   }
   std::string_view readStr{readBuf};
   if (auto v = wpi::util::parse_integer<int>(
-          wpi::util::substr(wpi::util::substr(readStr, readStr.find('v')), 1, 4), 16)) {
+          wpi::util::substr(wpi::util::substr(readStr, readStr.find('v')), 1,
+                            4),
+          16)) {
     *vendor = v.value();
   } else {
     return false;
   }
   if (auto v = wpi::util::parse_integer<int>(
-          wpi::util::substr(wpi::util::substr(readStr, readStr.find('p')), 1, 4), 16)) {
+          wpi::util::substr(wpi::util::substr(readStr, readStr.find('p')), 1,
+                            4),
+          16)) {
     *product = v.value();
   } else {
     return false;
@@ -262,8 +266,10 @@ static bool GetDescriptionIoctl(const char* cpath, std::string* desc) {
   std::optional<int> vendor;
   std::optional<int> product;
   if (wpi::util::starts_with(card, "UVC Camera (") &&
-      (vendor = wpi::util::parse_integer<int>(wpi::util::substr(card, 12, 4), 16)) &&
-      (product = wpi::util::parse_integer<int>(wpi::util::substr(card, 17, 4), 16))) {
+      (vendor =
+           wpi::util::parse_integer<int>(wpi::util::substr(card, 12, 4), 16)) &&
+      (product =
+           wpi::util::parse_integer<int>(wpi::util::substr(card, 17, 4), 16))) {
     std::string card2 = GetUsbNameFromId(vendor.value(), product.value());
     if (!card2.empty()) {
       *desc = std::move(card2);
@@ -566,9 +572,9 @@ void UsbCameraImpl::CameraThreadMain() {
           } else if (tsFlags == V4L2_BUF_FLAG_TIMESTAMP_MONOTONIC) {
             SDEBUG4("Got valid monotonic time for frame");
             // we can't go directly to frametime, since the rest of cscore
-            // expects us to use wpi::util::Now, which is in an arbitrary timebase
-            // (see timestamp.cpp). Best I can do is (approximately) translate
-            // between timebases
+            // expects us to use wpi::util::Now, which is in an arbitrary
+            // timebase (see timestamp.cpp). Best I can do is (approximately)
+            // translate between timebases
 
             // grab current time in the same timebase as buf.timestamp
             struct timespec ts;
@@ -595,7 +601,8 @@ void UsbCameraImpl::CameraThreadMain() {
               // Can't do anything if we can't access the clock, leave default
             }
           } else if (tsFlags == V4L2_BUF_FLAG_TIMESTAMP_COPY) {
-            SDEBUG4("Got valid copy time for frame - default to wpi::util::Now");
+            SDEBUG4(
+                "Got valid copy time for frame - default to wpi::util::Now");
           }
 
           PutFrame(static_cast<VideoMode::PixelFormat>(m_mode.pixelFormat),
@@ -1708,8 +1715,8 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
       }
 
       unsigned int dev = 0;
-      if (auto v =
-              wpi::util::parse_integer<unsigned int>(wpi::util::substr(fname, 5), 10)) {
+      if (auto v = wpi::util::parse_integer<unsigned int>(
+              wpi::util::substr(fname, 5), 10)) {
         dev = v.value();
       } else {
         continue;
@@ -1760,8 +1767,8 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
             std::string fname = fs::path{target}.filename();
             std::optional<unsigned int> dev;
             if (wpi::util::starts_with(fname, "video") &&
-                (dev = wpi::util::parse_integer<unsigned int>(wpi::util::substr(fname, 5),
-                                                        10)) &&
+                (dev = wpi::util::parse_integer<unsigned int>(
+                     wpi::util::substr(fname, 5), 10)) &&
                 dev.value() < retval.size()) {
               retval[dev.value()].otherPaths.emplace_back(path.str());
             }

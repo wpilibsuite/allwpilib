@@ -41,8 +41,9 @@ namespace wpi::units {
  */
 #if !defined(DISABLE_PREDEFINED_UNITS) || \
     defined(ENABLE_PREDEFINED_CHARGE_UNITS)
-UNIT_ADD_WITH_METRIC_PREFIXES(charge, coulomb, coulombs, C,
-                              unit<std::ratio<1>, wpi::units::category::charge_unit>)
+UNIT_ADD_WITH_METRIC_PREFIXES(
+    charge, coulomb, coulombs, C,
+    unit<std::ratio<1>, wpi::units::category::charge_unit>)
 UNIT_ADD_WITH_METRIC_PREFIXES(charge, ampere_hour, ampere_hours, Ah,
                               compound_unit<current::ampere, time::hours>)
 

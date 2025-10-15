@@ -60,7 +60,7 @@ TEST(DifferentialDriveFeedforwardTest, CalculateWithoutTrackwidth) {
       kVLinear, kALinear, kVAngular, kAAngular};
   wpi::math::LinearSystem<2, 2, 2> plant =
       wpi::math::LinearSystemId::IdentifyDrivetrainSystem(kVLinear, kALinear,
-                                                    kVAngular, kAAngular);
+                                                          kVAngular, kAAngular);
   for (auto currentLeftVelocity = -4_mps; currentLeftVelocity <= 4_mps;
        currentLeftVelocity += 2_mps) {
     for (auto currentRightVelocity = -4_mps; currentRightVelocity <= 4_mps;

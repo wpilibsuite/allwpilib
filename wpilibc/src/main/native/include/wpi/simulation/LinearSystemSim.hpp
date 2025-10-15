@@ -131,9 +131,9 @@ class LinearSystemSim {
    * @param u           The system inputs (usually voltage).
    * @param dt          The time difference between controller updates.
    */
-  virtual wpi::math::Vectord<States> UpdateX(const wpi::math::Vectord<States>& currentXhat,
-                                  const wpi::math::Vectord<Inputs>& u,
-                                  wpi::units::second_t dt) {
+  virtual wpi::math::Vectord<States> UpdateX(
+      const wpi::math::Vectord<States>& currentXhat,
+      const wpi::math::Vectord<Inputs>& u, wpi::units::second_t dt) {
     return m_plant.CalculateX(currentXhat, u, dt);
   }
 

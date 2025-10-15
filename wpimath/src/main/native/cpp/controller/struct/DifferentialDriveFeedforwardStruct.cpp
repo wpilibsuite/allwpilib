@@ -11,17 +11,22 @@ constexpr size_t kKvAngularOff = kKaLinearOff + 8;
 constexpr size_t kKaAngularOff = kKvAngularOff + 8;
 }  // namespace
 
-wpi::math::DifferentialDriveFeedforward wpi::util::Struct<
-    wpi::math::DifferentialDriveFeedforward>::Unpack(std::span<const uint8_t> data) {
-  return {
-      decltype(1_V / 1_mps){wpi::util::UnpackStruct<double, kKvLinearOff>(data)},
-      decltype(1_V / 1_mps_sq){wpi::util::UnpackStruct<double, kKaLinearOff>(data)},
-      decltype(1_V / 1_mps){wpi::util::UnpackStruct<double, kKvAngularOff>(data)},
-      decltype(1_V / 1_mps_sq){wpi::util::UnpackStruct<double, kKaAngularOff>(data)}};
+wpi::math::DifferentialDriveFeedforward
+wpi::util::Struct<wpi::math::DifferentialDriveFeedforward>::Unpack(
+    std::span<const uint8_t> data) {
+  return {decltype(1_V /
+                   1_mps){wpi::util::UnpackStruct<double, kKvLinearOff>(data)},
+          decltype(1_V / 1_mps_sq){
+              wpi::util::UnpackStruct<double, kKaLinearOff>(data)},
+          decltype(1_V /
+                   1_mps){wpi::util::UnpackStruct<double, kKvAngularOff>(data)},
+          decltype(1_V / 1_mps_sq){
+              wpi::util::UnpackStruct<double, kKaAngularOff>(data)}};
 }
 
 void wpi::util::Struct<wpi::math::DifferentialDriveFeedforward>::Pack(
-    std::span<uint8_t> data, const wpi::math::DifferentialDriveFeedforward& value) {
+    std::span<uint8_t> data,
+    const wpi::math::DifferentialDriveFeedforward& value) {
   wpi::util::PackStruct<kKvLinearOff>(data, value.m_kVLinear.value());
   wpi::util::PackStruct<kKaLinearOff>(data, value.m_kALinear.value());
   wpi::util::PackStruct<kKvAngularOff>(data, value.m_kVAngular.value());

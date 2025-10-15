@@ -67,7 +67,8 @@ void PortForwarder::Add(unsigned int port, std::string_view remoteHost,
       auto& loop = serverPtr->GetLoopRef();
       auto client = serverPtr->Accept();
       if (!client) {
-        wpi::util::print(stderr, "PortForwarder: Connecting to client failed\n");
+        wpi::util::print(stderr,
+                         "PortForwarder: Connecting to client failed\n");
         return;
       }
 

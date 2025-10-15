@@ -48,7 +48,8 @@ class PWMsSimModel : public wpi::glass::PWMsModel {
   bool Exists() override { return true; }
 
   void ForEachPWM(
-      wpi::util::function_ref<void(wpi::glass::PWMModel& model, int index)> func) override;
+      wpi::util::function_ref<void(wpi::glass::PWMModel& model, int index)>
+          func) override;
 
  private:
   // indexed by channel
@@ -71,7 +72,8 @@ void PWMsSimModel::Update() {
 }
 
 void PWMsSimModel::ForEachPWM(
-    wpi::util::function_ref<void(wpi::glass::PWMModel& model, int index)> func) {
+    wpi::util::function_ref<void(wpi::glass::PWMModel& model, int index)>
+        func) {
   const int32_t numPWM = m_sources.size();
   for (int32_t i = 0; i < numPWM; ++i) {
     if (auto model = m_sources[i].get()) {
@@ -99,7 +101,7 @@ void PWMSimGui::Initialize() {
         win->SetDefaultPos(910, 20);
         return wpi::glass::MakeFunctionView([=] {
           wpi::glass::DisplayPWMs(static_cast<PWMsSimModel*>(model),
-                             HALSimGui::halProvider->AreOutputsEnabled());
+                                  HALSimGui::halProvider->AreOutputsEnabled());
         });
       });
 }

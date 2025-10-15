@@ -134,7 +134,7 @@ namespace warn {
  * @param[out] status error code
  * @param[in]  format error message format
  */
-#define WPILIB_ReportError(status, format, ...)                       \
+#define WPILIB_ReportError(status, format, ...)                    \
   do {                                                             \
     if ((status) != 0) {                                           \
       ::wpi::ReportError(status, __FILE__, __LINE__, __FUNCTION__, \
@@ -147,7 +147,7 @@ namespace warn {
  *
  * @param[in]  format error message format
  */
-#define WPILIB_ReportWarning(format, ...)                                         \
+#define WPILIB_ReportWarning(format, ...)                                      \
   do {                                                                         \
     ::wpi::ReportError(::wpi::warn::Warning, __FILE__, __LINE__, __FUNCTION__, \
                        format __VA_OPT__(, ) __VA_ARGS__);                     \
@@ -161,7 +161,7 @@ namespace warn {
  * @param[in]  format error message format
  * @return runtime error object
  */
-#define WPILIB_MakeError(status, format, ...)                   \
+#define WPILIB_MakeError(status, format, ...)                \
   ::wpi::MakeError(status, __FILE__, __LINE__, __FUNCTION__, \
                    format __VA_OPT__(, ) __VA_ARGS__)
 
@@ -172,7 +172,7 @@ namespace warn {
  * @param[out] status error code
  * @param[in]  format error message format
  */
-#define WPILIB_CheckErrorStatus(status, format, ...)                      \
+#define WPILIB_CheckErrorStatus(status, format, ...)                   \
   do {                                                                 \
     if ((status) < 0) {                                                \
       throw ::wpi::MakeError(status, __FILE__, __LINE__, __FUNCTION__, \
@@ -183,7 +183,7 @@ namespace warn {
     }                                                                  \
   } while (0)
 
-#define WPILIB_AssertMessage(condition, format, ...)                              \
+#define WPILIB_AssertMessage(condition, format, ...)                           \
   do {                                                                         \
     if (!(condition)) {                                                        \
       throw ::wpi::MakeError(::wpi::err::AssertionFailure, __FILE__, __LINE__, \

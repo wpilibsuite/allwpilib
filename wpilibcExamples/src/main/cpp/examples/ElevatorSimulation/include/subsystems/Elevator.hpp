@@ -34,8 +34,8 @@ class Elevator {
   wpi::math::DCMotor m_elevatorGearbox = wpi::math::DCMotor::Vex775Pro(4);
 
   // Standard classes for controlling our elevator
-  wpi::math::TrapezoidProfile<wpi::units::meters>::Constraints m_constraints{2.45_mps,
-                                                                  2.45_mps_sq};
+  wpi::math::TrapezoidProfile<wpi::units::meters>::Constraints m_constraints{
+      2.45_mps, 2.45_mps_sq};
   wpi::math::ProfiledPIDController<wpi::units::meters> m_controller{
       Constants::kElevatorKp, Constants::kElevatorKi, Constants::kElevatorKd,
       m_constraints};

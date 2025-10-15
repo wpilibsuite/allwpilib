@@ -18,7 +18,8 @@
  *
  * @see RunCommand
  */
-class DefaultDrive : public wpi::cmd::CommandHelper<wpi::cmd::Command, DefaultDrive> {
+class DefaultDrive
+    : public wpi::cmd::CommandHelper<wpi::cmd::Command, DefaultDrive> {
  public:
   /**
    * Creates a new DefaultDrive.

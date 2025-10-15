@@ -15,7 +15,8 @@ class Robot : public wpi::TimedRobot {
  public:
   Robot() {
     m_trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
-        wpi::math::Pose2d{2_m, 2_m, 0_rad}, {}, wpi::math::Pose2d{6_m, 4_m, 0_rad},
+        wpi::math::Pose2d{2_m, 2_m, 0_rad}, {},
+        wpi::math::Pose2d{6_m, 4_m, 0_rad},
         wpi::math::TrajectoryConfig(2_mps, 2_mps_sq));
   }
 

@@ -550,7 +550,8 @@ void HALSIM_SetJoystickAxisType(int32_t stick, int32_t axis, int32_t type) {
 }
 
 void HALSIM_SetGameSpecificMessage(const WPI_String* message) {
-  SimDriverStationData->SetGameSpecificMessage(wpi::util::to_string_view(message));
+  SimDriverStationData->SetGameSpecificMessage(
+      wpi::util::to_string_view(message));
 }
 
 void HALSIM_SetEventName(const WPI_String* name) {

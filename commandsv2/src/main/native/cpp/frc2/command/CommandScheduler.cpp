@@ -286,7 +286,7 @@ void CommandScheduler::SetDefaultCommand(Subsystem* subsystem,
                                          CommandPtr&& defaultCommand) {
   if (!defaultCommand.get()->HasRequirement(subsystem)) {
     throw WPILIB_MakeError(wpi::err::CommandIllegalUse, "{}",
-                        "Default commands must require their subsystem!");
+                           "Default commands must require their subsystem!");
   }
   RequireUngrouped(defaultCommand.get());
 
@@ -431,11 +431,12 @@ void CommandScheduler::OnCommandFinish(Action action) {
 void CommandScheduler::RequireUngrouped(const Command* command) {
   auto stacktrace = command->GetPreviousCompositionSite();
   if (stacktrace.has_value()) {
-    throw WPILIB_MakeError(wpi::err::CommandIllegalUse,
-                        "Commands that have been composed may not be added to "
-                        "another composition or scheduled individually!"
-                        "\nOriginally composed at:\n{}",
-                        stacktrace.value());
+    throw WPILIB_MakeError(
+        wpi::err::CommandIllegalUse,
+        "Commands that have been composed may not be added to "
+        "another composition or scheduled individually!"
+        "\nOriginally composed at:\n{}",
+        stacktrace.value());
   }
 }
 
@@ -456,8 +457,8 @@ void CommandScheduler::RequireUngrouped(
 void CommandScheduler::RequireUngroupedAndUnscheduled(const Command* command) {
   if (IsScheduled(command)) {
     throw WPILIB_MakeError(wpi::err::CommandIllegalUse,
-                        "Commands that have been scheduled individually may "
-                        "not be added to another composition!");
+                           "Commands that have been scheduled individually may "
+                           "not be added to another composition!");
   }
   RequireUngrouped(command);
 }

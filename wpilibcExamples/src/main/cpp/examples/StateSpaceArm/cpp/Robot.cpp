@@ -32,7 +32,8 @@ class Robot : public wpi::TimedRobot {
   static constexpr wpi::units::radian_t kLoweredPosition = 0_deg;
 
   // Moment of inertia of the arm. Can be estimated with CAD. If finding this
-  // constant is difficult, wpi::math::LinearSystem.identifyPositionSystem may be better.
+  // constant is difficult, wpi::math::LinearSystem.identifyPositionSystem may
+  // be better.
   static constexpr wpi::units::kilogram_square_meter_t kArmMOI = 1.2_kg_sq_m;
 
   // Reduction between motors and encoder, as output over input. If the arm
@@ -46,8 +47,8 @@ class Robot : public wpi::TimedRobot {
   // Inputs (what we can "put in"): [voltage], in volts.
   // Outputs (what we can measure): [position], in radians.
   wpi::math::LinearSystem<2, 1, 1> m_armPlant =
-      wpi::math::LinearSystemId::SingleJointedArmSystem(wpi::math::DCMotor::NEO(2), kArmMOI,
-                                                  kArmGearing)
+      wpi::math::LinearSystemId::SingleJointedArmSystem(
+          wpi::math::DCMotor::NEO(2), kArmMOI, kArmGearing)
           .Slice(0);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
@@ -78,8 +79,8 @@ class Robot : public wpi::TimedRobot {
 
   // The state-space loop combines a controller, observer, feedforward and plant
   // for easy control.
-  wpi::math::LinearSystemLoop<2, 1, 1> m_loop{m_armPlant, m_controller, m_observer,
-                                        12_V, 20_ms};
+  wpi::math::LinearSystemLoop<2, 1, 1> m_loop{m_armPlant, m_controller,
+                                              m_observer, 12_V, 20_ms};
 
   // An encoder set up to measure arm position in radians per second.
   wpi::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
@@ -90,7 +91,8 @@ class Robot : public wpi::TimedRobot {
   wpi::math::TrapezoidProfile<wpi::units::radians> m_profile{
       {45_deg_per_s, 90_deg_per_s / 1_s}};
 
-  wpi::math::TrapezoidProfile<wpi::units::radians>::State m_lastProfiledReference;
+  wpi::math::TrapezoidProfile<wpi::units::radians>::State
+      m_lastProfiledReference;
 
  public:
   Robot() {
@@ -99,7 +101,8 @@ class Robot : public wpi::TimedRobot {
   }
 
   void TeleopInit() override {
-    m_loop.Reset(wpi::math::Vectord<2>{m_encoder.GetDistance(), m_encoder.GetRate()});
+    m_loop.Reset(
+        wpi::math::Vectord<2>{m_encoder.GetDistance(), m_encoder.GetRate()});
 
     m_lastProfiledReference = {
         wpi::units::radian_t{m_encoder.GetDistance()},
@@ -120,8 +123,9 @@ class Robot : public wpi::TimedRobot {
     m_lastProfiledReference =
         m_profile.Calculate(20_ms, m_lastProfiledReference, goal);
 
-    m_loop.SetNextR(wpi::math::Vectord<2>{m_lastProfiledReference.position.value(),
-                                    m_lastProfiledReference.velocity.value()});
+    m_loop.SetNextR(
+        wpi::math::Vectord<2>{m_lastProfiledReference.position.value(),
+                              m_lastProfiledReference.velocity.value()});
 
     // Correct our Kalman filter's state vector estimate with encoder data.
     m_loop.Correct(wpi::math::Vectord<1>{m_encoder.GetDistance()});

@@ -183,10 +183,10 @@ constexpr angle::radian_t atan2(const Y y, const X x) noexcept {
                 "The quantity y/x must yield a dimensionless ratio.");
 
   // X and Y could be different length units, so normalize them
-  return angle::radian_t(
-      gcem::atan2(y.template convert<
-                      typename wpi::units::traits::unit_t_traits<X>::unit_type>()(),
-                  x()));
+  return angle::radian_t(gcem::atan2(
+      y.template convert<
+          typename wpi::units::traits::unit_t_traits<X>::unit_type>()(),
+      x()));
 }
 #endif
 
@@ -479,15 +479,17 @@ constexpr dimensionless::scalar_t log2(const ScalarUnit x) noexcept {
  *       factor of the returned unit type may have errors no larger than
  *       `1e-10`.
  */
-template <
-    class UnitType,
-    std::enable_if_t<wpi::units::traits::has_linear_scale<UnitType>::value, int> = 0>
+template <class UnitType,
+          std::enable_if_t<
+              wpi::units::traits::has_linear_scale<UnitType>::value, int> = 0>
 inline constexpr auto sqrt(const UnitType& value) noexcept -> unit_t<
-    square_root<typename wpi::units::traits::unit_t_traits<UnitType>::unit_type>,
+    square_root<
+        typename wpi::units::traits::unit_t_traits<UnitType>::unit_type>,
     typename wpi::units::traits::unit_t_traits<UnitType>::underlying_type,
     linear_scale> {
   return unit_t<
-      square_root<typename wpi::units::traits::unit_t_traits<UnitType>::unit_type>,
+      square_root<
+          typename wpi::units::traits::unit_t_traits<UnitType>::unit_type>,
       typename wpi::units::traits::unit_t_traits<UnitType>::underlying_type,
       linear_scale>(gcem::sqrt(value()));
 }
@@ -501,16 +503,15 @@ inline constexpr auto sqrt(const UnitType& value) noexcept -> unit_t<
  * @returns square root of the sum-of-squares of x and y in the same units as x.
  */
 template <class UnitTypeLhs, class UnitTypeRhs,
-          std::enable_if_t<
-              wpi::units::traits::has_linear_scale<UnitTypeLhs, UnitTypeRhs>::value,
-              int> = 0>
+          std::enable_if_t<wpi::units::traits::has_linear_scale<
+                               UnitTypeLhs, UnitTypeRhs>::value,
+                           int> = 0>
 inline constexpr UnitTypeLhs hypot(const UnitTypeLhs& x, const UnitTypeRhs& y) {
   static_assert(traits::is_convertible_unit_t<UnitTypeLhs, UnitTypeRhs>::value,
                 "Parameters of hypot() function are not compatible units.");
   return UnitTypeLhs(gcem::hypot(
-      x(),
-      y.template convert<
-          typename wpi::units::traits::unit_t_traits<UnitTypeLhs>::unit_type>()()));
+      x(), y.template convert<typename wpi::units::traits::unit_t_traits<
+               UnitTypeLhs>::unit_type>()()));
 }
 
 //----------------------------------
@@ -563,8 +564,8 @@ constexpr UnitTypeLhs fmod(const UnitTypeLhs numer,
                 "Parameters of fmod() function are not compatible units.");
   return UnitTypeLhs(gcem::fmod(
       numer(),
-      denom.template convert<
-          typename wpi::units::traits::unit_t_traits<UnitTypeLhs>::unit_type>()()));
+      denom.template convert<typename wpi::units::traits::unit_t_traits<
+          UnitTypeLhs>::unit_type>()()));
 }
 
 /**
@@ -646,9 +647,8 @@ UnitTypeLhs fdim(const UnitTypeLhs x, const UnitTypeRhs y) noexcept {
   static_assert(traits::is_convertible_unit_t<UnitTypeLhs, UnitTypeRhs>::value,
                 "Parameters of fdim() function are not compatible units.");
   return UnitTypeLhs(std::fdim(
-      x(),
-      y.template convert<
-          typename wpi::units::traits::unit_t_traits<UnitTypeLhs>::unit_type>()()));
+      x(), y.template convert<typename wpi::units::traits::unit_t_traits<
+               UnitTypeLhs>::unit_type>()()));
 }
 
 /**
@@ -668,9 +668,8 @@ constexpr UnitTypeLhs fmax(const UnitTypeLhs x, const UnitTypeRhs y) noexcept {
   static_assert(traits::is_convertible_unit_t<UnitTypeLhs, UnitTypeRhs>::value,
                 "Parameters of fmax() function are not compatible units.");
   return UnitTypeLhs(gcem::max<double, double>(
-      x(),
-      y.template convert<
-          typename wpi::units::traits::unit_t_traits<UnitTypeLhs>::unit_type>()()));
+      x(), y.template convert<typename wpi::units::traits::unit_t_traits<
+               UnitTypeLhs>::unit_type>()()));
 }
 
 /**
@@ -691,9 +690,8 @@ constexpr UnitTypeLhs fmin(const UnitTypeLhs x, const UnitTypeRhs y) noexcept {
   static_assert(traits::is_convertible_unit_t<UnitTypeLhs, UnitTypeRhs>::value,
                 "Parameters of fmin() function are not compatible units.");
   return UnitTypeLhs(gcem::min<double, double>(
-      x(),
-      y.template convert<
-          typename wpi::units::traits::unit_t_traits<UnitTypeLhs>::unit_type>()()));
+      x(), y.template convert<typename wpi::units::traits::unit_t_traits<
+               UnitTypeLhs>::unit_type>()()));
 }
 
 //----------------------------------
@@ -746,10 +744,12 @@ auto fma(const UnitTypeLhs x, const UnitMultiply y, const UnitAdd z) noexcept
   using resultType = decltype(x * y);
   static_assert(
       traits::is_convertible_unit_t<
-          compound_unit<
-              typename wpi::units::traits::unit_t_traits<UnitTypeLhs>::unit_type,
-              typename wpi::units::traits::unit_t_traits<UnitMultiply>::unit_type>,
-          typename wpi::units::traits::unit_t_traits<UnitAdd>::unit_type>::value,
+          compound_unit<typename wpi::units::traits::unit_t_traits<
+                            UnitTypeLhs>::unit_type,
+                        typename wpi::units::traits::unit_t_traits<
+                            UnitMultiply>::unit_type>,
+          typename wpi::units::traits::unit_t_traits<UnitAdd>::unit_type>::
+          value,
       "Unit types are not compatible.");
   return resultType(std::fma(x(), y(), resultType(z)()));
 }

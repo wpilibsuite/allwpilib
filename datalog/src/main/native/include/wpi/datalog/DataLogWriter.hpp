@@ -13,7 +13,7 @@
 namespace wpi::util {
 class raw_ostream;
 class Logger;
-}  // namespace wpi
+}  // namespace wpi::util
 
 namespace wpi::log {
 
@@ -62,7 +62,8 @@ class DataLogWriter final : public DataLog {
    * @param os output stream
    * @param extraHeader extra header data
    */
-  DataLogWriter(wpi::util::Logger& msglog, std::unique_ptr<wpi::util::raw_ostream> os,
+  DataLogWriter(wpi::util::Logger& msglog,
+                std::unique_ptr<wpi::util::raw_ostream> os,
                 std::string_view extraHeader = "");
 
   ~DataLogWriter() final;

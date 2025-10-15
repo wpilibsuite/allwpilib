@@ -76,7 +76,8 @@ void TimedRobot::EndCompetition() {
   HAL_StopNotifier(m_notifier, &status);
 }
 
-TimedRobot::TimedRobot(wpi::units::second_t period) : IterativeRobotBase(period) {
+TimedRobot::TimedRobot(wpi::units::second_t period)
+    : IterativeRobotBase(period) {
   m_startTime = std::chrono::microseconds{RobotController::GetFPGATime()};
   AddPeriodic([=, this] { LoopFunc(); }, period);
 
@@ -101,7 +102,8 @@ uint64_t TimedRobot::GetLoopStartTime() {
 }
 
 void TimedRobot::AddPeriodic(std::function<void()> callback,
-                             wpi::units::second_t period, wpi::units::second_t offset) {
+                             wpi::units::second_t period,
+                             wpi::units::second_t offset) {
   m_callbacks.emplace(
       callback, m_startTime,
       std::chrono::microseconds{static_cast<int64_t>(period.value() * 1e6)},

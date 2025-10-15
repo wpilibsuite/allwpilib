@@ -37,7 +37,7 @@ static double Lerp(wpi::units::second_t time,
   const auto prev = next - 1;
 
   return wpi::util::Lerp(prev->measurement, next->measurement,
-                   (time - prev->time) / (next->time - prev->time));
+                         (time - prev->time) / (next->time - prev->time));
 }
 
 /**
@@ -79,8 +79,8 @@ static std::vector<PreparedData> ConvertToPrepared(const MotorData& data) {
 
 /**
  * To preserve a raw copy of the data, this method saves a raw version
- * in the dataset wpi::util::StringMap where the key of the raw data starts with "raw-"
- * before the name of the original data.
+ * in the dataset wpi::util::StringMap where the key of the raw data starts with
+ * "raw-" before the name of the original data.
  *
  * @tparam S The size of the array data that's being used
  *

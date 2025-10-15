@@ -23,7 +23,7 @@ using namespace halsimgui;
 
 namespace {
 #define DEFINE_SIMVALUESOURCE(Type, TYPE, v_type)                          \
-  class Sim##Type##ValueSource : public wpi::glass::Type##Source {              \
+  class Sim##Type##ValueSource : public wpi::glass::Type##Source {         \
    public:                                                                 \
     explicit Sim##Type##ValueSource(HAL_SimValueHandle handle,             \
                                     const char* device, const char* name)  \
@@ -90,7 +90,8 @@ class SimDevicesModel : public wpi::glass::Model {
   }
 
  private:
-  wpi::util::DenseMap<HAL_SimValueHandle, std::unique_ptr<wpi::glass::DataSource>>
+  wpi::util::DenseMap<HAL_SimValueHandle,
+                      std::unique_ptr<wpi::glass::DataSource>>
       m_sources;
 };
 }  // namespace
@@ -151,7 +152,7 @@ static void DisplaySimValue(const char* name, void* data,
     case HAL_BOOLEAN: {
       bool v = value->data.v_boolean;
       if (wpi::glass::DeviceBoolean(name, direction == HAL_SimValueOutput, &v,
-                               model->GetSource(handle))) {
+                                    model->GetSource(handle))) {
         valueCopy.data.v_boolean = v ? 1 : 0;
         HAL_SetSimValue(handle, valueCopy);
       }
@@ -159,8 +160,8 @@ static void DisplaySimValue(const char* name, void* data,
     }
     case HAL_DOUBLE:
       if (wpi::glass::DeviceDouble(name, direction == HAL_SimValueOutput,
-                              &valueCopy.data.v_double,
-                              model->GetSource(handle))) {
+                                   &valueCopy.data.v_double,
+                                   model->GetSource(handle))) {
         HAL_SetSimValue(handle, valueCopy);
       }
       break;
@@ -168,21 +169,23 @@ static void DisplaySimValue(const char* name, void* data,
       int32_t numOptions = 0;
       const char** options = HALSIM_GetSimValueEnumOptions(handle, &numOptions);
       if (wpi::glass::DeviceEnum(name, direction == HAL_SimValueOutput,
-                            &valueCopy.data.v_enum, options, numOptions,
-                            model->GetSource(handle))) {
+                                 &valueCopy.data.v_enum, options, numOptions,
+                                 model->GetSource(handle))) {
         HAL_SetSimValue(handle, valueCopy);
       }
       break;
     }
     case HAL_INT:
       if (wpi::glass::DeviceInt(name, direction == HAL_SimValueOutput,
-                           &valueCopy.data.v_int, model->GetSource(handle))) {
+                                &valueCopy.data.v_int,
+                                model->GetSource(handle))) {
         HAL_SetSimValue(handle, valueCopy);
       }
       break;
     case HAL_LONG:
       if (wpi::glass::DeviceLong(name, direction == HAL_SimValueOutput,
-                            &valueCopy.data.v_long, model->GetSource(handle))) {
+                                 &valueCopy.data.v_long,
+                                 model->GetSource(handle))) {
         HAL_SetSimValue(handle, valueCopy);
       }
       break;
@@ -234,7 +237,8 @@ void SimDeviceGui::Initialize() {
   });
 }
 
-wpi::glass::DataSource* SimDeviceGui::GetValueSource(HAL_SimValueHandle handle) {
+wpi::glass::DataSource* SimDeviceGui::GetValueSource(
+    HAL_SimValueHandle handle) {
   return gSimDevicesModel->GetSource(handle);
 }
 

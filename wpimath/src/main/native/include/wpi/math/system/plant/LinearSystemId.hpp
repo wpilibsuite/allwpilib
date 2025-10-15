@@ -27,12 +27,13 @@ namespace wpi::math {
 class WPILIB_DLLEXPORT LinearSystemId {
  public:
   template <typename Distance>
-  using Velocity_t = wpi::units::unit_t<
-      wpi::units::compound_unit<Distance, wpi::units::inverse<wpi::units::seconds>>>;
+  using Velocity_t = wpi::units::unit_t<wpi::units::compound_unit<
+      Distance, wpi::units::inverse<wpi::units::seconds>>>;
 
   template <typename Distance>
   using Acceleration_t = wpi::units::unit_t<wpi::units::compound_unit<
-      wpi::units::compound_unit<Distance, wpi::units::inverse<wpi::units::seconds>>,
+      wpi::units::compound_unit<Distance,
+                                wpi::units::inverse<wpi::units::seconds>>,
       wpi::units::inverse<wpi::units::seconds>>>;
 
   /**
@@ -46,10 +47,9 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @param gearing Gear ratio from motor to carriage.
    * @throws std::domain_error if mass <= 0, radius <= 0, or gearing <= 0.
    */
-  static constexpr LinearSystem<2, 1, 2> ElevatorSystem(DCMotor motor,
-                                                        wpi::units::kilogram_t mass,
-                                                        wpi::units::meter_t radius,
-                                                        double gearing) {
+  static constexpr LinearSystem<2, 1, 2> ElevatorSystem(
+      DCMotor motor, wpi::units::kilogram_t mass, wpi::units::meter_t radius,
+      double gearing) {
     if (mass <= 0_kg) {
       throw std::domain_error("mass must be greater than zero.");
     }
@@ -274,7 +274,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
   static constexpr LinearSystem<2, 2, 2> IdentifyDrivetrainSystem(
       decltype(1_V / 1_mps) kVLinear, decltype(1_V / 1_mps_sq) kALinear,
       decltype(1_V / 1_rad_per_s) kVAngular,
-      decltype(1_V / 1_rad_per_s_sq) kAAngular, wpi::units::meter_t trackwidth) {
+      decltype(1_V / 1_rad_per_s_sq) kAAngular,
+      wpi::units::meter_t trackwidth) {
     if (kVLinear <= decltype(kVLinear){0}) {
       throw std::domain_error("Kv,linear must be greater than zero.");
     }
@@ -427,7 +428,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
    */
   static constexpr LinearSystem<2, 2, 2> DrivetrainVelocitySystem(
       const DCMotor& motor, wpi::units::kilogram_t mass, wpi::units::meter_t r,
-      wpi::units::meter_t rb, wpi::units::kilogram_square_meter_t J, double gearing) {
+      wpi::units::meter_t rb, wpi::units::kilogram_square_meter_t J,
+      double gearing) {
     if (mass <= 0_kg) {
       throw std::domain_error("mass must be greater than zero.");
     }
@@ -448,14 +450,16 @@ class WPILIB_DLLEXPORT LinearSystemId {
               (motor.Kv * motor.R * wpi::units::math::pow<2>(r));
     auto C2 = gearing * motor.Kt / (motor.R * r);
 
-    Matrixd<2, 2> A{{((1 / mass + wpi::units::math::pow<2>(rb) / J) * C1).value(),
-                     ((1 / mass - wpi::units::math::pow<2>(rb) / J) * C1).value()},
-                    {((1 / mass - wpi::units::math::pow<2>(rb) / J) * C1).value(),
-                     ((1 / mass + wpi::units::math::pow<2>(rb) / J) * C1).value()}};
-    Matrixd<2, 2> B{{((1 / mass + wpi::units::math::pow<2>(rb) / J) * C2).value(),
-                     ((1 / mass - wpi::units::math::pow<2>(rb) / J) * C2).value()},
-                    {((1 / mass - wpi::units::math::pow<2>(rb) / J) * C2).value(),
-                     ((1 / mass + wpi::units::math::pow<2>(rb) / J) * C2).value()}};
+    Matrixd<2, 2> A{
+        {((1 / mass + wpi::units::math::pow<2>(rb) / J) * C1).value(),
+         ((1 / mass - wpi::units::math::pow<2>(rb) / J) * C1).value()},
+        {((1 / mass - wpi::units::math::pow<2>(rb) / J) * C1).value(),
+         ((1 / mass + wpi::units::math::pow<2>(rb) / J) * C1).value()}};
+    Matrixd<2, 2> B{
+        {((1 / mass + wpi::units::math::pow<2>(rb) / J) * C2).value(),
+         ((1 / mass - wpi::units::math::pow<2>(rb) / J) * C2).value()},
+        {((1 / mass - wpi::units::math::pow<2>(rb) / J) * C2).value(),
+         ((1 / mass + wpi::units::math::pow<2>(rb) / J) * C2).value()}};
     Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
     Matrixd<2, 2> D{{0.0, 0.0}, {0.0, 0.0}};
 

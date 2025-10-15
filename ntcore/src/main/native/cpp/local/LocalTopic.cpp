@@ -115,7 +115,7 @@ wpi::util::json LocalTopic::SetCached(bool value) {
 }
 
 wpi::util::json LocalTopic::SetProperty(std::string_view name,
-                                  const wpi::util::json& value) {
+                                        const wpi::util::json& value) {
   if (value.is_null()) {
     properties.erase(name);
   } else {

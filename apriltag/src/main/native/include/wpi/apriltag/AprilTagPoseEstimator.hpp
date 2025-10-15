@@ -66,7 +66,8 @@ class WPILIB_DLLEXPORT AprilTagPoseEstimator {
    * @param detection Tag detection
    * @return Pose estimate
    */
-  wpi::math::Transform3d EstimateHomography(const AprilTagDetection& detection) const;
+  wpi::math::Transform3d EstimateHomography(
+      const AprilTagDetection& detection) const;
 
   /**
    * Estimates the pose of the tag using the homography method described in [1].
@@ -74,7 +75,8 @@ class WPILIB_DLLEXPORT AprilTagPoseEstimator {
    * @param homography Homography 3x3 matrix data
    * @return Pose estimate
    */
-  wpi::math::Transform3d EstimateHomography(std::span<const double, 9> homography) const;
+  wpi::math::Transform3d EstimateHomography(
+      std::span<const double, 9> homography) const;
 
   /**
    * Estimates the pose of the tag. This returns one or two possible poses for
@@ -136,7 +138,7 @@ class WPILIB_DLLEXPORT AprilTagPoseEstimator {
    * @return Pose estimate
    */
   wpi::math::Transform3d Estimate(std::span<const double, 9> homography,
-                       std::span<const double, 8> corners) const;
+                                  std::span<const double, 8> corners) const;
 
  private:
   Config m_config;

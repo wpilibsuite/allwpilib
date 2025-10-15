@@ -18,10 +18,10 @@
 template <int States, int Inputs, int Outputs>
 struct wpi::util::Protobuf<wpi::math::LinearSystem<States, Inputs, Outputs>> {
   using MessageStruct = wpi_proto_ProtobufLinearSystem;
-  using InputStream =
-      wpi::util::ProtoInputStream<wpi::math::LinearSystem<States, Inputs, Outputs>>;
-  using OutputStream =
-      wpi::util::ProtoOutputStream<wpi::math::LinearSystem<States, Inputs, Outputs>>;
+  using InputStream = wpi::util::ProtoInputStream<
+      wpi::math::LinearSystem<States, Inputs, Outputs>>;
+  using OutputStream = wpi::util::ProtoOutputStream<
+      wpi::math::LinearSystem<States, Inputs, Outputs>>;
 
   static std::optional<wpi::math::LinearSystem<States, Inputs, Outputs>> Unpack(
       InputStream& stream) {
@@ -66,8 +66,9 @@ struct wpi::util::Protobuf<wpi::math::LinearSystem<States, Inputs, Outputs>> {
     };
   }
 
-  static bool Pack(OutputStream& stream,
-                   const wpi::math::LinearSystem<States, Inputs, Outputs>& value) {
+  static bool Pack(
+      OutputStream& stream,
+      const wpi::math::LinearSystem<States, Inputs, Outputs>& value) {
     wpi::util::PackCallback a{&value.A()};
     wpi::util::PackCallback b{&value.B()};
     wpi::util::PackCallback c{&value.C()};

@@ -61,7 +61,8 @@ class ParallelTcpConnector
    */
   static std::shared_ptr<ParallelTcpConnector> Create(
       wpi::net::uv::Loop& loop, wpi::net::uv::Timer::Time reconnectRate,
-      wpi::util::Logger& logger, std::function<void(wpi::net::uv::Tcp& tcp)> connected,
+      wpi::util::Logger& logger,
+      std::function<void(wpi::net::uv::Tcp& tcp)> connected,
       bool ipv4Only = false) {
     if (loop.IsClosing()) {
       return nullptr;
@@ -71,7 +72,8 @@ class ParallelTcpConnector
                                                   ipv4Only, private_init{});
   }
 
-  ParallelTcpConnector(wpi::net::uv::Loop& loop, wpi::net::uv::Timer::Time reconnectRate,
+  ParallelTcpConnector(wpi::net::uv::Loop& loop,
+                       wpi::net::uv::Timer::Time reconnectRate,
                        wpi::util::Logger& logger,
                        std::function<void(wpi::net::uv::Tcp& tcp)> connected,
                        bool ipv4Only, const private_init&);

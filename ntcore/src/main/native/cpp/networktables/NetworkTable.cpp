@@ -46,9 +46,9 @@ std::string NetworkTable::NormalizeKey(std::string_view key,
   return std::string{NormalizeKey(key, buf, withLeadingSlash)};
 }
 
-std::string_view NetworkTable::NormalizeKey(std::string_view key,
-                                            wpi::util::SmallVectorImpl<char>& buf,
-                                            bool withLeadingSlash) {
+std::string_view NetworkTable::NormalizeKey(
+    std::string_view key, wpi::util::SmallVectorImpl<char>& buf,
+    bool withLeadingSlash) {
   buf.clear();
   if (withLeadingSlash) {
     buf.push_back(PATH_SEPARATOR_CHAR);
@@ -412,7 +412,8 @@ NT_Listener NetworkTable::AddSubTableListener(SubTableListener listener) {
         if (!topicInfo) {
           return;
         }
-        auto relative_key = wpi::util::substr(topicInfo->name, m_path.size() + 1);
+        auto relative_key =
+            wpi::util::substr(topicInfo->name, m_path.size() + 1);
         auto end_sub_table = relative_key.find(PATH_SEPARATOR_CHAR);
         if (end_sub_table == std::string_view::npos) {
           return;

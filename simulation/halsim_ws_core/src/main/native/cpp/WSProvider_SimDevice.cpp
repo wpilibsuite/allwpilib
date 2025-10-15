@@ -249,7 +249,8 @@ void HALSimWSProviderSimDevice::OnValueReset(SimDeviceValueData* valueData,
   }
 }
 
-void HALSimWSProviderSimDevice::ProcessHalCallback(const wpi::util::json& payload) {
+void HALSimWSProviderSimDevice::ProcessHalCallback(
+    const wpi::util::json& payload) {
   auto ws = m_ws.lock();
   if (ws) {
     wpi::util::json netValue = {

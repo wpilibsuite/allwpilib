@@ -90,8 +90,8 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
 
   if (channel < 0 || channel >= kNumSmartIo) {
     *status = RESOURCE_OUT_OF_RANGE;
-    wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for AddressableLED",
-                                     0, kNumSmartIo, channel);
+    wpi::hal::SetLastErrorIndexOutOfRange(
+        status, "Invalid Index for AddressableLED", 0, kNumSmartIo, channel);
     return HAL_kInvalidHandle;
   }
 
@@ -103,7 +103,7 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
   if (*status != 0) {
     if (port) {
       wpi::hal::SetLastErrorPreviouslyAllocated(status, "SmartIo", channel,
-                                           port->previousAllocation);
+                                                port->previousAllocation);
     } else {
       wpi::hal::SetLastErrorIndexOutOfRange(
           status, "Invalid Index for AddressableLED", 0, kNumSmartIo, channel);

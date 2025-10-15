@@ -28,10 +28,12 @@ wpi::cmd::CommandPtr Shooter::RunShooterCommand(
       .WithName("Set Shooter Speed");
 }
 
-wpi::cmd::CommandPtr Shooter::SysIdQuasistatic(wpi::cmd::sysid::Direction direction) {
+wpi::cmd::CommandPtr Shooter::SysIdQuasistatic(
+    wpi::cmd::sysid::Direction direction) {
   return m_sysIdRoutine.Quasistatic(direction);
 }
 
-wpi::cmd::CommandPtr Shooter::SysIdDynamic(wpi::cmd::sysid::Direction direction) {
+wpi::cmd::CommandPtr Shooter::SysIdDynamic(
+    wpi::cmd::sysid::Direction direction) {
   return m_sysIdRoutine.Dynamic(direction);
 }

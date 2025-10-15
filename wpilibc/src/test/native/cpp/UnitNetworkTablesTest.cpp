@@ -11,12 +11,15 @@
 class UnitNetworkTablesTest : public ::testing::Test {
  public:
   UnitNetworkTablesTest() : inst{wpi::nt::NetworkTableInstance::Create()} {}
-  ~UnitNetworkTablesTest() override { wpi::nt::NetworkTableInstance::Destroy(inst); }
+  ~UnitNetworkTablesTest() override {
+    wpi::nt::NetworkTableInstance::Destroy(inst);
+  }
   wpi::nt::NetworkTableInstance inst;
 };
 
 TEST_F(UnitNetworkTablesTest, Publish) {
-  auto topic = wpi::nt::UnitTopic<wpi::units::meter_t>{inst.GetTopic("meterTest")};
+  auto topic =
+      wpi::nt::UnitTopic<wpi::units::meter_t>{inst.GetTopic("meterTest")};
   auto pub = topic.Publish();
   pub.Set(2_m);
   ASSERT_EQ(topic.GetProperty("unit"), "meter");
@@ -24,7 +27,8 @@ TEST_F(UnitNetworkTablesTest, Publish) {
 }
 
 TEST_F(UnitNetworkTablesTest, SubscribeDouble) {
-  auto topic = wpi::nt::UnitTopic<wpi::units::meter_t>{inst.GetTopic("meterTest")};
+  auto topic =
+      wpi::nt::UnitTopic<wpi::units::meter_t>{inst.GetTopic("meterTest")};
   auto pub = topic.Publish();
   auto sub = inst.GetDoubleTopic("meterTest").Subscribe(0);
   ASSERT_EQ(sub.Get(), 0);
@@ -34,7 +38,8 @@ TEST_F(UnitNetworkTablesTest, SubscribeDouble) {
 }
 
 TEST_F(UnitNetworkTablesTest, SubscribeUnit) {
-  auto topic = wpi::nt::UnitTopic<wpi::units::meter_t>{inst.GetTopic("meterTest")};
+  auto topic =
+      wpi::nt::UnitTopic<wpi::units::meter_t>{inst.GetTopic("meterTest")};
   auto pub = topic.Publish();
   auto sub = topic.Subscribe(0_m);
   ASSERT_EQ(sub.Get(), 0_m);

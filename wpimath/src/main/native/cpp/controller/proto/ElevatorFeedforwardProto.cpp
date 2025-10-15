@@ -8,8 +8,8 @@
 
 #include "wpimath/protobuf/controller.npb.h"
 
-std::optional<wpi::math::ElevatorFeedforward>
-wpi::util::Protobuf<wpi::math::ElevatorFeedforward>::Unpack(InputStream& stream) {
+std::optional<wpi::math::ElevatorFeedforward> wpi::util::Protobuf<
+    wpi::math::ElevatorFeedforward>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufElevatorFeedforward msg;
   if (!stream.Decode(msg)) {
     return {};

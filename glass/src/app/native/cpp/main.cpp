@@ -41,7 +41,8 @@ static std::unique_ptr<wpi::glass::PlotProvider> gPlotProvider;
 static std::unique_ptr<wpi::glass::NetworkTablesProvider> gNtProvider;
 
 static std::unique_ptr<wpi::glass::NetworkTablesModel> gNetworkTablesModel;
-static std::unique_ptr<wpi::glass::NetworkTablesSettings> gNetworkTablesSettings;
+static std::unique_ptr<wpi::glass::NetworkTablesSettings>
+    gNetworkTablesSettings;
 static wpi::glass::LogData gNetworkTablesLog;
 static std::unique_ptr<wpi::glass::Window> gNetworkTablesWindow;
 static std::unique_ptr<wpi::glass::Window> gNetworkTablesInfoWindow;
@@ -95,7 +96,8 @@ static std::string MakeTitle(NT_Inst inst, wpi::nt::Event event) {
 static void NtInitialize() {
   auto inst = wpi::nt::GetDefaultInstance();
   auto poller = wpi::nt::CreateListenerPoller(inst);
-  wpi::nt::AddPolledListener(poller, inst, NT_EVENT_CONNECTION | NT_EVENT_IMMEDIATE);
+  wpi::nt::AddPolledListener(poller, inst,
+                             NT_EVENT_CONNECTION | NT_EVENT_IMMEDIATE);
   wpi::nt::AddPolledLogger(poller, NT_LOG_INFO, 100);
   gui::AddEarlyExecute([inst, poller] {
     auto win = gui::GetSystemWindow();
@@ -149,9 +151,10 @@ static void NtInitialize() {
   gui::AddEarlyExecute([] { gNetworkTablesModel->Update(); });
 
   gNetworkTablesWindow = std::make_unique<wpi::glass::Window>(
-      wpi::glass::GetStorageRoot().GetChild("NetworkTables View"), "NetworkTables");
-  gNetworkTablesWindow->SetView(
-      std::make_unique<wpi::glass::NetworkTablesView>(gNetworkTablesModel.get()));
+      wpi::glass::GetStorageRoot().GetChild("NetworkTables View"),
+      "NetworkTables");
+  gNetworkTablesWindow->SetView(std::make_unique<wpi::glass::NetworkTablesView>(
+      gNetworkTablesModel.get()));
   gNetworkTablesWindow->SetDefaultPos(250, 277);
   gNetworkTablesWindow->SetDefaultSize(750, 185);
   gNetworkTablesWindow->DisableRenamePopup();
@@ -161,8 +164,9 @@ static void NtInitialize() {
   gNetworkTablesInfoWindow = std::make_unique<wpi::glass::Window>(
       wpi::glass::GetStorageRoot().GetChild("NetworkTables Info"),
       "NetworkTables Info");
-  gNetworkTablesInfoWindow->SetView(wpi::glass::MakeFunctionView(
-      [&] { wpi::glass::DisplayNetworkTablesInfo(gNetworkTablesModel.get()); }));
+  gNetworkTablesInfoWindow->SetView(wpi::glass::MakeFunctionView([&] {
+    wpi::glass::DisplayNetworkTablesInfo(gNetworkTablesModel.get());
+  }));
   gNetworkTablesInfoWindow->SetDefaultPos(250, 130);
   gNetworkTablesInfoWindow->SetDefaultSize(750, 145);
   gNetworkTablesInfoWindow->SetDefaultVisibility(wpi::glass::Window::kHide);
@@ -228,7 +232,7 @@ int main(int argc, char** argv) {
 
   wpi::glass::SetStorageName("glass");
   wpi::glass::SetStorageDir(saveDir.empty() ? gui::GetPlatformSaveFileDir()
-                                       : saveDir);
+                                            : saveDir);
   gPlotProvider->GlobalInit();
   gui::AddInit([] { wpi::glass::ResetTime(); });
   gNtProvider->GlobalInit();
@@ -328,12 +332,13 @@ int main(int argc, char** argv) {
       char nameBuf[32];
       const char* name = glfwGetKeyName(*gEnterKey, 0);
       if (!name) {
-        wpi::util::format_to_n_c_str(nameBuf, sizeof(nameBuf), "{}", *gEnterKey);
+        wpi::util::format_to_n_c_str(nameBuf, sizeof(nameBuf), "{}",
+                                     *gEnterKey);
 
         name = nameBuf;
       }
       wpi::util::format_to_n_c_str(editLabel, sizeof(editLabel), "{}###edit",
-                             gKeyEdit ? "(press key)" : name);
+                                   gKeyEdit ? "(press key)" : name);
 
       if (ImGui::SmallButton(editLabel)) {
         gKeyEdit = true;

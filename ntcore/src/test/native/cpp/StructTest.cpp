@@ -63,7 +63,9 @@ struct wpi::util::Struct<Inner> {
 template <>
 struct wpi::util::Struct<Outer> {
   static constexpr std::string_view GetTypeName() { return "Outer"; }
-  static constexpr size_t GetSize() { return wpi::util::GetStructSize<Inner>() + 4; }
+  static constexpr size_t GetSize() {
+    return wpi::util::GetStructSize<Inner>() + 4;
+  }
   static constexpr std::string_view GetSchema() {
     return "Inner inner; int32 c";
   }
@@ -283,7 +285,8 @@ TEST_F(StructTest, OuterNonconstexpr) {
 }
 
 TEST_F(StructTest, InnerArrayConstexpr) {
-  wpi::nt::StructArrayTopic<Inner> topic = inst.GetStructArrayTopic<Inner>("innerA");
+  wpi::nt::StructArrayTopic<Inner> topic =
+      inst.GetStructArrayTopic<Inner>("innerA");
   wpi::nt::StructArrayPublisher<Inner> pub = topic.Publish();
   wpi::nt::StructArraySubscriber<Inner> sub = topic.Subscribe({});
 
@@ -353,7 +356,8 @@ TEST_F(StructTest, StructA) {
 }
 
 TEST_F(StructTest, StructArrayA) {
-  wpi::nt::StructArrayTopic<ThingA> topic = inst.GetStructArrayTopic<ThingA>("a");
+  wpi::nt::StructArrayTopic<ThingA> topic =
+      inst.GetStructArrayTopic<ThingA>("a");
   wpi::nt::StructArrayPublisher<ThingA> pub = topic.Publish();
   wpi::nt::StructArrayPublisher<ThingA> pub2 = topic.PublishEx({{}});
   wpi::nt::StructArraySubscriber<ThingA> sub = topic.Subscribe({});
@@ -433,7 +437,8 @@ TEST_F(StructTest, StructFixedArrayB) {
   wpi::nt::StructPublisher<std::array<ThingB, 2>, Info1> pub = topic.Publish();
   wpi::nt::StructPublisher<std::array<ThingB, 2>, Info1> pub2 =
       topic.PublishEx({{}});
-  wpi::nt::StructSubscriber<std::array<ThingB, 2>, Info1> sub = topic.Subscribe({});
+  wpi::nt::StructSubscriber<std::array<ThingB, 2>, Info1> sub =
+      topic.Subscribe({});
   wpi::nt::StructEntry<std::array<ThingB, 2>, Info1> entry = topic.GetEntry({});
   std::array<ThingB, 2> arr;
   pub.SetDefault(arr);

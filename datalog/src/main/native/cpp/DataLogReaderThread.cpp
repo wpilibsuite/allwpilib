@@ -107,9 +107,10 @@ void DataLogReaderThread::ReadMain() {
       auto desc = m_structDb.Add(*typeStr, schema, &err);
       if (!desc) {
         wpi::util::print("could not decode struct '{}' schema '{}': {}\n", name,
-                   schema, err);
+                         schema, err);
       }
-    } else if (auto filename = wpi::util::remove_prefix(name, "/.schema/proto:")) {
+    } else if (auto filename =
+                   wpi::util::remove_prefix(name, "/.schema/proto:")) {
       // protobuf descriptor handling
       upb_Status status;
       status.ok = true;
@@ -120,7 +121,7 @@ void DataLogReaderThread::ReadMain() {
           &status);
       if (!status.ok) {
         wpi::util::print("could not decode protobuf '{}' filename '{}'\n", name,
-                   *filename);
+                         *filename);
       }
     }
   }

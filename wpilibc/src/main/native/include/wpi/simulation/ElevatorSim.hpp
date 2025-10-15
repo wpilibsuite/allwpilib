@@ -20,12 +20,13 @@ namespace wpi::sim {
 class ElevatorSim : public LinearSystemSim<2, 1, 2> {
  public:
   template <typename Distance>
-  using Velocity_t = wpi::units::unit_t<
-      wpi::units::compound_unit<Distance, wpi::units::inverse<wpi::units::seconds>>>;
+  using Velocity_t = wpi::units::unit_t<wpi::units::compound_unit<
+      Distance, wpi::units::inverse<wpi::units::seconds>>>;
 
   template <typename Distance>
   using Acceleration_t = wpi::units::unit_t<wpi::units::compound_unit<
-      wpi::units::compound_unit<Distance, wpi::units::inverse<wpi::units::seconds>>,
+      wpi::units::compound_unit<Distance,
+                                wpi::units::inverse<wpi::units::seconds>>,
       wpi::units::inverse<wpi::units::seconds>>>;
 
   /**
@@ -42,9 +43,10 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
    * @param startingHeight     The starting height of the elevator.
    * @param measurementStdDevs The standard deviation of the measurements.
    */
-  ElevatorSim(const wpi::math::LinearSystem<2, 1, 2>& plant, const wpi::math::DCMotor& gearbox,
-              wpi::units::meter_t minHeight, wpi::units::meter_t maxHeight,
-              bool simulateGravity, wpi::units::meter_t startingHeight,
+  ElevatorSim(const wpi::math::LinearSystem<2, 1, 2>& plant,
+              const wpi::math::DCMotor& gearbox, wpi::units::meter_t minHeight,
+              wpi::units::meter_t maxHeight, bool simulateGravity,
+              wpi::units::meter_t startingHeight,
               const std::array<double, 2>& measurementStdDevs = {0.0, 0.0});
 
   /**
@@ -64,9 +66,10 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
    * @param measurementStdDevs The standard deviation of the measurements.
    */
   ElevatorSim(const wpi::math::DCMotor& gearbox, double gearing,
-              wpi::units::kilogram_t carriageMass, wpi::units::meter_t drumRadius,
-              wpi::units::meter_t minHeight, wpi::units::meter_t maxHeight,
-              bool simulateGravity, wpi::units::meter_t startingHeight,
+              wpi::units::kilogram_t carriageMass,
+              wpi::units::meter_t drumRadius, wpi::units::meter_t minHeight,
+              wpi::units::meter_t maxHeight, bool simulateGravity,
+              wpi::units::meter_t startingHeight,
               const std::array<double, 2>& measurementStdDevs = {0.0, 0.0});
 
   /**
@@ -99,7 +102,8 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
    * @param position The new position
    * @param velocity The new velocity
    */
-  void SetState(wpi::units::meter_t position, wpi::units::meters_per_second_t velocity);
+  void SetState(wpi::units::meter_t position,
+                wpi::units::meters_per_second_t velocity);
 
   /**
    * Returns whether the elevator would hit the lower limit.
@@ -167,8 +171,9 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
    * @param u           The system inputs (voltage).
    * @param dt          The time difference between controller updates.
    */
-  wpi::math::Vectord<2> UpdateX(const wpi::math::Vectord<2>& currentXhat, const wpi::math::Vectord<1>& u,
-                     wpi::units::second_t dt) override;
+  wpi::math::Vectord<2> UpdateX(const wpi::math::Vectord<2>& currentXhat,
+                                const wpi::math::Vectord<1>& u,
+                                wpi::units::second_t dt) override;
 
  private:
   wpi::math::DCMotor m_gearbox;

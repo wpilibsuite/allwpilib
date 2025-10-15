@@ -24,11 +24,11 @@ DoubleSolenoid::DoubleSolenoid(int busId, int module,
       m_reverseChannel{reverseChannel} {
   if (!m_module->CheckSolenoidChannel(m_forwardChannel)) {
     throw WPILIB_MakeError(err::ChannelIndexOutOfRange, "Channel {}",
-                        m_forwardChannel);
+                           m_forwardChannel);
   }
   if (!m_module->CheckSolenoidChannel(m_reverseChannel)) {
     throw WPILIB_MakeError(err::ChannelIndexOutOfRange, "Channel {}",
-                        m_reverseChannel);
+                           m_reverseChannel);
   }
 
   m_forwardMask = 1 << forwardChannel;
@@ -38,14 +38,15 @@ DoubleSolenoid::DoubleSolenoid(int busId, int module,
   int allocMask = m_module->CheckAndReserveSolenoids(m_mask);
   if (allocMask != 0) {
     if (allocMask == m_mask) {
-      throw WPILIB_MakeError(err::ResourceAlreadyAllocated, "Channels {} and {}",
-                          m_forwardChannel, m_reverseChannel);
+      throw WPILIB_MakeError(err::ResourceAlreadyAllocated,
+                             "Channels {} and {}", m_forwardChannel,
+                             m_reverseChannel);
     } else if (allocMask == m_forwardMask) {
       throw WPILIB_MakeError(err::ResourceAlreadyAllocated, "Channel {}",
-                          m_forwardChannel);
+                             m_forwardChannel);
     } else {
       throw WPILIB_MakeError(err::ResourceAlreadyAllocated, "Channel {}",
-                          m_reverseChannel);
+                             m_reverseChannel);
     }
   }
 
@@ -53,8 +54,8 @@ DoubleSolenoid::DoubleSolenoid(int busId, int module,
       fmt::format("Solenoid[{},{}]", m_forwardChannel, m_reverseChannel),
       "DoubleSolenoid");
 
-  wpi::util::SendableRegistry::Add(this, "DoubleSolenoid",
-                             m_module->GetModuleNumber(), m_forwardChannel);
+  wpi::util::SendableRegistry::Add(
+      this, "DoubleSolenoid", m_module->GetModuleNumber(), m_forwardChannel);
 }
 
 DoubleSolenoid::DoubleSolenoid(int busId, PneumaticsModuleType moduleType,

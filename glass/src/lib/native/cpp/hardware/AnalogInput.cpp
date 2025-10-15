@@ -25,7 +25,8 @@ void wpi::glass::DisplayAnalogInput(AnalogInputModel* model, int index) {
   std::string& name = GetStorage().GetString("name");
   char label[128];
   if (!name.empty()) {
-    wpi::util::format_to_n_c_str(label, sizeof(label), "{} [{}]###name", name, index);
+    wpi::util::format_to_n_c_str(label, sizeof(label), "{} [{}]###name", name,
+                                 index);
   } else {
     wpi::util::format_to_n_c_str(label, sizeof(label), "In[{}]###name", index);
   }
@@ -48,7 +49,7 @@ void wpi::glass::DisplayAnalogInput(AnalogInputModel* model, int index) {
 }
 
 void wpi::glass::DisplayAnalogInputs(AnalogInputsModel* model,
-                                std::string_view noneMsg) {
+                                     std::string_view noneMsg) {
   ImGui::Text("(Use Ctrl+Click to edit value)");
   bool hasAny = false;
   bool first = true;

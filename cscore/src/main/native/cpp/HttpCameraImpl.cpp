@@ -164,7 +164,8 @@ wpi::net::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
     if (m_nextLocation >= m_locations.size()) {
       m_nextLocation = 0;
     }
-    req = wpi::net::HttpRequest{m_locations[m_nextLocation++], m_streamSettings};
+    req =
+        wpi::net::HttpRequest{m_locations[m_nextLocation++], m_streamSettings};
     m_streamSettingsUpdated = false;
   }
 
@@ -176,7 +177,8 @@ wpi::net::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
     return nullptr;
   }
 
-  auto connPtr = std::make_unique<wpi::net::HttpConnection>(std::move(stream), 1);
+  auto connPtr =
+      std::make_unique<wpi::net::HttpConnection>(std::move(stream), 1);
   wpi::net::HttpConnection* conn = connPtr.get();
 
   // update m_streamConn
@@ -195,7 +197,8 @@ wpi::net::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
   }
 
   // Parse Content-Type header to get the boundary
-  auto [mediaType, contentType] = wpi::util::split(conn->contentType.str(), ';');
+  auto [mediaType, contentType] =
+      wpi::util::split(conn->contentType.str(), ';');
   mediaType = wpi::util::trim(mediaType);
   if (mediaType != "multipart/x-mixed-replace") {
     SWARNING("\"{}\": unrecognized Content-Type \"{}\"", req.host.str(),
@@ -213,7 +216,8 @@ wpi::net::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
     contentType = wpi::util::ltrim(contentType);
     auto [key, value] = wpi::util::split(keyvalue, '=');
     if (wpi::util::trim(key) == "boundary") {
-      value = wpi::util::trim(wpi::util::trim(value), '"');  // value may be quoted
+      value =
+          wpi::util::trim(wpi::util::trim(value), '"');  // value may be quoted
       if (wpi::util::starts_with(value, "--")) {
         value = wpi::util::substr(value, 2);
       }
@@ -369,7 +373,8 @@ void HttpCameraImpl::DeviceSendSettings(wpi::net::HttpRequest& req) {
     return;
   }
 
-  auto connPtr = std::make_unique<wpi::net::HttpConnection>(std::move(stream), 1);
+  auto connPtr =
+      std::make_unique<wpi::net::HttpConnection>(std::move(stream), 1);
   wpi::net::HttpConnection* conn = connPtr.get();
 
   // update m_settingsConn
@@ -653,7 +658,8 @@ CS_Source CS_CreateHttpCamera(const struct WPI_String* name,
                               const struct WPI_String* url,
                               CS_HttpCameraKind kind, CS_Status* status) {
   return wpi::cs::CreateHttpCamera(wpi::util::to_string_view(name),
-                              wpi::util::to_string_view(url), kind, status);
+                                   wpi::util::to_string_view(url), kind,
+                                   status);
 }
 
 CS_Source CS_CreateHttpCameraMulti(const struct WPI_String* name,
@@ -664,7 +670,8 @@ CS_Source CS_CreateHttpCameraMulti(const struct WPI_String* name,
   for (int i = 0; i < count; ++i) {
     vec.emplace_back(wpi::util::to_string_view(&urls[i]));
   }
-  return wpi::cs::CreateHttpCamera(wpi::util::to_string_view(name), vec, kind, status);
+  return wpi::cs::CreateHttpCamera(wpi::util::to_string_view(name), vec, kind,
+                                   status);
 }
 
 CS_HttpCameraKind CS_GetHttpCameraKind(CS_Source source, CS_Status* status) {

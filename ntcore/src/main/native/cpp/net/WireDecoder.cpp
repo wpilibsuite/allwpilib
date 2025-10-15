@@ -47,8 +47,8 @@ static bool GetNumber(wpi::util::json& val, int64_t* num) {
   return true;
 }
 
-static std::string* ObjGetString(wpi::util::json::object_t& obj, std::string_view key,
-                                 std::string* error) {
+static std::string* ObjGetString(wpi::util::json::object_t& obj,
+                                 std::string_view key, std::string* error) {
   auto it = obj.find(key);
   if (it == obj.end()) {
     *error = fmt::format("no {} key", key);
@@ -75,8 +75,8 @@ static bool ObjGetNumber(wpi::util::json::object_t& obj, std::string_view key,
   return true;
 }
 
-static bool ObjGetStringArray(wpi::util::json::object_t& obj, std::string_view key,
-                              std::string* error,
+static bool ObjGetStringArray(wpi::util::json::object_t& obj,
+                              std::string_view key, std::string* error,
                               std::vector<std::string>* out) {
   // prefixes
   auto it = obj.find(key);
@@ -174,7 +174,8 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
             goto err;
           }
 
-          // limit to 32-bit range and exclude endpoints used by wpi::util::DenseMap
+          // limit to 32-bit range and exclude endpoints used by
+          // wpi::util::DenseMap
           if (pubuid >= 0x7fffffffLL || pubuid <= (-0x7fffffffLL - 1)) {
             error = "pubuid out of range";
             goto err;
@@ -206,7 +207,8 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
             goto err;
           }
 
-          // limit to 32-bit range and exclude endpoints used by wpi::util::DenseMap
+          // limit to 32-bit range and exclude endpoints used by
+          // wpi::util::DenseMap
           if (pubuid >= 0x7fffffffLL || pubuid <= (-0x7fffffffLL - 1)) {
             error = "pubuid out of range";
             goto err;
@@ -243,7 +245,8 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
             goto err;
           }
 
-          // limit to 32-bit range and exclude endpoints used by wpi::util::DenseMap
+          // limit to 32-bit range and exclude endpoints used by
+          // wpi::util::DenseMap
           if (subuid >= 0x7fffffffLL || subuid <= (-0x7fffffffLL - 1)) {
             error = "subuid out of range";
             goto err;
@@ -253,7 +256,8 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
           PubSubOptionsImpl options;
           auto optionsIt = params->find("options");
           if (optionsIt != params->end()) {
-            auto joptions = optionsIt->second.get_ptr<wpi::util::json::object_t*>();
+            auto joptions =
+                optionsIt->second.get_ptr<wpi::util::json::object_t*>();
             if (!joptions) {
               error = "options must be an object";
               goto err;
@@ -321,7 +325,8 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
             goto err;
           }
 
-          // limit to 32-bit range and exclude endpoints used by wpi::util::DenseMap
+          // limit to 32-bit range and exclude endpoints used by
+          // wpi::util::DenseMap
           if (subuid >= 0x7fffffffLL || subuid <= (-0x7fffffffLL - 1)) {
             error = "pubuid out of range";
             goto err;
@@ -348,7 +353,8 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
             goto err;
           }
 
-          // limit to 32-bit range and exclude endpoints used by wpi::util::DenseMap
+          // limit to 32-bit range and exclude endpoints used by
+          // wpi::util::DenseMap
           if (id >= 0x7fffffffLL || id <= (-0x7fffffffLL - 1)) {
             error = "id out of range";
             goto err;
@@ -370,7 +376,8 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
               goto err;
             }
 
-            // limit to 32-bit range and exclude endpoints used by wpi::util::DenseMap
+            // limit to 32-bit range and exclude endpoints used by
+            // wpi::util::DenseMap
             if (val >= 0x7fffffffLL || val <= (-0x7fffffffLL - 1)) {
               error = "pubuid out of range";
               goto err;
@@ -406,7 +413,8 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
             goto err;
           }
 
-          // limit to 32-bit range and exclude endpoints used by wpi::util::DenseMap
+          // limit to 32-bit range and exclude endpoints used by
+          // wpi::util::DenseMap
           if (id >= 0x7fffffffLL || id <= (-0x7fffffffLL - 1)) {
             error = "id out of range";
             goto err;
@@ -464,19 +472,21 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
 #pragma clang diagnostic pop
 #endif
 
-bool wpi::nt::net::WireDecodeText(std::string_view in, ClientMessageHandler& out,
-                             wpi::util::Logger& logger) {
+bool wpi::nt::net::WireDecodeText(std::string_view in,
+                                  ClientMessageHandler& out,
+                                  wpi::util::Logger& logger) {
   return ::WireDecodeTextImpl(in, out, logger);
 }
 
-void wpi::nt::net::WireDecodeText(std::string_view in, ServerMessageHandler& out,
-                             wpi::util::Logger& logger) {
+void wpi::nt::net::WireDecodeText(std::string_view in,
+                                  ServerMessageHandler& out,
+                                  wpi::util::Logger& logger) {
   ::WireDecodeTextImpl(in, out, logger);
 }
 
 bool wpi::nt::net::WireDecodeBinary(std::span<const uint8_t>* in, int* outId,
-                               Value* outValue, std::string* error,
-                               int64_t localTimeOffset) {
+                                    Value* outValue, std::string* error,
+                                    int64_t localTimeOffset) {
   mpack_reader_t reader;
   mpack_reader_init_data(&reader, reinterpret_cast<const char*>(in->data()),
                          in->size());

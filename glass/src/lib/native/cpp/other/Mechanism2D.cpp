@@ -38,9 +38,10 @@ namespace {
 // Per-frame data (not persistent)
 struct FrameData {
   wpi::math::Translation2d GetPosFromScreen(const ImVec2& cursor) const {
-    return {
-        wpi::units::meter_t{(std::clamp(cursor.x, min.x, max.x) - min.x) / scale},
-        wpi::units::meter_t{(max.y - std::clamp(cursor.y, min.y, max.y)) / scale}};
+    return {wpi::units::meter_t{(std::clamp(cursor.x, min.x, max.x) - min.x) /
+                                scale},
+            wpi::units::meter_t{(max.y - std::clamp(cursor.y, min.y, max.y)) /
+                                scale}};
   }
   ImVec2 GetScreenFromPos(const wpi::math::Translation2d& pos) const {
     return {min.x + scale * pos.X().to<float>(),
@@ -67,7 +68,8 @@ class BackgroundInfo {
   void DisplaySettings();
 
   void LoadImage();
-  FrameData GetFrameData(ImVec2 min, ImVec2 max, wpi::math::Translation2d dims) const;
+  FrameData GetFrameData(ImVec2 min, ImVec2 max,
+                         wpi::math::Translation2d dims) const;
   void Draw(ImDrawList* drawList, const FrameData& frameData,
             ImU32 bgColor) const;
 
@@ -184,11 +186,12 @@ void FrameData::DrawObject(ImDrawList* drawList, MechanismObjectModel& objModel,
                            const wpi::math::Pose2d& pose) const {
   const char* type = objModel.GetType();
   if (std::string_view{type} == "line") {
-    auto startPose =
-        pose + wpi::math::Transform2d{wpi::math::Translation2d{}, objModel.GetAngle()};
+    auto startPose = pose + wpi::math::Transform2d{wpi::math::Translation2d{},
+                                                   objModel.GetAngle()};
     auto endPose =
         startPose +
-        wpi::math::Transform2d{wpi::math::Translation2d{objModel.GetLength(), 0_m}, 0_deg};
+        wpi::math::Transform2d{
+            wpi::math::Translation2d{objModel.GetLength(), 0_m}, 0_deg};
     drawList->AddLine(GetScreenFromPos(startPose.Translation()),
                       GetScreenFromPos(endPose.Translation()),
                       objModel.GetColor(), objModel.GetWeight());
@@ -203,7 +206,7 @@ void FrameData::DrawGroup(ImDrawList* drawList, MechanismObjectGroup& group,
 }
 
 void wpi::glass::DisplayMechanism2D(Mechanism2DModel* model,
-                               const ImVec2& contentSize) {
+                                    const ImVec2& contentSize) {
   auto& storage = GetStorage();
   auto bg = storage.GetData<BackgroundInfo>();
   if (!bg) {

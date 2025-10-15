@@ -77,7 +77,8 @@ class WPILIB_DLLEXPORT Rotation3d {
    * @param axis The rotation axis.
    * @param angle The rotation around the axis.
    */
-  constexpr Rotation3d(const Eigen::Vector3d& axis, wpi::units::radian_t angle) {
+  constexpr Rotation3d(const Eigen::Vector3d& axis,
+                       wpi::units::radian_t angle) {
     double norm = ct_matrix{axis}.norm();
     if (norm == 0.0) {
       return;
@@ -281,11 +282,13 @@ class WPILIB_DLLEXPORT Rotation3d {
   constexpr Rotation3d operator*(double scalar) const {
     // https://en.wikipedia.org/wiki/Slerp#Quaternion_Slerp
     if (m_q.W() >= 0.0) {
-      return Rotation3d{Eigen::Vector3d{{m_q.X(), m_q.Y(), m_q.Z()}},
-                        2.0 * wpi::units::radian_t{scalar * gcem::acos(m_q.W())}};
+      return Rotation3d{
+          Eigen::Vector3d{{m_q.X(), m_q.Y(), m_q.Z()}},
+          2.0 * wpi::units::radian_t{scalar * gcem::acos(m_q.W())}};
     } else {
-      return Rotation3d{Eigen::Vector3d{{-m_q.X(), -m_q.Y(), -m_q.Z()}},
-                        2.0 * wpi::units::radian_t{scalar * gcem::acos(-m_q.W())}};
+      return Rotation3d{
+          Eigen::Vector3d{{-m_q.X(), -m_q.Y(), -m_q.Z()}},
+          2.0 * wpi::units::radian_t{scalar * gcem::acos(-m_q.W())}};
     }
   }
 
@@ -360,7 +363,8 @@ class WPILIB_DLLEXPORT Rotation3d {
     // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_(in_3-2-1_sequence)_conversion
     double ratio = 2.0 * (w * y - z * x);
     if (gcem::abs(ratio) >= 1.0) {
-      return wpi::units::radian_t{gcem::copysign(std::numbers::pi / 2.0, ratio)};
+      return wpi::units::radian_t{
+          gcem::copysign(std::numbers::pi / 2.0, ratio)};
     } else {
       return wpi::units::radian_t{gcem::asin(ratio)};
     }

@@ -64,7 +64,8 @@ static constexpr const unit_t<compound_unit<energy::joule, time::seconds>> h(
 static constexpr const unit_t<
     compound_unit<force::newtons, inverse<squared<current::ampere>>>>
     mu0(pi * 4.0e-7 * force::newton_t(1) /
-        wpi::units::math::cpow<2>(current::ampere_t(1)));  ///< vacuum permeability.
+        wpi::units::math::cpow<2>(
+            current::ampere_t(1)));  ///< vacuum permeability.
 static constexpr const unit_t<
     compound_unit<capacitance::farad, inverse<length::meter>>>
     epsilon0(1.0 / (mu0 * math::cpow<2>(c)));  ///< vacuum permitivity.

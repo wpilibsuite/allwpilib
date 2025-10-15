@@ -108,7 +108,8 @@ class UnitSubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueType GetAtomic(ParamType defaultValue) const {
-    auto doubleVal = ::wpi::nt::GetAtomicDouble(m_subHandle, defaultValue.value());
+    auto doubleVal =
+        ::wpi::nt::GetAtomicDouble(m_subHandle, defaultValue.value());
     return {doubleVal.time, doubleVal.serverTime, doubleVal.value};
   }
 
@@ -321,7 +322,8 @@ class UnitTopic final : public Topic {
       ParamType defaultValue,
       const PubSubOptions& options = kDefaultPubSubOptions) {
     return UnitSubscriber<T>{
-        ::wpi::nt::Subscribe(m_handle, NT_DOUBLE, "double", options), defaultValue};
+        ::wpi::nt::Subscribe(m_handle, NT_DOUBLE, "double", options),
+        defaultValue};
   }
 
   /**
@@ -366,8 +368,8 @@ class UnitTopic final : public Topic {
    */
   [[nodiscard]]
   PublisherType Publish(const PubSubOptions& options = kDefaultPubSubOptions) {
-    return UnitPublisher<T>{::wpi::nt::PublishEx(m_handle, NT_DOUBLE, "double",
-                                            {{"unit", T{}.name()}}, options)};
+    return UnitPublisher<T>{::wpi::nt::PublishEx(
+        m_handle, NT_DOUBLE, "double", {{"unit", T{}.name()}}, options)};
   }
 
   /**
@@ -421,8 +423,9 @@ class UnitTopic final : public Topic {
   [[nodiscard]]
   EntryType GetEntry(ParamType defaultValue,
                      const PubSubOptions& options = kDefaultPubSubOptions) {
-    return UnitEntry<T>{::wpi::nt::GetEntry(m_handle, NT_DOUBLE, "double", options),
-                        defaultValue};
+    return UnitEntry<T>{
+        ::wpi::nt::GetEntry(m_handle, NT_DOUBLE, "double", options),
+        defaultValue};
   }
 
   /**
@@ -450,7 +453,8 @@ class UnitTopic final : public Topic {
   EntryType GetEntryEx(std::string_view typeString, ParamType defaultValue,
                        const PubSubOptions& options = kDefaultPubSubOptions) {
     return UnitEntry<T>{
-        ::wpi::nt::GetEntry(m_handle, NT_DOUBLE, typeString, options), defaultValue};
+        ::wpi::nt::GetEntry(m_handle, NT_DOUBLE, typeString, options),
+        defaultValue};
   }
 };
 

@@ -19,7 +19,7 @@
 
 namespace wpi::util {
 class Logger;
-}  // namespace wpi
+}  // namespace wpi::util
 
 namespace wpi::nt::net {
 class ClientMessageQueue;

@@ -51,7 +51,8 @@ class Robot : public wpi::TimedRobot {
 
   // Create a motion profile with the given maximum velocity and maximum
   // acceleration constraints for the next setpoint.
-  wpi::math::TrapezoidProfile<wpi::units::meters> m_profile{{1.75_mps, 0.75_mps_sq}};
+  wpi::math::TrapezoidProfile<wpi::units::meters> m_profile{
+      {1.75_mps, 0.75_mps_sq}};
   wpi::math::TrapezoidProfile<wpi::units::meters>::State m_goal;
   wpi::math::TrapezoidProfile<wpi::units::meters>::State m_setpoint;
 };

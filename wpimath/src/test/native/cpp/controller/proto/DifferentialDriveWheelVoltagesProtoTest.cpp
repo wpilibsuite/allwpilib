@@ -11,7 +11,8 @@ using namespace wpi::math;
 
 namespace {
 
-using ProtoType = wpi::util::Protobuf<wpi::math::DifferentialDriveWheelVoltages>;
+using ProtoType =
+    wpi::util::Protobuf<wpi::math::DifferentialDriveWheelVoltages>;
 
 const DifferentialDriveWheelVoltages kExpectedData =
     DifferentialDriveWheelVoltages{0.174_V, 0.191_V};

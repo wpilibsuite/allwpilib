@@ -176,7 +176,9 @@ class NetworkTablesModel : public Model {
   Entry* GetEntry(std::string_view name);
   Entry* AddEntry(NT_Topic topic);
 
-  wpi::util::StructDescriptorDatabase& GetStructDatabase() { return m_structDb; }
+  wpi::util::StructDescriptorDatabase& GetStructDatabase() {
+    return m_structDb;
+  }
   upb_DefPool* GetProtobufDatabase() { return m_protoPool; }
   upb_Arena* GetProtobufArena() { return m_arena; }
 

@@ -16,7 +16,8 @@ constexpr size_t kRearRightOff =
 
 using StructType = wpi::util::Struct<wpi::math::MecanumDriveKinematics>;
 
-wpi::math::MecanumDriveKinematics StructType::Unpack(std::span<const uint8_t> data) {
+wpi::math::MecanumDriveKinematics StructType::Unpack(
+    std::span<const uint8_t> data) {
   return wpi::math::MecanumDriveKinematics{
       wpi::util::UnpackStruct<wpi::math::Translation2d, kFrontLeftOff>(data),
       wpi::util::UnpackStruct<wpi::math::Translation2d, kFrontRightOff>(data),

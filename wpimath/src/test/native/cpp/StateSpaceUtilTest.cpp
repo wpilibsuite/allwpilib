@@ -8,7 +8,8 @@
 #include "wpi/math/util/StateSpaceUtil.hpp"
 
 TEST(StateSpaceUtilTest, CostParameterPack) {
-  constexpr wpi::math::Matrixd<3, 3> mat = wpi::math::MakeCostMatrix(1.0, 2.0, 3.0);
+  constexpr wpi::math::Matrixd<3, 3> mat =
+      wpi::math::MakeCostMatrix(1.0, 2.0, 3.0);
   EXPECT_NEAR(mat(0, 0), 1.0, 1e-3);
   EXPECT_NEAR(mat(0, 1), 0.0, 1e-3);
   EXPECT_NEAR(mat(0, 2), 0.0, 1e-3);
@@ -21,7 +22,8 @@ TEST(StateSpaceUtilTest, CostParameterPack) {
 }
 
 TEST(StateSpaceUtilTest, CostArray) {
-  constexpr wpi::math::Matrixd<3, 3> mat = wpi::math::MakeCostMatrix<3>({1.0, 2.0, 3.0});
+  constexpr wpi::math::Matrixd<3, 3> mat =
+      wpi::math::MakeCostMatrix<3>({1.0, 2.0, 3.0});
   EXPECT_NEAR(mat(0, 0), 1.0, 1e-3);
   EXPECT_NEAR(mat(0, 1), 0.0, 1e-3);
   EXPECT_NEAR(mat(0, 2), 0.0, 1e-3);
@@ -47,7 +49,8 @@ TEST(StateSpaceUtilTest, CostDynamic) {
 }
 
 TEST(StateSpaceUtilTest, CovParameterPack) {
-  constexpr wpi::math::Matrixd<3, 3> mat = wpi::math::MakeCovMatrix(1.0, 2.0, 3.0);
+  constexpr wpi::math::Matrixd<3, 3> mat =
+      wpi::math::MakeCovMatrix(1.0, 2.0, 3.0);
   EXPECT_NEAR(mat(0, 0), 1.0, 1e-3);
   EXPECT_NEAR(mat(0, 1), 0.0, 1e-3);
   EXPECT_NEAR(mat(0, 2), 0.0, 1e-3);
@@ -60,7 +63,8 @@ TEST(StateSpaceUtilTest, CovParameterPack) {
 }
 
 TEST(StateSpaceUtilTest, CovArray) {
-  constexpr wpi::math::Matrixd<3, 3> mat = wpi::math::MakeCovMatrix<3>({1.0, 2.0, 3.0});
+  constexpr wpi::math::Matrixd<3, 3> mat =
+      wpi::math::MakeCovMatrix<3>({1.0, 2.0, 3.0});
   EXPECT_NEAR(mat(0, 0), 1.0, 1e-3);
   EXPECT_NEAR(mat(0, 1), 0.0, 1e-3);
   EXPECT_NEAR(mat(0, 2), 0.0, 1e-3);
@@ -105,23 +109,23 @@ TEST(StateSpaceUtilTest, IsStabilizable) {
 
   // First eigenvalue is uncontrollable and unstable.
   // Second eigenvalue is controllable and stable.
-  EXPECT_FALSE(
-      (wpi::math::IsStabilizable<2, 1>(wpi::math::Matrixd<2, 2>{{1.2, 0}, {0, 0.5}}, B)));
+  EXPECT_FALSE((wpi::math::IsStabilizable<2, 1>(
+      wpi::math::Matrixd<2, 2>{{1.2, 0}, {0, 0.5}}, B)));
 
   // First eigenvalue is uncontrollable and marginally stable.
   // Second eigenvalue is controllable and stable.
-  EXPECT_FALSE(
-      (wpi::math::IsStabilizable<2, 1>(wpi::math::Matrixd<2, 2>{{1, 0}, {0, 0.5}}, B)));
+  EXPECT_FALSE((wpi::math::IsStabilizable<2, 1>(
+      wpi::math::Matrixd<2, 2>{{1, 0}, {0, 0.5}}, B)));
 
   // First eigenvalue is uncontrollable and stable.
   // Second eigenvalue is controllable and stable.
-  EXPECT_TRUE(
-      (wpi::math::IsStabilizable<2, 1>(wpi::math::Matrixd<2, 2>{{0.2, 0}, {0, 0.5}}, B)));
+  EXPECT_TRUE((wpi::math::IsStabilizable<2, 1>(
+      wpi::math::Matrixd<2, 2>{{0.2, 0}, {0, 0.5}}, B)));
 
   // First eigenvalue is uncontrollable and stable.
   // Second eigenvalue is controllable and unstable.
-  EXPECT_TRUE(
-      (wpi::math::IsStabilizable<2, 1>(wpi::math::Matrixd<2, 2>{{0.2, 0}, {0, 1.2}}, B)));
+  EXPECT_TRUE((wpi::math::IsStabilizable<2, 1>(
+      wpi::math::Matrixd<2, 2>{{0.2, 0}, {0, 1.2}}, B)));
 }
 
 TEST(StateSpaceUtilTest, IsDetectable) {
@@ -129,21 +133,21 @@ TEST(StateSpaceUtilTest, IsDetectable) {
 
   // First eigenvalue is unobservable and unstable.
   // Second eigenvalue is observable and stable.
-  EXPECT_FALSE(
-      (wpi::math::IsDetectable<2, 1>(wpi::math::Matrixd<2, 2>{{1.2, 0}, {0, 0.5}}, C)));
+  EXPECT_FALSE((wpi::math::IsDetectable<2, 1>(
+      wpi::math::Matrixd<2, 2>{{1.2, 0}, {0, 0.5}}, C)));
 
   // First eigenvalue is unobservable and marginally stable.
   // Second eigenvalue is observable and stable.
-  EXPECT_FALSE(
-      (wpi::math::IsDetectable<2, 1>(wpi::math::Matrixd<2, 2>{{1, 0}, {0, 0.5}}, C)));
+  EXPECT_FALSE((wpi::math::IsDetectable<2, 1>(
+      wpi::math::Matrixd<2, 2>{{1, 0}, {0, 0.5}}, C)));
 
   // First eigenvalue is unobservable and stable.
   // Second eigenvalue is observable and stable.
-  EXPECT_TRUE(
-      (wpi::math::IsDetectable<2, 1>(wpi::math::Matrixd<2, 2>{{0.2, 0}, {0, 0.5}}, C)));
+  EXPECT_TRUE((wpi::math::IsDetectable<2, 1>(
+      wpi::math::Matrixd<2, 2>{{0.2, 0}, {0, 0.5}}, C)));
 
   // First eigenvalue is unobservable and stable.
   // Second eigenvalue is observable and unstable.
-  EXPECT_TRUE(
-      (wpi::math::IsDetectable<2, 1>(wpi::math::Matrixd<2, 2>{{0.2, 0}, {0, 1.2}}, C)));
+  EXPECT_TRUE((wpi::math::IsDetectable<2, 1>(
+      wpi::math::Matrixd<2, 2>{{0.2, 0}, {0, 1.2}}, C)));
 }

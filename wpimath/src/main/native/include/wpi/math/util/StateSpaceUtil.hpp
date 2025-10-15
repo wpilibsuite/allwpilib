@@ -83,8 +83,9 @@ constexpr Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCovMatrix(Ts... stdDevs) {
     }
   }
 
-  wpi::util::for_each([&](int i, double stdDev) { result(i, i) = stdDev * stdDev; },
-                stdDevs...);
+  wpi::util::for_each(
+      [&](int i, double stdDev) { result(i, i) = stdDev * stdDev; },
+      stdDevs...);
 
   return result;
 }

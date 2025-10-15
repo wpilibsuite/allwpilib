@@ -58,7 +58,7 @@ TEST_F(WebServerIntegrationTest, DISABLED_DigitalOutput) {
       }
       if (IsConnectedClientWS()) {
         wpi::util::print("***** Setting DIO value for pin {} to {}\n", PIN,
-                   (EXPECTED_VALUE ? "true" : "false"));
+                         (EXPECTED_VALUE ? "true" : "false"));
         HALSIM_SetDIOValue(PIN, EXPECTED_VALUE);
         done = true;
       }
@@ -109,8 +109,8 @@ TEST_F(WebServerIntegrationTest, DISABLED_DigitalInput) {
       }
       if (IsConnectedClientWS()) {
         wpi::util::json msg = {{"type", "DIO"},
-                         {"device", std::to_string(PIN)},
-                         {"data", {{"<>value", EXPECTED_VALUE}}}};
+                               {"device", std::to_string(PIN)},
+                               {"data", {{"<>value", EXPECTED_VALUE}}}};
         wpi::util::print("***** Input JSON: {}\n", msg.dump());
         m_webserverClient->SendMessage(msg);
         done = true;

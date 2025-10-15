@@ -6,8 +6,8 @@
 
 #include "wpimath/protobuf/controller.npb.h"
 
-std::optional<wpi::math::DifferentialDriveFeedforward>
-wpi::util::Protobuf<wpi::math::DifferentialDriveFeedforward>::Unpack(InputStream& stream) {
+std::optional<wpi::math::DifferentialDriveFeedforward> wpi::util::Protobuf<
+    wpi::math::DifferentialDriveFeedforward>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufDifferentialDriveFeedforward msg;
   if (!stream.Decode(msg)) {
     return {};
@@ -22,7 +22,8 @@ wpi::util::Protobuf<wpi::math::DifferentialDriveFeedforward>::Unpack(InputStream
 }
 
 bool wpi::util::Protobuf<wpi::math::DifferentialDriveFeedforward>::Pack(
-    OutputStream& stream, const wpi::math::DifferentialDriveFeedforward& value) {
+    OutputStream& stream,
+    const wpi::math::DifferentialDriveFeedforward& value) {
   wpi_proto_ProtobufDifferentialDriveFeedforward msg{
       .kv_linear = value.m_kVLinear.value(),
       .ka_linear = value.m_kALinear.value(),

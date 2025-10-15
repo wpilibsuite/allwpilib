@@ -95,9 +95,9 @@ void HALProvider::Show(ViewEntry* entry, wpi::glass::Window* window) {
 
   // the window might exist and we're just not associated to it yet
   if (!window) {
-    window = GetOrAddWindow(
-        entry->name, true,
-        entry->showDefault ? wpi::glass::Window::kShow : wpi::glass::Window::kHide);
+    window = GetOrAddWindow(entry->name, true,
+                            entry->showDefault ? wpi::glass::Window::kShow
+                                               : wpi::glass::Window::kHide);
   }
   if (!window) {
     return;

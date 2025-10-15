@@ -6,8 +6,8 @@
 
 #include "wpimath/protobuf/kinematics.npb.h"
 
-std::optional<wpi::math::MecanumDriveWheelPositions>
-wpi::util::Protobuf<wpi::math::MecanumDriveWheelPositions>::Unpack(InputStream& stream) {
+std::optional<wpi::math::MecanumDriveWheelPositions> wpi::util::Protobuf<
+    wpi::math::MecanumDriveWheelPositions>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufMecanumDriveWheelPositions msg;
   if (!stream.Decode(msg)) {
     return {};

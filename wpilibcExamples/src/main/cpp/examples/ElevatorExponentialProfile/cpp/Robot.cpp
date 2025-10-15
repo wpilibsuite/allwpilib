@@ -54,10 +54,12 @@ class Robot : public wpi::TimedRobot {
 
   // Create a motion profile with the given maximum velocity and maximum
   // acceleration constraints for the next setpoint.
-  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts> m_profile{
-      {10_V, 1_V / 1_mps, 1_V / 1_mps_sq}};
-  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>::State m_goal;
-  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>::State m_setpoint;
+  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>
+      m_profile{{10_V, 1_V / 1_mps, 1_V / 1_mps_sq}};
+  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>::State
+      m_goal;
+  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>::State
+      m_setpoint;
 };
 
 #ifndef RUNNING_WPILIB_TESTS

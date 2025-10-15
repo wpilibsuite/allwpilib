@@ -228,7 +228,7 @@ void MyHttpConnection::SendFileResponse(int code, std::string_view codeText,
 void MyHttpConnection::ProcessRequest() {
   // fmt::print(stderr, "HTTP request: '{}'\n", m_request.GetUrl());
   wpi::net::UrlParser url{m_request.GetUrl(),
-                     m_request.GetMethod() == wpi::net::HTTP_CONNECT};
+                          m_request.GetMethod() == wpi::net::HTTP_CONNECT};
   if (!url.IsValid()) {
     // failed to parse URL
     SendError(400);
@@ -257,7 +257,8 @@ void MyHttpConnection::ProcessRequest() {
   HttpQueryMap qmap{query};
 
   const bool isGET = m_request.GetMethod() == wpi::net::HTTP_GET;
-  if (isGET && wpi::util::starts_with(path, '/') && !wpi::util::contains(path, "..")) {
+  if (isGET && wpi::util::starts_with(path, '/') &&
+      !wpi::util::contains(path, "..")) {
     fs::path fullpath = fmt::format("{}{}", m_path, path);
     std::error_code ec;
     bool isdir = fs::is_directory(fullpath, ec);
@@ -282,13 +283,13 @@ void MyHttpConnection::ProcessRequest() {
           } else {
             files.emplace_back(
                 wpi::util::json{{"name", std::move(name)},
-                          {"size", subdir ? 0 : entry.file_size(ec)}});
+                                {"size", subdir ? 0 : entry.file_size(ec)}});
           }
         }
-        SendResponse(
-            200, "OK", "text/json",
-            wpi::util::json{{"dirs", std::move(dirs)}, {"files", std::move(files)}}
-                .dump());
+        SendResponse(200, "OK", "text/json",
+                     wpi::util::json{{"dirs", std::move(dirs)},
+                                     {"files", std::move(files)}}
+                         .dump());
       } else if (fs::exists(indexpath)) {
         SendFileResponse(200, "OK", GetMimeType("html"), indexpath,
                          "Content-Disposition: filename=\"index.html\"\r\n");
@@ -333,7 +334,8 @@ void MyHttpConnection::ProcessRequest() {
       os << "Content-Disposition: filename=\"";
       os.write_escaped(fullpath.filename().string());
       os << "\"\r\n";
-      SendFileResponse(200, "OK", GetMimeType(wpi::util::rsplit(path, '.').second),
+      SendFileResponse(200, "OK",
+                       GetMimeType(wpi::util::rsplit(path, '.').second),
                        fullpath, os.str());
     }
   } else {
@@ -366,22 +368,21 @@ void WebServer::Start(unsigned int port, std::string_view path) {
     server->Bind("", port);
 
     // when we get a connection, accept it
-    server->connection.connect(
-        [serverPtr = server.get(), path = std::string{path}] {
-          auto client = serverPtr->Accept();
-          if (!client) {
-            wpi::util::print(stderr, "WebServer: Connecting to client failed\n");
-            return;
-          }
+    server->connection.connect([serverPtr = server.get(),
+                                path = std::string{path}] {
+      auto client = serverPtr->Accept();
+      if (!client) {
+        wpi::util::print(stderr, "WebServer: Connecting to client failed\n");
+        return;
+      }
 
-          // close on error
-          client->error.connect([clientPtr = client.get()](uv::Error err) {
-            clientPtr->Close();
-          });
+      // close on error
+      client->error.connect(
+          [clientPtr = client.get()](uv::Error err) { clientPtr->Close(); });
 
-          auto conn = std::make_shared<MyHttpConnection>(client, path);
-          client->SetData(conn);
-        });
+      auto conn = std::make_shared<MyHttpConnection>(client, path);
+      client->SetData(conn);
+    });
 
     // start listening for incoming connections
     server->Listen();

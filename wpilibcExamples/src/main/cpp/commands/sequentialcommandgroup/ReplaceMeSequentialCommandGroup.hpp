@@ -12,7 +12,7 @@
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 class ReplaceMeSequentialCommandGroup
     : public wpi::cmd::CommandHelper<wpi::cmd::SequentialCommandGroup,
-                                 ReplaceMeSequentialCommandGroup> {
+                                     ReplaceMeSequentialCommandGroup> {
  public:
   ReplaceMeSequentialCommandGroup();
 };

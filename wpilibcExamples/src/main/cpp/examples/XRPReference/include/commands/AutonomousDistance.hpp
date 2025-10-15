@@ -13,7 +13,7 @@
 
 class AutonomousDistance
     : public wpi::cmd::CommandHelper<wpi::cmd::SequentialCommandGroup,
-                                 AutonomousDistance> {
+                                     AutonomousDistance> {
  public:
   /**
    * Creates a new Autonomous Drive based on distance. This will drive out for a

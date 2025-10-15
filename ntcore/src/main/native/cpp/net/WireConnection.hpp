@@ -12,7 +12,7 @@
 
 namespace wpi::util {
 class raw_ostream;
-}  // namespace wpi
+}  // namespace wpi::util
 
 namespace wpi::nt::net {
 

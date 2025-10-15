@@ -46,7 +46,8 @@ void testFollowTrajectory(
   wpi::units::second_t t = 0_s;
 
   std::vector<std::pair<wpi::units::second_t, wpi::math::Pose2d>> visionPoses;
-  std::vector<std::tuple<wpi::units::second_t, wpi::units::second_t, wpi::math::Pose2d>>
+  std::vector<
+      std::tuple<wpi::units::second_t, wpi::units::second_t, wpi::math::Pose2d>>
       visionLog;
 
   double maxError = -std::numeric_limits<double>::max();
@@ -67,9 +68,10 @@ void testFollowTrajectory(
         visionPoses.back().first + kVisionUpdateRate < t) {
       auto visionPose =
           visionMeasurementGenerator(groundTruthState) +
-          wpi::math::Transform2d{wpi::math::Translation2d{distribution(generator) * 0.1_m,
-                                              distribution(generator) * 0.1_m},
-                           wpi::math::Rotation2d{distribution(generator) * 0.05_rad}};
+          wpi::math::Transform2d{
+              wpi::math::Translation2d{distribution(generator) * 0.1_m,
+                                       distribution(generator) * 0.1_m},
+              wpi::math::Rotation2d{distribution(generator) * 0.05_rad}};
       visionPoses.push_back({t, visionPose});
     }
 
@@ -119,7 +121,8 @@ void testFollowTrajectory(
   }
 
   if (debug) {
-    wpi::util::print("apply_time, measured_time, vision_x, vision_y, vision_theta\n");
+    wpi::util::print(
+        "apply_time, measured_time, vision_x, vision_y, vision_theta\n");
 
     wpi::units::second_t apply_time;
     wpi::units::second_t measure_time;
@@ -127,9 +130,9 @@ void testFollowTrajectory(
     for (auto record : visionLog) {
       std::tie(apply_time, measure_time, vision_pose) = record;
       wpi::util::print("{}, {}, {}, {}, {}\n", apply_time.value(),
-                 measure_time.value(), vision_pose.X().value(),
-                 vision_pose.Y().value(),
-                 vision_pose.Rotation().Radians().value());
+                       measure_time.value(), vision_pose.X().value(),
+                       vision_pose.Y().value(),
+                       vision_pose.Rotation().Radians().value());
     }
   }
 
@@ -151,41 +154,53 @@ void testFollowTrajectory(
 TEST(DifferentialDrivePoseEstimatorTest, Accuracy) {
   wpi::math::DifferentialDriveKinematics kinematics{1.0_m};
 
-  wpi::math::DifferentialDrivePoseEstimator estimator{
-      kinematics,         wpi::math::Rotation2d{}, 0_m, 0_m, wpi::math::Pose2d{},
-      {0.02, 0.02, 0.01}, {0.1, 0.1, 0.1}};
+  wpi::math::DifferentialDrivePoseEstimator estimator{kinematics,
+                                                      wpi::math::Rotation2d{},
+                                                      0_m,
+                                                      0_m,
+                                                      wpi::math::Pose2d{},
+                                                      {0.02, 0.02, 0.01},
+                                                      {0.1, 0.1, 0.1}};
 
-  wpi::math::Trajectory trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
-      std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg}, wpi::math::Pose2d{3_m, 0_m, -90_deg},
-                  wpi::math::Pose2d{0_m, 0_m, 135_deg},
-                  wpi::math::Pose2d{-3_m, 0_m, -90_deg},
-                  wpi::math::Pose2d{0_m, 0_m, 45_deg}},
-      wpi::math::TrajectoryConfig(2_mps, 2_mps_sq));
+  wpi::math::Trajectory trajectory =
+      wpi::math::TrajectoryGenerator::GenerateTrajectory(
+          std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
+                      wpi::math::Pose2d{3_m, 0_m, -90_deg},
+                      wpi::math::Pose2d{0_m, 0_m, 135_deg},
+                      wpi::math::Pose2d{-3_m, 0_m, -90_deg},
+                      wpi::math::Pose2d{0_m, 0_m, 45_deg}},
+          wpi::math::TrajectoryConfig(2_mps, 2_mps_sq));
 
   testFollowTrajectory(
       kinematics, estimator, trajectory,
       [&](wpi::math::Trajectory::State& state) {
         return wpi::math::ChassisSpeeds{state.velocity, 0_mps,
-                                  state.velocity * state.curvature};
+                                        state.velocity * state.curvature};
       },
       [&](wpi::math::Trajectory::State& state) { return state.pose; },
-      trajectory.InitialPose(), {0_m, 0_m, wpi::math::Rotation2d{45_deg}}, 20_ms,
-      100_ms, 250_ms, true, false);
+      trajectory.InitialPose(), {0_m, 0_m, wpi::math::Rotation2d{45_deg}},
+      20_ms, 100_ms, 250_ms, true, false);
 }
 
 TEST(DifferentialDrivePoseEstimatorTest, BadInitialPose) {
   wpi::math::DifferentialDriveKinematics kinematics{1.0_m};
 
-  wpi::math::DifferentialDrivePoseEstimator estimator{
-      kinematics,         wpi::math::Rotation2d{}, 0_m, 0_m, wpi::math::Pose2d{},
-      {0.02, 0.02, 0.01}, {0.1, 0.1, 0.1}};
+  wpi::math::DifferentialDrivePoseEstimator estimator{kinematics,
+                                                      wpi::math::Rotation2d{},
+                                                      0_m,
+                                                      0_m,
+                                                      wpi::math::Pose2d{},
+                                                      {0.02, 0.02, 0.01},
+                                                      {0.1, 0.1, 0.1}};
 
-  wpi::math::Trajectory trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
-      std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg}, wpi::math::Pose2d{3_m, 0_m, -90_deg},
-                  wpi::math::Pose2d{0_m, 0_m, 135_deg},
-                  wpi::math::Pose2d{-3_m, 0_m, -90_deg},
-                  wpi::math::Pose2d{0_m, 0_m, 45_deg}},
-      wpi::math::TrajectoryConfig(2_mps, 2_mps_sq));
+  wpi::math::Trajectory trajectory =
+      wpi::math::TrajectoryGenerator::GenerateTrajectory(
+          std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
+                      wpi::math::Pose2d{3_m, 0_m, -90_deg},
+                      wpi::math::Pose2d{0_m, 0_m, 135_deg},
+                      wpi::math::Pose2d{-3_m, 0_m, -90_deg},
+                      wpi::math::Pose2d{0_m, 0_m, 45_deg}},
+          wpi::math::TrajectoryConfig(2_mps, 2_mps_sq));
 
   for (wpi::units::degree_t offset_direction_degs = 0_deg;
        offset_direction_degs < 360_deg; offset_direction_degs += 45_deg) {
@@ -194,21 +209,21 @@ TEST(DifferentialDrivePoseEstimatorTest, BadInitialPose) {
       auto pose_offset = wpi::math::Rotation2d{offset_direction_degs};
       auto heading_offset = wpi::math::Rotation2d{offset_heading_degs};
 
-      auto initial_pose =
-          trajectory.InitialPose() +
-          wpi::math::Transform2d{wpi::math::Translation2d{pose_offset.Cos() * 1_m,
-                                              pose_offset.Sin() * 1_m},
-                           heading_offset};
+      auto initial_pose = trajectory.InitialPose() +
+                          wpi::math::Transform2d{
+                              wpi::math::Translation2d{pose_offset.Cos() * 1_m,
+                                                       pose_offset.Sin() * 1_m},
+                              heading_offset};
 
       testFollowTrajectory(
           kinematics, estimator, trajectory,
           [&](wpi::math::Trajectory::State& state) {
             return wpi::math::ChassisSpeeds{state.velocity, 0_mps,
-                                      state.velocity * state.curvature};
+                                            state.velocity * state.curvature};
           },
           [&](wpi::math::Trajectory::State& state) { return state.pose; },
-          initial_pose, {0_m, 0_m, wpi::math::Rotation2d{45_deg}}, 20_ms, 100_ms,
-          250_ms, false, false);
+          initial_pose, {0_m, 0_m, wpi::math::Rotation2d{45_deg}}, 20_ms,
+          100_ms, 250_ms, false, false);
     }
   }
 }
@@ -285,7 +300,8 @@ TEST(DifferentialDrivePoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
 
   // Apply a vision measurement from 3 seconds ago
   estimator.AddVisionMeasurement(
-      wpi::math::Pose2d{wpi::math::Translation2d{10_m, 10_m}, wpi::math::Rotation2d{0.1_rad}},
+      wpi::math::Pose2d{wpi::math::Translation2d{10_m, 10_m},
+                        wpi::math::Rotation2d{0.1_rad}},
       1_s, {0.1, 0.1, 0.1});
 
   EXPECT_NEAR(odometryPose.X().value(),
@@ -310,16 +326,19 @@ TEST(DifferentialDrivePoseEstimatorTest, TestSampleAt) {
   // Add a tiny tolerance for the upper bound because of floating point rounding
   // error
   for (double time = 1; time <= 2 + 1e-9; time += 0.02) {
-    estimator.UpdateWithTime(wpi::units::second_t{time}, wpi::math::Rotation2d{},
-                             wpi::units::meter_t{time}, wpi::units::meter_t{time});
+    estimator.UpdateWithTime(wpi::units::second_t{time},
+                             wpi::math::Rotation2d{}, wpi::units::meter_t{time},
+                             wpi::units::meter_t{time});
   }
 
   // Sample at an added time
-  EXPECT_EQ(std::optional(wpi::math::Pose2d{1.02_m, 0_m, wpi::math::Rotation2d{}}),
-            estimator.SampleAt(1.02_s));
+  EXPECT_EQ(
+      std::optional(wpi::math::Pose2d{1.02_m, 0_m, wpi::math::Rotation2d{}}),
+      estimator.SampleAt(1.02_s));
   // Sample between updates (test interpolation)
-  EXPECT_EQ(std::optional(wpi::math::Pose2d{1.01_m, 0_m, wpi::math::Rotation2d{}}),
-            estimator.SampleAt(1.01_s));
+  EXPECT_EQ(
+      std::optional(wpi::math::Pose2d{1.01_m, 0_m, wpi::math::Rotation2d{}}),
+      estimator.SampleAt(1.01_s));
   // Sampling before the oldest value returns the oldest value
   EXPECT_EQ(std::optional(wpi::math::Pose2d{1_m, 0_m, wpi::math::Rotation2d{}}),
             estimator.SampleAt(0.5_s));
@@ -329,31 +348,37 @@ TEST(DifferentialDrivePoseEstimatorTest, TestSampleAt) {
 
   // Add a vision measurement after the odometry measurements (while keeping all
   // of the old odometry measurements)
-  estimator.AddVisionMeasurement(wpi::math::Pose2d{2_m, 0_m, wpi::math::Rotation2d{1_rad}},
-                                 2.2_s);
+  estimator.AddVisionMeasurement(
+      wpi::math::Pose2d{2_m, 0_m, wpi::math::Rotation2d{1_rad}}, 2.2_s);
 
   // Make sure nothing changed (except the newest value)
-  EXPECT_EQ(std::optional(wpi::math::Pose2d{1.02_m, 0_m, wpi::math::Rotation2d{}}),
-            estimator.SampleAt(1.02_s));
-  EXPECT_EQ(std::optional(wpi::math::Pose2d{1.01_m, 0_m, wpi::math::Rotation2d{}}),
-            estimator.SampleAt(1.01_s));
+  EXPECT_EQ(
+      std::optional(wpi::math::Pose2d{1.02_m, 0_m, wpi::math::Rotation2d{}}),
+      estimator.SampleAt(1.02_s));
+  EXPECT_EQ(
+      std::optional(wpi::math::Pose2d{1.01_m, 0_m, wpi::math::Rotation2d{}}),
+      estimator.SampleAt(1.01_s));
   EXPECT_EQ(std::optional(wpi::math::Pose2d{1_m, 0_m, wpi::math::Rotation2d{}}),
             estimator.SampleAt(0.5_s));
 
   // Add a vision measurement before the odometry measurements that's still in
   // the buffer
-  estimator.AddVisionMeasurement(wpi::math::Pose2d{1_m, 0.2_m, wpi::math::Rotation2d{}},
-                                 0.9_s);
+  estimator.AddVisionMeasurement(
+      wpi::math::Pose2d{1_m, 0.2_m, wpi::math::Rotation2d{}}, 0.9_s);
 
   // Everything should be the same except Y is 0.1 (halfway between 0 and 0.2)
-  EXPECT_EQ(std::optional(wpi::math::Pose2d{1.02_m, 0.1_m, wpi::math::Rotation2d{}}),
-            estimator.SampleAt(1.02_s));
-  EXPECT_EQ(std::optional(wpi::math::Pose2d{1.01_m, 0.1_m, wpi::math::Rotation2d{}}),
-            estimator.SampleAt(1.01_s));
-  EXPECT_EQ(std::optional(wpi::math::Pose2d{1_m, 0.1_m, wpi::math::Rotation2d{}}),
-            estimator.SampleAt(0.5_s));
-  EXPECT_EQ(std::optional(wpi::math::Pose2d{2_m, 0.1_m, wpi::math::Rotation2d{}}),
-            estimator.SampleAt(2.5_s));
+  EXPECT_EQ(
+      std::optional(wpi::math::Pose2d{1.02_m, 0.1_m, wpi::math::Rotation2d{}}),
+      estimator.SampleAt(1.02_s));
+  EXPECT_EQ(
+      std::optional(wpi::math::Pose2d{1.01_m, 0.1_m, wpi::math::Rotation2d{}}),
+      estimator.SampleAt(1.01_s));
+  EXPECT_EQ(
+      std::optional(wpi::math::Pose2d{1_m, 0.1_m, wpi::math::Rotation2d{}}),
+      estimator.SampleAt(0.5_s));
+  EXPECT_EQ(
+      std::optional(wpi::math::Pose2d{2_m, 0.1_m, wpi::math::Rotation2d{}}),
+      estimator.SampleAt(2.5_s));
 }
 
 TEST(DifferentialDrivePoseEstimatorTest, TestReset) {

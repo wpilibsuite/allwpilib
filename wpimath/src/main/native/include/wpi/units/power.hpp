@@ -38,8 +38,9 @@ namespace wpi::units {
  * @sa See unit_t for more information on unit type containers.
  */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_POWER_UNITS)
-UNIT_ADD_WITH_METRIC_PREFIXES(power, watt, watts, W,
-                              unit<std::ratio<1>, wpi::units::category::power_unit>)
+UNIT_ADD_WITH_METRIC_PREFIXES(
+    power, watt, watts, W,
+    unit<std::ratio<1>, wpi::units::category::power_unit>)
 UNIT_ADD(power, horsepower, horsepower, hp, unit<std::ratio<7457, 10>, watts>)
 UNIT_ADD_DECIBEL(power, watt, dBW)
 UNIT_ADD_DECIBEL(power, milliwatt, dBm)

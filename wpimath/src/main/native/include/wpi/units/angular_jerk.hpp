@@ -20,7 +20,8 @@ namespace wpi::units {
  * @sa See unit_t for more information on unit type containers.
  */
 UNIT_ADD(angular_jerk, radians_per_second_cubed, radians_per_second_cubed,
-         rad_per_s_cu, unit<std::ratio<1>, wpi::units::category::angular_jerk_unit>)
+         rad_per_s_cu,
+         unit<std::ratio<1>, wpi::units::category::angular_jerk_unit>)
 UNIT_ADD(angular_jerk, degrees_per_second_cubed, degrees_per_second_cubed,
          deg_per_s_cu,
          compound_unit<angle::degrees, inverse<cubed<time::seconds>>>)

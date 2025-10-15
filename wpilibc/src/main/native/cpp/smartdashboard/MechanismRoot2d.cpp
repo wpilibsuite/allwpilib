@@ -21,7 +21,8 @@ void MechanismRoot2d::SetPosition(double x, double y) {
   Flush();
 }
 
-void MechanismRoot2d::UpdateEntries(std::shared_ptr<wpi::nt::NetworkTable> table) {
+void MechanismRoot2d::UpdateEntries(
+    std::shared_ptr<wpi::nt::NetworkTable> table) {
   m_xPub = table->GetDoubleTopic("x").Publish();
   m_yPub = table->GetDoubleTopic("y").Publish();
   Flush();

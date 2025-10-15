@@ -19,7 +19,8 @@
 using namespace wpi::glass;
 
 NetworkTablesProvider::NetworkTablesProvider(Storage& storage)
-    : NetworkTablesProvider{storage, wpi::nt::NetworkTableInstance::GetDefault()} {}
+    : NetworkTablesProvider{storage,
+                            wpi::nt::NetworkTableInstance::GetDefault()} {}
 
 NetworkTablesProvider::NetworkTablesProvider(Storage& storage,
                                              wpi::nt::NetworkTableInstance inst)
@@ -69,7 +70,7 @@ void NetworkTablesProvider::DisplayMenu() {
   for (auto&& entry : m_viewEntries) {
     path.clear();
     wpi::util::split(entry->name, '/', -1, false,
-               [&](auto name) { path.emplace_back(name); });
+                     [&](auto name) { path.emplace_back(name); });
 
     bool fullDepth = true;
     int depth = 0;
@@ -119,8 +120,8 @@ void NetworkTablesProvider::Update() {
     if (auto info = event.GetTopicInfo()) {
       // add/remove entries from NT changes
       // look for .type fields
-      if (!wpi::util::ends_with(info->name, "/.type") || info->type != NT_STRING ||
-          info->type_str != "string") {
+      if (!wpi::util::ends_with(info->name, "/.type") ||
+          info->type != NT_STRING || info->type_str != "string") {
         continue;
       }
 
@@ -142,7 +143,8 @@ void NetworkTablesProvider::Update() {
       } else if (event.flags & wpi::nt::EventFlags::kPublish) {
         // subscribe to it; use a subscriber so we only get string values
         SubListener sublistener;
-        sublistener.subscriber = wpi::nt::StringTopic{info->topic}.Subscribe("");
+        sublistener.subscriber =
+            wpi::nt::StringTopic{info->topic}.Subscribe("");
         sublistener.listener = m_poller.AddListener(
             sublistener.subscriber,
             wpi::nt::EventFlags::kValueAll | wpi::nt::EventFlags::kImmediate);

@@ -34,14 +34,14 @@ inline constexpr wpi::units::meter_t kEncoderDistancePerPulse =
 
 namespace shooter {
 
-using kv_unit =
-    wpi::units::compound_unit<wpi::units::compound_unit<wpi::units::volts, wpi::units::seconds>,
-                         wpi::units::inverse<wpi::units::turns>>;
+using kv_unit = wpi::units::compound_unit<
+    wpi::units::compound_unit<wpi::units::volts, wpi::units::seconds>,
+    wpi::units::inverse<wpi::units::turns>>;
 using kv_unit_t = wpi::units::unit_t<kv_unit>;
 
-using ka_unit =
-    wpi::units::compound_unit<wpi::units::volts,
-                         wpi::units::inverse<wpi::units::turns_per_second_squared>>;
+using ka_unit = wpi::units::compound_unit<
+    wpi::units::volts,
+    wpi::units::inverse<wpi::units::turns_per_second_squared>>;
 using ka_unit_t = wpi::units::unit_t<ka_unit>;
 
 inline constexpr std::array<int, 2> kEncoderPorts = {4, 5};

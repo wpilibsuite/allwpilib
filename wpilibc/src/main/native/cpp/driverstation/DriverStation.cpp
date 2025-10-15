@@ -41,10 +41,10 @@ namespace {
 template <typename Topic>
 class MatchDataSenderEntry {
  public:
-  MatchDataSenderEntry(const std::shared_ptr<wpi::nt::NetworkTable>& table,
-                       std::string_view key,
-                       typename Topic::ParamType initialVal,
-                       wpi::util::json topicProperties = wpi::util::json::object())
+  MatchDataSenderEntry(
+      const std::shared_ptr<wpi::nt::NetworkTable>& table, std::string_view key,
+      typename Topic::ParamType initialVal,
+      wpi::util::json topicProperties = wpi::util::json::object())
       : publisher{Topic{table->GetTopic(key)}.PublishEx(Topic::kTypeString,
                                                         topicProperties)},
         prevVal{initialVal} {
@@ -76,13 +76,17 @@ struct MatchDataSender {
   MatchDataSenderEntry<wpi::nt::StringTopic> gameSpecificMessage{
       table, "GameSpecificMessage", ""};
   MatchDataSenderEntry<wpi::nt::StringTopic> eventName{table, "EventName", ""};
-  MatchDataSenderEntry<wpi::nt::IntegerTopic> matchNumber{table, "MatchNumber", 0};
-  MatchDataSenderEntry<wpi::nt::IntegerTopic> replayNumber{table, "ReplayNumber", 0};
+  MatchDataSenderEntry<wpi::nt::IntegerTopic> matchNumber{table, "MatchNumber",
+                                                          0};
+  MatchDataSenderEntry<wpi::nt::IntegerTopic> replayNumber{table,
+                                                           "ReplayNumber", 0};
   MatchDataSenderEntry<wpi::nt::IntegerTopic> matchType{table, "MatchType", 0};
-  MatchDataSenderEntry<wpi::nt::BooleanTopic> alliance{table, "IsRedAlliance", true};
-  MatchDataSenderEntry<wpi::nt::IntegerTopic> station{table, "StationNumber", 1};
-  MatchDataSenderEntry<wpi::nt::IntegerTopic> controlWord{table, "FMSControlData",
-                                                     0};
+  MatchDataSenderEntry<wpi::nt::BooleanTopic> alliance{table, "IsRedAlliance",
+                                                       true};
+  MatchDataSenderEntry<wpi::nt::IntegerTopic> station{table, "StationNumber",
+                                                      1};
+  MatchDataSenderEntry<wpi::nt::IntegerTopic> controlWord{table,
+                                                          "FMSControlData", 0};
 };
 
 class JoystickLogSender {
@@ -582,7 +586,8 @@ bool DriverStation::WaitForDsConnection(wpi::units::second_t timeout) {
   if (timeout == 0_s) {
     result = wpi::util::WaitForObject(event.GetHandle());
   } else {
-    result = wpi::util::WaitForObject(event.GetHandle(), timeout.value(), nullptr);
+    result =
+        wpi::util::WaitForObject(event.GetHandle(), timeout.value(), nullptr);
   }
 
   HAL_RemoveNewDataEventHandle(event.GetHandle());

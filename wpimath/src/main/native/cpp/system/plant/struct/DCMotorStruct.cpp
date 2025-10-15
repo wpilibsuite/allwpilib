@@ -16,16 +16,21 @@ using StructType = wpi::util::Struct<wpi::math::DCMotor>;
 
 wpi::math::DCMotor StructType::Unpack(std::span<const uint8_t> data) {
   return wpi::math::DCMotor{
-      wpi::units::volt_t{wpi::util::UnpackStruct<double, kNominalVoltageOff>(data)},
-      wpi::units::newton_meter_t{wpi::util::UnpackStruct<double, kStallTorqueOff>(data)},
-      wpi::units::ampere_t{wpi::util::UnpackStruct<double, kStallCurrentOff>(data)},
-      wpi::units::ampere_t{wpi::util::UnpackStruct<double, kFreeCurrentOff>(data)},
+      wpi::units::volt_t{
+          wpi::util::UnpackStruct<double, kNominalVoltageOff>(data)},
+      wpi::units::newton_meter_t{
+          wpi::util::UnpackStruct<double, kStallTorqueOff>(data)},
+      wpi::units::ampere_t{
+          wpi::util::UnpackStruct<double, kStallCurrentOff>(data)},
+      wpi::units::ampere_t{
+          wpi::util::UnpackStruct<double, kFreeCurrentOff>(data)},
       wpi::units::radians_per_second_t{
           wpi::util::UnpackStruct<double, kFreeSpeedOff>(data)},
   };
 }
 
-void StructType::Pack(std::span<uint8_t> data, const wpi::math::DCMotor& value) {
+void StructType::Pack(std::span<uint8_t> data,
+                      const wpi::math::DCMotor& value) {
   wpi::util::PackStruct<kNominalVoltageOff>(data, value.nominalVoltage.value());
   wpi::util::PackStruct<kStallTorqueOff>(data, value.stallTorque.value());
   wpi::util::PackStruct<kStallCurrentOff>(data, value.stallCurrent.value());

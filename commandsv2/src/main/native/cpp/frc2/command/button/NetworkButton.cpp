@@ -13,16 +13,18 @@ NetworkButton::NetworkButton(wpi::nt::BooleanTopic topic)
     : NetworkButton(topic.Subscribe(false)) {}
 
 NetworkButton::NetworkButton(wpi::nt::BooleanSubscriber sub)
-    : Trigger([sub = std::make_shared<wpi::nt::BooleanSubscriber>(std::move(sub))] {
-        return sub->GetTopic().GetInstance().IsConnected() && sub->Get();
-      }) {}
+    : Trigger(
+          [sub = std::make_shared<wpi::nt::BooleanSubscriber>(std::move(sub))] {
+            return sub->GetTopic().GetInstance().IsConnected() && sub->Get();
+          }) {}
 
 NetworkButton::NetworkButton(std::shared_ptr<wpi::nt::NetworkTable> table,
                              std::string_view field)
     : NetworkButton(table->GetBooleanTopic(field)) {}
 
 NetworkButton::NetworkButton(std::string_view table, std::string_view field)
-    : NetworkButton(wpi::nt::NetworkTableInstance::GetDefault(), table, field) {}
+    : NetworkButton(wpi::nt::NetworkTableInstance::GetDefault(), table, field) {
+}
 
 NetworkButton::NetworkButton(wpi::nt::NetworkTableInstance inst,
                              std::string_view table, std::string_view field)

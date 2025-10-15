@@ -172,8 +172,8 @@ class StructSubscriber : public Subscriber {
   TopicType GetTopic() const {
     return std::apply(
         [&](const I&... info) {
-          return StructTopic<T, I...>{::wpi::nt::GetTopicFromHandle(m_subHandle),
-                                      info...};
+          return StructTopic<T, I...>{
+              ::wpi::nt::GetTopicFromHandle(m_subHandle), info...};
         },
         m_info);
   }
@@ -294,8 +294,8 @@ class StructPublisher : public Publisher {
   TopicType GetTopic() const {
     return std::apply(
         [&](const I&... info) {
-          return StructTopic<T, I...>{::wpi::nt::GetTopicFromHandle(m_pubHandle),
-                                      info...};
+          return StructTopic<T, I...>{
+              ::wpi::nt::GetTopicFromHandle(m_pubHandle), info...};
         },
         m_info);
   }
@@ -421,9 +421,9 @@ class StructTopic final : public Topic {
     return std::apply(
         [&](const I&... info) {
           return StructSubscriber<T, I...>{
-              ::wpi::nt::Subscribe(m_handle, NT_RAW,
-                              wpi::util::GetStructTypeString<T, I...>(info...),
-                              options),
+              ::wpi::nt::Subscribe(
+                  m_handle, NT_RAW,
+                  wpi::util::GetStructTypeString<T, I...>(info...), options),
               std::move(defaultValue), info...};
         },
         m_info);
@@ -449,9 +449,9 @@ class StructTopic final : public Topic {
     return std::apply(
         [&](const I&... info) {
           return StructPublisher<T, I...>{
-              ::wpi::nt::Publish(m_handle, NT_RAW,
-                            wpi::util::GetStructTypeString<T, I...>(info...),
-                            options),
+              ::wpi::nt::Publish(
+                  m_handle, NT_RAW,
+                  wpi::util::GetStructTypeString<T, I...>(info...), options),
               info...};
         },
         m_info);
@@ -481,9 +481,10 @@ class StructTopic final : public Topic {
     return std::apply(
         [&](const I&... info) {
           return StructPublisher<T, I...>{
-              ::wpi::nt::PublishEx(m_handle, NT_RAW,
-                              wpi::util::GetStructTypeString<T, I...>(info...),
-                              properties, options),
+              ::wpi::nt::PublishEx(
+                  m_handle, NT_RAW,
+                  wpi::util::GetStructTypeString<T, I...>(info...), properties,
+                  options),
               info...};
         },
         m_info);
@@ -515,9 +516,9 @@ class StructTopic final : public Topic {
     return std::apply(
         [&](const I&... info) {
           return StructEntry<T, I...>{
-              ::wpi::nt::GetEntry(m_handle, NT_RAW,
-                             wpi::util::GetStructTypeString<T, I...>(info...),
-                             options),
+              ::wpi::nt::GetEntry(
+                  m_handle, NT_RAW,
+                  wpi::util::GetStructTypeString<T, I...>(info...), options),
               std::move(defaultValue), info...};
         },
         m_info);

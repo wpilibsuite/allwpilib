@@ -44,8 +44,8 @@ class Robot : public wpi::TimedRobot {
   // Inputs (what we can "put in"): [voltage], in volts.
   // Outputs (what we can measure): [position], in meters.
   wpi::math::LinearSystem<2, 1, 1> m_elevatorPlant =
-      wpi::math::LinearSystemId::ElevatorSystem(wpi::math::DCMotor::NEO(2), kCarriageMass,
-                                          kDrumRadius, kGearRatio)
+      wpi::math::LinearSystemId::ElevatorSystem(
+          wpi::math::DCMotor::NEO(2), kCarriageMass, kDrumRadius, kGearRatio)
           .Slice(0);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
@@ -79,7 +79,7 @@ class Robot : public wpi::TimedRobot {
   // The state-space loop combines a controller, observer, feedforward and plant
   // for easy control.
   wpi::math::LinearSystemLoop<2, 1, 1> m_loop{m_elevatorPlant, m_controller,
-                                        m_observer, 12_V, 20_ms};
+                                              m_observer, 12_V, 20_ms};
 
   // An encoder set up to measure elevator height in meters.
   wpi::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
@@ -89,7 +89,8 @@ class Robot : public wpi::TimedRobot {
 
   wpi::math::TrapezoidProfile<wpi::units::meters> m_profile{{3_fps, 6_fps_sq}};
 
-  wpi::math::TrapezoidProfile<wpi::units::meters>::State m_lastProfiledReference;
+  wpi::math::TrapezoidProfile<wpi::units::meters>::State
+      m_lastProfiledReference;
 
  public:
   Robot() {
@@ -100,10 +101,12 @@ class Robot : public wpi::TimedRobot {
 
   void TeleopInit() override {
     // Reset our loop to make sure it's in a known state.
-    m_loop.Reset(wpi::math::Vectord<2>{m_encoder.GetDistance(), m_encoder.GetRate()});
+    m_loop.Reset(
+        wpi::math::Vectord<2>{m_encoder.GetDistance(), m_encoder.GetRate()});
 
-    m_lastProfiledReference = {wpi::units::meter_t{m_encoder.GetDistance()},
-                               wpi::units::meters_per_second_t{m_encoder.GetRate()}};
+    m_lastProfiledReference = {
+        wpi::units::meter_t{m_encoder.GetDistance()},
+        wpi::units::meters_per_second_t{m_encoder.GetRate()}};
   }
 
   void TeleopPeriodic() override {
@@ -120,8 +123,9 @@ class Robot : public wpi::TimedRobot {
     m_lastProfiledReference =
         m_profile.Calculate(20_ms, m_lastProfiledReference, goal);
 
-    m_loop.SetNextR(wpi::math::Vectord<2>{m_lastProfiledReference.position.value(),
-                                    m_lastProfiledReference.velocity.value()});
+    m_loop.SetNextR(
+        wpi::math::Vectord<2>{m_lastProfiledReference.position.value(),
+                              m_lastProfiledReference.velocity.value()});
 
     // Correct our Kalman filter's state vector estimate with encoder data.
     m_loop.Correct(wpi::math::Vectord<1>{m_encoder.GetDistance()});

@@ -62,7 +62,8 @@ class KalmanFilterLatencyCompensator {
    * @param timestamp The timestamp of the state.
    */
   void AddObserverState(const KalmanFilterType& observer, Vectord<Inputs> u,
-                        Vectord<Outputs> localY, wpi::units::second_t timestamp) {
+                        Vectord<Outputs> localY,
+                        wpi::units::second_t timestamp) {
     // Add the new state into the vector.
     m_pastObserverSnapshots.emplace_back(timestamp,
                                          ObserverSnapshot{observer, u, localY});
@@ -86,7 +87,8 @@ class KalmanFilterLatencyCompensator {
    */
   template <int Rows>
   void ApplyPastGlobalMeasurement(
-      KalmanFilterType* observer, wpi::units::second_t nominalDt, Vectord<Rows> y,
+      KalmanFilterType* observer, wpi::units::second_t nominalDt,
+      Vectord<Rows> y,
       std::function<void(const Vectord<Inputs>& u, const Vectord<Rows>& y)>
           globalMeasurementCorrect,
       wpi::units::second_t timestamp) {
@@ -130,10 +132,10 @@ class KalmanFilterLatencyCompensator {
       int prevIdx = nextIdx - 1;
 
       // Find the snapshot closest in time to global measurement
-      wpi::units::second_t prevTimeDiff =
-          wpi::units::math::abs(timestamp - m_pastObserverSnapshots[prevIdx].first);
-      wpi::units::second_t nextTimeDiff =
-          wpi::units::math::abs(timestamp - m_pastObserverSnapshots[nextIdx].first);
+      wpi::units::second_t prevTimeDiff = wpi::units::math::abs(
+          timestamp - m_pastObserverSnapshots[prevIdx].first);
+      wpi::units::second_t nextTimeDiff = wpi::units::math::abs(
+          timestamp - m_pastObserverSnapshots[nextIdx].first);
       indexOfClosestEntry = prevTimeDiff < nextTimeDiff ? prevIdx : nextIdx;
     }
 

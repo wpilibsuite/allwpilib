@@ -61,7 +61,8 @@ class WPILIB_DLLEXPORT Translation2d {
    * @param vector The translation vector.
    */
   constexpr explicit Translation2d(const Eigen::Vector2d& vector)
-      : m_x{wpi::units::meter_t{vector.x()}}, m_y{wpi::units::meter_t{vector.y()}} {}
+      : m_x{wpi::units::meter_t{vector.x()}},
+        m_y{wpi::units::meter_t{vector.y()}} {}
 
   /**
    * Calculates the distance between two translations in 2D space.
@@ -121,7 +122,9 @@ class WPILIB_DLLEXPORT Translation2d {
    *
    * @return The norm of the translation.
    */
-  constexpr wpi::units::meter_t Norm() const { return wpi::units::math::hypot(m_x, m_y); }
+  constexpr wpi::units::meter_t Norm() const {
+    return wpi::units::math::hypot(m_x, m_y);
+  }
 
   /**
    * Returns the squared norm, or squared distance from the origin to the

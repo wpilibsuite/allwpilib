@@ -34,8 +34,8 @@ class Robot : public wpi::TimedRobot {
 
     // Run controller and update motor output
     m_motor.SetVoltage(
-        wpi::units::volt_t{
-            m_controller.Calculate(wpi::units::meter_t{m_encoder.GetDistance()})} +
+        wpi::units::volt_t{m_controller.Calculate(
+            wpi::units::meter_t{m_encoder.GetDistance()})} +
         m_feedforward.Calculate(m_controller.GetSetpoint().velocity));
   }
 
@@ -58,8 +58,8 @@ class Robot : public wpi::TimedRobot {
   // velocity and acceleration constraints.
   wpi::math::TrapezoidProfile<wpi::units::meters>::Constraints m_constraints{
       kMaxVelocity, kMaxAcceleration};
-  wpi::math::ProfiledPIDController<wpi::units::meters> m_controller{kP, kI, kD,
-                                                         m_constraints, kDt};
+  wpi::math::ProfiledPIDController<wpi::units::meters> m_controller{
+      kP, kI, kD, m_constraints, kDt};
   wpi::math::ElevatorFeedforward m_feedforward{kS, kG, kV};
 };
 

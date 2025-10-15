@@ -39,7 +39,8 @@ TEST(MulticastServiceAnnouncerTest, SingleText) {
   const int port = std::rand();
   std::array<std::pair<std::string, std::string>, 1> txt = {
       std::pair{"hello", "world"}};
-  wpi::net::MulticastServiceAnnouncer announcer(serviceName, serviceType, port, txt);
+  wpi::net::MulticastServiceAnnouncer announcer(serviceName, serviceType, port,
+                                                txt);
   wpi::net::MulticastServiceResolver resolver(serviceType);
 
   if (announcer.HasImplementation() && resolver.HasImplementation()) {

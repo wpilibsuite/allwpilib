@@ -10,7 +10,8 @@
 
 #include "subsystems/Drivetrain.hpp"
 
-class DriveDistance : public wpi::cmd::CommandHelper<wpi::cmd::Command, DriveDistance> {
+class DriveDistance
+    : public wpi::cmd::CommandHelper<wpi::cmd::Command, DriveDistance> {
  public:
   /**
    * Creates a new DriveDistance. This command will drive your your robot for a

@@ -475,7 +475,8 @@ Java_org_wpilib_vision_camera_CameraServerJNI_createUsbCameraDev
     return 0;
   }
   CS_Status status = 0;
-  auto val = wpi::cs::CreateUsbCameraDev(JStringRef{env, name}.str(), dev, &status);
+  auto val =
+      wpi::cs::CreateUsbCameraDev(JStringRef{env, name}.str(), dev, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -499,7 +500,7 @@ Java_org_wpilib_vision_camera_CameraServerJNI_createUsbCameraPath
   }
   CS_Status status = 0;
   auto val = wpi::cs::CreateUsbCameraPath(JStringRef{env, name}.str(),
-                                     JStringRef{env, path}.str(), &status);
+                                          JStringRef{env, path}.str(), &status);
   CheckStatus(env, status);
   return val;
 }
@@ -561,7 +562,7 @@ Java_org_wpilib_vision_camera_CameraServerJNI_createHttpCameraMulti
   CS_Status status = 0;
   auto val =
       wpi::cs::CreateHttpCamera(JStringRef{env, name}.str(), vec,
-                           static_cast<CS_HttpCameraKind>(kind), &status);
+                                static_cast<CS_HttpCameraKind>(kind), &status);
   CheckStatus(env, status);
   return val;
 }
@@ -583,9 +584,10 @@ Java_org_wpilib_vision_camera_CameraServerJNI_createRawSource
   CS_Status status = 0;
   auto val = wpi::cs::CreateRawSource(
       JStringRef{env, name}.str(), isCv,
-      wpi::cs::VideoMode{static_cast<wpi::cs::VideoMode::PixelFormat>(pixelFormat),
-                    static_cast<int>(width), static_cast<int>(height),
-                    static_cast<int>(fps)},
+      wpi::cs::VideoMode{
+          static_cast<wpi::cs::VideoMode::PixelFormat>(pixelFormat),
+          static_cast<int>(width), static_cast<int>(height),
+          static_cast<int>(fps)},
       &status);
   CheckStatus(env, status);
   return val;
@@ -770,8 +772,9 @@ Java_org_wpilib_vision_camera_CameraServerJNI_setSourceVideoMode
   CS_Status status = 0;
   auto val = wpi::cs::SetSourceVideoMode(
       source,
-      wpi::cs::VideoMode(static_cast<wpi::cs::VideoMode::PixelFormat>(pixelFormat), width,
-                    height, fps),
+      wpi::cs::VideoMode(
+          static_cast<wpi::cs::VideoMode::PixelFormat>(pixelFormat), width,
+          height, fps),
       &status);
   CheckStatus(env, status);
   return val;
@@ -788,7 +791,8 @@ Java_org_wpilib_vision_camera_CameraServerJNI_setSourcePixelFormat
 {
   CS_Status status = 0;
   auto val = wpi::cs::SetSourcePixelFormat(
-      source, static_cast<wpi::cs::VideoMode::PixelFormat>(pixelFormat), &status);
+      source, static_cast<wpi::cs::VideoMode::PixelFormat>(pixelFormat),
+      &status);
   CheckStatus(env, status);
   return val;
 }
@@ -833,7 +837,8 @@ Java_org_wpilib_vision_camera_CameraServerJNI_setSourceConfigJson
   (JNIEnv* env, jclass, jint source, jstring config)
 {
   CS_Status status = 0;
-  auto val = wpi::cs::SetSourceConfigJson(source, JStringRef{env, config}, &status);
+  auto val =
+      wpi::cs::SetSourceConfigJson(source, JStringRef{env, config}, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -1271,7 +1276,8 @@ Java_org_wpilib_vision_camera_CameraServerJNI_setSourceDescription
     return;
   }
   CS_Status status = 0;
-  wpi::cs::SetSourceDescription(source, JStringRef{env, description}.str(), &status);
+  wpi::cs::SetSourceDescription(source, JStringRef{env, description}.str(),
+                                &status);
   CheckStatus(env, status);
 }
 
@@ -1342,8 +1348,8 @@ Java_org_wpilib_vision_camera_CameraServerJNI_createMjpegServer
   }
   CS_Status status = 0;
   auto val = wpi::cs::CreateMjpegServer(JStringRef{env, name}.str(),
-                                   JStringRef{env, listenAddress}.str(), port,
-                                   &status);
+                                        JStringRef{env, listenAddress}.str(),
+                                        port, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -1432,7 +1438,8 @@ Java_org_wpilib_vision_camera_CameraServerJNI_getSinkProperty
     return 0;
   }
   CS_Status status = 0;
-  auto val = wpi::cs::GetSinkProperty(sink, JStringRef{env, name}.str(), &status);
+  auto val =
+      wpi::cs::GetSinkProperty(sink, JStringRef{env, name}.str(), &status);
   CheckStatus(env, status);
   return val;
 }
@@ -1465,7 +1472,8 @@ Java_org_wpilib_vision_camera_CameraServerJNI_setSinkConfigJson
   (JNIEnv* env, jclass, jint source, jstring config)
 {
   CS_Status status = 0;
-  auto val = wpi::cs::SetSinkConfigJson(source, JStringRef{env, config}, &status);
+  auto val =
+      wpi::cs::SetSinkConfigJson(source, JStringRef{env, config}, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -1513,8 +1521,8 @@ Java_org_wpilib_vision_camera_CameraServerJNI_getSinkSourceProperty
     return 0;
   }
   CS_Status status = 0;
-  auto val =
-      wpi::cs::GetSinkSourceProperty(sink, JStringRef{env, name}.str(), &status);
+  auto val = wpi::cs::GetSinkSourceProperty(sink, JStringRef{env, name}.str(),
+                                            &status);
   CheckStatus(env, status);
   return val;
 }
@@ -1609,7 +1617,8 @@ Java_org_wpilib_vision_camera_CameraServerJNI_setSinkDescription
     return;
   }
   CS_Status status = 0;
-  wpi::cs::SetSinkDescription(sink, JStringRef{env, description}.str(), &status);
+  wpi::cs::SetSinkDescription(sink, JStringRef{env, description}.str(),
+                              &status);
   CheckStatus(env, status);
 }
 
@@ -1630,7 +1639,7 @@ Java_org_wpilib_vision_camera_CameraServerJNI_grabRawSinkFrame
     return 0;
   }
   wpi::util::SetFrameData(env, rawFrameCls, frameObj, *frame,
-                    origData != frame->data);
+                          origData != frame->data);
   return rv;
 }
 
@@ -1648,12 +1657,12 @@ Java_org_wpilib_vision_camera_CameraServerJNI_grabRawSinkFrameTimeout
   auto origData = frame->data;
   CS_Status status = 0;
   auto rv = wpi::cs::GrabSinkFrameTimeout(static_cast<CS_Sink>(sink), *frame,
-                                     timeout, &status);
+                                          timeout, &status);
   if (!CheckStatus(env, status)) {
     return 0;
   }
   wpi::util::SetFrameData(env, rawFrameCls, frameObj, *frame,
-                    origData != frame->data);
+                          origData != frame->data);
   return rv;
 }
 
@@ -1801,7 +1810,8 @@ Java_org_wpilib_vision_camera_CameraServerJNI_addPolledListener
   (JNIEnv* env, jclass, jint poller, jint eventMask, jboolean immediateNotify)
 {
   CS_Status status = 0;
-  auto rv = wpi::cs::AddPolledListener(poller, eventMask, immediateNotify, &status);
+  auto rv =
+      wpi::cs::AddPolledListener(poller, eventMask, immediateNotify, &status);
   CheckStatus(env, status);
   return rv;
 }
@@ -1887,8 +1897,8 @@ Java_org_wpilib_vision_camera_CameraServerJNI_getTelemetryValue
   (JNIEnv* env, jclass, jint handle, jint kind)
 {
   CS_Status status = 0;
-  auto val = wpi::cs::GetTelemetryValue(handle, static_cast<CS_TelemetryKind>(kind),
-                                   &status);
+  auto val = wpi::cs::GetTelemetryValue(
+      handle, static_cast<CS_TelemetryKind>(kind), &status);
   CheckStatus(env, status);
   return val;
 }

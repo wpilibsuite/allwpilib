@@ -14,7 +14,8 @@ int main() {
   mjpegServer.SetSource(camera);
   wpi::cs::CvSink cvsink{"cvsink"};
   cvsink.SetSource(camera);
-  wpi::cs::CvSource cvsource{"cvsource", wpi::cs::VideoMode::kMJPEG, 320, 240, 30};
+  wpi::cs::CvSource cvsource{"cvsource", wpi::cs::VideoMode::kMJPEG, 320, 240,
+                             30};
   wpi::cs::MjpegServer cvMjpegServer{"cvhttpserver", 8082};
   cvMjpegServer.SetSource(cvsource);
 
@@ -26,8 +27,8 @@ int main() {
       wpi::util::print("error: {}\n", cvsink.GetError());
       continue;
     }
-    wpi::util::print("got frame at time {} size ({}, {})\n", time, test.size().width,
-               test.size().height);
+    wpi::util::print("got frame at time {} size ({}, {})\n", time,
+                     test.size().width, test.size().height);
     cv::flip(test, flip, 0);
     cvsource.PutFrame(flip);
   }

@@ -34,9 +34,11 @@ static float DisplayChannel(PowerDistributionModel& pdp, int channel) {
   return width;
 }
 
-void wpi::glass::DisplayPowerDistribution(PowerDistributionModel* model, int index) {
+void wpi::glass::DisplayPowerDistribution(PowerDistributionModel* model,
+                                          int index) {
   char name[128];
-  wpi::util::format_to_n_c_str(name, sizeof(name), "PowerDistribution[{}]", index);
+  wpi::util::format_to_n_c_str(name, sizeof(name), "PowerDistribution[{}]",
+                               index);
 
   if (CollapsingHeader(name)) {
     // temperature
@@ -81,7 +83,7 @@ void wpi::glass::DisplayPowerDistribution(PowerDistributionModel* model, int ind
 }
 
 void wpi::glass::DisplayPowerDistributions(PowerDistributionsModel* model,
-                                      std::string_view noneMsg) {
+                                           std::string_view noneMsg) {
   bool hasAny = false;
   model->ForEachPowerDistribution([&](PowerDistributionModel& pdp, int i) {
     hasAny = true;

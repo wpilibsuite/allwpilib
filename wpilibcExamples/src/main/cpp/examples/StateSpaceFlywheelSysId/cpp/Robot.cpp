@@ -42,8 +42,8 @@ class Robot : public wpi::TimedRobot {
   //
   // The Kv and Ka constants are found using the FRC Characterization toolsuite.
   wpi::math::LinearSystem<1, 1, 1> m_flywheelPlant =
-      wpi::math::LinearSystemId::IdentifyVelocitySystem<wpi::units::radian>(kFlywheelKv,
-                                                                 kFlywheelKa);
+      wpi::math::LinearSystemId::IdentifyVelocitySystem<wpi::units::radian>(
+          kFlywheelKv, kFlywheelKa);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   wpi::math::KalmanFilter<1, 1, 1> m_observer{
@@ -71,7 +71,7 @@ class Robot : public wpi::TimedRobot {
   // The state-space loop combines a controller, observer, feedforward and plant
   // for easy control.
   wpi::math::LinearSystemLoop<1, 1, 1> m_loop{m_flywheelPlant, m_controller,
-                                        m_observer, 12_V, 20_ms};
+                                              m_observer, 12_V, 20_ms};
 
   // An encoder set up to measure flywheel velocity in radians per second.
   wpi::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
