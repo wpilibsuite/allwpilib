@@ -34,7 +34,7 @@ generate_resources(
     src/main/native/resources/org/wpilib/fields
     ${CMAKE_CURRENT_BINARY_DIR}/generated/main/cpp
     FIELDS
-    fields
+    wpi::fields
     field_images_resources_src
 )
 

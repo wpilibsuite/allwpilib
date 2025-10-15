@@ -12,7 +12,7 @@ ext {
         apriltagTest: []]
     staticCvConfigs = []
 
-    def generateTask = createGenerateResourcesTask('main', 'APRILTAG', 'frc', project)
+    def generateTask = createGenerateResourcesTask('main', 'APRILTAG', 'wpi::apriltag', project)
 
     tasks.withType(CppCompile) {
         dependsOn generateTask
