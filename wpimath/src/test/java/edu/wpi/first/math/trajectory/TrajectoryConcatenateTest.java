@@ -11,6 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.List;
+
+import edu.wpi.first.units.measure.Time;
 import org.junit.jupiter.api.Test;
 
 class TrajectoryConcatenateTest {
@@ -32,6 +34,8 @@ class TrajectoryConcatenateTest {
 
     var t = t1.concatenate(t2);
 
+    Time t1Duration = t1.duration;
+
     double time = -1.0;
     for (int i = 0; i < t.samples.length; ++i) {
       var state = t.samples[i];
@@ -48,8 +52,7 @@ class TrajectoryConcatenateTest {
         var originalIndex = i - t1.samples.length;
         if (originalIndex < t2.samples.length) {
           var st = t2.samples[originalIndex];
-          // The concatenate method should handle timestamp adjustment automatically
-          // We just verify the pose, velocity, and acceleration are preserved
+          assertEquals(state.timestamp, st.timestamp.plus(t1Duration));
           assertEquals(state.pose, st.pose);
           assertEquals(state.velocity, st.velocity);
           assertEquals(state.acceleration, st.acceleration);
