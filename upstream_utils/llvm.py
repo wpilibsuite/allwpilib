@@ -13,8 +13,8 @@ def run_global_replacements(wpiutil_llvm_files: list[Path]):
             content = f.read()
 
         # Rename namespace from llvm to wpi
-        content = content.replace("namespace llvm", "namespace wpi")
-        content = content.replace("llvm:", "wpi:")
+        content = content.replace("namespace llvm", "namespace wpi::util")
+        content = content.replace("llvm:", "wpi::util:")
 
         # Fix #includes
         content = content.replace('include "llvm/ADT', 'include "wpi/util')
@@ -83,10 +83,10 @@ def run_global_replacements(wpiutil_llvm_files: list[Path]):
         content = content.replace("llvm_is_multithreaded()", "1")
 
         # Revert message in copyright header
-        content = content.replace("/// Defines the wpi::", "/// Defines the llvm::")
-        content = content.replace("// end llvm namespace", "// end wpi namespace")
-        content = content.replace("// end namespace llvm", "// end namespace wpi")
-        content = content.replace("// End llvm namespace", "// End wpi namespace")
+        content = content.replace("/// Defines the wpi::util::", "/// Defines the llvm::")
+        content = content.replace("// end llvm namespace", "// end wpi::util namespace")
+        content = content.replace("// end namespace llvm", "// end namespace wpi::util")
+        content = content.replace("// End llvm namespace", "// End wpi::util namespace")
 
         content = content.replace("fs::openFileForRead", "fs::OpenFileForRead")
 
