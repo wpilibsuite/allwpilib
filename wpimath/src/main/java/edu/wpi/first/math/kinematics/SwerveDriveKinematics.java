@@ -448,9 +448,6 @@ public class SwerveDriveKinematics
    * argument is defaulted to that use case. However, if you wish to change the center of rotation
    * for evasive maneuvers, vision alignment, or for any other use case, you can do so.
    *
-   * <p>A derivation for the second-order kinematics can be found
-   * <a href="https://www.chiefdelphi.com/uploads/short-url/qzj4k2LyBs7rLxAem0YajNIlStH.pdf">here</a>.
-   *
    * @param chassisAccelerations The desired chassis accelerations.
    * @param angularVelocity The desired robot angular velocity.
    * @param centerOfRotation The center of rotation. For example, if you set the center of rotation
@@ -462,6 +459,10 @@ public class SwerveDriveKinematics
       ChassisAccelerations chassisAccelerations,
       double angularVelocity,
       Translation2d centerOfRotation) {
+    // Derivation for second-order kinematics from "Swerve Drive Second Order Kinematics"
+    // by FRC Team 449 - The Blair Robot Project, Rafi Pedersen
+    // https://www.chiefdelphi.com/uploads/short-url/qzj4k2LyBs7rLxAem0YajNIlStH.pdf
+
     var moduleAccelerations = new SwerveModuleAccelerations[m_numModules];
 
     if (chassisAccelerations.ax == 0.0
@@ -528,9 +529,6 @@ public class SwerveDriveKinematics
    * acceleration on the field using data from the real-world acceleration of each module on the
    * robot.
    *
-   * <p>A derivation for the second-order kinematics can be found
-   * <a href="https://www.chiefdelphi.com/uploads/short-url/qzj4k2LyBs7rLxAem0YajNIlStH.pdf">here</a>.
-   *
    * @param moduleAccelerations The accelerations of the modules as measured from respective
    *     encoders and gyros. The order of the swerve module accelerations should be same as passed
    *     into the constructor of this class.
@@ -539,6 +537,10 @@ public class SwerveDriveKinematics
   @Override
   public ChassisAccelerations toChassisAccelerations(
       SwerveModuleAccelerations... moduleAccelerations) {
+    // Derivation for second-order kinematics from "Swerve Drive Second Order Kinematics"
+    // by FRC Team 449 - The Blair Robot Project, Rafi Pedersen
+    // https://www.chiefdelphi.com/uploads/short-url/qzj4k2LyBs7rLxAem0YajNIlStH.pdf
+
     if (moduleAccelerations.length != m_numModules) {
       throw new IllegalArgumentException(
           "Number of modules is not consistent with number of module locations provided in "

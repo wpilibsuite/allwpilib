@@ -461,9 +461,6 @@ class SwerveDriveKinematics
    * However, if you wish to change the center of rotation for evasive
    * maneuvers, vision alignment, or for any other use case, you can do so.
    *
-   * <p>A derivation for the second-order kinematics can be found
-   * <a href="https://www.chiefdelphi.com/uploads/short-url/qzj4k2LyBs7rLxAem0YajNIlStH.pdf">here</a>.
-   *
    * @param chassisAccelerations The desired chassis accelerations.
    * @param angularVelocity The desired robot angular velocity.
    * @param centerOfRotation The center of rotation. For example, if you set the
@@ -476,6 +473,10 @@ class SwerveDriveKinematics
       const ChassisAccelerations& chassisAccelerations,
       const units::radians_per_second_t angularVelocity = 0.0_rad_per_s,
       const Translation2d& centerOfRotation = Translation2d{}) const {
+    // Derivation for second-order kinematics from "Swerve Drive Second Order Kinematics"
+    // by FRC Team 449 - The Blair Robot Project, Rafi Pedersen
+    // https://www.chiefdelphi.com/uploads/short-url/qzj4k2LyBs7rLxAem0YajNIlStH.pdf
+
     wpi::array<SwerveModuleAccelerations, NumModules> moduleAccelerations(
         wpi::empty_array);
 
@@ -559,9 +560,6 @@ class SwerveDriveKinematics
    * calculations -- determining the robot's acceleration on the field using
    * data from the real-world acceleration of each module on the robot.
    *
-   * <p>A derivation for the second-order kinematics can be found
-   * <a href="https://www.chiefdelphi.com/uploads/short-url/qzj4k2LyBs7rLxAem0YajNIlStH.pdf">here</a>.
-   *
    * @param moduleAccelerations The accelerations of the modules as measured
    * from respective encoders and gyros. The order of the swerve module
    * accelerations should be same as passed into the constructor of this class.
@@ -570,6 +568,10 @@ class SwerveDriveKinematics
   ChassisAccelerations ToChassisAccelerations(
       const wpi::array<SwerveModuleAccelerations, NumModules>&
           moduleAccelerations) const override {
+    // Derivation for second-order kinematics from "Swerve Drive Second Order Kinematics"
+    // by FRC Team 449 - The Blair Robot Project, Rafi Pedersen
+    // https://www.chiefdelphi.com/uploads/short-url/qzj4k2LyBs7rLxAem0YajNIlStH.pdf
+
     Matrixd<NumModules * 2, 1> moduleAccelerationsMatrix;
 
     for (size_t i = 0; i < NumModules; i++) {
