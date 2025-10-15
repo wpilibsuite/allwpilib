@@ -10,9 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import java.util.List;
-
 import edu.wpi.first.units.measure.Time;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class TrajectoryConcatenateTest {
