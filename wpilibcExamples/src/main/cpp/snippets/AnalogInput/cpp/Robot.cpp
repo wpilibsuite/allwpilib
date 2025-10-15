@@ -47,7 +47,7 @@ class Robot : public wpi::TimedRobot {
   wpi::AnalogInput m_analog{0};
 };
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
   return wpi::StartRobot<Robot>();
 }

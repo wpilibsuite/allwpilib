@@ -23,7 +23,7 @@ CAN::CAN(int busId, int deviceId, int deviceManufacturer, int deviceType) {
   m_handle = HAL_InitializeCAN(
       busId, static_cast<HAL_CANManufacturer>(deviceManufacturer), deviceId,
       static_cast<HAL_CANDeviceType>(deviceType), &status);
-  FRC_CheckErrorStatus(status, "device id {} mfg {} type {}", deviceId,
+  WPILIB_CheckErrorStatus(status, "device id {} mfg {} type {}", deviceId,
                        deviceManufacturer, deviceType);
 
   HAL_ReportUsage(
@@ -34,20 +34,20 @@ CAN::CAN(int busId, int deviceId, int deviceManufacturer, int deviceType) {
 void CAN::WritePacket(int apiId, const HAL_CANMessage& message) {
   int32_t status = 0;
   HAL_WriteCANPacket(m_handle, apiId, &message, &status);
-  FRC_CheckErrorStatus(status, "WritePacket");
+  WPILIB_CheckErrorStatus(status, "WritePacket");
 }
 
 void CAN::WritePacketRepeating(int apiId, const HAL_CANMessage& message,
                                int repeatMs) {
   int32_t status = 0;
   HAL_WriteCANPacketRepeating(m_handle, apiId, &message, repeatMs, &status);
-  FRC_CheckErrorStatus(status, "WritePacketRepeating");
+  WPILIB_CheckErrorStatus(status, "WritePacketRepeating");
 }
 
 void CAN::WriteRTRFrame(int apiId, const HAL_CANMessage& message) {
   int32_t status = 0;
   HAL_WriteCANRTRFrame(m_handle, apiId, &message, &status);
-  FRC_CheckErrorStatus(status, "WriteRTRFrame");
+  WPILIB_CheckErrorStatus(status, "WriteRTRFrame");
 }
 
 int CAN::WritePacketNoError(int apiId, const HAL_CANMessage& message) {
@@ -72,7 +72,7 @@ int CAN::WriteRTRFrameNoError(int apiId, const HAL_CANMessage& message) {
 void CAN::StopPacketRepeating(int apiId) {
   int32_t status = 0;
   HAL_StopCANPacketRepeating(m_handle, apiId, &status);
-  FRC_CheckErrorStatus(status, "StopPacketRepeating");
+  WPILIB_CheckErrorStatus(status, "StopPacketRepeating");
 }
 
 bool CAN::ReadPacketNew(int apiId, HAL_CANReceiveMessage* data) {
@@ -82,7 +82,7 @@ bool CAN::ReadPacketNew(int apiId, HAL_CANReceiveMessage* data) {
     return false;
   }
   if (status != 0) {
-    FRC_CheckErrorStatus(status, "ReadPacketNew");
+    WPILIB_CheckErrorStatus(status, "ReadPacketNew");
     return false;
   } else {
     return true;
@@ -96,7 +96,7 @@ bool CAN::ReadPacketLatest(int apiId, HAL_CANReceiveMessage* data) {
     return false;
   }
   if (status != 0) {
-    FRC_CheckErrorStatus(status, "ReadPacketLatest");
+    WPILIB_CheckErrorStatus(status, "ReadPacketLatest");
     return false;
   } else {
     return true;
@@ -112,7 +112,7 @@ bool CAN::ReadPacketTimeout(int apiId, int timeoutMs,
     return false;
   }
   if (status != 0) {
-    FRC_CheckErrorStatus(status, "ReadPacketTimeout");
+    WPILIB_CheckErrorStatus(status, "ReadPacketTimeout");
     return false;
   } else {
     return true;

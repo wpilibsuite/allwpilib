@@ -31,7 +31,7 @@ class Robot : public wpi::TimedRobot {
       wpi::math::LinearFilter<wpi::units::meters_per_second_squared_t>::MovingAverage(10);
 };
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
   return wpi::StartRobot<Robot>();
 }

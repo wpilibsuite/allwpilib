@@ -54,7 +54,7 @@ wpi::math::Quaternion OnboardIMU::GetQuaternion() {
   HAL_Quaternion val;
   int32_t status = 0;
   HAL_GetIMUQuaternion(&val, &status);
-  FRC_CheckErrorStatus(status, "Onboard IMU");
+  WPILIB_CheckErrorStatus(status, "Onboard IMU");
   return wpi::math::Quaternion{val.w, val.x, val.y, val.z};
 }
 
@@ -72,7 +72,7 @@ wpi::units::radian_t OnboardIMU::GetAngleX() {
       HAL_GetIMUEulerAnglesPortrait(&val, &status);
       break;
   }
-  FRC_CheckErrorStatus(status, "Onboard IMU");
+  WPILIB_CheckErrorStatus(status, "Onboard IMU");
   return wpi::units::radian_t{val.x};
 }
 
@@ -90,7 +90,7 @@ wpi::units::radian_t OnboardIMU::GetAngleY() {
       HAL_GetIMUEulerAnglesPortrait(&val, &status);
       break;
   }
-  FRC_CheckErrorStatus(status, "Onboard IMU");
+  WPILIB_CheckErrorStatus(status, "Onboard IMU");
   return wpi::units::radian_t{val.y};
 }
 
@@ -108,7 +108,7 @@ wpi::units::radian_t OnboardIMU::GetAngleZ() {
       HAL_GetIMUEulerAnglesPortrait(&val, &status);
       break;
   }
-  FRC_CheckErrorStatus(status, "Onboard IMU");
+  WPILIB_CheckErrorStatus(status, "Onboard IMU");
   return wpi::units::radian_t{val.z};
 }
 
@@ -116,7 +116,7 @@ wpi::units::radians_per_second_t OnboardIMU::GetGyroRateX() {
   HAL_GyroRate3d val;
   int32_t status = 0;
   HAL_GetIMUGyroRates(&val, &status);
-  FRC_CheckErrorStatus(status, "Onboard IMU");
+  WPILIB_CheckErrorStatus(status, "Onboard IMU");
   return wpi::units::radians_per_second_t{val.x};
 }
 
@@ -124,7 +124,7 @@ wpi::units::radians_per_second_t OnboardIMU::GetGyroRateY() {
   HAL_GyroRate3d val;
   int32_t status = 0;
   HAL_GetIMUGyroRates(&val, &status);
-  FRC_CheckErrorStatus(status, "Onboard IMU");
+  WPILIB_CheckErrorStatus(status, "Onboard IMU");
   return wpi::units::radians_per_second_t{val.y};
 }
 
@@ -132,7 +132,7 @@ wpi::units::radians_per_second_t OnboardIMU::GetGyroRateZ() {
   HAL_GyroRate3d val;
   int32_t status = 0;
   HAL_GetIMUGyroRates(&val, &status);
-  FRC_CheckErrorStatus(status, "Onboard IMU");
+  WPILIB_CheckErrorStatus(status, "Onboard IMU");
   return wpi::units::radians_per_second_t{val.z};
 }
 
@@ -140,7 +140,7 @@ wpi::units::meters_per_second_squared_t OnboardIMU::GetAccelX() {
   HAL_Acceleration3d val;
   int32_t status = 0;
   HAL_GetIMUAcceleration(&val, &status);
-  FRC_CheckErrorStatus(status, "Onboard IMU");
+  WPILIB_CheckErrorStatus(status, "Onboard IMU");
   return wpi::units::meters_per_second_squared_t{val.x};
 }
 
@@ -148,7 +148,7 @@ wpi::units::meters_per_second_squared_t OnboardIMU::GetAccelY() {
   HAL_Acceleration3d val;
   int32_t status = 0;
   HAL_GetIMUAcceleration(&val, &status);
-  FRC_CheckErrorStatus(status, "Onboard IMU");
+  WPILIB_CheckErrorStatus(status, "Onboard IMU");
   return wpi::units::meters_per_second_squared_t{val.x};
 }
 
@@ -156,6 +156,6 @@ wpi::units::meters_per_second_squared_t OnboardIMU::GetAccelZ() {
   HAL_Acceleration3d val;
   int32_t status = 0;
   HAL_GetIMUAcceleration(&val, &status);
-  FRC_CheckErrorStatus(status, "Onboard IMU");
+  WPILIB_CheckErrorStatus(status, "Onboard IMU");
   return wpi::units::meters_per_second_squared_t{val.x};
 }

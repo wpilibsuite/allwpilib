@@ -69,7 +69,7 @@ void ParallelCommandGroup::AddCommands(
   CommandScheduler::GetInstance().RequireUngroupedAndUnscheduled(commands);
 
   if (isRunning) {
-    throw FRC_MakeError(wpi::err::CommandIllegalUse,
+    throw WPILIB_MakeError(wpi::err::CommandIllegalUse,
                         "Commands cannot be added to a CommandGroup "
                         "while the group is running");
   }
@@ -85,7 +85,7 @@ void ParallelCommandGroup::AddCommands(
       }
       m_commands.emplace_back(std::move(command), false);
     } else {
-      throw FRC_MakeError(wpi::err::CommandIllegalUse,
+      throw WPILIB_MakeError(wpi::err::CommandIllegalUse,
                           "Multiple commands in a parallel group cannot "
                           "require the same subsystems");
     }

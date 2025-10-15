@@ -31,7 +31,7 @@ class Robot : public wpi::TimedRobot {
   wpi::DigitalInput m_limit{2};
 };
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
   return wpi::StartRobot<Robot>();
 }

@@ -35,7 +35,7 @@ std::shared_ptr<PneumaticsBase> PneumaticsBase::GetForType(
   } else if (moduleType == PneumaticsModuleType::REVPH) {
     return PneumaticHub::GetForModule(busId, module);
   }
-  throw FRC_MakeError(err::InvalidParameter, "{}",
+  throw WPILIB_MakeError(err::InvalidParameter, "{}",
                       static_cast<int>(moduleType));
 }
 
@@ -45,6 +45,6 @@ int PneumaticsBase::GetDefaultForType(PneumaticsModuleType moduleType) {
   } else if (moduleType == PneumaticsModuleType::REVPH) {
     return SensorUtil::GetDefaultREVPHModule();
   }
-  throw FRC_MakeError(err::InvalidParameter, "{}",
+  throw WPILIB_MakeError(err::InvalidParameter, "{}",
                       static_cast<int>(moduleType));
 }

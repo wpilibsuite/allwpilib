@@ -36,7 +36,7 @@ bool OnBoardIO::GetButtonBPressed() {
 
   auto currentTime = wpi::Timer::GetTimestamp();
   if (currentTime > m_nextMessageTime) {
-    FRC_ReportError(wpi::err::Error, "{}", "Button B was not configured");
+    WPILIB_ReportError(wpi::err::Error, "{}", "Button B was not configured");
     m_nextMessageTime = currentTime + kMessageInterval;
   }
   return false;
@@ -49,7 +49,7 @@ bool OnBoardIO::GetButtonCPressed() {
 
   auto currentTime = wpi::Timer::GetTimestamp();
   if (currentTime > m_nextMessageTime) {
-    FRC_ReportError(wpi::err::Error, "{}", "Button C was not configured");
+    WPILIB_ReportError(wpi::err::Error, "{}", "Button C was not configured");
     m_nextMessageTime = currentTime + kMessageInterval;
   }
   return false;
@@ -61,7 +61,7 @@ void OnBoardIO::SetGreenLed(bool value) {
   } else {
     auto currentTime = wpi::Timer::GetTimestamp();
     if (currentTime > m_nextMessageTime) {
-      FRC_ReportError(wpi::err::Error, "{}", "Green LED was not configured");
+      WPILIB_ReportError(wpi::err::Error, "{}", "Green LED was not configured");
       m_nextMessageTime = currentTime + kMessageInterval;
     }
   }
@@ -73,7 +73,7 @@ void OnBoardIO::SetRedLed(bool value) {
   } else {
     auto currentTime = wpi::Timer::GetTimestamp();
     if (currentTime > m_nextMessageTime) {
-      FRC_ReportError(wpi::err::Error, "{}", "Red LED was not configured");
+      WPILIB_ReportError(wpi::err::Error, "{}", "Red LED was not configured");
       m_nextMessageTime = currentTime + kMessageInterval;
     }
   }

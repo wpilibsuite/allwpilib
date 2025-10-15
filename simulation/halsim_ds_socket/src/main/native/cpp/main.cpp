@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 /*----------------------------------------------------------------------------
-**  This extension reimplements enough of the FRC_Network layer to enable the
+**  This extension reimplements enough of the WPILIB_Network layer to enable the
 **    simulator to communicate with a driver station.  That includes a
 **    simple udp layer for communication.
 **  The protocol does not appear to be well documented; this implementation

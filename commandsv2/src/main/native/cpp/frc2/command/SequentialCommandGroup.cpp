@@ -68,7 +68,7 @@ void SequentialCommandGroup::AddCommands(
   CommandScheduler::GetInstance().RequireUngroupedAndUnscheduled(commands);
 
   if (m_currentCommandIndex != invalid_index) {
-    throw FRC_MakeError(wpi::err::CommandIllegalUse,
+    throw WPILIB_MakeError(wpi::err::CommandIllegalUse,
                         "Commands cannot be added to a CommandGroup "
                         "while the group is running");
   }

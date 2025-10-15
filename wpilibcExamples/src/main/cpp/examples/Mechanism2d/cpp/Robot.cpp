@@ -69,7 +69,7 @@ class Robot : public wpi::TimedRobot {
           "wrist", 0.5, 90_deg, 6, wpi::Color8Bit{wpi::Color::kPurple});
 };
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
   return wpi::StartRobot<Robot>();
 }
