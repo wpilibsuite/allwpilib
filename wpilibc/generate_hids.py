@@ -22,21 +22,21 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
         controllers = json.load(f)
 
     # C++ headers
-    hdr_subdirectory = "main/native/include/frc"
+    hdr_subdirectory = "main/native/include/wpi/driverstation"
     env = Environment(
         loader=FileSystemLoader(template_directory / hdr_subdirectory),
         autoescape=False,
         keep_trailing_newline=True,
     )
     root_path = output_directory / hdr_subdirectory
-    template = env.get_template("hid.h.jinja")
+    template = env.get_template("hid.hpp.jinja")
     for controller in controllers:
-        controllerName = f"{controller['ConsoleName']}Controller.h"
+        controllerName = f"{controller['ConsoleName']}Controller.hpp"
         output = template.render(controller)
         write_controller_file(root_path, controllerName, output)
 
     # C++ files
-    cpp_subdirectory = "main/native/cpp"
+    cpp_subdirectory = "main/native/cpp/driverstation"
     env = Environment(
         loader=FileSystemLoader(template_directory / cpp_subdirectory),
         autoescape=False,
@@ -49,16 +49,16 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
         write_controller_file(root_path, controllerName, output)
 
     # C++ simulation headers
-    sim_hdr_subdirectory = "main/native/include/frc/simulation"
+    sim_hdr_subdirectory = "main/native/include/wpi/simulation"
     env = Environment(
         loader=FileSystemLoader(template_directory / sim_hdr_subdirectory),
         autoescape=False,
         keep_trailing_newline=True,
     )
     root_path = output_directory / sim_hdr_subdirectory
-    template = env.get_template("hidsim.h.jinja")
+    template = env.get_template("hidsim.hpp.jinja")
     for controller in controllers:
-        controllerName = f"{controller['ConsoleName']}ControllerSim.h"
+        controllerName = f"{controller['ConsoleName']}ControllerSim.hpp"
         output = template.render(controller)
         write_controller_file(root_path, controllerName, output)
 
