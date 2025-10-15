@@ -8,7 +8,7 @@ Subject: [PATCH 22/36] OS-specific changes
  1 file changed, 7 insertions(+), 9 deletions(-)
 
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 6c2b1c433285d2ec5d124f96919ff27f3328d74c..05e7ee1d125bdd6ce9a8f0db97d4feed3832a7ba 100644
+index 9ef6f7da66c66a35b1ce63e603e8590c214f9843..4436b8e7f3a68ba85f184ee71014b9c1e0511d8a 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -96,15 +96,7 @@ void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
