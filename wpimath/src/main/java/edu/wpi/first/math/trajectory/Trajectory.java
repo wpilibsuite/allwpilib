@@ -68,12 +68,12 @@ public abstract class Trajectory<SampleType extends TrajectorySample<SampleType>
 
   /** Gets the first sample in the trajectory. */
   public SampleType start() {
-    return sampleAt(0.0);
+    return samples[0];
   }
 
   /** Gets the last sample in the trajectory. */
   public SampleType end() {
-    return sampleAt(duration);
+    return samples[samples.length - 1];
   }
 
   /** Gets the sample at the given timestamp. */
