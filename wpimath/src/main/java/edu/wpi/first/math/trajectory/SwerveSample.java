@@ -1,5 +1,7 @@
 package edu.wpi.first.math.trajectory;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisAccelerations;
@@ -31,6 +33,27 @@ public class SwerveSample extends TrajectorySample<SwerveSample> {
       ChassisSpeeds velocity,
       ChassisAccelerations acceleration,
       SwerveModuleState... states) {
+    super(timestamp, pose, velocity, acceleration);
+
+    this.states = Arrays.copyOf(states, states.length);
+  }
+
+  /**
+   * Constructs a SwerveSample.
+   *
+   * @param timestamp The timestamp of the sample in seconds.
+   * @param pose The robot pose at this sample (in the field reference frame).
+   * @param velocity The robot velocity at this sample (in the robot's reference frame).
+   * @param acceleration The robot acceleration at this sample (in the robot's reference frame).
+   * @param states The swerve module states at this sample.
+   */
+  @JsonCreator
+  public SwerveSample(
+      @JsonProperty("timestamp") double timestamp,
+      @JsonProperty("pose") Pose2d pose,
+      @JsonProperty("velocity") ChassisSpeeds velocity,
+      @JsonProperty("acceleration") ChassisAccelerations acceleration,
+      @JsonProperty("states") SwerveModuleState... states) {
     super(timestamp, pose, velocity, acceleration);
 
     this.states = Arrays.copyOf(states, states.length);
