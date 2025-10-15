@@ -4,6 +4,7 @@
 
 package org.wpilib.hardware.discrete;
 
+import org.wpilib.system.SensorUtil;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.PWMJNI;
 import org.wpilib.hardware.hal.SimDevice;

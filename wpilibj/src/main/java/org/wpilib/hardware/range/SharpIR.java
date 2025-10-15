@@ -4,6 +4,7 @@
 
 package org.wpilib.hardware.range;
 
+import org.wpilib.hardware.discrete.AnalogInput;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.SimDevice;
 import org.wpilib.hardware.hal.SimDevice.Direction;

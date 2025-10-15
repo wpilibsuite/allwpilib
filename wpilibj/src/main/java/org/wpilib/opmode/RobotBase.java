@@ -6,6 +6,9 @@ package org.wpilib.opmode;
 
 import org.wpilib.vision.stream.CameraServerShared;
 import org.wpilib.vision.stream.CameraServerSharedStore;
+import org.wpilib.system.Notifier;
+import org.wpilib.system.RuntimeType;
+import org.wpilib.driverstation.DriverStation;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.HALUtil;
 import org.wpilib.math.util.MathShared;
@@ -13,8 +16,9 @@ import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.networktables.MultiSubscriber;
 import org.wpilib.networktables.NetworkTableEvent;
 import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.system.Timer;
 import org.wpilib.util.WPIUtilJNI;
-import org.wpilib.util.WPILibVersion;
+import org.wpilib.system.WPILibVersion;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 

@@ -5,6 +5,7 @@
 package org.wpilib.system;
 
 import java.io.File;
+import org.wpilib.opmode.RobotBase;
 
 /**
  * Class for interacting with the Filesystem, particularly, interacting with FRC-related paths on

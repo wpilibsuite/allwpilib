@@ -7,6 +7,7 @@ package org.wpilib.util;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.wpilib.util.runtime.RuntimeLoader;
 
 /** WPIUtil JNI. */
 public class WPIUtilJNI {
