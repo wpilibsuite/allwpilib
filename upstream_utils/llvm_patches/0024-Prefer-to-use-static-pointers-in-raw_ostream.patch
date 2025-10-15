@@ -9,7 +9,7 @@ See #1401
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 841a30962da17fc3d7bd18e14b44993900b3f984..7a838a544a3ee5919cc48f806bceeaa3c1cec0de 100644
+index 3333890ed1b086c94cdfce8bc9efb3d191a47f89..7561f818287d208c628a126c3f8a6f7d531df236 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -608,9 +608,9 @@ raw_fd_ostream &llvm::outs() {

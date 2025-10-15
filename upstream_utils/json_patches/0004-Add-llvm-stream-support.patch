@@ -10,7 +10,7 @@ Subject: [PATCH 4/5] Add llvm stream support
  3 files changed, 59 insertions(+), 2 deletions(-)
 
 diff --git a/include/nlohmann/detail/output/output_adapters.hpp b/include/nlohmann/detail/output/output_adapters.hpp
-index 626f7c0c85e35ec51a90baa3bdd12cd8df7ba957..ecb2165d5e5ecc80b123cd60570f499f7a4e0ed1 100644
+index 626f7c0c85e35ec51a90baa3bdd12cd8df7ba957..2e2e92f9718ec13aaa585955707419f27b2088c6 100644
 --- a/include/nlohmann/detail/output/output_adapters.hpp
 +++ b/include/nlohmann/detail/output/output_adapters.hpp
 @@ -22,6 +22,8 @@

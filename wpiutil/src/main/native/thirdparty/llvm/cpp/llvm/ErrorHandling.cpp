@@ -176,7 +176,7 @@ void wpi::wpi_unreachable_internal(const char *msg, const char *file,
 #ifdef _WIN32
 
 #define WIN32_NO_STATUS
-#include "Windows/WindowsSupport.h"
+#include "Windows/WindowsSupport.hpp"
 #undef WIN32_NO_STATUS
 #include <ntstatus.h>
 #include <winerror.h>
