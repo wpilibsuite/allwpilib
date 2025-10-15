@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "DSCommPacket.h"
+#include "wpi/halsim/ds_socket/DSCommPacket.hpp"
 
 class DSCommPacketTest : public ::testing::Test {
  public:

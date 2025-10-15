@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "NetworkListener.h"
+#include "NetworkListener.hpp"
 
 #include <winsock2.h>  // NOLINT(build/include_order)
 
@@ -16,9 +16,9 @@
 
 #include <netioapi.h>  // NOLINT(build/include_order)
 
-#include "Instance.h"
-#include "Log.h"
-#include "Notifier.h"
+#include "Instance.hpp"
+#include "Log.hpp"
+#include "Notifier.hpp"
 
 #pragma comment(lib, "Iphlpapi.lib")
 

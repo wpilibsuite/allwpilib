@@ -4,9 +4,9 @@
 
 #include <gtest/gtest.h>
 
-#include "../ProtoTestBase.h"
-#include "frc/EigenCore.h"
-#include "frc/proto/MatrixProto.h"
+#include "../ProtoTestBase.hpp"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/linalg/proto/MatrixProto.hpp"
 
 using namespace frc;
 

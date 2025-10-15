@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "Frame.h"
+#include "Frame.hpp"
 
 #include <cstdlib>
 #include <memory>
@@ -11,8 +11,8 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include "Instance.h"
-#include "SourceImpl.h"
+#include "Instance.hpp"
+#include "SourceImpl.hpp"
 
 using namespace cs;
 

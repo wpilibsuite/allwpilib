@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/controller/LTVDifferentialDriveController.h"
+#include "wpi/math/controller/LTVDifferentialDriveController.hpp"
 
 #include <cmath>
 
-#include "frc/DARE.h"
-#include "frc/MathUtil.h"
-#include "frc/system/Discretization.h"
+#include "wpi/math/linalg/DARE.hpp"
+#include "wpi/math/util/MathUtil.hpp"
+#include "wpi/math/system/Discretization.hpp"
 
 using namespace frc;
 

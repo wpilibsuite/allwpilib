@@ -111,13 +111,13 @@ inline RuntimeError MakeError(int32_t status, const char* fileName,
 
 namespace err {
 #define S(label, offset, message) inline constexpr int label = offset;
-#include "frc/WPIErrors.mac"
+#include "wpi/system/WPIErrors.mac"
 #undef S
 }  // namespace err
 
 namespace warn {
 #define S(label, offset, message) inline constexpr int label = offset;
-#include "frc/WPIWarnings.mac"
+#include "wpi/system/WPIWarnings.mac"
 #undef S
 }  // namespace warn
 }  // namespace frc

@@ -6,7 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/Chrono.h"
+#include "wpi/util/Chrono.hpp"
 #include "gtest/gtest.h"
 
 using namespace wpi;

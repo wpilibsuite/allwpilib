@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/controller/BangBangController.h"
+#include "wpi/math/controller/BangBangController.hpp"
 
 TEST(BangBangInputOutputTest, ShouldOutput) {
   frc::BangBangController controller;

@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #import <Foundation/Foundation.h>
-#include "main.h"
+#include "main.hpp"
 
 #include <iostream>
 #include <string>

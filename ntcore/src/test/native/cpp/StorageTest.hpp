@@ -8,7 +8,7 @@
 #include <memory>
 #include <vector>
 
-#include "Log.h"
+#include "Log.hpp"
 #include "MockDispatcher.h"
 #include "Storage.h"
 

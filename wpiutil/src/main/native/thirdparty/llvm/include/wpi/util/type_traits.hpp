@@ -13,7 +13,7 @@
 #ifndef WPIUTIL_WPI_TYPE_TRAITS_H
 #define WPIUTIL_WPI_TYPE_TRAITS_H
 
-#include "wpi/Compiler.h"
+#include "wpi/util/Compiler.hpp"
 #include <type_traits>
 #include <utility>
 

@@ -9,7 +9,7 @@
 #include <span>
 #include <string_view>
 
-#include "ntcore_cpp.h"
+#include "wpi/ntcore/ntcore_cpp.hpp"
 
 namespace nt {
 

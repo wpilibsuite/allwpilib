@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Twist3d.h"
+#include "wpi/math/geometry/Twist3d.hpp"
 
 using namespace frc;
 

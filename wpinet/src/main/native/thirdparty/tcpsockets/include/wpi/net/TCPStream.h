@@ -28,7 +28,7 @@
 #include <string>
 #include <string_view>
 
-#include "wpinet/NetworkStream.h"
+#include "wpi/net/NetworkStream.hpp"
 
 struct sockaddr_in;
 

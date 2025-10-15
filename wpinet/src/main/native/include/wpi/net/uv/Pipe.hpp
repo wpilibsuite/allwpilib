@@ -12,7 +12,7 @@
 #include <string>
 #include <string_view>
 
-#include "wpinet/uv/NetworkStream.h"
+#include "wpi/net/uv/NetworkStream.hpp"
 
 namespace wpi::uv {
 

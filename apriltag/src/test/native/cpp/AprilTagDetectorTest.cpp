@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/apriltag/AprilTagDetector.h"
+#include "wpi/apriltag/AprilTagDetector.hpp"
 
 using namespace frc;
 

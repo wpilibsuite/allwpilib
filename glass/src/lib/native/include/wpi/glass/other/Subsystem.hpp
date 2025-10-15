@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "glass/Model.h"
+#include "wpi/glass/Model.hpp"
 
 namespace glass {
 class DataSource;

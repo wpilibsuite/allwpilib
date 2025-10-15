@@ -6,7 +6,7 @@
 
 #include "CallbackStore.h"
 #include "org_wpilib_hardware_hal_simulation_REVPHDataJNI.h"
-#include "hal/simulation/REVPHData.h"
+#include "wpi/hal/simulation/REVPHData.h"
 
 using namespace hal;
 

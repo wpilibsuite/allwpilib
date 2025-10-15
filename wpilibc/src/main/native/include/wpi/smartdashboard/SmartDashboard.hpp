@@ -11,8 +11,8 @@
 #include <string_view>
 #include <vector>
 
-#include <networktables/NetworkTableEntry.h>
-#include <networktables/NetworkTableValue.h>
+#include <wpi/ntcore/NetworkTableEntry.hpp>
+#include <wpi/ntcore/NetworkTableValue.hpp>
 
 namespace wpi {
 class Sendable;

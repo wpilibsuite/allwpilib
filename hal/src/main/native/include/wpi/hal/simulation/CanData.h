@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "hal/Types.h"
-#include "hal/Value.h"
-#include "hal/simulation/NotifyListener.h"
+#include "wpi/hal/Types.h"
+#include "wpi/hal/Value.h"
+#include "wpi/hal/simulation/NotifyListener.h"
 
 typedef void (*HAL_CAN_SendMessageCallback)(
     const char* name, void* param, int32_t busId, uint32_t messageId,

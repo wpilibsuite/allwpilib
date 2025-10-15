@@ -2,20 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/Preferences.h"
+#include "wpi/util/Preferences.hpp"
 
 #include <memory>
 #include <string>
 #include <vector>
 
 #include <fmt/format.h>
-#include <hal/UsageReporting.h>
-#include <networktables/MultiSubscriber.h>
-#include <networktables/NetworkTable.h>
-#include <networktables/NetworkTableInstance.h>
-#include <networktables/NetworkTableListener.h>
-#include <networktables/StringTopic.h>
-#include <wpi/json.h>
+#include <wpi/hal/UsageReporting.h>
+#include <wpi/ntcore/MultiSubscriber.hpp>
+#include <wpi/ntcore/NetworkTable.hpp>
+#include <wpi/ntcore/NetworkTableInstance.hpp>
+#include <wpi/ntcore/NetworkTableListener.hpp>
+#include <wpi/ntcore/StringTopic.hpp>
+#include <wpi/util/json.hpp>
 
 using namespace frc;
 

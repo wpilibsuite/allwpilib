@@ -4,9 +4,9 @@
 
 #include <gtest/gtest.h>
 
-#include "../../StructTestBase.h"
-#include "frc/kinematics/SwerveDriveKinematics.h"
-#include "frc/kinematics/struct/SwerveDriveKinematicsStruct.h"
+#include "../../StructTestBase.hpp"
+#include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
+#include "wpi/math/kinematics/struct/SwerveDriveKinematicsStruct.hpp"
 
 using namespace frc;
 

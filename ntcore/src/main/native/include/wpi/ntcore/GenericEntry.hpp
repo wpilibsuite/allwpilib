@@ -11,8 +11,8 @@
 #include <string_view>
 #include <vector>
 
-#include "networktables/Topic.h"
-#include "ntcore_cpp.h"
+#include "wpi/ntcore/Topic.hpp"
+#include "wpi/ntcore/ntcore_cpp.hpp"
 
 namespace nt {
 

@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Rectangle2d.h"
+#include "wpi/math/geometry/Rectangle2d.hpp"
 
 using namespace frc;
 

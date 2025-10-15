@@ -7,8 +7,8 @@
 #include <span>
 #include <string_view>
 
-#include "networktables/NetworkTableInstance.h"
-#include "ntcore_cpp.h"
+#include "wpi/ntcore/NetworkTableInstance.hpp"
+#include "wpi/ntcore/ntcore_cpp.hpp"
 
 namespace nt {
 

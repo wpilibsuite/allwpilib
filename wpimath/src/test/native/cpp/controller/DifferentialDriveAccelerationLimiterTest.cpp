@@ -4,9 +4,9 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/controller/DifferentialDriveAccelerationLimiter.h"
-#include "frc/system/plant/LinearSystemId.h"
-#include "units/math.h"
+#include "wpi/math/controller/DifferentialDriveAccelerationLimiter.hpp"
+#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/units/math.hpp"
 
 namespace frc {
 

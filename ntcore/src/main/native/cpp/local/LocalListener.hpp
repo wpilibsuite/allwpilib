@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "ntcore_c.h"
+#include "wpi/ntcore/ntcore_c.h"
 
 namespace nt::local {
 

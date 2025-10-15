@@ -5,7 +5,7 @@
 #include <Eigen/LU>
 #include <gtest/gtest.h>
 
-#include "frc/EigenCore.h"
+#include "wpi/math/linalg/EigenCore.hpp"
 
 TEST(EigenTest, Multiplication) {
   frc::Matrixd<2, 2> m1{{2, 1}, {0, 1}};

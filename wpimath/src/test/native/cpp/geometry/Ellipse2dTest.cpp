@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Ellipse2d.h"
+#include "wpi/math/geometry/Ellipse2d.hpp"
 
 TEST(Ellipse2dTest, FocalPoints) {
   constexpr frc::Pose2d center{1_m, 2_m, 0_deg};

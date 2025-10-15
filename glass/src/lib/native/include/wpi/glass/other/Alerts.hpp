@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-#include "glass/Model.h"
+#include "wpi/glass/Model.hpp"
 
 namespace glass {
 

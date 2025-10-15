@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/struct/DynamicStruct.h"
+#include "wpi/util/struct/DynamicStruct.hpp"
 
 #include <algorithm>
 #include <string>
@@ -10,11 +10,11 @@
 
 #include <fmt/format.h>
 
-#include "wpi/Endian.h"
-#include "wpi/SmallString.h"
-#include "wpi/SmallVector.h"
-#include "wpi/raw_ostream.h"
-#include "wpi/struct/SchemaParser.h"
+#include "wpi/util/Endian.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/raw_ostream.hpp"
+#include "wpi/util/struct/SchemaParser.hpp"
 
 using namespace wpi;
 

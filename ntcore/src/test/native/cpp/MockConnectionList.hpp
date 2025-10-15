@@ -6,7 +6,7 @@
 
 #include <vector>
 
-#include "IConnectionList.h"
+#include "IConnectionList.hpp"
 #include "gmock/gmock.h"
 
 namespace nt {

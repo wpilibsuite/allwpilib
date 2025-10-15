@@ -17,13 +17,13 @@
 
 #include <fmt/format.h>
 
-#include "wpi/Endian.h"
-#include "wpi/array.h"
-#include "wpi/bit.h"
-#include "wpi/ct_string.h"
-#include "wpi/function_ref.h"
-#include "wpi/mutex.h"
-#include "wpi/type_traits.h"
+#include "wpi/util/Endian.hpp"
+#include "wpi/util/array.hpp"
+#include "wpi/util/bit.hpp"
+#include "wpi/util/ct_string.hpp"
+#include "wpi/util/function_ref.hpp"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/type_traits.hpp"
 
 namespace wpi {
 

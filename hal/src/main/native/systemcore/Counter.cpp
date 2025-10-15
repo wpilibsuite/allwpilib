@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/Counter.h"
+#include "wpi/hal/Counter.h"
 
 #include <cstdio>
 #include <limits>
@@ -15,9 +15,9 @@
 #include "HALInternal.h"
 #include "PortsInternal.h"
 #include "SmartIo.h"
-#include "hal/HAL.h"
-#include "hal/cpp/fpga_clock.h"
-#include "hal/handles/LimitedHandleResource.h"
+#include "wpi/hal/HAL.h"
+#include "wpi/hal/cpp/fpga_clock.h"
+#include "wpi/hal/handles/LimitedHandleResource.h"
 
 using namespace hal;
 

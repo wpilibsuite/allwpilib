@@ -6,11 +6,11 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/kinematics/ChassisSpeeds.h"
-#include "frc/kinematics/DifferentialDriveKinematics.h"
-#include "units/angular_velocity.h"
-#include "units/length.h"
-#include "units/velocity.h"
+#include "wpi/math/kinematics/ChassisSpeeds.hpp"
+#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+#include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/velocity.hpp"
 
 using namespace frc;
 

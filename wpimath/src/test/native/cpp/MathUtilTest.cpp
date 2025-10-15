@@ -7,13 +7,13 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/MathUtil.h"
-#include "frc/geometry/Translation2d.h"
-#include "frc/geometry/Translation3d.h"
-#include "units/angle.h"
-#include "units/length.h"
-#include "units/time.h"
-#include "units/velocity.h"
+#include "wpi/math/util/MathUtil.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/math/geometry/Translation3d.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
 
 #define EXPECT_UNITS_EQ(a, b) EXPECT_DOUBLE_EQ((a).value(), (b).value())
 

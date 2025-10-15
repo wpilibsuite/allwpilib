@@ -2,28 +2,28 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "networktables/NetworkTableInstance.h"
+#include "wpi/ntcore/NetworkTableInstance.hpp"
 
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <wpi/SmallVector.h>
-#include <wpi/print.h>
+#include <wpi/util/SmallVector.hpp>
+#include <wpi/util/print.hpp>
 
-#include "networktables/BooleanArrayTopic.h"
-#include "networktables/BooleanTopic.h"
-#include "networktables/DoubleArrayTopic.h"
-#include "networktables/DoubleTopic.h"
-#include "networktables/FloatArrayTopic.h"
-#include "networktables/FloatTopic.h"
-#include "networktables/IntegerArrayTopic.h"
-#include "networktables/IntegerTopic.h"
-#include "networktables/MultiSubscriber.h"
-#include "networktables/RawTopic.h"
-#include "networktables/StringArrayTopic.h"
-#include "networktables/StringTopic.h"
+#include "wpi/ntcore/BooleanArrayTopic.hpp"
+#include "wpi/ntcore/BooleanTopic.hpp"
+#include "wpi/ntcore/DoubleArrayTopic.hpp"
+#include "wpi/ntcore/DoubleTopic.hpp"
+#include "wpi/ntcore/FloatArrayTopic.hpp"
+#include "wpi/ntcore/FloatTopic.hpp"
+#include "wpi/ntcore/IntegerArrayTopic.hpp"
+#include "wpi/ntcore/IntegerTopic.hpp"
+#include "wpi/ntcore/MultiSubscriber.hpp"
+#include "wpi/ntcore/RawTopic.hpp"
+#include "wpi/ntcore/StringArrayTopic.hpp"
+#include "wpi/ntcore/StringTopic.hpp"
 
 using namespace nt;
 

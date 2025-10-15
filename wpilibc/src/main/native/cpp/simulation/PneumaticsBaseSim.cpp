@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/PneumaticsBaseSim.h"
+#include "wpi/simulation/PneumaticsBaseSim.hpp"
 
 #include <memory>
 
-#include "frc/Errors.h"
-#include "frc/PneumaticsModuleType.h"
-#include "frc/simulation/CTREPCMSim.h"
-#include "frc/simulation/REVPHSim.h"
+#include "wpi/system/Errors.hpp"
+#include "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
+#include "wpi/simulation/CTREPCMSim.hpp"
+#include "wpi/simulation/REVPHSim.hpp"
 
 using namespace frc;
 using namespace frc::sim;

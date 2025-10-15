@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/util/Color.h"
+#include "wpi/util/Color.hpp"
 
 TEST(ColorTest, ConstructDefault) {
   constexpr frc::Color color;

@@ -14,14 +14,14 @@
 #ifndef WPIUTIL_WPI_DENSEMAP_H
 #define WPIUTIL_WPI_DENSEMAP_H
 
-#include "wpi/DenseMapInfo.h"
-#include "wpi/EpochTracker.h"
-#include "wpi/AlignOf.h"
-#include "wpi/Compiler.h"
-#include "wpi/MathExtras.h"
-#include "wpi/MemAlloc.h"
-#include "wpi/ReverseIteration.h"
-#include "wpi/type_traits.h"
+#include "wpi/util/DenseMapInfo.hpp"
+#include "wpi/util/EpochTracker.hpp"
+#include "wpi/util/AlignOf.hpp"
+#include "wpi/util/Compiler.hpp"
+#include "wpi/util/MathExtras.hpp"
+#include "wpi/util/MemAlloc.hpp"
+#include "wpi/util/ReverseIteration.hpp"
+#include "wpi/util/type_traits.hpp"
 #include <algorithm>
 #include <bit>
 #include <cassert>

@@ -3447,5 +3447,5 @@ using namespace units::literals;
 #endif  // UNIT_HAS_LITERAL_SUPPORT
 
 #if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
-#include "units/formatter.h"
+#include "wpi/units/formatter.hpp"
 #endif

@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/StringExtras.h"
+#include "wpi/util/StringExtras.hpp"
 
 TEST(StringExtrasTest, RemovePrefix) {
   std::string_view original = "wpilib";

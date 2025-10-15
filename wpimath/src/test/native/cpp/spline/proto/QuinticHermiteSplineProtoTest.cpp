@@ -4,8 +4,8 @@
 
 #include <gtest/gtest.h>
 
-#include "../../ProtoTestBase.h"
-#include "frc/spline/QuinticHermiteSpline.h"
+#include "../../ProtoTestBase.hpp"
+#include "wpi/math/spline/QuinticHermiteSpline.hpp"
 
 using namespace frc;
 

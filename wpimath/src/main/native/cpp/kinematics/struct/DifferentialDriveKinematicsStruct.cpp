@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/kinematics/struct/DifferentialDriveKinematicsStruct.h"
+#include "wpi/math/kinematics/struct/DifferentialDriveKinematicsStruct.hpp"
 
 namespace {
 constexpr size_t kTrackwidthOff = 0;

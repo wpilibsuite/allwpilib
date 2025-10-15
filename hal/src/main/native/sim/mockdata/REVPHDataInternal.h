@@ -5,8 +5,8 @@
 #pragma once
 
 #include "../PortsInternal.h"
-#include "hal/simulation/REVPHData.h"
-#include "hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/REVPHData.h"
+#include "wpi/hal/simulation/SimDataValue.h"
 
 namespace hal {
 class REVPHData {

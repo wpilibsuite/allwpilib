@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/util/Color8Bit.h"
+#include "wpi/util/Color8Bit.hpp"
 
 TEST(Color8BitTest, ConstructDefault) {
   constexpr frc::Color8Bit color;

@@ -6,8 +6,8 @@
 
 #include <stdint.h>
 
-#include "hal/PowerDistribution.h"
-#include "hal/Types.h"
+#include "wpi/hal/PowerDistribution.h"
+#include "wpi/hal/Types.h"
 
 /**
  * @defgroup hal_rev_pdh REV Power Distribution Hub API Functions

@@ -6,9 +6,9 @@
 
 #include <stdint.h>
 
-#include "hal/CAN.h"
-#include "hal/CANAPITypes.h"
-#include "hal/Types.h"
+#include "wpi/hal/CAN.h"
+#include "wpi/hal/CANAPITypes.h"
+#include "wpi/hal/Types.h"
 
 /**
  * @defgroup hal_canapi CAN API Functions

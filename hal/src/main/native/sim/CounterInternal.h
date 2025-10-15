@@ -5,8 +5,8 @@
 #pragma once
 
 #include "PortsInternal.h"
-#include "hal/handles/HandlesInternal.h"
-#include "hal/handles/LimitedHandleResource.h"
+#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/hal/handles/LimitedHandleResource.h"
 
 namespace hal {
 

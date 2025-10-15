@@ -11,11 +11,11 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/ErrorHandling.h"
-#include "wpi/SmallVector.h"
-#include "wpi/Errc.h"
-#include "wpi/WindowsError.h"
-#include "wpi/print.h"
+#include "wpi/util/ErrorHandling.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/Errc.hpp"
+#include "wpi/util/WindowsError.hpp"
+#include "wpi/util/print.hpp"
 #include <cassert>
 #include <cstdlib>
 #include <mutex>

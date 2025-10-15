@@ -4,8 +4,8 @@
 
 #include <gtest/gtest.h>
 
-#include "sysid/analysis/FeedbackAnalysis.h"
-#include "sysid/analysis/FeedbackControllerPreset.h"
+#include "wpi/sysid/analysis/FeedbackAnalysis.hpp"
+#include "wpi/sysid/analysis/FeedbackControllerPreset.hpp"
 
 TEST(FeedbackAnalysisTest, VelocitySystem1) {
   auto Kv = 3.060;

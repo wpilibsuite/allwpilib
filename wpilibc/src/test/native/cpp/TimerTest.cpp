@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/Timer.h"  // NOLINT(build/include_order)
+#include "wpi/system/Timer.hpp"  // NOLINT(build/include_order)
 
 #include <gtest/gtest.h>
 
-#include "frc/simulation/SimHooks.h"
+#include "wpi/simulation/SimHooks.hpp"
 
 using namespace frc;
 

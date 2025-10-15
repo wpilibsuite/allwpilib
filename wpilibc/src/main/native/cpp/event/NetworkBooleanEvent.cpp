@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/event/NetworkBooleanEvent.h"
+#include "wpi/event/NetworkBooleanEvent.hpp"
 
 #include <memory>
 #include <utility>
 
-#include <networktables/BooleanTopic.h>
-#include <networktables/NetworkTable.h>
-#include <networktables/NetworkTableInstance.h>
+#include <wpi/ntcore/BooleanTopic.hpp>
+#include <wpi/ntcore/NetworkTable.hpp>
+#include <wpi/ntcore/NetworkTableInstance.hpp>
 
 using namespace frc;
 

@@ -4,8 +4,8 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/trajectory/TrajectoryConfig.h"
-#include "frc/trajectory/TrajectoryGenerator.h"
+#include "wpi/math/trajectory/TrajectoryConfig.hpp"
+#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 
 TEST(TrajectoryConcatenateTest, States) {
   auto t1 = frc::TrajectoryGenerator::GenerateTrajectory(

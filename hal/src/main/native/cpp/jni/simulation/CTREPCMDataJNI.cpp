@@ -6,7 +6,7 @@
 
 #include "CallbackStore.h"
 #include "org_wpilib_hardware_hal_simulation_CTREPCMDataJNI.h"
-#include "hal/simulation/CTREPCMData.h"
+#include "wpi/hal/simulation/CTREPCMData.h"
 
 using namespace hal;
 

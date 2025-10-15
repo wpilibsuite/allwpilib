@@ -6,8 +6,8 @@
 
 #include <memory>
 
-#include "frc/PneumaticsModuleType.h"
-#include "frc/simulation/PneumaticsBaseSim.h"
+#include "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
+#include "wpi/simulation/PneumaticsBaseSim.hpp"
 
 namespace frc::sim {
 

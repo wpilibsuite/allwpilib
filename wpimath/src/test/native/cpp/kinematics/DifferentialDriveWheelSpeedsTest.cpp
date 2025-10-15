@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/kinematics/DifferentialDriveWheelSpeeds.h"
+#include "wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp"
 
 TEST(DifferentialDriveWheelSpeedsTest, Plus) {
   const frc::DifferentialDriveWheelSpeeds left{1.0_mps, 0.5_mps};

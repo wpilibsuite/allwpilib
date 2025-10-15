@@ -7,9 +7,9 @@
 
 #include <gtest/gtest.h>
 
-#include "TestPrinters.h"
-#include "networktables/NetworkTable.h"
-#include "networktables/NetworkTableInstance.h"
+#include "TestPrinters.hpp"
+#include "wpi/ntcore/NetworkTable.hpp"
+#include "wpi/ntcore/NetworkTableInstance.hpp"
 
 class NetworkTableTest : public ::testing::Test {};
 

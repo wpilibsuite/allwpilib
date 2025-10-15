@@ -25,8 +25,8 @@
 #define LLVM_ALLOCATORHOLDER_EMPTYBASE
 #endif // _MSC_VER
 
-#include "wpi/Compiler.h"
-#include "wpi/MemAlloc.h"
+#include "wpi/util/Compiler.hpp"
+#include "wpi/util/MemAlloc.hpp"
 #include <type_traits>
 
 namespace wpi {
