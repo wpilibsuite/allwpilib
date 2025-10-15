@@ -17,6 +17,7 @@ public class SwerveTrajectory extends Trajectory<SwerveSample> {
    *
    * @param samples the samples of the trajectory. Order does not matter as they will be ordered
    *     internally.
+   * @param kinematics the kinematics of the drivetrain.
    */
   @JsonCreator
   public SwerveTrajectory(
@@ -26,6 +27,13 @@ public class SwerveTrajectory extends Trajectory<SwerveSample> {
     this.kinematics = kinematics;
   }
 
+  /**
+   * Constructs a SwerveTrajectory.
+   *
+   * @param samples the samples of the trajectory. Order does not matter as they will be ordered
+   *     internally.
+   * @param kinematics the kinematics of the drivetrain.
+   */
   public SwerveTrajectory(SwerveDriveKinematics kinematics, TrajectorySample<?>[] samples) {
     this(
         kinematics,

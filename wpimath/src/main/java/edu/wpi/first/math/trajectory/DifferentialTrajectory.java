@@ -35,6 +35,13 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
     super(samples);
   }
 
+  /**
+   * Constructs a DifferentialTrajectory.
+   *
+   * @param samples the samples of the trajectory. Order does not matter as they will be ordered
+   *     internally.
+   * @param kinematics the kinematics of the drivetrain.
+   */
   public DifferentialTrajectory(
       DifferentialDriveKinematics kinematics, TrajectorySample<?>[] samples) {
     this(
