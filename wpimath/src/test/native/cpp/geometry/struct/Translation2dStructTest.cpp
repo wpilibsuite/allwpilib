@@ -6,11 +6,11 @@
 
 #include "wpi/math/geometry/Translation2d.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 namespace {
 
-using StructType = wpi::Struct<frc::Translation2d>;
+using StructType = wpi::util::Struct<wpi::math::Translation2d>;
 const Translation2d kExpectedData{Translation2d{3.504_m, 22.9_m}};
 }  // namespace
 

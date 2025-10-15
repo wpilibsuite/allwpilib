@@ -148,7 +148,7 @@ static bool EmitEntryTarget(int tag_id, std::string& file) {
   return rv;
 }
 
-void saveCalibration(wpi::json& field, std::string& output_directory,
+void saveCalibration(wpi::util::json& field, std::string& output_directory,
                      std::string output_name, bool& isCalibrating) {
   if (!field.empty() && !output_directory.empty()) {
     std::cout << "Saving calibration to " << output_directory << std::endl;
@@ -198,8 +198,8 @@ static void DisplayGui() {
       field_calibration_directory_selector;
   static std::unique_ptr<pfd::select_folder> download_directory_selector;
 
-  static wpi::json field_calibration_json;
-  static wpi::json field_combination_json;
+  static wpi::util::json field_calibration_json;
+  static wpi::util::json field_combination_json;
 
   static std::string selected_camera_intrinsics;
   static std::string selected_field_map;
@@ -534,8 +534,8 @@ static void DisplayGui() {
       std::ifstream calJson(output_calibration_json_path);
       std::ifstream refJson(selected_field_map);
 
-      currentCalibrationMap = Fieldmap(wpi::json::parse(calJson));
-      currentReferenceMap = Fieldmap(wpi::json::parse(refJson));
+      currentCalibrationMap = Fieldmap(wpi::util::json::parse(calJson));
+      currentReferenceMap = Fieldmap(wpi::util::json::parse(refJson));
 
       if (currentCalibrationMap.getNumTags() !=
           currentReferenceMap.getNumTags()) {
@@ -616,7 +616,7 @@ static void DisplayGui() {
     if (!selected_field_map.empty()) {
       drawCheck();
       std::ifstream json(selected_field_map);
-      currentReferenceMap = Fieldmap(wpi::json::parse(json));
+      currentReferenceMap = Fieldmap(wpi::util::json::parse(json));
       currentCombinerMap = currentReferenceMap;
     }
     openFilesButton("Select Field Calibrations",
@@ -660,7 +660,7 @@ static void DisplayGui() {
     if (ImGui::Button("Download", ImVec2(0, 0))) {
       for (auto& [key, val] : combiner_map) {
         std::ifstream json(val);
-        Fieldmap map(wpi::json::parse(json));
+        Fieldmap map(wpi::util::json::parse(json));
         currentCombinerMap.replaceTag(key, map.getTag(key));
       }
       field_combination_json = currentCombinerMap.toJson();

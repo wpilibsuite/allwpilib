@@ -6,7 +6,7 @@
 
 #include "wpi/commands2/button/Trigger.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 
 /**
  * A class containing static Trigger factories for running callbacks when robot
@@ -47,4 +47,4 @@ class RobotModeTriggers {
   static Trigger Test();
 };
 
-}  // namespace frc2
+}  // namespace wpi::cmd

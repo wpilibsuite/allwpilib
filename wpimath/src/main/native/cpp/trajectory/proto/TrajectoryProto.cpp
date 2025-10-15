@@ -10,9 +10,9 @@
 
 #include "wpimath/protobuf/trajectory.npb.h"
 
-std::optional<frc::Trajectory> wpi::Protobuf<frc::Trajectory>::Unpack(
+std::optional<wpi::math::Trajectory> wpi::util::Protobuf<wpi::math::Trajectory>::Unpack(
     InputStream& stream) {
-  wpi::StdVectorUnpackCallback<frc::Trajectory::State, SIZE_MAX> states;
+  wpi::util::StdVectorUnpackCallback<wpi::math::Trajectory::State, SIZE_MAX> states;
   wpi_proto_ProtobufTrajectory msg{
       .states = states.Callback(),
   };
@@ -20,12 +20,12 @@ std::optional<frc::Trajectory> wpi::Protobuf<frc::Trajectory>::Unpack(
     return {};
   }
 
-  return frc::Trajectory{states.Vec()};
+  return wpi::math::Trajectory{states.Vec()};
 }
 
-bool wpi::Protobuf<frc::Trajectory>::Pack(OutputStream& stream,
-                                          const frc::Trajectory& value) {
-  wpi::PackCallback<frc::Trajectory::State> states{value.States()};
+bool wpi::util::Protobuf<wpi::math::Trajectory>::Pack(OutputStream& stream,
+                                          const wpi::math::Trajectory& value) {
+  wpi::util::PackCallback<wpi::math::Trajectory::State> states{value.States()};
   wpi_proto_ProtobufTrajectory msg{
       .states = states.Callback(),
   };

@@ -9,9 +9,9 @@
 
 #include "wpi/hal/Errors.h"
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeThreads() {}
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 

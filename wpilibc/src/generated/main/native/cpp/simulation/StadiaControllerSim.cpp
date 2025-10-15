@@ -8,8 +8,8 @@
 
 #include "wpi/driverstation/StadiaController.hpp"
 
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 StadiaControllerSim::StadiaControllerSim(const StadiaController& joystick)
     : GenericHIDSim{joystick} {

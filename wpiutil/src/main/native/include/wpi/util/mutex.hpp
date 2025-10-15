@@ -8,7 +8,7 @@
 
 #include "wpi/util/priority_mutex.hpp"
 
-namespace wpi {
+namespace wpi::util {
 
 #ifdef WPI_HAVE_PRIORITY_MUTEX
 using mutex = priority_mutex;
@@ -18,4 +18,4 @@ using mutex = ::std::mutex;
 using recursive_mutex = ::std::recursive_mutex;
 #endif
 
-}  // namespace wpi
+}  // namespace wpi::util

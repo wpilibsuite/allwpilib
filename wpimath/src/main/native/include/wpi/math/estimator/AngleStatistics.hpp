@@ -10,7 +10,7 @@
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * Subtracts a and b while normalizing the resulting value in the selected row
@@ -26,7 +26,7 @@ Vectord<States> AngleResidual(const Vectord<States>& a,
                               const Vectord<States>& b, int angleStateIdx) {
   Vectord<States> ret = a - b;
   ret[angleStateIdx] =
-      AngleModulus(units::radian_t{ret[angleStateIdx]}).value();
+      AngleModulus(wpi::units::radian_t{ret[angleStateIdx]}).value();
   return ret;
 }
 
@@ -124,4 +124,4 @@ AngleMean(int angleStateIdx) {
   };
 }
 
-}  // namespace frc
+}  // namespace wpi::math

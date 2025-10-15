@@ -20,9 +20,9 @@
 #include "tag16h5.h"
 #include "tag36h11.h"
 
-using namespace frc;
+using namespace wpi::apriltag;
 
-static bool FamilyToImage(wpi::RawFrame* frame, apriltag_family_t* family,
+static bool FamilyToImage(wpi::util::RawFrame* frame, apriltag_family_t* family,
                           int id) {
   image_u8_t* image = apriltag_to_image(family, id);
   size_t totalDataSize = image->height * image->stride;
@@ -37,25 +37,25 @@ static bool FamilyToImage(wpi::RawFrame* frame, apriltag_family_t* family,
   return rv;
 }
 
-bool AprilTag::Generate36h11AprilTagImage(wpi::RawFrame* frame, int id) {
+bool AprilTag::Generate36h11AprilTagImage(wpi::util::RawFrame* frame, int id) {
   apriltag_family_t* tagFamily = tag36h11_create();
   bool rv = FamilyToImage(frame, tagFamily, id);
   tag36h11_destroy(tagFamily);
   return rv;
 }
 
-bool AprilTag::Generate16h5AprilTagImage(wpi::RawFrame* frame, int id) {
+bool AprilTag::Generate16h5AprilTagImage(wpi::util::RawFrame* frame, int id) {
   apriltag_family_t* tagFamily = tag16h5_create();
   bool rv = FamilyToImage(frame, tagFamily, id);
   tag16h5_destroy(tagFamily);
   return rv;
 }
 
-void frc::to_json(wpi::json& json, const AprilTag& apriltag) {
-  json = wpi::json{{"ID", apriltag.ID}, {"pose", apriltag.pose}};
+void wpi::apriltag::to_json(wpi::util::json& json, const AprilTag& apriltag) {
+  json = wpi::util::json{{"ID", apriltag.ID}, {"pose", apriltag.pose}};
 }
 
-void frc::from_json(const wpi::json& json, AprilTag& apriltag) {
+void wpi::apriltag::from_json(const wpi::util::json& json, AprilTag& apriltag) {
   apriltag.ID = json.at("ID").get<int>();
-  apriltag.pose = json.at("pose").get<Pose3d>();
+  apriltag.pose = json.at("pose").get<wpi::math::Pose3d>();
 }

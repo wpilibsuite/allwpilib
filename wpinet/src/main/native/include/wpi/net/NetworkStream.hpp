@@ -8,7 +8,7 @@
 #include <cstddef>
 #include <string_view>
 
-namespace wpi {
+namespace wpi::net {
 
 class NetworkStream {
  public:
@@ -39,6 +39,6 @@ class NetworkStream {
   NetworkStream& operator=(const NetworkStream&) = delete;
 };
 
-}  // namespace wpi
+}  // namespace wpi::net
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_NETWORKSTREAM_HPP_

@@ -17,7 +17,7 @@
 
 #include "wpi/system/Errors.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 DigitalOutput::DigitalOutput(int channel) {
   m_pwmGenerator = HAL_kInvalidHandle;
@@ -27,12 +27,12 @@ DigitalOutput::DigitalOutput(int channel) {
   m_channel = channel;
 
   int32_t status = 0;
-  std::string stackTrace = wpi::GetStackTrace(1);
+  std::string stackTrace = wpi::util::GetStackTrace(1);
   m_handle = HAL_InitializeDIOPort(channel, false, stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", channel);
 
   HAL_ReportUsage("IO", channel, "DigitalOutput");
-  wpi::SendableRegistry::Add(this, "DigitalOutput", channel);
+  wpi::util::SendableRegistry::Add(this, "DigitalOutput", channel);
 }
 
 DigitalOutput::~DigitalOutput() {
@@ -63,7 +63,7 @@ int DigitalOutput::GetChannel() const {
   return m_channel;
 }
 
-void DigitalOutput::Pulse(units::second_t pulseLength) {
+void DigitalOutput::Pulse(wpi::units::second_t pulseLength) {
   int32_t status = 0;
   HAL_Pulse(m_handle, pulseLength.value(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
@@ -143,7 +143,7 @@ void DigitalOutput::SetSimDevice(HAL_SimDeviceHandle device) {
   HAL_SetDIOSimDevice(m_handle, device);
 }
 
-void DigitalOutput::InitSendable(wpi::SendableBuilder& builder) {
+void DigitalOutput::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Digital Output");
   builder.AddBooleanProperty(
       "Value", [=, this] { return Get(); },

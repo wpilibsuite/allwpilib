@@ -8,7 +8,7 @@
 #include <utility>
 #include <vector>
 
-namespace frc2 {
+namespace wpi::cmd {
 
 template <typename T = void, typename... Args,
           typename CommonType = std::conditional_t<
@@ -31,4 +31,4 @@ std::vector<CommonType> make_vector(Args&&... args) {
   }
 }
 
-}  // namespace frc2
+}  // namespace wpi::cmd

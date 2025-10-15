@@ -10,7 +10,7 @@
 #include "gtest/gtest.h"
 #include <cstdlib>
 #include <ctime>
-using namespace wpi;
+using namespace wpi::util;
 
 #undef max
 

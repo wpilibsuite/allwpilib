@@ -15,47 +15,47 @@
 
 #include "Constants.hpp"
 
-class Drive : public frc2::SubsystemBase {
+class Drive : public wpi::cmd::SubsystemBase {
  public:
   Drive();
 
-  frc2::CommandPtr ArcadeDriveCommand(std::function<double()> fwd,
+  wpi::cmd::CommandPtr ArcadeDriveCommand(std::function<double()> fwd,
                                       std::function<double()> rot);
-  frc2::CommandPtr SysIdQuasistatic(frc2::sysid::Direction direction);
-  frc2::CommandPtr SysIdDynamic(frc2::sysid::Direction direction);
+  wpi::cmd::CommandPtr SysIdQuasistatic(wpi::cmd::sysid::Direction direction);
+  wpi::cmd::CommandPtr SysIdDynamic(wpi::cmd::sysid::Direction direction);
 
  private:
-  frc::PWMSparkMax m_leftMotor{constants::drive::kLeftMotor1Port};
-  frc::PWMSparkMax m_rightMotor{constants::drive::kRightMotor1Port};
-  frc::DifferentialDrive m_drive{[this](auto val) { m_leftMotor.Set(val); },
+  wpi::PWMSparkMax m_leftMotor{constants::drive::kLeftMotor1Port};
+  wpi::PWMSparkMax m_rightMotor{constants::drive::kRightMotor1Port};
+  wpi::DifferentialDrive m_drive{[this](auto val) { m_leftMotor.Set(val); },
                                  [this](auto val) { m_rightMotor.Set(val); }};
 
-  frc::Encoder m_leftEncoder{constants::drive::kLeftEncoderPorts[0],
+  wpi::Encoder m_leftEncoder{constants::drive::kLeftEncoderPorts[0],
                              constants::drive::kLeftEncoderPorts[1],
                              constants::drive::kLeftEncoderReversed};
 
-  frc::Encoder m_rightEncoder{constants::drive::kRightEncoderPorts[0],
+  wpi::Encoder m_rightEncoder{constants::drive::kRightEncoderPorts[0],
                               constants::drive::kRightEncoderPorts[1],
                               constants::drive::kRightEncoderReversed};
 
-  frc2::sysid::SysIdRoutine m_sysIdRoutine{
-      frc2::sysid::Config{std::nullopt, std::nullopt, std::nullopt, nullptr},
-      frc2::sysid::Mechanism{
-          [this](units::volt_t driveVoltage) {
+  wpi::cmd::sysid::SysIdRoutine m_sysIdRoutine{
+      wpi::cmd::sysid::Config{std::nullopt, std::nullopt, std::nullopt, nullptr},
+      wpi::cmd::sysid::Mechanism{
+          [this](wpi::units::volt_t driveVoltage) {
             m_leftMotor.SetVoltage(driveVoltage);
             m_rightMotor.SetVoltage(driveVoltage);
           },
-          [this](frc::sysid::SysIdRoutineLog* log) {
+          [this](wpi::sysid::SysIdRoutineLog* log) {
             log->Motor("drive-left")
                 .voltage(m_leftMotor.Get() *
-                         frc::RobotController::GetBatteryVoltage())
-                .position(units::meter_t{m_leftEncoder.GetDistance()})
-                .velocity(units::meters_per_second_t{m_leftEncoder.GetRate()});
+                         wpi::RobotController::GetBatteryVoltage())
+                .position(wpi::units::meter_t{m_leftEncoder.GetDistance()})
+                .velocity(wpi::units::meters_per_second_t{m_leftEncoder.GetRate()});
             log->Motor("drive-right")
                 .voltage(m_rightMotor.Get() *
-                         frc::RobotController::GetBatteryVoltage())
-                .position(units::meter_t{m_rightEncoder.GetDistance()})
-                .velocity(units::meters_per_second_t{m_rightEncoder.GetRate()});
+                         wpi::RobotController::GetBatteryVoltage())
+                .position(wpi::units::meter_t{m_rightEncoder.GetDistance()})
+                .velocity(wpi::units::meters_per_second_t{m_rightEncoder.GetRate()});
           },
           this}};
 };

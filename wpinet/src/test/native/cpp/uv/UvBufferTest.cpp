@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 TEST(UvSimpleBufferPoolTest, ConstructDefault) {
   SimpleBufferPool<> pool;
@@ -45,4 +45,4 @@ TEST(UvSimpleBufferPoolTest, ClearRemaining) {
   ASSERT_EQ(pool.Remaining(), 0u);
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

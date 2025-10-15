@@ -15,7 +15,7 @@
 #include "wpi/util/array.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
 
-namespace wpi {
+namespace wpi::util {
 
 /**
  * The behavior to use when more elements are in the message then expected when
@@ -268,7 +268,7 @@ class DirectUnpackCallback {
                      space.size());
     } else if constexpr (ProtobufSerializable<T>) {
       ProtoInputStream<T> istream{stream};
-      auto decoded = wpi::Protobuf<T>::Unpack(istream);
+      auto decoded = wpi::util::Protobuf<T>::Unpack(istream);
       if (decoded.has_value()) {
         m_storage.emplace_back(std::move(decoded.value()));
         return true;
@@ -332,13 +332,13 @@ class DirectUnpackCallback {
  */
 template <ProtoCallbackUnpackable T, size_t N = 1>
 class UnpackCallback
-    : public DirectUnpackCallback<T, wpi::SmallVector<T, N>, N> {
+    : public DirectUnpackCallback<T, wpi::util::SmallVector<T, N>, N> {
  public:
   /**
    * Constructs an UnpackCallback.
    */
   UnpackCallback()
-      : DirectUnpackCallback<T, wpi::SmallVector<T, N>, N>{m_storedBuffer} {
+      : DirectUnpackCallback<T, wpi::util::SmallVector<T, N>, N>{m_storedBuffer} {
     this->SetLimits(DecodeLimits::Ignore);
   }
 
@@ -361,10 +361,10 @@ class UnpackCallback
    *
    * @return small vector reference
    */
-  wpi::SmallVector<T, N>& Vec() noexcept { return m_storedBuffer; }
+  wpi::util::SmallVector<T, N>& Vec() noexcept { return m_storedBuffer; }
 
  private:
-  wpi::SmallVector<T, N> m_storedBuffer;
+  wpi::util::SmallVector<T, N> m_storedBuffer;
 };
 
 /**
@@ -414,12 +414,12 @@ class StdVectorUnpackCallback
 };
 
 /**
- * A wrapper around a wpi::array that lets us
+ * A wrapper around a wpi::util::array that lets us
  * treat it as a limited sized vector.
  */
 template <ProtoCallbackUnpackable T, size_t N>
 struct WpiArrayEmplaceWrapper {
-  wpi::array<T, N> m_array{wpi::empty_array_t{}};
+  wpi::util::array<T, N> m_array{wpi::util::empty_array_t{}};
   size_t m_currentIndex = 0;
 
   size_t size() const { return m_currentIndex; }
@@ -433,7 +433,7 @@ struct WpiArrayEmplaceWrapper {
 };
 
 /**
- * A DirectUnpackCallback backed by a wpi::array<T, N>.
+ * A DirectUnpackCallback backed by a wpi::util::array<T, N>.
  *
  * Any elements in the packed buffer past N will
  * be cause decoding to fail.
@@ -471,7 +471,7 @@ struct WpiArrayUnpackCallback
    *
    * @return array reference
    */
-  wpi::array<T, N>& Array() noexcept { return m_array.m_array; }
+  wpi::util::array<T, N>& Array() noexcept { return m_array.m_array; }
 
  private:
   WpiArrayEmplaceWrapper<T, N> m_array;
@@ -581,7 +581,7 @@ class PackCallback {
                               reinterpret_cast<const pb_byte_t*>(view.data()),
                               view.size());
     } else if constexpr (ProtobufSerializable<T>) {
-      return wpi::Protobuf<T>::Pack(stream, value);
+      return wpi::util::Protobuf<T>::Pack(stream, value);
     }
   }
 
@@ -667,4 +667,4 @@ class PackCallback {
   pb_callback_t m_callback;
 };
 
-}  // namespace wpi
+}  // namespace wpi::util

@@ -9,7 +9,7 @@
 #include "wpi/math/estimator/MerweScaledSigmaPoints.hpp"
 #include "wpi/math/estimator/UnscentedKalmanFilter.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 template <int States, int Inputs, int Outputs>
 using MerweUKF = UnscentedKalmanFilter<States, Inputs, Outputs,
@@ -22,4 +22,4 @@ extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
     UnscentedKalmanFilter<5, 3, 3, MerweScaledSigmaPoints<5>>;
 
-}  // namespace frc
+}  // namespace wpi::math

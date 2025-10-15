@@ -13,7 +13,7 @@
 #include "wpi/math/spline/SplineParameterizer.hpp"
 #include "wpi/math/trajectory/TrajectoryParameterizer.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 const Trajectory TrajectoryGenerator::kDoNothingTrajectory(
     std::vector<Trajectory::State>{Trajectory::State()});
@@ -23,7 +23,7 @@ void TrajectoryGenerator::ReportError(const char* error) {
   if (s_errorFunc) {
     s_errorFunc(error);
   } else {
-    wpi::print(stderr, "TrajectoryGenerator error: {}\n", error);
+    wpi::util::print(stderr, "TrajectoryGenerator error: {}\n", error);
   }
 }
 
@@ -42,7 +42,7 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
     end.y[1] *= -1;
   }
 
-  std::vector<frc::SplineParameterizer::PoseWithCurvature> points;
+  std::vector<wpi::math::SplineParameterizer::PoseWithCurvature> points;
   try {
     points =
         SplinePointsFromSplines(SplineHelper::CubicSplinesFromControlVectors(
@@ -87,7 +87,7 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
     }
   }
 
-  std::vector<frc::SplineParameterizer::PoseWithCurvature> points;
+  std::vector<wpi::math::SplineParameterizer::PoseWithCurvature> points;
   try {
     points = SplinePointsFromSplines(
         SplineHelper::QuinticSplinesFromControlVectors(controlVectors));

@@ -14,7 +14,7 @@
 
 #include "wpi/net/http_parser.hpp"
 
-namespace wpi {
+namespace wpi::net {
 
 /**
  * HTTP protocol parser.  Performs incremental parsing with callbacks for each
@@ -144,14 +144,14 @@ class HttpParser {
   /**
    * Message begin callback.
    */
-  sig::Signal<> messageBegin;
+  wpi::util::sig::Signal<> messageBegin;
 
   /**
    * URL callback.
    *
    * The parameter to the callback is the complete URL string.
    */
-  sig::Signal<std::string_view> url;
+  wpi::util::sig::Signal<std::string_view> url;
 
   /**
    * Status callback.
@@ -159,14 +159,14 @@ class HttpParser {
    * The parameter to the callback is the complete status string.
    * GetStatusCode() can be used to get the numeric status code.
    */
-  sig::Signal<std::string_view> status;
+  wpi::util::sig::Signal<std::string_view> status;
 
   /**
    * Header field callback.
    *
    * The parameters to the callback are the field name and field value.
    */
-  sig::Signal<std::string_view, std::string_view> header;
+  wpi::util::sig::Signal<std::string_view, std::string_view> header;
 
   /**
    * Headers complete callback.
@@ -176,7 +176,7 @@ class HttpParser {
    * connection.  If you are the server, respond with the "Connection: close"
    * header.  If you are the client, close the connection.
    */
-  sig::Signal<bool> headersComplete;
+  wpi::util::sig::Signal<bool> headersComplete;
 
   /**
    * Body data callback.
@@ -186,7 +186,7 @@ class HttpParser {
    * multiple times arbitrarily (e.g. it's possible that it may be called with
    * just a few characters at a time).
    */
-  sig::Signal<std::string_view, bool> body;
+  wpi::util::sig::Signal<std::string_view, bool> body;
 
   /**
    * Headers complete callback.
@@ -196,19 +196,19 @@ class HttpParser {
    * connection.  If you are the server, respond with the "Connection: close"
    * header.  If you are the client, close the connection.
    */
-  sig::Signal<bool> messageComplete;
+  wpi::util::sig::Signal<bool> messageComplete;
 
   /**
    * Chunk header callback.
    *
    * The parameter to the callback is the chunk size.
    */
-  sig::Signal<uint64_t> chunkHeader;
+  wpi::util::sig::Signal<uint64_t> chunkHeader;
 
   /**
    * Chunk complete callback.
    */
-  sig::Signal<> chunkComplete;
+  wpi::util::sig::Signal<> chunkComplete;
 
  private:
   http_parser m_parser;
@@ -216,13 +216,13 @@ class HttpParser {
 
   size_t m_maxLength = 1024;
   enum { kStart, kUrl, kStatus, kField, kValue } m_state = kStart;
-  SmallString<128> m_urlBuf;
-  SmallString<32> m_fieldBuf;
-  SmallString<128> m_valueBuf;
+  wpi::util::SmallString<128> m_urlBuf;
+  wpi::util::SmallString<32> m_fieldBuf;
+  wpi::util::SmallString<128> m_valueBuf;
 
   bool m_aborted = false;
 };
 
-}  // namespace wpi
+}  // namespace wpi::net
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_HTTPPARSER_HPP_

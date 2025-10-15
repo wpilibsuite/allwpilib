@@ -17,7 +17,7 @@
 #include "wpi/glass/Model.hpp"
 #include "wpi/glass/WindowManager.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 class Storage;
 
@@ -222,4 +222,4 @@ class Provider : public WindowManager {
   virtual void Show(ViewEntry* entry, Window* window) = 0;
 };
 
-}  // namespace glass
+}  // namespace wpi::glass

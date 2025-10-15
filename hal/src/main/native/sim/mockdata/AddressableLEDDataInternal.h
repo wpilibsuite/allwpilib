@@ -12,7 +12,7 @@
 #include "wpi/hal/simulation/SimCallbackRegistry.h"
 #include "wpi/hal/simulation/SimDataValue.h"
 
-namespace hal {
+namespace wpi::hal {
 class AddressableLEDData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(Start)
@@ -31,7 +31,7 @@ extern AddressableLEDData* SimAddressableLEDData;
 class AddressableLEDDataBuffer {
   HAL_SIMDATAVALUE_DEFINE_NAME(Data)
 
-  wpi::recursive_spinlock m_dataMutex;
+  wpi::util::recursive_spinlock m_dataMutex;
   HAL_AddressableLEDData m_data[HAL_kAddressableLEDMaxLength];
 
  public:
@@ -40,4 +40,4 @@ class AddressableLEDDataBuffer {
   SimCallbackRegistry<HAL_ConstBufferCallback, GetDataName> data;
 };
 extern AddressableLEDDataBuffer* SimAddressableLEDDataBuffer;
-}  // namespace hal
+}  // namespace wpi::hal

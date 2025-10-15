@@ -9,7 +9,7 @@
 #include "wpi/math/geometry/Twist2d.hpp"
 #include "wpi/math/kinematics/ChassisSpeeds.hpp"
 
-namespace frc {
+namespace wpi::math {
 /**
  * Helper class that converts a chassis velocity (dx, dy, and dtheta components)
  * into individual wheel speeds. Robot code should not use this directly-
@@ -76,4 +76,4 @@ class WPILIB_DLLEXPORT Kinematics {
                                      const WheelPositions& end,
                                      double t) const = 0;
 };
-}  // namespace frc
+}  // namespace wpi::math

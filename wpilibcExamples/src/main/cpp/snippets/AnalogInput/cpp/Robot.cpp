@@ -9,7 +9,7 @@
  * AnalogInput snippets for frc-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/analog-input-software.html
  */
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   Robot() {
     // Sets the AnalogInput to 4-bit oversampling.  16 samples will be added
@@ -44,11 +44,11 @@ class Robot : public frc::TimedRobot {
 
  private:
   // Initializes an AnalogInput on port 0
-  frc::AnalogInput m_analog{0};
+  wpi::AnalogInput m_analog{0};
 };
 
 #ifndef RUNNING_FRC_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

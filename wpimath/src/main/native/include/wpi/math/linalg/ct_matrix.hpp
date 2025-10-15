@@ -11,7 +11,7 @@
 #include <Eigen/Core>
 #include <gcem.hpp>
 
-namespace frc {
+namespace wpi::math {
 
 template <typename T>
 concept EigenMatrixLike = std::derived_from<T, Eigen::MatrixBase<T>>;
@@ -386,4 +386,4 @@ using ct_matrix3d = ct_matrix<double, 3, 3>;
 using ct_vector2d = ct_vector<double, 2>;
 using ct_vector3d = ct_vector<double, 3>;
 
-}  // namespace frc
+}  // namespace wpi::math

@@ -11,7 +11,7 @@
 #include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsControlModule.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 
 TEST(CTREPCMSimTest, InitializedCallback) {
   CTREPCMSim sim;
@@ -33,7 +33,7 @@ TEST(CTREPCMSimTest, SolenoidOutput) {
   CTREPCMSim sim(pcm);
   sim.ResetData();
 
-  DoubleSolenoid doubleSolenoid{0, frc::PneumaticsModuleType::CTREPCM, 3, 4};
+  DoubleSolenoid doubleSolenoid{0, wpi::PneumaticsModuleType::CTREPCM, 3, 4};
 
   BooleanCallback callback3;
   BooleanCallback callback4;
@@ -147,4 +147,4 @@ TEST(CTREPCMSimTest, SetCompressorCurrent) {
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(35.04, callback.GetLastValue());
 }
-}  // namespace frc::sim
+}  // namespace wpi::sim

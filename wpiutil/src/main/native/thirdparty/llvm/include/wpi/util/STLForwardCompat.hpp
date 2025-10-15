@@ -20,7 +20,7 @@
 #include <optional>
 #include <type_traits>
 
-namespace wpi {
+namespace wpi::util {
 
 //===----------------------------------------------------------------------===//
 //     Features from C++20
@@ -34,7 +34,7 @@ struct remove_cvref // NOLINT(readability-identifier-naming)
 
 template <typename T>
 using remove_cvref_t // NOLINT(readability-identifier-naming)
-    = typename wpi::remove_cvref<T>::type;
+    = typename wpi::util::remove_cvref<T>::type;
 
 //===----------------------------------------------------------------------===//
 //     Features from C++23
@@ -67,6 +67,6 @@ template <typename Enum>
   return static_cast<std::underlying_type_t<Enum>>(E);
 }
 
-} // namespace wpi
+} // namespace wpi::util
 
 #endif // WPIUTIL_WPI_STLFORWARDCOMPAT_H

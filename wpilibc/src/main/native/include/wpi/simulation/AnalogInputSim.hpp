@@ -8,7 +8,7 @@
 
 #include "wpi/simulation/CallbackStore.hpp"
 
-namespace frc {
+namespace wpi {
 
 class AnalogInput;
 
@@ -146,4 +146,4 @@ class AnalogInputSim {
   int m_index;
 };
 }  // namespace sim
-}  // namespace frc
+}  // namespace wpi

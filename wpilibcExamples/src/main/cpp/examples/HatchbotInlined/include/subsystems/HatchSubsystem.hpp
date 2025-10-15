@@ -11,7 +11,7 @@
 
 #include "Constants.hpp"
 
-class HatchSubsystem : public frc2::SubsystemBase {
+class HatchSubsystem : public wpi::cmd::SubsystemBase {
  public:
   HatchSubsystem();
 
@@ -20,17 +20,17 @@ class HatchSubsystem : public frc2::SubsystemBase {
   /**
    * Grabs the hatch.
    */
-  frc2::CommandPtr GrabHatchCommand();
+  wpi::cmd::CommandPtr GrabHatchCommand();
 
   /**
    * Releases the hatch.
    */
-  frc2::CommandPtr ReleaseHatchCommand();
+  wpi::cmd::CommandPtr ReleaseHatchCommand();
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
-  frc::DoubleSolenoid m_hatchSolenoid;
+  wpi::DoubleSolenoid m_hatchSolenoid;
 };

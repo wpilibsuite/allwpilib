@@ -10,7 +10,7 @@
 #include "subsystems/DriveSubsystem.hpp"
 
 class HalveDriveSpeed
-    : public frc2::CommandHelper<frc2::Command, HalveDriveSpeed> {
+    : public wpi::cmd::CommandHelper<wpi::cmd::Command, HalveDriveSpeed> {
  public:
   explicit HalveDriveSpeed(DriveSubsystem* subsystem);
 

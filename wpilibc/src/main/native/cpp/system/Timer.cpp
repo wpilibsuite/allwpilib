@@ -10,31 +10,31 @@
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/system/RobotController.hpp"
 
-namespace frc {
+namespace wpi {
 
-void Wait(units::second_t seconds) {
+void Wait(wpi::units::second_t seconds) {
   std::this_thread::sleep_for(std::chrono::duration<double>(seconds.value()));
 }
 
-units::second_t GetTime() {
+wpi::units::second_t GetTime() {
   using std::chrono::duration;
   using std::chrono::duration_cast;
   using std::chrono::system_clock;
 
-  return units::second_t{
+  return wpi::units::second_t{
       duration_cast<duration<double>>(system_clock::now().time_since_epoch())
           .count()};
 }
 
-}  // namespace frc
+}  // namespace wpi
 
-using namespace frc;
+using namespace wpi;
 
 Timer::Timer() {
   Reset();
 }
 
-units::second_t Timer::Get() const {
+wpi::units::second_t Timer::Get() const {
   if (m_running) {
     return (GetTimestamp() - m_startTime) + m_accumulatedTime;
   } else {
@@ -69,11 +69,11 @@ void Timer::Stop() {
   }
 }
 
-bool Timer::HasElapsed(units::second_t period) const {
+bool Timer::HasElapsed(wpi::units::second_t period) const {
   return Get() >= period;
 }
 
-bool Timer::AdvanceIfElapsed(units::second_t period) {
+bool Timer::AdvanceIfElapsed(wpi::units::second_t period) {
   if (Get() >= period) {
     // Advance the start time by the period.
     m_startTime += period;
@@ -88,15 +88,15 @@ bool Timer::IsRunning() const {
   return m_running;
 }
 
-units::second_t Timer::GetTimestamp() {
-  return units::second_t{frc::RobotController::GetTime() * 1.0e-6};
+wpi::units::second_t Timer::GetTimestamp() {
+  return wpi::units::second_t{wpi::RobotController::GetTime() * 1.0e-6};
 }
 
-units::second_t Timer::GetFPGATimestamp() {
+wpi::units::second_t Timer::GetFPGATimestamp() {
   // FPGA returns the timestamp in microseconds
-  return units::second_t{frc::RobotController::GetFPGATime() * 1.0e-6};
+  return wpi::units::second_t{wpi::RobotController::GetFPGATime() * 1.0e-6};
 }
 
-units::second_t Timer::GetMatchTime() {
-  return frc::DriverStation::GetMatchTime();
+wpi::units::second_t Timer::GetMatchTime() {
+  return wpi::DriverStation::GetMatchTime();
 }

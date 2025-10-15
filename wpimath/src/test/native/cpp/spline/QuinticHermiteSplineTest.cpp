@@ -14,9 +14,9 @@
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
-namespace frc {
+namespace wpi::math {
 class QuinticHermiteSplineTest : public ::testing::Test {
  protected:
   static void Run(const Pose2d& a, const Pose2d& b) {
@@ -51,7 +51,7 @@ class QuinticHermiteSplineTest : public ::testing::Test {
                 b.Rotation().Radians().value(), 1E-9);
   }
 };
-}  // namespace frc
+}  // namespace wpi::math
 
 TEST_F(QuinticHermiteSplineTest, StraightLine) {
   Run(Pose2d{}, Pose2d{3_m, 0_m, 0_deg});

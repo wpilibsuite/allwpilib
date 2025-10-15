@@ -46,8 +46,8 @@ int32_t HAL_ReportUsage(const struct WPI_String* resource,
  */
 inline int32_t HAL_ReportUsage(std::string_view resource,
                                std::string_view data) {
-  WPI_String resourceStr = wpi::make_string(resource);
-  WPI_String dataStr = wpi::make_string(data);
+  WPI_String resourceStr = wpi::util::make_string(resource);
+  WPI_String dataStr = wpi::util::make_string(data);
   return HAL_ReportUsage(&resourceStr, &dataStr);
 }
 

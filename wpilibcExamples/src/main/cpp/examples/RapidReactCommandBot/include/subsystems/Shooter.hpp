@@ -17,7 +17,7 @@
 
 #include "Constants.hpp"
 
-class Shooter : public frc2::SubsystemBase {
+class Shooter : public wpi::cmd::SubsystemBase {
  public:
   Shooter();
 
@@ -28,16 +28,16 @@ class Shooter : public frc2::SubsystemBase {
    *
    * @param setpointRotationsPerSecond The desired shooter velocity
    */
-  frc2::CommandPtr ShootCommand(units::turns_per_second_t setpoint);
+  wpi::cmd::CommandPtr ShootCommand(wpi::units::turns_per_second_t setpoint);
 
  private:
-  frc::PWMSparkMax m_shooterMotor{ShooterConstants::kShooterMotorPort};
-  frc::PWMSparkMax m_feederMotor{ShooterConstants::kFeederMotorPort};
+  wpi::PWMSparkMax m_shooterMotor{ShooterConstants::kShooterMotorPort};
+  wpi::PWMSparkMax m_feederMotor{ShooterConstants::kFeederMotorPort};
 
-  frc::Encoder m_shooterEncoder{ShooterConstants::kEncoderPorts[0],
+  wpi::Encoder m_shooterEncoder{ShooterConstants::kEncoderPorts[0],
                                 ShooterConstants::kEncoderPorts[1],
                                 ShooterConstants::kEncoderReversed};
-  frc::SimpleMotorFeedforward<units::radians> m_shooterFeedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::radians> m_shooterFeedforward{
       ShooterConstants::kS, ShooterConstants::kV};
-  frc::PIDController m_shooterFeedback{ShooterConstants::kP, 0.0, 0.0};
+  wpi::math::PIDController m_shooterFeedback{ShooterConstants::kP, 0.0, 0.0};
 };

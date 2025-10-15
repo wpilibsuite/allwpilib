@@ -11,23 +11,23 @@ constexpr size_t kKvOff = kKgOff + 8;
 constexpr size_t kKaOff = kKvOff + 8;
 }  // namespace
 
-using StructType = wpi::Struct<frc::ArmFeedforward>;
+using StructType = wpi::util::Struct<wpi::math::ArmFeedforward>;
 
-frc::ArmFeedforward StructType::Unpack(std::span<const uint8_t> data) {
-  return frc::ArmFeedforward{
-      units::volt_t{wpi::UnpackStruct<double, kKsOff>(data)},
-      units::volt_t{wpi::UnpackStruct<double, kKgOff>(data)},
-      units::unit_t<frc::ArmFeedforward::kv_unit>{
-          wpi::UnpackStruct<double, kKvOff>(data)},
-      units::unit_t<frc::ArmFeedforward::ka_unit>{
-          wpi::UnpackStruct<double, kKaOff>(data)},
+wpi::math::ArmFeedforward StructType::Unpack(std::span<const uint8_t> data) {
+  return wpi::math::ArmFeedforward{
+      wpi::units::volt_t{wpi::util::UnpackStruct<double, kKsOff>(data)},
+      wpi::units::volt_t{wpi::util::UnpackStruct<double, kKgOff>(data)},
+      wpi::units::unit_t<wpi::math::ArmFeedforward::kv_unit>{
+          wpi::util::UnpackStruct<double, kKvOff>(data)},
+      wpi::units::unit_t<wpi::math::ArmFeedforward::ka_unit>{
+          wpi::util::UnpackStruct<double, kKaOff>(data)},
   };
 }
 
 void StructType::Pack(std::span<uint8_t> data,
-                      const frc::ArmFeedforward& value) {
-  wpi::PackStruct<kKsOff>(data, value.GetKs().value());
-  wpi::PackStruct<kKgOff>(data, value.GetKg().value());
-  wpi::PackStruct<kKvOff>(data, value.GetKv().value());
-  wpi::PackStruct<kKaOff>(data, value.GetKa().value());
+                      const wpi::math::ArmFeedforward& value) {
+  wpi::util::PackStruct<kKsOff>(data, value.GetKs().value());
+  wpi::util::PackStruct<kKgOff>(data, value.GetKg().value());
+  wpi::util::PackStruct<kKvOff>(data, value.GetKv().value());
+  wpi::util::PackStruct<kKaOff>(data, value.GetKa().value());
 }

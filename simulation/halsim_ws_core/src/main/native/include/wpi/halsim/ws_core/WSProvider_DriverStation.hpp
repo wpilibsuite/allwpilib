@@ -17,7 +17,7 @@ class HALSimWSProviderDriverStation : public HALSimWSHalProvider {
   using HALSimWSHalProvider::HALSimWSHalProvider;
   ~HALSimWSProviderDriverStation() override;
 
-  void OnNetValueChanged(const wpi::json& json) override;
+  void OnNetValueChanged(const wpi::util::json& json) override;
 
  protected:
   void RegisterCallbacks() override;

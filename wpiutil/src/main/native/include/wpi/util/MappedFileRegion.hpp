@@ -18,7 +18,7 @@ using file_t = int;
 #endif
 }  // namespace fs
 
-namespace wpi {
+namespace wpi::util {
 
 class MappedFileRegion {
  public:
@@ -83,4 +83,4 @@ class MappedFileRegion {
 #endif
 };
 
-}  // namespace wpi
+}  // namespace wpi::util

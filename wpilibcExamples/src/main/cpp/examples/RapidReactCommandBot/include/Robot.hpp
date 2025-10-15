@@ -11,7 +11,7 @@
 
 #include "RapidReactCommandBot.hpp"
 
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   Robot();
   void RobotPeriodic() override;
@@ -26,5 +26,5 @@ class Robot : public frc::TimedRobot {
 
  private:
   RapidReactCommandBot m_robot;
-  std::optional<frc2::CommandPtr> m_autonomousCommand;
+  std::optional<wpi::cmd::CommandPtr> m_autonomousCommand;
 };

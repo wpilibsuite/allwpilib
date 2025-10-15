@@ -6,64 +6,64 @@
 
 #include "wpi/commands2/button/CommandXboxController.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 CommandXboxController::CommandXboxController(int port)
-    : CommandGenericHID(port), m_hid{frc::XboxController(port)} {}
+    : CommandGenericHID(port), m_hid{wpi::XboxController(port)} {}
 
-frc::XboxController& CommandXboxController::GetHID() {
+wpi::XboxController& CommandXboxController::GetHID() {
   return m_hid;
 }
 
-Trigger CommandXboxController::A(frc::EventLoop* loop) const {
-  return Button(frc::XboxController::Button::kA, loop);
+Trigger CommandXboxController::A(wpi::EventLoop* loop) const {
+  return Button(wpi::XboxController::Button::kA, loop);
 }
 
-Trigger CommandXboxController::B(frc::EventLoop* loop) const {
-  return Button(frc::XboxController::Button::kB, loop);
+Trigger CommandXboxController::B(wpi::EventLoop* loop) const {
+  return Button(wpi::XboxController::Button::kB, loop);
 }
 
-Trigger CommandXboxController::X(frc::EventLoop* loop) const {
-  return Button(frc::XboxController::Button::kX, loop);
+Trigger CommandXboxController::X(wpi::EventLoop* loop) const {
+  return Button(wpi::XboxController::Button::kX, loop);
 }
 
-Trigger CommandXboxController::Y(frc::EventLoop* loop) const {
-  return Button(frc::XboxController::Button::kY, loop);
+Trigger CommandXboxController::Y(wpi::EventLoop* loop) const {
+  return Button(wpi::XboxController::Button::kY, loop);
 }
 
-Trigger CommandXboxController::LeftBumper(frc::EventLoop* loop) const {
-  return Button(frc::XboxController::Button::kLeftBumper, loop);
+Trigger CommandXboxController::LeftBumper(wpi::EventLoop* loop) const {
+  return Button(wpi::XboxController::Button::kLeftBumper, loop);
 }
 
-Trigger CommandXboxController::RightBumper(frc::EventLoop* loop) const {
-  return Button(frc::XboxController::Button::kRightBumper, loop);
+Trigger CommandXboxController::RightBumper(wpi::EventLoop* loop) const {
+  return Button(wpi::XboxController::Button::kRightBumper, loop);
 }
 
-Trigger CommandXboxController::Back(frc::EventLoop* loop) const {
-  return Button(frc::XboxController::Button::kBack, loop);
+Trigger CommandXboxController::Back(wpi::EventLoop* loop) const {
+  return Button(wpi::XboxController::Button::kBack, loop);
 }
 
-Trigger CommandXboxController::Start(frc::EventLoop* loop) const {
-  return Button(frc::XboxController::Button::kStart, loop);
+Trigger CommandXboxController::Start(wpi::EventLoop* loop) const {
+  return Button(wpi::XboxController::Button::kStart, loop);
 }
 
-Trigger CommandXboxController::LeftStick(frc::EventLoop* loop) const {
-  return Button(frc::XboxController::Button::kLeftStick, loop);
+Trigger CommandXboxController::LeftStick(wpi::EventLoop* loop) const {
+  return Button(wpi::XboxController::Button::kLeftStick, loop);
 }
 
-Trigger CommandXboxController::RightStick(frc::EventLoop* loop) const {
-  return Button(frc::XboxController::Button::kRightStick, loop);
+Trigger CommandXboxController::RightStick(wpi::EventLoop* loop) const {
+  return Button(wpi::XboxController::Button::kRightStick, loop);
 }
 
 Trigger CommandXboxController::LeftTrigger(double threshold,
-                                           frc::EventLoop* loop) const {
+                                           wpi::EventLoop* loop) const {
   return Trigger(loop, [this, threshold] {
     return m_hid.GetLeftTriggerAxis() > threshold;
   });
 }
 
 Trigger CommandXboxController::RightTrigger(double threshold,
-                                           frc::EventLoop* loop) const {
+                                           wpi::EventLoop* loop) const {
   return Trigger(loop, [this, threshold] {
     return m_hid.GetRightTriggerAxis() > threshold;
   });

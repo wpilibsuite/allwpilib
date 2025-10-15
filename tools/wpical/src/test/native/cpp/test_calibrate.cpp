@@ -26,7 +26,7 @@ cameracalibration::CameraModel cameraModel = {
     .distortion_coefficients = Eigen::Matrix<double, 8, 1>::Zero(),
     .avg_reprojection_error = 0.0};
 
-wpi::json output_json;
+wpi::util::json output_json;
 
 #ifdef __linux__
 const std::string fileSuffix = ".avi";

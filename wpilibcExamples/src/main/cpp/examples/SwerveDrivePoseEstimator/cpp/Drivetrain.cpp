@@ -8,11 +8,11 @@
 
 #include "ExampleGlobalMeasurementSensor.hpp"
 
-void Drivetrain::Drive(units::meters_per_second_t xSpeed,
-                       units::meters_per_second_t ySpeed,
-                       units::radians_per_second_t rot, bool fieldRelative,
-                       units::second_t period) {
-  frc::ChassisSpeeds chassisSpeeds{xSpeed, ySpeed, rot};
+void Drivetrain::Drive(wpi::units::meters_per_second_t xSpeed,
+                       wpi::units::meters_per_second_t ySpeed,
+                       wpi::units::radians_per_second_t rot, bool fieldRelative,
+                       wpi::units::second_t period) {
+  wpi::math::ChassisSpeeds chassisSpeeds{xSpeed, ySpeed, rot};
   if (fieldRelative) {
     chassisSpeeds = chassisSpeeds.ToRobotRelative(
         m_poseEstimator.GetEstimatedPosition().Rotation());
@@ -40,5 +40,5 @@ void Drivetrain::UpdateOdometry() {
   m_poseEstimator.AddVisionMeasurement(
       ExampleGlobalMeasurementSensor::GetEstimatedGlobalPose(
           m_poseEstimator.GetEstimatedPosition()),
-      frc::Timer::GetTimestamp() - 0.3_s);
+      wpi::Timer::GetTimestamp() - 0.3_s);
 }

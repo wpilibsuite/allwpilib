@@ -8,7 +8,7 @@
 #include "org_wpilib_hardware_hal_simulation_PowerDistributionDataJNI.h"
 #include "wpi/hal/simulation/PowerDistributionData.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
 

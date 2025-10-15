@@ -8,7 +8,7 @@
 
 #include "Drivetrain.hpp"
 
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   void AutonomousPeriodic() override {
     TeleopPeriodic();
@@ -36,18 +36,18 @@ class Robot : public frc::TimedRobot {
   void SimulationPeriodic() override { m_drive.SimulationPeriodic(); }
 
  private:
-  frc::XboxController m_controller{0};
+  wpi::XboxController m_controller{0};
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0
   // to 1.
-  frc::SlewRateLimiter<units::scalar> m_speedLimiter{3 / 1_s};
-  frc::SlewRateLimiter<units::scalar> m_rotLimiter{3 / 1_s};
+  wpi::math::SlewRateLimiter<wpi::units::scalar> m_speedLimiter{3 / 1_s};
+  wpi::math::SlewRateLimiter<wpi::units::scalar> m_rotLimiter{3 / 1_s};
 
   Drivetrain m_drive;
 };
 
 #ifndef RUNNING_FRC_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

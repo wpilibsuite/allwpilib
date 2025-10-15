@@ -38,20 +38,20 @@ class RobotContainer {
   // Your subsystem configuration should take the overlays into account
  public:
   RobotContainer();
-  frc2::Command* GetAutonomousCommand();
+  wpi::cmd::Command* GetAutonomousCommand();
 
  private:
   // Assumes a gamepad plugged into channel 0
-  frc::Joystick m_controller{0};
-  frc::SendableChooser<frc2::Command*> m_chooser;
+  wpi::Joystick m_controller{0};
+  wpi::SendableChooser<wpi::cmd::Command*> m_chooser;
 
   // The robot's subsystems
   Drivetrain m_drive;
-  frc::OnBoardIO m_onboardIO{frc::OnBoardIO::ChannelMode::INPUT,
-                             frc::OnBoardIO::ChannelMode::INPUT};
+  wpi::romi::OnBoardIO m_onboardIO{wpi::romi::OnBoardIO::ChannelMode::INPUT,
+                             wpi::romi::OnBoardIO::ChannelMode::INPUT};
 
   // Example button
-  frc2::Trigger m_onboardButtonA{
+  wpi::cmd::Trigger m_onboardButtonA{
       [this] { return m_onboardIO.GetButtonAPressed(); }};
 
   // Autonomous commands.

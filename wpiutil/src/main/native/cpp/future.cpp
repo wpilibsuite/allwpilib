@@ -6,7 +6,7 @@
 
 #include <utility>
 
-namespace wpi {
+namespace wpi::util {
 namespace detail {
 
 PromiseFactoryBase::~PromiseFactoryBase() {
@@ -123,4 +123,4 @@ PromiseFactory<void>& PromiseFactory<void>::GetInstance() {
   return inst;
 }
 
-}  // namespace wpi
+}  // namespace wpi::util

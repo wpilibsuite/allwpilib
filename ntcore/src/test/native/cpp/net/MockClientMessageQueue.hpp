@@ -11,7 +11,7 @@
 #include "net/ClientMessageQueue.hpp"
 #include "net/Message.hpp"
 
-namespace nt::net {
+namespace wpi::nt::net {
 
 class MockClientMessageQueue : public net::ClientMessageQueue {
  public:
@@ -30,4 +30,4 @@ class MockClientMessageQueue : public net::ClientMessageQueue {
   std::vector<ClientMessage> msgs;
 };
 
-}  // namespace nt::net
+}  // namespace wpi::nt::net

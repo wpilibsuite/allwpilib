@@ -10,10 +10,10 @@
 #include "InstanceImpl.hpp"
 
 namespace {
-template <nt::ValidType T>
+template <wpi::nt::ValidType T>
 struct ValuesType {
   using Vector =
-      std::vector<typename nt::TypeInfo<std::remove_cvref_t<T>>::Value>;
+      std::vector<typename wpi::nt::TypeInfo<std::remove_cvref_t<T>>::Value>;
 };
 
 template <>
@@ -22,7 +22,7 @@ struct ValuesType<bool> {
 };
 }  // namespace
 
-namespace nt {
+namespace wpi::nt {
 
 template <ValidType T>
 static inline bool Set(NT_Handle pubentry, typename TypeInfo<T>::View value,
@@ -59,7 +59,7 @@ static inline Timestamped<typename TypeInfo<T>::Value> GetAtomic(
 template <ValidType T>
 inline Timestamped<typename TypeInfo<T>::SmallRet> GetAtomic(
     NT_Handle subentry,
-    wpi::SmallVectorImpl<typename TypeInfo<T>::SmallElem>& buf,
+    wpi::util::SmallVectorImpl<typename TypeInfo<T>::SmallElem>& buf,
     typename TypeInfo<T>::View defaultValue) {
   if (auto ii = InstanceImpl::Get(Handle{subentry}.GetInst())) {
     return ii->localStorage.GetAtomic<T>(subentry, buf, defaultValue);
@@ -117,18 +117,18 @@ std::vector<{% if t.cpp.ValueType == "bool" %}int{% else %}{{ t.cpp.ValueType }}
 {% if t.cpp.SmallRetType and t.cpp.SmallElemType %}
 {{ t.cpp.SmallRetType }} Get{{ t.TypeName }}(
     NT_Handle subentry,
-    wpi::SmallVectorImpl<{{ t.cpp.SmallElemType }}>& buf,
+    wpi::util::SmallVectorImpl<{{ t.cpp.SmallElemType }}>& buf,
     {{ t.cpp.ParamType }} defaultValue) {
   return GetAtomic<{{ t.cpp.TemplateType }}>(subentry, buf, defaultValue).value;
 }
 
 Timestamped{{ t.TypeName }}View GetAtomic{{ t.TypeName }}(
     NT_Handle subentry,
-    wpi::SmallVectorImpl<{{ t.cpp.SmallElemType }}>& buf,
+    wpi::util::SmallVectorImpl<{{ t.cpp.SmallElemType }}>& buf,
     {{ t.cpp.ParamType }} defaultValue) {
   return GetAtomic<{{ t.cpp.TemplateType }}>(subentry, buf, defaultValue);
 }
 {% endif %}
 {% endfor %}
-}  // namespace nt
+}  // namespace wpi::nt
 

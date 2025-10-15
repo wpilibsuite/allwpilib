@@ -10,7 +10,7 @@
  * AnalogAccelerometer snippets for frc-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/accelerometers-software.html
  */
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   Robot() {
     // Sets the sensitivity of the accelerometer to 1 volt per G
@@ -26,11 +26,11 @@ class Robot : public frc::TimedRobot {
 
  private:
   // Creates an analog accelerometer on analog input 0
-  frc::AnalogAccelerometer m_accelerometer{0};
+  wpi::AnalogAccelerometer m_accelerometer{0};
 };
 
 #ifndef RUNNING_FRC_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

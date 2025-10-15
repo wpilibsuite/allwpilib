@@ -8,9 +8,9 @@
 
 #include <imgui.h>
 
-using namespace glass;
+using namespace wpi::glass;
 
-void glass::DisplaySubsystem(SubsystemModel* m) {
+void wpi::glass::DisplaySubsystem(SubsystemModel* m) {
   if (auto name = m->GetName()) {
     ImGui::Text("%s", name);
     ImGui::Separator();

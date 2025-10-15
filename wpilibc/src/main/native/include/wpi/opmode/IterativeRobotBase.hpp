@@ -9,7 +9,7 @@
 #include "wpi/opmode/RobotBase.hpp"
 #include "wpi/system/Watchdog.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * IterativeRobotBase implements a specific type of robot program framework,
@@ -201,7 +201,7 @@ class IterativeRobotBase : public RobotBase {
   /**
    * Gets time period between calls to Periodic() functions.
    */
-  units::second_t GetPeriod() const;
+  wpi::units::second_t GetPeriod() const;
 
   /**
    * Prints list of epochs added so far and their times.
@@ -213,7 +213,7 @@ class IterativeRobotBase : public RobotBase {
    *
    * @param period Period.
    */
-  explicit IterativeRobotBase(units::second_t period);
+  explicit IterativeRobotBase(wpi::units::second_t period);
 
   ~IterativeRobotBase() override = default;
 
@@ -230,7 +230,7 @@ class IterativeRobotBase : public RobotBase {
   enum class Mode { kNone, kDisabled, kAutonomous, kTeleop, kTest };
 
   Mode m_lastMode = Mode::kNone;
-  units::second_t m_period;
+  wpi::units::second_t m_period;
   Watchdog m_watchdog;
   bool m_ntFlushEnabled = true;
   bool m_calledDsConnected = false;
@@ -238,4 +238,4 @@ class IterativeRobotBase : public RobotBase {
   void PrintLoopOverrunMessage();
 };
 
-}  // namespace frc
+}  // namespace wpi

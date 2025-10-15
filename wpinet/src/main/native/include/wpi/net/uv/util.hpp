@@ -14,7 +14,7 @@
 #pragma comment(lib, "Ws2_32.lib")
 #endif
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 namespace detail {
 template <typename T>
@@ -153,6 +153,6 @@ int NameToAddr(std::string_view ip, in_addr* addr);
  */
 int NameToAddr(std::string_view ip, in6_addr* addr);
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_UTIL_HPP_

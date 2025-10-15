@@ -14,7 +14,7 @@
 #include "wpi/simulation/CallbackStore.hpp"
 #include "wpi/system/RobotController.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 
 /**
  * A utility class to control a simulated RoboRIO.
@@ -37,14 +37,14 @@ class RoboRioSim {
    *
    * @return the Vin voltage
    */
-  static units::volt_t GetVInVoltage();
+  static wpi::units::volt_t GetVInVoltage();
 
   /**
    * Define the Vin voltage.
    *
    * @param vInVoltage the new voltage
    */
-  static void SetVInVoltage(units::volt_t vInVoltage);
+  static void SetVInVoltage(wpi::units::volt_t vInVoltage);
 
   /**
    * Register a callback to be run whenever the 3.3V rail voltage changes.
@@ -63,14 +63,14 @@ class RoboRioSim {
    *
    * @return the 3.3V rail voltage
    */
-  static units::volt_t GetUserVoltage3V3();
+  static wpi::units::volt_t GetUserVoltage3V3();
 
   /**
    * Define the 3.3V rail voltage.
    *
    * @param userVoltage3V3 the new voltage
    */
-  static void SetUserVoltage3V3(units::volt_t userVoltage3V3);
+  static void SetUserVoltage3V3(wpi::units::volt_t userVoltage3V3);
 
   /**
    * Register a callback to be run whenever the 3.3V rail current changes.
@@ -89,14 +89,14 @@ class RoboRioSim {
    *
    * @return the 3.3V rail current
    */
-  static units::ampere_t GetUserCurrent3V3();
+  static wpi::units::ampere_t GetUserCurrent3V3();
 
   /**
    * Define the 3.3V rail current.
    *
    * @param userCurrent3V3 the new current
    */
-  static void SetUserCurrent3V3(units::ampere_t userCurrent3V3);
+  static void SetUserCurrent3V3(wpi::units::ampere_t userCurrent3V3);
 
   /**
    * Register a callback to be run whenever the 3.3V rail active state changes.
@@ -167,14 +167,14 @@ class RoboRioSim {
    *
    * @return the brownout voltage
    */
-  static units::volt_t GetBrownoutVoltage();
+  static wpi::units::volt_t GetBrownoutVoltage();
 
   /**
    * Define the brownout voltage.
    *
    * @param brownoutVoltage the new voltage
    */
-  static void SetBrownoutVoltage(units::volt_t brownoutVoltage);
+  static void SetBrownoutVoltage(wpi::units::volt_t brownoutVoltage);
 
   /**
    * Register a callback to be run whenever the cpu temp changes.
@@ -192,14 +192,14 @@ class RoboRioSim {
    *
    * @return the cpu temp.
    */
-  static units::celsius_t GetCPUTemp();
+  static wpi::units::celsius_t GetCPUTemp();
 
   /**
    * Define the cpu temp.
    *
    * @param cpuTemp the new cpu temp.
    */
-  static void SetCPUTemp(units::celsius_t cpuTemp);
+  static void SetCPUTemp(wpi::units::celsius_t cpuTemp);
 
   /**
    * Register a callback to be run whenever the team number changes.
@@ -259,4 +259,4 @@ class RoboRioSim {
    */
   static void ResetData();
 };
-}  // namespace frc::sim
+}  // namespace wpi::sim

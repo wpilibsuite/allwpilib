@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-namespace wpi {
+namespace wpi::net {
 
 TEST(HttpParserTest, UrlMethodHeadersComplete) {
   HttpParser p{HttpParser::kRequest};
@@ -203,4 +203,4 @@ TEST(HttpParserTest, Reset) {
   ASSERT_FALSE(p.HasError());
 }
 
-}  // namespace wpi
+}  // namespace wpi::net

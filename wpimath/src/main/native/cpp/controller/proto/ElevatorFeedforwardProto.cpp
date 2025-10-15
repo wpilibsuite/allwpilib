@@ -8,23 +8,23 @@
 
 #include "wpimath/protobuf/controller.npb.h"
 
-std::optional<frc::ElevatorFeedforward>
-wpi::Protobuf<frc::ElevatorFeedforward>::Unpack(InputStream& stream) {
+std::optional<wpi::math::ElevatorFeedforward>
+wpi::util::Protobuf<wpi::math::ElevatorFeedforward>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufElevatorFeedforward msg;
   if (!stream.Decode(msg)) {
     return {};
   }
 
-  return frc::ElevatorFeedforward{
-      units::volt_t{msg.ks},
-      units::volt_t{msg.kg},
-      units::unit_t<frc::ElevatorFeedforward::kv_unit>{msg.kv},
-      units::unit_t<frc::ElevatorFeedforward::ka_unit>{msg.ka},
+  return wpi::math::ElevatorFeedforward{
+      wpi::units::volt_t{msg.ks},
+      wpi::units::volt_t{msg.kg},
+      wpi::units::unit_t<wpi::math::ElevatorFeedforward::kv_unit>{msg.kv},
+      wpi::units::unit_t<wpi::math::ElevatorFeedforward::ka_unit>{msg.ka},
   };
 }
 
-bool wpi::Protobuf<frc::ElevatorFeedforward>::Pack(
-    OutputStream& stream, const frc::ElevatorFeedforward& value) {
+bool wpi::util::Protobuf<wpi::math::ElevatorFeedforward>::Pack(
+    OutputStream& stream, const wpi::math::ElevatorFeedforward& value) {
   wpi_proto_ProtobufElevatorFeedforward msg{
       .ks = value.GetKs().value(),
       .kg = value.GetKg().value(),

@@ -6,8 +6,8 @@
 
 #include <wpi/ntcore/NetworkTableInstance.hpp>
 
-namespace hal {
+namespace wpi::hal {
 void InitializeSystemServer();
 void ShutdownSystemServer();
-nt::NetworkTableInstance GetSystemServer();
-}  // namespace hal
+wpi::nt::NetworkTableInstance GetSystemServer();
+}  // namespace wpi::hal

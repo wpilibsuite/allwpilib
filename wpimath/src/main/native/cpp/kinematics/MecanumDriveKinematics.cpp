@@ -4,7 +4,7 @@
 
 #include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 MecanumDriveWheelSpeeds MecanumDriveKinematics::ToWheelSpeeds(
     const ChassisSpeeds& chassisSpeeds,
@@ -28,10 +28,10 @@ MecanumDriveWheelSpeeds MecanumDriveKinematics::ToWheelSpeeds(
   Eigen::Vector4d wheelsVector = m_inverseKinematics * chassisSpeedsVector;
 
   MecanumDriveWheelSpeeds wheelSpeeds;
-  wheelSpeeds.frontLeft = units::meters_per_second_t{wheelsVector(0)};
-  wheelSpeeds.frontRight = units::meters_per_second_t{wheelsVector(1)};
-  wheelSpeeds.rearLeft = units::meters_per_second_t{wheelsVector(2)};
-  wheelSpeeds.rearRight = units::meters_per_second_t{wheelsVector(3)};
+  wheelSpeeds.frontLeft = wpi::units::meters_per_second_t{wheelsVector(0)};
+  wheelSpeeds.frontRight = wpi::units::meters_per_second_t{wheelsVector(1)};
+  wheelSpeeds.rearLeft = wpi::units::meters_per_second_t{wheelsVector(2)};
+  wheelSpeeds.rearRight = wpi::units::meters_per_second_t{wheelsVector(3)};
   return wheelSpeeds;
 }
 
@@ -44,9 +44,9 @@ ChassisSpeeds MecanumDriveKinematics::ToChassisSpeeds(
   Eigen::Vector3d chassisSpeedsVector =
       m_forwardKinematics.solve(wheelSpeedsVector);
 
-  return {units::meters_per_second_t{chassisSpeedsVector(0)},  // NOLINT
-          units::meters_per_second_t{chassisSpeedsVector(1)},
-          units::radians_per_second_t{chassisSpeedsVector(2)}};
+  return {wpi::units::meters_per_second_t{chassisSpeedsVector(0)},  // NOLINT
+          wpi::units::meters_per_second_t{chassisSpeedsVector(1)},
+          wpi::units::radians_per_second_t{chassisSpeedsVector(2)}};
 }
 
 Twist2d MecanumDriveKinematics::ToTwist2d(
@@ -60,8 +60,8 @@ Twist2d MecanumDriveKinematics::ToTwist2d(
 
   Eigen::Vector3d twistVector = m_forwardKinematics.solve(wheelDeltasVector);
 
-  return {units::meter_t{twistVector(0)}, units::meter_t{twistVector(1)},
-          units::radian_t{twistVector(2)}};
+  return {wpi::units::meter_t{twistVector(0)}, wpi::units::meter_t{twistVector(1)},
+          wpi::units::radian_t{twistVector(2)}};
 }
 
 Twist2d MecanumDriveKinematics::ToTwist2d(
@@ -72,8 +72,8 @@ Twist2d MecanumDriveKinematics::ToTwist2d(
 
   Eigen::Vector3d twistVector = m_forwardKinematics.solve(wheelDeltasVector);
 
-  return {units::meter_t{twistVector(0)}, units::meter_t{twistVector(1)},
-          units::radian_t{twistVector(2)}};
+  return {wpi::units::meter_t{twistVector(0)}, wpi::units::meter_t{twistVector(1)},
+          wpi::units::radian_t{twistVector(2)}};
 }
 
 void MecanumDriveKinematics::SetInverseKinematics(Translation2d fl,

@@ -9,7 +9,7 @@
 #include <utility>
 #include <vector>
 
-namespace wpi {
+namespace wpi::util {
 
 // Binary insertion into vector; std::log(n) efficiency.
 template <typename T>
@@ -32,4 +32,4 @@ constexpr void for_each(F&& f, Ts&&... elems) {
   }(std::index_sequence_for<Ts...>{});
 }
 
-}  // namespace wpi
+}  // namespace wpi::util

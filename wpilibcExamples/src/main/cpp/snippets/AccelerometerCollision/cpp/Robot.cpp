@@ -11,7 +11,7 @@
  * Collision detection snippets for frc-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/accelerometers-software.html
  */
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   void RobotPeriodic() override {
     // Gets the current accelerations in the X and Y directions
@@ -23,18 +23,18 @@ class Robot : public frc::TimedRobot {
     m_prevXAccel = xAccel;
     m_prevYAccel = yAccel;
 
-    frc::SmartDashboard::PutNumber("X Jerk", xJerk.value());
-    frc::SmartDashboard::PutNumber("Y Jerk", yJerk.value());
+    wpi::SmartDashboard::PutNumber("X Jerk", xJerk.value());
+    wpi::SmartDashboard::PutNumber("Y Jerk", yJerk.value());
   }
 
  private:
-  units::meters_per_second_squared_t m_prevXAccel = 0.0_mps_sq;
-  units::meters_per_second_squared_t m_prevYAccel = 0.0_mps_sq;
-  frc::OnboardIMU m_accelerometer{frc::OnboardIMU::MountOrientation::kFlat};
+  wpi::units::meters_per_second_squared_t m_prevXAccel = 0.0_mps_sq;
+  wpi::units::meters_per_second_squared_t m_prevYAccel = 0.0_mps_sq;
+  wpi::OnboardIMU m_accelerometer{wpi::OnboardIMU::MountOrientation::kFlat};
 };
 
 #ifndef RUNNING_FRC_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

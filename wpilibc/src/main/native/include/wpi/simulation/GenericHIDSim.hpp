@@ -9,7 +9,7 @@
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/driverstation/GenericHID.hpp"
 
-namespace frc {
+namespace wpi {
 
 class GenericHID;
 
@@ -142,4 +142,4 @@ class GenericHIDSim {
 };
 
 }  // namespace sim
-}  // namespace frc
+}  // namespace wpi

@@ -11,7 +11,7 @@
 
 #include "wpi/hardware/discrete/AnalogInput.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Class for reading analog potentiometers. Analog potentiometers read in an
@@ -19,8 +19,8 @@ namespace frc {
  * units you choose, by way of the scaling and offset constants passed to the
  * constructor.
  */
-class AnalogPotentiometer : public wpi::Sendable,
-                            public wpi::SendableHelper<AnalogPotentiometer> {
+class AnalogPotentiometer : public wpi::util::Sendable,
+                            public wpi::util::SendableHelper<AnalogPotentiometer> {
  public:
   /**
    * Construct an Analog Potentiometer object from a channel number.
@@ -102,11 +102,11 @@ class AnalogPotentiometer : public wpi::Sendable,
    */
   double Get() const;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
   std::shared_ptr<AnalogInput> m_analog_input;
   double m_fullRange, m_offset;
 };
 
-}  // namespace frc
+}  // namespace wpi

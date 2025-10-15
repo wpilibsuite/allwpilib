@@ -12,7 +12,7 @@
 #include "wpi/commands2/Command.hpp"
 #include "wpi/commands2/CommandHelper.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 /**
  * A command composition that runs one of two commands, depending on the value
  * of the given condition when this command is initialized.
@@ -73,7 +73,7 @@ class ConditionalCommand : public CommandHelper<Command, ConditionalCommand> {
 
   InterruptionBehavior GetInterruptionBehavior() const override;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
   std::unique_ptr<Command> m_onTrue;
@@ -82,4 +82,4 @@ class ConditionalCommand : public CommandHelper<Command, ConditionalCommand> {
   Command* m_selectedCommand{nullptr};
   bool m_runsWhenDisabled = true;
 };
-}  // namespace frc2
+}  // namespace wpi::cmd

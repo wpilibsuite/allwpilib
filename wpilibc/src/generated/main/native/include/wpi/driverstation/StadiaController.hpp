@@ -11,7 +11,7 @@
 
 #include "wpi/driverstation/GenericHID.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Handle input from Stadia controllers connected to the Driver Station.
@@ -26,8 +26,8 @@ namespace frc {
  * to have the same mapping, as well as any 3rd party controllers.
  */
 class StadiaController : public GenericHID,
-                                    public wpi::Sendable,
-                                    public wpi::SendableHelper<StadiaController> {
+                                    public wpi::util::Sendable,
+                                    public wpi::util::SendableHelper<StadiaController> {
  public:
   /**
    * Construct an instance of a controller.
@@ -649,7 +649,7 @@ class StadiaController : public GenericHID,
     static constexpr int kRightY = 4;
   };
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 };
 
-}  // namespace frc
+}  // namespace wpi

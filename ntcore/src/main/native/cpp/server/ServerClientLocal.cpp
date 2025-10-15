@@ -6,7 +6,7 @@
 
 #include "server/ServerImpl.hpp"
 
-using namespace nt::server;
+using namespace wpi::nt::server;
 
 // Suppress false positive -Wmaybe-uninitialized warning from GCC 14
 #if defined(__GNUC__) && !defined(__clang__)
@@ -14,7 +14,7 @@ using namespace nt::server;
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
 ServerClientLocal::ServerClientLocal(ServerStorage& storage, int id,
-                                     wpi::Logger& logger)
+                                     wpi::util::Logger& logger)
     : ServerClient4Base{"", "", true, [](uint32_t) {}, storage, id, logger} {
   // create local client meta topics
   m_metaPub = storage.CreateMetaTopic("$serverpub");
@@ -61,7 +61,7 @@ void ServerClientLocal::SendUnannounce(ServerTopic* topic) {
 }
 
 void ServerClientLocal::SendPropertiesUpdate(ServerTopic* topic,
-                                             const wpi::json& update,
+                                             const wpi::util::json& update,
                                              bool ack) {
   if (m_local) {
     if (!m_announceSent.lookup(topic)) {

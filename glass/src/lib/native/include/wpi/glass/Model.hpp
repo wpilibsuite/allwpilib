@@ -4,7 +4,7 @@
 
 #pragma once
 
-namespace glass {
+namespace wpi::glass {
 
 class Model {
  public:
@@ -19,4 +19,4 @@ class Model {
   virtual bool IsReadOnly();
 };
 
-}  // namespace glass
+}  // namespace wpi::glass

@@ -13,8 +13,8 @@
 
 static_assert(sizeof(jbyte) * 3 == sizeof(HAL_AddressableLEDData));
 
-using namespace hal;
-using namespace wpi::java;
+using namespace wpi::hal;
+using namespace wpi::util::java;
 
 extern "C" {
 

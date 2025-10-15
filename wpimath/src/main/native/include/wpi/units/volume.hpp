@@ -29,9 +29,9 @@
 #include "wpi/units/base.hpp"
 #include "wpi/units/length.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::volume
+ * @namespace wpi::units::volume
  * @brief namespace for unit types and containers representing volume values
  * @details The SI unit for volume is `cubic_meters`, and the corresponding
  *          `base_unit` category is `volume_unit`.
@@ -41,7 +41,7 @@ namespace units {
 #if !defined(DISABLE_PREDEFINED_UNITS) || \
     defined(ENABLE_PREDEFINED_VOLUME_UNITS)
 UNIT_ADD(volume, cubic_meter, cubic_meters, cu_m,
-         unit<std::ratio<1>, units::category::volume_unit>)
+         unit<std::ratio<1>, wpi::units::category::volume_unit>)
 UNIT_ADD(volume, cubic_millimeter, cubic_millimeters, cu_mm,
          cubed<length::millimeter>)
 UNIT_ADD(volume, cubic_kilometer, cubic_kilometers, cu_km,
@@ -80,4 +80,4 @@ UNIT_ADD_CATEGORY_TRAIT(volume)
 #endif
 
 using namespace volume;
-}  // namespace units
+}  // namespace wpi::units

@@ -11,7 +11,7 @@
 
 #include "Constants.hpp"
 
-class DriveSubsystem : public frc2::SubsystemBase {
+class DriveSubsystem : public wpi::cmd::SubsystemBase {
  public:
   DriveSubsystem();
 
@@ -50,25 +50,25 @@ class DriveSubsystem : public frc2::SubsystemBase {
    */
   void SetMaxOutput(double maxOutput);
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
 
   // The motor controllers
-  frc::PWMSparkMax m_left1;
-  frc::PWMSparkMax m_left2;
-  frc::PWMSparkMax m_right1;
-  frc::PWMSparkMax m_right2;
+  wpi::PWMSparkMax m_left1;
+  wpi::PWMSparkMax m_left2;
+  wpi::PWMSparkMax m_right1;
+  wpi::PWMSparkMax m_right2;
 
   // The robot's drive
-  frc::DifferentialDrive m_drive{[&](double output) { m_left1.Set(output); },
+  wpi::DifferentialDrive m_drive{[&](double output) { m_left1.Set(output); },
                                  [&](double output) { m_right1.Set(output); }};
 
   // The left-side drive encoder
-  frc::Encoder m_leftEncoder;
+  wpi::Encoder m_leftEncoder;
 
   // The right-side drive encoder
-  frc::Encoder m_rightEncoder;
+  wpi::Encoder m_rightEncoder;
 };

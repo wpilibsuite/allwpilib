@@ -9,7 +9,7 @@
 
 #include "wpi/commands2/button/Trigger.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 /**
  * A class used to bind command scheduling to joystick POV presses.  Can be
  * composed with other buttons with the operators in Trigger.
@@ -27,10 +27,10 @@ class POVButton : public Trigger {
    * @param angle The angle of the POV corresponding to a button press.
    * @param povNumber The number of the POV on the joystick.
    */
-  POVButton(frc::GenericHID* joystick, frc::DriverStation::POVDirection angle,
+  POVButton(wpi::GenericHID* joystick, wpi::DriverStation::POVDirection angle,
             int povNumber = 0)
       : Trigger([joystick, angle, povNumber] {
           return joystick->GetPOV(povNumber) == angle;
         }) {}
 };
-}  // namespace frc2
+}  // namespace wpi::cmd

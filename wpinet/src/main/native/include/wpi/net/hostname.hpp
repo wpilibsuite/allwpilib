@@ -8,12 +8,12 @@
 #include <string>
 #include <string_view>
 
-namespace wpi {
+namespace wpi::net {
 template <typename T>
 class SmallVectorImpl;
 
 std::string GetHostname();
-std::string_view GetHostname(SmallVectorImpl<char>& name);
-}  // namespace wpi
+std::string_view GetHostname(wpi::util::SmallVectorImpl<char>& name);
+}  // namespace wpi::net
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_HOSTNAME_HPP_

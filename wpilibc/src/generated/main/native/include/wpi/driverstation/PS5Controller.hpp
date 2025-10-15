@@ -11,7 +11,7 @@
 
 #include "wpi/driverstation/GenericHID.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Handle input from PS5 controllers connected to the Driver Station.
@@ -26,8 +26,8 @@ namespace frc {
  * to have the same mapping, as well as any 3rd party controllers.
  */
 class PS5Controller : public GenericHID,
-                                    public wpi::Sendable,
-                                    public wpi::SendableHelper<PS5Controller> {
+                                    public wpi::util::Sendable,
+                                    public wpi::util::SendableHelper<PS5Controller> {
  public:
   /**
    * Construct an instance of a controller.
@@ -602,7 +602,7 @@ class PS5Controller : public GenericHID,
     static constexpr int kR2 = 4;
   };
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 };
 
-}  // namespace frc
+}  // namespace wpi

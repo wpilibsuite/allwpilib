@@ -63,7 +63,7 @@
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/raw_ostream.hpp"
 
-namespace wpi {
+namespace wpi::util {
 
 // aaaack but it's fast and const should make it shared text page.
 static const unsigned char pr2six[256] = {
@@ -216,4 +216,4 @@ std::string_view Base64Encode(std::span<const uint8_t> plain,
   return os.str();
 }
 
-}  // namespace wpi
+}  // namespace wpi::util

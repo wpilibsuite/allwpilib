@@ -4,28 +4,28 @@
 
 #include "wpi/commands2/button/CommandJoystick.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 CommandJoystick::CommandJoystick(int port)
-    : CommandGenericHID(port), m_hid{frc::Joystick(port)} {}
+    : CommandGenericHID(port), m_hid{wpi::Joystick(port)} {}
 
-frc::Joystick& CommandJoystick::GetHID() {
+wpi::Joystick& CommandJoystick::GetHID() {
   return m_hid;
 }
 
-Trigger CommandJoystick::Trigger(frc::EventLoop* loop) const {
-  return Button(frc::Joystick::ButtonType::kTriggerButton, loop);
+Trigger CommandJoystick::Trigger(wpi::EventLoop* loop) const {
+  return Button(wpi::Joystick::ButtonType::kTriggerButton, loop);
 }
 
-Trigger CommandJoystick::Top(frc::EventLoop* loop) const {
-  return Button(frc::Joystick::ButtonType::kTopButton, loop);
+Trigger CommandJoystick::Top(wpi::EventLoop* loop) const {
+  return Button(wpi::Joystick::ButtonType::kTopButton, loop);
 }
 
 double CommandJoystick::GetMagnitude() const {
   return m_hid.GetMagnitude();
 }
 
-units::radian_t CommandJoystick::GetDirection() const {
+wpi::units::radian_t CommandJoystick::GetDirection() const {
   // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html#joystick-and-controller-coordinate-system
   // A positive rotation around the X axis moves the joystick right, and a
   // positive rotation around the Y axis moves the joystick backward. When

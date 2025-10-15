@@ -5,16 +5,16 @@
 #include "../PortsInternal.h"
 #include "DIODataInternal.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeDIOData() {
   static DIOData sdd[kNumDigitalChannels];
-  ::hal::SimDIOData = sdd;
+  ::wpi::hal::SimDIOData = sdd;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-DIOData* hal::SimDIOData;
+DIOData* wpi::hal::SimDIOData;
 void DIOData::ResetData() {
   initialized.Reset(false);
   simDevice = 0;

@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-namespace wpi {
+namespace wpi::net {
 
 TEST(HttpMultipartScannerTest, ExecuteExact) {
   HttpMultipartScanner scanner("foo");
@@ -99,4 +99,4 @@ TEST(HttpMultipartScannerTest, SeqNoDashesNoDashes) {
   EXPECT_TRUE(scanner.IsDone());
 }
 
-}  // namespace wpi
+}  // namespace wpi::net

@@ -11,7 +11,7 @@
 #include "wpi/units/math.hpp"
 #include "wpi/units/velocity.hpp"
 
-namespace frc {
+namespace wpi::math {
 /**
  * Represents the state of one swerve module.
  */
@@ -19,7 +19,7 @@ struct WPILIB_DLLEXPORT SwerveModuleState {
   /**
    * Speed of the wheel of the module.
    */
-  units::meters_per_second_t speed = 0_mps;
+  wpi::units::meters_per_second_t speed = 0_mps;
 
   /**
    * Angle of the module.
@@ -33,7 +33,7 @@ struct WPILIB_DLLEXPORT SwerveModuleState {
    * @return Whether the two objects are equal.
    */
   constexpr bool operator==(const SwerveModuleState& other) const {
-    return units::math::abs(speed - other.speed) < 1E-9_mps &&
+    return wpi::units::math::abs(speed - other.speed) < 1E-9_mps &&
            angle == other.angle;
   }
 
@@ -47,7 +47,7 @@ struct WPILIB_DLLEXPORT SwerveModuleState {
    */
   constexpr void Optimize(const Rotation2d& currentAngle) {
     auto delta = angle - currentAngle;
-    if (units::math::abs(delta.Degrees()) > 90_deg) {
+    if (wpi::units::math::abs(delta.Degrees()) > 90_deg) {
       speed *= -1;
       angle = angle + Rotation2d{180_deg};
     }
@@ -66,7 +66,7 @@ struct WPILIB_DLLEXPORT SwerveModuleState {
   constexpr static SwerveModuleState Optimize(
       const SwerveModuleState& desiredState, const Rotation2d& currentAngle) {
     auto delta = desiredState.angle - currentAngle;
-    if (units::math::abs(delta.Degrees()) > 90_deg) {
+    if (wpi::units::math::abs(delta.Degrees()) > 90_deg) {
       return {-desiredState.speed, desiredState.angle + Rotation2d{180_deg}};
     } else {
       return {desiredState.speed, desiredState.angle};
@@ -84,7 +84,7 @@ struct WPILIB_DLLEXPORT SwerveModuleState {
     speed *= (angle - currentAngle).Cos();
   }
 };
-}  // namespace frc
+}  // namespace wpi::math
 
 #include "wpi/math/kinematics/proto/SwerveModuleStateProto.hpp"
 #include "wpi/math/kinematics/struct/SwerveModuleStateStruct.hpp"

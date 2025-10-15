@@ -11,8 +11,8 @@
 
 #include "wpi/hardware/rotation/Encoder.hpp"
 
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 EncoderSim::EncoderSim(const Encoder& encoder)
     : m_index{encoder.GetFPGAIndex()} {}

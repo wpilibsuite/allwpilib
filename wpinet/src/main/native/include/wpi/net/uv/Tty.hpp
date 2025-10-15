@@ -12,7 +12,7 @@
 
 #include "wpi/net/uv/Stream.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 class Loop;
 class Tty;
@@ -80,6 +80,6 @@ class Tty final : public StreamImpl<Tty, uv_tty_t> {
   }
 };
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_TTY_HPP_

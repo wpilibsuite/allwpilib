@@ -14,7 +14,7 @@
 #include "wpi/commands2/Command.hpp"
 #include "wpi/commands2/Requirements.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 /**
  * A wrapper around std::unique_ptr<Command> so commands have move-only
  * semantics. Commands should only be stored and passed around when held in a
@@ -126,7 +126,7 @@ CommandPtr final {
    * @param duration the timeout duration
    * @return the command with the timeout added
    */
-  CommandPtr WithTimeout(units::second_t duration) &&;
+  CommandPtr WithTimeout(wpi::units::second_t duration) &&;
 
   /**
    * Decorates this command with an interrupt condition. If the specified
@@ -340,4 +340,4 @@ CommandPtr final {
   void AssertValid() const;
 };
 
-}  // namespace frc2
+}  // namespace wpi::cmd

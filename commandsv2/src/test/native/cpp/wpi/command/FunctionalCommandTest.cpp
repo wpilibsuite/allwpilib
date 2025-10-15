@@ -5,7 +5,7 @@
 #include "CommandTestBase.hpp"
 #include "wpi/commands2/FunctionalCommand.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 class FunctionalCommandTest : public CommandTestBase {};
 
 TEST_F(FunctionalCommandTest, FunctionalCommandSchedule) {

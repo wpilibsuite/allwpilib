@@ -11,14 +11,14 @@ static constexpr double kRange = 200;
 static constexpr double kTolerance = 10.0;
 
 TEST(PIDToleranceTest, InitialTolerance) {
-  frc::PIDController controller{0.5, 0.0, 0.0};
+  wpi::math::PIDController controller{0.5, 0.0, 0.0};
   controller.EnableContinuousInput(-kRange / 2, kRange / 2);
 
   EXPECT_FALSE(controller.AtSetpoint());
 }
 
 TEST(PIDToleranceTest, AbsoluteTolerance) {
-  frc::PIDController controller{0.5, 0.0, 0.0};
+  wpi::math::PIDController controller{0.5, 0.0, 0.0};
   controller.EnableContinuousInput(-kRange / 2, kRange / 2);
 
   EXPECT_FALSE(controller.AtSetpoint());

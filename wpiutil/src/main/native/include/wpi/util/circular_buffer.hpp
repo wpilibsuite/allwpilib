@@ -8,7 +8,7 @@
 #include <iterator>
 #include <vector>
 
-namespace wpi {
+namespace wpi::util {
 
 /**
  * This is a simple circular buffer so we don't need to "bucket brigade" copy
@@ -117,7 +117,7 @@ class circular_buffer {
    * Returns end iterator.
    */
   constexpr iterator end() {
-    return iterator(this, ::wpi::circular_buffer<T>::size());
+    return iterator(this, ::wpi::util::circular_buffer<T>::size());
   }
 
   /**
@@ -129,7 +129,7 @@ class circular_buffer {
    * Returns const end iterator.
    */
   constexpr const_iterator end() const {
-    return const_iterator(this, ::wpi::circular_buffer<T>::size());
+    return const_iterator(this, ::wpi::util::circular_buffer<T>::size());
   }
 
   /**
@@ -141,7 +141,7 @@ class circular_buffer {
    * Returns const end iterator.
    */
   constexpr const_iterator cend() const {
-    return const_iterator(this, ::wpi::circular_buffer<T>::size());
+    return const_iterator(this, ::wpi::util::circular_buffer<T>::size());
   }
 
   /**
@@ -431,4 +431,4 @@ class circular_buffer {
   }
 };
 
-}  // namespace wpi
+}  // namespace wpi::util

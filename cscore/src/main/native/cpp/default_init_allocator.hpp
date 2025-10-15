@@ -8,7 +8,7 @@
 #include <memory>
 #include <utility>
 
-namespace cs {
+namespace wpi::cs {
 
 // Allocator adaptor that interposes construct() calls to
 // convert value initialization into default initialization.
@@ -36,6 +36,6 @@ class default_init_allocator : public A {
   }
 };
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_DEFAULT_INIT_ALLOCATOR_HPP_

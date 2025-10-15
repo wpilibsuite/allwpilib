@@ -95,74 +95,74 @@ The invariants are checked by member function assert_invariant().
 */
 WPI_BASIC_JSON_TPL_DECLARATION
 class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-special-member-functions)
-    : public ::wpi::detail::json_base_class<CustomBaseClass>
+    : public ::wpi::util::detail::json_base_class<CustomBaseClass>
 {
   private:
     template<detail::value_t> friend struct detail::external_constructor;
 
     template<typename>
-    friend class ::wpi::json_pointer;
+    friend class ::wpi::util::json_pointer;
     // can be restored when json_pointer backwards compatibility is removed
-    // friend ::wpi::json_pointer<StringType>;
+    // friend ::wpi::util::json_pointer<StringType>;
 
     template<typename BasicJsonType, typename InputType>
-    friend class ::wpi::detail::parser;
-    friend ::wpi::detail::serializer<basic_json>;
+    friend class ::wpi::util::detail::parser;
+    friend ::wpi::util::detail::serializer<basic_json>;
     template<typename BasicJsonType>
-    friend class ::wpi::detail::iter_impl;
+    friend class ::wpi::util::detail::iter_impl;
     template<typename BasicJsonType, typename CharType>
-    friend class ::wpi::detail::binary_writer;
+    friend class ::wpi::util::detail::binary_writer;
     template<typename BasicJsonType, typename InputType, typename SAX>
-    friend class ::wpi::detail::binary_reader;
+    friend class ::wpi::util::detail::binary_reader;
     template<typename BasicJsonType>
-    friend class ::wpi::detail::json_sax_dom_parser;
+    friend class ::wpi::util::detail::json_sax_dom_parser;
     template<typename BasicJsonType>
-    friend class ::wpi::detail::json_sax_dom_callback_parser;
-    friend class ::wpi::detail::exception;
+    friend class ::wpi::util::detail::json_sax_dom_callback_parser;
+    friend class ::wpi::util::detail::exception;
 
     /// workaround type for MSVC
     using basic_json_t = WPI_BASIC_JSON_TPL;
-    using json_base_class_t = ::wpi::detail::json_base_class<CustomBaseClass>;
+    using json_base_class_t = ::wpi::util::detail::json_base_class<CustomBaseClass>;
 
   JSON_PRIVATE_UNLESS_TESTED:
     // convenience aliases for types residing in namespace detail;
-    using lexer = ::wpi::detail::lexer_base<basic_json>;
+    using lexer = ::wpi::util::detail::lexer_base<basic_json>;
 
     template<typename InputAdapterType>
-    static ::wpi::detail::parser<basic_json, InputAdapterType> parser(
+    static ::wpi::util::detail::parser<basic_json, InputAdapterType> parser(
         InputAdapterType adapter,
         detail::parser_callback_t<basic_json>cb = nullptr,
         const bool allow_exceptions = true,
         const bool ignore_comments = false
     )
     {
-        return ::wpi::detail::parser<basic_json, InputAdapterType>(std::move(adapter),
+        return ::wpi::util::detail::parser<basic_json, InputAdapterType>(std::move(adapter),
                 std::move(cb), allow_exceptions, ignore_comments);
     }
 
   private:
-    using primitive_iterator_t = ::wpi::detail::primitive_iterator_t;
+    using primitive_iterator_t = ::wpi::util::detail::primitive_iterator_t;
     template<typename BasicJsonType>
-    using internal_iterator = ::wpi::detail::internal_iterator<BasicJsonType>;
+    using internal_iterator = ::wpi::util::detail::internal_iterator<BasicJsonType>;
     template<typename BasicJsonType>
-    using iter_impl = ::wpi::detail::iter_impl<BasicJsonType>;
+    using iter_impl = ::wpi::util::detail::iter_impl<BasicJsonType>;
     template<typename Iterator>
-    using iteration_proxy = ::wpi::detail::iteration_proxy<Iterator>;
-    template<typename Base> using json_reverse_iterator = ::wpi::detail::json_reverse_iterator<Base>;
+    using iteration_proxy = ::wpi::util::detail::iteration_proxy<Iterator>;
+    template<typename Base> using json_reverse_iterator = ::wpi::util::detail::json_reverse_iterator<Base>;
 
     template<typename CharType>
-    using output_adapter_t = ::wpi::detail::output_adapter_t<CharType>;
+    using output_adapter_t = ::wpi::util::detail::output_adapter_t<CharType>;
 
     template<typename InputType>
-    using binary_reader = ::wpi::detail::binary_reader<basic_json, InputType>;
-    template<typename CharType> using binary_writer = ::wpi::detail::binary_writer<basic_json, CharType>;
+    using binary_reader = ::wpi::util::detail::binary_reader<basic_json, InputType>;
+    template<typename CharType> using binary_writer = ::wpi::util::detail::binary_writer<basic_json, CharType>;
 
   public:
-    using serializer = ::wpi::detail::serializer<basic_json>;
+    using serializer = ::wpi::util::detail::serializer<basic_json>;
 
     using value_t = detail::value_t;
     /// JSON Pointer, see @ref json_pointer
-    using json_pointer = ::wpi::json_pointer<StringType>;
+    using json_pointer = ::wpi::util::json_pointer<StringType>;
     template<typename T, typename SFINAE>
     using json_serializer = JSONSerializer<T, SFINAE>;
     /// how to treat decoding errors
@@ -173,7 +173,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     using initializer_list_t = std::initializer_list<detail::json_ref<basic_json>>;
 
     using input_format_t = detail::input_format_t;
-    /// SAX interface type, see wpi::json_sax
+    /// SAX interface type, see wpi::util::json_sax
     using json_sax_t = json_sax<basic_json>;
 
     ////////////////
@@ -361,7 +361,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
     /// @brief a type for a packed binary type
     /// @sa https://json.nlohmann.me/api/basic_json/binary_t/
-    using binary_t = wpi::byte_container_with_subtype<BinaryType>;
+    using binary_t = wpi::util::byte_container_with_subtype<BinaryType>;
 
     /// @brief object key comparator type
     /// @sa https://json.nlohmann.me/api/basic_json/object_comparator_t/
@@ -2370,8 +2370,8 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
                    detail::is_basic_json<BasicJsonType>::value
                    && detail::is_getable<basic_json_t, ValueType>::value
                    && !std::is_same<value_t, detail::uncvref_t<ValueType>>::value, int > = 0 >
-    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or wpi::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
-    ValueType value(const ::wpi::json_pointer<BasicJsonType>& ptr, const ValueType& default_value) const
+    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or wpi::util::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
+    ValueType value(const ::wpi::util::json_pointer<BasicJsonType>& ptr, const ValueType& default_value) const
     {
         return value(ptr.convert(), default_value);
     }
@@ -2381,8 +2381,8 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
                    detail::is_basic_json<BasicJsonType>::value
                    && detail::is_getable<basic_json_t, ReturnType>::value
                    && !std::is_same<value_t, detail::uncvref_t<ValueType>>::value, int > = 0 >
-    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or wpi::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
-    ReturnType value(const ::wpi::json_pointer<BasicJsonType>& ptr, ValueType && default_value) const
+    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or wpi::util::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
+    ReturnType value(const ::wpi::util::json_pointer<BasicJsonType>& ptr, ValueType && default_value) const
     {
         return value(ptr.convert(), std::forward<ValueType>(default_value));
     }
@@ -2746,8 +2746,8 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     template<typename BasicJsonType, detail::enable_if_t<detail::is_basic_json<BasicJsonType>::value, int> = 0>
-    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or wpi::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
-    bool contains(const typename ::wpi::json_pointer<BasicJsonType>& ptr) const
+    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or wpi::util::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
+    bool contains(const typename ::wpi::util::json_pointer<BasicJsonType>& ptr) const
     {
         return ptr.contains(this);
     }
@@ -4625,8 +4625,8 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     template<typename BasicJsonType, detail::enable_if_t<detail::is_basic_json<BasicJsonType>::value, int> = 0>
-    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or wpi::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
-    reference operator[](const ::wpi::json_pointer<BasicJsonType>& ptr)
+    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or wpi::util::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
+    reference operator[](const ::wpi::util::json_pointer<BasicJsonType>& ptr)
     {
         return ptr.get_unchecked(this);
     }
@@ -4639,8 +4639,8 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     template<typename BasicJsonType, detail::enable_if_t<detail::is_basic_json<BasicJsonType>::value, int> = 0>
-    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or wpi::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
-    const_reference operator[](const ::wpi::json_pointer<BasicJsonType>& ptr) const
+    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or wpi::util::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
+    const_reference operator[](const ::wpi::util::json_pointer<BasicJsonType>& ptr) const
     {
         return ptr.get_unchecked(this);
     }
@@ -4653,8 +4653,8 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     template<typename BasicJsonType, detail::enable_if_t<detail::is_basic_json<BasicJsonType>::value, int> = 0>
-    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or wpi::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
-    reference at(const ::wpi::json_pointer<BasicJsonType>& ptr)
+    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or wpi::util::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
+    reference at(const ::wpi::util::json_pointer<BasicJsonType>& ptr)
     {
         return ptr.get_checked(this);
     }
@@ -4667,8 +4667,8 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     template<typename BasicJsonType, detail::enable_if_t<detail::is_basic_json<BasicJsonType>::value, int> = 0>
-    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or wpi::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
-    const_reference at(const ::wpi::json_pointer<BasicJsonType>& ptr) const
+    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or wpi::util::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
+    const_reference at(const ::wpi::util::json_pointer<BasicJsonType>& ptr) const
     {
         return ptr.get_checked(this);
     }
@@ -5169,24 +5169,24 @@ inline namespace json_literals
 /// @sa https://json.nlohmann.me/api/basic_json/operator_literal_json/
 JSON_HEDLEY_NON_NULL(1)
 #if !defined(JSON_HEDLEY_GCC_VERSION) || JSON_HEDLEY_GCC_VERSION_CHECK(4,9,0)
-    inline wpi::json operator ""_json(const char* s, std::size_t n)
+    inline wpi::util::json operator ""_json(const char* s, std::size_t n)
 #else
-    inline wpi::json operator "" _json(const char* s, std::size_t n)
+    inline wpi::util::json operator "" _json(const char* s, std::size_t n)
 #endif
 {
-    return wpi::json::parse(s, s + n);
+    return wpi::util::json::parse(s, s + n);
 }
 
 /// @brief user-defined string literal for JSON pointer
 /// @sa https://json.nlohmann.me/api/basic_json/operator_literal_json_pointer/
 JSON_HEDLEY_NON_NULL(1)
 #if !defined(JSON_HEDLEY_GCC_VERSION) || JSON_HEDLEY_GCC_VERSION_CHECK(4,9,0)
-    inline wpi::json::json_pointer operator ""_json_pointer(const char* s, std::size_t n)
+    inline wpi::util::json::json_pointer operator ""_json_pointer(const char* s, std::size_t n)
 #else
-    inline wpi::json::json_pointer operator "" _json_pointer(const char* s, std::size_t n)
+    inline wpi::util::json::json_pointer operator "" _json_pointer(const char* s, std::size_t n)
 #endif
 {
-    return wpi::json::json_pointer(std::string(s, n));
+    return wpi::util::json::json_pointer(std::string(s, n));
 }
 
 }  // namespace json_literals
@@ -5203,29 +5203,29 @@ namespace std // NOLINT(cert-dcl58-cpp)
 /// @brief hash value for JSON objects
 /// @sa https://json.nlohmann.me/api/basic_json/std_hash/
 WPI_BASIC_JSON_TPL_DECLARATION
-struct hash<wpi::WPI_BASIC_JSON_TPL> // NOLINT(cert-dcl58-cpp)
+struct hash<wpi::util::WPI_BASIC_JSON_TPL> // NOLINT(cert-dcl58-cpp)
 {
-    std::size_t operator()(const wpi::WPI_BASIC_JSON_TPL& j) const
+    std::size_t operator()(const wpi::util::WPI_BASIC_JSON_TPL& j) const
     {
-        return wpi::detail::hash(j);
+        return wpi::util::detail::hash(j);
     }
 };
 
 // specialization for std::less<value_t>
 template<>
-struct less< ::wpi::detail::value_t> // do not remove the space after '<', see https://github.com/nlohmann/json/pull/679
+struct less< ::wpi::util::detail::value_t> // do not remove the space after '<', see https://github.com/nlohmann/json/pull/679
 {
     /*!
     @brief compare two value_t enum values
     @since version 3.0.0
     */
-    bool operator()(::wpi::detail::value_t lhs,
-                    ::wpi::detail::value_t rhs) const noexcept
+    bool operator()(::wpi::util::detail::value_t lhs,
+                    ::wpi::util::detail::value_t rhs) const noexcept
     {
 #if JSON_HAS_THREE_WAY_COMPARISON
         return std::is_lt(lhs <=> rhs); // *NOPAD*
 #else
-        return ::wpi::detail::operator<(lhs, rhs);
+        return ::wpi::util::detail::operator<(lhs, rhs);
 #endif
     }
 };
@@ -5236,9 +5236,9 @@ struct less< ::wpi::detail::value_t> // do not remove the space after '<', see h
 /// @brief exchanges the values of two JSON objects
 /// @sa https://json.nlohmann.me/api/basic_json/std_swap/
 WPI_BASIC_JSON_TPL_DECLARATION
-inline void swap(wpi::WPI_BASIC_JSON_TPL& j1, wpi::WPI_BASIC_JSON_TPL& j2) noexcept(  // NOLINT(readability-inconsistent-declaration-parameter-name, cert-dcl58-cpp)
-    is_nothrow_move_constructible<wpi::WPI_BASIC_JSON_TPL>::value&&                          // NOLINT(misc-redundant-expression,cppcoreguidelines-noexcept-swap,performance-noexcept-swap)
-    is_nothrow_move_assignable<wpi::WPI_BASIC_JSON_TPL>::value)
+inline void swap(wpi::util::WPI_BASIC_JSON_TPL& j1, wpi::util::WPI_BASIC_JSON_TPL& j2) noexcept(  // NOLINT(readability-inconsistent-declaration-parameter-name, cert-dcl58-cpp)
+    is_nothrow_move_constructible<wpi::util::WPI_BASIC_JSON_TPL>::value&&                          // NOLINT(misc-redundant-expression,cppcoreguidelines-noexcept-swap,performance-noexcept-swap)
+    is_nothrow_move_assignable<wpi::util::WPI_BASIC_JSON_TPL>::value)
 {
     j1.swap(j2);
 }
@@ -5249,11 +5249,11 @@ inline void swap(wpi::WPI_BASIC_JSON_TPL& j1, wpi::WPI_BASIC_JSON_TPL& j2) noexc
 
 #if JSON_USE_GLOBAL_UDLS
     #if !defined(JSON_HEDLEY_GCC_VERSION) || JSON_HEDLEY_GCC_VERSION_CHECK(4,9,0)
-        using wpi::literals::json_literals::operator ""_json; // NOLINT(misc-unused-using-decls,google-global-names-in-headers)
-        using wpi::literals::json_literals::operator ""_json_pointer; //NOLINT(misc-unused-using-decls,google-global-names-in-headers)
+        using wpi::util::literals::json_literals::operator ""_json; // NOLINT(misc-unused-using-decls,google-global-names-in-headers)
+        using wpi::util::literals::json_literals::operator ""_json_pointer; //NOLINT(misc-unused-using-decls,google-global-names-in-headers)
     #else
-        using wpi::literals::json_literals::operator "" _json; // NOLINT(misc-unused-using-decls,google-global-names-in-headers)
-        using wpi::literals::json_literals::operator "" _json_pointer; //NOLINT(misc-unused-using-decls,google-global-names-in-headers)
+        using wpi::util::literals::json_literals::operator "" _json; // NOLINT(misc-unused-using-decls,google-global-names-in-headers)
+        using wpi::util::literals::json_literals::operator "" _json_pointer; //NOLINT(misc-unused-using-decls,google-global-names-in-headers)
     #endif
 #endif
 

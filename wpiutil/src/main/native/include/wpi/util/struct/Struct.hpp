@@ -25,7 +25,7 @@
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/type_traits.hpp"
 
-namespace wpi {
+namespace wpi::util {
 
 /**
  * Struct serialization template. Unspecialized class has no members; only
@@ -47,7 +47,7 @@ struct Struct {};
  * values into a mutable std::span and deserialization consists of reading
  * values from an immutable std::span.
  *
- * Implementations must define a template specialization for wpi::Struct with
+ * Implementations must define a template specialization for wpi::util::Struct with
  * T being the type that is being serialized/deserialized, with the following
  * static members (as enforced by this concept):
  * - std::string_view GetTypeName(): function that returns the type name
@@ -96,7 +96,7 @@ concept StructSerializable = requires(std::span<const uint8_t> in,
  * Specifies that a type is capable of in-place raw struct deserialization.
  *
  * In addition to meeting StructSerializable, implementations must define a
- * wpi::Struct<T> static member `void UnpackInto(T*, std::span<const uint8_t>)`
+ * wpi::util::Struct<T> static member `void UnpackInto(T*, std::span<const uint8_t>)`
  * to update the pointed-to T with the contents of the span.
  */
 template <typename T, typename... I>
@@ -111,7 +111,7 @@ concept MutableStructSerializable =
  * Specifies that a struct type has nested struct declarations.
  *
  * In addition to meeting StructSerializable, implementations must define a
- * wpi::Struct<T> static member
+ * wpi::util::Struct<T> static member
  * `void ForEachNested(std::invocable<std::string_view, std::string_view) auto
  * fn)` (or equivalent) and call ForEachStructSchema<Type> on each nested struct
  * type.
@@ -169,17 +169,17 @@ inline T UnpackStruct(std::span<const uint8_t> data, const I&... info) {
  * @return Deserialized array
  */
 template <StructSerializable T, size_t Offset, size_t N>
-inline wpi::array<T, N> UnpackStructArray(std::span<const uint8_t> data) {
+inline wpi::util::array<T, N> UnpackStructArray(std::span<const uint8_t> data) {
   if (is_constexpr([] { Struct<std::remove_cvref_t<T>>::GetSize(); })) {
     constexpr auto StructSize = Struct<std::remove_cvref_t<T>>::GetSize();
-    wpi::array<T, N> arr(wpi::empty_array);
+    wpi::util::array<T, N> arr(wpi::util::empty_array);
     [&]<size_t... Is>(std::index_sequence<Is...>) {
       ((arr[Is] = UnpackStruct<T, Offset + Is * StructSize>(data)), ...);
     }(std::make_index_sequence<N>{});
     return arr;
   } else {
     auto size = Struct<std::remove_cvref_t<T>>::GetSize();
-    wpi::array<T, N> arr(wpi::empty_array);
+    wpi::util::array<T, N> arr(wpi::util::empty_array);
     for (size_t i = 0; i < N; i++) {
       arr[i] = UnpackStruct<T>(data);
       data = data.subspan(size);
@@ -232,7 +232,7 @@ inline void PackStruct(std::span<uint8_t> data, T&& value, const I&... info) {
  */
 template <size_t Offset, size_t N, StructSerializable T>
 inline void PackStructArray(std::span<uint8_t> data,
-                            const wpi::array<T, N>& arr) {
+                            const wpi::util::array<T, N>& arr) {
   if (is_constexpr([] { Struct<std::remove_cvref_t<T>>::GetSize(); })) {
     constexpr auto StructSize = Struct<std::remove_cvref_t<T>>::GetSize();
     [&]<size_t... Is>(std::index_sequence<Is...>) {
@@ -480,7 +480,7 @@ class StructArrayBuffer {
   }
 
  private:
-  wpi::mutex m_mutex;
+  wpi::util::mutex m_mutex;
   std::vector<uint8_t> m_buf;
 };
 
@@ -711,4 +711,4 @@ struct Struct<double> {
   }
 };
 
-}  // namespace wpi
+}  // namespace wpi::util

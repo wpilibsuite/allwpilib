@@ -14,7 +14,7 @@
 #include <fmt/core.h>
 #endif
 
-namespace wpi {
+namespace wpi::util {
 
 /**
  * Wrapper around fmt::print() that squelches write failure exceptions.
@@ -60,4 +60,4 @@ inline void println(std::FILE* f, fmt::format_string<T...> fmt, T&&... args) {
   }
 }
 
-}  // namespace wpi
+}  // namespace wpi::util

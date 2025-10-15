@@ -13,8 +13,8 @@ class PHSimGui {
  public:
   static void Initialize();
   static bool PHsAnyInitialized();
-  static bool PHsAnySolenoids(glass::PneumaticControlsModel* model);
-  static std::unique_ptr<glass::PneumaticControlsModel> GetPHsModel();
+  static bool PHsAnySolenoids(wpi::glass::PneumaticControlsModel* model);
+  static std::unique_ptr<wpi::glass::PneumaticControlsModel> GetPHsModel();
 };
 
 }  // namespace halsimgui

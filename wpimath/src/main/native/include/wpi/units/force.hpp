@@ -32,9 +32,9 @@
 #include "wpi/units/mass.hpp"
 #include "wpi/units/time.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::force
+ * @namespace wpi::units::force
  * @brief namespace for unit types and containers representing force values
  * @details The SI unit for force is `newtons`, and the corresponding
  *          `base_unit` category is `force_unit`.
@@ -43,7 +43,7 @@ namespace units {
  */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_FORCE_UNITS)
 UNIT_ADD_WITH_METRIC_PREFIXES(force, newton, newtons, N,
-                              unit<std::ratio<1>, units::category::force_unit>)
+                              unit<std::ratio<1>, wpi::units::category::force_unit>)
 UNIT_ADD(
     force, pound, pounds, lbf,
     compound_unit<mass::slug, length::foot, inverse<squared<time::seconds>>>)
@@ -59,4 +59,4 @@ UNIT_ADD_CATEGORY_TRAIT(force)
 
 using force::newton_t;
 using force::newtons;
-}  // namespace units
+}  // namespace wpi::units

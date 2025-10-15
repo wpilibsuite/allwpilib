@@ -6,8 +6,8 @@
 
 #include <stdint.h>
 
-namespace nt::server {
+namespace wpi::nt::server {
 
 inline constexpr uint32_t kMinPeriodMs = 5;
 
-}  // namespace nt::server
+}  // namespace wpi::nt::server

@@ -8,7 +8,7 @@
 
 #include "wpi/hardware/motor/PWMMotorController.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Playing with Fusion Venom Motor Controller with PWM control.
@@ -40,4 +40,4 @@ class PWMVenom : public PWMMotorController {
   PWMVenom& operator=(PWMVenom&&) = default;
 };
 
-}  // namespace frc
+}  // namespace wpi

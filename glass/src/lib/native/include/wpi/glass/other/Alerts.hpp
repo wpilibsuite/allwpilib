@@ -9,7 +9,7 @@
 
 #include "wpi/glass/Model.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 class AlertsModel : public Model {
  public:
@@ -20,4 +20,4 @@ class AlertsModel : public Model {
 
 void DisplayAlerts(AlertsModel* model);
 
-}  // namespace glass
+}  // namespace wpi::glass

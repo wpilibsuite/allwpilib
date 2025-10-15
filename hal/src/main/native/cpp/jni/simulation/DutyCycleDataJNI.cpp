@@ -8,7 +8,7 @@
 #include "org_wpilib_hardware_hal_simulation_DutyCycleDataJNI.h"
 #include "wpi/hal/simulation/DutyCycleData.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
 

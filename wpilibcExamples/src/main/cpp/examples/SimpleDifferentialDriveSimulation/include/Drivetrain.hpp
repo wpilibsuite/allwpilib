@@ -52,59 +52,59 @@ class Drivetrain {
 
     m_rightLeader.SetInverted(true);
 
-    frc::SmartDashboard::PutData("Field", &m_fieldSim);
+    wpi::SmartDashboard::PutData("Field", &m_fieldSim);
   }
 
-  static constexpr units::meters_per_second_t kMaxSpeed =
+  static constexpr wpi::units::meters_per_second_t kMaxSpeed =
       3.0_mps;  // 3 meters per second
-  static constexpr units::radians_per_second_t kMaxAngularSpeed{
+  static constexpr wpi::units::radians_per_second_t kMaxAngularSpeed{
       std::numbers::pi};  // 1/2 rotation per second
 
-  void SetSpeeds(const frc::DifferentialDriveWheelSpeeds& speeds);
-  void Drive(units::meters_per_second_t xSpeed,
-             units::radians_per_second_t rot);
+  void SetSpeeds(const wpi::math::DifferentialDriveWheelSpeeds& speeds);
+  void Drive(wpi::units::meters_per_second_t xSpeed,
+             wpi::units::radians_per_second_t rot);
   void UpdateOdometry();
-  void ResetOdometry(const frc::Pose2d& pose);
+  void ResetOdometry(const wpi::math::Pose2d& pose);
 
-  frc::Pose2d GetPose() const { return m_odometry.GetPose(); }
+  wpi::math::Pose2d GetPose() const { return m_odometry.GetPose(); }
 
   void SimulationPeriodic();
   void Periodic();
 
  private:
-  static constexpr units::meter_t kTrackwidth = 0.381_m * 2;
+  static constexpr wpi::units::meter_t kTrackwidth = 0.381_m * 2;
   static constexpr double kWheelRadius = 0.0508;  // meters
   static constexpr int kEncoderResolution = 4096;
 
-  frc::PWMSparkMax m_leftLeader{1};
-  frc::PWMSparkMax m_leftFollower{2};
-  frc::PWMSparkMax m_rightLeader{3};
-  frc::PWMSparkMax m_rightFollower{4};
+  wpi::PWMSparkMax m_leftLeader{1};
+  wpi::PWMSparkMax m_leftFollower{2};
+  wpi::PWMSparkMax m_rightLeader{3};
+  wpi::PWMSparkMax m_rightFollower{4};
 
-  frc::Encoder m_leftEncoder{0, 1};
-  frc::Encoder m_rightEncoder{2, 3};
+  wpi::Encoder m_leftEncoder{0, 1};
+  wpi::Encoder m_rightEncoder{2, 3};
 
-  frc::PIDController m_leftPIDController{8.5, 0.0, 0.0};
-  frc::PIDController m_rightPIDController{8.5, 0.0, 0.0};
+  wpi::math::PIDController m_leftPIDController{8.5, 0.0, 0.0};
+  wpi::math::PIDController m_rightPIDController{8.5, 0.0, 0.0};
 
-  frc::OnboardIMU m_imu{frc::OnboardIMU::kFlat};
+  wpi::OnboardIMU m_imu{wpi::OnboardIMU::kFlat};
 
-  frc::DifferentialDriveKinematics m_kinematics{kTrackwidth};
-  frc::DifferentialDriveOdometry m_odometry{
-      m_imu.GetRotation2d(), units::meter_t{m_leftEncoder.GetDistance()},
-      units::meter_t{m_rightEncoder.GetDistance()}};
+  wpi::math::DifferentialDriveKinematics m_kinematics{kTrackwidth};
+  wpi::math::DifferentialDriveOdometry m_odometry{
+      m_imu.GetRotation2d(), wpi::units::meter_t{m_leftEncoder.GetDistance()},
+      wpi::units::meter_t{m_rightEncoder.GetDistance()}};
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
-  frc::SimpleMotorFeedforward<units::meters> m_feedforward{1_V, 3_V / 1_mps};
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_feedforward{1_V, 3_V / 1_mps};
 
   // Simulation classes help us simulate our robot
-  frc::sim::EncoderSim m_leftEncoderSim{m_leftEncoder};
-  frc::sim::EncoderSim m_rightEncoderSim{m_rightEncoder};
-  frc::Field2d m_fieldSim;
-  frc::LinearSystem<2, 2, 2> m_drivetrainSystem =
-      frc::LinearSystemId::IdentifyDrivetrainSystem(
+  wpi::sim::EncoderSim m_leftEncoderSim{m_leftEncoder};
+  wpi::sim::EncoderSim m_rightEncoderSim{m_rightEncoder};
+  wpi::Field2d m_fieldSim;
+  wpi::math::LinearSystem<2, 2, 2> m_drivetrainSystem =
+      wpi::math::LinearSystemId::IdentifyDrivetrainSystem(
           1.98_V / 1_mps, 0.2_V / 1_mps_sq, 1.5_V / 1_mps, 0.3_V / 1_mps_sq);
-  frc::sim::DifferentialDrivetrainSim m_drivetrainSimulator{
-      m_drivetrainSystem, kTrackwidth, frc::DCMotor::CIM(2), 8, 2_in};
+  wpi::sim::DifferentialDrivetrainSim m_drivetrainSimulator{
+      m_drivetrainSystem, kTrackwidth, wpi::math::DCMotor::CIM(2), 8, 2_in};
 };

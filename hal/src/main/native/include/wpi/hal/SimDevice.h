@@ -394,7 +394,7 @@ void HAL_ResetSimValue(HAL_SimValueHandle handle);
 #endif
 
 #ifdef __cplusplus
-namespace hal {
+namespace wpi::hal {
 
 /**
  * C++ wrapper around a HAL simulator value handle.
@@ -944,5 +944,5 @@ class SimDevice {
   HAL_SimDeviceHandle m_handle = HAL_kInvalidHandle;
 };
 
-}  // namespace hal
+}  // namespace wpi::hal
 #endif  // __cplusplus

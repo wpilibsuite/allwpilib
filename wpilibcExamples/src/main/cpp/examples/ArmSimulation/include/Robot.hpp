@@ -12,7 +12,7 @@
 /**
  * This is a sample program to demonstrate the use of arm simulation.
  */
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   Robot() {}
   void SimulationPeriodic() override;
@@ -21,6 +21,6 @@ class Robot : public frc::TimedRobot {
   void DisabledInit() override;
 
  private:
-  frc::Joystick m_joystick{kJoystickPort};
+  wpi::Joystick m_joystick{kJoystickPort};
   Arm m_arm;
 };

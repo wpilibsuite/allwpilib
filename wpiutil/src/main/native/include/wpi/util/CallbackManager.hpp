@@ -19,7 +19,7 @@
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/raw_ostream.hpp"
 
-namespace wpi {
+namespace wpi::util {
 
 template <typename Callback>
 class CallbackListenerData {
@@ -47,7 +47,7 @@ template <typename Derived, typename TUserInfo,
           typename TListenerData =
               CallbackListenerData<std::function<void(const TUserInfo& info)>>,
           typename TNotifierData = TUserInfo>
-class CallbackThread : public wpi::SafeThread {
+class CallbackThread : public wpi::util::SafeThread {
  public:
   using UserInfo = TUserInfo;
   using NotifierData = TNotifierData;
@@ -67,10 +67,10 @@ class CallbackThread : public wpi::SafeThread {
 
   void Main() override;
 
-  wpi::UidVector<ListenerData, 64> m_listeners;
+  wpi::util::UidVector<ListenerData, 64> m_listeners;
 
   std::queue<std::pair<unsigned int, NotifierData>> m_queue;
-  wpi::condition_variable m_queue_empty;
+  wpi::util::condition_variable m_queue_empty;
 
   struct Poller {
     void Terminate() {
@@ -81,12 +81,12 @@ class CallbackThread : public wpi::SafeThread {
       poll_cond.notify_all();
     }
     std::queue<NotifierData> poll_queue;
-    wpi::mutex poll_mutex;
-    wpi::condition_variable poll_cond;
+    wpi::util::mutex poll_mutex;
+    wpi::util::condition_variable poll_cond;
     bool terminating = false;
     bool canceling = false;
   };
-  wpi::UidVector<std::shared_ptr<Poller>, 64> m_pollers;
+  wpi::util::UidVector<std::shared_ptr<Poller>, 64> m_pollers;
 
   std::function<void()> m_on_start;
   std::function<void()> m_on_exit;
@@ -379,17 +379,17 @@ class CallbackManager {
     thr->m_cond.notify_one();
   }
 
-  typename wpi::SafeThreadOwner<Thread>::Proxy GetThread() const {
+  typename wpi::util::SafeThreadOwner<Thread>::Proxy GetThread() const {
     return m_owner.GetThread();
   }
 
  private:
-  wpi::SafeThreadOwner<Thread> m_owner;
+  wpi::util::SafeThreadOwner<Thread> m_owner;
 
   std::function<void()> m_on_start;
   std::function<void()> m_on_exit;
 };
 
-}  // namespace wpi
+}  // namespace wpi::util
 
 #endif  // WPIUTIL_WPI_UTIL_CALLBACKMANAGER_HPP_

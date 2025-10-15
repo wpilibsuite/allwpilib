@@ -8,7 +8,7 @@
 
 #include "wpi/simulation/CallbackStore.hpp"
 
-namespace frc {
+namespace wpi {
 
 class PWM;
 class PWMMotorController;
@@ -118,4 +118,4 @@ class PWMSim {
   int m_index;
 };
 }  // namespace sim
-}  // namespace frc
+}  // namespace wpi

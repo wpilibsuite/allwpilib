@@ -6,7 +6,7 @@
 
 #include "wpi/util/SymbolExports.hpp"
 
-namespace wpi {
+namespace wpi::util {
 
 class SendableBuilder;
 
@@ -25,4 +25,4 @@ class WPILIB_DLLEXPORT Sendable {
   virtual void InitSendable(SendableBuilder& builder) = 0;
 };
 
-}  // namespace wpi
+}  // namespace wpi::util

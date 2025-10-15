@@ -7,7 +7,7 @@
 #include "CommandTestBase.hpp"
 #include "wpi/commands2/StartEndCommand.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 class StartEndCommandTest : public CommandTestBase {};
 
 TEST_F(StartEndCommandTest, StartEndCommandSchedule) {

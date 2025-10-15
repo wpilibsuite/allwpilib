@@ -12,13 +12,13 @@
 #include "wpi/net/MulticastServiceAnnouncer.h"
 #include "wpi/net/MulticastServiceResolver.h"
 
-namespace wpi {
+namespace wpi::net {
 struct MulticastHandleManager {
-  wpi::mutex mutex;
-  wpi::UidVector<int, 8> handleIds;
-  wpi::DenseMap<size_t, std::unique_ptr<wpi::MulticastServiceResolver>>
+  wpi::util::mutex mutex;
+  wpi::util::UidVector<int, 8> handleIds;
+  wpi::util::DenseMap<size_t, std::unique_ptr<wpi::net::MulticastServiceResolver>>
       resolvers;
-  wpi::DenseMap<size_t, std::unique_ptr<wpi::MulticastServiceAnnouncer>>
+  wpi::util::DenseMap<size_t, std::unique_ptr<wpi::net::MulticastServiceAnnouncer>>
       announcers;
 #ifdef _WIN32
   ~MulticastHandleManager();
@@ -26,4 +26,4 @@ struct MulticastHandleManager {
 };
 
 MulticastHandleManager& GetMulticastManager();
-}  // namespace wpi
+}  // namespace wpi::net

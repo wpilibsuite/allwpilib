@@ -13,18 +13,18 @@
 
 #include "Constants.hpp"
 
-class Pneumatics : frc2::SubsystemBase {
+class Pneumatics : wpi::cmd::SubsystemBase {
  public:
   Pneumatics();
   /** Returns a command that disables the compressor indefinitely. */
-  frc2::CommandPtr DisableCompressorCommand();
+  wpi::cmd::CommandPtr DisableCompressorCommand();
 
   /**
    * Query the analog pressure sensor.
    *
    * @return the measured pressure, in PSI
    */
-  units::pounds_per_square_inch_t GetPressure();
+  wpi::units::pounds_per_square_inch_t GetPressure();
 
  private:
   // External analog pressure sensor
@@ -35,9 +35,9 @@ class Pneumatics : frc2::SubsystemBase {
   // pressure is 250r-25
   static constexpr double kScale = 250;
   static constexpr double kOffset = -25;
-  frc::AnalogPotentiometer m_pressureTransducer{/* the AnalogIn port*/ 2,
+  wpi::AnalogPotentiometer m_pressureTransducer{/* the AnalogIn port*/ 2,
                                                 kScale, kOffset};
 
   // Compressor connected to a PH with a default CAN ID
-  frc::Compressor m_compressor{0, frc::PneumaticsModuleType::CTREPCM};
+  wpi::Compressor m_compressor{0, wpi::PneumaticsModuleType::CTREPCM};
 };

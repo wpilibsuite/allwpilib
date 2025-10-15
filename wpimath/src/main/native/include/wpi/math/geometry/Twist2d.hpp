@@ -10,7 +10,7 @@
 #include "wpi/units/length.hpp"
 #include "wpi/units/math.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 class Transform2d;
 
@@ -25,17 +25,17 @@ struct WPILIB_DLLEXPORT Twist2d {
   /**
    * Linear "dx" component
    */
-  units::meter_t dx = 0_m;
+  wpi::units::meter_t dx = 0_m;
 
   /**
    * Linear "dy" component
    */
-  units::meter_t dy = 0_m;
+  wpi::units::meter_t dy = 0_m;
 
   /**
    * Angular "dtheta" component (radians)
    */
-  units::radian_t dtheta = 0_rad;
+  wpi::units::radian_t dtheta = 0_rad;
 
   /**
    * Obtain a new Transform2d from a (constant curvature) velocity.
@@ -62,9 +62,9 @@ struct WPILIB_DLLEXPORT Twist2d {
    * @return Whether the two objects are equal.
    */
   constexpr bool operator==(const Twist2d& other) const {
-    return units::math::abs(dx - other.dx) < 1E-9_m &&
-           units::math::abs(dy - other.dy) < 1E-9_m &&
-           units::math::abs(dtheta - other.dtheta) < 1E-9_rad;
+    return wpi::units::math::abs(dx - other.dx) < 1E-9_m &&
+           wpi::units::math::abs(dy - other.dy) < 1E-9_m &&
+           wpi::units::math::abs(dtheta - other.dtheta) < 1E-9_rad;
   }
 
   /**
@@ -78,11 +78,11 @@ struct WPILIB_DLLEXPORT Twist2d {
   }
 };
 
-}  // namespace frc
+}  // namespace wpi::math
 
 #include "wpi/math/geometry/Transform2d.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 constexpr Transform2d Twist2d::Exp() const {
   const auto theta = dtheta.value();
@@ -102,7 +102,7 @@ constexpr Transform2d Twist2d::Exp() const {
                      Rotation2d{cosTheta, sinTheta});
 }
 
-}  // namespace frc
+}  // namespace wpi::math
 
 #include "wpi/math/geometry/proto/Twist2dProto.hpp"
 #include "wpi/math/geometry/struct/Twist2dStruct.hpp"

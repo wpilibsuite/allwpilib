@@ -9,7 +9,7 @@
 
 #include <cassert>
 
-namespace cs {
+namespace wpi::cs {
 
 template <typename Interface>
 class RemoveAddRefRelease : public Interface {
@@ -146,4 +146,4 @@ void swap(
   left.Swap(right);
 }
 
-}  // namespace cs
+}  // namespace wpi::cs

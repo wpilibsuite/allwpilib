@@ -4,12 +4,12 @@
 
 #pragma once
 
-namespace glass {
+namespace wpi::glass {
 class Storage;
 }  // namespace glass
 
 void DisplayInputFiles();
 void DisplayEntries();
-void DisplayOutput(glass::Storage& storage);
+void DisplayOutput(wpi::glass::Storage& storage);
 
 extern bool gShutdown;

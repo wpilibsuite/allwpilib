@@ -32,7 +32,7 @@ void RapidReactCommandBot::ConfigureBindings() {
 
   // Fire the shooter with the A button
   m_driverController.A().OnTrue(
-      frc2::cmd::Parallel(
+      wpi::cmd::cmd::Parallel(
           m_shooter.ShootCommand(ShooterConstants::kShooterTarget),
           m_storage.RunCommand())
           // Since we composed this inline we should give it a name
@@ -43,7 +43,7 @@ void RapidReactCommandBot::ConfigureBindings() {
       m_pneumatics.DisableCompressorCommand());
 }
 
-frc2::CommandPtr RapidReactCommandBot::GetAutonomousCommand() {
+wpi::cmd::CommandPtr RapidReactCommandBot::GetAutonomousCommand() {
   return m_drive
       .DriveDistanceCommand(AutoConstants::kDriveDistance,
                             AutoConstants::kDriveSpeed)

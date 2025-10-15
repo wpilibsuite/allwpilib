@@ -7,7 +7,7 @@
 #include "wpi/hal/simulation/DIOData.h"
 #include "wpi/hal/simulation/SimDataValue.h"
 
-namespace hal {
+namespace wpi::hal {
 class DIOData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(Value)
@@ -27,4 +27,4 @@ class DIOData {
   virtual void ResetData();
 };
 extern DIOData* SimDIOData;
-}  // namespace hal
+}  // namespace wpi::hal

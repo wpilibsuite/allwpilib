@@ -22,9 +22,9 @@ void Robot::RobotPeriodic() {
   // alliance, enabled in teleop mode, with 43 seconds left in the match.
 
   std::string allianceString = "U";
-  auto alliance = frc::DriverStation::GetAlliance();
+  auto alliance = wpi::DriverStation::GetAlliance();
   if (alliance.has_value()) {
-    if (alliance == frc::DriverStation::Alliance::kRed) {
+    if (alliance == wpi::DriverStation::Alliance::kRed) {
       allianceString = "R";
     } else {
       allianceString = "B";
@@ -33,15 +33,15 @@ void Robot::RobotPeriodic() {
 
   auto string =
       fmt::format("{}{}{}{:03}", allianceString,
-                  frc::DriverStation::IsEnabled() ? "E" : "D",
-                  frc::DriverStation::IsAutonomous() ? "A" : "T",
-                  static_cast<int>(frc::Timer::GetMatchTime().value()));
+                  wpi::DriverStation::IsEnabled() ? "E" : "D",
+                  wpi::DriverStation::IsAutonomous() ? "A" : "T",
+                  static_cast<int>(wpi::Timer::GetMatchTime().value()));
 
   arduino.WriteBulk(reinterpret_cast<uint8_t*>(string.data()), string.size());
 }
 
 #ifndef RUNNING_FRC_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

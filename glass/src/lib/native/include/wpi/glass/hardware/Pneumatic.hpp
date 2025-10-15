@@ -12,7 +12,7 @@
 
 #include "wpi/glass/Model.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 class BooleanSource;
 class DoubleSource;
@@ -42,7 +42,7 @@ class PneumaticControlModel : public Model {
   virtual CompressorModel* GetCompressor() = 0;
 
   virtual void ForEachSolenoid(
-      wpi::function_ref<void(SolenoidModel& model, int index)> func) = 0;
+      wpi::util::function_ref<void(SolenoidModel& model, int index)> func) = 0;
 
   virtual std::string_view GetName() = 0;
 };
@@ -50,7 +50,7 @@ class PneumaticControlModel : public Model {
 class PneumaticControlsModel : public Model {
  public:
   virtual void ForEachPneumaticControl(
-      wpi::function_ref<void(PneumaticControlModel& model, int index)>
+      wpi::util::function_ref<void(PneumaticControlModel& model, int index)>
           func) = 0;
 };
 
@@ -78,4 +78,4 @@ void DisplayCompressorDevice(CompressorModel* model, int index,
 void DisplayCompressorsDevice(PneumaticControlsModel* model,
                               bool outputsEnabled);
 
-}  // namespace glass
+}  // namespace wpi::glass

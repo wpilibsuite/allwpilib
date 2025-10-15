@@ -16,7 +16,7 @@
 #include <algorithm>
 #include <cstddef>
 
-namespace wpi {
+namespace wpi::util {
 
 /// A suitably aligned and sized character array member which can hold elements
 /// of any type.
@@ -25,6 +25,6 @@ template <typename... Ts> struct AlignedCharArrayUnion {
       std::byte buffer[(std::max)({static_cast<size_t>(1), sizeof(Ts)...})];
 };
 
-} // end namespace wpi
+} // end namespace wpi::util
 
 #endif // WPIUTIL_WPI_ALIGNOF_H

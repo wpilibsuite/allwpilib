@@ -18,7 +18,7 @@
 
 #include "wpi/commands2/CommandHelper.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 /**
  * A command composition that runs a set of commands in parallel, ending only
  * when a specific command (the "deadline") ends, interrupting all other
@@ -56,8 +56,8 @@ class ParallelDeadlineGroup
    * @param deadline the command that determines when the composition ends
    * @param commands the commands to be executed
    */
-  template <wpi::DecayedDerivedFrom<Command> T,
-            wpi::DecayedDerivedFrom<Command>... Commands>
+  template <wpi::util::DecayedDerivedFrom<Command> T,
+            wpi::util::DecayedDerivedFrom<Command>... Commands>
   explicit ParallelDeadlineGroup(T&& deadline, Commands&&... commands) {
     SetDeadline(std::make_unique<std::decay_t<T>>(std::forward<T>(deadline)));
     AddCommands(std::forward<Commands>(commands)...);
@@ -76,7 +76,7 @@ class ParallelDeadlineGroup
    *
    * @param commands Commands to add to the group.
    */
-  template <wpi::DecayedDerivedFrom<Command>... Commands>
+  template <wpi::util::DecayedDerivedFrom<Command>... Commands>
   void AddCommands(Commands&&... commands) {
     std::vector<std::unique_ptr<Command>> foo;
     ((void)foo.emplace_back(std::make_unique<std::decay_t<Commands>>(
@@ -97,7 +97,7 @@ class ParallelDeadlineGroup
 
   Command::InterruptionBehavior GetInterruptionBehavior() const override;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
   void AddCommands(std::vector<std::unique_ptr<Command>>&& commands);
@@ -111,7 +111,7 @@ class ParallelDeadlineGroup
       Command::InterruptionBehavior::kCancelIncoming};
   bool m_finished{true};
 };
-}  // namespace frc2
+}  // namespace wpi::cmd
 
 #ifdef _WIN32
 #pragma warning(pop)

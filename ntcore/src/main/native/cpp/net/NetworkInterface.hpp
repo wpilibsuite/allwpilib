@@ -6,7 +6,7 @@
 
 #include "MessageHandler.hpp"
 
-namespace nt::net {
+namespace wpi::nt::net {
 
 class ILocalStorage : public ServerMessageHandler {
  public:
@@ -14,4 +14,4 @@ class ILocalStorage : public ServerMessageHandler {
   virtual void ClearNetwork() = 0;
 };
 
-}  // namespace nt::net
+}  // namespace wpi::nt::net

@@ -9,7 +9,7 @@
 #include "JoystickTestMacros.hpp"
 #include "wpi/simulation/PS5ControllerSim.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 BUTTON_TEST(PS5Controller, SquareButton)
 BUTTON_TEST(PS5Controller, CrossButton)

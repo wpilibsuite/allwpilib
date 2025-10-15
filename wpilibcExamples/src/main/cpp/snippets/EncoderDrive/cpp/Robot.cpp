@@ -11,7 +11,7 @@
  * Encoder drive to distance snippets for frc-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/encoders-software.html
  */
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   Robot() {
     // Configures the encoder's distance-per-pulse
@@ -37,18 +37,18 @@ class Robot : public frc::TimedRobot {
 
  private:
   // Creates an encoder on DIO ports 0 and 1.
-  frc::Encoder m_encoder{0, 1};
+  wpi::Encoder m_encoder{0, 1};
   // Initialize motor controllers and drive
-  frc::Spark leftLeader{0};
-  frc::Spark leftFollower{1};
-  frc::Spark rightLeader{2};
-  frc::Spark rightFollower{3};
-  frc::DifferentialDrive drive{[&](double output) { leftLeader.Set(output); },
+  wpi::Spark leftLeader{0};
+  wpi::Spark leftFollower{1};
+  wpi::Spark rightLeader{2};
+  wpi::Spark rightFollower{3};
+  wpi::DifferentialDrive drive{[&](double output) { leftLeader.Set(output); },
                                [&](double output) { rightLeader.Set(output); }};
 };
 
 #ifndef RUNNING_FRC_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

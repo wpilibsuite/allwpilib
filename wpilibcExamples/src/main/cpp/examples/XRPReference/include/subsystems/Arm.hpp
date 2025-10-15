@@ -8,7 +8,7 @@
 #include <wpi/units/angle.hpp>
 #include <wpi/xrp/XRPServo.hpp>
 
-class Arm : public frc2::SubsystemBase {
+class Arm : public wpi::cmd::SubsystemBase {
  public:
   /**
    * Will be called periodically whenever the CommandScheduler runs.
@@ -20,8 +20,8 @@ class Arm : public frc2::SubsystemBase {
    *
    * @param angle the commanded angle
    */
-  void SetAngle(units::radian_t angle);
+  void SetAngle(wpi::units::radian_t angle);
 
  private:
-  frc::XRPServo m_armServo{4};
+  wpi::xrp::XRPServo m_armServo{4};
 };

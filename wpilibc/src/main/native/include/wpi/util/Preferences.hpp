@@ -10,7 +10,7 @@
 #include <string_view>
 #include <vector>
 
-namespace frc {
+namespace wpi {
 
 /**
  * The preferences class provides a relatively simple way to save important
@@ -218,4 +218,4 @@ class Preferences {
   Preferences() = default;
 };
 
-}  // namespace frc
+}  // namespace wpi

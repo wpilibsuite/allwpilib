@@ -29,7 +29,7 @@ typedef WPI_Handle WPI_SemaphoreHandle;  // NOLINT
 
 #ifdef __cplusplus
 
-namespace wpi {
+namespace wpi::util {
 
 /** Constant representing an invalid handle. */
 constexpr unsigned int kInvalidHandle = 0;
@@ -442,7 +442,7 @@ class SignalObject final {
   T m_handle;
 };
 
-}  // namespace wpi
+}  // namespace wpi::util
 
 extern "C" {
 

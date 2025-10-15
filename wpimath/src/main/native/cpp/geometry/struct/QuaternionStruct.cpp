@@ -11,20 +11,20 @@ constexpr size_t kYOff = kXOff + 8;
 constexpr size_t kZOff = kYOff + 8;
 }  // namespace
 
-using StructType = wpi::Struct<frc::Quaternion>;
+using StructType = wpi::util::Struct<wpi::math::Quaternion>;
 
-frc::Quaternion StructType::Unpack(std::span<const uint8_t> data) {
-  return frc::Quaternion{
-      wpi::UnpackStruct<double, kWOff>(data),
-      wpi::UnpackStruct<double, kXOff>(data),
-      wpi::UnpackStruct<double, kYOff>(data),
-      wpi::UnpackStruct<double, kZOff>(data),
+wpi::math::Quaternion StructType::Unpack(std::span<const uint8_t> data) {
+  return wpi::math::Quaternion{
+      wpi::util::UnpackStruct<double, kWOff>(data),
+      wpi::util::UnpackStruct<double, kXOff>(data),
+      wpi::util::UnpackStruct<double, kYOff>(data),
+      wpi::util::UnpackStruct<double, kZOff>(data),
   };
 }
 
-void StructType::Pack(std::span<uint8_t> data, const frc::Quaternion& value) {
-  wpi::PackStruct<kWOff>(data, value.W());
-  wpi::PackStruct<kXOff>(data, value.X());
-  wpi::PackStruct<kYOff>(data, value.Y());
-  wpi::PackStruct<kZOff>(data, value.Z());
+void StructType::Pack(std::span<uint8_t> data, const wpi::math::Quaternion& value) {
+  wpi::util::PackStruct<kWOff>(data, value.W());
+  wpi::util::PackStruct<kXOff>(data, value.X());
+  wpi::util::PackStruct<kYOff>(data, value.Y());
+  wpi::util::PackStruct<kZOff>(data, value.Z());
 }

@@ -4,11 +4,11 @@
 
 #include "NetworkListener.hpp"
 
-using namespace cs;
+using namespace wpi::cs;
 
 class NetworkListener::Impl {};
 
-NetworkListener::NetworkListener(wpi::Logger& logger, Notifier& notifier) {}
+NetworkListener::NetworkListener(wpi::util::Logger& logger, Notifier& notifier) {}
 
 NetworkListener::~NetworkListener() = default;
 

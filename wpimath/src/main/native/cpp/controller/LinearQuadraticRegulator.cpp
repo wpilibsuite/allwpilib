@@ -4,7 +4,7 @@
 
 #include "wpi/math/controller/LinearQuadraticRegulator.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT)
     LinearQuadraticRegulator<1, 1>;
@@ -13,4 +13,4 @@ template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT)
 template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT)
     LinearQuadraticRegulator<2, 2>;
 
-}  // namespace frc
+}  // namespace wpi::math

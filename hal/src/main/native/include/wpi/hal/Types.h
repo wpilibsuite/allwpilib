@@ -88,7 +88,7 @@ typedef int32_t HAL_Bool;
 #define HAL_ENUM(name) HAL_ENUM_WITH_UNDERLYING_TYPE(name, int32_t)
 
 #ifdef __cplusplus
-namespace hal {
+namespace wpi::hal {
 /**
  * A move-only C++ wrapper around a HAL handle.
  * Will free the handle if FreeFunction is provided
@@ -137,6 +137,6 @@ class Handle {
   CType m_handle = CInvalid;
 };
 
-}  // namespace hal
+}  // namespace wpi::hal
 #endif
 /** @} */

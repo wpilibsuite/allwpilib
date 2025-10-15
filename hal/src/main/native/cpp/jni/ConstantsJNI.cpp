@@ -10,7 +10,7 @@
 #include "org_wpilib_hardware_hal_ConstantsJNI.h"
 #include "wpi/hal/Constants.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
 /*

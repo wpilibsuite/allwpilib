@@ -6,7 +6,7 @@
 
 #include "wpi/glass/Model.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 class BooleanSource;
 class DoubleSource;
@@ -38,4 +38,4 @@ class RoboRioModel : public Model {
 
 void DisplayRoboRio(RoboRioModel* model);
 
-}  // namespace glass
+}  // namespace wpi::glass

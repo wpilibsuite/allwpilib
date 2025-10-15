@@ -18,7 +18,7 @@
 
 #include <algorithm>
 
-using namespace wpi;
+using namespace wpi::util;
 using testing::UnorderedElementsAre;
 
 TEST(SmallPtrSetTest, Assignment) {

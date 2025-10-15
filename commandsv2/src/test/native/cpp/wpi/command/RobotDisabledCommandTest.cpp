@@ -10,7 +10,7 @@
 #include "wpi/commands2/SelectCommand.hpp"
 #include "wpi/commands2/SequentialCommandGroup.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 class RobotDisabledCommandTest : public CommandTestBase {};
 
 TEST_F(RobotDisabledCommandTest, RobotDisabledCommandCancel) {

@@ -16,7 +16,7 @@
 
 #include "wpi/net/uv/Request.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 class Loop;
 
@@ -34,7 +34,7 @@ class GetNameInfoReq : public RequestImpl<GetNameInfoReq, uv_getnameinfo_t> {
    * Resolved lookup signal.
    * Parameters are hostname and service.
    */
-  sig::Signal<const char*, const char*> resolved;
+  wpi::util::sig::Signal<const char*, const char*> resolved;
 };
 
 /**
@@ -223,6 +223,6 @@ inline void GetNameInfo6(const std::shared_ptr<Loop>& loop,
   return GetNameInfo6(*loop, std::move(callback), ip, port, flags);
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_GETNAMEINFO_HPP_

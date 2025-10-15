@@ -7,7 +7,7 @@
 #include <chrono>
 
 /** WPILib Hardware Abstraction Layer (HAL) namespace */
-namespace hal {
+namespace wpi::hal {
 
 /**
  * A std::chrono compatible wrapper around the FPGA Timer.
@@ -28,4 +28,4 @@ class fpga_clock {
 
   static const time_point min_time;
 };
-}  // namespace hal
+}  // namespace wpi::hal

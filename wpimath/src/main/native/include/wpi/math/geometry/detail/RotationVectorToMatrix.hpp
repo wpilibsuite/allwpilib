@@ -8,7 +8,7 @@
 
 #include "wpi/math/linalg/ct_matrix.hpp"
 
-namespace frc::detail {
+namespace wpi::math::detail {
 
 constexpr ct_matrix3d RotationVectorToMatrix(const ct_vector3d& rotation) {
   return ct_matrix3d{{0.0, -rotation(2), rotation(1)},
@@ -23,4 +23,4 @@ constexpr Eigen::Matrix3d RotationVectorToMatrix(
                          {-rotation(1), rotation(0), 0.0}};
 }
 
-}  // namespace frc::detail
+}  // namespace wpi::math::detail

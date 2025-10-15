@@ -13,12 +13,12 @@
 #include "wpi/commands2/CommandScheduler.hpp"
 #include "wpi/commands2/button/CommandGenericHID.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 /**
- * A version of {@link frc::{{ ConsoleName }}Controller} with {@link Trigger} factories for
+ * A version of {@link wpi::{{ ConsoleName }}Controller} with {@link Trigger} factories for
  * command-based.
  *
- * @see frc::{{ ConsoleName }}Controller
+ * @see wpi::{{ ConsoleName }}Controller
  */
 class Command{{ ConsoleName }}Controller : public CommandGenericHID {
  public:
@@ -35,7 +35,7 @@ class Command{{ ConsoleName }}Controller : public CommandGenericHID {
    *
    * @return the wrapped GenericHID object
    */
-  frc::{{ ConsoleName }}Controller& GetHID();
+  wpi::{{ ConsoleName }}Controller& GetHID();
 {% for button in buttons %}
   /**
    * Constructs a Trigger instance around the {{ button.DocName|default(button.name) }} button's
@@ -46,7 +46,7 @@ class Command{{ ConsoleName }}Controller : public CommandGenericHID {
    * @return a Trigger instance representing the {{ button.DocName|default(button.name) }} button's
    * digital signal attached to the given loop.
    */
-  Trigger {{ capitalize_first(button.name) }}(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger {{ capitalize_first(button.name) }}(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 {% endfor -%}
 {% for trigger in triggers -%}
@@ -65,7 +65,7 @@ class Command{{ ConsoleName }}Controller : public CommandGenericHID {
    * exceeds the provided threshold, attached to the given loop
    */
   Trigger {{ capitalize_first(trigger.name) }}(double threshold = 0.5,
-                      frc::EventLoop* loop = CommandScheduler::GetInstance()
+                      wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                  .GetDefaultButtonLoop()) const;
 {% endif -%}
 {% endfor -%}
@@ -87,6 +87,6 @@ class Command{{ ConsoleName }}Controller : public CommandGenericHID {
   double Get{{ capitalize_first(trigger.name) }}Axis() const;
 {% endfor %}
  private:
-  frc::{{ ConsoleName }}Controller m_hid;
+  wpi::{{ ConsoleName }}Controller m_hid;
 };
-}  // namespace frc2
+}  // namespace wpi::cmd

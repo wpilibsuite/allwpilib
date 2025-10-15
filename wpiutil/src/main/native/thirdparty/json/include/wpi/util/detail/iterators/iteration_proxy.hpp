@@ -190,7 +190,7 @@ template<typename IteratorType> class iteration_proxy
 // For further reference see https://blog.tartanllama.xyz/structured-bindings/
 // And see https://github.com/nlohmann/json/pull/1391
 template<std::size_t N, typename IteratorType, enable_if_t<N == 0, int> = 0>
-auto get(const wpi::detail::iteration_proxy_value<IteratorType>& i) -> decltype(i.key())
+auto get(const wpi::util::detail::iteration_proxy_value<IteratorType>& i) -> decltype(i.key())
 {
     return i.key();
 }
@@ -198,7 +198,7 @@ auto get(const wpi::detail::iteration_proxy_value<IteratorType>& i) -> decltype(
 // For further reference see https://blog.tartanllama.xyz/structured-bindings/
 // And see https://github.com/nlohmann/json/pull/1391
 template<std::size_t N, typename IteratorType, enable_if_t<N == 1, int> = 0>
-auto get(const wpi::detail::iteration_proxy_value<IteratorType>& i) -> decltype(i.value())
+auto get(const wpi::util::detail::iteration_proxy_value<IteratorType>& i) -> decltype(i.value())
 {
     return i.value();
 }
@@ -219,16 +219,16 @@ namespace std
     #pragma clang diagnostic ignored "-Wmismatched-tags"
 #endif
 template<typename IteratorType>
-class tuple_size<::wpi::detail::iteration_proxy_value<IteratorType>> // NOLINT(cert-dcl58-cpp)
+class tuple_size<::wpi::util::detail::iteration_proxy_value<IteratorType>> // NOLINT(cert-dcl58-cpp)
             : public std::integral_constant<std::size_t, 2> {};
 
 template<std::size_t N, typename IteratorType>
-class tuple_element<N, ::wpi::detail::iteration_proxy_value<IteratorType >> // NOLINT(cert-dcl58-cpp)
+class tuple_element<N, ::wpi::util::detail::iteration_proxy_value<IteratorType >> // NOLINT(cert-dcl58-cpp)
 {
   public:
     using type = decltype(
                      get<N>(std::declval <
-                            ::wpi::detail::iteration_proxy_value<IteratorType >> ()));
+                            ::wpi::util::detail::iteration_proxy_value<IteratorType >> ()));
 };
 #if defined(__clang__)
     #pragma clang diagnostic pop
@@ -238,5 +238,5 @@ class tuple_element<N, ::wpi::detail::iteration_proxy_value<IteratorType >> // N
 
 #if JSON_HAS_RANGES
     template <typename IteratorType>
-    inline constexpr bool ::std::ranges::enable_borrowed_range<::wpi::detail::iteration_proxy<IteratorType>> = true;
+    inline constexpr bool ::std::ranges::enable_borrowed_range<::wpi::util::detail::iteration_proxy<IteratorType>> = true;
 #endif

@@ -23,19 +23,19 @@
 #include "wpi/ntcore/Topic.hpp"
 #include "wpi/ntcore/ntcore_cpp.hpp"
 
-namespace nt {
+namespace wpi::nt {
 
 template <typename T, typename... I>
-  requires wpi::StructSerializable<T, I...>
+  requires wpi::util::StructSerializable<T, I...>
 class StructTopic;
 
 /**
  * NetworkTables struct-encoded value subscriber.
  */
 template <typename T, typename... I>
-  requires wpi::StructSerializable<T, I...>
+  requires wpi::util::StructSerializable<T, I...>
 class StructSubscriber : public Subscriber {
-  using S = wpi::Struct<T, I...>;
+  using S = wpi::util::Struct<T, I...>;
 
  public:
   using TopicType = StructTopic<T, I...>;
@@ -88,14 +88,14 @@ class StructSubscriber : public Subscriber {
    * @return true if successful
    */
   bool GetInto(T* out) {
-    wpi::SmallVector<uint8_t, 128> buf;
-    TimestampedRawView view = ::nt::GetAtomicRaw(m_subHandle, buf, {});
+    wpi::util::SmallVector<uint8_t, 128> buf;
+    TimestampedRawView view = ::wpi::nt::GetAtomicRaw(m_subHandle, buf, {});
     if (view.value.size() < std::apply(S::GetSize, m_info)) {
       return false;
     } else {
       std::apply(
           [&](const I&... info) {
-            wpi::UnpackStructInto(out, view.value, info...);
+            wpi::util::UnpackStructInto(out, view.value, info...);
           },
           m_info);
       return true;
@@ -120,8 +120,8 @@ class StructSubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueType GetAtomic(const T& defaultValue) const {
-    wpi::SmallVector<uint8_t, 128> buf;
-    TimestampedRawView view = ::nt::GetAtomicRaw(m_subHandle, buf, {});
+    wpi::util::SmallVector<uint8_t, 128> buf;
+    TimestampedRawView view = ::wpi::nt::GetAtomicRaw(m_subHandle, buf, {});
     if (view.value.size() < std::apply(S::GetSize, m_info)) {
       return {0, 0, defaultValue};
     } else {
@@ -145,7 +145,7 @@ class StructSubscriber : public Subscriber {
    *     have been published since the previous call.
    */
   std::vector<TimestampedValueType> ReadQueue() {
-    auto raw = ::nt::ReadQueueRaw(m_subHandle);
+    auto raw = ::wpi::nt::ReadQueueRaw(m_subHandle);
     std::vector<TimestampedValueType> rv;
     rv.reserve(raw.size());
     for (auto&& r : raw) {
@@ -172,7 +172,7 @@ class StructSubscriber : public Subscriber {
   TopicType GetTopic() const {
     return std::apply(
         [&](const I&... info) {
-          return StructTopic<T, I...>{::nt::GetTopicFromHandle(m_subHandle),
+          return StructTopic<T, I...>{::wpi::nt::GetTopicFromHandle(m_subHandle),
                                       info...};
         },
         m_info);
@@ -188,9 +188,9 @@ class StructSubscriber : public Subscriber {
  * NetworkTables struct-encoded value publisher.
  */
 template <typename T, typename... I>
-  requires wpi::StructSerializable<T, I...>
+  requires wpi::util::StructSerializable<T, I...>
 class StructPublisher : public Publisher {
-  using S = wpi::Struct<T, I...>;
+  using S = wpi::util::Struct<T, I...>;
 
  public:
   using TopicType = StructTopic<T, I...>;
@@ -244,17 +244,17 @@ class StructPublisher : public Publisher {
           m_info);
     }
     if constexpr (sizeof...(I) == 0) {
-      if constexpr (wpi::is_constexpr([] { S::GetSize(); })) {
+      if constexpr (wpi::util::is_constexpr([] { S::GetSize(); })) {
         uint8_t buf[S::GetSize()];
         S::Pack(buf, value);
-        ::nt::SetRaw(m_pubHandle, buf, time);
+        ::wpi::nt::SetRaw(m_pubHandle, buf, time);
         return;
       }
     }
-    wpi::SmallVector<uint8_t, 128> buf;
+    wpi::util::SmallVector<uint8_t, 128> buf;
     buf.resize_for_overwrite(std::apply(S::GetSize, m_info));
     std::apply([&](const I&... info) { S::Pack(buf, value, info...); }, m_info);
-    ::nt::SetRaw(m_pubHandle, buf, time);
+    ::wpi::nt::SetRaw(m_pubHandle, buf, time);
   }
 
   /**
@@ -273,17 +273,17 @@ class StructPublisher : public Publisher {
           m_info);
     }
     if constexpr (sizeof...(I) == 0) {
-      if constexpr (wpi::is_constexpr([] { S::GetSize(); })) {
+      if constexpr (wpi::util::is_constexpr([] { S::GetSize(); })) {
         uint8_t buf[S::GetSize()];
         S::Pack(buf, value);
-        ::nt::SetDefaultRaw(m_pubHandle, buf);
+        ::wpi::nt::SetDefaultRaw(m_pubHandle, buf);
         return;
       }
     }
-    wpi::SmallVector<uint8_t, 128> buf;
+    wpi::util::SmallVector<uint8_t, 128> buf;
     buf.resize_for_overwrite(std::apply(S::GetSize, m_info));
     std::apply([&](const I&... info) { S::Pack(buf, value, info...); }, m_info);
-    ::nt::SetDefaultRaw(m_pubHandle, buf);
+    ::wpi::nt::SetDefaultRaw(m_pubHandle, buf);
   }
 
   /**
@@ -294,7 +294,7 @@ class StructPublisher : public Publisher {
   TopicType GetTopic() const {
     return std::apply(
         [&](const I&... info) {
-          return StructTopic<T, I...>{::nt::GetTopicFromHandle(m_pubHandle),
+          return StructTopic<T, I...>{::wpi::nt::GetTopicFromHandle(m_pubHandle),
                                       info...};
         },
         m_info);
@@ -312,7 +312,7 @@ class StructPublisher : public Publisher {
  * @note Unlike NetworkTableEntry, the entry goes away when this is destroyed.
  */
 template <typename T, typename... I>
-  requires wpi::StructSerializable<T, I...>
+  requires wpi::util::StructSerializable<T, I...>
 class StructEntry final : public StructSubscriber<T, I...>,
                           public StructPublisher<T, I...> {
  public:
@@ -362,14 +362,14 @@ class StructEntry final : public StructSubscriber<T, I...>,
   /**
    * Stops publishing the entry if it's published.
    */
-  void Unpublish() { ::nt::Unpublish(this->m_pubHandle); }
+  void Unpublish() { ::wpi::nt::Unpublish(this->m_pubHandle); }
 };
 
 /**
  * NetworkTables struct-encoded value topic.
  */
 template <typename T, typename... I>
-  requires wpi::StructSerializable<T, I...>
+  requires wpi::util::StructSerializable<T, I...>
 class StructTopic final : public Topic {
  public:
   using SubscriberType = StructSubscriber<T, I...>;
@@ -421,8 +421,8 @@ class StructTopic final : public Topic {
     return std::apply(
         [&](const I&... info) {
           return StructSubscriber<T, I...>{
-              ::nt::Subscribe(m_handle, NT_RAW,
-                              wpi::GetStructTypeString<T, I...>(info...),
+              ::wpi::nt::Subscribe(m_handle, NT_RAW,
+                              wpi::util::GetStructTypeString<T, I...>(info...),
                               options),
               std::move(defaultValue), info...};
         },
@@ -449,8 +449,8 @@ class StructTopic final : public Topic {
     return std::apply(
         [&](const I&... info) {
           return StructPublisher<T, I...>{
-              ::nt::Publish(m_handle, NT_RAW,
-                            wpi::GetStructTypeString<T, I...>(info...),
+              ::wpi::nt::Publish(m_handle, NT_RAW,
+                            wpi::util::GetStructTypeString<T, I...>(info...),
                             options),
               info...};
         },
@@ -476,13 +476,13 @@ class StructTopic final : public Topic {
    */
   [[nodiscard]]
   PublisherType PublishEx(
-      const wpi::json& properties,
+      const wpi::util::json& properties,
       const PubSubOptions& options = kDefaultPubSubOptions) {
     return std::apply(
         [&](const I&... info) {
           return StructPublisher<T, I...>{
-              ::nt::PublishEx(m_handle, NT_RAW,
-                              wpi::GetStructTypeString<T, I...>(info...),
+              ::wpi::nt::PublishEx(m_handle, NT_RAW,
+                              wpi::util::GetStructTypeString<T, I...>(info...),
                               properties, options),
               info...};
         },
@@ -515,8 +515,8 @@ class StructTopic final : public Topic {
     return std::apply(
         [&](const I&... info) {
           return StructEntry<T, I...>{
-              ::nt::GetEntry(m_handle, NT_RAW,
-                             wpi::GetStructTypeString<T, I...>(info...),
+              ::wpi::nt::GetEntry(m_handle, NT_RAW,
+                             wpi::util::GetStructTypeString<T, I...>(info...),
                              options),
               std::move(defaultValue), info...};
         },
@@ -528,4 +528,4 @@ class StructTopic final : public Topic {
   std::tuple<I...> m_info;
 };
 
-}  // namespace nt
+}  // namespace wpi::nt

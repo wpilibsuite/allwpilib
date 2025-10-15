@@ -11,13 +11,13 @@
 #include "server/Functions.hpp"
 #include "server/ServerClient4Base.hpp"
 
-namespace nt::server {
+namespace wpi::nt::server {
 
 class ServerClient4 final : public ServerClient4Base {
  public:
   ServerClient4(std::string_view name, std::string_view connInfo, bool local,
                 net::WireConnection& wire, SetPeriodicFunc setPeriodic,
-                ServerStorage& storage, int id, wpi::Logger& logger);
+                ServerStorage& storage, int id, wpi::util::Logger& logger);
 
   bool ProcessIncomingText(std::string_view data) final;
   bool ProcessIncomingBinary(std::span<const uint8_t> data) final;
@@ -34,7 +34,7 @@ class ServerClient4 final : public ServerClient4Base {
                  net::ValueSendMode mode) final;
   void SendAnnounce(ServerTopic* topic, std::optional<int> pubuid) final;
   void SendUnannounce(ServerTopic* topic) final;
-  void SendPropertiesUpdate(ServerTopic* topic, const wpi::json& update,
+  void SendPropertiesUpdate(ServerTopic* topic, const wpi::util::json& update,
                             bool ack) final;
   void SendOutgoing(uint64_t curTimeMs, bool flush) final;
 
@@ -51,4 +51,4 @@ class ServerClient4 final : public ServerClient4Base {
   net::NetworkOutgoingQueue<net::ServerMessage> m_outgoing;
 };
 
-}  // namespace nt::server
+}  // namespace wpi::nt::server

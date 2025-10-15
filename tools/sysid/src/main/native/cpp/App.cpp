@@ -31,16 +31,16 @@
 
 namespace gui = wpi::gui;
 
-static std::unique_ptr<glass::WindowManager> gWindowManager;
+static std::unique_ptr<wpi::glass::WindowManager> gWindowManager;
 
-glass::Window* gLogLoaderWindow;
-glass::Window* gDataSelectorWindow;
-glass::Window* gAnalyzerWindow;
-glass::Window* gProgramLogWindow;
-static glass::MainMenuBar gMainMenu;
+wpi::glass::Window* gLogLoaderWindow;
+wpi::glass::Window* gDataSelectorWindow;
+wpi::glass::Window* gAnalyzerWindow;
+wpi::glass::Window* gProgramLogWindow;
+static wpi::glass::MainMenuBar gMainMenu;
 
-glass::LogData gLog;
-wpi::Logger gLogger;
+wpi::glass::LogData gLog;
+wpi::util::Logger gLogger;
 
 const char* GetWPILibVersion();
 
@@ -57,7 +57,7 @@ std::string_view GetResource_sysid_512_png();
 void Application(std::string_view saveDir) {
   // Create the wpigui (along with Dear ImGui) and Glass contexts.
   gui::CreateContext();
-  glass::CreateContext();
+  wpi::glass::CreateContext();
 
   // Add icons
   gui::AddIcon(sysid::GetResource_sysid_16_png());
@@ -68,37 +68,37 @@ void Application(std::string_view saveDir) {
   gui::AddIcon(sysid::GetResource_sysid_256_png());
   gui::AddIcon(sysid::GetResource_sysid_512_png());
 
-  glass::SetStorageName("sysid");
-  glass::SetStorageDir(saveDir.empty() ? gui::GetPlatformSaveFileDir()
+  wpi::glass::SetStorageName("sysid");
+  wpi::glass::SetStorageDir(saveDir.empty() ? gui::GetPlatformSaveFileDir()
                                        : saveDir);
 
   // Add messages from the global sysid logger into the Log window.
   gLogger.SetLogger([](unsigned int level, const char* file, unsigned int line,
                        const char* msg) {
     const char* lvl = "";
-    if (level >= wpi::WPI_LOG_CRITICAL) {
+    if (level >= wpi::util::WPI_LOG_CRITICAL) {
       lvl = "CRITICAL: ";
-    } else if (level >= wpi::WPI_LOG_ERROR) {
+    } else if (level >= wpi::util::WPI_LOG_ERROR) {
       lvl = "ERROR: ";
-    } else if (level >= wpi::WPI_LOG_WARNING) {
+    } else if (level >= wpi::util::WPI_LOG_WARNING) {
       lvl = "WARNING: ";
-    } else if (level >= wpi::WPI_LOG_INFO) {
+    } else if (level >= wpi::util::WPI_LOG_INFO) {
       lvl = "INFO: ";
-    } else if (level >= wpi::WPI_LOG_DEBUG) {
+    } else if (level >= wpi::util::WPI_LOG_DEBUG) {
       lvl = "DEBUG: ";
     }
     std::string filename = std::filesystem::path{file}.filename().string();
     gLog.Append(fmt::format("{}{} ({}:{})\n", lvl, msg, filename, line));
 #ifndef NDEBUG
-    wpi::print(stderr, "{}{} ({}:{})\n", lvl, msg, filename, line);
+    wpi::util::print(stderr, "{}{} ({}:{})\n", lvl, msg, filename, line);
 #endif
   });
 
-  gLogger.set_min_level(wpi::WPI_LOG_DEBUG);
+  gLogger.set_min_level(wpi::util::WPI_LOG_DEBUG);
 
   // Initialize window manager and add views.
-  auto& storage = glass::GetStorageRoot().GetChild("SysId");
-  gWindowManager = std::make_unique<glass::WindowManager>(storage);
+  auto& storage = wpi::glass::GetStorageRoot().GetChild("SysId");
+  gWindowManager = std::make_unique<wpi::glass::WindowManager>(storage);
   gWindowManager->GlobalInit();
 
   auto logLoader = std::make_unique<sysid::LogLoader>(storage, gLogger);
@@ -122,7 +122,7 @@ void Application(std::string_view saveDir) {
   gAnalyzerWindow = gWindowManager->AddWindow("Analyzer", std::move(analyzer));
 
   gProgramLogWindow = gWindowManager->AddWindow(
-      "Program Log", std::make_unique<glass::LogView>(&gLog));
+      "Program Log", std::make_unique<wpi::glass::LogView>(&gLog));
 
   // Set default positions and sizes for windows.
 
@@ -194,7 +194,7 @@ void Application(std::string_view saveDir) {
       ImGui::Separator();
       ImGui::Text("v%s", GetWPILibVersion());
       ImGui::Separator();
-      ImGui::Text("Save location: %s", glass::GetStorageDir().c_str());
+      ImGui::Text("Save location: %s", wpi::glass::GetStorageDir().c_str());
       if (ImGui::Button("Close")) {
         ImGui::CloseCurrentPopup();
       }
@@ -206,7 +206,7 @@ void Application(std::string_view saveDir) {
                   sysid::kAppWindowSize.y);
   gui::Main();
 
-  glass::DestroyContext();
+  wpi::glass::DestroyContext();
   gui::DestroyContext();
 }
 

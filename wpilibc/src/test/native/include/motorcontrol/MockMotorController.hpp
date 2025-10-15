@@ -8,7 +8,7 @@
 
 #include "wpi/hardware/motor/MotorController.hpp"
 
-namespace frc {
+namespace wpi {
 
 WPI_IGNORE_DEPRECATED
 
@@ -28,4 +28,4 @@ class MockMotorController : public MotorController {
 
 WPI_UNIGNORE_DEPRECATED
 
-}  // namespace frc
+}  // namespace wpi

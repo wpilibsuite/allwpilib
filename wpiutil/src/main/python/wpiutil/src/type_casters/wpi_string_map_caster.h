@@ -12,8 +12,8 @@ namespace detail
 {
 
 template <typename Value>
-struct type_caster<wpi::StringMap<Value>>
- : map_caster<wpi::StringMap<Value>, std::string, Value> { };
+struct type_caster<wpi::util::StringMap<Value>>
+ : map_caster<wpi::util::StringMap<Value>, std::string, Value> { };
 
 } // namespace detail
 } // namespace pybind11

@@ -15,22 +15,22 @@
 #include "mockdata/PWMDataInternal.h"
 #include "wpi/hal/handles/HandlesInternal.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializePWM() {}
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 
 HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
                                         const char* allocationLocation,
                                         int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
 
   if (channel < 0 || channel >= kNumPWMChannels) {
     *status = RESOURCE_OUT_OF_RANGE;
-    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWM", 0,
+    wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWM", 0,
                                      kNumPWMChannels, channel);
     return HAL_kInvalidHandle;
   }
@@ -50,10 +50,10 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
 
   if (*status != 0) {
     if (port) {
-      hal::SetLastErrorPreviouslyAllocated(status, "PWM or DIO", channel,
+      wpi::hal::SetLastErrorPreviouslyAllocated(status, "PWM or DIO", channel,
                                            port->previousAllocation);
     } else {
-      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWM", 0,
+      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWM", 0,
                                        kNumPWMChannels, channel);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.

@@ -7,7 +7,7 @@
 #include "wpi/commands2/FunctionalCommand.hpp"
 #include "wpi/commands2/RepeatCommand.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 class RepeatCommandTest : public CommandTestBase {};
 
 TEST_F(RepeatCommandTest, CallsMethodsCorrectly) {

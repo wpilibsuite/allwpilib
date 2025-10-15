@@ -13,7 +13,7 @@
 
 #include "wpi/event/BooleanEvent.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 {{ ConsoleName }}Controller::{{ ConsoleName }}Controller(int port) : GenericHID(port) {
   HAL_ReportUsage("HID", port, "{{ ConsoleName }}Controller");
@@ -92,7 +92,7 @@ bool {{ ConsoleName }}Controller::GetTouchpadReleased() {
 }
 {%- endif %}
 
-void {{ ConsoleName }}Controller::InitSendable(wpi::SendableBuilder& builder) {
+void {{ ConsoleName }}Controller::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("HID");
   builder.PublishConstString("ControllerType", "{{ ConsoleName }}");
 {%- for trigger in triggers %}

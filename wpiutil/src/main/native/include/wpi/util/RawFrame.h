@@ -61,18 +61,18 @@ enum WPI_PixelFormat {
 };
 
 /**
- * Timestamp metadata. Timebase is the same as wpi::Now
+ * Timestamp metadata. Timebase is the same as wpi::util::Now
  */
 enum WPI_TimestampSource {
   WPI_TIMESRC_UNKNOWN = 0,    // unknown
-  WPI_TIMESRC_FRAME_DEQUEUE,  // wpi::Now when the new frame was dequeued by
+  WPI_TIMESRC_FRAME_DEQUEUE,  // wpi::util::Now when the new frame was dequeued by
                               // CSCore. Does not account for camera exposure
                               // time or V4L latency.
   WPI_TIMESRC_V4L_EOF,  // End of Frame. Same as V4L2_BUF_FLAG_TSTAMP_SRC_EOF,
-                        // translated into wpi::Now's timebase.
+                        // translated into wpi::util::Now's timebase.
   WPI_TIMESRC_V4L_SOE,  // Start of Exposure. Same as
                         // V4L2_BUF_FLAG_TSTAMP_SRC_SOE, translated into
-                        // wpi::Now's timebase.
+                        // wpi::util::Now's timebase.
 };
 
 // Returns nonzero if the frame data was allocated/reallocated
@@ -88,7 +88,7 @@ void WPI_SetRawFrameData(WPI_RawFrame* frame, void* data, size_t size,
 #endif
 
 #ifdef __cplusplus
-namespace wpi {
+namespace wpi::util {
 struct RawFrame : public WPI_RawFrame {
   RawFrame() {
     data = nullptr;
@@ -135,7 +135,7 @@ struct RawFrame : public WPI_RawFrame {
 };
 
 #ifdef WPI_RAWFRAME_JNI
-template <std::same_as<wpi::RawFrame> T>
+template <std::same_as<wpi::util::RawFrame> T>
 void SetFrameData(JNIEnv* env, jclass rawFrameCls, jobject jframe,
                   const T& frame, bool newData) {
   if (newData) {
@@ -160,7 +160,7 @@ void SetFrameData(JNIEnv* env, jclass rawFrameCls, jobject jframe,
 }
 #endif
 
-}  // namespace wpi
+}  // namespace wpi::util
 #endif
 
 #endif  // WPIUTIL_WPI_UTIL_RAWFRAME_H_

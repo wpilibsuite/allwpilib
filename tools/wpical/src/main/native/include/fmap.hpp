@@ -10,6 +10,6 @@
 #include "tagpose.hpp"
 
 namespace fmap {
-wpi::json singleTag(int tag, const tag::Pose& tagpose);
-wpi::json convertfmap(const wpi::json& json);
+wpi::util::json singleTag(int tag, const tag::Pose& tagpose);
+wpi::util::json convertfmap(const wpi::util::json& json);
 }  // namespace fmap

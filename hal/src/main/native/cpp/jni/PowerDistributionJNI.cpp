@@ -11,7 +11,7 @@
 #include "wpi/hal/Ports.h"
 #include "wpi/hal/PowerDistribution.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
 static_assert(org_wpilib_hardware_hal_PowerDistributionJNI_AUTOMATIC_TYPE ==
               HAL_PowerDistributionType::HAL_PowerDistributionType_kAutomatic);
@@ -34,7 +34,7 @@ Java_org_wpilib_hardware_hal_PowerDistributionJNI_initialize
   (JNIEnv* env, jclass, jint busId, jint module, jint type)
 {
   int32_t status = 0;
-  auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
+  auto stack = wpi::util::java::GetJavaStackTrace(env, "edu.wpi.first");
   auto handle = HAL_InitializePowerDistribution(
       busId, module, static_cast<HAL_PowerDistributionType>(type),
       stack.c_str(), &status);
@@ -183,7 +183,7 @@ Java_org_wpilib_hardware_hal_PowerDistributionJNI_getAllCurrents
 {
   int32_t status = 0;
   int32_t size = HAL_GetPowerDistributionNumChannels(handle, &status);
-  wpi::SmallVector<double, 24> storage;
+  wpi::util::SmallVector<double, 24> storage;
   storage.resize_for_overwrite(size);
 
   HAL_GetPowerDistributionAllChannelCurrents(handle, storage.data(), size,

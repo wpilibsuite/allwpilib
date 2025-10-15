@@ -10,7 +10,7 @@
 #include "org_wpilib_hardware_hal_simulation_I2CDataJNI.h"
 #include "wpi/hal/simulation/I2CData.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
 

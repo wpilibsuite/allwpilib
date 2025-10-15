@@ -52,7 +52,7 @@ CS_Source CS_CreateRawSource(const struct WPI_String* name, CS_Bool isCv,
 #endif
 
 #ifdef __cplusplus
-namespace cs {
+namespace wpi::cs {
 
 /**
  * @defgroup cscore_raw_func Raw Image Functions
@@ -111,7 +111,7 @@ class RawSource : public ImageSource {
    *
    * @param image raw frame image
    */
-  void PutFrame(wpi::RawFrame& image);
+  void PutFrame(wpi::util::RawFrame& image);
 };
 
 /**
@@ -155,22 +155,22 @@ class RawSink : public ImageSink {
    * The provided image will have three 8-bit channels stored in BGR order.
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
-   *         message); the frame time is in the same time base as wpi::Now(),
+   *         message); the frame time is in the same time base as wpi::util::Now(),
    *         and is in 1 us increments.
    */
   [[nodiscard]]
-  uint64_t GrabFrame(wpi::RawFrame& image, double timeout = 0.225) const;
+  uint64_t GrabFrame(wpi::util::RawFrame& image, double timeout = 0.225) const;
 
   /**
    * Wait for the next frame and get the image.  May block forever.
    * The provided image will have three 8-bit channels stored in BGR order.
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
-   *         message); the frame time is in the same time base as wpi::Now(),
+   *         message); the frame time is in the same time base as wpi::util::Now(),
    *         and is in 1 us increments.
    */
   [[nodiscard]]
-  uint64_t GrabFrameNoTimeout(wpi::RawFrame& image) const;
+  uint64_t GrabFrameNoTimeout(wpi::util::RawFrame& image) const;
 
   /**
    * Wait for the next frame and get the image.  May block forever.
@@ -183,11 +183,11 @@ class RawSink : public ImageSink {
    * a new frame.
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
-   *         message); the frame time is in the same time base as wpi::Now(),
+   *         message); the frame time is in the same time base as wpi::util::Now(),
    *         and is in 1 us increments.
    */
   [[nodiscard]]
-  uint64_t GrabFrameLastTime(wpi::RawFrame& image, uint64_t lastFrameTime,
+  uint64_t GrabFrameLastTime(wpi::util::RawFrame& image, uint64_t lastFrameTime,
                              double timeout = 0.225) const;
 };
 
@@ -202,7 +202,7 @@ inline RawSource::RawSource(std::string_view name,
                              &m_status);
 }
 
-inline void RawSource::PutFrame(wpi::RawFrame& image) {
+inline void RawSource::PutFrame(wpi::util::RawFrame& image) {
   m_status = 0;
   PutSourceFrame(m_handle, image, &m_status);
 }
@@ -216,17 +216,17 @@ inline RawSink::RawSink(std::string_view name,
   m_handle = CreateRawSinkCallback(name, false, processFrame, &m_status);
 }
 
-inline uint64_t RawSink::GrabFrame(wpi::RawFrame& image, double timeout) const {
+inline uint64_t RawSink::GrabFrame(wpi::util::RawFrame& image, double timeout) const {
   m_status = 0;
   return GrabSinkFrameTimeout(m_handle, image, timeout, &m_status);
 }
 
-inline uint64_t RawSink::GrabFrameNoTimeout(wpi::RawFrame& image) const {
+inline uint64_t RawSink::GrabFrameNoTimeout(wpi::util::RawFrame& image) const {
   m_status = 0;
   return GrabSinkFrame(m_handle, image, &m_status);
 }
 
-inline uint64_t RawSink::GrabFrameLastTime(wpi::RawFrame& image,
+inline uint64_t RawSink::GrabFrameLastTime(wpi::util::RawFrame& image,
                                            uint64_t lastFrameTime,
                                            double timeout) const {
   m_status = 0;
@@ -235,7 +235,7 @@ inline uint64_t RawSink::GrabFrameLastTime(wpi::RawFrame& image,
 }
 /** @} */
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif
 

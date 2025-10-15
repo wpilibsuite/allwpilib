@@ -18,7 +18,7 @@
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/units/time.hpp"
 
-namespace frc {
+namespace wpi::math {
 namespace detail {
 WPILIB_DLLEXPORT
 int IncrementAndGetProfiledPIDControllerInstances();
@@ -30,16 +30,16 @@ int IncrementAndGetProfiledPIDControllerInstances();
  */
 template <class Distance>
 class ProfiledPIDController
-    : public wpi::Sendable,
-      public wpi::SendableHelper<ProfiledPIDController<Distance>> {
+    : public wpi::util::Sendable,
+      public wpi::util::SendableHelper<ProfiledPIDController<Distance>> {
  public:
-  using Distance_t = units::unit_t<Distance>;
+  using Distance_t = wpi::units::unit_t<Distance>;
   using Velocity =
-      units::compound_unit<Distance, units::inverse<units::seconds>>;
-  using Velocity_t = units::unit_t<Velocity>;
+      wpi::units::compound_unit<Distance, wpi::units::inverse<wpi::units::seconds>>;
+  using Velocity_t = wpi::units::unit_t<Velocity>;
   using Acceleration =
-      units::compound_unit<Velocity, units::inverse<units::seconds>>;
-  using Acceleration_t = units::unit_t<Acceleration>;
+      wpi::units::compound_unit<Velocity, wpi::units::inverse<wpi::units::seconds>>;
+  using Acceleration_t = wpi::units::unit_t<Acceleration>;
   using State = typename TrapezoidProfile<Distance>::State;
   using Constraints = typename TrapezoidProfile<Distance>::Constraints;
 
@@ -57,7 +57,7 @@ class ProfiledPIDController
    */
   constexpr ProfiledPIDController(double Kp, double Ki, double Kd,
                                   Constraints constraints,
-                                  units::second_t period = 20_ms)
+                                  wpi::units::second_t period = 20_ms)
       : m_controller{Kp, Ki, Kd, period},
         m_constraints{constraints},
         m_profile{m_constraints} {
@@ -65,7 +65,7 @@ class ProfiledPIDController
       int instances = detail::IncrementAndGetProfiledPIDControllerInstances();
       wpi::math::MathSharedStore::ReportUsage("ProfiledPIDController",
                                               std::to_string(instances));
-      wpi::SendableRegistry::Add(this, "ProfiledPIDController", instances);
+      wpi::util::SendableRegistry::Add(this, "ProfiledPIDController", instances);
     }
   }
 
@@ -157,7 +157,7 @@ class ProfiledPIDController
    *
    * @return The period of the controller.
    */
-  constexpr units::second_t GetPeriod() const {
+  constexpr wpi::units::second_t GetPeriod() const {
     return m_controller.GetPeriod();
   }
 
@@ -328,9 +328,9 @@ class ProfiledPIDController
     if (m_controller.IsContinuousInputEnabled()) {
       // Get error which is smallest distance between goal and measurement
       auto errorBound = (m_maximumInput - m_minimumInput) / 2.0;
-      auto goalMinDistance = frc::InputModulus<Distance_t>(
+      auto goalMinDistance = wpi::math::InputModulus<Distance_t>(
           m_goal.position - measurement, -errorBound, errorBound);
-      auto setpointMinDistance = frc::InputModulus<Distance_t>(
+      auto setpointMinDistance = wpi::math::InputModulus<Distance_t>(
           m_setpoint.position - measurement, -errorBound, errorBound);
 
       // Recompute the profile goal with the smallest error, thus giving the
@@ -378,7 +378,7 @@ class ProfiledPIDController
    */
   constexpr double Calculate(
       Distance_t measurement, Distance_t goal,
-      typename frc::TrapezoidProfile<Distance>::Constraints constraints) {
+      typename wpi::math::TrapezoidProfile<Distance>::Constraints constraints) {
     SetConstraints(constraints);
     return Calculate(measurement, goal);
   }
@@ -414,7 +414,7 @@ class ProfiledPIDController
     Reset(measuredPosition, Velocity_t{0});
   }
 
-  void InitSendable(wpi::SendableBuilder& builder) override {
+  void InitSendable(wpi::util::SendableBuilder& builder) override {
     builder.SetSmartDashboardType("ProfiledPIDController");
     builder.AddDoubleProperty(
         "p", [this] { return GetP(); }, [this](double value) { SetP(value); });
@@ -448,10 +448,10 @@ class ProfiledPIDController
   Distance_t m_minimumInput{0};
   Distance_t m_maximumInput{0};
 
-  typename frc::TrapezoidProfile<Distance>::Constraints m_constraints;
+  typename wpi::math::TrapezoidProfile<Distance>::Constraints m_constraints;
   TrapezoidProfile<Distance> m_profile;
-  typename frc::TrapezoidProfile<Distance>::State m_goal;
-  typename frc::TrapezoidProfile<Distance>::State m_setpoint;
+  typename wpi::math::TrapezoidProfile<Distance>::State m_goal;
+  typename wpi::math::TrapezoidProfile<Distance>::State m_setpoint;
 };
 
-}  // namespace frc
+}  // namespace wpi::math

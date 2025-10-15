@@ -28,9 +28,9 @@
 
 #include "wpi/units/base.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::mass
+ * @namespace wpi::units::mass
  * @brief namespace for unit types and containers representing mass values
  * @details The SI unit for mass is `kilograms`, and the corresponding
  *          `base_unit` category is `mass_unit`.
@@ -39,7 +39,7 @@ namespace units {
  */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_MASS_UNITS)
 UNIT_ADD_WITH_METRIC_PREFIXES(
-    mass, gram, grams, g, unit<std::ratio<1, 1000>, units::category::mass_unit>)
+    mass, gram, grams, g, unit<std::ratio<1, 1000>, wpi::units::category::mass_unit>)
 UNIT_ADD(mass, metric_ton, metric_tons, t, unit<std::ratio<1000>, kilograms>)
 UNIT_ADD(mass, pound, pounds, lb,
          unit<std::ratio<45359237, 100000000>, kilograms>)
@@ -55,4 +55,4 @@ UNIT_ADD_CATEGORY_TRAIT(mass)
 #endif
 
 using namespace mass;
-}  // namespace units
+}  // namespace wpi::units

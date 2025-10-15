@@ -20,10 +20,10 @@ RobotContainer::RobotContainer() {
   m_chooser.AddOption("Complex Auto", &m_complexAuto);
 
   // Put the chooser on the dashboard
-  frc::SmartDashboard::PutData("Autonomous", &m_chooser);
+  wpi::SmartDashboard::PutData("Autonomous", &m_chooser);
   // Put subsystems to dashboard.
-  frc::SmartDashboard::PutData("Drivetrain", &m_drive);
-  frc::SmartDashboard::PutData("HatchSubsystem", &m_hatch);
+  wpi::SmartDashboard::PutData("Drivetrain", &m_drive);
+  wpi::SmartDashboard::PutData("HatchSubsystem", &m_hatch);
 
   // Configure the button bindings
   ConfigureButtonBindings();
@@ -41,18 +41,18 @@ void RobotContainer::ConfigureButtonBindings() {
   // the scheduler thus, no memory leaks!
 
   // Grab the hatch when the 'A' button is pressed.
-  frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kA)
+  wpi::cmd::JoystickButton(&m_driverController, wpi::XboxController::Button::kA)
       .OnTrue(GrabHatch(&m_hatch).ToPtr());
   // Release the hatch when the 'B' button is pressed.
-  frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kB)
+  wpi::cmd::JoystickButton(&m_driverController, wpi::XboxController::Button::kB)
       .OnTrue(ReleaseHatch(&m_hatch).ToPtr());
   // While holding the shoulder button, drive at half speed
-  frc2::JoystickButton(&m_driverController,
-                       frc::XboxController::Button::kRightBumper)
+  wpi::cmd::JoystickButton(&m_driverController,
+                       wpi::XboxController::Button::kRightBumper)
       .WhileTrue(HalveDriveSpeed(&m_drive).ToPtr());
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
+wpi::cmd::Command* RobotContainer::GetAutonomousCommand() {
   // Runs the chosen command in autonomous
   return m_chooser.GetSelected();
 }

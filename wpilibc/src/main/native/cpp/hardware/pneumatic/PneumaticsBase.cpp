@@ -13,7 +13,7 @@
 #include "wpi/hardware/pneumatic/PneumaticsControlModule.hpp"
 #include "wpi/system/Errors.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 static_assert(
     static_cast<int>(CompressorConfigType::Disabled) ==

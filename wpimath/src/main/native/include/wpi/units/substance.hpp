@@ -28,9 +28,9 @@
 
 #include "wpi/units/base.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::substance
+ * @namespace wpi::units::substance
  * @brief namespace for unit types and containers representing substance values
  * @details The SI unit for substance is `moles`, and the corresponding
  *          `base_unit` category is `substance_unit`.
@@ -40,10 +40,10 @@ namespace units {
 #if !defined(DISABLE_PREDEFINED_UNITS) || \
     defined(ENABLE_PREDEFINED_SUBSTANCE_UNITS)
 UNIT_ADD(substance, mole, moles, mol,
-         unit<std::ratio<1>, units::category::substance_unit>)
+         unit<std::ratio<1>, wpi::units::category::substance_unit>)
 
 UNIT_ADD_CATEGORY_TRAIT(substance)
 #endif
 
 using namespace substance;
-}  // namespace units
+}  // namespace wpi::units

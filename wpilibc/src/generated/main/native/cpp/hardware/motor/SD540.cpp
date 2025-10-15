@@ -8,7 +8,7 @@
 
 #include <wpi/hal/UsageReporting.h>
 
-using namespace frc;
+using namespace wpi;
 
 SD540::SD540(int channel) : PWMMotorController("SD540", channel) {
   SetBounds(2.05_ms, 1.55_ms, 1.5_ms, 1.44_ms, 0.94_ms);

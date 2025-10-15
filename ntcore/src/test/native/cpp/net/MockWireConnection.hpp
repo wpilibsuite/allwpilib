@@ -16,7 +16,7 @@
 #include "gmock/gmock.h"
 #include "net/WireConnection.hpp"
 
-namespace nt::net {
+namespace wpi::nt::net {
 
 class MockWireConnection : public WireConnection {
  public:
@@ -26,30 +26,30 @@ class MockWireConnection : public WireConnection {
 
   MOCK_METHOD(bool, Ready, (), (const, override));
 
-  int WriteText(wpi::function_ref<void(wpi::raw_ostream& os)> writer) override {
+  int WriteText(wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) override {
     std::string text;
-    wpi::raw_string_ostream os{text};
+    wpi::util::raw_string_ostream os{text};
     writer(os);
     return DoWriteText(text);
   }
   int WriteBinary(
-      wpi::function_ref<void(wpi::raw_ostream& os)> writer) override {
+      wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) override {
     std::vector<uint8_t> binary;
-    wpi::raw_uvector_ostream os{binary};
+    wpi::util::raw_uvector_ostream os{binary};
     writer(os);
     return DoWriteBinary(binary);
   }
 
-  void SendText(wpi::function_ref<void(wpi::raw_ostream& os)> writer) override {
+  void SendText(wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) override {
     std::string text;
-    wpi::raw_string_ostream os{text};
+    wpi::util::raw_string_ostream os{text};
     writer(os);
     DoSendText(text);
   }
   void SendBinary(
-      wpi::function_ref<void(wpi::raw_ostream& os)> writer) override {
+      wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) override {
     std::vector<uint8_t> binary;
-    wpi::raw_uvector_ostream os{binary};
+    wpi::util::raw_uvector_ostream os{binary};
     writer(os);
     DoSendBinary(binary);
   }
@@ -71,4 +71,4 @@ class MockWireConnection : public WireConnection {
   MOCK_METHOD(void, Disconnect, (std::string_view reason), (override));
 };
 
-}  // namespace nt::net
+}  // namespace wpi::nt::net

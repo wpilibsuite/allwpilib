@@ -10,7 +10,7 @@
 
 #include "wpi/net/uv/Loop.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 WorkReq::WorkReq() {
   error = [this](Error err) { GetLoop().error(err); };
@@ -57,4 +57,4 @@ void QueueWork(Loop& loop, std::function<void()> work,
   QueueWork(loop, req);
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

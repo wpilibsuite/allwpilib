@@ -14,7 +14,7 @@
 
 #include "dns_sd.h"
 
-using namespace wpi;
+using namespace wpi::net;
 
 struct MulticastServiceAnnouncer::Impl {
   std::string serviceName;
@@ -58,7 +58,7 @@ MulticastServiceAnnouncer::MulticastServiceAnnouncer(
   pImpl->serviceType = serviceType;
   pImpl->port = port;
 
-  wpi::SmallString<64> key;
+  wpi::util::SmallString<64> key;
 
   for (auto&& i : txt) {
     key.clear();

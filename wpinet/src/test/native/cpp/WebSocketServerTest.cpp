@@ -15,7 +15,7 @@
 #include "WebSocketTest.hpp"
 #include "wpi/net/HttpParser.hpp"
 
-namespace wpi {
+namespace wpi::net {
 
 class WebSocketServerTest : public WebSocketTest {
  public:
@@ -794,4 +794,4 @@ TEST_P(WebSocketServerDataTest, ReceiveUnmasked) {
   ASSERT_EQ(gotCallback, 1);
 }
 
-}  // namespace wpi
+}  // namespace wpi::net

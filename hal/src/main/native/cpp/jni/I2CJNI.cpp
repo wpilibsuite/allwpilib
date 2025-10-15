@@ -12,8 +12,8 @@
 #include "org_wpilib_hardware_hal_I2CJNI.h"
 #include "wpi/hal/I2C.h"
 
-using namespace hal;
-using namespace wpi::java;
+using namespace wpi::hal;
+using namespace wpi::util::java;
 
 extern "C" {
 
@@ -74,7 +74,7 @@ Java_org_wpilib_hardware_hal_I2CJNI_i2CTransactionB
     return 0;
   }
 
-  wpi::SmallVector<uint8_t, 128> recvBuf;
+  wpi::util::SmallVector<uint8_t, 128> recvBuf;
   recvBuf.resize(receiveSize);
   jint returnValue =
       HAL_TransactionI2C(static_cast<HAL_I2CPort>(port), address,
@@ -157,7 +157,7 @@ Java_org_wpilib_hardware_hal_I2CJNI_i2CReadB
     return 0;
   }
 
-  wpi::SmallVector<uint8_t, 128> recvBuf;
+  wpi::util::SmallVector<uint8_t, 128> recvBuf;
   recvBuf.resize(receiveSize);
   jint returnValue = HAL_ReadI2C(static_cast<HAL_I2CPort>(port), address,
                                  recvBuf.data(), receiveSize);

@@ -20,7 +20,7 @@
 #include "wpi/util/ErrorHandling.hpp"
 #include <cstdlib>
 
-namespace wpi {
+namespace wpi::util {
 
 #ifdef _WIN32
 #pragma warning(push)
@@ -91,7 +91,7 @@ allocate_buffer(size_t Size, size_t Alignment);
 /// most likely using the above helper.
 void deallocate_buffer(void *Ptr, size_t Size, size_t Alignment);
 
-} // namespace wpi
+} // namespace wpi::util
 
 #ifdef _WIN32
 #pragma warning(pop)

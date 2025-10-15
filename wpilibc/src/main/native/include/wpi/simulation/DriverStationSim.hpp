@@ -11,7 +11,7 @@
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/simulation/CallbackStore.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 
 /**
  * Class to control a simulated driver station.
@@ -396,4 +396,4 @@ class DriverStationSim {
    */
   static void ResetData();
 };
-}  // namespace frc::sim
+}  // namespace wpi::sim

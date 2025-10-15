@@ -21,7 +21,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace wpi {
+namespace wpi::util {
 
 namespace densemap::detail {
 // A bit mixer with very low latency using one multiplications and one
@@ -320,6 +320,6 @@ struct DenseMapInfo<Enum, std::enable_if_t<std::is_enum_v<Enum>>> {
 
   static bool isEqual(const Enum &LHS, const Enum &RHS) { return LHS == RHS; }
 };
-} // end namespace wpi
+} // end namespace wpi::util
 
 #endif // WPIUTIL_WPI_DENSEMAPINFO_H

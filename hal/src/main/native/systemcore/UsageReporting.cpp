@@ -14,10 +14,10 @@
 
 namespace {
 struct SystemServerUsageReporting {
-  nt::NetworkTableInstance ntInst;
-  wpi::StringMap<nt::StringPublisher> publishers;
+  wpi::nt::NetworkTableInstance ntInst;
+  wpi::util::StringMap<wpi::nt::StringPublisher> publishers;
 
-  explicit SystemServerUsageReporting(nt::NetworkTableInstance inst)
+  explicit SystemServerUsageReporting(wpi::nt::NetworkTableInstance inst)
       : ntInst{inst} {}
 };
 
@@ -29,7 +29,7 @@ extern "C" {
 
 int32_t HAL_ReportUsage(const struct WPI_String* resource,
                         const struct WPI_String* data) {
-  auto resourceStr = wpi::to_string_view(resource);
+  auto resourceStr = wpi::util::to_string_view(resource);
   auto& publisher = systemServerUsage->publishers[resourceStr];
   if (!publisher) {
     publisher =
@@ -37,15 +37,15 @@ int32_t HAL_ReportUsage(const struct WPI_String* resource,
             .GetStringTopic(fmt::format("/UsageReporting/{}", resourceStr))
             .Publish();
   }
-  publisher.Set(wpi::to_string_view(data));
+  publisher.Set(wpi::util::to_string_view(data));
 
   return 0;
 }
 
 }  // extern "C"
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeUsageReporting() {
-  systemServerUsage = new ::SystemServerUsageReporting{hal::GetSystemServer()};
+  systemServerUsage = new ::SystemServerUsageReporting{wpi::hal::GetSystemServer()};
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init

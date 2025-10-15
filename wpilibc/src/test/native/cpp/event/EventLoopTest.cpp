@@ -7,18 +7,18 @@
 #include "wpi/event/EventLoop.hpp"
 #include "wpi/system/Errors.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 TEST(EventLoopTest, ConcurrentModification) {
   EventLoop loop;
 
-  loop.Bind([&loop] { ASSERT_THROW(loop.Bind([] {}), frc::RuntimeError); });
+  loop.Bind([&loop] { ASSERT_THROW(loop.Bind([] {}), wpi::RuntimeError); });
 
   loop.Poll();
 
   loop.Clear();
 
-  loop.Bind([&loop] { ASSERT_THROW(loop.Clear(), frc::RuntimeError); });
+  loop.Bind([&loop] { ASSERT_THROW(loop.Clear(), wpi::RuntimeError); });
 
   loop.Poll();
 }

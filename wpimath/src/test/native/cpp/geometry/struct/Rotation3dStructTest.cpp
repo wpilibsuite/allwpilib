@@ -6,11 +6,11 @@
 
 #include "wpi/math/geometry/Rotation3d.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 namespace {
 
-using StructType = wpi::Struct<frc::Rotation3d>;
+using StructType = wpi::util::Struct<wpi::math::Rotation3d>;
 const Rotation3d kExpectedData{
     Rotation3d{Quaternion{2.29, 0.191, 0.191, 17.4}}};
 }  // namespace

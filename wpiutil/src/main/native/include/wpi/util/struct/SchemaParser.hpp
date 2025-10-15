@@ -11,7 +11,7 @@
 #include <utility>
 #include <vector>
 
-namespace wpi::structparser {
+namespace wpi::util::structparser {
 
 /**
  * A lexed raw struct schema token.
@@ -196,4 +196,4 @@ class Parser {
   std::string m_error;
 };
 
-}  // namespace wpi::structparser
+}  // namespace wpi::util::structparser
