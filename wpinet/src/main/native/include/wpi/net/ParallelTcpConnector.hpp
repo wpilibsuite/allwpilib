@@ -15,10 +15,11 @@
 
 #include "wpi/net/uv/Timer.hpp"
 
-namespace wpi::net {
-
+namespace wpi::util {
 class Logger;
+}
 
+namespace wpi::net {
 namespace uv {
 class GetAddrInfoReq;
 class Loop;

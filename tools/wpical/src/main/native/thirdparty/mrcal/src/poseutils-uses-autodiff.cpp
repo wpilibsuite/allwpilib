@@ -288,7 +288,7 @@ compose_r_core(// output
 
     Described here:
 
-        Altmann, Simon L. "Hamilton, Rodrigues, and the wpi::math::Quaternion Scandal."
+        Altmann, Simon L. "Hamilton, Rodrigues, and the Quaternion Scandal."
         Mathematics Magazine, vol. 62, no. 5, 1989, pp. 291–308
 
     Available here:

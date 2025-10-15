@@ -19,7 +19,7 @@
 #include "wpi/net/uv/Error.hpp"
 #include "wpi/net/uv/Loop.hpp"
 
-namespace wpi::net {
+namespace wpi::util {
 class Logger;
 }  // namespace wpi::net
 

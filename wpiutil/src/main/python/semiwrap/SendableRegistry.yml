@@ -3,7 +3,7 @@ extra_includes:
 - wpi/util/sendable/SendableBuilder.hpp
 
 classes:
-  wpi::SendableRegistry:
+  wpi::util::SendableRegistry:
     nodelete: true
     methods:
       Add:

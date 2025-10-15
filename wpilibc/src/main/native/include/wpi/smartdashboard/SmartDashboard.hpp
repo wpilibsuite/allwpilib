@@ -14,7 +14,7 @@
 #include <wpi/ntcore/NetworkTableEntry.hpp>
 #include <wpi/ntcore/NetworkTableValue.hpp>
 
-namespace wpi {
+namespace wpi::util {
 class Sendable;
 }  // namespace wpi
 
