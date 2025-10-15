@@ -67,9 +67,33 @@ public class SwerveTrajectory extends Trajectory<SwerveSample> {
 
   @Override
   public SwerveTrajectory transformBy(Transform2d transform) {
+    Pose2d firstPose = start().pose;
+    Pose2d transformedFirstPose = firstPose.transformBy(transform);
+
+    SwerveSample transformedFirstSample =
+        new SwerveSample(
+            start().timestamp,
+            transformedFirstPose,
+            start().velocity,
+            start().acceleration,
+            start().states);
+
+    Stream<SwerveSample> transformedSamples =
+        Arrays.stream(samples)
+            .skip(1)
+            .map(
+                sample ->
+                    new SwerveSample(
+                        sample.timestamp,
+                        transformedFirstPose.plus(sample.pose.minus(firstPose)),
+                        sample.velocity,
+                        sample.acceleration,
+                        sample.states));
+
     return new SwerveTrajectory(
         kinematics,
-        Arrays.stream(samples).map(s -> s.transform(transform)).toArray(SwerveSample[]::new));
+        Stream.concat(Stream.of(transformedFirstSample), transformedSamples)
+            .toArray(SwerveSample[]::new));
   }
 
   @Override

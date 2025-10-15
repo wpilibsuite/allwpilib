@@ -129,8 +129,34 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
 
   @Override
   public DifferentialTrajectory transformBy(Transform2d transform) {
+    Pose2d firstPose = start().pose;
+    Pose2d transformedFirstPose = firstPose.transformBy(transform);
+
+    DifferentialSample transformedFirstSample =
+        new DifferentialSample(
+            start().timestamp,
+            transformedFirstPose,
+            start().velocity,
+            start().acceleration,
+            start().leftSpeed,
+            start().rightSpeed);
+
+    Stream<DifferentialSample> transformedSamples =
+        Arrays.stream(samples)
+            .skip(1)
+            .map(
+                sample ->
+                    new DifferentialSample(
+                        sample.timestamp,
+                        transformedFirstPose.plus(sample.pose.minus(firstPose)),
+                        sample.velocity,
+                        sample.acceleration,
+                        sample.leftSpeed,
+                        sample.rightSpeed));
+
     return new DifferentialTrajectory(
-        Arrays.stream(samples).map(s -> s.transform(transform)).toArray(DifferentialSample[]::new));
+        Stream.concat(Stream.of(transformedFirstSample), transformedSamples)
+            .toArray(DifferentialSample[]::new));
   }
 
   @Override

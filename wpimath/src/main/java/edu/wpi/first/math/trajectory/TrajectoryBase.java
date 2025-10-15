@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Stream;
 
 /** A base trajectory class for general-purpose trajectory following. */
@@ -19,6 +20,10 @@ public class TrajectoryBase extends Trajectory<TrajectorySample.Base> {
   @JsonCreator
   public TrajectoryBase(@JsonProperty("samples") TrajectorySample.Base[] samples) {
     super(samples);
+  }
+
+  public TrajectoryBase(List<TrajectorySample.Base> samples) {
+    this(samples.toArray(TrajectorySample.Base[]::new));
   }
 
   /**
@@ -37,9 +42,26 @@ public class TrajectoryBase extends Trajectory<TrajectorySample.Base> {
 
   @Override
   public TrajectoryBase transformBy(Transform2d transform) {
-    return new TrajectoryBase(
+    Pose2d firstPose = start().pose;
+    Pose2d transformedFirstPose = firstPose.transformBy(transform);
+
+    TrajectorySample.Base transformedFirstSample =
+        new TrajectorySample.Base(
+            start().timestamp, transformedFirstPose, start().velocity, start().acceleration);
+
+    Stream<TrajectorySample.Base> transformedSamples =
         Arrays.stream(samples)
-            .map(s -> s.transform(transform))
+            .skip(1)
+            .map(
+                sample ->
+                    new TrajectorySample.Base(
+                        sample.timestamp,
+                        transformedFirstPose.plus(sample.pose.minus(firstPose)),
+                        sample.velocity,
+                        sample.acceleration));
+
+    return new TrajectoryBase(
+        Stream.concat(Stream.of(transformedFirstSample), transformedSamples)
             .toArray(TrajectorySample.Base[]::new));
   }
 

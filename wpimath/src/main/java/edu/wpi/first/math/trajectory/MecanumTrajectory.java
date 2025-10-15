@@ -59,9 +59,33 @@ public class MecanumTrajectory extends Trajectory<MecanumSample> {
 
   @Override
   public MecanumTrajectory transformBy(Transform2d transform) {
+    Pose2d firstPose = start().pose;
+    Pose2d transformedFirstPose = firstPose.transformBy(transform);
+
+    MecanumSample transformedFirstSample =
+        new MecanumSample(
+            start().timestamp,
+            transformedFirstPose,
+            start().velocity,
+            start().acceleration,
+            start().speeds);
+
+    Stream<MecanumSample> transformedSamples =
+        Arrays.stream(samples)
+            .skip(1)
+            .map(
+                sample ->
+                    new MecanumSample(
+                        sample.timestamp,
+                        transformedFirstPose.plus(sample.pose.minus(firstPose)),
+                        sample.velocity,
+                        sample.acceleration,
+                        sample.speeds));
+
     return new MecanumTrajectory(
         kinematics,
-        Arrays.stream(samples).map(s -> s.transform(transform)).toArray(MecanumSample[]::new));
+        Stream.concat(Stream.of(transformedFirstSample), transformedSamples)
+            .toArray(MecanumSample[]::new));
   }
 
   @Override
