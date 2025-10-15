@@ -4,9 +4,9 @@
 
 package org.wpilib.math.trajectory.struct;
 
+import java.nio.ByteBuffer;
 import org.wpilib.math.trajectory.ExponentialProfile;
 import org.wpilib.util.struct.Struct;
-import java.nio.ByteBuffer;
 
 public class ExponentialProfileStateStruct implements Struct<ExponentialProfile.State> {
   @Override

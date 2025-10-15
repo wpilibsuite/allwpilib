@@ -4,10 +4,10 @@
 
 package org.wpilib.math.filter;
 
-import org.wpilib.math.util.MathSharedStore;
-import org.wpilib.util.container.DoubleCircularBuffer;
 import java.util.Arrays;
 import org.ejml.simple.SimpleMatrix;
+import org.wpilib.math.util.MathSharedStore;
+import org.wpilib.util.container.DoubleCircularBuffer;
 
 /**
  * This class implements a linear, digital filter. All types of FIR and IIR filters are supported.

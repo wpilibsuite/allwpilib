@@ -6,11 +6,11 @@ package org.wpilib.math.geometry.proto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Ellipse2d;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.proto.Geometry2D.ProtobufEllipse2d;
-import org.junit.jupiter.api.Test;
 
 class Ellipse2dProtoTest {
   private static final Ellipse2d DATA =

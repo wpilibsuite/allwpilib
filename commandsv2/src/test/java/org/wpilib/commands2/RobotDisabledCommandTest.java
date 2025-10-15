@@ -4,9 +4,9 @@
 
 package org.wpilib.commands2;
 
-import static org.wpilib.commands2.Commands.parallel;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.wpilib.commands2.Commands.parallel;
 
 import java.util.Map;
 import org.junit.jupiter.api.Test;

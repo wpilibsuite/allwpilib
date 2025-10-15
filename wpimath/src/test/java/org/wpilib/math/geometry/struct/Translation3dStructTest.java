@@ -6,10 +6,10 @@ package org.wpilib.math.geometry.struct;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.math.geometry.Translation3d;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.geometry.Translation3d;
 
 class Translation3dStructTest {
   private static final Translation3d DATA = new Translation3d(35.04, 22.9, 3.504);

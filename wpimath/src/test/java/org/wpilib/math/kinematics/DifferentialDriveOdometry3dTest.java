@@ -7,10 +7,10 @@ package org.wpilib.math.kinematics;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.util.Units;
-import org.junit.jupiter.api.Test;
 
 class DifferentialDriveOdometry3dTest {
   private static final double kEpsilon = 1E-9;

@@ -4,15 +4,15 @@
 
 package org.wpilib.units.measure;
 
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.wpilib.units.Units.Milliseconds;
 import static org.wpilib.units.Units.Seconds;
 import static org.wpilib.units.Units.Volts;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.units.Measure;
 import org.wpilib.units.VelocityUnit;
 import org.wpilib.units.VoltageUnit;
-import org.junit.jupiter.api.Test;
 
 class VelocityTest {
   @Test

@@ -4,7 +4,6 @@
 
 package org.wpilib.driverstation;
 
-import org.wpilib.driverstation.DriverStation;
 import org.wpilib.hardware.hal.ControlWord;
 
 /** A wrapper around Driver Station control word. */

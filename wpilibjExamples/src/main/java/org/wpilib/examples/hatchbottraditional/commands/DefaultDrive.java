@@ -4,9 +4,9 @@
 
 package org.wpilib.examples.hatchbottraditional.commands;
 
-import org.wpilib.examples.hatchbottraditional.subsystems.DriveSubsystem;
-import org.wpilib.commands2.Command;
 import java.util.function.DoubleSupplier;
+import org.wpilib.commands2.Command;
+import org.wpilib.examples.hatchbottraditional.subsystems.DriveSubsystem;
 
 /**
  * A command to drive the robot with joystick input (passed in as {@link DoubleSupplier}s). Written

@@ -4,10 +4,10 @@
 
 package org.wpilib.commands3;
 
-import org.wpilib.units.measure.Time;
 import java.util.List;
 import java.util.function.Consumer;
 import org.wpilib.annotation.NoDiscard;
+import org.wpilib.units.measure.Time;
 
 /**
  * Generic base class to represent mechanisms on a robot. Commands can require sole ownership of a

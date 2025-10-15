@@ -6,6 +6,11 @@ package org.wpilib.epilogue.logging;
 
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.BiFunction;
 import org.wpilib.datalog.BooleanArrayLogEntry;
 import org.wpilib.datalog.BooleanLogEntry;
 import org.wpilib.datalog.DataLog;
@@ -24,11 +29,6 @@ import org.wpilib.datalog.StructArrayLogEntry;
 import org.wpilib.datalog.StructLogEntry;
 import org.wpilib.util.protobuf.Protobuf;
 import org.wpilib.util.struct.Struct;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiFunction;
 import us.hebi.quickbuf.ProtoMessage;
 
 /** A backend implementation that saves information to a WPILib {@link DataLog} file on disk. */

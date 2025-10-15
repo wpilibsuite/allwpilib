@@ -4,11 +4,11 @@
 
 package org.wpilib.examples.tankdrive;
 
-import org.wpilib.util.sendable.SendableRegistry;
-import org.wpilib.driverstation.Joystick;
-import org.wpilib.opmode.TimedRobot;
 import org.wpilib.drive.DifferentialDrive;
+import org.wpilib.driverstation.Joystick;
 import org.wpilib.hardware.motor.PWMSparkMax;
+import org.wpilib.opmode.TimedRobot;
+import org.wpilib.util.sendable.SendableRegistry;
 
 /**
  * This is a demo program showing the use of the DifferentialDrive class, specifically it contains

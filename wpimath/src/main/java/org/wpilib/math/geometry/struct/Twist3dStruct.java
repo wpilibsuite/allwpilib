@@ -4,9 +4,9 @@
 
 package org.wpilib.math.geometry.struct;
 
+import java.nio.ByteBuffer;
 import org.wpilib.math.geometry.Twist3d;
 import org.wpilib.util.struct.Struct;
-import java.nio.ByteBuffer;
 
 public class Twist3dStruct implements Struct<Twist3d> {
   @Override

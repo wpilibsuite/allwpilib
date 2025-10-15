@@ -6,16 +6,16 @@ package org.wpilib.simulation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Test;
+import org.wpilib.hardware.motor.PWMVictorSPX;
+import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N2;
 import org.wpilib.math.system.LinearSystem;
 import org.wpilib.math.system.plant.DCMotor;
 import org.wpilib.math.system.plant.LinearSystemId;
-import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.system.RobotController;
-import org.wpilib.hardware.motor.PWMVictorSPX;
-import org.junit.jupiter.api.Test;
 
 class DCMotorSimTest {
   @Test

@@ -6,11 +6,11 @@ package org.wpilib.commands3.button;
 
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
+import org.wpilib.commands3.Trigger;
 import org.wpilib.networktables.BooleanSubscriber;
 import org.wpilib.networktables.BooleanTopic;
 import org.wpilib.networktables.NetworkTable;
 import org.wpilib.networktables.NetworkTableInstance;
-import org.wpilib.commands3.Trigger;
 
 /** A {@link Trigger} that uses a {@link NetworkTable} boolean field. */
 public class NetworkButton extends Trigger {

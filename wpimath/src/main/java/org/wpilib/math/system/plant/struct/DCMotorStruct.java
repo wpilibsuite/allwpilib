@@ -4,9 +4,9 @@
 
 package org.wpilib.math.system.plant.struct;
 
+import java.nio.ByteBuffer;
 import org.wpilib.math.system.plant.DCMotor;
 import org.wpilib.util.struct.Struct;
-import java.nio.ByteBuffer;
 
 public class DCMotorStruct implements Struct<DCMotor> {
   @Override

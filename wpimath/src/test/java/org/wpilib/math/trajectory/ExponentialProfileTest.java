@@ -9,9 +9,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.wpilib.math.controller.SimpleMotorFeedforward;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.controller.SimpleMotorFeedforward;
 
 class ExponentialProfileTest {
   private static final double kDt = 0.01;

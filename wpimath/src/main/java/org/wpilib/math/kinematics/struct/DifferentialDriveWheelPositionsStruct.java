@@ -4,9 +4,9 @@
 
 package org.wpilib.math.kinematics.struct;
 
+import java.nio.ByteBuffer;
 import org.wpilib.math.kinematics.DifferentialDriveWheelPositions;
 import org.wpilib.util.struct.Struct;
-import java.nio.ByteBuffer;
 
 public class DifferentialDriveWheelPositionsStruct
     implements Struct<DifferentialDriveWheelPositions> {

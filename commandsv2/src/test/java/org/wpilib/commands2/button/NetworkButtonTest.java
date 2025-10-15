@@ -7,12 +7,12 @@ package org.wpilib.commands2.button;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import org.wpilib.networktables.NetworkTableInstance;
-import org.wpilib.commands2.CommandScheduler;
-import org.wpilib.commands2.CommandTestBase;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.wpilib.commands2.CommandScheduler;
+import org.wpilib.commands2.CommandTestBase;
+import org.wpilib.networktables.NetworkTableInstance;
 
 class NetworkButtonTest extends CommandTestBase {
   NetworkTableInstance m_inst;

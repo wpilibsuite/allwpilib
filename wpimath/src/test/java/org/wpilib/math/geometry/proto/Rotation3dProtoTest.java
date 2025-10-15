@@ -6,10 +6,10 @@ package org.wpilib.math.geometry.proto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Quaternion;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.proto.Geometry3D.ProtobufRotation3d;
-import org.junit.jupiter.api.Test;
 
 class Rotation3dProtoTest {
   private static final Rotation3d DATA = new Rotation3d(new Quaternion(2.29, 0.191, 0.191, 17.4));

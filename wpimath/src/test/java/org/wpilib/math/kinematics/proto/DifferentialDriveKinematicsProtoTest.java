@@ -6,9 +6,9 @@ package org.wpilib.math.kinematics.proto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import org.wpilib.math.proto.Kinematics.ProtobufDifferentialDriveKinematics;
-import org.junit.jupiter.api.Test;
 
 class DifferentialDriveKinematicsProtoTest {
   private static final DifferentialDriveKinematics DATA = new DifferentialDriveKinematics(1.74);

@@ -4,9 +4,6 @@
 
 package org.wpilib.epilogue.processor;
 
-import org.wpilib.epilogue.CustomLoggerFor;
-import org.wpilib.epilogue.Logged;
-import org.wpilib.epilogue.NotLogged;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -35,11 +32,11 @@ import javax.lang.model.type.NoType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
+import org.wpilib.epilogue.CustomLoggerFor;
+import org.wpilib.epilogue.Logged;
+import org.wpilib.epilogue.NotLogged;
 
-@SupportedAnnotationTypes({
-  "org.wpilib.epilogue.CustomLoggerFor",
-  "org.wpilib.epilogue.Logged"
-})
+@SupportedAnnotationTypes({"org.wpilib.epilogue.CustomLoggerFor", "org.wpilib.epilogue.Logged"})
 @SupportedSourceVersion(SourceVersion.RELEASE_21)
 public class AnnotationProcessor extends AbstractProcessor {
   private static final String kCustomLoggerFqn = "org.wpilib.epilogue.CustomLoggerFor";

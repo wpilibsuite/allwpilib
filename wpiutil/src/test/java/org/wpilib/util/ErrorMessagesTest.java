@@ -4,9 +4,9 @@
 
 package org.wpilib.util;
 
-import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import org.junit.jupiter.api.Test;
 

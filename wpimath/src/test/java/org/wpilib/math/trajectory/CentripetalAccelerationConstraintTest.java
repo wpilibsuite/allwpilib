@@ -6,10 +6,10 @@ package org.wpilib.math.trajectory;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.wpilib.math.trajectory.constraint.CentripetalAccelerationConstraint;
-import org.wpilib.math.util.Units;
 import java.util.Collections;
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.trajectory.constraint.CentripetalAccelerationConstraint;
+import org.wpilib.math.util.Units;
 
 class CentripetalAccelerationConstraintTest {
   @Test

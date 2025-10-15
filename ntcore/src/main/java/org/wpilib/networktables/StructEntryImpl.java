@@ -4,9 +4,9 @@
 
 package org.wpilib.networktables;
 
-import org.wpilib.util.struct.StructBuffer;
 import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
+import org.wpilib.util.struct.StructBuffer;
 
 /**
  * NetworkTables struct-encoded value implementation.

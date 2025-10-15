@@ -4,11 +4,11 @@
 
 package org.wpilib;
 
-import org.wpilib.hardware.hal.HAL;
-import org.wpilib.simulation.DriverStationSim;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
+import org.wpilib.hardware.hal.HAL;
+import org.wpilib.simulation.DriverStationSim;
 
 public final class MockHardwareExtension implements BeforeAllCallback {
   private static ExtensionContext getRoot(ExtensionContext context) {

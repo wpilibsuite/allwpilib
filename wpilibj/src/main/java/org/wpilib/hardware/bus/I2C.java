@@ -6,10 +6,10 @@ package org.wpilib.hardware.bus;
 
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
+import java.nio.ByteBuffer;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.I2CJNI;
 import org.wpilib.hardware.hal.util.BoundaryException;
-import java.nio.ByteBuffer;
 
 /**
  * I2C bus interface class.

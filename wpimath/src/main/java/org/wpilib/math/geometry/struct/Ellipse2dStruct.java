@@ -4,10 +4,10 @@
 
 package org.wpilib.math.geometry.struct;
 
+import java.nio.ByteBuffer;
 import org.wpilib.math.geometry.Ellipse2d;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.util.struct.Struct;
-import java.nio.ByteBuffer;
 
 public class Ellipse2dStruct implements Struct<Ellipse2d> {
   @Override

@@ -4,12 +4,12 @@
 
 package org.wpilib.math.controller;
 
+import org.ejml.simple.SimpleMatrix;
 import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Num;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.system.Discretization;
 import org.wpilib.math.system.LinearSystem;
-import org.ejml.simple.SimpleMatrix;
+import org.wpilib.math.util.Num;
 
 /**
  * Constructs a plant inversion model-based feedforward from a {@link LinearSystem}.

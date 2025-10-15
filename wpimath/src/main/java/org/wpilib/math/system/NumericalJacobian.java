@@ -4,12 +4,12 @@
 
 package org.wpilib.math.system;
 
-import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Nat;
-import org.wpilib.math.util.Num;
-import org.wpilib.math.numbers.N1;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.util.Nat;
+import org.wpilib.math.util.Num;
 
 /** Numerical Jacobian utilities. */
 public final class NumericalJacobian {

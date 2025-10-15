@@ -4,9 +4,9 @@
 
 package org.wpilib.util.struct;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.wpilib.util.struct.StructGenerator.genEnum;
 import static org.wpilib.util.struct.StructGenerator.genRecord;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

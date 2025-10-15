@@ -4,10 +4,9 @@
 
 package org.wpilib.examples.differentialdriveposeestimator;
 
-import org.wpilib.vision.apriltag.AprilTagFieldLayout;
-import org.wpilib.vision.apriltag.AprilTagFields;
-import org.wpilib.math.util.ComputerVisionUtil;
-import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.hardware.imu.OnboardIMU;
+import org.wpilib.hardware.motor.PWMSparkMax;
+import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
 import org.wpilib.math.estimator.DifferentialDrivePoseEstimator;
@@ -20,22 +19,23 @@ import org.wpilib.math.geometry.Translation3d;
 import org.wpilib.math.kinematics.ChassisSpeeds;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import org.wpilib.math.kinematics.DifferentialDriveWheelSpeeds;
+import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N2;
 import org.wpilib.math.system.LinearSystem;
 import org.wpilib.math.system.plant.DCMotor;
 import org.wpilib.math.system.plant.LinearSystemId;
+import org.wpilib.math.util.ComputerVisionUtil;
 import org.wpilib.math.util.Units;
 import org.wpilib.networktables.DoubleArrayEntry;
 import org.wpilib.networktables.DoubleArrayTopic;
-import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.hardware.imu.OnboardIMU;
-import org.wpilib.system.RobotController;
-import org.wpilib.system.Timer;
-import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.simulation.DifferentialDrivetrainSim;
 import org.wpilib.simulation.EncoderSim;
 import org.wpilib.smartdashboard.Field2d;
 import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.system.RobotController;
+import org.wpilib.system.Timer;
+import org.wpilib.vision.apriltag.AprilTagFieldLayout;
+import org.wpilib.vision.apriltag.AprilTagFields;
 
 /** Represents a differential drive style drivetrain. */
 public class Drivetrain {

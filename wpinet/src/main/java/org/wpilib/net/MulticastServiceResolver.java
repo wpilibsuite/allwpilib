@@ -4,8 +4,8 @@
 
 package org.wpilib.net;
 
-import org.wpilib.util.cleanup.WPICleaner;
 import java.lang.ref.Cleaner.Cleanable;
+import org.wpilib.util.cleanup.WPICleaner;
 
 /** Class to resolve a service over mDNS. */
 public class MulticastServiceResolver implements AutoCloseable {

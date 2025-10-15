@@ -6,8 +6,8 @@ package org.wpilib.drive;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.hardware.motor.MockPWMMotorController;
 import org.junit.jupiter.api.Test;
+import org.wpilib.hardware.motor.MockPWMMotorController;
 
 @SuppressWarnings("resource")
 class DifferentialDriveTest {

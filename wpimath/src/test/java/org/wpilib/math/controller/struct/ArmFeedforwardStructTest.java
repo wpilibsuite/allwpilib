@@ -6,10 +6,10 @@ package org.wpilib.math.controller.struct;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.math.controller.ArmFeedforward;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.controller.ArmFeedforward;
 
 class ArmFeedforwardStructTest {
   private static final ArmFeedforward DATA = new ArmFeedforward(0.174, 0.229, 4.4, 4.4);

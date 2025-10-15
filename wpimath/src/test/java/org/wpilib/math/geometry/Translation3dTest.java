@@ -4,15 +4,15 @@
 
 package org.wpilib.math.geometry;
 
-import static org.wpilib.units.Units.Inches;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.wpilib.units.Units.Inches;
 
-import org.wpilib.math.linalg.VecBuilder;
-import org.wpilib.math.util.Units;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.math.util.Units;
 
 class Translation3dTest {
   private static final double kEpsilon = 1E-9;

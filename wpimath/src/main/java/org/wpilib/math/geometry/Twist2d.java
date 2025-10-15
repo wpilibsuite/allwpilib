@@ -4,11 +4,11 @@
 
 package org.wpilib.math.geometry;
 
+import java.util.Objects;
 import org.wpilib.math.geometry.proto.Twist2dProto;
 import org.wpilib.math.geometry.struct.Twist2dStruct;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
-import java.util.Objects;
 
 /**
  * A change in distance along a 2D arc since the last pose update. We can use ideas from

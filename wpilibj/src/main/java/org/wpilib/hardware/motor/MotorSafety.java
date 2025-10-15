@@ -4,14 +4,14 @@
 
 package org.wpilib.hardware.motor;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
 import org.wpilib.driverstation.DriverStation;
 import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.opmode.RobotState;
 import org.wpilib.system.Timer;
 import org.wpilib.util.WPIUtilJNI;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 /**
  * The Motor Safety feature acts as a watchdog timer for an individual motor. It operates by

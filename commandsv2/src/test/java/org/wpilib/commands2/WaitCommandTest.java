@@ -12,12 +12,12 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.wpilib.hardware.hal.HAL;
-import org.wpilib.simulation.SimHooks;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
+import org.wpilib.hardware.hal.HAL;
+import org.wpilib.simulation.SimHooks;
 
 class WaitCommandTest extends CommandTestBase {
   @BeforeEach

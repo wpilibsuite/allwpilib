@@ -6,11 +6,11 @@ package org.wpilib.simulation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.hardware.hal.HAL;
-import org.wpilib.hardware.accelerometer.ADXL345_I2C;
-import org.wpilib.hardware.bus.I2C;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.wpilib.hardware.accelerometer.ADXL345_I2C;
+import org.wpilib.hardware.bus.I2C;
+import org.wpilib.hardware.hal.HAL;
 
 class ADXL345SimTest {
   @ParameterizedTest

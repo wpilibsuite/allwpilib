@@ -4,9 +4,9 @@
 
 package org.wpilib.examples.elevatortrapezoidprofile;
 
+import org.wpilib.driverstation.Joystick;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
 import org.wpilib.math.trajectory.TrapezoidProfile;
-import org.wpilib.driverstation.Joystick;
 import org.wpilib.opmode.TimedRobot;
 
 public class Robot extends TimedRobot {

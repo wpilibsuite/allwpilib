@@ -4,12 +4,12 @@
 
 package org.wpilib.examples.swervebot;
 
+import org.wpilib.hardware.imu.OnboardIMU;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.kinematics.ChassisSpeeds;
 import org.wpilib.math.kinematics.SwerveDriveKinematics;
 import org.wpilib.math.kinematics.SwerveDriveOdometry;
 import org.wpilib.math.kinematics.SwerveModulePosition;
-import org.wpilib.hardware.imu.OnboardIMU;
 
 /** Represents a swerve drive style drivetrain. */
 public class Drivetrain {

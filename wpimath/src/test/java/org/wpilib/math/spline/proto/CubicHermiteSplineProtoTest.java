@@ -6,9 +6,9 @@ package org.wpilib.math.spline.proto;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
+import org.wpilib.ProtoTestBase;
 import org.wpilib.math.proto.Spline.ProtobufCubicHermiteSpline;
 import org.wpilib.math.spline.CubicHermiteSpline;
-import org.wpilib.ProtoTestBase;
 
 @SuppressWarnings("PMD.TestClassWithoutTestCases")
 class CubicHermiteSplineProtoTest

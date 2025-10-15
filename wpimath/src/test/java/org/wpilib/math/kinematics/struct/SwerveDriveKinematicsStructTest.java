@@ -6,9 +6,9 @@ package org.wpilib.math.kinematics.struct;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
+import org.wpilib.StructTestBase;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.kinematics.SwerveDriveKinematics;
-import org.wpilib.StructTestBase;
 
 @SuppressWarnings("PMD.TestClassWithoutTestCases")
 class SwerveDriveKinematicsStructTest extends StructTestBase<SwerveDriveKinematics> {

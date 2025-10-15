@@ -4,16 +4,6 @@
 
 package org.wpilib.math.linalg;
 
-import org.wpilib.math.jni.EigenJNI;
-import org.wpilib.math.numbers.N1;
-import org.wpilib.math.linalg.proto.MatrixProto;
-import org.wpilib.math.linalg.struct.MatrixStruct;
-import org.wpilib.math.util.Nat;
-import org.wpilib.math.util.Num;
-import org.wpilib.util.protobuf.Protobuf;
-import org.wpilib.util.protobuf.ProtobufSerializable;
-import org.wpilib.util.struct.Struct;
-import org.wpilib.util.struct.StructSerializable;
 import java.util.Objects;
 import org.ejml.MatrixDimensionException;
 import org.ejml.data.DMatrixRMaj;
@@ -23,6 +13,16 @@ import org.ejml.dense.row.NormOps_DDRM;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.CholeskyDecomposition_F64;
 import org.ejml.simple.SimpleMatrix;
+import org.wpilib.math.jni.EigenJNI;
+import org.wpilib.math.linalg.proto.MatrixProto;
+import org.wpilib.math.linalg.struct.MatrixStruct;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.util.Nat;
+import org.wpilib.math.util.Num;
+import org.wpilib.util.protobuf.Protobuf;
+import org.wpilib.util.protobuf.ProtobufSerializable;
+import org.wpilib.util.struct.Struct;
+import org.wpilib.util.struct.StructSerializable;
 
 /**
  * A shape-safe wrapper over Efficient Java Matrix Library (EJML) matrices.

@@ -6,11 +6,11 @@ package org.wpilib.math.kinematics.struct;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.kinematics.SwerveModuleState;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.kinematics.SwerveModuleState;
 
 class SwerveModuleStateStructTest {
   private static final SwerveModuleState DATA = new SwerveModuleState(22.9, new Rotation2d(3.3));

@@ -10,8 +10,8 @@ import org.wpilib.units.measure.Acceleration;
  * A generic unit of acceleration.
  *
  * <p><strong>NOTE:</strong> This type is not compatible with unit-specific accelerations like
- * {@link org.wpilib.units.measure.LinearAcceleration}. Authors of APIs that need to interact
- * with all types should consider using a generic {@code Measure<? extends PerUnit<? extends
+ * {@link org.wpilib.units.measure.LinearAcceleration}. Authors of APIs that need to interact with
+ * all types should consider using a generic {@code Measure<? extends PerUnit<? extends
  * PerUnit<[dimension>], TimeUnit>, TimeUnit>}. Bounded wildcards are necessary in order to
  * interoperate with <i>any</i> subclass of the {@link org.wpilib.units.measure.Per} measurement
  * type.

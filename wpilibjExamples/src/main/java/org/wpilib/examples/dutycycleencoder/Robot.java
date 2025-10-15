@@ -4,8 +4,8 @@
 
 package org.wpilib.examples.dutycycleencoder;
 
-import org.wpilib.math.util.MathUtil;
 import org.wpilib.hardware.rotation.DutyCycleEncoder;
+import org.wpilib.math.util.MathUtil;
 import org.wpilib.opmode.TimedRobot;
 import org.wpilib.smartdashboard.SmartDashboard;
 

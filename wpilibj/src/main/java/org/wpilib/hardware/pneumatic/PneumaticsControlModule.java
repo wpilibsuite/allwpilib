@@ -4,12 +4,12 @@
 
 package org.wpilib.hardware.pneumatic;
 
-import org.wpilib.system.SensorUtil;
+import java.util.HashMap;
+import java.util.Map;
 import org.wpilib.hardware.hal.CTREPCMJNI;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.PortsJNI;
-import java.util.HashMap;
-import java.util.Map;
+import org.wpilib.system.SensorUtil;
 
 /** Module class for controlling a Cross The Road Electronics Pneumatics Control Module. */
 public class PneumaticsControlModule implements PneumaticsBase {

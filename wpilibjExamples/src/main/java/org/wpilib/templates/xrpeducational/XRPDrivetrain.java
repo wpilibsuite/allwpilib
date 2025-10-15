@@ -4,8 +4,8 @@
 
 package org.wpilib.templates.xrpeducational;
 
-import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.drive.DifferentialDrive;
+import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.xrp.XRPMotor;
 
 public class XRPDrivetrain {

@@ -4,6 +4,9 @@
 
 package org.wpilib.units;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.wpilib.units.Units.Feet;
 import static org.wpilib.units.Units.FeetPerSecond;
 import static org.wpilib.units.Units.Meters;
@@ -14,9 +17,6 @@ import static org.wpilib.units.Units.Minute;
 import static org.wpilib.units.Units.Radians;
 import static org.wpilib.units.Units.Second;
 import static org.wpilib.units.Units.Seconds;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 

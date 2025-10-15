@@ -4,9 +4,9 @@
 
 package org.wpilib.util.cleanup;
 
-import org.wpilib.util.ErrorMessages;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import org.wpilib.util.ErrorMessages;
 
 /**
  * An object containing a Stack of AutoCloseable objects that are closed when this object is closed.

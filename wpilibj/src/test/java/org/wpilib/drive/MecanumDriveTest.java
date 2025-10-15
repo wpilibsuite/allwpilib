@@ -6,9 +6,9 @@ package org.wpilib.drive;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.hardware.motor.MockPWMMotorController;
 import org.junit.jupiter.api.Test;
+import org.wpilib.hardware.motor.MockPWMMotorController;
+import org.wpilib.math.geometry.Rotation2d;
 
 @SuppressWarnings("resource")
 class MecanumDriveTest {

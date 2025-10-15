@@ -11,8 +11,6 @@ import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.ReturnTree;
 import com.sun.source.util.SimpleTreeVisitor;
 import com.sun.source.util.Trees;
-import org.wpilib.epilogue.Logged;
-import org.wpilib.epilogue.NotLogged;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
@@ -38,6 +36,8 @@ import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.tools.Diagnostic;
+import org.wpilib.epilogue.Logged;
+import org.wpilib.epilogue.NotLogged;
 
 /** Generates logger class files for {@link Logged @Logged}-annotated classes. */
 public class LoggerGenerator {
@@ -104,9 +104,9 @@ public class LoggerGenerator {
 
   /**
    * Generates the logger class used to handle data objects of the given type. The generated logger
-   * class will subclass from {@link org.wpilib.epilogue.logging.ClassSpecificLogger} and
-   * implement the {@code update()} method to populate a data log with information from an instance
-   * of the data type.
+   * class will subclass from {@link org.wpilib.epilogue.logging.ClassSpecificLogger} and implement
+   * the {@code update()} method to populate a data log with information from an instance of the
+   * data type.
    *
    * @param clazz the data type that the logger should support.
    * @throws IOException if the file could not be written

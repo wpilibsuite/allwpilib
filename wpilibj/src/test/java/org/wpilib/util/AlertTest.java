@@ -8,11 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.wpilib.networktables.NetworkTableInstance;
-import org.wpilib.networktables.StringArraySubscriber;
-import org.wpilib.util.Alert.AlertType;
-import org.wpilib.simulation.SimHooks;
-import org.wpilib.smartdashboard.SmartDashboard;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,6 +16,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.parallel.ResourceLock;
+import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.networktables.StringArraySubscriber;
+import org.wpilib.simulation.SimHooks;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.util.Alert.AlertType;
 
 class AlertTest {
   private NetworkTableInstance m_inst;

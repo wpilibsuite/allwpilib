@@ -4,23 +4,23 @@
 
 package org.wpilib.util;
 
-import org.wpilib.system.RobotController;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.smartdashboard.SmartDashboard;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.system.RobotController;
+import org.wpilib.util.sendable.Sendable;
+import org.wpilib.util.sendable.SendableBuilder;
 
 /**
  * Persistent alert to be sent via NetworkTables. Alerts are tagged with a type of {@code kError},
- * {@code kWarning}, or {@code kInfo} to denote urgency. See {@link
- * org.wpilib.util.Alert.AlertType AlertType} for suggested usage of each type. Alerts can be
- * displayed on supported dashboards, and are shown in a priority order based on type and recency of
- * activation, with newly activated alerts first.
+ * {@code kWarning}, or {@code kInfo} to denote urgency. See {@link org.wpilib.util.Alert.AlertType
+ * AlertType} for suggested usage of each type. Alerts can be displayed on supported dashboards, and
+ * are shown in a priority order based on type and recency of activation, with newly activated
+ * alerts first.
  *
  * <p>Alerts should be created once and stored persistently, then updated to "active" or "inactive"
  * as necessary. {@link #set(boolean)} can be safely called periodically.

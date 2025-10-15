@@ -6,11 +6,11 @@ package org.wpilib.math.linalg.struct;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.math.util.Nat;
+import org.wpilib.StructTestBase;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.numbers.N2;
-import org.wpilib.StructTestBase;
+import org.wpilib.math.util.Nat;
 
 @SuppressWarnings("PMD.TestClassWithoutTestCases")
 class VectorStructTest extends StructTestBase<Vector<N2>> {

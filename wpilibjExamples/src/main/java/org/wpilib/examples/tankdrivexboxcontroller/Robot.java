@@ -4,11 +4,11 @@
 
 package org.wpilib.examples.tankdrivexboxcontroller;
 
-import org.wpilib.util.sendable.SendableRegistry;
-import org.wpilib.opmode.TimedRobot;
-import org.wpilib.driverstation.XboxController;
 import org.wpilib.drive.DifferentialDrive;
+import org.wpilib.driverstation.XboxController;
 import org.wpilib.hardware.motor.PWMSparkMax;
+import org.wpilib.opmode.TimedRobot;
+import org.wpilib.util.sendable.SendableRegistry;
 
 /**
  * This is a demo program showing the use of the DifferentialDrive class. Runs the motors with tank

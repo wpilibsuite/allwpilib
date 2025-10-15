@@ -4,8 +4,8 @@
 
 package org.wpilib.vision.apriltag;
 
-import org.wpilib.vision.apriltag.jni.AprilTagJNI;
 import org.opencv.core.Mat;
+import org.wpilib.vision.apriltag.jni.AprilTagJNI;
 
 /**
  * An AprilTag detector engine. This is expensive to set up and tear down, so most use cases should
