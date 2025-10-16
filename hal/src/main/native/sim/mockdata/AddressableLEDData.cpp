@@ -8,19 +8,19 @@
 #include "../PortsInternal.h"
 #include "AddressableLEDDataInternal.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeAddressableLEDData() {
   static AddressableLEDData sad[kNumAddressableLEDs];
-  ::hal::SimAddressableLEDData = sad;
+  ::wpi::hal::SimAddressableLEDData = sad;
   static AddressableLEDDataBuffer buf;
-  ::hal::SimAddressableLEDDataBuffer = &buf;
+  ::wpi::hal::SimAddressableLEDDataBuffer = &buf;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-AddressableLEDData* hal::SimAddressableLEDData;
-AddressableLEDDataBuffer* hal::SimAddressableLEDDataBuffer;
+AddressableLEDData* wpi::hal::SimAddressableLEDData;
+AddressableLEDDataBuffer* wpi::hal::SimAddressableLEDDataBuffer;
 
 void AddressableLEDData::ResetData() {
   initialized.Reset(false);

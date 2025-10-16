@@ -2,34 +2,34 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/Counter.h"
+#include "wpi/hal/Counter.h"
 
 #include "CounterInternal.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
-#include "hal/handles/HandlesInternal.h"
-#include "hal/handles/LimitedHandleResource.h"
+#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/hal/handles/LimitedHandleResource.h"
 
-namespace hal {
+namespace wpi::hal {
 
 LimitedHandleResource<HAL_CounterHandle, Counter, kNumCounters,
                       HAL_HandleEnum::Counter>* counterHandles;
-}  // namespace hal
+}  // namespace wpi::hal
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeCounter() {
   static LimitedHandleResource<HAL_CounterHandle, Counter, kNumCounters,
                                HAL_HandleEnum::Counter>
       cH;
   counterHandles = &cH;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 HAL_CounterHandle HAL_InitializeCounter(int channel, HAL_Bool risingEdge,
                                         const char* allocationLocation,
                                         int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
   return 0;
 }
 void HAL_FreeCounter(HAL_CounterHandle counterHandle) {}

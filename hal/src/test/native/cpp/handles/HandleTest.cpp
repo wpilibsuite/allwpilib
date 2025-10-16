@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-#include "hal/handles/IndexedClassedHandleResource.h"
+#include "wpi/hal/handles/IndexedClassedHandleResource.h"
 
 #define HAL_TestHandle HAL_Handle
 
@@ -14,14 +14,14 @@ namespace {
 class MyTestClass {};
 }  // namespace
 
-namespace hal {
+namespace wpi::hal {
 TEST(HandleTest, ClassedHandle) {
-  hal::IndexedClassedHandleResource<HAL_TestHandle, MyTestClass, 8,
-                                    HAL_HandleEnum::Vendor>
+  wpi::hal::IndexedClassedHandleResource<HAL_TestHandle, MyTestClass, 8,
+                                         HAL_HandleEnum::Vendor>
       testClass;
   int32_t status = 0;
   testClass.Allocate(0, std::make_unique<MyTestClass>(), &status);
   EXPECT_EQ(0, status);
 }
 
-}  // namespace hal
+}  // namespace wpi::hal

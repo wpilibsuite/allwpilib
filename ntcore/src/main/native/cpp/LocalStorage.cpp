@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "LocalStorage.h"
+#include "LocalStorage.hpp"
 
 #include <vector>
 
-using namespace nt;
+using namespace wpi::nt;
 
 std::vector<NT_Topic> LocalStorage::GetTopics(std::string_view prefix,
                                               unsigned int types) {

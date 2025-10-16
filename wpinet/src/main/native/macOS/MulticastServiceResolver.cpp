@@ -4,7 +4,7 @@
 
 #if defined(__APPLE__)
 
-#include "wpinet/MulticastServiceResolver.h"
+#include "wpi/net/MulticastServiceResolver.h"
 
 #include <netinet/in.h>
 #include <poll.h>
@@ -16,12 +16,12 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/SmallVector.h>
+#include <wpi/util/SmallVector.hpp>
 
-#include "ResolverThread.h"
+#include "ResolverThread.hpp"
 #include "dns_sd.h"
 
-using namespace wpi;
+using namespace wpi::net;
 
 struct DnsResolveState {
   DnsResolveState(MulticastServiceResolver::Impl* impl,
@@ -215,17 +215,17 @@ void MulticastServiceResolver::Stop() {
   if (!pImpl->serviceRef) {
     return;
   }
-  wpi::SmallVector<WPI_EventHandle, 8> cleanupEvents;
+  wpi::util::SmallVector<WPI_EventHandle, 8> cleanupEvents;
   for (auto&& i : pImpl->ResolveStates) {
     cleanupEvents.push_back(
         pImpl->thread->RemoveServiceRefOutsideThread(i->ResolveRef));
   }
   cleanupEvents.push_back(
       pImpl->thread->RemoveServiceRefOutsideThread(pImpl->serviceRef));
-  wpi::SmallVector<WPI_Handle, 8> signaledBuf;
+  wpi::util::SmallVector<WPI_Handle, 8> signaledBuf;
   signaledBuf.resize(cleanupEvents.size());
   while (!cleanupEvents.empty()) {
-    auto signaled = wpi::WaitForObjects(cleanupEvents, signaledBuf);
+    auto signaled = wpi::util::WaitForObjects(cleanupEvents, signaledBuf);
     for (auto&& s : signaled) {
       cleanupEvents.erase(
           std::find(cleanupEvents.begin(), cleanupEvents.end(), s));

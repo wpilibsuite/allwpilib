@@ -7,23 +7,23 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/DriverStation.h"
-#include "frc/Joystick.h"
-#include "frc/simulation/DriverStationSim.h"
-#include "frc/simulation/SimHooks.h"
+#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/Joystick.hpp"
+#include "wpi/simulation/DriverStationSim.hpp"
+#include "wpi/simulation/SimHooks.hpp"
 
 class IsJoystickConnectedParametersTest
     : public ::testing::TestWithParam<std::tuple<int, int, int, bool>> {};
 
 TEST_P(IsJoystickConnectedParametersTest, IsJoystickConnected) {
-  frc::sim::DriverStationSim::SetJoystickAxisCount(1, std::get<0>(GetParam()));
-  frc::sim::DriverStationSim::SetJoystickButtonCount(1,
+  wpi::sim::DriverStationSim::SetJoystickAxisCount(1, std::get<0>(GetParam()));
+  wpi::sim::DriverStationSim::SetJoystickButtonCount(1,
                                                      std::get<1>(GetParam()));
-  frc::sim::DriverStationSim::SetJoystickPOVCount(1, std::get<2>(GetParam()));
-  frc::sim::DriverStationSim::NotifyNewData();
+  wpi::sim::DriverStationSim::SetJoystickPOVCount(1, std::get<2>(GetParam()));
+  wpi::sim::DriverStationSim::NotifyNewData();
 
   ASSERT_EQ(std::get<3>(GetParam()),
-            frc::DriverStation::IsJoystickConnected(1));
+            wpi::DriverStation::IsJoystickConnected(1));
 }
 
 INSTANTIATE_TEST_SUITE_P(IsConnectedTests, IsJoystickConnectedParametersTest,
@@ -42,16 +42,16 @@ TEST_P(JoystickConnectionWarningTest, JoystickConnectionWarnings) {
   ::testing::internal::CaptureStderr();
 
   // Set FMS and Silence settings
-  frc::sim::DriverStationSim::SetFmsAttached(std::get<0>(GetParam()));
-  frc::sim::DriverStationSim::NotifyNewData();
-  frc::DriverStation::SilenceJoystickConnectionWarning(std::get<1>(GetParam()));
+  wpi::sim::DriverStationSim::SetFmsAttached(std::get<0>(GetParam()));
+  wpi::sim::DriverStationSim::NotifyNewData();
+  wpi::DriverStation::SilenceJoystickConnectionWarning(std::get<1>(GetParam()));
 
   // Create joystick and attempt to retrieve button.
-  frc::Joystick joystick(0);
+  wpi::Joystick joystick(0);
   joystick.GetRawButton(1);
 
-  frc::sim::StepTiming(1_s);
-  EXPECT_EQ(frc::DriverStation::IsJoystickConnectionWarningSilenced(),
+  wpi::sim::StepTiming(1_s);
+  EXPECT_EQ(wpi::DriverStation::IsJoystickConnectionWarningSilenced(),
             std::get<2>(GetParam()));
   EXPECT_EQ(::testing::internal::GetCapturedStderr().substr(
                 0, std::get<3>(GetParam()).size()),

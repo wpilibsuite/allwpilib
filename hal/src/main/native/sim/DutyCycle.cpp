@@ -2,19 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/DutyCycle.h"
+#include "wpi/hal/DutyCycle.h"
 
 #include <string>
 
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
-#include "hal/Errors.h"
-#include "hal/handles/HandlesInternal.h"
-#include "hal/handles/IndexedHandleResource.h"
 #include "mockdata/DutyCycleDataInternal.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/hal/handles/IndexedHandleResource.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
 namespace {
 struct DutyCycle {
@@ -27,31 +27,31 @@ struct Empty {};
 static IndexedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
                              HAL_HandleEnum::DutyCycle>* dutyCycleHandles;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeDutyCycle() {
   static IndexedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
                                HAL_HandleEnum::DutyCycle>
       dcH;
   dutyCycleHandles = &dcH;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 HAL_DutyCycleHandle HAL_InitializeDutyCycle(int32_t channel,
                                             const char* allocationLocation,
                                             int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
 
   HAL_DutyCycleHandle handle = HAL_kInvalidHandle;
   auto dutyCycle = dutyCycleHandles->Allocate(channel, &handle, status);
 
   if (*status != 0) {
     if (dutyCycle) {
-      hal::SetLastErrorPreviouslyAllocated(status, "SmartIo", channel,
-                                           dutyCycle->previousAllocation);
+      wpi::hal::SetLastErrorPreviouslyAllocated(status, "SmartIo", channel,
+                                                dutyCycle->previousAllocation);
     } else {
-      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Duty Cycle",
-                                       0, kNumDutyCycles, channel);
+      wpi::hal::SetLastErrorIndexOutOfRange(
+          status, "Invalid Index for Duty Cycle", 0, kNumDutyCycles, channel);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
   }

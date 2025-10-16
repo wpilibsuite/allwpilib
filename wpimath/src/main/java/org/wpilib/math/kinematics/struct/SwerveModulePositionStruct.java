@@ -1,0 +1,50 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package org.wpilib.math.kinematics.struct;
+
+import java.nio.ByteBuffer;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.kinematics.SwerveModulePosition;
+import org.wpilib.util.struct.Struct;
+
+public class SwerveModulePositionStruct implements Struct<SwerveModulePosition> {
+  @Override
+  public Class<SwerveModulePosition> getTypeClass() {
+    return SwerveModulePosition.class;
+  }
+
+  @Override
+  public String getTypeName() {
+    return "SwerveModulePosition";
+  }
+
+  @Override
+  public int getSize() {
+    return kSizeDouble + Rotation2d.struct.getSize();
+  }
+
+  @Override
+  public String getSchema() {
+    return "double distance;Rotation2d angle";
+  }
+
+  @Override
+  public Struct<?>[] getNested() {
+    return new Struct<?>[] {Rotation2d.struct};
+  }
+
+  @Override
+  public SwerveModulePosition unpack(ByteBuffer bb) {
+    double distance = bb.getDouble();
+    Rotation2d angle = Rotation2d.struct.unpack(bb);
+    return new SwerveModulePosition(distance, angle);
+  }
+
+  @Override
+  public void pack(ByteBuffer bb, SwerveModulePosition value) {
+    bb.putDouble(value.distance);
+    Rotation2d.struct.pack(bb, value.angle);
+  }
+}

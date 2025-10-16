@@ -2,6 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <cscore.h>
-#include <hal/HAL.h>
-#include <ntcore.h>
+#include <wpi/cscore/cscore.h>
+
+#include <wpi/hal/HAL.h>
+#include <wpi/ntcore/ntcore.h>

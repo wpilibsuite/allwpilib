@@ -15,21 +15,21 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/StringExtras.h"
+#include "wpi/util/StringExtras.hpp"
 
 #include <algorithm>
 #include <cstdlib>
 #include <string_view>
 
-#include "wpi/SmallString.h"
+#include "wpi/util/SmallString.hpp"
 
 // strncasecmp() is not available on non-POSIX systems, so define an
 // alternative function here.
 static int ascii_strncasecmp(const char* lhs, const char* rhs,
                              size_t length) noexcept {
   for (size_t i = 0; i < length; ++i) {
-    unsigned char lhc = wpi::toLower(lhs[i]);
-    unsigned char rhc = wpi::toLower(rhs[i]);
+    unsigned char lhc = wpi::util::toLower(lhs[i]);
+    unsigned char rhc = wpi::util::toLower(rhs[i]);
     if (lhc != rhc) {
       return lhc < rhc ? -1 : 1;
     }
@@ -37,7 +37,7 @@ static int ascii_strncasecmp(const char* lhs, const char* rhs,
   return 0;
 }
 
-int wpi::compare_lower(std::string_view lhs, std::string_view rhs) noexcept {
+int wpi::util::compare_lower(std::string_view lhs, std::string_view rhs) noexcept {
   if (int Res = ascii_strncasecmp(lhs.data(), rhs.data(),
                                   (std::min)(lhs.size(), rhs.size()))) {
     return Res;
@@ -48,7 +48,7 @@ int wpi::compare_lower(std::string_view lhs, std::string_view rhs) noexcept {
   return lhs.size() < rhs.size() ? -1 : 1;
 }
 
-std::string_view::size_type wpi::find_lower(
+std::string_view::size_type wpi::util::find_lower(
     std::string_view str, char ch, std::string_view::size_type from) noexcept {
   char lch = toLower(ch);
   auto s = drop_front(str, from);
@@ -61,7 +61,7 @@ std::string_view::size_type wpi::find_lower(
   return std::string_view::npos;
 }
 
-std::string_view::size_type wpi::find_lower(
+std::string_view::size_type wpi::util::find_lower(
     std::string_view str, std::string_view other,
     std::string_view::size_type from) noexcept {
   auto s = substr(str, from);
@@ -75,7 +75,7 @@ std::string_view::size_type wpi::find_lower(
   return std::string_view::npos;
 }
 
-std::string_view::size_type wpi::rfind_lower(
+std::string_view::size_type wpi::util::rfind_lower(
     std::string_view str, char ch, std::string_view::size_type from) noexcept {
   from = (std::min)(from, str.size());
   auto data = str.data();
@@ -89,7 +89,7 @@ std::string_view::size_type wpi::rfind_lower(
   return std::string_view::npos;
 }
 
-std::string_view::size_type wpi::rfind_lower(std::string_view str,
+std::string_view::size_type wpi::util::rfind_lower(std::string_view str,
                                              std::string_view other) noexcept {
   std::string_view::size_type n = other.size();
   if (n > str.size()) {
@@ -104,13 +104,13 @@ std::string_view::size_type wpi::rfind_lower(std::string_view str,
   return std::string_view::npos;
 }
 
-bool wpi::starts_with_lower(std::string_view str,
+bool wpi::util::starts_with_lower(std::string_view str,
                             std::string_view prefix) noexcept {
   return str.size() >= prefix.size() &&
          ascii_strncasecmp(str.data(), prefix.data(), prefix.size()) == 0;
 }
 
-bool wpi::ends_with_lower(std::string_view str,
+bool wpi::util::ends_with_lower(std::string_view str,
                           std::string_view suffix) noexcept {
   return str.size() >= suffix.size() &&
          ascii_strncasecmp(str.data() + str.size() - suffix.size(),
@@ -122,22 +122,22 @@ static unsigned GetAutoSenseRadix(std::string_view& str) noexcept {
     return 10;
   }
 
-  if (wpi::starts_with(str, "0x") || wpi::starts_with(str, "0X")) {
+  if (wpi::util::starts_with(str, "0x") || wpi::util::starts_with(str, "0X")) {
     str.remove_prefix(2);
     return 16;
   }
 
-  if (wpi::starts_with(str, "0b") || wpi::starts_with(str, "0B")) {
+  if (wpi::util::starts_with(str, "0b") || wpi::util::starts_with(str, "0B")) {
     str.remove_prefix(2);
     return 2;
   }
 
-  if (wpi::starts_with(str, "0o")) {
+  if (wpi::util::starts_with(str, "0o")) {
     str.remove_prefix(2);
     return 8;
   }
 
-  if (str[0] == '0' && str.size() > 1 && wpi::isDigit(str[1])) {
+  if (str[0] == '0' && str.size() > 1 && wpi::util::isDigit(str[1])) {
     str.remove_prefix(1);
     return 8;
   }
@@ -145,7 +145,7 @@ static unsigned GetAutoSenseRadix(std::string_view& str) noexcept {
   return 10;
 }
 
-bool wpi::detail::ConsumeUnsignedInteger(
+bool wpi::util::detail::ConsumeUnsignedInteger(
     std::string_view& str, unsigned radix,
     unsigned long long& result) noexcept {  // NOLINT(runtime/int)
   // Autosense radix if not specified.
@@ -201,14 +201,14 @@ bool wpi::detail::ConsumeUnsignedInteger(
   return false;
 }
 
-bool wpi::detail::ConsumeSignedInteger(
+bool wpi::util::detail::ConsumeSignedInteger(
     std::string_view& str, unsigned radix,
     long long& result) noexcept {  // NOLINT(runtime/int)
   unsigned long long ullVal;       // NOLINT(runtime/int)
 
   // Handle positive strings first.
   if (str.empty() || str.front() != '-') {
-    if (wpi::detail::ConsumeUnsignedInteger(str, radix, ullVal) ||
+    if (wpi::util::detail::ConsumeUnsignedInteger(str, radix, ullVal) ||
         // Check for value so large it overflows a signed value.
         static_cast<long long>(ullVal) < 0) {  // NOLINT(runtime/int)
       return true;
@@ -218,8 +218,8 @@ bool wpi::detail::ConsumeSignedInteger(
   }
 
   // Get the positive part of the value.
-  std::string_view str2 = wpi::drop_front(str);
-  if (wpi::detail::ConsumeUnsignedInteger(str2, radix, ullVal) ||
+  std::string_view str2 = wpi::util::drop_front(str);
+  if (wpi::util::detail::ConsumeUnsignedInteger(str2, radix, ullVal) ||
       // Reject values so large they'd overflow as negative signed, but allow
       // "-0".  This negates the unsigned so that the negative isn't undefined
       // on signed overflow.
@@ -232,10 +232,10 @@ bool wpi::detail::ConsumeSignedInteger(
   return false;
 }
 
-bool wpi::detail::GetAsUnsignedInteger(
+bool wpi::util::detail::GetAsUnsignedInteger(
     std::string_view str, unsigned radix,
     unsigned long long& result) noexcept {  // NOLINT(runtime/int)
-  if (wpi::detail::ConsumeUnsignedInteger(str, radix, result)) {
+  if (wpi::util::detail::ConsumeUnsignedInteger(str, radix, result)) {
     return true;
   }
 
@@ -244,10 +244,10 @@ bool wpi::detail::GetAsUnsignedInteger(
   return !str.empty();
 }
 
-bool wpi::detail::GetAsSignedInteger(
+bool wpi::util::detail::GetAsSignedInteger(
     std::string_view str, unsigned radix,
     long long& result) noexcept {  // NOLINT(runtime/int)
-  if (wpi::detail::ConsumeSignedInteger(str, radix, result)) {
+  if (wpi::util::detail::ConsumeSignedInteger(str, radix, result)) {
     return true;
   }
 
@@ -257,11 +257,11 @@ bool wpi::detail::GetAsSignedInteger(
 }
 
 template <>
-std::optional<float> wpi::parse_float<float>(std::string_view str) noexcept {
+std::optional<float> wpi::util::parse_float<float>(std::string_view str) noexcept {
   if (str.empty()) {
     return std::nullopt;
   }
-  wpi::SmallString<32> storage{str};
+  wpi::util::SmallString<32> storage{str};
   char* end;
   float val = std::strtof(storage.c_str(), &end);
   if (*end != '\0') {
@@ -271,11 +271,11 @@ std::optional<float> wpi::parse_float<float>(std::string_view str) noexcept {
 }
 
 template <>
-std::optional<double> wpi::parse_float<double>(std::string_view str) noexcept {
+std::optional<double> wpi::util::parse_float<double>(std::string_view str) noexcept {
   if (str.empty()) {
     return std::nullopt;
   }
-  wpi::SmallString<32> storage{str};
+  wpi::util::SmallString<32> storage{str};
   char* end;
   double val = std::strtod(storage.c_str(), &end);
   if (*end != '\0') {
@@ -285,12 +285,12 @@ std::optional<double> wpi::parse_float<double>(std::string_view str) noexcept {
 }
 
 template <>
-std::optional<long double> wpi::parse_float<long double>(
+std::optional<long double> wpi::util::parse_float<long double>(
     std::string_view str) noexcept {
   if (str.empty()) {
     return std::nullopt;
   }
-  wpi::SmallString<32> storage{str};
+  wpi::util::SmallString<32> storage{str};
   char* end;
   long double val = std::strtold(storage.c_str(), &end);
   if (*end != '\0') {
@@ -299,8 +299,8 @@ std::optional<long double> wpi::parse_float<long double>(
   return val;
 }
 
-std::pair<std::string_view, std::string_view> wpi::UnescapeCString(
-    std::string_view str, wpi::SmallVectorImpl<char>& buf) {
+std::pair<std::string_view, std::string_view> wpi::util::UnescapeCString(
+    std::string_view str, wpi::util::SmallVectorImpl<char>& buf) {
   buf.clear();
   buf.reserve(str.size());
   const char* s = str.data();
@@ -338,10 +338,10 @@ std::pair<std::string_view, std::string_view> wpi::UnescapeCString(
           buf.push_back('x');  // treat it like a unknown escape
           break;
         }
-        unsigned int ch = wpi::hexDigitValue(*++s);
+        unsigned int ch = wpi::util::hexDigitValue(*++s);
         if ((s + 1) < end && std::isxdigit(*(s + 1))) {
           ch <<= 4;
-          ch |= wpi::hexDigitValue(*++s);
+          ch |= wpi::util::hexDigitValue(*++s);
         }
         buf.push_back(static_cast<char>(ch));
         break;
@@ -358,11 +358,11 @@ std::pair<std::string_view, std::string_view> wpi::UnescapeCString(
       case '9': {
         // octal escape
         unsigned int ch = *s - '0';
-        if ((s + 1) < end && wpi::isDigit(*(s + 1))) {
+        if ((s + 1) < end && wpi::util::isDigit(*(s + 1))) {
           ch <<= 3;
           ch |= *++s - '0';
         }
-        if ((s + 1) < end && wpi::isDigit(*(s + 1))) {
+        if ((s + 1) < end && wpi::util::isDigit(*(s + 1))) {
           ch <<= 3;
           ch |= *++s - '0';
         }

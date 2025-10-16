@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/sendable/SendableRegistry.h"
+#include "wpi/util/sendable/SendableRegistry.hpp"
 
 #include <memory>
 #include <string>
@@ -10,14 +10,14 @@
 
 #include <fmt/format.h>
 
-#include "wpi/DenseMap.h"
-#include "wpi/SmallVector.h"
-#include "wpi/UidVector.h"
-#include "wpi/mutex.h"
-#include "wpi/sendable/Sendable.h"
-#include "wpi/sendable/SendableBuilder.h"
+#include "wpi/util/DenseMap.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/UidVector.hpp"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/sendable/Sendable.hpp"
+#include "wpi/util/sendable/SendableBuilder.hpp"
 
-using namespace wpi;
+using namespace wpi::util;
 
 namespace {
 struct Component {
@@ -26,7 +26,7 @@ struct Component {
   std::string name;
   std::string subsystem = "Ungrouped";
   Sendable* parent = nullptr;
-  wpi::SmallVector<std::shared_ptr<void>, 2> data;
+  wpi::util::SmallVector<std::shared_ptr<void>, 2> data;
 
   void SetName(std::string_view moduleType, int channel) {
     name = fmt::format("{}[{}]", moduleType, channel);
@@ -38,10 +38,10 @@ struct Component {
 };
 
 struct SendableRegistryInst {
-  wpi::recursive_mutex mutex;
+  wpi::util::recursive_mutex mutex;
 
-  wpi::UidVector<std::unique_ptr<Component>, 32> components;
-  wpi::DenseMap<void*, SendableRegistry::UID> componentMap;
+  wpi::util::UidVector<std::unique_ptr<Component>, 32> components;
+  wpi::util::DenseMap<void*, SendableRegistry::UID> componentMap;
   int nextDataHandle = 0;
 
   Component& GetOrAdd(void* sendable, SendableRegistry::UID* uid = nullptr);
@@ -72,11 +72,11 @@ static SendableRegistryInst& GetInstance() {
 }
 
 #ifndef __FRC_SYSTEMCORE__
-namespace wpi::impl {
+namespace wpi::util::impl {
 void ResetSendableRegistry() {
   std::make_unique<SendableRegistryInst>().swap(GetInstanceHolder());
 }
-}  // namespace wpi::impl
+}  // namespace wpi::util::impl
 #endif
 
 void SendableRegistry::EnsureInitialized() {

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/PowerDistribution.h"
+#include "wpi/hal/PowerDistribution.h"
 
 #include <fmt/format.h>
 
@@ -10,11 +10,11 @@
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
-#include "hal/CANAPI.h"
-#include "hal/Errors.h"
 #include "mockdata/PowerDistributionDataInternal.h"
+#include "wpi/hal/CANAPI.h"
+#include "wpi/hal/Errors.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
 static constexpr HAL_CANManufacturer manufacturer =
     HAL_CANManufacturer::HAL_CAN_Man_kCTRE;
@@ -22,9 +22,9 @@ static constexpr HAL_CANManufacturer manufacturer =
 static constexpr HAL_CANDeviceType deviceType =
     HAL_CANDeviceType::HAL_CAN_Dev_kPowerDistribution;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializePowerDistribution() {}
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
@@ -33,7 +33,7 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
   if (type == HAL_PowerDistributionType_kAutomatic) {
     if (module != HAL_DEFAULT_POWER_DISTRIBUTION_MODULE) {
       *status = PARAMETER_OUT_OF_RANGE;
-      hal::SetLastError(
+      wpi::hal::SetLastError(
           status, "Automatic PowerDistributionType must have default module");
       return HAL_kInvalidHandle;
     }
@@ -46,15 +46,16 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
   if (!HAL_CheckPowerDistributionModule(module, type)) {
     *status = RESOURCE_OUT_OF_RANGE;
     if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE) {
-      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for CTRE PDP", 0,
-                                       kNumCTREPDPModules - 1, module);
+      wpi::hal::SetLastErrorIndexOutOfRange(status,
+                                            "Invalid Index for CTRE PDP", 0,
+                                            kNumCTREPDPModules - 1, module);
     } else {
-      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PDH", 1,
-                                       kNumREVPDHModules, module);
+      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PDH",
+                                            1, kNumREVPDHModules, module);
     }
     return HAL_kInvalidHandle;
   }
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
   SimPowerDistributionData[module].initialized = true;
   auto handle =
       HAL_InitializeCAN(busId, manufacturer, module, deviceType, status);
@@ -69,7 +70,7 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
 
 int32_t HAL_GetPowerDistributionModuleNumber(HAL_PowerDistributionHandle handle,
                                              int32_t* status) {
-  auto module = hal::can::GetCANModuleFromHandle(handle, status);
+  auto module = wpi::hal::can::GetCANModuleFromHandle(handle, status);
   if (*status != 0) {
     return 0;
   }
@@ -116,7 +117,7 @@ void HAL_CleanPowerDistribution(HAL_PowerDistributionHandle handle) {
 
 double HAL_GetPowerDistributionTemperature(HAL_PowerDistributionHandle handle,
                                            int32_t* status) {
-  auto module = hal::can::GetCANModuleFromHandle(handle, status);
+  auto module = wpi::hal::can::GetCANModuleFromHandle(handle, status);
   if (*status != 0) {
     return 0.0;
   }
@@ -124,7 +125,7 @@ double HAL_GetPowerDistributionTemperature(HAL_PowerDistributionHandle handle,
 }
 double HAL_GetPowerDistributionVoltage(HAL_PowerDistributionHandle handle,
                                        int32_t* status) {
-  auto module = hal::can::GetCANModuleFromHandle(handle, status);
+  auto module = wpi::hal::can::GetCANModuleFromHandle(handle, status);
   if (*status != 0) {
     return 0.0;
   }
@@ -132,7 +133,7 @@ double HAL_GetPowerDistributionVoltage(HAL_PowerDistributionHandle handle,
 }
 double HAL_GetPowerDistributionChannelCurrent(
     HAL_PowerDistributionHandle handle, int32_t channel, int32_t* status) {
-  auto module = hal::can::GetCANModuleFromHandle(handle, status);
+  auto module = wpi::hal::can::GetCANModuleFromHandle(handle, status);
   if (*status != 0) {
     return 0.0;
   }
@@ -141,7 +142,7 @@ double HAL_GetPowerDistributionChannelCurrent(
 void HAL_GetPowerDistributionAllChannelCurrents(
     HAL_PowerDistributionHandle handle, double* currents,
     int32_t currentsLength, int32_t* status) {
-  auto module = hal::can::GetCANModuleFromHandle(handle, status);
+  auto module = wpi::hal::can::GetCANModuleFromHandle(handle, status);
   if (*status != 0) {
     return;
   }
@@ -154,7 +155,7 @@ void HAL_GetPowerDistributionAllChannelCurrents(
 }
 double HAL_GetPowerDistributionTotalCurrent(HAL_PowerDistributionHandle handle,
                                             int32_t* status) {
-  auto module = hal::can::GetCANModuleFromHandle(handle, status);
+  auto module = wpi::hal::can::GetCANModuleFromHandle(handle, status);
   if (*status != 0) {
     return 0.0;
   }

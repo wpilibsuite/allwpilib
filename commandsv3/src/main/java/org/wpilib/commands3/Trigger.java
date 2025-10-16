@@ -4,17 +4,17 @@
 
 package org.wpilib.commands3;
 
-import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+import static org.wpilib.units.Units.Seconds;
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.wpilibj.event.EventLoop;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
+import org.wpilib.event.EventLoop;
+import org.wpilib.math.filter.Debouncer;
+import org.wpilib.units.measure.Time;
 
 /**
  * Triggers allow users to specify conditions for when commands should run. Triggers can be set up

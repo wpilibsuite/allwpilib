@@ -13,7 +13,7 @@
 struct HAL_MatchInfo;
 struct HAL_Value;
 
-namespace hal {
+namespace wpi::hal {
 
 void ReportError(JNIEnv* env, int32_t status, bool doThrow = true);
 
@@ -84,6 +84,6 @@ jobject CreateCANStreamMessage(JNIEnv* env);
 
 JavaVM* GetJVM();
 
-}  // namespace hal
+}  // namespace wpi::hal
 
 #endif  // HAL_HAL_SRC_MAIN_NATIVE_CPP_JNI_HALUTIL_H_

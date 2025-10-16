@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "Drivetrain.h"
+#include "Drivetrain.hpp"
 
 #include <vector>
 
@@ -28,11 +28,12 @@ Drivetrain::Drivetrain() {
   m_leftEncoder.Reset();
   m_rightEncoder.Reset();
 
-  frc::SmartDashboard::PutData("FieldSim", &m_fieldSim);
-  frc::SmartDashboard::PutData("Approximation", &m_fieldApproximation);
+  wpi::SmartDashboard::PutData("FieldSim", &m_fieldSim);
+  wpi::SmartDashboard::PutData("Approximation", &m_fieldApproximation);
 }
 
-void Drivetrain::SetSpeeds(const frc::DifferentialDriveWheelSpeeds& speeds) {
+void Drivetrain::SetSpeeds(
+    const wpi::math::DifferentialDriveWheelSpeeds& speeds) {
   const auto leftFeedforward = m_feedforward.Calculate(speeds.left);
   const auto rightFeedforward = m_feedforward.Calculate(speeds.right);
   const double leftOutput = m_leftPIDController.Calculate(
@@ -40,22 +41,22 @@ void Drivetrain::SetSpeeds(const frc::DifferentialDriveWheelSpeeds& speeds) {
   const double rightOutput = m_rightPIDController.Calculate(
       m_rightEncoder.GetRate(), speeds.right.value());
 
-  m_leftLeader.SetVoltage(units::volt_t{leftOutput} + leftFeedforward);
-  m_rightLeader.SetVoltage(units::volt_t{rightOutput} + rightFeedforward);
+  m_leftLeader.SetVoltage(wpi::units::volt_t{leftOutput} + leftFeedforward);
+  m_rightLeader.SetVoltage(wpi::units::volt_t{rightOutput} + rightFeedforward);
 }
 
-void Drivetrain::Drive(units::meters_per_second_t xSpeed,
-                       units::radians_per_second_t rot) {
+void Drivetrain::Drive(wpi::units::meters_per_second_t xSpeed,
+                       wpi::units::radians_per_second_t rot) {
   SetSpeeds(m_kinematics.ToWheelSpeeds({xSpeed, 0_mps, rot}));
 }
 
 void Drivetrain::PublishCameraToObject(
-    frc::Pose3d objectInField, frc::Transform3d robotToCamera,
-    nt::DoubleArrayEntry& cameraToObjectEntry,
-    frc::sim::DifferentialDrivetrainSim drivetrainSimulator) {
-  frc::Pose3d robotInField{drivetrainSimulator.GetPose()};
-  frc::Pose3d cameraInField = robotInField + robotToCamera;
-  frc::Transform3d cameraToObject{cameraInField, objectInField};
+    wpi::math::Pose3d objectInField, wpi::math::Transform3d robotToCamera,
+    wpi::nt::DoubleArrayEntry& cameraToObjectEntry,
+    wpi::sim::DifferentialDrivetrainSim drivetrainSimulator) {
+  wpi::math::Pose3d robotInField{drivetrainSimulator.GetPose()};
+  wpi::math::Pose3d cameraInField = robotInField + robotToCamera;
+  wpi::math::Transform3d cameraToObject{cameraInField, objectInField};
 
   // Publishes double array with Translation3D elements {x, y, z} and Rotation3D
   // elements {w, x, y, z} which describe the cameraToObject transformation.
@@ -69,24 +70,27 @@ void Drivetrain::PublishCameraToObject(
   cameraToObjectEntry.Set(val);
 }
 
-frc::Pose3d Drivetrain::ObjectToRobotPose(
-    frc::Pose3d objectInField, frc::Transform3d robotToCamera,
-    nt::DoubleArrayEntry& cameraToObjectEntry) {
+wpi::math::Pose3d Drivetrain::ObjectToRobotPose(
+    wpi::math::Pose3d objectInField, wpi::math::Transform3d robotToCamera,
+    wpi::nt::DoubleArrayEntry& cameraToObjectEntry) {
   std::vector<double> val{cameraToObjectEntry.Get()};
 
   // Reconstruct cameraToObject Transform3D from networktables.
-  frc::Translation3d translation{units::meter_t{val[0]}, units::meter_t{val[1]},
-                                 units::meter_t{val[2]}};
-  frc::Rotation3d rotation{frc::Quaternion{val[3], val[4], val[5], val[6]}};
-  frc::Transform3d cameraToObject{translation, rotation};
+  wpi::math::Translation3d translation{wpi::units::meter_t{val[0]},
+                                       wpi::units::meter_t{val[1]},
+                                       wpi::units::meter_t{val[2]}};
+  wpi::math::Rotation3d rotation{
+      wpi::math::Quaternion{val[3], val[4], val[5], val[6]}};
+  wpi::math::Transform3d cameraToObject{translation, rotation};
 
-  return frc::ObjectToRobotPose(objectInField, cameraToObject, robotToCamera);
+  return wpi::math::ObjectToRobotPose(objectInField, cameraToObject,
+                                      robotToCamera);
 }
 
 void Drivetrain::UpdateOdometry() {
   m_poseEstimator.Update(m_imu.GetRotation2d(),
-                         units::meter_t{m_leftEncoder.GetDistance()},
-                         units::meter_t{m_rightEncoder.GetDistance()});
+                         wpi::units::meter_t{m_leftEncoder.GetDistance()},
+                         wpi::units::meter_t{m_rightEncoder.GetDistance()});
 
   // Publish cameraToObject transformation to networktables --this would
   // normally be handled by the computer vision solution.
@@ -95,28 +99,28 @@ void Drivetrain::UpdateOdometry() {
 
   // Compute the robot's field-relative position exclusively from vision
   // measurements.
-  frc::Pose3d visionMeasurement3d = ObjectToRobotPose(
+  wpi::math::Pose3d visionMeasurement3d = ObjectToRobotPose(
       m_objectInField, m_robotToCamera, m_cameraToObjectEntryRef);
 
-  // Convert robot's pose from Pose3d to Pose2d needed to apply vision
-  // measurements.
-  frc::Pose2d visionMeasurement2d = visionMeasurement3d.ToPose2d();
+  // Convert robot's pose from wpi::math::Pose3d to wpi::math::Pose2d needed to
+  // apply vision measurements.
+  wpi::math::Pose2d visionMeasurement2d = visionMeasurement3d.ToPose2d();
 
   // Apply vision measurements. For simulation purposes only, we don't input a
   // latency delay -- on a real robot, this must be calculated based either on
   // known latency or timestamps.
   m_poseEstimator.AddVisionMeasurement(visionMeasurement2d,
-                                       frc::Timer::GetTimestamp());
+                                       wpi::Timer::GetTimestamp());
 }
 
 void Drivetrain::SimulationPeriodic() {
   // To update our simulation, we set motor voltage inputs, update the
   // simulation, and write the simulated positions and velocities to our
   // simulated encoder and gyro.
-  m_drivetrainSimulator.SetInputs(units::volt_t{m_leftLeader.Get()} *
-                                      frc::RobotController::GetInputVoltage(),
-                                  units::volt_t{m_rightLeader.Get()} *
-                                      frc::RobotController::GetInputVoltage());
+  m_drivetrainSimulator.SetInputs(wpi::units::volt_t{m_leftLeader.Get()} *
+                                      wpi::RobotController::GetInputVoltage(),
+                                  wpi::units::volt_t{m_rightLeader.Get()} *
+                                      wpi::RobotController::GetInputVoltage());
   m_drivetrainSimulator.Update(20_ms);
 
   m_leftEncoderSim.SetDistance(m_drivetrainSimulator.GetLeftPosition().value());

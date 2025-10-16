@@ -11,15 +11,15 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/SmallPtrSet.h"
-#include "wpi/DenseMapInfo.h"
-#include "wpi/MathExtras.h"
-#include "wpi/MemAlloc.h"
+#include "wpi/util/SmallPtrSet.hpp"
+#include "wpi/util/DenseMapInfo.hpp"
+#include "wpi/util/MathExtras.hpp"
+#include "wpi/util/MemAlloc.hpp"
 #include <algorithm>
 #include <cassert>
 #include <cstdlib>
 
-using namespace wpi;
+using namespace wpi::util;
 
 void SmallPtrSetImplBase::shrink_and_clear() {
   assert(!isSmall() && "Can't shrink a small set!");

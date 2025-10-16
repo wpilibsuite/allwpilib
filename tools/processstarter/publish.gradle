@@ -1,0 +1,68 @@
+apply plugin: 'maven-publish'
+
+def baseArtifactId = 'processstarter'
+def artifactGroupId = 'org.wpilib.tools'
+def zipBaseName = '_GROUP_org_wpilib_tools_ID_processstarter_CLS'
+
+def outputsFolder = file("$project.buildDir/outputs")
+
+model {
+    tasks {
+        // Create the run task.
+        $.components.processstarter.binaries.each { bin ->
+            if (bin.buildable && bin.name.toLowerCase().contains("debug") && nativeUtils.isNativeDesktopPlatform(bin.targetPlatform)) {
+                Task run = project.tasks.create("run", Exec) {
+                    commandLine bin.tasks.install.runScriptFile.get().asFile.toString()
+                }
+                run.dependsOn bin.tasks.install
+            }
+        }
+    }
+    publishing {
+        def processstarterTaskList = []
+        $.components.each { component ->
+            component.binaries.each { binary ->
+                if (binary in NativeExecutableBinarySpec && binary.component.name.contains("processstarter")) {
+                    if (binary.buildable && (binary.name.contains('Release') || binary.name.contains('release'))) {
+                        // We are now in the binary that we want.
+                        // This is the default application path for the ZIP task.
+                        def applicationPath = binary.executable.file
+
+                        // Create the ZIP.
+                        def task = project.tasks.create("copyprocessstarterExecutable" + binary.targetPlatform.architecture.name, Zip) {
+                            description = "Copies the processstarter executable to the outputs directory."
+                            destinationDirectory = outputsFolder
+
+                            archiveBaseName = zipBaseName
+                            duplicatesStrategy = 'exclude'
+                            archiveClassifier = nativeUtils.getPublishClassifier(binary)
+
+                            from(licenseFile) {
+                                into '/'
+                            }
+
+                            from(applicationPath)
+                            into(nativeUtils.getPlatformPath(binary))
+                        }
+
+                        task.dependsOn binary.tasks.link
+                        processstarterTaskList.add(task)
+                        project.build.dependsOn task
+                        project.artifacts { task }
+                        addTaskToCopyAllOutputs(task)
+                    }
+                }
+            }
+        }
+
+        publications {
+            processstarter(MavenPublication) {
+                processstarterTaskList.each { artifact it }
+
+                artifactId = baseArtifactId
+                groupId = artifactGroupId
+                version = wpilibVersioning.version.get()
+            }
+        }
+    }
+}

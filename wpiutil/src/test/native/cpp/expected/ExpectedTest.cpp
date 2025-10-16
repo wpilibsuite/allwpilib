@@ -9,7 +9,7 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/expected"
+#include "wpi/util/expected"
 
 namespace {
 struct TakesInitAndVariadic {
@@ -25,14 +25,14 @@ struct TakesInitAndVariadic {
 
 TEST(ExpectedTest, Emplace) {
   {
-    wpi::expected<std::unique_ptr<int>, int> e;
+    wpi::util::expected<std::unique_ptr<int>, int> e;
     e.emplace(new int{42});
     EXPECT_TRUE(e);
     EXPECT_EQ(**e, 42);
   }
 
   {
-    wpi::expected<std::vector<int>, int> e;
+    wpi::util::expected<std::vector<int>, int> e;
     e.emplace({0, 1});
     EXPECT_TRUE(e);
     EXPECT_EQ((*e)[0], 0);
@@ -40,7 +40,7 @@ TEST(ExpectedTest, Emplace) {
   }
 
   {
-    wpi::expected<std::tuple<int, int>, int> e;
+    wpi::util::expected<std::tuple<int, int>, int> e;
     e.emplace(2, 3);
     EXPECT_TRUE(e);
     EXPECT_EQ(std::get<0>(*e), 2);
@@ -48,7 +48,8 @@ TEST(ExpectedTest, Emplace) {
   }
 
   {
-    wpi::expected<TakesInitAndVariadic, int> e = wpi::make_unexpected(0);
+    wpi::util::expected<TakesInitAndVariadic, int> e =
+        wpi::util::make_unexpected(0);
     e.emplace({0, 1}, 2, 3);
     EXPECT_TRUE(e);
     EXPECT_EQ(e->v[0], 0);

@@ -4,8 +4,8 @@
 
 package org.wpilib.commands3;
 
-import edu.wpi.first.wpilibj.RobotController;
 import java.util.function.Consumer;
+import org.wpilib.system.RobotController;
 
 /**
  * An event that occurs during scheduler processing. This can range from {@link Scheduled a command

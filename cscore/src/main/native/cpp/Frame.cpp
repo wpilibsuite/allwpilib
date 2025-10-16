@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "Frame.h"
+#include "Frame.hpp"
 
 #include <cstdlib>
 #include <memory>
@@ -11,10 +11,10 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include "Instance.h"
-#include "SourceImpl.h"
+#include "Instance.hpp"
+#include "SourceImpl.hpp"
 
-using namespace cs;
+using namespace wpi::cs;
 
 Frame::Frame(SourceImpl& source, std::string_view error, Time time,
              WPI_TimestampSource timeSrc)
@@ -802,10 +802,10 @@ void Frame::ReleaseFrame() {
   m_impl = nullptr;
 }
 
-namespace cs {
-std::unique_ptr<Image> CreateImageFromBGRA(cs::SourceImpl* source, size_t width,
-                                           size_t height, size_t stride,
-                                           const uint8_t* data) {
+namespace wpi::cs {
+std::unique_ptr<Image> CreateImageFromBGRA(wpi::cs::SourceImpl* source,
+                                           size_t width, size_t height,
+                                           size_t stride, const uint8_t* data) {
   cv::Mat finalImage{static_cast<int>(height), static_cast<int>(width), CV_8UC4,
                      const_cast<uint8_t*>(data), stride};
   std::unique_ptr<Image> dest = source->AllocImage(
@@ -813,4 +813,4 @@ std::unique_ptr<Image> CreateImageFromBGRA(cs::SourceImpl* source, size_t width,
   cv::cvtColor(finalImage, dest->AsMat(), cv::COLOR_BGRA2BGR);
   return dest;
 }
-}  // namespace cs
+}  // namespace wpi::cs

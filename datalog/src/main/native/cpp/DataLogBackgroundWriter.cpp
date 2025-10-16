@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/datalog/DataLogBackgroundWriter.h"
+#include "wpi/datalog/DataLogBackgroundWriter.hpp"
 
 #ifndef _WIN32
 #include <unistd.h>
@@ -24,8 +24,8 @@
 
 #include <fmt/format.h>
 
-#include "wpi/Logger.h"
-#include "wpi/fs.h"
+#include "wpi/util/Logger.hpp"
+#include "wpi/util/fs.hpp"
 
 using namespace wpi::log;
 
@@ -53,7 +53,7 @@ DataLogBackgroundWriter::DataLogBackgroundWriter(std::string_view dir,
     : DataLogBackgroundWriter{s_defaultMessageLog, dir, filename, period,
                               extraHeader} {}
 
-DataLogBackgroundWriter::DataLogBackgroundWriter(wpi::Logger& msglog,
+DataLogBackgroundWriter::DataLogBackgroundWriter(wpi::util::Logger& msglog,
                                                  std::string_view dir,
                                                  std::string_view filename,
                                                  double period,
@@ -70,7 +70,7 @@ DataLogBackgroundWriter::DataLogBackgroundWriter(
                               extraHeader} {}
 
 DataLogBackgroundWriter::DataLogBackgroundWriter(
-    wpi::Logger& msglog,
+    wpi::util::Logger& msglog,
     std::function<void(std::span<const uint8_t> data)> write, double period,
     std::string_view extraHeader)
     : DataLog{msglog, extraHeader},
@@ -132,7 +132,7 @@ void DataLogBackgroundWriter::Stop() {
 }
 
 static void WriteToFile(fs::file_t f, std::span<const uint8_t> data,
-                        std::string_view filename, wpi::Logger& msglog) {
+                        std::string_view filename, wpi::util::Logger& msglog) {
   do {
 #ifdef _WIN32
     DWORD ret;
@@ -469,8 +469,8 @@ struct WPI_DataLog* WPI_DataLog_CreateBackgroundWriter(
     const struct WPI_String* dir, const struct WPI_String* filename,
     double period, const struct WPI_String* extraHeader) {
   return reinterpret_cast<WPI_DataLog*>(new DataLogBackgroundWriter{
-      wpi::to_string_view(dir), wpi::to_string_view(filename), period,
-      wpi::to_string_view(extraHeader)});
+      wpi::util::to_string_view(dir), wpi::util::to_string_view(filename),
+      period, wpi::util::to_string_view(extraHeader)});
 }
 
 struct WPI_DataLog* WPI_DataLog_CreateBackgroundWriter_Func(
@@ -478,13 +478,13 @@ struct WPI_DataLog* WPI_DataLog_CreateBackgroundWriter_Func(
     double period, const struct WPI_String* extraHeader) {
   return reinterpret_cast<WPI_DataLog*>(new DataLogBackgroundWriter{
       [=](auto data) { write(ptr, data.data(), data.size()); }, period,
-      wpi::to_string_view(extraHeader)});
+      wpi::util::to_string_view(extraHeader)});
 }
 
 void WPI_DataLog_SetBackgroundWriterFilename(
     struct WPI_DataLog* datalog, const struct WPI_String* filename) {
   reinterpret_cast<DataLogBackgroundWriter*>(datalog)->SetFilename(
-      wpi::to_string_view(filename));
+      wpi::util::to_string_view(filename));
 }
 
 }  // extern "C"

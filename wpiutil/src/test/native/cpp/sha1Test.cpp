@@ -23,9 +23,9 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/sha1.h"
+#include "wpi/util/sha1.hpp"
 
-namespace wpi {
+namespace wpi::util {
 
 /*
  * The 3 test vectors from FIPS PUB 180-1
@@ -87,4 +87,4 @@ TEST(SHA1Test, Concurrent) {
             "a9993e364706816aba3e25717850c26c9cd0d89d"); /* "abc" */
 }
 
-}  // namespace wpi
+}  // namespace wpi::util

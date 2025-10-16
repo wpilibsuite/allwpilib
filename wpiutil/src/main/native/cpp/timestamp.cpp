@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/timestamp.h"
+#include "wpi/util/timestamp.h"
 
 #include <atomic>
 #include <optional>
@@ -19,7 +19,7 @@
 
 #include <cstdio>
 
-#include "wpi/print.h"
+#include "wpi/util/print.hpp"
 
 // offset in microseconds
 static uint64_t time_since_epoch() noexcept {
@@ -78,7 +78,7 @@ static const uint64_t offset_val = timestamp();
 static const uint64_t frequency_val = update_frequency();
 #endif
 
-uint64_t wpi::NowDefault() {
+uint64_t wpi::util::NowDefault() {
 #ifdef _WIN32
   assert(offset_val > 0u);
   assert(frequency_val > 0u);
@@ -95,36 +95,36 @@ uint64_t wpi::NowDefault() {
 #endif
 }
 
-static std::atomic<uint64_t (*)()> now_impl{wpi::NowDefault};
+static std::atomic<uint64_t (*)()> now_impl{wpi::util::NowDefault};
 
-void wpi::SetNowImpl(uint64_t (*func)(void)) {
+void wpi::util::SetNowImpl(uint64_t (*func)(void)) {
   now_impl = func ? func : NowDefault;
 }
 
-uint64_t wpi::Now() {
+uint64_t wpi::util::Now() {
   return (now_impl.load())();
 }
 
-uint64_t wpi::GetSystemTime() {
+uint64_t wpi::util::GetSystemTime() {
   return time_since_epoch();
 }
 
 extern "C" {
 
 uint64_t WPI_NowDefault(void) {
-  return wpi::NowDefault();
+  return wpi::util::NowDefault();
 }
 
 void WPI_SetNowImpl(uint64_t (*func)(void)) {
-  wpi::SetNowImpl(func);
+  wpi::util::SetNowImpl(func);
 }
 
 uint64_t WPI_Now(void) {
-  return wpi::Now();
+  return wpi::util::Now();
 }
 
 uint64_t WPI_GetSystemTime(void) {
-  return wpi::GetSystemTime();
+  return wpi::util::GetSystemTime();
 }
 
 }  // extern "C"

@@ -73,7 +73,7 @@ wpilib_cc_static_library(
 
 cc_library(
     name = "test_headers",
-    srcs = glob(["src/test/native/include/*.h"]),
+    srcs = glob(["src/test/native/include/*.hpp"]),
     includes = ["src/test/native/include"],
     strip_include_prefix = "src/test/native/include",
 )
@@ -103,5 +103,5 @@ cc_binary(
 package_minimal_cc_project(
     name = "halsim_ws_server",
     maven_artifact_name = "halsim_ws_server",
-    maven_group_id = "edu.wpi.first.halsim",
+    maven_group_id = "org.wpilib.halsim",
 )
