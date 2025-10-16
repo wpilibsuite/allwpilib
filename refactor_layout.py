@@ -1283,6 +1283,7 @@ def wpimath_namespaced_classes_and_functions():
         "Debouncer",
         "ApplyDeadband",
         "CopySignPow",
+        "CopyDirectionPow",
         "Debouncer",
         "TrapezoidProfile",
         "ExponentialProfile",
@@ -1967,6 +1968,7 @@ def main():
     
     apply_patch("0026-HAND-FIX-final-frc-replacements.patch")
     apply_patch("0027-HAND-FIX-final-java-package-changes.patch")
+    apply_patch("0028-HAND-FIXES-Fix-ntcoreffi.patch")
 
     # Finally run one last linter pass
     run_linters()

@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Sun, 12 Oct 2025 05:12:38 -0400
-Subject: [PATCH 21/29] HAND FIXES: Update build scripts for namespaces
+Date: Wed, 15 Oct 2025 02:36:02 -0400
+Subject: [PATCH 21/30] HAND FIXES: Update build scripts for namespaces
 
 ---
  apriltag/BUILD.bazel    | 2 +-

@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Sun, 12 Oct 2025 05:12:39 -0400
-Subject: [PATCH 22/29] HAND FIXES: Manual cleanup of namespaces
+Date: Wed, 15 Oct 2025 02:36:03 -0400
+Subject: [PATCH 22/30] HAND FIXES: Manual cleanup of namespaces
 
 ---
  .../src/main/native/cpp/vision/VisionRunner.cpp      |  4 ++--

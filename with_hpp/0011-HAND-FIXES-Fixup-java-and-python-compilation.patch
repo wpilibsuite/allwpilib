@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Sun, 12 Oct 2025 03:40:41 -0400
-Subject: [PATCH 11/29] HAND FIXES: Fixup java and python compilation
+Date: Wed, 15 Oct 2025 02:33:09 -0400
+Subject: [PATCH 11/30] HAND FIXES: Fixup java and python compilation
 
 ---
  .../main/java/org/wpilib/driverstation/DSControlWord.java   | 1 +
@@ -41,9 +41,11 @@ Subject: [PATCH 11/29] HAND FIXES: Fixup java and python compilation
  wpimath/src/main/java/org/wpilib/math/linalg/Matrix.java    | 2 ++
  .../src/main/java/org/wpilib/math/linalg/VecBuilder.java    | 2 ++
  wpimath/src/main/java/org/wpilib/math/linalg/Vector.java    | 2 ++
+ wpimath/src/main/java/org/wpilib/math/util/MathUtil.java    | 1 +
  .../src/main/java/org/wpilib/math/util/StateSpaceUtil.java  | 2 ++
  wpimath/src/test/java/org/wpilib/math/linalg/DARETest.java  | 2 ++
  .../src/test/java/org/wpilib/math/linalg/MatrixTest.java    | 1 +
+ .../src/test/java/org/wpilib/math/util/MathUtilTest.java    | 1 +
  .../test/java/org/wpilib/math/util/StateSpaceUtilTest.java  | 3 +++
  wpiutil/src/dev/java/org/wpilib/util/DevMain.java           | 2 ++
  wpiutil/src/main/java/org/wpilib/util/WPIUtilJNI.java       | 1 +
@@ -51,7 +53,7 @@ Subject: [PATCH 11/29] HAND FIXES: Fixup java and python compilation
  wpiutil/src/main/native/cpp/jni/WPIUtilJNI.cpp              | 2 +-
  wpiutil/src/main/python/semiwrap/Sendable.yml               | 2 +-
  wpiutil/src/main/python/semiwrap/SendableRegistry.yml       | 4 ++--
- 47 files changed, 76 insertions(+), 5 deletions(-)
+ 49 files changed, 78 insertions(+), 5 deletions(-)
 
 diff --git a/wpilibj/src/main/java/org/wpilib/driverstation/DSControlWord.java b/wpilibj/src/main/java/org/wpilib/driverstation/DSControlWord.java
 index 0b68001c0f6567cce5beaab86d01f5c179a33f5b..0a70aacfd41334449afa57c6b5a81413964d1b96 100644
@@ -543,6 +545,18 @@ index 364cfcbd2f04dcdb7e7d0af3521f6efba8ee685a..2e5e849e8f13d230c340becd162f92f2
  import org.wpilib.util.protobuf.Protobuf;
  import org.wpilib.util.protobuf.ProtobufSerializable;
  import org.wpilib.util.struct.Struct;
+diff --git a/wpimath/src/main/java/org/wpilib/math/util/MathUtil.java b/wpimath/src/main/java/org/wpilib/math/util/MathUtil.java
+index e9a1eb64596bd80c27b1945396d3e8ec683b29c5..fd4df6e3ff021f56bae2a91658a594529e456d0d 100644
+--- a/wpimath/src/main/java/org/wpilib/math/util/MathUtil.java
++++ b/wpimath/src/main/java/org/wpilib/math/util/MathUtil.java
+@@ -6,6 +6,7 @@ package org.wpilib.math.util;
+ 
+ import org.wpilib.math.geometry.Translation2d;
+ import org.wpilib.math.geometry.Translation3d;
++import org.wpilib.math.linalg.Vector;
+ 
+ /** Math utility functions. */
+ public final class MathUtil {
 diff --git a/wpimath/src/main/java/org/wpilib/math/util/StateSpaceUtil.java b/wpimath/src/main/java/org/wpilib/math/util/StateSpaceUtil.java
 index ddf239fae0577be501f8c01990d5b94b8a6ead46..3209c0e6dc50694bc4d4076965b20f5b9899614f 100644
 --- a/wpimath/src/main/java/org/wpilib/math/util/StateSpaceUtil.java
@@ -581,6 +595,18 @@ index b54c82883a6910e6e4c233ae395902fc2ad83338..7c04c97353258303e0f1138adaa6924d
  import org.ejml.data.SingularMatrixException;
  import org.junit.jupiter.api.Test;
  
+diff --git a/wpimath/src/test/java/org/wpilib/math/util/MathUtilTest.java b/wpimath/src/test/java/org/wpilib/math/util/MathUtilTest.java
+index 039effa5c4bcbd9ce85cf040778f6ac5b744ba54..cdfcab78ef9f411a703ff38a01bbf22633408b80 100644
+--- a/wpimath/src/test/java/org/wpilib/math/util/MathUtilTest.java
++++ b/wpimath/src/test/java/org/wpilib/math/util/MathUtilTest.java
+@@ -12,6 +12,7 @@ import org.wpilib.math.geometry.Translation2d;
+ import org.wpilib.math.geometry.Translation3d;
+ import org.wpilib.UtilityClassTest;
+ import org.junit.jupiter.api.Test;
++import org.wpilib.math.linalg.VecBuilder;
+ 
+ class MathUtilTest extends UtilityClassTest<MathUtil> {
+   MathUtilTest() {
 diff --git a/wpimath/src/test/java/org/wpilib/math/util/StateSpaceUtilTest.java b/wpimath/src/test/java/org/wpilib/math/util/StateSpaceUtilTest.java
 index a9d0b8efb9d1fcefa1d0d122b2038154460baf0e..189474e04945e5ab4b9dcab4ae6072c4cebe9cac 100644
 --- a/wpimath/src/test/java/org/wpilib/math/util/StateSpaceUtilTest.java

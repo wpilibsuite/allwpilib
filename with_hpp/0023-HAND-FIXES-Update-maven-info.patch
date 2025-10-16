@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Sun, 12 Oct 2025 05:12:39 -0400
-Subject: [PATCH 23/29] HAND FIXES: Update maven info
+Date: Wed, 15 Oct 2025 02:36:03 -0400
+Subject: [PATCH 23/30] HAND FIXES: Update maven info
 
 ---
  apriltag/BUILD.bazel                    |  4 ++--
@@ -253,7 +253,7 @@ index 0ecbdedf706a5655e226bb288e7a8ca59f8fa24c..e505e212823d39b3d46d6a2f439630b7
      visibility = ["//visibility:public"],
  )
 diff --git a/docs/build.gradle b/docs/build.gradle
-index 24f5dc44b665f05bfe546802033627aba2638a93..65040363927460e2e24ad1ead8c0ea61faea0d0e 100644
+index 30a7b2aba7e6d7a9419a16edd2ac970804a46a99..d6ed3f53e769dbc1ba79e35d3327a69630cac3f5 100644
 --- a/docs/build.gradle
 +++ b/docs/build.gradle
 @@ -22,12 +22,12 @@ evaluationDependsOn(':romiVendordep')

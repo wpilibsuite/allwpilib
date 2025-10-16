@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Sun, 12 Oct 2025 12:48:31 -0400
-Subject: [PATCH 27/29] HAND FIX: final java package changes
+Date: Wed, 15 Oct 2025 02:36:04 -0400
+Subject: [PATCH 27/30] HAND FIX: final java package changes
 
 ---
  GeneratedFiles.md                 | 4 ++--

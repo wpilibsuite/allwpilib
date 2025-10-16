@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Sun, 12 Oct 2025 05:10:20 -0400
-Subject: [PATCH 18/29] HAND FIXES: Update upstream for namespace changes
+Date: Wed, 15 Oct 2025 02:34:51 -0400
+Subject: [PATCH 18/30] HAND FIXES: Update upstream for namespace changes
 
 ---
  upstream_utils/argparse_lib.py                     |  4 ++--

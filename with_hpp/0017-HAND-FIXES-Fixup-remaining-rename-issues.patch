@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Sun, 12 Oct 2025 05:10:20 -0400
-Subject: [PATCH 17/29] HAND FIXES: Fixup remaining rename issues
+Date: Wed, 15 Oct 2025 02:34:51 -0400
+Subject: [PATCH 17/30] HAND FIXES: Fixup remaining rename issues
 
 ---
  cameraserver/multiCameraServer/BUILD.bazel    |  4 +-
