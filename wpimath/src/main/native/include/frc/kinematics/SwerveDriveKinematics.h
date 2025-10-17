@@ -512,8 +512,12 @@ class SwerveDriveKinematics
       units::meters_per_second_squared_t linearAcceleration =
           units::math::hypot(x, y);
 
-      moduleAccelerations[i] = {linearAcceleration,
+      if (linearAcceleration.value() < 1e-6) {
+        moduleAccelerations[i] = {linearAcceleration, {}};
+      } else {
+        moduleAccelerations[i] = {linearAcceleration,
                                 Rotation2d{x.value(), y.value()}};
+      }
     }
 
     return moduleAccelerations;
