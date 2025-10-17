@@ -4,6 +4,8 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -18,11 +20,18 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N6;
 import edu.wpi.first.math.system.NumericalIntegration;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
 /** A trajectory for differential drive robots with drivetrain-specific interpolation. */
 public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
+
+  private static final ObjectReader reader = new ObjectMapper().readerFor(DifferentialTrajectory.class);
 
   /**
    * Constructs a DifferentialTrajectory.
@@ -181,5 +190,38 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
   public DifferentialTrajectory relativeTo(Pose2d other) {
     return new DifferentialTrajectory(
         Arrays.stream(samples).map(s -> s.relativeTo(other)).toArray(DifferentialSample[]::new));
+  }
+
+  /**
+   * Loads a trajectory from a JSON stream.
+   *
+   * @param stream the stream to read from
+   * @return the deserialized trajectory
+   * @throws IOException if there's an error reading the file or parsing the JSON
+   */
+  public static DifferentialTrajectory loadFromStream(InputStream stream) throws IOException {
+    return reader.readValue(stream);
+  }
+
+  /**
+   * Loads a trajectory from a JSON file.
+   *
+   * @param file the file to read from
+   * @return the deserialized trajectory
+   * @throws IOException if there's an error reading the file or parsing the JSON
+   */
+  public static DifferentialTrajectory loadFromFile(File file) throws IOException {
+    return loadFromStream(Files.newInputStream(file.toPath()));
+  }
+
+  /**
+   * Loads a trajectory from a JSON file.
+   *
+   * @param filename the path to the file to read from
+   * @return the deserialized trajectory
+   * @throws IOException if there's an error reading the file or parsing the JSON
+   */
+  public static DifferentialTrajectory loadFromFile(String filename) throws IOException {
+    return loadFromFile(new File(filename));
   }
 }

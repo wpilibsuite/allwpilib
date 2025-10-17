@@ -2,14 +2,23 @@ package edu.wpi.first.math.trajectory;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
 /** A trajectory for swerve drive robots with drivetrain-specific interpolation. */
 public class SwerveTrajectory extends Trajectory<SwerveSample> {
+
+  private static final ObjectReader reader = new ObjectMapper().readerFor(SwerveTrajectory.class);
+
   private final SwerveDriveKinematics kinematics;
 
   /**
@@ -119,5 +128,38 @@ public class SwerveTrajectory extends Trajectory<SwerveSample> {
     return new SwerveTrajectory(
         kinematics,
         Arrays.stream(samples).map(s -> s.relativeTo(other)).toArray(SwerveSample[]::new));
+  }
+
+  /**
+   * Loads a trajectory from a JSON stream.
+   *
+   * @param stream the stream to read from
+   * @return the deserialized trajectory
+   * @throws IOException if there's an error reading the file or parsing the JSON
+   */
+  public static SwerveTrajectory loadFromStream(InputStream stream) throws IOException {
+    return reader.readValue(stream);
+  }
+
+  /**
+   * Loads a trajectory from a JSON file.
+   *
+   * @param file the file to read from
+   * @return the deserialized trajectory
+   * @throws IOException if there's an error reading the file or parsing the JSON
+   */
+  public static SwerveTrajectory loadFromFile(File file) throws IOException {
+    return loadFromStream(Files.newInputStream(file.toPath()));
+  }
+
+  /**
+   * Loads a trajectory from a JSON file.
+   *
+   * @param filename the path to the file to read from
+   * @return the deserialized trajectory
+   * @throws IOException if there's an error reading the file or parsing the JSON
+   */
+  public static SwerveTrajectory loadFromFile(String filename) throws IOException {
+    return loadFromFile(new File(filename));
   }
 }

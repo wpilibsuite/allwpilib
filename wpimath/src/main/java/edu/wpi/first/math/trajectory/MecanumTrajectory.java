@@ -2,14 +2,23 @@ package edu.wpi.first.math.trajectory;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
 /** A trajectory for mecanum drive robots with drivetrain-specific interpolation. */
 public class MecanumTrajectory extends Trajectory<MecanumSample> {
+
+  private static final ObjectReader reader = new ObjectMapper().readerFor(MecanumTrajectory.class);
+
   private final MecanumDriveKinematics kinematics;
 
   /**
@@ -111,5 +120,38 @@ public class MecanumTrajectory extends Trajectory<MecanumSample> {
     return new MecanumTrajectory(
         kinematics,
         Arrays.stream(samples).map(s -> s.relativeTo(other)).toArray(MecanumSample[]::new));
+  }
+
+  /**
+   * Loads a trajectory from a JSON stream.
+   *
+   * @param stream the stream to read from
+   * @return the deserialized trajectory
+   * @throws IOException if there's an error reading the file or parsing the JSON
+   */
+  public static MecanumTrajectory loadFromStream(InputStream stream) throws IOException {
+    return reader.readValue(stream);
+  }
+
+  /**
+   * Loads a trajectory from a JSON file.
+   *
+   * @param file the file to read from
+   * @return the deserialized trajectory
+   * @throws IOException if there's an error reading the file or parsing the JSON
+   */
+  public static MecanumTrajectory loadFromFile(File file) throws IOException {
+    return loadFromStream(Files.newInputStream(file.toPath()));
+  }
+
+  /**
+   * Loads a trajectory from a JSON file.
+   *
+   * @param filename the path to the file to read from
+   * @return the deserialized trajectory
+   * @throws IOException if there's an error reading the file or parsing the JSON
+   */
+  public static MecanumTrajectory loadFromFile(String filename) throws IOException {
+    return loadFromFile(new File(filename));
   }
 }

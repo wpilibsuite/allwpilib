@@ -2,14 +2,23 @@ package edu.wpi.first.math.trajectory;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
 /** A base trajectory class for general-purpose trajectory following. */
 public class TrajectoryBase extends Trajectory<TrajectorySample.Base> {
+
+  private static final ObjectReader reader = new ObjectMapper().readerFor(TrajectoryBase.class);
 
   /**
    * Constructs a BaseTrajectory.
@@ -87,5 +96,39 @@ public class TrajectoryBase extends Trajectory<TrajectorySample.Base> {
   public TrajectoryBase relativeTo(Pose2d other) {
     return new TrajectoryBase(
         Arrays.stream(samples).map(s -> s.relativeTo(other)).toArray(TrajectorySample.Base[]::new));
+  }
+
+
+  /**
+   * Loads a trajectory from a JSON stream.
+   *
+   * @param stream the stream to read from
+   * @return the deserialized trajectory
+   * @throws IOException if there's an error reading the file or parsing the JSON
+   */
+  public static TrajectoryBase loadFromStream(InputStream stream) throws IOException {
+    return reader.readValue(stream);
+  }
+
+  /**
+   * Loads a trajectory from a JSON file.
+   *
+   * @param file the file to read from
+   * @return the deserialized trajectory
+   * @throws IOException if there's an error reading the file or parsing the JSON
+   */
+  public static TrajectoryBase loadFromFile(File file) throws IOException {
+    return loadFromStream(Files.newInputStream(file.toPath()));
+  }
+
+  /**
+   * Loads a trajectory from a JSON file.
+   *
+   * @param filename the path to the file to read from
+   * @return the deserialized trajectory
+   * @throws IOException if there's an error reading the file or parsing the JSON
+   */
+  public static TrajectoryBase loadFromFile(String filename) throws IOException {
+    return loadFromFile(new File(filename));
   }
 }
