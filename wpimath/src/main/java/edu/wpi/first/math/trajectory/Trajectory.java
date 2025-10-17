@@ -20,7 +20,6 @@ import java.util.List;
  * interpolating between them.
  */
 public abstract class Trajectory<SampleType extends TrajectorySample<SampleType>> {
-
   /** The samples this Trajectory is composed of. */
   protected final SampleType[] samples;
 
