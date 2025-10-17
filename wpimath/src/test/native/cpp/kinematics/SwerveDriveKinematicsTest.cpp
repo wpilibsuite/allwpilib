@@ -380,18 +380,18 @@ TEST_F(SwerveDriveKinematicsTest, TurnInPlaceInverseAccelerations) {
     expectedAngles[i] = Rotation2d{totalX, totalY};
   }
 
-  EXPECT_NEAR(totalAccel, flAccel.acceleration.value(), 0.1);
-  EXPECT_NEAR(totalAccel, frAccel.acceleration.value(), 0.1);
-  EXPECT_NEAR(totalAccel, blAccel.acceleration.value(), 0.1);
-  EXPECT_NEAR(totalAccel, brAccel.acceleration.value(), 0.1);
+  EXPECT_NEAR(totalAccel, flAccel.acceleration.value(), kEpsilon);
+  EXPECT_NEAR(totalAccel, frAccel.acceleration.value(), kEpsilon);
+  EXPECT_NEAR(totalAccel, blAccel.acceleration.value(), kEpsilon);
+  EXPECT_NEAR(totalAccel, brAccel.acceleration.value(), kEpsilon);
   EXPECT_NEAR(expectedAngles[0].Degrees().value(),
-              flAccel.angle.Degrees().value(), 0.1);
+              flAccel.angle.Degrees().value(), kEpsilon);
   EXPECT_NEAR(expectedAngles[1].Degrees().value(),
-              frAccel.angle.Degrees().value(), 0.1);
+              frAccel.angle.Degrees().value(), kEpsilon);
   EXPECT_NEAR(expectedAngles[2].Degrees().value(),
-              blAccel.angle.Degrees().value(), 0.1);
+              blAccel.angle.Degrees().value(), kEpsilon);
   EXPECT_NEAR(expectedAngles[3].Degrees().value(),
-              brAccel.angle.Degrees().value(), 0.1);
+              brAccel.angle.Degrees().value(), kEpsilon);
 }
 
 TEST_F(SwerveDriveKinematicsTest, TurnInPlaceForwardAccelerations) {
@@ -403,9 +403,9 @@ TEST_F(SwerveDriveKinematicsTest, TurnInPlaceForwardAccelerations) {
   auto chassisAccelerations =
       m_kinematics.ToChassisAccelerations(flAccel, frAccel, blAccel, brAccel);
 
-  EXPECT_NEAR(0.0, chassisAccelerations.ax.value(), 0.1);
-  EXPECT_NEAR(0.0, chassisAccelerations.ay.value(), 0.1);
-  EXPECT_NEAR(2 * std::numbers::pi, chassisAccelerations.alpha.value(), 0.1);
+  EXPECT_NEAR(0.0, chassisAccelerations.ax.value(), kEpsilon);
+  EXPECT_NEAR(0.0, chassisAccelerations.ay.value(), kEpsilon);
+  EXPECT_NEAR(2 * std::numbers::pi, chassisAccelerations.alpha.value(), kEpsilon);
 }
 
 TEST_F(SwerveDriveKinematicsTest, OffCenterRotationInverseAccelerations) {
@@ -474,16 +474,16 @@ TEST_F(SwerveDriveKinematicsTest, OffCenterRotationInverseAccelerations) {
     }
   }
 
-  EXPECT_NEAR(expectedAccelerations[0], flAccel.acceleration.value(), 0.1);
-  EXPECT_NEAR(expectedAccelerations[1], frAccel.acceleration.value(), 0.1);
-  EXPECT_NEAR(expectedAccelerations[2], blAccel.acceleration.value(), 0.1);
-  EXPECT_NEAR(expectedAccelerations[3], brAccel.acceleration.value(), 0.1);
+  EXPECT_NEAR(expectedAccelerations[0], flAccel.acceleration.value(), kEpsilon);
+  EXPECT_NEAR(expectedAccelerations[1], frAccel.acceleration.value(), kEpsilon);
+  EXPECT_NEAR(expectedAccelerations[2], blAccel.acceleration.value(), kEpsilon);
+  EXPECT_NEAR(expectedAccelerations[3], brAccel.acceleration.value(), kEpsilon);
   EXPECT_NEAR(expectedAngles[0].Degrees().value(),
-              flAccel.angle.Degrees().value(), 0.1);
+              flAccel.angle.Degrees().value(), kEpsilon);
   EXPECT_NEAR(expectedAngles[1].Degrees().value(),
-              frAccel.angle.Degrees().value(), 0.1);
+              frAccel.angle.Degrees().value(), kEpsilon);
   EXPECT_NEAR(expectedAngles[2].Degrees().value(),
-              blAccel.angle.Degrees().value(), 0.1);
+              blAccel.angle.Degrees().value(), kEpsilon);
   EXPECT_NEAR(expectedAngles[3].Degrees().value(),
-              brAccel.angle.Degrees().value(), 0.1);
+              brAccel.angle.Degrees().value(), kEpsilon);
 }

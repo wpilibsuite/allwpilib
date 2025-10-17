@@ -471,22 +471,22 @@ class SwerveDriveKinematicsTest {
             .toArray(Rotation2d[]::new);
 
     assertAll(
-        () -> assertEquals(totalAccel, moduleAccelerations[0].acceleration, 0.1),
-        () -> assertEquals(totalAccel, moduleAccelerations[1].acceleration, 0.1),
-        () -> assertEquals(totalAccel, moduleAccelerations[2].acceleration, 0.1),
-        () -> assertEquals(totalAccel, moduleAccelerations[3].acceleration, 0.1),
+        () -> assertEquals(totalAccel, moduleAccelerations[0].acceleration, kEpsilon),
+        () -> assertEquals(totalAccel, moduleAccelerations[1].acceleration, kEpsilon),
+        () -> assertEquals(totalAccel, moduleAccelerations[2].acceleration, kEpsilon),
+        () -> assertEquals(totalAccel, moduleAccelerations[3].acceleration, kEpsilon),
         () ->
             assertEquals(
-                expectedAngles[0].getDegrees(), moduleAccelerations[0].angle.getDegrees(), 0.1),
+                expectedAngles[0].getDegrees(), moduleAccelerations[0].angle.getDegrees(), kEpsilon),
         () ->
             assertEquals(
-                expectedAngles[1].getDegrees(), moduleAccelerations[1].angle.getDegrees(), 0.1),
+                expectedAngles[1].getDegrees(), moduleAccelerations[1].angle.getDegrees(), kEpsilon),
         () ->
             assertEquals(
-                expectedAngles[2].getDegrees(), moduleAccelerations[2].angle.getDegrees(), 0.1),
+                expectedAngles[2].getDegrees(), moduleAccelerations[2].angle.getDegrees(), kEpsilon),
         () ->
             assertEquals(
-                expectedAngles[3].getDegrees(), moduleAccelerations[3].angle.getDegrees(), 0.1));
+                expectedAngles[3].getDegrees(), moduleAccelerations[3].angle.getDegrees(), kEpsilon));
   }
 
   @Test
@@ -504,8 +504,8 @@ class SwerveDriveKinematicsTest {
         m_kinematics.toChassisAccelerations(flAccel, frAccel, blAccel, brAccel);
 
     assertAll(
-        () -> assertEquals(0.0, chassisAccelerations.ax, 0.1),
-        () -> assertEquals(0.0, chassisAccelerations.ay, 0.1),
+        () -> assertEquals(0.0, chassisAccelerations.ax, kEpsilon),
+        () -> assertEquals(0.0, chassisAccelerations.ay, kEpsilon),
         () -> assertEquals(2 * Math.PI, chassisAccelerations.alpha, 0.1));
   }
 
@@ -584,21 +584,21 @@ class SwerveDriveKinematicsTest {
             .toArray(Rotation2d[]::new);
 
     assertAll(
-        () -> assertEquals(expectedAccelerations[0], moduleAccelerations[0].acceleration, 0.1),
-        () -> assertEquals(expectedAccelerations[1], moduleAccelerations[1].acceleration, 0.1),
-        () -> assertEquals(expectedAccelerations[2], moduleAccelerations[2].acceleration, 0.1),
-        () -> assertEquals(expectedAccelerations[3], moduleAccelerations[3].acceleration, 0.1),
+        () -> assertEquals(expectedAccelerations[0], moduleAccelerations[0].acceleration, kEpsilon),
+        () -> assertEquals(expectedAccelerations[1], moduleAccelerations[1].acceleration, kEpsilon),
+        () -> assertEquals(expectedAccelerations[2], moduleAccelerations[2].acceleration, kEpsilon),
+        () -> assertEquals(expectedAccelerations[3], moduleAccelerations[3].acceleration, kEpsilon),
         () ->
             assertEquals(
-                expectedAngles[0].getDegrees(), moduleAccelerations[0].angle.getDegrees(), 0.1),
+                expectedAngles[0].getDegrees(), moduleAccelerations[0].angle.getDegrees(), kEpsilon),
         () ->
             assertEquals(
-                expectedAngles[1].getDegrees(), moduleAccelerations[1].angle.getDegrees(), 0.1),
+                expectedAngles[1].getDegrees(), moduleAccelerations[1].angle.getDegrees(), kEpsilon),
         () ->
             assertEquals(
-                expectedAngles[2].getDegrees(), moduleAccelerations[2].angle.getDegrees(), 0.1),
+                expectedAngles[2].getDegrees(), moduleAccelerations[2].angle.getDegrees(), kEpsilon),
         () ->
             assertEquals(
-                expectedAngles[3].getDegrees(), moduleAccelerations[3].angle.getDegrees(), 0.1));
+                expectedAngles[3].getDegrees(), moduleAccelerations[3].angle.getDegrees(), kEpsilon));
   }
 }
