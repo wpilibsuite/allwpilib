@@ -21,13 +21,16 @@ class Color;
 
 namespace detail {
 template <typename T>
-concept NoArgOpMode = std::constructible_from<T>;
+concept OpModeDerived = std::derived_from<T, OpMode>;
+template <typename T>
+concept NoArgOpMode = std::constructible_from<T> && OpModeDerived<T>;
 template <typename T, typename R>
-concept OneArgOpMode = std::constructible_from<T, R&>;
+concept OneArgOpMode = std::constructible_from<T, R&> && OpModeDerived<T>;
 }  // namespace detail
 
 /**
- *
+ * Concept indicating a class is derived from OpMode and has either a
+ * no-argument constructor or a constructorthat accepts R&.
  */
 template <typename T, typename R>
 concept ConstructibleOpMode =
