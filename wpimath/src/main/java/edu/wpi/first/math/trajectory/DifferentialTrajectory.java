@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package edu.wpi.first.math.trajectory;
 
 import static edu.wpi.first.units.Units.Seconds;
@@ -20,7 +24,6 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N6;
 import edu.wpi.first.math.system.NumericalIntegration;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,8 +33,8 @@ import java.util.stream.Stream;
 
 /** A trajectory for differential drive robots with drivetrain-specific interpolation. */
 public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
-
-  private static final ObjectReader reader = new ObjectMapper().readerFor(DifferentialTrajectory.class);
+  private static final ObjectReader reader =
+      new ObjectMapper().readerFor(DifferentialTrajectory.class);
 
   /**
    * Constructs a DifferentialTrajectory.

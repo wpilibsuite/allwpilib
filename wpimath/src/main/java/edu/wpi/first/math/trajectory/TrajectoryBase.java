@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package edu.wpi.first.math.trajectory;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -6,7 +10,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +20,6 @@ import java.util.stream.Stream;
 
 /** A base trajectory class for general-purpose trajectory following. */
 public class TrajectoryBase extends Trajectory<TrajectorySample.Base> {
-
   private static final ObjectReader reader = new ObjectMapper().readerFor(TrajectoryBase.class);
 
   /**
@@ -97,7 +99,6 @@ public class TrajectoryBase extends Trajectory<TrajectorySample.Base> {
     return new TrajectoryBase(
         Arrays.stream(samples).map(s -> s.relativeTo(other)).toArray(TrajectorySample.Base[]::new));
   }
-
 
   /**
    * Loads a trajectory from a JSON stream.

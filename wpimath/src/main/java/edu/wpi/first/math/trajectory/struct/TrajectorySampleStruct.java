@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package edu.wpi.first.math.trajectory.struct;
 
 import static edu.wpi.first.units.Units.Seconds;
@@ -11,7 +15,6 @@ import edu.wpi.first.util.struct.Struct;
 import java.nio.ByteBuffer;
 
 public class TrajectorySampleStruct implements Struct<TrajectorySample.Base> {
-
   @Override
   public Class<TrajectorySample.Base> getTypeClass() {
     return TrajectorySample.Base.class;

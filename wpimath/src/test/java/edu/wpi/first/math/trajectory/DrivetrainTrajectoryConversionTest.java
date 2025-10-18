@@ -109,8 +109,7 @@ class DrivetrainTrajectoryConversionTest {
     // Verify all samples have correct wheel speeds
     for (DifferentialSample sample : diffTrajectory.samples) {
       // Calculate expected wheel speeds from chassis speeds using kinematics
-      DifferentialDriveWheelSpeeds expectedWheelSpeeds =
-          kinematics.toWheelSpeeds(sample.velocity);
+      DifferentialDriveWheelSpeeds expectedWheelSpeeds = kinematics.toWheelSpeeds(sample.velocity);
 
       // Assert the sample's wheel speeds match the kinematics calculation
       assertAll(
@@ -163,8 +162,7 @@ class DrivetrainTrajectoryConversionTest {
         new DifferentialTrajectory(kinematics, baseTrajectory.samples);
 
     for (DifferentialSample sample : diffTrajectory.samples) {
-      DifferentialDriveWheelSpeeds expectedWheelSpeeds =
-          kinematics.toWheelSpeeds(sample.velocity);
+      DifferentialDriveWheelSpeeds expectedWheelSpeeds = kinematics.toWheelSpeeds(sample.velocity);
 
       assertEquals(expectedWheelSpeeds.left, sample.leftSpeed, kEpsilon);
       assertEquals(expectedWheelSpeeds.right, sample.rightSpeed, kEpsilon);
@@ -273,16 +271,11 @@ class DrivetrainTrajectoryConversionTest {
       assertEquals(expectedStates.length, sample.states.length);
 
       for (int i = 0; i < expectedStates.length; i++) {
-        assertEquals(
-            expectedStates[i].speed,
-            sample.states[i].speed,
-            kEpsilon);
+        assertEquals(expectedStates[i].speed, sample.states[i].speed, kEpsilon);
         // Only compare angles when module speed is significant
         if (Math.abs(expectedStates[i].speed) > 0.01) {
           assertEquals(
-              expectedStates[i].angle.getRadians(),
-              sample.states[i].angle.getRadians(),
-              0.01);
+              expectedStates[i].angle.getRadians(), sample.states[i].angle.getRadians(), 0.01);
         }
       }
     }
@@ -401,7 +394,8 @@ class DrivetrainTrajectoryConversionTest {
     Translation2d rearRight = new Translation2d(-0.3, -0.3);
     SwerveDriveKinematics swerveKinematics =
         new SwerveDriveKinematics(frontLeft, frontRight, rearLeft, rearRight);
-    SwerveTrajectory swerveTrajectory = new SwerveTrajectory(swerveKinematics, baseTrajectory.samples);
+    SwerveTrajectory swerveTrajectory =
+        new SwerveTrajectory(swerveKinematics, baseTrajectory.samples);
 
     // Mecanum drive
     MecanumDriveKinematics mecanumKinematics =
@@ -435,10 +429,7 @@ class DrivetrainTrajectoryConversionTest {
       SwerveModuleState[] expectedSwerveSpeeds =
           swerveKinematics.toWheelSpeeds(swerveSample.velocity);
       for (int j = 0; j < expectedSwerveSpeeds.length; j++) {
-        assertEquals(
-            expectedSwerveSpeeds[j].speed,
-            swerveSample.states[j].speed,
-            kEpsilon);
+        assertEquals(expectedSwerveSpeeds[j].speed, swerveSample.states[j].speed, kEpsilon);
       }
 
       MecanumDriveWheelSpeeds expectedMecanumSpeeds =

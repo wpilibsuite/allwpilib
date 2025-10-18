@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package edu.wpi.first.math.trajectory;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -16,7 +20,6 @@ import java.util.stream.Stream;
 
 /** A trajectory for swerve drive robots with drivetrain-specific interpolation. */
 public class SwerveTrajectory extends Trajectory<SwerveSample> {
-
   private static final ObjectReader reader = new ObjectMapper().readerFor(SwerveTrajectory.class);
 
   private final SwerveDriveKinematics kinematics;
