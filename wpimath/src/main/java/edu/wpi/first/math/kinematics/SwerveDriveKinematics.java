@@ -497,7 +497,7 @@ public class SwerveDriveKinematics
       // The linear acceleration is the magnitude of the acceleration vector
       double linearAcceleration = Math.hypot(x, y);
 
-      if (linearAcceleration < 1e-6) {
+      if (linearAcceleration <= 1e-6) {
         moduleAccelerations[i] =
             new SwerveModuleAccelerations(linearAcceleration, Rotation2d.kZero);
       } else {
