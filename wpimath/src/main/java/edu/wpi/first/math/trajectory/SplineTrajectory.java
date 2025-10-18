@@ -87,8 +87,32 @@ public class SplineTrajectory extends Trajectory<SplineSample> {
 
   @Override
   public SplineTrajectory transformBy(Transform2d transform) {
+    Pose2d firstPose = start().pose;
+    Pose2d transformedFirstPose = firstPose.transformBy(transform);
+
+    SplineSample transformedFirstSample =
+        new SplineSample(
+            start().timestamp,
+            transformedFirstPose,
+            start().velocity,
+            start().acceleration,
+            start().curvature);
+
+    Stream<SplineSample> transformedSamples =
+        Arrays.stream(samples)
+            .skip(1)
+            .map(
+                sample ->
+                    new SplineSample(
+                        sample.timestamp,
+                        transformedFirstPose.plus(sample.pose.minus(firstPose)),
+                        sample.velocity,
+                        sample.acceleration,
+                        sample.curvature));
+
     return new SplineTrajectory(
-        Arrays.stream(samples).map(s -> s.transform(transform)).toArray(SplineSample[]::new));
+        Stream.concat(Stream.of(transformedFirstSample), transformedSamples)
+            .toArray(SplineSample[]::new));
   }
 
   @Override
