@@ -24,7 +24,7 @@ void OpModeRobotBase::AddOpModeFactory(OpModeFactory factory, RobotMode mode,
                                        std::string_view description,
                                        const Color& textColor,
                                        const Color& backgroundColor) {
-  int64_t id = DriverStation::AddOpMode(mode, name, description, group,
+  int64_t id = DriverStation::AddOpMode(mode, name, group, description,
                                         textColor, backgroundColor);
   if (id != 0) {
     m_opModes[id] = std::move(factory);
@@ -35,7 +35,7 @@ void OpModeRobotBase::AddOpModeFactory(OpModeFactory factory, RobotMode mode,
                                        std::string_view name,
                                        std::string_view group,
                                        std::string_view description) {
-  int64_t id = DriverStation::AddOpMode(mode, name, description, group);
+  int64_t id = DriverStation::AddOpMode(mode, name, group, description);
   if (id != 0) {
     m_opModes[id] = std::move(factory);
   }

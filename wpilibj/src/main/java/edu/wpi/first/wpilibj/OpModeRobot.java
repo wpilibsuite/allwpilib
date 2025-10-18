@@ -192,7 +192,7 @@ public abstract class OpModeRobot extends RobotBase {
       String description,
       Color textColor,
       Color backgroundColor) {
-    long id = DriverStation.addOpMode(mode, name, description, group, textColor, backgroundColor);
+    long id = DriverStation.addOpMode(mode, name, group, description, textColor, backgroundColor);
     m_opModes.put(id, new OpModeFactory(name, factory));
   }
 
