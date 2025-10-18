@@ -142,9 +142,9 @@ class ExpansionHubPidConstants {
    * @param minimumInput The minimum value expected from the input.
    * @param maximumInput The maximum value expected from the input.
    */
-  public void enableContinuousInput(double minimum, double maximum) {
-    m_continuousMaximumPublisher.set(maximum);
-    m_continuousMinimumPublisher.set(minimum);
+  public void enableContinuousInput(double minimumInput, double maximumInput) {
+    m_continuousMaximumPublisher.set(maximumInput);
+    m_continuousMinimumPublisher.set(minimumInput);
     m_continuousPublisher.set(true);
   }
 

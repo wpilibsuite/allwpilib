@@ -13,10 +13,7 @@ import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 
-/**
- * This class controls a specific motor and encoder hooked up to an
- * ExpansionHub.
- */
+/** This class controls a specific motor and encoder hooked up to an ExpansionHub. */
 public class ExpansionHubMotor implements AutoCloseable {
   private ExpansionHub m_hub;
   private final int m_channel;
@@ -42,7 +39,7 @@ public class ExpansionHubMotor implements AutoCloseable {
   /**
    * Constructs a servo at the requested channel on a specific USB port.
    *
-   * @param usbId   The USB port ID the hub is connected to
+   * @param usbId The USB port ID the hub is connected to
    * @param channel The motor channel
    */
   public ExpansionHubMotor(int usbId, int channel) {
@@ -63,48 +60,59 @@ public class ExpansionHubMotor implements AutoCloseable {
 
     NetworkTableInstance systemServer = SystemServer.getSystemServer();
 
-    PubSubOption[] options = new PubSubOption[] {
-        PubSubOption.sendAll(true),
-        PubSubOption.keepDuplicates(true),
-        PubSubOption.periodic(0.005)
-    };
+    PubSubOption[] options =
+        new PubSubOption[] {
+          PubSubOption.sendAll(true),
+          PubSubOption.keepDuplicates(true),
+          PubSubOption.periodic(0.005)
+        };
 
-    m_encoderSubscriber = systemServer
-        .getDoubleTopic("/rhsp/" + usbId + "/motor" + channel + "/encoder")
-        .subscribe(0, options);
-    m_encoderVelocitySubscriber = systemServer
-        .getDoubleTopic("/rhsp/" + usbId + "/motor" + channel + "/encoderVelocity")
-        .subscribe(0, options);
-    m_currentSubscriber = systemServer
-        .getDoubleTopic("/rhsp/" + usbId + "/motor" + channel + "/current")
-        .subscribe(0, options);
+    m_encoderSubscriber =
+        systemServer
+            .getDoubleTopic("/rhsp/" + usbId + "/motor" + channel + "/encoder")
+            .subscribe(0, options);
+    m_encoderVelocitySubscriber =
+        systemServer
+            .getDoubleTopic("/rhsp/" + usbId + "/motor" + channel + "/encoderVelocity")
+            .subscribe(0, options);
+    m_currentSubscriber =
+        systemServer
+            .getDoubleTopic("/rhsp/" + usbId + "/motor" + channel + "/current")
+            .subscribe(0, options);
 
-    m_setpointPublisher = systemServer
-        .getDoubleTopic("/rhsp/" + usbId + "/motor" + channel + "/setpoint")
-        .publish(options);
+    m_setpointPublisher =
+        systemServer
+            .getDoubleTopic("/rhsp/" + usbId + "/motor" + channel + "/setpoint")
+            .publish(options);
 
-    m_distancePerCountPublisher = systemServer
-        .getDoubleTopic("/rhsp/" + usbId + "/motor" + channel + "/distancePerCount")
-        .publish(options);
+    m_distancePerCountPublisher =
+        systemServer
+            .getDoubleTopic("/rhsp/" + usbId + "/motor" + channel + "/distancePerCount")
+            .publish(options);
 
-    m_floatOn0Publisher = systemServer
-        .getBooleanTopic("/rhsp/" + usbId + "/motor" + channel + "/floatOn0")
-        .publish(options);
-    m_enabledPublisher = systemServer
-        .getBooleanTopic("/rhsp/" + usbId + "/motor" + channel + "/enabled")
-        .publish(options);
+    m_floatOn0Publisher =
+        systemServer
+            .getBooleanTopic("/rhsp/" + usbId + "/motor" + channel + "/floatOn0")
+            .publish(options);
+    m_enabledPublisher =
+        systemServer
+            .getBooleanTopic("/rhsp/" + usbId + "/motor" + channel + "/enabled")
+            .publish(options);
 
-    m_modePublisher = systemServer
-        .getIntegerTopic("/rhsp/" + usbId + "/motor" + channel + "/mode")
-        .publish(options);
+    m_modePublisher =
+        systemServer
+            .getIntegerTopic("/rhsp/" + usbId + "/motor" + channel + "/mode")
+            .publish(options);
 
-    m_reversedPublisher = systemServer
-        .getBooleanTopic("/rhsp/" + usbId + "/motor" + channel + "/reversed")
-        .publish(options);
+    m_reversedPublisher =
+        systemServer
+            .getBooleanTopic("/rhsp/" + usbId + "/motor" + channel + "/reversed")
+            .publish(options);
 
-    m_resetEncoderPublisher = systemServer
-        .getBooleanTopic("/rhsp/" + usbId + "/motor" + channel + "/resetEncoder")
-        .publish(options);
+    m_resetEncoderPublisher =
+        systemServer
+            .getBooleanTopic("/rhsp/" + usbId + "/motor" + channel + "/resetEncoder")
+            .publish(options);
 
     m_velocityPidConstants = new ExpansionHubPidConstants(usbId, channel, true);
     m_positionPidConstants = new ExpansionHubPidConstants(usbId, channel, false);
@@ -143,8 +151,7 @@ public class ExpansionHubMotor implements AutoCloseable {
   }
 
   /**
-   * Sets the voltage to run the motor at. This value will be continously scaled
-   * to match the input
+   * Sets the voltage to run the motor at. This value will be continously scaled to match the input
    * voltage.
    *
    * @param voltage The voltage to drive the motor at
@@ -155,8 +162,7 @@ public class ExpansionHubMotor implements AutoCloseable {
   }
 
   /**
-   * Command the motor to drive to a specific position setpoint. This value will
-   * be scaled by
+   * Command the motor to drive to a specific position setpoint. This value will be scaled by
    * setDistancePerCount and influenced by the PID constants.
    *
    * @param setpoint The position setpoint to drive the motor to
@@ -167,8 +173,7 @@ public class ExpansionHubMotor implements AutoCloseable {
   }
 
   /**
-   * Command the motor to drive to a specific velocity setpoint. This value will
-   * be scaled by
+   * Command the motor to drive to a specific velocity setpoint. This value will be scaled by
    * setDistancePerCount and influenced by the PID constants.
    *
    * @param setpoint The velocity setpoint to drive the motor to
@@ -188,8 +193,7 @@ public class ExpansionHubMotor implements AutoCloseable {
   }
 
   /**
-   * Sets if the motor should float or brake when 0 is commanded. Defaults to
-   * false.
+   * Sets if the motor should float or brake when 0 is commanded. Defaults to false.
    *
    * @param floatOn0 True to float when commanded 0, false to brake
    */
@@ -225,8 +229,7 @@ public class ExpansionHubMotor implements AutoCloseable {
   }
 
   /**
-   * Gets the current velocity of the motor encoder. Scaled into distancePerCount
-   * units.
+   * Gets the current velocity of the motor encoder. Scaled into distancePerCount units.
    *
    * @return Encoder velocity
    */
@@ -235,8 +238,7 @@ public class ExpansionHubMotor implements AutoCloseable {
   }
 
   /**
-   * Gets the current position of the motor encoder. Scaled into distancePerCount
-   * units.
+   * Gets the current position of the motor encoder. Scaled into distancePerCount units.
    *
    * @return Encoder position
    */

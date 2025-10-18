@@ -8,6 +8,8 @@
 
 #include "frc/SystemServer.h"
 
+#include <string>
+
 using namespace frc;
 
 ExpansionHubPidConstants::ExpansionHubPidConstants(int usbId, int channel,
@@ -84,10 +86,10 @@ void ExpansionHubPidConstants::SetFF(double s, double v, double a) {
   m_aPublisher.Set(a);
 }
 
-void ExpansionHubPidConstants::EnableContinousInput(double minimum,
-                                                    double maximum) {
-  m_continuousMaximumPublisher.Set(maximum);
-  m_continuousMinimumPublisher.Set(minimum);
+void ExpansionHubPidConstants::EnableContinousInput(double minimumInput,
+                                                    double maximumInput) {
+  m_continuousMaximumPublisher.Set(maximumInput);
+  m_continuousMinimumPublisher.Set(minimumInput);
   m_continuousPublisher.Set(true);
 }
 

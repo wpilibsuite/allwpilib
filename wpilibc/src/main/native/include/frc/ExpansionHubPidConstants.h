@@ -49,7 +49,7 @@ class ExpansionHubPidConstants {
    * @param minimumInput The minimum value expected from the input.
    * @param maximumInput The maximum value expected from the input.
    */
-  void EnableContinousInput(double minimum, double maximum);
+  void EnableContinousInput(double minimumInput, double maximumInput);
 
   /**
    * Disables continuous input.

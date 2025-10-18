@@ -132,7 +132,7 @@ public class ExpansionHubServo implements AutoCloseable {
    * @param pulseWidth Pulse width
    */
   public void setPulseWidth(Time pulseWidth) {
-    m_pulseWidthPublisher.set((long)pulseWidth.in(Microseconds));
+    m_pulseWidthPublisher.set((long) pulseWidth.in(Microseconds));
   }
 
   /**
@@ -150,7 +150,7 @@ public class ExpansionHubServo implements AutoCloseable {
    * @param framePeriod The frame period
    */
   public void setFramePeriod(Time framePeriod) {
-    m_framePeriodPublisher.set((long)framePeriod.in(Microseconds));
+    m_framePeriodPublisher.set((long) framePeriod.in(Microseconds));
   }
 
   /**

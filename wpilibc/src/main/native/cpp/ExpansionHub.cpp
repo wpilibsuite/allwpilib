@@ -8,6 +8,7 @@
 
 #include <networktables/BooleanTopic.h>
 #include <hal/UsageReporting.h>
+#include <memory>
 
 #include "frc/SystemServer.h"
 
@@ -21,7 +22,7 @@ std::weak_ptr<ExpansionHub::DataStore> ExpansionHub::m_storeMap[4];
 
 class ExpansionHub::DataStore {
  public:
-  DataStore(int usbId) : m_usbId{usbId} {
+  explicit DataStore(int usbId) : m_usbId{usbId} {
     auto systemServer = SystemServer::GetSystemServer();
 
     m_hubConnectedSubscriber =
