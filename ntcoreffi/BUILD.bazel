@@ -34,7 +34,6 @@ wpilib_cc_library(
     ]),
     hdrs = glob(["src/main/native/include/**"]),
     extra_hdr_pkg_files = [
-        "//wpiutil:protobuf-hdrs-pkg",
         "//wpiutil:fmtlib-hdrs-pkg",
         "//wpiutil:llvm-hdrs-pkg",
         "//wpiutil:wpiutil-hdrs-pkg",
