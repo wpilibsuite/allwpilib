@@ -83,7 +83,7 @@ public class AnalogAccelerometer implements Sendable, AutoCloseable {
     if (m_analogChannel == null) {
       return 0.0;
     }
-    return (m_analogChannel.getAverageVoltage() - m_zeroGVoltage) / m_voltsPerG;
+    return (m_analogChannel.getVoltage() - m_zeroGVoltage) / m_voltsPerG;
   }
 
   /**

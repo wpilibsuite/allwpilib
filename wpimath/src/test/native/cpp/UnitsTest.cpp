@@ -3513,3 +3513,18 @@ TEST_F(CaseStudies, pythagoreanTheorum) {
                   pow<2>(RightTriangle::b::value()) ==
               pow<2>(RightTriangle::c::value()));
 }
+
+TEST(Units, overloadResolution) {
+  // Slight hack to get nested functions
+  struct Scope {
+    static bool f(units::meter_t) {
+      return true;
+    };
+
+    static bool f(units::second_t) {
+      return false;
+    };
+  };
+  // Make sure this properly selects the meter overload
+  EXPECT_TRUE(Scope::f(1_mm));
+}

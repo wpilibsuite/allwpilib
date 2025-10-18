@@ -11,6 +11,7 @@ wpilib_java_library(
         "//ntcore:ntcore-java",
         "//wpiunits:wpiunits-java",
         "//wpiutil:wpiutil-java",
+        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
 )
 
@@ -19,6 +20,8 @@ wpilib_java_junit5_test(
     srcs = glob(["src/test/java/**/*.java"]),
     deps = [
         ":epilogue-java",
+        "//wpimath:wpimath-java",
         "//wpiutil:wpiutil-java",
+        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
 )

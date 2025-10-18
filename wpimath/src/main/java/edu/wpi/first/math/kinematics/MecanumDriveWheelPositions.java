@@ -96,9 +96,9 @@ public class MecanumDriveWheelPositions
   @Override
   public MecanumDriveWheelPositions interpolate(MecanumDriveWheelPositions endValue, double t) {
     return new MecanumDriveWheelPositions(
-        MathUtil.interpolate(this.frontLeft, endValue.frontLeft, t),
-        MathUtil.interpolate(this.frontRight, endValue.frontRight, t),
-        MathUtil.interpolate(this.rearLeft, endValue.rearLeft, t),
-        MathUtil.interpolate(this.rearRight, endValue.rearRight, t));
+        MathUtil.lerp(this.frontLeft, endValue.frontLeft, t),
+        MathUtil.lerp(this.frontRight, endValue.frontRight, t),
+        MathUtil.lerp(this.rearLeft, endValue.rearLeft, t),
+        MathUtil.lerp(this.rearRight, endValue.rearRight, t));
   }
 }

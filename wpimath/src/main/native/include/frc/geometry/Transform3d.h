@@ -14,6 +14,7 @@
 namespace frc {
 
 class Pose3d;
+struct Twist3d;
 
 /**
  * Represents a transformation for a Pose3d in the pose's frame.
@@ -135,6 +136,14 @@ class WPILIB_DLLEXPORT Transform3d {
   constexpr const Rotation3d& Rotation() const { return m_rotation; }
 
   /**
+   * Returns a Twist3d of the current transform (pose delta). If b is the output
+   * of {@code a.Log()}, then {@code b.Exp()} would yield a.
+   *
+   * @return The twist that maps the current transform.
+   */
+  constexpr Twist3d Log() const;
+
+  /**
    * Invert the transformation. This is useful for undoing a transformation.
    *
    * @return The inverted transformation.
@@ -188,6 +197,8 @@ class WPILIB_DLLEXPORT Transform3d {
 }  // namespace frc
 
 #include "frc/geometry/Pose3d.h"
+#include "frc/geometry/Twist3d.h"
+#include "frc/geometry/detail/RotationVectorToMatrix.h"
 
 namespace frc {
 
@@ -203,6 +214,59 @@ constexpr Transform3d::Transform3d(const Pose3d& initial, const Pose3d& final) {
 
 constexpr Transform3d Transform3d::operator+(const Transform3d& other) const {
   return Transform3d{Pose3d{}, Pose3d{}.TransformBy(*this).TransformBy(other)};
+}
+
+constexpr Twist3d Transform3d::Log() const {
+  // Implementation from Section 3.2 of https://ethaneade.org/lie.pdf
+
+  auto impl = [this]<typename Matrix3d, typename Vector3d>() -> Twist3d {
+    Vector3d u{{m_translation.X().value(), m_translation.Y().value(),
+                m_translation.Z().value()}};
+    Vector3d rvec = m_rotation.ToVector();
+    Matrix3d omega = detail::RotationVectorToMatrix(rvec);
+    Matrix3d omegaSq = omega * omega;
+    double theta = rvec.norm();
+    double thetaSq = theta * theta;
+
+    double C;
+    if (gcem::abs(theta) < 1E-7) {
+      // Taylor Expansions around θ = 0
+      // A = 1/1! - θ²/3! + θ⁴/5!
+      // B = 1/2! - θ²/4! + θ⁴/6!
+      // C = 1/6 * (1/2 + θ²/5! + θ⁴/7!)
+      // sources:
+      // A:
+      // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5Bsin%5C%2840%29x%5C%2841%29%2Cx%5D+at+x%3D0
+      // B:
+      // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5B1-cos%5C%2840%29x%5C%2841%29%2CPower%5Bx%2C2%5D%5D+at+x%3D0
+      // C:
+      // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5B1-Divide%5BDivide%5Bsin%5C%2840%29x%5C%2841%29%2Cx%5D%2C2Divide%5B1-cos%5C%2840%29x%5C%2841%29%2CPower%5Bx%2C2%5D%5D%5D%2CPower%5Bx%2C2%5D%5D+at+x%3D0
+      C = 1 / 12.0 + thetaSq / 720 + thetaSq * thetaSq / 30240;
+    } else {
+      // A = std::sin(θ)/θ
+      // B = (1 - std::cos(θ)) / θ²
+      // C = (1 - A/(2*B)) / θ²
+      double A = gcem::sin(theta) / theta;
+      double B = (1 - gcem::cos(theta)) / thetaSq;
+      C = (1 - A / (2 * B)) / thetaSq;
+    }
+
+    Matrix3d V_inv = Matrix3d::Identity() - 0.5 * omega + C * omegaSq;
+
+    Vector3d translation_component = V_inv * u;
+
+    return Twist3d{units::meter_t{translation_component(0)},
+                   units::meter_t{translation_component(1)},
+                   units::meter_t{translation_component(2)},
+                   units::radian_t{rvec(0)},
+                   units::radian_t{rvec(1)},
+                   units::radian_t{rvec(2)}};
+  };
+
+  if (std::is_constant_evaluated()) {
+    return impl.template operator()<ct_matrix3d, ct_vector3d>();
+  }
+  return impl.template operator()<Eigen::Matrix3d, Eigen::Vector3d>();
 }
 
 }  // namespace frc

@@ -33,7 +33,7 @@ TEST(LTVUnicycleControllerTest, ReachesReference) {
     auto [vx, vy, omega] = controller.Calculate(robotPose, state);
     static_cast<void>(vy);
 
-    robotPose = robotPose.Exp(frc::Twist2d{vx * kDt, 0_m, omega * kDt});
+    robotPose = robotPose + frc::Twist2d{vx * kDt, 0_m, omega * kDt}.Exp();
   }
 
   auto& endPose = trajectory.States().back().pose;

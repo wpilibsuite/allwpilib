@@ -15,8 +15,8 @@
 namespace slp {
 
 /**
- * This class calculates the gradient of a a variable with respect to a vector
- * of variables.
+ * This class calculates the gradient of a variable with respect to a vector of
+ * variables.
  *
  * The gradient is only recomputed if the variable expression is quadratic or
  * higher order.
@@ -29,7 +29,7 @@ class SLEIPNIR_DLLEXPORT Gradient {
    * @param variable Variable of which to compute the gradient.
    * @param wrt Variable with respect to which to compute the gradient.
    */
-  Gradient(Variable variable, Variable wrt) noexcept
+  Gradient(Variable variable, Variable wrt)
       : m_jacobian{std::move(variable), std::move(wrt)} {}
 
   /**
@@ -39,7 +39,7 @@ class SLEIPNIR_DLLEXPORT Gradient {
    * @param wrt Vector of variables with respect to which to compute the
    *   gradient.
    */
-  Gradient(Variable variable, SleipnirMatrixLike auto wrt) noexcept
+  Gradient(Variable variable, SleipnirMatrixLike auto wrt)
       : m_jacobian{VariableMatrix{std::move(variable)}, std::move(wrt)} {}
 
   /**
@@ -58,7 +58,7 @@ class SLEIPNIR_DLLEXPORT Gradient {
    * @return The gradient at wrt's value.
    */
   const Eigen::SparseVector<double>& value() {
-    m_g = m_jacobian.value();
+    m_g = m_jacobian.value().transpose();
 
     return m_g;
   }

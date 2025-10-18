@@ -137,8 +137,8 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
    * @param max maximum voltage percentage (0-1 range)
    */
   public void setVoltagePercentageRange(double min, double max) {
-    m_sensorMin = MathUtil.clamp(min, 0.0, 1.0);
-    m_sensorMax = MathUtil.clamp(max, 0.0, 1.0);
+    m_sensorMin = Math.clamp(min, 0.0, 1.0);
+    m_sensorMax = Math.clamp(max, 0.0, 1.0);
   }
 
   /**

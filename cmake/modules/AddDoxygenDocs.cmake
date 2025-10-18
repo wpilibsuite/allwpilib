@@ -17,7 +17,7 @@ macro(add_doxygen_docs)
     foreach(dir ${dirs})
         list(APPEND docs_dirs ${dir}/src/main/native/include)
         file(GLOB dirs ${dir}/src/main/native/thirdparty/*/include)
-        list(FILTER dirs EXCLUDE REGEX eigen|protobuf)
+        list(FILTER dirs EXCLUDE REGEX eigen)
         set(DOXYGEN_EXCLUDE_PATTERNS "*.pb.h" "**/.clang-tidy" "**/.clang-format")
 
         if(DOCS_WARNINGS_AS_ERRORS)

@@ -56,7 +56,7 @@ TEST(DiscretizationTest, DiscretizeSlowModelAQ) {
   frc::Matrixd<2, 2> contA{{0, 1}, {0, 0}};
   frc::Matrixd<2, 2> contQ{{1, 0}, {0, 1}};
 
-  constexpr auto dt = 1_s;
+  constexpr units::second_t dt = 1_s;
 
   //       T
   // Q_d ≈ ∫ e^(Aτ) Q e^(Aᵀτ) dτ
@@ -88,7 +88,7 @@ TEST(DiscretizationTest, DiscretizeFastModelAQ) {
   frc::Matrixd<2, 2> contA{{0, 1}, {0, -1406.29}};
   frc::Matrixd<2, 2> contQ{{0.0025, 0}, {0, 1}};
 
-  constexpr auto dt = 5_ms;
+  constexpr units::second_t dt = 5_ms;
 
   //       T
   // Q_d = ∫ e^(Aτ) Q e^(Aᵀτ) dτ

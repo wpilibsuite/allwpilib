@@ -6,8 +6,8 @@
 
 #include <functional>
 
-#include <frc/AnalogGyro.h>
 #include <frc/Encoder.h>
+#include <frc/OnboardIMU.h>
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/drive/DifferentialDrive.h>
@@ -65,7 +65,7 @@ class Drive : public frc2::SubsystemBase {
                               DriveConstants::kRightEncoderPorts[1],
                               DriveConstants::kRightEncoderReversed};
 
-  frc::AnalogGyro m_gyro{0};
+  frc::OnboardIMU m_imu{frc::OnboardIMU::kFlat};
 
   frc::ProfiledPIDController<units::radians> m_controller{
       DriveConstants::kTurnP,

@@ -118,6 +118,7 @@ struct packet_traits<float> : default_packet_traits {
     HasLog1p = 1,
     HasExpm1 = 1,
     HasExp = 1,
+    HasPow = 1,
     HasNdtri = 1,
     HasBessel = 1,
     HasSqrt = 1,
@@ -149,6 +150,7 @@ struct packet_traits<double> : default_packet_traits {
     HasErf = 1,
     HasErfc = 1,
     HasExp = 1,
+    HasPow = 1,
     HasSqrt = 1,
     HasRsqrt = 1,
     HasCbrt = 1,
@@ -653,25 +655,6 @@ EIGEN_STRONG_INLINE int64_t pfirst<Packet4l>(const Packet4l& a) {
 template <>
 EIGEN_STRONG_INLINE uint64_t pfirst<Packet4ul>(const Packet4ul& a) {
   return _mm_extract_epi64_0(_mm256_castsi256_si128(a));
-}
-template <>
-EIGEN_STRONG_INLINE int64_t predux<Packet4l>(const Packet4l& a) {
-  __m128i r = _mm_add_epi64(_mm256_castsi256_si128(a), _mm256_extractf128_si256(a, 1));
-  return _mm_extract_epi64_0(r) + _mm_extract_epi64_1(r);
-}
-template <>
-EIGEN_STRONG_INLINE uint64_t predux<Packet4ul>(const Packet4ul& a) {
-  __m128i r = _mm_add_epi64(_mm256_castsi256_si128(a), _mm256_extractf128_si256(a, 1));
-  return numext::bit_cast<uint64_t>(_mm_extract_epi64_0(r) + _mm_extract_epi64_1(r));
-}
-
-template <>
-EIGEN_STRONG_INLINE bool predux_any(const Packet4l& a) {
-  return _mm256_movemask_pd(_mm256_castsi256_pd(a)) != 0;
-}
-template <>
-EIGEN_STRONG_INLINE bool predux_any(const Packet4ul& a) {
-  return _mm256_movemask_pd(_mm256_castsi256_pd(a)) != 0;
 }
 
 #define MM256_SHUFFLE_EPI64(A, B, M) _mm256_shuffle_pd(_mm256_castsi256_pd(A), _mm256_castsi256_pd(B), M)
@@ -1956,23 +1939,6 @@ EIGEN_STRONG_INLINE Packet4d pldexp_fast<Packet4d>(const Packet4d& a, const Pack
 }
 
 template <>
-EIGEN_STRONG_INLINE float predux<Packet8f>(const Packet8f& a) {
-  return predux(Packet4f(_mm_add_ps(_mm256_castps256_ps128(a), _mm256_extractf128_ps(a, 1))));
-}
-template <>
-EIGEN_STRONG_INLINE double predux<Packet4d>(const Packet4d& a) {
-  return predux(Packet2d(_mm_add_pd(_mm256_castpd256_pd128(a), _mm256_extractf128_pd(a, 1))));
-}
-template <>
-EIGEN_STRONG_INLINE int predux<Packet8i>(const Packet8i& a) {
-  return predux(Packet4i(_mm_add_epi32(_mm256_castsi256_si128(a), _mm256_extractf128_si256(a, 1))));
-}
-template <>
-EIGEN_STRONG_INLINE uint32_t predux<Packet8ui>(const Packet8ui& a) {
-  return predux(Packet4ui(_mm_add_epi32(_mm256_castsi256_si128(a), _mm256_extractf128_si256(a, 1))));
-}
-
-template <>
 EIGEN_STRONG_INLINE Packet4f predux_half_dowto4<Packet8f>(const Packet8f& a) {
   return _mm_add_ps(_mm256_castps256_ps128(a), _mm256_extractf128_ps(a, 1));
 }
@@ -1983,82 +1949,6 @@ EIGEN_STRONG_INLINE Packet4i predux_half_dowto4<Packet8i>(const Packet8i& a) {
 template <>
 EIGEN_STRONG_INLINE Packet4ui predux_half_dowto4<Packet8ui>(const Packet8ui& a) {
   return _mm_add_epi32(_mm256_castsi256_si128(a), _mm256_extractf128_si256(a, 1));
-}
-
-template <>
-EIGEN_STRONG_INLINE float predux_mul<Packet8f>(const Packet8f& a) {
-  Packet8f tmp;
-  tmp = _mm256_mul_ps(a, _mm256_permute2f128_ps(a, a, 1));
-  tmp = _mm256_mul_ps(tmp, _mm256_shuffle_ps(tmp, tmp, _MM_SHUFFLE(1, 0, 3, 2)));
-  return pfirst(_mm256_mul_ps(tmp, _mm256_shuffle_ps(tmp, tmp, 1)));
-}
-template <>
-EIGEN_STRONG_INLINE double predux_mul<Packet4d>(const Packet4d& a) {
-  Packet4d tmp;
-  tmp = _mm256_mul_pd(a, _mm256_permute2f128_pd(a, a, 1));
-  return pfirst(_mm256_mul_pd(tmp, _mm256_shuffle_pd(tmp, tmp, 1)));
-}
-
-template <>
-EIGEN_STRONG_INLINE float predux_min<Packet8f>(const Packet8f& a) {
-  Packet8f tmp = _mm256_min_ps(a, _mm256_permute2f128_ps(a, a, 1));
-  tmp = _mm256_min_ps(tmp, _mm256_shuffle_ps(tmp, tmp, _MM_SHUFFLE(1, 0, 3, 2)));
-  return pfirst(_mm256_min_ps(tmp, _mm256_shuffle_ps(tmp, tmp, 1)));
-}
-template <>
-EIGEN_STRONG_INLINE double predux_min<Packet4d>(const Packet4d& a) {
-  Packet4d tmp = _mm256_min_pd(a, _mm256_permute2f128_pd(a, a, 1));
-  return pfirst(_mm256_min_pd(tmp, _mm256_shuffle_pd(tmp, tmp, 1)));
-}
-
-template <>
-EIGEN_STRONG_INLINE float predux_max<Packet8f>(const Packet8f& a) {
-  Packet8f tmp = _mm256_max_ps(a, _mm256_permute2f128_ps(a, a, 1));
-  tmp = _mm256_max_ps(tmp, _mm256_shuffle_ps(tmp, tmp, _MM_SHUFFLE(1, 0, 3, 2)));
-  return pfirst(_mm256_max_ps(tmp, _mm256_shuffle_ps(tmp, tmp, 1)));
-}
-
-template <>
-EIGEN_STRONG_INLINE double predux_max<Packet4d>(const Packet4d& a) {
-  Packet4d tmp = _mm256_max_pd(a, _mm256_permute2f128_pd(a, a, 1));
-  return pfirst(_mm256_max_pd(tmp, _mm256_shuffle_pd(tmp, tmp, 1)));
-}
-
-// not needed yet
-// template<> EIGEN_STRONG_INLINE bool predux_all(const Packet8f& x)
-// {
-//   return _mm256_movemask_ps(x)==0xFF;
-// }
-
-template <>
-EIGEN_STRONG_INLINE bool predux_any(const Packet8f& x) {
-  return _mm256_movemask_ps(x) != 0;
-}
-
-template <>
-EIGEN_STRONG_INLINE bool predux_any(const Packet4d& x) {
-  return _mm256_movemask_pd(x) != 0;
-}
-
-template <>
-EIGEN_STRONG_INLINE bool predux_any(const Packet8i& x) {
-  return _mm256_movemask_ps(_mm256_castsi256_ps(x)) != 0;
-}
-template <>
-EIGEN_STRONG_INLINE bool predux_any(const Packet8ui& x) {
-  return _mm256_movemask_ps(_mm256_castsi256_ps(x)) != 0;
-}
-
-#ifndef EIGEN_VECTORIZE_AVX512FP16
-template <>
-EIGEN_STRONG_INLINE bool predux_any(const Packet8h& x) {
-  return _mm_movemask_epi8(x) != 0;
-}
-#endif  // EIGEN_VECTORIZE_AVX512FP16
-
-template <>
-EIGEN_STRONG_INLINE bool predux_any(const Packet8bf& x) {
-  return _mm_movemask_epi8(x) != 0;
 }
 
 EIGEN_DEVICE_FUNC inline void ptranspose(PacketBlock<Packet8f, 8>& kernel) {
@@ -2362,23 +2252,63 @@ EIGEN_STRONG_INLINE Packet8h ptrunc<Packet8h>(const Packet8h& a) {
 }
 
 template <>
+EIGEN_STRONG_INLINE Packet8h pisinf<Packet8h>(const Packet8h& a) {
+  constexpr uint16_t kInf = ((1 << 5) - 1) << 10;
+  constexpr uint16_t kAbsMask = (1 << 15) - 1;
+  return _mm_cmpeq_epi16(_mm_and_si128(a.m_val, _mm_set1_epi16(kAbsMask)), _mm_set1_epi16(kInf));
+}
+
+template <>
+EIGEN_STRONG_INLINE Packet8h pisnan<Packet8h>(const Packet8h& a) {
+  constexpr uint16_t kInf = ((1 << 5) - 1) << 10;
+  constexpr uint16_t kAbsMask = (1 << 15) - 1;
+  return _mm_cmpgt_epi16(_mm_and_si128(a.m_val, _mm_set1_epi16(kAbsMask)), _mm_set1_epi16(kInf));
+}
+
+// convert the sign-magnitude representation to two's complement
+EIGEN_STRONG_INLINE __m128i pmaptosigned(const __m128i& a) {
+  constexpr uint16_t kAbsMask = (1 << 15) - 1;
+  // if 'a' has the sign bit set, clear the sign bit and negate the result as if it were an integer
+  return _mm_sign_epi16(_mm_and_si128(a, _mm_set1_epi16(kAbsMask)), a);
+}
+
+// return true if both `a` and `b` are not NaN
+EIGEN_STRONG_INLINE Packet8h pisordered(const Packet8h& a, const Packet8h& b) {
+  constexpr uint16_t kInf = ((1 << 5) - 1) << 10;
+  constexpr uint16_t kAbsMask = (1 << 15) - 1;
+  __m128i abs_a = _mm_and_si128(a.m_val, _mm_set1_epi16(kAbsMask));
+  __m128i abs_b = _mm_and_si128(b.m_val, _mm_set1_epi16(kAbsMask));
+  // check if both `abs_a <= kInf` and `abs_b <= kInf` by checking if max(abs_a, abs_b) <= kInf
+  // SSE has no `lesser or equal` instruction for integers, but comparing against kInf + 1 accomplishes the same goal
+  return _mm_cmplt_epi16(_mm_max_epu16(abs_a, abs_b), _mm_set1_epi16(kInf + 1));
+}
+
+template <>
 EIGEN_STRONG_INLINE Packet8h pcmp_eq(const Packet8h& a, const Packet8h& b) {
-  return Pack16To8(pcmp_eq(half2float(a), half2float(b)));
+  __m128i isOrdered = pisordered(a, b);
+  __m128i isEqual = _mm_cmpeq_epi16(pmaptosigned(a.m_val), pmaptosigned(b.m_val));
+  return _mm_and_si128(isOrdered, isEqual);
 }
 
 template <>
 EIGEN_STRONG_INLINE Packet8h pcmp_le(const Packet8h& a, const Packet8h& b) {
-  return Pack16To8(pcmp_le(half2float(a), half2float(b)));
+  __m128i isOrdered = pisordered(a, b);
+  __m128i isGreater = _mm_cmpgt_epi16(pmaptosigned(a.m_val), pmaptosigned(b.m_val));
+  return _mm_andnot_si128(isGreater, isOrdered);
 }
 
 template <>
 EIGEN_STRONG_INLINE Packet8h pcmp_lt(const Packet8h& a, const Packet8h& b) {
-  return Pack16To8(pcmp_lt(half2float(a), half2float(b)));
+  __m128i isOrdered = pisordered(a, b);
+  __m128i isLess = _mm_cmplt_epi16(pmaptosigned(a.m_val), pmaptosigned(b.m_val));
+  return _mm_and_si128(isOrdered, isLess);
 }
 
 template <>
 EIGEN_STRONG_INLINE Packet8h pcmp_lt_or_nan(const Packet8h& a, const Packet8h& b) {
-  return Pack16To8(pcmp_lt_or_nan(half2float(a), half2float(b)));
+  __m128i isUnordered = por(pisnan(a), pisnan(b));
+  __m128i isLess = _mm_cmplt_epi16(pmaptosigned(a.m_val), pmaptosigned(b.m_val));
+  return _mm_or_si128(isUnordered, isLess);
 }
 
 template <>
@@ -2471,34 +2401,6 @@ EIGEN_STRONG_INLINE void pscatter<Eigen::half, Packet8h>(Eigen::half* to, const 
   to[stride * 5] = aux[5];
   to[stride * 6] = aux[6];
   to[stride * 7] = aux[7];
-}
-
-template <>
-EIGEN_STRONG_INLINE Eigen::half predux<Packet8h>(const Packet8h& a) {
-  Packet8f af = half2float(a);
-  float reduced = predux<Packet8f>(af);
-  return Eigen::half(reduced);
-}
-
-template <>
-EIGEN_STRONG_INLINE Eigen::half predux_max<Packet8h>(const Packet8h& a) {
-  Packet8f af = half2float(a);
-  float reduced = predux_max<Packet8f>(af);
-  return Eigen::half(reduced);
-}
-
-template <>
-EIGEN_STRONG_INLINE Eigen::half predux_min<Packet8h>(const Packet8h& a) {
-  Packet8f af = half2float(a);
-  float reduced = predux_min<Packet8f>(af);
-  return Eigen::half(reduced);
-}
-
-template <>
-EIGEN_STRONG_INLINE Eigen::half predux_mul<Packet8h>(const Packet8h& a) {
-  Packet8f af = half2float(a);
-  float reduced = predux_mul<Packet8f>(af);
-  return Eigen::half(reduced);
 }
 
 template <>
@@ -2857,26 +2759,6 @@ EIGEN_STRONG_INLINE void pscatter<bfloat16, Packet8bf>(bfloat16* to, const Packe
   to[stride * 5] = aux[5];
   to[stride * 6] = aux[6];
   to[stride * 7] = aux[7];
-}
-
-template <>
-EIGEN_STRONG_INLINE bfloat16 predux<Packet8bf>(const Packet8bf& a) {
-  return static_cast<bfloat16>(predux<Packet8f>(Bf16ToF32(a)));
-}
-
-template <>
-EIGEN_STRONG_INLINE bfloat16 predux_max<Packet8bf>(const Packet8bf& a) {
-  return static_cast<bfloat16>(predux_max<Packet8f>(Bf16ToF32(a)));
-}
-
-template <>
-EIGEN_STRONG_INLINE bfloat16 predux_min<Packet8bf>(const Packet8bf& a) {
-  return static_cast<bfloat16>(predux_min<Packet8f>(Bf16ToF32(a)));
-}
-
-template <>
-EIGEN_STRONG_INLINE bfloat16 predux_mul<Packet8bf>(const Packet8bf& a) {
-  return static_cast<bfloat16>(predux_mul<Packet8f>(Bf16ToF32(a)));
 }
 
 template <>

@@ -793,6 +793,12 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 nextafter(const bfloat16& from, c
   return numext::bit_cast<bfloat16>(from_bits);
 }
 
+// Specialize multiply-add to match packet operations and reduce conversions to/from float.
+template<>
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC Eigen::bfloat16 madd<Eigen::bfloat16>(const Eigen::bfloat16& x, const Eigen::bfloat16& y, const Eigen::bfloat16& z) {
+  return Eigen::bfloat16(static_cast<float>(x) * static_cast<float>(y) + static_cast<float>(z));
+}
+
 }  // namespace numext
 }  // namespace Eigen
 

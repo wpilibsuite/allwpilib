@@ -355,9 +355,7 @@ void ListenerStorage::Reset() {
   m_valueListeners.clear();
   m_logListeners.clear();
   m_timeSyncListeners.clear();
-  if (m_thread) {
-    m_thread.Stop();
-  }
+  m_thread.Join();
 }
 
 std::vector<std::pair<NT_Listener, unsigned int>>

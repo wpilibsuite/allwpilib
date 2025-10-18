@@ -25,6 +25,12 @@
 #include <ntcore_c.h>
 #include <ntcore_cpp.h>
 #include <ntcore_cpp_types.h>
+#include <upb/message/message.h>
+#include <upb/mini_table/message.h>
+#include <upb/reflection/def.h>
+#include <upb/reflection/message.h>
+#include <upb/reflection/stage0/google/protobuf/descriptor.upb.h>
+#include <upb/wire/decode.h>
 #include <wpi/MessagePack.h>
 #include <wpi/SmallString.h>
 #include <wpi/SpanExtras.h>
@@ -32,11 +38,6 @@
 #include <wpi/mpack.h>
 #include <wpi/print.h>
 #include <wpi/raw_ostream.h>
-
-#ifndef NO_PROTOBUF
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/message.h>
-#endif
 
 #include "glass/Context.h"
 #include "glass/DataSource.h"
@@ -232,6 +233,17 @@ static void UpdateMsgpackValueSource(NetworkTablesModel& model,
   }
 }
 
+static std::string GetEnumValue(const wpi::StructFieldDescriptor& field,
+                                int64_t val) {
+  auto& enumValues = field.GetEnumValues();
+  for (auto&& ev : enumValues) {
+    if (ev.second == val) {
+      return ev.first;
+    }
+  }
+  return fmt::format("<{}>", val);
+}
+
 static void UpdateStructValueSource(NetworkTablesModel& model,
                                     NetworkTablesModel::ValueSource* out,
                                     const wpi::DynamicStruct& s,
@@ -280,6 +292,30 @@ static void UpdateStructValueSource(NetworkTablesModel& model,
       case wpi::StructFieldType::kUint32:
       case wpi::StructFieldType::kUint64: {
         bool isUint = field.IsUint();
+        if (field.HasEnum()) {
+          if (field.IsArray()) {
+            std::vector<std::string> v;
+            v.reserve(field.GetArraySize());
+            for (size_t i = 0; i < field.GetArraySize(); ++i) {
+              if (isUint) {
+                v.emplace_back(GetEnumValue(field, s.GetUintField(&field, i)));
+              } else {
+                v.emplace_back(GetEnumValue(field, s.GetIntField(&field, i)));
+              }
+            }
+            child.UpdateFromEnum(child.path, std::move(v), time);
+          } else {
+            if (isUint) {
+              child.UpdateFromEnum(child.path,
+                                   GetEnumValue(field, s.GetUintField(&field)),
+                                   time);
+            } else {
+              child.UpdateFromEnum(
+                  child.path, GetEnumValue(field, s.GetIntField(&field)), time);
+            }
+          }
+          break;
+        }
         if (field.IsArray()) {
           std::vector<int64_t> v;
           v.reserve(field.GetArraySize());
@@ -353,172 +389,219 @@ static void UpdateStructValueSource(NetworkTablesModel& model,
   }
 }
 
-#ifndef NO_PROTOBUF
 static void UpdateProtobufValueSource(NetworkTablesModel& model,
                                       NetworkTablesModel::ValueSource* out,
-                                      const google::protobuf::Message& msg,
+                                      const upb_Message* msg,
+                                      const upb_MessageDef* msgDef,
                                       std::string_view name, int64_t time) {
-  auto desc = msg.GetDescriptor();
-  out->typeStr = fmt::format("proto:{}", desc->full_name());
+  out->typeStr = fmt::format("proto:{}", upb_MessageDef_FullName(msgDef));
+  int fieldCount = upb_MessageDef_FieldCount(msgDef);
   if (!out->valueChildrenMap ||
-      desc->field_count() != static_cast<int>(out->valueChildren.size())) {
+      fieldCount != static_cast<int>(out->valueChildren.size())) {
     out->valueChildren.clear();
     out->valueChildrenMap = true;
-    out->valueChildren.reserve(desc->field_count());
-    for (int i = 0, end = desc->field_count(); i < end; ++i) {
+    out->valueChildren.reserve(fieldCount);
+    for (int i = 0, end = fieldCount; i < end; ++i) {
       out->valueChildren.emplace_back();
       auto& child = out->valueChildren.back();
-      child.name = desc->field(i)->name();
+      child.name = upb_FieldDef_Name(upb_MessageDef_Field(msgDef, i));
       child.path = fmt::format("{}/{}", name, child.name);
     }
   }
-  auto refl = msg.GetReflection();
   auto outIt = out->valueChildren.begin();
-  for (int fieldNum = 0, end = desc->field_count(); fieldNum < end;
-       ++fieldNum) {
-    auto field = desc->field(fieldNum);
+  for (int fieldNum = 0, end = fieldCount; fieldNum < end; ++fieldNum) {
+    const upb_FieldDef* field = upb_MessageDef_Field(msgDef, fieldNum);
     auto& child = *outIt++;
-    switch (field->cpp_type()) {
-      case google::protobuf::FieldDescriptor::CPPTYPE_BOOL:
-        if (field->is_repeated()) {
-          size_t size = refl->FieldSize(msg, field);
+    auto value = upb_Message_GetFieldByDef(msg, field);
+    // Ensure null dereferences don't occur. Non-repeated types will just be
+    // defaulted to zero or empty. Submessages are always optional and are
+    // covered in the next check.
+    bool isEmptyArray = upb_FieldDef_IsRepeated(field) && !value.array_val;
+    // https://protobuf.dev/programming-guides/proto3/#field-labels
+    // https://protobuf.dev/programming-guides/field_presence/#semantic-differences
+    // If the field was marked optional (which means it has explicit presence,
+    // checkable via HasPresence), it differentiates between not being set, and
+    // having a default zero value. If the field hasn't been set (checked via
+    // HasFieldByDef), we should display a blank space to indicate that it
+    // wasn't set, as opposed to displaying the default value. If it wasn't
+    // marked optional, always display the value, which might be the default
+    // value, but that should be semantically correct for all of our types.
+    bool isEmptyOptional = upb_FieldDef_HasPresence(field) &&
+                           !upb_Message_HasFieldByDef(msg, field);
+    if (isEmptyArray || isEmptyOptional) {
+      continue;
+    }
+    switch (upb_FieldDef_CType(field)) {
+      case kUpb_CType_Bool: {
+        if (upb_FieldDef_IsRepeated(field)) {
+          const upb_Array* arr = value.array_val;
+          size_t size = upb_Array_Size(arr);
           std::vector<int> v;
           v.reserve(size);
           for (size_t i = 0; i < size; ++i) {
-            v.emplace_back(refl->GetRepeatedBool(msg, field, i));
+            v.emplace_back(upb_Array_Get(arr, i).bool_val);
           }
           child.value = nt::Value::MakeBooleanArray(std::move(v), time);
         } else {
-          child.value = nt::Value::MakeBoolean(refl->GetBool(msg, field), time);
-        }
-        child.UpdateFromValue(model, child.path, "");
-        break;
-      case google::protobuf::FieldDescriptor::CPPTYPE_STRING:
-        if (field->is_repeated()) {
-          size_t size = refl->FieldSize(msg, field);
-          std::vector<std::string> v;
-          v.reserve(size);
-          for (size_t i = 0; i < size; ++i) {
-            v.emplace_back(refl->GetRepeatedString(msg, field, i));
-          }
-          child.value = nt::Value::MakeStringArray(std::move(v), time);
-        } else {
-          child.value =
-              nt::Value::MakeString(refl->GetString(msg, field), time);
+          child.value = nt::Value::MakeBoolean(value.bool_val, time);
           child.UpdateFromValue(model, child.path, "");
         }
         break;
-      case google::protobuf::FieldDescriptor::CPPTYPE_INT32:
-        if (field->is_repeated()) {
-          size_t size = refl->FieldSize(msg, field);
-          std::vector<int64_t> v;
-          v.reserve(size);
-          for (size_t i = 0; i < size; ++i) {
-            v.emplace_back(refl->GetRepeatedInt32(msg, field, i));
-          }
-          child.value = nt::Value::MakeIntegerArray(std::move(v), time);
-        } else {
-          child.value =
-              nt::Value::MakeInteger(refl->GetInt32(msg, field), time);
-        }
-        child.UpdateFromValue(model, child.path, "");
-        break;
-      case google::protobuf::FieldDescriptor::CPPTYPE_INT64:
-        if (field->is_repeated()) {
-          size_t size = refl->FieldSize(msg, field);
-          std::vector<int64_t> v;
-          v.reserve(size);
-          for (size_t i = 0; i < size; ++i) {
-            v.emplace_back(refl->GetRepeatedInt64(msg, field, i));
-          }
-          child.value = nt::Value::MakeIntegerArray(std::move(v), time);
-        } else {
-          child.value =
-              nt::Value::MakeInteger(refl->GetInt64(msg, field), time);
-        }
-        child.UpdateFromValue(model, child.path, "");
-        break;
-      case google::protobuf::FieldDescriptor::CPPTYPE_UINT32:
-        if (field->is_repeated()) {
-          size_t size = refl->FieldSize(msg, field);
-          std::vector<int64_t> v;
-          v.reserve(size);
-          for (size_t i = 0; i < size; ++i) {
-            v.emplace_back(refl->GetRepeatedUInt32(msg, field, i));
-          }
-          child.value = nt::Value::MakeIntegerArray(std::move(v), time);
-        } else {
-          child.value =
-              nt::Value::MakeInteger(refl->GetUInt32(msg, field), time);
-        }
-        child.UpdateFromValue(model, child.path, "");
-        break;
-      case google::protobuf::FieldDescriptor::CPPTYPE_UINT64:
-        if (field->is_repeated()) {
-          size_t size = refl->FieldSize(msg, field);
-          std::vector<int64_t> v;
-          v.reserve(size);
-          for (size_t i = 0; i < size; ++i) {
-            v.emplace_back(refl->GetRepeatedUInt64(msg, field, i));
-          }
-          child.value = nt::Value::MakeIntegerArray(std::move(v), time);
-        } else {
-          child.value =
-              nt::Value::MakeInteger(refl->GetUInt64(msg, field), time);
-        }
-        child.UpdateFromValue(model, child.path, "");
-        break;
-      case google::protobuf::FieldDescriptor::CPPTYPE_FLOAT:
-        if (field->is_repeated()) {
-          size_t size = refl->FieldSize(msg, field);
-          std::vector<float> v;
-          v.reserve(size);
-          for (size_t i = 0; i < size; ++i) {
-            v.emplace_back(refl->GetRepeatedFloat(msg, field, i));
-          }
-          child.value = nt::Value::MakeFloatArray(std::move(v), time);
-        } else {
-          child.value = nt::Value::MakeFloat(refl->GetFloat(msg, field), time);
-        }
-        child.UpdateFromValue(model, child.path, "");
-        break;
-      case google::protobuf::FieldDescriptor::CPPTYPE_DOUBLE:
-        if (field->is_repeated()) {
-          size_t size = refl->FieldSize(msg, field);
-          std::vector<double> v;
-          v.reserve(size);
-          for (size_t i = 0; i < size; ++i) {
-            v.emplace_back(refl->GetRepeatedDouble(msg, field, i));
-          }
-          child.value = nt::Value::MakeDoubleArray(std::move(v), time);
-        } else {
-          child.value =
-              nt::Value::MakeDouble(refl->GetDouble(msg, field), time);
-        }
-        child.UpdateFromValue(model, child.path, "");
-        break;
-      case google::protobuf::FieldDescriptor::CPPTYPE_ENUM:
-        if (field->is_repeated()) {
-          size_t size = refl->FieldSize(msg, field);
+      }
+      case kUpb_CType_String: {
+        if (upb_FieldDef_IsRepeated(field)) {
+          const upb_Array* arr = value.array_val;
+          size_t size = upb_Array_Size(arr);
           std::vector<std::string> v;
           v.reserve(size);
           for (size_t i = 0; i < size; ++i) {
-            v.emplace_back(refl->GetRepeatedEnum(msg, field, i)->name());
+            upb_StringView sv = upb_Array_Get(arr, i).str_val;
+            v.emplace_back(sv.data, sv.size);
           }
           child.value = nt::Value::MakeStringArray(std::move(v), time);
         } else {
-          child.value =
-              nt::Value::MakeString(refl->GetEnum(msg, field)->name(), time);
+          upb_StringView sv = value.str_val;
+          child.value = nt::Value::MakeString({sv.data, sv.size}, time);
+          child.UpdateFromValue(model, child.path, "");
+        }
+        break;
+      }
+      case kUpb_CType_Int32: {
+        if (upb_FieldDef_IsRepeated(field)) {
+          const upb_Array* arr = value.array_val;
+          size_t size = upb_Array_Size(arr);
+          std::vector<int64_t> v;
+          v.reserve(size);
+          for (size_t i = 0; i < size; ++i) {
+            v.emplace_back(upb_Array_Get(arr, i).int32_val);
+          }
+          child.value = nt::Value::MakeIntegerArray(std::move(v), time);
+        } else {
+          child.value = nt::Value::MakeInteger(value.int32_val, time);
         }
         child.UpdateFromValue(model, child.path, "");
         break;
-      case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
-        if (field->is_repeated()) {
+      }
+      case kUpb_CType_Int64: {
+        if (upb_FieldDef_IsRepeated(field)) {
+          const upb_Array* arr = value.array_val;
+          size_t size = upb_Array_Size(arr);
+          std::vector<int64_t> v;
+          v.reserve(size);
+          for (size_t i = 0; i < size; ++i) {
+            v.emplace_back(upb_Array_Get(arr, i).int64_val);
+          }
+          child.value = nt::Value::MakeIntegerArray(std::move(v), time);
+        } else {
+          child.value = nt::Value::MakeInteger(value.int64_val, time);
+        }
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      }
+      case kUpb_CType_UInt32: {
+        if (upb_FieldDef_IsRepeated(field)) {
+          const upb_Array* arr = value.array_val;
+          size_t size = upb_Array_Size(arr);
+          std::vector<int64_t> v;
+          v.reserve(size);
+          for (size_t i = 0; i < size; ++i) {
+            v.emplace_back(upb_Array_Get(arr, i).uint32_val);
+          }
+          child.value = nt::Value::MakeIntegerArray(std::move(v), time);
+        } else {
+          child.value = nt::Value::MakeInteger(value.uint32_val, time);
+        }
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      }
+      case kUpb_CType_UInt64: {
+        if (upb_FieldDef_IsRepeated(field)) {
+          const upb_Array* arr = value.array_val;
+          size_t size = upb_Array_Size(arr);
+          std::vector<int64_t> v;
+          v.reserve(size);
+          for (size_t i = 0; i < size; ++i) {
+            v.emplace_back(upb_Array_Get(arr, i).uint64_val);
+          }
+          child.value = nt::Value::MakeIntegerArray(std::move(v), time);
+        } else {
+          child.value = nt::Value::MakeInteger(value.uint64_val, time);
+        }
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      }
+      case kUpb_CType_Float: {
+        if (upb_FieldDef_IsRepeated(field)) {
+          const upb_Array* arr = value.array_val;
+          size_t size = upb_Array_Size(arr);
+          std::vector<float> v;
+          v.reserve(size);
+          for (size_t i = 0; i < size; ++i) {
+            v.emplace_back(upb_Array_Get(arr, i).float_val);
+          }
+          child.value = nt::Value::MakeFloatArray(std::move(v), time);
+        } else {
+          child.value = nt::Value::MakeFloat(value.float_val, time);
+        }
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      }
+      case kUpb_CType_Double: {
+        if (upb_FieldDef_IsRepeated(field)) {
+          const upb_Array* arr = value.array_val;
+          size_t size = upb_Array_Size(arr);
+          std::vector<double> v;
+          v.reserve(size);
+          for (size_t i = 0; i < size; ++i) {
+            v.emplace_back(upb_Array_Get(arr, i).double_val);
+          }
+          child.value = nt::Value::MakeDoubleArray(std::move(v), time);
+        } else {
+          child.value = nt::Value::MakeDouble(value.double_val, time);
+        }
+        child.UpdateFromValue(model, child.path, "");
+        break;
+      }
+      case kUpb_CType_Enum: {
+        const upb_EnumDef* enumDef = upb_FieldDef_EnumSubDef(field);
+        if (upb_FieldDef_IsRepeated(field)) {
+          const upb_Array* arr = value.array_val;
+          size_t size = upb_Array_Size(arr);
+          std::vector<std::string> v;
+          v.reserve(size);
+          for (size_t i = 0; i < size; ++i) {
+            int32_t val = value.int32_val;
+            const upb_EnumValueDef* enumValueDef =
+                upb_EnumDef_FindValueByNumber(enumDef, val);
+            if (enumValueDef) {
+              const char* name = upb_EnumValueDef_Name(enumValueDef);
+              v.emplace_back(name);
+            } else {
+              v.emplace_back(fmt::format("<{}>", val));
+            }
+          }
+          child.UpdateFromEnum(child.path, std::move(v), time);
+        } else {
+          int32_t val = value.int32_val;
+          const upb_EnumValueDef* enumValueDef =
+              upb_EnumDef_FindValueByNumber(enumDef, val);
+          if (enumValueDef) {
+            const char* name = upb_EnumValueDef_Name(enumValueDef);
+            child.UpdateFromEnum(child.path, name, time);
+          } else {
+            child.UpdateFromEnum(child.path, fmt::format("<{}>", val), time);
+          }
+        }
+        break;
+      }
+      case kUpb_CType_Message: {
+        if (upb_FieldDef_IsRepeated(field)) {
           if (child.valueChildrenMap) {
             child.valueChildren.clear();
             child.valueChildrenMap = false;
           }
-          size_t size = refl->FieldSize(msg, field);
+          const upb_Array* arr = value.array_val;
+          size_t size = upb_Array_Size(arr);
           child.valueChildren.resize(size);
           unsigned int i = 0;
           for (auto&& child2 : child.valueChildren) {
@@ -526,23 +609,24 @@ static void UpdateProtobufValueSource(NetworkTablesModel& model,
               child2.name = fmt::format("[{}]", i);
               child2.path = fmt::format("{}{}", name, child.name);
             }
-            UpdateProtobufValueSource(model, &child2,
-                                      refl->GetRepeatedMessage(msg, field, i),
+            const upb_Message* submsg = upb_Array_Get(arr, i).msg_val;
+            const upb_MessageDef* submsgDef = upb_FieldDef_MessageSubDef(field);
+            UpdateProtobufValueSource(model, &child2, submsg, submsgDef,
                                       child2.path, time);  // recurse
             ++i;
           }
         } else {
-          UpdateProtobufValueSource(
-              model, &child,
-              refl->GetMessage(msg, field,
-                               model.GetProtobufDatabase().GetMessageFactory()),
-              child.path, time);  // recurse
+          UpdateProtobufValueSource(model, &child, value.msg_val,
+                                    upb_FieldDef_MessageSubDef(field),
+                                    child.path, time);  // recurse
         }
+        break;
+      }
+      case kUpb_CType_Bytes:
         break;
     }
   }
 }
-#endif
 
 static void UpdateJsonValueSource(NetworkTablesModel& model,
                                   NetworkTablesModel::ValueSource* out,
@@ -628,6 +712,38 @@ static void UpdateJsonValueSource(NetworkTablesModel& model,
       out->value = {};
       break;
   }
+}
+
+void NetworkTablesModel::ValueSource::UpdateFromEnum(std::string_view name,
+                                                     std::string_view v,
+                                                     int64_t time) {
+  valueChildren.clear();
+  value = nt::Value::MakeString(v, time);
+  valueStr = v;
+  auto s = dynamic_cast<StringSource*>(source.get());
+  if (!s) {
+    source = std::make_unique<StringSource>(fmt::format("NT:{}", name));
+    s = static_cast<StringSource*>(source.get());
+  }
+  s->SetValue(v, time);
+}
+
+void NetworkTablesModel::ValueSource::UpdateFromEnum(
+    std::string_view name, std::vector<std::string> arr, int64_t time) {
+  if (valueChildrenMap) {
+    valueChildren.clear();
+    valueChildrenMap = false;
+  }
+  valueChildren.resize(arr.size());
+  unsigned int i = 0;
+  for (auto&& child : valueChildren) {
+    if (child.name.empty()) {
+      child.name = fmt::format("[{}]", i);
+      child.path = fmt::format("{}{}", name, child.name);
+    }
+    child.UpdateFromEnum(child.path, arr[i++], time);
+  }
+  value = nt::Value::MakeStringArray(std::move(arr), time);
 }
 
 void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
@@ -817,13 +933,19 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
           valueChildren.clear();
         }
       } else if (auto filename = wpi::remove_prefix(typeStr, "proto:")) {
-#ifndef NO_PROTOBUF
-        auto msg = model.m_protoDb.Find(*filename);
-        if (msg) {
-          msg->Clear();
+        const upb_MessageDef* messageDef = upb_DefPool_FindMessageByName(
+            model.GetProtobufDatabase(), filename->data());
+        if (messageDef) {
           auto raw = value.GetRaw();
-          if (msg->ParseFromArray(raw.data(), raw.size())) {
-            UpdateProtobufValueSource(model, this, *msg, name,
+          const upb_MiniTable* miniTable = upb_MessageDef_MiniTable(messageDef);
+
+          upb_Message* message =
+              upb_Message_New(miniTable, model.GetProtobufArena());
+          upb_DecodeStatus status = upb_Decode(
+              reinterpret_cast<const char*>(raw.data()), raw.size(), message,
+              miniTable, nullptr, 0, model.GetProtobufArena());
+          if (status == kUpb_DecodeStatus_Ok) {
+            UpdateProtobufValueSource(model, this, message, messageDef, name,
                                       value.last_change());
           } else {
             valueChildren.clear();
@@ -831,9 +953,6 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
         } else {
           valueChildren.clear();
         }
-#else
-        valueChildren.clear();
-#endif
       } else {
         valueChildren.clear();
       }
@@ -959,9 +1078,17 @@ void NetworkTablesModel::Update() {
                        wpi::remove_prefix(entry->info.name, "/.schema/proto:");
                    entry->value.IsRaw() && filename &&
                    entry->info.type_str == "proto:FileDescriptorProto") {
-#ifndef NO_PROTOBUF
           // protobuf descriptor handling
-          if (!m_protoDb.Add(*filename, entry->value.GetRaw())) {
+          upb_Status status;
+          status.ok = true;
+          auto descriptor = entry->value.GetRaw();
+          upb_DefPool_AddFile(
+              m_protoPool,
+              google_protobuf_FileDescriptorProto_parse(
+                  reinterpret_cast<const char*>(descriptor.data()),
+                  descriptor.size(), m_arena),
+              &status);
+          if (!status.ok) {
             wpi::print("could not decode protobuf '{}' filename '{}'\n",
                        entry->info.name, *filename);
           } else {
@@ -976,7 +1103,6 @@ void NetworkTablesModel::Update() {
               }
             }
           }
-#endif
         }
       }
     }

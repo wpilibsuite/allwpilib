@@ -31,6 +31,7 @@ ext {
 staticGtestConfigs["${nativeName}Test"] = []
 
 apply from: "${rootDir}/shared/googletest.gradle"
+apply from: "${rootDir}/shared/catch2.gradle"
 
 model {
     components {
@@ -148,7 +149,11 @@ model {
         // By default, a development executable will be generated. This is to help the case of
         // testing specific functionality of the library.
         "${nativeName}Dev"(NativeExecutableSpec) {
-            targetBuildTypes 'debug'
+            if (project.hasProperty('ciDebugOnly') || project.hasProperty('debugJNI')) {
+                targetBuildTypes 'debug'
+            } else {
+                targetBuildTypes 'release'
+            }
             sources {
                 cpp {
                     source {
@@ -202,6 +207,7 @@ model {
                     source {
                         srcDirs 'src/test/native/cpp'
                         include '**/*.cpp'
+                        exclude '**/TestCatch2.cpp', '**/catch2main.cpp'
                     }
                     exportedHeaders {
                         srcDirs 'src/test/native/include', 'src/main/native/cpp', "$buildDir/generated/source/proto/main/cpp"
@@ -269,11 +275,6 @@ apply from: "${rootDir}/shared/cppJavaDesktopTestTask.gradle"
 
 ext.getJniSpecClass = {
     return JniNativeLibrarySpec
-}
-
-tasks.withType(RunTestExecutable) {
-    args "--gtest_output=xml:test_detail.xml"
-    outputs.dir outputDir
 }
 
 apply from: "${rootDir}/shared/jni/publish.gradle"

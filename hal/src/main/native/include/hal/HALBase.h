@@ -64,29 +64,6 @@ const char* HAL_GetLastError(int32_t* status);
 const char* HAL_GetErrorMessage(int32_t code);
 
 /**
- * Returns the FPGA Version number.
- *
- * For now, expect this to be competition year.
- *
- * @param[out] status the error code, or 0 for success
- * @return FPGA Version number.
- */
-int32_t HAL_GetFPGAVersion(int32_t* status);
-
-/**
- * Returns the FPGA Revision number.
- *
- * The format of the revision is 3 numbers.
- * The 12 most significant bits are the Major Revision.
- * the next 8 bits are the Minor Revision.
- * The 12 least significant bits are the Build Number.
- *
- * @param[out] status the error code, or 0 for success
- * @return FPGA Revision number.
- */
-int64_t HAL_GetFPGARevision(int32_t* status);
-
-/**
  * Returns the roboRIO serial number.
  *
  * @param[out] serialNumber The roboRIO serial number. Free with WPI_FreeString

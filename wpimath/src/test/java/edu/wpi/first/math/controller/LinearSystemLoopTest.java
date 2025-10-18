@@ -22,7 +22,7 @@ import java.util.Random;
 import org.junit.jupiter.api.Test;
 
 class LinearSystemLoopTest {
-  private static final double kDt = 0.00505;
+  private static final double kDt = 0.005;
   private static final double kPositionStddev = 0.0001;
   private static final Random random = new Random();
 
@@ -45,12 +45,12 @@ class LinearSystemLoopTest {
           (LinearSystem<N2, N1, N1>) m_plant.slice(0),
           VecBuilder.fill(0.02, 0.4),
           VecBuilder.fill(12.0),
-          0.00505);
+          0.005);
 
   @SuppressWarnings("unchecked")
   private final LinearSystemLoop<N2, N1, N1> m_loop =
       new LinearSystemLoop<>(
-          (LinearSystem<N2, N1, N1>) m_plant.slice(0), m_controller, m_observer, 12, 0.00505);
+          (LinearSystem<N2, N1, N1>) m_plant.slice(0), m_controller, m_observer, 12, 0.005);
 
   private static void updateTwoState(
       LinearSystem<N2, N1, N1> plant, LinearSystemLoop<N2, N1, N1> loop, double noise) {

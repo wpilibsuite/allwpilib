@@ -269,8 +269,8 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    */
   public static WheelSpeeds driveCartesianIK(
       double xSpeed, double ySpeed, double zRotation, Rotation2d gyroAngle) {
-    xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
-    ySpeed = MathUtil.clamp(ySpeed, -1.0, 1.0);
+    xSpeed = Math.clamp(xSpeed, -1.0, 1.0);
+    ySpeed = Math.clamp(ySpeed, -1.0, 1.0);
 
     // Compensate for gyro angle.
     var input = new Translation2d(xSpeed, ySpeed).rotateBy(gyroAngle.unaryMinus());

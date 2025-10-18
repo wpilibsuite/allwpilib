@@ -10,7 +10,7 @@ pluginManagement {
 }
 
 plugins {
-    id "com.gradle.enterprise" version "3.15.1"
+    id "com.gradle.develocity" version "4.2"
 }
 
 // Set the flag to tell gradle to ignore unresolved headers
@@ -31,6 +31,8 @@ include 'wpilibc'
 include 'wpilibcExamples'
 include 'wpilibjExamples'
 include 'wpilibj'
+include 'javacPlugin'
+include 'wpiannotations'
 include 'wpiunits'
 include 'fieldImages'
 include 'glass'
@@ -46,6 +48,7 @@ include 'simulation:halsim_xrp'
 include 'cameraserver'
 include 'cameraserver:multiCameraServer'
 include 'wpilibNewCommands'
+include 'commandsv3'
 include 'romiVendordep'
 include 'xrpVendordep'
 include 'developerRobot'
@@ -57,6 +60,7 @@ include 'apriltag'
 include 'processstarter'
 include 'epilogue-processor'
 include 'epilogue-runtime'
+include 'thirdparty:catch2'
 include 'thirdparty:googletest'
 include 'thirdparty:imgui_suite'
 include 'wpical'

@@ -10,7 +10,7 @@
 namespace frc {
 
 TEST(ImplicitModelFollowerTest, SameModel) {
-  constexpr auto dt = 5_ms;
+  constexpr units::second_t dt = 5_ms;
 
   using Kv_t = decltype(1_V / 1_mps);
   using Ka_t = decltype(1_V / 1_mps_sq);
@@ -54,7 +54,7 @@ TEST(ImplicitModelFollowerTest, SameModel) {
 }
 
 TEST(ImplicitModelFollowerTest, SlowerRefModel) {
-  constexpr auto dt = 5_ms;
+  constexpr units::second_t dt = 5_ms;
 
   using Kv_t = decltype(1_V / 1_mps);
   using Ka_t = decltype(1_V / 1_mps_sq);

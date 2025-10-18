@@ -35,7 +35,7 @@ AnalogAccelerometer::AnalogAccelerometer(std::shared_ptr<AnalogInput> channel)
 }
 
 double AnalogAccelerometer::GetAcceleration() const {
-  return (m_analogInput->GetAverageVoltage() - m_zeroGVoltage) / m_voltsPerG;
+  return (m_analogInput->GetVoltage() - m_zeroGVoltage) / m_voltsPerG;
 }
 
 void AnalogAccelerometer::SetSensitivity(double sensitivity) {

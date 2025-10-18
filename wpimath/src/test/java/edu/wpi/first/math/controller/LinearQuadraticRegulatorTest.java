@@ -29,12 +29,12 @@ class LinearQuadraticRegulatorTest {
 
     var qElms = VecBuilder.fill(0.02, 0.4);
     var rElms = VecBuilder.fill(12.0);
-    var dt = 0.00505;
+    var dt = 0.005;
 
     var K = new LinearQuadraticRegulator<>(plant, qElms, rElms, dt).getK();
 
-    assertEquals(522.153, K.get(0, 0), 0.1);
-    assertEquals(38.2, K.get(0, 1), 0.1);
+    assertEquals(522.87006795347486, K.get(0, 0), 1e-6);
+    assertEquals(38.239878385020411, K.get(0, 1), 1e-6);
   }
 
   @Test
@@ -65,12 +65,12 @@ class LinearQuadraticRegulatorTest {
 
     var qElms = VecBuilder.fill(0.01745, 0.08726);
     var rElms = VecBuilder.fill(12.0);
-    var dt = 0.00505;
+    var dt = 0.005;
 
     var K = new LinearQuadraticRegulator<>(plant, qElms, rElms, dt).getK();
 
-    assertEquals(19.16, K.get(0, 0), 0.1);
-    assertEquals(3.32, K.get(0, 1), 0.1);
+    assertEquals(19.339349883583761, K.get(0, 0), 1e-6);
+    assertEquals(3.3542559517421582, K.get(0, 1), 1e-6);
   }
 
   /**

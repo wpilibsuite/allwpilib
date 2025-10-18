@@ -131,7 +131,7 @@ class WPILIB_DLLEXPORT Odometry3d {
                   units::radian_t{angle_difference(1)},
                   units::radian_t{angle_difference(2)}};
 
-    auto newPose = m_pose.Exp(twist);
+    auto newPose = m_pose + twist.Exp();
 
     m_previousWheelPositions = wheelPositions;
     m_previousAngle = angle;

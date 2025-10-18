@@ -45,10 +45,16 @@ class DenseCoeffsBase<Derived, ReadOnlyAccessors> : public EigenBase<Derived> {
   // - This is the return type of the coeff() method.
   // - The LvalueBit means exactly that we can offer a coeffRef() method, which means exactly that we can get references
   // to coeffs, which means exactly that we can have coeff() return a const reference (as opposed to returning a value).
+  // - The DirectAccessBit means exactly that the underlying data of coefficients can be directly accessed as a plain
+  // strided array, which means exactly that the underlying data of coefficients does exist in memory, which means
+  // exactly that the coefficients is const-referencable, which means exactly that we can have coeff() return a const
+  // reference. For example, Map<const Matrix> have DirectAccessBit but not LvalueBit, so that Map<const Matrix>.coeff()
+  // does points to a const Scalar& which exists in memory, while does not allow coeffRef() as it would not provide a
+  // lvalue. Notice that DirectAccessBit and LvalueBit are mutually orthogonal.
   // - The is_arithmetic check is required since "const int", "const double", etc. will cause warnings on some systems
   // while the declaration of "const T", where T is a non arithmetic type does not. Always returning "const Scalar&" is
   // not possible, since the underlying expressions might not offer a valid address the reference could be referring to.
-  typedef std::conditional_t<bool(internal::traits<Derived>::Flags& LvalueBit), const Scalar&,
+  typedef std::conditional_t<bool(internal::traits<Derived>::Flags&(LvalueBit | DirectAccessBit)), const Scalar&,
                              std::conditional_t<internal::is_arithmetic<Scalar>::value, Scalar, const Scalar>>
       CoeffReturnType;
 

@@ -120,12 +120,6 @@ jobs:
           ./mpack.py clone
           ./mpack.py copy-src
           ./mpack.py format-patch
-      - name: Run protobuf.py
-        run: |
-          cd upstream_utils
-          ./protobuf.py clone
-          ./protobuf.py copy-src
-          ./protobuf.py format-patch
       - name: Run sleipnir.py
         run: |
           cd upstream_utils
@@ -138,6 +132,12 @@ jobs:
           ./stb.py clone
           ./stb.py copy-src
           ./stb.py format-patch
+      - name: Run upb.py
+        run: |
+          cd upstream_utils
+          ./upb.py clone
+          ./upb.py copy-src
+          ./upb.py format-patch
       - name: Add untracked files to index so they count as changes
         run: git add -A
       - name: Check output

@@ -95,14 +95,40 @@ constexpr T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
 }
 
 /**
+ * Returns a zero vector if the given vector is within the specified
+ * distance from the origin. The remaining distance between the deadband and the
+ * maximum distance is scaled from the origin to the maximum distance.
+ *
+ * @param value Value to clip.
+ * @param deadband Distance from origin.
+ * @param maxMagnitude The maximum distance from the origin of the input
+ * (defaults to 1). Can be infinite.
+ * @return The value after the deadband is applied.
+ */
+template <typename T, int N>
+  requires std::is_arithmetic_v<T> || units::traits::is_unit_t_v<T>
+Eigen::Vector<T, N> ApplyDeadband(const Eigen::Vector<T, N>& value, T deadband,
+                                  T maxMagnitude = T{1.0}) {
+  if constexpr (std::is_arithmetic_v<T>) {
+    if (value.norm() < T{1e-9}) {
+      return Eigen::Vector<T, N>::Zero();
+    }
+    return value.normalized() *
+           ApplyDeadband(value.norm(), deadband, maxMagnitude);
+  } else {
+    const Eigen::Vector<double, N> asDouble = value.template cast<double>();
+    const Eigen::Vector<double, N> processed =
+        ApplyDeadband(asDouble, deadband.value(), maxMagnitude.value());
+    return processed.template cast<T>();
+  }
+}
+
+/**
  * Raises the input to the power of the given exponent while preserving its
  * sign.
  *
  * The function normalizes the input value to the range [0, 1] based on the
- * maximum magnitude, raises it to the power of the exponent, then scales the
- * result back to the original range and copying the sign. This keeps the value
- * in the original range and gives consistent curve behavior regardless of the
- * input value's scale.
+ * maximum magnitude so that the output stays in the range.
  *
  * This is useful for applying smoother or more aggressive control response
  * curves (e.g. joystick input shaping).
@@ -110,14 +136,15 @@ constexpr T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
  * @param value The input value to transform.
  * @param exponent The exponent to apply (e.g. 1.0 = linear, 2.0 = squared
  * curve). Must be positive.
- * @param maxMagnitude The maximum expected absolute value of input. Must be
- * positive.
+ * @param maxMagnitude The maximum expected absolute value of input (defaults to
+ * 1). Must be positive.
  * @return The transformed value with the same sign and scaled to the input
  * range.
  */
 template <typename T>
   requires std::is_arithmetic_v<T> || units::traits::is_unit_t_v<T>
-constexpr T CopySignPow(T value, double exponent, T maxMagnitude = T{1.0}) {
+constexpr T CopyDirectionPow(T value, double exponent,
+                             T maxMagnitude = T{1.0}) {
   if constexpr (std::is_arithmetic_v<T>) {
     return gcem::copysign(
         gcem::pow(gcem::abs(value) / maxMagnitude, exponent) * maxMagnitude,
@@ -127,6 +154,42 @@ constexpr T CopySignPow(T value, double exponent, T maxMagnitude = T{1.0}) {
         gcem::pow((units::math::abs(value) / maxMagnitude).value(), exponent) *
             maxMagnitude,
         value);
+  }
+}
+
+/**
+ * Raises the norm of the input to the power of the given exponent while
+ * preserving its direction.
+ *
+ * The function normalizes the input value to the range [0, 1] based on the
+ * maximum magnitude so that the output stays in the range.
+ *
+ * This is useful for applying smoother or more aggressive control response
+ * curves (e.g. joystick input shaping).
+ *
+ * @param value The input vector to transform.
+ * @param exponent The exponent to apply (e.g. 1.0 = linear, 2.0 = squared
+ * curve). Must be positive.
+ * @param maxMagnitude The maximum expected distance from origin of input
+ * (defaults to 1). Must be positive.
+ * @return The transformed value with the same direction and norm scaled to
+ * the input range.
+ */
+template <typename T, int N>
+  requires std::is_arithmetic_v<T> || units::traits::is_unit_t_v<T>
+Eigen::Vector<T, N> CopyDirectionPow(const Eigen::Vector<T, N>& value,
+                                     double exponent, T maxMagnitude = T{1.0}) {
+  if constexpr (std::is_arithmetic_v<T>) {
+    if (value.norm() < T{1e-9}) {
+      return Eigen::Vector<T, N>::Zero();
+    }
+    return value.normalized() *
+           CopyDirectionPow(value.norm(), exponent, maxMagnitude);
+  } else {
+    const Eigen::Vector<double, N> asDouble = value.template cast<double>();
+    const Eigen::Vector<double, N> processed =
+        CopyDirectionPow(asDouble, exponent, maxMagnitude.value());
+    return processed.template cast<T>();
   }
 }
 
@@ -279,6 +342,7 @@ constexpr Translation2d SlewRateLimit(const Translation2d& current,
   }
   if (dist > maxVelocity * dt) {
     // Move maximum allowed amount in direction of the difference
+    // NOLINTNEXTLINE(bugprone-integer-division)
     return current + diff * (maxVelocity * dt / dist);
   }
   return next;
@@ -309,6 +373,7 @@ constexpr Translation3d SlewRateLimit(const Translation3d& current,
   }
   if (dist > maxVelocity * dt) {
     // Move maximum allowed amount in direction of the difference
+    // NOLINTNEXTLINE(bugprone-integer-division)
     return current + diff * (maxVelocity * dt / dist);
   }
   return next;

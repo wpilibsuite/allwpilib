@@ -15,6 +15,9 @@ generatedFileExclude {
   src/main/native/include/wpinet/http_parser\.h$
   src/main/native/resources/
   src/main/native/linux/AvahiClient
+
+  src/main/python/
+  src/test/python/
 }
 
 licenseUpdateExclude {

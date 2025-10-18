@@ -23,7 +23,6 @@ jobs:
           - os: macOS-14
             name: macOS
             container: ""
-            env: ""
             flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
           - os: windows-2022
             name: Windows
@@ -36,11 +35,11 @@ jobs:
     steps:
       - name: Install dependencies (Linux)
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv-java libprotobuf-dev protobuf-compiler ninja-build
+        run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv-java ninja-build
 
       - name: Install dependencies (macOS)
         if: runner.os == 'macOS'
-        run: brew install opencv protobuf@29 ninja
+        run: brew install opencv ninja
 
       - uses: ilammy/msvc-dev-cmd@v1.13.0
         if: runner.os == 'Windows'
