@@ -62,23 +62,10 @@ class TrajectoryTransformTest {
       var actualRel = b2.relativeTo(b1);
 
       assertEquals(
-          expectedRel.getX(),
-          actualRel.getX(),
-          1e-6,
+          expectedRel,
+          actualRel,
           String.format(
-              "X mismatch at index %d: expected %s, actual %s", i, expectedRel, actualRel));
-      assertEquals(
-          expectedRel.getY(),
-          actualRel.getY(),
-          1e-6,
-          String.format(
-              "Y mismatch at index %d: expected %s, actual %s", i, expectedRel, actualRel));
-      assertEquals(
-          expectedRel.getRotation().getRadians(),
-          actualRel.getRotation().getRadians(),
-          1e-6,
-          String.format(
-              "Rotation mismatch at index %d: expected %s, actual %s", i, expectedRel, actualRel));
+              "pose mismatch at index %d: expected %s, actual %s", i, expectedRel, actualRel));
     }
   }
 }
