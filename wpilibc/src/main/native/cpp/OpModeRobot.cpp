@@ -4,18 +4,181 @@
 
 #include "frc/OpModeRobot.h"
 
+#include <cstdlib>
+
+#include <fmt/format.h>
 #include <hal/DriverStation.h>
+#include <wpi/SafeThread.h>
+#include <wpi/Synchronization.h>
+#include <cstdint>
 
 #include "frc/DriverStation.h"
+#include "frc/opmode/OpMode.h"
+#include "hal/DriverStationTypes.h"
+#include "hal/HALBase.h"
 
 using namespace frc;
 
+namespace {
+class MonitorThread : public wpi::SafeThreadEvent {
+ public:
+  MonitorThread(int64_t modeId, wpi::Event& dsEvent,
+                std::weak_ptr<OpMode> activeOpMode)
+      : m_modeId{modeId},
+        m_dsEvent{dsEvent.GetHandle()},
+        m_activeOpMode{activeOpMode} {}
+
+ private:
+  void Main() override {
+    // Wait for DS to disable or change modes
+    WPI_EventHandle events[] = {m_dsEvent, m_stopEvent.GetHandle()};
+    WPI_Handle signaledBuf[2];
+    for (;;) {
+      auto signaled = wpi::WaitForObjects(events, signaledBuf);
+      if (signaled.empty()) {
+        return;  // handles destroyed
+      }
+      if (signaled[0] == m_stopEvent.GetHandle() ||
+          (signaled.size() >= 2 && signaled[1] == m_stopEvent.GetHandle())) {
+        return;  // stop requested
+      }
+
+      // did the opmode or enable state change?
+      HAL_ControlWord word;
+      HAL_GetUncachedControlWord(&word);
+      if (!HAL_ControlWord_IsEnabled(word) ||
+          HAL_ControlWord_GetOpModeId(word) != m_modeId) {
+        break;
+      }
+    }
+
+    bool timedOut = false;
+    wpi::WaitForObject(m_stopEvent.GetHandle(), 0.2, &timedOut);
+    if (!timedOut) {
+      return;
+    }
+
+    // if it hasn't transitioned after 200 ms, call opmode stop
+    auto opMode = m_activeOpMode.lock();
+    if (opMode) {
+      FRC_ReportWarning("OpMode did not exit, calling OpModeStop");
+      opMode->OpmodeStop();
+    }
+
+    wpi::WaitForObject(m_stopEvent.GetHandle(), 0.8, &timedOut);
+    if (!timedOut) {
+      return;
+    }
+
+    // if it hasn't transitioned after 1 second, terminate the program
+    FRC_ReportError(1, "OpMode did not exit, terminating program");
+    HAL_Shutdown();
+    std::exit(0);
+  }
+
+  int64_t m_modeId;
+  WPI_EventHandle m_dsEvent;
+  std::weak_ptr<OpMode> m_activeOpMode;
+};
+}  // namespace
+
 void OpModeRobotBase::StartCompetition() {
-  // TODO
+  fmt::print("********** Robot program startup complete **********\n");
+
+  wpi::Event event;
+  struct DSListener {
+    wpi::Event& event;
+    explicit DSListener(wpi::Event& event) : event{event} {
+      HAL_ProvideNewDataEventHandle(event.GetHandle());
+    }
+    ~DSListener() { HAL_RemoveNewDataEventHandle(event.GetHandle()); }
+  } listener{event};
+
+  m_running = true;
+  int64_t lastModeId = -1;
+  bool calledDriverStationConnected = false;
+  std::shared_ptr<OpMode> opMode;
+  while (m_running) {
+    // Wait for new data from the driver station
+    bool timedOut = false;
+    if (!wpi::WaitForObject(event.GetHandle(), 0.05, &timedOut) && !timedOut) {
+      break;
+    }
+
+    // Get the latest control word and opmode
+    DriverStation::RefreshData();
+    HAL_ControlWord ctlWord;
+    HAL_GetControlWord(&ctlWord);
+    int64_t modeId = HAL_ControlWord_GetOpModeId(ctlWord);
+
+    if (!calledDriverStationConnected &&
+        HAL_ControlWord_IsDSAttached(ctlWord)) {
+      calledDriverStationConnected = true;
+      DriverStationConnected();
+    }
+
+    if ((!HAL_ControlWord_IsDSAttached(ctlWord) || modeId == 0) && opMode) {
+      // no opmode selected but we're currently running one; close it
+      opMode.reset();
+    } else if (HAL_ControlWord_IsDSAttached(ctlWord) && modeId != 0 &&
+               (modeId != lastModeId || !opMode)) {
+      // New opmode selected, or closed after running once
+
+      // Close the previous opmode
+      opMode.reset();
+
+      auto data = m_opModes.lookup(modeId);
+      if (!data.factory) {
+        FRC_ReportError(1, "No OpMode found for mode {}", modeId);
+        continue;
+      }
+
+      // Instantiate the opmode
+      fmt::print("********** Starting OpMode {} **********\n", data.name);
+      opMode = data.factory();
+      if (!opMode) {
+        continue;  // could not construct
+      }
+      {
+        std::scoped_lock lock(m_opModeMutex);
+        m_activeOpMode = opMode;
+      }
+      if (lastModeId == -1) {
+        // Tell the DS that the robot is ready
+        HAL_ObserveUserProgramStarting();
+      }
+      lastModeId = modeId;
+    }
+
+    if (!opMode) {
+      NonePeriodic();
+      continue;
+    }
+
+    HAL_ObserveUserProgram(ctlWord);
+    if (HAL_ControlWord_IsEnabled(ctlWord)) {
+      // When enabled, call the opmode run function, then close and clear
+      wpi::SafeThreadOwner<MonitorThread> monitor;
+      monitor.Start(modeId, event, opMode);
+      opMode->OpmodeRun(modeId);
+      opMode.reset();
+    } else {
+      // When disabled, call the DisabledPeriodic function
+      opMode->DisabledPeriodic();
+    }
+  }
 }
 
 void OpModeRobotBase::EndCompetition() {
-  // TODO
+  m_running = false;
+  std::shared_ptr<OpMode> opMode;
+  {
+    std::scoped_lock lock(m_opModeMutex);
+    opMode = m_activeOpMode.lock();
+  }
+  if (opMode) {
+    opMode->OpmodeStop();
+  }
 }
 
 void OpModeRobotBase::AddOpModeFactory(OpModeFactory factory, RobotMode mode,
@@ -27,7 +190,7 @@ void OpModeRobotBase::AddOpModeFactory(OpModeFactory factory, RobotMode mode,
   int64_t id = DriverStation::AddOpMode(mode, name, group, description,
                                         textColor, backgroundColor);
   if (id != 0) {
-    m_opModes[id] = std::move(factory);
+    m_opModes[id] = OpModeData{std::string{name}, std::move(factory)};
   }
 }
 
@@ -37,7 +200,7 @@ void OpModeRobotBase::AddOpModeFactory(OpModeFactory factory, RobotMode mode,
                                        std::string_view description) {
   int64_t id = DriverStation::AddOpMode(mode, name, group, description);
   if (id != 0) {
-    m_opModes[id] = std::move(factory);
+    m_opModes[id] = OpModeData{std::string{name}, std::move(factory)};
   }
 }
 

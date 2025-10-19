@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <concepts>
 #include <cstdint>
 #include <functional>
@@ -64,8 +65,8 @@ class OpModeRobotBase : public RobotBase {
    * Constructor.
    */
   OpModeRobotBase() = default;
-  OpModeRobotBase(OpModeRobotBase&&) = default;
-  OpModeRobotBase& operator=(OpModeRobotBase&&) = default;
+  OpModeRobotBase(OpModeRobotBase&&) = delete;
+  OpModeRobotBase& operator=(OpModeRobotBase&&) = delete;
 
   ~OpModeRobotBase() override;
 
@@ -137,8 +138,14 @@ class OpModeRobotBase : public RobotBase {
   void ClearOpModes();
 
  private:
-  wpi::DenseMap<int64_t, OpModeFactory> m_opModes;
-  std::unique_ptr<OpMode> m_activeOpMode;
+  struct OpModeData {
+    std::string name;
+    OpModeFactory factory;
+  };
+  wpi::DenseMap<int64_t, OpModeData> m_opModes;
+  std::atomic_bool m_running{false};
+  wpi::mutex m_opModeMutex;
+  std::weak_ptr<OpMode> m_activeOpMode;
 };
 
 /**
