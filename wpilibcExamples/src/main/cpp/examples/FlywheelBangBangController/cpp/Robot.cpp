@@ -94,10 +94,11 @@ class Robot : public frc::TimedRobot {
       0.5 * 1.5_lb * 4_in * 4_in;
 
   frc::DCMotor m_gearbox = frc::DCMotor::NEO(1);
+  units::volt_t m_ks = units::volt_t{0.12};
   frc::LinearSystem<1, 1, 1> m_plant{frc::LinearSystemId::FlywheelSystem(
       m_gearbox, kFlywheelMomentOfInertia, kFlywheelGearing)};
 
-  frc::sim::FlywheelSim m_flywheelSim{m_plant, m_gearbox};
+  frc::sim::FlywheelSim m_flywheelSim{m_ks, m_plant, m_gearbox};
   frc::sim::EncoderSim m_encoderSim{m_encoder};
 };
 
