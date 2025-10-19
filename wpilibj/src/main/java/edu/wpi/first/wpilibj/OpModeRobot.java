@@ -97,7 +97,7 @@ public abstract class OpModeRobot extends RobotBase {
     }
     Color tColor = textColor.isBlank() ? null : Color.fromString(textColor);
     Color bColor = backgroundColor.isBlank() ? null : Color.fromString(backgroundColor);
-    long id = DriverStation.addOpMode(mode, name, description, group, tColor, bColor);
+    long id = DriverStation.addOpMode(mode, name, group, description, tColor, bColor);
     m_opModes.put(id, new OpModeFactory(name, () -> constructOpModeClass(cls)));
   }
 
