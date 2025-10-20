@@ -9,23 +9,23 @@ import java.util.List;
 import java.util.Set;
 
 class RunDefaultsCommand extends Command {
-  private final Set<Subsystem> subsystems;
-  private final List<Command> defaultCmds = new ArrayList<>();
+  private final Set<Subsystem> m_subsystems;
+  private final List<Command> m_defaultCmds = new ArrayList<>();
 
-  public RunDefaultsCommand(Subsystem... subsystems) {
-    this.subsystems = Set.of(subsystems);
+  RunDefaultsCommand(Subsystem... subsystems) {
+    m_subsystems = Set.of(subsystems);
   }
 
-  public RunDefaultsCommand(Set<Subsystem> subsystems) {
-    this.subsystems = subsystems;
+  RunDefaultsCommand(Set<Subsystem> subsystems) {
+    m_subsystems = subsystems;
   }
 
   @Override
   public void initialize() {
-    for (var s : subsystems) {
+    for (var s : m_subsystems) {
       var defaultCmd = s.getDefaultCommand();
       if (defaultCmd != null) {
-        defaultCmds.add(defaultCmd);
+        m_defaultCmds.add(defaultCmd);
         defaultCmd.initialize();
       }
     }
@@ -33,7 +33,7 @@ class RunDefaultsCommand extends Command {
 
   @Override
   public void execute() {
-    for (var cmd : defaultCmds) {
+    for (var cmd : m_defaultCmds) {
       cmd.execute();
     }
   }
