@@ -13,7 +13,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public final class NonBlockingCommands {
   /**
-   * Adds additional requirements to a command while preserving their default behavior.
+   * Creates a new command that requires additional subsystems without interrupting the default
+   * commands of said subsystems.
    *
    * @param command The base command
    * @param nonBlockingRequirements The requirements to add.
@@ -26,8 +27,8 @@ public final class NonBlockingCommands {
   }
 
   /**
-   * Runs a group of commands in series, one after the other, while preserving the default command
-   * behavior of idle subsystems.
+   * Runs a group of commands in series, one after the other. Any subsystem required by the group
+   * but not by the currently running command will run its default command.
    *
    * @param commands the commands to include
    * @return the command group
@@ -48,8 +49,9 @@ public final class NonBlockingCommands {
   }
 
   /**
-   * Runs a group of commands at the same time, while preserving the default command behavior of
-   * idle subsystems. Ends once all commands in the group finish.
+   * Runs a group of commands at the same time. Ends once all commands in the group finish. Any
+   * subsystem required by the group but not by the currently running command will run its default
+   * command.
    *
    * @param commands the commands to include
    * @return the command group
@@ -68,8 +70,9 @@ public final class NonBlockingCommands {
   }
 
   /**
-   * Runs a group of commands at the same time, while preserving the default command behavior of
-   * idle subsystems. Ends once a specific command finishes, and cancels the others.
+   * Runs a group of commands at the same time. Ends once a specific command finishes, and cancels
+   * the others. Any subsystem required by the group but not by the currently running command will
+   * run its default command.
    *
    * @param deadline the deadline command
    * @param otherCommands the other commands to include
