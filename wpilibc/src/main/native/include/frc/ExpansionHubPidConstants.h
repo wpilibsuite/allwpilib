@@ -5,8 +5,8 @@
 #pragma once
 
 #include <networktables/BooleanTopic.h>
-#include <networktables/IntegerTopic.h>
 #include <networktables/DoubleTopic.h>
+#include <networktables/IntegerTopic.h>
 
 namespace frc {
 class ExpansionHubMotor;

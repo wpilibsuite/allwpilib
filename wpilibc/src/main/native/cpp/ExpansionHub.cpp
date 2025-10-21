@@ -4,16 +4,15 @@
 
 #include "frc/ExpansionHub.h"
 
-#include "frc/Errors.h"
-
-#include <networktables/BooleanTopic.h>
-#include <hal/UsageReporting.h>
 #include <memory>
 
-#include "frc/SystemServer.h"
+#include <hal/UsageReporting.h>
+#include <networktables/BooleanTopic.h>
 
+#include "frc/Errors.h"
 #include "frc/ExpansionHubMotor.h"
 #include "frc/ExpansionHubServo.h"
+#include "frc/SystemServer.h"
 
 using namespace frc;
 

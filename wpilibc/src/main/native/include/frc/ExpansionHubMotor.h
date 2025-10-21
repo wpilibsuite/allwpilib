@@ -5,17 +5,17 @@
 #pragma once
 
 #include <memory>
-#include "frc/ExpansionHub.h"
-#include "frc/ExpansionHubPidConstants.h"
-
-#include <units/angle.h>
-#include <units/time.h>
-#include <units/voltage.h>
-#include <units/current.h>
 
 #include <networktables/BooleanTopic.h>
-#include <networktables/IntegerTopic.h>
 #include <networktables/DoubleTopic.h>
+#include <networktables/IntegerTopic.h>
+#include <units/angle.h>
+#include <units/current.h>
+#include <units/time.h>
+#include <units/voltage.h>
+
+#include "frc/ExpansionHub.h"
+#include "frc/ExpansionHubPidConstants.h"
 
 namespace frc {
 

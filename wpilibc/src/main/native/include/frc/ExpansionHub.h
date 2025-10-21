@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <wpi/mutex.h>
-
 #include <memory>
 #include <string_view>
+
+#include <wpi/mutex.h>
 
 namespace frc {
 class ExpansionHubServo;

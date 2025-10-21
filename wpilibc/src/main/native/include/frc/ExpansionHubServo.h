@@ -5,13 +5,13 @@
 #pragma once
 
 #include <memory>
-#include "frc/ExpansionHub.h"
-
-#include <units/angle.h>
-#include <units/time.h>
 
 #include <networktables/BooleanTopic.h>
 #include <networktables/IntegerTopic.h>
+#include <units/angle.h>
+#include <units/time.h>
+
+#include "frc/ExpansionHub.h"
 
 namespace frc {
 

@@ -5,7 +5,6 @@
 #include "frc/ExpansionHubServo.h"
 
 #include "frc/Errors.h"
-
 #include "frc/SystemServer.h"
 
 using namespace frc;
@@ -104,11 +103,10 @@ void ExpansionHubServo::SetPWMRange(units::microsecond_t minPwm,
   m_maxPwm = maxPwm;
 }
 
-void ExpansionHubServo::SetReversed(bool reversed) {
-}
+void ExpansionHubServo::SetReversed(bool reversed) {}
 
 void ExpansionHubServo::SetAngleRange(units::degree_t minAngle,
-                                        units::degree_t maxAngle) {
+                                      units::degree_t maxAngle) {
   if (maxAngle <= minAngle) {
     throw FRC_MakeError(err::ParameterOutOfRange,
                         "Max angle must be greater than Min angle");

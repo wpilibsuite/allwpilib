@@ -5,7 +5,6 @@
 #include "frc/ExpansionHubMotor.h"
 
 #include "frc/Errors.h"
-
 #include "frc/SystemServer.h"
 
 static constexpr int kPercentageMode = 0;

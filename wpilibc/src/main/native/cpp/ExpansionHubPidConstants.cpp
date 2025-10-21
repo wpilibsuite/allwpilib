@@ -4,11 +4,10 @@
 
 #include "frc/ExpansionHubPidConstants.h"
 
-#include "frc/Errors.h"
-
-#include "frc/SystemServer.h"
-
 #include <string>
+
+#include "frc/Errors.h"
+#include "frc/SystemServer.h"
 
 using namespace frc;
 
