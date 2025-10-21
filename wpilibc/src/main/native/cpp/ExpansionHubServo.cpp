@@ -55,6 +55,11 @@ ExpansionHubServo::~ExpansionHubServo() noexcept {
 }
 
 void ExpansionHubServo::Set(double value) {
+  if (m_continousMode) {
+    value = std::clamp(value, -1.0, 1.0);
+    value = (value + 1.0) / 2.0;
+  }
+
   value = std::clamp(value, 0.0, 1.0);
   if (m_reversed) {
     value = 1.0 - value;
@@ -110,4 +115,8 @@ void ExpansionHubServo::SetAngleRange(units::degree_t minAngle,
   }
   m_minServoAngle = minAngle;
   m_maxServoAngle = maxAngle;
+}
+
+void ExpansionHubServo::SetContinousRotationMode(bool enable) {
+  m_continousMode = enable;
 }

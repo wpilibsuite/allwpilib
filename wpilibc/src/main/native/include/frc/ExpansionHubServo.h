@@ -107,6 +107,16 @@ class ExpansionHubServo {
    */
   void SetReversed(bool reversed);
 
+  /**
+   * Enables or disables continuous rotation mode.
+   *
+   * In continuous rotation mode, the servo will interpret
+   * Set() commands to between -1.0 and 1.0, instead of 0.0 to 1.0.
+   *
+   * @param enable True to enable continuous rotation mode, false to disable
+   */
+  void SetContinousRotationMode(bool enable);
+
  private:
   units::microsecond_t GetFullRangeScaleFactor();
   units::degree_t GetServoAngleRange();
@@ -121,6 +131,7 @@ class ExpansionHubServo {
   units::microsecond_t m_maxPwm = 2400_us;
 
   bool m_reversed = false;
+  bool m_continousMode = false;
 
   nt::IntegerPublisher m_pulseWidthPublisher;
   nt::IntegerPublisher m_framePeriodPublisher;
