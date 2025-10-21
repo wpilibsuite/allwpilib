@@ -20,18 +20,17 @@ public class ExpansionHubServo implements AutoCloseable {
   private ExpansionHub m_hub;
   private final int m_channel;
 
+  private boolean m_reversed;
+
   private final IntegerPublisher m_pulseWidthPublisher;
   private final IntegerPublisher m_framePeriodPublisher;
   private final BooleanPublisher m_enabledPublisher;
 
-  private static final double kMaxServoAngle = 180.0;
-  private static final double kMinServoAngle = 0.0;
+  private double m_maxServoAngle = 180.0;
+  private double m_minServoAngle;
 
-  private static final int kDefaultMaxServoPWM = 2400;
-  private static final int kDefaultMinServoPWM = 600;
-
-  private static final int m_minPwm = kDefaultMinServoPWM;
-  private static final int m_maxPwm = kDefaultMaxServoPWM;
+  private int m_minPwm = 600;
+  private int m_maxPwm = 2400;
 
   /**
    * Constructs a servo at the requested channel on a specific USB port.
@@ -94,6 +93,10 @@ public class ExpansionHubServo implements AutoCloseable {
   public void set(double value) {
     value = Math.clamp(value, 0.0, 1.0);
 
+    if (m_reversed) {
+      value = 1.0 - value;
+    }
+
     int rawValue = (int) ((value * getFullRangeScaleFactor()) + m_minPwm);
 
     m_pulseWidthPublisher.set(rawValue);
@@ -102,20 +105,19 @@ public class ExpansionHubServo implements AutoCloseable {
   /**
    * Sets the servo angle
    *
-   * <p>Servo angles range from 0 to 180 degrees. Use set() with your own scaler for other angle
-   * ranges.
+   * <p>Servo angles range defaults to 0 to 180 degrees, but can be changed with setAngleRange().
    *
-   * @param angle Position in angle units. Will be scaled between 0 and 180 degrees
+   * @param angle Position in angle units. Will be scaled between the current angle range.
    */
   public void setAngle(Angle angle) {
     double dAngle = angle.in(Degrees);
-    if (dAngle < kMinServoAngle) {
-      dAngle = kMinServoAngle;
-    } else if (dAngle > kMaxServoAngle) {
-      dAngle = kMaxServoAngle;
+    if (dAngle < m_minServoAngle) {
+      dAngle = m_minServoAngle;
+    } else if (dAngle > m_maxServoAngle) {
+      dAngle = m_maxServoAngle;
     }
 
-    set((dAngle - kMinServoAngle) / getServoAngleRange());
+    set((dAngle - m_minServoAngle) / getServoAngleRange());
   }
 
   private double getFullRangeScaleFactor() {
@@ -123,7 +125,7 @@ public class ExpansionHubServo implements AutoCloseable {
   }
 
   private double getServoAngleRange() {
-    return kMaxServoAngle - kMinServoAngle;
+    return m_maxServoAngle - m_minServoAngle;
   }
 
   /**
@@ -160,6 +162,51 @@ public class ExpansionHubServo implements AutoCloseable {
    */
   public boolean isHubConnected() {
     return m_hub.isHubConnected();
+  }
+
+  /**
+   * Sets whether the servo is reversed.
+   *
+   * This will reverse both set() and setAngle().
+   *
+   * @param reversed True to reverse, false for normal
+   */
+  public void setReversed(boolean reversed) {
+    m_reversed = reversed;
+  }
+
+  /**
+   * Sets the PWM range for the servo.
+   * By default, this is 600 to 2400 microseconds.
+   *
+   * Maximum must be greater than minimum.
+   *
+   * @param minPwm Minimum PWM
+   * @param maxPwm Maximum PWM
+   */
+  public void setPWMRange(int minPwm, int maxPwm) {
+    if (maxPwm <= minPwm) {
+      throw new IllegalArgumentException("Maximum PWM must be greater than minimum PWM");
+    }
+    m_minPwm = minPwm;
+    m_maxPwm = maxPwm;
+  }
+
+  /**
+   * Sets the angle range for the setAngle call.
+   * By default, this is 0 to 180 degrees.
+   *
+   * Maximum angle must be greater than minimum angle.
+   *
+   * @param minAngle Minimum angle
+   * @param maxAngle Maximum angle
+   */
+  public void setAngleRange(double minAngle, double maxAngle) {
+    if (maxAngle <= minAngle) {
+      throw new IllegalArgumentException("Maximum angle must be greater than minimum angle");
+    }
+    m_minServoAngle = minAngle;
+    m_maxServoAngle = maxAngle;
   }
 
   /** Closes a servo so another instance can be constructed. */

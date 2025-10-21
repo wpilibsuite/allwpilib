@@ -56,18 +56,17 @@ ExpansionHubServo::~ExpansionHubServo() noexcept {
 
 void ExpansionHubServo::Set(double value) {
   value = std::clamp(value, 0.0, 1.0);
+  if (m_reversed) {
+    value = 1.0 - value;
+  }
   auto rawValue = ((value * GetFullRangeScaleFactor()) + m_minPwm);
   SetPulseWidth(rawValue);
 }
 
 void ExpansionHubServo::SetAngle(units::degree_t angle) {
-  if (angle < kMinServoAngle) {
-    angle = kMinServoAngle;
-  } else if (angle > kMaxServoAngle) {
-    angle = kMaxServoAngle;
-  }
+  angle = std::clamp(angle, m_minServoAngle, m_maxServoAngle);
 
-  Set((angle - kMinServoAngle) / GetServoAngleRange());
+  Set((angle - m_minServoAngle) / GetServoAngleRange());
 }
 
 void ExpansionHubServo::SetPulseWidth(units::microsecond_t pulseWidth) {
@@ -87,5 +86,28 @@ units::microsecond_t ExpansionHubServo::GetFullRangeScaleFactor() {
 }
 
 units::degree_t ExpansionHubServo::GetServoAngleRange() {
-  return kMaxServoAngle - kMinServoAngle;
+  return m_maxServoAngle - m_minServoAngle;
+}
+
+void ExpansionHubServo::SetPWMRange(units::microsecond_t minPwm,
+                                    units::microsecond_t maxPwm) {
+  if (maxPwm <= minPwm) {
+    throw FRC_MakeError(err::ParameterOutOfRange,
+                        "Max PWM must be greater than Min PWM");
+  }
+  m_minPwm = minPwm;
+  m_maxPwm = maxPwm;
+}
+
+void ExpansionHubServo::SetReversed(bool reversed) {
+}
+
+void ExpansionHubServo::SetAngleRange(units::degree_t minAngle,
+                                        units::degree_t maxAngle) {
+  if (maxAngle <= minAngle) {
+    throw FRC_MakeError(err::ParameterOutOfRange,
+                        "Max angle must be greater than Min angle");
+  }
+  m_minServoAngle = minAngle;
+  m_maxServoAngle = maxAngle;
 }

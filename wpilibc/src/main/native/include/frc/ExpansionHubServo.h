@@ -76,6 +76,37 @@ class ExpansionHubServo {
    */
   bool IsHubConnected() const { return m_hub.IsHubConnected(); }
 
+  /**
+   * Sets the angle range for the setAngle call.
+   * By default, this is 0 to 180 degrees.
+   *
+   * Maximum angle must be greater than minimum angle.
+   *
+   * @param minAngle Minimum angle
+   * @param maxAngle Maximum angle
+   */
+  void SetAngleRange(units::degree_t minAngle, units::degree_t maxAngle);
+
+  /**
+   * Sets the PWM range for the servo.
+   * By default, this is 600 to 2400 microseconds.
+   *
+   * Maximum must be greater than minimum.
+   *
+   * @param minPwm Minimum PWM
+   * @param maxPwm Maximum PWM
+   */
+  void SetPWMRange(units::microsecond_t minPwm, units::microsecond_t maxPwm);
+
+  /**
+   * Sets whether the servo is reversed.
+   *
+   * This will reverse both Set() and SetAngle().
+   *
+   * @param reversed True to reverse, false for normal
+   */
+  void SetReversed(bool reversed);
+
  private:
   units::microsecond_t GetFullRangeScaleFactor();
   units::degree_t GetServoAngleRange();
@@ -83,14 +114,13 @@ class ExpansionHubServo {
   ExpansionHub m_hub;
   int m_channel;
 
-  static constexpr units::degree_t kMaxServoAngle = 180.0_deg;
-  static constexpr units::degree_t kMinServoAngle = 0.0_deg;
+  units::degree_t m_maxServoAngle = 180.0_deg;
+  units::degree_t m_minServoAngle = 0.0_deg;
 
-  static constexpr units::microsecond_t kDefaultMaxServoPWM = 2400_us;
-  static constexpr units::microsecond_t kDefaultMinServoPWM = 600_us;
+  units::microsecond_t m_minPwm = 600_us;
+  units::microsecond_t m_maxPwm = 2400_us;
 
-  static constexpr units::microsecond_t m_minPwm = kDefaultMinServoPWM;
-  static constexpr units::microsecond_t m_maxPwm = kDefaultMaxServoPWM;
+  bool m_reversed = false;
 
   nt::IntegerPublisher m_pulseWidthPublisher;
   nt::IntegerPublisher m_framePeriodPublisher;
