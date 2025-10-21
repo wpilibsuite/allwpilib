@@ -8,6 +8,11 @@
 
 #include "frc/SystemServer.h"
 
+static constexpr int kPercentageMode = 0;
+static constexpr int kVoltageMode = 1;
+static constexpr int kPositionMode = 2;
+static constexpr int kVelocityMode = 3;
+
 using namespace frc;
 
 ExpansionHubMotor::ExpansionHubMotor(int usbId, int channel)
@@ -87,22 +92,22 @@ ExpansionHubMotor::~ExpansionHubMotor() noexcept {
 }
 
 void ExpansionHubMotor::SetPercentagePower(double power) {
-  m_modePublisher.Set(0);
+  m_modePublisher.Set(kPercentageMode);
   m_setpointPublisher.Set(power);
 }
 
 void ExpansionHubMotor::SetVoltage(units::volt_t voltage) {
-  m_modePublisher.Set(1);
+  m_modePublisher.Set(kVoltageMode);
   m_setpointPublisher.Set(voltage.to<double>());
 }
 
 void ExpansionHubMotor::SetPositionSetpoint(double setpoint) {
-  m_modePublisher.Set(2);
+  m_modePublisher.Set(kPositionMode);
   m_setpointPublisher.Set(setpoint);
 }
 
 void ExpansionHubMotor::SetVelocitySetpoint(double setpoint) {
-  m_modePublisher.Set(3);
+  m_modePublisher.Set(kVelocityMode);
   m_setpointPublisher.Set(setpoint);
 }
 

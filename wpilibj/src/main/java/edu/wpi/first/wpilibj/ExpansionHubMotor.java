@@ -15,6 +15,11 @@ import edu.wpi.first.units.measure.Voltage;
 
 /** This class controls a specific motor and encoder hooked up to an ExpansionHub. */
 public class ExpansionHubMotor implements AutoCloseable {
+  private static final int kPercentageMode = 0;
+  private static final int kVoltageMode = 1;
+  private static final int kPositionMode = 2;
+  private static final int kVelocityMode = 3;
+
   private ExpansionHub m_hub;
   private final int m_channel;
 
@@ -146,7 +151,7 @@ public class ExpansionHubMotor implements AutoCloseable {
    * @param power The power to drive the motor at
    */
   public void setPercentagePower(double power) {
-    m_modePublisher.set(0);
+    m_modePublisher.set(kPercentageMode);
     m_setpointPublisher.set(power);
   }
 
@@ -157,7 +162,7 @@ public class ExpansionHubMotor implements AutoCloseable {
    * @param voltage The voltage to drive the motor at
    */
   public void setVoltage(Voltage voltage) {
-    m_modePublisher.set(1);
+    m_modePublisher.set(kVoltageMode);
     m_setpointPublisher.set(voltage.in(Volts));
   }
 
@@ -168,7 +173,7 @@ public class ExpansionHubMotor implements AutoCloseable {
    * @param setpoint The position setpoint to drive the motor to
    */
   public void setPositionSetpoint(double setpoint) {
-    m_modePublisher.set(2);
+    m_modePublisher.set(kPositionMode);
     m_setpointPublisher.set(setpoint);
   }
 
@@ -179,7 +184,7 @@ public class ExpansionHubMotor implements AutoCloseable {
    * @param setpoint The velocity setpoint to drive the motor to
    */
   public void setVelocitySetpoint(double setpoint) {
-    m_modePublisher.set(3);
+    m_modePublisher.set(kVelocityMode);
     m_setpointPublisher.set(setpoint);
   }
 
