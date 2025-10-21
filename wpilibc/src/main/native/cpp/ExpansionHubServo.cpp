@@ -70,8 +70,8 @@ void ExpansionHubServo::Set(double value) {
 void ExpansionHubServo::SetAngle(units::degree_t angle) {
   angle = std::clamp(angle, m_minServoAngle, m_maxServoAngle);
 
-  Set((angle - m_minServoAngle).to<double>() /
-      GetServoAngleRange().to<double>());
+  // NOLINTNEXTLINE(bugprone-integer-division)
+  Set((angle - m_minServoAngle) / GetServoAngleRange());
 }
 
 void ExpansionHubServo::SetPulseWidth(units::microsecond_t pulseWidth) {
