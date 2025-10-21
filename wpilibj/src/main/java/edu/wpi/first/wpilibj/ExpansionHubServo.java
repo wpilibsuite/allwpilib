@@ -174,7 +174,7 @@ public class ExpansionHubServo implements AutoCloseable {
   /**
    * Sets whether the servo is reversed.
    *
-   * This will reverse both set() and setAngle().
+   * <p>This will reverse both set() and setAngle().
    *
    * @param reversed True to reverse, false for normal
    */
@@ -186,7 +186,7 @@ public class ExpansionHubServo implements AutoCloseable {
    * Sets the PWM range for the servo.
    * By default, this is 600 to 2400 microseconds.
    *
-   * Maximum must be greater than minimum.
+   * <p>Maximum must be greater than minimum.
    *
    * @param minPwm Minimum PWM
    * @param maxPwm Maximum PWM
@@ -203,7 +203,7 @@ public class ExpansionHubServo implements AutoCloseable {
    * Sets the angle range for the setAngle call.
    * By default, this is 0 to 180 degrees.
    *
-   * Maximum angle must be greater than minimum angle.
+   * <p>Maximum angle must be greater than minimum angle.
    *
    * @param minAngle Minimum angle
    * @param maxAngle Maximum angle
@@ -219,7 +219,7 @@ public class ExpansionHubServo implements AutoCloseable {
   /**
    * Enables or disables continuous rotation mode.
    *
-   * In continuous rotation mode, the servo will interpret
+   * <p>In continuous rotation mode, the servo will interpret
    * Set() commands to between -1.0 and 1.0, instead of 0.0 to 1.0.
    *
    * @param enable True to enable continuous rotation mode, false to disable
