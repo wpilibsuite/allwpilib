@@ -87,8 +87,8 @@ public class ExpansionHubServo implements AutoCloseable {
   /**
    * Set the servo position.
    *
-   * <p>Servo values range from 0.0 to 1.0 corresponding to the range of full left to full right.
-   * If continuous rotation mode is enabled, the range is -1.0 to 1.0.
+   * <p>Servo values range from 0.0 to 1.0 corresponding to the range of full left to full right. If
+   * continuous rotation mode is enabled, the range is -1.0 to 1.0.
    *
    * @param value Position from 0.0 to 1.0 (-1 to 1 in CR mode).
    */
@@ -183,8 +183,7 @@ public class ExpansionHubServo implements AutoCloseable {
   }
 
   /**
-   * Sets the PWM range for the servo.
-   * By default, this is 600 to 2400 microseconds.
+   * Sets the PWM range for the servo. By default, this is 600 to 2400 microseconds.
    *
    * <p>Maximum must be greater than minimum.
    *
@@ -200,8 +199,7 @@ public class ExpansionHubServo implements AutoCloseable {
   }
 
   /**
-   * Sets the angle range for the setAngle call.
-   * By default, this is 0 to 180 degrees.
+   * Sets the angle range for the setAngle call. By default, this is 0 to 180 degrees.
    *
    * <p>Maximum angle must be greater than minimum angle.
    *
@@ -219,8 +217,8 @@ public class ExpansionHubServo implements AutoCloseable {
   /**
    * Enables or disables continuous rotation mode.
    *
-   * <p>In continuous rotation mode, the servo will interpret
-   * Set() commands to between -1.0 and 1.0, instead of 0.0 to 1.0.
+   * <p>In continuous rotation mode, the servo will interpret Set() commands to between -1.0 and
+   * 1.0, instead of 0.0 to 1.0.
    *
    * @param enable True to enable continuous rotation mode, false to disable
    */
