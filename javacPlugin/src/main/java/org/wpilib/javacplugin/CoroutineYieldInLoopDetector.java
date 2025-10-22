@@ -12,18 +12,13 @@ import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.WhileLoopTree;
 import com.sun.source.util.JavacTask;
-import com.sun.source.util.TaskEvent;
-import com.sun.source.util.TaskListener;
 import com.sun.source.util.TreeScanner;
 import com.sun.source.util.Trees;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 
 /**
@@ -37,29 +32,14 @@ import javax.tools.Diagnostic;
 //   while (true) { ... }
 // Placing it at a higher level (lambda or method declaration) would silence ALL unsafe usage in
 // that expression; it's impossible to do on a case-by-case basis.
-public class CoroutineYieldInLoopDetector implements TaskListener {
-  private final JavacTask m_task;
-  private final Set<CompilationUnitTree> m_visitedCUs = new HashSet<>();
-
+public class CoroutineYieldInLoopDetector extends CoroutineBasedDetector {
   public CoroutineYieldInLoopDetector(JavacTask task) {
-    m_task = task;
+    super(task);
   }
 
   @Override
-  public void finished(TaskEvent e) {
-    if (e.getKind() == TaskEvent.Kind.ANALYZE && m_visitedCUs.add(e.getCompilationUnit())) {
-      if (getCoroutineType() == null) {
-        // Not using the commands library; nothing to scan for
-        return;
-      }
-
-      e.getCompilationUnit().accept(new Scanner(e.getCompilationUnit()), null);
-    }
-  }
-
-  private TypeMirror getCoroutineType() {
-    var te = m_task.getElements().getTypeElement("org.wpilib.commands3.Coroutine");
-    return te != null ? te.asType() : null;
+  protected TreeScanner<?, ?> createScanner(CompilationUnitTree compilationUnit) {
+    return new Scanner(compilationUnit);
   }
 
   /**
@@ -112,12 +92,10 @@ public class CoroutineYieldInLoopDetector implements TaskListener {
   private final class Scanner extends TreeScanner<LoopState, LoopState> {
     private final CompilationUnitTree m_root;
     private final Trees m_trees;
-    private final TypeMirror m_coroutineType;
 
     Scanner(CompilationUnitTree compilationUnit) {
       m_root = compilationUnit;
       m_trees = Trees.instance(m_task);
-      m_coroutineType = getCoroutineType();
     }
 
     @Override

@@ -11,17 +11,12 @@ import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.util.JavacTask;
-import com.sun.source.util.TaskEvent;
-import com.sun.source.util.TaskListener;
 import com.sun.source.util.TreeScanner;
 import com.sun.source.util.Trees;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 
 /**
@@ -44,29 +39,14 @@ import javax.tools.Diagnostic;
  * mech.run(coroutine -> coroutineField = coroutine); // ERROR
  * }</pre>
  */
-public class IncorrectCoroutineUseDetector implements TaskListener {
-  private final JavacTask m_task;
-  private final Set<CompilationUnitTree> m_visitedCUs = new HashSet<>();
-
+public class IncorrectCoroutineUseDetector extends CoroutineBasedDetector {
   public IncorrectCoroutineUseDetector(JavacTask task) {
-    m_task = task;
+    super(task);
   }
 
   @Override
-  public void finished(TaskEvent e) {
-    if (e.getKind() == TaskEvent.Kind.ANALYZE && m_visitedCUs.add(e.getCompilationUnit())) {
-      if (getCoroutineType() == null) {
-        // Not using the commands library; nothing to scan for
-        return;
-      }
-
-      e.getCompilationUnit().accept(new Scanner(e.getCompilationUnit()), null);
-    }
-  }
-
-  private TypeMirror getCoroutineType() {
-    var te = m_task.getElements().getTypeElement("org.wpilib.commands3.Coroutine");
-    return te != null ? te.asType() : null;
+  protected TreeScanner<?, ?> createScanner(CompilationUnitTree compilationUnit) {
+    return new Scanner(compilationUnit);
   }
 
   private static final class State {
@@ -98,12 +78,10 @@ public class IncorrectCoroutineUseDetector implements TaskListener {
   private final class Scanner extends TreeScanner<State, State> {
     private final CompilationUnitTree m_root;
     private final Trees m_trees;
-    private final TypeMirror m_coroutineType;
 
     Scanner(CompilationUnitTree compilationUnit) {
       m_root = compilationUnit;
       m_trees = Trees.instance(m_task);
-      m_coroutineType = getCoroutineType();
     }
 
     @Override

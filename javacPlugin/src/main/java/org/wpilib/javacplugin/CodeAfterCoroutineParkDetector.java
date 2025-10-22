@@ -13,45 +13,23 @@ import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.StatementTree;
 import com.sun.source.util.JavacTask;
-import com.sun.source.util.TaskEvent;
-import com.sun.source.util.TaskListener;
 import com.sun.source.util.TreeScanner;
 import com.sun.source.util.Trees;
-import java.util.HashSet;
-import java.util.Set;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 
 /**
  * Detects any statements after a call to {@code coroutine.park()} and labels them as unreachable
  * code, similar to a {@code while (true)} statement.
  */
-public class CodeAfterCoroutineParkDetector implements TaskListener {
-  private final JavacTask m_task;
-  private final Set<CompilationUnitTree> m_visitedCUs = new HashSet<>();
-
+public class CodeAfterCoroutineParkDetector extends CoroutineBasedDetector {
   public CodeAfterCoroutineParkDetector(JavacTask task) {
-    m_task = task;
+    super(task);
   }
 
   @Override
-  public void finished(TaskEvent taskEvent) {
-    CompilationUnitTree compilationUnit = taskEvent.getCompilationUnit();
-    if (taskEvent.getKind() == TaskEvent.Kind.ANALYZE && m_visitedCUs.add(compilationUnit)) {
-      TypeMirror coroutineType = getCoroutineType();
-      if (coroutineType == null) {
-        // Not using the commands library; nothing to scan for
-        return;
-      }
-
-      compilationUnit.accept(new Scanner(compilationUnit), null);
-    }
-  }
-
-  private TypeMirror getCoroutineType() {
-    var te = m_task.getElements().getTypeElement("org.wpilib.commands3.Coroutine");
-    return te != null ? te.asType() : null;
+  protected TreeScanner<?, ?> createScanner(CompilationUnitTree compilationUnit) {
+    return new Scanner(compilationUnit);
   }
 
   private final class Scanner extends TreeScanner<Void, Void> {
@@ -88,7 +66,7 @@ public class CodeAfterCoroutineParkDetector implements TaskListener {
           var idPath = m_trees.getPath(m_root, id);
           var identifierElement = m_trees.getElement(idPath);
           if (identifierElement instanceof VariableElement ve
-              && m_task.getTypes().isSameType(getCoroutineType(), ve.asType())) {
+              && m_task.getTypes().isSameType(m_coroutineType, ve.asType())) {
             parkInvocation = mit;
           }
         }
