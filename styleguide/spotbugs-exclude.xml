@@ -34,10 +34,6 @@
   </Match>
   <Match>
     <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
-    <Class name="edu.wpi.first.wpilibj.motorcontrol.NidecBrushless" />
-  </Match>
-  <Match>
-    <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
     <Class name="edu.wpi.first.wpilibj2.command.CommandScheduler" />
   </Match>
   <Match>
