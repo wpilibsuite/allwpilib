@@ -443,14 +443,7 @@ public abstract class OpModeRobot extends RobotBase {
       }
     }
 
-    try {
-      WPIUtilJNI.waitForObjectTimeout(endEvent, 0.2);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      return;
-    }
-
-    // if it hasn't transitioned after 200 ms, call opmode stop
+    // call opmode stop
     OpMode opMode = m_activeOpMode.get();
     if (opMode != null) {
       DriverStation.reportWarning("OpMode did not exit, calling stop", false);
@@ -464,12 +457,12 @@ public abstract class OpModeRobot extends RobotBase {
       return;
     }
 
-    // if it hasn't transitioned after 400 ms, call thread.interrupt()
+    // if it hasn't transitioned after 200 ms, call thread.interrupt()
     DriverStation.reportError("OpMode did not exit, interrupting thread", false);
     thr.interrupt();
 
     try {
-      WPIUtilJNI.waitForObjectTimeout(endEvent, 0.6);
+      WPIUtilJNI.waitForObjectTimeout(endEvent, 0.8);
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       return;

@@ -15,9 +15,7 @@ void LinearOpMode::OpModeRun(int64_t opModeId) {
   HAL_ControlWord_SetOpModeId(&word, opModeId);
 
   internal::DriverStationModeThread bgThread{word};
-  Start();
   Run();
-  End();
 }
 
 void LinearOpMode::OpModeStop() {

@@ -52,20 +52,15 @@ class MonitorThread : public wpi::SafeThreadEvent {
       }
     }
 
-    bool timedOut = false;
-    wpi::WaitForObject(m_stopEvent.GetHandle(), 0.2, &timedOut);
-    if (!timedOut) {
-      return;
-    }
-
-    // if it hasn't transitioned after 200 ms, call opmode stop
+    // call opmode stop
     auto opMode = m_activeOpMode.lock();
     if (opMode) {
       FRC_ReportWarning("OpMode did not exit, calling OpModeStop");
       opMode->OpModeStop();
     }
 
-    wpi::WaitForObject(m_stopEvent.GetHandle(), 0.8, &timedOut);
+    bool timedOut = false;
+    wpi::WaitForObject(m_stopEvent.GetHandle(), 1.0, &timedOut);
     if (!timedOut) {
       return;
     }
@@ -102,6 +97,7 @@ void OpModeRobotBase::StartCompetition() {
     // Wait for new data from the driver station
     bool timedOut = false;
     if (!wpi::WaitForObject(event.GetHandle(), 0.05, &timedOut) && !timedOut) {
+      // event destroyed
       break;
     }
 

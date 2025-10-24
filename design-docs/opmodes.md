@@ -118,7 +118,7 @@ Providing the top-level teleop, autonomous, and test selection available in the 
 
 - OpModes are usually registered via annotation of classes.  These annotations may specify a name (or default to the class name), group name (for grouping of routines in the selection list), and description.  Annotations are used to specify whether the class is a teleop, auto, or test opmode.
 
-- OpModes may also be registered via annotation of functions (in the Robot class only) or via explicit function calls.  As C++ does not support annotations, function call registration is the only available method in that language.
+- OpModes may also be registered via annotation of functions (in the Robot class only) or via explicit function calls.  As C++ does not support annotations, function call registration is the only available method in that language.  If manually registered, `publishOpModes()` must be called to publish the list of opmodes to the DS.
 
 - For maximum flexibility, all code in the robot project has access to the enable/disable state, the overall robot teleop/auto/test mode, and the selected opmodes for teleop, auto, and test (even when the robot is disabled).
 
@@ -144,12 +144,12 @@ Only the opmodes appropriate to the selected mode are shown in the corresponding
 
 Java is used for illustrative purposes.  Python and C++ should follow a similar structure, except that C++ doesn't support annotations.
 
-### RobotBase
+### OpModeRobot
 
-The `RobotBase` class is the base class for the user's `Robot` class.  It also implements the private library machinery for robot startup and robot execution (including creating and transitioning between opmodes in accordance with the opmode lifecycle, as described in the following section).
+The `OpModeRobot` class is the base class for the user's `Robot` class.  It also implements the private library machinery for robot startup and robot execution (including creating and transitioning between opmodes in accordance with the opmode lifecycle, as described in the following section).
 
 ```java
-public abstract class RobotBase {
+public abstract class OpModeRobot {
   public void disabledStart() {
     // this code is called when the robot enters disabled state (including at startup)
   }
@@ -175,36 +175,36 @@ There are library base classes for different coding styles of routines.  The `Op
 
 The full lifecycle of a opmode is as follows:
 - Operator selects opmode on DS -> opmode object is constructed
-- If different opmode is selected -> `close()` is called, object is released to GC
+- If different opmode is selected -> `opModeClose()` is called (which typically just calls `close()`), object is released to GC
 - While opmode is selected and robot is disabled, `disabledPeriodic()` is called
 - When the robot is enabled in the selected opmode, `opmodeRun()` is called; the result of this is different for different opmode base classes:
-  - `start()` is called once (for both `LinearOpMode` and `PeriodicOpMode`)
+  - `start()` is called once (for `PeriodicOpMode`)
   - `run()` is called (for `LinearOpMode`), or `periodic()` is called periodically (for `PeriodicOpMode`)
-- When the robot is disabled, `opmodeStop()` is called (which results in `end()` being called for both `LinearOpMode` and `PeriodicOpMode`), followed by `close()`, object is released to GC
+- When the robot is disabled, `opModeStop()` is called (which results in `end()` being called for `PeriodicOpMode`), followed by `opModeClose()` (which results in `close()` being called for both `PeriodicOpMode` and `LinearOpMode`), object is released to GC
 
-Following `close()` being called, a *new* opmode object is constructed based on the DS teleop/auto/test/match selector and selected opmode.  In teleop/auto/test, the drop-down selection will be the same as before the previous enable, so the same opmode class is constructed again.  In match (or when FMS-connected), only the selected auto opmode object is initially constructed; once auto completes, the selected teleop opmode object is constructed.  Thus only zero or one opmode objects will ever be "alive" at any given time.
+Following `opModeClose()` being called, a *new* opmode object is constructed based on the DS teleop/auto/test/match selector and selected opmode.  In teleop/auto/test, the drop-down selection will be the same as before the previous enable, so the same opmode class is constructed again.  In match (or when FMS-connected), only the selected auto opmode object is initially constructed; once auto completes, the selected teleop opmode object is constructed.  Thus only zero or one opmode objects will ever be "alive" at any given time.
 
-For consistency in operation, the library will ensure that `disablePeriodic()` is always called at least once before `opmodeRun()` is called.
+For consistency in operation, the library will ensure that `disabledPeriodic()` is always called at least once before `opModeRun()` is called.
 
-User implementations of opmode classes may have either a no-parameter constructor or a constructor that accepts a class derived from `RobotBase`.  If available, the library will call the latter and pass the user's `Robot` object to it when constructing the class.
+User implementations of opmode classes may have either a no-parameter constructor or a constructor that accepts the user's `Robot` class type.  If available, the library will call the latter and pass the user's `Robot` object to it when constructing the class.
 
-The library will use escalating steps to attempt to terminate a opmode if `opmodeRun()` does not return within a reasonable timeframe after `opmodeStop()` is called, up to and including termination of the robot executable process (which will result in an automatic restart of it at the system level).
+The library will use escalating steps to attempt to terminate a opmode if `opModeRun()` does not return within a reasonable timeframe after `opModeStop()` is called, up to and including termination of the robot executable process (which will result in an automatic restart of it at the system level).  User code (particularly in `LinearOpMode` derived classes) should check for `isRunning()` returning false and return as quickly as possible to allow the opmode to terminate gracefully.
 
 ```java
 public interface OpMode {
   // this function is called periodically while the opmode is selected on the DS (robot is disabled)
-  void disabledPeriodic();
+  default void disabledPeriodic() {}
 
   // this function is called when the opmode starts (robot is enabled)
-  void opmodeRun(long opModeId) throws InterruptedException;
+  void opModeRun(long opModeId) throws InterruptedException;
 
   // this function is called asynchronously when the robot is disabled,
-  // to request the opmode return from opmodeRun()
-  void opmodeStop();
+  // to request the opmode return from opModeRun()
+  void opModeStop();
 
   // this function is called when the opmode is de-selected on the DS or after
-  // opmodeRun() returns
-  void opmodeClose();
+  // opModeRun() returns
+  void opModeClose();
 }
 ```
 
@@ -217,38 +217,31 @@ public abstract class LinearOpMode implements OpMode {
     // this code is called periodically while the opmode is selected on the DS (robot is disabled)
   }
 
-  @Override
   public void close() {
     // this code is called when the opmode is de-selected on the DS
   }
 
-  public void start() {
-    // this code is called when the opmode starts (robot is enabled)
-  }
+  // this function is called once to run the opmode (robot is enabled)
+  public abstract void run() throws InterruptedException:
 
-  public void run() throws InterruptedException {
-    // this code is called once to run the opmode (robot is enabled)
-  }
-
-  public void end() {
-    // this code is called when the opmode ends (robot is disabled)
+  public boolean isRunning() {
+    // returns true until opModeEnd() is called
   }
 
   // implements OpMode interface
   @Override
-  public final void opmodeRun(long opModeId) {
-    start();
+  public final void opModeRun(long opModeId) {
     run();
-    end();
   }
 
   @Override
-  public final void opmodeEnd() {
-    // tries various things to "encourage" the run() function to return
+  public final void opModeEnd() {
+    // pseudo-code
+    isRunning = false;
   }
 
   @Override
-  public final void opmodeClose() {
+  public final void opModeClose() {
     close();
   }
 }
@@ -267,7 +260,6 @@ public abstract class PeriodicOpMode implements OpMode {
     // this code is called periodically while the opmode is selected on the DS (robot is disabled)
   }
 
-  @Override
   public void close() {
     // this code is called when the opmode is de-selected on the DS
   }
@@ -276,9 +268,8 @@ public abstract class PeriodicOpMode implements OpMode {
     // this code is called when the opmode starts (robot is enabled)
   }
 
-  public void periodic() {
-    // this code is called periodically while the opmode is running (robot is enabled)
-  }
+  // this function is called periodically while the opmode is running (robot is enabled)
+  public abstract void periodic();
 
   public void end() {
     // this code is called when the opmode ends (robot is disabled)
@@ -288,12 +279,16 @@ public abstract class PeriodicOpMode implements OpMode {
   public final void addPeriodic(Runnable callback, double period) {...}
   public final void addPeriodic(Runnable callback, double period, double offset) {...}
 
-  // returns the start time of the current loop
-  public final double getLoopStartTime() {...}
+  // returns the start time of the current loop in microseconds
+  public final long getLoopStartTime() {...}
+
+  public boolean isRunning() {
+    // returns true until opModeEnd() is called
+  }
 
   // implements OpMode interface
   @Override
-  public final void opmodeRun(long opModeId) {
+  public final void opModeRun(long opModeId) {
     // psuedo-code
     start();
     while (isRunning) {
@@ -305,13 +300,13 @@ public abstract class PeriodicOpMode implements OpMode {
   }
 
   @Override
-  public final void opmodeStop() {
+  public final void opModeStop() {
     // pseudo-code
     isRunning = false;
   }
 
   @Override
-  public final void opmodeClose() {
+  public final void opModeClose() {
     close();
   }
 }
@@ -323,7 +318,7 @@ All annotations are class-level.  All elements are optional and may be omitted. 
 
 ```java
 @Autonomous(String name, String group, String description)
-@Teleoperated(String name, String group, String description)
+@Teleop(String name, String group, String description)
 @TestOpMode(String name, String group, String description)
 ```
 
@@ -335,7 +330,7 @@ Example use cases:
 public class MyAuto extends OpModeBaseClass {...}
 
 // will use default group
-@Teleoperated("my teleop")
+@Teleop("my teleop")
 public class MyTeleop extends OpModeBaseClass {...}
 
 @TestOpMode(name="my test", group="mechanisms", description="tests arm")
@@ -362,9 +357,19 @@ public final class DriverStation {
   // returns the currently selected opmode for the currently selected robot mode;
   // this works even when the robot is disabled
   public static String getOpMode() {...}
+  // returns the opmode ID instead of the the string name
+  public static long getOpModeId() {...}
+
+  // returns true if the opmode is the provided ID/name
+  public static boolean isOpMode(long id) {...}
+  public static boolean isOpMode(String name) {...}
 
   // add/remove opmodes
-  public static int addOpMode(RobotMode mode, String name, String group, String description, int textColor, int backgroundColor) {...}
+  public static long addOpMode(RobotMode mode, String name, String group, String description, Color textColor, Color backgroundColor) {...}
+  public static long removeOpMode(RobotMode mode, String name) {...}
+  // publish the list of opmodes to the DS
+  public static void publishOpModes() {...}
+  // clear the list of opmodes
   public static void clearOpModes() {...}
 }
 ```
@@ -382,7 +387,7 @@ The following example code for non-command-based Java demonstrates the following
 Robot:
 
 ```java
-public class Robot extends RobotBase {
+public class Robot extends OpModeRobot {
   public final DifferentialDrive drive = new DifferentialDrive(...);
 
   public Robot() {}
@@ -421,7 +426,7 @@ public class AutoDriveStraight extends PeriodicOpMode {
 Teleop opmode:
 
 ```java
-@Teleoperated
+@Teleop
 public class Teleop extends PeriodicOpMode {
   private final Joystick joy = new Joystick(1);
   private final Robot robot;
@@ -453,7 +458,7 @@ public class TestDashboardIndicator extends LinearOpMode {
 
 ## C++ Robot Code
 
-C++ does not support annotations, so explicit registration via `RobotBase` function calls is required.
+C++ does not support annotations, so explicit registration via `OpModeRobot` function calls is required.
 
 ## Python Robot Code
 
@@ -461,22 +466,34 @@ Should be able to be annotation (decorator) based, similar to Java.
 
 ## HAL
 
-At the HAL level, Control Word bits indicate enabled state and teleop/auto/test selection (identical to current WPILib).  What needs to be added are functions to maintain the list of available opmodes and get the selected opmode as communicated by the DS.
+At the HAL level, Control Word bits indicate enabled state and teleop/auto/test selection (identical to current WPILib).  The Control Word needs to be lengthened to 64-bit to indicate the selected opmode, and functions to maintain the list of available opmodes need to be added.  An "opmode ID" is the combination of the opmode hash and the robot mode (e.g. teleop/auto/test).
 
-Adding the following functions provides all the required functionality:
+To communicate the selected opmode ID, `HAL_ControlWord` needs to become a 64-bit type; changing it from a bitfield to a type with helper functions also will improve the ease of use:
+- `HAL_ControlWord HAL_MakeControlWord(int64_t opModeHash, HAL_RobotMode robotMode, HAL_Bool enabled, HAL_Bool eStop, HAL_Bool fmsAttached, HAL_Bool dsAttached)` - builds a control word from its parts
+- `int64_t HAL_ControlWord_GetOpModeHash(HAL_ControlWord word)` - gets the opmode hash from the control word
+- `int64_t HAL_ControlWord_GetOpModeId(HAL_ControlWord word)` - gets the opmode ID from the control word (combination of hash and robot mode); 0 is returned if the hash is 0
+- `void HAL_ControlWord_SetOpModeId(HAL_ControlWord* word, int64_t id)` - sets the opmode ID portion of a control word
+- `HAL_RobotMode HAL_ControlWord_GetRobotMode(HAL_ControlWord word)` - gets the robot mode from the control word
+- `HAL_Bool HAL_ControlWord_IsEnabled(HAL_ControlWord word)` - returns true if the control word indicates the robot is enabled
+- `HAL_Bool HAL_ControlWord_IsEStopped(HAL_ControlWord word)` - returns true if the control word indicates the robot is estopped
+- `HAL_Bool HAL_ControlWord_IsFMSAttached(HAL_ControlWord word)` - returns true if the control word indicates the robot is attached to the FMS
+- `HAL_Bool HAL_ControlWord_IsDSAttached(HAL_ControlWord word)` - returns true if the control word indicates the robot is attached to the DS
+- `int64_t HAL_MakeOpModeId(HAL_RobotMode mode, int64_t hash)` - makes an opmode ID from a robot mode and an opmode hash
+- `HAL_RobotMode HAL_OpMode_GetRobotMode(int64_t id)` - gets the robot mode portion of an opmode ID
+- `int64_t HAL_OpMode_GetHash(int64_t id)` - gets the opmode hash portion of an opmode ID
+
+Adding the following function enables maintaining the available opmode options list:
 - `void HAL_SetOpModeOptions(HAL_OpModeOption* array, int count)` – sets the list of available opmode options
-- `long HAL_GetOpMode()` - gets the opmode ID selected to execute on the DS (the robot may or may not be enabled)
 
 `HAL_OpModeOption` is a structure describing each option:
 - `long id` - unique ID identifying the opmode (robot mode, name) pair.  This encodes the robot mode in the upper bits, indicating which robot mode the opmode should be visible for (auto/teleop/test)
-- `string name`
 - `string group`
 - `string description`
 - `int textColor` - optional, used to set the text color for the option in the DS GUI
 - `int backgroundColor` - optional, used to set the text color for the option in the DS GUI
 
 The user program observe functions also need to be updated:
-- Replace `HAL_ObserveUserProgramDisabled()`, `HAL_ObserveUserProgramAutonomous()`, `HAL_ObserveUserProgramTeleop()`, and `HAL_ObserveUserProgramTest()` with `HAL_ObserveUserProgramOpMode(long id, bool enabled)`
+- Replace `HAL_ObserveUserProgramDisabled()`, `HAL_ObserveUserProgramAutonomous()`, `HAL_ObserveUserProgramTeleop()`, and `HAL_ObserveUserProgramTest()` with `HAL_ObserveUserProgram(HAL_ControlWord word)`
 
 ## DS Protocol
 

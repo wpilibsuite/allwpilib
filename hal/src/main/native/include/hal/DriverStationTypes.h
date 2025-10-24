@@ -232,9 +232,7 @@ inline HAL_Bool HAL_ControlWord_IsDSAttached(HAL_ControlWord word) {
 // NOLINTEND
 
 inline int64_t HAL_MakeOpModeId(HAL_RobotMode mode, int64_t hash) {
-  return (((int64_t)(mode) << HAL_OPMODE_ROBOT_MODE_SHIFT) &  // NOLINT
-          HAL_OPMODE_ROBOT_MODE_MASK) |
-         (hash & HAL_OPMODE_HASH_MASK);
+  return HAL_MAKE_OPMODEID(mode, hash);
 }
 
 inline HAL_RobotMode HAL_OpMode_GetRobotMode(int64_t id) {

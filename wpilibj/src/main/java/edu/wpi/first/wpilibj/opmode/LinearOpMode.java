@@ -18,8 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * <ul>
  *   <li>constructed when opmode selected on driver station
  *   <li>disabledPeriodic() called periodically as long as DS is disabled
- *   <li>when DS transitions from disabled to enabled, start(), run(), and end() are each called
- *       exactly once, in that order
+ *   <li>when DS transitions from disabled to enabled, run() will be called exactly once
  *   <li>when DS transitions from enabled to disabled, or a different opmode is selected on the
  *       driver station, close() is called; the object is not reused
  * </ul>
@@ -42,19 +41,13 @@ public abstract class LinearOpMode implements OpMode {
    */
   public void close() {}
 
-  /** Called a single time when the robot is enabled after being disabled. */
-  public void start() {}
-
   /**
-   * Called once when the robot is enabled, after start() is called. When it returns, end() will be
-   * called and it will not be called again until the robot is disabled and enabled again.
+   * Called once when the robot is enabled.  It will not be called a second time on the same
+   * object.
    *
    * @throws InterruptedException when interrupted
    */
   public abstract void run() throws InterruptedException;
-
-  /** Called a single time when the robot is disabled after being enabled. */
-  public void end() {}
 
   /**
    * Returns true while this opmode is selected (regardless of enable state). All other functions
@@ -74,9 +67,7 @@ public abstract class LinearOpMode implements OpMode {
     word.setOpModeId(opModeId);
 
     try (DriverStationModeThread bgThread = new DriverStationModeThread(word)) {
-      start();
       run();
-      end();
     }
   }
 

@@ -8,15 +8,13 @@
 
 #include <atomic>
 
-#include <wpi/SafeThread.h>
-
 #include "frc/opmode/OpMode.h"
 
 namespace frc {
 
-  /**
+/**
  * An opmode structure for "linear" operation. The user is responsible for
- * implementing any looping behavior; after run() returns it will not be called
+ * implementing any looping behavior; after Run() returns it will not be called
  * again on the same object.
  *
  * Lifecycle:
@@ -25,8 +23,7 @@ namespace frc {
  *
  * - DisabledPeriodic() called periodically as long as DS is disabled
  *
- * - When DS transitions from disabled to enabled, Start(), Run(), and End() are
- * each called exactly once, in that order
+ * - When DS transitions from disabled to enabled, Run() is called exactly once
  *
  * - When DS transitions from enabled to disabled, or a different opmode is
  * selected on the driver station, object is destroyed
@@ -44,18 +41,11 @@ class LinearOpMode : public OpMode {
    */
   void DisabledPeriodic() override {}
 
-  /** Called a single time when the robot is enabled after being disabled. */
-  virtual void Start() {}
-
   /**
-   * Called once when the robot is enabled, after start() is called. When it
-   * returns, end() will be called and it will not be called again until the
-   * robot is disabled and enabled again.
+   * Called once when the robot is enabled. When it returns, it will not be
+   * called again on the same object.
    */
   virtual void Run() = 0;
-
-  /** Called a single time when the robot is disabled after being enabled. */
-  virtual void End() {}
 
   /**
    * Returns true while this opmode is selected (regardless of enable state).
@@ -73,8 +63,6 @@ class LinearOpMode : public OpMode {
 
  private:
   std::atomic_bool m_running{true};
-  class Thread;
-  wpi::SafeThreadOwner<Thread> m_bgThread;
 };
 
 }  // namespace frc
