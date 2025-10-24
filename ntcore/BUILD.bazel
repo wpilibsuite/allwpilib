@@ -57,6 +57,7 @@ third_party_cc_lib_helper(
     include_root = "src/generated/main/native/include",
     src_excludes = ["src/generated/main/native/cpp/jni/**"],
     src_root = "src/generated/main/native/cpp",
+    visibility = ["//visibility:public"],
 )
 
 filegroup(

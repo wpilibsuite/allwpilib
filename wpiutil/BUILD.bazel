@@ -85,51 +85,60 @@ third_party_cc_lib_helper(
     name = "argparse",
     include_root = "src/main/native/thirdparty/argparse/include",
     src_root = None,
+    visibility = ["//visibility:public"],
 )
 
 third_party_cc_lib_helper(
     name = "debugging",
     include_root = "src/main/native/thirdparty/debugging/include",
     src_root = "src/main/native/thirdparty/debugging/src",
+    visibility = ["//visibility:public"],
 )
 
 third_party_cc_lib_helper(
     name = "expected",
     include_root = "src/main/native/thirdparty/expected/include",
+    visibility = ["//visibility:public"],
 )
 
 third_party_cc_lib_helper(
     name = "fmtlib",
     include_root = "src/main/native/thirdparty/fmtlib/include",
     src_root = "src/main/native/thirdparty/fmtlib/src",
+    visibility = ["//visibility:public"],
 )
 
 third_party_cc_lib_helper(
     name = "json",
     include_root = "src/main/native/thirdparty/json/include",
+    visibility = ["//visibility:public"],
 )
 
 third_party_cc_lib_helper(
     name = "llvm",
     include_root = "src/main/native/thirdparty/llvm/include",
     src_root = "src/main/native/thirdparty/llvm/cpp",
+    visibility = ["//visibility:public"],
 )
 
 third_party_cc_lib_helper(
     name = "mpack",
     include_root = "src/main/native/thirdparty/mpack/include",
     src_root = "src/main/native/thirdparty/mpack/src",
+    visibility = ["//visibility:public"],
 )
 
 third_party_cc_lib_helper(
     name = "nanopb",
     include_root = "src/main/native/thirdparty/nanopb/include",
     src_root = "src/main/native/thirdparty/nanopb/src",
+    visibility = ["//visibility:public"],
 )
 
 third_party_cc_lib_helper(
     name = "sigslot",
     include_root = "src/main/native/thirdparty/sigslot/include",
+    visibility = ["//visibility:public"],
 )
 
 third_party_cc_lib_helper(
