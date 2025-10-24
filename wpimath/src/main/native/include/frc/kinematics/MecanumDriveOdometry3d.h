@@ -26,7 +26,8 @@ namespace frc {
  * when using computer-vision systems.
  */
 class WPILIB_DLLEXPORT MecanumDriveOdometry3d
-    : public Odometry3d<MecanumDriveWheelSpeeds, MecanumDriveWheelPositions> {
+    : public Odometry3d<MecanumDriveWheelSpeeds, MecanumDriveWheelPositions,
+                        MecanumDriveWheelAccelerations> {
  public:
   /**
    * Constructs a MecanumDriveOdometry3d object.
