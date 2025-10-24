@@ -130,9 +130,9 @@ class PeriodicOpMode : public OpMode {
 
  public:
   // implements OpMode interface
-  void OpmodeRun(int64_t opModeId) final;
+  void OpModeRun(int64_t opModeId) final;
 
-  void OpmodeStop() final;
+  void OpModeStop() final;
 
  private:
   class Callback {

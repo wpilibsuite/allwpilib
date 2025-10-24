@@ -17,7 +17,7 @@ class OpMode {
  public:
   /**
    * The object is destroyed when the opmode is no longer selected on the DS or
-   * after OpmodeRun() returns.
+   * after OpModeRun() returns.
    */
   virtual ~OpMode() = default;
 
@@ -33,13 +33,13 @@ class OpMode {
    *
    * @param opModeId opmode unique ID
    */
-  virtual void OpmodeRun(int64_t opModeId) = 0;
+  virtual void OpModeRun(int64_t opModeId) = 0;
 
   /**
    * This function is called asynchronously when the robot is disabled, to
-   * request the opmode return from OpmodeRun().
+   * request the opmode return from OpModeRun().
    */
-  virtual void OpmodeStop() = 0;
+  virtual void OpModeStop() = 0;
 };
 
 }  // namespace frc

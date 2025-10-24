@@ -23,17 +23,17 @@ public interface OpMode {
    * @param opModeId opmode unique ID
    * @throws InterruptedException when interrupted
    */
-  void opmodeRun(long opModeId) throws InterruptedException;
+  void opModeRun(long opModeId) throws InterruptedException;
 
   /**
    * This function is called asynchronously when the robot is disabled, to request the opmode return
-   * from opmodeRun().
+   * from opModeRun().
    */
-  void opmodeStop();
+  void opModeStop();
 
   /**
    * This function is called when the opmode is no longer selected on the DS or after opmodeRun()
    * returns. The object will not be reused after this is called.
    */
-  void opmodeClose();
+  void opModeClose();
 }

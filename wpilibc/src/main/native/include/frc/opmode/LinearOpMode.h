@@ -67,9 +67,9 @@ class LinearOpMode : public OpMode {
   bool IsRunning() const { return m_running; }
 
   // implements OpMode interface
-  void OpmodeRun(int64_t opModeId) final;
+  void OpModeRun(int64_t opModeId) final;
 
-  void OpmodeStop() final;
+  void OpModeStop() final;
 
  private:
   std::atomic_bool m_running{true};

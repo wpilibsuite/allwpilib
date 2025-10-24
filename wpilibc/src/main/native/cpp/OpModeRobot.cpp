@@ -62,7 +62,7 @@ class MonitorThread : public wpi::SafeThreadEvent {
     auto opMode = m_activeOpMode.lock();
     if (opMode) {
       FRC_ReportWarning("OpMode did not exit, calling OpModeStop");
-      opMode->OpmodeStop();
+      opMode->OpModeStop();
     }
 
     wpi::WaitForObject(m_stopEvent.GetHandle(), 0.8, &timedOut);
@@ -160,7 +160,7 @@ void OpModeRobotBase::StartCompetition() {
       // When enabled, call the opmode run function, then close and clear
       wpi::SafeThreadOwner<MonitorThread> monitor;
       monitor.Start(modeId, event, opMode);
-      opMode->OpmodeRun(modeId);
+      opMode->OpModeRun(modeId);
       opMode.reset();
     } else {
       // When disabled, call the DisabledPeriodic function
@@ -177,7 +177,7 @@ void OpModeRobotBase::EndCompetition() {
     opMode = m_activeOpMode.lock();
   }
   if (opMode) {
-    opMode->OpmodeStop();
+    opMode->OpModeStop();
   }
 }
 

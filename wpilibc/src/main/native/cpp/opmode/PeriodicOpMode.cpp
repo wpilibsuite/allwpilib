@@ -96,7 +96,7 @@ void PeriodicOpMode::LoopFunc() {
   }
 }
 
-void PeriodicOpMode::OpmodeRun(int64_t opModeId) {
+void PeriodicOpMode::OpModeRun(int64_t opModeId) {
   m_opModeId = opModeId;
 
   Start();
@@ -145,7 +145,7 @@ void PeriodicOpMode::OpmodeRun(int64_t opModeId) {
   End();
 }
 
-void PeriodicOpMode::OpmodeStop() {
+void PeriodicOpMode::OpModeStop() {
   int32_t status = 0;
   HAL_StopNotifier(m_notifier, &status);
 }

@@ -454,7 +454,7 @@ public abstract class OpModeRobot extends RobotBase {
     OpMode opMode = m_activeOpMode.get();
     if (opMode != null) {
       DriverStation.reportWarning("OpMode did not exit, calling stop", false);
-      opMode.opmodeStop();
+      opMode.opModeStop();
     }
 
     try {
@@ -519,7 +519,7 @@ public abstract class OpModeRobot extends RobotBase {
           OpMode opMode = m_activeOpMode.getAndSet(null);
           if (opMode != null) {
             // Close the previous opmode
-            opMode.opmodeClose();
+            opMode.opModeClose();
           }
         } else if (DriverStation.isDSAttached()
             && modeId != 0
@@ -529,7 +529,7 @@ public abstract class OpModeRobot extends RobotBase {
           OpMode opMode = m_activeOpMode.getAndSet(null);
           if (opMode != null) {
             // Close the previous opmode
-            opMode.opmodeClose();
+            opMode.opModeClose();
           }
 
           OpModeFactory factory = m_opModes.get(modeId);
@@ -570,7 +570,7 @@ public abstract class OpModeRobot extends RobotBase {
                   });
           monitor.start();
           try {
-            opMode.opmodeRun(modeId);
+            opMode.opModeRun(modeId);
           } catch (InterruptedException e) {
             Thread.interrupted();
           } finally {
@@ -584,7 +584,7 @@ public abstract class OpModeRobot extends RobotBase {
           }
           opMode = m_activeOpMode.getAndSet(null);
           if (opMode != null) {
-            opMode.opmodeClose();
+            opMode.opModeClose();
           }
         } else {
           // When disabled, call the disabledPeriodic function
@@ -603,7 +603,7 @@ public abstract class OpModeRobot extends RobotBase {
     m_running.set(false);
     OpMode opMode = m_activeOpMode.get();
     if (opMode != null) {
-      opMode.opmodeStop();
+      opMode.opModeStop();
     }
   }
 }

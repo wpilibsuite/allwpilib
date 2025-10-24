@@ -68,7 +68,7 @@ public abstract class LinearOpMode implements OpMode {
 
   // implements OpMode interface
   @Override
-  public final void opmodeRun(long opModeId) throws InterruptedException {
+  public final void opModeRun(long opModeId) throws InterruptedException {
     ControlWord word = new ControlWord();
     DriverStation.refreshControlWordFromCache(word);
     word.setOpModeId(opModeId);
@@ -81,12 +81,12 @@ public abstract class LinearOpMode implements OpMode {
   }
 
   @Override
-  public final void opmodeStop() {
+  public final void opModeStop() {
     m_running.set(false);
   }
 
   @Override
-  public final void opmodeClose() {
+  public final void opModeClose() {
     close();
   }
 

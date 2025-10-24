@@ -9,7 +9,7 @@
 
 using namespace frc;
 
-void LinearOpMode::OpmodeRun(int64_t opModeId) {
+void LinearOpMode::OpModeRun(int64_t opModeId) {
   HAL_ControlWord word;
   HAL_GetControlWord(&word);
   HAL_ControlWord_SetOpModeId(&word, opModeId);
@@ -20,6 +20,6 @@ void LinearOpMode::OpmodeRun(int64_t opModeId) {
   End();
 }
 
-void LinearOpMode::OpmodeStop() {
+void LinearOpMode::OpModeStop() {
   m_running = false;
 }

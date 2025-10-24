@@ -269,7 +269,7 @@ public abstract class PeriodicOpMode implements OpMode {
 
   // implements OpMode interface
   @Override
-  public final void opmodeRun(long opModeId) {
+  public final void opModeRun(long opModeId) {
     m_opModeId = opModeId;
 
     start();
@@ -315,12 +315,12 @@ public abstract class PeriodicOpMode implements OpMode {
   }
 
   @Override
-  public final void opmodeStop() {
+  public final void opModeStop() {
     NotifierJNI.stopNotifier(m_notifier);
   }
 
   @Override
-  public final void opmodeClose() {
+  public final void opModeClose() {
     NotifierJNI.stopNotifier(m_notifier);
     NotifierJNI.cleanNotifier(m_notifier);
     close();
