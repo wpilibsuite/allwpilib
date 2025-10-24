@@ -1,0 +1,9 @@
+classes:
+  frc::AprilTagPoseEstimate:
+    attributes:
+      pose1:
+      pose2:
+      error1:
+      error2:
+    methods:
+      GetAmbiguity:

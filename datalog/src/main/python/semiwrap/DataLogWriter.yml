@@ -1,0 +1,28 @@
+classes:
+  wpi::log::DataLogWriter:
+    methods:
+      DataLogWriter:
+        overloads:
+          std::string_view, std::error_code&, std::string_view:
+            cpp_code: |
+              [](std::string_view filename, std::string_view extraHeader) {
+                std::error_code ec;
+                auto writer = std::make_unique<DataLogWriter>(filename, ec, extraHeader);
+                if (ec) {
+                  throw std::system_error(ec);
+                }
+                return writer;
+              }
+            param_override:
+              ec:
+                ignore: true
+          wpi::Logger&, std::string_view, std::error_code&, std::string_view:
+            ignore: true
+          std::unique_ptr<wpi::raw_ostream>, std::string_view:
+            ignore: true
+          wpi::Logger&, std::unique_ptr<wpi::raw_ostream>, std::string_view:
+            ignore: true
+      Flush:
+      Stop:
+      GetStream:
+        ignore: true

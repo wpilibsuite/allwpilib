@@ -1,0 +1,115 @@
+classes:
+  nt::FloatArraySubscriber:
+    methods:
+      FloatArraySubscriber:
+        overloads:
+          '':
+            ignore: true
+          NT_Subscriber, ParamType:
+            ignore: true
+      Get:
+        overloads:
+          '[const]':
+          ParamType [const]:
+          wpi::SmallVectorImpl<SmallElemType>& [const]:
+            ignore: true
+          wpi::SmallVectorImpl<SmallElemType>&, ParamType [const]:
+            ignore: true
+      GetAtomic:
+        overloads:
+          '[const]':
+          ParamType [const]:
+          wpi::SmallVectorImpl<SmallElemType>& [const]:
+            ignore: true
+          wpi::SmallVectorImpl<SmallElemType>&, ParamType [const]:
+            ignore: true
+      ReadQueue:
+      GetTopic:
+    inline_code: |
+      .def("close", [](FloatArraySubscriber *self) {
+        py::gil_scoped_release release;
+        *self = FloatArraySubscriber();
+      }, py::doc("Destroys the subscriber"))
+      .def("__enter__", [](FloatArraySubscriber *self) {
+        return self;
+      })
+      .def("__exit__", [](FloatArraySubscriber *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = FloatArraySubscriber();
+      })
+  nt::FloatArrayPublisher:
+    methods:
+      FloatArrayPublisher:
+        overloads:
+          '':
+            ignore: true
+          NT_Publisher:
+            ignore: true
+      Set:
+      SetDefault:
+      GetTopic:
+    inline_code: |
+      .def("close", [](FloatArrayPublisher *self) {
+        py::gil_scoped_release release;
+        *self = FloatArrayPublisher();
+      }, py::doc("Destroys the publisher"))
+      .def("__enter__", [](FloatArrayPublisher *self) {
+        return self;
+      })
+      .def("__exit__", [](FloatArrayPublisher *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = FloatArrayPublisher();
+      })
+  nt::FloatArrayEntry:
+    methods:
+      FloatArrayEntry:
+        overloads:
+          '':
+            ignore: true
+          NT_Entry, ParamType:
+            ignore: true
+      GetHandle:
+        ignore: true
+      GetTopic:
+      Unpublish:
+    inline_code: |
+      .def("close", [](FloatArrayEntry *self) {
+        py::gil_scoped_release release;
+        *self = FloatArrayEntry();
+      }, py::doc("Destroys the entry"))
+      .def("__enter__", [](FloatArrayEntry *self) {
+        return self;
+      })
+      .def("__exit__", [](FloatArrayEntry *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = FloatArrayEntry();
+      })
+  nt::FloatArrayTopic:
+    attributes:
+      kTypeString:
+    methods:
+      FloatArrayTopic:
+        overloads:
+          '':
+            ignore: true
+          NT_Topic:
+            ignore: true
+          Topic:
+      Subscribe:
+      SubscribeEx:
+      Publish:
+      PublishEx:
+      GetEntry:
+      GetEntryEx:
+    inline_code: |
+      .def("close", [](FloatArrayTopic *self) {
+        py::gil_scoped_release release;
+        *self = FloatArrayTopic();
+      }, py::doc("Destroys the topic"))
+      .def("__enter__", [](FloatArrayTopic *self) {
+        return self;
+      })
+      .def("__exit__", [](FloatArrayTopic *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = FloatArrayTopic();
+      })

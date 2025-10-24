@@ -6,6 +6,11 @@ cppSrcFileInclude {
   \.cpp$
 }
 
+generatedFileExclude {
+  src/main/python/
+  src/test/python/
+}
+
 licenseUpdateExclude {
   examples/printlog
 }

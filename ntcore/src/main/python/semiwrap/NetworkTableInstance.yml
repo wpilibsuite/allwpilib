@@ -1,0 +1,181 @@
+extra_includes:
+- networktables/BooleanArrayTopic.h
+- networktables/BooleanTopic.h
+- networktables/DoubleArrayTopic.h
+- networktables/DoubleTopic.h
+- networktables/FloatArrayTopic.h
+- networktables/FloatTopic.h
+- networktables/IntegerArrayTopic.h
+- networktables/IntegerTopic.h
+- networktables/MultiSubscriber.h
+- networktables/RawTopic.h
+- networktables/StringArrayTopic.h
+- networktables/StringTopic.h
+- networktables/StructArrayTopic.h
+- networktables/StructTopic.h
+- networktables/Topic.h
+- src/py2value.h
+- src/nt_instance.h
+- wpi/datalog/DataLog.h
+- wpystruct.h
+
+classes:
+  nt::NetworkTableInstance:
+    force_type_casters:
+    - std::function
+    attributes:
+      kDefaultPort:
+    enums:
+      NetworkMode:
+        arithmetic: true
+        inline_code: |
+          .value("kNetModeStarting", (nt::NetworkTableInstance::NetworkMode)NT_NET_MODE_STARTING)
+      LogLevel:
+    methods:
+      NetworkTableInstance:
+        overloads:
+          '':
+            ignore: true
+          NT_Inst:
+            ignore: true
+      GetDefault:
+      Create:
+      Destroy:
+        cpp_code: |
+          [](NetworkTableInstance * self) {
+            pyntcore::onInstanceDestroy(self);
+            py::gil_scoped_release release;
+            NetworkTableInstance::Destroy(*self);
+          }
+      GetHandle:
+        internal: true
+      GetTopic:
+      GetBooleanTopic:
+      GetIntegerTopic:
+      GetFloatTopic:
+      GetDoubleTopic:
+      GetStringTopic:
+      GetRawTopic:
+      GetBooleanArrayTopic:
+      GetIntegerArrayTopic:
+      GetFloatArrayTopic:
+      GetDoubleArrayTopic:
+      GetStringArrayTopic:
+      GetProtobufTopic:
+        ignore: true
+      GetStructTopic:
+        param_override:
+          info:
+            name: type
+        cpp_code: |
+          [](const NetworkTableInstance &self, std::string_view name, const py::type &t) {
+            WPyStructInfo info(t);
+            return self.GetStructTopic<WPyStruct, WPyStructInfo>(name, info);
+          }
+      GetStructArrayTopic:
+        param_override:
+          info:
+            name: type
+        cpp_code: |
+          [](const NetworkTableInstance &self, std::string_view name, const py::type &t) {
+            WPyStructInfo info(t);
+            return self.GetStructArrayTopic<WPyStruct, WPyStructInfo>(name, info);
+          }
+      GetTopics:
+        overloads:
+          '':
+          std::string_view:
+          std::string_view, unsigned int:
+          std::string_view, std::span<std::string_view>:
+      GetTopicInfo:
+        overloads:
+          '':
+          std::string_view:
+          std::string_view, unsigned int:
+          std::string_view, std::span<std::string_view>:
+      GetEntry:
+      GetTable:
+      RemoveListener:
+      WaitForListenerQueue:
+      AddConnectionListener:
+      AddTimeSyncListener:
+      AddListener:
+        overloads:
+          Topic, unsigned int, ListenerCallback:
+          Subscriber&, unsigned int, ListenerCallback:
+          MultiSubscriber&, int, ListenerCallback:
+          const NetworkTableEntry&, int, ListenerCallback:
+          std::span<const std::string_view>, int, ListenerCallback:
+      GetNetworkMode:
+      StartLocal:
+        cpp_code: |
+          [](NetworkTableInstance * self) {
+            pyntcore::onInstanceStart(self);
+            py::gil_scoped_release release;
+            self->StartLocal();
+          }
+      StopLocal:
+      StartServer:
+        cpp_code: |
+          [](NetworkTableInstance * self, std::string_view persist_filename,  const char* listen_address,
+             unsigned int port) {
+            pyntcore::onInstanceStart(self);
+            py::gil_scoped_release release;
+            self->StartServer(persist_filename, listen_address, port);
+          }
+      StopServer:
+      StopClient:
+      SetServer:
+        overloads:
+          std::string_view, unsigned int:
+          std::span<const std::pair<std::string_view, unsigned int>>:
+          std::span<const std::string_view>, unsigned int:
+      SetServerTeam:
+      Disconnect:
+      StartDSClient:
+      StopDSClient:
+      FlushLocal:
+      Flush:
+      GetConnections:
+      IsConnected:
+      GetServerTimeOffset:
+      StartEntryDataLog:
+      StopEntryDataLog:
+      StartConnectionDataLog:
+      StopConnectionDataLog:
+      AddLogger:
+      HasSchema:
+      AddSchema:
+        overloads:
+          std::string_view, std::string_view, std::span<const uint8_t>:
+          std::string_view, std::string_view, std::string_view:
+      AddProtobufSchema:
+        ignore: true
+      AddStructSchema:
+        ignore: true
+      operator==:
+      StartClient:
+    inline_code: |
+      .def("configPythonLogging", [](NetworkTableInstance * self, 
+        NetworkTableInstance::LogLevel minLevel, NetworkTableInstance::LogLevel maxLevel, py::str logName) {
+          py::module::import("ntcore._logutil").attr("_config_logging")(self, minLevel, maxLevel, logName);
+        }, py::kw_only(),
+          py::arg("min") = NetworkTableInstance::LogLevel::kLogInfo,
+          py::arg("max") = NetworkTableInstance::LogLevel::kLogCritical,
+          py::arg("name") = "nt",
+        py::doc("Configure python logging for this instance.\n"
+                "\n"
+                ":param min:  Minimum NT level to log\n"
+                ":param max:  Maximum NT level to log\n"
+                ":param name: Name of python logger\n"
+                "\n"
+                ".. note:: This must be called before the instance is started")
+      )
+      .def("_reset", [](NetworkTableInstance *self) {
+        pyntcore::onInstancePreReset(self);
+        {
+          py::gil_scoped_release release;
+          nt::ResetInstance(self->GetHandle());
+        }
+        pyntcore::onInstancePostReset(self);
+      })

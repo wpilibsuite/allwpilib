@@ -1,0 +1,47 @@
+strip_prefixes:
+- HAL_
+
+enums:
+  HAL_RuntimeType:
+functions:
+  HAL_GetErrorMessage:
+  HAL_GetFPGAVersion:
+  HAL_GetFPGARevision:
+  HAL_GetSerialNumber:
+    param_override:
+      serialNumber:
+        ignore: true
+    cpp_code: |
+      []() {
+        WPI_String s;
+        HAL_GetSerialNumber(&s);
+        std::string ss(wpi::to_string_view(&s));
+        WPI_FreeString(&s);
+        return ss;
+      }
+  HAL_GetComments:
+    param_override:
+      comments:
+        ignore: true
+    cpp_code: |
+      []() {
+        WPI_String s;
+        HAL_GetComments(&s);
+        std::string ss(wpi::to_string_view(&s));
+        WPI_FreeString(&s);
+        return ss;
+      }
+  HAL_GetTeamNumber:
+  HAL_GetRuntimeType:
+  HAL_GetSystemActive:
+  HAL_GetBrownedOut:
+  HAL_GetFPGATime:
+  HAL_ExpandFPGATime:
+  HAL_GetRSLState:
+  HAL_GetSystemTimeValid:
+  HAL_Initialize:
+  HAL_Shutdown:
+  HAL_SimPeriodicBefore:
+  HAL_SimPeriodicAfter:
+  HAL_GetLastError:
+  HAL_GetCommsDisableCount:

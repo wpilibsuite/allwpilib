@@ -1,0 +1,25 @@
+extra_includes:
+- frc/AnalogInput.h
+
+classes:
+  frc::sim::AnalogInputSim:
+    force_type_casters:
+    - std::function
+    methods:
+      AnalogInputSim:
+        overloads:
+          const AnalogInput&:
+          int:
+      RegisterInitializedCallback:
+      GetInitialized:
+      SetInitialized:
+      RegisterAverageBitsCallback:
+      GetAverageBits:
+      SetAverageBits:
+      RegisterOversampleBitsCallback:
+      GetOversampleBits:
+      SetOversampleBits:
+      RegisterVoltageCallback:
+      GetVoltage:
+      SetVoltage:
+      ResetData:

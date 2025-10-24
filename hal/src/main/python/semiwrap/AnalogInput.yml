@@ -1,0 +1,23 @@
+strip_prefixes:
+- HAL_
+
+functions:
+  HAL_InitializeAnalogInputPort:
+  HAL_FreeAnalogInputPort:
+  HAL_CheckAnalogModule:
+  HAL_CheckAnalogInputChannel:
+  HAL_SetAnalogInputSimDevice:
+  HAL_SetAnalogSampleRate:
+  HAL_GetAnalogSampleRate:
+  HAL_SetAnalogAverageBits:
+  HAL_GetAnalogAverageBits:
+  HAL_SetAnalogOversampleBits:
+  HAL_GetAnalogOversampleBits:
+  HAL_GetAnalogValue:
+  HAL_GetAnalogAverageValue:
+  HAL_GetAnalogVoltsToValue:
+  HAL_GetAnalogVoltage:
+  HAL_GetAnalogAverageVoltage:
+  HAL_GetAnalogLSBWeight:
+  HAL_GetAnalogOffset:
+  HAL_GetAnalogValueToVolts:

@@ -1,0 +1,53 @@
+extra_includes:
+- wpystruct.h
+
+classes:
+  frc::DifferentialDriveWheelSpeeds:
+    force_no_default_constructor: true
+    attributes:
+      left:
+      right:
+    methods:
+      Desaturate:
+      operator+:
+      operator-:
+        overloads:
+          const DifferentialDriveWheelSpeeds& [const]:
+          '[const]':
+      operator*:
+      operator/:
+
+
+inline_code: |
+  cls_DifferentialDriveWheelSpeeds
+    .def(
+      py::init<units::meters_per_second_t, units::meters_per_second_t>(),
+      py::arg("left") = 0, py::arg("right") = 0
+    )
+    .def_static("fromFeet", [](units::feet_per_second_t left, units::feet_per_second_t right){
+      return DifferentialDriveWheelSpeeds{left, right};
+    }, py::arg("left"), py::arg("right"))
+    .def_property("left_fps",
+      [](DifferentialDriveWheelSpeeds * self) -> units::feet_per_second_t {
+        return self->left;
+      },
+      [](DifferentialDriveWheelSpeeds * self, units::feet_per_second_t left) {
+        self->left = left;
+      }
+    )
+    .def_property("right_fps", 
+      [](DifferentialDriveWheelSpeeds * self) -> units::feet_per_second_t {
+        return self->right;
+      },
+      [](DifferentialDriveWheelSpeeds * self, units::feet_per_second_t right) {
+        self->right = right;
+      }
+    )
+    .def("__repr__", [](const DifferentialDriveWheelSpeeds &dds) -> std::string {
+      return "DifferentialDriveWheelSpeeds(left=" + std::to_string(dds.left()) + ", "
+                                          "right=" + std::to_string(dds.right()) + ")";
+    })
+  ;
+
+  SetupWPyStruct<frc::DifferentialDriveWheelSpeeds>(cls_DifferentialDriveWheelSpeeds);
+

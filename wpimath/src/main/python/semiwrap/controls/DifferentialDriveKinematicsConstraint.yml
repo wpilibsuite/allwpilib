@@ -1,0 +1,19 @@
+defaults:
+  subpackage: constraint
+
+classes:
+  frc::DifferentialDriveKinematicsConstraint:
+    typealias:
+    - frc::TrajectoryConstraint::MinMax
+    methods:
+      DifferentialDriveKinematicsConstraint:
+      MaxVelocity:
+      MinMaxAcceleration:
+
+inline_code: |-
+  cls_DifferentialDriveKinematicsConstraint
+    .def_static("fromFps", [](const DifferentialDriveKinematics& kinematics,
+                              units::feet_per_second_t maxSpeed) {
+      return std::make_shared<DifferentialDriveKinematicsConstraint>(kinematics, maxSpeed);
+    }, py::arg("kinematics"), py::arg("maxSpeed"))
+  ;

@@ -1,0 +1,36 @@
+classes:
+  frc::CANStatus:
+    attributes:
+      percentBusUtilization:
+      busOffCount:
+      txFullCount:
+      receiveErrorCount:
+      transmitErrorCount:
+  frc::RobotController:
+    nodelete: true
+    methods:
+      GetFPGAVersion:
+      GetFPGARevision:
+      GetSerialNumber:
+      GetComments:
+      GetTeamNumber:
+      SetTimeSource:
+      GetTime:
+      GetFPGATime:
+      IsSysActive:
+      IsBrownedOut:
+      GetRSLState:
+      IsSystemTimeValid:
+      GetInputVoltage:
+      GetVoltage3V3:
+      GetCurrent3V3:
+      SetEnabled3V3:
+      GetEnabled3V3:
+      GetFaultCount3V3:
+      GetBatteryVoltage:
+      GetBrownoutVoltage:
+      SetBrownoutVoltage:
+      GetCPUTemp:
+      GetCANStatus:
+      GetCommsDisableCount:
+      ResetRailFaultCounts:

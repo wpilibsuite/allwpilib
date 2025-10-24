@@ -1,0 +1,23 @@
+classes:
+  frc::sim::GenericHIDSim:
+    methods:
+      GenericHIDSim:
+        overloads:
+          const GenericHID&:
+          int:
+      NotifyNewData:
+      SetRawButton:
+      SetRawAxis:
+      SetPOV:
+        overloads:
+          int, DriverStation::POVDirection:
+          DriverStation::POVDirection:
+      SetAxisCount:
+      SetPOVCount:
+      SetButtonCount:
+      SetType:
+      SetName:
+      SetAxisType:
+      GetOutput:
+      GetOutputs:
+      GetRumble:

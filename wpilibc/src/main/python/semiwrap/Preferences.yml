@@ -1,0 +1,25 @@
+classes:
+  frc::Preferences:
+    methods:
+      GetKeys:
+      GetString:
+      GetInt:
+      GetDouble:
+      GetFloat:
+      GetBoolean:
+      GetLong:
+      SetString:
+      InitString:
+      SetInt:
+      InitInt:
+      SetDouble:
+      InitDouble:
+      SetFloat:
+      InitFloat:
+      SetBoolean:
+      InitBoolean:
+      SetLong:
+      InitLong:
+      ContainsKey:
+      Remove:
+      RemoveAll:

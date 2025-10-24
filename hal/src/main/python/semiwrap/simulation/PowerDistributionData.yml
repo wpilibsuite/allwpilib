@@ -1,0 +1,29 @@
+strip_prefixes:
+- HALSIM_
+
+functions:
+  HALSIM_ResetPowerDistributionData:
+  HALSIM_RegisterPowerDistributionInitializedCallback:
+    ignore: true
+  HALSIM_CancelPowerDistributionInitializedCallback:
+  HALSIM_GetPowerDistributionInitialized:
+  HALSIM_SetPowerDistributionInitialized:
+  HALSIM_RegisterPowerDistributionTemperatureCallback:
+    ignore: true
+  HALSIM_CancelPowerDistributionTemperatureCallback:
+  HALSIM_GetPowerDistributionTemperature:
+  HALSIM_SetPowerDistributionTemperature:
+  HALSIM_RegisterPowerDistributionVoltageCallback:
+    ignore: true
+  HALSIM_CancelPowerDistributionVoltageCallback:
+  HALSIM_GetPowerDistributionVoltage:
+  HALSIM_SetPowerDistributionVoltage:
+  HALSIM_RegisterPowerDistributionCurrentCallback:
+    ignore: true
+  HALSIM_CancelPowerDistributionCurrentCallback:
+  HALSIM_GetPowerDistributionCurrent:
+  HALSIM_SetPowerDistributionCurrent:
+  HALSIM_GetPowerDistributionAllCurrents:
+  HALSIM_SetPowerDistributionAllCurrents:
+  HALSIM_RegisterPowerDistributionAllNonCurrentCallbacks:
+    ignore: true

@@ -1,0 +1,4 @@
+classes:
+  frc::RomiMotor:
+    methods:
+      RomiMotor:
