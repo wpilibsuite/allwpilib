@@ -4,9 +4,12 @@
 
 package edu.wpi.first.wpilibj;
 
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.NotifierJNI;
+import edu.wpi.first.units.measure.Frequency;
+import edu.wpi.first.units.measure.Time;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -187,6 +190,15 @@ public class Notifier implements AutoCloseable {
   }
 
   /**
+   * Run the callback once after the given delay.
+   *
+   * @param delay Time to wait before the callback is called.
+   */
+  public void startSingle(Time delay) {
+    startSingle(delay.in(Seconds));
+  }
+
+  /**
    * Run the callback periodically with the given period.
    *
    * <p>The user-provided callback should be written so that it completes before the next time it's
@@ -205,6 +217,32 @@ public class Notifier implements AutoCloseable {
     } finally {
       m_processLock.unlock();
     }
+  }
+
+  /**
+   * Run the callback periodically with the given period.
+   *
+   * <p>The user-provided callback should be written so that it completes before the next time it's
+   * scheduled to run.
+   *
+   * @param period Period after which to call the callback starting one period after the call to
+   *     this method.
+   */
+  public void startPeriodic(Time period) {
+    startPeriodic(period.in(Seconds));
+  }
+
+  /**
+   * Run the callback periodically with the given frequency.
+   *
+   * <p>The user-provided callback should be written so that it completes before the next time it's
+   * scheduled to run.
+   *
+   * @param frequency Frequency at which to call the callback, starting one period after the call to
+   *     this method.
+   */
+  public void startPeriodic(Frequency frequency) {
+    startPeriodic(frequency.asPeriod());
   }
 
   /**
