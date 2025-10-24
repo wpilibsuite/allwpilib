@@ -10,6 +10,7 @@
 
 #include "frc/geometry/Twist2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
+#include "frc/kinematics/DifferentialDriveWheelAccelerations.h"
 #include "frc/kinematics/DifferentialDriveWheelPositions.h"
 #include "frc/kinematics/DifferentialDriveWheelSpeeds.h"
 #include "frc/kinematics/Kinematics.h"
@@ -28,7 +29,8 @@ namespace frc {
  */
 class WPILIB_DLLEXPORT DifferentialDriveKinematics
     : public Kinematics<DifferentialDriveWheelSpeeds,
-                        DifferentialDriveWheelPositions> {
+                        DifferentialDriveWheelPositions,
+                        DifferentialDriveWheelAccelerations> {
  public:
   /**
    * Constructs a differential drive kinematics object.
@@ -97,6 +99,23 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
       const DifferentialDriveWheelPositions& start,
       const DifferentialDriveWheelPositions& end, double t) const override {
     return start.Interpolate(end, t);
+  }
+
+  constexpr ChassisAccelerations ToChassisAccelerations(
+      const DifferentialDriveWheelAccelerations& wheelAccelerations)
+      const override {
+    return {(wheelAccelerations.left + wheelAccelerations.right) / 2.0,
+            0_mps_sq,
+            (wheelAccelerations.right - wheelAccelerations.left) / trackwidth *
+                1_rad};
+  }
+
+  constexpr DifferentialDriveWheelAccelerations ToWheelAccelerations(
+      const ChassisAccelerations& chassisAccelerations) const override {
+    return {chassisAccelerations.ax -
+                trackwidth / 2 * chassisAccelerations.alpha / 1_rad,
+            chassisAccelerations.ax +
+                trackwidth / 2 * chassisAccelerations.alpha / 1_rad};
   }
 
   /// Differential drive trackwidth.

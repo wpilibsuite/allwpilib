@@ -8,14 +8,15 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.interpolation.Interpolator;
 
 /**
- * Helper class that converts a chassis velocity (dx and dtheta components) into wheel speeds. Robot
- * code should not use this directly- Instead, use the particular type for your drivetrain (e.g.,
- * {@link DifferentialDriveKinematics}).
+ * Helper class that converts a chassis velocity (dx and dtheta components) into wheel speeds and
+ * chassis accelerations into wheel accelerations. Robot code should not use this directly- Instead,
+ * use the particular type for your drivetrain (e.g., {@link DifferentialDriveKinematics}).
  *
  * @param <S> The type of the wheel speeds.
+ * @param <A> The type of the wheel accelerations.
  * @param <P> The type of the wheel positions.
  */
-public interface Kinematics<S, P> extends Interpolator<P> {
+public interface Kinematics<S, A, P> extends Interpolator<P> {
   /**
    * Performs forward kinematics to return the resulting chassis speed from the wheel speeds. This
    * method is often used for odometry -- determining the robot's position on the field using data
@@ -34,6 +35,27 @@ public interface Kinematics<S, P> extends Interpolator<P> {
    * @return The wheel speeds.
    */
   S toWheelSpeeds(ChassisSpeeds chassisSpeeds);
+
+  /**
+   * Performs forward kinematics to return the resulting chassis accelerations from the wheel
+   * accelerations. This method is often used for dynamics calculations -- determining the robot's
+   * acceleration on the field using data from the real-world acceleration of each wheel on the
+   * robot.
+   *
+   * @param wheelAccelerations The accelerations of the wheels.
+   * @return The chassis accelerations.
+   */
+  ChassisAccelerations toChassisAccelerations(A wheelAccelerations);
+
+  /**
+   * Performs inverse kinematics to return the wheel accelerations from a desired chassis
+   * acceleration. This method is often used for dynamics calculations -- converting desired robot
+   * accelerations into individual wheel accelerations.
+   *
+   * @param chassisAccelerations The desired chassis accelerations.
+   * @return The wheel accelerations.
+   */
+  A toWheelAccelerations(ChassisAccelerations chassisAccelerations);
 
   /**
    * Performs forward kinematics to return the resulting Twist2d from the given change in wheel
