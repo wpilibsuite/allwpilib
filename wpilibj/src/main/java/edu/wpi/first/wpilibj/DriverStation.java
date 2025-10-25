@@ -1216,9 +1216,6 @@ public final class DriverStation {
   public static void publishOpModes() {
     m_opModesMutex.lock();
     try {
-      for (OpModeOption o : m_opModes.values()) {
-        System.out.println("Option " + o.name + " ID " + o.id);
-      }
       OpModeOption[] options = new OpModeOption[m_opModes.size()];
       DriverStationJNI.setOpModeOptions(m_opModes.values().toArray(options));
     } finally {
