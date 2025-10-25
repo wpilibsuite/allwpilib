@@ -1193,6 +1193,9 @@ public final class DriverStation {
    * @return unique ID for the opmode, or 0 if not found
    */
   public static long removeOpMode(RobotMode mode, String name) {
+    if (name.isBlank()) {
+      return 0;
+    }
     m_opModesMutex.lock();
     try {
       // we have to loop over all entries to find the one with the correct name
