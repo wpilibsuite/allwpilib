@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Wed, 15 Oct 2025 02:33:00 -0400
+Date: Sat, 25 Oct 2025 01:15:46 -0400
 Subject: [PATCH 09/30] HAND FIX - Fixup pregen files
 
 ---
@@ -148,7 +148,7 @@ index 8b366f2d2ecc22d4e222e4213d96a7f433771799..605d526b9bd6e76d08efdc8b9b78740c
  /**
   * A version of {@link {{ ConsoleName }}Controller} with {@link Trigger} factories for command-based.
 diff --git a/ntcore/generate_topics.py b/ntcore/generate_topics.py
-index e454048d73c74a459d074c191b4aa4266e65c30c..d55bc223ebd3fc26b7e506b85a8be3b2c40df026 100755
+index e454048d73c74a459d074c191b4aa4266e65c30c..26b085bca760500a8013fadaeeada15201329a2a 100755
 --- a/ntcore/generate_topics.py
 +++ b/ntcore/generate_topics.py
 @@ -25,7 +25,7 @@ def generate_topics(
@@ -165,7 +165,7 @@ index e454048d73c74a459d074c191b4aa4266e65c30c..d55bc223ebd3fc26b7e506b85a8be3b2
  
      # C++ classes
 -    cpp_subdirectory = "main/native/include/networktables"
-+    cpp_subdirectory = "main/native/include/wpi/ntcore"
++    cpp_subdirectory = "main/native/include/wpi/nt"
      cpp_template_directory = template_root / cpp_subdirectory
      env = Environment(
          loader=FileSystemLoader(cpp_template_directory),
@@ -179,7 +179,7 @@ index e454048d73c74a459d074c191b4aa4266e65c30c..d55bc223ebd3fc26b7e506b85a8be3b2
      Output(
 -        output_directory / hdr_subdirectory,
 -        "ntcore_cpp_types.h",
-+        output_directory / hdr_subdirectory / "wpi/ntcore",
++        output_directory / hdr_subdirectory / "wpi/nt",
 +        "ntcore_cpp_types.hpp",
          output,
      )
@@ -190,7 +190,7 @@ index e454048d73c74a459d074c191b4aa4266e65c30c..d55bc223ebd3fc26b7e506b85a8be3b2
      output = template.render(types=types)
 -    Output(output_directory / hdr_subdirectory, "ntcore_c_types.h", output)
 +    Output(
-+        output_directory / hdr_subdirectory / "wpi/ntcore", "ntcore_c_types.h", output
++        output_directory / hdr_subdirectory / "wpi/nt", "ntcore_c_types.h", output
 +    )
  
      # C handle API (source)

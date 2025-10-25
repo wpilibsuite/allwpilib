@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Wed, 15 Oct 2025 02:33:09 -0400
+Date: Sat, 25 Oct 2025 01:15:54 -0400
 Subject: [PATCH 12/30] HAND FIXES: Fixup gradle / cmake / styleguide
 
 ---
@@ -34,10 +34,10 @@ Subject: [PATCH 12/30] HAND FIXES: Fixup gradle / cmake / styleguide
  27 files changed, 135 insertions(+), 133 deletions(-)
 
 diff --git a/.styleguide b/.styleguide
-index f5e8ad36c5f7a404bad2a404d6dee4f2f5ae96c9..510daaf302b5f1aaab0c1c32e4ade73a7ff83ea2 100644
+index 18dc8e9ca6513164074141608dba5debc1253b58..ecbd6dd13467d6776e4e2f362bce7440df04f082 100644
 --- a/.styleguide
 +++ b/.styleguide
-@@ -36,20 +36,21 @@ includeOtherLibs {
+@@ -43,20 +43,21 @@ includeOtherLibs {
    ^fmt/
    ^glass/
    ^gtest/
@@ -187,7 +187,7 @@ index 2737ace2a78c4ce127dd940068c25fde18d127d0..029503e50f40f07e2828496a5f8e1ea2
 +  ^wpi/net/
  }
 diff --git a/datalog/.styleguide b/datalog/.styleguide
-index 718d2404f4289e19a5675558ef508e00ba1c15ad..309041dfd5c13d565538913f34e3cea8e812cfa0 100644
+index 3916f30045614a16f29065469af1d63861a9450a..3eb942d50b22dad0d01a0a5e27a6dc4ae796a98e 100644
 --- a/datalog/.styleguide
 +++ b/datalog/.styleguide
 @@ -1,5 +1,6 @@
@@ -323,10 +323,10 @@ index c72e55d59c3149839fc146b6ea2489e8cfc8b0ef..91173004b37f146f980936b1dbe0ceac
 +  ^wpi/math/
  }
 diff --git a/hal/.styleguide b/hal/.styleguide
-index 2386f43145dfd4bc1b4c6b03b6fb5a1c98eac065..bd3473f2db611cd72430a3b2ee8fcb2d2f5eaec1 100644
+index 86d583b857784d3328cf34e25a3151c82d3748c6..88ae28806efa3f8c6f7a00389f0344e25982cd20 100644
 --- a/hal/.styleguide
 +++ b/hal/.styleguide
-@@ -31,18 +31,17 @@ repoRootNameOverride {
+@@ -34,18 +34,17 @@ repoRootNameOverride {
  }
  
  includeOtherLibs {
@@ -363,7 +363,7 @@ index c0e66354a319b7b1aff13c08af7397fa8321d295..d22e5aed606f9d932cb6f8a5d6b391b5
      splitSetup = {
          if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
 diff --git a/ntcore/.styleguide b/ntcore/.styleguide
-index 13634e44df6212efcccb0c195470913f6ac27460..f93bd8d1aaee878c7e348d91ac545674196c42b8 100644
+index 7715fa6362442e5c7fc45b26ab4746b4f7c1505e..900e07c2f7355efeb00004a1978489e7019db223 100644
 --- a/ntcore/.styleguide
 +++ b/ntcore/.styleguide
 @@ -4,6 +4,7 @@ cHeaderFileInclude {
@@ -374,7 +374,7 @@ index 13634e44df6212efcccb0c195470913f6ac27460..f93bd8d1aaee878c7e348d91ac545674
    \.inc$
    \.inl$
  }
-@@ -32,6 +33,7 @@ includeOtherLibs {
+@@ -35,6 +36,7 @@ includeOtherLibs {
    ^fmt/
    ^gtest/
    ^support/
@@ -617,10 +617,10 @@ index 07f5df67dad1dfcf56adabf348c0712025ea5859..0e5620c10d180a1591d74596e319f3e9
  clean {
      delete oldWpilibVersionFile
 diff --git a/wpilibjExamples/build.gradle b/wpilibjExamples/build.gradle
-index 5e11e2a5dcff634689f9f55f8a994b90e88d547e..2a6f06a9e633a14a4cfa01e3b2d8ff0bc0222415 100644
+index 8f5bcab7d759045fb998c30933d82974a0df95c2..9abcdd441454b95f5e6ef4e5651a61f7fe8392e0 100644
 --- a/wpilibjExamples/build.gradle
 +++ b/wpilibjExamples/build.gradle
-@@ -66,14 +66,14 @@ tasks.register('buildDesktopJava') {
+@@ -79,14 +79,14 @@ tasks.register('buildDesktopJava') {
  apply from: 'publish.gradle'
  
  ext {
@@ -643,7 +643,7 @@ index 5e11e2a5dcff634689f9f55f8a994b90e88d547e..2a6f06a9e633a14a4cfa01e3b2d8ff0b
  }
  
  apply plugin: 'cpp'
-@@ -161,7 +161,7 @@ model {
+@@ -174,7 +174,7 @@ model {
                              new groovy.json.JsonSlurper().parseText(exampleFile.text).each { entry ->
                                  project.tasks.create("run${entry.foldername}", JavaExec) { run ->
                                      run.group = "run examples"
@@ -652,7 +652,7 @@ index 5e11e2a5dcff634689f9f55f8a994b90e88d547e..2a6f06a9e633a14a4cfa01e3b2d8ff0b
                                      run.classpath = sourceSets.main.runtimeClasspath
                                      run.dependsOn it.tasks.install
                                      run.systemProperty 'java.library.path', filePath
-@@ -175,15 +175,15 @@ model {
+@@ -188,15 +188,15 @@ model {
                                      testTask.group = "verification"
                                      testTask.useJUnitPlatform()
                                      testTask.filter {
@@ -671,7 +671,7 @@ index 5e11e2a5dcff634689f9f55f8a994b90e88d547e..2a6f06a9e633a14a4cfa01e3b2d8ff0b
                                          setFailOnNoMatchingTests(false)
                                      }
                                      testTask.testClassesDirs = sourceSets.test.output.classesDirs
-@@ -206,7 +206,7 @@ model {
+@@ -219,7 +219,7 @@ model {
                              new groovy.json.JsonSlurper().parseText(snippetsFile.text).each { entry ->
                                  project.tasks.create("runSnippet${entry.foldername}", JavaExec) { run ->
                                      run.group = "run snippets"
@@ -680,7 +680,7 @@ index 5e11e2a5dcff634689f9f55f8a994b90e88d547e..2a6f06a9e633a14a4cfa01e3b2d8ff0b
                                      run.classpath = sourceSets.main.runtimeClasspath
                                      run.dependsOn it.tasks.install
                                      run.systemProperty 'java.library.path', filePath
-@@ -220,11 +220,11 @@ model {
+@@ -233,11 +233,11 @@ model {
                                      testTask.group = "verification"
                                      testTask.useJUnitPlatform()
                                      testTask.filter {
@@ -695,7 +695,7 @@ index 5e11e2a5dcff634689f9f55f8a994b90e88d547e..2a6f06a9e633a14a4cfa01e3b2d8ff0b
                                      }
                                      testTask.testClassesDirs = sourceSets.test.output.classesDirs
 diff --git a/wpimath/.styleguide b/wpimath/.styleguide
-index 36cfb199bedd8661e5cf4c9b5977cb9a22707fae..f05a5a5143865c5faebf2fd916c50100efb515af 100644
+index f61c8b9c8bcf4f84b84447e1435231aae6bad165..615157d303067ddfe2acd9bdc28b84f08684b6c5 100644
 --- a/wpimath/.styleguide
 +++ b/wpimath/.styleguide
 @@ -14,13 +14,11 @@ modifiableFileExclude {
@@ -713,8 +713,8 @@ index 36cfb199bedd8661e5cf4c9b5977cb9a22707fae..f05a5a5143865c5faebf2fd916c50100
 -  src/test/native/include/drake/
    src/generated/main/java/org/wpilib/math/proto
    src/generated/main/native/cpp
- }
-@@ -41,7 +39,7 @@ includeOtherLibs {
+ 
+@@ -44,7 +42,7 @@ includeOtherLibs {
    ^gcem/
    ^gtest/
    ^unsupported/

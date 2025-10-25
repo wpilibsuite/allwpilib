@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Tue, 14 Oct 2025 18:31:46 -0400
+Date: Sat, 25 Oct 2025 01:20:55 -0400
 Subject: [PATCH 28/30] HAND FIXES: Fix ntcoreffi
 
 ---
@@ -8,7 +8,7 @@ Subject: [PATCH 28/30] HAND FIXES: Fix ntcoreffi
  1 file changed, 20 insertions(+), 20 deletions(-)
 
 diff --git a/ntcoreffi/src/main/native/cpp/DataLogManager.cpp b/ntcoreffi/src/main/native/cpp/DataLogManager.cpp
-index 3d86f1e960ddc45e71135914b69086ba7af4176f..8e3b3de60e626ecc39391f05378cb4fa691db4b6 100644
+index e2e88acea95eea636b9b9e3876561223cde5d5b7..a06ea69c8056054e570532f498b972e3eae5f7fc 100644
 --- a/ntcoreffi/src/main/native/cpp/DataLogManager.cpp
 +++ b/ntcoreffi/src/main/native/cpp/DataLogManager.cpp
 @@ -59,7 +59,7 @@ inline void ReportError(int32_t status, const char* fileName, int lineNumber,

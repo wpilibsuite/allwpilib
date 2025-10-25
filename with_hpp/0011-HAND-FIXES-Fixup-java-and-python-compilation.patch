@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Wed, 15 Oct 2025 02:33:09 -0400
+Date: Sat, 25 Oct 2025 01:15:54 -0400
 Subject: [PATCH 11/30] HAND FIXES: Fixup java and python compilation
 
 ---
@@ -68,7 +68,7 @@ index 0b68001c0f6567cce5beaab86d01f5c179a33f5b..0a70aacfd41334449afa57c6b5a81413
  
  /** A wrapper around Driver Station control word. */
 diff --git a/wpilibj/src/main/java/org/wpilib/driverstation/DriverStation.java b/wpilibj/src/main/java/org/wpilib/driverstation/DriverStation.java
-index 5e8e7b4d87c982654eefb58a08187c03930c627b..3f64cce17d471017cd956628227355f3bf29d81f 100644
+index b89ba709c9b6b45f86ca933419b09acaef5fc7a4..53850ffbb8bb7e767f7bf227571b0b2828ad6fd9 100644
 --- a/wpilibj/src/main/java/org/wpilib/driverstation/DriverStation.java
 +++ b/wpilibj/src/main/java/org/wpilib/driverstation/DriverStation.java
 @@ -21,6 +21,7 @@ import org.wpilib.networktables.NetworkTableInstance;

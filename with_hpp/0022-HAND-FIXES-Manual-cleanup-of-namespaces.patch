@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Wed, 15 Oct 2025 02:36:03 -0400
+Date: Fri, 24 Oct 2025 22:51:43 -0400
 Subject: [PATCH 22/30] HAND FIXES: Manual cleanup of namespaces
 
 ---
@@ -196,7 +196,7 @@ index 6c938e1adc6f858deb40725fd1abc785402ec644..268b947d91119087d89a98d244b72564
  class BooleanTopic;
  class NetworkTable;
 diff --git a/wpilibc/src/main/native/include/wpi/smartdashboard/FieldObject2d.hpp b/wpilibc/src/main/native/include/wpi/smartdashboard/FieldObject2d.hpp
-index 06967260a842034f27fb5d8d4e78e78bd42a57ce..ff45ba68da075da5982d620394cf7e97f3d45a7a 100644
+index 37d27968eefaa481d6bda72e4d9e82aa66135752..b57b3303c53fe95bbf4492eb387eee6ab6b33215 100644
 --- a/wpilibc/src/main/native/include/wpi/smartdashboard/FieldObject2d.hpp
 +++ b/wpilibc/src/main/native/include/wpi/smartdashboard/FieldObject2d.hpp
 @@ -17,10 +17,13 @@
@@ -216,12 +216,12 @@ index 06967260a842034f27fb5d8d4e78e78bd42a57ce..ff45ba68da075da5982d620394cf7e97
  /**
   * Game field object on a Field2d.
 diff --git a/wpilibc/src/main/native/include/wpi/smartdashboard/SmartDashboard.hpp b/wpilibc/src/main/native/include/wpi/smartdashboard/SmartDashboard.hpp
-index 5127389a38166f17ff89e9675d8cea742954c1cd..4f097faf7bba792f3d69ce4d01e5c437a0bbe651 100644
+index f8e10cacf33d88295c594a426d1b35206479b939..8d0989a8b013385059bc51dae4adc6770d3a529d 100644
 --- a/wpilibc/src/main/native/include/wpi/smartdashboard/SmartDashboard.hpp
 +++ b/wpilibc/src/main/native/include/wpi/smartdashboard/SmartDashboard.hpp
 @@ -14,7 +14,7 @@
- #include <wpi/ntcore/NetworkTableEntry.hpp>
- #include <wpi/ntcore/NetworkTableValue.hpp>
+ #include <wpi/nt/NetworkTableEntry.hpp>
+ #include <wpi/nt/NetworkTableValue.hpp>
  
 -namespace wpi {
 +namespace wpi::util {

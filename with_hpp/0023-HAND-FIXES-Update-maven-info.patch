@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Wed, 15 Oct 2025 02:36:03 -0400
+Date: Sat, 25 Oct 2025 01:20:53 -0400
 Subject: [PATCH 23/30] HAND FIXES: Update maven info
 
 ---
@@ -463,7 +463,7 @@ index 732652db66d9b12664e0726e7ed8343f16aaddaf..d09a54ed7dbfadd4d199241a695a6f15
      def vsLocator = gradle.services.get(VisualStudioLocator)
  
 diff --git a/ntcore/BUILD.bazel b/ntcore/BUILD.bazel
-index b8ca1cc22640b1a52a06b74bd8d48414747d3bb5..87513bbe36ef24912d1180626cf2b225470b4968 100644
+index 8d619c2741cb5abf432bc3093813e7ab2b1fe470..cffe62aa485e1ca6909526c410018c1a32faf4e5 100644
 --- a/ntcore/BUILD.bazel
 +++ b/ntcore/BUILD.bazel
 @@ -161,7 +161,7 @@ wpilib_jni_java_library(

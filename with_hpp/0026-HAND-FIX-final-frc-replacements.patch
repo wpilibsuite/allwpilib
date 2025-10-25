@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Wed, 15 Oct 2025 02:36:04 -0400
+Date: Sat, 25 Oct 2025 01:20:55 -0400
 Subject: [PATCH 26/30] HAND FIX final frc:: replacements
 
 ---
@@ -22,7 +22,7 @@ index accb80b3350e0086fc7e0b64e7843e521ad6a6d6..5808af16ab40399e44bbeb76aaf05496
   * @param param parameter data to pass to mainFunc and exitFunc
   * @param mainFunc the function to be run when HAL_RunMain() is called.
 diff --git a/ntcoreffi/src/main/native/cpp/DataLogManager.cpp b/ntcoreffi/src/main/native/cpp/DataLogManager.cpp
-index 54e9d07e053a869eb8aeb30ecfc459bf9d75b68e..3d86f1e960ddc45e71135914b69086ba7af4176f 100644
+index 9ddf61bc92824044bce4d3d113b4b7ff979b7778..e2e88acea95eea636b9b9e3876561223cde5d5b7 100644
 --- a/ntcoreffi/src/main/native/cpp/DataLogManager.cpp
 +++ b/ntcoreffi/src/main/native/cpp/DataLogManager.cpp
 @@ -29,7 +29,7 @@ namespace warn {

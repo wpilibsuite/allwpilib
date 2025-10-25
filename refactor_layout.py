@@ -67,8 +67,8 @@ class RawConfig:
         ("wpinet/src/main/native/thirdparty/tcpsockets/include", "wpinet", "wpi/net"),
         # datalog here for the auto h -> hpp change
         ("datalog/src/main/native/include", "wpi/datalog", "wpi/datalog"),
-        ("ntcore/src/main/native/include", "networktables", "wpi/ntcore"),
-        ("ntcore/src/generated/main/native/include", "networktables", "wpi/ntcore"),
+        ("ntcore/src/main/native/include", "networktables", "wpi/nt"),
+        ("ntcore/src/generated/main/native/include", "networktables", "wpi/nt"),
         ("hal/src/main/native/include", "hal", "wpi/hal"),
         ("wpimath/src/main/native/include", "frc", "wpi/math"),
         ("wpimath/src/main/native/include", "units", "wpi/units"),
@@ -99,10 +99,10 @@ class RawConfig:
         (
             pathlib.Path("ntcore/src/main/native/include"),
             [
-                ("ntcore_test.h", "wpi/ntcore/ntcore_test" + NEW_CC_FILE_SUFFIX),
-                ("ntcore.h", "wpi/ntcore/ntcore.h"),
-                ("ntcore_c.h", "wpi/ntcore/ntcore_c.h"),
-                ("ntcore_cpp.h", "wpi/ntcore/ntcore_cpp" + NEW_CC_FILE_SUFFIX),
+                ("ntcore_test.h", "wpi/nt/ntcore_test" + NEW_CC_FILE_SUFFIX),
+                ("ntcore.h", "wpi/nt/ntcore.h"),
+                ("ntcore_c.h", "wpi/nt/ntcore_c.h"),
+                ("ntcore_cpp.h", "wpi/nt/ntcore_cpp" + NEW_CC_FILE_SUFFIX),
             ],
         ),
         (
@@ -121,8 +121,8 @@ class RawConfig:
         (
             pathlib.Path("ntcore/src/generated/main/native/include"),
             [
-                ("ntcore_c_types.h", "wpi/ntcore/ntcore_c_types.h"),
-                ("ntcore_cpp_types.h", "wpi/ntcore/ntcore_cpp_types" + NEW_CC_FILE_SUFFIX),
+                ("ntcore_c_types.h", "wpi/nt/ntcore_c_types.h"),
+                ("ntcore_cpp_types.h", "wpi/nt/ntcore_cpp_types" + NEW_CC_FILE_SUFFIX),
             ],
         ),
         (
@@ -144,13 +144,13 @@ class RawConfig:
         (
             pathlib.Path("cscore/src/main/native/include"),
             [
-                ("cscore_cv.h", "wpi/cscore/cscore_cv" + NEW_CC_FILE_SUFFIX),
-                ("cscore_cpp.h", "wpi/cscore/cscore_cpp" + NEW_CC_FILE_SUFFIX),
-                ("cscore.h", "wpi/cscore/cscore.h"),
-                ("cscore_raw.h", "wpi/cscore/cscore_raw.h"),
-                ("cscore_c.h", "wpi/cscore/cscore_c.h"),
-                ("cscore_oo.h", "wpi/cscore/cscore_oo" + NEW_CC_FILE_SUFFIX),
-                ("cscore_runloop.h", "wpi/cscore/cscore_runloop" + NEW_CC_FILE_SUFFIX),
+                ("cscore_cv.h", "wpi/cs/cscore_cv" + NEW_CC_FILE_SUFFIX),
+                ("cscore_cpp.h", "wpi/cs/cscore_cpp" + NEW_CC_FILE_SUFFIX),
+                ("cscore.h", "wpi/cs/cscore.h"),
+                ("cscore_raw.h", "wpi/cs/cscore_raw.h"),
+                ("cscore_c.h", "wpi/cs/cscore_c.h"),
+                ("cscore_oo.h", "wpi/cs/cscore_oo" + NEW_CC_FILE_SUFFIX),
+                ("cscore_runloop.h", "wpi/cs/cscore_runloop" + NEW_CC_FILE_SUFFIX),
             ],
         ),
         (
@@ -586,7 +586,7 @@ class RawConfig:
         ("commandsv2/src/generate/main/native/include/wpi/commands2/button/commandhid.h.jinja", "commandsv2/src/generate/main/native/include/wpi/commands2/button/commandhid.hpp.jinja"),
         ("fields/fieldimages-config.cmake.in", "fields/fields-config.cmake.in"),
         ("fields/src/main/native/resources/edu/wpi/first", "fields/src/main/native/resources/org/wpilib"),
-        ("ntcore/src/generate/main/native/include/networktables/Topic.h.jinja", "ntcore/src/generate/main/native/include/wpi/ntcore/Topic" + NEW_CC_FILE_SUFFIX + ".jinja"),
+        ("ntcore/src/generate/main/native/include/networktables/Topic.h.jinja", "ntcore/src/generate/main/native/include/wpi/nt/Topic" + NEW_CC_FILE_SUFFIX + ".jinja"),
         ("ntcore/src/generate/main/native/include/ntcore_cpp_types.h.jinja", "ntcore/src/generate/main/native/include/ntcore_cpp_types.hpp.jinja"),
         ("wpilibj/src/test/resources/edu/wpi/first/wpilibj/", "wpilibj/src/test/resources/org/wpilib/util"),
         ("wpilibc/src/generate/main/native/include/frc/", "wpilibc/src/generate/main/native/include/wpi/"),
@@ -1957,6 +1957,7 @@ def main():
     # replacements
     apply_patch("0018-HAND-FIXES-Update-upstream-for-namespace-changes.patch")
     run_namespace_replacements()
+    # trim_header_namespaces()
     run_upstream_utils()
     apply_patch("0021-HAND-FIXES-Update-build-scripts-for-namespaces.patch")
     apply_patch("0022-HAND-FIXES-Manual-cleanup-of-namespaces.patch")
