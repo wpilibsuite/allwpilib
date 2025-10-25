@@ -7,6 +7,7 @@
 #include <memory>
 #include <utility>
 
+#include "frc/DoubleSolenoid.h"
 #include "frc/PneumaticsBase.h"
 
 using namespace frc;
@@ -44,6 +45,30 @@ DoubleSolenoid::Value DoubleSolenoidSim::Get() const {
 void DoubleSolenoidSim::Set(DoubleSolenoid::Value output) {
   m_module->SetSolenoidOutput(m_fwd, output == DoubleSolenoid::Value::kForward);
   m_module->SetSolenoidOutput(m_rev, output == DoubleSolenoid::Value::kReverse);
+}
+
+bool DoubleSolenoidSim::IsForward() {
+  return Get() == DoubleSolenoid::Value::kForward;
+}
+
+bool DoubleSolenoidSim::IsReverse() {
+  return Get() == DoubleSolenoid::Value::kReverse;
+}
+
+bool DoubleSolenoidSim::IsOff() {
+  return Get() == DoubleSolenoid::Value::kOff;
+}
+
+void DoubleSolenoidSim::SetForward() {
+  Set(DoubleSolenoid::Value::kForward);
+}
+
+void DoubleSolenoidSim::SetReverse() {
+  Set(DoubleSolenoid::Value::kReverse);
+}
+
+void DoubleSolenoidSim::SetOff() {
+  Set(DoubleSolenoid::Value::kOff);
 }
 
 std::shared_ptr<PneumaticsBaseSim> DoubleSolenoidSim::GetModuleSim() const {
