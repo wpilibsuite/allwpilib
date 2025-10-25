@@ -448,7 +448,6 @@ public abstract class OpModeRobot extends RobotBase {
     // call opmode stop
     OpMode opMode = m_activeOpMode.get();
     if (opMode != null) {
-      DriverStation.reportWarning("OpMode did not exit, calling stop", false);
       opMode.opModeStop();
     }
 

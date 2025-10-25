@@ -26,7 +26,7 @@ class MonitorThread : public wpi::SafeThreadEvent {
                 std::weak_ptr<OpMode> activeOpMode)
       : m_modeId{modeId},
         m_dsEvent{dsEvent.GetHandle()},
-        m_activeOpMode{activeOpMode} {}
+        m_activeOpMode{std::move(activeOpMode)} {}
 
  private:
   void Main() override {
@@ -55,7 +55,6 @@ class MonitorThread : public wpi::SafeThreadEvent {
     // call opmode stop
     auto opMode = m_activeOpMode.lock();
     if (opMode) {
-      FRC_ReportWarning("OpMode did not exit, calling OpModeStop");
       opMode->OpModeStop();
     }
 
