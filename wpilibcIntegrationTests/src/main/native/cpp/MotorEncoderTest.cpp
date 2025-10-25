@@ -14,9 +14,7 @@
 #include "frc/Timer.h"
 #include "frc/controller/PIDController.h"
 #include "frc/filter/LinearFilter.h"
-#include "frc/motorcontrol/Jaguar.h"
 #include "frc/motorcontrol/Talon.h"
-#include "frc/motorcontrol/Victor.h"
 
 enum MotorEncoderTestType { TEST_VICTOR, TEST_JAGUAR, TEST_TALON };
 
@@ -53,13 +51,13 @@ class MotorEncoderTest : public testing::TestWithParam<MotorEncoderTestType> {
   MotorEncoderTest() {
     switch (GetParam()) {
       case TEST_VICTOR:
-        m_motorController = new frc::Victor(TestBench::kVictorChannel);
+        m_motorController = new frc::Talon(TestBench::kVictorChannel);
         m_encoder = new frc::Encoder(TestBench::kVictorEncoderChannelA,
                                      TestBench::kVictorEncoderChannelB);
         break;
 
       case TEST_JAGUAR:
-        m_motorController = new frc::Jaguar(TestBench::kJaguarChannel);
+        m_motorController = new frc::Talon(TestBench::kJaguarChannel);
         m_encoder = new frc::Encoder(TestBench::kJaguarEncoderChannelA,
                                      TestBench::kJaguarEncoderChannelB);
         break;

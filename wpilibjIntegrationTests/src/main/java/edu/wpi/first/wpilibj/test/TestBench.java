@@ -15,9 +15,7 @@ import edu.wpi.first.wpilibj.fixtures.DIOCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.fixtures.RelayCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.TiltPanCameraFixture;
-import edu.wpi.first.wpilibj.motorcontrol.Jaguar;
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
-import edu.wpi.first.wpilibj.motorcontrol.Victor;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -92,16 +90,16 @@ public final class TestBench {
   }
 
   /**
-   * Constructs a new set of objects representing a connected set of Victor controlled Motors and an
+   * Constructs a new set of objects representing a connected set of Talon controlled Motors and an
    * encoder.
    *
-   * @return a freshly allocated Victor, Encoder pair
+   * @return a freshly allocated Talon, Encoder pair
    */
-  public static MotorEncoderFixture<Victor> getVictorPair() {
+  public static MotorEncoderFixture<Talon> getVictorPair() {
     return new MotorEncoderFixture<>() {
       @Override
-      protected Victor giveMotorController() {
-        return new Victor(kVictorChannel);
+      protected Talon giveMotorController() {
+        return new Talon(kVictorChannel);
       }
 
       @Override
@@ -122,16 +120,16 @@ public final class TestBench {
   }
 
   /**
-   * Constructs a new set of objects representing a connected set of Jaguar controlled Motors and an
+   * Constructs a new set of objects representing a connected set of Talon controlled Motors and an
    * encoder.
    *
-   * @return a freshly allocated Jaguar, Encoder pair
+   * @return a freshly allocated Talon, Encoder pair
    */
-  public static MotorEncoderFixture<Jaguar> getJaguarPair() {
+  public static MotorEncoderFixture<Talon> getJaguarPair() {
     return new MotorEncoderFixture<>() {
       @Override
-      protected Jaguar giveMotorController() {
-        return new Jaguar(kJaguarChannel);
+      protected Talon giveMotorController() {
+        return new Talon(kJaguarChannel);
       }
 
       @Override

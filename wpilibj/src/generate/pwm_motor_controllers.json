@@ -1,31 +1,5 @@
 [
   {
-    "name": "DMC60",
-    "Manufacturer": "Digilent",
-    "DisplayName": "DMC 60",
-    "ResourceName": "DigilentDMC60",
-    "pulse_width_ms": {
-      "max": 2.004,
-      "deadbandMax": 1.520,
-      "center": 1.500,
-      "deadbandMin": 1.480,
-      "min": 0.997
-    }
-  },
-  {
-    "name": "Jaguar",
-    "Manufacturer": "Luminary Micro / Vex Robotics",
-    "DisplayName": "Jaguar",
-    "ResourceName": "Jaguar",
-    "pulse_width_ms": {
-      "max": 2.310,
-      "deadbandMax": 1.550,
-      "center": 1.507,
-      "deadbandMin": 1.454,
-      "min": 0.697
-    }
-  },
-  {
     "name": "PWMSparkFlex",
     "Manufacturer": "REV Robotics",
     "DisplayName": "SPARK Flex",
@@ -104,19 +78,6 @@
     }
   },
   {
-    "name": "SD540",
-    "Manufacturer": "Mindsensors",
-    "DisplayName": "SD540",
-    "ResourceName": "MindsensorsSD540",
-    "pulse_width_ms": {
-      "max": 2.05,
-      "deadbandMax": 1.55,
-      "center": 1.50,
-      "deadbandMin": 1.44,
-      "min": 0.94
-    }
-  },
-  {
     "name": "Spark",
     "Manufacturer": "REV Robotics",
     "DisplayName": "SPARK",
@@ -140,20 +101,6 @@
       "center": 1.513,
       "deadbandMin": 1.487,
       "min": 0.989
-    }
-  },
-  {
-    "name": "Victor",
-    "Manufacturer": "Vex Robotics",
-    "DisplayName": "Victor 888",
-    "ResourceName": "Victor",
-    "PeriodMultiplier": 2,
-    "pulse_width_ms": {
-      "max": 2.027,
-      "deadbandMax": 1.525,
-      "center": 1.507,
-      "deadbandMin": 1.490,
-      "min": 1.026
     }
   },
   {

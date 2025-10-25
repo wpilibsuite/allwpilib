@@ -9,9 +9,7 @@
 
 #include "TestBench.h"
 #include "frc/Timer.h"
-#include "frc/motorcontrol/Jaguar.h"
 #include "frc/motorcontrol/Talon.h"
-#include "frc/motorcontrol/Victor.h"
 
 static constexpr auto kMotorDelay = 2.5_s;
 
@@ -23,8 +21,8 @@ class CounterTest : public testing::Test {
   frc::Counter m_victorCounter{TestBench::kVictorEncoderChannelA};
   frc::Counter m_jaguarCounter{TestBench::kJaguarEncoderChannelA};
   frc::Talon m_talon{TestBench::kVictorChannel};
-  frc::Victor m_victor{TestBench::kTalonChannel};
-  frc::Jaguar m_jaguar{TestBench::kJaguarChannel};
+  frc::Talon m_victor{TestBench::kTalonChannel};
+  frc::Talon m_jaguar{TestBench::kJaguarChannel};
 
   void Reset() {
     m_talonCounter.Reset();

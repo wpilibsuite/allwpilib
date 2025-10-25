@@ -204,14 +204,10 @@ enum class BuiltInWidgets {
    * The motor controller will be controllable from the dashboard when test mode
    * is enabled, but will otherwise be view-only. <br>Supported types: <ul>
    * <li>PWMMotorController</li>
-   * <li>DMC60</li>
-   * <li>Jaguar</li>
    * <li>PWMTalonSRX</li>
    * <li>PWMVictorSPX</li>
-   * <li>SD540</li>
    * <li>Spark</li>
    * <li>Talon</li>
-   * <li>Victor</li>
    * <li>VictorSP</li>
    * <li>MotorControllerGroup</li>
    * <li>Any custom subclass of {@code SpeedContorller}</li>

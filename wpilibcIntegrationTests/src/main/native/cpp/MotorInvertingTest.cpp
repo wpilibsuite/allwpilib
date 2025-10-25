@@ -9,9 +9,7 @@
 #include "TestBench.h"
 #include "frc/Encoder.h"
 #include "frc/Timer.h"
-#include "frc/motorcontrol/Jaguar.h"
 #include "frc/motorcontrol/Talon.h"
-#include "frc/motorcontrol/Victor.h"
 
 enum MotorInvertingTestType { TEST_VICTOR, TEST_JAGUAR, TEST_TALON };
 
@@ -45,13 +43,13 @@ class MotorInvertingTest
   MotorInvertingTest() {
     switch (GetParam()) {
       case TEST_VICTOR:
-        m_motorController = new frc::Victor(TestBench::kVictorChannel);
+        m_motorController = new frc::Talon(TestBench::kVictorChannel);
         m_encoder = new frc::Encoder(TestBench::kVictorEncoderChannelA,
                                      TestBench::kVictorEncoderChannelB);
         break;
 
       case TEST_JAGUAR:
-        m_motorController = new frc::Jaguar(TestBench::kJaguarChannel);
+        m_motorController = new frc::Talon(TestBench::kJaguarChannel);
         m_encoder = new frc::Encoder(TestBench::kJaguarEncoderChannelA,
                                      TestBench::kJaguarEncoderChannelB);
         break;

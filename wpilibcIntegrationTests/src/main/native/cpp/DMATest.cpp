@@ -13,7 +13,6 @@
 #include "frc/DMASample.h"
 #include "frc/DigitalOutput.h"
 #include "frc/Timer.h"
-#include "frc/motorcontrol/Jaguar.h"
 
 using namespace frc;
 
@@ -24,7 +23,7 @@ class DMATest : public testing::Test {
   AnalogInput m_analogInput{TestBench::kAnalogOutputChannel};
   AnalogOutput m_analogOutput{TestBench::kFakeAnalogOutputChannel};
   DigitalOutput m_manualTrigger{TestBench::kLoop1InputChannel};
-  Jaguar m_pwm{TestBench::kFakePwmOutput};
+  Talon m_pwm{TestBench::kFakePwmOutput};
   DMA m_dma;
 
   void SetUp() override {

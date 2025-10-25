@@ -250,17 +250,13 @@ public enum BuiltInWidgets implements WidgetType {
    *
    * <ul>
    *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.PWMMotorController}
-   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.DMC60}
-   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.Jaguar}
    *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax}
    *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.PWMTalonFX}
    *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.PWMTalonSRX}
    *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.PWMVenom}
    *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX}
-   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.SD540}
    *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.Spark}
    *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.Talon}
-   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.Victor}
    *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.VictorSP}
    *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup}
    *   <li>Any custom subclass of {@code MotorController}
