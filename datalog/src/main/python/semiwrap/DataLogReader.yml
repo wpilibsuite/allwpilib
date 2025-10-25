@@ -1,0 +1,332 @@
+classes:
+  wpi::log::StartRecordData:
+    attributes:
+      entry:
+        access: readonly
+      name:
+        access: readonly
+      type:
+        access: readonly
+      metadata:
+        access: readonly
+  wpi::log::MetadataRecordData:
+    attributes:
+      entry:
+        access: readonly
+      metadata:
+        access: readonly
+  wpi::log::DataLogRecord:
+    methods:
+      DataLogRecord:
+        overloads:
+          "":
+            ignore: true
+          int, int64_t, std::span<const uint8_t>:
+            ignore: true
+      GetEntry:
+      GetTimestamp:
+      GetSize:
+      GetRaw:
+        no_release_gil: true
+        cpp_code: |
+          [](const DataLogRecord *self) {
+            auto data = self->GetRaw();
+            return py::bytes((char*)data.data(), data.size());
+          }
+      IsControl:
+      IsStart:
+      IsFinish:
+      IsSetMetadata:
+      GetStartData:
+        no_release_gil: true
+        param_override:
+          out:
+            ignore: true
+        doc: |
+          Decodes a start control record. Raises TypeError on error.
+        cpp_code: |
+          [](const DataLogRecord *self) {
+            auto ptr = std::make_unique<wpi::log::StartRecordData>();
+            if (!self->GetStartData(ptr.get())) {
+              throw py::type_error("not a start record");
+            }
+            return ptr;
+          }
+        return_value_policy: reference_internal
+      GetFinishEntry:
+        no_release_gil: true
+        param_override:
+          out:
+            ignore: true
+        doc: |
+          Decodes a finish control record. Raises TypeError on error.
+        cpp_code: |
+          [](const DataLogRecord *self) {
+            int value;
+            if (!self->GetFinishEntry(&value)) {
+              throw py::type_error("not a finish entry");
+            }
+            return value;
+          }
+      GetSetMetadataData:
+        no_release_gil: true
+        param_override:
+          out:
+            ignore: true
+        doc: |
+          Decodes a set metadata control record. Raises TypeError on error.
+        cpp_code: |
+          [](const DataLogRecord *self) {
+            auto ptr = std::make_unique<wpi::log::MetadataRecordData>();
+            if (!self->GetSetMetadataData(ptr.get())) {
+              throw py::type_error("not a metadata control record");
+            }
+            return ptr;
+          }
+        return_value_policy: reference_internal
+      GetBoolean:
+        no_release_gil: true
+        param_override:
+          value:
+            ignore: true
+        doc: |
+          Decodes a data record as a boolean. Note if the data type (as indicated in
+          the corresponding start control record for this entry) is not "boolean",
+          invalid results may be returned or TypeError will be raised.
+        cpp_code: |
+          [](const DataLogRecord *self) {
+            bool value;
+            if (!self->GetBoolean(&value)) {
+              throw py::type_error("not a boolean");
+            }
+            return value;
+          }
+      GetInteger:
+        no_release_gil: true
+        param_override:
+          value:
+            ignore: true
+        doc: |
+          Decodes a data record as an integer. Note if the data type (as indicated in
+          the corresponding start control record for this entry) is not "int64",
+          invalid results may be returned or TypeError will be raised.
+        cpp_code: |
+          [](const DataLogRecord *self) {
+            int64_t value;
+            if (!self->GetInteger(&value)) {
+              throw py::type_error("not an integer");
+            }
+            return value;
+          }
+      GetFloat:
+        no_release_gil: true
+        param_override:
+          value:
+            ignore: true
+        doc: |
+          Decodes a data record as a float. Note if the data type (as indicated in
+          the corresponding start control record for this entry) is not "float",
+          invalid results may be returned or TypeError will be raised.
+        cpp_code: |
+          [](const DataLogRecord *self) {
+            float value;
+            if (!self->GetFloat(&value)) {
+              throw py::type_error("not a float");
+            }
+            return value;
+          }
+      GetDouble:
+        no_release_gil: true
+        param_override:
+          value:
+            ignore: true
+        doc: |
+          Decodes a data record as a double. Note if the data type (as indicated in
+          the corresponding start control record for this entry) is not "double",
+          invalid results may be returned or TypeError will be raised.
+        cpp_code: |
+          [](const DataLogRecord *self) {
+            double value;
+            if (!self->GetDouble(&value)) {
+              throw py::type_error("not a double");
+            }
+            return value;
+          }
+      GetString:
+        no_release_gil: true
+        param_override:
+          value:
+            ignore: true
+        doc: |
+          Decodes a data record as a string. Note if the data type (as indicated in
+          the corresponding start control record for this entry) is not "string",
+          invalid results may be returned or TypeError will be raised.
+        cpp_code: |
+          [](const DataLogRecord *self) {
+            std::string_view value;
+            if (!self->GetString(&value)) {
+              throw py::type_error("not a string");
+            }
+            return value;
+          }
+      GetBooleanArray:
+        no_release_gil: true
+        param_override:
+          arr:
+            ignore: true
+        doc: |
+          Decodes a data record as a boolean array. Note if the data type (as
+          indicated in the corresponding start control record for this entry) is not
+          "boolean[]", invalid results may be returned or a TypeError may be raised.
+        cpp_code: |
+          [](const DataLogRecord *self) {
+            std::vector<int> arr;
+            if (!self->GetBooleanArray(&arr)) {
+              throw py::type_error("not a boolean array");
+            }
+            py::list l(arr.size());
+            for (size_t i = 0; i < arr.size(); i++) {
+              auto b = py::bool_(arr[i]);
+              PyList_SET_ITEM(l.ptr(), i, b.release().ptr());
+            }
+            return l;
+          }
+      GetIntegerArray:
+        no_release_gil: true
+        param_override:
+          arr:
+            ignore: true
+        doc: |
+          Decodes a data record as an integer array. Note if the data type (as
+          indicated in the corresponding start control record for this entry) is not
+          "int64[]", invalid results may be returned or a TypeError may be raised.
+        cpp_code: |
+          [](const DataLogRecord *self) {
+            std::vector<int64_t> arr;
+            if (!self->GetIntegerArray(&arr)) {
+              throw py::type_error("not an integer array");
+            }
+            return arr;
+          }
+      GetFloatArray:
+        no_release_gil: true
+        param_override:
+          arr:
+            ignore: true
+        doc: |
+          Decodes a data record as a float array. Note if the data type (as
+          indicated in the corresponding start control record for this entry) is not
+          "float[]", invalid results may be returned or a TypeError may be raised.
+        cpp_code: |
+          [](const DataLogRecord *self) {
+            std::vector<float> arr;
+            if (!self->GetFloatArray(&arr)) {
+              throw py::type_error("not a float array");
+            }
+            return arr;
+          }
+      GetDoubleArray:
+        no_release_gil: true
+        param_override:
+          arr:
+            ignore: true
+        doc: |
+          Decodes a data record as a double array. Note if the data type (as
+          indicated in the corresponding start control record for this entry) is not
+          "double[]", invalid results may be returned or a TypeError may be raised.
+        cpp_code: |
+          [](const DataLogRecord *self) {
+            std::vector<double> arr;
+            if (!self->GetDoubleArray(&arr)) {
+              throw py::type_error("not a double array");
+            }
+            return arr;
+          }
+      GetStringArray:
+        no_release_gil: true
+        param_override:
+          arr:
+            ignore: true
+        doc: |
+          Decodes a data record as a string array. Note if the data type (as
+          indicated in the corresponding start control record for this entry) is not
+          "string[]", invalid results may be returned or a TypeError may be raised.
+        cpp_code: |
+          [](const DataLogRecord *self) {
+            std::vector<std::string_view> arr;
+            if (!self->GetStringArray(&arr)) {
+              throw py::type_error("not a string array");
+            }
+            return arr;
+          }
+  wpi::log::DataLogIterator:
+    ignore: true
+  wpi::log::DataLogReader:
+    typealias:
+    - wpi::MemoryBuffer
+    methods:
+      DataLogReader:
+        ignore: true
+      IsValid:
+      GetVersion:
+      GetExtraHeader:
+      GetBufferIdentifier:
+      begin:
+        ignore: true
+      end:
+        ignore: true
+
+inline_code: |
+  cls_StartRecordData
+    .def("__repr__", [](const wpi::log::StartRecordData &data) -> std::string {
+      return "StartRecordData(entry=" + std::to_string(data.entry) + ", "
+                             "name=\"" + std::string(data.name) + "\", "
+                             "type=\"" + std::string(data.type) + "\", "
+                             "metadata=\"" + std::string(data.metadata) + "\")";
+    });
+
+  cls_MetadataRecordData
+    .def("__repr__", [](const wpi::log::MetadataRecordData &data) -> std::string {
+      return "MetadataRecordData(entry=" + std::to_string(data.entry) + ", "
+                                "metadata=\"" + std::string(data.metadata) + "\")";
+    });
+
+
+  cls_DataLogReader
+    .def(py::init([](const std::string &filename) {
+      auto mbuf = wpi::MemoryBuffer::GetFile(filename);
+      if (!mbuf) {
+        py::gil_scoped_acquire gil;
+        #ifdef _WIN32
+          PyErr_SetFromWindowsErr(mbuf.error().value());
+        #else
+          errno = mbuf.error().value();
+          PyErr_SetFromErrno(PyExc_OSError);
+        #endif
+        throw py::error_already_set();
+      }
+
+      return std::make_shared<wpi::log::DataLogReader>(std::move(*mbuf));
+    }),
+      release_gil(), py::arg("filename"))
+
+    .def(py::init([](const py::buffer &buffer, const std::string &name) {
+      auto req = buffer.request();
+      if (req.itemsize != 1) {
+        throw py::value_error("buffer must only contain bytes");
+      } else if (req.ndim != 1) {
+        throw py::value_error("buffer must only have a single dimension");
+      }
+
+      auto mbuf = wpi::MemoryBuffer::GetMemBuffer(std::span((uint8_t*)req.ptr, req.size), name);
+
+      {
+        py::gil_scoped_release gil;
+        return std::make_shared<wpi::log::DataLogReader>(std::move(mbuf));
+      }
+    }),
+      py::arg("buffer"), py::arg("name") = "",
+      py::keep_alive<1, 2>())
+    .def("__iter__", [](wpi::log::DataLogReader * that) {
+      return py::make_iterator(that->begin(), that->end());
+    }, py::keep_alive<0,1>());

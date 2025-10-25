@@ -1,0 +1,15 @@
+extra_includes:
+- wpi/sendable/SendableBuilder.h
+
+classes:
+  frc::Servo:
+    ignored_bases:
+    - wpi::SendableHelper<Servo>
+    methods:
+      Servo:
+      Set:
+      Get:
+      SetAngle:
+      GetAngle:
+      InitSendable:
+      GetChannel:

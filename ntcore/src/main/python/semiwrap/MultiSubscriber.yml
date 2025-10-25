@@ -1,0 +1,22 @@
+classes:
+  nt::MultiSubscriber:
+    methods:
+      MultiSubscriber:
+        overloads:
+          '':
+            ignore: true
+          NetworkTableInstance, std::span<const std::string_view>, const PubSubOptions&:
+      GetHandle:
+        ignore: true
+    inline_code: |
+      .def("close", [](MultiSubscriber *self) {
+        py::gil_scoped_release release;
+        *self = MultiSubscriber();
+      }, py::doc("Destroys the subscriber"))
+      .def("__enter__", [](MultiSubscriber *self) {
+        return self;
+      })
+      .def("__exit__", [](MultiSubscriber *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = MultiSubscriber();
+      })

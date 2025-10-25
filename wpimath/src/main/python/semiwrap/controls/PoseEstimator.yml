@@ -1,0 +1,63 @@
+defaults:
+  subpackage: estimator
+
+extra_includes:
+- frc/kinematics/DifferentialDriveWheelPositions.h
+- frc/kinematics/DifferentialDriveWheelSpeeds.h
+- frc/kinematics/MecanumDriveWheelPositions.h
+- frc/kinematics/MecanumDriveWheelSpeeds.h
+- frc/kinematics/SwerveDriveKinematics.h
+
+
+classes:
+  frc::PoseEstimator:
+    template_params:
+    - WheelSpeeds
+    - WheelPositions
+    methods:
+      PoseEstimator:
+      SetVisionMeasurementStdDevs:
+      ResetPosition:
+      ResetPose:
+      ResetTranslation:
+      ResetRotation:
+      GetEstimatedPosition:
+      SampleAt:
+      AddVisionMeasurement:
+        overloads:
+          const Pose2d&, units::second_t:
+          const Pose2d&, units::second_t, const wpi::array<double, 3>&:
+      Update:
+      UpdateWithTime:
+
+templates:
+  DifferentialDrivePoseEstimatorBase:
+    qualname: frc::PoseEstimator
+    params:
+    - frc::DifferentialDriveWheelSpeeds
+    - frc::DifferentialDriveWheelPositions
+  MecanumDrivePoseEstimatorBase:
+    qualname: frc::PoseEstimator
+    params:
+    - frc::MecanumDriveWheelSpeeds
+    - frc::MecanumDriveWheelPositions
+  SwerveDrive2PoseEstimatorBase:
+    qualname: frc::PoseEstimator
+    params:
+    - wpi::array<frc::SwerveModuleState,2>
+    - wpi::array<frc::SwerveModulePosition,2>
+  SwerveDrive3PoseEstimatorBase:
+    qualname: frc::PoseEstimator
+    params:
+    - wpi::array<frc::SwerveModuleState,3>
+    - wpi::array<frc::SwerveModulePosition,3>
+  SwerveDrive4PoseEstimatorBase:
+    qualname: frc::PoseEstimator
+    params:
+    - wpi::array<frc::SwerveModuleState,4>
+    - wpi::array<frc::SwerveModulePosition,4>
+  SwerveDrive6PoseEstimatorBase:
+    qualname: frc::PoseEstimator
+    params:
+    - wpi::array<frc::SwerveModuleState,6>
+    - wpi::array<frc::SwerveModulePosition,6>

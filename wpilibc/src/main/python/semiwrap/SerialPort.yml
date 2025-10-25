@@ -1,0 +1,50 @@
+classes:
+  frc::SerialPort:
+    enums:
+      Parity:
+      StopBits:
+      FlowControl:
+      WriteBufferMode:
+      Port:
+    methods:
+      SerialPort:
+        overloads:
+          int, Port, int, Parity, StopBits:
+            param_override:
+              port:
+                default: frc::SerialPort::Port::kOnboard
+              parity:
+                default: frc::SerialPort::Parity::kParity_None
+              stopBits:
+                default: frc::SerialPort::StopBits::kStopBits_One
+          int, std::string_view, Port, int, Parity, StopBits:
+            param_override:
+              port:
+                default: frc::SerialPort::Port::kOnboard
+              parity:
+                default: frc::SerialPort::Parity::kParity_None
+              stopBits:
+                default: frc::SerialPort::StopBits::kStopBits_One
+      SetFlowControl:
+      EnableTermination:
+        param_override:
+          terminator:
+            default: "'\\n'"
+      DisableTermination:
+      GetBytesReceived:
+      Read:
+        buffers:
+        - {type: OUT, src: buffer, len: count}
+      Write:
+        overloads:
+          const char*, int:
+            buffers:
+            - {type: IN, src: buffer, len: count}
+          std::string_view:
+            ignore: true
+      SetTimeout:
+      SetReadBufferSize:
+      SetWriteBufferSize:
+      SetWriteBufferMode:
+      Flush:
+      Reset:

@@ -23,6 +23,9 @@ generatedFileExclude {
   src/test/native/include/drake/
   src/generated/main/java/edu/wpi/first/math/proto
   src/generated/main/native/cpp
+
+  src/main/python/
+  src/test/python/
 }
 
 repoRootNameOverride {

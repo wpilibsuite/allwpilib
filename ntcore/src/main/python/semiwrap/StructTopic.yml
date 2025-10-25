@@ -1,0 +1,149 @@
+classes:
+  nt::StructSubscriber:
+    template_params:
+    - T
+    - I
+    methods:
+      StructSubscriber:
+        overloads:
+          '':
+            ignore: true
+          NT_Subscriber, T, I...:
+            ignore: true
+      Get:
+        overloads:
+          '[const]':
+          const T& [const]:
+      GetInto:
+        ignore: true
+      GetAtomic:
+        overloads:
+          '[const]':
+          const T& [const]:
+      ReadQueue:
+      GetTopic:
+    inline_code: |
+      .def("close", [](nt::StructSubscriber<T, I> *self) {
+        py::gil_scoped_release release;
+        *self = nt::StructSubscriber<T, I>();
+      }, py::doc("Destroys the subscriber"))
+      .def("__enter__", [](nt::StructSubscriber<T, I> *self) {
+        return self;
+      })
+      .def("__exit__", [](nt::StructSubscriber<T, I> *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = nt::StructSubscriber<T, I>();
+      })
+  nt::StructPublisher:
+    template_params:
+    - T
+    - I
+    methods:
+      StructPublisher:
+        overloads:
+          '':
+            ignore: true
+          NT_Publisher, I...:
+            ignore: true
+      Set:
+      SetDefault:
+      GetTopic:
+    inline_code: |
+      .def("close", [](nt::StructPublisher<T, I> *self) {
+        py::gil_scoped_release release;
+        *self = nt::StructPublisher<T, I>();
+      }, py::doc("Destroys the publisher"))
+      .def("__enter__", [](nt::StructPublisher<T, I> *self) {
+        return self;
+      })
+      .def("__exit__", [](nt::StructPublisher<T, I> *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = nt::StructPublisher<T, I>();
+      })
+  nt::StructEntry:
+    template_params:
+    - T
+    - I
+    base_qualnames:
+      StructSubscriber: nt::StructSubscriber<T, I>
+      StructPublisher: nt::StructPublisher<T, I>
+    methods:
+      StructEntry:
+        overloads:
+          '':
+            ignore: true
+          NT_Entry, T, const I&...:
+            ignore: true
+      GetHandle:
+        ignore: true
+      GetTopic:
+      Unpublish:
+    inline_code: |
+      .def("close", [](nt::StructEntry<T, I> *self) {
+        py::gil_scoped_release release;
+        *self = nt::StructEntry<T, I>();
+      }, py::doc("Destroys the entry"))
+      .def("__enter__", [](nt::StructEntry<T, I> *self) {
+        return self;
+      })
+      .def("__exit__", [](nt::StructEntry<T, I> *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = nt::StructEntry<T, I>();
+      })
+  nt::StructTopic:
+    template_params:
+    - T
+    - I
+    methods:
+      StructTopic:
+        overloads:
+          '':
+            ignore: true
+          NT_Topic, I...:
+            ignore: true
+          Topic, I...:
+            param_override:
+              info:
+                name: type
+            cpp_code: |
+              [](Topic topic, const py::type &t) {
+                WPyStructInfo info(t);
+                return nt::StructTopic<T, I>(topic, info);
+              }
+      Subscribe:
+      Publish:
+      PublishEx:
+      GetEntry:
+    inline_code: |
+      .def("close", [](nt::StructTopic<T, I> *self) {
+        py::gil_scoped_release release;
+        *self = nt::StructTopic<T, I>();
+      }, py::doc("Destroys the topic"))
+      .def("__enter__", [](nt::StructTopic<T, I> *self) {
+        return self;
+      })
+      .def("__exit__", [](nt::StructTopic<T, I> *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = nt::StructTopic<T, I>();
+      })
+templates:
+  StructSubscriber:
+    qualname: nt::StructSubscriber
+    params:
+    - WPyStruct
+    - WPyStructInfo
+  StructPublisher:
+    qualname: nt::StructPublisher
+    params:
+    - WPyStruct
+    - WPyStructInfo
+  StructEntry:
+    qualname: nt::StructEntry
+    params:
+    - WPyStruct
+    - WPyStructInfo
+  StructTopic:
+    qualname: nt::StructTopic
+    params:
+    - WPyStruct
+    - WPyStructInfo

@@ -1,0 +1,4 @@
+classes:
+  frc::SparkMini:
+    methods:
+      SparkMini:
