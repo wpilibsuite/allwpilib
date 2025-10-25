@@ -557,33 +557,33 @@ class PS4Controller : public GenericHID,
   /** Represents a digital button on an PS4Controller. */
   struct Button {
     /// Square button.
-    static constexpr int kSquare = 1;
+    static constexpr int kSquare = 0;
     /// Cross button.
-    static constexpr int kCross = 2;
+    static constexpr int kCross = 1;
     /// Circle button.
-    static constexpr int kCircle = 3;
+    static constexpr int kCircle = 2;
     /// Triangle button.
-    static constexpr int kTriangle = 4;
+    static constexpr int kTriangle = 3;
     /// Left trigger 1 button.
-    static constexpr int kL1 = 5;
+    static constexpr int kL1 = 4;
     /// Right trigger 1 button.
-    static constexpr int kR1 = 6;
+    static constexpr int kR1 = 5;
     /// Left trigger 2 button.
-    static constexpr int kL2 = 7;
+    static constexpr int kL2 = 6;
     /// Right trigger 2 button.
-    static constexpr int kR2 = 8;
+    static constexpr int kR2 = 7;
     /// Share button.
-    static constexpr int kShare = 9;
+    static constexpr int kShare = 8;
     /// Options button.
-    static constexpr int kOptions = 10;
+    static constexpr int kOptions = 9;
     /// L3 (left stick) button.
-    static constexpr int kL3 = 11;
+    static constexpr int kL3 = 10;
     /// R3 (right stick) button.
-    static constexpr int kR3 = 12;
+    static constexpr int kR3 = 11;
     /// PlayStation button.
-    static constexpr int kPS = 13;
+    static constexpr int kPS = 12;
     /// Touchpad button.
-    static constexpr int kTouchpad = 14;
+    static constexpr int kTouchpad = 13;
   };
 
   /** Represents an axis on an PS4Controller. */

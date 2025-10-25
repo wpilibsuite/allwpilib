@@ -210,6 +210,38 @@ void DriverStationSim::SetJoystickPOV(int stick, int pov,
   HALSIM_SetJoystickPOV(stick, pov, static_cast<HAL_JoystickPOV>(value));
 }
 
+void DriverStationSim::SetJoystickAxesMaximumIndex(int stick,
+                                                   int maximumIndex) {
+  SetJoystickAxesAvailable(stick, (1 << maximumIndex) - 1);
+}
+
+void DriverStationSim::SetJoystickAxesAvailable(int stick, int count) {
+  HALSIM_SetJoystickAxesAvailable(stick, count);
+}
+
+void DriverStationSim::SetJoystickPOVsMaximumIndex(int stick,
+                                                   int maximumIndex) {
+  SetJoystickPOVsAvailable(stick, (1 << maximumIndex) - 1);
+}
+
+void DriverStationSim::SetJoystickPOVsAvailable(int stick, int count) {
+  HALSIM_SetJoystickPOVsAvailable(stick, count);
+}
+
+void DriverStationSim::SetJoystickButtonsMaximumIndex(int stick,
+                                                      int maximumIndex) {
+  if (maximumIndex >= 64) {
+    SetJoystickButtonsAvailable(stick, 0xFFFFFFFFFFFFFFFFL);
+  } else {
+    SetJoystickButtonsAvailable(stick, (1L << maximumIndex) - 1);
+  }
+}
+
+void DriverStationSim::SetJoystickButtonsAvailable(int stick,
+                                                   uint64_t available) {
+  HALSIM_SetJoystickButtonsAvailable(stick, available);
+}
+
 // void DriverStationSim::SetJoystickButtons(int stick, uint32_t buttons) {
 //   HALSIM_SetJoystickButtonsValue(stick, buttons);
 // }

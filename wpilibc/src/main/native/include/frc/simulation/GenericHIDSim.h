@@ -70,26 +70,33 @@ class GenericHIDSim {
    */
   void SetPOV(DriverStation::POVDirection value);
 
+  void SetAxesMaximumIndex(int maximumIndex);
+
   /**
    * Set the axis count of this device.
    *
    * @param count the new axis count
    */
-  void SetAxisCount(int count);
+  void SetAxesAvailable(int count);
+
+  void SetPOVsMaximumIndex(int maximumIndex);
 
   /**
    * Set the POV count of this device.
    *
    * @param count the new POV count
    */
-  void SetPOVCount(int count);
+  void SetPOVsAvailable(int count);
+
+
+  void SetButtonsMaximumIndex(int maximumIndex);
 
   /**
    * Set the button count of this device.
    *
    * @param count the new button count
    */
-  void SetButtonCount(int count);
+  void SetButtonsAvailable(uint64_t count);
 
   /**
    * Set the type of this device.

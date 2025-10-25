@@ -297,7 +297,7 @@ class DriverStationSim {
    * @param stick The joystick number
    * @param count The number of axes on the indicated joystick
    */
-  static void SetJoystickAxisMaximumIndex(int stick, int maximumIndex);
+  static void SetJoystickAxesMaximumIndex(int stick, int maximumIndex);
 
   /**
    * Sets the number of axes for a joystick.
@@ -305,7 +305,7 @@ class DriverStationSim {
    * @param stick The joystick number
    * @param count The number of axes on the indicated joystick
    */
-  static void SetJoystickAxisAvailable(int stick, int available);
+  static void SetJoystickAxesAvailable(int stick, int available);
 
   /**
    * Sets the number of POVs for a joystick.
@@ -313,9 +313,9 @@ class DriverStationSim {
    * @param stick The joystick number
    * @param count The number of POVs on the indicated joystick
    */
-  static void SetJoystickPOVMaximumIndex(int stick, int count);
+  static void SetJoystickPOVsMaximumIndex(int stick, int count);
 
-  static void SetJoystickPOVAvailable(int stick, int count);
+  static void SetJoystickPOVsAvailable(int stick, int count);
 
   /**
    * Sets the number of buttons for a joystick.
@@ -323,9 +323,9 @@ class DriverStationSim {
    * @param stick The joystick number
    * @param count The number of buttons on the indicated joystick
    */
-  static void SetJoystickButtonMaximumIndex(int stick, int count);
+  static void SetJoystickButtonsMaximumIndex(int stick, int count);
 
-  static void SetJoystickButtonAvailable(int stick, uint64_t available);
+  static void SetJoystickButtonsAvailable(int stick, uint64_t available);
 
   /**
    * Sets the value of isGamepad for a joystick.
