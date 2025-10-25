@@ -90,8 +90,9 @@ class OpModeRobotBase : public RobotBase {
   virtual void NonePeriodic() {}
 
   /**
-   * Adds an operating mode option. It's necessary to call PublishOpModes() to
-   * make the added modes visible to the driver station.
+   * Adds an operating mode option using a factory function that creates the
+   * opmode. It's necessary to call PublishOpModes() to make the added modes
+   * visible to the driver station.
    *
    * @param factory factory function
    * @param mode robot mode
@@ -107,8 +108,9 @@ class OpModeRobotBase : public RobotBase {
                         const Color& backgroundColor);
 
   /**
-   * Adds an operating mode option. It's necessary to call PublishOpModes() to
-   * make the added modes visible to the driver station.
+   * Adds an operating mode option using a factory function that creates the
+   * opmode. It's necessary to call PublishOpModes() to make the added modes
+   * visible to the driver station.
    *
    * @param factory factory function
    * @param mode robot mode
