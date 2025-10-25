@@ -528,6 +528,13 @@ class DriverStation final {
   static double GetBatteryVoltage();
 
   /**
+   * Get the current control word.
+   *
+   * @return control word
+   */
+  static HAL_ControlWord GetControlWord();
+
+  /**
    * Copy data from the DS task for the user. If no new data exists, it will
    * just be returned, otherwise the data will be copied from the DS polling
    * loop.

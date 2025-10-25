@@ -469,8 +469,7 @@ bool DriverStation::IsJoystickConnected(int stick) {
 }
 
 bool DriverStation::IsEnabled() {
-  HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
+  HAL_ControlWord controlWord = GetControlWord();
   return HAL_ControlWord_IsEnabled(controlWord) &&
          HAL_ControlWord_IsDSAttached(controlWord);
 }
@@ -480,55 +479,47 @@ bool DriverStation::IsDisabled() {
 }
 
 bool DriverStation::IsEStopped() {
-  HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
+  HAL_ControlWord controlWord = GetControlWord();
   return HAL_ControlWord_IsEStopped(controlWord);
 }
 
 RobotMode DriverStation::GetRobotMode() {
-  HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
+  HAL_ControlWord controlWord = GetControlWord();
   return static_cast<RobotMode>(HAL_ControlWord_GetRobotMode(controlWord));
 }
 
 bool DriverStation::IsAutonomous() {
-  HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
+  HAL_ControlWord controlWord = GetControlWord();
   return HAL_ControlWord_GetRobotMode(controlWord) == HAL_ROBOTMODE_AUTONOMOUS;
 }
 
 bool DriverStation::IsAutonomousEnabled() {
-  HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
+  HAL_ControlWord controlWord = GetControlWord();
   return HAL_ControlWord_GetRobotMode(controlWord) ==
              HAL_ROBOTMODE_AUTONOMOUS &&
          HAL_ControlWord_IsEnabled(controlWord);
 }
 
 bool DriverStation::IsTeleop() {
-  HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
+  HAL_ControlWord controlWord = GetControlWord();
   return HAL_ControlWord_GetRobotMode(controlWord) ==
          HAL_ROBOTMODE_TELEOPERATED;
 }
 
 bool DriverStation::IsTeleopEnabled() {
-  HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
+  HAL_ControlWord controlWord = GetControlWord();
   return HAL_ControlWord_GetRobotMode(controlWord) ==
              HAL_ROBOTMODE_TELEOPERATED &&
          HAL_ControlWord_IsEnabled(controlWord);
 }
 
 bool DriverStation::IsTest() {
-  HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
+  HAL_ControlWord controlWord = GetControlWord();
   return HAL_ControlWord_GetRobotMode(controlWord) == HAL_ROBOTMODE_TEST;
 }
 
 bool DriverStation::IsTestEnabled() {
-  HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
+  HAL_ControlWord controlWord = GetControlWord();
   return HAL_ControlWord_GetRobotMode(controlWord) == HAL_ROBOTMODE_TEST &&
          HAL_ControlWord_IsEnabled(controlWord);
 }
@@ -629,8 +620,7 @@ void DriverStation::ClearOpModes() {
 }
 
 int64_t DriverStation::GetOpModeId() {
-  HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
+  HAL_ControlWord controlWord = GetControlWord();
   return HAL_ControlWord_GetOpModeId(controlWord);
 }
 
@@ -647,14 +637,12 @@ bool DriverStation::IsOpMode(std::string_view mode) {
 }
 
 bool DriverStation::IsDSAttached() {
-  HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
+  HAL_ControlWord controlWord = GetControlWord();
   return HAL_ControlWord_IsDSAttached(controlWord);
 }
 
 bool DriverStation::IsFMSAttached() {
-  HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
+  HAL_ControlWord controlWord = GetControlWord();
   return HAL_ControlWord_IsFMSAttached(controlWord);
 }
 
@@ -749,6 +737,12 @@ double DriverStation::GetBatteryVoltage() {
   FRC_CheckErrorStatus(status, "getVinVoltage");
 
   return voltage;
+}
+
+HAL_ControlWord DriverStation::GetControlWord() {
+  HAL_ControlWord controlWord;
+  HAL_GetControlWord(&controlWord);
+  return controlWord;
 }
 
 /**

@@ -39,9 +39,8 @@ void Robot::StartCompetition() {
 
   while (!m_exit) {
     HAL_GetControlWord(&word);
-    bool enabled = IsEnabled();
     modeThread.InControl(word);
-    if (!enabled) {
+    if (IsDisabled()) {
       Disabled();
       while (IsDisabled()) {
         wpi::WaitForObject(event.GetHandle());

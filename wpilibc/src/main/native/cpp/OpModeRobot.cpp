@@ -107,9 +107,8 @@ void OpModeRobotBase::StartCompetition() {
 
     // Get the latest control word and opmode
     DriverStation::RefreshData();
-    HAL_ControlWord ctlWord;
-    HAL_GetControlWord(&ctlWord);
-    int64_t modeId = HAL_ControlWord_GetOpModeId(ctlWord);
+    HAL_ControlWord ctlWord = DriverStation::GetControlWord();
+    HAL_ObserveUserProgram(ctlWord);
 
     if (!calledDriverStationConnected &&
         HAL_ControlWord_IsDSAttached(ctlWord)) {
@@ -117,15 +116,24 @@ void OpModeRobotBase::StartCompetition() {
       DriverStationConnected();
     }
 
-    if ((!HAL_ControlWord_IsDSAttached(ctlWord) || modeId == 0) && opMode) {
-      // no opmode selected but we're currently running one; close it
-      opMode.reset();
-    } else if (HAL_ControlWord_IsDSAttached(ctlWord) && modeId != 0 &&
-               (modeId != lastModeId || !opMode)) {
-      // New opmode selected, or closed after running once
+    int64_t modeId;
+    if (!HAL_ControlWord_IsDSAttached(ctlWord)) {
+      modeId = 0;
+    } else {
+      modeId = HAL_ControlWord_GetOpModeId(ctlWord);
+    }
 
-      // Close the previous opmode
-      opMode.reset();
+    if (!opMode || modeId != lastModeId) {
+      if (opMode) {
+        // no or different opmode selected
+        opMode.reset();
+      }
+
+      if (modeId == 0) {
+        // no opmode selected
+        NonePeriodic();
+        continue;
+      }
 
       auto data = m_opModes.lookup(modeId);
       if (!data.factory) {
@@ -148,14 +156,10 @@ void OpModeRobotBase::StartCompetition() {
         HAL_ObserveUserProgramStarting();
       }
       lastModeId = modeId;
+      // Ensure disabledPeriodic is called at least once
+      opMode->DisabledPeriodic();
     }
 
-    if (!opMode) {
-      NonePeriodic();
-      continue;
-    }
-
-    HAL_ObserveUserProgram(ctlWord);
     if (HAL_ControlWord_IsEnabled(ctlWord)) {
       // When enabled, call the opmode run function, then close and clear
       wpi::SafeThreadOwner<MonitorThread> monitor;

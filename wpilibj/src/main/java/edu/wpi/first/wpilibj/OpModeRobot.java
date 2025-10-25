@@ -506,29 +506,33 @@ public abstract class OpModeRobot extends RobotBase {
         // Get the latest control word and opmode
         DriverStation.refreshData();
         DriverStation.refreshControlWordFromCache(m_word);
-        long modeId = DriverStation.getOpModeId();
+        DriverStationJNI.observeUserProgram(m_word.getNative());
 
         if (!calledDriverStationConnected && m_word.isDSAttached()) {
           calledDriverStationConnected = true;
           driverStationConnected();
         }
 
-        if ((!DriverStation.isDSAttached() || modeId == 0) && m_activeOpMode.get() != null) {
-          // no opmode selected but we're currently running one; close it
-          OpMode opMode = m_activeOpMode.getAndSet(null);
-          if (opMode != null) {
-            // Close the previous opmode
-            opMode.opModeClose();
-          }
-        } else if (DriverStation.isDSAttached()
-            && modeId != 0
-            && (modeId != lastModeId || m_activeOpMode.get() == null)) {
-          // New opmode selected, or closed after running once
+        long modeId;
+        if (!m_word.isDSAttached()) {
+          modeId = 0;
+        } else {
+          modeId = m_word.getOpModeId();
+        }
 
-          OpMode opMode = m_activeOpMode.getAndSet(null);
+        OpMode opMode = m_activeOpMode.get();
+        if (opMode == null || modeId != lastModeId) {
           if (opMode != null) {
-            // Close the previous opmode
+            // no or different opmode selected
+            m_activeOpMode.set(null);
             opMode.opModeClose();
+            opMode = null;
+          }
+
+          if (modeId == 0) {
+            // no opmode selected
+            nonePeriodic();
+            continue;
           }
 
           OpModeFactory factory = m_opModes.get(modeId);
@@ -549,15 +553,10 @@ public abstract class OpModeRobot extends RobotBase {
             DriverStationJNI.observeUserProgramStarting();
           }
           lastModeId = modeId;
+          // Ensure disabledPeriodic is always called at least once
+          opMode.disabledPeriodic();
         }
 
-        OpMode opMode = m_activeOpMode.get();
-        if (opMode == null) {
-          nonePeriodic();
-          continue;
-        }
-
-        DriverStationJNI.observeUserProgram(m_word.getNative());
         if (m_word.isEnabled()) {
           // When enabled, call the opmode run function, then close and clear
           int endMonitor = WPIUtilJNI.createEvent(true, false);
@@ -571,7 +570,7 @@ public abstract class OpModeRobot extends RobotBase {
           try {
             opMode.opModeRun(modeId);
           } catch (InterruptedException e) {
-            Thread.interrupted();
+            // ignored
           } finally {
             Thread.interrupted();
             WPIUtilJNI.destroyEvent(endMonitor);
