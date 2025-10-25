@@ -124,9 +124,9 @@ public abstract class PeriodicOpMode implements OpMode {
     m_watchdog = new Watchdog(period, this::printLoopOverrunMessage);
 
     addPeriodic(this::loopFunc, period);
-    NotifierJNI.setNotifierName(m_notifier, "TimedRobot");
+    NotifierJNI.setNotifierName(m_notifier, "PeriodicOpMode");
 
-    HAL.reportUsage("Framework", "TimedRobot");
+    HAL.reportUsage("OpMode", "PeriodicOpMode");
   }
 
   /** Called periodically while the opmode is selected on the DS (robot is disabled). */
