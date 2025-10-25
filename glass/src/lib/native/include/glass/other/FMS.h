@@ -22,14 +22,20 @@ class StringSource;
 
 class FMSModel : public Model {
  public:
+  enum RobotMode {
+    kUnknown = 0,
+    kAutonomous = 1,
+    kTeleop = 2,
+    kTest = 3,
+  };
+
   virtual BooleanSource* GetFmsAttachedData() = 0;
   virtual BooleanSource* GetDsAttachedData() = 0;
   virtual IntegerSource* GetAllianceStationIdData() = 0;
   virtual DoubleSource* GetMatchTimeData() = 0;
   virtual BooleanSource* GetEStopData() = 0;
   virtual BooleanSource* GetEnabledData() = 0;
-  virtual BooleanSource* GetTestData() = 0;
-  virtual BooleanSource* GetAutonomousData() = 0;
+  virtual IntegerSource* GetRobotModeData() = 0;
   virtual StringSource* GetGameSpecificMessageData() = 0;
 
   virtual void SetFmsAttached(bool val) = 0;
@@ -38,8 +44,7 @@ class FMSModel : public Model {
   virtual void SetMatchTime(double val) = 0;
   virtual void SetEStop(bool val) = 0;
   virtual void SetEnabled(bool val) = 0;
-  virtual void SetTest(bool val) = 0;
-  virtual void SetAutonomous(bool val) = 0;
+  virtual void SetRobotMode(RobotMode val) = 0;
   virtual void SetGameSpecificMessage(std::string_view val) = 0;
 };
 

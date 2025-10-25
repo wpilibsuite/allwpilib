@@ -55,6 +55,10 @@
     <Bug pattern="DM_DEFAULT_ENCODING" />
   </Match>
   <Match>
+    <Bug pattern="DM_EXIT" />
+    <Class name="edu.wpi.first.wpilibj.OpModeRobot" />
+  </Match>
+  <Match>
     <Bug pattern="DMI_HARDCODED_ABSOLUTE_FILENAME" />
   </Match>
   <Match>

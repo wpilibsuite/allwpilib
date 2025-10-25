@@ -11,55 +11,30 @@
 
 using namespace frc::internal;
 
-DriverStationModeThread::DriverStationModeThread() {
+DriverStationModeThread::DriverStationModeThread(HAL_ControlWord word)
+    : m_userControlWord{word.value} {
+  HAL_ProvideNewDataEventHandle(m_event.GetHandle());
   m_keepAlive = true;
-  m_thread = std::thread{[&] { Run(); }};
+  m_thread = std::thread{[this] { Run(); }};
 }
 
 DriverStationModeThread::~DriverStationModeThread() {
+  HAL_RemoveNewDataEventHandle(m_event.GetHandle());
   m_keepAlive = false;
+  m_event.Set();
   if (m_thread.joinable()) {
     m_thread.join();
   }
 }
 
-void DriverStationModeThread::InDisabled(bool entering) {
-  m_userInDisabled = entering;
-}
-
-void DriverStationModeThread::InAutonomous(bool entering) {
-  m_userInAutonomous = entering;
-}
-
-void DriverStationModeThread::InTeleop(bool entering) {
-  m_userInTeleop = entering;
-}
-
-void DriverStationModeThread::InTest(bool entering) {
-  m_userInTest = entering;
-}
-
 void DriverStationModeThread::Run() {
-  wpi::Event event{false, false};
-  HAL_ProvideNewDataEventHandle(event.GetHandle());
-
-  while (m_keepAlive.load()) {
+  for (;;) {
     bool timedOut = false;
-    wpi::WaitForObject(event.GetHandle(), 0.1, &timedOut);
+    wpi::WaitForObject(m_event.GetHandle(), 0.1, &timedOut);
+    if (!m_keepAlive) {
+      break;
+    }
     frc::DriverStation::RefreshData();
-    if (m_userInDisabled) {
-      HAL_ObserveUserProgramDisabled();
-    }
-    if (m_userInAutonomous) {
-      HAL_ObserveUserProgramAutonomous();
-    }
-    if (m_userInTeleop) {
-      HAL_ObserveUserProgramTeleop();
-    }
-    if (m_userInTest) {
-      HAL_ObserveUserProgramTest();
-    }
+    HAL_ObserveUserProgram({.value = m_userControlWord});
   }
-
-  HAL_RemoveNewDataEventHandle(event.GetHandle());
 }

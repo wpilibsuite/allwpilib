@@ -6,6 +6,7 @@
 
 #include <units/time.h>
 
+#include "frc/DSControlWord.h"
 #include "frc/RobotBase.h"
 #include "frc/Watchdog.h"
 
@@ -227,9 +228,7 @@ class IterativeRobotBase : public RobotBase {
   void LoopFunc();
 
  private:
-  enum class Mode { kNone, kDisabled, kAutonomous, kTeleop, kTest };
-
-  Mode m_lastMode = Mode::kNone;
+  int m_lastMode = -1;
   units::second_t m_period;
   Watchdog m_watchdog;
   bool m_ntFlushEnabled = true;
