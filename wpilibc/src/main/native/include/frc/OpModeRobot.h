@@ -32,6 +32,9 @@ concept OneArgOpMode = std::constructible_from<T, R&> && OpModeDerived<T>;
 /**
  * Concept indicating a class is derived from OpMode and has either a
  * no-argument constructor or a constructorthat accepts R&.
+ *
+ * @tparam T opmode class
+ * @tparam R robot class
  */
 template <typename T, typename R>
 concept ConstructibleOpMode =
