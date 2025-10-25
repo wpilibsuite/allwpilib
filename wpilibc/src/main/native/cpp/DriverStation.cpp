@@ -308,7 +308,7 @@ double DriverStation::GetStickAxis(int stick, int axis) {
   HAL_JoystickAxes axes;
   HAL_GetJoystickAxes(stick, &axes);
 
-  if ((axes.available & mask) != 0) {
+  if ((axes.available & mask) == 0) {
     ReportJoystickUnpluggedWarning(
         "Joystick Axis {} missing (available {}), check if all controllers are "
         "plugged in",
@@ -334,7 +334,7 @@ DriverStation::POVDirection DriverStation::GetStickPOV(int stick, int pov) {
   HAL_JoystickPOVs povs;
   HAL_GetJoystickPOVs(stick, &povs);
 
-  if ((povs.available & mask) != 0) {
+  if ((povs.available & mask) == 0) {
     ReportJoystickUnpluggedWarning(
         "Joystick POV {} missing (available {}), check if all controllers are "
         "plugged in",
