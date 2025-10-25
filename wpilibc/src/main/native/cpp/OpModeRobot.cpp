@@ -93,11 +93,15 @@ void OpModeRobotBase::StartCompetition() {
   int64_t lastModeId = -1;
   bool calledDriverStationConnected = false;
   std::shared_ptr<OpMode> opMode;
-  while (m_running) {
+  for (;;) {
     // Wait for new data from the driver station
     bool timedOut = false;
     if (!wpi::WaitForObject(event.GetHandle(), 0.05, &timedOut) && !timedOut) {
       // event destroyed
+      break;
+    }
+
+    if (!m_running) {
       break;
     }
 

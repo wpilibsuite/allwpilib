@@ -34,7 +34,8 @@ import java.util.PriorityQueue;
  *       on a set time interval (it does not use the same time interval as periodic())
  *   <li>when DS transitions from disabled to enabled, start() is called once
  *   <li>while DS is enabled, periodic() is called periodically on the time interval set by the
- *       constructor
+ *       constructor, and additional periodic callbacks added via addPeriodic() are called
+ *       periodically on their set time intervals
  *   <li>when DS transitions from enabled to disabled, or a different opmode is selected on the
  *       driver station when the DS is enabled, end() is called, followed by close(); the object is
  *       not reused

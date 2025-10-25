@@ -39,7 +39,8 @@ namespace frc {
  * - When DS transitions from disabled to enabled, Start() is called once
  *
  * - While DS is enabled, Periodic() is called periodically on the time interval
- *   set by the constructor
+ *   set by the constructor, and additional periodic callbacks added via
+ *   AddPeriodic() are called periodically on their set time intervals
  *
  * - When DS transitions from enabled to disabled, or a different opmode is
  *   selected on the driver station when the DS is enabled, End() is called,
@@ -54,8 +55,6 @@ class PeriodicOpMode : public OpMode {
   /** Default loop period. */
   static constexpr auto kDefaultPeriod = 20_ms;
 
-  ~PeriodicOpMode() override;
-
  protected:
   /**
    * Constructor. Periodic opmodes may specify the period used for the
@@ -66,6 +65,8 @@ class PeriodicOpMode : public OpMode {
   explicit PeriodicOpMode(units::second_t period = kDefaultPeriod);
 
  public:
+  ~PeriodicOpMode() override;
+
   /**
    * Called periodically while the opmode is selected on the DS (robot is
    * disabled).

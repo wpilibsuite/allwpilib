@@ -26,7 +26,7 @@ namespace frc {
  * - When DS transitions from disabled to enabled, Run() is called exactly once
  *
  * - When DS transitions from enabled to disabled, or a different opmode is
- * selected on the driver station, object is destroyed
+ *   selected on the driver station, object is destroyed and not reused
  *
  * The user is responsible for exiting Run() when the opmode is directed to stop
  * executing. This is indicated by IsRunning() returning false. All other

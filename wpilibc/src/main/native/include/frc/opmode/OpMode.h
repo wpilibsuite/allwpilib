@@ -8,7 +8,7 @@
 
 namespace frc {
 
-  /**
+/**
  * Top-level interface for opmode classes. Users should generally extend one of
  * the abstract implementations of this interface (e.g. PeriodicOpMode or
  * LinearOpMode) rather than directly implementing this interface.
