@@ -42,8 +42,7 @@ public abstract class LinearOpMode implements OpMode {
   public void close() {}
 
   /**
-   * Called once when the robot is enabled.  It will not be called a second time on the same
-   * object.
+   * Called once when the robot is enabled. It will not be called a second time on the same object.
    *
    * @throws InterruptedException when interrupted
    */

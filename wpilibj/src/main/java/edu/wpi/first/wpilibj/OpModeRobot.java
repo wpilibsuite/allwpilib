@@ -159,10 +159,38 @@ public abstract class OpModeRobot extends RobotBase {
   }
 
   /**
+   * Adds an opmode using a factory function that creates the opmode. It's necessary to call
+   * publishOpModes() to make the added mode visible to the driver station.
+   *
+   * @param factory factory function to create the opmode
+   * @param mode robot mode
+   * @param name name of the operating mode
+   * @param group group of the operating mode
+   * @throws IllegalArgumentException if class does not meet criteria
+   */
+  public void addOpModeFactory(
+      Supplier<OpMode> factory, RobotMode mode, String name, String group) {
+    addOpModeFactory(factory, mode, name, group, "");
+  }
+
+  /**
+   * Adds an opmode using a factory function that creates the opmode. It's necessary to call
+   * publishOpModes() to make the added mode visible to the driver station.
+   *
+   * @param factory factory function to create the opmode
+   * @param mode robot mode
+   * @param name name of the operating mode
+   * @throws IllegalArgumentException if class does not meet criteria
+   */
+  public void addOpModeFactory(Supplier<OpMode> factory, RobotMode mode, String name) {
+    addOpModeFactory(factory, mode, name, "");
+  }
+
+  /**
    * Adds an opmode for an opmode class. The class must be a public, non-abstract subclass of OpMode
    * with a public constructor that either takes no arguments or accepts a single argument of this
-   * class's type. It's necessary to call publishOpModes() to make the added mode visible to the
-   * driver station.
+   * class's type (the latter is preferred). It's necessary to call publishOpModes() to make the
+   * added mode visible to the driver station.
    *
    * @param cls class to add
    * @param mode robot mode
@@ -195,8 +223,8 @@ public abstract class OpModeRobot extends RobotBase {
   /**
    * Adds an opmode for an opmode class. The class must be a public, non-abstract subclass of OpMode
    * with a public constructor that either takes no arguments or accepts a single argument of this
-   * class's type. It's necessary to call publishOpModes() to make the added mode visible to the
-   * driver station.
+   * class's type (the latter is preferred). It's necessary to call publishOpModes() to make the
+   * added mode visible to the driver station.
    *
    * @param cls class to add
    * @param mode robot mode
@@ -208,6 +236,37 @@ public abstract class OpModeRobot extends RobotBase {
   public void addOpMode(
       Class<? extends OpMode> cls, RobotMode mode, String name, String group, String description) {
     addOpMode(cls, mode, name, group, description, null, null);
+  }
+
+  /**
+   * Adds an opmode for an opmode class. The class must be a public, non-abstract subclass of OpMode
+   * with a public constructor that either takes no arguments or accepts a single argument of this
+   * class's type (the latter is preferred). It's necessary to call publishOpModes() to make the
+   * added mode visible to the driver station.
+   *
+   * @param cls class to add
+   * @param mode robot mode
+   * @param name name of the operating mode
+   * @param group group of the operating mode
+   * @throws IllegalArgumentException if class does not meet criteria
+   */
+  public void addOpMode(Class<? extends OpMode> cls, RobotMode mode, String name, String group) {
+    addOpMode(cls, mode, name, group, "");
+  }
+
+  /**
+   * Adds an opmode for an opmode class. The class must be a public, non-abstract subclass of OpMode
+   * with a public constructor that either takes no arguments or accepts a single argument of this
+   * class's type (the latter is preferred). It's necessary to call publishOpModes() to make the
+   * added mode visible to the driver station.
+   *
+   * @param cls class to add
+   * @param mode robot mode
+   * @param name name of the operating mode
+   * @throws IllegalArgumentException if class does not meet criteria
+   */
+  public void addOpMode(Class<? extends OpMode> cls, RobotMode mode, String name) {
+    addOpMode(cls, mode, name, "");
   }
 
   private void addOpModeClassImpl(
@@ -265,8 +324,8 @@ public abstract class OpModeRobot extends RobotBase {
   }
 
   /**
-   * Adds an opmode for an opmode class annotated with {@link Autonomous}, {@link Teleop}, or
-   * {@link TestOpMode}. The class must be a public, non-abstract subclass of OpMode with a public
+   * Adds an opmode for an opmode class annotated with {@link Autonomous}, {@link Teleop}, or {@link
+   * TestOpMode}. The class must be a public, non-abstract subclass of OpMode with a public
    * constructor that either takes no arguments or accepts a single argument of this class's type.
    * It's necessary to call publishOpModes() to make the added mode visible to the driver station.
    *
@@ -324,8 +383,8 @@ public abstract class OpModeRobot extends RobotBase {
 
   /**
    * Scans for classes in the specified package and all nested packages that are annotated with
-   * {@link Autonomous}, {@link Teleop}, or {@link TestOpMode} and registers them. It's necessary
-   * to call publishOpModes() to make the added modes visible to the driver station.
+   * {@link Autonomous}, {@link Teleop}, or {@link TestOpMode} and registers them. It's necessary to
+   * call publishOpModes() to make the added modes visible to the driver station.
    *
    * @param pkg package to scan
    */

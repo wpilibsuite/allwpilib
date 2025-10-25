@@ -170,7 +170,9 @@ class OpModeRobot : public OpModeRobotBase {
    * Adds an operating mode option. It's necessary to call PublishOpModes() to
    * make the added modes visible to the driver station.
    *
-   * @tparam T opmode class
+   * @tparam T opmode class; must be a public, non-abstract subclass of OpMode
+   * with a public constructor that either takes no arguments or accepts a
+   * single argument of this class's type (the latter is preferred).
    * @param mode robot mode
    * @param name name of the operating mode
    * @param group group of the operating mode
@@ -183,8 +185,9 @@ class OpModeRobot : public OpModeRobotBase {
                  std::string_view description, const Color& textColor,
                  const Color& backgroundColor) {
     if constexpr (detail::OneArgOpMode<T, Derived>) {
-      AddOpModeFactory([this] { return std::make_unique<T>(*this); }, mode,
-                       name, group, description, textColor, backgroundColor);
+      AddOpModeFactory(
+          [this] { return std::make_unique<T>(*static_cast<Derived*>(this)); },
+          mode, name, group, description, textColor, backgroundColor);
     } else if constexpr (detail::NoArgOpMode<T>) {
       AddOpModeFactory([] { return std::make_unique<T>(); }, mode, name, group,
                        description, textColor, backgroundColor);
@@ -195,7 +198,9 @@ class OpModeRobot : public OpModeRobotBase {
    * Adds an operating mode option. It's necessary to call PublishOpModes() to
    * make the added modes visible to the driver station.
    *
-   * @tparam T opmode class
+   * @tparam T opmode class; must be a public, non-abstract subclass of OpMode
+   * with a public constructor that either takes no arguments or accepts a
+   * single argument of this class's type (the latter is preferred).
    * @param mode robot mode
    * @param name name of the operating mode
    * @param group group of the operating mode
@@ -206,8 +211,9 @@ class OpModeRobot : public OpModeRobotBase {
                  std::string_view group = {},
                  std::string_view description = {}) {
     if constexpr (detail::OneArgOpMode<T, Derived>) {
-      AddOpModeFactory([this] { return std::make_unique<T>(*this); }, mode,
-                       name, group, description);
+      AddOpModeFactory(
+          [this] { return std::make_unique<T>(*static_cast<Derived*>(this)); },
+          mode, name, group, description);
     } else if constexpr (detail::NoArgOpMode<T>) {
       AddOpModeFactory([] { return std::make_unique<T>(); }, mode, name, group,
                        description);
