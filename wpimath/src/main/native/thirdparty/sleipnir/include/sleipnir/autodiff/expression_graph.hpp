@@ -81,11 +81,7 @@ inline void update_values(const gch::small_vector<Expression*>& list) {
     auto& rhs = node->args[1];
 
     if (lhs != nullptr) {
-      if (rhs != nullptr) {
-        node->val = node->value(lhs->val, rhs->val);
-      } else {
-        node->val = node->value(lhs->val, 0.0);
-      }
+      node->val = node->value(lhs->val, rhs ? rhs->val : 0.0);
     }
   }
 }

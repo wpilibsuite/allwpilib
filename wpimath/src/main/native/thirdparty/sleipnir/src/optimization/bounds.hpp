@@ -186,7 +186,7 @@ inline Bounds get_bounds(
  */
 template <typename Derived>
   requires(static_cast<bool>(Eigen::DenseBase<Derived>::IsVectorAtCompileTime))
-inline void project_onto_bounds(
+void project_onto_bounds(
     Eigen::DenseBase<Derived>& x,
     std::span<const std::pair<typename Eigen::DenseBase<Derived>::Scalar,
                               typename Eigen::DenseBase<Derived>::Scalar>>

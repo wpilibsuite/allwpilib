@@ -45,7 +45,7 @@ index 09828cdb6d7cddff692b9d17603dc0c11cd5a3ec..886de24cc0532d31f1e186150da79e92
          for (const auto& [count, name] :
               std::views::zip(counts, std::array{"empty", "constant", "linear",
 diff --git a/src/util/print_diagnostics.hpp b/src/util/print_diagnostics.hpp
-index fde36957c0258f6e3cd435ef6224d60407012ff7..82e0e082b0e40153dcb2fcd2c655a412a8a9540a 100644
+index 2b7d6e485cbf6d3958b6369a9293200144f50a5f..bfd3449998e9e0996dd2af2cf9eea5b3408322a6 100644
 --- a/src/util/print_diagnostics.hpp
 +++ b/src/util/print_diagnostics.hpp
 @@ -238,9 +238,9 @@ void print_iteration_diagnostics(int iterations, IterationType type,

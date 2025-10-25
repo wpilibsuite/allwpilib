@@ -38,6 +38,16 @@ class SLEIPNIR_DLLEXPORT Jacobian {
   /**
    * Constructs a Jacobian object.
    *
+   * @param variable Variable of which to compute the Jacobian.
+   * @param wrt Vector of variables with respect to which to compute the
+   *   Jacobian.
+   */
+  Jacobian(Variable variable, SleipnirMatrixLike auto wrt)
+      : Jacobian{VariableMatrix{std::move(variable)}, std::move(wrt)} {}
+
+  /**
+   * Constructs a Jacobian object.
+   *
    * @param variables Vector of variables of which to compute the Jacobian.
    * @param wrt Vector of variables with respect to which to compute the
    *   Jacobian.
@@ -70,7 +80,7 @@ class SLEIPNIR_DLLEXPORT Jacobian {
         // If the row is linear, compute its gradient once here and cache its
         // triplets. Constant rows are ignored because their gradients have no
         // nonzero triplets.
-        m_graphs[row].append_adjoint_triplets(m_cached_triplets, row, m_wrt);
+        m_graphs[row].append_gradient_triplets(m_cached_triplets, row, m_wrt);
       } else if (m_variables[row].type() > ExpressionType::LINEAR) {
         // If the row is quadratic or nonlinear, add it to the list of nonlinear
         // rows to be recomputed in Value().
@@ -129,7 +139,7 @@ class SLEIPNIR_DLLEXPORT Jacobian {
 
     // Compute each nonlinear row of the Jacobian
     for (int row : m_nonlinear_rows) {
-      m_graphs[row].append_adjoint_triplets(triplets, row, m_wrt);
+      m_graphs[row].append_gradient_triplets(triplets, row, m_wrt);
     }
 
     m_J.setFromTriplets(triplets.begin(), triplets.end());

@@ -608,6 +608,19 @@ WPI_JNI_MAKEJARRAY(jdouble, Double)
 #undef WPI_JNI_MAKEJARRAY
 
 template <class T>
+  requires(sizeof(typename T::value_type) == sizeof(jint) &&
+           std::integral<typename T::value_type>)
+inline jintArray MakeJIntArray(JNIEnv* env, const T& arr) {
+  jintArray jarr = env->NewIntArray(arr.size());
+  if (!jarr) {
+    return nullptr;
+  }
+  env->SetIntArrayRegion(jarr, 0, arr.size(),
+                         reinterpret_cast<const jint*>(arr.data()));
+  return jarr;
+}
+
+template <class T>
   requires(sizeof(typename T::value_type) == sizeof(jlong) &&
            std::integral<typename T::value_type>)
 inline jlongArray MakeJLongArray(JNIEnv* env, const T& arr) {
@@ -617,6 +630,19 @@ inline jlongArray MakeJLongArray(JNIEnv* env, const T& arr) {
   }
   env->SetLongArrayRegion(jarr, 0, arr.size(),
                           reinterpret_cast<const jlong*>(arr.data()));
+  return jarr;
+}
+
+template <class T>
+  requires(sizeof(typename T::value_type) == sizeof(jdouble) &&
+           std::floating_point<typename T::value_type>)
+inline jdoubleArray MakeJDoubleArray(JNIEnv* env, const T& arr) {
+  jdoubleArray jarr = env->NewDoubleArray(arr.size());
+  if (!jarr) {
+    return nullptr;
+  }
+  env->SetDoubleArrayRegion(jarr, 0, arr.size(),
+                            reinterpret_cast<const jdouble*>(arr.data()));
   return jarr;
 }
 

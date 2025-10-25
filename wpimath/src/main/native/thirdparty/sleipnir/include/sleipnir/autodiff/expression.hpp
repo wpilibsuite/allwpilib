@@ -72,13 +72,20 @@ template <ExpressionType T>
 struct UnaryMinusExpression;
 
 /**
+ * Creates an intrusive shared pointer to a constant expression.
+ *
+ * @param value The expression value.
+ */
+ExpressionPtr constant_ptr(double value);
+
+/**
  * An autodiff expression node.
  */
 struct Expression {
   /// The value of the expression node.
   double val = 0.0;
 
-  /// The adjoint of the expression node used during autodiff.
+  /// The adjoint of the expression node, used during autodiff.
   double adjoint = 0.0;
 
   /// Counts incoming edges for this node.
@@ -87,7 +94,7 @@ struct Expression {
   /// This expression's column in a Jacobian, or -1 otherwise.
   int32_t col = -1;
 
-  /// The adjoint of the expression node used during gradient expression tree
+  /// The adjoint of the expression node, used during gradient expression tree
   /// generation.
   ExpressionPtr adjoint_expr;
 
@@ -164,7 +171,7 @@ struct Expression {
 
     // Evaluate constant
     if (lhs->type() == CONSTANT && rhs->type() == CONSTANT) {
-      return make_expression_ptr<ConstExpression>(lhs->val * rhs->val);
+      return constant_ptr(lhs->val * rhs->val);
     }
 
     // Evaluate expression type
@@ -211,7 +218,7 @@ struct Expression {
 
     // Evaluate constant
     if (lhs->type() == CONSTANT && rhs->type() == CONSTANT) {
-      return make_expression_ptr<ConstExpression>(lhs->val / rhs->val);
+      return constant_ptr(lhs->val / rhs->val);
     }
 
     // Evaluate expression type
@@ -247,7 +254,7 @@ struct Expression {
 
     // Evaluate constant
     if (lhs->type() == CONSTANT && rhs->type() == CONSTANT) {
-      return make_expression_ptr<ConstExpression>(lhs->val + rhs->val);
+      return constant_ptr(lhs->val + rhs->val);
     }
 
     auto type = std::max(lhs->type(), rhs->type());
@@ -295,7 +302,7 @@ struct Expression {
 
     // Evaluate constant
     if (lhs->type() == CONSTANT && rhs->type() == CONSTANT) {
-      return make_expression_ptr<ConstExpression>(lhs->val - rhs->val);
+      return constant_ptr(lhs->val - rhs->val);
     }
 
     auto type = std::max(lhs->type(), rhs->type());
@@ -324,7 +331,7 @@ struct Expression {
 
     // Evaluate constant
     if (lhs->type() == CONSTANT) {
-      return make_expression_ptr<ConstExpression>(-lhs->val);
+      return constant_ptr(-lhs->val);
     }
 
     if (lhs->type() == LINEAR) {
@@ -364,12 +371,12 @@ struct Expression {
   virtual ExpressionType type() const = 0;
 
   /**
-   * Returns double adjoint of the left child expression.
+   * Returns ∂/∂l as a double.
    *
    * @param lhs Left argument to binary operator.
    * @param rhs Right argument to binary operator.
    * @param parent_adjoint Adjoint of parent expression.
-   * @return The double adjoint of the left child expression.
+   * @return ∂/∂l as a double.
    */
   virtual double grad_l([[maybe_unused]] double lhs,
                         [[maybe_unused]] double rhs,
@@ -378,12 +385,12 @@ struct Expression {
   }
 
   /**
-   * Returns double adjoint of the right child expression.
+   * Returns ∂/∂r as a double.
    *
    * @param lhs Left argument to binary operator.
    * @param rhs Right argument to binary operator.
    * @param parent_adjoint Adjoint of parent expression.
-   * @return The double adjoint of the right child expression.
+   * @return ∂/∂r as a double.
    */
   virtual double grad_r([[maybe_unused]] double lhs,
                         [[maybe_unused]] double rhs,
@@ -392,35 +399,39 @@ struct Expression {
   }
 
   /**
-   * Returns Expression adjoint of the left child expression.
+   * Returns ∂/∂l as an Expression.
    *
    * @param lhs Left argument to binary operator.
    * @param rhs Right argument to binary operator.
    * @param parent_adjoint Adjoint of parent expression.
-   * @return The Expression adjoint of the left child expression.
+   * @return ∂/∂l as an Expression.
    */
   virtual ExpressionPtr grad_expr_l(
       [[maybe_unused]] const ExpressionPtr& lhs,
       [[maybe_unused]] const ExpressionPtr& rhs,
       [[maybe_unused]] const ExpressionPtr& parent_adjoint) const {
-    return make_expression_ptr<ConstExpression>();
+    return constant_ptr(0.0);
   }
 
   /**
-   * Returns Expression adjoint of the right child expression.
+   * Returns ∂/∂r as an Expression.
    *
    * @param lhs Left argument to binary operator.
    * @param rhs Right argument to binary operator.
    * @param parent_adjoint Adjoint of parent expression.
-   * @return The Expression adjoint of the right child expression.
+   * @return ∂/∂r as an Expression.
    */
   virtual ExpressionPtr grad_expr_r(
       [[maybe_unused]] const ExpressionPtr& lhs,
       [[maybe_unused]] const ExpressionPtr& rhs,
       [[maybe_unused]] const ExpressionPtr& parent_adjoint) const {
-    return make_expression_ptr<ConstExpression>();
+    return constant_ptr(0.0);
   }
 };
+
+inline ExpressionPtr constant_ptr(double value) {
+  return make_expression_ptr<ConstExpression>(value);
+}
 
 inline ExpressionPtr cbrt(const ExpressionPtr& x);
 inline ExpressionPtr exp(const ExpressionPtr& x);
@@ -535,7 +546,7 @@ struct CbrtExpression final : Expression {
       const ExpressionPtr& x, const ExpressionPtr&,
       const ExpressionPtr& parent_adjoint) const override {
     auto c = slp::detail::cbrt(x);
-    return parent_adjoint / (make_expression_ptr<ConstExpression>(3.0) * c * c);
+    return parent_adjoint / (constant_ptr(3.0) * c * c);
   }
 };
 
@@ -555,7 +566,7 @@ inline ExpressionPtr cbrt(const ExpressionPtr& x) {
     } else if (x->val == -1.0 || x->val == 1.0) {
       return x;
     } else {
-      return make_expression_ptr<ConstExpression>(std::cbrt(x->val));
+      return constant_ptr(std::cbrt(x->val));
     }
   }
 
@@ -566,11 +577,6 @@ inline ExpressionPtr cbrt(const ExpressionPtr& x) {
  * Derived expression type for constant.
  */
 struct ConstExpression final : Expression {
-  /**
-   * Constructs a constant expression with a value of zero.
-   */
-  constexpr ConstExpression() = default;
-
   /**
    * Constructs a nullary expression (an operator with no arguments).
    *
@@ -802,8 +808,7 @@ struct AbsExpression final : Expression {
     } else if (x->val > 0.0) {
       return parent_adjoint;
     } else {
-      // Return zero
-      return make_expression_ptr<ConstExpression>();
+      return constant_ptr(0.0);
     }
   }
 };
@@ -824,7 +829,7 @@ inline ExpressionPtr abs(const ExpressionPtr& x) {
 
   // Evaluate constant
   if (x->type() == CONSTANT) {
-    return make_expression_ptr<ConstExpression>(std::abs(x->val));
+    return constant_ptr(std::abs(x->val));
   }
 
   return make_expression_ptr<AbsExpression>(x);
@@ -853,8 +858,7 @@ struct AcosExpression final : Expression {
   ExpressionPtr grad_expr_l(
       const ExpressionPtr& x, const ExpressionPtr&,
       const ExpressionPtr& parent_adjoint) const override {
-    return -parent_adjoint /
-           slp::detail::sqrt(make_expression_ptr<ConstExpression>(1.0) - x * x);
+    return -parent_adjoint / slp::detail::sqrt(constant_ptr(1.0) - x * x);
   }
 };
 
@@ -868,12 +872,12 @@ inline ExpressionPtr acos(const ExpressionPtr& x) {
 
   // Prune expression
   if (x->is_constant(0.0)) {
-    return make_expression_ptr<ConstExpression>(std::numbers::pi / 2.0);
+    return constant_ptr(std::numbers::pi / 2.0);
   }
 
   // Evaluate constant
   if (x->type() == CONSTANT) {
-    return make_expression_ptr<ConstExpression>(std::acos(x->val));
+    return constant_ptr(std::acos(x->val));
   }
 
   return make_expression_ptr<AcosExpression>(x);
@@ -902,8 +906,7 @@ struct AsinExpression final : Expression {
   ExpressionPtr grad_expr_l(
       const ExpressionPtr& x, const ExpressionPtr&,
       const ExpressionPtr& parent_adjoint) const override {
-    return parent_adjoint /
-           slp::detail::sqrt(make_expression_ptr<ConstExpression>(1.0) - x * x);
+    return parent_adjoint / slp::detail::sqrt(constant_ptr(1.0) - x * x);
   }
 };
 
@@ -923,7 +926,7 @@ inline ExpressionPtr asin(const ExpressionPtr& x) {
 
   // Evaluate constant
   if (x->type() == CONSTANT) {
-    return make_expression_ptr<ConstExpression>(std::asin(x->val));
+    return constant_ptr(std::asin(x->val));
   }
 
   return make_expression_ptr<AsinExpression>(x);
@@ -952,7 +955,7 @@ struct AtanExpression final : Expression {
   ExpressionPtr grad_expr_l(
       const ExpressionPtr& x, const ExpressionPtr&,
       const ExpressionPtr& parent_adjoint) const override {
-    return parent_adjoint / (make_expression_ptr<ConstExpression>(1.0) + x * x);
+    return parent_adjoint / (constant_ptr(1.0) + x * x);
   }
 };
 
@@ -972,7 +975,7 @@ inline ExpressionPtr atan(const ExpressionPtr& x) {
 
   // Evaluate constant
   if (x->type() == CONSTANT) {
-    return make_expression_ptr<ConstExpression>(std::atan(x->val));
+    return constant_ptr(std::atan(x->val));
   }
 
   return make_expression_ptr<AtanExpression>(x);
@@ -1030,12 +1033,12 @@ inline ExpressionPtr atan2(const ExpressionPtr& y, const ExpressionPtr& x) {
     // Return zero
     return y;
   } else if (x->is_constant(0.0)) {
-    return make_expression_ptr<ConstExpression>(std::numbers::pi / 2.0);
+    return constant_ptr(std::numbers::pi / 2.0);
   }
 
   // Evaluate constant
   if (y->type() == CONSTANT && x->type() == CONSTANT) {
-    return make_expression_ptr<ConstExpression>(std::atan2(y->val, x->val));
+    return constant_ptr(std::atan2(y->val, x->val));
   }
 
   return make_expression_ptr<Atan2Expression>(y, x);
@@ -1058,7 +1061,7 @@ struct CosExpression final : Expression {
   ExpressionType type() const override { return ExpressionType::NONLINEAR; }
 
   double grad_l(double x, double, double parent_adjoint) const override {
-    return -parent_adjoint * std::sin(x);
+    return parent_adjoint * -std::sin(x);
   }
 
   ExpressionPtr grad_expr_l(
@@ -1078,12 +1081,12 @@ inline ExpressionPtr cos(const ExpressionPtr& x) {
 
   // Prune expression
   if (x->is_constant(0.0)) {
-    return make_expression_ptr<ConstExpression>(1.0);
+    return constant_ptr(1.0);
   }
 
   // Evaluate constant
   if (x->type() == CONSTANT) {
-    return make_expression_ptr<ConstExpression>(std::cos(x->val));
+    return constant_ptr(std::cos(x->val));
   }
 
   return make_expression_ptr<CosExpression>(x);
@@ -1126,12 +1129,12 @@ inline ExpressionPtr cosh(const ExpressionPtr& x) {
 
   // Prune expression
   if (x->is_constant(0.0)) {
-    return make_expression_ptr<ConstExpression>(1.0);
+    return constant_ptr(1.0);
   }
 
   // Evaluate constant
   if (x->type() == CONSTANT) {
-    return make_expression_ptr<ConstExpression>(std::cosh(x->val));
+    return constant_ptr(std::cosh(x->val));
   }
 
   return make_expression_ptr<CoshExpression>(x);
@@ -1160,9 +1163,7 @@ struct ErfExpression final : Expression {
   ExpressionPtr grad_expr_l(
       const ExpressionPtr& x, const ExpressionPtr&,
       const ExpressionPtr& parent_adjoint) const override {
-    return parent_adjoint *
-           make_expression_ptr<ConstExpression>(2.0 *
-                                                std::numbers::inv_sqrtpi) *
+    return parent_adjoint * constant_ptr(2.0 * std::numbers::inv_sqrtpi) *
            slp::detail::exp(-x * x);
   }
 };
@@ -1183,7 +1184,7 @@ inline ExpressionPtr erf(const ExpressionPtr& x) {
 
   // Evaluate constant
   if (x->type() == CONSTANT) {
-    return make_expression_ptr<ConstExpression>(std::erf(x->val));
+    return constant_ptr(std::erf(x->val));
   }
 
   return make_expression_ptr<ErfExpression>(x);
@@ -1226,12 +1227,12 @@ inline ExpressionPtr exp(const ExpressionPtr& x) {
 
   // Prune expression
   if (x->is_constant(0.0)) {
-    return make_expression_ptr<ConstExpression>(1.0);
+    return constant_ptr(1.0);
   }
 
   // Evaluate constant
   if (x->type() == CONSTANT) {
-    return make_expression_ptr<ConstExpression>(std::exp(x->val));
+    return constant_ptr(std::exp(x->val));
   }
 
   return make_expression_ptr<ExpExpression>(x);
@@ -1295,7 +1296,7 @@ inline ExpressionPtr hypot(const ExpressionPtr& x, const ExpressionPtr& y) {
 
   // Evaluate constant
   if (x->type() == CONSTANT && y->type() == CONSTANT) {
-    return make_expression_ptr<ConstExpression>(std::hypot(x->val, y->val));
+    return constant_ptr(std::hypot(x->val, y->val));
   }
 
   return make_expression_ptr<HypotExpression>(x, y);
@@ -1344,7 +1345,7 @@ inline ExpressionPtr log(const ExpressionPtr& x) {
 
   // Evaluate constant
   if (x->type() == CONSTANT) {
-    return make_expression_ptr<ConstExpression>(std::log(x->val));
+    return constant_ptr(std::log(x->val));
   }
 
   return make_expression_ptr<LogExpression>(x);
@@ -1373,8 +1374,7 @@ struct Log10Expression final : Expression {
   ExpressionPtr grad_expr_l(
       const ExpressionPtr& x, const ExpressionPtr&,
       const ExpressionPtr& parent_adjoint) const override {
-    return parent_adjoint /
-           (make_expression_ptr<ConstExpression>(std::numbers::ln10) * x);
+    return parent_adjoint / (constant_ptr(std::numbers::ln10) * x);
   }
 };
 
@@ -1394,7 +1394,7 @@ inline ExpressionPtr log10(const ExpressionPtr& x) {
 
   // Evaluate constant
   if (x->type() == CONSTANT) {
-    return make_expression_ptr<ConstExpression>(std::log10(x->val));
+    return constant_ptr(std::log10(x->val));
   }
 
   return make_expression_ptr<Log10Expression>(x);
@@ -1405,7 +1405,7 @@ inline ExpressionPtr pow(const ExpressionPtr& base, const ExpressionPtr& power);
 /**
  * Derived expression type for std::pow().
  *
- * @tparam Expression type.
+ * @tparam T Expression type.
  */
 template <ExpressionType T>
 struct PowExpression final : Expression {
@@ -1435,16 +1435,14 @@ struct PowExpression final : Expression {
     if (base == 0.0) {
       return 0.0;
     } else {
-      return parent_adjoint * std::pow(base, power - 1) * base * std::log(base);
+      return parent_adjoint * std::pow(base, power) * std::log(base);
     }
   }
 
   ExpressionPtr grad_expr_l(
       const ExpressionPtr& base, const ExpressionPtr& power,
       const ExpressionPtr& parent_adjoint) const override {
-    return parent_adjoint *
-           slp::detail::pow(base,
-                            power - make_expression_ptr<ConstExpression>(1.0)) *
+    return parent_adjoint * slp::detail::pow(base, power - constant_ptr(1.0)) *
            power;
   }
 
@@ -1456,10 +1454,8 @@ struct PowExpression final : Expression {
       // Return zero
       return base;
     } else {
-      return parent_adjoint *
-             slp::detail::pow(
-                 base, power - make_expression_ptr<ConstExpression>(1.0)) *
-             base * slp::detail::log(base);
+      return parent_adjoint * slp::detail::pow(base, power) *
+             slp::detail::log(base);
     }
   }
 };
@@ -1483,15 +1479,14 @@ inline ExpressionPtr pow(const ExpressionPtr& base,
     return base;
   }
   if (power->is_constant(0.0)) {
-    return make_expression_ptr<ConstExpression>(1.0);
+    return constant_ptr(1.0);
   } else if (power->is_constant(1.0)) {
     return base;
   }
 
   // Evaluate constant
   if (base->type() == CONSTANT && power->type() == CONSTANT) {
-    return make_expression_ptr<ConstExpression>(
-        std::pow(base->val, power->val));
+    return constant_ptr(std::pow(base->val, power->val));
   }
 
   if (power->is_constant(2.0)) {
@@ -1528,14 +1523,6 @@ struct SignExpression final : Expression {
   }
 
   ExpressionType type() const override { return ExpressionType::NONLINEAR; }
-
-  double grad_l(double, double, double) const override { return 0.0; }
-
-  ExpressionPtr grad_expr_l(const ExpressionPtr&, const ExpressionPtr&,
-                            const ExpressionPtr&) const override {
-    // Return zero
-    return make_expression_ptr<ConstExpression>();
-  }
 };
 
 /**
@@ -1549,12 +1536,12 @@ inline ExpressionPtr sign(const ExpressionPtr& x) {
   // Evaluate constant
   if (x->type() == CONSTANT) {
     if (x->val < 0.0) {
-      return make_expression_ptr<ConstExpression>(-1.0);
+      return constant_ptr(-1.0);
     } else if (x->val == 0.0) {
       // Return zero
       return x;
     } else {
-      return make_expression_ptr<ConstExpression>(1.0);
+      return constant_ptr(1.0);
     }
   }
 
@@ -1604,7 +1591,7 @@ inline ExpressionPtr sin(const ExpressionPtr& x) {
 
   // Evaluate constant
   if (x->type() == CONSTANT) {
-    return make_expression_ptr<ConstExpression>(std::sin(x->val));
+    return constant_ptr(std::sin(x->val));
   }
 
   return make_expression_ptr<SinExpression>(x);
@@ -1653,7 +1640,7 @@ inline ExpressionPtr sinh(const ExpressionPtr& x) {
 
   // Evaluate constant
   if (x->type() == CONSTANT) {
-    return make_expression_ptr<ConstExpression>(std::sinh(x->val));
+    return constant_ptr(std::sinh(x->val));
   }
 
   return make_expression_ptr<SinhExpression>(x);
@@ -1682,8 +1669,7 @@ struct SqrtExpression final : Expression {
   ExpressionPtr grad_expr_l(
       const ExpressionPtr& x, const ExpressionPtr&,
       const ExpressionPtr& parent_adjoint) const override {
-    return parent_adjoint /
-           (make_expression_ptr<ConstExpression>(2.0) * slp::detail::sqrt(x));
+    return parent_adjoint / (constant_ptr(2.0) * slp::detail::sqrt(x));
   }
 };
 
@@ -1703,7 +1689,7 @@ inline ExpressionPtr sqrt(const ExpressionPtr& x) {
     } else if (x->val == 1.0) {
       return x;
     } else {
-      return make_expression_ptr<ConstExpression>(std::sqrt(x->val));
+      return constant_ptr(std::sqrt(x->val));
     }
   }
 
@@ -1727,13 +1713,15 @@ struct TanExpression final : Expression {
   ExpressionType type() const override { return ExpressionType::NONLINEAR; }
 
   double grad_l(double x, double, double parent_adjoint) const override {
-    return parent_adjoint / (std::cos(x) * std::cos(x));
+    auto c = std::cos(x);
+    return parent_adjoint / (c * c);
   }
 
   ExpressionPtr grad_expr_l(
       const ExpressionPtr& x, const ExpressionPtr&,
       const ExpressionPtr& parent_adjoint) const override {
-    return parent_adjoint / (slp::detail::cos(x) * slp::detail::cos(x));
+    auto c = slp::detail::cos(x);
+    return parent_adjoint / (c * c);
   }
 };
 
@@ -1753,7 +1741,7 @@ inline ExpressionPtr tan(const ExpressionPtr& x) {
 
   // Evaluate constant
   if (x->type() == CONSTANT) {
-    return make_expression_ptr<ConstExpression>(std::tan(x->val));
+    return constant_ptr(std::tan(x->val));
   }
 
   return make_expression_ptr<TanExpression>(x);
@@ -1776,13 +1764,15 @@ struct TanhExpression final : Expression {
   ExpressionType type() const override { return ExpressionType::NONLINEAR; }
 
   double grad_l(double x, double, double parent_adjoint) const override {
-    return parent_adjoint / (std::cosh(x) * std::cosh(x));
+    auto c = std::cosh(x);
+    return parent_adjoint / (c * c);
   }
 
   ExpressionPtr grad_expr_l(
       const ExpressionPtr& x, const ExpressionPtr&,
       const ExpressionPtr& parent_adjoint) const override {
-    return parent_adjoint / (slp::detail::cosh(x) * slp::detail::cosh(x));
+    auto c = slp::detail::cosh(x);
+    return parent_adjoint / (c * c);
   }
 };
 
@@ -1802,7 +1792,7 @@ inline ExpressionPtr tanh(const ExpressionPtr& x) {
 
   // Evaluate constant
   if (x->type() == CONSTANT) {
-    return make_expression_ptr<ConstExpression>(std::tanh(x->val));
+    return constant_ptr(std::tanh(x->val));
   }
 
   return make_expression_ptr<TanhExpression>(x);

@@ -74,7 +74,7 @@ class SLEIPNIR_DLLEXPORT Hessian {
         // If the row is linear, compute its gradient once here and cache its
         // triplets. Constant rows are ignored because their gradients have no
         // nonzero triplets.
-        m_graphs[row].append_adjoint_triplets(m_cached_triplets, row, m_wrt);
+        m_graphs[row].append_gradient_triplets(m_cached_triplets, row, m_wrt);
       } else if (m_variables[row].type() > ExpressionType::LINEAR) {
         // If the row is quadratic or nonlinear, add it to the list of nonlinear
         // rows to be recomputed in Value().
@@ -136,7 +136,7 @@ class SLEIPNIR_DLLEXPORT Hessian {
 
     // Compute each nonlinear row of the Hessian
     for (int row : m_nonlinear_rows) {
-      m_graphs[row].append_adjoint_triplets(triplets, row, m_wrt);
+      m_graphs[row].append_gradient_triplets(triplets, row, m_wrt);
     }
 
     m_H.setFromTriplets(triplets.begin(), triplets.end());

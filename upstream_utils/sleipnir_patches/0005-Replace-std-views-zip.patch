@@ -9,10 +9,10 @@ Subject: [PATCH 5/8] Replace std::views::zip()
  2 files changed, 9 insertions(+), 5 deletions(-)
 
 diff --git a/include/sleipnir/autodiff/adjoint_expression_graph.hpp b/include/sleipnir/autodiff/adjoint_expression_graph.hpp
-index 33b6eee615141a1d6472f116842d62052ef54dd9..b333aebd3e59fa23eed6046c13d736c3d2eccac7 100644
+index 405d9540ee4ce7cb6d8d540fc99bcf66403d952c..8c476adaf6b838f2a47aa101de37a478067d0705 100644
 --- a/include/sleipnir/autodiff/adjoint_expression_graph.hpp
 +++ b/include/sleipnir/autodiff/adjoint_expression_graph.hpp
-@@ -158,7 +158,10 @@ class AdjointExpressionGraph {
+@@ -166,7 +166,10 @@ class AdjointExpressionGraph {
          }
        }
      } else {
