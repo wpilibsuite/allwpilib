@@ -27,26 +27,6 @@ class RobotController {
   RobotController() = delete;
 
   /**
-   * Return the FPGA Version number.
-   *
-   * For now, expect this to be competition year.
-   *
-   * @return FPGA Version number.
-   */
-  static int GetFPGAVersion();
-
-  /**
-   * Return the FPGA Revision number.
-   *
-   * The format of the revision is 3 numbers. The 12 most significant bits are
-   * the Major Revision. The next 8 bits are the Minor Revision. The 12 least
-   * significant bits are the Build Number.
-   *
-   * @return FPGA Revision number.
-   */
-  static int64_t GetFPGARevision();
-
-  /**
    * Return the serial number of the roboRIO.
    *
    * @return The serial number of the roboRIO.

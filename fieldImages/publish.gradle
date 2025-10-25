@@ -63,8 +63,8 @@ model {
                 artifact cppSourcesZip
 
                 artifactId = "${baseArtifactId}-cpp"
-                groupId artifactGroupId
-                version wpilibVersioning.version.get()
+                groupId = artifactGroupId
+                version = wpilibVersioning.version.get()
             }
         }
     }

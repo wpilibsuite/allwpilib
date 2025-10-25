@@ -1,0 +1,13 @@
+classes:
+  frc::EventLoop:
+    force_type_casters:
+    - std::function
+    methods:
+      EventLoop:
+      Bind:
+        cpp_code: |
+          [](EventLoop *self, std::function<void()> action) {
+            self->Bind(std::move(action));
+          }
+      Poll:
+      Clear:

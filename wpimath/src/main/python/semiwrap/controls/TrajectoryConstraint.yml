@@ -1,0 +1,38 @@
+defaults:
+  subpackage: constraint
+
+classes:
+  frc::TrajectoryConstraint:
+    force_type_casters:
+    - units::meters_per_second_squared
+    methods:
+      TrajectoryConstraint:
+      MaxVelocity:
+      MinMaxAcceleration:
+  frc::TrajectoryConstraint::MinMax:
+    attributes:
+      minAcceleration:
+      maxAcceleration:
+    inline_code: |
+      .def(py::init([](
+          units::meters_per_second_squared_t minAcceleration,
+          units::meters_per_second_squared_t maxAcceleration) {
+        return frc::TrajectoryConstraint::MinMax{minAcceleration, maxAcceleration};
+      }), py::arg("minAcceleration"), py::arg("maxAcceleration"))
+
+      .def("__len__", [](const frc::TrajectoryConstraint::MinMax& self) { return 2; })
+      .def("__getitem__", [](const frc::TrajectoryConstraint::MinMax& self, int index) {
+        switch (index) {
+          case 0:
+            return self.minAcceleration;
+          case 1:
+            return self.maxAcceleration;
+          default:
+            throw std::out_of_range("TrajectoryConstraint.MinMax index out of range");
+        }
+      })
+
+      .def("__repr__", [](const frc::TrajectoryConstraint::MinMax &self) {
+        return py::str("TrajectoryConstraint.MinMax(minAcceleration={}, maxAcceleration={})").format(
+          self.minAcceleration, self.maxAcceleration);
+      })

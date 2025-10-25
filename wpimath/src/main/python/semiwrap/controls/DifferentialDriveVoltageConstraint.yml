@@ -1,0 +1,11 @@
+defaults:
+  subpackage: constraint
+
+classes:
+  frc::DifferentialDriveVoltageConstraint:
+    typealias:
+    - frc::TrajectoryConstraint::MinMax
+    methods:
+      DifferentialDriveVoltageConstraint:
+      MaxVelocity:
+      MinMaxAcceleration:

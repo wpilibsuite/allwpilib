@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
-@SuppressWarnings("PMD.RedundantFieldInitializer")
 public class Robot extends TimedRobot {
   private static double kDt = 0.02;
   private static double kMaxVelocity = 1.75;

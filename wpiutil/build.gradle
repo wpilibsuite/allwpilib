@@ -1,5 +1,6 @@
 apply from: "${rootDir}/shared/resources.gradle"
 
+apply plugin: 'c'
 ext {
     noWpiutil = true
     skipJniSymbols = [
@@ -80,15 +81,6 @@ ext {
                     srcDirs 'src/main/native/thirdparty/sigslot/include'
                 }
             }
-            protobufCpp(CppSourceSet) {
-                source {
-                    srcDirs 'src/main/native/thirdparty/protobuf/src'
-                    include '**/*.cpp'
-                }
-                exportedHeaders {
-                    srcDirs 'src/main/native/thirdparty/protobuf/include'
-                }
-            }
             resourcesCpp(CppSourceSet) {
                 source {
                     srcDirs "$buildDir/generated/main/cpp", "$rootDir/shared/singlelib"
@@ -96,6 +88,15 @@ ext {
                 }
                 exportedHeaders {
                     srcDirs 'src/main/native/include'
+                }
+            }
+            upbCpp(CSourceSet) {
+                source {
+                    srcDirs 'src/main/native/thirdparty/upb/src'
+                    include '**/*.c'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/thirdparty/upb/include'
                 }
             }
         }
@@ -181,7 +182,7 @@ cppHeadersZip {
         'src/main/native/thirdparty/mpack/include',
         'src/main/native/thirdparty/nanopb/include',
         'src/main/native/thirdparty/sigslot/include',
-        'src/main/native/thirdparty/protobuf/include'
+        'src/main/native/thirdparty/upb/include'
     ]
 
     thirdpartyIncDirs.each {
@@ -211,10 +212,10 @@ cppSourcesZip {
     from('src/main/native/thirdparty/nanopb/src') {
         into '/'
     }
-    from('src/main/native/thirdparty/protobuf/src') {
+    from('src/main/native/thirdparty/sigslot/src') {
         into '/'
     }
-    from('src/main/native/thirdparty/sigslot/src') {
+    from('src/main/native/thirdparty/upb/src') {
         into '/'
     }
 }
@@ -224,12 +225,34 @@ model {
         all {
             it.sources.each {
                 it.exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/argparse/include/', 'src/main/native/thirdparty/debugging/include', 'src/main/native/thirdparty/expected/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/protobuf/include', 'src/main/native/thirdparty/nanopb/include'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/argparse/include/', 'src/main/native/thirdparty/debugging/include', 'src/main/native/thirdparty/expected/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/nanopb/include', 'src/main/native/thirdparty/upb/include'
                 }
             }
         }
     }
     testSuites {
+        "${nativeName}Catch2Test"(GoogleTestTestSuiteSpec) {
+            for(NativeComponentSpec c : $.components) {
+                if (c.name == nativeName) {
+                    testing c
+                    break
+                }
+            }
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/test/native/cpp'
+                        include '**/TestCatch2.cpp', '**/catch2main.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/test/native/include', 'src/main/native/cpp'
+                    }
+                }
+            }
+            binaries.all {
+                lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
+            }
+        }
         withType(GoogleTestTestSuiteSpec) {
             sources {
                 protobufGenCpp(CppSourceSet) {
@@ -252,8 +275,8 @@ model {
 }
 
 dependencies {
-    api "com.fasterxml.jackson.core:jackson-annotations:2.15.2"
-    api "com.fasterxml.jackson.core:jackson-core:2.15.2"
-    api "com.fasterxml.jackson.core:jackson-databind:2.15.2"
-    api 'us.hebi.quickbuf:quickbuf-runtime:1.3.3'
+    api "com.fasterxml.jackson.core:jackson-annotations:2.19.2"
+    api "com.fasterxml.jackson.core:jackson-core:2.19.2"
+    api "com.fasterxml.jackson.core:jackson-databind:2.19.2"
+    api 'us.hebi.quickbuf:quickbuf-runtime:1.4'
 }

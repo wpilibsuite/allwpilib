@@ -44,7 +44,7 @@ public class SendableHandler extends ElementHandler {
   }
 
   @Override
-  public String logInvocation(Element element) {
+  public String logInvocation(Element element, TypeElement loggedClass) {
     var dataType = dataType(element);
 
     // Do not log commands or subsystems via their sendable implementations
@@ -66,7 +66,7 @@ public class SendableHandler extends ElementHandler {
     return "logSendable(backend.getNested(\""
         + loggedName(element)
         + "\"), "
-        + elementAccess(element)
+        + elementAccess(element, loggedClass)
         + ")";
   }
 }

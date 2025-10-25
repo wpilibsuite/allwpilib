@@ -4,11 +4,13 @@
 
 package edu.wpi.first.epilogue.logging;
 
+import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.struct.Struct;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import us.hebi.quickbuf.ProtoMessage;
 
 /**
  * A backend implementation that only logs data when it changes. Useful for keeping bandwidth and
@@ -40,7 +42,13 @@ public class LazyBackend implements EpilogueBackend {
 
   @Override
   public EpilogueBackend getNested(String path) {
-    return m_subLoggers.computeIfAbsent(path, k -> new NestedBackend(k, this));
+    if (!m_subLoggers.containsKey(path)) {
+      var nested = new NestedBackend(path, this);
+      m_subLoggers.put(path, nested);
+      return nested;
+    }
+
+    return m_subLoggers.get(path);
   }
 
   @Override
@@ -236,5 +244,18 @@ public class LazyBackend implements EpilogueBackend {
 
     m_previousValues.put(identifier, value.clone());
     m_backend.log(identifier, value, struct);
+  }
+
+  @Override
+  public <P, M extends ProtoMessage<M>> void log(String identifier, P value, Protobuf<P, M> proto) {
+    var previous = m_previousValues.get(identifier);
+
+    if (Objects.equals(previous, value)) {
+      // no change
+      return;
+    }
+
+    m_previousValues.put(identifier, value);
+    m_backend.log(identifier, value, proto);
   }
 }

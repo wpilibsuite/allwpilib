@@ -375,14 +375,6 @@ class DriverStation final {
   static std::optional<int> GetLocation();
 
   /**
-   * Wait for a DS connection.
-   *
-   * @param timeout timeout in seconds. 0 for infinite.
-   * @return true if connected, false if timeout
-   */
-  static bool WaitForDsConnection(units::second_t timeout);
-
-  /**
    * Return the approximate match time. The FMS does not send an official match
    * time to the robots, but does send an approximate match time. The value will
    * count down the time remaining in the current period (auto or teleop).

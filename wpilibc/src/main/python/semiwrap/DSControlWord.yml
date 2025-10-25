@@ -1,0 +1,24 @@
+classes:
+  frc::DSControlWord:
+    methods:
+      DSControlWord:
+      IsEnabled:
+        no_release_gil: true
+      IsDisabled:
+        no_release_gil: true
+      IsEStopped:
+        no_release_gil: true
+      IsAutonomous:
+        no_release_gil: true
+      IsAutonomousEnabled:
+        no_release_gil: true
+      IsTeleop:
+        no_release_gil: true
+      IsTeleopEnabled:
+        no_release_gil: true
+      IsTest:
+        no_release_gil: true
+      IsDSAttached:
+        no_release_gil: true
+      IsFMSAttached:
+        no_release_gil: true

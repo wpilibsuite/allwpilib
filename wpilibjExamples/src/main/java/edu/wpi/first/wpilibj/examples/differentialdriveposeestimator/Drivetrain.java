@@ -27,8 +27,8 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleArrayEntry;
 import edu.wpi.first.networktables.DoubleArrayTopic;
-import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.OnboardIMU;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
@@ -54,7 +54,7 @@ public class Drivetrain {
   private final Encoder m_leftEncoder = new Encoder(0, 1);
   private final Encoder m_rightEncoder = new Encoder(2, 3);
 
-  private final AnalogGyro m_gyro = new AnalogGyro(0);
+  private final OnboardIMU m_imu = new OnboardIMU(OnboardIMU.MountOrientation.kFlat);
 
   private final PIDController m_leftPIDController = new PIDController(1, 0, 0);
   private final PIDController m_rightPIDController = new PIDController(1, 0, 0);
@@ -79,7 +79,7 @@ public class Drivetrain {
   private final DifferentialDrivePoseEstimator m_poseEstimator =
       new DifferentialDrivePoseEstimator(
           m_kinematics,
-          m_gyro.getRotation2d(),
+          m_imu.getRotation2d(),
           m_leftEncoder.getDistance(),
           m_rightEncoder.getDistance(),
           Pose2d.kZero,
@@ -103,7 +103,7 @@ public class Drivetrain {
    * gyro.
    */
   public Drivetrain(DoubleArrayTopic cameraToObjectTopic) {
-    m_gyro.reset();
+    m_imu.resetYaw();
 
     m_leftLeader.addFollower(m_leftFollower);
     m_rightLeader.addFollower(m_rightFollower);
@@ -220,7 +220,7 @@ public class Drivetrain {
   /** Updates the field-relative position. */
   public void updateOdometry() {
     m_poseEstimator.update(
-        m_gyro.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
+        m_imu.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
 
     // Publish cameraToObject transformation to networktables --this would normally be handled by
     // the
@@ -254,7 +254,8 @@ public class Drivetrain {
     m_leftEncoderSim.setRate(m_drivetrainSimulator.getLeftVelocity());
     m_rightEncoderSim.setDistance(m_drivetrainSimulator.getRightPosition());
     m_rightEncoderSim.setRate(m_drivetrainSimulator.getRightVelocity());
-    // m_gyroSim.setAngle(-m_drivetrainSimulator.getHeading().getDegrees());
+    // m_gyroSim.setAngle(-m_drivetrainSimulator.getHeading().getDegrees()); // TODO(Ryan): fixup
+    // when sim implemented
   }
 
   /** This function is called periodically, no matter the mode. */

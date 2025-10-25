@@ -5,6 +5,7 @@
 package edu.wpi.first.util.sendable;
 
 /** The base interface for objects that can be sent over the network. */
+@SuppressWarnings("PMD.ImplicitFunctionalInterface")
 public interface Sendable {
   /**
    * Initializes this {@link Sendable} object.

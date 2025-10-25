@@ -1,4 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:halsim_library.bzl", "wpilib_halsim_extension")
 load("//shared/bazel/rules:packaging.bzl", "package_minimal_cc_project")
 
@@ -10,6 +11,47 @@ wpilib_halsim_extension(
     ]),
     deps = [
         "//simulation/halsim_ws_core",
+    ],
+)
+
+wpilib_halsim_extension(
+    name = "halsim_ws_client_static",
+    srcs = glob([
+        "src/main/native/cpp/*.cpp",
+        "src/main/native/include/*.h",
+    ]),
+    copts = [
+        "-DHALSIM_InitExtension=HALSIM_InitExtension_WS_CLIENT",
+    ],
+    deps = [
+        "//simulation/halsim_ws_core",
+    ],
+)
+
+wpilib_cc_shared_library(
+    name = "shared/halsim_ws_client",
+    dynamic_deps = [
+        "//hal:shared/wpiHal",
+        "//wpinet:shared/wpinet",
+        "//wpiutil:shared/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":halsim_ws_client",
+    ],
+)
+
+wpilib_cc_static_library(
+    name = "static/halsim_ws_client",
+    static_deps = [
+        "//hal:static/wpiHal",
+        "//wpinet:static/wpinet",
+        "//wpiutil:static/wpiutil",
+        "//simulation/halsim_ws_core:static/halsim_ws_core",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":halsim_ws_client_static",
     ],
 )
 

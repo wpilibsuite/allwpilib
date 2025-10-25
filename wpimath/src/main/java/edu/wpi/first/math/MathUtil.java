@@ -14,27 +14,36 @@ public final class MathUtil {
   }
 
   /**
-   * Returns value clamped between low and high boundaries.
+   * Computes the linear interpolation between a and b if t ∈ [0, 1) and the linear extrapolation
+   * otherwise.
    *
-   * @param value Value to clamp.
-   * @param low The lower boundary to which to clamp value.
-   * @param high The higher boundary to which to clamp value.
-   * @return The clamped value.
+   * @param a The start value.
+   * @param b The end value.
+   * @param t The fraction for interpolation.
+   * @return The interpolated value.
    */
-  public static int clamp(int value, int low, int high) {
-    return Math.max(low, Math.min(value, high));
+  public static double lerp(double a, double b, double t) {
+    return a + (b - a) * t;
   }
 
   /**
-   * Returns value clamped between low and high boundaries.
+   * Returns the interpolant t that reflects where q is with respect to the range (a, b). In other
+   * words, returns t such that q = a + (b - a)t. If a = b, then returns 0.
    *
-   * @param value Value to clamp.
-   * @param low The lower boundary to which to clamp value.
-   * @param high The higher boundary to which to clamp value.
-   * @return The clamped value.
+   * @param a Lower part of interpolation range.
+   * @param b Upper part of interpolation range.
+   * @param q Query.
+   * @return Interpolant.
    */
-  public static double clamp(double value, double low, double high) {
-    return Math.max(low, Math.min(value, high));
+  public static double inverseLerp(double a, double b, double q) {
+    // q = a + (b − a)t
+    // (b − a)t = q − a
+    // t = (q − a)/(b − a)
+    if (Math.abs(a - b) < 1e-9) {
+      return 0.0;
+    } else {
+      return (q - a) / (b - a);
+    }
   }
 
   /**
@@ -108,6 +117,39 @@ public final class MathUtil {
   }
 
   /**
+   * Returns a zero vector if the given vector is within the specified distance from the origin. The
+   * remaining distance between the deadband and the maximum distance is scaled from the origin to
+   * the maximum distance.
+   *
+   * @param value Value to clip.
+   * @param deadband Distance from origin.
+   * @param maxMagnitude The maximum distance from the origin of the input. Can be infinite.
+   * @param <R> The number of rows in the vector.
+   * @return The value after the deadband is applied.
+   */
+  public static <R extends Num> Vector<R> applyDeadband(
+      Vector<R> value, double deadband, double maxMagnitude) {
+    if (value.norm() < 1e-9) {
+      return value.times(0);
+    }
+    return value.unit().times(applyDeadband(value.norm(), deadband, maxMagnitude));
+  }
+
+  /**
+   * Returns a zero vector if the given vector is within the specified distance from the origin. The
+   * remaining distance between the deadband and a distance of 1.0 is scaled from the origin to a
+   * distance of 1.0.
+   *
+   * @param value Value to clip.
+   * @param deadband Distance from origin.
+   * @param <R> The number of rows in the vector.
+   * @return The value after the deadband is applied.
+   */
+  public static <R extends Num> Vector<R> applyDeadband(Vector<R> value, double deadband) {
+    return applyDeadband(value, deadband, 1);
+  }
+
+  /**
    * Raises the input to the power of the given exponent while preserving its sign.
    *
    * <p>The function normalizes the input value to the range [0, 1] based on the maximum magnitude,
@@ -124,7 +166,7 @@ public final class MathUtil {
    * @param maxMagnitude The maximum expected absolute value of input. Must be positive.
    * @return The transformed value with the same sign and scaled to the input range.
    */
-  public static double copySignPow(double value, double exponent, double maxMagnitude) {
+  public static double copyDirectionPow(double value, double exponent, double maxMagnitude) {
     return Math.copySign(Math.pow(Math.abs(value) / maxMagnitude, exponent), value) * maxMagnitude;
   }
 
@@ -139,8 +181,44 @@ public final class MathUtil {
    *     positive.
    * @return The transformed value with the same sign.
    */
-  public static double copySignPow(double value, double exponent) {
-    return copySignPow(value, exponent, 1);
+  public static double copyDirectionPow(double value, double exponent) {
+    return copyDirectionPow(value, exponent, 1);
+  }
+
+  /**
+   * Raises the norm of the input to the power of the given exponent while preserving its direction.
+   *
+   * <p>The function normalizes the norm of the input to the range [0, 1] based on the maximum
+   * distance, raises it to the power of the exponent, then scales the result back to the original
+   * range. This keeps the value in the original max distance and gives consistent curve behavior
+   * regardless of the input norm's scale.
+   *
+   * @param value The input vector to transform.
+   * @param exponent The exponent to apply (e.g. 1.0 = linear, 2.0 = squared curve). Must be
+   *     positive.
+   * @param maxMagnitude The maximum expected distance from origin of input. Must be positive.
+   * @param <R> The number of rows in the vector.
+   * @return The transformed value with the same direction and norm scaled to the input range.
+   */
+  public static <R extends Num> Vector<R> copyDirectionPow(
+      Vector<R> value, double exponent, double maxMagnitude) {
+    if (value.norm() < 1e-9) {
+      return value.times(0);
+    }
+    return value.unit().times(copyDirectionPow(value.norm(), exponent, maxMagnitude));
+  }
+
+  /**
+   * Raises the norm of the input to the power of the given exponent while preserving its direction.
+   *
+   * @param value The input vector to transform.
+   * @param exponent The exponent to apply (e.g. 1.0 = linear, 2.0 = squared curve). Must be
+   *     positive.
+   * @param <R> The number of rows in the vector.
+   * @return The transformed value with the same direction.
+   */
+  public static <R extends Num> Vector<R> copyDirectionPow(Vector<R> value, double exponent) {
+    return copyDirectionPow(value, exponent, 1);
   }
 
   /**
@@ -173,38 +251,6 @@ public final class MathUtil {
    */
   public static double angleModulus(double angleRadians) {
     return inputModulus(angleRadians, -Math.PI, Math.PI);
-  }
-
-  /**
-   * Perform linear interpolation between two values.
-   *
-   * @param startValue The value to start at.
-   * @param endValue The value to end at.
-   * @param t How far between the two values to interpolate. This is clamped to [0, 1].
-   * @return The interpolated value.
-   */
-  public static double interpolate(double startValue, double endValue, double t) {
-    return startValue + (endValue - startValue) * MathUtil.clamp(t, 0, 1);
-  }
-
-  /**
-   * Return where within interpolation range [0, 1] q is between startValue and endValue.
-   *
-   * @param startValue Lower part of interpolation range.
-   * @param endValue Upper part of interpolation range.
-   * @param q Query.
-   * @return Interpolant in range [0, 1].
-   */
-  public static double inverseInterpolate(double startValue, double endValue, double q) {
-    double totalRange = endValue - startValue;
-    if (totalRange <= 0) {
-      return 0.0;
-    }
-    double queryToStart = q - startValue;
-    if (queryToStart <= 0) {
-      return 0.0;
-    }
-    return queryToStart / totalRange;
   }
 
   /**

@@ -1130,7 +1130,11 @@ void set_from_triplets(const InputIterator& begin, const InputIterator& end, Spa
   using TransposedSparseMatrix =
       SparseMatrix<typename SparseMatrixType::Scalar, IsRowMajor ? ColMajor : RowMajor, StorageIndex>;
 
-  if (begin == end) return;
+  if (begin == end) {
+    // Clear out existing data (if any).
+    mat.setZero();
+    return;
+  }
 
   // There are two strategies to consider for constructing a matrix from unordered triplets:
   // A) construct the 'mat' in its native storage order and sort in-place (less memory); or,

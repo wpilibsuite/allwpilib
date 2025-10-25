@@ -1,0 +1,43 @@
+extra_includes:
+- pybind11/eigen.h
+
+classes:
+  frc::AprilTagDetection:
+    methods:
+      GetFamily:
+      GetId:
+      GetHamming:
+      GetDecisionMargin:
+      GetHomography:
+      GetHomographyMatrix:
+      GetCenter:
+      GetCorner:
+      GetCorners:
+    inline_code: |
+      .def("__repr__", [](const AprilTagDetection &self) {
+        return py::str("<AprilTagDetection tag_family={} tag_id={} hamming={} decision_margin={} center={}>")
+          .format(self.GetFamily(), self.GetId(), self.GetHamming(), self.GetDecisionMargin(), self.GetCenter());
+      })
+  frc::AprilTagDetection::Point:
+    attributes:
+      x:
+      y:
+    inline_code: |
+      .def(py::init([](double x, double y) {
+        AprilTagDetection::Point pt{x, y};
+        return std::make_unique<AprilTagDetection::Point>(std::move(pt));
+      }), py::arg("x"), py::arg("y"))
+      .def("__len__", [](const AprilTagDetection::Point &self) { return 2; })
+      .def("__getitem__", [](const AprilTagDetection::Point &self, int index) {
+        switch (index) {
+          case 0:
+            return self.x;
+          case 1:
+            return self.y;
+          default:
+            throw std::out_of_range("AprilTagDetection.Point index out of range");
+        }
+      })
+      .def("__repr__", [](const AprilTagDetection::Point &self) {
+        return py::str("AprilTagDetection.Point(x={}, y={})").format(self.x, self.y);
+      })

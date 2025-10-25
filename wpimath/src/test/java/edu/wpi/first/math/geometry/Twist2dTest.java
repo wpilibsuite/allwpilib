@@ -13,27 +13,27 @@ class Twist2dTest {
   @Test
   void testStraight() {
     var straight = new Twist2d(5.0, 0.0, 0.0);
-    var straightPose = Pose2d.kZero.exp(straight);
+    var straightPose = straight.exp();
 
-    var expected = new Pose2d(5.0, 0.0, Rotation2d.kZero);
+    var expected = new Transform2d(5.0, 0.0, Rotation2d.kZero);
     assertEquals(expected, straightPose);
   }
 
   @Test
   void testQuarterCircle() {
     var quarterCircle = new Twist2d(5.0 / 2.0 * Math.PI, 0, Math.PI / 2.0);
-    var quarterCirclePose = Pose2d.kZero.exp(quarterCircle);
+    var quarterCirclePose = quarterCircle.exp();
 
-    var expected = new Pose2d(5.0, 5.0, Rotation2d.kCCW_Pi_2);
+    var expected = new Transform2d(5.0, 5.0, Rotation2d.kCCW_Pi_2);
     assertEquals(expected, quarterCirclePose);
   }
 
   @Test
   void testDiagonalNoDtheta() {
     var diagonal = new Twist2d(2.0, 2.0, 0.0);
-    var diagonalPose = Pose2d.kZero.exp(diagonal);
+    var diagonalPose = diagonal.exp();
 
-    var expected = new Pose2d(2.0, 2.0, Rotation2d.kZero);
+    var expected = new Transform2d(2.0, 2.0, Rotation2d.kZero);
     assertEquals(expected, diagonalPose);
   }
 
@@ -56,13 +56,13 @@ class Twist2dTest {
     final var start = Pose2d.kZero;
     final var end = new Pose2d(5.0, 5.0, Rotation2d.kCCW_Pi_2);
 
-    final var twist = start.log(end);
+    final var twist = end.minus(start).log();
 
     var expected = new Twist2d(5.0 / 2.0 * Math.PI, 0.0, Math.PI / 2.0);
     assertEquals(expected, twist);
 
     // Make sure computed twist gives back original end pose
-    final var reapplied = start.exp(twist);
+    final var reapplied = start.plus(twist.exp());
     assertEquals(end, reapplied);
   }
 }

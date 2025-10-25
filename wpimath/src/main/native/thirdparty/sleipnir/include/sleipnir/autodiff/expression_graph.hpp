@@ -21,8 +21,7 @@ inline gch::small_vector<Expression*> topological_sort(
     const ExpressionPtr& root) {
   gch::small_vector<Expression*> list;
 
-  // If the root type is a constant, Update() is a no-op, so there's no work
-  // to do
+  // If the root type is constant, updates are a no-op, so return an empty list
   if (root == nullptr || root->type() == ExpressionType::CONSTANT) {
     return list;
   }

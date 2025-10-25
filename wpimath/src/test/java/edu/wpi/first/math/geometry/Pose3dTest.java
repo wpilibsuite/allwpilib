@@ -257,8 +257,8 @@ class Pose3dTest {
       var start = initial_poses.get(i);
       var end = final_poses.get(i);
 
-      var twist = start.log(end);
-      var start_exp = start.exp(twist);
+      var twist = end.minus(start).log();
+      var start_exp = start.plus(twist.exp());
 
       assertAll(
           () -> assertEquals(start_exp.getX(), end.getX(), eps),
@@ -314,7 +314,7 @@ class Pose3dTest {
       var start = initial_poses.get(i);
       var end = final_poses.get(i);
 
-      var twist = start.log(end);
+      var twist = end.minus(start).log();
       assertAll(
           () -> assertFalse(((Double) twist.dx).isNaN()),
           () -> assertFalse(((Double) twist.dy).isNaN()),

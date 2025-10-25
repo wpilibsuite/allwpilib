@@ -1,0 +1,54 @@
+extra_includes:
+- wpi/sendable/Sendable.h
+- wpi/sendable/SendableBuilder.h
+
+classes:
+  wpi::SendableRegistry:
+    nodelete: true
+    methods:
+      Add:
+        overloads:
+          Sendable*, std::string_view:
+            keepalive:
+            - [1, 2]
+          Sendable*, std::string_view, int:
+            keepalive:
+            - [1, 2]
+          Sendable*, std::string_view, int, int:
+            keepalive:
+            - [1, 2]
+          Sendable*, std::string_view, std::string_view:
+            keepalive:
+            - [1, 2]
+      AddChild:
+        overloads:
+          Sendable*, Sendable*:
+            keepalive:
+            - [1, 2]
+            - [2, 3]
+          Sendable*, void*:
+            ignore: true
+      Remove:
+      Move:
+        ignore: true
+      Contains:
+      GetName:
+      SetName:
+        overloads:
+          Sendable*, std::string_view:
+          Sendable*, std::string_view, int:
+          Sendable*, std::string_view, int, int:
+          Sendable*, std::string_view, std::string_view:
+      GetSubsystem:
+      SetSubsystem:
+      GetDataHandle:
+        ignore: true
+      SetData:
+        ignore: true
+      GetData:
+        ignore: true
+      GetUniqueId:
+      GetSendable:
+      Publish:
+      Update:
+      EnsureInitialized:

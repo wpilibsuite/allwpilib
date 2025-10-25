@@ -76,24 +76,24 @@ publishing {
             artifact cppExamplesZip
 
             artifactId = baseExamplesArtifactId
-            groupId artifactGroupId
-            version wpilibVersioning.version.get()
+            groupId = artifactGroupId
+            version = wpilibVersioning.version.get()
         }
 
         templates(MavenPublication) {
             artifact cppTemplatesZip
 
             artifactId = baseTemplatesArtifactId
-            groupId artifactGroupId
-            version wpilibVersioning.version.get()
+            groupId = artifactGroupId
+            version = wpilibVersioning.version.get()
         }
 
         commands(MavenPublication) {
             artifact cppCommandsZip
 
             artifactId = baseCommandsArtifactId
-            groupId artifactGroupId
-            version wpilibVersioning.version.get()
+            groupId = artifactGroupId
+            version = wpilibVersioning.version.get()
         }
     }
 }

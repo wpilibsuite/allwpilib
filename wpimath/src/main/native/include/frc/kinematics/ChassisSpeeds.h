@@ -71,11 +71,11 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
   constexpr ChassisSpeeds Discretize(units::second_t dt) const {
     // Construct the desired pose after a timestep, relative to the current
     // pose. The desired pose has decoupled translation and rotation.
-    Pose2d desiredDeltaPose{vx * dt, vy * dt, omega * dt};
+    Transform2d desiredTransform{vx * dt, vy * dt, omega * dt};
 
     // Find the chassis translation/rotation deltas in the robot frame that move
     // the robot from its current pose to the desired pose
-    auto twist = Pose2d{}.Log(desiredDeltaPose);
+    auto twist = desiredTransform.Log();
 
     // Turn the chassis translation/rotation deltas into average velocities
     return {twist.dx / dt, twist.dy / dt, twist.dtheta / dt};

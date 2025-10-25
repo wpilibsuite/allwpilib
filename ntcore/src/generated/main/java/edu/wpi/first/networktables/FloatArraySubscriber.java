@@ -9,7 +9,6 @@ package edu.wpi.first.networktables;
 import java.util.function.Supplier;
 
 /** NetworkTables FloatArray subscriber. */
-@SuppressWarnings("PMD.MissingOverride")
 public interface FloatArraySubscriber extends Subscriber, Supplier<float[]> {
   /**
    * Get the corresponding topic.

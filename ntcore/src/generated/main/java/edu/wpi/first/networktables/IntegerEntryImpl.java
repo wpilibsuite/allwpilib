@@ -7,7 +7,6 @@
 package edu.wpi.first.networktables;
 
 /** NetworkTables Integer implementation. */
-@SuppressWarnings("PMD.ArrayIsStoredDirectly")
 final class IntegerEntryImpl extends EntryBase implements IntegerEntry {
   /**
    * Constructor.

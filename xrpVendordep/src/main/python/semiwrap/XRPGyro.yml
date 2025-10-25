@@ -1,0 +1,14 @@
+classes:
+  frc::XRPGyro:
+    methods:
+      XRPGyro:
+      GetAngle:
+      GetRate:
+      GetRateX:
+      GetRateY:
+      GetRateZ:
+      GetAngleX:
+      GetAngleY:
+      GetAngleZ:
+      Reset:
+      GetRotation2d:

@@ -1,0 +1,22 @@
+classes:
+  frc::Watchdog:
+    methods:
+      Watchdog:
+        overloads:
+          units::second_t, std::function<void ()>:
+          units::second_t, Callable&&, Arg&&, Args&&...:
+            ignore: true
+      GetTime:
+      SetTimeout:
+        overloads:
+          double:
+            ignore: true
+          units::second_t:
+      GetTimeout:
+      IsExpired:
+      AddEpoch:
+      PrintEpochs:
+      Reset:
+      Enable:
+      Disable:
+      SuppressTimeoutMessage:

@@ -27,12 +27,25 @@ dependencies {
     implementation project(':epilogue-runtime')
     annotationProcessor project(':epilogue-processor')
 
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.13.4'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+// Prevent the eclipse compiler (used by the VS Code extension for intellisense and debugging)
+// from generating bad class files from annotation processors like Epilogue
+eclipse {
+    classpath {
+        containers 'org.eclipse.buildship.core.gradleclasspathcontainer'
+        file.whenMerged { cp ->
+            def entries = cp.entries;
+            def src = new org.gradle.plugins.ide.eclipse.model.SourceFolder('build/generated/sources/annotationProcessor/java/main/', null)
+            entries.add(src)
+        }
+    }
+}
+
 jacoco {
-    toolVersion = "0.8.10"
+    toolVersion = "0.8.13"
 }
 
 jacocoTestReport {
@@ -160,7 +173,7 @@ model {
 
                             new groovy.json.JsonSlurper().parseText(exampleFile.text).each { entry ->
                                 project.tasks.create("run${entry.foldername}", JavaExec) { run ->
-                                    run.group "run examples"
+                                    run.group = "run examples"
                                     run.mainClass = "edu.wpi.first.wpilibj.examples." + entry.foldername + "." + entry.mainclass
                                     run.classpath = sourceSets.main.runtimeClasspath
                                     run.dependsOn it.tasks.install
@@ -172,7 +185,7 @@ model {
                                     }
                                 }
                                 project.tasks.create("test${entry.foldername}", Test) { testTask ->
-                                    testTask.group "verification"
+                                    testTask.group = "verification"
                                     testTask.useJUnitPlatform()
                                     testTask.filter {
                                         includeTestsMatching("edu.wpi.first.wpilibj.examples.${entry.foldername}.*")
@@ -193,7 +206,7 @@ model {
                                     testTask.systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
                                     testTask.testLogging {
                                         events "failed"
-                                        exceptionFormat "full"
+                                        exceptionFormat = "full"
                                     }
                                     testTask.systemProperty 'java.library.path', filePath
 
@@ -205,7 +218,7 @@ model {
                             }
                             new groovy.json.JsonSlurper().parseText(snippetsFile.text).each { entry ->
                                 project.tasks.create("runSnippet${entry.foldername}", JavaExec) { run ->
-                                    run.group "run snippets"
+                                    run.group = "run snippets"
                                     run.mainClass = "edu.wpi.first.wpilibj.snippets." + entry.foldername + "." + entry.mainclass
                                     run.classpath = sourceSets.main.runtimeClasspath
                                     run.dependsOn it.tasks.install
@@ -217,7 +230,7 @@ model {
                                     }
                                 }
                                 project.tasks.create("testSnippet${entry.foldername}", Test) { testTask ->
-                                    testTask.group "verification"
+                                    testTask.group = "verification"
                                     testTask.useJUnitPlatform()
                                     testTask.filter {
                                         includeTestsMatching("edu.wpi.first.wpilibj.snippets.${entry.foldername}.*")
@@ -234,7 +247,7 @@ model {
                                     testTask.systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
                                     testTask.testLogging {
                                         events "failed"
-                                        exceptionFormat "full"
+                                        exceptionFormat = "full"
                                     }
                                     testTask.systemProperty 'java.library.path', filePath
 

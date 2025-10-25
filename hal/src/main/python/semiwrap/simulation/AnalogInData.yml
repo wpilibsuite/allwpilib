@@ -1,0 +1,28 @@
+strip_prefixes:
+- HALSIM_
+
+functions:
+  HALSIM_ResetAnalogInData:
+  HALSIM_RegisterAnalogInInitializedCallback:
+    ignore: true
+  HALSIM_CancelAnalogInInitializedCallback:
+  HALSIM_GetAnalogInInitialized:
+  HALSIM_SetAnalogInInitialized:
+  HALSIM_GetAnalogInSimDevice:
+  HALSIM_RegisterAnalogInAverageBitsCallback:
+    ignore: true
+  HALSIM_CancelAnalogInAverageBitsCallback:
+  HALSIM_GetAnalogInAverageBits:
+  HALSIM_SetAnalogInAverageBits:
+  HALSIM_RegisterAnalogInOversampleBitsCallback:
+    ignore: true
+  HALSIM_CancelAnalogInOversampleBitsCallback:
+  HALSIM_GetAnalogInOversampleBits:
+  HALSIM_SetAnalogInOversampleBits:
+  HALSIM_RegisterAnalogInVoltageCallback:
+    ignore: true
+  HALSIM_CancelAnalogInVoltageCallback:
+  HALSIM_GetAnalogInVoltage:
+  HALSIM_SetAnalogInVoltage:
+  HALSIM_RegisterAnalogInAllCallbacks:
+    ignore: true

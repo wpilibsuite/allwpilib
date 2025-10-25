@@ -1,0 +1,8 @@
+classes:
+  frc::DifferentialDriveWheelPositions:
+    attributes:
+      left:
+      right:
+    methods:
+      operator==:
+      Interpolate:

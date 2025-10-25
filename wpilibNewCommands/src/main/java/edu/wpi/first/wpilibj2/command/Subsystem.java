@@ -99,6 +99,15 @@ public interface Subsystem {
   }
 
   /**
+   * Constructs a command that does nothing until interrupted. Requires this subsystem.
+   *
+   * @return the command
+   */
+  default Command idle() {
+    return Commands.idle(this);
+  }
+
+  /**
    * Constructs a command that runs an action once and finishes. Requires this subsystem.
    *
    * @param action the action to run

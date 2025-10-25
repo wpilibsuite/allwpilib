@@ -1,4 +1,5 @@
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
+load("@rules_jvm_external//:defs.bzl", "maven_export")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//wpilibjExamples:build_java_examples.bzl", "build_commands", "build_examples", "build_snippets", "build_templates", "build_tests")
 
@@ -46,3 +47,24 @@ build_snippets()
 build_templates()
 
 build_tests()
+
+maven_export(
+    name = "examples_publish",
+    maven_coordinates = "edu.wpi.first.wpilibj:examples:$(WPILIB_VERSION)",
+    target = ":examples-zip",
+    visibility = ["//visibility:public"],
+)
+
+maven_export(
+    name = "commands_publish",
+    maven_coordinates = "edu.wpi.first.wpilibj:commands:$(WPILIB_VERSION)",
+    target = ":commands-zip",
+    visibility = ["//visibility:public"],
+)
+
+maven_export(
+    name = "templates_publish",
+    maven_coordinates = "edu.wpi.first.wpilibj:templates:$(WPILIB_VERSION)",
+    target = ":templates-zip",
+    visibility = ["//visibility:public"],
+)

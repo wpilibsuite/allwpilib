@@ -90,7 +90,6 @@ class Stream : public Handle {
    * complete.  Errors will be reported to the stream error handler.
    *
    * @param callback Callback function to call when shutdown completes
-   * @return Connection object for the callback
    */
   void Shutdown(std::function<void()> callback = nullptr);
 

@@ -99,7 +99,7 @@ public class SwerveModulePosition
   @Override
   public SwerveModulePosition interpolate(SwerveModulePosition endValue, double t) {
     return new SwerveModulePosition(
-        MathUtil.interpolate(this.distance, endValue.distance, t),
+        MathUtil.lerp(this.distance, endValue.distance, t),
         this.angle.interpolate(endValue.angle, t));
   }
 }

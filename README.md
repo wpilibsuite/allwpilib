@@ -56,10 +56,15 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
     - If the WPILib installer was used, this toolchain is already installed
 - Raspberry Pi toolchain (optional)
     - Run `./gradlew installArm32Toolchain` after cloning this repository
+- SystemCore toolchain (required for SystemCore development)
+    - Run `./gradlew installSystemCoreToolchain` after cloning this repository
+    - If the WPILib installer was used, this toolchain is already installed
 
 On macOS ARM, run `softwareupdate --install-rosetta`. This is necessary to be able to use the macOS x86 roboRIO toolchain on ARM.
 
 On linux, run `sudo apt install gfortran`. This is necessary to be able to build WPIcal on linux platforms.
+
+On linux, run `sudo apt install libx11-dev libgl-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev` to be able to build things depending on glfw.
 
 ## Setup
 

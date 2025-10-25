@@ -14,6 +14,8 @@ extern "C" struct GLFWwindow;
 
 namespace wpi::gui {
 
+struct Context;
+
 /**
  * Creates GUI context.  Must be called prior to calling any other functions.
  */
@@ -23,6 +25,20 @@ void CreateContext();
  * Destroys GUI context.
  */
 void DestroyContext();
+
+/**
+ * Gets GUI context.
+ *
+ * @return context
+ */
+Context* GetCurrentContext();
+
+/**
+ * Sets GUI context.
+ *
+ * @param context context
+ */
+void SetCurrentContext(Context* context);
 
 /**
  * Initializes the GUI.

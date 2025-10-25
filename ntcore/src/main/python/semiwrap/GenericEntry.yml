@@ -1,0 +1,86 @@
+extra_includes:
+- src/nt_type_caster.h
+
+classes:
+  nt::GenericSubscriber:
+    methods:
+      GenericSubscriber:
+        overloads:
+          '':
+            ignore: true
+          NT_Subscriber:
+            ignore: true
+      Get:
+      GetBoolean:
+      GetInteger:
+      GetFloat:
+      GetDouble:
+      GetString:
+      GetRaw:
+      GetBooleanArray:
+      GetIntegerArray:
+      GetFloatArray:
+      GetDoubleArray:
+      GetStringArray:
+      ReadQueue:
+      GetTopic:
+  nt::GenericPublisher:
+    methods:
+      GenericPublisher:
+        overloads:
+          '':
+            ignore: true
+          NT_Publisher:
+            ignore: true
+      Set:
+      SetBoolean:
+      SetInteger:
+      SetFloat:
+      SetDouble:
+      SetString:
+      SetRaw:
+      SetBooleanArray:
+        overloads:
+          std::span<const bool>, int64_t:
+          std::span<const int>, int64_t:
+      SetIntegerArray:
+      SetFloatArray:
+      SetDoubleArray:
+      SetStringArray:
+      SetDefault:
+      SetDefaultBoolean:
+      SetDefaultInteger:
+      SetDefaultFloat:
+      SetDefaultDouble:
+      SetDefaultString:
+      SetDefaultRaw:
+      SetDefaultBooleanArray:
+      SetDefaultIntegerArray:
+      SetDefaultFloatArray:
+      SetDefaultDoubleArray:
+      SetDefaultStringArray:
+      GetTopic:
+  nt::GenericEntry:
+    methods:
+      GenericEntry:
+        overloads:
+          '':
+            ignore: true
+          NT_Entry:
+            ignore: true
+      GetHandle:
+        ignore: true
+      GetTopic:
+      Unpublish:
+    inline_code: |
+      .def("close", [](GenericEntry *self) {
+        py::gil_scoped_release release;
+        *self = GenericEntry();
+      }, py::doc("Destroys the entry"))
+      .def("__enter__", [](GenericEntry *self) {
+        return self;
+      })
+      .def("__exit__", [](GenericEntry *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = GenericEntry();
+      })

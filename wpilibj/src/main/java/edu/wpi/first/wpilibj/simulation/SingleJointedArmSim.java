@@ -4,7 +4,6 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
@@ -117,8 +116,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
    * @param velocityRadPerSec The new angular velocity in radians per second.
    */
   public final void setState(double angleRadians, double velocityRadPerSec) {
-    setState(
-        VecBuilder.fill(MathUtil.clamp(angleRadians, m_minAngle, m_maxAngle), velocityRadPerSec));
+    setState(VecBuilder.fill(Math.clamp(angleRadians, m_minAngle, m_maxAngle), velocityRadPerSec));
   }
 
   /**

@@ -9,7 +9,7 @@ package edu.wpi.first.units.measure;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 
-@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle"})
 public record Velocity<D extends Unit>(double magnitude, double baseUnitMagnitude, VelocityUnit<D> unit) implements Measure<VelocityUnit<D>> {
   /**
    * For doing math with measures of a known dimension but an unknown unit. Most users should use
@@ -25,7 +25,7 @@ public record Velocity<D extends Unit>(double magnitude, double baseUnitMagnitud
   /**
    * For doing math with measures of a known dimension but an unknown unit. Most users should use
    * {@link VelocityUnit#of(double)} on a known unit from {@link Units} instead of calling this method.
-   * @param magnitude the magnitude of the measurement in terms of the given unit's base unit
+   * @param baseUnitMagnitude the magnitude of the measurement in terms of the given unit's base unit
    * @param unit the unit of the measurement
    * @return a measurement object
    */

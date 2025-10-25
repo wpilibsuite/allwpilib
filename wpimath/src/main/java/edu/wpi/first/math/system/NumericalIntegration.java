@@ -19,9 +19,9 @@ public final class NumericalIntegration {
   }
 
   /**
-   * Performs Runge Kutta integration (4th order).
+   * Performs 4th order Runge-Kutta integration of dx/dt = f(x) for dt.
    *
-   * @param f The function to integrate, which takes one argument x.
+   * @param f The function to integrate. It must take one argument x.
    * @param x The initial value of x.
    * @param dt The time over which to integrate in seconds.
    * @return the integration of dx/dt = f(x) for dt.
@@ -37,13 +37,13 @@ public final class NumericalIntegration {
   }
 
   /**
-   * Performs Runge Kutta integration (4th order).
+   * Performs 4th order Runge-Kutta integration of dx/dt = f(x, u) for dt.
    *
    * @param f The function to integrate. It must take two arguments x and u.
    * @param x The initial value of x.
    * @param u The value u held constant over the integration period.
    * @param dt The time over which to integrate in seconds.
-   * @return The result of Runge Kutta integration (4th order).
+   * @return the integration of dx/dt = f(x, u) for dt.
    */
   public static double rk4(DoubleBinaryOperator f, double x, double u, double dt) {
     final var h = dt;
@@ -89,7 +89,7 @@ public final class NumericalIntegration {
    * @param f The function to integrate. It must take one argument x.
    * @param x The initial value of x.
    * @param dt The time over which to integrate in seconds.
-   * @return 4th order Runge-Kutta integration of dx/dt = f(x) for dt.
+   * @return the integration of dx/dt = f(x) for dt.
    */
   public static <States extends Num> Matrix<States, N1> rk4(
       UnaryOperator<Matrix<States, N1>> f, Matrix<States, N1> x, double dt) {

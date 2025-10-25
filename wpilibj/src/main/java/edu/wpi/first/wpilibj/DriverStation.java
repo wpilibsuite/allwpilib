@@ -376,7 +376,6 @@ public final class DriverStation {
       System.arraycopy(axes.m_axes, 0, m_prevAxes.m_axes, 0, count);
     }
 
-    @SuppressWarnings("PMD.AvoidArrayLoops")
     void appendPOVs(HALJoystickPOVs povs, long timestamp) {
       int count = availableToCount(povs.m_available);
       if (m_sizedPOVs == null || m_sizedPOVs.length != count) {
@@ -1235,33 +1234,6 @@ public final class DriverStation {
    */
   public static AllianceStationID getRawAllianceStation() {
     return DriverStationJNI.getAllianceStation();
-  }
-
-  /**
-   * Wait for a DS connection.
-   *
-   * @param timeout timeout in seconds. 0 for infinite.
-   * @return true if connected, false if timeout
-   */
-  public static boolean waitForDsConnection(double timeout) {
-    int event = WPIUtilJNI.createEvent(true, false);
-    DriverStationJNI.provideNewDataEventHandle(event);
-    boolean result;
-    try {
-      if (timeout == 0) {
-        WPIUtilJNI.waitForObject(event);
-        result = true;
-      } else {
-        result = !WPIUtilJNI.waitForObjectTimeout(event, timeout);
-      }
-    } catch (InterruptedException ex) {
-      Thread.currentThread().interrupt();
-      result = false;
-    } finally {
-      DriverStationJNI.removeNewDataEventHandle(event);
-      WPIUtilJNI.destroyEvent(event);
-    }
-    return result;
   }
 
   /**

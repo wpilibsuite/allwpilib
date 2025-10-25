@@ -13,16 +13,14 @@
 #include <utility>
 #include <vector>
 
+#include <upb/mem/arena.h>
+#include <upb/reflection/def.h>
 #include <wpi/DenseMap.h>
 #include <wpi/Signal.h>
 #include <wpi/mutex.h>
 #include <wpi/struct/DynamicStruct.h>
 
 #include "wpi/datalog/DataLogReader.h"
-
-#ifndef NO_PROTOBUF
-#include <wpi/protobuf/ProtobufMessageDatabase.h>
-#endif
 
 namespace wpi::log {
 
@@ -78,10 +76,18 @@ class DataLogReaderThread {
     return &it->second;
   }
 
+  const DataLogReaderEntry* GetEntry(int entry) const {
+    std::scoped_lock lock{m_mutex};
+    auto it = m_entriesById.find(entry);
+    if (it == m_entriesById.end()) {
+      return nullptr;
+    }
+    return it->second;
+  }
+
   wpi::StructDescriptorDatabase& GetStructDatabase() { return m_structDb; }
-#ifndef NO_PROTOBUF
-  wpi::ProtobufMessageDatabase& GetProtobufDatabase() { return m_protoDb; }
-#endif
+  upb_DefPool* GetProtobufDatabase() { return m_protoPool; }
+  upb_Arena* GetProtobufArena() { return m_arena; }
 
   const wpi::log::DataLogReader& GetReader() const { return m_reader; }
 
@@ -100,9 +106,8 @@ class DataLogReaderThread {
   std::map<std::string, DataLogReaderEntry, std::less<>> m_entriesByName;
   wpi::DenseMap<int, DataLogReaderEntry*> m_entriesById;
   wpi::StructDescriptorDatabase m_structDb;
-#ifndef NO_PROTOBUF
-  wpi::ProtobufMessageDatabase m_protoDb;
-#endif
+  upb_DefPool* m_protoPool = upb_DefPool_New();
+  upb_Arena* m_arena = upb_Arena_New();
   std::thread m_thread;
 };
 

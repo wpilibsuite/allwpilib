@@ -35,6 +35,7 @@ build:build_java --test_tag_filters=allwpilib-build-java --build_tag_filters=all
 build:build_cpp --test_tag_filters=+allwpilib-build-cpp --build_tag_filters=+allwpilib-build-cpp
 build:no_example --test_tag_filters=-wpi-example --build_tag_filters=-wpi-example
 test:no_example --test_tag_filters=-wpi-example --build_tag_filters=-wpi-example
+common:skip_robotpy --test_tag_filters=-robotpy --build_tag_filters=-robotpy
 
 # Build Buddy Cache Setup
 build:build_buddy --bes_results_url=https://app.buildbuddy.io/invocation/
@@ -67,3 +68,8 @@ common --define="WPILIB_VERSION=2025.424242.3.1-unknown"
 # List of artifact types to build in CI.
 # Anything else gets skipped to speed up CI.
 common:ci --repo_env="WPI_PUBLISH_CLASSIFIER_FILTER=headers,sources,linuxsystemcore,linuxsystemcoredebug,linuxsystemcorestatic,linuxsystemcorestaticdebug,linuxx86-64,linuxx86-64debug,linuxx86-64static,linuxx86-64staticdebug,osxuniversal,osxuniversaldebug,osxuniversalstatic,osxuniversalstaticdebug,windowsarm64,windowsarm64debug,windowsarm64static,windowsarm64staticdebug,windowsx86-64,windowsx86-64debug,windowsx86-64static,windowsx86-64staticdebug"
+
+# The 2 configurations for windows are very slow to build each time.
+# Instead, skip the cross transition for ARM on x86, and the reverse on x86.
+common:ci_windows_x86 --repo_env="WPI_PUBLISH_CLASSIFIER_FILTER=headers,sources,linuxsystemcore,linuxsystemcoredebug,linuxsystemcorestatic,linuxsystemcorestaticdebug,linuxx86-64,linuxx86-64debug,linuxx86-64static,linuxx86-64staticdebug,osxuniversal,osxuniversaldebug,osxuniversalstatic,osxuniversalstaticdebug,windowsx86-64,windowsx86-64debug,windowsx86-64static,windowsx86-64staticdebug"
+common:ci_windows_arm --repo_env="WPI_PUBLISH_CLASSIFIER_FILTER=headers,sources,linuxsystemcore,linuxsystemcoredebug,linuxsystemcorestatic,linuxsystemcorestaticdebug,linuxx86-64,linuxx86-64debug,linuxx86-64static,linuxx86-64staticdebug,osxuniversal,osxuniversaldebug,osxuniversalstatic,osxuniversalstaticdebug,windowsarm64,windowsarm64debug,windowsarm64static,windowsarm64staticdebug"

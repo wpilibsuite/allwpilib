@@ -5,7 +5,7 @@ if (project.hasProperty('skipJavaFormat')) {
 apply plugin: 'checkstyle'
 
 checkstyle {
-    toolVersion = "10.26.1"
+    toolVersion = "11.0.0"
     configDirectory = file("${project.rootDir}/styleguide")
     config = resources.text.fromFile(new File(configDirectory.get().getAsFile(), "checkstyle.xml"))
 }
@@ -13,7 +13,7 @@ checkstyle {
 apply plugin: 'pmd'
 
 pmd {
-    toolVersion = '7.2.0'
+    toolVersion = '7.16.0'
     consoleOutput = true
     reportsDir = file("$project.buildDir/reports/pmd")
     ruleSetFiles = files(new File(rootDir, "styleguide/pmd-ruleset.xml"))
@@ -40,7 +40,7 @@ spotless {
             exclude '**/build/**', '**/build-*/**', '**/bin/**'
         }
         greclipse()
-        indentWithSpaces(4)
+        leadingTabsToSpaces(4)
         trimTrailingWhitespace()
         endWithNewline()
     }
@@ -60,7 +60,7 @@ spotless {
         }
         eclipseWtp('xml')
         trimTrailingWhitespace()
-        indentWithSpaces(2)
+        leadingTabsToSpaces(2)
         endWithNewline()
     }
     format 'misc', {
@@ -69,7 +69,7 @@ spotless {
             exclude '**/build/**', '**/build-*/**', '**/bin/**'
         }
         trimTrailingWhitespace()
-        indentWithSpaces(2)
+        leadingTabsToSpaces(2)
         endWithNewline()
     }
 }

@@ -8,7 +8,6 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDevice.Direction;
 import edu.wpi.first.hal.SimDouble;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -130,12 +129,12 @@ public class SharpIR implements Sendable, AutoCloseable {
    */
   public double getRange() {
     if (m_simRange != null) {
-      return MathUtil.clamp(m_simRange.get(), m_min, m_max);
+      return Math.clamp(m_simRange.get(), m_min, m_max);
     } else {
       // Don't allow zero/negative values
       var v = Math.max(m_sensor.getVoltage(), 0.00001);
 
-      return MathUtil.clamp(m_A * Math.pow(v, m_B) * 1e-2, m_min, m_max);
+      return Math.clamp(m_A * Math.pow(v, m_B) * 1e-2, m_min, m_max);
     }
   }
 

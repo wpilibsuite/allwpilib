@@ -1,0 +1,39 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [
+    "hatchling",
+    "hatch-nativelib~=0.2.0",
+    "hatch-robotpy~=0.2.1",
+    "robotpy-native-wpilib==2027.0.0a2",
+]
+
+[project]
+name = "robotpy-native-romi"
+version = "2027.0.0a2"
+description = "WPILib Romi support library"
+license = "BSD-3-Clause"
+
+dependencies = [
+    "robotpy-native-wpilib==2027.0.0a2",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/native"]
+
+[[tool.hatch.build.hooks.robotpy.maven_lib_download]]
+artifact_id = "romiVendordep-cpp"
+group_id = "edu.wpi.first.romiVendordep"
+repo_url = "https://frcmaven.wpi.edu/artifactory/release-2027"
+version = "2027.0.0-alpha-2"
+
+extract_to = "src/native/romi"
+libs = ["romiVendordep"]
+
+[[tool.hatch.build.hooks.nativelib.pcfile]]
+pcfile = "src/native/romi/robotpy-native-romi.pc"
+name = "romi"
+
+includedir = "src/native/romi/include"
+libdir = "src/native/romi/lib"
+shared_libraries = ["romiVendordep"]
+requires = ["robotpy-native-wpilib"]

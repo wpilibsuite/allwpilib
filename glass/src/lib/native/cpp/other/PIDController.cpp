@@ -31,8 +31,8 @@ void glass::DisplayPIDController(PIDControllerModel* m) {
         [flag](const char* name, double* v,
                std::function<void(double)> callback) {
           ImGui::SetNextItemWidth(ImGui::GetFontSize() * 4);
-          if (ImGui::InputScalar(name, ImGuiDataType_Double, v, NULL, NULL,
-                                 "%.3f", flag)) {
+          if (ImGui::InputScalar(name, ImGuiDataType_Double, v, nullptr,
+                                 nullptr, "%.3f", flag)) {
             callback(*v);
           }
         };

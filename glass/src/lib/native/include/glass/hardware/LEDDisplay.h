@@ -20,9 +20,9 @@ namespace glass {
 class LEDDisplayModel : public glass::Model {
  public:
   struct Data {
-    uint8_t b;
-    uint8_t g;
     uint8_t r;
+    uint8_t g;
+    uint8_t b;
   };
 
   virtual std::span<const Data> GetData(wpi::SmallVectorImpl<Data>& buf) = 0;

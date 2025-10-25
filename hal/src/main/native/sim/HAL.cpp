@@ -241,14 +241,6 @@ void HALSIM_SetRuntimeType(HAL_RuntimeType type) {
   runtimeType = type;
 }
 
-int32_t HAL_GetFPGAVersion(int32_t* status) {
-  return 2018;  // Automatically script this at some point
-}
-
-int64_t HAL_GetFPGARevision(int32_t* status) {
-  return 0;  // TODO: Find a better number to return;
-}
-
 void HAL_GetSerialNumber(struct WPI_String* serialNumber) {
   HALSIM_GetRoboRioSerialNumber(serialNumber);
 }

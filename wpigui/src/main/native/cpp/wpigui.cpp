@@ -169,6 +169,14 @@ void gui::DestroyContext() {
   gContext = nullptr;
 }
 
+Context* gui::GetCurrentContext() {
+  return gContext;
+}
+
+void gui::SetCurrentContext(Context* context) {
+  gContext = context;
+}
+
 static void UpdateFontScale() {
   // Scale based on OS window content scaling
   float windowScale = 1.0;

@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -184,5 +185,18 @@ class LazyBackendTest {
         new byte[] {0x00, 0x00, 0x00, 0x00}, (byte[]) backend.getEntries().get(0).value());
     assertArrayEquals(
         new byte[] {0x01, 0x00, 0x00, 0x00}, (byte[]) backend.getEntries().get(1).value());
+  }
+
+  @Test
+  void lazyProtobuf() {
+    var backend = new TestBackend();
+    var lazy = new LazyBackend(backend);
+
+    var rotation = Rotation2d.kZero;
+    lazy.log("rotation", rotation, Rotation2d.proto);
+    assertEquals(1, backend.getEntries().size());
+    var entry = backend.getEntries().get(0);
+    assertEquals("rotation", entry.identifier());
+    assertArrayEquals(new byte[] {9, 0, 0, 0, 0, 0, 0, 0, 0}, (byte[]) entry.value());
   }
 }

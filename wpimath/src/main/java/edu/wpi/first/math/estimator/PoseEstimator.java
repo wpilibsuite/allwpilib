@@ -5,7 +5,6 @@
 package edu.wpi.first.math.estimator;
 
 import edu.wpi.first.math.MathSharedStore;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
@@ -187,7 +186,7 @@ public class PoseEstimator<T> {
     // the buffer will always use a timestamp between the first and last timestamps)
     double oldestOdometryTimestamp = m_odometryPoseBuffer.getInternalBuffer().firstKey();
     double newestOdometryTimestamp = m_odometryPoseBuffer.getInternalBuffer().lastKey();
-    timestamp = MathUtil.clamp(timestamp, oldestOdometryTimestamp, newestOdometryTimestamp);
+    timestamp = Math.clamp(timestamp, oldestOdometryTimestamp, newestOdometryTimestamp);
 
     // Step 2: If there are no applicable vision updates, use the odometry-only information.
     if (m_visionUpdates.isEmpty() || timestamp < m_visionUpdates.firstKey()) {
@@ -272,7 +271,7 @@ public class PoseEstimator<T> {
     }
 
     // Step 4: Measure the twist between the old pose estimate and the vision pose.
-    var twist = visionSample.get().log(visionRobotPose);
+    var twist = visionRobotPose.minus(visionSample.get()).log();
 
     // Step 5: We should not trust the twist entirely, so instead we scale this twist by a Kalman
     // gain matrix representing how much we trust vision measurements compared to our current pose.
@@ -283,7 +282,8 @@ public class PoseEstimator<T> {
         new Twist2d(k_times_twist.get(0, 0), k_times_twist.get(1, 0), k_times_twist.get(2, 0));
 
     // Step 7: Calculate and record the vision update.
-    var visionUpdate = new VisionUpdate(visionSample.get().exp(scaledTwist), odometrySample.get());
+    var visionUpdate =
+        new VisionUpdate(visionSample.get().plus(scaledTwist.exp()), odometrySample.get());
     m_visionUpdates.put(timestamp, visionUpdate);
 
     // Step 8: Remove later vision measurements. (Matches previous behavior)
