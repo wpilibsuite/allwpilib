@@ -90,8 +90,8 @@ TEST(DriverStationTest, Joystick) {
   EXPECT_EQ(0, povs.povs[5]);  // Should not have been set, still 0
   EXPECT_EQ(0, povs.povs[6]);  // Should not have been set, still 0
 
-  EXPECT_EQ(0xFF, buttons.available);
-  EXPECT_EQ(0xDEADBEEFu, buttons.buttons);
+  EXPECT_EQ(0xFFllu, buttons.available);
+  EXPECT_EQ(0xDEADBEEFllu, buttons.buttons);
 
   // Reset
   HALSIM_ResetDriverStationData();
@@ -113,8 +113,8 @@ TEST(DriverStationTest, Joystick) {
       EXPECT_EQ(0, povs.povs[i]);
     }
 
-    EXPECT_EQ(0, buttons.available);
-    EXPECT_EQ(0u, buttons.buttons);
+    EXPECT_EQ(0llu, buttons.available);
+    EXPECT_EQ(0llu, buttons.buttons);
   }
 }
 
