@@ -108,7 +108,7 @@ void DSCommPacket::ReadJoystickTag(std::span<const uint8_t> dataInput,
       stick.axes.axes[i] = value / 127.0;
     }
   }
-  stick.axes.count = axesLength;
+  stick.axes.available = (1 << axesLength) - 1;
 
   dataInput = dataInput.subspan(1 + axesLength);
 
@@ -119,7 +119,12 @@ void DSCommPacket::ReadJoystickTag(std::span<const uint8_t> dataInput,
   for (int i = 0; i < numBytes; i++) {
     stick.buttons.buttons |= dataInput[numBytes - i] << (8 * (i));
   }
-  stick.buttons.count = buttonCount;
+
+  if (buttonCount < 64) {
+    stick.buttons.available = (1ULL << buttonCount) - 1;
+  } else {
+    stick.buttons.available = (std::numeric_limits<uint64_t>::max)();
+  }
 
   dataInput = dataInput.subspan(1 + numBytes);
 
@@ -129,7 +134,7 @@ void DSCommPacket::ReadJoystickTag(std::span<const uint8_t> dataInput,
         DegreesToPOV((dataInput[1 + i] << 8) | dataInput[2 + i]);
   }
 
-  stick.povs.count = povsLength;
+  stick.povs.available = (1 << povsLength) - 1;
 
   return;
 }
@@ -264,17 +269,6 @@ void DSCommPacket::ReadJoystickDescriptionTag(std::span<const uint8_t> data) {
   }
   data = data.subspan(4 + nameLength);
   packet.descriptor.name[nameLength] = '\0';
-  int axesCount = data[0];
-  packet.descriptor.axisCount = axesCount;
-  for (int i = 0,
-           len = std::min<int>(axesCount, sizeof(packet.descriptor.axisTypes));
-       i < len; i++) {
-    packet.descriptor.axisTypes[i] = data[1 + i];
-  }
-  data = data.subspan(1 + axesCount);
-
-  packet.descriptor.buttonCount = data[0];
-  packet.descriptor.povCount = data[1];
 }
 
 void DSCommPacket::SendJoysticks(void) {
