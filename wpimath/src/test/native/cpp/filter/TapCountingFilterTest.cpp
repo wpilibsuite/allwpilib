@@ -5,12 +5,12 @@
 #include <gtest/gtest.h>
 #include <wpi/timestamp.h>
 
-#include "frc/filter/TapCountFilter.h"
+#include "frc/filter/MultiTapFilter.h"
 #include "units/time.h"
 
 static units::second_t now = 0_s;
 
-class TapCountFilterTest : public ::testing::Test {
+class MultiTapFilterTest : public ::testing::Test {
  protected:
   void SetUp() override {
     WPI_SetNowImpl([] { return units::microsecond_t{now}.to<uint64_t>(); });
@@ -19,8 +19,8 @@ class TapCountFilterTest : public ::testing::Test {
   void TearDown() override { WPI_SetNowImpl(nullptr); }
 };
 
-TEST_F(TapCountFilterTest, TapCountFilterActivated) {
-  frc::TapCountFilter filter{2, 0.2_s};
+TEST_F(MultiTapFilterTest, MultiTapFilterActivated) {
+  frc::MultiTapFilter filter{2, 0.2_s};
 
   EXPECT_FALSE(filter.Calculate(true));  // First tap
 
@@ -40,8 +40,8 @@ TEST_F(TapCountFilterTest, TapCountFilterActivated) {
   EXPECT_FALSE(filter.Calculate(false));  // Input false, should reset
 }
 
-TEST_F(TapCountFilterTest, TapCountFilterExpired) {
-  frc::TapCountFilter filter{2, 0.2_s};
+TEST_F(MultiTapFilterTest, MultiTapFilterExpired) {
+  frc::MultiTapFilter filter{2, 0.2_s};
 
   EXPECT_FALSE(filter.Calculate(true));  // First tap
 
@@ -55,8 +55,8 @@ TEST_F(TapCountFilterTest, TapCountFilterExpired) {
   EXPECT_FALSE(filter.Calculate(true));  // Still false
 }
 
-TEST_F(TapCountFilterTest, TapCountFilterParams) {
-  frc::TapCountFilter filter{2, 0.2_s};
+TEST_F(MultiTapFilterTest, MultiTapFilterParams) {
+  frc::MultiTapFilter filter{2, 0.2_s};
 
   EXPECT_EQ(filter.GetRequiredTaps(), 2);
   EXPECT_EQ(filter.GetTapWindow(), 0.2_s);

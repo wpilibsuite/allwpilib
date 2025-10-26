@@ -22,17 +22,17 @@ namespace frc {
  * <p>Input must be stable; consider using a Debouncer before this filter to
  * avoid counting noise as multiple taps.
  */
-class WPILIB_DLLEXPORT TapCountFilter {
+class WPILIB_DLLEXPORT MultiTapFilter {
  public:
   /**
-   * Creates a new TapCountFilter.
+   * Creates a new MultiTapFilter.
    *
    * @param requiredTaps The number of rising edges (taps) required before the
    *                     output goes true.
    * @param tapWindow The maximum time window in which all required taps must
    *                  occur after the first rising edge.
    */
-  explicit TapCountFilter(int requiredTaps, units::second_t tapWindow);
+  explicit MultiTapFilter(int requiredTaps, units::second_t tapWindow);
 
   /**
    * Applies the tap counter filter to the input stream.

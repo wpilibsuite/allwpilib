@@ -13,7 +13,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class TapCountFilterTest {
+class MultiTapFilterTest {
   @BeforeEach
   void setUp() {
     WPIUtilJNI.enableMockTime();
@@ -27,8 +27,8 @@ class TapCountFilterTest {
   }
 
   @Test
-  void tapCountFilterActivatedTest() {
-    var filter = new TapCountFilter(2, 0.2);
+  void multiTapFilterActivatedTest() {
+    var filter = new MultiTapFilter(2, 0.2);
 
     assertFalse(filter.calculate(true)); // First tap
 
@@ -49,8 +49,8 @@ class TapCountFilterTest {
   }
 
   @Test
-  void tapCountFilterExpiredTest() {
-    var filter = new TapCountFilter(2, 0.2);
+  void multiTapFilterExpiredTest() {
+    var filter = new MultiTapFilter(2, 0.2);
 
     assertFalse(filter.calculate(true)); // First tap
 
@@ -65,8 +65,8 @@ class TapCountFilterTest {
   }
 
   @Test
-  void tapCountFilterParamsTest() {
-    var filter = new TapCountFilter(2, 0.2);
+  void multiTapFilterParamsTest() {
+    var filter = new MultiTapFilter(2, 0.2);
 
     assertEquals(filter.getRequiredTaps(), 2);
     assertEquals(filter.getTapWindowSeconds(), 0.2);

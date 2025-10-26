@@ -15,7 +15,7 @@ import edu.wpi.first.math.MathSharedStore;
  * <p>Input must be stable; consider using a Debouncer before this filter to avoid counting noise as
  * multiple taps.
  */
-public class TapCountFilter {
+public class MultiTapFilter {
 
   private int m_requiredTaps = 0;
   private double m_tapWindowSeconds;
@@ -26,13 +26,13 @@ public class TapCountFilter {
   private boolean m_lastInput = false;
 
   /**
-   * Creates a new TapCountFilter.
+   * Creates a new MultiTapFilter.
    *
    * @param requiredTaps The number of rising edges (taps) required before the output goes true.
    * @param tapWindowSeconds The maximum time window in which all required taps must occur after the
    *     first rising edge.
    */
-  public TapCountFilter(int requiredTaps, double tapWindowSeconds) {
+  public MultiTapFilter(int requiredTaps, double tapWindowSeconds) {
     m_requiredTaps = requiredTaps;
     m_tapWindowSeconds = tapWindowSeconds;
 

@@ -2,26 +2,26 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/filter/TapCountFilter.h"
+#include "frc/filter/MultiTapFilter.h"
 #include "wpimath/MathShared.h"
 
 using namespace frc;
 
-TapCountFilter::TapCountFilter(int requiredTaps, units::second_t tapWindow)
+MultiTapFilter::MultiTapFilter(int requiredTaps, units::second_t tapWindow)
     : m_requiredTaps(requiredTaps), m_tapWindow(tapWindow) {
   ResetTimer();
 }
 
-void TapCountFilter::ResetTimer() {
+void MultiTapFilter::ResetTimer() {
   m_firstTapTime = wpi::math::MathSharedStore::GetTimestamp();
 }
 
-bool TapCountFilter::HasElapsed() const {
+bool MultiTapFilter::HasElapsed() const {
   return wpi::math::MathSharedStore::GetTimestamp() - m_firstTapTime >=
          m_tapWindow;
 }
 
-bool TapCountFilter::Calculate(bool input) {
+bool MultiTapFilter::Calculate(bool input) {
   // Detect rising edge
   if (input && !m_lastInput) {
     if (m_currentTapCount == 0) {
