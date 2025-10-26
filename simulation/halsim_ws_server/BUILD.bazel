@@ -1,6 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
-load("//shared/bazel/rules:packaging.bzl", "package_minimal_cc_project")
+load("//shared/bazel/rules:halsim_library.bzl", "wpilib_halsim_extension")
 
 cc_library(
     name = "headers",
@@ -8,66 +7,24 @@ cc_library(
     includes = ["src/main/native/include"],
 )
 
-wpilib_cc_library(
+wpilib_halsim_extension(
     name = "halsim_ws_server",
     srcs = glob(["src/main/native/cpp/**"]),
-    include_license_files = True,
-    target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
-    visibility = ["//visibility:public"],
-    deps = [
-        ":headers",
-        "//simulation/halsim_ws_core",
-    ],
-)
-
-wpilib_cc_library(
-    name = "halsim_ws_server_static",
-    srcs = glob(["src/main/native/cpp/**"]),
-    copts = [
-        "-DHALSIM_InitExtension=HALSIM_InitExtension_WS_SERVER",
-    ],
-    include_license_files = True,
-    target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
-    visibility = ["//visibility:public"],
-    deps = [
-        ":headers",
-        "//simulation/halsim_ws_core",
-    ],
-)
-
-wpilib_cc_shared_library(
-    name = "shared/halsim_ws_server",
-    auto_export_windows_symbols = False,
     dynamic_deps = [
         "//hal:shared/wpiHal",
         "//wpinet:shared/wpinet",
         "//wpiutil:shared/wpiutil",
     ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":halsim_ws_server",
-    ],
-)
-
-wpilib_cc_static_library(
-    name = "static/halsim_ws_server",
     static_deps = [
         "//hal:static/wpiHal",
         "//wpinet:static/wpinet",
         "//wpiutil:static/wpiutil",
         "//simulation/halsim_ws_core:static/halsim_ws_core",
     ],
-    visibility = ["//visibility:public"],
+    static_init_extension_name = "HALSIM_InitExtension_WS_SERVER",
     deps = [
-        ":halsim_ws_server_static",
+        ":headers",
+        "//simulation/halsim_ws_core",
     ],
 )
 
@@ -98,10 +55,4 @@ cc_binary(
     deps = [
         ":halsim_ws_server",
     ],
-)
-
-package_minimal_cc_project(
-    name = "halsim_ws_server",
-    maven_artifact_name = "halsim_ws_server",
-    maven_group_id = "edu.wpi.first.halsim",
 )
