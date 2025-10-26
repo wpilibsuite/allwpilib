@@ -106,7 +106,7 @@ void HALSimWSProviderJoystick::OnNetValueChanged(const wpi::json& json) {
         std::min(it.value().size(),
                  static_cast<wpi::json::size_type>(HAL_kMaxJoystickAxes));
     axes.available = (1 << axesCount) - 1;
-    for (int i = 0; i < axesCount; i++) {
+    for (wpi::json::size_type i = 0; i < axesCount; i++) {
       axes.axes[i] = it.value()[i];
     }
 
@@ -122,7 +122,7 @@ void HALSimWSProviderJoystick::OnNetValueChanged(const wpi::json& json) {
     } else {
       buttons.available = (std::numeric_limits<uint64_t>::max)();
     }
-    for (int i = 0; i < buttonsCount; i++) {
+    for (wpi::json::size_type i = 0; i < buttonsCount; i++) {
       if (it.value()[i]) {
         buttons.buttons |= 1llu << i;
       }
@@ -137,7 +137,7 @@ void HALSimWSProviderJoystick::OnNetValueChanged(const wpi::json& json) {
         std::min(it.value().size(),
                  static_cast<wpi::json::size_type>(HAL_kMaxJoystickPOVs));
     povs.available = (1 << povsCount) - 1;
-    for (int i = 0; i < povsCount; i++) {
+    for (wpi::json::size_type i = 0; i < povsCount; i++) {
       povs.povs[i] = it.value()[i];
     }
 

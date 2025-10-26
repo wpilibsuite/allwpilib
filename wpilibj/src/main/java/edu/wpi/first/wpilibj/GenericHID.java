@@ -364,6 +364,11 @@ public class GenericHID {
     }
   }
 
+  /**
+   * Get the maximum axis index for the joystick.
+   *
+   * @return the maximum axis index for the joystick
+   */
   public int getAxesMaximumIndex() {
     return DriverStation.getStickAxesMaximumIndex(m_port);
   }
@@ -377,6 +382,11 @@ public class GenericHID {
     return DriverStation.getStickAxesAvailable(m_port);
   }
 
+  /**
+   * Get the maximum POV index for the joystick.
+   *
+   * @return the maximum POV index for the joystick
+   */
   public int getPOVsMaximumIndex() {
     return DriverStation.getStickPOVsMaximumIndex(m_port);
   }
@@ -390,6 +400,11 @@ public class GenericHID {
     return DriverStation.getStickPOVsAvailable(m_port);
   }
 
+  /**
+   * Get the maximum button index for the joystick.
+   *
+   * @return the maximum button index for the joystick
+   */
   public int getButtonsMaximumIndex() {
     return DriverStation.getStickButtonsMaximumIndex(m_port);
   }
