@@ -69,19 +69,19 @@ public class SysIdRoutine extends SysIdRoutineLog {
     /** Optional handle for recording test state in a third-party logging solution. */
     public final Consumer<State> m_recordState;
 
-    /** Default voltage ramp rate used in quasistatic test routines, set to 1 volt per second.*/
+    /** Default voltage ramp rate used in quasistatic test routines, set to 1 volt per second. */
     public static final Velocity<VoltageUnit> DEFAULT_RAMP_RATE = Volts.of(1).per(Second);
 
-    /** Default step voltage used in dynamic test routines, set to 7 volts.*/
+    /** Default step voltage used in dynamic test routines, set to 7 volts. */
     public static final Voltage DEFAULT_STEP_VOLTAGE = Volts.of(7);
 
-    /** Default timeout used to automatically end test routine commands, set to 10 seconds.*/
+    /** Default timeout used to automatically end test routine commands, set to 10 seconds. */
     public static final Time DEFAULT_TIMEOUT = Seconds.of(10);
 
     /**
-     * Create a new configuration for a SysId test routine. To use the default config values, 
-     * pass in the provided static default fields.
-     * 
+     * Create a new configuration for a SysId test routine. To use the default config values, pass
+     * in the provided static default fields.
+     *
      * @param rampRate The voltage ramp rate used for quasistatic test routines.
      * @param stepVoltage The step voltage output used for dynamic test routines.
      * @param timeout Safety timeout for the test routine commands.
@@ -110,7 +110,8 @@ public class SysIdRoutine extends SysIdRoutineLog {
      * @param stepVoltage The step voltage output used for dynamic test routines.
      * @param timeout Safety timeout for the test routine commands.
      */
-    public static Config useWpilog(Velocity<VoltageUnit> rampRate, Voltage stepVoltage, Time timeout) {
+    public static Config useWpilog(
+        Velocity<VoltageUnit> rampRate, Voltage stepVoltage, Time timeout) {
       return new Config(rampRate, stepVoltage, timeout, null);
     }
 
@@ -123,7 +124,6 @@ public class SysIdRoutine extends SysIdRoutineLog {
      *
      * <p>timeout: 10 seconds
      */
-
     public static Config defaults() {
       return new Config(DEFAULT_RAMP_RATE, DEFAULT_STEP_VOLTAGE, DEFAULT_TIMEOUT, null);
     }
@@ -214,30 +214,39 @@ public class SysIdRoutine extends SysIdRoutineLog {
    * @return A command to run the test.
    */
   public Command quasistatic(Direction direction) {
-    double outputSign = switch (direction) {
-      case kForward -> 1.0;
-      case kReverse -> -1.0;
-    };
-    State state = switch (direction) {
-      case kForward -> State.kDynamicForward;
-      case kReverse -> State.kDynamicReverse;
-    };
+    double outputSign =
+        switch (direction) {
+          case kForward -> 1.0;
+          case kReverse -> -1.0;
+        };
+    State state =
+        switch (direction) {
+          case kForward -> State.kDynamicForward;
+          case kReverse -> State.kDynamicReverse;
+        };
 
-    return m_mechanism.m_subsystem.run(co -> {
-      Timer timer = new Timer();
-      timer.start();
-      while (!timer.hasElapsed(m_config.m_timeout.in(Seconds))) {
-        m_mechanism.m_drive.accept((Voltage)m_config.m_rampRate.times(Seconds.of(timer.get() * outputSign)));
-        m_mechanism.m_log.accept(this);
-        m_recordState.accept(state);
-        co.yield();
-      }
-      m_mechanism.m_drive.accept(Volts.of(0));
-      m_recordState.accept(State.kNone);
-    }).whenCanceled(() -> {
-      m_mechanism.m_drive.accept(Volts.of(0));
-      m_recordState.accept(State.kNone);
-    }).named("sysid-" + state.toString() + "-" + m_mechanism.m_name);
+    return m_mechanism
+        .m_subsystem
+        .run(
+            co -> {
+              Timer timer = new Timer();
+              timer.start();
+              while (!timer.hasElapsed(m_config.m_timeout.in(Seconds))) {
+                m_mechanism.m_drive.accept(
+                    (Voltage) m_config.m_rampRate.times(Seconds.of(timer.get() * outputSign)));
+                m_mechanism.m_log.accept(this);
+                m_recordState.accept(state);
+                co.yield();
+              }
+              m_mechanism.m_drive.accept(Volts.of(0));
+              m_recordState.accept(State.kNone);
+            })
+        .whenCanceled(
+            () -> {
+              m_mechanism.m_drive.accept(Volts.of(0));
+              m_recordState.accept(State.kNone);
+            })
+        .named("sysid-" + state.toString() + "-" + m_mechanism.m_name);
   }
 
   /**
@@ -251,32 +260,39 @@ public class SysIdRoutine extends SysIdRoutineLog {
    * @return A command to run the test.
    */
   public Command dynamic(Direction direction) {
-    double outputSign = switch (direction) {
-      case kForward -> 1.0;
-      case kReverse -> -1.0;
-    };
-    State state = switch (direction) {
-      case kForward -> State.kDynamicForward;
-      case kReverse -> State.kDynamicReverse;
-    };
+    double outputSign =
+        switch (direction) {
+          case kForward -> 1.0;
+          case kReverse -> -1.0;
+        };
+    State state =
+        switch (direction) {
+          case kForward -> State.kDynamicForward;
+          case kReverse -> State.kDynamicReverse;
+        };
 
-    return m_mechanism.m_subsystem.run(co -> {
-      Voltage output = m_config.m_stepVoltage.times(outputSign);
-      Timer timer = new Timer();
-      timer.start();
+    return m_mechanism
+        .m_subsystem
+        .run(
+            co -> {
+              Voltage output = m_config.m_stepVoltage.times(outputSign);
+              Timer timer = new Timer();
+              timer.start();
 
-      while (!timer.hasElapsed(m_config.m_timeout.in(Seconds))) {
-        m_mechanism.m_drive.accept(output);
-        m_mechanism.m_log.accept(this);
-        m_recordState.accept(state);
-        co.yield();
-      }
-      m_mechanism.m_drive.accept(Volts.of(0));
-      m_recordState.accept(State.kNone);
-    }).whenCanceled(() -> {
-      m_mechanism.m_drive.accept(Volts.of(0));
-      m_recordState.accept(State.kNone);
-    }).named("sysid-" + state + "-" + m_mechanism.m_name);
-
+              while (!timer.hasElapsed(m_config.m_timeout.in(Seconds))) {
+                m_mechanism.m_drive.accept(output);
+                m_mechanism.m_log.accept(this);
+                m_recordState.accept(state);
+                co.yield();
+              }
+              m_mechanism.m_drive.accept(Volts.of(0));
+              m_recordState.accept(State.kNone);
+            })
+        .whenCanceled(
+            () -> {
+              m_mechanism.m_drive.accept(Volts.of(0));
+              m_recordState.accept(State.kNone);
+            })
+        .named("sysid-" + state + "-" + m_mechanism.m_name);
   }
 }
