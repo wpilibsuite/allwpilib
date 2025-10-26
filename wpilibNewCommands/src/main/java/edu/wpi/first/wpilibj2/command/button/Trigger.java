@@ -7,6 +7,7 @@ package edu.wpi.first.wpilibj2.command.button;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.MultiTapFilter;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -284,6 +285,27 @@ public class Trigger implements BooleanSupplier {
           @Override
           public boolean getAsBoolean() {
             return m_debouncer.calculate(m_condition.getAsBoolean());
+          }
+        });
+  }
+
+  /**
+   * Creates a new multi-tap trigger from this trigger - it will become active when this trigger
+   * has been activated the required number of times within the specified time window.
+   *
+   * @param requiredTaps The number of taps required.
+   * @param tapWindowSeconds The time window in which the taps must occur.
+   * @return The multi-tap filtered trigger.
+   */
+  public Trigger multiTap(int requiredTaps, double tapWindowSeconds) {
+    return new Trigger(
+        m_loop,
+        new BooleanSupplier() {
+          final MultiTapFilter m_multiTapFilter = new MultiTapFilter(requiredTaps, tapWindowSeconds);
+
+          @Override
+          public boolean getAsBoolean() {
+            return m_multiTapFilter.calculate(m_condition.getAsBoolean());
           }
         });
   }

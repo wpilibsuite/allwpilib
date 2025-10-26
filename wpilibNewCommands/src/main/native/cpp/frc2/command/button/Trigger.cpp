@@ -184,6 +184,13 @@ Trigger Trigger::Debounce(units::second_t debounceTime,
   });
 }
 
+Trigger Trigger::MultiTap(int requiredTaps, units::second_t tapWindow) {
+  return Trigger(m_loop, [filter = frc::MultiTapFilter(requiredTaps, tapWindow),
+                          condition = m_condition]() mutable {
+    return filter.Calculate(condition());
+  });
+}
+
 bool Trigger::Get() const {
   return m_condition();
 }

@@ -285,6 +285,17 @@ class Trigger {
                        frc::Debouncer::DebounceType::kRising);
 
   /**
+   * Creates a new multi-tap trigger from this trigger - it will become active
+   * when this trigger has been activated the required number of times within
+   * the specified time window.
+   *
+   * @param requiredTaps The number of taps required.
+   * @param tapWindowSeconds The time window in which the taps must occur.
+   * @return The multi-tap filtered trigger.
+   */
+  Trigger MultiTap(int numTaps, units::second_t interval);
+
+  /**
    * Returns the current state of this trigger.
    *
    * @return A bool representing the current state of the trigger.
