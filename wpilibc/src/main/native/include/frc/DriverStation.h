@@ -162,35 +162,53 @@ class DriverStation final {
    * @param stick The joystick to read.
    * @return The state of the buttons on the joystick.
    */
-  static int GetStickButtons(int stick);
+  static uint64_t GetStickButtons(int stick);
 
+  /**
+   * Returns the maximum axis index on a given joystick port.
+   *
+   * @param stick The joystick port number
+   * @return The maximum axis index on the indicated joystick
+   */
   static int GetStickAxesMaximumIndex(int stick);
 
   /**
-   * Returns the number of axes on a given joystick port.
+   * Returns the mask of available axes on a given joystick port.
    *
    * @param stick The joystick port number
-   * @return The number of axes on the indicated joystick
+   * @return The mask of available axes on the indicated joystick
    */
   static int GetStickAxesAvailable(int stick);
 
+  /**
+   * Returns the maximum POV index on a given joystick port.
+   *
+   * @param stick The joystick port number
+   * @return The maximum POV index on the indicated joystick
+   */
   static int GetStickPOVsMaximumIndex(int stick);
 
   /**
-   * Returns the number of POVs on a given joystick port.
+   * Returns the mask of available POVs on a given joystick port.
    *
    * @param stick The joystick port number
-   * @return The number of POVs on the indicated joystick
+   * @return The mask of available POVs on the indicated joystick
    */
   static int GetStickPOVsAvailable(int stick);
 
+  /**
+   * Returns the maximum button index on a given joystick port.
+   *
+   * @param stick The joystick port number
+   * @return The maximum button index on the indicated joystick
+   */
   static int GetStickButtonsMaximumIndex(int stick);
 
   /**
-   * Returns the number of buttons on a given joystick port.
+   * Returns the mask of available buttons on a given joystick port.
    *
    * @param stick The joystick port number
-   * @return The number of buttons on the indicated joystick
+   * @return The mask of available buttons on the indicated joystick
    */
   static uint64_t GetStickButtonsAvailable(int stick);
 

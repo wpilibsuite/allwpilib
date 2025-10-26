@@ -345,7 +345,7 @@ DriverStation::POVDirection DriverStation::GetStickPOV(int stick, int pov) {
   return static_cast<POVDirection>(povs.povs[pov]);
 }
 
-int DriverStation::GetStickButtons(int stick) {
+uint64_t DriverStation::GetStickButtons(int stick) {
   if (stick < 0 || stick >= kJoystickPorts) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0;

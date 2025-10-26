@@ -815,6 +815,12 @@ public final class DriverStation {
     }
   }
 
+  /**
+   * Gets the maximum index of axes on a given joystick port.
+   *
+   * @param stick The joystick port number
+   * @return The maximum index of axes on the indicated joystick
+   */
   public static int getStickAxesMaximumIndex(int stick) {
     return availableToCount(getStickAxesAvailable(stick));
   }
@@ -838,6 +844,12 @@ public final class DriverStation {
     }
   }
 
+  /**
+   * Gets the maximum index of povs on a given joystick port.
+   *
+   * @param stick The joystick port number
+   * @return The maximum index of povs on the indicated joystick
+   */
   public static int getStickPOVsMaximumIndex(int stick) {
     return availableToCount(getStickPOVsAvailable(stick));
   }
@@ -861,6 +873,12 @@ public final class DriverStation {
     }
   }
 
+  /**
+   * Gets the maximum index of buttons on a given joystick port.
+   *
+   * @param stick The joystick port number
+   * @return The maximum index of buttons on the indicated joystick
+   */
   public static int getStickButtonsMaximumIndex(int stick) {
     return availableToCount(getStickButtonsAvailable(stick));
   }
