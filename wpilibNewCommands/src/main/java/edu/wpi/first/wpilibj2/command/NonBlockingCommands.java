@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj2.command;
 
 import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -16,12 +17,12 @@ public final class NonBlockingCommands {
    * Creates a new command that requires additional subsystems without interrupting the default
    * commands of said subsystems.
    *
-   * @param command The base command
+   * @param command The base command6
    * @param nonBlockingRequirements The requirements to add.
    * @return A new command
    */
   public static Command of(Command command, Subsystem... nonBlockingRequirements) {
-    var cmd = command.deadlineFor(new RunDefaultsCommand(nonBlockingRequirements));
+    var cmd = command.deadlineFor(runDefaultCommands(Set.of(nonBlockingRequirements)));
     cmd.addRequirements(nonBlockingRequirements);
     return cmd;
   }
@@ -39,11 +40,10 @@ public final class NonBlockingCommands {
       allReqs.addAll(command.getRequirements());
     }
     var group = new SequentialCommandGroup();
-    group.addRequirements();
     for (var command : commands) {
       var requirementsToIdle = new HashSet<>(allReqs);
       requirementsToIdle.removeAll(command.getRequirements());
-      group.addCommands(command.deadlineFor(new RunDefaultsCommand(requirementsToIdle)));
+      group.addCommands(command.deadlineFor(runDefaultCommands(requirementsToIdle)));
     }
     return group.withName("NonBlockingSequentialCommandGroup");
   }
@@ -62,7 +62,7 @@ public final class NonBlockingCommands {
     for (var cmd : commands) {
       group.addCommands(
           cmd.finallyDo(numEnded::getAndIncrement)
-              .andThen(new RunDefaultsCommand(cmd.getRequirements())));
+              .andThen(runDefaultCommands(cmd.getRequirements())));
     }
     return group
         .until(() -> numEnded.get() == commands.length)
@@ -84,6 +84,14 @@ public final class NonBlockingCommands {
     return parallel(otherCommands)
         .withDeadline(deadline)
         .withName("NonBlockingParallelDeadlineGroup");
+  }
+
+  private static Command runDefaultCommands(Set<Subsystem> subsystems) {
+    var group = new ParallelCommandGroup();
+    for (var subsystem : subsystems) {
+      group.addCommands(new WrapperCommand(subsystem.getDefaultCommand(), false) {});
+    }
+    return group;
   }
 
   private NonBlockingCommands() {
