@@ -17,13 +17,13 @@ import edu.wpi.first.math.MathSharedStore;
  */
 public class MultiTapFilter {
 
-  private int m_requiredTaps = 0;
+  private int m_requiredTaps;
   private double m_tapWindowSeconds;
 
-  private double m_firstTapTimeSeconds = 0.0;
-  private int m_currentTapCount = 0;
+  private double m_firstTapTimeSeconds;
+  private int m_currentTapCount;
 
-  private boolean m_lastInput = false;
+  private boolean m_lastInput;
 
   /**
    * Creates a new MultiTapFilter.
@@ -55,6 +55,15 @@ public class MultiTapFilter {
    *     is currently true; false otherwise.
    */
   public boolean calculate(boolean input) {
+    boolean enoughTaps = m_currentTapCount >= m_requiredTaps;
+
+    boolean expired = hasElapsed() && !enoughTaps;
+    boolean activationEnded = !input && enoughTaps;
+
+    if (expired || activationEnded) {
+      m_currentTapCount = 0;
+    }
+
     if (input && !m_lastInput) {
       if (m_currentTapCount == 0) {
         resetTimer(); // Start timer on first rising edge
@@ -63,18 +72,9 @@ public class MultiTapFilter {
       m_currentTapCount++;
     }
 
-    boolean activated = input && m_currentTapCount >= m_requiredTaps;
-
-    boolean timeExpired = hasElapsed() && !activated;
-    boolean activationEnded = !input && m_currentTapCount >= m_requiredTaps;
-
-    if (timeExpired || activationEnded) {
-      m_currentTapCount = 0;
-    }
-
     m_lastInput = input;
 
-    return activated;
+    return input && m_currentTapCount >= m_requiredTaps;
   }
 
   /**

@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "frc/filter/MultiTapFilter.h"
+
 #include "wpimath/MathShared.h"
 
 using namespace frc;
@@ -22,7 +23,15 @@ bool MultiTapFilter::HasElapsed() const {
 }
 
 bool MultiTapFilter::Calculate(bool input) {
-  // Detect rising edge
+  bool enoughTaps = m_currentTapCount >= m_requiredTaps;
+
+  bool expired = HasElapsed() && !enoughTaps;
+  bool activationEnded = !input && enoughTaps;
+
+  if (expired || activationEnded) {
+    m_currentTapCount = 0;
+  }
+
   if (input && !m_lastInput) {
     if (m_currentTapCount == 0) {
       ResetTimer();  // Start timer on first rising edge
@@ -31,16 +40,7 @@ bool MultiTapFilter::Calculate(bool input) {
     m_currentTapCount++;
   }
 
-  bool activated = input && m_currentTapCount >= m_requiredTaps;
-
-  bool timeExpired = HasElapsed() && !activated;
-  bool activationEnded = !input && m_currentTapCount >= m_requiredTaps;
-
-  if (timeExpired || activationEnded) {
-    m_currentTapCount = 0;
-  }
-
   m_lastInput = input;
 
-  return activated;
+  return input && m_currentTapCount >= m_requiredTaps;
 }
