@@ -44,7 +44,7 @@ TEST_F(DSCommPacketTest, EmptyJoystickTag) {
     auto& data = ReadJoystickTag(arr, 0);
     ASSERT_EQ(data.axes.available, 0);
     ASSERT_EQ(data.povs.available, 0);
-    ASSERT_EQ(data.buttons.available, 0);
+    ASSERT_EQ(data.buttons.available, 0llu);
   }
 }
 
@@ -59,7 +59,7 @@ TEST_F(DSCommPacketTest, BlankJoystickTag) {
     auto& data = ReadJoystickTag(arr, 0);
     ASSERT_EQ(data.axes.available, 0);
     ASSERT_EQ(data.povs.available, 0);
-    ASSERT_EQ(data.buttons.available, 0);
+    ASSERT_EQ(data.buttons.available, 0llu);
   }
 }
 
@@ -89,7 +89,7 @@ TEST_F(DSCommPacketTest, MainJoystickTag) {
     auto& data = ReadJoystickTag(arr, 0);
     ASSERT_EQ(data.axes.available, 0xF);
     ASSERT_EQ(data.povs.available, 0x7);
-    ASSERT_EQ(data.buttons.available, 0xFFF);
+    ASSERT_EQ(data.buttons.available, 0xFFFllu);
 
     for (int btn = 0; btn < 12; btn++) {
       ASSERT_EQ((data.buttons.buttons & (1llu << btn)) != 0, _buttons[btn] != 0)
