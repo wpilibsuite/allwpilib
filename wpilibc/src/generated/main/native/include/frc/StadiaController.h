@@ -606,35 +606,35 @@ class StadiaController : public GenericHID,
   /** Represents a digital button on an StadiaController. */
   struct Button {
     /// A button.
-    static constexpr int kA = 1;
+    static constexpr int kA = 0;
     /// B button.
-    static constexpr int kB = 2;
+    static constexpr int kB = 1;
     /// X button.
-    static constexpr int kX = 3;
+    static constexpr int kX = 2;
     /// Y button.
-    static constexpr int kY = 4;
+    static constexpr int kY = 3;
     /// Left bumper button.
-    static constexpr int kLeftBumper = 5;
+    static constexpr int kLeftBumper = 4;
     /// Right bumper button.
-    static constexpr int kRightBumper = 6;
+    static constexpr int kRightBumper = 5;
     /// Left stick button.
-    static constexpr int kLeftStick = 7;
+    static constexpr int kLeftStick = 6;
     /// Right stick button.
-    static constexpr int kRightStick = 8;
+    static constexpr int kRightStick = 7;
     /// Ellipses button.
-    static constexpr int kEllipses = 9;
+    static constexpr int kEllipses = 8;
     /// Hamburger button.
-    static constexpr int kHamburger = 10;
+    static constexpr int kHamburger = 9;
     /// Stadia button.
-    static constexpr int kStadia = 11;
+    static constexpr int kStadia = 10;
     /// Right trigger button.
-    static constexpr int kRightTrigger = 12;
+    static constexpr int kRightTrigger = 11;
     /// Left trigger button.
-    static constexpr int kLeftTrigger = 13;
+    static constexpr int kLeftTrigger = 12;
     /// Google button.
-    static constexpr int kGoogle = 14;
+    static constexpr int kGoogle = 13;
     /// Frame button.
-    static constexpr int kFrame = 15;
+    static constexpr int kFrame = 14;
   };
 
   /** Represents an axis on an StadiaController. */

@@ -17,9 +17,9 @@ class DriverStationTest {
   @ParameterizedTest
   @MethodSource("isConnectedProvider")
   void testIsConnected(int axisCount, int buttonCount, int povCount, boolean expected) {
-    DriverStationSim.setJoystickAxisCount(1, axisCount);
-    DriverStationSim.setJoystickButtonCount(1, buttonCount);
-    DriverStationSim.setJoystickPOVCount(1, povCount);
+    DriverStationSim.setJoystickAxesMaximumIndex(1, axisCount);
+    DriverStationSim.setJoystickButtonsMaximumIndex(1, buttonCount);
+    DriverStationSim.setJoystickPOVsMaximumIndex(1, povCount);
 
     DriverStationSim.notifyNewData();
 
