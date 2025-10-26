@@ -10,7 +10,6 @@
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/print.h>
 
-#include "frc/DSControlWord.h"
 #include "frc/Errors.h"
 #include "frc/smartdashboard/SmartDashboard.h"
 
@@ -101,7 +100,7 @@ void IterativeRobotBase::LoopFunc() {
   m_watchdog.Reset();
 
   // Get current mode; treat disabled as unknown
-  DSControlWord word;
+  hal::ControlWord word = hal::GetControlWord();
   bool enabled = word.IsEnabled();
   RobotMode mode = enabled ? word.GetRobotMode() : RobotMode::UNKNOWN;
 
@@ -142,7 +141,7 @@ void IterativeRobotBase::LoopFunc() {
   }
 
   // Call the appropriate function depending upon the current robot mode
-  HAL_ObserveUserProgram(word.GetControlWord());
+  HAL_ObserveUserProgram(word.GetValue());
   if (mode == RobotMode::UNKNOWN) {
     DisabledPeriodic();
     m_watchdog.AddEpoch("DisabledPeriodic()");

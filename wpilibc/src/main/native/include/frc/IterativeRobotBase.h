@@ -6,7 +6,6 @@
 
 #include <units/time.h>
 
-#include "frc/DSControlWord.h"
 #include "frc/RobotBase.h"
 #include "frc/Watchdog.h"
 

@@ -584,7 +584,6 @@ public abstract class OpModeRobot extends RobotBase {
             // no or different opmode selected
             m_activeOpMode.set(null);
             opMode.opModeClose();
-            opMode = null;
           }
 
           if (modeId == 0) {

@@ -4,7 +4,6 @@
 
 #include "frc/RobotState.h"
 
-#include "frc/DSControlWord.h"
 #include "frc/DriverStation.h"
 
 using namespace frc;

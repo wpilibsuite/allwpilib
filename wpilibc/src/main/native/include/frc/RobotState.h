@@ -4,9 +4,11 @@
 
 #pragma once
 
-#include "frc/DSControlWord.h"
+#include <hal/DriverStationTypes.h>
 
 namespace frc {
+
+using RobotMode = hal::RobotMode;
 
 /**
  * Robot state utility functions.

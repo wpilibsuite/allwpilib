@@ -10,13 +10,15 @@
 #include <functional>
 #include <memory>
 
+#include <hal/DriverStationTypes.h>
 #include <wpi/DenseMap.h>
 
-#include "frc/DSControlWord.h"
 #include "frc/RobotBase.h"
 #include "frc/opmode/OpMode.h"
 
 namespace frc {
+
+using RobotMode = hal::RobotMode;
 
 class Color;
 

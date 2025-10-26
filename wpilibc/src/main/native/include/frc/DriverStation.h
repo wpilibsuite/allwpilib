@@ -14,13 +14,13 @@
 #include <units/time.h>
 #include <wpi/Synchronization.h>
 
-#include "frc/DSControlWord.h"
-
 namespace wpi::log {
 class DataLog;
 }  // namespace wpi::log
 
 namespace frc {
+
+using hal::RobotMode;
 
 class Color;
 

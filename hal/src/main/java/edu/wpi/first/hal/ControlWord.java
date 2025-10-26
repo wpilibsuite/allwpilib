@@ -18,10 +18,6 @@ public class ControlWord {
 
   private long m_word;
   private RobotMode m_robotMode = RobotMode.UNKNOWN;
-  private boolean m_enabled;
-  private boolean m_emergencyStop;
-  private boolean m_fmsAttached;
-  private boolean m_dsAttached;
 
   /** Default constructor. */
   public ControlWord() {}
@@ -51,10 +47,6 @@ public class ControlWord {
             | (fmsAttached ? FMS_ATTACHED_MASK : 0)
             | (dsAttached ? DS_ATTACHED_MASK : 0);
     m_robotMode = robotMode;
-    m_enabled = enabled;
-    m_emergencyStop = emergencyStop;
-    m_fmsAttached = fmsAttached;
-    m_dsAttached = dsAttached;
   }
 
   /**
@@ -65,10 +57,6 @@ public class ControlWord {
   public void update(long word) {
     m_word = word;
     m_robotMode = RobotMode.fromInt((int) ((word & ROBOT_MODE_MASK) >> ROBOT_MODE_SHIFT));
-    m_enabled = (word & ENABLED_MASK) != 0;
-    m_emergencyStop = (word & ESTOP_MASK) != 0;
-    m_fmsAttached = (word & FMS_ATTACHED_MASK) != 0;
-    m_dsAttached = (word & DS_ATTACHED_MASK) != 0;
   }
 
   /**
@@ -79,10 +67,6 @@ public class ControlWord {
   public void update(ControlWord word) {
     m_word = word.m_word;
     m_robotMode = word.m_robotMode;
-    m_enabled = word.m_enabled;
-    m_emergencyStop = word.m_emergencyStop;
-    m_fmsAttached = word.m_fmsAttached;
-    m_dsAttached = word.m_dsAttached;
   }
 
   /**
@@ -91,7 +75,7 @@ public class ControlWord {
    * @return the Enabled flag
    */
   public boolean isEnabled() {
-    return m_enabled;
+    return (m_word & ENABLED_MASK) != 0;
   }
 
   /**
@@ -135,7 +119,7 @@ public class ControlWord {
    * @return the E-Stop flag
    */
   public boolean isEStopped() {
-    return m_emergencyStop;
+    return (m_word & ESTOP_MASK) != 0;
   }
 
   /**
@@ -144,7 +128,7 @@ public class ControlWord {
    * @return the FMS attached flag
    */
   public boolean isFMSAttached() {
-    return m_fmsAttached;
+    return (m_word & FMS_ATTACHED_MASK) != 0;
   }
 
   /**
@@ -153,7 +137,67 @@ public class ControlWord {
    * @return the DS attached flag
    */
   public boolean isDSAttached() {
-    return m_dsAttached;
+    return (m_word & DS_ATTACHED_MASK) != 0;
+  }
+
+  /**
+   * Gets a value indicating whether the Driver Station requires the robot to be running in
+   * autonomous mode.
+   *
+   * @return True if autonomous mode should be enabled, false otherwise.
+   */
+  public boolean isAutonomous() {
+    return getRobotMode() == RobotMode.AUTONOMOUS;
+  }
+
+  /**
+   * Gets a value indicating whether the Driver Station requires the robot to be running in
+   * autonomous mode and enabled.
+   *
+   * @return True if autonomous should be set and the robot should be enabled.
+   */
+  public boolean isAutonomousEnabled() {
+    return isAutonomous() && isEnabled() && isDSAttached();
+  }
+
+  /**
+   * Gets a value indicating whether the Driver Station requires the robot to be running in
+   * operator-controlled mode.
+   *
+   * @return True if operator-controlled mode should be enabled, false otherwise.
+   */
+  public boolean isTeleop() {
+    return getRobotMode() == RobotMode.TELEOPERATED;
+  }
+
+  /**
+   * Gets a value indicating whether the Driver Station requires the robot to be running in
+   * operator-controller mode and enabled.
+   *
+   * @return True if operator-controlled mode should be set and the robot should be enabled.
+   */
+  public boolean isTeleopEnabled() {
+    return isTeleop() && isEnabled() && isDSAttached();
+  }
+
+  /**
+   * Gets a value indicating whether the Driver Station requires the robot to be running in test
+   * mode.
+   *
+   * @return True if test mode should be enabled, false otherwise.
+   */
+  public boolean isTest() {
+    return getRobotMode() == RobotMode.TEST;
+  }
+
+  /**
+   * Gets a value indicating whether the Driver Station requires the robot to be running in test
+   * mode and enabled.
+   *
+   * @return True if test mode should be set and the robot should be enabled.
+   */
+  public boolean isTestEnabled() {
+    return isTest() && isEnabled() && isDSAttached();
   }
 
   /**

@@ -36,7 +36,6 @@
 #include <wpi/struct/Struct.h>
 #include <wpi/timestamp.h>
 
-#include "frc/DSControlWord.h"
 #include "frc/Errors.h"
 #include "frc/Timer.h"
 #include "frc/util/Color.h"
@@ -75,7 +74,7 @@ static constexpr std::string_view kSmartDashboardType = "FMSInfo";
 
 struct MatchDataSender {
   MatchDataSender()
-      : controlWord{table->GetStructTopic<HAL_ControlWord>("ControlWord")
+      : controlWord{table->GetStructTopic<hal::ControlWord>("ControlWord")
                         .Publish()},
         opMode{table->GetStringTopic("OpMode").Publish()} {
     controlWord.Set(prevControlWord);
@@ -97,9 +96,9 @@ struct MatchDataSender {
   MatchDataSenderEntry<nt::IntegerTopic> matchType{table, "MatchType", 0};
   MatchDataSenderEntry<nt::BooleanTopic> alliance{table, "IsRedAlliance", true};
   MatchDataSenderEntry<nt::IntegerTopic> station{table, "StationNumber", 1};
-  nt::StructPublisher<HAL_ControlWord> controlWord;
+  nt::StructPublisher<hal::ControlWord> controlWord;
   nt::StringPublisher opMode;
-  HAL_ControlWord prevControlWord{0};
+  hal::ControlWord prevControlWord;
 };
 
 class JoystickLogSender {
@@ -128,8 +127,8 @@ class DataLogSender {
  private:
   std::atomic_bool m_initialized{false};
 
-  HAL_ControlWord m_prevControlWord{0};
-  wpi::log::StructLogEntry<HAL_ControlWord> m_logControlWord;
+  hal::ControlWord m_prevControlWord;
+  wpi::log::StructLogEntry<hal::ControlWord> m_logControlWord;
   wpi::log::StringLogEntry m_logOpMode;
 
   bool m_logJoysticks;
@@ -886,12 +885,10 @@ void SendMatchData() {
   inst.matchDataSender.replayNumber.Set(tmpDataStore.replayNumber);
   inst.matchDataSender.matchType.Set(static_cast<int>(tmpDataStore.matchType));
 
-  HAL_ControlWord ctlWord;
-  HAL_GetControlWord(&ctlWord);
-  if (ctlWord.value != inst.matchDataSender.prevControlWord.value) {
-    int64_t opModeId = HAL_ControlWord_GetOpModeId(ctlWord);
-    if (opModeId !=
-        HAL_ControlWord_GetOpModeId(inst.matchDataSender.prevControlWord)) {
+  hal::ControlWord ctlWord = hal::GetControlWord();
+  if (ctlWord != inst.matchDataSender.prevControlWord) {
+    int64_t opModeId = ctlWord.GetOpModeId();
+    if (opModeId != inst.matchDataSender.prevControlWord.GetOpModeId()) {
       inst.matchDataSender.opMode.Set(inst.OpModeToString(opModeId));
     }
 
@@ -975,19 +972,18 @@ void JoystickLogSender::AppendPOVs(const HAL_JoystickPOVs& povs,
 
 void DataLogSender::Init(wpi::log::DataLog& log, bool logJoysticks,
                          int64_t timestamp) {
-  m_logControlWord = wpi::log::StructLogEntry<HAL_ControlWord>{
+  m_logControlWord = wpi::log::StructLogEntry<hal::ControlWord>{
       log, "DS:controlWord", timestamp};
   m_logOpMode = wpi::log::StringLogEntry{log, "DS:opMode", timestamp};
 
   // append initial control word value
-  HAL_ControlWord ctlWord;
-  HAL_GetControlWord(&ctlWord);
+  hal::ControlWord ctlWord = hal::GetControlWord();
   m_prevControlWord = ctlWord;
   m_logControlWord.Append(ctlWord);
 
   // append initial opmode value
   auto& inst = GetInstance();
-  m_logOpMode.Append(inst.OpModeToString(HAL_ControlWord_GetOpModeId(ctlWord)));
+  m_logOpMode.Append(inst.OpModeToString(ctlWord.GetOpModeId()));
 
   m_logJoysticks = logJoysticks;
   if (logJoysticks) {
@@ -1006,12 +1002,11 @@ void DataLogSender::Send(uint64_t timestamp) {
   }
 
   // append control word value changes
-  HAL_ControlWord ctlWord;
-  HAL_GetControlWord(&ctlWord);
-  if (ctlWord.value != m_prevControlWord.value) {
+  hal::ControlWord ctlWord = hal::GetControlWord();
+  if (ctlWord != m_prevControlWord) {
     // append opmode value changes
-    int64_t opModeId = HAL_ControlWord_GetOpModeId(ctlWord);
-    if (opModeId != HAL_ControlWord_GetOpModeId(m_prevControlWord)) {
+    int64_t opModeId = ctlWord.GetOpModeId();
+    if (opModeId != m_prevControlWord.GetOpModeId()) {
       auto& inst = GetInstance();
       m_logOpMode.Append(inst.OpModeToString(opModeId));
     }

@@ -275,5 +275,19 @@ void HAL_ObserveUserProgram(HAL_ControlWord word);
 
 #ifdef __cplusplus
 }  // extern "C"
+
+namespace hal {
+inline ControlWord GetControlWord() {
+  HAL_ControlWord word;
+  HAL_GetControlWord(&word);
+  return ControlWord{word};
+}
+
+inline ControlWord GetUncachedControlWord() {
+  HAL_ControlWord word;
+  HAL_GetUncachedControlWord(&word);
+  return ControlWord{word};
+}
+}  // namespace hal
 #endif
 /** @} */

@@ -9,7 +9,6 @@
 #include <hal/DriverStationTypes.h>
 
 #include "callback_helpers/TestCallbackHelpers.h"
-#include "frc/DSControlWord.h"
 #include "frc/DriverStation.h"
 #include "frc/Joystick.h"
 #include "frc/RobotState.h"
