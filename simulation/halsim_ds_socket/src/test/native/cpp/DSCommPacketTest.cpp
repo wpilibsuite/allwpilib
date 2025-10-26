@@ -42,9 +42,9 @@ TEST_F(DSCommPacketTest, EmptyJoystickTag) {
   for (int i = 0; i < HAL_kMaxJoysticks; i++) {
     uint8_t arr[2];
     auto& data = ReadJoystickTag(arr, 0);
-    ASSERT_EQ(data.axes.count, 0);
-    ASSERT_EQ(data.povs.count, 0);
-    ASSERT_EQ(data.buttons.count, 0);
+    ASSERT_EQ(data.axes.available, 0);
+    ASSERT_EQ(data.povs.available, 0);
+    ASSERT_EQ(data.buttons.available, 0llu);
   }
 }
 
@@ -57,9 +57,9 @@ TEST_F(DSCommPacketTest, BlankJoystickTag) {
     arr[3] = 0;
     arr[4] = 0;
     auto& data = ReadJoystickTag(arr, 0);
-    ASSERT_EQ(data.axes.count, 0);
-    ASSERT_EQ(data.povs.count, 0);
-    ASSERT_EQ(data.buttons.count, 0);
+    ASSERT_EQ(data.axes.available, 0);
+    ASSERT_EQ(data.povs.available, 0);
+    ASSERT_EQ(data.buttons.available, 0llu);
   }
 }
 
@@ -87,12 +87,12 @@ TEST_F(DSCommPacketTest, MainJoystickTag) {
                                   3, 0, 50, 0, 100, 0x0F, 0x00};
 
     auto& data = ReadJoystickTag(arr, 0);
-    ASSERT_EQ(data.axes.count, 4);
-    ASSERT_EQ(data.povs.count, 3);
-    ASSERT_EQ(data.buttons.count, 12);
+    ASSERT_EQ(data.axes.available, 0xF);
+    ASSERT_EQ(data.povs.available, 0x7);
+    ASSERT_EQ(data.buttons.available, 0xFFFllu);
 
     for (int btn = 0; btn < 12; btn++) {
-      ASSERT_EQ((data.buttons.buttons & (1 << btn)) != 0, _buttons[btn] != 0)
+      ASSERT_EQ((data.buttons.buttons & (1llu << btn)) != 0, _buttons[btn] != 0)
           << "Button " << btn;
     }
   }
@@ -115,12 +115,6 @@ TEST_F(DSCommPacketTest, DescriptorTag) {
     ASSERT_EQ(data.descriptor.isGamepad, 1);
     ASSERT_EQ(data.descriptor.type, 0);
     ASSERT_STREQ(data.descriptor.name, "Hello World");
-    ASSERT_EQ(data.descriptor.axisCount, 4);
-    for (int i = 0; i < 4; i++) {
-      ASSERT_EQ(data.descriptor.axisTypes[i], i + 1);
-    }
-    ASSERT_EQ(data.descriptor.buttonCount, 12);
-    ASSERT_EQ(data.descriptor.povCount, 3);
   }
 }
 

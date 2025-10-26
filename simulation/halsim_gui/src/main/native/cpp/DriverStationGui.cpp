@@ -178,7 +178,7 @@ struct RobotJoystick {
   void SetHAL(int i);
   void GetHAL(int i);
   bool IsButtonPressed(int i) {
-    return (data.buttons.buttons & (1u << i)) != 0;
+    return (data.buttons.buttons & (1llu << i)) != 0;
   }
 };
 
@@ -294,7 +294,7 @@ static inline bool IsDSDisabled() {
 JoystickModel::JoystickModel(int index) : m_index{index} {
   HAL_JoystickAxes halAxes;
   HALSIM_GetJoystickAxes(index, &halAxes);
-  axisCount = halAxes.count;
+  axisCount = static_cast<uint8_t>(16 - std::countl_zero(halAxes.available));
   for (int i = 0; i < axisCount; ++i) {
     axes[i] = std::make_unique<glass::DoubleSource>(
         fmt::format("Joystick[{}] Axis[{}]", index, i));
@@ -302,18 +302,19 @@ JoystickModel::JoystickModel(int index) : m_index{index} {
 
   HAL_JoystickButtons halButtons;
   HALSIM_GetJoystickButtons(index, &halButtons);
-  buttonCount = halButtons.count;
+  buttonCount =
+      static_cast<uint8_t>(64 - std::countl_zero(halButtons.available));
   for (int i = 0; i < buttonCount; ++i) {
     buttons[i] = new glass::BooleanSource(
         fmt::format("Joystick[{}] Button[{}]", index, i + 1));
   }
-  for (int i = buttonCount; i < 32; ++i) {
+  for (int i = buttonCount; i < 64; ++i) {
     buttons[i] = nullptr;
   }
 
   HAL_JoystickPOVs halPOVs;
   HALSIM_GetJoystickPOVs(index, &halPOVs);
-  povCount = halPOVs.count;
+  povCount = static_cast<uint8_t>(8 - std::countl_zero(halPOVs.available));
   for (int i = 0; i < povCount; ++i) {
     povs[i] = std::make_unique<glass::IntegerSource>(
         fmt::format("Joystick[{}] POV [{}]", index, i));
@@ -328,7 +329,8 @@ void JoystickModel::CallbackFunc(const char*, void* param, const HAL_Value*) {
 
   HAL_JoystickAxes halAxes;
   HALSIM_GetJoystickAxes(self->m_index, &halAxes);
-  for (int i = 0; i < halAxes.count; ++i) {
+  int halAxesCount = 16 - std::countl_zero(halAxes.available);
+  for (int i = 0; i < halAxesCount; ++i) {
     if (auto axis = self->axes[i].get()) {
       axis->SetValue(halAxes.axes[i]);
     }
@@ -336,15 +338,17 @@ void JoystickModel::CallbackFunc(const char*, void* param, const HAL_Value*) {
 
   HAL_JoystickButtons halButtons;
   HALSIM_GetJoystickButtons(self->m_index, &halButtons);
-  for (int i = 0; i < halButtons.count; ++i) {
+  int halButtonCount = 64 - std::countl_zero(halButtons.available);
+  for (int i = 0; i < halButtonCount; ++i) {
     if (auto button = self->buttons[i]) {
-      button->SetValue((halButtons.buttons & (1u << i)) != 0 ? 1 : 0);
+      button->SetValue((halButtons.buttons & (1llu << i)) != 0 ? 1 : 0);
     }
   }
 
   HAL_JoystickPOVs halPOVs;
   HALSIM_GetJoystickPOVs(self->m_index, &halPOVs);
-  for (int i = 0; i < halPOVs.count; ++i) {
+  int halPovCount = 8 - std::countl_zero(halPOVs.available);
+  for (int i = 0; i < halPovCount; ++i) {
     if (auto pov = self->povs[i].get()) {
       pov->SetValue(halPOVs.povs[i]);
     }
@@ -419,17 +423,22 @@ void GlfwSystemJoystick::GetData(HALJoystickData* data, bool mapGamepad) const {
   data->desc.type = m_isGamepad ? 21 : 20;
   std::strncpy(data->desc.name, m_name, sizeof(data->desc.name) - 1);
   data->desc.name[sizeof(data->desc.name) - 1] = '\0';
-  data->desc.axisCount = (std::min)(m_axisCount, HAL_kMaxJoystickAxes);
-  // desc.axisTypes ???
-  data->desc.buttonCount = (std::min)(m_buttonCount, 32);
-  data->desc.povCount = (std::min)(m_hatCount, HAL_kMaxJoystickPOVs);
+  int axesCount = (std::min)(m_axisCount, HAL_kMaxJoystickAxes);
+  int buttonCount = (std::min)(m_buttonCount, 64);
+  int povsCount = (std::min)(m_hatCount, HAL_kMaxJoystickPOVs);
 
-  data->buttons.count = data->desc.buttonCount;
-  for (int j = 0; j < data->buttons.count; ++j) {
+  if (buttonCount < 64) {
+    data->buttons.available = (1ULL << buttonCount) - 1;
+  } else {
+    data->buttons.available = (std::numeric_limits<uint64_t>::max)();
+  }
+  data->axes.available = (1 << axesCount) - 1;
+  data->povs.available = (1 << povsCount) - 1;
+
+  for (int j = 0; j < buttonCount; ++j) {
     data->buttons.buttons |= (sysButtons[j] ? 1u : 0u) << j;
   }
 
-  data->axes.count = data->desc.axisCount;
   if (m_isGamepad && mapGamepad) {
     // the FRC DriverStation maps gamepad (XInput) trigger values to 0-1 range
     // on axis 2 and 3.
@@ -440,21 +449,12 @@ void GlfwSystemJoystick::GetData(HALJoystickData* data, bool mapGamepad) const {
     data->axes.axes[4] = sysAxes[2];
     data->axes.axes[5] = sysAxes[3];
 
-    // the start button for gamepads is not mapped on the FRC DriverStation
-    // platforms, so remove it if present
-    if (data->buttons.count == 11) {
-      --data->desc.buttonCount;
-      --data->buttons.count;
-      data->buttons.buttons = (data->buttons.buttons & 0xff) |
-                              ((data->buttons.buttons >> 1) & 0x300);
-    }
   } else {
     std::memcpy(data->axes.axes, sysAxes,
-                data->axes.count * sizeof(data->axes.axes[0]));
+                axesCount * sizeof(data->axes.axes[0]));
   }
 
-  data->povs.count = data->desc.povCount;
-  for (int j = 0; j < data->povs.count; ++j) {
+  for (int j = 0; j < povsCount; ++j) {
 #if __GNUC__ >= 12
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstringop-overflow="
@@ -706,20 +706,27 @@ void KeyboardJoystick::Update() {
     m_povCount = 0;
   }
 
-  m_data.axes.count =
+  int axesCount =
       (std::min)(m_axisCount, static_cast<int>(m_axisConfig.size()));
-  m_data.buttons.count =
+  int buttonsCount =
       (std::min)(m_buttonCount, static_cast<int>(m_buttonKey.size()));
-  m_data.povs.count =
-      (std::min)(m_povCount, static_cast<int>(m_povConfig.size()));
+  int povsCount = (std::min)(m_povCount, static_cast<int>(m_povConfig.size()));
 
-  if (m_data.axes.count > 0 || m_data.buttons.count > 0 ||
-      m_data.povs.count > 0) {
+  m_data.axes.available = (1 << axesCount) - 1;
+  m_data.povs.available = (1 << povsCount) - 1;
+  if (buttonsCount >= 64) {
+    m_data.buttons.available = (std::numeric_limits<uint64_t>::max)();
+  } else {
+    m_data.buttons.available = (1u << buttonsCount) - 1;
+  }
+
+  if (m_data.axes.available > 0 || m_data.buttons.available > 0 ||
+      m_data.povs.available > 0) {
     m_present = true;
   }
 
   // axes
-  for (int i = 0; i < m_data.axes.count; ++i) {
+  for (int i = 0; i < axesCount; ++i) {
     auto& config = m_axisConfig[i];
     float& axisValue = m_data.axes.axes[i];
     // increase/decrease while key held down (to saturation); decay back to 0
@@ -753,15 +760,15 @@ void KeyboardJoystick::Update() {
   // buttons
   m_data.buttons.buttons = 0;
   m_anyButtonPressed = false;
-  for (int i = 0; i < m_data.buttons.count; ++i) {
+  for (int i = 0; i < buttonsCount; ++i) {
     if (IsKeyDown(io, m_buttonKey[i])) {
-      m_data.buttons.buttons |= 1u << i;
+      m_data.buttons.buttons |= 1llu << i;
       m_anyButtonPressed = true;
     }
   }
 
   // povs
-  for (int i = 0; i < m_data.povs.count; ++i) {
+  for (int i = 0; i < povsCount; ++i) {
     auto& config = m_povConfig[i];
     auto& povValue = m_data.povs.povs[i];
     povValue = HAL_JoystickPOV_kCentered;
@@ -791,11 +798,6 @@ void KeyboardJoystick::Update() {
       break;
     }
   }
-
-  // update desc
-  m_data.desc.axisCount = m_data.axes.count;
-  m_data.desc.buttonCount = m_data.buttons.count;
-  m_data.desc.povCount = m_data.povs.count;
 }
 
 void KeyboardJoystick::ClearKey(int key) {
@@ -1010,10 +1012,20 @@ static void DriverStationExecute() {
   // update sources
   for (int i = 0; i < HAL_kMaxJoysticks; ++i) {
     auto& source = gJoystickSources[i];
-    int32_t axisCount, buttonCount, povCount;
-    HALSIM_GetJoystickCounts(i, &axisCount, &buttonCount, &povCount);
-    if (axisCount != 0 || buttonCount != 0 || povCount != 0) {
-      if (!source || source->axisCount != axisCount ||
+    uint16_t axesAvailable;
+    uint8_t povsAvailable;
+    uint64_t buttonsAvailable;
+    HALSIM_GetJoystickAvailables(i, &axesAvailable, &buttonsAvailable,
+                                 &povsAvailable);
+    if (axesAvailable != 0 || buttonsAvailable != 0 || povsAvailable != 0) {
+      uint8_t axesCount =
+          static_cast<uint8_t>(16 - std::countl_zero(axesAvailable));
+      uint8_t buttonCount =
+          static_cast<uint8_t>(64 - std::countl_zero(buttonsAvailable));
+      uint8_t povCount =
+          static_cast<uint8_t>(8 - std::countl_zero(povsAvailable));
+
+      if (!source || source->axisCount != axesCount ||
           source->buttonCount != buttonCount || source->povCount != povCount) {
         source.reset();
         source = std::make_unique<JoystickModel>(i);
@@ -1321,7 +1333,10 @@ static void DisplayJoysticks() {
         }
       }
 
-      for (int j = 0; j < joy.data.axes.count; ++j) {
+      uint8_t axesCount =
+          static_cast<uint8_t>(16 - std::countl_zero(joy.data.axes.available));
+
+      for (int j = 0; j < axesCount; ++j) {
         if (source && source->axes[j]) {
           char label[64];
           wpi::format_to_n_c_str(label, sizeof(label), "Axis[{}]", j);
@@ -1335,7 +1350,10 @@ static void DisplayJoysticks() {
         }
       }
 
-      for (int j = 0; j < joy.data.povs.count; ++j) {
+      uint8_t povCount =
+          static_cast<uint8_t>(16 - std::countl_zero(joy.data.povs.available));
+
+      for (int j = 0; j < povCount; ++j) {
         if (source && source->povs[j]) {
           char label[64];
           wpi::format_to_n_c_str(label, sizeof(label), "POVs[{}]", j);
@@ -1349,11 +1367,14 @@ static void DisplayJoysticks() {
         }
       }
 
+      uint8_t buttonCount = static_cast<uint8_t>(
+          64 - std::countl_zero(joy.data.buttons.available));
+
       // show buttons as multiple lines of LED indicators, 8 per line
       static const ImU32 color = IM_COL32(255, 255, 102, 255);
       wpi::SmallVector<int, 64> buttons;
-      buttons.resize(joy.data.buttons.count);
-      for (int j = 0; j < joy.data.buttons.count; ++j) {
+      buttons.resize(buttonCount);
+      for (int j = 0; j < buttonCount; ++j) {
         buttons[j] = joy.IsButtonPressed(j) ? 1 : -1;
       }
       DrawLEDSources(buttons.data(), source ? source->buttons : nullptr,

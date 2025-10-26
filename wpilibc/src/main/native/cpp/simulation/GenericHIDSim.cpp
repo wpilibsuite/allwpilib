@@ -36,16 +36,28 @@ void GenericHIDSim::SetPOV(DriverStation::POVDirection value) {
   SetPOV(0, value);
 }
 
-void GenericHIDSim::SetAxisCount(int count) {
-  DriverStationSim::SetJoystickAxisCount(m_port, count);
+void GenericHIDSim::SetAxesMaximumIndex(int maximumIndex) {
+  DriverStationSim::SetJoystickAxesMaximumIndex(m_port, maximumIndex);
 }
 
-void GenericHIDSim::SetPOVCount(int count) {
-  DriverStationSim::SetJoystickPOVCount(m_port, count);
+void GenericHIDSim::SetAxesAvailable(int count) {
+  DriverStationSim::SetJoystickAxesAvailable(m_port, count);
 }
 
-void GenericHIDSim::SetButtonCount(int count) {
-  DriverStationSim::SetJoystickButtonCount(m_port, count);
+void GenericHIDSim::SetPOVsMaximumIndex(int maximumIndex) {
+  DriverStationSim::SetJoystickPOVsMaximumIndex(m_port, maximumIndex);
+}
+
+void GenericHIDSim::SetPOVsAvailable(int count) {
+  DriverStationSim::SetJoystickPOVsAvailable(m_port, count);
+}
+
+void GenericHIDSim::SetButtonsMaximumIndex(int maximumIndex) {
+  DriverStationSim::SetJoystickButtonsMaximumIndex(m_port, maximumIndex);
+}
+
+void GenericHIDSim::SetButtonsAvailable(uint64_t count) {
+  DriverStationSim::SetJoystickButtonsAvailable(m_port, count);
 }
 
 void GenericHIDSim::SetType(GenericHID::HIDType type) {
@@ -54,10 +66,6 @@ void GenericHIDSim::SetType(GenericHID::HIDType type) {
 
 void GenericHIDSim::SetName(const char* name) {
   DriverStationSim::SetJoystickName(m_port, name);
-}
-
-void GenericHIDSim::SetAxisType(int axis, int type) {
-  DriverStationSim::SetJoystickAxisType(m_port, axis, type);
 }
 
 bool GenericHIDSim::GetOutput(int outputNumber) {
