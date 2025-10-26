@@ -74,6 +74,11 @@ public class GenericHIDSim {
     setPOV(0, value);
   }
 
+  /**
+   * Set the maximum axis index for this device.
+   *
+   * @param maximumIndex the new maximum axis index
+   */
   public void setAxesMaximumIndex(int maximumIndex) {
     DriverStationSim.setJoystickAxesMaximumIndex(m_port, maximumIndex);
   }
@@ -87,6 +92,11 @@ public class GenericHIDSim {
     DriverStationSim.setJoystickAxesAvailable(m_port, count);
   }
 
+  /**
+   * Set the maximum POV index for this device.
+   *
+   * @param maximumIndex the new maximum POV index
+   */
   public void setPOVsMaximumIndex(int maximumIndex) {
     DriverStationSim.setJoystickPOVsMaximumIndex(m_port, maximumIndex);
   }
@@ -100,6 +110,11 @@ public class GenericHIDSim {
     DriverStationSim.setJoystickPOVsAvailable(m_port, count);
   }
 
+  /**
+   * Set the maximum button index for this device.
+   *
+   * @param maximumIndex the new maximum button index
+   */
   public void setButtonsMaximumIndex(int maximumIndex) {
     DriverStationSim.setJoystickButtonsMaximumIndex(m_port, maximumIndex);
   }
