@@ -37,8 +37,7 @@ void HALSimWSProviderJoystick::RegisterCallbacks() {
         std::vector<double> axesValues;
         HALSIM_GetJoystickAxes(provider->GetChannel(), &axes);
 
-        uint8_t axesCount =
-            static_cast<uint8_t>(16 - std::countl_zero(axes.available));
+        int axesCount = 16 - std::countl_zero(axes.available);
 
         for (int i = 0; i < axesCount; i++) {
           axesValues.push_back(axes.axes[i]);
@@ -49,8 +48,7 @@ void HALSimWSProviderJoystick::RegisterCallbacks() {
         std::vector<int16_t> povsValues;
         HALSIM_GetJoystickPOVs(provider->GetChannel(), &povs);
 
-        uint8_t povsCount =
-            static_cast<uint8_t>(8 - std::countl_zero(povs.available));
+        int povsCount = 8 - std::countl_zero(povs.available);
 
         for (int i = 0; i < povsCount; i++) {
           povsValues.push_back(povs.povs[i]);
@@ -60,8 +58,7 @@ void HALSimWSProviderJoystick::RegisterCallbacks() {
         HAL_JoystickButtons buttons{};
         std::vector<bool> buttonsValues;
 
-        uint8_t buttonsCount =
-            static_cast<uint8_t>(64 - std::countl_zero(buttons.available));
+        int buttonsCount = 64 - std::countl_zero(buttons.available);
 
         for (int i = 0; i < buttonsCount; i++) {
           buttonsValues.push_back(((buttons.buttons >> i) & 0x1) == 1);
