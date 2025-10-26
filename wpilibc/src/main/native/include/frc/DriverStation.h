@@ -324,7 +324,7 @@ class DriverStation final {
    * @param description description of the operating mode
    * @param textColor text color
    * @param backgroundColor background color
-   * @return unique ID used to later identify the operating mode; if an empty
+   * @return unique ID used to later identify the operating mode; if a blank
    * name is passed, 0 is returned; identical names for the same robot
    * mode result in a 0 return value
    */
@@ -341,7 +341,7 @@ class DriverStation final {
    * @param name name of the operating mode
    * @param group group of the operating mode
    * @param description description of the operating mode
-   * @return unique ID used to later identify the operating mode; if an empty
+   * @return unique ID used to later identify the operating mode; if a blank
    * name is passed, 0 is returned; identical names for the same robot
    * mode result in a 0 return value
    */

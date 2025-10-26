@@ -28,6 +28,7 @@
 #include <networktables/StructTopic.h>
 #include <wpi/DenseMap.h>
 #include <wpi/EventVector.h>
+#include <wpi/StringExtras.h>
 #include <wpi/condition_variable.h>
 #include <wpi/datalog/DataLog.h>
 #include <wpi/json.h>
@@ -526,7 +527,7 @@ bool DriverStation::IsTestEnabled() {
 static int64_t DoAddOpMode(RobotMode mode, std::string_view name,
                            std::string_view group, std::string_view description,
                            int32_t textColor, int32_t backgroundColor) {
-  if (name.empty()) {
+  if (wpi::trim(name).empty()) {
     return 0;
   }
 
@@ -579,7 +580,7 @@ int64_t DriverStation::AddOpMode(RobotMode mode, std::string_view name,
 }
 
 int64_t DriverStation::RemoveOpMode(RobotMode mode, std::string_view name) {
-  if (name.empty()) {
+  if (wpi::trim(name).empty()) {
     return 0;
   }
 
