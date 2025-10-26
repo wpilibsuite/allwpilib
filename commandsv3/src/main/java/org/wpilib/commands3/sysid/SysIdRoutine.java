@@ -109,8 +109,10 @@ public class SysIdRoutine extends SysIdRoutineLog {
      * @param rampRate The voltage ramp rate used for quasistatic test routines.
      * @param stepVoltage The step voltage output used for dynamic test routines.
      * @param timeout Safety timeout for the test routine commands.
+     * @return A Config object with the specified ramp rate, step voltage, and timeout that records
+     *     to a DataLog file.
      */
-    public static Config useWpilog(
+    public static Config useDataLog(
         Velocity<VoltageUnit> rampRate, Voltage stepVoltage, Time timeout) {
       return new Config(rampRate, stepVoltage, timeout, null);
     }
@@ -123,6 +125,9 @@ public class SysIdRoutine extends SysIdRoutineLog {
      * <p>stepVoltage: 7 volts
      *
      * <p>timeout: 10 seconds
+     *
+     * @return A Config object with the default ramp rate, step voltage, and timeout that records to
+     *     a DataLog file.
      */
     public static Config defaults() {
       return new Config(DEFAULT_RAMP_RATE, DEFAULT_STEP_VOLTAGE, DEFAULT_TIMEOUT, null);
