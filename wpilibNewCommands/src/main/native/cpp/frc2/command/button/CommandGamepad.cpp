@@ -21,8 +21,8 @@ Trigger CommandGamepad::EastFace(frc::EventLoop* loop) const {
   return Button(frc::Gamepad::Button::kEastFace, loop);
 }
 
-Trigger CommandGamepad::WestFacen(frc::EventLoop* loop) const {
-  return Button(frc::Gamepad::Button::kWestFacen, loop);
+Trigger CommandGamepad::WestFace(frc::EventLoop* loop) const {
+  return Button(frc::Gamepad::Button::kWestFace, loop);
 }
 
 Trigger CommandGamepad::NorthFacen(frc::EventLoop* loop) const {

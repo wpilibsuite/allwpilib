@@ -197,21 +197,21 @@ class Gamepad : public GenericHID,
    *
    * @return The state of the button.
    */
-  bool GetWestFacenButton() const;
+  bool GetWestFaceButton() const;
 
   /**
    * Whether the West Face button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
-  bool GetWestFacenButtonPressed();
+  bool GetWestFaceButtonPressed();
 
   /**
    * Whether the West Face button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
-  bool GetWestFacenButtonReleased();
+  bool GetWestFaceButtonReleased();
 
   /**
    * Constructs an event instance around the West Face button's
@@ -221,7 +221,7 @@ class Gamepad : public GenericHID,
    * @return an event instance representing the West Face button's
    * digital signal attached to the given loop.
    */
-  BooleanEvent WestFacen(EventLoop* loop) const;
+  BooleanEvent WestFace(EventLoop* loop) const;
 
   /**
    * Read the value of the North Face button on the controller.
@@ -943,7 +943,7 @@ class Gamepad : public GenericHID,
     /// East Face button.
     static constexpr int kEastFace = 1;
     /// West Face button.
-    static constexpr int kWestFacen = 2;
+    static constexpr int kWestFace = 2;
     /// North Face button.
     static constexpr int kNorthFacen = 3;
     /// Back button.
@@ -1009,6 +1009,10 @@ class Gamepad : public GenericHID,
   };
 
   void InitSendable(wpi::SendableBuilder& builder) override;
+
+  private:
+  double GetAxisForSendable(int axis) const;
+  bool GetButtonForSendable(int button) const;
 };
 
 }  // namespace frc

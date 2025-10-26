@@ -66,7 +66,7 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the West Face button's
    * digital signal attached to the given loop.
    */
-  Trigger WestFacen(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger WestFace(frc::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 
   /**

@@ -29,7 +29,7 @@ public class Gamepad extends GenericHID implements Sendable {
     /** East Face button. */
     kEastFace(1),
     /** West Face button. */
-    kWestFacen(2),
+    kWestFace(2),
     /** North Face button. */
     kNorthFacen(3),
     /** Back button. */
@@ -338,8 +338,8 @@ public class Gamepad extends GenericHID implements Sendable {
    *
    * @return The state of the button.
    */
-  public boolean getWestFacenButton() {
-    return getRawButton(Button.kWestFacen.value);
+  public boolean getWestFaceButton() {
+    return getRawButton(Button.kWestFace.value);
   }
 
   /**
@@ -347,8 +347,8 @@ public class Gamepad extends GenericHID implements Sendable {
    *
    * @return Whether the button was pressed since the last check.
    */
-  public boolean getWestFacenButtonPressed() {
-    return getRawButtonPressed(Button.kWestFacen.value);
+  public boolean getWestFaceButtonPressed() {
+    return getRawButtonPressed(Button.kWestFace.value);
   }
 
   /**
@@ -356,8 +356,8 @@ public class Gamepad extends GenericHID implements Sendable {
    *
    * @return Whether the button was released since the last check.
    */
-  public boolean getWestFacenButtonReleased() {
-    return getRawButtonReleased(Button.kWestFacen.value);
+  public boolean getWestFaceButtonReleased() {
+    return getRawButtonReleased(Button.kWestFace.value);
   }
 
   /**
@@ -367,8 +367,8 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return an event instance representing the West Face button's digital signal attached to the
    *     given loop.
    */
-  public BooleanEvent westFacen(EventLoop loop) {
-    return button(Button.kWestFacen.value, loop);
+  public BooleanEvent westFace(EventLoop loop) {
+    return button(Button.kWestFace.value, loop);
   }
 
   /**
@@ -1245,41 +1245,67 @@ public class Gamepad extends GenericHID implements Sendable {
     return button(Button.kMisc6.value, loop);
   }
 
+  private double getAxisForSendable(int axis) {
+    return DriverStation.getStickAxisIfAvailable(getPort(), axis);
+  }
+
+  private boolean getButtonForSendable(int button) {
+    return DriverStation.getStickButtonIfAvailable(getPort(), button);
+  }
+
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("HID");
     builder.publishConstString("ControllerType", "Gamepad");
-    builder.addDoubleProperty("LeftTrigger Axis", this::getLeftTriggerAxis, null);
-    builder.addDoubleProperty("RightTrigger Axis", this::getRightTriggerAxis, null);
-    builder.addDoubleProperty("LeftX", this::getLeftX, null);
-    builder.addDoubleProperty("LeftY", this::getLeftY, null);
-    builder.addDoubleProperty("RightX", this::getRightX, null);
-    builder.addDoubleProperty("RightY", this::getRightY, null);
-    builder.addBooleanProperty("SouthFace", this::getSouthFaceButton, null);
-    builder.addBooleanProperty("EastFace", this::getEastFaceButton, null);
-    builder.addBooleanProperty("WestFacen", this::getWestFacenButton, null);
-    builder.addBooleanProperty("NorthFacen", this::getNorthFacenButton, null);
-    builder.addBooleanProperty("Back", this::getBackButton, null);
-    builder.addBooleanProperty("Guide", this::getGuideButton, null);
-    builder.addBooleanProperty("Start", this::getStartButton, null);
-    builder.addBooleanProperty("LeftStick", this::getLeftStickButton, null);
-    builder.addBooleanProperty("RightStick", this::getRightStickButton, null);
-    builder.addBooleanProperty("LeftShoulder", this::getLeftShoulderButton, null);
-    builder.addBooleanProperty("RightShoulder", this::getRightShoulderButton, null);
-    builder.addBooleanProperty("DpadUp", this::getDpadUpButton, null);
-    builder.addBooleanProperty("DpadDown", this::getDpadDownButton, null);
-    builder.addBooleanProperty("DpadLeft", this::getDpadLeftButton, null);
-    builder.addBooleanProperty("DpadRight", this::getDpadRightButton, null);
-    builder.addBooleanProperty("Misc1", this::getMisc1Button, null);
-    builder.addBooleanProperty("RightPaddle1", this::getRightPaddle1Button, null);
-    builder.addBooleanProperty("LeftPaddle1", this::getLeftPaddle1Button, null);
-    builder.addBooleanProperty("RightPaddle2", this::getRightPaddle2Button, null);
-    builder.addBooleanProperty("LeftPaddle2", this::getLeftPaddle2Button, null);
-    builder.addBooleanProperty("Touchpad", this::getTouchpadButton, null);
-    builder.addBooleanProperty("Misc2", this::getMisc2Button, null);
-    builder.addBooleanProperty("Misc3", this::getMisc3Button, null);
-    builder.addBooleanProperty("Misc4", this::getMisc4Button, null);
-    builder.addBooleanProperty("Misc5", this::getMisc5Button, null);
-    builder.addBooleanProperty("Misc6", this::getMisc6Button, null);
+    builder.addDoubleProperty(
+        "LeftTrigger Axis", () -> getAxisForSendable(Axis.kLeftTrigger.value), null);
+    builder.addDoubleProperty(
+        "RightTrigger Axis", () -> getAxisForSendable(Axis.kRightTrigger.value), null);
+    builder.addDoubleProperty("LeftX", () -> getAxisForSendable(Axis.kLeftX.value), null);
+    builder.addDoubleProperty("LeftY", () -> getAxisForSendable(Axis.kLeftY.value), null);
+    builder.addDoubleProperty("RightX", () -> getAxisForSendable(Axis.kRightX.value), null);
+    builder.addDoubleProperty("RightY", () -> getAxisForSendable(Axis.kRightY.value), null);
+    builder.addBooleanProperty(
+        "SouthFace", () -> getButtonForSendable(Button.kSouthFace.value), null);
+    builder.addBooleanProperty(
+        "EastFace", () -> getButtonForSendable(Button.kEastFace.value), null);
+    builder.addBooleanProperty(
+        "WestFace", () -> getButtonForSendable(Button.kWestFace.value), null);
+    builder.addBooleanProperty(
+        "NorthFacen", () -> getButtonForSendable(Button.kNorthFacen.value), null);
+    builder.addBooleanProperty("Back", () -> getButtonForSendable(Button.kBack.value), null);
+    builder.addBooleanProperty("Guide", () -> getButtonForSendable(Button.kGuide.value), null);
+    builder.addBooleanProperty("Start", () -> getButtonForSendable(Button.kStart.value), null);
+    builder.addBooleanProperty(
+        "LeftStick", () -> getButtonForSendable(Button.kLeftStick.value), null);
+    builder.addBooleanProperty(
+        "RightStick", () -> getButtonForSendable(Button.kRightStick.value), null);
+    builder.addBooleanProperty(
+        "LeftShoulder", () -> getButtonForSendable(Button.kLeftShoulder.value), null);
+    builder.addBooleanProperty(
+        "RightShoulder", () -> getButtonForSendable(Button.kRightShoulder.value), null);
+    builder.addBooleanProperty("DpadUp", () -> getButtonForSendable(Button.kDpadUp.value), null);
+    builder.addBooleanProperty(
+        "DpadDown", () -> getButtonForSendable(Button.kDpadDown.value), null);
+    builder.addBooleanProperty(
+        "DpadLeft", () -> getButtonForSendable(Button.kDpadLeft.value), null);
+    builder.addBooleanProperty(
+        "DpadRight", () -> getButtonForSendable(Button.kDpadRight.value), null);
+    builder.addBooleanProperty("Misc1", () -> getButtonForSendable(Button.kMisc1.value), null);
+    builder.addBooleanProperty(
+        "RightPaddle1", () -> getButtonForSendable(Button.kRightPaddle1.value), null);
+    builder.addBooleanProperty(
+        "LeftPaddle1", () -> getButtonForSendable(Button.kLeftPaddle1.value), null);
+    builder.addBooleanProperty(
+        "RightPaddle2", () -> getButtonForSendable(Button.kRightPaddle2.value), null);
+    builder.addBooleanProperty(
+        "LeftPaddle2", () -> getButtonForSendable(Button.kLeftPaddle2.value), null);
+    builder.addBooleanProperty(
+        "Touchpad", () -> getButtonForSendable(Button.kTouchpad.value), null);
+    builder.addBooleanProperty("Misc2", () -> getButtonForSendable(Button.kMisc2.value), null);
+    builder.addBooleanProperty("Misc3", () -> getButtonForSendable(Button.kMisc3.value), null);
+    builder.addBooleanProperty("Misc4", () -> getButtonForSendable(Button.kMisc4.value), null);
+    builder.addBooleanProperty("Misc5", () -> getButtonForSendable(Button.kMisc5.value), null);
+    builder.addBooleanProperty("Misc6", () -> getButtonForSendable(Button.kMisc6.value), null);
   }
 }

@@ -109,20 +109,29 @@ class DriverStation final {
   static constexpr int kJoystickPorts = 6;
 
   /**
-   * The state of one joystick button. %Button indexes begin at 1.
+   * The state of one joystick button. Button indexes begin at 0.
    *
    * @param stick  The joystick to read.
-   * @param button The button index, beginning at 1.
+   * @param button The button index, beginning at 0.
    * @return The state of the joystick button.
    */
   static bool GetStickButton(int stick, int button);
+
+  /**
+   * The state of one joystick button, only if available. Button indexes begin at 0.
+   *
+   * @param stick  The joystick to read.
+   * @param button The button index, beginning at 0.
+   * @return The state of the joystick button, or false if not available.
+   */
+  static bool GetStickButtonIfAvailable(int stick, int button);
 
   /**
    * Whether one joystick button was pressed since the last check. %Button
    * indexes begin at 1.
    *
    * @param stick  The joystick to read.
-   * @param button The button index, beginning at 1.
+   * @param button The button index, beginning at 0.
    * @return Whether the joystick button was pressed since the last check.
    */
   static bool GetStickButtonPressed(int stick, int button);
@@ -132,7 +141,7 @@ class DriverStation final {
    * indexes begin at 1.
    *
    * @param stick  The joystick to read.
-   * @param button The button index, beginning at 1.
+   * @param button The button index, beginning at 0.
    * @return Whether the joystick button was released since the last check.
    */
   static bool GetStickButtonReleased(int stick, int button);
@@ -148,6 +157,18 @@ class DriverStation final {
    * @return The value of the axis on the joystick.
    */
   static double GetStickAxis(int stick, int axis);
+
+/**
+   * Get the value of the axis on a joystick, if available.
+   *
+   * This depends on the mapping of the joystick connected to the specified
+   * port.
+   *
+   * @param stick The joystick to read.
+   * @param axis  The analog axis value to read from the joystick.
+   * @return The value of the axis on the joystick, or 0 if not available.
+   */
+  static double GetStickAxisIfAvailable(int stick, int axis);
 
   /**
    * Get the state of a POV on the joystick.

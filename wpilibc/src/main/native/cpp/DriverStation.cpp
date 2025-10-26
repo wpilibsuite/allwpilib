@@ -227,6 +227,28 @@ bool DriverStation::GetStickButton(int stick, int button) {
   return (buttons.buttons & mask) != 0;
 }
 
+bool DriverStation::GetStickButtonIfAvailable(int stick, int button) {
+  if (stick < 0 || stick >= kJoystickPorts) {
+    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
+    return false;
+  }
+  if (button < 0 || button >= 64) {
+    FRC_ReportError(warn::BadJoystickIndex, "button {} out of range", button);
+    return false;
+  }
+
+  uint64_t mask = 1LLU << button;
+
+  HAL_JoystickButtons buttons;
+  HAL_GetJoystickButtons(stick, &buttons);
+
+  if ((buttons.available & mask) == 0) {
+    return false;
+  }
+
+  return (buttons.buttons & mask) != 0;
+}
+
 bool DriverStation::GetStickButtonPressed(int stick, int button) {
   if (stick < 0 || stick >= kJoystickPorts) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
@@ -313,6 +335,28 @@ double DriverStation::GetStickAxis(int stick, int axis) {
         "Joystick Axis {} missing (available {}), check if all controllers are "
         "plugged in",
         axis, axes.available);
+    return 0.0;
+  }
+
+  return axes.axes[axis];
+}
+
+double DriverStation::GetStickAxisIfAvailable(int stick, int axis) {
+  if (stick < 0 || stick >= kJoystickPorts) {
+    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
+    return 0.0;
+  }
+  if (axis < 0 || axis >= HAL_kMaxJoystickAxes) {
+    FRC_ReportError(warn::BadJoystickAxis, "axis {} out of range", axis);
+    return 0.0;
+  }
+
+  uint16_t mask = 1 << axis;
+
+  HAL_JoystickAxes axes;
+  HAL_GetJoystickAxes(stick, &axes);
+
+  if ((axes.available & mask) == 0) {
     return 0.0;
   }
 

@@ -106,7 +106,7 @@ class GenericHID {
    * since the last time this method was called. This is useful if you only
    * want to call a function once when you press the button.
    *
-   * @param button The button index, beginning at 1.
+   * @param button The button index, beginning at 0.
    * @return Whether the button was pressed since the last check.
    */
   bool GetRawButtonPressed(int button);
@@ -119,7 +119,7 @@ class GenericHID {
    * since the last time this method was called. This is useful if you only
    * want to call a function once when you release the button.
    *
-   * @param button The button index, beginning at 1.
+   * @param button The button index, beginning at 0.
    * @return Whether the button was released since the last check.
    */
   bool GetRawButtonReleased(int button);

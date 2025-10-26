@@ -92,7 +92,7 @@ class GamepadSim : public GenericHIDSim {
    *
    * @param value the new value
    */
-  void SetWestFacenButton(bool value);
+  void SetWestFaceButton(bool value);
 
   /**
    * Change the value of the North Face button on the controller.
