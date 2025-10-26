@@ -14,12 +14,12 @@ namespace frc {
  * change value to true for a specified number of times within a specified time
  * window after the first rising edge before the filtered value changes.
  *
- * <p>The filter activates when the input has risen (transitioned from false to
+ * The filter activates when the input has risen (transitioned from false to
  * true) the required number of times within the time window. Once activated,
  * the output remains true as long as the input is true. The tap count resets
  * when the time window expires or when the input goes false after activation.
  *
- * <p>Input must be stable; consider using a Debouncer before this filter to
+ * Input must be stable; consider using a Debouncer before this filter to
  * avoid counting noise as multiple taps.
  */
 class WPILIB_DLLEXPORT MultiTapFilter {
