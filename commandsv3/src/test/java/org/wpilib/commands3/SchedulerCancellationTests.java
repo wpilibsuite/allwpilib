@@ -23,7 +23,7 @@ class SchedulerCancellationTests extends CommandTestBase {
   void cancelOnInterruptDoesNotResume() {
     var count = new AtomicInteger(0);
 
-    var mechanism = new Mechanism("mechanism", m_scheduler);
+    var mechanism = Mechanism.createDummy("mechanism", m_scheduler);
 
     var interrupter =
         Command.requiring(mechanism)
@@ -54,7 +54,7 @@ class SchedulerCancellationTests extends CommandTestBase {
   void defaultCommandResumesAfterInterruption() {
     var count = new AtomicInteger(0);
 
-    var mechanism = new Mechanism("mechanism", m_scheduler);
+    var mechanism = Mechanism.createDummy("mechanism", m_scheduler);
     var defaultCmd =
         mechanism
             .run(
@@ -169,7 +169,7 @@ class SchedulerCancellationTests extends CommandTestBase {
   void cancelAllStartsDefaults() {
     var mechanisms = new ArrayList<Mechanism>(10);
     for (int i = 1; i <= 10; i++) {
-      mechanisms.add(new Mechanism("System " + i, m_scheduler));
+      mechanisms.add(Mechanism.createDummy("System " + i, m_scheduler));
     }
 
     var command = Command.requiring(mechanisms).executing(Coroutine::yield).named("Big Command");
@@ -237,7 +237,7 @@ class SchedulerCancellationTests extends CommandTestBase {
 
   @Test
   void compositionsDoNotSelfCancel() {
-    var mech = new Mechanism("The mechanism", m_scheduler);
+    var mech = Mechanism.createDummy("The mechanism", m_scheduler);
     var group =
         mech.run(
                 co -> {
@@ -263,7 +263,7 @@ class SchedulerCancellationTests extends CommandTestBase {
 
   @Test
   void compositionsDoNotCancelParent() {
-    var mech = new Mechanism("The mechanism", m_scheduler);
+    var mech = Mechanism.createDummy("The mechanism", m_scheduler);
     var group =
         mech.run(
                 co -> {
@@ -286,7 +286,7 @@ class SchedulerCancellationTests extends CommandTestBase {
   void doesNotRunOnCancelWhenInterruptingOnDeck() {
     var ran = new AtomicBoolean(false);
 
-    var mechanism = new Mechanism("The mechanism", m_scheduler);
+    var mechanism = Mechanism.createDummy("The mechanism", m_scheduler);
     var cmd = mechanism.run(Coroutine::yield).whenCanceled(() -> ran.set(true)).named("cmd");
     var interrupter = mechanism.run(Coroutine::yield).named("Interrupter");
     m_scheduler.schedule(cmd);
@@ -300,7 +300,7 @@ class SchedulerCancellationTests extends CommandTestBase {
   void doesNotRunOnCancelWhenCancelingOnDeck() {
     var ran = new AtomicBoolean(false);
 
-    var mechanism = new Mechanism("The mechanism", m_scheduler);
+    var mechanism = Mechanism.createDummy("The mechanism", m_scheduler);
     var cmd = mechanism.run(Coroutine::yield).whenCanceled(() -> ran.set(true)).named("cmd");
     m_scheduler.schedule(cmd);
     // canceling before calling .run()
@@ -314,7 +314,7 @@ class SchedulerCancellationTests extends CommandTestBase {
   void runsOnCancelWhenInterruptingCommand() {
     var ran = new AtomicBoolean(false);
 
-    var mechanism = new Mechanism("The mechanism", m_scheduler);
+    var mechanism = Mechanism.createDummy("The mechanism", m_scheduler);
     var cmd = mechanism.run(Coroutine::park).whenCanceled(() -> ran.set(true)).named("cmd");
     var interrupter = mechanism.run(Coroutine::park).named("Interrupter");
     m_scheduler.schedule(cmd);
@@ -329,7 +329,7 @@ class SchedulerCancellationTests extends CommandTestBase {
   void doesNotRunOnCancelWhenCompleting() {
     var ran = new AtomicBoolean(false);
 
-    var mechanism = new Mechanism("The mechanism", m_scheduler);
+    var mechanism = Mechanism.createDummy("The mechanism", m_scheduler);
     var cmd = mechanism.run(Coroutine::yield).whenCanceled(() -> ran.set(true)).named("cmd");
     m_scheduler.schedule(cmd);
     m_scheduler.run();
@@ -343,7 +343,7 @@ class SchedulerCancellationTests extends CommandTestBase {
   void runsOnCancelWhenCanceling() {
     var ran = new AtomicBoolean(false);
 
-    var mechanism = new Mechanism("The mechanism", m_scheduler);
+    var mechanism = Mechanism.createDummy("The mechanism", m_scheduler);
     var cmd = mechanism.run(Coroutine::yield).whenCanceled(() -> ran.set(true)).named("cmd");
     m_scheduler.schedule(cmd);
     m_scheduler.run();
@@ -356,7 +356,7 @@ class SchedulerCancellationTests extends CommandTestBase {
   void runsOnCancelWhenCancelingParent() {
     var ran = new AtomicBoolean(false);
 
-    var mechanism = new Mechanism("The mechanism", m_scheduler);
+    var mechanism = Mechanism.createDummy("The mechanism", m_scheduler);
     var cmd = mechanism.run(Coroutine::yield).whenCanceled(() -> ran.set(true)).named("cmd");
 
     var group = new SequentialGroup("Seq", Collections.singletonList(cmd));

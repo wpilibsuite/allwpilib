@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 class SchedulerErrorHandlingTests extends CommandTestBase {
   @Test
   void errorDetection() {
-    var mechanism = new Mechanism("X", m_scheduler);
+    var mechanism = Mechanism.createDummy("X", m_scheduler);
 
     var command =
         mechanism

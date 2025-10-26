@@ -45,8 +45,18 @@ class SchedulerTest extends CommandTestBase {
   @SuppressWarnings("PMD.ImmutableField") // PMD bugs
   void atomicity() {
     var mechanism =
-        new Mechanism("X", m_scheduler) {
+        new Mechanism() {
           int m_x = 0;
+
+          @Override
+          public String getName() {
+            return "X";
+          }
+
+          @Override
+          public Scheduler getRegisteredScheduler() {
+            return m_scheduler;
+          }
         };
 
     // Launch 100 commands that each call `x++` 500 times.
@@ -82,8 +92,18 @@ class SchedulerTest extends CommandTestBase {
   @SuppressWarnings("PMD.ImmutableField") // PMD bugs
   void runMechanism() {
     var example =
-        new Mechanism("Counting", m_scheduler) {
+        new Mechanism() {
           int m_x = 0;
+
+          @Override
+          public String getName() {
+            return "Counting";
+          }
+
+          @Override
+          public Scheduler getRegisteredScheduler() {
+            return m_scheduler;
+          }
         };
 
     Command countToTen =
@@ -109,8 +129,8 @@ class SchedulerTest extends CommandTestBase {
 
   @Test
   void compositionsDoNotNeedRequirements() {
-    var m1 = new Mechanism("M1", m_scheduler);
-    var m2 = new Mechanism("m2", m_scheduler);
+    var m1 = Mechanism.createDummy("M1", m_scheduler);
+    var m2 = Mechanism.createDummy("m2", m_scheduler);
 
     // the group has no requirements, but can schedule child commands that do
     var group =
@@ -131,9 +151,19 @@ class SchedulerTest extends CommandTestBase {
   @Test
   void nestedMechanisms() {
     var superstructure =
-        new Mechanism("Superstructure", m_scheduler) {
-          private final Mechanism m_elevator = new Mechanism("Elevator", m_scheduler);
-          private final Mechanism m_arm = new Mechanism("Arm", m_scheduler);
+        new Mechanism() {
+          private final Mechanism m_elevator = Mechanism.createDummy("Elevator", m_scheduler);
+          private final Mechanism m_arm = Mechanism.createDummy("Arm", m_scheduler);
+
+          @Override
+          public String getName() {
+            return "Superstructure";
+          }
+
+          @Override
+          public Scheduler getRegisteredScheduler() {
+            return m_scheduler;
+          }
 
           public Command superCommand() {
             return run(co -> {

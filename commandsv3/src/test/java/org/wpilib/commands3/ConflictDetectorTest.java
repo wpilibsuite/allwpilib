@@ -23,7 +23,7 @@ class ConflictDetectorTest extends CommandTestBase {
 
   @Test
   void singleInputHasNoConflicts() {
-    var mech = new Mechanism("Mech", m_scheduler);
+    var mech = Mechanism.createDummy("Mech", m_scheduler);
     var command = Command.requiring(mech).executing(Coroutine::park).named("Command");
     var conflicts = findAllConflicts(List.of(command));
     assertEquals(0, conflicts.size());
@@ -31,7 +31,7 @@ class ConflictDetectorTest extends CommandTestBase {
 
   @Test
   void commandDoesNotConflictWithSelf() {
-    var mech = new Mechanism("Mech", m_scheduler);
+    var mech = Mechanism.createDummy("Mech", m_scheduler);
     var command = Command.requiring(mech).executing(Coroutine::park).named("Command");
     var conflicts = findAllConflicts(List.of(command, command));
     assertEquals(0, conflicts.size());
@@ -39,8 +39,8 @@ class ConflictDetectorTest extends CommandTestBase {
 
   @Test
   void detectManyConflicts() {
-    var mech1 = new Mechanism("Mech 1", m_scheduler);
-    var mech2 = new Mechanism("Mech 2", m_scheduler);
+    var mech1 = Mechanism.createDummy("Mech 1", m_scheduler);
+    var mech2 = Mechanism.createDummy("Mech 2", m_scheduler);
 
     var command1 = Command.requiring(mech1, mech2).executing(Coroutine::park).named("Command1");
     var command2 = Command.requiring(mech1).executing(Coroutine::park).named("Command2");
