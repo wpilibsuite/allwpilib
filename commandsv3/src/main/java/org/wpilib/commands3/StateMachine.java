@@ -105,9 +105,9 @@ public final class StateMachine implements Command {
    * stateMachine.switchFromAny(state1, state2, state3).to(state4).when(() -> foo == true);
    *
    * // Functionally equivalent to:
-   * state1.transitionTo(state4).when(() -> foo == true);
-   * state2.transitionTo(state4).when(() -> foo == true);
-   * state3.transitionTo(state4).when(() -> foo == true);
+   * state1.switchTo(state4).when(() -> foo == true);
+   * state2.switchTo(state4).when(() -> foo == true);
+   * state3.switchTo(state4).when(() -> foo == true);
    *
    * // Set up an early exit condition from any state
    * stateMachine.switchFromAny().toExitStateMachine().when(() -> bar == true);
