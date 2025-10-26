@@ -79,9 +79,8 @@ public class SysIdRoutine extends SysIdRoutineLog {
     public static final Time DEFAULT_TIMEOUT = Seconds.of(10);
 
     /**
-     * Create a new configuration for a SysId test routine.
-     *  
-     * To use the default config values, pass in the provided static default fields.
+     * Create a new configuration for a SysId test routine. To use the default config values, 
+     * pass in the provided static default fields.
      * 
      * @param rampRate The voltage ramp rate used for quasistatic test routines.
      * @param stepVoltage The step voltage output used for dynamic test routines.
@@ -107,15 +106,12 @@ public class SysIdRoutine extends SysIdRoutineLog {
     /**
      * Create a new configuration for a SysId test routine.
      *
-     * @param rampRate The voltage ramp rate used for quasistatic test routines. Defaults to 1 volt
-     *     per second if left null.
-     * @param stepVoltage The step voltage output used for dynamic test routines. Defaults to 7
-     *     volts if left null.
-     * @param timeout Safety timeout for the test routine commands. Defaults to 10 seconds if left
-     *     null.
+     * @param rampRate The voltage ramp rate used for quasistatic test routines.
+     * @param stepVoltage The step voltage output used for dynamic test routines.
+     * @param timeout Safety timeout for the test routine commands.
      */
-    public Config(Velocity<VoltageUnit> rampRate, Voltage stepVoltage, Time timeout) {
-      this(rampRate, stepVoltage, timeout, null);
+    public static Config useWpilog(Velocity<VoltageUnit> rampRate, Voltage stepVoltage, Time timeout) {
+      return new Config(rampRate, stepVoltage, timeout, null);
     }
 
     /**
@@ -127,8 +123,9 @@ public class SysIdRoutine extends SysIdRoutineLog {
      *
      * <p>timeout: 10 seconds
      */
-    public Config() {
-      this(null, null, null, null);
+
+    public static Config defaults() {
+      return new Config(DEFAULT_RAMP_RATE, DEFAULT_STEP_VOLTAGE, DEFAULT_TIMEOUT, null);
     }
   }
 
@@ -147,7 +144,7 @@ public class SysIdRoutine extends SysIdRoutineLog {
     public final Consumer<SysIdRoutineLog> m_log;
 
     /** The subsystem containing the motor(s) that is (or are) being characterized. */
-    public final Mechanism m_subsystem;
+    private final Mechanism m_subsystem;
 
     /** The name of the mechanism being tested. */
     public final String m_name;
