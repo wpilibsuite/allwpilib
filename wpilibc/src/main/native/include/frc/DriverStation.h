@@ -123,9 +123,9 @@ class DriverStation final {
    *
    * @param stick  The joystick to read.
    * @param button The button index, beginning at 0.
-   * @return The state of the joystick button, or false if not available.
+   * @return The state of the joystick button, or empty if unavailable.
    */
-  static bool GetStickButtonIfAvailable(int stick, int button);
+  static std::optional<bool> GetStickButtonIfAvailable(int stick, int button);
 
   /**
    * Whether one joystick button was pressed since the last check. %Button
@@ -167,9 +167,9 @@ class DriverStation final {
    *
    * @param stick The joystick to read.
    * @param axis  The analog axis value to read from the joystick.
-   * @return The value of the axis on the joystick, or 0 if not available.
+   * @return The value of the axis on the joystick, or empty if not available.
    */
-  static double GetStickAxisIfAvailable(int stick, int axis);
+  static std::optional<double> GetStickAxisIfAvailable(int stick, int axis);
 
   /**
    * Get the state of a POV on the joystick.

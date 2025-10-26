@@ -24,6 +24,7 @@ import edu.wpi.first.util.EventVector;
 import edu.wpi.first.util.WPIUtilJNI;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -650,7 +651,7 @@ public final class DriverStation {
    * @param button The button index.
    * @return The state of the joystick button, or false if the button is not available.
    */
-  public static boolean getStickButtonIfAvailable(final int stick, final int button) {
+  public static Optional<Boolean> getStickButtonIfAvailable(final int stick, final int button) {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
@@ -663,12 +664,12 @@ public final class DriverStation {
     m_cacheDataMutex.lock();
     try {
       if ((m_joystickButtons[stick].m_available & mask) != 0) {
-        return (m_joystickButtons[stick].m_buttons & mask) != 0;
+        return Optional.of((m_joystickButtons[stick].m_buttons & mask) != 0);
       }
     } finally {
       m_cacheDataMutex.unlock();
     }
-    return false;
+    return Optional.empty();
   }
 
   /**
@@ -797,7 +798,7 @@ public final class DriverStation {
    * @param axis The analog axis value to read from the joystick.
    * @return The value of the axis on the joystick, or 0 if the axis is not available.
    */
-  public static double getStickAxisIfAvailable(int stick, int axis) {
+  public static OptionalDouble getStickAxisIfAvailable(int stick, int axis) {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
@@ -810,13 +811,13 @@ public final class DriverStation {
     m_cacheDataMutex.lock();
     try {
       if ((m_joystickAxes[stick].m_available & mask) != 0) {
-        return m_joystickAxes[stick].m_axes[axis];
+        return OptionalDouble.of(m_joystickAxes[stick].m_axes[axis]);
       }
     } finally {
       m_cacheDataMutex.unlock();
     }
 
-    return 0.0;
+    return OptionalDouble.empty();
   }
 
   /**

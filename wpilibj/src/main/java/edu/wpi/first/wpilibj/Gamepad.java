@@ -1246,11 +1246,11 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   private double getAxisForSendable(int axis) {
-    return DriverStation.getStickAxisIfAvailable(getPort(), axis);
+    return DriverStation.getStickAxisIfAvailable(getPort(), axis).orElse(0.0);
   }
 
   private boolean getButtonForSendable(int button) {
-    return DriverStation.getStickButtonIfAvailable(getPort(), button);
+    return DriverStation.getStickButtonIfAvailable(getPort(), button).orElse(false);
   }
 
   @Override
