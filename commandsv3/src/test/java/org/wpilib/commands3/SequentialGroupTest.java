@@ -62,8 +62,8 @@ class SequentialGroupTest extends CommandTestBase {
 
   @Test
   void inheritsRequirements() {
-    var mech1 = Mechanism.createDummy("Mech 1", m_scheduler);
-    var mech2 = Mechanism.createDummy("Mech 2", m_scheduler);
+    var mech1 = new DummyMechanism("Mech 1", m_scheduler);
+    var mech2 = new DummyMechanism("Mech 2", m_scheduler);
     var command1 = mech1.run(Coroutine::park).named("Command 1");
     var command2 = mech2.run(Coroutine::park).named("Command 2");
     var sequence = new SequentialGroup("Sequence", List.of(command1, command2));
@@ -72,8 +72,8 @@ class SequentialGroupTest extends CommandTestBase {
 
   @Test
   void inheritsPriority() {
-    var mech1 = Mechanism.createDummy("Mech 1", m_scheduler);
-    var mech2 = Mechanism.createDummy("Mech 2", m_scheduler);
+    var mech1 = new DummyMechanism("Mech 1", m_scheduler);
+    var mech2 = new DummyMechanism("Mech 2", m_scheduler);
     var command1 = mech1.run(Coroutine::park).withPriority(100).named("Command 1");
     var command2 = mech2.run(Coroutine::park).withPriority(200).named("Command 2");
     var sequence = new SequentialGroup("Sequence", List.of(command1, command2));

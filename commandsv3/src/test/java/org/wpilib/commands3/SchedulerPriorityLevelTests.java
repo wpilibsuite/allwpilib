@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 class SchedulerPriorityLevelTests extends CommandTestBase {
   @Test
   void higherPriorityCancels() {
-    final var subsystem = Mechanism.createDummy("Subsystem", m_scheduler);
+    final var subsystem = new DummyMechanism("Subsystem", m_scheduler);
 
     final var lower = new PriorityCommand(-1000, subsystem);
     final var higher = new PriorityCommand(+1000, subsystem);
@@ -29,7 +29,7 @@ class SchedulerPriorityLevelTests extends CommandTestBase {
 
   @Test
   void lowerPriorityDoesNotCancel() {
-    final var subsystem = Mechanism.createDummy("Subsystem", m_scheduler);
+    final var subsystem = new DummyMechanism("Subsystem", m_scheduler);
 
     final var lower = new PriorityCommand(-1000, subsystem);
     final var higher = new PriorityCommand(+1000, subsystem);
@@ -47,7 +47,7 @@ class SchedulerPriorityLevelTests extends CommandTestBase {
 
   @Test
   void samePriorityCancels() {
-    final var subsystem = Mechanism.createDummy("Subsystem", m_scheduler);
+    final var subsystem = new DummyMechanism("Subsystem", m_scheduler);
 
     final var first = new PriorityCommand(512, subsystem);
     final var second = new PriorityCommand(512, subsystem);

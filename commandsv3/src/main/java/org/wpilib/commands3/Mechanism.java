@@ -131,25 +131,4 @@ public interface Mechanism {
   default List<Command> getRunningCommands() {
     return getRegisteredScheduler().getRunningCommandsFor(this);
   }
-
-  /**
-   * Creates a dummy mechanism, for use in unit tests.
-   *
-   * @param name The name of this dummy mechanism.
-   * @param scheduler The registered scheduler. Cannot be null.
-   * @return The dummy mechanism.
-   */
-  static Mechanism createDummy(String name, Scheduler scheduler) {
-    return new Mechanism() {
-      @Override
-      public String getName() {
-        return name;
-      }
-
-      @Override
-      public Scheduler getRegisteredScheduler() {
-        return scheduler;
-      }
-    };
-  }
 }
