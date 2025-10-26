@@ -391,8 +391,10 @@ public abstract class RobotBase implements AutoCloseable {
         } catch (ClassNotFoundException e) {
           DriverStation.reportError(
               "Could not find class from stack trace? This should not happen.\n"
-                  + "If simulating in VS Code, try opening the Command Palette and running Clean Java Language Server Workspace.\n"
-                  + "If this is on a real robot, try redeploying. If this is persistent, report this on https://github.com/wpilibsuite/allwpilib/issues/new?template=bug_report.md. Error: "
+                  + "If simulating in VS Code, try opening the Command Palette "
+                  + "and running Clean Java Language Server Workspace.\n"
+                  + "If this is on a real robot, try redeploying. If this is persistent, "
+                  + "report this on https://github.com/wpilibsuite/allwpilib/issues/new?template=bug_report.md. Error: "
                   + throwable,
               elements);
         }
@@ -529,10 +531,8 @@ public abstract class RobotBase implements AutoCloseable {
       runRobot(robotSupplier);
     }
 
-    // On RIO, this will just terminate rather than shutting down cleanly (it's a
-    // no-op in sim).
-    // It's not worth the risk of hanging on shutdown when we want the code to
-    // restart as quickly
+    // On RIO, this will just terminate rather than shutting down cleanly (it's a no-op in sim).
+    // It's not worth the risk of hanging on shutdown when we want the code to restart as quickly
     // as possible.
     HAL.terminate();
 
