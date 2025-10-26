@@ -86,10 +86,10 @@ public class CommandGamepad extends CommandGenericHID {
    *
    * @return a Trigger instance representing the West Face button's digital signal attached to the
    *     {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
-   * @see #WestFace(EventLoop)
+   * @see #westFace(EventLoop)
    */
-  public Trigger WestFace() {
-    return WestFace(CommandScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger westFace() {
+    return westFace(CommandScheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -99,7 +99,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @return a Trigger instance representing the West Face button's digital signal attached to the
    *     given loop.
    */
-  public Trigger WestFace(EventLoop loop) {
+  public Trigger westFace(EventLoop loop) {
     return button(Gamepad.Button.kWestFace.value, loop);
   }
 

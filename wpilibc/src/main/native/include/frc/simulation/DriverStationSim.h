@@ -295,7 +295,7 @@ class DriverStationSim {
    * Sets the number of axes for a joystick.
    *
    * @param stick The joystick number
-   * @param count The number of axes on the indicated joystick
+   * @param maximumIndex The number of axes on the indicated joystick
    */
   static void SetJoystickAxesMaximumIndex(int stick, int maximumIndex);
 
@@ -303,7 +303,7 @@ class DriverStationSim {
    * Sets the number of axes for a joystick.
    *
    * @param stick The joystick number
-   * @param count The number of axes on the indicated joystick
+   * @param available The number of axes on the indicated joystick
    */
   static void SetJoystickAxesAvailable(int stick, int available);
 
@@ -311,11 +311,17 @@ class DriverStationSim {
    * Sets the number of POVs for a joystick.
    *
    * @param stick The joystick number
-   * @param count The number of POVs on the indicated joystick
+   * @param maximumIndex The number of POVs on the indicated joystick
    */
-  static void SetJoystickPOVsMaximumIndex(int stick, int count);
+  static void SetJoystickPOVsMaximumIndex(int stick, int maximumIndex);
 
-  static void SetJoystickPOVsAvailable(int stick, int count);
+  /**
+   * Sets the number of POVs for a joystick.
+   *
+   * @param stick The joystick number
+   * @param available The number of POVs on the indicated joystick
+   */
+  static void SetJoystickPOVsAvailable(int stick, int available);
 
   /**
    * Sets the number of buttons for a joystick.
