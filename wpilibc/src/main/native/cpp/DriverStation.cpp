@@ -978,13 +978,12 @@ void DataLogSender::Init(wpi::log::DataLog& log, bool logJoysticks,
   m_logOpMode = wpi::log::StringLogEntry{log, "DS:opMode", timestamp};
 
   // append initial control word value
-  hal::ControlWord ctlWord = hal::GetControlWord();
-  m_prevControlWord = ctlWord;
-  m_logControlWord.Append(ctlWord);
+  m_prevControlWord = hal::GetControlWord();
+  m_logControlWord.Append(m_prevControlWord);
 
   // append initial opmode value
   auto& inst = GetInstance();
-  m_logOpMode.Append(inst.OpModeToString(ctlWord.GetOpModeId()));
+  m_logOpMode.Append(inst.OpModeToString(m_prevControlWord.GetOpModeId()));
 
   m_logJoysticks = logJoysticks;
   if (logJoysticks) {
