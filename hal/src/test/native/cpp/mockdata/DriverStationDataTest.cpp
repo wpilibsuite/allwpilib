@@ -34,8 +34,8 @@ TEST(DriverStationTest, Joystick) {
       EXPECT_EQ(0, povs.povs[i]);
     }
 
-    EXPECT_EQ(0, buttons.available);
-    EXPECT_EQ(0u, buttons.buttons);
+    EXPECT_EQ(0llu, buttons.available);
+    EXPECT_EQ(0llu, buttons.buttons);
   }
 
   HAL_JoystickAxes set_axes;
