@@ -227,7 +227,8 @@ bool DriverStation::GetStickButton(int stick, int button) {
   return (buttons.buttons & mask) != 0;
 }
 
-std::optional<bool> DriverStation::GetStickButtonIfAvailable(int stick, int button) {
+std::optional<bool> DriverStation::GetStickButtonIfAvailable(int stick,
+                                                             int button) {
   if (stick < 0 || stick >= kJoystickPorts) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return false;
@@ -341,7 +342,8 @@ double DriverStation::GetStickAxis(int stick, int axis) {
   return axes.axes[axis];
 }
 
-std::optional<double> DriverStation::GetStickAxisIfAvailable(int stick, int axis) {
+std::optional<double> DriverStation::GetStickAxisIfAvailable(int stick,
+                                                             int axis) {
   if (stick < 0 || stick >= kJoystickPorts) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0.0;

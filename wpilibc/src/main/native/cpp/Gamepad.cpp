@@ -481,7 +481,8 @@ double Gamepad::GetAxisForSendable(int axis) const {
 }
 
 bool Gamepad::GetButtonForSendable(int button) const {
-  return DriverStation::GetStickButtonIfAvailable(GetPort(), button).value_or(false);
+  return DriverStation::GetStickButtonIfAvailable(GetPort(), button)
+      .value_or(false);
 }
 
 void Gamepad::InitSendable(wpi::SendableBuilder& builder) {
