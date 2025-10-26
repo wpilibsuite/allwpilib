@@ -15,11 +15,10 @@ import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
-
-import org.wpilib.commands3.Command;
-import org.wpilib.commands3.Mechanism;
 import java.util.Map;
 import java.util.function.Consumer;
+import org.wpilib.commands3.Command;
+import org.wpilib.commands3.Mechanism;
 
 /**
  * A SysId characterization routine for a single mechanism. Mechanisms may have multiple motors.
@@ -183,7 +182,8 @@ public class SysIdRoutine extends SysIdRoutineLog {
      *     will be appended to the log entry title for the routine's test state, e.g.
      *     "sysid-test-state-subsystem".
      */
-    public SysIdMechanism(Consumer<Voltage> drive, Consumer<SysIdRoutineLog> log, Mechanism subsystem) {
+    public SysIdMechanism(
+        Consumer<Voltage> drive, Consumer<SysIdRoutineLog> log, Mechanism subsystem) {
       this(drive, log, subsystem, null);
     }
   }
@@ -218,27 +218,29 @@ public class SysIdRoutine extends SysIdRoutineLog {
 
     Timer timer = new Timer();
     return Command.sequence(
-      m_mechanism.m_subsystem.run((co) -> timer.restart()).named("sysid-Restart Timer"),
-      m_mechanism.m_subsystem.run(
-        (co) -> {
-          while (true) {
-            m_mechanism.m_drive.accept(
-              (Voltage) m_config.m_rampRate.times(Seconds.of(timer.get() * outputSign)));
-            m_mechanism.m_log.accept(this);
-            m_recordState.accept(state);
-            co.yield();
-          }
-        })
-        .whenCanceled(() -> {
-          m_mechanism.m_drive.accept(Volts.of(0));
-          m_recordState.accept(State.kNone);
-          timer.stop();
-        }
-      )
-      .named("sysid-run quasistatic test")
-      )
-      .named("sysid-" + state.toString() + "-" + m_mechanism.m_name)
-      .withTimeout(m_config.m_timeout);
+            m_mechanism.m_subsystem.run(co -> timer.restart()).named("sysid-Restart Timer"),
+            m_mechanism
+                .m_subsystem
+                .run(
+                    co -> {
+                      while (true) {
+                        m_mechanism.m_drive.accept(
+                            (Voltage)
+                                m_config.m_rampRate.times(Seconds.of(timer.get() * outputSign)));
+                        m_mechanism.m_log.accept(this);
+                        m_recordState.accept(state);
+                        co.yield();
+                      }
+                    })
+                .whenCanceled(
+                    () -> {
+                      m_mechanism.m_drive.accept(Volts.of(0));
+                      m_recordState.accept(State.kNone);
+                      timer.stop();
+                    })
+                .named("sysid-run quasistatic test"))
+        .named("sysid-" + state.toString() + "-" + m_mechanism.m_name)
+        .withTimeout(m_config.m_timeout);
   }
 
   /**
@@ -260,22 +262,28 @@ public class SysIdRoutine extends SysIdRoutineLog {
             .get(direction);
     Voltage[] output = {Volts.zero()};
     return Command.sequence(
-      m_mechanism.m_subsystem.run((co) -> output[0] = m_config.m_stepVoltage.times(outputSign)).named("sysid-setup dynamic step voltage"),
-      m_mechanism.m_subsystem.run((co) -> {
-        while (true) {
-          m_mechanism.m_drive.accept(output[0]);
-          m_mechanism.m_log.accept(this);
-          m_recordState.accept(state);
-          co.yield();
-        }
-      })
-      .whenCanceled(() -> {
-        m_mechanism.m_drive.accept(Volts.of(0));
-        m_recordState.accept(State.kNone);
-      })
-      .named("sysid-run dynamic test")
-    )
-    .named("sysid-" + state.toString() + "-" + m_mechanism.m_name)
-    .withTimeout(m_config.m_timeout);
+            m_mechanism
+                .m_subsystem
+                .run(co -> output[0] = m_config.m_stepVoltage.times(outputSign))
+                .named("sysid-setup dynamic step voltage"),
+            m_mechanism
+                .m_subsystem
+                .run(
+                    co -> {
+                      while (true) {
+                        m_mechanism.m_drive.accept(output[0]);
+                        m_mechanism.m_log.accept(this);
+                        m_recordState.accept(state);
+                        co.yield();
+                      }
+                    })
+                .whenCanceled(
+                    () -> {
+                      m_mechanism.m_drive.accept(Volts.of(0));
+                      m_recordState.accept(State.kNone);
+                    })
+                .named("sysid-run dynamic test"))
+        .named("sysid-" + state.toString() + "-" + m_mechanism.m_name)
+        .withTimeout(m_config.m_timeout);
   }
 }
