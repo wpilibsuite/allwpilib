@@ -289,6 +289,11 @@ class Trigger {
    * when this trigger has been activated the required number of times within
    * the specified time window.
    *
+   * This is useful for implementing "double-click" style functionality.
+   *
+   * Input for this must be stable, consider using a Debouncer before this
+   * filter to avoid counting noise as multiple taps.
+   *
    * @param requiredTaps The number of taps required.
    * @param tapWindowSeconds The time window in which the taps must occur.
    * @return The multi-tap filtered trigger.
