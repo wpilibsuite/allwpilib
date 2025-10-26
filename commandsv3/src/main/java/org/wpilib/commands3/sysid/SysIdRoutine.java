@@ -7,6 +7,7 @@ package org.wpilib.commands3.sysid;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Time;
@@ -68,15 +69,23 @@ public class SysIdRoutine extends SysIdRoutineLog {
     /** Optional handle for recording test state in a third-party logging solution. */
     public final Consumer<State> m_recordState;
 
+    /** Default voltage ramp rate used in quasistatic test routines, set to 1 volt per second.*/
+    public static final Velocity<VoltageUnit> DEFAULT_RAMP_RATE = Volts.of(1).per(Second);
+
+    /** Default step voltage used in dynamic test routines, set to 7 volts.*/
+    public static final Voltage DEFAULT_STEP_VOLTAGE = Volts.of(7);
+
+    /** Default timeout used to automatically end test routine commands, set to 10 seconds.*/
+    public static final Time DEFAULT_TIMEOUT = Seconds.of(10);
+
     /**
      * Create a new configuration for a SysId test routine.
-     *
-     * @param rampRate The voltage ramp rate used for quasistatic test routines. Defaults to 1 volt
-     *     per second if left null.
-     * @param stepVoltage The step voltage output used for dynamic test routines. Defaults to 7
-     *     volts if left null.
-     * @param timeout Safety timeout for the test routine commands. Defaults to 10 seconds if left
-     *     null.
+     *  
+     * To use the default config values, pass in the provided static default fields.
+     * 
+     * @param rampRate The voltage ramp rate used for quasistatic test routines.
+     * @param stepVoltage The step voltage output used for dynamic test routines.
+     * @param timeout Safety timeout for the test routine commands.
      * @param recordState Optional handle for recording test state in a third-party logging
      *     solution. If provided, the test routine state will be passed to this callback instead of
      *     logged in WPILog.
@@ -86,9 +95,12 @@ public class SysIdRoutine extends SysIdRoutineLog {
         Voltage stepVoltage,
         Time timeout,
         Consumer<State> recordState) {
-      m_rampRate = rampRate != null ? rampRate : Volts.of(1).per(Second);
-      m_stepVoltage = stepVoltage != null ? stepVoltage : Volts.of(7);
-      m_timeout = timeout != null ? timeout : Seconds.of(10);
+      requireNonNullParam(rampRate, "rampRate", "SysIdRoutine.Config");
+      requireNonNullParam(stepVoltage, "stepVoltage", "SysIdRoutine.Config");
+      requireNonNullParam(timeout, "timeout", "SysIdRoutine.Config");
+      m_rampRate = rampRate;
+      m_stepVoltage = stepVoltage;
+      m_timeout = timeout;
       m_recordState = recordState;
     }
 
