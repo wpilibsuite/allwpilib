@@ -11,7 +11,6 @@
 #include "callback_helpers/TestCallbackHelpers.h"
 #include "frc/DriverStation.h"
 #include "frc/Joystick.h"
-#include "frc/RobotState.h"
 #include "frc/simulation/DriverStationSim.h"
 #include "frc/simulation/SimHooks.h"
 
@@ -31,7 +30,6 @@ TEST(DriverStationTest, Enabled) {
   DriverStationSim::NotifyNewData();
   EXPECT_TRUE(DriverStationSim::GetEnabled());
   EXPECT_TRUE(DriverStation::IsEnabled());
-  EXPECT_TRUE(RobotState::IsEnabled());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_TRUE(callback.GetLastValue());
 }
@@ -49,8 +47,6 @@ TEST(DriverStationTest, AutonomousMode) {
   EXPECT_EQ(DriverStationSim::GetRobotMode(), HAL_ROBOTMODE_AUTONOMOUS);
   EXPECT_TRUE(DriverStation::IsAutonomous());
   EXPECT_EQ(DriverStation::GetRobotMode(), RobotMode::AUTONOMOUS);
-  EXPECT_TRUE(RobotState::IsAutonomous());
-  EXPECT_EQ(RobotState::GetRobotMode(), RobotMode::AUTONOMOUS);
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(callback.GetLastValue(), HAL_ROBOTMODE_AUTONOMOUS);
 }
@@ -68,8 +64,6 @@ TEST(DriverStationTest, Mode) {
   EXPECT_EQ(DriverStationSim::GetRobotMode(), HAL_ROBOTMODE_TEST);
   EXPECT_TRUE(DriverStation::IsTest());
   EXPECT_EQ(DriverStation::GetRobotMode(), RobotMode::TEST);
-  EXPECT_TRUE(RobotState::IsTest());
-  EXPECT_EQ(RobotState::GetRobotMode(), RobotMode::TEST);
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(callback.GetLastValue(), HAL_ROBOTMODE_TEST);
 }
@@ -86,7 +80,6 @@ TEST(DriverStationTest, Estop) {
   DriverStationSim::NotifyNewData();
   EXPECT_TRUE(DriverStationSim::GetEStop());
   EXPECT_TRUE(DriverStation::IsEStopped());
-  EXPECT_TRUE(RobotState::IsEStopped());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_TRUE(callback.GetLastValue());
 }
