@@ -23,7 +23,8 @@ import org.wpilib.annotation.NoDiscard;
  */
 public interface Mechanism {
   /**
-   * Gets the scheduler that registered this subsystem.
+   * Returns the scheduler under which this subsystem and its default commands are registered. The
+   * scheduler is also used to fetch running commands for the subsystem.
    *
    * @return The registered scheduler.
    */
@@ -32,13 +33,13 @@ public interface Mechanism {
   }
 
   /**
-   * Gets the name of this mechanism.
+   * Gets the name of this mechanism. This will default to the name of this mechanism's class.
    *
    * @return The name of the mechanism.
    */
   @NoDiscard
   default String getName() {
-    return this.getClass().getSimpleName();
+    return getClass().getSimpleName();
   }
 
   /**
