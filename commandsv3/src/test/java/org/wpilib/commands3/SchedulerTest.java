@@ -135,6 +135,12 @@ class SchedulerTest extends CommandTestBase {
           private final Mechanism m_elevator = new DummyMechanism("Elevator", m_scheduler);
           private final Mechanism m_arm = new DummyMechanism("Arm", m_scheduler);
 
+          {
+            m_arm.setDefaultCommand(m_arm.idle());
+            m_elevator.setDefaultCommand(m_elevator.idle());
+            setDefaultCommand(this.idle());
+          }
+
           public Command superCommand() {
             return run(co -> {
                   co.await(m_elevator.run(Coroutine::park).named("Elevator Subcommand"));

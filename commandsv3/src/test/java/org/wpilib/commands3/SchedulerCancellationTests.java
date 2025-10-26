@@ -169,7 +169,9 @@ class SchedulerCancellationTests extends CommandTestBase {
   void cancelAllStartsDefaults() {
     var mechanisms = new ArrayList<Mechanism>(10);
     for (int i = 1; i <= 10; i++) {
-      mechanisms.add(new DummyMechanism("System " + i, m_scheduler));
+      var mechanism = new DummyMechanism("System " + i, m_scheduler);
+      mechanism.setDefaultCommand(mechanism.idle());
+      mechanisms.add(mechanism);
     }
 
     var command = Command.requiring(mechanisms).executing(Coroutine::yield).named("Big Command");
