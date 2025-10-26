@@ -6,8 +6,10 @@
 #include <tuple>
 
 #include <gtest/gtest.h>
+#include <hal/DriverStationTypes.h>
 
 #include "callback_helpers/TestCallbackHelpers.h"
+#include "frc/DSControlWord.h"
 #include "frc/DriverStation.h"
 #include "frc/Joystick.h"
 #include "frc/RobotState.h"
@@ -25,6 +27,7 @@ TEST(DriverStationTest, Enabled) {
   BooleanCallback callback;
   auto cb =
       DriverStationSim::RegisterEnabledCallback(callback.GetCallback(), false);
+  DriverStationSim::SetRobotMode(HAL_ROBOTMODE_TELEOPERATED);
   DriverStationSim::SetEnabled(true);
   DriverStationSim::NotifyNewData();
   EXPECT_TRUE(DriverStationSim::GetEnabled());
@@ -39,16 +42,18 @@ TEST(DriverStationTest, AutonomousMode) {
   DriverStationSim::ResetData();
 
   EXPECT_FALSE(DriverStation::IsAutonomous());
-  BooleanCallback callback;
-  auto cb = DriverStationSim::RegisterAutonomousCallback(callback.GetCallback(),
-                                                         false);
-  DriverStationSim::SetAutonomous(true);
+  EnumCallback callback;
+  auto cb = DriverStationSim::RegisterRobotModeCallback(callback.GetCallback(),
+                                                        false);
+  DriverStationSim::SetRobotMode(HAL_ROBOTMODE_AUTONOMOUS);
   DriverStationSim::NotifyNewData();
-  EXPECT_TRUE(DriverStationSim::GetAutonomous());
+  EXPECT_EQ(DriverStationSim::GetRobotMode(), HAL_ROBOTMODE_AUTONOMOUS);
   EXPECT_TRUE(DriverStation::IsAutonomous());
+  EXPECT_EQ(DriverStation::GetRobotMode(), RobotMode::AUTONOMOUS);
   EXPECT_TRUE(RobotState::IsAutonomous());
+  EXPECT_EQ(RobotState::GetRobotMode(), RobotMode::AUTONOMOUS);
   EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_TRUE(callback.GetLastValue());
+  EXPECT_EQ(callback.GetLastValue(), HAL_ROBOTMODE_AUTONOMOUS);
 }
 
 TEST(DriverStationTest, Mode) {
@@ -56,16 +61,18 @@ TEST(DriverStationTest, Mode) {
   DriverStationSim::ResetData();
 
   EXPECT_FALSE(DriverStation::IsTest());
-  BooleanCallback callback;
-  auto cb =
-      DriverStationSim::RegisterTestCallback(callback.GetCallback(), false);
-  DriverStationSim::SetTest(true);
+  EnumCallback callback;
+  auto cb = DriverStationSim::RegisterRobotModeCallback(callback.GetCallback(),
+                                                        false);
+  DriverStationSim::SetRobotMode(HAL_ROBOTMODE_TEST);
   DriverStationSim::NotifyNewData();
-  EXPECT_TRUE(DriverStationSim::GetTest());
+  EXPECT_EQ(DriverStationSim::GetRobotMode(), HAL_ROBOTMODE_TEST);
   EXPECT_TRUE(DriverStation::IsTest());
+  EXPECT_EQ(DriverStation::GetRobotMode(), RobotMode::TEST);
   EXPECT_TRUE(RobotState::IsTest());
+  EXPECT_EQ(RobotState::GetRobotMode(), RobotMode::TEST);
   EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_TRUE(callback.GetLastValue());
+  EXPECT_EQ(callback.GetLastValue(), HAL_ROBOTMODE_TEST);
 }
 
 TEST(DriverStationTest, Estop) {

@@ -4,6 +4,7 @@
 
 #include <frc/DriverStation.h>
 #include <frc/simulation/DriverStationSim.h>
+#include <hal/DriverStationTypes.h>
 
 #include "../CommandTestBase.h"
 #include "frc2/command/button/RobotModeTriggers.h"
@@ -15,8 +16,7 @@ class RobotModeTriggersTest : public CommandTestBase {};
 
 TEST(RobotModeTriggersTest, Autonomous) {
   DriverStationSim::ResetData();
-  DriverStationSim::SetAutonomous(true);
-  DriverStationSim::SetTest(false);
+  DriverStationSim::SetRobotMode(HAL_ROBOTMODE_AUTONOMOUS);
   DriverStationSim::SetEnabled(true);
   DriverStationSim::NotifyNewData();
   Trigger autonomous = RobotModeTriggers::Autonomous();
@@ -25,8 +25,7 @@ TEST(RobotModeTriggersTest, Autonomous) {
 
 TEST(RobotModeTriggersTest, Teleop) {
   DriverStationSim::ResetData();
-  DriverStationSim::SetAutonomous(false);
-  DriverStationSim::SetTest(false);
+  DriverStationSim::SetRobotMode(HAL_ROBOTMODE_TELEOPERATED);
   DriverStationSim::SetEnabled(true);
   DriverStationSim::NotifyNewData();
   Trigger teleop = RobotModeTriggers::Teleop();
@@ -35,8 +34,6 @@ TEST(RobotModeTriggersTest, Teleop) {
 
 TEST(RobotModeTriggersTest, Disabled) {
   DriverStationSim::ResetData();
-  DriverStationSim::SetAutonomous(false);
-  DriverStationSim::SetTest(false);
   DriverStationSim::SetEnabled(false);
   DriverStationSim::NotifyNewData();
   Trigger disabled = RobotModeTriggers::Disabled();
@@ -45,8 +42,7 @@ TEST(RobotModeTriggersTest, Disabled) {
 
 TEST(RobotModeTriggersTest, TestMode) {
   DriverStationSim::ResetData();
-  DriverStationSim::SetAutonomous(false);
-  DriverStationSim::SetTest(true);
+  DriverStationSim::SetRobotMode(HAL_ROBOTMODE_TEST);
   DriverStationSim::SetEnabled(true);
   DriverStationSim::NotifyNewData();
   Trigger test = RobotModeTriggers::Test();
