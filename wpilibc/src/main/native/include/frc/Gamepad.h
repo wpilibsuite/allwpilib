@@ -24,8 +24,8 @@ namespace frc {
  * to have the same mapping, as well as any 3rd party controllers.
  */
 class Gamepad : public GenericHID,
-                                    public wpi::Sendable,
-                                    public wpi::SendableHelper<Gamepad> {
+                public wpi::Sendable,
+                public wpi::SendableHelper<Gamepad> {
  public:
   /**
    * Construct an instance of a controller.
@@ -1010,7 +1010,7 @@ class Gamepad : public GenericHID,
 
   void InitSendable(wpi::SendableBuilder& builder) override;
 
-  private:
+ private:
   double GetAxisForSendable(int axis) const;
   bool GetButtonForSendable(int button) const;
 };

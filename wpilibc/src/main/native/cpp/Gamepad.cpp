@@ -36,7 +36,9 @@ double Gamepad::GetLeftTriggerAxis() const {
 }
 
 BooleanEvent Gamepad::LeftTrigger(double threshold, EventLoop* loop) const {
-  return BooleanEvent(loop, [this, threshold] { return this->GetLeftTriggerAxis() > threshold; });
+  return BooleanEvent(loop, [this, threshold] {
+    return this->GetLeftTriggerAxis() > threshold;
+  });
 }
 
 BooleanEvent Gamepad::LeftTrigger(EventLoop* loop) const {
@@ -48,7 +50,9 @@ double Gamepad::GetRightTriggerAxis() const {
 }
 
 BooleanEvent Gamepad::RightTrigger(double threshold, EventLoop* loop) const {
-  return BooleanEvent(loop, [this, threshold] { return this->GetRightTriggerAxis() > threshold; });
+  return BooleanEvent(loop, [this, threshold] {
+    return this->GetRightTriggerAxis() > threshold;
+  });
 }
 
 BooleanEvent Gamepad::RightTrigger(EventLoop* loop) const {
@@ -228,7 +232,8 @@ bool Gamepad::GetRightShoulderButtonReleased() {
 }
 
 BooleanEvent Gamepad::RightShoulder(EventLoop* loop) const {
-  return BooleanEvent(loop, [this]() { return this->GetRightShoulderButton(); });
+  return BooleanEvent(loop,
+                      [this]() { return this->GetRightShoulderButton(); });
 }
 
 bool Gamepad::GetDpadUpButton() const {
@@ -482,36 +487,95 @@ bool Gamepad::GetButtonForSendable(int button) const {
 void Gamepad::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("HID");
   builder.PublishConstString("ControllerType", "Gamepad");
-  builder.AddDoubleProperty("LeftTrigger Axis", [this] { return GetAxisForSendable(Axis::kLeftTrigger); }, nullptr);
-  builder.AddDoubleProperty("RightTrigger Axis", [this] { return GetAxisForSendable(Axis::kRightTrigger); }, nullptr);
-  builder.AddDoubleProperty("LeftX", [this] { return GetAxisForSendable(Axis::kLeftX); }, nullptr);
-  builder.AddDoubleProperty("LeftY", [this] { return GetAxisForSendable(Axis::kLeftY); }, nullptr);
-  builder.AddDoubleProperty("RightX", [this] { return GetAxisForSendable(Axis::kRightX); }, nullptr);
-  builder.AddDoubleProperty("RightY", [this] { return GetAxisForSendable(Axis::kRightY); }, nullptr);
-  builder.AddBooleanProperty("SouthFace", [this] { return GetButtonForSendable(Button::kSouthFace); }, nullptr);
-  builder.AddBooleanProperty("EastFace", [this] { return GetButtonForSendable(Button::kEastFace); }, nullptr);
-  builder.AddBooleanProperty("WestFace", [this] { return GetButtonForSendable(Button::kWestFace); }, nullptr);
-  builder.AddBooleanProperty("NorthFacen", [this] { return GetButtonForSendable(Button::kNorthFacen); }, nullptr);
-  builder.AddBooleanProperty("Back", [this] { return GetButtonForSendable(Button::kBack); }, nullptr);
-  builder.AddBooleanProperty("Guide", [this] { return GetButtonForSendable(Button::kGuide); }, nullptr);
-  builder.AddBooleanProperty("Start", [this] { return GetButtonForSendable(Button::kStart); }, nullptr);
-  builder.AddBooleanProperty("LeftStick", [this] { return GetButtonForSendable(Button::kLeftStick); }, nullptr);
-  builder.AddBooleanProperty("RightStick", [this] { return GetButtonForSendable(Button::kRightStick); }, nullptr);
-  builder.AddBooleanProperty("LeftShoulder", [this] { return GetButtonForSendable(Button::kLeftShoulder); }, nullptr);
-  builder.AddBooleanProperty("RightShoulder", [this] { return GetButtonForSendable(Button::kRightShoulder); }, nullptr);
-  builder.AddBooleanProperty("DpadUp", [this] { return GetButtonForSendable(Button::kDpadUp); }, nullptr);
-  builder.AddBooleanProperty("DpadDown", [this] { return GetButtonForSendable(Button::kDpadDown); }, nullptr);
-  builder.AddBooleanProperty("DpadLeft", [this] { return GetButtonForSendable(Button::kDpadLeft); }, nullptr);
-  builder.AddBooleanProperty("DpadRight", [this] { return GetButtonForSendable(Button::kDpadRight); }, nullptr);
-  builder.AddBooleanProperty("Misc1", [this] { return GetButtonForSendable(Button::kMisc1); }, nullptr);
-  builder.AddBooleanProperty("RightPaddle1", [this] { return GetButtonForSendable(Button::kRightPaddle1); }, nullptr);
-  builder.AddBooleanProperty("LeftPaddle1", [this] { return GetButtonForSendable(Button::kLeftPaddle1); }, nullptr);
-  builder.AddBooleanProperty("RightPaddle2", [this] { return GetButtonForSendable(Button::kRightPaddle2); }, nullptr);
-  builder.AddBooleanProperty("LeftPaddle2", [this] { return GetButtonForSendable(Button::kLeftPaddle2); }, nullptr);
-  builder.AddBooleanProperty("Touchpad", [this] { return GetButtonForSendable(Button::kTouchpad); }, nullptr);
-  builder.AddBooleanProperty("Misc2", [this] { return GetButtonForSendable(Button::kMisc2); }, nullptr);
-  builder.AddBooleanProperty("Misc3", [this] { return GetButtonForSendable(Button::kMisc3); }, nullptr);
-  builder.AddBooleanProperty("Misc4", [this] { return GetButtonForSendable(Button::kMisc4); }, nullptr);
-  builder.AddBooleanProperty("Misc5", [this] { return GetButtonForSendable(Button::kMisc5); }, nullptr);
-  builder.AddBooleanProperty("Misc6", [this] { return GetButtonForSendable(Button::kMisc6); }, nullptr);
+  builder.AddDoubleProperty(
+      "LeftTrigger Axis",
+      [this] { return GetAxisForSendable(Axis::kLeftTrigger); }, nullptr);
+  builder.AddDoubleProperty(
+      "RightTrigger Axis",
+      [this] { return GetAxisForSendable(Axis::kRightTrigger); }, nullptr);
+  builder.AddDoubleProperty(
+      "LeftX", [this] { return GetAxisForSendable(Axis::kLeftX); }, nullptr);
+  builder.AddDoubleProperty(
+      "LeftY", [this] { return GetAxisForSendable(Axis::kLeftY); }, nullptr);
+  builder.AddDoubleProperty(
+      "RightX", [this] { return GetAxisForSendable(Axis::kRightX); }, nullptr);
+  builder.AddDoubleProperty(
+      "RightY", [this] { return GetAxisForSendable(Axis::kRightY); }, nullptr);
+  builder.AddBooleanProperty(
+      "SouthFace", [this] { return GetButtonForSendable(Button::kSouthFace); },
+      nullptr);
+  builder.AddBooleanProperty(
+      "EastFace", [this] { return GetButtonForSendable(Button::kEastFace); },
+      nullptr);
+  builder.AddBooleanProperty(
+      "WestFace", [this] { return GetButtonForSendable(Button::kWestFace); },
+      nullptr);
+  builder.AddBooleanProperty(
+      "NorthFacen",
+      [this] { return GetButtonForSendable(Button::kNorthFacen); }, nullptr);
+  builder.AddBooleanProperty(
+      "Back", [this] { return GetButtonForSendable(Button::kBack); }, nullptr);
+  builder.AddBooleanProperty(
+      "Guide", [this] { return GetButtonForSendable(Button::kGuide); },
+      nullptr);
+  builder.AddBooleanProperty(
+      "Start", [this] { return GetButtonForSendable(Button::kStart); },
+      nullptr);
+  builder.AddBooleanProperty(
+      "LeftStick", [this] { return GetButtonForSendable(Button::kLeftStick); },
+      nullptr);
+  builder.AddBooleanProperty(
+      "RightStick",
+      [this] { return GetButtonForSendable(Button::kRightStick); }, nullptr);
+  builder.AddBooleanProperty(
+      "LeftShoulder",
+      [this] { return GetButtonForSendable(Button::kLeftShoulder); }, nullptr);
+  builder.AddBooleanProperty(
+      "RightShoulder",
+      [this] { return GetButtonForSendable(Button::kRightShoulder); }, nullptr);
+  builder.AddBooleanProperty(
+      "DpadUp", [this] { return GetButtonForSendable(Button::kDpadUp); },
+      nullptr);
+  builder.AddBooleanProperty(
+      "DpadDown", [this] { return GetButtonForSendable(Button::kDpadDown); },
+      nullptr);
+  builder.AddBooleanProperty(
+      "DpadLeft", [this] { return GetButtonForSendable(Button::kDpadLeft); },
+      nullptr);
+  builder.AddBooleanProperty(
+      "DpadRight", [this] { return GetButtonForSendable(Button::kDpadRight); },
+      nullptr);
+  builder.AddBooleanProperty(
+      "Misc1", [this] { return GetButtonForSendable(Button::kMisc1); },
+      nullptr);
+  builder.AddBooleanProperty(
+      "RightPaddle1",
+      [this] { return GetButtonForSendable(Button::kRightPaddle1); }, nullptr);
+  builder.AddBooleanProperty(
+      "LeftPaddle1",
+      [this] { return GetButtonForSendable(Button::kLeftPaddle1); }, nullptr);
+  builder.AddBooleanProperty(
+      "RightPaddle2",
+      [this] { return GetButtonForSendable(Button::kRightPaddle2); }, nullptr);
+  builder.AddBooleanProperty(
+      "LeftPaddle2",
+      [this] { return GetButtonForSendable(Button::kLeftPaddle2); }, nullptr);
+  builder.AddBooleanProperty(
+      "Touchpad", [this] { return GetButtonForSendable(Button::kTouchpad); },
+      nullptr);
+  builder.AddBooleanProperty(
+      "Misc2", [this] { return GetButtonForSendable(Button::kMisc2); },
+      nullptr);
+  builder.AddBooleanProperty(
+      "Misc3", [this] { return GetButtonForSendable(Button::kMisc3); },
+      nullptr);
+  builder.AddBooleanProperty(
+      "Misc4", [this] { return GetButtonForSendable(Button::kMisc4); },
+      nullptr);
+  builder.AddBooleanProperty(
+      "Misc5", [this] { return GetButtonForSendable(Button::kMisc5); },
+      nullptr);
+  builder.AddBooleanProperty(
+      "Misc6", [this] { return GetButtonForSendable(Button::kMisc6); },
+      nullptr);
 }

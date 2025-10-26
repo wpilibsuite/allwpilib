@@ -118,7 +118,8 @@ class DriverStation final {
   static bool GetStickButton(int stick, int button);
 
   /**
-   * The state of one joystick button, only if available. Button indexes begin at 0.
+   * The state of one joystick button, only if available. Button indexes begin
+   * at 0.
    *
    * @param stick  The joystick to read.
    * @param button The button index, beginning at 0.
@@ -158,7 +159,7 @@ class DriverStation final {
    */
   static double GetStickAxis(int stick, int axis);
 
-/**
+  /**
    * Get the value of the axis on a joystick, if available.
    *
    * This depends on the mapping of the joystick connected to the specified

@@ -254,7 +254,6 @@ class GamepadSim : public GenericHIDSim {
    * @param value the new value
    */
   void SetMisc6Button(bool value);
-
 };
 
 }  // namespace sim

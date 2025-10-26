@@ -5,9 +5,9 @@
 #pragma once
 #include <frc/Gamepad.h>
 
-#include "frc2/command/button/Trigger.h"
 #include "frc2/command/CommandScheduler.h"
 #include "frc2/command/button/CommandGenericHID.h"
+#include "frc2/command/button/Trigger.h"
 
 namespace frc2 {
 /**
@@ -43,7 +43,7 @@ class CommandGamepad : public CommandGenericHID {
    * digital signal attached to the given loop.
    */
   Trigger SouthFace(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                                .GetDefaultButtonLoop()) const;
+                                               .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the East Face button's
@@ -55,7 +55,7 @@ class CommandGamepad : public CommandGenericHID {
    * digital signal attached to the given loop.
    */
   Trigger EastFace(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                                .GetDefaultButtonLoop()) const;
+                                              .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the West Face button's
@@ -67,7 +67,7 @@ class CommandGamepad : public CommandGenericHID {
    * digital signal attached to the given loop.
    */
   Trigger WestFace(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                                .GetDefaultButtonLoop()) const;
+                                              .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the North Face button's
@@ -91,7 +91,7 @@ class CommandGamepad : public CommandGenericHID {
    * digital signal attached to the given loop.
    */
   Trigger Back(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                                .GetDefaultButtonLoop()) const;
+                                          .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the Guide button's
@@ -103,7 +103,7 @@ class CommandGamepad : public CommandGenericHID {
    * digital signal attached to the given loop.
    */
   Trigger Guide(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                                .GetDefaultButtonLoop()) const;
+                                           .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the Start button's
@@ -115,7 +115,7 @@ class CommandGamepad : public CommandGenericHID {
    * digital signal attached to the given loop.
    */
   Trigger Start(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                                .GetDefaultButtonLoop()) const;
+                                           .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the left stick button's
@@ -127,7 +127,7 @@ class CommandGamepad : public CommandGenericHID {
    * digital signal attached to the given loop.
    */
   Trigger LeftStick(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                                .GetDefaultButtonLoop()) const;
+                                               .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the right stick button's
@@ -150,8 +150,9 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the right shoulder button's
    * digital signal attached to the given loop.
    */
-  Trigger LeftShoulder(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                                .GetDefaultButtonLoop()) const;
+  Trigger LeftShoulder(
+      frc::EventLoop* loop =
+          CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the right shoulder button's
@@ -162,8 +163,9 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the right shoulder button's
    * digital signal attached to the given loop.
    */
-  Trigger RightShoulder(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                                .GetDefaultButtonLoop()) const;
+  Trigger RightShoulder(
+      frc::EventLoop* loop =
+          CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the D-pad up button's
@@ -175,7 +177,7 @@ class CommandGamepad : public CommandGenericHID {
    * digital signal attached to the given loop.
    */
   Trigger DpadUp(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                                .GetDefaultButtonLoop()) const;
+                                            .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the D-pad down button's
@@ -187,7 +189,7 @@ class CommandGamepad : public CommandGenericHID {
    * digital signal attached to the given loop.
    */
   Trigger DpadDown(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                                .GetDefaultButtonLoop()) const;
+                                              .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the D-pad left button's
@@ -199,7 +201,7 @@ class CommandGamepad : public CommandGenericHID {
    * digital signal attached to the given loop.
    */
   Trigger DpadLeft(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                                .GetDefaultButtonLoop()) const;
+                                              .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the D-pad right button's
@@ -211,7 +213,7 @@ class CommandGamepad : public CommandGenericHID {
    * digital signal attached to the given loop.
    */
   Trigger DpadRight(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                                .GetDefaultButtonLoop()) const;
+                                               .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the Miscellaneous 1 button's
@@ -223,7 +225,7 @@ class CommandGamepad : public CommandGenericHID {
    * digital signal attached to the given loop.
    */
   Trigger Misc1(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                                .GetDefaultButtonLoop()) const;
+                                           .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the Right Paddle 1 button's
@@ -234,8 +236,9 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the Right Paddle 1 button's
    * digital signal attached to the given loop.
    */
-  Trigger RightPaddle1(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                                .GetDefaultButtonLoop()) const;
+  Trigger RightPaddle1(
+      frc::EventLoop* loop =
+          CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the Left Paddle 1 button's
@@ -247,7 +250,7 @@ class CommandGamepad : public CommandGenericHID {
    * digital signal attached to the given loop.
    */
   Trigger LeftPaddle1(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                                .GetDefaultButtonLoop()) const;
+                                                 .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the Right Paddle 2 button's
@@ -258,8 +261,9 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the Right Paddle 2 button's
    * digital signal attached to the given loop.
    */
-  Trigger RightPaddle2(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                                .GetDefaultButtonLoop()) const;
+  Trigger RightPaddle2(
+      frc::EventLoop* loop =
+          CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the Left Paddle 2 button's
@@ -271,7 +275,7 @@ class CommandGamepad : public CommandGenericHID {
    * digital signal attached to the given loop.
    */
   Trigger LeftPaddle2(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                                .GetDefaultButtonLoop()) const;
+                                                 .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the Touchpad button's
@@ -283,7 +287,7 @@ class CommandGamepad : public CommandGenericHID {
    * digital signal attached to the given loop.
    */
   Trigger Touchpad(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                                .GetDefaultButtonLoop()) const;
+                                              .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the Miscellaneous 2 button's
@@ -295,7 +299,7 @@ class CommandGamepad : public CommandGenericHID {
    * digital signal attached to the given loop.
    */
   Trigger Misc2(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                                .GetDefaultButtonLoop()) const;
+                                           .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the Miscellaneous 3 button's
@@ -307,7 +311,7 @@ class CommandGamepad : public CommandGenericHID {
    * digital signal attached to the given loop.
    */
   Trigger Misc3(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                                .GetDefaultButtonLoop()) const;
+                                           .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the Miscellaneous 4 button's
@@ -319,7 +323,7 @@ class CommandGamepad : public CommandGenericHID {
    * digital signal attached to the given loop.
    */
   Trigger Misc4(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                                .GetDefaultButtonLoop()) const;
+                                           .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the Miscellaneous 5 button's
@@ -331,7 +335,7 @@ class CommandGamepad : public CommandGenericHID {
    * digital signal attached to the given loop.
    */
   Trigger Misc5(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                                .GetDefaultButtonLoop()) const;
+                                           .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the Miscellaneous 6 button's
@@ -343,7 +347,7 @@ class CommandGamepad : public CommandGenericHID {
    * digital signal attached to the given loop.
    */
   Trigger Misc6(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                                .GetDefaultButtonLoop()) const;
+                                           .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the axis value of the left trigger.
@@ -375,9 +379,10 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance that is true when the right trigger's axis
    * exceeds the provided threshold, attached to the given loop
    */
-  Trigger RightTrigger(double threshold = 0.5,
-                      frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                                 .GetDefaultButtonLoop()) const;
+  Trigger RightTrigger(
+      double threshold = 0.5,
+      frc::EventLoop* loop =
+          CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 
   /**
    * Get the X axis value of left side of the controller. Right is positive.
@@ -408,16 +413,16 @@ class CommandGamepad : public CommandGenericHID {
   double GetRightY() const;
 
   /**
-   * Get the left trigger axis value of the controller. Note that this axis is bound
-   * to the range of [0, 1] as opposed to the usual [-1, 1].
+   * Get the left trigger axis value of the controller. Note that this axis is
+   * bound to the range of [0, 1] as opposed to the usual [-1, 1].
    *
    * @return The axis value.
    */
   double GetLeftTriggerAxis() const;
 
   /**
-   * Get the right trigger axis value of the controller. Note that this axis is bound
-   * to the range of [0, 1] as opposed to the usual [-1, 1].
+   * Get the right trigger axis value of the controller. Note that this axis is
+   * bound to the range of [0, 1] as opposed to the usual [-1, 1].
    *
    * @return The axis value.
    */

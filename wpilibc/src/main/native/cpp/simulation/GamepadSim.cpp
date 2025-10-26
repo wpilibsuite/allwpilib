@@ -9,8 +9,7 @@
 using namespace frc;
 using namespace frc::sim;
 
-GamepadSim::GamepadSim(const Gamepad& joystick)
-    : GenericHIDSim{joystick} {
+GamepadSim::GamepadSim(const Gamepad& joystick) : GenericHIDSim{joystick} {
   SetAxesMaximumIndex(6);
   SetButtonsMaximumIndex(26);
   SetPOVsMaximumIndex(1);

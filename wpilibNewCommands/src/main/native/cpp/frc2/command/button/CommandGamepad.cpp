@@ -118,14 +118,14 @@ Trigger CommandGamepad::Misc6(frc::EventLoop* loop) const {
 }
 
 Trigger CommandGamepad::LeftTrigger(double threshold,
-                                           frc::EventLoop* loop) const {
+                                    frc::EventLoop* loop) const {
   return Trigger(loop, [this, threshold] {
     return m_hid.GetLeftTriggerAxis() > threshold;
   });
 }
 
 Trigger CommandGamepad::RightTrigger(double threshold,
-                                           frc::EventLoop* loop) const {
+                                     frc::EventLoop* loop) const {
   return Trigger(loop, [this, threshold] {
     return m_hid.GetRightTriggerAxis() > threshold;
   });
