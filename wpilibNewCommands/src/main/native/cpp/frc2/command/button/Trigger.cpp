@@ -7,6 +7,7 @@
 #include <utility>
 
 #include <frc/filter/Debouncer.h>
+#include <frc/filter/MultiTapFilter.h>
 
 #include "frc2/command/CommandPtr.h"
 

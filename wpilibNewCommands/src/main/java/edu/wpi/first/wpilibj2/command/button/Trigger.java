@@ -290,8 +290,8 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
-   * Creates a new multi-tap trigger from this trigger - it will become active when this trigger
-   * has been activated the required number of times within the specified time window.
+   * Creates a new multi-tap trigger from this trigger - it will become active when this trigger has
+   * been activated the required number of times within the specified time window.
    *
    * @param requiredTaps The number of taps required.
    * @param tapWindowSeconds The time window in which the taps must occur.
@@ -301,7 +301,8 @@ public class Trigger implements BooleanSupplier {
     return new Trigger(
         m_loop,
         new BooleanSupplier() {
-          final MultiTapFilter m_multiTapFilter = new MultiTapFilter(requiredTaps, tapWindowSeconds);
+          final MultiTapFilter m_multiTapFilter =
+              new MultiTapFilter(requiredTaps, tapWindowSeconds);
 
           @Override
           public boolean getAsBoolean() {
