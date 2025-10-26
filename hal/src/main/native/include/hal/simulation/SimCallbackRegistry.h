@@ -102,7 +102,7 @@ class SimCallbackRegistry : public impl::SimCallbackRegistryBase {
  */
 #define HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(NAME)           \
   static LLVM_ATTRIBUTE_ALWAYS_INLINE constexpr const char* \
-  Get##NAME##Name() {                                       \
+      Get##NAME##Name() {                                   \
     return #NAME;                                           \
   }
 

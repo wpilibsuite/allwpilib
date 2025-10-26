@@ -103,8 +103,8 @@ class DriverStationData {
   void SetJoystickPOVsAvailable(int32_t stick, uint8_t available);
   void SetJoystickButtonsAvailable(int32_t stick, uint64_t available);
   void GetJoystickAvailables(int32_t stick, uint16_t* axesAvailable,
-                                  uint64_t* buttonsAvailable,
-                                  uint8_t* povsAvailable);
+                             uint64_t* buttonsAvailable,
+                             uint8_t* povsAvailable);
 
   void SetJoystickIsGamepad(int32_t stick, HAL_Bool isGamepad);
   void SetJoystickType(int32_t stick, int32_t type);

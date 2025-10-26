@@ -88,7 +88,6 @@ class GenericHIDSim {
    */
   void SetPOVsAvailable(int count);
 
-
   void SetButtonsMaximumIndex(int maximumIndex);
 
   /**

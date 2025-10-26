@@ -482,7 +482,8 @@ int32_t HAL_GetJoystickButtons(int32_t joystickNum,
   return 0;
 }
 
-void HAL_GetAllJoystickData(int32_t joystickNum, HAL_JoystickAxes* axes, HAL_JoystickPOVs* povs,
+void HAL_GetAllJoystickData(int32_t joystickNum, HAL_JoystickAxes* axes,
+                            HAL_JoystickPOVs* povs,
                             HAL_JoystickButtons* buttons) {
   std::scoped_lock lock{cacheMutex};
   *axes = currentRead->axes[joystickNum];

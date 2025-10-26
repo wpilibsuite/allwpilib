@@ -272,7 +272,8 @@ void DriverStationData::SetJoystickButtons(int32_t stick, uint64_t buttons) {
   m_joystickButtonsCallbacks(stick, &m_joystickData[stick].buttons);
 }
 
-void DriverStationData::SetJoystickAxesAvailable(int32_t stick, uint16_t available) {
+void DriverStationData::SetJoystickAxesAvailable(int32_t stick,
+                                                 uint16_t available) {
   if (stick < 0 || stick >= kNumJoysticks) {
     return;
   }
@@ -281,7 +282,8 @@ void DriverStationData::SetJoystickAxesAvailable(int32_t stick, uint16_t availab
   m_joystickAxesCallbacks(stick, &m_joystickData[stick].axes);
 }
 
-void DriverStationData::SetJoystickPOVsAvailable(int32_t stick, uint8_t available) {
+void DriverStationData::SetJoystickPOVsAvailable(int32_t stick,
+                                                 uint8_t available) {
   if (stick < 0 || stick >= kNumJoysticks) {
     return;
   }
@@ -290,8 +292,8 @@ void DriverStationData::SetJoystickPOVsAvailable(int32_t stick, uint8_t availabl
   m_joystickPOVsCallbacks(stick, &m_joystickData[stick].povs);
 }
 
-void DriverStationData::SetJoystickButtonsAvailable(int32_t stick, uint64_t available)
-{
+void DriverStationData::SetJoystickButtonsAvailable(int32_t stick,
+                                                    uint64_t available) {
   if (stick < 0 || stick >= kNumJoysticks) {
     return;
   }
@@ -300,9 +302,10 @@ void DriverStationData::SetJoystickButtonsAvailable(int32_t stick, uint64_t avai
   m_joystickButtonsCallbacks(stick, &m_joystickData[stick].buttons);
 }
 
-void DriverStationData::GetJoystickAvailables(int32_t stick, uint16_t* axesAvailable,
-                                  uint64_t* buttonsAvailable,
-                                  uint8_t* povsAvailable) {
+void DriverStationData::GetJoystickAvailables(int32_t stick,
+                                              uint16_t* axesAvailable,
+                                              uint64_t* buttonsAvailable,
+                                              uint8_t* povsAvailable) {
   if (stick < 0 || stick >= kNumJoysticks) {
     *axesAvailable = 0;
     *buttonsAvailable = 0;

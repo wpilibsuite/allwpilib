@@ -16,10 +16,12 @@ class IsJoystickConnectedParametersTest
     : public ::testing::TestWithParam<std::tuple<int, int, int, bool>> {};
 
 TEST_P(IsJoystickConnectedParametersTest, IsJoystickConnected) {
-  frc::sim::DriverStationSim::SetJoystickAxesMaximumIndex(1, std::get<0>(GetParam()));
-  frc::sim::DriverStationSim::SetJoystickButtonsMaximumIndex(1,
-                                                     std::get<1>(GetParam()));
-  frc::sim::DriverStationSim::SetJoystickPOVsMaximumIndex(1, std::get<2>(GetParam()));
+  frc::sim::DriverStationSim::SetJoystickAxesMaximumIndex(
+      1, std::get<0>(GetParam()));
+  frc::sim::DriverStationSim::SetJoystickButtonsMaximumIndex(
+      1, std::get<1>(GetParam()));
+  frc::sim::DriverStationSim::SetJoystickPOVsMaximumIndex(
+      1, std::get<2>(GetParam()));
   frc::sim::DriverStationSim::NotifyNewData();
 
   ASSERT_EQ(std::get<3>(GetParam()),

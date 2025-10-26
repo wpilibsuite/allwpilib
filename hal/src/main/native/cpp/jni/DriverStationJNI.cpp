@@ -140,8 +140,9 @@ Java_edu_wpi_first_hal_DriverStationJNI_nativeGetAllianceStation
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_DriverStationJNI_getAllJoystickData
-  (JNIEnv* env, jclass cls, jint stick, jfloatArray axesArray, jshortArray rawAxesArray,
-   jbyteArray povsArray, jlongArray buttonsAndMetadataArray)
+  (JNIEnv* env, jclass cls, jint stick, jfloatArray axesArray,
+   jshortArray rawAxesArray, jbyteArray povsArray,
+   jlongArray buttonsAndMetadataArray)
 {
   HAL_JoystickAxes axes;
   HAL_JoystickPOVs povs;
@@ -158,12 +159,9 @@ Java_edu_wpi_first_hal_DriverStationJNI_getAllJoystickData
   static_assert(sizeof(jRawAxes[0]) == sizeof(axes.raw[0]));
   static_assert(sizeof(jPovs[0]) == sizeof(povs.povs[0]));
 
-  std::memcpy(&jAxes[0], axes.axes,
-              sizeof(axes.axes));
-  std::memcpy(&jRawAxes[0], axes.raw,
-              sizeof(axes.raw));
-  std::memcpy(&jPovs[0], povs.povs,
-              sizeof(povs.povs));
+  std::memcpy(&jAxes[0], axes.axes, sizeof(axes.axes));
+  std::memcpy(&jRawAxes[0], axes.raw, sizeof(axes.raw));
+  std::memcpy(&jPovs[0], povs.povs, sizeof(povs.povs));
   jButtons[0] = axes.available;
   jButtons[1] = povs.available;
   jButtons[2] = buttons.available;

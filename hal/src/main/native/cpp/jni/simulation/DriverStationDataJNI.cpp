@@ -431,7 +431,8 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setMatchTime
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickAxes
-  (JNIEnv* env, jclass, jbyte joystickNum, jfloatArray axesArray, jshort availableAxes)
+  (JNIEnv* env, jclass, jbyte joystickNum, jfloatArray axesArray,
+   jshort availableAxes)
 {
   HAL_JoystickAxes axes;
   {
@@ -456,7 +457,8 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickAxes
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickPOVs
-  (JNIEnv* env, jclass, jbyte joystickNum, jbyteArray povsArray, jshort availablePovs)
+  (JNIEnv* env, jclass, jbyte joystickNum, jbyteArray povsArray,
+   jshort availablePovs)
 {
   HAL_JoystickPOVs povs;
   {
@@ -477,11 +479,12 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickPOVs
 /*
  * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    setJoystickButtons
- * Signature: (BIZZ)V
+ * Signature: (BJJ)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickButtons
-  (JNIEnv* env, jclass, jbyte joystickNum, jlong buttons, jlong availableButtons)
+  (JNIEnv* env, jclass, jbyte joystickNum, jlong buttons,
+   jlong availableButtons)
 {
   HAL_JoystickButtons joystickButtons;
   joystickButtons.available = availableButtons;
@@ -651,7 +654,7 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickPOV
 /*
  * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    setJoystickButtonsValue
- * Signature: (II)V
+ * Signature: (IJ)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickButtonsValue
@@ -687,7 +690,7 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickPOVsAvailable
 /*
  * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    setJoystickButtonsAvailable
- * Signature: (II)V
+ * Signature: (IJ)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickButtonsAvailable

@@ -280,7 +280,7 @@ class GenericHID {
   BooleanEvent AxisGreaterThan(int axis, double threshold,
                                EventLoop* loop) const;
 
-    int GetAxesMaximumIndex() const;
+  int GetAxesMaximumIndex() const;
 
   /**
    * Get the number of axes for the HID.
