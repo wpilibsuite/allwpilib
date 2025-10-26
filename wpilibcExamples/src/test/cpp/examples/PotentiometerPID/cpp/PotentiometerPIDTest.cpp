@@ -70,7 +70,7 @@ class PotentiometerPIDTest : public testing::Test {
     frc::sim::PauseTiming();
     frc::sim::DriverStationSim::ResetData();
 
-    m_joystickSim.SetButtonCount(12);
+    m_joystickSim.SetButtonsMaximumIndex(12);
 
     m_callback =
         HALSIM_RegisterSimPeriodicBeforeCallback(CallSimPeriodicBefore, this);
