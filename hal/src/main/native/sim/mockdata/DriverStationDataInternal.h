@@ -98,17 +98,17 @@ class DriverStationData {
   void SetJoystickButton(int32_t stick, int32_t button, HAL_Bool state);
   void SetJoystickAxis(int32_t stick, int32_t axis, double value);
   void SetJoystickPOV(int32_t stick, int32_t pov, HAL_JoystickPOV value);
-  void SetJoystickButtons(int32_t stick, uint32_t buttons);
-  void SetJoystickAxisCount(int32_t stick, int32_t count);
-  void SetJoystickPOVCount(int32_t stick, int32_t count);
-  void SetJoystickButtonCount(int32_t stick, int32_t count);
-  void GetJoystickCounts(int32_t stick, int32_t* axisCount,
-                         int32_t* buttonCount, int32_t* povCount);
+  void SetJoystickButtons(int32_t stick, uint64_t buttons);
+  void SetJoystickAxesAvailable(int32_t stick, uint16_t available);
+  void SetJoystickPOVsAvailable(int32_t stick, uint8_t available);
+  void SetJoystickButtonsAvailable(int32_t stick, uint64_t available);
+  void GetJoystickAvailables(int32_t stick, uint16_t* axesAvailable,
+                             uint64_t* buttonsAvailable,
+                             uint8_t* povsAvailable);
 
   void SetJoystickIsGamepad(int32_t stick, HAL_Bool isGamepad);
   void SetJoystickType(int32_t stick, int32_t type);
   void SetJoystickName(int32_t stick, std::string_view message);
-  void SetJoystickAxisType(int32_t stick, int32_t axis, int32_t type);
 
   void SetGameSpecificMessage(std::string_view message);
   void SetEventName(std::string_view name);

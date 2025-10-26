@@ -511,25 +511,25 @@ class XboxController : public GenericHID,
   /** Represents a digital button on an XboxController. */
   struct Button {
     /// A button.
-    static constexpr int kA = 1;
+    static constexpr int kA = 0;
     /// B button.
-    static constexpr int kB = 2;
+    static constexpr int kB = 1;
     /// X button.
-    static constexpr int kX = 3;
+    static constexpr int kX = 2;
     /// Y button.
-    static constexpr int kY = 4;
+    static constexpr int kY = 3;
     /// Left bumper button.
-    static constexpr int kLeftBumper = 5;
+    static constexpr int kLeftBumper = 4;
     /// Right bumper button.
-    static constexpr int kRightBumper = 6;
+    static constexpr int kRightBumper = 5;
     /// Back button.
-    static constexpr int kBack = 7;
+    static constexpr int kBack = 6;
     /// Start button.
-    static constexpr int kStart = 8;
+    static constexpr int kStart = 7;
     /// Left stick button.
-    static constexpr int kLeftStick = 9;
+    static constexpr int kLeftStick = 8;
     /// Right stick button.
-    static constexpr int kRightStick = 10;
+    static constexpr int kRightStick = 9;
   };
 
   /** Represents an axis on an XboxController. */

@@ -27,35 +27,35 @@ public class StadiaController extends GenericHID implements Sendable {
   /** Represents a digital button on a StadiaController. */
   public enum Button {
     /** A button. */
-    kA(1),
+    kA(0),
     /** B button. */
-    kB(2),
+    kB(1),
     /** X button. */
-    kX(3),
+    kX(2),
     /** Y button. */
-    kY(4),
+    kY(3),
     /** Left bumper button. */
-    kLeftBumper(5),
+    kLeftBumper(4),
     /** Right bumper button. */
-    kRightBumper(6),
+    kRightBumper(5),
     /** Left stick button. */
-    kLeftStick(7),
+    kLeftStick(6),
     /** Right stick button. */
-    kRightStick(8),
+    kRightStick(7),
     /** Ellipses button. */
-    kEllipses(9),
+    kEllipses(8),
     /** Hamburger button. */
-    kHamburger(10),
+    kHamburger(9),
     /** Stadia button. */
-    kStadia(11),
+    kStadia(10),
     /** Right trigger button. */
-    kRightTrigger(12),
+    kRightTrigger(11),
     /** Left trigger button. */
-    kLeftTrigger(13),
+    kLeftTrigger(12),
     /** Google button. */
-    kGoogle(14),
+    kGoogle(13),
     /** Frame button. */
-    kFrame(15);
+    kFrame(14);
 
     /** Button value. */
     public final int value;

@@ -18,9 +18,9 @@ public class PS5ControllerSim extends GenericHIDSim {
   @SuppressWarnings("this-escape")
   public PS5ControllerSim(PS5Controller joystick) {
     super(joystick);
-    setAxisCount(6);
-    setButtonCount(14);
-    setPOVCount(1);
+    setAxesMaximumIndex(6);
+    setButtonsMaximumIndex(14);
+    setPOVsMaximumIndex(1);
   }
 
   /**
@@ -31,9 +31,9 @@ public class PS5ControllerSim extends GenericHIDSim {
   @SuppressWarnings("this-escape")
   public PS5ControllerSim(int port) {
     super(port);
-    setAxisCount(6);
-    setButtonCount(14);
-    setPOVCount(1);
+    setAxesMaximumIndex(6);
+    setButtonsMaximumIndex(14);
+    setPOVsMaximumIndex(1);
   }
 
   /**

@@ -27,33 +27,33 @@ public class PS5Controller extends GenericHID implements Sendable {
   /** Represents a digital button on a PS5Controller. */
   public enum Button {
     /** Square button. */
-    kSquare(1),
+    kSquare(0),
     /** Cross button. */
-    kCross(2),
+    kCross(1),
     /** Circle button. */
-    kCircle(3),
+    kCircle(2),
     /** Triangle button. */
-    kTriangle(4),
+    kTriangle(3),
     /** Left trigger 1 button. */
-    kL1(5),
+    kL1(4),
     /** Right trigger 1 button. */
-    kR1(6),
+    kR1(5),
     /** Left trigger 2 button. */
-    kL2(7),
+    kL2(6),
     /** Right trigger 2 button. */
-    kR2(8),
+    kR2(7),
     /** Create button. */
-    kCreate(9),
+    kCreate(8),
     /** Options button. */
-    kOptions(10),
+    kOptions(9),
     /** L3 (left stick) button. */
-    kL3(11),
+    kL3(10),
     /** R3 (right stick) button. */
-    kR3(12),
+    kR3(11),
     /** PlayStation button. */
-    kPS(13),
+    kPS(12),
     /** Touchpad button. */
-    kTouchpad(14);
+    kTouchpad(13);
 
     /** Button value. */
     public final int value;

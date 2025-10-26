@@ -74,13 +74,21 @@ public class GenericHIDSim {
     setPOV(0, value);
   }
 
+  public void setAxesMaximumIndex(int maximumIndex) {
+    DriverStationSim.setJoystickAxesMaximumIndex(m_port, maximumIndex);
+  }
+
   /**
    * Set the axis count of this device.
    *
    * @param count the new axis count
    */
-  public void setAxisCount(int count) {
-    DriverStationSim.setJoystickAxisCount(m_port, count);
+  public void setAxesAvailable(int count) {
+    DriverStationSim.setJoystickAxesAvailable(m_port, count);
+  }
+
+  public void setPOVsMaximumIndex(int maximumIndex) {
+    DriverStationSim.setJoystickPOVsMaximumIndex(m_port, maximumIndex);
   }
 
   /**
@@ -88,8 +96,12 @@ public class GenericHIDSim {
    *
    * @param count the new POV count
    */
-  public void setPOVCount(int count) {
-    DriverStationSim.setJoystickPOVCount(m_port, count);
+  public void setPOVsAvailable(int count) {
+    DriverStationSim.setJoystickPOVsAvailable(m_port, count);
+  }
+
+  public void setButtonsMaximumIndex(int maximumIndex) {
+    DriverStationSim.setJoystickButtonsMaximumIndex(m_port, maximumIndex);
   }
 
   /**
@@ -97,8 +109,8 @@ public class GenericHIDSim {
    *
    * @param count the new button count
    */
-  public void setButtonCount(int count) {
-    DriverStationSim.setJoystickButtonCount(m_port, count);
+  public void setButtonsAvailable(long count) {
+    DriverStationSim.setJoystickButtonsAvailable(m_port, count);
   }
 
   /**
@@ -117,16 +129,6 @@ public class GenericHIDSim {
    */
   public void setName(String name) {
     DriverStationSim.setJoystickName(m_port, name);
-  }
-
-  /**
-   * Set the type of the provided axis channel.
-   *
-   * @param axis the axis
-   * @param type the type
-   */
-  public void setAxisType(int axis, int type) {
-    DriverStationSim.setJoystickAxisType(m_port, axis, type);
   }
 
   /**

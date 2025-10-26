@@ -16,10 +16,12 @@ class IsJoystickConnectedParametersTest
     : public ::testing::TestWithParam<std::tuple<int, int, int, bool>> {};
 
 TEST_P(IsJoystickConnectedParametersTest, IsJoystickConnected) {
-  frc::sim::DriverStationSim::SetJoystickAxisCount(1, std::get<0>(GetParam()));
-  frc::sim::DriverStationSim::SetJoystickButtonCount(1,
-                                                     std::get<1>(GetParam()));
-  frc::sim::DriverStationSim::SetJoystickPOVCount(1, std::get<2>(GetParam()));
+  frc::sim::DriverStationSim::SetJoystickAxesMaximumIndex(
+      1, std::get<0>(GetParam()));
+  frc::sim::DriverStationSim::SetJoystickButtonsMaximumIndex(
+      1, std::get<1>(GetParam()));
+  frc::sim::DriverStationSim::SetJoystickPOVsMaximumIndex(
+      1, std::get<2>(GetParam()));
   frc::sim::DriverStationSim::NotifyNewData();
 
   ASSERT_EQ(std::get<3>(GetParam()),
@@ -64,13 +66,13 @@ INSTANTIATE_TEST_SUITE_P(
         std::make_tuple(false, true, true, ""),
         std::make_tuple(
             false, false, false,
-            "Warning: Joystick Button 1 missing (max 0), check if all "
+            "Warning: Joystick Button 1 missing (available 0), check if all "
             "controllers are plugged in\n"),
         std::make_tuple(
             true, true, false,
-            "Warning: Joystick Button 1 missing (max 0), check if all "
+            "Warning: Joystick Button 1 missing (available 0), check if all "
             "controllers are plugged in\n"),
         std::make_tuple(
             true, false, false,
-            "Warning: Joystick Button 1 missing (max 0), check if all "
+            "Warning: Joystick Button 1 missing (available 0), check if all "
             "controllers are plugged in\n")));

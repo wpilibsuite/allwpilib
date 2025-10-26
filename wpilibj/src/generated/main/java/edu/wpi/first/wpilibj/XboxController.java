@@ -27,25 +27,25 @@ public class XboxController extends GenericHID implements Sendable {
   /** Represents a digital button on a XboxController. */
   public enum Button {
     /** A button. */
-    kA(1),
+    kA(0),
     /** B button. */
-    kB(2),
+    kB(1),
     /** X button. */
-    kX(3),
+    kX(2),
     /** Y button. */
-    kY(4),
+    kY(3),
     /** Left bumper button. */
-    kLeftBumper(5),
+    kLeftBumper(4),
     /** Right bumper button. */
-    kRightBumper(6),
+    kRightBumper(5),
     /** Back button. */
-    kBack(7),
+    kBack(6),
     /** Start button. */
-    kStart(8),
+    kStart(7),
     /** Left stick button. */
-    kLeftStick(9),
+    kLeftStick(8),
     /** Right stick button. */
-    kRightStick(10);
+    kRightStick(9);
 
     /** Button value. */
     public final int value;

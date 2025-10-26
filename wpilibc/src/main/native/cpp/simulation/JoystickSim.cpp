@@ -13,16 +13,16 @@ using namespace frc::sim;
 JoystickSim::JoystickSim(const Joystick& joystick)
     : GenericHIDSim{joystick}, m_joystick{&joystick} {
   // default to a reasonable joystick configuration
-  SetAxisCount(5);
-  SetButtonCount(12);
-  SetPOVCount(1);
+  SetAxesMaximumIndex(5);
+  SetButtonsMaximumIndex(12);
+  SetPOVsMaximumIndex(1);
 }
 
 JoystickSim::JoystickSim(int port) : GenericHIDSim{port} {
   // default to a reasonable joystick configuration
-  SetAxisCount(5);
-  SetButtonCount(12);
-  SetPOVCount(1);
+  SetAxesMaximumIndex(5);
+  SetButtonsMaximumIndex(12);
+  SetPOVsMaximumIndex(1);
 }
 
 void JoystickSim::SetX(double value) {

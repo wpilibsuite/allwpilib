@@ -20,9 +20,9 @@ public class {{ ConsoleName }}ControllerSim extends GenericHIDSim {
   @SuppressWarnings("this-escape")
   public {{ ConsoleName }}ControllerSim({{ ConsoleName }}Controller joystick) {
     super(joystick);
-    setAxisCount({{ sticks|length + triggers|length }});
-    setButtonCount({{ buttons|length }});
-    setPOVCount(1);
+    setAxesMaximumIndex({{ sticks|length + triggers|length }});
+    setButtonsMaximumIndex({{ buttons|length }});
+    setPOVsMaximumIndex(1);
   }
 
   /**
@@ -33,9 +33,9 @@ public class {{ ConsoleName }}ControllerSim extends GenericHIDSim {
   @SuppressWarnings("this-escape")
   public {{ ConsoleName }}ControllerSim(int port) {
     super(port);
-    setAxisCount({{ sticks|length + triggers|length }});
-    setButtonCount({{ buttons|length }});
-    setPOVCount(1);
+    setAxesMaximumIndex({{ sticks|length + triggers|length }});
+    setButtonsMaximumIndex({{ buttons|length }});
+    setPOVsMaximumIndex(1);
   }
 {% for stick in sticks %}
   /**

@@ -18,9 +18,9 @@ public class StadiaControllerSim extends GenericHIDSim {
   @SuppressWarnings("this-escape")
   public StadiaControllerSim(StadiaController joystick) {
     super(joystick);
-    setAxisCount(4);
-    setButtonCount(15);
-    setPOVCount(1);
+    setAxesMaximumIndex(4);
+    setButtonsMaximumIndex(15);
+    setPOVsMaximumIndex(1);
   }
 
   /**
@@ -31,9 +31,9 @@ public class StadiaControllerSim extends GenericHIDSim {
   @SuppressWarnings("this-escape")
   public StadiaControllerSim(int port) {
     super(port);
-    setAxisCount(4);
-    setButtonCount(15);
-    setPOVCount(1);
+    setAxesMaximumIndex(4);
+    setButtonsMaximumIndex(15);
+    setPOVsMaximumIndex(1);
   }
 
   /**

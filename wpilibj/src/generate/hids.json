@@ -6,50 +6,50 @@
     "buttons": [
       {
         "name": "a",
-        "value": 1,
+        "value": 0,
         "DocName": "A"
       },
       {
         "name": "b",
-        "value": 2,
+        "value": 1,
         "DocName": "B"
       },
       {
         "name": "x",
-        "value": 3,
+        "value": 2,
         "DocName": "X"
       },
       {
         "name": "y",
-        "value": 4,
+        "value": 3,
         "DocName": "Y"
       },
       {
         "name": "leftBumper",
-        "value": 5,
+        "value": 4,
         "DocName": "left bumper"
       },
       {
         "name": "rightBumper",
-        "value": 6,
+        "value": 5,
         "DocName": "right bumper"
       },
       {
         "name": "back",
-        "value": 7
+        "value": 6
       },
       {
         "name": "start",
-        "value": 8
+        "value": 7
       },
       {
         "name": "leftStick",
-        "value": 9,
+        "value": 8,
         "DocName": "left stick"
       },
       {
         "name": "rightStick",
-        "value": 10,
+        "value": 9,
         "DocName": "right stick"
       }
     ],
@@ -109,66 +109,66 @@
     "buttons": [
       {
         "name": "square",
-        "value": 1
+        "value": 0
       },
       {
         "name": "cross",
-        "value": 2
+        "value": 1
       },
       {
         "name": "circle",
-        "value": 3
+        "value": 2
       },
       {
         "name": "triangle",
-        "value": 4
+        "value": 3
       },
       {
         "name": "L1",
-        "value": 5,
+        "value": 4,
         "DocName": "left trigger 1"
       },
       {
         "name": "R1",
-        "value": 6,
+        "value": 5,
         "DocName": "right trigger 1"
       },
       {
         "name": "L2",
-        "value": 7,
+        "value": 6,
         "DocName": "left trigger 2"
       },
       {
         "name": "R2",
-        "value": 8,
+        "value": 7,
         "DocName": "right trigger 2"
       },
       {
         "name": "share",
-        "value": 9
+        "value": 8
       },
       {
         "name": "options",
-        "value": 10
+        "value": 9
       },
       {
         "name": "L3",
-        "value": 11,
+        "value": 10,
         "DocName": "L3 (left stick)"
       },
       {
         "name": "R3",
-        "value": 12,
+        "value": 11,
         "DocName": "R3 (right stick)"
       },
       {
         "name": "PS",
-        "value": 13,
+        "value": 12,
         "DocName": "PlayStation"
       },
       {
         "name": "touchpad",
-        "value": 14
+        "value": 13
       }
     ],
     "sticks": [
@@ -227,66 +227,66 @@
     "buttons": [
       {
         "name": "square",
-        "value": 1
+        "value": 0
       },
       {
         "name": "cross",
-        "value": 2
+        "value": 1
       },
       {
         "name": "circle",
-        "value": 3
+        "value": 2
       },
       {
         "name": "triangle",
-        "value": 4
+        "value": 3
       },
       {
         "name": "L1",
-        "value": 5,
+        "value": 4,
         "DocName": "left trigger 1"
       },
       {
         "name": "R1",
-        "value": 6,
+        "value": 5,
         "DocName": "right trigger 1"
       },
       {
         "name": "L2",
-        "value": 7,
+        "value": 6,
         "DocName": "left trigger 2"
       },
       {
         "name": "R2",
-        "value": 8,
+        "value": 7,
         "DocName": "right trigger 2"
       },
       {
         "name": "create",
-        "value": 9
+        "value": 8
       },
       {
         "name": "options",
-        "value": 10
+        "value": 9
       },
       {
         "name": "L3",
-        "value": 11,
+        "value": 10,
         "DocName": "L3 (left stick)"
       },
       {
         "name": "R3",
-        "value": 12,
+        "value": 11,
         "DocName": "R3 (right stick)"
       },
       {
         "name": "PS",
-        "value": 13,
+        "value": 12,
         "DocName": "PlayStation"
       },
       {
         "name": "touchpad",
-        "value": 14
+        "value": 13
       }
     ],
     "sticks": [
@@ -345,73 +345,73 @@
     "buttons": [
       {
         "name": "a",
-        "value": 1,
+        "value": 0,
         "DocName": "A"
       },
       {
         "name": "b",
-        "value": 2,
+        "value": 1,
         "DocName": "B"
       },
       {
         "name": "x",
-        "value": 3,
+        "value": 2,
         "DocName": "X"
       },
       {
         "name": "y",
-        "value": 4,
+        "value": 3,
         "DocName": "Y"
       },
       {
         "name": "leftBumper",
-        "value": 5,
+        "value": 4,
         "DocName": "left bumper"
       },
       {
         "name": "rightBumper",
-        "value": 6,
+        "value": 5,
         "DocName": "right bumper"
       },
       {
         "name": "leftStick",
-        "value": 7,
+        "value": 6,
         "DocName": "left stick"
       },
       {
         "name": "rightStick",
-        "value": 8,
+        "value": 7,
         "DocName": "right stick"
       },
       {
         "name": "ellipses",
-        "value": 9
+        "value": 8
       },
       {
         "name": "hamburger",
-        "value": 10
+        "value": 9
       },
       {
         "name": "stadia",
-        "value": 11
+        "value": 10
       },
       {
         "name": "rightTrigger",
-        "value": 12,
+        "value": 11,
         "DocName": "right trigger"
       },
       {
         "name": "leftTrigger",
-        "value": 13,
+        "value": 12,
         "DocName": "left trigger"
       },
       {
         "name": "google",
-        "value": 14
+        "value": 13
       },
       {
         "name": "frame",
-        "value": 15
+        "value": 14
       }
     ],
     "sticks": [

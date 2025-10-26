@@ -15,15 +15,15 @@ using namespace frc::sim;
 
 {{ ConsoleName }}ControllerSim::{{ ConsoleName }}ControllerSim(const {{ ConsoleName }}Controller& joystick)
     : GenericHIDSim{joystick} {
-  SetAxisCount({{ sticks|length + triggers|length }});
-  SetButtonCount({{ buttons|length }});
-  SetPOVCount(1);
+  SetAxesMaximumIndex({{ sticks|length + triggers|length }});
+  SetButtonsMaximumIndex({{ buttons|length }});
+  SetPOVsMaximumIndex(1);
 }
 
 {{ ConsoleName }}ControllerSim::{{ ConsoleName }}ControllerSim(int port) : GenericHIDSim{port} {
-  SetAxisCount({{ sticks|length + triggers|length }});
-  SetButtonCount({{ buttons|length }});
-  SetPOVCount(1);
+  SetAxesMaximumIndex({{ sticks|length + triggers|length }});
+  SetButtonsMaximumIndex({{ buttons|length }});
+  SetPOVsMaximumIndex(1);
 }
 {% for stick in sticks %}
 void {{ ConsoleName }}ControllerSim::Set{{ stick.NameParts|map("capitalize")|join }}(double value) {

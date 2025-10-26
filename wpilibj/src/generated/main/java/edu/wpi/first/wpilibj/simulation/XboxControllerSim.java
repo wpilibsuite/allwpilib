@@ -18,9 +18,9 @@ public class XboxControllerSim extends GenericHIDSim {
   @SuppressWarnings("this-escape")
   public XboxControllerSim(XboxController joystick) {
     super(joystick);
-    setAxisCount(6);
-    setButtonCount(10);
-    setPOVCount(1);
+    setAxesMaximumIndex(6);
+    setButtonsMaximumIndex(10);
+    setPOVsMaximumIndex(1);
   }
 
   /**
@@ -31,9 +31,9 @@ public class XboxControllerSim extends GenericHIDSim {
   @SuppressWarnings("this-escape")
   public XboxControllerSim(int port) {
     super(port);
-    setAxisCount(6);
-    setButtonCount(10);
-    setPOVCount(1);
+    setAxesMaximumIndex(6);
+    setButtonsMaximumIndex(10);
+    setPOVsMaximumIndex(1);
   }
 
   /**

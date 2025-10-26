@@ -77,11 +77,14 @@ public class DriverStationDataJNI extends JNIWrapper {
 
   public static native void setMatchTime(double matchTime);
 
-  public static native void setJoystickAxes(byte joystickNum, float[] axesArray);
+  public static native void setJoystickAxes(
+      byte joystickNum, float[] axesArray, short availableAxes);
 
-  public static native void setJoystickPOVs(byte joystickNum, byte[] povsArray);
+  public static native void setJoystickPOVs(
+      byte joystickNum, byte[] povsArray, short availablePovs);
 
-  public static native void setJoystickButtons(byte joystickNum, int buttons, int count);
+  public static native void setJoystickButtons(
+      byte joystickNum, long buttons, long availableButtons);
 
   public static native long getJoystickOutputs(int stick);
 
@@ -108,21 +111,19 @@ public class DriverStationDataJNI extends JNIWrapper {
 
   public static native void setJoystickPOV(int stick, int pov, byte value);
 
-  public static native void setJoystickButtonsValue(int stick, int buttons);
+  public static native void setJoystickButtonsValue(int stick, long buttons);
 
-  public static native void setJoystickAxisCount(int stick, int count);
+  public static native void setJoystickAxesAvailable(int stick, int available);
 
-  public static native void setJoystickPOVCount(int stick, int count);
+  public static native void setJoystickPOVsAvailable(int stick, int available);
 
-  public static native void setJoystickButtonCount(int stick, int count);
+  public static native void setJoystickButtonsAvailable(int stick, long available);
 
   public static native void setJoystickIsGamepad(int stick, boolean isGamepad);
 
   public static native void setJoystickType(int stick, int type);
 
   public static native void setJoystickName(int stick, String name);
-
-  public static native void setJoystickAxisType(int stick, int axis, int type);
 
   public static native void setGameSpecificMessage(String message);
 

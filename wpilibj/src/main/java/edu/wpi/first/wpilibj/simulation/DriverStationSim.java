@@ -338,10 +338,10 @@ public final class DriverStationSim {
   }
 
   /**
-   * Sets the state of one joystick button. Button indexes begin at 1.
+   * Sets the state of one joystick button. Button indexes begin at 0.
    *
    * @param stick The joystick number
-   * @param button The button index, beginning at 1
+   * @param button The button index, beginning at 0
    * @param state The state of the joystick button
    */
   public static void setJoystickButton(int stick, int button, boolean state) {
@@ -371,13 +371,13 @@ public final class DriverStationSim {
   }
 
   /**
-   * Sets the state of all the buttons on a joystick.
+   * Sets the maximum index that an axis is available at.
    *
    * @param stick The joystick number
-   * @param buttons The bitmap state of the buttons on the joystick
+   * @param maximumIndex The maximum index an axis is available at.
    */
-  public static void setJoystickButtons(int stick, int buttons) {
-    DriverStationDataJNI.setJoystickButtonsValue(stick, buttons);
+  public static void setJoystickAxesMaximumIndex(int stick, int maximumIndex) {
+    setJoystickAxesAvailable(stick, (1 << maximumIndex) - 1);
   }
 
   /**
@@ -386,8 +386,18 @@ public final class DriverStationSim {
    * @param stick The joystick number
    * @param count The number of axes on the indicated joystick
    */
-  public static void setJoystickAxisCount(int stick, int count) {
-    DriverStationDataJNI.setJoystickAxisCount(stick, count);
+  public static void setJoystickAxesAvailable(int stick, int count) {
+    DriverStationDataJNI.setJoystickAxesAvailable(stick, count);
+  }
+
+  /**
+   * Sets the maximum index that a pov is available at.
+   *
+   * @param stick The joystick number
+   * @param maximumIndex The maximum index a pov is available at.
+   */
+  public static void setJoystickPOVsMaximumIndex(int stick, int maximumIndex) {
+    setJoystickPOVsAvailable(stick, (1 << maximumIndex) - 1);
   }
 
   /**
@@ -396,8 +406,22 @@ public final class DriverStationSim {
    * @param stick The joystick number
    * @param count The number of POVs on the indicated joystick
    */
-  public static void setJoystickPOVCount(int stick, int count) {
-    DriverStationDataJNI.setJoystickPOVCount(stick, count);
+  public static void setJoystickPOVsAvailable(int stick, int count) {
+    DriverStationDataJNI.setJoystickPOVsAvailable(stick, count);
+  }
+
+  /**
+   * Sets the maximum index that a button is available at.
+   *
+   * @param stick The joystick number
+   * @param maximumIndex The maximum index a button is available at.
+   */
+  public static void setJoystickButtonsMaximumIndex(int stick, int maximumIndex) {
+    if (maximumIndex >= 64) {
+      setJoystickButtonsAvailable(stick, 0xFFFFFFFFFFFFFFFFL);
+    } else {
+      setJoystickButtonsAvailable(stick, (1L << maximumIndex) - 1);
+    }
   }
 
   /**
@@ -406,8 +430,8 @@ public final class DriverStationSim {
    * @param stick The joystick number
    * @param count The number of buttons on the indicated joystick
    */
-  public static void setJoystickButtonCount(int stick, int count) {
-    DriverStationDataJNI.setJoystickButtonCount(stick, count);
+  public static void setJoystickButtonsAvailable(int stick, long count) {
+    DriverStationDataJNI.setJoystickButtonsAvailable(stick, count);
   }
 
   /**
@@ -438,17 +462,6 @@ public final class DriverStationSim {
    */
   public static void setJoystickName(int stick, String name) {
     DriverStationDataJNI.setJoystickName(stick, name);
-  }
-
-  /**
-   * Sets the types of Axes for a joystick.
-   *
-   * @param stick The joystick number
-   * @param axis The target axis
-   * @param type The type of axis
-   */
-  public static void setJoystickAxisType(int stick, int axis, int type) {
-    DriverStationDataJNI.setJoystickAxisType(stick, axis, type);
   }
 
   /**

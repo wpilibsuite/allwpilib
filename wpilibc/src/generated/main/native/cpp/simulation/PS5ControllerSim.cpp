@@ -13,15 +13,15 @@ using namespace frc::sim;
 
 PS5ControllerSim::PS5ControllerSim(const PS5Controller& joystick)
     : GenericHIDSim{joystick} {
-  SetAxisCount(6);
-  SetButtonCount(14);
-  SetPOVCount(1);
+  SetAxesMaximumIndex(6);
+  SetButtonsMaximumIndex(14);
+  SetPOVsMaximumIndex(1);
 }
 
 PS5ControllerSim::PS5ControllerSim(int port) : GenericHIDSim{port} {
-  SetAxisCount(6);
-  SetButtonCount(14);
-  SetPOVCount(1);
+  SetAxesMaximumIndex(6);
+  SetButtonsMaximumIndex(14);
+  SetPOVsMaximumIndex(1);
 }
 
 void PS5ControllerSim::SetLeftX(double value) {
