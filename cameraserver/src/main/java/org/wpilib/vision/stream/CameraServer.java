@@ -4,17 +4,13 @@
 
 package org.wpilib.vision.stream;
 
-import org.wpilib.vision.camera.CameraServerJNI;
-import org.wpilib.vision.camera.CvSink;
-import org.wpilib.vision.camera.CvSource;
-import org.wpilib.vision.camera.MjpegServer;
-import org.wpilib.vision.camera.UsbCamera;
-import org.wpilib.vision.camera.VideoEvent;
-import org.wpilib.vision.camera.VideoException;
-import org.wpilib.vision.camera.VideoListener;
-import org.wpilib.vision.camera.VideoMode;
-import org.wpilib.vision.camera.VideoSink;
-import org.wpilib.vision.camera.VideoSource;
+import java.lang.ref.Reference;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.wpilib.networktables.BooleanEntry;
 import org.wpilib.networktables.BooleanPublisher;
 import org.wpilib.networktables.IntegerEntry;
@@ -26,13 +22,17 @@ import org.wpilib.networktables.StringArrayTopic;
 import org.wpilib.networktables.StringEntry;
 import org.wpilib.networktables.StringPublisher;
 import org.wpilib.util.PixelFormat;
-import java.lang.ref.Reference;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
+import org.wpilib.vision.camera.CameraServerJNI;
+import org.wpilib.vision.camera.CvSink;
+import org.wpilib.vision.camera.CvSource;
+import org.wpilib.vision.camera.MjpegServer;
+import org.wpilib.vision.camera.UsbCamera;
+import org.wpilib.vision.camera.VideoEvent;
+import org.wpilib.vision.camera.VideoException;
+import org.wpilib.vision.camera.VideoListener;
+import org.wpilib.vision.camera.VideoMode;
+import org.wpilib.vision.camera.VideoSink;
+import org.wpilib.vision.camera.VideoSource;
 
 /**
  * Singleton class for creating and keeping camera servers. Also publishes camera information to

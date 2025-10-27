@@ -4,14 +4,14 @@
 
 package org.wpilib.examples.eventloop;
 
-import org.wpilib.math.controller.PIDController;
-import org.wpilib.math.controller.SimpleMotorFeedforward;
-import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.driverstation.Joystick;
-import org.wpilib.opmode.TimedRobot;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
 import org.wpilib.hardware.motor.PWMSparkMax;
+import org.wpilib.hardware.rotation.Encoder;
+import org.wpilib.math.controller.PIDController;
+import org.wpilib.math.controller.SimpleMotorFeedforward;
+import org.wpilib.opmode.TimedRobot;
 
 public class Robot extends TimedRobot {
   public static final double SHOT_VELOCITY = 200; // rpm

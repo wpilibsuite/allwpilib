@@ -6,9 +6,9 @@ package org.wpilib.driverstation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.driverstation.GenericHID.RumbleType;
 import org.wpilib.simulation.GenericHIDSim;
-import org.junit.jupiter.api.Test;
 
 class GenericHIDTest {
   private static final double kEpsilon = 0.0001;

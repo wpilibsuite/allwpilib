@@ -4,11 +4,11 @@
 
 package org.wpilib.examples.potentiometerpid;
 
-import org.wpilib.math.controller.PIDController;
-import org.wpilib.hardware.rotation.AnalogPotentiometer;
 import org.wpilib.driverstation.Joystick;
-import org.wpilib.opmode.TimedRobot;
 import org.wpilib.hardware.motor.PWMSparkMax;
+import org.wpilib.hardware.rotation.AnalogPotentiometer;
+import org.wpilib.math.controller.PIDController;
+import org.wpilib.opmode.TimedRobot;
 
 /**
  * This is a sample program to demonstrate how to use a soft potentiometer and a PID controller to

@@ -4,12 +4,12 @@
 
 package org.wpilib.simulation;
 
+import org.wpilib.driverstation.DriverStation;
 import org.wpilib.hardware.hal.AllianceStationID;
 import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.hardware.hal.simulation.DriverStationDataJNI;
 import org.wpilib.hardware.hal.simulation.NotifyCallback;
 import org.wpilib.util.WPIUtilJNI;
-import org.wpilib.driverstation.DriverStation;
 
 /** Class to control a simulated driver station. */
 public final class DriverStationSim {

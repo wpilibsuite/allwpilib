@@ -4,18 +4,18 @@
 
 package org.wpilib.math.linalg;
 
-import org.wpilib.math.numbers.N1;
-import org.wpilib.math.numbers.N3;
+import java.util.Objects;
+import org.ejml.simple.SimpleMatrix;
 import org.wpilib.math.linalg.proto.VectorProto;
 import org.wpilib.math.linalg.struct.VectorStruct;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.numbers.N3;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Num;
 import org.wpilib.util.protobuf.Protobuf;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.Struct;
 import org.wpilib.util.struct.StructSerializable;
-import java.util.Objects;
-import org.ejml.simple.SimpleMatrix;
 
 /**
  * A shape-safe wrapper over Efficient Java Matrix Library (EJML) matrices.

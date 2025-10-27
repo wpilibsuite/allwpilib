@@ -4,10 +4,12 @@
 
 package org.wpilib.examples.statespacearm;
 
-import org.wpilib.math.util.Nat;
-import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.driverstation.Joystick;
+import org.wpilib.hardware.motor.PWMSparkMax;
+import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.LinearQuadraticRegulator;
 import org.wpilib.math.estimator.KalmanFilter;
+import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N2;
 import org.wpilib.math.system.LinearSystem;
@@ -15,11 +17,9 @@ import org.wpilib.math.system.LinearSystemLoop;
 import org.wpilib.math.system.plant.DCMotor;
 import org.wpilib.math.system.plant.LinearSystemId;
 import org.wpilib.math.trajectory.TrapezoidProfile;
+import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Units;
-import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.driverstation.Joystick;
 import org.wpilib.opmode.TimedRobot;
-import org.wpilib.hardware.motor.PWMSparkMax;
 
 /**
  * This is a sample program to demonstrate how to use a state-space controller to control an arm.

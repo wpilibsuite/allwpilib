@@ -4,9 +4,9 @@
 
 package org.wpilib.examples.mecanumbot;
 
+import org.wpilib.driverstation.XboxController;
 import org.wpilib.math.filter.SlewRateLimiter;
 import org.wpilib.opmode.TimedRobot;
-import org.wpilib.driverstation.XboxController;
 
 public class Robot extends TimedRobot {
   private final XboxController m_controller = new XboxController(0);

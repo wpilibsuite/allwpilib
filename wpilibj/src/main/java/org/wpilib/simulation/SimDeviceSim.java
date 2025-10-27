@@ -235,7 +235,8 @@ public class SimDeviceSim {
   }
 
   /**
-   * Register a callback to be run every time a new {@link org.wpilib.hardware.hal.SimDevice} is created.
+   * Register a callback to be run every time a new {@link org.wpilib.hardware.hal.SimDevice} is
+   * created.
    *
    * @param prefix the prefix to filter sim devices
    * @param callback the callback

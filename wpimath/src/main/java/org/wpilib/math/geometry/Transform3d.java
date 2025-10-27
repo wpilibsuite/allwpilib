@@ -6,17 +6,17 @@ package org.wpilib.math.geometry;
 
 import static org.wpilib.units.Units.Meters;
 
-import org.wpilib.math.linalg.MatBuilder;
-import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Nat;
+import java.util.Objects;
 import org.wpilib.math.geometry.proto.Transform3dProto;
 import org.wpilib.math.geometry.struct.Transform3dStruct;
 import org.wpilib.math.jni.Transform3dJNI;
+import org.wpilib.math.linalg.MatBuilder;
+import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N4;
+import org.wpilib.math.util.Nat;
 import org.wpilib.units.measure.Distance;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
-import java.util.Objects;
 
 /** Represents a transformation for a Pose3d in the pose's frame. */
 public class Transform3d implements ProtobufSerializable, StructSerializable {

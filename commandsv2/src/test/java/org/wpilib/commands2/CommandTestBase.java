@@ -7,11 +7,11 @@ package org.wpilib.commands2;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.wpilib.driverstation.DriverStation;
-import org.wpilib.simulation.DriverStationSim;
-import org.wpilib.commands2.Command.InterruptionBehavior;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
+import org.wpilib.commands2.Command.InterruptionBehavior;
+import org.wpilib.driverstation.DriverStation;
+import org.wpilib.simulation.DriverStationSim;
 
 /** Basic setup for all {@link Command tests}. */
 public class CommandTestBase {

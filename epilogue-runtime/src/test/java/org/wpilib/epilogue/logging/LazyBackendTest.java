@@ -8,9 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
-import org.wpilib.math.geometry.Rotation2d;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.geometry.Rotation2d;
 
 class LazyBackendTest {
   @Test

@@ -8,15 +8,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.wpilib.hardware.hal.AllianceStationID;
-import org.wpilib.hardware.hal.HAL;
-import org.wpilib.driverstation.DriverStation;
-import org.wpilib.simulation.testutils.BooleanCallback;
-import org.wpilib.simulation.testutils.DoubleCallback;
-import org.wpilib.simulation.testutils.EnumCallback;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.wpilib.driverstation.DriverStation;
+import org.wpilib.hardware.hal.AllianceStationID;
+import org.wpilib.hardware.hal.HAL;
+import org.wpilib.simulation.testutils.BooleanCallback;
+import org.wpilib.simulation.testutils.DoubleCallback;
+import org.wpilib.simulation.testutils.EnumCallback;
 
 class DriverStationSimTest {
   @Test

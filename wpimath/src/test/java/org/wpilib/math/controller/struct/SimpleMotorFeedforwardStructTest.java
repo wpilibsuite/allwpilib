@@ -6,8 +6,8 @@ package org.wpilib.math.controller.struct;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.math.controller.SimpleMotorFeedforward;
 import org.wpilib.StructTestBase;
+import org.wpilib.math.controller.SimpleMotorFeedforward;
 
 @SuppressWarnings("PMD.TestClassWithoutTestCases")
 class SimpleMotorFeedforwardStructTest extends StructTestBase<SimpleMotorFeedforward> {

@@ -6,9 +6,9 @@ package org.wpilib.simulation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.hardware.rotation.AnalogEncoder;
-import org.wpilib.hardware.discrete.AnalogInput;
 import org.junit.jupiter.api.Test;
+import org.wpilib.hardware.discrete.AnalogInput;
+import org.wpilib.hardware.rotation.AnalogEncoder;
 
 class AnalogEncoderSimTest {
   @Test

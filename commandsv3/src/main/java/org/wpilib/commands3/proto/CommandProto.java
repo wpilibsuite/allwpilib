@@ -4,11 +4,11 @@
 
 package org.wpilib.commands3.proto;
 
-import org.wpilib.util.protobuf.Protobuf;
 import org.wpilib.commands3.Command;
 import org.wpilib.commands3.Mechanism;
 import org.wpilib.commands3.Scheduler;
 import org.wpilib.commands3.proto.ProtobufCommands.ProtobufCommand;
+import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors;
 
 /** Protobuf serde for running commands. */

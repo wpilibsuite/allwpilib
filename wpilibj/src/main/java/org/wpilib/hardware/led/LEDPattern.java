@@ -9,6 +9,10 @@ import static org.wpilib.units.Units.Microsecond;
 import static org.wpilib.units.Units.Microseconds;
 import static org.wpilib.units.Units.Value;
 
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 import org.wpilib.driverstation.DriverStation;
 import org.wpilib.system.RobotController;
 import org.wpilib.units.collections.LongToObjectHashMap;
@@ -17,12 +21,8 @@ import org.wpilib.units.measure.Distance;
 import org.wpilib.units.measure.Frequency;
 import org.wpilib.units.measure.LinearVelocity;
 import org.wpilib.units.measure.Time;
-import org.wpilib.util.WPIUtilJNI;
 import org.wpilib.util.Color;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
+import org.wpilib.util.WPIUtilJNI;
 
 /**
  * An LED pattern controls lights on an LED strip to command patterns of color that may change over

@@ -6,16 +6,16 @@ package org.wpilib.math.geometry;
 
 import static org.wpilib.units.Units.Meters;
 
-import org.wpilib.math.linalg.MatBuilder;
-import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Nat;
+import java.util.Objects;
 import org.wpilib.math.geometry.proto.Transform2dProto;
 import org.wpilib.math.geometry.struct.Transform2dStruct;
+import org.wpilib.math.linalg.MatBuilder;
+import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N3;
+import org.wpilib.math.util.Nat;
 import org.wpilib.units.measure.Distance;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
-import java.util.Objects;
 
 /** Represents a transformation for a Pose2d in the pose's frame. */
 public class Transform2d implements ProtobufSerializable, StructSerializable {

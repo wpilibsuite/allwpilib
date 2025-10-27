@@ -28,10 +28,10 @@
 
 package org.wpilib.math.trajectory;
 
-import org.wpilib.math.spline.PoseWithCurvature;
-import org.wpilib.math.trajectory.constraint.TrajectoryConstraint;
 import java.util.ArrayList;
 import java.util.List;
+import org.wpilib.math.spline.PoseWithCurvature;
+import org.wpilib.math.trajectory.constraint.TrajectoryConstraint;
 
 /** Class used to parameterize a trajectory by time. */
 public final class TrajectoryParameterizer {

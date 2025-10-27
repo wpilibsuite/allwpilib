@@ -4,12 +4,12 @@
 
 package org.wpilib.examples.gyro;
 
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.drive.DifferentialDrive;
 import org.wpilib.driverstation.Joystick;
 import org.wpilib.hardware.imu.OnboardIMU;
-import org.wpilib.opmode.TimedRobot;
-import org.wpilib.drive.DifferentialDrive;
 import org.wpilib.hardware.motor.PWMSparkMax;
+import org.wpilib.opmode.TimedRobot;
+import org.wpilib.util.sendable.SendableRegistry;
 
 /**
  * This is a sample program to demonstrate how to use a gyro sensor to make a robot drive straight.

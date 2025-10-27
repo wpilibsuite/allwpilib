@@ -6,10 +6,10 @@ package org.wpilib.epilogue.processor;
 
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
-import static org.wpilib.epilogue.processor.CompileTestOptions.kJavaVersionOptions;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.wpilib.epilogue.processor.CompileTestOptions.kJavaVersionOptions;
 
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
@@ -2335,8 +2335,7 @@ class AnnotationProcessorTest {
             .withOptions(kJavaVersionOptions)
             .withProcessors(new AnnotationProcessor())
             .compile(
-                JavaFileObjects.forSourceString(
-                    "org.wpilib.epilogue.Example", loggedClassContent));
+                JavaFileObjects.forSourceString("org.wpilib.epilogue.Example", loggedClassContent));
 
     assertThat(compilation).succeeded();
     var generatedFiles = compilation.generatedSourceFiles();

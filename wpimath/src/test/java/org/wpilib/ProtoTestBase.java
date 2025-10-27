@@ -4,8 +4,8 @@
 
 package org.wpilib;
 
-import org.wpilib.util.protobuf.Protobuf;
 import org.junit.jupiter.api.Test;
+import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.ProtoMessage;
 
 public abstract class ProtoTestBase<T, MessageType extends ProtoMessage<MessageType>> {

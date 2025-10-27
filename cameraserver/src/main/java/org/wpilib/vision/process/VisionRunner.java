@@ -4,10 +4,10 @@
 
 package org.wpilib.vision.process;
 
-import org.wpilib.vision.stream.CameraServerSharedStore;
+import org.opencv.core.Mat;
 import org.wpilib.vision.camera.CvSink;
 import org.wpilib.vision.camera.VideoSource;
-import org.opencv.core.Mat;
+import org.wpilib.vision.stream.CameraServerSharedStore;
 
 /**
  * A vision runner is a convenient wrapper object to make it easy to run vision pipelines from robot

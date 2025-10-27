@@ -6,13 +6,13 @@ package org.wpilib.math.geometry.struct;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Quaternion;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Transform3d;
 import org.wpilib.math.geometry.Translation3d;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import org.junit.jupiter.api.Test;
 
 class Transform3dStructTest {
   private static final Transform3d DATA =

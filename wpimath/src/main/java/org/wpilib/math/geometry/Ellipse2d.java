@@ -6,14 +6,14 @@ package org.wpilib.math.geometry;
 
 import static org.wpilib.units.Units.Meters;
 
-import org.wpilib.math.util.Pair;
+import java.util.Objects;
 import org.wpilib.math.geometry.proto.Ellipse2dProto;
 import org.wpilib.math.geometry.struct.Ellipse2dStruct;
 import org.wpilib.math.jni.Ellipse2dJNI;
+import org.wpilib.math.util.Pair;
 import org.wpilib.units.measure.Distance;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
-import java.util.Objects;
 
 /** Represents a 2d ellipse space containing translational, rotational, and scaling components. */
 public class Ellipse2d implements ProtobufSerializable, StructSerializable {

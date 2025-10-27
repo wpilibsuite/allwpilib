@@ -4,14 +4,13 @@
 
 package org.wpilib.examples.elevatorsimulation.subsystems;
 
+import org.wpilib.examples.elevatorsimulation.Constants;
+import org.wpilib.hardware.motor.PWMSparkMax;
+import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.ElevatorFeedforward;
 import org.wpilib.math.controller.ProfiledPIDController;
 import org.wpilib.math.system.plant.DCMotor;
 import org.wpilib.math.trajectory.TrapezoidProfile;
-import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.system.RobotController;
-import org.wpilib.examples.elevatorsimulation.Constants;
-import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.simulation.BatterySim;
 import org.wpilib.simulation.ElevatorSim;
 import org.wpilib.simulation.EncoderSim;
@@ -21,6 +20,7 @@ import org.wpilib.smartdashboard.Mechanism2d;
 import org.wpilib.smartdashboard.MechanismLigament2d;
 import org.wpilib.smartdashboard.MechanismRoot2d;
 import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.system.RobotController;
 
 public class Elevator implements AutoCloseable {
   // This gearbox represents a gearbox containing 4 Vex 775pro motors.

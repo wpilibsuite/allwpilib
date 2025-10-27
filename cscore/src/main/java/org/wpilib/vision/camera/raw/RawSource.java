@@ -4,12 +4,12 @@
 
 package org.wpilib.vision.camera.raw;
 
+import java.nio.ByteBuffer;
+import org.wpilib.util.PixelFormat;
+import org.wpilib.util.RawFrame;
 import org.wpilib.vision.camera.CameraServerJNI;
 import org.wpilib.vision.camera.ImageSource;
 import org.wpilib.vision.camera.VideoMode;
-import org.wpilib.util.PixelFormat;
-import org.wpilib.util.RawFrame;
-import java.nio.ByteBuffer;
 
 /**
  * A source for user code to provide video frames as raw bytes.

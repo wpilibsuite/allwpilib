@@ -9,12 +9,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.linalg.MatBuilder;
 import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Nat;
 import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Units;
-import org.junit.jupiter.api.Test;
 
 class Rotation3dTest {
   private static final double kEpsilon = 1E-9;

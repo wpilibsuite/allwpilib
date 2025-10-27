@@ -4,12 +4,12 @@
 
 package org.wpilib.math.linalg.struct;
 
+import java.nio.ByteBuffer;
 import org.wpilib.math.linalg.MatBuilder;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Num;
 import org.wpilib.util.struct.Struct;
-import java.nio.ByteBuffer;
 
 public final class MatrixStruct<R extends Num, C extends Num> implements Struct<Matrix<R, C>> {
   private final Nat<R> m_rows;

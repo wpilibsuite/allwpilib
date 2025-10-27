@@ -4,7 +4,6 @@
 
 package org.wpilib.epilogue.processor;
 
-import org.wpilib.epilogue.Logged;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Set;
@@ -17,6 +16,7 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import org.wpilib.epilogue.Logged;
 
 /** Handles logging for types annotated with the {@link Logged @Logged} annotation. */
 public class LoggableHandler extends ElementHandler {

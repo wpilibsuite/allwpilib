@@ -4,12 +4,12 @@
 
 package org.wpilib.math.linalg.struct;
 
-import org.wpilib.math.util.Nat;
-import org.wpilib.math.util.Num;
-import org.wpilib.math.linalg.Vector;
-import org.wpilib.util.struct.Struct;
 import java.nio.ByteBuffer;
 import org.ejml.simple.SimpleMatrix;
+import org.wpilib.math.linalg.Vector;
+import org.wpilib.math.util.Nat;
+import org.wpilib.math.util.Num;
+import org.wpilib.util.struct.Struct;
 
 public final class VectorStruct<R extends Num> implements Struct<Vector<R>> {
   private final int m_rows;

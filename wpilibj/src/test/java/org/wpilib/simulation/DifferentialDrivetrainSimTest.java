@@ -7,15 +7,16 @@ package org.wpilib.simulation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Nat;
-import org.wpilib.math.linalg.VecBuilder;
-import org.wpilib.math.linalg.Vector;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.controller.LTVUnicycleController;
 import org.wpilib.math.controller.LinearPlantInversionFeedforward;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N7;
 import org.wpilib.math.system.NumericalIntegration;
@@ -24,9 +25,8 @@ import org.wpilib.math.system.plant.LinearSystemId;
 import org.wpilib.math.trajectory.TrajectoryConfig;
 import org.wpilib.math.trajectory.TrajectoryGenerator;
 import org.wpilib.math.trajectory.constraint.DifferentialDriveKinematicsConstraint;
+import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Units;
-import java.util.List;
-import org.junit.jupiter.api.Test;
 
 class DifferentialDrivetrainSimTest {
   @Test

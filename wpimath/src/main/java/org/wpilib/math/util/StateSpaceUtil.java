@@ -4,6 +4,8 @@
 
 package org.wpilib.math.util;
 
+import java.util.Random;
+import org.ejml.simple.SimpleMatrix;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.jni.StateSpaceUtilJNI;
 import org.wpilib.math.linalg.Matrix;
@@ -11,8 +13,6 @@ import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N3;
 import org.wpilib.math.numbers.N4;
-import java.util.Random;
-import org.ejml.simple.SimpleMatrix;
 
 /** State-space utilities. */
 public final class StateSpaceUtil {

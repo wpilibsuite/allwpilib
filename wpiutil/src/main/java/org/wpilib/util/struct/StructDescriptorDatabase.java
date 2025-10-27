@@ -4,13 +4,13 @@
 
 package org.wpilib.util.struct;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
 import org.wpilib.util.struct.parser.ParseException;
 import org.wpilib.util.struct.parser.ParsedDeclaration;
 import org.wpilib.util.struct.parser.ParsedSchema;
 import org.wpilib.util.struct.parser.Parser;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
 
 /** Database of raw struct dynamic descriptors. */
 public class StructDescriptorDatabase {

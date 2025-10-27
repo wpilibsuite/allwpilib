@@ -4,14 +4,14 @@
 
 package org.wpilib.math.estimator;
 
-import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Nat;
-import org.wpilib.math.util.Num;
-import org.wpilib.math.numbers.N1;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.util.Nat;
+import org.wpilib.math.util.Num;
 
 /**
  * This class incorporates time-delayed measurements into a Kalman filter's state estimate.

@@ -4,6 +4,9 @@
 
 package org.wpilib.examples.mecanumbot;
 
+import org.wpilib.hardware.imu.OnboardIMU;
+import org.wpilib.hardware.motor.PWMSparkMax;
+import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
 import org.wpilib.math.geometry.Translation2d;
@@ -12,9 +15,6 @@ import org.wpilib.math.kinematics.MecanumDriveKinematics;
 import org.wpilib.math.kinematics.MecanumDriveOdometry;
 import org.wpilib.math.kinematics.MecanumDriveWheelPositions;
 import org.wpilib.math.kinematics.MecanumDriveWheelSpeeds;
-import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.hardware.imu.OnboardIMU;
-import org.wpilib.hardware.motor.PWMSparkMax;
 
 /** Represents a mecanum drive style drivetrain. */
 public class Drivetrain {

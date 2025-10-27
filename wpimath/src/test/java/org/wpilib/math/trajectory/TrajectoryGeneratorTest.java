@@ -4,20 +4,20 @@
 
 package org.wpilib.math.trajectory;
 
-import static org.wpilib.math.util.Units.feetToMeters;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.wpilib.math.util.Units.feetToMeters;
 
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.trajectory.constraint.TrajectoryConstraint;
-import java.util.ArrayList;
-import java.util.List;
-import org.junit.jupiter.api.Test;
 
 class TrajectoryGeneratorTest {
   static Trajectory getTrajectory(List<? extends TrajectoryConstraint> constraints) {

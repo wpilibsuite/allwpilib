@@ -6,8 +6,8 @@ package org.wpilib.hardware.range;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.simulation.SharpIRSim;
 import org.junit.jupiter.api.Test;
+import org.wpilib.simulation.SharpIRSim;
 
 class SharpIRTest {
   @Test

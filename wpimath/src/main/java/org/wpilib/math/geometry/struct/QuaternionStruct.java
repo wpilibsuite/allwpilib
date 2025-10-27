@@ -4,9 +4,9 @@
 
 package org.wpilib.math.geometry.struct;
 
+import java.nio.ByteBuffer;
 import org.wpilib.math.geometry.Quaternion;
 import org.wpilib.util.struct.Struct;
-import java.nio.ByteBuffer;
 
 public class QuaternionStruct implements Struct<Quaternion> {
   @Override

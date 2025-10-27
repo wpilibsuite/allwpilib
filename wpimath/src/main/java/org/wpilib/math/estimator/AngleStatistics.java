@@ -4,12 +4,12 @@
 
 package org.wpilib.math.estimator;
 
-import org.wpilib.math.util.MathUtil;
-import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Num;
-import org.wpilib.math.numbers.N1;
 import java.util.function.BiFunction;
 import org.ejml.simple.SimpleMatrix;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.math.util.Num;
 
 /** Angle statistics functions. */
 public final class AngleStatistics {

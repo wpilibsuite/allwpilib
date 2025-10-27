@@ -9,6 +9,7 @@ import static org.wpilib.units.Units.Celsius;
 import static org.wpilib.units.Units.Microseconds;
 import static org.wpilib.units.Units.Volts;
 
+import java.util.function.LongSupplier;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.HALUtil;
 import org.wpilib.hardware.hal.PowerJNI;
@@ -18,7 +19,6 @@ import org.wpilib.units.measure.Current;
 import org.wpilib.units.measure.Temperature;
 import org.wpilib.units.measure.Time;
 import org.wpilib.units.measure.Voltage;
-import java.util.function.LongSupplier;
 
 /** Contains functions for roboRIO functionality. */
 public final class RobotController {

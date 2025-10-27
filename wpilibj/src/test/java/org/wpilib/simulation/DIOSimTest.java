@@ -7,11 +7,11 @@ package org.wpilib.simulation;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.wpilib.hardware.hal.HAL;
+import org.junit.jupiter.api.Test;
 import org.wpilib.hardware.discrete.DigitalInput;
 import org.wpilib.hardware.discrete.DigitalOutput;
+import org.wpilib.hardware.hal.HAL;
 import org.wpilib.simulation.testutils.BooleanCallback;
-import org.junit.jupiter.api.Test;
 
 class DIOSimTest {
   @Test

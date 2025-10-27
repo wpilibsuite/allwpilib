@@ -4,9 +4,6 @@
 
 package org.wpilib.epilogue.processor;
 
-import org.wpilib.epilogue.Logged;
-import org.wpilib.epilogue.logging.ClassSpecificLogger;
-import org.wpilib.epilogue.logging.EpilogueBackend;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -16,6 +13,9 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
+import org.wpilib.epilogue.Logged;
+import org.wpilib.epilogue.logging.ClassSpecificLogger;
+import org.wpilib.epilogue.logging.EpilogueBackend;
 
 /**
  * Handles logging of fields or methods. An element that passes the {@link #isLoggable(Element)}

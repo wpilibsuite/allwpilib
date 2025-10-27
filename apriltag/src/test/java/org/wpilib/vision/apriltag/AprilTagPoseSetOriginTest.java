@@ -6,12 +6,12 @@ package org.wpilib.vision.apriltag;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.List;
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Translation3d;
 import org.wpilib.math.util.Units;
-import java.util.List;
-import org.junit.jupiter.api.Test;
 
 class AprilTagPoseSetOriginTest {
   @Test

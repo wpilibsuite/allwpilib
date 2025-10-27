@@ -4,10 +4,10 @@
 
 package org.wpilib.simulation;
 
-import org.wpilib.hardware.hal.simulation.DIODataJNI;
-import org.wpilib.hardware.hal.simulation.NotifyCallback;
 import org.wpilib.hardware.discrete.DigitalInput;
 import org.wpilib.hardware.discrete.DigitalOutput;
+import org.wpilib.hardware.hal.simulation.DIODataJNI;
+import org.wpilib.hardware.hal.simulation.NotifyCallback;
 
 /** Class to control a simulated digital input or output. */
 public class DIOSim {

@@ -4,10 +4,10 @@
 
 package org.wpilib.datalog;
 
-import org.wpilib.util.protobuf.Protobuf;
-import org.wpilib.util.protobuf.ProtobufBuffer;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import org.wpilib.util.protobuf.Protobuf;
+import org.wpilib.util.protobuf.ProtobufBuffer;
 import us.hebi.quickbuf.ProtoMessage;
 
 /**

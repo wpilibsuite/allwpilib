@@ -4,14 +4,14 @@
 
 package org.wpilib.smartdashboard;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.networktables.NTSendable;
 import org.wpilib.networktables.NTSendableBuilder;
 import org.wpilib.networktables.NetworkTable;
 import org.wpilib.util.sendable.SendableRegistry;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 2D representation of game field for dashboards.

@@ -4,13 +4,13 @@
 
 package org.wpilib.commands2.button;
 
-import org.wpilib.math.util.Pair;
+import java.util.HashMap;
+import java.util.Map;
+import org.wpilib.commands2.CommandScheduler;
 import org.wpilib.driverstation.DriverStation.POVDirection;
 import org.wpilib.driverstation.GenericHID;
 import org.wpilib.event.EventLoop;
-import org.wpilib.commands2.CommandScheduler;
-import java.util.HashMap;
-import java.util.Map;
+import org.wpilib.math.util.Pair;
 
 /**
  * A version of {@link GenericHID} with {@link Trigger} factories for command-based.

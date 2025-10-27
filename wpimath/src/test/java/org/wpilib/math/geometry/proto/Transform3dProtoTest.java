@@ -6,12 +6,12 @@ package org.wpilib.math.geometry.proto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Quaternion;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Transform3d;
 import org.wpilib.math.geometry.Translation3d;
 import org.wpilib.math.proto.Geometry3D.ProtobufTransform3d;
-import org.junit.jupiter.api.Test;
 
 class Transform3dProtoTest {
   private static final Transform3d DATA =

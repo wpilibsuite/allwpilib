@@ -4,8 +4,8 @@
 
 package org.wpilib.vision.camera;
 
-import org.wpilib.util.PixelFormat;
 import org.opencv.core.Mat;
+import org.wpilib.util.PixelFormat;
 
 /**
  * A source that represents a video camera. These sources require the WPILib OpenCV builds. For an

@@ -4,7 +4,9 @@
 
 package org.wpilib.examples.mecanumdriveposeestimator;
 
-import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.hardware.imu.OnboardIMU;
+import org.wpilib.hardware.motor.PWMSparkMax;
+import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
 import org.wpilib.math.estimator.MecanumDrivePoseEstimator;
@@ -14,11 +16,9 @@ import org.wpilib.math.kinematics.ChassisSpeeds;
 import org.wpilib.math.kinematics.MecanumDriveKinematics;
 import org.wpilib.math.kinematics.MecanumDriveWheelPositions;
 import org.wpilib.math.kinematics.MecanumDriveWheelSpeeds;
+import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.util.Units;
-import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.hardware.imu.OnboardIMU;
 import org.wpilib.system.Timer;
-import org.wpilib.hardware.motor.PWMSparkMax;
 
 /** Represents a mecanum drive style drivetrain. */
 public class Drivetrain {

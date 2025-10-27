@@ -4,9 +4,9 @@
 
 package org.wpilib.math.jni;
 
-import org.wpilib.util.runtime.RuntimeLoader;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.wpilib.util.runtime.RuntimeLoader;
 
 /** Base class for all WPIMath JNI wrappers. */
 public class WPIMathJNI {

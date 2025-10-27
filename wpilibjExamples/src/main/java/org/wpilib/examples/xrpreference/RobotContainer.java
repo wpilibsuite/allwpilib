@@ -4,6 +4,11 @@
 
 package org.wpilib.examples.xrpreference;
 
+import org.wpilib.commands2.Command;
+import org.wpilib.commands2.InstantCommand;
+import org.wpilib.commands2.PrintCommand;
+import org.wpilib.commands2.button.JoystickButton;
+import org.wpilib.commands2.button.Trigger;
 import org.wpilib.driverstation.GenericHID;
 import org.wpilib.driverstation.Joystick;
 import org.wpilib.driverstation.XboxController;
@@ -15,11 +20,6 @@ import org.wpilib.examples.xrpreference.subsystems.Drivetrain;
 import org.wpilib.smartdashboard.SendableChooser;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.xrp.XRPOnBoardIO;
-import org.wpilib.commands2.Command;
-import org.wpilib.commands2.InstantCommand;
-import org.wpilib.commands2.PrintCommand;
-import org.wpilib.commands2.button.JoystickButton;
-import org.wpilib.commands2.button.Trigger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a

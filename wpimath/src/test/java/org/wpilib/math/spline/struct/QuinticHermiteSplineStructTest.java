@@ -6,8 +6,8 @@ package org.wpilib.math.spline.struct;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
-import org.wpilib.math.spline.QuinticHermiteSpline;
 import org.wpilib.StructTestBase;
+import org.wpilib.math.spline.QuinticHermiteSpline;
 
 @SuppressWarnings("PMD.TestClassWithoutTestCases")
 class QuinticHermiteSplineStructTest extends StructTestBase<QuinticHermiteSpline> {

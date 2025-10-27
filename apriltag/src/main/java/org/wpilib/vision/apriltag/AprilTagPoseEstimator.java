@@ -4,8 +4,8 @@
 
 package org.wpilib.vision.apriltag;
 
-import org.wpilib.vision.apriltag.jni.AprilTagJNI;
 import org.wpilib.math.geometry.Transform3d;
+import org.wpilib.vision.apriltag.jni.AprilTagJNI;
 
 /** Pose estimators for AprilTag tags. */
 public class AprilTagPoseEstimator {

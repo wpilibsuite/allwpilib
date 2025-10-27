@@ -4,12 +4,12 @@
 
 package org.wpilib.math.geometry;
 
+import java.util.Objects;
 import org.wpilib.math.geometry.proto.Twist3dProto;
 import org.wpilib.math.geometry.struct.Twist3dStruct;
 import org.wpilib.math.jni.Twist3dJNI;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
-import java.util.Objects;
 
 /**
  * A change in distance along a 3D arc since the last pose update. We can use ideas from

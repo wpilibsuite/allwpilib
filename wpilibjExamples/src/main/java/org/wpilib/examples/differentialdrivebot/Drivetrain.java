@@ -4,15 +4,15 @@
 
 package org.wpilib.examples.differentialdrivebot;
 
+import org.wpilib.hardware.imu.OnboardIMU;
+import org.wpilib.hardware.motor.PWMSparkMax;
+import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
 import org.wpilib.math.kinematics.ChassisSpeeds;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import org.wpilib.math.kinematics.DifferentialDriveOdometry;
 import org.wpilib.math.kinematics.DifferentialDriveWheelSpeeds;
-import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.hardware.imu.OnboardIMU;
-import org.wpilib.hardware.motor.PWMSparkMax;
 
 /** Represents a differential drive style drivetrain. */
 public class Drivetrain {

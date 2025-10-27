@@ -4,8 +4,8 @@
 
 package org.wpilib.simulation.testutils;
 
-import org.wpilib.hardware.hal.simulation.ConstBufferCallback;
 import java.util.Arrays;
+import org.wpilib.hardware.hal.simulation.ConstBufferCallback;
 
 public class BufferCallback implements ConstBufferCallback {
   private boolean m_wasTriggered;

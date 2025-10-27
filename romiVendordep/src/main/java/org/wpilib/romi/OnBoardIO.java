@@ -4,9 +4,9 @@
 
 package org.wpilib.romi;
 
+import org.wpilib.driverstation.DriverStation;
 import org.wpilib.hardware.discrete.DigitalInput;
 import org.wpilib.hardware.discrete.DigitalOutput;
-import org.wpilib.driverstation.DriverStation;
 import org.wpilib.system.Timer;
 
 /**

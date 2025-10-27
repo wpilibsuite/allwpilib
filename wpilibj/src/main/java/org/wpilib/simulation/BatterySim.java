@@ -33,8 +33,8 @@ public final class BatterySim {
   /**
    * Calculate the loaded battery voltage. Use this with {@link RoboRioSim#setVInVoltage(double)} to
    * set the simulated battery voltage, which can then be retrieved with the {@link
-   * org.wpilib.system.RobotController#getBatteryVoltage()} method. This function assumes a
-   * nominal voltage of 12v and a resistance of 20 milliohms (0.020 ohms)
+   * org.wpilib.system.RobotController#getBatteryVoltage()} method. This function assumes a nominal
+   * voltage of 12v and a resistance of 20 milliohms (0.020 ohms)
    *
    * @param currents The currents drawn from the battery.
    * @return The battery's voltage under load.

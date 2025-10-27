@@ -6,12 +6,12 @@ package org.wpilib.math.linalg.proto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.math.util.Nat;
+import org.wpilib.ProtoTestBase;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.numbers.N2;
 import org.wpilib.math.proto.Wpimath.ProtobufVector;
-import org.wpilib.ProtoTestBase;
+import org.wpilib.math.util.Nat;
 
 @SuppressWarnings("PMD.TestClassWithoutTestCases")
 class VectorProtoTest extends ProtoTestBase<Vector<N2>, ProtobufVector> {

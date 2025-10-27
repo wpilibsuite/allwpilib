@@ -4,9 +4,9 @@
 
 package org.wpilib.math.spline.struct;
 
+import java.nio.ByteBuffer;
 import org.wpilib.math.spline.QuinticHermiteSpline;
 import org.wpilib.util.struct.Struct;
-import java.nio.ByteBuffer;
 
 public final class QuinticHermiteSplineStruct implements Struct<QuinticHermiteSpline> {
   @Override

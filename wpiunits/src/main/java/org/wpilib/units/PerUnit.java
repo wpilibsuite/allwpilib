@@ -4,8 +4,8 @@
 
 package org.wpilib.units;
 
-import org.wpilib.units.measure.Per;
 import java.util.Objects;
+import org.wpilib.units.measure.Per;
 
 /**
  * Generic combinatory unit type that represents the proportion of one unit to another, such as
@@ -157,8 +157,8 @@ public class PerUnit<N extends Unit, D extends Unit> extends Unit {
    * {@inheritDoc}
    *
    * <p>Note: When called on an object of type {@code PerUnit} (and <i>not</i> a subclass!), this
-   * method will always return a {@link org.wpilib.units.measure.Per} instance. If you want to
-   * avoid casting, use {@link #ofNative(double)} that returns a {@code Per} instance directly.
+   * method will always return a {@link org.wpilib.units.measure.Per} instance. If you want to avoid
+   * casting, use {@link #ofNative(double)} that returns a {@code Per} instance directly.
    *
    * @param magnitude the magnitude of the measure
    * @return the ratio measure
@@ -172,9 +172,8 @@ public class PerUnit<N extends Unit, D extends Unit> extends Unit {
    * {@inheritDoc}
    *
    * <p>Note: When called on an object of type {@code PerUnit} (and <i>not</i> a subclass!), this
-   * method will always return a {@link org.wpilib.units.measure.Per} instance. If you want to
-   * avoid casting, use {@link #ofNativeBaseUnits(double)} that returns a {@code Per} instance
-   * directly.
+   * method will always return a {@link org.wpilib.units.measure.Per} instance. If you want to avoid
+   * casting, use {@link #ofNativeBaseUnits(double)} that returns a {@code Per} instance directly.
    *
    * @param baseUnitMagnitude the magnitude of the measure in terms of its base units.
    * @return the ratio measure
