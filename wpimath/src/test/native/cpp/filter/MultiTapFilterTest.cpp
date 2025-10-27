@@ -13,10 +13,14 @@ static units::second_t now = 0_s;
 class MultiTapFilterTest : public ::testing::Test {
  protected:
   void SetUp() override {
+    now = 0_ms;
     WPI_SetNowImpl([] { return units::microsecond_t{now}.to<uint64_t>(); });
   }
 
-  void TearDown() override { WPI_SetNowImpl(nullptr); }
+  void TearDown() override {
+    now = 0_ms;
+    WPI_SetNowImpl(nullptr);
+  }
 };
 
 TEST_F(MultiTapFilterTest, MultiTapFilterActivated) {
