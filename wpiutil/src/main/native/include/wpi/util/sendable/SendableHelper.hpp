@@ -6,7 +6,7 @@
 
 #include <type_traits>
 
-#include "wpi/sendable/SendableRegistry.h"
+#include "wpi/util/sendable/SendableRegistry.hpp"
 
 namespace wpi {
 

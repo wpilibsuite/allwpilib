@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/argparse.h"
+#include "wpi/util/argparse.hpp"
 
 TEST(ArgparseTest, Basic) {
   wpi::ArgumentParser program("ArgparseTest");

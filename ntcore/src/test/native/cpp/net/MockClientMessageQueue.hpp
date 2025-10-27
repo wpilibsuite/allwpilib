@@ -8,8 +8,8 @@
 #include <utility>
 #include <vector>
 
-#include "net/ClientMessageQueue.h"
-#include "net/Message.h"
+#include "net/ClientMessageQueue.hpp"
+#include "net/Message.hpp"
 
 namespace nt::net {
 

@@ -9,7 +9,7 @@
 #include <utility>
 
 #include "gmock/gmock.h"
-#include "networktables/NetworkTableValue.h"
+#include "wpi/nt/NetworkTableValue.hpp"
 
 namespace nt {
 

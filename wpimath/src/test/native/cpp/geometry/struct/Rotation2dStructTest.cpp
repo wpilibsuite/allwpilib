@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Rotation2d.h"
+#include "wpi/math/geometry/Rotation2d.hpp"
 
 using namespace frc;
 

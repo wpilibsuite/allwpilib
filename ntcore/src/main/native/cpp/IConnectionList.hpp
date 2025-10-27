@@ -6,7 +6,7 @@
 
 #include <vector>
 
-#include "ntcore_cpp.h"
+#include "wpi/nt/ntcore_cpp.hpp"
 
 namespace nt {
 

@@ -8,7 +8,7 @@
 #include <array>
 #include <cmath>
 
-#include "units/time.h"
+#include "wpi/units/time.hpp"
 
 namespace frc {
 

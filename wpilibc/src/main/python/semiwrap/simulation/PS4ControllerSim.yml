@@ -1,5 +1,5 @@
 extra_includes:
-- frc/PS4Controller.h
+- wpi/driverstation/PS4Controller.hpp
 
 classes:
   frc::sim::PS4ControllerSim:

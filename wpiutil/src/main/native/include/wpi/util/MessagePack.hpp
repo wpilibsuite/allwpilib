@@ -10,7 +10,7 @@
 #include <string>
 #include <string_view>
 
-#include "wpi/mpack.h"
+#include "wpi/util/mpack.h"
 
 namespace mpack {
 

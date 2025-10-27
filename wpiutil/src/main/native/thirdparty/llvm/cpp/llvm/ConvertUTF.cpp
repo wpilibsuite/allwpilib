@@ -61,14 +61,14 @@
 
 ------------------------------------------------------------------------ */
 
-#include "wpi/ConvertUTF.h"
+#include "wpi/util/ConvertUTF.hpp"
 #ifdef CVTUTF_DEBUG
 #include <stdio.h>
 #endif
 #include <assert.h>
 
 #ifdef _WIN32
-#include "wpi/WindowsError.h"
+#include "wpi/util/WindowsError.hpp"
 #include "Windows/WindowsSupport.h"
 #endif
 

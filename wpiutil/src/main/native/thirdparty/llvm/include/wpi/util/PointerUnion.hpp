@@ -15,10 +15,10 @@
 #ifndef WPIUTIL_WPI_POINTERUNION_H
 #define WPIUTIL_WPI_POINTERUNION_H
 
-#include "wpi/DenseMapInfo.h"
-#include "wpi/PointerIntPair.h"
-#include "wpi/Casting.h"
-#include "wpi/PointerLikeTypeTraits.h"
+#include "wpi/util/DenseMapInfo.hpp"
+#include "wpi/util/PointerIntPair.hpp"
+#include "wpi/util/Casting.hpp"
+#include "wpi/util/PointerLikeTypeTraits.hpp"
 #include <algorithm>
 #include <cassert>
 #include <cstddef>

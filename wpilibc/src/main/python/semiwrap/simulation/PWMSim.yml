@@ -1,6 +1,6 @@
 extra_includes:
-- frc/PWM.h
-- frc/motorcontrol/PWMMotorController.h
+- wpi/hardware/discrete/PWM.hpp
+- wpi/hardware/motor/PWMMotorController.hpp
 
 classes:
   frc::sim::PWMSim:

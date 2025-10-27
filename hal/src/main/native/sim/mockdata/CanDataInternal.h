@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "hal/simulation/CanData.h"
-#include "hal/simulation/SimCallbackRegistry.h"
+#include "wpi/hal/simulation/CanData.h"
+#include "wpi/hal/simulation/SimCallbackRegistry.h"
 
 namespace hal {
 

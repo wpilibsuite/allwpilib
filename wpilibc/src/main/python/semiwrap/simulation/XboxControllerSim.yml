@@ -1,5 +1,5 @@
 extra_includes:
-- frc/XboxController.h
+- wpi/driverstation/XboxController.hpp
 
 classes:
   frc::sim::XboxControllerSim:

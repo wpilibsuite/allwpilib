@@ -23,7 +23,7 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/sha1.h"
+#include "wpi/util/sha1.hpp"
 
 namespace wpi {
 

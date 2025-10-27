@@ -2,21 +2,21 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "fields/fields.h"
+#include "wpi/fields/fields.hpp"
 
-#include "fields/2018-powerup.h"
-#include "fields/2019-deepspace.h"
-#include "fields/2020-infiniterecharge.h"
-#include "fields/2021-barrel.h"
-#include "fields/2021-bounce.h"
-#include "fields/2021-galacticsearcha.h"
-#include "fields/2021-galacticsearchb.h"
-#include "fields/2021-infiniterecharge.h"
-#include "fields/2021-slalom.h"
-#include "fields/2022-rapidreact.h"
-#include "fields/2023-chargedup.h"
-#include "fields/2024-crescendo.h"
-#include "fields/2025-reefscape.h"
+#include "wpi/fields/2018-powerup.hpp"
+#include "wpi/fields/2019-deepspace.hpp"
+#include "wpi/fields/2020-infiniterecharge.hpp"
+#include "wpi/fields/2021-barrel.hpp"
+#include "wpi/fields/2021-bounce.hpp"
+#include "wpi/fields/2021-galacticsearcha.hpp"
+#include "wpi/fields/2021-galacticsearchb.hpp"
+#include "wpi/fields/2021-infiniterecharge.hpp"
+#include "wpi/fields/2021-slalom.hpp"
+#include "wpi/fields/2022-rapidreact.hpp"
+#include "wpi/fields/2023-chargedup.hpp"
+#include "wpi/fields/2024-crescendo.hpp"
+#include "wpi/fields/2025-reefscape.hpp"
 
 using namespace fields;
 

@@ -6,9 +6,9 @@
 
 #include <type_traits>
 
-#include "units/math.h"
-#include "units/time.h"
-#include "wpimath/MathShared.h"
+#include "wpi/units/math.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/math/util/MathShared.hpp"
 
 namespace frc {
 

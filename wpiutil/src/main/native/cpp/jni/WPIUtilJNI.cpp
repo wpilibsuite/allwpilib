@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "WPIUtilJNI.h"
+#include "WPIUtilJNI.hpp"
 
 #include <jni.h>
 
 #include "org_wpilib_util_WPIUtilJNI.h"
-#include "wpi/RawFrame.h"
-#include "wpi/RuntimeCheck.h"
-#include "wpi/Synchronization.h"
-#include "wpi/jni_util.h"
-#include "wpi/print.h"
-#include "wpi/timestamp.h"
+#include "wpi/util/RawFrame.h"
+#include "wpi/util/RuntimeCheck.h"
+#include "wpi/util/Synchronization.h"
+#include "wpi/util/jni_util.hpp"
+#include "wpi/util/print.hpp"
+#include "wpi/util/timestamp.h"
 
 using namespace wpi::java;
 

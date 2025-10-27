@@ -13,7 +13,7 @@
 #ifndef WPIUTIL_WPI_RAW_OS_OSTREAM_H
 #define WPIUTIL_WPI_RAW_OS_OSTREAM_H
 
-#include "wpi/raw_ostream.h"
+#include "wpi/util/raw_ostream.hpp"
 #include <iosfwd>
 
 namespace wpi {

@@ -1,5 +1,5 @@
 extra_includes:
-- frc/StadiaController.h
+- wpi/driverstation/StadiaController.hpp
 
 classes:
   frc::sim::StadiaControllerSim:

@@ -6,7 +6,7 @@
 
 #include <mutex>
 
-#include "wpi/priority_mutex.h"
+#include "wpi/util/priority_mutex.hpp"
 
 namespace wpi {
 

@@ -4,8 +4,8 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/drive/MecanumDrive.h"
-#include "motorcontrol/MockPWMMotorController.h"
+#include "wpi/drive/MecanumDrive.hpp"
+#include "motorcontrol/MockPWMMotorController.hpp"
 
 TEST(MecanumDriveTest, CartesianIK) {
   // Forward

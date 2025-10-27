@@ -31,7 +31,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-#include "wpi/Signal.h"  // NOLINT(build/include_order)
+#include "wpi/util/Signal.h"  // NOLINT(build/include_order)
 
 #include <cmath>
 #include <sstream>

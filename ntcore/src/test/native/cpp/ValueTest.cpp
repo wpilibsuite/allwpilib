@@ -10,9 +10,9 @@
 
 #include <gtest/gtest.h>
 
-#include "TestPrinters.h"
-#include "Value_internal.h"
-#include "networktables/NetworkTableValue.h"
+#include "TestPrinters.hpp"
+#include "Value_internal.hpp"
+#include "wpi/nt/NetworkTableValue.hpp"
 
 using namespace std::string_view_literals;
 

@@ -26,10 +26,10 @@
 
 #import <AVFoundation/AVFoundation.h>
 
-#import "UvcControlImpl.h"
+#import "UvcControlImpl.hpp"
 
-#include "Log.h"
-#include "UsbCameraImpl.h"
+#include "Log.hpp"
+#include "UsbCameraImpl.hpp"
 
 template <typename S, typename... Args>
 inline void NamedLog(UvcControlImpl* objc, unsigned int level,

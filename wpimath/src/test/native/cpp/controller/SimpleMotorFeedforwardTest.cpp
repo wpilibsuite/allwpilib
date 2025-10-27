@@ -6,13 +6,13 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/EigenCore.h"
-#include "frc/controller/LinearPlantInversionFeedforward.h"
-#include "frc/controller/SimpleMotorFeedforward.h"
-#include "units/acceleration.h"
-#include "units/length.h"
-#include "units/time.h"
-#include "units/velocity.h"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
+#include "wpi/math/controller/SimpleMotorFeedforward.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
 
 namespace frc {
 

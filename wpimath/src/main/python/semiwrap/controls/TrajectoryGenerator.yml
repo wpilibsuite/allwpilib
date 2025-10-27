@@ -2,8 +2,8 @@ defaults:
   subpackage: trajectory
 
 extra_includes:
-- frc/spline/CubicHermiteSpline.h
-- frc/spline/QuinticHermiteSpline.h
+- wpi/math/spline/CubicHermiteSpline.hpp
+- wpi/math/spline/QuinticHermiteSpline.hpp
 
 classes:
   frc::TrajectoryGenerator:

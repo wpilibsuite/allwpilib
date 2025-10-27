@@ -10,7 +10,7 @@
 #include <utility>
 #include <vector>
 
-#include "glass/Model.h"
+#include "wpi/glass/Model.hpp"
 
 struct ImVec2;
 

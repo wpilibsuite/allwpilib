@@ -1,7 +1,7 @@
 extra_includes:
-- networktables/BooleanTopic.h
-- networktables/NetworkTable.h
-- networktables/NetworkTableInstance.h
+- wpi/nt/BooleanTopic.hpp
+- wpi/nt/NetworkTable.hpp
+- wpi/nt/NetworkTableInstance.hpp
 
 classes:
   frc::NetworkBooleanEvent:

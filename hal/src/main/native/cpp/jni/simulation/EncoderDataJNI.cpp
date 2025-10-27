@@ -6,7 +6,7 @@
 
 #include "CallbackStore.h"
 #include "org_wpilib_hardware_hal_simulation_EncoderDataJNI.h"
-#include "hal/simulation/EncoderData.h"
+#include "wpi/hal/simulation/EncoderData.h"
 
 using namespace hal;
 

@@ -1,22 +1,22 @@
 extra_includes:
-- networktables/BooleanArrayTopic.h
-- networktables/BooleanTopic.h
-- networktables/DoubleArrayTopic.h
-- networktables/DoubleTopic.h
-- networktables/FloatArrayTopic.h
-- networktables/FloatTopic.h
-- networktables/IntegerArrayTopic.h
-- networktables/IntegerTopic.h
-- networktables/MultiSubscriber.h
-- networktables/RawTopic.h
-- networktables/StringArrayTopic.h
-- networktables/StringTopic.h
-- networktables/StructArrayTopic.h
-- networktables/StructTopic.h
-- networktables/Topic.h
+- wpi/nt/BooleanArrayTopic.hpp
+- wpi/nt/BooleanTopic.hpp
+- wpi/nt/DoubleArrayTopic.hpp
+- wpi/nt/DoubleTopic.hpp
+- wpi/nt/FloatArrayTopic.hpp
+- wpi/nt/FloatTopic.hpp
+- wpi/nt/IntegerArrayTopic.hpp
+- wpi/nt/IntegerTopic.hpp
+- wpi/nt/MultiSubscriber.hpp
+- wpi/nt/RawTopic.hpp
+- wpi/nt/StringArrayTopic.hpp
+- wpi/nt/StringTopic.hpp
+- wpi/nt/StructArrayTopic.hpp
+- wpi/nt/StructTopic.hpp
+- wpi/nt/Topic.hpp
 - src/py2value.h
 - src/nt_instance.h
-- wpi/datalog/DataLog.h
+- wpi/datalog/DataLog.hpp
 - wpystruct.h
 
 classes:

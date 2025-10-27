@@ -2,7 +2,7 @@ defaults:
   subpackage: estimator
 
 extra_includes:
-- frc/kinematics/SwerveModuleState.h
+- wpi/math/kinematics/SwerveModuleState.hpp
 
 classes:
   frc::SwerveDrivePoseEstimator:

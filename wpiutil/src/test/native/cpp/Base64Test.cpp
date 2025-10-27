@@ -6,8 +6,8 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/Base64.h"
-#include "wpi/SmallString.h"
+#include "wpi/util/Base64.hpp"
+#include "wpi/util/SmallString.hpp"
 
 namespace wpi {
 

@@ -1,6 +1,6 @@
 extra_includes:
-- wpi/sendable/SendableBuilder.h
-- frc/DutyCycle.h
+- wpi/util/sendable/SendableBuilder.hpp
+- wpi/hardware/rotation/DutyCycle.hpp
 
 classes:
   frc::DutyCycleEncoder:

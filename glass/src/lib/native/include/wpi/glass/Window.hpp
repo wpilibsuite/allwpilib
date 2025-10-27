@@ -11,7 +11,7 @@
 
 #include <imgui.h>
 
-#include "glass/View.h"
+#include "wpi/glass/View.hpp"
 
 namespace glass {
 

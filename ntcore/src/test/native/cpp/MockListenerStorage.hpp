@@ -8,7 +8,7 @@
 #include <span>
 #include <string_view>
 
-#include "IListenerStorage.h"
+#include "IListenerStorage.hpp"
 #include "gmock/gmock.h"
 
 namespace nt {

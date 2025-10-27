@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#include "cscore_cpp.h"
+#include "wpi/cs/cscore_cpp.hpp"
 
 #pragma comment(lib, "Ws2_32.lib")
 

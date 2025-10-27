@@ -7,8 +7,8 @@
 
 #include <gtest/gtest.h>
 
-#include "hal/CANAPI.h"
-#include "hal/simulation/CanData.h"
+#include "wpi/hal/CANAPI.h"
+#include "wpi/hal/simulation/CanData.h"
 
 namespace hal {
 struct CANTestStore {

@@ -6,10 +6,10 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Pose2d.h"
-#include "frc/geometry/Rotation2d.h"
-#include "frc/geometry/Transform2d.h"
-#include "frc/geometry/Translation2d.h"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/geometry/Transform2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
 
 using namespace frc;
 

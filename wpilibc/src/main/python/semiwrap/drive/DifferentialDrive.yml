@@ -1,6 +1,6 @@
 extra_includes:
-- wpi/sendable/SendableBuilder.h
-- frc/motorcontrol/MotorController.h
+- wpi/util/sendable/SendableBuilder.hpp
+- wpi/hardware/motor/MotorController.hpp
 
 classes:
   frc::DifferentialDrive:

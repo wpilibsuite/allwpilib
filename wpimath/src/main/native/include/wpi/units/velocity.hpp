@@ -26,9 +26,9 @@
 
 #pragma once
 
-#include "units/base.h"
-#include "units/length.h"
-#include "units/time.h"
+#include "wpi/units/base.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/time.hpp"
 
 namespace units {
 /**

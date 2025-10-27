@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Pose2d.h"
+#include "wpi/math/geometry/Pose2d.hpp"
 
 using namespace frc;
 

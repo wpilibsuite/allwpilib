@@ -1,5 +1,5 @@
 extra_includes:
-- frc/DriverStation.h
+- wpi/driverstation/DriverStation.hpp
 - rpy/ControlWord.h
 
 functions:

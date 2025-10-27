@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "hal/Value.h"
+#include "wpi/hal/Value.h"
 
 typedef void (*HAL_NotifyCallback)(const char* name, void* param,
                                    const struct HAL_Value* value);

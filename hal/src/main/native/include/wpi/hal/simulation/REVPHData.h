@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "hal/REVPH.h"
-#include "hal/Types.h"
-#include "hal/simulation/NotifyListener.h"
+#include "wpi/hal/REVPH.h"
+#include "wpi/hal/Types.h"
+#include "wpi/hal/simulation/NotifyListener.h"
 
 #ifdef __cplusplus
 extern "C" {

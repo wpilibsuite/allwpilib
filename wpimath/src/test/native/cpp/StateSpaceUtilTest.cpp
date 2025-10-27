@@ -4,8 +4,8 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/EigenCore.h"
-#include "frc/StateSpaceUtil.h"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/util/StateSpaceUtil.hpp"
 
 TEST(StateSpaceUtilTest, CostParameterPack) {
   constexpr frc::Matrixd<3, 3> mat = frc::MakeCostMatrix(1.0, 2.0, 3.0);

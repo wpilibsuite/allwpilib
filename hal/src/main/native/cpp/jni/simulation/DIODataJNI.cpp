@@ -6,7 +6,7 @@
 
 #include "CallbackStore.h"
 #include "org_wpilib_hardware_hal_simulation_DIODataJNI.h"
-#include "hal/simulation/DIOData.h"
+#include "wpi/hal/simulation/DIOData.h"
 
 using namespace hal;
 

@@ -8,8 +8,8 @@
 #include <functional>
 #include <memory>
 
-#include "cscore_cv.h"
-#include "vision/VisionPipeline.h"
+#include "wpi/cs/cscore_cv.hpp"
+#include "wpi/vision/VisionPipeline.hpp"
 
 namespace frc {
 

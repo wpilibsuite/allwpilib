@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/filter/MedianFilter.h"
+#include "wpi/math/filter/MedianFilter.hpp"
 
 TEST(MedianFilterTest, MedianFilterNotFullTestEven) {
   frc::MedianFilter<double> filter{10};

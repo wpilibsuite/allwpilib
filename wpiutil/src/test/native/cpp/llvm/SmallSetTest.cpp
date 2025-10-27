@@ -10,7 +10,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/SmallSet.h"
+#include "wpi/util/SmallSet.hpp"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include <algorithm>

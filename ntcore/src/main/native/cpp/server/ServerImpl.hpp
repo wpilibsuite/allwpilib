@@ -13,9 +13,9 @@
 #include <utility>
 #include <vector>
 
-#include "server/Functions.h"
-#include "server/ServerClient.h"
-#include "server/ServerStorage.h"
+#include "server/Functions.hpp"
+#include "server/ServerClient.hpp"
+#include "server/ServerStorage.hpp"
 
 namespace wpi {
 class Logger;

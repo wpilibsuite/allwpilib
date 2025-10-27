@@ -22,9 +22,9 @@
 #include <string_view>
 #include <utility>
 
-#include "wpi/MemoryBuffer.h"
-#include "wpi/SmallVector.h"
-#include "wpi/raw_ostream.h"
+#include "wpi/util/MemoryBuffer.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
 namespace wpi {
 

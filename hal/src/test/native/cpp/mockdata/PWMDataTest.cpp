@@ -6,10 +6,10 @@
 
 #include <gtest/gtest.h>
 
-#include "hal/HAL.h"
-#include "hal/PWM.h"
-#include "hal/handles/HandlesInternal.h"
-#include "hal/simulation/PWMData.h"
+#include "wpi/hal/HAL.h"
+#include "wpi/hal/PWM.h"
+#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/hal/simulation/PWMData.h"
 
 namespace hal {
 

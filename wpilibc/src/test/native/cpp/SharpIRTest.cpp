@@ -4,8 +4,8 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/SharpIR.h"
-#include "frc/simulation/SharpIRSim.h"
+#include "wpi/hardware/range/SharpIR.hpp"
+#include "wpi/simulation/SharpIRSim.hpp"
 
 using namespace frc;
 

@@ -4,7 +4,7 @@ defaults:
 
 extra_includes:
 - pybind11/stl.h
-- networktables/Topic.h
+- wpi/nt/Topic.hpp
 
 functions:
   RemoveListener:

@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/controller/PIDController.h"
+#include "wpi/math/controller/PIDController.hpp"
 
 TEST(PIDInputOutputTest, ContinuousInput) {
   frc::PIDController controller{0.0, 0.0, 0.0};

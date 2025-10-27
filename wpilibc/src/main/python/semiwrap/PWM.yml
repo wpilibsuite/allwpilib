@@ -1,7 +1,7 @@
 extra_includes:
-- wpi/sendable/SendableBuilder.h
-- frc/AddressableLED.h
-- wpi/SmallString.h
+- wpi/util/sendable/SendableBuilder.hpp
+- wpi/hardware/led/AddressableLED.hpp
+- wpi/util/SmallString.hpp
 
 classes:
   frc::PWM:

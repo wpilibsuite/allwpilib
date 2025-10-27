@@ -7,9 +7,9 @@
 #include <string>
 #include <string_view>
 
-#include "sysid/analysis/AnalysisType.h"
-#include "sysid/analysis/OLS.h"
-#include "sysid/analysis/Storage.h"
+#include "wpi/sysid/analysis/AnalysisType.hpp"
+#include "wpi/sysid/analysis/OLS.hpp"
+#include "wpi/sysid/analysis/Storage.hpp"
 
 namespace sysid {
 

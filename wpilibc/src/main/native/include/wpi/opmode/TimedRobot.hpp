@@ -9,14 +9,14 @@
 #include <utility>
 #include <vector>
 
-#include <hal/Notifier.h>
-#include <hal/Types.h>
-#include <units/math.h>
-#include <units/time.h>
-#include <wpi/priority_queue.h>
+#include <wpi/hal/Notifier.h>
+#include <wpi/hal/Types.h>
+#include <wpi/units/math.hpp>
+#include <wpi/units/time.hpp>
+#include <wpi/util/priority_queue.hpp>
 
-#include "frc/IterativeRobotBase.h"
-#include "frc/RobotController.h"
+#include "wpi/opmode/IterativeRobotBase.hpp"
+#include "wpi/system/RobotController.hpp"
 
 namespace frc {
 

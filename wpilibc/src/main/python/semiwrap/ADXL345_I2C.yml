@@ -1,5 +1,5 @@
 extra_includes:
-- networktables/NTSendableBuilder.h
+- wpi/nt/NTSendableBuilder.hpp
 
 classes:
   frc::ADXL345_I2C:

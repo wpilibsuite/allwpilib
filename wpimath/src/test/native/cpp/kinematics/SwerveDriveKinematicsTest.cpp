@@ -6,9 +6,9 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Translation2d.h"
-#include "frc/kinematics/SwerveDriveKinematics.h"
-#include "units/angular_velocity.h"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
+#include "wpi/units/angular_velocity.hpp"
 
 using namespace frc;
 

@@ -15,7 +15,7 @@
 
 #include <gmock/gmock.h>
 
-#include "wpi/TestPrinters.h"
+#include "wpi/util/TestPrinters.hpp"
 
 namespace wpi {
 

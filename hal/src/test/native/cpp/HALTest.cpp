@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "hal/HAL.h"
+#include "wpi/hal/HAL.h"
 
 namespace hal {
 TEST(HALTest, RuntimeType) {

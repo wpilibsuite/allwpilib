@@ -6,8 +6,8 @@
 
 #include <stdint.h>
 
-#include "hal/AddressableLEDTypes.h"
-#include "hal/Types.h"
+#include "wpi/hal/AddressableLEDTypes.h"
+#include "wpi/hal/Types.h"
 
 /**
  * @defgroup hal_addressable Addressable LED Functions

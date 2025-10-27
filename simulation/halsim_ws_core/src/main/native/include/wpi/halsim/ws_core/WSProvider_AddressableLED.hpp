@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "WSHalProviders.h"
+#include "wpi/halsim/ws_core/WSHalProviders.hpp"
 
 namespace wpilibws {
 class HALSimWSProviderAddressableLED : public HALSimWSHalChanProvider {

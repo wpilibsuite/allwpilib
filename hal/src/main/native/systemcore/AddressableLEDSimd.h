@@ -5,7 +5,7 @@
 #pragma once
 #include <utility>
 
-#include "hal/AddressableLEDTypes.h"
+#include "wpi/hal/AddressableLEDTypes.h"
 #include "simd/simd.h"
 
 namespace hal::detail {

@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/AnalogInput.h"
+#include "wpi/hal/AnalogInput.h"
 
 #include "AnalogInternal.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
-#include "hal/handles/HandlesInternal.h"
+#include "wpi/hal/handles/HandlesInternal.h"
 #include "mockdata/AnalogInDataInternal.h"
 
 using namespace hal;

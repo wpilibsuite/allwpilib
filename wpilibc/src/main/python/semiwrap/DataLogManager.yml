@@ -1,5 +1,5 @@
 extra_includes:
-- wpi/datalog/DataLog.h
+- wpi/datalog/DataLog.hpp
 
 classes:
   frc::DataLogManager:

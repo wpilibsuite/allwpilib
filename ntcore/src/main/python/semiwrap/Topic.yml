@@ -1,6 +1,6 @@
 extra_includes:
-- networktables/GenericEntry.h
-- networktables/NetworkTableInstance.h
+- wpi/nt/GenericEntry.hpp
+- wpi/nt/NetworkTableInstance.hpp
 
 classes:
   nt::Topic:

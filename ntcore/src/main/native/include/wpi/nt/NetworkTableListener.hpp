@@ -9,11 +9,11 @@
 #include <utility>
 #include <vector>
 
-#include "networktables/MultiSubscriber.h"
-#include "networktables/NetworkTableEntry.h"
-#include "networktables/NetworkTableInstance.h"
-#include "networktables/Topic.h"
-#include "ntcore_cpp.h"
+#include "wpi/nt/MultiSubscriber.hpp"
+#include "wpi/nt/NetworkTableEntry.hpp"
+#include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/nt/Topic.hpp"
+#include "wpi/nt/ntcore_cpp.hpp"
 
 namespace nt {
 

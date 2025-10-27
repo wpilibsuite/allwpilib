@@ -4,8 +4,8 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Rotation2d.h"
-#include "frc/kinematics/SwerveModulePosition.h"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/kinematics/SwerveModulePosition.hpp"
 
 TEST(SwerveModulePositionTest, Equality) {
   frc::SwerveModulePosition position1{2_m, 90_deg};

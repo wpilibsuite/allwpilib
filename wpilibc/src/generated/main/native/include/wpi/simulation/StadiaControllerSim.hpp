@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "frc/simulation/GenericHIDSim.h"
+#include "wpi/simulation/GenericHIDSim.hpp"
 
 namespace frc {
 

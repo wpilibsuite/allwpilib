@@ -32,7 +32,7 @@
 #define MPACK_INTERNAL 1
 #define MPACK_EMIT_INLINE_DEFS 0
 
-#include "wpi/mpack.h"
+#include "wpi/util/mpack.h"
 
 
 /* mpack/mpack-platform.c.c */

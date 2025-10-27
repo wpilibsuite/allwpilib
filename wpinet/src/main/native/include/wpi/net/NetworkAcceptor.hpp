@@ -7,7 +7,7 @@
 
 #include <memory>
 
-#include "wpinet/NetworkStream.h"
+#include "wpi/net/NetworkStream.hpp"
 
 namespace wpi {
 

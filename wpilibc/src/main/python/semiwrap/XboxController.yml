@@ -1,7 +1,7 @@
 extra_includes:
-- wpi/sendable/SendableBuilder.h
-- frc/DriverStation.h
-- frc/event/BooleanEvent.h
+- wpi/util/sendable/SendableBuilder.hpp
+- wpi/driverstation/DriverStation.hpp
+- wpi/event/BooleanEvent.hpp
 
 classes:
   frc::XboxController:

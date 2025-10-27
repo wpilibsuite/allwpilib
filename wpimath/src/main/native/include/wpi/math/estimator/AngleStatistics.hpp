@@ -7,8 +7,8 @@
 #include <functional>
 #include <numbers>
 
-#include "frc/EigenCore.h"
-#include "frc/MathUtil.h"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/util/MathUtil.hpp"
 
 namespace frc {
 

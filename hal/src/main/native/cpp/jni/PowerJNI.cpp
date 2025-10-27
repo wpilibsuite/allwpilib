@@ -6,7 +6,7 @@
 
 #include "HALUtil.h"
 #include "org_wpilib_hardware_hal_PowerJNI.h"
-#include "hal/Power.h"
+#include "wpi/hal/Power.h"
 
 using namespace hal;
 

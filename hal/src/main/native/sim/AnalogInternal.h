@@ -9,8 +9,8 @@
 #include <string>
 
 #include "PortsInternal.h"
-#include "hal/handles/HandlesInternal.h"
-#include "hal/handles/IndexedHandleResource.h"
+#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/hal/handles/IndexedHandleResource.h"
 
 namespace hal {
 constexpr int32_t kTimebase = 40000000;  ///< 40 MHz clock

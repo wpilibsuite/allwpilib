@@ -1,5 +1,5 @@
 extra_includes:
-- frc/Joystick.h
+- wpi/driverstation/Joystick.hpp
 
 classes:
   frc::sim::JoystickSim:

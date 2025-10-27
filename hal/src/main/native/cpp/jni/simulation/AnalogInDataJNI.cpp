@@ -6,7 +6,7 @@
 
 #include "CallbackStore.h"
 #include "org_wpilib_hardware_hal_simulation_AnalogInDataJNI.h"
-#include "hal/simulation/AnalogInData.h"
+#include "wpi/hal/simulation/AnalogInData.h"
 
 using namespace hal;
 

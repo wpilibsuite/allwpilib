@@ -4,11 +4,11 @@
 
 #include <gtest/gtest.h>
 
-#include "../../ProtoTestBase.h"
-#include "frc/controller/SimpleMotorFeedforward.h"
-#include "frc/controller/proto/SimpleMotorFeedforwardProto.h"
-#include "units/acceleration.h"
-#include "units/velocity.h"
+#include "../../ProtoTestBase.hpp"
+#include "wpi/math/controller/SimpleMotorFeedforward.hpp"
+#include "wpi/math/controller/proto/SimpleMotorFeedforwardProto.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/velocity.hpp"
 
 using namespace frc;
 

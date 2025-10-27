@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "units/math.h"
-#include "units/time.h"
+#include "wpi/units/math.hpp"
+#include "wpi/units/time.hpp"
 
 namespace frc {
 

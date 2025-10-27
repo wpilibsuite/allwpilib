@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-#include "hal/Types.h"
+#include "wpi/hal/Types.h"
 
 /**
  * @defgroup hal_ctre_pcm CTRE Pneumatic Control Module (PCM) Functions

@@ -6,8 +6,8 @@
 
 #include <stdint.h>
 
-#include "frc/DriverStation.h"
-#include "frc/GenericHID.h"
+#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/GenericHID.hpp"
 
 namespace frc {
 

@@ -11,7 +11,7 @@
 #include <string_view>
 #include <vector>
 
-#include "cscore_cv.h"
+#include "wpi/cs/cscore_cv.hpp"
 
 namespace frc {
 

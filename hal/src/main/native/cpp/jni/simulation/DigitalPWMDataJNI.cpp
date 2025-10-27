@@ -6,7 +6,7 @@
 
 #include "CallbackStore.h"
 #include "org_wpilib_hardware_hal_simulation_DigitalPWMDataJNI.h"
-#include "hal/simulation/DigitalPWMData.h"
+#include "wpi/hal/simulation/DigitalPWMData.h"
 
 using namespace hal;
 

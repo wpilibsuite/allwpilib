@@ -14,7 +14,7 @@
 //  See http://www.wtfpl.net/ for more details.
 //
 
-#include "portable-file-dialogs.h"
+#include "wpi/gui/portable-file-dialogs.h"
 
 #if _WIN32
 #ifndef WIN32_LEAN_AND_MEAN

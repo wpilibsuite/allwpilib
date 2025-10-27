@@ -1,6 +1,6 @@
 extra_includes:
-- wpi/SmallString.h
-- wpi/raw_ostream.h
+- wpi/util/SmallString.hpp
+- wpi/util/raw_ostream.hpp
 
 classes:
   frc::Tracer:

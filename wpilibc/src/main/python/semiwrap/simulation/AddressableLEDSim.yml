@@ -1,5 +1,5 @@
 extra_includes:
-- frc/AddressableLED.h
+- wpi/hardware/led/AddressableLED.hpp
 
 classes:
   frc::sim::AddressableLEDSim:

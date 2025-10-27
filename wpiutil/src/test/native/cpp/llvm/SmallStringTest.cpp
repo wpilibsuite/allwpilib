@@ -10,7 +10,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/SmallString.h"
+#include "wpi/util/SmallString.hpp"
 #include "gtest/gtest.h"
 #include <climits>
 #include <cstring>

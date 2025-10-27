@@ -4,8 +4,8 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Rotation2d.h"
-#include "frc/kinematics/SwerveModuleState.h"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/kinematics/SwerveModuleState.hpp"
 
 static constexpr double kEpsilon = 1E-9;
 

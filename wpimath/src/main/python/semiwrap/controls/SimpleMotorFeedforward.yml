@@ -2,7 +2,7 @@ defaults:
   subpackage: controller
 
 extra_includes:
-- units/dimensionless.h
+- wpi/units/dimensionless.hpp
 
 classes:
   frc::SimpleMotorFeedforward:

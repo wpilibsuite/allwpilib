@@ -13,7 +13,7 @@
 #ifndef WPIUTIL_WPI_RAW_OSTREAM_H
 #define WPIUTIL_WPI_RAW_OSTREAM_H
 
-#include "wpi/SmallVector.h"
+#include "wpi/util/SmallVector.hpp"
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
