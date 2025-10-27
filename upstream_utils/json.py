@@ -35,8 +35,8 @@ def copy_upstream_src(wpilib_root: Path):
             content = f.read()
 
         # Rename namespace from nlohmann to wpi
-        content = content.replace("namespace nlohmann", "namespace wpi")
-        content = content.replace("nlohmann::", "wpi::")
+        content = content.replace("namespace nlohmann", "namespace wpi::util")
+        content = content.replace("nlohmann::", "wpi::util::")
 
         # Fix internal includes
         content = content.replace("include <nlohmann/", "include <wpi/util/")
