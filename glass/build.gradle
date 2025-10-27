@@ -59,7 +59,7 @@ gradle.taskGraph.addTaskExecutionGraphListener { graph ->
     }
 }
 
-def generateTask = createGenerateResourcesTask('app', 'GLASS', 'glass', project)
+def generateTask = createGenerateResourcesTask('app', 'GLASS', 'wpi::glass', project)
 
 project(':').libraryBuild.dependsOn build
 tasks.withType(CppCompile) {
