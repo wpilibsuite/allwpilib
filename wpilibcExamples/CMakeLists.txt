@@ -39,7 +39,7 @@ foreach(example ${EXAMPLES})
                 src/main/cpp/examples/${example}/include
                 src/test/cpp/examples/${example}/include
         )
-        target_compile_definitions(Example_${example}_test PUBLIC RUNNING_FRC_TESTS)
+        target_compile_definitions(Example_${example}_test PUBLIC RUNNING_WPILIB_TESTS)
         target_link_libraries(
             Example_${example}_test
             apriltag

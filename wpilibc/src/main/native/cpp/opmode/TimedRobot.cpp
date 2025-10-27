@@ -36,7 +36,7 @@ void TimedRobot::StartCompetition() {
     int32_t status = 0;
     HAL_UpdateNotifierAlarm(m_notifier, callback.expirationTime.count(),
                             &status);
-    FRC_CheckErrorStatus(status, "UpdateNotifierAlarm");
+    WPILIB_CheckErrorStatus(status, "UpdateNotifierAlarm");
 
     std::chrono::microseconds currentTime{
         HAL_WaitForNotifierAlarm(m_notifier, &status)};
@@ -82,7 +82,7 @@ TimedRobot::TimedRobot(wpi::units::second_t period) : IterativeRobotBase(period)
 
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
-  FRC_CheckErrorStatus(status, "InitializeNotifier");
+  WPILIB_CheckErrorStatus(status, "InitializeNotifier");
   HAL_SetNotifierName(m_notifier, "TimedRobot", &status);
 
   HAL_ReportUsage("Framework", "TimedRobot");
@@ -92,7 +92,7 @@ TimedRobot::~TimedRobot() {
   if (m_notifier != HAL_kInvalidHandle) {
     int32_t status = 0;
     HAL_StopNotifier(m_notifier, &status);
-    FRC_ReportError(status, "StopNotifier");
+    WPILIB_ReportError(status, "StopNotifier");
   }
 }
 

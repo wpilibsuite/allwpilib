@@ -202,11 +202,11 @@ Instance::~Instance() {
 
 bool DriverStation::GetStickButton(int stick, int button) {
   if (stick < 0 || stick >= kJoystickPorts) {
-    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
+    WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return false;
   }
   if (button < 0 || button >= 64) {
-    FRC_ReportError(warn::BadJoystickIndex, "button {} out of range", button);
+    WPILIB_ReportError(warn::BadJoystickIndex, "button {} out of range", button);
     return false;
   }
 
@@ -230,11 +230,11 @@ bool DriverStation::GetStickButton(int stick, int button) {
 std::optional<bool> DriverStation::GetStickButtonIfAvailable(int stick,
                                                              int button) {
   if (stick < 0 || stick >= kJoystickPorts) {
-    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
+    WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return false;
   }
   if (button < 0 || button >= 64) {
-    FRC_ReportError(warn::BadJoystickIndex, "button {} out of range", button);
+    WPILIB_ReportError(warn::BadJoystickIndex, "button {} out of range", button);
     return false;
   }
 
@@ -252,11 +252,11 @@ std::optional<bool> DriverStation::GetStickButtonIfAvailable(int stick,
 
 bool DriverStation::GetStickButtonPressed(int stick, int button) {
   if (stick < 0 || stick >= kJoystickPorts) {
-    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
+    WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return false;
   }
   if (button < 0 || button >= 64) {
-    FRC_ReportError(warn::BadJoystickIndex, "button {} out of range", button);
+    WPILIB_ReportError(warn::BadJoystickIndex, "button {} out of range", button);
     return false;
   }
 
@@ -285,11 +285,11 @@ bool DriverStation::GetStickButtonPressed(int stick, int button) {
 
 bool DriverStation::GetStickButtonReleased(int stick, int button) {
   if (stick < 0 || stick >= kJoystickPorts) {
-    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
+    WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return false;
   }
   if (button < 0 || button >= 64) {
-    FRC_ReportError(warn::BadJoystickIndex, "button {} out of range", button);
+    WPILIB_ReportError(warn::BadJoystickIndex, "button {} out of range", button);
     return false;
   }
 
@@ -318,11 +318,11 @@ bool DriverStation::GetStickButtonReleased(int stick, int button) {
 
 double DriverStation::GetStickAxis(int stick, int axis) {
   if (stick < 0 || stick >= kJoystickPorts) {
-    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
+    WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0.0;
   }
   if (axis < 0 || axis >= HAL_kMaxJoystickAxes) {
-    FRC_ReportError(warn::BadJoystickAxis, "axis {} out of range", axis);
+    WPILIB_ReportError(warn::BadJoystickAxis, "axis {} out of range", axis);
     return 0.0;
   }
 
@@ -345,11 +345,11 @@ double DriverStation::GetStickAxis(int stick, int axis) {
 std::optional<double> DriverStation::GetStickAxisIfAvailable(int stick,
                                                              int axis) {
   if (stick < 0 || stick >= kJoystickPorts) {
-    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
+    WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0.0;
   }
   if (axis < 0 || axis >= HAL_kMaxJoystickAxes) {
-    FRC_ReportError(warn::BadJoystickAxis, "axis {} out of range", axis);
+    WPILIB_ReportError(warn::BadJoystickAxis, "axis {} out of range", axis);
     return 0.0;
   }
 
@@ -367,11 +367,11 @@ std::optional<double> DriverStation::GetStickAxisIfAvailable(int stick,
 
 DriverStation::POVDirection DriverStation::GetStickPOV(int stick, int pov) {
   if (stick < 0 || stick >= kJoystickPorts) {
-    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
+    WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return kCenter;
   }
   if (pov < 0 || pov >= HAL_kMaxJoystickPOVs) {
-    FRC_ReportError(warn::BadJoystickAxis, "POV {} out of range", pov);
+    WPILIB_ReportError(warn::BadJoystickAxis, "POV {} out of range", pov);
     return kCenter;
   }
 
@@ -393,7 +393,7 @@ DriverStation::POVDirection DriverStation::GetStickPOV(int stick, int pov) {
 
 uint64_t DriverStation::GetStickButtons(int stick) {
   if (stick < 0 || stick >= kJoystickPorts) {
-    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
+    WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0;
   }
 
@@ -409,7 +409,7 @@ int DriverStation::GetStickAxesMaximumIndex(int stick) {
 
 int DriverStation::GetStickAxesAvailable(int stick) {
   if (stick < 0 || stick >= kJoystickPorts) {
-    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
+    WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0;
   }
 
@@ -425,7 +425,7 @@ int DriverStation::GetStickPOVsMaximumIndex(int stick) {
 
 int DriverStation::GetStickPOVsAvailable(int stick) {
   if (stick < 0 || stick >= kJoystickPorts) {
-    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
+    WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0;
   }
 
@@ -441,7 +441,7 @@ int DriverStation::GetStickButtonsMaximumIndex(int stick) {
 
 uint64_t DriverStation::GetStickButtonsAvailable(int stick) {
   if (stick < 0 || stick >= kJoystickPorts) {
-    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
+    WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0;
   }
 
@@ -453,7 +453,7 @@ uint64_t DriverStation::GetStickButtonsAvailable(int stick) {
 
 bool DriverStation::GetJoystickIsGamepad(int stick) {
   if (stick < 0 || stick >= kJoystickPorts) {
-    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
+    WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return false;
   }
 
@@ -465,7 +465,7 @@ bool DriverStation::GetJoystickIsGamepad(int stick) {
 
 int DriverStation::GetJoystickType(int stick) {
   if (stick < 0 || stick >= kJoystickPorts) {
-    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
+    WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return -1;
   }
 
@@ -477,7 +477,7 @@ int DriverStation::GetJoystickType(int stick) {
 
 std::string DriverStation::GetJoystickName(int stick) {
   if (stick < 0 || stick >= kJoystickPorts) {
-    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
+    WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
   }
 
   HAL_JoystickDescriptor descriptor;
@@ -632,7 +632,7 @@ wpi::units::second_t DriverStation::GetMatchTime() {
 double DriverStation::GetBatteryVoltage() {
   int32_t status = 0;
   double voltage = HAL_GetVinVoltage(&status);
-  FRC_CheckErrorStatus(status, "getVinVoltage");
+  WPILIB_CheckErrorStatus(status, "getVinVoltage");
 
   return voltage;
 }

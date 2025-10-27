@@ -19,12 +19,12 @@ std::set<int> XRPMotor::s_registeredDevices = {};
 
 void XRPMotor::CheckDeviceAllocation(int deviceNum) {
   if (s_simDeviceMap.count(deviceNum) == 0) {
-    throw FRC_MakeError(wpi::err::ChannelIndexOutOfRange, "Channel {}",
+    throw WPILIB_MakeError(wpi::err::ChannelIndexOutOfRange, "Channel {}",
                         deviceNum);
   }
 
   if (s_registeredDevices.count(deviceNum) > 0) {
-    throw FRC_MakeError(wpi::err::ResourceAlreadyAllocated, "Channel {}",
+    throw WPILIB_MakeError(wpi::err::ResourceAlreadyAllocated, "Channel {}",
                         deviceNum);
   }
 

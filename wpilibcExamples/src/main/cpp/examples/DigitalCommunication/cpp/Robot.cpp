@@ -22,7 +22,7 @@ void Robot::RobotPeriodic() {
   m_alertOutput.Set(matchTime <= 30_s && matchTime >= 25_s);
 }
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
   return wpi::StartRobot<Robot>();
 }

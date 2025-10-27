@@ -24,7 +24,7 @@ std::shared_ptr<PneumaticsBaseSim> PneumaticsBaseSim::GetForType(
       return std::make_shared<CTREPCMSim>(module);
 
     default:
-      throw FRC_MakeError(err::InvalidParameter, "{}",
+      throw WPILIB_MakeError(err::InvalidParameter, "{}",
                           static_cast<int>(module));
   }
 }

@@ -20,7 +20,7 @@ classes:
             cpp_code: |
               [](py::str &key, std::shared_ptr<wpi::util::Sendable> data) {
                 if (!data) {
-                  throw FRC_MakeError(err::NullParameter, "{}", "value");
+                  throw WPILIB_MakeError(err::NullParameter, "{}", "value");
                 }
 
                 // convert key to a raw string so that we can create a StringRef

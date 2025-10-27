@@ -33,12 +33,12 @@ static void _hang_thread_if_finalizing() {
 
 PyNotifier::PyNotifier(std::function<void()> handler) {
   if (!handler) {
-    throw FRC_MakeError(err::NullParameter, "handler");
+    throw WPILIB_MakeError(err::NullParameter, "handler");
   }
   m_handler = handler;
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
-  FRC_CheckErrorStatus(status, "InitializeNotifier");
+  WPILIB_CheckErrorStatus(status, "InitializeNotifier");
 
   std::function<void()> target([this] {
     py::gil_scoped_release release;
@@ -99,7 +99,7 @@ PyNotifier::~PyNotifier() {
   // atomically set handle to 0, then clean
   HAL_NotifierHandle handle = m_notifier.exchange(0);
   HAL_StopNotifier(handle, &status);
-  FRC_ReportError(status, "StopNotifier");
+  WPILIB_ReportError(status, "StopNotifier");
 
   // Join the thread to ensure the handler has exited.
   if (m_thread) {
@@ -165,7 +165,7 @@ void PyNotifier::Stop() {
   m_periodic = false;
   int32_t status = 0;
   HAL_CancelNotifierAlarm(m_notifier, &status);
-  FRC_CheckErrorStatus(status, "CancelNotifierAlarm");
+  WPILIB_CheckErrorStatus(status, "CancelNotifierAlarm");
 }
 
 void PyNotifier::UpdateAlarm(uint64_t triggerTime) {
@@ -176,7 +176,7 @@ void PyNotifier::UpdateAlarm(uint64_t triggerTime) {
     return;
   }
   HAL_UpdateNotifierAlarm(notifier, triggerTime, &status);
-  FRC_CheckErrorStatus(status, "UpdateNotifierAlarm");
+  WPILIB_CheckErrorStatus(status, "UpdateNotifierAlarm");
 }
 
 void PyNotifier::UpdateAlarm() {

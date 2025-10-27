@@ -40,7 +40,7 @@ void Robot::RobotPeriodic() {
   arduino.WriteBulk(reinterpret_cast<uint8_t*>(string.data()), string.size());
 }
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
   return wpi::StartRobot<Robot>();
 }

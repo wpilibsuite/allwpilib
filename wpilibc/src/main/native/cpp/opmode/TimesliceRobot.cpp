@@ -16,7 +16,7 @@ TimesliceRobot::TimesliceRobot(wpi::units::second_t robotPeriodicAllocation,
 void TimesliceRobot::Schedule(std::function<void()> func,
                               wpi::units::second_t allocation) {
   if (m_nextOffset + allocation > m_controllerPeriod) {
-    throw FRC_MakeError(err::Error,
+    throw WPILIB_MakeError(err::Error,
                         "Function scheduled at offset {} with allocation {} "
                         "exceeded controller period of {}\n",
                         m_nextOffset, allocation, m_controllerPeriod);

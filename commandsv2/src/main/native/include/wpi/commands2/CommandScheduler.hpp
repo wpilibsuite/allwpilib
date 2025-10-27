@@ -212,7 +212,7 @@ class CommandScheduler final : public wpi::util::Sendable,
   template <std::derived_from<Command> T>
   void SetDefaultCommand(Subsystem* subsystem, T&& defaultCommand) {
     if (!defaultCommand.HasRequirement(subsystem)) {
-      throw FRC_MakeError(wpi::err::CommandIllegalUse,
+      throw WPILIB_MakeError(wpi::err::CommandIllegalUse,
                           "Default commands must require their subsystem!");
     }
     SetDefaultCommandImpl(subsystem, std::make_unique<std::decay_t<T>>(
