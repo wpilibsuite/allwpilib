@@ -11,11 +11,11 @@
 #include <wpi/hal/HALBase.h>
 #include <wpi/hal/Main.h>
 #include <wpi/hal/simulation/DIOData.h>
-#include <wpi/util/print.hpp>
 #include <wpi/net/uv/Loop.hpp>
+#include <wpi/util/print.hpp>
 
-#include "wpi/halsim/ws_server/HALSimWSServer.hpp"
 #include "WebServerClientTest.hpp"
+#include "wpi/halsim/ws_server/HALSimWSServer.hpp"
 
 namespace uv = wpi::uv;
 

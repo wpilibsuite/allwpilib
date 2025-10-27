@@ -4,9 +4,9 @@
 
 #pragma once
 
+#include <imgui.h>
 #include <wpi/math/geometry/Rotation2d.hpp>
 #include <wpi/math/geometry/Translation2d.hpp>
-#include <imgui.h>
 #include <wpi/util/function_ref.hpp>
 
 #include "wpi/glass/Model.hpp"

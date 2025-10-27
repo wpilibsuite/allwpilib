@@ -11,12 +11,12 @@
 #include <wpi/nt/NTSendable.hpp>
 #include <wpi/nt/NetworkTable.hpp>
 #include <wpi/nt/StringTopic.hpp>
+#include <wpi/util/Color8Bit.hpp>
 #include <wpi/util/StringMap.hpp>
 #include <wpi/util/mutex.hpp>
 #include <wpi/util/sendable/SendableHelper.hpp>
 
 #include "wpi/smartdashboard/MechanismRoot2d.hpp"
-#include "wpi/util/Color8Bit.hpp"
 
 namespace frc {
 

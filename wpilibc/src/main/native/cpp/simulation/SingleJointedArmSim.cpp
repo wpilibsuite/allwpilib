@@ -6,12 +6,12 @@
 
 #include <cmath>
 
+#include <wpi/math/system/NumericalIntegration.hpp>
+#include <wpi/math/system/plant/LinearSystemId.hpp>
 #include <wpi/units/voltage.hpp>
 #include <wpi/util/MathExtras.hpp>
 
 #include "wpi/system/RobotController.hpp"
-#include "wpi/math/system/NumericalIntegration.hpp"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
 
 using namespace frc;
 using namespace frc::sim;

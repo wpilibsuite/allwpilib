@@ -13,12 +13,12 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/util/SmallString.hpp>
-#include <wpi/util/StringExtras.hpp>
 #include <wpi/net/HttpUtil.hpp>
 #include <wpi/net/uv/Loop.hpp>
 #include <wpi/net/uv/Tcp.hpp>
 #include <wpi/net/uv/util.hpp>
+#include <wpi/util/SmallString.hpp>
+#include <wpi/util/StringExtras.hpp>
 
 #include "IConnectionList.hpp"
 #include "Log.hpp"

@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_RAWSINKIMPL_H_
-#define CSCORE_RAWSINKIMPL_H_
+#ifndef CSCORE_RAWSINKIMPL_HPP_
+#define CSCORE_RAWSINKIMPL_HPP_
 
 #include <stdint.h>
 
@@ -51,4 +51,4 @@ class RawSinkImpl : public SinkImpl {
 };
 }  // namespace cs
 
-#endif  // CSCORE_RAWSINKIMPL_H_
+#endif  // CSCORE_RAWSINKIMPL_HPP_

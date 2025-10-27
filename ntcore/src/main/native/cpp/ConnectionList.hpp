@@ -13,8 +13,8 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/util/UidVector.hpp>
 #include <wpi/datalog/DataLog.hpp>
+#include <wpi/util/UidVector.hpp>
 #include <wpi/util/mutex.hpp>
 
 #include "Handle.hpp"

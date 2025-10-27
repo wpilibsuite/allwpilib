@@ -12,13 +12,13 @@
 #include <wpi/hal/Ports.h>
 #include <wpi/hal/UsageReporting.h>
 #include <wpi/util/NullDeleter.hpp>
+#include <wpi/util/SensorUtil.hpp>
 #include <wpi/util/StackTrace.hpp>
 
 #include "wpi/hardware/pneumatic/Compressor.hpp"
 #include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
-#include "wpi/system/Errors.hpp"
-#include "wpi/util/SensorUtil.hpp"
 #include "wpi/hardware/pneumatic/Solenoid.hpp"
+#include "wpi/system/Errors.hpp"
 
 using namespace frc;
 

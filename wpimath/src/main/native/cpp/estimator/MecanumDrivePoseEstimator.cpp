@@ -6,9 +6,9 @@
 
 #include <wpi/util/timestamp.h>
 
-#include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/math/estimator/AngleStatistics.hpp"
 #include "wpi/math/util/MathShared.hpp"
+#include "wpi/math/util/StateSpaceUtil.hpp"
 
 using namespace frc;
 

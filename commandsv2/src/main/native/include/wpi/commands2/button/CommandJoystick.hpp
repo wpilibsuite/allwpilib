@@ -5,9 +5,9 @@
 #pragma once
 #include <wpi/driverstation/Joystick.hpp>
 
-#include "wpi/commands2/button/Trigger.hpp"
 #include "wpi/commands2/CommandScheduler.hpp"
 #include "wpi/commands2/button/CommandGenericHID.hpp"
+#include "wpi/commands2/button/Trigger.hpp"
 
 namespace frc2 {
 /**

@@ -8,12 +8,12 @@
 #include <Eigen/QR>
 #include <gtest/gtest.h>
 
-#include "wpi/math/linalg/EigenCore.hpp"
-#include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/math/estimator/ExtendedKalmanFilter.hpp"
+#include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/NumericalJacobian.hpp"
 #include "wpi/math/system/plant/DCMotor.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
+#include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
 
 namespace {

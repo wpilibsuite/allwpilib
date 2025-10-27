@@ -10,9 +10,9 @@
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
+#include "mockdata/PowerDistributionDataInternal.h"
 #include "wpi/hal/CANAPI.h"
 #include "wpi/hal/Errors.h"
-#include "mockdata/PowerDistributionDataInternal.h"
 
 using namespace hal;
 

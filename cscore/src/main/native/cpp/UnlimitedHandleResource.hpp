@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_UNLIMITEDHANDLERESOURCE_H_
-#define CSCORE_UNLIMITEDHANDLERESOURCE_H_
+#ifndef CSCORE_UNLIMITEDHANDLERESOURCE_HPP_
+#define CSCORE_UNLIMITEDHANDLERESOURCE_HPP_
 
 #include <memory>
 #include <span>
@@ -191,4 +191,4 @@ UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::FindIf(F func) {
 
 }  // namespace cs
 
-#endif  // CSCORE_UNLIMITEDHANDLERESOURCE_H_
+#endif  // CSCORE_UNLIMITEDHANDLERESOURCE_HPP_

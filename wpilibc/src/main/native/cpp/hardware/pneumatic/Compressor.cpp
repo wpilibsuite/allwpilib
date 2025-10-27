@@ -4,9 +4,8 @@
 
 #include "wpi/hardware/pneumatic/Compressor.hpp"
 
-#include <wpi/hardware/pneumatic/PneumaticHub.hpp>
-
 #include <wpi/hal/Ports.h>
+#include <wpi/hardware/pneumatic/PneumaticHub.hpp>
 #include <wpi/util/sendable/SendableBuilder.hpp>
 #include <wpi/util/sendable/SendableRegistry.hpp>
 

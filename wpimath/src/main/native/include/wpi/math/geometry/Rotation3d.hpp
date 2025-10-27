@@ -13,13 +13,13 @@
 #include <wpi/util/SymbolExports.hpp>
 #include <wpi/util/json_fwd.hpp>
 
-#include "wpi/math/linalg/ct_matrix.hpp"
 #include "wpi/math/fmt/Eigen.hpp"
 #include "wpi/math/geometry/Quaternion.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/linalg/ct_matrix.hpp"
+#include "wpi/math/util/MathShared.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/math.hpp"
-#include "wpi/math/util/MathShared.hpp"
 
 namespace frc {
 

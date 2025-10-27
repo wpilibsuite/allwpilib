@@ -3,7 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <wpi/commands2/Commands.hpp>
-
 #include <wpi/simulation/SimHooks.hpp>
 
 #include "CommandTestBase.hpp"

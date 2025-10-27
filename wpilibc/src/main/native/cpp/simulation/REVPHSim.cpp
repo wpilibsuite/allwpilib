@@ -7,8 +7,7 @@
 #include <memory>
 
 #include <wpi/hal/simulation/REVPHData.h>
-
-#include "wpi/util/SensorUtil.hpp"
+#include <wpi/util/SensorUtil.hpp>
 
 using namespace frc;
 using namespace frc::sim;

@@ -4,6 +4,8 @@
 
 #include "wpi/glass/networktables/NetworkTables.hpp"
 
+#include <wpi/nt/ntcore_c.h>
+
 #include <algorithm>
 #include <cinttypes>
 #include <cstring>
@@ -20,17 +22,16 @@
 #include <fmt/format.h>
 #include <imgui.h>
 #include <imgui_stdlib.h>
-#include <wpi/nt/NetworkTableInstance.hpp>
-#include <wpi/nt/NetworkTableValue.hpp>
-#include <wpi/nt/ntcore_c.h>
-#include <wpi/nt/ntcore_cpp.hpp>
-#include <wpi/nt/ntcore_cpp_types.hpp>
 #include <upb/message/message.h>
 #include <upb/mini_table/message.h>
 #include <upb/reflection/def.h>
 #include <upb/reflection/message.h>
 #include <upb/reflection/stage0/google/protobuf/descriptor.upb.h>
 #include <upb/wire/decode.h>
+#include <wpi/nt/NetworkTableInstance.hpp>
+#include <wpi/nt/NetworkTableValue.hpp>
+#include <wpi/nt/ntcore_cpp.hpp>
+#include <wpi/nt/ntcore_cpp_types.hpp>
 #include <wpi/util/MessagePack.hpp>
 #include <wpi/util/SmallString.hpp>
 #include <wpi/util/SpanExtras.hpp>

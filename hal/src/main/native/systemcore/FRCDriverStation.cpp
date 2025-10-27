@@ -29,6 +29,7 @@
 
 #include "HALInitializer.h"
 #include "SystemServerInternal.h"
+#include "mrc/NtNetComm.h"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/proto/ControlData.h"
@@ -37,7 +38,6 @@
 #include "wpi/hal/proto/JoystickRumbleData.h"
 #include "wpi/hal/proto/MatchInfo.h"
 #include "wpi/hal/proto/OpMode.h"
-#include "mrc/NtNetComm.h"
 
 static_assert(sizeof(int32_t) >= sizeof(int),
               "FRC_NetworkComm status variable is larger than 32 bits");

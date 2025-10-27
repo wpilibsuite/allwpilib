@@ -17,8 +17,8 @@
 #include <wpi/util/circular_buffer.hpp>
 
 #include "wpi/math/linalg/EigenCore.hpp"
-#include "wpi/units/time.hpp"
 #include "wpi/math/util/MathShared.hpp"
+#include "wpi/units/time.hpp"
 
 namespace frc {
 

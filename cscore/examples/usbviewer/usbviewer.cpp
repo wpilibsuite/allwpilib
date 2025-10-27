@@ -13,10 +13,10 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/imgproc.hpp>
+#include <wpi/gui/wpigui.hpp>
 #include <wpi/util/mutex.hpp>
 #include <wpi/util/print.hpp>
 #include <wpi/util/spinlock.hpp>
-#include <wpi/gui/wpigui.hpp>
 
 #include "wpi/cs/cscore.h"
 #include "wpi/cs/cscore_cv.hpp"

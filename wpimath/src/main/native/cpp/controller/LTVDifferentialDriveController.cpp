@@ -7,8 +7,8 @@
 #include <cmath>
 
 #include "wpi/math/linalg/DARE.hpp"
-#include "wpi/math/util/MathUtil.hpp"
 #include "wpi/math/system/Discretization.hpp"
+#include "wpi/math/util/MathUtil.hpp"
 
 using namespace frc;
 

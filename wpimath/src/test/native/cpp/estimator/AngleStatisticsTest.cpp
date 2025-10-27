@@ -6,8 +6,8 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/estimator/AngleStatistics.hpp"
+#include "wpi/math/linalg/EigenCore.hpp"
 
 TEST(AngleStatisticsTest, Mean) {
   frc::Matrixd<3, 3> sigmas{

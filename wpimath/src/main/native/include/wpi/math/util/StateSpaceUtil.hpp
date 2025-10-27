@@ -15,8 +15,8 @@
 #include <wpi/util/Algorithm.hpp>
 #include <wpi/util/SymbolExports.hpp>
 
-#include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/linalg/EigenCore.hpp"
 
 namespace frc {
 

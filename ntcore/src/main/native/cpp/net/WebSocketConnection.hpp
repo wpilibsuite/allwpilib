@@ -9,10 +9,10 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/util/function_ref.hpp>
 #include <wpi/net/WebSocket.hpp>
 #include <wpi/net/uv/Buffer.hpp>
 #include <wpi/net/uv/Stream.hpp>
+#include <wpi/util/function_ref.hpp>
 
 #include "WireConnection.hpp"
 

@@ -3,9 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <wpi/hardware/discrete/DigitalInput.hpp>
+#include <wpi/hardware/motor/Spark.hpp>
 #include <wpi/hardware/rotation/Encoder.hpp>
 #include <wpi/opmode/TimedRobot.hpp>
-#include <wpi/hardware/motor/Spark.hpp>
 
 /**
  * Encoder mechanism homing snippets for frc-docs.

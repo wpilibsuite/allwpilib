@@ -7,13 +7,13 @@
 #include <Eigen/QR>
 #include <wpi/util/SymbolExports.hpp>
 
-#include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/geometry/Twist2d.hpp"
 #include "wpi/math/kinematics/ChassisSpeeds.hpp"
 #include "wpi/math/kinematics/Kinematics.hpp"
 #include "wpi/math/kinematics/MecanumDriveWheelPositions.hpp"
 #include "wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp"
+#include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/util/MathShared.hpp"
 
 namespace frc {

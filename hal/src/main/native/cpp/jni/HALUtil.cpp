@@ -30,7 +30,8 @@ using namespace wpi::java;
 #define kRIOStatusFeatureNotSupported (kRioStatusOffset - 193)
 #define kRIOStatusResourceNotInitialized -52010
 
-static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_ROBORIO == HAL_Runtime_RoboRIO);
+static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_ROBORIO ==
+              HAL_Runtime_RoboRIO);
 static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_ROBORIO2 ==
               HAL_Runtime_RoboRIO2);
 static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_SIMULATION ==
@@ -73,7 +74,8 @@ static const JExceptionInit exceptions[] = {
     {"org/wpilib/hardware/hal/util/BoundaryException", &boundaryExCls},
     {"org/wpilib/hardware/hal/util/AllocationException", &allocationExCls},
     {"org/wpilib/hardware/hal/util/HalHandleException", &halHandleExCls},
-    {"org/wpilib/hardware/hal/util/UncleanStatusException", &uncleanStatusExCls},
+    {"org/wpilib/hardware/hal/util/UncleanStatusException",
+     &uncleanStatusExCls},
     {"java/lang/NullPointerException", &nullPointerEx}};
 
 namespace hal {

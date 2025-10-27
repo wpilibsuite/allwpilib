@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_NOTIFIER_H_
-#define CSCORE_NOTIFIER_H_
+#ifndef CSCORE_NOTIFIER_HPP_
+#define CSCORE_NOTIFIER_HPP_
 
 #include <functional>
 #include <utility>
@@ -90,4 +90,4 @@ class Notifier : public wpi::CallbackManager<Notifier, impl::NotifierThread> {
 
 }  // namespace cs
 
-#endif  // CSCORE_NOTIFIER_H_
+#endif  // CSCORE_NOTIFIER_HPP_

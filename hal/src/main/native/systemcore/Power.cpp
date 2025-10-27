@@ -10,8 +10,8 @@
 
 #include "HALInitializer.h"
 #include "SystemServerInternal.h"
-#include "wpi/hal/Errors.h"
 #include "mrc/NtNetComm.h"
+#include "wpi/hal/Errors.h"
 
 using namespace hal;
 

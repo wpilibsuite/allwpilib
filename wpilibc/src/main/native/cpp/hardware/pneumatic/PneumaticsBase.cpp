@@ -7,11 +7,11 @@
 #include <memory>
 
 #include <wpi/hal/REVPH.h>
+#include <wpi/util/SensorUtil.hpp>
 
-#include "wpi/system/Errors.hpp"
 #include "wpi/hardware/pneumatic/PneumaticHub.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsControlModule.hpp"
-#include "wpi/util/SensorUtil.hpp"
+#include "wpi/system/Errors.hpp"
 
 using namespace frc;
 

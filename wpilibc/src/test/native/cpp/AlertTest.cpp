@@ -13,8 +13,8 @@
 #include <gtest/gtest.h>
 #include <wpi/nt/NetworkTableInstance.hpp>
 #include <wpi/nt/StringArrayTopic.hpp>
+#include <wpi/util/Alert.hpp>
 
-#include "wpi/util/Alert.hpp"
 #include "wpi/simulation/SimHooks.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
 

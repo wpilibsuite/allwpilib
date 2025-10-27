@@ -16,9 +16,9 @@
 #include <wpi/util/mutex.hpp>
 #include <wpi/util/sendable/SendableRegistry.hpp>
 
-#include "wpi/system/Errors.hpp"
 #include "wpi/smartdashboard/ListenerExecutor.hpp"
 #include "wpi/smartdashboard/SendableBuilderImpl.hpp"
+#include "wpi/system/Errors.hpp"
 
 using namespace frc;
 

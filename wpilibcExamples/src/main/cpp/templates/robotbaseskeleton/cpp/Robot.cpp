@@ -5,8 +5,8 @@
 #include "Robot.hpp"
 
 #include <wpi/driverstation/DriverStation.hpp>
-#include <wpi/internal/DriverStationModeThread.hpp>
 #include <wpi/hal/DriverStation.h>
+#include <wpi/internal/DriverStationModeThread.hpp>
 #include <wpi/nt/NetworkTable.hpp>
 
 Robot::Robot() {}

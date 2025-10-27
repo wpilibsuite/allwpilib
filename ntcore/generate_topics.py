@@ -97,9 +97,7 @@ def generate_topics(
     )
     template = env.get_template("ntcore_c_types.h.jinja")
     output = template.render(types=types)
-    Output(
-        output_directory / hdr_subdirectory / "wpi/nt", "ntcore_c_types.h", output
-    )
+    Output(output_directory / hdr_subdirectory / "wpi/nt", "ntcore_c_types.h", output)
 
     # C handle API (source)
     c_subdirectory = "main/native/cpp"

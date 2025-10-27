@@ -8,9 +8,9 @@
 #include <string>
 #include <vector>
 
+#include <wpi/net/hostname.hpp>
 #include <wpi/util/SmallString.hpp>
 #include <wpi/util/json.hpp>
-#include <wpi/net/hostname.hpp>
 
 #include "Handle.hpp"
 #include "Instance.hpp"

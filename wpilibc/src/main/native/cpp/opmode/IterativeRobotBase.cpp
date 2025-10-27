@@ -5,14 +5,13 @@
 #include "wpi/opmode/IterativeRobotBase.hpp"
 
 #include <wpi/driverstation/DriverStation.hpp>
-
 #include <wpi/hal/DriverStation.h>
 #include <wpi/nt/NetworkTableInstance.hpp>
 #include <wpi/util/print.hpp>
 
 #include "wpi/driverstation/DSControlWord.hpp"
-#include "wpi/system/Errors.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/system/Errors.hpp"
 
 using namespace frc;
 
