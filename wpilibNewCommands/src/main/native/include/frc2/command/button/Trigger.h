@@ -295,10 +295,10 @@ class Trigger {
    * filter to avoid counting noise as multiple taps.
    *
    * @param requiredTaps The number of taps required.
-   * @param tapWindowSeconds The time window in which the taps must occur.
+   * @param tapWindow The time window in which the taps must occur.
    * @return The multi-tap filtered trigger.
    */
-  Trigger MultiTap(int numTaps, units::second_t interval);
+  Trigger MultiTap(int requiredTaps, units::second_t tapWindow);
 
   /**
    * Returns the current state of this trigger.
