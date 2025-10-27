@@ -7,7 +7,7 @@ package edu.wpi.first.wpilibj2.command.button;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.filter.MultiTapFilter;
+import edu.wpi.first.math.filter.EdgeCounterFilter;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -290,28 +290,28 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
-   * Creates a new multi-tap trigger from this trigger - it will become active when this trigger has
-   * been activated the required number of times within the specified time window.
+   * Creates a new multi-press trigger from this trigger - it will become active when this trigger
+   * has been activated the required number of times within the specified time window.
    *
    * <p>This is useful for implementing "double-click" style functionality.
    *
-   * <p>Input for this must be stable, consider using a Debouncer before this filter to avoid
-   * counting noise as multiple taps.
+   * <p>Input for this must be stable, consider using a Debouncer before this to avoid counting
+   * noise as multiple presses.
    *
-   * @param requiredTaps The number of taps required.
-   * @param tapWindowSeconds The time window in which the taps must occur.
-   * @return The multi-tap filtered trigger.
+   * @param requiredPresses The number of presses required.
+   * @param windowTime The number of seconds in which the presses must occur.
+   * @return The multi-press trigger.
    */
-  public Trigger multiTap(int requiredTaps, double tapWindowSeconds) {
+  public Trigger multiPress(int requiredPresses, double windowTime) {
     return new Trigger(
         m_loop,
         new BooleanSupplier() {
-          final MultiTapFilter m_multiTapFilter =
-              new MultiTapFilter(requiredTaps, tapWindowSeconds);
+          final EdgeCounterFilter m_edgeCounterFilter =
+              new EdgeCounterFilter(requiredPresses, windowTime);
 
           @Override
           public boolean getAsBoolean() {
-            return m_multiTapFilter.calculate(m_condition.getAsBoolean());
+            return m_edgeCounterFilter.calculate(m_condition.getAsBoolean());
           }
         });
   }

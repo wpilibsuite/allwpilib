@@ -7,7 +7,7 @@
 #include <utility>
 
 #include <frc/filter/Debouncer.h>
-#include <frc/filter/MultiTapFilter.h>
+#include <frc/filter/EdgeCountFilter.h>
 
 #include "frc2/command/CommandPtr.h"
 
@@ -185,11 +185,12 @@ Trigger Trigger::Debounce(units::second_t debounceTime,
   });
 }
 
-Trigger Trigger::MultiTap(int requiredTaps, units::second_t tapWindow) {
-  return Trigger(m_loop, [filter = frc::MultiTapFilter(requiredTaps, tapWindow),
-                          condition = m_condition]() mutable {
-    return filter.Calculate(condition());
-  });
+Trigger Trigger::MultiPress(int requiredPresses, units::second_t windowTime) {
+  return Trigger(m_loop,
+                 [filter = frc::EdgeCounterFilter(requiredPresses, windowTime),
+                  condition = m_condition]() mutable {
+                   return filter.Calculate(condition());
+                 });
 }
 
 bool Trigger::Get() const {

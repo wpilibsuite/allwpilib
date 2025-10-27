@@ -285,20 +285,20 @@ class Trigger {
                        frc::Debouncer::DebounceType::kRising);
 
   /**
-   * Creates a new multi-tap trigger from this trigger - it will become active
+   * Creates a new multi-press trigger from this trigger - it will become active
    * when this trigger has been activated the required number of times within
    * the specified time window.
    *
-   * This is useful for implementing "double-click" style functionality.
+   * <p>This is useful for implementing "double-click" style functionality.
    *
-   * Input for this must be stable, consider using a Debouncer before this
-   * filter to avoid counting noise as multiple taps.
+   * <p>Input for this must be stable, consider using a Debouncer before this to
+   * avoid counting noise as multiple presses.
    *
-   * @param requiredTaps The number of taps required.
-   * @param tapWindow The time window in which the taps must occur.
-   * @return The multi-tap filtered trigger.
+   * @param requiredPresses The number of presses required.
+   * @param windowTime The time in which the presses must occur.
+   * @return The multi-press trigger.
    */
-  Trigger MultiTap(int requiredTaps, units::second_t tapWindow);
+  Trigger MultiPress(int requiredPresses, units::second_t windowTime);
 
   /**
    * Returns the current state of this trigger.

@@ -13,7 +13,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class MultiTapFilterTest {
+class EdgeCounterFilterTest {
   @BeforeEach
   void setUp() {
     WPIUtilJNI.enableMockTime();
@@ -27,16 +27,16 @@ class MultiTapFilterTest {
   }
 
   @Test
-  void multiTapFilterActivatedTest() {
-    var filter = new MultiTapFilter(2, 0.2);
+  void edgeCounterFilterActivatedTest() {
+    var filter = new EdgeCounterFilter(2, 0.2);
 
-    assertFalse(filter.calculate(true)); // First tap
+    assertFalse(filter.calculate(true)); // First edge
 
     WPIUtilJNI.setMockTime(50_000L);
-    assertFalse(filter.calculate(false)); // First tap ended
+    assertFalse(filter.calculate(false)); // First edge ended
 
     WPIUtilJNI.setMockTime(100_000L);
-    assertTrue(filter.calculate(true)); // Second tap
+    assertTrue(filter.calculate(true)); // Second edge
 
     WPIUtilJNI.setMockTime(150_000L);
     assertTrue(filter.calculate(true)); // Still true
@@ -49,34 +49,34 @@ class MultiTapFilterTest {
   }
 
   @Test
-  void multiTapFilterExpiredTest() {
-    var filter = new MultiTapFilter(2, 0.2);
+  void edgeCounterFilterExpiredTest() {
+    var filter = new EdgeCounterFilter(2, 0.2);
 
-    assertFalse(filter.calculate(true)); // First tap
+    assertFalse(filter.calculate(true)); // First edge
 
     WPIUtilJNI.setMockTime(50_000L);
-    filter.calculate(false); // First tap ended
+    filter.calculate(false); // First edge ended
 
     WPIUtilJNI.setMockTime(250_000L);
-    assertFalse(filter.calculate(true)); // Second tap after window expired
+    assertFalse(filter.calculate(true)); // Second edge after window expired
 
     WPIUtilJNI.setMockTime(300_000L);
     assertFalse(filter.calculate(true)); // Still false
   }
 
   @Test
-  void multiTapFilterParamsTest() {
-    var filter = new MultiTapFilter(2, 0.2);
+  void edgeCounterFilterParamsTest() {
+    var filter = new EdgeCounterFilter(2, 0.2);
 
-    assertEquals(filter.getRequiredTaps(), 2);
-    assertEquals(filter.getTapWindowSeconds(), 0.2);
+    assertEquals(filter.getRequiredEdges(), 2);
+    assertEquals(filter.getWindowTime(), 0.2);
 
-    filter.setRequiredTaps(3);
+    filter.setRequiredEdges(3);
 
-    assertEquals(filter.getRequiredTaps(), 3);
+    assertEquals(filter.getRequiredEdges(), 3);
 
-    filter.setTapWindowSeconds(0.5);
+    filter.setWindowTime(0.5);
 
-    assertEquals(filter.getTapWindowSeconds(), 0.5);
+    assertEquals(filter.getWindowTime(), 0.5);
   }
 }
