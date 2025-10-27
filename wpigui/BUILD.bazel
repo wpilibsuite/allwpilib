@@ -86,5 +86,5 @@ wpilib_cc_static_library(
 package_minimal_cc_project(
     name = "wpigui",
     maven_artifact_name = "wpigui-cpp",
-    maven_group_id = "edu.wpi.first.wpigui",
+    maven_group_id = "org.wpilib.wpigui",
 )

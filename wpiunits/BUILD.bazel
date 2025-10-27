@@ -34,7 +34,7 @@ wpilib_java_library(
     name = "wpiunits-java",
     srcs = glob(["src/main/java/**/*.java"]) + glob(["src/generated/main/java/**/*.java"]),
     maven_artifact_name = "wpiunits-java",
-    maven_group_id = "edu.wpi.first.wpiunits",
+    maven_group_id = "org.wpilib.wpiunits",
     visibility = ["//visibility:public"],
     deps = [],
 )

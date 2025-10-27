@@ -96,7 +96,7 @@ pkg_zip(
 
 maven_export(
     name = "wpilibc_publish",
-    maven_coordinates = "edu.wpi.first.wpilibc:documentation:$(WPILIB_VERSION)",
+    maven_coordinates = "org.wpilib.wpilibc:documentation:$(WPILIB_VERSION)",
     target = ":doxygen-zip",
     visibility = ["//visibility:public"],
 )
@@ -130,7 +130,7 @@ copy_file(
 
 maven_export(
     name = "wpilibj_publish",
-    maven_coordinates = "edu.wpi.first.wpilibj:documentation:$(WPILIB_VERSION)",
+    maven_coordinates = "org.wpilib.wpilibj:documentation:$(WPILIB_VERSION)",
     target = ":javadoc-zip",
     visibility = ["//visibility:public"],
 )

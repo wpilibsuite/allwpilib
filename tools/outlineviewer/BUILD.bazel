@@ -43,5 +43,5 @@ cc_binary(
 package_binary_cc_project(
     name = "outlineviewer",
     maven_artifact_name = "OutlineViewer",
-    maven_group_id = "edu.wpi.first.tools",
+    maven_group_id = "org.wpilib.tools",
 )

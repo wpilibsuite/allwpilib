@@ -210,7 +210,7 @@ wpilib_jni_java_library(
     name = "cscore-java",
     srcs = glob(["src/main/java/**/*.java"]),
     maven_artifact_name = "cscore-java",
-    maven_group_id = "edu.wpi.first.cscore",
+    maven_group_id = "org.wpilib.cscore",
     native_libs = [":cscorejni"],
     visibility = ["//visibility:public"],
     deps = [
@@ -281,7 +281,7 @@ java_binary(
 package_minimal_jni_project(
     name = "cscore",
     maven_artifact_name = "cscore-cpp",
-    maven_group_id = "edu.wpi.first.cscore",
+    maven_group_id = "org.wpilib.cscore",
 )
 
 alias(

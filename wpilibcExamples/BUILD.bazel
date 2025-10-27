@@ -52,21 +52,21 @@ build_tests()
 
 maven_export(
     name = "examples_publish",
-    maven_coordinates = "edu.wpi.first.wpilibc:examples:$(WPILIB_VERSION)",
+    maven_coordinates = "org.wpilib.wpilibc:examples:$(WPILIB_VERSION)",
     target = ":examples-zip",
     visibility = ["//visibility:public"],
 )
 
 maven_export(
     name = "commands_publish",
-    maven_coordinates = "edu.wpi.first.wpilibc:commands:$(WPILIB_VERSION)",
+    maven_coordinates = "org.wpilib.wpilibc:commands:$(WPILIB_VERSION)",
     target = ":commands-zip",
     visibility = ["//visibility:public"],
 )
 
 maven_export(
     name = "templates_publish",
-    maven_coordinates = "edu.wpi.first.wpilibc:templates:$(WPILIB_VERSION)",
+    maven_coordinates = "org.wpilib.wpilibc:templates:$(WPILIB_VERSION)",
     target = ":templates-zip",
     visibility = ["//visibility:public"],
 )
