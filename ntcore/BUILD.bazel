@@ -211,8 +211,8 @@ cc_binary(
 
 java_binary(
     name = "DevMain-Java",
-    srcs = ["src/dev/java/edu/wpi/first/ntcore/DevMain.java"],
-    main_class = "edu.wpi.first.ntcore.DevMain",
+    srcs = ["src/dev/java/org/wpilib/networktables/DevMain.java"],
+    main_class = "org.wpilib.networktables.DevMain",
     deps = [
         "ntcore-java",
         "//wpiutil:wpiutil-java",
