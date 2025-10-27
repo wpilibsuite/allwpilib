@@ -7,14 +7,14 @@ WPILib is normally built with Gradle, however for some systems, such as Linux ba
 * cameraserver
 * commandsv3
 * cscore
-* fieldImages
+* fields
 * hal (simulation HAL only)
 * ntcore
 * romiVendordep
 * simulation extensions
 * wpigui
 * wpilib (wpilibc, wpilibj, and myRobot)
-* wpilibNewCommands
+* commandsv2
 * wpimath
 * wpinet
 * wpiunits
@@ -162,7 +162,7 @@ file(GLOB_RECURSE JAVA_SOURCES *.java)
 # If you want Gradle compatibility or you are using one of the templates/examples, comment out the above line and uncomment this line instead:
 # file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
 add_jar(robot ${JAVA_SOURCES}
-    INCLUDE_JARS apriltag_jar cscore_jar hal_jar ntcore_jar wpilibNewCommands_jar wpimath_jar wpinet_jar wpiutil_jar wpiunits_jar wpilibj_jar ${opencvJar})
+    INCLUDE_JARS apriltag_jar cscore_jar hal_jar ntcore_jar commandsv2_jar wpimath_jar wpinet_jar wpiutil_jar wpiunits_jar wpilibj_jar ${opencvJar})
 export_jars(TARGETS robot FILE robot.jar)
 ```
 This includes all the built JARs except for the vendordeps. If you are not using a JAR/library, you may remove it.
@@ -176,7 +176,7 @@ After that, run `cmake --build .` to create your JAR file. To execute the JAR fi
 
 ## Using vendordeps
 
-Vendordeps are not included as part of the `wpilib` CMake package. However, if you want to use a vendordep, you need to use `find_package(VENDORDEP)`, where `VENDORDEP` is the name of the vendordep (case-sensitive), like `xrpVendordep` or `romiVendordep`. Note that wpilibNewCommands, while a vendordep in normal robot projects, is not built as a vendordep in CMake, and is instead included as part of the `wpilib` CMake package. After you used `find_package`, you can reference the vendordep library like normal, either by using `target_link_libraries` for C++ or `add_jar` for Java.
+Vendordeps are not included as part of the `wpilib` CMake package. However, if you want to use a vendordep, you need to use `find_package(VENDORDEP)`, where `VENDORDEP` is the name of the vendordep (case-sensitive), like `xrpVendordep` or `romiVendordep`. Note that commandsv2, while a vendordep in normal robot projects, is not built as a vendordep in CMake, and is instead included as part of the `wpilib` CMake package. After you used `find_package`, you can reference the vendordep library like normal, either by using `target_link_libraries` for C++ or `add_jar` for Java.
 
 ## Troubleshooting
 Below are some common issues that are run into when building.

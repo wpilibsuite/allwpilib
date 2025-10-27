@@ -6,7 +6,7 @@ load("@rules_python//python:defs.bzl", "py_binary")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test", "wpilib_java_library")
 load("//shared/bazel/rules:packaging.bzl", "package_minimal_cc_project")
-load("//wpilibNewCommands:generate.bzl", "generate_wpilib_new_commands")
+load("//commandsv2:generate.bzl", "generate_wpilib_new_commands")
 
 filegroup(
     name = "doxygen-files",
@@ -60,7 +60,7 @@ filegroup(
 )
 
 wpilib_cc_library(
-    name = "wpilibNewCommands",
+    name = "commandsv2",
     srcs = glob(["src/main/native/cpp/**"]),
     hdrs = glob(["src/main/native/include/**"]),
     includes = ["src/main/native/include"],
@@ -77,7 +77,7 @@ wpilib_cc_library(
 )
 
 wpilib_cc_shared_library(
-    name = "shared/wpilibNewCommands",
+    name = "shared/commandsv2",
     dynamic_deps = [
         "//hal:shared/wpiHal",
         "//ntcore:shared/ntcore",
@@ -87,26 +87,26 @@ wpilib_cc_shared_library(
         "//wpiutil:shared/wpiutil",
     ],
     visibility = ["//visibility:public"],
-    deps = [":wpilibNewCommands"],
+    deps = [":commandsv2"],
 )
 
 wpilib_cc_static_library(
-    name = "static/wpilibNewCommands",
+    name = "static/commandsv2",
     static_deps = [
         "//ntcore:static/ntcore",
         "//wpilibc:static/wpilibc",
         "//wpinet:static/wpinet",
     ],
     visibility = ["//visibility:public"],
-    deps = [":wpilibNewCommands"],
+    deps = [":commandsv2"],
 )
 
 wpilib_java_library(
-    name = "wpilibNewCommands-java",
+    name = "commandsv2-java",
     srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
     exported_plugins = ["//javacPlugin:plugin"],
-    maven_artifact_name = "wpilibNewCommands-java",
-    maven_group_id = "edu.wpi.first.wpilibNewCommands",
+    maven_artifact_name = "commandsv2-java",
+    maven_group_id = "edu.wpi.first.commandsv2",
     plugins = ["//javacPlugin:plugin"],
     visibility = ["//visibility:public"],
     deps = [
@@ -123,7 +123,7 @@ wpilib_java_library(
 )
 
 cc_test(
-    name = "wpilibNewCommands-cpp-test",
+    name = "commandsv2-cpp-test",
     size = "small",
     srcs = glob([
         "src/test/native/**/*.cpp",
@@ -134,18 +134,18 @@ cc_test(
         "no-ubsan",
     ],
     deps = [
-        ":wpilibNewCommands",
+        ":commandsv2",
         "//thirdparty/googletest",
     ],
 )
 
 wpilib_java_junit5_test(
-    name = "wpilibNewCommands-java-test",
+    name = "commandsv2-java-test",
     srcs = glob(["**/*.java"]),
-    resource_strip_prefix = "wpilibNewCommands/src/test/resources",
+    resource_strip_prefix = "commandsv2/src/test/resources",
     resources = glob(["src/test/resources/**"]),
     deps = [
-        ":wpilibNewCommands-java",
+        ":commandsv2-java",
         "//hal:hal-java",
         "//ntcore:ntcore-java",
         "//wpiannotations",
@@ -169,7 +169,7 @@ java_binary(
     srcs = ["src/dev/java/edu/wpi/first/wpilibj2/commands/DevMain.java"],
     main_class = "edu.wpi.first.wpilibj2.commands.DevMain",
     deps = [
-        ":wpilibNewCommands-java",
+        ":commandsv2-java",
         "//hal:hal-java",
         "//ntcore:ntcore-java",
         "//wpiannotations",
@@ -179,7 +179,7 @@ java_binary(
 )
 
 package_minimal_cc_project(
-    name = "wpilibNewCommands",
-    maven_artifact_name = "wpilibNewCommands-cpp",
-    maven_group_id = "edu.wpi.first.wpilibNewCommands",
+    name = "commandsv2",
+    maven_artifact_name = "commandsv2-cpp",
+    maven_group_id = "edu.wpi.first.commandsv2",
 )
