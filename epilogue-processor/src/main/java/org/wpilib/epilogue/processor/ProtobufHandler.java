@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.epilogue.processor;
+package org.wpilib.epilogue.processor;
 
 import java.util.Set;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -30,10 +30,10 @@ public class ProtobufHandler extends ElementHandler {
     m_serializable =
         processingEnv
             .getElementUtils()
-            .getTypeElement("edu.wpi.first.util.protobuf.ProtobufSerializable")
+            .getTypeElement("org.wpilib.util.protobuf.ProtobufSerializable")
             .asType();
     m_protobufType =
-        processingEnv.getElementUtils().getTypeElement("edu.wpi.first.util.protobuf.Protobuf");
+        processingEnv.getElementUtils().getTypeElement("org.wpilib.util.protobuf.Protobuf");
     m_typeUtils = processingEnv.getTypeUtils();
     m_elementUtils = processingEnv.getElementUtils();
   }

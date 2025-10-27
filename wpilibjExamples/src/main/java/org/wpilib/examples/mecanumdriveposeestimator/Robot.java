@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.mecanumdriveposeestimator;
+package org.wpilib.examples.mecanumdriveposeestimator;
 
-import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
+import org.wpilib.math.filter.SlewRateLimiter;
+import org.wpilib.opmode.TimedRobot;
+import org.wpilib.driverstation.XboxController;
 
 public class Robot extends TimedRobot {
   private final XboxController m_controller = new XboxController(0);

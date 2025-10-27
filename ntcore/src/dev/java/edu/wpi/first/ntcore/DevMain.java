@@ -4,8 +4,8 @@
 
 package edu.wpi.first.ntcore;
 
-import edu.wpi.first.networktables.NetworkTablesJNI;
-import edu.wpi.first.util.CombinedRuntimeLoader;
+import org.wpilib.networktables.NetworkTablesJNI;
+import org.wpilib.util.runtime.CombinedRuntimeLoader;
 
 public final class DevMain {
   /** Main method. */

@@ -2,19 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.geometry;
+package org.wpilib.math.geometry;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.Vector;
-import edu.wpi.first.math.geometry.proto.QuaternionProto;
-import edu.wpi.first.math.geometry.struct.QuaternionStruct;
-import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.util.protobuf.ProtobufSerializable;
-import edu.wpi.first.util.struct.StructSerializable;
+import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.math.linalg.Vector;
+import org.wpilib.math.geometry.proto.QuaternionProto;
+import org.wpilib.math.geometry.struct.QuaternionStruct;
+import org.wpilib.math.numbers.N3;
+import org.wpilib.util.protobuf.ProtobufSerializable;
+import org.wpilib.util.struct.StructSerializable;
 import java.util.Objects;
 
 /** Represents a quaternion. */

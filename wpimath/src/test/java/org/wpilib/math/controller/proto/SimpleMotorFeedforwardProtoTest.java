@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.controller.proto;
+package org.wpilib.math.controller.proto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.proto.Controller.ProtobufSimpleMotorFeedforward;
-import edu.wpi.first.wpilibj.ProtoTestBase;
+import org.wpilib.math.controller.SimpleMotorFeedforward;
+import org.wpilib.math.proto.Controller.ProtobufSimpleMotorFeedforward;
+import org.wpilib.ProtoTestBase;
 
 @SuppressWarnings("PMD.TestClassWithoutTestCases")
 class SimpleMotorFeedforwardProtoTest

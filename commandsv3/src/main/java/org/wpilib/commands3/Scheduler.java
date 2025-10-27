@@ -4,14 +4,14 @@
 
 package org.wpilib.commands3;
 
-import static edu.wpi.first.units.Units.Microseconds;
-import static edu.wpi.first.units.Units.Milliseconds;
+import static org.wpilib.units.Units.Microseconds;
+import static org.wpilib.units.Units.Milliseconds;
 
-import edu.wpi.first.util.ErrorMessages;
-import edu.wpi.first.util.protobuf.ProtobufSerializable;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.event.EventLoop;
+import org.wpilib.util.ErrorMessages;
+import org.wpilib.util.protobuf.ProtobufSerializable;
+import org.wpilib.system.RobotController;
+import org.wpilib.opmode.TimedRobot;
+import org.wpilib.event.EventLoop;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;

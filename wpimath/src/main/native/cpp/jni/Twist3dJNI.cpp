@@ -6,7 +6,7 @@
 
 #include <wpi/jni_util.h>
 
-#include "edu_wpi_first_math_jni_Twist3dJNI.h"
+#include "org_wpilib_math_jni_Twist3dJNI.h"
 #include "frc/geometry/Transform3d.h"
 #include "frc/geometry/Twist3d.h"
 #include "units/angle.h"
@@ -17,12 +17,12 @@ using namespace wpi::java;
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_math_jni_Twist3dJNI
+ * Class:     org_wpilib_math_jni_Twist3dJNI
  * Method:    exp
  * Signature: (DDDDDD)[D
  */
 JNIEXPORT jdoubleArray JNICALL
-Java_edu_wpi_first_math_jni_Twist3dJNI_exp
+Java_org_wpilib_math_jni_Twist3dJNI_exp
   (JNIEnv* env, jclass, jdouble twistDx, jdouble twistDy, jdouble twistDz,
    jdouble twistRx, jdouble twistRy, jdouble twistRz)
 {

@@ -4,11 +4,11 @@
 
 package org.wpilib.commands3;
 
-import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+import static org.wpilib.units.Units.Seconds;
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.wpilibj.Timer;
+import org.wpilib.units.measure.Time;
+import org.wpilib.system.Timer;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;

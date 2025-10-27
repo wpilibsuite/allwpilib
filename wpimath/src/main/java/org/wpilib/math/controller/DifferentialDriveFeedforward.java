@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.controller;
+package org.wpilib.math.controller;
 
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.controller.proto.DifferentialDriveFeedforwardProto;
-import edu.wpi.first.math.controller.struct.DifferentialDriveFeedforwardStruct;
-import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.util.protobuf.ProtobufSerializable;
-import edu.wpi.first.util.struct.StructSerializable;
+import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.math.controller.proto.DifferentialDriveFeedforwardProto;
+import org.wpilib.math.controller.struct.DifferentialDriveFeedforwardStruct;
+import org.wpilib.math.numbers.N2;
+import org.wpilib.math.system.LinearSystem;
+import org.wpilib.math.system.plant.LinearSystemId;
+import org.wpilib.util.protobuf.ProtobufSerializable;
+import org.wpilib.util.struct.StructSerializable;
 
 /** A helper class which computes the feedforward outputs for a differential drive drivetrain. */
 public class DifferentialDriveFeedforward implements ProtobufSerializable, StructSerializable {

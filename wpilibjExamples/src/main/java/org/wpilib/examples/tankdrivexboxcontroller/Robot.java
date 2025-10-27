@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.tankdrivexboxcontroller;
+package org.wpilib.examples.tankdrivexboxcontroller;
 
-import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.opmode.TimedRobot;
+import org.wpilib.driverstation.XboxController;
+import org.wpilib.drive.DifferentialDrive;
+import org.wpilib.hardware.motor.PWMSparkMax;
 
 /**
  * This is a demo program showing the use of the DifferentialDrive class. Runs the motors with tank

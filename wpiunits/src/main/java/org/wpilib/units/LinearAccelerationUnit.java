@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.units;
+package org.wpilib.units;
 
-import edu.wpi.first.units.measure.LinearAcceleration;
+import org.wpilib.units.measure.LinearAcceleration;
 
 /**
- * A unit of linear acceleration like {@link edu.wpi.first.units.Units#MetersPerSecondPerSecond}.
+ * A unit of linear acceleration like {@link org.wpilib.units.Units#MetersPerSecondPerSecond}.
  */
 public final class LinearAccelerationUnit extends PerUnit<LinearVelocityUnit, TimeUnit> {
   private static final CombinatoryUnitCache<LinearVelocityUnit, TimeUnit, LinearAccelerationUnit>

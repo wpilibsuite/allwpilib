@@ -15,7 +15,7 @@
     "java": {
       "ValueType": "boolean",
       "EmptyValue": "false",
-      "ConsumerFunctionPackage": "edu.wpi.first.util.function",
+      "ConsumerFunctionPackage": "org.wpilib.util.function",
       "FunctionTypePrefix": "Boolean",
       "ToWrapObject": "Boolean.valueOf",
       "FromStorageBegin": "(Boolean) "
@@ -79,8 +79,8 @@
     "java": {
       "ValueType": "float",
       "EmptyValue": "0",
-      "ConsumerFunctionPackage": "edu.wpi.first.util.function",
-      "SupplierFunctionPackage": "edu.wpi.first.util.function",
+      "ConsumerFunctionPackage": "org.wpilib.util.function",
+      "SupplierFunctionPackage": "org.wpilib.util.function",
       "FunctionTypePrefix": "Float",
       "ToWrapObject": "Float.valueOf",
       "FromStorageBegin": "((Number) ",

@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.geometry;
+package org.wpilib.math.geometry;
 
-import static edu.wpi.first.units.Units.Meters;
+import static org.wpilib.units.Units.Meters;
 
-import edu.wpi.first.math.Pair;
-import edu.wpi.first.math.geometry.proto.Ellipse2dProto;
-import edu.wpi.first.math.geometry.struct.Ellipse2dStruct;
-import edu.wpi.first.math.jni.Ellipse2dJNI;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.util.protobuf.ProtobufSerializable;
-import edu.wpi.first.util.struct.StructSerializable;
+import org.wpilib.math.util.Pair;
+import org.wpilib.math.geometry.proto.Ellipse2dProto;
+import org.wpilib.math.geometry.struct.Ellipse2dStruct;
+import org.wpilib.math.jni.Ellipse2dJNI;
+import org.wpilib.units.measure.Distance;
+import org.wpilib.util.protobuf.ProtobufSerializable;
+import org.wpilib.util.struct.StructSerializable;
 import java.util.Objects;
 
 /** Represents a 2d ellipse space containing translational, rotational, and scaling components. */

@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.encoder;
+package org.wpilib.examples.encoder;
 
-import edu.wpi.first.wpilibj.CounterBase;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.wpilib.hardware.discrete.CounterBase;
+import org.wpilib.hardware.rotation.Encoder;
+import org.wpilib.opmode.TimedRobot;
+import org.wpilib.smartdashboard.SmartDashboard;
 
 /**
  * Sample program displaying the value of a quadrature encoder on the SmartDashboard. Quadrature

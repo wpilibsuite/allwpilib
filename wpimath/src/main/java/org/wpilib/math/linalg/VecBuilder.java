@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math;
+package org.wpilib.math.linalg;
 
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N10;
-import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.numbers.N4;
-import edu.wpi.first.math.numbers.N5;
-import edu.wpi.first.math.numbers.N6;
-import edu.wpi.first.math.numbers.N7;
-import edu.wpi.first.math.numbers.N8;
-import edu.wpi.first.math.numbers.N9;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.numbers.N10;
+import org.wpilib.math.numbers.N2;
+import org.wpilib.math.numbers.N3;
+import org.wpilib.math.numbers.N4;
+import org.wpilib.math.numbers.N5;
+import org.wpilib.math.numbers.N6;
+import org.wpilib.math.numbers.N7;
+import org.wpilib.math.numbers.N8;
+import org.wpilib.math.numbers.N9;
 import java.util.Objects;
 import org.ejml.simple.SimpleMatrix;
 

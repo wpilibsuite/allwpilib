@@ -6,7 +6,7 @@
 
 #include <wpi/jni_util.h>
 
-#include "edu_wpi_first_math_jni_ArmFeedforwardJNI.h"
+#include "org_wpilib_math_jni_ArmFeedforwardJNI.h"
 #include "frc/controller/ArmFeedforward.h"
 
 using namespace wpi::java;
@@ -14,12 +14,12 @@ using namespace wpi::java;
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_math_jni_ArmFeedforwardJNI
+ * Class:     org_wpilib_math_jni_ArmFeedforwardJNI
  * Method:    calculate
  * Signature: (DDDDDDDD)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_math_jni_ArmFeedforwardJNI_calculate
+Java_org_wpilib_math_jni_ArmFeedforwardJNI_calculate
   (JNIEnv* env, jclass, jdouble ks, jdouble kv, jdouble ka, jdouble kg,
    jdouble currentAngle, jdouble currentVelocity, jdouble nextVelocity,
    jdouble dt)

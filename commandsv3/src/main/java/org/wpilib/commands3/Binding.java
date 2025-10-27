@@ -4,7 +4,7 @@
 
 package org.wpilib.commands3;
 
-import edu.wpi.first.util.ErrorMessages;
+import org.wpilib.util.ErrorMessages;
 
 /**
  * A single trigger binding.

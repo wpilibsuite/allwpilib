@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.xrp;
+package org.wpilib.xrp;
 
-import edu.wpi.first.hal.SimDevice;
-import edu.wpi.first.hal.SimDevice.Direction;
-import edu.wpi.first.hal.SimDouble;
-import edu.wpi.first.math.geometry.Rotation2d;
+import org.wpilib.hardware.hal.SimDevice;
+import org.wpilib.hardware.hal.SimDevice.Direction;
+import org.wpilib.hardware.hal.SimDouble;
+import org.wpilib.math.geometry.Rotation2d;
 
 /**
  * Use a rate gyro to return the robots heading relative to a starting position.

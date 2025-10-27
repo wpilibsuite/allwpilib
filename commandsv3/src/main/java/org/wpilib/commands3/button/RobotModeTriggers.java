@@ -4,7 +4,7 @@
 
 package org.wpilib.commands3.button;
 
-import edu.wpi.first.wpilibj.DriverStation;
+import org.wpilib.driverstation.DriverStation;
 import org.wpilib.commands3.Trigger;
 
 /**

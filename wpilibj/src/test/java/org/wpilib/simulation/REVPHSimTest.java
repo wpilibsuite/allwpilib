@@ -2,21 +2,21 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.simulation;
+package org.wpilib.simulation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.CompressorConfigType;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.PneumaticHub;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.simulation.testutils.BooleanCallback;
-import edu.wpi.first.wpilibj.simulation.testutils.DoubleCallback;
-import edu.wpi.first.wpilibj.simulation.testutils.EnumCallback;
+import org.wpilib.hardware.hal.HAL;
+import org.wpilib.hardware.pneumatic.CompressorConfigType;
+import org.wpilib.hardware.pneumatic.DoubleSolenoid;
+import org.wpilib.hardware.pneumatic.PneumaticHub;
+import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
+import org.wpilib.simulation.testutils.BooleanCallback;
+import org.wpilib.simulation.testutils.DoubleCallback;
+import org.wpilib.simulation.testutils.EnumCallback;
 import org.junit.jupiter.api.Test;
 
 class REVPHSimTest {

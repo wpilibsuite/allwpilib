@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.epilogue.processor;
+package org.wpilib.epilogue.processor;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
@@ -11,8 +11,8 @@ import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.ReturnTree;
 import com.sun.source.util.SimpleTreeVisitor;
 import com.sun.source.util.Trees;
-import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.epilogue.NotLogged;
+import org.wpilib.epilogue.Logged;
+import org.wpilib.epilogue.NotLogged;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
@@ -104,7 +104,7 @@ public class LoggerGenerator {
 
   /**
    * Generates the logger class used to handle data objects of the given type. The generated logger
-   * class will subclass from {@link edu.wpi.first.epilogue.logging.ClassSpecificLogger} and
+   * class will subclass from {@link org.wpilib.epilogue.logging.ClassSpecificLogger} and
    * implement the {@code update()} method to populate a data log with information from an instance
    * of the data type.
    *
@@ -211,10 +211,10 @@ public class LoggerGenerator {
         out.println();
       }
 
-      out.println("import edu.wpi.first.epilogue.Logged;");
-      out.println("import edu.wpi.first.epilogue.Epilogue;");
-      out.println("import edu.wpi.first.epilogue.logging.ClassSpecificLogger;");
-      out.println("import edu.wpi.first.epilogue.logging.EpilogueBackend;");
+      out.println("import org.wpilib.epilogue.Logged;");
+      out.println("import org.wpilib.epilogue.Epilogue;");
+      out.println("import org.wpilib.epilogue.logging.ClassSpecificLogger;");
+      out.println("import org.wpilib.epilogue.logging.EpilogueBackend;");
       if (requiresVarHandles) {
         out.println("import java.lang.invoke.MethodHandles;");
         out.println("import java.lang.invoke.VarHandle;");

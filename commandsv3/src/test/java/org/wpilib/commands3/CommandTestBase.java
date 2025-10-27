@@ -4,7 +4,7 @@
 
 package org.wpilib.commands3;
 
-import edu.wpi.first.wpilibj.RobotController;
+import org.wpilib.system.RobotController;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;

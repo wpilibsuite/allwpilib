@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.estimator;
+package org.wpilib.math.estimator;
 
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
-import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
-import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.kinematics.MecanumDriveKinematics;
+import org.wpilib.math.kinematics.MecanumDriveOdometry;
+import org.wpilib.math.kinematics.MecanumDriveWheelPositions;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.numbers.N3;
 
 /**
  * This class wraps {@link MecanumDriveOdometry Mecanum Drive Odometry} to fuse latency-compensated

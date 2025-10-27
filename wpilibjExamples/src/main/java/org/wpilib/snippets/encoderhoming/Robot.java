@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.snippets.encoderhoming;
+package org.wpilib.snippets.encoderhoming;
 
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
+import org.wpilib.hardware.discrete.DigitalInput;
+import org.wpilib.hardware.rotation.Encoder;
+import org.wpilib.opmode.TimedRobot;
+import org.wpilib.hardware.motor.Spark;
 
 /**
  * Encoder mechanism homing snippets for frc-docs.

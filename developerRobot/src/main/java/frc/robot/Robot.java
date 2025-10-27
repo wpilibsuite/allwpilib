@@ -4,7 +4,7 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.TimedRobot;
+import org.wpilib.opmode.TimedRobot;
 
 public class Robot extends TimedRobot {
   /**

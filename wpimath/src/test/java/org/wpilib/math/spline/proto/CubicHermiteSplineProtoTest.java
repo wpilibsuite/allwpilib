@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.spline.proto;
+package org.wpilib.math.spline.proto;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
-import edu.wpi.first.math.proto.Spline.ProtobufCubicHermiteSpline;
-import edu.wpi.first.math.spline.CubicHermiteSpline;
-import edu.wpi.first.wpilibj.ProtoTestBase;
+import org.wpilib.math.proto.Spline.ProtobufCubicHermiteSpline;
+import org.wpilib.math.spline.CubicHermiteSpline;
+import org.wpilib.ProtoTestBase;
 
 @SuppressWarnings("PMD.TestClassWithoutTestCases")
 class CubicHermiteSplineProtoTest
