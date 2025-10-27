@@ -13,6 +13,7 @@
 #include "frc/DMASample.h"
 #include "frc/DigitalOutput.h"
 #include "frc/Timer.h"
+#include "frc/motorcontrol/Talon.h"
 
 using namespace frc;
 
