@@ -6,7 +6,7 @@
 
 #include "wpi/apriltag/AprilTagDetector.hpp"
 
-using namespace frc;
+using namespace wpi::apriltag;
 
 TEST(AprilTagDetectorTest, ConfigDefaults) {
   AprilTagDetector detector;

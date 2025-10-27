@@ -8,7 +8,7 @@
 
 #include <imgui.h>
 
-namespace glass {
+namespace wpi::glass {
 
 class BooleanSource;
 
@@ -113,4 +113,4 @@ extern template bool InputExpr(const char*, float*, const char*,
 extern template bool InputExpr(const char*, double*, const char*,
                                ImGuiInputTextFlags);
 
-}  // namespace glass
+}  // namespace wpi::glass

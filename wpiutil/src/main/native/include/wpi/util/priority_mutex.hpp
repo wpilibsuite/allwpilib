@@ -11,7 +11,7 @@
 
 #include <mutex>
 
-namespace wpi {
+namespace wpi::util {
 
 #if defined(__FRC_SYSTEMCORE__) && !defined(WPI_USE_PRIORITY_MUTEX)
 #define WPI_USE_PRIORITY_MUTEX
@@ -75,4 +75,4 @@ class priority_mutex {
 
 #endif  // defined(WPI_USE_PRIORITY_MUTEX) && defined(__linux__)
 
-}  // namespace wpi
+}  // namespace wpi::util

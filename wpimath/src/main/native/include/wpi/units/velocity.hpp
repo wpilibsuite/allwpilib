@@ -30,9 +30,9 @@
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::velocity
+ * @namespace wpi::units::velocity
  * @brief namespace for unit types and containers representing velocity values
  * @details The SI unit for velocity is `meters_per_second`, and the
  *          corresponding `base_unit` category is `velocity_unit`.
@@ -42,7 +42,7 @@ namespace units {
 #if !defined(DISABLE_PREDEFINED_UNITS) || \
     defined(ENABLE_PREDEFINED_VELOCITY_UNITS)
 UNIT_ADD(velocity, meters_per_second, meters_per_second, mps,
-         unit<std::ratio<1>, units::category::velocity_unit>)
+         unit<std::ratio<1>, wpi::units::category::velocity_unit>)
 UNIT_ADD(velocity, feet_per_second, feet_per_second, fps,
          compound_unit<length::feet, inverse<time::seconds>>)
 UNIT_ADD(velocity, miles_per_hour, miles_per_hour, mph,
@@ -56,4 +56,4 @@ UNIT_ADD_CATEGORY_TRAIT(velocity)
 #endif
 
 using namespace velocity;
-}  // namespace units
+}  // namespace wpi::units

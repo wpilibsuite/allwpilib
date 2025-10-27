@@ -13,7 +13,7 @@
 #include "wpi/math/kinematics/Odometry.hpp"
 #include "wpi/units/length.hpp"
 
-namespace frc {
+namespace wpi::math {
 /**
  * Class for differential drive odometry. Odometry allows you to track the
  * robot's position on the field over the course of a match using readings from
@@ -42,8 +42,8 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry
    * @param initialPose The starting position of the robot on the field.
    */
   explicit DifferentialDriveOdometry(const Rotation2d& gyroAngle,
-                                     units::meter_t leftDistance,
-                                     units::meter_t rightDistance,
+                                     wpi::units::meter_t leftDistance,
+                                     wpi::units::meter_t rightDistance,
                                      const Pose2d& initialPose = Pose2d{});
 
   /**
@@ -60,8 +60,8 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry
    * @param leftDistance The distance traveled by the left encoder.
    * @param rightDistance The distance traveled by the right encoder.
    */
-  void ResetPosition(const Rotation2d& gyroAngle, units::meter_t leftDistance,
-                     units::meter_t rightDistance, const Pose2d& pose) {
+  void ResetPosition(const Rotation2d& gyroAngle, wpi::units::meter_t leftDistance,
+                     wpi::units::meter_t rightDistance, const Pose2d& pose) {
     Odometry::ResetPosition(gyroAngle, {leftDistance, rightDistance}, pose);
   }
 
@@ -76,12 +76,12 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry
    * @param rightDistance The distance traveled by the right encoder.
    * @return The new pose of the robot.
    */
-  const Pose2d& Update(const Rotation2d& gyroAngle, units::meter_t leftDistance,
-                       units::meter_t rightDistance) {
+  const Pose2d& Update(const Rotation2d& gyroAngle, wpi::units::meter_t leftDistance,
+                       wpi::units::meter_t rightDistance) {
     return Odometry::Update(gyroAngle, {leftDistance, rightDistance});
   }
 
  private:
-  DifferentialDriveKinematics m_kinematicsImpl{units::meter_t{1}};
+  DifferentialDriveKinematics m_kinematicsImpl{wpi::units::meter_t{1}};
 };
-}  // namespace frc
+}  // namespace wpi::math

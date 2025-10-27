@@ -31,7 +31,7 @@
  * Be aware that the performance on this is much worse than a coprocessor
  * solution!
  */
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   Robot() {
     // We need to run our vision program in a separate thread. If not, our robot
@@ -49,7 +49,7 @@ class Robot : public frc::TimedRobot {
 
  private:
   static void VisionThread() {
-    frc::AprilTagDetector detector;
+    wpi::apriltag::AprilTagDetector detector;
     // look for tag36h11, correct 1 error bit
     // hamming 1 allocates 781KB, 2 allocates 27.4 MB, 3 allocates 932 MB
     // max of 1 recommended for RoboRIO 1, while hamming 2 is feasible on the
@@ -58,24 +58,24 @@ class Robot : public frc::TimedRobot {
 
     // Set up Pose Estimator - parameters are for a Microsoft Lifecam HD-3000
     // (https://www.chiefdelphi.com/t/wpilib-apriltagdetector-sample-code/421411/21)
-    frc::AprilTagPoseEstimator::Config poseEstConfig = {
+    wpi::apriltag::AprilTagPoseEstimator::Config poseEstConfig = {
         .tagSize = 6.5_in,
         .fx = 699.3778103158814,
         .fy = 677.7161226393544,
         .cx = 345.6059345433618,
         .cy = 207.12741326228522};
-    frc::AprilTagPoseEstimator estimator(poseEstConfig);
+    wpi::apriltag::AprilTagPoseEstimator estimator(poseEstConfig);
 
     // Get the USB camera from CameraServer
-    cs::UsbCamera camera = frc::CameraServer::StartAutomaticCapture();
+    wpi::cs::UsbCamera camera = wpi::CameraServer::StartAutomaticCapture();
     // Set the resolution
     camera.SetResolution(640, 480);
 
     // Get a CvSink. This will capture Mats from the Camera
-    cs::CvSink cvSink = frc::CameraServer::GetVideo();
+    wpi::cs::CvSink cvSink = wpi::CameraServer::GetVideo();
     // Setup a CvSource. This will send images back to the Dashboard
-    cs::CvSource outputStream =
-        frc::CameraServer::PutVideo("Detected", 640, 480);
+    wpi::cs::CvSource outputStream =
+        wpi::CameraServer::PutVideo("Detected", 640, 480);
 
     // Mats are very memory expensive. Lets reuse this Mat.
     cv::Mat mat;
@@ -88,7 +88,7 @@ class Robot : public frc::TimedRobot {
 
     // We'll output to NT
     auto tagsTable =
-        nt::NetworkTableInstance::GetDefault().GetTable("apriltags");
+        wpi::nt::NetworkTableInstance::GetDefault().GetTable("apriltags");
     auto pubTags = tagsTable->GetIntegerArrayTopic("tags").Publish();
 
     while (true) {
@@ -105,27 +105,27 @@ class Robot : public frc::TimedRobot {
       cv::cvtColor(mat, grayMat, cv::COLOR_BGR2GRAY);
 
       cv::Size g_size = grayMat.size();
-      frc::AprilTagDetector::Results detections =
+      wpi::apriltag::AprilTagDetector::Results detections =
           detector.Detect(g_size.width, g_size.height, grayMat.data);
 
       // have not seen any tags yet
       tags.clear();
 
-      for (const frc::AprilTagDetection* detection : detections) {
+      for (const wpi::apriltag::AprilTagDetection* detection : detections) {
         // remember we saw this tag
         tags.push_back(detection->GetId());
 
         // draw lines around the tag
         for (int i = 0; i <= 3; i++) {
           int j = (i + 1) % 4;
-          const frc::AprilTagDetection::Point pti = detection->GetCorner(i);
-          const frc::AprilTagDetection::Point ptj = detection->GetCorner(j);
+          const wpi::apriltag::AprilTagDetection::Point pti = detection->GetCorner(i);
+          const wpi::apriltag::AprilTagDetection::Point ptj = detection->GetCorner(j);
           line(mat, cv::Point(pti.x, pti.y), cv::Point(ptj.x, ptj.y),
                outlineColor, 2);
         }
 
         // mark the center of the tag
-        const frc::AprilTagDetection::Point c = detection->GetCenter();
+        const wpi::apriltag::AprilTagDetection::Point c = detection->GetCenter();
         int ll = 10;
         line(mat, cv::Point(c.x - ll, c.y), cv::Point(c.x + ll, c.y),
              crossColor, 2);
@@ -138,10 +138,10 @@ class Robot : public frc::TimedRobot {
                 crossColor, 3);
 
         // determine pose
-        frc::Transform3d pose = estimator.Estimate(*detection);
+        wpi::math::Transform3d pose = estimator.Estimate(*detection);
 
         // put pose into NT
-        frc::Rotation3d rotation = pose.Rotation();
+        wpi::math::Rotation3d rotation = pose.Rotation();
         tagsTable->GetEntry(fmt::format("pose_{}", detection->GetId()))
             .SetDoubleArray(
                 {{ pose.X().value(),
@@ -164,6 +164,6 @@ class Robot : public frc::TimedRobot {
 
 #ifndef RUNNING_FRC_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

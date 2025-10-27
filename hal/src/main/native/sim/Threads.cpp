@@ -4,9 +4,9 @@
 
 #include "wpi/hal/Threads.h"
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeThreads() {}
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 int32_t HAL_GetThreadPriority(NativeThreadHandle handle, HAL_Bool* isRealTime,
                               int32_t* status) {

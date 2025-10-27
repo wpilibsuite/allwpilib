@@ -6,7 +6,7 @@
 
 #include "wpi/glass/Model.hpp"
 
-namespace glass {
+namespace wpi::glass {
 class DataSource;
 class SubsystemModel : public Model {
  public:
@@ -15,4 +15,4 @@ class SubsystemModel : public Model {
   virtual const char* GetCurrentCommand() const = 0;
 };
 void DisplaySubsystem(SubsystemModel* m);
-}  // namespace glass
+}  // namespace wpi::glass

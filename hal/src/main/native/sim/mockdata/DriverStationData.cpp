@@ -6,16 +6,16 @@
 
 #include "DriverStationDataInternal.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeDriverStationData() {
   static DriverStationData dsd;
-  ::hal::SimDriverStationData = &dsd;
+  ::wpi::hal::SimDriverStationData = &dsd;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-DriverStationData* hal::SimDriverStationData;
+DriverStationData* wpi::hal::SimDriverStationData;
 
 DriverStationData::DriverStationData() {
   ResetData();
@@ -215,12 +215,12 @@ void DriverStationData::CallNewDataCallbacks() {
   m_newDataCallbacks(&empty);
 }
 
-namespace hal {
+namespace wpi::hal {
 void NewDriverStationData();
-}  // namespace hal
+}  // namespace wpi::hal
 
 void DriverStationData::NotifyNewData() {
-  hal::NewDriverStationData();
+  wpi::hal::NewDriverStationData();
 }
 
 void DriverStationData::SetJoystickButton(int32_t stick, int32_t button,
@@ -528,15 +528,15 @@ void HALSIM_SetJoystickType(int32_t stick, int32_t type) {
 }
 
 void HALSIM_SetJoystickName(int32_t stick, const WPI_String* name) {
-  SimDriverStationData->SetJoystickName(stick, wpi::to_string_view(name));
+  SimDriverStationData->SetJoystickName(stick, wpi::util::to_string_view(name));
 }
 
 void HALSIM_SetGameSpecificMessage(const WPI_String* message) {
-  SimDriverStationData->SetGameSpecificMessage(wpi::to_string_view(message));
+  SimDriverStationData->SetGameSpecificMessage(wpi::util::to_string_view(message));
 }
 
 void HALSIM_SetEventName(const WPI_String* name) {
-  SimDriverStationData->SetEventName(wpi::to_string_view(name));
+  SimDriverStationData->SetEventName(wpi::util::to_string_view(name));
 }
 
 void HALSIM_SetMatchType(HAL_MatchType type) {

@@ -7,7 +7,7 @@
 
 #include <string>
 
-namespace wpi {
+namespace wpi::net {
 
 int SocketErrno();
 
@@ -17,6 +17,6 @@ inline std::string SocketStrerror() {
   return SocketStrerror(SocketErrno());
 }
 
-}  // namespace wpi
+}  // namespace wpi::net
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_SOCKETERROR_HPP_

@@ -11,7 +11,7 @@
 #include "wpi/commands2/Command.hpp"
 #include "wpi/commands2/CommandPtr.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 
 /**
  * CRTP implementation to allow polymorphic decorator functions in Command.
@@ -33,4 +33,4 @@ class CommandHelper : public Base {
         std::make_unique<CRTP>(std::move(*static_cast<CRTP*>(this))));
   }
 };
-}  // namespace frc2
+}  // namespace wpi::cmd

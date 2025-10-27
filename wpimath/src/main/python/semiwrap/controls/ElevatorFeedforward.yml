@@ -2,23 +2,23 @@ defaults:
   subpackage: controller
 
 classes:
-  frc::ElevatorFeedforward:
+  wpi::math::ElevatorFeedforward:
     force_type_casters:
-    - units::meters_per_second
+    - wpi::units::meters_per_second
     - meters_per_second_squared
     methods:
       ElevatorFeedforward:
         overloads:
           '':
-          units::volt_t, units::volt_t, units::unit_t<kv_unit>, units::unit_t<ka_unit>:
+          wpi::units::volt_t, wpi::units::volt_t, wpi::units::unit_t<kv_unit>, wpi::units::unit_t<ka_unit>:
       Calculate:
         overloads:
-          units::unit_t<Velocity>, units::unit_t<Acceleration> [const]:
+          wpi::units::unit_t<Velocity>, wpi::units::unit_t<Acceleration> [const]:
             ignore: true
-          units::unit_t<Velocity>, units::unit_t<Velocity>, units::second_t [const]:
+          wpi::units::unit_t<Velocity>, wpi::units::unit_t<Velocity>, wpi::units::second_t [const]:
             ignore: true
-          units::unit_t<Velocity> [const]:
-          units::unit_t<Velocity>, units::unit_t<Velocity> [const]:
+          wpi::units::unit_t<Velocity> [const]:
+          wpi::units::unit_t<Velocity>, wpi::units::unit_t<Velocity> [const]:
       MaxAchievableVelocity:
       MinAchievableVelocity:
       MaxAchievableAcceleration:
@@ -36,4 +36,4 @@ extra_includes:
 - wpystruct.h
 
 inline_code: |
-  SetupWPyStruct<frc::ElevatorFeedforward>(cls_ElevatorFeedforward);
+  SetupWPyStruct<wpi::math::ElevatorFeedforward>(cls_ElevatorFeedforward);

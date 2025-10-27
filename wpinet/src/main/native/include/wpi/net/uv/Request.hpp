@@ -13,7 +13,7 @@
 
 #include "wpi/net/uv/Error.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 /**
  * Request.  Requests are not moveable or copyable.
@@ -166,6 +166,6 @@ class RequestImpl : public Request {
   U m_uv_req;
 };
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_REQUEST_HPP_

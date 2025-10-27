@@ -4,7 +4,7 @@
 
 #include "PropertyImpl.hpp"
 
-using namespace cs;
+using namespace wpi::cs;
 
 PropertyImpl::PropertyImpl(std::string_view name_) : name{name_} {}
 PropertyImpl::PropertyImpl(std::string_view name_, CS_PropertyKind kind_,

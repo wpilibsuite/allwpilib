@@ -26,17 +26,17 @@ using ::testing::Field;
 using ::testing::Pointee;
 using ::testing::Return;
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 inline bool operator==(const Buffer& lhs, const Buffer& rhs) {
   return lhs.len == rhs.len &&
          std::equal(lhs.base, lhs.base + lhs.len, rhs.base);
 }
 inline void PrintTo(const Buffer& buf, ::std::ostream* os) {
-  ::wpi::PrintTo(buf.bytes(), os);
+  ::wpi::util::PrintTo(buf.bytes(), os);
 }
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv
 
-namespace wpi {
+namespace wpi::net {
 inline bool operator==(const WebSocket::Frame& lhs,
                        const WebSocket::Frame& rhs) {
   return lhs.opcode == rhs.opcode &&
@@ -44,11 +44,11 @@ inline bool operator==(const WebSocket::Frame& lhs,
 }
 inline void PrintTo(const WebSocket::Frame& frame, ::std::ostream* os) {
   *os << frame.opcode << ": ";
-  ::wpi::PrintTo(frame.data, os);
+  ::wpi::util::PrintTo(frame.data, os);
 }
-}  // namespace wpi
+}  // namespace wpi::net
 
-namespace wpi::detail {
+namespace wpi::net::detail {
 
 class MockWebSocketWriteReq
     : public std::enable_shared_from_this<MockWebSocketWriteReq>,
@@ -72,7 +72,7 @@ class MockStream {
               (std::span<const uv::Buffer> bufs,
                const std::shared_ptr<MockWebSocketWriteReq>& req));
 
-  Logger* GetLogger() const { return nullptr; }
+  wpi::util::Logger* GetLogger() const { return nullptr; }
 };
 
 class WebSocketWriteReqTest : public ::testing::Test {
@@ -103,7 +103,7 @@ TEST_F(WebSocketWriteReqTest, ContinueDone) {
 }
 
 TEST_F(WebSocketWriteReqTest, ContinueTryWriteComplete) {
-  EXPECT_CALL(stream, TryWrite(wpi::SpanEq(req->m_frames.m_bufs)))
+  EXPECT_CALL(stream, TryWrite(wpi::util::SpanEq(req->m_frames.m_bufs)))
       .WillOnce(Return(9));
   ASSERT_EQ(req->Continue(stream, req), 0);
 }
@@ -114,7 +114,7 @@ TEST_F(WebSocketWriteReqTest, ContinueTryWriteNoProgress) {
   // Write should get called for all of next frame - make forward progress
   uv::Buffer remBufs[2] = {uv::Buffer{m_buf0}, uv::Buffer{m_buf1}};
   EXPECT_CALL(stream,
-              DoWrite(wpi::SpanEq(std::span<const uv::Buffer>(remBufs)), _));
+              DoWrite(wpi::util::SpanEq(std::span<const uv::Buffer>(remBufs)), _));
   ASSERT_EQ(req->Continue(stream, req), 1);
 }
 
@@ -130,7 +130,7 @@ TEST_F(WebSocketWriteReqTest, ContinueTryWritePartialMidFrameMidBuf1) {
   // Write should get called for remainder of buf 0 and all of buf 1
   uv::Buffer remBufs[2] = {uv::Buffer{&m_buf0[2], 1}, uv::Buffer{m_buf1}};
   EXPECT_CALL(stream,
-              DoWrite(wpi::SpanEq(std::span<const uv::Buffer>(remBufs)), _));
+              DoWrite(wpi::util::SpanEq(std::span<const uv::Buffer>(remBufs)), _));
   ASSERT_EQ(req->Continue(stream, req), 1);
 }
 
@@ -140,7 +140,7 @@ TEST_F(WebSocketWriteReqTest, ContinueTryWritePartialMidFrameBufBoundary) {
   // Write should get called for all of buf 1
   uv::Buffer remBufs[1] = {uv::Buffer{m_buf1}};
   EXPECT_CALL(stream,
-              DoWrite(wpi::SpanEq(std::span<const uv::Buffer>(remBufs)), _));
+              DoWrite(wpi::util::SpanEq(std::span<const uv::Buffer>(remBufs)), _));
   ASSERT_EQ(req->Continue(stream, req), 1);
 }
 
@@ -150,7 +150,7 @@ TEST_F(WebSocketWriteReqTest, ContinueTryWritePartialMidFrameMidBuf2) {
   // Write should get called for remainder of buf 1
   uv::Buffer remBufs[1] = {uv::Buffer{&m_buf1[1], 1}};
   EXPECT_CALL(stream,
-              DoWrite(wpi::SpanEq(std::span<const uv::Buffer>(remBufs)), _));
+              DoWrite(wpi::util::SpanEq(std::span<const uv::Buffer>(remBufs)), _));
   ASSERT_EQ(req->Continue(stream, req), 1);
 }
 
@@ -160,7 +160,7 @@ TEST_F(WebSocketWriteReqTest, ContinueTryWritePartialFrameBoundary) {
   // Write should get called for all of next frame
   uv::Buffer remBufs[1] = {uv::Buffer{m_buf2}};
   EXPECT_CALL(stream,
-              DoWrite(wpi::SpanEq(std::span<const uv::Buffer>(remBufs)), _));
+              DoWrite(wpi::util::SpanEq(std::span<const uv::Buffer>(remBufs)), _));
   ASSERT_EQ(req->Continue(stream, req), 1);
 }
 
@@ -170,7 +170,7 @@ TEST_F(WebSocketWriteReqTest, ContinueTryWritePartialMidFrameMidBuf3) {
   // Write should get called for remainder of buf 2
   uv::Buffer remBufs[1] = {uv::Buffer{&m_buf2[1], 3}};
   EXPECT_CALL(stream,
-              DoWrite(wpi::SpanEq(std::span<const uv::Buffer>(remBufs)), _));
+              DoWrite(wpi::util::SpanEq(std::span<const uv::Buffer>(remBufs)), _));
   ASSERT_EQ(req->Continue(stream, req), 1);
 }
 
@@ -243,10 +243,10 @@ void WebSocketTrySendTest::CheckTrySendFrames(
           [&](auto bufs, auto err) {
             ++callbackCalled;
             ASSERT_THAT(bufs,
-                        SpanEq(std::span<const uv::Buffer>(expectCbBufs)));
+                        wpi::util::SpanEq(std::span<const uv::Buffer>(expectCbBufs)));
             ASSERT_EQ(err.code(), expectErr);
           }),
-      SpanEq(expectRet));
+      wpi::util::SpanEq(expectRet));
 }
 
 TEST_F(WebSocketTrySendTest, ServerComplete) {
@@ -288,13 +288,13 @@ TEST_F(WebSocketTrySendTest, ServerPartialMidFrameMidBuf0) {
                                     m_bufs[1]};
   std::array<uv::Buffer, 2> contBufs{m_frameHeaders[1], m_bufs[2]};
   std::array<int, 1> contFrameOffs{static_cast<int>(m_serialized[1].size())};
-  EXPECT_CALL(stream, DoWrite(wpi::SpanEq(remBufs), _));
+  EXPECT_CALL(stream, DoWrite(wpi::util::SpanEq(remBufs), _));
   CheckTrySendFrames({}, std::span{m_frames}.subspan(2));
   ASSERT_EQ(makeReqCalled, 1);
-  ASSERT_THAT(req->m_frames.m_bufs, SpanEq(contBufs));
+  ASSERT_THAT(req->m_frames.m_bufs, wpi::util::SpanEq(contBufs));
   ASSERT_EQ(req->m_continueBufPos, 0u);
   ASSERT_EQ(req->m_continueFramePos, 0u);
-  ASSERT_THAT(req->m_continueFrameOffs, SpanEq(contFrameOffs));
+  ASSERT_THAT(req->m_continueFrameOffs, wpi::util::SpanEq(contFrameOffs));
   ASSERT_EQ(callbackCalled, 0);
 }
 
@@ -306,10 +306,10 @@ TEST_F(WebSocketTrySendTest, ServerPartialMidFrameBufBoundary) {
   // return will be frame 2 only
   std::array<uv::Buffer, 1> remBufs{m_bufs[1]};
   std::array<uv::Buffer, 2> contBufs{m_frameHeaders[1], m_bufs[2]};
-  EXPECT_CALL(stream, DoWrite(wpi::SpanEq(remBufs), _));
+  EXPECT_CALL(stream, DoWrite(wpi::util::SpanEq(remBufs), _));
   CheckTrySendFrames({}, std::span{m_frames}.subspan(2));
   ASSERT_EQ(makeReqCalled, 1);
-  ASSERT_THAT(req->m_frames.m_bufs, SpanEq(contBufs));
+  ASSERT_THAT(req->m_frames.m_bufs, wpi::util::SpanEq(contBufs));
   ASSERT_EQ(callbackCalled, 0);
 }
 
@@ -321,10 +321,10 @@ TEST_F(WebSocketTrySendTest, ServerPartialMidFrameMidBuf1) {
   // return will be frame 2 only
   std::array<uv::Buffer, 1> remBufs{std::span{m_buf1data}.subspan(1)};
   std::array<uv::Buffer, 2> contBufs{m_frameHeaders[1], m_bufs[2]};
-  EXPECT_CALL(stream, DoWrite(wpi::SpanEq(remBufs), _));
+  EXPECT_CALL(stream, DoWrite(wpi::util::SpanEq(remBufs), _));
   CheckTrySendFrames({}, std::span{m_frames}.subspan(2));
   ASSERT_EQ(makeReqCalled, 1);
-  ASSERT_THAT(req->m_frames.m_bufs, SpanEq(contBufs));
+  ASSERT_THAT(req->m_frames.m_bufs, wpi::util::SpanEq(contBufs));
   ASSERT_EQ(callbackCalled, 0);
 }
 
@@ -336,7 +336,7 @@ TEST_F(WebSocketTrySendTest, ServerPartialFrameBoundary) {
   // no continuation
   // return will be frame 2 only
   std::array<uv::Buffer, 1> remBufs{m_bufs[2]};
-  EXPECT_CALL(stream, DoWrite(wpi::SpanEq(remBufs), _));
+  EXPECT_CALL(stream, DoWrite(wpi::util::SpanEq(remBufs), _));
   CheckTrySendFrames({}, std::span{m_frames}.subspan(2));
   ASSERT_EQ(makeReqCalled, 1);
   ASSERT_TRUE(req->m_frames.m_bufs.empty());
@@ -350,7 +350,7 @@ TEST_F(WebSocketTrySendTest, ServerPartialMidFrameMidBuf2) {
   // Write should get called for remainder of buf 2; no continuation
   // return will be frame 2 only
   std::array<uv::Buffer, 1> remBufs{std::span{m_buf2data}.subspan(1)};
-  EXPECT_CALL(stream, DoWrite(wpi::SpanEq(remBufs), _));
+  EXPECT_CALL(stream, DoWrite(wpi::util::SpanEq(remBufs), _));
   CheckTrySendFrames({}, std::span{m_frames}.subspan(2));
   ASSERT_EQ(makeReqCalled, 1);
   ASSERT_TRUE(req->m_frames.m_bufs.empty());
@@ -375,7 +375,7 @@ TEST_F(WebSocketTrySendTest, ServerPartialLastFrame) {
                        m_frameHeaders[2].len + 10));
   // Write called for remainder of buf 3; no continuation
   std::array<uv::Buffer, 1> remBufs{std::span{m_buf3data}.subspan(1)};
-  EXPECT_CALL(stream, DoWrite(wpi::SpanEq(remBufs), _));
+  EXPECT_CALL(stream, DoWrite(wpi::util::SpanEq(remBufs), _));
   CheckTrySendFrames({}, {});
   ASSERT_EQ(makeReqCalled, 1);
   ASSERT_TRUE(req->m_frames.m_bufs.empty());
@@ -400,7 +400,7 @@ TEST_F(WebSocketTrySendTest, Big) {
   for (size_t i = 6; i < bufs.size(); ++i) {
     remBufs.emplace_back(bufs[i]);
   }
-  EXPECT_CALL(stream, DoWrite(wpi::SpanEq(remBufs), _));
+  EXPECT_CALL(stream, DoWrite(wpi::util::SpanEq(remBufs), _));
 
   ASSERT_TRUE(
       TrySendFrames(
@@ -420,4 +420,4 @@ TEST_F(WebSocketTrySendTest, Big) {
   ASSERT_EQ(callbackCalled, 0);
 }
 
-}  // namespace wpi::detail
+}  // namespace wpi::net::detail

@@ -10,7 +10,7 @@
 #include "wpi/simulation/CallbackStore.hpp"
 #include "wpi/simulation/PneumaticsBaseSim.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 
 /**
  * Class to control a simulated Pneumatic Control Module (PCM).
@@ -140,4 +140,4 @@ class CTREPCMSim : public PneumaticsBaseSim {
 
   void ResetData() override;
 };
-}  // namespace frc::sim
+}  // namespace wpi::sim

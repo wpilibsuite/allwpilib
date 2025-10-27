@@ -1,5 +1,5 @@
 classes:
-  frc::internal::DriverStationModeThread:
+  wpi::internal::DriverStationModeThread:
     rename: _DriverStationModeThread
     methods:
       DriverStationModeThread:

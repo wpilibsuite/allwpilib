@@ -14,10 +14,10 @@
 #include "wpi/units/math.hpp"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
-  EXPECT_LE(units::math::abs(val1 - val2), eps)
+  EXPECT_LE(wpi::units::math::abs(val1 - val2), eps)
 
-static constexpr units::meter_t kTolerance{1 / 12.0};
-static constexpr units::radian_t kAngularTolerance{2.0 * std::numbers::pi /
+static constexpr wpi::units::meter_t kTolerance{1 / 12.0};
+static constexpr wpi::units::radian_t kAngularTolerance{2.0 * std::numbers::pi /
                                                    180.0};
 
 /**
@@ -45,14 +45,14 @@ static constexpr auto kLinearV = 3.02_V / 1_mps;
 static constexpr auto kLinearA = 0.642_V / 1_mps_sq;
 static constexpr auto kAngularV = 1.382_V / 1_mps;
 static constexpr auto kAngularA = 0.08495_V / 1_mps_sq;
-static auto plant = frc::LinearSystemId::IdentifyDrivetrainSystem(
+static auto plant = wpi::math::LinearSystemId::IdentifyDrivetrainSystem(
     kLinearV, kLinearA, kAngularV, kAngularA);
 static constexpr auto kTrackwidth = 0.9_m;
 
-frc::Vectord<5> Dynamics(const frc::Vectord<5>& x, const frc::Vectord<2>& u) {
+wpi::math::Vectord<5> Dynamics(const wpi::math::Vectord<5>& x, const wpi::math::Vectord<2>& u) {
   double v = (x(State::kLeftVelocity) + x(State::kRightVelocity)) / 2.0;
 
-  frc::Vectord<5> xdot;
+  wpi::math::Vectord<5> xdot;
   xdot(0) = v * std::cos(x(State::kHeading));
   xdot(1) = v * std::sin(x(State::kHeading));
   xdot(2) = ((x(State::kRightVelocity) - x(State::kLeftVelocity)) / kTrackwidth)
@@ -62,18 +62,18 @@ frc::Vectord<5> Dynamics(const frc::Vectord<5>& x, const frc::Vectord<2>& u) {
 }
 
 TEST(LTVDifferentialDriveControllerTest, ReachesReference) {
-  constexpr units::second_t kDt = 20_ms;
+  constexpr wpi::units::second_t kDt = 20_ms;
 
-  frc::LTVDifferentialDriveController controller{
+  wpi::math::LTVDifferentialDriveController controller{
       plant, kTrackwidth, {0.0625, 0.125, 2.5, 0.95, 0.95}, {12.0, 12.0}, kDt};
-  frc::Pose2d robotPose{2.7_m, 23_m, 0_deg};
+  wpi::math::Pose2d robotPose{2.7_m, 23_m, 0_deg};
 
-  auto waypoints = std::vector{frc::Pose2d{2.75_m, 22.521_m, 0_rad},
-                               frc::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
-  auto trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
+  auto waypoints = std::vector{wpi::math::Pose2d{2.75_m, 22.521_m, 0_rad},
+                               wpi::math::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
+  auto trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
       waypoints, {8.8_mps, 0.1_mps_sq});
 
-  frc::Vectord<5> x = frc::Vectord<5>::Zero();
+  wpi::math::Vectord<5> x = wpi::math::Vectord<5>::Zero();
   x(State::kX) = robotPose.X().value();
   x(State::kY) = robotPose.Y().value();
   x(State::kHeading) = robotPose.Rotation().Radians().value();
@@ -82,21 +82,21 @@ TEST(LTVDifferentialDriveControllerTest, ReachesReference) {
   for (size_t i = 0; i < (totalTime / kDt).value(); ++i) {
     auto state = trajectory.Sample(kDt * i);
     robotPose =
-        frc::Pose2d{units::meter_t{x(State::kX)}, units::meter_t{x(State::kY)},
-                    units::radian_t{x(State::kHeading)}};
+        wpi::math::Pose2d{wpi::units::meter_t{x(State::kX)}, wpi::units::meter_t{x(State::kY)},
+                    wpi::units::radian_t{x(State::kHeading)}};
     auto [leftVoltage, rightVoltage] = controller.Calculate(
-        robotPose, units::meters_per_second_t{x(State::kLeftVelocity)},
-        units::meters_per_second_t{x(State::kRightVelocity)}, state);
+        robotPose, wpi::units::meters_per_second_t{x(State::kLeftVelocity)},
+        wpi::units::meters_per_second_t{x(State::kRightVelocity)}, state);
 
-    x = frc::RKDP(&Dynamics, x,
-                  frc::Vectord<2>{leftVoltage.value(), rightVoltage.value()},
+    x = wpi::math::RKDP(&Dynamics, x,
+                  wpi::math::Vectord<2>{leftVoltage.value(), rightVoltage.value()},
                   kDt);
   }
 
   auto& endPose = trajectory.States().back().pose;
   EXPECT_NEAR_UNITS(endPose.X(), robotPose.X(), kTolerance);
   EXPECT_NEAR_UNITS(endPose.Y(), robotPose.Y(), kTolerance);
-  EXPECT_NEAR_UNITS(frc::AngleModulus(endPose.Rotation().Radians() -
+  EXPECT_NEAR_UNITS(wpi::math::AngleModulus(endPose.Rotation().Radians() -
                                       robotPose.Rotation().Radians()),
                     0_rad, kAngularTolerance);
 }

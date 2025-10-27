@@ -8,7 +8,7 @@
 
 #include "wpi/net/uv/Loop.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 std::shared_ptr<Signal> Signal::Create(Loop& loop) {
   if (loop.IsClosing()) {
@@ -37,4 +37,4 @@ void Signal::Start(int signum) {
       signum);
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

@@ -11,7 +11,7 @@
 #include "org_wpilib_networktables_NetworkTablesJNI.h"
 #include "wpi/nt/ntcore.h"
 
-using namespace wpi::java;
+using namespace wpi::util::java;
 
 //
 // Globals and load/unload
@@ -45,7 +45,7 @@ static const JExceptionInit exceptions[] = {
     {"java/lang/NullPointerException", &nullPointerEx},
 };
 
-namespace nt {
+namespace wpi::nt {
 
 bool JNI_LoadTypes(JNIEnv* env) {
   // Cache references to classes
@@ -76,7 +76,7 @@ void JNI_UnloadTypes(JNIEnv* env) {
   }
 }
 
-}  // namespace nt
+}  // namespace wpi::nt
 
 static std::vector<int> FromJavaBooleanArray(JNIEnv* env, jbooleanArray jarr) {
   CriticalJSpan<const jboolean> ref{env, jarr};
@@ -109,7 +109,7 @@ static std::vector<std::string> FromJavaStringArray(JNIEnv* env, jobjectArray ja
 }
 
 {% for t in types %}
-static jobject MakeJObject(JNIEnv* env, nt::Timestamped{{ t.TypeName }} value) {
+static jobject MakeJObject(JNIEnv* env, wpi::nt::Timestamped{{ t.TypeName }} value) {
   static jmethodID constructor = env->GetMethodID(
       timestamped{{ t.TypeName }}Cls, "<init>", "(JJ{{ t.jni.jtypestr }})V");
 {%- if t.jni.JavaObject %}
@@ -127,7 +127,7 @@ static jobject MakeJObject(JNIEnv* env, nt::Timestamped{{ t.TypeName }} value) {
 {% endfor %}
 {%- for t in types %}
 static jobjectArray MakeJObject(JNIEnv* env,
-                                std::span<const nt::Timestamped{{ t.TypeName }}> arr) {
+                                std::span<const wpi::nt::Timestamped{{ t.TypeName }}> arr) {
   jobjectArray jarr =
       env->NewObjectArray(arr.size(), timestamped{{ t.TypeName }}Cls, nullptr);
   if (!jarr) {
@@ -168,7 +168,7 @@ JNIEXPORT jobject JNICALL
 Java_org_wpilib_networktables_NetworkTablesJNI_getAtomic{{ t.TypeName }}
   (JNIEnv* env, jclass, jint subentry, {{ t.jni.jtype }} defaultValue)
 {
-  return MakeJObject(env, nt::GetAtomic{{ t.TypeName }}(subentry, {{ t.jni.FromJavaBegin }}defaultValue{{ t.jni.FromJavaEnd }}));
+  return MakeJObject(env, wpi::nt::GetAtomic{{ t.TypeName }}(subentry, {{ t.jni.FromJavaBegin }}defaultValue{{ t.jni.FromJavaEnd }}));
 }
 
 /*
@@ -180,7 +180,7 @@ JNIEXPORT jobjectArray JNICALL
 Java_org_wpilib_networktables_NetworkTablesJNI_readQueue{{ t.TypeName }}
   (JNIEnv* env, jclass, jint subentry)
 {
-  return MakeJObject(env, nt::ReadQueue{{ t.TypeName }}(subentry));
+  return MakeJObject(env, wpi::nt::ReadQueue{{ t.TypeName }}(subentry));
 }
 
 /*
@@ -192,7 +192,7 @@ JNIEXPORT {% if t.jni.JavaObject %}jobject{% else %}{{ t.jni.jtype }}{% endif %}
 Java_org_wpilib_networktables_NetworkTablesJNI_readQueueValues{{ t.TypeName }}
   (JNIEnv* env, jclass, jint subentry)
 {
-  return {{ t.jni.ToJavaArray }}(env, nt::ReadQueueValues{{ t.TypeName }}(subentry));
+  return {{ t.jni.ToJavaArray }}(env, wpi::nt::ReadQueueValues{{ t.TypeName }}(subentry));
 }
 {% if t.TypeName == "Raw" %}
 /*
@@ -221,7 +221,7 @@ Java_org_wpilib_networktables_NetworkTablesJNI_setRaw
     indexOobEx.Throw(env, "start + len must be smaller than array length");
     return false;
   }
-  return nt::SetRaw(entry, cvalue.uarray().subspan(start, len), time);
+  return wpi::nt::SetRaw(entry, cvalue.uarray().subspan(start, len), time);
 }
 
 /*
@@ -250,7 +250,7 @@ Java_org_wpilib_networktables_NetworkTablesJNI_setRawBuffer
     illegalArgEx.Throw(env, "value must be a native ByteBuffer");
     return false;
   }
-  return nt::SetRaw(entry, cvalue.uarray().subspan(start, len), time);
+  return wpi::nt::SetRaw(entry, cvalue.uarray().subspan(start, len), time);
 }
 {% else %}
 /*
@@ -268,7 +268,7 @@ Java_org_wpilib_networktables_NetworkTablesJNI_set{{ t.TypeName }}
     return false;
   }
 {%- endif %}
-  return nt::Set{{ t.TypeName }}(entry, {{ t.jni.FromJavaBegin }}value{{ t.jni.FromJavaEnd }}, time);
+  return wpi::nt::Set{{ t.TypeName }}(entry, {{ t.jni.FromJavaBegin }}value{{ t.jni.FromJavaEnd }}, time);
 }
 {% endif %}
 /*
@@ -281,13 +281,13 @@ Java_org_wpilib_networktables_NetworkTablesJNI_get{{ t.TypeName }}
   (JNIEnv*{% if t.jni.JavaObject %} env{% endif %}, jclass, jint entry, {{ t.jni.jtype }} defaultValue)
 {
 {%- if t.jni.JavaObject %}
-  auto val = nt::GetEntryValue(entry);
+  auto val = wpi::nt::GetEntryValue(entry);
   if (!val || !val.Is{{ t.TypeName }}()) {
     return defaultValue;
   }
   return {{ t.jni.ToJavaBegin }}val.Get{{ t.TypeName }}(){{ t.jni.ToJavaEnd }};
 {%- else %}
-  return nt::Get{{ t.TypeName }}(entry, defaultValue);
+  return wpi::nt::Get{{ t.TypeName }}(entry, defaultValue);
 {%- endif %}
 }
 {% if t.TypeName == "Raw" %}
@@ -317,7 +317,7 @@ Java_org_wpilib_networktables_NetworkTablesJNI_setDefaultRaw
     indexOobEx.Throw(env, "start + len must be smaller than array length");
     return false;
   }
-  return nt::SetDefaultRaw(entry, cvalue.uarray().subspan(start, len));
+  return wpi::nt::SetDefaultRaw(entry, cvalue.uarray().subspan(start, len));
 }
 
 /*
@@ -346,7 +346,7 @@ Java_org_wpilib_networktables_NetworkTablesJNI_setDefaultRawBuffer
     illegalArgEx.Throw(env, "value must be a native ByteBuffer");
     return false;
   }
-  return nt::SetDefaultRaw(entry, cvalue.uarray().subspan(start, len));
+  return wpi::nt::SetDefaultRaw(entry, cvalue.uarray().subspan(start, len));
 }
 {% else %}
 /*
@@ -364,7 +364,7 @@ Java_org_wpilib_networktables_NetworkTablesJNI_setDefault{{ t.TypeName }}
     return false;
   }
 {%- endif %}
-  return nt::SetDefault{{ t.TypeName }}(entry, {{ t.jni.FromJavaBegin }}defaultValue{{ t.jni.FromJavaEnd }});
+  return wpi::nt::SetDefault{{ t.TypeName }}(entry, {{ t.jni.FromJavaBegin }}defaultValue{{ t.jni.FromJavaEnd }});
 }
 {% endif %}
 {% endfor %}

@@ -6,7 +6,7 @@ functions:
   LoadAprilTagLayoutField:
     ignore: true
 classes:
-  frc::AprilTagFieldLayout:
+  wpi::apriltag::AprilTagFieldLayout:
     enums:
       OriginPosition:
     methods:
@@ -14,7 +14,7 @@ classes:
         overloads:
           '':
           std::string_view:
-          std::vector<AprilTag>, units::meter_t, units::meter_t:
+          std::vector<AprilTag>, wpi::units::meter_t, wpi::units::meter_t:
       LoadField:
       GetFieldLength:
       GetFieldWidth:
@@ -22,7 +22,7 @@ classes:
       SetOrigin:
         overloads:
           OriginPosition:
-          const Pose3d&:
+          const wpi::math::Pose3d&:
       GetOrigin:
       GetTagPose:
       Serialize:

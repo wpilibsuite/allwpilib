@@ -11,8 +11,8 @@
 
 #include "wpi/hardware/discrete/DigitalOutput.hpp"
 
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 DigitalPWMSim::DigitalPWMSim(const DigitalOutput& digitalOutput)
     : m_index{digitalOutput.GetChannel()} {}

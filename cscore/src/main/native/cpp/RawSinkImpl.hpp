@@ -18,14 +18,14 @@
 #include "SinkImpl.hpp"
 #include "wpi/cs/cscore_raw.h"
 
-namespace cs {
+namespace wpi::cs {
 class SourceImpl;
 
 class RawSinkImpl : public SinkImpl {
  public:
-  RawSinkImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
+  RawSinkImpl(std::string_view name, wpi::util::Logger& logger, Notifier& notifier,
               Telemetry& telemetry);
-  RawSinkImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
+  RawSinkImpl(std::string_view name, wpi::util::Logger& logger, Notifier& notifier,
               Telemetry& telemetry,
               std::function<void(uint64_t time)> processFrame);
   ~RawSinkImpl() override;
@@ -49,6 +49,6 @@ class RawSinkImpl : public SinkImpl {
   std::thread m_thread;
   std::function<void(uint64_t time)> m_processFrame;
 };
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_RAWSINKIMPL_HPP_

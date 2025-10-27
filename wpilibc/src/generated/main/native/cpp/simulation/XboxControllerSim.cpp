@@ -8,8 +8,8 @@
 
 #include "wpi/driverstation/XboxController.hpp"
 
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 XboxControllerSim::XboxControllerSim(const XboxController& joystick)
     : GenericHIDSim{joystick} {

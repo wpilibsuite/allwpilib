@@ -7,7 +7,7 @@
 
 #include <string>
 
-namespace wpi {
+namespace wpi::util {
 
 /**
  * Get a stack trace, ignoring the first "offset" symbols.
@@ -30,6 +30,6 @@ std::string GetStackTraceDefault(int offset);
  */
 void SetGetStackTraceImpl(std::string (*func)(int offset));
 
-}  // namespace wpi
+}  // namespace wpi::util
 
 #endif  // WPIUTIL_WPI_UTIL_STACKTRACE_HPP_

@@ -14,7 +14,7 @@
 
 #include "AvahiClient.hpp"
 
-using namespace wpi;
+using namespace wpi::net;
 
 struct MulticastServiceAnnouncer::Impl {
   AvahiFunctionTable& table = AvahiFunctionTable::Get();

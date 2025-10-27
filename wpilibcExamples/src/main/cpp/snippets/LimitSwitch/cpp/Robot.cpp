@@ -12,7 +12,7 @@
  * Limit Switch snippets for frc-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/limit-switch.html
  */
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   void TeleopPeriodic() override { SetMotorSpeed(m_joystick.GetRawAxis(2)); }
   void SetMotorSpeed(double speed) {
@@ -37,14 +37,14 @@ class Robot : public frc::TimedRobot {
   }
 
  private:
-  frc::DigitalInput m_toplimitSwitch{0};
-  frc::DigitalInput m_bottomlimitSwitch{1};
-  frc::PWMVictorSPX m_motor{0};
-  frc::Joystick m_joystick{0};
+  wpi::DigitalInput m_toplimitSwitch{0};
+  wpi::DigitalInput m_bottomlimitSwitch{1};
+  wpi::PWMVictorSPX m_motor{0};
+  wpi::Joystick m_joystick{0};
 };
 
 #ifndef RUNNING_FRC_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

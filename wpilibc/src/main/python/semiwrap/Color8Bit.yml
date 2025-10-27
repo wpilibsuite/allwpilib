@@ -2,9 +2,9 @@ extra_includes:
 - pybind11/operators.h
 
 classes:
-  frc::Color8Bit:
+  wpi::Color8Bit:
     force_type_casters:
-    - wpi::ct_string
+    - wpi::util::ct_string
     attributes:
       red:
         access: readonly
@@ -32,7 +32,7 @@ classes:
 
 inline_code: |
   cls_Color8Bit
-    .def("toColor", [](const Color8Bit &self) -> frc::Color {
+    .def("toColor", [](const Color8Bit &self) -> wpi::Color {
       return self;
     })
     .def("__hash__", [](Color8Bit *self) -> size_t {

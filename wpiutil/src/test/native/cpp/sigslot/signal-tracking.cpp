@@ -40,7 +40,7 @@ SOFTWARE.
 
 #include <gtest/gtest.h>
 
-using namespace wpi::sig;
+using namespace wpi::util::sig;
 
 namespace {
 
@@ -71,7 +71,7 @@ static_assert(trait::is_callable_v<trait::typelist<int>, decltype(&s::f1),
 
 }  // namespace
 
-namespace wpi {
+namespace wpi::util {
 
 TEST(SignalTest, TrackShared) {
   sum = 0;
@@ -178,4 +178,4 @@ TEST(SignalTest, TrackGenericLambda) {
   ASSERT_EQ(s.str(), "1foo4.1");
 }
 
-}  // namespace wpi
+}  // namespace wpi::util

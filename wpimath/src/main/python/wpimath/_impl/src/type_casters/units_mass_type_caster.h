@@ -4,107 +4,107 @@
 
 namespace pybind11 {
 namespace detail {
-template <> struct handle_type_name<units::gram_t> {
+template <> struct handle_type_name<wpi::units::gram_t> {
   static constexpr auto name = _("wpimath.units.grams");
 };
 
-template <> struct handle_type_name<units::grams> {
+template <> struct handle_type_name<wpi::units::grams> {
   static constexpr auto name = _("wpimath.units.grams");
 };
 
-template <> struct handle_type_name<units::nanogram_t> {
+template <> struct handle_type_name<wpi::units::nanogram_t> {
   static constexpr auto name = _("wpimath.units.nanograms");
 };
 
-template <> struct handle_type_name<units::nanograms> {
+template <> struct handle_type_name<wpi::units::nanograms> {
   static constexpr auto name = _("wpimath.units.nanograms");
 };
 
-template <> struct handle_type_name<units::microgram_t> {
+template <> struct handle_type_name<wpi::units::microgram_t> {
   static constexpr auto name = _("wpimath.units.micrograms");
 };
 
-template <> struct handle_type_name<units::micrograms> {
+template <> struct handle_type_name<wpi::units::micrograms> {
   static constexpr auto name = _("wpimath.units.micrograms");
 };
 
-template <> struct handle_type_name<units::milligram_t> {
+template <> struct handle_type_name<wpi::units::milligram_t> {
   static constexpr auto name = _("wpimath.units.milligrams");
 };
 
-template <> struct handle_type_name<units::milligrams> {
+template <> struct handle_type_name<wpi::units::milligrams> {
   static constexpr auto name = _("wpimath.units.milligrams");
 };
 
-template <> struct handle_type_name<units::kilogram_t> {
+template <> struct handle_type_name<wpi::units::kilogram_t> {
   static constexpr auto name = _("wpimath.units.kilograms");
 };
 
-template <> struct handle_type_name<units::kilograms> {
+template <> struct handle_type_name<wpi::units::kilograms> {
   static constexpr auto name = _("wpimath.units.kilograms");
 };
 
-template <> struct handle_type_name<units::metric_ton_t> {
+template <> struct handle_type_name<wpi::units::metric_ton_t> {
   static constexpr auto name = _("wpimath.units.metric_tons");
 };
 
-template <> struct handle_type_name<units::metric_tons> {
+template <> struct handle_type_name<wpi::units::metric_tons> {
   static constexpr auto name = _("wpimath.units.metric_tons");
 };
 
-template <> struct handle_type_name<units::pound_t> {
+template <> struct handle_type_name<wpi::units::pound_t> {
   static constexpr auto name = _("wpimath.units.pounds");
 };
 
-template <> struct handle_type_name<units::pounds> {
+template <> struct handle_type_name<wpi::units::pounds> {
   static constexpr auto name = _("wpimath.units.pounds");
 };
 
-template <> struct handle_type_name<units::long_ton_t> {
+template <> struct handle_type_name<wpi::units::long_ton_t> {
   static constexpr auto name = _("wpimath.units.long_tons");
 };
 
-template <> struct handle_type_name<units::long_tons> {
+template <> struct handle_type_name<wpi::units::long_tons> {
   static constexpr auto name = _("wpimath.units.long_tons");
 };
 
-template <> struct handle_type_name<units::short_ton_t> {
+template <> struct handle_type_name<wpi::units::short_ton_t> {
   static constexpr auto name = _("wpimath.units.short_tons");
 };
 
-template <> struct handle_type_name<units::short_tons> {
+template <> struct handle_type_name<wpi::units::short_tons> {
   static constexpr auto name = _("wpimath.units.short_tons");
 };
 
-template <> struct handle_type_name<units::stone_t> {
+template <> struct handle_type_name<wpi::units::stone_t> {
   static constexpr auto name = _("wpimath.units.stone");
 };
 
-template <> struct handle_type_name<units::stone> {
+template <> struct handle_type_name<wpi::units::stone> {
   static constexpr auto name = _("wpimath.units.stone");
 };
 
-template <> struct handle_type_name<units::ounce_t> {
+template <> struct handle_type_name<wpi::units::ounce_t> {
   static constexpr auto name = _("wpimath.units.ounces");
 };
 
-template <> struct handle_type_name<units::ounces> {
+template <> struct handle_type_name<wpi::units::ounces> {
   static constexpr auto name = _("wpimath.units.ounces");
 };
 
-template <> struct handle_type_name<units::carat_t> {
+template <> struct handle_type_name<wpi::units::carat_t> {
   static constexpr auto name = _("wpimath.units.carats");
 };
 
-template <> struct handle_type_name<units::carats> {
+template <> struct handle_type_name<wpi::units::carats> {
   static constexpr auto name = _("wpimath.units.carats");
 };
 
-template <> struct handle_type_name<units::slug_t> {
+template <> struct handle_type_name<wpi::units::slug_t> {
   static constexpr auto name = _("wpimath.units.slugs");
 };
 
-template <> struct handle_type_name<units::slugs> {
+template <> struct handle_type_name<wpi::units::slugs> {
   static constexpr auto name = _("wpimath.units.slugs");
 };
 

@@ -2,9 +2,9 @@ extra_includes:
 - wpi/util/sendable/SendableBuilder.hpp
 
 classes:
-  frc::DigitalOutput:
+  wpi::DigitalOutput:
     ignored_bases:
-    - wpi::SendableHelper<DigitalOutput>
+    - wpi::util::SendableHelper<DigitalOutput>
     methods:
       DigitalOutput:
       Set:

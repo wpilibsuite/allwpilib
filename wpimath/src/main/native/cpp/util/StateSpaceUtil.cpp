@@ -6,7 +6,7 @@
 
 #include <limits>
 
-namespace frc {
+namespace wpi::math {
 
 template bool IsStabilizable<1, 1>(const Matrixd<1, 1>& A,
                                    const Matrixd<1, 1>& B);
@@ -68,4 +68,4 @@ Eigen::MatrixXd MakeCovMatrix(const std::span<const double> stdDevs) {
   return result;
 }
 
-}  // namespace frc
+}  // namespace wpi::math

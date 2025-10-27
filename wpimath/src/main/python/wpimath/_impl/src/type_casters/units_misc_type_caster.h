@@ -5,19 +5,19 @@
 namespace pybind11 {
 namespace detail {
 
-template <> struct handle_type_name<units::dimensionless::scalar_t> {
+template <> struct handle_type_name<wpi::units::dimensionless::scalar_t> {
   static constexpr auto name = _("float");
 };
 
-template <> struct handle_type_name<units::dimensionless::scalar> {
+template <> struct handle_type_name<wpi::units::dimensionless::scalar> {
   static constexpr auto name = _("float");
 };
 
-// template <> struct handle_type_name<units::dimensionless::dimensionless_t> {
+// template <> struct handle_type_name<wpi::units::dimensionless::dimensionless_t> {
 //   static constexpr auto name = _("float");
 // };
 
-// template <> struct handle_type_name<units::dimensionless::dimensionless> {
+// template <> struct handle_type_name<wpi::units::dimensionless::dimensionless> {
 //   static constexpr auto name = _("float");
 // };
 

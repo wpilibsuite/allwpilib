@@ -10,7 +10,7 @@
 Robot::Robot() {
   m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
   m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
-  frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
+  wpi::SmartDashboard::PutData("Auto Modes", &m_chooser);
 }
 
 /**
@@ -38,7 +38,7 @@ void Robot::AutonomousInit() {
   m_autoSelected = m_chooser.GetSelected();
   // m_autoSelected = SmartDashboard::GetString("Auto Selector",
   //     kAutoNameDefault);
-  wpi::print("Auto selected: {}\n", m_autoSelected);
+  wpi::util::print("Auto selected: {}\n", m_autoSelected);
 
   if (m_autoSelected == kAutoNameCustom) {
     // Custom Auto goes here
@@ -73,6 +73,6 @@ void Robot::SimulationPeriodic() {}
 
 #ifndef RUNNING_FRC_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

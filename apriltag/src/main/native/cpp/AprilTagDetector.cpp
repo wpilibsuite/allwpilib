@@ -19,7 +19,7 @@
 #include "tag16h5.h"
 #include "tag36h11.h"
 
-using namespace frc;
+using namespace wpi::apriltag;
 
 AprilTagDetector::Results::Results(void* impl, const private_init&)
     : span{reinterpret_cast<AprilTagDetection**>(

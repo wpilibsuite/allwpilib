@@ -26,7 +26,7 @@
 #include "wpi/util/string.h"
 
 /** Java Native Interface (JNI) utility functions */
-namespace wpi::java {
+namespace wpi::util::java {
 
 /**
  * Gets a Java stack trace.
@@ -160,7 +160,7 @@ class JStringRef {
         env->ReleaseStringCritical(str, chars);
       }
     } else {
-      wpi::print(stderr, "JStringRef was passed a null pointer at\n",
+      wpi::util::print(stderr, "JStringRef was passed a null pointer at\n",
                  GetJavaStackTrace(env));
     }
     // Ensure str is null-terminated.
@@ -172,7 +172,7 @@ class JStringRef {
   std::string_view str() const { return m_str.str(); }
   const char* c_str() const { return m_str.data(); }
   size_t size() const { return m_str.size(); }
-  WPI_String wpi_str() const { return wpi::make_string(str()); }
+  WPI_String wpi_str() const { return wpi::util::make_string(str()); }
 
  private:
   SmallString<128> m_str;
@@ -284,7 +284,7 @@ class JSpanBase {
         m_elements{static_cast<std::remove_cv_t<T>*>(
             bb ? env->GetDirectBufferAddress(bb) : nullptr)} {
     if (!bb) {
-      wpi::print(stderr, "JSpan was passed a null pointer at\n",
+      wpi::util::print(stderr, "JSpan was passed a null pointer at\n",
                  GetJavaStackTrace(env));
     }
   }
@@ -303,7 +303,7 @@ class JSpanBase {
         m_elements = ArrHelper::GetArrayElements(env, jarr);
       }
     } else {
-      wpi::print(stderr, "JSpan was passed a null pointer at\n",
+      wpi::util::print(stderr, "JSpan was passed a null pointer at\n",
                  GetJavaStackTrace(env));
     }
   }
@@ -845,7 +845,7 @@ inline std::string GetJavaStackTrace(JNIEnv* env, std::string_view skipPrefix) {
     // add a line to res
     JStringRef elem(env, stackElementString);
     if (!foundFirst) {
-      if (wpi::starts_with(elem, skipPrefix)) {
+      if (wpi::util::starts_with(elem, skipPrefix)) {
         continue;
       }
       foundFirst = true;
@@ -928,7 +928,7 @@ inline std::string GetJavaStackTrace(JNIEnv* env, std::string* func,
       if (i == 1) {
         *func = elem.str();
       } else if (i > 1 && !haveLoc && !excludeFuncPrefix.empty() &&
-                 !wpi::starts_with(elem, excludeFuncPrefix)) {
+                 !wpi::util::starts_with(elem, excludeFuncPrefix)) {
         *func = elem.str();
         haveLoc = true;
       }
@@ -975,6 +975,6 @@ struct JExceptionInit {
   JException* cls;
 };
 
-}  // namespace wpi::java
+}  // namespace wpi::util::java
 
 #endif  // WPIUTIL_WPI_UTIL_JNI_UTIL_HPP_

@@ -11,7 +11,7 @@
 
 #include "wpi/event/BooleanEvent.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 StadiaController::StadiaController(int port) : GenericHID(port) {
   HAL_ReportUsage("HID", port, "StadiaController");
@@ -297,7 +297,7 @@ bool StadiaController::GetRightBumperReleased() {
   return GetRawButtonReleased(Button::kRightBumper);
 }
 
-void StadiaController::InitSendable(wpi::SendableBuilder& builder) {
+void StadiaController::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("HID");
   builder.PublishConstString("ControllerType", "Stadia");
   builder.AddDoubleProperty("LeftX", [this] { return GetLeftX(); }, nullptr);

@@ -8,7 +8,7 @@
 
 #include "wpi/simulation/CallbackStore.hpp"
 
-namespace frc {
+namespace wpi {
 
 class Encoder;
 
@@ -317,4 +317,4 @@ class EncoderSim {
   int m_index;
 };
 }  // namespace sim
-}  // namespace frc
+}  // namespace wpi

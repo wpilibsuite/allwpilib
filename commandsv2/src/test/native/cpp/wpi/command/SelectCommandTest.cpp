@@ -11,7 +11,7 @@
 #include "wpi/commands2/InstantCommand.hpp"
 #include "wpi/commands2/SelectCommand.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 class SelectCommandTest : public CommandTestBase {};
 
 TEST_F(SelectCommandTest, SelectCommand) {

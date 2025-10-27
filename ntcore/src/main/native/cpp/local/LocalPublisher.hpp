@@ -12,7 +12,7 @@
 #include "local/LocalTopic.hpp"
 #include "local/PubSubConfig.hpp"
 
-namespace nt::local {
+namespace wpi::nt::local {
 
 struct LocalPublisher {
   static constexpr auto kType = Handle::kPublisher;
@@ -25,7 +25,7 @@ struct LocalPublisher {
   }
 
   // invariants
-  wpi::SignalObject<NT_Publisher> handle;
+  wpi::util::SignalObject<NT_Publisher> handle;
   LocalTopic* topic;
   PubSubConfig config;
 
@@ -33,4 +33,4 @@ struct LocalPublisher {
   bool active{false};
 };
 
-}  // namespace nt::local
+}  // namespace wpi::nt::local

@@ -10,7 +10,7 @@
 #include "wpi/math/controller/DifferentialDriveWheelVoltages.hpp"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Struct<frc::DifferentialDriveWheelVoltages> {
+struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::DifferentialDriveWheelVoltages> {
   static constexpr std::string_view GetTypeName() {
     return "DifferentialDriveWheelVoltages";
   }
@@ -19,10 +19,10 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::DifferentialDriveWheelVoltages> {
     return "double left;double right";
   }
 
-  static frc::DifferentialDriveWheelVoltages Unpack(
+  static wpi::math::DifferentialDriveWheelVoltages Unpack(
       std::span<const uint8_t> data);
   static void Pack(std::span<uint8_t> data,
-                   const frc::DifferentialDriveWheelVoltages& value);
+                   const wpi::math::DifferentialDriveWheelVoltages& value);
 };
 
-static_assert(wpi::StructSerializable<frc::DifferentialDriveWheelVoltages>);
+static_assert(wpi::util::StructSerializable<wpi::math::DifferentialDriveWheelVoltages>);

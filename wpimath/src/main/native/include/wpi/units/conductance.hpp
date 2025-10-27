@@ -28,9 +28,9 @@
 
 #include "wpi/units/base.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::conductance
+ * @namespace wpi::units::conductance
  * @brief namespace for unit types and containers representing conductance
  *        values
  * @details The SI unit for conductance is `siemens`, and the corresponding
@@ -42,10 +42,10 @@ namespace units {
     defined(ENABLE_PREDEFINED_CONDUCTANCE_UNITS)
 UNIT_ADD_WITH_METRIC_PREFIXES(
     conductance, siemens, siemens, S,
-    unit<std::ratio<1>, units::category::conductance_unit>)
+    unit<std::ratio<1>, wpi::units::category::conductance_unit>)
 
 UNIT_ADD_CATEGORY_TRAIT(conductance)
 #endif
 
 using namespace conductance;
-}  // namespace units
+}  // namespace wpi::units

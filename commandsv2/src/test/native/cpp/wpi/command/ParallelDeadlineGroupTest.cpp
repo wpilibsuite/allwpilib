@@ -12,7 +12,7 @@
 #include "wpi/commands2/ParallelDeadlineGroup.hpp"
 #include "wpi/commands2/WaitUntilCommand.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 class ParallelDeadlineGroupTest : public CommandTestBase {};
 
 TEST_F(ParallelDeadlineGroupTest, DeadlineGroupSchedule) {

@@ -8,7 +8,7 @@
 
 #include <imgui.h>
 
-namespace glass {
+namespace wpi::glass {
 
 class ColorSetting {
  public:
@@ -50,4 +50,4 @@ class ColorSetting {
   std::vector<float>& m_color;
 };
 
-}  // namespace glass
+}  // namespace wpi::glass

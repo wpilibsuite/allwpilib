@@ -1,5 +1,5 @@
 classes:
-  frc::sim::DriverStationSim:
+  wpi::sim::DriverStationSim:
     force_type_casters:
     - std::function
     methods:

@@ -6,73 +6,73 @@
 
 #include "wpi/commands2/button/CommandStadiaController.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 CommandStadiaController::CommandStadiaController(int port)
-    : CommandGenericHID(port), m_hid{frc::StadiaController(port)} {}
+    : CommandGenericHID(port), m_hid{wpi::StadiaController(port)} {}
 
-frc::StadiaController& CommandStadiaController::GetHID() {
+wpi::StadiaController& CommandStadiaController::GetHID() {
   return m_hid;
 }
 
-Trigger CommandStadiaController::A(frc::EventLoop* loop) const {
-  return Button(frc::StadiaController::Button::kA, loop);
+Trigger CommandStadiaController::A(wpi::EventLoop* loop) const {
+  return Button(wpi::StadiaController::Button::kA, loop);
 }
 
-Trigger CommandStadiaController::B(frc::EventLoop* loop) const {
-  return Button(frc::StadiaController::Button::kB, loop);
+Trigger CommandStadiaController::B(wpi::EventLoop* loop) const {
+  return Button(wpi::StadiaController::Button::kB, loop);
 }
 
-Trigger CommandStadiaController::X(frc::EventLoop* loop) const {
-  return Button(frc::StadiaController::Button::kX, loop);
+Trigger CommandStadiaController::X(wpi::EventLoop* loop) const {
+  return Button(wpi::StadiaController::Button::kX, loop);
 }
 
-Trigger CommandStadiaController::Y(frc::EventLoop* loop) const {
-  return Button(frc::StadiaController::Button::kY, loop);
+Trigger CommandStadiaController::Y(wpi::EventLoop* loop) const {
+  return Button(wpi::StadiaController::Button::kY, loop);
 }
 
-Trigger CommandStadiaController::LeftBumper(frc::EventLoop* loop) const {
-  return Button(frc::StadiaController::Button::kLeftBumper, loop);
+Trigger CommandStadiaController::LeftBumper(wpi::EventLoop* loop) const {
+  return Button(wpi::StadiaController::Button::kLeftBumper, loop);
 }
 
-Trigger CommandStadiaController::RightBumper(frc::EventLoop* loop) const {
-  return Button(frc::StadiaController::Button::kRightBumper, loop);
+Trigger CommandStadiaController::RightBumper(wpi::EventLoop* loop) const {
+  return Button(wpi::StadiaController::Button::kRightBumper, loop);
 }
 
-Trigger CommandStadiaController::LeftStick(frc::EventLoop* loop) const {
-  return Button(frc::StadiaController::Button::kLeftStick, loop);
+Trigger CommandStadiaController::LeftStick(wpi::EventLoop* loop) const {
+  return Button(wpi::StadiaController::Button::kLeftStick, loop);
 }
 
-Trigger CommandStadiaController::RightStick(frc::EventLoop* loop) const {
-  return Button(frc::StadiaController::Button::kRightStick, loop);
+Trigger CommandStadiaController::RightStick(wpi::EventLoop* loop) const {
+  return Button(wpi::StadiaController::Button::kRightStick, loop);
 }
 
-Trigger CommandStadiaController::Ellipses(frc::EventLoop* loop) const {
-  return Button(frc::StadiaController::Button::kEllipses, loop);
+Trigger CommandStadiaController::Ellipses(wpi::EventLoop* loop) const {
+  return Button(wpi::StadiaController::Button::kEllipses, loop);
 }
 
-Trigger CommandStadiaController::Hamburger(frc::EventLoop* loop) const {
-  return Button(frc::StadiaController::Button::kHamburger, loop);
+Trigger CommandStadiaController::Hamburger(wpi::EventLoop* loop) const {
+  return Button(wpi::StadiaController::Button::kHamburger, loop);
 }
 
-Trigger CommandStadiaController::Stadia(frc::EventLoop* loop) const {
-  return Button(frc::StadiaController::Button::kStadia, loop);
+Trigger CommandStadiaController::Stadia(wpi::EventLoop* loop) const {
+  return Button(wpi::StadiaController::Button::kStadia, loop);
 }
 
-Trigger CommandStadiaController::RightTrigger(frc::EventLoop* loop) const {
-  return Button(frc::StadiaController::Button::kRightTrigger, loop);
+Trigger CommandStadiaController::RightTrigger(wpi::EventLoop* loop) const {
+  return Button(wpi::StadiaController::Button::kRightTrigger, loop);
 }
 
-Trigger CommandStadiaController::LeftTrigger(frc::EventLoop* loop) const {
-  return Button(frc::StadiaController::Button::kLeftTrigger, loop);
+Trigger CommandStadiaController::LeftTrigger(wpi::EventLoop* loop) const {
+  return Button(wpi::StadiaController::Button::kLeftTrigger, loop);
 }
 
-Trigger CommandStadiaController::Google(frc::EventLoop* loop) const {
-  return Button(frc::StadiaController::Button::kGoogle, loop);
+Trigger CommandStadiaController::Google(wpi::EventLoop* loop) const {
+  return Button(wpi::StadiaController::Button::kGoogle, loop);
 }
 
-Trigger CommandStadiaController::Frame(frc::EventLoop* loop) const {
-  return Button(frc::StadiaController::Button::kFrame, loop);
+Trigger CommandStadiaController::Frame(wpi::EventLoop* loop) const {
+  return Button(wpi::StadiaController::Button::kFrame, loop);
 }
 
 double CommandStadiaController::GetLeftX() const {

@@ -15,7 +15,7 @@
 #include "wpi/net/uv/Pipe.hpp"
 #include "wpi/net/uv/Timer.hpp"
 
-namespace wpi {
+namespace wpi::net {
 
 class WebSocketTest : public ::testing::Test {
  public:
@@ -68,4 +68,4 @@ class WebSocketTest : public ::testing::Test {
   std::shared_ptr<uv::Pipe> serverPipe;
 };
 
-}  // namespace wpi
+}  // namespace wpi::net

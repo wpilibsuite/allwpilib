@@ -4,9 +4,9 @@ extra_includes:
 - wpi/util/SmallString.hpp
 
 classes:
-  frc::PWM:
+  wpi::PWM:
     ignored_bases:
-    - wpi::SendableHelper<PWM>
+    - wpi::util::SendableHelper<PWM>
     enums:
       OutputPeriod:
     methods:

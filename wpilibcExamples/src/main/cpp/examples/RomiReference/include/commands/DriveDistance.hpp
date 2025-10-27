@@ -10,7 +10,7 @@
 
 #include "subsystems/Drivetrain.hpp"
 
-class DriveDistance : public frc2::CommandHelper<frc2::Command, DriveDistance> {
+class DriveDistance : public wpi::cmd::CommandHelper<wpi::cmd::Command, DriveDistance> {
  public:
   /**
    * Creates a new DriveDistance. This command will drive your your robot for a
@@ -20,7 +20,7 @@ class DriveDistance : public frc2::CommandHelper<frc2::Command, DriveDistance> {
    * @param distance The distance the robot will drive
    * @param drive The drivetrain subsystem on which this command will run
    */
-  DriveDistance(double speed, units::meter_t distance, Drivetrain* drive)
+  DriveDistance(double speed, wpi::units::meter_t distance, Drivetrain* drive)
       : m_speed(speed), m_distance(distance), m_drive(drive) {
     AddRequirements(m_drive);
   }
@@ -32,6 +32,6 @@ class DriveDistance : public frc2::CommandHelper<frc2::Command, DriveDistance> {
 
  private:
   double m_speed;
-  units::meter_t m_distance;
+  wpi::units::meter_t m_distance;
   Drivetrain* m_drive;
 };

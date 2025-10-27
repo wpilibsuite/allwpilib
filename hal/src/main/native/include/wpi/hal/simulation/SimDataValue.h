@@ -13,7 +13,7 @@
 #include "wpi/hal/simulation/NotifyListener.h"
 #include "wpi/hal/simulation/SimCallbackRegistry.h"
 
-namespace hal {
+namespace wpi::hal {
 
 namespace impl {
 template <typename T, HAL_Value (*MakeValue)(T)>
@@ -36,7 +36,7 @@ class SimDataValueBase : protected SimCallbackRegistryBase {
     m_value = value;
   }
 
-  wpi::recursive_spinlock& GetMutex() { return m_mutex; }
+  wpi::util::recursive_spinlock& GetMutex() { return m_mutex; }
 
  protected:
   int32_t DoRegisterCallback(HAL_NotifyCallback callback, void* param,
@@ -334,4 +334,4 @@ class SimDataValue final : public impl::SimDataValueBase<T, MakeValue> {
                                                                           \
   void NS##_Set##CAPINAME(TYPE) {}
 
-}  // namespace hal
+}  // namespace wpi::hal

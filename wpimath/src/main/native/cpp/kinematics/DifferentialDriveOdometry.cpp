@@ -6,11 +6,11 @@
 
 #include "wpi/math/util/MathShared.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 DifferentialDriveOdometry::DifferentialDriveOdometry(
-    const Rotation2d& gyroAngle, units::meter_t leftDistance,
-    units::meter_t rightDistance, const Pose2d& initialPose)
+    const Rotation2d& gyroAngle, wpi::units::meter_t leftDistance,
+    wpi::units::meter_t rightDistance, const Pose2d& initialPose)
     : Odometry(m_kinematicsImpl, gyroAngle, {leftDistance, rightDistance},
                initialPose) {
   wpi::math::MathSharedStore::ReportUsage("DifferentialDriveOdometry", "");

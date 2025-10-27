@@ -557,7 +557,7 @@ template<template <typename...> class Primary, typename... Args>
 struct is_specialization_of<Primary, Primary<Args...>> : std::true_type {};
 
 template<typename T>
-using is_json_pointer = is_specialization_of<::wpi::json_pointer, uncvref_t<T>>;
+using is_json_pointer = is_specialization_of<::wpi::util::json_pointer, uncvref_t<T>>;
 
 // checks if A and B are comparable using Compare functor
 template<typename Compare, typename A, typename B, typename = void>

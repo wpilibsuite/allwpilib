@@ -2,24 +2,24 @@ extra_includes:
 - wpi/math/trajectory/Trajectory.hpp
 
 classes:
-  frc::FieldObject2d:
+  wpi::FieldObject2d:
     nodelete: true
     methods:
       FieldObject2d:
         ignore: true
       SetPose:
         overloads:
-          const Pose2d&:
-          units::meter_t, units::meter_t, Rotation2d:
+          const wpi::math::Pose2d&:
+          wpi::units::meter_t, wpi::units::meter_t, wpi::math::Rotation2d:
       GetPose:
       SetPoses:
         overloads:
-          std::span<const Pose2d>:
-          std::initializer_list<Pose2d>:
+          std::span<const wpi::math::Pose2d>:
+          std::initializer_list<wpi::math::Pose2d>:
             ignore: true
       SetTrajectory:
       GetPoses:
         overloads:
           '[const]':
-          wpi::SmallVectorImpl<Pose2d>& [const]:
+          wpi::util::SmallVectorImpl<wpi::math::Pose2d>& [const]:
             ignore: true

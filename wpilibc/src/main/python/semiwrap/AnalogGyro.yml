@@ -3,9 +3,9 @@ extra_includes:
 - wpi/hardware/discrete/AnalogInput.hpp
 
 classes:
-  frc::AnalogGyro:
+  wpi::AnalogGyro:
     ignored_bases:
-    - wpi::SendableHelper<AnalogGyro>
+    - wpi::util::SendableHelper<AnalogGyro>
     methods:
       AnalogGyro:
         overloads:

@@ -8,11 +8,11 @@
 #include <string>
 #include <string_view>
 
-namespace wpi {
+namespace wpi::util {
 class raw_istream;
 }  // namespace wpi
 
-namespace cs {
+namespace wpi::cs {
 
 bool IsJpeg(std::string_view data);
 
@@ -22,8 +22,8 @@ bool JpegNeedsDHT(const char* data, size_t* size, size_t* locSOF);
 
 std::string_view JpegGetDHT();
 
-bool ReadJpeg(wpi::raw_istream& is, std::string& buf, int* width, int* height);
+bool ReadJpeg(wpi::util::raw_istream& is, std::string& buf, int* width, int* height);
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_JPEGUTIL_HPP_

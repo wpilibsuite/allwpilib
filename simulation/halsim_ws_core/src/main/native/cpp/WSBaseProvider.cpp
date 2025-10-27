@@ -12,7 +12,7 @@ HALSimWSBaseProvider::HALSimWSBaseProvider(std::string_view key,
                                            std::string_view type)
     : m_key(key), m_type(type) {}
 
-void HALSimWSBaseProvider::OnNetValueChanged(const wpi::json& json) {
+void HALSimWSBaseProvider::OnNetValueChanged(const wpi::util::json& json) {
   // empty
 }
 

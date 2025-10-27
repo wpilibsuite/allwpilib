@@ -9,7 +9,7 @@
 #include <wpi/opmode/TimesliceRobot.hpp>
 #include <wpi/smartdashboard/SendableChooser.hpp>
 
-class Robot : public frc::TimesliceRobot {
+class Robot : public wpi::TimesliceRobot {
  public:
   Robot();
   void RobotPeriodic() override;
@@ -23,7 +23,7 @@ class Robot : public frc::TimesliceRobot {
   void TestPeriodic() override;
 
  private:
-  frc::SendableChooser<std::string> m_chooser;
+  wpi::SendableChooser<std::string> m_chooser;
   const std::string kAutoNameDefault = "Default";
   const std::string kAutoNameCustom = "My Auto";
   std::string m_autoSelected;

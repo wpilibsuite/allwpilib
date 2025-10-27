@@ -10,7 +10,7 @@
 
 #include "wpi/nt/ntcore_cpp.hpp"
 
-namespace nt {
+namespace wpi::nt {
 
 class INetworkClient {
  public:
@@ -27,4 +27,4 @@ class INetworkClient {
   virtual void Flush() = 0;
 };
 
-}  // namespace nt
+}  // namespace wpi::nt

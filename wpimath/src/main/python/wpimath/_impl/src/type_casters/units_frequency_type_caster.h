@@ -4,43 +4,43 @@
 
 namespace pybind11 {
 namespace detail {
-template <> struct handle_type_name<units::hertz_t> {
+template <> struct handle_type_name<wpi::units::hertz_t> {
   static constexpr auto name = _("wpimath.units.hertz");
 };
 
-template <> struct handle_type_name<units::hertz> {
+template <> struct handle_type_name<wpi::units::hertz> {
   static constexpr auto name = _("wpimath.units.hertz");
 };
 
-template <> struct handle_type_name<units::nanohertz_t> {
+template <> struct handle_type_name<wpi::units::nanohertz_t> {
   static constexpr auto name = _("wpimath.units.nanohertz");
 };
 
-template <> struct handle_type_name<units::nanohertz> {
+template <> struct handle_type_name<wpi::units::nanohertz> {
   static constexpr auto name = _("wpimath.units.nanohertz");
 };
 
-template <> struct handle_type_name<units::microhertz_t> {
+template <> struct handle_type_name<wpi::units::microhertz_t> {
   static constexpr auto name = _("wpimath.units.microhertz");
 };
 
-template <> struct handle_type_name<units::microhertz> {
+template <> struct handle_type_name<wpi::units::microhertz> {
   static constexpr auto name = _("wpimath.units.microhertz");
 };
 
-template <> struct handle_type_name<units::millihertz_t> {
+template <> struct handle_type_name<wpi::units::millihertz_t> {
   static constexpr auto name = _("wpimath.units.millihertz");
 };
 
-template <> struct handle_type_name<units::millihertz> {
+template <> struct handle_type_name<wpi::units::millihertz> {
   static constexpr auto name = _("wpimath.units.millihertz");
 };
 
-template <> struct handle_type_name<units::kilohertz_t> {
+template <> struct handle_type_name<wpi::units::kilohertz_t> {
   static constexpr auto name = _("wpimath.units.kilohertz");
 };
 
-template <> struct handle_type_name<units::kilohertz> {
+template <> struct handle_type_name<wpi::units::kilohertz> {
   static constexpr auto name = _("wpimath.units.kilohertz");
 };
 

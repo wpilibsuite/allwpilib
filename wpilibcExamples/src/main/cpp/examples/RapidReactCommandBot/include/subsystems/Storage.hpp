@@ -12,16 +12,16 @@
 
 #include "Constants.hpp"
 
-class Storage : frc2::SubsystemBase {
+class Storage : wpi::cmd::SubsystemBase {
  public:
   Storage();
   /** Returns a command that runs the storage motor indefinitely. */
-  frc2::CommandPtr RunCommand();
+  wpi::cmd::CommandPtr RunCommand();
 
   /** Whether the ball storage is full. */
-  frc2::Trigger HasCargo{[this] { return m_ballSensor.Get(); }};
+  wpi::cmd::Trigger HasCargo{[this] { return m_ballSensor.Get(); }};
 
  private:
-  frc::PWMSparkMax m_motor{StorageConstants::kMotorPort};
-  frc::DigitalInput m_ballSensor{StorageConstants::kBallSensorPort};
+  wpi::PWMSparkMax m_motor{StorageConstants::kMotorPort};
+  wpi::DigitalInput m_ballSensor{StorageConstants::kBallSensorPort};
 };

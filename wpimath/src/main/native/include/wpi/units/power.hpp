@@ -28,9 +28,9 @@
 
 #include "wpi/units/base.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::power
+ * @namespace wpi::units::power
  * @brief namespace for unit types and containers representing power values
  * @details The SI unit for power is `watts`, and the corresponding `base_unit`
  *          category is `power_unit`.
@@ -39,7 +39,7 @@ namespace units {
  */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_POWER_UNITS)
 UNIT_ADD_WITH_METRIC_PREFIXES(power, watt, watts, W,
-                              unit<std::ratio<1>, units::category::power_unit>)
+                              unit<std::ratio<1>, wpi::units::category::power_unit>)
 UNIT_ADD(power, horsepower, horsepower, hp, unit<std::ratio<7457, 10>, watts>)
 UNIT_ADD_DECIBEL(power, watt, dBW)
 UNIT_ADD_DECIBEL(power, milliwatt, dBm)
@@ -48,4 +48,4 @@ UNIT_ADD_CATEGORY_TRAIT(power)
 #endif
 
 using namespace power;
-}  // namespace units
+}  // namespace wpi::units

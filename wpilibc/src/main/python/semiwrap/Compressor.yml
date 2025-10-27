@@ -5,9 +5,9 @@ extra_includes:
 - wpi/hardware/pneumatic/DoubleSolenoid.hpp
 
 classes:
-  frc::Compressor:
+  wpi::Compressor:
     ignored_bases:
-    - wpi::SendableHelper<Compressor>
+    - wpi::util::SendableHelper<Compressor>
     methods:
       Compressor:
         overloads:

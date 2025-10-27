@@ -11,7 +11,7 @@
 #include "wpi/hal/handles/HandlesInternal.h"
 #include "wpi/hal/simulation/CTREPCMData.h"
 
-namespace hal {
+namespace wpi::hal {
 
 std::string gTestSolenoidCallbackName;
 HAL_Value gTestSolenoidCallbackValue;
@@ -66,7 +66,7 @@ TEST(PCMDataTest, PCMInitialization) {
   EXPECT_STREQ("Unset", gTestSolenoidCallbackName.c_str());
 
   // Reset, should allow you to re-register
-  hal::HandleBase::ResetGlobalHandles();
+  wpi::hal::HandleBase::ResetGlobalHandles();
   HALSIM_ResetCTREPCMData(MODULE_TO_TEST);
   callbackId = HALSIM_RegisterCTREPCMInitializedCallback(
       MODULE_TO_TEST, &TestSolenoidInitializationCallback, &callbackParam,
@@ -82,4 +82,4 @@ TEST(PCMDataTest, PCMInitialization) {
   EXPECT_STREQ("Initialized", gTestSolenoidCallbackName.c_str());
 }
 
-}  // namespace hal
+}  // namespace wpi::hal

@@ -2,9 +2,9 @@ extra_includes:
 - wpi/util/sendable/SendableBuilder.hpp
 
 classes:
-  frc::Solenoid:
+  wpi::Solenoid:
     ignored_bases:
-    - wpi::SendableHelper<Solenoid>
+    - wpi::util::SendableHelper<Solenoid>
     methods:
       Solenoid:
         overloads:

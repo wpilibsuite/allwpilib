@@ -17,7 +17,7 @@
 #include <wpi/units/time.hpp>
 #include <wpi/util/mutex.hpp>
 
-namespace frc {
+namespace wpi {
 
 /**
  * Notifiers run a user-provided callback function on a separate thread.
@@ -94,7 +94,7 @@ class Notifier {
    *
    * @param delay Time to wait before the callback is called.
    */
-  void StartSingle(units::second_t delay);
+  void StartSingle(wpi::units::second_t delay);
 
   /**
    * Run the callback periodically with the given period.
@@ -105,7 +105,7 @@ class Notifier {
    * @param period Period after which to call the callback starting one
    *               period after the call to this method.
    */
-  void StartPeriodic(units::second_t period);
+  void StartPeriodic(wpi::units::second_t period);
 
   /**
    * Stop further callback invocations.
@@ -152,7 +152,7 @@ class Notifier {
   std::thread m_thread;
 
   // The mutex held while updating process information
-  wpi::mutex m_processMutex;
+  wpi::util::mutex m_processMutex;
 
   // HAL handle (atomic for proper destruction)
   std::atomic<HAL_NotifierHandle> m_notifier{0};
@@ -162,14 +162,14 @@ class Notifier {
 
   // The time at which the callback should be called. Has the same zero as
   // Timer::GetFPGATimestamp().
-  units::second_t m_expirationTime = 0_s;
+  wpi::units::second_t m_expirationTime = 0_s;
 
   // If periodic, stores the callback period; if single, stores the time until
   // the callback call.
-  units::second_t m_period = 0_s;
+  wpi::units::second_t m_period = 0_s;
 
   // True if the callback is periodic
   bool m_periodic = false;
 };
 
-}  // namespace frc
+}  // namespace wpi

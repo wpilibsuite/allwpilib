@@ -8,7 +8,7 @@
 
 #include "wpi/simulation/GenericHIDSim.hpp"
 
-namespace frc {
+namespace wpi {
 
 class XboxController;
 
@@ -170,4 +170,4 @@ class XboxControllerSim : public GenericHIDSim {
 };
 
 }  // namespace sim
-}  // namespace frc
+}  // namespace wpi

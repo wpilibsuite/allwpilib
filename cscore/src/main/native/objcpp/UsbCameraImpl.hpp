@@ -16,7 +16,7 @@
 
 #include "SourceImpl.hpp"
 
-namespace cs {
+namespace wpi::cs {
 struct CameraFPSRange {
   int min;
   int max;
@@ -32,9 +32,9 @@ struct CameraModeStore {
 
 class UsbCameraImpl : public SourceImpl {
  public:
-  UsbCameraImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
+  UsbCameraImpl(std::string_view name, wpi::util::Logger& logger, Notifier& notifier,
                 Telemetry& telemetry, std::string_view path);
-  UsbCameraImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
+  UsbCameraImpl(std::string_view name, wpi::util::Logger& logger, Notifier& notifier,
                 Telemetry& telemetry, int deviceId);
   ~UsbCameraImpl() override;
 
@@ -64,7 +64,7 @@ class UsbCameraImpl : public SourceImpl {
   void NumSinksChanged() override;
   void NumSinksEnabledChanged() override;
 
-  cs::Notifier& objcGetNotifier() { return m_notifier; }
+  wpi::cs::Notifier& objcGetNotifier() { return m_notifier; }
 
   void objcSwapVideoModes(std::vector<VideoMode>& modes) {
     std::scoped_lock lock(m_mutex);
@@ -86,7 +86,7 @@ class UsbCameraImpl : public SourceImpl {
     return m_platformModes;
   }
 
-  wpi::Logger& objcGetLogger() { return m_logger; }
+  wpi::util::Logger& objcGetLogger() { return m_logger; }
 
   UsbCameraImplObjc* cppGetObjc() { return m_objc; }
 
@@ -106,18 +106,18 @@ class UsbCameraImpl : public SourceImpl {
     UpdatePropertyValue(property, setString, value, valueStr);
   }
 
-  wpi::mutex& GetMutex() { return m_mutex; }
+  wpi::util::mutex& GetMutex() { return m_mutex; }
 
   // Property cache accessors
-  wpi::StringMap<uint32_t>& GetPropertyCache() { return m_propertyCache; }
-  wpi::StringMap<uint32_t>& GetPropertyAutoCache() { return m_propertyAutoCache; }
+  wpi::util::StringMap<uint32_t>& GetPropertyCache() { return m_propertyCache; }
+  wpi::util::StringMap<uint32_t>& GetPropertyAutoCache() { return m_propertyAutoCache; }
 
  private:
   UsbCameraImplObjc* m_objc;
   std::vector<CameraModeStore> m_platformModes;
   
   // Property caches
-  wpi::StringMap<uint32_t> m_propertyCache;
-  wpi::StringMap<uint32_t> m_propertyAutoCache;
+  wpi::util::StringMap<uint32_t> m_propertyCache;
+  wpi::util::StringMap<uint32_t> m_propertyAutoCache;
 };
-}  // namespace cs
+}  // namespace wpi::cs

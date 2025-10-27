@@ -7,7 +7,7 @@
 #include <CoreFoundation/CFRunLoop.h>
 #import <Foundation/Foundation.h>
 
-namespace cs {
+namespace wpi::cs {
 
 void RunMainRunLoop() {
   if (CFRunLoopGetMain() != CFRunLoopGetCurrent()) {

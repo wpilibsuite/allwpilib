@@ -9,7 +9,7 @@
 
 #include "wpi/driverstation/GenericHID.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Handle input from Gamepad controllers connected to the Driver Station.
@@ -24,8 +24,8 @@ namespace frc {
  * to have the same mapping, as well as any 3rd party controllers.
  */
 class Gamepad : public GenericHID,
-                public wpi::Sendable,
-                public wpi::SendableHelper<Gamepad> {
+                public wpi::util::Sendable,
+                public wpi::util::SendableHelper<Gamepad> {
  public:
   /**
    * Construct an instance of a controller.
@@ -1008,11 +1008,11 @@ class Gamepad : public GenericHID,
     static constexpr int kRightTrigger = 5;
   };
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
   double GetAxisForSendable(int axis) const;
   bool GetButtonForSendable(int button) const;
 };
 
-}  // namespace frc
+}  // namespace wpi

@@ -9,7 +9,7 @@
 #include "wpi/hal/handles/DigitalHandleResource.h"
 #include "wpi/hal/handles/HandlesInternal.h"
 
-namespace hal {
+namespace wpi::hal {
 
 DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
                       kNumDigitalChannels + kNumPWMHeaders>*
@@ -45,4 +45,4 @@ int32_t GetDigitalInputChannel(HAL_DigitalHandle handle, int32_t* status) {
 
   return digital->channel;
 }
-}  // namespace hal
+}  // namespace wpi::hal

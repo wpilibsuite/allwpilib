@@ -6,7 +6,7 @@
 
 #include <jni.h>
 
-using namespace wpi::java;
+using namespace wpi::util::java;
 
 //
 // Globals and load/unload

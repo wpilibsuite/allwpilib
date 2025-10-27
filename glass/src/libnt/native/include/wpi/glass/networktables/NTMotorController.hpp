@@ -15,13 +15,13 @@
 #include "wpi/glass/DataSource.hpp"
 #include "wpi/glass/hardware/MotorController.hpp"
 
-namespace glass {
+namespace wpi::glass {
 class NTMotorControllerModel : public MotorControllerModel {
  public:
   static constexpr const char* kType = "Motor Controller";
 
   explicit NTMotorControllerModel(std::string_view path);
-  NTMotorControllerModel(nt::NetworkTableInstance inst, std::string_view path);
+  NTMotorControllerModel(wpi::nt::NetworkTableInstance inst, std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
   const char* GetSimDevice() const override { return nullptr; }
@@ -34,13 +34,13 @@ class NTMotorControllerModel : public MotorControllerModel {
   bool IsReadOnly() override { return !m_controllableValue; }
 
  private:
-  nt::NetworkTableInstance m_inst;
-  nt::DoubleEntry m_value;
-  nt::StringSubscriber m_name;
-  nt::BooleanSubscriber m_controllable;
+  wpi::nt::NetworkTableInstance m_inst;
+  wpi::nt::DoubleEntry m_value;
+  wpi::nt::StringSubscriber m_name;
+  wpi::nt::BooleanSubscriber m_controllable;
 
   DoubleSource m_valueData;
   std::string m_nameValue;
   bool m_controllableValue = false;
 };
-}  // namespace glass
+}  // namespace wpi::glass

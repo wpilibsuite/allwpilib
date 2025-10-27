@@ -18,7 +18,7 @@
 #include <string>
 #include <string_view>
 
-namespace wpi {
+namespace wpi::util {
 
   /// An error handler callback.
   typedef void (*fatal_error_handler_t)(void *user_data,
@@ -140,9 +140,9 @@ wpi_unreachable_internal(const char *msg = nullptr, const char *file = nullptr,
 /// unnecessary code.
 #ifndef NDEBUG
 #define wpi_unreachable(msg) \
-  ::wpi::wpi_unreachable_internal(msg, __FILE__, __LINE__)
+  ::wpi::util::wpi_unreachable_internal(msg, __FILE__, __LINE__)
 #elif !defined(LLVM_BUILTIN_UNREACHABLE)
-#define wpi_unreachable(msg) ::wpi::wpi_unreachable_internal()
+#define wpi_unreachable(msg) ::wpi::util::wpi_unreachable_internal()
 #elif LLVM_UNREACHABLE_OPTIMIZE
 #define wpi_unreachable(msg) LLVM_BUILTIN_UNREACHABLE
 #else

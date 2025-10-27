@@ -9,7 +9,7 @@
 #include "wpi/util/Errno.hpp"
 #include "gtest/gtest.h"
 
-using namespace wpi::sys;
+using namespace wpi::util::sys;
 
 TEST(ErrnoTest, RetryAfterSignal) {
   EXPECT_EQ(1, RetryAfterSignal(-1, [] { return 1; }));

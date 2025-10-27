@@ -12,23 +12,23 @@ constexpr size_t kFreeCurrentOff = kStallCurrentOff + 8;
 constexpr size_t kFreeSpeedOff = kFreeCurrentOff + 8;
 }  // namespace
 
-using StructType = wpi::Struct<frc::DCMotor>;
+using StructType = wpi::util::Struct<wpi::math::DCMotor>;
 
-frc::DCMotor StructType::Unpack(std::span<const uint8_t> data) {
-  return frc::DCMotor{
-      units::volt_t{wpi::UnpackStruct<double, kNominalVoltageOff>(data)},
-      units::newton_meter_t{wpi::UnpackStruct<double, kStallTorqueOff>(data)},
-      units::ampere_t{wpi::UnpackStruct<double, kStallCurrentOff>(data)},
-      units::ampere_t{wpi::UnpackStruct<double, kFreeCurrentOff>(data)},
-      units::radians_per_second_t{
-          wpi::UnpackStruct<double, kFreeSpeedOff>(data)},
+wpi::math::DCMotor StructType::Unpack(std::span<const uint8_t> data) {
+  return wpi::math::DCMotor{
+      wpi::units::volt_t{wpi::util::UnpackStruct<double, kNominalVoltageOff>(data)},
+      wpi::units::newton_meter_t{wpi::util::UnpackStruct<double, kStallTorqueOff>(data)},
+      wpi::units::ampere_t{wpi::util::UnpackStruct<double, kStallCurrentOff>(data)},
+      wpi::units::ampere_t{wpi::util::UnpackStruct<double, kFreeCurrentOff>(data)},
+      wpi::units::radians_per_second_t{
+          wpi::util::UnpackStruct<double, kFreeSpeedOff>(data)},
   };
 }
 
-void StructType::Pack(std::span<uint8_t> data, const frc::DCMotor& value) {
-  wpi::PackStruct<kNominalVoltageOff>(data, value.nominalVoltage.value());
-  wpi::PackStruct<kStallTorqueOff>(data, value.stallTorque.value());
-  wpi::PackStruct<kStallCurrentOff>(data, value.stallCurrent.value());
-  wpi::PackStruct<kFreeCurrentOff>(data, value.freeCurrent.value());
-  wpi::PackStruct<kFreeSpeedOff>(data, value.freeSpeed.value());
+void StructType::Pack(std::span<uint8_t> data, const wpi::math::DCMotor& value) {
+  wpi::util::PackStruct<kNominalVoltageOff>(data, value.nominalVoltage.value());
+  wpi::util::PackStruct<kStallTorqueOff>(data, value.stallTorque.value());
+  wpi::util::PackStruct<kStallCurrentOff>(data, value.stallCurrent.value());
+  wpi::util::PackStruct<kFreeCurrentOff>(data, value.freeCurrent.value());
+  wpi::util::PackStruct<kFreeSpeedOff>(data, value.freeSpeed.value());
 }

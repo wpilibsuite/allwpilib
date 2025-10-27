@@ -172,7 +172,7 @@ do {                                                                 \
 #define KEEP_ALIVE "keep-alive"
 #define CLOSE "close"
 
-namespace wpi {
+namespace wpi::net {
 
 
 static const char *method_strings[] =
@@ -2478,4 +2478,4 @@ http_parser_version(void) {
          HTTP_PARSER_VERSION_PATCH * 0x00001;
 }
 
-}  // namespace wpi
+}  // namespace wpi::net

@@ -11,7 +11,7 @@ namespace wpi::log {
 class DataLog;
 }  // namespace wpi::log
 
-namespace frc {
+namespace wpi {
 
 /**
  * Centralized data log that provides automatic data log file management. It
@@ -93,4 +93,4 @@ class DataLogManager final {
   static void LogConsoleOutput(bool enabled);
 };
 
-}  // namespace frc
+}  // namespace wpi

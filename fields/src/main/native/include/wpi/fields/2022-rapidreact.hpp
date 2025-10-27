@@ -6,7 +6,7 @@
 
 #include <string_view>
 
-namespace fields {
+namespace wpi::fields {
 std::string_view GetResource_2022_rapidreact_json();
 std::string_view GetResource_2022_field_png();
-}  // namespace fields
+}  // namespace wpi::fields

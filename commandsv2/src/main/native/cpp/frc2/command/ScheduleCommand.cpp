@@ -4,7 +4,7 @@
 
 #include "wpi/commands2/ScheduleCommand.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 ScheduleCommand::ScheduleCommand(std::span<Command* const> toSchedule) {
   for (auto cmd : toSchedule) {
@@ -18,7 +18,7 @@ ScheduleCommand::ScheduleCommand(Command* toSchedule) {
 
 void ScheduleCommand::Initialize() {
   for (auto command : m_toSchedule) {
-    frc2::CommandScheduler::GetInstance().Schedule(command);
+    wpi::cmd::CommandScheduler::GetInstance().Schedule(command);
   }
 }
 

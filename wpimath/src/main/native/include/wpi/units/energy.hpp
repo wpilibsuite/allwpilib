@@ -28,9 +28,9 @@
 
 #include "wpi/units/base.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::energy
+ * @namespace wpi::units::energy
  * @brief namespace for unit types and containers representing energy values
  * @details The SI unit for energy is `joules`, and the corresponding
  *          `base_unit` category is `energy_unit`.
@@ -40,7 +40,7 @@ namespace units {
 #if !defined(DISABLE_PREDEFINED_UNITS) || \
     defined(ENABLE_PREDEFINED_ENERGY_UNITS)
 UNIT_ADD_WITH_METRIC_PREFIXES(energy, joule, joules, J,
-                              unit<std::ratio<1>, units::category::energy_unit>)
+                              unit<std::ratio<1>, wpi::units::category::energy_unit>)
 UNIT_ADD_WITH_METRIC_PREFIXES(energy, calorie, calories, cal,
                               unit<std::ratio<4184, 1000>, joules>)
 UNIT_ADD(energy, kilowatt_hour, kilowatt_hours, kWh,
@@ -62,4 +62,4 @@ UNIT_ADD_CATEGORY_TRAIT(energy)
 #endif
 
 using namespace energy;
-}  // namespace units
+}  // namespace wpi::units

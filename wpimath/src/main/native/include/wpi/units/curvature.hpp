@@ -8,7 +8,7 @@
 #include "wpi/units/base.hpp"
 #include "wpi/units/length.hpp"
 
-namespace units {
-using curvature_t = units::unit_t<
-    units::compound_unit<units::radians, units::inverse<units::meters>>>;
-}  // namespace units
+namespace wpi::units {
+using curvature_t = wpi::units::unit_t<
+    wpi::units::compound_unit<wpi::units::radians, wpi::units::inverse<wpi::units::meters>>>;
+}  // namespace wpi::units

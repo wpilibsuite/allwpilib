@@ -11,7 +11,7 @@
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * Enforces a particular constraint only within a rectangular region.
@@ -47,20 +47,20 @@ class RectangularRegionConstraint : public TrajectoryConstraint {
                                         const Constraint& constraint)
       : m_rectangle{rectangle}, m_constraint{constraint} {}
 
-  constexpr units::meters_per_second_t MaxVelocity(
-      const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t velocity) const override {
+  constexpr wpi::units::meters_per_second_t MaxVelocity(
+      const Pose2d& pose, wpi::units::curvature_t curvature,
+      wpi::units::meters_per_second_t velocity) const override {
     if (m_rectangle.Contains(pose.Translation())) {
       return m_constraint.MaxVelocity(pose, curvature, velocity);
     } else {
-      return units::meters_per_second_t{
+      return wpi::units::meters_per_second_t{
           std::numeric_limits<double>::infinity()};
     }
   }
 
   constexpr MinMax MinMaxAcceleration(
-      const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t speed) const override {
+      const Pose2d& pose, wpi::units::curvature_t curvature,
+      wpi::units::meters_per_second_t speed) const override {
     if (m_rectangle.Contains(pose.Translation())) {
       return m_constraint.MinMaxAcceleration(pose, curvature, speed);
     } else {
@@ -73,4 +73,4 @@ class RectangularRegionConstraint : public TrajectoryConstraint {
   Constraint m_constraint;
 };
 
-}  // namespace frc
+}  // namespace wpi::math

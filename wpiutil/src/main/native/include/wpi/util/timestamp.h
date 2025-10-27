@@ -51,7 +51,7 @@ uint64_t WPI_GetSystemTime(void);
 #endif
 
 #ifdef __cplusplus
-namespace wpi {
+namespace wpi::util {
 
 /**
  * The default implementation used for Now().
@@ -83,7 +83,7 @@ uint64_t Now();
  */
 uint64_t GetSystemTime();
 
-}  // namespace wpi
+}  // namespace wpi::util
 #endif
 
 #endif  // WPIUTIL_WPI_UTIL_TIMESTAMP_H_

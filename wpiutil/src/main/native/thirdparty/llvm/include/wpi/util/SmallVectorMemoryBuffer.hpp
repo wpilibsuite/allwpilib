@@ -26,7 +26,7 @@
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/raw_ostream.hpp"
 
-namespace wpi {
+namespace wpi::util {
 
 /// SmallVector-backed MemoryBuffer instance.
 ///
@@ -60,4 +60,4 @@ class SmallVectorMemoryBuffer : public MemoryBuffer {
   std::string m_bufferName;
 };
 
-}  // namespace wpi
+}  // namespace wpi::util

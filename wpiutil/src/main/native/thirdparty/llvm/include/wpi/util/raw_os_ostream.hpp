@@ -16,7 +16,7 @@
 #include "wpi/util/raw_ostream.hpp"
 #include <iosfwd>
 
-namespace wpi {
+namespace wpi::util {
 
 /// raw_os_ostream - A raw_ostream that writes to an std::ostream.  This is a
 /// simple adaptor class.  It does not check for output errors; clients should

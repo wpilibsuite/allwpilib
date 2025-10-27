@@ -11,7 +11,7 @@
 namespace {
 struct LastErrorStorage {
   int32_t status;
-  wpi::SmallString<512> message;
+  wpi::util::SmallString<512> message;
 };
 }  // namespace
 
@@ -20,7 +20,7 @@ static LastErrorStorage& GetThreadLastError() {
   return lastError;
 }
 
-namespace hal {
+namespace wpi::hal {
 void SetLastError(int32_t* status, std::string_view value) {
   LastErrorStorage& lastError = GetThreadLastError();
   lastError.message = value;
@@ -40,13 +40,13 @@ void SetLastErrorIndexOutOfRange(int32_t* status, std::string_view message,
 void SetLastErrorPreviouslyAllocated(int32_t* status, std::string_view message,
                                      int32_t channel,
                                      std::string_view previousAllocation) {
-  hal::SetLastError(status,
+  wpi::hal::SetLastError(status,
                     fmt::format("{} {} previously allocated.\n"
                                 "Location of the previous allocation:\n{}\n"
                                 "Location of the current allocation:",
                                 message, channel, previousAllocation));
 }
-}  // namespace hal
+}  // namespace wpi::hal
 
 extern "C" {
 const char* HAL_GetLastError(int32_t* status) {

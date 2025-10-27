@@ -15,22 +15,22 @@
 #include "wpi/hal/Types.h"
 #include "wpi/hal/handles/UnlimitedHandleResource.h"
 
-using namespace hal;
-using namespace hal::sim;
-using namespace wpi::java;
+using namespace wpi::hal;
+using namespace wpi::hal::sim;
+using namespace wpi::util::java;
 
-static hal::UnlimitedHandleResource<SIM_JniHandle, ConstBufferCallbackStore,
-                                    hal::HAL_HandleEnum::SimulationJni>*
+static wpi::hal::UnlimitedHandleResource<SIM_JniHandle, ConstBufferCallbackStore,
+                                    wpi::hal::HAL_HandleEnum::SimulationJni>*
     callbackHandles;
 
-namespace hal::sim {
+namespace wpi::hal::sim {
 void InitializeConstBufferStore() {
-  static hal::UnlimitedHandleResource<SIM_JniHandle, ConstBufferCallbackStore,
-                                      hal::HAL_HandleEnum::SimulationJni>
+  static wpi::hal::UnlimitedHandleResource<SIM_JniHandle, ConstBufferCallbackStore,
+                                      wpi::hal::HAL_HandleEnum::SimulationJni>
       cb;
   callbackHandles = &cb;
 }
-}  // namespace hal::sim
+}  // namespace wpi::hal::sim
 
 void ConstBufferCallbackStore::create(JNIEnv* env, jobject obj) {
   m_call = JGlobal<jobject>(env, obj);

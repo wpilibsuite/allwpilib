@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-namespace hal {
+namespace wpi::hal {
 
 constexpr int32_t kNumCanBuses = 5;
 constexpr int32_t kNumSmartIo = 6;
@@ -33,4 +33,4 @@ constexpr int32_t kNumAddressableLEDs = 6;
 constexpr int32_t kNumREVPHModules = 63;
 constexpr int32_t kNumREVPHChannels = 16;
 
-}  // namespace hal
+}  // namespace wpi::hal

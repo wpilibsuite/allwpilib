@@ -2,7 +2,7 @@ extra_includes:
 - wpi/util/SmallString.hpp
 
 classes:
-  frc::MotorSafety:
+  wpi::MotorSafety:
     methods:
       MotorSafety:
       Feed:

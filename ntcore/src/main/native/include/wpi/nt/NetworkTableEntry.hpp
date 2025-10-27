@@ -15,7 +15,7 @@
 #include "wpi/nt/NetworkTableValue.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
 
-namespace nt {
+namespace wpi::nt {
 
 class NetworkTableInstance;
 class Topic;
@@ -109,7 +109,7 @@ class NetworkTableEntry final {
    * @return the entry's value or the given default value
    */
   bool GetBoolean(bool defaultValue) const {
-    return nt::GetBoolean(m_handle, defaultValue);
+    return wpi::nt::GetBoolean(m_handle, defaultValue);
   }
 
   /**
@@ -120,7 +120,7 @@ class NetworkTableEntry final {
    * @return the entry's value or the given default value
    */
   int64_t GetInteger(int64_t defaultValue) const {
-    return nt::GetInteger(m_handle, defaultValue);
+    return wpi::nt::GetInteger(m_handle, defaultValue);
   }
 
   /**
@@ -131,7 +131,7 @@ class NetworkTableEntry final {
    * @return the entry's value or the given default value
    */
   float GetFloat(float defaultValue) const {
-    return nt::GetFloat(m_handle, defaultValue);
+    return wpi::nt::GetFloat(m_handle, defaultValue);
   }
 
   /**
@@ -142,7 +142,7 @@ class NetworkTableEntry final {
    * @return the entry's value or the given default value
    */
   double GetDouble(double defaultValue) const {
-    return nt::GetDouble(m_handle, defaultValue);
+    return wpi::nt::GetDouble(m_handle, defaultValue);
   }
 
   /**
@@ -153,7 +153,7 @@ class NetworkTableEntry final {
    * @return the entry's value or the given default value
    */
   std::string GetString(std::string_view defaultValue) const {
-    return nt::GetString(m_handle, defaultValue);
+    return wpi::nt::GetString(m_handle, defaultValue);
   }
 
   /**
@@ -164,7 +164,7 @@ class NetworkTableEntry final {
    * @return the entry's value or the given default value
    */
   std::vector<uint8_t> GetRaw(std::span<const uint8_t> defaultValue) const {
-    return nt::GetRaw(m_handle, defaultValue);
+    return wpi::nt::GetRaw(m_handle, defaultValue);
   }
 
   /**
@@ -182,7 +182,7 @@ class NetworkTableEntry final {
    *       non-zero value is true.
    */
   std::vector<int> GetBooleanArray(std::span<const int> defaultValue) const {
-    return nt::GetBooleanArray(m_handle, defaultValue);
+    return wpi::nt::GetBooleanArray(m_handle, defaultValue);
   }
 
   /**
@@ -197,7 +197,7 @@ class NetworkTableEntry final {
    */
   std::vector<int64_t> GetIntegerArray(
       std::span<const int64_t> defaultValue) const {
-    return nt::GetIntegerArray(m_handle, defaultValue);
+    return wpi::nt::GetIntegerArray(m_handle, defaultValue);
   }
 
   /**
@@ -211,7 +211,7 @@ class NetworkTableEntry final {
    *       concern, use GetValue() instead.
    */
   std::vector<float> GetFloatArray(std::span<const float> defaultValue) const {
-    return nt::GetFloatArray(m_handle, defaultValue);
+    return wpi::nt::GetFloatArray(m_handle, defaultValue);
   }
 
   /**
@@ -226,7 +226,7 @@ class NetworkTableEntry final {
    */
   std::vector<double> GetDoubleArray(
       std::span<const double> defaultValue) const {
-    return nt::GetDoubleArray(m_handle, defaultValue);
+    return wpi::nt::GetDoubleArray(m_handle, defaultValue);
   }
 
   /**
@@ -241,7 +241,7 @@ class NetworkTableEntry final {
    */
   std::vector<std::string> GetStringArray(
       std::span<const std::string> defaultValue) const {
-    return nt::GetStringArray(m_handle, defaultValue);
+    return wpi::nt::GetStringArray(m_handle, defaultValue);
   }
 
   /**
@@ -253,7 +253,7 @@ class NetworkTableEntry final {
    *     published since the previous call.
    */
   std::vector<NetworkTableValue> ReadQueue() {
-    return nt::ReadQueueValue(m_handle);
+    return wpi::nt::ReadQueueValue(m_handle);
   }
 
   /**
@@ -273,7 +273,7 @@ class NetworkTableEntry final {
    * @return True if the entry did not already have a value, otherwise False
    */
   bool SetDefaultBoolean(bool defaultValue) {
-    return nt::SetDefaultBoolean(m_handle, defaultValue);
+    return wpi::nt::SetDefaultBoolean(m_handle, defaultValue);
   }
 
   /**
@@ -283,7 +283,7 @@ class NetworkTableEntry final {
    * @return True if the entry did not already have a value, otherwise False
    */
   bool SetDefaultInteger(int64_t defaultValue) {
-    return nt::SetDefaultInteger(m_handle, defaultValue);
+    return wpi::nt::SetDefaultInteger(m_handle, defaultValue);
   }
 
   /**
@@ -293,7 +293,7 @@ class NetworkTableEntry final {
    * @return True if the entry did not already have a value, otherwise False
    */
   bool SetDefaultFloat(float defaultValue) {
-    return nt::SetDefaultFloat(m_handle, defaultValue);
+    return wpi::nt::SetDefaultFloat(m_handle, defaultValue);
   }
 
   /**
@@ -303,7 +303,7 @@ class NetworkTableEntry final {
    * @return True if the entry did not already have a value, otherwise False
    */
   bool SetDefaultDouble(double defaultValue) {
-    return nt::SetDefaultDouble(m_handle, defaultValue);
+    return wpi::nt::SetDefaultDouble(m_handle, defaultValue);
   }
 
   /**
@@ -313,7 +313,7 @@ class NetworkTableEntry final {
    * @return True if the entry did not already have a value, otherwise False
    */
   bool SetDefaultString(std::string_view defaultValue) {
-    return nt::SetDefaultString(m_handle, defaultValue);
+    return wpi::nt::SetDefaultString(m_handle, defaultValue);
   }
 
   /**
@@ -323,7 +323,7 @@ class NetworkTableEntry final {
    * @return True if the entry did not already have a value, otherwise False
    */
   bool SetDefaultRaw(std::span<const uint8_t> defaultValue) {
-    return nt::SetDefaultRaw(m_handle, defaultValue);
+    return wpi::nt::SetDefaultRaw(m_handle, defaultValue);
   }
 
   /**
@@ -333,7 +333,7 @@ class NetworkTableEntry final {
    * @return True if the entry did not already have a value, otherwise False
    */
   bool SetDefaultBooleanArray(std::span<const int> defaultValue) {
-    return nt::SetDefaultBooleanArray(m_handle, defaultValue);
+    return wpi::nt::SetDefaultBooleanArray(m_handle, defaultValue);
   }
 
   /**
@@ -343,7 +343,7 @@ class NetworkTableEntry final {
    * @return True if the entry did not already have a value, otherwise False
    */
   bool SetDefaultIntegerArray(std::span<const int64_t> defaultValue) {
-    return nt::SetDefaultIntegerArray(m_handle, defaultValue);
+    return wpi::nt::SetDefaultIntegerArray(m_handle, defaultValue);
   }
 
   /**
@@ -353,7 +353,7 @@ class NetworkTableEntry final {
    * @return True if the entry did not already have a value, otherwise False
    */
   bool SetDefaultFloatArray(std::span<const float> defaultValue) {
-    return nt::SetDefaultFloatArray(m_handle, defaultValue);
+    return wpi::nt::SetDefaultFloatArray(m_handle, defaultValue);
   }
 
   /**
@@ -363,7 +363,7 @@ class NetworkTableEntry final {
    * @return True if the entry did not already have a value, otherwise False
    */
   bool SetDefaultDoubleArray(std::span<const double> defaultValue) {
-    return nt::SetDefaultDoubleArray(m_handle, defaultValue);
+    return wpi::nt::SetDefaultDoubleArray(m_handle, defaultValue);
   }
 
   /**
@@ -373,7 +373,7 @@ class NetworkTableEntry final {
    * @return True if the entry did not already have a value, otherwise False
    */
   bool SetDefaultStringArray(std::span<const std::string> defaultValue) {
-    return nt::SetDefaultStringArray(m_handle, defaultValue);
+    return wpi::nt::SetDefaultStringArray(m_handle, defaultValue);
   }
 
   /**
@@ -388,73 +388,73 @@ class NetworkTableEntry final {
    * Sets the entry's value.
    *
    * @param value the value to set
-   * @param time the timestamp to set (0 = nt::Now())
+   * @param time the timestamp to set (0 = wpi::nt::Now())
    * @return False if the entry exists with a different type
    */
   bool SetBoolean(bool value, int64_t time = 0) {
-    return nt::SetBoolean(m_handle, value, time);
+    return wpi::nt::SetBoolean(m_handle, value, time);
   }
 
   /**
    * Sets the entry's value.
    *
    * @param value the value to set
-   * @param time the timestamp to set (0 = nt::Now())
+   * @param time the timestamp to set (0 = wpi::nt::Now())
    * @return False if the entry exists with a different type
    */
   bool SetInteger(int64_t value, int64_t time = 0) {
-    return nt::SetInteger(m_handle, value, time);
+    return wpi::nt::SetInteger(m_handle, value, time);
   }
 
   /**
    * Sets the entry's value.
    *
    * @param value the value to set
-   * @param time the timestamp to set (0 = nt::Now())
+   * @param time the timestamp to set (0 = wpi::nt::Now())
    * @return False if the entry exists with a different type
    */
   bool SetFloat(float value, int64_t time = 0) {
-    return nt::SetFloat(m_handle, value, time);
+    return wpi::nt::SetFloat(m_handle, value, time);
   }
 
   /**
    * Sets the entry's value.
    *
    * @param value the value to set
-   * @param time the timestamp to set (0 = nt::Now())
+   * @param time the timestamp to set (0 = wpi::nt::Now())
    * @return False if the entry exists with a different type
    */
   bool SetDouble(double value, int64_t time = 0) {
-    return nt::SetDouble(m_handle, value, time);
+    return wpi::nt::SetDouble(m_handle, value, time);
   }
 
   /**
    * Sets the entry's value.
    *
    * @param value the value to set
-   * @param time the timestamp to set (0 = nt::Now())
+   * @param time the timestamp to set (0 = wpi::nt::Now())
    * @return False if the entry exists with a different type
    */
   bool SetString(std::string_view value, int64_t time = 0) {
-    return nt::SetString(m_handle, value, time);
+    return wpi::nt::SetString(m_handle, value, time);
   }
 
   /**
    * Sets the entry's value.
    *
    * @param value the value to set
-   * @param time the timestamp to set (0 = nt::Now())
+   * @param time the timestamp to set (0 = wpi::nt::Now())
    * @return False if the entry exists with a different type
    */
   bool SetRaw(std::span<const uint8_t> value, int64_t time = 0) {
-    return nt::SetRaw(m_handle, value, time);
+    return wpi::nt::SetRaw(m_handle, value, time);
   }
 
   /**
    * Sets the entry's value.
    *
    * @param value the value to set
-   * @param time the timestamp to set (0 = nt::Now())
+   * @param time the timestamp to set (0 = wpi::nt::Now())
    * @return False if the entry exists with a different type
    */
   bool SetBooleanArray(std::span<const bool> value, int64_t time = 0) {
@@ -465,69 +465,69 @@ class NetworkTableEntry final {
    * Sets the entry's value.
    *
    * @param value the value to set
-   * @param time the timestamp to set (0 = nt::Now())
+   * @param time the timestamp to set (0 = wpi::nt::Now())
    * @return False if the entry exists with a different type
    */
   bool SetBooleanArray(std::span<const int> value, int64_t time = 0) {
-    return nt::SetBooleanArray(m_handle, value, time);
+    return wpi::nt::SetBooleanArray(m_handle, value, time);
   }
 
   /**
    * Sets the entry's value.
    *
    * @param value the value to set
-   * @param time the timestamp to set (0 = nt::Now())
+   * @param time the timestamp to set (0 = wpi::nt::Now())
    * @return False if the entry exists with a different type
    */
   bool SetIntegerArray(std::span<const int64_t> value, int64_t time = 0) {
-    return nt::SetIntegerArray(m_handle, value, time);
+    return wpi::nt::SetIntegerArray(m_handle, value, time);
   }
 
   /**
    * Sets the entry's value.
    *
    * @param value the value to set
-   * @param time the timestamp to set (0 = nt::Now())
+   * @param time the timestamp to set (0 = wpi::nt::Now())
    * @return False if the entry exists with a different type
    */
   bool SetFloatArray(std::span<const float> value, int64_t time = 0) {
-    return nt::SetFloatArray(m_handle, value, time);
+    return wpi::nt::SetFloatArray(m_handle, value, time);
   }
 
   /**
    * Sets the entry's value.
    *
    * @param value the value to set
-   * @param time the timestamp to set (0 = nt::Now())
+   * @param time the timestamp to set (0 = wpi::nt::Now())
    * @return False if the entry exists with a different type
    */
   bool SetDoubleArray(std::span<const double> value, int64_t time = 0) {
-    return nt::SetDoubleArray(m_handle, value, time);
+    return wpi::nt::SetDoubleArray(m_handle, value, time);
   }
 
   /**
    * Sets the entry's value.
    *
    * @param value the value to set
-   * @param time the timestamp to set (0 = nt::Now())
+   * @param time the timestamp to set (0 = wpi::nt::Now())
    * @return False if the entry exists with a different type
    */
   bool SetStringArray(std::span<const std::string> value, int64_t time = 0) {
-    return nt::SetStringArray(m_handle, value, time);
+    return wpi::nt::SetStringArray(m_handle, value, time);
   }
 
   /**
    * Make value persistent through program restarts.
    */
   void SetPersistent() {
-    nt::SetTopicPersistent(nt::GetTopicFromHandle(m_handle), true);
+    wpi::nt::SetTopicPersistent(wpi::nt::GetTopicFromHandle(m_handle), true);
   }
 
   /**
    * Stop making value persistent through program restarts.
    */
   void ClearPersistent() {
-    nt::SetTopicPersistent(nt::GetTopicFromHandle(m_handle), false);
+    wpi::nt::SetTopicPersistent(wpi::nt::GetTopicFromHandle(m_handle), false);
   }
 
   /**
@@ -536,13 +536,13 @@ class NetworkTableEntry final {
    * @return True if the value is persistent.
    */
   bool IsPersistent() const {
-    return nt::GetTopicPersistent(nt::GetTopicFromHandle(m_handle));
+    return wpi::nt::GetTopicPersistent(wpi::nt::GetTopicFromHandle(m_handle));
   }
 
   /**
    * Stops publishing the entry if it's been published.
    */
-  void Unpublish() { return nt::Unpublish(m_handle); }
+  void Unpublish() { return wpi::nt::Unpublish(m_handle); }
 
   /**
    * Gets the entry's topic.
@@ -562,4 +562,4 @@ class NetworkTableEntry final {
   NT_Entry m_handle{0};
 };
 
-}  // namespace nt
+}  // namespace wpi::nt

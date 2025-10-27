@@ -13,7 +13,7 @@
 #include "wpi/math/trajectory/TrajectoryConfig.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 static constexpr double kEpsilon = 0.01;
 
@@ -78,7 +78,7 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingTrajectory) {
       Translation2d{-1_m, -1_m}, Translation2d{-1_m, 1_m}};
 
   SwerveDriveOdometry<4> odometry{
-      kinematics, frc::Rotation2d{}, {zero, zero, zero, zero}};
+      kinematics, wpi::math::Rotation2d{}, {zero, zero, zero, zero}};
 
   SwerveModulePosition fl;
   SwerveModulePosition fr;
@@ -94,8 +94,8 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingTrajectory) {
   std::default_random_engine generator;
   std::normal_distribution<double> distribution(0.0, 1.0);
 
-  units::second_t dt = 20_ms;
-  units::second_t t = 0_s;
+  wpi::units::second_t dt = 20_ms;
+  wpi::units::second_t t = 0_s;
 
   double maxError = -std::numeric_limits<double>::max();
   double errorSum = 0;
@@ -119,7 +119,7 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingTrajectory) {
 
     auto xhat =
         odometry.Update(groundTruthState.pose.Rotation() +
-                            frc::Rotation2d{distribution(generator) * 0.05_rad},
+                            wpi::math::Rotation2d{distribution(generator) * 0.05_rad},
                         {fl, fr, bl, br});
     double error = groundTruthState.pose.Translation()
                        .Distance(xhat.Translation())
@@ -143,7 +143,7 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingXAxis) {
       Translation2d{-1_m, -1_m}, Translation2d{-1_m, 1_m}};
 
   SwerveDriveOdometry<4> odometry{
-      kinematics, frc::Rotation2d{}, {zero, zero, zero, zero}};
+      kinematics, wpi::math::Rotation2d{}, {zero, zero, zero, zero}};
 
   SwerveModulePosition fl;
   SwerveModulePosition fr;
@@ -159,8 +159,8 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingXAxis) {
   std::default_random_engine generator;
   std::normal_distribution<double> distribution(0.0, 1.0);
 
-  units::second_t dt = 20_ms;
-  units::second_t t = 0_s;
+  wpi::units::second_t dt = 20_ms;
+  wpi::units::second_t t = 0_s;
 
   double maxError = -std::numeric_limits<double>::max();
   double errorSum = 0;
@@ -183,7 +183,7 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingXAxis) {
     br.angle = groundTruthState.pose.Rotation();
 
     auto xhat = odometry.Update(
-        frc::Rotation2d{distribution(generator) * 0.05_rad}, {fl, fr, bl, br});
+        wpi::math::Rotation2d{distribution(generator) * 0.05_rad}, {fl, fr, bl, br});
     double error = groundTruthState.pose.Translation()
                        .Distance(xhat.Translation())
                        .value();

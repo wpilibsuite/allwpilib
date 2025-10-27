@@ -33,27 +33,27 @@
  * single solenoids only take a single channel.
  */
 
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   Robot();
   void TeleopPeriodic() override;
 
  private:
-  frc::Joystick m_stick{0};
+  wpi::Joystick m_stick{0};
 
   // Solenoid corresponds to a single solenoid.
   // In this case, it's connected to channel 0 of a PH with the default CAN
   // ID.
-  frc::Solenoid m_solenoid{0, frc::PneumaticsModuleType::REVPH, 0};
+  wpi::Solenoid m_solenoid{0, wpi::PneumaticsModuleType::REVPH, 0};
 
   // DoubleSolenoid corresponds to a double solenoid.
   // In this case, it's connected to channels 1 and 2 of a PH with the default
   // CAN ID.
-  frc::DoubleSolenoid m_doubleSolenoid{0, frc::PneumaticsModuleType::REVPH, 1,
+  wpi::DoubleSolenoid m_doubleSolenoid{0, wpi::PneumaticsModuleType::REVPH, 1,
                                        2};
 
   // Compressor connected to a PH with a default CAN ID
-  frc::Compressor m_compressor{0, frc::PneumaticsModuleType::REVPH};
+  wpi::Compressor m_compressor{0, wpi::PneumaticsModuleType::REVPH};
 
   static constexpr int kSolenoidButton = 1;
   static constexpr int kDoubleSolenoidForward = 2;

@@ -17,22 +17,22 @@
 #include "wpi/hal/handles/HandlesInternal.h"
 #include "wpi/hal/handles/LimitedHandleResource.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeDIO() {}
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 
 HAL_DigitalHandle HAL_InitializeDIOPort(int32_t channel, HAL_Bool input,
                                         const char* allocationLocation,
                                         int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
 
   if (channel < 0 || channel >= kNumSmartIo) {
     *status = RESOURCE_OUT_OF_RANGE;
-    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
+    wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
                                      kNumSmartIo, channel);
     return HAL_kInvalidHandle;
   }
@@ -44,10 +44,10 @@ HAL_DigitalHandle HAL_InitializeDIOPort(int32_t channel, HAL_Bool input,
 
   if (*status != 0) {
     if (port) {
-      hal::SetLastErrorPreviouslyAllocated(status, "SmartIo", channel,
+      wpi::hal::SetLastErrorPreviouslyAllocated(status, "SmartIo", channel,
                                            port->previousAllocation);
     } else {
-      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
+      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
                                        kNumSmartIo, channel);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
@@ -80,9 +80,9 @@ void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle) {
   smartIoHandles->Free(dioPortHandle, HAL_HandleEnum::DIO);
 
   // Wait for no other object to hold this handle.
-  auto start = hal::fpga_clock::now();
+  auto start = wpi::hal::fpga_clock::now();
   while (port.use_count() != 1) {
-    auto current = hal::fpga_clock::now();
+    auto current = wpi::hal::fpga_clock::now();
     if (start + std::chrono::seconds(1) < current) {
       std::puts("DIO handle free timeout");
       std::fflush(stdout);

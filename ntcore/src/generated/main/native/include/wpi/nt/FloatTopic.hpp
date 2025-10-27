@@ -19,12 +19,12 @@
 #include "wpi/nt/Topic.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
 
-namespace wpi {
+namespace wpi::util {
 template <typename T>
 class SmallVectorImpl;
 }  // namespace wpi
 
-namespace nt {
+namespace wpi::nt {
 
 class FloatTopic;
 
@@ -70,7 +70,7 @@ class FloatSubscriber : public Subscriber {
    * @return value
    */
   ValueType Get(ParamType defaultValue) const {
-    return ::nt::GetFloat(m_subHandle, defaultValue);
+    return ::wpi::nt::GetFloat(m_subHandle, defaultValue);
   }
 
   /**
@@ -93,7 +93,7 @@ class FloatSubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueType GetAtomic(ParamType defaultValue) const {
-    return ::nt::GetAtomicFloat(m_subHandle, defaultValue);
+    return ::wpi::nt::GetAtomicFloat(m_subHandle, defaultValue);
   }
 
   /**
@@ -107,7 +107,7 @@ class FloatSubscriber : public Subscriber {
    *     been published since the previous call.
    */
   std::vector<TimestampedValueType> ReadQueue() {
-    return ::nt::ReadQueueFloat(m_subHandle);
+    return ::wpi::nt::ReadQueueFloat(m_subHandle);
   }
 
   /**
@@ -149,7 +149,7 @@ class FloatPublisher : public Publisher {
    * @param time timestamp; 0 indicates current NT time should be used
    */
   void Set(ParamType value, int64_t time = 0) {
-    ::nt::SetFloat(m_pubHandle, value, time);
+    ::wpi::nt::SetFloat(m_pubHandle, value, time);
   }
 
   /**
@@ -160,7 +160,7 @@ class FloatPublisher : public Publisher {
    * @param value value
    */
   void SetDefault(ParamType value) {
-    ::nt::SetDefaultFloat(m_pubHandle, value);
+    ::wpi::nt::SetDefaultFloat(m_pubHandle, value);
   }
 
   /**
@@ -225,7 +225,7 @@ class FloatEntry final : public FloatSubscriber,
    * Stops publishing the entry if it's published.
    */
   void Unpublish() {
-    ::nt::Unpublish(m_pubHandle);
+    ::wpi::nt::Unpublish(m_pubHandle);
   }
 };
 
@@ -280,7 +280,7 @@ class FloatTopic final : public Topic {
       ParamType defaultValue,
       const PubSubOptions& options = kDefaultPubSubOptions) {
     return FloatSubscriber{
-        ::nt::Subscribe(m_handle, NT_FLOAT, "float", options),
+        ::wpi::nt::Subscribe(m_handle, NT_FLOAT, "float", options),
         defaultValue};
   }
   /**
@@ -304,7 +304,7 @@ class FloatTopic final : public Topic {
       std::string_view typeString, ParamType defaultValue,
       const PubSubOptions& options = kDefaultPubSubOptions) {
     return FloatSubscriber{
-        ::nt::Subscribe(m_handle, NT_FLOAT, typeString, options),
+        ::wpi::nt::Subscribe(m_handle, NT_FLOAT, typeString, options),
         defaultValue};
   }
 
@@ -326,7 +326,7 @@ class FloatTopic final : public Topic {
   [[nodiscard]]
   PublisherType Publish(const PubSubOptions& options = kDefaultPubSubOptions) {
     return FloatPublisher{
-        ::nt::Publish(m_handle, NT_FLOAT, "float", options)};
+        ::wpi::nt::Publish(m_handle, NT_FLOAT, "float", options)};
   }
 
   /**
@@ -349,9 +349,9 @@ class FloatTopic final : public Topic {
    */
   [[nodiscard]]
   PublisherType PublishEx(std::string_view typeString,
-    const wpi::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
+    const wpi::util::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
     return FloatPublisher{
-        ::nt::PublishEx(m_handle, NT_FLOAT, typeString, properties, options)};
+        ::wpi::nt::PublishEx(m_handle, NT_FLOAT, typeString, properties, options)};
   }
 
   /**
@@ -378,7 +378,7 @@ class FloatTopic final : public Topic {
   EntryType GetEntry(ParamType defaultValue,
                      const PubSubOptions& options = kDefaultPubSubOptions) {
     return FloatEntry{
-        ::nt::GetEntry(m_handle, NT_FLOAT, "float", options),
+        ::wpi::nt::GetEntry(m_handle, NT_FLOAT, "float", options),
         defaultValue};
   }
   /**
@@ -406,22 +406,22 @@ class FloatTopic final : public Topic {
   EntryType GetEntryEx(std::string_view typeString, ParamType defaultValue,
                        const PubSubOptions& options = kDefaultPubSubOptions) {
     return FloatEntry{
-        ::nt::GetEntry(m_handle, NT_FLOAT, typeString, options),
+        ::wpi::nt::GetEntry(m_handle, NT_FLOAT, typeString, options),
         defaultValue};
   }
 
 };
 
 inline FloatTopic FloatSubscriber::GetTopic() const {
-  return FloatTopic{::nt::GetTopicFromHandle(m_subHandle)};
+  return FloatTopic{::wpi::nt::GetTopicFromHandle(m_subHandle)};
 }
 
 inline FloatTopic FloatPublisher::GetTopic() const {
-  return FloatTopic{::nt::GetTopicFromHandle(m_pubHandle)};
+  return FloatTopic{::wpi::nt::GetTopicFromHandle(m_pubHandle)};
 }
 
 inline FloatTopic FloatEntry::GetTopic() const {
-  return FloatTopic{::nt::GetTopicFromHandle(m_subHandle)};
+  return FloatTopic{::wpi::nt::GetTopicFromHandle(m_subHandle)};
 }
 
-}  // namespace nt
+}  // namespace wpi::nt

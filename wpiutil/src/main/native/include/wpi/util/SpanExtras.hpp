@@ -7,7 +7,7 @@
 #include <cassert>
 #include <span>
 
-namespace wpi {
+namespace wpi::util {
 
 /// Drop the first \p N elements of the array.
 template <typename T, size_t N>
@@ -55,4 +55,4 @@ constexpr std::span<T> take_back(std::span<T, N> in,
   return drop_front(in, length - n);
 }
 
-}  // namespace wpi
+}  // namespace wpi::util

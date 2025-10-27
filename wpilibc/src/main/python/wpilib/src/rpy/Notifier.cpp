@@ -16,7 +16,7 @@
 #include <pybind11/functional.h>
 #include <gilsafe_object.h>
 
-using namespace frc;
+using namespace wpi;
 using namespace pybind11::literals;
 
 // Hang the thread since returning to the caller is going to crash when we try
@@ -144,7 +144,7 @@ void PyNotifier::SetCallback(std::function<void()> handler) {
   m_handler = handler;
 }
 
-void PyNotifier::StartSingle(units::second_t delay) {
+void PyNotifier::StartSingle(wpi::units::second_t delay) {
   std::scoped_lock lock(m_processMutex);
   m_periodic = false;
   m_period = delay;
@@ -152,7 +152,7 @@ void PyNotifier::StartSingle(units::second_t delay) {
   UpdateAlarm();
 }
 
-void PyNotifier::StartPeriodic(units::second_t period) {
+void PyNotifier::StartPeriodic(wpi::units::second_t period) {
   std::scoped_lock lock(m_processMutex);
   m_periodic = true;
   m_period = period;

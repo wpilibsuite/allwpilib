@@ -4,147 +4,147 @@
 
 namespace pybind11 {
 namespace detail {
-template <> struct handle_type_name<units::becquerel_t> {
+template <> struct handle_type_name<wpi::units::becquerel_t> {
   static constexpr auto name = _("wpimath.units.becquerels");
 };
 
-template <> struct handle_type_name<units::becquerels> {
+template <> struct handle_type_name<wpi::units::becquerels> {
   static constexpr auto name = _("wpimath.units.becquerels");
 };
 
-template <> struct handle_type_name<units::nanobecquerel_t> {
+template <> struct handle_type_name<wpi::units::nanobecquerel_t> {
   static constexpr auto name = _("wpimath.units.nanobecquerels");
 };
 
-template <> struct handle_type_name<units::nanobecquerels> {
+template <> struct handle_type_name<wpi::units::nanobecquerels> {
   static constexpr auto name = _("wpimath.units.nanobecquerels");
 };
 
-template <> struct handle_type_name<units::microbecquerel_t> {
+template <> struct handle_type_name<wpi::units::microbecquerel_t> {
   static constexpr auto name = _("wpimath.units.microbecquerels");
 };
 
-template <> struct handle_type_name<units::microbecquerels> {
+template <> struct handle_type_name<wpi::units::microbecquerels> {
   static constexpr auto name = _("wpimath.units.microbecquerels");
 };
 
-template <> struct handle_type_name<units::millibecquerel_t> {
+template <> struct handle_type_name<wpi::units::millibecquerel_t> {
   static constexpr auto name = _("wpimath.units.millibecquerels");
 };
 
-template <> struct handle_type_name<units::millibecquerels> {
+template <> struct handle_type_name<wpi::units::millibecquerels> {
   static constexpr auto name = _("wpimath.units.millibecquerels");
 };
 
-template <> struct handle_type_name<units::kilobecquerel_t> {
+template <> struct handle_type_name<wpi::units::kilobecquerel_t> {
   static constexpr auto name = _("wpimath.units.kilobecquerels");
 };
 
-template <> struct handle_type_name<units::kilobecquerels> {
+template <> struct handle_type_name<wpi::units::kilobecquerels> {
   static constexpr auto name = _("wpimath.units.kilobecquerels");
 };
 
-template <> struct handle_type_name<units::gray_t> {
+template <> struct handle_type_name<wpi::units::gray_t> {
   static constexpr auto name = _("wpimath.units.grays");
 };
 
-template <> struct handle_type_name<units::grays> {
+template <> struct handle_type_name<wpi::units::grays> {
   static constexpr auto name = _("wpimath.units.grays");
 };
 
-template <> struct handle_type_name<units::nanogray_t> {
+template <> struct handle_type_name<wpi::units::nanogray_t> {
   static constexpr auto name = _("wpimath.units.nanograys");
 };
 
-template <> struct handle_type_name<units::nanograys> {
+template <> struct handle_type_name<wpi::units::nanograys> {
   static constexpr auto name = _("wpimath.units.nanograys");
 };
 
-template <> struct handle_type_name<units::microgray_t> {
+template <> struct handle_type_name<wpi::units::microgray_t> {
   static constexpr auto name = _("wpimath.units.micrograys");
 };
 
-template <> struct handle_type_name<units::micrograys> {
+template <> struct handle_type_name<wpi::units::micrograys> {
   static constexpr auto name = _("wpimath.units.micrograys");
 };
 
-template <> struct handle_type_name<units::milligray_t> {
+template <> struct handle_type_name<wpi::units::milligray_t> {
   static constexpr auto name = _("wpimath.units.milligrays");
 };
 
-template <> struct handle_type_name<units::milligrays> {
+template <> struct handle_type_name<wpi::units::milligrays> {
   static constexpr auto name = _("wpimath.units.milligrays");
 };
 
-template <> struct handle_type_name<units::kilogray_t> {
+template <> struct handle_type_name<wpi::units::kilogray_t> {
   static constexpr auto name = _("wpimath.units.kilograys");
 };
 
-template <> struct handle_type_name<units::kilograys> {
+template <> struct handle_type_name<wpi::units::kilograys> {
   static constexpr auto name = _("wpimath.units.kilograys");
 };
 
-template <> struct handle_type_name<units::sievert_t> {
+template <> struct handle_type_name<wpi::units::sievert_t> {
   static constexpr auto name = _("wpimath.units.sieverts");
 };
 
-template <> struct handle_type_name<units::sieverts> {
+template <> struct handle_type_name<wpi::units::sieverts> {
   static constexpr auto name = _("wpimath.units.sieverts");
 };
 
-template <> struct handle_type_name<units::nanosievert_t> {
+template <> struct handle_type_name<wpi::units::nanosievert_t> {
   static constexpr auto name = _("wpimath.units.nanosieverts");
 };
 
-template <> struct handle_type_name<units::nanosieverts> {
+template <> struct handle_type_name<wpi::units::nanosieverts> {
   static constexpr auto name = _("wpimath.units.nanosieverts");
 };
 
-template <> struct handle_type_name<units::microsievert_t> {
+template <> struct handle_type_name<wpi::units::microsievert_t> {
   static constexpr auto name = _("wpimath.units.microsieverts");
 };
 
-template <> struct handle_type_name<units::microsieverts> {
+template <> struct handle_type_name<wpi::units::microsieverts> {
   static constexpr auto name = _("wpimath.units.microsieverts");
 };
 
-template <> struct handle_type_name<units::millisievert_t> {
+template <> struct handle_type_name<wpi::units::millisievert_t> {
   static constexpr auto name = _("wpimath.units.millisieverts");
 };
 
-template <> struct handle_type_name<units::millisieverts> {
+template <> struct handle_type_name<wpi::units::millisieverts> {
   static constexpr auto name = _("wpimath.units.millisieverts");
 };
 
-template <> struct handle_type_name<units::kilosievert_t> {
+template <> struct handle_type_name<wpi::units::kilosievert_t> {
   static constexpr auto name = _("wpimath.units.kilosieverts");
 };
 
-template <> struct handle_type_name<units::kilosieverts> {
+template <> struct handle_type_name<wpi::units::kilosieverts> {
   static constexpr auto name = _("wpimath.units.kilosieverts");
 };
 
-template <> struct handle_type_name<units::curie_t> {
+template <> struct handle_type_name<wpi::units::curie_t> {
   static constexpr auto name = _("wpimath.units.curies");
 };
 
-template <> struct handle_type_name<units::curies> {
+template <> struct handle_type_name<wpi::units::curies> {
   static constexpr auto name = _("wpimath.units.curies");
 };
 
-template <> struct handle_type_name<units::rutherford_t> {
+template <> struct handle_type_name<wpi::units::rutherford_t> {
   static constexpr auto name = _("wpimath.units.rutherfords");
 };
 
-template <> struct handle_type_name<units::rutherfords> {
+template <> struct handle_type_name<wpi::units::rutherfords> {
   static constexpr auto name = _("wpimath.units.rutherfords");
 };
 
-template <> struct handle_type_name<units::rad_t> {
+template <> struct handle_type_name<wpi::units::rad_t> {
   static constexpr auto name = _("wpimath.units.rads");
 };
 
-template <> struct handle_type_name<units::rads> {
+template <> struct handle_type_name<wpi::units::rads> {
   static constexpr auto name = _("wpimath.units.rads");
 };
 

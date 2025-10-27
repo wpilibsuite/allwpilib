@@ -19,12 +19,12 @@
 #include "wpi/nt/Topic.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
 
-namespace wpi {
+namespace wpi::util {
 template <typename T>
 class SmallVectorImpl;
 }  // namespace wpi
 
-namespace nt {
+namespace wpi::nt {
 
 class StringArrayTopic;
 
@@ -70,7 +70,7 @@ class StringArraySubscriber : public Subscriber {
    * @return value
    */
   ValueType Get(ParamType defaultValue) const {
-    return ::nt::GetStringArray(m_subHandle, defaultValue);
+    return ::wpi::nt::GetStringArray(m_subHandle, defaultValue);
   }
 
   /**
@@ -93,7 +93,7 @@ class StringArraySubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueType GetAtomic(ParamType defaultValue) const {
-    return ::nt::GetAtomicStringArray(m_subHandle, defaultValue);
+    return ::wpi::nt::GetAtomicStringArray(m_subHandle, defaultValue);
   }
 
   /**
@@ -107,7 +107,7 @@ class StringArraySubscriber : public Subscriber {
    *     been published since the previous call.
    */
   std::vector<TimestampedValueType> ReadQueue() {
-    return ::nt::ReadQueueStringArray(m_subHandle);
+    return ::wpi::nt::ReadQueueStringArray(m_subHandle);
   }
 
   /**
@@ -149,7 +149,7 @@ class StringArrayPublisher : public Publisher {
    * @param time timestamp; 0 indicates current NT time should be used
    */
   void Set(ParamType value, int64_t time = 0) {
-    ::nt::SetStringArray(m_pubHandle, value, time);
+    ::wpi::nt::SetStringArray(m_pubHandle, value, time);
   }
 
   /**
@@ -160,7 +160,7 @@ class StringArrayPublisher : public Publisher {
    * @param value value
    */
   void SetDefault(ParamType value) {
-    ::nt::SetDefaultStringArray(m_pubHandle, value);
+    ::wpi::nt::SetDefaultStringArray(m_pubHandle, value);
   }
 
   /**
@@ -225,7 +225,7 @@ class StringArrayEntry final : public StringArraySubscriber,
    * Stops publishing the entry if it's published.
    */
   void Unpublish() {
-    ::nt::Unpublish(m_pubHandle);
+    ::wpi::nt::Unpublish(m_pubHandle);
   }
 };
 
@@ -280,7 +280,7 @@ class StringArrayTopic final : public Topic {
       ParamType defaultValue,
       const PubSubOptions& options = kDefaultPubSubOptions) {
     return StringArraySubscriber{
-        ::nt::Subscribe(m_handle, NT_STRING_ARRAY, "string[]", options),
+        ::wpi::nt::Subscribe(m_handle, NT_STRING_ARRAY, "string[]", options),
         defaultValue};
   }
   /**
@@ -304,7 +304,7 @@ class StringArrayTopic final : public Topic {
       std::string_view typeString, ParamType defaultValue,
       const PubSubOptions& options = kDefaultPubSubOptions) {
     return StringArraySubscriber{
-        ::nt::Subscribe(m_handle, NT_STRING_ARRAY, typeString, options),
+        ::wpi::nt::Subscribe(m_handle, NT_STRING_ARRAY, typeString, options),
         defaultValue};
   }
 
@@ -326,7 +326,7 @@ class StringArrayTopic final : public Topic {
   [[nodiscard]]
   PublisherType Publish(const PubSubOptions& options = kDefaultPubSubOptions) {
     return StringArrayPublisher{
-        ::nt::Publish(m_handle, NT_STRING_ARRAY, "string[]", options)};
+        ::wpi::nt::Publish(m_handle, NT_STRING_ARRAY, "string[]", options)};
   }
 
   /**
@@ -349,9 +349,9 @@ class StringArrayTopic final : public Topic {
    */
   [[nodiscard]]
   PublisherType PublishEx(std::string_view typeString,
-    const wpi::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
+    const wpi::util::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
     return StringArrayPublisher{
-        ::nt::PublishEx(m_handle, NT_STRING_ARRAY, typeString, properties, options)};
+        ::wpi::nt::PublishEx(m_handle, NT_STRING_ARRAY, typeString, properties, options)};
   }
 
   /**
@@ -378,7 +378,7 @@ class StringArrayTopic final : public Topic {
   EntryType GetEntry(ParamType defaultValue,
                      const PubSubOptions& options = kDefaultPubSubOptions) {
     return StringArrayEntry{
-        ::nt::GetEntry(m_handle, NT_STRING_ARRAY, "string[]", options),
+        ::wpi::nt::GetEntry(m_handle, NT_STRING_ARRAY, "string[]", options),
         defaultValue};
   }
   /**
@@ -406,22 +406,22 @@ class StringArrayTopic final : public Topic {
   EntryType GetEntryEx(std::string_view typeString, ParamType defaultValue,
                        const PubSubOptions& options = kDefaultPubSubOptions) {
     return StringArrayEntry{
-        ::nt::GetEntry(m_handle, NT_STRING_ARRAY, typeString, options),
+        ::wpi::nt::GetEntry(m_handle, NT_STRING_ARRAY, typeString, options),
         defaultValue};
   }
 
 };
 
 inline StringArrayTopic StringArraySubscriber::GetTopic() const {
-  return StringArrayTopic{::nt::GetTopicFromHandle(m_subHandle)};
+  return StringArrayTopic{::wpi::nt::GetTopicFromHandle(m_subHandle)};
 }
 
 inline StringArrayTopic StringArrayPublisher::GetTopic() const {
-  return StringArrayTopic{::nt::GetTopicFromHandle(m_pubHandle)};
+  return StringArrayTopic{::wpi::nt::GetTopicFromHandle(m_pubHandle)};
 }
 
 inline StringArrayTopic StringArrayEntry::GetTopic() const {
-  return StringArrayTopic{::nt::GetTopicFromHandle(m_subHandle)};
+  return StringArrayTopic{::wpi::nt::GetTopicFromHandle(m_subHandle)};
 }
 
-}  // namespace nt
+}  // namespace wpi::nt

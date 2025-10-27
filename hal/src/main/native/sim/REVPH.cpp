@@ -13,12 +13,12 @@
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/handles/IndexedHandleResource.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
 namespace {
 struct PCM {
   int32_t module;
-  wpi::mutex lock;
+  wpi::util::mutex lock;
   std::string previousAllocation;
 };
 }  // namespace
@@ -26,23 +26,23 @@ struct PCM {
 static IndexedHandleResource<HAL_REVPHHandle, PCM, kNumREVPHModules,
                              HAL_HandleEnum::REVPH>* pcmHandles;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeREVPH() {
   static IndexedHandleResource<HAL_REVPHHandle, PCM, kNumREVPHModules,
                                HAL_HandleEnum::REVPH>
       pH;
   pcmHandles = &pH;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
                                     const char* allocationLocation,
                                     int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
 
   if (!HAL_CheckREVPHModuleNumber(module)) {
     *status = RESOURCE_OUT_OF_RANGE;
-    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PH", 1,
+    wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PH", 1,
                                      kNumREVPHModules, module);
     return HAL_kInvalidHandle;
   }
@@ -53,10 +53,10 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
 
   if (*status != 0) {
     if (pcm) {
-      hal::SetLastErrorPreviouslyAllocated(status, "REV PH", module,
+      wpi::hal::SetLastErrorPreviouslyAllocated(status, "REV PH", module,
                                            pcm->previousAllocation);
     } else {
-      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PH", 1,
+      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PH", 1,
                                        kNumREVPHModules, module);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.

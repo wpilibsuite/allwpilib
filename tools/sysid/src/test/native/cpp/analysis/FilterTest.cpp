@@ -13,7 +13,7 @@
 #include "wpi/sysid/analysis/FilteringUtils.hpp"
 #include "wpi/sysid/analysis/Storage.hpp"
 
-TEST(FilterTest, MedianFilter) {
+TEST(FilterTest, wpi::math::MedianFilter) {
   std::vector<sysid::PreparedData> testData{
       sysid::PreparedData{0_s, 0, 0, 0},    sysid::PreparedData{0_s, 0, 0, 1},
       sysid::PreparedData{0_s, 0, 0, 10},   sysid::PreparedData{0_s, 0, 0, 5},
@@ -49,7 +49,7 @@ void FillStepVoltageData(std::vector<sysid::PreparedData>& data) {
     auto& datum = data.at(i);
     datum.timestamp = previousDatum.timestamp + previousDatum.dt;
     datum.position = 0.5 * previousDatum.acceleration *
-                         units::math::pow<2>(previousDatum.dt).value() +
+                         wpi::units::math::pow<2>(previousDatum.dt).value() +
                      previousDatum.velocity * previousDatum.dt.value() +
                      previousDatum.position;
     datum.velocity = previousDatum.velocity +
@@ -136,7 +136,7 @@ TEST(FilterTest, StepTrim) {
 }
 
 template <int Derivative, int Samples, typename F, typename DfDx>
-void AssertCentralResults(F&& f, DfDx&& dfdx, units::second_t h, double min,
+void AssertCentralResults(F&& f, DfDx&& dfdx, wpi::units::second_t h, double min,
                           double max) {
   static_assert(Samples % 2 != 0, "Number of samples must be odd.");
 

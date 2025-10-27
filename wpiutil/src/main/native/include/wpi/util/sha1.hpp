@@ -25,7 +25,7 @@
 #include <string>
 #include <string_view>
 
-namespace wpi {
+namespace wpi::util {
 template <typename T>
 class SmallVectorImpl;
 class raw_istream;
@@ -47,6 +47,6 @@ class SHA1 {
   uint64_t transforms;
 };
 
-}  // namespace wpi
+}  // namespace wpi::util
 
 #endif  // WPIUTIL_WPI_UTIL_SHA1_HPP_

@@ -19,12 +19,12 @@
 #include "wpi/nt/Topic.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
 
-namespace wpi {
+namespace wpi::util {
 template <typename T>
 class SmallVectorImpl;
 }  // namespace wpi
 
-namespace nt {
+namespace wpi::nt {
 
 class RawTopic;
 
@@ -74,7 +74,7 @@ class RawSubscriber : public Subscriber {
    * @return value
    */
   ValueType Get(ParamType defaultValue) const {
-    return ::nt::GetRaw(m_subHandle, defaultValue);
+    return ::wpi::nt::GetRaw(m_subHandle, defaultValue);
   }
 
   /**
@@ -84,7 +84,7 @@ class RawSubscriber : public Subscriber {
    * @param buf storage for returned value
    * @return value
    */
-  SmallRetType Get(wpi::SmallVectorImpl<SmallElemType>& buf) const {
+  SmallRetType Get(wpi::util::SmallVectorImpl<SmallElemType>& buf) const {
     return Get(buf, m_defaultValue);
   }
 
@@ -96,8 +96,8 @@ class RawSubscriber : public Subscriber {
    * @param defaultValue default value to return if no value has been published
    * @return value
    */
-  SmallRetType Get(wpi::SmallVectorImpl<SmallElemType>& buf, ParamType defaultValue) const {
-    return nt::GetRaw(m_subHandle, buf, defaultValue);
+  SmallRetType Get(wpi::util::SmallVectorImpl<SmallElemType>& buf, ParamType defaultValue) const {
+    return wpi::nt::GetRaw(m_subHandle, buf, defaultValue);
   }
 
   /**
@@ -120,7 +120,7 @@ class RawSubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueType GetAtomic(ParamType defaultValue) const {
-    return ::nt::GetAtomicRaw(m_subHandle, defaultValue);
+    return ::wpi::nt::GetAtomicRaw(m_subHandle, defaultValue);
   }
 
   /**
@@ -132,7 +132,7 @@ class RawSubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueViewType GetAtomic(
-      wpi::SmallVectorImpl<SmallElemType>& buf) const {
+      wpi::util::SmallVectorImpl<SmallElemType>& buf) const {
     return GetAtomic(buf, m_defaultValue);
   }
 
@@ -146,9 +146,9 @@ class RawSubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueViewType GetAtomic(
-      wpi::SmallVectorImpl<SmallElemType>& buf,
+      wpi::util::SmallVectorImpl<SmallElemType>& buf,
       ParamType defaultValue) const {
-    return nt::GetAtomicRaw(m_subHandle, buf, defaultValue);
+    return wpi::nt::GetAtomicRaw(m_subHandle, buf, defaultValue);
   }
 
   /**
@@ -162,7 +162,7 @@ class RawSubscriber : public Subscriber {
    *     been published since the previous call.
    */
   std::vector<TimestampedValueType> ReadQueue() {
-    return ::nt::ReadQueueRaw(m_subHandle);
+    return ::wpi::nt::ReadQueueRaw(m_subHandle);
   }
 
   /**
@@ -207,7 +207,7 @@ class RawPublisher : public Publisher {
    * @param time timestamp; 0 indicates current NT time should be used
    */
   void Set(ParamType value, int64_t time = 0) {
-    ::nt::SetRaw(m_pubHandle, value, time);
+    ::wpi::nt::SetRaw(m_pubHandle, value, time);
   }
 
   /**
@@ -218,7 +218,7 @@ class RawPublisher : public Publisher {
    * @param value value
    */
   void SetDefault(ParamType value) {
-    ::nt::SetDefaultRaw(m_pubHandle, value);
+    ::wpi::nt::SetDefaultRaw(m_pubHandle, value);
   }
 
   /**
@@ -286,7 +286,7 @@ class RawEntry final : public RawSubscriber,
    * Stops publishing the entry if it's published.
    */
   void Unpublish() {
-    ::nt::Unpublish(m_pubHandle);
+    ::wpi::nt::Unpublish(m_pubHandle);
   }
 };
 
@@ -341,7 +341,7 @@ class RawTopic final : public Topic {
       std::string_view typeString, ParamType defaultValue,
       const PubSubOptions& options = kDefaultPubSubOptions) {
     return RawSubscriber{
-        ::nt::Subscribe(m_handle, NT_RAW, typeString, options),
+        ::wpi::nt::Subscribe(m_handle, NT_RAW, typeString, options),
         defaultValue};
   }
   /**
@@ -364,7 +364,7 @@ class RawTopic final : public Topic {
   [[nodiscard]]
   PublisherType Publish(std::string_view typeString, const PubSubOptions& options = kDefaultPubSubOptions) {
     return RawPublisher{
-        ::nt::Publish(m_handle, NT_RAW, typeString, options)};
+        ::wpi::nt::Publish(m_handle, NT_RAW, typeString, options)};
   }
 
   /**
@@ -387,9 +387,9 @@ class RawTopic final : public Topic {
    */
   [[nodiscard]]
   PublisherType PublishEx(std::string_view typeString,
-    const wpi::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
+    const wpi::util::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
     return RawPublisher{
-        ::nt::PublishEx(m_handle, NT_RAW, typeString, properties, options)};
+        ::wpi::nt::PublishEx(m_handle, NT_RAW, typeString, properties, options)};
   }
 
   /**
@@ -418,21 +418,21 @@ class RawTopic final : public Topic {
   EntryType GetEntry(std::string_view typeString, ParamType defaultValue,
                      const PubSubOptions& options = kDefaultPubSubOptions) {
     return RawEntry{
-        ::nt::GetEntry(m_handle, NT_RAW, typeString, options),
+        ::wpi::nt::GetEntry(m_handle, NT_RAW, typeString, options),
         defaultValue};
   }
 };
 
 inline RawTopic RawSubscriber::GetTopic() const {
-  return RawTopic{::nt::GetTopicFromHandle(m_subHandle)};
+  return RawTopic{::wpi::nt::GetTopicFromHandle(m_subHandle)};
 }
 
 inline RawTopic RawPublisher::GetTopic() const {
-  return RawTopic{::nt::GetTopicFromHandle(m_pubHandle)};
+  return RawTopic{::wpi::nt::GetTopicFromHandle(m_pubHandle)};
 }
 
 inline RawTopic RawEntry::GetTopic() const {
-  return RawTopic{::nt::GetTopicFromHandle(m_subHandle)};
+  return RawTopic{::wpi::nt::GetTopicFromHandle(m_subHandle)};
 }
 
-}  // namespace nt
+}  // namespace wpi::nt

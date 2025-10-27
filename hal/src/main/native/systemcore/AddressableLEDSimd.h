@@ -8,7 +8,7 @@
 #include "simd/simd.h"
 #include "wpi/hal/AddressableLEDTypes.h"
 
-namespace hal::detail {
+namespace wpi::hal::detail {
 
 constexpr size_t kPixelSize = 3;
 static_assert(sizeof(HAL_AddressableLEDData) == kPixelSize);
@@ -221,4 +221,4 @@ void ConvertPixels(const uint8_t* src, uint8_t* dst, size_t len) {
     }
   }
 }
-}  // namespace hal::detail
+}  // namespace wpi::hal::detail

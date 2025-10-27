@@ -3,9 +3,9 @@ extra_includes:
 - wpi/hardware/rotation/DutyCycle.hpp
 
 classes:
-  frc::DutyCycleEncoder:
+  wpi::DutyCycleEncoder:
     ignored_bases:
-    - wpi::SendableHelper<DutyCycleEncoder>
+    - wpi::util::SendableHelper<DutyCycleEncoder>
     methods:
       DutyCycleEncoder:
         overloads:

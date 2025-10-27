@@ -8,7 +8,7 @@
 
 #include "wpi/hardware/motor/PWMMotorController.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Luminary Micro / Vex Robotics Jaguar Motor Controller with PWM control.
@@ -40,4 +40,4 @@ class Jaguar : public PWMMotorController {
   Jaguar& operator=(Jaguar&&) = default;
 };
 
-}  // namespace frc
+}  // namespace wpi

@@ -1,5 +1,5 @@
 classes:
-  nt::IntegerSubscriber:
+  wpi::nt::IntegerSubscriber:
     methods:
       IntegerSubscriber:
         overloads:
@@ -29,7 +29,7 @@ classes:
         py::gil_scoped_release release;
         *self = IntegerSubscriber();
       })
-  nt::IntegerPublisher:
+  wpi::nt::IntegerPublisher:
     methods:
       IntegerPublisher:
         overloads:
@@ -52,7 +52,7 @@ classes:
         py::gil_scoped_release release;
         *self = IntegerPublisher();
       })
-  nt::IntegerEntry:
+  wpi::nt::IntegerEntry:
     methods:
       IntegerEntry:
         overloads:
@@ -76,7 +76,7 @@ classes:
         py::gil_scoped_release release;
         *self = IntegerEntry();
       })
-  nt::IntegerTopic:
+  wpi::nt::IntegerTopic:
     attributes:
       kTypeString:
     methods:

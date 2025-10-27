@@ -1,5 +1,5 @@
 classes:
-  frc::PyNotifier:
+  wpi::PyNotifier:
     rename: Notifier
     methods:
       PyNotifier:
@@ -11,11 +11,11 @@ classes:
         overloads:
           double:
             ignore: true
-          units::second_t:
+          wpi::units::second_t:
       StartPeriodic:
         overloads:
           double:
             ignore: true
-          units::second_t:
+          wpi::units::second_t:
       Stop:
       SetHALThreadPriority:

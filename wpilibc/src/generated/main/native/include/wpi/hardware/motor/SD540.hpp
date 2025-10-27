@@ -8,7 +8,7 @@
 
 #include "wpi/hardware/motor/PWMMotorController.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Mindsensors SD540 Motor Controller with PWM control.
@@ -40,4 +40,4 @@ class SD540 : public PWMMotorController {
   SD540& operator=(SD540&&) = default;
 };
 
-}  // namespace frc
+}  // namespace wpi

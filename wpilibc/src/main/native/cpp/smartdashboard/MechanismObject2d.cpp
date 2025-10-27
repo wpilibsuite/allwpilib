@@ -6,7 +6,7 @@
 
 #include <string>
 
-using namespace frc;
+using namespace wpi;
 
 MechanismObject2d::MechanismObject2d(std::string_view name) : m_name{name} {}
 
@@ -14,7 +14,7 @@ const std::string& MechanismObject2d::GetName() const {
   return m_name;
 }
 
-void MechanismObject2d::Update(std::shared_ptr<nt::NetworkTable> table) {
+void MechanismObject2d::Update(std::shared_ptr<wpi::nt::NetworkTable> table) {
   std::scoped_lock lock(m_mutex);
   m_table = table;
   UpdateEntries(m_table);

@@ -13,7 +13,7 @@
 
 #include "wpi/glass/other/Alerts.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 class NTAlertsModel : public AlertsModel {
  public:
@@ -21,7 +21,7 @@ class NTAlertsModel : public AlertsModel {
 
   // path is to the table containing ".type", excluding the trailing /
   explicit NTAlertsModel(std::string_view path);
-  NTAlertsModel(nt::NetworkTableInstance inst, std::string_view path);
+  NTAlertsModel(wpi::nt::NetworkTableInstance inst, std::string_view path);
 
   const std::vector<std::string>& GetInfos() override { return m_infosValue; }
 
@@ -36,14 +36,14 @@ class NTAlertsModel : public AlertsModel {
   bool IsReadOnly() override { return false; }
 
  private:
-  nt::NetworkTableInstance m_inst;
-  nt::StringArraySubscriber m_infos;
-  nt::StringArraySubscriber m_warnings;
-  nt::StringArraySubscriber m_errors;
+  wpi::nt::NetworkTableInstance m_inst;
+  wpi::nt::StringArraySubscriber m_infos;
+  wpi::nt::StringArraySubscriber m_warnings;
+  wpi::nt::StringArraySubscriber m_errors;
 
   std::vector<std::string> m_infosValue;
   std::vector<std::string> m_warningsValue;
   std::vector<std::string> m_errorsValue;
 };
 
-}  // namespace glass
+}  // namespace wpi::glass

@@ -16,7 +16,7 @@
 #include "wpi/commands2/Command.hpp"
 #include "wpi/commands2/CommandHelper.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 /**
  * A command that runs another command repeatedly, restarting it when it ends,
  * until this command is interrupted. Command instances that are passed to it
@@ -71,13 +71,13 @@ class RepeatCommand : public CommandHelper<Command, RepeatCommand> {
 
   Command::InterruptionBehavior GetInterruptionBehavior() const override;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
   std::unique_ptr<Command> m_command;
   bool m_ended;
 };
-}  // namespace frc2
+}  // namespace wpi::cmd
 
 #ifdef _WIN32
 #pragma warning(pop)

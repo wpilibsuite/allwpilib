@@ -2,9 +2,9 @@ defaults:
   subpackage: trajectory
 
 classes:
-  frc::TrajectoryParameterizer:
+  wpi::math::TrajectoryParameterizer:
     force_type_casters:
-    - units::unit_t
-    - units::curvature_t
+    - wpi::units::unit_t
+    - wpi::units::curvature_t
     methods:
       TimeParameterizeTrajectory:

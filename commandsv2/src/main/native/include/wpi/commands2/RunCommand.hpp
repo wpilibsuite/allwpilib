@@ -10,7 +10,7 @@
 #include "wpi/commands2/FunctionalCommand.hpp"
 #include "wpi/commands2/Requirements.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 /**
  * A command that runs a Runnable continuously.  Has no end condition as-is;
  * either subclass it or use Command.WithTimeout() or
@@ -35,4 +35,4 @@ class RunCommand : public CommandHelper<FunctionalCommand, RunCommand> {
 
   RunCommand(const RunCommand& other) = default;
 };
-}  // namespace frc2
+}  // namespace wpi::cmd

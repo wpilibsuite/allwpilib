@@ -27,14 +27,14 @@ static double GetData(double t) {
 class LinearFilterNoiseTest
     : public testing::TestWithParam<LinearFilterNoiseTestType> {
  protected:
-  frc::LinearFilter<double> m_filter = [=] {
+  wpi::math::LinearFilter<double> m_filter = [=] {
     switch (GetParam()) {
       case kTestSinglePoleIIR:
-        return frc::LinearFilter<double>::SinglePoleIIR(
+        return wpi::math::LinearFilter<double>::SinglePoleIIR(
             kSinglePoleIIRTimeConstant, kFilterStep);
         break;
       default:
-        return frc::LinearFilter<double>::MovingAverage(kMovAvgTaps);
+        return wpi::math::LinearFilter<double>::MovingAverage(kMovAvgTaps);
         break;
     }
   }();

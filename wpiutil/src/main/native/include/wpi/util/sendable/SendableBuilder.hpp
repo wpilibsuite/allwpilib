@@ -13,7 +13,7 @@
 
 #include "wpi/util/SmallVector.hpp"
 
-namespace wpi {
+namespace wpi::util {
 
 /**
  * Helper class for building Sendable dashboard representations.
@@ -277,7 +277,7 @@ class SendableBuilder {
    */
   virtual void AddSmallStringProperty(
       std::string_view key,
-      std::function<std::string_view(wpi::SmallVectorImpl<char>& buf)> getter,
+      std::function<std::string_view(wpi::util::SmallVectorImpl<char>& buf)> getter,
       std::function<void(std::string_view)> setter) = 0;
 
   /**
@@ -289,7 +289,7 @@ class SendableBuilder {
    */
   virtual void AddSmallBooleanArrayProperty(
       std::string_view key,
-      std::function<std::span<const int>(wpi::SmallVectorImpl<int>& buf)>
+      std::function<std::span<const int>(wpi::util::SmallVectorImpl<int>& buf)>
           getter,
       std::function<void(std::span<const int>)> setter) = 0;
 
@@ -303,7 +303,7 @@ class SendableBuilder {
   virtual void AddSmallIntegerArrayProperty(
       std::string_view key,
       std::function<
-          std::span<const int64_t>(wpi::SmallVectorImpl<int64_t>& buf)>
+          std::span<const int64_t>(wpi::util::SmallVectorImpl<int64_t>& buf)>
           getter,
       std::function<void(std::span<const int64_t>)> setter) = 0;
 
@@ -316,7 +316,7 @@ class SendableBuilder {
    */
   virtual void AddSmallFloatArrayProperty(
       std::string_view key,
-      std::function<std::span<const float>(wpi::SmallVectorImpl<float>& buf)>
+      std::function<std::span<const float>(wpi::util::SmallVectorImpl<float>& buf)>
           getter,
       std::function<void(std::span<const float>)> setter) = 0;
 
@@ -329,7 +329,7 @@ class SendableBuilder {
    */
   virtual void AddSmallDoubleArrayProperty(
       std::string_view key,
-      std::function<std::span<const double>(wpi::SmallVectorImpl<double>& buf)>
+      std::function<std::span<const double>(wpi::util::SmallVectorImpl<double>& buf)>
           getter,
       std::function<void(std::span<const double>)> setter) = 0;
 
@@ -343,7 +343,7 @@ class SendableBuilder {
   virtual void AddSmallStringArrayProperty(
       std::string_view key,
       std::function<
-          std::span<const std::string>(wpi::SmallVectorImpl<std::string>& buf)>
+          std::span<const std::string>(wpi::util::SmallVectorImpl<std::string>& buf)>
           getter,
       std::function<void(std::span<const std::string>)> setter) = 0;
 
@@ -357,7 +357,7 @@ class SendableBuilder {
    */
   virtual void AddSmallRawProperty(
       std::string_view key, std::string_view typeString,
-      std::function<std::span<uint8_t>(wpi::SmallVectorImpl<uint8_t>& buf)>
+      std::function<std::span<uint8_t>(wpi::util::SmallVectorImpl<uint8_t>& buf)>
           getter,
       std::function<void(std::span<const uint8_t>)> setter) = 0;
 
@@ -386,4 +386,4 @@ class SendableBuilder {
   virtual void ClearProperties() = 0;
 };
 
-}  // namespace wpi
+}  // namespace wpi::util

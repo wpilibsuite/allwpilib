@@ -12,7 +12,7 @@
 
 #include "uv.h"
 
-namespace wpi {
+namespace wpi::net {
 
 std::string GetHostname() {
   std::string rv;
@@ -34,8 +34,8 @@ std::string GetHostname() {
   return rv;
 }
 
-std::string_view GetHostname(SmallVectorImpl<char>& name) {
-  // Use a tmp array to not require the SmallVector to be too large.
+std::string_view GetHostname(wpi::util::SmallVectorImpl<char>& name) {
+  // Use a tmp array to not require the wpi::util::SmallVector to be too large.
   char tmpName[256];
   size_t size = sizeof(tmpName);
 
@@ -55,4 +55,4 @@ std::string_view GetHostname(SmallVectorImpl<char>& name) {
   return {name.data(), size};
 }
 
-}  // namespace wpi
+}  // namespace wpi::net

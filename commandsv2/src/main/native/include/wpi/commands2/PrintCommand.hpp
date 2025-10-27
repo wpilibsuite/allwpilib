@@ -9,7 +9,7 @@
 #include "wpi/commands2/CommandHelper.hpp"
 #include "wpi/commands2/InstantCommand.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 /**
  * A command that prints a string when initialized.
  *
@@ -30,4 +30,4 @@ class PrintCommand : public CommandHelper<InstantCommand, PrintCommand> {
 
   bool RunsWhenDisabled() const override;
 };
-}  // namespace frc2
+}  // namespace wpi::cmd

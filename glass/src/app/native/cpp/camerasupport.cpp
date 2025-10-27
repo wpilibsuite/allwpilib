@@ -30,7 +30,7 @@ static bool TryDelayLoadAllImports(LPCSTR szDll) {
   }
   return true;
 }
-namespace glass {
+namespace wpi::glass {
 bool HasCameraSupport() {
   bool hasCameraSupport = false;
   hasCameraSupport = TryDelayLoadAllImports("MF.dll");
@@ -42,11 +42,11 @@ bool HasCameraSupport() {
   }
   return hasCameraSupport;
 }
-}  // namespace glass
+}  // namespace wpi::glass
 #else
-namespace glass {
+namespace wpi::glass {
 bool HasCameraSupport() {
   return true;
 }
-}  // namespace glass
+}  // namespace wpi::glass
 #endif

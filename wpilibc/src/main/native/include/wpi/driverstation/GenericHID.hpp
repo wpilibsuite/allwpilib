@@ -10,7 +10,7 @@
 
 #include "wpi/driverstation/DriverStation.hpp"
 
-namespace frc {
+namespace wpi {
 
 class BooleanEvent;
 class EventLoop;
@@ -367,4 +367,4 @@ class GenericHID {
   uint16_t m_rightRumble = 0;
 };
 
-}  // namespace frc
+}  // namespace wpi

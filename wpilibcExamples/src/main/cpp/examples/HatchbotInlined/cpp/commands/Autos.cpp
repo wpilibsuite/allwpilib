@@ -11,8 +11,8 @@
 
 using namespace AutoConstants;
 
-frc2::CommandPtr autos::SimpleAuto(DriveSubsystem* drive) {
-  return frc2::FunctionalCommand(
+wpi::cmd::CommandPtr autos::SimpleAuto(DriveSubsystem* drive) {
+  return wpi::cmd::FunctionalCommand(
              // Reset encoders on command start
              [drive] { drive->ResetEncoders(); },
              // Drive forward while the command is executing
@@ -30,11 +30,11 @@ frc2::CommandPtr autos::SimpleAuto(DriveSubsystem* drive) {
       .ToPtr();
 }
 
-frc2::CommandPtr autos::ComplexAuto(DriveSubsystem* drive,
+wpi::cmd::CommandPtr autos::ComplexAuto(DriveSubsystem* drive,
                                     HatchSubsystem* hatch) {
-  return frc2::cmd::Sequence(
+  return wpi::cmd::cmd::Sequence(
       // Drive forward the specified distance
-      frc2::FunctionalCommand(
+      wpi::cmd::FunctionalCommand(
           // Reset encoders on command start
           [drive] { drive->ResetEncoders(); },
           // Drive forward while the command is executing
@@ -54,7 +54,7 @@ frc2::CommandPtr autos::ComplexAuto(DriveSubsystem* drive,
       hatch->ReleaseHatchCommand(),
       // Drive backward the specified distance
       // Drive forward the specified distance
-      frc2::FunctionalCommand(
+      wpi::cmd::FunctionalCommand(
           // Reset encoders on command start
           [drive] { drive->ResetEncoders(); },
           // Drive backward while the command is executing

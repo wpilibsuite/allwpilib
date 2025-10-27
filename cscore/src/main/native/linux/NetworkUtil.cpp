@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-namespace cs {
+namespace wpi::cs {
 
 std::vector<std::string> GetNetworkInterfaces() {
   struct ifaddrs* ifa;
@@ -42,4 +42,4 @@ std::vector<std::string> GetNetworkInterfaces() {
   return rv;
 }
 
-}  // namespace cs
+}  // namespace wpi::cs

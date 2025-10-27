@@ -4,7 +4,7 @@ functions:
   from_json:
     ignore: true
 classes:
-  frc::AprilTag:
+  wpi::apriltag::AprilTag:
     attributes:
       ID:
       pose:

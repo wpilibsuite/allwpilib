@@ -1,9 +1,9 @@
 classes:
-  frc::sim::SolenoidSim:
+  wpi::sim::SolenoidSim:
     force_type_casters:
     - std::function
     typealias:
-    - frc::PneumaticsModuleType
+    - wpi::PneumaticsModuleType
     methods:
       SolenoidSim:
         overloads:

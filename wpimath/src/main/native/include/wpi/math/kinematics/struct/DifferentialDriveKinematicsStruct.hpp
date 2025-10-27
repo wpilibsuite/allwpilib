@@ -10,16 +10,16 @@
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Struct<frc::DifferentialDriveKinematics> {
+struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::DifferentialDriveKinematics> {
   static constexpr std::string_view GetTypeName() {
     return "DifferentialDriveKinematics";
   }
   static constexpr size_t GetSize() { return 8; }
   static constexpr std::string_view GetSchema() { return "double trackwidth"; }
 
-  static frc::DifferentialDriveKinematics Unpack(std::span<const uint8_t> data);
+  static wpi::math::DifferentialDriveKinematics Unpack(std::span<const uint8_t> data);
   static void Pack(std::span<uint8_t> data,
-                   const frc::DifferentialDriveKinematics& value);
+                   const wpi::math::DifferentialDriveKinematics& value);
 };
 
-static_assert(wpi::StructSerializable<frc::DifferentialDriveKinematics>);
+static_assert(wpi::util::StructSerializable<wpi::math::DifferentialDriveKinematics>);

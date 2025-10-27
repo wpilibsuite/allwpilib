@@ -6,22 +6,22 @@
 
 #include "wpi/cs/cscore_runloop.hpp"
 
-static wpi::Event& GetInstance() {
-  static wpi::Event event;
+static wpi::util::Event& GetInstance() {
+  static wpi::util::Event event;
   return event;
 }
 
-namespace cs {
+namespace wpi::cs {
 
 void RunMainRunLoop() {
-  wpi::Event& event = GetInstance();
-  wpi::WaitForObject(event.GetHandle());
+  wpi::util::Event& event = GetInstance();
+  wpi::util::WaitForObject(event.GetHandle());
 }
 
 int RunMainRunLoopTimeout(double timeout) {
-  wpi::Event& event = GetInstance();
+  wpi::util::Event& event = GetInstance();
   bool timedOut = false;
-  bool signaled = wpi::WaitForObject(event.GetHandle(), timeout, &timedOut);
+  bool signaled = wpi::util::WaitForObject(event.GetHandle(), timeout, &timedOut);
   if (timedOut) {
     return 3;
   }
@@ -32,8 +32,8 @@ int RunMainRunLoopTimeout(double timeout) {
 }
 
 void StopMainRunLoop() {
-  wpi::Event& event = GetInstance();
+  wpi::util::Event& event = GetInstance();
   event.Set();
 }
 
-}  // namespace cs
+}  // namespace wpi::cs

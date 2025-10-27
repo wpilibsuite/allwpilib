@@ -9,7 +9,7 @@
 #include <string_view>
 #include <typeinfo>
 
-namespace wpi {
+namespace wpi::util {
 
 /**
  * Demangle a C++ symbol.
@@ -28,6 +28,6 @@ std::string GetTypeName(const T& type) {
   return Demangle(typeid(type).name());
 }
 
-}  // namespace wpi
+}  // namespace wpi::util
 
 #endif  // WPIUTIL_WPI_UTIL_DEMANGLE_HPP_

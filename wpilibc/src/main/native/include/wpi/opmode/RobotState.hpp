@@ -4,7 +4,7 @@
 
 #pragma once
 
-namespace frc {
+namespace wpi {
 
 /**
  * Robot state utility functions.
@@ -56,4 +56,4 @@ class RobotState {
   static bool IsTest();
 };
 
-}  // namespace frc
+}  // namespace wpi

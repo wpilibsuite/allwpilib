@@ -8,7 +8,7 @@
 #include <wpi/hal/Ports.h>
 #include <wpi/util/SensorUtil.hpp>
 
-using namespace frc;
+using namespace wpi;
 
 int SensorUtil::GetDefaultCTREPCMModule() {
   return 0;

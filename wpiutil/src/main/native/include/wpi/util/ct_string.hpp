@@ -12,7 +12,7 @@
 #include <string>
 #include <string_view>
 
-namespace wpi {
+namespace wpi::util {
 
 // derived from:
 // https://codereview.stackexchange.com/questions/282514/string-literals-concatenation-with-support-for-dynamic-strings
@@ -228,4 +228,4 @@ constexpr auto NumToCtString() {
   return res;
 }
 
-}  // namespace wpi
+}  // namespace wpi::util

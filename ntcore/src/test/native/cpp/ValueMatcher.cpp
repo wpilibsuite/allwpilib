@@ -6,7 +6,7 @@
 
 #include "TestPrinters.hpp"
 
-namespace nt {
+namespace wpi::nt {
 
 bool ValueMatcher::MatchAndExplain(
     Value val, ::testing::MatchResultListener* listener) const {
@@ -26,4 +26,4 @@ void ValueMatcher::DescribeNegationTo(::std::ostream* os) const {
   PrintTo(goodval, os);
 }
 
-}  // namespace nt
+}  // namespace wpi::nt

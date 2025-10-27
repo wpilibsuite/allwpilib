@@ -13,7 +13,7 @@
 
 #include "wpi/cs/cscore_cv.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Singleton class for creating and keeping camera servers.
@@ -200,4 +200,4 @@ class CameraServer {
   CameraServer() = default;
 };
 
-}  // namespace frc
+}  // namespace wpi

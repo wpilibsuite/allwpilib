@@ -9,11 +9,11 @@
 
 #include "wpi/math/geometry/Rotation2d.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 TEST(Rotation2dTest, RadiansToDegrees) {
-  const Rotation2d rot1{units::radian_t{std::numbers::pi / 3.0}};
-  const Rotation2d rot2{units::radian_t{std::numbers::pi / 4.0}};
+  const Rotation2d rot1{wpi::units::radian_t{std::numbers::pi / 3.0}};
+  const Rotation2d rot2{wpi::units::radian_t{std::numbers::pi / 4.0}};
 
   EXPECT_DOUBLE_EQ(60.0, rot1.Degrees().value());
   EXPECT_DOUBLE_EQ(45.0, rot2.Degrees().value());

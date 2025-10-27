@@ -2,7 +2,7 @@ extra_includes:
 - wpi/apriltag/AprilTagDetection.hpp
 
 classes:
-  frc::AprilTagPoseEstimator:
+  wpi::apriltag::AprilTagPoseEstimator:
     methods:
       AprilTagPoseEstimator:
       SetConfig:
@@ -19,7 +19,7 @@ classes:
         overloads:
           const AprilTagDetection& [const]:
           std::span<const double, 9>, std::span<const double, 8> [const]:
-  frc::AprilTagPoseEstimator::Config:
+  wpi::apriltag::AprilTagPoseEstimator::Config:
     force_no_default_constructor: true
     attributes:
       tagSize:
@@ -30,7 +30,7 @@ classes:
     methods:
       operator==:
     inline_code: |
-      .def(py::init([](units::meter_t tagSize, double fx, double fy, double cx, double cy) {
+      .def(py::init([](wpi::units::meter_t tagSize, double fx, double fy, double cx, double cy) {
         AprilTagPoseEstimator::Config cfg{tagSize, fx, fy, cx, cy};
         return std::make_unique<AprilTagPoseEstimator::Config>(std::move(cfg));
       }), py::arg("tagSize"), py::arg("fx"), py::arg("fy"), py::arg("cx"), py::arg("cy"))

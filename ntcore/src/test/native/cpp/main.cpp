@@ -11,7 +11,7 @@
 #include "wpi/nt/ntcore.h"
 
 int main(int argc, char** argv) {
-  nt::AddLogger(nt::GetDefaultInstance(), 0, UINT_MAX, [](auto& event) {
+  wpi::nt::AddLogger(wpi::nt::GetDefaultInstance(), 0, UINT_MAX, [](auto& event) {
     if (auto msg = event.GetLogMessage()) {
       std::fputs(msg->message.c_str(), stderr);
       std::fputc('\n', stderr);

@@ -2,7 +2,7 @@ extra_includes:
 - wpi/driverstation/StadiaController.hpp
 
 classes:
-  frc::sim::StadiaControllerSim:
+  wpi::sim::StadiaControllerSim:
     force_no_trampoline: true
     methods:
       StadiaControllerSim:

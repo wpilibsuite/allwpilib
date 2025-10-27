@@ -11,7 +11,7 @@
 // For more information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 class ReplaceMeParallelRaceGroup
-    : public frc2::CommandHelper<frc2::ParallelRaceGroup,
+    : public wpi::cmd::CommandHelper<wpi::cmd::ParallelRaceGroup,
                                  ReplaceMeParallelRaceGroup> {
  public:
   ReplaceMeParallelRaceGroup();

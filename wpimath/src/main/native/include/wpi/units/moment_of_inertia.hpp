@@ -8,9 +8,9 @@
 #include "wpi/units/base.hpp"
 #include "wpi/units/mass.hpp"
 
-namespace units {
+namespace wpi::units {
 UNIT_ADD(moment_of_inertia, kilogram_square_meter, kilogram_square_meters,
          kg_sq_m, compound_unit<mass::kilograms, area::square_meters>)
 
 using namespace moment_of_inertia;
-}  // namespace units
+}  // namespace wpi::units

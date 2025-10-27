@@ -10,7 +10,7 @@
 #include "PubSubOptions.hpp"
 #include "wpi/nt/ntcore_c.h"
 
-namespace nt::local {
+namespace wpi::nt::local {
 
 struct PubSubConfig : public PubSubOptionsImpl {
   PubSubConfig() = default;
@@ -24,4 +24,4 @@ struct PubSubConfig : public PubSubOptionsImpl {
   std::string typeStr;
 };
 
-}  // namespace nt::local
+}  // namespace wpi::nt::local

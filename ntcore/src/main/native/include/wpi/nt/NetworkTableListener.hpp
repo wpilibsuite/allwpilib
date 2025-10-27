@@ -15,7 +15,7 @@
 #include "wpi/nt/Topic.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
 
-namespace nt {
+namespace wpi::nt {
 
 class MultiSubscriber;
 class NetworkTableEntry;
@@ -47,7 +47,7 @@ class NetworkTableListener final {
   static NetworkTableListener CreateListener(
       NetworkTableInstance inst, std::span<const std::string_view> prefixes,
       unsigned int mask, ListenerCallback listener) {
-    return NetworkTableListener{::nt::AddListener(inst.GetHandle(), prefixes,
+    return NetworkTableListener{::wpi::nt::AddListener(inst.GetHandle(), prefixes,
                                                   mask, std::move(listener))};
   }
 
@@ -63,7 +63,7 @@ class NetworkTableListener final {
   static NetworkTableListener CreateListener(Topic topic, unsigned int mask,
                                              ListenerCallback listener) {
     return NetworkTableListener{
-        nt::AddListener(topic.GetHandle(), mask, std::move(listener))};
+        wpi::nt::AddListener(topic.GetHandle(), mask, std::move(listener))};
   }
 
   /**
@@ -79,7 +79,7 @@ class NetworkTableListener final {
                                              unsigned int mask,
                                              ListenerCallback listener) {
     return NetworkTableListener{
-        ::nt::AddListener(subscriber.GetHandle(), mask, std::move(listener))};
+        ::wpi::nt::AddListener(subscriber.GetHandle(), mask, std::move(listener))};
   }
 
   /**
@@ -95,7 +95,7 @@ class NetworkTableListener final {
                                              unsigned int mask,
                                              ListenerCallback listener) {
     return NetworkTableListener{
-        ::nt::AddListener(subscriber.GetHandle(), mask, std::move(listener))};
+        ::wpi::nt::AddListener(subscriber.GetHandle(), mask, std::move(listener))};
   }
 
   /**
@@ -110,7 +110,7 @@ class NetworkTableListener final {
                                              unsigned int mask,
                                              ListenerCallback listener) {
     return NetworkTableListener{
-        ::nt::AddListener(entry.GetHandle(), mask, std::move(listener))};
+        ::wpi::nt::AddListener(entry.GetHandle(), mask, std::move(listener))};
   }
 
   /**
@@ -124,7 +124,7 @@ class NetworkTableListener final {
   static NetworkTableListener CreateConnectionListener(
       NetworkTableInstance inst, bool immediate_notify,
       ListenerCallback listener) {
-    return NetworkTableListener{::nt::AddListener(
+    return NetworkTableListener{::wpi::nt::AddListener(
         inst.GetHandle(),
         NT_EVENT_CONNECTION | (immediate_notify ? NT_EVENT_IMMEDIATE : 0),
         std::move(listener))};
@@ -142,7 +142,7 @@ class NetworkTableListener final {
   static NetworkTableListener CreateTimeSyncListener(
       NetworkTableInstance inst, bool immediate_notify,
       ListenerCallback listener) {
-    return NetworkTableListener{::nt::AddListener(
+    return NetworkTableListener{::wpi::nt::AddListener(
         inst.GetHandle(),
         NT_EVENT_TIMESYNC | (immediate_notify ? NT_EVENT_IMMEDIATE : 0),
         std::move(listener))};
@@ -166,7 +166,7 @@ class NetworkTableListener final {
                                            unsigned int minLevel,
                                            unsigned int maxLevel,
                                            ListenerCallback listener) {
-    return NetworkTableListener{::nt::AddLogger(inst.GetHandle(), minLevel,
+    return NetworkTableListener{::wpi::nt::AddLogger(inst.GetHandle(), minLevel,
                                                 maxLevel, std::move(listener))};
   }
 
@@ -179,7 +179,7 @@ class NetworkTableListener final {
 
   NetworkTableListener& operator=(NetworkTableListener&& rhs) {
     if (m_handle != 0) {
-      nt::RemoveListener(m_handle);
+      wpi::nt::RemoveListener(m_handle);
     }
     m_handle = rhs.m_handle;
     rhs.m_handle = 0;
@@ -188,7 +188,7 @@ class NetworkTableListener final {
 
   ~NetworkTableListener() {
     if (m_handle != 0) {
-      nt::RemoveListener(m_handle);
+      wpi::nt::RemoveListener(m_handle);
     }
   }
 
@@ -213,7 +213,7 @@ class NetworkTableListener final {
    */
   bool WaitForQueue(double timeout) {
     if (m_handle != 0) {
-      return nt::WaitForListenerQueue(m_handle, timeout);
+      return wpi::nt::WaitForListenerQueue(m_handle, timeout);
     } else {
       return false;
     }
@@ -240,7 +240,7 @@ class NetworkTableListenerPoller final {
    * @param inst Instance
    */
   explicit NetworkTableListenerPoller(NetworkTableInstance inst)
-      : m_handle(nt::CreateListenerPoller(inst.GetHandle())) {}
+      : m_handle(wpi::nt::CreateListenerPoller(inst.GetHandle())) {}
 
   NetworkTableListenerPoller(const NetworkTableListenerPoller&) = delete;
   NetworkTableListenerPoller& operator=(const NetworkTableListenerPoller&) =
@@ -253,7 +253,7 @@ class NetworkTableListenerPoller final {
 
   NetworkTableListenerPoller& operator=(NetworkTableListenerPoller&& rhs) {
     if (m_handle != 0) {
-      nt::DestroyListenerPoller(m_handle);
+      wpi::nt::DestroyListenerPoller(m_handle);
     }
     m_handle = rhs.m_handle;
     rhs.m_handle = 0;
@@ -262,7 +262,7 @@ class NetworkTableListenerPoller final {
 
   ~NetworkTableListenerPoller() {
     if (m_handle != 0) {
-      nt::DestroyListenerPoller(m_handle);
+      wpi::nt::DestroyListenerPoller(m_handle);
     }
   }
 
@@ -286,7 +286,7 @@ class NetworkTableListenerPoller final {
    */
   NT_Listener AddListener(std::span<const std::string_view> prefixes,
                           unsigned int mask) {
-    return nt::AddPolledListener(m_handle, prefixes, mask);
+    return wpi::nt::AddPolledListener(m_handle, prefixes, mask);
   }
 
   /**
@@ -298,7 +298,7 @@ class NetworkTableListenerPoller final {
    * @return Listener handle
    */
   NT_Listener AddListener(Topic topic, unsigned int mask) {
-    return ::nt::AddPolledListener(m_handle, topic.GetHandle(), mask);
+    return ::wpi::nt::AddPolledListener(m_handle, topic.GetHandle(), mask);
   }
 
   /**
@@ -310,7 +310,7 @@ class NetworkTableListenerPoller final {
    * @return Listener handle
    */
   NT_Listener AddListener(Subscriber& subscriber, unsigned int mask) {
-    return ::nt::AddPolledListener(m_handle, subscriber.GetHandle(), mask);
+    return ::wpi::nt::AddPolledListener(m_handle, subscriber.GetHandle(), mask);
   }
 
   /**
@@ -322,7 +322,7 @@ class NetworkTableListenerPoller final {
    * @return Listener handle
    */
   NT_Listener AddListener(MultiSubscriber& subscriber, unsigned int mask) {
-    return ::nt::AddPolledListener(m_handle, subscriber.GetHandle(), mask);
+    return ::wpi::nt::AddPolledListener(m_handle, subscriber.GetHandle(), mask);
   }
 
   /**
@@ -333,7 +333,7 @@ class NetworkTableListenerPoller final {
    * @return Listener handle
    */
   NT_Listener AddListener(NetworkTableEntry& entry, unsigned int mask) {
-    return ::nt::AddPolledListener(m_handle, entry.GetHandle(), mask);
+    return ::wpi::nt::AddPolledListener(m_handle, entry.GetHandle(), mask);
   }
 
   /**
@@ -345,8 +345,8 @@ class NetworkTableListenerPoller final {
    * @return Listener handle
    */
   NT_Listener AddConnectionListener(bool immediate_notify) {
-    return ::nt::AddPolledListener(
-        m_handle, ::nt::GetInstanceFromHandle(m_handle),
+    return ::wpi::nt::AddPolledListener(
+        m_handle, ::wpi::nt::GetInstanceFromHandle(m_handle),
         NT_EVENT_CONNECTION | (immediate_notify ? NT_EVENT_IMMEDIATE : 0));
   }
 
@@ -361,8 +361,8 @@ class NetworkTableListenerPoller final {
    * @return Listener handle
    */
   NT_Listener AddTimeSyncListener(bool immediate_notify) {
-    return ::nt::AddPolledListener(
-        m_handle, ::nt::GetInstanceFromHandle(m_handle),
+    return ::wpi::nt::AddPolledListener(
+        m_handle, ::wpi::nt::GetInstanceFromHandle(m_handle),
         NT_EVENT_TIMESYNC | (immediate_notify ? NT_EVENT_IMMEDIATE : 0));
   }
 
@@ -378,7 +378,7 @@ class NetworkTableListenerPoller final {
    * @return Listener handle
    */
   NT_Listener AddLogger(unsigned int minLevel, unsigned int maxLevel) {
-    return ::nt::AddPolledLogger(m_handle, minLevel, maxLevel);
+    return ::wpi::nt::AddPolledLogger(m_handle, minLevel, maxLevel);
   }
 
   /**
@@ -386,17 +386,17 @@ class NetworkTableListenerPoller final {
    *
    * @param listener Listener handle
    */
-  void RemoveListener(NT_Listener listener) { ::nt::RemoveListener(listener); }
+  void RemoveListener(NT_Listener listener) { ::wpi::nt::RemoveListener(listener); }
 
   /**
    * Read events.
    *
    * @return Events since the previous call to ReadQueue()
    */
-  std::vector<Event> ReadQueue() { return ::nt::ReadListenerQueue(m_handle); }
+  std::vector<Event> ReadQueue() { return ::wpi::nt::ReadListenerQueue(m_handle); }
 
  private:
   NT_ListenerPoller m_handle{0};
 };
 
-}  // namespace nt
+}  // namespace wpi::nt

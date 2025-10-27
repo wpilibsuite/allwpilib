@@ -13,7 +13,7 @@
 #include "wpi/commands2/FunctionalCommand.hpp"
 #include "wpi/commands2/RunCommand.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 class SchedulingRecursionTest
     : public CommandTestBaseWithParam<Command::InterruptionBehavior> {};
@@ -343,15 +343,15 @@ TEST_F(SchedulingRecursionTest, CancelDefaultCommandFromEnd) {
 TEST_F(SchedulingRecursionTest, CancelNextCommandFromCommand) {
   CommandScheduler scheduler = GetScheduler();
 
-  frc2::RunCommand* command1Ptr = nullptr;
-  frc2::RunCommand* command2Ptr = nullptr;
+  wpi::cmd::RunCommand* command1Ptr = nullptr;
+  wpi::cmd::RunCommand* command2Ptr = nullptr;
   int counter = 0;
 
-  auto command1 = frc2::RunCommand([&counter, &command2Ptr, &scheduler] {
+  auto command1 = wpi::cmd::RunCommand([&counter, &command2Ptr, &scheduler] {
     scheduler.Cancel(command2Ptr);
     counter++;
   });
-  auto command2 = frc2::RunCommand([&counter, &command1Ptr, &scheduler] {
+  auto command2 = wpi::cmd::RunCommand([&counter, &command1Ptr, &scheduler] {
     scheduler.Cancel(command1Ptr);
     counter++;
   });

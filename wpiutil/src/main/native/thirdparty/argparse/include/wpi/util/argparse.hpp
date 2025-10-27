@@ -71,7 +71,7 @@ SOFTWARE.
 #define WPI_CUSTOM_STRTOLD strtold
 #endif
 
-namespace wpi {
+namespace wpi::util {
 
 namespace details { // namespace for helper methods
 
@@ -2540,4 +2540,4 @@ protected:
   std::vector<std::string> m_group_names;
 };
 
-} // namespace wpi
+} // namespace wpi::util

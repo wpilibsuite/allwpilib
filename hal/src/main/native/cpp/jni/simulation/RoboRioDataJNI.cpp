@@ -10,8 +10,8 @@
 #include "org_wpilib_hardware_hal_simulation_RoboRioDataJNI.h"
 #include "wpi/hal/simulation/RoboRioData.h"
 
-using namespace hal;
-using namespace wpi::java;
+using namespace wpi::hal;
+using namespace wpi::util::java;
 
 extern "C" {
 
@@ -431,7 +431,7 @@ Java_org_wpilib_hardware_hal_simulation_RoboRioDataJNI_getSerialNumber
 {
   WPI_String str;
   HALSIM_GetRoboRioSerialNumber(&str);
-  auto jstr = MakeJString(env, wpi::to_string_view(&str));
+  auto jstr = MakeJString(env, wpi::util::to_string_view(&str));
   WPI_FreeString(&str);
   return jstr;
 }
@@ -446,7 +446,7 @@ Java_org_wpilib_hardware_hal_simulation_RoboRioDataJNI_setSerialNumber
   (JNIEnv* env, jclass, jstring serialNumber)
 {
   JStringRef serialNumberJString{env, serialNumber};
-  auto str = wpi::make_string(serialNumberJString);
+  auto str = wpi::util::make_string(serialNumberJString);
   HALSIM_SetRoboRioSerialNumber(&str);
 }
 
@@ -461,7 +461,7 @@ Java_org_wpilib_hardware_hal_simulation_RoboRioDataJNI_getComments
 {
   WPI_String str;
   HALSIM_GetRoboRioComments(&str);
-  auto jstr = MakeJString(env, wpi::to_string_view(&str));
+  auto jstr = MakeJString(env, wpi::util::to_string_view(&str));
   WPI_FreeString(&str);
   return jstr;
 }
@@ -476,7 +476,7 @@ Java_org_wpilib_hardware_hal_simulation_RoboRioDataJNI_setComments
   (JNIEnv* env, jclass, jstring comments)
 {
   JStringRef commentsJString{env, comments};
-  auto str = wpi::make_string(commentsJString);
+  auto str = wpi::util::make_string(commentsJString);
   HALSIM_SetRoboRioComments(&str);
 }
 

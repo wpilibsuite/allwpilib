@@ -10,7 +10,7 @@
 #include "PubSubOptions.hpp"
 #include "gmock/gmock.h"
 
-namespace nt {
+namespace wpi::nt {
 
 class PubSubOptionsMatcher
     : public ::testing::MatcherInterface<const PubSubOptionsImpl&> {
@@ -32,4 +32,4 @@ inline ::testing::Matcher<const PubSubOptionsImpl&> PubSubOptionsEq(
   return ::testing::MakeMatcher(new PubSubOptionsMatcher(std::move(good)));
 }
 
-}  // namespace nt
+}  // namespace wpi::nt

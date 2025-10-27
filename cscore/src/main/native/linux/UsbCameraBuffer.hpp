@@ -9,7 +9,7 @@
 
 #include <utility>
 
-namespace cs {
+namespace wpi::cs {
 
 class UsbCameraBuffer {
  public:
@@ -50,6 +50,6 @@ class UsbCameraBuffer {
   size_t m_length{0};
 };
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_USBCAMERABUFFER_HPP_

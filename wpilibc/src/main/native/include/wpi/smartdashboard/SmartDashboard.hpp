@@ -18,7 +18,7 @@ namespace wpi {
 class Sendable;
 }  // namespace wpi
 
-namespace frc {
+namespace wpi {
 
 class SmartDashboard {
  public:
@@ -71,7 +71,7 @@ class SmartDashboard {
    * @param key the key
    * @return    the entry for the key
    */
-  static nt::NetworkTableEntry GetEntry(std::string_view key);
+  static wpi::nt::NetworkTableEntry GetEntry(std::string_view key);
 
   /**
    * Maps the specified key to the specified value in this table.
@@ -85,7 +85,7 @@ class SmartDashboard {
    * @param key  the key
    * @param data the value
    */
-  static void PutData(std::string_view key, wpi::Sendable* data);
+  static void PutData(std::string_view key, wpi::util::Sendable* data);
 
   /**
    * Maps the specified key (where the key is the name of the Sendable)
@@ -99,7 +99,7 @@ class SmartDashboard {
    *
    * @param value the value
    */
-  static void PutData(wpi::Sendable* value);
+  static void PutData(wpi::util::Sendable* value);
 
   /**
    * Returns the value at the specified key.
@@ -107,7 +107,7 @@ class SmartDashboard {
    * @param keyName the key
    * @return the value
    */
-  static wpi::Sendable* GetData(std::string_view keyName);
+  static wpi::util::Sendable* GetData(std::string_view keyName);
 
   /**
    * Maps the specified key to the specified value in this table.
@@ -371,7 +371,7 @@ class SmartDashboard {
    * @param value   the value
    * @return        False if the table key already exists with a different type
    */
-  static bool PutValue(std::string_view keyName, const nt::Value& value);
+  static bool PutValue(std::string_view keyName, const wpi::nt::Value& value);
 
   /**
    * Set the value in the table if key does not exist.
@@ -381,7 +381,7 @@ class SmartDashboard {
    * @returns True if the table key did not already exist, otherwise False
    */
   static bool SetDefaultValue(std::string_view key,
-                              const nt::Value& defaultValue);
+                              const wpi::nt::Value& defaultValue);
 
   /**
    * Retrieves the complex value (such as an array) in this table into the
@@ -389,7 +389,7 @@ class SmartDashboard {
    *
    * @param keyName the key
    */
-  static nt::Value GetValue(std::string_view keyName);
+  static wpi::nt::Value GetValue(std::string_view keyName);
 
   /**
    * Posts a task from a listener to the ListenerExecutor, so that it can be run
@@ -405,4 +405,4 @@ class SmartDashboard {
   static void UpdateValues();
 };
 
-}  // namespace frc
+}  // namespace wpi

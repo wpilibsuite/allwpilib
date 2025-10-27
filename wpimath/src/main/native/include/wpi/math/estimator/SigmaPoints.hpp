@@ -8,7 +8,7 @@
 
 #include "wpi/math/linalg/EigenCore.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 template <typename T, int States>
 concept SigmaPoints =
@@ -23,4 +23,4 @@ concept SigmaPoints =
       { t.Wc(i) } -> std::same_as<double>;
     } && std::default_initializable<T>;
 
-}  // namespace frc
+}  // namespace wpi::math

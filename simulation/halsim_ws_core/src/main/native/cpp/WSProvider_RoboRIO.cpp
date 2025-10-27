@@ -53,8 +53,8 @@ void HALSimWSProviderRoboRIO::DoCancelCallbacks() {
   m_3v3VoltageCbKey = 0;
 }
 
-void HALSimWSProviderRoboRIO::OnNetValueChanged(const wpi::json& json) {
-  wpi::json::const_iterator it;
+void HALSimWSProviderRoboRIO::OnNetValueChanged(const wpi::util::json& json) {
+  wpi::util::json::const_iterator it;
   if ((it = json.find(">vin_voltage")) != json.end()) {
     HALSIM_SetRoboRioVInVoltage(it.value());
   }

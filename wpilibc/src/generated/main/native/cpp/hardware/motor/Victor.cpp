@@ -8,7 +8,7 @@
 
 #include <wpi/hal/UsageReporting.h>
 
-using namespace frc;
+using namespace wpi;
 
 Victor::Victor(int channel) : PWMMotorController("Victor", channel) {
   SetBounds(2.027_ms, 1.525_ms, 1.507_ms, 1.49_ms, 1.026_ms);

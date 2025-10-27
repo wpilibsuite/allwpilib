@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 TEST(UvTimerTest, StartAndStop) {
   auto loop = Loop::Create();
@@ -66,4 +66,4 @@ TEST(UvTimerTest, Repeat) {
   loop->Run();  // forces close callback to run
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

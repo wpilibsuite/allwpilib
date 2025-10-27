@@ -6,7 +6,7 @@
 
 #include "wpi/net/NetworkStream.hpp"
 
-using namespace wpi;
+using namespace wpi::net;
 
 void raw_socket_istream::read_impl(void* data, size_t len) {
   char* cdata = static_cast<char*>(data);

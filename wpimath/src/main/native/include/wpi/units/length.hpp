@@ -28,9 +28,9 @@
 
 #include "wpi/units/base.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::length
+ * @namespace wpi::units::length
  * @brief namespace for unit types and containers representing length values
  * @details The SI unit for length is `meters`, and the corresponding
  *          `base_unit` category is `length_unit`.
@@ -40,7 +40,7 @@ namespace units {
 #if !defined(DISABLE_PREDEFINED_UNITS) || \
     defined(ENABLE_PREDEFINED_LENGTH_UNITS)
 UNIT_ADD_WITH_METRIC_PREFIXES(length, meter, meters, m,
-                              unit<std::ratio<1>, units::category::length_unit>)
+                              unit<std::ratio<1>, wpi::units::category::length_unit>)
 UNIT_ADD(length, foot, feet, ft, unit<std::ratio<381, 1250>, meters>)
 UNIT_ADD(length, inch, inches, in, unit<std::ratio<1, 12>, feet>)
 UNIT_ADD(length, mil, mils, mil, unit<std::ratio<1, 1000>, inches>)
@@ -69,4 +69,4 @@ UNIT_ADD_CATEGORY_TRAIT(length)
 #endif
 
 using namespace length;
-}  // namespace units
+}  // namespace wpi::units

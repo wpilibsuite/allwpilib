@@ -9,9 +9,9 @@
 #include "wpi/glass/Context.hpp"
 #include "wpi/glass/DataSource.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
-void glass::DisplayCommandScheduler(CommandSchedulerModel* m) {
+void wpi::glass::DisplayCommandScheduler(CommandSchedulerModel* m) {
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 20);
   ImGui::Text("Scheduled Commands: ");
   ImGui::Separator();

@@ -18,7 +18,7 @@
 
 #include "wpi/nt/ntcore_c.h"
 
-namespace nt {
+namespace wpi::nt {
 
 // Forward declare here to avoid circular dependency on ntcore_cpp.h
 int64_t Now();
@@ -91,14 +91,14 @@ class Value final {
   /**
    * Get the creation time of the value, in local time.
    *
-   * @return The time, in the units returned by nt::Now().
+   * @return The time, in the units returned by wpi::nt::Now().
    */
   int64_t last_change() const { return m_val.last_change; }
 
   /**
    * Get the creation time of the value, in local time.
    *
-   * @return The time, in the units returned by nt::Now().
+   * @return The time, in the units returned by wpi::nt::Now().
    */
   int64_t time() const { return m_val.last_change; }
 
@@ -695,4 +695,4 @@ bool operator==(const Value& lhs, const Value& rhs);
  */
 using NetworkTableValue = Value;
 
-}  // namespace nt
+}  // namespace wpi::nt

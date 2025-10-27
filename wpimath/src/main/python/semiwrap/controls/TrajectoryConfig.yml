@@ -5,7 +5,7 @@ extra_includes:
 - PyTrajectoryConstraint.h
 
 classes:
-  frc::TrajectoryConfig:
+  wpi::math::TrajectoryConfig:
     methods:
       TrajectoryConfig:
       SetStartVelocity:
@@ -30,14 +30,14 @@ classes:
 
 inline_code: |-
   cls_TrajectoryConfig
-    .def_static("fromFps", [](units::feet_per_second_t maxVelocity, units::feet_per_second_squared_t maxAcceleration) {
+    .def_static("fromFps", [](wpi::units::feet_per_second_t maxVelocity, wpi::units::feet_per_second_squared_t maxAcceleration) {
       return std::make_shared<TrajectoryConfig>(maxVelocity, maxAcceleration);
     }, py::arg("maxVelocity"), py::arg("maxAcceleration"))
 
     // TODO: robotpy-build bug
 
-    .def("setKinematics", static_cast<void (frc::TrajectoryConfig::*)(frc::SwerveDriveKinematics<2>&)>(
-  &frc::TrajectoryConfig::SetKinematics<2>),
+    .def("setKinematics", static_cast<void (wpi::math::TrajectoryConfig::*)(wpi::math::SwerveDriveKinematics<2>&)>(
+  &wpi::math::TrajectoryConfig::SetKinematics<2>),
         py::arg("kinematics"), release_gil(), py::doc(
       "Adds a swerve drive kinematics constraint to ensure that\n"
   "no wheel velocity of a swerve drive goes above the max velocity.\n"
@@ -45,8 +45,8 @@ inline_code: |-
   ":param kinematics: The swerve drive kinematics.")
     )
       
-    .def("setKinematics", static_cast<void (frc::TrajectoryConfig::*)(frc::SwerveDriveKinematics<3>&)>(
-  &frc::TrajectoryConfig::SetKinematics<3>),
+    .def("setKinematics", static_cast<void (wpi::math::TrajectoryConfig::*)(wpi::math::SwerveDriveKinematics<3>&)>(
+  &wpi::math::TrajectoryConfig::SetKinematics<3>),
         py::arg("kinematics"), release_gil(), py::doc(
       "Adds a swerve drive kinematics constraint to ensure that\n"
   "no wheel velocity of a swerve drive goes above the max velocity.\n"
@@ -54,8 +54,8 @@ inline_code: |-
   ":param kinematics: The swerve drive kinematics.")
     )
       
-    .def("setKinematics", static_cast<void (frc::TrajectoryConfig::*)(frc::SwerveDriveKinematics<4>&)>(
-  &frc::TrajectoryConfig::SetKinematics<4>),
+    .def("setKinematics", static_cast<void (wpi::math::TrajectoryConfig::*)(wpi::math::SwerveDriveKinematics<4>&)>(
+  &wpi::math::TrajectoryConfig::SetKinematics<4>),
         py::arg("kinematics"), release_gil(), py::doc(
       "Adds a swerve drive kinematics constraint to ensure that\n"
   "no wheel velocity of a swerve drive goes above the max velocity.\n"
@@ -63,8 +63,8 @@ inline_code: |-
   ":param kinematics: The swerve drive kinematics.")
     )
       
-    .def("setKinematics", static_cast<void (frc::TrajectoryConfig::*)(frc::SwerveDriveKinematics<6>&)>(
-  &frc::TrajectoryConfig::SetKinematics<6>),
+    .def("setKinematics", static_cast<void (wpi::math::TrajectoryConfig::*)(wpi::math::SwerveDriveKinematics<6>&)>(
+  &wpi::math::TrajectoryConfig::SetKinematics<6>),
         py::arg("kinematics"), release_gil(), py::doc(
       "Adds a swerve drive kinematics constraint to ensure that\n"
   "no wheel velocity of a swerve drive goes above the max velocity.\n"

@@ -14,7 +14,7 @@
 #include "wpi/glass/DataSource.hpp"
 #include "wpi/glass/other/FMS.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 class NTFMSModel : public FMSModel {
  public:
@@ -22,7 +22,7 @@ class NTFMSModel : public FMSModel {
 
   // path is to the table containing ".type", excluding the trailing /
   explicit NTFMSModel(std::string_view path);
-  NTFMSModel(nt::NetworkTableInstance inst, std::string_view path);
+  NTFMSModel(wpi::nt::NetworkTableInstance inst, std::string_view path);
 
   BooleanSource* GetFmsAttachedData() override { return &m_fmsAttached; }
   BooleanSource* GetDsAttachedData() override { return &m_dsAttached; }
@@ -55,11 +55,11 @@ class NTFMSModel : public FMSModel {
   bool IsReadOnly() override { return true; }
 
  private:
-  nt::NetworkTableInstance m_inst;
-  nt::StringSubscriber m_gameSpecificMessage;
-  nt::BooleanSubscriber m_alliance;
-  nt::IntegerSubscriber m_station;
-  nt::IntegerSubscriber m_controlWord;
+  wpi::nt::NetworkTableInstance m_inst;
+  wpi::nt::StringSubscriber m_gameSpecificMessage;
+  wpi::nt::BooleanSubscriber m_alliance;
+  wpi::nt::IntegerSubscriber m_station;
+  wpi::nt::IntegerSubscriber m_controlWord;
 
   BooleanSource m_fmsAttached;
   BooleanSource m_dsAttached;
@@ -71,4 +71,4 @@ class NTFMSModel : public FMSModel {
   StringSource m_gameSpecificMessageData;
 };
 
-}  // namespace glass
+}  // namespace wpi::glass

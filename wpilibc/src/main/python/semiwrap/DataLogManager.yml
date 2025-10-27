@@ -2,7 +2,7 @@ extra_includes:
 - wpi/datalog/DataLog.hpp
 
 classes:
-  frc::DataLogManager:
+  wpi::DataLogManager:
     methods:
       Start:
       Stop:

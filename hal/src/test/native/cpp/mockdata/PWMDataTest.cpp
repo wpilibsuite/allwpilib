@@ -11,7 +11,7 @@
 #include "wpi/hal/handles/HandlesInternal.h"
 #include "wpi/hal/simulation/PWMData.h"
 
-namespace hal {
+namespace wpi::hal {
 
 std::string gTestPwmCallbackName;
 HAL_Value gTestPwmCallbackValue;
@@ -65,7 +65,7 @@ TEST(PWMSimTest, PwmInitialization) {
   EXPECT_STREQ("Unset", gTestPwmCallbackName.c_str());
 
   // Reset, should allow you to re-register
-  hal::HandleBase::ResetGlobalHandles();
+  wpi::hal::HandleBase::ResetGlobalHandles();
   HALSIM_ResetPWMData(INDEX_TO_TEST);
   callbackId = HALSIM_RegisterPWMInitializedCallback(
       INDEX_TO_TEST, &TestPwmInitializationCallback, &callbackParam, false);
@@ -79,4 +79,4 @@ TEST(PWMSimTest, PwmInitialization) {
   EXPECT_STREQ("Initialized", gTestPwmCallbackName.c_str());
   HALSIM_CancelPWMInitializedCallback(INDEX_TO_TEST, callbackId);
 }
-}  // namespace hal
+}  // namespace wpi::hal

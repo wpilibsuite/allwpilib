@@ -13,7 +13,7 @@ functions:
   ResetMotorSafety:
     ignore: true
 classes:
-  frc::RobotBase:
+  wpi::RobotBase:
     attributes:
       m_threadId:
         ignore: true

@@ -15,18 +15,18 @@
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/handles/LimitedClassedHandleResource.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeEncoder() {}
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 HAL_EncoderHandle HAL_InitializeEncoder(int32_t aChannel, int32_t bChannel,
                                         HAL_Bool reverseDirection,
                                         HAL_EncoderEncodingType encodingType,
                                         int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
   *status = HAL_HANDLE_ERROR;
   return HAL_kInvalidHandle;
 }

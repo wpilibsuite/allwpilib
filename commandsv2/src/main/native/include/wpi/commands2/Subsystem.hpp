@@ -13,7 +13,7 @@
 
 #include "wpi/commands2/CommandScheduler.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 class Command;
 class CommandPtr;
 /**
@@ -180,6 +180,6 @@ class Subsystem {
    * @param supplier the command supplier.
    * @return the command.
    */
-  CommandPtr Defer(wpi::unique_function<CommandPtr()> supplier);
+  CommandPtr Defer(wpi::util::unique_function<CommandPtr()> supplier);
 };
-}  // namespace frc2
+}  // namespace wpi::cmd

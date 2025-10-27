@@ -1,7 +1,7 @@
 classes:
-  frc::Tachometer:
+  wpi::Tachometer:
     ignored_bases:
-    - wpi::SendableHelper<Tachometer>
+    - wpi::util::SendableHelper<Tachometer>
     methods:
       Tachometer:
         overloads:

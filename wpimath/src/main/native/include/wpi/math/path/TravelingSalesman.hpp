@@ -16,7 +16,7 @@
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/optimization/SimulatedAnnealing.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * Given a list of poses, this class finds the shortest possible route that
@@ -56,7 +56,7 @@ class TravelingSalesman {
    * @return The optimized path as an array of Pose2ds.
    */
   template <size_t Poses>
-  wpi::array<Pose2d, Poses> Solve(const wpi::array<Pose2d, Poses>& poses,
+  wpi::util::array<Pose2d, Poses> Solve(const wpi::util::array<Pose2d, Poses>& poses,
                                   int iterations) {
     SimulatedAnnealing<Vectord<Poses>> solver{
         1, &Neighbor<Poses>, [&](const Vectord<Poses>& state) {
@@ -77,7 +77,7 @@ class TravelingSalesman {
 
     auto indices = solver.Solve(initial, iterations);
 
-    wpi::array<Pose2d, Poses> solution{wpi::empty_array};
+    wpi::util::array<Pose2d, Poses> solution{wpi::util::empty_array};
     for (size_t i = 0; i < poses.size(); ++i) {
       solution[i] = poses[static_cast<int>(indices[i])];
     }
@@ -138,7 +138,7 @@ class TravelingSalesman {
   // Default cost is distance between poses
   std::function<double(const Pose2d&, const Pose2d&)> m_cost =
       [](const Pose2d& a, const Pose2d& b) -> double {
-    return units::math::hypot(a.X() - b.X(), a.Y() - b.Y()).value();
+    return wpi::units::math::hypot(a.X() - b.X(), a.Y() - b.Y()).value();
   };
 
   /**
@@ -176,4 +176,4 @@ class TravelingSalesman {
   }
 };
 
-}  // namespace frc
+}  // namespace wpi::math

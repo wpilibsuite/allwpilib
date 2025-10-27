@@ -2,9 +2,9 @@ defaults:
   subpackage: controller
 
 classes:
-  frc::BangBangController:
+  wpi::math::BangBangController:
     ignored_bases:
-    - wpi::SendableHelper<BangBangController>
+    - wpi::util::SendableHelper<BangBangController>
     methods:
       BangBangController:
       SetSetpoint:

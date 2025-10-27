@@ -20,7 +20,7 @@ extra_includes:
 - wpystruct.h
 
 classes:
-  nt::NetworkTableInstance:
+  wpi::nt::NetworkTableInstance:
     force_type_casters:
     - std::function
     attributes:
@@ -29,7 +29,7 @@ classes:
       NetworkMode:
         arithmetic: true
         inline_code: |
-          .value("kNetModeStarting", (nt::NetworkTableInstance::NetworkMode)NT_NET_MODE_STARTING)
+          .value("kNetModeStarting", (wpi::nt::NetworkTableInstance::NetworkMode)NT_NET_MODE_STARTING)
       LogLevel:
     methods:
       NetworkTableInstance:
@@ -175,7 +175,7 @@ classes:
         pyntcore::onInstancePreReset(self);
         {
           py::gil_scoped_release release;
-          nt::ResetInstance(self->GetHandle());
+          wpi::nt::ResetInstance(self->GetHandle());
         }
         pyntcore::onInstancePostReset(self);
       })

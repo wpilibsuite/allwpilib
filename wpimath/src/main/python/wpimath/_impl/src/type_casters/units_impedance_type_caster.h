@@ -4,43 +4,43 @@
 
 namespace pybind11 {
 namespace detail {
-template <> struct handle_type_name<units::ohm_t> {
+template <> struct handle_type_name<wpi::units::ohm_t> {
   static constexpr auto name = _("wpimath.units.ohms");
 };
 
-template <> struct handle_type_name<units::ohms> {
+template <> struct handle_type_name<wpi::units::ohms> {
   static constexpr auto name = _("wpimath.units.ohms");
 };
 
-template <> struct handle_type_name<units::nanoohm_t> {
+template <> struct handle_type_name<wpi::units::nanoohm_t> {
   static constexpr auto name = _("wpimath.units.nanoohms");
 };
 
-template <> struct handle_type_name<units::nanoohms> {
+template <> struct handle_type_name<wpi::units::nanoohms> {
   static constexpr auto name = _("wpimath.units.nanoohms");
 };
 
-template <> struct handle_type_name<units::microohm_t> {
+template <> struct handle_type_name<wpi::units::microohm_t> {
   static constexpr auto name = _("wpimath.units.microohms");
 };
 
-template <> struct handle_type_name<units::microohms> {
+template <> struct handle_type_name<wpi::units::microohms> {
   static constexpr auto name = _("wpimath.units.microohms");
 };
 
-template <> struct handle_type_name<units::milliohm_t> {
+template <> struct handle_type_name<wpi::units::milliohm_t> {
   static constexpr auto name = _("wpimath.units.milliohms");
 };
 
-template <> struct handle_type_name<units::milliohms> {
+template <> struct handle_type_name<wpi::units::milliohms> {
   static constexpr auto name = _("wpimath.units.milliohms");
 };
 
-template <> struct handle_type_name<units::kiloohm_t> {
+template <> struct handle_type_name<wpi::units::kiloohm_t> {
   static constexpr auto name = _("wpimath.units.kiloohms");
 };
 
-template <> struct handle_type_name<units::kiloohms> {
+template <> struct handle_type_name<wpi::units::kiloohms> {
   static constexpr auto name = _("wpimath.units.kiloohms");
 };
 

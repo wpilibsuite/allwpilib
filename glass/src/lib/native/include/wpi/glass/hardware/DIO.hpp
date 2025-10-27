@@ -10,7 +10,7 @@
 
 #include "wpi/glass/Model.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 class EncoderModel;
 class BooleanSource;
@@ -54,11 +54,11 @@ class DIOModel : public Model {
 class DIOsModel : public Model {
  public:
   virtual void ForEachDIO(
-      wpi::function_ref<void(DIOModel& model, int index)> func) = 0;
+      wpi::util::function_ref<void(DIOModel& model, int index)> func) = 0;
 };
 
 void DisplayDIO(DIOModel* model, int index, bool outputsEnabled);
 void DisplayDIOs(DIOsModel* model, bool outputsEnabled,
                  std::string_view noneMsg = "No Digital I/O");
 
-}  // namespace glass
+}  // namespace wpi::glass

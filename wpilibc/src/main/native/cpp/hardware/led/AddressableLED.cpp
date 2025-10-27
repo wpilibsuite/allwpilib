@@ -16,7 +16,7 @@
 
 #include "wpi/system/Errors.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 AddressableLED::AddressableLED(int channel) : m_channel{channel} {
   if (!SensorUtil::CheckDigitalChannel(channel)) {
@@ -24,7 +24,7 @@ AddressableLED::AddressableLED(int channel) : m_channel{channel} {
   }
 
   int32_t status = 0;
-  auto stack = wpi::GetStackTrace(1);
+  auto stack = wpi::util::GetStackTrace(1);
   m_handle = HAL_InitializeAddressableLED(channel, stack.c_str(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", channel);
 

@@ -2,7 +2,7 @@ defaults:
   subpackage: estimator
 
 classes:
-  frc::KalmanFilter:
+  wpi::math::KalmanFilter:
     template_params:
     - int States
     - int Inputs
@@ -31,31 +31,31 @@ classes:
 
 templates:
   KalmanFilter_1_1_1:
-    qualname: frc::KalmanFilter
+    qualname: wpi::math::KalmanFilter
     params:
     - 1
     - 1
     - 1
   KalmanFilter_2_1_1:
-    qualname: frc::KalmanFilter
+    qualname: wpi::math::KalmanFilter
     params:
     - 2
     - 1
     - 1
   KalmanFilter_2_1_2:
-    qualname: frc::KalmanFilter
+    qualname: wpi::math::KalmanFilter
     params:
     - 2
     - 1
     - 2
   KalmanFilter_2_2_2:
-    qualname: frc::KalmanFilter
+    qualname: wpi::math::KalmanFilter
     params:
     - 2
     - 2
     - 2
   KalmanFilter_3_2_3:
-    qualname: frc::KalmanFilter
+    qualname: wpi::math::KalmanFilter
     params:
     - 3
     - 2

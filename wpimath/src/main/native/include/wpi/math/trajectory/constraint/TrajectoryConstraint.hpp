@@ -13,7 +13,7 @@
 #include "wpi/units/curvature.hpp"
 #include "wpi/units/velocity.hpp"
 
-namespace frc {
+namespace wpi::math {
 /**
  * An interface for defining user-defined velocity and acceleration constraints
  * while generating trajectories.
@@ -38,13 +38,13 @@ class WPILIB_DLLEXPORT TrajectoryConstraint {
     /**
      * The minimum acceleration.
      */
-    units::meters_per_second_squared_t minAcceleration{
+    wpi::units::meters_per_second_squared_t minAcceleration{
         -std::numeric_limits<double>::max()};
 
     /**
      * The maximum acceleration.
      */
-    units::meters_per_second_squared_t maxAcceleration{
+    wpi::units::meters_per_second_squared_t maxAcceleration{
         std::numeric_limits<double>::max()};
   };
 
@@ -58,9 +58,9 @@ class WPILIB_DLLEXPORT TrajectoryConstraint {
    *
    * @return The absolute maximum velocity.
    */
-  constexpr virtual units::meters_per_second_t MaxVelocity(
-      const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t velocity) const = 0;
+  constexpr virtual wpi::units::meters_per_second_t MaxVelocity(
+      const Pose2d& pose, wpi::units::curvature_t curvature,
+      wpi::units::meters_per_second_t velocity) const = 0;
 
   /**
    * Returns the minimum and maximum allowable acceleration for the trajectory
@@ -73,7 +73,7 @@ class WPILIB_DLLEXPORT TrajectoryConstraint {
    * @return The min and max acceleration bounds.
    */
   constexpr virtual MinMax MinMaxAcceleration(
-      const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t speed) const = 0;
+      const Pose2d& pose, wpi::units::curvature_t curvature,
+      wpi::units::meters_per_second_t speed) const = 0;
 };
-}  // namespace frc
+}  // namespace wpi::math

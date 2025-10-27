@@ -40,9 +40,9 @@ inline constexpr int kMovementCombinations = 16;
 template <typename Model>
 sysid::Storage CollectData(Model& model, std::bitset<4> movements) {
   constexpr auto kUstep = 0.25_V / 1_s;
-  constexpr units::volt_t kUmax = 7_V;
-  constexpr units::second_t T = 5_ms;
-  constexpr units::second_t kTestDuration = 5_s;
+  constexpr wpi::units::volt_t kUmax = 7_V;
+  constexpr wpi::units::second_t T = 5_ms;
+  constexpr wpi::units::second_t kTestDuration = 5_s;
 
   sysid::Storage storage;
   auto& [slowForward, slowBackward, fastForward, fastBackward] = storage;

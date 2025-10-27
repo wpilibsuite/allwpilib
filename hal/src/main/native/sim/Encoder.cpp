@@ -15,7 +15,7 @@
 #include "wpi/hal/handles/HandlesInternal.h"
 #include "wpi/hal/handles/LimitedHandleResource.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
 namespace {
 struct Encoder {
@@ -36,7 +36,7 @@ static LimitedHandleResource<HAL_EncoderHandle, Encoder,
 static LimitedHandleResource<HAL_FPGAEncoderHandle, Empty, kNumEncoders,
                              HAL_HandleEnum::FPGAEncoder>* fpgaEncoderHandles;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeEncoder() {
   static LimitedHandleResource<HAL_FPGAEncoderHandle, Empty, kNumEncoders,
                                HAL_HandleEnum::FPGAEncoder>
@@ -48,9 +48,9 @@ void InitializeEncoder() {
       eH;
   encoderHandles = &eH;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-namespace hal {
+namespace wpi::hal {
 bool GetEncoderBaseHandle(HAL_EncoderHandle handle,
                           HAL_FPGAEncoderHandle* fpgaHandle,
                           HAL_CounterHandle* counterHandle) {
@@ -63,14 +63,14 @@ bool GetEncoderBaseHandle(HAL_EncoderHandle handle,
   *counterHandle = encoder->counterHandle;
   return true;
 }
-}  // namespace hal
+}  // namespace wpi::hal
 
 extern "C" {
 HAL_EncoderHandle HAL_InitializeEncoder(int32_t aChannel, int32_t bChannel,
                                         HAL_Bool reverseDirection,
                                         HAL_EncoderEncodingType encodingType,
                                         int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
   HAL_Handle nativeHandle = HAL_kInvalidHandle;
   if (encodingType == HAL_EncoderEncodingType::HAL_Encoder_k4X) {
     // k4x, allocate encoder
@@ -272,7 +272,7 @@ void HAL_SetEncoderMinRate(HAL_EncoderHandle encoderHandle, double minRate,
 
   if (minRate == 0.0) {
     *status = PARAMETER_OUT_OF_RANGE;
-    hal::SetLastError(status, "minRate must not be 0");
+    wpi::hal::SetLastError(status, "minRate must not be 0");
     return;
   }
 
@@ -289,7 +289,7 @@ void HAL_SetEncoderDistancePerPulse(HAL_EncoderHandle encoderHandle,
 
   if (distancePerPulse == 0.0) {
     *status = PARAMETER_OUT_OF_RANGE;
-    hal::SetLastError(status, "distancePerPulse must not be 0");
+    wpi::hal::SetLastError(status, "distancePerPulse must not be 0");
     return;
   }
   encoder->distancePerPulse = distancePerPulse;

@@ -6,7 +6,7 @@
 
 #include <cstring>
 
-using namespace wpi;
+using namespace wpi::net;
 
 void raw_uv_ostream::write_impl(const char* data, size_t len) {
   while (len > 0) {

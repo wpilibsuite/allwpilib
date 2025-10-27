@@ -82,7 +82,7 @@
 #define CAPPROPID_POWERLINEFREQ 13
 #define CAPPROPID_LAST 14
 
-namespace cs {
+namespace wpi::cs {
 class UsbCameraImpl;
 }
 
@@ -90,7 +90,7 @@ class UsbCameraImpl;
 
 @property(nonatomic) IOUSBInterfaceInterface190** controlInterface;
 @property(nonatomic) uint32_t processingUnitID;
-@property(nonatomic) std::weak_ptr<cs::UsbCameraImpl> cppImpl;
+@property(nonatomic) std::weak_ptr<wpi::cs::UsbCameraImpl> cppImpl;
 
 // Create from AVCaptureDevice
 + (instancetype)createFromAVCaptureDevice:(AVCaptureDevice*)device status:(CS_Status*)status;

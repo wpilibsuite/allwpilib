@@ -10,7 +10,7 @@
 #include "wpi/hal/simulation/EncoderData.h"
 #include "wpi/hal/simulation/SimDataValue.h"
 
-namespace hal {
+namespace wpi::hal {
 class EncoderData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(Count)
@@ -44,4 +44,4 @@ class EncoderData {
   virtual void ResetData();
 };
 extern EncoderData* SimEncoderData;
-}  // namespace hal
+}  // namespace wpi::hal

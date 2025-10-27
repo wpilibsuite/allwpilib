@@ -15,7 +15,7 @@
 #include "PubSubOptions.hpp"
 #include "server/Constants.hpp"
 
-namespace nt::server {
+namespace wpi::nt::server {
 
 class ServerClient;
 struct ServerTopic;
@@ -71,4 +71,4 @@ class ServerSubscriber {
   uint32_t m_periodMs;
 };
 
-}  // namespace nt::server
+}  // namespace wpi::nt::server

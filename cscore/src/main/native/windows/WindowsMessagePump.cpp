@@ -21,7 +21,7 @@
 #pragma comment(lib, "Ole32.lib")
 #pragma comment(lib, "User32.lib")
 
-namespace cs {
+namespace wpi::cs {
 
 static LRESULT CALLBACK pWndProc(HWND hwnd, UINT uiMsg, WPARAM wParam,
                                  LPARAM lParam) {
@@ -148,4 +148,4 @@ void WindowsMessagePump::ThreadMain(HANDLE eventHandle) {
   CoUninitialize();
 }
 
-}  // namespace cs
+}  // namespace wpi::cs

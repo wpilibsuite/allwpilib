@@ -10,7 +10,7 @@
 
 #include "wpi/event/BooleanEvent.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 Joystick::Joystick(int port) : GenericHID(port) {
   m_axes[Axis::kX] = kDefaultXChannel;
@@ -118,7 +118,7 @@ double Joystick::GetMagnitude() const {
   return std::hypot(GetX(), GetY());
 }
 
-units::radian_t Joystick::GetDirection() const {
+wpi::units::radian_t Joystick::GetDirection() const {
   // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html#joystick-and-controller-coordinate-system
   // A positive rotation around the X axis moves the joystick right, and a
   // positive rotation around the Y axis moves the joystick backward. When
@@ -127,5 +127,5 @@ units::radian_t Joystick::GetDirection() const {
   //
   // It's rotated 90 degrees CCW (y is negated and the arguments are reversed)
   // so that 0 radians is forward.
-  return units::radian_t{std::atan2(GetX(), -GetY())};
+  return wpi::units::radian_t{std::atan2(GetX(), -GetY())};
 }

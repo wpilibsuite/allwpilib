@@ -15,7 +15,7 @@
 #include "wpi/units/time.hpp"
 
 TEST(KalmanFilterTest, Flywheel) {
-  auto motor = frc::DCMotor::NEO();
-  auto flywheel = frc::LinearSystemId::FlywheelSystem(motor, 1_kg_sq_m, 1.0);
-  frc::KalmanFilter<1, 1, 1> kf{flywheel, {1}, {1}, 5_ms};
+  auto motor = wpi::math::DCMotor::NEO();
+  auto flywheel = wpi::math::LinearSystemId::FlywheelSystem(motor, 1_kg_sq_m, 1.0);
+  wpi::math::KalmanFilter<1, 1, 1> kf{flywheel, {1}, {1}, 5_ms};
 }

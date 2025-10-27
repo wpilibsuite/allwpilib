@@ -19,12 +19,12 @@
 #include "wpi/nt/Topic.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
 
-namespace wpi {
+namespace wpi::util {
 template <typename T>
 class SmallVectorImpl;
 }  // namespace wpi
 
-namespace nt {
+namespace wpi::nt {
 
 class BooleanArrayTopic;
 
@@ -74,7 +74,7 @@ class BooleanArraySubscriber : public Subscriber {
    * @return value
    */
   ValueType Get(ParamType defaultValue) const {
-    return ::nt::GetBooleanArray(m_subHandle, defaultValue);
+    return ::wpi::nt::GetBooleanArray(m_subHandle, defaultValue);
   }
 
   /**
@@ -84,7 +84,7 @@ class BooleanArraySubscriber : public Subscriber {
    * @param buf storage for returned value
    * @return value
    */
-  SmallRetType Get(wpi::SmallVectorImpl<SmallElemType>& buf) const {
+  SmallRetType Get(wpi::util::SmallVectorImpl<SmallElemType>& buf) const {
     return Get(buf, m_defaultValue);
   }
 
@@ -96,8 +96,8 @@ class BooleanArraySubscriber : public Subscriber {
    * @param defaultValue default value to return if no value has been published
    * @return value
    */
-  SmallRetType Get(wpi::SmallVectorImpl<SmallElemType>& buf, ParamType defaultValue) const {
-    return nt::GetBooleanArray(m_subHandle, buf, defaultValue);
+  SmallRetType Get(wpi::util::SmallVectorImpl<SmallElemType>& buf, ParamType defaultValue) const {
+    return wpi::nt::GetBooleanArray(m_subHandle, buf, defaultValue);
   }
 
   /**
@@ -120,7 +120,7 @@ class BooleanArraySubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueType GetAtomic(ParamType defaultValue) const {
-    return ::nt::GetAtomicBooleanArray(m_subHandle, defaultValue);
+    return ::wpi::nt::GetAtomicBooleanArray(m_subHandle, defaultValue);
   }
 
   /**
@@ -132,7 +132,7 @@ class BooleanArraySubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueViewType GetAtomic(
-      wpi::SmallVectorImpl<SmallElemType>& buf) const {
+      wpi::util::SmallVectorImpl<SmallElemType>& buf) const {
     return GetAtomic(buf, m_defaultValue);
   }
 
@@ -146,9 +146,9 @@ class BooleanArraySubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueViewType GetAtomic(
-      wpi::SmallVectorImpl<SmallElemType>& buf,
+      wpi::util::SmallVectorImpl<SmallElemType>& buf,
       ParamType defaultValue) const {
-    return nt::GetAtomicBooleanArray(m_subHandle, buf, defaultValue);
+    return wpi::nt::GetAtomicBooleanArray(m_subHandle, buf, defaultValue);
   }
 
   /**
@@ -162,7 +162,7 @@ class BooleanArraySubscriber : public Subscriber {
    *     been published since the previous call.
    */
   std::vector<TimestampedValueType> ReadQueue() {
-    return ::nt::ReadQueueBooleanArray(m_subHandle);
+    return ::wpi::nt::ReadQueueBooleanArray(m_subHandle);
   }
 
   /**
@@ -207,7 +207,7 @@ class BooleanArrayPublisher : public Publisher {
    * @param time timestamp; 0 indicates current NT time should be used
    */
   void Set(ParamType value, int64_t time = 0) {
-    ::nt::SetBooleanArray(m_pubHandle, value, time);
+    ::wpi::nt::SetBooleanArray(m_pubHandle, value, time);
   }
 
   /**
@@ -218,7 +218,7 @@ class BooleanArrayPublisher : public Publisher {
    * @param value value
    */
   void SetDefault(ParamType value) {
-    ::nt::SetDefaultBooleanArray(m_pubHandle, value);
+    ::wpi::nt::SetDefaultBooleanArray(m_pubHandle, value);
   }
 
   /**
@@ -286,7 +286,7 @@ class BooleanArrayEntry final : public BooleanArraySubscriber,
    * Stops publishing the entry if it's published.
    */
   void Unpublish() {
-    ::nt::Unpublish(m_pubHandle);
+    ::wpi::nt::Unpublish(m_pubHandle);
   }
 };
 
@@ -341,7 +341,7 @@ class BooleanArrayTopic final : public Topic {
       ParamType defaultValue,
       const PubSubOptions& options = kDefaultPubSubOptions) {
     return BooleanArraySubscriber{
-        ::nt::Subscribe(m_handle, NT_BOOLEAN_ARRAY, "boolean[]", options),
+        ::wpi::nt::Subscribe(m_handle, NT_BOOLEAN_ARRAY, "boolean[]", options),
         defaultValue};
   }
   /**
@@ -365,7 +365,7 @@ class BooleanArrayTopic final : public Topic {
       std::string_view typeString, ParamType defaultValue,
       const PubSubOptions& options = kDefaultPubSubOptions) {
     return BooleanArraySubscriber{
-        ::nt::Subscribe(m_handle, NT_BOOLEAN_ARRAY, typeString, options),
+        ::wpi::nt::Subscribe(m_handle, NT_BOOLEAN_ARRAY, typeString, options),
         defaultValue};
   }
 
@@ -387,7 +387,7 @@ class BooleanArrayTopic final : public Topic {
   [[nodiscard]]
   PublisherType Publish(const PubSubOptions& options = kDefaultPubSubOptions) {
     return BooleanArrayPublisher{
-        ::nt::Publish(m_handle, NT_BOOLEAN_ARRAY, "boolean[]", options)};
+        ::wpi::nt::Publish(m_handle, NT_BOOLEAN_ARRAY, "boolean[]", options)};
   }
 
   /**
@@ -410,9 +410,9 @@ class BooleanArrayTopic final : public Topic {
    */
   [[nodiscard]]
   PublisherType PublishEx(std::string_view typeString,
-    const wpi::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
+    const wpi::util::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
     return BooleanArrayPublisher{
-        ::nt::PublishEx(m_handle, NT_BOOLEAN_ARRAY, typeString, properties, options)};
+        ::wpi::nt::PublishEx(m_handle, NT_BOOLEAN_ARRAY, typeString, properties, options)};
   }
 
   /**
@@ -439,7 +439,7 @@ class BooleanArrayTopic final : public Topic {
   EntryType GetEntry(ParamType defaultValue,
                      const PubSubOptions& options = kDefaultPubSubOptions) {
     return BooleanArrayEntry{
-        ::nt::GetEntry(m_handle, NT_BOOLEAN_ARRAY, "boolean[]", options),
+        ::wpi::nt::GetEntry(m_handle, NT_BOOLEAN_ARRAY, "boolean[]", options),
         defaultValue};
   }
   /**
@@ -467,22 +467,22 @@ class BooleanArrayTopic final : public Topic {
   EntryType GetEntryEx(std::string_view typeString, ParamType defaultValue,
                        const PubSubOptions& options = kDefaultPubSubOptions) {
     return BooleanArrayEntry{
-        ::nt::GetEntry(m_handle, NT_BOOLEAN_ARRAY, typeString, options),
+        ::wpi::nt::GetEntry(m_handle, NT_BOOLEAN_ARRAY, typeString, options),
         defaultValue};
   }
 
 };
 
 inline BooleanArrayTopic BooleanArraySubscriber::GetTopic() const {
-  return BooleanArrayTopic{::nt::GetTopicFromHandle(m_subHandle)};
+  return BooleanArrayTopic{::wpi::nt::GetTopicFromHandle(m_subHandle)};
 }
 
 inline BooleanArrayTopic BooleanArrayPublisher::GetTopic() const {
-  return BooleanArrayTopic{::nt::GetTopicFromHandle(m_pubHandle)};
+  return BooleanArrayTopic{::wpi::nt::GetTopicFromHandle(m_pubHandle)};
 }
 
 inline BooleanArrayTopic BooleanArrayEntry::GetTopic() const {
-  return BooleanArrayTopic{::nt::GetTopicFromHandle(m_subHandle)};
+  return BooleanArrayTopic{::wpi::nt::GetTopicFromHandle(m_subHandle)};
 }
 
-}  // namespace nt
+}  // namespace wpi::nt

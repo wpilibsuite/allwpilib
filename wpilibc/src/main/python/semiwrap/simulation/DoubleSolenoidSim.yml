@@ -1,7 +1,7 @@
 classes:
-  frc::sim::DoubleSolenoidSim:
+  wpi::sim::DoubleSolenoidSim:
     typealias:
-    - frc::PneumaticsModuleType
+    - wpi::PneumaticsModuleType
     methods:
       DoubleSolenoidSim:
         overloads:

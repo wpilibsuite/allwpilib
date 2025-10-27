@@ -14,7 +14,7 @@
 #include "wpi/hal/handles/HandlesInternal.h"
 #include "wpi/hal/handles/IndexedHandleResource.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
 namespace {
 struct DutyCycle {
@@ -27,30 +27,30 @@ struct Empty {};
 static IndexedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
                              HAL_HandleEnum::DutyCycle>* dutyCycleHandles;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeDutyCycle() {
   static IndexedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
                                HAL_HandleEnum::DutyCycle>
       dcH;
   dutyCycleHandles = &dcH;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 HAL_DutyCycleHandle HAL_InitializeDutyCycle(int32_t channel,
                                             const char* allocationLocation,
                                             int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
 
   HAL_DutyCycleHandle handle = HAL_kInvalidHandle;
   auto dutyCycle = dutyCycleHandles->Allocate(channel, &handle, status);
 
   if (*status != 0) {
     if (dutyCycle) {
-      hal::SetLastErrorPreviouslyAllocated(status, "SmartIo", channel,
+      wpi::hal::SetLastErrorPreviouslyAllocated(status, "SmartIo", channel,
                                            dutyCycle->previousAllocation);
     } else {
-      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Duty Cycle",
+      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Duty Cycle",
                                        0, kNumDutyCycles, channel);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.

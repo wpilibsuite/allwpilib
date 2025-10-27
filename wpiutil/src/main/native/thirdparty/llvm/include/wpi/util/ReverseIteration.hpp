@@ -3,7 +3,7 @@
 
 #include "wpi/util/PointerLikeTypeTraits.hpp"
 
-namespace wpi {
+namespace wpi::util {
 
 template<class T = void *>
 bool shouldReverseIterate() {
@@ -14,5 +14,5 @@ bool shouldReverseIterate() {
 #endif
 }
 
-} // namespace wpi
+} // namespace wpi::util
 #endif

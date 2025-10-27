@@ -45,40 +45,40 @@ class Drivetrain {
     m_rightEncoder.Reset();
   }
 
-  static constexpr units::meters_per_second_t kMaxSpeed =
+  static constexpr wpi::units::meters_per_second_t kMaxSpeed =
       3.0_mps;  // 3 meters per second
-  static constexpr units::radians_per_second_t kMaxAngularSpeed{
+  static constexpr wpi::units::radians_per_second_t kMaxAngularSpeed{
       std::numbers::pi};  // 1/2 rotation per second
 
-  void SetSpeeds(const frc::DifferentialDriveWheelSpeeds& speeds);
-  void Drive(units::meters_per_second_t xSpeed,
-             units::radians_per_second_t rot);
+  void SetSpeeds(const wpi::math::DifferentialDriveWheelSpeeds& speeds);
+  void Drive(wpi::units::meters_per_second_t xSpeed,
+             wpi::units::radians_per_second_t rot);
   void UpdateOdometry();
 
  private:
-  static constexpr units::meter_t kTrackwidth = 0.381_m * 2;
+  static constexpr wpi::units::meter_t kTrackwidth = 0.381_m * 2;
   static constexpr double kWheelRadius = 0.0508;  // meters
   static constexpr int kEncoderResolution = 4096;
 
-  frc::PWMSparkMax m_leftLeader{1};
-  frc::PWMSparkMax m_leftFollower{2};
-  frc::PWMSparkMax m_rightLeader{3};
-  frc::PWMSparkMax m_rightFollower{4};
+  wpi::PWMSparkMax m_leftLeader{1};
+  wpi::PWMSparkMax m_leftFollower{2};
+  wpi::PWMSparkMax m_rightLeader{3};
+  wpi::PWMSparkMax m_rightFollower{4};
 
-  frc::Encoder m_leftEncoder{0, 1};
-  frc::Encoder m_rightEncoder{2, 3};
+  wpi::Encoder m_leftEncoder{0, 1};
+  wpi::Encoder m_rightEncoder{2, 3};
 
-  frc::PIDController m_leftPIDController{1.0, 0.0, 0.0};
-  frc::PIDController m_rightPIDController{1.0, 0.0, 0.0};
+  wpi::math::PIDController m_leftPIDController{1.0, 0.0, 0.0};
+  wpi::math::PIDController m_rightPIDController{1.0, 0.0, 0.0};
 
-  frc::OnboardIMU m_imu{frc::OnboardIMU::kFlat};
+  wpi::OnboardIMU m_imu{wpi::OnboardIMU::kFlat};
 
-  frc::DifferentialDriveKinematics m_kinematics{kTrackwidth};
-  frc::DifferentialDriveOdometry m_odometry{
-      m_imu.GetRotation2d(), units::meter_t{m_leftEncoder.GetDistance()},
-      units::meter_t{m_rightEncoder.GetDistance()}};
+  wpi::math::DifferentialDriveKinematics m_kinematics{kTrackwidth};
+  wpi::math::DifferentialDriveOdometry m_odometry{
+      m_imu.GetRotation2d(), wpi::units::meter_t{m_leftEncoder.GetDistance()},
+      wpi::units::meter_t{m_rightEncoder.GetDistance()}};
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
-  frc::SimpleMotorFeedforward<units::meters> m_feedforward{1_V, 3_V / 1_mps};
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_feedforward{1_V, 3_V / 1_mps};
 };

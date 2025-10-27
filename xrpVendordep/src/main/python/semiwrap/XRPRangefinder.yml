@@ -1,4 +1,4 @@
 classes:
-  frc::XRPRangefinder:
+  wpi::xrp::XRPRangefinder:
     methods:
       GetDistance:

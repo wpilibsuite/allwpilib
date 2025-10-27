@@ -3,7 +3,7 @@ extra_includes:
 - wpi/util/SmallString.hpp
 
 classes:
-  frc::RobotDriveBase:
+  wpi::RobotDriveBase:
     attributes:
       m_deadband:
       m_maxOutput:

@@ -6,11 +6,11 @@
 
 #include "wpi/math/kinematics/SwerveModulePosition.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 namespace {
 
-using StructType = wpi::Struct<frc::SwerveModulePosition>;
+using StructType = wpi::util::Struct<wpi::math::SwerveModulePosition>;
 const SwerveModulePosition kExpectedData{
     SwerveModulePosition{3.504_m, Rotation2d{17.4_rad}}};
 }  // namespace

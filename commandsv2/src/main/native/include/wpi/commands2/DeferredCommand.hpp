@@ -12,7 +12,7 @@
 #include "wpi/commands2/CommandHelper.hpp"
 #include "wpi/commands2/Requirements.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 /**
  * Defers Command construction to runtime. Runs the command returned by a
  * supplier when this command is initialized, and ends when it ends. Useful for
@@ -38,7 +38,7 @@ class DeferredCommand : public CommandHelper<Command, DeferredCommand> {
    * @param requirements The command requirements.
    *
    */
-  DeferredCommand(wpi::unique_function<CommandPtr()> supplier,
+  DeferredCommand(wpi::util::unique_function<CommandPtr()> supplier,
                   Requirements requirements);
 
   DeferredCommand(DeferredCommand&& other) = default;
@@ -51,10 +51,10 @@ class DeferredCommand : public CommandHelper<Command, DeferredCommand> {
 
   bool IsFinished() override;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
-  wpi::unique_function<CommandPtr()> m_supplier;
+  wpi::util::unique_function<CommandPtr()> m_supplier;
   std::unique_ptr<Command> m_command;
 };
-}  // namespace frc2
+}  // namespace wpi::cmd

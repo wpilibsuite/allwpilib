@@ -6,7 +6,7 @@
 using OnThreadStartFn = void *(*)();
 using OnThreadEndFn = void (*)(void *);
 
-namespace wpi::impl {
+namespace wpi::util::impl {
 void SetSafeThreadNotifiers(OnThreadStartFn OnStart, OnThreadEndFn OnEnd);
 }
 
@@ -59,7 +59,7 @@ void setup_safethread_gil() {
   atexit.attr("register")(
       py::cpp_function([]() { g_gilstate_managed = false; }));
 
-  wpi::impl::SetSafeThreadNotifiers(on_safe_thread_start, on_safe_thread_end);
+  wpi::util::impl::SetSafeThreadNotifiers(on_safe_thread_start, on_safe_thread_end);
 }
 
 void cleanup_safethread_gil() { g_gilstate_managed = false; }

@@ -3,23 +3,23 @@
 
 #ifndef __FRC_SYSTEMCORE__
 
-namespace frc::impl {
+namespace wpi::impl {
 void ResetSmartDashboardInstance();
 void ResetMotorSafety();
-} // namespace frc::impl
+} // namespace wpi::impl
 
 namespace wpi::impl {
 void ResetSendableRegistry();
 } // namespace wpi::impl
 
 void resetWpilibSimulationData() {
-  frc::impl::ResetSmartDashboardInstance();
-  frc::impl::ResetMotorSafety();
+  wpi::impl::ResetSmartDashboardInstance();
+  wpi::impl::ResetMotorSafety();
   wpi::impl::ResetSendableRegistry();
 }
 
 void resetMotorSafety() {
-  frc::impl::ResetMotorSafety();
+  wpi::impl::ResetMotorSafety();
 }
 
 #else

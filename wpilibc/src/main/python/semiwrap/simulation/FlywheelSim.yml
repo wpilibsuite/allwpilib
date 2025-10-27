@@ -1,16 +1,16 @@
 classes:
-  frc::sim::FlywheelSim:
+  wpi::sim::FlywheelSim:
     typealias:
-    - frc::DCMotor
-    - template <int S, int I, int O> using LinearSystem = frc::LinearSystem<S, I, O>
+    - wpi::math::DCMotor
+    - template <int S, int I, int O> using wpi::math::LinearSystem = wpi::math::LinearSystem<S, I, O>
     methods:
       FlywheelSim:
         overloads:
-          const LinearSystem<1, 1, 1>&, const DCMotor&, double, const std::array<double, 1>&:
+          const wpi::math::LinearSystem<1, 1, 1>&, const wpi::math::DCMotor&, double, const std::array<double, 1>&:
             param_override:
               measurementStdDevs:
                 default: std::array<double, 1>{0.0}
-          const DCMotor&, double, units::kilogram_square_meter_t, const std::array<double, 1>&:
+          const wpi::math::DCMotor&, double, wpi::units::kilogram_square_meter_t, const std::array<double, 1>&:
             param_override:
               measurementStdDevs:
                 default: std::array<double, 1>{0.0}

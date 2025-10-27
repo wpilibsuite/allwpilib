@@ -7,7 +7,7 @@
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
 
-using namespace wpi;
+using namespace wpi::util;
 
 namespace {
 

@@ -18,7 +18,7 @@
 #include "wpi/commands2/Requirements.hpp"
 #include "wpi/commands2/Subsystem.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 
 /**
  * A state machine representing a complete action to be performed by the robot.
@@ -38,7 +38,7 @@ namespace frc2 {
  * @see CommandScheduler
  * @see CommandHelper
  */
-class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
+class Command : public wpi::util::Sendable, public wpi::util::SendableHelper<Command> {
  public:
   ~Command() override;
 
@@ -88,7 +88,7 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * @return the set of subsystems that are required
    * @see InterruptionBehavior
    */
-  virtual wpi::SmallSet<Subsystem*, 4> GetRequirements() const;
+  virtual wpi::util::SmallSet<Subsystem*, 4> GetRequirements() const;
 
   /**
    * Adds the specified Subsystem requirements to the command.
@@ -122,7 +122,7 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    *
    * @param requirements the Subsystem requirements to add
    */
-  void AddRequirements(wpi::SmallSet<Subsystem*, 4> requirements);
+  void AddRequirements(wpi::util::SmallSet<Subsystem*, 4> requirements);
 
   /**
    * Adds the specified Subsystem requirement to the command.
@@ -192,7 +192,7 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * @param duration the timeout duration
    * @return the command with the timeout added
    */
-  CommandPtr WithTimeout(units::second_t duration) &&;
+  CommandPtr WithTimeout(wpi::units::second_t duration) &&;
 
   /**
    * Decorates this command with an interrupt condition. If the specified
@@ -474,14 +474,14 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    */
   virtual CommandPtr ToPtr() && = 0;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  protected:
   Command();
 
  private:
   /// Requirements set.
-  wpi::SmallSet<Subsystem*, 4> m_requirements;
+  wpi::util::SmallSet<Subsystem*, 4> m_requirements;
 
   std::optional<std::string> m_previousComposition;
 };
@@ -494,4 +494,4 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
  * @return False if first and second share a requirement.
  */
 bool RequirementsDisjoint(Command* first, Command* second);
-}  // namespace frc2
+}  // namespace wpi::cmd

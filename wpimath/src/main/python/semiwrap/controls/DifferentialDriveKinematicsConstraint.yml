@@ -2,9 +2,9 @@ defaults:
   subpackage: constraint
 
 classes:
-  frc::DifferentialDriveKinematicsConstraint:
+  wpi::math::DifferentialDriveKinematicsConstraint:
     typealias:
-    - frc::TrajectoryConstraint::MinMax
+    - wpi::math::TrajectoryConstraint::MinMax
     methods:
       DifferentialDriveKinematicsConstraint:
       MaxVelocity:
@@ -13,7 +13,7 @@ classes:
 inline_code: |-
   cls_DifferentialDriveKinematicsConstraint
     .def_static("fromFps", [](const DifferentialDriveKinematics& kinematics,
-                              units::feet_per_second_t maxSpeed) {
+                              wpi::units::feet_per_second_t maxSpeed) {
       return std::make_shared<DifferentialDriveKinematicsConstraint>(kinematics, maxSpeed);
     }, py::arg("kinematics"), py::arg("maxSpeed"))
   ;

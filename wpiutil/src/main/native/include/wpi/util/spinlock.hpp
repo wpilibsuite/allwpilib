@@ -11,7 +11,7 @@
 
 #include "wpi/util/Compiler.hpp"
 
-namespace wpi {
+namespace wpi::util {
 
 /**
  * A spinlock mutex.  Wraps std::atomic_flag in a std::mutex compatible way.
@@ -141,4 +141,4 @@ using recursive_spinlock = recursive_spinlock2;
 using recursive_spinlock = recursive_spinlock1;
 #endif
 
-}  // namespace wpi
+}  // namespace wpi::util

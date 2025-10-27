@@ -12,7 +12,7 @@
 
 #include "PneumaticsBase.hpp"
 
-namespace frc {
+namespace wpi {
 /** Module class for controlling a Cross The Road Electronics Pneumatics Control
  * Module. */
 class PneumaticsControlModule : public PneumaticsBase {
@@ -53,8 +53,8 @@ class PneumaticsControlModule : public PneumaticsBase {
    * @see EnableCompressorDigital()
    */
   void EnableCompressorAnalog(
-      units::pounds_per_square_inch_t minPressure,
-      units::pounds_per_square_inch_t maxPressure) override;
+      wpi::units::pounds_per_square_inch_t minPressure,
+      wpi::units::pounds_per_square_inch_t maxPressure) override;
 
   /**
    * Enables the compressor in digital mode. Hybrid mode is unsupported by the
@@ -65,14 +65,14 @@ class PneumaticsControlModule : public PneumaticsBase {
    * @see EnableCompressorDigital()
    */
   void EnableCompressorHybrid(
-      units::pounds_per_square_inch_t minPressure,
-      units::pounds_per_square_inch_t maxPressure) override;
+      wpi::units::pounds_per_square_inch_t minPressure,
+      wpi::units::pounds_per_square_inch_t maxPressure) override;
 
   CompressorConfigType GetCompressorConfigType() const override;
 
   bool GetPressureSwitch() const override;
 
-  units::ampere_t GetCompressorCurrent() const override;
+  wpi::units::ampere_t GetCompressorCurrent() const override;
 
   /**
    * Return whether the compressor current is currently too high.
@@ -162,7 +162,7 @@ class PneumaticsControlModule : public PneumaticsBase {
 
   void FireOneShot(int index) override;
 
-  void SetOneShotDuration(int index, units::second_t duration) override;
+  void SetOneShotDuration(int index, wpi::units::second_t duration) override;
 
   bool CheckSolenoidChannel(int channel) const override;
 
@@ -180,7 +180,7 @@ class PneumaticsControlModule : public PneumaticsBase {
    * @param channel Unsupported.
    * @return 0
    */
-  units::volt_t GetAnalogVoltage(int channel) const override;
+  wpi::units::volt_t GetAnalogVoltage(int channel) const override;
 
   /**
    * Unsupported by the CTRE PCM.
@@ -188,7 +188,7 @@ class PneumaticsControlModule : public PneumaticsBase {
    * @param channel Unsupported.
    * @return 0
    */
-  units::pounds_per_square_inch_t GetPressure(int channel) const override;
+  wpi::units::pounds_per_square_inch_t GetPressure(int channel) const override;
 
   Solenoid MakeSolenoid(int channel) override;
   DoubleSolenoid MakeDoubleSolenoid(int forwardChannel,
@@ -209,9 +209,9 @@ class PneumaticsControlModule : public PneumaticsBase {
   HAL_CTREPCMHandle m_handle;
   int m_module;
 
-  static wpi::mutex m_handleLock;
-  static std::unique_ptr<wpi::DenseMap<int, std::weak_ptr<DataStore>>[]>
+  static wpi::util::mutex m_handleLock;
+  static std::unique_ptr<wpi::util::DenseMap<int, std::weak_ptr<DataStore>>[]>
       m_handleMaps;
   static std::weak_ptr<DataStore>& GetDataStore(int busId, int module);
 };
-}  // namespace frc
+}  // namespace wpi

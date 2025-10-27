@@ -7,14 +7,14 @@
 #include <wpi/commands2/CommandPtr.hpp>
 #include <wpi/commands2/SubsystemBase.hpp>
 
-class ExampleSubsystem : public frc2::SubsystemBase {
+class ExampleSubsystem : public wpi::cmd::SubsystemBase {
  public:
   ExampleSubsystem();
 
   /**
    * Example command factory method.
    */
-  frc2::CommandPtr ExampleMethodCommand();
+  wpi::cmd::CommandPtr ExampleMethodCommand();
 
   /**
    * An example method querying a boolean state of the subsystem (for example, a

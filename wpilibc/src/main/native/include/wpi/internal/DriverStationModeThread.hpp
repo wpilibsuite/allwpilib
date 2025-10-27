@@ -7,7 +7,7 @@
 #include <atomic>
 #include <thread>
 
-namespace frc::internal {
+namespace wpi::internal {
 /**
  * For internal use only.
  */
@@ -70,4 +70,4 @@ class DriverStationModeThread {
   bool m_userInTeleop{false};
   bool m_userInTest{false};
 };
-}  // namespace frc::internal
+}  // namespace wpi::internal

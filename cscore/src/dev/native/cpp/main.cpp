@@ -7,5 +7,5 @@
 #include "wpi/cs/cscore.h"
 
 int main() {
-  wpi::print("{}\n", cs::GetHostname());
+  wpi::util::print("{}\n", wpi::cs::GetHostname());
 }

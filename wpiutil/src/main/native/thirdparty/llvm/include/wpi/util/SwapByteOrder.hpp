@@ -19,42 +19,42 @@
 #include <cstdint>
 #include <type_traits>
 
-namespace wpi {
+namespace wpi::util {
 
 namespace sys {
 
 constexpr bool IsBigEndianHost =
-    wpi::endianness::native == wpi::endianness::big;
+    wpi::util::endianness::native == wpi::util::endianness::big;
 
 static const bool IsLittleEndianHost = !IsBigEndianHost;
 
-inline unsigned char      getSwappedBytes(unsigned char      C) { return wpi::byteswap(C); }
-inline   signed char      getSwappedBytes( signed  char      C) { return wpi::byteswap(C); }
-inline          char      getSwappedBytes(         char      C) { return wpi::byteswap(C); }
+inline unsigned char      getSwappedBytes(unsigned char      C) { return wpi::util::byteswap(C); }
+inline   signed char      getSwappedBytes( signed  char      C) { return wpi::util::byteswap(C); }
+inline          char      getSwappedBytes(         char      C) { return wpi::util::byteswap(C); }
 
-inline unsigned short     getSwappedBytes(unsigned short     C) { return wpi::byteswap(C); }
-inline   signed short     getSwappedBytes(  signed short     C) { return wpi::byteswap(C); }
+inline unsigned short     getSwappedBytes(unsigned short     C) { return wpi::util::byteswap(C); }
+inline   signed short     getSwappedBytes(  signed short     C) { return wpi::util::byteswap(C); }
 
-inline unsigned int       getSwappedBytes(unsigned int       C) { return wpi::byteswap(C); }
-inline   signed int       getSwappedBytes(  signed int       C) { return wpi::byteswap(C); }
+inline unsigned int       getSwappedBytes(unsigned int       C) { return wpi::util::byteswap(C); }
+inline   signed int       getSwappedBytes(  signed int       C) { return wpi::util::byteswap(C); }
 
-inline unsigned long      getSwappedBytes(unsigned long      C) { return wpi::byteswap(C); }
-inline   signed long      getSwappedBytes(  signed long      C) { return wpi::byteswap(C); }
+inline unsigned long      getSwappedBytes(unsigned long      C) { return wpi::util::byteswap(C); }
+inline   signed long      getSwappedBytes(  signed long      C) { return wpi::util::byteswap(C); }
 
-inline unsigned long long getSwappedBytes(unsigned long long C) { return wpi::byteswap(C); }
-inline   signed long long getSwappedBytes(  signed long long C) { return wpi::byteswap(C); }
+inline unsigned long long getSwappedBytes(unsigned long long C) { return wpi::util::byteswap(C); }
+inline   signed long long getSwappedBytes(  signed long long C) { return wpi::util::byteswap(C); }
 
 inline float getSwappedBytes(float C) {
-  return wpi::bit_cast<float>(wpi::byteswap(wpi::bit_cast<uint32_t>(C)));
+  return wpi::util::bit_cast<float>(wpi::util::byteswap(wpi::util::bit_cast<uint32_t>(C)));
 }
 
 inline double getSwappedBytes(double C) {
-  return wpi::bit_cast<double>(wpi::byteswap(wpi::bit_cast<uint64_t>(C)));
+  return wpi::util::bit_cast<double>(wpi::util::byteswap(wpi::util::bit_cast<uint64_t>(C)));
 }
 
 template <typename T>
 inline std::enable_if_t<std::is_enum_v<T>, T> getSwappedBytes(T C) {
-  return static_cast<T>(wpi::byteswap(wpi::to_underlying(C)));
+  return static_cast<T>(wpi::util::byteswap(wpi::util::to_underlying(C)));
 }
 
 template<typename T>
@@ -63,6 +63,6 @@ inline void swapByteOrder(T &Value) {
 }
 
 } // end namespace sys
-} // end namespace wpi
+} // end namespace wpi::util
 
 #endif

@@ -23,7 +23,7 @@
 WPI_JSON_NAMESPACE_BEGIN
 
 /// ordered_map: a minimal map-like container that preserves insertion order
-/// for use within wpi::basic_json<ordered_map>
+/// for use within wpi::util::basic_json<ordered_map>
 template <class Key, class T, class IgnoredLess = std::less<Key>,
           class Allocator = std::allocator<std::pair<const Key, T>>>
                   struct ordered_map : std::vector<std::pair<const Key, T>, Allocator>

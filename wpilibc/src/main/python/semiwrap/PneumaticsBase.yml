@@ -6,7 +6,7 @@ extra_includes:
 
 
 classes:
-  frc::PneumaticsBase:
+  wpi::PneumaticsBase:
     methods:
       GetCompressor:
       GetPressureSwitch:

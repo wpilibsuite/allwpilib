@@ -1,5 +1,5 @@
 classes:
-  nt::StringArraySubscriber:
+  wpi::nt::StringArraySubscriber:
     methods:
       StringArraySubscriber:
         overloads:
@@ -29,7 +29,7 @@ classes:
         py::gil_scoped_release release;
         *self = StringArraySubscriber();
       })
-  nt::StringArrayPublisher:
+  wpi::nt::StringArrayPublisher:
     methods:
       StringArrayPublisher:
         overloads:
@@ -52,7 +52,7 @@ classes:
         py::gil_scoped_release release;
         *self = StringArrayPublisher();
       })
-  nt::StringArrayEntry:
+  wpi::nt::StringArrayEntry:
     methods:
       StringArrayEntry:
         overloads:
@@ -76,7 +76,7 @@ classes:
         py::gil_scoped_release release;
         *self = StringArrayEntry();
       })
-  nt::StringArrayTopic:
+  wpi::nt::StringArrayTopic:
     attributes:
       kTypeString:
     methods:

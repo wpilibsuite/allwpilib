@@ -12,7 +12,7 @@
 #include <Eigen/Core>
 #include <wpi/util/SymbolExports.hpp>
 
-namespace frc {
+namespace wpi::apriltag {
 
 /**
  * A detection of an AprilTag tag.
@@ -157,4 +157,4 @@ class WPILIB_DLLEXPORT AprilTagDetection final {
   double p[4][2];
 };
 
-}  // namespace frc
+}  // namespace wpi::apriltag

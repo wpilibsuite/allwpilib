@@ -8,7 +8,7 @@
 #include "wpi/hal/simulation/SimCallbackRegistry.h"
 #include "wpi/hal/simulation/SimDataValue.h"
 
-namespace hal {
+namespace wpi::hal {
 class I2CData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(Read)
@@ -27,4 +27,4 @@ class I2CData {
   void ResetData();
 };
 extern I2CData* SimI2CData;
-}  // namespace hal
+}  // namespace wpi::hal

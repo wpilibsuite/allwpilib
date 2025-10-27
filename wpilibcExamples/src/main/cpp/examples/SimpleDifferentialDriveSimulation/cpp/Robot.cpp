@@ -11,12 +11,12 @@
 
 #include "Drivetrain.hpp"
 
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   Robot() {
-    m_trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-        frc::Pose2d{2_m, 2_m, 0_rad}, {}, frc::Pose2d{6_m, 4_m, 0_rad},
-        frc::TrajectoryConfig(2_mps, 2_mps_sq));
+    m_trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
+        wpi::math::Pose2d{2_m, 2_m, 0_rad}, {}, wpi::math::Pose2d{6_m, 4_m, 0_rad},
+        wpi::math::TrajectoryConfig(2_mps, 2_mps_sq));
   }
 
   void RobotPeriodic() override { m_drive.Periodic(); }
@@ -52,21 +52,21 @@ class Robot : public frc::TimedRobot {
   void SimulationPeriodic() override { m_drive.SimulationPeriodic(); }
 
  private:
-  frc::XboxController m_controller{0};
+  wpi::XboxController m_controller{0};
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0
   // to 1.
-  frc::SlewRateLimiter<units::scalar> m_speedLimiter{3 / 1_s};
-  frc::SlewRateLimiter<units::scalar> m_rotLimiter{3 / 1_s};
+  wpi::math::SlewRateLimiter<wpi::units::scalar> m_speedLimiter{3 / 1_s};
+  wpi::math::SlewRateLimiter<wpi::units::scalar> m_rotLimiter{3 / 1_s};
 
   Drivetrain m_drive;
-  frc::Trajectory m_trajectory;
-  frc::LTVUnicycleController m_feedback{20_ms};
-  frc::Timer m_timer;
+  wpi::math::Trajectory m_trajectory;
+  wpi::math::LTVUnicycleController m_feedback{20_ms};
+  wpi::Timer m_timer;
 };
 
 #ifndef RUNNING_FRC_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

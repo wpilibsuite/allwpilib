@@ -23,7 +23,7 @@ using testing::_;
 using testing::MockFunction;
 using testing::StrictMock;
 
-namespace nt {
+namespace wpi::nt {
 
 class WireDecodeTextClientTest : public ::testing::Test {
  public:
@@ -110,7 +110,7 @@ TEST_F(WireDecodeTextClientTest, ErrorUnknownMethod) {
 TEST_F(WireDecodeTextClientTest, PublishPropsEmpty) {
   EXPECT_CALL(handler, ClientPublish(5, std::string_view{"test"},
                                      std::string_view{"double"},
-                                     wpi::json::object(), PubSubOptionsEq({})));
+                                     wpi::util::json::object(), PubSubOptionsEq({})));
   net::WireDecodeText(
       "[{\"method\":\"publish\",\"params\":{"
       "\"name\":\"test\",\"properties\":{},\"pubuid\":5,\"type\":\"double\"}}]",
@@ -118,7 +118,7 @@ TEST_F(WireDecodeTextClientTest, PublishPropsEmpty) {
 
   EXPECT_CALL(handler, ClientPublish(5, std::string_view{"test"},
                                      std::string_view{"double"},
-                                     wpi::json::object(), PubSubOptionsEq({})));
+                                     wpi::util::json::object(), PubSubOptionsEq({})));
   net::WireDecodeText(
       "[{\"method\":\"publish\",\"params\":{"
       "\"name\":\"test\",\"pubuid\":5,\"type\":\"double\"}}]",
@@ -126,7 +126,7 @@ TEST_F(WireDecodeTextClientTest, PublishPropsEmpty) {
 }
 
 TEST_F(WireDecodeTextClientTest, PublishProps) {
-  wpi::json props = {{"k", 6}};
+  wpi::util::json props = {{"k", 6}};
   EXPECT_CALL(handler, ClientPublish(5, std::string_view{"test"},
                                      std::string_view{"double"}, props,
                                      PubSubOptionsEq({})));
@@ -192,4 +192,4 @@ TEST_F(WireDecodeTextClientTest, UnpublishError) {
       logger);
 }
 
-}  // namespace nt
+}  // namespace wpi::nt

@@ -8,7 +8,7 @@
 
 #include "wpi/simulation/GenericHIDSim.hpp"
 
-namespace frc {
+namespace wpi {
 
 class PS4Controller;
 
@@ -187,4 +187,4 @@ class PS4ControllerSim : public GenericHIDSim {
 };
 
 }  // namespace sim
-}  // namespace frc
+}  // namespace wpi

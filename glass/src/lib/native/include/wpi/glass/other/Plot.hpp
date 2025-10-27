@@ -6,7 +6,7 @@
 
 #include "wpi/glass/WindowManager.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 class PlotProvider : private WindowManager {
  public:
@@ -33,4 +33,4 @@ class PlotProvider : private WindowManager {
   bool m_paused = false;
 };
 
-}  // namespace glass
+}  // namespace wpi::glass

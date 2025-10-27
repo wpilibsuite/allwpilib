@@ -10,7 +10,7 @@
 
 #include "wpi/system/DataLogManager.hpp"
 
-using namespace frc::sysid;
+using namespace wpi::sysid;
 
 SysIdRoutineLog::SysIdRoutineLog(std::string_view logName)
     : m_logName(logName) {}
@@ -27,7 +27,7 @@ SysIdRoutineLog::MotorLog& SysIdRoutineLog::MotorLog::value(
   auto& motorEntries = (*m_logEntries)[m_motorName];
 
   if (!motorEntries.contains(name)) {
-    wpi::log::DataLog& log = frc::DataLogManager::GetLog();
+    wpi::log::DataLog& log = wpi::DataLogManager::GetLog();
 
     motorEntries[name] = wpi::log::DoubleLogEntry(
         log, fmt::format("{}-{}-{}", name, m_motorName, m_logName), unit);
@@ -44,7 +44,7 @@ SysIdRoutineLog::MotorLog SysIdRoutineLog::Motor(std::string_view motorName) {
 void SysIdRoutineLog::RecordState(State state) {
   if (!m_stateInitialized) {
     m_state =
-        wpi::log::StringLogEntry{frc::DataLogManager::GetLog(),
+        wpi::log::StringLogEntry{wpi::DataLogManager::GetLog(),
                                  fmt::format("sysid-test-state-{}", m_logName)};
     m_stateInitialized = true;
   }

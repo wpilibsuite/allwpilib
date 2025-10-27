@@ -11,5 +11,5 @@ functions:
   getHandleTypedIndex:
   createHandle:
 classes:
-  hal::HandleBase:
+  wpi::hal::HandleBase:
     ignore: true

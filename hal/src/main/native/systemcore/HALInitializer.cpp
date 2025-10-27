@@ -6,9 +6,9 @@
 
 #include "wpi/hal/HALBase.h"
 
-namespace hal::init {
+namespace wpi::hal::init {
 std::atomic_bool HAL_IsInitialized{false};
 void RunInitialize() {
   HAL_Initialize(500, 0);
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init

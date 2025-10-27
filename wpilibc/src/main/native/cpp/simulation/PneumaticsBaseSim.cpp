@@ -11,8 +11,8 @@
 #include "wpi/simulation/REVPHSim.hpp"
 #include "wpi/system/Errors.hpp"
 
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 std::shared_ptr<PneumaticsBaseSim> PneumaticsBaseSim::GetForType(
     int module, PneumaticsModuleType type) {

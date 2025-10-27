@@ -12,7 +12,7 @@
 #include "wpi/hal/handles/HandlesInternal.h"
 #include "wpi/hal/handles/IndexedHandleResource.h"
 
-namespace hal {
+namespace wpi::hal {
 constexpr int32_t kTimebase = 40000000;  ///< 40 MHz clock
 constexpr int32_t kDefaultOversampleBits = 0;
 constexpr int32_t kDefaultAverageBits = 7;
@@ -25,7 +25,7 @@ struct AnalogPort {
   std::string previousAllocation;
 };
 
-extern IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort,
+extern IndexedHandleResource<HAL_AnalogInputHandle, wpi::hal::AnalogPort,
                              kNumAnalogInputs, HAL_HandleEnum::AnalogInput>*
     analogInputHandles;
-}  // namespace hal
+}  // namespace wpi::hal

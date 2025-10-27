@@ -2,11 +2,11 @@ defaults:
   subpackage: trajectory
 
 classes:
-  frc::TrapezoidProfile:
+  wpi::math::TrapezoidProfile:
     force_type_casters:
-    - units::second_t
-    - units::radians_per_second
-    - units::radians_per_second_squared
+    - wpi::units::second_t
+    - wpi::units::radians_per_second
+    - wpi::units::radians_per_second_squared
     template_params:
     - Distance
     doc: |
@@ -70,7 +70,7 @@ classes:
             "velocity=" + std::to_string(self.velocity()) + ")";
         });
       }
-  frc::TrapezoidProfile::Constraints:
+  wpi::math::TrapezoidProfile::Constraints:
     attributes:
       maxVelocity:
       maxAcceleration:
@@ -85,7 +85,7 @@ classes:
                 default: '0'
               maxAcceleration:
                 default: '0'
-  frc::TrapezoidProfile::State:
+  wpi::math::TrapezoidProfile::State:
     force_no_default_constructor: true
     attributes:
       position:
@@ -95,12 +95,12 @@ classes:
         cpp_code: py::self == State()
 templates:
   TrapezoidProfile:
-    qualname: frc::TrapezoidProfile
+    qualname: wpi::math::TrapezoidProfile
     params:
-    - units::dimensionless::scalar
+    - wpi::units::dimensionless::scalar
 
   # needed for HolonomicDriveController
   TrapezoidProfileRadians:
-    qualname: frc::TrapezoidProfile
+    qualname: wpi::math::TrapezoidProfile
     params:
-    - units::radian
+    - wpi::units::radian

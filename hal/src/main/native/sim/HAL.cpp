@@ -33,7 +33,7 @@ NtQueryTimerResolution(PULONG MinimumResolution, PULONG MaximumResolution,
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/hal/simulation/SimCallbackRegistry.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
 namespace {
 class SimPeriodicCallbackRegistry : public impl::SimCallbackRegistryBase {
@@ -55,16 +55,16 @@ class SimPeriodicCallbackRegistry : public impl::SimCallbackRegistryBase {
 }  // namespace
 
 static HAL_RuntimeType runtimeType{HAL_Runtime_Simulation};
-static wpi::spinlock gOnShutdownMutex;
+static wpi::util::spinlock gOnShutdownMutex;
 static std::vector<std::pair<void*, void (*)(void*)>> gOnShutdown;
 static SimPeriodicCallbackRegistry gSimPeriodicBefore;
 static SimPeriodicCallbackRegistry gSimPeriodicAfter;
 
-namespace hal {
+namespace wpi::hal {
 void InitializeDriverStation();
-}  // namespace hal
+}  // namespace wpi::hal
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeHAL() {
   InitializeAddressableLEDData();
   InitializeAnalogInData();
@@ -108,7 +108,7 @@ void InitializeHAL() {
   InitializeSimDevice();
   InitializeThreads();
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 
@@ -254,7 +254,7 @@ int32_t HAL_GetTeamNumber(void) {
 }
 
 uint64_t HAL_GetFPGATime(int32_t* status) {
-  return hal::GetFPGATime();
+  return wpi::hal::GetFPGATime();
 }
 
 uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status) {
@@ -303,7 +303,7 @@ HAL_Bool HAL_GetSystemTimeValid(int32_t* status) {
 
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   static std::atomic_bool initialized{false};
-  static wpi::mutex initializeMutex;
+  static wpi::util::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished
   if (initialized) {
     return true;
@@ -315,12 +315,12 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     return true;
   }
 
-  hal::init::InitializeHAL();
+  wpi::hal::init::InitializeHAL();
 
-  hal::init::HAL_IsInitialized.store(true);
+  wpi::hal::init::HAL_IsInitialized.store(true);
 
-  hal::RestartTiming();
-  hal::InitializeDriverStation();
+  wpi::hal::RestartTiming();
+  wpi::hal::InitializeDriverStation();
 
   initialized = true;
 

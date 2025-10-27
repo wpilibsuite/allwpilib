@@ -4,19 +4,19 @@
 
 namespace pybind11 {
 namespace detail {
-template <> struct handle_type_name<units::exabyte_t> {
+template <> struct handle_type_name<wpi::units::exabyte_t> {
   static constexpr auto name = _("wpimath.units.exabytes");
 };
 
-template <> struct handle_type_name<units::exabytes> {
+template <> struct handle_type_name<wpi::units::exabytes> {
   static constexpr auto name = _("wpimath.units.exabytes");
 };
 
-template <> struct handle_type_name<units::exabit_t> {
+template <> struct handle_type_name<wpi::units::exabit_t> {
   static constexpr auto name = _("wpimath.units.exabits");
 };
 
-template <> struct handle_type_name<units::exabits> {
+template <> struct handle_type_name<wpi::units::exabits> {
   static constexpr auto name = _("wpimath.units.exabits");
 };
 

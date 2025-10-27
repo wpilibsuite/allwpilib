@@ -2,6 +2,6 @@ extra_includes:
 - wpi/util/sendable/SendableBuilder.hpp
 
 classes:
-  frc::PWMVenom:
+  wpi::PWMVenom:
     methods:
       PWMVenom:

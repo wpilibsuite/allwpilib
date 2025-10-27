@@ -26,7 +26,7 @@
 #include "wpi/util/raw_istream.hpp"
 #include "wpi/util/raw_ostream.hpp"
 
-using namespace wpi;
+using namespace wpi::util;
 
 static const size_t BLOCK_INTS =
     16; /* number of 32bit integers per SHA1 block */

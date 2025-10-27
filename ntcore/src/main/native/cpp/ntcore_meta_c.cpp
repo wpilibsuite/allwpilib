@@ -8,8 +8,8 @@
 #include "Value_internal.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
 
-using namespace nt;
-using namespace nt::meta;
+using namespace wpi::nt;
+using namespace wpi::nt::meta;
 
 static void ConvertToC(const SubscriberOptions& in,
                        NT_Meta_SubscriberOptions* out) {
@@ -56,7 +56,7 @@ static O* ConvertToC(const std::optional<std::vector<I>>& in, size_t* out_len) {
     if (O* rv = ConvertToC<O>(*in, out_len)) {
       return rv;
     } else {
-      return static_cast<O*>(wpi::safe_malloc(0));  // return non-NULL
+      return static_cast<O*>(wpi::util::safe_malloc(0));  // return non-NULL
     }
   } else {
     *out_len = 0;

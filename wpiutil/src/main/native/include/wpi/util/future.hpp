@@ -18,7 +18,7 @@
 #include "wpi/util/condition_variable.hpp"
 #include "wpi/util/mutex.hpp"
 
-namespace wpi {
+namespace wpi::util {
 
 template <typename T>
 class PromiseFactory;
@@ -39,16 +39,16 @@ class PromiseFactoryBase {
 
   bool IsActive() const { return m_active; }
 
-  wpi::mutex& GetResultMutex() { return m_resultMutex; }
+  wpi::util::mutex& GetResultMutex() { return m_resultMutex; }
 
   void Notify() { m_resultCv.notify_all(); }
 
   // must be called with locked lock == ResultMutex
-  void Wait(std::unique_lock<wpi::mutex>& lock) { m_resultCv.wait(lock); }
+  void Wait(std::unique_lock<wpi::util::mutex>& lock) { m_resultCv.wait(lock); }
 
   // returns false if timeout reached
   template <class Clock, class Duration>
-  bool WaitUntil(std::unique_lock<wpi::mutex>& lock,
+  bool WaitUntil(std::unique_lock<wpi::util::mutex>& lock,
                  const std::chrono::time_point<Clock, Duration>& timeout_time) {
     return m_resultCv.wait_until(lock, timeout_time) ==
            std::cv_status::no_timeout;
@@ -67,9 +67,9 @@ class PromiseFactoryBase {
   uint64_t CreateErasedRequest() { return ++m_uid; }
 
  private:
-  wpi::mutex m_resultMutex;
+  wpi::util::mutex m_resultMutex;
   std::atomic_bool m_active{true};
-  wpi::condition_variable m_resultCv;
+  wpi::util::condition_variable m_resultCv;
 
   uint64_t m_uid = 0;
   std::vector<uint64_t> m_requests;
@@ -938,6 +938,6 @@ future<void> detail::FutureThen<void, void>::Create(
   return factory.CreateFuture(req);
 }
 
-}  // namespace wpi
+}  // namespace wpi::util
 
 #endif  // WPIUTIL_WPI_UTIL_FUTURE_HPP_

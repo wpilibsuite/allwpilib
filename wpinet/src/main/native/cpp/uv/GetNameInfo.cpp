@@ -11,7 +11,7 @@
 #include "wpi/net/uv/Loop.hpp"
 #include "wpi/net/uv/util.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 GetNameInfoReq::GetNameInfoReq() {
   error = [this](Error err) { GetLoop().error(err); };
@@ -98,4 +98,4 @@ void GetNameInfo6(Loop& loop,
   }
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

@@ -37,9 +37,9 @@
 #include "wpi/units/frequency.hpp"
 #include "wpi/units/mass.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::radiation
+ * @namespace wpi::units::radiation
  * @brief namespace for unit types and containers representing radiation values
  * @details The SI units for radiation are:
  *          - source activity:	becquerel
@@ -51,7 +51,7 @@ namespace units {
 #if !defined(DISABLE_PREDEFINED_UNITS) || \
     defined(ENABLE_PREDEFINED_RADIATION_UNITS)
 UNIT_ADD_WITH_METRIC_PREFIXES(radiation, becquerel, becquerels, Bq,
-                              unit<std::ratio<1>, units::frequency::hertz>)
+                              unit<std::ratio<1>, wpi::units::frequency::hertz>)
 UNIT_ADD_WITH_METRIC_PREFIXES(
     radiation, gray, grays, Gy,
     compound_unit<energy::joules, inverse<mass::kilogram>>)
@@ -66,4 +66,4 @@ UNIT_ADD_CATEGORY_TRAIT(radioactivity)
 #endif
 
 using namespace radiation;
-}  // namespace units
+}  // namespace wpi::units

@@ -6,7 +6,7 @@
 
 #include <Eigen/Core>
 
-namespace frc {
+namespace wpi::math {
 
 template <int Size>
 using Vectord = Eigen::Vector<double, Size>;
@@ -20,4 +20,4 @@ template <int Rows, int Cols,
           int MaxRows = Rows, int MaxCols = Cols>
 using Matrixd = Eigen::Matrix<double, Rows, Cols, Options, MaxRows, MaxCols>;
 
-}  // namespace frc
+}  // namespace wpi::math

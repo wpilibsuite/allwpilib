@@ -4,9 +4,9 @@
 
 #include "wpi/math/estimator/KalmanFilter.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT) KalmanFilter<1, 1, 1>;
 template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT) KalmanFilter<2, 1, 1>;
 
-}  // namespace frc
+}  // namespace wpi::math

@@ -12,7 +12,7 @@
 #include "ComPtr.hpp"
 #include "wpi/cs/cscore_cpp.hpp"
 
-namespace cs {
+namespace wpi::cs {
 
 class UsbCameraImpl;
 
@@ -20,8 +20,8 @@ class UsbCameraImpl;
 // COM object, so it needs a to ref count itself.
 class SourceReaderCB : public IMFSourceReaderCallback {
  public:
-  explicit SourceReaderCB(std::weak_ptr<cs::UsbCameraImpl> source,
-                          const cs::VideoMode& mode);
+  explicit SourceReaderCB(std::weak_ptr<wpi::cs::UsbCameraImpl> source,
+                          const wpi::cs::VideoMode& mode);
   void SetVideoMode(const VideoMode& mode) { m_mode = mode; }
 
   STDMETHODIMP QueryInterface(REFIID iid, void** ppv);
@@ -35,7 +35,7 @@ class SourceReaderCB : public IMFSourceReaderCallback {
                             IMFSample* pSample  // Can be NULL
   );
 
-  void InvalidateCapture() { m_source = std::weak_ptr<cs::UsbCameraImpl>(); }
+  void InvalidateCapture() { m_source = std::weak_ptr<wpi::cs::UsbCameraImpl>(); }
 
  private:
   // Destructor is private. Caller should call Release.
@@ -43,13 +43,13 @@ class SourceReaderCB : public IMFSourceReaderCallback {
   void NotifyError(HRESULT hr);
 
   ULONG m_nRefCount;
-  std::weak_ptr<cs::UsbCameraImpl> m_source;
-  cs::VideoMode m_mode;
+  std::weak_ptr<wpi::cs::UsbCameraImpl> m_source;
+  wpi::cs::VideoMode m_mode;
 };
 
 ComPtr<SourceReaderCB> CreateSourceReaderCB(
-    std::weak_ptr<cs::UsbCameraImpl> source, const cs::VideoMode& mode);
+    std::weak_ptr<wpi::cs::UsbCameraImpl> source, const wpi::cs::VideoMode& mode);
 ComPtr<IMFSourceReader> CreateSourceReader(IMFMediaSource* mediaSource,
                                            IMFSourceReaderCallback* callback);
 ComPtr<IMFMediaSource> CreateVideoCaptureDevice(LPCWSTR pszSymbolicLink);
-}  // namespace cs
+}  // namespace wpi::cs

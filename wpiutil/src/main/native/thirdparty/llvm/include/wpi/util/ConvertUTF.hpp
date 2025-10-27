@@ -111,10 +111,10 @@
 #include <string_view>
 #include <system_error>
 
-// Wrap everything in namespace wpi so that programs can link with llvm and
+// Wrap everything in namespace wpi::util so that programs can link with llvm and
 // their own version of the unicode libraries.
 
-namespace wpi {
+namespace wpi::util {
 
 /* ---------------------------------------------------------------------
     The following 4 definitions are compiler-specific.
@@ -340,6 +340,6 @@ std::error_code UTF16ToCurCP(const wchar_t *utf16, size_t utf16_len,
 } // namespace sys
 #endif
 
-} /* end namespace wpi */
+} /* end namespace wpi::util */
 
 #endif

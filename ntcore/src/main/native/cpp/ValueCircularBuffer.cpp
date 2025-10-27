@@ -7,7 +7,7 @@
 #include <utility>
 #include <vector>
 
-using namespace nt;
+using namespace wpi::nt;
 
 std::vector<Value> ValueCircularBuffer::ReadValue(unsigned int types) {
   std::vector<Value> rv;

@@ -9,7 +9,7 @@
 #include "IConnectionList.hpp"
 #include "gmock/gmock.h"
 
-namespace nt {
+namespace wpi::nt {
 
 class MockConnectionList : public IConnectionList {
  public:
@@ -21,4 +21,4 @@ class MockConnectionList : public IConnectionList {
   MOCK_METHOD(bool, IsConnected, (), (const, override));
 };
 
-}  // namespace nt
+}  // namespace wpi::nt

@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-using namespace wpi::structparser;
+using namespace wpi::util::structparser;
 
 TEST(StructParserTest, Empty) {
   Parser p{""};

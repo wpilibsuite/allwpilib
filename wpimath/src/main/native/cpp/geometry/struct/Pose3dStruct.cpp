@@ -7,19 +7,19 @@
 namespace {
 constexpr size_t kTranslationOff = 0;
 constexpr size_t kRotationOff =
-    kTranslationOff + wpi::GetStructSize<frc::Translation3d>();
+    kTranslationOff + wpi::util::GetStructSize<wpi::math::Translation3d>();
 }  // namespace
 
-using StructType = wpi::Struct<frc::Pose3d>;
+using StructType = wpi::util::Struct<wpi::math::Pose3d>;
 
-frc::Pose3d StructType::Unpack(std::span<const uint8_t> data) {
-  return frc::Pose3d{
-      wpi::UnpackStruct<frc::Translation3d, kTranslationOff>(data),
-      wpi::UnpackStruct<frc::Rotation3d, kRotationOff>(data),
+wpi::math::Pose3d StructType::Unpack(std::span<const uint8_t> data) {
+  return wpi::math::Pose3d{
+      wpi::util::UnpackStruct<wpi::math::Translation3d, kTranslationOff>(data),
+      wpi::util::UnpackStruct<wpi::math::Rotation3d, kRotationOff>(data),
   };
 }
 
-void StructType::Pack(std::span<uint8_t> data, const frc::Pose3d& value) {
-  wpi::PackStruct<kTranslationOff>(data, value.Translation());
-  wpi::PackStruct<kRotationOff>(data, value.Rotation());
+void StructType::Pack(std::span<uint8_t> data, const wpi::math::Pose3d& value) {
+  wpi::util::PackStruct<kTranslationOff>(data, value.Translation());
+  wpi::util::PackStruct<kRotationOff>(data, value.Rotation());
 }

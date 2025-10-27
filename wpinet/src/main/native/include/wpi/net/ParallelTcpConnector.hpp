@@ -15,7 +15,7 @@
 
 #include "wpi/net/uv/Timer.hpp"
 
-namespace wpi {
+namespace wpi::net {
 
 class Logger;
 
@@ -59,8 +59,8 @@ class ParallelTcpConnector
    * @return Parallel connector
    */
   static std::shared_ptr<ParallelTcpConnector> Create(
-      wpi::uv::Loop& loop, wpi::uv::Timer::Time reconnectRate,
-      wpi::Logger& logger, std::function<void(wpi::uv::Tcp& tcp)> connected,
+      wpi::net::uv::Loop& loop, wpi::net::uv::Timer::Time reconnectRate,
+      wpi::util::Logger& logger, std::function<void(wpi::net::uv::Tcp& tcp)> connected,
       bool ipv4Only = false) {
     if (loop.IsClosing()) {
       return nullptr;
@@ -70,9 +70,9 @@ class ParallelTcpConnector
                                                   ipv4Only, private_init{});
   }
 
-  ParallelTcpConnector(wpi::uv::Loop& loop, wpi::uv::Timer::Time reconnectRate,
-                       wpi::Logger& logger,
-                       std::function<void(wpi::uv::Tcp& tcp)> connected,
+  ParallelTcpConnector(wpi::net::uv::Loop& loop, wpi::net::uv::Timer::Time reconnectRate,
+                       wpi::util::Logger& logger,
+                       std::function<void(wpi::net::uv::Tcp& tcp)> connected,
                        bool ipv4Only, const private_init&);
   ~ParallelTcpConnector();
 
@@ -105,24 +105,24 @@ class ParallelTcpConnector
    *
    * @param tcp connection passed to connected callback
    */
-  void Succeeded(wpi::uv::Tcp& tcp);
+  void Succeeded(wpi::net::uv::Tcp& tcp);
 
  private:
   bool IsConnected() const { return m_isConnected || m_servers.empty(); }
   void Connect();
-  void CancelAll(wpi::uv::Tcp* except = nullptr);
+  void CancelAll(wpi::net::uv::Tcp* except = nullptr);
 
-  wpi::uv::Loop& m_loop;
-  wpi::Logger& m_logger;
-  wpi::uv::Timer::Time m_reconnectRate;
+  wpi::net::uv::Loop& m_loop;
+  wpi::util::Logger& m_logger;
+  wpi::net::uv::Timer::Time m_reconnectRate;
   bool m_ipv4Only;
-  std::function<void(wpi::uv::Tcp& tcp)> m_connected;
-  std::shared_ptr<wpi::uv::Timer> m_reconnectTimer;
+  std::function<void(wpi::net::uv::Tcp& tcp)> m_connected;
+  std::shared_ptr<wpi::net::uv::Timer> m_reconnectTimer;
   std::vector<std::pair<std::string, unsigned int>> m_servers;
-  std::vector<std::weak_ptr<wpi::uv::GetAddrInfoReq>> m_resolvers;
-  std::vector<std::pair<sockaddr_storage, std::weak_ptr<wpi::uv::Tcp>>>
+  std::vector<std::weak_ptr<wpi::net::uv::GetAddrInfoReq>> m_resolvers;
+  std::vector<std::pair<sockaddr_storage, std::weak_ptr<wpi::net::uv::Tcp>>>
       m_attempts;
   bool m_isConnected{false};
 };
 
-}  // namespace wpi
+}  // namespace wpi::net
