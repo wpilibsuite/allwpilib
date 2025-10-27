@@ -1,5 +1,6 @@
 cppHeaderFileInclude {
   \.h$
+  \.hpp$
 }
 
 cppSrcFileInclude {
@@ -8,7 +9,7 @@ cppSrcFileInclude {
 
 generatedFileExclude {
   wpigui/src/main/native/cpp/portable-file-dialogs\.cpp$
-  wpigui/src/main/native/include/portable-file-dialogs\.h$
+  wpigui/src/main/native/include/wpi/gui/portable-file-dialogs\.h$
 }
 
 repoRootNameOverride {

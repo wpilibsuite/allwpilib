@@ -4,7 +4,7 @@ apply plugin: 'c'
 
 ext {
     nativeName = 'apriltag'
-    devMain = 'edu.wpi.first.apriltag.DevMain'
+    devMain = 'org.wpilib.vision.apriltag.DevMain'
     useJava = true
     useCpp = true
     sharedCvConfigs = [

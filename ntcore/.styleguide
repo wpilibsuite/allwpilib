@@ -4,6 +4,7 @@ cHeaderFileInclude {
 
 cppHeaderFileInclude {
   (?<!_c)\.h$
+  \.hpp$
   \.inc$
   \.inl$
 }
@@ -35,6 +36,7 @@ includeOtherLibs {
   ^fmt/
   ^gtest/
   ^support/
-  ^wpi/
-  ^wpinet/
+  ^wpi/util/
+  ^wpi/net/
+  ^wpi/datalog/
 }

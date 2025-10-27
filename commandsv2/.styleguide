@@ -17,19 +17,15 @@ generatedFileExclude {
 }
 
 includeOtherLibs {
-  ^cameraserver/
-  ^cscore
-  ^fmt/
-  ^frc/
   ^gtest/
-  ^hal/
   ^imgui
   ^mockdata/
   ^networktables/
-  ^ntcore
   ^opencv2/
   ^support/
   ^units/
   ^vision/
-  ^wpi/
+  ^wpi/ntcore
+  ^wpi/hal/
+  ^wpi/util/
 }

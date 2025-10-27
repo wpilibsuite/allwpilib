@@ -5,7 +5,7 @@ ext {
     groupId = 'edu.wpi.first.wpimath'
 
     nativeName = 'wpimath'
-    devMain = 'edu.wpi.first.math.DevMain'
+    devMain = 'org.wpilib.math.DevMain'
 
     splitSetup = {
         it.sources {
