@@ -49,8 +49,8 @@ class SwerveModule {
       0.0,
       {kModuleMaxAngularVelocity, kModuleMaxAngularAcceleration}};
 
-  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_driveFeedforward{1_V,
-                                                                3_V / 1_mps};
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_driveFeedforward{
+      1_V, 3_V / 1_mps};
   wpi::math::SimpleMotorFeedforward<wpi::units::radians> m_turnFeedforward{
       1_V, 0.5_V / 1_rad_per_s};
 };

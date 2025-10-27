@@ -8,8 +8,8 @@
 
 #include "wpimath/protobuf/kinematics.npb.h"
 
-std::optional<wpi::math::SwerveModulePosition>
-wpi::util::Protobuf<wpi::math::SwerveModulePosition>::Unpack(InputStream& stream) {
+std::optional<wpi::math::SwerveModulePosition> wpi::util::Protobuf<
+    wpi::math::SwerveModulePosition>::Unpack(InputStream& stream) {
   wpi::util::UnpackCallback<wpi::math::Rotation2d> angle;
   wpi_proto_ProtobufSwerveModulePosition msg{
       .distance = 0,

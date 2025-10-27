@@ -6,21 +6,22 @@
 
 #include "wpimath/protobuf/geometry3d.npb.h"
 
-std::optional<wpi::math::Twist3d> wpi::util::Protobuf<wpi::math::Twist3d>::Unpack(
-    InputStream& stream) {
+std::optional<wpi::math::Twist3d>
+wpi::util::Protobuf<wpi::math::Twist3d>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufTwist3d msg;
   if (!stream.Decode(msg)) {
     return {};
   }
 
   return wpi::math::Twist3d{
-      wpi::units::meter_t{msg.dx},  wpi::units::meter_t{msg.dy},  wpi::units::meter_t{msg.dz},
-      wpi::units::radian_t{msg.rx}, wpi::units::radian_t{msg.ry}, wpi::units::radian_t{msg.rz},
+      wpi::units::meter_t{msg.dx},  wpi::units::meter_t{msg.dy},
+      wpi::units::meter_t{msg.dz},  wpi::units::radian_t{msg.rx},
+      wpi::units::radian_t{msg.ry}, wpi::units::radian_t{msg.rz},
   };
 }
 
-bool wpi::util::Protobuf<wpi::math::Twist3d>::Pack(OutputStream& stream,
-                                       const wpi::math::Twist3d& value) {
+bool wpi::util::Protobuf<wpi::math::Twist3d>::Pack(
+    OutputStream& stream, const wpi::math::Twist3d& value) {
   wpi_proto_ProtobufTwist3d msg{
       .dx = value.dx.value(),
       .dy = value.dy.value(),

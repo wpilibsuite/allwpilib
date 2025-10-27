@@ -14,15 +14,16 @@
 #include "wpimath/protobuf/wpimath.npb.h"
 
 template <int Size, int Options, int MaxRows, int MaxCols>
-struct wpi::util::Protobuf<wpi::math::Matrixd<Size, 1, Options, MaxRows, MaxCols>> {
+struct wpi::util::Protobuf<
+    wpi::math::Matrixd<Size, 1, Options, MaxRows, MaxCols>> {
   using MessageStruct = wpi_proto_ProtobufVector;
-  using InputStream =
-      wpi::util::ProtoInputStream<wpi::math::Matrixd<Size, 1, Options, MaxRows, MaxCols>>;
-  using OutputStream =
-      wpi::util::ProtoOutputStream<wpi::math::Matrixd<Size, 1, Options, MaxRows, MaxCols>>;
+  using InputStream = wpi::util::ProtoInputStream<
+      wpi::math::Matrixd<Size, 1, Options, MaxRows, MaxCols>>;
+  using OutputStream = wpi::util::ProtoOutputStream<
+      wpi::math::Matrixd<Size, 1, Options, MaxRows, MaxCols>>;
 
-  static std::optional<wpi::math::Matrixd<Size, 1, Options, MaxRows, MaxCols>> Unpack(
-      InputStream& stream) {
+  static std::optional<wpi::math::Matrixd<Size, 1, Options, MaxRows, MaxCols>>
+  Unpack(InputStream& stream) {
     constexpr bool isSmall = Size * sizeof(double) < 256;
     using UnpackType =
         std::conditional_t<isSmall, wpi::util::UnpackCallback<double, Size>,

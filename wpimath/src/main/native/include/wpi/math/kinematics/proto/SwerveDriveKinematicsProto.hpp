@@ -18,12 +18,13 @@ struct wpi::util::Protobuf<wpi::math::SwerveDriveKinematics<NumModules>> {
   using MessageStruct = wpi_proto_ProtobufSwerveDriveKinematics;
   using InputStream =
       wpi::util::ProtoInputStream<wpi::math::SwerveDriveKinematics<NumModules>>;
-  using OutputStream =
-      wpi::util::ProtoOutputStream<wpi::math::SwerveDriveKinematics<NumModules>>;
+  using OutputStream = wpi::util::ProtoOutputStream<
+      wpi::math::SwerveDriveKinematics<NumModules>>;
 
   static std::optional<wpi::math::SwerveDriveKinematics<NumModules>> Unpack(
       InputStream& stream) {
-    wpi::util::WpiArrayUnpackCallback<wpi::math::Translation2d, NumModules> modules;
+    wpi::util::WpiArrayUnpackCallback<wpi::math::Translation2d, NumModules>
+        modules;
     wpi_proto_ProtobufSwerveDriveKinematics msg{
         .modules = modules.Callback(),
     };
@@ -37,7 +38,8 @@ struct wpi::util::Protobuf<wpi::math::SwerveDriveKinematics<NumModules>> {
 
   static bool Pack(OutputStream& stream,
                    const wpi::math::SwerveDriveKinematics<NumModules>& value) {
-    wpi::util::PackCallback<wpi::math::Translation2d> modules{value.GetModules()};
+    wpi::util::PackCallback<wpi::math::Translation2d> modules{
+        value.GetModules()};
     wpi_proto_ProtobufSwerveDriveKinematics msg{
         .modules = modules.Callback(),
     };

@@ -26,7 +26,8 @@ class HALSimHttpConnection
  public:
   HALSimHttpConnection(std::shared_ptr<HALSimWeb> server,
                        std::shared_ptr<wpi::net::uv::Stream> stream)
-      : wpi::net::HttpWebSocketServerConnection<HALSimHttpConnection>(stream, {}),
+      : wpi::net::HttpWebSocketServerConnection<HALSimHttpConnection>(stream,
+                                                                      {}),
         m_server(std::move(server)),
         m_buffers(128) {}
 

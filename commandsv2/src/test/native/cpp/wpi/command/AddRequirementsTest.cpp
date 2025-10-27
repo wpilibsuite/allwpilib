@@ -16,7 +16,8 @@ using namespace wpi::cmd;
 class MockAddRequirements {
  public:
   MOCK_METHOD(void, AddRequirements, (Requirements), ());
-  MOCK_METHOD(void, AddRequirements, ((wpi::util::SmallSet<Subsystem*, 4>)), ());
+  MOCK_METHOD(void, AddRequirements, ((wpi::util::SmallSet<Subsystem*, 4>)),
+              ());
   MOCK_METHOD(void, AddRequirements, (Subsystem*), ());
 };
 
@@ -45,8 +46,9 @@ TEST(AddRequirementsTest, SmallSetOverloadResolution) {
 
   MockAddRequirements overloadResolver;
 
-  EXPECT_CALL(overloadResolver,
-              AddRequirements(testing::An<wpi::util::SmallSet<Subsystem*, 4>>()));
+  EXPECT_CALL(
+      overloadResolver,
+      AddRequirements(testing::An<wpi::util::SmallSet<Subsystem*, 4>>()));
 
   overloadResolver.AddRequirements(requirementsSet);
 }
@@ -86,7 +88,7 @@ TEST(AddRequirementsTest, SpanSemantics) {
   TestSubsystem requirement2;
 
   wpi::util::array<Subsystem* const, 2> requirementsArray(&requirement1,
-                                                    &requirement2);
+                                                          &requirement2);
 
   RunCommand command([] {});
   command.AddRequirements(std::span{requirementsArray});
@@ -98,7 +100,8 @@ TEST(AddRequirementsTest, SpanSemantics) {
 TEST(AddRequirementsTest, SpanDuplicatesSemantics) {
   TestSubsystem requirement;
 
-  wpi::util::array<Subsystem* const, 2> requirementsArray(&requirement, &requirement);
+  wpi::util::array<Subsystem* const, 2> requirementsArray(&requirement,
+                                                          &requirement);
 
   RunCommand command([] {});
   command.AddRequirements(std::span{requirementsArray});

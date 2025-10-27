@@ -32,9 +32,9 @@ void ArmSim::Update(wpi::units::volt_t voltage, wpi::units::second_t dt) {
   auto f = [=, this](
                const Eigen::Vector<double, 2>& x,
                const Eigen::Vector<double, 1>& u) -> Eigen::Vector<double, 2> {
-    return Eigen::Vector<double, 2>{
-        x(1), (m_A * x.block<1, 1>(1, 0) + m_B * u + m_c * wpi::util::sgn(x(1)) +
-               m_d * std::cos(x(0) + m_offset))(0)};
+    return Eigen::Vector<double, 2>{x(1), (m_A * x.block<1, 1>(1, 0) + m_B * u +
+                                           m_c * wpi::util::sgn(x(1)) +
+                                           m_d * std::cos(x(0) + m_offset))(0)};
   };
 
   // Max error is large because an accurate sim isn't as important as the sim
@@ -56,7 +56,8 @@ double ArmSim::GetVelocity() const {
 double ArmSim::GetAcceleration(wpi::units::volt_t voltage) const {
   Eigen::Vector<double, 1> u{voltage.value()};
   return (m_A * m_x.block<1, 1>(1, 0) + m_B * u +
-          m_c * wpi::util::sgn(GetVelocity()) + m_d * std::cos(m_x(0) + m_offset))(0);
+          m_c * wpi::util::sgn(GetVelocity()) +
+          m_d * std::cos(m_x(0) + m_offset))(0);
 }
 
 void ArmSim::Reset(double position, double velocity) {

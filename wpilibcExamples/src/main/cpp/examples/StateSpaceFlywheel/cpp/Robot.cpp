@@ -28,8 +28,8 @@ class Robot : public wpi::TimedRobot {
   static constexpr int kJoystickPort = 0;
   static constexpr wpi::units::radians_per_second_t kSpinup = 500_rpm;
 
-  static constexpr wpi::units::kilogram_square_meter_t kFlywheelMomentOfInertia =
-      0.00032_kg_sq_m;
+  static constexpr wpi::units::kilogram_square_meter_t
+      kFlywheelMomentOfInertia = 0.00032_kg_sq_m;
 
   // Reduction between motors and encoder, as output over input. If the flywheel
   // spins slower than the motors, this number should be greater than one.
@@ -42,8 +42,9 @@ class Robot : public wpi::TimedRobot {
   // Inputs (what we can "put in"): [voltage], in volts.
   // Outputs (what we can measure): [velocity], in radians per second.
   wpi::math::LinearSystem<1, 1, 1> m_flywheelPlant =
-      wpi::math::LinearSystemId::FlywheelSystem(
-          wpi::math::DCMotor::NEO(2), kFlywheelMomentOfInertia, kFlywheelGearing);
+      wpi::math::LinearSystemId::FlywheelSystem(wpi::math::DCMotor::NEO(2),
+                                                kFlywheelMomentOfInertia,
+                                                kFlywheelGearing);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   wpi::math::KalmanFilter<1, 1, 1> m_observer{
@@ -71,7 +72,7 @@ class Robot : public wpi::TimedRobot {
   // The state-space loop combines a controller, observer, feedforward and plant
   // for easy control.
   wpi::math::LinearSystemLoop<1, 1, 1> m_loop{m_flywheelPlant, m_controller,
-                                        m_observer, 12_V, 20_ms};
+                                              m_observer, 12_V, 20_ms};
 
   // An encoder set up to measure flywheel velocity in radians per second.
   wpi::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};

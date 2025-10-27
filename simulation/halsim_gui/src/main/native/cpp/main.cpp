@@ -64,9 +64,9 @@ __declspec(dllexport)
   HAL_RegisterExtension(
       HALSIMGUI_EXT_GETGUICONTEXT,
       reinterpret_cast<void*>((GetGuiContextFn)&gui::GetCurrentContext));
-  HAL_RegisterExtension(
-      HALSIMGUI_EXT_GETGLASSCONTEXT,
-      reinterpret_cast<void*>((GetGlassContextFn)&wpi::glass::GetCurrentContext));
+  HAL_RegisterExtension(HALSIMGUI_EXT_GETGLASSCONTEXT,
+                        reinterpret_cast<void*>(
+                            (GetGlassContextFn)&wpi::glass::GetCurrentContext));
 
   HALSimGui::GlobalInit();
   DriverStationGui::GlobalInit();

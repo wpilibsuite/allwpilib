@@ -33,7 +33,8 @@ SwerveModule::SwerveModule(const int driveMotorChannel,
   // Limit the PID Controller's input range between -pi and pi and set the input
   // to be continuous.
   m_turningPIDController.EnableContinuousInput(
-      -wpi::units::radian_t{std::numbers::pi}, wpi::units::radian_t{std::numbers::pi});
+      -wpi::units::radian_t{std::numbers::pi},
+      wpi::units::radian_t{std::numbers::pi});
 }
 
 wpi::math::SwerveModuleState SwerveModule::GetState() const {
@@ -46,7 +47,8 @@ wpi::math::SwerveModulePosition SwerveModule::GetPosition() const {
           wpi::units::radian_t{m_turningEncoder.GetDistance()}};
 }
 
-void SwerveModule::SetDesiredState(wpi::math::SwerveModuleState& referenceState) {
+void SwerveModule::SetDesiredState(
+    wpi::math::SwerveModuleState& referenceState) {
   wpi::math::Rotation2d encoderRotation{
       wpi::units::radian_t{m_turningEncoder.GetDistance()}};
 

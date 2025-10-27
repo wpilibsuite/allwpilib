@@ -27,7 +27,7 @@ struct ImPlotPoint;
 
 namespace wpi::glass {
 class Storage;
-}  // namespace glass
+}  // namespace wpi::glass
 
 namespace sysid {
 /**

@@ -151,28 +151,28 @@ static inline bool DeviceValueImpl(const char* name, bool readonly,
 }
 
 bool wpi::glass::DeviceBoolean(const char* name, bool readonly, bool* value,
-                          const DataSource* source) {
+                               const DataSource* source) {
   return DeviceValueImpl(name, readonly, source, DeviceBooleanImpl, value);
 }
 
 bool wpi::glass::DeviceDouble(const char* name, bool readonly, double* value,
-                         const DataSource* source) {
+                              const DataSource* source) {
   return DeviceValueImpl(name, readonly, source, DeviceDoubleImpl, value);
 }
 
 bool wpi::glass::DeviceEnum(const char* name, bool readonly, int* value,
-                       const char** options, int32_t numOptions,
-                       const DataSource* source) {
+                            const char** options, int32_t numOptions,
+                            const DataSource* source) {
   return DeviceValueImpl(name, readonly, source, DeviceEnumImpl, value, options,
                          numOptions);
 }
 
 bool wpi::glass::DeviceInt(const char* name, bool readonly, int32_t* value,
-                      const DataSource* source) {
+                           const DataSource* source) {
   return DeviceValueImpl(name, readonly, source, DeviceIntImpl, value);
 }
 
 bool wpi::glass::DeviceLong(const char* name, bool readonly, int64_t* value,
-                       const DataSource* source) {
+                            const DataSource* source) {
   return DeviceValueImpl(name, readonly, source, DeviceLongImpl, value);
 }

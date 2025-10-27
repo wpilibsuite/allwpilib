@@ -106,7 +106,7 @@ void wpi::glass::DisplayDIO(DIOModel* model, int index, bool outputsEnabled) {
 }
 
 void wpi::glass::DisplayDIOs(DIOsModel* model, bool outputsEnabled,
-                        std::string_view noneMsg) {
+                             std::string_view noneMsg) {
   bool hasAny = false;
 
   ImGui::PushItemWidth(ImGui::GetFontSize() * 8);

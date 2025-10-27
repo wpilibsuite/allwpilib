@@ -6,7 +6,8 @@
 
 namespace {
 constexpr size_t kCenterOff = 0;
-constexpr size_t kXSemiAxisOff = kCenterOff + wpi::util::GetStructSize<wpi::math::Pose2d>();
+constexpr size_t kXSemiAxisOff =
+    kCenterOff + wpi::util::GetStructSize<wpi::math::Pose2d>();
 constexpr size_t kYSemiAxisOff = kXSemiAxisOff + 8;
 }  // namespace
 
@@ -20,7 +21,8 @@ wpi::math::Ellipse2d StructType::Unpack(std::span<const uint8_t> data) {
   };
 }
 
-void StructType::Pack(std::span<uint8_t> data, const wpi::math::Ellipse2d& value) {
+void StructType::Pack(std::span<uint8_t> data,
+                      const wpi::math::Ellipse2d& value) {
   wpi::util::PackStruct<kCenterOff>(data, value.Center());
   wpi::util::PackStruct<kXSemiAxisOff>(data, value.XSemiAxis().value());
   wpi::util::PackStruct<kYSemiAxisOff>(data, value.YSemiAxis().value());

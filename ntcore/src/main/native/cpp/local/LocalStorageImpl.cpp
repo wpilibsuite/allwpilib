@@ -110,7 +110,8 @@ void StorageImpl::RemoveNetworkPublisher(LocalTopic* topic) {
 }
 
 void StorageImpl::NetworkPropertiesUpdate(LocalTopic* topic,
-                                          const wpi::util::json& update, bool ack) {
+                                          const wpi::util::json& update,
+                                          bool ack) {
   DEBUG4("NetworkPropertiesUpdate({},{})", topic->name, ack);
   if (ack) {
     return;  // ignore acks
@@ -215,7 +216,8 @@ void StorageImpl::SetProperty(LocalTopic* topic, std::string_view name,
                     true);
 }
 
-bool StorageImpl::SetProperties(LocalTopic* topic, const wpi::util::json& update,
+bool StorageImpl::SetProperties(LocalTopic* topic,
+                                const wpi::util::json& update,
                                 bool sendNetwork) {
   DEBUG4("SetProperties({},{})", topic->name, sendNetwork);
   if (!topic->SetProperties(update)) {
@@ -864,7 +866,8 @@ void StorageImpl::NotifyValue(LocalTopic* topic, const Value& value,
   }
 }
 
-void StorageImpl::PropertiesUpdated(LocalTopic* topic, const wpi::util::json& update,
+void StorageImpl::PropertiesUpdated(LocalTopic* topic,
+                                    const wpi::util::json& update,
                                     unsigned int eventFlags, bool sendNetwork,
                                     bool updateFlags) {
   DEBUG4("PropertiesUpdated({}, {}, {}, {}, {})", topic->name, update.dump(),
@@ -901,9 +904,9 @@ void StorageImpl::RefreshPubSubActive(LocalTopic* topic,
   }
 }
 
-LocalPublisher* StorageImpl::AddLocalPublisher(LocalTopic* topic,
-                                               const wpi::util::json& properties,
-                                               const PubSubConfig& config) {
+LocalPublisher* StorageImpl::AddLocalPublisher(
+    LocalTopic* topic, const wpi::util::json& properties,
+    const PubSubConfig& config) {
   bool didExist = topic->Exists();
   auto publisher = m_publishers.Add(m_inst, topic, config);
   topic->localPublishers.Add(publisher);

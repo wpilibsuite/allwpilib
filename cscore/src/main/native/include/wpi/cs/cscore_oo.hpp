@@ -547,8 +547,8 @@ class VideoSource {
    */
   double GetActualFPS() const {
     m_status = 0;
-    return wpi::cs::GetTelemetryAverageValue(m_handle, CS_SOURCE_FRAMES_RECEIVED,
-                                        &m_status);
+    return wpi::cs::GetTelemetryAverageValue(
+        m_handle, CS_SOURCE_FRAMES_RECEIVED, &m_status);
   }
 
   /**
@@ -561,7 +561,7 @@ class VideoSource {
   double GetActualDataRate() const {
     m_status = 0;
     return wpi::cs::GetTelemetryAverageValue(m_handle, CS_SOURCE_BYTES_RECEIVED,
-                                        &m_status);
+                                             &m_status);
   }
 
   /**

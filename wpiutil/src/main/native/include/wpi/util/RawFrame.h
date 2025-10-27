@@ -65,8 +65,8 @@ enum WPI_PixelFormat {
  */
 enum WPI_TimestampSource {
   WPI_TIMESRC_UNKNOWN = 0,    // unknown
-  WPI_TIMESRC_FRAME_DEQUEUE,  // wpi::util::Now when the new frame was dequeued by
-                              // CSCore. Does not account for camera exposure
+  WPI_TIMESRC_FRAME_DEQUEUE,  // wpi::util::Now when the new frame was dequeued
+                              // by CSCore. Does not account for camera exposure
                               // time or V4L latency.
   WPI_TIMESRC_V4L_EOF,  // End of Frame. Same as V4L2_BUF_FLAG_TSTAMP_SRC_EOF,
                         // translated into wpi::util::Now's timebase.

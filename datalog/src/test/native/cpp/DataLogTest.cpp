@@ -131,8 +131,8 @@ class DataLogTest : public ::testing::Test {
  public:
   wpi::util::Logger msglog;
   std::vector<uint8_t> data;
-  wpi::log::DataLogWriter log{msglog,
-                              std::make_unique<wpi::util::raw_uvector_ostream>(data)};
+  wpi::log::DataLogWriter log{
+      msglog, std::make_unique<wpi::util::raw_uvector_ostream>(data)};
 };
 
 TEST_F(DataLogTest, SimpleInt) {

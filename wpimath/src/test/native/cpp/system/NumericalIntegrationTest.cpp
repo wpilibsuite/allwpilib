@@ -14,7 +14,9 @@ TEST(NumericalIntegrationTest, Exponential) {
   wpi::math::Vectord<1> y0{0.0};
 
   wpi::math::Vectord<1> y1 = wpi::math::RK4(
-      [](const wpi::math::Vectord<1>& x) { return wpi::math::Vectord<1>{std::exp(x(0))}; },
+      [](const wpi::math::Vectord<1>& x) {
+        return wpi::math::Vectord<1>{std::exp(x(0))};
+      },
       y0, 0.1_s);
   EXPECT_NEAR(y1(0), std::exp(0.1) - std::exp(0), 1e-3);
 }
@@ -40,12 +42,13 @@ TEST(NumericalIntegrationTest, ExponentialWithU) {
 //
 //   x(t) = 12eᵗ/(eᵗ + 1)²
 TEST(NumericalIntegrationTest, RK4TimeVarying) {
-  wpi::math::Vectord<1> y0{12.0 * std::exp(5.0) / std::pow(std::exp(5.0) + 1.0, 2.0)};
+  wpi::math::Vectord<1> y0{12.0 * std::exp(5.0) /
+                           std::pow(std::exp(5.0) + 1.0, 2.0)};
 
   wpi::math::Vectord<1> y1 = wpi::math::RK4(
       [](wpi::units::second_t t, const wpi::math::Vectord<1>& x) {
         return wpi::math::Vectord<1>{x(0) *
-                               (2.0 / (std::exp(t.value()) + 1.0) - 1.0)};
+                                     (2.0 / (std::exp(t.value()) + 1.0) - 1.0)};
       },
       5_s, y0, 1_s);
   EXPECT_NEAR(y1(0), 12.0 * std::exp(6.0) / std::pow(std::exp(6.0) + 1.0, 2.0),
@@ -83,12 +86,13 @@ TEST(NumericalIntegrationTest, ExponentialRKDP) {
 //
 //   x(t) = 12eᵗ/(eᵗ + 1)²
 TEST(NumericalIntegrationTest, RKDPTimeVarying) {
-  wpi::math::Vectord<1> y0{12.0 * std::exp(5.0) / std::pow(std::exp(5.0) + 1.0, 2.0)};
+  wpi::math::Vectord<1> y0{12.0 * std::exp(5.0) /
+                           std::pow(std::exp(5.0) + 1.0, 2.0)};
 
   wpi::math::Vectord<1> y1 = wpi::math::RKDP(
       [](wpi::units::second_t t, const wpi::math::Vectord<1>& x) {
         return wpi::math::Vectord<1>{x(0) *
-                               (2.0 / (std::exp(t.value()) + 1.0) - 1.0)};
+                                     (2.0 / (std::exp(t.value()) + 1.0) - 1.0)};
       },
       5_s, y0, 1_s, 1e-12);
   EXPECT_NEAR(y1(0), 12.0 * std::exp(6.0) / std::pow(std::exp(6.0) + 1.0, 2.0),

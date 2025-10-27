@@ -59,7 +59,7 @@ class LinearFilterOutputTest
         break;
       case kTestHighPass:
         return wpi::math::LinearFilter<double>::HighPass(kHighPassTimeConstant,
-                                                   kFilterStep);
+                                                         kFilterStep);
         break;
       case kTestMovAvg:
         return wpi::math::LinearFilter<double>::MovingAverage(kMovAvgTaps);
@@ -121,8 +121,8 @@ INSTANTIATE_TEST_SUITE_P(Tests, LinearFilterOutputTest,
                                          kTestMovAvg, kTestPulse));
 
 template <int Derivative, int Samples, typename F, typename DfDx>
-void AssertCentralResults(F&& f, DfDx&& dfdx, wpi::units::second_t h, double min,
-                          double max) {
+void AssertCentralResults(F&& f, DfDx&& dfdx, wpi::units::second_t h,
+                          double min, double max) {
   static_assert(Samples % 2 != 0, "Number of samples must be odd.");
 
   // Generate stencil points from -(samples - 1)/2 to (samples - 1)/2
@@ -132,8 +132,8 @@ void AssertCentralResults(F&& f, DfDx&& dfdx, wpi::units::second_t h, double min
   }
 
   auto filter =
-      wpi::math::LinearFilter<double>::FiniteDifference<Derivative, Samples>(stencil,
-                                                                       h);
+      wpi::math::LinearFilter<double>::FiniteDifference<Derivative, Samples>(
+          stencil, h);
 
   for (int i = min / h.value(); i < max / h.value(); ++i) {
     // Let filter initialize
@@ -153,11 +153,11 @@ void AssertCentralResults(F&& f, DfDx&& dfdx, wpi::units::second_t h, double min
 }
 
 template <int Derivative, int Samples, typename F, typename DfDx>
-void AssertBackwardResults(F&& f, DfDx&& dfdx, wpi::units::second_t h, double min,
-                           double max) {
+void AssertBackwardResults(F&& f, DfDx&& dfdx, wpi::units::second_t h,
+                           double min, double max) {
   auto filter =
-      wpi::math::LinearFilter<double>::BackwardFiniteDifference<Derivative, Samples>(
-          h);
+      wpi::math::LinearFilter<double>::BackwardFiniteDifference<Derivative,
+                                                                Samples>(h);
 
   for (int i = min / h.value(); i < max / h.value(); ++i) {
     // Let filter initialize

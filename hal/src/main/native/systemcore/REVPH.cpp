@@ -198,7 +198,7 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
   if (!HAL_CheckREVPHModuleNumber(module)) {
     *status = RESOURCE_OUT_OF_RANGE;
     wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PH", 1,
-                                     kNumREVPHModules, module);
+                                          kNumREVPHModules, module);
     return HAL_kInvalidHandle;
   }
 
@@ -208,10 +208,10 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
   if (*status != 0) {
     if (hph) {
       wpi::hal::SetLastErrorPreviouslyAllocated(status, "REV PH", module,
-                                           hph->previousAllocation);
+                                                hph->previousAllocation);
     } else {
-      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PH", 1,
-                                       kNumREVPHModules, module);
+      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PH",
+                                            1, kNumREVPHModules, module);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
   }
@@ -398,8 +398,8 @@ double HAL_GetREVPHAnalogVoltage(HAL_REVPHHandle handle, int32_t channel,
 
   if (channel < 0 || channel > 1) {
     *status = PARAMETER_OUT_OF_RANGE;
-    wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid REV Analog Index", 0, 2,
-                                     channel);
+    wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid REV Analog Index", 0,
+                                          2, channel);
     return 0;
   }
 

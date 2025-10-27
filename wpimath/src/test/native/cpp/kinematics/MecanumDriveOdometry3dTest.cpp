@@ -28,7 +28,8 @@ class MecanumDriveOdometry3dTest : public ::testing::Test {
 TEST_F(MecanumDriveOdometry3dTest, Initialize) {
   MecanumDriveOdometry3d odometry{
       kinematics, wpi::math::Rotation3d{}, zero,
-      wpi::math::Pose3d{1_m, 2_m, 0_m, wpi::math::Rotation3d{0_deg, 0_deg, 45_deg}}};
+      wpi::math::Pose3d{1_m, 2_m, 0_m,
+                        wpi::math::Rotation3d{0_deg, 0_deg, 45_deg}}};
 
   const wpi::math::Pose3d& pose = odometry.GetPose();
 
@@ -82,7 +83,8 @@ TEST_F(MecanumDriveOdometry3dTest, 90DegreeTurn) {
 }
 
 TEST_F(MecanumDriveOdometry3dTest, GyroAngleReset) {
-  odometry.ResetPosition(wpi::math::Rotation3d{0_deg, 0_deg, 90_deg}, zero, Pose3d{});
+  odometry.ResetPosition(wpi::math::Rotation3d{0_deg, 0_deg, 90_deg}, zero,
+                         Pose3d{});
 
   MecanumDriveWheelPositions wheelDeltas{0.3536_m, 0.3536_m, 0.3536_m,
                                          0.3536_m};
@@ -99,19 +101,22 @@ TEST_F(MecanumDriveOdometry3dTest, GyroAngleReset) {
 TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingTrajectory) {
   wpi::math::MecanumDriveKinematics kinematics{
       wpi::math::Translation2d{1_m, 1_m}, wpi::math::Translation2d{1_m, -1_m},
-      wpi::math::Translation2d{-1_m, -1_m}, wpi::math::Translation2d{-1_m, 1_m}};
+      wpi::math::Translation2d{-1_m, -1_m},
+      wpi::math::Translation2d{-1_m, 1_m}};
 
   wpi::math::MecanumDriveWheelPositions wheelPositions;
 
-  wpi::math::MecanumDriveOdometry3d odometry{kinematics, wpi::math::Rotation3d{},
-                                       wheelPositions};
+  wpi::math::MecanumDriveOdometry3d odometry{
+      kinematics, wpi::math::Rotation3d{}, wheelPositions};
 
-  wpi::math::Trajectory trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
-      std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg}, wpi::math::Pose2d{3_m, 0_m, -90_deg},
-                  wpi::math::Pose2d{0_m, 0_m, 135_deg},
-                  wpi::math::Pose2d{-3_m, 0_m, -90_deg},
-                  wpi::math::Pose2d{0_m, 0_m, 45_deg}},
-      wpi::math::TrajectoryConfig(5.0_mps, 2.0_mps_sq));
+  wpi::math::Trajectory trajectory =
+      wpi::math::TrajectoryGenerator::GenerateTrajectory(
+          std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
+                      wpi::math::Pose2d{3_m, 0_m, -90_deg},
+                      wpi::math::Pose2d{0_m, 0_m, 135_deg},
+                      wpi::math::Pose2d{-3_m, 0_m, -90_deg},
+                      wpi::math::Pose2d{0_m, 0_m, 45_deg}},
+          wpi::math::TrajectoryConfig(5.0_mps, 2.0_mps_sq));
 
   std::default_random_engine generator;
   std::normal_distribution<double> distribution(0.0, 1.0);
@@ -140,8 +145,9 @@ TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingTrajectory) {
     wheelPositions.rearRight += wheelSpeeds.rearRight * dt;
 
     auto xhat = odometry.Update(
-        wpi::math::Rotation3d{groundTruthState.pose.Rotation() +
-                        wpi::math::Rotation2d{distribution(generator) * 0.05_rad}},
+        wpi::math::Rotation3d{
+            groundTruthState.pose.Rotation() +
+            wpi::math::Rotation2d{distribution(generator) * 0.05_rad}},
         wheelPositions);
     double error = groundTruthState.pose.Translation()
                        .Distance(xhat.Translation().ToTranslation2d())
@@ -162,19 +168,22 @@ TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingTrajectory) {
 TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingXAxis) {
   wpi::math::MecanumDriveKinematics kinematics{
       wpi::math::Translation2d{1_m, 1_m}, wpi::math::Translation2d{1_m, -1_m},
-      wpi::math::Translation2d{-1_m, -1_m}, wpi::math::Translation2d{-1_m, 1_m}};
+      wpi::math::Translation2d{-1_m, -1_m},
+      wpi::math::Translation2d{-1_m, 1_m}};
 
   wpi::math::MecanumDriveWheelPositions wheelPositions;
 
-  wpi::math::MecanumDriveOdometry3d odometry{kinematics, wpi::math::Rotation3d{},
-                                       wheelPositions};
+  wpi::math::MecanumDriveOdometry3d odometry{
+      kinematics, wpi::math::Rotation3d{}, wheelPositions};
 
-  wpi::math::Trajectory trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
-      std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg}, wpi::math::Pose2d{3_m, 0_m, -90_deg},
-                  wpi::math::Pose2d{0_m, 0_m, 135_deg},
-                  wpi::math::Pose2d{-3_m, 0_m, -90_deg},
-                  wpi::math::Pose2d{0_m, 0_m, 45_deg}},
-      wpi::math::TrajectoryConfig(5.0_mps, 2.0_mps_sq));
+  wpi::math::Trajectory trajectory =
+      wpi::math::TrajectoryGenerator::GenerateTrajectory(
+          std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
+                      wpi::math::Pose2d{3_m, 0_m, -90_deg},
+                      wpi::math::Pose2d{0_m, 0_m, 135_deg},
+                      wpi::math::Pose2d{-3_m, 0_m, -90_deg},
+                      wpi::math::Pose2d{0_m, 0_m, 45_deg}},
+          wpi::math::TrajectoryConfig(5.0_mps, 2.0_mps_sq));
 
   std::default_random_engine generator;
   std::normal_distribution<double> distribution(0.0, 1.0);

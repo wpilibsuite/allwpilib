@@ -36,7 +36,7 @@ std::shared_ptr<PneumaticsBase> PneumaticsBase::GetForType(
     return PneumaticHub::GetForModule(busId, module);
   }
   throw WPILIB_MakeError(err::InvalidParameter, "{}",
-                      static_cast<int>(moduleType));
+                         static_cast<int>(moduleType));
 }
 
 int PneumaticsBase::GetDefaultForType(PneumaticsModuleType moduleType) {
@@ -46,5 +46,5 @@ int PneumaticsBase::GetDefaultForType(PneumaticsModuleType moduleType) {
     return SensorUtil::GetDefaultREVPHModule();
   }
   throw WPILIB_MakeError(err::InvalidParameter, "{}",
-                      static_cast<int>(moduleType));
+                         static_cast<int>(moduleType));
 }

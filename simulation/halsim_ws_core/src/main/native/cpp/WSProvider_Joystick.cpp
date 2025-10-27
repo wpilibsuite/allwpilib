@@ -115,8 +115,8 @@ void HALSimWSProviderJoystick::OnNetValueChanged(const wpi::util::json& json) {
 
   if ((it = json.find(">buttons")) != json.end()) {
     HAL_JoystickButtons buttons{};
-    wpi::util::json::size_type buttonsCount =
-        std::min(it.value().size(), static_cast<wpi::util::json::size_type>(64));
+    wpi::util::json::size_type buttonsCount = std::min(
+        it.value().size(), static_cast<wpi::util::json::size_type>(64));
     if (buttonsCount < 64) {
       buttons.available = (1ULL << buttonsCount) - 1;
     } else {

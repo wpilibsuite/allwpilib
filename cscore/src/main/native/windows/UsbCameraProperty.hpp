@@ -85,13 +85,14 @@ class UsbCameraProperty : public PropertyImpl {
                  IAMCameraControl* pProcAmp);
   bool DeviceSet(std::unique_lock<wpi::util::mutex>& lock,
                  IAMCameraControl* pProcAmp) const;
-  bool DeviceSet(std::unique_lock<wpi::util::mutex>& lock, IAMCameraControl* pProcAmp,
-                 int newValue) const;
+  bool DeviceSet(std::unique_lock<wpi::util::mutex>& lock,
+                 IAMCameraControl* pProcAmp, int newValue) const;
 
-  bool DeviceGet(std::unique_lock<wpi::util::mutex>& lock, IAMVideoProcAmp* pProcAmp);
+  bool DeviceGet(std::unique_lock<wpi::util::mutex>& lock,
+                 IAMVideoProcAmp* pProcAmp);
   bool DeviceSet(std::unique_lock<wpi::util::mutex>& lock,
                  IAMVideoProcAmp* pProcAmp) const;
-  bool DeviceSet(std::unique_lock<wpi::util::mutex>& lock, IAMVideoProcAmp* pProcAmp,
-                 int newValue) const;
+  bool DeviceSet(std::unique_lock<wpi::util::mutex>& lock,
+                 IAMVideoProcAmp* pProcAmp, int newValue) const;
 };
 }  // namespace wpi::cs

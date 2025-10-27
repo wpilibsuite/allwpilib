@@ -6,7 +6,8 @@
 
 #include <wpi/system/RobotController.hpp>
 
-void Drivetrain::SetSpeeds(const wpi::math::DifferentialDriveWheelSpeeds& speeds) {
+void Drivetrain::SetSpeeds(
+    const wpi::math::DifferentialDriveWheelSpeeds& speeds) {
   auto leftFeedforward = m_feedforward.Calculate(speeds.left);
   auto rightFeedforward = m_feedforward.Calculate(speeds.right);
   double leftOutput = m_leftPIDController.Calculate(m_leftEncoder.GetRate(),
@@ -31,9 +32,9 @@ void Drivetrain::UpdateOdometry() {
 
 void Drivetrain::ResetOdometry(const wpi::math::Pose2d& pose) {
   m_drivetrainSimulator.SetPose(pose);
-  m_odometry.ResetPosition(m_imu.GetRotation2d(),
-                           wpi::units::meter_t{m_leftEncoder.GetDistance()},
-                           wpi::units::meter_t{m_rightEncoder.GetDistance()}, pose);
+  m_odometry.ResetPosition(
+      m_imu.GetRotation2d(), wpi::units::meter_t{m_leftEncoder.GetDistance()},
+      wpi::units::meter_t{m_rightEncoder.GetDistance()}, pose);
 }
 
 void Drivetrain::SimulationPeriodic() {

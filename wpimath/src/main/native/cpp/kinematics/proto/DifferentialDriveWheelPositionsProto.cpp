@@ -20,7 +20,8 @@ std::optional<wpi::math::DifferentialDriveWheelPositions> wpi::util::Protobuf<
 }
 
 bool wpi::util::Protobuf<wpi::math::DifferentialDriveWheelPositions>::Pack(
-    OutputStream& stream, const wpi::math::DifferentialDriveWheelPositions& value) {
+    OutputStream& stream,
+    const wpi::math::DifferentialDriveWheelPositions& value) {
   wpi_proto_ProtobufDifferentialDriveWheelPositions msg{
       .left = value.left.value(),
       .right = value.right.value(),

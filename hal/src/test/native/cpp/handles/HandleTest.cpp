@@ -17,7 +17,7 @@ class MyTestClass {};
 namespace wpi::hal {
 TEST(HandleTest, ClassedHandle) {
   wpi::hal::IndexedClassedHandleResource<HAL_TestHandle, MyTestClass, 8,
-                                    HAL_HandleEnum::Vendor>
+                                         HAL_HandleEnum::Vendor>
       testClass;
   int32_t status = 0;
   testClass.Allocate(0, std::make_unique<MyTestClass>(), &status);

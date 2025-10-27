@@ -18,7 +18,7 @@
 
 namespace wpi::util {
 class Logger;
-}  // namespace wpi
+}  // namespace wpi::util
 
 namespace wpi::nt::net {
 
@@ -38,18 +38,22 @@ class WebSocketConnection final
 
   bool Ready() const final { return !m_ws.IsWriteInProgress(); }
 
-  int WriteText(wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) final {
+  int WriteText(
+      wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) final {
     return Write(kText, writer);
   }
-  int WriteBinary(wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) final {
+  int WriteBinary(
+      wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) final {
     return Write(kBinary, writer);
   }
   int Flush() final;
 
-  void SendText(wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) final {
+  void SendText(
+      wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) final {
     Send(wpi::net::WebSocket::Frame::kText, writer);
   }
-  void SendBinary(wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) final {
+  void SendBinary(
+      wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) final {
     Send(wpi::net::WebSocket::Frame::kBinary, writer);
   }
 
@@ -79,7 +83,8 @@ class WebSocketConnection final
  private:
   enum State { kEmpty, kText, kBinary };
 
-  int Write(State kind, wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer);
+  int Write(State kind,
+            wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer);
   void Send(uint8_t opcode,
             wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer);
 

@@ -70,7 +70,7 @@ void Application(std::string_view saveDir) {
 
   wpi::glass::SetStorageName("sysid");
   wpi::glass::SetStorageDir(saveDir.empty() ? gui::GetPlatformSaveFileDir()
-                                       : saveDir);
+                                            : saveDir);
 
   // Add messages from the global sysid logger into the Log window.
   gLogger.SetLogger([](unsigned int level, const char* file, unsigned int line,

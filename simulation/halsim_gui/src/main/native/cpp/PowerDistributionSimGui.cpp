@@ -79,7 +79,8 @@ class PowerDistributionsSimModel : public wpi::glass::PowerDistributionsModel {
   bool Exists() override { return true; }
 
   void ForEachPowerDistribution(
-      wpi::util::function_ref<void(wpi::glass::PowerDistributionModel& model, int index)>
+      wpi::util::function_ref<void(wpi::glass::PowerDistributionModel& model,
+                                   int index)>
           func) override;
 
  private:
@@ -102,7 +103,8 @@ void PowerDistributionsSimModel::Update() {
 }
 
 void PowerDistributionsSimModel::ForEachPowerDistribution(
-    wpi::util::function_ref<void(wpi::glass::PowerDistributionModel& model, int index)>
+    wpi::util::function_ref<void(wpi::glass::PowerDistributionModel& model,
+                                 int index)>
         func) {
   for (int32_t i = 0, iend = static_cast<int32_t>(m_models.size()); i < iend;
        ++i) {

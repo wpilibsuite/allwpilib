@@ -16,9 +16,9 @@ void NamedLogV(wpi::util::Logger& logger, unsigned int level, const char* file,
                fmt::string_view format, fmt::format_args args);
 
 template <typename S, typename... Args>
-inline void NamedLog(wpi::util::Logger& logger, unsigned int level, const char* file,
-                     unsigned int line, std::string_view name, const S& format,
-                     Args&&... args) {
+inline void NamedLog(wpi::util::Logger& logger, unsigned int level,
+                     const char* file, unsigned int line, std::string_view name,
+                     const S& format, Args&&... args) {
   if (logger.HasLogger() && level >= logger.min_level()) {
     NamedLogV(logger, level, file, line, name, format,
               fmt::make_format_args(args...));

@@ -40,7 +40,8 @@ struct wpi::util::Protobuf<TestProto> {
   static bool Pack(OutputStream& stream, const TestProto& value);
 };
 
-std::optional<TestProto> wpi::util::Protobuf<TestProto>::Unpack(InputStream& stream) {
+std::optional<TestProto> wpi::util::Protobuf<TestProto>::Unpack(
+    InputStream& stream) {
   wpi::util::UnpackCallback<std::string> str;
   wpi::util::UnpackCallback<std::vector<uint8_t>> bytes;
   wpi::util::UnpackCallback<TestProtoInner> inner;
@@ -81,7 +82,7 @@ std::optional<TestProto> wpi::util::Protobuf<TestProto>::Unpack(InputStream& str
 }
 
 bool wpi::util::Protobuf<TestProto>::Pack(OutputStream& stream,
-                                    const TestProto& value) {
+                                          const TestProto& value) {
   wpi::util::PackCallback str{&value.string_msg};
   wpi::util::PackCallback bytes{&value.bytes_msg};
   wpi::util::PackCallback inner{&value.TestProtoInner_msg};

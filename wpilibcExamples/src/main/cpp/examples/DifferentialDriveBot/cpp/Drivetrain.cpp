@@ -4,7 +4,8 @@
 
 #include "Drivetrain.hpp"
 
-void Drivetrain::SetSpeeds(const wpi::math::DifferentialDriveWheelSpeeds& speeds) {
+void Drivetrain::SetSpeeds(
+    const wpi::math::DifferentialDriveWheelSpeeds& speeds) {
   const auto leftFeedforward = m_feedforward.Calculate(speeds.left);
   const auto rightFeedforward = m_feedforward.Calculate(speeds.right);
   const double leftOutput = m_leftPIDController.Calculate(

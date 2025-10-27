@@ -24,7 +24,8 @@
 
 using namespace wpi::glass;
 
-void wpi::glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
+void wpi::glass::AddStandardNetworkTablesViews(
+    NetworkTablesProvider& provider) {
   provider.Register(
       NTAlertsModel::kType,
       [](wpi::nt::NetworkTableInstance inst, const char* path) {

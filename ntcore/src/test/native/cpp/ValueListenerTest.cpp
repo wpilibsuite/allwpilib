@@ -37,9 +37,12 @@ TEST_F(ValueListenerTest, MultiPollSub) {
   auto poller1 = wpi::nt::CreateListenerPoller(m_inst);
   auto poller2 = wpi::nt::CreateListenerPoller(m_inst);
   auto poller3 = wpi::nt::CreateListenerPoller(m_inst);
-  auto h1 = wpi::nt::AddPolledListener(poller1, sub, wpi::nt::EventFlags::kValueLocal);
-  auto h2 = wpi::nt::AddPolledListener(poller2, sub, wpi::nt::EventFlags::kValueLocal);
-  auto h3 = wpi::nt::AddPolledListener(poller3, sub, wpi::nt::EventFlags::kValueLocal);
+  auto h1 = wpi::nt::AddPolledListener(poller1, sub,
+                                       wpi::nt::EventFlags::kValueLocal);
+  auto h2 = wpi::nt::AddPolledListener(poller2, sub,
+                                       wpi::nt::EventFlags::kValueLocal);
+  auto h3 = wpi::nt::AddPolledListener(poller3, sub,
+                                       wpi::nt::EventFlags::kValueLocal);
 
   wpi::nt::SetDouble(pub, 0);
 
@@ -89,8 +92,10 @@ TEST_F(ValueListenerTest, PollMultiSub) {
   auto sub2 = wpi::nt::Subscribe(topic, NT_DOUBLE, "double");
 
   auto poller = wpi::nt::CreateListenerPoller(m_inst);
-  auto h1 = wpi::nt::AddPolledListener(poller, sub1, wpi::nt::EventFlags::kValueLocal);
-  auto h2 = wpi::nt::AddPolledListener(poller, sub2, wpi::nt::EventFlags::kValueLocal);
+  auto h1 = wpi::nt::AddPolledListener(poller, sub1,
+                                       wpi::nt::EventFlags::kValueLocal);
+  auto h2 = wpi::nt::AddPolledListener(poller, sub2,
+                                       wpi::nt::EventFlags::kValueLocal);
 
   wpi::nt::SetDouble(pub, 0);
 
@@ -126,8 +131,10 @@ TEST_F(ValueListenerTest, PollMultiSubTopic) {
   auto sub2 = wpi::nt::Subscribe(topic2, NT_DOUBLE, "double");
 
   auto poller = wpi::nt::CreateListenerPoller(m_inst);
-  auto h1 = wpi::nt::AddPolledListener(poller, sub1, wpi::nt::EventFlags::kValueLocal);
-  auto h2 = wpi::nt::AddPolledListener(poller, sub2, wpi::nt::EventFlags::kValueLocal);
+  auto h1 = wpi::nt::AddPolledListener(poller, sub1,
+                                       wpi::nt::EventFlags::kValueLocal);
+  auto h2 = wpi::nt::AddPolledListener(poller, sub2,
+                                       wpi::nt::EventFlags::kValueLocal);
 
   wpi::nt::SetDouble(pub1, 0);
   wpi::nt::SetDouble(pub2, 1);
@@ -163,7 +170,8 @@ TEST_F(ValueListenerTest, PollSubMultiple) {
   auto sub = wpi::nt::SubscribeMultiple(m_inst, {{"foo"}});
 
   auto poller = wpi::nt::CreateListenerPoller(m_inst);
-  auto h = wpi::nt::AddPolledListener(poller, sub, wpi::nt::EventFlags::kValueLocal);
+  auto h =
+      wpi::nt::AddPolledListener(poller, sub, wpi::nt::EventFlags::kValueLocal);
 
   wpi::nt::SetDouble(pub1, 0);
   wpi::nt::SetDouble(pub2, 1);
@@ -193,8 +201,8 @@ TEST_F(ValueListenerTest, PollSubMultiple) {
 
 TEST_F(ValueListenerTest, PollSubPrefixCreated) {
   auto poller = wpi::nt::CreateListenerPoller(m_inst);
-  auto h =
-      wpi::nt::AddPolledListener(poller, {{"foo"}}, wpi::nt::EventFlags::kValueLocal);
+  auto h = wpi::nt::AddPolledListener(poller, {{"foo"}},
+                                      wpi::nt::EventFlags::kValueLocal);
 
   auto topic1 = wpi::nt::GetTopic(m_inst, "foo/1");
   auto topic2 = wpi::nt::GetTopic(m_inst, "foo/2");
@@ -232,7 +240,8 @@ TEST_F(ValueListenerTest, PollEntry) {
   auto entry = wpi::nt::GetEntry(m_inst, "foo");
 
   auto poller = wpi::nt::CreateListenerPoller(m_inst);
-  auto h = wpi::nt::AddPolledListener(poller, entry, wpi::nt::EventFlags::kValueLocal);
+  auto h = wpi::nt::AddPolledListener(poller, entry,
+                                      wpi::nt::EventFlags::kValueLocal);
 
   ASSERT_TRUE(wpi::nt::SetDouble(entry, 0));
 
@@ -257,7 +266,8 @@ TEST_F(ValueListenerTest, PollImmediate) {
 
   auto poller = wpi::nt::CreateListenerPoller(m_inst);
   auto h = wpi::nt::AddPolledListener(
-      poller, entry, wpi::nt::EventFlags::kValueLocal | wpi::nt::EventFlags::kImmediate);
+      poller, entry,
+      wpi::nt::EventFlags::kValueLocal | wpi::nt::EventFlags::kImmediate);
 
   bool timedOut = false;
   ASSERT_TRUE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
@@ -265,8 +275,8 @@ TEST_F(ValueListenerTest, PollImmediate) {
   auto results = wpi::nt::ReadListenerQueue(poller);
 
   ASSERT_EQ(results.size(), 1u);
-  EXPECT_EQ(results[0].flags &
-                (wpi::nt::EventFlags::kValueLocal | wpi::nt::EventFlags::kImmediate),
+  EXPECT_EQ(results[0].flags & (wpi::nt::EventFlags::kValueLocal |
+                                wpi::nt::EventFlags::kImmediate),
             wpi::nt::EventFlags::kValueLocal | wpi::nt::EventFlags::kImmediate);
   EXPECT_EQ(results[0].listener, h);
   auto valueData = results[0].GetValueEventData();
@@ -281,7 +291,8 @@ TEST_F(ValueListenerTest, PollImmediateNoValue) {
 
   auto poller = wpi::nt::CreateListenerPoller(m_inst);
   auto h = wpi::nt::AddPolledListener(
-      poller, entry, wpi::nt::EventFlags::kValueLocal | wpi::nt::EventFlags::kImmediate);
+      poller, entry,
+      wpi::nt::EventFlags::kValueLocal | wpi::nt::EventFlags::kImmediate);
 
   bool timedOut = false;
   ASSERT_FALSE(wpi::util::WaitForObject(poller, 0.02, &timedOut));
@@ -317,7 +328,8 @@ TEST_F(ValueListenerTest, PollImmediateSubMultiple) {
 
   auto poller = wpi::nt::CreateListenerPoller(m_inst);
   auto h = wpi::nt::AddPolledListener(
-      poller, sub, wpi::nt::EventFlags::kValueLocal | wpi::nt::EventFlags::kImmediate);
+      poller, sub,
+      wpi::nt::EventFlags::kValueLocal | wpi::nt::EventFlags::kImmediate);
 
   bool timedOut = false;
   ASSERT_TRUE(wpi::util::WaitForObject(poller, 1.0, &timedOut));
@@ -325,8 +337,8 @@ TEST_F(ValueListenerTest, PollImmediateSubMultiple) {
   auto results = wpi::nt::ReadListenerQueue(poller);
 
   ASSERT_EQ(results.size(), 2u);
-  EXPECT_EQ(results[0].flags &
-                (wpi::nt::EventFlags::kValueLocal | wpi::nt::EventFlags::kImmediate),
+  EXPECT_EQ(results[0].flags & (wpi::nt::EventFlags::kValueLocal |
+                                wpi::nt::EventFlags::kImmediate),
             wpi::nt::EventFlags::kValueLocal | wpi::nt::EventFlags::kImmediate);
   EXPECT_EQ(results[0].listener, h);
   auto valueData = results[0].GetValueEventData();
@@ -335,8 +347,8 @@ TEST_F(ValueListenerTest, PollImmediateSubMultiple) {
   EXPECT_EQ(valueData->topic, topic1);
   EXPECT_EQ(valueData->value, wpi::nt::Value::MakeDouble(0.0));
 
-  EXPECT_EQ(results[1].flags &
-                (wpi::nt::EventFlags::kValueLocal | wpi::nt::EventFlags::kImmediate),
+  EXPECT_EQ(results[1].flags & (wpi::nt::EventFlags::kValueLocal |
+                                wpi::nt::EventFlags::kImmediate),
             wpi::nt::EventFlags::kValueLocal | wpi::nt::EventFlags::kImmediate);
   EXPECT_EQ(results[1].listener, h);
   valueData = results[1].GetValueEventData();
@@ -354,7 +366,8 @@ TEST_F(ValueListenerTest, TwoSubOneListener) {
   auto sub3 = wpi::nt::SubscribeMultiple(m_inst, {{"foo"}});
 
   auto poller = wpi::nt::CreateListenerPoller(m_inst);
-  auto h = wpi::nt::AddPolledListener(poller, sub1, wpi::nt::EventFlags::kValueLocal);
+  auto h = wpi::nt::AddPolledListener(poller, sub1,
+                                      wpi::nt::EventFlags::kValueLocal);
   (void)sub2;
   (void)sub3;
 
@@ -384,7 +397,8 @@ TEST_F(ValueListenerTest, TwoSubOneMultiListener) {
   auto sub3 = wpi::nt::SubscribeMultiple(m_inst, {{"foo"}});
 
   auto poller = wpi::nt::CreateListenerPoller(m_inst);
-  auto h = wpi::nt::AddPolledListener(poller, sub3, wpi::nt::EventFlags::kValueLocal);
+  auto h = wpi::nt::AddPolledListener(poller, sub3,
+                                      wpi::nt::EventFlags::kValueLocal);
   (void)sub1;
   (void)sub2;
 

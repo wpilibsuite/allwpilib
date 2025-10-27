@@ -103,7 +103,7 @@ static void RebuildEntryTree() {
       parts.emplace_back(prefix);
     }
     wpi::util::split(mainpart, '/', -1, false,
-               [&](auto part) { parts.emplace_back(part); });
+                     [&](auto part) { parts.emplace_back(part); });
 
     // ignore a raw "/" key
     if (parts.empty()) {
@@ -112,7 +112,8 @@ static void RebuildEntryTree() {
 
     // get to leaf
     auto nodes = &gEntryTree;
-    for (auto part : wpi::util::drop_back(std::span{parts.begin(), parts.end()})) {
+    for (auto part :
+         wpi::util::drop_back(std::span{parts.begin(), parts.end()})) {
       auto it =
           std::find_if(nodes->begin(), nodes->end(),
                        [&](const auto& node) { return node.name == part; });
@@ -439,7 +440,8 @@ void DisplayEntries() {
 static wpi::util::mutex gExportMutex;
 static std::vector<std::string> gExportErrors;
 
-static void PrintEscapedCsvString(wpi::util::raw_ostream& os, std::string_view str) {
+static void PrintEscapedCsvString(wpi::util::raw_ostream& os,
+                                  std::string_view str) {
   auto s = str;
   while (!s.empty()) {
     std::string_view fragment;
@@ -461,8 +463,8 @@ static void ValueToCsv(wpi::util::raw_ostream& os, const Entry& entry,
     int64_t val;
     if (record.GetInteger(&val)) {
       std::time_t timeval = val / 1000000;
-      wpi::util::print(os, "{:%Y-%m-%d %H:%M:%S}.{:06}", *std::localtime(&timeval),
-                 val % 1000000);
+      wpi::util::print(os, "{:%Y-%m-%d %H:%M:%S}.{:06}",
+                       *std::localtime(&timeval), val % 1000000);
       return;
     }
   } else if (entry.type == "double") {

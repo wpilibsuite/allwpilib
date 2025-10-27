@@ -15,7 +15,8 @@ static wpi::units::second_t now = 0_s;
 class SlewRateLimiterTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    WPI_SetNowImpl([] { return wpi::units::microsecond_t{now}.to<uint64_t>(); });
+    WPI_SetNowImpl(
+        [] { return wpi::units::microsecond_t{now}.to<uint64_t>(); });
   }
 
   void TearDown() override { WPI_SetNowImpl(nullptr); }

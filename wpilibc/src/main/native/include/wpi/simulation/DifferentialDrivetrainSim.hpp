@@ -20,12 +20,13 @@ class DifferentialDrivetrainSim {
   /**
    * Creates a simulated differential drivetrain.
    *
-   * @param plant The wpi::math::LinearSystem representing the robot's drivetrain. This
-   *              system can be created with
+   * @param plant The wpi::math::LinearSystem representing the robot's
+   * drivetrain. This system can be created with
    *              wpi::math::LinearSystemId::DrivetrainVelocitySystem() or
    *              wpi::math::LinearSystemId::IdentifyDrivetrainSystem().
    * @param trackwidth   The robot's trackwidth.
-   * @param driveMotor   A wpi::math::DCMotor representing the left side of the drivetrain.
+   * @param driveMotor   A wpi::math::DCMotor representing the left side of the
+   * drivetrain.
    * @param gearingRatio The gearingRatio ratio of the left side, as output over
    *                     input. This must be the same ratio as the ratio used to
    *                     identify or create the plant.
@@ -41,13 +42,15 @@ class DifferentialDrivetrainSim {
    */
   DifferentialDrivetrainSim(
       wpi::math::LinearSystem<2, 2, 2> plant, wpi::units::meter_t trackwidth,
-      wpi::math::DCMotor driveMotor, double gearingRatio, wpi::units::meter_t wheelRadius,
+      wpi::math::DCMotor driveMotor, double gearingRatio,
+      wpi::units::meter_t wheelRadius,
       const std::array<double, 7>& measurementStdDevs = {});
 
   /**
    * Creates a simulated differential drivetrain.
    *
-   * @param driveMotor  A wpi::math::DCMotor representing the left side of the drivetrain.
+   * @param driveMotor  A wpi::math::DCMotor representing the left side of the
+   * drivetrain.
    * @param gearing     The gearing on the drive between motor and wheel, as
    *                    output over input. This must be the same ratio as the
    *                    ratio used to identify or create the plant.
@@ -67,9 +70,9 @@ class DifferentialDrivetrainSim {
    *                           starting point.
    */
   DifferentialDrivetrainSim(
-      wpi::math::DCMotor driveMotor, double gearing, wpi::units::kilogram_square_meter_t J,
-      wpi::units::kilogram_t mass, wpi::units::meter_t wheelRadius,
-      wpi::units::meter_t trackwidth,
+      wpi::math::DCMotor driveMotor, double gearing,
+      wpi::units::kilogram_square_meter_t J, wpi::units::kilogram_t mass,
+      wpi::units::meter_t wheelRadius, wpi::units::meter_t trackwidth,
       const std::array<double, 7>& measurementStdDevs = {});
 
   /**
@@ -88,7 +91,8 @@ class DifferentialDrivetrainSim {
    * @param leftVoltage  The left voltage.
    * @param rightVoltage The right voltage.
    */
-  void SetInputs(wpi::units::volt_t leftVoltage, wpi::units::volt_t rightVoltage);
+  void SetInputs(wpi::units::volt_t leftVoltage,
+                 wpi::units::volt_t rightVoltage);
 
   /**
    * Sets the gearing reduction on the drivetrain. This is commonly used for
@@ -101,8 +105,8 @@ class DifferentialDrivetrainSim {
   /**
    * Updates the simulation.
    *
-   * @param dt The time that's passed since the last Update(wpi::units::second_t)
-   *           call.
+   * @param dt The time that's passed since the last
+   * Update(wpi::units::second_t) call.
    */
   void Update(wpi::units::second_t dt);
 
@@ -193,7 +197,8 @@ class DifferentialDrivetrainSim {
    * @param u The input.
    * @return The state derivative with respect to time.
    */
-  wpi::math::Vectord<7> Dynamics(const wpi::math::Vectord<7>& x, const Eigen::Vector2d& u);
+  wpi::math::Vectord<7> Dynamics(const wpi::math::Vectord<7>& x,
+                                 const Eigen::Vector2d& u);
 
   class State {
    public:
@@ -234,14 +239,17 @@ class DifferentialDrivetrainSim {
   class KitbotMotor {
    public:
     /// One CIM motor per drive side.
-    static constexpr wpi::math::DCMotor SingleCIMPerSide = wpi::math::DCMotor::CIM(1);
+    static constexpr wpi::math::DCMotor SingleCIMPerSide =
+        wpi::math::DCMotor::CIM(1);
     /// Two CIM motors per drive side.
-    static constexpr wpi::math::DCMotor DualCIMPerSide = wpi::math::DCMotor::CIM(2);
+    static constexpr wpi::math::DCMotor DualCIMPerSide =
+        wpi::math::DCMotor::CIM(2);
     /// One Mini CIM motor per drive side.
     static constexpr wpi::math::DCMotor SingleMiniCIMPerSide =
         wpi::math::DCMotor::MiniCIM(1);
     /// Two Mini CIM motors per drive side.
-    static constexpr wpi::math::DCMotor DualMiniCIMPerSide = wpi::math::DCMotor::MiniCIM(2);
+    static constexpr wpi::math::DCMotor DualMiniCIMPerSide =
+        wpi::math::DCMotor::MiniCIM(2);
     /// One Falcon 500 motor per drive side.
     static constexpr wpi::math::DCMotor SingleFalcon500PerSide =
         wpi::math::DCMotor::Falcon500(1);
@@ -249,9 +257,11 @@ class DifferentialDrivetrainSim {
     static constexpr wpi::math::DCMotor DualFalcon500PerSide =
         wpi::math::DCMotor::Falcon500(2);
     /// One NEO motor per drive side.
-    static constexpr wpi::math::DCMotor SingleNEOPerSide = wpi::math::DCMotor::NEO(1);
+    static constexpr wpi::math::DCMotor SingleNEOPerSide =
+        wpi::math::DCMotor::NEO(1);
     /// Two NEO motors per drive side.
-    static constexpr wpi::math::DCMotor DualNEOPerSide = wpi::math::DCMotor::NEO(2);
+    static constexpr wpi::math::DCMotor DualNEOPerSide =
+        wpi::math::DCMotor::NEO(2);
   };
 
   /**
@@ -285,9 +295,9 @@ class DifferentialDrivetrainSim {
       const std::array<double, 7>& measurementStdDevs = {}) {
     // MOI estimation -- note that I = mr² for point masses
     wpi::units::kilogram_square_meter_t batteryMoi = 12.5_lb * 10_in * 10_in;
-    wpi::units::kilogram_square_meter_t gearboxMoi = (2.8_lb + 2.0_lb) *
-                                                2  // CIM plus toughbox per side
-                                                * (26_in / 2) * (26_in / 2);
+    wpi::units::kilogram_square_meter_t gearboxMoi =
+        (2.8_lb + 2.0_lb) * 2  // CIM plus toughbox per side
+        * (26_in / 2) * (26_in / 2);
 
     return DifferentialDrivetrainSim{
         motor,           gearing, batteryMoi + gearboxMoi, 60_lb,

@@ -7,8 +7,10 @@
 #include "wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp"
 
 TEST(MecanumDriveWheelSpeedsTest, Plus) {
-  const wpi::math::MecanumDriveWheelSpeeds left{1.0_mps, 0.5_mps, 2.0_mps, 1.5_mps};
-  const wpi::math::MecanumDriveWheelSpeeds right{2.0_mps, 1.5_mps, 0.5_mps, 1.0_mps};
+  const wpi::math::MecanumDriveWheelSpeeds left{1.0_mps, 0.5_mps, 2.0_mps,
+                                                1.5_mps};
+  const wpi::math::MecanumDriveWheelSpeeds right{2.0_mps, 1.5_mps, 0.5_mps,
+                                                 1.0_mps};
 
   const wpi::math::MecanumDriveWheelSpeeds result = left + right;
 
@@ -19,8 +21,10 @@ TEST(MecanumDriveWheelSpeedsTest, Plus) {
 }
 
 TEST(MecanumDriveWheelSpeedsTest, Minus) {
-  const wpi::math::MecanumDriveWheelSpeeds left{1.0_mps, 0.5_mps, 2.0_mps, 1.5_mps};
-  const wpi::math::MecanumDriveWheelSpeeds right{2.0_mps, 1.5_mps, 0.5_mps, 1.0_mps};
+  const wpi::math::MecanumDriveWheelSpeeds left{1.0_mps, 0.5_mps, 2.0_mps,
+                                                1.5_mps};
+  const wpi::math::MecanumDriveWheelSpeeds right{2.0_mps, 1.5_mps, 0.5_mps,
+                                                 1.0_mps};
 
   const wpi::math::MecanumDriveWheelSpeeds result = left - right;
 
@@ -31,7 +35,8 @@ TEST(MecanumDriveWheelSpeedsTest, Minus) {
 }
 
 TEST(MecanumDriveWheelSpeedsTest, UnaryMinus) {
-  const wpi::math::MecanumDriveWheelSpeeds speeds{1.0_mps, 0.5_mps, 2.0_mps, 1.5_mps};
+  const wpi::math::MecanumDriveWheelSpeeds speeds{1.0_mps, 0.5_mps, 2.0_mps,
+                                                  1.5_mps};
 
   const wpi::math::MecanumDriveWheelSpeeds result = -speeds;
 
@@ -42,7 +47,8 @@ TEST(MecanumDriveWheelSpeedsTest, UnaryMinus) {
 }
 
 TEST(MecanumDriveWheelSpeedsTest, Multiplication) {
-  const wpi::math::MecanumDriveWheelSpeeds speeds{1.0_mps, 0.5_mps, 2.0_mps, 1.5_mps};
+  const wpi::math::MecanumDriveWheelSpeeds speeds{1.0_mps, 0.5_mps, 2.0_mps,
+                                                  1.5_mps};
 
   const wpi::math::MecanumDriveWheelSpeeds result = speeds * 2;
 
@@ -53,7 +59,8 @@ TEST(MecanumDriveWheelSpeedsTest, Multiplication) {
 }
 
 TEST(MecanumDriveWheelSpeedsTest, Division) {
-  const wpi::math::MecanumDriveWheelSpeeds speeds{1.0_mps, 0.5_mps, 2.0_mps, 1.5_mps};
+  const wpi::math::MecanumDriveWheelSpeeds speeds{1.0_mps, 0.5_mps, 2.0_mps,
+                                                  1.5_mps};
 
   const wpi::math::MecanumDriveWheelSpeeds result = speeds / 2;
 

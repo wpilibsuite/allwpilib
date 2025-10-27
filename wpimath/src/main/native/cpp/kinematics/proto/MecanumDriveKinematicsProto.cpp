@@ -8,8 +8,8 @@
 
 #include "wpimath/protobuf/kinematics.npb.h"
 
-std::optional<wpi::math::MecanumDriveKinematics>
-wpi::util::Protobuf<wpi::math::MecanumDriveKinematics>::Unpack(InputStream& stream) {
+std::optional<wpi::math::MecanumDriveKinematics> wpi::util::Protobuf<
+    wpi::math::MecanumDriveKinematics>::Unpack(InputStream& stream) {
   wpi::util::UnpackCallback<wpi::math::Translation2d> frontLeft;
   wpi::util::UnpackCallback<wpi::math::Translation2d> frontRight;
   wpi::util::UnpackCallback<wpi::math::Translation2d> rearLeft;

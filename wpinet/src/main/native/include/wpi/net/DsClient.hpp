@@ -30,7 +30,8 @@ class DsClient : public std::enable_shared_from_this<DsClient> {
     return std::make_shared<DsClient>(loop, logger, private_init{});
   }
 
-  DsClient(wpi::net::uv::Loop& loop, wpi::util::Logger& logger, const private_init&);
+  DsClient(wpi::net::uv::Loop& loop, wpi::util::Logger& logger,
+           const private_init&);
   ~DsClient();
   DsClient(const DsClient&) = delete;
   DsClient& operator=(const DsClient&) = delete;

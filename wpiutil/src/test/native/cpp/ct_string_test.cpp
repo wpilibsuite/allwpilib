@@ -14,7 +14,8 @@ TEST(CtStringTest, Concat) {
   constexpr std::string_view astring = "name";
   constexpr int arrsize = 5;
   constexpr auto str = Concat(
-      wpi::util::ct_string<char, std::char_traits<char>, astring.size()>{astring},
+      wpi::util::ct_string<char, std::char_traits<char>, astring.size()>{
+          astring},
       "["_ct_string, wpi::util::NumToCtString<arrsize>(), "]"_ct_string);
   static_assert(str.size() == 7);
   ASSERT_EQ(std::string{str}, "name[5]");
@@ -24,7 +25,8 @@ TEST(CtStringTest, OperatorPlus) {
   using namespace wpi::util::literals;
   constexpr std::string_view astring = "name";
   constexpr auto str =
-      wpi::util::ct_string<char, std::char_traits<char>, astring.size()>{astring} +
+      wpi::util::ct_string<char, std::char_traits<char>, astring.size()>{
+          astring} +
       "[]"_ct_string;
   static_assert(str.size() == 6);
   ASSERT_EQ(std::string{str}, "name[]");

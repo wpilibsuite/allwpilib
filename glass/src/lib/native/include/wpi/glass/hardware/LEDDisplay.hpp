@@ -13,7 +13,7 @@
 namespace wpi::util {
 template <typename T>
 class SmallVectorImpl;
-}  // namespace wpi
+}  // namespace wpi::util
 
 namespace wpi::glass {
 
@@ -25,7 +25,8 @@ class LEDDisplayModel : public wpi::glass::Model {
     uint8_t b;
   };
 
-  virtual std::span<const Data> GetData(wpi::util::SmallVectorImpl<Data>& buf) = 0;
+  virtual std::span<const Data> GetData(
+      wpi::util::SmallVectorImpl<Data>& buf) = 0;
 };
 
 class LEDDisplaysModel : public wpi::glass::Model {
@@ -33,7 +34,8 @@ class LEDDisplaysModel : public wpi::glass::Model {
   virtual size_t GetNumLEDDisplays() = 0;
 
   virtual void ForEachLEDDisplay(
-      wpi::util::function_ref<void(LEDDisplayModel& model, int index)> func) = 0;
+      wpi::util::function_ref<void(LEDDisplayModel& model, int index)>
+          func) = 0;
 };
 
 void DisplayLEDDisplay(LEDDisplayModel* model, int index);

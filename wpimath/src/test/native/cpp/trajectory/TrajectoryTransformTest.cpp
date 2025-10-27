@@ -10,8 +10,9 @@
 #include "wpi/math/trajectory/TrajectoryConfig.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 
-void TestSameShapedTrajectory(std::vector<wpi::math::Trajectory::State> statesA,
-                              std::vector<wpi::math::Trajectory::State> statesB) {
+void TestSameShapedTrajectory(
+    std::vector<wpi::math::Trajectory::State> statesA,
+    std::vector<wpi::math::Trajectory::State> statesB) {
   for (unsigned int i = 0; i < statesA.size() - 1; i++) {
     auto a1 = statesA[i].pose;
     auto a2 = statesA[i + 1].pose;
@@ -48,7 +49,8 @@ TEST(TrajectoryTransformsTest, TransformBy) {
 TEST(TrajectoryTransformsTest, RelativeTo) {
   wpi::math::TrajectoryConfig config{3_mps, 3_mps_sq};
   auto trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
-      wpi::math::Pose2d{1_m, 2_m, 30_deg}, {}, wpi::math::Pose2d{5_m, 7_m, 90_deg}, config);
+      wpi::math::Pose2d{1_m, 2_m, 30_deg}, {},
+      wpi::math::Pose2d{5_m, 7_m, 90_deg}, config);
 
   auto transformedTrajectory = trajectory.RelativeTo({1_m, 2_m, 30_deg});
 

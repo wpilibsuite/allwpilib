@@ -26,9 +26,9 @@ namespace wpi {
  * connected and provides a match number, the log file is renamed to
  * "WPILIB_yyyyMMdd_HHmmss_{event}_{match}.wpilog".
  *
- * On startup, all existing WPILIB_TBD log files are deleted. If there is less than
- * 50 MB of free space on the target storage, WPILIB_ log files are deleted (oldest
- * to newest) until there is 50 MB free OR there are 10 files remaining.
+ * On startup, all existing WPILIB_TBD log files are deleted. If there is less
+ * than 50 MB of free space on the target storage, WPILIB_ log files are deleted
+ * (oldest to newest) until there is 50 MB free OR there are 10 files remaining.
  *
  * By default, all NetworkTables value changes are stored to the data log.
  */

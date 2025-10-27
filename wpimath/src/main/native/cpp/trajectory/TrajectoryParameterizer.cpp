@@ -67,9 +67,9 @@ Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
       // acceleration limit. v_f = √(v_i² + 2ad).
 
       constrainedState.maxVelocity = wpi::units::math::min(
-          maxVelocity,
-          wpi::units::math::sqrt(predecessor.maxVelocity * predecessor.maxVelocity +
-                            predecessor.maxAcceleration * ds * 2.0));
+          maxVelocity, wpi::units::math::sqrt(
+                           predecessor.maxVelocity * predecessor.maxVelocity +
+                           predecessor.maxAcceleration * ds * 2.0));
 
       constrainedState.minAcceleration = -maxAcceleration;
       constrainedState.maxAcceleration = maxAcceleration;
@@ -131,7 +131,7 @@ Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
       // v_f = √(v_i² + 2ad), where v_i = successor.
       wpi::units::meters_per_second_t newMaxVelocity =
           wpi::units::math::sqrt(successor.maxVelocity * successor.maxVelocity +
-                            successor.minAcceleration * ds * 2.0);
+                                 successor.minAcceleration * ds * 2.0);
 
       // No more limits to impose! This state can be finalized.
       if (newMaxVelocity >= constrainedState.maxVelocity) {

@@ -54,7 +54,8 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
    * @param dt     Discretization timestep.
    */
   LTVUnicycleController(const wpi::util::array<double, 3>& Qelems,
-                        const wpi::util::array<double, 2>& Relems, wpi::units::second_t dt)
+                        const wpi::util::array<double, 2>& Relems,
+                        wpi::units::second_t dt)
       : m_Q{wpi::math::MakeCostMatrix(Qelems)},
         m_R{wpi::math::MakeCostMatrix(Relems)},
         m_dt{dt} {}

@@ -136,8 +136,9 @@ static bool LoadWindowStorageImpl(const std::string& filename) {
     return false;
   }
   try {
-    return JsonToWindow(wpi::util::json::parse(fileBuffer.value()->GetCharBuffer()),
-                        filename.c_str());
+    return JsonToWindow(
+        wpi::util::json::parse(fileBuffer.value()->GetCharBuffer()),
+        filename.c_str());
   } catch (wpi::util::json::parse_error& e) {
     ImGui::LogText("Error loading %s: %s", filename.c_str(), e.what());
     return false;
@@ -154,8 +155,9 @@ static bool LoadStorageRootImpl(Context* ctx, const std::string& filename,
   }
   auto [it, createdStorage] = ctx->storageRoots.try_emplace(rootName);
   try {
-    it->second.FromJson(wpi::util::json::parse(fileBuffer.value()->GetCharBuffer()),
-                        filename.c_str());
+    it->second.FromJson(
+        wpi::util::json::parse(fileBuffer.value()->GetCharBuffer()),
+        filename.c_str());
   } catch (wpi::util::json::parse_error& e) {
     ImGui::LogText("Error loading %s: %s", filename.c_str(), e.what());
     if (createdStorage) {
@@ -214,8 +216,10 @@ static wpi::util::json WindowToJson() {
     if (line[0] == '[') {
       // new section
       auto [section, subsection] = wpi::util::split(line, ']');
-      section = wpi::util::drop_front(section);  // drop '['; ']' was dropped by split
-      subsection = wpi::util::drop_back(wpi::util::drop_front(subsection));  // drop []
+      section =
+          wpi::util::drop_front(section);  // drop '['; ']' was dropped by split
+      subsection =
+          wpi::util::drop_back(wpi::util::drop_front(subsection));  // drop []
       auto& jsection = out[section];
       if (jsection.is_null()) {
         jsection = wpi::util::json::object();
@@ -472,7 +476,7 @@ void wpi::glass::End() {
 }
 
 bool wpi::glass::BeginChild(const char* str_id, const ImVec2& size, bool border,
-                       ImGuiWindowFlags flags) {
+                            ImGuiWindowFlags flags) {
   PushStorageStack(str_id);
   return ImGui::BeginChild(str_id, size, border, flags);
 }

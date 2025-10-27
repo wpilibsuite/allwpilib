@@ -34,8 +34,9 @@ class Subsystem;
  *
  * This class is provided by the NewCommands VendorDep
  */
-class CommandScheduler final : public wpi::util::Sendable,
-                               public wpi::util::SendableHelper<CommandScheduler> {
+class CommandScheduler final
+    : public wpi::util::Sendable,
+      public wpi::util::SendableHelper<CommandScheduler> {
  public:
   /**
    * Returns the Scheduler instance.
@@ -213,7 +214,7 @@ class CommandScheduler final : public wpi::util::Sendable,
   void SetDefaultCommand(Subsystem* subsystem, T&& defaultCommand) {
     if (!defaultCommand.HasRequirement(subsystem)) {
       throw WPILIB_MakeError(wpi::err::CommandIllegalUse,
-                          "Default commands must require their subsystem!");
+                             "Default commands must require their subsystem!");
     }
     SetDefaultCommandImpl(subsystem, std::make_unique<std::decay_t<T>>(
                                          std::forward<T>(defaultCommand)));

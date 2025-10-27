@@ -22,7 +22,8 @@ wpi::math::MecanumDriveWheelPositions Drivetrain::GetCurrentDistances() const {
           wpi::units::meter_t{m_backRightEncoder.GetDistance()}};
 }
 
-void Drivetrain::SetSpeeds(const wpi::math::MecanumDriveWheelSpeeds& wheelSpeeds) {
+void Drivetrain::SetSpeeds(
+    const wpi::math::MecanumDriveWheelSpeeds& wheelSpeeds) {
   std::function<void(wpi::units::meters_per_second_t, const wpi::Encoder&,
                      wpi::math::PIDController&, wpi::PWMSparkMax&)>
       calcAndSetSpeeds = [&m_feedforward = m_feedforward](

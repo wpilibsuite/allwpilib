@@ -48,7 +48,8 @@ TEST(ExpectedTest, Emplace) {
   }
 
   {
-    wpi::util::expected<TakesInitAndVariadic, int> e = wpi::util::make_unexpected(0);
+    wpi::util::expected<TakesInitAndVariadic, int> e =
+        wpi::util::make_unexpected(0);
     e.emplace({0, 1}, 2, 3);
     EXPECT_TRUE(e);
     EXPECT_EQ(e->v[0], 0);

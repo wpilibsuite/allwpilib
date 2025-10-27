@@ -151,7 +151,8 @@ constexpr T CopyDirectionPow(T value, double exponent,
         value);
   } else {
     return wpi::units::math::copysign(
-        gcem::pow((wpi::units::math::abs(value) / maxMagnitude).value(), exponent) *
+        gcem::pow((wpi::units::math::abs(value) / maxMagnitude).value(),
+                  exponent) *
             maxMagnitude,
         value);
   }
@@ -258,7 +259,8 @@ template <typename T>
   requires std::is_arithmetic_v<T> || wpi::units::traits::is_unit_t_v<T>
 constexpr bool IsNear(T expected, T actual, T tolerance, T min, T max) {
   T errorBound = (max - min) / 2.0;
-  T error = wpi::math::InputModulus<T>(expected - actual, -errorBound, errorBound);
+  T error =
+      wpi::math::InputModulus<T>(expected - actual, -errorBound, errorBound);
 
   if constexpr (std::is_arithmetic_v<T>) {
     return std::abs(error) < tolerance;
@@ -274,9 +276,9 @@ constexpr bool IsNear(T expected, T actual, T tolerance, T min, T max) {
  */
 WPILIB_DLLEXPORT
 constexpr wpi::units::radian_t AngleModulus(wpi::units::radian_t angle) {
-  return InputModulus<wpi::units::radian_t>(angle,
-                                       wpi::units::radian_t{-std::numbers::pi},
-                                       wpi::units::radian_t{std::numbers::pi});
+  return InputModulus<wpi::units::radian_t>(
+      angle, wpi::units::radian_t{-std::numbers::pi},
+      wpi::units::radian_t{std::numbers::pi});
 }
 
 // floorDiv and floorMod algorithms taken from Java
@@ -326,10 +328,9 @@ constexpr std::signed_integral auto FloorMod(std::signed_integral auto x,
  * @param maxVelocity Maximum translation velocity.
  * @return Returns the next Translation2d limited to maxVelocity
  */
-constexpr Translation2d SlewRateLimit(const Translation2d& current,
-                                      const Translation2d& next,
-                                      wpi::units::second_t dt,
-                                      wpi::units::meters_per_second_t maxVelocity) {
+constexpr Translation2d SlewRateLimit(
+    const Translation2d& current, const Translation2d& next,
+    wpi::units::second_t dt, wpi::units::meters_per_second_t maxVelocity) {
   if (maxVelocity < 0_mps) {
     wpi::math::MathSharedStore::ReportError(
         "maxVelocity must be a non-negative number, got {}!", maxVelocity);
@@ -357,10 +358,9 @@ constexpr Translation2d SlewRateLimit(const Translation2d& current,
  * @param maxVelocity Maximum translation velocity.
  * @return Returns the next Translation3d limited to maxVelocity
  */
-constexpr Translation3d SlewRateLimit(const Translation3d& current,
-                                      const Translation3d& next,
-                                      wpi::units::second_t dt,
-                                      wpi::units::meters_per_second_t maxVelocity) {
+constexpr Translation3d SlewRateLimit(
+    const Translation3d& current, const Translation3d& next,
+    wpi::units::second_t dt, wpi::units::meters_per_second_t maxVelocity) {
   if (maxVelocity < 0_mps) {
     wpi::math::MathSharedStore::ReportError(
         "maxVelocity must be a non-negative number, got {}!", maxVelocity);

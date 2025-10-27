@@ -517,7 +517,8 @@ Java_org_wpilib_vision_apriltag_jni_AprilTagJNI_estimatePoseHomography
     return nullptr;
   }
 
-  AprilTagPoseEstimator estimator({wpi::units::meter_t{tagSize}, fx, fy, cx, cy});
+  AprilTagPoseEstimator estimator(
+      {wpi::units::meter_t{tagSize}, fx, fy, cx, cy});
   return MakeJObject(env, estimator.EstimateHomography(harr));
 }
 
@@ -553,7 +554,8 @@ Java_org_wpilib_vision_apriltag_jni_AprilTagJNI_estimatePoseOrthogonalIteration
     return nullptr;
   }
 
-  AprilTagPoseEstimator estimator({wpi::units::meter_t{tagSize}, fx, fy, cx, cy});
+  AprilTagPoseEstimator estimator(
+      {wpi::units::meter_t{tagSize}, fx, fy, cx, cy});
   return MakeJObject(env,
                      estimator.EstimateOrthogonalIteration(harr, carr, nIters));
 }
@@ -590,7 +592,8 @@ Java_org_wpilib_vision_apriltag_jni_AprilTagJNI_estimatePose
     return nullptr;
   }
 
-  AprilTagPoseEstimator estimator({wpi::units::meter_t{tagSize}, fx, fy, cx, cy});
+  AprilTagPoseEstimator estimator(
+      {wpi::units::meter_t{tagSize}, fx, fy, cx, cy});
   return MakeJObject(env, estimator.Estimate(harr, carr));
 }
 

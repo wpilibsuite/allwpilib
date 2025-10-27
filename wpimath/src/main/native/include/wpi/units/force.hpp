@@ -42,8 +42,9 @@ namespace wpi::units {
  * @sa See unit_t for more information on unit type containers.
  */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_FORCE_UNITS)
-UNIT_ADD_WITH_METRIC_PREFIXES(force, newton, newtons, N,
-                              unit<std::ratio<1>, wpi::units::category::force_unit>)
+UNIT_ADD_WITH_METRIC_PREFIXES(
+    force, newton, newtons, N,
+    unit<std::ratio<1>, wpi::units::category::force_unit>)
 UNIT_ADD(
     force, pound, pounds, lbf,
     compound_unit<mass::slug, length::foot, inverse<squared<time::seconds>>>)

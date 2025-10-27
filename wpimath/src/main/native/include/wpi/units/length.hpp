@@ -39,8 +39,9 @@ namespace wpi::units {
  */
 #if !defined(DISABLE_PREDEFINED_UNITS) || \
     defined(ENABLE_PREDEFINED_LENGTH_UNITS)
-UNIT_ADD_WITH_METRIC_PREFIXES(length, meter, meters, m,
-                              unit<std::ratio<1>, wpi::units::category::length_unit>)
+UNIT_ADD_WITH_METRIC_PREFIXES(
+    length, meter, meters, m,
+    unit<std::ratio<1>, wpi::units::category::length_unit>)
 UNIT_ADD(length, foot, feet, ft, unit<std::ratio<381, 1250>, meters>)
 UNIT_ADD(length, inch, inches, in, unit<std::ratio<1, 12>, feet>)
 UNIT_ADD(length, mil, mils, mil, unit<std::ratio<1, 1000>, inches>)

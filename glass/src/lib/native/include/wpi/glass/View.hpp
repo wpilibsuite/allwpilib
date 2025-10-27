@@ -54,6 +54,7 @@ class View {
  * @param display Display function
  * @return unique_ptr to View
  */
-std::unique_ptr<View> MakeFunctionView(wpi::util::unique_function<void()> display);
+std::unique_ptr<View> MakeFunctionView(
+    wpi::util::unique_function<void()> display);
 
 }  // namespace wpi::glass

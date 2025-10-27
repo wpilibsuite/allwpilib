@@ -89,9 +89,9 @@ void HALSimWSClientConnection::OnSimValueChanged(const wpi::util::json& msg) {
 
   wpi::util::SmallVector<uv::Buffer, 4> sendBufs;
   wpi::net::raw_uv_ostream os{sendBufs, [this]() -> uv::Buffer {
-                           std::lock_guard lock(m_buffers_mutex);
-                           return m_buffers.Allocate();
-                         }};
+                                std::lock_guard lock(m_buffers_mutex);
+                                return m_buffers.Allocate();
+                              }};
 
   os << msg;
 

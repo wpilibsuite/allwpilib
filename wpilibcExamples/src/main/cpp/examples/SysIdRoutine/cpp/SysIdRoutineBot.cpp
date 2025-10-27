@@ -18,9 +18,11 @@ void SysIdRoutineBot::ConfigureBindings() {
   // Using bumpers as a modifier and combining it with the buttons so that we
   // can have both sets of bindings at once
   (m_driverController.A() && m_driverController.RightBumper())
-      .WhileTrue(m_drive.SysIdQuasistatic(wpi::cmd::sysid::Direction::kForward));
+      .WhileTrue(
+          m_drive.SysIdQuasistatic(wpi::cmd::sysid::Direction::kForward));
   (m_driverController.B() && m_driverController.RightBumper())
-      .WhileTrue(m_drive.SysIdQuasistatic(wpi::cmd::sysid::Direction::kReverse));
+      .WhileTrue(
+          m_drive.SysIdQuasistatic(wpi::cmd::sysid::Direction::kReverse));
   (m_driverController.X() && m_driverController.RightBumper())
       .WhileTrue(m_drive.SysIdDynamic(wpi::cmd::sysid::Direction::kForward));
   (m_driverController.Y() && m_driverController.RightBumper())
@@ -30,9 +32,11 @@ void SysIdRoutineBot::ConfigureBindings() {
       [this] { return m_driverController.GetLeftTriggerAxis(); }));
 
   (m_driverController.A() && m_driverController.LeftBumper())
-      .WhileTrue(m_shooter.SysIdQuasistatic(wpi::cmd::sysid::Direction::kForward));
+      .WhileTrue(
+          m_shooter.SysIdQuasistatic(wpi::cmd::sysid::Direction::kForward));
   (m_driverController.B() && m_driverController.LeftBumper())
-      .WhileTrue(m_shooter.SysIdQuasistatic(wpi::cmd::sysid::Direction::kReverse));
+      .WhileTrue(
+          m_shooter.SysIdQuasistatic(wpi::cmd::sysid::Direction::kReverse));
   (m_driverController.X() && m_driverController.LeftBumper())
       .WhileTrue(m_shooter.SysIdDynamic(wpi::cmd::sysid::Direction::kForward));
   (m_driverController.Y() && m_driverController.LeftBumper())

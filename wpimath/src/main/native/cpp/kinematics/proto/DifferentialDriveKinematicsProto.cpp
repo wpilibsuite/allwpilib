@@ -6,8 +6,8 @@
 
 #include "wpimath/protobuf/kinematics.npb.h"
 
-std::optional<wpi::math::DifferentialDriveKinematics>
-wpi::util::Protobuf<wpi::math::DifferentialDriveKinematics>::Unpack(InputStream& stream) {
+std::optional<wpi::math::DifferentialDriveKinematics> wpi::util::Protobuf<
+    wpi::math::DifferentialDriveKinematics>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufDifferentialDriveKinematics msg;
   if (!stream.Decode(msg)) {
     return {};

@@ -35,7 +35,8 @@ template <typename O, typename I>
 static O* ConvertToC(std::vector<I>&& in, int* count) {
   using T = std::vector<I>;
   size_t size = in.size();
-  O* out = static_cast<O*>(wpi::util::safe_malloc(size * sizeof(O) + sizeof(T)));
+  O* out =
+      static_cast<O*>(wpi::util::safe_malloc(size * sizeof(O) + sizeof(T)));
   *count = size;
   for (size_t i = 0; i < size; ++i) {
     out[i] = ConvertToC(in[i]);
@@ -93,7 +94,8 @@ void CS_GetStringProperty(CS_Property property, WPI_String* value,
 
 void CS_SetStringProperty(CS_Property property, const struct WPI_String* value,
                           CS_Status* status) {
-  return wpi::cs::SetStringProperty(property, wpi::util::to_string_view(value), status);
+  return wpi::cs::SetStringProperty(property, wpi::util::to_string_view(value),
+                                    status);
 }
 
 WPI_String* CS_GetEnumPropertyChoices(CS_Property property, int* count,
@@ -119,7 +121,8 @@ void CS_GetSourceName(CS_Source source, WPI_String* name, CS_Status* status) {
 void CS_GetSourceDescription(CS_Source source, WPI_String* description,
                              CS_Status* status) {
   wpi::util::SmallString<128> buf;
-  wpi::cs::ConvertToC(description, wpi::cs::GetSourceDescription(source, buf, status));
+  wpi::cs::ConvertToC(description,
+                      wpi::cs::GetSourceDescription(source, buf, status));
 }
 
 uint64_t CS_GetSourceLastFrameTime(CS_Source source, CS_Status* status) {
@@ -143,7 +146,8 @@ CS_Bool CS_IsSourceEnabled(CS_Source source, CS_Status* status) {
 CS_Property CS_GetSourceProperty(CS_Source source,
                                  const struct WPI_String* name,
                                  CS_Status* status) {
-  return wpi::cs::GetSourceProperty(source, wpi::util::to_string_view(name), status);
+  return wpi::cs::GetSourceProperty(source, wpi::util::to_string_view(name),
+                                    status);
 }
 
 CS_Property* CS_EnumerateSourceProperties(CS_Source source, int* count,
@@ -175,8 +179,8 @@ CS_Bool CS_SetSourceVideoModeDiscrete(CS_Source source,
   return wpi::cs::SetSourceVideoMode(
       source,
       wpi::cs::VideoMode{static_cast<wpi::cs::VideoMode::PixelFormat>(
-                        static_cast<int>(pixelFormat)),
-                    width, height, fps},
+                             static_cast<int>(pixelFormat)),
+                         width, height, fps},
       status);
 }
 
@@ -185,7 +189,8 @@ CS_Bool CS_SetSourcePixelFormat(CS_Source source,
                                 CS_Status* status) {
   return wpi::cs::SetSourcePixelFormat(
       source,
-      static_cast<wpi::cs::VideoMode::PixelFormat>(static_cast<int>(pixelFormat)),
+      static_cast<wpi::cs::VideoMode::PixelFormat>(
+          static_cast<int>(pixelFormat)),
       status);
 }
 
@@ -201,7 +206,8 @@ CS_Bool CS_SetSourceFPS(CS_Source source, int fps, CS_Status* status) {
 CS_Bool CS_SetSourceConfigJson(CS_Source source,
                                const struct WPI_String* config,
                                CS_Status* status) {
-  return wpi::cs::SetSourceConfigJson(source, wpi::util::to_string_view(config), status);
+  return wpi::cs::SetSourceConfigJson(source, wpi::util::to_string_view(config),
+                                      status);
 }
 
 void CS_GetSourceConfigJson(CS_Source source, WPI_String* config,
@@ -223,8 +229,8 @@ CS_Sink* CS_EnumerateSourceSinks(CS_Source source, int* count,
                                  CS_Status* status) {
   wpi::util::SmallVector<CS_Sink, 32> buf;
   auto handles = wpi::cs::EnumerateSourceSinks(source, buf, status);
-  CS_Sink* sinks =
-      static_cast<CS_Sink*>(wpi::util::safe_malloc(handles.size() * sizeof(CS_Sink)));
+  CS_Sink* sinks = static_cast<CS_Sink*>(
+      wpi::util::safe_malloc(handles.size() * sizeof(CS_Sink)));
   *count = handles.size();
   std::copy(handles.begin(), handles.end(), sinks);
   return sinks;
@@ -285,12 +291,14 @@ void CS_GetSinkName(CS_Sink sink, WPI_String* name, CS_Status* status) {
 void CS_GetSinkDescription(CS_Sink sink, WPI_String* description,
                            CS_Status* status) {
   wpi::util::SmallString<128> buf;
-  wpi::cs::ConvertToC(description, wpi::cs::GetSinkDescription(sink, buf, status));
+  wpi::cs::ConvertToC(description,
+                      wpi::cs::GetSinkDescription(sink, buf, status));
 }
 
 CS_Property CS_GetSinkProperty(CS_Sink sink, const struct WPI_String* name,
                                CS_Status* status) {
-  return wpi::cs::GetSinkProperty(sink, wpi::util::to_string_view(name), status);
+  return wpi::cs::GetSinkProperty(sink, wpi::util::to_string_view(name),
+                                  status);
 }
 
 CS_Property* CS_EnumerateSinkProperties(CS_Sink sink, int* count,
@@ -306,7 +314,8 @@ CS_Property* CS_EnumerateSinkProperties(CS_Sink sink, int* count,
 
 CS_Bool CS_SetSinkConfigJson(CS_Sink sink, const struct WPI_String* config,
                              CS_Status* status) {
-  return wpi::cs::SetSinkConfigJson(sink, wpi::util::to_string_view(config), status);
+  return wpi::cs::SetSinkConfigJson(sink, wpi::util::to_string_view(config),
+                                    status);
 }
 
 void CS_GetSinkConfigJson(CS_Sink sink, WPI_String* config, CS_Status* status) {
@@ -324,7 +333,8 @@ CS_Source CS_GetSinkSource(CS_Sink sink, CS_Status* status) {
 CS_Property CS_GetSinkSourceProperty(CS_Sink sink,
                                      const struct WPI_String* name,
                                      CS_Status* status) {
-  return wpi::cs::GetSinkSourceProperty(sink, wpi::util::to_string_view(name), status);
+  return wpi::cs::GetSinkSourceProperty(sink, wpi::util::to_string_view(name),
+                                        status);
 }
 
 CS_Sink CS_CopySink(CS_Sink sink, CS_Status* status) {
@@ -465,8 +475,8 @@ void CS_ReleaseEnumeratedSources(CS_Source* sources, int count) {
 CS_Sink* CS_EnumerateSinks(int* count, CS_Status* status) {
   wpi::util::SmallVector<CS_Sink, 32> buf;
   auto handles = wpi::cs::EnumerateSinkHandles(buf, status);
-  CS_Sink* sinks =
-      static_cast<CS_Sink*>(wpi::util::safe_malloc(handles.size() * sizeof(CS_Sink)));
+  CS_Sink* sinks = static_cast<CS_Sink*>(
+      wpi::util::safe_malloc(handles.size() * sizeof(CS_Sink)));
   *count = handles.size();
   std::copy(handles.begin(), handles.end(), sinks);
   return sinks;

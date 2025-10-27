@@ -34,7 +34,8 @@ static const JExceptionInit exceptions[] = {
     {"java/lang/NullPointerException", &nullPointerEx},
     {"org/wpilib/util/runtime/MsvcRuntimeException", &msvcRuntimeEx}};
 
-void wpi::util::ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg) {
+void wpi::util::ThrowIllegalArgumentException(JNIEnv* env,
+                                              std::string_view msg) {
   illegalArgEx.Throw(env, msg);
 }
 
@@ -98,7 +99,8 @@ Java_org_wpilib_util_WPIUtilJNI_checkMsvcRuntime
                           &expectedMinor, &runtimePath)) {
     static jmethodID ctor =
         env->GetMethodID(msvcRuntimeEx, "<init>", "(IIIILjava/lang/String;)V");
-    jstring jmsvcruntime = MakeJString(env, wpi::util::to_string_view(&runtimePath));
+    jstring jmsvcruntime =
+        MakeJString(env, wpi::util::to_string_view(&runtimePath));
     jobject exception =
         env->NewObject(msvcRuntimeEx, ctor, foundMajor, foundMinor,
                        expectedMajor, expectedMinor, jmsvcruntime);
@@ -129,7 +131,8 @@ Java_org_wpilib_util_WPIUtilJNI_enableMockTime
   (JNIEnv*, jclass)
 {
 #ifdef __FRC_SYSTEMCORE__
-  wpi::util::print(stderr, "WPIUtil: Mocking time is not available on systemcore\n");
+  wpi::util::print(stderr,
+                   "WPIUtil: Mocking time is not available on systemcore\n");
 #else
   mockTimeEnabled = true;
   wpi::util::SetNowImpl([] { return mockNow; });

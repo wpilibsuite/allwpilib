@@ -17,10 +17,10 @@ struct Writer : public mpack::mpack_writer_t {
   Writer() {
     mpack::mpack_writer_init(this, buf, sizeof(buf));
     mpack::mpack_writer_set_context(this, &os);
-    mpack::mpack_writer_set_flush(
-        this, [](mpack::mpack_writer_t* w, const char* buffer, size_t count) {
-          static_cast<wpi::util::raw_ostream*>(w->context)->write(buffer, count);
-        });
+    mpack::mpack_writer_set_flush(this, [](mpack::mpack_writer_t* w,
+                                           const char* buffer, size_t count) {
+      static_cast<wpi::util::raw_ostream*>(w->context)->write(buffer, count);
+    });
   }
 
   std::vector<uint8_t> bytes;

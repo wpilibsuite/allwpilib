@@ -37,7 +37,8 @@ class WPILIB_DLLEXPORT Rotation2d {
    */
   constexpr Rotation2d(wpi::units::angle_unit auto value)  // NOLINT
       : m_cos{gcem::cos(value.template convert<wpi::units::radian>().value())},
-        m_sin{gcem::sin(value.template convert<wpi::units::radian>().value())} {}
+        m_sin{gcem::sin(value.template convert<wpi::units::radian>().value())} {
+  }
 
   /**
    * Constructs a Rotation2d with the given x and y (cosine and sine)

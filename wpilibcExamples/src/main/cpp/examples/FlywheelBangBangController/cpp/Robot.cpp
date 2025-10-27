@@ -15,8 +15,8 @@
 #include <wpi/units/moment_of_inertia.hpp>
 
 /**
- * This is a sample program to demonstrate the use of a wpi::math::BangBangController with
- * a flywheel to control speed.
+ * This is a sample program to demonstrate the use of a
+ * wpi::math::BangBangController with a flywheel to control speed.
  */
 class Robot : public wpi::TimedRobot {
  public:
@@ -25,8 +25,8 @@ class Robot : public wpi::TimedRobot {
    */
   void TeleopPeriodic() override {
     // Scale setpoint value between 0 and maxSetpointValue
-    wpi::units::radians_per_second_t setpoint =
-        wpi::units::math::max(0_rpm, m_joystick.GetRawAxis(0) * kMaxSetpointValue);
+    wpi::units::radians_per_second_t setpoint = wpi::units::math::max(
+        0_rpm, m_joystick.GetRawAxis(0) * kMaxSetpointValue);
 
     // Set setpoint and measurement of the bang-bang controller
     wpi::units::volt_t bangOutput =
@@ -64,7 +64,8 @@ class Robot : public wpi::TimedRobot {
   static constexpr int kEncoderBChannel = 1;
 
   // Max setpoint for joystick control
-  static constexpr wpi::units::radians_per_second_t kMaxSetpointValue = 6000_rpm;
+  static constexpr wpi::units::radians_per_second_t kMaxSetpointValue =
+      6000_rpm;
 
   // Joystick to control setpoint
   wpi::Joystick m_joystick{0};
@@ -90,12 +91,13 @@ class Robot : public wpi::TimedRobot {
   static constexpr double kFlywheelGearing = 1.0;
 
   // 1/2 MR²
-  static constexpr wpi::units::kilogram_square_meter_t kFlywheelMomentOfInertia =
-      0.5 * 1.5_lb * 4_in * 4_in;
+  static constexpr wpi::units::kilogram_square_meter_t
+      kFlywheelMomentOfInertia = 0.5 * 1.5_lb * 4_in * 4_in;
 
   wpi::math::DCMotor m_gearbox = wpi::math::DCMotor::NEO(1);
-  wpi::math::LinearSystem<1, 1, 1> m_plant{wpi::math::LinearSystemId::FlywheelSystem(
-      m_gearbox, kFlywheelMomentOfInertia, kFlywheelGearing)};
+  wpi::math::LinearSystem<1, 1, 1> m_plant{
+      wpi::math::LinearSystemId::FlywheelSystem(
+          m_gearbox, kFlywheelMomentOfInertia, kFlywheelGearing)};
 
   wpi::sim::FlywheelSim m_flywheelSim{m_plant, m_gearbox};
   wpi::sim::EncoderSim m_encoderSim{m_encoder};

@@ -267,7 +267,8 @@ std::unique_ptr<UsbCameraProperty> UsbCameraProperty::DeviceQuery(int fd,
   return prop;
 }
 
-bool UsbCameraProperty::DeviceGet(std::unique_lock<wpi::util::mutex>& lock, int fd) {
+bool UsbCameraProperty::DeviceGet(std::unique_lock<wpi::util::mutex>& lock,
+                                  int fd) {
   if (fd < 0) {
     return true;
   }
@@ -313,8 +314,8 @@ bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::util::mutex>& lock,
   return DeviceSet(lock, fd, value, valueStrCopy.str());
 }
 
-bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::util::mutex>& lock, int fd,
-                                  int newValue,
+bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::util::mutex>& lock,
+                                  int fd, int newValue,
                                   std::string_view newValueStr) const {
   if (!device || fd < 0) {
     return true;

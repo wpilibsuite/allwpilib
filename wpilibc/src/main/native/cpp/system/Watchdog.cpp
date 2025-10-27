@@ -34,7 +34,7 @@ class Watchdog::Impl {
   wpi::util::mutex m_mutex;
   std::atomic<HAL_NotifierHandle> m_notifier;
   wpi::util::priority_queue<Watchdog*, std::vector<Watchdog*>,
-                      DerefGreater<Watchdog*>>
+                            DerefGreater<Watchdog*>>
       m_watchdogs;
 
   void UpdateAlarm();
@@ -115,7 +115,7 @@ void Watchdog::Impl::Main() {
       watchdog->m_lastTimeoutPrintTime = now;
       if (!watchdog->m_suppressTimeoutMessage) {
         WPILIB_ReportWarning("Watchdog not fed within {:.6f}s",
-                          watchdog->m_timeout.value());
+                             watchdog->m_timeout.value());
       }
     }
 

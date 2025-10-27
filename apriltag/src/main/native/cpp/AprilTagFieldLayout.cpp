@@ -22,13 +22,16 @@ AprilTagFieldLayout::AprilTagFieldLayout(std::string_view path) {
     throw std::runtime_error(fmt::format("Cannot open file: {}", path));
   }
 
-  wpi::util::json json = wpi::util::json::parse(fileBuffer.value()->GetCharBuffer());
+  wpi::util::json json =
+      wpi::util::json::parse(fileBuffer.value()->GetCharBuffer());
 
   for (const auto& tag : json.at("tags").get<std::vector<AprilTag>>()) {
     m_apriltags[tag.ID] = tag;
   }
-  m_fieldWidth = wpi::units::meter_t{json.at("field").at("width").get<double>()};
-  m_fieldLength = wpi::units::meter_t{json.at("field").at("length").get<double>()};
+  m_fieldWidth =
+      wpi::units::meter_t{json.at("field").at("width").get<double>()};
+  m_fieldLength =
+      wpi::units::meter_t{json.at("field").at("length").get<double>()};
 }
 
 AprilTagFieldLayout::AprilTagFieldLayout(std::vector<AprilTag> apriltags,
@@ -64,8 +67,9 @@ void AprilTagFieldLayout::SetOrigin(OriginPosition origin) {
       SetOrigin(wpi::math::Pose3d{});
       break;
     case OriginPosition::kRedAllianceWallRightSide:
-      SetOrigin(wpi::math::Pose3d{wpi::math::Translation3d{m_fieldLength, m_fieldWidth, 0_m},
-                       wpi::math::Rotation3d{0_deg, 0_deg, 180_deg}});
+      SetOrigin(wpi::math::Pose3d{
+          wpi::math::Translation3d{m_fieldLength, m_fieldWidth, 0_m},
+          wpi::math::Rotation3d{0_deg, 0_deg, 180_deg}});
       break;
     default:
       throw std::invalid_argument("Invalid origin");
@@ -101,7 +105,8 @@ void AprilTagFieldLayout::Serialize(std::string_view path) {
   output.flush();
 }
 
-void wpi::apriltag::to_json(wpi::util::json& json, const AprilTagFieldLayout& layout) {
+void wpi::apriltag::to_json(wpi::util::json& json,
+                            const AprilTagFieldLayout& layout) {
   std::vector<AprilTag> tagVector;
   tagVector.reserve(layout.m_apriltags.size());
   for (const auto& pair : layout.m_apriltags) {
@@ -109,12 +114,13 @@ void wpi::apriltag::to_json(wpi::util::json& json, const AprilTagFieldLayout& la
   }
 
   json = wpi::util::json{{"field",
-                    {{"length", layout.m_fieldLength.value()},
-                     {"width", layout.m_fieldWidth.value()}}},
-                   {"tags", tagVector}};
+                          {{"length", layout.m_fieldLength.value()},
+                           {"width", layout.m_fieldWidth.value()}}},
+                         {"tags", tagVector}};
 }
 
-void wpi::apriltag::from_json(const wpi::util::json& json, AprilTagFieldLayout& layout) {
+void wpi::apriltag::from_json(const wpi::util::json& json,
+                              AprilTagFieldLayout& layout) {
   layout.m_apriltags.clear();
   for (const auto& tag : json.at("tags").get<std::vector<AprilTag>>()) {
     layout.m_apriltags[tag.ID] = tag;
@@ -164,6 +170,7 @@ AprilTagFieldLayout AprilTagFieldLayout::LoadField(AprilTagField field) {
   return json.get<AprilTagFieldLayout>();
 }
 
-AprilTagFieldLayout wpi::apriltag::LoadAprilTagLayoutField(AprilTagField field) {
+AprilTagFieldLayout wpi::apriltag::LoadAprilTagLayoutField(
+    AprilTagField field) {
   return AprilTagFieldLayout::LoadField(field);
 }

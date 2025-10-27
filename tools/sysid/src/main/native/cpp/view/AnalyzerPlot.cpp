@@ -30,8 +30,8 @@ static ImPlotPoint Getter(int idx, void* data) {
 template <typename Model>
 static std::vector<std::vector<ImPlotPoint>> PopulateTimeDomainSim(
     const std::vector<PreparedData>& data,
-    const std::array<wpi::units::second_t, 4>& startTimes, size_t step, Model model,
-    double* simSquaredErrorSum, double* squaredVariationSum,
+    const std::array<wpi::units::second_t, 4>& startTimes, size_t step,
+    Model model, double* simSquaredErrorSum, double* squaredVariationSum,
     int* timeSeriesPoints) {
   // Create the vector of ImPlotPoints that will contain our simulated data.
   std::vector<std::vector<ImPlotPoint>> pts;
@@ -60,7 +60,8 @@ static std::vector<std::vector<ImPlotPoint>> PopulateTimeDomainSim(
       continue;
     }
 
-    model.Update(wpi::units::volt_t{pre.voltage}, now.timestamp - pre.timestamp);
+    model.Update(wpi::units::volt_t{pre.voltage},
+                 now.timestamp - pre.timestamp);
     tmp.emplace_back((startTime + t).value(), model.GetVelocity());
     *simSquaredErrorSum += std::pow(now.velocity - model.GetVelocity(), 2);
     *squaredVariationSum += std::pow(now.velocity, 2);
@@ -128,11 +129,11 @@ void AnalyzerPlot::SetRawData(const Storage& data, std::string_view unit,
   SetRawTimeData(slow, fast, abort);
 }
 
-void AnalyzerPlot::SetData(const Storage& rawData, const Storage& filteredData,
-                           std::string_view unit,
-                           const AnalysisManager::FeedforwardGains& ffGains,
-                           const std::array<wpi::units::second_t, 4>& startTimes,
-                           AnalysisType type, std::atomic<bool>& abort) {
+void AnalyzerPlot::SetData(
+    const Storage& rawData, const Storage& filteredData, std::string_view unit,
+    const AnalysisManager::FeedforwardGains& ffGains,
+    const std::array<wpi::units::second_t, 4>& startTimes, AnalysisType type,
+    std::atomic<bool>& abort) {
   double simSquaredErrorSum = 0;
   double squaredVariationSum = 0;
   int timeSeriesPoints = 0;
@@ -361,7 +362,8 @@ void AnalyzerPlot::SetData(const Storage& rawData, const Storage& filteredData,
   m_timestepData.fitLine[0] =
       ImPlotPoint{minTime.value(), wpi::units::millisecond_t{dtMean}.value()};
 
-  auto maxTime = wpi::units::math::max(slow.back().timestamp, fast.back().timestamp);
+  auto maxTime =
+      wpi::units::math::max(slow.back().timestamp, fast.back().timestamp);
   m_timestepData.fitLine[1] =
       ImPlotPoint{maxTime.value(), wpi::units::millisecond_t{dtMean}.value()};
 

@@ -23,8 +23,8 @@
 using namespace wpi;
 
 wpi::util::mutex PneumaticsControlModule::m_handleLock;
-std::unique_ptr<
-    wpi::util::DenseMap<int, std::weak_ptr<PneumaticsControlModule::DataStore>>[]>
+std::unique_ptr<wpi::util::DenseMap<
+    int, std::weak_ptr<PneumaticsControlModule::DataStore>>[]>
     PneumaticsControlModule::m_handleMaps = nullptr;
 
 // Always called under lock, so we can avoid the double lock from the magic
@@ -33,7 +33,7 @@ std::weak_ptr<PneumaticsControlModule::DataStore>&
 PneumaticsControlModule::GetDataStore(int busId, int module) {
   int32_t numBuses = HAL_GetNumCanBuses();
   WPILIB_AssertMessage(busId >= 0 && busId < numBuses,
-                    "Bus {} out of range. Must be [0-{}).", busId, numBuses);
+                       "Bus {} out of range. Must be [0-{}).", busId, numBuses);
   if (!m_handleMaps) {
     m_handleMaps = std::make_unique<wpi::util::DenseMap<
         int, std::weak_ptr<PneumaticsControlModule::DataStore>>[]>(numBuses);
@@ -234,8 +234,8 @@ void PneumaticsControlModule::FireOneShot(int index) {
   WPILIB_ReportError(status, "Module {}", m_module);
 }
 
-void PneumaticsControlModule::SetOneShotDuration(int index,
-                                                 wpi::units::second_t duration) {
+void PneumaticsControlModule::SetOneShotDuration(
+    int index, wpi::units::second_t duration) {
   int32_t status = 0;
   wpi::units::millisecond_t millis = duration;
   HAL_SetCTREPCMOneShotDuration(m_handle, index, millis.to<int32_t>(), &status);
@@ -275,7 +275,8 @@ void PneumaticsControlModule::UnreserveCompressor() {
   m_dataStore->m_compressorReserved = false;
 }
 
-wpi::units::volt_t PneumaticsControlModule::GetAnalogVoltage(int channel) const {
+wpi::units::volt_t PneumaticsControlModule::GetAnalogVoltage(
+    int channel) const {
   return 0_V;
 }
 

@@ -91,9 +91,9 @@ void HALSimHttpConnection::OnSimValueChanged(const wpi::util::json& msg) {
   // render json to buffers
   wpi::util::SmallVector<uv::Buffer, 4> sendBufs;
   wpi::net::raw_uv_ostream os{sendBufs, [this]() -> uv::Buffer {
-                           std::lock_guard lock(m_buffers_mutex);
-                           return m_buffers.Allocate();
-                         }};
+                                std::lock_guard lock(m_buffers_mutex);
+                                return m_buffers.Allocate();
+                              }};
   os << msg;
 
   // call the websocket send function on the uv loop
@@ -154,7 +154,7 @@ void HALSimHttpConnection::SendFileResponse(int code, std::string_view codeText,
 
 void HALSimHttpConnection::ProcessRequest() {
   wpi::net::UrlParser url{m_request.GetUrl(),
-                     m_request.GetMethod() == wpi::net::HTTP_CONNECT};
+                          m_request.GetMethod() == wpi::net::HTTP_CONNECT};
   if (!url.IsValid()) {
     // failed to parse URL
     MySendError(400, "Invalid URL");
@@ -166,17 +166,18 @@ void HALSimHttpConnection::ProcessRequest() {
     path = url.GetPath();
   }
 
-  if (m_request.GetMethod() == wpi::net::HTTP_GET && wpi::util::starts_with(path, '/') &&
-      !wpi::util::contains(path, "..") && !wpi::util::contains(path, "//")) {
+  if (m_request.GetMethod() == wpi::net::HTTP_GET &&
+      wpi::util::starts_with(path, '/') && !wpi::util::contains(path, "..") &&
+      !wpi::util::contains(path, "//")) {
     // convert to fs native representation
     fs::path nativePath;
     if (auto userPath = wpi::util::remove_prefix(path, "/user/")) {
       nativePath = fs::path{m_server->GetWebrootSys()} /
                    fs::path{*userPath, fs::path::format::generic_format};
     } else {
-      nativePath =
-          fs::path{m_server->GetWebrootSys()} /
-          fs::path{wpi::util::drop_front(path), fs::path::format::generic_format};
+      nativePath = fs::path{m_server->GetWebrootSys()} /
+                   fs::path{wpi::util::drop_front(path),
+                            fs::path::format::generic_format};
     }
 
     if (fs::is_directory(nativePath)) {
@@ -202,5 +203,5 @@ void HALSimHttpConnection::MySendError(int code, std::string_view message) {
 void HALSimHttpConnection::Log(int code) {
   auto method = wpi::net::http_method_str(m_request.GetMethod());
   wpi::util::print(stderr, "{} {} HTTP/{}.{} {}\n", method, m_request.GetUrl(),
-             m_request.GetMajor(), m_request.GetMinor(), code);
+                   m_request.GetMajor(), m_request.GetMinor(), code);
 }

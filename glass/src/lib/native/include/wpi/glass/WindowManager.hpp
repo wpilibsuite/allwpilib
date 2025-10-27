@@ -65,7 +65,8 @@ class WindowManager {
    * @param display window contents display function
    * @param defaultVisibility default window visibility
    */
-  Window* AddWindow(std::string_view id, wpi::util::unique_function<void()> display,
+  Window* AddWindow(std::string_view id,
+                    wpi::util::unique_function<void()> display,
                     Window::Visibility defaultVisibility = Window::kShow);
 
   /**

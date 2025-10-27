@@ -129,7 +129,7 @@ void LogLoader::RebuildEntryTree() {
       parts.emplace_back(prefix);
     }
     wpi::util::split(mainpart, '/', -1, false,
-               [&](auto part) { parts.emplace_back(part); });
+                     [&](auto part) { parts.emplace_back(part); });
 
     // ignore a raw "/" key
     if (parts.empty()) {
@@ -138,7 +138,8 @@ void LogLoader::RebuildEntryTree() {
 
     // get to leaf
     auto nodes = &m_entryTree;
-    for (auto part : wpi::util::drop_back(std::span{parts.begin(), parts.end()})) {
+    for (auto part :
+         wpi::util::drop_back(std::span{parts.begin(), parts.end()})) {
       auto it =
           std::find_if(nodes->begin(), nodes->end(),
                        [&](const auto& node) { return node.name == part; });

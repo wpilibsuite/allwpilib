@@ -38,7 +38,8 @@ namespace wpi::cmd {
  * @see CommandScheduler
  * @see CommandHelper
  */
-class Command : public wpi::util::Sendable, public wpi::util::SendableHelper<Command> {
+class Command : public wpi::util::Sendable,
+                public wpi::util::SendableHelper<Command> {
  public:
   ~Command() override;
 

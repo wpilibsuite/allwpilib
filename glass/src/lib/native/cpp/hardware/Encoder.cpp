@@ -73,11 +73,11 @@ void wpi::glass::DisplayEncoder(EncoderModel* model) {
   std::string& name = GetStorage().GetString("name");
   char label[128];
   if (!name.empty()) {
-    wpi::util::format_to_n_c_str(label, sizeof(label), "{} [{},{}]###header", name,
-                           chA, chB);
+    wpi::util::format_to_n_c_str(label, sizeof(label), "{} [{},{}]###header",
+                                 name, chA, chB);
   } else {
-    wpi::util::format_to_n_c_str(label, sizeof(label), "Encoder[{},{}]###header", chA,
-                           chB);
+    wpi::util::format_to_n_c_str(label, sizeof(label),
+                                 "Encoder[{},{}]###header", chA, chB);
   }
 
   // header
@@ -159,7 +159,8 @@ void wpi::glass::DisplayEncoder(EncoderModel* model) {
   ImGui::PopItemWidth();
 }
 
-void wpi::glass::DisplayEncoders(EncodersModel* model, std::string_view noneMsg) {
+void wpi::glass::DisplayEncoders(EncodersModel* model,
+                                 std::string_view noneMsg) {
   bool hasAny = false;
   model->ForEachEncoder([&](EncoderModel& encoder, int i) {
     hasAny = true;

@@ -16,7 +16,8 @@
 class ConnectionListenerTest : public ::testing::Test {
  public:
   ConnectionListenerTest()
-      : server_inst(wpi::nt::CreateInstance()), client_inst(wpi::nt::CreateInstance()) {}
+      : server_inst(wpi::nt::CreateInstance()),
+        client_inst(wpi::nt::CreateInstance()) {}
 
   ~ConnectionListenerTest() override {
     wpi::nt::DestroyInstance(server_inst);
@@ -31,7 +32,8 @@ class ConnectionListenerTest : public ::testing::Test {
 };
 
 void ConnectionListenerTest::Connect(const char* address, unsigned int port4) {
-  wpi::nt::StartServer(server_inst, "connectionlistenertest.ini", address, port4);
+  wpi::nt::StartServer(server_inst, "connectionlistenertest.ini", address,
+                       port4);
   wpi::nt::StartClient(client_inst, "client");
   wpi::nt::SetServer(client_inst, address, port4);
 
@@ -50,8 +52,8 @@ TEST_F(ConnectionListenerTest, Polled) {
   // set up the poller
   NT_ListenerPoller poller = wpi::nt::CreateListenerPoller(server_inst);
   ASSERT_NE(poller, 0u);
-  NT_Listener handle =
-      wpi::nt::AddPolledListener(poller, server_inst, wpi::nt::EventFlags::kConnection);
+  NT_Listener handle = wpi::nt::AddPolledListener(
+      poller, server_inst, wpi::nt::EventFlags::kConnection);
   ASSERT_NE(handle, 0u);
 
   // trigger a connect event
@@ -89,11 +91,11 @@ class ConnectionListenerVariantTest
 TEST_P(ConnectionListenerVariantTest, Threaded) {
   wpi::util::mutex m;
   std::vector<wpi::nt::Event> result;
-  auto handle = wpi::nt::AddListener(server_inst, wpi::nt::EventFlags::kConnection,
-                                [&](auto& event) {
-                                  std::scoped_lock lock{m};
-                                  result.push_back(event);
-                                });
+  auto handle = wpi::nt::AddListener(
+      server_inst, wpi::nt::EventFlags::kConnection, [&](auto& event) {
+        std::scoped_lock lock{m};
+        result.push_back(event);
+      });
 
   // trigger a connect event
   Connect(GetParam().first, 20001 + GetParam().second);

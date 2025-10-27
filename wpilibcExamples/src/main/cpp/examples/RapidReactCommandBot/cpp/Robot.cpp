@@ -26,7 +26,8 @@ void Robot::AutonomousInit() {
   m_autonomousCommand = m_robot.GetAutonomousCommand();
 
   if (m_autonomousCommand) {
-    wpi::cmd::CommandScheduler::GetInstance().Schedule(m_autonomousCommand.value());
+    wpi::cmd::CommandScheduler::GetInstance().Schedule(
+        m_autonomousCommand.value());
   }
 }
 
