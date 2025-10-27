@@ -91,7 +91,7 @@ index 83d5586ae8a77ec585e7e59df3075ca59cfb9d0c..395965bc6fc969ed9a2d92743a0010dd
  } // end namespace llvm.
  
 diff --git a/llvm/lib/Support/ConvertUTF.cpp b/llvm/lib/Support/ConvertUTF.cpp
-index bc04c5ab5113563fb82d7b3b168985369b611f4b..b1012d896bd8ba9e07221f87a358b90fe203b172 100644
+index bc04c5ab5113563fb82d7b3b168985369b611f4b..b865b5589df961813007e57a910dbc14f875426b 100644
 --- a/llvm/lib/Support/ConvertUTF.cpp
 +++ b/llvm/lib/Support/ConvertUTF.cpp
 @@ -67,6 +67,11 @@
