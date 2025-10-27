@@ -8,7 +8,7 @@
   "jsonUrl": "",
   "javaDependencies": [
     {
-      "groupId": "edu.wpi.first.commandsv2",
+      "groupId": "org.wpilib.commandsv2",
       "artifactId": "commandsv2-java",
       "version": "wpilib"
     }
@@ -16,7 +16,7 @@
   "jniDependencies": [],
   "cppDependencies": [
     {
-      "groupId": "edu.wpi.first.commandsv2",
+      "groupId": "org.wpilib.commandsv2",
       "artifactId": "commandsv2-cpp",
       "version": "wpilib",
       "libName": "commandsv2",
