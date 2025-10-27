@@ -4,6 +4,8 @@
 
 package org.wpilib.opmode;
 
+import org.wpilib.driverstation.DriverStation;
+
 /** Robot state utility functions. */
 public final class RobotState {
   /**

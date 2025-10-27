@@ -4,10 +4,13 @@
 
 package org.wpilib.opmode;
 
+import org.wpilib.driverstation.DSControlWord;
+import org.wpilib.driverstation.DriverStation;
 import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.system.Watchdog;
 
 /**
  * IterativeRobotBase implements a specific type of robot program framework, extending the RobotBase

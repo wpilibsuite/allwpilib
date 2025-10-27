@@ -8,6 +8,8 @@ import org.wpilib.math.jni.EigenJNI;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.linalg.proto.MatrixProto;
 import org.wpilib.math.linalg.struct.MatrixStruct;
+import org.wpilib.math.util.Nat;
+import org.wpilib.math.util.Num;
 import org.wpilib.util.protobuf.Protobuf;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.Struct;

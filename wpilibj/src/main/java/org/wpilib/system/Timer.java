@@ -4,6 +4,8 @@
 
 package org.wpilib.system;
 
+import org.wpilib.driverstation.DriverStation;
+
 /**
  * A timer class.
  *

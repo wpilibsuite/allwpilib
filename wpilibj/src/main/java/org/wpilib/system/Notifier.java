@@ -6,7 +6,9 @@ package org.wpilib.system;
 
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
+import org.wpilib.driverstation.DriverStation;
 import org.wpilib.hardware.hal.NotifierJNI;
+import org.wpilib.system.RobotController;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 

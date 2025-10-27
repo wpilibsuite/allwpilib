@@ -4,6 +4,7 @@
 
 package org.wpilib.system;
 
+import org.wpilib.driverstation.DriverStation;
 import org.wpilib.hardware.hal.NotifierJNI;
 import java.io.Closeable;
 import java.util.PriorityQueue;
