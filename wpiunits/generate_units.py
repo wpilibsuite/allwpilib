@@ -353,7 +353,7 @@ def generate_units(output_directory: Path, template_directory: Path):
     )
 
     interfaceTemplate = env.get_template("Measure-implementation.java.jinja")
-    rootPath = output_directory / "main/java/edu/wpi/first/units"
+    rootPath = output_directory / "main/java/org/wpilib/units"
 
     helpers = {
         "type_decl": type_decl,
