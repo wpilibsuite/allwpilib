@@ -83,8 +83,8 @@ public class EdgeCounterFilter {
   /**
    * Sets the time window duration.
    *
-   * @param windowTime The maximum window of seconds in which all required edges must
-   *     occur after the first rising edge.
+   * @param windowTime The maximum window of seconds in which all required edges must occur after
+   *     the first rising edge.
    */
   public void setWindowTime(double windowTime) {
     m_windowTimeSeconds = windowTime;
