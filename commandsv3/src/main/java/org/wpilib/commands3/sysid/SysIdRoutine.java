@@ -58,16 +58,16 @@ public class SysIdRoutine extends SysIdRoutineLog {
   /** Hardware-independent configuration for a SysId test routine. */
   public static class Config {
     /** The voltage ramp rate used for quasistatic test routines. */
-    public final Velocity<VoltageUnit> m_rampRate;
+    final Velocity<VoltageUnit> m_rampRate;
 
     /** The step voltage output used for dynamic test routines. */
-    public final Voltage m_stepVoltage;
+    final Voltage m_stepVoltage;
 
     /** Safety timeout for the test routine commands. */
-    public final Time m_timeout;
+    final Time m_timeout;
 
     /** Optional handle for recording test state in a third-party logging solution. */
-    public final Consumer<State> m_recordState;
+    final Consumer<State> m_recordState;
 
     /** Default voltage ramp rate used in quasistatic test routines, set to 1 volt per second. */
     public static final Velocity<VoltageUnit> DEFAULT_RAMP_RATE = Volts.of(1).per(Second);
@@ -140,19 +140,19 @@ public class SysIdRoutine extends SysIdRoutineLog {
    */
   public static class SysIdMechanism {
     /** Sends the SysId-specified drive signal to the mechanism motors during test routines. */
-    public final Consumer<? super Voltage> m_drive;
+    final Consumer<? super Voltage> m_drive;
 
     /**
      * Returns measured data (voltages, positions, velocities) of the mechanism motors during test
      * routines.
      */
-    public final Consumer<SysIdRoutineLog> m_log;
+    final Consumer<SysIdRoutineLog> m_log;
 
     /** The subsystem containing the motor(s) that is (or are) being characterized. */
-    private final Mechanism m_subsystem;
+    final Mechanism m_subsystem;
 
     /** The name of the mechanism being tested. */
-    public final String m_name;
+    final String m_name;
 
     /**
      * Create a new mechanism specification for a SysId routine.
