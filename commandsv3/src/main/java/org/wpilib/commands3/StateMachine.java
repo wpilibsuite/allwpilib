@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.SequencedMap;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
-import org.wpilib.annotation.PostConstructionInitializer;
 import org.wpilib.annotation.NoDiscard;
+import org.wpilib.annotation.PostConstructionInitializer;
 
 /**
  * A declarative state machine that can be used to implement complex command routines. State machine
