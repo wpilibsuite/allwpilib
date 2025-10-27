@@ -296,8 +296,8 @@ class WPILIB_DLLEXPORT Quaternion {
     // 𝑣⃗ = θ * v̂
     // v̂ = 𝑣⃗ / θ
 
-    // 𝑞 = std::cos(θ/2) + std::sin(θ/2) * v̂
-    // 𝑞 = std::cos(θ/2) + std::sin(θ/2) / θ * 𝑣⃗
+    // 𝑞 = cos(θ/2) + sin(θ/2) * v̂
+    // 𝑞 = cos(θ/2) + sin(θ/2) / θ * 𝑣⃗
 
     double theta = gcem::hypot(rvec(0), rvec(1), rvec(2));
     double cos = gcem::cos(theta / 2);

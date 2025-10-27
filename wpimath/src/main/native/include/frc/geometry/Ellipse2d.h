@@ -91,7 +91,7 @@ class WPILIB_DLLEXPORT Ellipse2d {
     auto a = units::math::max(m_xSemiAxis, m_ySemiAxis);
 
     // Minor semi-axis
-    auto b = units::math::min(m_xSemiAxis, m_ySemiAxis);  // NOLINT
+    auto b = units::math::min(m_xSemiAxis, m_ySemiAxis);
 
     auto c = units::math::sqrt(a * a - b * b);
 
@@ -203,7 +203,9 @@ class WPILIB_DLLEXPORT Ellipse2d {
     auto x = rotPoint.X() - m_center.X();
     auto y = rotPoint.Y() - m_center.Y();
 
+    // NOLINTNEXTLINE (bugprone-integer-division)
     return (x * x) / (m_xSemiAxis * m_xSemiAxis) +
+           // NOLINTNEXTLINE (bugprone-integer-division)
            (y * y) / (m_ySemiAxis * m_ySemiAxis);
   }
 };
