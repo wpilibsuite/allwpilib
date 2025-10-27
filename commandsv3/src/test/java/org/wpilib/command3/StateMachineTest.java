@@ -19,10 +19,12 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
+import org.wpilib.annotation.PostConstructionInitializer;
 
 @SuppressWarnings("PMD.CompareObjectsWithEquals")
 class StateMachineTest extends CommandTestBase {
   @Test
+  @SuppressWarnings(PostConstructionInitializer.SUPPRESSION_KEY)
   void errorsWithoutInitialState() {
     Mechanism mech = new Mechanism("Mechanism", m_scheduler);
     Command command1 = mech.run(Coroutine::park).named("Command 1");
@@ -31,9 +33,13 @@ class StateMachineTest extends CommandTestBase {
     StateMachine stateMachine = new StateMachine("State Machine");
     var state1 = stateMachine.addState(command1);
     var state2 = stateMachine.addState(command2);
+    // stateMachine.setInitialState(state1); // Oops, someone forgot to set the initial state!
     state1.switchTo(state2).whenComplete();
 
     m_scheduler.schedule(stateMachine);
+
+    // Don't worry, it'll be caught at runtime.
+    // It would actually be caught at compile time, but we disabled the compiler check for this test
     var exception = assertThrows(IllegalStateException.class, () -> m_scheduler.run());
     assertEquals(
         "State Machine does not have an initial state. Use .setInitialState() to provide one.",

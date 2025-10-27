@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.SequencedMap;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
+import org.wpilib.annotation.PostConstructionInitializer;
 import org.wpilib.annotation.NoDiscard;
 
 /**
@@ -28,6 +29,9 @@ import org.wpilib.annotation.NoDiscard;
  * State state1 = stateMachine.addState(...);
  * State state2 = stateMachine.addState(...);
  * State state3 = stateMachine.addState(...);
+ *
+ * // Set initial state
+ * stateMachine.setInitialState(state1);
  *
  * // Declare transitions
  * state1.switchTo(state2).when(...);
@@ -131,10 +135,15 @@ public final class StateMachine implements Command {
   }
 
   /**
-   * Sets the initial state for the state machine.
+   * Sets the initial state for the state machine. This must be called before the state machine is
+   * scheduled. Failure to do so will result in an {@link IllegalStateException} being thrown when
+   * the state machine is started. Usage of this method is enforced by the WPILib compiler plugin;
+   * creating a state machine and neglecting to call this method will result in a compilation error.
    *
    * @param initialState The new initial state. Cannot be null.
+   * @see PostConstructionInitializer
    */
+  @PostConstructionInitializer
   public void setInitialState(State initialState) {
     requireNonNullParam(initialState, "initialState", "StateMachine.setInitialState");
     if (!this.equals(initialState.m_stateMachine)) {
