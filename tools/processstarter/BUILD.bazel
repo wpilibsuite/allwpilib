@@ -3,18 +3,15 @@ load("//shared/bazel/rules:objectivec_rules.bzl", "wpilib_objc_library")
 load("//shared/bazel/rules:packaging.bzl", "package_binary_cc_project")
 
 WIN_SRCS = glob([
-    "src/main/native/windows/**/*.cpp",
-    "src/main/native/windows/**/*.h",
+    "src/main/native/windows/**",
 ])
 
 LINUX_SRCS = glob([
-    "src/main/native/linux/**/*.cpp",
-    "src/main/native/linux/**/*.h",
+    "src/main/native/linux/**",
 ])
 
 MAC_SRCS = glob([
-    "src/main/native/osx/**/*.mm",
-    "src/main/native/osx/**/*.h",
+    "src/main/native/osx/**",
 ])
 
 filegroup(

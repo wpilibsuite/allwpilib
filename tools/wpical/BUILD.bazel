@@ -228,7 +228,7 @@ cc_test(
         "src/main/native/assets/fieldvideo",
     ],
     defines = [
-        'PROJECT_ROOT_PATH=\\"wpical/src/main/native/assets\\"',
+        'PROJECT_ROOT_PATH=\\"tools/wpical/src/main/native/assets\\"',
         "__BAZEL__=1",
     ],
     deps = [
