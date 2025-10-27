@@ -8,14 +8,14 @@ void ResetSmartDashboardInstance();
 void ResetMotorSafety();
 } // namespace wpi::impl
 
-namespace wpi::impl {
+namespace wpi::util::impl {
 void ResetSendableRegistry();
 } // namespace wpi::impl
 
 void resetWpilibSimulationData() {
   wpi::impl::ResetSmartDashboardInstance();
   wpi::impl::ResetMotorSafety();
-  wpi::impl::ResetSendableRegistry();
+  wpi::util::impl::ResetSendableRegistry();
 }
 
 void resetMotorSafety() {

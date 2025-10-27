@@ -18,7 +18,7 @@ namespace wpi::romi {
  *
  * A general use PWM motor controller representing the motors on a Romi robot
  */
-class RomiMotor : public PWMMotorController {
+class RomiMotor : public wpi::PWMMotorController {
  public:
   /**
    * Constructor for a RomiMotor.
