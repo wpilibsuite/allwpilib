@@ -46,10 +46,10 @@ class WPILIB_DLLEXPORT EdgeCounterFilter {
   /**
    * Sets the time window duration.
    *
-   * @param window The maximum time window in which all required edges must
+   * @param windowTime The maximum time window in which all required edges must
    *               occur after the first rising edge.
    */
-  constexpr void SetWindowTime(units::second_t time) { m_windowTime = time; }
+  constexpr void SetWindowTime(units::second_t windowTime) { m_windowTime = windowTime; }
 
   /**
    * Gets the time window duration.
