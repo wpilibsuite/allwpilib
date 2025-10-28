@@ -3,9 +3,6 @@ apply from: "${rootDir}/shared/resources.gradle"
 apply plugin: 'c'
 ext {
     noWpiutil = true
-    skipJniSymbols = [
-        'Java_edu_wpi_first_util_CombinedRuntimeLoader_setDllDirectory'
-    ]
     baseId = 'wpiutil'
     groupId = 'edu.wpi.first.wpiutil'
 
