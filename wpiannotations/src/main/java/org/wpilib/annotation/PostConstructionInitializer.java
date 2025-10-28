@@ -30,9 +30,9 @@ import java.lang.annotation.Target;
  *
  * }</pre>
  *   <li>Static initializer methods must accept exactly one parameter of the type that defines the
- *   static method (they cannot accept a parameter of a supertype or derived type).
+ *       static method (they cannot accept a parameter of a supertype or derived type).
  *   <li>Static initializer methods with multiple parameters of the initialized type must annotate
- *   one of them with {@link InitializedParam} to disambiguate for the compiler.
+ *       one of them with {@link InitializedParam} to disambiguate for the compiler.
  * </ul>
  *
  * <p>Errors reported by the compiler plugin may be suppressed by annotating the offending method
@@ -87,6 +87,5 @@ public @interface PostConstructionInitializer {
    */
   @Target(ElementType.PARAMETER)
   @Retention(RetentionPolicy.RUNTIME)
-  @interface InitializedParam {
-  }
+  @interface InitializedParam {}
 }
