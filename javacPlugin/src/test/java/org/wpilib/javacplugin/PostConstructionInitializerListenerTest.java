@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 
 class PostConstructionInitializerListenerTest {
   @Test
-  void initializerIsUsed() {
+  void instanceInitializerIsUsed() {
     String source =
         """
         package frc.robot;
@@ -42,7 +42,7 @@ class PostConstructionInitializerListenerTest {
   }
 
   @Test
-  void initializerIsNotUsed() {
+  void instanceInitializerIsNotUsed() {
     String source =
         """
         package frc.robot;
@@ -74,7 +74,7 @@ class PostConstructionInitializerListenerTest {
   }
 
   @Test
-  void initializerIsUsedInFactory() {
+  void instanceInitializerIsUsedInFactory() {
     String source =
         """
         package frc.robot;
@@ -106,7 +106,7 @@ class PostConstructionInitializerListenerTest {
   }
 
   @Test
-  void initializerCalledInInnerBlock() {
+  void instanceInitializerCalledInInnerBlock() {
     String source =
         """
         package frc.robot;
@@ -133,6 +133,100 @@ class PostConstructionInitializerListenerTest {
             .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
+  }
+
+  @Test
+  void instanceInitializerInConstructorDoesNotCount() {
+    String source =
+        """
+        package frc.robot;
+
+        import org.wpilib.annotation.PostConstructionInitializer;
+
+        class Example {
+          public Example() {
+            init();
+          }
+
+          @PostConstructionInitializer
+          void init() { }
+
+          static void usage() {
+            var example = new Example();
+          }
+        }
+      """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(kJavaVersionOptions)
+            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+
+    assertThat(compilation).failed();
+    assertEquals(1, compilation.errors().size());
+    var error = compilation.errors().get(0);
+    assertEquals(
+        "Partially-initialized object `example` is missing a call to initializer method `init()`",
+        error.getMessage(null));
+  }
+
+  @Test
+  void staticInitializerIsUsed() {
+    String source =
+        """
+        package frc.robot;
+
+        import org.wpilib.annotation.PostConstructionInitializer;
+
+        class Example {
+          @PostConstructionInitializer
+          static void init(Example e) { }
+
+          static void usage() {
+            var example = new Example();
+            Example.init(example);
+          }
+        }
+      """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(kJavaVersionOptions)
+            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+
+    assertThat(compilation).succeededWithoutWarnings();
+  }
+
+  @Test
+  void staticInitializerIsNotUsed() {
+    String source =
+        """
+        package frc.robot;
+
+        import org.wpilib.annotation.PostConstructionInitializer;
+
+        class Example {
+          @PostConstructionInitializer
+          static void init(Example e) { }
+
+          static void usage() {
+            var example = new Example();
+            // Example.init(example);
+          }
+        }
+      """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(kJavaVersionOptions)
+            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+
+    assertThat(compilation).failed();
+    assertEquals(1, compilation.errors().size());
+    var error = compilation.errors().get(0);
+    assertEquals(
+        "Partially-initialized object `example` is missing a call to initializer method `init()`",
+        error.getMessage(null));
   }
 
   @Test

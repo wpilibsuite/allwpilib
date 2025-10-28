@@ -17,10 +17,6 @@ import java.lang.annotation.Target;
  * <p>Limitations of this annotation:
  *
  * <ul>
- *   <li>Annotated methods cannot be static
- *   <li>Annotated methods must have at least the same access modifiers as the class they are in
- *       (e.g., annotated method in a public class must be public; annotated methods in a protected
- *       class must be protected or public)
  *   <li>Initializer methods must be called on the variable directly. They cannot be detected if
  *       called indirectly (e.g., on an object returned by a method)
  *       <pre>{@code
@@ -33,6 +29,10 @@ import java.lang.annotation.Target;
  * box.getFoo().init();
  *
  * }</pre>
+ *   <li>Static initializer methods must accept exactly one parameter of the type that defines the
+ *   static method (they cannot accept a parameter of a supertype or derived type).
+ *   <li>Static initializer methods with multiple parameters of the initialized type must annotate
+ *   one of them with {@link InitializedParam} to disambiguate for the compiler.
  * </ul>
  *
  * <p>Errors reported by the compiler plugin may be suppressed by annotating the offending method
@@ -49,4 +49,44 @@ public @interface PostConstructionInitializer {
    * messages related to this annotation.
    */
   String SUPPRESSION_KEY = "PostConstructionInitializer";
+
+  /**
+   * Marks a specific parameter in a static initializer method as being the initialized object. This
+   * disambiguates situations where static initializer methods accept multiple arguments of the same
+   * initialize-required type; for example:
+   *
+   * <pre>{@code
+   * class Foo {
+   *   @PostConstructionInitializer
+   *   static void copy(Foo src, @InitializedParam Foo dst) {
+   *     // ...
+   *   }
+   * }
+   * }</pre>
+   *
+   * <p>Static initializer methods must have a parameter of the exact type that defines the static
+   * method.
+   *
+   * <pre>{@code
+   * interface I {
+   *   @PostConstructionInitializer
+   *   static void init(I object) { ... }
+   * }
+   *
+   * class Foo implements I {
+   *   @PostConstructionInitializer
+   *   static void initFoo(Foo foo) { ... } // OK
+   *
+   *   @PostConstructionInitializer
+   *   static void initI(I object) { ... } // ERROR: I is not Foo
+   *
+   *   @PostConstructionInitializer
+   *   static void initOther(SomeOtherType o) { ... } // ERROR: SomeOtherType is not Foo
+   * }
+   * }</pre>
+   */
+  @Target(ElementType.PARAMETER)
+  @Retention(RetentionPolicy.RUNTIME)
+  @interface InitializedParam {
+  }
 }

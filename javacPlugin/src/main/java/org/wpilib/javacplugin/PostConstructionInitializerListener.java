@@ -7,6 +7,7 @@ package org.wpilib.javacplugin;
 import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.BlockTree;
 import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.NewClassTree;
@@ -24,11 +25,8 @@ import java.util.Map;
 import java.util.SequencedSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
@@ -37,8 +35,8 @@ import javax.tools.Diagnostic;
 import org.wpilib.annotation.PostConstructionInitializer;
 
 /**
- * Ensures methods tagged with {@link org.wpilib.annotation.PostConstructionInitializer} are called
- * after the owning object is constructed.
+ * Ensures methods tagged with {@link PostConstructionInitializer} are called after the owning
+ * object is constructed.
  */
 public class PostConstructionInitializerListener implements TaskListener {
   private final JavacTask m_task;
@@ -108,38 +106,11 @@ public class PostConstructionInitializerListener implements TaskListener {
     // Elements#getAllMembers returns all members including inherited ones (classes + interfaces)
     for (Element member : m_task.getElements().getAllMembers(typeElement)) {
       if (member instanceof ExecutableElement method) {
-        // Skip static methods; the annotation docs disallow static use
-        if (method.getModifiers().contains(Modifier.STATIC)) {
+        if (method.getAnnotation(PostConstructionInitializer.class) == null) {
           continue;
         }
-        if (typeElement.getModifiers().contains(Modifier.PUBLIC)) {
-          if (!method.getModifiers().contains(Modifier.PUBLIC)) {
-            // Method has lower visibility than the owning type
-            // TODO: Compiler error?
-            continue;
-          }
-        } else if (typeElement.getModifiers().contains(Modifier.PROTECTED)) {
-          if (!method.getModifiers().contains(Modifier.PROTECTED)
-              && !method.getModifiers().contains(Modifier.PUBLIC)) {
-            // Method has lower visibility than the owning type
-            // TODO: Compiler error?
-            continue;
-          }
-        } else if (typeElement.getModifiers().contains(Modifier.PRIVATE)) {
-          // doesn't matter what the method's visibility is
-        } else {
-          // package-private
-          if (method.getModifiers().contains(Modifier.PRIVATE)) {
-            // Method has lower visibility than the owning type
-            // TODO: Compiler error?
-            continue;
-          }
-        }
 
-        // Check for the annotation
-        if (method.getAnnotation(PostConstructionInitializer.class) != null) {
-          methods.add(method);
-        }
+        methods.add(method);
       }
     }
 
@@ -164,6 +135,10 @@ public class PostConstructionInitializerListener implements TaskListener {
         return;
       }
       m_initializedObjects.put(object, new InitializedObject(object, requiredInitializers));
+    }
+
+    boolean isTracking(VariableElement e) {
+      return m_initializedObjects.containsKey(e);
     }
 
     void removeFullyInitializedObjects() {
@@ -251,7 +226,7 @@ public class PostConstructionInitializerListener implements TaskListener {
 
       TreePath path = m_trees.getPath(m_root, node);
 
-      if (isSuppressed(path)) {
+      if (Suppressions.hasSuppression(m_trees, path, PostConstructionInitializer.SUPPRESSION_KEY)) {
         // Warnings are suppressed in this context, ignore
         return super.visitNewClass(node, workingState);
       }
@@ -290,9 +265,39 @@ public class PostConstructionInitializerListener implements TaskListener {
 
       if (node.getMethodSelect() instanceof MemberSelectTree variableTree) {
         var element = m_trees.getElement(m_trees.getPath(m_root, variableTree.getExpression()));
-        if (element instanceof VariableElement v
-            && workingState.m_initializedObjects.containsKey(v)) {
-          workingState.removeInitializer(v, executableElement);
+        switch (element) {
+          case VariableElement v when workingState.isTracking(v) -> {
+            workingState.removeInitializer(v, executableElement);
+          }
+          case TypeElement t -> {
+            // Static method call, check for a variable that's in scope that's passed to this
+            // method. If the method accepts multiple parameters of this type, then check for a
+            // parameter with the @PostConstructionInitializer.InitializedParam annotation and only
+            // look at the variable passed as that parameter.
+            List<? extends VariableElement> possibleParameters =
+                getAnnotatedParameters(executableElement, t);
+
+            if (possibleParameters.size() != 1) {
+              // This condition is enforced by the annotation processor, which runs before this
+              // plugin. If there's an error with the setup, users will already see a compiler error
+              break;
+            }
+
+            VariableElement param = possibleParameters.get(0);
+            // Find the argument at the same index as the parameter and, if it refers to a
+            // tracked variable/field, mark its initializer as called.
+            int paramIndex = executableElement.getParameters().indexOf(param);
+            if (paramIndex >= 0 && paramIndex < node.getArguments().size()) {
+              ExpressionTree argument = node.getArguments().get(paramIndex);
+              Element argElement = m_trees.getElement(m_trees.getPath(m_root, argument));
+              if (argElement instanceof VariableElement v && workingState.isTracking(v)) {
+                workingState.removeInitializer(v, executableElement);
+              }
+            }
+          }
+          default -> {
+            // Ignore
+          }
         }
       }
       workingState.removeFullyInitializedObjects();
@@ -301,60 +306,11 @@ public class PostConstructionInitializerListener implements TaskListener {
       return workingState;
     }
 
-    /**
-     * Checks if an element at the given path is annotated with
-     * {@code @SuppressWarnings("PostConstructionInitializer")} or {@code @SuppressWarnings("all")}.
-     * Also walks up the tree to check if any parent elements are annotated.
-     *
-     * @param path The path to check.
-     * @return True if the element is annotated with the suppression annotation. False otherwise.
-     */
-    private boolean isSuppressed(TreePath path) {
-      TreePath currentPath = path;
-      while (currentPath != null) {
-        var element = m_trees.getElement(currentPath);
-        currentPath = currentPath.getParentPath();
-
-        if (element == null) {
-          continue;
-        }
-
-        for (AnnotationMirror annotationMirror : element.getAnnotationMirrors()) {
-          var annotationType = annotationMirror.getAnnotationType().toString();
-          if (!"java.lang.SuppressWarnings".equals(annotationType)) {
-            continue;
-          }
-
-          for (var entry : annotationMirror.getElementValues().entrySet()) {
-            var name = entry.getKey().getSimpleName().toString();
-            if (!"value".equals(name)) {
-              continue;
-            }
-
-            Object value = entry.getValue().getValue();
-            if (value instanceof List<?> list) {
-              // eg @SuppressWarnings({"PostConstructionInitializer", "OtherSuppression"})
-              for (Object valueEntry : list) {
-                if (valueEntry instanceof AnnotationValue a
-                    && a.getValue() instanceof String str
-                    && isSuppressionString(str)) {
-                  return true;
-                }
-              }
-            } else if (value instanceof String str && isSuppressionString(str)) {
-              // eg @SuppressWarnings("PostConstructionInitializer")
-              return true;
-            }
-          }
-        }
-      }
-
-      // No suppression annotations found on the element or any parent element.
-      return false;
-    }
-
-    private boolean isSuppressionString(String str) {
-      return "all".equals(str) || PostConstructionInitializer.SUPPRESSION_KEY.equals(str);
+    private List<? extends VariableElement> getAnnotatedParameters(
+        ExecutableElement executableElement, TypeElement requiredType) {
+      return executableElement.getParameters().stream()
+          .filter(p -> p.asType().equals(requiredType.asType()))
+          .toList();
     }
   }
 }
