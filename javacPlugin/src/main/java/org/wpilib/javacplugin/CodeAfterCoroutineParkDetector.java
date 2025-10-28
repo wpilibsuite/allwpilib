@@ -23,6 +23,8 @@ import javax.tools.Diagnostic;
  * code, similar to a {@code while (true)} statement.
  */
 public class CodeAfterCoroutineParkDetector extends CoroutineBasedDetector {
+  public static final String SUPPRESSION_KEY = "CodeAfterCoroutinePark";
+
   public CodeAfterCoroutineParkDetector(JavacTask task) {
     super(task);
   }
@@ -42,6 +44,12 @@ public class CodeAfterCoroutineParkDetector extends CoroutineBasedDetector {
 
     @Override
     public Void visitBlock(BlockTree node, Void param) {
+      var path = m_trees.getPath(m_root, node);
+      if (Suppressions.hasSuppression(m_trees, path, SUPPRESSION_KEY)) {
+        // Error is suppressed for this block, don't bother checking
+        return super.visitBlock(node, param);
+      }
+
       MethodInvocationTree parkInvocation = null;
       for (StatementTree statement : node.getStatements()) {
         if (statement instanceof EmptyStatementTree) {

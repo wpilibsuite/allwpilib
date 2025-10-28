@@ -112,11 +112,8 @@ class CoroutineTest extends CommandTestBase {
     assertEquals("Coroutines can only be used by the command bound to them", error.getMessage());
   }
 
-  // This test is commented out because we use the compiler plugin to prevent this kind of usage.
-  // The test suite would fail to compile if this were enabled.
-
-  /*
   @Test
+  @SuppressWarnings("CoroutineMayNotBeInScope")
   void usingParentCoroutineInChildThrows() {
     var parent =
         Command.noRequirements()
@@ -136,7 +133,6 @@ class CoroutineTest extends CommandTestBase {
     var error = assertThrows(IllegalStateException.class, m_scheduler::run);
     assertEquals("Coroutines can only be used by the command bound to them", error.getMessage());
   }
-  */
 
   @Test
   void awaitAnyCleansUp() {

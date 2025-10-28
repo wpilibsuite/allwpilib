@@ -40,6 +40,9 @@ import javax.tools.Diagnostic;
  * }</pre>
  */
 public class IncorrectCoroutineUseDetector extends CoroutineBasedDetector {
+  public static final String CAPTURE_SUPPRESSION_KEY = "CoroutineCapture";
+  public static final String SCOPE_SUPPRESSION_KEY = "CoroutineMayNotBeInScope";
+
   public IncorrectCoroutineUseDetector(JavacTask task) {
     super(task);
   }
@@ -127,6 +130,12 @@ public class IncorrectCoroutineUseDetector extends CoroutineBasedDetector {
         return super.visitMethodInvocation(node, state);
       }
 
+      var path = m_trees.getPath(m_root, node);
+      if (Suppressions.hasSuppression(m_trees, path, SCOPE_SUPPRESSION_KEY)) {
+        // Suppressed this warning, bail
+        return super.visitMethodInvocation(node, state);
+      }
+
       // Check for calling a method on a nonlocal coroutine (eg `outerCoroutine.yield()`)
       var sel = node.getMethodSelect();
       if (sel instanceof MemberSelectTree ms && ms.getExpression() instanceof IdentifierTree id) {
@@ -195,6 +204,11 @@ public class IncorrectCoroutineUseDetector extends CoroutineBasedDetector {
       // coroutine.
       var variable = node.getVariable();
       var variablePath = m_trees.getPath(m_root, variable);
+      if (Suppressions.hasSuppression(m_trees, variablePath, CAPTURE_SUPPRESSION_KEY)) {
+        // User suppressed this error, skip
+        return super.visitAssignment(node, state);
+      }
+
       var variableElement = m_trees.getElement(variablePath);
       if (variableElement instanceof VariableElement ve
           && ve.getEnclosingElement() instanceof TypeElement

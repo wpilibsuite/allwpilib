@@ -33,6 +33,8 @@ import javax.tools.Diagnostic;
 // Placing it at a higher level (lambda or method declaration) would silence ALL unsafe usage in
 // that expression; it's impossible to do on a case-by-case basis.
 public class CoroutineYieldInLoopDetector extends CoroutineBasedDetector {
+  public static final String SUPPRESSION_KEY = "CoroutineYieldInLoop";
+
   public CoroutineYieldInLoopDetector(JavacTask task) {
     super(task);
   }
@@ -174,6 +176,12 @@ public class CoroutineYieldInLoopDetector extends CoroutineBasedDetector {
       if (loopState == null) {
         // Not inside a coroutine-accepting method or lambda function; bail
         return super.visitWhileLoop(node, null);
+      }
+
+      var path = m_trees.getPath(m_root, node);
+      if (Suppressions.hasSuppression(m_trees, path, SUPPRESSION_KEY)) {
+        // Error is suppressed in this context, don't bother checking
+        return super.visitWhileLoop(node, loopState);
       }
 
       if (loopState.m_loop == null) {
