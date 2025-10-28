@@ -7,10 +7,10 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/kinematics/MecanumDriveOdometry.h"
-#include "frc/trajectory/TrajectoryGenerator.h"
+#include "wpi/math/kinematics/MecanumDriveOdometry.hpp"
+#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 class MecanumDriveOdometryTest : public ::testing::Test {
  protected:
@@ -78,33 +78,36 @@ TEST_F(MecanumDriveOdometryTest, GyroAngleReset) {
 }
 
 TEST_F(MecanumDriveOdometryTest, AccuracyFacingTrajectory) {
-  frc::MecanumDriveKinematics kinematics{
-      frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
-      frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
+  wpi::math::MecanumDriveKinematics kinematics{
+      wpi::math::Translation2d{1_m, 1_m}, wpi::math::Translation2d{1_m, -1_m},
+      wpi::math::Translation2d{-1_m, -1_m},
+      wpi::math::Translation2d{-1_m, 1_m}};
 
-  frc::MecanumDriveWheelPositions wheelPositions;
+  wpi::math::MecanumDriveWheelPositions wheelPositions;
 
-  frc::MecanumDriveOdometry odometry{kinematics, frc::Rotation2d{},
-                                     wheelPositions};
+  wpi::math::MecanumDriveOdometry odometry{kinematics, wpi::math::Rotation2d{},
+                                           wheelPositions};
 
-  frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
-                  frc::Pose2d{0_m, 0_m, 135_deg},
-                  frc::Pose2d{-3_m, 0_m, -90_deg},
-                  frc::Pose2d{0_m, 0_m, 45_deg}},
-      frc::TrajectoryConfig(5.0_mps, 2.0_mps_sq));
+  wpi::math::Trajectory trajectory =
+      wpi::math::TrajectoryGenerator::GenerateTrajectory(
+          std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
+                      wpi::math::Pose2d{3_m, 0_m, -90_deg},
+                      wpi::math::Pose2d{0_m, 0_m, 135_deg},
+                      wpi::math::Pose2d{-3_m, 0_m, -90_deg},
+                      wpi::math::Pose2d{0_m, 0_m, 45_deg}},
+          wpi::math::TrajectoryConfig(5.0_mps, 2.0_mps_sq));
 
   std::default_random_engine generator;
   std::normal_distribution<double> distribution(0.0, 1.0);
 
-  units::second_t dt = 20_ms;
-  units::second_t t = 0_s;
+  wpi::units::second_t dt = 20_ms;
+  wpi::units::second_t t = 0_s;
 
   double maxError = -std::numeric_limits<double>::max();
   double errorSum = 0;
 
   while (t < trajectory.TotalTime()) {
-    frc::Trajectory::State groundTruthState = trajectory.Sample(t);
+    wpi::math::Trajectory::State groundTruthState = trajectory.Sample(t);
 
     auto wheelSpeeds = kinematics.ToWheelSpeeds(
         {groundTruthState.velocity, 0_mps,
@@ -120,10 +123,10 @@ TEST_F(MecanumDriveOdometryTest, AccuracyFacingTrajectory) {
     wheelPositions.rearLeft += wheelSpeeds.rearLeft * dt;
     wheelPositions.rearRight += wheelSpeeds.rearRight * dt;
 
-    auto xhat =
-        odometry.Update(groundTruthState.pose.Rotation() +
-                            frc::Rotation2d{distribution(generator) * 0.05_rad},
-                        wheelPositions);
+    auto xhat = odometry.Update(
+        groundTruthState.pose.Rotation() +
+            wpi::math::Rotation2d{distribution(generator) * 0.05_rad},
+        wheelPositions);
     double error = groundTruthState.pose.Translation()
                        .Distance(xhat.Translation())
                        .value();
@@ -141,33 +144,36 @@ TEST_F(MecanumDriveOdometryTest, AccuracyFacingTrajectory) {
 }
 
 TEST_F(MecanumDriveOdometryTest, AccuracyFacingXAxis) {
-  frc::MecanumDriveKinematics kinematics{
-      frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
-      frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
+  wpi::math::MecanumDriveKinematics kinematics{
+      wpi::math::Translation2d{1_m, 1_m}, wpi::math::Translation2d{1_m, -1_m},
+      wpi::math::Translation2d{-1_m, -1_m},
+      wpi::math::Translation2d{-1_m, 1_m}};
 
-  frc::MecanumDriveWheelPositions wheelPositions;
+  wpi::math::MecanumDriveWheelPositions wheelPositions;
 
-  frc::MecanumDriveOdometry odometry{kinematics, frc::Rotation2d{},
-                                     wheelPositions};
+  wpi::math::MecanumDriveOdometry odometry{kinematics, wpi::math::Rotation2d{},
+                                           wheelPositions};
 
-  frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
-                  frc::Pose2d{0_m, 0_m, 135_deg},
-                  frc::Pose2d{-3_m, 0_m, -90_deg},
-                  frc::Pose2d{0_m, 0_m, 45_deg}},
-      frc::TrajectoryConfig(5.0_mps, 2.0_mps_sq));
+  wpi::math::Trajectory trajectory =
+      wpi::math::TrajectoryGenerator::GenerateTrajectory(
+          std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
+                      wpi::math::Pose2d{3_m, 0_m, -90_deg},
+                      wpi::math::Pose2d{0_m, 0_m, 135_deg},
+                      wpi::math::Pose2d{-3_m, 0_m, -90_deg},
+                      wpi::math::Pose2d{0_m, 0_m, 45_deg}},
+          wpi::math::TrajectoryConfig(5.0_mps, 2.0_mps_sq));
 
   std::default_random_engine generator;
   std::normal_distribution<double> distribution(0.0, 1.0);
 
-  units::second_t dt = 20_ms;
-  units::second_t t = 0_s;
+  wpi::units::second_t dt = 20_ms;
+  wpi::units::second_t t = 0_s;
 
   double maxError = -std::numeric_limits<double>::max();
   double errorSum = 0;
 
   while (t < trajectory.TotalTime()) {
-    frc::Trajectory::State groundTruthState = trajectory.Sample(t);
+    wpi::math::Trajectory::State groundTruthState = trajectory.Sample(t);
 
     auto wheelSpeeds = kinematics.ToWheelSpeeds(
         {groundTruthState.velocity * groundTruthState.pose.Rotation().Cos(),
@@ -185,7 +191,8 @@ TEST_F(MecanumDriveOdometryTest, AccuracyFacingXAxis) {
     wheelPositions.rearRight += wheelSpeeds.rearRight * dt;
 
     auto xhat = odometry.Update(
-        frc::Rotation2d{distribution(generator) * 0.05_rad}, wheelPositions);
+        wpi::math::Rotation2d{distribution(generator) * 0.05_rad},
+        wheelPositions);
     double error = groundTruthState.pose.Translation()
                        .Distance(xhat.Translation())
                        .value();

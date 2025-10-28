@@ -2,14 +2,14 @@ defaults:
   subpackage: controller
 
 classes:
-  frc::HolonomicDriveController:
+  wpi::math::HolonomicDriveController:
     methods:
       HolonomicDriveController:
       AtReference:
       SetTolerance:
       Calculate:
         overloads:
-          const Pose2d&, const Pose2d&, units::meters_per_second_t, const Rotation2d&:
+          const Pose2d&, const Pose2d&, wpi::units::meters_per_second_t, const Rotation2d&:
           const Pose2d&, const Trajectory::State&, const Rotation2d&:
       SetEnabled:
       getThetaController:

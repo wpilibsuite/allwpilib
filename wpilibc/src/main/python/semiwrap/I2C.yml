@@ -1,5 +1,5 @@
 classes:
-  frc::I2C:
+  wpi::I2C:
     enums:
       Port:
     methods:

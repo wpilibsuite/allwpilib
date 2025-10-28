@@ -1,26 +1,26 @@
 extra_includes:
-- networktables/BooleanArrayTopic.h
-- networktables/BooleanTopic.h
-- networktables/DoubleArrayTopic.h
-- networktables/DoubleTopic.h
-- networktables/FloatArrayTopic.h
-- networktables/FloatTopic.h
-- networktables/IntegerArrayTopic.h
-- networktables/IntegerTopic.h
-- networktables/MultiSubscriber.h
-- networktables/RawTopic.h
-- networktables/StringArrayTopic.h
-- networktables/StringTopic.h
-- networktables/StructArrayTopic.h
-- networktables/StructTopic.h
-- networktables/Topic.h
+- wpi/nt/BooleanArrayTopic.hpp
+- wpi/nt/BooleanTopic.hpp
+- wpi/nt/DoubleArrayTopic.hpp
+- wpi/nt/DoubleTopic.hpp
+- wpi/nt/FloatArrayTopic.hpp
+- wpi/nt/FloatTopic.hpp
+- wpi/nt/IntegerArrayTopic.hpp
+- wpi/nt/IntegerTopic.hpp
+- wpi/nt/MultiSubscriber.hpp
+- wpi/nt/RawTopic.hpp
+- wpi/nt/StringArrayTopic.hpp
+- wpi/nt/StringTopic.hpp
+- wpi/nt/StructArrayTopic.hpp
+- wpi/nt/StructTopic.hpp
+- wpi/nt/Topic.hpp
 - src/py2value.h
 - src/nt_instance.h
-- wpi/datalog/DataLog.h
+- wpi/datalog/DataLog.hpp
 - wpystruct.h
 
 classes:
-  nt::NetworkTableInstance:
+  wpi::nt::NetworkTableInstance:
     force_type_casters:
     - std::function
     attributes:
@@ -29,7 +29,7 @@ classes:
       NetworkMode:
         arithmetic: true
         inline_code: |
-          .value("kNetModeStarting", (nt::NetworkTableInstance::NetworkMode)NT_NET_MODE_STARTING)
+          .value("kNetModeStarting", (wpi::nt::NetworkTableInstance::NetworkMode)NT_NET_MODE_STARTING)
       LogLevel:
     methods:
       NetworkTableInstance:
@@ -175,7 +175,7 @@ classes:
         pyntcore::onInstancePreReset(self);
         {
           py::gil_scoped_release release;
-          nt::ResetInstance(self->GetHandle());
+          wpi::nt::ResetInstance(self->GetHandle());
         }
         pyntcore::onInstancePostReset(self);
       })

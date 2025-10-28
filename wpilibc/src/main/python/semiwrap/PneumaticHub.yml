@@ -1,11 +1,11 @@
 extra_includes:
-- wpi/sendable/SendableBuilder.h
-- frc/Compressor.h
-- frc/Solenoid.h
-- frc/DoubleSolenoid.h
+- wpi/util/sendable/SendableBuilder.hpp
+- wpi/hardware/pneumatic/Compressor.hpp
+- wpi/hardware/pneumatic/Solenoid.hpp
+- wpi/hardware/pneumatic/DoubleSolenoid.hpp
 
 classes:
-  frc::PneumaticHub:
+  wpi::PneumaticHub:
     methods:
       PneumaticHub:
         overloads:
@@ -44,7 +44,7 @@ classes:
       GetAnalogVoltage:
       GetPressure:
       ReportUsage:
-  frc::PneumaticHub::Version:
+  wpi::PneumaticHub::Version:
     attributes:
       FirmwareMajor:
       FirmwareMinor:
@@ -52,7 +52,7 @@ classes:
       HardwareMinor:
       HardwareMajor:
       UniqueId:
-  frc::PneumaticHub::Faults:
+  wpi::PneumaticHub::Faults:
     attributes:
       Channel0Fault:
       Channel1Fault:
@@ -78,7 +78,7 @@ classes:
       HardwareFault:
     methods:
       GetChannelFault:
-  frc::PneumaticHub::StickyFaults:
+  wpi::PneumaticHub::StickyFaults:
     attributes:
       CompressorOverCurrent:
       CompressorOpen:

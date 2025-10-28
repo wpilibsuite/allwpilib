@@ -1,5 +1,5 @@
 classes:
-  frc::Preferences:
+  wpi::Preferences:
     methods:
       GetKeys:
       GetString:

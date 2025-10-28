@@ -10,15 +10,15 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/SmallPtrSet.h"
-#include "wpi/PointerIntPair.h"
-#include "wpi/PointerLikeTypeTraits.h"
+#include "wpi/util/SmallPtrSet.hpp"
+#include "wpi/util/PointerIntPair.hpp"
+#include "wpi/util/PointerLikeTypeTraits.hpp"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
 #include <algorithm>
 
-using namespace wpi;
+using namespace wpi::util;
 using testing::UnorderedElementsAre;
 
 TEST(SmallPtrSetTest, Assignment) {

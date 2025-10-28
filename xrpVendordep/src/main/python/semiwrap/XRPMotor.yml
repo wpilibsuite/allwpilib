@@ -1,5 +1,5 @@
 classes:
-  frc::XRPMotor:
+  wpi::xrp::XRPMotor:
     methods:
       XRPMotor:
       Set:

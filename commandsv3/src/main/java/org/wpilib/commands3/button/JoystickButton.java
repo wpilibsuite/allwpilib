@@ -4,10 +4,10 @@
 
 package org.wpilib.commands3.button;
 
-import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.wpilibj.GenericHID;
 import org.wpilib.commands3.Trigger;
+import org.wpilib.driverstation.GenericHID;
 
 /** A {@link Trigger} that gets its state from a {@link GenericHID}. */
 public class JoystickButton extends Trigger {

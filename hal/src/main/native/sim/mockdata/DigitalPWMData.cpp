@@ -5,16 +5,16 @@
 #include "../PortsInternal.h"
 #include "DigitalPWMDataInternal.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeDigitalPWMData() {
   static DigitalPWMData sdpd[kNumDigitalPWMOutputs];
-  ::hal::SimDigitalPWMData = sdpd;
+  ::wpi::hal::SimDigitalPWMData = sdpd;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-DigitalPWMData* hal::SimDigitalPWMData;
+DigitalPWMData* wpi::hal::SimDigitalPWMData;
 void DigitalPWMData::ResetData() {
   initialized.Reset(false);
   dutyCycle.Reset(0.0);

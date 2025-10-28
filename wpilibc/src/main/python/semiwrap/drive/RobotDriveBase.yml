@@ -1,9 +1,9 @@
 extra_includes:
-- frc/motorcontrol/MotorController.h
-- wpi/SmallString.h
+- wpi/hardware/motor/MotorController.hpp
+- wpi/util/SmallString.hpp
 
 classes:
-  frc::RobotDriveBase:
+  wpi::RobotDriveBase:
     attributes:
       m_deadband:
       m_maxOutput:

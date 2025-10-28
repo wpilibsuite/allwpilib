@@ -1,10 +1,10 @@
 extra_includes:
-- frc/smartdashboard/MechanismLigament2d.h
+- wpi/smartdashboard/MechanismLigament2d.hpp
 
 classes:
-  frc::MechanismObject2d:
+  wpi::MechanismObject2d:
     force_type_casters:
-    - units::degree_t
+    - wpi::units::degree_t
     attributes:
       m_mutex:
         ignore: true
@@ -20,12 +20,12 @@ classes:
 inline_code: |-
   cls_MechanismObject2d
     .def("appendLigament", [](MechanismObject2d *self,
-      std::string_view name, double length, units::degree_t angle,
-      double lineWidth, const frc::Color8Bit& color) {
+      std::string_view name, double length, wpi::units::degree_t angle,
+      double lineWidth, const wpi::Color8Bit& color) {
         return self->Append<MechanismLigament2d>(name, length, angle, lineWidth, color);
       },
       py::arg("name"), py::arg("length"), py::arg("angle"),
-      py::arg("lineWidth") = 6, py::arg("color") = frc::Color8Bit{235, 137, 52},
+      py::arg("lineWidth") = 6, py::arg("color") = wpi::Color8Bit{235, 137, 52},
       "Append a ligament node",
       py::return_value_policy::reference_internal)
     ;

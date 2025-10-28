@@ -1,4 +1,4 @@
 classes:
-  frc::Koors40:
+  wpi::Koors40:
     methods:
       Koors40:

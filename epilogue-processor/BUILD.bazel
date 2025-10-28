@@ -7,12 +7,12 @@ wpilib_java_library(
     srcs = glob(["src/main/java/**/*.java"]),
     extra_source_pkgs = ["resources"],
     maven_artifact_name = "epilogue-processor-java",
-    maven_group_id = "edu.wpi.first.epilogue",
+    maven_group_id = "org.wpilib.epilogue",
     resource_strip_prefix = "epilogue-processor/src/main/resources/",
     resources = glob(["src/main/resources/**"]),
     visibility = ["//visibility:public"],
     runtime_deps = [
-        "//wpilibNewCommands:wpilibNewCommands-java",
+        "//commandsv2:commandsv2-java",
     ],
     deps = [
         "//epilogue-runtime:epilogue-java",
@@ -27,7 +27,7 @@ pkg_files(
 
 java_plugin(
     name = "plugin",
-    processor_class = "edu.wpi.first.epilogue.processor.AnnotationProcessor",
+    processor_class = "org.wpilib.epilogue.processor.AnnotationProcessor",
     visibility = ["//visibility:public"],
     deps = [
         ":processor-java",

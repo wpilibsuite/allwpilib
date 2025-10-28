@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/Ports.h"
+#include "wpi/hal/Ports.h"
 
 #include "PortsInternal.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializePorts() {}
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 int32_t HAL_GetNumCanBuses(void) {

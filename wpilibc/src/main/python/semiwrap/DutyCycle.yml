@@ -1,10 +1,10 @@
 extra_includes:
-- wpi/sendable/SendableBuilder.h
+- wpi/util/sendable/SendableBuilder.hpp
 
 classes:
-  frc::DutyCycle:
+  wpi::DutyCycle:
     ignored_bases:
-    - wpi::SendableHelper<DutyCycle>
+    - wpi::util::SendableHelper<DutyCycle>
     methods:
       DutyCycle:
         overloads:

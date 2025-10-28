@@ -1,10 +1,10 @@
 extra_includes:
-- wpi/sendable/SendableBuilder.h
+- wpi/util/sendable/SendableBuilder.hpp
 
 classes:
-  frc::PowerDistribution:
+  wpi::PowerDistribution:
     ignored_bases:
-    - wpi::SendableHelper<PowerDistribution>
+    - wpi::util::SendableHelper<PowerDistribution>
     attributes:
       kDefaultModule:
     enums:
@@ -32,7 +32,7 @@ classes:
       GetNumChannels:
       GetAllCurrents:
       InitSendable:
-  frc::PowerDistribution::Version:
+  wpi::PowerDistribution::Version:
     attributes:
       FirmwareMajor:
       FirmwareMinor:
@@ -40,7 +40,7 @@ classes:
       HardwareMinor:
       HardwareMajor:
       UniqueId:
-  frc::PowerDistribution::Faults:
+  wpi::PowerDistribution::Faults:
     attributes:
       Channel0BreakerFault:
       Channel1BreakerFault:
@@ -71,7 +71,7 @@ classes:
       HardwareFault:
     methods:
       GetBreakerFault:
-  frc::PowerDistribution::StickyFaults:
+  wpi::PowerDistribution::StickyFaults:
     attributes:
       Channel0BreakerFault:
       Channel1BreakerFault:

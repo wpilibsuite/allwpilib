@@ -1,8 +1,8 @@
 extra_includes:
-- frc/DutyCycle.h
+- wpi/hardware/rotation/DutyCycle.hpp
 
 classes:
-  frc::sim::DutyCycleSim:
+  wpi::sim::DutyCycleSim:
     force_type_casters:
     - std::function
     methods:

@@ -1,10 +1,10 @@
 extra_includes:
-- wpi/sendable/SendableBuilder.h
+- wpi/util/sendable/SendableBuilder.hpp
 
 classes:
-  frc::SharpIR:
+  wpi::SharpIR:
     ignored_bases:
-    - wpi::SendableHelper<SharpIR>
+    - wpi::util::SendableHelper<SharpIR>
     methods:
       GP2Y0A02YK0F:
       GP2Y0A21YK0F:

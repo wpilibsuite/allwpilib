@@ -1,8 +1,8 @@
 extra_includes:
-- frc/Joystick.h
+- wpi/driverstation/Joystick.hpp
 
 classes:
-  frc::sim::JoystickSim:
+  wpi::sim::JoystickSim:
     force_no_trampoline: true
     methods:
       JoystickSim:

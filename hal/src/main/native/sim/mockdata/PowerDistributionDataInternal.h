@@ -5,10 +5,10 @@
 #pragma once
 
 #include "../PortsInternal.h"
-#include "hal/simulation/PowerDistributionData.h"
-#include "hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/PowerDistributionData.h"
+#include "wpi/hal/simulation/SimDataValue.h"
 
-namespace hal {
+namespace wpi::hal {
 
 class PowerDistributionData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
@@ -31,4 +31,4 @@ class PowerDistributionData {
   virtual void ResetData();
 };
 extern PowerDistributionData* SimPowerDistributionData;
-}  // namespace hal
+}  // namespace wpi::hal

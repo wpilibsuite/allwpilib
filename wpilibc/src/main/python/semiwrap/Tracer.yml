@@ -1,9 +1,9 @@
 extra_includes:
-- wpi/SmallString.h
-- wpi/raw_ostream.h
+- wpi/util/SmallString.hpp
+- wpi/util/raw_ostream.hpp
 
 classes:
-  frc::Tracer:
+  wpi::Tracer:
     methods:
       Tracer:
       ResetTimer:
@@ -12,15 +12,15 @@ classes:
       PrintEpochs:
         overloads:
           '':
-          wpi::raw_ostream&:
+          wpi::util::raw_ostream&:
             ignore: true
 
 inline_code: |-
   cls_Tracer
     .def("getEpochs",
       [](Tracer * self) -> py::str {
-        wpi::SmallString<128> buf;
-        wpi::raw_svector_ostream s(buf);
+        wpi::util::SmallString<128> buf;
+        wpi::util::raw_svector_ostream s(buf);
         self->PrintEpochs(s);
         return py::cast(s.str());
       },

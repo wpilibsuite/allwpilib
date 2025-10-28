@@ -1,10 +1,10 @@
 extra_includes:
-- wpi/sendable/SendableBuilder.h
+- wpi/util/sendable/SendableBuilder.hpp
 
 classes:
-  frc::PWMMotorController:
+  wpi::PWMMotorController:
     ignored_bases:
-    - wpi::SendableHelper<PWMMotorController>
+    - wpi::util::SendableHelper<PWMMotorController>
     attributes:
       m_pwm:
     methods:

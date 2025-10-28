@@ -9,7 +9,7 @@ functions:
     # work around GCC 10 issue on raspbian
     cpp_code: |
       [](int64_t x, int64_t y) -> int64_t {
-        return frc::FloorDiv(x, y);
+        return wpi::math::FloorDiv(x, y);
       }
   FloorMod:
     template_impls:
@@ -17,7 +17,7 @@ functions:
     # work around GCC 10 issue on raspbian
     cpp_code: |
       [](int64_t x, int64_t y) -> int64_t {
-        return frc::FloorMod(x, y);
+        return wpi::math::FloorMod(x, y);
       }
   ApplyDeadband:
     param_override:
@@ -43,5 +43,5 @@ functions:
         - [double]
   SlewRateLimit:
     overloads:
-      const Translation2d&, const Translation2d&, units::second_t, units::meters_per_second_t:
-      const Translation3d&, const Translation3d&, units::second_t, units::meters_per_second_t:
+      const Translation2d&, const Translation2d&, wpi::units::second_t, wpi::units::meters_per_second_t:
+      const Translation3d&, const Translation3d&, wpi::units::second_t, wpi::units::meters_per_second_t:

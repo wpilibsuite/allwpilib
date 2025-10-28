@@ -1,0 +1,33 @@
+cppHeaderFileInclude {
+  \.h$
+  \.inc$
+  \.inl$
+}
+
+cppSrcFileInclude {
+  \.cpp$
+}
+
+generatedFileExclude {
+  src/main/native/resources/
+  src/main/native/win/outlineviewer.ico
+  src/main/native/mac/ov.icns
+}
+
+repoRootNameOverride {
+  outlineviewer
+}
+
+includeOtherLibs {
+  ^GLFW
+  ^fmt/
+  ^gtest/
+  ^imgui
+  ^implot\.h$
+  ^portable-file-dialogs\.h$
+  ^wpi/glass/
+  ^wpi/ntcore
+  ^wpi/units/
+  ^wpi/util/
+  ^wpi/gui
+}

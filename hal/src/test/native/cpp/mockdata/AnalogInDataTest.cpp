@@ -6,12 +6,12 @@
 
 #include <gtest/gtest.h>
 
-#include "hal/AnalogInput.h"
-#include "hal/HAL.h"
-#include "hal/handles/HandlesInternal.h"
-#include "hal/simulation/AnalogInData.h"
+#include "wpi/hal/AnalogInput.h"
+#include "wpi/hal/HAL.h"
+#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/hal/simulation/AnalogInData.h"
 
-namespace hal {
+namespace wpi::hal {
 
 std::string gTestAnalogInCallbackName;
 HAL_Value gTestAnalogInCallbackValue;
@@ -66,7 +66,7 @@ TEST(AnalogInSimTest, AnalogInInitialization) {
   EXPECT_STREQ("Unset", gTestAnalogInCallbackName.c_str());
 
   // Reset, should allow you to re-register
-  hal::HandleBase::ResetGlobalHandles();
+  wpi::hal::HandleBase::ResetGlobalHandles();
   HALSIM_ResetAnalogInData(INDEX_TO_TEST);
   callbackId = HALSIM_RegisterAnalogInInitializedCallback(
       INDEX_TO_TEST, &TestAnalogInInitializationCallback, &callbackParam,
@@ -81,4 +81,4 @@ TEST(AnalogInSimTest, AnalogInInitialization) {
   EXPECT_STREQ("Initialized", gTestAnalogInCallbackName.c_str());
   HALSIM_CancelAnalogInInitializedCallback(INDEX_TO_TEST, callbackId);
 }
-}  // namespace hal
+}  // namespace wpi::hal

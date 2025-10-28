@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/interpolating_map.h"  // NOLINT(build/include_order)
+#include "wpi/util/interpolating_map.hpp"  // NOLINT(build/include_order)
 
 #include <gtest/gtest.h>
 
 TEST(InterpolatingMapTest, Insert) {
-  wpi::interpolating_map<double, double> table;
+  wpi::util::interpolating_map<double, double> table;
 
   table.insert(125, 450);
   table.insert(200, 510);
@@ -35,7 +35,7 @@ TEST(InterpolatingMapTest, Insert) {
 }
 
 TEST(InterpolatingMapTest, Clear) {
-  wpi::interpolating_map<double, double> table;
+  wpi::util::interpolating_map<double, double> table;
 
   table.insert(125, 450);
   table.insert(200, 510);

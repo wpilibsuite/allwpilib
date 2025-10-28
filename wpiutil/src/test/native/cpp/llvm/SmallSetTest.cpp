@@ -10,13 +10,13 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/SmallSet.h"
+#include "wpi/util/SmallSet.hpp"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include <algorithm>
 #include <string>
 
-using namespace wpi;
+using namespace wpi::util;
 
 TEST(SmallSetTest, ConstructorIteratorPair) {
   std::initializer_list<int> L = {1, 2, 3, 4, 5};
@@ -27,7 +27,7 @@ TEST(SmallSetTest, ConstructorIteratorPair) {
 TEST(SmallSet, ConstructorRange) {
   std::initializer_list<int> L = {1, 2, 3, 4, 5};
 
-  SmallSet<int, 4> S(wpi::make_range(std::begin(L), std::end(L)));
+  SmallSet<int, 4> S(wpi::util::make_range(std::begin(L), std::end(L)));
   EXPECT_THAT(S, testing::UnorderedElementsAreArray(L));
 }
 

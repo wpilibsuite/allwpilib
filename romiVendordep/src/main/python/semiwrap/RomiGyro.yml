@@ -1,5 +1,5 @@
 classes:
-  frc::RomiGyro:
+  wpi::RomiGyro:
     methods:
       RomiGyro:
       GetAngle:

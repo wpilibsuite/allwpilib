@@ -9,7 +9,7 @@
 
 #include <Windows.h>
 
-#include "UsbCameraImpl.h"
+#include "UsbCameraImpl.hpp"
 
 // https://github.com/opencv/opencv/blob/master/modules/videoio/src/cap_msmf.cpp
 
@@ -20,8 +20,8 @@
 
 #include <memory>
 
-#include "COMCreators.h"
-#include "ComPtr.h"
+#include "COMCreators.hpp"
+#include "ComPtr.hpp"
 
 #pragma comment(lib, "Mfplat.lib")
 #pragma comment(lib, "Mf.lib")
@@ -31,10 +31,10 @@
 #pragma comment(lib, "Mfreadwrite.lib")
 #pragma comment(lib, "Shlwapi.lib")
 
-namespace cs {
+namespace wpi::cs {
 
-SourceReaderCB::SourceReaderCB(std::weak_ptr<cs::UsbCameraImpl> source,
-                               const cs::VideoMode& mode)
+SourceReaderCB::SourceReaderCB(std::weak_ptr<wpi::cs::UsbCameraImpl> source,
+                               const wpi::cs::VideoMode& mode)
     : m_nRefCount(1), m_source(source), m_mode{mode} {}
 
 // IUnknown methods
@@ -94,7 +94,8 @@ STDMETHODIMP SourceReaderCB::OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex,
 
 // Create a Source Reader COM Smart Object
 ComPtr<SourceReaderCB> CreateSourceReaderCB(
-    std::weak_ptr<cs::UsbCameraImpl> source, const cs::VideoMode& mode) {
+    std::weak_ptr<wpi::cs::UsbCameraImpl> source,
+    const wpi::cs::VideoMode& mode) {
   SourceReaderCB* ptr = new SourceReaderCB(source, mode);
   ComPtr<SourceReaderCB> sourceReaderCB;
   sourceReaderCB.Attach(ptr);
@@ -157,4 +158,4 @@ ComPtr<IMFSourceReader> CreateSourceReader(IMFMediaSource* mediaSource,
   return sourceReader;
 }
 
-}  // namespace cs
+}  // namespace wpi::cs

@@ -10,9 +10,9 @@ functions:
   from_json:
     ignore: true
 classes:
-  frc::Trajectory:
+  wpi::math::Trajectory:
     force_type_casters:
-    - units::curvature_t
+    - wpi::units::curvature_t
     methods:
       Trajectory:
         overloads:
@@ -26,7 +26,7 @@ classes:
       InitialPose:
       operator+:
       operator==:
-  frc::Trajectory::State:
+  wpi::math::Trajectory::State:
     force_no_default_constructor: true
     attributes:
       t:
@@ -42,11 +42,11 @@ inline_code: |
   cls_State
     .def(
       py::init<
-        units::second_t,
-        units::meters_per_second_t,
-        units::meters_per_second_squared_t,
+        wpi::units::second_t,
+        wpi::units::meters_per_second_t,
+        wpi::units::meters_per_second_squared_t,
         Pose2d,
-        units::curvature_t
+        wpi::units::curvature_t
       >(),
       py::arg("t") = 0_s,
       py::arg("velocity") = 0_mps,
@@ -54,13 +54,13 @@ inline_code: |
       py::arg("pose") = Pose2d(),
       py::arg("curvature") = 0.0
     )
-    .def_property_readonly("velocity_fps", [](frc::Trajectory::State * self) -> units::feet_per_second_t {
+    .def_property_readonly("velocity_fps", [](wpi::math::Trajectory::State * self) -> wpi::units::feet_per_second_t {
       return self->velocity;
     })
-    .def_property_readonly("acceleration_fps", [](frc::Trajectory::State * self) -> units::feet_per_second_squared_t {
+    .def_property_readonly("acceleration_fps", [](wpi::math::Trajectory::State * self) -> wpi::units::feet_per_second_squared_t {
       return self->acceleration;
     })
-    .def("__repr__", [](frc::Trajectory::State *self) {
+    .def("__repr__", [](wpi::math::Trajectory::State *self) {
       return "Trajectory.State("
         "t=" + std::to_string(self->t()) + ", "
         "velocity=" + std::to_string(self->velocity()) + ", "
@@ -68,4 +68,4 @@ inline_code: |
         "pose=" + rpy::toString(self->pose) + ", "
         "curvature=" + std::to_string(self->curvature()) + ")";
     })
-    .def_readwrite("curvature", &frc::Trajectory::State::curvature);
+    .def_readwrite("curvature", &wpi::math::Trajectory::State::curvature);

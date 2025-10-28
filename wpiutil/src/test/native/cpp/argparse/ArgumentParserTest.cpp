@@ -4,10 +4,10 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/argparse.h"
+#include "wpi/util/argparse.hpp"
 
 TEST(ArgparseTest, Basic) {
-  wpi::ArgumentParser program("ArgparseTest");
+  wpi::util::ArgumentParser program("ArgparseTest");
 
   program.add_argument("test").help("Test argument").scan<'i', int>();
 

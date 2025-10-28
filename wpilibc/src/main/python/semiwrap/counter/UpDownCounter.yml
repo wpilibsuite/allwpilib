@@ -1,7 +1,7 @@
 classes:
-  frc::UpDownCounter:
+  wpi::UpDownCounter:
     ignored_bases:
-    - wpi::SendableHelper<UpDownCounter>
+    - wpi::util::SendableHelper<UpDownCounter>
     methods:
       UpDownCounter:
         overloads:

@@ -1,5 +1,5 @@
 classes:
-  frc::SendableBuilderImpl:
+  wpi::SendableBuilderImpl:
     methods:
       SendableBuilderImpl:
       SetTable:

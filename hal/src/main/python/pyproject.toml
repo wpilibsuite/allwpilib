@@ -43,36 +43,36 @@ update_init = []
 scan_headers_ignore = [
     "hal/ChipObject.h",
     "hal/DMA.h",
-    "hal/Errors.h",
-    "hal/HAL.h",
-    "hal/IMU.h",
-    "hal/IMUTypes.h",
-    "hal/SystemServer.h",
-    "hal/Types.h",
-    "hal/Value.h",
+    "wpi/hal/Errors.h",
+    "wpi/hal/HAL.h",
+    "wpi/hal/IMU.h",
+    "wpi/hal/IMUTypes.h",
+    "wpi/hal/SystemServer.h",
+    "wpi/hal/Types.h",
+    "wpi/hal/Value.h",
 
     "hal/cpp/SerialHelper.h",
     "hal/cpp/UnsafeDIO.h",
-    "hal/cpp/fpga_clock.h",
+    "wpi/hal/cpp/fpga_clock.h",
 
-    "hal/handles/DigitalHandleResource.h",
-    "hal/handles/IndexedClassedHandleResource.h",
-    "hal/handles/IndexedHandleResource.h",
-    "hal/handles/LimitedClassedHandleResource.h",
-    "hal/handles/LimitedHandleResource.h",
-    "hal/handles/UnlimitedHandleResource.h",
+    "wpi/hal/handles/DigitalHandleResource.h",
+    "wpi/hal/handles/IndexedClassedHandleResource.h",
+    "wpi/hal/handles/IndexedHandleResource.h",
+    "wpi/hal/handles/LimitedClassedHandleResource.h",
+    "wpi/hal/handles/LimitedHandleResource.h",
+    "wpi/hal/handles/UnlimitedHandleResource.h",
 
     "hal/proto/*",
 
     "hal/roborio/HMB.h",
     "hal/roborio/InterruptManager.h",
 
-    "hal/simulation/CanData.h",
-    "hal/simulation/I2CData.h",
-    "hal/simulation/NotifyListener.h",
+    "wpi/hal/simulation/CanData.h",
+    "wpi/hal/simulation/I2CData.h",
+    "wpi/hal/simulation/NotifyListener.h",
     "hal/simulation/SPIData.h",
-    "hal/simulation/SimCallbackRegistry.h",
-    "hal/simulation/SimDataValue.h",
+    "wpi/hal/simulation/SimCallbackRegistry.h",
+    "wpi/hal/simulation/SimDataValue.h",
 
     # TODO: might want this in the future
     "mrc/*",
@@ -89,54 +89,54 @@ depends = ["wpiutil", "ntcore"]
 
 [tool.semiwrap.extension_modules."hal._wpiHal".headers]
 # hal
-AddressableLED = "hal/AddressableLED.h"
-AddressableLEDTypes = "hal/AddressableLEDTypes.h"
-AnalogInput = "hal/AnalogInput.h"
-CAN = "hal/CAN.h"
-CANAPI = "hal/CANAPI.h"
-CANAPITypes = "hal/CANAPITypes.h"
-CTREPCM = "hal/CTREPCM.h"
-Constants = "hal/Constants.h"
-Counter = "hal/Counter.h"
-DIO = "hal/DIO.h"
+AddressableLED = "wpi/hal/AddressableLED.h"
+AddressableLEDTypes = "wpi/hal/AddressableLEDTypes.h"
+AnalogInput = "wpi/hal/AnalogInput.h"
+CAN = "wpi/hal/CAN.h"
+CANAPI = "wpi/hal/CANAPI.h"
+CANAPITypes = "wpi/hal/CANAPITypes.h"
+CTREPCM = "wpi/hal/CTREPCM.h"
+Constants = "wpi/hal/Constants.h"
+Counter = "wpi/hal/Counter.h"
+DIO = "wpi/hal/DIO.h"
 # DMA = "hal/DMA.h"
-DriverStation = "hal/DriverStation.h"
-DriverStationTypes = "hal/DriverStationTypes.h"
-DutyCycle = "hal/DutyCycle.h"
-Encoder = "hal/Encoder.h"
-# Errors = "hal/Errors.h"
-Extensions = "hal/Extensions.h"
-# HAL = "hal/HAL.h"
-HALBase = "hal/HALBase.h"
-I2C = "hal/I2C.h"
-I2CTypes = "hal/I2CTypes.h"
-# IMU = "hal/IMU.h"
-# IMUTypes = "hal/IMUTypes.h"
-Main = "hal/Main.h"
-Notifier = "hal/Notifier.h"
-PWM = "hal/PWM.h"
-Ports = "hal/Ports.h"
-Power = "hal/Power.h"
-PowerDistribution = "hal/PowerDistribution.h"
-REVPH = "hal/REVPH.h"
-SerialPort = "hal/SerialPort.h"
-SimDevice = "hal/SimDevice.h"
-UsageReporting = "hal/UsageReporting.h"
-Threads = "hal/Threads.h"
-# Types = "hal/Types.h"
-# Value = "hal/Value.h"
+DriverStation = "wpi/hal/DriverStation.h"
+DriverStationTypes = "wpi/hal/DriverStationTypes.h"
+DutyCycle = "wpi/hal/DutyCycle.h"
+Encoder = "wpi/hal/Encoder.h"
+# Errors = "wpi/hal/Errors.h"
+Extensions = "wpi/hal/Extensions.h"
+# HAL = "wpi/hal/HAL.h"
+HALBase = "wpi/hal/HALBase.h"
+I2C = "wpi/hal/I2C.h"
+I2CTypes = "wpi/hal/I2CTypes.h"
+# IMU = "wpi/hal/IMU.h"
+# IMUTypes = "wpi/hal/IMUTypes.h"
+Main = "wpi/hal/Main.h"
+Notifier = "wpi/hal/Notifier.h"
+PWM = "wpi/hal/PWM.h"
+Ports = "wpi/hal/Ports.h"
+Power = "wpi/hal/Power.h"
+PowerDistribution = "wpi/hal/PowerDistribution.h"
+REVPH = "wpi/hal/REVPH.h"
+SerialPort = "wpi/hal/SerialPort.h"
+SimDevice = "wpi/hal/SimDevice.h"
+UsageReporting = "wpi/hal/UsageReporting.h"
+Threads = "wpi/hal/Threads.h"
+# Types = "wpi/hal/Types.h"
+# Value = "wpi/hal/Value.h"
 
 # hal/cpp
-# fpga_clock = "hal/cpp/fpga_clock.h"
+# fpga_clock = "wpi/hal/cpp/fpga_clock.h"
 
 # hal/handles
-# DigitalHandleResource = "hal/handles/DigitalHandleResource.h"
-HandlesInternal = "hal/handles/HandlesInternal.h"
-# IndexedClassedHandleResource = "hal/handles/IndexedClassedHandleResource.h"
-# IndexedHandleResource = "hal/handles/IndexedHandleResource.h"
-# LimitedClassedHandleResource = "hal/handles/LimitedClassedHandleResource.h"
-# LimitedHandleResource = "hal/handles/LimitedHandleResource.h"
-# UnlimitedHandleResource = "hal/handles/UnlimitedHandleResource.h"
+# DigitalHandleResource = "wpi/hal/handles/DigitalHandleResource.h"
+HandlesInternal = "wpi/hal/handles/HandlesInternal.h"
+# IndexedClassedHandleResource = "wpi/hal/handles/IndexedClassedHandleResource.h"
+# IndexedHandleResource = "wpi/hal/handles/IndexedHandleResource.h"
+# LimitedClassedHandleResource = "wpi/hal/handles/LimitedClassedHandleResource.h"
+# LimitedHandleResource = "wpi/hal/handles/LimitedHandleResource.h"
+# UnlimitedHandleResource = "wpi/hal/handles/UnlimitedHandleResource.h"
 
 
 [tool.semiwrap.extension_modules."hal.simulation._simulation"]
@@ -146,24 +146,24 @@ depends = ["wpiutil", "ntcore"]
 yaml_path = "semiwrap/simulation"
 
 [tool.semiwrap.extension_modules."hal.simulation._simulation".headers]
-AddressableLEDData = "hal/simulation/AddressableLEDData.h"
-AnalogInData = "hal/simulation/AnalogInData.h"
-CTREPCMData = "hal/simulation/CTREPCMData.h"
-# CanData = "hal/simulation/CanData.h"
-DIOData = "hal/simulation/DIOData.h"
-DigitalPWMData = "hal/simulation/DigitalPWMData.h"
-DriverStationData = "hal/simulation/DriverStationData.h"
-DutyCycleData = "hal/simulation/DutyCycleData.h"
-EncoderData = "hal/simulation/EncoderData.h"
-# I2CData = "hal/simulation/I2CData.h"
-MockHooks = "hal/simulation/MockHooks.h"
-NotifierData = "hal/simulation/NotifierData.h"
-# NotifyListener = "hal/simulation/NotifyListener.h"
-PWMData = "hal/simulation/PWMData.h"
-PowerDistributionData = "hal/simulation/PowerDistributionData.h"
-REVPHData = "hal/simulation/REVPHData.h"
-Reset = "hal/simulation/Reset.h"
-RoboRioData = "hal/simulation/RoboRioData.h"
-# SimCallbackRegistry = "hal/simulation/SimCallbackRegistry.h"
-# SimDataValue = "hal/simulation/SimDataValue.h"
-SimDeviceData = "hal/simulation/SimDeviceData.h"
+AddressableLEDData = "wpi/hal/simulation/AddressableLEDData.h"
+AnalogInData = "wpi/hal/simulation/AnalogInData.h"
+CTREPCMData = "wpi/hal/simulation/CTREPCMData.h"
+# CanData = "wpi/hal/simulation/CanData.h"
+DIOData = "wpi/hal/simulation/DIOData.h"
+DigitalPWMData = "wpi/hal/simulation/DigitalPWMData.h"
+DriverStationData = "wpi/hal/simulation/DriverStationData.h"
+DutyCycleData = "wpi/hal/simulation/DutyCycleData.h"
+EncoderData = "wpi/hal/simulation/EncoderData.h"
+# I2CData = "wpi/hal/simulation/I2CData.h"
+MockHooks = "wpi/hal/simulation/MockHooks.h"
+NotifierData = "wpi/hal/simulation/NotifierData.h"
+# NotifyListener = "wpi/hal/simulation/NotifyListener.h"
+PWMData = "wpi/hal/simulation/PWMData.h"
+PowerDistributionData = "wpi/hal/simulation/PowerDistributionData.h"
+REVPHData = "wpi/hal/simulation/REVPHData.h"
+Reset = "wpi/hal/simulation/Reset.h"
+RoboRioData = "wpi/hal/simulation/RoboRioData.h"
+# SimCallbackRegistry = "wpi/hal/simulation/SimCallbackRegistry.h"
+# SimDataValue = "wpi/hal/simulation/SimDataValue.h"
+SimDeviceData = "wpi/hal/simulation/SimDeviceData.h"

@@ -1,5 +1,5 @@
 classes:
-  frc::XRPReflectanceSensor:
+  wpi::xrp::XRPReflectanceSensor:
     methods:
       GetLeftReflectanceValue:
       GetRightReflectanceValue:

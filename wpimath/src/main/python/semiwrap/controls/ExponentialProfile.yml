@@ -2,9 +2,9 @@ defaults:
   subpackage: trajectory
 
 classes:
-  frc::ExponentialProfile:
+  wpi::math::ExponentialProfile:
     force_type_casters:
-    - units::meters_per_second_t
+    - wpi::units::meters_per_second_t
     template_params:
     - Distance
     - Input
@@ -18,7 +18,7 @@ classes:
       CalculateProfileTiming:
         overloads:
           const State&, const State& [const]:
-  frc::ExponentialProfile::Constraints:
+  wpi::math::ExponentialProfile::Constraints:
     attributes:
       maxInput:
       A:
@@ -33,13 +33,13 @@ classes:
       MaxVelocity:
     inline_code: |
       .def_static("fromStateSpace", [](Input_t maxInput, A_t a, B_t b) {
-          return typename frc::ExponentialProfile<Distance, Input>::Constraints(maxInput, a, b);
+          return typename wpi::math::ExponentialProfile<Distance, Input>::Constraints(maxInput, a, b);
         }, py::arg("maxInput"), py::arg("a"), py::arg("b"))
       .def_static("fromCharacteristics", [](Input_t maxInput, kV_t kv, kA_t ka) {
-          return typename frc::ExponentialProfile<Distance, Input>::Constraints(maxInput, kv, ka);
+          return typename wpi::math::ExponentialProfile<Distance, Input>::Constraints(maxInput, kv, ka);
         }, py::arg("maxInput"), py::arg("kV"), py::arg("kA"))
 
-  frc::ExponentialProfile::State:
+  wpi::math::ExponentialProfile::State:
     force_no_default_constructor: true
     attributes:
       position:
@@ -48,7 +48,7 @@ classes:
       operator==:
     inline_code: |
       .def(py::init<Distance_t, Velocity_t>())
-  frc::ExponentialProfile::ProfileTiming:
+  wpi::math::ExponentialProfile::ProfileTiming:
     attributes:
       inflectionTime:
       totalTime:
@@ -57,7 +57,7 @@ classes:
 
 templates:
   ExponentialProfileMeterVolts:
-    qualname: frc::ExponentialProfile
+    qualname: wpi::math::ExponentialProfile
     params:
-    - units::meter
-    - units::volt
+    - wpi::units::meter
+    - wpi::units::volt

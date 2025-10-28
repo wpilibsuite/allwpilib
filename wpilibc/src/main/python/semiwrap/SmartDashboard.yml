@@ -1,10 +1,10 @@
 extra_includes:
 - src/rpy/SmartDashboardData.h
-- frc/Errors.h
-- wpi/sendable/SendableRegistry.h
+- wpi/system/Errors.hpp
+- wpi/util/sendable/SendableRegistry.hpp
 
 classes:
-  frc::SmartDashboard:
+  wpi::SmartDashboard:
     methods:
       init:
       ContainsKey:
@@ -16,11 +16,11 @@ classes:
       PutData:
         # overrides ensure data doesn't die if this is the only reference
         overloads:
-          std::string_view, wpi::Sendable*:
+          std::string_view, wpi::util::Sendable*:
             cpp_code: |
-              [](py::str &key, std::shared_ptr<wpi::Sendable> data) {
+              [](py::str &key, std::shared_ptr<wpi::util::Sendable> data) {
                 if (!data) {
-                  throw FRC_MakeError(err::NullParameter, "{}", "value");
+                  throw WPILIB_MakeError(err::NullParameter, "{}", "value");
                 }
 
                 // convert key to a raw string so that we can create a StringRef
@@ -31,19 +31,19 @@ classes:
                 }
 
                 std::string_view keyRef(raw_str, raw_size);
-                frc::SmartDashboard::PutData(keyRef, data.get());
+                wpi::SmartDashboard::PutData(keyRef, data.get());
 
                 // this comes after the PutData to ensure that the original object doesn't die
                 // while PutData is called
                 rpy::addSmartDashboardData(key, data);
               }
-          wpi::Sendable*:
+          wpi::util::Sendable*:
             cpp_code: |
-              [](std::shared_ptr<wpi::Sendable> value) {
-                frc::SmartDashboard::PutData(value.get());
+              [](std::shared_ptr<wpi::util::Sendable> value) {
+                wpi::SmartDashboard::PutData(value.get());
                 // this comes after the PutData to ensure that the original object doesn't die
                 // while PutData is called
-                auto name = wpi::SendableRegistry::GetName(value.get());
+                auto name = wpi::util::SendableRegistry::GetName(value.get());
                 if (!name.empty()) {
                   py::str key(name);
                   rpy::addSmartDashboardData(key, value);
@@ -55,11 +55,11 @@ classes:
       GetBoolean:
         cpp_code: |
           [](std::string_view key, py::object defaultValue) -> py::object {
-              nt::Value value;
+              wpi::nt::Value value;
               {
                 py::gil_scoped_release release;
-                auto entry = frc::SmartDashboard::GetEntry(key);
-                value = nt::GetEntryValue(entry.GetHandle());
+                auto entry = wpi::SmartDashboard::GetEntry(key);
+                value = wpi::nt::GetEntryValue(entry.GetHandle());
               }
               if (!value || value.type() != NT_BOOLEAN) return defaultValue;
               return py::cast(value.GetBoolean());
@@ -69,11 +69,11 @@ classes:
       GetNumber:
         cpp_code: |
           [](std::string_view key, py::object defaultValue) -> py::object {
-              nt::Value value;
+              wpi::nt::Value value;
               {
                 py::gil_scoped_release release;
-                auto entry = frc::SmartDashboard::GetEntry(key);
-                value = nt::GetEntryValue(entry.GetHandle());
+                auto entry = wpi::SmartDashboard::GetEntry(key);
+                value = wpi::nt::GetEntryValue(entry.GetHandle());
               }
               if (!value || value.type() != NT_DOUBLE) return defaultValue;
               return py::cast(value.GetDouble());
@@ -83,11 +83,11 @@ classes:
       GetString:
         cpp_code: |
           [](std::string_view key, py::object defaultValue) -> py::object {
-              nt::Value value;
+              wpi::nt::Value value;
               {
                 py::gil_scoped_release release;
-                auto entry = frc::SmartDashboard::GetEntry(key);
-                value = nt::GetEntryValue(entry.GetHandle());
+                auto entry = wpi::SmartDashboard::GetEntry(key);
+                value = wpi::nt::GetEntryValue(entry.GetHandle());
               }
               if (!value || value.type() != NT_STRING) return defaultValue;
               return py::cast(value.GetString());
@@ -97,11 +97,11 @@ classes:
       GetBooleanArray:
         cpp_code: |
           [](std::string_view key, py::object defaultValue) -> py::object {
-            nt::Value value;
+            wpi::nt::Value value;
             {
               py::gil_scoped_release release;
-              auto entry = frc::SmartDashboard::GetEntry(key);
-              value = nt::GetEntryValue(entry.GetHandle());
+              auto entry = wpi::SmartDashboard::GetEntry(key);
+              value = wpi::nt::GetEntryValue(entry.GetHandle());
             }
             if (!value || value.type() != NT_BOOLEAN_ARRAY) return defaultValue;
             // ntcore will return bit vector by default. Convert to List[bool]
@@ -118,11 +118,11 @@ classes:
       GetNumberArray:
         cpp_code: |
           [](std::string_view key, py::object defaultValue) -> py::object {
-              nt::Value value;
+              wpi::nt::Value value;
               {
                 py::gil_scoped_release release;
-                auto entry = frc::SmartDashboard::GetEntry(key);
-                value = nt::GetEntryValue(entry.GetHandle());
+                auto entry = wpi::SmartDashboard::GetEntry(key);
+                value = wpi::nt::GetEntryValue(entry.GetHandle());
               }
               if (!value || value.type() != NT_DOUBLE_ARRAY) return defaultValue;
               return py::cast(value.GetDoubleArray());
@@ -132,11 +132,11 @@ classes:
       GetStringArray:
         cpp_code: |
           [](std::string_view key, py::object defaultValue) -> py::object {
-              nt::Value value;
+              wpi::nt::Value value;
               {
                 py::gil_scoped_release release;
-                auto entry = frc::SmartDashboard::GetEntry(key);
-                value = nt::GetEntryValue(entry.GetHandle());
+                auto entry = wpi::SmartDashboard::GetEntry(key);
+                value = wpi::nt::GetEntryValue(entry.GetHandle());
               }
               if (!value || value.type() != NT_STRING_ARRAY) return defaultValue;
               return py::cast(value.GetStringArray());
@@ -146,11 +146,11 @@ classes:
       GetRaw:
         cpp_code: |
           [](std::string_view key, py::object defaultValue) -> py::object {
-              nt::Value value;
+              wpi::nt::Value value;
               {
                 py::gil_scoped_release release;
-                auto entry = frc::SmartDashboard::GetEntry(key);
-                value = nt::GetEntryValue(entry.GetHandle());
+                auto entry = wpi::SmartDashboard::GetEntry(key);
+                value = wpi::nt::GetEntryValue(entry.GetHandle());
               }
               if (!value || value.type() != NT_STRING) return defaultValue;
               return py::cast(value.GetString());

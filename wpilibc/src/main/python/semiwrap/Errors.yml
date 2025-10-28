@@ -9,5 +9,5 @@ functions:
   MakeError:
     ignore: true
 classes:
-  frc::RuntimeError:
+  wpi::RuntimeError:
     ignore: true

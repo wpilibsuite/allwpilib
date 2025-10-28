@@ -1,5 +1,5 @@
 classes:
-  frc::SwerveDriveOdometry3d:
+  wpi::math::SwerveDriveOdometry3d:
     force_no_trampoline: true
     template_params:
     - size_t NumModules
@@ -8,18 +8,18 @@ classes:
 
 templates:
   SwerveDrive2Odometry3d:
-    qualname: frc::SwerveDriveOdometry3d
+    qualname: wpi::math::SwerveDriveOdometry3d
     params:
     - 2
   SwerveDrive3Odometry3d:
-    qualname: frc::SwerveDriveOdometry3d
+    qualname: wpi::math::SwerveDriveOdometry3d
     params:
     - 3
   SwerveDrive4Odometry3d:
-    qualname: frc::SwerveDriveOdometry3d
+    qualname: wpi::math::SwerveDriveOdometry3d
     params:
     - 4
   SwerveDrive6Odometry3d:
-    qualname: frc::SwerveDriveOdometry3d
+    qualname: wpi::math::SwerveDriveOdometry3d
     params:
     - 6

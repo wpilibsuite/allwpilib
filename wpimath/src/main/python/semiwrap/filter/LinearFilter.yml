@@ -1,5 +1,5 @@
 classes:
-  frc::LinearFilter:
+  wpi::math::LinearFilter:
     template_params:
     - T
     methods:
@@ -24,6 +24,6 @@ classes:
 
 templates:
   LinearFilter:
-    qualname: frc::LinearFilter
+    qualname: wpi::math::LinearFilter
     params:
     - double

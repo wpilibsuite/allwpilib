@@ -2,7 +2,7 @@ extra_includes:
 - wpystruct.h
 
 classes:
-  frc::DifferentialDriveKinematics:
+  wpi::math::DifferentialDriveKinematics:
     attributes:
       trackwidth:
     methods:
@@ -11,9 +11,9 @@ classes:
       ToWheelSpeeds:
       ToTwist2d:
         overloads:
-          const units::meter_t, const units::meter_t [const]:
+          const wpi::units::meter_t, const wpi::units::meter_t [const]:
           const DifferentialDriveWheelPositions&, const DifferentialDriveWheelPositions& [const]:
       Interpolate:
 
 inline_code: |
-  SetupWPyStruct<frc::DifferentialDriveKinematics>(cls_DifferentialDriveKinematics);
+  SetupWPyStruct<wpi::math::DifferentialDriveKinematics>(cls_DifferentialDriveKinematics);

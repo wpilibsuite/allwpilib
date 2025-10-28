@@ -4,11 +4,12 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/EigenCore.h"
-#include "frc/StateSpaceUtil.h"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/util/StateSpaceUtil.hpp"
 
 TEST(StateSpaceUtilTest, CostParameterPack) {
-  constexpr frc::Matrixd<3, 3> mat = frc::MakeCostMatrix(1.0, 2.0, 3.0);
+  constexpr wpi::math::Matrixd<3, 3> mat =
+      wpi::math::MakeCostMatrix(1.0, 2.0, 3.0);
   EXPECT_NEAR(mat(0, 0), 1.0, 1e-3);
   EXPECT_NEAR(mat(0, 1), 0.0, 1e-3);
   EXPECT_NEAR(mat(0, 2), 0.0, 1e-3);
@@ -21,7 +22,8 @@ TEST(StateSpaceUtilTest, CostParameterPack) {
 }
 
 TEST(StateSpaceUtilTest, CostArray) {
-  constexpr frc::Matrixd<3, 3> mat = frc::MakeCostMatrix<3>({1.0, 2.0, 3.0});
+  constexpr wpi::math::Matrixd<3, 3> mat =
+      wpi::math::MakeCostMatrix<3>({1.0, 2.0, 3.0});
   EXPECT_NEAR(mat(0, 0), 1.0, 1e-3);
   EXPECT_NEAR(mat(0, 1), 0.0, 1e-3);
   EXPECT_NEAR(mat(0, 2), 0.0, 1e-3);
@@ -34,7 +36,7 @@ TEST(StateSpaceUtilTest, CostArray) {
 }
 
 TEST(StateSpaceUtilTest, CostDynamic) {
-  Eigen::MatrixXd mat = frc::MakeCostMatrix(std::vector{1.0, 2.0, 3.0});
+  Eigen::MatrixXd mat = wpi::math::MakeCostMatrix(std::vector{1.0, 2.0, 3.0});
   EXPECT_NEAR(mat(0, 0), 1.0, 1e-3);
   EXPECT_NEAR(mat(0, 1), 0.0, 1e-3);
   EXPECT_NEAR(mat(0, 2), 0.0, 1e-3);
@@ -47,7 +49,8 @@ TEST(StateSpaceUtilTest, CostDynamic) {
 }
 
 TEST(StateSpaceUtilTest, CovParameterPack) {
-  constexpr frc::Matrixd<3, 3> mat = frc::MakeCovMatrix(1.0, 2.0, 3.0);
+  constexpr wpi::math::Matrixd<3, 3> mat =
+      wpi::math::MakeCovMatrix(1.0, 2.0, 3.0);
   EXPECT_NEAR(mat(0, 0), 1.0, 1e-3);
   EXPECT_NEAR(mat(0, 1), 0.0, 1e-3);
   EXPECT_NEAR(mat(0, 2), 0.0, 1e-3);
@@ -60,7 +63,8 @@ TEST(StateSpaceUtilTest, CovParameterPack) {
 }
 
 TEST(StateSpaceUtilTest, CovArray) {
-  constexpr frc::Matrixd<3, 3> mat = frc::MakeCovMatrix<3>({1.0, 2.0, 3.0});
+  constexpr wpi::math::Matrixd<3, 3> mat =
+      wpi::math::MakeCovMatrix<3>({1.0, 2.0, 3.0});
   EXPECT_NEAR(mat(0, 0), 1.0, 1e-3);
   EXPECT_NEAR(mat(0, 1), 0.0, 1e-3);
   EXPECT_NEAR(mat(0, 2), 0.0, 1e-3);
@@ -73,7 +77,7 @@ TEST(StateSpaceUtilTest, CovArray) {
 }
 
 TEST(StateSpaceUtilTest, CovDynamic) {
-  Eigen::MatrixXd mat = frc::MakeCovMatrix(std::vector{1.0, 2.0, 3.0});
+  Eigen::MatrixXd mat = wpi::math::MakeCovMatrix(std::vector{1.0, 2.0, 3.0});
   EXPECT_NEAR(mat(0, 0), 1.0, 1e-3);
   EXPECT_NEAR(mat(0, 1), 0.0, 1e-3);
   EXPECT_NEAR(mat(0, 2), 0.0, 1e-3);
@@ -87,63 +91,63 @@ TEST(StateSpaceUtilTest, CovDynamic) {
 
 TEST(StateSpaceUtilTest, WhiteNoiseVectorParameterPack) {
   [[maybe_unused]]
-  frc::Vectord<2> vec = frc::MakeWhiteNoiseVector(2.0, 3.0);
+  wpi::math::Vectord<2> vec = wpi::math::MakeWhiteNoiseVector(2.0, 3.0);
 }
 
 TEST(StateSpaceUtilTest, WhiteNoiseVectorArray) {
   [[maybe_unused]]
-  frc::Vectord<2> vec = frc::MakeWhiteNoiseVector<2>({2.0, 3.0});
+  wpi::math::Vectord<2> vec = wpi::math::MakeWhiteNoiseVector<2>({2.0, 3.0});
 }
 
 TEST(StateSpaceUtilTest, WhiteNoiseVectorDynamic) {
   [[maybe_unused]]
-  Eigen::VectorXd vec = frc::MakeWhiteNoiseVector(std::vector{2.0, 3.0});
+  Eigen::VectorXd vec = wpi::math::MakeWhiteNoiseVector(std::vector{2.0, 3.0});
 }
 
 TEST(StateSpaceUtilTest, IsStabilizable) {
-  frc::Matrixd<2, 1> B{0, 1};
+  wpi::math::Matrixd<2, 1> B{0, 1};
 
   // First eigenvalue is uncontrollable and unstable.
   // Second eigenvalue is controllable and stable.
-  EXPECT_FALSE(
-      (frc::IsStabilizable<2, 1>(frc::Matrixd<2, 2>{{1.2, 0}, {0, 0.5}}, B)));
+  EXPECT_FALSE((wpi::math::IsStabilizable<2, 1>(
+      wpi::math::Matrixd<2, 2>{{1.2, 0}, {0, 0.5}}, B)));
 
   // First eigenvalue is uncontrollable and marginally stable.
   // Second eigenvalue is controllable and stable.
-  EXPECT_FALSE(
-      (frc::IsStabilizable<2, 1>(frc::Matrixd<2, 2>{{1, 0}, {0, 0.5}}, B)));
+  EXPECT_FALSE((wpi::math::IsStabilizable<2, 1>(
+      wpi::math::Matrixd<2, 2>{{1, 0}, {0, 0.5}}, B)));
 
   // First eigenvalue is uncontrollable and stable.
   // Second eigenvalue is controllable and stable.
-  EXPECT_TRUE(
-      (frc::IsStabilizable<2, 1>(frc::Matrixd<2, 2>{{0.2, 0}, {0, 0.5}}, B)));
+  EXPECT_TRUE((wpi::math::IsStabilizable<2, 1>(
+      wpi::math::Matrixd<2, 2>{{0.2, 0}, {0, 0.5}}, B)));
 
   // First eigenvalue is uncontrollable and stable.
   // Second eigenvalue is controllable and unstable.
-  EXPECT_TRUE(
-      (frc::IsStabilizable<2, 1>(frc::Matrixd<2, 2>{{0.2, 0}, {0, 1.2}}, B)));
+  EXPECT_TRUE((wpi::math::IsStabilizable<2, 1>(
+      wpi::math::Matrixd<2, 2>{{0.2, 0}, {0, 1.2}}, B)));
 }
 
 TEST(StateSpaceUtilTest, IsDetectable) {
-  frc::Matrixd<1, 2> C{0, 1};
+  wpi::math::Matrixd<1, 2> C{0, 1};
 
   // First eigenvalue is unobservable and unstable.
   // Second eigenvalue is observable and stable.
-  EXPECT_FALSE(
-      (frc::IsDetectable<2, 1>(frc::Matrixd<2, 2>{{1.2, 0}, {0, 0.5}}, C)));
+  EXPECT_FALSE((wpi::math::IsDetectable<2, 1>(
+      wpi::math::Matrixd<2, 2>{{1.2, 0}, {0, 0.5}}, C)));
 
   // First eigenvalue is unobservable and marginally stable.
   // Second eigenvalue is observable and stable.
-  EXPECT_FALSE(
-      (frc::IsDetectable<2, 1>(frc::Matrixd<2, 2>{{1, 0}, {0, 0.5}}, C)));
+  EXPECT_FALSE((wpi::math::IsDetectable<2, 1>(
+      wpi::math::Matrixd<2, 2>{{1, 0}, {0, 0.5}}, C)));
 
   // First eigenvalue is unobservable and stable.
   // Second eigenvalue is observable and stable.
-  EXPECT_TRUE(
-      (frc::IsDetectable<2, 1>(frc::Matrixd<2, 2>{{0.2, 0}, {0, 0.5}}, C)));
+  EXPECT_TRUE((wpi::math::IsDetectable<2, 1>(
+      wpi::math::Matrixd<2, 2>{{0.2, 0}, {0, 0.5}}, C)));
 
   // First eigenvalue is unobservable and stable.
   // Second eigenvalue is observable and unstable.
-  EXPECT_TRUE(
-      (frc::IsDetectable<2, 1>(frc::Matrixd<2, 2>{{0.2, 0}, {0, 1.2}}, C)));
+  EXPECT_TRUE((wpi::math::IsDetectable<2, 1>(
+      wpi::math::Matrixd<2, 2>{{0.2, 0}, {0, 1.2}}, C)));
 }

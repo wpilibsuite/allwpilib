@@ -4,17 +4,17 @@
 
 #include <gtest/gtest.h>
 
-#include "networktables/NetworkTableInstance.h"
-#include "networktables/NetworkTableListener.h"
+#include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/nt/NetworkTableListener.hpp"
 
 class TimeSyncTest : public ::testing::Test {
  public:
-  TimeSyncTest() : m_inst(nt::NetworkTableInstance::Create()) {}
+  TimeSyncTest() : m_inst(wpi::nt::NetworkTableInstance::Create()) {}
 
-  ~TimeSyncTest() override { nt::NetworkTableInstance::Destroy(m_inst); }
+  ~TimeSyncTest() override { wpi::nt::NetworkTableInstance::Destroy(m_inst); }
 
  protected:
-  nt::NetworkTableInstance m_inst;
+  wpi::nt::NetworkTableInstance m_inst;
 };
 
 TEST_F(TimeSyncTest, TestLocal) {
@@ -23,7 +23,7 @@ TEST_F(TimeSyncTest, TestLocal) {
 }
 
 TEST_F(TimeSyncTest, TestServer) {
-  nt::NetworkTableListenerPoller poller{m_inst};
+  wpi::nt::NetworkTableListenerPoller poller{m_inst};
   poller.AddTimeSyncListener(false);
 
   m_inst.StartServer("timesynctest.json", "127.0.0.1", 10030);

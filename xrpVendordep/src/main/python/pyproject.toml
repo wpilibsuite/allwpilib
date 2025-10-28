@@ -58,9 +58,9 @@ depends = ["wpilib", "wpimath_geometry"]
 
 [tool.semiwrap.extension_modules."xrp._xrp".headers]
 # frc/xrp
-XRPGyro = "frc/xrp/XRPGyro.h"
-XRPMotor = "frc/xrp/XRPMotor.h"
-XRPOnBoardIO = "frc/xrp/XRPOnBoardIO.h"
-XRPRangefinder = "frc/xrp/XRPRangefinder.h"
-XRPReflectanceSensor = "frc/xrp/XRPReflectanceSensor.h"
-XRPServo = "frc/xrp/XRPServo.h"
+XRPGyro = "wpi/xrp/XRPGyro.hpp"
+XRPMotor = "wpi/xrp/XRPMotor.hpp"
+XRPOnBoardIO = "wpi/xrp/XRPOnBoardIO.hpp"
+XRPRangefinder = "wpi/xrp/XRPRangefinder.hpp"
+XRPReflectanceSensor = "wpi/xrp/XRPReflectanceSensor.hpp"
+XRPServo = "wpi/xrp/XRPServo.hpp"

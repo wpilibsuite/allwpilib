@@ -1,9 +1,9 @@
 extra_includes:
-- frc/DigitalInput.h
-- frc/DigitalOutput.h
+- wpi/hardware/discrete/DigitalInput.hpp
+- wpi/hardware/discrete/DigitalOutput.hpp
 
 classes:
-  frc::sim::DIOSim:
+  wpi::sim::DIOSim:
     force_type_casters:
     - std::function
     methods:

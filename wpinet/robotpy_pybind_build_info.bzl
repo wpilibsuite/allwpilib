@@ -10,20 +10,20 @@ def wpinet_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             class_name = "PortForwarder",
             yml_file = "semiwrap/PortForwarder.yml",
             header_root = "$(execpath :robotpy-native-wpinet.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpinet.copy_headers)/wpinet/PortForwarder.h",
+            header_file = "$(execpath :robotpy-native-wpinet.copy_headers)/wpi/net/PortForwarder.hpp",
             tmpl_class_names = [],
             trampolines = [
-                ("wpi::PortForwarder", "wpi__PortForwarder.hpp"),
+                ("wpi::net::PortForwarder", "wpi__net__PortForwarder.hpp"),
             ],
         ),
         struct(
             class_name = "WebServer",
             yml_file = "semiwrap/WebServer.yml",
             header_root = "$(execpath :robotpy-native-wpinet.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpinet.copy_headers)/wpinet/WebServer.h",
+            header_file = "$(execpath :robotpy-native-wpinet.copy_headers)/wpi/net/WebServer.hpp",
             tmpl_class_names = [],
             trampolines = [
-                ("wpi::WebServer", "wpi__WebServer.hpp"),
+                ("wpi::net::WebServer", "wpi__net__WebServer.hpp"),
             ],
         ),
     ]

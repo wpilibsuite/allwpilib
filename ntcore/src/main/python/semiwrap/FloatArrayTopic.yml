@@ -1,5 +1,5 @@
 classes:
-  nt::FloatArraySubscriber:
+  wpi::nt::FloatArraySubscriber:
     methods:
       FloatArraySubscriber:
         overloads:
@@ -11,17 +11,17 @@ classes:
         overloads:
           '[const]':
           ParamType [const]:
-          wpi::SmallVectorImpl<SmallElemType>& [const]:
+          wpi::util::SmallVectorImpl<SmallElemType>& [const]:
             ignore: true
-          wpi::SmallVectorImpl<SmallElemType>&, ParamType [const]:
+          wpi::util::SmallVectorImpl<SmallElemType>&, ParamType [const]:
             ignore: true
       GetAtomic:
         overloads:
           '[const]':
           ParamType [const]:
-          wpi::SmallVectorImpl<SmallElemType>& [const]:
+          wpi::util::SmallVectorImpl<SmallElemType>& [const]:
             ignore: true
-          wpi::SmallVectorImpl<SmallElemType>&, ParamType [const]:
+          wpi::util::SmallVectorImpl<SmallElemType>&, ParamType [const]:
             ignore: true
       ReadQueue:
       GetTopic:
@@ -37,7 +37,7 @@ classes:
         py::gil_scoped_release release;
         *self = FloatArraySubscriber();
       })
-  nt::FloatArrayPublisher:
+  wpi::nt::FloatArrayPublisher:
     methods:
       FloatArrayPublisher:
         overloads:
@@ -60,7 +60,7 @@ classes:
         py::gil_scoped_release release;
         *self = FloatArrayPublisher();
       })
-  nt::FloatArrayEntry:
+  wpi::nt::FloatArrayEntry:
     methods:
       FloatArrayEntry:
         overloads:
@@ -84,7 +84,7 @@ classes:
         py::gil_scoped_release release;
         *self = FloatArrayEntry();
       })
-  nt::FloatArrayTopic:
+  wpi::nt::FloatArrayTopic:
     attributes:
       kTypeString:
     methods:

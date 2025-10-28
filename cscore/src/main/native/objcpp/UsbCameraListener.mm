@@ -3,12 +3,12 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #import <AVFoundation/AVFoundation.h>
-#include "UsbCameraListener.h"
+#include "UsbCameraListener.hpp"
 
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-#include "Notifier.h"
+#include "Notifier.hpp"
 
-using namespace cs;
+using namespace wpi::cs;
 
 @interface UsbCameraListenerImpl : NSObject
 @property(nonatomic) Notifier* notifier;
@@ -99,7 +99,7 @@ class UsbCameraListener::Impl {
   }
 };
 
-UsbCameraListener::UsbCameraListener(wpi::Logger&, Notifier& notifier)
+UsbCameraListener::UsbCameraListener(wpi::util::Logger&, Notifier& notifier)
     : m_impl{std::make_unique<Impl>(notifier)} {}
 
 UsbCameraListener::~UsbCameraListener() {

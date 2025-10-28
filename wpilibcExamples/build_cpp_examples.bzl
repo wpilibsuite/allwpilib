@@ -32,7 +32,7 @@ def build_examples(halsim_deps = []):
     for folder in EXAMPLE_FOLDERS:
         cc_library(
             name = folder + "-examples-headers",
-            hdrs = native.glob(["src/main/cpp/examples/" + folder + "/include/**/*.h"], allow_empty = True),
+            hdrs = native.glob(["src/main/cpp/examples/" + folder + "/include/**/*.hpp"], allow_empty = True),
             strip_include_prefix = "src/main/cpp/examples/" + folder + "/include",
             tags = ["wpi-example"],
         )
@@ -40,7 +40,7 @@ def build_examples(halsim_deps = []):
             name = folder + "-example",
             srcs = native.glob(["src/main/cpp/examples/" + folder + "/cpp/**/*.cpp", "src/main/cpp/examples/" + folder + "/c/**/*.c"], allow_empty = True),
             deps = [
-                "//wpilibNewCommands",
+                "//commandsv2",
                 "//apriltag",
                 "//romiVendordep",
                 "//xrpVendordep",
@@ -57,9 +57,9 @@ def build_commands():
         cc_library(
             name = folder + "-command",
             srcs = native.glob(["src/main/cpp/commands/" + folder + "/**/*.cpp"]),
-            hdrs = native.glob(["src/main/cpp/commands/" + folder + "/**/*.h"]),
+            hdrs = native.glob(["src/main/cpp/commands/" + folder + "/**/*.hpp"]),
             deps = [
-                "//wpilibNewCommands",
+                "//commandsv2",
             ],
             strip_include_prefix = "src/main/cpp/commands/" + folder,
             tags = ["wpi-example"],
@@ -72,9 +72,9 @@ def build_snippets():
         cc_library(
             name = folder + "-template",
             srcs = native.glob(["src/main/cpp/snippets/" + folder + "/**/*.cpp"]),
-            hdrs = native.glob(["src/main/cpp/snippets/" + folder + "/**/*.h"], allow_empty = True),
+            hdrs = native.glob(["src/main/cpp/snippets/" + folder + "/**/*.hpp"], allow_empty = True),
             deps = [
-                "//wpilibNewCommands",
+                "//commandsv2",
             ],
             strip_include_prefix = "src/main/cpp/snippets/" + folder + "/include",
             tags = ["wpi-example"],
@@ -87,9 +87,9 @@ def build_templates():
         cc_library(
             name = folder + "-template",
             srcs = native.glob(["src/main/cpp/templates/" + folder + "/**/*.cpp"]),
-            hdrs = native.glob(["src/main/cpp/templates/" + folder + "/**/*.h"]),
+            hdrs = native.glob(["src/main/cpp/templates/" + folder + "/**/*.hpp"]),
             deps = [
-                "//wpilibNewCommands",
+                "//commandsv2",
             ],
             strip_include_prefix = "src/main/cpp/templates/" + folder + "/include",
             tags = ["wpi-example"],
@@ -104,10 +104,10 @@ def build_tests():
             size = "small",
             srcs = native.glob([example_test_folder + "/**/*.cpp", example_src_folder + "/cpp/**/*.cpp", example_src_folder + "/c/**/*.c"], allow_empty = True),
             deps = [
-                "//wpilibNewCommands",
+                "//commandsv2",
                 ":{}-examples-headers".format(folder),
                 "//thirdparty/googletest",
             ],
-            defines = ["RUNNING_FRC_TESTS=1"],
+            defines = ["RUNNING_WPILIB_TESTS=1"],
             tags = ["wpi-example", "no-tsan", "no-asan", "no-ubsan", "exclusive"],
         )

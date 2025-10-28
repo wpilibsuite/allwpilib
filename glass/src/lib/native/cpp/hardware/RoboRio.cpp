@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/hardware/RoboRio.h"
+#include "wpi/glass/hardware/RoboRio.hpp"
 
 #include <imgui.h>
 
-#include "glass/Context.h"
-#include "glass/DataSource.h"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/DataSource.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 static void DisplayRail(RoboRioRailModel& rail, const char* name) {
   if (CollapsingHeader(name)) {
@@ -46,7 +46,7 @@ static void DisplayRail(RoboRioRailModel& rail, const char* name) {
   }
 }
 
-void glass::DisplayRoboRio(RoboRioModel* model) {
+void wpi::glass::DisplayRoboRio(RoboRioModel* model) {
   ImGui::PushItemWidth(ImGui::GetFontSize() * 8);
 
   if (CollapsingHeader("RoboRIO Input")) {

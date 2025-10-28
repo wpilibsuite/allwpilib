@@ -1,5 +1,6 @@
 cppHeaderFileInclude {
   \.h$
+  \.hpp$
   \.inc$
   \.inl$
 }
@@ -20,17 +21,15 @@ repoRootNameOverride {
 
 includeOtherLibs {
   ^GLFW
-  ^cscore
   ^fmt/
-  ^fields/
-  ^frc/
   ^imgui
   portable-file-dialogs.h
-  ^networktables/
-  ^ntcore
-  ^units
   ^upb/
-  ^wpi/
-  ^wpigui
-  ^wpimath/
+  ^wpi/cscore
+  ^wpi/fields/
+  ^wpi/ntcore
+  ^wpi/units
+  ^wpi/util
+  ^wpi/gui
+  ^wpi/math/
 }

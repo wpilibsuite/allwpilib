@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/SocketError.h"
+#include "wpi/net/SocketError.hpp"
 
 #include <string>
 
@@ -13,7 +13,7 @@
 #include <cstring>
 #endif
 
-namespace wpi {
+namespace wpi::net {
 
 int SocketErrno() {
 #ifdef _WIN32
@@ -36,4 +36,4 @@ std::string SocketStrerror(int code) {
 #endif
 }
 
-}  // namespace wpi
+}  // namespace wpi::net

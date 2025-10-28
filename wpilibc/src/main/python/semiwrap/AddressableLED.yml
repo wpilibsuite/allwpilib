@@ -3,7 +3,7 @@ functions:
     ignore: true
 
 classes:
-  frc::AddressableLED:
+  wpi::AddressableLED:
     methods:
       AddressableLED:
       SetLength:
@@ -19,7 +19,7 @@ classes:
       SetGlobalData:
     enums:
       ColorOrder:
-  frc::AddressableLED::LEDData:
+  wpi::AddressableLED::LEDData:
     force_no_trampoline: true
     base_qualnames:
       HAL_AddressableLEDData: ::HAL_AddressableLEDData

@@ -1,8 +1,8 @@
 extra_includes:
-- frc/AnalogEncoder.h
+- wpi/hardware/rotation/AnalogEncoder.hpp
 
 classes:
-  frc::sim::AnalogEncoderSim:
+  wpi::sim::AnalogEncoderSim:
     force_type_casters:
     - std::function
     methods:

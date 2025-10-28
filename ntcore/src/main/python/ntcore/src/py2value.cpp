@@ -41,7 +41,7 @@ const char * nttype2str(NT_Type type) {
 }
 
 
-py::object ntvalue2py(const nt::Value &ntvalue) {
+py::object ntvalue2py(const wpi::nt::Value &ntvalue) {
   auto &v = ntvalue.value();
   switch (v.type) {
   case NT_BOOLEAN:
@@ -109,17 +109,17 @@ py::object ntvalue2py(const nt::Value &ntvalue) {
   }
 }
 
-nt::Value py2ntvalue(py::handle h) {
+wpi::nt::Value py2ntvalue(py::handle h) {
   if (py::isinstance<py::bool_>(h)) {
-    return nt::Value::MakeBoolean(h.cast<bool>());
+    return wpi::nt::Value::MakeBoolean(h.cast<bool>());
   } else if (py::isinstance<py::float_>(h)) {
-    return nt::Value::MakeDouble(h.cast<double>());
+    return wpi::nt::Value::MakeDouble(h.cast<double>());
   } else if (py::isinstance<py::int_>(h)) {
-    return nt::Value::MakeInteger(h.cast<int64_t>());
+    return wpi::nt::Value::MakeInteger(h.cast<int64_t>());
   } else if (py::isinstance<py::str>(h)) {
-    return nt::Value::MakeString(h.cast<std::string>());
+    return wpi::nt::Value::MakeString(h.cast<std::string>());
   } else if (py::isinstance<py::bytes>(h)) {
-    return nt::Value::MakeRaw(h.cast<std::span<const uint8_t>>());
+    return wpi::nt::Value::MakeRaw(h.cast<std::span<const uint8_t>>());
   } else if (py::isinstance<py::none>(h)) {
     throw py::value_error("Cannot put None into NetworkTable");
   }
@@ -132,45 +132,45 @@ nt::Value py2ntvalue(py::handle h) {
   auto i1 = seq[0];
   if (py::isinstance<py::bool_>(i1)) {
     auto v = h.cast<std::vector<int>>();
-    return nt::Value::MakeBooleanArray(v);
+    return wpi::nt::Value::MakeBooleanArray(v);
   } else if (py::isinstance<py::float_>(i1)) {
     auto v = h.cast<std::vector<double>>();
-    return nt::Value::MakeDoubleArray(v);
+    return wpi::nt::Value::MakeDoubleArray(v);
   } else if (py::isinstance<py::int_>(i1)) {
     auto v = h.cast<std::vector<int64_t>>();
-    return nt::Value::MakeIntegerArray(v);
+    return wpi::nt::Value::MakeIntegerArray(v);
   } else if (py::isinstance<py::str>(i1)) {
     auto v = h.cast<std::vector<std::string>>();
-    return nt::Value::MakeStringArray(v);
+    return wpi::nt::Value::MakeStringArray(v);
   } else {
     throw py::value_error("Can only put bool/int/float/str/bytes or lists/tuples of them");
   }
 }
 
-py::function valueFactoryByType(nt::NetworkTableType type) {
+py::function valueFactoryByType(wpi::nt::NetworkTableType type) {
   py::object PyNtValue = py::module::import("ntcore").attr("Value");
   switch (type) {
-  case nt::NetworkTableType::kBoolean:
+  case wpi::nt::NetworkTableType::kBoolean:
     return PyNtValue.attr("makeBoolean");
-  case nt::NetworkTableType::kDouble:
+  case wpi::nt::NetworkTableType::kDouble:
     return PyNtValue.attr("makeDouble");
-  case nt::NetworkTableType::kString:
+  case wpi::nt::NetworkTableType::kString:
     return PyNtValue.attr("makeString");
-  case nt::NetworkTableType::kRaw:
+  case wpi::nt::NetworkTableType::kRaw:
     return PyNtValue.attr("makeRaw");
-  case nt::NetworkTableType::kBooleanArray: 
+  case wpi::nt::NetworkTableType::kBooleanArray: 
     return PyNtValue.attr("makeBooleanArray");
-  case nt::NetworkTableType::kDoubleArray: 
+  case wpi::nt::NetworkTableType::kDoubleArray: 
     return PyNtValue.attr("makeDoubleArray");
-  case nt::NetworkTableType::kStringArray:
+  case wpi::nt::NetworkTableType::kStringArray:
     return PyNtValue.attr("makeStringArray");
-  case nt::NetworkTableType::kInteger:
+  case wpi::nt::NetworkTableType::kInteger:
     return PyNtValue.attr("makeInteger");
-  case nt::NetworkTableType::kFloat:
+  case wpi::nt::NetworkTableType::kFloat:
     return PyNtValue.attr("makeFloat");
-  case nt::NetworkTableType::kIntegerArray:
+  case wpi::nt::NetworkTableType::kIntegerArray:
     return PyNtValue.attr("makeIntegerArray");
-  case nt::NetworkTableType::kFloatArray:
+  case wpi::nt::NetworkTableType::kFloatArray:
     return PyNtValue.attr("makeFloatArray");
   default:
     throw py::type_error("empty nt value");

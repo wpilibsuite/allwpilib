@@ -1,0 +1,31 @@
+cppHeaderFileInclude {
+  \.h$
+  \.hpp$
+  \.inc$
+}
+
+cppSrcFileInclude {
+  \.cpp$
+}
+
+repoRootNameOverride {
+  wpilib
+}
+
+generatedFileExclude {
+  commandsv2/src/generated/
+}
+
+includeOtherLibs {
+  ^gtest/
+  ^imgui
+  ^mockdata/
+  ^networktables/
+  ^opencv2/
+  ^support/
+  ^units/
+  ^vision/
+  ^wpi/ntcore
+  ^wpi/hal/
+  ^wpi/util/
+}

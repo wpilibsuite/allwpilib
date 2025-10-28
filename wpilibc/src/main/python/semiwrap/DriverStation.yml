@@ -1,9 +1,9 @@
 extra_includes:
 - rpy/ControlWord.h
-- wpi/datalog/DataLog.h
+- wpi/datalog/DataLog.hpp
 
 classes:
-  frc::DriverStation:
+  wpi::DriverStation:
     attributes:
       kJoystickPorts:
     enums:

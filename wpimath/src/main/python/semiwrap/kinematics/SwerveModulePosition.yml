@@ -2,7 +2,7 @@ extra_includes:
 - wpystruct.h
 
 classes:
-  frc::SwerveModulePosition:
+  wpi::math::SwerveModulePosition:
     force_no_default_constructor: true
     attributes:
       distance:
@@ -13,15 +13,15 @@ classes:
     inline_code: |
       .def(
         py::init<
-          units::meter_t, frc::Rotation2d
+          wpi::units::meter_t, wpi::math::Rotation2d
         >(),
-        py::arg("distance") = 0, py::arg("angle") = frc::Rotation2d()
+        py::arg("distance") = 0, py::arg("angle") = wpi::math::Rotation2d()
       )
       .def_property("distance_ft",
-        [](SwerveModulePosition * self) -> units::foot_t {
+        [](SwerveModulePosition * self) -> wpi::units::foot_t {
           return self->distance;
         },
-        [](SwerveModulePosition * self, units::foot_t distance) {
+        [](SwerveModulePosition * self, wpi::units::foot_t distance) {
           self->distance = distance;
         }
       )
@@ -31,4 +31,4 @@ classes:
       })
 
 inline_code: |
-  SetupWPyStruct<frc::SwerveModulePosition>(cls_SwerveModulePosition);
+  SetupWPyStruct<wpi::math::SwerveModulePosition>(cls_SwerveModulePosition);

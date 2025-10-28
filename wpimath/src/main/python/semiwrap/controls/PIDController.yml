@@ -2,9 +2,9 @@ defaults:
   subpackage: controller
 
 classes:
-  frc::PIDController:
+  wpi::math::PIDController:
     ignored_bases:
-    - wpi::SendableHelper<PIDController>
+    - wpi::util::SendableHelper<PIDController>
     methods:
       PIDController:
         param_override:

@@ -1,0 +1,32 @@
+cppHeaderFileInclude {
+  \.h$
+  \.hpp$
+  \.inc$
+  \.inl$
+}
+
+cppSrcFileInclude {
+  \.cpp$
+}
+
+generatedFileExclude {
+  src/main/native/resources/
+  src/main/native/win/datalogtool.ico
+  src/main/native/mac/datalogtool.icns
+}
+
+repoRootNameOverride {
+  datalogtool
+}
+
+includeOtherLibs {
+  ^GLFW
+  ^fmt/
+  ^imgui
+  ^libssh/
+  ^portable-file-dialog
+  ^wpi/datalog/
+  ^wpi/glass/
+  ^wpi/util/
+  ^wpi/gui
+}

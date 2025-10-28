@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "InstanceImpl.h"
+#include "InstanceImpl.hpp"
 
 #include <memory>
 #include <string>
 #include <utility>
 
-using namespace nt;
+using namespace wpi::nt;
 
 std::atomic<int> InstanceImpl::s_default{-1};
 std::atomic<InstanceImpl*> InstanceImpl::s_instances[kNumInstances];
-wpi::mutex InstanceImpl::s_mutex;
+wpi::util::mutex InstanceImpl::s_mutex;
 InstanceImpl::Cleanup InstanceImpl::s_cleanup;
 
 using namespace std::placeholders;

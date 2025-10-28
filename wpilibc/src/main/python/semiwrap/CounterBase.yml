@@ -2,7 +2,7 @@ defaults:
   subpackage: interfaces
 
 classes:
-  frc::CounterBase:
+  wpi::CounterBase:
     enums:
       EncodingType:
     methods:
