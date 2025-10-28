@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Sat, 25 Oct 2025 01:18:14 -0400
+Date: Mon, 27 Oct 2025 01:12:25 -0400
 Subject: [PATCH 17/30] HAND FIXES: Fixup remaining rename issues
 
 ---
@@ -70,10 +70,10 @@ index 517389600ea6416d7ab885017ee1ec2ea3b4ad7c..0a303b352b3e677549d1b7ed0d08d885
 -edu.wpi.first.epilogue.processor.AnnotationProcessor
 +org.wpilib.epilogue.processor.AnnotationProcessor
 diff --git a/ntcore/BUILD.bazel b/ntcore/BUILD.bazel
-index 88652a6fddb5576eaf4eb89ce31318c9a1886fac..b8ca1cc22640b1a52a06b74bd8d48414747d3bb5 100644
+index 9c1e25b28ded973dfdae7c90b521fea014aec7c5..1135ac0ab0935d63ef96453bb6ed599ec3b6b1fc 100644
 --- a/ntcore/BUILD.bazel
 +++ b/ntcore/BUILD.bazel
-@@ -210,8 +210,8 @@ cc_binary(
+@@ -211,8 +211,8 @@ cc_binary(
  
  java_binary(
      name = "DevMain-Java",

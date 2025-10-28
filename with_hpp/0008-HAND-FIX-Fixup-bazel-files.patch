@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Sat, 25 Oct 2025 01:15:46 -0400
+Date: Mon, 27 Oct 2025 01:09:55 -0400
 Subject: [PATCH 08/30] HAND FIX - Fixup bazel files
 
 ---
@@ -277,10 +277,10 @@ index c498706bf1b1cc0d54baae6f0f12c0eff319bb43..175c99c2ea344f0c749e8a19b56cb950
      ],
  )
 diff --git a/ntcore/BUILD.bazel b/ntcore/BUILD.bazel
-index cf31240675a663908a77e823e592b06d9caa7bb0..88652a6fddb5576eaf4eb89ce31318c9a1886fac 100644
+index f251827ee8452d6b170f8953c3dc4bb58a9dbcbb..9c1e25b28ded973dfdae7c90b521fea014aec7c5 100644
 --- a/ntcore/BUILD.bazel
 +++ b/ntcore/BUILD.bazel
-@@ -73,8 +73,8 @@ filegroup(
+@@ -74,8 +74,8 @@ filegroup(
  cc_library(
      name = "ntcore_c_headers",
      hdrs = [
@@ -291,7 +291,7 @@ index cf31240675a663908a77e823e592b06d9caa7bb0..88652a6fddb5576eaf4eb89ce31318c9
      ],
      includes = [
          "src/generated/main/native/include",
-@@ -176,7 +176,7 @@ cc_test(
+@@ -177,7 +177,7 @@ cc_test(
      size = "small",
      srcs = glob([
          "src/test/native/**/*.cpp",
@@ -674,10 +674,10 @@ index d23543e0f2f4dc4f3f21980f4021d13c46048bd4..db0d7deba759ab0e6e8f5524e99248b2
          ":wpiunits-java",
      ],
 diff --git a/wpiutil/BUILD.bazel b/wpiutil/BUILD.bazel
-index 5b73100044385de838f32fc0a92e3a74a112328b..b6c9ecdec8a93b7cf8d224f7dd2a87a64eee8a91 100644
+index 7cf14c2b8629943709e5c0d2491e80a67298dd09..d4eadd0794d3571624515ba3338abc3f5b4d86a4 100644
 --- a/wpiutil/BUILD.bazel
 +++ b/wpiutil/BUILD.bazel
-@@ -334,8 +334,8 @@ cc_binary(
+@@ -343,8 +343,8 @@ cc_binary(
  
  java_binary(
      name = "DevMain-Java",

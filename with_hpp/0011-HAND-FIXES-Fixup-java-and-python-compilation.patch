@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Sat, 25 Oct 2025 01:15:54 -0400
+Date: Mon, 27 Oct 2025 01:10:12 -0400
 Subject: [PATCH 11/30] HAND FIXES: Fixup java and python compilation
 
 ---
@@ -51,9 +51,7 @@ Subject: [PATCH 11/30] HAND FIXES: Fixup java and python compilation
  wpiutil/src/main/java/org/wpilib/util/WPIUtilJNI.java       | 1 +
  .../main/java/org/wpilib/util/concurrent/EventVector.java   | 1 +
  wpiutil/src/main/native/cpp/jni/WPIUtilJNI.cpp              | 2 +-
- wpiutil/src/main/python/semiwrap/Sendable.yml               | 2 +-
- wpiutil/src/main/python/semiwrap/SendableRegistry.yml       | 4 ++--
- 49 files changed, 78 insertions(+), 5 deletions(-)
+ 47 files changed, 75 insertions(+), 2 deletions(-)
 
 diff --git a/wpilibj/src/main/java/org/wpilib/driverstation/DSControlWord.java b/wpilibj/src/main/java/org/wpilib/driverstation/DSControlWord.java
 index 0b68001c0f6567cce5beaab86d01f5c179a33f5b..0a70aacfd41334449afa57c6b5a81413964d1b96 100644
@@ -68,7 +66,7 @@ index 0b68001c0f6567cce5beaab86d01f5c179a33f5b..0a70aacfd41334449afa57c6b5a81413
  
  /** A wrapper around Driver Station control word. */
 diff --git a/wpilibj/src/main/java/org/wpilib/driverstation/DriverStation.java b/wpilibj/src/main/java/org/wpilib/driverstation/DriverStation.java
-index b89ba709c9b6b45f86ca933419b09acaef5fc7a4..53850ffbb8bb7e767f7bf227571b0b2828ad6fd9 100644
+index e78fd086eb702b0bb845eb2bd9c2d497cf05ae12..fcb94c391ed0e2f1ba60a69d1e11f578941d8886 100644
 --- a/wpilibj/src/main/java/org/wpilib/driverstation/DriverStation.java
 +++ b/wpilibj/src/main/java/org/wpilib/driverstation/DriverStation.java
 @@ -21,6 +21,7 @@ import org.wpilib.networktables.NetworkTableInstance;
@@ -77,8 +75,8 @@ index b89ba709c9b6b45f86ca933419b09acaef5fc7a4..53850ffbb8bb7e767f7bf227571b0b28
  import org.wpilib.util.concurrent.EventVector;
 +import org.wpilib.system.Timer;
  import org.wpilib.util.WPIUtilJNI;
- import java.nio.ByteBuffer;
  import java.util.Map;
+ import java.util.Optional;
 diff --git a/wpilibj/src/main/java/org/wpilib/hardware/accelerometer/ADXL345_I2C.java b/wpilibj/src/main/java/org/wpilib/hardware/accelerometer/ADXL345_I2C.java
 index ccb36cee51c9866b1d5bed0a73cbd8f69aed3643..2aae25ff2bd46590bc13d021ce94f8d9fe875369 100644
 --- a/wpilibj/src/main/java/org/wpilib/hardware/accelerometer/ADXL345_I2C.java
@@ -671,27 +669,3 @@ index 58e619ff2f82ae5e5a6099b5eb2b47ec945af9af..9d0c20874a857a443424e48be302c341
  
  void wpi::ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg) {
    illegalArgEx.Throw(env, msg);
-diff --git a/wpiutil/src/main/python/semiwrap/Sendable.yml b/wpiutil/src/main/python/semiwrap/Sendable.yml
-index 938741a4268ccdc1b1ba4fcaf66408a405b8d8be..e67fe280dc2af9280bed0ac63d6722a826fa0726 100644
---- a/wpiutil/src/main/python/semiwrap/Sendable.yml
-+++ b/wpiutil/src/main/python/semiwrap/Sendable.yml
-@@ -1,5 +1,5 @@
- extra_includes:
--- wpi/util/sendable/SendableBuilder.h
-+- wpi/util/sendable/SendableBuilder.hpp
- 
- classes:
-   wpi::Sendable:
-diff --git a/wpiutil/src/main/python/semiwrap/SendableRegistry.yml b/wpiutil/src/main/python/semiwrap/SendableRegistry.yml
-index ea928b619449d30ed35251d9a97b985bb99706c3..3c0596b6ea5ffa91689d73bb93c3b43a6637f5e5 100644
---- a/wpiutil/src/main/python/semiwrap/SendableRegistry.yml
-+++ b/wpiutil/src/main/python/semiwrap/SendableRegistry.yml
-@@ -1,6 +1,6 @@
- extra_includes:
--- wpi/util/sendable/Sendable.h
--- wpi/util/sendable/SendableBuilder.h
-+- wpi/util/sendable/Sendable.hpp
-+- wpi/util/sendable/SendableBuilder.hpp
- 
- classes:
-   wpi::SendableRegistry:

@@ -1,12 +1,13 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Fri, 24 Oct 2025 22:51:43 -0400
+Date: Mon, 27 Oct 2025 01:13:59 -0400
 Subject: [PATCH 22/30] HAND FIXES: Manual cleanup of namespaces
 
 ---
  .../src/main/native/cpp/vision/VisionRunner.cpp      |  4 ++--
  .../main/native/cpp/frc2/command/button/Trigger.cpp  |  2 +-
  .../src/main/native/include/wpi/datalog/DataLog.hpp  |  4 ++--
+ .../src/main/native/include/wpi/romi/RomiMotor.hpp   |  2 +-
  tools/sysid/src/main/native/cpp/view/Analyzer.cpp    |  4 ++--
  .../native/include/wpi/sysid/view/DataSelector.hpp   |  4 +++-
  .../main/native/include/wpi/sysid/view/LogLoader.hpp |  4 +++-
@@ -16,6 +17,12 @@ Subject: [PATCH 22/30] HAND FIXES: Manual cleanup of namespaces
  .../native/include/wpi/event/NetworkBooleanEvent.hpp |  2 +-
  .../include/wpi/smartdashboard/FieldObject2d.hpp     |  7 +++++--
  .../include/wpi/smartdashboard/SmartDashboard.hpp    |  2 +-
+ .../simulation/DifferentialDrivetrainSim.yml         |  2 +-
+ .../main/python/semiwrap/simulation/ElevatorSim.yml  |  4 ++--
+ .../main/python/semiwrap/simulation/FlywheelSim.yml  |  2 +-
+ .../python/semiwrap/simulation/LinearSystemSim.yml   |  4 ++--
+ .../semiwrap/simulation/SingleJointedArmSim.yml      |  4 ++--
+ .../src/main/python/wpilib/simulation/simulation.cpp |  4 ++--
  .../main/java/org/wpilib/system/DataLogManager.java  |  2 +-
  wpimath/src/test/native/cpp/UnitsTest.cpp            |  2 +-
  wpinet/robotpy_pybind_build_info.bzl                 |  4 ++--
@@ -28,17 +35,11 @@ Subject: [PATCH 22/30] HAND FIXES: Manual cleanup of namespaces
  wpinet/src/main/native/macOS/ResolverThread.cpp      |  2 +-
  .../tcpsockets/include/wpi/net/TCPAcceptor.h         |  5 +++--
  .../tcpsockets/include/wpi/net/TCPConnector.h        |  5 +++--
- wpinet/src/main/python/semiwrap/PortForwarder.yml    |  2 +-
- wpinet/src/main/python/semiwrap/WebServer.yml        |  2 +-
  wpinet/src/test/native/cpp/WorkerThreadTest.cpp      |  8 ++++----
  wpiutil/robotpy_pybind_build_info.bzl                |  6 +++---
  wpiutil/src/main/native/include/wpi/util/scope       |  4 ++--
  .../thirdparty/expected/include/wpi/util/expected    | 12 ++++++------
- wpiutil/src/main/python/semiwrap/Sendable.yml        |  2 +-
- wpiutil/src/main/python/semiwrap/SendableBuilder.yml |  2 +-
- .../src/main/python/semiwrap/SendableRegistry.yml    |  2 +-
- wpiutil/src/main/python/semiwrap/Synchronization.yml |  4 ++--
- 34 files changed, 74 insertions(+), 56 deletions(-)
+ 35 files changed, 78 insertions(+), 60 deletions(-)
 
 diff --git a/cameraserver/src/main/native/cpp/vision/VisionRunner.cpp b/cameraserver/src/main/native/cpp/vision/VisionRunner.cpp
 index 990cb3a14abc0918147d40f2ac9a80196782ec18..a0164a0fbec38a716c0f9b3825ca2fd52decefc0 100644
@@ -97,6 +98,19 @@ index e74c45bf8da760a80bbe53599978fc8149080da2..fdfc45ec0728ff8f62f79c03f7308512
      }
      wpi::util::ForEachStructSchema<T>(
          [this, timestamp](auto typeString, auto schema) {
+diff --git a/romiVendordep/src/main/native/include/wpi/romi/RomiMotor.hpp b/romiVendordep/src/main/native/include/wpi/romi/RomiMotor.hpp
+index 0429281f33988c5e0e8507b93716f8dc03a50bd7..60ceefd92ee530521d368d9e213ae83ca16e9ae6 100644
+--- a/romiVendordep/src/main/native/include/wpi/romi/RomiMotor.hpp
++++ b/romiVendordep/src/main/native/include/wpi/romi/RomiMotor.hpp
+@@ -18,7 +18,7 @@ namespace wpi::romi {
+  *
+  * A general use PWM motor controller representing the motors on a Romi robot
+  */
+-class RomiMotor : public PWMMotorController {
++class RomiMotor : public wpi::PWMMotorController {
+  public:
+   /**
+    * Constructor for a RomiMotor.
 diff --git a/tools/sysid/src/main/native/cpp/view/Analyzer.cpp b/tools/sysid/src/main/native/cpp/view/Analyzer.cpp
 index dfa18a401d03766d4838add5c2c44c304f177faa..47fd71f632ee4b5ebd4d9e5fddf61e03df9de39d 100644
 --- a/tools/sysid/src/main/native/cpp/view/Analyzer.cpp
@@ -228,6 +242,98 @@ index f8e10cacf33d88295c594a426d1b35206479b939..8d0989a8b013385059bc51dae4adc677
  class Sendable;
  }  // namespace wpi
  
+diff --git a/wpilibc/src/main/python/semiwrap/simulation/DifferentialDrivetrainSim.yml b/wpilibc/src/main/python/semiwrap/simulation/DifferentialDrivetrainSim.yml
+index 8c779e82c42944f5fc032bd51ae74b60e1c8f168..16d7dcb62b756f934024d7a671c1343e6eeb22a7 100644
+--- a/wpilibc/src/main/python/semiwrap/simulation/DifferentialDrivetrainSim.yml
++++ b/wpilibc/src/main/python/semiwrap/simulation/DifferentialDrivetrainSim.yml
+@@ -2,7 +2,7 @@ classes:
+   wpi::sim::DifferentialDrivetrainSim:
+     typealias:
+     - wpi::math::DCMotor
+-    - template <int S, int I, int O> using wpi::math::LinearSystem = wpi::math::LinearSystem<S, I, O>
++    - template <int S, int I, int O> using LinearSystem = wpi::math::LinearSystem<S, I, O>
+     methods:
+       DifferentialDrivetrainSim:
+         overloads:
+diff --git a/wpilibc/src/main/python/semiwrap/simulation/ElevatorSim.yml b/wpilibc/src/main/python/semiwrap/simulation/ElevatorSim.yml
+index b086ba47ed9323309d0f07d914ecbe2559d66b3d..2170e0413b3b93cf2f85fcd894ec18e7311bb806 100644
+--- a/wpilibc/src/main/python/semiwrap/simulation/ElevatorSim.yml
++++ b/wpilibc/src/main/python/semiwrap/simulation/ElevatorSim.yml
+@@ -2,8 +2,8 @@ classes:
+   wpi::sim::ElevatorSim:
+     typealias:
+     - wpi::math::DCMotor
+-    - template <int S, int I, int O> using wpi::math::LinearSystem = wpi::math::LinearSystem<S, I, O>
+-    - template <int I> using wpi::math::Vectord = wpi::math::Vectord<I>
++    - template <int S, int I, int O> using LinearSystem = wpi::math::LinearSystem<S, I, O>
++    - template <int I> using Vectord = wpi::math::Vectord<I>
+     methods:
+       ElevatorSim:
+         overloads:
+diff --git a/wpilibc/src/main/python/semiwrap/simulation/FlywheelSim.yml b/wpilibc/src/main/python/semiwrap/simulation/FlywheelSim.yml
+index 23b2c4d0c2632969adfeee8ba48d17e6b0438615..931b684c48c879b16a093dee7f96dada3dba23f3 100644
+--- a/wpilibc/src/main/python/semiwrap/simulation/FlywheelSim.yml
++++ b/wpilibc/src/main/python/semiwrap/simulation/FlywheelSim.yml
+@@ -2,7 +2,7 @@ classes:
+   wpi::sim::FlywheelSim:
+     typealias:
+     - wpi::math::DCMotor
+-    - template <int S, int I, int O> using wpi::math::LinearSystem = wpi::math::LinearSystem<S, I, O>
++    - template <int S, int I, int O> using LinearSystem = wpi::math::LinearSystem<S, I, O>
+     methods:
+       FlywheelSim:
+         overloads:
+diff --git a/wpilibc/src/main/python/semiwrap/simulation/LinearSystemSim.yml b/wpilibc/src/main/python/semiwrap/simulation/LinearSystemSim.yml
+index 0006ff4b43431d98c6e43221fa5ed333b45f123d..040e2a34260ebe98943aae6f9659ae0cb01b4d98 100644
+--- a/wpilibc/src/main/python/semiwrap/simulation/LinearSystemSim.yml
++++ b/wpilibc/src/main/python/semiwrap/simulation/LinearSystemSim.yml
+@@ -1,8 +1,8 @@
+ classes:
+   wpi::sim::LinearSystemSim:
+     typealias:
+-    - template <int S, int I, int O> using wpi::math::LinearSystem = wpi::math::LinearSystem<S, I, O>
+-    - template <int I> using wpi::math::Vectord = wpi::math::Vectord<I>
++    - template <int S, int I, int O> using LinearSystem = wpi::math::LinearSystem<S, I, O>
++    - template <int I> using Vectord = wpi::math::Vectord<I>
+     template_params:
+     - int States
+     - int Inputs
+diff --git a/wpilibc/src/main/python/semiwrap/simulation/SingleJointedArmSim.yml b/wpilibc/src/main/python/semiwrap/simulation/SingleJointedArmSim.yml
+index 08cf0b5e7826e7d00d1f16d9b004e31aa42b914a..51bc81431d3ba052cf3a5ff4df1a112c7ffcb536 100644
+--- a/wpilibc/src/main/python/semiwrap/simulation/SingleJointedArmSim.yml
++++ b/wpilibc/src/main/python/semiwrap/simulation/SingleJointedArmSim.yml
+@@ -2,8 +2,8 @@ classes:
+   wpi::sim::SingleJointedArmSim:
+     typealias:
+     - wpi::math::DCMotor
+-    - template <int S, int I, int O> using wpi::math::LinearSystem = wpi::math::LinearSystem<S, I, O>
+-    - template <int I> using wpi::math::Vectord = wpi::math::Vectord<I>
++    - template <int S, int I, int O> using LinearSystem = wpi::math::LinearSystem<S, I, O>
++    - template <int I> using Vectord = wpi::math::Vectord<I>
+     methods:
+       SingleJointedArmSim:
+         overloads:
+diff --git a/wpilibc/src/main/python/wpilib/simulation/simulation.cpp b/wpilibc/src/main/python/wpilib/simulation/simulation.cpp
+index e3f880e905ffddf6c88c36fe70ecabc6182c2498..c562e91cb3ea68bd466eb4be32740ed6d63f9d36 100644
+--- a/wpilibc/src/main/python/wpilib/simulation/simulation.cpp
++++ b/wpilibc/src/main/python/wpilib/simulation/simulation.cpp
+@@ -8,14 +8,14 @@ void ResetSmartDashboardInstance();
+ void ResetMotorSafety();
+ } // namespace wpi::impl
+ 
+-namespace wpi::impl {
++namespace wpi::util::impl {
+ void ResetSendableRegistry();
+ } // namespace wpi::impl
+ 
+ void resetWpilibSimulationData() {
+   wpi::impl::ResetSmartDashboardInstance();
+   wpi::impl::ResetMotorSafety();
+-  wpi::impl::ResetSendableRegistry();
++  wpi::util::impl::ResetSendableRegistry();
+ }
+ 
+ void resetMotorSafety() {
 diff --git a/wpilibj/src/main/java/org/wpilib/system/DataLogManager.java b/wpilibj/src/main/java/org/wpilib/system/DataLogManager.java
 index 337804d041fc56537f9f4060989aba253a5219d8..e1d8bf8ab50205d3c084a84e298c2098849e9a44 100644
 --- a/wpilibj/src/main/java/org/wpilib/system/DataLogManager.java
@@ -428,28 +534,6 @@ index 1a3e094cc125e4b0d9b7865b0649fa42eca4aa5d..6da49b6cdc6213762eed10e06caf568b
  class TCPConnector {
   public:
    static std::unique_ptr<NetworkStream> connect(const char* server, int port,
-diff --git a/wpinet/src/main/python/semiwrap/PortForwarder.yml b/wpinet/src/main/python/semiwrap/PortForwarder.yml
-index 64e172eae9a7759dff282ff840722914bcbec5f3..6c80be7140677cf609f6f9ac981d7026006588c3 100644
---- a/wpinet/src/main/python/semiwrap/PortForwarder.yml
-+++ b/wpinet/src/main/python/semiwrap/PortForwarder.yml
-@@ -1,5 +1,5 @@
- classes:
--  wpi::PortForwarder:
-+  wpi::net::PortForwarder:
-     nodelete: true
-     methods:
-       GetInstance:
-diff --git a/wpinet/src/main/python/semiwrap/WebServer.yml b/wpinet/src/main/python/semiwrap/WebServer.yml
-index 61ac08875148e5b3aefccbde08734c017528ddbd..192ae179136e6ce254fc8bd42427cf36ebeee146 100644
---- a/wpinet/src/main/python/semiwrap/WebServer.yml
-+++ b/wpinet/src/main/python/semiwrap/WebServer.yml
-@@ -1,5 +1,5 @@
- classes:
--  wpi::WebServer:
-+  wpi::net::WebServer:
-     nodelete: true
-     methods:
-       GetInstance:
 diff --git a/wpinet/src/test/native/cpp/WorkerThreadTest.cpp b/wpinet/src/test/native/cpp/WorkerThreadTest.cpp
 index fbd58ca19b01a883b73914b1f38fc6942671fe46..637ce3437c38a688807b4d6f2bf438a6e032d09e 100644
 --- a/wpinet/src/test/native/cpp/WorkerThreadTest.cpp
@@ -579,62 +663,3 @@ index 24b7a26ec789861fd762cfd554f82cef3e3978ad..168f97889ca9972e6198b5e3b7cee54f
 +} // namespace wpi::util
  
  #endif
-diff --git a/wpiutil/src/main/python/semiwrap/Sendable.yml b/wpiutil/src/main/python/semiwrap/Sendable.yml
-index e67fe280dc2af9280bed0ac63d6722a826fa0726..6ec6c43a0d1e74358fca6342dbc2a263b6320d54 100644
---- a/wpiutil/src/main/python/semiwrap/Sendable.yml
-+++ b/wpiutil/src/main/python/semiwrap/Sendable.yml
-@@ -2,7 +2,7 @@ extra_includes:
- - wpi/util/sendable/SendableBuilder.hpp
- 
- classes:
--  wpi::Sendable:
-+  wpi::util::Sendable:
-     methods:
-       InitSendable:
-         virtual_xform: |-
-diff --git a/wpiutil/src/main/python/semiwrap/SendableBuilder.yml b/wpiutil/src/main/python/semiwrap/SendableBuilder.yml
-index 1a52df427d4a58d0085a2d939e66554c97538637..44e621a6e2a037aebcf501c2c92aa2f6817a8cfd 100644
---- a/wpiutil/src/main/python/semiwrap/SendableBuilder.yml
-+++ b/wpiutil/src/main/python/semiwrap/SendableBuilder.yml
-@@ -1,5 +1,5 @@
- classes:
--  wpi::SendableBuilder:
-+  wpi::util::SendableBuilder:
-     enums:
-       BackendKind:
-     methods:
-diff --git a/wpiutil/src/main/python/semiwrap/SendableRegistry.yml b/wpiutil/src/main/python/semiwrap/SendableRegistry.yml
-index 3c0596b6ea5ffa91689d73bb93c3b43a6637f5e5..dd7822334bf8831a5068c5b95690cbd524a61476 100644
---- a/wpiutil/src/main/python/semiwrap/SendableRegistry.yml
-+++ b/wpiutil/src/main/python/semiwrap/SendableRegistry.yml
-@@ -3,7 +3,7 @@ extra_includes:
- - wpi/util/sendable/SendableBuilder.hpp
- 
- classes:
--  wpi::SendableRegistry:
-+  wpi::util::SendableRegistry:
-     nodelete: true
-     methods:
-       Add:
-diff --git a/wpiutil/src/main/python/semiwrap/Synchronization.yml b/wpiutil/src/main/python/semiwrap/Synchronization.yml
-index 633c7d56ca5375eef423063d4d82ec528a9b81e4..a051b684ca75f60e848b4e5147615da9bb6aad25 100644
---- a/wpiutil/src/main/python/semiwrap/Synchronization.yml
-+++ b/wpiutil/src/main/python/semiwrap/Synchronization.yml
-@@ -30,7 +30,7 @@ functions:
-           [](std::span<const WPI_Handle> handles) {
-             py::gil_scoped_release release;
-             std::vector<WPI_Handle> signaled(handles.size());
--            auto result = wpi::WaitForObjects(handles, signaled);
-+            auto result = wpi::util::WaitForObjects(handles, signaled);
-             signaled.resize(result.size());
-             return signaled;
-           }
-@@ -47,7 +47,7 @@ functions:
-             py::gil_scoped_release release;
-             std::vector<WPI_Handle> signaled(handles.size());
-             bool timedOut = false;
--            auto result = wpi::WaitForObjects(handles, signaled, timeout, &timedOut);
-+            auto result = wpi::util::WaitForObjects(handles, signaled, timeout, &timedOut);
-             signaled.resize(result.size());
-             return std::make_tuple(signaled, timedOut);
-           }

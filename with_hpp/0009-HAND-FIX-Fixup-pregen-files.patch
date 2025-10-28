@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Sat, 25 Oct 2025 01:15:46 -0400
+Date: Mon, 27 Oct 2025 01:09:55 -0400
 Subject: [PATCH 09/30] HAND FIX - Fixup pregen files
 
 ---
@@ -30,9 +30,7 @@ Subject: [PATCH 09/30] HAND FIX - Fixup pregen files
  wpimath/generate_quickbuf.py                       |  2 +-
  wpimath/src/generate/main/java/Nat.java.jinja      |  2 +-
  wpiunits/generate_units.py                         |  2 +-
- wpiutil/src/main/python/semiwrap/Sendable.yml      |  2 +-
- .../src/main/python/semiwrap/SendableRegistry.yml  |  4 ++--
- 28 files changed, 68 insertions(+), 66 deletions(-)
+ 26 files changed, 65 insertions(+), 63 deletions(-)
  rename wpilibc/src/generate/main/native/cpp/{ => driverstation}/hid.cpp.jinja (98%)
  rename wpilibc/src/generate/main/native/cpp/{motorcontroller => hardware/motor}/pwm_motor_controller.cpp.jinja (94%)
 
@@ -377,7 +375,7 @@ index e15fb879c4c9c2af39fd1f4194fa05d35ffc5801..c8d12ae91e04e6a3899738b49018b7d8
  #include <wpi/hal/UsageReporting.h>
  
 diff --git a/wpilibc/src/generate/main/native/cpp/simulation/hidsim.cpp.jinja b/wpilibc/src/generate/main/native/cpp/simulation/hidsim.cpp.jinja
-index 576b9ba13918cf66a1e511ecd06073b554b5e329..3022fa2d7b75772014b11dafd12f346ebbf06ce7 100644
+index 944fd93f40edcd956db60a916c42fe27bf98a46e..3a99eafbd192f673f5aae9cd92d6b23b0a37dd1d 100644
 --- a/wpilibc/src/generate/main/native/cpp/simulation/hidsim.cpp.jinja
 +++ b/wpilibc/src/generate/main/native/cpp/simulation/hidsim.cpp.jinja
 @@ -6,9 +6,9 @@
@@ -459,7 +457,7 @@ index 6b27b3ee7ed0b1bc9fcd1834dde09da3fa3f6fe6..23c5ff7a8c548dfb5a8afacc528140d8
  /**
   * Handle input from {{ ConsoleName }} controllers connected to the Driver Station.
 diff --git a/wpilibj/src/generate/main/java/hidsim.java.jinja b/wpilibj/src/generate/main/java/hidsim.java.jinja
-index b26e76fbfb59687ec14fb59bccdca09db98fa806..56a4c81e8e73178301ce509a28d6088bc3456675 100644
+index 5274eafc40496531054d5ccb96909b71e2684824..318f9995365110af0e372ed58a2cc63323235f66 100644
 --- a/wpilibj/src/generate/main/java/hidsim.java.jinja
 +++ b/wpilibj/src/generate/main/java/hidsim.java.jinja
 @@ -8,7 +8,7 @@
@@ -577,27 +575,3 @@ index 05bd7c06dbbc8d82c4b4c155277842b704030c52..05f415db5d884955cb21edeb4f8d726a
  
      helpers = {
          "type_decl": type_decl,
-diff --git a/wpiutil/src/main/python/semiwrap/Sendable.yml b/wpiutil/src/main/python/semiwrap/Sendable.yml
-index c146a2911043e0b0661bff2c775db62caebf8d1c..938741a4268ccdc1b1ba4fcaf66408a405b8d8be 100644
---- a/wpiutil/src/main/python/semiwrap/Sendable.yml
-+++ b/wpiutil/src/main/python/semiwrap/Sendable.yml
-@@ -1,5 +1,5 @@
- extra_includes:
--- wpi/sendable/SendableBuilder.h
-+- wpi/util/sendable/SendableBuilder.h
- 
- classes:
-   wpi::Sendable:
-diff --git a/wpiutil/src/main/python/semiwrap/SendableRegistry.yml b/wpiutil/src/main/python/semiwrap/SendableRegistry.yml
-index 65e97a169fed317055540879849bbeb3e99394a0..ea928b619449d30ed35251d9a97b985bb99706c3 100644
---- a/wpiutil/src/main/python/semiwrap/SendableRegistry.yml
-+++ b/wpiutil/src/main/python/semiwrap/SendableRegistry.yml
-@@ -1,6 +1,6 @@
- extra_includes:
--- wpi/sendable/Sendable.h
--- wpi/sendable/SendableBuilder.h
-+- wpi/util/sendable/Sendable.h
-+- wpi/util/sendable/SendableBuilder.h
- 
- classes:
-   wpi::SendableRegistry:

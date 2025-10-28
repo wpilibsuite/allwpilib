@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Sat, 25 Oct 2025 01:20:53 -0400
+Date: Mon, 27 Oct 2025 01:13:59 -0400
 Subject: [PATCH 23/30] HAND FIXES: Update maven info
 
 ---
@@ -463,10 +463,10 @@ index 732652db66d9b12664e0726e7ed8343f16aaddaf..d09a54ed7dbfadd4d199241a695a6f15
      def vsLocator = gradle.services.get(VisualStudioLocator)
  
 diff --git a/ntcore/BUILD.bazel b/ntcore/BUILD.bazel
-index 8d619c2741cb5abf432bc3093813e7ab2b1fe470..cffe62aa485e1ca6909526c410018c1a32faf4e5 100644
+index d57ee8f658f02613ffe10ba9b7570d6997cd3ace..1f70ad922eb87ccc66c20bd78bfe9b0b194cc392 100644
 --- a/ntcore/BUILD.bazel
 +++ b/ntcore/BUILD.bazel
-@@ -161,7 +161,7 @@ wpilib_jni_java_library(
+@@ -162,7 +162,7 @@ wpilib_jni_java_library(
      name = "ntcore-java",
      srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
      maven_artifact_name = "ntcore-java",
@@ -475,7 +475,7 @@ index 8d619c2741cb5abf432bc3093813e7ab2b1fe470..cffe62aa485e1ca6909526c410018c1a
      native_libs = [":ntcorejni"],
      visibility = ["//visibility:public"],
      deps = [
-@@ -221,5 +221,5 @@ java_binary(
+@@ -222,5 +222,5 @@ java_binary(
  package_default_jni_project(
      name = "ntcore",
      maven_artifact_name = "ntcore-cpp",
@@ -483,10 +483,10 @@ index 8d619c2741cb5abf432bc3093813e7ab2b1fe470..cffe62aa485e1ca6909526c410018c1a
 +    maven_group_id = "org.wpilib.ntcore",
  )
 diff --git a/ntcoreffi/BUILD.bazel b/ntcoreffi/BUILD.bazel
-index 05029aa0c0286a4cd35ce764d67fe08c7136becc..f40d1d48e2713a5fcca1a959d6bbc53827b2f79d 100644
+index 273a1150abf2c31fa75fc0e680021e3ab98bdbbf..a019ccaa7c2b7bb453604a2f21826fa0cd27210e 100644
 --- a/ntcoreffi/BUILD.bazel
 +++ b/ntcoreffi/BUILD.bazel
-@@ -55,5 +55,5 @@ wpilib_cc_shared_library(
+@@ -69,5 +69,5 @@ wpilib_cc_shared_library(
  package_shared_cc_project(
      name = "ntcoreffi",
      maven_artifact_name = "ntcoreffi-cpp",
@@ -1089,10 +1089,10 @@ index e6b2338575761694070cebb2e7345098abc4b615..bd57203ff3f04cbfcf587fe7430dd259
  
  apply from: "${rootDir}/shared/java/javacommon.gradle"
 diff --git a/wpiutil/BUILD.bazel b/wpiutil/BUILD.bazel
-index b6c9ecdec8a93b7cf8d224f7dd2a87a64eee8a91..670944f25f316864d7f3565e1684e952996b5ddb 100644
+index d4eadd0794d3571624515ba3338abc3f5b4d86a4..d20ed0c6ecea1f6d3526761a346b175cf474cb4e 100644
 --- a/wpiutil/BUILD.bazel
 +++ b/wpiutil/BUILD.bazel
-@@ -253,7 +253,7 @@ wpilib_jni_java_library(
+@@ -262,7 +262,7 @@ wpilib_jni_java_library(
      name = "wpiutil-java",
      srcs = glob(["src/main/java/**/*.java"]),
      maven_artifact_name = "wpiutil-java",
@@ -1101,7 +1101,7 @@ index b6c9ecdec8a93b7cf8d224f7dd2a87a64eee8a91..670944f25f316864d7f3565e1684e952
      native_libs = [":wpiutiljni"],
      visibility = ["//visibility:public"],
      deps = [
-@@ -433,5 +433,5 @@ robotpy_py_test(
+@@ -442,5 +442,5 @@ robotpy_py_test(
  package_default_jni_project(
      name = "wpiutil",
      maven_artifact_name = "wpiutil-cpp",

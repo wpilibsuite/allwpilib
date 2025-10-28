@@ -169,6 +169,7 @@ class RawConfig:
                 ("frc/DriverStation.h", "wpi/driverstation/DriverStation" + NEW_CC_FILE_SUFFIX),
                 ("frc/GenericHID.h", "wpi/driverstation/GenericHID" + NEW_CC_FILE_SUFFIX),
                 ("frc/Joystick.h", "wpi/driverstation/Joystick" + NEW_CC_FILE_SUFFIX),
+                ("frc/Gamepad.h", "wpi/driverstation/Gamepad" + NEW_CC_FILE_SUFFIX),
                 ("frc/ADXL345_I2C.h", "wpi/hardware/accelerometer/ADXL345_I2C" + NEW_CC_FILE_SUFFIX),
                 ("frc/DSControlWord.h", "wpi/driverstation/DSControlWord" + NEW_CC_FILE_SUFFIX),
                 ("frc/AnalogAccelerometer.h", "wpi/hardware/accelerometer/AnalogAccelerometer" + NEW_CC_FILE_SUFFIX),
@@ -352,6 +353,7 @@ class RawConfig:
         ("wpilibc/src/main/native/cpp/DriverStation.cpp", "wpilibc/src/main/native/cpp/driverstation/DriverStation.cpp"),
         ("wpilibc/src/main/native/cpp/GenericHID.cpp", "wpilibc/src/main/native/cpp/driverstation/GenericHID.cpp"),
         ("wpilibc/src/main/native/cpp/Joystick.cpp", "wpilibc/src/main/native/cpp/driverstation/Joystick.cpp"),
+        ("wpilibc/src/main/native/cpp/Gamepad.cpp", "wpilibc/src/main/native/cpp/driverstation/Gamepad.cpp"),
         ("wpilibc/src/main/native/cpp/ADXL345_I2C.cpp", "wpilibc/src/main/native/cpp/hardware/accelerometer/ADXL345_I2C.cpp"),
         ("wpilibc/src/main/native/cpp/AnalogAccelerometer.cpp", "wpilibc/src/main/native/cpp/hardware/accelerometer/AnalogAccelerometer.cpp"),
         ("wpilibc/src/main/native/cpp/CAN.cpp", "wpilibc/src/main/native/cpp/hardware/bus/CAN.cpp"),
@@ -485,6 +487,7 @@ class RawConfig:
                 ("edu/wpi/first/wpilibj", "org/wpilib/driverstation", "DriverStation"),
                 ("edu/wpi/first/wpilibj", "org/wpilib/driverstation", "GenericHID"),
                 ("edu/wpi/first/wpilibj", "org/wpilib/driverstation", "Joystick"),
+                ("edu/wpi/first/wpilibj", "org/wpilib/driverstation", "Gamepad"),
                 ("edu/wpi/first/wpilibj", "org/wpilib/driverstation", "PS4Controller"),
                 ("edu/wpi/first/wpilibj", "org/wpilib/driverstation", "PS5Controller"),
                 ("edu/wpi/first/wpilibj", "org/wpilib/driverstation", "StadiaController"),
@@ -927,6 +930,9 @@ def run_cc_include_fixup(pp_config):
     def cc_replacement_filter(full_file):
         if full_file.endswith("/pyproject.toml"):
             return True
+            
+        if "semiwrap" in full_file:
+            return True
 
         suffix = full_file.split(".")[-1]
         return suffix in ["c", "cpp", "h", "hpp", "jinja", "mm"]
@@ -935,6 +941,9 @@ def run_cc_include_fixup(pp_config):
         for old_pkg, new_pkg in pp_config.cc_include_replacements.items():
             contents = contents.replace(f'"{old_pkg}"', f'"{new_pkg}"')
             contents = contents.replace(f"<{old_pkg}>", f"<{new_pkg}>")
+
+            if "semiwrap" in filename:
+                contents = contents.replace(f"- {old_pkg}", f"- {new_pkg}")
 
         project_root = pathlib.Path(filename).parts[0]
         if project_root in pp_config.cc_private_include_replacements:
@@ -1766,10 +1775,15 @@ NAMESPACE_PROJECT_REPLACEMENTS = [
     ),
 ]
 
-
 def run_namespace_replacements():
     def namespace_replacement_filter(full_file):
         suffix = full_file.split(".")[-1]
+        if "semiwrap" in full_file:
+            return True
+        if full_file.endswith(".cpp.inl"):
+            return True
+        if full_file.endswith("/pyproject.toml"):
+            return True
         return suffix in ["cpp", "h", "hpp", "mm", "jinja"]
 
     def namespace_replacement_impl(filename, contents):
@@ -1786,7 +1800,6 @@ def run_namespace_replacements():
         )
 
     _make_commit("SCRIPT namespace replacements")
-
 
 def run_package_stacktrace_replacement():
     def pkg_replacement_filter(full_file):
@@ -1957,7 +1970,6 @@ def main():
     # replacements
     apply_patch("0018-HAND-FIXES-Update-upstream-for-namespace-changes.patch")
     run_namespace_replacements()
-    # trim_header_namespaces()
     run_upstream_utils()
     apply_patch("0021-HAND-FIXES-Update-build-scripts-for-namespaces.patch")
     apply_patch("0022-HAND-FIXES-Manual-cleanup-of-namespaces.patch")
