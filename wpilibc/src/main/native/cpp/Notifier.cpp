@@ -182,6 +182,10 @@ void Notifier::StartPeriodic(units::second_t period) {
   UpdateAlarm();
 }
 
+void Notifier::StartPeriodic(units::hertz_t frequency) {
+  StartPeriodic(1 / frequency);
+}
+
 void Notifier::Stop() {
   std::scoped_lock lock(m_processMutex);
   m_periodic = false;

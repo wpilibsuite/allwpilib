@@ -4,7 +4,10 @@
 
 package edu.wpi.first.wpilibj;
 
+import static edu.wpi.first.units.Units.Seconds;
+
 import edu.wpi.first.hal.NotifierJNI;
+import edu.wpi.first.units.measure.Time;
 import java.io.Closeable;
 import java.util.PriorityQueue;
 import java.util.concurrent.locks.ReentrantLock;
@@ -53,6 +56,16 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     m_timeoutSeconds = timeoutSeconds;
     m_callback = callback;
     m_tracer = new Tracer();
+  }
+
+  /**
+   * Watchdog constructor.
+   *
+   * @param timeout The watchdog's timeout with microsecond resolution.
+   * @param callback This function is called when the timeout expires.
+   */
+  public Watchdog(Time timeout, Runnable callback) {
+    this(timeout.in(Seconds), callback);
   }
 
   @Override
