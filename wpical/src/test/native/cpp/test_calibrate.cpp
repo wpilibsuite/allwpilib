@@ -2,24 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <cameracalibration.h>
-#include <fieldcalibration.h>
-
+#include <fstream>
+#include <optional>
 #include <string>
 
+#include <frc/apriltag/AprilTagFieldLayout.h>
+#include <frc/apriltag/AprilTagFields.h>
 #include <gtest/gtest.h>
 #include <wpi/json.h>
+
+#include "cameracalibration.h"
+#include "fieldcalibration.h"
 
 const std::string projectRootPath = PROJECT_ROOT_PATH;
 const std::string calSavePath =
     projectRootPath.substr(0, projectRootPath.find("/src/main/native/assets")) +
     "/build";
-cameracalibration::CameraModel cameraModel = {
-    .intrinsic_matrix = Eigen::Matrix<double, 3, 3>::Identity(),
-    .distortion_coefficients = Eigen::Matrix<double, 8, 1>::Zero(),
-    .avg_reprojection_error = 0.0};
-
-wpi::json output_json;
 
 #ifdef __linux__
 const std::string fileSuffix = ".avi";
@@ -28,80 +26,87 @@ const std::string videoLocation = "/altfieldvideo";
 const std::string fileSuffix = ".mp4";
 const std::string videoLocation = "/fieldvideo";
 #endif
-TEST(Camera_CalibrationTest, OpenCV_Typical) {
-  int ret = cameracalibration::calibrate(
-      projectRootPath + "/testcalibration" + fileSuffix, cameraModel, 0.709f,
-      0.551f, 12, 8, false);
-  cameracalibration::dumpJson(cameraModel,
-                              calSavePath + "/cameracalibration.json");
-  EXPECT_EQ(ret, 0);
+
+TEST(CameraCalibrationTest, Typical) {
+  std::string path = projectRootPath + "/testcalibration" + fileSuffix;
+  auto calibrator = wpical::CameraCalibrator(4, 0.709, 0.551, 12, 8, path);
+  while (!calibrator.IsFinished()) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  }
+  auto ret = calibrator.GetCameraModel();
+  EXPECT_NE(ret, std::nullopt);
+  std::ofstream output_file(calSavePath + "/cameracalibration.json");
+  output_file << wpi::json(ret.value()).dump(4) << std::endl;
 }
 
-TEST(Camera_CalibrationTest, OpenCV_Atypical) {
-  int ret = cameracalibration::calibrate(
-      projectRootPath + videoLocation + "/long" + fileSuffix, cameraModel,
-      0.709f, 0.551f, 12, 8, false);
-  EXPECT_EQ(ret, 1);
+TEST(CameraCalibrationTest, Atypical) {
+  std::string path = projectRootPath + videoLocation + "/short" + fileSuffix;
+  auto calibrator = wpical::CameraCalibrator(4, 0.709, 0.551, 12, 8, path);
+  while (!calibrator.IsFinished()) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  }
+  auto ret = calibrator.GetCameraModel();
+  EXPECT_EQ(ret, std::nullopt);
 }
 
-TEST(Camera_CalibrationTest, MRcal_Typical) {
-  int ret = cameracalibration::calibrate(
-      projectRootPath + "/testcalibration" + fileSuffix, cameraModel, .709f, 12,
-      8, 1080, 1920, false);
-  EXPECT_EQ(ret, 0);
+TEST(FieldCalibrationTest, Typical) {
+  auto model =
+      wpi::json::parse(std::ifstream(calSavePath + "/cameracalibration.json"))
+          .get<wpical::CameraModel>();
+  auto ret = wpical::calibrate(
+      projectRootPath + videoLocation, model,
+      frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2024Crescendo),
+      3, false);
+  EXPECT_NE(ret, std::nullopt);
 }
 
-TEST(Camera_CalibrationTest, MRcal_Atypical) {
-  int ret = cameracalibration::calibrate(
-      projectRootPath + videoLocation + "/short" + fileSuffix, cameraModel,
-      0.709f, 12, 8, 1080, 1920, false);
-  EXPECT_EQ(ret, 1);
+TEST(FieldCalibrationTest, Atypical_Bad_Camera_Model) {
+  wpical::CameraModel model{};
+  auto ret = wpical::calibrate(
+      projectRootPath + videoLocation, model,
+      frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2024Crescendo),
+      3, false);
+  EXPECT_EQ(ret, std::nullopt);
 }
 
-TEST(Field_CalibrationTest, Typical) {
-  int ret = fieldcalibration::calibrate(
-      projectRootPath + videoLocation, output_json,
-      calSavePath + "/cameracalibration.json",
-      projectRootPath + "/2024-crescendo.json", 3, false);
-  EXPECT_EQ(ret, 0);
+TEST(FieldCalibrationTest, Atypical_Bad_Field_Layout) {
+  auto model =
+      wpi::json::parse(std::ifstream(calSavePath + "/cameracalibration.json"))
+          .get<wpical::CameraModel>();
+  auto ret = wpical::calibrate(projectRootPath + videoLocation, model,
+                               frc::AprilTagFieldLayout{}, 3, false);
+  EXPECT_EQ(ret, std::nullopt);
 }
 
-TEST(Field_CalibrationTest, Atypical_Bad_Camera_Model_Directory) {
-  int ret = fieldcalibration::calibrate(
-      projectRootPath + videoLocation, output_json,
-      projectRootPath + videoLocation + "/long" + fileSuffix,
-      projectRootPath + "/2024-crescendo.json", 3, false);
-  EXPECT_EQ(ret, 1);
+TEST(FieldCalibrationTest, Atypical_Bad_Input_Directory) {
+  auto model =
+      wpi::json::parse(std::ifstream(calSavePath + "/cameracalibration.json"))
+          .get<wpical::CameraModel>();
+  auto ret = wpical::calibrate(
+      projectRootPath, model,
+      frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2024Crescendo),
+      3, false);
+  EXPECT_EQ(ret, std::nullopt);
 }
 
-TEST(Field_CalibrationTest, Atypical_Bad_Ideal_JSON) {
-  int ret = fieldcalibration::calibrate(
-      projectRootPath + videoLocation, output_json,
-      calSavePath + "/cameracalibration.json",
-      calSavePath + "/cameracalibration.json", 3, false);
-  EXPECT_EQ(ret, 1);
+TEST(FieldCalibrationTest, Atypical_Bad_Pinned_Tag) {
+  auto model =
+      wpi::json::parse(std::ifstream(calSavePath + "/cameracalibration.json"))
+          .get<wpical::CameraModel>();
+  auto ret = wpical::calibrate(
+      projectRootPath + videoLocation, model,
+      frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2024Crescendo),
+      42, false);
+  EXPECT_EQ(ret, std::nullopt);
 }
 
-TEST(Field_CalibrationTest, Atypical_Bad_Input_Directory) {
-  int ret = fieldcalibration::calibrate(
-      projectRootPath + "", output_json,
-      calSavePath + "/cameracalibration.json",
-      projectRootPath + "/2024-crescendo.json", 3, false);
-  EXPECT_EQ(ret, 1);
-}
-
-TEST(Field_CalibrationTest, Atypical_Bad_Pinned_Tag) {
-  int ret = fieldcalibration::calibrate(
-      projectRootPath + videoLocation, output_json,
-      calSavePath + "/cameracalibration.json",
-      projectRootPath + "/2024-crescendo.json", 42, false);
-  EXPECT_EQ(ret, 1);
-}
-
-TEST(Field_CalibrationTest, Atypical_Bad_Pinned_Tag_Negative) {
-  int ret = fieldcalibration::calibrate(
-      projectRootPath + videoLocation, output_json,
-      calSavePath + "/cameracalibration.json",
-      projectRootPath + "/2024-crescendo.json", -1, false);
-  EXPECT_EQ(ret, 1);
+TEST(FieldCalibrationTest, Atypical_Bad_Pinned_Tag_Negative) {
+  auto model =
+      wpi::json::parse(std::ifstream(calSavePath + "/cameracalibration.json"))
+          .get<wpical::CameraModel>();
+  auto ret = wpical::calibrate(
+      projectRootPath + videoLocation, model,
+      frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2024Crescendo),
+      -1, false);
+  EXPECT_EQ(ret, std::nullopt);
 }
