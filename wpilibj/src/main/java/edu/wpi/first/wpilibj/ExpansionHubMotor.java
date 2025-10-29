@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.util.AllocationException;
 import edu.wpi.first.networktables.BooleanPublisher;
@@ -23,6 +24,7 @@ public class ExpansionHubMotor implements AutoCloseable {
   private static final int kVoltageMode = 1;
   private static final int kPositionMode = 2;
   private static final int kVelocityMode = 3;
+  private static final int kFollowerMode = 4;
 
   private ExpansionHub m_hub;
   private final int m_channel;
@@ -285,5 +287,22 @@ public class ExpansionHubMotor implements AutoCloseable {
    */
   public ExpansionHubPidConstants getPositionPidConstants() {
     return m_positionPidConstants;
+  }
+
+  /**
+   * Sets this motor to follow another motor on the same hub.
+   *
+   * <p>This does not support following motors that are also followers. Additionally, the
+   * direction of both motors will be the same.
+   *
+   * @param leader The motor to follow
+   */
+  public void follow(ExpansionHubMotor leader) {
+    requireNonNullParam(leader, "leader", "follow");
+    if (leader.m_hub.getUsbId() != this.m_hub.getUsbId()) {
+      throw new IllegalArgumentException("Leader motor must be on the same hub as the follower");
+    }
+    m_modePublisher.set(kFollowerMode);
+    m_setpointPublisher.set(leader.m_channel);
   }
 }

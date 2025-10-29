@@ -175,4 +175,13 @@ public class ExpansionHub implements AutoCloseable {
   public boolean isHubConnected() {
     return m_dataStore.m_hubConnectedSubscriber.get(false);
   }
+
+  /**
+   * Gets the USB ID of this hub.
+   *
+   * @return The USB ID
+   */
+  public int getUsbId() {
+    return m_dataStore.m_usbId;
+  }
 }

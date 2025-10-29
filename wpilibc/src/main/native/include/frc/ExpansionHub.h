@@ -57,6 +57,13 @@ class ExpansionHub {
    */
   bool IsHubConnected() const;
 
+  /**
+   * Gets the USB ID of this hub.
+   *
+   * @return The USB ID
+   */
+  int GetUsbId() const { return m_usbId; }
+
   static constexpr int NumUsbPorts = 4;
   static constexpr int NumServoPorts = 6;
   static constexpr int NumMotorPorts = 4;

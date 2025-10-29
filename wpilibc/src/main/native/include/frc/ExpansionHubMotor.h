@@ -139,6 +139,16 @@ class ExpansionHubMotor {
    */
   bool IsHubConnected() { return m_hub.IsHubConnected(); }
 
+  /**
+   * Sets this motor to follow another motor on the same hub.
+   *
+   * This does not support following motors that are also followers.
+   * Additionally, the direction of both motors will be the same.
+   *
+   * @param leader The motor to follow
+   */
+  void Follow(const ExpansionHubMotor& leader);
+
  private:
   ExpansionHub m_hub;
   int m_channel;

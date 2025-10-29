@@ -11,6 +11,7 @@ static constexpr int kPercentageMode = 0;
 static constexpr int kVoltageMode = 1;
 static constexpr int kPositionMode = 2;
 static constexpr int kVelocityMode = 3;
+static constexpr int kFollowerMode = 4;
 
 using namespace frc;
 
@@ -148,4 +149,13 @@ ExpansionHubPidConstants& ExpansionHubMotor::GetVelocityPidConstants() {
 
 ExpansionHubPidConstants& ExpansionHubMotor::GetPositionPidConstants() {
   return m_positionPidConstants;
+}
+
+void ExpansionHubMotor::Follow(const ExpansionHubMotor& leader) {
+  if (m_hub.GetUsbId() != leader.m_hub.GetUsbId()) {
+    throw FRC_MakeError(err::InvalidParameter,
+                        "Cannot follow motor on different hub");
+  }
+  m_modePublisher.Set(kFollowerMode);
+  m_setpointPublisher.Set(leader.m_channel);
 }
