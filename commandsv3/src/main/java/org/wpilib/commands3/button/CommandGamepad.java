@@ -5,6 +5,7 @@
 package org.wpilib.commands3.button;
 
 import edu.wpi.first.wpilibj.Gamepad;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import org.wpilib.commands3.Scheduler;
 import org.wpilib.commands3.Trigger;
@@ -25,6 +26,17 @@ public class CommandGamepad extends CommandGenericHID {
    */
   public CommandGamepad(int port) {
     super(port);
+    m_hid = new Gamepad(port);
+  }
+
+  /**
+   * Construct an instance of a controller.
+   *
+   * @param scheduler The scheduler that should execute the triggered commands.
+   * @param port The port index on the Driver Station that the controller is plugged into.
+   */
+  public CommandGamepad(Scheduler scheduler, int port) {
+    super(scheduler, port);
     m_hid = new Gamepad(port);
   }
 
