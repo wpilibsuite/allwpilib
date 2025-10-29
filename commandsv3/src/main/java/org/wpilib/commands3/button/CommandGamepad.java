@@ -130,7 +130,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     scheduler} if a scheduler was not explicitly provided.
    * @see #northFacen(EventLoop)
    */
-  public Trigger northFacen() {
+  public Trigger northFace() {
     return northFacen(getScheduler().getDefaultEventLoop());
   }
 
@@ -141,7 +141,7 @@ public class CommandGamepad extends CommandGenericHID {
    * @return a Trigger instance representing the North Face button's digital signal attached to the
    *     given loop.
    */
-  public Trigger northFacen(EventLoop loop) {
+  public Trigger northFace(EventLoop loop) {
     return button(Gamepad.Button.kNorthFacen.value, loop);
   }
 
