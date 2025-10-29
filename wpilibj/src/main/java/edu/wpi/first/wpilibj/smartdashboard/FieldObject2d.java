@@ -95,7 +95,7 @@ public class FieldObject2d implements AutoCloseable {
   public synchronized <SampleType extends TrajectorySample<SampleType>> void setTrajectory(
       Trajectory<SampleType> trajectory) {
     m_poses.clear();
-    for (SampleType state : trajectory.samples) {
+    for (SampleType state : trajectory.getSamples()) {
       m_poses.add(state.pose);
     }
     updateEntry();
