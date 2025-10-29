@@ -192,11 +192,11 @@ TEST(LinearFilterOutputTest, CentralFiniteDifference) {
 
   AssertCentralResults<1, 3>(
       [](double x) {
-        // f(x) = std::sin(x)
+        // f(x) = sin(x)
         return std::sin(x);
       },
       [](double x) {
-        // df/dx = std::cos(x)
+        // df/dx = cos(x)
         return std::cos(x);
       },
       h, -20.0, 20.0);
@@ -225,11 +225,11 @@ TEST(LinearFilterOutputTest, CentralFiniteDifference) {
 
   AssertCentralResults<2, 5>(
       [](double x) {
-        // f(x) = std::sin(x)
+        // f(x) = sin(x)
         return std::sin(x);
       },
       [](double x) {
-        // d²f/dx² = -std::sin(x)
+        // d²f/dx² = -sin(x)
         return -std::sin(x);
       },
       h, -20.0, 20.0);
@@ -265,11 +265,11 @@ TEST(LinearFilterOutputTest, BackwardFiniteDifference) {
 
   AssertBackwardResults<1, 2>(
       [](double x) {
-        // f(x) = std::sin(x)
+        // f(x) = sin(x)
         return std::sin(x);
       },
       [](double x) {
-        // df/dx = std::cos(x)
+        // df/dx = cos(x)
         return std::cos(x);
       },
       h, -20.0, 20.0);
@@ -298,11 +298,11 @@ TEST(LinearFilterOutputTest, BackwardFiniteDifference) {
 
   AssertBackwardResults<2, 4>(
       [](double x) {
-        // f(x) = std::sin(x)
+        // f(x) = sin(x)
         return std::sin(x);
       },
       [](double x) {
-        // d²f/dx² = -std::sin(x)
+        // d²f/dx² = -sin(x)
         return -std::sin(x);
       },
       h, -20.0, 20.0);

@@ -18,7 +18,7 @@ extern "C" {
 __declspec(dllexport)
 #endif
 
-    int HALSIM_InitExtension(void) {
+int HALSIM_InitExtension(void) {
   std::puts("HALSim WS Client Extension Initializing");
 
   HAL_OnShutdown(nullptr, [](void*) { gClient.reset(); });
