@@ -516,7 +516,7 @@ class SwerveDriveKinematics
         moduleAccelerations[i] = {linearAcceleration, {}};
       } else {
         moduleAccelerations[i] = {linearAcceleration,
-                                Rotation2d{x.value(), y.value()}};
+                                  Rotation2d{x.value(), y.value()}};
       }
     }
 

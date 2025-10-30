@@ -405,7 +405,8 @@ TEST_F(SwerveDriveKinematicsTest, TurnInPlaceForwardAccelerations) {
 
   EXPECT_NEAR(0.0, chassisAccelerations.ax.value(), kEpsilon);
   EXPECT_NEAR(0.0, chassisAccelerations.ay.value(), kEpsilon);
-  EXPECT_NEAR(2 * std::numbers::pi, chassisAccelerations.alpha.value(), kEpsilon);
+  EXPECT_NEAR(2 * std::numbers::pi, chassisAccelerations.alpha.value(),
+              kEpsilon);
 }
 
 TEST_F(SwerveDriveKinematicsTest, OffCenterRotationInverseAccelerations) {
