@@ -1193,6 +1193,20 @@ void NT_SetServerMulti(NT_Inst inst, size_t count,
 void NT_SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port);
 
 /**
+ * Sets extra server address for client (without restarting client).
+ * Connects using commonly known robot addresses for the specified team,
+ * plus an extra address.
+ *
+ * @param inst        instance handle
+ * @param team        team number
+ * @param extraAddress  extra server address
+ * @param port        port to communicate over
+ */
+void NT_SetServerTeamExtra(NT_Inst inst, unsigned int team,
+                           const struct WPI_String* extraAddress,
+                           unsigned int port);
+
+/**
  * Disconnects the client if it's running and connected. This will automatically
  * start reconnection attempts to the current server list.
  *

@@ -681,10 +681,14 @@ void SetServer(
   }
 }
 
-void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
+void SetServerTeam(NT_Inst inst, unsigned int team, std::string_view extraAddress, unsigned int port) {
+  SetServerTeamExtra(inst, team, {}, port);
+}
+
+void SetServerTeamExtra(NT_Inst inst, unsigned int team, std::string_view extraAddress, unsigned int port) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
     std::vector<std::pair<std::string, unsigned int>> servers;
-    servers.reserve(5);
+    servers.reserve(6);
 
     // 10.te.am.2
     servers.emplace_back(fmt::format("10.{}.{}.2", static_cast<int>(team / 100),
@@ -703,6 +707,11 @@ void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
     // roboRIO-<team>-FRC.frc-field.local
     servers.emplace_back(fmt::format("roboRIO-{}-FRC.frc-field.local", team),
                          port);
+
+    if (!extraAddress.empty()) {
+      // robot.local
+      servers.emplace_back(extraAddress, port);
+    }
 
     ii->SetServers(servers);
   }
