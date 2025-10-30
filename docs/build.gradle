@@ -47,20 +47,25 @@ cppProjectZips.add(project(':romiVendordep').cppHeadersZip)
 cppProjectZips.add(project(':xrpVendordep').cppHeadersZip)
 
 doxygen {
-    // Doxygen binaries are only provided for x86_64 platforms
-    // Other platforms will need to provide doxygen via their system
-    // See below maven and https://doxygen.nl/download.html for provided binaries
-    // Ensure theme.css (from https://github.com/jothepro/doxygen-awesome-css) is compatible with
-    // doxygen version when updating
+    // Doxygen binaries are only provided for x86_64 platforms. Other platforms
+    // will need to use a local Doxygen install.
+    //
+    // executeByVersion() fetches Doxygen binaries from
+    // https://frcmaven.wpi.edu/ui/native/generic-release-mirror/doxygen/, which
+    // is a mirror of binaries from https://doxygen.nl/download.html.
+    //
+    // Ensure theme.css (from https://github.com/jothepro/doxygen-awesome-css)
+    // is compatible with Doxygen version when updating.
     executables {
         doxygen {
-            // Note: has no effect if not on an x86_64 platform - you need to have a global install available on your
-            // PATH for the doxygen plugin to run
+            // Note: has no effect if not on an x86_64 platform - you need to
+            // have a global install available on your PATH for the Doxygen
+            // plugin to run.
             executableByVersion('1.12.0')
 
             String arch = System.getProperty("os.arch");
             if (!(arch.equals("x86_64") || arch.equals("amd64"))) {
-                // Search for a local doxygen install
+                // Search for a local Doxygen install
                 executableBySearchPath('doxygen')
             }
         }
