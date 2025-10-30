@@ -16,12 +16,13 @@ public class SplineSample extends TrajectorySample<SplineSample> {
   public final double curvature;
 
   /** Constructs a SplineSample. */
-  public SplineSample(double timestamp, Pose2d pose, double vel, double accel, double curvature) {
+  public SplineSample(
+      double timestamp, Pose2d pose, double velocity, double acceleration, double curvature) {
     super(
         Seconds.of(timestamp),
         pose,
-        new ChassisSpeeds(vel, 0.0, vel * curvature),
-        new ChassisAccelerations(accel, 0.0, accel * curvature));
+        new ChassisSpeeds(velocity, 0.0, velocity * curvature),
+        new ChassisAccelerations(acceleration, 0.0, acceleration * curvature));
     this.curvature = curvature;
   }
 
@@ -29,10 +30,10 @@ public class SplineSample extends TrajectorySample<SplineSample> {
   public SplineSample(
       Time timestamp,
       Pose2d pose,
-      ChassisSpeeds vel,
-      ChassisAccelerations accel,
+      ChassisSpeeds velocity,
+      ChassisAccelerations acceleration,
       double curvature) {
-    super(timestamp, pose, vel, accel);
+    super(timestamp, pose, velocity, acceleration);
     this.curvature = curvature;
   }
 

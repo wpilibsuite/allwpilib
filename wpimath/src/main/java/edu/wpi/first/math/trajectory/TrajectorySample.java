@@ -23,7 +23,7 @@ import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
 /** Represents a single sample in a trajectory. */
-@JsonPropertyOrder({"timestamp", "pose", "vel", "accel"})
+@JsonPropertyOrder({"timestamp", "pose", "velocity", "acceleration"})
 public abstract class TrajectorySample<SampleType extends TrajectorySample<SampleType>>
     implements StructSerializable {
   /** The timestamp of the sample relative to the trajectory start. */

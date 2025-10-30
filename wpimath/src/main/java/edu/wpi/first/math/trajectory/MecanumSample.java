@@ -64,17 +64,17 @@ public class MecanumSample extends TrajectorySample<MecanumSample> {
    *
    * @param timestamp The timestamp of the sample.
    * @param pose The robot pose at this sample (in the field reference frame).
-   * @param vel The robot velocity at this sample (in the robot's reference frame).
-   * @param accel The robot acceleration at this sample (in the robot's reference frame).
+   * @param velocity The robot velocity at this sample (in the robot's reference frame).
+   * @param acceleration The robot acceleration at this sample (in the robot's reference frame).
    * @param kinematics The kinematics of the drivetrain.
    */
   public MecanumSample(
       Time timestamp,
       Pose2d pose,
-      ChassisSpeeds vel,
-      ChassisAccelerations accel,
+      ChassisSpeeds velocity,
+      ChassisAccelerations acceleration,
       MecanumDriveKinematics kinematics) {
-    this(timestamp, pose, vel, accel, kinematics.toWheelSpeeds(vel));
+    this(timestamp, pose, velocity, acceleration, kinematics.toWheelSpeeds(velocity));
   }
 
   /**
