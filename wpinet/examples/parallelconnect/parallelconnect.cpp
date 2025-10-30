@@ -41,9 +41,8 @@ int main() {
             connect->Disconnected();
           });
         });
-    connect->SetServers({{{"robot.local", 8080},
-                          {"10.2.94.2", 8080},
-                          {"127.0.0.1", 8080}}});
+    connect->SetServers(
+        {{{"robot.local", 8080}, {"10.2.94.2", 8080}, {"127.0.0.1", 8080}}});
   });
 
   // wait for a keypress to terminate

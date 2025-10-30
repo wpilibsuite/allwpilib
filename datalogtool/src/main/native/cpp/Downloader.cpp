@@ -288,9 +288,8 @@ void Downloader::ThreadMain() {
         case kConnecting:
           if (auto team = wpi::parse_integer<unsigned int>(m_serverTeam, 10)) {
             // team number
-            session = std::make_unique<sftp::Session>(
-                "robot.local", 22,
-                m_username, m_password);
+            session = std::make_unique<sftp::Session>("robot.local", 22,
+                                                      m_username, m_password);
           } else {
             session = std::make_unique<sftp::Session>(m_serverTeam, 22,
                                                       m_username, m_password);
