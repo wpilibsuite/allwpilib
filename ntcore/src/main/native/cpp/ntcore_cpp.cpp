@@ -677,7 +677,7 @@ void SetServer(
 void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
     std::vector<std::pair<std::string, unsigned int>> servers;
-    servers.reserve(5);
+    servers.reserve(3);
 
     // 10.te.am.2
     servers.emplace_back(fmt::format("10.{}.{}.2", static_cast<int>(team / 100),
@@ -687,15 +687,8 @@ void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
     // 172.22.11.2
     servers.emplace_back("172.22.11.2", port);
 
-    // roboRIO-<team>-FRC.local
-    servers.emplace_back(fmt::format("roboRIO-{}-FRC.local", team), port);
-
-    // roboRIO-<team>-FRC.lan
-    servers.emplace_back(fmt::format("roboRIO-{}-FRC.lan", team), port);
-
-    // roboRIO-<team>-FRC.frc-field.local
-    servers.emplace_back(fmt::format("roboRIO-{}-FRC.frc-field.local", team),
-                         port);
+    // robot.local
+    servers.emplace_back(fmt::format("robot.local", team), port);
 
     ii->SetServers(servers);
   }
