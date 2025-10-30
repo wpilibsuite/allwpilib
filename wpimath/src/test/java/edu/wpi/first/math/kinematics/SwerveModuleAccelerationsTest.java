@@ -62,7 +62,7 @@ class SwerveModuleAccelerationsTest {
 
     assertTrue(slower.compareTo(faster) < 0);
     assertTrue(faster.compareTo(slower) > 0);
-    assertEquals(0, slower.compareTo(slower));
+    assertEquals(0, slower.compareTo(new SwerveModuleAccelerations(1.0, new Rotation2d(2.0))));
   }
 
   @Test

@@ -448,9 +448,6 @@ public class SwerveDriveKinematics
    * argument is defaulted to that use case. However, if you wish to change the center of rotation
    * for evasive maneuvers, vision alignment, or for any other use case, you can do so.
    *
-   * <p>In the case that the desired chassis accelerations are zero (i.e. the robot will be
-   * stationary), the previously calculated module angle will be maintained.
-   *
    * @param chassisAccelerations The desired chassis accelerations.
    * @param angularVelocity The desired robot angular velocity.
    * @param centerOfRotation The center of rotation. For example, if you set the center of rotation
@@ -462,6 +459,10 @@ public class SwerveDriveKinematics
       ChassisAccelerations chassisAccelerations,
       double angularVelocity,
       Translation2d centerOfRotation) {
+    // Derivation for second-order kinematics from "Swerve Drive Second Order Kinematics"
+    // by FRC Team 449 - The Blair Robot Project, Rafi Pedersen
+    // https://www.chiefdelphi.com/uploads/short-url/qzj4k2LyBs7rLxAem0YajNIlStH.pdf
+
     var moduleAccelerations = new SwerveModuleAccelerations[m_numModules];
 
     if (chassisAccelerations.ax == 0.0
@@ -496,8 +497,13 @@ public class SwerveDriveKinematics
       // The linear acceleration is the magnitude of the acceleration vector
       double linearAcceleration = Math.hypot(x, y);
 
-      moduleAccelerations[i] =
-          new SwerveModuleAccelerations(linearAcceleration, new Rotation2d(x, y));
+      if (linearAcceleration <= 1e-6) {
+        moduleAccelerations[i] =
+            new SwerveModuleAccelerations(linearAcceleration, Rotation2d.kZero);
+      } else {
+        moduleAccelerations[i] =
+            new SwerveModuleAccelerations(linearAcceleration, new Rotation2d(x, y));
+      }
     }
 
     return moduleAccelerations;
@@ -536,6 +542,10 @@ public class SwerveDriveKinematics
   @Override
   public ChassisAccelerations toChassisAccelerations(
       SwerveModuleAccelerations... moduleAccelerations) {
+    // Derivation for second-order kinematics from "Swerve Drive Second Order Kinematics"
+    // by FRC Team 449 - The Blair Robot Project, Rafi Pedersen
+    // https://www.chiefdelphi.com/uploads/short-url/qzj4k2LyBs7rLxAem0YajNIlStH.pdf
+
     if (moduleAccelerations.length != m_numModules) {
       throw new IllegalArgumentException(
           "Number of modules is not consistent with number of module locations provided in "
