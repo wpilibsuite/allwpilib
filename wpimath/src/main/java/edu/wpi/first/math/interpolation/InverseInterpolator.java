@@ -5,6 +5,8 @@
 package edu.wpi.first.math.interpolation;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Unit;
 
 /**
  * An inverse interpolation function which determines where within an interpolation range an object
@@ -30,6 +32,17 @@ public interface InverseInterpolator<T> {
    * @return Inverse interpolator for Double.
    */
   static InverseInterpolator<Double> forDouble() {
+    return MathUtil::inverseLerp;
+  }
+
+  /**
+   * Returns inverse interpolator for a Measure.
+   *
+   * @param <U> The unit of the Measure.
+   * @param <M> The type of the Measure.
+   * @return Inverse interpolator for a Measure.
+   */
+  static <U extends Unit, M extends Measure<U>> InverseInterpolator<M> forMeasure() {
     return MathUtil::inverseLerp;
   }
 }
