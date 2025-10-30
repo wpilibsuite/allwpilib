@@ -512,8 +512,8 @@ void Gamepad::InitSendable(wpi::SendableBuilder& builder) {
       "WestFace", [this] { return GetButtonForSendable(Button::kWestFace); },
       nullptr);
   builder.AddBooleanProperty(
-      "NorthFace",
-      [this] { return GetButtonForSendable(Button::kNorthFace); }, nullptr);
+      "NorthFace", [this] { return GetButtonForSendable(Button::kNorthFace); },
+      nullptr);
   builder.AddBooleanProperty(
       "Back", [this] { return GetButtonForSendable(Button::kBack); }, nullptr);
   builder.AddBooleanProperty(
