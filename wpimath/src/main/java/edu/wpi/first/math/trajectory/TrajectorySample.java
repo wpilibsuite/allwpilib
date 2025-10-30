@@ -198,8 +198,8 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
       super(timestamp, pose, velocity, acceleration);
     }
 
-    public Base(Time timestamp, Pose2d pose, ChassisSpeeds vel, ChassisAccelerations accel) {
-      super(timestamp, pose, vel, accel);
+    public Base(Time timestamp, Pose2d pose, ChassisSpeeds velocity, ChassisAccelerations acceleration) {
+      super(timestamp, pose, velocity, acceleration);
     }
 
     public Base(TrajectorySample<?> sample) {
