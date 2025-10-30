@@ -228,21 +228,21 @@ class Gamepad : public GenericHID,
    *
    * @return The state of the button.
    */
-  bool GetNorthFacenButton() const;
+  bool GetNorthFaceButton() const;
 
   /**
    * Whether the North Face button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
-  bool GetNorthFacenButtonPressed();
+  bool GetNorthFaceButtonPressed();
 
   /**
    * Whether the North Face button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
-  bool GetNorthFacenButtonReleased();
+  bool GetNorthFaceButtonReleased();
 
   /**
    * Constructs an event instance around the North Face button's
@@ -252,7 +252,7 @@ class Gamepad : public GenericHID,
    * @return an event instance representing the North Face button's
    * digital signal attached to the given loop.
    */
-  BooleanEvent NorthFacen(EventLoop* loop) const;
+  BooleanEvent NorthFace(EventLoop* loop) const;
 
   /**
    * Read the value of the Back button on the controller.
@@ -945,7 +945,7 @@ class Gamepad : public GenericHID,
     /// West Face button.
     static constexpr int kWestFace = 2;
     /// North Face button.
-    static constexpr int kNorthFacen = 3;
+    static constexpr int kNorthFace = 3;
     /// Back button.
     static constexpr int kBack = 4;
     /// Guide button.

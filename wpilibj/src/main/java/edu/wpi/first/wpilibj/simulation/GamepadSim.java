@@ -120,8 +120,8 @@ public class GamepadSim extends GenericHIDSim {
    *
    * @param value the new value
    */
-  public void setNorthFacenButton(boolean value) {
-    setRawButton(Gamepad.Button.kNorthFacen.value, value);
+  public void setNorthFaceButton(boolean value) {
+    setRawButton(Gamepad.Button.kNorthFace.value, value);
   }
 
   /**

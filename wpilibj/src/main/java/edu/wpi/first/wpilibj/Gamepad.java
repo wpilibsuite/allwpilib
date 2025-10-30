@@ -31,7 +31,7 @@ public class Gamepad extends GenericHID implements Sendable {
     /** West Face button. */
     kWestFace(2),
     /** North Face button. */
-    kNorthFacen(3),
+    kNorthFace(3),
     /** Back button. */
     kBack(4),
     /** Guide button. */
@@ -376,8 +376,8 @@ public class Gamepad extends GenericHID implements Sendable {
    *
    * @return The state of the button.
    */
-  public boolean getNorthFacenButton() {
-    return getRawButton(Button.kNorthFacen.value);
+  public boolean getNorthFaceButton() {
+    return getRawButton(Button.kNorthFace.value);
   }
 
   /**
@@ -385,8 +385,8 @@ public class Gamepad extends GenericHID implements Sendable {
    *
    * @return Whether the button was pressed since the last check.
    */
-  public boolean getNorthFacenButtonPressed() {
-    return getRawButtonPressed(Button.kNorthFacen.value);
+  public boolean getNorthFaceButtonPressed() {
+    return getRawButtonPressed(Button.kNorthFace.value);
   }
 
   /**
@@ -394,8 +394,8 @@ public class Gamepad extends GenericHID implements Sendable {
    *
    * @return Whether the button was released since the last check.
    */
-  public boolean getNorthFacenButtonReleased() {
-    return getRawButtonReleased(Button.kNorthFacen.value);
+  public boolean getNorthFaceButtonReleased() {
+    return getRawButtonReleased(Button.kNorthFace.value);
   }
 
   /**
@@ -405,8 +405,8 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return an event instance representing the North Face button's digital signal attached to the
    *     given loop.
    */
-  public BooleanEvent northFacen(EventLoop loop) {
-    return button(Button.kNorthFacen.value, loop);
+  public BooleanEvent northFace(EventLoop loop) {
+    return button(Button.kNorthFace.value, loop);
   }
 
   /**
@@ -1272,7 +1272,7 @@ public class Gamepad extends GenericHID implements Sendable {
     builder.addBooleanProperty(
         "WestFace", () -> getButtonForSendable(Button.kWestFace.value), null);
     builder.addBooleanProperty(
-        "NorthFacen", () -> getButtonForSendable(Button.kNorthFacen.value), null);
+        "NorthFace", () -> getButtonForSendable(Button.kNorthFace.value), null);
     builder.addBooleanProperty("Back", () -> getButtonForSendable(Button.kBack.value), null);
     builder.addBooleanProperty("Guide", () -> getButtonForSendable(Button.kGuide.value), null);
     builder.addBooleanProperty("Start", () -> getButtonForSendable(Button.kStart.value), null);

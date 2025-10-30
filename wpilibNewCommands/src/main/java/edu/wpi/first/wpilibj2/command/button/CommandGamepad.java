@@ -108,10 +108,10 @@ public class CommandGamepad extends CommandGenericHID {
    *
    * @return a Trigger instance representing the North Face button's digital signal attached to the
    *     {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
-   * @see #northFacen(EventLoop)
+   * @see #northFace(EventLoop)
    */
-  public Trigger northFacen() {
-    return northFacen(CommandScheduler.getInstance().getDefaultButtonLoop());
+  public Trigger northFace() {
+    return northFace(CommandScheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
@@ -121,8 +121,8 @@ public class CommandGamepad extends CommandGenericHID {
    * @return a Trigger instance representing the North Face button's digital signal attached to the
    *     given loop.
    */
-  public Trigger northFacen(EventLoop loop) {
-    return button(Gamepad.Button.kNorthFacen.value, loop);
+  public Trigger northFace(EventLoop loop) {
+    return button(Gamepad.Button.kNorthFace.value, loop);
   }
 
   /**

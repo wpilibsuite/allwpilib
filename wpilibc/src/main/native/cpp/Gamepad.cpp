@@ -107,20 +107,20 @@ BooleanEvent Gamepad::WestFace(EventLoop* loop) const {
   return BooleanEvent(loop, [this]() { return this->GetWestFaceButton(); });
 }
 
-bool Gamepad::GetNorthFacenButton() const {
-  return GetRawButton(Button::kNorthFacen);
+bool Gamepad::GetNorthFaceButton() const {
+  return GetRawButton(Button::kNorthFace);
 }
 
-bool Gamepad::GetNorthFacenButtonPressed() {
-  return GetRawButtonPressed(Button::kNorthFacen);
+bool Gamepad::GetNorthFaceButtonPressed() {
+  return GetRawButtonPressed(Button::kNorthFace);
 }
 
-bool Gamepad::GetNorthFacenButtonReleased() {
-  return GetRawButtonReleased(Button::kNorthFacen);
+bool Gamepad::GetNorthFaceButtonReleased() {
+  return GetRawButtonReleased(Button::kNorthFace);
 }
 
-BooleanEvent Gamepad::NorthFacen(EventLoop* loop) const {
-  return BooleanEvent(loop, [this]() { return this->GetNorthFacenButton(); });
+BooleanEvent Gamepad::NorthFace(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetNorthFaceButton(); });
 }
 
 bool Gamepad::GetBackButton() const {
@@ -512,8 +512,8 @@ void Gamepad::InitSendable(wpi::SendableBuilder& builder) {
       "WestFace", [this] { return GetButtonForSendable(Button::kWestFace); },
       nullptr);
   builder.AddBooleanProperty(
-      "NorthFacen",
-      [this] { return GetButtonForSendable(Button::kNorthFacen); }, nullptr);
+      "NorthFace",
+      [this] { return GetButtonForSendable(Button::kNorthFace); }, nullptr);
   builder.AddBooleanProperty(
       "Back", [this] { return GetButtonForSendable(Button::kBack); }, nullptr);
   builder.AddBooleanProperty(

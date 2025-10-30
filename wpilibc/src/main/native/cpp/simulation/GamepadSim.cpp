@@ -57,8 +57,8 @@ void GamepadSim::SetWestFaceButton(bool value) {
   SetRawButton(Gamepad::Button::kWestFace, value);
 }
 
-void GamepadSim::SetNorthFacenButton(bool value) {
-  SetRawButton(Gamepad::Button::kNorthFacen, value);
+void GamepadSim::SetNorthFaceButton(bool value) {
+  SetRawButton(Gamepad::Button::kNorthFace, value);
 }
 
 void GamepadSim::SetBackButton(bool value) {
