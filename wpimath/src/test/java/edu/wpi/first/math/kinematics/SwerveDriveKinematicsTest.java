@@ -477,16 +477,24 @@ class SwerveDriveKinematicsTest {
         () -> assertEquals(totalAccel, moduleAccelerations[3].acceleration, kEpsilon),
         () ->
             assertEquals(
-                expectedAngles[0].getDegrees(), moduleAccelerations[0].angle.getDegrees(), kEpsilon),
+                expectedAngles[0].getDegrees(),
+                moduleAccelerations[0].angle.getDegrees(),
+                kEpsilon),
         () ->
             assertEquals(
-                expectedAngles[1].getDegrees(), moduleAccelerations[1].angle.getDegrees(), kEpsilon),
+                expectedAngles[1].getDegrees(),
+                moduleAccelerations[1].angle.getDegrees(),
+                kEpsilon),
         () ->
             assertEquals(
-                expectedAngles[2].getDegrees(), moduleAccelerations[2].angle.getDegrees(), kEpsilon),
+                expectedAngles[2].getDegrees(),
+                moduleAccelerations[2].angle.getDegrees(),
+                kEpsilon),
         () ->
             assertEquals(
-                expectedAngles[3].getDegrees(), moduleAccelerations[3].angle.getDegrees(), kEpsilon));
+                expectedAngles[3].getDegrees(),
+                moduleAccelerations[3].angle.getDegrees(),
+                kEpsilon));
   }
 
   @Test
@@ -590,15 +598,23 @@ class SwerveDriveKinematicsTest {
         () -> assertEquals(expectedAccelerations[3], moduleAccelerations[3].acceleration, kEpsilon),
         () ->
             assertEquals(
-                expectedAngles[0].getDegrees(), moduleAccelerations[0].angle.getDegrees(), kEpsilon),
+                expectedAngles[0].getDegrees(),
+                moduleAccelerations[0].angle.getDegrees(),
+                kEpsilon),
         () ->
             assertEquals(
-                expectedAngles[1].getDegrees(), moduleAccelerations[1].angle.getDegrees(), kEpsilon),
+                expectedAngles[1].getDegrees(),
+                moduleAccelerations[1].angle.getDegrees(),
+                kEpsilon),
         () ->
             assertEquals(
-                expectedAngles[2].getDegrees(), moduleAccelerations[2].angle.getDegrees(), kEpsilon),
+                expectedAngles[2].getDegrees(),
+                moduleAccelerations[2].angle.getDegrees(),
+                kEpsilon),
         () ->
             assertEquals(
-                expectedAngles[3].getDegrees(), moduleAccelerations[3].angle.getDegrees(), kEpsilon));
+                expectedAngles[3].getDegrees(),
+                moduleAccelerations[3].angle.getDegrees(),
+                kEpsilon));
   }
 }
