@@ -1137,7 +1137,7 @@ void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port);
  * @param port          port to communicate over
  */
 void SetServerTeamExtra(NT_Inst inst, unsigned int team,
-                         std::string_view extraAddress, unsigned int port);
+                        std::string_view extraAddress, unsigned int port);
 
 /**
  * Disconnects the client if it's running and connected. This will automatically

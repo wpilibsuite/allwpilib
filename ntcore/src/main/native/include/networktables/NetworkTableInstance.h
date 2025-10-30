@@ -702,7 +702,8 @@ class NetworkTableInstance final {
    * @param extraAddress extra address to connect to
    * @param port         port to communicate over (0 = default)
    */
-  void SetServerTeamExtra(unsigned int team, std::string_view extraAddress, unsigned int port = 0) {
+  void SetServerTeamExtra(unsigned int team, std::string_view extraAddress,
+                          unsigned int port = 0) {
     ::nt::SetServerTeamExtra(m_handle, team, extraAddress, port);
   }
 

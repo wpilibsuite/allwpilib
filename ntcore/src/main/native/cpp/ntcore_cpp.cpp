@@ -681,11 +681,12 @@ void SetServer(
   }
 }
 
-void SetServerTeam(NT_Inst inst, unsigned int team, std::string_view extraAddress, unsigned int port) {
+void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
   SetServerTeamExtra(inst, team, {}, port);
 }
 
-void SetServerTeamExtra(NT_Inst inst, unsigned int team, std::string_view extraAddress, unsigned int port) {
+void SetServerTeamExtra(NT_Inst inst, unsigned int team,
+                        std::string_view extraAddress, unsigned int port) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
     std::vector<std::pair<std::string, unsigned int>> servers;
     servers.reserve(6);
