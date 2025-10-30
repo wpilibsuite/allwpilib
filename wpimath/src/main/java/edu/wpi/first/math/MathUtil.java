@@ -157,6 +157,39 @@ public final class MathUtil {
   }
 
   /**
+   * Returns a zero vector if the given vector is within the specified distance from the origin. The
+   * remaining distance between the deadband and the maximum distance is scaled from the origin to
+   * the maximum distance.
+   *
+   * @param value Value to clip.
+   * @param deadband Distance from origin.
+   * @param maxMagnitude The maximum distance from the origin of the input. Can be infinite.
+   * @param <R> The number of rows in the vector.
+   * @return The value after the deadband is applied.
+   */
+  public static <R extends Num> Vector<R> applyDeadband(
+      Vector<R> value, double deadband, double maxMagnitude) {
+    if (value.norm() < 1e-9) {
+      return value.times(0);
+    }
+    return value.unit().times(applyDeadband(value.norm(), deadband, maxMagnitude));
+  }
+
+  /**
+   * Returns a zero vector if the given vector is within the specified distance from the origin. The
+   * remaining distance between the deadband and a distance of 1.0 is scaled from the origin to a
+   * distance of 1.0.
+   *
+   * @param value Value to clip.
+   * @param deadband Distance from origin.
+   * @param <R> The number of rows in the vector.
+   * @return The value after the deadband is applied.
+   */
+  public static <R extends Num> Vector<R> applyDeadband(Vector<R> value, double deadband) {
+    return applyDeadband(value, deadband, 1);
+  }
+
+  /**
    * Raises the input to the power of the given exponent while preserving its sign.
    *
    * <p>The function normalizes the input value to the range [0, 1] based on the maximum magnitude,
@@ -173,7 +206,7 @@ public final class MathUtil {
    * @param maxMagnitude The maximum expected absolute value of input. Must be positive.
    * @return The transformed value with the same sign and scaled to the input range.
    */
-  public static double copySignPow(double value, double exponent, double maxMagnitude) {
+  public static double copyDirectionPow(double value, double exponent, double maxMagnitude) {
     return Math.copySign(Math.pow(Math.abs(value) / maxMagnitude, exponent), value) * maxMagnitude;
   }
 
@@ -188,8 +221,44 @@ public final class MathUtil {
    *     positive.
    * @return The transformed value with the same sign.
    */
-  public static double copySignPow(double value, double exponent) {
-    return copySignPow(value, exponent, 1);
+  public static double copyDirectionPow(double value, double exponent) {
+    return copyDirectionPow(value, exponent, 1);
+  }
+
+  /**
+   * Raises the norm of the input to the power of the given exponent while preserving its direction.
+   *
+   * <p>The function normalizes the norm of the input to the range [0, 1] based on the maximum
+   * distance, raises it to the power of the exponent, then scales the result back to the original
+   * range. This keeps the value in the original max distance and gives consistent curve behavior
+   * regardless of the input norm's scale.
+   *
+   * @param value The input vector to transform.
+   * @param exponent The exponent to apply (e.g. 1.0 = linear, 2.0 = squared curve). Must be
+   *     positive.
+   * @param maxMagnitude The maximum expected distance from origin of input. Must be positive.
+   * @param <R> The number of rows in the vector.
+   * @return The transformed value with the same direction and norm scaled to the input range.
+   */
+  public static <R extends Num> Vector<R> copyDirectionPow(
+      Vector<R> value, double exponent, double maxMagnitude) {
+    if (value.norm() < 1e-9) {
+      return value.times(0);
+    }
+    return value.unit().times(copyDirectionPow(value.norm(), exponent, maxMagnitude));
+  }
+
+  /**
+   * Raises the norm of the input to the power of the given exponent while preserving its direction.
+   *
+   * @param value The input vector to transform.
+   * @param exponent The exponent to apply (e.g. 1.0 = linear, 2.0 = squared curve). Must be
+   *     positive.
+   * @param <R> The number of rows in the vector.
+   * @return The transformed value with the same direction.
+   */
+  public static <R extends Num> Vector<R> copyDirectionPow(Vector<R> value, double exponent) {
+    return copyDirectionPow(value, exponent, 1);
   }
 
   /**
