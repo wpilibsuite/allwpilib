@@ -68,7 +68,7 @@ jobs:
   build-host:
     if: (github.repository_owner == 'wpilibsuite' && github.ref == 'refs/heads/main') || github.event_name != 'schedule'
     env:
-      MACOSX_DEPLOYMENT_TARGET: 13.3
+      MACOSX_DEPLOYMENT_TARGET: 14
     strategy:
       fail-fast: false
       matrix:
