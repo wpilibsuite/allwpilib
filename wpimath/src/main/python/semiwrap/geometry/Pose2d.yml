@@ -27,8 +27,6 @@ classes:
       RotateBy:
       TransformBy:
       RelativeTo:
-      Exp:
-      Log:
       ToMatrix:
       Nearest:
         overloads:

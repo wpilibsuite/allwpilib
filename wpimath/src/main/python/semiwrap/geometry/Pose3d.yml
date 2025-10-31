@@ -7,11 +7,6 @@ functions:
     ignore: true
   from_json:
     ignore: true
-  RotationVectorToMatrix:
-    overloads:
-      const ct_vector3d&:
-        ignore: true
-      const Eigen::Vector3d&:
 classes:
   frc::Pose3d:
     methods:
@@ -36,13 +31,11 @@ classes:
       operator*:
       operator/:
       RotateBy:
-      RotateAround:
       TransformBy:
       RelativeTo:
-      Exp:
-      Log:
       ToMatrix:
       ToPose2d:
+      RotateAround:
       Nearest:
         overloads:
           std::span<const Pose3d> [const]:

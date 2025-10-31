@@ -11,6 +11,7 @@ classes:
     methods:
       operator==:
       operator*:
+      Exp:
 
 inline_code: |
   cls_Twist2d

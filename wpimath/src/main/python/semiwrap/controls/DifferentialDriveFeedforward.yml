@@ -1,3 +1,6 @@
+defaults:
+  subpackage: controller
+
 classes:
   frc::DifferentialDriveFeedforward:
     force_type_casters:
