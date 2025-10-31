@@ -16,8 +16,8 @@
 #include <gch/small_vector.hpp>
 
 #include "sleipnir/util/print.hpp"
-#include "util/setup_profiler.hpp"
-#include "util/solve_profiler.hpp"
+#include "sleipnir/util/setup_profiler.hpp"
+#include "sleipnir/util/solve_profiler.hpp"
 
 namespace slp {
 
@@ -47,13 +47,16 @@ constexpr double to_ms(const std::chrono::duration<Rep, Period>& duration) {
 /**
  * Renders value as power of 10.
  *
+ * @tparam Scalar Scalar type.
  * @param value Value.
  */
-inline std::string power_of_10(double value) {
-  if (value == 0.0) {
+template <typename Scalar>
+std::string power_of_10(Scalar value) {
+  if (value == Scalar(0)) {
     return " 0";
   } else {
-    int exponent = std::log10(value);
+    using std::log10;
+    int exponent = static_cast<int>(log10(value));
 
     if (exponent == 0) {
       return " 1";
@@ -89,14 +92,17 @@ inline std::string power_of_10(double value) {
 /**
  * Prints error for too few degrees of freedom.
  *
+ * @tparam Scalar Scalar type.
  * @param c_e The problem's equality constraints cₑ(x) evaluated at the current
  *   iterate.
  */
-inline void print_too_few_dofs_error(const Eigen::VectorXd& c_e) {
+template <typename Scalar>
+void print_too_few_dofs_error(
+    const Eigen::Vector<Scalar, Eigen::Dynamic>& c_e) {
   slp::println("The problem has too few degrees of freedom.");
   slp::println("Violated constraints (cₑ(x) = 0) in order of declaration:");
   for (int row = 0; row < c_e.rows(); ++row) {
-    if (c_e[row] < 0.0) {
+    if (c_e[row] < Scalar(0)) {
       slp::println("  {}/{}: {} = 0", row + 1, c_e.rows(), c_e[row]);
     }
   }
@@ -109,16 +115,19 @@ inline void print_too_few_dofs_error(const Eigen::VectorXd& c_e) {
 /**
  * Prints equality constraint local infeasibility error.
  *
+ * @tparam Scalar Scalar type.
  * @param c_e The problem's equality constraints cₑ(x) evaluated at the current
  *   iterate.
  */
-inline void print_c_e_local_infeasibility_error(const Eigen::VectorXd& c_e) {
+template <typename Scalar>
+void print_c_e_local_infeasibility_error(
+    const Eigen::Vector<Scalar, Eigen::Dynamic>& c_e) {
   slp::println(
       "The problem is locally infeasible due to violated equality "
       "constraints.");
   slp::println("Violated constraints (cₑ(x) = 0) in order of declaration:");
   for (int row = 0; row < c_e.rows(); ++row) {
-    if (c_e[row] < 0.0) {
+    if (c_e[row] < Scalar(0)) {
       slp::println("  {}/{}: {} = 0", row + 1, c_e.rows(), c_e[row]);
     }
   }
@@ -131,16 +140,19 @@ inline void print_c_e_local_infeasibility_error(const Eigen::VectorXd& c_e) {
 /**
  * Prints inequality constraint local infeasibility error.
  *
+ * @tparam Scalar Scalar type.
  * @param c_i The problem's inequality constraints cᵢ(x) evaluated at the
  *   current iterate.
  */
-inline void print_c_i_local_infeasibility_error(const Eigen::VectorXd& c_i) {
+template <typename Scalar>
+void print_c_i_local_infeasibility_error(
+    const Eigen::Vector<Scalar, Eigen::Dynamic>& c_i) {
   slp::println(
       "The problem is locally infeasible due to violated inequality "
       "constraints.");
   slp::println("Violated constraints (cᵢ(x) ≥ 0) in order of declaration:");
   for (int row = 0; row < c_i.rows(); ++row) {
-    if (c_i[row] < 0.0) {
+    if (c_i[row] < Scalar(0)) {
       slp::println("  {}/{}: {} ≥ 0", row + 1, c_i.rows(), c_i[row]);
     }
   }
@@ -172,6 +184,7 @@ inline void print_bound_constraint_global_infeasibility_error(
 /**
  * Prints diagnostics for the current iteration.
  *
+ * @tparam Scalar Scalar type.
  * @param iterations Number of iterations.
  * @param type The iteration's type.
  * @param time The iteration duration.
@@ -187,14 +200,14 @@ inline void print_bound_constraint_global_infeasibility_error(
  *   backtracking.
  * @param dual_α The dual step size.
  */
-template <typename Rep, typename Period = std::ratio<1>>
+template <typename Scalar, typename Rep, typename Period = std::ratio<1>>
 void print_iteration_diagnostics(int iterations, IterationType type,
                                  const std::chrono::duration<Rep, Period>& time,
-                                 double error, double cost,
-                                 double infeasibility, double complementarity,
-                                 double μ, double δ, double primal_α,
-                                 double primal_α_max, double α_reduction_factor,
-                                 double dual_α) {
+                                 Scalar error, Scalar cost,
+                                 Scalar infeasibility, Scalar complementarity,
+                                 Scalar μ, Scalar δ, Scalar primal_α,
+                                 Scalar primal_α_max, Scalar α_reduction_factor,
+                                 Scalar dual_α) {
   if (iterations % 20 == 0) {
     if (iterations == 0) {
       slp::print("┏");
@@ -231,8 +244,9 @@ void print_iteration_diagnostics(int iterations, IterationType type,
   //   ln(rˣ) = ln(α/αᵐᵃˣ)
   //   x ln(r) = ln(α/αᵐᵃˣ)
   //   x = ln(α/αᵐᵃˣ)/ln(r)
-  int backtracks = static_cast<int>(std::log(primal_α / primal_α_max) /
-                                    std::log(α_reduction_factor));
+  using std::log;
+  int backtracks =
+      static_cast<int>(log(primal_α / primal_α_max) / log(α_reduction_factor));
 
   constexpr std::array ITERATION_TYPES = {"norm", "✓SOC", "XSOC"};
   slp::println(
@@ -301,22 +315,22 @@ inline void print_solver_diagnostics(
     const gch::small_vector<SolveProfiler>& solve_profilers) {
   auto solve_duration = to_ms(solve_profilers[0].total_duration());
 
-  slp::println("┏{:━^25}┯{:━^18}┯{:━^10}┯{:━^9}┯{:━^4}┓", "", "", "", "", "");
-  slp::println("┃{:^25}│{:^18}│{:^10}│{:^9}│{:^4}┃", "solver trace", "percent",
+  slp::println("┏{:━^23}┯{:━^18}┯{:━^10}┯{:━^9}┯{:━^4}┓", "", "", "", "", "");
+  slp::println("┃{:^23}│{:^18}│{:^10}│{:^9}│{:^4}┃", "solver trace", "percent",
                "total (ms)", "each (ms)", "runs");
-  slp::println("┡{:━^25}┷{:━^18}┷{:━^10}┷{:━^9}┷{:━^4}┩", "", "", "", "", "");
+  slp::println("┡{:━^23}┷{:━^18}┷{:━^10}┷{:━^9}┷{:━^4}┩", "", "", "", "", "");
 
   for (auto& profiler : solve_profilers) {
     double norm = solve_duration == 0.0
                       ? (&profiler == &solve_profilers[0] ? 1.0 : 0.0)
                       : to_ms(profiler.total_duration()) / solve_duration;
-    slp::println("│{:<25} {:>6.2f}%▕{}▏ {:>10.3f} {:>9.3f} {:>4}│",
+    slp::println("│{:<23} {:>6.2f}%▕{}▏ {:>10.3f} {:>9.3f} {:>4}│",
                  profiler.name(), norm * 100.0, histogram<9>(norm),
                  to_ms(profiler.total_duration()),
                  to_ms(profiler.average_duration()), profiler.num_solves());
   }
 
-  slp::println("└{:─^70}┘", "");
+  slp::println("└{:─^68}┘", "");
 }
 #else
 #define print_solver_diagnostics(...)
@@ -333,22 +347,22 @@ inline void print_autodiff_diagnostics(
   auto setup_duration = to_ms(setup_profilers[0].duration());
 
   // Print heading
-  slp::println("┏{:━^25}┯{:━^18}┯{:━^10}┯{:━^9}┯{:━^4}┓", "", "", "", "", "");
-  slp::println("┃{:^25}│{:^18}│{:^10}│{:^9}│{:^4}┃", "autodiff trace",
+  slp::println("┏{:━^23}┯{:━^18}┯{:━^10}┯{:━^9}┯{:━^4}┓", "", "", "", "", "");
+  slp::println("┃{:^23}│{:^18}│{:^10}│{:^9}│{:^4}┃", "autodiff trace",
                "percent", "total (ms)", "each (ms)", "runs");
-  slp::println("┡{:━^25}┷{:━^18}┷{:━^10}┷{:━^9}┷{:━^4}┩", "", "", "", "", "");
+  slp::println("┡{:━^23}┷{:━^18}┷{:━^10}┷{:━^9}┷{:━^4}┩", "", "", "", "", "");
 
   // Print setup profilers
   for (auto& profiler : setup_profilers) {
     double norm = setup_duration == 0.0
                       ? (&profiler == &setup_profilers[0] ? 1.0 : 0.0)
                       : to_ms(profiler.duration()) / setup_duration;
-    slp::println("│{:<25} {:>6.2f}%▕{}▏ {:>10.3f} {:>9.3f} {:>4}│",
+    slp::println("│{:<23} {:>6.2f}%▕{}▏ {:>10.3f} {:>9.3f} {:>4}│",
                  profiler.name(), norm * 100.0, histogram<9>(norm),
                  to_ms(profiler.duration()), to_ms(profiler.duration()), "1");
   }
 
-  slp::println("└{:─^70}┘", "");
+  slp::println("└{:─^68}┘", "");
 }
 #else
 #define print_autodiff_diagnostics(...)

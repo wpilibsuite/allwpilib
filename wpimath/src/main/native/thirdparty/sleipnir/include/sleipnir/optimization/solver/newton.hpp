@@ -2,88 +2,34 @@
 
 #pragma once
 
+#include <chrono>
+#include <cmath>
 #include <functional>
+#include <limits>
 #include <span>
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
+#include <gch/small_vector.hpp>
 
 #include "sleipnir/optimization/solver/exit_status.hpp"
 #include "sleipnir/optimization/solver/iteration_info.hpp"
+#include "sleipnir/optimization/solver/newton_matrix_callbacks.hpp"
 #include "sleipnir/optimization/solver/options.hpp"
+#include "sleipnir/optimization/solver/util/error_estimate.hpp"
+#include "sleipnir/optimization/solver/util/filter.hpp"
+#include "sleipnir/optimization/solver/util/kkt_error.hpp"
+#include "sleipnir/optimization/solver/util/regularized_ldlt.hpp"
+#include "sleipnir/util/assert.hpp"
+#include "sleipnir/util/print_diagnostics.hpp"
+#include "sleipnir/util/scope_exit.hpp"
+#include "sleipnir/util/scoped_profiler.hpp"
+#include "sleipnir/util/solve_profiler.hpp"
 #include "sleipnir/util/symbol_exports.hpp"
 
+// See docs/algorithms.md#Works_cited for citation definitions.
+
 namespace slp {
-
-/**
- * Matrix callbacks for the Newton's method solver.
- */
-struct SLEIPNIR_DLLEXPORT NewtonMatrixCallbacks {
-  /// Cost function value f(x) getter.
-  ///
-  /// <table>
-  ///   <tr>
-  ///     <th>Variable</th>
-  ///     <th>Rows</th>
-  ///     <th>Columns</th>
-  ///   </tr>
-  ///   <tr>
-  ///     <td>x</td>
-  ///     <td>num_decision_variables</td>
-  ///     <td>1</td>
-  ///   </tr>
-  ///   <tr>
-  ///     <td>f(x)</td>
-  ///     <td>1</td>
-  ///     <td>1</td>
-  ///   </tr>
-  /// </table>
-  std::function<double(const Eigen::VectorXd& x)> f;
-
-  /// Cost function gradient ∇f(x) getter.
-  ///
-  /// <table>
-  ///   <tr>
-  ///     <th>Variable</th>
-  ///     <th>Rows</th>
-  ///     <th>Columns</th>
-  ///   </tr>
-  ///   <tr>
-  ///     <td>x</td>
-  ///     <td>num_decision_variables</td>
-  ///     <td>1</td>
-  ///   </tr>
-  ///   <tr>
-  ///     <td>∇f(x)</td>
-  ///     <td>num_decision_variables</td>
-  ///     <td>1</td>
-  ///   </tr>
-  /// </table>
-  std::function<Eigen::SparseVector<double>(const Eigen::VectorXd& x)> g;
-
-  /// Lagrangian Hessian ∇ₓₓ²L(x) getter.
-  ///
-  /// L(xₖ) = f(xₖ)
-  ///
-  /// <table>
-  ///   <tr>
-  ///     <th>Variable</th>
-  ///     <th>Rows</th>
-  ///     <th>Columns</th>
-  ///   </tr>
-  ///   <tr>
-  ///     <td>x</td>
-  ///     <td>num_decision_variables</td>
-  ///     <td>1</td>
-  ///   </tr>
-  ///   <tr>
-  ///     <td>∇ₓₓ²L(x)</td>
-  ///     <td>num_decision_variables</td>
-  ///     <td>num_decision_variables</td>
-  ///   </tr>
-  /// </table>
-  std::function<Eigen::SparseMatrix<double>(const Eigen::VectorXd& x)> H;
-};
 
 /**
 Finds the optimal solution to a nonlinear program using Newton's method.
@@ -96,6 +42,7 @@ A nonlinear program has the form:
 
 where f(x) is the cost function.
 
+@tparam Scalar Scalar type.
 @param[in] matrix_callbacks Matrix callbacks.
 @param[in] iteration_callbacks The list of callbacks to call at the beginning of
   each iteration.
@@ -104,10 +51,244 @@ where f(x) is the cost function.
   variables.
 @return The exit status.
 */
-SLEIPNIR_DLLEXPORT ExitStatus
-newton(const NewtonMatrixCallbacks& matrix_callbacks,
-       std::span<std::function<bool(const IterationInfo& info)>>
+template <typename Scalar>
+ExitStatus newton(
+    const NewtonMatrixCallbacks<Scalar>& matrix_callbacks,
+    std::span<std::function<bool(const IterationInfo<Scalar>& info)>>
+        iteration_callbacks,
+    const Options& options, Eigen::Vector<Scalar, Eigen::Dynamic>& x) {
+  using std::isfinite;
+
+  const auto solve_start_time = std::chrono::steady_clock::now();
+
+  gch::small_vector<SolveProfiler> solve_profilers;
+  solve_profilers.emplace_back("solver");
+  solve_profilers.emplace_back("  ↳ setup");
+  solve_profilers.emplace_back("  ↳ iteration");
+  solve_profilers.emplace_back("    ↳ feasibility ✓");
+  solve_profilers.emplace_back("    ↳ iter callbacks");
+  solve_profilers.emplace_back("    ↳ KKT matrix decomp");
+  solve_profilers.emplace_back("    ↳ KKT system solve");
+  solve_profilers.emplace_back("    ↳ line search");
+  solve_profilers.emplace_back("    ↳ next iter prep");
+  solve_profilers.emplace_back("    ↳ f(x)");
+  solve_profilers.emplace_back("    ↳ ∇f(x)");
+  solve_profilers.emplace_back("    ↳ ∇²ₓₓL");
+
+  auto& solver_prof = solve_profilers[0];
+  auto& setup_prof = solve_profilers[1];
+  auto& inner_iter_prof = solve_profilers[2];
+  auto& feasibility_check_prof = solve_profilers[3];
+  auto& iter_callbacks_prof = solve_profilers[4];
+  auto& kkt_matrix_decomp_prof = solve_profilers[5];
+  auto& kkt_system_solve_prof = solve_profilers[6];
+  auto& line_search_prof = solve_profilers[7];
+  auto& next_iter_prep_prof = solve_profilers[8];
+
+  // Set up profiled matrix callbacks
+#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
+  auto& f_prof = solve_profilers[9];
+  auto& g_prof = solve_profilers[10];
+  auto& H_prof = solve_profilers[11];
+
+  NewtonMatrixCallbacks<Scalar> matrices{
+      [&](const Eigen::Vector<Scalar, Eigen::Dynamic>& x) -> Scalar {
+        ScopedProfiler prof{f_prof};
+        return matrix_callbacks.f(x);
+      },
+      [&](const Eigen::Vector<Scalar, Eigen::Dynamic>& x)
+          -> Eigen::SparseVector<Scalar> {
+        ScopedProfiler prof{g_prof};
+        return matrix_callbacks.g(x);
+      },
+      [&](const Eigen::Vector<Scalar, Eigen::Dynamic>& x)
+          -> Eigen::SparseMatrix<Scalar> {
+        ScopedProfiler prof{H_prof};
+        return matrix_callbacks.H(x);
+      }};
+#else
+  const auto& matrices = matrix_callbacks;
+#endif
+
+  solver_prof.start();
+  setup_prof.start();
+
+  Scalar f = matrices.f(x);
+
+  int num_decision_variables = x.rows();
+
+  Eigen::SparseVector<Scalar> g = matrices.g(x);
+  Eigen::SparseMatrix<Scalar> H = matrices.H(x);
+
+  // Ensure matrix callback dimensions are consistent
+  slp_assert(g.rows() == num_decision_variables);
+  slp_assert(H.rows() == num_decision_variables);
+  slp_assert(H.cols() == num_decision_variables);
+
+  // Check whether initial guess has finite f(xₖ)
+  if (!isfinite(f)) {
+    return ExitStatus::NONFINITE_INITIAL_COST_OR_CONSTRAINTS;
+  }
+
+  int iterations = 0;
+
+  Filter<Scalar> filter;
+
+  RegularizedLDLT<Scalar> solver{num_decision_variables, 0};
+
+  // Variables for determining when a step is acceptable
+  constexpr Scalar α_reduction_factor(0.5);
+  constexpr Scalar α_min(1e-20);
+
+  // Error estimate
+  Scalar E_0 = std::numeric_limits<Scalar>::infinity();
+
+  setup_prof.stop();
+
+  // Prints final solver diagnostics when the solver exits
+  scope_exit exit{[&] {
+    if (options.diagnostics) {
+      solver_prof.stop();
+      if (iterations > 0) {
+        print_bottom_iteration_diagnostics();
+      }
+      print_solver_diagnostics(solve_profilers);
+    }
+  }};
+
+  while (E_0 > Scalar(options.tolerance)) {
+    ScopedProfiler inner_iter_profiler{inner_iter_prof};
+    ScopedProfiler feasibility_check_profiler{feasibility_check_prof};
+
+    // Check for diverging iterates
+    if (x.template lpNorm<Eigen::Infinity>() > Scalar(1e10) || !x.allFinite()) {
+      return ExitStatus::DIVERGING_ITERATES;
+    }
+
+    feasibility_check_profiler.stop();
+    ScopedProfiler iter_callbacks_profiler{iter_callbacks_prof};
+
+    // Call iteration callbacks
+    for (const auto& callback : iteration_callbacks) {
+      if (callback({iterations, x, g, H, Eigen::SparseMatrix<Scalar>{},
+                    Eigen::SparseMatrix<Scalar>{}})) {
+        return ExitStatus::CALLBACK_REQUESTED_STOP;
+      }
+    }
+
+    iter_callbacks_profiler.stop();
+    ScopedProfiler kkt_matrix_decomp_profiler{kkt_matrix_decomp_prof};
+
+    // Solve the Newton-KKT system
+    //
+    // Hpˣ = −∇f
+    solver.compute(H);
+
+    kkt_matrix_decomp_profiler.stop();
+    ScopedProfiler kkt_system_solve_profiler{kkt_system_solve_prof};
+
+    Eigen::Vector<Scalar, Eigen::Dynamic> p_x = solver.solve(-g);
+
+    kkt_system_solve_profiler.stop();
+    ScopedProfiler line_search_profiler{line_search_prof};
+
+    constexpr Scalar α_max(1);
+    Scalar α = α_max;
+
+    // Loop until a step is accepted. If a step becomes acceptable, the loop
+    // will exit early.
+    while (1) {
+      Eigen::Vector<Scalar, Eigen::Dynamic> trial_x = x + α * p_x;
+
+      Scalar trial_f = matrices.f(trial_x);
+
+      // If f(xₖ + αpₖˣ) isn't finite, reduce step size immediately
+      if (!isfinite(trial_f)) {
+        // Reduce step size
+        α *= α_reduction_factor;
+
+        if (α < α_min) {
+          return ExitStatus::LINE_SEARCH_FAILED;
+        }
+        continue;
+      }
+
+      // Check whether filter accepts trial iterate
+      if (filter.try_add(FilterEntry{trial_f}, α)) {
+        // Accept step
+        break;
+      }
+
+      // Reduce step size
+      α *= α_reduction_factor;
+
+      // If step size hit a minimum, check if the KKT error was reduced. If it
+      // wasn't, report bad line search.
+      if (α < α_min) {
+        Scalar current_kkt_error = kkt_error<Scalar>(g);
+
+        Eigen::Vector<Scalar, Eigen::Dynamic> trial_x = x + α_max * p_x;
+
+        Scalar next_kkt_error = kkt_error<Scalar>(matrices.g(trial_x));
+
+        // If the step using αᵐᵃˣ reduced the KKT error, accept it anyway
+        if (next_kkt_error <= Scalar(0.999) * current_kkt_error) {
+          α = α_max;
+
+          // Accept step
+          break;
+        }
+
+        return ExitStatus::LINE_SEARCH_FAILED;
+      }
+    }
+
+    line_search_profiler.stop();
+
+    // xₖ₊₁ = xₖ + αₖpₖˣ
+    x += α * p_x;
+
+    // Update autodiff for Hessian
+    f = matrices.f(x);
+    g = matrices.g(x);
+    H = matrices.H(x);
+
+    ScopedProfiler next_iter_prep_profiler{next_iter_prep_prof};
+
+    // Update the error estimate
+    E_0 = error_estimate<Scalar>(g);
+
+    next_iter_prep_profiler.stop();
+    inner_iter_profiler.stop();
+
+    if (options.diagnostics) {
+      print_iteration_diagnostics(iterations, IterationType::NORMAL,
+                                  inner_iter_profiler.current_duration(), E_0,
+                                  f, Scalar(0), Scalar(0), Scalar(0),
+                                  solver.hessian_regularization(), α, α_max,
+                                  α_reduction_factor, Scalar(1));
+    }
+
+    ++iterations;
+
+    // Check for max iterations
+    if (iterations >= options.max_iterations) {
+      return ExitStatus::MAX_ITERATIONS_EXCEEDED;
+    }
+
+    // Check for max wall clock time
+    if (std::chrono::steady_clock::now() - solve_start_time > options.timeout) {
+      return ExitStatus::TIMEOUT;
+    }
+  }
+
+  return ExitStatus::SUCCESS;
+}
+
+extern template SLEIPNIR_DLLEXPORT ExitStatus
+newton(const NewtonMatrixCallbacks<double>& matrix_callbacks,
+       std::span<std::function<bool(const IterationInfo<double>& info)>>
            iteration_callbacks,
-       const Options& options, Eigen::VectorXd& x);
+       const Options& options, Eigen::Vector<double, Eigen::Dynamic>& x);
 
 }  // namespace slp
