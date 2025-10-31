@@ -14,20 +14,23 @@ namespace slp {
 /**
  * Returns the error estimate using the KKT conditions for Newton's method.
  *
+ * @tparam Scalar Scalar type.
  * @param g Gradient of the cost function ∇f.
  */
-inline double error_estimate(const Eigen::VectorXd& g) {
+template <typename Scalar>
+Scalar error_estimate(const Eigen::Vector<Scalar, Eigen::Dynamic>& g) {
   // Update the error estimate using the KKT conditions from equations (19.5a)
   // through (19.5d) of [1].
   //
   //   ∇f = 0
 
-  return g.lpNorm<Eigen::Infinity>();
+  return g.template lpNorm<Eigen::Infinity>();
 }
 
 /**
  * Returns the error estimate using the KKT conditions for SQP.
  *
+ * @tparam Scalar Scalar type.
  * @param g Gradient of the cost function ∇f.
  * @param A_e The problem's equality constraint Jacobian Aₑ(x) evaluated at the
  *   current iterate.
@@ -35,10 +38,11 @@ inline double error_estimate(const Eigen::VectorXd& g) {
  *   iterate.
  * @param y Equality constraint dual variables.
  */
-inline double error_estimate(const Eigen::VectorXd& g,
-                             const Eigen::SparseMatrix<double>& A_e,
-                             const Eigen::VectorXd& c_e,
-                             const Eigen::VectorXd& y) {
+template <typename Scalar>
+Scalar error_estimate(const Eigen::Vector<Scalar, Eigen::Dynamic>& g,
+                      const Eigen::SparseMatrix<Scalar>& A_e,
+                      const Eigen::Vector<Scalar, Eigen::Dynamic>& c_e,
+                      const Eigen::Vector<Scalar, Eigen::Dynamic>& y) {
   // Update the error estimate using the KKT conditions from equations (19.5a)
   // through (19.5d) of [1].
   //
@@ -52,17 +56,20 @@ inline double error_estimate(const Eigen::VectorXd& g,
   //   ‖cₑ‖_∞
 
   // s_d = max(sₘₐₓ, ‖y‖₁ / m) / sₘₐₓ
-  constexpr double s_max = 100.0;
-  double s_d = std::max(s_max, y.lpNorm<1>() / y.rows()) / s_max;
+  constexpr Scalar s_max(100);
+  Scalar s_d =
+      std::max(s_max, y.template lpNorm<1>() / Scalar(y.rows())) / s_max;
 
-  return std::max({(g - A_e.transpose() * y).lpNorm<Eigen::Infinity>() / s_d,
-                   c_e.lpNorm<Eigen::Infinity>()});
+  return std::max(
+      {(g - A_e.transpose() * y).template lpNorm<Eigen::Infinity>() / s_d,
+       c_e.template lpNorm<Eigen::Infinity>()});
 }
 
 /**
  * Returns the error estimate using the KKT conditions for the interior-point
  * method.
  *
+ * @tparam Scalar Scalar type.
  * @param g Gradient of the cost function ∇f.
  * @param A_e The problem's equality constraint Jacobian Aₑ(x) evaluated at the
  *   current iterate.
@@ -77,13 +84,16 @@ inline double error_estimate(const Eigen::VectorXd& g,
  * @param z Inequality constraint dual variables.
  * @param μ Barrier parameter.
  */
-inline double error_estimate(const Eigen::VectorXd& g,
-                             const Eigen::SparseMatrix<double>& A_e,
-                             const Eigen::VectorXd& c_e,
-                             const Eigen::SparseMatrix<double>& A_i,
-                             const Eigen::VectorXd& c_i,
-                             const Eigen::VectorXd& s, const Eigen::VectorXd& y,
-                             const Eigen::VectorXd& z, double μ) {
+template <typename Scalar>
+Scalar error_estimate(const Eigen::Vector<Scalar, Eigen::Dynamic>& g,
+                      const Eigen::SparseMatrix<Scalar>& A_e,
+                      const Eigen::Vector<Scalar, Eigen::Dynamic>& c_e,
+                      const Eigen::SparseMatrix<Scalar>& A_i,
+                      const Eigen::Vector<Scalar, Eigen::Dynamic>& c_i,
+                      const Eigen::Vector<Scalar, Eigen::Dynamic>& s,
+                      const Eigen::Vector<Scalar, Eigen::Dynamic>& y,
+                      const Eigen::Vector<Scalar, Eigen::Dynamic>& z,
+                      Scalar μ) {
   // Update the error estimate using the KKT conditions from equations (19.5a)
   // through (19.5d) of [1].
   //
@@ -101,23 +111,26 @@ inline double error_estimate(const Eigen::VectorXd& g,
   //   ‖cᵢ − s‖_∞
 
   // s_d = max(sₘₐₓ, (‖y‖₁ + ‖z‖₁) / (m + n)) / sₘₐₓ
-  constexpr double s_max = 100.0;
-  double s_d =
-      std::max(s_max, (y.lpNorm<1>() + z.lpNorm<1>()) / (y.rows() + z.rows())) /
+  constexpr Scalar s_max(100);
+  Scalar s_d =
+      std::max(s_max, (y.template lpNorm<1>() + z.template lpNorm<1>()) /
+                          Scalar(y.rows() + z.rows())) /
       s_max;
 
   // s_c = max(sₘₐₓ, ‖z‖₁ / n) / sₘₐₓ
-  double s_c = std::max(s_max, z.lpNorm<1>() / z.rows()) / s_max;
+  Scalar s_c =
+      std::max(s_max, z.template lpNorm<1>() / Scalar(z.rows())) / s_max;
 
   const auto S = s.asDiagonal();
-  const Eigen::VectorXd μe = Eigen::VectorXd::Constant(s.rows(), μ);
+  const Eigen::Vector<Scalar, Eigen::Dynamic> μe =
+      Eigen::Vector<Scalar, Eigen::Dynamic>::Constant(s.rows(), μ);
 
   return std::max({(g - A_e.transpose() * y - A_i.transpose() * z)
-                           .lpNorm<Eigen::Infinity>() /
+                           .template lpNorm<Eigen::Infinity>() /
                        s_d,
-                   (S * z - μe).lpNorm<Eigen::Infinity>() / s_c,
-                   c_e.lpNorm<Eigen::Infinity>(),
-                   (c_i - s).lpNorm<Eigen::Infinity>()});
+                   (S * z - μe).template lpNorm<Eigen::Infinity>() / s_c,
+                   c_e.template lpNorm<Eigen::Infinity>(),
+                   (c_i - s).template lpNorm<Eigen::Infinity>()});
 }
 
 }  // namespace slp

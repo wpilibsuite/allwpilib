@@ -8,12 +8,12 @@ Subject: [PATCH 7/8] Suppress GCC 12 warning false positive
  1 file changed, 7 insertions(+)
 
 diff --git a/include/sleipnir/autodiff/variable_matrix.hpp b/include/sleipnir/autodiff/variable_matrix.hpp
-index 349a1550235516f9853609b61feded834ef2894b..70bccf4fc078a49e22b6699db1228c765430a121 100644
+index 7ddf02c0e2f66aff8da422b874cbe9772f9fd00d..351030b4041027ba63a2e6ec08f2077b3c35b5db 100644
 --- a/include/sleipnir/autodiff/variable_matrix.hpp
 +++ b/include/sleipnir/autodiff/variable_matrix.hpp
-@@ -573,6 +573,10 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+@@ -578,6 +578,10 @@ class VariableMatrix : public SleipnirBase {
  
-     VariableMatrix result(VariableMatrix::empty, lhs.rows(), rhs.cols());
+     VariableMatrix<Scalar> result(detail::empty, lhs.rows(), rhs.cols());
  
 +#if __GNUC__ >= 12
 +#pragma GCC diagnostic push
@@ -21,8 +21,8 @@ index 349a1550235516f9853609b61feded834ef2894b..70bccf4fc078a49e22b6699db1228c76
 +#endif
      for (int i = 0; i < lhs.rows(); ++i) {
        for (int j = 0; j < rhs.cols(); ++j) {
-         Variable sum;
-@@ -590,6 +594,9 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+         Variable sum{Scalar(0)};
+@@ -637,6 +641,9 @@ class VariableMatrix : public SleipnirBase {
          result[i, j] = sum;
        }
      }
