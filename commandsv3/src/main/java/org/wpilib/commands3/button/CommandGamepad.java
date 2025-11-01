@@ -2,11 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj2.command.button;
+package org.wpilib.commands3.button;
 
 import edu.wpi.first.wpilibj.Gamepad;
 import edu.wpi.first.wpilibj.event.EventLoop;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import org.wpilib.commands3.Scheduler;
+import org.wpilib.commands3.Trigger;
 
 /**
  * A version of {@link Gamepad} with {@link Trigger} factories for command-based.
@@ -28,6 +29,17 @@ public class CommandGamepad extends CommandGenericHID {
   }
 
   /**
+   * Construct an instance of a controller.
+   *
+   * @param scheduler The scheduler that should execute the triggered commands.
+   * @param port The port index on the Driver Station that the controller is plugged into.
+   */
+  public CommandGamepad(Scheduler scheduler, int port) {
+    super(scheduler, port);
+    m_hid = new Gamepad(port);
+  }
+
+  /**
    * Get the underlying GenericHID object.
    *
    * @return the wrapped GenericHID object
@@ -41,11 +53,13 @@ public class CommandGamepad extends CommandGenericHID {
    * Constructs a Trigger instance around the South Face button's digital signal.
    *
    * @return a Trigger instance representing the South Face button's digital signal attached to the
-   *     {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
+   *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
+   *     scheduler} if a scheduler was not explicitly provided.
    * @see #southFace(EventLoop)
    */
   public Trigger southFace() {
-    return southFace(CommandScheduler.getInstance().getDefaultButtonLoop());
+    return southFace(getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -63,11 +77,13 @@ public class CommandGamepad extends CommandGenericHID {
    * Constructs a Trigger instance around the East Face button's digital signal.
    *
    * @return a Trigger instance representing the East Face button's digital signal attached to the
-   *     {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
+   *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
+   *     scheduler} if a scheduler was not explicitly provided.
    * @see #eastFace(EventLoop)
    */
   public Trigger eastFace() {
-    return eastFace(CommandScheduler.getInstance().getDefaultButtonLoop());
+    return eastFace(getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -85,11 +101,13 @@ public class CommandGamepad extends CommandGenericHID {
    * Constructs a Trigger instance around the West Face button's digital signal.
    *
    * @return a Trigger instance representing the West Face button's digital signal attached to the
-   *     {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
+   *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
+   *     scheduler} if a scheduler was not explicitly provided.
    * @see #westFace(EventLoop)
    */
   public Trigger westFace() {
-    return westFace(CommandScheduler.getInstance().getDefaultButtonLoop());
+    return westFace(getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -107,11 +125,13 @@ public class CommandGamepad extends CommandGenericHID {
    * Constructs a Trigger instance around the North Face button's digital signal.
    *
    * @return a Trigger instance representing the North Face button's digital signal attached to the
-   *     {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
+   *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
+   *     scheduler} if a scheduler was not explicitly provided.
    * @see #northFace(EventLoop)
    */
   public Trigger northFace() {
-    return northFace(CommandScheduler.getInstance().getDefaultButtonLoop());
+    return northFace(getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -129,11 +149,13 @@ public class CommandGamepad extends CommandGenericHID {
    * Constructs a Trigger instance around the Back button's digital signal.
    *
    * @return a Trigger instance representing the Back button's digital signal attached to the {@link
-   *     CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler passed to
+   *     the controller's constructor, or the {@link Scheduler#getDefault default scheduler} if a
+   *     scheduler was not explicitly provided.
    * @see #back(EventLoop)
    */
   public Trigger back() {
-    return back(CommandScheduler.getInstance().getDefaultButtonLoop());
+    return back(getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -151,11 +173,13 @@ public class CommandGamepad extends CommandGenericHID {
    * Constructs a Trigger instance around the Guide button's digital signal.
    *
    * @return a Trigger instance representing the Guide button's digital signal attached to the
-   *     {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
+   *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
+   *     scheduler} if a scheduler was not explicitly provided.
    * @see #guide(EventLoop)
    */
   public Trigger guide() {
-    return guide(CommandScheduler.getInstance().getDefaultButtonLoop());
+    return guide(getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -173,11 +197,13 @@ public class CommandGamepad extends CommandGenericHID {
    * Constructs a Trigger instance around the Start button's digital signal.
    *
    * @return a Trigger instance representing the Start button's digital signal attached to the
-   *     {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
+   *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
+   *     scheduler} if a scheduler was not explicitly provided.
    * @see #start(EventLoop)
    */
   public Trigger start() {
-    return start(CommandScheduler.getInstance().getDefaultButtonLoop());
+    return start(getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -195,11 +221,13 @@ public class CommandGamepad extends CommandGenericHID {
    * Constructs a Trigger instance around the left stick button's digital signal.
    *
    * @return a Trigger instance representing the left stick button's digital signal attached to the
-   *     {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
+   *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
+   *     scheduler} if a scheduler was not explicitly provided.
    * @see #leftStick(EventLoop)
    */
   public Trigger leftStick() {
-    return leftStick(CommandScheduler.getInstance().getDefaultButtonLoop());
+    return leftStick(getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -217,11 +245,13 @@ public class CommandGamepad extends CommandGenericHID {
    * Constructs a Trigger instance around the right stick button's digital signal.
    *
    * @return a Trigger instance representing the right stick button's digital signal attached to the
-   *     {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
+   *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
+   *     scheduler} if a scheduler was not explicitly provided.
    * @see #rightStick(EventLoop)
    */
   public Trigger rightStick() {
-    return rightStick(CommandScheduler.getInstance().getDefaultButtonLoop());
+    return rightStick(getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -239,11 +269,13 @@ public class CommandGamepad extends CommandGenericHID {
    * Constructs a Trigger instance around the right shoulder button's digital signal.
    *
    * @return a Trigger instance representing the right shoulder button's digital signal attached to
-   *     the {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
+   *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
+   *     scheduler} if a scheduler was not explicitly provided.
    * @see #leftShoulder(EventLoop)
    */
   public Trigger leftShoulder() {
-    return leftShoulder(CommandScheduler.getInstance().getDefaultButtonLoop());
+    return leftShoulder(getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -261,11 +293,13 @@ public class CommandGamepad extends CommandGenericHID {
    * Constructs a Trigger instance around the right shoulder button's digital signal.
    *
    * @return a Trigger instance representing the right shoulder button's digital signal attached to
-   *     the {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
+   *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
+   *     scheduler} if a scheduler was not explicitly provided.
    * @see #rightShoulder(EventLoop)
    */
   public Trigger rightShoulder() {
-    return rightShoulder(CommandScheduler.getInstance().getDefaultButtonLoop());
+    return rightShoulder(getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -283,11 +317,13 @@ public class CommandGamepad extends CommandGenericHID {
    * Constructs a Trigger instance around the D-pad up button's digital signal.
    *
    * @return a Trigger instance representing the D-pad up button's digital signal attached to the
-   *     {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
+   *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
+   *     scheduler} if a scheduler was not explicitly provided.
    * @see #dpadUp(EventLoop)
    */
   public Trigger dpadUp() {
-    return dpadUp(CommandScheduler.getInstance().getDefaultButtonLoop());
+    return dpadUp(getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -305,11 +341,13 @@ public class CommandGamepad extends CommandGenericHID {
    * Constructs a Trigger instance around the D-pad down button's digital signal.
    *
    * @return a Trigger instance representing the D-pad down button's digital signal attached to the
-   *     {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
+   *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
+   *     scheduler} if a scheduler was not explicitly provided.
    * @see #dpadDown(EventLoop)
    */
   public Trigger dpadDown() {
-    return dpadDown(CommandScheduler.getInstance().getDefaultButtonLoop());
+    return dpadDown(getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -327,11 +365,13 @@ public class CommandGamepad extends CommandGenericHID {
    * Constructs a Trigger instance around the D-pad left button's digital signal.
    *
    * @return a Trigger instance representing the D-pad left button's digital signal attached to the
-   *     {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
+   *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
+   *     scheduler} if a scheduler was not explicitly provided.
    * @see #dpadLeft(EventLoop)
    */
   public Trigger dpadLeft() {
-    return dpadLeft(CommandScheduler.getInstance().getDefaultButtonLoop());
+    return dpadLeft(getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -349,11 +389,13 @@ public class CommandGamepad extends CommandGenericHID {
    * Constructs a Trigger instance around the D-pad right button's digital signal.
    *
    * @return a Trigger instance representing the D-pad right button's digital signal attached to the
-   *     {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
+   *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
+   *     scheduler} if a scheduler was not explicitly provided.
    * @see #dpadRight(EventLoop)
    */
   public Trigger dpadRight() {
-    return dpadRight(CommandScheduler.getInstance().getDefaultButtonLoop());
+    return dpadRight(getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -371,11 +413,13 @@ public class CommandGamepad extends CommandGenericHID {
    * Constructs a Trigger instance around the Miscellaneous 1 button's digital signal.
    *
    * @return a Trigger instance representing the Miscellaneous 1 button's digital signal attached to
-   *     the {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
+   *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
+   *     scheduler} if a scheduler was not explicitly provided.
    * @see #misc1(EventLoop)
    */
   public Trigger misc1() {
-    return misc1(CommandScheduler.getInstance().getDefaultButtonLoop());
+    return misc1(getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -393,11 +437,13 @@ public class CommandGamepad extends CommandGenericHID {
    * Constructs a Trigger instance around the Right Paddle 1 button's digital signal.
    *
    * @return a Trigger instance representing the Right Paddle 1 button's digital signal attached to
-   *     the {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
+   *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
+   *     scheduler} if a scheduler was not explicitly provided.
    * @see #rightPaddle1(EventLoop)
    */
   public Trigger rightPaddle1() {
-    return rightPaddle1(CommandScheduler.getInstance().getDefaultButtonLoop());
+    return rightPaddle1(getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -415,11 +461,13 @@ public class CommandGamepad extends CommandGenericHID {
    * Constructs a Trigger instance around the Left Paddle 1 button's digital signal.
    *
    * @return a Trigger instance representing the Left Paddle 1 button's digital signal attached to
-   *     the {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
+   *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
+   *     scheduler} if a scheduler was not explicitly provided.
    * @see #leftPaddle1(EventLoop)
    */
   public Trigger leftPaddle1() {
-    return leftPaddle1(CommandScheduler.getInstance().getDefaultButtonLoop());
+    return leftPaddle1(getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -437,11 +485,13 @@ public class CommandGamepad extends CommandGenericHID {
    * Constructs a Trigger instance around the Right Paddle 2 button's digital signal.
    *
    * @return a Trigger instance representing the Right Paddle 2 button's digital signal attached to
-   *     the {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
+   *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
+   *     scheduler} if a scheduler was not explicitly provided.
    * @see #rightPaddle2(EventLoop)
    */
   public Trigger rightPaddle2() {
-    return rightPaddle2(CommandScheduler.getInstance().getDefaultButtonLoop());
+    return rightPaddle2(getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -459,11 +509,13 @@ public class CommandGamepad extends CommandGenericHID {
    * Constructs a Trigger instance around the Left Paddle 2 button's digital signal.
    *
    * @return a Trigger instance representing the Left Paddle 2 button's digital signal attached to
-   *     the {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
+   *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
+   *     scheduler} if a scheduler was not explicitly provided.
    * @see #leftPaddle2(EventLoop)
    */
   public Trigger leftPaddle2() {
-    return leftPaddle2(CommandScheduler.getInstance().getDefaultButtonLoop());
+    return leftPaddle2(getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -481,11 +533,13 @@ public class CommandGamepad extends CommandGenericHID {
    * Constructs a Trigger instance around the Touchpad button's digital signal.
    *
    * @return a Trigger instance representing the Touchpad button's digital signal attached to the
-   *     {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
+   *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
+   *     scheduler} if a scheduler was not explicitly provided.
    * @see #touchpad(EventLoop)
    */
   public Trigger touchpad() {
-    return touchpad(CommandScheduler.getInstance().getDefaultButtonLoop());
+    return touchpad(getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -503,11 +557,13 @@ public class CommandGamepad extends CommandGenericHID {
    * Constructs a Trigger instance around the Miscellaneous 2 button's digital signal.
    *
    * @return a Trigger instance representing the Miscellaneous 2 button's digital signal attached to
-   *     the {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
+   *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
+   *     scheduler} if a scheduler was not explicitly provided.
    * @see #misc2(EventLoop)
    */
   public Trigger misc2() {
-    return misc2(CommandScheduler.getInstance().getDefaultButtonLoop());
+    return misc2(getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -525,11 +581,13 @@ public class CommandGamepad extends CommandGenericHID {
    * Constructs a Trigger instance around the Miscellaneous 3 button's digital signal.
    *
    * @return a Trigger instance representing the Miscellaneous 3 button's digital signal attached to
-   *     the {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
+   *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
+   *     scheduler} if a scheduler was not explicitly provided.
    * @see #misc3(EventLoop)
    */
   public Trigger misc3() {
-    return misc3(CommandScheduler.getInstance().getDefaultButtonLoop());
+    return misc3(getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -547,11 +605,13 @@ public class CommandGamepad extends CommandGenericHID {
    * Constructs a Trigger instance around the Miscellaneous 4 button's digital signal.
    *
    * @return a Trigger instance representing the Miscellaneous 4 button's digital signal attached to
-   *     the {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
+   *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
+   *     scheduler} if a scheduler was not explicitly provided.
    * @see #misc4(EventLoop)
    */
   public Trigger misc4() {
-    return misc4(CommandScheduler.getInstance().getDefaultButtonLoop());
+    return misc4(getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -569,11 +629,13 @@ public class CommandGamepad extends CommandGenericHID {
    * Constructs a Trigger instance around the Miscellaneous 5 button's digital signal.
    *
    * @return a Trigger instance representing the Miscellaneous 5 button's digital signal attached to
-   *     the {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
+   *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
+   *     scheduler} if a scheduler was not explicitly provided.
    * @see #misc5(EventLoop)
    */
   public Trigger misc5() {
-    return misc5(CommandScheduler.getInstance().getDefaultButtonLoop());
+    return misc5(getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -591,11 +653,13 @@ public class CommandGamepad extends CommandGenericHID {
    * Constructs a Trigger instance around the Miscellaneous 6 button's digital signal.
    *
    * @return a Trigger instance representing the Miscellaneous 6 button's digital signal attached to
-   *     the {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
+   *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
+   *     scheduler} if a scheduler was not explicitly provided.
    * @see #misc6(EventLoop)
    */
   public Trigger misc6() {
-    return misc6(CommandScheduler.getInstance().getDefaultButtonLoop());
+    return misc6(getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -630,11 +694,11 @@ public class CommandGamepad extends CommandGenericHID {
    * @param threshold the minimum axis value for the returned {@link Trigger} to be true. This value
    *     should be in the range [0, 1] where 0 is the unpressed state of the axis.
    * @return a Trigger instance that is true when the left trigger's axis exceeds the provided
-   *     threshold, attached to the {@link CommandScheduler#getDefaultButtonLoop() default scheduler
-   *     button loop}.
+   *     threshold, attached to the {@link Scheduler#getDefaultEventLoop() default scheduler button
+   *     loop}.
    */
   public Trigger leftTrigger(double threshold) {
-    return leftTrigger(threshold, CommandScheduler.getInstance().getDefaultButtonLoop());
+    return leftTrigger(threshold, getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -642,7 +706,9 @@ public class CommandGamepad extends CommandGenericHID {
    * will be true when the axis value is greater than 0.5.
    *
    * @return a Trigger instance that is true when the left trigger's axis exceeds 0.5, attached to
-   *     the {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
+   *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
+   *     scheduler} if a scheduler was not explicitly provided.
    */
   public Trigger leftTrigger() {
     return leftTrigger(0.5);
@@ -669,11 +735,11 @@ public class CommandGamepad extends CommandGenericHID {
    * @param threshold the minimum axis value for the returned {@link Trigger} to be true. This value
    *     should be in the range [0, 1] where 0 is the unpressed state of the axis.
    * @return a Trigger instance that is true when the right trigger's axis exceeds the provided
-   *     threshold, attached to the {@link CommandScheduler#getDefaultButtonLoop() default scheduler
-   *     button loop}.
+   *     threshold, attached to the {@link Scheduler#getDefaultEventLoop() default scheduler button
+   *     loop}.
    */
   public Trigger rightTrigger(double threshold) {
-    return rightTrigger(threshold, CommandScheduler.getInstance().getDefaultButtonLoop());
+    return rightTrigger(threshold, getScheduler().getDefaultEventLoop());
   }
 
   /**
@@ -681,7 +747,9 @@ public class CommandGamepad extends CommandGenericHID {
    * will be true when the axis value is greater than 0.5.
    *
    * @return a Trigger instance that is true when the right trigger's axis exceeds 0.5, attached to
-   *     the {@link CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   *     the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
+   *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
+   *     scheduler} if a scheduler was not explicitly provided.
    */
   public Trigger rightTrigger() {
     return rightTrigger(0.5);

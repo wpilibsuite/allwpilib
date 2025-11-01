@@ -78,8 +78,8 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the North Face button's
    * digital signal attached to the given loop.
    */
-  Trigger NorthFacen(frc::EventLoop* loop = CommandScheduler::GetInstance()
-                                                .GetDefaultButtonLoop()) const;
+  Trigger NorthFace(frc::EventLoop* loop = CommandScheduler::GetInstance()
+                                               .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the Back button's

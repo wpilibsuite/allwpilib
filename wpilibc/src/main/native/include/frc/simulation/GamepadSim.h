@@ -99,7 +99,7 @@ class GamepadSim : public GenericHIDSim {
    *
    * @param value the new value
    */
-  void SetNorthFacenButton(bool value);
+  void SetNorthFaceButton(bool value);
 
   /**
    * Change the value of the Back button on the controller.
