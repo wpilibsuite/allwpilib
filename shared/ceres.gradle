@@ -6,7 +6,7 @@ nativeUtils {
             headerClassifier = "headers"
             sourceClassifier = "sources"
             ext = "zip"
-            version = '2.2-1'
+            version = '2.2-2'
             targetPlatforms.addAll(nativeUtils.wpi.platforms.desktopPlatforms)
             targetPlatforms.addAll("linuxarm32", "linuxarm64")
         }
