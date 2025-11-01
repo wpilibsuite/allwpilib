@@ -1,26 +1,26 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "semiwrap~=0.1.7",
-    "hatch-meson~=0.1.0b2",
+    "semiwrap~=0.2.1",
+    "hatch-meson~=0.1.0",
     "hatch-robotpy~=0.2.1",
     "hatchling",
-    "robotpy-native-wpimath==2027.0.0a2",
-    "robotpy-wpiutil==2027.0.0a2",
+    "robotpy-native-wpimath==0.0.0",
+    "robotpy-wpiutil==0.0.0",
     # "numpy", # broken in raspbian CI
 ]
 
 [project]
 name = "robotpy-wpimath"
-version = "2027.0.0a2"
+version = "0.0.0"
 description = "Binary wrapper for FRC WPIMath library"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]
 license = "BSD-3-Clause"
 dependencies = [
-    "robotpy-native-wpimath==2027.0.0a2",
-    "robotpy-wpiutil==2027.0.0a2",
+    "robotpy-native-wpimath==0.0.0",
+    "robotpy-wpiutil==0.0.0",
 ]
 
 [project.urls]
@@ -45,6 +45,8 @@ update_init = [
     "wpimath.estimator wpimath._controls._controls.estimator",
     "wpimath.filter",
     "wpimath.geometry",
+    "wpimath.kinematics",
+    "wpimath.interpolation",
     "wpimath.optimization wpimath._controls._controls.optimization",
     "wpimath.path wpimath._controls._controls.path",
     "wpimath.spline",
@@ -72,6 +74,8 @@ scan_headers_ignore = [
     "frc/estimator/SteadyStateKalmanFilter.h",
     "frc/estimator/UnscentedKalmanFilter.h",
     "frc/estimator/UnscentedTransform.h",
+
+    "frc/geometry/detail/RotationVectorToMatrix.h",
 
     "frc/system/Discretization.h",
     "frc/system/NumericalIntegration.h",
@@ -1574,7 +1578,6 @@ DifferentialDriveAccelerationLimiter = "frc/controller/DifferentialDriveAccelera
 DifferentialDriveFeedforward = "frc/controller/DifferentialDriveFeedforward.h"
 DifferentialDriveWheelVoltages = "frc/controller/DifferentialDriveWheelVoltages.h"
 ElevatorFeedforward = "frc/controller/ElevatorFeedforward.h"
-HolonomicDriveController = "frc/controller/HolonomicDriveController.h"
 ImplicitModelFollower = "frc/controller/ImplicitModelFollower.h"
 LTVDifferentialDriveController = "frc/controller/LTVDifferentialDriveController.h"
 LTVUnicycleController = "frc/controller/LTVUnicycleController.h"

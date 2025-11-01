@@ -4,17 +4,17 @@ requires = [
     "hatchling",
     "hatch-nativelib~=0.2.0",
     "hatch-robotpy~=0.2.1",
-    "robotpy-native-wpilib==2027.0.0a2",
+    "robotpy-native-wpilib==0.0.0",
 ]
 
 [project]
 name = "robotpy-native-xrp"
-version = "2027.0.0a2"
+version = "0.0.0"
 description = "WPILib XRP vendor library"
 license = "BSD-3-Clause"
 
 dependencies = [
-    "robotpy-native-wpilib==2027.0.0a2",
+    "robotpy-native-wpilib==0.0.0",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -24,7 +24,7 @@ packages = ["src/native"]
 artifact_id = "xrpVendordep-cpp"
 group_id = "edu.wpi.first.xrpVendordep"
 repo_url = "https://frcmaven.wpi.edu/artifactory/release-2027"
-version = "2027.0.0-alpha-2"
+version = "0.0.0"
 
 extract_to = "src/native/xrp"
 libs = ["xrpVendordep"]

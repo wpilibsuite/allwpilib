@@ -30,6 +30,7 @@ classes:
       operator/:
       operator==:
       operator+:
+      Log:
 
 inline_code: |
   cls_Transform2d

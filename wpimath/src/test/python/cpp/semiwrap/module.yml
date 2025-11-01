@@ -1,12 +1,13 @@
----
 
 classes:
   SomeClass:
     attributes:
-      kDefaultPeriod:
       five_ft:
+      s_constant:
+      ms_constant1:
+      ms_constant2:
+      ms_constant3:
     methods:
-      checkDefaultByName:
       checkDefaultByNum1:
         param_override:
           period:
@@ -17,3 +18,6 @@ classes:
             default: 0.050_s
       ms2s:
       ft2m:
+      checkDefaultByName1:
+      checkDefaultByName2:
+      s2ms:

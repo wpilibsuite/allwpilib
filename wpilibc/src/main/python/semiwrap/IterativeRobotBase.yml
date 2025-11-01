@@ -1,7 +1,6 @@
 classes:
   frc::IterativeRobotBase:
     methods:
-      RobotInit:
       DriverStationConnected:
       DisabledInit:
       AutonomousInit:

@@ -181,7 +181,7 @@ inline_code: |
         ^ (std::hash<double>{}(self->green) << 1)
         ^ (std::hash<double>{}(self->blue) << 2)
       );
-      return h != -1 ? h : -2;
+      return h != static_cast<size_t>(-1) ? h : -2;
     })
     .def("__repr__", [](Color *self) {
       return "Color("

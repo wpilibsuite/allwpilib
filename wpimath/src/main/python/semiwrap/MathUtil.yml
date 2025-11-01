@@ -4,33 +4,23 @@ functions:
     - [double]
   AngleModulus:
   FloorDiv:
-    template_impls:
-    - [int64_t, int64_t]
-    # work around GCC 10 issue on raspbian
-    cpp_code: |
-      [](int64_t x, int64_t y) -> int64_t {
-        return frc::FloorDiv(x, y);
-      }
+    # Use // operator instead, it's more efficient
+    # - https://github.com/robotpy/mostrobotpy/pull/200
+    ignore: true
   FloorMod:
-    template_impls:
-    - [int64_t, int64_t]
-    # work around GCC 10 issue on raspbian
-    cpp_code: |
-      [](int64_t x, int64_t y) -> int64_t {
-        return frc::FloorMod(x, y);
-      }
+    # Use % operator instead, it's more efficient
+    # - https://github.com/robotpy/mostrobotpy/pull/200
+    ignore: true
   ApplyDeadband:
     param_override:
       maxMagnitude:
         default: '1.0'
-    template_impls:
-    - [double]
-  CopySignPow:
-    param_override:
-      maxMagnitude:
-        default: '1.0'
-    template_impls:
-    - [double]
+    overloads:
+      T, T, T:
+        template_impls:
+        - [double]
+      const Eigen::Vector<T, N>&, T, T:
+        ignore: true
   IsNear:
     overloads:
       T, T, T:
@@ -45,3 +35,9 @@ functions:
     overloads:
       const Translation2d&, const Translation2d&, units::second_t, units::meters_per_second_t:
       const Translation3d&, const Translation3d&, units::second_t, units::meters_per_second_t:
+  CopyDirectionPow:
+    overloads:
+      T, double, T:
+        ignore: true
+      const Eigen::Vector<T, N>&, double, T:
+        ignore: true

@@ -41,6 +41,10 @@ classes:
             ignore: true
 
       RotateAround:
+      SquaredDistance:
+      SquaredNorm:
+      Dot:
+      Cross:
 inline_code: |
   cls_Translation3d
     .def_static("fromFeet", [](units::foot_t x, units::foot_t y, units::foot_t z){

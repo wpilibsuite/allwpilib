@@ -5,8 +5,6 @@ enums:
   HAL_RuntimeType:
 functions:
   HAL_GetErrorMessage:
-  HAL_GetFPGAVersion:
-  HAL_GetFPGARevision:
   HAL_GetSerialNumber:
     param_override:
       serialNumber:

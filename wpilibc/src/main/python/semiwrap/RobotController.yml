@@ -9,8 +9,6 @@ classes:
   frc::RobotController:
     nodelete: true
     methods:
-      GetFPGAVersion:
-      GetFPGARevision:
       GetSerialNumber:
       GetComments:
       GetTeamNumber:

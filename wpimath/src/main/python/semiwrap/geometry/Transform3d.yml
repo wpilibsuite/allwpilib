@@ -28,6 +28,7 @@ classes:
       operator/:
       operator+:
       operator==:
+      Log:
 
 
 inline_code: |

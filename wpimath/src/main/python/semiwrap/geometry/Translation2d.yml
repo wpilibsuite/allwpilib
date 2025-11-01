@@ -38,6 +38,10 @@ classes:
       operator*:
       operator/:
       operator==:
+      SquaredDistance:
+      SquaredNorm:
+      Dot:
+      Cross:
 
 inline_code: |
   cls_Translation2d
