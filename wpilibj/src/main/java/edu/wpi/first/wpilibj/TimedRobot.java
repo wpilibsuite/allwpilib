@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.NotifierJNI;
+import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.Time;
 import java.util.PriorityQueue;
 
@@ -82,7 +83,7 @@ public class TimedRobot extends IterativeRobotBase {
   /**
    * Constructor for TimedRobot.
    *
-   * @param period Period in seconds.
+   * @param period The period of the robot loop function.
    */
   protected TimedRobot(double period) {
     super(period);
@@ -91,6 +92,24 @@ public class TimedRobot extends IterativeRobotBase {
     NotifierJNI.setNotifierName(m_notifier, "TimedRobot");
 
     HAL.reportUsage("Framework", "TimedRobot");
+  }
+
+  /**
+   * Constructor for TimedRobot.
+   *
+   * @param period The period of the robot loop function.
+   */
+  protected TimedRobot(Time period) {
+    this(period.in(Seconds));
+  }
+
+  /**
+   * Constructor for TimedRobot.
+   *
+   * @param frequency The frequency of the robot loop function.
+   */
+  protected TimedRobot(Frequency frequency) {
+    this(frequency.asPeriod());
   }
 
   @Override

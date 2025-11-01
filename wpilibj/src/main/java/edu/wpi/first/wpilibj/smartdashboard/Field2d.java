@@ -4,11 +4,14 @@
 
 package edu.wpi.first.wpilibj.smartdashboard;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NTSendable;
 import edu.wpi.first.networktables.NTSendableBuilder;
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +67,17 @@ public class Field2d implements NTSendable, AutoCloseable {
    */
   public synchronized void setRobotPose(double x, double y, Rotation2d rotation) {
     m_objects.get(0).setPose(x, y, rotation);
+  }
+
+  /**
+   * Set the robot pose from x, y, and rotation.
+   *
+   * @param x X location
+   * @param y Y location
+   * @param rotation rotation
+   */
+  public synchronized void setRobotPose(Distance x, Distance y, Rotation2d rotation) {
+    m_objects.get(0).setPose(x.in(Meters), y.in(Meters), rotation);
   }
 
   /**
