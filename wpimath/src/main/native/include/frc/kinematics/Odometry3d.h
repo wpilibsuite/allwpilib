@@ -28,8 +28,10 @@ namespace frc {
  *
  * @tparam WheelSpeeds Wheel speeds type.
  * @tparam WheelPositions Wheel positions type.
+ * @tparam WheelAccelerations Wheel accelerations type.
  */
-template <typename WheelSpeeds, typename WheelPositions>
+template <typename WheelSpeeds, typename WheelPositions,
+          typename WheelAccelerations>
 class WPILIB_DLLEXPORT Odometry3d {
  public:
   /**
@@ -40,7 +42,8 @@ class WPILIB_DLLEXPORT Odometry3d {
    * @param wheelPositions The current distances measured by each wheel.
    * @param initialPose The starting position of the robot on the field.
    */
-  explicit Odometry3d(const Kinematics<WheelSpeeds, WheelPositions>& kinematics,
+  explicit Odometry3d(const Kinematics<WheelSpeeds, WheelPositions,
+                                       WheelAccelerations>& kinematics,
                       const Rotation3d& gyroAngle,
                       const WheelPositions& wheelPositions,
                       const Pose3d& initialPose = Pose3d{})
@@ -141,7 +144,8 @@ class WPILIB_DLLEXPORT Odometry3d {
   }
 
  private:
-  const Kinematics<WheelSpeeds, WheelPositions>& m_kinematics;
+  const Kinematics<WheelSpeeds, WheelPositions, WheelAccelerations>&
+      m_kinematics;
   Pose3d m_pose;
 
   WheelPositions m_previousWheelPositions;

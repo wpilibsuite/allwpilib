@@ -28,7 +28,8 @@ namespace frc {
  */
 class WPILIB_DLLEXPORT DifferentialDriveOdometry3d
     : public Odometry3d<DifferentialDriveWheelSpeeds,
-                        DifferentialDriveWheelPositions> {
+                        DifferentialDriveWheelPositions,
+                        DifferentialDriveWheelAccelerations> {
  public:
   /**
    * Constructs a DifferentialDriveOdometry3d object.
