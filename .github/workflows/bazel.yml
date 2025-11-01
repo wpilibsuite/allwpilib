@@ -37,7 +37,7 @@ jobs:
 
   build-mac:
     name: "Mac"
-    runs-on: macos-14
+    runs-on: macOS-15
     steps:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
