@@ -1,0 +1,281 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [
+    "semiwrap~=0.2.1",
+    "hatch-meson~=0.1.0",
+    "hatch-robotpy~=0.2.1",
+    "hatchling",
+    "robotpy-native-wpilib==0.0.0",
+    "robotpy-wpiutil==0.0.0",
+    "robotpy-wpimath==0.0.0",
+    "robotpy-hal==0.0.0",
+    "pyntcore==0.0.0",
+]
+
+[project]
+name = "wpilib"
+version = "0.0.0"
+description = "Binary wrapper for FRC WPILib"
+authors = [
+    {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
+]
+license = "BSD-3-Clause"
+dependencies = [
+    "robotpy-native-wpilib==0.0.0",
+    "robotpy-wpiutil==0.0.0",
+    "robotpy-wpimath==0.0.0",
+    "robotpy-hal==0.0.0",
+    "pyntcore==0.0.0",
+    "robotpy-cli~=2027.0.0a1"
+]
+
+[project.urls]
+"Source code" = "https://github.com/robotpy/mostrobotpy"
+
+[project.entry-points."robotpy_cli.2027"]
+run = "wpilib._impl.start:Main"
+
+
+[tool.hatch.build.hooks.robotpy]
+version_file = "wpilib/version.py"
+
+[tool.hatch.build.hooks.semiwrap]
+
+[tool.hatch.build.hooks.meson]
+
+[tool.hatch.build.targets.wheel]
+packages = ["wpilib"]
+
+
+[tool.semiwrap]
+update_init = [
+    "wpilib",
+    "wpilib.counter",
+    "wpilib.drive",
+    "wpilib.event",
+    "wpilib.interfaces wpilib._wpilib.interfaces",
+    "wpilib.simulation",
+    "wpilib.sysid wpilib._wpilib.sysid",
+]
+scan_headers_ignore = [
+    "WPILibVersion.h",
+
+    # needs a python wrapper
+    "frc/AsynchronousInterrupt.h",
+
+    "frc/Filesystem.h",
+    "frc/Notifier.h", # wrapped separately
+    "frc/Resource.h",
+    "frc/ScopedTracer.h", # not useful for python
+
+    "frc/motorcontrol/MotorControllerGroup.h", # wrapped separately
+
+    "frc/smartdashboard/ListenerExecutor.h",    # internal detail
+
+    # Internals
+    "rpy/ControlWord.h",
+    "rpy/SmartDashboardData.h",
+]
+
+[tool.semiwrap.extension_modules."wpilib._wpilib"]
+name = "wpilib"
+wraps = ["robotpy-native-wpilib"]
+depends = [
+    "wpihal", "wpiutil", "ntcore",
+    "wpimath", "wpimath_geometry", "wpimath_controls",
+    "wpilib_event"
+]
+includes = ["wpilib/src"]
+
+[tool.semiwrap.extension_modules."wpilib._wpilib".defines]
+DYNAMIC_CAMERA_SERVER = 1
+
+[tool.semiwrap.extension_modules."wpilib._wpilib".headers]
+# frc
+ADXL345_I2C = "frc/ADXL345_I2C.h"
+AddressableLED = "frc/AddressableLED.h"
+Alert = "frc/Alert.h"
+AnalogAccelerometer = "frc/AnalogAccelerometer.h"
+AnalogEncoder = "frc/AnalogEncoder.h"
+AnalogInput = "frc/AnalogInput.h"
+AnalogPotentiometer = "frc/AnalogPotentiometer.h"
+CAN = "frc/CAN.h"
+Compressor = "frc/Compressor.h"
+CompressorConfigType = "frc/CompressorConfigType.h"
+DataLogManager = "frc/DataLogManager.h"
+DSControlWord = "frc/DSControlWord.h"
+DigitalInput = "frc/DigitalInput.h"
+DigitalOutput = "frc/DigitalOutput.h"
+DoubleSolenoid = "frc/DoubleSolenoid.h"
+DriverStation = "frc/DriverStation.h"
+DutyCycle = "frc/DutyCycle.h"
+DutyCycleEncoder = "frc/DutyCycleEncoder.h"
+Encoder = "frc/Encoder.h"
+Errors = "frc/Errors.h"
+Filesystem = "rpy/Filesystem.h"
+I2C = "frc/I2C.h"
+IterativeRobotBase = "frc/IterativeRobotBase.h"
+Joystick = "frc/Joystick.h"
+LEDPattern = "frc/LEDPattern.h"
+MotorSafety = "frc/MotorSafety.h"
+Notifier = "rpy/Notifier.h"
+OnboardIMU = "frc/OnboardIMU.h"
+PS4Controller = "frc/PS4Controller.h"
+PS5Controller = "frc/PS5Controller.h"
+PWM = "frc/PWM.h"
+PneumaticHub = "frc/PneumaticHub.h"
+PneumaticsBase = "frc/PneumaticsBase.h"
+PneumaticsControlModule = "frc/PneumaticsControlModule.h"
+PneumaticsModuleType = "frc/PneumaticsModuleType.h"
+PowerDistribution = "frc/PowerDistribution.h"
+Preferences = "frc/Preferences.h"
+RobotBase = "frc/RobotBase.h"
+RobotController = "frc/RobotController.h"
+RobotState = "frc/RobotState.h"
+RuntimeType = "frc/RuntimeType.h"
+SensorUtil = "frc/SensorUtil.h"
+SerialPort = "frc/SerialPort.h"
+SharpIR = "frc/SharpIR.h"
+Solenoid = "frc/Solenoid.h"
+StadiaController = "frc/StadiaController.h"
+SystemServer = "frc/SystemServer.h"
+Threads = "frc/Threads.h"
+TimedRobot = "frc/TimedRobot.h"
+Timer = "frc/Timer.h"
+TimesliceRobot = "frc/TimesliceRobot.h"
+Tracer = "frc/Tracer.h"
+Watchdog = "frc/Watchdog.h"
+XboxController = "frc/XboxController.h"
+
+# frc (interfaces)
+CounterBase = "frc/CounterBase.h"
+GenericHID = "frc/GenericHID.h"
+MotorController = "frc/motorcontrol/MotorController.h"
+
+# frc/internal
+DriverStationModeThread = "frc/internal/DriverStationModeThread.h"
+
+# frc/motorcontrol
+DMC60 = "frc/motorcontrol/DMC60.h"
+Jaguar = "frc/motorcontrol/Jaguar.h"
+Koors40 = "frc/motorcontrol/Koors40.h"
+MotorControllerGroup = "rpy/MotorControllerGroup.h"
+PWMMotorController = "frc/motorcontrol/PWMMotorController.h"
+PWMSparkFlex = "frc/motorcontrol/PWMSparkFlex.h"
+PWMSparkMax = "frc/motorcontrol/PWMSparkMax.h"
+PWMTalonFX = "frc/motorcontrol/PWMTalonFX.h"
+PWMTalonSRX = "frc/motorcontrol/PWMTalonSRX.h"
+PWMVenom = "frc/motorcontrol/PWMVenom.h"
+PWMVictorSPX = "frc/motorcontrol/PWMVictorSPX.h"
+SD540 = "frc/motorcontrol/SD540.h"
+Spark = "frc/motorcontrol/Spark.h"
+SparkMini = "frc/motorcontrol/SparkMini.h"
+Talon = "frc/motorcontrol/Talon.h"
+Victor = "frc/motorcontrol/Victor.h"
+VictorSP = "frc/motorcontrol/VictorSP.h"
+
+# frc/smartdashboard
+Field2d = "frc/smartdashboard/Field2d.h"
+FieldObject2d = "frc/smartdashboard/FieldObject2d.h"
+Mechanism2d = "frc/smartdashboard/Mechanism2d.h"
+MechanismLigament2d = "frc/smartdashboard/MechanismLigament2d.h"
+MechanismObject2d = "frc/smartdashboard/MechanismObject2d.h"
+MechanismRoot2d = "frc/smartdashboard/MechanismRoot2d.h"
+SendableBuilderImpl = "frc/smartdashboard/SendableBuilderImpl.h"
+SendableChooser = "frc/smartdashboard/SendableChooser.h"
+SendableChooserBase = "frc/smartdashboard/SendableChooserBase.h"
+SmartDashboard = "frc/smartdashboard/SmartDashboard.h"
+
+# frc/sysid
+SysIdRoutineLog = "frc/sysid/SysIdRoutineLog.h"
+
+# frc/util
+Color = "frc/util/Color.h"
+Color8Bit = "frc/util/Color8Bit.h"
+
+
+[tool.semiwrap.extension_modules."wpilib.counter._counter"]
+name = "wpilib_counter"
+wraps = ["robotpy-native-wpilib"]
+depends = ["wpilib"]
+yaml_path = "semiwrap/counter"
+
+[tool.semiwrap.extension_modules."wpilib.counter._counter".headers]
+# frc/counter
+EdgeConfiguration = "frc/counter/EdgeConfiguration.h"
+Tachometer = "frc/counter/Tachometer.h"
+UpDownCounter = "frc/counter/UpDownCounter.h"
+
+
+[tool.semiwrap.extension_modules."wpilib.drive._drive"]
+name = "wpilib_drive"
+wraps = ["robotpy-native-wpilib"]
+depends = ["wpilib"]
+yaml_path = "semiwrap/drive"
+
+[tool.semiwrap.extension_modules."wpilib.drive._drive".headers]
+# frc/drive
+DifferentialDrive = "frc/drive/DifferentialDrive.h"
+MecanumDrive = "frc/drive/MecanumDrive.h"
+RobotDriveBase = "frc/drive/RobotDriveBase.h"
+
+
+[tool.semiwrap.extension_modules."wpilib.event._event"]
+name = "wpilib_event"
+wraps = ["robotpy-native-wpilib"]
+# depends = ["wpilib", "wpimath_filter"]
+depends = ["wpimath_filter"]
+yaml_path = "semiwrap/event"
+
+[tool.semiwrap.extension_modules."wpilib.event._event".headers]
+# frc/event
+BooleanEvent = "frc/event/BooleanEvent.h"
+EventLoop = "frc/event/EventLoop.h"
+NetworkBooleanEvent = "frc/event/NetworkBooleanEvent.h"
+
+
+[tool.semiwrap.extension_modules."wpilib.simulation._simulation"]
+name = "wpilib_simulation"
+wraps = ["robotpy-native-wpilib"]
+depends = ["wpilib", "wpimath_controls", "wpimath_geometry", "wpimath_kinematics"]
+yaml_path = "semiwrap/simulation"
+
+[tool.semiwrap.extension_modules."wpilib.simulation._simulation".headers]
+# frc/simulation
+ADXL345Sim = "frc/simulation/ADXL345Sim.h"
+AddressableLEDSim = "frc/simulation/AddressableLEDSim.h"
+AnalogEncoderSim = "frc/simulation/AnalogEncoderSim.h"
+AnalogInputSim = "frc/simulation/AnalogInputSim.h"
+BatterySim = "frc/simulation/BatterySim.h"
+CTREPCMSim = "frc/simulation/CTREPCMSim.h"
+CallbackStore = "frc/simulation/CallbackStore.h"
+DCMotorSim = "frc/simulation/DCMotorSim.h"
+DIOSim = "frc/simulation/DIOSim.h"
+DifferentialDrivetrainSim = "frc/simulation/DifferentialDrivetrainSim.h"
+DigitalPWMSim = "frc/simulation/DigitalPWMSim.h"
+DoubleSolenoidSim = "frc/simulation/DoubleSolenoidSim.h"
+DriverStationSim = "frc/simulation/DriverStationSim.h"
+DutyCycleEncoderSim = "frc/simulation/DutyCycleEncoderSim.h"
+DutyCycleSim = "frc/simulation/DutyCycleSim.h"
+ElevatorSim = "frc/simulation/ElevatorSim.h"
+EncoderSim = "frc/simulation/EncoderSim.h"
+FlywheelSim = "frc/simulation/FlywheelSim.h"
+GenericHIDSim = "frc/simulation/GenericHIDSim.h"
+JoystickSim = "frc/simulation/JoystickSim.h"
+LinearSystemSim = "frc/simulation/LinearSystemSim.h"
+PS4ControllerSim = "frc/simulation/PS4ControllerSim.h"
+PS5ControllerSim = "frc/simulation/PS5ControllerSim.h"
+PWMSim = "frc/simulation/PWMSim.h"
+PneumaticsBaseSim = "frc/simulation/PneumaticsBaseSim.h"
+PowerDistributionSim = "frc/simulation/PowerDistributionSim.h"
+PWMMotorControllerSim = "frc/simulation/PWMMotorControllerSim.h"
+REVPHSim = "frc/simulation/REVPHSim.h"
+RoboRioSim = "frc/simulation/RoboRioSim.h"
+SendableChooserSim = "frc/simulation/SendableChooserSim.h"
+SharpIRSim = "frc/simulation/SharpIRSim.h"
+SimDeviceSim = "frc/simulation/SimDeviceSim.h"
+SimHooks = "frc/simulation/SimHooks.h"
+SingleJointedArmSim = "frc/simulation/SingleJointedArmSim.h"
+SolenoidSim = "frc/simulation/SolenoidSim.h"
+StadiaControllerSim = "frc/simulation/StadiaControllerSim.h"
+XboxControllerSim = "frc/simulation/XboxControllerSim.h"

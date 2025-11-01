@@ -1,0 +1,82 @@
+extra_includes:
+- rpy/geometryToString.h
+- wpystruct.h
+- pybind11/eigen.h
+
+functions:
+  to_json:
+    ignore: true
+  from_json:
+    ignore: true
+classes:
+  frc::Translation2d:
+    methods:
+      Translation2d:
+        overloads:
+          '':
+          units::meter_t, units::meter_t:
+          units::meter_t, const Rotation2d&:
+          const Eigen::Vector2d&:
+      Distance:
+      X:
+      Y:
+      ToVector:
+      Norm:
+      Angle:
+      RotateBy:
+      RotateAround:
+      Nearest:
+        overloads:
+          std::span<const Translation2d> [const]:
+          std::initializer_list<Translation2d> [const]:
+            ignore: true
+      operator+:
+      operator-:
+        overloads:
+          const Translation2d& [const]:
+          '[const]':
+      operator*:
+      operator/:
+      operator==:
+      SquaredDistance:
+      SquaredNorm:
+      Dot:
+      Cross:
+
+inline_code: |
+  cls_Translation2d
+    .def_static("fromFeet", [](units::foot_t x, units::foot_t y){
+      return std::make_unique<Translation2d>(x, y);
+    }, py::arg("x"), py::arg("y"))
+    .def_static("fromFeet", [](units::foot_t distance, const Rotation2d &angle) {
+      return std::make_unique<Translation2d>(distance, angle);
+    }, py::arg("distance"), py::arg("angle"))
+    .def_property_readonly("x", &Translation2d::X)
+    .def_property_readonly("y", &Translation2d::Y)
+    .def_property_readonly("x_feet", [](Translation2d * self) -> units::foot_t {
+      return self->X();
+    })
+    .def_property_readonly("y_feet", [](Translation2d * self) -> units::foot_t {
+      return self->Y();
+    })
+    .def("distanceFeet", [](Translation2d * self, const Translation2d &other) -> units::foot_t {
+      return self->Distance(other);
+    })
+    .def("normFeet", [](Translation2d * self) -> units::foot_t {
+      return self->Norm();
+    })
+    .def("__abs__", &Translation2d::Norm)
+    .def("__len__", [](const Translation2d& self) { return 2; })
+    .def("__getitem__", [](const Translation2d& self, int index) {
+      switch (index) {
+        case 0:
+          return self.X();
+        case 1:
+          return self.Y();
+        default:
+          throw std::out_of_range("Translation2d index out of range");
+      }
+    })
+    .def("__repr__", py::overload_cast<const Translation2d&>(&rpy::toString));
+
+  SetupWPyStruct<frc::Translation2d>(cls_Translation2d);

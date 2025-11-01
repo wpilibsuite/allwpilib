@@ -21,7 +21,8 @@ struct HAL_ControlWord {
   uint32_t eStop : 1;
   uint32_t fmsAttached : 1;
   uint32_t dsAttached : 1;
-  uint32_t control_reserved : 26;
+  uint32_t watchdogEnabled : 1;
+  uint32_t control_reserved : 25;
 };
 typedef struct HAL_ControlWord HAL_ControlWord;
 
@@ -67,7 +68,7 @@ HAL_ENUM(HAL_MatchType) {
 #define HAL_kMaxJoysticks 6
 
 struct HAL_JoystickAxes {
-  int16_t count;
+  uint16_t available;
   float axes[HAL_kMaxJoystickAxes];
   int16_t raw[HAL_kMaxJoystickAxes];
 };
@@ -95,14 +96,14 @@ HAL_ENUM_WITH_UNDERLYING_TYPE(HAL_JoystickPOV, uint8_t){
 };
 
 struct HAL_JoystickPOVs {
-  int16_t count;
+  uint8_t available;
   HAL_JoystickPOV povs[HAL_kMaxJoystickPOVs];
 };
 typedef struct HAL_JoystickPOVs HAL_JoystickPOVs;
 
 struct HAL_JoystickButtons {
-  uint32_t buttons;
-  uint8_t count;
+  uint64_t buttons;
+  uint64_t available;
 };
 typedef struct HAL_JoystickButtons HAL_JoystickButtons;
 
@@ -110,10 +111,6 @@ struct HAL_JoystickDescriptor {
   uint8_t isGamepad;
   uint8_t type;
   char name[256];
-  uint8_t axisCount;
-  uint8_t axisTypes[HAL_kMaxJoystickAxes];
-  uint8_t buttonCount;
-  uint8_t povCount;
 };
 typedef struct HAL_JoystickDescriptor HAL_JoystickDescriptor;
 

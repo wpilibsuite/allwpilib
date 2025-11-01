@@ -18,7 +18,7 @@ extern "C" {
 #if defined(WIN32) || defined(_WIN32)
 __declspec(dllexport)
 #endif
-    int HALSIM_InitExtension(void) {
+int HALSIM_InitExtension(void) {
   std::puts("Websocket WS Server Initializing.");
 
   HAL_OnShutdown(nullptr, [](void*) { gServer.reset(); });

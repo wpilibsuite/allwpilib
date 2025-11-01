@@ -1,0 +1,47 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [
+    "hatchling",
+    "hatch-nativelib~=0.2.0",
+    "hatch-robotpy~=0.2.1",
+    "robotpy-native-wpiutil==0.0.0",
+    "robotpy-native-wpinet==0.0.0",
+    "robotpy-native-ntcore==0.0.0",
+    "robotpy-native-wpimath==0.0.0",
+    "robotpy-native-wpihal==0.0.0",
+]
+
+[project]
+name = "robotpy-native-wpilib"
+version = "0.0.0"
+description = "WPILib Robotics Library"
+license = "BSD-3-Clause"
+
+dependencies = [
+    "robotpy-native-wpiutil==0.0.0",
+    "robotpy-native-wpinet==0.0.0",
+    "robotpy-native-ntcore==0.0.0",
+    "robotpy-native-wpimath==0.0.0",
+    "robotpy-native-wpihal==0.0.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/native"]
+
+[[tool.hatch.build.hooks.robotpy.maven_lib_download]]
+artifact_id = "wpilibc-cpp"
+group_id = "edu.wpi.first.wpilibc"
+repo_url = "https://frcmaven.wpi.edu/artifactory/release-2027"
+version = "0.0.0"
+
+extract_to = "src/native/wpilib"
+libs = ["wpilibc"]
+
+[[tool.hatch.build.hooks.nativelib.pcfile]]
+pcfile = "src/native/wpilib/robotpy-native-wpilib.pc"
+name = "wpilib"
+
+includedir = "src/native/wpilib/include"
+libdir = "src/native/wpilib/lib"
+shared_libraries = ["wpilibc"]
+requires = ["robotpy-native-wpiutil", "robotpy-native-wpinet", "robotpy-native-ntcore", "robotpy-native-wpimath", "robotpy-native-wpihal"]

@@ -1,0 +1,21 @@
+defaults:
+  subpackage: controller
+
+classes:
+  frc::BangBangController:
+    ignored_bases:
+    - wpi::SendableHelper<BangBangController>
+    methods:
+      BangBangController:
+      SetSetpoint:
+      GetSetpoint:
+      AtSetpoint:
+      SetTolerance:
+      GetTolerance:
+      GetMeasurement:
+      GetError:
+      Calculate:
+        overloads:
+          double, double:
+          double:
+      InitSendable:

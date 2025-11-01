@@ -1,0 +1,50 @@
+extra_includes:
+- "frc/geometry/Pose3d.h"
+
+classes:
+  frc::TimeInterpolatableBuffer:
+    template_params:
+    - T
+    methods:
+      TimeInterpolatableBuffer:
+        overloads:
+          units::second_t, std::function<T (const T&, const T&, double)>:
+          units::second_t:
+      AddSample:
+      Clear:
+      Sample:
+      GetInternalBuffer:
+        overloads:
+          "":
+          '[const]':
+            ignore: true
+
+templates:
+  TimeInterpolatablePose2dBuffer:
+    qualname: frc::TimeInterpolatableBuffer
+    params:
+    - frc::Pose2d
+  TimeInterpolatablePose3dBuffer:
+    qualname: frc::TimeInterpolatableBuffer
+    params:
+    - frc::Pose3d
+  TimeInterpolatableRotation2dBuffer:
+    qualname: frc::TimeInterpolatableBuffer
+    params:
+    - frc::Rotation2d
+  TimeInterpolatableRotation3dBuffer:
+    qualname: frc::TimeInterpolatableBuffer
+    params:
+    - frc::Rotation3d
+  TimeInterpolatableTranslation2dBuffer:
+    qualname: frc::TimeInterpolatableBuffer
+    params:
+    - frc::Translation2d
+  TimeInterpolatableTranslation3dBuffer:
+    qualname: frc::TimeInterpolatableBuffer
+    params:
+    - frc::Translation3d
+  TimeInterpolatableFloatBuffer:
+    qualname: frc::TimeInterpolatableBuffer
+    params:
+    - double

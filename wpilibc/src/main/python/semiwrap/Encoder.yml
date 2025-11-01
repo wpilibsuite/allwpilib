@@ -1,0 +1,43 @@
+extra_includes:
+- wpi/sendable/SendableBuilder.h
+
+classes:
+  frc::Encoder:
+    ignored_bases:
+    - wpi::SendableHelper<Encoder>
+    typealias:
+    - frc::Encoder::EncodingType
+    methods:
+      Encoder:
+        overloads:
+          int, int, bool, EncodingType:
+            param_override:
+              encodingType:
+                default: frc::Encoder::EncodingType::k4X
+          DigitalSource*, DigitalSource*, bool, EncodingType:
+            ignore: true
+          DigitalSource&, DigitalSource&, bool, EncodingType:
+            ignore: true
+          std::shared_ptr<DigitalSource>, std::shared_ptr<DigitalSource>, bool, EncodingType:
+            param_override:
+              encodingType:
+                default: frc::Encoder::EncodingType::k4X
+      Get:
+      Reset:
+      GetPeriod:
+      SetMaxPeriod:
+      GetStopped:
+      GetDirection:
+      GetRaw:
+      GetEncodingScale:
+      GetDistance:
+      GetRate:
+      SetMinRate:
+      SetDistancePerPulse:
+      GetDistancePerPulse:
+      SetReverseDirection:
+      SetSamplesToAverage:
+      GetSamplesToAverage:
+      SetSimDevice:
+      GetFPGAIndex:
+      InitSendable:

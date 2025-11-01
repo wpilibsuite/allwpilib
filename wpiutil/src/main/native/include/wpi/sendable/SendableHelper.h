@@ -39,8 +39,7 @@ class SendableHelper {
   // See https://bugzilla.mozilla.org/show_bug.cgi?id=1442819
   __attribute__((no_sanitize("vptr")))
 #endif
-  constexpr SendableHelper&
-  operator=(SendableHelper&& rhs) {
+  constexpr SendableHelper& operator=(SendableHelper&& rhs) {
     if (!std::is_constant_evaluated()) {
       // it is safe to call Move() multiple times with the same rhs
       SendableRegistry::Move(static_cast<Derived*>(this),

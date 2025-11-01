@@ -1,0 +1,115 @@
+classes:
+  nt::StringSubscriber:
+    methods:
+      StringSubscriber:
+        overloads:
+          '':
+            ignore: true
+          NT_Subscriber, ParamType:
+            ignore: true
+      Get:
+        overloads:
+          '[const]':
+          ParamType [const]:
+          wpi::SmallVectorImpl<SmallElemType>& [const]:
+            ignore: true
+          wpi::SmallVectorImpl<SmallElemType>&, ParamType [const]:
+            ignore: true
+      GetAtomic:
+        overloads:
+          '[const]':
+          ParamType [const]:
+          wpi::SmallVectorImpl<SmallElemType>& [const]:
+            ignore: true
+          wpi::SmallVectorImpl<SmallElemType>&, ParamType [const]:
+            ignore: true
+      ReadQueue:
+      GetTopic:
+    inline_code: |
+      .def("close", [](StringSubscriber *self) {
+        py::gil_scoped_release release;
+        *self = StringSubscriber();
+      }, py::doc("Destroys the subscriber"))
+      .def("__enter__", [](StringSubscriber *self) {
+        return self;
+      })
+      .def("__exit__", [](StringSubscriber *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = StringSubscriber();
+      })
+  nt::StringPublisher:
+    methods:
+      StringPublisher:
+        overloads:
+          '':
+            ignore: true
+          NT_Publisher:
+            ignore: true
+      Set:
+      SetDefault:
+      GetTopic:
+    inline_code: |
+      .def("close", [](StringPublisher *self) {
+        py::gil_scoped_release release;
+        *self = StringPublisher();
+      }, py::doc("Destroys the publisher"))
+      .def("__enter__", [](StringPublisher *self) {
+        return self;
+      })
+      .def("__exit__", [](StringPublisher *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = StringPublisher();
+      })
+  nt::StringEntry:
+    methods:
+      StringEntry:
+        overloads:
+          '':
+            ignore: true
+          NT_Entry, ParamType:
+            ignore: true
+      GetHandle:
+        ignore: true
+      GetTopic:
+      Unpublish:
+    inline_code: |
+      .def("close", [](StringEntry *self) {
+        py::gil_scoped_release release;
+        *self = StringEntry();
+      }, py::doc("Destroys the entry"))
+      .def("__enter__", [](StringEntry *self) {
+        return self;
+      })
+      .def("__exit__", [](StringEntry *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = StringEntry();
+      })
+  nt::StringTopic:
+    attributes:
+      kTypeString:
+    methods:
+      StringTopic:
+        overloads:
+          '':
+            ignore: true
+          NT_Topic:
+            ignore: true
+          Topic:
+      Subscribe:
+      SubscribeEx:
+      Publish:
+      PublishEx:
+      GetEntry:
+      GetEntryEx:
+    inline_code: |
+      .def("close", [](StringTopic *self) {
+        py::gil_scoped_release release;
+        *self = StringTopic();
+      }, py::doc("Destroys the topic"))
+      .def("__enter__", [](StringTopic *self) {
+        return self;
+      })
+      .def("__exit__", [](StringTopic *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = StringTopic();
+      })

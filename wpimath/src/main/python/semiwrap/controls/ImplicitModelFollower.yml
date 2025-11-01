@@ -1,0 +1,48 @@
+defaults:
+  subpackage: controller
+
+classes:
+  frc::ImplicitModelFollower:
+    template_params:
+    - int States
+    - int Inputs
+    methods:
+      ImplicitModelFollower:
+        overloads:
+          const LinearSystem<States, Inputs, Outputs>&, const LinearSystem<States, Inputs, Outputs>&:
+            ignore: true
+          ? const Matrixd<States, States>&, const Matrixd<States, Inputs>&, const Matrixd<States, States>&, const Matrixd<States, Inputs>&
+          :
+      U:
+        overloads:
+          '[const]':
+          int [const]:
+      Reset:
+      Calculate:
+
+    template_inline_code: |
+      cls_ImplicitModelFollower
+        .def(py::init<const frc::LinearSystem<States, Inputs, 1>&, const frc::LinearSystem<States, Inputs, 1>&>(),
+          py::arg("plant"), py::arg("plantRef"))
+        .def(py::init<const frc::LinearSystem<States, Inputs, 2>&, const frc::LinearSystem<States, Inputs, 2>&>(),
+          py::arg("plant"), py::arg("plantRef"))
+        .def(py::init<const frc::LinearSystem<States, Inputs, 3>&, const frc::LinearSystem<States, Inputs, 3>&>(),
+          py::arg("plant"), py::arg("plantRef"))
+        ;
+
+templates:
+  ImplicitModelFollower_1_1:
+    qualname: frc::ImplicitModelFollower
+    params:
+    - 1
+    - 1
+  ImplicitModelFollower_2_1:
+    qualname: frc::ImplicitModelFollower
+    params:
+    - 2
+    - 1
+  ImplicitModelFollower_2_2:
+    qualname: frc::ImplicitModelFollower
+    params:
+    - 2
+    - 2

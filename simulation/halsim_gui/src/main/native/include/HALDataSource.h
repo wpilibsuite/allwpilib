@@ -54,13 +54,9 @@
         HALSIM_Cancel##cbname##Callback(m_index, m_callback);                 \
     }                                                                         \
                                                                               \
-    int32_t GetIndex() const {                                                \
-      return m_index;                                                         \
-    }                                                                         \
+    int32_t GetIndex() const { return m_index; }                              \
                                                                               \
-    int GetChannel() const {                                                  \
-      return m_channel;                                                       \
-    }                                                                         \
+    int GetChannel() const { return m_channel; }                              \
                                                                               \
    private:                                                                   \
     static void CallbackFunc(const char*, void* param,                        \
@@ -95,13 +91,9 @@
         HALSIM_Cancel##cbname##Callback(m_index, m_channel, m_callback);      \
     }                                                                         \
                                                                               \
-    int32_t GetIndex() const {                                                \
-      return m_index;                                                         \
-    }                                                                         \
+    int32_t GetIndex() const { return m_index; }                              \
                                                                               \
-    int32_t GetChannel() const {                                              \
-      return m_channel;                                                       \
-    }                                                                         \
+    int32_t GetChannel() const { return m_channel; }                          \
                                                                               \
    private:                                                                   \
     static void CallbackFunc(const char*, void* param,                        \

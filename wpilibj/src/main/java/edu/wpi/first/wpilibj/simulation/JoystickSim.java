@@ -20,9 +20,9 @@ public class JoystickSim extends GenericHIDSim {
     super(joystick);
     m_joystick = joystick;
     // default to a reasonable joystick configuration
-    setAxisCount(5);
-    setButtonCount(12);
-    setPOVCount(1);
+    setAxesMaximumIndex(5);
+    setButtonsMaximumIndex(12);
+    setPOVsMaximumIndex(1);
   }
 
   /**
@@ -34,9 +34,9 @@ public class JoystickSim extends GenericHIDSim {
   public JoystickSim(int port) {
     super(port);
     // default to a reasonable joystick configuration
-    setAxisCount(5);
-    setButtonCount(12);
-    setPOVCount(1);
+    setAxesMaximumIndex(5);
+    setButtonsMaximumIndex(12);
+    setPOVsMaximumIndex(1);
   }
 
   /**

@@ -98,7 +98,7 @@ jobs:
             build-options: "-PciReleaseOnly -Pbuildwinarm64 -Ponlywindowsarm64"
             task: "copyAllOutputs"
             outputs: "build/allOutputs"
-          - os: macOS-14
+          - os: macOS-15
             artifact-name: macOS
             architecture: aarch64
             task: "build"
@@ -144,7 +144,7 @@ jobs:
         if: matrix.os == 'windows-2022'
       - name: Check disk free space pre-cleanup (macOS)
         run: df -h .
-        if: matrix.os == 'macOS-14'
+        if: matrix.os == 'macOS-15'
       - name: Cleanup disk space
         # CodeQL: 5G
         # go: 748M
@@ -153,10 +153,10 @@ jobs:
           rm -rf /Users/runner/hostedtoolcache/CodeQL
           rm -rf /Users/runner/hostedtoolcache/go
           rm -rf /Users/runner/Library/Android
-        if: matrix.os == 'macOS-14'
+        if: matrix.os == 'macOS-15'
       - name: Check disk free space post-cleanup (macOS)
         run: df -h .
-        if: matrix.os == 'macOS-14'
+        if: matrix.os == 'macOS-15'
       - name: Build with Gradle
         run: ./gradlew ${{ matrix.task }} --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
         env:
@@ -172,7 +172,7 @@ jobs:
         if: matrix.os == 'windows-2022'
       - name: Check disk free space (macOS)
         run: df -h .
-        if: matrix.os == 'macOS-14'
+        if: matrix.os == 'macOS-15'
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact-name }}
