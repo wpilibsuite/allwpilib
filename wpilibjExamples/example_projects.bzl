@@ -79,6 +79,7 @@ SNIPPETS_FOLDERS = [
     "encoderhoming",
     "limitswitch",
     "onboardimu",
+    "profiledpidfeedforward",
 ]
 
 TEMPLATES_FOLDERS = [
