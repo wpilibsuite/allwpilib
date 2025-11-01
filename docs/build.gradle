@@ -55,6 +55,10 @@ doxygen {
     // https://frcmaven.wpi.edu/ui/native/generic-release-mirror/doxygen/, which
     // is a mirror of binaries from https://doxygen.nl/download.html.
     //
+    // To mirror a new Doxygen version, retrigger the GitHub Actions workflow in
+    // https://github.com/wpilibsuite/doxygen-mirror with the desired version
+    // number as an input.
+    //
     // Ensure theme.css (from https://github.com/jothepro/doxygen-awesome-css)
     // is compatible with Doxygen version when updating.
     executables {
