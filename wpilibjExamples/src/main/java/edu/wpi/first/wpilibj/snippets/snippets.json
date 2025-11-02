@@ -160,5 +160,16 @@
     "foldername": "onboardimu",
     "gradlebase": "java",
     "mainclass": "Main"
+  },
+  {
+    "name": "ProfiledPIDFeedforward",
+    "description": "Snippets of ProfiledPIDController with feedforward for frc-docs.",
+    "tags": [
+      "PID",
+      "Profiled PID"
+    ],
+    "foldername": "profiledpidfeedforward",
+    "gradlebase": "java",
+    "mainclass": "Robot"
   }
 ]

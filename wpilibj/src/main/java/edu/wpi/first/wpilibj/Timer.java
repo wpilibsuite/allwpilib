@@ -4,6 +4,10 @@
 
 package edu.wpi.first.wpilibj;
 
+import static edu.wpi.first.units.Units.Seconds;
+
+import edu.wpi.first.units.measure.Time;
+
 /**
  * A timer class.
  *
@@ -46,10 +50,20 @@ public class Timer {
   }
 
   /**
-   * Pause the thread for a specified time. Pause the execution of the thread for a specified period
-   * of time given in seconds. Motors will continue to run at their last assigned values, and
-   * sensors will continue to update. Only the task containing the wait will pause until the wait
-   * time is expired.
+   * Pause the execution of the thread for a specified period of time. Motors will continue to run
+   * at their last assigned values, and sensors will continue to update. Only the task containing
+   * the wait will pause until the wait time is expired.
+   *
+   * @param period Length of time to pause
+   */
+  public static void delay(final Time period) {
+    delay(period.in(Seconds));
+  }
+
+  /**
+   * Pause the execution of the thread for a specified period of time given in seconds. Motors will
+   * continue to run at their last assigned values, and sensors will continue to update. Only the
+   * task containing the wait will pause until the wait time is expired.
    *
    * @param seconds Length of time to pause
    */
@@ -137,7 +151,17 @@ public class Timer {
   /**
    * Check if the period specified has passed.
    *
-   * @param seconds The period to check.
+   * @param period The period to check.
+   * @return Whether the period has passed.
+   */
+  public boolean hasElapsed(Time period) {
+    return hasElapsed(period.in(Seconds));
+  }
+
+  /**
+   * Check if the period specified has passed.
+   *
+   * @param seconds The period to check in seconds.
    * @return Whether the period has passed.
    */
   public boolean hasElapsed(double seconds) {

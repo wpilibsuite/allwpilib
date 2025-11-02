@@ -102,7 +102,8 @@ int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs);
 int32_t HAL_GetJoystickButtons(int32_t joystickNum,
                                HAL_JoystickButtons* buttons);
 
-void HAL_GetAllJoystickData(HAL_JoystickAxes* axes, HAL_JoystickPOVs* povs,
+void HAL_GetAllJoystickData(int32_t joystickNum, HAL_JoystickAxes* axes,
+                            HAL_JoystickPOVs* povs,
                             HAL_JoystickButtons* buttons);
 
 /**
@@ -149,18 +150,6 @@ int32_t HAL_GetJoystickType(int32_t joystickNum);
  * @param joystickNum the joystick number
  */
 void HAL_GetJoystickName(struct WPI_String* name, int32_t joystickNum);
-
-/**
- * Gets the type of a specific joystick axis.
- *
- * This is device specific, and different depending on what system input type
- * the joystick uses.
- *
- * @param joystickNum the joystick number
- * @param axis        the axis number
- * @return the enumerated axis type
- */
-int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis);
 
 /**
  * Set joystick outputs.

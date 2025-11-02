@@ -35,6 +35,10 @@
 
 using namespace frc;
 
+static constexpr int availableToCount(uint64_t available) {
+  return 64 - std::countl_zero(available);
+}
+
 namespace {
 // A simple class which caches the previous value written to an NT entry
 // Used to prevent redundant, repeated writes of the same value
@@ -157,14 +161,6 @@ static Instance& GetInstance() {
 
 static void SendMatchData();
 
-/**
- * Reports errors related to unplugged joysticks.
- *
- * Throttles the errors so that they don't overwhelm the DS.
- */
-static void ReportJoystickUnpluggedErrorV(fmt::string_view format,
-                                          fmt::format_args args);
-
 template <typename S, typename... Args>
 static inline void ReportJoystickUnpluggedError(const S& format,
                                                 Args&&... args) {
@@ -193,7 +189,7 @@ Instance::Instance() {
   for (unsigned int i = 0; i < DriverStation::kJoystickPorts; i++) {
     joystickButtonsPressed[i] = 0;
     joystickButtonsReleased[i] = 0;
-    previousButtonStates[i].count = 0;
+    previousButtonStates[i].available = 0;
     previousButtonStates[i].buttons = 0;
   }
 }
@@ -209,24 +205,49 @@ bool DriverStation::GetStickButton(int stick, int button) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return false;
   }
-  if (button <= 0) {
-    ReportJoystickUnpluggedError(
-        "Joystick Button {} index out of range; indexes begin at 1", button);
+  if (button < 0 || button >= 64) {
+    FRC_ReportError(warn::BadJoystickIndex, "button {} out of range", button);
     return false;
   }
+
+  uint64_t mask = 1LLU << button;
 
   HAL_JoystickButtons buttons;
   HAL_GetJoystickButtons(stick, &buttons);
 
-  if (button > buttons.count) {
+  if ((buttons.available & mask) == 0) {
     ReportJoystickUnpluggedWarning(
-        "Joystick Button {} missing (max {}), check if all controllers are "
+        "Joystick Button {} missing (available {}), check if all controllers "
+        "are "
         "plugged in",
-        button, buttons.count);
+        button, buttons.available);
     return false;
   }
 
-  return buttons.buttons & 1 << (button - 1);
+  return (buttons.buttons & mask) != 0;
+}
+
+std::optional<bool> DriverStation::GetStickButtonIfAvailable(int stick,
+                                                             int button) {
+  if (stick < 0 || stick >= kJoystickPorts) {
+    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
+    return false;
+  }
+  if (button < 0 || button >= 64) {
+    FRC_ReportError(warn::BadJoystickIndex, "button {} out of range", button);
+    return false;
+  }
+
+  uint64_t mask = 1LLU << button;
+
+  HAL_JoystickButtons buttons;
+  HAL_GetJoystickButtons(stick, &buttons);
+
+  if ((buttons.available & mask) == 0) {
+    return std::nullopt;
+  }
+
+  return (buttons.buttons & mask) != 0;
 }
 
 bool DriverStation::GetStickButtonPressed(int stick, int button) {
@@ -234,27 +255,29 @@ bool DriverStation::GetStickButtonPressed(int stick, int button) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return false;
   }
-  if (button <= 0) {
-    ReportJoystickUnpluggedError(
-        "Joystick Button {} index out of range; indexes begin at 1", button);
+  if (button < 0 || button >= 64) {
+    FRC_ReportError(warn::BadJoystickIndex, "button {} out of range", button);
     return false;
   }
 
   HAL_JoystickButtons buttons;
   HAL_GetJoystickButtons(stick, &buttons);
 
-  if (button > buttons.count) {
+  uint64_t mask = 1LLU << button;
+
+  if ((buttons.available & mask) == 0) {
     ReportJoystickUnpluggedWarning(
-        "Joystick Button {} missing (max {}), check if all controllers are "
+        "Joystick Button {} missing (available {}), check if all controllers "
+        "are "
         "plugged in",
-        button, buttons.count);
+        button, buttons.available);
     return false;
   }
   auto& inst = ::GetInstance();
   std::unique_lock lock(inst.buttonEdgeMutex);
   // If button was pressed, clear flag and return true
-  if (inst.joystickButtonsPressed[stick] & 1 << (button - 1)) {
-    inst.joystickButtonsPressed[stick] &= ~(1 << (button - 1));
+  if (inst.joystickButtonsPressed[stick] & mask) {
+    inst.joystickButtonsPressed[stick] &= ~mask;
     return true;
   }
   return false;
@@ -265,27 +288,29 @@ bool DriverStation::GetStickButtonReleased(int stick, int button) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return false;
   }
-  if (button <= 0) {
-    ReportJoystickUnpluggedError(
-        "Joystick Button {} index out of range; indexes begin at 1", button);
+  if (button < 0 || button >= 64) {
+    FRC_ReportError(warn::BadJoystickIndex, "button {} out of range", button);
     return false;
   }
 
   HAL_JoystickButtons buttons;
   HAL_GetJoystickButtons(stick, &buttons);
 
-  if (button > buttons.count) {
+  uint64_t mask = 1LLU << button;
+
+  if ((buttons.available & mask) == 0) {
     ReportJoystickUnpluggedWarning(
-        "Joystick Button {} missing (max {}), check if all controllers are "
+        "Joystick Button {} missing (available {}), check if all controllers "
+        "are "
         "plugged in",
-        button, buttons.count);
+        button, buttons.available);
     return false;
   }
   auto& inst = ::GetInstance();
   std::unique_lock lock(inst.buttonEdgeMutex);
   // If button was released, clear flag and return true
-  if (inst.joystickButtonsReleased[stick] & 1 << (button - 1)) {
-    inst.joystickButtonsReleased[stick] &= ~(1 << (button - 1));
+  if (inst.joystickButtonsReleased[stick] & mask) {
+    inst.joystickButtonsReleased[stick] &= ~mask;
     return true;
   }
   return false;
@@ -301,15 +326,40 @@ double DriverStation::GetStickAxis(int stick, int axis) {
     return 0.0;
   }
 
+  uint16_t mask = 1 << axis;
+
   HAL_JoystickAxes axes;
   HAL_GetJoystickAxes(stick, &axes);
 
-  if (axis >= axes.count) {
+  if ((axes.available & mask) == 0) {
     ReportJoystickUnpluggedWarning(
-        "Joystick Axis {} missing (max {}), check if all controllers are "
+        "Joystick Axis {} missing (available {}), check if all controllers are "
         "plugged in",
-        axis, axes.count);
+        axis, axes.available);
     return 0.0;
+  }
+
+  return axes.axes[axis];
+}
+
+std::optional<double> DriverStation::GetStickAxisIfAvailable(int stick,
+                                                             int axis) {
+  if (stick < 0 || stick >= kJoystickPorts) {
+    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
+    return 0.0;
+  }
+  if (axis < 0 || axis >= HAL_kMaxJoystickAxes) {
+    FRC_ReportError(warn::BadJoystickAxis, "axis {} out of range", axis);
+    return 0.0;
+  }
+
+  uint16_t mask = 1 << axis;
+
+  HAL_JoystickAxes axes;
+  HAL_GetJoystickAxes(stick, &axes);
+
+  if ((axes.available & mask) == 0) {
+    return std::nullopt;
   }
 
   return axes.axes[axis];
@@ -325,21 +375,23 @@ DriverStation::POVDirection DriverStation::GetStickPOV(int stick, int pov) {
     return kCenter;
   }
 
+  uint16_t mask = 1 << pov;
+
   HAL_JoystickPOVs povs;
   HAL_GetJoystickPOVs(stick, &povs);
 
-  if (pov >= povs.count) {
+  if ((povs.available & mask) == 0) {
     ReportJoystickUnpluggedWarning(
-        "Joystick POV {} missing (max {}), check if all controllers are "
+        "Joystick POV {} missing (available {}), check if all controllers are "
         "plugged in",
-        pov, povs.count);
+        pov, povs.available);
     return kCenter;
   }
 
   return static_cast<POVDirection>(povs.povs[pov]);
 }
 
-int DriverStation::GetStickButtons(int stick) {
+uint64_t DriverStation::GetStickButtons(int stick) {
   if (stick < 0 || stick >= kJoystickPorts) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0;
@@ -351,7 +403,11 @@ int DriverStation::GetStickButtons(int stick) {
   return buttons.buttons;
 }
 
-int DriverStation::GetStickAxisCount(int stick) {
+int DriverStation::GetStickAxesMaximumIndex(int stick) {
+  return availableToCount(GetStickAxesAvailable(stick));
+}
+
+int DriverStation::GetStickAxesAvailable(int stick) {
   if (stick < 0 || stick >= kJoystickPorts) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0;
@@ -360,10 +416,14 @@ int DriverStation::GetStickAxisCount(int stick) {
   HAL_JoystickAxes axes;
   HAL_GetJoystickAxes(stick, &axes);
 
-  return axes.count;
+  return axes.available;
 }
 
-int DriverStation::GetStickPOVCount(int stick) {
+int DriverStation::GetStickPOVsMaximumIndex(int stick) {
+  return availableToCount(GetStickPOVsAvailable(stick));
+}
+
+int DriverStation::GetStickPOVsAvailable(int stick) {
   if (stick < 0 || stick >= kJoystickPorts) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0;
@@ -372,10 +432,14 @@ int DriverStation::GetStickPOVCount(int stick) {
   HAL_JoystickPOVs povs;
   HAL_GetJoystickPOVs(stick, &povs);
 
-  return povs.count;
+  return povs.available;
 }
 
-int DriverStation::GetStickButtonCount(int stick) {
+int DriverStation::GetStickButtonsMaximumIndex(int stick) {
+  return availableToCount(GetStickButtonsAvailable(stick));
+}
+
+uint64_t DriverStation::GetStickButtonsAvailable(int stick) {
   if (stick < 0 || stick >= kJoystickPorts) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0;
@@ -384,7 +448,7 @@ int DriverStation::GetStickButtonCount(int stick) {
   HAL_JoystickButtons buttons;
   HAL_GetJoystickButtons(stick, &buttons);
 
-  return buttons.count;
+  return buttons.available;
 }
 
 bool DriverStation::GetJoystickIsGamepad(int stick) {
@@ -422,25 +486,10 @@ std::string DriverStation::GetJoystickName(int stick) {
   return descriptor.name;
 }
 
-int DriverStation::GetJoystickAxisType(int stick, int axis) {
-  if (stick < 0 || stick >= kJoystickPorts) {
-    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
-    return -1;
-  }
-  if (axis < 0 || axis >= HAL_kMaxJoystickAxes) {
-    FRC_ReportError(warn::BadJoystickAxis, "axis {} out of range", axis);
-    return -1;
-  }
-
-  HAL_JoystickDescriptor descriptor;
-  HAL_GetJoystickDescriptor(stick, &descriptor);
-
-  return descriptor.axisTypes[axis];
-}
-
 bool DriverStation::IsJoystickConnected(int stick) {
-  return GetStickAxisCount(stick) > 0 || GetStickButtonCount(stick) > 0 ||
-         GetStickPOVCount(stick) > 0;
+  return GetStickAxesAvailable(stick) != 0 ||
+         GetStickButtonsAvailable(stick) != 0 ||
+         GetStickPOVsAvailable(stick) != 0;
 }
 
 bool DriverStation::IsEnabled() {
@@ -575,20 +624,6 @@ std::optional<int> DriverStation::GetLocation() {
   }
 }
 
-bool DriverStation::WaitForDsConnection(units::second_t timeout) {
-  wpi::Event event{true, false};
-  HAL_ProvideNewDataEventHandle(event.GetHandle());
-  bool result = false;
-  if (timeout == 0_s) {
-    result = wpi::WaitForObject(event.GetHandle());
-  } else {
-    result = wpi::WaitForObject(event.GetHandle(), timeout.value(), nullptr);
-  }
-
-  HAL_RemoveNewDataEventHandle(event.GetHandle());
-  return result;
-}
-
 units::second_t DriverStation::GetMatchTime() {
   int32_t status = 0;
   return units::second_t{HAL_GetMatchTime(&status)};
@@ -675,16 +710,6 @@ void DriverStation::StartDataLog(wpi::log::DataLog& log, bool logJoysticks) {
   }
 }
 
-void ReportJoystickUnpluggedErrorV(fmt::string_view format,
-                                   fmt::format_args args) {
-  auto& inst = GetInstance();
-  auto currentTime = Timer::GetTimestamp();
-  if (currentTime > inst.nextMessageTime) {
-    ReportErrorV(err::Error, "", 0, "", format, args);
-    inst.nextMessageTime = currentTime + kJoystickUnpluggedMessageInterval;
-  }
-}
-
 void ReportJoystickUnpluggedWarningV(fmt::string_view format,
                                      fmt::format_args args) {
   auto& inst = GetInstance();
@@ -765,9 +790,9 @@ void JoystickLogSender::Init(wpi::log::DataLog& log, unsigned int stick,
   HAL_GetJoystickAxes(m_stick, &m_prevAxes);
   HAL_GetJoystickPOVs(m_stick, &m_prevPOVs);
   AppendButtons(m_prevButtons, timestamp);
+  int axesCount = availableToCount(m_prevAxes.available);
   m_logAxes.Append(
-      std::span<const float>{m_prevAxes.axes,
-                             static_cast<size_t>(m_prevAxes.count)},
+      std::span<const float>{m_prevAxes.axes, static_cast<size_t>(axesCount)},
       timestamp);
   AppendPOVs(m_prevPOVs, timestamp);
 }
@@ -775,7 +800,7 @@ void JoystickLogSender::Init(wpi::log::DataLog& log, unsigned int stick,
 void JoystickLogSender::Send(uint64_t timestamp) {
   HAL_JoystickButtons buttons;
   HAL_GetJoystickButtons(m_stick, &buttons);
-  if (buttons.count != m_prevButtons.count ||
+  if (buttons.available != m_prevButtons.available ||
       buttons.buttons != m_prevButtons.buttons) {
     AppendButtons(buttons, timestamp);
   }
@@ -783,20 +808,22 @@ void JoystickLogSender::Send(uint64_t timestamp) {
 
   HAL_JoystickAxes axes;
   HAL_GetJoystickAxes(m_stick, &axes);
-  if (axes.count != m_prevAxes.count ||
+  int axesCount = availableToCount(axes.available);
+  if (axes.available != m_prevAxes.available ||
       std::memcmp(axes.axes, m_prevAxes.axes,
-                  sizeof(axes.axes[0]) * axes.count) != 0) {
+                  sizeof(axes.axes[0]) * axesCount) != 0) {
     m_logAxes.Append(
-        std::span<const float>{axes.axes, static_cast<size_t>(axes.count)},
+        std::span<const float>{axes.axes, static_cast<size_t>(axesCount)},
         timestamp);
   }
   m_prevAxes = axes;
 
   HAL_JoystickPOVs povs;
   HAL_GetJoystickPOVs(m_stick, &povs);
-  if (povs.count != m_prevPOVs.count ||
+  int povsCount = availableToCount(povs.available);
+  if (povs.available != m_prevPOVs.available ||
       std::memcmp(povs.povs, m_prevPOVs.povs,
-                  sizeof(povs.povs[0]) * povs.count) != 0) {
+                  sizeof(povs.povs[0]) * povsCount) != 0) {
     AppendPOVs(povs, timestamp);
   }
   m_prevPOVs = povs;
@@ -804,23 +831,25 @@ void JoystickLogSender::Send(uint64_t timestamp) {
 
 void JoystickLogSender::AppendButtons(HAL_JoystickButtons buttons,
                                       uint64_t timestamp) {
-  uint8_t buttonsArr[32];
-  for (unsigned int i = 0; i < buttons.count; ++i) {
-    buttonsArr[i] = (buttons.buttons & (1u << i)) != 0;
+  int count = availableToCount(buttons.available);
+  uint8_t buttonsArr[64];
+  for (int i = 0; i < count; ++i) {
+    buttonsArr[i] = (buttons.buttons & (1llu << i)) != 0;
   }
-  m_logButtons.Append(std::span<const uint8_t>{buttonsArr, buttons.count},
-                      timestamp);
+  m_logButtons.Append(
+      std::span<const uint8_t>{buttonsArr, static_cast<size_t>(count)},
+      timestamp);
 }
 
 void JoystickLogSender::AppendPOVs(const HAL_JoystickPOVs& povs,
                                    uint64_t timestamp) {
+  int count = availableToCount(povs.available);
   int64_t povsArr[HAL_kMaxJoystickPOVs];
-  for (int i = 0; i < povs.count; ++i) {
+  for (int i = 0; i < count; ++i) {
     povsArr[i] = povs.povs[i];
   }
   m_logPOVs.Append(
-      std::span<const int64_t>{povsArr, static_cast<size_t>(povs.count)},
-      timestamp);
+      std::span<const int64_t>{povsArr, static_cast<size_t>(count)}, timestamp);
 }
 
 void DataLogSender::Init(wpi::log::DataLog& log, bool logJoysticks,

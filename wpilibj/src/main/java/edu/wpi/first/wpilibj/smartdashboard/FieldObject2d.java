@@ -4,12 +4,15 @@
 
 package edu.wpi.first.wpilibj.smartdashboard;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectorySample;
 import edu.wpi.first.networktables.DoubleArrayEntry;
+import edu.wpi.first.units.measure.Distance;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -50,6 +53,17 @@ public class FieldObject2d implements AutoCloseable {
    */
   public synchronized void setPose(double x, double y, Rotation2d rotation) {
     setPose(new Pose2d(x, y, rotation));
+  }
+
+  /**
+   * Set the pose from x, y, and rotation.
+   *
+   * @param x X location
+   * @param y Y location
+   * @param rotation rotation
+   */
+  public synchronized void setPose(Distance x, Distance y, Rotation2d rotation) {
+    setPose(new Pose2d(x.in(Meters), y.in(Meters), rotation));
   }
 
   /**

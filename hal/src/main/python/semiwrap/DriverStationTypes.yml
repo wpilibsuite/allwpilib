@@ -1,0 +1,53 @@
+strip_prefixes:
+- HAL_
+
+extra_includes:
+- src/ds_types_fmt.h
+
+enums:
+  HAL_AllianceStationID:
+    value_prefix: HAL_AllianceStationID
+  HAL_JoystickPOV:
+    value_prefix: HAL_JoystickPOV
+  HAL_MatchType:
+    value_prefix: HAL_kMatchType
+classes:
+  HAL_ControlWord:
+    attributes:
+      enabled:
+      autonomous:
+      test:
+      eStop:
+      fmsAttached:
+      dsAttached:
+      control_reserved:
+  HAL_JoystickAxes:
+    attributes:
+      count:
+      axes:
+      raw:
+  HAL_JoystickPOVs:
+    attributes:
+      count:
+      povs:
+  HAL_JoystickButtons:
+    attributes:
+      buttons:
+      count:
+  HAL_JoystickDescriptor:
+    attributes:
+      type:
+      name:
+      axisCount:
+      axisTypes:
+      buttonCount:
+      povCount:
+      isGamepad:
+  HAL_MatchInfo:
+    attributes:
+      eventName:
+      matchType:
+      matchNumber:
+      replayNumber:
+      gameSpecificMessage:
+      gameSpecificMessageSize:

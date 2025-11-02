@@ -20,7 +20,7 @@ jobs:
             name: Linux
             container: wpilib/systemcore-cross-ubuntu:2027-24.04
             flags: "--preset with-java-and-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
-          - os: macOS-14
+          - os: macOS-15
             name: macOS
             container: ""
             flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
@@ -58,7 +58,7 @@ jobs:
         uses: lukka/run-vcpkg@v11.5
         with:
           vcpkgDirectory: ${{ runner.workspace }}/vcpkg
-          vcpkgGitCommitId: 37c3e63a1306562f7f59c4c3c8892ddd50fdf992 # HEAD on 2024-02-24
+          vcpkgGitCommitId: 74e6536215718009aae747d86d84b78376bf9e09 # HEAD on 2025-10-17
 
       - name: configure
         run: cmake ${{ matrix.flags }}

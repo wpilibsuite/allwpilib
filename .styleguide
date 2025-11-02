@@ -23,6 +23,13 @@ generatedFileExclude {
   fieldImages/src/main/native/resources/
   apriltag/src/test/resources/
   wpilibc/src/generated/
+
+  apriltag/src/main/python/
+  apriltag/src/test/python/
+  wpilibc/src/main/python/
+  wpilibc/src/test/python/
+  xrpVendordep/src/main/python/
+  xrpVendordep/src/test/python/
 }
 
 repoRootNameOverride {

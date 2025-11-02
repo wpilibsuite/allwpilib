@@ -1,0 +1,115 @@
+classes:
+  nt::BooleanArraySubscriber:
+    methods:
+      BooleanArraySubscriber:
+        overloads:
+          '':
+            ignore: true
+          NT_Subscriber, ParamType:
+            ignore: true
+      Get:
+        overloads:
+          '[const]':
+          ParamType [const]:
+          wpi::SmallVectorImpl<SmallElemType>& [const]:
+            ignore: true
+          wpi::SmallVectorImpl<SmallElemType>&, ParamType [const]:
+            ignore: true
+      GetAtomic:
+        overloads:
+          '[const]':
+          ParamType [const]:
+          wpi::SmallVectorImpl<SmallElemType>& [const]:
+            ignore: true
+          wpi::SmallVectorImpl<SmallElemType>&, ParamType [const]:
+            ignore: true
+      ReadQueue:
+      GetTopic:
+    inline_code: |
+      .def("close", [](BooleanArraySubscriber *self) {
+        py::gil_scoped_release release;
+        *self = BooleanArraySubscriber();
+      }, py::doc("Destroys the subscriber"))
+      .def("__enter__", [](BooleanArraySubscriber *self) {
+        return self;
+      })
+      .def("__exit__", [](BooleanArraySubscriber *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = BooleanArraySubscriber();
+      })
+  nt::BooleanArrayPublisher:
+    methods:
+      BooleanArrayPublisher:
+        overloads:
+          '':
+            ignore: true
+          NT_Publisher:
+            ignore: true
+      Set:
+      SetDefault:
+      GetTopic:
+    inline_code: |
+      .def("close", [](BooleanArrayPublisher *self) {
+        py::gil_scoped_release release;
+        *self = BooleanArrayPublisher();
+      }, py::doc("Destroys the publisher"))
+      .def("__enter__", [](BooleanArrayPublisher *self) {
+        return self;
+      })
+      .def("__exit__", [](BooleanArrayPublisher *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = BooleanArrayPublisher();
+      })
+  nt::BooleanArrayEntry:
+    methods:
+      BooleanArrayEntry:
+        overloads:
+          '':
+            ignore: true
+          NT_Entry, ParamType:
+            ignore: true
+      GetHandle:
+        ignore: true
+      GetTopic:
+      Unpublish:
+    inline_code: |
+      .def("close", [](BooleanArrayEntry *self) {
+        py::gil_scoped_release release;
+        *self = BooleanArrayEntry();
+      }, py::doc("Destroys the entry"))
+      .def("__enter__", [](BooleanArrayEntry *self) {
+        return self;
+      })
+      .def("__exit__", [](BooleanArrayEntry *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = BooleanArrayEntry();
+      })
+  nt::BooleanArrayTopic:
+    attributes:
+      kTypeString:
+    methods:
+      BooleanArrayTopic:
+        overloads:
+          '':
+            ignore: true
+          NT_Topic:
+            ignore: true
+          Topic:
+      Subscribe:
+      SubscribeEx:
+      Publish:
+      PublishEx:
+      GetEntry:
+      GetEntryEx:
+    inline_code: |
+      .def("close", [](BooleanArrayTopic *self) {
+        py::gil_scoped_release release;
+        *self = BooleanArrayTopic();
+      }, py::doc("Destroys the topic"))
+      .def("__enter__", [](BooleanArrayTopic *self) {
+        return self;
+      })
+      .def("__exit__", [](BooleanArrayTopic *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = BooleanArrayTopic();
+      })

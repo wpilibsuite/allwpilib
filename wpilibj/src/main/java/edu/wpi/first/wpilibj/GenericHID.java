@@ -136,7 +136,7 @@ public class GenericHID {
    * time this method was called. This is useful if you only want to call a function once when you
    * press the button.
    *
-   * @param button The button index, beginning at 1.
+   * @param button The button index, beginning at 0.
    * @return Whether the button was pressed since the last check.
    */
   public boolean getRawButtonPressed(int button) {
@@ -150,7 +150,7 @@ public class GenericHID {
    * time this method was called. This is useful if you only want to call a function once when you
    * release the button.
    *
-   * @param button The button index, beginning at 1.
+   * @param button The button index, beginning at 0.
    * @return Whether the button was released since the last check.
    */
   public boolean getRawButtonReleased(int button) {
@@ -365,12 +365,30 @@ public class GenericHID {
   }
 
   /**
+   * Get the maximum axis index for the joystick.
+   *
+   * @return the maximum axis index for the joystick
+   */
+  public int getAxesMaximumIndex() {
+    return DriverStation.getStickAxesMaximumIndex(m_port);
+  }
+
+  /**
    * Get the number of axes for the HID.
    *
    * @return the number of axis for the current HID
    */
-  public int getAxisCount() {
-    return DriverStation.getStickAxisCount(m_port);
+  public int getAxesAvailable() {
+    return DriverStation.getStickAxesAvailable(m_port);
+  }
+
+  /**
+   * Get the maximum POV index for the joystick.
+   *
+   * @return the maximum POV index for the joystick
+   */
+  public int getPOVsMaximumIndex() {
+    return DriverStation.getStickPOVsMaximumIndex(m_port);
   }
 
   /**
@@ -378,8 +396,17 @@ public class GenericHID {
    *
    * @return the number of POVs for the current HID
    */
-  public int getPOVCount() {
-    return DriverStation.getStickPOVCount(m_port);
+  public int getPOVsAvailable() {
+    return DriverStation.getStickPOVsAvailable(m_port);
+  }
+
+  /**
+   * Get the maximum button index for the joystick.
+   *
+   * @return the maximum button index for the joystick
+   */
+  public int getButtonsMaximumIndex() {
+    return DriverStation.getStickButtonsMaximumIndex(m_port);
   }
 
   /**
@@ -387,8 +414,8 @@ public class GenericHID {
    *
    * @return the number of buttons for the current HID
    */
-  public int getButtonCount() {
-    return DriverStation.getStickButtonCount(m_port);
+  public long getButtonsAvailable() {
+    return DriverStation.getStickButtonsAvailable(m_port);
   }
 
   /**
@@ -416,16 +443,6 @@ public class GenericHID {
    */
   public String getName() {
     return DriverStation.getJoystickName(m_port);
-  }
-
-  /**
-   * Get the axis type of the provided joystick axis.
-   *
-   * @param axis The axis to read, starting at 0.
-   * @return the axis type of the given joystick axis
-   */
-  public int getAxisType(int axis) {
-    return DriverStation.getJoystickAxisType(m_port, axis);
   }
 
   /**

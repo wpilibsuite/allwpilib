@@ -13,15 +13,15 @@ using namespace frc::sim;
 
 StadiaControllerSim::StadiaControllerSim(const StadiaController& joystick)
     : GenericHIDSim{joystick} {
-  SetAxisCount(4);
-  SetButtonCount(15);
-  SetPOVCount(1);
+  SetAxesMaximumIndex(4);
+  SetButtonsMaximumIndex(15);
+  SetPOVsMaximumIndex(1);
 }
 
 StadiaControllerSim::StadiaControllerSim(int port) : GenericHIDSim{port} {
-  SetAxisCount(4);
-  SetButtonCount(15);
-  SetPOVCount(1);
+  SetAxesMaximumIndex(4);
+  SetButtonsMaximumIndex(15);
+  SetPOVsMaximumIndex(1);
 }
 
 void StadiaControllerSim::SetLeftX(double value) {

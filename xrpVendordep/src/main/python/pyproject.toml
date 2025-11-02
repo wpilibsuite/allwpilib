@@ -1,0 +1,66 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [
+    "semiwrap~=0.2.1",
+    "hatch-meson~=0.1.0",
+    "hatch-robotpy~=0.2.1",
+    "hatchling",
+    "robotpy-native-xrp==0.0.0",
+    "wpilib==0.0.0",
+]
+
+
+[project]
+name = "robotpy-xrp"
+version = "0.0.0"
+description = "Binary wrapper for WPILib XRP Vendor library"
+authors = [
+    {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
+]
+license = "BSD-3-Clause"
+dependencies = [
+    "robotpy-native-xrp==0.0.0",
+    "wpilib==0.0.0"
+]
+
+[project.entry-points."robotpy_sim.2027"]
+xrp = "xrp.extension"
+
+
+[tool.hatch.build.hooks.robotpy]
+version_file = "xrp/version.py"
+
+[[tool.hatch.build.hooks.robotpy.maven_lib_download]]
+artifact_id = "halsim_xrp"
+group_id = "edu.wpi.first.halsim"
+repo_url = "https://frcmaven.wpi.edu/artifactory/release-2027"
+version = "0.0.0"
+use_headers = false
+
+extract_to = "xrp/extension"
+libs = ["halsim_xrp"]
+
+[tool.hatch.build.hooks.semiwrap]
+
+[tool.hatch.build.hooks.meson]
+
+[tool.hatch.build.targets.wheel]
+packages = ["xrp"]
+
+
+[tool.semiwrap]
+update_init = ["xrp"]
+
+[tool.semiwrap.extension_modules."xrp._xrp"]
+name = "xrp"
+wraps = ["robotpy-native-xrp"]
+depends = ["wpilib", "wpimath_geometry"]
+
+[tool.semiwrap.extension_modules."xrp._xrp".headers]
+# frc/xrp
+XRPGyro = "frc/xrp/XRPGyro.h"
+XRPMotor = "frc/xrp/XRPMotor.h"
+XRPOnBoardIO = "frc/xrp/XRPOnBoardIO.h"
+XRPRangefinder = "frc/xrp/XRPRangefinder.h"
+XRPReflectanceSensor = "frc/xrp/XRPReflectanceSensor.h"
+XRPServo = "frc/xrp/XRPServo.h"

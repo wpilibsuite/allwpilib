@@ -1,0 +1,43 @@
+functions:
+  InputModulus:
+    template_impls:
+    - [double]
+  AngleModulus:
+  FloorDiv:
+    # Use // operator instead, it's more efficient
+    # - https://github.com/robotpy/mostrobotpy/pull/200
+    ignore: true
+  FloorMod:
+    # Use % operator instead, it's more efficient
+    # - https://github.com/robotpy/mostrobotpy/pull/200
+    ignore: true
+  ApplyDeadband:
+    param_override:
+      maxMagnitude:
+        default: '1.0'
+    overloads:
+      T, T, T:
+        template_impls:
+        - [double]
+      const Eigen::Vector<T, N>&, T, T:
+        ignore: true
+  IsNear:
+    overloads:
+      T, T, T:
+        ignore: true
+        template_impls:
+        - [double]
+      T, T, T, T, T:
+        ignore: true
+        template_impls:
+        - [double]
+  SlewRateLimit:
+    overloads:
+      const Translation2d&, const Translation2d&, units::second_t, units::meters_per_second_t:
+      const Translation3d&, const Translation3d&, units::second_t, units::meters_per_second_t:
+  CopyDirectionPow:
+    overloads:
+      T, double, T:
+        ignore: true
+      const Eigen::Vector<T, N>&, double, T:
+        ignore: true

@@ -109,20 +109,30 @@ class DriverStation final {
   static constexpr int kJoystickPorts = 6;
 
   /**
-   * The state of one joystick button. %Button indexes begin at 1.
+   * The state of one joystick button. Button indexes begin at 0.
    *
    * @param stick  The joystick to read.
-   * @param button The button index, beginning at 1.
+   * @param button The button index, beginning at 0.
    * @return The state of the joystick button.
    */
   static bool GetStickButton(int stick, int button);
+
+  /**
+   * The state of one joystick button, only if available. Button indexes begin
+   * at 0.
+   *
+   * @param stick  The joystick to read.
+   * @param button The button index, beginning at 0.
+   * @return The state of the joystick button, or empty if unavailable.
+   */
+  static std::optional<bool> GetStickButtonIfAvailable(int stick, int button);
 
   /**
    * Whether one joystick button was pressed since the last check. %Button
    * indexes begin at 1.
    *
    * @param stick  The joystick to read.
-   * @param button The button index, beginning at 1.
+   * @param button The button index, beginning at 0.
    * @return Whether the joystick button was pressed since the last check.
    */
   static bool GetStickButtonPressed(int stick, int button);
@@ -132,7 +142,7 @@ class DriverStation final {
    * indexes begin at 1.
    *
    * @param stick  The joystick to read.
-   * @param button The button index, beginning at 1.
+   * @param button The button index, beginning at 0.
    * @return Whether the joystick button was released since the last check.
    */
   static bool GetStickButtonReleased(int stick, int button);
@@ -150,6 +160,18 @@ class DriverStation final {
   static double GetStickAxis(int stick, int axis);
 
   /**
+   * Get the value of the axis on a joystick, if available.
+   *
+   * This depends on the mapping of the joystick connected to the specified
+   * port.
+   *
+   * @param stick The joystick to read.
+   * @param axis  The analog axis value to read from the joystick.
+   * @return The value of the axis on the joystick, or empty if not available.
+   */
+  static std::optional<double> GetStickAxisIfAvailable(int stick, int axis);
+
+  /**
    * Get the state of a POV on the joystick.
    *
    * @return the angle of the POV.
@@ -162,31 +184,55 @@ class DriverStation final {
    * @param stick The joystick to read.
    * @return The state of the buttons on the joystick.
    */
-  static int GetStickButtons(int stick);
+  static uint64_t GetStickButtons(int stick);
 
   /**
-   * Returns the number of axes on a given joystick port.
+   * Returns the maximum axis index on a given joystick port.
    *
    * @param stick The joystick port number
-   * @return The number of axes on the indicated joystick
+   * @return The maximum axis index on the indicated joystick
    */
-  static int GetStickAxisCount(int stick);
+  static int GetStickAxesMaximumIndex(int stick);
 
   /**
-   * Returns the number of POVs on a given joystick port.
+   * Returns the mask of available axes on a given joystick port.
    *
    * @param stick The joystick port number
-   * @return The number of POVs on the indicated joystick
+   * @return The mask of available axes on the indicated joystick
    */
-  static int GetStickPOVCount(int stick);
+  static int GetStickAxesAvailable(int stick);
 
   /**
-   * Returns the number of buttons on a given joystick port.
+   * Returns the maximum POV index on a given joystick port.
    *
    * @param stick The joystick port number
-   * @return The number of buttons on the indicated joystick
+   * @return The maximum POV index on the indicated joystick
    */
-  static int GetStickButtonCount(int stick);
+  static int GetStickPOVsMaximumIndex(int stick);
+
+  /**
+   * Returns the mask of available POVs on a given joystick port.
+   *
+   * @param stick The joystick port number
+   * @return The mask of available POVs on the indicated joystick
+   */
+  static int GetStickPOVsAvailable(int stick);
+
+  /**
+   * Returns the maximum button index on a given joystick port.
+   *
+   * @param stick The joystick port number
+   * @return The maximum button index on the indicated joystick
+   */
+  static int GetStickButtonsMaximumIndex(int stick);
+
+  /**
+   * Returns the mask of available buttons on a given joystick port.
+   *
+   * @param stick The joystick port number
+   * @return The mask of available buttons on the indicated joystick
+   */
+  static uint64_t GetStickButtonsAvailable(int stick);
 
   /**
    * Returns a boolean indicating if the controller is an xbox controller.
@@ -211,15 +257,6 @@ class DriverStation final {
    * @return The name of the joystick at the given port
    */
   static std::string GetJoystickName(int stick);
-
-  /**
-   * Returns the types of Axes on a given joystick port.
-   *
-   * @param stick The joystick port number and the target axis
-   * @param axis  The analog axis value to read from the joystick.
-   * @return What type of axis the axis is reporting to be
-   */
-  static int GetJoystickAxisType(int stick, int axis);
 
   /**
    * Returns if a joystick is connected to the Driver Station.
@@ -376,14 +413,6 @@ class DriverStation final {
    * @return The location of the driver station (1-3, 0 for invalid)
    */
   static std::optional<int> GetLocation();
-
-  /**
-   * Wait for a DS connection.
-   *
-   * @param timeout timeout in seconds. 0 for infinite.
-   * @return true if connected, false if timeout
-   */
-  static bool WaitForDsConnection(units::second_t timeout);
 
   /**
    * Return the approximate match time. The FMS does not send an official match

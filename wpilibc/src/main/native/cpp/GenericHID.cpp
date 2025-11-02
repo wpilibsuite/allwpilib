@@ -107,16 +107,28 @@ BooleanEvent GenericHID::AxisGreaterThan(int axis, double threshold,
   });
 }
 
-int GenericHID::GetAxisCount() const {
-  return DriverStation::GetStickAxisCount(m_port);
+int GenericHID::GetAxesMaximumIndex() const {
+  return DriverStation::GetStickAxesMaximumIndex(m_port);
 }
 
-int GenericHID::GetPOVCount() const {
-  return DriverStation::GetStickPOVCount(m_port);
+int GenericHID::GetAxesAvailable() const {
+  return DriverStation::GetStickAxesAvailable(m_port);
 }
 
-int GenericHID::GetButtonCount() const {
-  return DriverStation::GetStickButtonCount(m_port);
+int GenericHID::GetPOVsMaximumIndex() const {
+  return DriverStation::GetStickPOVsMaximumIndex(m_port);
+}
+
+int GenericHID::GetPOVsAvailable() const {
+  return DriverStation::GetStickPOVsAvailable(m_port);
+}
+
+int GenericHID::GetButtonsMaximumIndex() const {
+  return DriverStation::GetStickButtonsMaximumIndex(m_port);
+}
+
+uint64_t GenericHID::GetButtonsAvailable() const {
+  return DriverStation::GetStickButtonsAvailable(m_port);
 }
 
 bool GenericHID::IsConnected() const {
@@ -129,10 +141,6 @@ GenericHID::HIDType GenericHID::GetType() const {
 
 std::string GenericHID::GetName() const {
   return DriverStation::GetJoystickName(m_port);
-}
-
-int GenericHID::GetAxisType(int axis) const {
-  return DriverStation::GetJoystickAxisType(m_port, axis);
 }
 
 int GenericHID::GetPort() const {

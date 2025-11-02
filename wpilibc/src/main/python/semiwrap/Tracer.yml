@@ -1,0 +1,31 @@
+extra_includes:
+- wpi/SmallString.h
+- wpi/raw_ostream.h
+
+classes:
+  frc::Tracer:
+    methods:
+      Tracer:
+      ResetTimer:
+      ClearEpochs:
+      AddEpoch:
+      PrintEpochs:
+        overloads:
+          '':
+          wpi::raw_ostream&:
+            ignore: true
+
+inline_code: |-
+  cls_Tracer
+    .def("getEpochs",
+      [](Tracer * self) -> py::str {
+        wpi::SmallString<128> buf;
+        wpi::raw_svector_ostream s(buf);
+        self->PrintEpochs(s);
+        return py::cast(s.str());
+      },
+      "Retreives list of epochs added so far as a string\n"
+      "\n"
+      ".. versionadded:: 2021.1.2\n"
+      "\n"
+      ".. note:: This function only exists in RobotPy\n");

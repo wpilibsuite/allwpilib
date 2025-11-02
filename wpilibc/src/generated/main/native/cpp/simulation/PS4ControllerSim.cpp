@@ -13,15 +13,15 @@ using namespace frc::sim;
 
 PS4ControllerSim::PS4ControllerSim(const PS4Controller& joystick)
     : GenericHIDSim{joystick} {
-  SetAxisCount(6);
-  SetButtonCount(14);
-  SetPOVCount(1);
+  SetAxesMaximumIndex(6);
+  SetButtonsMaximumIndex(14);
+  SetPOVsMaximumIndex(1);
 }
 
 PS4ControllerSim::PS4ControllerSim(int port) : GenericHIDSim{port} {
-  SetAxisCount(6);
-  SetButtonCount(14);
-  SetPOVCount(1);
+  SetAxesMaximumIndex(6);
+  SetButtonsMaximumIndex(14);
+  SetPOVsMaximumIndex(1);
 }
 
 void PS4ControllerSim::SetLeftX(double value) {

@@ -1,0 +1,96 @@
+classes:
+  frc::sim::DifferentialDrivetrainSim:
+    typealias:
+    - frc::DCMotor
+    - template <int S, int I, int O> using LinearSystem = frc::LinearSystem<S, I, O>
+    methods:
+      DifferentialDrivetrainSim:
+        overloads:
+          LinearSystem<2, 2, 2>, units::meter_t, DCMotor, double, units::meter_t, const std::array<double, 7>&:
+            param_override:
+              measurementStdDevs:
+                default: std::array<double, 7>{}
+          ? frc::DCMotor, double, units::kilogram_square_meter_t, units::kilogram_t, units::meter_t, units::meter_t, const std::array<double, 7>&
+          : param_override:
+              measurementStdDevs:
+                default: std::array<double, 7>{}
+      ClampInput:
+      SetInputs:
+      SetGearing:
+      Update:
+      GetGearing:
+      GetHeading:
+      GetPose:
+      GetRightPosition:
+      GetRightVelocity:
+      GetLeftPosition:
+      GetLeftVelocity:
+      GetRightCurrentDraw:
+      GetLeftCurrentDraw:
+      GetCurrentDraw:
+      SetState:
+      SetPose:
+      Dynamics:
+      CreateKitbotSim:
+        overloads:
+          frc::DCMotor, double, units::meter_t, const std::array<double, 7>&:
+            param_override:
+              measurementStdDevs:
+                default: std::array<double, 7>{}
+          frc::DCMotor, double, units::meter_t, units::kilogram_square_meter_t, const std::array<double, 7>&:
+            param_override:
+              measurementStdDevs:
+                default: std::array<double, 7>{}
+  frc::sim::DifferentialDrivetrainSim::State:
+    attributes:
+      kX:
+      kY:
+      kHeading:
+      kLeftVelocity:
+      kRightVelocity:
+      kLeftPosition:
+      kRightPosition:
+  frc::sim::DifferentialDrivetrainSim::KitbotGearing:
+    attributes:
+      k12p75:
+      k10p71:
+      k8p45:
+      k7p31:
+      k5p95:
+  frc::sim::DifferentialDrivetrainSim::KitbotMotor:
+    attributes:
+      SingleCIMPerSide:
+      DualCIMPerSide:
+      SingleMiniCIMPerSide:
+      DualMiniCIMPerSide:
+      SingleFalcon500PerSide:
+      DualFalcon500PerSide:
+      SingleNEOPerSide:
+      DualNEOPerSide:
+  frc::sim::DifferentialDrivetrainSim::KitbotWheelSize:
+    attributes:
+      kSixInch:
+      kEightInch:
+      kTenInch:
+
+inline_code: |-
+  cls_DifferentialDrivetrainSim
+    .def("getLeftPositionFeet", [](DifferentialDrivetrainSim * self) -> units::foot_t {
+      return self->GetLeftPosition();
+    })
+    .def("getLeftPositionInches", [](DifferentialDrivetrainSim * self) -> units::inch_t {
+      return self->GetLeftPosition();
+    })
+    .def("getLeftVelocityFps", [](DifferentialDrivetrainSim * self) -> units::feet_per_second_t {
+      return self->GetLeftVelocity();
+    })
+    .def("getRightPositionFeet", [](DifferentialDrivetrainSim * self) -> units::foot_t {
+      return self->GetRightPosition();
+    })
+    .def("getRightPositionInches", [](DifferentialDrivetrainSim * self) -> units::inch_t {
+      return self->GetRightPosition();
+    })
+    .def("getRightVelocityFps", [](DifferentialDrivetrainSim * self) -> units::feet_per_second_t {
+      return self->GetRightVelocity();
+    })
+  ;
