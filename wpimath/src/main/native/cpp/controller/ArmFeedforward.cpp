@@ -18,7 +18,7 @@ using namespace frc;
 units::volt_t ArmFeedforward::Calculate(
     units::unit_t<Angle> currentAngle, units::unit_t<Velocity> currentVelocity,
     units::unit_t<Velocity> nextVelocity) const {
-  using VarMat = slp::VariableMatrix;
+  using VarMat = slp::VariableMatrix<double>;
 
   // Small kₐ values make the solver ill-conditioned
   if (kA < units::unit_t<ka_unit>{1e-1}) {
@@ -39,7 +39,7 @@ units::volt_t ArmFeedforward::Calculate(
 
   Vectord<2> r_k{currentAngle.value(), currentVelocity.value()};
 
-  slp::Variable u_k;
+  slp::Variable<double> u_k;
 
   // Initial guess
   auto acceleration = (nextVelocity - currentVelocity) / m_dt;
