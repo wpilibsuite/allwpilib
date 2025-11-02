@@ -65,8 +65,6 @@ if(NOT MSVC AND NOT APPLE)
     endif()
 endif()
 
-generate_resources(src/main/native/resources generated/main/cpp WPI wpi wpinet_resources_src)
-
 file(
     GLOB_RECURSE wpinet_native_src
     src/main/native/cpp/*.cpp
@@ -121,7 +119,7 @@ set(uv_linux_src
     src/main/native/thirdparty/libuv/src/unix/random-sysctl-linux.cpp
 )
 
-add_library(wpinet ${wpinet_native_src} ${wpinet_resources_src})
+add_library(wpinet ${wpinet_native_src})
 set_target_properties(wpinet PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET wpinet PROPERTY FOLDER "libraries")
