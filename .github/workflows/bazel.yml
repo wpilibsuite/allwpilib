@@ -86,7 +86,7 @@ jobs:
 
   buildifier:
     name: "buildifier"
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     steps:
       - name: Set up Go 1.15.x
         uses: actions/setup-go@v5
