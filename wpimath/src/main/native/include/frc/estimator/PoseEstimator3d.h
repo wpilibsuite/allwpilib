@@ -486,7 +486,9 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
   TimeInterpolatableBuffer<Pose3d> m_odometryPoseBuffer{kBufferDuration};
   // Maps timestamps to vision updates
   // Always contains one entry before the oldest entry in m_odometryPoseBuffer,
-  // unless there have been no vision measurements after the last reset
+  // unless there have been no vision measurements after the last reset. May
+  // contain one entry while m_odometryPoseBuffer is empty to correct for
+  // translation/rotation after a call to ResetRotation/ResetTranslation.
   std::map<units::second_t, VisionUpdate> m_visionUpdates;
 
   Pose3d m_poseEstimate;

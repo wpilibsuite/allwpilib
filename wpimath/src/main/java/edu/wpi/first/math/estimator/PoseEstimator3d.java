@@ -56,7 +56,9 @@ public class PoseEstimator3d<T> {
       TimeInterpolatableBuffer.createBuffer(kBufferDuration);
   // Maps timestamps to vision updates
   // Always contains one entry before the oldest entry in m_odometryPoseBuffer, unless there have
-  // been no vision measurements after the last reset
+  // been no vision measurements after the last reset. May contain one entry while
+  // m_odometryPoseBuffer is empty to correct for translation/rotation after a call to
+  // ResetRotation/ResetTranslation.
   private final NavigableMap<Double, VisionUpdate> m_visionUpdates = new TreeMap<>();
 
   private Pose3d m_poseEstimate;
