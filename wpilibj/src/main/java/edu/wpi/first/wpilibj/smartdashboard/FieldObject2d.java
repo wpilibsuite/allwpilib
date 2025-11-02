@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectorySample;
 import edu.wpi.first.networktables.DoubleArrayEntry;
 import edu.wpi.first.units.measure.Distance;
 import java.util.ArrayList;
@@ -105,9 +106,10 @@ public class FieldObject2d implements AutoCloseable {
    *
    * @param trajectory The trajectory from which the poses should be added.
    */
-  public synchronized void setTrajectory(Trajectory trajectory) {
+  public synchronized <SampleType extends TrajectorySample<SampleType>> void setTrajectory(
+      Trajectory<SampleType> trajectory) {
     m_poses.clear();
-    for (Trajectory.State state : trajectory.getStates()) {
+    for (SampleType state : trajectory.getSamples()) {
       m_poses.add(state.pose);
     }
     updateEntry();
