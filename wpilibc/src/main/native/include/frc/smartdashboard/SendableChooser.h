@@ -84,8 +84,8 @@ class SendableChooser : public SendableChooserBase {
   }
 
   /**
-   * Returns a copy of the selected option (a std::weak_ptr<U> if T =
-   * std::shared_ptr<U>).
+   * Returns a copy of the selected option (a std::weak_ptr&lt;U&gt; if T =
+   * std::shared_ptr&lt;U&gt;).
    *
    * If there is none selected, it will return the default. If there is none
    * selected and no default, then it will return a value-initialized instance.

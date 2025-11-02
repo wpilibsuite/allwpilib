@@ -62,7 +62,7 @@ doxygen {
             // Note: has no effect if not on an x86_64 platform - you need to
             // have a global install available on your PATH for the Doxygen
             // plugin to run.
-            executableByVersion('1.12.0')
+            executableByVersion('1.15.0')
 
             String arch = System.getProperty("os.arch");
             if (!(arch.equals("x86_64") || arch.equals("amd64"))) {

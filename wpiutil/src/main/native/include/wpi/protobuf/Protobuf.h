@@ -136,7 +136,7 @@ class ProtoOutputStream {
   /**
    * Constructs a nanopb ostream from a buffer.
    *
-   * This constructor will cause `Encode` to call pb_encode_ex`
+   * This constructor will cause `Encode` to call `pb_encode_ex`
    *
    * @param[in] out the stream buffer
    */
@@ -153,7 +153,7 @@ class ProtoOutputStream {
   /**
    * Constructs a nanopb ostream from a buffer.
    *
-   * This constructor will cause `Encode` to call pb_encode_ex`
+   * This constructor will cause `Encode` to call `pb_encode_ex`
    *
    * @param[in] out the stream buffer
    */
@@ -171,7 +171,7 @@ class ProtoOutputStream {
    * Constructs a empty nanopb stream. You must fill out the stream
    * returned from `Stream` before calling Encode.
    *
-   * This constructor exists to cause `Encode` to call pb_encode_ex`,
+   * This constructor exists to cause `Encode` to call `pb_encode_ex`,
    * but allow manipulating the stream manually.
    */
   ProtoOutputStream()
@@ -274,9 +274,9 @@ concept ProtobufSerializable = requires(
  * Specifies that a type is capable of in-place protobuf deserialization.
  *
  * In addition to meeting ProtobufSerializable, implementations must define a
- * wpi::Protobuf<T> static member
- * - bool UnpackInto(T*, wpi::ProtoInputStream<T>&)` to update the
- *   pointed-to T with the contents of the message.
+ * wpi::Protobuf<T> static member -
+ * `bool UnpackInto(T*, wpi::ProtoInputStream<T>&)` to update the pointed-to T
+ * with the contents of the message.
  */
 template <typename T>
 concept MutableProtobufSerializable =

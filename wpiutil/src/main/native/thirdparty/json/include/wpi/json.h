@@ -1857,7 +1857,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     @brief get a value (implicit)
 
     Implicit type conversion between the JSON value and a compatible value.
-    The call is realized by calling @ref get() const.
+    The call is realized by calling @ref get().
 
     @tparam ValueType non-pointer type compatible to the JSON value, for
     instance `int` for JSON integer numbers, `bool` for JSON booleans, or

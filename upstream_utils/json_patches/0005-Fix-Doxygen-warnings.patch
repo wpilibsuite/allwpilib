@@ -4,11 +4,11 @@ Date: Tue, 27 May 2025 23:39:02 -0400
 Subject: [PATCH 5/5] Fix Doxygen warnings
 
 ---
- include/nlohmann/json.hpp | 31 ++++++-------------------------
- 1 file changed, 6 insertions(+), 25 deletions(-)
+ include/nlohmann/json.hpp | 33 +++++++--------------------------
+ 1 file changed, 7 insertions(+), 26 deletions(-)
 
 diff --git a/include/nlohmann/json.hpp b/include/nlohmann/json.hpp
-index a89e2151e589663ba487a462c3d15cd247ff06cf..a5b4f8b4a118c1f5763ec6ba596a8a2d3d5791eb 100644
+index a89e2151e589663ba487a462c3d15cd247ff06cf..d5d6d6d51f1df4fd030e69a54941fe0911bdba93 100644
 --- a/include/nlohmann/json.hpp
 +++ b/include/nlohmann/json.hpp
 @@ -161,7 +161,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
@@ -75,6 +75,15 @@ index a89e2151e589663ba487a462c3d15cd247ff06cf..a5b4f8b4a118c1f5763ec6ba596a8a2d
  
      @sa see @ref get_ptr() for explicit pointer-member access
  
+@@ -1869,7 +1857,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
+     @brief get a value (implicit)
+ 
+     Implicit type conversion between the JSON value and a compatible value.
+-    The call is realized by calling @ref get() const.
++    The call is realized by calling @ref get().
+ 
+     @tparam ValueType non-pointer type compatible to the JSON value, for
+     instance `int` for JSON integer numbers, `bool` for JSON booleans, or
 @@ -1883,14 +1871,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
      to the JSON value type (e.g., the JSON value is of type boolean, but a
      string is requested); see example below
