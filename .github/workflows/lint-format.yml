@@ -20,7 +20,7 @@ jobs:
 
   wpiformat:
     name: "wpiformat"
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
