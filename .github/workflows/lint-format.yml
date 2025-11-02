@@ -13,14 +13,14 @@ concurrency:
 jobs:
   validation:
     name: "Validation"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@v4
       - uses: gradle/actions/wrapper-validation@v4
 
   wpiformat:
     name: "wpiformat"
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@v4
         with:
