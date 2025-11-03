@@ -143,15 +143,16 @@ class WPILIB_DLLEXPORT PoseEstimator {
   void ResetTranslation(const Translation2d& translation) {
     m_odometry.ResetTranslation(translation);
 
-    std::optional<std::pair<units::second_t, VisionUpdate>> latestVisionUpdate =
-        m_visionUpdates.empty() ? std::nullopt
-                                : std::optional{*m_visionUpdates.crbegin()};
+    const std::optional<std::pair<units::second_t, VisionUpdate>>
+        latestVisionUpdate =
+            m_visionUpdates.empty() ? std::nullopt
+                                    : std::optional{*m_visionUpdates.crbegin()};
     m_odometryPoseBuffer.Clear();
     m_visionUpdates.clear();
 
     if (latestVisionUpdate) {
       // apply vision compensation to the pose rotation
-      VisionUpdate const visionUpdate{
+      const VisionUpdate visionUpdate{
           Pose2d{translation, latestVisionUpdate->second.visionPose.Rotation()},
           Pose2d{translation,
                  latestVisionUpdate->second.odometryPose.Rotation()}};
@@ -177,15 +178,16 @@ class WPILIB_DLLEXPORT PoseEstimator {
   void ResetRotation(const Rotation2d& rotation) {
     m_odometry.ResetRotation(rotation);
 
-    std::optional<std::pair<units::second_t, VisionUpdate>> latestVisionUpdate =
-        m_visionUpdates.empty() ? std::nullopt
-                                : std::optional{*m_visionUpdates.crbegin()};
+    const std::optional<std::pair<units::second_t, VisionUpdate>>
+        latestVisionUpdate =
+            m_visionUpdates.empty() ? std::nullopt
+                                    : std::optional{*m_visionUpdates.crbegin()};
     m_odometryPoseBuffer.Clear();
     m_visionUpdates.clear();
 
     if (latestVisionUpdate) {
       // apply vision compensation to the pose translation
-      VisionUpdate const visionUpdate{
+      const VisionUpdate visionUpdate{
           Pose2d{latestVisionUpdate->second.visionPose.Translation(), rotation},
           Pose2d{latestVisionUpdate->second.odometryPose.Translation(),
                  rotation}};
