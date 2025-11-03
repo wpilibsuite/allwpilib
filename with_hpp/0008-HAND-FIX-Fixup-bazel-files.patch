@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Mon, 27 Oct 2025 01:09:55 -0400
-Subject: [PATCH 08/30] HAND FIX - Fixup bazel files
+Date: Mon, 3 Nov 2025 04:54:17 -0500
+Subject: [PATCH 08/34] HAND FIX - Fixup bazel files
 
 ---
  BUILD.bazel                             | 10 +++++-----
@@ -15,6 +15,9 @@ Subject: [PATCH 08/30] HAND FIX - Fixup bazel files
  glass/BUILD.bazel                       |  2 +-
  hal/BUILD.bazel                         |  4 ++--
  ntcore/BUILD.bazel                      |  6 +++---
+ requirements.txt                        |  2 +-
+ requirements_lock.txt                   | 10 +++++++---
+ requirements_windows_lock.txt           | 10 +++++++---
  romiVendordep/BUILD.bazel               |  4 ++--
  simulation/halsim_gui/BUILD.bazel       |  4 ++--
  simulation/halsim_ws_client/BUILD.bazel |  4 ++--
@@ -32,7 +35,7 @@ Subject: [PATCH 08/30] HAND FIX - Fixup bazel files
  wpiunits/BUILD.bazel                    |  4 ++--
  wpiutil/BUILD.bazel                     |  4 ++--
  xrpVendordep/BUILD.bazel                |  4 ++--
- 28 files changed, 78 insertions(+), 81 deletions(-)
+ 31 files changed, 93 insertions(+), 88 deletions(-)
 
 diff --git a/BUILD.bazel b/BUILD.bazel
 index 58d9728113b5c98ed7fd8dbeffa5b7496db6abf4..11b2d3942a33d1deeaff88eb3765af88e48e9b74 100644
@@ -277,7 +280,7 @@ index c498706bf1b1cc0d54baae6f0f12c0eff319bb43..175c99c2ea344f0c749e8a19b56cb950
      ],
  )
 diff --git a/ntcore/BUILD.bazel b/ntcore/BUILD.bazel
-index f251827ee8452d6b170f8953c3dc4bb58a9dbcbb..9c1e25b28ded973dfdae7c90b521fea014aec7c5 100644
+index f251827ee8452d6b170f8953c3dc4bb58a9dbcbb..d279e644f55d1c59bf2f554feb00a7929961744a 100644
 --- a/ntcore/BUILD.bazel
 +++ b/ntcore/BUILD.bazel
 @@ -74,8 +74,8 @@ filegroup(
@@ -286,8 +289,8 @@ index f251827ee8452d6b170f8953c3dc4bb58a9dbcbb..9c1e25b28ded973dfdae7c90b521fea0
      hdrs = [
 -        "src/generated/main/native/include/ntcore_c_types.h",
 -        "src/main/native/include/ntcore_c.h",
-+        "src/generated/main/native/include/wpi/ntcore/ntcore_c_types.h",
-+        "src/main/native/include/wpi/ntcore/ntcore_c.h",
++        "src/generated/main/native/include/wpi/nt/ntcore_c_types.h",
++        "src/main/native/include/wpi/nt/ntcore_c.h",
      ],
      includes = [
          "src/generated/main/native/include",
@@ -300,6 +303,75 @@ index f251827ee8452d6b170f8953c3dc4bb58a9dbcbb..9c1e25b28ded973dfdae7c90b521fea0
      ]),
      tags = [
          "exclusive",
+diff --git a/requirements.txt b/requirements.txt
+index ca73df8d6077d80f8d761f30d4981f1008ff1cfd..08903134703e355da6562d079764e73988d96c9a 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -1,7 +1,7 @@
+ jinja2==3.1.6
+ protobuf==5.28.3
+ grpcio-tools==1.68.0
+-semiwrap==0.1.8
++semiwrap==0.2.1
+ pytest
+ numpy
+ opencv-python~=4.6
+diff --git a/requirements_lock.txt b/requirements_lock.txt
+index f8f9e918a9ad7f9e3c9d50431ec9a36a3c9a99c4..495192c6d21c145d5081e546a1a6434370092c7e 100644
+--- a/requirements_lock.txt
++++ b/requirements_lock.txt
+@@ -311,6 +311,10 @@ protobuf==5.28.3 \
+     # via
+     #   -r requirements.txt
+     #   grpcio-tools
++pybind11==3.0.1 \
++    --hash=sha256:9c0f40056a016da59bab516efb523089139fcc6f2ba7e4930854c61efb932051 \
++    --hash=sha256:aa8f0aa6e0a94d3b64adfc38f560f33f15e589be2175e103c0a33c6bce55ee89
++    # via semiwrap
+ pybind11-stubgen==2.5.4 \
+     --hash=sha256:8625f25da48cf96eea24ba7cae673b5f49b45847b6ef01eead60c4eb762fe5c5 \
+     --hash=sha256:b6bd44a6d4ba55cef80bd8af92f1f8195b1c6bb0f7bd2f6d785c9530ce6bcae9
+@@ -430,9 +434,9 @@ ruamel-yaml-clib==0.2.12 \
+     --hash=sha256:fc4b630cd3fa2cf7fce38afa91d7cfe844a9f75d7f0f36393fa98815e911d987 \
+     --hash=sha256:fd5415dded15c3822597455bc02bcd66e81ef8b7a48cb71a33628fc9fdde39df
+     # via ruamel-yaml
+-semiwrap==0.1.8 \
+-    --hash=sha256:af5fe5aa3fb9c39b9924ab2f763f41a7a8128ffbaf743a3cb0c3bef6a30c8233 \
+-    --hash=sha256:e176f9f4cca2409a104fab7d14956e1e371ee36264c8478b78a2d142e104537d
++semiwrap==0.2.1 \
++    --hash=sha256:aa49db870a77c417797240d06ca1b247580f2b0b40b9ed215cada654d87e4c8f \
++    --hash=sha256:bcf0e7eb2c77241f86c59bc09dc94bd899e88f2a0570d77e01821f9135370f75
+     # via -r requirements.txt
+ sphinxify==0.12 \
+     --hash=sha256:3ec299e78babac7d3457f47bf263411b48e10b9c8add18d7159fa0327cc4a061 \
+diff --git a/requirements_windows_lock.txt b/requirements_windows_lock.txt
+index 92bd9fef151e42d8970f753655f3bd2bb9db7017..06788964e7512180bffb1f96213dbe380e7ae6f9 100644
+--- a/requirements_windows_lock.txt
++++ b/requirements_windows_lock.txt
+@@ -317,6 +317,10 @@ protobuf==5.28.3 \
+     # via
+     #   -r requirements.txt
+     #   grpcio-tools
++pybind11==3.0.1 \
++    --hash=sha256:9c0f40056a016da59bab516efb523089139fcc6f2ba7e4930854c61efb932051 \
++    --hash=sha256:aa8f0aa6e0a94d3b64adfc38f560f33f15e589be2175e103c0a33c6bce55ee89
++    # via semiwrap
+ pybind11-stubgen==2.5.4 \
+     --hash=sha256:8625f25da48cf96eea24ba7cae673b5f49b45847b6ef01eead60c4eb762fe5c5 \
+     --hash=sha256:b6bd44a6d4ba55cef80bd8af92f1f8195b1c6bb0f7bd2f6d785c9530ce6bcae9
+@@ -436,9 +440,9 @@ ruamel-yaml-clib==0.2.12 \
+     --hash=sha256:fc4b630cd3fa2cf7fce38afa91d7cfe844a9f75d7f0f36393fa98815e911d987 \
+     --hash=sha256:fd5415dded15c3822597455bc02bcd66e81ef8b7a48cb71a33628fc9fdde39df
+     # via ruamel-yaml
+-semiwrap==0.1.8 \
+-    --hash=sha256:af5fe5aa3fb9c39b9924ab2f763f41a7a8128ffbaf743a3cb0c3bef6a30c8233 \
+-    --hash=sha256:e176f9f4cca2409a104fab7d14956e1e371ee36264c8478b78a2d142e104537d
++semiwrap==0.2.1 \
++    --hash=sha256:aa49db870a77c417797240d06ca1b247580f2b0b40b9ed215cada654d87e4c8f \
++    --hash=sha256:bcf0e7eb2c77241f86c59bc09dc94bd899e88f2a0570d77e01821f9135370f75
+     # via -r requirements.txt
+ sphinxify==0.12 \
+     --hash=sha256:3ec299e78babac7d3457f47bf263411b48e10b9c8add18d7159fa0327cc4a061 \
 diff --git a/romiVendordep/BUILD.bazel b/romiVendordep/BUILD.bazel
 index 31ae22769fc7146dcd6729161b0ed6922775813d..7f65bb689d77c94f585cd915425fede37955f5f5 100644
 --- a/romiVendordep/BUILD.bazel
@@ -617,10 +689,10 @@ index 37007f3c98a0f935ff73487d84518e90fa62bc10..1a8a02c0ef235a88ad1fd85da74c09c1
          ":wpimath-java",
      ],
 diff --git a/wpinet/BUILD.bazel b/wpinet/BUILD.bazel
-index df8e3ac5d858c016b23a4a75b77b9b5b64e9dcf1..de9fa913798409653d081930d96e7e645ecd179a 100644
+index 4a45a333b34e0fee53ce9fbf9c0cfca5e7a0b452..6d3c7ede3b64de86b04e68d5203cdeaac37bb52d 100644
 --- a/wpinet/BUILD.bazel
 +++ b/wpinet/BUILD.bazel
-@@ -126,7 +126,7 @@ filegroup(
+@@ -118,7 +118,7 @@ filegroup(
  cc_library(
      name = "private_includes",
      hdrs = glob([
@@ -629,7 +701,7 @@ index df8e3ac5d858c016b23a4a75b77b9b5b64e9dcf1..de9fa913798409653d081930d96e7e64
      ]),
      strip_include_prefix = "src/main/native/cpp",
  )
-@@ -191,7 +191,7 @@ wpilib_jni_cc_library(
+@@ -183,7 +183,7 @@ wpilib_jni_cc_library(
      name = "wpinetjni",
      srcs = glob([
          "src/main/native/cpp/jni/**",
@@ -638,7 +710,7 @@ index df8e3ac5d858c016b23a4a75b77b9b5b64e9dcf1..de9fa913798409653d081930d96e7e64
      ]),
      java_dep = ":wpinet-java",
      visibility = ["//visibility:public"],
-@@ -229,7 +229,7 @@ cc_test(
+@@ -221,7 +221,7 @@ cc_test(
      size = "small",
      srcs = glob([
          "src/test/native/**/*.cpp",
@@ -647,7 +719,7 @@ index df8e3ac5d858c016b23a4a75b77b9b5b64e9dcf1..de9fa913798409653d081930d96e7e64
      ]),
      tags = ["no-asan"],
      deps = [
-@@ -257,8 +257,8 @@ cc_binary(
+@@ -249,8 +249,8 @@ cc_binary(
  
  java_binary(
      name = "DevMain-java",

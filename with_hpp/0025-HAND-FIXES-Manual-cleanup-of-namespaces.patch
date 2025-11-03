@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Mon, 27 Oct 2025 01:13:59 -0400
-Subject: [PATCH 22/30] HAND FIXES: Manual cleanup of namespaces
+Date: Mon, 3 Nov 2025 05:00:12 -0500
+Subject: [PATCH 25/34] HAND FIXES: Manual cleanup of namespaces
 
 ---
  .../src/main/native/cpp/vision/VisionRunner.cpp      |  4 ++--
@@ -64,12 +64,12 @@ index 990cb3a14abc0918147d40f2ac9a80196782ec18..a0164a0fbec38a716c0f9b3825ca2fd5
    if (res.second && (std::this_thread::get_id() == res.first)) {
      csShared->SetVisionRunnerError(
 diff --git a/commandsv2/src/main/native/cpp/frc2/command/button/Trigger.cpp b/commandsv2/src/main/native/cpp/frc2/command/button/Trigger.cpp
-index 2a1578e36c22aaeff98fc80fb432aac4d8d761f5..c2f19c505fdf64cfaa803f52232c411c4c1fc83f 100644
+index ba8909fd4bd54ce92c4c8a1d848c44f33b3fdfb6..8382d40f75f9474877380d9c278238002b798fa4 100644
 --- a/commandsv2/src/main/native/cpp/frc2/command/button/Trigger.cpp
 +++ b/commandsv2/src/main/native/cpp/frc2/command/button/Trigger.cpp
-@@ -10,7 +10,7 @@
- 
+@@ -9,7 +9,7 @@
  #include "wpi/commands2/CommandPtr.hpp"
+ #include "wpi/math/filter/Debouncer.hpp"
  
 -using namespace frc;
 +using namespace wpi;
@@ -77,10 +77,10 @@ index 2a1578e36c22aaeff98fc80fb432aac4d8d761f5..c2f19c505fdf64cfaa803f52232c411c
  
  Trigger::Trigger(const Trigger& other) = default;
 diff --git a/datalog/src/main/native/include/wpi/datalog/DataLog.hpp b/datalog/src/main/native/include/wpi/datalog/DataLog.hpp
-index e74c45bf8da760a80bbe53599978fc8149080da2..fdfc45ec0728ff8f62f79c03f730851230ef128b 100644
+index da823809a728f26355365a1d9a5b29ee7405240b..e2ad942e027196c3da01d8a460b685c698f8f949 100644
 --- a/datalog/src/main/native/include/wpi/datalog/DataLog.hpp
 +++ b/datalog/src/main/native/include/wpi/datalog/DataLog.hpp
-@@ -162,7 +162,7 @@ class DataLog {
+@@ -161,7 +161,7 @@ class DataLog {
    template <wpi::util::ProtobufSerializable T>
    void AddProtobufSchema(wpi::util::ProtobufMessage<T>& msg, int64_t timestamp = 0) {
      if (timestamp == 0) {
@@ -89,7 +89,7 @@ index e74c45bf8da760a80bbe53599978fc8149080da2..fdfc45ec0728ff8f62f79c03f7308512
      }
      msg.ForEachProtobufDescriptor(
          [this](auto typeString) { return HasSchema(typeString); },
-@@ -183,7 +183,7 @@ class DataLog {
+@@ -182,7 +182,7 @@ class DataLog {
      requires wpi::util::StructSerializable<T, I...>
    void AddStructSchema(const I&... info, int64_t timestamp = 0) {
      if (timestamp == 0) {
@@ -99,7 +99,7 @@ index e74c45bf8da760a80bbe53599978fc8149080da2..fdfc45ec0728ff8f62f79c03f7308512
      wpi::util::ForEachStructSchema<T>(
          [this, timestamp](auto typeString, auto schema) {
 diff --git a/romiVendordep/src/main/native/include/wpi/romi/RomiMotor.hpp b/romiVendordep/src/main/native/include/wpi/romi/RomiMotor.hpp
-index 0429281f33988c5e0e8507b93716f8dc03a50bd7..60ceefd92ee530521d368d9e213ae83ca16e9ae6 100644
+index 505735718f4cdee4a1506c80f1d2d56ddc56b128..92ed28a5430948566e3d95f463a8f88190941209 100644
 --- a/romiVendordep/src/main/native/include/wpi/romi/RomiMotor.hpp
 +++ b/romiVendordep/src/main/native/include/wpi/romi/RomiMotor.hpp
 @@ -18,7 +18,7 @@ namespace wpi::romi {
@@ -112,7 +112,7 @@ index 0429281f33988c5e0e8507b93716f8dc03a50bd7..60ceefd92ee530521d368d9e213ae83c
    /**
     * Constructor for a RomiMotor.
 diff --git a/tools/sysid/src/main/native/cpp/view/Analyzer.cpp b/tools/sysid/src/main/native/cpp/view/Analyzer.cpp
-index dfa18a401d03766d4838add5c2c44c304f177faa..47fd71f632ee4b5ebd4d9e5fddf61e03df9de39d 100644
+index cc39f90c158f361faf5fb04dc606335b504b560d..a5d8e0fd599f909a9b12df788c844f1308273853 100644
 --- a/tools/sysid/src/main/native/cpp/view/Analyzer.cpp
 +++ b/tools/sysid/src/main/native/cpp/view/Analyzer.cpp
 @@ -612,9 +612,9 @@ void Analyzer::DisplayFeedbackGains() {
@@ -128,10 +128,10 @@ index dfa18a401d03766d4838add5c2c44c304f177faa..47fd71f632ee4b5ebd4d9e5fddf61e03
        "with CTRE motor controllers.\n"
        "REV (Brushless): For use with NEO and NEO 550 motors on a SPARK MAX.\n"
 diff --git a/tools/sysid/src/main/native/include/wpi/sysid/view/DataSelector.hpp b/tools/sysid/src/main/native/include/wpi/sysid/view/DataSelector.hpp
-index 23464c51f8d287cb4b26928ee6aae8a5f49ff88a..02d6754dfa80658c95b13223b926a4058543cda5 100644
+index 6f8f39d984235f319e59cc507aef2190271aec1f..4bbb44c989f188290e7bae36ee18c5ebf9bfe961 100644
 --- a/tools/sysid/src/main/native/include/wpi/sysid/view/DataSelector.hpp
 +++ b/tools/sysid/src/main/native/include/wpi/sysid/view/DataSelector.hpp
-@@ -26,7 +26,9 @@ namespace wpi {
+@@ -25,7 +25,9 @@ namespace wpi {
  namespace log {
  class DataLogReaderEntry;
  }  // namespace log
@@ -143,7 +143,7 @@ index 23464c51f8d287cb4b26928ee6aae8a5f49ff88a..02d6754dfa80658c95b13223b926a405
  
  namespace sysid {
 diff --git a/tools/sysid/src/main/native/include/wpi/sysid/view/LogLoader.hpp b/tools/sysid/src/main/native/include/wpi/sysid/view/LogLoader.hpp
-index 2182ae72f44dcd224b8c617a9dbd732b9dd4d921..404ab0315a43e69721f6967afb035d6cd9363b84 100644
+index 0f5edec62d98fe4a9db3380ae22f28392d014080..bc5626724248514be1af67eb451d75456d622db4 100644
 --- a/tools/sysid/src/main/native/include/wpi/sysid/view/LogLoader.hpp
 +++ b/tools/sysid/src/main/native/include/wpi/sysid/view/LogLoader.hpp
 @@ -25,7 +25,9 @@ namespace log {
@@ -184,18 +184,18 @@ index 39b31408a8a6ff74baac50929c249dff28e8b598..deb4670887ef8b3d52d2b6de0cd01b44
  
      Available here:
 diff --git a/wpilibc/src/main/native/cpp/smartdashboard/MechanismRoot2d.cpp b/wpilibc/src/main/native/cpp/smartdashboard/MechanismRoot2d.cpp
-index cb40ee8a76fbaf3b377de4dec1fdf82e901769c4..74d3d74c7e1a965463c171d7235c1ac4fc4122a9 100644
+index a86ef26a8618479ddd3b61ce714e6c53aefb16fc..806f7c60f94eb8a24f4bf0f3aca2e9820456e747 100644
 --- a/wpilibc/src/main/native/cpp/smartdashboard/MechanismRoot2d.cpp
 +++ b/wpilibc/src/main/native/cpp/smartdashboard/MechanismRoot2d.cpp
-@@ -4,6 +4,8 @@
+@@ -6,6 +6,8 @@
  
- #include "wpi/smartdashboard/MechanismRoot2d.hpp"
+ #include "wpi/util/Color8Bit.hpp"
  
 +#include <memory>
 +
- #include <wpi/util/Color8Bit.hpp>
- 
  using namespace wpi;
+ 
+ MechanismRoot2d::MechanismRoot2d(std::string_view name, double x, double y,
 diff --git a/wpilibc/src/main/native/include/wpi/event/NetworkBooleanEvent.hpp b/wpilibc/src/main/native/include/wpi/event/NetworkBooleanEvent.hpp
 index 6c938e1adc6f858deb40725fd1abc785402ec644..268b947d91119087d89a98d244b72564adfe7d6b 100644
 --- a/wpilibc/src/main/native/include/wpi/event/NetworkBooleanEvent.hpp
@@ -210,12 +210,12 @@ index 6c938e1adc6f858deb40725fd1abc785402ec644..268b947d91119087d89a98d244b72564
  class BooleanTopic;
  class NetworkTable;
 diff --git a/wpilibc/src/main/native/include/wpi/smartdashboard/FieldObject2d.hpp b/wpilibc/src/main/native/include/wpi/smartdashboard/FieldObject2d.hpp
-index 37d27968eefaa481d6bda72e4d9e82aa66135752..b57b3303c53fe95bbf4492eb387eee6ab6b33215 100644
+index 47ab8a0fc224a18eaa78f0848fc84b137795f26e..884b6530649e582501f1a4c675bd6c884c2a163d 100644
 --- a/wpilibc/src/main/native/include/wpi/smartdashboard/FieldObject2d.hpp
 +++ b/wpilibc/src/main/native/include/wpi/smartdashboard/FieldObject2d.hpp
 @@ -17,10 +17,13 @@
- #include <wpi/util/SmallVector.hpp>
- #include <wpi/util/mutex.hpp>
+ #include "wpi/util/SmallVector.hpp"
+ #include "wpi/util/mutex.hpp"
  
 -namespace wpi {
 +namespace wpi::math {
@@ -230,12 +230,12 @@ index 37d27968eefaa481d6bda72e4d9e82aa66135752..b57b3303c53fe95bbf4492eb387eee6a
  /**
   * Game field object on a Field2d.
 diff --git a/wpilibc/src/main/native/include/wpi/smartdashboard/SmartDashboard.hpp b/wpilibc/src/main/native/include/wpi/smartdashboard/SmartDashboard.hpp
-index f8e10cacf33d88295c594a426d1b35206479b939..8d0989a8b013385059bc51dae4adc6770d3a529d 100644
+index 9b354d063014705dd1a5e69225dc4981a68e4d40..07ffb78f4e34b1570252f3b733a56653fbddf5ec 100644
 --- a/wpilibc/src/main/native/include/wpi/smartdashboard/SmartDashboard.hpp
 +++ b/wpilibc/src/main/native/include/wpi/smartdashboard/SmartDashboard.hpp
 @@ -14,7 +14,7 @@
- #include <wpi/nt/NetworkTableEntry.hpp>
- #include <wpi/nt/NetworkTableValue.hpp>
+ #include "wpi/nt/NetworkTableEntry.hpp"
+ #include "wpi/nt/NetworkTableValue.hpp"
  
 -namespace wpi {
 +namespace wpi::util {
@@ -348,7 +348,7 @@ index 337804d041fc56537f9f4060989aba253a5219d8..e1d8bf8ab50205d3c084a84e298c2098
      for (int i = 0; i < 4; i++) {
        filename.append(String.format("%04x", rnd.nextInt(0x10000)));
 diff --git a/wpimath/src/test/native/cpp/UnitsTest.cpp b/wpimath/src/test/native/cpp/UnitsTest.cpp
-index 98eb8c1742dcb7c67378a58dc6466c94abdd8154..6d7d198cc684b4463b0821704610466cae92c2cc 100644
+index 2440a9c8a380cb9ca1c6be969d1e4c1f78e8b5de..bf27ea49c0650211713d0acc94c7c4f5b34911a5 100644
 --- a/wpimath/src/test/native/cpp/UnitsTest.cpp
 +++ b/wpimath/src/test/native/cpp/UnitsTest.cpp
 @@ -87,7 +87,7 @@ using namespace wpi::units::torque;
@@ -383,12 +383,12 @@ index 322860de28dd9dcc119f3a8cd38dcdd26df5a007..7a6b190cf25336387863a1a74c60eac0
          ),
      ]
 diff --git a/wpinet/src/main/native/include/wpi/net/DsClient.hpp b/wpinet/src/main/native/include/wpi/net/DsClient.hpp
-index b4b3f199e39c671b9184e895fcbe1b6428a05de6..70a6a89b13eb9425ce7bc9c4013f92559e08994a 100644
+index a96be18cc6f227db09b29eb1d37a7e4b5eb4c86a..55df512c20cb8bea8496ac650c7cda465298e39f 100644
 --- a/wpinet/src/main/native/include/wpi/net/DsClient.hpp
 +++ b/wpinet/src/main/native/include/wpi/net/DsClient.hpp
 @@ -10,10 +10,11 @@
  
- #include <wpi/util/Signal.h>
+ #include "wpi/util/Signal.h"
  
 -namespace wpi::net {
 -
@@ -437,12 +437,12 @@ index 713c890fc3c7684f971326f671737cd927387f8b..b4d396dd35d7032df7a34b3b980a82f7
  class GetAddrInfoReq;
  class Loop;
 diff --git a/wpinet/src/main/native/include/wpi/net/UDPClient.hpp b/wpinet/src/main/native/include/wpi/net/UDPClient.hpp
-index 0b9115285cc9eeadc11853878817da315bb5f295..cc848f3b38e82a066014db94e0db035f1253c7e7 100644
+index 1c7c2cb44558716543bd6b1a9b6aa3d860eeef3c..ce5851cffc589aaa62f25084465b93194872a6d5 100644
 --- a/wpinet/src/main/native/include/wpi/net/UDPClient.hpp
 +++ b/wpinet/src/main/native/include/wpi/net/UDPClient.hpp
 @@ -12,10 +12,11 @@
- #include <wpi/util/SmallVector.hpp>
- #include <wpi/util/mutex.hpp>
+ #include "wpi/util/SmallVector.hpp"
+ #include "wpi/util/mutex.hpp"
  
 -namespace wpi::net {
 -
@@ -473,12 +473,12 @@ index 2dc6b8e628250e54a2f5848838c609b03815afe3..3857059319e098620dfd20dcfdc4bc8c
  std::string_view GetHostname(wpi::util::SmallVectorImpl<char>& name);
  }  // namespace wpi::net
 diff --git a/wpinet/src/main/native/include/wpi/net/uv/Handle.hpp b/wpinet/src/main/native/include/wpi/net/uv/Handle.hpp
-index e540e22a326d583afd692c61c8054815d0ac317d..df40527cf5907bd8435e855e60d34a5d3d7e443a 100644
+index 9ea645e0e4d7d7ea21c87d544a776a8161f4c4a4..07da9aa5a2e73a153740d06eeaf1079d76daef90 100644
 --- a/wpinet/src/main/native/include/wpi/net/uv/Handle.hpp
 +++ b/wpinet/src/main/native/include/wpi/net/uv/Handle.hpp
-@@ -19,7 +19,7 @@
- #include "wpi/net/uv/Error.hpp"
+@@ -18,7 +18,7 @@
  #include "wpi/net/uv/Loop.hpp"
+ #include "wpi/util/Signal.h"
  
 -namespace wpi::net {
 +namespace wpi::util {
@@ -486,7 +486,7 @@ index e540e22a326d583afd692c61c8054815d0ac317d..df40527cf5907bd8435e855e60d34a5d
  }  // namespace wpi::net
  
 diff --git a/wpinet/src/main/native/macOS/ResolverThread.cpp b/wpinet/src/main/native/macOS/ResolverThread.cpp
-index 6f698db5b5d9571e76c1f853e3a2b701b84dfe4b..a5cee229d94ca29d9b9b813dbbbb0c15faabc76a 100644
+index d275441081944238b13f3348d1a90b0584ca2e65..e2ea391ad82f084fa588a807467e16d708c3c06b 100644
 --- a/wpinet/src/main/native/macOS/ResolverThread.cpp
 +++ b/wpinet/src/main/native/macOS/ResolverThread.cpp
 @@ -50,7 +50,7 @@ void ResolverThread::RemoveServiceRefInThread(DNSServiceRef serviceRef) {
@@ -535,7 +535,7 @@ index 1a3e094cc125e4b0d9b7865b0649fa42eca4aa5d..6da49b6cdc6213762eed10e06caf568b
   public:
    static std::unique_ptr<NetworkStream> connect(const char* server, int port,
 diff --git a/wpinet/src/test/native/cpp/WorkerThreadTest.cpp b/wpinet/src/test/native/cpp/WorkerThreadTest.cpp
-index fbd58ca19b01a883b73914b1f38fc6942671fe46..637ce3437c38a688807b4d6f2bf438a6e032d09e 100644
+index ea65f0b5d63771f5d3933eb9560f88f86dd53dc9..b63f7385d248905089afbdbf9e63382a3cd555c6 100644
 --- a/wpinet/src/test/native/cpp/WorkerThreadTest.cpp
 +++ b/wpinet/src/test/native/cpp/WorkerThreadTest.cpp
 @@ -36,8 +36,8 @@ TEST(WorkerThreadTest, FutureVoid) {

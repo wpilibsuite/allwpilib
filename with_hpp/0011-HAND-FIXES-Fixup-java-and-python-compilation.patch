@@ -1,9 +1,13 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Mon, 27 Oct 2025 01:10:12 -0400
-Subject: [PATCH 11/30] HAND FIXES: Fixup java and python compilation
+Date: Mon, 3 Nov 2025 04:55:56 -0500
+Subject: [PATCH 11/34] HAND FIXES: Fixup java and python compilation
 
 ---
+ wpilibj/src/main/java/org/wpilib/ExpansionHub.java          | 1 +
+ wpilibj/src/main/java/org/wpilib/ExpansionHubMotor.java     | 1 +
+ .../src/main/java/org/wpilib/ExpansionHubPidConstants.java  | 1 +
+ wpilibj/src/main/java/org/wpilib/ExpansionHubServo.java     | 1 +
  .../main/java/org/wpilib/driverstation/DSControlWord.java   | 1 +
  .../main/java/org/wpilib/driverstation/DriverStation.java   | 1 +
  .../java/org/wpilib/hardware/accelerometer/ADXL345_I2C.java | 1 +
@@ -27,7 +31,7 @@ Subject: [PATCH 11/30] HAND FIXES: Fixup java and python compilation
  wpilibj/src/main/java/org/wpilib/system/DataLogManager.java | 2 ++
  wpilibj/src/main/java/org/wpilib/system/Filesystem.java     | 1 +
  wpilibj/src/main/java/org/wpilib/system/Notifier.java       | 2 ++
- wpilibj/src/main/java/org/wpilib/system/Timer.java          | 2 ++
+ wpilibj/src/main/java/org/wpilib/system/Timer.java          | 1 +
  wpilibj/src/main/java/org/wpilib/system/Tracer.java         | 1 +
  wpilibj/src/main/java/org/wpilib/system/Watchdog.java       | 1 +
  wpilibj/src/main/java/org/wpilib/util/Alert.java            | 1 +
@@ -51,8 +55,56 @@ Subject: [PATCH 11/30] HAND FIXES: Fixup java and python compilation
  wpiutil/src/main/java/org/wpilib/util/WPIUtilJNI.java       | 1 +
  .../main/java/org/wpilib/util/concurrent/EventVector.java   | 1 +
  wpiutil/src/main/native/cpp/jni/WPIUtilJNI.cpp              | 2 +-
- 47 files changed, 75 insertions(+), 2 deletions(-)
+ 51 files changed, 78 insertions(+), 2 deletions(-)
 
+diff --git a/wpilibj/src/main/java/org/wpilib/ExpansionHub.java b/wpilibj/src/main/java/org/wpilib/ExpansionHub.java
+index d99003566d9fac62646571d5b9074ae05261c6f9..4b58366aaffa2b5272e9a6ca63b2628b4c051379 100644
+--- a/wpilibj/src/main/java/org/wpilib/ExpansionHub.java
++++ b/wpilibj/src/main/java/org/wpilib/ExpansionHub.java
+@@ -7,6 +7,7 @@ package org.wpilib;
+ import org.wpilib.hardware.hal.HAL;
+ import org.wpilib.networktables.BooleanSubscriber;
+ import org.wpilib.networktables.NetworkTableInstance;
++import org.wpilib.system.SystemServer;
+ 
+ /** This class controls a REV ExpansionHub plugged in over USB to Systemcore. */
+ public class ExpansionHub implements AutoCloseable {
+diff --git a/wpilibj/src/main/java/org/wpilib/ExpansionHubMotor.java b/wpilibj/src/main/java/org/wpilib/ExpansionHubMotor.java
+index 95a90f025a3cd07f130c0541d9c819ed4212e51f..2228c730d0d979b8554e548e42b21e2a9e2c06b5 100644
+--- a/wpilibj/src/main/java/org/wpilib/ExpansionHubMotor.java
++++ b/wpilibj/src/main/java/org/wpilib/ExpansionHubMotor.java
+@@ -15,6 +15,7 @@ import org.wpilib.networktables.DoubleSubscriber;
+ import org.wpilib.networktables.IntegerPublisher;
+ import org.wpilib.networktables.NetworkTableInstance;
+ import org.wpilib.networktables.PubSubOption;
++import org.wpilib.system.SystemServer;
+ import org.wpilib.units.measure.Current;
+ import org.wpilib.units.measure.Voltage;
+ 
+diff --git a/wpilibj/src/main/java/org/wpilib/ExpansionHubPidConstants.java b/wpilibj/src/main/java/org/wpilib/ExpansionHubPidConstants.java
+index c95faecd929fecf311b56ab2bbf2c6539e255b89..0cbcd2bb9bc49263e834efc7b274c2c5c45911fa 100644
+--- a/wpilibj/src/main/java/org/wpilib/ExpansionHubPidConstants.java
++++ b/wpilibj/src/main/java/org/wpilib/ExpansionHubPidConstants.java
+@@ -8,6 +8,7 @@ import org.wpilib.networktables.BooleanPublisher;
+ import org.wpilib.networktables.DoublePublisher;
+ import org.wpilib.networktables.NetworkTableInstance;
+ import org.wpilib.networktables.PubSubOption;
++import org.wpilib.system.SystemServer;
+ 
+ /** This class contains PID constants for an ExpansionHub motor. */
+ public class ExpansionHubPidConstants {
+diff --git a/wpilibj/src/main/java/org/wpilib/ExpansionHubServo.java b/wpilibj/src/main/java/org/wpilib/ExpansionHubServo.java
+index 59aec0cc364ca445e9dc03ed47139716c629b4ac..50aa4952871e75e08b6d69a7ce2e7cf9ae81d9f4 100644
+--- a/wpilibj/src/main/java/org/wpilib/ExpansionHubServo.java
++++ b/wpilibj/src/main/java/org/wpilib/ExpansionHubServo.java
+@@ -12,6 +12,7 @@ import org.wpilib.networktables.BooleanPublisher;
+ import org.wpilib.networktables.IntegerPublisher;
+ import org.wpilib.networktables.NetworkTableInstance;
+ import org.wpilib.networktables.PubSubOption;
++import org.wpilib.system.SystemServer;
+ import org.wpilib.units.measure.Angle;
+ import org.wpilib.units.measure.Time;
+ 
 diff --git a/wpilibj/src/main/java/org/wpilib/driverstation/DSControlWord.java b/wpilibj/src/main/java/org/wpilib/driverstation/DSControlWord.java
 index 0b68001c0f6567cce5beaab86d01f5c179a33f5b..0a70aacfd41334449afa57c6b5a81413964d1b96 100644
 --- a/wpilibj/src/main/java/org/wpilib/driverstation/DSControlWord.java
@@ -315,7 +367,7 @@ index 978ed5bf2248415ba48abd5c8c70210dfebe7cd4..568721af60f0dc23c2768771f3ba4d88
  public final class RobotState {
    /**
 diff --git a/wpilibj/src/main/java/org/wpilib/opmode/TimedRobot.java b/wpilibj/src/main/java/org/wpilib/opmode/TimedRobot.java
-index 9afa6a5e632d8cb8fdc60b48e14801a9a006fa5e..6d43b9347b74ff52630987842c4cc65e21b7a47c 100644
+index eb7ba305fac590de6402757cd6779d462688f0b9..72f14ce6e01801dbe05c1a95eb7163df7d1ba36b 100644
 --- a/wpilibj/src/main/java/org/wpilib/opmode/TimedRobot.java
 +++ b/wpilibj/src/main/java/org/wpilib/opmode/TimedRobot.java
 @@ -9,6 +9,7 @@ import static org.wpilib.units.Units.Seconds;
@@ -323,9 +375,9 @@ index 9afa6a5e632d8cb8fdc60b48e14801a9a006fa5e..6d43b9347b74ff52630987842c4cc65e
  import org.wpilib.hardware.hal.HAL;
  import org.wpilib.hardware.hal.NotifierJNI;
 +import org.wpilib.system.RobotController;
+ import org.wpilib.units.measure.Frequency;
  import org.wpilib.units.measure.Time;
  import java.util.PriorityQueue;
- 
 diff --git a/wpilibj/src/main/java/org/wpilib/system/DataLogManager.java b/wpilibj/src/main/java/org/wpilib/system/DataLogManager.java
 index c6d844661cedca4e884454c3a5379ee0b9c8f0e8..606b5ef28c9c7c5d88fcfcf8c557cbe651095a01 100644
 --- a/wpilibj/src/main/java/org/wpilib/system/DataLogManager.java
@@ -354,32 +406,33 @@ index f413d3764c17ea74da1a6526a295906d2d598779..2167a63ad2119b04b73aaf16e3cc24a4
  /**
   * Class for interacting with the Filesystem, particularly, interacting with FRC-related paths on
 diff --git a/wpilibj/src/main/java/org/wpilib/system/Notifier.java b/wpilibj/src/main/java/org/wpilib/system/Notifier.java
-index c4976d9911b700314530170e6ad59b06c17ebd67..021c5c5f7707afa8d56f85236fe872bad537e2e4 100644
+index 54e147b56d4c8ad91be4b52a8cbe93cd3371af92..4602917e501dbeb9273fbd8f92b58911b7fc1617 100644
 --- a/wpilibj/src/main/java/org/wpilib/system/Notifier.java
 +++ b/wpilibj/src/main/java/org/wpilib/system/Notifier.java
-@@ -6,7 +6,9 @@ package org.wpilib.system;
- 
+@@ -7,9 +7,11 @@ package org.wpilib.system;
+ import static org.wpilib.units.Units.Seconds;
  import static org.wpilib.util.ErrorMessages.requireNonNullParam;
  
 +import org.wpilib.driverstation.DriverStation;
  import org.wpilib.hardware.hal.NotifierJNI;
+ import org.wpilib.units.measure.Frequency;
+ import org.wpilib.units.measure.Time;
 +import org.wpilib.system.RobotController;
  import java.util.concurrent.atomic.AtomicInteger;
  import java.util.concurrent.locks.ReentrantLock;
  
 diff --git a/wpilibj/src/main/java/org/wpilib/system/Timer.java b/wpilibj/src/main/java/org/wpilib/system/Timer.java
-index a76fcf42d692069902621c01abea21a9362e6611..518ec9300d33e74ebbd3fbc75cad0d84bd082d37 100644
+index d583347dfd51b0d9dcb4f4ca7c985d50f9323b4e..7f5b47ffc13df1ccffe54a1debd95f2c30e93bbb 100644
 --- a/wpilibj/src/main/java/org/wpilib/system/Timer.java
 +++ b/wpilibj/src/main/java/org/wpilib/system/Timer.java
-@@ -4,6 +4,8 @@
+@@ -7,6 +7,7 @@ package org.wpilib.system;
+ import static org.wpilib.units.Units.Seconds;
  
- package org.wpilib.system;
- 
+ import org.wpilib.units.measure.Time;
 +import org.wpilib.driverstation.DriverStation;
-+
+ 
  /**
   * A timer class.
-  *
 diff --git a/wpilibj/src/main/java/org/wpilib/system/Tracer.java b/wpilibj/src/main/java/org/wpilib/system/Tracer.java
 index 234d85104fee52758f9e3804629aec1832aea072..b28387a374ba6e625a710c1446b989b00f33ea2e 100644
 --- a/wpilibj/src/main/java/org/wpilib/system/Tracer.java
@@ -393,17 +446,17 @@ index 234d85104fee52758f9e3804629aec1832aea072..b28387a374ba6e625a710c1446b989b0
  /**
   * A class for keeping track of how much time it takes for different parts of code to execute. This
 diff --git a/wpilibj/src/main/java/org/wpilib/system/Watchdog.java b/wpilibj/src/main/java/org/wpilib/system/Watchdog.java
-index d42aa618ba6d4e752921c23885022e29376f3de1..d853f96daaabfba301d3c07ed4e0160ee4371aaa 100644
+index 568c4e3452c15ea9a4da9ea45ae8a55ccb14a565..63c1068359f6d70b9cdfc9ac9c0687d38422a763 100644
 --- a/wpilibj/src/main/java/org/wpilib/system/Watchdog.java
 +++ b/wpilibj/src/main/java/org/wpilib/system/Watchdog.java
-@@ -4,6 +4,7 @@
+@@ -6,6 +6,7 @@ package org.wpilib.system;
  
- package org.wpilib.system;
+ import static org.wpilib.units.Units.Seconds;
  
 +import org.wpilib.driverstation.DriverStation;
  import org.wpilib.hardware.hal.NotifierJNI;
+ import org.wpilib.units.measure.Time;
  import java.io.Closeable;
- import java.util.PriorityQueue;
 diff --git a/wpilibj/src/main/java/org/wpilib/util/Alert.java b/wpilibj/src/main/java/org/wpilib/util/Alert.java
 index f38a478da61127634c1ed3ec03d8f44904010c1a..3b3bbcfa9112d9e193e2fae2f08fa373144e5f97 100644
 --- a/wpilibj/src/main/java/org/wpilib/util/Alert.java

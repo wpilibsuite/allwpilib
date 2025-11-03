@@ -1,0 +1,119 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Mon, 3 Nov 2025 05:00:14 -0500
+Subject: [PATCH 32/34] HAND FIX: Fixup robotpy yaml files
+
+---
+ romiVendordep/src/main/python/semiwrap/OnBoardIO.yml          | 2 +-
+ romiVendordep/src/main/python/semiwrap/RomiGyro.yml           | 2 +-
+ romiVendordep/src/main/python/semiwrap/RomiMotor.yml          | 2 +-
+ .../python/semiwrap/simulation/DifferentialDrivetrainSim.yml  | 4 ++--
+ .../controls/DifferentialDriveAccelerationLimiter.yml         | 3 ++-
+ .../python/semiwrap/controls/SwerveDrivePoseEstimator.yml     | 3 ++-
+ .../python/semiwrap/controls/SwerveDrivePoseEstimator3d.yml   | 3 ++-
+ .../main/python/semiwrap/kinematics/SwerveDriveKinematics.yml | 3 ++-
+ 8 files changed, 13 insertions(+), 9 deletions(-)
+
+diff --git a/romiVendordep/src/main/python/semiwrap/OnBoardIO.yml b/romiVendordep/src/main/python/semiwrap/OnBoardIO.yml
+index 3f94510d8e47b9bd2f7ce538832fbd18014c2053..12c28b571353b53919528528c80c9c9d3f06d1a3 100644
+--- a/romiVendordep/src/main/python/semiwrap/OnBoardIO.yml
++++ b/romiVendordep/src/main/python/semiwrap/OnBoardIO.yml
+@@ -1,5 +1,5 @@
+ classes:
+-  wpi::OnBoardIO:
++  wpi::romi::OnBoardIO:
+     attributes:
+       kMessageInterval:
+       m_nextMessageTime:
+diff --git a/romiVendordep/src/main/python/semiwrap/RomiGyro.yml b/romiVendordep/src/main/python/semiwrap/RomiGyro.yml
+index 246fba0e225bd1915377332920bcfbb5699cabc8..54092d5570d5efea56ef8fa1c45c80179783e087 100644
+--- a/romiVendordep/src/main/python/semiwrap/RomiGyro.yml
++++ b/romiVendordep/src/main/python/semiwrap/RomiGyro.yml
+@@ -1,5 +1,5 @@
+ classes:
+-  wpi::RomiGyro:
++  wpi::romi::RomiGyro:
+     methods:
+       RomiGyro:
+       GetAngle:
+diff --git a/romiVendordep/src/main/python/semiwrap/RomiMotor.yml b/romiVendordep/src/main/python/semiwrap/RomiMotor.yml
+index 34dbf5ee485d95a69decb8486123e27db959f214..22af2f09a5cf65ad0dbdcfbe720654666f954937 100644
+--- a/romiVendordep/src/main/python/semiwrap/RomiMotor.yml
++++ b/romiVendordep/src/main/python/semiwrap/RomiMotor.yml
+@@ -1,4 +1,4 @@
+ classes:
+-  wpi::RomiMotor:
++  wpi::romi::RomiMotor:
+     methods:
+       RomiMotor:
+diff --git a/wpilibc/src/main/python/semiwrap/simulation/DifferentialDrivetrainSim.yml b/wpilibc/src/main/python/semiwrap/simulation/DifferentialDrivetrainSim.yml
+index 16d7dcb62b756f934024d7a671c1343e6eeb22a7..5ca862b02e859ae540456b5fc22fd7254e13ae4a 100644
+--- a/wpilibc/src/main/python/semiwrap/simulation/DifferentialDrivetrainSim.yml
++++ b/wpilibc/src/main/python/semiwrap/simulation/DifferentialDrivetrainSim.yml
+@@ -6,8 +6,8 @@ classes:
+     methods:
+       DifferentialDrivetrainSim:
+         overloads:
+-          wpi::math::LinearSystem<2, 2, 2>, wpi::units::meter_t, wpi::math::DCMotor, double, wpi::units::meter_t, const std::array<double, 7>&:
+-            param_override:
++          ? wpi::math::LinearSystem<2, 2, 2>, wpi::units::meter_t, wpi::math::DCMotor, double, wpi::units::meter_t, const std::array<double, 7>&
++          : param_override:
+               measurementStdDevs:
+                 default: std::array<double, 7>{}
+           ? wpi::math::DCMotor, double, wpi::units::kilogram_square_meter_t, wpi::units::kilogram_t, wpi::units::meter_t, wpi::units::meter_t, const std::array<double, 7>&
+diff --git a/wpimath/src/main/python/semiwrap/controls/DifferentialDriveAccelerationLimiter.yml b/wpimath/src/main/python/semiwrap/controls/DifferentialDriveAccelerationLimiter.yml
+index 76ee6fa0e99088446176938f3be1d5073b8dc586..291fdea9c40f6886cfbd3783c8e6fca7c8f3dca9 100644
+--- a/wpimath/src/main/python/semiwrap/controls/DifferentialDriveAccelerationLimiter.yml
++++ b/wpimath/src/main/python/semiwrap/controls/DifferentialDriveAccelerationLimiter.yml
+@@ -6,7 +6,8 @@ classes:
+     methods:
+       DifferentialDriveAccelerationLimiter:
+         overloads:
+-          LinearSystem<2, 2, 2>, wpi::units::meter_t, wpi::units::meters_per_second_squared_t, wpi::units::radians_per_second_squared_t:
++          ? LinearSystem<2, 2, 2>, wpi::units::meter_t, wpi::units::meters_per_second_squared_t, wpi::units::radians_per_second_squared_t
++          :
+           ? LinearSystem<2, 2, 2>, wpi::units::meter_t, wpi::units::meters_per_second_squared_t, wpi::units::meters_per_second_squared_t, wpi::units::radians_per_second_squared_t
+           :
+       Calculate:
+diff --git a/wpimath/src/main/python/semiwrap/controls/SwerveDrivePoseEstimator.yml b/wpimath/src/main/python/semiwrap/controls/SwerveDrivePoseEstimator.yml
+index 774ead2191ede097a2738698169b1d07a4817b0a..05c75827e07499e8f342b4582d2ffa240f774076 100644
+--- a/wpimath/src/main/python/semiwrap/controls/SwerveDrivePoseEstimator.yml
++++ b/wpimath/src/main/python/semiwrap/controls/SwerveDrivePoseEstimator.yml
+@@ -30,7 +30,8 @@ classes:
+     methods:
+       SwerveDrivePoseEstimator:
+         overloads:
+-          SwerveDriveKinematics<NumModules>&, const Rotation2d&, const wpi::util::array<SwerveModulePosition, NumModules>&, const Pose2d&:
++          ? SwerveDriveKinematics<NumModules>&, const Rotation2d&, const wpi::util::array<SwerveModulePosition, NumModules>&, const Pose2d&
++          :
+           ? SwerveDriveKinematics<NumModules>&, const Rotation2d&, const wpi::util::array<SwerveModulePosition, NumModules>&, const Pose2d&, const wpi::util::array<double, 3>&, const wpi::util::array<double, 3>&
+           :
+ 
+diff --git a/wpimath/src/main/python/semiwrap/controls/SwerveDrivePoseEstimator3d.yml b/wpimath/src/main/python/semiwrap/controls/SwerveDrivePoseEstimator3d.yml
+index d7b0794719d4a7b92f6017971f35697c74ff7720..d895537b31ba793e3fa5cdf3236e97bbea210724 100644
+--- a/wpimath/src/main/python/semiwrap/controls/SwerveDrivePoseEstimator3d.yml
++++ b/wpimath/src/main/python/semiwrap/controls/SwerveDrivePoseEstimator3d.yml
+@@ -12,7 +12,8 @@ classes:
+     methods:
+       SwerveDrivePoseEstimator3d:
+         overloads:
+-          SwerveDriveKinematics<NumModules>&, const Rotation3d&, const wpi::util::array<SwerveModulePosition, NumModules>&, const Pose3d&:
++          ? SwerveDriveKinematics<NumModules>&, const Rotation3d&, const wpi::util::array<SwerveModulePosition, NumModules>&, const Pose3d&
++          :
+           ? SwerveDriveKinematics<NumModules>&, const Rotation3d&, const wpi::util::array<SwerveModulePosition, NumModules>&, const Pose3d&, const wpi::util::array<double, 4>&, const wpi::util::array<double, 4>&
+           :
+ 
+diff --git a/wpimath/src/main/python/semiwrap/kinematics/SwerveDriveKinematics.yml b/wpimath/src/main/python/semiwrap/kinematics/SwerveDriveKinematics.yml
+index a4bd38be46f0a03d66d55a573abf7fc882405394..141fd96668e8b0ec08d7b26e9fc24b86cb1b7769 100644
+--- a/wpimath/src/main/python/semiwrap/kinematics/SwerveDriveKinematics.yml
++++ b/wpimath/src/main/python/semiwrap/kinematics/SwerveDriveKinematics.yml
+@@ -54,7 +54,8 @@ classes:
+           ModuleDeltas&&... [const]:
+             ignore: true
+           wpi::util::array<SwerveModulePosition, NumModules> [const]:
+-          const wpi::util::array<SwerveModulePosition, NumModules>&, const wpi::util::array<SwerveModulePosition, NumModules>& [const]:
++          ? const wpi::util::array<SwerveModulePosition, NumModules>&, const wpi::util::array<SwerveModulePosition, NumModules>& [const]
++          :
+       DesaturateWheelSpeeds:
+         overloads:
+           wpi::util::array<SwerveModuleState, NumModules>*, wpi::units::meters_per_second_t:

@@ -410,7 +410,8 @@ class RawConfig:
         ("wpimath", "edu.wpi.first.math", "org.wpilib.math"),
         ("wpinet", "edu.wpi.first.net", "org.wpilib.net"),
         ("datalog", "edu.wpi.first.datalog", "org.wpilib.datalog"),
-        ("commandsv2", "edu.wpi.first.wpilibj2.command", "org.wpilib.commands2"),
+        ("commandsv2", "edu.wpi.first.wpilibj2.command", "org.wpilib.command2"),
+        ("commandsv3", "org.wpilib.commands3", "org.wpilib.command3"),
         ("ntcore", "edu.wpi.first.networktables", "org.wpilib.networktables"),
         ("fields", "edu.wpi.first.fields", "org.wpilib.fields"),
         ("hal", "edu.wpi.first.hal", "org.wpilib.hardware.hal"),
@@ -940,7 +941,7 @@ def run_cc_include_fixup(pp_config):
     def cc_replacement_impl(filename, contents):
         for old_pkg, new_pkg in pp_config.cc_include_replacements.items():
             contents = contents.replace(f'"{old_pkg}"', f'"{new_pkg}"')
-            contents = contents.replace(f"<{old_pkg}>", f"<{new_pkg}>")
+            contents = contents.replace(f"<{old_pkg}>", f'"{new_pkg}"')
 
             if "semiwrap" in filename:
                 contents = contents.replace(f"- {old_pkg}", f"- {new_pkg}")
@@ -949,7 +950,7 @@ def run_cc_include_fixup(pp_config):
         if project_root in pp_config.cc_private_include_replacements:
             for old_pkg, new_pkg in pp_config.cc_private_include_replacements[project_root].items():
                 contents = contents.replace(f'"{old_pkg}"', f'"{new_pkg}"')
-                contents = contents.replace(f"<{old_pkg}>", f"<{new_pkg}>")
+                contents = contents.replace(f"<{old_pkg}>", f'"{new_pkg}"')
                 
                 contents = contents.replace(f'"../{old_pkg}"', f'"../{new_pkg}"')
                 contents = contents.replace(f'"../../{old_pkg}"', f'"../../{new_pkg}"')
@@ -1964,28 +1965,36 @@ def main():
     run_upstream_utils()
 
     apply_patch("0017-HAND-FIXES-Fixup-remaining-rename-issues.patch")
+    apply_patch("0018-HAND-FIX-Fix-robotpy-yaml-files.patch")
+
+    # An alternate version of the script includes patches for getting the whole repo compiling robotpy.
+    # These two commits are here to keep the patch numbers the same for that vs what is going to get landed
+    # in the refactoring PR
+    _make_commit("SCRIPT: Placeholder for robotpy compilation", allow_empty=True)
+    _make_commit("SCRIPT: Placeholder for robotpy compilation", allow_empty=True)
 
     # At this point the code should compile cleanly with just the file moves
     # The next phase of refactoring is running the more complicated namespace
     # replacements
-    apply_patch("0018-HAND-FIXES-Update-upstream-for-namespace-changes.patch")
+    apply_patch("0021-HAND-FIXES-Update-upstream-for-namespace-changes.patch")
     run_namespace_replacements()
     run_upstream_utils()
-    apply_patch("0021-HAND-FIXES-Update-build-scripts-for-namespaces.patch")
-    apply_patch("0022-HAND-FIXES-Manual-cleanup-of-namespaces.patch")
-    apply_patch("0023-HAND-FIXES-Update-maven-info.patch")
+    apply_patch("0024-HAND-FIXES-Update-build-scripts-for-namespaces.patch")
+    apply_patch("0025-HAND-FIXES-Manual-cleanup-of-namespaces.patch")
+    apply_patch("0026-HAND-FIXES-Update-maven-info.patch")
 
     # Cleanup some extra things
     run_package_stacktrace_replacement()
     run_frc_caps_replacement()
     
-    apply_patch("0026-HAND-FIX-final-frc-replacements.patch")
-    apply_patch("0027-HAND-FIX-final-java-package-changes.patch")
-    apply_patch("0028-HAND-FIXES-Fix-ntcoreffi.patch")
+    apply_patch("0029-HAND-FIX-final-frc-replacements.patch")
+    apply_patch("0030-HAND-FIX-final-java-package-changes.patch")
+    apply_patch("0031-HAND-FIXES-Fix-ntcoreffi.patch")
+    
+    apply_patch("0032-HAND-FIX-Fixup-robotpy-yaml-files.patch")
 
     # Finally run one last linter pass
     run_linters()
-
 
 
 if __name__ == "__main__":

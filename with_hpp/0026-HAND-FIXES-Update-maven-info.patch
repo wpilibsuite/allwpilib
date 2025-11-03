@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Mon, 27 Oct 2025 01:13:59 -0400
-Subject: [PATCH 23/30] HAND FIXES: Update maven info
+Date: Mon, 3 Nov 2025 05:00:12 -0500
+Subject: [PATCH 26/34] HAND FIXES: Update maven info
 
 ---
  apriltag/BUILD.bazel                    |  4 ++--
@@ -253,7 +253,7 @@ index 0ecbdedf706a5655e226bb288e7a8ca59f8fa24c..e505e212823d39b3d46d6a2f439630b7
      visibility = ["//visibility:public"],
  )
 diff --git a/docs/build.gradle b/docs/build.gradle
-index 30a7b2aba7e6d7a9419a16edd2ac970804a46a99..d6ed3f53e769dbc1ba79e35d3327a69630cac3f5 100644
+index 05220f8c62637cabc71dda73d10c9690c99dbdf5..103cf42df276c3b4dba13e44a3d87a440fa8d5fd 100644
 --- a/docs/build.gradle
 +++ b/docs/build.gradle
 @@ -22,12 +22,12 @@ evaluationDependsOn(':romiVendordep')
@@ -1022,10 +1022,10 @@ index b16e9e28265a7d9bd95be488f6fc44c776d6ef65..e797ab482ec6f10660329c71ac1a1ed5
      nativeName = 'wpimath'
      devMain = 'org.wpilib.math.DevMain'
 diff --git a/wpinet/BUILD.bazel b/wpinet/BUILD.bazel
-index de9fa913798409653d081930d96e7e645ecd179a..19917d9a226ec0086e2126f98a12ec006443c4e7 100644
+index 6d3c7ede3b64de86b04e68d5203cdeaac37bb52d..1334f4607fd1ac76ac8b22b1e5a1ff064e2ae1cb 100644
 --- a/wpinet/BUILD.bazel
 +++ b/wpinet/BUILD.bazel
-@@ -216,7 +216,7 @@ wpilib_jni_java_library(
+@@ -208,7 +208,7 @@ wpilib_jni_java_library(
      name = "wpinet-java",
      srcs = glob(["src/main/java/**/*.java"]),
      maven_artifact_name = "wpinet-java",
@@ -1034,7 +1034,7 @@ index de9fa913798409653d081930d96e7e645ecd179a..19917d9a226ec0086e2126f98a12ec00
      native_libs = [":wpinetjni"],
      visibility = ["//visibility:public"],
      deps = [
-@@ -361,5 +361,5 @@ robotpy_py_test(
+@@ -353,5 +353,5 @@ robotpy_py_test(
  package_minimal_jni_project(
      name = "wpinet",
      maven_artifact_name = "wpinet-cpp",
@@ -1042,11 +1042,10 @@ index de9fa913798409653d081930d96e7e645ecd179a..19917d9a226ec0086e2126f98a12ec00
 +    maven_group_id = "org.wpilib.wpinet",
  )
 diff --git a/wpinet/build.gradle b/wpinet/build.gradle
-index f2a10bfb153a08484f687d789c51109ddbd1155a..4701ac9b6af6f8faa0a54ec1da61ef980e50a9af 100644
+index 7edb74a966dbc67ac0f0a9a4901b761ac7addf3e..0964ea7be17fe3ad27372c8086083388228ae26b 100644
 --- a/wpinet/build.gradle
 +++ b/wpinet/build.gradle
-@@ -2,10 +2,10 @@ apply from: "${rootDir}/shared/resources.gradle"
- 
+@@ -1,9 +1,9 @@
  ext {
      baseId = 'wpinet'
 -    groupId = 'edu.wpi.first.net'
@@ -1055,9 +1054,9 @@ index f2a10bfb153a08484f687d789c51109ddbd1155a..4701ac9b6af6f8faa0a54ec1da61ef98
      nativeName = 'wpinet'
 -    devMain = 'edu.wpi.first.net.DevMain'
 +    devMain = 'org.wpilib.net.DevMain'
-     def generateTask = createGenerateResourcesTask('main', 'WPI', 'wpi', project)
  
      splitSetup = {
+         it.sources {
 diff --git a/wpiunits/BUILD.bazel b/wpiunits/BUILD.bazel
 index db0d7deba759ab0e6e8f5524e99248b287d01325..b97e0e60cebc22928f2705a298eef69f4de80447 100644
 --- a/wpiunits/BUILD.bazel

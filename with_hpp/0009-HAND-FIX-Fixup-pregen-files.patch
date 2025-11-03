@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Mon, 27 Oct 2025 01:09:55 -0400
-Subject: [PATCH 09/30] HAND FIX - Fixup pregen files
+Date: Sun, 2 Nov 2025 14:58:59 -0500
+Subject: [PATCH 09/34] HAND FIX - Fixup pregen files
 
 ---
  .github/actions/pregen/action.yml                  |  2 +-
@@ -48,7 +48,7 @@ index e406a70705b5849e223899b4d9e883b514579f84..a67e2a380f01bd9519366151e77372e6
  
      - name: Regenerate wpimath
 diff --git a/commandsv2/generate_hids.py b/commandsv2/generate_hids.py
-index f592b75e433a08e4779f592256523b724bd460a1..cc1ed10b4a5522ba0aaecc5dc176b6287479e467 100755
+index f592b75e433a08e4779f592256523b724bd460a1..80d30c8b649d3e23d7871e3344e3db6fbec6de6e 100755
 --- a/commandsv2/generate_hids.py
 +++ b/commandsv2/generate_hids.py
 @@ -22,7 +22,7 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
@@ -56,7 +56,7 @@ index f592b75e433a08e4779f592256523b724bd460a1..cc1ed10b4a5522ba0aaecc5dc176b628
  
      # Java files
 -    java_subdirectory = "main/java/edu/wpi/first/wpilibj2/command/button"
-+    java_subdirectory = "main/java/org/wpilib/commands2/button"
++    java_subdirectory = "main/java/org/wpilib/command2/button"
      env = Environment(
          loader=FileSystemLoader(template_directory / "main/java"),
          autoescape=False,
@@ -87,16 +87,16 @@ index f592b75e433a08e4779f592256523b724bd460a1..cc1ed10b4a5522ba0aaecc5dc176b628
          loader=FileSystemLoader(template_directory / cpp_subdirectory),
          autoescape=False,
 diff --git a/commandsv2/src/generate/main/java/commandhid.java.jinja b/commandsv2/src/generate/main/java/commandhid.java.jinja
-index aa28390a48a40c6858d5a840eb9b092875da6020..3ebe38083a2c9b65a4655079e7b86ed911b874b6 100644
+index b1a7749fa0167ad0aed59539518da22b633502a8..eed399b2e1c02e91811170b3281d68cbc5b12847 100644
 --- a/commandsv2/src/generate/main/java/commandhid.java.jinja
 +++ b/commandsv2/src/generate/main/java/commandhid.java.jinja
 @@ -8,9 +8,9 @@
  {%- endmacro %}
- package org.wpilib.commands2.button;
+ package org.wpilib.command2.button;
  
 -import org.wpilib.{{ ConsoleName }}Controller;
 -import org.wpilib.event.EventLoop;
- import org.wpilib.commands2.CommandScheduler;
+ import org.wpilib.command2.CommandScheduler;
 +import org.wpilib.driverstation.{{ ConsoleName }}Controller;
 +import org.wpilib.event.EventLoop;
  
@@ -129,17 +129,17 @@ index 168c8b112ef76671304b024bc34a52eecf8dc9ff..694c61bad4c0eb54d063325f8f9fcd75
  #include "wpi/commands2/button/Trigger.hpp"
  #include "wpi/commands2/CommandScheduler.hpp"
 diff --git a/commandsv3/src/generate/main/java/commandhid.java.jinja b/commandsv3/src/generate/main/java/commandhid.java.jinja
-index 8b366f2d2ecc22d4e222e4213d96a7f433771799..605d526b9bd6e76d08efdc8b9b78740cbe91cf22 100644
+index d48c80b25770a587abc7c76e00262855635d73f0..b39cf459c9baccdadd5bddf60a6c0aa5d679239c 100644
 --- a/commandsv3/src/generate/main/java/commandhid.java.jinja
 +++ b/commandsv3/src/generate/main/java/commandhid.java.jinja
 @@ -8,10 +8,10 @@
  {%- endmacro %}
- package org.wpilib.commands3.button;
+ package org.wpilib.command3.button;
  
 -import org.wpilib.{{ ConsoleName }}Controller;
 -import org.wpilib.event.EventLoop;
- import org.wpilib.commands3.Scheduler;
- import org.wpilib.commands3.Trigger;
+ import org.wpilib.command3.Scheduler;
+ import org.wpilib.command3.Trigger;
 +import org.wpilib.driverstation.{{ ConsoleName }}Controller;
 +import org.wpilib.event.EventLoop;
  
@@ -346,7 +346,7 @@ diff --git a/wpilibc/src/generate/main/native/cpp/hid.cpp.jinja b/wpilibc/src/ge
 similarity index 98%
 rename from wpilibc/src/generate/main/native/cpp/hid.cpp.jinja
 rename to wpilibc/src/generate/main/native/cpp/driverstation/hid.cpp.jinja
-index 2aeccd858046fad42dd1a61b9db3be263926b605..cea3cd8397224962d83f065a61a169fd15d9760d 100644
+index 5b4803c0d343cd4f32b42992aefe68b05446b33f..9ac2bca4516cc762e28ff4d06315a21540d62ec0 100644
 --- a/wpilibc/src/generate/main/native/cpp/hid.cpp.jinja
 +++ b/wpilibc/src/generate/main/native/cpp/driverstation/hid.cpp.jinja
 @@ -6,7 +6,7 @@
@@ -356,13 +356,13 @@ index 2aeccd858046fad42dd1a61b9db3be263926b605..cea3cd8397224962d83f065a61a169fd
 -#include "frc/{{ ConsoleName }}Controller.h"
 +#include "wpi/driverstation/{{ ConsoleName }}Controller.hpp"
  
- #include <wpi/hal/UsageReporting.h>
- #include <wpi/util/sendable/SendableBuilder.hpp>
+ #include "wpi/hal/UsageReporting.h"
+ #include "wpi/util/sendable/SendableBuilder.hpp"
 diff --git a/wpilibc/src/generate/main/native/cpp/motorcontroller/pwm_motor_controller.cpp.jinja b/wpilibc/src/generate/main/native/cpp/hardware/motor/pwm_motor_controller.cpp.jinja
 similarity index 94%
 rename from wpilibc/src/generate/main/native/cpp/motorcontroller/pwm_motor_controller.cpp.jinja
 rename to wpilibc/src/generate/main/native/cpp/hardware/motor/pwm_motor_controller.cpp.jinja
-index e15fb879c4c9c2af39fd1f4194fa05d35ffc5801..c8d12ae91e04e6a3899738b49018b7d8775d3c9f 100644
+index 55f9f7e2eb9a99b49c1f5dba8963a34af3cc0b51..0c0909176fe08403efa25c5399fe6f6d91976d59 100644
 --- a/wpilibc/src/generate/main/native/cpp/motorcontroller/pwm_motor_controller.cpp.jinja
 +++ b/wpilibc/src/generate/main/native/cpp/hardware/motor/pwm_motor_controller.cpp.jinja
 @@ -4,7 +4,7 @@
@@ -372,7 +372,7 @@ index e15fb879c4c9c2af39fd1f4194fa05d35ffc5801..c8d12ae91e04e6a3899738b49018b7d8
 -#include "frc/motorcontrol/{{ name }}.h"
 +#include "wpi/hardware/motor/{{ name }}.hpp"
  
- #include <wpi/hal/UsageReporting.h>
+ #include "wpi/hal/UsageReporting.h"
  
 diff --git a/wpilibc/src/generate/main/native/cpp/simulation/hidsim.cpp.jinja b/wpilibc/src/generate/main/native/cpp/simulation/hidsim.cpp.jinja
 index 944fd93f40edcd956db60a916c42fe27bf98a46e..3a99eafbd192f673f5aae9cd92d6b23b0a37dd1d 100644

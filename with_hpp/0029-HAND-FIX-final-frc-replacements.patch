@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Mon, 27 Oct 2025 01:14:01 -0400
-Subject: [PATCH 26/30] HAND FIX final frc:: replacements
+Date: Mon, 3 Nov 2025 05:00:14 -0500
+Subject: [PATCH 29/34] HAND FIX final frc:: replacements
 
 ---
  hal/src/main/native/include/wpi/hal/Main.h       | 2 +-
@@ -22,10 +22,10 @@ index accb80b3350e0086fc7e0b64e7843e521ad6a6d6..5808af16ab40399e44bbeb76aaf05496
   * @param param parameter data to pass to mainFunc and exitFunc
   * @param mainFunc the function to be run when HAL_RunMain() is called.
 diff --git a/ntcoreffi/src/main/native/cpp/DataLogManager.cpp b/ntcoreffi/src/main/native/cpp/DataLogManager.cpp
-index 9ddf61bc92824044bce4d3d113b4b7ff979b7778..e2e88acea95eea636b9b9e3876561223cde5d5b7 100644
+index 13e808a2f759c4b68e69a67f50e944797557cadc..23b03c550f43fb8809c3579b7696fb927625ede0 100644
 --- a/ntcoreffi/src/main/native/cpp/DataLogManager.cpp
 +++ b/ntcoreffi/src/main/native/cpp/DataLogManager.cpp
-@@ -29,7 +29,7 @@ namespace warn {
+@@ -30,7 +30,7 @@ namespace warn {
  static constexpr int Warning = 16;
  }  // namespace warn
  
@@ -34,7 +34,7 @@ index 9ddf61bc92824044bce4d3d113b4b7ff979b7778..e2e88acea95eea636b9b9e3876561223
  void ReportErrorV(int32_t status, const char* fileName, int lineNumber,
                    const char* funcName, fmt::string_view format,
                    fmt::format_args args) {
-@@ -54,12 +54,12 @@ inline void ReportError(int32_t status, const char* fileName, int lineNumber,
+@@ -55,12 +55,12 @@ inline void ReportError(int32_t status, const char* fileName, int lineNumber,
    ReportErrorV(status, fileName, lineNumber, funcName, format,
                 fmt::make_format_args(args...));
  }

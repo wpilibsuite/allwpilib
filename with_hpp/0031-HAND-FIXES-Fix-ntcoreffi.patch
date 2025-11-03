@@ -1,17 +1,17 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Mon, 27 Oct 2025 01:14:01 -0400
-Subject: [PATCH 28/30] HAND FIXES: Fix ntcoreffi
+Date: Mon, 3 Nov 2025 05:00:14 -0500
+Subject: [PATCH 31/34] HAND FIXES: Fix ntcoreffi
 
 ---
  .../src/main/native/cpp/DataLogManager.cpp    | 40 +++++++++----------
  1 file changed, 20 insertions(+), 20 deletions(-)
 
 diff --git a/ntcoreffi/src/main/native/cpp/DataLogManager.cpp b/ntcoreffi/src/main/native/cpp/DataLogManager.cpp
-index e2e88acea95eea636b9b9e3876561223cde5d5b7..a06ea69c8056054e570532f498b972e3eae5f7fc 100644
+index 23b03c550f43fb8809c3579b7696fb927625ede0..6ef50188c8257a2a99a406e8e26f3e84f5dd1f47 100644
 --- a/ntcoreffi/src/main/native/cpp/DataLogManager.cpp
 +++ b/ntcoreffi/src/main/native/cpp/DataLogManager.cpp
-@@ -59,7 +59,7 @@ inline void ReportError(int32_t status, const char* fileName, int lineNumber,
+@@ -60,7 +60,7 @@ inline void ReportError(int32_t status, const char* fileName, int lineNumber,
  #define WPILIB_ReportError(status, format, ...)                       \
    do {                                                             \
      if ((status) != 0) {                                           \
@@ -20,7 +20,7 @@ index e2e88acea95eea636b9b9e3876561223cde5d5b7..a06ea69c8056054e570532f498b972e3
                           format __VA_OPT__(, ) __VA_ARGS__);       \
      }                                                              \
    } while (0)
-@@ -184,7 +184,7 @@ inline void RemoveRefreshedDataEventHandle(WPI_EventHandle event) {}
+@@ -185,7 +185,7 @@ inline void RemoveRefreshedDataEventHandle(WPI_EventHandle event) {}
  // }  // namespace RobotBase
  // #endif
  
@@ -29,7 +29,7 @@ index e2e88acea95eea636b9b9e3876561223cde5d5b7..a06ea69c8056054e570532f498b972e3
    Thread(std::string_view dir, std::string_view filename, double period);
    ~Thread() override;
  
-@@ -197,18 +197,18 @@ struct Thread final : public wpi::util::SafeThread {
+@@ -198,18 +198,18 @@ struct Thread final : public wpi::util::SafeThread {
  
    std::string m_logDir;
    bool m_filenameOverride;
@@ -52,7 +52,7 @@ index e2e88acea95eea636b9b9e3876561223cde5d5b7..a06ea69c8056054e570532f498b972e3
  };
  
  }  // namespace
-@@ -286,9 +286,9 @@ void Thread::Main() {
+@@ -287,9 +287,9 @@ void Thread::Main() {
        std::vector<fs::directory_entry> entries;
        for (auto&& entry : fs::directory_iterator{m_logDir, ec}) {
          auto stem = entry.path().stem().string();
@@ -64,7 +64,7 @@ index e2e88acea95eea636b9b9e3876561223cde5d5b7..a06ea69c8056054e570532f498b972e3
            entries.emplace_back(entry);
          }
        }
-@@ -312,7 +312,7 @@ void Thread::Main() {
+@@ -313,7 +313,7 @@ void Thread::Main() {
              break;
            }
          } else {
@@ -73,7 +73,7 @@ index e2e88acea95eea636b9b9e3876561223cde5d5b7..a06ea69c8056054e570532f498b972e3
                       entry.path().string());
          }
        }
-@@ -333,17 +333,17 @@ void Thread::Main() {
+@@ -334,17 +334,17 @@ void Thread::Main() {
    bool dsRenamed = m_filenameOverride;
    bool fmsRenamed = m_filenameOverride;
    int sysTimeCount = 0;
@@ -94,7 +94,7 @@ index e2e88acea95eea636b9b9e3876561223cde5d5b7..a06ea69c8056054e570532f498b972e3
      if (!m_active) {
        break;
      }
-@@ -428,7 +428,7 @@ void Thread::Main() {
+@@ -429,7 +429,7 @@ void Thread::Main() {
      if (sysTimeCount >= 250) {
        sysTimeCount = 0;
        if (RobotController::IsSystemTimeValid()) {
@@ -103,7 +103,7 @@ index e2e88acea95eea636b9b9e3876561223cde5d5b7..a06ea69c8056054e570532f498b972e3
        }
      }
    }
-@@ -474,10 +474,10 @@ Instance::Instance(std::string_view dir, std::string_view filename,
+@@ -475,10 +475,10 @@ Instance::Instance(std::string_view dir, std::string_view filename,
    auto logDir = MakeLogDir(dir);
    std::error_code ec;
    for (auto&& entry : fs::directory_iterator{logDir, ec}) {
@@ -116,7 +116,7 @@ index e2e88acea95eea636b9b9e3876561223cde5d5b7..a06ea69c8056054e570532f498b972e3
                     entry.path().string());
        }
      }
-@@ -509,10 +509,10 @@ void DataLogManager::Stop() {
+@@ -510,10 +510,10 @@ void DataLogManager::Stop() {
  
  void DataLogManager::Log(std::string_view message) {
    GetInstance().owner.GetThread()->m_messageLog.Append(message);
@@ -129,7 +129,7 @@ index e2e88acea95eea636b9b9e3876561223cde5d5b7..a06ea69c8056054e570532f498b972e3
    return GetInstance().owner.GetThread()->m_log;
  }
  
-@@ -541,14 +541,14 @@ void DataLogManager::LogConsoleOutput(bool enabled) {
+@@ -542,14 +542,14 @@ void DataLogManager::LogConsoleOutput(bool enabled) {
  }
  
  void DataLogManager::SignalNewDSDataOccur() {
@@ -146,7 +146,7 @@ index e2e88acea95eea636b9b9e3876561223cde5d5b7..a06ea69c8056054e570532f498b972e3
                          period);
  }
  
-@@ -557,7 +557,7 @@ void DLM_Stop(void) {
+@@ -558,7 +558,7 @@ void DLM_Stop(void) {
  }
  
  void DLM_Log(const struct WPI_String* message) {

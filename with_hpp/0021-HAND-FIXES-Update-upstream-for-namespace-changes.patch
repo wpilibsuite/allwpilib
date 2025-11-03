@@ -1,10 +1,9 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Mon, 27 Oct 2025 01:12:25 -0400
-Subject: [PATCH 18/30] HAND FIXES: Update upstream for namespace changes
+Date: Mon, 3 Nov 2025 04:57:51 -0500
+Subject: [PATCH 21/34] HAND FIXES: Update upstream for namespace changes
 
 ---
- ntcore/BUILD.bazel                                 |  4 ++--
  upstream_utils/argparse_lib.py                     |  4 ++--
  upstream_utils/debugging.py                        |  2 +-
  .../0005-Add-emscripten-shim.patch                 |  4 ++--
@@ -17,23 +16,8 @@ Subject: [PATCH 18/30] HAND FIXES: Update upstream for namespace changes
  .../llvm_patches/0022-OS-specific-changes.patch    |  4 ++--
  upstream_utils/sleipnir.py                         |  2 +-
  .../sleipnir_patches/0003-Use-wpi-byteswap.patch   |  2 +-
- 13 files changed, 34 insertions(+), 34 deletions(-)
+ 12 files changed, 32 insertions(+), 32 deletions(-)
 
-diff --git a/ntcore/BUILD.bazel b/ntcore/BUILD.bazel
-index 1135ac0ab0935d63ef96453bb6ed599ec3b6b1fc..d57ee8f658f02613ffe10ba9b7570d6997cd3ace 100644
---- a/ntcore/BUILD.bazel
-+++ b/ntcore/BUILD.bazel
-@@ -74,8 +74,8 @@ filegroup(
- cc_library(
-     name = "ntcore_c_headers",
-     hdrs = [
--        "src/generated/main/native/include/wpi/ntcore/ntcore_c_types.h",
--        "src/main/native/include/wpi/ntcore/ntcore_c.h",
-+        "src/generated/main/native/include/wpi/nt/ntcore_c_types.h",
-+        "src/main/native/include/wpi/nt/ntcore_c.h",
-     ],
-     includes = [
-         "src/generated/main/native/include",
 diff --git a/upstream_utils/argparse_lib.py b/upstream_utils/argparse_lib.py
 index 2c6c077637e0550e842735f4765eaf959909f0e1..62668667ff5fe95dbe42413bca793f24c3017d6b 100755
 --- a/upstream_utils/argparse_lib.py
@@ -273,10 +257,10 @@ index 98407fe271dce77ef100df3a655bdcce85ce9c22..92def1c7c16905e40898a5cb7d4b25e1
   
  -  // If we reached here, we are failing ungracefully. Run the interrupt handlers
 diff --git a/upstream_utils/sleipnir.py b/upstream_utils/sleipnir.py
-index 9c202f32bc8464d69ce813530a2b6fe19fbc4ec0..84a425c3cf524465eb934fd822c4a4258ed16913 100755
+index 3e8ce2691d5b8b65ede1ba09256b20b23eac2548..96ddd0c62870d88999377f1710028e165035b0db 100755
 --- a/upstream_utils/sleipnir.py
 +++ b/upstream_utils/sleipnir.py
-@@ -42,7 +42,7 @@ def copy_upstream_src(wpilib_root: Path):
+@@ -39,7 +39,7 @@ def copy_upstream_src(wpilib_root: Path):
  namespace gch {
  
  template <typename T>
