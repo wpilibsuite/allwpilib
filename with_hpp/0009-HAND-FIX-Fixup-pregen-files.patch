@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Sun, 2 Nov 2025 14:58:59 -0500
+Date: Mon, 3 Nov 2025 19:46:25 -0500
 Subject: [PATCH 09/34] HAND FIX - Fixup pregen files
 
 ---
@@ -9,6 +9,7 @@ Subject: [PATCH 09/34] HAND FIX - Fixup pregen files
  .../src/generate/main/java/commandhid.java.jinja   |  4 ++--
  .../cpp/wpi/commands2/button/commandhid.cpp.jinja  |  2 +-
  .../wpi/commands2/button/commandhid.hpp.jinja      |  2 +-
+ commandsv3/generate_files.py                       |  4 ++--
  .../src/generate/main/java/commandhid.java.jinja   |  4 ++--
  ntcore/generate_topics.py                          | 14 ++++++++------
  .../main/java/NetworkTableInstance.java.jinja      | 10 +++++-----
@@ -30,7 +31,7 @@ Subject: [PATCH 09/34] HAND FIX - Fixup pregen files
  wpimath/generate_quickbuf.py                       |  2 +-
  wpimath/src/generate/main/java/Nat.java.jinja      |  2 +-
  wpiunits/generate_units.py                         |  2 +-
- 26 files changed, 65 insertions(+), 63 deletions(-)
+ 27 files changed, 67 insertions(+), 65 deletions(-)
  rename wpilibc/src/generate/main/native/cpp/{ => driverstation}/hid.cpp.jinja (98%)
  rename wpilibc/src/generate/main/native/cpp/{motorcontroller => hardware/motor}/pwm_motor_controller.cpp.jinja (94%)
 
@@ -128,6 +129,28 @@ index 168c8b112ef76671304b024bc34a52eecf8dc9ff..694c61bad4c0eb54d063325f8f9fcd75
  
  #include "wpi/commands2/button/Trigger.hpp"
  #include "wpi/commands2/CommandScheduler.hpp"
+diff --git a/commandsv3/generate_files.py b/commandsv3/generate_files.py
+index f6c1cb20c00978542ae3496927704680ba0e5f57..23ae3a8a6701e92e2270861be032e7c62e562856 100755
+--- a/commandsv3/generate_files.py
++++ b/commandsv3/generate_files.py
+@@ -24,7 +24,7 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
+         controllers = json.load(f)
+ 
+     # Java files
+-    java_subdirectory = "main/java/org/wpilib/commands3/button"
++    java_subdirectory = "main/java/org/wpilib/command3/button"
+     env = Environment(
+         loader=FileSystemLoader(template_directory / "main/java"),
+         autoescape=False,
+@@ -54,7 +54,7 @@ def generate_quickbuf(
+             absolute_filename,
+         ]
+         subprocess.check_call(args)
+-    java_files = (output_directory / "org/wpilib/commands3/proto").glob("*.java")
++    java_files = (output_directory / "org/wpilib/command3/proto").glob("*.java")
+     for java_file in java_files:
+         with (java_file).open(encoding="utf-8") as f:
+             content = f.read()
 diff --git a/commandsv3/src/generate/main/java/commandhid.java.jinja b/commandsv3/src/generate/main/java/commandhid.java.jinja
 index d48c80b25770a587abc7c76e00262855635d73f0..b39cf459c9baccdadd5bddf60a6c0aa5d679239c 100644
 --- a/commandsv3/src/generate/main/java/commandhid.java.jinja

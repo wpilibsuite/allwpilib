@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Mon, 3 Nov 2025 04:54:17 -0500
+Date: Mon, 3 Nov 2025 19:46:25 -0500
 Subject: [PATCH 08/34] HAND FIX - Fixup bazel files
 
 ---
@@ -8,7 +8,7 @@ Subject: [PATCH 08/34] HAND FIX - Fixup bazel files
  apriltag/BUILD.bazel                    |  4 ++--
  cameraserver/BUILD.bazel                |  4 ++--
  commandsv2/BUILD.bazel                  | 10 +++++-----
- commandsv3/BUILD.bazel                  |  2 +-
+ commandsv3/BUILD.bazel                  |  6 +++---
  cscore/BUILD.bazel                      | 12 ++++++------
  docs/BUILD.bazel                        |  4 ++--
  epilogue-processor/BUILD.bazel          |  2 +-
@@ -35,7 +35,7 @@ Subject: [PATCH 08/34] HAND FIX - Fixup bazel files
  wpiunits/BUILD.bazel                    |  4 ++--
  wpiutil/BUILD.bazel                     |  4 ++--
  xrpVendordep/BUILD.bazel                |  4 ++--
- 31 files changed, 93 insertions(+), 88 deletions(-)
+ 31 files changed, 95 insertions(+), 90 deletions(-)
 
 diff --git a/BUILD.bazel b/BUILD.bazel
 index 58d9728113b5c98ed7fd8dbeffa5b7496db6abf4..11b2d3942a33d1deeaff88eb3765af88e48e9b74 100644
@@ -150,7 +150,7 @@ index 6da2bbeaaa82120ebb390f1d431d18c181be32fa..402c2305db64e26e7efb92bb476293ca
          ":commandsv2-java",
          "//hal:hal-java",
 diff --git a/commandsv3/BUILD.bazel b/commandsv3/BUILD.bazel
-index 291663056579e651dff3287edfd0fc5345124eee..aa07cbb8df0c894be55d4a0b7ced29d2569082e7 100644
+index 291663056579e651dff3287edfd0fc5345124eee..c7c41c175082ec5e59cd84a274e9ab6e98c40d32 100644
 --- a/commandsv3/BUILD.bazel
 +++ b/commandsv3/BUILD.bazel
 @@ -65,7 +65,7 @@ wpilib_java_library(
@@ -162,6 +162,17 @@ index 291663056579e651dff3287edfd0fc5345124eee..aa07cbb8df0c894be55d4a0b7ced29d2
      deps = [
          ":commandsv3-java",
          "//hal:hal-java",
+@@ -81,8 +81,8 @@ wpilib_java_junit5_test(
+ 
+ java_binary(
+     name = "DevMain-Java",
+-    srcs = ["src/dev/java/org/wpilib/commands3/DevMain.java"],
+-    main_class = "org.wpilib.commands3.DevMain",
++    srcs = ["src/dev/java/org/wpilib/command3/DevMain.java"],
++    main_class = "org.wpilib.command3.DevMain",
+     deps = [
+         "//hal:hal-java",
+         "//ntcore:ntcore-java",
 diff --git a/cscore/BUILD.bazel b/cscore/BUILD.bazel
 index c94e844b093ec59bc2cde4c27ff5ce7e95b08313..6da0c35c7e7dca6af5b145490a687fc5769c5b92 100644
 --- a/cscore/BUILD.bazel

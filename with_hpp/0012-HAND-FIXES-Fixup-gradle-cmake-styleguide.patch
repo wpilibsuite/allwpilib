@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
-Date: Mon, 3 Nov 2025 04:55:56 -0500
+Date: Mon, 3 Nov 2025 19:46:30 -0500
 Subject: [PATCH 12/34] HAND FIXES: Fixup gradle / cmake / styleguide
 
 ---
@@ -11,7 +11,7 @@ Subject: [PATCH 12/34] HAND FIXES: Fixup gradle / cmake / styleguide
  commandsv2/.styleguide          |  7 ----
  cscore/.styleguide              |  6 ++--
  datalog/.styleguide             |  2 +-
- docs/build.gradle               | 58 +++++++++++++++++----------------
+ docs/build.gradle               | 60 +++++++++++++++++----------------
  glass/.styleguide               | 16 ++++-----
  hal/.styleguide                 |  5 ---
  hal/build.gradle                |  2 +-
@@ -34,7 +34,7 @@ Subject: [PATCH 12/34] HAND FIXES: Fixup gradle / cmake / styleguide
  wpinet/.styleguide              |  4 +--
  wpiutil/.styleguide             |  8 ++---
  wpiutil/build.gradle            |  4 +--
- 30 files changed, 93 insertions(+), 160 deletions(-)
+ 30 files changed, 94 insertions(+), 161 deletions(-)
 
 diff --git a/.styleguide b/.styleguide
 index 18dc8e9ca6513164074141608dba5debc1253b58..71becc3ccf52303127ef013817994aa84569b6ae 100644
@@ -192,7 +192,7 @@ index 3916f30045614a16f29065469af1d63861a9450a..91b25b9cc5d65f24d8374fdbde000fd5
 -  ^wpi/(?!datalog)
  }
 diff --git a/docs/build.gradle b/docs/build.gradle
-index 72bcbd0e43229c17a2f6ecdfc68cd75c0404e0ae..05220f8c62637cabc71dda73d10c9690c99dbdf5 100644
+index 72bcbd0e43229c17a2f6ecdfc68cd75c0404e0ae..d9494b7d1557b5f15c4ddb694a4eb1bbaae6bef3 100644
 --- a/docs/build.gradle
 +++ b/docs/build.gradle
 @@ -89,24 +89,24 @@ doxygen.sourceSets.main {
@@ -254,6 +254,7 @@ index 72bcbd0e43229c17a2f6ecdfc68cd75c0404e0ae..05220f8c62637cabc71dda73d10c9690
 -            "-edu.wpi.first.math.system.plant.struct," +
 -            "-edu.wpi.first.math.trajectory.proto," +
 -            "-edu.wpi.first.math.trajectory.struct," +
+-            "-org.wpilib.commands3.proto," +
 +            "-org.wpilib.math.proto," +
 +            "-org.wpilib.math.struct," +
 +            "-org.wpilib.math.controller.proto," +
@@ -272,7 +273,7 @@ index 72bcbd0e43229c17a2f6ecdfc68cd75c0404e0ae..05220f8c62637cabc71dda73d10c9690
 +            "-org.wpilib.math.system.plant.struct," +
 +            "-org.wpilib.math.trajectory.proto," +
 +            "-org.wpilib.math.trajectory.struct," +
-             "-org.wpilib.commands3.proto," +
++            "-org.wpilib.command3.proto," +
              // The .measure package contains generated source files for which automatic javadoc
              // generation is very difficult to do meaningfully.
 -            "-edu.wpi.first.units.measure", true)
