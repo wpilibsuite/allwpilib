@@ -1,0 +1,99 @@
+extra_includes:
+- pybind11_typing.h
+
+classes:
+  frc::AprilTagDetector:
+    methods:
+      AprilTagDetector:
+      SetConfig:
+      GetConfig:
+      SetQuadThresholdParameters:
+      GetQuadThresholdParameters:
+      AddFamily:
+      RemoveFamily:
+      ClearFamilies:
+      Detect:
+        overloads:
+          int, int, int, uint8_t*:
+            ignore: true
+          int, int, uint8_t*:
+            ignore: true
+    inline_code: |
+      .def("detect", [](AprilTagDetector *self, py::buffer img) {
+
+        // validate the input image buffer
+        auto buf = img.request();
+        if (buf.ndim != 2) {
+          throw py::value_error("buffer must only have two dimensions");
+        } else if (buf.itemsize != 1) {
+          throw py::value_error("buffer elements must be bytes");
+        }
+
+        // We are going to move the detection result into this shared_ptr
+        // so that python can keep it alive. We don't expose the result directly
+        // to the user because we'd have to pretend it's a list, and that would
+        // be annoying. 
+        std::shared_ptr<AprilTagDetector::Results> c_result;
+        {
+          py::gil_scoped_release unlock;
+          c_result = std::make_shared<AprilTagDetector::Results>(std::move(self->Detect(buf.shape[1], buf.shape[0], (uint8_t*)buf.ptr)));
+        }
+
+        // This tells python about the shared_ptr, and it'll keep it alive as
+        // long as the python reference is alive. When we call get(), we marked
+        // the return value as reference_internal so python will keep the python
+        // reference for the results object alive for as long as all of its
+        // results that we put into the list are alive
+        py::object py_result = py::cast(c_result);
+        auto len = c_result->size();
+        auto get = py_result.attr("get");
+        py::typing::List<AprilTagDetection> l(len);
+        for (size_t i = 0; i < len; i++) {
+          l[i] = get(i);
+        }
+        return l;
+      }, py::arg("image"),
+        R"doc(
+          Detect tags from an 8-bit grayscale image with shape (height, width)
+
+          :return: list of results
+        )doc"
+      )
+  frc::AprilTagDetector::Config:
+    attributes:
+      numThreads:
+      quadDecimate:
+      quadSigma:
+      refineEdges:
+      decodeSharpening:
+      debug:
+    methods:
+      operator==:
+  frc::AprilTagDetector::QuadThresholdParameters:
+    attributes:
+      minClusterPixels:
+      maxNumMaxima:
+      criticalAngle:
+      maxLineFitMSE:
+      minWhiteBlackDiff:
+      deglitch:
+    methods:
+      operator==:
+  frc::AprilTagDetector::Results:
+    rename: _Results
+    ignored_bases:
+    - std::span<const AprilTagDetection* const>
+    force_no_trampoline: true
+    methods:
+      Results:
+        overloads:
+          '':
+            ignore: true
+          void*, const private_init&:
+            ignore: true
+    inline_code: |
+      // use the keepalive to keep the array of results around until
+      // the user deletes them
+      .def("get", [](const AprilTagDetector::Results &self, int i) {
+        return self[i];
+      }, py::return_value_policy::reference_internal)

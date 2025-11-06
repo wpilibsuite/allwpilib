@@ -146,5 +146,15 @@
     ],
     "foldername": "OnboardIMU",
     "gradlebase": "cpp"
+  },
+  {
+    "name": "ProfiledPIDFeedforward",
+    "description": "Snippets of ProfiledPIDController with feedforward for frc-docs.",
+    "tags": [
+      "PID",
+      "Profiled PID"
+    ],
+    "foldername": "ProfiledPIDFeedforward",
+    "gradlebase": "cpp"
   }
 ]

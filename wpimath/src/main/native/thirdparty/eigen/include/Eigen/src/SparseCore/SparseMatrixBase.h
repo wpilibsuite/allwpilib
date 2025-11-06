@@ -227,9 +227,6 @@ class SparseMatrixBase : public EigenBase<Derived> {
     using Nested = typename Derived::Nested;
     using NestedCleaned = typename internal::remove_all<Nested>::type;
 
-    /// For converting `0's` to the matrices numerical type
-    using Scalar = typename Derived::Scalar;
-
     if (Flags & RowMajorBit) {
       Nested nm(m.derived());
       internal::evaluator<NestedCleaned> thisEval(nm);

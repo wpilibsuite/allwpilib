@@ -1,0 +1,15 @@
+classes:
+  nt::NTSendableBuilder:
+    force_type_casters:
+    - std::function
+    typealias:
+    - BackendKind = wpi::SendableBuilder::BackendKind
+    methods:
+      SetUpdateTable:
+        cpp_code: |
+          [](NTSendableBuilder *self, std::function<void()> func) {
+            self->SetUpdateTable(std::move(func));
+          }
+      GetTopic:
+      GetTable:
+      GetBackendKind:

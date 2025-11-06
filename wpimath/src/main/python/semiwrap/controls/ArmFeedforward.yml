@@ -1,0 +1,42 @@
+defaults:
+  subpackage: controller
+
+classes:
+  frc::ArmFeedforward:
+    force_type_casters:
+    - units::radians_per_second_squared
+    typealias:
+    - frc::ArmFeedforward::Acceleration
+    - frc::ArmFeedforward::kv_unit
+    - frc::ArmFeedforward::ka_unit
+    methods:
+      ArmFeedforward:
+        overloads:
+          '':
+          units::volt_t, units::volt_t, units::unit_t<kv_unit>, units::unit_t<ka_unit>:
+      Calculate:
+        overloads:
+          units::unit_t<Angle>, units::unit_t<Velocity>, units::unit_t<Acceleration> [const]:
+            ignore: true
+          units::unit_t<Angle>, units::unit_t<Velocity>, units::unit_t<Velocity>, units::second_t [const]:
+            ignore: true
+          units::unit_t<Angle>, units::unit_t<Velocity> [const]:
+          units::unit_t<Angle>, units::unit_t<Velocity>, units::unit_t<Velocity> [const]:
+      MaxAchievableVelocity:
+      MinAchievableVelocity:
+      MaxAchievableAcceleration:
+      MinAchievableAcceleration:
+      GetKs:
+      GetKg:
+      GetKv:
+      GetKa:
+      SetKs:
+      SetKg:
+      SetKv:
+      SetKa:
+
+extra_includes:
+- wpystruct.h
+
+inline_code: |
+  SetupWPyStruct<frc::ArmFeedforward>(cls_ArmFeedforward);

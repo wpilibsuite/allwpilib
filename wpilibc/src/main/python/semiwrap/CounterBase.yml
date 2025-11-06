@@ -1,0 +1,15 @@
+defaults:
+  subpackage: interfaces
+
+classes:
+  frc::CounterBase:
+    enums:
+      EncodingType:
+    methods:
+      CounterBase:
+      Get:
+      Reset:
+      GetPeriod:
+      SetMaxPeriod:
+      GetStopped:
+      GetDirection:

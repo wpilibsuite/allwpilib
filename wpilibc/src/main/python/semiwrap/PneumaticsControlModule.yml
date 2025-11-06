@@ -1,0 +1,47 @@
+extra_includes:
+- wpi/sendable/SendableBuilder.h
+- frc/Compressor.h
+- frc/Solenoid.h
+- frc/DoubleSolenoid.h
+
+classes:
+  frc::PneumaticsControlModule:
+    methods:
+      PneumaticsControlModule:
+        overloads:
+          int:
+          int, int:
+      GetCompressor:
+      DisableCompressor:
+      EnableCompressorDigital:
+      EnableCompressorAnalog:
+      EnableCompressorHybrid:
+      GetCompressorConfigType:
+      GetPressureSwitch:
+      GetCompressorCurrent:
+      GetCompressorCurrentTooHighFault:
+      GetCompressorCurrentTooHighStickyFault:
+      GetCompressorShortedFault:
+      GetCompressorShortedStickyFault:
+      GetCompressorNotConnectedFault:
+      GetCompressorNotConnectedStickyFault:
+      GetSolenoidVoltageFault:
+      GetSolenoidVoltageStickyFault:
+      ClearAllStickyFaults:
+      SetSolenoids:
+      GetSolenoids:
+      GetModuleNumber:
+      GetSolenoidDisabledList:
+      FireOneShot:
+      SetOneShotDuration:
+      CheckSolenoidChannel:
+      CheckAndReserveSolenoids:
+      UnreserveSolenoids:
+      ReserveCompressor:
+      UnreserveCompressor:
+      GetAnalogVoltage:
+      GetPressure:
+      MakeSolenoid:
+      MakeDoubleSolenoid:
+      MakeCompressor:
+      ReportUsage:

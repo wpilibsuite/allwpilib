@@ -8,7 +8,7 @@ requires = [
 
 [project]
 name = "robotpy-native-wpiutil"
-version = "2027.0.0a2"
+version = "0.0.0"
 description = "WPILib Utility Library"
 license = "BSD-3-Clause"
 
@@ -23,7 +23,7 @@ packages = ["src/native"]
 artifact_id = "wpiutil-cpp"
 group_id = "edu.wpi.first.wpiutil"
 repo_url = "https://frcmaven.wpi.edu/artifactory/release-2027"
-version = "2027.0.0-alpha-2"
+version = "0.0.0"
 
 extract_to = "src/native/wpiutil"
 libs = ["wpiutil"]

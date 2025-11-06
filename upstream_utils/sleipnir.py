@@ -19,10 +19,7 @@ def copy_upstream_src(wpilib_root: Path):
     # Copy Sleipnir files into allwpilib
     walk_cwd_and_copy_if(
         lambda dp, f: (has_prefix(dp, Path("include")) or has_prefix(dp, Path("src")))
-        or f == ".clang-format"
-        or f == ".clang-tidy"
-        or f == ".styleguide"
-        or f == ".styleguide-license",
+        and f not in [".styleguide", ".styleguide-license"],
         wpimath / "src/main/native/thirdparty/sleipnir",
     )
 

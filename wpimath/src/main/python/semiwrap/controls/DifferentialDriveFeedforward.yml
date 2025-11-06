@@ -1,0 +1,44 @@
+defaults:
+  subpackage: controller
+
+classes:
+  frc::DifferentialDriveFeedforward:
+    force_type_casters:
+    - units::meters_per_second
+    - units::meters_per_second_squared
+    - units::radians_per_second
+    - units::radians_per_second_squared
+    - units::compound_unit
+    attributes:
+      m_kVLinear:
+      m_kALinear:
+      m_kVAngular:
+      m_kAAngular:
+    methods:
+      DifferentialDriveFeedforward:
+        overloads:
+          decltype(1_V/1_mps), decltype(1_V/1_mps_sq), decltype(1_V/1_rad_per_s), decltype(1_V/1_rad_per_s_sq), units::meter_t:
+          decltype(1_V/1_mps), decltype(1_V/1_mps_sq), decltype(1_V/1_mps), decltype(1_V/1_mps_sq):
+          # ? decltype ( 1 _V / 1 _mps ), decltype ( 1 _V / 1 _mps_sq ), decltype (
+          #   1 _V / 1 _rad_per_s ), decltype ( 1 _V / 1 _rad_per_s_sq ), units::meter_t
+          # :
+          #   param_override:
+          #     kVLinear:
+          #       x_type: decltype(1_V / 1_mps)
+          #     kALinear:
+          #       x_type: decltype(1_V / 1_mps_sq)
+          #     kVAngular:
+          #       x_type: decltype(1_V / 1_rad_per_s)
+          #     kAAngular:
+          #       x_type: decltype(1_V / 1_rad_per_s_sq)
+          # decltype ( 1 _V / 1 _mps ), decltype ( 1 _V / 1 _mps_sq ), decltype ( 1 _V / 1 _mps ), decltype ( 1 _V / 1 _mps_sq ):
+          #   param_override:
+          #     kVLinear:
+          #       x_type: decltype(1_V / 1_mps)
+          #     kALinear:
+          #       x_type: decltype(1_V / 1_mps_sq)
+          #     kVAngular:
+          #       x_type: decltype(1_V / 1_mps)
+          #     kAAngular:
+          #       x_type: decltype(1_V / 1_mps_sq)
+      Calculate:

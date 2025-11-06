@@ -88,6 +88,8 @@ TimedRobot::TimedRobot(units::second_t period) : IterativeRobotBase(period) {
   HAL_ReportUsage("Framework", "TimedRobot");
 }
 
+TimedRobot::TimedRobot(units::hertz_t frequency) : TimedRobot{1 / frequency} {}
+
 TimedRobot::~TimedRobot() {
   if (m_notifier != HAL_kInvalidHandle) {
     int32_t status = 0;

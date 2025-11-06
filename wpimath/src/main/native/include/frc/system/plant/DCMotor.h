@@ -248,6 +248,31 @@ class WPILIB_DLLEXPORT DCMotor {
   }
 
   /**
+   * Return a gearbox of Kraken X44 brushless motors.
+   */
+  static constexpr DCMotor KrakenX44(int numMotors = 1) {
+    // From https://motors.ctr-electronics.com/dyno/dynometer-testing/
+    return DCMotor(12_V, 4.11_Nm, 279_A, 2_A, 7758_rpm, numMotors);
+  }
+
+  /**
+   * Return a gearbox of Kraken X44 brushless motors with FOC (Field-Oriented
+   * Control) enabled.
+   */
+  static constexpr DCMotor KrakenX44FOC(int numMotors = 1) {
+    // From https://motors.ctr-electronics.com/dyno/dynometer-testing/
+    return DCMotor(12_V, 5.01_Nm, 329_A, 2_A, 7368_rpm, numMotors);
+  }
+
+  /**
+   * Return a gearbox of Minion brushless motors.
+   */
+  static constexpr DCMotor Minion(int numMotors = 1) {
+    // From https://motors.ctr-electronics.com/dyno/dynometer-testing/
+    return DCMotor(12_V, 3.17_Nm, 211_A, 2_A, 7704_rpm, numMotors);
+  }
+
+  /**
    * Return a gearbox of Neo Vortex brushless motors.
    */
   static constexpr DCMotor NeoVortex(int numMotors = 1) {

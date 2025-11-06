@@ -1,0 +1,26 @@
+extra_includes:
+- wpi/sendable/SendableBuilder.h
+- frc/Compressor.h
+- frc/Solenoid.h
+- frc/DoubleSolenoid.h
+
+classes:
+  frc::Compressor:
+    ignored_bases:
+    - wpi::SendableHelper<Compressor>
+    methods:
+      Compressor:
+        overloads:
+          int, PneumaticsModuleType:
+          int, int, PneumaticsModuleType:
+      IsEnabled:
+      GetPressureSwitchValue:
+      GetCurrent:
+      GetAnalogVoltage:
+      GetPressure:
+      Disable:
+      EnableDigital:
+      EnableAnalog:
+      EnableHybrid:
+      GetConfigType:
+      InitSendable:

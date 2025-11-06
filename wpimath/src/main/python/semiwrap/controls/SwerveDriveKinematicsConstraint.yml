@@ -1,0 +1,38 @@
+defaults:
+  subpackage: constraint
+
+classes:
+  frc::SwerveDriveKinematicsConstraint:
+    template_params:
+    - size_t NumModules
+    typealias:
+    - frc::TrajectoryConstraint::MinMax
+    methods:
+      SwerveDriveKinematicsConstraint:
+      MaxVelocity:
+      MinMaxAcceleration:
+    template_inline_code: |
+      cls_SwerveDriveKinematicsConstraint
+        .def_static("fromFps", [](const frc::SwerveDriveKinematics<NumModules>& kinematics,
+                                  units::feet_per_second_t maxSpeed) {
+          return std::make_shared<frc::SwerveDriveKinematicsConstraint<NumModules>>(kinematics, maxSpeed);
+        }, py::arg("kinematics"), py::arg("maxSpeed"))
+      ;
+
+templates:
+  SwerveDrive2KinematicsConstraint:
+    qualname: frc::SwerveDriveKinematicsConstraint
+    params:
+    - 2
+  SwerveDrive3KinematicsConstraint:
+    qualname: frc::SwerveDriveKinematicsConstraint
+    params:
+    - 3
+  SwerveDrive4KinematicsConstraint:
+    qualname: frc::SwerveDriveKinematicsConstraint
+    params:
+    - 4
+  SwerveDrive6KinematicsConstraint:
+    qualname: frc::SwerveDriveKinematicsConstraint
+    params:
+    - 6
