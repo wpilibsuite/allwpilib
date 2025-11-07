@@ -428,4 +428,7 @@ class ExtendedKalmanFilter {
   StateMatrix m_initP;
 };
 
+template <int States, int Inputs, int Outputs>
+using EKF = ExtendedKalmanFilter<States, Inputs, Outputs>;
+
 }  // namespace wpi::math
