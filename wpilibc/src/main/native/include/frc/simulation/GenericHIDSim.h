@@ -112,14 +112,6 @@ class GenericHIDSim {
   void SetName(const char* name);
 
   /**
-   * Set the type of an axis.
-   *
-   * @param axis the axis
-   * @param type the type
-   */
-  void SetAxisType(int axis, int type);
-
-  /**
    * Read the output of a button.
    *
    * @param outputNumber the button number
