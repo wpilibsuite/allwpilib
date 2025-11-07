@@ -1,0 +1,162 @@
+if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxsystemcore')) {
+    return;
+}
+
+apply plugin: 'c'
+apply plugin: 'cpp'
+apply plugin: 'java'
+apply plugin: 'visual-studio'
+apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'edu.wpi.first.GradleJni'
+
+ext {
+    nativeName = 'mrcal'
+    baseId = nativeName
+    groupId = 'edu.wpi.first.mrcal'
+    devMain = 'edu.wpi.first.mrcal.DevMain'
+    useJava = true;
+}
+
+apply from: "${rootDir}/shared/config.gradle"
+apply from: "${rootDir}/shared/java/javacommon.gradle"
+apply from: "${rootDir}/shared/ceres.gradle"
+apply from: "${rootDir}/shared/opencv.gradle"
+
+nativeUtils.exportsConfigs {
+    mrcal {
+    }
+}
+
+// Suppress warnings
+nativeUtils.platformConfigs.each {
+    if (it.name.contains('windows')) {
+        it.cCompiler.args.add("/wd4047")
+        it.cCompiler.args.add("/wd4098")
+        it.cCompiler.args.add("/wd4267")
+        it.cppCompiler.args.add("/wd4068")
+        it.cppCompiler.args.add("/wd4101")
+        it.cppCompiler.args.add("/wd4200")
+        it.cppCompiler.args.add("/wd4576")
+        it.cppCompiler.args.add("/wd4715")
+    } else if (it.name.contains('osx')) {
+        it.cCompiler.args.add("-Wno-format-nonliteral")
+        it.cCompiler.args.remove("-pedantic")
+        it.cCompiler.args.add("-Wno-unused-variable")
+        it.cCompiler.args.add("-Wno-unused-function")
+        it.cCompiler.args.add("-Wno-sign-compare")
+        it.cppCompiler.args.add("-Wno-missing-field-initializers")
+        it.cppCompiler.args.remove("-pedantic")
+        it.cppCompiler.args.add("-Wno-unused-variable")
+        it.cppCompiler.args.add("-Wno-unused-function")
+        it.cppCompiler.args.add("-Wno-sign-compare")
+        it.cppCompiler.args.remove("-permissive")
+        it.cppCompiler.args.add("-fpermissive")
+        it.cppCompiler.args.add("-Wno-missing-braces")
+        it.cppCompiler.args.add("-Wno-null-conversion")
+        it.cppCompiler.args.add("-Wno-unused-but-set-variable")
+    } else {
+        it.cCompiler.args.add("-Wno-format-nonliteral")
+        it.cCompiler.args.remove("-pedantic")
+        it.cCompiler.args.add("-Wno-unused-variable")
+        it.cCompiler.args.add("-Wno-unused-function")
+        it.cCompiler.args.add("-Wno-sign-compare")
+        it.cppCompiler.args.add("-Wno-missing-field-initializers")
+        it.cppCompiler.args.remove("-pedantic")
+        it.cppCompiler.args.add("-Wno-unused-variable")
+        it.cppCompiler.args.add("-Wno-unused-function")
+        it.cppCompiler.args.add("-Wno-sign-compare")
+        it.cppCompiler.args.add("-Wno-deprecated-declarations")
+        it.cppCompiler.args.add("-Wno-deprecated-enum-enum-conversion")
+        it.cppCompiler.args.remove("-permissive")
+        it.cppCompiler.args.add("-fpermissive")
+    }
+}
+
+project(':').libraryBuild.dependsOn build
+
+model {
+    components {
+        "${nativeName}"(NativeLibrarySpec) {
+            sources {
+                c {
+                    source {
+                        srcDirs 'src/main/native/thirdparty/src'
+                        include '*.c'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/thirdparty/include', 'src/main/native/thirdparty/generated'
+                    }
+                }
+                cpp {
+                    source {
+                        srcDirs 'src/main/native/thirdparty/src', 'src/main/native/src', 'src/main/native/thirdparty/libdogleg/src'
+                        include '*.cpp'
+                        exclude '**/jni/**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/thirdparty/include', 'src/main/native/thirdparty/generated', 'src/main/native/include', 'src/main/native/thirdparty/libdogleg/include'
+                    }
+                }
+            }
+            binaries.all {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                    it.buildable = false
+                    return
+                }
+
+                if (it in SharedLibraryBinarySpec) {
+                    nativeUtils.useRequiredLibrary(it, 'opencv_shared')
+                } else {
+                    nativeUtils.useRequiredLibrary(it, 'opencv_static')
+                }
+                nativeUtils.useRequiredLibrary(it, 'ceres')
+
+                if (it.targetPlatform.operatingSystem.isMacOsX()) {
+                    it.linker.args  << '-framework' << 'Accelerate'
+                }
+            }
+        }
+        "${nativeName}JNIShared"(JniNativeLibrarySpec) {
+            baseName = nativeName + 'jni'
+
+            if (project.hasProperty('skipJniSymbols')) {
+                checkSkipSymbols = skipJniSymbols
+            }
+
+            enableCheckTask !project.hasProperty('skipJniCheck')
+            javaCompileTasks << compileJava
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm32)
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm64)
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/main/native/src'
+                        include '**/jni/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDir 'src/main/native/include/jni'
+                        include '**/*.h'
+                    }
+                }
+            }
+            binaries.all {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                    it.buildable = false
+                    return
+                }
+
+                if (it instanceof StaticLibraryBinarySpec) {
+                    it.buildable = false
+                    return
+                }
+                if (!project.hasProperty('noWpiutil')) {
+                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                }
+                lib library: "${nativeName}", linkage: 'shared'
+                nativeUtils.useRequiredLibrary(it, 'ceres')
+                nativeUtils.useRequiredLibrary(it, 'opencv_shared')
+            }
+        }
+    }
+}
+apply from: 'publish.gradle'

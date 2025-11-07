@@ -11,7 +11,13 @@ cppSrcFileInclude {
 
 modifiableFileExclude {
   cmake/toolchains/
-  thirdparty/
+  thirdparty/benchmark
+  thirdparty/catch2
+  thirdparty/eigen
+  thirdparty/apriltag
+  thirdparty/googletest
+  thirdparty/imgui_suite
+  thirdparty/mrcal/src/main/native/thirdparty
   \.patch$
   gradlew
   BUILD.bazel

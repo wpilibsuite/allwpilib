@@ -4703,7 +4703,7 @@ void optimizer_callback(// input state
 
         int splined_intrinsics_grad_irun = 0;
 
-        bool camera_at_identity = icam_extrinsics < 0;  
+        bool camera_at_identity = icam_extrinsics < 0;
         project(q_hypothesis.data(),
 
                 ctx->problem_selections.do_optimize_intrinsics_core || ctx->problem_selections.do_optimize_intrinsics_distortions ?
