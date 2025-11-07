@@ -10,61 +10,36 @@ import java.util.function.Consumer;
 import org.wpilib.annotation.NoDiscard;
 
 /**
- * Generic base class to represent mechanisms on a robot. Commands can require sole ownership of a
+ * Generic interface to represent mechanisms on a robot. Commands can require sole ownership of a
  * mechanism; when a command that requires a mechanism is running, no other commands may use it at
  * the same time.
  *
- * <p>Even though this class is named "Mechanism", it may be used to represent other physical
+ * <p>Unlike the Subsystem interface of commands v2, Mechanism does not need to be explicitly
+ * registered in the constructor.
+ *
+ * <p>Even though this interface is named "Mechanism", it may be used to represent other physical
  * hardware on a robot that should be controlled with commands - for example, an LED strip or a
  * vision processor that can switch between different pipelines could be represented as mechanisms.
  */
-public class Mechanism {
-  private final String m_name;
-
-  private final Scheduler m_registeredScheduler;
-
+public interface Mechanism {
   /**
-   * Creates a new mechanism registered with the default scheduler instance and named using the name
-   * of the class. Intended to be used by subclasses to get sane defaults without needing to
-   * manually declare a constructor.
-   */
-  @SuppressWarnings("this-escape")
-  protected Mechanism() {
-    m_name = getClass().getSimpleName();
-    m_registeredScheduler = Scheduler.getDefault();
-    setDefaultCommand(idle());
-  }
-
-  /**
-   * Creates a new mechanism, registered with the default scheduler instance.
+   * Returns the scheduler under which this subsystem and its default commands are registered. The
+   * scheduler is also used to fetch running commands for the subsystem.
    *
-   * @param name The name of the mechanism. Cannot be null.
+   * @return The registered scheduler.
    */
-  public Mechanism(String name) {
-    this(name, Scheduler.getDefault());
+  default Scheduler getRegisteredScheduler() {
+    return Scheduler.getDefault();
   }
 
   /**
-   * Creates a new mechanism, registered with the given scheduler instance.
-   *
-   * @param name The name of the mechanism. Cannot be null.
-   * @param scheduler The registered scheduler. Cannot be null.
-   */
-  @SuppressWarnings("this-escape")
-  public Mechanism(String name, Scheduler scheduler) {
-    m_name = name;
-    m_registeredScheduler = scheduler;
-    setDefaultCommand(idle());
-  }
-
-  /**
-   * Gets the name of this mechanism.
+   * Gets the name of this mechanism. This will default to the name of this mechanism's class.
    *
    * @return The name of the mechanism.
    */
   @NoDiscard
-  public String getName() {
-    return m_name;
+  default String getName() {
+    return getClass().getSimpleName();
   }
 
   /**
@@ -79,8 +54,8 @@ public class Mechanism {
    *
    * @param defaultCommand the new default command
    */
-  public void setDefaultCommand(Command defaultCommand) {
-    m_registeredScheduler.setDefaultCommand(this, defaultCommand);
+  default void setDefaultCommand(Command defaultCommand) {
+    getRegisteredScheduler().setDefaultCommand(this, defaultCommand);
   }
 
   /**
@@ -89,8 +64,8 @@ public class Mechanism {
    *
    * @return The currently configured default command
    */
-  public Command getDefaultCommand() {
-    return m_registeredScheduler.getDefaultCommandFor(this);
+  default Command getDefaultCommand() {
+    return getRegisteredScheduler().getDefaultCommandFor(this);
   }
 
   /**
@@ -99,7 +74,7 @@ public class Mechanism {
    * @param commandBody The main function body of the command.
    * @return The command builder, for further configuration.
    */
-  public NeedsNameBuilderStage run(Consumer<Coroutine> commandBody) {
+  default NeedsNameBuilderStage run(Consumer<Coroutine> commandBody) {
     return new StagedCommandBuilder().requiring(this).executing(commandBody);
   }
 
@@ -111,7 +86,7 @@ public class Mechanism {
    * @param loopBody The body of the infinite loop.
    * @return The command builder, for further configuration.
    */
-  public NeedsNameBuilderStage runRepeatedly(Runnable loopBody) {
+  default NeedsNameBuilderStage runRepeatedly(Runnable loopBody) {
     return run(
         coroutine -> {
           while (true) {
@@ -131,7 +106,7 @@ public class Mechanism {
    *
    * @return A new idle command.
    */
-  public Command idle() {
+  default Command idle() {
     return run(Coroutine::park).withPriority(Command.LOWEST_PRIORITY).named(getName() + "[IDLE]");
   }
 
@@ -141,7 +116,7 @@ public class Mechanism {
    * @param duration How long the mechanism should idle for.
    * @return A new idle command.
    */
-  public Command idleFor(Time duration) {
+  default Command idleFor(Time duration) {
     return idle().withTimeout(duration);
   }
 
@@ -154,12 +129,7 @@ public class Mechanism {
    * @return The currently running commands that require the mechanism.
    */
   @NoDiscard
-  public List<Command> getRunningCommands() {
-    return m_registeredScheduler.getRunningCommandsFor(this);
-  }
-
-  @Override
-  public String toString() {
-    return m_name;
+  default List<Command> getRunningCommands() {
+    return getRegisteredScheduler().getRunningCommandsFor(this);
   }
 }
