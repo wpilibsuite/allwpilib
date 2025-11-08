@@ -42,4 +42,4 @@
     #undef JSON_USE_LEGACY_DISCARDED_VALUE_COMPARISON
 #endif
 
-#include "wpi/util/thirdparty/hedley/hedley_undef.hpp"
+#include <wpi/util/thirdparty/hedley/hedley_undef.hpp>

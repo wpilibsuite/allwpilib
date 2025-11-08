@@ -69,7 +69,7 @@
 
 #ifdef _WIN32
 #include "wpi/util/WindowsError.hpp"
-#include "Windows/WindowsSupport.h"
+#include "Windows/WindowsSupport.hpp"
 #endif
 
 /*

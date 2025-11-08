@@ -17,13 +17,13 @@
 #include <string> // to_string
 #include <vector> // vector
 
-#include "wpi/util/detail/value_t.hpp"
-#include "wpi/util/detail/string_escape.hpp"
-#include "wpi/util/detail/input/position_t.hpp"
-#include "wpi/util/detail/macro_scope.hpp"
-#include "wpi/util/detail/meta/cpp_future.hpp"
-#include "wpi/util/detail/meta/type_traits.hpp"
-#include "wpi/util/detail/string_concat.hpp"
+#include <wpi/util/detail/value_t.hpp>
+#include <wpi/util/detail/string_escape.hpp>
+#include <wpi/util/detail/input/position_t.hpp>
+#include <wpi/util/detail/macro_scope.hpp>
+#include <wpi/util/detail/meta/cpp_future.hpp>
+#include <wpi/util/detail/meta/type_traits.hpp>
+#include <wpi/util/detail/string_concat.hpp>
 
 WPI_JSON_NAMESPACE_BEGIN
 namespace detail

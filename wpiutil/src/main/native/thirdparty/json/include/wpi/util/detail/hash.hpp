@@ -12,8 +12,8 @@
 #include <cstddef> // size_t
 #include <functional> // hash
 
-#include "wpi/util/detail/abi_macros.hpp"
-#include "wpi/util/detail/value_t.hpp"
+#include <wpi/util/detail/abi_macros.hpp>
+#include <wpi/util/detail/value_t.hpp>
 
 WPI_JSON_NAMESPACE_BEGIN
 namespace detail

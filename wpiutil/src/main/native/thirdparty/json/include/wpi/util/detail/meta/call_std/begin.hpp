@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "wpi/util/detail/macro_scope.hpp"
+#include <wpi/util/detail/macro_scope.hpp>
 
 WPI_JSON_NAMESPACE_BEGIN
 

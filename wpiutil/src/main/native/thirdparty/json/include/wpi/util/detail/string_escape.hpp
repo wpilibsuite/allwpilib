@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "wpi/util/detail/abi_macros.hpp"
+#include <wpi/util/detail/abi_macros.hpp>
 
 WPI_JSON_NAMESPACE_BEGIN
 namespace detail

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "wpi/util/SmallVector.hpp"
+#include <wpi/util/SmallVector.hpp>
 
 namespace gch {
 
