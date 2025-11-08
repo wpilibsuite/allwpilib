@@ -4,13 +4,12 @@
 
 #include "RobotContainer.hpp"
 
-#include <wpi/commands2/button/JoystickButton.hpp>
-#include <wpi/smartdashboard/SmartDashboard.hpp>
-
 #include "commands/DefaultDrive.hpp"
 #include "commands/GrabHatch.hpp"
 #include "commands/HalveDriveSpeed.hpp"
 #include "commands/ReleaseHatch.hpp"
+#include "wpi/commands2/button/JoystickButton.hpp"
+#include "wpi/smartdashboard/SmartDashboard.hpp"
 
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here

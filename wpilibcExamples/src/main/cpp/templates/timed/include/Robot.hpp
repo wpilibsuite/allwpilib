@@ -6,8 +6,8 @@
 
 #include <string>
 
-#include <wpi/framework/TimedRobot.hpp>
-#include <wpi/smartdashboard/SendableChooser.hpp>
+#include "wpi/framework/TimedRobot.hpp"
+#include "wpi/smartdashboard/SendableChooser.hpp"
 
 class Robot : public wpi::TimedRobot {
  public:

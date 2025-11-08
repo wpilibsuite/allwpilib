@@ -41,5 +41,4 @@ includeOtherLibs {
   ^imgui
   ^support/
   ^tcpsockets/
-  ^wpi/net/
 }

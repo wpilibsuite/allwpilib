@@ -4,10 +4,9 @@
 
 #pragma once
 
-#include <wpi/commands2/Command.hpp>
-#include <wpi/commands2/CommandHelper.hpp>
-
 #include "subsystems/DriveSubsystem.hpp"
+#include "wpi/commands2/Command.hpp"
+#include "wpi/commands2/CommandHelper.hpp"
 
 class HalveDriveSpeed
     : public wpi::cmd::CommandHelper<wpi::cmd::Command, HalveDriveSpeed> {

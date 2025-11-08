@@ -4,12 +4,11 @@
 
 #pragma once
 
-#include <wpi/commands2/Command.hpp>
-#include <wpi/commands2/CommandHelper.hpp>
-#include <wpi/system/Timer.hpp>
-#include <wpi/units/time.hpp>
-
 #include "subsystems/Drivetrain.hpp"
+#include "wpi/commands2/Command.hpp"
+#include "wpi/commands2/CommandHelper.hpp"
+#include "wpi/system/Timer.hpp"
+#include "wpi/units/time.hpp"
 
 class TurnTime : public wpi::cmd::CommandHelper<wpi::cmd::Command, TurnTime> {
  public:

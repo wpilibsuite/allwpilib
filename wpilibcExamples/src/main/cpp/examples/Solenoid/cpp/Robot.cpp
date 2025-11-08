@@ -4,8 +4,8 @@
 
 #include "Robot.hpp"
 
-#include <wpi/smartdashboard/SmartDashboard.hpp>
-#include <wpi/units/pressure.hpp>
+#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/units/pressure.hpp"
 
 Robot::Robot() {
   // Publish elements to shuffleboard.

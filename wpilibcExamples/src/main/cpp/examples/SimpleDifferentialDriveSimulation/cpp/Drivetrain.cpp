@@ -4,7 +4,7 @@
 
 #include "Drivetrain.hpp"
 
-#include <wpi/system/RobotController.hpp>
+#include "wpi/system/RobotController.hpp"
 
 void Drivetrain::SetSpeeds(
     const wpi::math::DifferentialDriveWheelSpeeds& speeds) {

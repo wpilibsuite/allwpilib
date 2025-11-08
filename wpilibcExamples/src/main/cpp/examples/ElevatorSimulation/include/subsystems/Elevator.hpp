@@ -4,22 +4,21 @@
 
 #pragma once
 
-#include <wpi/hardware/motor/PWMSparkMax.hpp>
-#include <wpi/hardware/rotation/Encoder.hpp>
-#include <wpi/math/controller/ElevatorFeedforward.hpp>
-#include <wpi/math/controller/PIDController.hpp>
-#include <wpi/math/controller/ProfiledPIDController.hpp>
-#include <wpi/simulation/BatterySim.hpp>
-#include <wpi/simulation/ElevatorSim.hpp>
-#include <wpi/simulation/EncoderSim.hpp>
-#include <wpi/simulation/PWMMotorControllerSim.hpp>
-#include <wpi/simulation/RoboRioSim.hpp>
-#include <wpi/smartdashboard/Mechanism2d.hpp>
-#include <wpi/smartdashboard/MechanismLigament2d.hpp>
-#include <wpi/smartdashboard/MechanismRoot2d.hpp>
-#include <wpi/units/length.hpp>
-
 #include "Constants.hpp"
+#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/math/controller/ElevatorFeedforward.hpp"
+#include "wpi/math/controller/PIDController.hpp"
+#include "wpi/math/controller/ProfiledPIDController.hpp"
+#include "wpi/simulation/BatterySim.hpp"
+#include "wpi/simulation/ElevatorSim.hpp"
+#include "wpi/simulation/EncoderSim.hpp"
+#include "wpi/simulation/PWMMotorControllerSim.hpp"
+#include "wpi/simulation/RoboRioSim.hpp"
+#include "wpi/smartdashboard/Mechanism2d.hpp"
+#include "wpi/smartdashboard/MechanismLigament2d.hpp"
+#include "wpi/smartdashboard/MechanismRoot2d.hpp"
+#include "wpi/units/length.hpp"
 
 class Elevator {
  public:

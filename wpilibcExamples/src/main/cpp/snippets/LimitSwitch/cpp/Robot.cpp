@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <wpi/driverstation/Joystick.hpp>
-#include <wpi/framework/TimedRobot.hpp>
-#include <wpi/hardware/discrete/DigitalInput.hpp>
-#include <wpi/hardware/motor/PWMVictorSPX.hpp>
-#include <wpi/hardware/rotation/Encoder.hpp>
+#include "wpi/driverstation/Joystick.hpp"
+#include "wpi/framework/TimedRobot.hpp"
+#include "wpi/hardware/discrete/DigitalInput.hpp"
+#include "wpi/hardware/motor/PWMVictorSPX.hpp"
+#include "wpi/hardware/rotation/Encoder.hpp"
 
 /**
  * Limit Switch snippets for frc-docs.

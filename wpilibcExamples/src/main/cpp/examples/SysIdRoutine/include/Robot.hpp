@@ -6,10 +6,9 @@
 
 #include <optional>
 
-#include <wpi/commands2/CommandPtr.hpp>
-#include <wpi/framework/TimedRobot.hpp>
-
 #include "SysIdRoutineBot.hpp"
+#include "wpi/commands2/CommandPtr.hpp"
+#include "wpi/framework/TimedRobot.hpp"
 
 class Robot : public wpi::TimedRobot {
  public:

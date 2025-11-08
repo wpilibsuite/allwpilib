@@ -4,10 +4,9 @@
 
 #include "RobotContainer.hpp"
 
-#include <wpi/commands2/button/Trigger.hpp>
-
 #include "commands/Autos.hpp"
 #include "commands/ExampleCommand.hpp"
+#include "wpi/commands2/button/Trigger.hpp"
 
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here

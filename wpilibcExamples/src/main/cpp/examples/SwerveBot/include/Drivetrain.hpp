@@ -6,12 +6,11 @@
 
 #include <numbers>
 
-#include <wpi/hardware/imu/OnboardIMU.hpp>
-#include <wpi/math/geometry/Translation2d.hpp>
-#include <wpi/math/kinematics/SwerveDriveKinematics.hpp>
-#include <wpi/math/kinematics/SwerveDriveOdometry.hpp>
-
 #include "SwerveModule.hpp"
+#include "wpi/hardware/imu/OnboardIMU.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
+#include "wpi/math/kinematics/SwerveDriveOdometry.hpp"
 
 /**
  * Represents a swerve drive style drivetrain.

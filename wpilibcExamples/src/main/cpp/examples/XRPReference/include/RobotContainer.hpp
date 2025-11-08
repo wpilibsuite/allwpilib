@@ -4,18 +4,17 @@
 
 #pragma once
 
-#include <wpi/commands2/Command.hpp>
-#include <wpi/commands2/CommandPtr.hpp>
-#include <wpi/commands2/button/Trigger.hpp>
-#include <wpi/driverstation/Joystick.hpp>
-#include <wpi/smartdashboard/SendableChooser.hpp>
-#include <wpi/xrp/XRPOnBoardIO.hpp>
-
 #include "Constants.hpp"
 #include "commands/AutonomousDistance.hpp"
 #include "commands/AutonomousTime.hpp"
 #include "subsystems/Arm.hpp"
 #include "subsystems/Drivetrain.hpp"
+#include "wpi/commands2/Command.hpp"
+#include "wpi/commands2/CommandPtr.hpp"
+#include "wpi/commands2/button/Trigger.hpp"
+#include "wpi/driverstation/Joystick.hpp"
+#include "wpi/smartdashboard/SendableChooser.hpp"
+#include "wpi/xrp/XRPOnBoardIO.hpp"
 
 /**
  * This class is where the bulk of the robot should be declared.  Since

@@ -4,9 +4,8 @@
 
 #include "commands/Autos.hpp"
 
-#include <wpi/commands2/Commands.hpp>
-
 #include "commands/ExampleCommand.hpp"
+#include "wpi/commands2/Commands.hpp"
 
 wpi::cmd::CommandPtr autos::ExampleAuto(ExampleSubsystem* subsystem) {
   return wpi::cmd::cmd::Sequence(subsystem->ExampleMethodCommand(),

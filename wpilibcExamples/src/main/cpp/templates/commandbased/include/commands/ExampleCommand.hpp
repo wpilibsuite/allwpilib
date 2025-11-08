@@ -4,10 +4,9 @@
 
 #pragma once
 
-#include <wpi/commands2/Command.hpp>
-#include <wpi/commands2/CommandHelper.hpp>
-
 #include "subsystems/ExampleSubsystem.hpp"
+#include "wpi/commands2/Command.hpp"
+#include "wpi/commands2/CommandHelper.hpp"
 
 /**
  * An example command that uses an example subsystem.

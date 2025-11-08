@@ -4,12 +4,11 @@
 
 #pragma once
 
-#include <wpi/commands2/CommandPtr.hpp>
-#include <wpi/commands2/button/CommandXboxController.hpp>
-
 #include "Constants.hpp"
 #include "subsystems/Drive.hpp"
 #include "subsystems/Shooter.hpp"
+#include "wpi/commands2/CommandPtr.hpp"
+#include "wpi/commands2/button/CommandXboxController.hpp"
 
 class SysIdRoutineBot {
  public:

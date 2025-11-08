@@ -4,17 +4,16 @@
 
 #include <numbers>
 
-#include <wpi/driverstation/Joystick.hpp>
-#include <wpi/framework/TimedRobot.hpp>
-#include <wpi/math/controller/SimpleMotorFeedforward.hpp>
-#include <wpi/math/trajectory/TrapezoidProfile.hpp>
-#include <wpi/units/acceleration.hpp>
-#include <wpi/units/length.hpp>
-#include <wpi/units/time.hpp>
-#include <wpi/units/velocity.hpp>
-#include <wpi/units/voltage.hpp>
-
 #include "ExampleSmartMotorController.hpp"
+#include "wpi/driverstation/Joystick.hpp"
+#include "wpi/framework/TimedRobot.hpp"
+#include "wpi/math/controller/SimpleMotorFeedforward.hpp"
+#include "wpi/math/trajectory/TrapezoidProfile.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
+#include "wpi/units/voltage.hpp"
 
 class Robot : public wpi::TimedRobot {
  public:

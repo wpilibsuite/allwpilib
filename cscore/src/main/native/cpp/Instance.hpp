@@ -8,8 +8,6 @@
 #include <memory>
 #include <utility>
 
-#include <wpi/net/EventLoopRunner.hpp>
-
 #include "Log.hpp"
 #include "NetworkListener.hpp"
 #include "Notifier.hpp"
@@ -18,6 +16,7 @@
 #include "Telemetry.hpp"
 #include "UnlimitedHandleResource.hpp"
 #include "UsbCameraListener.hpp"
+#include "wpi/net/EventLoopRunner.hpp"
 #include "wpi/util/Logger.hpp"
 
 namespace wpi::cs {

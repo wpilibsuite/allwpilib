@@ -12,11 +12,10 @@
 #include <thread>
 #include <vector>
 
-#include <wpi/net/NetworkAcceptor.hpp>
-#include <wpi/net/NetworkStream.hpp>
-#include <wpi/net/raw_socket_ostream.hpp>
-
 #include "SinkImpl.hpp"
+#include "wpi/net/NetworkAcceptor.hpp"
+#include "wpi/net/NetworkStream.hpp"
+#include "wpi/net/raw_socket_ostream.hpp"
 #include "wpi/util/SafeThread.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/raw_istream.hpp"

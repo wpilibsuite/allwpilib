@@ -4,11 +4,10 @@
 
 #pragma once
 
-#include <wpi/driverstation/Joystick.hpp>
-#include <wpi/framework/TimedRobot.hpp>
-
 #include "Constants.hpp"
 #include "subsystems/Intake.hpp"
+#include "wpi/driverstation/Joystick.hpp"
+#include "wpi/framework/TimedRobot.hpp"
 
 class Robot : public wpi::TimedRobot {
  public:

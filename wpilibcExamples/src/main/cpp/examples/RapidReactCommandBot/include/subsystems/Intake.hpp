@@ -6,12 +6,11 @@
 
 #include <functional>
 
-#include <wpi/commands2/CommandPtr.hpp>
-#include <wpi/commands2/SubsystemBase.hpp>
-#include <wpi/hardware/motor/PWMSparkMax.hpp>
-#include <wpi/hardware/pneumatic/DoubleSolenoid.hpp>
-
 #include "Constants.hpp"
+#include "wpi/commands2/CommandPtr.hpp"
+#include "wpi/commands2/SubsystemBase.hpp"
+#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
 
 class Intake : public wpi::cmd::SubsystemBase {
  public:
