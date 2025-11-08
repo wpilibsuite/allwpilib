@@ -10,7 +10,9 @@ def copy_upstream_src(wpilib_root: Path):
     wpiutil = wpilib_root / "wpiutil"
 
     # Copy expected header into allwpilib
-    dest_filename = wpiutil / "src/main/native/thirdparty/expected/include/wpi/expected"
+    dest_filename = (
+        wpiutil / "src/main/native/thirdparty/expected/include/wpi/util/expected"
+    )
     shutil.copyfile("include/tl/expected.hpp", dest_filename)
 
     # Rename namespace from tl to wpi, and detail to detail_expected

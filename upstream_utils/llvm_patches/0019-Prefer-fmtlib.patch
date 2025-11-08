@@ -8,7 +8,7 @@ Subject: [PATCH 19/36] Prefer fmtlib
  1 file changed, 6 insertions(+), 14 deletions(-)
 
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index d0fd67bd3c0d4cf33922cdda042531424d277951..b66f4a0d71f4897821084dc05a278d7c5194a847 100644
+index d0fd67bd3c0d4cf33922cdda042531424d277951..2f160c45b47cf57bb28f6393dd56cde06089639b 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -22,7 +22,7 @@
@@ -16,7 +16,7 @@ index d0fd67bd3c0d4cf33922cdda042531424d277951..b66f4a0d71f4897821084dc05a278d7c
  #include "llvm/Support/Threading.h"
  #include "llvm/Support/WindowsError.h"
 -#include "llvm/Support/raw_ostream.h"
-+#include "wpi/print.h"
++#include "wpi/util/print.hpp"
  #include <cassert>
  #include <cstdlib>
  #include <mutex>
