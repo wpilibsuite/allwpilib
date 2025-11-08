@@ -6,11 +6,10 @@
 
 #include <utility>
 
-#include "wpi/util/MessagePack.hpp"
-#include "wpi/util/StringExtras.hpp"
-
 #include "PubSubOptions.hpp"
 #include "server/MessagePackWriter.hpp"
+#include "wpi/util/MessagePack.hpp"
+#include "wpi/util/StringExtras.hpp"
 
 using namespace nt;
 using namespace nt::server;

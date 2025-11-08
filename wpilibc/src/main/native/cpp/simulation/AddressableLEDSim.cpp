@@ -8,7 +8,6 @@
 #include <stdexcept>
 
 #include "wpi/hal/simulation/AddressableLEDData.h"
-
 #include "wpi/hardware/led/AddressableLED.hpp"
 
 using namespace frc;

@@ -3,9 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/hal/HALBase.h"
-#include "wpi/util/print.hpp"
-
 #include "wpi/system/WPILibVersion.hpp"
+#include "wpi/util/print.hpp"
 
 int main() {
   wpi::print("Hello World\n");

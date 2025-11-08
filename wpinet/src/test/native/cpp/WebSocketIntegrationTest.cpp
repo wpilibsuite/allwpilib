@@ -6,9 +6,8 @@
 
 #include <vector>
 
-#include "wpi/util/SmallString.hpp"
-
 #include "WebSocketTest.hpp"
+#include "wpi/util/SmallString.hpp"
 
 namespace wpi {
 

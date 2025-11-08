@@ -12,9 +12,9 @@
 #include <string_view>
 
 #include <Dshow.h>
-#include "wpi/util/mutex.hpp"
 
 #include "PropertyImpl.hpp"
+#include "wpi/util/mutex.hpp"
 
 namespace cs {
 

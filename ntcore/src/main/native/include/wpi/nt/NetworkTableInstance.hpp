@@ -11,13 +11,12 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/util/protobuf/Protobuf.hpp"
-#include "wpi/util/struct/Struct.hpp"
-
 #include "wpi/nt/NetworkTable.hpp"
 #include "wpi/nt/NetworkTableEntry.hpp"
 #include "wpi/nt/ntcore_c.h"
 #include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/protobuf/Protobuf.hpp"
+#include "wpi/util/struct/Struct.hpp"
 
 namespace nt {
 

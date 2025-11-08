@@ -9,11 +9,10 @@
 #include <string_view>
 #include <utility>
 
+#include "server/ServerTopic.hpp"
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/UidVector.hpp"
 #include "wpi/util/json_fwd.hpp"
-
-#include "server/ServerTopic.hpp"
 
 namespace wpi {
 class Logger;

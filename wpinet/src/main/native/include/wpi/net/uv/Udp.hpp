@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef WPINET_UV_UDP_H_
-#define WPINET_UV_UDP_H_
+#ifndef WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_UDP_HPP_
+#define WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_UDP_HPP_
 
 #include <uv.h>
 
@@ -13,10 +13,9 @@
 #include <string_view>
 #include <utility>
 
-#include "wpi/util/Signal.h"
-
 #include "wpi/net/uv/Handle.hpp"
 #include "wpi/net/uv/Request.hpp"
+#include "wpi/util/Signal.h"
 
 namespace wpi::uv {
 
@@ -396,4 +395,4 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
 
 }  // namespace wpi::uv
 
-#endif  // WPINET_UV_UDP_H_
+#endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_UDP_HPP_

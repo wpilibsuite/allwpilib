@@ -4,12 +4,11 @@
 
 #pragma once
 
-#include "wpi/util/SymbolExports.hpp"
-
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/velocity.hpp"
+#include "wpi/util/SymbolExports.hpp"
 
 namespace frc {
 /**

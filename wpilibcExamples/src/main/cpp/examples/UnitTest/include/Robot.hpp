@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "wpi/driverstation/Joystick.hpp"
-#include "wpi/opmode/TimedRobot.hpp"
+#include <wpi/driverstation/Joystick.hpp>
+#include <wpi/opmode/TimedRobot.hpp>
 
 #include "Constants.hpp"
 #include "subsystems/Intake.hpp"

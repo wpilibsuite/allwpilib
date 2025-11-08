@@ -7,7 +7,6 @@
 #include <memory>
 
 #include "wpi/hal/simulation/PWMData.h"
-
 #include "wpi/hardware/discrete/PWM.hpp"
 #include "wpi/hardware/motor/PWMMotorController.hpp"
 

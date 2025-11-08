@@ -6,10 +6,10 @@
 
 #include <memory>
 
-#include "wpi/system/Errors.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
 #include "wpi/simulation/CTREPCMSim.hpp"
 #include "wpi/simulation/REVPHSim.hpp"
+#include "wpi/system/Errors.hpp"
 
 using namespace frc;
 using namespace frc::sim;

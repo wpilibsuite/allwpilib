@@ -8,10 +8,10 @@
 #include <string>
 
 #include <fmt/format.h>
-#include "wpi/util/print.hpp"
-#include "wpi/net/raw_uv_ostream.hpp"
 
 #include "wpi/halsim/ws_client/HALSimWS.hpp"
+#include "wpi/net/raw_uv_ostream.hpp"
+#include "wpi/util/print.hpp"
 
 namespace uv = wpi::uv;
 

@@ -4,7 +4,7 @@
 
 #include "Robot.hpp"
 
-#include "wpi/driverstation/DriverStation.hpp"
+#include <wpi/driverstation/DriverStation.hpp>
 
 void Robot::RobotPeriodic() {
   // pull alliance port high if on red alliance, pull low if on blue alliance

@@ -6,8 +6,8 @@
 
 #include <functional>
 
-#include "wpi/commands2/Command.hpp"
-#include "wpi/commands2/CommandHelper.hpp"
+#include <wpi/commands2/Command.hpp>
+#include <wpi/commands2/CommandHelper.hpp>
 
 #include "subsystems/DriveSubsystem.hpp"
 

@@ -11,13 +11,13 @@
 #include <utility>
 
 #include <fmt/format.h>
-#include "wpi/util/Logger.hpp"
 
 #include "wpi/net/uv/GetAddrInfo.hpp"
 #include "wpi/net/uv/Loop.hpp"
 #include "wpi/net/uv/Tcp.hpp"
 #include "wpi/net/uv/Timer.hpp"
 #include "wpi/net/uv/util.hpp"
+#include "wpi/util/Logger.hpp"
 
 using namespace wpi;
 

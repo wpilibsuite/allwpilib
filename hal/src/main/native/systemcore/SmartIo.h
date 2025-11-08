@@ -6,11 +6,10 @@
 
 #include <string>
 
-#include "wpi/nt/IntegerTopic.hpp"
-
 #include "PortsInternal.h"
 #include "wpi/hal/handles/DigitalHandleResource.h"
 #include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/nt/IntegerTopic.hpp"
 
 namespace hal {
 

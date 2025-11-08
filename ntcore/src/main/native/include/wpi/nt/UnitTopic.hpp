@@ -9,10 +9,9 @@
 #include <string_view>
 #include <vector>
 
-#include "wpi/util/json.hpp"
-
 #include "wpi/nt/Topic.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/json.hpp"
 
 namespace nt {
 

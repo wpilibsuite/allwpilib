@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
+
 #include "wpi/hal/HALBase.h"
 
 int main(int argc, char** argv) {

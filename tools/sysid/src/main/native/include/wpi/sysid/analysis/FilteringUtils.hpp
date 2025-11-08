@@ -14,13 +14,13 @@
 
 #include <fmt/format.h>
 #include <fmt/ranges.h>
+
 #include "wpi/math/filter/LinearFilter.hpp"
+#include "wpi/sysid/analysis/AnalysisManager.hpp"
+#include "wpi/sysid/analysis/Storage.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/array.hpp"
-
-#include "wpi/sysid/analysis/AnalysisManager.hpp"
-#include "wpi/sysid/analysis/Storage.hpp"
 
 namespace sysid {
 

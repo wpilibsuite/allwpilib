@@ -6,6 +6,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+
 #include "wpi/util/json.hpp"
 
 namespace tag {

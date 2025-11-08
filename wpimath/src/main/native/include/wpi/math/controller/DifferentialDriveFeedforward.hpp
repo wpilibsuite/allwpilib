@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include "wpi/util/SymbolExports.hpp"
-
 #include "wpi/math/controller/DifferentialDriveWheelVoltages.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/math/system/plant/LinearSystemId.hpp"
@@ -16,6 +14,7 @@
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
 #include "wpi/units/voltage.hpp"
+#include "wpi/util/SymbolExports.hpp"
 
 namespace frc {
 /**

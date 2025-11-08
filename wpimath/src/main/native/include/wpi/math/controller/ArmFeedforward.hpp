@@ -6,14 +6,13 @@
 
 #include <cstdlib>
 
-#include "wpi/util/MathExtras.hpp"
-#include "wpi/util/SymbolExports.hpp"
-
+#include "wpi/math/util/MathShared.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/math.hpp"
 #include "wpi/units/voltage.hpp"
-#include "wpi/math/util/MathShared.hpp"
+#include "wpi/util/MathExtras.hpp"
+#include "wpi/util/SymbolExports.hpp"
 
 namespace frc {
 /**

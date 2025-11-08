@@ -9,6 +9,7 @@
 #include <utility>
 
 #include <fmt/format.h>
+
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/timestamp.h"
 

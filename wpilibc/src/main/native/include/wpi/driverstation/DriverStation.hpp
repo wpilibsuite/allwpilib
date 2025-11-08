@@ -4,12 +4,11 @@
 
 #pragma once
 
-#include "wpi/math/geometry/Rotation2d.hpp"
-
 #include <optional>
 #include <string>
 
 #include "wpi/hal/DriverStationTypes.h"
+#include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/Synchronization.h"
 

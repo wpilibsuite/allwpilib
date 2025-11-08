@@ -12,7 +12,6 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include "wpi/units/math.hpp"
 
 #include "wpi/sysid/Util.hpp"
 #include "wpi/sysid/analysis/AnalysisManager.hpp"
@@ -20,6 +19,7 @@
 #include "wpi/sysid/analysis/ElevatorSim.hpp"
 #include "wpi/sysid/analysis/FilteringUtils.hpp"
 #include "wpi/sysid/analysis/SimpleMotorSim.hpp"
+#include "wpi/units/math.hpp"
 
 using namespace sysid;
 

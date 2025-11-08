@@ -2,12 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_HANDLE_H_
-#define CSCORE_HANDLE_H_
-
-#include "wpi/util/Synchronization.h"
+#ifndef CSCORE_HANDLE_HPP_
+#define CSCORE_HANDLE_HPP_
 
 #include "wpi/cs/cscore_c.h"
+#include "wpi/util/Synchronization.h"
 
 namespace cs {
 
@@ -66,4 +65,4 @@ class Handle {
 
 }  // namespace cs
 
-#endif  // CSCORE_HANDLE_H_
+#endif  // CSCORE_HANDLE_HPP_

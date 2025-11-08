@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef WPIUTIL_WPI_TIMESTAMP_H_
-#define WPIUTIL_WPI_TIMESTAMP_H_
+#ifndef WPIUTIL_WPI_UTIL_TIMESTAMP_H_
+#define WPIUTIL_WPI_UTIL_TIMESTAMP_H_
 
 #include <stdint.h>
 
@@ -86,4 +86,4 @@ uint64_t GetSystemTime();
 }  // namespace wpi
 #endif
 
-#endif  // WPIUTIL_WPI_TIMESTAMP_H_
+#endif  // WPIUTIL_WPI_UTIL_TIMESTAMP_H_

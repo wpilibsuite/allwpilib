@@ -7,9 +7,8 @@
 #include <bit>
 #include <utility>
 
-#include "wpi/util/Endian.hpp"
-
 #include "wpi/datalog/DataLog.hpp"
+#include "wpi/util/Endian.hpp"
 
 using namespace wpi::log;
 

@@ -9,9 +9,9 @@
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
+#include "mockdata/REVPHDataInternal.h"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/handles/IndexedHandleResource.h"
-#include "mockdata/REVPHDataInternal.h"
 
 using namespace hal;
 

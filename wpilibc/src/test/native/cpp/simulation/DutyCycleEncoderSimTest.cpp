@@ -5,9 +5,9 @@
 #include "wpi/simulation/DutyCycleEncoderSim.hpp"  // NOLINT(build/include_order)
 
 #include <gtest/gtest.h>
-#include "wpi/hal/HAL.h"
 
 #include "callback_helpers/TestCallbackHelpers.hpp"
+#include "wpi/hal/HAL.h"
 #include "wpi/hardware/rotation/DutyCycleEncoder.hpp"
 
 namespace frc::sim {

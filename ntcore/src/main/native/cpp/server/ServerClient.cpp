@@ -6,11 +6,10 @@
 
 #include <utility>
 
-#include "wpi/util/MessagePack.hpp"
-
 #include "server/MessagePackWriter.hpp"
 #include "server/ServerPublisher.hpp"
 #include "server/ServerStorage.hpp"
+#include "wpi/util/MessagePack.hpp"
 
 using namespace nt::server;
 using namespace mpack;

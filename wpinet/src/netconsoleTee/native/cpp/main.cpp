@@ -8,10 +8,6 @@
 #include <string>
 
 #include <fmt/format.h>
-#include "wpi/util/SmallVector.hpp"
-#include "wpi/util/StringExtras.hpp"
-#include "wpi/util/print.hpp"
-#include "wpi/util/timestamp.h"
 
 #include "wpi/net/raw_uv_ostream.hpp"
 #include "wpi/net/uv/Loop.hpp"
@@ -19,6 +15,10 @@
 #include "wpi/net/uv/Tty.hpp"
 #include "wpi/net/uv/Udp.hpp"
 #include "wpi/net/uv/util.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/print.hpp"
+#include "wpi/util/timestamp.h"
 
 namespace uv = wpi::uv;
 

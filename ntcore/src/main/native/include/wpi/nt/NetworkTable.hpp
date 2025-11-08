@@ -12,14 +12,13 @@
 #include <utility>
 #include <vector>
 
+#include "wpi/nt/NetworkTableEntry.hpp"
+#include "wpi/nt/Topic.hpp"
+#include "wpi/nt/ntcore_c.h"
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
 #include "wpi/util/struct/Struct.hpp"
-
-#include "wpi/nt/NetworkTableEntry.hpp"
-#include "wpi/nt/Topic.hpp"
-#include "wpi/nt/ntcore_c.h"
 
 namespace nt {
 

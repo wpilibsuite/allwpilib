@@ -15,9 +15,8 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/util/DecayedDerivedFrom.hpp"
-
 #include "wpi/commands2/CommandHelper.hpp"
+#include "wpi/util/DecayedDerivedFrom.hpp"
 
 namespace frc2 {
 

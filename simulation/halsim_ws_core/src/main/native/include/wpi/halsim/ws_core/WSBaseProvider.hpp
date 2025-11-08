@@ -9,9 +9,8 @@
 #include <string>
 #include <string_view>
 
-#include "wpi/util/json.hpp"
-
 #include "wpi/halsim/ws_core/HALSimBaseWebSocketConnection.hpp"
+#include "wpi/util/json.hpp"
 
 namespace wpilibws {
 

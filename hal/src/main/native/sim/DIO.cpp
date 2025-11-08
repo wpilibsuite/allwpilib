@@ -8,10 +8,10 @@
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
-#include "wpi/hal/handles/HandlesInternal.h"
-#include "wpi/hal/handles/LimitedHandleResource.h"
 #include "mockdata/DIODataInternal.h"
 #include "mockdata/DigitalPWMDataInternal.h"
+#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/hal/handles/LimitedHandleResource.h"
 
 using namespace hal;
 

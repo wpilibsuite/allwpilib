@@ -11,13 +11,12 @@
 #include "wpi/hal/HALBase.h"
 #include "wpi/hal/Main.h"
 #include "wpi/nt/NetworkTable.hpp"
+#include "wpi/system/Errors.hpp"
+#include "wpi/system/RuntimeType.hpp"
 #include "wpi/util/RuntimeCheck.h"
 #include "wpi/util/condition_variable.hpp"
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/string.h"
-
-#include "wpi/system/Errors.hpp"
-#include "wpi/system/RuntimeType.hpp"
 
 namespace frc {
 

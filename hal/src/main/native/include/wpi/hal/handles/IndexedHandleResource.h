@@ -9,11 +9,10 @@
 #include <array>
 #include <memory>
 
-#include "wpi/util/mutex.hpp"
-
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/Types.h"
 #include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/util/mutex.hpp"
 
 namespace hal {
 

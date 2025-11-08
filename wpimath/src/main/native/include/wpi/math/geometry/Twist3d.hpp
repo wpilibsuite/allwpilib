@@ -4,11 +4,10 @@
 
 #pragma once
 
-#include "wpi/util/SymbolExports.hpp"
-
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/math.hpp"
+#include "wpi/util/SymbolExports.hpp"
 
 namespace frc {
 

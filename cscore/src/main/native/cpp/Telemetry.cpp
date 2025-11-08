@@ -7,13 +7,12 @@
 #include <chrono>
 #include <utility>
 
-#include "wpi/util/DenseMap.hpp"
-#include "wpi/util/timestamp.h"
-
 #include "Handle.hpp"
 #include "Instance.hpp"
 #include "Notifier.hpp"
 #include "SourceImpl.hpp"
+#include "wpi/util/DenseMap.hpp"
+#include "wpi/util/timestamp.h"
 
 using namespace cs;
 

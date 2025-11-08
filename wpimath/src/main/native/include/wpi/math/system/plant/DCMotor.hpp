@@ -4,13 +4,12 @@
 
 #pragma once
 
-#include "wpi/util/SymbolExports.hpp"
-
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/current.hpp"
 #include "wpi/units/impedance.hpp"
 #include "wpi/units/torque.hpp"
 #include "wpi/units/voltage.hpp"
+#include "wpi/util/SymbolExports.hpp"
 
 namespace frc {
 

@@ -6,9 +6,8 @@
 
 #include <utility>
 
-#include "wpi/math/filter/Debouncer.hpp"
-
 #include "wpi/commands2/CommandPtr.hpp"
+#include "wpi/math/filter/Debouncer.hpp"
 
 using namespace frc;
 using namespace frc2;

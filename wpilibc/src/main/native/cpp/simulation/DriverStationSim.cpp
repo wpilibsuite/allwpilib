@@ -6,11 +6,10 @@
 
 #include <memory>
 
+#include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/hal/simulation/MockHooks.h"
-
-#include "wpi/driverstation/DriverStation.hpp"
 
 using namespace frc;
 using namespace frc::sim;

@@ -4,11 +4,10 @@
 
 #pragma once
 
-#include "wpi/hardware/discrete/DigitalInput.hpp"
-#include "wpi/hardware/discrete/DigitalOutput.hpp"
-
 #include <memory>
 
+#include "wpi/hardware/discrete/DigitalInput.hpp"
+#include "wpi/hardware/discrete/DigitalOutput.hpp"
 #include "wpi/units/time.hpp"
 
 namespace frc {

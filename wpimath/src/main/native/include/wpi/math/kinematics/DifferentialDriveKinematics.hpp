@@ -6,16 +6,15 @@
 
 #include <type_traits>
 
-#include "wpi/util/SymbolExports.hpp"
-
 #include "wpi/math/geometry/Twist2d.hpp"
 #include "wpi/math/kinematics/ChassisSpeeds.hpp"
 #include "wpi/math/kinematics/DifferentialDriveWheelPositions.hpp"
 #include "wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp"
 #include "wpi/math/kinematics/Kinematics.hpp"
+#include "wpi/math/util/MathShared.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
-#include "wpi/math/util/MathShared.hpp"
+#include "wpi/util/SymbolExports.hpp"
 
 namespace frc {
 /**

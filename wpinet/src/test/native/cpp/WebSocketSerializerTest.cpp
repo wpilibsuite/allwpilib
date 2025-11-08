@@ -14,10 +14,10 @@
 #include <vector>
 
 #include <gmock/gmock.h>
-#include "wpi/util/SpanMatcher.hpp"
 
 #include "WebSocketTest.hpp"
 #include "wpi/net/uv/Buffer.hpp"
+#include "wpi/util/SpanMatcher.hpp"
 
 using ::testing::_;
 using ::testing::AnyOf;

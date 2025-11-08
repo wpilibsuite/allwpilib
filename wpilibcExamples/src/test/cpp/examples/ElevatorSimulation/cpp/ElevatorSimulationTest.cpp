@@ -5,15 +5,15 @@
 #include <string>
 #include <thread>
 
-#include "wpi/simulation/DriverStationSim.hpp"
-#include "wpi/simulation/JoystickSim.hpp"
-#include "wpi/simulation/PWMMotorControllerSim.hpp"
-#include "wpi/simulation/SimHooks.hpp"
 #include <gtest/gtest.h>
-#include "wpi/hal/simulation/MockHooks.h"
-#include "wpi/units/length.hpp"
-#include "wpi/units/mass.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/hal/simulation/MockHooks.h>
+#include <wpi/simulation/DriverStationSim.hpp>
+#include <wpi/simulation/JoystickSim.hpp>
+#include <wpi/simulation/PWMMotorControllerSim.hpp>
+#include <wpi/simulation/SimHooks.hpp>
+#include <wpi/units/length.hpp>
+#include <wpi/units/mass.hpp>
+#include <wpi/units/time.hpp>
 
 #include "Constants.hpp"
 #include "Robot.hpp"

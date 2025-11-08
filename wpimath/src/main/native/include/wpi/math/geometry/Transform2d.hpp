@@ -6,10 +6,9 @@
 
 #include <utility>
 
-#include "wpi/util/SymbolExports.hpp"
-
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/util/SymbolExports.hpp"
 
 namespace frc {
 

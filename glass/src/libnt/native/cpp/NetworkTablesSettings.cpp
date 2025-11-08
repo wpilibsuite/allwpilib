@@ -11,11 +11,11 @@
 
 #include <imgui.h>
 #include <imgui_stdlib.h>
-#include "wpi/nt/ntcore_cpp.hpp"
-#include "wpi/util/StringExtras.hpp"
 
 #include "wpi/glass/Context.hpp"
 #include "wpi/glass/Storage.hpp"
+#include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/StringExtras.hpp"
 
 using namespace glass;
 

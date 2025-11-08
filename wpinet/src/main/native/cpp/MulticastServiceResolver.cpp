@@ -8,9 +8,8 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/util/MemAlloc.hpp"
-
 #include "MulticastHandleManager.hpp"
+#include "wpi/util/MemAlloc.hpp"
 
 extern "C" {
 WPI_MulticastServiceResolverHandle WPI_CreateMulticastServiceResolver(

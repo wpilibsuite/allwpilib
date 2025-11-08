@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_HTTPCAMERAIMPL_H_
-#define CSCORE_HTTPCAMERAIMPL_H_
+#ifndef CSCORE_HTTPCAMERAIMPL_HPP_
+#define CSCORE_HTTPCAMERAIMPL_HPP_
 
 #include <atomic>
 #include <functional>
@@ -15,13 +15,13 @@
 #include <thread>
 #include <vector>
 
-#include "wpi/util/StringMap.hpp"
-#include "wpi/util/condition_variable.hpp"
-#include "wpi/util/raw_istream.hpp"
-#include "wpi/net/HttpUtil.hpp"
+#include <wpi/net/HttpUtil.hpp>
 
 #include "SourceImpl.hpp"
 #include "wpi/cs/cscore_cpp.hpp"
+#include "wpi/util/StringMap.hpp"
+#include "wpi/util/condition_variable.hpp"
+#include "wpi/util/raw_istream.hpp"
 
 namespace cs {
 
@@ -160,4 +160,4 @@ class AxisCameraImpl : public HttpCameraImpl {
 
 }  // namespace cs
 
-#endif  // CSCORE_HTTPCAMERAIMPL_H_
+#endif  // CSCORE_HTTPCAMERAIMPL_HPP_

@@ -6,8 +6,8 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/controller/LinearQuadraticRegulator.hpp"
+#include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/math/system/plant/DCMotor.hpp"
 #include "wpi/math/system/plant/LinearSystemId.hpp"

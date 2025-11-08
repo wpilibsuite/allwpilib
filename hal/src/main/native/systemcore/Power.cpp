@@ -6,12 +6,11 @@
 
 #include <memory>
 
-#include "wpi/nt/DoubleTopic.hpp"
-
 #include "HALInitializer.h"
 #include "SystemServerInternal.h"
-#include "wpi/hal/Errors.h"
 #include "mrc/NtNetComm.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/nt/DoubleTopic.hpp"
 
 using namespace hal;
 

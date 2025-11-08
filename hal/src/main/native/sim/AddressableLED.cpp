@@ -10,10 +10,10 @@
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
+#include "mockdata/AddressableLEDDataInternal.h"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/handles/HandlesInternal.h"
 #include "wpi/hal/handles/IndexedHandleResource.h"
-#include "mockdata/AddressableLEDDataInternal.h"
 
 using namespace hal;
 

@@ -9,9 +9,6 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/util/mutex.hpp"
-#include "wpi/util/spinlock.hpp"
-
 #ifdef _WIN32
 #include <Windows.h>
 #pragma comment(lib, "Winmm.lib")
@@ -26,12 +23,14 @@ NtQueryTimerResolution(PULONG MinimumResolution, PULONG MaximumResolution,
 #include "ErrorsInternal.h"
 #include "HALInitializer.h"
 #include "MockHooksInternal.h"
+#include "mockdata/RoboRioDataInternal.h"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/Extensions.h"
 #include "wpi/hal/handles/HandlesInternal.h"
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/hal/simulation/SimCallbackRegistry.h"
-#include "mockdata/RoboRioDataInternal.h"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/spinlock.hpp"
 
 using namespace hal;
 

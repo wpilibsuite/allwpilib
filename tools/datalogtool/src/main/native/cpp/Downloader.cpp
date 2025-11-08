@@ -18,15 +18,15 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include "wpi/glass/Storage.hpp"
 #include <imgui.h>
 #include <imgui_stdlib.h>
 #include <libssh/sftp.h>
+
+#include "Sftp.hpp"
+#include "wpi/glass/Storage.hpp"
 #include "wpi/gui/portable-file-dialogs.h"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/fs.hpp"
-
-#include "Sftp.hpp"
 
 Downloader::Downloader(glass::Storage& storage)
     : m_serverTeam{storage.GetString("serverTeam")},

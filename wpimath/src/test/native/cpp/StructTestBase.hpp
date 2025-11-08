@@ -5,6 +5,7 @@
 #pragma once
 
 #include <gtest/gtest.h>
+
 #include "wpi/util/struct/Struct.hpp"
 
 template <typename T>

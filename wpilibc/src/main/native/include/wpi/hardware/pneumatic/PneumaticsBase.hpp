@@ -7,13 +7,12 @@
 #include <memory>
 #include <string_view>
 
+#include "wpi/hardware/pneumatic/CompressorConfigType.hpp"
+#include "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
 #include "wpi/units/current.hpp"
 #include "wpi/units/pressure.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/voltage.hpp"
-
-#include "wpi/hardware/pneumatic/CompressorConfigType.hpp"
-#include "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
 
 namespace frc {
 class Solenoid;

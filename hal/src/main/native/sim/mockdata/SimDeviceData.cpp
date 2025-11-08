@@ -8,9 +8,8 @@
 #include <memory>
 #include <utility>
 
-#include "wpi/util/StringExtras.hpp"
-
 #include "SimDeviceDataInternal.h"
+#include "wpi/util/StringExtras.hpp"
 
 using namespace hal;
 

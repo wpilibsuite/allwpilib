@@ -16,10 +16,9 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/util/SmallVector.hpp"
-
 #include "ResolverThread.hpp"
 #include "dns_sd.h"
+#include "wpi/util/SmallVector.hpp"
 
 using namespace wpi;
 

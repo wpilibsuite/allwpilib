@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include "wpi/driverstation/Joystick.hpp"
-#include "wpi/smartdashboard/SendableChooser.hpp"
-#include "wpi/xrp/XRPOnBoardIO.hpp"
-#include "wpi/commands2/Command.hpp"
-#include "wpi/commands2/CommandPtr.hpp"
-#include "wpi/commands2/button/Trigger.hpp"
+#include <wpi/commands2/Command.hpp>
+#include <wpi/commands2/CommandPtr.hpp>
+#include <wpi/commands2/button/Trigger.hpp>
+#include <wpi/driverstation/Joystick.hpp>
+#include <wpi/smartdashboard/SendableChooser.hpp>
+#include <wpi/xrp/XRPOnBoardIO.hpp>
 
 #include "Constants.hpp"
 #include "commands/AutonomousDistance.hpp"

@@ -6,11 +6,10 @@
 
 #include <cassert>
 
-#include "wpi/util/jni_util.hpp"
-
 #include "HALUtil.h"
 #include "org_wpilib_hardware_hal_I2CJNI.h"
 #include "wpi/hal/I2C.h"
+#include "wpi/util/jni_util.hpp"
 
 using namespace hal;
 using namespace wpi::java;

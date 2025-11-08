@@ -2,16 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_PROPERTYIMPL_H_
-#define CSCORE_PROPERTYIMPL_H_
+#ifndef CSCORE_PROPERTYIMPL_HPP_
+#define CSCORE_PROPERTYIMPL_HPP_
 
 #include <string>
 #include <string_view>
 #include <vector>
 
-#include "wpi/util/Signal.h"
-
 #include "wpi/cs/cscore_c.h"
+#include "wpi/util/Signal.h"
 
 namespace cs {
 
@@ -51,4 +50,4 @@ class PropertyImpl {
 
 }  // namespace cs
 
-#endif  // CSCORE_PROPERTYIMPL_H_
+#endif  // CSCORE_PROPERTYIMPL_HPP_

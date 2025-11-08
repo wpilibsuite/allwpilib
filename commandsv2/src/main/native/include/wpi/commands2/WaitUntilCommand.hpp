@@ -6,10 +6,9 @@
 
 #include <functional>
 
-#include "wpi/units/time.hpp"
-
 #include "wpi/commands2/Command.hpp"
 #include "wpi/commands2/CommandHelper.hpp"
+#include "wpi/units/time.hpp"
 
 namespace frc2 {
 /**

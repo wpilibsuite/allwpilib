@@ -12,14 +12,13 @@
 #include "wpi/halsim/ws_core/HALSimBaseWebSocketConnection.hpp"
 #include "wpi/halsim/ws_core/WSProviderContainer.hpp"
 #include "wpi/halsim/ws_core/WSProvider_SimDevice.hpp"
-#include "wpi/util/json_fwd.hpp"
+#include "wpi/halsim/xrp/XRP.hpp"
 #include "wpi/net/uv/Async.hpp"
 #include "wpi/net/uv/Buffer.hpp"
 #include "wpi/net/uv/Loop.hpp"
 #include "wpi/net/uv/Timer.hpp"
 #include "wpi/net/uv/Udp.hpp"
-
-#include "wpi/halsim/xrp/XRP.hpp"
+#include "wpi/util/json_fwd.hpp"
 
 namespace wpilibxrp {
 

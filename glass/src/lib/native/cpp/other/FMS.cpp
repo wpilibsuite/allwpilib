@@ -8,9 +8,9 @@
 
 #include <imgui.h>
 #include <imgui_stdlib.h>
-#include "wpi/util/SmallString.hpp"
 
 #include "wpi/glass/DataSource.hpp"
+#include "wpi/util/SmallString.hpp"
 
 using namespace glass;
 

@@ -4,9 +4,8 @@
 
 #pragma once
 
-#include "wpi/util/Logger.hpp"
-
 #include "gmock/gmock.h"
+#include "wpi/util/Logger.hpp"
 
 namespace wpi {
 

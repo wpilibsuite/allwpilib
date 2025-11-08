@@ -8,7 +8,6 @@
 
 #include "wpi/glass/hardware/RoboRio.hpp"
 #include "wpi/hal/simulation/RoboRioData.h"
-
 #include "wpi/halsim/gui/HALDataSource.hpp"
 #include "wpi/halsim/gui/HALSimGui.hpp"
 

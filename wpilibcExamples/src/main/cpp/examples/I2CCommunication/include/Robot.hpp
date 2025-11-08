@@ -6,8 +6,8 @@
 
 #include <array>
 
-#include "wpi/hardware/bus/I2C.hpp"
-#include "wpi/opmode/TimedRobot.hpp"
+#include <wpi/hardware/bus/I2C.hpp>
+#include <wpi/opmode/TimedRobot.hpp>
 
 /**
  * This is a sample program demonstrating how to communicate to a light

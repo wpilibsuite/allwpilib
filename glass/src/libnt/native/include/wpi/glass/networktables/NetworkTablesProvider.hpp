@@ -9,15 +9,14 @@
 #include <string_view>
 #include <vector>
 
+#include "wpi/glass/Model.hpp"
+#include "wpi/glass/Provider.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/NetworkTableListener.hpp"
 #include "wpi/nt/StringTopic.hpp"
 #include "wpi/nt/Topic.hpp"
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/StringMap.hpp"
-
-#include "wpi/glass/Model.hpp"
-#include "wpi/glass/Provider.hpp"
 
 namespace glass {
 

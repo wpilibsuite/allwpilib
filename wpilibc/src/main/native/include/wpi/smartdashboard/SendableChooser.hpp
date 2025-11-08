@@ -13,10 +13,9 @@
 #include <utility>
 #include <vector>
 
+#include "wpi/smartdashboard/SendableChooserBase.hpp"
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
-
-#include "wpi/smartdashboard/SendableChooserBase.hpp"
 
 namespace frc {
 

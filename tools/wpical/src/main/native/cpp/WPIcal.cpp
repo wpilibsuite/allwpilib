@@ -2,11 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "cameracalibration.hpp"
-#include "fieldcalibration.hpp"
-#include "fieldmap.hpp"
-#include "fmap.hpp"
-
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -18,11 +13,15 @@
 #include <GLFW/glfw3.h>
 #include <fmt/format.h>
 #include <imgui.h>
-#include "wpi/gui/portable-file-dialogs.h"
-#include "wpi/util/json.hpp"
-#include "wpi/gui/wpigui.hpp"
 
+#include "cameracalibration.hpp"
+#include "fieldcalibration.hpp"
+#include "fieldmap.hpp"
+#include "fmap.hpp"
 #include "tagpose.hpp"
+#include "wpi/gui/portable-file-dialogs.h"
+#include "wpi/gui/wpigui.hpp"
+#include "wpi/util/json.hpp"
 
 namespace gui = wpi::gui;
 

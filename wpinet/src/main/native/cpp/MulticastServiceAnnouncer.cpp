@@ -7,9 +7,8 @@
 #include <memory>
 #include <utility>
 
-#include "wpi/util/SmallVector.hpp"
-
 #include "MulticastHandleManager.hpp"
+#include "wpi/util/SmallVector.hpp"
 
 extern "C" {
 WPI_MulticastServiceAnnouncerHandle WPI_CreateMulticastServiceAnnouncer(

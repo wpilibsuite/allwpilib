@@ -4,7 +4,7 @@
 
 #include "ReplaceMeParallelDeadlineGroup.hpp"
 
-#include "wpi/commands2/InstantCommand.hpp"
+#include <wpi/commands2/InstantCommand.hpp>
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.
 // For more information, see:

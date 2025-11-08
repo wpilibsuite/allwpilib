@@ -8,14 +8,13 @@
 #include <string_view>
 #include <utility>
 
+#include "net/NetworkOutgoingQueue.hpp"
+#include "server/ServerPublisher.hpp"
+#include "server/ServerSubscriber.hpp"
+#include "wpi/nt/NetworkTableValue.hpp"
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/SmallPtrSet.hpp"
 #include "wpi/util/json.hpp"
-
-#include "net/NetworkOutgoingQueue.hpp"
-#include "wpi/nt/NetworkTableValue.hpp"
-#include "server/ServerPublisher.hpp"
-#include "server/ServerSubscriber.hpp"
 
 namespace wpi {
 class Logger;

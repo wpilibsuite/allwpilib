@@ -8,13 +8,12 @@
 #include <string_view>
 #include <vector>
 
+#include "wpi/glass/DataSource.hpp"
+#include "wpi/glass/other/Drive.hpp"
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/DoubleTopic.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/StringTopic.hpp"
-
-#include "wpi/glass/DataSource.hpp"
-#include "wpi/glass/other/Drive.hpp"
 
 namespace glass {
 class NTDifferentialDriveModel : public DriveModel {

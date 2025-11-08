@@ -15,13 +15,12 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/util/SmallVector.hpp"
-#include "wpi/util/json_fwd.hpp"
-#include "wpi/util/struct/Struct.hpp"
-
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/Topic.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/json_fwd.hpp"
+#include "wpi/util/struct/Struct.hpp"
 
 namespace nt {
 

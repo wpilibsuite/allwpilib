@@ -5,10 +5,9 @@
 #include <climits>
 #include <cstdio>
 
-#include "wpi/util/timestamp.h"
-
 #include "gmock/gmock.h"
 #include "wpi/nt/ntcore.h"
+#include "wpi/util/timestamp.h"
 
 int main(int argc, char** argv) {
   nt::AddLogger(nt::GetDefaultInstance(), 0, UINT_MAX, [](auto& event) {

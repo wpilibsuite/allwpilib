@@ -8,6 +8,7 @@
 
 #include <fmt/format.h>
 #include <imgui.h>
+
 #include "wpi/util/MathExtras.hpp"
 #include "wpi/util/StringExtras.hpp"
 

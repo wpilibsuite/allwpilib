@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef WPIUTIL_WPI_UIDVECTOR_H_
-#define WPIUTIL_WPI_UIDVECTOR_H_
+#ifndef WPIUTIL_WPI_UTIL_UIDVECTOR_HPP_
+#define WPIUTIL_WPI_UTIL_UIDVECTOR_HPP_
 
 #include <iterator>
 #include <utility>
@@ -156,4 +156,4 @@ class UidVector {
 
 }  // namespace wpi
 
-#endif  // WPIUTIL_WPI_UIDVECTOR_H_
+#endif  // WPIUTIL_WPI_UTIL_UIDVECTOR_HPP_

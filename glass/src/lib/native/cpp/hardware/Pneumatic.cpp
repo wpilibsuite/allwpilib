@@ -9,8 +9,6 @@
 #include <string>
 
 #include <imgui.h>
-#include "wpi/util/SmallVector.hpp"
-#include "wpi/util/StringExtras.hpp"
 
 #include "wpi/glass/Context.hpp"
 #include "wpi/glass/DataSource.hpp"
@@ -18,6 +16,8 @@
 #include "wpi/glass/other/DeviceTree.hpp"
 #include "wpi/glass/support/ExtraGuiWidgets.hpp"
 #include "wpi/glass/support/NameSetting.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/StringExtras.hpp"
 
 using namespace glass;
 

@@ -4,11 +4,10 @@
 
 #pragma once
 
-#include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+#include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/math/system/plant/DCMotor.hpp"
-
 #include "wpi/units/length.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
 #include "wpi/units/time.hpp"

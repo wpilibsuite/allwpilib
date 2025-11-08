@@ -10,11 +10,11 @@
 #include <utility>
 
 #include <fmt/format.h>
+
 #include "wpi/hal/simulation/NotifyListener.h"
+#include "wpi/halsim/ws_core/WSBaseProvider.hpp"
 #include "wpi/util/json_fwd.hpp"
 #include "wpi/util/mutex.hpp"
-
-#include "wpi/halsim/ws_core/WSBaseProvider.hpp"
 
 namespace wpilibws {
 

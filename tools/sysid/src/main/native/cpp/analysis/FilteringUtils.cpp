@@ -14,6 +14,7 @@
 #include <vector>
 
 #include <fmt/format.h>
+
 #include "wpi/math/filter/LinearFilter.hpp"
 #include "wpi/math/filter/MedianFilter.hpp"
 #include "wpi/units/math.hpp"

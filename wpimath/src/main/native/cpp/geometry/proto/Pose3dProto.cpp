@@ -4,10 +4,9 @@
 
 #include "wpi/math/geometry/proto/Pose3dProto.hpp"
 
+#include "wpi/math/geometry/Pose3d.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
-
-#include "wpi/math/geometry/Pose3d.hpp"
 #include "wpimath/protobuf/geometry3d.npb.h"
 
 std::optional<frc::Pose3d> wpi::Protobuf<frc::Pose3d>::Unpack(

@@ -12,8 +12,6 @@
 #include <thread>
 
 #include <fmt/format.h>
-#include "wpi/nt/NetworkTableInstance.hpp"
-#include "wpi/nt/RawTopic.hpp"
 
 #include "AddressableLEDSimd.h"
 #include "HALInitializer.h"
@@ -24,6 +22,8 @@
 #include "wpi/hal/AddressableLEDTypes.h"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/cpp/fpga_clock.h"
+#include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/nt/RawTopic.hpp"
 
 using namespace hal;
 

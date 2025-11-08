@@ -8,10 +8,9 @@
 #include <string_view>
 #include <vector>
 
+#include "wpi/glass/other/Alerts.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/StringArrayTopic.hpp"
-
-#include "wpi/glass/other/Alerts.hpp"
 
 namespace glass {
 

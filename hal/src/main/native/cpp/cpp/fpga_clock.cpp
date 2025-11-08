@@ -7,9 +7,8 @@
 #include <cstdio>
 #include <limits>
 
-#include "wpi/util/print.hpp"
-
 #include "wpi/hal/HALBase.h"
+#include "wpi/util/print.hpp"
 
 namespace hal {
 const fpga_clock::time_point fpga_clock::min_time =

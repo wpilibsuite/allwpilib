@@ -10,15 +10,15 @@
 #include <vector>
 
 #include <fmt/format.h>
+
 #include "wpi/nt/NTSendable.hpp"
 #include "wpi/nt/NTSendableBuilder.hpp"
+#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/system/Errors.hpp"
+#include "wpi/system/RobotController.hpp"
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
-
-#include "wpi/system/Errors.hpp"
-#include "wpi/system/RobotController.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
 
 using namespace frc;
 

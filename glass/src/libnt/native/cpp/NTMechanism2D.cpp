@@ -12,10 +12,10 @@
 
 #include <fmt/format.h>
 #include <imgui.h>
-#include "wpi/nt/ntcore_cpp.hpp"
-#include "wpi/util/StringExtras.hpp"
 
 #include "wpi/glass/other/Mechanism2D.hpp"
+#include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/StringExtras.hpp"
 
 using namespace glass;
 

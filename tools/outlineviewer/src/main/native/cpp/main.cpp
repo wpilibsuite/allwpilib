@@ -7,6 +7,8 @@
 
 #include <GLFW/glfw3.h>
 #include <fmt/format.h>
+#include <imgui.h>
+
 #include "wpi/glass/Context.hpp"
 #include "wpi/glass/MainMenuBar.hpp"
 #include "wpi/glass/Model.hpp"
@@ -14,10 +16,9 @@
 #include "wpi/glass/networktables/NetworkTables.hpp"
 #include "wpi/glass/networktables/NetworkTablesSettings.hpp"
 #include "wpi/glass/other/Log.hpp"
-#include <imgui.h>
-#include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/gui/wpigui.hpp"
 #include "wpi/gui/wpigui_openurl.hpp"
+#include "wpi/nt/ntcore_cpp.hpp"
 
 namespace gui = wpi::gui;
 

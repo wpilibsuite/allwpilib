@@ -17,13 +17,6 @@
 #include <thread>
 #include <utility>
 
-#include "wpi/util/MemoryBuffer.hpp"
-#include "wpi/util/StringExtras.hpp"
-#include "wpi/util/fs.hpp"
-#include "wpi/util/mutex.hpp"
-#include "wpi/util/print.hpp"
-#include "wpi/util/timestamp.h"
-
 #include "CANInternal.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
@@ -32,6 +25,12 @@
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/Notifier.h"
 #include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/util/MemoryBuffer.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/fs.hpp"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/print.hpp"
+#include "wpi/util/timestamp.h"
 
 using namespace hal;
 

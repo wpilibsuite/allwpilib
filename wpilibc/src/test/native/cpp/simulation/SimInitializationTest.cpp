@@ -5,8 +5,8 @@
 #include <exception>
 
 #include <gtest/gtest.h>
-#include "wpi/hal/HAL.h"
 
+#include "wpi/hal/HAL.h"
 #include "wpi/simulation/AddressableLEDSim.hpp"
 #include "wpi/simulation/AnalogInputSim.hpp"
 #include "wpi/simulation/CTREPCMSim.hpp"

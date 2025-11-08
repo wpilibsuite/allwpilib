@@ -5,9 +5,9 @@
 #include "wpi/simulation/DIOSim.hpp"  // NOLINT(build/include_order)
 
 #include <gtest/gtest.h>
-#include "wpi/hal/HAL.h"
 
 #include "callback_helpers/TestCallbackHelpers.hpp"
+#include "wpi/hal/HAL.h"
 #include "wpi/hardware/discrete/DigitalInput.hpp"
 #include "wpi/hardware/discrete/DigitalOutput.hpp"
 

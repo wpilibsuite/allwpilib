@@ -5,11 +5,10 @@
 #include "wpi/hardware/accelerometer/AnalogAccelerometer.hpp"
 
 #include "wpi/hal/UsageReporting.h"
+#include "wpi/system/Errors.hpp"
 #include "wpi/util/NullDeleter.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
-
-#include "wpi/system/Errors.hpp"
 
 using namespace frc;
 

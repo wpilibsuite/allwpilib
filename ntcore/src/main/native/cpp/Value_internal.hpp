@@ -13,11 +13,10 @@
 #include <type_traits>
 #include <vector>
 
-#include "wpi/util/MemAlloc.hpp"
-
 #include "wpi/nt/NetworkTableValue.hpp"
 #include "wpi/nt/ntcore_c.h"
 #include "wpi/nt/ntcore_cpp_types.hpp"
+#include "wpi/util/MemAlloc.hpp"
 
 namespace nt {
 

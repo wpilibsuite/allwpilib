@@ -4,9 +4,9 @@
 
 #include <numbers>
 
-#include "wpi/hardware/rotation/Encoder.hpp"
-#include "wpi/opmode/TimedRobot.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include <wpi/hardware/rotation/Encoder.hpp>
+#include <wpi/opmode/TimedRobot.hpp>
+#include <wpi/smartdashboard/SmartDashboard.hpp>
 
 /**
  * Sample program displaying the value of a quadrature encoder on the

@@ -7,11 +7,11 @@
 #include <thread>
 
 #include <gtest/gtest.h>
-#include "wpi/util/condition_variable.hpp"
-#include "wpi/util/mutex.hpp"
 
 #include "wpi/net/EventLoopRunner.hpp"
 #include "wpi/net/uv/Loop.hpp"
+#include "wpi/util/condition_variable.hpp"
+#include "wpi/util/mutex.hpp"
 
 namespace wpi {
 

@@ -7,12 +7,12 @@
 #include <memory>
 
 #include <fmt/format.h>
-#include "wpi/util/Logger.hpp"
-#include "wpi/util/StringExtras.hpp"
-#include "wpi/util/json.hpp"
 
 #include "wpi/net/uv/Tcp.hpp"
 #include "wpi/net/uv/Timer.hpp"
+#include "wpi/util/Logger.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/json.hpp"
 
 using namespace wpi;
 

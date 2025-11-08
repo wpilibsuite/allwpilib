@@ -6,9 +6,8 @@
 
 #include <functional>
 
-#include "wpi/units/time.hpp"
-
 #include "wpi/opmode/TimedRobot.hpp"
+#include "wpi/units/time.hpp"
 
 namespace frc {
 

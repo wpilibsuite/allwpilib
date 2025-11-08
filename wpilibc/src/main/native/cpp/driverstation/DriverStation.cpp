@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/hal/DriverStation.h"
 
 #include <stdint.h>
 
@@ -14,7 +15,8 @@
 #include <string_view>
 
 #include <fmt/format.h>
-#include "wpi/hal/DriverStation.h"
+
+#include "wpi/datalog/DataLog.hpp"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/HALBase.h"
 #include "wpi/hal/Power.h"
@@ -23,15 +25,13 @@
 #include "wpi/nt/NetworkTable.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/StringTopic.hpp"
+#include "wpi/system/Errors.hpp"
+#include "wpi/system/Timer.hpp"
 #include "wpi/util/EventVector.hpp"
 #include "wpi/util/condition_variable.hpp"
-#include "wpi/datalog/DataLog.hpp"
 #include "wpi/util/json.hpp"
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/timestamp.h"
-
-#include "wpi/system/Errors.hpp"
-#include "wpi/system/Timer.hpp"
 
 using namespace frc;
 

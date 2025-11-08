@@ -8,13 +8,13 @@
 #include <string>
 
 #include <fmt/format.h>
-#include "wpi/util/DenseMap.hpp"
-#include "wpi/util/print.hpp"
 
 #include "wpi/net/EventLoopRunner.hpp"
 #include "wpi/net/uv/GetAddrInfo.hpp"
 #include "wpi/net/uv/Tcp.hpp"
 #include "wpi/net/uv/Timer.hpp"
+#include "wpi/util/DenseMap.hpp"
+#include "wpi/util/print.hpp"
 
 using namespace wpi;
 

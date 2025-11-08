@@ -11,15 +11,14 @@
 #include <string_view>
 #include <vector>
 
+#include "net/ClientMessageQueue.hpp"
+#include "net/Message.hpp"
+#include "server/ServerImpl.hpp"
 #include "wpi/net/EventLoopRunner.hpp"
 #include "wpi/net/uv/Async.hpp"
 #include "wpi/net/uv/Idle.hpp"
 #include "wpi/net/uv/Timer.hpp"
-
-#include "net/ClientMessageQueue.hpp"
-#include "net/Message.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
-#include "server/ServerImpl.hpp"
 
 namespace wpi {
 class Logger;

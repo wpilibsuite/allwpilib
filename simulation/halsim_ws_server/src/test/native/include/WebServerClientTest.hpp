@@ -8,7 +8,6 @@
 #include <memory>
 #include <string>
 
-#include "wpi/util/json.hpp"
 #include "wpi/net/WebSocket.hpp"
 #include "wpi/net/uv/AsyncFunction.hpp"
 #include "wpi/net/uv/Buffer.hpp"
@@ -16,6 +15,7 @@
 #include "wpi/net/uv/Stream.hpp"
 #include "wpi/net/uv/Tcp.hpp"
 #include "wpi/net/uv/Timer.hpp"
+#include "wpi/util/json.hpp"
 
 namespace wpilibws {
 

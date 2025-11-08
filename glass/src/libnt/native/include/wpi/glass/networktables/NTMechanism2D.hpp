@@ -10,12 +10,11 @@
 #include <utility>
 #include <vector>
 
+#include "wpi/glass/other/Mechanism2D.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/nt/MultiSubscriber.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/NetworkTableListener.hpp"
-
-#include "wpi/glass/other/Mechanism2D.hpp"
 
 namespace glass {
 

@@ -4,7 +4,7 @@
 
 #include "RobotContainer.hpp"
 
-#include "wpi/commands2/button/Trigger.hpp"
+#include <wpi/commands2/button/Trigger.hpp>
 
 #include "commands/Autos.hpp"
 #include "commands/ExampleCommand.hpp"

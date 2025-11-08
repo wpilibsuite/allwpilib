@@ -9,10 +9,9 @@
 #include <memory>
 #include <utility>
 
+#include "wpi/net/uv/util.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/SmallVector.hpp"
-
-#include "wpi/net/uv/util.hpp"
 
 namespace {
 

@@ -6,9 +6,8 @@
 
 #include <utility>
 
-#include "wpi/util/sendable/SendableBuilder.hpp"
-
 #include "wpi/commands2/Commands.hpp"
+#include "wpi/util/sendable/SendableBuilder.hpp"
 
 using namespace frc2;
 

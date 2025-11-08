@@ -8,12 +8,6 @@
 #include <memory>
 #include <string_view>
 
-#include "wpi/util/DenseMap.hpp"
-#include "wpi/util/StringExtras.hpp"
-#include "wpi/util/StringMap.hpp"
-#include "wpi/util/Synchronization.h"
-#include "wpi/util/json.hpp"
-
 #include "HandleMap.hpp"
 #include "local/LocalDataLogger.hpp"
 #include "local/LocalEntry.hpp"
@@ -24,6 +18,11 @@
 #include "local/LocalTopic.hpp"
 #include "wpi/nt/ntcore_c.h"
 #include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/DenseMap.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/StringMap.hpp"
+#include "wpi/util/Synchronization.h"
+#include "wpi/util/json.hpp"
 
 namespace wpi {
 class Logger;

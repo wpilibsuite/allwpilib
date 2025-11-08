@@ -7,11 +7,10 @@
 #include <memory>
 #include <utility>
 
+#include "wpi/system/RobotController.hpp"
 #include "wpi/util/NullDeleter.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
-
-#include "wpi/system/RobotController.hpp"
 
 using namespace frc;
 

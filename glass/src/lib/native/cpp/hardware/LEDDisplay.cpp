@@ -6,11 +6,10 @@
 
 #include <vector>
 
-#include "wpi/util/SmallVector.hpp"
-
 #include "wpi/glass/Context.hpp"
 #include "wpi/glass/Storage.hpp"
 #include "wpi/glass/support/ExtraGuiWidgets.hpp"
+#include "wpi/util/SmallVector.hpp"
 
 using namespace glass;
 

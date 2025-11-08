@@ -6,9 +6,8 @@
 
 #include <cmath>
 
-#include "wpi/hal/UsageReporting.h"
-
 #include "wpi/event/BooleanEvent.hpp"
+#include "wpi/hal/UsageReporting.h"
 
 using namespace frc;
 

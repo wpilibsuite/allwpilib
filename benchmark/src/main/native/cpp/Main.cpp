@@ -3,9 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <benchmark/benchmark.h>
+
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/path/TravelingSalesman.hpp"
-
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/util/array.hpp"

@@ -13,14 +13,13 @@
 #include <utility>
 #include <vector>
 
+#include "Value_internal.hpp"
+#include "wpi/nt/ntcore.h"
+#include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/MemAlloc.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/json.hpp"
 #include "wpi/util/timestamp.h"
-
-#include "Value_internal.hpp"
-#include "wpi/nt/ntcore.h"
-#include "wpi/nt/ntcore_cpp.hpp"
 
 using namespace nt;
 

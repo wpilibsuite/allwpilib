@@ -9,6 +9,7 @@
 #include <vector>
 
 #include <fmt/format.h>
+
 #include "wpi/hal/UsageReporting.h"
 #include "wpi/nt/MultiSubscriber.hpp"
 #include "wpi/nt/NetworkTable.hpp"

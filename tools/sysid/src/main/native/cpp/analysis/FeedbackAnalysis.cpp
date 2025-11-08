@@ -9,11 +9,10 @@
 #include "wpi/math/controller/LinearQuadraticRegulator.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/sysid/analysis/FeedbackControllerPreset.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/velocity.hpp"
 #include "wpi/units/voltage.hpp"
-
-#include "wpi/sysid/analysis/FeedbackControllerPreset.hpp"
 
 using namespace sysid;
 

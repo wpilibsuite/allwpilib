@@ -11,6 +11,7 @@
 #include <vector>
 
 #include <fmt/format.h>
+
 #include "wpi/nt/DoubleArrayTopic.hpp"
 #include "wpi/nt/MultiSubscriber.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
