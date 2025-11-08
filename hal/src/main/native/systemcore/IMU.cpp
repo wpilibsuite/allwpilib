@@ -6,13 +6,12 @@
 
 #include <numbers>
 
-#include "wpi/nt/DoubleArrayTopic.hpp"
-#include "wpi/nt/DoubleTopic.hpp"
-#include "wpi/nt/NetworkTableInstance.hpp"
-
 #include "HALInitializer.h"
 #include "SystemServerInternal.h"
 #include "wpi/hal/Errors.h"
+#include "wpi/nt/DoubleArrayTopic.hpp"
+#include "wpi/nt/DoubleTopic.hpp"
+#include "wpi/nt/NetworkTableInstance.hpp"
 
 #define IMU_PREFIX "/imu/"
 

@@ -11,7 +11,6 @@
 #include "wpi/hal/Ports.h"
 #include "wpi/hal/simulation/AddressableLEDData.h"
 #include "wpi/hal/simulation/PWMData.h"
-
 #include "wpi/halsim/gui/HALDataSource.hpp"
 #include "wpi/halsim/gui/HALSimGui.hpp"
 

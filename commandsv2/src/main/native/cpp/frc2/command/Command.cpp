@@ -7,12 +7,11 @@
 #include <string>
 #include <utility>
 
+#include "wpi/commands2/CommandPtr.hpp"
+#include "wpi/commands2/CommandScheduler.hpp"
 #include "wpi/util/StackTrace.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
-
-#include "wpi/commands2/CommandPtr.hpp"
-#include "wpi/commands2/CommandScheduler.hpp"
 
 using namespace frc2;
 

@@ -4,10 +4,9 @@
 
 #pragma once
 
-#include "wpi/util/json.hpp"
-
 #include "gmock/gmock.h"
 #include "net/NetworkInterface.hpp"
+#include "wpi/util/json.hpp"
 
 namespace nt::net {
 

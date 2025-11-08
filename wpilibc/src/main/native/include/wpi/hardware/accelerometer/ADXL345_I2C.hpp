@@ -5,10 +5,9 @@
 #pragma once
 
 #include "wpi/hal/SimDevice.h"
+#include "wpi/hardware/bus/I2C.hpp"
 #include "wpi/nt/NTSendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
-
-#include "wpi/hardware/bus/I2C.hpp"
 
 namespace frc {
 

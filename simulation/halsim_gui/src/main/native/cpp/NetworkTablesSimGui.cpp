@@ -10,7 +10,6 @@
 #include "wpi/glass/Storage.hpp"
 #include "wpi/glass/networktables/NetworkTables.hpp"
 #include "wpi/gui/wpigui.hpp"
-
 #include "wpi/halsim/gui/HALSimGui.hpp"
 
 using namespace halsimgui;

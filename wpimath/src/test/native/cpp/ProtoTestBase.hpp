@@ -5,6 +5,7 @@
 #pragma once
 
 #include <gtest/gtest.h>
+
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
 

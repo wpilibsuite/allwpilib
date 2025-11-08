@@ -9,8 +9,6 @@
 #include <span>
 
 #include <gtest/gtest.h>
-#include "wpi/units/time.hpp"
-#include "wpi/units/voltage.hpp"
 
 #include "wpi/sysid/analysis/AnalysisManager.hpp"
 #include "wpi/sysid/analysis/AnalysisType.hpp"
@@ -18,6 +16,8 @@
 #include "wpi/sysid/analysis/ElevatorSim.hpp"
 #include "wpi/sysid/analysis/FeedforwardAnalysis.hpp"
 #include "wpi/sysid/analysis/SimpleMotorSim.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/voltage.hpp"
 
 namespace {
 

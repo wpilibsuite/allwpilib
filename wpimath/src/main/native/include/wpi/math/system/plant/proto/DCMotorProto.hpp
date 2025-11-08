@@ -4,10 +4,9 @@
 
 #pragma once
 
+#include "wpi/math/system/plant/DCMotor.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
-
-#include "wpi/math/system/plant/DCMotor.hpp"
 #include "wpimath/protobuf/plant.npb.h"
 
 template <>

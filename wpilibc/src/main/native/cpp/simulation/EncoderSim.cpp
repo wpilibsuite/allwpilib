@@ -8,7 +8,6 @@
 #include <stdexcept>
 
 #include "wpi/hal/simulation/EncoderData.h"
-
 #include "wpi/hardware/rotation/Encoder.hpp"
 
 using namespace frc;

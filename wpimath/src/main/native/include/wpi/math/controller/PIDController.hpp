@@ -10,14 +10,14 @@
 #include <type_traits>
 
 #include <gcem.hpp>
+
+#include "wpi/math/util/MathShared.hpp"
+#include "wpi/math/util/MathUtil.hpp"
+#include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
-
-#include "wpi/math/util/MathUtil.hpp"
-#include "wpi/units/time.hpp"
-#include "wpi/math/util/MathShared.hpp"
 
 namespace frc {
 

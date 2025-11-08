@@ -4,9 +4,8 @@
 
 #pragma once
 
-#include "wpi/math/geometry/Rotation2d.hpp"
-
 #include "wpi/hal/SimDevice.h"
+#include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/angular_velocity.hpp"
 

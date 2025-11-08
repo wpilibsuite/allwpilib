@@ -7,10 +7,10 @@
 #include <string>
 
 #include <fmt/format.h>
-#include "wpi/util/sendable/SendableBuilder.hpp"
-#include "wpi/util/sendable/SendableRegistry.hpp"
 
 #include "wpi/system/RobotController.hpp"
+#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/util/sendable/SendableRegistry.hpp"
 
 using namespace frc;
 

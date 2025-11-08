@@ -12,12 +12,11 @@
 #include <string>
 #include <utility>
 
+#include "DynamicDns.hpp"
 #include "wpi/util/ConvertUTF.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/StringExtras.hpp"
-
-#include "DynamicDns.hpp"
 
 #pragma comment(lib, "dnsapi")
 

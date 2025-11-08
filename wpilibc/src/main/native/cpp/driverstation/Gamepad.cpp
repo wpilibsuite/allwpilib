@@ -4,10 +4,9 @@
 
 #include "wpi/driverstation/Gamepad.hpp"
 
+#include "wpi/event/BooleanEvent.hpp"
 #include "wpi/hal/UsageReporting.h"
 #include "wpi/util/sendable/SendableBuilder.hpp"
-
-#include "wpi/event/BooleanEvent.hpp"
 
 using namespace frc;
 

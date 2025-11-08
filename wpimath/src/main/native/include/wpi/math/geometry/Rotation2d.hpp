@@ -9,13 +9,13 @@
 
 #include <Eigen/Core>
 #include <gcem.hpp>
+
+#include "wpi/math/linalg/ct_matrix.hpp"
+#include "wpi/math/util/MathShared.hpp"
+#include "wpi/units/angle.hpp"
 #include "wpi/util/StackTrace.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/json_fwd.hpp"
-
-#include "wpi/math/linalg/ct_matrix.hpp"
-#include "wpi/units/angle.hpp"
-#include "wpi/math/util/MathShared.hpp"
 
 namespace frc {
 

@@ -6,12 +6,12 @@
 
 #include <memory>
 
-#include "wpi/util/StringExtras.hpp"
-#include "wpi/net/EventLoopRunner.hpp"
-#include "wpi/net/uv/FsEvent.hpp"
-#include "wpi/net/uv/Timer.hpp"
+#include <wpi/net/EventLoopRunner.hpp>
+#include <wpi/net/uv/FsEvent.hpp>
+#include <wpi/net/uv/Timer.hpp>
 
 #include "Notifier.hpp"
+#include "wpi/util/StringExtras.hpp"
 
 using namespace cs;
 

@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
+
 #include "wpi/nt/DoubleTopic.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/UnitTopic.hpp"

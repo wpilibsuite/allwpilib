@@ -4,10 +4,9 @@
 
 #pragma once
 
-#include "wpi/util/struct/Struct.hpp"
-
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
 #include "wpi/units/length.hpp"
+#include "wpi/util/struct/Struct.hpp"
 
 // Everything is converted into units for
 // frc::SimpleMotorFeedforward<units::meters> or

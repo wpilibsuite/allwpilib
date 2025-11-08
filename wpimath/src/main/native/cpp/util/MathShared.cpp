@@ -7,10 +7,9 @@
 #include <memory>
 #include <utility>
 
+#include "wpi/units/time.hpp"
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/timestamp.h"
-
-#include "wpi/units/time.hpp"
 
 using namespace wpi::math;
 

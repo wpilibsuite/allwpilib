@@ -7,6 +7,7 @@
 #include <memory>
 #include <vector>
 
+#include "EncoderSimGui.hpp"
 #include "wpi/glass/hardware/DIO.hpp"
 #include "wpi/glass/hardware/Encoder.hpp"
 #include "wpi/hal/Ports.h"
@@ -15,8 +16,6 @@
 #include "wpi/hal/simulation/DutyCycleData.h"
 #include "wpi/hal/simulation/EncoderData.h"
 #include "wpi/hal/simulation/SimDeviceData.h"
-
-#include "EncoderSimGui.hpp"
 #include "wpi/halsim/gui/HALDataSource.hpp"
 #include "wpi/halsim/gui/HALSimGui.hpp"
 

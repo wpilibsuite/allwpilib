@@ -2,14 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef WPINET_URLPARSER_H_
-#define WPINET_URLPARSER_H_
+#ifndef WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_URLPARSER_HPP_
+#define WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_URLPARSER_HPP_
 
 #include <string_view>
 
-#include "wpi/util/StringExtras.hpp"
-
 #include "wpi/net/http_parser.hpp"
+#include "wpi/util/StringExtras.hpp"
 
 namespace wpi {
 
@@ -93,4 +92,4 @@ class UrlParser {
 
 }  // namespace wpi
 
-#endif  // WPINET_URLPARSER_H_
+#endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_URLPARSER_HPP_

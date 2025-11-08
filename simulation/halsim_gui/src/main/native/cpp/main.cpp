@@ -6,30 +6,30 @@
 #include <memory>
 #include <string_view>
 
-#include "wpi/glass/Context.hpp"
-#include "wpi/glass/Storage.hpp"
-#include "wpi/glass/hardware/Pneumatic.hpp"
-#include "wpi/glass/other/Plot.hpp"
-#include "wpi/hal/Extensions.h"
-#include "wpi/hal/Main.h"
 #include <imgui.h>
-#include "wpi/gui/wpigui.hpp"
 
 #include "AddressableLEDGui.hpp"
 #include "AnalogInputSimGui.hpp"
 #include "DIOSimGui.hpp"
 #include "DriverStationGui.hpp"
 #include "EncoderSimGui.hpp"
-#include "wpi/halsim/gui/HALSimGui.hpp"
-#include "wpi/halsim/gui/HALSimGuiExt.hpp"
 #include "NetworkTablesSimGui.hpp"
 #include "PCMSimGui.hpp"
 #include "PHSimGui.hpp"
 #include "PWMSimGui.hpp"
 #include "PowerDistributionSimGui.hpp"
 #include "RoboRioSimGui.hpp"
-#include "wpi/halsim/gui/SimDeviceGui.hpp"
 #include "TimingGui.hpp"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/Storage.hpp"
+#include "wpi/glass/hardware/Pneumatic.hpp"
+#include "wpi/glass/other/Plot.hpp"
+#include "wpi/gui/wpigui.hpp"
+#include "wpi/hal/Extensions.h"
+#include "wpi/hal/Main.h"
+#include "wpi/halsim/gui/HALSimGui.hpp"
+#include "wpi/halsim/gui/HALSimGuiExt.hpp"
+#include "wpi/halsim/gui/SimDeviceGui.hpp"
 
 using namespace halsimgui;
 

@@ -8,9 +8,8 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/util/print.hpp"
-
 #include "wpi/datalog/DataLogBackgroundWriter.hpp"
+#include "wpi/util/print.hpp"
 
 int main(int argc, char** argv) {
   using std::chrono::duration_cast;

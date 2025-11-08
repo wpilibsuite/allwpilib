@@ -6,10 +6,9 @@
 
 #include <string>
 
+#include "wpi/glass/support/EnumSetting.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/SafeThread.hpp"
-
-#include "wpi/glass/support/EnumSetting.hpp"
 
 namespace wpi {
 template <typename T>

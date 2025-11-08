@@ -12,11 +12,10 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/util/deprecated.hpp"
-
 #include "wpi/commands2/CommandPtr.hpp"
 #include "wpi/commands2/Requirements.hpp"
 #include "wpi/commands2/SelectCommand.hpp"
+#include "wpi/util/deprecated.hpp"
 
 namespace frc2 {
 class Subsystem;

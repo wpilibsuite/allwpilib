@@ -2,9 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/util/Synchronization.h"
-
 #include "wpi/cs/cscore_runloop.hpp"
+#include "wpi/util/Synchronization.h"
 
 static wpi::Event& GetInstance() {
   static wpi::Event event;

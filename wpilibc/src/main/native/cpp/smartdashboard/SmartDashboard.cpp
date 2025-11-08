@@ -12,13 +12,12 @@
 #include "wpi/hal/UsageReporting.h"
 #include "wpi/nt/NetworkTable.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/smartdashboard/ListenerExecutor.hpp"
+#include "wpi/smartdashboard/SendableBuilderImpl.hpp"
+#include "wpi/system/Errors.hpp"
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
-
-#include "wpi/system/Errors.hpp"
-#include "wpi/smartdashboard/ListenerExecutor.hpp"
-#include "wpi/smartdashboard/SendableBuilderImpl.hpp"
 
 using namespace frc;
 

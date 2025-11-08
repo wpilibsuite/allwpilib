@@ -11,11 +11,10 @@
 #include <string_view>
 #include <utility>
 
+#include "wpi/apriltag/AprilTagDetection.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/SymbolExports.hpp"
-
-#include "wpi/apriltag/AprilTagDetection.hpp"
 
 namespace frc {
 

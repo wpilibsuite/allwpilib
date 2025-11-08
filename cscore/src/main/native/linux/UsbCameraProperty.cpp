@@ -9,10 +9,10 @@
 #include <utility>
 
 #include <fmt/format.h>
-#include "wpi/util/SmallString.hpp"
-#include "wpi/util/StringExtras.hpp"
 
 #include "UsbUtil.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/StringExtras.hpp"
 
 using namespace cs;
 

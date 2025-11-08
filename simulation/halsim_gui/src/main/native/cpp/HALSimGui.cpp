@@ -7,9 +7,10 @@
 #include <memory>
 #include <utility>
 
+#include <imgui.h>
+
 #include "wpi/glass/Context.hpp"
 #include "wpi/glass/Storage.hpp"
-#include <imgui.h>
 #include "wpi/gui/wpigui.hpp"
 
 using namespace halsimgui;

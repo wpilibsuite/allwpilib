@@ -7,11 +7,10 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/util/print.hpp"
-
 #include "wpi/math/spline/SplineHelper.hpp"
 #include "wpi/math/spline/SplineParameterizer.hpp"
 #include "wpi/math/trajectory/TrajectoryParameterizer.hpp"
+#include "wpi/util/print.hpp"
 
 using namespace frc;
 

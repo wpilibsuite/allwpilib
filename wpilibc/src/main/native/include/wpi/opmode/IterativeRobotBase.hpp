@@ -4,10 +4,9 @@
 
 #pragma once
 
-#include "wpi/units/time.hpp"
-
 #include "wpi/opmode/RobotBase.hpp"
 #include "wpi/system/Watchdog.hpp"
+#include "wpi/units/time.hpp"
 
 namespace frc {
 

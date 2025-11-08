@@ -6,13 +6,12 @@
 
 #include <string>
 
-#include "wpi/util/SmallString.hpp"
-#include "wpi/util/json.hpp"
-
 #include "Instance.hpp"
 #include "Notifier.hpp"
 #include "SourceImpl.hpp"
 #include "c_util.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/json.hpp"
 
 using namespace cs;
 

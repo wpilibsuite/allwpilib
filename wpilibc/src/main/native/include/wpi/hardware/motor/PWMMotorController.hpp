@@ -13,14 +13,13 @@
 #include <vector>
 
 #include "wpi/hal/SimDevice.h"
+#include "wpi/hardware/discrete/PWM.hpp"
+#include "wpi/hardware/motor/MotorController.hpp"
+#include "wpi/hardware/motor/MotorSafety.hpp"
 #include "wpi/units/voltage.hpp"
 #include "wpi/util/deprecated.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
-
-#include "wpi/hardware/motor/MotorSafety.hpp"
-#include "wpi/hardware/discrete/PWM.hpp"
-#include "wpi/hardware/motor/MotorController.hpp"
 
 namespace frc {
 

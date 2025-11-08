@@ -3,19 +3,19 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include "wpi/units/current.hpp"
-#include "wpi/units/math.hpp"
-#include "wpi/units/moment_of_inertia.hpp"
 
 #include "wpi/math/controller/LTVUnicycleController.hpp"
 #include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
-#include "wpi/simulation/DifferentialDrivetrainSim.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
 #include "wpi/math/system/plant/DCMotor.hpp"
 #include "wpi/math/system/plant/LinearSystemId.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 #include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
+#include "wpi/simulation/DifferentialDrivetrainSim.hpp"
+#include "wpi/units/current.hpp"
+#include "wpi/units/math.hpp"
+#include "wpi/units/moment_of_inertia.hpp"
 
 TEST(DifferentialDrivetrainSimTest, Convergence) {
   auto motor = frc::DCMotor::NEO(2);

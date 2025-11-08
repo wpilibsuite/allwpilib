@@ -10,7 +10,6 @@
 #include "wpi/hal/CAN.h"
 #include "wpi/hal/HALBase.h"
 #include "wpi/hal/Power.h"
-
 #include "wpi/system/Errors.hpp"
 
 using namespace frc;

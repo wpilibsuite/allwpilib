@@ -10,11 +10,10 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/util/MemAlloc.hpp"
-#include "wpi/util/SmallString.hpp"
-
 #include "c_util.hpp"
 #include "wpi/cs/cscore_cpp.hpp"
+#include "wpi/util/MemAlloc.hpp"
+#include "wpi/util/SmallString.hpp"
 
 static CS_Event ConvertToC(const cs::RawEvent& rawEvent) {
   CS_Event event;

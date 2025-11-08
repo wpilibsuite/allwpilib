@@ -9,17 +9,17 @@
 
 #include <Eigen/Cholesky>
 #include <unsupported/Eigen/MatrixFunctions>
-#include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/array.hpp"
 
+#include "wpi/math/fmt/Eigen.hpp"
 #include "wpi/math/linalg/DARE.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
-#include "wpi/math/util/StateSpaceUtil.hpp"
-#include "wpi/math/fmt/Eigen.hpp"
 #include "wpi/math/system/Discretization.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
-#include "wpi/units/time.hpp"
 #include "wpi/math/util/MathShared.hpp"
+#include "wpi/math/util/StateSpaceUtil.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/array.hpp"
 
 namespace frc {
 

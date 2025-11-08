@@ -11,6 +11,7 @@
 #include <utility>
 
 #include <fmt/format.h>
+
 #include "wpi/hal/Ports.h"
 #include "wpi/util/StringExtras.hpp"
 

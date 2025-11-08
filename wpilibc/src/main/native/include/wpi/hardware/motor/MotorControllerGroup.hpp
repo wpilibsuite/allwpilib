@@ -7,11 +7,10 @@
 #include <functional>
 #include <vector>
 
+#include "wpi/hardware/motor/MotorController.hpp"
 #include "wpi/util/deprecated.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
-
-#include "wpi/hardware/motor/MotorController.hpp"
 
 WPI_IGNORE_DEPRECATED
 

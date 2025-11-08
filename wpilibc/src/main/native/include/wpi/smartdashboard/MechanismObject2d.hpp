@@ -12,9 +12,8 @@
 #include <utility>
 
 #include "wpi/nt/NetworkTable.hpp"
-#include "wpi/util/StringMap.hpp"
-
 #include "wpi/system/Errors.hpp"
+#include "wpi/util/StringMap.hpp"
 
 namespace frc {
 

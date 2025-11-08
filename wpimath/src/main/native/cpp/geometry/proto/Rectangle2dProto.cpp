@@ -5,7 +5,6 @@
 #include "wpi/math/geometry/proto/Rectangle2dProto.hpp"
 
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
-
 #include "wpimath/protobuf/geometry2d.npb.h"
 
 std::optional<frc::Rectangle2d> wpi::Protobuf<frc::Rectangle2d>::Unpack(

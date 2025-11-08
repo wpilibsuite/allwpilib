@@ -11,13 +11,13 @@
 #include <string>
 
 #include <fmt/format.h>
+
+#include "Instance.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/fs.hpp"
 #include "wpi/util/raw_istream.hpp"
 #include "wpi/util/raw_ostream.hpp"
-
-#include "Instance.hpp"
 
 namespace cs {
 

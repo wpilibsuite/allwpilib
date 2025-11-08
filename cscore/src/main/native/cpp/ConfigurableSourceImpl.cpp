@@ -7,11 +7,10 @@
 #include <memory>
 #include <string>
 
-#include "wpi/util/timestamp.h"
-
 #include "Handle.hpp"
 #include "Instance.hpp"
 #include "Notifier.hpp"
+#include "wpi/util/timestamp.h"
 
 using namespace cs;
 

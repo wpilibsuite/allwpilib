@@ -6,8 +6,8 @@
 
 #include <cmath>
 
-#include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
+#include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/util/MathExtras.hpp"
 
 using namespace sysid;

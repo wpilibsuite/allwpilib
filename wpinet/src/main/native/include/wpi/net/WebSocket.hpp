@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef WPINET_WEBSOCKET_H_
-#define WPINET_WEBSOCKET_H_
+#ifndef WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_WEBSOCKET_HPP_
+#define WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_WEBSOCKET_HPP_
 
 #include <stdint.h>
 
@@ -15,12 +15,11 @@
 #include <string_view>
 #include <utility>
 
-#include "wpi/util/Signal.h"
-#include "wpi/util/SmallVector.hpp"
-
 #include "wpi/net/uv/Buffer.hpp"
 #include "wpi/net/uv/Error.hpp"
 #include "wpi/net/uv/Timer.hpp"
+#include "wpi/util/Signal.h"
+#include "wpi/util/SmallVector.hpp"
 
 namespace wpi {
 
@@ -562,4 +561,4 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
 
 }  // namespace wpi
 
-#endif  // WPINET_WEBSOCKET_H_
+#endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_WEBSOCKET_HPP_

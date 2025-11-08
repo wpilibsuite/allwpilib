@@ -4,10 +4,9 @@
 
 #pragma once
 
-#include "wpi/util/protobuf/Protobuf.hpp"
-
 #include <string>
 
+#include "wpi/util/protobuf/Protobuf.hpp"
 #include "wpiutil.npb.h"
 
 struct TestProtoInner {

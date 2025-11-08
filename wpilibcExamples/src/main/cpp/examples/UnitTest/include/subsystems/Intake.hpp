@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
-#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include <wpi/hardware/motor/PWMSparkMax.hpp>
+#include <wpi/hardware/pneumatic/DoubleSolenoid.hpp>
 
 #include "Constants.hpp"
 

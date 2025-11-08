@@ -8,6 +8,7 @@
 #include <string>
 
 #include <fmt/format.h>
+
 #include "wpi/util/Endian.hpp"
 #include "wpi/util/json.hpp"
 

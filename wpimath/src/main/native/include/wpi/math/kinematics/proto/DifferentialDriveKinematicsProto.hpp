@@ -4,10 +4,9 @@
 
 #pragma once
 
+#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
-
-#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpimath/protobuf/kinematics.npb.h"
 
 template <>

@@ -7,12 +7,11 @@
 #include <utility>
 
 #include "wpi/hal/Ports.h"
+#include "wpi/system/Errors.hpp"
 #include "wpi/util/NullDeleter.hpp"
+#include "wpi/util/SensorUtil.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
-
-#include "wpi/system/Errors.hpp"
-#include "wpi/util/SensorUtil.hpp"
 
 using namespace frc;
 

@@ -7,12 +7,11 @@
 #include <string>
 #include <string_view>
 
+#include "wpi/glass/DataSource.hpp"
+#include "wpi/glass/hardware/Gyro.hpp"
 #include "wpi/nt/DoubleTopic.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/StringTopic.hpp"
-
-#include "wpi/glass/DataSource.hpp"
-#include "wpi/glass/hardware/Gyro.hpp"
 
 namespace glass {
 class NTGyroModel : public GyroModel {

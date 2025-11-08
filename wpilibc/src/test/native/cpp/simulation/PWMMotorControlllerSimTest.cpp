@@ -5,8 +5,8 @@
 #include "wpi/simulation/PWMMotorControllerSim.hpp"  // NOLINT(build/include_order)
 
 #include <gtest/gtest.h>
-#include "wpi/hal/HAL.h"
 
+#include "wpi/hal/HAL.h"
 #include "wpi/hardware/motor/Spark.hpp"
 
 namespace frc::sim {

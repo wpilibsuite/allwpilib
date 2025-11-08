@@ -15,10 +15,9 @@
 #include <utility>
 #include <vector>
 
+#include "dns_sd.h"
 #include "wpi/util/Synchronization.h"
 #include "wpi/util/mutex.hpp"
-
-#include "dns_sd.h"
 
 namespace wpi {
 class ResolverThread {

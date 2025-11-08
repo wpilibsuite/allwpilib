@@ -9,9 +9,9 @@
 #include <Eigen/Cholesky>
 #include <Eigen/Core>
 #include <Eigen/LU>
-#include "wpi/util/expected"
 
 #include "wpi/math/util/StateSpaceUtil.hpp"
+#include "wpi/util/expected"
 
 namespace frc {
 

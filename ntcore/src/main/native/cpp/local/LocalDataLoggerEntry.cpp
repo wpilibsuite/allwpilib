@@ -8,9 +8,9 @@
 #include <string_view>
 
 #include <fmt/format.h>
-#include "wpi/util/StringExtras.hpp"
 
 #include "wpi/nt/NetworkTableValue.hpp"
+#include "wpi/util/StringExtras.hpp"
 
 using namespace nt::local;
 

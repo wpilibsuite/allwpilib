@@ -6,11 +6,10 @@
 
 #include <memory>
 
+#include "wpi/halsim/ws_client/HALSimWS.hpp"
 #include "wpi/halsim/ws_core/WSProviderContainer.hpp"
 #include "wpi/halsim/ws_core/WSProvider_SimDevice.hpp"
 #include "wpi/net/EventLoopRunner.hpp"
-
-#include "wpi/halsim/ws_client/HALSimWS.hpp"
 
 namespace wpilibws {
 

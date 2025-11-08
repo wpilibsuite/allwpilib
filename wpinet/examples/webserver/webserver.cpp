@@ -5,13 +5,12 @@
 #include <cstdio>
 #include <memory>
 
-#include "wpi/util/print.hpp"
-
 #include "wpi/net/EventLoopRunner.hpp"
 #include "wpi/net/HttpServerConnection.hpp"
 #include "wpi/net/UrlParser.hpp"
 #include "wpi/net/uv/Loop.hpp"
 #include "wpi/net/uv/Tcp.hpp"
+#include "wpi/util/print.hpp"
 
 namespace uv = wpi::uv;
 

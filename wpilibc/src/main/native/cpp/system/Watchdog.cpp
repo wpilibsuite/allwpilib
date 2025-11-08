@@ -10,12 +10,12 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include "wpi/hal/Notifier.h"
-#include "wpi/util/mutex.hpp"
-#include "wpi/util/priority_queue.hpp"
 
+#include "wpi/hal/Notifier.h"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/Timer.hpp"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/priority_queue.hpp"
 
 using namespace frc;
 

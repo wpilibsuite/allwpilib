@@ -20,15 +20,15 @@
 #include <memory>
 #include <string_view>
 
-#include "wpi/halsim/ds_socket/DSCommPacket.hpp"
 #include "wpi/hal/Extensions.h"
-#include "wpi/util/print.hpp"
+#include "wpi/halsim/ds_socket/DSCommPacket.hpp"
 #include "wpi/net/EventLoopRunner.hpp"
 #include "wpi/net/raw_uv_ostream.hpp"
 #include "wpi/net/uv/Tcp.hpp"
 #include "wpi/net/uv/Timer.hpp"
 #include "wpi/net/uv/Udp.hpp"
 #include "wpi/net/uv/util.hpp"
+#include "wpi/util/print.hpp"
 
 #if defined(Win32) || defined(_WIN32)
 #pragma comment(lib, "Ws2_32.lib")

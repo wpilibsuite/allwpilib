@@ -9,12 +9,12 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include "wpi/util/print.hpp"
 
 #include "wpi/math/estimator/MecanumDrivePoseEstimator.hpp"
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
+#include "wpi/util/print.hpp"
 
 void testFollowTrajectory(
     const frc::MecanumDriveKinematics& kinematics,

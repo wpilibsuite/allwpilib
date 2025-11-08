@@ -6,7 +6,6 @@
 #include <memory>
 
 #include "wpi/hal/Extensions.h"
-
 #include "wpi/halsim/xrp/HALSimXRPClient.hpp"
 
 #if defined(Win32) || defined(_WIN32)

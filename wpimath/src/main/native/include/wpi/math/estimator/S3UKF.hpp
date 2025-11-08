@@ -4,10 +4,9 @@
 
 #pragma once
 
-#include "wpi/util/SymbolExports.hpp"
-
 #include "wpi/math/estimator/S3SigmaPoints.hpp"
 #include "wpi/math/estimator/UnscentedKalmanFilter.hpp"
+#include "wpi/util/SymbolExports.hpp"
 
 namespace frc {
 

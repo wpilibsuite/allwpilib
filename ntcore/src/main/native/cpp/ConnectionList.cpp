@@ -7,13 +7,12 @@
 #include <string>
 #include <vector>
 
-#include "wpi/util/SmallVector.hpp"
-#include "wpi/util/json.hpp"
-#include "wpi/util/raw_ostream.hpp"
-
 #include "IListenerStorage.hpp"
 #include "wpi/nt/ntcore_c.h"
 #include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/json.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
 using namespace nt;
 

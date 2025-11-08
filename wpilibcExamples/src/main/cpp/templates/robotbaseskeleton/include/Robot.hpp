@@ -6,7 +6,7 @@
 
 #include <atomic>
 
-#include "wpi/opmode/RobotBase.hpp"
+#include <wpi/opmode/RobotBase.hpp>
 
 class Robot : public frc::RobotBase {
  public:

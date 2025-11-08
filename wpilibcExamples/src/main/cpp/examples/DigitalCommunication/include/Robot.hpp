@@ -6,8 +6,8 @@
 
 #include <array>
 
-#include "wpi/hardware/discrete/DigitalOutput.hpp"
-#include "wpi/opmode/TimedRobot.hpp"
+#include <wpi/hardware/discrete/DigitalOutput.hpp>
+#include <wpi/opmode/TimedRobot.hpp>
 
 /**
  * This is a sample program demonstrating how to communicate to a light

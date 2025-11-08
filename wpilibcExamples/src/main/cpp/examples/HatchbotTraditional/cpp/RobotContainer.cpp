@@ -4,8 +4,8 @@
 
 #include "RobotContainer.hpp"
 
-#include "wpi/smartdashboard/SmartDashboard.hpp"
-#include "wpi/commands2/button/JoystickButton.hpp"
+#include <wpi/commands2/button/JoystickButton.hpp>
+#include <wpi/smartdashboard/SmartDashboard.hpp>
 
 #include "commands/DefaultDrive.hpp"
 #include "commands/GrabHatch.hpp"

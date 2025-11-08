@@ -9,10 +9,10 @@
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
+#include "mockdata/DutyCycleDataInternal.h"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/handles/HandlesInternal.h"
 #include "wpi/hal/handles/IndexedHandleResource.h"
-#include "mockdata/DutyCycleDataInternal.h"
 
 using namespace hal;
 

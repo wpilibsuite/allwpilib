@@ -13,14 +13,14 @@
 #include <cstring>
 
 #include <fmt/format.h>
-#include "wpi/util/mutex.hpp"
-#include "wpi/util/print.hpp"
 
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
 #include "wpi/hal/DIO.h"
 #include "wpi/hal/HAL.h"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/print.hpp"
 
 using namespace hal;
 

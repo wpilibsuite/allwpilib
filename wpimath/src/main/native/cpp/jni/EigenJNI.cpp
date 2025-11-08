@@ -8,9 +8,9 @@
 #include <Eigen/Core>
 #include <Eigen/QR>
 #include <unsupported/Eigen/MatrixFunctions>
-#include "wpi/util/jni_util.hpp"
 
 #include "org_wpilib_math_jni_EigenJNI.h"
+#include "wpi/util/jni_util.hpp"
 
 using namespace wpi::java;
 

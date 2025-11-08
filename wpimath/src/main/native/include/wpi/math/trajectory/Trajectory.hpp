@@ -8,10 +8,6 @@
 #include <stdexcept>
 #include <vector>
 
-#include "wpi/util/MathExtras.hpp"
-#include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/json_fwd.hpp"
-
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Transform2d.hpp"
 #include "wpi/units/acceleration.hpp"
@@ -19,6 +15,9 @@
 #include "wpi/units/math.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
+#include "wpi/util/MathExtras.hpp"
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/json_fwd.hpp"
 
 namespace frc {
 /**

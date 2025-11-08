@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef WPINET_UV_ASYNCFUNCTION_H_
-#define WPINET_UV_ASYNCFUNCTION_H_
+#ifndef WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_ASYNCFUNCTION_HPP_
+#define WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_ASYNCFUNCTION_HPP_
 
 #include <stdint.h>
 #include <uv.h>
@@ -16,11 +16,10 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/util/future.hpp"
-#include "wpi/util/mutex.hpp"
-
 #include "wpi/net/uv/Handle.hpp"
 #include "wpi/net/uv/Loop.hpp"
+#include "wpi/util/future.hpp"
+#include "wpi/util/mutex.hpp"
 
 namespace wpi::uv {
 
@@ -176,4 +175,4 @@ class AsyncFunction<R(T...)> final
 
 }  // namespace wpi::uv
 
-#endif  // WPINET_UV_ASYNCFUNCTION_H_
+#endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_ASYNCFUNCTION_HPP_

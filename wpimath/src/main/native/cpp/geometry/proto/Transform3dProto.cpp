@@ -5,7 +5,6 @@
 #include "wpi/math/geometry/proto/Transform3dProto.hpp"
 
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
-
 #include "wpimath/protobuf/geometry3d.npb.h"
 
 std::optional<frc::Transform3d> wpi::Protobuf<frc::Transform3d>::Unpack(

@@ -7,14 +7,13 @@
 #include <functional>
 #include <utility>
 
+#include "wpi/commands2/Command.hpp"
+#include "wpi/commands2/CommandScheduler.hpp"
 #include "wpi/event/BooleanEvent.hpp"
 #include "wpi/event/EventLoop.hpp"
 #include "wpi/math/filter/Debouncer.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/FunctionExtras.hpp"
-
-#include "wpi/commands2/Command.hpp"
-#include "wpi/commands2/CommandScheduler.hpp"
 
 namespace frc2 {
 class Command;

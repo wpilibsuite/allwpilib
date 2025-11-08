@@ -8,6 +8,7 @@
 
 #include <Eigen/Core>
 #include <gcem.hpp>
+
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/json_fwd.hpp"
 

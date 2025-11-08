@@ -5,7 +5,6 @@
 #pragma once
 
 #include "wpi/hardware/discrete/AnalogInput.hpp"
-
 #include "wpi/units/length.hpp"
 
 namespace frc {

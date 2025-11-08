@@ -13,16 +13,16 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
+
+#include "wpi/glass/ContextInternal.hpp"
+#include "wpi/gui/wpigui.hpp"
+#include "wpi/gui/wpigui_internal.hpp"
 #include "wpi/util/MemoryBuffer.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/fs.hpp"
 #include "wpi/util/json.hpp"
 #include "wpi/util/raw_ostream.hpp"
 #include "wpi/util/timestamp.h"
-#include "wpi/gui/wpigui.hpp"
-#include "wpi/gui/wpigui_internal.hpp"
-
-#include "wpi/glass/ContextInternal.hpp"
 
 using namespace glass;
 

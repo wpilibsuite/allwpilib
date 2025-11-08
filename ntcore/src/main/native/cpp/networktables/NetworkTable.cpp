@@ -11,9 +11,6 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include "wpi/util/SmallString.hpp"
-#include "wpi/util/StringExtras.hpp"
-#include "wpi/util/StringMap.hpp"
 
 #include "wpi/nt/BooleanArrayTopic.hpp"
 #include "wpi/nt/BooleanTopic.hpp"
@@ -29,6 +26,9 @@
 #include "wpi/nt/StringTopic.hpp"
 #include "wpi/nt/ntcore.h"
 #include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/StringMap.hpp"
 
 using namespace nt;
 

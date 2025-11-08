@@ -7,7 +7,6 @@
 #include <memory>
 
 #include "wpi/hal/simulation/DIOData.h"
-
 #include "wpi/hardware/discrete/DigitalInput.hpp"
 #include "wpi/hardware/discrete/DigitalOutput.hpp"
 

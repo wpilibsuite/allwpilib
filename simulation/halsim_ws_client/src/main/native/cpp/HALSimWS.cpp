@@ -8,12 +8,11 @@
 #include <memory>
 #include <string>
 
+#include "wpi/halsim/ws_client/HALSimWSClientConnection.hpp"
+#include "wpi/net/uv/util.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/print.hpp"
-#include "wpi/net/uv/util.hpp"
-
-#include "wpi/halsim/ws_client/HALSimWSClientConnection.hpp"
 
 static constexpr int kTcpConnectAttemptTimeout = 1000;
 

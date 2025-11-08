@@ -11,7 +11,6 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include "wpi/util/SpanMatcher.hpp"
 
 #include "../MockLogger.hpp"
 #include "../PubSubOptionsMatcher.hpp"
@@ -24,9 +23,10 @@
 #include "gmock/gmock.h"
 #include "net/Message.hpp"
 #include "net/WireEncoder.hpp"
+#include "server/ServerImpl.hpp"
 #include "wpi/nt/ntcore_c.h"
 #include "wpi/nt/ntcore_cpp.hpp"
-#include "server/ServerImpl.hpp"
+#include "wpi/util/SpanMatcher.hpp"
 
 using ::testing::_;
 using ::testing::AllOf;

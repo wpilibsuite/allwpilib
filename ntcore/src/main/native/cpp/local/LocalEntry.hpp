@@ -4,10 +4,9 @@
 
 #pragma once
 
-#include "wpi/util/Synchronization.h"
-
 #include "Handle.hpp"
 #include "local/LocalSubscriber.hpp"
+#include "wpi/util/Synchronization.h"
 
 namespace nt::local {
 

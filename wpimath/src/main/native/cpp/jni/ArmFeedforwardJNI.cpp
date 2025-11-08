@@ -4,10 +4,9 @@
 
 #include <jni.h>
 
-#include "wpi/util/jni_util.hpp"
-
 #include "org_wpilib_math_jni_ArmFeedforwardJNI.h"
 #include "wpi/math/controller/ArmFeedforward.hpp"
+#include "wpi/util/jni_util.hpp"
 
 using namespace wpi::java;
 

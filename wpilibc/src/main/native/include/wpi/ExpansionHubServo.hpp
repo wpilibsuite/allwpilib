@@ -6,12 +6,11 @@
 
 #include <memory>
 
+#include "wpi/ExpansionHub.hpp"
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/IntegerTopic.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/time.hpp"
-
-#include "wpi/ExpansionHub.hpp"
 
 namespace frc {
 

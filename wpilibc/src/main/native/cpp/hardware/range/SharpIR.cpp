@@ -7,11 +7,10 @@
 #include <algorithm>
 
 #include "wpi/hal/UsageReporting.h"
+#include "wpi/hardware/discrete/AnalogInput.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
-
-#include "wpi/hardware/discrete/AnalogInput.hpp"
 
 using namespace frc;
 

@@ -7,9 +7,9 @@
 #include <array>
 
 #include <gtest/gtest.h>
-#include "wpi/hal/HAL.h"
 
 #include "callback_helpers/TestCallbackHelpers.hpp"
+#include "wpi/hal/HAL.h"
 #include "wpi/hardware/led/AddressableLED.hpp"
 
 namespace frc::sim {

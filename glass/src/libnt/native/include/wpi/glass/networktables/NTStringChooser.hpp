@@ -7,11 +7,10 @@
 #include <string>
 #include <vector>
 
+#include "wpi/glass/other/StringChooser.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/StringArrayTopic.hpp"
 #include "wpi/nt/StringTopic.hpp"
-
-#include "wpi/glass/other/StringChooser.hpp"
 
 namespace glass {
 

@@ -4,10 +4,9 @@
 
 #include "wpi/internal/DriverStationModeThread.hpp"
 
+#include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/util/Synchronization.h"
-
-#include "wpi/driverstation/DriverStation.hpp"
 
 using namespace frc::internal;
 

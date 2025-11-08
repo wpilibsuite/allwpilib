@@ -4,10 +4,9 @@
 
 #pragma once
 
+#include "wpi/driverstation/GenericHID.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
-
-#include "wpi/driverstation/GenericHID.hpp"
 
 namespace frc {
 

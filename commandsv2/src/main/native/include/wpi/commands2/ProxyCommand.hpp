@@ -6,11 +6,10 @@
 
 #include <memory>
 
-#include "wpi/util/FunctionExtras.hpp"
-#include "wpi/util/deprecated.hpp"
-
 #include "wpi/commands2/Command.hpp"
 #include "wpi/commands2/CommandHelper.hpp"
+#include "wpi/util/FunctionExtras.hpp"
+#include "wpi/util/deprecated.hpp"
 
 namespace frc2 {
 /**

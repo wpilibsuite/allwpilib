@@ -7,11 +7,11 @@
 #include <algorithm>
 
 #include <imgui.h>
-#include "wpi/util/StringExtras.hpp"
 
 #include "wpi/glass/Context.hpp"
 #include "wpi/glass/DataSource.hpp"
 #include "wpi/glass/support/NameSetting.hpp"
+#include "wpi/util/StringExtras.hpp"
 
 using namespace glass;
 

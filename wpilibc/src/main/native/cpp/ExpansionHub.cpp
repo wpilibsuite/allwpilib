@@ -6,12 +6,11 @@
 
 #include <memory>
 
-#include "wpi/hal/UsageReporting.h"
-#include "wpi/nt/BooleanTopic.hpp"
-
-#include "wpi/system/Errors.hpp"
 #include "wpi/ExpansionHubMotor.hpp"
 #include "wpi/ExpansionHubServo.hpp"
+#include "wpi/hal/UsageReporting.h"
+#include "wpi/nt/BooleanTopic.hpp"
+#include "wpi/system/Errors.hpp"
 #include "wpi/system/SystemServer.hpp"
 
 using namespace frc;

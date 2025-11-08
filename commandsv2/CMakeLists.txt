@@ -77,19 +77,10 @@ target_include_directories(
 install(TARGETS commandsv2 EXPORT commandsv2)
 export(TARGETS commandsv2 FILE commandsv2.cmake NAMESPACE commandsv2::)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/commandsv2")
-install(
-    DIRECTORY src/generated/main/native/include/
-    DESTINATION "${include_dest}/commandsv2"
-)
+install(DIRECTORY src/generated/main/native/include/ DESTINATION "${include_dest}/commandsv2")
 
-configure_file(
-    commandsv2-config.cmake.in
-    ${WPILIB_BINARY_DIR}/commandsv2-config.cmake
-)
-install(
-    FILES ${WPILIB_BINARY_DIR}/commandsv2-config.cmake
-    DESTINATION share/commandsv2
-)
+configure_file(commandsv2-config.cmake.in ${WPILIB_BINARY_DIR}/commandsv2-config.cmake)
+install(FILES ${WPILIB_BINARY_DIR}/commandsv2-config.cmake DESTINATION share/commandsv2)
 install(EXPORT commandsv2 DESTINATION share/commandsv2)
 
 if(WITH_TESTS)

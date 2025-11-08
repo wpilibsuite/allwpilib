@@ -13,13 +13,13 @@
 
 #include <imgui.h>
 #include <implot.h>
-#include "wpi/units/time.hpp"
-#include "wpi/util/Logger.hpp"
-#include "wpi/util/spinlock.hpp"
 
 #include "wpi/sysid/analysis/AnalysisManager.hpp"
 #include "wpi/sysid/analysis/AnalysisType.hpp"
 #include "wpi/sysid/analysis/Storage.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/util/Logger.hpp"
+#include "wpi/util/spinlock.hpp"
 
 namespace sysid {
 /**

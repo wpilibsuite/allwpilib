@@ -12,7 +12,6 @@
 #include "wpi/glass/hardware/PowerDistribution.hpp"
 #include "wpi/hal/Ports.h"
 #include "wpi/hal/simulation/PowerDistributionData.h"
-
 #include "wpi/halsim/gui/HALDataSource.hpp"
 #include "wpi/halsim/gui/HALSimGui.hpp"
 

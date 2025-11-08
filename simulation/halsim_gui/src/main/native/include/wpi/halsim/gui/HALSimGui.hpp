@@ -10,7 +10,6 @@
 #include "wpi/glass/MainMenuBar.hpp"
 #include "wpi/glass/WindowManager.hpp"
 #include "wpi/glass/networktables/NetworkTablesProvider.hpp"
-
 #include "wpi/halsim/gui/HALProvider.hpp"
 
 namespace halsimgui {

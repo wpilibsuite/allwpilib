@@ -7,12 +7,11 @@
 #include <stdexcept>
 #include <string>
 
-#include "wpi/util/jni_util.hpp"
-
 #include "Exceptions.hpp"
 #include "org_wpilib_math_jni_DAREJNI.h"
-#include "wpi/math/linalg/DARE.hpp"
 #include "wpi/math/fmt/Eigen.hpp"
+#include "wpi/math/linalg/DARE.hpp"
+#include "wpi/util/jni_util.hpp"
 
 using namespace wpi::java;
 

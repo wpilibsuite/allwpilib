@@ -11,20 +11,20 @@
 #include <vector>
 
 #include <fmt/format.h>
+
+#include "wpi/cameraserver/CameraServerShared.hpp"
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/IntegerTopic.hpp"
 #include "wpi/nt/NetworkTable.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/StringArrayTopic.hpp"
 #include "wpi/nt/StringTopic.hpp"
+#include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/mutex.hpp"
-
-#include "wpi/cameraserver/CameraServerShared.hpp"
-#include "wpi/nt/ntcore_cpp.hpp"
 
 using namespace frc;
 

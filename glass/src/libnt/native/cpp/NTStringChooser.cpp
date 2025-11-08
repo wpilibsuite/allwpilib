@@ -7,6 +7,7 @@
 #include <utility>
 
 #include <fmt/format.h>
+
 #include "wpi/util/json.hpp"
 
 using namespace glass;

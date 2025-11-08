@@ -10,10 +10,10 @@
 
 #include <imgui.h>
 #include <imgui_internal.h>
-#include "wpi/util/DenseMap.hpp"
 
 #include "wpi/glass/DataSource.hpp"
 #include "wpi/glass/support/ExpressionParser.hpp"
+#include "wpi/util/DenseMap.hpp"
 
 namespace glass {
 

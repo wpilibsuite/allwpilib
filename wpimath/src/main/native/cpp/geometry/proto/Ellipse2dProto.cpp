@@ -5,7 +5,6 @@
 #include "wpi/math/geometry/proto/Ellipse2dProto.hpp"
 
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
-
 #include "wpimath/protobuf/geometry2d.npb.h"
 
 std::optional<frc::Ellipse2d> wpi::Protobuf<frc::Ellipse2d>::Unpack(

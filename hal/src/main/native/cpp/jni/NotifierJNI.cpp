@@ -7,11 +7,10 @@
 #include <cassert>
 #include <cstdio>
 
-#include "wpi/util/jni_util.hpp"
-
 #include "HALUtil.h"
 #include "org_wpilib_hardware_hal_NotifierJNI.h"
 #include "wpi/hal/Notifier.h"
+#include "wpi/util/jni_util.hpp"
 
 using namespace hal;
 

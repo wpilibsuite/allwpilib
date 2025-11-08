@@ -6,9 +6,8 @@
 
 #include <string>
 
-#include "wpi/util/json.hpp"
-
 #include "cameracalibration.hpp"
+#include "wpi/util/json.hpp"
 
 namespace fieldcalibration {
 int calibrate(std::string input_dir_path, wpi::json& output_json,

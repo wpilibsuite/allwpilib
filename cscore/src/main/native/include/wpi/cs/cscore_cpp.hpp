@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_CSCORE_CPP_H_
-#define CSCORE_CSCORE_CPP_H_
+#ifndef CSCORE_WPI_CS_CSCORE_CPP_HPP_
+#define CSCORE_WPI_CS_CSCORE_CPP_HPP_
 
 #include <stdint.h>
 
@@ -13,11 +13,10 @@
 #include <string_view>
 #include <vector>
 
+#include "wpi/cs/cscore_c.h"
 #include "wpi/util/RawFrame.h"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/json_fwd.hpp"
-
-#include "wpi/cs/cscore_c.h"
 
 #ifdef _WIN32
 // Disable uninitialized variable warnings
@@ -455,4 +454,4 @@ std::vector<std::string> GetNetworkInterfaces();
 #pragma warning(pop)
 #endif
 
-#endif  // CSCORE_CSCORE_CPP_H_
+#endif  // CSCORE_WPI_CS_CSCORE_CPP_HPP_

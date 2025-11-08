@@ -4,15 +4,14 @@
 
 #pragma once
 
-#include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/array.hpp"
-
 #include "wpi/math/estimator/PoseEstimator.hpp"
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/kinematics/DifferentialDriveOdometry.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/array.hpp"
 
 namespace frc {
 /**

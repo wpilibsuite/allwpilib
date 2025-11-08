@@ -11,13 +11,12 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/util/StringExtras.hpp"
-#include "wpi/util/json.hpp"
-#include "wpi/util/timestamp.h"
-
 #include "Log.hpp"
 #include "Notifier.hpp"
 #include "Telemetry.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/json.hpp"
+#include "wpi/util/timestamp.h"
 
 using namespace cs;
 

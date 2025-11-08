@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "wpi/commands2/CommandPtr.hpp"
-#include "wpi/commands2/SubsystemBase.hpp"
+#include <wpi/commands2/CommandPtr.hpp>
+#include <wpi/commands2/SubsystemBase.hpp>
 
 class ExampleSubsystem : public frc2::SubsystemBase {
  public:

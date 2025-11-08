@@ -11,11 +11,10 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/util/json_fwd.hpp"
-
 #include "wpi/nt/NetworkTableType.hpp"
 #include "wpi/nt/ntcore_c.h"
 #include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/json_fwd.hpp"
 
 namespace nt {
 

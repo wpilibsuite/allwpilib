@@ -4,10 +4,9 @@
 
 #pragma once
 
-#include "wpi/util/SymbolExports.hpp"
-
 #include "wpi/math/geometry/Twist2d.hpp"
 #include "wpi/math/kinematics/ChassisSpeeds.hpp"
+#include "wpi/util/SymbolExports.hpp"
 
 namespace frc {
 /**

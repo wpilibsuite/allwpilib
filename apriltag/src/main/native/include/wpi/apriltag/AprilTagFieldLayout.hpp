@@ -9,13 +9,12 @@
 #include <unordered_map>
 #include <vector>
 
-#include "wpi/units/length.hpp"
-#include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/json_fwd.hpp"
-
 #include "wpi/apriltag/AprilTag.hpp"
 #include "wpi/apriltag/AprilTagFields.hpp"
 #include "wpi/math/geometry/Pose3d.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/json_fwd.hpp"
 
 namespace frc {
 /**

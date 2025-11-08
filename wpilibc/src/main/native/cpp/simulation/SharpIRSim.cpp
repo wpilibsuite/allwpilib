@@ -5,9 +5,8 @@
 #include "wpi/simulation/SharpIRSim.hpp"
 
 #include "wpi/hal/SimDevice.h"
-#include "wpi/units/length.hpp"
-
 #include "wpi/simulation/SimDeviceSim.hpp"
+#include "wpi/units/length.hpp"
 
 using namespace frc;
 

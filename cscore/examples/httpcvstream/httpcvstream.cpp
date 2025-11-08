@@ -5,10 +5,10 @@
 #include <cstdio>
 
 #include <opencv2/core/core.hpp>
-#include "wpi/util/print.hpp"
 
 #include "wpi/cs/cscore.h"
 #include "wpi/cs/cscore_cv.hpp"
+#include "wpi/util/print.hpp"
 
 int main() {
   cs::HttpCamera camera{"httpcam", "http://localhost:8081/?action=stream"};

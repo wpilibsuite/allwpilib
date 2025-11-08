@@ -7,13 +7,12 @@
 #include <string>
 #include <string_view>
 
+#include "wpi/glass/DataSource.hpp"
+#include "wpi/glass/other/PIDController.hpp"
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/DoubleTopic.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/StringTopic.hpp"
-
-#include "wpi/glass/DataSource.hpp"
-#include "wpi/glass/other/PIDController.hpp"
 
 namespace glass {
 class NTPIDControllerModel : public PIDControllerModel {

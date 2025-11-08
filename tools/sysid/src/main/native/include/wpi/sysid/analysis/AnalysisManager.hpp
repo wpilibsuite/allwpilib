@@ -13,16 +13,15 @@
 #include <string_view>
 #include <vector>
 
-#include "wpi/units/time.hpp"
-#include "wpi/util/Logger.hpp"
-#include "wpi/util/StringMap.hpp"
-#include "wpi/util/json.hpp"
-
 #include "wpi/sysid/analysis/AnalysisType.hpp"
 #include "wpi/sysid/analysis/FeedbackAnalysis.hpp"
 #include "wpi/sysid/analysis/FeedbackControllerPreset.hpp"
 #include "wpi/sysid/analysis/OLS.hpp"
 #include "wpi/sysid/analysis/Storage.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/util/Logger.hpp"
+#include "wpi/util/StringMap.hpp"
+#include "wpi/util/json.hpp"
 
 namespace sysid {
 

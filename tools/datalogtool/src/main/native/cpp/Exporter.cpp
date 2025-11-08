@@ -19,24 +19,24 @@
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 #include <fmt/ranges.h>
-#include "wpi/glass/Storage.hpp"
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
+
+#include "App.hpp"
+#include "wpi/datalog/DataLogReaderThread.hpp"
+#include "wpi/glass/Storage.hpp"
 #include "wpi/gui/portable-file-dialogs.h"
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/MemoryBuffer.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/SpanExtras.hpp"
 #include "wpi/util/StringExtras.hpp"
-#include "wpi/datalog/DataLogReaderThread.hpp"
 #include "wpi/util/fmt/raw_ostream.hpp"
 #include "wpi/util/fs.hpp"
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/print.hpp"
 #include "wpi/util/raw_ostream.hpp"
-
-#include "App.hpp"
 
 namespace {
 struct InputFile {

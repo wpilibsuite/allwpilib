@@ -4,10 +4,9 @@
 
 #include "wpi/cs/cscore_c.h"  // NOLINT(build/include_order)
 
-#include "wpi/util/MemAlloc.hpp"
-
 #include "c_util.hpp"
 #include "wpi/cs/cscore_cpp.hpp"
+#include "wpi/util/MemAlloc.hpp"
 
 using namespace cs;
 

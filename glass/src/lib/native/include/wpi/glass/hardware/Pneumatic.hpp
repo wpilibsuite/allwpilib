@@ -8,9 +8,8 @@
 #include <string_view>
 #include <utility>
 
-#include "wpi/util/function_ref.hpp"
-
 #include "wpi/glass/Model.hpp"
+#include "wpi/util/function_ref.hpp"
 
 namespace glass {
 

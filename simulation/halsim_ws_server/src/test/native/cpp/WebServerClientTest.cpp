@@ -9,10 +9,11 @@
 #include <string>
 
 #include <fmt/format.h>
-#include "wpi/util/SmallString.hpp"
-#include "wpi/util/print.hpp"
+
 #include "wpi/net/raw_uv_ostream.hpp"
 #include "wpi/net/uv/util.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/print.hpp"
 
 static constexpr int kTcpConnectAttemptTimeout = 1000;
 

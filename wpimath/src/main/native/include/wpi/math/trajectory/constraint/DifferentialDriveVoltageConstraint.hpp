@@ -8,15 +8,14 @@
 #include <limits>
 #include <utility>
 
-#include "wpi/util/MathExtras.hpp"
-#include "wpi/util/SymbolExports.hpp"
-
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/math.hpp"
 #include "wpi/units/voltage.hpp"
+#include "wpi/util/MathExtras.hpp"
+#include "wpi/util/SymbolExports.hpp"
 
 namespace frc {
 /**

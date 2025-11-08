@@ -13,13 +13,12 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/util/DenseMap.hpp"
-
 #include "Message.hpp"
 #include "WireConnection.hpp"
 #include "WireEncoder.hpp"
 #include "wpi/nt/NetworkTableValue.hpp"
 #include "wpi/nt/ntcore_c.h"
+#include "wpi/util/DenseMap.hpp"
 
 namespace nt::net {
 

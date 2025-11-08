@@ -10,11 +10,10 @@
 #include <string>
 #include <utility>
 
+#include "AvahiClient.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/mutex.hpp"
-
-#include "AvahiClient.hpp"
 
 using namespace wpi;
 

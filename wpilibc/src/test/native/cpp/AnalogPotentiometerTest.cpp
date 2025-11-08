@@ -3,8 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include "wpi/hal/HAL.h"
 
+#include "wpi/hal/HAL.h"
 #include "wpi/hardware/rotation/AnalogPotentiometer.hpp"
 #include "wpi/simulation/AnalogInputSim.hpp"
 #include "wpi/simulation/RoboRioSim.hpp"

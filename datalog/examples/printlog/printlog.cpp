@@ -9,11 +9,11 @@
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 #include <fmt/ranges.h>
+
+#include "wpi/datalog/DataLogReader.hpp"
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/MemoryBuffer.hpp"
 #include "wpi/util/print.hpp"
-
-#include "wpi/datalog/DataLogReader.hpp"
 
 int main(int argc, const char** argv) {
   if (argc != 2) {

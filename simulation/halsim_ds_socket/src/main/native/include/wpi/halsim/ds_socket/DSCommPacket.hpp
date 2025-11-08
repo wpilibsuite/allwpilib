@@ -7,8 +7,8 @@
 #include <array>
 #include <span>
 
-#include "wpi/halsim/ds_socket/DSCommJoystickPacket.hpp"
 #include "wpi/hal/simulation/DriverStationData.h"
+#include "wpi/halsim/ds_socket/DSCommJoystickPacket.hpp"
 #include "wpi/net/raw_uv_ostream.hpp"
 
 class DSCommPacketTest;

@@ -4,10 +4,9 @@
 
 #pragma once
 
+#include "wpi/units/length.hpp"
 #include "wpi/util/MathExtras.hpp"
 #include "wpi/util/SymbolExports.hpp"
-
-#include "wpi/units/length.hpp"
 
 namespace frc {
 /**

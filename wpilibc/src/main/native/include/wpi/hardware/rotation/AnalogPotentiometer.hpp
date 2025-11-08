@@ -6,10 +6,9 @@
 
 #include <memory>
 
+#include "wpi/hardware/discrete/AnalogInput.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
-
-#include "wpi/hardware/discrete/AnalogInput.hpp"
 
 namespace frc {
 

@@ -6,11 +6,10 @@
 
 #include <string>
 
-#include "wpi/hal/DriverStation.h"
-
 #include "wpi/driverstation/DriverStation.hpp"
-#include "wpi/system/Errors.hpp"
 #include "wpi/event/BooleanEvent.hpp"
+#include "wpi/hal/DriverStation.h"
+#include "wpi/system/Errors.hpp"
 
 using namespace frc;
 

@@ -5,9 +5,8 @@
 #pragma once
 
 #include "wpi/hal/SimDevice.h"
-#include "wpi/units/length.hpp"
-
 #include "wpi/hardware/range/SharpIR.hpp"
+#include "wpi/units/length.hpp"
 
 namespace frc {
 

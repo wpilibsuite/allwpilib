@@ -6,11 +6,10 @@
 
 #include <string>
 
-#include "wpi/util/sendable/SendableBuilder.hpp"
-#include "wpi/util/sendable/SendableRegistry.hpp"
-
 #include "wpi/commands2/Command.hpp"
 #include "wpi/commands2/CommandScheduler.hpp"
+#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/util/sendable/SendableRegistry.hpp"
 
 using namespace frc2;
 

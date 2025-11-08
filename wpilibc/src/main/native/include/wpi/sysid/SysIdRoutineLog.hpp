@@ -7,6 +7,7 @@
 #include <string>
 #include <string_view>
 
+#include "wpi/datalog/DataLog.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/angular_acceleration.hpp"
@@ -15,7 +16,6 @@
 #include "wpi/units/length.hpp"
 #include "wpi/units/velocity.hpp"
 #include "wpi/units/voltage.hpp"
-#include "wpi/datalog/DataLog.hpp"
 
 namespace frc::sysid {
 

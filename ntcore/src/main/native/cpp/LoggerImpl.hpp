@@ -7,11 +7,10 @@
 #include <atomic>
 #include <vector>
 
-#include "wpi/util/mutex.hpp"
-
 #include "IListenerStorage.hpp"
 #include "wpi/nt/ntcore_c.h"
 #include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/mutex.hpp"
 
 namespace nt {
 

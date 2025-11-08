@@ -4,10 +4,9 @@
 
 #include "wpi/nt/Topic.hpp"
 
-#include "wpi/util/json.hpp"
-
 #include "wpi/nt/GenericEntry.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/util/json.hpp"
 
 using namespace nt;
 

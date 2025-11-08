@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_IMAGE_H_
-#define CSCORE_IMAGE_H_
+#ifndef CSCORE_IMAGE_HPP_
+#define CSCORE_IMAGE_HPP_
 
 #include <string_view>
 #include <vector>
 
 #include <opencv2/core/core.hpp>
 
-#include "wpi/cs/cscore_cpp.hpp"
 #include "default_init_allocator.hpp"
+#include "wpi/cs/cscore_cpp.hpp"
 
 namespace cs {
 
@@ -131,4 +131,4 @@ class Image {
 
 }  // namespace cs
 
-#endif  // CSCORE_IMAGE_H_
+#endif  // CSCORE_IMAGE_HPP_

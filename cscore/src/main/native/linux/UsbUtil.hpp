@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_USBUTIL_H_
-#define CSCORE_USBUTIL_H_
+#ifndef CSCORE_USBUTIL_HPP_
+#define CSCORE_USBUTIL_HPP_
 
 #include <string>
 
@@ -21,4 +21,4 @@ int CheckedIoctl(int fd, unsigned long req, void* data,  // NOLINT(runtime/int)
 
 }  // namespace cs
 
-#endif  // CSCORE_USBUTIL_H_
+#endif  // CSCORE_USBUTIL_HPP_

@@ -7,14 +7,14 @@
 #include <functional>
 #include <utility>
 
-#include "wpi/simulation/DriverStationSim.hpp"
 #include <gtest/gtest.h>
 
+#include "gmock/gmock.h"
 #include "wpi/commands2/CommandHelper.hpp"
 #include "wpi/commands2/CommandScheduler.hpp"
 #include "wpi/commands2/Requirements.hpp"
 #include "wpi/commands2/SubsystemBase.hpp"
-#include "gmock/gmock.h"
+#include "wpi/simulation/DriverStationSim.hpp"
 
 namespace frc2 {
 

@@ -5,8 +5,8 @@
 #include <string_view>
 
 #include <gtest/gtest.h>
-#include "wpi/hal/SimDevice.h"
 
+#include "wpi/hal/SimDevice.h"
 #include "wpi/simulation/SimDeviceSim.hpp"
 
 using namespace frc::sim;

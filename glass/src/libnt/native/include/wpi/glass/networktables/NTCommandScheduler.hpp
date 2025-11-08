@@ -10,13 +10,12 @@
 #include <string_view>
 #include <vector>
 
+#include "wpi/glass/DataSource.hpp"
+#include "wpi/glass/other/CommandScheduler.hpp"
 #include "wpi/nt/IntegerArrayTopic.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/StringArrayTopic.hpp"
 #include "wpi/nt/StringTopic.hpp"
-
-#include "wpi/glass/DataSource.hpp"
-#include "wpi/glass/other/CommandScheduler.hpp"
 
 namespace glass {
 class NTCommandSchedulerModel : public CommandSchedulerModel {

@@ -8,9 +8,6 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include "wpi/util/SpanMatcher.hpp"
-#include "wpi/util/json.hpp"
-#include "wpi/util/raw_ostream.hpp"
 
 #include "../TestPrinters.hpp"
 #include "Handle.hpp"
@@ -19,6 +16,9 @@
 #include "net/Message.hpp"
 #include "net/WireEncoder.hpp"
 #include "wpi/nt/NetworkTableValue.hpp"
+#include "wpi/util/SpanMatcher.hpp"
+#include "wpi/util/json.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
 using namespace std::string_view_literals;
 

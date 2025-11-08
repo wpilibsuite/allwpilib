@@ -10,7 +10,6 @@
 #include <thread>
 
 #include <fmt/format.h>
-#include "wpi/util/print.hpp"
 
 #include "HALInitializer.h"
 #include "HALInternal.h"
@@ -19,6 +18,7 @@
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/cpp/fpga_clock.h"
 #include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/util/print.hpp"
 
 using namespace hal;
 

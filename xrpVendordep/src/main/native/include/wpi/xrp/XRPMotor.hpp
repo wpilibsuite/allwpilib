@@ -4,14 +4,13 @@
 
 #pragma once
 
-#include "wpi/hardware/motor/MotorSafety.hpp"
-#include "wpi/hardware/motor/MotorController.hpp"
-
 #include <map>
 #include <set>
 #include <string>
 
 #include "wpi/hal/SimDevice.h"
+#include "wpi/hardware/motor/MotorController.hpp"
+#include "wpi/hardware/motor/MotorSafety.hpp"
 #include "wpi/util/deprecated.hpp"
 
 namespace frc {

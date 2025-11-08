@@ -4,10 +4,9 @@
 
 #pragma once
 
+#include "wpi/math/geometry/Transform2d.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
-
-#include "wpi/math/geometry/Transform2d.hpp"
 #include "wpimath/protobuf/geometry2d.npb.h"
 
 template <>
