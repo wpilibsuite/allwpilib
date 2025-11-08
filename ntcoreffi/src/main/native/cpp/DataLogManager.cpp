@@ -30,7 +30,7 @@ namespace warn {
 static constexpr int Warning = 16;
 }  // namespace warn
 
-namespace frc {
+namespace wpi {
 void ReportErrorV(int32_t status, const char* fileName, int lineNumber,
                   const char* funcName, fmt::string_view format,
                   fmt::format_args args) {
@@ -55,12 +55,12 @@ inline void ReportError(int32_t status, const char* fileName, int lineNumber,
   ReportErrorV(status, fileName, lineNumber, funcName, format,
                fmt::make_format_args(args...));
 }
-}  // namespace frc
+}  // namespace wpi
 
 #define WPILIB_ReportError(status, format, ...)                       \
   do {                                                             \
     if ((status) != 0) {                                           \
-      ::frc::ReportError(status, __FILE__, __LINE__, __FUNCTION__, \
+      ::wpi::ReportError(status, __FILE__, __LINE__, __FUNCTION__, \
                          format __VA_OPT__(, ) __VA_ARGS__);       \
     }                                                              \
   } while (0)

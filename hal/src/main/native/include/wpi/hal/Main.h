@@ -25,7 +25,7 @@ extern "C" {
  * require the GUI be run in the main thread.
  *
  * To be effective, this function must be called before the robot code starts
- * the main loop (e.g. by frc::StartRobot()).
+ * the main loop (e.g. by wpi::StartRobot()).
  *
  * @param param parameter data to pass to mainFunc and exitFunc
  * @param mainFunc the function to be run when HAL_RunMain() is called.
