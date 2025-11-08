@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.commands3.button;
+package org.wpilib.command3.button;
 
-import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.networktables.BooleanSubscriber;
-import edu.wpi.first.networktables.BooleanTopic;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import org.wpilib.commands3.Trigger;
+import org.wpilib.networktables.BooleanSubscriber;
+import org.wpilib.networktables.BooleanTopic;
+import org.wpilib.networktables.NetworkTable;
+import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.command3.Trigger;
 
 /** A {@link Trigger} that uses a {@link NetworkTable} boolean field. */
 public class NetworkButton extends Trigger {

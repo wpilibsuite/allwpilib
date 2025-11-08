@@ -2,21 +2,21 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj2.command;
+package org.wpilib.command2;
 
-import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.RobotState;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Watchdog;
-import edu.wpi.first.wpilibj.event.EventLoop;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
+import org.wpilib.hardware.hal.HAL;
+import org.wpilib.util.sendable.Sendable;
+import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.driverstation.DriverStation;
+import org.wpilib.opmode.RobotBase;
+import org.wpilib.opmode.RobotState;
+import org.wpilib.opmode.TimedRobot;
+import org.wpilib.system.Watchdog;
+import org.wpilib.event.EventLoop;
+import org.wpilib.command2.Command.InterruptionBehavior;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -650,12 +650,12 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    *
    * @param stacktrace the original stacktrace
    * @return the stacktrace stripped of leading elements so there is at max one leading element from
-   *     the edu.wpi.first.wpilibj2.command package.
+   *     the org.wpilib.command2 package.
    */
   private StackTraceElement[] stripFrameworkStackElements(StackTraceElement[] stacktrace) {
     int i = stacktrace.length - 1;
     for (; i > 0; i--) {
-      if (stacktrace[i].getClassName().startsWith("edu.wpi.first.wpilibj2.command.")) {
+      if (stacktrace[i].getClassName().startsWith("org.wpilib.command2.")) {
         break;
       }
     }

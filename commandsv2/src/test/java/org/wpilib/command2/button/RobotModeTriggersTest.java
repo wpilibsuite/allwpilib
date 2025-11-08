@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj2.command.button;
+package org.wpilib.command2.button;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.wpi.first.wpilibj.simulation.DriverStationSim;
-import edu.wpi.first.wpilibj2.command.CommandTestBase;
+import org.wpilib.simulation.DriverStationSim;
+import org.wpilib.command2.CommandTestBase;
 import org.junit.jupiter.api.Test;
 
 class RobotModeTriggersTest extends CommandTestBase {

@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.snippets.profiledpidfeedforward;
+package org.wpilib.snippets.profiledpidfeedforward;
 
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import org.wpilib.math.controller.ProfiledPIDController;
+import org.wpilib.math.controller.SimpleMotorFeedforward;
+import org.wpilib.math.trajectory.TrapezoidProfile;
+import org.wpilib.hardware.rotation.Encoder;
+import org.wpilib.opmode.TimedRobot;
+import org.wpilib.hardware.motor.PWMSparkMax;
 
 /**
  * ProfiledPIDController with feedforward snippets for frc-docs.

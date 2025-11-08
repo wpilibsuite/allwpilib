@@ -4,8 +4,8 @@
 
 package printlog;
 
-import edu.wpi.first.datalog.DataLogReader;
-import edu.wpi.first.datalog.DataLogRecord;
+import org.wpilib.datalog.DataLogReader;
+import org.wpilib.datalog.DataLogRecord;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;

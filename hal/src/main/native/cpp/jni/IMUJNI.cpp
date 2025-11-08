@@ -9,7 +9,7 @@
 #include <fmt/format.h>
 
 #include "HALUtil.h"
-#include "edu_wpi_first_hal_IMUJNI.h"
+#include "org_wpilib_hardware_hal_IMUJNI.h"
 #include "hal/IMU.h"
 
 using namespace hal;
@@ -29,12 +29,12 @@ void assertArraySize(JNIEnv* env, jarray array, int minimumSize,
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_hal_IMUJNI
+ * Class:     org_wpilib_hardware_hal_IMUJNI
  * Method:    getIMUAcceleration
  * Signature: ([D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_IMUJNI_getIMUAcceleration
+Java_org_wpilib_hardware_hal_IMUJNI_getIMUAcceleration
   (JNIEnv* env, jclass, jdoubleArray accel)
 {
   assertArraySize(env, accel, 3, "accel");
@@ -50,12 +50,12 @@ Java_edu_wpi_first_hal_IMUJNI_getIMUAcceleration
 }
 
 /*
- * Class:     edu_wpi_first_hal_IMUJNI
+ * Class:     org_wpilib_hardware_hal_IMUJNI
  * Method:    getIMUGyroRates
  * Signature: ([D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_IMUJNI_getIMUGyroRates
+Java_org_wpilib_hardware_hal_IMUJNI_getIMUGyroRates
   (JNIEnv* env, jclass, jdoubleArray rates)
 {
   assertArraySize(env, rates, 3, "rates");
@@ -71,12 +71,12 @@ Java_edu_wpi_first_hal_IMUJNI_getIMUGyroRates
 }
 
 /*
- * Class:     edu_wpi_first_hal_IMUJNI
+ * Class:     org_wpilib_hardware_hal_IMUJNI
  * Method:    getIMUEulerAnglesFlat
  * Signature: ([D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_IMUJNI_getIMUEulerAnglesFlat
+Java_org_wpilib_hardware_hal_IMUJNI_getIMUEulerAnglesFlat
   (JNIEnv* env, jclass, jdoubleArray angles)
 {
   assertArraySize(env, angles, 3, "angles");
@@ -92,12 +92,12 @@ Java_edu_wpi_first_hal_IMUJNI_getIMUEulerAnglesFlat
 }
 
 /*
- * Class:     edu_wpi_first_hal_IMUJNI
+ * Class:     org_wpilib_hardware_hal_IMUJNI
  * Method:    getIMUEulerAnglesLandscape
  * Signature: ([D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_IMUJNI_getIMUEulerAnglesLandscape
+Java_org_wpilib_hardware_hal_IMUJNI_getIMUEulerAnglesLandscape
   (JNIEnv* env, jclass, jdoubleArray angles)
 {
   assertArraySize(env, angles, 3, "angles");
@@ -113,12 +113,12 @@ Java_edu_wpi_first_hal_IMUJNI_getIMUEulerAnglesLandscape
 }
 
 /*
- * Class:     edu_wpi_first_hal_IMUJNI
+ * Class:     org_wpilib_hardware_hal_IMUJNI
  * Method:    getIMUEulerAnglesPortrait
  * Signature: ([D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_IMUJNI_getIMUEulerAnglesPortrait
+Java_org_wpilib_hardware_hal_IMUJNI_getIMUEulerAnglesPortrait
   (JNIEnv* env, jclass, jdoubleArray angles)
 {
   assertArraySize(env, angles, 3, "angles");
@@ -134,12 +134,12 @@ Java_edu_wpi_first_hal_IMUJNI_getIMUEulerAnglesPortrait
 }
 
 /*
- * Class:     edu_wpi_first_hal_IMUJNI
+ * Class:     org_wpilib_hardware_hal_IMUJNI
  * Method:    getIMUQuaternion
  * Signature: ([D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_IMUJNI_getIMUQuaternion
+Java_org_wpilib_hardware_hal_IMUJNI_getIMUQuaternion
   (JNIEnv* env, jclass, jdoubleArray quat)
 {
   assertArraySize(env, quat, 4, "quat");
@@ -155,12 +155,12 @@ Java_edu_wpi_first_hal_IMUJNI_getIMUQuaternion
 }
 
 /*
- * Class:     edu_wpi_first_hal_IMUJNI
+ * Class:     org_wpilib_hardware_hal_IMUJNI
  * Method:    getIMUYawFlat
  * Signature: ()D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_IMUJNI_getIMUYawFlat
+Java_org_wpilib_hardware_hal_IMUJNI_getIMUYawFlat
   (JNIEnv* env, jclass)
 {
   int64_t timestamp;
@@ -168,12 +168,12 @@ Java_edu_wpi_first_hal_IMUJNI_getIMUYawFlat
 }
 
 /*
- * Class:     edu_wpi_first_hal_IMUJNI
+ * Class:     org_wpilib_hardware_hal_IMUJNI
  * Method:    getIMUYawLandscape
  * Signature: ()D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_IMUJNI_getIMUYawLandscape
+Java_org_wpilib_hardware_hal_IMUJNI_getIMUYawLandscape
   (JNIEnv* env, jclass)
 {
   int64_t timestamp;
@@ -181,12 +181,12 @@ Java_edu_wpi_first_hal_IMUJNI_getIMUYawLandscape
 }
 
 /*
- * Class:     edu_wpi_first_hal_IMUJNI
+ * Class:     org_wpilib_hardware_hal_IMUJNI
  * Method:    getIMUYawPortrait
  * Signature: ()D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_IMUJNI_getIMUYawPortrait
+Java_org_wpilib_hardware_hal_IMUJNI_getIMUYawPortrait
   (JNIEnv* env, jclass)
 {
   int64_t timestamp;

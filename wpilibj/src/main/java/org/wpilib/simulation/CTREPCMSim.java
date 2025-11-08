@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.simulation;
+package org.wpilib.simulation;
 
-import edu.wpi.first.hal.simulation.CTREPCMDataJNI;
-import edu.wpi.first.hal.simulation.NotifyCallback;
-import edu.wpi.first.wpilibj.PneumaticsControlModule;
-import edu.wpi.first.wpilibj.SensorUtil;
+import org.wpilib.hardware.hal.simulation.CTREPCMDataJNI;
+import org.wpilib.hardware.hal.simulation.NotifyCallback;
+import org.wpilib.hardware.pneumatic.PneumaticsControlModule;
+import org.wpilib.system.SensorUtil;
 
 /** Class to control a simulated Pneumatic Control Module (PCM). */
 public class CTREPCMSim extends PneumaticsBaseSim {

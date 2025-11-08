@@ -14,7 +14,7 @@
 #include <wpi/jni_util.h>
 #include <wpi/json.h>
 
-#include "edu_wpi_first_networktables_NetworkTablesJNI.h"
+#include "org_wpilib_networktables_NetworkTablesJNI.h"
 #include "ntcore.h"
 #include "ntcore_cpp.h"
 
@@ -53,18 +53,18 @@ static JException nullPointerEx;
 
 static const JClassInit classes[] = {
     {"java/lang/Boolean", &booleanCls},
-    {"edu/wpi/first/networktables/ConnectionInfo", &connectionInfoCls},
+    {"org/wpilib/networktables/ConnectionInfo", &connectionInfoCls},
     {"java/lang/Double", &doubleCls},
-    {"edu/wpi/first/networktables/NetworkTableEvent", &eventCls},
+    {"org/wpilib/networktables/NetworkTableEvent", &eventCls},
     {"java/lang/Float", &floatCls},
-    {"edu/wpi/first/networktables/LogMessage", &logMessageCls},
+    {"org/wpilib/networktables/LogMessage", &logMessageCls},
     {"java/lang/Long", &longCls},
     {"java/util/OptionalLong", &optionalLongCls},
-    {"edu/wpi/first/networktables/PubSubOptions", &pubSubOptionsCls},
-    {"edu/wpi/first/networktables/TimeSyncEventData", &timeSyncEventDataCls},
-    {"edu/wpi/first/networktables/TopicInfo", &topicInfoCls},
-    {"edu/wpi/first/networktables/NetworkTableValue", &valueCls},
-    {"edu/wpi/first/networktables/ValueEventData", &valueEventDataCls}};
+    {"org/wpilib/networktables/PubSubOptions", &pubSubOptionsCls},
+    {"org/wpilib/networktables/TimeSyncEventData", &timeSyncEventDataCls},
+    {"org/wpilib/networktables/TopicInfo", &topicInfoCls},
+    {"org/wpilib/networktables/NetworkTableValue", &valueCls},
+    {"org/wpilib/networktables/ValueEventData", &valueEventDataCls}};
 
 static const JExceptionInit exceptions[] = {
     {"java/lang/IllegalArgumentException", &illegalArgEx},
@@ -278,7 +278,7 @@ static jobject MakeJObject(JNIEnv* env, jobject inst,
                            const nt::TopicInfo& info) {
   static jmethodID constructor = env->GetMethodID(
       topicInfoCls, "<init>",
-      "(Ledu/wpi/first/networktables/"
+      "(Lorg/wpilib/networktables/"
       "NetworkTableInstance;ILjava/lang/String;ILjava/lang/String;)V");
   JLocal<jstring> name{env, MakeJString(env, info.name)};
   JLocal<jstring> typeStr{env, MakeJString(env, info.type_str)};
@@ -291,8 +291,8 @@ static jobject MakeJObject(JNIEnv* env, jobject inst,
                            const nt::ValueEventData& data) {
   static jmethodID constructor =
       env->GetMethodID(valueEventDataCls, "<init>",
-                       "(Ledu/wpi/first/networktables/NetworkTableInstance;II"
-                       "Ledu/wpi/first/networktables/NetworkTableValue;)V");
+                       "(Lorg/wpilib/networktables/NetworkTableInstance;II"
+                       "Lorg/wpilib/networktables/NetworkTableValue;)V");
   JLocal<jobject> value{env, MakeJValue(env, data.value)};
   return env->NewObject(valueEventDataCls, constructor, inst,
                         static_cast<jint>(data.topic),
@@ -311,12 +311,12 @@ static jobject MakeJObject(JNIEnv* env, const nt::TimeSyncEventData& data) {
 static jobject MakeJObject(JNIEnv* env, jobject inst, const nt::Event& event) {
   static jmethodID constructor =
       env->GetMethodID(eventCls, "<init>",
-                       "(Ledu/wpi/first/networktables/NetworkTableInstance;II"
-                       "Ledu/wpi/first/networktables/ConnectionInfo;"
-                       "Ledu/wpi/first/networktables/TopicInfo;"
-                       "Ledu/wpi/first/networktables/ValueEventData;"
-                       "Ledu/wpi/first/networktables/LogMessage;"
-                       "Ledu/wpi/first/networktables/TimeSyncEventData;)V");
+                       "(Lorg/wpilib/networktables/NetworkTableInstance;II"
+                       "Lorg/wpilib/networktables/ConnectionInfo;"
+                       "Lorg/wpilib/networktables/TopicInfo;"
+                       "Lorg/wpilib/networktables/ValueEventData;"
+                       "Lorg/wpilib/networktables/LogMessage;"
+                       "Lorg/wpilib/networktables/TimeSyncEventData;)V");
   JLocal<jobject> connInfo{env, nullptr};
   JLocal<jobject> topicInfo{env, nullptr};
   JLocal<jobject> valueData{env, nullptr};
@@ -367,60 +367,60 @@ static jobjectArray MakeJObject(JNIEnv* env, jobject inst,
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getDefaultInstance
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getDefaultInstance
+Java_org_wpilib_networktables_NetworkTablesJNI_getDefaultInstance
   (JNIEnv*, jclass)
 {
   return nt::GetDefaultInstance();
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    createInstance
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_createInstance
+Java_org_wpilib_networktables_NetworkTablesJNI_createInstance
   (JNIEnv*, jclass)
 {
   return nt::CreateInstance();
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    destroyInstance
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_destroyInstance
+Java_org_wpilib_networktables_NetworkTablesJNI_destroyInstance
   (JNIEnv*, jclass, jint inst)
 {
   nt::DestroyInstance(inst);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getInstanceFromHandle
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getInstanceFromHandle
+Java_org_wpilib_networktables_NetworkTablesJNI_getInstanceFromHandle
   (JNIEnv*, jclass, jint handle)
 {
   return nt::GetInstanceFromHandle(handle);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getEntry
  * Signature: (ILjava/lang/String;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntry
+Java_org_wpilib_networktables_NetworkTablesJNI_getEntry
   (JNIEnv* env, jclass, jint inst, jstring key)
 {
   if (!key) {
@@ -431,48 +431,48 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntry
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getEntryName
  * Signature: (I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntryName
+Java_org_wpilib_networktables_NetworkTablesJNI_getEntryName
   (JNIEnv* env, jclass, jint entry)
 {
   return MakeJString(env, nt::GetEntryName(entry));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getEntryLastChange
  * Signature: (I)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntryLastChange
+Java_org_wpilib_networktables_NetworkTablesJNI_getEntryLastChange
   (JNIEnv*, jclass, jint entry)
 {
   return nt::GetEntryLastChange(entry);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getType
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getType
+Java_org_wpilib_networktables_NetworkTablesJNI_getType
   (JNIEnv*, jclass, jint entry)
 {
   return nt::GetEntryType(entry);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getTopics
  * Signature: (ILjava/lang/String;I)[I
  */
 JNIEXPORT jintArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopics
+Java_org_wpilib_networktables_NetworkTablesJNI_getTopics
   (JNIEnv* env, jclass, jint inst, jstring prefix, jint types)
 {
   if (!prefix) {
@@ -484,12 +484,12 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopics
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getTopicsStr
  * Signature: (ILjava/lang/String;[Ljava/lang/Object;)[I
  */
 JNIEXPORT jintArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopicsStr
+Java_org_wpilib_networktables_NetworkTablesJNI_getTopicsStr
   (JNIEnv* env, jclass, jint inst, jstring prefix, jobjectArray types)
 {
   if (!prefix) {
@@ -521,12 +521,12 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopicsStr
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getTopicInfos
  * Signature: (Ljava/lang/Object;ILjava/lang/String;I)[Ljava/lang/Object;
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopicInfos
+Java_org_wpilib_networktables_NetworkTablesJNI_getTopicInfos
   (JNIEnv* env, jclass, jobject instObject, jint inst, jstring prefix,
    jint types)
 {
@@ -547,12 +547,12 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopicInfos
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getTopicInfosStr
  * Signature: (Ljava/lang/Object;ILjava/lang/String;[Ljava/lang/Object;)[Ljava/lang/Object;
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopicInfosStr
+Java_org_wpilib_networktables_NetworkTablesJNI_getTopicInfosStr
   (JNIEnv* env, jclass, jobject instObject, jint inst, jstring prefix,
    jobjectArray types)
 {
@@ -593,144 +593,144 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopicInfosStr
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getTopic
  * Signature: (ILjava/lang/String;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopic
+Java_org_wpilib_networktables_NetworkTablesJNI_getTopic
   (JNIEnv* env, jclass, jint inst, jstring name)
 {
   return nt::GetTopic(inst, JStringRef{env, name});
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getTopicName
  * Signature: (I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopicName
+Java_org_wpilib_networktables_NetworkTablesJNI_getTopicName
   (JNIEnv* env, jclass, jint topic)
 {
   return MakeJString(env, nt::GetTopicName(topic));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getTopicType
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopicType
+Java_org_wpilib_networktables_NetworkTablesJNI_getTopicType
   (JNIEnv*, jclass, jint topic)
 {
   return nt::GetTopicType(topic);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setTopicPersistent
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setTopicPersistent
+Java_org_wpilib_networktables_NetworkTablesJNI_setTopicPersistent
   (JNIEnv*, jclass, jint topic, jboolean value)
 {
   nt::SetTopicPersistent(topic, value);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getTopicPersistent
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopicPersistent
+Java_org_wpilib_networktables_NetworkTablesJNI_getTopicPersistent
   (JNIEnv*, jclass, jint topic)
 {
   return nt::GetTopicPersistent(topic);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setTopicRetained
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setTopicRetained
+Java_org_wpilib_networktables_NetworkTablesJNI_setTopicRetained
   (JNIEnv*, jclass, jint topic, jboolean value)
 {
   nt::SetTopicRetained(topic, value);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getTopicRetained
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopicRetained
+Java_org_wpilib_networktables_NetworkTablesJNI_getTopicRetained
   (JNIEnv*, jclass, jint topic)
 {
   return nt::GetTopicRetained(topic);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setTopicCached
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setTopicCached
+Java_org_wpilib_networktables_NetworkTablesJNI_setTopicCached
   (JNIEnv*, jclass, jint topic, jboolean value)
 {
   nt::SetTopicCached(topic, value);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getTopicCached
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopicCached
+Java_org_wpilib_networktables_NetworkTablesJNI_getTopicCached
   (JNIEnv*, jclass, jint topic)
 {
   return nt::GetTopicCached(topic);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getTopicTypeString
  * Signature: (I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopicTypeString
+Java_org_wpilib_networktables_NetworkTablesJNI_getTopicTypeString
   (JNIEnv* env, jclass, jint topic)
 {
   return MakeJString(env, nt::GetTopicTypeString(topic));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getTopicExists
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopicExists
+Java_org_wpilib_networktables_NetworkTablesJNI_getTopicExists
   (JNIEnv*, jclass, jint topic)
 {
   return nt::GetTopicExists(topic);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getTopicProperty
  * Signature: (ILjava/lang/String;)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopicProperty
+Java_org_wpilib_networktables_NetworkTablesJNI_getTopicProperty
   (JNIEnv* env, jclass, jint topic, jstring name)
 {
   return MakeJString(env,
@@ -738,12 +738,12 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopicProperty
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setTopicProperty
  * Signature: (ILjava/lang/String;Ljava/lang/String;)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setTopicProperty
+Java_org_wpilib_networktables_NetworkTablesJNI_setTopicProperty
   (JNIEnv* env, jclass, jint topic, jstring name, jstring value)
 {
   wpi::json j;
@@ -758,36 +758,36 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setTopicProperty
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    deleteTopicProperty
  * Signature: (ILjava/lang/String;)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_deleteTopicProperty
+Java_org_wpilib_networktables_NetworkTablesJNI_deleteTopicProperty
   (JNIEnv* env, jclass, jint topic, jstring name)
 {
   nt::DeleteTopicProperty(topic, JStringRef{env, name});
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getTopicProperties
  * Signature: (I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopicProperties
+Java_org_wpilib_networktables_NetworkTablesJNI_getTopicProperties
   (JNIEnv* env, jclass, jint topic)
 {
   return MakeJString(env, nt::GetTopicProperties(topic).dump());
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setTopicProperties
  * Signature: (ILjava/lang/String;)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setTopicProperties
+Java_org_wpilib_networktables_NetworkTablesJNI_setTopicProperties
   (JNIEnv* env, jclass, jint topic, jstring properties)
 {
   wpi::json j;
@@ -806,12 +806,12 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setTopicProperties
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    subscribe
  * Signature: (IILjava/lang/String;Ljava/lang/Object;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_subscribe
+Java_org_wpilib_networktables_NetworkTablesJNI_subscribe
   (JNIEnv* env, jclass, jint topic, jint type, jstring typeStr, jobject options)
 {
   return nt::Subscribe(topic, static_cast<NT_Type>(type),
@@ -820,24 +820,24 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_subscribe
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    unsubscribe
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_unsubscribe
+Java_org_wpilib_networktables_NetworkTablesJNI_unsubscribe
   (JNIEnv*, jclass, jint sub)
 {
   nt::Unsubscribe(sub);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    publish
  * Signature: (IILjava/lang/String;Ljava/lang/Object;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_publish
+Java_org_wpilib_networktables_NetworkTablesJNI_publish
   (JNIEnv* env, jclass, jint topic, jint type, jstring typeStr, jobject options)
 {
   return nt::Publish(topic, static_cast<NT_Type>(type),
@@ -846,12 +846,12 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_publish
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    publishEx
  * Signature: (IILjava/lang/String;Ljava/lang/String;Ljava/lang/Object;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_publishEx
+Java_org_wpilib_networktables_NetworkTablesJNI_publishEx
   (JNIEnv* env, jclass, jint topic, jint type, jstring typeStr,
    jstring properties, jobject options)
 {
@@ -873,24 +873,24 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_publishEx
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    unpublish
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_unpublish
+Java_org_wpilib_networktables_NetworkTablesJNI_unpublish
   (JNIEnv*, jclass, jint pubentry)
 {
   nt::Unpublish(pubentry);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getEntryImpl
  * Signature: (IILjava/lang/String;Ljava/lang/Object;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntryImpl
+Java_org_wpilib_networktables_NetworkTablesJNI_getEntryImpl
   (JNIEnv* env, jclass, jint topic, jint type, jstring typeStr, jobject options)
 {
   return nt::GetEntry(topic, static_cast<NT_Type>(type),
@@ -899,48 +899,48 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntryImpl
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    releaseEntry
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_releaseEntry
+Java_org_wpilib_networktables_NetworkTablesJNI_releaseEntry
   (JNIEnv*, jclass, jint entry)
 {
   nt::ReleaseEntry(entry);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    release
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_release
+Java_org_wpilib_networktables_NetworkTablesJNI_release
   (JNIEnv*, jclass, jint pubsubentry)
 {
   nt::Release(pubsubentry);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getTopicFromHandle
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopicFromHandle
+Java_org_wpilib_networktables_NetworkTablesJNI_getTopicFromHandle
   (JNIEnv*, jclass, jint pubsubentry)
 {
   return nt::GetTopicFromHandle(pubsubentry);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    subscribeMultiple
  * Signature: (I[Ljava/lang/Object;Ljava/lang/Object;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_subscribeMultiple
+Java_org_wpilib_networktables_NetworkTablesJNI_subscribeMultiple
   (JNIEnv* env, jclass, jint inst, jobjectArray prefixes, jobject options)
 {
   if (!prefixes) {
@@ -969,108 +969,108 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_subscribeMultiple
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    unsubscribeMultiple
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_unsubscribeMultiple
+Java_org_wpilib_networktables_NetworkTablesJNI_unsubscribeMultiple
   (JNIEnv*, jclass, jint sub)
 {
   nt::UnsubscribeMultiple(sub);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    readQueueValue
  * Signature: (I)[Ljava/lang/Object;
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readQueueValue
+Java_org_wpilib_networktables_NetworkTablesJNI_readQueueValue
   (JNIEnv* env, jclass, jint subentry)
 {
   return MakeJObject(env, nt::ReadQueueValue(subentry));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getValue
  * Signature: (I)Ljava/lang/Object;
  */
 JNIEXPORT jobject JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getValue
+Java_org_wpilib_networktables_NetworkTablesJNI_getValue
   (JNIEnv* env, jclass, jint entry)
 {
   return MakeJValue(env, nt::GetEntryValue(entry));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setEntryFlags
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setEntryFlags
+Java_org_wpilib_networktables_NetworkTablesJNI_setEntryFlags
   (JNIEnv*, jclass, jint entry, jint flags)
 {
   nt::SetEntryFlags(entry, flags);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getEntryFlags
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntryFlags
+Java_org_wpilib_networktables_NetworkTablesJNI_getEntryFlags
   (JNIEnv*, jclass, jint entry)
 {
   return nt::GetEntryFlags(entry);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getTopicInfo
  * Signature: (Ljava/lang/Object;I)Ljava/lang/Object;
  */
 JNIEXPORT jobject JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getTopicInfo
+Java_org_wpilib_networktables_NetworkTablesJNI_getTopicInfo
   (JNIEnv* env, jclass, jobject inst, jint topic)
 {
   return MakeJObject(env, inst, nt::GetTopicInfo(topic));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    createListenerPoller
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_createListenerPoller
+Java_org_wpilib_networktables_NetworkTablesJNI_createListenerPoller
   (JNIEnv*, jclass, jint inst)
 {
   return nt::CreateListenerPoller(inst);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    destroyListenerPoller
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_destroyListenerPoller
+Java_org_wpilib_networktables_NetworkTablesJNI_destroyListenerPoller
   (JNIEnv*, jclass, jint poller)
 {
   nt::DestroyListenerPoller(poller);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    addListener
  * Signature: (I[Ljava/lang/Object;I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_addListener__I_3Ljava_lang_String_2I
+Java_org_wpilib_networktables_NetworkTablesJNI_addListener__I_3Ljava_lang_String_2I
   (JNIEnv* env, jclass, jint poller, jobjectArray prefixes, jint flags)
 {
   if (!prefixes) {
@@ -1099,84 +1099,84 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_addListener__I_3Ljava_lang_Str
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    addListener
  * Signature: (III)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_addListener__III
+Java_org_wpilib_networktables_NetworkTablesJNI_addListener__III
   (JNIEnv* env, jclass, jint poller, jint handle, jint flags)
 {
   return nt::AddPolledListener(poller, handle, flags);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    readListenerQueue
  * Signature: (Ljava/lang/Object;I)[Ljava/lang/Object;
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_readListenerQueue
+Java_org_wpilib_networktables_NetworkTablesJNI_readListenerQueue
   (JNIEnv* env, jclass, jobject inst, jint poller)
 {
   return MakeJObject(env, inst, nt::ReadListenerQueue(poller));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    removeListener
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_removeListener
+Java_org_wpilib_networktables_NetworkTablesJNI_removeListener
   (JNIEnv*, jclass, jint topicListener)
 {
   nt::RemoveListener(topicListener);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getNetworkMode
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getNetworkMode
+Java_org_wpilib_networktables_NetworkTablesJNI_getNetworkMode
   (JNIEnv*, jclass, jint inst)
 {
   return nt::GetNetworkMode(inst);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    startLocal
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_startLocal
+Java_org_wpilib_networktables_NetworkTablesJNI_startLocal
   (JNIEnv*, jclass, jint inst)
 {
   nt::StartLocal(inst);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    stopLocal
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_stopLocal
+Java_org_wpilib_networktables_NetworkTablesJNI_stopLocal
   (JNIEnv*, jclass, jint inst)
 {
   nt::StopLocal(inst);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    startServer
  * Signature: (ILjava/lang/String;Ljava/lang/String;I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_startServer
+Java_org_wpilib_networktables_NetworkTablesJNI_startServer
   (JNIEnv* env, jclass, jint inst, jstring persistFilename,
    jstring listenAddress, jint port)
 {
@@ -1193,24 +1193,24 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_startServer
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    stopServer
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_stopServer
+Java_org_wpilib_networktables_NetworkTablesJNI_stopServer
   (JNIEnv*, jclass, jint inst)
 {
   nt::StopServer(inst);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    startClient
  * Signature: (ILjava/lang/String;)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_startClient
+Java_org_wpilib_networktables_NetworkTablesJNI_startClient
   (JNIEnv* env, jclass, jint inst, jstring identity)
 {
   if (!identity) {
@@ -1221,24 +1221,24 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_startClient
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    stopClient
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_stopClient
+Java_org_wpilib_networktables_NetworkTablesJNI_stopClient
   (JNIEnv*, jclass, jint inst)
 {
   nt::StopClient(inst);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setServer
  * Signature: (ILjava/lang/String;I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setServer__ILjava_lang_String_2I
+Java_org_wpilib_networktables_NetworkTablesJNI_setServer__ILjava_lang_String_2I
   (JNIEnv* env, jclass, jint inst, jstring serverName, jint port)
 {
   if (!serverName) {
@@ -1249,12 +1249,12 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setServer__ILjava_lang_String_
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setServer
  * Signature: (I[Ljava/lang/Object;[I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setServer__I_3Ljava_lang_String_2_3I
+Java_org_wpilib_networktables_NetworkTablesJNI_setServer__I_3Ljava_lang_String_2_3I
   (JNIEnv* env, jclass, jint inst, jobjectArray serverNames, jintArray ports)
 {
   if (!serverNames) {
@@ -1295,84 +1295,84 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setServer__I_3Ljava_lang_Strin
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setServerTeam
  * Signature: (III)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_setServerTeam
+Java_org_wpilib_networktables_NetworkTablesJNI_setServerTeam
   (JNIEnv* env, jclass, jint inst, jint team, jint port)
 {
   nt::SetServerTeam(inst, team, port);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    disconnect
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_disconnect
+Java_org_wpilib_networktables_NetworkTablesJNI_disconnect
   (JNIEnv* env, jclass, jint inst)
 {
   nt::Disconnect(inst);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    startDSClient
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_startDSClient
+Java_org_wpilib_networktables_NetworkTablesJNI_startDSClient
   (JNIEnv*, jclass, jint inst, jint port)
 {
   nt::StartDSClient(inst, port);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    stopDSClient
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_stopDSClient
+Java_org_wpilib_networktables_NetworkTablesJNI_stopDSClient
   (JNIEnv*, jclass, jint inst)
 {
   nt::StopDSClient(inst);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    flushLocal
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_flushLocal
+Java_org_wpilib_networktables_NetworkTablesJNI_flushLocal
   (JNIEnv*, jclass, jint inst)
 {
   nt::FlushLocal(inst);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    flush
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_flush
+Java_org_wpilib_networktables_NetworkTablesJNI_flush
   (JNIEnv*, jclass, jint inst)
 {
   nt::Flush(inst);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getConnections
  * Signature: (I)[Ljava/lang/Object;
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getConnections
+Java_org_wpilib_networktables_NetworkTablesJNI_getConnections
   (JNIEnv* env, jclass, jint inst)
 {
   auto arr = nt::GetConnections(inst);
@@ -1389,48 +1389,48 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getConnections
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    isConnected
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_isConnected
+Java_org_wpilib_networktables_NetworkTablesJNI_isConnected
   (JNIEnv*, jclass, jint inst)
 {
   return nt::IsConnected(inst);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getServerTimeOffset
  * Signature: (I)Ljava/lang/Object;
  */
 JNIEXPORT jobject JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_getServerTimeOffset
+Java_org_wpilib_networktables_NetworkTablesJNI_getServerTimeOffset
   (JNIEnv* env, jclass, jint inst)
 {
   return MakeJObject(env, nt::GetServerTimeOffset(inst));
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    now
  * Signature: ()J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_now
+Java_org_wpilib_networktables_NetworkTablesJNI_now
   (JNIEnv*, jclass)
 {
   return nt::Now();
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    startEntryDataLog
  * Signature: (IJLjava/lang/String;Ljava/lang/String;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_startEntryDataLog
+Java_org_wpilib_networktables_NetworkTablesJNI_startEntryDataLog
   (JNIEnv* env, jclass, jint inst, jlong log, jstring prefix, jstring logPrefix)
 {
   return nt::StartEntryDataLog(inst, *reinterpret_cast<wpi::log::DataLog*>(log),
@@ -1439,24 +1439,24 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_startEntryDataLog
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    stopEntryDataLog
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_stopEntryDataLog
+Java_org_wpilib_networktables_NetworkTablesJNI_stopEntryDataLog
   (JNIEnv*, jclass, jint logger)
 {
   nt::StopEntryDataLog(logger);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    startConnectionDataLog
  * Signature: (IJLjava/lang/String;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_startConnectionDataLog
+Java_org_wpilib_networktables_NetworkTablesJNI_startConnectionDataLog
   (JNIEnv* env, jclass, jint inst, jlong log, jstring name)
 {
   return nt::StartConnectionDataLog(
@@ -1464,24 +1464,24 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_startConnectionDataLog
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    stopConnectionDataLog
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_stopConnectionDataLog
+Java_org_wpilib_networktables_NetworkTablesJNI_stopConnectionDataLog
   (JNIEnv*, jclass, jint logger)
 {
   nt::StopConnectionDataLog(logger);
 }
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    addLogger
  * Signature: (III)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_addLogger
+Java_org_wpilib_networktables_NetworkTablesJNI_addLogger
   (JNIEnv*, jclass, jint poller, jint minLevel, jint maxLevel)
 {
   return nt::AddPolledLogger(poller, minLevel, maxLevel);

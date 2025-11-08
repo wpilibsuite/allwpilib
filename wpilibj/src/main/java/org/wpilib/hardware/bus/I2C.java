@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.hardware.bus;
 
-import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.I2CJNI;
-import edu.wpi.first.hal.util.BoundaryException;
+import org.wpilib.hardware.hal.HAL;
+import org.wpilib.hardware.hal.I2CJNI;
+import org.wpilib.hardware.hal.util.BoundaryException;
 import java.nio.ByteBuffer;
 
 /**

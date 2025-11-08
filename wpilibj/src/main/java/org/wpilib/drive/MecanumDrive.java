@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.drive;
+package org.wpilib.drive;
 
-import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import org.wpilib.hardware.hal.HAL;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.util.sendable.Sendable;
+import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.hardware.motor.MotorController;
 import java.util.function.DoubleConsumer;
 
 /**
@@ -42,11 +42,11 @@ import java.util.function.DoubleConsumer;
  * positive Z axis points up. Rotations follow the right-hand rule, so counterclockwise rotation
  * around the Z axis is positive.
  *
- * <p>Inputs smaller then {@value edu.wpi.first.wpilibj.drive.RobotDriveBase#kDefaultDeadband} will
+ * <p>Inputs smaller then {@value org.wpilib.drive.RobotDriveBase#kDefaultDeadband} will
  * be set to 0, and larger values will be scaled so that the full range is still used. This deadband
  * value can be changed with {@link #setDeadband}.
  *
- * <p>{@link edu.wpi.first.wpilibj.MotorSafety} is enabled by default. The driveCartesian or
+ * <p>{@link org.wpilib.hardware.motor.MotorSafety} is enabled by default. The driveCartesian or
  * drivePolar methods should be called periodically to avoid Motor Safety timeouts.
  */
 public class MecanumDrive extends RobotDriveBase implements Sendable, AutoCloseable {

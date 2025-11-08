@@ -6,7 +6,7 @@
 
 #include <wpi/jni_util.h>
 
-#include "edu_wpi_first_math_jni_Transform3dJNI.h"
+#include "org_wpilib_math_jni_Transform3dJNI.h"
 #include "frc/geometry/Quaternion.h"
 #include "frc/geometry/Rotation3d.h"
 #include "frc/geometry/Transform3d.h"
@@ -19,12 +19,12 @@ using namespace wpi::java;
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_math_jni_Transform3dJNI
+ * Class:     org_wpilib_math_jni_Transform3dJNI
  * Method:    log
  * Signature: (DDDDDDD)[D
  */
 JNIEXPORT jdoubleArray JNICALL
-Java_edu_wpi_first_math_jni_Transform3dJNI_log
+Java_org_wpilib_math_jni_Transform3dJNI_log
   (JNIEnv* env, jclass, jdouble relX, jdouble relY, jdouble relZ, jdouble relQw,
    jdouble relQx, jdouble relQy, jdouble relQz)
 {

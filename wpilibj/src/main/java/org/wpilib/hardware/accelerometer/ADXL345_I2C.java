@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.hardware.accelerometer;
 
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.SimDevice;
-import edu.wpi.first.hal.SimDouble;
-import edu.wpi.first.hal.SimEnum;
-import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.DoubleTopic;
-import edu.wpi.first.networktables.NTSendable;
-import edu.wpi.first.networktables.NTSendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
+import org.wpilib.hardware.hal.HAL;
+import org.wpilib.hardware.hal.SimDevice;
+import org.wpilib.hardware.hal.SimDouble;
+import org.wpilib.hardware.hal.SimEnum;
+import org.wpilib.networktables.DoublePublisher;
+import org.wpilib.networktables.DoubleTopic;
+import org.wpilib.networktables.NTSendable;
+import org.wpilib.networktables.NTSendableBuilder;
+import org.wpilib.util.sendable.SendableRegistry;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 

@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.smartdashboard;
+package org.wpilib.smartdashboard;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.networktables.DoubleEntry;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.StringEntry;
-import edu.wpi.first.networktables.StringPublisher;
-import edu.wpi.first.networktables.StringTopic;
-import edu.wpi.first.wpilibj.util.Color8Bit;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.networktables.DoubleEntry;
+import org.wpilib.networktables.NetworkTable;
+import org.wpilib.networktables.StringEntry;
+import org.wpilib.networktables.StringPublisher;
+import org.wpilib.networktables.StringTopic;
+import org.wpilib.util.Color8Bit;
 
 /**
  * Ligament node on a Mechanism2d. A ligament can have its length changed (like an elevator) or

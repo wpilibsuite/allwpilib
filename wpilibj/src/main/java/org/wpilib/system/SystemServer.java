@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.system;
 
-import edu.wpi.first.hal.SystemServerJNI;
-import edu.wpi.first.networktables.NetworkTableInstance;
+import org.wpilib.hardware.hal.SystemServerJNI;
+import org.wpilib.networktables.NetworkTableInstance;
 
 /** Class to get system server NT instance. */
 public final class SystemServer {

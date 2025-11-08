@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.hardware.motor;
 
-import edu.wpi.first.hal.ControlWord;
-import edu.wpi.first.hal.DriverStationJNI;
-import edu.wpi.first.util.WPIUtilJNI;
+import org.wpilib.hardware.hal.ControlWord;
+import org.wpilib.hardware.hal.DriverStationJNI;
+import org.wpilib.util.WPIUtilJNI;
 import java.util.LinkedHashSet;
 import java.util.Set;
 

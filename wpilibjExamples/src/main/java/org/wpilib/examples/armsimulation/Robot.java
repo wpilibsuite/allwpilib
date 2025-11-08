@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.armsimulation;
+package org.wpilib.examples.armsimulation;
 
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.examples.armsimulation.subsystems.Arm;
+import org.wpilib.driverstation.Joystick;
+import org.wpilib.opmode.TimedRobot;
+import org.wpilib.examples.armsimulation.subsystems.Arm;
 
 /** This is a sample program to demonstrate the use of arm simulation with existing code. */
 public class Robot extends TimedRobot {

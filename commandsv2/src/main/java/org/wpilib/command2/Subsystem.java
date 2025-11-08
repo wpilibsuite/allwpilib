@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj2.command;
+package org.wpilib.command2;
 
 import java.util.Set;
 import java.util.function.Supplier;
@@ -36,7 +36,7 @@ public interface Subsystem {
   /**
    * This method is called periodically by the {@link CommandScheduler}. Useful for updating
    * subsystem-specific state that needs to be maintained for simulations, such as for updating
-   * {@link edu.wpi.first.wpilibj.simulation} classes and setting simulated sensor readings.
+   * {@link org.wpilib.simulation} classes and setting simulated sensor readings.
    */
   default void simulationPeriodic() {}
 

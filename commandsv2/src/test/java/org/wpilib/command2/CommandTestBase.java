@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj2.command;
+package org.wpilib.command2;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.simulation.DriverStationSim;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
+import org.wpilib.driverstation.DriverStation;
+import org.wpilib.simulation.DriverStationSim;
+import org.wpilib.command2.Command.InterruptionBehavior;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 

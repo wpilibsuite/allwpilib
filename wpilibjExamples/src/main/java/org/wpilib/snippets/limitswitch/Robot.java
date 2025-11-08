@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.snippets.limitswitch;
+package org.wpilib.snippets.limitswitch;
 
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX;
+import org.wpilib.hardware.discrete.DigitalInput;
+import org.wpilib.driverstation.Joystick;
+import org.wpilib.opmode.TimedRobot;
+import org.wpilib.hardware.motor.PWMVictorSPX;
 
 /**
  * Limit Switch snippets for frc-docs.

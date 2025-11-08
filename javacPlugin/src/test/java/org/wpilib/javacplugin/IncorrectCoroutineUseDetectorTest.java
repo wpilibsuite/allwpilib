@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 class IncorrectCoroutineUseDetectorTest {
   private static final String kCoroutineSource =
       """
-      package org.wpilib.commands3;
+      package org.wpilib.command3;
 
       public interface Coroutine {
         void yield();
@@ -30,7 +30,7 @@ class IncorrectCoroutineUseDetectorTest {
         """
         package frc.robot;
 
-        import org.wpilib.commands3.Coroutine;
+        import org.wpilib.command3.Coroutine;
         import java.util.function.Consumer;
 
         class Example {
@@ -46,7 +46,7 @@ class IncorrectCoroutineUseDetectorTest {
         javac()
             .withOptions(kJavaVersionOptions)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.commands3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
                 JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).failed();
@@ -63,7 +63,7 @@ class IncorrectCoroutineUseDetectorTest {
         """
         package frc.robot;
 
-        import org.wpilib.commands3.Coroutine;
+        import org.wpilib.command3.Coroutine;
         import java.util.function.Consumer;
 
         class Example {
@@ -81,7 +81,7 @@ class IncorrectCoroutineUseDetectorTest {
         javac()
             .withOptions(kJavaVersionOptions)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.commands3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
                 JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).failed();
@@ -98,7 +98,7 @@ class IncorrectCoroutineUseDetectorTest {
         """
         package frc.robot;
 
-        import org.wpilib.commands3.Coroutine;
+        import org.wpilib.command3.Coroutine;
         import java.util.function.BiConsumer;
         import java.util.function.Consumer;
 
@@ -117,7 +117,7 @@ class IncorrectCoroutineUseDetectorTest {
         javac()
             .withOptions(kJavaVersionOptions)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.commands3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
                 JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).failed();
@@ -134,7 +134,7 @@ class IncorrectCoroutineUseDetectorTest {
         """
         package frc.robot;
 
-        import org.wpilib.commands3.Coroutine;
+        import org.wpilib.command3.Coroutine;
         import java.util.function.Consumer;
 
         @FunctionalInterface
@@ -157,7 +157,7 @@ class IncorrectCoroutineUseDetectorTest {
         javac()
             .withOptions(kJavaVersionOptions)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.commands3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
                 JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).failed();
@@ -174,7 +174,7 @@ class IncorrectCoroutineUseDetectorTest {
         """
         package frc.robot;
 
-        import org.wpilib.commands3.Coroutine;
+        import org.wpilib.command3.Coroutine;
         import java.util.function.Consumer;
 
         class Example {
@@ -190,7 +190,7 @@ class IncorrectCoroutineUseDetectorTest {
         javac()
             .withOptions(kJavaVersionOptions)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.commands3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
                 JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).failed();
@@ -205,7 +205,7 @@ class IncorrectCoroutineUseDetectorTest {
         """
         package frc.robot;
 
-        import org.wpilib.commands3.Coroutine;
+        import org.wpilib.command3.Coroutine;
         import java.util.function.Consumer;
 
         class Example {
@@ -224,7 +224,7 @@ class IncorrectCoroutineUseDetectorTest {
         javac()
             .withOptions(kJavaVersionOptions)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.commands3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
                 JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).failed();
@@ -247,7 +247,7 @@ class IncorrectCoroutineUseDetectorTest {
         """
         package frc.robot;
 
-        import org.wpilib.commands3.Coroutine;
+        import org.wpilib.command3.Coroutine;
         import java.util.function.Consumer;
 
         class Example {
@@ -261,7 +261,7 @@ class IncorrectCoroutineUseDetectorTest {
         javac()
             .withOptions(kJavaVersionOptions)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.commands3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
                 JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
@@ -275,7 +275,7 @@ class IncorrectCoroutineUseDetectorTest {
         """
         package frc.robot;
 
-        import org.wpilib.commands3.Coroutine;
+        import org.wpilib.command3.Coroutine;
         import java.util.function.Consumer;
 
         class Example {
@@ -295,7 +295,7 @@ class IncorrectCoroutineUseDetectorTest {
         javac()
             .withOptions(kJavaVersionOptions)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.commands3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
                 JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();

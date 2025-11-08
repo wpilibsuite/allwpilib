@@ -2,22 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.system;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Celsius;
-import static edu.wpi.first.units.Units.Microseconds;
-import static edu.wpi.first.units.Units.Volts;
+import static org.wpilib.units.Units.Amps;
+import static org.wpilib.units.Units.Celsius;
+import static org.wpilib.units.Units.Microseconds;
+import static org.wpilib.units.Units.Volts;
 
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.HALUtil;
-import edu.wpi.first.hal.PowerJNI;
-import edu.wpi.first.hal.can.CANJNI;
-import edu.wpi.first.hal.can.CANStatus;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Temperature;
-import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.units.measure.Voltage;
+import org.wpilib.hardware.hal.HAL;
+import org.wpilib.hardware.hal.HALUtil;
+import org.wpilib.hardware.hal.PowerJNI;
+import org.wpilib.hardware.hal.can.CANJNI;
+import org.wpilib.hardware.hal.can.CANStatus;
+import org.wpilib.units.measure.Current;
+import org.wpilib.units.measure.Temperature;
+import org.wpilib.units.measure.Time;
+import org.wpilib.units.measure.Voltage;
 import java.util.function.LongSupplier;
 
 /** Contains functions for roboRIO functionality. */

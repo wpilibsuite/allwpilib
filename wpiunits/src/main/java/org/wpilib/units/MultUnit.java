@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.units;
+package org.wpilib.units;
 
-import edu.wpi.first.units.measure.Mult;
+import org.wpilib.units.measure.Mult;
 import java.util.Objects;
 
 /**
@@ -91,7 +91,7 @@ public class MultUnit<A extends Unit, B extends Unit> extends Unit {
    * {@inheritDoc}
    *
    * <p>Note: When called on an object of type {@code MultUnit} (and <i>not</i> a subclass!), this
-   * method will always return a {@link edu.wpi.first.units.measure.Mult} instance. If you want to
+   * method will always return a {@link org.wpilib.units.measure.Mult} instance. If you want to
    * avoid casting, use {@link #ofNativeBaseUnits(double)} that returns a {@code Per} instance
    * directly.
    *
@@ -107,7 +107,7 @@ public class MultUnit<A extends Unit, B extends Unit> extends Unit {
    * {@inheritDoc}
    *
    * <p>Note: When called on an object of type {@code MultUnit} (and <i>not</i> a subclass!), this
-   * method will always return a {@link edu.wpi.first.units.measure.Mult} instance. If you want to
+   * method will always return a {@link org.wpilib.units.measure.Mult} instance. If you want to
    * avoid casting, use {@link #ofNativeBaseUnits(double)} that returns a {@code Per} instance
    * directly.
    *

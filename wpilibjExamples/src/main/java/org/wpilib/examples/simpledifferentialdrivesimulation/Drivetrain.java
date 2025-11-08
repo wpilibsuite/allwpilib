@@ -2,27 +2,27 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.simpledifferentialdrivesimulation;
+package org.wpilib.examples.simpledifferentialdrivesimulation;
 
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
-import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
-import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.OnboardIMU;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.wpilib.math.controller.PIDController;
+import org.wpilib.math.controller.SimpleMotorFeedforward;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.DifferentialDriveKinematics;
+import org.wpilib.math.kinematics.DifferentialDriveOdometry;
+import org.wpilib.math.kinematics.DifferentialDriveWheelSpeeds;
+import org.wpilib.math.numbers.N2;
+import org.wpilib.math.system.LinearSystem;
+import org.wpilib.math.system.plant.DCMotor;
+import org.wpilib.math.system.plant.LinearSystemId;
+import org.wpilib.hardware.rotation.Encoder;
+import org.wpilib.hardware.imu.OnboardIMU;
+import org.wpilib.system.RobotController;
+import org.wpilib.hardware.motor.PWMSparkMax;
+import org.wpilib.simulation.DifferentialDrivetrainSim;
+import org.wpilib.simulation.EncoderSim;
+import org.wpilib.smartdashboard.Field2d;
+import org.wpilib.smartdashboard.SmartDashboard;
 
 public class Drivetrain {
   // 3 meters per second.

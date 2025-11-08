@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.templates.romicommandbased.commands;
+package org.wpilib.templates.romicommandbased.commands;
 
-import edu.wpi.first.wpilibj.templates.romicommandbased.subsystems.RomiDrivetrain;
-import edu.wpi.first.wpilibj2.command.Command;
+import org.wpilib.templates.romicommandbased.subsystems.RomiDrivetrain;
+import org.wpilib.command2.Command;
 
 /** An example command that uses an example subsystem. */
 public class ExampleCommand extends Command {

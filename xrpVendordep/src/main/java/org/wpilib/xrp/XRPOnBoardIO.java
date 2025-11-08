@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.xrp;
+package org.wpilib.xrp;
 
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DigitalOutput;
+import org.wpilib.hardware.discrete.DigitalInput;
+import org.wpilib.hardware.discrete.DigitalOutput;
 
 /**
  * This class represents the onboard IO of the XRP Reference Robot. This includes the USER

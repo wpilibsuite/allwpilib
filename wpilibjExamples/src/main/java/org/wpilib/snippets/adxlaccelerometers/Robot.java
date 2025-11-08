@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.snippets.adxlaccelerometers;
+package org.wpilib.snippets.adxlaccelerometers;
 
-import edu.wpi.first.wpilibj.ADXL345_I2C;
-import edu.wpi.first.wpilibj.I2C;
-import edu.wpi.first.wpilibj.TimedRobot;
+import org.wpilib.hardware.accelerometer.ADXL345_I2C;
+import org.wpilib.hardware.bus.I2C;
+import org.wpilib.opmode.TimedRobot;
 
 /**
  * ADXL345, 362 Accelerometer snippets for frc-docs.

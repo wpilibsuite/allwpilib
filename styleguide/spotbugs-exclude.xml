@@ -2,50 +2,50 @@
 <FindBugsFilter>
   <Match>
     <Bug pattern="AT_NONATOMIC_64BIT_PRIMITIVE" />
-    <Class name="edu.wpi.first.wpilibj.DriverStation" />
+    <Class name="org.wpilib.driverstation.DriverStation" />
   </Match>
   <Match>
     <Bug pattern="AT_NONATOMIC_64BIT_PRIMITIVE" />
-    <Class name="edu.wpi.first.wpilibj.Ultrasonic" />
+    <Class name="org.wpilib.Ultrasonic" />
   </Match>
   <Match>
     <Bug pattern="AT_NONATOMIC_64BIT_PRIMITIVE" />
-    <Class name="edu.wpi.first.wpilibj.Watchdog" />
+    <Class name="org.wpilib.system.Watchdog" />
   </Match>
   <Match>
     <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
-    <Class name="edu.wpi.first.wpilibj.ADIS16448_IMU" />
+    <Class name="org.wpilib.ADIS16448_IMU" />
   </Match>
   <Match>
     <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
-    <Class name="edu.wpi.first.wpilibj.ADIS16470_IMU" />
+    <Class name="org.wpilib.ADIS16470_IMU" />
   </Match>
   <Match>
     <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
-    <Class name="edu.wpi.first.wpilibj.DriverStation" />
+    <Class name="org.wpilib.driverstation.DriverStation" />
   </Match>
   <Match>
     <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
-    <Class name="edu.wpi.first.wpilibj.GenericHID" />
+    <Class name="org.wpilib.driverstation.GenericHID" />
   </Match>
   <Match>
     <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
-    <Class name="edu.wpi.first.wpilibj.Ultrasonic" />
+    <Class name="org.wpilib.Ultrasonic" />
   </Match>
   <Match>
     <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
-    <Class name="edu.wpi.first.wpilibj2.command.CommandScheduler" />
+    <Class name="org.wpilib.command2.CommandScheduler" />
   </Match>
   <Match>
     <Bug pattern="CT_CONSTRUCTOR_THROW" />
   </Match>
   <Match>
     <Bug pattern="DCN_NULLPOINTER_EXCEPTION" />
-    <Class name="edu.wpi.first.wpilibj.test.TestSuite" />
+    <Class name="org.wpilib.test.TestSuite" />
   </Match>
   <Match>
     <Bug pattern="DE_MIGHT_IGNORE" />
-    <Class name="edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl$Property" />
+    <Class name="org.wpilib.smartdashboard.SendableBuilderImpl$Property" />
   </Match>
   <Match>
     <Bug pattern="DM_DEFAULT_ENCODING" />
@@ -58,7 +58,7 @@
   </Match>
   <Match>
     <Bug pattern="EC_BAD_ARRAY_COMPARE" />
-    <Class name="edu.wpi.first.math.estimator.SwerveDrivePoseEstimator$InterpolationRecord" />
+    <Class name="org.wpilib.math.estimator.SwerveDrivePoseEstimator$InterpolationRecord" />
   </Match>
   <Match>
     <Bug pattern="EI_EXPOSE_REP" />
@@ -80,7 +80,7 @@
   </Match>
   <Match>
     <Bug pattern="IS2_INCONSISTENT_SYNC" />
-    <Class name="edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d" />
+    <Class name="org.wpilib.smartdashboard.MechanismLigament2d" />
   </Match>
   <Match>
     <Bug pattern="MS_EXPOSE_REP" />
@@ -90,69 +90,69 @@
   </Match>
   <Match>
     <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
-    <Class name="edu.wpi.first.wpilibj2.command.ParallelCommandGroup" />
+    <Class name="org.wpilib.command2.ParallelCommandGroup" />
   </Match>
   <Match>
     <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
-    <Class name="edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup" />
+    <Class name="org.wpilib.command2.ParallelDeadlineGroup" />
   </Match>
   <Match>
     <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
-    <Class name="edu.wpi.first.wpilibj2.command.ParallelRaceGroup" />
+    <Class name="org.wpilib.command2.ParallelRaceGroup" />
   </Match>
   <Match>
     <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
-    <Class name="edu.wpi.first.wpilibj2.command.ProxyScheduleCommand" />
+    <Class name="org.wpilib.command2.ProxyScheduleCommand" />
   </Match>
   <Match>
     <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
-    <Class name="edu.wpi.first.wpilibj2.command.SequentialCommandGroup" />
+    <Class name="org.wpilib.command2.SequentialCommandGroup" />
   </Match>
   <Match>
     <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
-    <Class name="edu.wpi.first.wpilibj2.command.SelectCommand" />
+    <Class name="org.wpilib.command2.SelectCommand" />
   </Match>
   <Match>
     <Bug pattern="PA_PUBLIC_PRIMITIVE_ATTRIBUTE" />
   </Match>
   <Match>
     <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
-    <Class name="edu.wpi.first.wpilibj.test.AntJunitLauncher" />
+    <Class name="org.wpilib.test.AntJunitLauncher" />
   </Match>
   <Match>
     <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
-    <Class name="edu.wpi.first.util.CombinedRuntimeLoader" />
+    <Class name="org.wpilib.util.runtime.CombinedRuntimeLoader" />
   </Match>
   <Match>
     <Bug pattern="RV_RETURN_VALUE_OF_PUTIFABSENT_IGNORED" />
-    <Class name="edu.wpi.first.networktables.NetworkTableInstance" />
+    <Class name="org.wpilib.networktables.NetworkTableInstance" />
   </Match>
   <Match>
     <Bug pattern="SC_START_IN_CTOR" />
   </Match>
   <Match>
     <Bug pattern="SF_SWITCH_FALLTHROUGH" />
-    <Class name="edu.wpi.first.cameraserver.CameraServer$PropertyPublisher" />
+    <Class name="org.wpilib.vision.stream.CameraServer$PropertyPublisher" />
   </Match>
   <Match>
     <Bug pattern="SING_SINGLETON_GETTER_NOT_SYNCHRONIZED" />
-    <Class name="edu.wpi.first.wpilibj.test.TestSuite" />
+    <Class name="org.wpilib.test.TestSuite" />
   </Match>
   <Match>
     <Bug pattern="SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR" />
-    <Class name="edu.wpi.first.wpilibj.test.TestSuite" />
+    <Class name="org.wpilib.test.TestSuite" />
   </Match>
   <Match>
     <Bug pattern="SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR" />
-    <Class name="edu.wpi.first.wpilibj2.command.CommandScheduler" />
+    <Class name="org.wpilib.command2.CommandScheduler" />
   </Match>
   <Match>
     <Bug pattern="SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR" />
-    <Class name="edu.wpi.first.math.geometry.CoordinateAxis" />
+    <Class name="org.wpilib.math.geometry.CoordinateAxis" />
   </Match>
   <Match>
     <Bug pattern="SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR" />
-    <Class name="edu.wpi.first.math.geometry.CoordinateSystem" />
+    <Class name="org.wpilib.math.geometry.CoordinateSystem" />
   </Match>
   <Match>
     <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD" />
@@ -168,43 +168,43 @@
   </Match>
   <Match>
     <Bug pattern="UC_USELESS_VOID_METHOD" />
-    <Class name="edu.wpi.first.wpilibj.templates.romitimed.Robot" />
+    <Class name="org.wpilib.templates.romitimed.Robot" />
   </Match>
   <Match>
     <Bug pattern="UC_USELESS_VOID_METHOD" />
-    <Class name="edu.wpi.first.wpilibj.templates.xrptimed.Robot" />
+    <Class name="org.wpilib.templates.xrptimed.Robot" />
   </Match>
   <Match>
     <Bug pattern="UC_USELESS_VOID_METHOD" />
-    <Class name="edu.wpi.first.wpilibj.templates.timed.Robot" />
+    <Class name="org.wpilib.templates.timed.Robot" />
   </Match>
   <Match>
     <Bug pattern="UC_USELESS_VOID_METHOD" />
-    <Class name="edu.wpi.first.wpilibj.templates.timeslice.Robot" />
+    <Class name="org.wpilib.templates.timeslice.Robot" />
   </Match>
   <Match>
     <Bug pattern="UC_USELESS_VOID_METHOD" />
-    <Class name="edu.wpi.first.wpilibj.templates.timesliceskeleton.Robot" />
+    <Class name="org.wpilib.templates.timesliceskeleton.Robot" />
   </Match>
   <Match>
     <Bug pattern="URF_UNREAD_FIELD" />
-    <Class name="edu.wpi.first.wpilibj.ADIS16448_IMU" />
+    <Class name="org.wpilib.ADIS16448_IMU" />
   </Match>
   <Match>
     <Bug pattern="URF_UNREAD_FIELD" />
-    <Class name="edu.wpi.first.wpilibj.ADIS16470_IMU" />
+    <Class name="org.wpilib.ADIS16470_IMU" />
   </Match>
   <Match>
     <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />
   </Match>
   <Match>
     <Bug pattern="UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD" />
-    <Class name="edu.wpi.first.epilogue.EpilogueConfiguration" />
+    <Class name="org.wpilib.epilogue.EpilogueConfiguration" />
   </Match>
   <Match>
     <!-- PMD will skip variables named `ignore`, but spotbugs isn't as smart -->
     <Bug pattern="DLS_DEAD_LOCAL_STORE" />
-    <Class name="org.wpilib.commands3.StagedCommandBuilderTest" />
+    <Class name="org.wpilib.command3.StagedCommandBuilderTest" />
   </Match>
   <Match>
     <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE" />

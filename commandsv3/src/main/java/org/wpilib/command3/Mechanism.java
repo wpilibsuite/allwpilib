@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.commands3;
+package org.wpilib.command3;
 
-import edu.wpi.first.units.measure.Time;
+import org.wpilib.units.measure.Time;
 import java.util.List;
 import java.util.function.Consumer;
 import org.wpilib.annotation.NoDiscard;

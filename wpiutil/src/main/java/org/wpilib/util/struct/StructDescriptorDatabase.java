@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.util.struct;
+package org.wpilib.util.struct;
 
-import edu.wpi.first.util.struct.parser.ParseException;
-import edu.wpi.first.util.struct.parser.ParsedDeclaration;
-import edu.wpi.first.util.struct.parser.ParsedSchema;
-import edu.wpi.first.util.struct.parser.Parser;
+import org.wpilib.util.struct.parser.ParseException;
+import org.wpilib.util.struct.parser.ParsedDeclaration;
+import org.wpilib.util.struct.parser.ParsedSchema;
+import org.wpilib.util.struct.parser.Parser;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;

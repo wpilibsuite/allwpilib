@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.driverstation;
 
-import edu.wpi.first.hal.DriverStationJNI;
-import edu.wpi.first.math.Pair;
-import edu.wpi.first.wpilibj.DriverStation.POVDirection;
-import edu.wpi.first.wpilibj.event.BooleanEvent;
-import edu.wpi.first.wpilibj.event.EventLoop;
+import org.wpilib.hardware.hal.DriverStationJNI;
+import org.wpilib.math.util.Pair;
+import org.wpilib.driverstation.DriverStation.POVDirection;
+import org.wpilib.event.BooleanEvent;
+import org.wpilib.event.EventLoop;
 import java.util.HashMap;
 import java.util.Map;
 

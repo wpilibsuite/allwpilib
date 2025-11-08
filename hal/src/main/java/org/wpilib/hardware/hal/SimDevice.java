@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.hal;
+package org.wpilib.hardware.hal;
 
 /**
  * A wrapper around a simulator device handle.
  *
  * <p>Teams: if you are using this class, you are likely confusing it for {@link
- * edu.wpi.first.wpilibj.simulation.SimDeviceSim}.
+ * org.wpilib.simulation.SimDeviceSim}.
  *
  * <p>Vendors: This class should be used from inside the device class to define the
  * properties/fields of the device. Use {@link #create} to get a SimDevice object, then use {@link
  * #createDouble(String, Direction, double)} or similar to define the device's fields. See {@link
- * edu.wpi.first.wpilibj.ADXRS450_Gyro} for an example implementation.
+ * org.wpilib.ADXRS450_Gyro} for an example implementation.
  */
 public class SimDevice implements AutoCloseable {
   /** Sim device direction. */

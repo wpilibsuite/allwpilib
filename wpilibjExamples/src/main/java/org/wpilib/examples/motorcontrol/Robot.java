@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.motorcontrol;
+package org.wpilib.examples.motorcontrol;
 
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.wpilib.hardware.rotation.Encoder;
+import org.wpilib.driverstation.Joystick;
+import org.wpilib.opmode.TimedRobot;
+import org.wpilib.hardware.motor.PWMSparkMax;
+import org.wpilib.smartdashboard.SmartDashboard;
 
 /**
  * This sample program shows how to control a motor using a joystick. In the operator control part

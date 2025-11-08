@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.commands3;
+package org.wpilib.command3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -31,7 +31,7 @@ class SchedulerErrorHandlingTests extends CommandTestBase {
     assertEquals("The exception", e.getMessage());
 
     assertEquals(
-        "org.wpilib.commands3.SchedulerErrorHandlingTests", e.getStackTrace()[0].getClassName());
+        "org.wpilib.command3.SchedulerErrorHandlingTests", e.getStackTrace()[0].getClassName());
     assertEquals("lambda$errorDetection$0", e.getStackTrace()[0].getMethodName());
 
     assertEquals("=== Command Binding Trace ===", e.getStackTrace()[2].getClassName());

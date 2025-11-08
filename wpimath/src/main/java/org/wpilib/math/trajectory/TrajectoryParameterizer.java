@@ -26,10 +26,10 @@
  * SOFTWARE.
  */
 
-package edu.wpi.first.math.trajectory;
+package org.wpilib.math.trajectory;
 
-import edu.wpi.first.math.spline.PoseWithCurvature;
-import edu.wpi.first.math.trajectory.constraint.TrajectoryConstraint;
+import org.wpilib.math.spline.PoseWithCurvature;
+import org.wpilib.math.trajectory.constraint.TrajectoryConstraint;
 import java.util.ArrayList;
 import java.util.List;
 

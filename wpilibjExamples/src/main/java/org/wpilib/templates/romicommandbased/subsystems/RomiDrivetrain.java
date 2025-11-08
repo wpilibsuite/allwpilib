@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.templates.romicommandbased.subsystems;
+package org.wpilib.templates.romicommandbased.subsystems;
 
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.wpilib.hardware.rotation.Encoder;
+import org.wpilib.drive.DifferentialDrive;
+import org.wpilib.hardware.motor.Spark;
+import org.wpilib.command2.SubsystemBase;
 
 public class RomiDrivetrain extends SubsystemBase {
   private static final double kCountsPerRevolution = 1440.0;

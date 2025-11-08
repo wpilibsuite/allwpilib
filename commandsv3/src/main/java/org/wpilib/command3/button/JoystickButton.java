@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.commands3.button;
+package org.wpilib.command3.button;
 
-import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.wpilibj.GenericHID;
-import org.wpilib.commands3.Trigger;
+import org.wpilib.driverstation.GenericHID;
+import org.wpilib.command3.Trigger;
 
 /** A {@link Trigger} that gets its state from a {@link GenericHID}. */
 public class JoystickButton extends Trigger {

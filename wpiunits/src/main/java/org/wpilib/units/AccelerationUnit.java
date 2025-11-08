@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.units;
+package org.wpilib.units;
 
-import edu.wpi.first.units.measure.Acceleration;
+import org.wpilib.units.measure.Acceleration;
 
 /**
  * A generic unit of acceleration.
  *
  * <p><strong>NOTE:</strong> This type is not compatible with unit-specific accelerations like
- * {@link edu.wpi.first.units.measure.LinearAcceleration}. Authors of APIs that need to interact
+ * {@link org.wpilib.units.measure.LinearAcceleration}. Authors of APIs that need to interact
  * with all types should consider using a generic {@code Measure<? extends PerUnit<? extends
  * PerUnit<[dimension>], TimeUnit>, TimeUnit>}. Bounded wildcards are necessary in order to
- * interoperate with <i>any</i> subclass of the {@link edu.wpi.first.units.measure.Per} measurement
+ * interoperate with <i>any</i> subclass of the {@link org.wpilib.units.measure.Per} measurement
  * type.
  *
  * @param <D> the unit of the accelerating quantity
