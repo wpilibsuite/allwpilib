@@ -55,7 +55,7 @@ cc_library(
 
 generate_resources(
     name = "generate-resources",
-    namespace = "frc",
+    namespace = "wpi::apriltag",
     prefix = "APRILTAG",
     resource_files = glob(["src/main/native/resources/**"]),
 )
