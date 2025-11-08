@@ -25,7 +25,7 @@ Java_org_wpilib_hardware_hal_CTREPCMJNI_initialize
   (JNIEnv* env, jclass, jint busId, jint module)
 {
   int32_t status = 0;
-  auto stack = wpi::util::java::GetJavaStackTrace(env, "edu.wpi.first");
+  auto stack = wpi::util::java::GetJavaStackTrace(env, "org.wpilib");
   auto handle = HAL_InitializeCTREPCM(busId, module, stack.c_str(), &status);
   CheckStatusForceThrow(env, status);
   return handle;
