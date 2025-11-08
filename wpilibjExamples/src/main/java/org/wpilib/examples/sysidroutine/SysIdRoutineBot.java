@@ -4,13 +4,13 @@
 
 package org.wpilib.examples.sysidroutine;
 
-import org.wpilib.examples.sysidroutine.Constants.OIConstants;
-import org.wpilib.examples.sysidroutine.subsystems.Drive;
-import org.wpilib.examples.sysidroutine.subsystems.Shooter;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.button.CommandXboxController;
 import org.wpilib.command2.button.Trigger;
 import org.wpilib.command2.sysid.SysIdRoutine;
+import org.wpilib.examples.sysidroutine.Constants.OIConstants;
+import org.wpilib.examples.sysidroutine.subsystems.Drive;
+import org.wpilib.examples.sysidroutine.subsystems.Shooter;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a

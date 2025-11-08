@@ -4,7 +4,10 @@
 
 package org.wpilib.math.trajectory;
 
-import org.wpilib.math.util.MathSharedStore;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.BiConsumer;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Transform2d;
@@ -14,10 +17,7 @@ import org.wpilib.math.spline.Spline;
 import org.wpilib.math.spline.SplineHelper;
 import org.wpilib.math.spline.SplineParameterizer;
 import org.wpilib.math.spline.SplineParameterizer.MalformedSplineException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.BiConsumer;
+import org.wpilib.math.util.MathSharedStore;
 
 /** Helper class used to generate trajectories with various constraints. */
 public final class TrajectoryGenerator {

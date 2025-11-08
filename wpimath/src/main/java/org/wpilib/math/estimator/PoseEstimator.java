@@ -4,10 +4,9 @@
 
 package org.wpilib.math.estimator;
 
-import org.wpilib.math.util.MathSharedStore;
-import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Nat;
-import org.wpilib.math.linalg.VecBuilder;
+import java.util.NavigableMap;
+import java.util.Optional;
+import java.util.TreeMap;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
@@ -15,11 +14,12 @@ import org.wpilib.math.geometry.Twist2d;
 import org.wpilib.math.interpolation.TimeInterpolatableBuffer;
 import org.wpilib.math.kinematics.Kinematics;
 import org.wpilib.math.kinematics.Odometry;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N3;
-import java.util.NavigableMap;
-import java.util.Optional;
-import java.util.TreeMap;
+import org.wpilib.math.util.MathSharedStore;
+import org.wpilib.math.util.Nat;
 
 /**
  * This class wraps {@link Odometry} to fuse latency-compensated vision measurements with encoder

@@ -7,10 +7,11 @@ package org.wpilib.math.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Nat;
-import org.wpilib.math.linalg.VecBuilder;
+import java.util.Random;
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.estimator.KalmanFilter;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N2;
 import org.wpilib.math.system.LinearSystem;
@@ -18,8 +19,7 @@ import org.wpilib.math.system.LinearSystemLoop;
 import org.wpilib.math.system.plant.DCMotor;
 import org.wpilib.math.system.plant.LinearSystemId;
 import org.wpilib.math.trajectory.TrapezoidProfile;
-import java.util.Random;
-import org.junit.jupiter.api.Test;
+import org.wpilib.math.util.Nat;
 
 class LinearSystemLoopTest {
   private static final double kDt = 0.005;

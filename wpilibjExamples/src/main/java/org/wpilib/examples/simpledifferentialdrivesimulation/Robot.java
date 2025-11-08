@@ -4,6 +4,8 @@
 
 package org.wpilib.examples.simpledifferentialdrivesimulation;
 
+import java.util.List;
+import org.wpilib.driverstation.XboxController;
 import org.wpilib.math.controller.LTVUnicycleController;
 import org.wpilib.math.filter.SlewRateLimiter;
 import org.wpilib.math.geometry.Pose2d;
@@ -14,8 +16,6 @@ import org.wpilib.math.trajectory.TrajectoryConfig;
 import org.wpilib.math.trajectory.TrajectoryGenerator;
 import org.wpilib.opmode.TimedRobot;
 import org.wpilib.system.Timer;
-import org.wpilib.driverstation.XboxController;
-import java.util.List;
 
 public class Robot extends TimedRobot {
   private final XboxController m_controller = new XboxController(0);

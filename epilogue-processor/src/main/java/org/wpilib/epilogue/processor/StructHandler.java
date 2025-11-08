@@ -32,8 +32,7 @@ public class StructHandler extends ElementHandler {
             .getElementUtils()
             .getTypeElement("org.wpilib.util.struct.StructSerializable")
             .asType();
-    m_structType =
-        processingEnv.getElementUtils().getTypeElement("org.wpilib.util.struct.Struct");
+    m_structType = processingEnv.getElementUtils().getTypeElement("org.wpilib.util.struct.Struct");
     m_typeUtils = processingEnv.getTypeUtils();
     m_elementUtils = processingEnv.getElementUtils();
   }

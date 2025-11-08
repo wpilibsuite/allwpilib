@@ -6,8 +6,8 @@ package org.wpilib.math.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.UtilityClassTest;
 import org.junit.jupiter.api.Test;
+import org.wpilib.UtilityClassTest;
 
 class UnitsTest extends UtilityClassTest<Units> {
   UnitsTest() {

@@ -7,15 +7,15 @@ package org.wpilib.simulation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.wpilib.math.linalg.VecBuilder;
+import org.junit.jupiter.api.Test;
+import org.wpilib.hardware.motor.PWMVictorSPX;
+import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.PIDController;
+import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.system.plant.DCMotor;
 import org.wpilib.math.system.plant.LinearSystemId;
 import org.wpilib.math.util.Units;
-import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.system.RobotController;
-import org.wpilib.hardware.motor.PWMVictorSPX;
-import org.junit.jupiter.api.Test;
 
 class ElevatorSimTest {
   @Test

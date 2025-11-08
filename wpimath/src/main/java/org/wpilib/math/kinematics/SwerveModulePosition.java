@@ -6,15 +6,15 @@ package org.wpilib.math.kinematics;
 
 import static org.wpilib.units.Units.Meters;
 
-import org.wpilib.math.util.MathUtil;
+import java.util.Objects;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.interpolation.Interpolatable;
 import org.wpilib.math.kinematics.proto.SwerveModulePositionProto;
 import org.wpilib.math.kinematics.struct.SwerveModulePositionStruct;
+import org.wpilib.math.util.MathUtil;
 import org.wpilib.units.measure.Distance;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
-import java.util.Objects;
 
 /** Represents the state of one swerve module. */
 public class SwerveModulePosition

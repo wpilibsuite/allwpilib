@@ -4,9 +4,12 @@
 
 package org.wpilib.math.system;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.ejml.simple.SimpleMatrix;
 import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Nat;
-import org.wpilib.math.util.Num;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N10;
 import org.wpilib.math.numbers.N11;
@@ -29,15 +32,12 @@ import org.wpilib.math.numbers.N8;
 import org.wpilib.math.numbers.N9;
 import org.wpilib.math.system.proto.LinearSystemProto;
 import org.wpilib.math.system.struct.LinearSystemStruct;
+import org.wpilib.math.util.Nat;
+import org.wpilib.math.util.Num;
 import org.wpilib.util.protobuf.Protobuf;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.Struct;
 import org.wpilib.util.struct.StructSerializable;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import org.ejml.simple.SimpleMatrix;
 
 /**
  * A plant defined using state-space notation.

@@ -6,9 +6,9 @@ package org.wpilib.math.geometry.proto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Twist3d;
 import org.wpilib.math.proto.Geometry3D.ProtobufTwist3d;
-import org.junit.jupiter.api.Test;
 
 class Twist3dProtoTest {
   private static final Twist3d DATA = new Twist3d(1.1, 2.29, 35.04, 0.174, 19.1, 4.4);

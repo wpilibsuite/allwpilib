@@ -6,10 +6,10 @@ package org.wpilib.vision.apriltag;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.wpilib.vision.apriltag.jni.AprilTagJNI;
+import java.util.Objects;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.util.RawFrame;
-import java.util.Objects;
+import org.wpilib.vision.apriltag.jni.AprilTagJNI;
 
 /** Represents an AprilTag's metadata. */
 @SuppressWarnings("MemberName")

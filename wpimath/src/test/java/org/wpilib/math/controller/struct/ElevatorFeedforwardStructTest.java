@@ -6,10 +6,10 @@ package org.wpilib.math.controller.struct;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.math.controller.ElevatorFeedforward;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.controller.ElevatorFeedforward;
 
 class ElevatorFeedforwardStructTest {
   private static final ElevatorFeedforward DATA = new ElevatorFeedforward(1.91, 1.1, 1.1, 0.229);

@@ -6,14 +6,14 @@ package org.wpilib.math.trajectory;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Ellipse2d;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.trajectory.constraint.EllipticalRegionConstraint;
 import org.wpilib.math.trajectory.constraint.MaxVelocityConstraint;
 import org.wpilib.math.util.Units;
-import java.util.List;
-import org.junit.jupiter.api.Test;
 
 class EllipticalRegionConstraintTest {
   @Test

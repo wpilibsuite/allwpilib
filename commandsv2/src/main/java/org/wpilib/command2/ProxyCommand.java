@@ -6,8 +6,8 @@ package org.wpilib.command2;
 
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import org.wpilib.util.sendable.SendableBuilder;
 import java.util.function.Supplier;
+import org.wpilib.util.sendable.SendableBuilder;
 
 /**
  * Schedules a given command when this command is initialized and ends when it ends, but does not

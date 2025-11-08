@@ -6,13 +6,13 @@ package org.wpilib.opmode;
 
 import static org.wpilib.units.Units.Seconds;
 
+import java.util.PriorityQueue;
 import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.NotifierJNI;
 import org.wpilib.system.RobotController;
 import org.wpilib.units.measure.Frequency;
 import org.wpilib.units.measure.Time;
-import java.util.PriorityQueue;
 
 /**
  * TimedRobot implements the IterativeRobotBase robot program framework.

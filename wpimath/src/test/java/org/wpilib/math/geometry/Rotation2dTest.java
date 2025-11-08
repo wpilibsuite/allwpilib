@@ -8,8 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-import org.wpilib.units.Units;
 import org.junit.jupiter.api.Test;
+import org.wpilib.units.Units;
 
 class Rotation2dTest {
   private static final double kEpsilon = 1E-9;

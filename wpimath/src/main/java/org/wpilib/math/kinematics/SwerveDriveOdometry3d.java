@@ -4,13 +4,13 @@
 
 package org.wpilib.math.kinematics;
 
-import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Translation3d;
+import org.wpilib.math.util.MathSharedStore;
 
 /**
  * Class for swerve drive odometry. Odometry allows you to track the robot's position on the field

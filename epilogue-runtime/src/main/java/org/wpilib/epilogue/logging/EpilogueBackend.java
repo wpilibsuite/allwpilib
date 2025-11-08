@@ -4,11 +4,11 @@
 
 package org.wpilib.epilogue.logging;
 
+import java.util.Collection;
 import org.wpilib.units.Measure;
 import org.wpilib.units.Unit;
 import org.wpilib.util.protobuf.Protobuf;
 import org.wpilib.util.struct.Struct;
-import java.util.Collection;
 import us.hebi.quickbuf.ProtoMessage;
 
 /** A backend is a generic interface for Epilogue to log discrete data points. */

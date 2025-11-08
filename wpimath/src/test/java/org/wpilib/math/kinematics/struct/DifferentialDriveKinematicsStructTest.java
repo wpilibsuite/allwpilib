@@ -6,10 +6,10 @@ package org.wpilib.math.kinematics.struct;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 
 class DifferentialDriveKinematicsStructTest {
   private static final DifferentialDriveKinematics DATA = new DifferentialDriveKinematics(1.74);

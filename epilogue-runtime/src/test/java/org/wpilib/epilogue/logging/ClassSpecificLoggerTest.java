@@ -6,9 +6,9 @@ package org.wpilib.epilogue.logging;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.epilogue.Logged;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.wpilib.epilogue.Logged;
 
 class ClassSpecificLoggerTest {
   @Logged

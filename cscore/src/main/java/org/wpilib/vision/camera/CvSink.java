@@ -4,12 +4,12 @@
 
 package org.wpilib.vision.camera;
 
-import org.wpilib.util.PixelFormat;
-import org.wpilib.util.RawFrame;
-import org.wpilib.util.TimestampSource;
 import java.nio.ByteBuffer;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.wpilib.util.PixelFormat;
+import org.wpilib.util.RawFrame;
+import org.wpilib.util.TimestampSource;
 
 /**
  * A sink for user code to accept video frames as OpenCV images. These sinks require the WPILib

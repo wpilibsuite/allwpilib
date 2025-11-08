@@ -6,9 +6,9 @@ package org.wpilib.math.interpolation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
-import org.junit.jupiter.api.Test;
 
 class TimeInterpolatableBufferTest {
   @Test

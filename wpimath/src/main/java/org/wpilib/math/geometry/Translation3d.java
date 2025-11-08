@@ -10,20 +10,20 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.wpilib.math.util.MathUtil;
-import org.wpilib.math.linalg.VecBuilder;
-import org.wpilib.math.linalg.Vector;
-import org.wpilib.math.geometry.proto.Translation3dProto;
-import org.wpilib.math.geometry.struct.Translation3dStruct;
-import org.wpilib.math.interpolation.Interpolatable;
-import org.wpilib.math.numbers.N3;
-import org.wpilib.units.measure.Distance;
-import org.wpilib.util.protobuf.ProtobufSerializable;
-import org.wpilib.util.struct.StructSerializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Objects;
+import org.wpilib.math.geometry.proto.Translation3dProto;
+import org.wpilib.math.geometry.struct.Translation3dStruct;
+import org.wpilib.math.interpolation.Interpolatable;
+import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.math.linalg.Vector;
+import org.wpilib.math.numbers.N3;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.units.measure.Distance;
+import org.wpilib.util.protobuf.ProtobufSerializable;
+import org.wpilib.util.struct.StructSerializable;
 
 /**
  * Represents a translation in 3D space. This object can be used to represent a point or a vector.

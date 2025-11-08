@@ -6,8 +6,8 @@ package org.wpilib.hardware.motor;
 
 import static org.wpilib.units.Units.Volts;
 
-import org.wpilib.units.measure.Voltage;
 import org.wpilib.system.RobotController;
+import org.wpilib.units.measure.Voltage;
 
 /** Interface for motor controlling devices. */
 public interface MotorController {

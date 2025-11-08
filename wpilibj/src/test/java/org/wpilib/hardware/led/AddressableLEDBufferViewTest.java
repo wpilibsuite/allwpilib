@@ -6,8 +6,8 @@ package org.wpilib.hardware.led;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.util.Color;
 import org.junit.jupiter.api.Test;
+import org.wpilib.util.Color;
 
 class AddressableLEDBufferViewTest {
   @Test

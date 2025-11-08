@@ -6,10 +6,10 @@ package org.wpilib.math.system.plant.struct;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.math.system.plant.DCMotor;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.system.plant.DCMotor;
 
 class DCMotorStructTest {
   private static final DCMotor DATA = new DCMotor(1.91, 19.1, 1.74, 1.74, 22.9, 3);

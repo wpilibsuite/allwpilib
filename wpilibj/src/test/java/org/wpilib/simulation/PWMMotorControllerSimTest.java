@@ -6,9 +6,9 @@ package org.wpilib.simulation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.motor.Spark;
-import org.junit.jupiter.api.Test;
 
 class PWMMotorControllerSimTest {
   @Test

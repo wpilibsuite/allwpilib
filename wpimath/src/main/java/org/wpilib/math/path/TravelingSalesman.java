@@ -4,13 +4,13 @@
 
 package org.wpilib.math.path;
 
-import org.wpilib.math.util.Num;
-import org.wpilib.math.linalg.Vector;
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.optimization.SimulatedAnnealing;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.function.ToDoubleBiFunction;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.linalg.Vector;
+import org.wpilib.math.optimization.SimulatedAnnealing;
+import org.wpilib.math.util.Num;
 
 /**
  * Given a list of poses, this class finds the shortest possible route that visits each pose exactly

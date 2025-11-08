@@ -4,9 +4,9 @@
 
 package org.wpilib.command2;
 
-import org.wpilib.util.sendable.SendableBuilder;
 import java.util.ArrayList;
 import java.util.List;
+import org.wpilib.util.sendable.SendableBuilder;
 
 /**
  * A command composition that runs a list of commands in sequence.

@@ -6,10 +6,10 @@ package org.wpilib.math.controller.struct;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.math.controller.DifferentialDriveWheelVoltages;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.controller.DifferentialDriveWheelVoltages;
 
 class DifferentialDriveWheelVoltagesStructTest {
   private static final DifferentialDriveWheelVoltages DATA =

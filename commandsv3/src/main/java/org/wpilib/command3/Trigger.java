@@ -7,14 +7,14 @@ package org.wpilib.command3;
 import static org.wpilib.units.Units.Seconds;
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import org.wpilib.math.filter.Debouncer;
-import org.wpilib.units.measure.Time;
-import org.wpilib.event.EventLoop;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
+import org.wpilib.event.EventLoop;
+import org.wpilib.math.filter.Debouncer;
+import org.wpilib.units.measure.Time;
 
 /**
  * Triggers allow users to specify conditions for when commands should run. Triggers can be set up

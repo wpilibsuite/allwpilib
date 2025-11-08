@@ -6,9 +6,9 @@ package org.wpilib.command2;
 
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import org.wpilib.util.sendable.SendableBuilder;
 import java.util.Set;
 import java.util.function.Supplier;
+import org.wpilib.util.sendable.SendableBuilder;
 
 /**
  * Defers Command construction to runtime. Runs the command returned by a supplier when this command

@@ -4,8 +4,8 @@
 
 package org.wpilib.command3.button;
 
-import org.wpilib.driverstation.DriverStation;
 import org.wpilib.command3.Trigger;
+import org.wpilib.driverstation.DriverStation;
 
 /**
  * A class containing static {@link Trigger} factories for running callbacks when the robot mode

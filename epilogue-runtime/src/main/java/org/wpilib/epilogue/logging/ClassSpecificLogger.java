@@ -4,12 +4,12 @@
 
 package org.wpilib.epilogue.logging;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.wpilib.epilogue.CustomLoggerFor;
 import org.wpilib.epilogue.logging.errors.ErrorHandler;
 import org.wpilib.util.sendable.Sendable;
 import org.wpilib.util.sendable.SendableBuilder;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Base class for class-specific generated loggers. Loggers are generated at compile time by the

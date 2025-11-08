@@ -7,8 +7,8 @@ package org.wpilib.math.kinematics;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.math.geometry.Translation2d;
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.geometry.Translation2d;
 
 class MecanumDriveKinematicsTest {
   private static final double kEpsilon = 1E-9;

@@ -6,13 +6,13 @@ package org.wpilib.command3;
 
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import org.wpilib.units.measure.Time;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import org.wpilib.annotation.NoDiscard;
+import org.wpilib.units.measure.Time;
 
 /**
  * Performs some task using one or more {@link Mechanism mechanisms}. Commands are fundamentally

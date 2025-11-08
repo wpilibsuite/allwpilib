@@ -19,16 +19,13 @@ public class SendableHandler extends ElementHandler {
     super(processingEnv);
 
     m_sendableType =
-        Optional.ofNullable(
-                lookupTypeElement(processingEnv, "org.wpilib.util.sendable.Sendable"))
+        Optional.ofNullable(lookupTypeElement(processingEnv, "org.wpilib.util.sendable.Sendable"))
             .map(TypeElement::asType);
     m_commandType =
-        Optional.ofNullable(
-                lookupTypeElement(processingEnv, "org.wpilib.command2.Command"))
+        Optional.ofNullable(lookupTypeElement(processingEnv, "org.wpilib.command2.Command"))
             .map(TypeElement::asType);
     m_subsystemType =
-        Optional.ofNullable(
-                lookupTypeElement(processingEnv, "org.wpilib.command2.SubsystemBase"))
+        Optional.ofNullable(lookupTypeElement(processingEnv, "org.wpilib.command2.SubsystemBase"))
             .map(TypeElement::asType);
   }
 

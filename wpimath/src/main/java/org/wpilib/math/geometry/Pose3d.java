@@ -10,20 +10,20 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.wpilib.math.linalg.MatBuilder;
-import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Nat;
-import org.wpilib.math.geometry.proto.Pose3dProto;
-import org.wpilib.math.geometry.struct.Pose3dStruct;
-import org.wpilib.math.interpolation.Interpolatable;
-import org.wpilib.math.numbers.N4;
-import org.wpilib.units.measure.Distance;
-import org.wpilib.util.protobuf.ProtobufSerializable;
-import org.wpilib.util.struct.StructSerializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Objects;
+import org.wpilib.math.geometry.proto.Pose3dProto;
+import org.wpilib.math.geometry.struct.Pose3dStruct;
+import org.wpilib.math.interpolation.Interpolatable;
+import org.wpilib.math.linalg.MatBuilder;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.numbers.N4;
+import org.wpilib.math.util.Nat;
+import org.wpilib.units.measure.Distance;
+import org.wpilib.util.protobuf.ProtobufSerializable;
+import org.wpilib.util.struct.StructSerializable;
 
 /** Represents a 3D pose containing translational and rotational elements. */
 @JsonIgnoreProperties(ignoreUnknown = true)

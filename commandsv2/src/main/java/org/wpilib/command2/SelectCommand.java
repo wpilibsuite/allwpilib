@@ -6,9 +6,9 @@ package org.wpilib.command2;
 
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import org.wpilib.util.sendable.SendableBuilder;
 import java.util.Map;
 import java.util.function.Supplier;
+import org.wpilib.util.sendable.SendableBuilder;
 
 /**
  * A command composition that runs one of a selection of commands using a selector and a key to

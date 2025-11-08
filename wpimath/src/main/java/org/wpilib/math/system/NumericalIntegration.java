@@ -4,13 +4,13 @@
 
 package org.wpilib.math.system;
 
-import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Num;
-import org.wpilib.math.numbers.N1;
 import java.util.function.BiFunction;
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.UnaryOperator;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.util.Num;
 
 /** Numerical integration utilities. */
 public final class NumericalIntegration {

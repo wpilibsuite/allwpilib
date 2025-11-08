@@ -4,13 +4,13 @@
 
 package org.wpilib.math.controller;
 
-import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Nat;
-import org.wpilib.math.util.Num;
-import org.wpilib.math.numbers.N1;
-import org.wpilib.math.system.NumericalJacobian;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.system.NumericalJacobian;
+import org.wpilib.math.util.Nat;
+import org.wpilib.math.util.Num;
 
 /**
  * Constructs a control-affine plant inversion model-based feedforward from given model dynamics.

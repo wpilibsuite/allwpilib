@@ -6,8 +6,8 @@ package org.wpilib.math.geometry;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.units.Units;
 import org.junit.jupiter.api.Test;
+import org.wpilib.units.Units;
 
 class Transform2dTest {
   private static final double kEpsilon = 1E-9;

@@ -6,12 +6,12 @@ package org.wpilib.math.estimator;
 
 import org.wpilib.math.linalg.DARE;
 import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Nat;
-import org.wpilib.math.util.Num;
-import org.wpilib.math.util.StateSpaceUtil;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.system.Discretization;
 import org.wpilib.math.system.LinearSystem;
+import org.wpilib.math.util.Nat;
+import org.wpilib.math.util.Num;
+import org.wpilib.math.util.StateSpaceUtil;
 
 /**
  * A Kalman filter combines predictions from a model and measurements to give an estimate of the

@@ -4,9 +4,9 @@
 
 package org.wpilib.smartdashboard;
 
-import org.wpilib.networktables.NetworkTable;
 import java.util.HashMap;
 import java.util.Map;
+import org.wpilib.networktables.NetworkTable;
 
 /**
  * Common base class for all Mechanism2d node types.

@@ -6,9 +6,9 @@ package org.wpilib.math.kinematics.proto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.kinematics.MecanumDriveWheelPositions;
 import org.wpilib.math.proto.Kinematics.ProtobufMecanumDriveWheelPositions;
-import org.junit.jupiter.api.Test;
 
 class MecanumDriveWheelPositionsProtoTest {
   private static final MecanumDriveWheelPositions DATA =

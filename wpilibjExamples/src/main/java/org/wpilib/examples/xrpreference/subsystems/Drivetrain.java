@@ -4,12 +4,12 @@
 
 package org.wpilib.examples.xrpreference.subsystems;
 
-import org.wpilib.util.sendable.SendableRegistry;
-import org.wpilib.hardware.rotation.Encoder;
+import org.wpilib.command2.SubsystemBase;
 import org.wpilib.drive.DifferentialDrive;
+import org.wpilib.hardware.rotation.Encoder;
+import org.wpilib.util.sendable.SendableRegistry;
 import org.wpilib.xrp.XRPGyro;
 import org.wpilib.xrp.XRPMotor;
-import org.wpilib.command2.SubsystemBase;
 
 public class Drivetrain extends SubsystemBase {
   private static final double kGearRatio =

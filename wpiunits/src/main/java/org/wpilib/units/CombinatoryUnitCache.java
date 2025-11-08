@@ -4,9 +4,9 @@
 
 package org.wpilib.units;
 
-import org.wpilib.units.collections.LongToObjectHashMap;
 import java.util.Objects;
 import java.util.function.BiFunction;
+import org.wpilib.units.collections.LongToObjectHashMap;
 
 /**
  * A helper class for creating and caching combined unit objects. This helps to reduce unnecessary

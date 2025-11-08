@@ -4,10 +4,10 @@
 
 package org.wpilib.snippets.limitswitch;
 
-import org.wpilib.hardware.discrete.DigitalInput;
 import org.wpilib.driverstation.Joystick;
-import org.wpilib.opmode.TimedRobot;
+import org.wpilib.hardware.discrete.DigitalInput;
 import org.wpilib.hardware.motor.PWMVictorSPX;
+import org.wpilib.opmode.TimedRobot;
 
 /**
  * Limit Switch snippets for frc-docs.

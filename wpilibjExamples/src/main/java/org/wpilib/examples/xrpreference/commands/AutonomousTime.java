@@ -4,8 +4,8 @@
 
 package org.wpilib.examples.xrpreference.commands;
 
-import org.wpilib.examples.xrpreference.subsystems.Drivetrain;
 import org.wpilib.command2.SequentialCommandGroup;
+import org.wpilib.examples.xrpreference.subsystems.Drivetrain;
 
 public class AutonomousTime extends SequentialCommandGroup {
   /**

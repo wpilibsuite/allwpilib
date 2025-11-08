@@ -4,15 +4,15 @@
 
 package org.wpilib.math.controller;
 
+import org.ejml.simple.SimpleMatrix;
 import org.wpilib.math.linalg.DARE;
 import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Num;
-import org.wpilib.math.util.StateSpaceUtil;
 import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.system.Discretization;
 import org.wpilib.math.system.LinearSystem;
-import org.ejml.simple.SimpleMatrix;
+import org.wpilib.math.util.Num;
+import org.wpilib.math.util.StateSpaceUtil;
 
 /**
  * Contains the controller coefficients and logic for a linear-quadratic regulator (LQR). LQRs use

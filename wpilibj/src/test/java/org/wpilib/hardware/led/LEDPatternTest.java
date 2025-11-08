@@ -4,6 +4,10 @@
 
 package org.wpilib.hardware.led;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.wpilib.hardware.led.LEDPattern.GradientType.kContinuous;
+import static org.wpilib.hardware.led.LEDPattern.GradientType.kDiscontinuous;
 import static org.wpilib.units.Units.Centimeters;
 import static org.wpilib.units.Units.Meters;
 import static org.wpilib.units.Units.MetersPerSecond;
@@ -12,8 +16,6 @@ import static org.wpilib.units.Units.Microseconds;
 import static org.wpilib.units.Units.Percent;
 import static org.wpilib.units.Units.Seconds;
 import static org.wpilib.units.Units.Value;
-import static org.wpilib.hardware.led.LEDPattern.GradientType.kContinuous;
-import static org.wpilib.hardware.led.LEDPattern.GradientType.kDiscontinuous;
 import static org.wpilib.util.Color.kBlack;
 import static org.wpilib.util.Color.kBlue;
 import static org.wpilib.util.Color.kGreen;
@@ -24,18 +26,16 @@ import static org.wpilib.util.Color.kPurple;
 import static org.wpilib.util.Color.kRed;
 import static org.wpilib.util.Color.kWhite;
 import static org.wpilib.util.Color.kYellow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
-import org.wpilib.system.RobotController;
-import org.wpilib.util.Color;
-import org.wpilib.util.Color8Bit;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.wpilib.system.RobotController;
+import org.wpilib.util.Color;
+import org.wpilib.util.Color8Bit;
 
 class LEDPatternTest {
   long m_mockTime;

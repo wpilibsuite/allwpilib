@@ -8,11 +8,11 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.linalg.MatBuilder;
-import org.wpilib.math.util.Nat;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
-import org.junit.jupiter.api.Test;
+import org.wpilib.math.util.Nat;
 
 class SimpleMotorFeedforwardTest {
   @Test

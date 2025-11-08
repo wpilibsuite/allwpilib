@@ -6,13 +6,13 @@ package org.wpilib.command2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.hardware.hal.HAL;
-import org.wpilib.simulation.SimHooks;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
+import org.wpilib.hardware.hal.HAL;
+import org.wpilib.simulation.SimHooks;
 
 class NotifierCommandTest extends CommandTestBase {
   @BeforeEach

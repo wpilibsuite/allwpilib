@@ -4,13 +4,13 @@
 
 package org.wpilib.math.system.struct;
 
+import java.nio.ByteBuffer;
 import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Nat;
-import org.wpilib.math.util.Num;
 import org.wpilib.math.linalg.struct.MatrixStruct;
 import org.wpilib.math.system.LinearSystem;
+import org.wpilib.math.util.Nat;
+import org.wpilib.math.util.Num;
 import org.wpilib.util.struct.Struct;
-import java.nio.ByteBuffer;
 
 public final class LinearSystemStruct<States extends Num, Inputs extends Num, Outputs extends Num>
     implements Struct<LinearSystem<States, Inputs, Outputs>> {

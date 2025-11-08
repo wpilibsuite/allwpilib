@@ -7,9 +7,9 @@ package org.wpilib.math.kinematics;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
-import org.junit.jupiter.api.Test;
 
 class SwerveDriveKinematicsTest {
   private static final double kEpsilon = 1E-9;

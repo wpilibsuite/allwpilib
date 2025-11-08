@@ -4,10 +4,10 @@
 
 package org.wpilib.examples.motorcontrol;
 
-import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.driverstation.Joystick;
-import org.wpilib.opmode.TimedRobot;
 import org.wpilib.hardware.motor.PWMSparkMax;
+import org.wpilib.hardware.rotation.Encoder;
+import org.wpilib.opmode.TimedRobot;
 import org.wpilib.smartdashboard.SmartDashboard;
 
 /**

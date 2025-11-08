@@ -8,9 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.wpilib.UtilityClassTest;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.jupiter.api.Test;
+import org.wpilib.UtilityClassTest;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Num;
 

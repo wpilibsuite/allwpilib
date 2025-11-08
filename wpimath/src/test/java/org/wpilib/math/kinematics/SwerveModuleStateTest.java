@@ -7,8 +7,8 @@ package org.wpilib.math.kinematics;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.math.geometry.Rotation2d;
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.geometry.Rotation2d;
 
 class SwerveModuleStateTest {
   private static final double kEpsilon = 1E-9;
