@@ -105,7 +105,7 @@ public final class StringUtils {
 
   /**
    * Gets the name of the generated class used to log data of the given type. This will be
-   * fully-qualified class name, such as {@code "frc.robot.MyRobotLogger"}.
+   * fully-qualified class name, such as {@code "wpilib.robot.MyRobotLogger"}.
    *
    * @param clazz the data type that the logger supports
    * @return the logger class name
