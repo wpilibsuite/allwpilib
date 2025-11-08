@@ -6,8 +6,8 @@
 
 package org.wpilib.hardware.motor;
 
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.discrete.PWM;
+import org.wpilib.hardware.hal.HAL;
 
 /**
  * Cross the Road Electronics (CTRE) Talon Motor Controller.

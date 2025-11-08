@@ -6,11 +6,6 @@
 
 package org.wpilib.networktables;
 
-import org.wpilib.datalog.DataLog;
-import org.wpilib.util.WPIUtilJNI;
-import org.wpilib.util.concurrent.Event;
-import org.wpilib.util.protobuf.Protobuf;
-import org.wpilib.util.struct.Struct;
 import java.nio.charset.StandardCharsets;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -24,6 +19,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
+import org.wpilib.datalog.DataLog;
+import org.wpilib.util.WPIUtilJNI;
+import org.wpilib.util.concurrent.Event;
+import org.wpilib.util.protobuf.Protobuf;
+import org.wpilib.util.struct.Struct;
 import us.hebi.quickbuf.ProtoMessage;
 
 /**

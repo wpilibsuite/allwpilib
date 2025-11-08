@@ -6,13 +6,13 @@
 
 package org.wpilib.networktables;
 
-import org.wpilib.datalog.DataLog;
-import org.wpilib.util.runtime.RuntimeLoader;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.EnumSet;
 import java.util.OptionalLong;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.wpilib.datalog.DataLog;
+import org.wpilib.util.runtime.RuntimeLoader;
 
 /** NetworkTables JNI. */
 public final class NetworkTablesJNI {
