@@ -117,7 +117,7 @@ void ReportError(JNIEnv* env, int32_t status, bool doThrow) {
         env, fmt::format(" Code: {}. {}", status, message).c_str(), status);
   } else {
     std::string func;
-    auto stack = GetJavaStackTrace(env, &func, "edu.wpi.first");
+    auto stack = GetJavaStackTrace(env, &func, "org.wpilib");
     // Make a copy of message for safety, calling back into the HAL might
     // invalidate the string.
     std::string lastMessage{message};

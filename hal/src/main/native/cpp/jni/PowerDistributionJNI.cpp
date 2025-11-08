@@ -33,7 +33,7 @@ Java_org_wpilib_hardware_hal_PowerDistributionJNI_initialize
   (JNIEnv* env, jclass, jint busId, jint module, jint type)
 {
   int32_t status = 0;
-  auto stack = wpi::util::java::GetJavaStackTrace(env, "edu.wpi.first");
+  auto stack = wpi::util::java::GetJavaStackTrace(env, "org.wpilib");
   auto handle = HAL_InitializePowerDistribution(
       busId, module, static_cast<HAL_PowerDistributionType>(type),
       stack.c_str(), &status);
