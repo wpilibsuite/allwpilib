@@ -4,8 +4,8 @@
 
 package org.wpilib.templates.romicommandbased.commands;
 
-import org.wpilib.templates.romicommandbased.subsystems.RomiDrivetrain;
 import org.wpilib.command2.Command;
+import org.wpilib.templates.romicommandbased.subsystems.RomiDrivetrain;
 
 /** An example command that uses an example subsystem. */
 public class ExampleCommand extends Command {

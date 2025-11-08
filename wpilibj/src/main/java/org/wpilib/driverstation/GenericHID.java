@@ -4,13 +4,13 @@
 
 package org.wpilib.driverstation;
 
-import org.wpilib.hardware.hal.DriverStationJNI;
-import org.wpilib.math.util.Pair;
+import java.util.HashMap;
+import java.util.Map;
 import org.wpilib.driverstation.DriverStation.POVDirection;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
-import java.util.HashMap;
-import java.util.Map;
+import org.wpilib.hardware.hal.DriverStationJNI;
+import org.wpilib.math.util.Pair;
 
 /**
  * Handle input from standard HID devices connected to the Driver Station.

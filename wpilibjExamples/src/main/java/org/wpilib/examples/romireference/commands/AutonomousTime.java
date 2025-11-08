@@ -4,8 +4,8 @@
 
 package org.wpilib.examples.romireference.commands;
 
-import org.wpilib.examples.romireference.subsystems.Drivetrain;
 import org.wpilib.command2.SequentialCommandGroup;
+import org.wpilib.examples.romireference.subsystems.Drivetrain;
 
 public class AutonomousTime extends SequentialCommandGroup {
   /**

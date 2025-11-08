@@ -5,8 +5,8 @@
 package org.wpilib.math.estimator;
 
 import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Num;
 import org.wpilib.math.numbers.N1;
+import org.wpilib.math.util.Num;
 
 /**
  * Interface for Kalman filters for use with KalmanFilterLatencyCompensator.

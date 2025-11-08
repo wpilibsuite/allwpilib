@@ -7,12 +7,12 @@ package org.wpilib.math.system;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.linalg.MatBuilder;
 import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Nat;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N2;
-import org.junit.jupiter.api.Test;
+import org.wpilib.math.util.Nat;
 
 class DiscretizationTest {
   // Check that for a simple second-order system that we can easily analyze

@@ -4,12 +4,10 @@
 
 package org.wpilib.simulation;
 
-import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Nat;
-import org.wpilib.math.util.StateSpaceUtil;
-import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N2;
 import org.wpilib.math.numbers.N7;
@@ -17,6 +15,8 @@ import org.wpilib.math.system.LinearSystem;
 import org.wpilib.math.system.NumericalIntegration;
 import org.wpilib.math.system.plant.DCMotor;
 import org.wpilib.math.system.plant.LinearSystemId;
+import org.wpilib.math.util.Nat;
+import org.wpilib.math.util.StateSpaceUtil;
 import org.wpilib.math.util.Units;
 import org.wpilib.system.RobotController;
 
@@ -24,8 +24,8 @@ import org.wpilib.system.RobotController;
  * This class simulates the state of the drivetrain. In simulationPeriodic, users should first set
  * inputs from motors with {@link #setInputs(double, double)}, call {@link #update(double)} to
  * update the simulation, and set estimated encoder and gyro positions, as well as estimated
- * odometry pose. Teams can use {@link org.wpilib.smartdashboard.Field2d} to visualize
- * their robot on the Sim GUI's field.
+ * odometry pose. Teams can use {@link org.wpilib.smartdashboard.Field2d} to visualize their robot
+ * on the Sim GUI's field.
  *
  * <p>Our state-space system is:
  *
@@ -90,8 +90,8 @@ public class DifferentialDrivetrainSim {
    *
    * @param plant The {@link LinearSystem} representing the robot's drivetrain. This system can be
    *     created with {@link
-   *     org.wpilib.math.system.plant.LinearSystemId#createDrivetrainVelocitySystem(DCMotor,
-   *     double, double, double, double, double)} or {@link
+   *     org.wpilib.math.system.plant.LinearSystemId#createDrivetrainVelocitySystem(DCMotor, double,
+   *     double, double, double, double)} or {@link
    *     org.wpilib.math.system.plant.LinearSystemId#identifyDrivetrainSystem(double, double,
    *     double, double)}.
    * @param driveMotor A {@link DCMotor} representing the drivetrain.

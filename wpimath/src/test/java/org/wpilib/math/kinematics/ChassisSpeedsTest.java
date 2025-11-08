@@ -4,15 +4,15 @@
 
 package org.wpilib.math.kinematics;
 
-import static org.wpilib.units.Units.InchesPerSecond;
-import static org.wpilib.units.Units.RPM;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.wpilib.units.Units.InchesPerSecond;
+import static org.wpilib.units.Units.RPM;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Twist2d;
-import org.junit.jupiter.api.Test;
 
 class ChassisSpeedsTest {
   private static final double kEpsilon = 1E-9;

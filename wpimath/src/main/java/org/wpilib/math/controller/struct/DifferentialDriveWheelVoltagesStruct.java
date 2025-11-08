@@ -4,9 +4,9 @@
 
 package org.wpilib.math.controller.struct;
 
+import java.nio.ByteBuffer;
 import org.wpilib.math.controller.DifferentialDriveWheelVoltages;
 import org.wpilib.util.struct.Struct;
-import java.nio.ByteBuffer;
 
 public class DifferentialDriveWheelVoltagesStruct
     implements Struct<DifferentialDriveWheelVoltages> {

@@ -4,10 +4,10 @@
 
 package org.wpilib.math.kinematics.struct;
 
+import java.nio.ByteBuffer;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.kinematics.SwerveModulePosition;
 import org.wpilib.util.struct.Struct;
-import java.nio.ByteBuffer;
 
 public class SwerveModulePositionStruct implements Struct<SwerveModulePosition> {
   @Override

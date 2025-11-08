@@ -6,10 +6,10 @@ package org.wpilib.math.trajectory.struct;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.math.trajectory.ExponentialProfile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.trajectory.ExponentialProfile;
 
 class ExponentialProfileStateStructTest {
   private static final ExponentialProfile.State STATE = new ExponentialProfile.State(4.0, 5.0);

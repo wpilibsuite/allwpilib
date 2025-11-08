@@ -4,9 +4,9 @@
 
 package org.wpilib.datalog;
 
+import java.nio.ByteBuffer;
 import org.wpilib.util.struct.Struct;
 import org.wpilib.util.struct.StructBuffer;
-import java.nio.ByteBuffer;
 
 /**
  * Log struct-encoded values.

@@ -8,12 +8,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.wpilib.hardware.hal.HAL;
-import org.wpilib.simulation.PS4ControllerSim;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.wpilib.hardware.hal.HAL;
+import org.wpilib.simulation.PS4ControllerSim;
 
 class PS4ControllerTest {
   @ParameterizedTest

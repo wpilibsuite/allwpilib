@@ -4,10 +4,10 @@
 
 package org.wpilib.examples.swervedriveposeestimator;
 
-import org.wpilib.math.util.StateSpaceUtil;
-import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.math.util.StateSpaceUtil;
 import org.wpilib.math.util.Units;
 
 /** This dummy class represents a global measurement sensor, such as a computer vision solution. */

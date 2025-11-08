@@ -4,10 +4,10 @@
 
 package org.wpilib.examples.digitalcommunication;
 
-import org.wpilib.hardware.discrete.DigitalOutput;
-import org.wpilib.driverstation.DriverStation;
-import org.wpilib.opmode.TimedRobot;
 import java.util.Optional;
+import org.wpilib.driverstation.DriverStation;
+import org.wpilib.hardware.discrete.DigitalOutput;
+import org.wpilib.opmode.TimedRobot;
 
 /**
  * This is a sample program demonstrating how to communicate to a light controller from the robot

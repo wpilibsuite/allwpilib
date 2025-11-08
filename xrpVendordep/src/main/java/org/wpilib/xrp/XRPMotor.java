@@ -4,13 +4,13 @@
 
 package org.wpilib.xrp;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import org.wpilib.hardware.hal.SimBoolean;
 import org.wpilib.hardware.hal.SimDevice;
 import org.wpilib.hardware.hal.SimDevice.Direction;
 import org.wpilib.hardware.hal.SimDouble;
 import org.wpilib.hardware.motor.MotorController;
-import java.util.HashMap;
-import java.util.HashSet;
 
 /**
  * XRPMotor.

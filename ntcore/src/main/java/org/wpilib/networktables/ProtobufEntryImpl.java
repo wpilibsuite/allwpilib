@@ -4,10 +4,10 @@
 
 package org.wpilib.networktables;
 
-import org.wpilib.util.protobuf.ProtobufBuffer;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
+import org.wpilib.util.protobuf.ProtobufBuffer;
 
 /**
  * NetworkTables protobuf-encoded value implementation.

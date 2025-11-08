@@ -4,9 +4,9 @@
 
 package org.wpilib.math.geometry.struct;
 
+import java.nio.ByteBuffer;
 import org.wpilib.math.geometry.Translation3d;
 import org.wpilib.util.struct.Struct;
-import java.nio.ByteBuffer;
 
 public class Translation3dStruct implements Struct<Translation3d> {
   @Override

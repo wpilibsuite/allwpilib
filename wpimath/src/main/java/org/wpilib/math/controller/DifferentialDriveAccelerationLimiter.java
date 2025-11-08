@@ -6,11 +6,11 @@ package org.wpilib.math.controller;
 
 import org.wpilib.math.linalg.MatBuilder;
 import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Nat;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N2;
 import org.wpilib.math.system.LinearSystem;
+import org.wpilib.math.util.Nat;
 
 /**
  * Filters the provided voltages to limit a differential drive's linear and angular acceleration.

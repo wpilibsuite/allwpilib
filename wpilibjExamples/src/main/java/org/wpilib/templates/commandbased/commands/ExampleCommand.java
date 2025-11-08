@@ -4,8 +4,8 @@
 
 package org.wpilib.templates.commandbased.commands;
 
-import org.wpilib.templates.commandbased.subsystems.ExampleSubsystem;
 import org.wpilib.command2.Command;
+import org.wpilib.templates.commandbased.subsystems.ExampleSubsystem;
 
 /** An example command that uses an example subsystem. */
 public class ExampleCommand extends Command {

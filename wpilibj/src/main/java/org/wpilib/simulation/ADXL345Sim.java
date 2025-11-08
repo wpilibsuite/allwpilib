@@ -4,9 +4,9 @@
 
 package org.wpilib.simulation;
 
-import org.wpilib.hardware.hal.SimDouble;
-import org.wpilib.hardware.accelerometer.ADXL345_I2C;
 import java.util.Objects;
+import org.wpilib.hardware.accelerometer.ADXL345_I2C;
+import org.wpilib.hardware.hal.SimDouble;
 
 /** Class to control a simulated ADXL345. */
 public class ADXL345Sim {

@@ -4,11 +4,11 @@
 
 package org.wpilib.vision.apriltag;
 
+import java.util.Arrays;
 import org.wpilib.math.linalg.MatBuilder;
 import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Nat;
 import org.wpilib.math.numbers.N3;
-import java.util.Arrays;
+import org.wpilib.math.util.Nat;
 
 /** A detection of an AprilTag tag. */
 public class AprilTagDetection {

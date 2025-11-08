@@ -9,14 +9,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.wpilib.util.struct.Struct;
-import org.wpilib.util.struct.StructSerializable;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.Objects;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.wpilib.util.struct.Struct;
+import org.wpilib.util.struct.StructSerializable;
 
 @SuppressWarnings("AvoidEscapedUnicodeCharacters")
 class DataLogTest {

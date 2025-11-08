@@ -4,10 +4,10 @@
 
 package org.wpilib.command3;
 
-import org.wpilib.system.RobotController;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
+import org.wpilib.system.RobotController;
 
 class CommandTestBase {
   protected Scheduler m_scheduler;

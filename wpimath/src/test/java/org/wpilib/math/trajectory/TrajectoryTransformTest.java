@@ -6,12 +6,12 @@ package org.wpilib.math.trajectory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.List;
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.geometry.Translation2d;
-import java.util.List;
-import org.junit.jupiter.api.Test;
 
 class TrajectoryTransformTest {
   @Test

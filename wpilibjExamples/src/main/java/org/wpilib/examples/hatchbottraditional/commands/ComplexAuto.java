@@ -4,10 +4,10 @@
 
 package org.wpilib.examples.hatchbottraditional.commands;
 
+import org.wpilib.command2.SequentialCommandGroup;
 import org.wpilib.examples.hatchbottraditional.Constants.AutoConstants;
 import org.wpilib.examples.hatchbottraditional.subsystems.DriveSubsystem;
 import org.wpilib.examples.hatchbottraditional.subsystems.HatchSubsystem;
-import org.wpilib.command2.SequentialCommandGroup;
 
 /** A complex auto command that drives forward, releases a hatch, and then drives backward. */
 public class ComplexAuto extends SequentialCommandGroup {

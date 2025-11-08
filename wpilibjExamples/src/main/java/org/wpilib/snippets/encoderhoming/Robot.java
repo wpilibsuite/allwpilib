@@ -5,9 +5,9 @@
 package org.wpilib.snippets.encoderhoming;
 
 import org.wpilib.hardware.discrete.DigitalInput;
+import org.wpilib.hardware.motor.Spark;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.opmode.TimedRobot;
-import org.wpilib.hardware.motor.Spark;
 
 /**
  * Encoder mechanism homing snippets for frc-docs.

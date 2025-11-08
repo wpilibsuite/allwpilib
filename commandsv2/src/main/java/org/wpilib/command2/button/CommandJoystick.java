@@ -4,9 +4,9 @@
 
 package org.wpilib.command2.button;
 
+import org.wpilib.command2.CommandScheduler;
 import org.wpilib.driverstation.Joystick;
 import org.wpilib.event.EventLoop;
-import org.wpilib.command2.CommandScheduler;
 
 /**
  * A version of {@link Joystick} with {@link Trigger} factories for command-based.

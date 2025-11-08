@@ -4,9 +4,9 @@
 
 package org.wpilib.math.trajectory;
 
+import java.util.Objects;
 import org.wpilib.math.trajectory.struct.ExponentialProfileStateStruct;
 import org.wpilib.util.struct.StructSerializable;
-import java.util.Objects;
 
 /**
  * A exponential curve-shaped velocity profile.

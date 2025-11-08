@@ -7,15 +7,15 @@ package org.wpilib.math.controller;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.math.util.MathUtil;
-import org.wpilib.math.linalg.VecBuilder;
+import java.util.ArrayList;
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Twist2d;
+import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.trajectory.TrajectoryConfig;
 import org.wpilib.math.trajectory.TrajectoryGenerator;
-import java.util.ArrayList;
-import org.junit.jupiter.api.Test;
+import org.wpilib.math.util.MathUtil;
 
 class LTVUnicycleControllerTest {
   private static final double kTolerance = 1 / 12.0;

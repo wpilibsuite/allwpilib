@@ -4,11 +4,11 @@
 
 package org.wpilib.math.spline;
 
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Rotation2d;
 import java.util.Arrays;
 import java.util.Optional;
 import org.ejml.simple.SimpleMatrix;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
 
 /** Represents a two-dimensional parametric spline that interpolates between two points. */
 public abstract class Spline {

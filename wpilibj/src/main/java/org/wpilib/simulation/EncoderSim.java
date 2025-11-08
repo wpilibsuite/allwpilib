@@ -4,10 +4,10 @@
 
 package org.wpilib.simulation;
 
+import java.util.NoSuchElementException;
 import org.wpilib.hardware.hal.simulation.EncoderDataJNI;
 import org.wpilib.hardware.hal.simulation.NotifyCallback;
 import org.wpilib.hardware.rotation.Encoder;
-import java.util.NoSuchElementException;
 
 /** Class to control a simulated encoder. */
 public class EncoderSim {

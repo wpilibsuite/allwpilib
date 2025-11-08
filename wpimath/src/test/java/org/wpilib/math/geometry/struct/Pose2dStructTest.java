@@ -6,12 +6,12 @@ package org.wpilib.math.geometry.struct;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.geometry.Translation2d;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
 
 class Pose2dStructTest {
   private static final Pose2d DATA =

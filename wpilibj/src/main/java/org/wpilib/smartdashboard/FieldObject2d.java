@@ -6,15 +6,15 @@ package org.wpilib.smartdashboard;
 
 import static org.wpilib.units.Units.Meters;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.trajectory.Trajectory;
 import org.wpilib.networktables.DoubleArrayEntry;
 import org.wpilib.units.measure.Distance;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /** Game field object on a Field2d. */
 public class FieldObject2d implements AutoCloseable {

@@ -4,11 +4,11 @@
 
 package org.wpilib.math.estimator;
 
+import org.ejml.simple.SimpleMatrix;
 import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.numbers.N1;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Num;
-import org.wpilib.math.numbers.N1;
-import org.ejml.simple.SimpleMatrix;
 
 /**
  * Generates sigma points and weights according to Van der Merwe's 2004 dissertation[1] for the

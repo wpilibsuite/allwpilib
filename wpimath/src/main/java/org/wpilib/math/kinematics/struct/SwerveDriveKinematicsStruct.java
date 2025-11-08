@@ -4,10 +4,10 @@
 
 package org.wpilib.math.kinematics.struct;
 
+import java.nio.ByteBuffer;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.kinematics.SwerveDriveKinematics;
 import org.wpilib.util.struct.Struct;
-import java.nio.ByteBuffer;
 
 public final class SwerveDriveKinematicsStruct implements Struct<SwerveDriveKinematics> {
   private final int m_numModules;

@@ -4,10 +4,10 @@
 
 package org.wpilib.math.filter;
 
-import org.wpilib.util.container.DoubleCircularBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.wpilib.util.container.DoubleCircularBuffer;
 
 /**
  * A class that implements a moving-window median filter. Useful for reducing measurement noise,

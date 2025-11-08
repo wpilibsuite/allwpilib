@@ -8,12 +8,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.wpilib.hardware.hal.HAL;
+import org.junit.jupiter.api.Test;
 import org.wpilib.hardware.discrete.DigitalOutput;
+import org.wpilib.hardware.hal.HAL;
 import org.wpilib.simulation.testutils.BooleanCallback;
 import org.wpilib.simulation.testutils.DoubleCallback;
 import org.wpilib.simulation.testutils.IntCallback;
-import org.junit.jupiter.api.Test;
 
 class DigitalPWMSimTest {
   @Test

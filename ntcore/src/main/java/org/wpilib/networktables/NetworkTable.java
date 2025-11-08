@@ -4,8 +4,6 @@
 
 package org.wpilib.networktables;
 
-import org.wpilib.util.protobuf.Protobuf;
-import org.wpilib.util.struct.Struct;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -15,6 +13,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
+import org.wpilib.util.protobuf.Protobuf;
+import org.wpilib.util.struct.Struct;
 import us.hebi.quickbuf.ProtoMessage;
 
 /** A network table that knows its subtable path. */

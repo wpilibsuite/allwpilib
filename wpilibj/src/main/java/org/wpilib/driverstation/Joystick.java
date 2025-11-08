@@ -4,9 +4,9 @@
 
 package org.wpilib.driverstation;
 
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
+import org.wpilib.hardware.hal.HAL;
 
 /**
  * Handle input from Flight Joysticks connected to the Driver Station.

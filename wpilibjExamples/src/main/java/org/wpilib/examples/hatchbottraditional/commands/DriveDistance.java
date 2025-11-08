@@ -4,8 +4,8 @@
 
 package org.wpilib.examples.hatchbottraditional.commands;
 
-import org.wpilib.examples.hatchbottraditional.subsystems.DriveSubsystem;
 import org.wpilib.command2.Command;
+import org.wpilib.examples.hatchbottraditional.subsystems.DriveSubsystem;
 
 public class DriveDistance extends Command {
   private final DriveSubsystem m_drive;

@@ -4,11 +4,11 @@
 
 package org.wpilib.hardware.bus;
 
+import java.io.Closeable;
 import org.wpilib.hardware.hal.CANAPIJNI;
 import org.wpilib.hardware.hal.CANAPITypes;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.can.CANReceiveMessage;
-import java.io.Closeable;
 
 /**
  * High level class for interfacing with CAN devices conforming to the standard CAN spec.

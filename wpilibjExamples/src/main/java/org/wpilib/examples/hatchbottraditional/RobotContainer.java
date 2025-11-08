@@ -6,6 +6,8 @@ package org.wpilib.examples.hatchbottraditional;
 
 import static org.wpilib.driverstation.XboxController.Button;
 
+import org.wpilib.command2.Command;
+import org.wpilib.command2.button.JoystickButton;
 import org.wpilib.driverstation.XboxController;
 import org.wpilib.examples.hatchbottraditional.Constants.AutoConstants;
 import org.wpilib.examples.hatchbottraditional.Constants.OIConstants;
@@ -19,8 +21,6 @@ import org.wpilib.examples.hatchbottraditional.subsystems.DriveSubsystem;
 import org.wpilib.examples.hatchbottraditional.subsystems.HatchSubsystem;
 import org.wpilib.smartdashboard.SendableChooser;
 import org.wpilib.smartdashboard.SmartDashboard;
-import org.wpilib.command2.Command;
-import org.wpilib.command2.button.JoystickButton;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a

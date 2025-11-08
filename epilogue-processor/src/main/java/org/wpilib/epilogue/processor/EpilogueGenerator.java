@@ -4,7 +4,6 @@
 
 package org.wpilib.epilogue.processor;
 
-import org.wpilib.epilogue.EpilogueConfiguration;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collection;
@@ -14,13 +13,14 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
+import org.wpilib.epilogue.EpilogueConfiguration;
 
 /**
  * Generates the {@code Epilogue} file used as the main entry point to logging with Epilogue in a
  * robot program. {@code Epilogue} has instances of every generated logger class, a {@link
  * EpilogueConfiguration config} object, and (if the main robot class inherits from {@link
- * org.wpilib.opmode.TimedRobot TimedRobot}) a {@code bind()} method to automatically add a
- * periodic logging call to the robot.
+ * org.wpilib.opmode.TimedRobot TimedRobot}) a {@code bind()} method to automatically add a periodic
+ * logging call to the robot.
  */
 public class EpilogueGenerator {
   private final ProcessingEnvironment m_processingEnv;

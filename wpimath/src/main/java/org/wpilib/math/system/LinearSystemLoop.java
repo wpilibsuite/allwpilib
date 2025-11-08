@@ -4,16 +4,16 @@
 
 package org.wpilib.math.system;
 
-import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Num;
-import org.wpilib.math.util.StateSpaceUtil;
-import org.wpilib.math.controller.LinearPlantInversionFeedforward;
-import org.wpilib.math.controller.LinearQuadraticRegulator;
-import org.wpilib.math.estimator.KalmanFilter;
-import org.wpilib.math.numbers.N1;
 import java.util.function.Function;
 import org.ejml.MatrixDimensionException;
 import org.ejml.simple.SimpleMatrix;
+import org.wpilib.math.controller.LinearPlantInversionFeedforward;
+import org.wpilib.math.controller.LinearQuadraticRegulator;
+import org.wpilib.math.estimator.KalmanFilter;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.util.Num;
+import org.wpilib.math.util.StateSpaceUtil;
 
 /**
  * Combines a controller, feedforward, and observer for controlling a mechanism with full state

@@ -8,11 +8,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.rotation.DutyCycle;
 import org.wpilib.simulation.testutils.BooleanCallback;
 import org.wpilib.simulation.testutils.DoubleCallback;
-import org.junit.jupiter.api.Test;
 
 class DutyCycleSimTest {
   @Test

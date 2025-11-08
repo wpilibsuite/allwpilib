@@ -5,9 +5,9 @@
 package org.wpilib.examples.unittest;
 
 import org.wpilib.driverstation.Joystick;
-import org.wpilib.opmode.TimedRobot;
 import org.wpilib.examples.unittest.Constants.IntakeConstants;
 import org.wpilib.examples.unittest.subsystems.Intake;
+import org.wpilib.opmode.TimedRobot;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in

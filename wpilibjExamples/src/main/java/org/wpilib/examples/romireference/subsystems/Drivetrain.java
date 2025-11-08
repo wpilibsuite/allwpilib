@@ -4,12 +4,12 @@
 
 package org.wpilib.examples.romireference.subsystems;
 
-import org.wpilib.util.sendable.SendableRegistry;
-import org.wpilib.hardware.rotation.Encoder;
+import org.wpilib.command2.SubsystemBase;
 import org.wpilib.drive.DifferentialDrive;
 import org.wpilib.hardware.motor.Spark;
+import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.romi.RomiGyro;
-import org.wpilib.command2.SubsystemBase;
+import org.wpilib.util.sendable.SendableRegistry;
 
 public class Drivetrain extends SubsystemBase {
   private static final double kCountsPerRevolution = 1440.0;

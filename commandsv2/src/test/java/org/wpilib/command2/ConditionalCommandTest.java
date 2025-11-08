@@ -10,13 +10,13 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import org.wpilib.command2.Command.InterruptionBehavior;
 import java.util.function.BooleanSupplier;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.wpilib.command2.Command.InterruptionBehavior;
 
 class ConditionalCommandTest extends CommandTestBase {
   @Test

@@ -7,10 +7,10 @@ package org.wpilib.math.trajectory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Rotation2d;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
 
 class TrajectoryConcatenateTest {
   @Test

@@ -6,12 +6,12 @@ package org.wpilib.system;
 
 import static org.wpilib.units.Units.Seconds;
 
-import org.wpilib.driverstation.DriverStation;
-import org.wpilib.hardware.hal.NotifierJNI;
-import org.wpilib.units.measure.Time;
 import java.io.Closeable;
 import java.util.PriorityQueue;
 import java.util.concurrent.locks.ReentrantLock;
+import org.wpilib.driverstation.DriverStation;
+import org.wpilib.hardware.hal.NotifierJNI;
+import org.wpilib.units.measure.Time;
 
 /**
  * A class that's a wrapper around a watchdog timer.

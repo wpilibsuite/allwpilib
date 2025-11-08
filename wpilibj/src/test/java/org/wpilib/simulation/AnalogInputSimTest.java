@@ -7,11 +7,11 @@ package org.wpilib.simulation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.wpilib.hardware.hal.HAL;
+import org.junit.jupiter.api.Test;
 import org.wpilib.hardware.discrete.AnalogInput;
+import org.wpilib.hardware.hal.HAL;
 import org.wpilib.simulation.testutils.BooleanCallback;
 import org.wpilib.simulation.testutils.DoubleCallback;
-import org.junit.jupiter.api.Test;
 
 class AnalogInputSimTest {
   @Test

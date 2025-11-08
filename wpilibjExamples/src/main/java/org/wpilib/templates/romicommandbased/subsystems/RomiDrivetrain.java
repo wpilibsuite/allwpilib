@@ -4,10 +4,10 @@
 
 package org.wpilib.templates.romicommandbased.subsystems;
 
-import org.wpilib.hardware.rotation.Encoder;
+import org.wpilib.command2.SubsystemBase;
 import org.wpilib.drive.DifferentialDrive;
 import org.wpilib.hardware.motor.Spark;
-import org.wpilib.command2.SubsystemBase;
+import org.wpilib.hardware.rotation.Encoder;
 
 public class RomiDrivetrain extends SubsystemBase {
   private static final double kCountsPerRevolution = 1440.0;

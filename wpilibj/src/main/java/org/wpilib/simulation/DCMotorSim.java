@@ -27,10 +27,9 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    *
    * @param plant The linear system representing the DC motor. This system can be created with
    *     {@link org.wpilib.math.system.plant.LinearSystemId#createDCMotorSystem(DCMotor, double,
-   *     double)} or {@link
-   *     org.wpilib.math.system.plant.LinearSystemId#createDCMotorSystem(double, double)}. If
-   *     {@link org.wpilib.math.system.plant.LinearSystemId#createDCMotorSystem(double, double)}
-   *     is used, the distance unit must be radians.
+   *     double)} or {@link org.wpilib.math.system.plant.LinearSystemId#createDCMotorSystem(double,
+   *     double)}. If {@link org.wpilib.math.system.plant.LinearSystemId#createDCMotorSystem(double,
+   *     double)} is used, the distance unit must be radians.
    * @param gearbox The type of and number of motors in the DC motor gearbox.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 2 elements. The first element is for position. The

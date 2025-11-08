@@ -6,8 +6,8 @@ package org.wpilib.command2;
 
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import org.wpilib.util.sendable.SendableBuilder;
 import java.util.function.BooleanSupplier;
+import org.wpilib.util.sendable.SendableBuilder;
 
 /**
  * A command composition that runs one of two commands, depending on the value of the given

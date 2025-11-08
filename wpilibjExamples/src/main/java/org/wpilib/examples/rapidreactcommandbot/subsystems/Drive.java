@@ -4,21 +4,21 @@
 
 package org.wpilib.examples.rapidreactcommandbot.subsystems;
 
+import java.util.function.DoubleSupplier;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.SubsystemBase;
+import org.wpilib.drive.DifferentialDrive;
 import org.wpilib.epilogue.Logged;
 import org.wpilib.epilogue.NotLogged;
+import org.wpilib.examples.rapidreactcommandbot.Constants.DriveConstants;
+import org.wpilib.hardware.imu.OnboardIMU;
+import org.wpilib.hardware.motor.PWMSparkMax;
+import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.ProfiledPIDController;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
 import org.wpilib.math.trajectory.TrapezoidProfile;
-import org.wpilib.util.sendable.SendableRegistry;
-import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.hardware.imu.OnboardIMU;
 import org.wpilib.system.RobotController;
-import org.wpilib.drive.DifferentialDrive;
-import org.wpilib.examples.rapidreactcommandbot.Constants.DriveConstants;
-import org.wpilib.hardware.motor.PWMSparkMax;
-import org.wpilib.command2.Command;
-import org.wpilib.command2.SubsystemBase;
-import java.util.function.DoubleSupplier;
+import org.wpilib.util.sendable.SendableRegistry;
 
 @Logged
 public class Drive extends SubsystemBase {

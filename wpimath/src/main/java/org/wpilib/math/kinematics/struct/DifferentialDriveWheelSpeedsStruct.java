@@ -4,9 +4,9 @@
 
 package org.wpilib.math.kinematics.struct;
 
+import java.nio.ByteBuffer;
 import org.wpilib.math.kinematics.DifferentialDriveWheelSpeeds;
 import org.wpilib.util.struct.Struct;
-import java.nio.ByteBuffer;
 
 public class DifferentialDriveWheelSpeedsStruct implements Struct<DifferentialDriveWheelSpeeds> {
   @Override

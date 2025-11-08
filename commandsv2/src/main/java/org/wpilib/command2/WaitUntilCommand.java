@@ -6,8 +6,8 @@ package org.wpilib.command2;
 
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import org.wpilib.system.Timer;
 import java.util.function.BooleanSupplier;
+import org.wpilib.system.Timer;
 
 /**
  * A command that does nothing but ends after a specified match time or condition. Useful for

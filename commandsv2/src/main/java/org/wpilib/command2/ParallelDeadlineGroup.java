@@ -4,10 +4,10 @@
 
 package org.wpilib.command2;
 
-import org.wpilib.util.sendable.SendableBuilder;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.wpilib.util.sendable.SendableBuilder;
 
 /**
  * A command composition that runs a set of commands in parallel, ending only when a specific

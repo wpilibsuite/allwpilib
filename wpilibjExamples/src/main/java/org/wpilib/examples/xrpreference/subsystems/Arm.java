@@ -4,8 +4,8 @@
 
 package org.wpilib.examples.xrpreference.subsystems;
 
-import org.wpilib.xrp.XRPServo;
 import org.wpilib.command2.SubsystemBase;
+import org.wpilib.xrp.XRPServo;
 
 public class Arm extends SubsystemBase {
   private final XRPServo m_armServo;

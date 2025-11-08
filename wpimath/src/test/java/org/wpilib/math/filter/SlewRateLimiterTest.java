@@ -7,10 +7,10 @@ package org.wpilib.math.filter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.wpilib.util.WPIUtilJNI;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.wpilib.util.WPIUtilJNI;
 
 class SlewRateLimiterTest {
   @BeforeEach

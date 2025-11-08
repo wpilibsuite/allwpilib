@@ -6,15 +6,15 @@ package org.wpilib.drive;
 
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
+import java.util.function.DoubleConsumer;
 import org.wpilib.hardware.hal.HAL;
-import org.wpilib.math.util.MathUtil;
+import org.wpilib.hardware.motor.MotorController;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.util.MathUtil;
 import org.wpilib.util.sendable.Sendable;
 import org.wpilib.util.sendable.SendableBuilder;
 import org.wpilib.util.sendable.SendableRegistry;
-import org.wpilib.hardware.motor.MotorController;
-import java.util.function.DoubleConsumer;
 
 /**
  * A class for driving Mecanum drive platforms.
@@ -42,9 +42,9 @@ import java.util.function.DoubleConsumer;
  * positive Z axis points up. Rotations follow the right-hand rule, so counterclockwise rotation
  * around the Z axis is positive.
  *
- * <p>Inputs smaller then {@value org.wpilib.drive.RobotDriveBase#kDefaultDeadband} will
- * be set to 0, and larger values will be scaled so that the full range is still used. This deadband
- * value can be changed with {@link #setDeadband}.
+ * <p>Inputs smaller then {@value org.wpilib.drive.RobotDriveBase#kDefaultDeadband} will be set to
+ * 0, and larger values will be scaled so that the full range is still used. This deadband value can
+ * be changed with {@link #setDeadband}.
  *
  * <p>{@link org.wpilib.hardware.motor.MotorSafety} is enabled by default. The driveCartesian or
  * drivePolar methods should be called periodically to avoid Motor Safety timeouts.

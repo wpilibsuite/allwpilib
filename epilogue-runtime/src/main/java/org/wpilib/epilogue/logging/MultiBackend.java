@@ -4,11 +4,11 @@
 
 package org.wpilib.epilogue.logging;
 
-import org.wpilib.util.protobuf.Protobuf;
-import org.wpilib.util.struct.Struct;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.wpilib.util.protobuf.Protobuf;
+import org.wpilib.util.struct.Struct;
 import us.hebi.quickbuf.ProtoMessage;
 
 /**

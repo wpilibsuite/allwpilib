@@ -6,17 +6,6 @@ package org.wpilib.command2;
 
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import org.wpilib.hardware.hal.HAL;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
-import org.wpilib.driverstation.DriverStation;
-import org.wpilib.opmode.RobotBase;
-import org.wpilib.opmode.RobotState;
-import org.wpilib.opmode.TimedRobot;
-import org.wpilib.system.Watchdog;
-import org.wpilib.event.EventLoop;
-import org.wpilib.command2.Command.InterruptionBehavior;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -33,6 +22,17 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import org.wpilib.command2.Command.InterruptionBehavior;
+import org.wpilib.driverstation.DriverStation;
+import org.wpilib.event.EventLoop;
+import org.wpilib.hardware.hal.HAL;
+import org.wpilib.opmode.RobotBase;
+import org.wpilib.opmode.RobotState;
+import org.wpilib.opmode.TimedRobot;
+import org.wpilib.system.Watchdog;
+import org.wpilib.util.sendable.Sendable;
+import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.util.sendable.SendableRegistry;
 
 /**
  * The scheduler responsible for running {@link Command}s. A Command-based robot should call {@link

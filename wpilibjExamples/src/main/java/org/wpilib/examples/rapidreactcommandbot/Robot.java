@@ -4,12 +4,12 @@
 
 package org.wpilib.examples.rapidreactcommandbot;
 
-import org.wpilib.epilogue.Epilogue;
-import org.wpilib.epilogue.Logged;
-import org.wpilib.system.DataLogManager;
-import org.wpilib.opmode.TimedRobot;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
+import org.wpilib.epilogue.Epilogue;
+import org.wpilib.epilogue.Logged;
+import org.wpilib.opmode.TimedRobot;
+import org.wpilib.system.DataLogManager;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in

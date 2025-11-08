@@ -4,10 +4,10 @@
 
 package org.wpilib.templates.xrpcommandbased;
 
+import org.wpilib.command2.Command;
 import org.wpilib.driverstation.XboxController;
 import org.wpilib.templates.xrpcommandbased.commands.ExampleCommand;
 import org.wpilib.templates.xrpcommandbased.subsystems.XRPDrivetrain;
-import org.wpilib.command2.Command;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a

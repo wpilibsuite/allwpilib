@@ -4,9 +4,9 @@
 
 package org.wpilib.math.controller.struct;
 
+import java.nio.ByteBuffer;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
 import org.wpilib.util.struct.Struct;
-import java.nio.ByteBuffer;
 
 public final class SimpleMotorFeedforwardStruct implements Struct<SimpleMotorFeedforward> {
   @Override

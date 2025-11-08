@@ -6,13 +6,13 @@ package org.wpilib.math.linalg.proto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.wpilib.ProtoTestBase;
 import org.wpilib.math.linalg.MatBuilder;
 import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Nat;
 import org.wpilib.math.numbers.N2;
 import org.wpilib.math.numbers.N3;
 import org.wpilib.math.proto.Wpimath.ProtobufMatrix;
-import org.wpilib.ProtoTestBase;
+import org.wpilib.math.util.Nat;
 
 @SuppressWarnings("PMD.TestClassWithoutTestCases")
 class MatrixProtoTest extends ProtoTestBase<Matrix<N2, N3>, ProtobufMatrix> {

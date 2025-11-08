@@ -4,9 +4,9 @@
 
 package org.wpilib.simulation;
 
+import org.wpilib.hardware.discrete.AnalogInput;
 import org.wpilib.hardware.hal.simulation.AnalogInDataJNI;
 import org.wpilib.hardware.hal.simulation.NotifyCallback;
-import org.wpilib.hardware.discrete.AnalogInput;
 
 /** Class to control a simulated analog input. */
 public class AnalogInputSim {
