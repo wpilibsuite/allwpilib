@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.filter;
+package org.wpilib.math.filter;
 
-import edu.wpi.first.math.MathSharedStore;
+import org.wpilib.math.util.MathSharedStore;
 
 /**
  * A class that limits the rate of change of an input value. Useful for implementing voltage,
  * setpoint, and/or output ramps. A slew-rate limit is most appropriate when the quantity being
  * controlled is a velocity or a voltage; when controlling a position, consider using a {@link
- * edu.wpi.first.math.trajectory.TrapezoidProfile} instead.
+ * org.wpilib.math.trajectory.TrapezoidProfile} instead.
  */
 public class SlewRateLimiter {
   private final double m_positiveRateLimit;

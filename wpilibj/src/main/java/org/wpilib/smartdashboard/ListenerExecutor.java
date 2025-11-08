@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.smartdashboard;
+package org.wpilib.smartdashboard;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.Executor;
 
 /**
- * An executor for running listener tasks posted by {@link edu.wpi.first.wpilibj.Sendable} listeners
+ * An executor for running listener tasks posted by {@link org.wpilib.Sendable} listeners
  * synchronously from the main application thread.
  */
 class ListenerExecutor implements Executor {

@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.util;
 
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.wpilib.util.sendable.Sendable;
+import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.smartdashboard.SmartDashboard;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -17,7 +17,7 @@ import java.util.TreeSet;
 /**
  * Persistent alert to be sent via NetworkTables. Alerts are tagged with a type of {@code kError},
  * {@code kWarning}, or {@code kInfo} to denote urgency. See {@link
- * edu.wpi.first.wpilibj.Alert.AlertType AlertType} for suggested usage of each type. Alerts can be
+ * org.wpilib.util.Alert.AlertType AlertType} for suggested usage of each type. Alerts can be
  * displayed on supported dashboards, and are shown in a priority order based on type and recency of
  * activation, with newly activated alerts first.
  *

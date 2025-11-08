@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj2.command;
+package org.wpilib.command2;
 
-import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+import static org.wpilib.units.Units.Seconds;
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.util.function.BooleanConsumer;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
+import org.wpilib.units.measure.Time;
+import org.wpilib.util.function.BooleanConsumer;
+import org.wpilib.util.sendable.Sendable;
+import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.util.sendable.SendableRegistry;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;

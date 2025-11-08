@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.datalog;
+package org.wpilib.datalog;
 
-import edu.wpi.first.util.struct.Struct;
-import edu.wpi.first.util.struct.StructBuffer;
+import org.wpilib.util.struct.Struct;
+import org.wpilib.util.struct.StructBuffer;
 import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.util.Arrays;

@@ -6,11 +6,11 @@
 {% macro capitalize_first(string) -%}
 {{ string[0]|capitalize + string[1:] }}
 {%- endmacro %}
-package edu.wpi.first.wpilibj2.command.button;
+package org.wpilib.command2.button;
 
-import edu.wpi.first.wpilibj.{{ ConsoleName }}Controller;
-import edu.wpi.first.wpilibj.event.EventLoop;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import org.wpilib.{{ ConsoleName }}Controller;
+import org.wpilib.event.EventLoop;
+import org.wpilib.command2.CommandScheduler;
 
 /**
  * A version of {@link {{ ConsoleName }}Controller} with {@link Trigger} factories for command-based.

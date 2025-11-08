@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.templates.romieducational;
+package org.wpilib.templates.romieducational;
 
 /**
  * The run() function is called automatically when the robot is enabled. If you change the name of

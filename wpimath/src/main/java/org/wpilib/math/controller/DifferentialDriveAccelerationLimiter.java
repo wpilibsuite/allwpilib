@@ -2,21 +2,21 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.controller;
+package org.wpilib.math.controller;
 
-import edu.wpi.first.math.MatBuilder;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.math.system.LinearSystem;
+import org.wpilib.math.linalg.MatBuilder;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.util.Nat;
+import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.numbers.N2;
+import org.wpilib.math.system.LinearSystem;
 
 /**
  * Filters the provided voltages to limit a differential drive's linear and angular acceleration.
  *
  * <p>The differential drive model can be created via the functions in {@link
- * edu.wpi.first.math.system.plant.LinearSystemId}.
+ * org.wpilib.math.system.plant.LinearSystemId}.
  */
 public class DifferentialDriveAccelerationLimiter {
   private final LinearSystem<N2, N2, N2> m_system;

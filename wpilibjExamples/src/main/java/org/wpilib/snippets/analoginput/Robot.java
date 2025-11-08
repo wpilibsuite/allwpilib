@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.snippets.analoginput;
+package org.wpilib.snippets.analoginput;
 
-import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.TimedRobot;
+import org.wpilib.hardware.discrete.AnalogInput;
+import org.wpilib.opmode.TimedRobot;
 
 /**
  * AnalogInput snippets for frc-docs.

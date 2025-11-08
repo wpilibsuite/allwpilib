@@ -2,26 +2,26 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.driverstation;
 
-import edu.wpi.first.datalog.BooleanArrayLogEntry;
-import edu.wpi.first.datalog.BooleanLogEntry;
-import edu.wpi.first.datalog.DataLog;
-import edu.wpi.first.datalog.FloatArrayLogEntry;
-import edu.wpi.first.datalog.IntegerArrayLogEntry;
-import edu.wpi.first.hal.AllianceStationID;
-import edu.wpi.first.hal.ControlWord;
-import edu.wpi.first.hal.DriverStationJNI;
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.MatchInfoData;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.networktables.BooleanPublisher;
-import edu.wpi.first.networktables.IntegerPublisher;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StringPublisher;
-import edu.wpi.first.networktables.StringTopic;
-import edu.wpi.first.util.EventVector;
-import edu.wpi.first.util.WPIUtilJNI;
+import org.wpilib.datalog.BooleanArrayLogEntry;
+import org.wpilib.datalog.BooleanLogEntry;
+import org.wpilib.datalog.DataLog;
+import org.wpilib.datalog.FloatArrayLogEntry;
+import org.wpilib.datalog.IntegerArrayLogEntry;
+import org.wpilib.hardware.hal.AllianceStationID;
+import org.wpilib.hardware.hal.ControlWord;
+import org.wpilib.hardware.hal.DriverStationJNI;
+import org.wpilib.hardware.hal.HAL;
+import org.wpilib.hardware.hal.MatchInfoData;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.networktables.BooleanPublisher;
+import org.wpilib.networktables.IntegerPublisher;
+import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.networktables.StringPublisher;
+import org.wpilib.networktables.StringTopic;
+import org.wpilib.util.concurrent.EventVector;
+import org.wpilib.util.WPIUtilJNI;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;

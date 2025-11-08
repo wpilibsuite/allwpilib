@@ -2,26 +2,26 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.epilogue.logging;
+package org.wpilib.epilogue.logging;
 
-import edu.wpi.first.networktables.BooleanArrayPublisher;
-import edu.wpi.first.networktables.BooleanPublisher;
-import edu.wpi.first.networktables.DoubleArrayPublisher;
-import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.FloatArrayPublisher;
-import edu.wpi.first.networktables.FloatPublisher;
-import edu.wpi.first.networktables.IntegerArrayPublisher;
-import edu.wpi.first.networktables.IntegerPublisher;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.ProtobufPublisher;
-import edu.wpi.first.networktables.Publisher;
-import edu.wpi.first.networktables.RawPublisher;
-import edu.wpi.first.networktables.StringArrayPublisher;
-import edu.wpi.first.networktables.StringPublisher;
-import edu.wpi.first.networktables.StructArrayPublisher;
-import edu.wpi.first.networktables.StructPublisher;
-import edu.wpi.first.util.protobuf.Protobuf;
-import edu.wpi.first.util.struct.Struct;
+import org.wpilib.networktables.BooleanArrayPublisher;
+import org.wpilib.networktables.BooleanPublisher;
+import org.wpilib.networktables.DoubleArrayPublisher;
+import org.wpilib.networktables.DoublePublisher;
+import org.wpilib.networktables.FloatArrayPublisher;
+import org.wpilib.networktables.FloatPublisher;
+import org.wpilib.networktables.IntegerArrayPublisher;
+import org.wpilib.networktables.IntegerPublisher;
+import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.networktables.ProtobufPublisher;
+import org.wpilib.networktables.Publisher;
+import org.wpilib.networktables.RawPublisher;
+import org.wpilib.networktables.StringArrayPublisher;
+import org.wpilib.networktables.StringPublisher;
+import org.wpilib.networktables.StructArrayPublisher;
+import org.wpilib.networktables.StructPublisher;
+import org.wpilib.util.protobuf.Protobuf;
+import org.wpilib.util.struct.Struct;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;

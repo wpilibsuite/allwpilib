@@ -6,7 +6,7 @@
 
 #include <jni.h>
 
-#include "edu_wpi_first_util_WPIUtilJNI.h"
+#include "org_wpilib_util_WPIUtilJNI.h"
 #include "wpi/RawFrame.h"
 #include "wpi/RuntimeCheck.h"
 #include "wpi/Synchronization.h"
@@ -32,7 +32,7 @@ static const JExceptionInit exceptions[] = {
     {"java/lang/InterruptedException", &interruptedEx},
     {"java/io/IOException", &ioEx},
     {"java/lang/NullPointerException", &nullPointerEx},
-    {"edu/wpi/first/util/MsvcRuntimeException", &msvcRuntimeEx}};
+    {"org/wpilib/util/MsvcRuntimeException", &msvcRuntimeEx}};
 
 void wpi::ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg) {
   illegalArgEx.Throw(env, msg);
@@ -80,12 +80,12 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     org_wpilib_util_WPIUtilJNI
  * Method:    checkMsvcRuntime
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_checkMsvcRuntime
+Java_org_wpilib_util_WPIUtilJNI_checkMsvcRuntime
   (JNIEnv* env, jclass)
 {
   uint32_t foundMajor;
@@ -108,24 +108,24 @@ Java_edu_wpi_first_util_WPIUtilJNI_checkMsvcRuntime
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     org_wpilib_util_WPIUtilJNI
  * Method:    writeStderr
  * Signature: (Ljava/lang/String;)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_writeStderr
+Java_org_wpilib_util_WPIUtilJNI_writeStderr
   (JNIEnv* env, jclass, jstring str)
 {
   wpi::print(stderr, "{}", JStringRef{env, str}.str());
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     org_wpilib_util_WPIUtilJNI
  * Method:    enableMockTime
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_enableMockTime
+Java_org_wpilib_util_WPIUtilJNI_enableMockTime
   (JNIEnv*, jclass)
 {
 #ifdef __FRC_SYSTEMCORE__
@@ -137,12 +137,12 @@ Java_edu_wpi_first_util_WPIUtilJNI_enableMockTime
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     org_wpilib_util_WPIUtilJNI
  * Method:    disableMockTime
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_disableMockTime
+Java_org_wpilib_util_WPIUtilJNI_disableMockTime
   (JNIEnv*, jclass)
 {
   mockTimeEnabled = false;
@@ -150,24 +150,24 @@ Java_edu_wpi_first_util_WPIUtilJNI_disableMockTime
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     org_wpilib_util_WPIUtilJNI
  * Method:    setMockTime
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_setMockTime
+Java_org_wpilib_util_WPIUtilJNI_setMockTime
   (JNIEnv*, jclass, jlong time)
 {
   mockNow = time;
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     org_wpilib_util_WPIUtilJNI
  * Method:    now
  * Signature: ()J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_now
+Java_org_wpilib_util_WPIUtilJNI_now
   (JNIEnv*, jclass)
 {
   if (mockTimeEnabled) {
@@ -178,108 +178,108 @@ Java_edu_wpi_first_util_WPIUtilJNI_now
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     org_wpilib_util_WPIUtilJNI
  * Method:    getSystemTime
  * Signature: ()J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_getSystemTime
+Java_org_wpilib_util_WPIUtilJNI_getSystemTime
   (JNIEnv*, jclass)
 {
   return wpi::GetSystemTime();
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     org_wpilib_util_WPIUtilJNI
  * Method:    createEvent
  * Signature: (ZZ)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_createEvent
+Java_org_wpilib_util_WPIUtilJNI_createEvent
   (JNIEnv*, jclass, jboolean manualReset, jboolean initialState)
 {
   return wpi::CreateEvent(manualReset, initialState);
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     org_wpilib_util_WPIUtilJNI
  * Method:    destroyEvent
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_destroyEvent
+Java_org_wpilib_util_WPIUtilJNI_destroyEvent
   (JNIEnv*, jclass, jint eventHandle)
 {
   wpi::DestroyEvent(eventHandle);
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     org_wpilib_util_WPIUtilJNI
  * Method:    setEvent
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_setEvent
+Java_org_wpilib_util_WPIUtilJNI_setEvent
   (JNIEnv*, jclass, jint eventHandle)
 {
   wpi::SetEvent(eventHandle);
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     org_wpilib_util_WPIUtilJNI
  * Method:    resetEvent
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_resetEvent
+Java_org_wpilib_util_WPIUtilJNI_resetEvent
   (JNIEnv*, jclass, jint eventHandle)
 {
   wpi::ResetEvent(eventHandle);
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     org_wpilib_util_WPIUtilJNI
  * Method:    createSemaphore
  * Signature: (II)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_createSemaphore
+Java_org_wpilib_util_WPIUtilJNI_createSemaphore
   (JNIEnv*, jclass, jint initialCount, jint maximumCount)
 {
   return wpi::CreateSemaphore(initialCount, maximumCount);
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     org_wpilib_util_WPIUtilJNI
  * Method:    destroySemaphore
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_destroySemaphore
+Java_org_wpilib_util_WPIUtilJNI_destroySemaphore
   (JNIEnv*, jclass, jint semHandle)
 {
   wpi::DestroySemaphore(semHandle);
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     org_wpilib_util_WPIUtilJNI
  * Method:    releaseSemaphore
  * Signature: (II)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_releaseSemaphore
+Java_org_wpilib_util_WPIUtilJNI_releaseSemaphore
   (JNIEnv*, jclass, jint semHandle, jint releaseCount)
 {
   return wpi::ReleaseSemaphore(semHandle, releaseCount);
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     org_wpilib_util_WPIUtilJNI
  * Method:    waitForObject
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_waitForObject
+Java_org_wpilib_util_WPIUtilJNI_waitForObject
   (JNIEnv* env, jclass, jint handle)
 {
   if (!wpi::WaitForObject(handle)) {
@@ -288,12 +288,12 @@ Java_edu_wpi_first_util_WPIUtilJNI_waitForObject
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     org_wpilib_util_WPIUtilJNI
  * Method:    waitForObjectTimeout
  * Signature: (ID)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_waitForObjectTimeout
+Java_org_wpilib_util_WPIUtilJNI_waitForObjectTimeout
   (JNIEnv* env, jclass, jint handle, jdouble timeout)
 {
   bool timedOut;
@@ -305,12 +305,12 @@ Java_edu_wpi_first_util_WPIUtilJNI_waitForObjectTimeout
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     org_wpilib_util_WPIUtilJNI
  * Method:    waitForObjects
  * Signature: ([I)[I
  */
 JNIEXPORT jintArray JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_waitForObjects
+Java_org_wpilib_util_WPIUtilJNI_waitForObjects
   (JNIEnv* env, jclass, jintArray handles)
 {
   JSpan<const jint> handlesArr{env, handles};
@@ -329,12 +329,12 @@ Java_edu_wpi_first_util_WPIUtilJNI_waitForObjects
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     org_wpilib_util_WPIUtilJNI
  * Method:    waitForObjectsTimeout
  * Signature: ([ID)[I
  */
 JNIEXPORT jintArray JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_waitForObjectsTimeout
+Java_org_wpilib_util_WPIUtilJNI_waitForObjectsTimeout
   (JNIEnv* env, jclass, jintArray handles, jdouble timeout)
 {
   JSpan<const jint> handlesArr{env, handles};
@@ -355,36 +355,36 @@ Java_edu_wpi_first_util_WPIUtilJNI_waitForObjectsTimeout
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     org_wpilib_util_WPIUtilJNI
  * Method:    allocateRawFrame
  * Signature: ()J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_allocateRawFrame
+Java_org_wpilib_util_WPIUtilJNI_allocateRawFrame
   (JNIEnv*, jclass)
 {
   return reinterpret_cast<jlong>(new wpi::RawFrame);
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     org_wpilib_util_WPIUtilJNI
  * Method:    freeRawFrame
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_freeRawFrame
+Java_org_wpilib_util_WPIUtilJNI_freeRawFrame
   (JNIEnv*, jclass, jlong frame)
 {
   delete reinterpret_cast<wpi::RawFrame*>(frame);
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     org_wpilib_util_WPIUtilJNI
  * Method:    getRawFrameDataPtr
  * Signature: (J)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_getRawFrameDataPtr
+Java_org_wpilib_util_WPIUtilJNI_getRawFrameDataPtr
   (JNIEnv* env, jclass, jlong frame)
 {
   auto* f = reinterpret_cast<wpi::RawFrame*>(frame);
@@ -396,12 +396,12 @@ Java_edu_wpi_first_util_WPIUtilJNI_getRawFrameDataPtr
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     org_wpilib_util_WPIUtilJNI
  * Method:    setRawFrameData
  * Signature: (JLjava/lang/Object;IIIII)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_setRawFrameData
+Java_org_wpilib_util_WPIUtilJNI_setRawFrameData
   (JNIEnv* env, jclass, jlong frame, jobject data, jint size, jint width,
    jint height, jint stride, jint pixelFormat)
 {
@@ -425,12 +425,12 @@ Java_edu_wpi_first_util_WPIUtilJNI_setRawFrameData
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     org_wpilib_util_WPIUtilJNI
  * Method:    setRawFrameTime
  * Signature: (JJI)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_setRawFrameTime
+Java_org_wpilib_util_WPIUtilJNI_setRawFrameTime
   (JNIEnv* env, jclass, jlong frame, jlong time, jint timeSource)
 {
   auto* f = reinterpret_cast<wpi::RawFrame*>(frame);
@@ -443,12 +443,12 @@ Java_edu_wpi_first_util_WPIUtilJNI_setRawFrameTime
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     org_wpilib_util_WPIUtilJNI
  * Method:    setRawFrameInfo
  * Signature: (JIIIII)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_setRawFrameInfo
+Java_org_wpilib_util_WPIUtilJNI_setRawFrameInfo
   (JNIEnv* env, jclass, jlong frame, jint size, jint width, jint height,
    jint stride, jint pixelFormat)
 {

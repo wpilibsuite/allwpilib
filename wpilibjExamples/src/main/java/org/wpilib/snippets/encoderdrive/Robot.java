@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.snippets.encoderdrive;
+package org.wpilib.snippets.encoderdrive;
 
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
+import org.wpilib.hardware.rotation.Encoder;
+import org.wpilib.opmode.TimedRobot;
+import org.wpilib.drive.DifferentialDrive;
+import org.wpilib.hardware.motor.Spark;
 
 /**
  * Encoder drive to distance snippets for frc-docs.

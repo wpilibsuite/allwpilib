@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.kinematics.proto;
+package org.wpilib.math.kinematics.proto;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
-import edu.wpi.first.math.proto.Kinematics.ProtobufMecanumDriveKinematics;
-import edu.wpi.first.util.protobuf.Protobuf;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.kinematics.MecanumDriveKinematics;
+import org.wpilib.math.proto.Kinematics.ProtobufMecanumDriveKinematics;
+import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
 public class MecanumDriveKinematicsProto

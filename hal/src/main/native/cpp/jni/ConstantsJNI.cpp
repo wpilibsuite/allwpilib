@@ -7,19 +7,19 @@
 #include <cassert>
 
 #include "HALUtil.h"
-#include "edu_wpi_first_hal_ConstantsJNI.h"
+#include "org_wpilib_hardware_hal_ConstantsJNI.h"
 #include "hal/Constants.h"
 
 using namespace hal;
 
 extern "C" {
 /*
- * Class:     edu_wpi_first_hal_ConstantsJNI
+ * Class:     org_wpilib_hardware_hal_ConstantsJNI
  * Method:    getSystemClockTicksPerMicrosecond
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_ConstantsJNI_getSystemClockTicksPerMicrosecond
+Java_org_wpilib_hardware_hal_ConstantsJNI_getSystemClockTicksPerMicrosecond
   (JNIEnv* env, jclass)
 {
   jint value = HAL_GetSystemClockTicksPerMicrosecond();

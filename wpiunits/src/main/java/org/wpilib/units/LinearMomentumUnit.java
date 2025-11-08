@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.units;
+package org.wpilib.units;
 
-import edu.wpi.first.units.measure.LinearMomentum;
+import org.wpilib.units.measure.LinearMomentum;
 
-/** A unit of linear momentum like {@link edu.wpi.first.units.Units#KilogramMetersPerSecond}. */
+/** A unit of linear momentum like {@link org.wpilib.units.Units#KilogramMetersPerSecond}. */
 public final class LinearMomentumUnit extends MultUnit<MassUnit, LinearVelocityUnit> {
   private static final CombinatoryUnitCache<MassUnit, LinearVelocityUnit, LinearMomentumUnit>
       cache = new CombinatoryUnitCache<>(LinearMomentumUnit::new);

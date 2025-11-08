@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.snippets.analogaccelerometer;
+package org.wpilib.snippets.analogaccelerometer;
 
-import edu.wpi.first.wpilibj.AnalogAccelerometer;
-import edu.wpi.first.wpilibj.TimedRobot;
+import org.wpilib.hardware.accelerometer.AnalogAccelerometer;
+import org.wpilib.opmode.TimedRobot;
 
 /**
  * AnalogAccelerometer snippets for frc-docs.

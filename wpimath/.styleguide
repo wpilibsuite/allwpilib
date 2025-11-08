@@ -19,7 +19,7 @@ generatedFileExclude {
   src/main/native/include/unsupported/
   src/main/native/thirdparty/
   src/test/native/cpp/UnitsTest\.cpp$
-  src/generated/main/java/edu/wpi/first/math/proto
+  src/generated/main/java/org/wpilib/math/proto
   src/generated/main/native/cpp
 
   src/main/python/

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.commands3;
+package org.wpilib.command3;
 
 /**
  * A scope for when a binding is live. Bindings tied to a scope must be deleted when the scope

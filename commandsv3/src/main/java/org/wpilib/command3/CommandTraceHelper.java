@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.commands3;
+package org.wpilib.command3;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,7 @@ final class CommandTraceHelper {
             Coroutine.class.getName(),
             Continuation.class.getName(),
             Scheduler.class.getName(),
-            "org.wpilib.commands3.StagedCommandBuilder$BuilderBackedCommand",
+            "org.wpilib.command3.StagedCommandBuilder$BuilderBackedCommand",
             "jdk.internal.vm.Continuation");
 
     boolean sawRun = false;

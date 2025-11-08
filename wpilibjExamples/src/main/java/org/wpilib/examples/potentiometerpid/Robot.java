@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.potentiometerpid;
+package org.wpilib.examples.potentiometerpid;
 
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.AnalogPotentiometer;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import org.wpilib.math.controller.PIDController;
+import org.wpilib.hardware.rotation.AnalogPotentiometer;
+import org.wpilib.driverstation.Joystick;
+import org.wpilib.opmode.TimedRobot;
+import org.wpilib.hardware.motor.PWMSparkMax;
 
 /**
  * This is a sample program to demonstrate how to use a soft potentiometer and a PID controller to

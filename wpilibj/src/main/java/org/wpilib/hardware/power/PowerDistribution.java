@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.hardware.power;
 
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.PowerDistributionFaults;
-import edu.wpi.first.hal.PowerDistributionJNI;
-import edu.wpi.first.hal.PowerDistributionStickyFaults;
-import edu.wpi.first.hal.PowerDistributionVersion;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
+import org.wpilib.hardware.hal.HAL;
+import org.wpilib.hardware.hal.PowerDistributionFaults;
+import org.wpilib.hardware.hal.PowerDistributionJNI;
+import org.wpilib.hardware.hal.PowerDistributionStickyFaults;
+import org.wpilib.hardware.hal.PowerDistributionVersion;
+import org.wpilib.util.sendable.Sendable;
+import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.util.sendable.SendableRegistry;
 
 /**
  * Class for getting voltage, current, temperature, power and energy from the CTRE Power

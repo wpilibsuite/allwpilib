@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.kinematics;
+package org.wpilib.math.kinematics;
 
-import static edu.wpi.first.units.Units.Meters;
+import static org.wpilib.units.Units.Meters;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.interpolation.Interpolatable;
-import edu.wpi.first.math.kinematics.proto.MecanumDriveWheelPositionsProto;
-import edu.wpi.first.math.kinematics.struct.MecanumDriveWheelPositionsStruct;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.util.protobuf.ProtobufSerializable;
-import edu.wpi.first.util.struct.StructSerializable;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.math.interpolation.Interpolatable;
+import org.wpilib.math.kinematics.proto.MecanumDriveWheelPositionsProto;
+import org.wpilib.math.kinematics.struct.MecanumDriveWheelPositionsStruct;
+import org.wpilib.units.measure.Distance;
+import org.wpilib.util.protobuf.ProtobufSerializable;
+import org.wpilib.util.struct.StructSerializable;
 import java.util.Objects;
 
 /** Represents the wheel positions for a mecanum drive drivetrain. */

@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.motorcontrol;
+package org.wpilib.hardware.motor;
 
-import edu.wpi.first.hal.SimDevice;
-import edu.wpi.first.hal.SimDevice.Direction;
-import edu.wpi.first.hal.SimDouble;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.MotorSafety;
-import edu.wpi.first.wpilibj.PWM;
-import edu.wpi.first.wpilibj.RobotController;
+import org.wpilib.hardware.hal.SimDevice;
+import org.wpilib.hardware.hal.SimDevice.Direction;
+import org.wpilib.hardware.hal.SimDouble;
+import org.wpilib.util.sendable.Sendable;
+import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.hardware.motor.MotorSafety;
+import org.wpilib.hardware.discrete.PWM;
+import org.wpilib.system.RobotController;
 import java.util.ArrayList;
 
 /** Common base class for all PWM Motor Controllers. */

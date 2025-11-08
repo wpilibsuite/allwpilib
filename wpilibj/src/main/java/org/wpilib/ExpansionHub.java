@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib;
 
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.networktables.BooleanSubscriber;
-import edu.wpi.first.networktables.NetworkTableInstance;
+import org.wpilib.hardware.hal.HAL;
+import org.wpilib.networktables.BooleanSubscriber;
+import org.wpilib.networktables.NetworkTableInstance;
 
 /** This class controls a REV ExpansionHub plugged in over USB to Systemcore. */
 public class ExpansionHub implements AutoCloseable {

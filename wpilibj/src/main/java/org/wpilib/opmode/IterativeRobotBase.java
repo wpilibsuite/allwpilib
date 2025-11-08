@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.opmode;
 
-import edu.wpi.first.hal.DriverStationJNI;
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.wpilib.hardware.hal.DriverStationJNI;
+import org.wpilib.hardware.hal.HAL;
+import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.smartdashboard.SmartDashboard;
 
 /**
  * IterativeRobotBase implements a specific type of robot program framework, extending the RobotBase

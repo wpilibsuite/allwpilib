@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.templates.timedskeleton;
+package org.wpilib.templates.timedskeleton;
 
-import edu.wpi.first.wpilibj.TimedRobot;
+import org.wpilib.opmode.TimedRobot;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in

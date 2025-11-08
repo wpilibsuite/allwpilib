@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.geometry;
+package org.wpilib.math.geometry;
 
-import edu.wpi.first.math.geometry.proto.Twist3dProto;
-import edu.wpi.first.math.geometry.struct.Twist3dStruct;
-import edu.wpi.first.math.jni.Twist3dJNI;
-import edu.wpi.first.util.protobuf.ProtobufSerializable;
-import edu.wpi.first.util.struct.StructSerializable;
+import org.wpilib.math.geometry.proto.Twist3dProto;
+import org.wpilib.math.geometry.struct.Twist3dStruct;
+import org.wpilib.math.jni.Twist3dJNI;
+import org.wpilib.util.protobuf.ProtobufSerializable;
+import org.wpilib.util.struct.StructSerializable;
 import java.util.Objects;
 
 /**

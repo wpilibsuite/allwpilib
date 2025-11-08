@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.controller;
+package org.wpilib.math.controller;
 
-import edu.wpi.first.math.controller.proto.ArmFeedforwardProto;
-import edu.wpi.first.math.controller.struct.ArmFeedforwardStruct;
-import edu.wpi.first.math.jni.ArmFeedforwardJNI;
-import edu.wpi.first.util.protobuf.ProtobufSerializable;
-import edu.wpi.first.util.struct.StructSerializable;
+import org.wpilib.math.controller.proto.ArmFeedforwardProto;
+import org.wpilib.math.controller.struct.ArmFeedforwardStruct;
+import org.wpilib.math.jni.ArmFeedforwardJNI;
+import org.wpilib.util.protobuf.ProtobufSerializable;
+import org.wpilib.util.struct.StructSerializable;
 
 /**
  * A helper class that computes feedforward outputs for a simple arm (modeled as a motor acting

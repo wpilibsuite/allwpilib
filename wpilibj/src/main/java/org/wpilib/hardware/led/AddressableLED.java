@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.hardware.led;
 
-import edu.wpi.first.hal.AddressableLEDJNI;
-import edu.wpi.first.hal.HAL;
+import org.wpilib.hardware.hal.AddressableLEDJNI;
+import org.wpilib.hardware.hal.HAL;
 
 /**
  * A class for driving addressable LEDs, such as WS2812B, WS2815, and NeoPixels.

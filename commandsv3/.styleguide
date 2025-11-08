@@ -3,8 +3,8 @@ modifiableFileExclude {
 }
 
 generatedFileExclude {
-  src/generated/main/java/org/wpilib/commands3/button/
-  src/generated/main/java/org/wpilib/commands3/proto/
+  src/generated/main/java/org/wpilib/command3/button/
+  src/generated/main/java/org/wpilib/command3/proto/
 }
 
 repoRootNameOverride {

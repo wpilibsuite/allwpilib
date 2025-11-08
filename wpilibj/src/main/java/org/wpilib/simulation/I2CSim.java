@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.simulation;
+package org.wpilib.simulation;
 
-import edu.wpi.first.hal.simulation.BufferCallback;
-import edu.wpi.first.hal.simulation.ConstBufferCallback;
-import edu.wpi.first.hal.simulation.I2CDataJNI;
-import edu.wpi.first.hal.simulation.NotifyCallback;
+import org.wpilib.hardware.hal.simulation.BufferCallback;
+import org.wpilib.hardware.hal.simulation.ConstBufferCallback;
+import org.wpilib.hardware.hal.simulation.I2CDataJNI;
+import org.wpilib.hardware.hal.simulation.NotifyCallback;
 
 /** A class to control a simulated I2C device. */
 public class I2CSim {

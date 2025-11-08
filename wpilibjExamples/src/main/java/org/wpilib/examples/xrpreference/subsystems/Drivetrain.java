@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.xrpreference.subsystems;
+package org.wpilib.examples.xrpreference.subsystems;
 
-import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.xrp.XRPGyro;
-import edu.wpi.first.wpilibj.xrp.XRPMotor;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.hardware.rotation.Encoder;
+import org.wpilib.drive.DifferentialDrive;
+import org.wpilib.xrp.XRPGyro;
+import org.wpilib.xrp.XRPMotor;
+import org.wpilib.command2.SubsystemBase;
 
 public class Drivetrain extends SubsystemBase {
   private static final double kGearRatio =

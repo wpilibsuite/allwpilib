@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.apriltag;
+package org.wpilib.vision.apriltag;
 
 import java.io.UncheckedIOException;
 
@@ -20,7 +20,7 @@ public enum AprilTagFields {
   k2025ReefscapeAndyMark("2025-reefscape-andymark.json");
 
   /** Base resource directory. */
-  public static final String kBaseResourceDir = "/edu/wpi/first/apriltag/";
+  public static final String kBaseResourceDir = "/org/wpilib/vision/apriltag/";
 
   /** Alias to the current game. */
   public static final AprilTagFields kDefaultField = k2025ReefscapeWelded;

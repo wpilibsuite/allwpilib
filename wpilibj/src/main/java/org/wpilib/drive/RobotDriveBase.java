@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.drive;
+package org.wpilib.drive;
 
-import edu.wpi.first.wpilibj.MotorSafety;
+import org.wpilib.hardware.motor.MotorSafety;
 
 /**
  * Common base class for drive platforms.
  *
- * <p>{@link edu.wpi.first.wpilibj.MotorSafety} is enabled by default.
+ * <p>{@link org.wpilib.hardware.motor.MotorSafety} is enabled by default.
  */
 public abstract class RobotDriveBase extends MotorSafety {
   /** Default input deadband. */
@@ -60,7 +60,7 @@ public abstract class RobotDriveBase extends MotorSafety {
    *
    * <p>The default value is {@value #kDefaultDeadband}. Inputs smaller than the deadband are set to
    * 0.0 while inputs larger than the deadband are scaled from 0.0 to 1.0. See {@link
-   * edu.wpi.first.math.MathUtil#applyDeadband}.
+   * org.wpilib.math.util.MathUtil#applyDeadband}.
    *
    * @param deadband The deadband to set.
    */

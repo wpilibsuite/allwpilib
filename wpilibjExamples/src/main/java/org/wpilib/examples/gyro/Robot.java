@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.gyro;
+package org.wpilib.examples.gyro;
 
-import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.OnboardIMU;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.driverstation.Joystick;
+import org.wpilib.hardware.imu.OnboardIMU;
+import org.wpilib.opmode.TimedRobot;
+import org.wpilib.drive.DifferentialDrive;
+import org.wpilib.hardware.motor.PWMSparkMax;
 
 /**
  * This is a sample program to demonstrate how to use a gyro sensor to make a robot drive straight.

@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.units;
+package org.wpilib.units;
 
-import edu.wpi.first.units.measure.LinearVelocity;
+import org.wpilib.units.measure.LinearVelocity;
 
-/** A unit of linear velocity like {@link edu.wpi.first.units.Units#MetersPerSecond}. */
+/** A unit of linear velocity like {@link org.wpilib.units.Units#MetersPerSecond}. */
 public final class LinearVelocityUnit extends PerUnit<DistanceUnit, TimeUnit> {
   private static final CombinatoryUnitCache<DistanceUnit, TimeUnit, LinearVelocityUnit> cache =
       new CombinatoryUnitCache<>(LinearVelocityUnit::new);

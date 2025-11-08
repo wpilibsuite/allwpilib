@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.epilogue.processor;
+package org.wpilib.epilogue.processor;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
@@ -21,7 +21,7 @@ public class MeasureHandler extends ElementHandler {
             .erasure(
                 processingEnv
                     .getElementUtils()
-                    .getTypeElement("edu.wpi.first.units.Measure")
+                    .getTypeElement("org.wpilib.units.Measure")
                     .asType());
   }
 

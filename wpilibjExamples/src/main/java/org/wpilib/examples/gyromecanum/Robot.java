@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.gyromecanum;
+package org.wpilib.examples.gyromecanum;
 
-import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.OnboardIMU;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.drive.MecanumDrive;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.driverstation.Joystick;
+import org.wpilib.hardware.imu.OnboardIMU;
+import org.wpilib.opmode.TimedRobot;
+import org.wpilib.drive.MecanumDrive;
+import org.wpilib.hardware.motor.PWMSparkMax;
 
 /**
  * This is a sample program that uses mecanum drive with a gyro sensor to maintain rotation vectors

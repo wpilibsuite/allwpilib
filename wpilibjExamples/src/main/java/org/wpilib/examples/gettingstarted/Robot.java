@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.gettingstarted;
+package org.wpilib.examples.gettingstarted;
 
-import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.opmode.TimedRobot;
+import org.wpilib.system.Timer;
+import org.wpilib.driverstation.XboxController;
+import org.wpilib.drive.DifferentialDrive;
+import org.wpilib.hardware.motor.PWMSparkMax;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in

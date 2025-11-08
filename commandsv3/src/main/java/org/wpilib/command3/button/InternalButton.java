@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.commands3.button;
+package org.wpilib.command3.button;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.wpilib.commands3.Trigger;
+import org.wpilib.command3.Trigger;
 
 /**
  * This class is intended to be used within a program. The programmer can manually set its value.

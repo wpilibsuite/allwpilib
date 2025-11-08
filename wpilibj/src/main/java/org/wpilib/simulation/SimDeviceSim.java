@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.simulation;
+package org.wpilib.simulation;
 
-import edu.wpi.first.hal.SimBoolean;
-import edu.wpi.first.hal.SimDouble;
-import edu.wpi.first.hal.SimEnum;
-import edu.wpi.first.hal.SimInt;
-import edu.wpi.first.hal.SimLong;
-import edu.wpi.first.hal.SimValue;
-import edu.wpi.first.hal.simulation.SimDeviceCallback;
-import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
-import edu.wpi.first.hal.simulation.SimValueCallback;
+import org.wpilib.hardware.hal.SimBoolean;
+import org.wpilib.hardware.hal.SimDouble;
+import org.wpilib.hardware.hal.SimEnum;
+import org.wpilib.hardware.hal.SimInt;
+import org.wpilib.hardware.hal.SimLong;
+import org.wpilib.hardware.hal.SimValue;
+import org.wpilib.hardware.hal.simulation.SimDeviceCallback;
+import org.wpilib.hardware.hal.simulation.SimDeviceDataJNI;
+import org.wpilib.hardware.hal.simulation.SimValueCallback;
 
 /** Class to control the simulation side of a SimDevice. */
 public class SimDeviceSim {
@@ -235,7 +235,7 @@ public class SimDeviceSim {
   }
 
   /**
-   * Register a callback to be run every time a new {@link edu.wpi.first.hal.SimDevice} is created.
+   * Register a callback to be run every time a new {@link org.wpilib.hardware.hal.SimDevice} is created.
    *
    * @param prefix the prefix to filter sim devices
    * @param callback the callback
@@ -249,7 +249,7 @@ public class SimDeviceSim {
   }
 
   /**
-   * Register a callback to be run every time a {@link edu.wpi.first.hal.SimDevice} is
+   * Register a callback to be run every time a {@link org.wpilib.hardware.hal.SimDevice} is
    * freed/destroyed.
    *
    * @param prefix the prefix to filter sim devices

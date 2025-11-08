@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.system;
+package org.wpilib.math.system;
 
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Num;
-import edu.wpi.first.math.StateSpaceUtil;
-import edu.wpi.first.math.controller.LinearPlantInversionFeedforward;
-import edu.wpi.first.math.controller.LinearQuadraticRegulator;
-import edu.wpi.first.math.estimator.KalmanFilter;
-import edu.wpi.first.math.numbers.N1;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.util.Num;
+import org.wpilib.math.util.StateSpaceUtil;
+import org.wpilib.math.controller.LinearPlantInversionFeedforward;
+import org.wpilib.math.controller.LinearQuadraticRegulator;
+import org.wpilib.math.estimator.KalmanFilter;
+import org.wpilib.math.numbers.N1;
 import java.util.function.Function;
 import org.ejml.MatrixDimensionException;
 import org.ejml.simple.SimpleMatrix;
