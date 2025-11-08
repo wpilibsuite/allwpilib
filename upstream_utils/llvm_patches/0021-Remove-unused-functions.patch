@@ -48,7 +48,7 @@ index 990d3e4cfe53e025df6ce797f46f9de5af8ca6dc..264b8192a0473b94363765995517851c
    //===--------------------------------------------------------------------===//
    // Subclass Interface
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 2f160c45b47cf57bb28f6393dd56cde06089639b..9ef6f7da66c66a35b1ce63e603e8590c214f9843 100644
+index c153b91391fe63e819e4907ac98d2ee26228107a..c9bb71be96f0ea3ad26c61cfa8ab35dfa6f60d02 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -182,22 +182,6 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,

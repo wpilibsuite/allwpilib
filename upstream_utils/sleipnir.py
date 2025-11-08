@@ -39,7 +39,7 @@ def copy_upstream_src(wpilib_root: Path):
 namespace gch {
 
 template <typename T>
-using small_vector = wpi::SmallVector<T>;
+using small_vector = wpi::util::SmallVector<T>;
 
 }  // namespace gch
 """
