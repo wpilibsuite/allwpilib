@@ -7,6 +7,7 @@ package org.wpilib.system;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
+import org.wpilib.driverstation.DriverStation;
 
 /**
  * A class for keeping track of how much time it takes for different parts of code to execute. This

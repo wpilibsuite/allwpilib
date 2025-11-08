@@ -6,6 +6,7 @@ package org.wpilib.hardware.accelerometer;
 
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
+import org.wpilib.hardware.discrete.AnalogInput;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.util.sendable.Sendable;
 import org.wpilib.util.sendable.SendableBuilder;

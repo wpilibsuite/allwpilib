@@ -9,6 +9,7 @@ import static org.wpilib.units.Units.Seconds;
 import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.NotifierJNI;
+import org.wpilib.system.RobotController;
 import org.wpilib.units.measure.Frequency;
 import org.wpilib.units.measure.Time;
 import java.util.PriorityQueue;
