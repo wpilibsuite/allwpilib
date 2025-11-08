@@ -11,8 +11,8 @@
 #include <initializer_list>
 #include <utility>
 
-#include "wpi/util/detail/abi_macros.hpp"
-#include "wpi/util/detail/meta/type_traits.hpp"
+#include <wpi/util/detail/abi_macros.hpp>
+#include <wpi/util/detail/meta/type_traits.hpp>
 
 WPI_JSON_NAMESPACE_BEGIN
 namespace detail

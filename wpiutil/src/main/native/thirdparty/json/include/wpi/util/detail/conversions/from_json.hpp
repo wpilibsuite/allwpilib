@@ -20,14 +20,14 @@
 #include <utility> // pair, declval
 #include <valarray> // valarray
 
-#include "wpi/util/detail/exceptions.hpp"
-#include "wpi/util/detail/macro_scope.hpp"
-#include "wpi/util/detail/meta/cpp_future.hpp"
-#include "wpi/util/detail/meta/identity_tag.hpp"
-#include "wpi/util/detail/meta/std_fs.hpp"
-#include "wpi/util/detail/meta/type_traits.hpp"
-#include "wpi/util/detail/string_concat.hpp"
-#include "wpi/util/detail/value_t.hpp"
+#include <wpi/util/detail/exceptions.hpp>
+#include <wpi/util/detail/macro_scope.hpp>
+#include <wpi/util/detail/meta/cpp_future.hpp>
+#include <wpi/util/detail/meta/identity_tag.hpp>
+#include <wpi/util/detail/meta/std_fs.hpp>
+#include <wpi/util/detail/meta/type_traits.hpp>
+#include <wpi/util/detail/string_concat.hpp>
+#include <wpi/util/detail/value_t.hpp>
 
 WPI_JSON_NAMESPACE_BEGIN
 namespace detail

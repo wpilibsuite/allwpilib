@@ -75,7 +75,7 @@ index 2f160c45b47cf57bb28f6393dd56cde06089639b..9ef6f7da66c66a35b1ce63e603e8590c
  
  #define WIN32_NO_STATUS
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 585f45d9eedc2d900886988010738dc390acbf90..841a30962da17fc3d7bd18e14b44993900b3f984 100644
+index a1b40ae78da9fed4bb9d489f298c7adc9cf437b9..3333890ed1b086c94cdfce8bc9efb3d191a47f89 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -168,16 +168,6 @@ raw_ostream &raw_ostream::write_escaped(std::string_view Str,

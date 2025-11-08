@@ -10,7 +10,7 @@
 
 #include <type_traits>
 
-#include "wpi/util/detail/meta/void_t.hpp"
+#include <wpi/util/detail/meta/void_t.hpp>
 
 WPI_JSON_NAMESPACE_BEGIN
 namespace detail

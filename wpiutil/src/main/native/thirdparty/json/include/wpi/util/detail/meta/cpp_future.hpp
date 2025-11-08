@@ -14,7 +14,7 @@
 #include <type_traits> // conditional, enable_if, false_type, integral_constant, is_constructible, is_integral, is_same, remove_cv, remove_reference, true_type
 #include <utility> // index_sequence, make_index_sequence, index_sequence_for
 
-#include "wpi/util/detail/macro_scope.hpp"
+#include <wpi/util/detail/macro_scope.hpp>
 
 WPI_JSON_NAMESPACE_BEGIN
 namespace detail

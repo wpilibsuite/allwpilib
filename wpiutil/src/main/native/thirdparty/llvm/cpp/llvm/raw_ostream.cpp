@@ -54,7 +54,7 @@
 
 #ifdef _WIN32
 #include "wpi/util/ConvertUTF.hpp"
-#include "Windows/WindowsSupport.h"
+#include "Windows/WindowsSupport.hpp"
 #endif
 
 using namespace wpi;

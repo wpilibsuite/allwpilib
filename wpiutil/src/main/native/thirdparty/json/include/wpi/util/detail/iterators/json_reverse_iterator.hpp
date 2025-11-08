@@ -12,7 +12,7 @@
 #include <iterator> // reverse_iterator
 #include <utility> // declval
 
-#include "wpi/util/detail/abi_macros.hpp"
+#include <wpi/util/detail/abi_macros.hpp>
 
 WPI_JSON_NAMESPACE_BEGIN
 namespace detail

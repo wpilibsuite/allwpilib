@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "wpi/util/detail/macro_scope.hpp"
+#include <wpi/util/detail/macro_scope.hpp>
 
 #if JSON_HAS_EXPERIMENTAL_FILESYSTEM
 #include <experimental/filesystem>

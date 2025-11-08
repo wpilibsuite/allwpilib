@@ -8,11 +8,11 @@ Subject: [PATCH 33/36] Remove auto-conversion from raw_ostream
  1 file changed, 1 insertion(+), 10 deletions(-)
 
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 4b76e51dd3c3dcb050a8dc2e5d88f4575acd51b5..e8536a0d98c78ab2bbf400418b37f5dd4b8a8c42 100644
+index 816242fa1139d66467435a4b1acbfa93f799c00f..40da41028c75f4906b76e85b36ca546494d5bd12 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -19,7 +19,6 @@
- #include "wpi/util/SmallVector.h"
+ #include "wpi/util/SmallVector.hpp"
  #include "llvm/ADT/StringExtras.h"
  #include "llvm/Config/config.h"
 -#include "llvm/Support/AutoConvert.h"
