@@ -76,7 +76,7 @@ generate_version_file(
 
 generate_resources(
     name = "generate-resources",
-    namespace = "glass",
+    namespace = "wpi::glass",
     prefix = "GLASS",
     resource_files = glob(["src/app/native/resources/*"]),
 )
