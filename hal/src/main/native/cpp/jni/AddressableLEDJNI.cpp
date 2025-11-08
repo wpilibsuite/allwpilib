@@ -7,7 +7,7 @@
 #include <wpi/jni_util.h>
 
 #include "HALUtil.h"
-#include "edu_wpi_first_hal_AddressableLEDJNI.h"
+#include "org_wpilib_hardware_hal_AddressableLEDJNI.h"
 #include "hal/AddressableLED.h"
 
 using namespace hal;
@@ -15,27 +15,27 @@ using namespace wpi::java;
 
 static_assert(sizeof(jbyte) * 3 == sizeof(HAL_AddressableLEDData));
 
-static_assert(edu_wpi_first_hal_AddressableLEDJNI_COLOR_ORDER_RGB ==
+static_assert(org_wpilib_hardware_hal_AddressableLEDJNI_COLOR_ORDER_RGB ==
               HAL_ALED_RGB);
-static_assert(edu_wpi_first_hal_AddressableLEDJNI_COLOR_ORDER_RBG ==
+static_assert(org_wpilib_hardware_hal_AddressableLEDJNI_COLOR_ORDER_RBG ==
               HAL_ALED_RBG);
-static_assert(edu_wpi_first_hal_AddressableLEDJNI_COLOR_ORDER_BGR ==
+static_assert(org_wpilib_hardware_hal_AddressableLEDJNI_COLOR_ORDER_BGR ==
               HAL_ALED_BGR);
-static_assert(edu_wpi_first_hal_AddressableLEDJNI_COLOR_ORDER_BRG ==
+static_assert(org_wpilib_hardware_hal_AddressableLEDJNI_COLOR_ORDER_BRG ==
               HAL_ALED_BRG);
-static_assert(edu_wpi_first_hal_AddressableLEDJNI_COLOR_ORDER_GBR ==
+static_assert(org_wpilib_hardware_hal_AddressableLEDJNI_COLOR_ORDER_GBR ==
               HAL_ALED_GBR);
-static_assert(edu_wpi_first_hal_AddressableLEDJNI_COLOR_ORDER_GRB ==
+static_assert(org_wpilib_hardware_hal_AddressableLEDJNI_COLOR_ORDER_GRB ==
               HAL_ALED_GRB);
 
 extern "C" {
 /*
- * Class:     edu_wpi_first_hal_AddressableLEDJNI
+ * Class:     org_wpilib_hardware_hal_AddressableLEDJNI
  * Method:    initialize
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_AddressableLEDJNI_initialize
+Java_org_wpilib_hardware_hal_AddressableLEDJNI_initialize
   (JNIEnv* env, jclass, jint channel)
 {
   int32_t status = 0;
@@ -46,12 +46,12 @@ Java_edu_wpi_first_hal_AddressableLEDJNI_initialize
 }
 
 /*
- * Class:     edu_wpi_first_hal_AddressableLEDJNI
+ * Class:     org_wpilib_hardware_hal_AddressableLEDJNI
  * Method:    free
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_AddressableLEDJNI_free
+Java_org_wpilib_hardware_hal_AddressableLEDJNI_free
   (JNIEnv* env, jclass, jint handle)
 {
   if (handle != HAL_kInvalidHandle) {
@@ -60,12 +60,12 @@ Java_edu_wpi_first_hal_AddressableLEDJNI_free
 }
 
 /*
- * Class:     edu_wpi_first_hal_AddressableLEDJNI
+ * Class:     org_wpilib_hardware_hal_AddressableLEDJNI
  * Method:    setStart
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_AddressableLEDJNI_setStart
+Java_org_wpilib_hardware_hal_AddressableLEDJNI_setStart
   (JNIEnv* env, jclass, jint handle, jint start)
 {
   int32_t status = 0;
@@ -75,12 +75,12 @@ Java_edu_wpi_first_hal_AddressableLEDJNI_setStart
 }
 
 /*
- * Class:     edu_wpi_first_hal_AddressableLEDJNI
+ * Class:     org_wpilib_hardware_hal_AddressableLEDJNI
  * Method:    setLength
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_AddressableLEDJNI_setLength
+Java_org_wpilib_hardware_hal_AddressableLEDJNI_setLength
   (JNIEnv* env, jclass, jint handle, jint length)
 {
   int32_t status = 0;
@@ -90,12 +90,12 @@ Java_edu_wpi_first_hal_AddressableLEDJNI_setLength
 }
 
 /*
- * Class:     edu_wpi_first_hal_AddressableLEDJNI
+ * Class:     org_wpilib_hardware_hal_AddressableLEDJNI
  * Method:    setData
  * Signature: (II[BII)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_AddressableLEDJNI_setData
+Java_org_wpilib_hardware_hal_AddressableLEDJNI_setData
   (JNIEnv* env, jclass, jint outStart, jint colorOrder, jbyteArray data,
    jint start, jint len)
 {
@@ -130,12 +130,12 @@ Java_edu_wpi_first_hal_AddressableLEDJNI_setData
 }
 
 /*
- * Class:     edu_wpi_first_hal_AddressableLEDJNI
+ * Class:     org_wpilib_hardware_hal_AddressableLEDJNI
  * Method:    setDataFromBuffer
  * Signature: (IILjava/lang/Object;II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_AddressableLEDJNI_setDataFromBuffer
+Java_org_wpilib_hardware_hal_AddressableLEDJNI_setDataFromBuffer
   (JNIEnv* env, jclass, jint outStart, jint colorOrder, jobject data,
    jint start, jint len)
 {

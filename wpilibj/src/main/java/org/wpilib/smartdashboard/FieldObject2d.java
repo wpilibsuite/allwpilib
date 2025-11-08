@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.smartdashboard;
+package org.wpilib.smartdashboard;
 
-import static edu.wpi.first.units.Units.Meters;
+import static org.wpilib.units.Units.Meters;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.networktables.DoubleArrayEntry;
-import edu.wpi.first.units.measure.Distance;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.trajectory.Trajectory;
+import org.wpilib.networktables.DoubleArrayEntry;
+import org.wpilib.units.measure.Distance;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.kinematics.struct;
+package org.wpilib.math.kinematics.struct;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.wpilibj.StructTestBase;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.kinematics.SwerveDriveKinematics;
+import org.wpilib.StructTestBase;
 
 @SuppressWarnings("PMD.TestClassWithoutTestCases")
 class SwerveDriveKinematicsStructTest extends StructTestBase<SwerveDriveKinematics> {

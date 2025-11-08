@@ -50,7 +50,7 @@ public abstract class CoroutineBasedDetector implements TaskListener {
   protected abstract TreeScanner<?, ?> createScanner(CompilationUnitTree compilationUnit);
 
   private TypeMirror getCoroutineType() {
-    var te = m_task.getElements().getTypeElement("org.wpilib.commands3.Coroutine");
+    var te = m_task.getElements().getTypeElement("org.wpilib.command3.Coroutine");
     return te == null ? null : te.asType();
   }
 }

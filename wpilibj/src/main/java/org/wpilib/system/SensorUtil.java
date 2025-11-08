@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.system;
 
-import edu.wpi.first.hal.AnalogJNI;
-import edu.wpi.first.hal.ConstantsJNI;
-import edu.wpi.first.hal.DIOJNI;
-import edu.wpi.first.hal.PWMJNI;
-import edu.wpi.first.hal.PortsJNI;
+import org.wpilib.hardware.hal.AnalogJNI;
+import org.wpilib.hardware.hal.ConstantsJNI;
+import org.wpilib.hardware.hal.DIOJNI;
+import org.wpilib.hardware.hal.PWMJNI;
+import org.wpilib.hardware.hal.PortsJNI;
 
 /**
  * Stores most recent status information as well as containing utility functions for checking

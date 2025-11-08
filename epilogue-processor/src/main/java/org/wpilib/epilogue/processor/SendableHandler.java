@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.epilogue.processor;
+package org.wpilib.epilogue.processor;
 
 import java.util.Optional;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -20,15 +20,15 @@ public class SendableHandler extends ElementHandler {
 
     m_sendableType =
         Optional.ofNullable(
-                lookupTypeElement(processingEnv, "edu.wpi.first.util.sendable.Sendable"))
+                lookupTypeElement(processingEnv, "org.wpilib.util.sendable.Sendable"))
             .map(TypeElement::asType);
     m_commandType =
         Optional.ofNullable(
-                lookupTypeElement(processingEnv, "edu.wpi.first.wpilibj2.command.Command"))
+                lookupTypeElement(processingEnv, "org.wpilib.command2.Command"))
             .map(TypeElement::asType);
     m_subsystemType =
         Optional.ofNullable(
-                lookupTypeElement(processingEnv, "edu.wpi.first.wpilibj2.command.SubsystemBase"))
+                lookupTypeElement(processingEnv, "org.wpilib.command2.SubsystemBase"))
             .map(TypeElement::asType);
   }
 

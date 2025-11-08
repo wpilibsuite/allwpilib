@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.snippets.accelerometerfilter;
+package org.wpilib.snippets.accelerometerfilter;
 
-import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.wpilibj.OnboardIMU;
-import edu.wpi.first.wpilibj.OnboardIMU.MountOrientation;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.wpilib.math.filter.LinearFilter;
+import org.wpilib.hardware.imu.OnboardIMU;
+import org.wpilib.hardware.imu.OnboardIMU.MountOrientation;
+import org.wpilib.opmode.TimedRobot;
+import org.wpilib.smartdashboard.SmartDashboard;
 
 /**
  * Accelerometer filtering snippets for frc-docs.

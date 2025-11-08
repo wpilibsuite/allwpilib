@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.units;
+package org.wpilib.units;
 
-import static edu.wpi.first.units.Units.Joules;
-import static edu.wpi.first.units.Units.Seconds;
+import static org.wpilib.units.Units.Joules;
+import static org.wpilib.units.Units.Seconds;
 
-import edu.wpi.first.units.measure.Power;
+import org.wpilib.units.measure.Power;
 
 /**
  * Unit of power dimension.

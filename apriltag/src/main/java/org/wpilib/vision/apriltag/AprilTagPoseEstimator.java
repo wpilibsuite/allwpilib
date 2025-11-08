@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.apriltag;
+package org.wpilib.vision.apriltag;
 
-import edu.wpi.first.apriltag.jni.AprilTagJNI;
-import edu.wpi.first.math.geometry.Transform3d;
+import org.wpilib.vision.apriltag.jni.AprilTagJNI;
+import org.wpilib.math.geometry.Transform3d;
 
 /** Pose estimators for AprilTag tags. */
 public class AprilTagPoseEstimator {

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.networktables;
+package org.wpilib.networktables;
 
 /**
  * Subscribe to multiple topics based on one or more topic name prefixes. Can be used in combination

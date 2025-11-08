@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 class CodeAfterCoroutineParkDetectorTest {
   private static final String kCoroutineSource =
       """
-      package org.wpilib.commands3;
+      package org.wpilib.command3;
 
       public interface Coroutine {
         void park();
@@ -31,7 +31,7 @@ class CodeAfterCoroutineParkDetectorTest {
       package frc.robot;
 
       import java.util.function.Consumer;
-      import org.wpilib.commands3.Coroutine;
+      import org.wpilib.command3.Coroutine;
 
       class Example {
         Consumer<Coroutine> lambda = coroutine -> {
@@ -44,7 +44,7 @@ class CodeAfterCoroutineParkDetectorTest {
         javac()
             .withOptions(kJavaVersionOptions)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.commands3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
                 JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
@@ -57,7 +57,7 @@ class CodeAfterCoroutineParkDetectorTest {
       package frc.robot;
 
       import java.util.function.Consumer;
-      import org.wpilib.commands3.Coroutine;
+      import org.wpilib.command3.Coroutine;
 
       class Example {
         Consumer<Coroutine> lambda = coroutine -> {
@@ -72,7 +72,7 @@ class CodeAfterCoroutineParkDetectorTest {
         javac()
             .withOptions(kJavaVersionOptions)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.commands3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
                 JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).failed();
@@ -90,7 +90,7 @@ class CodeAfterCoroutineParkDetectorTest {
       package frc.robot;
 
       import java.util.function.Consumer;
-      import org.wpilib.commands3.Coroutine;
+      import org.wpilib.command3.Coroutine;
 
       class Example {
         Consumer<Coroutine> lambda = coroutine -> {
@@ -108,7 +108,7 @@ class CodeAfterCoroutineParkDetectorTest {
         javac()
             .withOptions(kJavaVersionOptions)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.commands3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
                 JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
@@ -121,7 +121,7 @@ class CodeAfterCoroutineParkDetectorTest {
       package frc.robot;
 
       import java.util.function.Consumer;
-      import org.wpilib.commands3.Coroutine;
+      import org.wpilib.command3.Coroutine;
 
       class Example {
         Consumer<Coroutine> lambda = coroutine -> {
@@ -136,7 +136,7 @@ class CodeAfterCoroutineParkDetectorTest {
         javac()
             .withOptions(kJavaVersionOptions)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.commands3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
                 JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).failed();
@@ -154,7 +154,7 @@ class CodeAfterCoroutineParkDetectorTest {
       package frc.robot;
 
       import java.util.function.Consumer;
-      import org.wpilib.commands3.Coroutine;
+      import org.wpilib.command3.Coroutine;
 
       class Example {
         Consumer<Coroutine> lambda = coroutine -> {
@@ -169,7 +169,7 @@ class CodeAfterCoroutineParkDetectorTest {
         javac()
             .withOptions(kJavaVersionOptions)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.commands3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
                 JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).failed();
@@ -187,7 +187,7 @@ class CodeAfterCoroutineParkDetectorTest {
       package frc.robot;
 
       import java.util.function.Consumer;
-      import org.wpilib.commands3.Coroutine;
+      import org.wpilib.command3.Coroutine;
 
       class Example {
         Consumer<Coroutine> lambda = coroutine -> {
@@ -200,7 +200,7 @@ class CodeAfterCoroutineParkDetectorTest {
         javac()
             .withOptions(kJavaVersionOptions)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.commands3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
                 JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
@@ -213,7 +213,7 @@ class CodeAfterCoroutineParkDetectorTest {
       package frc.robot;
 
       import java.util.function.Consumer;
-      import org.wpilib.commands3.Coroutine;
+      import org.wpilib.command3.Coroutine;
 
       class Example {
         Consumer<Coroutine> lambda = coroutine -> {
@@ -227,7 +227,7 @@ class CodeAfterCoroutineParkDetectorTest {
         javac()
             .withOptions(kJavaVersionOptions)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.commands3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
                 JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).failed();

@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.elevatorexponentialprofile;
+package org.wpilib.examples.elevatorexponentialprofile;
 
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.trajectory.ExponentialProfile;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.TimedRobot;
+import org.wpilib.math.controller.SimpleMotorFeedforward;
+import org.wpilib.math.trajectory.ExponentialProfile;
+import org.wpilib.driverstation.Joystick;
+import org.wpilib.opmode.TimedRobot;
 
 public class Robot extends TimedRobot {
   private static double kDt = 0.02;

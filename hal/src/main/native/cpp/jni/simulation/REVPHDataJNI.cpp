@@ -5,7 +5,7 @@
 #include <jni.h>
 
 #include "CallbackStore.h"
-#include "edu_wpi_first_hal_simulation_REVPHDataJNI.h"
+#include "org_wpilib_hardware_hal_simulation_REVPHDataJNI.h"
 #include "hal/simulation/REVPHData.h"
 
 using namespace hal;
@@ -13,12 +13,12 @@ using namespace hal;
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_REVPHDataJNI
  * Method:    registerInitializedCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_registerInitializedCallback
+Java_org_wpilib_hardware_hal_simulation_REVPHDataJNI_registerInitializedCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(env, index, callback, initialNotify,
@@ -26,12 +26,12 @@ Java_edu_wpi_first_hal_simulation_REVPHDataJNI_registerInitializedCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_REVPHDataJNI
  * Method:    cancelInitializedCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_cancelInitializedCallback
+Java_org_wpilib_hardware_hal_simulation_REVPHDataJNI_cancelInitializedCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
@@ -39,36 +39,36 @@ Java_edu_wpi_first_hal_simulation_REVPHDataJNI_cancelInitializedCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_REVPHDataJNI
  * Method:    getInitialized
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_getInitialized
+Java_org_wpilib_hardware_hal_simulation_REVPHDataJNI_getInitialized
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetREVPHInitialized(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_REVPHDataJNI
  * Method:    setInitialized
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_setInitialized
+Java_org_wpilib_hardware_hal_simulation_REVPHDataJNI_setInitialized
   (JNIEnv*, jclass, jint index, jboolean value)
 {
   HALSIM_SetREVPHInitialized(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_REVPHDataJNI
  * Method:    registerSolenoidOutputCallback
  * Signature: (IILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_registerSolenoidOutputCallback
+Java_org_wpilib_hardware_hal_simulation_REVPHDataJNI_registerSolenoidOutputCallback
   (JNIEnv* env, jclass, jint index, jint channel, jobject callback,
    jboolean initialNotify)
 {
@@ -78,12 +78,12 @@ Java_edu_wpi_first_hal_simulation_REVPHDataJNI_registerSolenoidOutputCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_REVPHDataJNI
  * Method:    cancelSolenoidOutputCallback
  * Signature: (III)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_cancelSolenoidOutputCallback
+Java_org_wpilib_hardware_hal_simulation_REVPHDataJNI_cancelSolenoidOutputCallback
   (JNIEnv* env, jclass, jint index, jint channel, jint handle)
 {
   return sim::FreeChannelCallback(env, handle, index, channel,
@@ -91,36 +91,36 @@ Java_edu_wpi_first_hal_simulation_REVPHDataJNI_cancelSolenoidOutputCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_REVPHDataJNI
  * Method:    getSolenoidOutput
  * Signature: (II)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_getSolenoidOutput
+Java_org_wpilib_hardware_hal_simulation_REVPHDataJNI_getSolenoidOutput
   (JNIEnv*, jclass, jint index, jint channel)
 {
   return HALSIM_GetREVPHSolenoidOutput(index, channel);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_REVPHDataJNI
  * Method:    setSolenoidOutput
  * Signature: (IIZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_setSolenoidOutput
+Java_org_wpilib_hardware_hal_simulation_REVPHDataJNI_setSolenoidOutput
   (JNIEnv*, jclass, jint index, jint channel, jboolean value)
 {
   HALSIM_SetREVPHSolenoidOutput(index, channel, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_REVPHDataJNI
  * Method:    registerCompressorOnCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_registerCompressorOnCallback
+Java_org_wpilib_hardware_hal_simulation_REVPHDataJNI_registerCompressorOnCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(env, index, callback, initialNotify,
@@ -128,12 +128,12 @@ Java_edu_wpi_first_hal_simulation_REVPHDataJNI_registerCompressorOnCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_REVPHDataJNI
  * Method:    cancelCompressorOnCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_cancelCompressorOnCallback
+Java_org_wpilib_hardware_hal_simulation_REVPHDataJNI_cancelCompressorOnCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
@@ -141,36 +141,36 @@ Java_edu_wpi_first_hal_simulation_REVPHDataJNI_cancelCompressorOnCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_REVPHDataJNI
  * Method:    getCompressorOn
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_getCompressorOn
+Java_org_wpilib_hardware_hal_simulation_REVPHDataJNI_getCompressorOn
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetREVPHCompressorOn(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_REVPHDataJNI
  * Method:    setCompressorOn
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_setCompressorOn
+Java_org_wpilib_hardware_hal_simulation_REVPHDataJNI_setCompressorOn
   (JNIEnv*, jclass, jint index, jboolean value)
 {
   HALSIM_SetREVPHCompressorOn(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_REVPHDataJNI
  * Method:    registerCompressorConfigTypeCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_registerCompressorConfigTypeCallback
+Java_org_wpilib_hardware_hal_simulation_REVPHDataJNI_registerCompressorConfigTypeCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(
@@ -179,12 +179,12 @@ Java_edu_wpi_first_hal_simulation_REVPHDataJNI_registerCompressorConfigTypeCallb
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_REVPHDataJNI
  * Method:    cancelCompressorConfigTypeCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_cancelCompressorConfigTypeCallback
+Java_org_wpilib_hardware_hal_simulation_REVPHDataJNI_cancelCompressorConfigTypeCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
@@ -192,24 +192,24 @@ Java_edu_wpi_first_hal_simulation_REVPHDataJNI_cancelCompressorConfigTypeCallbac
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_REVPHDataJNI
  * Method:    getCompressorConfigType
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_getCompressorConfigType
+Java_org_wpilib_hardware_hal_simulation_REVPHDataJNI_getCompressorConfigType
   (JNIEnv*, jclass, jint index)
 {
   return static_cast<jint>(HALSIM_GetREVPHCompressorConfigType(index));
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_REVPHDataJNI
  * Method:    setCompressorConfigType
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_setCompressorConfigType
+Java_org_wpilib_hardware_hal_simulation_REVPHDataJNI_setCompressorConfigType
   (JNIEnv*, jclass, jint index, jint value)
 {
   HALSIM_SetREVPHCompressorConfigType(
@@ -217,12 +217,12 @@ Java_edu_wpi_first_hal_simulation_REVPHDataJNI_setCompressorConfigType
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_REVPHDataJNI
  * Method:    registerPressureSwitchCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_registerPressureSwitchCallback
+Java_org_wpilib_hardware_hal_simulation_REVPHDataJNI_registerPressureSwitchCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(env, index, callback, initialNotify,
@@ -230,12 +230,12 @@ Java_edu_wpi_first_hal_simulation_REVPHDataJNI_registerPressureSwitchCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_REVPHDataJNI
  * Method:    cancelPressureSwitchCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_cancelPressureSwitchCallback
+Java_org_wpilib_hardware_hal_simulation_REVPHDataJNI_cancelPressureSwitchCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
@@ -243,36 +243,36 @@ Java_edu_wpi_first_hal_simulation_REVPHDataJNI_cancelPressureSwitchCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_REVPHDataJNI
  * Method:    getPressureSwitch
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_getPressureSwitch
+Java_org_wpilib_hardware_hal_simulation_REVPHDataJNI_getPressureSwitch
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetREVPHPressureSwitch(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_REVPHDataJNI
  * Method:    setPressureSwitch
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_setPressureSwitch
+Java_org_wpilib_hardware_hal_simulation_REVPHDataJNI_setPressureSwitch
   (JNIEnv*, jclass, jint index, jboolean value)
 {
   HALSIM_SetREVPHPressureSwitch(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_REVPHDataJNI
  * Method:    registerCompressorCurrentCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_registerCompressorCurrentCallback
+Java_org_wpilib_hardware_hal_simulation_REVPHDataJNI_registerCompressorCurrentCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(env, index, callback, initialNotify,
@@ -280,12 +280,12 @@ Java_edu_wpi_first_hal_simulation_REVPHDataJNI_registerCompressorCurrentCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_REVPHDataJNI
  * Method:    cancelCompressorCurrentCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_cancelCompressorCurrentCallback
+Java_org_wpilib_hardware_hal_simulation_REVPHDataJNI_cancelCompressorCurrentCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
@@ -293,36 +293,36 @@ Java_edu_wpi_first_hal_simulation_REVPHDataJNI_cancelCompressorCurrentCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_REVPHDataJNI
  * Method:    getCompressorCurrent
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_getCompressorCurrent
+Java_org_wpilib_hardware_hal_simulation_REVPHDataJNI_getCompressorCurrent
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetREVPHCompressorCurrent(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_REVPHDataJNI
  * Method:    setCompressorCurrent
  * Signature: (ID)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_setCompressorCurrent
+Java_org_wpilib_hardware_hal_simulation_REVPHDataJNI_setCompressorCurrent
   (JNIEnv*, jclass, jint index, jdouble value)
 {
   HALSIM_SetREVPHCompressorCurrent(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_REVPHDataJNI
  * Method:    registerAllNonSolenoidCallbacks
  * Signature: (ILjava/lang/Object;Z)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_registerAllNonSolenoidCallbacks
+Java_org_wpilib_hardware_hal_simulation_REVPHDataJNI_registerAllNonSolenoidCallbacks
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   sim::AllocateCallback(
@@ -334,12 +334,12 @@ Java_edu_wpi_first_hal_simulation_REVPHDataJNI_registerAllNonSolenoidCallbacks
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_REVPHDataJNI
  * Method:    registerAllSolenoidCallbacks
  * Signature: (IILjava/lang/Object;Z)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_registerAllSolenoidCallbacks
+Java_org_wpilib_hardware_hal_simulation_REVPHDataJNI_registerAllSolenoidCallbacks
   (JNIEnv* env, jclass, jint index, jint channel, jobject callback,
    jboolean initialNotify)
 {
@@ -353,12 +353,12 @@ Java_edu_wpi_first_hal_simulation_REVPHDataJNI_registerAllSolenoidCallbacks
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_REVPHDataJNI
  * Method:    resetData
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_resetData
+Java_org_wpilib_hardware_hal_simulation_REVPHDataJNI_resetData
   (JNIEnv*, jclass, jint index)
 {
   HALSIM_ResetREVPHData(index);

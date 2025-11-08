@@ -2,21 +2,21 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Volts;
-import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+import static org.wpilib.units.Units.Amps;
+import static org.wpilib.units.Units.Volts;
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.hal.util.AllocationException;
-import edu.wpi.first.networktables.BooleanPublisher;
-import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.DoubleSubscriber;
-import edu.wpi.first.networktables.IntegerPublisher;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.PubSubOption;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Voltage;
+import org.wpilib.hardware.hal.util.AllocationException;
+import org.wpilib.networktables.BooleanPublisher;
+import org.wpilib.networktables.DoublePublisher;
+import org.wpilib.networktables.DoubleSubscriber;
+import org.wpilib.networktables.IntegerPublisher;
+import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.networktables.PubSubOption;
+import org.wpilib.units.measure.Current;
+import org.wpilib.units.measure.Voltage;
 
 /** This class controls a specific motor and encoder hooked up to an ExpansionHub. */
 public class ExpansionHubMotor implements AutoCloseable {

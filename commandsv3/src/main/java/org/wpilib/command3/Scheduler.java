@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.commands3;
+package org.wpilib.command3;
 
-import static edu.wpi.first.units.Units.Microseconds;
-import static edu.wpi.first.units.Units.Milliseconds;
+import static org.wpilib.units.Units.Microseconds;
+import static org.wpilib.units.Units.Milliseconds;
 
-import edu.wpi.first.util.ErrorMessages;
-import edu.wpi.first.util.protobuf.ProtobufSerializable;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.event.EventLoop;
+import org.wpilib.util.ErrorMessages;
+import org.wpilib.util.protobuf.ProtobufSerializable;
+import org.wpilib.system.RobotController;
+import org.wpilib.opmode.TimedRobot;
+import org.wpilib.event.EventLoop;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,8 +27,8 @@ import java.util.Stack;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.wpilib.annotation.NoDiscard;
-import org.wpilib.commands3.button.CommandGenericHID;
-import org.wpilib.commands3.proto.SchedulerProto;
+import org.wpilib.command3.button.CommandGenericHID;
+import org.wpilib.command3.proto.SchedulerProto;
 
 /**
  * Manages the lifecycles of {@link Coroutine}-based {@link Command Commands}. Commands may be

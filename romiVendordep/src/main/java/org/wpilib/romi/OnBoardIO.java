@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.romi;
+package org.wpilib.romi;
 
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DigitalOutput;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
+import org.wpilib.hardware.discrete.DigitalInput;
+import org.wpilib.hardware.discrete.DigitalOutput;
+import org.wpilib.driverstation.DriverStation;
+import org.wpilib.system.Timer;
 
 /**
  * This class represents the onboard IO of the Romi reference robot. This includes the pushbuttons

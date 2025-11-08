@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.units;
+package org.wpilib.units;
 
-import edu.wpi.first.units.measure.Torque;
+import org.wpilib.units.measure.Torque;
 
-/** A unit of torque like {@link edu.wpi.first.units.Units#NewtonMeters}. */
+/** A unit of torque like {@link org.wpilib.units.Units#NewtonMeters}. */
 public final class TorqueUnit extends MultUnit<DistanceUnit, ForceUnit> {
   private static final CombinatoryUnitCache<DistanceUnit, ForceUnit, TorqueUnit> cache =
       new CombinatoryUnitCache<>(TorqueUnit::new);

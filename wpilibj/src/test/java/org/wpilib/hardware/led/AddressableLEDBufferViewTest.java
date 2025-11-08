@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.hardware.led;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.wpilibj.util.Color;
+import org.wpilib.util.Color;
 import org.junit.jupiter.api.Test;
 
 class AddressableLEDBufferViewTest {

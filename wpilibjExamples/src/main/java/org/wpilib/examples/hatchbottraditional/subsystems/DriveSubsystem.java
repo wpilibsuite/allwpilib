@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.hatchbottraditional.subsystems;
+package org.wpilib.examples.hatchbottraditional.subsystems;
 
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.examples.hatchbottraditional.Constants.DriveConstants;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.hardware.rotation.Encoder;
+import org.wpilib.drive.DifferentialDrive;
+import org.wpilib.examples.hatchbottraditional.Constants.DriveConstants;
+import org.wpilib.hardware.motor.PWMSparkMax;
+import org.wpilib.command2.SubsystemBase;
 
 public class DriveSubsystem extends SubsystemBase {
   // The motors on the left side of the drive.

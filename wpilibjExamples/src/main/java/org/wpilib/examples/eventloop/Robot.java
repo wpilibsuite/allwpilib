@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.eventloop;
+package org.wpilib.examples.eventloop;
 
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.event.BooleanEvent;
-import edu.wpi.first.wpilibj.event.EventLoop;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import org.wpilib.math.controller.PIDController;
+import org.wpilib.math.controller.SimpleMotorFeedforward;
+import org.wpilib.hardware.rotation.Encoder;
+import org.wpilib.driverstation.Joystick;
+import org.wpilib.opmode.TimedRobot;
+import org.wpilib.event.BooleanEvent;
+import org.wpilib.event.EventLoop;
+import org.wpilib.hardware.motor.PWMSparkMax;
 
 public class Robot extends TimedRobot {
   public static final double SHOT_VELOCITY = 200; // rpm

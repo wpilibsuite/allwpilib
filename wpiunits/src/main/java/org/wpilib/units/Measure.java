@@ -2,35 +2,35 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.units;
+package org.wpilib.units;
 
-import static edu.wpi.first.units.Units.Value;
+import static org.wpilib.units.Units.Value;
 
-import edu.wpi.first.units.measure.Acceleration;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularAcceleration;
-import edu.wpi.first.units.measure.AngularMomentum;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Dimensionless;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.Energy;
-import edu.wpi.first.units.measure.Force;
-import edu.wpi.first.units.measure.Frequency;
-import edu.wpi.first.units.measure.LinearAcceleration;
-import edu.wpi.first.units.measure.LinearMomentum;
-import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.Mass;
-import edu.wpi.first.units.measure.MomentOfInertia;
-import edu.wpi.first.units.measure.Mult;
-import edu.wpi.first.units.measure.Per;
-import edu.wpi.first.units.measure.Power;
-import edu.wpi.first.units.measure.Resistance;
-import edu.wpi.first.units.measure.Temperature;
-import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.units.measure.Torque;
-import edu.wpi.first.units.measure.Velocity;
-import edu.wpi.first.units.measure.Voltage;
+import org.wpilib.units.measure.Acceleration;
+import org.wpilib.units.measure.Angle;
+import org.wpilib.units.measure.AngularAcceleration;
+import org.wpilib.units.measure.AngularMomentum;
+import org.wpilib.units.measure.AngularVelocity;
+import org.wpilib.units.measure.Current;
+import org.wpilib.units.measure.Dimensionless;
+import org.wpilib.units.measure.Distance;
+import org.wpilib.units.measure.Energy;
+import org.wpilib.units.measure.Force;
+import org.wpilib.units.measure.Frequency;
+import org.wpilib.units.measure.LinearAcceleration;
+import org.wpilib.units.measure.LinearMomentum;
+import org.wpilib.units.measure.LinearVelocity;
+import org.wpilib.units.measure.Mass;
+import org.wpilib.units.measure.MomentOfInertia;
+import org.wpilib.units.measure.Mult;
+import org.wpilib.units.measure.Per;
+import org.wpilib.units.measure.Power;
+import org.wpilib.units.measure.Resistance;
+import org.wpilib.units.measure.Temperature;
+import org.wpilib.units.measure.Time;
+import org.wpilib.units.measure.Torque;
+import org.wpilib.units.measure.Velocity;
+import org.wpilib.units.measure.Voltage;
 
 /**
  * A measure holds the magnitude and unit of some dimension, such as distance, time, or speed. Two

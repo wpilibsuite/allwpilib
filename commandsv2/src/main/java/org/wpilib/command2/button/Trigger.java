@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj2.command.button;
+package org.wpilib.command2.button;
 
-import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.wpilibj.event.EventLoop;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import org.wpilib.math.filter.Debouncer;
+import org.wpilib.event.EventLoop;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.CommandScheduler;
 import java.util.function.BooleanSupplier;
 
 /**
@@ -138,7 +138,7 @@ public class Trigger implements BooleanSupplier {
    * changes to `false`.
    *
    * <p>Doesn't re-start the command if it ends while the condition is still `true`. If the command
-   * should restart, see {@link edu.wpi.first.wpilibj2.command.RepeatCommand}.
+   * should restart, see {@link org.wpilib.command2.RepeatCommand}.
    *
    * @param command the command to start
    * @return this trigger, so calls can be chained
@@ -161,7 +161,7 @@ public class Trigger implements BooleanSupplier {
    * condition changes to `true`.
    *
    * <p>Doesn't re-start the command if it ends while the condition is still `false`. If the command
-   * should restart, see {@link edu.wpi.first.wpilibj2.command.RepeatCommand}.
+   * should restart, see {@link org.wpilib.command2.RepeatCommand}.
    *
    * @param command the command to start
    * @return this trigger, so calls can be chained

@@ -2,20 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.geometry;
+package org.wpilib.math.geometry;
 
-import static edu.wpi.first.units.Units.Meters;
+import static org.wpilib.units.Units.Meters;
 
-import edu.wpi.first.math.MatBuilder;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.geometry.proto.Transform3dProto;
-import edu.wpi.first.math.geometry.struct.Transform3dStruct;
-import edu.wpi.first.math.jni.Transform3dJNI;
-import edu.wpi.first.math.numbers.N4;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.util.protobuf.ProtobufSerializable;
-import edu.wpi.first.util.struct.StructSerializable;
+import org.wpilib.math.linalg.MatBuilder;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.util.Nat;
+import org.wpilib.math.geometry.proto.Transform3dProto;
+import org.wpilib.math.geometry.struct.Transform3dStruct;
+import org.wpilib.math.jni.Transform3dJNI;
+import org.wpilib.math.numbers.N4;
+import org.wpilib.units.measure.Distance;
+import org.wpilib.util.protobuf.ProtobufSerializable;
+import org.wpilib.util.struct.StructSerializable;
 import java.util.Objects;
 
 /** Represents a transformation for a Pose3d in the pose's frame. */

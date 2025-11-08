@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.estimator;
+package org.wpilib.math.estimator;
 
-import edu.wpi.first.math.DARE;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.Num;
-import edu.wpi.first.math.StateSpaceUtil;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.system.Discretization;
-import edu.wpi.first.math.system.NumericalIntegration;
-import edu.wpi.first.math.system.NumericalJacobian;
+import org.wpilib.math.linalg.DARE;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.util.Nat;
+import org.wpilib.math.util.Num;
+import org.wpilib.math.util.StateSpaceUtil;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.system.Discretization;
+import org.wpilib.math.system.NumericalIntegration;
+import org.wpilib.math.system.NumericalJacobian;
 import java.util.function.BiFunction;
 
 /**

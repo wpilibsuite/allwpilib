@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems;
+package org.wpilib.examples.rapidreactcommandbot.subsystems;
 
-import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.epilogue.NotLogged;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.StorageConstants;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import org.wpilib.epilogue.Logged;
+import org.wpilib.epilogue.NotLogged;
+import org.wpilib.hardware.discrete.DigitalInput;
+import org.wpilib.examples.rapidreactcommandbot.Constants.StorageConstants;
+import org.wpilib.hardware.motor.PWMSparkMax;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.SubsystemBase;
+import org.wpilib.command2.button.Trigger;
 
 @Logged
 public class Storage extends SubsystemBase {

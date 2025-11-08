@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.optimization;
+package org.wpilib.math.optimization;
 
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
@@ -14,7 +14,7 @@ import java.util.function.ToDoubleFunction;
  * cost function. Simulated annealing is good for solving optimization problems with many local
  * minima and a very large search space (it’s a heuristic solver rather than an exact solver like,
  * say, SQP or interior-point method). Simulated annealing is a popular choice for solving the
- * traveling salesman problem (see {@link edu.wpi.first.math.path.TravelingSalesman}).
+ * traveling salesman problem (see {@link org.wpilib.math.path.TravelingSalesman}).
  *
  * @see <a
  *     href="https://en.wikipedia.org/wiki/Simulated_annealing">https://en.wikipedia.org/wiki/Simulated_annealing</a>

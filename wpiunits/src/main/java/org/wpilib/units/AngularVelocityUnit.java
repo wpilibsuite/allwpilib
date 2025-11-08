@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.units;
+package org.wpilib.units;
 
-import edu.wpi.first.units.measure.AngularVelocity;
+import org.wpilib.units.measure.AngularVelocity;
 
 /** A unit of angular velocity like {@link Units#RadiansPerSecond}. */
 public final class AngularVelocityUnit extends PerUnit<AngleUnit, TimeUnit> {

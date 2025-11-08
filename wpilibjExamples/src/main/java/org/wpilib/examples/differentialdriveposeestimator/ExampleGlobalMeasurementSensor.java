@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.differentialdriveposeestimator;
+package org.wpilib.examples.differentialdriveposeestimator;
 
-import edu.wpi.first.math.StateSpaceUtil;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
+import org.wpilib.math.util.StateSpaceUtil;
+import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.util.Units;
 
 /** This dummy class represents a global measurement sensor, such as a computer vision solution. */
 public final class ExampleGlobalMeasurementSensor {

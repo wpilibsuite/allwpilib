@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.fields;
+package org.wpilib.fields;
 
 public enum Fields {
   k2018PowerUp("2018-powerup.json"),
@@ -19,7 +19,7 @@ public enum Fields {
   k2024Crescendo("2024-crescendo.json"),
   k2025Reefscape("2025-reefscape.json");
 
-  public static final String kBaseResourceDir = "/edu/wpi/first/fields/";
+  public static final String kBaseResourceDir = "/org/wpilib/fields/";
 
   /** Alias to the current game. */
   public static final Fields kDefaultField = k2025Reefscape;

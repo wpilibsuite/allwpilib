@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.apriltag.jni;
+package org.wpilib.vision.apriltag.jni;
 
-import edu.wpi.first.apriltag.AprilTagDetection;
-import edu.wpi.first.apriltag.AprilTagDetector;
-import edu.wpi.first.apriltag.AprilTagPoseEstimate;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.util.RawFrame;
-import edu.wpi.first.util.RuntimeLoader;
+import org.wpilib.vision.apriltag.AprilTagDetection;
+import org.wpilib.vision.apriltag.AprilTagDetector;
+import org.wpilib.vision.apriltag.AprilTagPoseEstimate;
+import org.wpilib.math.geometry.Transform3d;
+import org.wpilib.util.RawFrame;
+import org.wpilib.util.runtime.RuntimeLoader;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 

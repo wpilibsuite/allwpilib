@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.units;
+package org.wpilib.units;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -11,12 +11,12 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularMomentum;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.Per;
-import edu.wpi.first.units.measure.Time;
+import org.wpilib.units.measure.Angle;
+import org.wpilib.units.measure.AngularMomentum;
+import org.wpilib.units.measure.Distance;
+import org.wpilib.units.measure.LinearVelocity;
+import org.wpilib.units.measure.Per;
+import org.wpilib.units.measure.Time;
 import org.junit.jupiter.api.Test;
 
 class MeasureTest {

@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math;
+package org.wpilib.math.linalg;
 
-import edu.wpi.first.math.jni.EigenJNI;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.proto.MatrixProto;
-import edu.wpi.first.math.struct.MatrixStruct;
-import edu.wpi.first.util.protobuf.Protobuf;
-import edu.wpi.first.util.protobuf.ProtobufSerializable;
-import edu.wpi.first.util.struct.Struct;
-import edu.wpi.first.util.struct.StructSerializable;
+import org.wpilib.math.jni.EigenJNI;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.linalg.proto.MatrixProto;
+import org.wpilib.math.linalg.struct.MatrixStruct;
+import org.wpilib.util.protobuf.Protobuf;
+import org.wpilib.util.protobuf.ProtobufSerializable;
+import org.wpilib.util.struct.Struct;
+import org.wpilib.util.struct.StructSerializable;
 import java.util.Objects;
 import org.ejml.MatrixDimensionException;
 import org.ejml.data.DMatrixRMaj;

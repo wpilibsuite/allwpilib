@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.simulation;
+package org.wpilib.simulation;
 
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.GenericHID;
+import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.GenericHID;
 
 /** Class to control a simulated generic joystick. */
 public class GenericHIDSim {

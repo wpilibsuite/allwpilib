@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.epilogue.processor;
+package org.wpilib.epilogue.processor;
 
-import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-import edu.wpi.first.epilogue.logging.EpilogueBackend;
+import org.wpilib.epilogue.Logged;
+import org.wpilib.epilogue.logging.ClassSpecificLogger;
+import org.wpilib.epilogue.logging.EpilogueBackend;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;

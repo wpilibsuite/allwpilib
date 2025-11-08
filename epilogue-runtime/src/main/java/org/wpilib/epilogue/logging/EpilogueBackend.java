@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.epilogue.logging;
+package org.wpilib.epilogue.logging;
 
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Unit;
-import edu.wpi.first.util.protobuf.Protobuf;
-import edu.wpi.first.util.struct.Struct;
+import org.wpilib.units.Measure;
+import org.wpilib.units.Unit;
+import org.wpilib.util.protobuf.Protobuf;
+import org.wpilib.util.struct.Struct;
 import java.util.Collection;
 import us.hebi.quickbuf.ProtoMessage;
 

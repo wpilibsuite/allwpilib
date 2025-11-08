@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.epilogue.processor;
+package org.wpilib.epilogue.processor;
 
-import edu.wpi.first.epilogue.CustomLoggerFor;
-import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.epilogue.NotLogged;
+import org.wpilib.epilogue.CustomLoggerFor;
+import org.wpilib.epilogue.Logged;
+import org.wpilib.epilogue.NotLogged;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -37,15 +37,15 @@ import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 
 @SupportedAnnotationTypes({
-  "edu.wpi.first.epilogue.CustomLoggerFor",
-  "edu.wpi.first.epilogue.Logged"
+  "org.wpilib.epilogue.CustomLoggerFor",
+  "org.wpilib.epilogue.Logged"
 })
 @SupportedSourceVersion(SourceVersion.RELEASE_21)
 public class AnnotationProcessor extends AbstractProcessor {
-  private static final String kCustomLoggerFqn = "edu.wpi.first.epilogue.CustomLoggerFor";
+  private static final String kCustomLoggerFqn = "org.wpilib.epilogue.CustomLoggerFor";
   private static final String kClassSpecificLoggerFqn =
-      "edu.wpi.first.epilogue.logging.ClassSpecificLogger";
-  private static final String kLoggedFqn = "edu.wpi.first.epilogue.Logged";
+      "org.wpilib.epilogue.logging.ClassSpecificLogger";
+  private static final String kLoggedFqn = "org.wpilib.epilogue.Logged";
 
   private EpilogueGenerator m_epiloguerGenerator;
   private LoggerGenerator m_loggerGenerator;
@@ -297,7 +297,7 @@ public class AnnotationProcessor extends AbstractProcessor {
     var loggerSuperClass =
         processingEnv
             .getElementUtils()
-            .getTypeElement("edu.wpi.first.epilogue.logging.ClassSpecificLogger");
+            .getTypeElement("org.wpilib.epilogue.logging.ClassSpecificLogger");
 
     for (Element annotatedElement : annotatedElements) {
       List<AnnotationValue> targetTypes = List.of();
@@ -388,7 +388,7 @@ public class AnnotationProcessor extends AbstractProcessor {
 
     // Used to check for a main robot class
     var robotBaseClass =
-        processingEnv.getElementUtils().getTypeElement("edu.wpi.first.wpilibj.TimedRobot").asType();
+        processingEnv.getElementUtils().getTypeElement("org.wpilib.opmode.TimedRobot").asType();
 
     boolean validFields = validateFields(annotatedElements);
     boolean validMethods = validateMethods(annotatedElements);

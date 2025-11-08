@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.epilogue.processor;
+package org.wpilib.epilogue.processor;
 
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
-import static edu.wpi.first.epilogue.processor.CompileTestOptions.kJavaVersionOptions;
+import static org.wpilib.epilogue.processor.CompileTestOptions.kJavaVersionOptions;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -27,7 +27,7 @@ class AnnotationProcessorTest {
   void simple() {
     String source =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
       @Logged
       class Example {
@@ -37,12 +37,12 @@ class AnnotationProcessorTest {
 
     String expectedGeneratedSource =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
-      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -65,7 +65,7 @@ class AnnotationProcessorTest {
   void optInFields() {
     String source =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
       class Example {
         @Logged double x;
@@ -75,12 +75,12 @@ class AnnotationProcessorTest {
 
     String expectedGeneratedSource =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
-      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -104,7 +104,7 @@ class AnnotationProcessorTest {
   void optInMethods() {
     String source =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
       class Example {
         @Logged public double getValue() { return 2.0; }
@@ -114,12 +114,12 @@ class AnnotationProcessorTest {
 
     String expectedGeneratedSource =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
-      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -153,7 +153,7 @@ class AnnotationProcessorTest {
         javac()
             .withOptions(kJavaVersionOptions)
             .withProcessors(new AnnotationProcessor())
-            .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
+            .compile(JavaFileObjects.forSourceString("org.wpilib.epilogue.Example", source));
 
     assertThat(compilation).succeeded();
     // nothing is annotated with @Logged; so, no logger file should be generated
@@ -166,7 +166,7 @@ class AnnotationProcessorTest {
   void multiple() {
     String source =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
       @Logged
       class Example {
@@ -177,12 +177,12 @@ class AnnotationProcessorTest {
 
     String expectedGeneratedSource =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
-      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -206,7 +206,7 @@ class AnnotationProcessorTest {
   void privateFields() {
     String source =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
       @Logged
       class Example {
@@ -216,24 +216,24 @@ class AnnotationProcessorTest {
 
     String expectedGeneratedSource =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
-      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
       import java.lang.invoke.MethodHandles;
       import java.lang.invoke.VarHandle;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
-        // Accesses private or superclass field edu.wpi.first.epilogue.Example.x
-        private static final VarHandle $edu_wpi_first_epilogue_Example_x;
+        // Accesses private or superclass field org.wpilib.epilogue.Example.x
+        private static final VarHandle $org_wpilib_epilogue_Example_x;
 
         static {
           try {
             var rootLookup = MethodHandles.lookup();
-            var lookup$$edu_wpi_first_epilogue_Example = MethodHandles.privateLookupIn(edu.wpi.first.epilogue.Example.class, rootLookup);
-            $edu_wpi_first_epilogue_Example_x = lookup$$edu_wpi_first_epilogue_Example.findVarHandle(edu.wpi.first.epilogue.Example.class, "x", double.class);
+            var lookup$$org_wpilib_epilogue_Example = MethodHandles.privateLookupIn(org.wpilib.epilogue.Example.class, rootLookup);
+            $org_wpilib_epilogue_Example_x = lookup$$org_wpilib_epilogue_Example.findVarHandle(org.wpilib.epilogue.Example.class, "x", double.class);
           } catch (ReflectiveOperationException e) {
             throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
           }
@@ -246,7 +246,7 @@ class AnnotationProcessorTest {
         @Override
         public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("x", ((double) $edu_wpi_first_epilogue_Example_x.get(object)));
+            backend.log("x", ((double) $org_wpilib_epilogue_Example_x.get(object)));
           }
         }
       }
@@ -259,7 +259,7 @@ class AnnotationProcessorTest {
   void privateSuppliers() {
     String source =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
       import java.util.function.DoubleSupplier;
 
@@ -271,24 +271,24 @@ class AnnotationProcessorTest {
 
     String expectedGeneratedSource =
         """
-    package edu.wpi.first.epilogue;
+    package org.wpilib.epilogue;
 
-    import edu.wpi.first.epilogue.Logged;
-    import edu.wpi.first.epilogue.Epilogue;
-    import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-    import edu.wpi.first.epilogue.logging.EpilogueBackend;
+    import org.wpilib.epilogue.Logged;
+    import org.wpilib.epilogue.Epilogue;
+    import org.wpilib.epilogue.logging.ClassSpecificLogger;
+    import org.wpilib.epilogue.logging.EpilogueBackend;
     import java.lang.invoke.MethodHandles;
     import java.lang.invoke.VarHandle;
 
     public class ExampleLogger extends ClassSpecificLogger<Example> {
-      // Accesses private or superclass field edu.wpi.first.epilogue.Example.x
-      private static final VarHandle $edu_wpi_first_epilogue_Example_x;
+      // Accesses private or superclass field org.wpilib.epilogue.Example.x
+      private static final VarHandle $org_wpilib_epilogue_Example_x;
 
       static {
         try {
           var rootLookup = MethodHandles.lookup();
-          var lookup$$edu_wpi_first_epilogue_Example = MethodHandles.privateLookupIn(edu.wpi.first.epilogue.Example.class, rootLookup);
-          $edu_wpi_first_epilogue_Example_x = lookup$$edu_wpi_first_epilogue_Example.findVarHandle(edu.wpi.first.epilogue.Example.class, "x", java.util.function.DoubleSupplier.class);
+          var lookup$$org_wpilib_epilogue_Example = MethodHandles.privateLookupIn(org.wpilib.epilogue.Example.class, rootLookup);
+          $org_wpilib_epilogue_Example_x = lookup$$org_wpilib_epilogue_Example.findVarHandle(org.wpilib.epilogue.Example.class, "x", java.util.function.DoubleSupplier.class);
         } catch (ReflectiveOperationException e) {
           throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
         }
@@ -301,7 +301,7 @@ class AnnotationProcessorTest {
       @Override
       public void update(EpilogueBackend backend, Example object) {
         if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-          backend.log("x", ((java.util.function.DoubleSupplier) $edu_wpi_first_epilogue_Example_x.get(object)).getAsDouble());
+          backend.log("x", ((java.util.function.DoubleSupplier) $org_wpilib_epilogue_Example_x.get(object)).getAsDouble());
         }
       }
     }
@@ -314,34 +314,34 @@ class AnnotationProcessorTest {
   void privateWithGenerics() {
     String source =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
       @Logged
       class Example {
-        private edu.wpi.first.wpilibj.smartdashboard.SendableChooser<String> chooser;
+        private org.wpilib.smartdashboard.SendableChooser<String> chooser;
       }
       """;
 
     String expectedGeneratedSource =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
-      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
       import java.lang.invoke.MethodHandles;
       import java.lang.invoke.VarHandle;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
-        // Accesses private or superclass field edu.wpi.first.epilogue.Example.chooser
-        private static final VarHandle $edu_wpi_first_epilogue_Example_chooser;
+        // Accesses private or superclass field org.wpilib.epilogue.Example.chooser
+        private static final VarHandle $org_wpilib_epilogue_Example_chooser;
 
         static {
           try {
             var rootLookup = MethodHandles.lookup();
-            var lookup$$edu_wpi_first_epilogue_Example = MethodHandles.privateLookupIn(edu.wpi.first.epilogue.Example.class, rootLookup);
-            $edu_wpi_first_epilogue_Example_chooser = lookup$$edu_wpi_first_epilogue_Example.findVarHandle(edu.wpi.first.epilogue.Example.class, "chooser", edu.wpi.first.wpilibj.smartdashboard.SendableChooser.class);
+            var lookup$$org_wpilib_epilogue_Example = MethodHandles.privateLookupIn(org.wpilib.epilogue.Example.class, rootLookup);
+            $org_wpilib_epilogue_Example_chooser = lookup$$org_wpilib_epilogue_Example.findVarHandle(org.wpilib.epilogue.Example.class, "chooser", org.wpilib.smartdashboard.SendableChooser.class);
           } catch (ReflectiveOperationException e) {
             throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
           }
@@ -354,7 +354,7 @@ class AnnotationProcessorTest {
         @Override
         public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            logSendable(backend.getNested("chooser"), ((edu.wpi.first.wpilibj.smartdashboard.SendableChooser<java.lang.String>) $edu_wpi_first_epilogue_Example_chooser.get(object)));
+            logSendable(backend.getNested("chooser"), ((org.wpilib.smartdashboard.SendableChooser<java.lang.String>) $org_wpilib_epilogue_Example_chooser.get(object)));
           }
         }
       }
@@ -367,7 +367,7 @@ class AnnotationProcessorTest {
   void importanceLevels() {
     String source =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
       @Logged(importance = Logged.Importance.INFO)
       class Example {
@@ -379,12 +379,12 @@ class AnnotationProcessorTest {
 
     String expectedGeneratedSource =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
-      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -413,7 +413,7 @@ class AnnotationProcessorTest {
   void logEnum() {
     String source =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
       @Logged
       class Example {
@@ -427,12 +427,12 @@ class AnnotationProcessorTest {
 
     String expectedGeneratedSource =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
-      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -455,7 +455,7 @@ class AnnotationProcessorTest {
   void superclassStillOptIn() {
     String source =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
       // nothing should be logged from BaseExample
       class BaseExample {
@@ -471,12 +471,12 @@ class AnnotationProcessorTest {
 
     String expectedGeneratedSource =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
-      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -499,7 +499,7 @@ class AnnotationProcessorTest {
   void simpleSuperclass() {
     String source =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
       @Logged
       class BaseExample {
@@ -517,30 +517,30 @@ class AnnotationProcessorTest {
 
     String expectedGeneratedSource =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
-      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
       import java.lang.invoke.MethodHandles;
       import java.lang.invoke.VarHandle;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
-        // Accesses private or superclass field edu.wpi.first.epilogue.BaseExample.b
-        private static final VarHandle $edu_wpi_first_epilogue_BaseExample_b;
-        // Accesses private or superclass field edu.wpi.first.epilogue.BaseExample.c
-        private static final VarHandle $edu_wpi_first_epilogue_BaseExample_c;
-        // Accesses private or superclass field edu.wpi.first.epilogue.BaseExample.d
-        private static final VarHandle $edu_wpi_first_epilogue_BaseExample_d;
+        // Accesses private or superclass field org.wpilib.epilogue.BaseExample.b
+        private static final VarHandle $org_wpilib_epilogue_BaseExample_b;
+        // Accesses private or superclass field org.wpilib.epilogue.BaseExample.c
+        private static final VarHandle $org_wpilib_epilogue_BaseExample_c;
+        // Accesses private or superclass field org.wpilib.epilogue.BaseExample.d
+        private static final VarHandle $org_wpilib_epilogue_BaseExample_d;
 
         static {
           try {
             var rootLookup = MethodHandles.lookup();
-            var lookup$$edu_wpi_first_epilogue_BaseExample = MethodHandles.privateLookupIn(edu.wpi.first.epilogue.BaseExample.class, rootLookup);
-            $edu_wpi_first_epilogue_BaseExample_b = lookup$$edu_wpi_first_epilogue_BaseExample.findVarHandle(edu.wpi.first.epilogue.BaseExample.class, "b", double.class);
-            $edu_wpi_first_epilogue_BaseExample_c = lookup$$edu_wpi_first_epilogue_BaseExample.findVarHandle(edu.wpi.first.epilogue.BaseExample.class, "c", double.class);
-            $edu_wpi_first_epilogue_BaseExample_d = lookup$$edu_wpi_first_epilogue_BaseExample.findVarHandle(edu.wpi.first.epilogue.BaseExample.class, "d", double.class);
+            var lookup$$org_wpilib_epilogue_BaseExample = MethodHandles.privateLookupIn(org.wpilib.epilogue.BaseExample.class, rootLookup);
+            $org_wpilib_epilogue_BaseExample_b = lookup$$org_wpilib_epilogue_BaseExample.findVarHandle(org.wpilib.epilogue.BaseExample.class, "b", double.class);
+            $org_wpilib_epilogue_BaseExample_c = lookup$$org_wpilib_epilogue_BaseExample.findVarHandle(org.wpilib.epilogue.BaseExample.class, "c", double.class);
+            $org_wpilib_epilogue_BaseExample_d = lookup$$org_wpilib_epilogue_BaseExample.findVarHandle(org.wpilib.epilogue.BaseExample.class, "d", double.class);
           } catch (ReflectiveOperationException e) {
             throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
           }
@@ -555,9 +555,9 @@ class AnnotationProcessorTest {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             backend.log("e", object.e);
             backend.log("a", object.a);
-            backend.log("b", ((double) $edu_wpi_first_epilogue_BaseExample_b.get(object)));
-            backend.log("c", ((double) $edu_wpi_first_epilogue_BaseExample_c.get(object)));
-            backend.log("d", ((double) $edu_wpi_first_epilogue_BaseExample_d.get(object)));
+            backend.log("b", ((double) $org_wpilib_epilogue_BaseExample_b.get(object)));
+            backend.log("c", ((double) $org_wpilib_epilogue_BaseExample_c.get(object)));
+            backend.log("d", ((double) $org_wpilib_epilogue_BaseExample_d.get(object)));
           }
         }
       }
@@ -570,7 +570,7 @@ class AnnotationProcessorTest {
   void complexSuperclass() {
     String source =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
       class Grandparent {
         @Logged
@@ -598,34 +598,34 @@ class AnnotationProcessorTest {
 
     String expectedGeneratedSource =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
-      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
       import java.lang.invoke.MethodHandles;
       import java.lang.invoke.VarHandle;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
-        // Accesses private or superclass field edu.wpi.first.epilogue.Example.i
-        private static final VarHandle $edu_wpi_first_epilogue_Example_i;
-        // Accesses private or superclass field edu.wpi.first.epilogue.BaseExample.d
-        private static final VarHandle $edu_wpi_first_epilogue_BaseExample_d;
-        // Accesses private or superclass field edu.wpi.first.epilogue.BaseExample.f
-        private static final VarHandle $edu_wpi_first_epilogue_BaseExample_f;
-        // Accesses private or superclass field edu.wpi.first.epilogue.BaseExample.g
-        private static final VarHandle $edu_wpi_first_epilogue_BaseExample_g;
+        // Accesses private or superclass field org.wpilib.epilogue.Example.i
+        private static final VarHandle $org_wpilib_epilogue_Example_i;
+        // Accesses private or superclass field org.wpilib.epilogue.BaseExample.d
+        private static final VarHandle $org_wpilib_epilogue_BaseExample_d;
+        // Accesses private or superclass field org.wpilib.epilogue.BaseExample.f
+        private static final VarHandle $org_wpilib_epilogue_BaseExample_f;
+        // Accesses private or superclass field org.wpilib.epilogue.BaseExample.g
+        private static final VarHandle $org_wpilib_epilogue_BaseExample_g;
 
         static {
           try {
             var rootLookup = MethodHandles.lookup();
-            var lookup$$edu_wpi_first_epilogue_BaseExample = MethodHandles.privateLookupIn(edu.wpi.first.epilogue.BaseExample.class, rootLookup);
-            $edu_wpi_first_epilogue_BaseExample_d = lookup$$edu_wpi_first_epilogue_BaseExample.findVarHandle(edu.wpi.first.epilogue.BaseExample.class, "d", double.class);
-            $edu_wpi_first_epilogue_BaseExample_f = lookup$$edu_wpi_first_epilogue_BaseExample.findVarHandle(edu.wpi.first.epilogue.BaseExample.class, "f", double.class);
-            $edu_wpi_first_epilogue_BaseExample_g = lookup$$edu_wpi_first_epilogue_BaseExample.findVarHandle(edu.wpi.first.epilogue.BaseExample.class, "g", double.class);
-            var lookup$$edu_wpi_first_epilogue_Example = MethodHandles.privateLookupIn(edu.wpi.first.epilogue.Example.class, rootLookup);
-            $edu_wpi_first_epilogue_Example_i = lookup$$edu_wpi_first_epilogue_Example.findVarHandle(edu.wpi.first.epilogue.Example.class, "i", double.class);
+            var lookup$$org_wpilib_epilogue_BaseExample = MethodHandles.privateLookupIn(org.wpilib.epilogue.BaseExample.class, rootLookup);
+            $org_wpilib_epilogue_BaseExample_d = lookup$$org_wpilib_epilogue_BaseExample.findVarHandle(org.wpilib.epilogue.BaseExample.class, "d", double.class);
+            $org_wpilib_epilogue_BaseExample_f = lookup$$org_wpilib_epilogue_BaseExample.findVarHandle(org.wpilib.epilogue.BaseExample.class, "f", double.class);
+            $org_wpilib_epilogue_BaseExample_g = lookup$$org_wpilib_epilogue_BaseExample.findVarHandle(org.wpilib.epilogue.BaseExample.class, "g", double.class);
+            var lookup$$org_wpilib_epilogue_Example = MethodHandles.privateLookupIn(org.wpilib.epilogue.Example.class, rootLookup);
+            $org_wpilib_epilogue_Example_i = lookup$$org_wpilib_epilogue_Example.findVarHandle(org.wpilib.epilogue.Example.class, "i", double.class);
           } catch (ReflectiveOperationException e) {
             throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
           }
@@ -639,11 +639,11 @@ class AnnotationProcessorTest {
         public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             backend.log("h", object.h);
-            backend.log("i", ((double) $edu_wpi_first_epilogue_Example_i.get(object)));
-            backend.log("d", ((double) $edu_wpi_first_epilogue_BaseExample_d.get(object)));
+            backend.log("i", ((double) $org_wpilib_epilogue_Example_i.get(object)));
+            backend.log("d", ((double) $org_wpilib_epilogue_BaseExample_d.get(object)));
             backend.log("e", object.e);
-            backend.log("f", ((double) $edu_wpi_first_epilogue_BaseExample_f.get(object)));
-            backend.log("g", ((double) $edu_wpi_first_epilogue_BaseExample_g.get(object)));
+            backend.log("f", ((double) $org_wpilib_epilogue_BaseExample_f.get(object)));
+            backend.log("g", ((double) $org_wpilib_epilogue_BaseExample_g.get(object)));
             backend.log("a", object.a);
             backend.log("getValue", object.getValue());
             backend.log("getB", object.getB());
@@ -659,7 +659,7 @@ class AnnotationProcessorTest {
   void bytes() {
     String source =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
       @Logged
       class Example {
@@ -675,12 +675,12 @@ class AnnotationProcessorTest {
 
     String expectedGeneratedSource =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
-      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -706,7 +706,7 @@ class AnnotationProcessorTest {
   void chars() {
     String source =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
       @Logged
       class Example {
@@ -722,12 +722,12 @@ class AnnotationProcessorTest {
 
     String expectedGeneratedSource =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
-      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -751,7 +751,7 @@ class AnnotationProcessorTest {
   void shorts() {
     String source =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
       @Logged
       class Example {
@@ -767,12 +767,12 @@ class AnnotationProcessorTest {
 
     String expectedGeneratedSource =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
-      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -796,7 +796,7 @@ class AnnotationProcessorTest {
   void ints() {
     String source =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
       @Logged
       class Example {
@@ -812,12 +812,12 @@ class AnnotationProcessorTest {
 
     String expectedGeneratedSource =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
-      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -843,7 +843,7 @@ class AnnotationProcessorTest {
   void longs() {
     String source =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
       @Logged
       class Example {
@@ -859,12 +859,12 @@ class AnnotationProcessorTest {
 
     String expectedGeneratedSource =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
-      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -890,7 +890,7 @@ class AnnotationProcessorTest {
   void floats() {
     String source =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
       @Logged
       class Example {
@@ -906,12 +906,12 @@ class AnnotationProcessorTest {
 
     String expectedGeneratedSource =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
-      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -937,7 +937,7 @@ class AnnotationProcessorTest {
   void doubles() {
     String source =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
       import java.util.List;
 
@@ -956,12 +956,12 @@ class AnnotationProcessorTest {
 
     String expectedGeneratedSource =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
-      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -987,7 +987,7 @@ class AnnotationProcessorTest {
   void booleans() {
     String source =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
       import java.util.List;
 
       @Logged
@@ -1005,12 +1005,12 @@ class AnnotationProcessorTest {
 
     String expectedGeneratedSource =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
-      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -1036,7 +1036,7 @@ class AnnotationProcessorTest {
   void strings() {
     String source =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
       import java.util.List;
 
@@ -1055,12 +1055,12 @@ class AnnotationProcessorTest {
 
     String expectedGeneratedSource =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
-      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -1087,10 +1087,10 @@ class AnnotationProcessorTest {
   void structs() {
     String source =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.util.struct.Struct;
-      import edu.wpi.first.util.struct.StructSerializable;
+      import org.wpilib.util.struct.Struct;
+      import org.wpilib.util.struct.StructSerializable;
       import java.util.List;
 
       @Logged
@@ -1114,12 +1114,12 @@ class AnnotationProcessorTest {
 
     String expectedGeneratedSource =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
-      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -1129,11 +1129,11 @@ class AnnotationProcessorTest {
         @Override
         public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("x", object.x, edu.wpi.first.epilogue.Example.Structable.struct);
-            backend.log("arr1", object.arr1, edu.wpi.first.epilogue.Example.Structable.struct);
-            backend.log("list", object.list, edu.wpi.first.epilogue.Example.Structable.struct);
-            backend.log("getX", object.getX(), edu.wpi.first.epilogue.Example.Structable.struct);
-            backend.log("getArr1", object.getArr1(), edu.wpi.first.epilogue.Example.Structable.struct);
+            backend.log("x", object.x, org.wpilib.epilogue.Example.Structable.struct);
+            backend.log("arr1", object.arr1, org.wpilib.epilogue.Example.Structable.struct);
+            backend.log("list", object.list, org.wpilib.epilogue.Example.Structable.struct);
+            backend.log("getX", object.getX(), org.wpilib.epilogue.Example.Structable.struct);
+            backend.log("getArr1", object.getArr1(), org.wpilib.epilogue.Example.Structable.struct);
           }
         }
       }
@@ -1146,10 +1146,10 @@ class AnnotationProcessorTest {
   void protobuf() {
     String source =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.util.protobuf.Protobuf;
-      import edu.wpi.first.util.protobuf.ProtobufSerializable;
+      import org.wpilib.util.protobuf.Protobuf;
+      import org.wpilib.util.protobuf.ProtobufSerializable;
       import java.util.List;
       import us.hebi.quickbuf.*;
 
@@ -1188,12 +1188,12 @@ class AnnotationProcessorTest {
 
     String expectedGeneratedSource =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
-      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -1203,7 +1203,7 @@ class AnnotationProcessorTest {
         @Override
         public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("x", object.x, edu.wpi.first.epilogue.ProtobufType.proto);
+            backend.log("x", object.x, org.wpilib.epilogue.ProtobufType.proto);
           }
         }
       }
@@ -1216,10 +1216,10 @@ class AnnotationProcessorTest {
   void lists() {
     String source =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.util.struct.Struct;
-      import edu.wpi.first.util.struct.StructSerializable;
+      import org.wpilib.util.struct.Struct;
+      import org.wpilib.util.struct.StructSerializable;
       import java.util.*;
 
       @Logged
@@ -1235,12 +1235,12 @@ class AnnotationProcessorTest {
 
     String expectedGeneratedSource =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
-      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -1269,10 +1269,10 @@ class AnnotationProcessorTest {
 
     String source =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.util.struct.Struct;
-      import edu.wpi.first.util.struct.StructSerializable;
+      import org.wpilib.util.struct.Struct;
+      import org.wpilib.util.struct.StructSerializable;
       import java.util.List;
 
       @Logged
@@ -1285,12 +1285,12 @@ class AnnotationProcessorTest {
 
     String expectedGeneratedSource =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
-      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -1310,10 +1310,10 @@ class AnnotationProcessorTest {
   void badLogSetup() {
     String source =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.util.struct.Struct;
-      import edu.wpi.first.util.struct.StructSerializable;
+      import org.wpilib.util.struct.Struct;
+      import org.wpilib.util.struct.StructSerializable;
       import java.util.*;
 
       @Logged
@@ -1349,7 +1349,7 @@ class AnnotationProcessorTest {
         javac()
             .withOptions(kJavaVersionOptions)
             .withProcessors(new AnnotationProcessor())
-            .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
+            .compile(JavaFileObjects.forSourceString("org.wpilib.epilogue.Example", source));
 
     assertThat(compilation).failed();
     assertThat(compilation).hadErrorCount(10);
@@ -1404,7 +1404,7 @@ class AnnotationProcessorTest {
   void onGenericType() {
     String source =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
       @Logged
       class Example<T extends String> {
@@ -1417,24 +1417,24 @@ class AnnotationProcessorTest {
 
     String expectedGeneratedSource =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
-      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
       import java.lang.invoke.MethodHandles;
       import java.lang.invoke.VarHandle;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
-        // Accesses private or superclass field edu.wpi.first.epilogue.Example.valueB
-        private static final VarHandle $edu_wpi_first_epilogue_Example_valueB;
+        // Accesses private or superclass field org.wpilib.epilogue.Example.valueB
+        private static final VarHandle $org_wpilib_epilogue_Example_valueB;
 
         static {
           try {
             var rootLookup = MethodHandles.lookup();
-            var lookup$$edu_wpi_first_epilogue_Example = MethodHandles.privateLookupIn(edu.wpi.first.epilogue.Example.class, rootLookup);
-            $edu_wpi_first_epilogue_Example_valueB = lookup$$edu_wpi_first_epilogue_Example.findVarHandle(edu.wpi.first.epilogue.Example.class, "valueB", java.lang.String.class);
+            var lookup$$org_wpilib_epilogue_Example = MethodHandles.privateLookupIn(org.wpilib.epilogue.Example.class, rootLookup);
+            $org_wpilib_epilogue_Example_valueB = lookup$$org_wpilib_epilogue_Example.findVarHandle(org.wpilib.epilogue.Example.class, "valueB", java.lang.String.class);
           } catch (ReflectiveOperationException e) {
             throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
           }
@@ -1448,7 +1448,7 @@ class AnnotationProcessorTest {
         public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             backend.log("valueA", object.valueA);
-            backend.log("valueB", ((java.lang.String) $edu_wpi_first_epilogue_Example_valueB.get(object)));
+            backend.log("valueB", ((java.lang.String) $org_wpilib_epilogue_Example_valueB.get(object)));
             backend.log("upcast", object.upcast());
           }
         }
@@ -1462,7 +1462,7 @@ class AnnotationProcessorTest {
   void annotationInheritance() {
     String source =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
       @Logged
       class Child {}
@@ -1485,12 +1485,12 @@ class AnnotationProcessorTest {
 
     String expectedRootLogger =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
-      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -1514,7 +1514,7 @@ class AnnotationProcessorTest {
   void inheritanceOfLoggedTypes() {
     String source =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
         @Logged
         interface IFace {}
@@ -1572,12 +1572,12 @@ class AnnotationProcessorTest {
 
     String expectedRootLogger =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
-        import edu.wpi.first.epilogue.Logged;
-        import edu.wpi.first.epilogue.Epilogue;
-        import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-        import edu.wpi.first.epilogue.logging.EpilogueBackend;
+        import org.wpilib.epilogue.Logged;
+        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.logging.ClassSpecificLogger;
+        import org.wpilib.epilogue.logging.EpilogueBackend;
 
         public class ExampleLogger extends ClassSpecificLogger<Example> {
           public ExampleLogger() {
@@ -1588,27 +1588,27 @@ class AnnotationProcessorTest {
           public void update(EpilogueBackend backend, Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
               var $$asInterface = object.asInterface;
-              if ($$asInterface instanceof edu.wpi.first.epilogue.Impl1 edu_wpi_first_epilogue_Impl1) {
-                Epilogue.impl1Logger.tryUpdate(backend.getNested("asInterface"), edu_wpi_first_epilogue_Impl1, Epilogue.getConfig().errorHandler);
-              } else if ($$asInterface instanceof edu.wpi.first.epilogue.Impl2 edu_wpi_first_epilogue_Impl2) {
-                Epilogue.impl2Logger.tryUpdate(backend.getNested("asInterface"), edu_wpi_first_epilogue_Impl2, Epilogue.getConfig().errorHandler);
+              if ($$asInterface instanceof org.wpilib.epilogue.Impl1 org_wpilib_epilogue_Impl1) {
+                Epilogue.impl1Logger.tryUpdate(backend.getNested("asInterface"), org_wpilib_epilogue_Impl1, Epilogue.getConfig().errorHandler);
+              } else if ($$asInterface instanceof org.wpilib.epilogue.Impl2 org_wpilib_epilogue_Impl2) {
+                Epilogue.impl2Logger.tryUpdate(backend.getNested("asInterface"), org_wpilib_epilogue_Impl2, Epilogue.getConfig().errorHandler);
               } else {
-                // Base type edu.wpi.first.epilogue.IFace
+                // Base type org.wpilib.epilogue.IFace
                 Epilogue.iFaceLogger.tryUpdate(backend.getNested("asInterface"), $$asInterface, Epilogue.getConfig().errorHandler);
               };
               Epilogue.impl1Logger.tryUpdate(backend.getNested("firstImpl"), object.firstImpl, Epilogue.getConfig().errorHandler);
               Epilogue.impl2Logger.tryUpdate(backend.getNested("secondImpl"), object.secondImpl, Epilogue.getConfig().errorHandler);
               var $$complex = object.complex;
-              if ($$complex instanceof edu.wpi.first.epilogue.ConcreteLogged edu_wpi_first_epilogue_ConcreteLogged) {
-                Epilogue.concreteLoggedLogger.tryUpdate(backend.getNested("complex"), edu_wpi_first_epilogue_ConcreteLogged, Epilogue.getConfig().errorHandler);
-              } else if ($$complex instanceof edu.wpi.first.epilogue.I4 edu_wpi_first_epilogue_I4) {
-                Epilogue.i4Logger.tryUpdate(backend.getNested("complex"), edu_wpi_first_epilogue_I4, Epilogue.getConfig().errorHandler);
-              } else if ($$complex instanceof edu.wpi.first.epilogue.I2 edu_wpi_first_epilogue_I2) {
-                Epilogue.i2Logger.tryUpdate(backend.getNested("complex"), edu_wpi_first_epilogue_I2, Epilogue.getConfig().errorHandler);
-              } else if ($$complex instanceof edu.wpi.first.epilogue.I3 edu_wpi_first_epilogue_I3) {
-                Epilogue.i3Logger.tryUpdate(backend.getNested("complex"), edu_wpi_first_epilogue_I3, Epilogue.getConfig().errorHandler);
+              if ($$complex instanceof org.wpilib.epilogue.ConcreteLogged org_wpilib_epilogue_ConcreteLogged) {
+                Epilogue.concreteLoggedLogger.tryUpdate(backend.getNested("complex"), org_wpilib_epilogue_ConcreteLogged, Epilogue.getConfig().errorHandler);
+              } else if ($$complex instanceof org.wpilib.epilogue.I4 org_wpilib_epilogue_I4) {
+                Epilogue.i4Logger.tryUpdate(backend.getNested("complex"), org_wpilib_epilogue_I4, Epilogue.getConfig().errorHandler);
+              } else if ($$complex instanceof org.wpilib.epilogue.I2 org_wpilib_epilogue_I2) {
+                Epilogue.i2Logger.tryUpdate(backend.getNested("complex"), org_wpilib_epilogue_I2, Epilogue.getConfig().errorHandler);
+              } else if ($$complex instanceof org.wpilib.epilogue.I3 org_wpilib_epilogue_I3) {
+                Epilogue.i3Logger.tryUpdate(backend.getNested("complex"), org_wpilib_epilogue_I3, Epilogue.getConfig().errorHandler);
               } else {
-                // Base type edu.wpi.first.epilogue.I
+                // Base type org.wpilib.epilogue.I
                 Epilogue.iLogger.tryUpdate(backend.getNested("complex"), $$complex, Epilogue.getConfig().errorHandler);
               };
             }
@@ -1623,7 +1623,7 @@ class AnnotationProcessorTest {
   void innerClasses() {
     String source =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
         class Outer {
           @Logged
@@ -1635,12 +1635,12 @@ class AnnotationProcessorTest {
 
     String expectedRootLogger =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
-        import edu.wpi.first.epilogue.Logged;
-        import edu.wpi.first.epilogue.Epilogue;
-        import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-        import edu.wpi.first.epilogue.logging.EpilogueBackend;
+        import org.wpilib.epilogue.Logged;
+        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.logging.ClassSpecificLogger;
+        import org.wpilib.epilogue.logging.EpilogueBackend;
 
         public class Outer$ExampleLogger extends ClassSpecificLogger<Outer.Example> {
           public Outer$ExampleLogger() {
@@ -1663,7 +1663,7 @@ class AnnotationProcessorTest {
   void highlyNestedInnerClasses() {
     String source =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
         class A {
           class B {
@@ -1681,12 +1681,12 @@ class AnnotationProcessorTest {
 
     String expectedRootLogger =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
-        import edu.wpi.first.epilogue.Logged;
-        import edu.wpi.first.epilogue.Epilogue;
-        import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-        import edu.wpi.first.epilogue.logging.EpilogueBackend;
+        import org.wpilib.epilogue.Logged;
+        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.logging.ClassSpecificLogger;
+        import org.wpilib.epilogue.logging.EpilogueBackend;
 
         public class A$B$C$D$ExampleLogger extends ClassSpecificLogger<A.B.C.D.Example> {
           public A$B$C$D$ExampleLogger() {
@@ -1709,7 +1709,7 @@ class AnnotationProcessorTest {
   void renamedInnerClass() {
     String source =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
         class Outer {
           @Logged(name = "Custom Example") // For the sake of testing, needs "Example" somewhere in the name
@@ -1721,12 +1721,12 @@ class AnnotationProcessorTest {
 
     String expectedRootLogger =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
-        import edu.wpi.first.epilogue.Logged;
-        import edu.wpi.first.epilogue.Epilogue;
-        import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-        import edu.wpi.first.epilogue.logging.EpilogueBackend;
+        import org.wpilib.epilogue.Logged;
+        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.logging.ClassSpecificLogger;
+        import org.wpilib.epilogue.logging.EpilogueBackend;
 
         public class CustomExampleLogger extends ClassSpecificLogger<Outer.Example> {
           public CustomExampleLogger() {
@@ -1749,7 +1749,7 @@ class AnnotationProcessorTest {
   void diamondInheritance() {
     String source =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
         @Logged
         interface I {}
@@ -1774,12 +1774,12 @@ class AnnotationProcessorTest {
 
     String expectedRootLogger =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
-        import edu.wpi.first.epilogue.Logged;
-        import edu.wpi.first.epilogue.Epilogue;
-        import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-        import edu.wpi.first.epilogue.logging.EpilogueBackend;
+        import org.wpilib.epilogue.Logged;
+        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.logging.ClassSpecificLogger;
+        import org.wpilib.epilogue.logging.EpilogueBackend;
 
         public class ExampleLogger extends ClassSpecificLogger<Example> {
           public ExampleLogger() {
@@ -1790,12 +1790,12 @@ class AnnotationProcessorTest {
           public void update(EpilogueBackend backend, Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
               var $$theField = object.theField;
-              if ($$theField instanceof edu.wpi.first.epilogue.Base edu_wpi_first_epilogue_Base) {
-                Epilogue.baseLogger.tryUpdate(backend.getNested("theField"), edu_wpi_first_epilogue_Base, Epilogue.getConfig().errorHandler);
-              } else if ($$theField instanceof edu.wpi.first.epilogue.ExtendingInterface edu_wpi_first_epilogue_ExtendingInterface) {
-                Epilogue.extendingInterfaceLogger.tryUpdate(backend.getNested("theField"), edu_wpi_first_epilogue_ExtendingInterface, Epilogue.getConfig().errorHandler);
+              if ($$theField instanceof org.wpilib.epilogue.Base org_wpilib_epilogue_Base) {
+                Epilogue.baseLogger.tryUpdate(backend.getNested("theField"), org_wpilib_epilogue_Base, Epilogue.getConfig().errorHandler);
+              } else if ($$theField instanceof org.wpilib.epilogue.ExtendingInterface org_wpilib_epilogue_ExtendingInterface) {
+                Epilogue.extendingInterfaceLogger.tryUpdate(backend.getNested("theField"), org_wpilib_epilogue_ExtendingInterface, Epilogue.getConfig().errorHandler);
               } else {
-                // Base type edu.wpi.first.epilogue.I
+                // Base type org.wpilib.epilogue.I
                 Epilogue.iLogger.tryUpdate(backend.getNested("theField"), $$theField, Epilogue.getConfig().errorHandler);
               };
             }
@@ -1810,7 +1810,7 @@ class AnnotationProcessorTest {
   void instanceofChainWithField() {
     String source =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
         @Logged
         interface I {}
@@ -1826,24 +1826,24 @@ class AnnotationProcessorTest {
 
     String expectedRootLogger =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
-        import edu.wpi.first.epilogue.Logged;
-        import edu.wpi.first.epilogue.Epilogue;
-        import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-        import edu.wpi.first.epilogue.logging.EpilogueBackend;
+        import org.wpilib.epilogue.Logged;
+        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.logging.ClassSpecificLogger;
+        import org.wpilib.epilogue.logging.EpilogueBackend;
         import java.lang.invoke.MethodHandles;
         import java.lang.invoke.VarHandle;
 
         public class ExampleLogger extends ClassSpecificLogger<Example> {
-          // Accesses private or superclass field edu.wpi.first.epilogue.Example.theField
-          private static final VarHandle $edu_wpi_first_epilogue_Example_theField;
+          // Accesses private or superclass field org.wpilib.epilogue.Example.theField
+          private static final VarHandle $org_wpilib_epilogue_Example_theField;
 
           static {
             try {
               var rootLookup = MethodHandles.lookup();
-              var lookup$$edu_wpi_first_epilogue_Example = MethodHandles.privateLookupIn(edu.wpi.first.epilogue.Example.class, rootLookup);
-              $edu_wpi_first_epilogue_Example_theField = lookup$$edu_wpi_first_epilogue_Example.findVarHandle(edu.wpi.first.epilogue.Example.class, "theField", edu.wpi.first.epilogue.I.class);
+              var lookup$$org_wpilib_epilogue_Example = MethodHandles.privateLookupIn(org.wpilib.epilogue.Example.class, rootLookup);
+              $org_wpilib_epilogue_Example_theField = lookup$$org_wpilib_epilogue_Example.findVarHandle(org.wpilib.epilogue.Example.class, "theField", org.wpilib.epilogue.I.class);
             } catch (ReflectiveOperationException e) {
               throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
             }
@@ -1856,11 +1856,11 @@ class AnnotationProcessorTest {
           @Override
           public void update(EpilogueBackend backend, Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-              var $$theField = ((edu.wpi.first.epilogue.I) $edu_wpi_first_epilogue_Example_theField.get(object));
-              if ($$theField instanceof edu.wpi.first.epilogue.Base edu_wpi_first_epilogue_Base) {
-                Epilogue.baseLogger.tryUpdate(backend.getNested("theField"), edu_wpi_first_epilogue_Base, Epilogue.getConfig().errorHandler);
+              var $$theField = ((org.wpilib.epilogue.I) $org_wpilib_epilogue_Example_theField.get(object));
+              if ($$theField instanceof org.wpilib.epilogue.Base org_wpilib_epilogue_Base) {
+                Epilogue.baseLogger.tryUpdate(backend.getNested("theField"), org_wpilib_epilogue_Base, Epilogue.getConfig().errorHandler);
               } else {
-                // Base type edu.wpi.first.epilogue.I
+                // Base type org.wpilib.epilogue.I
                 Epilogue.iLogger.tryUpdate(backend.getNested("theField"), $$theField, Epilogue.getConfig().errorHandler);
               };
             }
@@ -1875,7 +1875,7 @@ class AnnotationProcessorTest {
   void nestedOptIn() {
     String source =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
         class Implicit {
           @Logged double x;
@@ -1888,12 +1888,12 @@ class AnnotationProcessorTest {
 
     String expectedRootLogger =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
-        import edu.wpi.first.epilogue.Logged;
-        import edu.wpi.first.epilogue.Epilogue;
-        import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-        import edu.wpi.first.epilogue.logging.EpilogueBackend;
+        import org.wpilib.epilogue.Logged;
+        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.logging.ClassSpecificLogger;
+        import org.wpilib.epilogue.logging.EpilogueBackend;
 
         public class ExampleLogger extends ClassSpecificLogger<Example> {
           public ExampleLogger() {
@@ -1916,9 +1916,9 @@ class AnnotationProcessorTest {
   void customLogger() {
     String source =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
-        import edu.wpi.first.epilogue.logging.*;
+        import org.wpilib.epilogue.logging.*;
 
         record Point(int x, int y) {}
 
@@ -1942,12 +1942,12 @@ class AnnotationProcessorTest {
 
     String expectedGeneratedSource =
         """
-      package edu.wpi.first.epilogue;
+      package org.wpilib.epilogue;
 
-      import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
-      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -1970,12 +1970,12 @@ class AnnotationProcessorTest {
   void customGenericLogger() {
     String source =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
-        import edu.wpi.first.epilogue.logging.*;
-        import edu.wpi.first.math.numbers.*;
-        import edu.wpi.first.math.Num;
-        import edu.wpi.first.math.Vector;
+        import org.wpilib.epilogue.logging.*;
+        import org.wpilib.math.numbers.*;
+        import org.wpilib.math.util.Num;
+        import org.wpilib.math.linalg.Vector;
 
         @CustomLoggerFor(Vector.class)
         class VectorLogger extends ClassSpecificLogger<Vector<?>> {
@@ -1997,12 +1997,12 @@ class AnnotationProcessorTest {
 
     String expectedGeneratedSource =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
-        import edu.wpi.first.epilogue.Logged;
-        import edu.wpi.first.epilogue.Epilogue;
-        import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-        import edu.wpi.first.epilogue.logging.EpilogueBackend;
+        import org.wpilib.epilogue.Logged;
+        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.logging.ClassSpecificLogger;
+        import org.wpilib.epilogue.logging.EpilogueBackend;
 
         public class ExampleLogger extends ClassSpecificLogger<Example> {
           public ExampleLogger() {
@@ -2025,9 +2025,9 @@ class AnnotationProcessorTest {
   void genericLoggerForGenericType() {
     String source =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
-        import edu.wpi.first.epilogue.logging.*;
+        import org.wpilib.epilogue.logging.*;
 
         class Generic<T> { }
 
@@ -2054,7 +2054,7 @@ class AnnotationProcessorTest {
         javac()
             .withOptions(kJavaVersionOptions)
             .withProcessors(new AnnotationProcessor())
-            .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
+            .compile(JavaFileObjects.forSourceString("org.wpilib.epilogue.Example", source));
 
     assertThat(compilation).failed();
     assertThat(compilation).hadErrorCount(1);
@@ -2070,7 +2070,7 @@ class AnnotationProcessorTest {
   void warnsAboutNonLoggableFields() {
     String source =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
         @Logged(warnForNonLoggableTypes = true)
         class Example {
@@ -2082,7 +2082,7 @@ class AnnotationProcessorTest {
         javac()
             .withOptions(kJavaVersionOptions)
             .withProcessors(new AnnotationProcessor())
-            .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
+            .compile(JavaFileObjects.forSourceString("org.wpilib.epilogue.Example", source));
 
     assertThat(compilation).succeeded();
     assertEquals(1, compilation.notes().size());
@@ -2097,7 +2097,7 @@ class AnnotationProcessorTest {
   void loggingRecords() {
     String source =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
         @Logged
         record Example(double x, double y) { }
@@ -2105,12 +2105,12 @@ class AnnotationProcessorTest {
 
     String expectedRootLogger =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
-        import edu.wpi.first.epilogue.Logged;
-        import edu.wpi.first.epilogue.Epilogue;
-        import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-        import edu.wpi.first.epilogue.logging.EpilogueBackend;
+        import org.wpilib.epilogue.Logged;
+        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.logging.ClassSpecificLogger;
+        import org.wpilib.epilogue.logging.EpilogueBackend;
 
         public class ExampleLogger extends ClassSpecificLogger<Example> {
           public ExampleLogger() {
@@ -2134,7 +2134,7 @@ class AnnotationProcessorTest {
   void errorsOnFieldNameConflicts() {
     String source =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
         @Logged
         class Example {
@@ -2147,7 +2147,7 @@ class AnnotationProcessorTest {
     Compilation compilation =
         javac()
             .withProcessors(new AnnotationProcessor())
-            .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
+            .compile(JavaFileObjects.forSourceString("org.wpilib.epilogue.Example", source));
 
     assertThat(compilation).failed();
     assertThat(compilation).hadErrorCount(3);
@@ -2178,7 +2178,7 @@ class AnnotationProcessorTest {
   void doesNotErrorOnGetterMethod() {
     String source =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
         @Logged
         class Example {
@@ -2193,12 +2193,12 @@ class AnnotationProcessorTest {
 
     String expectedRootLogger =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
-        import edu.wpi.first.epilogue.Logged;
-        import edu.wpi.first.epilogue.Epilogue;
-        import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-        import edu.wpi.first.epilogue.logging.EpilogueBackend;
+        import org.wpilib.epilogue.Logged;
+        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.logging.ClassSpecificLogger;
+        import org.wpilib.epilogue.logging.EpilogueBackend;
 
         public class ExampleLogger extends ClassSpecificLogger<Example> {
           public ExampleLogger() {
@@ -2223,7 +2223,7 @@ class AnnotationProcessorTest {
   void configuredDefaultNaming() {
     String source =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
         @Logged(defaultNaming = Logged.Naming.USE_HUMAN_NAME)
         class Example {
@@ -2245,12 +2245,12 @@ class AnnotationProcessorTest {
 
     String expectedRootLogger =
         """
-        package edu.wpi.first.epilogue;
+        package org.wpilib.epilogue;
 
-        import edu.wpi.first.epilogue.Logged;
-        import edu.wpi.first.epilogue.Epilogue;
-        import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-        import edu.wpi.first.epilogue.logging.EpilogueBackend;
+        import org.wpilib.epilogue.Logged;
+        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.logging.ClassSpecificLogger;
+        import org.wpilib.epilogue.logging.EpilogueBackend;
 
         public class ExampleLogger extends ClassSpecificLogger<Example> {
           public ExampleLogger() {
@@ -2280,7 +2280,7 @@ class AnnotationProcessorTest {
         """
         package example;
 
-        import edu.wpi.first.epilogue.*;
+        import org.wpilib.epilogue.*;
 
         @Logged
         class Example {}
@@ -2336,7 +2336,7 @@ class AnnotationProcessorTest {
             .withProcessors(new AnnotationProcessor())
             .compile(
                 JavaFileObjects.forSourceString(
-                    "edu.wpi.first.epilogue.Example", loggedClassContent));
+                    "org.wpilib.epilogue.Example", loggedClassContent));
 
     assertThat(compilation).succeeded();
     var generatedFiles = compilation.generatedSourceFiles();

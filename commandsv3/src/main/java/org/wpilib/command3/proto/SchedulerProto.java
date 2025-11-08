@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.commands3.proto;
+package org.wpilib.command3.proto;
 
-import edu.wpi.first.util.protobuf.Protobuf;
-import org.wpilib.commands3.Command;
-import org.wpilib.commands3.Scheduler;
-import org.wpilib.commands3.proto.ProtobufCommands.ProtobufScheduler;
+import org.wpilib.util.protobuf.Protobuf;
+import org.wpilib.command3.Command;
+import org.wpilib.command3.Scheduler;
+import org.wpilib.command3.proto.ProtobufCommands.ProtobufScheduler;
 import us.hebi.quickbuf.Descriptors;
 
 /**

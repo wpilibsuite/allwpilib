@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package org.wpilib.driverstation;
 
-import edu.wpi.first.hal.ControlWord;
+import org.wpilib.hardware.hal.ControlWord;
 
 /** A wrapper around Driver Station control word. */
 public class DSControlWord {
