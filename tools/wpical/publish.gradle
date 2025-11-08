@@ -1,8 +1,8 @@
 apply plugin: 'maven-publish'
 
 def baseArtifactId = 'wpical'
-def artifactGroupId = 'edu.wpi.first.tools'
-def zipBaseName = '_GROUP_edu_wpi_first_tools_ID_wpical_CLS'
+def artifactGroupId = 'org.wpilib.tools'
+def zipBaseName = '_GROUP_org_wpilib_tools_ID_wpical_CLS'
 
 def outputsFolder = file("$project.buildDir/outputs")
 

@@ -2,7 +2,7 @@ ext {
     useJava = true
     useCpp = true
     baseId = 'wpimath'
-    groupId = 'edu.wpi.first.wpimath'
+    groupId = 'org.wpilib.wpimath'
 
     nativeName = 'wpimath'
     devMain = 'org.wpilib.math.DevMain'

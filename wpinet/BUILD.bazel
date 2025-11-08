@@ -208,7 +208,7 @@ wpilib_jni_java_library(
     name = "wpinet-java",
     srcs = glob(["src/main/java/**/*.java"]),
     maven_artifact_name = "wpinet-java",
-    maven_group_id = "edu.wpi.first.wpinet",
+    maven_group_id = "org.wpilib.wpinet",
     native_libs = [":wpinetjni"],
     visibility = ["//visibility:public"],
     deps = [
@@ -353,5 +353,5 @@ robotpy_py_test(
 package_minimal_jni_project(
     name = "wpinet",
     maven_artifact_name = "wpinet-cpp",
-    maven_group_id = "edu.wpi.first.wpinet",
+    maven_group_id = "org.wpilib.wpinet",
 )

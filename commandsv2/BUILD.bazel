@@ -106,7 +106,7 @@ wpilib_java_library(
     srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
     exported_plugins = ["//javacPlugin:plugin"],
     maven_artifact_name = "commandsv2-java",
-    maven_group_id = "edu.wpi.first.commandsv2",
+    maven_group_id = "org.wpilib.commandsv2",
     plugins = ["//javacPlugin:plugin"],
     visibility = ["//visibility:public"],
     deps = [
@@ -181,5 +181,5 @@ java_binary(
 package_minimal_cc_project(
     name = "commandsv2",
     maven_artifact_name = "commandsv2-cpp",
-    maven_group_id = "edu.wpi.first.commandsv2",
+    maven_group_id = "org.wpilib.commandsv2",
 )

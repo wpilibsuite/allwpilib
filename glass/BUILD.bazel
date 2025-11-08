@@ -102,19 +102,19 @@ cc_binary(
 package_minimal_cc_project(
     name = "glass",
     maven_artifact_name = "libglass",
-    maven_group_id = "edu.wpi.first.glass",
+    maven_group_id = "org.wpilib.glass",
 )
 
 package_minimal_cc_project(
     name = "glassnt",
     maven_artifact_name = "libglassnt",
-    maven_group_id = "edu.wpi.first.glass",
+    maven_group_id = "org.wpilib.glass",
 )
 
 package_binary_cc_project(
     name = "glassapp",
     maven_artifact_name = "Glass",
-    maven_group_id = "edu.wpi.first.tools",
+    maven_group_id = "org.wpilib.tools",
     renames = {
         "glassapp": "glass",
     },
