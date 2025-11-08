@@ -89,24 +89,24 @@ doxygen.sourceSets.main {
         exclude 'apriltag_pose.h'
 
         // LLVM
-        exclude 'wpi/Compiler.h'
-        exclude 'wpi/ErrorHandling.h'
-        exclude 'wpi/bit.h'
-        exclude 'wpi/raw_ostream.h'
-        exclude 'wpi/SmallVector.h'
-        exclude 'wpi/StringExtras.h'
+        exclude 'wpi/util/Compiler.hpp'
+        exclude 'wpi/util/ErrorHandling.hpp'
+        exclude 'wpi/util/bit.hpp'
+        exclude 'wpi/util/raw_ostream.hpp'
+        exclude 'wpi/util/SmallVector.hpp'
+        exclude 'wpi/util/StringExtras.hpp'
 
         // libuv
         exclude 'uv/**'
 
         // json
-        exclude 'wpi/detail/**'
+        exclude 'wpi/util/detail/**'
 
         // mpack
-        exclude 'wpi/mpack.h'
+        exclude 'wpi/util/mpack.h'
 
         // units
-        exclude 'units/**'
+        exclude 'wpi/units/**'
     }
 
     exclude '*.pb.h'
@@ -152,29 +152,31 @@ task generateJavaDocs(type: Javadoc) {
     options.addStringOption("tag", "pre:a:Pre-Condition")
     options.addBooleanOption("Xdoclint/package:" +
             // TODO: v Document these, then remove them from the list
-            "-edu.wpi.first.hal," +
-            "-edu.wpi.first.hal.simulation," +
+            "-org.wpilib.hardware.hal," +
+            "-org.wpilib.hardware.hal.simulation," +
             // TODO: ^ Document these, then remove them from the list
-            "-edu.wpi.first.math.proto," +
-            "-edu.wpi.first.math.struct," +
-            "-edu.wpi.first.math.controller.proto," +
-            "-edu.wpi.first.math.controller.struct," +
-            "-edu.wpi.first.math.geometry.proto," +
-            "-edu.wpi.first.math.geometry.struct," +
-            "-edu.wpi.first.math.kinematics.proto," +
-            "-edu.wpi.first.math.kinematics.struct," +
-            "-edu.wpi.first.math.spline.proto," +
-            "-edu.wpi.first.math.spline.struct," +
-            "-edu.wpi.first.math.system.proto," +
-            "-edu.wpi.first.math.system.struct," +
-            "-edu.wpi.first.math.system.plant.proto," +
-            "-edu.wpi.first.math.system.plant.struct," +
-            "-edu.wpi.first.math.trajectory.proto," +
-            "-edu.wpi.first.math.trajectory.struct," +
-            "-org.wpilib.commands3.proto," +
+            "-org.wpilib.math.proto," +
+            "-org.wpilib.math.struct," +
+            "-org.wpilib.math.controller.proto," +
+            "-org.wpilib.math.controller.struct," +
+            "-org.wpilib.math.geometry.proto," +
+            "-org.wpilib.math.geometry.struct," +
+            "-org.wpilib.math.kinematics.proto," +
+            "-org.wpilib.math.kinematics.struct," +
+            "-org.wpilib.math.linalg.proto," +
+            "-org.wpilib.math.linalg.struct," +
+            "-org.wpilib.math.spline.proto," +
+            "-org.wpilib.math.spline.struct," +
+            "-org.wpilib.math.system.proto," +
+            "-org.wpilib.math.system.struct," +
+            "-org.wpilib.math.system.plant.proto," +
+            "-org.wpilib.math.system.plant.struct," +
+            "-org.wpilib.math.trajectory.proto," +
+            "-org.wpilib.math.trajectory.struct," +
+            "-org.wpilib.command3.proto," +
             // The .measure package contains generated source files for which automatic javadoc
             // generation is very difficult to do meaningfully.
-            "-edu.wpi.first.units.measure", true)
+            "-org.wpilib.units.measure", true)
     options.addBooleanOption("Xdoclint:html,missing,reference,syntax", true)
     options.addBooleanOption('html5', true)
     options.linkSource(true)

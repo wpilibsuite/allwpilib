@@ -1,5 +1,6 @@
 cppHeaderFileInclude {
   \.h$
+  \.hpp$
   \.inc$
   \.inl$
 }
@@ -24,13 +25,9 @@ includeOtherLibs {
   ^GLFW
   ^ceres/
   ^fmt/
-  ^frc/
   ^gtest/
   ^imgui
   ^implot\.h$
   ^mrcal_wrapper\.h$
   ^opencv2\.h$
-  ^portable-file-dialogs\.h$
-  ^wpi/
-  ^wpigui
 }
