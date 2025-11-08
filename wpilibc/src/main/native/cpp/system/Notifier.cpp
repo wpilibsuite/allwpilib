@@ -18,12 +18,12 @@ using namespace wpi;
 
 Notifier::Notifier(std::function<void()> callback) {
   if (!callback) {
-    throw FRC_MakeError(err::NullParameter, "callback");
+    throw WPILIB_MakeError(err::NullParameter, "callback");
   }
   m_callback = callback;
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
-  FRC_CheckErrorStatus(status, "InitializeNotifier");
+  WPILIB_CheckErrorStatus(status, "InitializeNotifier");
 
   m_thread = std::thread([=, this] {
     for (;;) {
@@ -60,12 +60,12 @@ Notifier::Notifier(std::function<void()> callback) {
 
 Notifier::Notifier(int priority, std::function<void()> callback) {
   if (!callback) {
-    throw FRC_MakeError(err::NullParameter, "callback");
+    throw WPILIB_MakeError(err::NullParameter, "callback");
   }
   m_callback = callback;
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
-  FRC_CheckErrorStatus(status, "InitializeNotifier");
+  WPILIB_CheckErrorStatus(status, "InitializeNotifier");
 
   m_thread = std::thread([=, this] {
     int32_t status = 0;
@@ -99,7 +99,7 @@ Notifier::Notifier(int priority, std::function<void()> callback) {
           callback();
         } catch (const wpi::RuntimeError& e) {
           e.Report();
-          FRC_ReportError(
+          WPILIB_ReportError(
               err::Error,
               "Error in Notifier thread."
               "  The above stacktrace can help determine where the error "
@@ -120,7 +120,7 @@ Notifier::~Notifier() {
   // atomically set handle to 0, then clean
   HAL_NotifierHandle handle = m_notifier.exchange(0);
   HAL_StopNotifier(handle, &status);
-  FRC_ReportError(status, "StopNotifier");
+  WPILIB_ReportError(status, "StopNotifier");
 
   // Join the thread to ensure the callback has exited.
   if (m_thread.joinable()) {
@@ -190,7 +190,7 @@ void Notifier::Stop() {
   m_periodic = false;
   int32_t status = 0;
   HAL_CancelNotifierAlarm(m_notifier, &status);
-  FRC_CheckErrorStatus(status, "CancelNotifierAlarm");
+  WPILIB_CheckErrorStatus(status, "CancelNotifierAlarm");
 }
 
 void Notifier::UpdateAlarm(uint64_t triggerTime) {
@@ -201,7 +201,7 @@ void Notifier::UpdateAlarm(uint64_t triggerTime) {
     return;
   }
   HAL_UpdateNotifierAlarm(notifier, triggerTime, &status);
-  FRC_CheckErrorStatus(status, "UpdateNotifierAlarm");
+  WPILIB_CheckErrorStatus(status, "UpdateNotifierAlarm");
 }
 
 void Notifier::UpdateAlarm() {

@@ -108,6 +108,6 @@ def build_tests():
                 ":{}-examples-headers".format(folder),
                 "//thirdparty/googletest",
             ],
-            defines = ["RUNNING_FRC_TESTS=1"],
+            defines = ["RUNNING_WPILIB_TESTS=1"],
             tags = ["wpi-example", "no-tsan", "no-asan", "no-ubsan", "exclusive"],
         )

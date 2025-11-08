@@ -84,7 +84,7 @@ wpi::nt::NetworkTableEntry SmartDashboard::GetEntry(std::string_view key) {
 
 void SmartDashboard::PutData(std::string_view key, wpi::util::Sendable* data) {
   if (!data) {
-    throw FRC_MakeError(err::NullParameter, "value");
+    throw WPILIB_MakeError(err::NullParameter, "value");
   }
   if (!gReported) {
     HAL_ReportUsage("SmartDashboard", "");
@@ -108,7 +108,7 @@ void SmartDashboard::PutData(std::string_view key, wpi::util::Sendable* data) {
 
 void SmartDashboard::PutData(wpi::util::Sendable* value) {
   if (!value) {
-    throw FRC_MakeError(err::NullParameter, "value");
+    throw WPILIB_MakeError(err::NullParameter, "value");
   }
   auto name = wpi::util::SendableRegistry::GetName(value);
   if (!name.empty()) {
@@ -121,7 +121,7 @@ wpi::util::Sendable* SmartDashboard::GetData(std::string_view key) {
   std::scoped_lock lock(inst.tablesToDataMutex);
   auto it = inst.tablesToData.find(key);
   if (it == inst.tablesToData.end()) {
-    throw FRC_MakeError(err::SmartDashboardMissingKey, "{}", key);
+    throw WPILIB_MakeError(err::SmartDashboardMissingKey, "{}", key);
   }
   return wpi::util::SendableRegistry::GetSendable(it->second);
 }

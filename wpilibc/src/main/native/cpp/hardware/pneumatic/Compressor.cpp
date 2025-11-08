@@ -16,7 +16,7 @@ Compressor::Compressor(int busId, int module, PneumaticsModuleType moduleType)
     : m_module{PneumaticsBase::GetForType(busId, module, moduleType)},
       m_moduleType{moduleType} {
   if (!m_module->ReserveCompressor()) {
-    throw FRC_MakeError(err::ResourceAlreadyAllocated, "{}", module);
+    throw WPILIB_MakeError(err::ResourceAlreadyAllocated, "{}", module);
   }
 
   m_module->EnableCompressorDigital();

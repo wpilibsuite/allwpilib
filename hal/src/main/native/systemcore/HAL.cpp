@@ -303,7 +303,7 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   //   return false;
   // }
 
-  // FRC_NetworkCommunication_Reserve(nullptr);
+  // WPILIB_NetworkCommunication_Reserve(nullptr);
 
   int32_t status = 0;
 

@@ -284,7 +284,7 @@ void CommandScheduler::UnregisterAllSubsystems() {
 void CommandScheduler::SetDefaultCommand(Subsystem* subsystem,
                                          CommandPtr&& defaultCommand) {
   if (!defaultCommand.get()->HasRequirement(subsystem)) {
-    throw FRC_MakeError(wpi::err::CommandIllegalUse, "{}",
+    throw WPILIB_MakeError(wpi::err::CommandIllegalUse, "{}",
                         "Default commands must require their subsystem!");
   }
   RequireUngrouped(defaultCommand.get());
@@ -430,7 +430,7 @@ void CommandScheduler::OnCommandFinish(Action action) {
 void CommandScheduler::RequireUngrouped(const Command* command) {
   auto stacktrace = command->GetPreviousCompositionSite();
   if (stacktrace.has_value()) {
-    throw FRC_MakeError(wpi::err::CommandIllegalUse,
+    throw WPILIB_MakeError(wpi::err::CommandIllegalUse,
                         "Commands that have been composed may not be added to "
                         "another composition or scheduled individually!"
                         "\nOriginally composed at:\n{}",
@@ -454,7 +454,7 @@ void CommandScheduler::RequireUngrouped(
 
 void CommandScheduler::RequireUngroupedAndUnscheduled(const Command* command) {
   if (IsScheduled(command)) {
-    throw FRC_MakeError(wpi::err::CommandIllegalUse,
+    throw WPILIB_MakeError(wpi::err::CommandIllegalUse,
                         "Commands that have been scheduled individually may "
                         "not be added to another composition!");
   }

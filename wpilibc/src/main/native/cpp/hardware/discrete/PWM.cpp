@@ -20,13 +20,13 @@ using namespace wpi;
 
 PWM::PWM(int channel, bool registerSendable) {
   if (!SensorUtil::CheckPWMChannel(channel)) {
-    throw FRC_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
+    throw WPILIB_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
   }
 
   auto stack = wpi::util::GetStackTrace(1);
   int32_t status = 0;
   m_handle = HAL_InitializePWMPort(channel, stack.c_str(), &status);
-  FRC_CheckErrorStatus(status, "Channel {}", channel);
+  WPILIB_CheckErrorStatus(status, "Channel {}", channel);
 
   m_channel = channel;
 
@@ -47,13 +47,13 @@ PWM::~PWM() {
 void PWM::SetPulseTime(wpi::units::microsecond_t time) {
   int32_t status = 0;
   HAL_SetPWMPulseTimeMicroseconds(m_handle, time.value(), &status);
-  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
+  WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
 wpi::units::microsecond_t PWM::GetPulseTime() const {
   int32_t status = 0;
   double value = HAL_GetPWMPulseTimeMicroseconds(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
+  WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
 
   return wpi::units::microsecond_t{value};
 }
@@ -61,7 +61,7 @@ wpi::units::microsecond_t PWM::GetPulseTime() const {
 void PWM::SetDisabled() {
   int32_t status = 0;
   HAL_SetPWMPulseTimeMicroseconds(m_handle, 0, &status);
-  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
+  WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
 void PWM::SetOutputPeriod(OutputPeriod mult) {
@@ -81,11 +81,11 @@ void PWM::SetOutputPeriod(OutputPeriod mult) {
                              &status);  // Don't squelch any outputs
       break;
     default:
-      throw FRC_MakeError(err::InvalidParameter, "OutputPeriod value {}",
+      throw WPILIB_MakeError(err::InvalidParameter, "OutputPeriod value {}",
                           static_cast<int>(mult));
   }
 
-  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
+  WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
 int PWM::GetChannel() const {

@@ -48,7 +48,7 @@ class Watchdog::Impl {
 Watchdog::Impl::Impl() {
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
-  FRC_CheckErrorStatus(status, "starting watchdog notifier");
+  WPILIB_CheckErrorStatus(status, "starting watchdog notifier");
   HAL_SetNotifierName(m_notifier, "Watchdog", &status);
 
   m_thread = std::thread([=, this] { Main(); });
@@ -59,7 +59,7 @@ Watchdog::Impl::~Impl() {
   // atomically set handle to 0, then clean
   HAL_NotifierHandle handle = m_notifier.exchange(0);
   HAL_StopNotifier(handle, &status);
-  FRC_ReportError(status, "stopping watchdog notifier");
+  WPILIB_ReportError(status, "stopping watchdog notifier");
 
   // Join the thread to ensure the handler has exited.
   if (m_thread.joinable()) {
@@ -85,7 +85,7 @@ void Watchdog::Impl::UpdateAlarm() {
                               1e6),
         &status);
   }
-  FRC_CheckErrorStatus(status, "updating watchdog notifier alarm");
+  WPILIB_CheckErrorStatus(status, "updating watchdog notifier alarm");
 }
 
 void Watchdog::Impl::Main() {
@@ -114,7 +114,7 @@ void Watchdog::Impl::Main() {
     if (now - watchdog->m_lastTimeoutPrintTime > kMinPrintPeriod) {
       watchdog->m_lastTimeoutPrintTime = now;
       if (!watchdog->m_suppressTimeoutMessage) {
-        FRC_ReportWarning("Watchdog not fed within {:.6f}s",
+        WPILIB_ReportWarning("Watchdog not fed within {:.6f}s",
                           watchdog->m_timeout.value());
       }
     }

@@ -50,7 +50,7 @@ const char* GetErrorMessage(int32_t* code);
 
 /**
  * Reports an error to the driver station (using HAL_SendError).
- * Generally the FRC_ReportError wrapper macro should be used instead.
+ * Generally the WPILIB_ReportError wrapper macro should be used instead.
  *
  * @param[out] status error code
  * @param[in]  fileName source file name
@@ -65,7 +65,7 @@ void ReportErrorV(int32_t status, const char* fileName, int lineNumber,
 
 /**
  * Reports an error to the driver station (using HAL_SendError).
- * Generally the FRC_ReportError wrapper macro should be used instead.
+ * Generally the WPILIB_ReportError wrapper macro should be used instead.
  *
  * @param[out] status error code
  * @param[in]  fileName source file name
@@ -84,7 +84,7 @@ inline void ReportError(int32_t status, const char* fileName, int lineNumber,
 
 /**
  * Makes a runtime error exception object. This object should be thrown
- * by the caller. Generally the FRC_MakeError wrapper macro should be used
+ * by the caller. Generally the WPILIB_MakeError wrapper macro should be used
  * instead.
  *
  * @param[out] status error code
@@ -134,7 +134,7 @@ namespace warn {
  * @param[out] status error code
  * @param[in]  format error message format
  */
-#define FRC_ReportError(status, format, ...)                       \
+#define WPILIB_ReportError(status, format, ...)                       \
   do {                                                             \
     if ((status) != 0) {                                           \
       ::wpi::ReportError(status, __FILE__, __LINE__, __FUNCTION__, \
@@ -147,7 +147,7 @@ namespace warn {
  *
  * @param[in]  format error message format
  */
-#define FRC_ReportWarning(format, ...)                                         \
+#define WPILIB_ReportWarning(format, ...)                                         \
   do {                                                                         \
     ::wpi::ReportError(::wpi::warn::Warning, __FILE__, __LINE__, __FUNCTION__, \
                        format __VA_OPT__(, ) __VA_ARGS__);                     \
@@ -161,7 +161,7 @@ namespace warn {
  * @param[in]  format error message format
  * @return runtime error object
  */
-#define FRC_MakeError(status, format, ...)                   \
+#define WPILIB_MakeError(status, format, ...)                   \
   ::wpi::MakeError(status, __FILE__, __LINE__, __FUNCTION__, \
                    format __VA_OPT__(, ) __VA_ARGS__)
 
@@ -172,7 +172,7 @@ namespace warn {
  * @param[out] status error code
  * @param[in]  format error message format
  */
-#define FRC_CheckErrorStatus(status, format, ...)                      \
+#define WPILIB_CheckErrorStatus(status, format, ...)                      \
   do {                                                                 \
     if ((status) < 0) {                                                \
       throw ::wpi::MakeError(status, __FILE__, __LINE__, __FUNCTION__, \
@@ -183,7 +183,7 @@ namespace warn {
     }                                                                  \
   } while (0)
 
-#define FRC_AssertMessage(condition, format, ...)                              \
+#define WPILIB_AssertMessage(condition, format, ...)                              \
   do {                                                                         \
     if (!(condition)) {                                                        \
       throw ::wpi::MakeError(::wpi::err::AssertionFailure, __FILE__, __LINE__, \
@@ -191,4 +191,4 @@ namespace warn {
     }                                                                          \
   } while (0)
 
-#define FRC_Assert(condition) FRC_AssertMessage(condition, #condition)
+#define WPILIB_Assert(condition) WPILIB_AssertMessage(condition, #condition)

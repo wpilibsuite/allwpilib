@@ -33,13 +33,13 @@ import org.wpilib.util.concurrent.Event;
  * available) competition match number. The data file will be saved to a USB flash drive in a folder
  * named "logs" if one is attached, or to /home/systemcore/logs otherwise.
  *
- * <p>Log files are initially named "FRC_TBD_{random}.wpilog" until the DS connects. After the DS
- * connects, the log file is renamed to "FRC_yyyyMMdd_HHmmss.wpilog" (where the date/time is UTC).
+ * <p>Log files are initially named "WPILIB_TBD_{random}.wpilog" until the DS connects. After the DS
+ * connects, the log file is renamed to "WPILIB_yyyyMMdd_HHmmss.wpilog" (where the date/time is UTC).
  * If the FMS is connected and provides a match number, the log file is renamed to
- * "FRC_yyyyMMdd_HHmmss_{event}_{match}.wpilog".
+ * "WPILIB_yyyyMMdd_HHmmss_{event}_{match}.wpilog".
  *
- * <p>On startup, all existing FRC_TBD log files are deleted. If there is less than 50 MB of free
- * space on the target storage, FRC_ log files are deleted (oldest to newest) until there is 50 MB
+ * <p>On startup, all existing WPILIB_TBD log files are deleted. If there is less than 50 MB of free
+ * space on the target storage, WPILIB_ log files are deleted (oldest to newest) until there is 50 MB
  * free OR there are 10 files remaining.
  *
  * <p>By default, all NetworkTables value changes are stored to the data log.
@@ -107,12 +107,12 @@ public final class DataLogManager {
       m_logDir = makeLogDir(dir);
       m_filenameOverride = !filename.isEmpty();
 
-      // Delete all previously existing FRC_TBD_*.wpilog files. These only exist when the robot
+      // Delete all previously existing WPILIB_TBD_*.wpilog files. These only exist when the robot
       // never connects to the DS, so they are very unlikely to have useful data and just clutter
       // the filesystem.
       File[] files =
           new File(m_logDir)
-              .listFiles((d, name) -> name.startsWith("FRC_TBD_") && name.endsWith(".wpilog"));
+              .listFiles((d, name) -> name.startsWith("WPILIB_TBD_") && name.endsWith(".wpilog"));
       if (files != null) {
         for (File file : files) {
           if (!file.delete()) {
@@ -272,7 +272,7 @@ public final class DataLogManager {
     }
     Random rnd = new Random();
     StringBuilder filename = new StringBuilder(18);
-    filename.append("FRC_TBD_");
+    filename.append("WPILIB_TBD_");
     for (int i = 0; i < 4; i++) {
       filename.append(String.format("%04x", rnd.nextInt(0x10000)));
     }
@@ -293,7 +293,7 @@ public final class DataLogManager {
 
   private static void startConsoleLog() {
     if (RobotBase.isReal()) {
-      m_consoleLogger = new FileLogger("/home/systemcore/FRC_UserProgram.log", m_log, "console");
+      m_consoleLogger = new FileLogger("/home/systemcore/WPILIB_UserProgram.log", m_log, "console");
     }
   }
 
@@ -304,18 +304,18 @@ public final class DataLogManager {
   }
 
   private static void logMain() {
-    // based on free disk space, scan for "old" FRC_*.wpilog files and remove
+    // based on free disk space, scan for "old" WPILIB_*.wpilog files and remove
     {
       File logDir = new File(m_logDir);
       long freeSpace = logDir.getUsableSpace();
       if (freeSpace < kFreeSpaceThreshold) {
-        // Delete oldest FRC_*.wpilog files (ignore FRC_TBD_*.wpilog as we just created one)
+        // Delete oldest WPILIB_*.wpilog files (ignore WPILIB_TBD_*.wpilog as we just created one)
         File[] files =
             logDir.listFiles(
                 (dir, name) ->
-                    name.startsWith("FRC_")
+                    name.startsWith("WPILIB_")
                         && name.endsWith(".wpilog")
-                        && !name.startsWith("FRC_TBD_"));
+                        && !name.startsWith("WPILIB_TBD_"));
         if (files != null) {
           Arrays.sort(files, Comparator.comparingLong(File::lastModified));
           int count = files.length;
@@ -398,7 +398,7 @@ public final class DataLogManager {
         if (dsAttachCount > 50) { // 1 second
           if (RobotController.isSystemTimeValid()) {
             LocalDateTime now = LocalDateTime.now(m_utc);
-            m_log.setFilename("FRC_" + m_timeFormatter.format(now) + ".wpilog");
+            m_log.setFilename("WPILIB_" + m_timeFormatter.format(now) + ".wpilog");
             dsRenamed = true;
           } else {
             dsAttachCount = 0; // wait a bit and try again
@@ -427,7 +427,7 @@ public final class DataLogManager {
                   default -> '_';
                 };
             m_log.setFilename(
-                "FRC_"
+                "WPILIB_"
                     + m_timeFormatter.format(LocalDateTime.now(m_utc))
                     + "_"
                     + DriverStation.getEventName()

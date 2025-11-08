@@ -321,8 +321,8 @@ model {
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             nativeUtils.useRequiredLibrary(it, 'opencv_shared')
 
-            it.cppCompiler.define('RUNNING_FRC_TESTS')
-            it.cCompiler.define('RUNNING_FRC_TESTS')
+            it.cppCompiler.define('RUNNING_WPILIB_TESTS')
+            it.cCompiler.define('RUNNING_WPILIB_TESTS')
         }
     }
 }
