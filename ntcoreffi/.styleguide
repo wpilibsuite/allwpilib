@@ -1,5 +1,6 @@
 cppHeaderFileInclude {
   \.h$
+  \.hpp$
 }
 
 cppSrcFileInclude {
@@ -18,8 +19,6 @@ includeOtherLibs {
   ^fmt/
   ^gmock/
   ^gtest/
-  ^networktables/
-  ^wpi/
 }
 
 includeGuardRoots {

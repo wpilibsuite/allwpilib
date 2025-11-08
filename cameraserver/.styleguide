@@ -1,5 +1,6 @@
 cppHeaderFileInclude {
   \.h$
+  \.hpp$
   \.inc$
 }
 
@@ -14,11 +15,8 @@ repoRootNameOverride {
 includeOtherLibs {
   ^fmt/
   ^gtest/
-  ^hal/
-  ^networktables/
   ^opencv2/
   ^support/
-  ^wpi/
 }
 
 includeGuardRoots {
