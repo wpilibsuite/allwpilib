@@ -81,11 +81,11 @@ scan_headers_ignore = [
     "wpi/math/system/NumericalIntegration.hpp",
     "wpi/math/system/NumericalJacobian.hpp",
 
-    "frc/proto/*",
-    "frc/*/proto/*",
+    "wpi/math/proto/*",
+    "wpi/math/*/proto/*",
     
-    "frc/struct/*",
-    "frc/*/struct/*",
+    "wpi/math/struct/*",
+    "wpi/math/*/struct/*",
     
     "[eE]igen/*",
 
@@ -96,7 +96,7 @@ scan_headers_ignore = [
     "sleipnir/*",
     "type_casters/*",
     "unsupported/*",
-    "units/*",
+    "wpi/units/*",
     "wpimath/protobuf/*",
 
     "wpi/math/util/MathShared.hpp",

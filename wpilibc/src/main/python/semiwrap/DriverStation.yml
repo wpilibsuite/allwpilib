@@ -17,12 +17,8 @@ classes:
       GetStickAxis:
       GetStickPOV:
       GetStickButtons:
-      GetStickAxisCount:
-      GetStickPOVCount:
-      GetStickButtonCount:
       GetJoystickType:
       GetJoystickName:
-      GetJoystickAxisType:
       IsJoystickConnected:
       IsEnabled:
       IsDisabled:
@@ -52,6 +48,14 @@ classes:
       StartDataLog:
       GetAngle:
       GetJoystickIsGamepad:
+      GetStickButtonIfAvailable:
+      GetStickAxisIfAvailable:
+      GetStickAxesMaximumIndex:
+      GetStickAxesAvailable:
+      GetStickPOVsMaximumIndex:
+      GetStickPOVsAvailable:
+      GetStickButtonsMaximumIndex:
+      GetStickButtonsAvailable:
     inline_code: |
       .def("getControlState",
         [](DriverStation *self) -> std::tuple<bool, bool, bool> {

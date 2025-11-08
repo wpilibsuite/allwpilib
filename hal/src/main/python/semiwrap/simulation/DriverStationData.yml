@@ -77,10 +77,6 @@ functions:
   HALSIM_SetJoystickAxis:
   HALSIM_SetJoystickPOV:
   HALSIM_SetJoystickButtonsValue:
-  HALSIM_SetJoystickAxisCount:
-  HALSIM_SetJoystickPOVCount:
-  HALSIM_SetJoystickButtonCount:
-  HALSIM_GetJoystickCounts:
   HALSIM_SetJoystickType:
   HALSIM_SetJoystickName:
     cpp_code: |
@@ -88,7 +84,6 @@ functions:
         auto s = wpi::make_string(sv);
         HALSIM_SetJoystickName(stick, &s);
       }
-  HALSIM_SetJoystickAxisType:
   HALSIM_SetGameSpecificMessage:
     cpp_code: |
       [](std::string_view sv) {
@@ -111,3 +106,7 @@ functions:
   HALSIM_CancelDriverStationNewDataCallback:
   HALSIM_NotifyDriverStationNewData:
   HALSIM_SetJoystickIsGamepad:
+  HALSIM_SetJoystickAxesAvailable:
+  HALSIM_SetJoystickPOVsAvailable:
+  HALSIM_SetJoystickButtonsAvailable:
+  HALSIM_GetJoystickAvailables:
