@@ -74,8 +74,8 @@ filegroup(
 cc_library(
     name = "ntcore_c_headers",
     hdrs = [
-        "src/generated/main/native/include/ntcore_c_types.h",
-        "src/main/native/include/ntcore_c.h",
+        "src/generated/main/native/include/wpi/nt/ntcore_c_types.h",
+        "src/main/native/include/wpi/nt/ntcore_c.h",
     ],
     includes = [
         "src/generated/main/native/include",
@@ -177,7 +177,7 @@ cc_test(
     size = "small",
     srcs = glob([
         "src/test/native/**/*.cpp",
-        "src/test/native/**/*.h",
+        "src/test/native/**/*.hpp",
     ]),
     tags = [
         "exclusive",

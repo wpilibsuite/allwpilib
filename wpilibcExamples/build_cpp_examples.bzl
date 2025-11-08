@@ -32,7 +32,7 @@ def build_examples(halsim_deps = []):
     for folder in EXAMPLE_FOLDERS:
         cc_library(
             name = folder + "-examples-headers",
-            hdrs = native.glob(["src/main/cpp/examples/" + folder + "/include/**/*.h"], allow_empty = True),
+            hdrs = native.glob(["src/main/cpp/examples/" + folder + "/include/**/*.hpp"], allow_empty = True),
             strip_include_prefix = "src/main/cpp/examples/" + folder + "/include",
             tags = ["wpi-example"],
         )
@@ -57,7 +57,7 @@ def build_commands():
         cc_library(
             name = folder + "-command",
             srcs = native.glob(["src/main/cpp/commands/" + folder + "/**/*.cpp"]),
-            hdrs = native.glob(["src/main/cpp/commands/" + folder + "/**/*.h"]),
+            hdrs = native.glob(["src/main/cpp/commands/" + folder + "/**/*.hpp"]),
             deps = [
                 "//commandsv2",
             ],
@@ -72,7 +72,7 @@ def build_snippets():
         cc_library(
             name = folder + "-template",
             srcs = native.glob(["src/main/cpp/snippets/" + folder + "/**/*.cpp"]),
-            hdrs = native.glob(["src/main/cpp/snippets/" + folder + "/**/*.h"], allow_empty = True),
+            hdrs = native.glob(["src/main/cpp/snippets/" + folder + "/**/*.hpp"], allow_empty = True),
             deps = [
                 "//commandsv2",
             ],
@@ -87,7 +87,7 @@ def build_templates():
         cc_library(
             name = folder + "-template",
             srcs = native.glob(["src/main/cpp/templates/" + folder + "/**/*.cpp"]),
-            hdrs = native.glob(["src/main/cpp/templates/" + folder + "/**/*.h"]),
+            hdrs = native.glob(["src/main/cpp/templates/" + folder + "/**/*.hpp"]),
             deps = [
                 "//commandsv2",
             ],

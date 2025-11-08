@@ -263,7 +263,7 @@ cc_test(
     size = "small",
     srcs = glob([
         "src/test/native/cpp/**/*.cpp",
-        "src/test/native/cpp/**/*.h",
+        "src/test/native/cpp/**/*.hpp",
     ]),
     tags = [
         "no-raspi",
@@ -298,8 +298,8 @@ cc_binary(
 
 java_binary(
     name = "DevMain-Java",
-    srcs = ["src/dev/java/edu/wpi/first/math/DevMain.java"],
-    main_class = "edu.wpi.first.math.DevMain",
+    srcs = ["src/dev/java/org/wpilib/math/DevMain.java"],
+    main_class = "org.wpilib.math.DevMain",
     deps = [
         ":wpimath-java",
     ],
