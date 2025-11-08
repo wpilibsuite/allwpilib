@@ -93,6 +93,7 @@ class WPILIB_DLLEXPORT Trajectory {
       // interpolation is the change in position (delta s) divided by the total
       // distance between the two endpoints.
       const double interpolationFrac =
+          // NOLINTNEXTLINE (bugprone-integer-division)
           newS / endValue.pose.Translation().Distance(pose.Translation());
 
       return {
