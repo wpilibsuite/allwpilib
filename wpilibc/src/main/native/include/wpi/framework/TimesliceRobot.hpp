@@ -6,7 +6,7 @@
 
 #include <functional>
 
-#include "wpi/opmode/TimedRobot.hpp"
+#include "wpi/framework/TimedRobot.hpp"
 #include "wpi/units/time.hpp"
 
 namespace wpi {

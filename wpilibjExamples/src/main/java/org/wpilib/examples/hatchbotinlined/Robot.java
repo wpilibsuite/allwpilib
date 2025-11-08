@@ -7,7 +7,7 @@ package org.wpilib.examples.hatchbotinlined;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.driverstation.DriverStation;
-import org.wpilib.opmode.TimedRobot;
+import org.wpilib.framework.TimedRobot;
 import org.wpilib.system.DataLogManager;
 
 /**

@@ -6,7 +6,7 @@ package org.wpilib.examples.selectcommand;
 
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
-import org.wpilib.opmode.TimedRobot;
+import org.wpilib.framework.TimedRobot;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in

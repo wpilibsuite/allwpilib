@@ -4,8 +4,8 @@
 
 #include <numbers>
 
+#include <wpi/framework/TimedRobot.hpp>
 #include <wpi/hardware/rotation/Encoder.hpp>
-#include <wpi/opmode/TimedRobot.hpp>
 #include <wpi/smartdashboard/SmartDashboard.hpp>
 
 /**

@@ -6,9 +6,9 @@ package org.wpilib.examples.i2ccommunication;
 
 import java.util.Optional;
 import org.wpilib.driverstation.DriverStation;
+import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.bus.I2C;
 import org.wpilib.hardware.bus.I2C.Port;
-import org.wpilib.opmode.TimedRobot;
 
 /**
  * This is a sample program demonstrating how to communicate to a light controller from the robot

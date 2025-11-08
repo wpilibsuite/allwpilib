@@ -6,8 +6,8 @@ package org.wpilib.examples.tankdrive;
 
 import org.wpilib.drive.DifferentialDrive;
 import org.wpilib.driverstation.Joystick;
+import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.motor.PWMSparkMax;
-import org.wpilib.opmode.TimedRobot;
 import org.wpilib.util.sendable.SendableRegistry;
 
 /**

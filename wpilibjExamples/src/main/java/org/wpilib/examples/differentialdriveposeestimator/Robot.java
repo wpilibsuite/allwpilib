@@ -5,10 +5,10 @@
 package org.wpilib.examples.differentialdriveposeestimator;
 
 import org.wpilib.driverstation.XboxController;
+import org.wpilib.framework.TimedRobot;
 import org.wpilib.math.filter.SlewRateLimiter;
 import org.wpilib.networktables.DoubleArrayTopic;
 import org.wpilib.networktables.NetworkTableInstance;
-import org.wpilib.opmode.TimedRobot;
 
 public class Robot extends TimedRobot {
   private final NetworkTableInstance m_inst = NetworkTableInstance.getDefault();

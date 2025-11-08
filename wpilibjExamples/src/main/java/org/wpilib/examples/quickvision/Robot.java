@@ -4,7 +4,7 @@
 
 package org.wpilib.examples.quickvision;
 
-import org.wpilib.opmode.TimedRobot;
+import org.wpilib.framework.TimedRobot;
 import org.wpilib.vision.stream.CameraServer;
 
 /**

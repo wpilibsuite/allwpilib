@@ -4,8 +4,8 @@
 
 package org.wpilib.snippets.encoder;
 
+import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.opmode.TimedRobot;
 
 /**
  * Encoder snippets for frc-docs.

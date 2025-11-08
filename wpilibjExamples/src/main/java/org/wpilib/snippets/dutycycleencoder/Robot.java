@@ -4,8 +4,8 @@
 
 package org.wpilib.snippets.dutycycleencoder;
 
+import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.rotation.DutyCycleEncoder;
-import org.wpilib.opmode.TimedRobot;
 
 /**
  * DutyCycleEncoder snippets for frc-docs.

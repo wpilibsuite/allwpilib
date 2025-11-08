@@ -4,7 +4,7 @@
 
 package org.wpilib.templates.timeslice;
 
-import org.wpilib.opmode.TimesliceRobot;
+import org.wpilib.framework.TimesliceRobot;
 import org.wpilib.smartdashboard.SendableChooser;
 import org.wpilib.smartdashboard.SmartDashboard;
 

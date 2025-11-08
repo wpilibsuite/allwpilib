@@ -25,7 +25,7 @@ import org.wpilib.annotation.NoDiscard;
 import org.wpilib.command3.button.CommandGenericHID;
 import org.wpilib.command3.proto.SchedulerProto;
 import org.wpilib.event.EventLoop;
-import org.wpilib.opmode.TimedRobot;
+import org.wpilib.framework.TimedRobot;
 import org.wpilib.system.RobotController;
 import org.wpilib.util.ErrorMessages;
 import org.wpilib.util.protobuf.ProtobufSerializable;

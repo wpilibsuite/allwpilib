@@ -21,9 +21,9 @@ import org.wpilib.datalog.FileLogger;
 import org.wpilib.datalog.IntegerLogEntry;
 import org.wpilib.datalog.StringLogEntry;
 import org.wpilib.driverstation.DriverStation;
+import org.wpilib.framework.RobotBase;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.networktables.NetworkTableInstance;
-import org.wpilib.opmode.RobotBase;
 import org.wpilib.util.WPIUtilJNI;
 import org.wpilib.util.concurrent.Event;
 

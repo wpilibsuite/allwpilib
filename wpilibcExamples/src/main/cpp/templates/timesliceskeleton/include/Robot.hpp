@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/opmode/TimesliceRobot.hpp>
+#include <wpi/framework/TimesliceRobot.hpp>
 
 class Robot : public wpi::TimesliceRobot {
  public:

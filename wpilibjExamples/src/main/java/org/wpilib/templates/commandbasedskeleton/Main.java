@@ -4,7 +4,7 @@
 
 package org.wpilib.templates.commandbasedskeleton;
 
-import org.wpilib.opmode.RobotBase;
+import org.wpilib.framework.RobotBase;
 
 public final class Main {
   private Main() {}

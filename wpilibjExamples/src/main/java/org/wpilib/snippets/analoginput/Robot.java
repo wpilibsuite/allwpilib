@@ -4,8 +4,8 @@
 
 package org.wpilib.snippets.analoginput;
 
+import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.discrete.AnalogInput;
-import org.wpilib.opmode.TimedRobot;
 
 /**
  * AnalogInput snippets for frc-docs.

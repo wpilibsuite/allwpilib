@@ -4,9 +4,9 @@
 
 package org.wpilib.snippets.onboardimu;
 
+import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.imu.OnboardIMU;
 import org.wpilib.hardware.imu.OnboardIMU.MountOrientation;
-import org.wpilib.opmode.TimedRobot;
 
 /**
  * on board IMU snippets for frc-docs.

@@ -6,7 +6,7 @@ package org.wpilib.examples.armsimulation;
 
 import org.wpilib.driverstation.Joystick;
 import org.wpilib.examples.armsimulation.subsystems.Arm;
-import org.wpilib.opmode.TimedRobot;
+import org.wpilib.framework.TimedRobot;
 
 /** This is a sample program to demonstrate the use of arm simulation with existing code. */
 public class Robot extends TimedRobot {

@@ -3,12 +3,12 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <wpi/driverstation/Joystick.hpp>
+#include <wpi/framework/TimedRobot.hpp>
 #include <wpi/hardware/motor/PWMSparkMax.hpp>
 #include <wpi/hardware/rotation/Encoder.hpp>
 #include <wpi/math/controller/BangBangController.hpp>
 #include <wpi/math/controller/SimpleMotorFeedforward.hpp>
 #include <wpi/math/system/plant/LinearSystemId.hpp>
-#include <wpi/opmode/TimedRobot.hpp>
 #include <wpi/simulation/EncoderSim.hpp>
 #include <wpi/simulation/FlywheelSim.hpp>
 #include <wpi/smartdashboard/SmartDashboard.hpp>

@@ -4,8 +4,8 @@
 
 package org.wpilib.snippets.analogencoder;
 
+import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.rotation.AnalogEncoder;
-import org.wpilib.opmode.TimedRobot;
 
 /**
  * AnalogEncoder snippets for frc-docs.

@@ -4,8 +4,8 @@
 
 package org.wpilib.snippets.analogaccelerometer;
 
+import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.accelerometer.AnalogAccelerometer;
-import org.wpilib.opmode.TimedRobot;
 
 /**
  * AnalogAccelerometer snippets for frc-docs.
