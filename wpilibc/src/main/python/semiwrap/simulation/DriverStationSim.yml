@@ -35,13 +35,8 @@ classes:
       SetJoystickButton:
       SetJoystickAxis:
       SetJoystickPOV:
-      SetJoystickButtons:
-      SetJoystickAxisCount:
-      SetJoystickPOVCount:
-      SetJoystickButtonCount:
       SetJoystickType:
       SetJoystickName:
-      SetJoystickAxisType:
       SetGameSpecificMessage:
       SetEventName:
       SetMatchType:
@@ -49,3 +44,9 @@ classes:
       SetReplayNumber:
       ResetData:
       SetJoystickIsGamepad:
+      SetJoystickAxesMaximumIndex:
+      SetJoystickAxesAvailable:
+      SetJoystickPOVsMaximumIndex:
+      SetJoystickPOVsAvailable:
+      SetJoystickButtonsMaximumIndex:
+      SetJoystickButtonsAvailable:

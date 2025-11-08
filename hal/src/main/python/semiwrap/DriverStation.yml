@@ -26,7 +26,6 @@ functions:
         WPI_FreeString(&name);
         return sname;
       }
-  HAL_GetJoystickAxisType:
   HAL_SetJoystickOutputs:
   HAL_GetMatchTime:
   HAL_GetOutputsEnabled:

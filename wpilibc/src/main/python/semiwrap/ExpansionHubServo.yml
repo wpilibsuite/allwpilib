@@ -1,0 +1,14 @@
+classes:
+  frc::ExpansionHubServo:
+    methods:
+      ExpansionHubServo:
+      Set:
+      SetAngle:
+      SetPulseWidth:
+      SetEnabled:
+      SetFramePeriod:
+      IsHubConnected:
+      SetAngleRange:
+      SetPWMRange:
+      SetReversed:
+      SetContinousRotationMode:

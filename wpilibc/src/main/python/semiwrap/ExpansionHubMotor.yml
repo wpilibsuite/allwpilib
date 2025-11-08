@@ -1,0 +1,20 @@
+classes:
+  frc::ExpansionHubMotor:
+    methods:
+      ExpansionHubMotor:
+      SetPercentagePower:
+      SetVoltage:
+      SetPositionSetpoint:
+      SetVelocitySetpoint:
+      SetEnabled:
+      SetFloatOn0:
+      GetCurrent:
+      SetDistancePerCount:
+      GetEncoderVelocity:
+      GetEncoderPosition:
+      SetReversed:
+      ResetEncoder:
+      GetVelocityPidConstants:
+      GetPositionPidConstants:
+      IsHubConnected:
+      Follow:

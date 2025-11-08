@@ -41,8 +41,6 @@ packages = ["hal"]
 [tool.semiwrap]
 update_init = []
 scan_headers_ignore = [
-    "hal/ChipObject.h",
-    "hal/DMA.h",
     "wpi/hal/Errors.h",
     "wpi/hal/HAL.h",
     "wpi/hal/IMU.h",
@@ -51,8 +49,6 @@ scan_headers_ignore = [
     "wpi/hal/Types.h",
     "wpi/hal/Value.h",
 
-    "hal/cpp/SerialHelper.h",
-    "hal/cpp/UnsafeDIO.h",
     "wpi/hal/cpp/fpga_clock.h",
 
     "wpi/hal/handles/DigitalHandleResource.h",
@@ -62,15 +58,11 @@ scan_headers_ignore = [
     "wpi/hal/handles/LimitedHandleResource.h",
     "wpi/hal/handles/UnlimitedHandleResource.h",
 
-    "hal/proto/*",
-
-    "hal/roborio/HMB.h",
-    "hal/roborio/InterruptManager.h",
+    "wpi/hal/proto/*",
 
     "wpi/hal/simulation/CanData.h",
     "wpi/hal/simulation/I2CData.h",
     "wpi/hal/simulation/NotifyListener.h",
-    "hal/simulation/SPIData.h",
     "wpi/hal/simulation/SimCallbackRegistry.h",
     "wpi/hal/simulation/SimDataValue.h",
 
