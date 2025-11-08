@@ -8,7 +8,7 @@ Subject: [PATCH 19/36] Prefer fmtlib
  1 file changed, 6 insertions(+), 14 deletions(-)
 
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index d0fd67bd3c0d4cf33922cdda042531424d277951..2f160c45b47cf57bb28f6393dd56cde06089639b 100644
+index d0fd67bd3c0d4cf33922cdda042531424d277951..c153b91391fe63e819e4907ac98d2ee26228107a 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -22,7 +22,7 @@
@@ -33,7 +33,7 @@ index d0fd67bd3c0d4cf33922cdda042531424d277951..2f160c45b47cf57bb28f6393dd56cde0
 -    std::string_view MessageStr = OS.str();
 -    ssize_t written = ::write(2, MessageStr.data(), MessageStr.size());
 -    (void)written; // If something went wrong, we deliberately just give up.
-+    wpi::print(stderr, "LLVM ERROR: {}\n", Reason);
++    wpi::util::print(stderr, "LLVM ERROR: {}\n", Reason);
    }
  
    // If we reached here, we are failing ungracefully. Run the interrupt handlers
@@ -43,13 +43,13 @@ index d0fd67bd3c0d4cf33922cdda042531424d277951..2f160c45b47cf57bb28f6393dd56cde0
    if (msg)
 -    dbgs() << msg << "\n";
 -  dbgs() << "UNREACHABLE executed";
-+    wpi::print(stderr, "{}\n", msg);
++    wpi::util::print(stderr, "{}\n", msg);
 +  std::fputs("UNREACHABLE executed", stderr);
    if (file)
 -    dbgs() << " at " << file << ":" << line;
 -  dbgs() << "!\n";
-+    wpi::print(stderr, " at {}:{}", file, line);
-+  wpi::print(stderr, "!\n");
++    wpi::util::print(stderr, " at {}:{}", file, line);
++  wpi::util::print(stderr, "!\n");
    abort();
  #ifdef LLVM_BUILTIN_UNREACHABLE
    // Windows systems and possibly others don't declare abort() to be noreturn,
