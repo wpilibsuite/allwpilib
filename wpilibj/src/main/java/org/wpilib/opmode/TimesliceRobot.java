@@ -63,8 +63,9 @@ package org.wpilib.opmode;
  *
  * <p>If the robot periodic functions and the controller periodic functions have a lot of scheduling
  * jitter that cause them to occasionally overlap with later timeslices, consider giving the main
- * robot thread a real-time priority using {@link Threads#setCurrentThreadPriority(boolean,int)}. An
- * RT priority of 15 is a reasonable choice.
+ * robot thread a real-time priority using {@link
+ * org.wpilib.system.Threads#setCurrentThreadPriority(boolean,int)}. An RT priority of 15 is a
+ * reasonable choice.
  *
  * <p>If you do enable RT though, <i>make sure your periodic functions do not block</i>. If they do,
  * the operating system will lock up, and you'll have to boot the roboRIO into safe mode and delete
