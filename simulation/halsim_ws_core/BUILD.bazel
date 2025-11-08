@@ -4,7 +4,7 @@ load("//shared/bazel/rules:packaging.bzl", "package_minimal_cc_project")
 wpilib_cc_library(
     name = "halsim_ws_core",
     srcs = glob(["src/main/native/cpp/*.cpp"]),
-    hdrs = glob(["src/main/native/include/*.h"]),
+    hdrs = glob(["src/main/native/include/**/*.hpp"]),
     include_license_files = True,
     strip_include_prefix = "src/main/native/include",
     target_compatible_with = select({

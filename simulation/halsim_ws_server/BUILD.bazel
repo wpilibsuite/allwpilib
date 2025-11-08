@@ -73,7 +73,7 @@ wpilib_cc_static_library(
 
 cc_library(
     name = "test_headers",
-    srcs = glob(["src/test/native/include/*.h"]),
+    srcs = glob(["src/test/native/include/*.hpp"]),
     includes = ["src/test/native/include"],
     strip_include_prefix = "src/test/native/include",
 )

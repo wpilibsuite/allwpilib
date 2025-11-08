@@ -7,7 +7,7 @@ wpilib_halsim_extension(
     name = "halsim_ws_client",
     srcs = glob([
         "src/main/native/cpp/*.cpp",
-        "src/main/native/include/*.h",
+        "src/main/native/include/**/*.hpp",
     ]),
     deps = [
         "//simulation/halsim_ws_core",
@@ -18,7 +18,7 @@ wpilib_halsim_extension(
     name = "halsim_ws_client_static",
     srcs = glob([
         "src/main/native/cpp/*.cpp",
-        "src/main/native/include/*.h",
+        "src/main/native/include/**/*.hpp",
     ]),
     copts = [
         "-DHALSIM_InitExtension=HALSIM_InitExtension_WS_CLIENT",

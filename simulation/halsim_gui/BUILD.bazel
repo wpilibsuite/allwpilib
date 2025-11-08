@@ -6,7 +6,7 @@ wpilib_cc_library(
     name = "halsim_gui",
     srcs = glob([
         "src/main/native/cpp/*",
-        "src/main/native/include/*.h",
+        "src/main/native/include/**/*.hpp",
     ]),
     include_license_files = True,
     includes = ["src/main/native/include"],
@@ -32,7 +32,7 @@ wpilib_cc_library(
     name = "halsim_gui_static",
     srcs = glob([
         "src/main/native/cpp/*",
-        "src/main/native/include/*.h",
+        "src/main/native/include/**/*.hpp",
     ]),
     copts = [
         "-DHALSIM_InitExtension=HALSIM_InitExtension_GUI",
