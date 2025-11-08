@@ -54,7 +54,8 @@ classes:
           ModuleDeltas&&... [const]:
             ignore: true
           wpi::util::array<SwerveModulePosition, NumModules> [const]:
-          const wpi::util::array<SwerveModulePosition, NumModules>&, const wpi::util::array<SwerveModulePosition, NumModules>& [const]:
+          ? const wpi::util::array<SwerveModulePosition, NumModules>&, const wpi::util::array<SwerveModulePosition, NumModules>& [const]
+          :
       DesaturateWheelSpeeds:
         overloads:
           wpi::util::array<SwerveModuleState, NumModules>*, wpi::units::meters_per_second_t:

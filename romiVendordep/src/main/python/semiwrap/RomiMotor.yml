@@ -1,4 +1,4 @@
 classes:
-  wpi::RomiMotor:
+  wpi::romi::RomiMotor:
     methods:
       RomiMotor:
