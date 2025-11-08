@@ -67,7 +67,7 @@ class MechanismObject2d {
     std::scoped_lock lock(m_mutex);
     auto& obj = m_objects[name];
     if (obj) {
-      throw FRC_MakeError(
+      throw WPILIB_MakeError(
           err::Error,
           "MechanismObject names must be unique! `{}` was inserted twice!",
           name);

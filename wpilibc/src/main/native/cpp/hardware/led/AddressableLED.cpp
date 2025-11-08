@@ -19,13 +19,13 @@ using namespace wpi;
 
 AddressableLED::AddressableLED(int channel) : m_channel{channel} {
   if (!SensorUtil::CheckDigitalChannel(channel)) {
-    throw FRC_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
+    throw WPILIB_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
   }
 
   int32_t status = 0;
   auto stack = wpi::util::GetStackTrace(1);
   m_handle = HAL_InitializeAddressableLED(channel, stack.c_str(), &status);
-  FRC_CheckErrorStatus(status, "Channel {}", channel);
+  WPILIB_CheckErrorStatus(status, "Channel {}", channel);
 
   HAL_ReportUsage("IO", channel, "AddressableLED");
 }
@@ -38,14 +38,14 @@ void AddressableLED::SetStart(int start) {
   m_start = start;
   int32_t status = 0;
   HAL_SetAddressableLEDStart(m_handle, start, &status);
-  FRC_CheckErrorStatus(status, "Channel {} start {}", m_channel, start);
+  WPILIB_CheckErrorStatus(status, "Channel {} start {}", m_channel, start);
 }
 
 void AddressableLED::SetLength(int length) {
   m_length = length;
   int32_t status = 0;
   HAL_SetAddressableLEDLength(m_handle, length, &status);
-  FRC_CheckErrorStatus(status, "Channel {} length {}", m_channel, length);
+  WPILIB_CheckErrorStatus(status, "Channel {} length {}", m_channel, length);
 }
 
 static_assert(sizeof(AddressableLED::LEDData) == sizeof(HAL_AddressableLEDData),
@@ -57,7 +57,7 @@ void AddressableLED::SetData(std::span<const LEDData> ledData) {
       m_start, std::min(static_cast<size_t>(m_length), ledData.size()),
       static_cast<HAL_AddressableLEDColorOrder>(m_colorOrder), ledData.data(),
       &status);
-  FRC_CheckErrorStatus(status, "Port {}", m_channel);
+  WPILIB_CheckErrorStatus(status, "Port {}", m_channel);
 }
 
 void AddressableLED::SetData(std::initializer_list<LEDData> ledData) {
@@ -71,7 +71,7 @@ void AddressableLED::SetGlobalData(int start, ColorOrder colorOrder,
       start, ledData.size(),
       static_cast<HAL_AddressableLEDColorOrder>(colorOrder), ledData.data(),
       &status);
-  FRC_CheckErrorStatus(status, "");
+  WPILIB_CheckErrorStatus(status, "");
 }
 
 void AddressableLED::LEDData::SetHSV(int h, int s, int v) {

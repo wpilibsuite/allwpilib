@@ -28,7 +28,7 @@ class Robot : public wpi::TimedRobot {
   wpi::AnalogEncoder m_encoderFR{0, 4.0, 2.0};
 };
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
   return wpi::StartRobot<Robot>();
 }

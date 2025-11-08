@@ -20,7 +20,7 @@ AnalogAccelerometer::AnalogAccelerometer(int channel)
 AnalogAccelerometer::AnalogAccelerometer(AnalogInput* channel)
     : m_analogInput(channel, wpi::util::NullDeleter<AnalogInput>()) {
   if (!channel) {
-    throw FRC_MakeError(err::NullParameter, "channel");
+    throw WPILIB_MakeError(err::NullParameter, "channel");
   }
   InitAccelerometer();
 }
@@ -28,7 +28,7 @@ AnalogAccelerometer::AnalogAccelerometer(AnalogInput* channel)
 AnalogAccelerometer::AnalogAccelerometer(std::shared_ptr<AnalogInput> channel)
     : m_analogInput(channel) {
   if (!channel) {
-    throw FRC_MakeError(err::NullParameter, "channel");
+    throw WPILIB_MakeError(err::NullParameter, "channel");
   }
   InitAccelerometer();
 }

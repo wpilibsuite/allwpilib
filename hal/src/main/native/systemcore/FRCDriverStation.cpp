@@ -40,7 +40,7 @@
 #include "wpi/util/timestamp.h"
 
 static_assert(sizeof(int32_t) >= sizeof(int),
-              "FRC_NetworkComm status variable is larger than 32 bits");
+              "WPILIB_NetworkComm status variable is larger than 32 bits");
 
 static_assert(MRC_MAX_NUM_AXES == HAL_kMaxJoystickAxes);
 static_assert(MRC_MAX_NUM_POVS == HAL_kMaxJoystickPOVs);

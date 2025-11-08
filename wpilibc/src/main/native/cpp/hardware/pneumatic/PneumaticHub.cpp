@@ -48,7 +48,7 @@ std::unique_ptr<wpi::util::DenseMap<int, std::weak_ptr<PneumaticHub::DataStore>>
 std::weak_ptr<PneumaticHub::DataStore>& PneumaticHub::GetDataStore(int busId,
                                                                    int module) {
   int32_t numBuses = HAL_GetNumCanBuses();
-  FRC_AssertMessage(busId >= 0 && busId < numBuses,
+  WPILIB_AssertMessage(busId >= 0 && busId < numBuses,
                     "Bus {} out of range. Must be [0-{}).", busId, numBuses);
   if (!m_handleMaps) {
     m_handleMaps = std::make_unique<
@@ -63,7 +63,7 @@ class PneumaticHub::DataStore {
     int32_t status = 0;
     HAL_REVPHHandle handle =
         HAL_InitializeREVPH(busId, module, stackTrace, &status);
-    FRC_CheckErrorStatus(status, "Module {}", module);
+    WPILIB_CheckErrorStatus(status, "Module {}", module);
     m_moduleObject = PneumaticHub{busId, handle, module};
     m_moduleObject.m_dataStore =
         std::shared_ptr<DataStore>{this, wpi::util::NullDeleter<DataStore>()};
@@ -72,7 +72,7 @@ class PneumaticHub::DataStore {
 
     // Check PH firmware version
     if (version.FirmwareMajor > 0 && version.FirmwareMajor < 22) {
-      throw FRC_MakeError(
+      throw WPILIB_MakeError(
           err::AssertionFailure,
           "The Pneumatic Hub has firmware version {}.{}.{}, and must be "
           "updated to version 2022.0.0 or later using the REV Hardware Client",
@@ -117,36 +117,36 @@ PneumaticHub::PneumaticHub(int /* busId */, HAL_REVPHHandle handle, int module)
 bool PneumaticHub::GetCompressor() const {
   int32_t status = 0;
   auto result = HAL_GetREVPHCompressor(m_handle, &status);
-  FRC_ReportError(status, "Module {}", m_module);
+  WPILIB_ReportError(status, "Module {}", m_module);
   return result;
 }
 
 void PneumaticHub::DisableCompressor() {
   int32_t status = 0;
   HAL_SetREVPHClosedLoopControlDisabled(m_handle, &status);
-  FRC_ReportError(status, "Module {}", m_module);
+  WPILIB_ReportError(status, "Module {}", m_module);
 }
 
 void PneumaticHub::EnableCompressorDigital() {
   int32_t status = 0;
   HAL_SetREVPHClosedLoopControlDigital(m_handle, &status);
-  FRC_ReportError(status, "Module {}", m_module);
+  WPILIB_ReportError(status, "Module {}", m_module);
 }
 
 void PneumaticHub::EnableCompressorAnalog(
     wpi::units::pounds_per_square_inch_t minPressure,
     wpi::units::pounds_per_square_inch_t maxPressure) {
   if (minPressure >= maxPressure) {
-    throw FRC_MakeError(err::InvalidParameter,
+    throw WPILIB_MakeError(err::InvalidParameter,
                         "maxPressure must be greater than minPressure");
   }
   if (minPressure < 0_psi || minPressure > 120_psi) {
-    throw FRC_MakeError(err::ParameterOutOfRange,
+    throw WPILIB_MakeError(err::ParameterOutOfRange,
                         "minPressure must be between 0 and 120 PSI, got {}",
                         minPressure);
   }
   if (maxPressure < 0_psi || maxPressure > 120_psi) {
-    throw FRC_MakeError(err::ParameterOutOfRange,
+    throw WPILIB_MakeError(err::ParameterOutOfRange,
                         "maxPressure must be between 0 and 120 PSI, got {}",
                         maxPressure);
   }
@@ -160,23 +160,23 @@ void PneumaticHub::EnableCompressorAnalog(
   int32_t status = 0;
   HAL_SetREVPHClosedLoopControlAnalog(m_handle, minAnalogVoltage.value(),
                                       maxAnalogVoltage.value(), &status);
-  FRC_ReportError(status, "Module {}", m_module);
+  WPILIB_ReportError(status, "Module {}", m_module);
 }
 
 void PneumaticHub::EnableCompressorHybrid(
     wpi::units::pounds_per_square_inch_t minPressure,
     wpi::units::pounds_per_square_inch_t maxPressure) {
   if (minPressure >= maxPressure) {
-    throw FRC_MakeError(err::InvalidParameter,
+    throw WPILIB_MakeError(err::InvalidParameter,
                         "maxPressure must be greater than minPressure");
   }
   if (minPressure < 0_psi || minPressure > 120_psi) {
-    throw FRC_MakeError(err::ParameterOutOfRange,
+    throw WPILIB_MakeError(err::ParameterOutOfRange,
                         "minPressure must be between 0 and 120 PSI, got {}",
                         minPressure);
   }
   if (maxPressure < 0_psi || maxPressure > 120_psi) {
-    throw FRC_MakeError(err::ParameterOutOfRange,
+    throw WPILIB_MakeError(err::ParameterOutOfRange,
                         "maxPressure must be between 0 and 120 PSI, got {}",
                         maxPressure);
   }
@@ -190,40 +190,40 @@ void PneumaticHub::EnableCompressorHybrid(
   int32_t status = 0;
   HAL_SetREVPHClosedLoopControlHybrid(m_handle, minAnalogVoltage.value(),
                                       maxAnalogVoltage.value(), &status);
-  FRC_ReportError(status, "Module {}", m_module);
+  WPILIB_ReportError(status, "Module {}", m_module);
 }
 
 CompressorConfigType PneumaticHub::GetCompressorConfigType() const {
   int32_t status = 0;
   auto result = HAL_GetREVPHCompressorConfig(m_handle, &status);
-  FRC_ReportError(status, "Module {}", m_module);
+  WPILIB_ReportError(status, "Module {}", m_module);
   return static_cast<CompressorConfigType>(result);
 }
 
 bool PneumaticHub::GetPressureSwitch() const {
   int32_t status = 0;
   auto result = HAL_GetREVPHPressureSwitch(m_handle, &status);
-  FRC_ReportError(status, "Module {}", m_module);
+  WPILIB_ReportError(status, "Module {}", m_module);
   return result;
 }
 
 wpi::units::ampere_t PneumaticHub::GetCompressorCurrent() const {
   int32_t status = 0;
   auto result = HAL_GetREVPHCompressorCurrent(m_handle, &status);
-  FRC_ReportError(status, "Module {}", m_module);
+  WPILIB_ReportError(status, "Module {}", m_module);
   return wpi::units::ampere_t{result};
 }
 
 void PneumaticHub::SetSolenoids(int mask, int values) {
   int32_t status = 0;
   HAL_SetREVPHSolenoids(m_handle, mask, values, &status);
-  FRC_ReportError(status, "Module {}", m_module);
+  WPILIB_ReportError(status, "Module {}", m_module);
 }
 
 int PneumaticHub::GetSolenoids() const {
   int32_t status = 0;
   auto result = HAL_GetREVPHSolenoids(m_handle, &status);
-  FRC_ReportError(status, "Module {}", m_module);
+  WPILIB_ReportError(status, "Module {}", m_module);
   return result;
 }
 
@@ -234,7 +234,7 @@ int PneumaticHub::GetModuleNumber() const {
 int PneumaticHub::GetSolenoidDisabledList() const {
   int32_t status = 0;
   auto result = HAL_GetREVPHSolenoidDisabledList(m_handle, &status);
-  FRC_ReportError(status, "Module {}", m_module);
+  WPILIB_ReportError(status, "Module {}", m_module);
   return result;
 }
 
@@ -242,7 +242,7 @@ void PneumaticHub::FireOneShot(int index) {
   int32_t status = 0;
   HAL_FireREVPHOneShot(m_handle, index,
                        m_dataStore->m_oneShotDurMs[index].value(), &status);
-  FRC_ReportError(status, "Module {}", m_module);
+  WPILIB_ReportError(status, "Module {}", m_module);
 }
 
 void PneumaticHub::SetOneShotDuration(int index, wpi::units::second_t duration) {
@@ -287,7 +287,7 @@ PneumaticHub::Version PneumaticHub::GetVersion() const {
   HAL_REVPHVersion halVersions;
   std::memset(&halVersions, 0, sizeof(halVersions));
   HAL_GetREVPHVersion(m_handle, &halVersions, &status);
-  FRC_ReportError(status, "Module {}", m_module);
+  WPILIB_ReportError(status, "Module {}", m_module);
   PneumaticHub::Version versions;
   static_assert(sizeof(halVersions) == sizeof(versions));
   static_assert(std::is_standard_layout_v<decltype(versions)>);
@@ -301,7 +301,7 @@ PneumaticHub::Faults PneumaticHub::GetFaults() const {
   HAL_REVPHFaults halFaults;
   std::memset(&halFaults, 0, sizeof(halFaults));
   HAL_GetREVPHFaults(m_handle, &halFaults, &status);
-  FRC_ReportError(status, "Module {}", m_module);
+  WPILIB_ReportError(status, "Module {}", m_module);
   PneumaticHub::Faults faults;
   static_assert(sizeof(halFaults) == sizeof(faults));
   static_assert(std::is_standard_layout_v<decltype(faults)>);
@@ -315,7 +315,7 @@ PneumaticHub::StickyFaults PneumaticHub::GetStickyFaults() const {
   HAL_REVPHStickyFaults halStickyFaults;
   std::memset(&halStickyFaults, 0, sizeof(halStickyFaults));
   HAL_GetREVPHStickyFaults(m_handle, &halStickyFaults, &status);
-  FRC_ReportError(status, "Module {}", m_module);
+  WPILIB_ReportError(status, "Module {}", m_module);
   PneumaticHub::StickyFaults stickyFaults;
   static_assert(sizeof(halStickyFaults) == sizeof(stickyFaults));
   static_assert(std::is_standard_layout_v<decltype(stickyFaults)>);
@@ -359,7 +359,7 @@ bool PneumaticHub::Faults::GetChannelFault(int channel) const {
     case 15:
       return Channel15Fault != 0;
     default:
-      throw FRC_MakeError(err::ChannelIndexOutOfRange,
+      throw WPILIB_MakeError(err::ChannelIndexOutOfRange,
                           "Pneumatics fault channel out of bounds!");
   }
 }
@@ -367,50 +367,50 @@ bool PneumaticHub::Faults::GetChannelFault(int channel) const {
 void PneumaticHub::ClearStickyFaults() {
   int32_t status = 0;
   HAL_ClearREVPHStickyFaults(m_handle, &status);
-  FRC_ReportError(status, "Module {}", m_module);
+  WPILIB_ReportError(status, "Module {}", m_module);
 }
 
 wpi::units::volt_t PneumaticHub::GetInputVoltage() const {
   int32_t status = 0;
   auto voltage = HAL_GetREVPHVoltage(m_handle, &status);
-  FRC_ReportError(status, "Module {}", m_module);
+  WPILIB_ReportError(status, "Module {}", m_module);
   return wpi::units::volt_t{voltage};
 }
 
 wpi::units::volt_t PneumaticHub::Get5VRegulatedVoltage() const {
   int32_t status = 0;
   auto voltage = HAL_GetREVPH5VVoltage(m_handle, &status);
-  FRC_ReportError(status, "Module {}", m_module);
+  WPILIB_ReportError(status, "Module {}", m_module);
   return wpi::units::volt_t{voltage};
 }
 
 wpi::units::ampere_t PneumaticHub::GetSolenoidsTotalCurrent() const {
   int32_t status = 0;
   auto current = HAL_GetREVPHSolenoidCurrent(m_handle, &status);
-  FRC_ReportError(status, "Module {}", m_module);
+  WPILIB_ReportError(status, "Module {}", m_module);
   return wpi::units::ampere_t{current};
 }
 
 wpi::units::volt_t PneumaticHub::GetSolenoidsVoltage() const {
   int32_t status = 0;
   auto voltage = HAL_GetREVPHSolenoidVoltage(m_handle, &status);
-  FRC_ReportError(status, "Module {}", m_module);
+  WPILIB_ReportError(status, "Module {}", m_module);
   return wpi::units::volt_t{voltage};
 }
 
 wpi::units::volt_t PneumaticHub::GetAnalogVoltage(int channel) const {
   int32_t status = 0;
   auto voltage = HAL_GetREVPHAnalogVoltage(m_handle, channel, &status);
-  FRC_ReportError(status, "Module {}", m_module);
+  WPILIB_ReportError(status, "Module {}", m_module);
   return wpi::units::volt_t{voltage};
 }
 
 wpi::units::pounds_per_square_inch_t PneumaticHub::GetPressure(int channel) const {
   int32_t status = 0;
   auto sensorVoltage = HAL_GetREVPHAnalogVoltage(m_handle, channel, &status);
-  FRC_ReportError(status, "Module {}", m_module);
+  WPILIB_ReportError(status, "Module {}", m_module);
   auto supplyVoltage = HAL_GetREVPH5VVoltage(m_handle, &status);
-  FRC_ReportError(status, "Module {}", m_module);
+  WPILIB_ReportError(status, "Module {}", m_module);
   return VoltsToPSI(wpi::units::volt_t{sensorVoltage}, wpi::units::volt_t{supplyVoltage});
 }
 

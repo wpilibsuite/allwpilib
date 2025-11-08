@@ -11,11 +11,11 @@ using namespace wpi;
 
 ExpansionHubServo::ExpansionHubServo(int usbId, int channel)
     : m_hub{usbId}, m_channel{channel} {
-  FRC_AssertMessage(channel >= 0 && channel < ExpansionHub::NumServoPorts,
+  WPILIB_AssertMessage(channel >= 0 && channel < ExpansionHub::NumServoPorts,
                     "ExHub Servo Channel {} out of range", channel);
 
   if (!m_hub.CheckAndReserveServo(channel)) {
-    throw FRC_MakeError(err::ResourceAlreadyAllocated, "Channel {}", channel);
+    throw WPILIB_MakeError(err::ResourceAlreadyAllocated, "Channel {}", channel);
   }
 
   m_hub.ReportUsage(fmt::format("ExHubServo[{}]", channel), "ExHubServo");
@@ -97,7 +97,7 @@ wpi::units::degree_t ExpansionHubServo::GetServoAngleRange() {
 void ExpansionHubServo::SetPWMRange(wpi::units::microsecond_t minPwm,
                                     wpi::units::microsecond_t maxPwm) {
   if (maxPwm <= minPwm) {
-    throw FRC_MakeError(err::ParameterOutOfRange,
+    throw WPILIB_MakeError(err::ParameterOutOfRange,
                         "Max PWM must be greater than Min PWM");
   }
   m_minPwm = minPwm;
@@ -109,7 +109,7 @@ void ExpansionHubServo::SetReversed(bool reversed) {}
 void ExpansionHubServo::SetAngleRange(wpi::units::degree_t minAngle,
                                       wpi::units::degree_t maxAngle) {
   if (maxAngle <= minAngle) {
-    throw FRC_MakeError(err::ParameterOutOfRange,
+    throw WPILIB_MakeError(err::ParameterOutOfRange,
                         "Max angle must be greater than Min angle");
   }
   m_minServoAngle = minAngle;

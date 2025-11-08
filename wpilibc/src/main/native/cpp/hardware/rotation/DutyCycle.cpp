@@ -20,7 +20,7 @@ using namespace wpi;
 
 DutyCycle::DutyCycle(int channel) : m_channel{channel} {
   if (!SensorUtil::CheckDigitalChannel(channel)) {
-    throw FRC_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
+    throw WPILIB_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
   }
   InitDutyCycle();
 }
@@ -29,7 +29,7 @@ void DutyCycle::InitDutyCycle() {
   int32_t status = 0;
   std::string stackTrace = wpi::util::GetStackTrace(1);
   m_handle = HAL_InitializeDutyCycle(m_channel, stackTrace.c_str(), &status);
-  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
+  WPILIB_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
   HAL_ReportUsage("IO", m_channel, "DutyCycle");
   wpi::util::SendableRegistry::Add(this, "Duty Cycle", m_channel);
 }
@@ -37,21 +37,21 @@ void DutyCycle::InitDutyCycle() {
 wpi::units::hertz_t DutyCycle::GetFrequency() const {
   int32_t status = 0;
   auto retVal = HAL_GetDutyCycleFrequency(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
+  WPILIB_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
   return wpi::units::hertz_t{retVal};
 }
 
 double DutyCycle::GetOutput() const {
   int32_t status = 0;
   auto retVal = HAL_GetDutyCycleOutput(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
+  WPILIB_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
   return retVal;
 }
 
 wpi::units::second_t DutyCycle::GetHighTime() const {
   int32_t status = 0;
   auto retVal = HAL_GetDutyCycleHighTime(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
+  WPILIB_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
   return wpi::units::nanosecond_t{static_cast<double>(retVal)};
 }
 

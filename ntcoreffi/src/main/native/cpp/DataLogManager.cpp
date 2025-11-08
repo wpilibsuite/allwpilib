@@ -43,7 +43,7 @@ void ReportErrorV(int32_t status, const char* fileName, int lineNumber,
   //   fmt::format_to(fmt::appender{out}, "Warning: ");
   //   fmt::vformat_to(fmt::appender{out}, format, args);
   //   out.push_back('\0');
-  //   FRC_NetworkCommunication_sendError(status < 0, status, 0, out.data(),
+  //   WPILIB_NetworkCommunication_sendError(status < 0, status, 0, out.data(),
   //                                      "DataLogManager", "");
   // #endif
 }
@@ -57,7 +57,7 @@ inline void ReportError(int32_t status, const char* fileName, int lineNumber,
 }
 }  // namespace frc
 
-#define FRC_ReportError(status, format, ...)                       \
+#define WPILIB_ReportError(status, format, ...)                       \
   do {                                                             \
     if ((status) != 0) {                                           \
       ::frc::ReportError(status, __FILE__, __LINE__, __FUNCTION__, \
@@ -71,7 +71,7 @@ inline bool IsSystemTimeValid() {
   // TODO when we get a proper low level library, and time setting
   return false;
   // uint8_t timeWasSet = 0;
-  // FRC_NetworkCommunication_getTimeWasSet(&timeWasSet);
+  // WPILIB_NetworkCommunication_getTimeWasSet(&timeWasSet);
   // return timeWasSet != 0;
 #else
   return true;
@@ -109,7 +109,7 @@ enum MatchType { kNone, kPractice, kQualification, kElimination };
 inline void UpdateMatchInfo() {
   // #ifdef __FRC_SYSTEMCORE__
   //   gGameSpecificMessageSize = sizeof(gGameSpecificMessage);
-  //   FRC_NetworkCommunication_getMatchInfo(gEventName, &gMatchType,
+  //   WPILIB_NetworkCommunication_getMatchInfo(gEventName, &gMatchType,
   //   &gMatchNumber,
   //                                         &gReplayNumber,
   //                                         gGameSpecificMessage,
@@ -144,7 +144,7 @@ inline uint16_t GetMatchNumber() {
 inline bool IsDSAttached() {
   // #ifdef __FRC_SYSTEMCORE__
   //   struct ControlWord_t cw;
-  //   FRC_NetworkCommunication_getControlWord(&cw);
+  //   WPILIB_NetworkCommunication_getControlWord(&cw);
   //   return cw.dsAttached;
   // #else
   return true;
@@ -154,7 +154,7 @@ inline bool IsDSAttached() {
 inline bool IsFMSAttached() {
   // #ifdef __FRC_SYSTEMCORE__
   //   struct ControlWord_t cw;
-  //   FRC_NetworkCommunication_getControlWord(&cw);
+  //   WPILIB_NetworkCommunication_getControlWord(&cw);
   //   return cw.fmsAttached;
   // #else
   return false;
@@ -250,7 +250,7 @@ static std::string MakeLogFilename(std::string_view filenameOverride) {
   static std::mt19937 rng(dev());
   std::uniform_int_distribution<int> dist(0, 15);
   const char* v = "0123456789abcdef";
-  std::string filename = "FRC_TBD_";
+  std::string filename = "WPILIB_TBD_";
   for (int i = 0; i < 16; i++) {
     filename += v[dist(rng)];
   }
@@ -271,7 +271,7 @@ Thread::~Thread() {
 }
 
 void Thread::Main() {
-  // based on free disk space, scan for "old" FRC_*.wpilog files and remove
+  // based on free disk space, scan for "old" WPILIB_*.wpilog files and remove
   {
     std::error_code ec;
     uintmax_t freeSpace;
@@ -282,14 +282,14 @@ void Thread::Main() {
       freeSpace = UINTMAX_MAX;
     }
     if (freeSpace < kFreeSpaceThreshold) {
-      // Delete oldest FRC_*.wpilog files (ignore FRC_TBD_*.wpilog as we just
+      // Delete oldest WPILIB_*.wpilog files (ignore WPILIB_TBD_*.wpilog as we just
       // created one)
       std::vector<fs::directory_entry> entries;
       for (auto&& entry : fs::directory_iterator{m_logDir, ec}) {
         auto stem = entry.path().stem().string();
-        if (wpi::util::starts_with(stem, "FRC_") &&
+        if (wpi::util::starts_with(stem, "WPILIB_") &&
             entry.path().extension() == ".wpilog" &&
-            !wpi::util::starts_with(stem, "FRC_TBD_")) {
+            !wpi::util::starts_with(stem, "WPILIB_TBD_")) {
           entries.emplace_back(entry);
         }
       }
@@ -306,7 +306,7 @@ void Thread::Main() {
         }
         auto size = entry.file_size();
         if (fs::remove(entry.path(), ec)) {
-          FRC_ReportError(warn::Warning, "DataLogManager: Deleted {}",
+          WPILIB_ReportError(warn::Warning, "DataLogManager: Deleted {}",
                           entry.path().string());
           freeSpace += size;
           if (freeSpace >= kFreeSpaceThreshold) {
@@ -318,7 +318,7 @@ void Thread::Main() {
         }
       }
     } else if (freeSpace < 2 * kFreeSpaceThreshold) {
-      FRC_ReportError(
+      WPILIB_ReportError(
           warn::Warning,
           "DataLogManager: Log storage device has {} MB of free space "
           "remaining! Logs will get deleted below {} MB of free space. "
@@ -376,7 +376,7 @@ void Thread::Main() {
         if (RobotController::IsSystemTimeValid()) {
           std::time_t now = std::time(nullptr);
           auto tm = std::gmtime(&now);
-          m_log.SetFilename(fmt::format("FRC_{:%Y%m%d_%H%M%S}.wpilog", *tm));
+          m_log.SetFilename(fmt::format("WPILIB_{:%Y%m%d_%H%M%S}.wpilog", *tm));
           dsRenamed = true;
         } else {
           dsAttachCount = 0;  // wait a bit and try again
@@ -415,7 +415,7 @@ void Thread::Main() {
           }
           std::time_t now = std::time(nullptr);
           m_log.SetFilename(
-              fmt::format("FRC_{:%Y%m%d_%H%M%S}_{}_{}{}.wpilog",
+              fmt::format("WPILIB_{:%Y%m%d_%H%M%S}_{}_{}{}.wpilog",
                           *std::gmtime(&now), DriverStation::GetEventName(),
                           matchTypeChar, DriverStation::GetMatchNumber()));
           fmsRenamed = true;
@@ -456,7 +456,7 @@ void Thread::StopNTLog() {
 void Thread::StartConsoleLog() {
   if (!m_consoleLoggerEnabled) {
     m_consoleLoggerEnabled = true;
-    m_consoleLogger = {"/home/systemcore/FRC_UserProgram.log", m_log, "output"};
+    m_consoleLogger = {"/home/systemcore/WPILIB_UserProgram.log", m_log, "output"};
   }
 }
 
@@ -469,13 +469,13 @@ void Thread::StopConsoleLog() {
 
 Instance::Instance(std::string_view dir, std::string_view filename,
                    double period) {
-  // Delete all previously existing FRC_TBD_*.wpilog files. These only exist
+  // Delete all previously existing WPILIB_TBD_*.wpilog files. These only exist
   // when the robot never connects to the DS, so they are very unlikely to
   // have useful data and just clutter the filesystem.
   auto logDir = MakeLogDir(dir);
   std::error_code ec;
   for (auto&& entry : fs::directory_iterator{logDir, ec}) {
-    if (wpi::util::starts_with(entry.path().stem().string(), "FRC_TBD_") &&
+    if (wpi::util::starts_with(entry.path().stem().string(), "WPILIB_TBD_") &&
         entry.path().extension() == ".wpilog") {
       if (!fs::remove(entry, ec)) {
         wpi::util::print(stderr, "DataLogManager: could not delete {}\n",

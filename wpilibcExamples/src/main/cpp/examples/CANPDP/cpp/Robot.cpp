@@ -54,7 +54,7 @@ class Robot : public wpi::TimedRobot {
   wpi::PowerDistribution m_pdp{0};
 };
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
   return wpi::StartRobot<Robot>();
 }

@@ -38,7 +38,7 @@ void RunRobot(wpi::util::mutex& m, Robot** robot) {
     theRobot.StartCompetition();
   } catch (const wpi::RuntimeError& e) {
     e.Report();
-    FRC_ReportError(
+    WPILIB_ReportError(
         err::Error,
         "The robot program quit unexpectedly."
         " This is usually due to a code error.\n"

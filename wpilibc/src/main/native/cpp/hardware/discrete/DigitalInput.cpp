@@ -20,14 +20,14 @@ using namespace wpi;
 
 DigitalInput::DigitalInput(int channel) {
   if (!SensorUtil::CheckDigitalChannel(channel)) {
-    throw FRC_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
+    throw WPILIB_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
   }
   m_channel = channel;
 
   int32_t status = 0;
   std::string stackTrace = wpi::util::GetStackTrace(1);
   m_handle = HAL_InitializeDIOPort(channel, true, stackTrace.c_str(), &status);
-  FRC_CheckErrorStatus(status, "Channel {}", channel);
+  WPILIB_CheckErrorStatus(status, "Channel {}", channel);
 
   HAL_ReportUsage("IO", channel, "DigitalInput");
   wpi::util::SendableRegistry::Add(this, "DigitalInput", channel);
@@ -36,7 +36,7 @@ DigitalInput::DigitalInput(int channel) {
 bool DigitalInput::Get() const {
   int32_t status = 0;
   bool value = HAL_GetDIO(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
+  WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
   return value;
 }
 

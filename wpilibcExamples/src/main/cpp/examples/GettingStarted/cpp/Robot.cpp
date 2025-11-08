@@ -59,7 +59,7 @@ class Robot : public wpi::TimedRobot {
   wpi::Timer m_timer;
 };
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
   return wpi::StartRobot<Robot>();
 }

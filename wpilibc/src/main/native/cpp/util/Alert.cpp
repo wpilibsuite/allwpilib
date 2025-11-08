@@ -70,7 +70,7 @@ class Alert::SendableAlerts : public wpi::nt::NTSendable,
       case AlertType::kError:
         return m_alerts[static_cast<int32_t>(type)];
       default:
-        throw FRC_MakeError(wpi::err::InvalidParameter,
+        throw WPILIB_MakeError(wpi::err::InvalidParameter,
                             "Invalid Alert Type: {}", type);
     }
   }
