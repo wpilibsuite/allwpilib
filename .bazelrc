@@ -43,7 +43,7 @@ build:build_buddy_bes --bes_backend=grpcs://remote.buildbuddy.io
 # Common Cache Settings
 build:common_cache --remote_timeout=3600
 build:common_cache --remote_cache_compression
-build:common_cache --remote_cache_compression_threshold=100
+build:common_cache --experimental_remote_cache_compression_threshold=100
 
 # Build Buddy Cache Setup
 build:build_buddy --config=common_cache
