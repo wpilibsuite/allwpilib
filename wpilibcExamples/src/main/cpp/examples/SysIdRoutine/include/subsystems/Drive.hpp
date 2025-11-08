@@ -6,14 +6,14 @@
 
 #include <functional>
 
-#include <frc/Encoder.h>
-#include <frc/RobotController.h>
-#include <frc/drive/DifferentialDrive.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc2/command/SubsystemBase.h>
-#include <frc2/command/sysid/SysIdRoutine.h>
+#include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/system/RobotController.hpp"
+#include "wpi/drive/DifferentialDrive.hpp"
+#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/commands2/SubsystemBase.hpp"
+#include "wpi/commands2/sysid/SysIdRoutine.hpp"
 
-#include "Constants.h"
+#include "Constants.hpp"
 
 class Drive : public frc2::SubsystemBase {
  public:

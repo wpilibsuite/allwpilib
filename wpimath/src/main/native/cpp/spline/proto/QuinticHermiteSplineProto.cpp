@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/spline/proto/QuinticHermiteSplineProto.h"
+#include "wpi/math/spline/proto/QuinticHermiteSplineProto.hpp"
 
-#include <wpi/protobuf/ProtobufCallbacks.h>
+#include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 
 #include "wpimath/protobuf/spline.npb.h"
 

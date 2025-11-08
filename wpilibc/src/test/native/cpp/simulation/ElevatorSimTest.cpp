@@ -3,18 +3,18 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <units/math.h>
-#include <units/time.h>
+#include "wpi/units/math.hpp"
+#include "wpi/units/time.hpp"
 
-#include "frc/Encoder.h"
-#include "frc/RobotController.h"
-#include "frc/controller/PIDController.h"
-#include "frc/motorcontrol/PWMVictorSPX.h"
-#include "frc/simulation/ElevatorSim.h"
-#include "frc/simulation/EncoderSim.h"
-#include "frc/system/NumericalIntegration.h"
-#include "frc/system/plant/DCMotor.h"
-#include "frc/system/plant/LinearSystemId.h"
+#include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/system/RobotController.hpp"
+#include "wpi/math/controller/PIDController.hpp"
+#include "wpi/hardware/motor/PWMVictorSPX.hpp"
+#include "wpi/simulation/ElevatorSim.hpp"
+#include "wpi/simulation/EncoderSim.hpp"
+#include "wpi/math/system/NumericalIntegration.hpp"
+#include "wpi/math/system/plant/DCMotor.hpp"
+#include "wpi/math/system/plant/LinearSystemId.hpp"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(units::math::abs(val1 - val2), eps)

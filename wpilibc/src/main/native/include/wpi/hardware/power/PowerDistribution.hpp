@@ -6,10 +6,10 @@
 
 #include <vector>
 
-#include <hal/PowerDistribution.h>
-#include <hal/Types.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include "wpi/hal/PowerDistribution.h"
+#include "wpi/hal/Types.h"
+#include "wpi/util/sendable/Sendable.hpp"
+#include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace frc {
 

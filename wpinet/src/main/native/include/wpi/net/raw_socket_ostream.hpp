@@ -5,7 +5,7 @@
 #ifndef WPINET_RAW_SOCKET_OSTREAM_H_
 #define WPINET_RAW_SOCKET_OSTREAM_H_
 
-#include <wpi/raw_ostream.h>
+#include "wpi/util/raw_ostream.hpp"
 
 namespace wpi {
 

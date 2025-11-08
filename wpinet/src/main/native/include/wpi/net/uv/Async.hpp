@@ -13,11 +13,11 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/Signal.h>
-#include <wpi/mutex.h>
+#include "wpi/util/Signal.h"
+#include "wpi/util/mutex.hpp"
 
-#include "wpinet/uv/Handle.h"
-#include "wpinet/uv/Loop.h"
+#include "wpi/net/uv/Handle.hpp"
+#include "wpi/net/uv/Loop.hpp"
 
 namespace wpi::uv {
 

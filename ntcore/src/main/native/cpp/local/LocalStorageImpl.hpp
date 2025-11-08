@@ -8,22 +8,22 @@
 #include <memory>
 #include <string_view>
 
-#include <wpi/DenseMap.h>
-#include <wpi/StringExtras.h>
-#include <wpi/StringMap.h>
-#include <wpi/Synchronization.h>
-#include <wpi/json.h>
+#include "wpi/util/DenseMap.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/StringMap.hpp"
+#include "wpi/util/Synchronization.h"
+#include "wpi/util/json.hpp"
 
-#include "HandleMap.h"
-#include "local/LocalDataLogger.h"
-#include "local/LocalEntry.h"
-#include "local/LocalListener.h"
-#include "local/LocalMultiSubscriber.h"
-#include "local/LocalPublisher.h"
-#include "local/LocalSubscriber.h"
-#include "local/LocalTopic.h"
-#include "ntcore_c.h"
-#include "ntcore_cpp.h"
+#include "HandleMap.hpp"
+#include "local/LocalDataLogger.hpp"
+#include "local/LocalEntry.hpp"
+#include "local/LocalListener.hpp"
+#include "local/LocalMultiSubscriber.hpp"
+#include "local/LocalPublisher.hpp"
+#include "local/LocalSubscriber.hpp"
+#include "local/LocalTopic.hpp"
+#include "wpi/nt/ntcore_c.h"
+#include "wpi/nt/ntcore_cpp.hpp"
 
 namespace wpi {
 class Logger;

@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/handles/HandlesInternal.h"
+#include "wpi/hal/handles/HandlesInternal.h"
 
 #include <algorithm>
 
-#include <wpi/SmallVector.h>
-#include <wpi/mutex.h>
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/mutex.hpp"
 
 namespace hal {
 static wpi::SmallVector<HandleBase*, 32>* globalHandles = nullptr;

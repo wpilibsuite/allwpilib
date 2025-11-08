@@ -8,7 +8,7 @@
 
 #include <string>
 
-#include "frc/DriverStation.h"
+#include "wpi/driverstation/DriverStation.hpp"
 
 namespace frc {
 

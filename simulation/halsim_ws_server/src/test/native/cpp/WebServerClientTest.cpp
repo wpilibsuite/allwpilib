@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "WebServerClientTest.h"
+#include "WebServerClientTest.hpp"
 
 #include <cstdio>
 #include <memory>
 #include <string>
 
 #include <fmt/format.h>
-#include <wpi/SmallString.h>
-#include <wpi/print.h>
-#include <wpinet/raw_uv_ostream.h>
-#include <wpinet/uv/util.h>
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/print.hpp"
+#include "wpi/net/raw_uv_ostream.hpp"
+#include "wpi/net/uv/util.hpp"
 
 static constexpr int kTcpConnectAttemptTimeout = 1000;
 

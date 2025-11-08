@@ -1,6 +1,6 @@
 #pragma once
 
-#include <units/magnetic_flux.h>
+#include "wpi/units/magnetic_flux.hpp"
 
 namespace pybind11 {
 namespace detail {

@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/estimator/MecanumDrivePoseEstimator3d.h"
+#include "wpi/math/estimator/MecanumDrivePoseEstimator3d.hpp"
 
-#include <wpi/timestamp.h>
+#include "wpi/util/timestamp.h"
 
-#include "frc/StateSpaceUtil.h"
-#include "frc/estimator/AngleStatistics.h"
-#include "wpimath/MathShared.h"
+#include "wpi/math/util/StateSpaceUtil.hpp"
+#include "wpi/math/estimator/AngleStatistics.hpp"
+#include "wpi/math/util/MathShared.hpp"
 
 using namespace frc;
 

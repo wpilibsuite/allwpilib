@@ -3,9 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <wpi/SmallVector.h>
+#include "wpi/util/SmallVector.hpp"
 
-#include "frc/geometry/Twist3d.h"
+#include "wpi/math/geometry/Twist3d.hpp"
 
 using namespace frc;
 

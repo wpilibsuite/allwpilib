@@ -2,8 +2,8 @@
 #include <pybind11/functional.h>
 #include <pybind11/stl.h>
 #include <semiwrap.h>
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/util/sendable/SendableRegistry.hpp"
 
 class MySendableBuilder : public wpi::SendableBuilder {
 public:

@@ -8,8 +8,8 @@
 
 #include "HALUtil.h"
 #include "org_wpilib_hardware_hal_EncoderJNI.h"
-#include "hal/Encoder.h"
-#include "hal/Errors.h"
+#include "wpi/hal/Encoder.h"
+#include "wpi/hal/Errors.h"
 
 using namespace hal;
 

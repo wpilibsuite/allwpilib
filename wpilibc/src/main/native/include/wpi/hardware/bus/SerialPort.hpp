@@ -7,9 +7,9 @@
 #include <string>
 #include <string_view>
 
-#include <hal/SerialPort.h>
-#include <hal/Types.h>
-#include <units/time.h>
+#include "wpi/hal/SerialPort.h"
+#include "wpi/hal/Types.h"
+#include "wpi/units/time.hpp"
 
 namespace frc {
 

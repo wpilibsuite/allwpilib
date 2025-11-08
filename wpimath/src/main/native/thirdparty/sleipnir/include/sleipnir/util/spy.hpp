@@ -12,7 +12,7 @@
 #include <string_view>
 
 #include <Eigen/SparseCore>
-#include <wpi/bit.h>
+#include "wpi/util/bit.hpp"
 
 #include "sleipnir/util/symbol_exports.hpp"
 

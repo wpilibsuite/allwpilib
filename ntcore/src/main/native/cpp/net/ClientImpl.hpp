@@ -12,14 +12,14 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/DenseMap.h>
+#include "wpi/util/DenseMap.hpp"
 
-#include "MessageHandler.h"
-#include "NetworkOutgoingQueue.h"
-#include "NetworkPing.h"
-#include "PubSubOptions.h"
-#include "WireConnection.h"
-#include "WireDecoder.h"
+#include "MessageHandler.hpp"
+#include "NetworkOutgoingQueue.hpp"
+#include "NetworkPing.hpp"
+#include "PubSubOptions.hpp"
+#include "WireConnection.hpp"
+#include "WireDecoder.hpp"
 
 namespace wpi {
 class Logger;

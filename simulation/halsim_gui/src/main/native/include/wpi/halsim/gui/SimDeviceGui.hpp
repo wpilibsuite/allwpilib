@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <hal/SimDevice.h>
+#include "wpi/hal/SimDevice.h"
 
 namespace glass {
 class DataSource;

@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "SinkImpl.h"
+#include "SinkImpl.hpp"
 
 #include <string>
 
-#include <wpi/SmallString.h>
-#include <wpi/json.h>
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/json.hpp"
 
-#include "Instance.h"
-#include "Notifier.h"
-#include "SourceImpl.h"
-#include "c_util.h"
+#include "Instance.hpp"
+#include "Notifier.hpp"
+#include "SourceImpl.hpp"
+#include "c_util.hpp"
 
 using namespace cs;
 

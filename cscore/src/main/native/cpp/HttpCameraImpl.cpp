@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "HttpCameraImpl.h"
+#include "HttpCameraImpl.hpp"
 
 #include <memory>
 #include <string>
@@ -10,17 +10,17 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/MemAlloc.h>
-#include <wpi/StringExtras.h>
-#include <wpi/timestamp.h>
-#include <wpinet/TCPConnector.h>
+#include "wpi/util/MemAlloc.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/timestamp.h"
+#include "wpi/net/TCPConnector.h"
 
-#include "Instance.h"
-#include "JpegUtil.h"
-#include "Log.h"
-#include "Notifier.h"
-#include "Telemetry.h"
-#include "c_util.h"
+#include "Instance.hpp"
+#include "JpegUtil.hpp"
+#include "Log.hpp"
+#include "Notifier.hpp"
+#include "Telemetry.hpp"
+#include "c_util.hpp"
 
 using namespace cs;
 

@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <wpi/SymbolExports.h>
+#include "wpi/util/SymbolExports.hpp"
 
-#include "frc/geometry/Pose2d.h"
-#include "frc/geometry/Rotation2d.h"
-#include "units/angular_velocity.h"
-#include "units/velocity.h"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/velocity.hpp"
 
 namespace frc {
 /**
@@ -197,5 +197,5 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
 };
 }  // namespace frc
 
-#include "frc/kinematics/proto/ChassisSpeedsProto.h"
-#include "frc/kinematics/struct/ChassisSpeedsStruct.h"
+#include "wpi/math/kinematics/proto/ChassisSpeedsProto.hpp"
+#include "wpi/math/kinematics/struct/ChassisSpeedsStruct.hpp"

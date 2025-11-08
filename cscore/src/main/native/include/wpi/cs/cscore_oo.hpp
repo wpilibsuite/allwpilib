@@ -13,9 +13,9 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/deprecated.h>
+#include "wpi/util/deprecated.hpp"
 
-#include "cscore_cpp.h"
+#include "wpi/cs/cscore_cpp.hpp"
 
 namespace cs {
 

@@ -10,9 +10,9 @@
 #include <shared_mutex>
 #include <string_view>
 
-#include <wpi/StringMap.h>
+#include "wpi/util/StringMap.hpp"
 
-#include "WSBaseProvider.h"
+#include "wpi/halsim/ws_core/WSBaseProvider.hpp"
 
 namespace wpilibws {
 

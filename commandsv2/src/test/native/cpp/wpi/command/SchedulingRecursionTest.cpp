@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc2/command/Commands.h>
+#include "wpi/commands2/Commands.hpp"
 
 #include <utility>
 
 #include <gtest/gtest.h>
 
-#include "CommandTestBase.h"
-#include "frc2/command/Command.h"
-#include "frc2/command/CommandHelper.h"
-#include "frc2/command/FunctionalCommand.h"
-#include "frc2/command/RunCommand.h"
+#include "CommandTestBase.hpp"
+#include "wpi/commands2/Command.hpp"
+#include "wpi/commands2/CommandHelper.hpp"
+#include "wpi/commands2/FunctionalCommand.hpp"
+#include "wpi/commands2/RunCommand.hpp"
 
 using namespace frc2;
 

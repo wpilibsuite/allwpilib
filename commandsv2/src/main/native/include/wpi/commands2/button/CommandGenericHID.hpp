@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include <frc/DriverStation.h>
-#include <frc/GenericHID.h>
+#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/GenericHID.hpp"
 
-#include "Trigger.h"
-#include "frc2/command/CommandScheduler.h"
+#include "wpi/commands2/button/Trigger.hpp"
+#include "wpi/commands2/CommandScheduler.hpp"
 
 namespace frc2 {
 

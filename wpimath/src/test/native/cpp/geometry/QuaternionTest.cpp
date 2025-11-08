@@ -6,9 +6,9 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Quaternion.h"
-#include "units/angle.h"
-#include "units/math.h"
+#include "wpi/math/geometry/Quaternion.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/math.hpp"
 
 using namespace frc;
 

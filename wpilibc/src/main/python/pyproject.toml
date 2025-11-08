@@ -58,19 +58,19 @@ update_init = [
     "wpilib.sysid wpilib._wpilib.sysid",
 ]
 scan_headers_ignore = [
-    "WPILibVersion.h",
+    "wpi/system/WPILibVersion.hpp",
 
     # needs a python wrapper
     "frc/AsynchronousInterrupt.h",
 
-    "frc/Filesystem.h",
-    "frc/Notifier.h", # wrapped separately
-    "frc/Resource.h",
-    "frc/ScopedTracer.h", # not useful for python
+    "wpi/system/Filesystem.hpp",
+    "wpi/system/Notifier.hpp", # wrapped separately
+    "wpi/system/Resource.hpp",
+    "wpi/system/ScopedTracer.hpp", # not useful for python
 
-    "frc/motorcontrol/MotorControllerGroup.h", # wrapped separately
+    "wpi/hardware/motor/MotorControllerGroup.hpp", # wrapped separately
 
-    "frc/smartdashboard/ListenerExecutor.h",    # internal detail
+    "wpi/smartdashboard/ListenerExecutor.hpp",    # internal detail
 
     # Internals
     "rpy/ControlWord.h",
@@ -92,102 +92,102 @@ DYNAMIC_CAMERA_SERVER = 1
 
 [tool.semiwrap.extension_modules."wpilib._wpilib".headers]
 # frc
-ADXL345_I2C = "frc/ADXL345_I2C.h"
-AddressableLED = "frc/AddressableLED.h"
-Alert = "frc/Alert.h"
-AnalogAccelerometer = "frc/AnalogAccelerometer.h"
-AnalogEncoder = "frc/AnalogEncoder.h"
-AnalogInput = "frc/AnalogInput.h"
-AnalogPotentiometer = "frc/AnalogPotentiometer.h"
-CAN = "frc/CAN.h"
-Compressor = "frc/Compressor.h"
-CompressorConfigType = "frc/CompressorConfigType.h"
-DataLogManager = "frc/DataLogManager.h"
-DSControlWord = "frc/DSControlWord.h"
-DigitalInput = "frc/DigitalInput.h"
-DigitalOutput = "frc/DigitalOutput.h"
-DoubleSolenoid = "frc/DoubleSolenoid.h"
-DriverStation = "frc/DriverStation.h"
-DutyCycle = "frc/DutyCycle.h"
-DutyCycleEncoder = "frc/DutyCycleEncoder.h"
-Encoder = "frc/Encoder.h"
-Errors = "frc/Errors.h"
+ADXL345_I2C = "wpi/hardware/accelerometer/ADXL345_I2C.hpp"
+AddressableLED = "wpi/hardware/led/AddressableLED.hpp"
+Alert = "wpi/util/Alert.hpp"
+AnalogAccelerometer = "wpi/hardware/accelerometer/AnalogAccelerometer.hpp"
+AnalogEncoder = "wpi/hardware/rotation/AnalogEncoder.hpp"
+AnalogInput = "wpi/hardware/discrete/AnalogInput.hpp"
+AnalogPotentiometer = "wpi/hardware/rotation/AnalogPotentiometer.hpp"
+CAN = "wpi/hardware/bus/CAN.hpp"
+Compressor = "wpi/hardware/pneumatic/Compressor.hpp"
+CompressorConfigType = "wpi/hardware/pneumatic/CompressorConfigType.hpp"
+DataLogManager = "wpi/system/DataLogManager.hpp"
+DSControlWord = "wpi/driverstation/DSControlWord.hpp"
+DigitalInput = "wpi/hardware/discrete/DigitalInput.hpp"
+DigitalOutput = "wpi/hardware/discrete/DigitalOutput.hpp"
+DoubleSolenoid = "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
+DriverStation = "wpi/driverstation/DriverStation.hpp"
+DutyCycle = "wpi/hardware/rotation/DutyCycle.hpp"
+DutyCycleEncoder = "wpi/hardware/rotation/DutyCycleEncoder.hpp"
+Encoder = "wpi/hardware/rotation/Encoder.hpp"
+Errors = "wpi/system/Errors.hpp"
 Filesystem = "rpy/Filesystem.h"
-I2C = "frc/I2C.h"
-IterativeRobotBase = "frc/IterativeRobotBase.h"
-Joystick = "frc/Joystick.h"
-LEDPattern = "frc/LEDPattern.h"
-MotorSafety = "frc/MotorSafety.h"
+I2C = "wpi/hardware/bus/I2C.hpp"
+IterativeRobotBase = "wpi/opmode/IterativeRobotBase.hpp"
+Joystick = "wpi/driverstation/Joystick.hpp"
+LEDPattern = "wpi/hardware/led/LEDPattern.hpp"
+MotorSafety = "wpi/hardware/motor/MotorSafety.hpp"
 Notifier = "rpy/Notifier.h"
-OnboardIMU = "frc/OnboardIMU.h"
-PS4Controller = "frc/PS4Controller.h"
-PS5Controller = "frc/PS5Controller.h"
-PWM = "frc/PWM.h"
-PneumaticHub = "frc/PneumaticHub.h"
-PneumaticsBase = "frc/PneumaticsBase.h"
-PneumaticsControlModule = "frc/PneumaticsControlModule.h"
-PneumaticsModuleType = "frc/PneumaticsModuleType.h"
-PowerDistribution = "frc/PowerDistribution.h"
-Preferences = "frc/Preferences.h"
-RobotBase = "frc/RobotBase.h"
-RobotController = "frc/RobotController.h"
-RobotState = "frc/RobotState.h"
-RuntimeType = "frc/RuntimeType.h"
-SensorUtil = "frc/SensorUtil.h"
-SerialPort = "frc/SerialPort.h"
-SharpIR = "frc/SharpIR.h"
-Solenoid = "frc/Solenoid.h"
-StadiaController = "frc/StadiaController.h"
-SystemServer = "frc/SystemServer.h"
-Threads = "frc/Threads.h"
-TimedRobot = "frc/TimedRobot.h"
-Timer = "frc/Timer.h"
-TimesliceRobot = "frc/TimesliceRobot.h"
-Tracer = "frc/Tracer.h"
-Watchdog = "frc/Watchdog.h"
-XboxController = "frc/XboxController.h"
+OnboardIMU = "wpi/hardware/imu/OnboardIMU.hpp"
+PS4Controller = "wpi/driverstation/PS4Controller.hpp"
+PS5Controller = "wpi/driverstation/PS5Controller.hpp"
+PWM = "wpi/hardware/discrete/PWM.hpp"
+PneumaticHub = "wpi/hardware/pneumatic/PneumaticHub.hpp"
+PneumaticsBase = "wpi/hardware/pneumatic/PneumaticsBase.hpp"
+PneumaticsControlModule = "wpi/hardware/pneumatic/PneumaticsControlModule.hpp"
+PneumaticsModuleType = "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
+PowerDistribution = "wpi/hardware/power/PowerDistribution.hpp"
+Preferences = "wpi/util/Preferences.hpp"
+RobotBase = "wpi/opmode/RobotBase.hpp"
+RobotController = "wpi/system/RobotController.hpp"
+RobotState = "wpi/opmode/RobotState.hpp"
+RuntimeType = "wpi/system/RuntimeType.hpp"
+SensorUtil = "wpi/util/SensorUtil.hpp"
+SerialPort = "wpi/hardware/bus/SerialPort.hpp"
+SharpIR = "wpi/hardware/range/SharpIR.hpp"
+Solenoid = "wpi/hardware/pneumatic/Solenoid.hpp"
+StadiaController = "wpi/driverstation/StadiaController.hpp"
+SystemServer = "wpi/system/SystemServer.hpp"
+Threads = "wpi/system/Threads.hpp"
+TimedRobot = "wpi/opmode/TimedRobot.hpp"
+Timer = "wpi/system/Timer.hpp"
+TimesliceRobot = "wpi/opmode/TimesliceRobot.hpp"
+Tracer = "wpi/system/Tracer.hpp"
+Watchdog = "wpi/system/Watchdog.hpp"
+XboxController = "wpi/driverstation/XboxController.hpp"
 
 # frc (interfaces)
-CounterBase = "frc/CounterBase.h"
-GenericHID = "frc/GenericHID.h"
-MotorController = "frc/motorcontrol/MotorController.h"
+CounterBase = "wpi/hardware/discrete/CounterBase.hpp"
+GenericHID = "wpi/driverstation/GenericHID.hpp"
+MotorController = "wpi/hardware/motor/MotorController.hpp"
 
 # frc/internal
-DriverStationModeThread = "frc/internal/DriverStationModeThread.h"
+DriverStationModeThread = "wpi/internal/DriverStationModeThread.hpp"
 
 # frc/motorcontrol
-Koors40 = "frc/motorcontrol/Koors40.h"
+Koors40 = "wpi/hardware/motor/Koors40.hpp"
 MotorControllerGroup = "rpy/MotorControllerGroup.h"
-PWMMotorController = "frc/motorcontrol/PWMMotorController.h"
-PWMSparkFlex = "frc/motorcontrol/PWMSparkFlex.h"
-PWMSparkMax = "frc/motorcontrol/PWMSparkMax.h"
-PWMTalonFX = "frc/motorcontrol/PWMTalonFX.h"
-PWMTalonSRX = "frc/motorcontrol/PWMTalonSRX.h"
-PWMVenom = "frc/motorcontrol/PWMVenom.h"
-PWMVictorSPX = "frc/motorcontrol/PWMVictorSPX.h"
-Spark = "frc/motorcontrol/Spark.h"
-SparkMini = "frc/motorcontrol/SparkMini.h"
-Talon = "frc/motorcontrol/Talon.h"
-VictorSP = "frc/motorcontrol/VictorSP.h"
+PWMMotorController = "wpi/hardware/motor/PWMMotorController.hpp"
+PWMSparkFlex = "wpi/hardware/motor/PWMSparkFlex.hpp"
+PWMSparkMax = "wpi/hardware/motor/PWMSparkMax.hpp"
+PWMTalonFX = "wpi/hardware/motor/PWMTalonFX.hpp"
+PWMTalonSRX = "wpi/hardware/motor/PWMTalonSRX.hpp"
+PWMVenom = "wpi/hardware/motor/PWMVenom.hpp"
+PWMVictorSPX = "wpi/hardware/motor/PWMVictorSPX.hpp"
+Spark = "wpi/hardware/motor/Spark.hpp"
+SparkMini = "wpi/hardware/motor/SparkMini.hpp"
+Talon = "wpi/hardware/motor/Talon.hpp"
+VictorSP = "wpi/hardware/motor/VictorSP.hpp"
 
 # frc/smartdashboard
-Field2d = "frc/smartdashboard/Field2d.h"
-FieldObject2d = "frc/smartdashboard/FieldObject2d.h"
-Mechanism2d = "frc/smartdashboard/Mechanism2d.h"
-MechanismLigament2d = "frc/smartdashboard/MechanismLigament2d.h"
-MechanismObject2d = "frc/smartdashboard/MechanismObject2d.h"
-MechanismRoot2d = "frc/smartdashboard/MechanismRoot2d.h"
-SendableBuilderImpl = "frc/smartdashboard/SendableBuilderImpl.h"
-SendableChooser = "frc/smartdashboard/SendableChooser.h"
-SendableChooserBase = "frc/smartdashboard/SendableChooserBase.h"
-SmartDashboard = "frc/smartdashboard/SmartDashboard.h"
+Field2d = "wpi/smartdashboard/Field2d.hpp"
+FieldObject2d = "wpi/smartdashboard/FieldObject2d.hpp"
+Mechanism2d = "wpi/smartdashboard/Mechanism2d.hpp"
+MechanismLigament2d = "wpi/smartdashboard/MechanismLigament2d.hpp"
+MechanismObject2d = "wpi/smartdashboard/MechanismObject2d.hpp"
+MechanismRoot2d = "wpi/smartdashboard/MechanismRoot2d.hpp"
+SendableBuilderImpl = "wpi/smartdashboard/SendableBuilderImpl.hpp"
+SendableChooser = "wpi/smartdashboard/SendableChooser.hpp"
+SendableChooserBase = "wpi/smartdashboard/SendableChooserBase.hpp"
+SmartDashboard = "wpi/smartdashboard/SmartDashboard.hpp"
 
 # frc/sysid
-SysIdRoutineLog = "frc/sysid/SysIdRoutineLog.h"
+SysIdRoutineLog = "wpi/sysid/SysIdRoutineLog.hpp"
 
 # frc/util
-Color = "frc/util/Color.h"
-Color8Bit = "frc/util/Color8Bit.h"
+Color = "wpi/util/Color.hpp"
+Color8Bit = "wpi/util/Color8Bit.hpp"
 
 
 [tool.semiwrap.extension_modules."wpilib.counter._counter"]
@@ -198,9 +198,9 @@ yaml_path = "semiwrap/counter"
 
 [tool.semiwrap.extension_modules."wpilib.counter._counter".headers]
 # frc/counter
-EdgeConfiguration = "frc/counter/EdgeConfiguration.h"
-Tachometer = "frc/counter/Tachometer.h"
-UpDownCounter = "frc/counter/UpDownCounter.h"
+EdgeConfiguration = "wpi/counter/EdgeConfiguration.hpp"
+Tachometer = "wpi/counter/Tachometer.hpp"
+UpDownCounter = "wpi/counter/UpDownCounter.hpp"
 
 
 [tool.semiwrap.extension_modules."wpilib.drive._drive"]
@@ -211,9 +211,9 @@ yaml_path = "semiwrap/drive"
 
 [tool.semiwrap.extension_modules."wpilib.drive._drive".headers]
 # frc/drive
-DifferentialDrive = "frc/drive/DifferentialDrive.h"
-MecanumDrive = "frc/drive/MecanumDrive.h"
-RobotDriveBase = "frc/drive/RobotDriveBase.h"
+DifferentialDrive = "wpi/drive/DifferentialDrive.hpp"
+MecanumDrive = "wpi/drive/MecanumDrive.hpp"
+RobotDriveBase = "wpi/drive/RobotDriveBase.hpp"
 
 
 [tool.semiwrap.extension_modules."wpilib.event._event"]
@@ -225,9 +225,9 @@ yaml_path = "semiwrap/event"
 
 [tool.semiwrap.extension_modules."wpilib.event._event".headers]
 # frc/event
-BooleanEvent = "frc/event/BooleanEvent.h"
-EventLoop = "frc/event/EventLoop.h"
-NetworkBooleanEvent = "frc/event/NetworkBooleanEvent.h"
+BooleanEvent = "wpi/event/BooleanEvent.hpp"
+EventLoop = "wpi/event/EventLoop.hpp"
+NetworkBooleanEvent = "wpi/event/NetworkBooleanEvent.hpp"
 
 
 [tool.semiwrap.extension_modules."wpilib.simulation._simulation"]
@@ -238,40 +238,40 @@ yaml_path = "semiwrap/simulation"
 
 [tool.semiwrap.extension_modules."wpilib.simulation._simulation".headers]
 # frc/simulation
-ADXL345Sim = "frc/simulation/ADXL345Sim.h"
-AddressableLEDSim = "frc/simulation/AddressableLEDSim.h"
-AnalogEncoderSim = "frc/simulation/AnalogEncoderSim.h"
-AnalogInputSim = "frc/simulation/AnalogInputSim.h"
-BatterySim = "frc/simulation/BatterySim.h"
-CTREPCMSim = "frc/simulation/CTREPCMSim.h"
-CallbackStore = "frc/simulation/CallbackStore.h"
-DCMotorSim = "frc/simulation/DCMotorSim.h"
-DIOSim = "frc/simulation/DIOSim.h"
-DifferentialDrivetrainSim = "frc/simulation/DifferentialDrivetrainSim.h"
-DigitalPWMSim = "frc/simulation/DigitalPWMSim.h"
-DoubleSolenoidSim = "frc/simulation/DoubleSolenoidSim.h"
-DriverStationSim = "frc/simulation/DriverStationSim.h"
-DutyCycleEncoderSim = "frc/simulation/DutyCycleEncoderSim.h"
-DutyCycleSim = "frc/simulation/DutyCycleSim.h"
-ElevatorSim = "frc/simulation/ElevatorSim.h"
-EncoderSim = "frc/simulation/EncoderSim.h"
-FlywheelSim = "frc/simulation/FlywheelSim.h"
-GenericHIDSim = "frc/simulation/GenericHIDSim.h"
-JoystickSim = "frc/simulation/JoystickSim.h"
-LinearSystemSim = "frc/simulation/LinearSystemSim.h"
-PS4ControllerSim = "frc/simulation/PS4ControllerSim.h"
-PS5ControllerSim = "frc/simulation/PS5ControllerSim.h"
-PWMSim = "frc/simulation/PWMSim.h"
-PneumaticsBaseSim = "frc/simulation/PneumaticsBaseSim.h"
-PowerDistributionSim = "frc/simulation/PowerDistributionSim.h"
-PWMMotorControllerSim = "frc/simulation/PWMMotorControllerSim.h"
-REVPHSim = "frc/simulation/REVPHSim.h"
-RoboRioSim = "frc/simulation/RoboRioSim.h"
-SendableChooserSim = "frc/simulation/SendableChooserSim.h"
-SharpIRSim = "frc/simulation/SharpIRSim.h"
-SimDeviceSim = "frc/simulation/SimDeviceSim.h"
-SimHooks = "frc/simulation/SimHooks.h"
-SingleJointedArmSim = "frc/simulation/SingleJointedArmSim.h"
-SolenoidSim = "frc/simulation/SolenoidSim.h"
-StadiaControllerSim = "frc/simulation/StadiaControllerSim.h"
-XboxControllerSim = "frc/simulation/XboxControllerSim.h"
+ADXL345Sim = "wpi/simulation/ADXL345Sim.hpp"
+AddressableLEDSim = "wpi/simulation/AddressableLEDSim.hpp"
+AnalogEncoderSim = "wpi/simulation/AnalogEncoderSim.hpp"
+AnalogInputSim = "wpi/simulation/AnalogInputSim.hpp"
+BatterySim = "wpi/simulation/BatterySim.hpp"
+CTREPCMSim = "wpi/simulation/CTREPCMSim.hpp"
+CallbackStore = "wpi/simulation/CallbackStore.hpp"
+DCMotorSim = "wpi/simulation/DCMotorSim.hpp"
+DIOSim = "wpi/simulation/DIOSim.hpp"
+DifferentialDrivetrainSim = "wpi/simulation/DifferentialDrivetrainSim.hpp"
+DigitalPWMSim = "wpi/simulation/DigitalPWMSim.hpp"
+DoubleSolenoidSim = "wpi/simulation/DoubleSolenoidSim.hpp"
+DriverStationSim = "wpi/simulation/DriverStationSim.hpp"
+DutyCycleEncoderSim = "wpi/simulation/DutyCycleEncoderSim.hpp"
+DutyCycleSim = "wpi/simulation/DutyCycleSim.hpp"
+ElevatorSim = "wpi/simulation/ElevatorSim.hpp"
+EncoderSim = "wpi/simulation/EncoderSim.hpp"
+FlywheelSim = "wpi/simulation/FlywheelSim.hpp"
+GenericHIDSim = "wpi/simulation/GenericHIDSim.hpp"
+JoystickSim = "wpi/simulation/JoystickSim.hpp"
+LinearSystemSim = "wpi/simulation/LinearSystemSim.hpp"
+PS4ControllerSim = "wpi/simulation/PS4ControllerSim.hpp"
+PS5ControllerSim = "wpi/simulation/PS5ControllerSim.hpp"
+PWMSim = "wpi/simulation/PWMSim.hpp"
+PneumaticsBaseSim = "wpi/simulation/PneumaticsBaseSim.hpp"
+PowerDistributionSim = "wpi/simulation/PowerDistributionSim.hpp"
+PWMMotorControllerSim = "wpi/simulation/PWMMotorControllerSim.hpp"
+REVPHSim = "wpi/simulation/REVPHSim.hpp"
+RoboRioSim = "wpi/simulation/RoboRioSim.hpp"
+SendableChooserSim = "wpi/simulation/SendableChooserSim.hpp"
+SharpIRSim = "wpi/simulation/SharpIRSim.hpp"
+SimDeviceSim = "wpi/simulation/SimDeviceSim.hpp"
+SimHooks = "wpi/simulation/SimHooks.hpp"
+SingleJointedArmSim = "wpi/simulation/SingleJointedArmSim.hpp"
+SolenoidSim = "wpi/simulation/SolenoidSim.hpp"
+StadiaControllerSim = "wpi/simulation/StadiaControllerSim.hpp"
+XboxControllerSim = "wpi/simulation/XboxControllerSim.hpp"

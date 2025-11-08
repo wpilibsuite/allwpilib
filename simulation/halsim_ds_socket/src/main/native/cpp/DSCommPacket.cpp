@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "DSCommPacket.h"
+#include "wpi/halsim/ds_socket/DSCommPacket.hpp"
 
 #include <algorithm>
 #include <chrono>
@@ -11,8 +11,8 @@
 #include <thread>
 #include <vector>
 
-#include <hal/simulation/DriverStationData.h>
-#include <hal/simulation/MockHooks.h>
+#include "wpi/hal/simulation/DriverStationData.h"
+#include "wpi/hal/simulation/MockHooks.h"
 
 using namespace halsim;
 

@@ -7,7 +7,7 @@
 
 #include <memory>
 
-#include <wpi/Logger.h>
+#include "wpi/util/Logger.hpp"
 
 namespace cs {
 

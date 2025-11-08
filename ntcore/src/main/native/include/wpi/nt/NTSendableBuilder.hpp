@@ -7,11 +7,11 @@
 #include <memory>
 #include <string_view>
 
-#include <wpi/FunctionExtras.h>
-#include <wpi/sendable/SendableBuilder.h>
+#include "wpi/util/FunctionExtras.hpp"
+#include "wpi/util/sendable/SendableBuilder.hpp"
 
-#include "networktables/NetworkTable.h"
-#include "networktables/Topic.h"
+#include "wpi/nt/NetworkTable.hpp"
+#include "wpi/nt/Topic.hpp"
 
 namespace nt {
 

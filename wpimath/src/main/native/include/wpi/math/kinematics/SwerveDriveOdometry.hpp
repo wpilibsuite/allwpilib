@@ -7,15 +7,15 @@
 #include <cstddef>
 #include <ctime>
 
-#include <wpi/SymbolExports.h>
-#include <wpi/timestamp.h>
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/timestamp.h"
 
-#include "Odometry.h"
-#include "SwerveDriveKinematics.h"
-#include "SwerveModulePosition.h"
-#include "SwerveModuleState.h"
-#include "frc/geometry/Pose2d.h"
-#include "wpimath/MathShared.h"
+#include "wpi/math/kinematics/Odometry.hpp"
+#include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
+#include "wpi/math/kinematics/SwerveModulePosition.hpp"
+#include "wpi/math/kinematics/SwerveModuleState.hpp"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/util/MathShared.hpp"
 
 namespace frc {
 

@@ -7,7 +7,7 @@
 
 #include <fmt/format.h>
 
-#include "wpi/raw_ostream.h"
+#include "wpi/util/raw_ostream.hpp"
 
 namespace wpi {
 

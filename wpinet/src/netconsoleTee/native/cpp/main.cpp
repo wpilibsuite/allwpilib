@@ -8,17 +8,17 @@
 #include <string>
 
 #include <fmt/format.h>
-#include <wpi/SmallVector.h>
-#include <wpi/StringExtras.h>
-#include <wpi/print.h>
-#include <wpi/timestamp.h>
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/print.hpp"
+#include "wpi/util/timestamp.h"
 
-#include "wpinet/raw_uv_ostream.h"
-#include "wpinet/uv/Loop.h"
-#include "wpinet/uv/Tcp.h"
-#include "wpinet/uv/Tty.h"
-#include "wpinet/uv/Udp.h"
-#include "wpinet/uv/util.h"
+#include "wpi/net/raw_uv_ostream.hpp"
+#include "wpi/net/uv/Loop.hpp"
+#include "wpi/net/uv/Tcp.hpp"
+#include "wpi/net/uv/Tty.hpp"
+#include "wpi/net/uv/Udp.hpp"
+#include "wpi/net/uv/util.hpp"
 
 namespace uv = wpi::uv;
 

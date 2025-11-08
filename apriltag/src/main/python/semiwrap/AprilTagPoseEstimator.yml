@@ -1,5 +1,5 @@
 extra_includes:
-- frc/apriltag/AprilTagDetection.h
+- wpi/apriltag/AprilTagDetection.hpp
 
 classes:
   frc::AprilTagPoseEstimator:

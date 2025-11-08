@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "UsbCameraImpl.h"
+#include "UsbCameraImpl.hpp"
 
 #include <dirent.h>
 #include <fcntl.h>
@@ -26,20 +26,20 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/MemAlloc.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringExtras.h>
-#include <wpi/fs.h>
-#include <wpi/raw_ostream.h>
-#include <wpi/timestamp.h>
+#include "wpi/util/MemAlloc.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/fs.hpp"
+#include "wpi/util/raw_ostream.hpp"
+#include "wpi/util/timestamp.h"
 
-#include "Instance.h"
-#include "JpegUtil.h"
-#include "Log.h"
-#include "Notifier.h"
-#include "Telemetry.h"
-#include "UsbUtil.h"
-#include "cscore_cpp.h"
+#include "Instance.hpp"
+#include "JpegUtil.hpp"
+#include "Log.hpp"
+#include "Notifier.hpp"
+#include "Telemetry.hpp"
+#include "UsbUtil.hpp"
+#include "wpi/cs/cscore_cpp.hpp"
 
 using namespace cs;
 

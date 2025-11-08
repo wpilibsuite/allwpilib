@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "Robot.h"
+#include "Robot.hpp"
 
 // Run robot periodic() functions for 5 ms, and run controllers every 10 ms
 Robot::Robot() : frc::TimesliceRobot{5_ms, 10_ms} {

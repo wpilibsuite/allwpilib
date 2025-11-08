@@ -6,15 +6,15 @@
 
 #include <functional>
 
-#include <wpi/SymbolExports.h>
+#include "wpi/util/SymbolExports.hpp"
 
-#include "frc/EigenCore.h"
-#include "frc/controller/LinearPlantInversionFeedforward.h"
-#include "frc/controller/LinearQuadraticRegulator.h"
-#include "frc/estimator/KalmanFilter.h"
-#include "frc/system/LinearSystem.h"
-#include "units/time.h"
-#include "units/voltage.h"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
+#include "wpi/math/controller/LinearQuadraticRegulator.hpp"
+#include "wpi/math/estimator/KalmanFilter.hpp"
+#include "wpi/math/system/LinearSystem.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/voltage.hpp"
 
 namespace frc {
 

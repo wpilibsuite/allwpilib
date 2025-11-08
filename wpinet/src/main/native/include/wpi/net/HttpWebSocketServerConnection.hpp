@@ -11,12 +11,12 @@
 #include <string>
 #include <string_view>
 
-#include <wpi/SmallVector.h>
+#include "wpi/util/SmallVector.hpp"
 
-#include "wpinet/HttpServerConnection.h"
-#include "wpinet/WebSocket.h"
-#include "wpinet/WebSocketServer.h"
-#include "wpinet/uv/Stream.h"
+#include "wpi/net/HttpServerConnection.hpp"
+#include "wpi/net/WebSocket.hpp"
+#include "wpi/net/WebSocketServer.hpp"
+#include "wpi/net/uv/Stream.hpp"
 
 namespace wpi {
 

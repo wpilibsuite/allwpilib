@@ -13,10 +13,10 @@
 #include <thread>
 #include <utility>
 
-#include <hal/Types.h>
-#include <units/frequency.h>
-#include <units/time.h>
-#include <wpi/mutex.h>
+#include "wpi/hal/Types.h"
+#include "wpi/units/frequency.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/util/mutex.hpp"
 
 namespace frc {
 

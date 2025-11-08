@@ -5,7 +5,7 @@
 #pragma once
 #include <memory>
 
-#include <glass/hardware/Pneumatic.h>
+#include "wpi/glass/hardware/Pneumatic.hpp"
 
 namespace halsimgui {
 

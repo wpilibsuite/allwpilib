@@ -4,10 +4,10 @@
 
 #include <regex>
 
-#include "CommandTestBase.h"
-#include "frc2/command/InstantCommand.h"
-#include "frc2/command/ScheduleCommand.h"
-#include "frc2/command/SequentialCommandGroup.h"
+#include "CommandTestBase.hpp"
+#include "wpi/commands2/InstantCommand.hpp"
+#include "wpi/commands2/ScheduleCommand.hpp"
+#include "wpi/commands2/SequentialCommandGroup.hpp"
 
 using namespace frc2;
 class ScheduleCommandTest : public CommandTestBase {};

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "sysid/view/DataSelector.h"
+#include "wpi/sysid/view/DataSelector.hpp"
 
 #include <algorithm>
 #include <string>
@@ -12,14 +12,14 @@
 
 #include <fmt/format.h>
 #include <imgui.h>
-#include <wpi/Logger.h>
-#include <wpi/StringExtras.h>
-#include <wpi/datalog/DataLogReader.h>
-#include <wpi/datalog/DataLogReaderThread.h>
+#include "wpi/util/Logger.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/datalog/DataLogReader.hpp"
+#include "wpi/datalog/DataLogReaderThread.hpp"
 
-#include "sysid/Util.h"
-#include "sysid/analysis/AnalysisType.h"
-#include "sysid/analysis/Storage.h"
+#include "wpi/sysid/Util.hpp"
+#include "wpi/sysid/analysis/AnalysisType.hpp"
+#include "wpi/sysid/analysis/Storage.hpp"
 
 using namespace sysid;
 

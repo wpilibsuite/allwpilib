@@ -13,17 +13,17 @@
 #include <utility>
 #include <vector>
 
-#include <networktables/NetworkTableInstance.h>
-#include <networktables/NetworkTableListener.h>
-#include <ntcore_cpp.h>
+#include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/nt/NetworkTableListener.hpp"
+#include "wpi/nt/ntcore_cpp.hpp"
 #include <upb/mem/arena.h>
 #include <upb/reflection/def.h>
-#include <wpi/DenseMap.h>
-#include <wpi/json.h>
-#include <wpi/struct/DynamicStruct.h>
+#include "wpi/util/DenseMap.hpp"
+#include "wpi/util/json.hpp"
+#include "wpi/util/struct/DynamicStruct.hpp"
 
-#include "glass/Model.h"
-#include "glass/View.h"
+#include "wpi/glass/Model.hpp"
+#include "wpi/glass/View.hpp"
 
 namespace glass {
 

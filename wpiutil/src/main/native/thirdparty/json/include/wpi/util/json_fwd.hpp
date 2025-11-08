@@ -15,7 +15,7 @@
 #include <string> // string
 #include <vector> // vector
 
-#include <wpi/detail/abi_macros.h>
+#include "wpi/util/detail/abi_macros.hpp"
 
 /*!
 @brief namespace for Niels Lohmann

@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "sysid/analysis/OLS.h"
+#include "wpi/sysid/analysis/OLS.hpp"
 
 TEST(OLSTest, TwoVariablesTwoPoints) {
   // (1, 3) and (2, 5). Should produce y = 2x + 1.

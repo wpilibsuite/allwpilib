@@ -8,7 +8,7 @@
 #include <memory>
 #include <vector>
 
-#include <portable-file-dialogs.h>
+#include "wpi/gui/portable-file-dialogs.h"
 
 namespace glass {
 

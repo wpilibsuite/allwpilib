@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-#include <wpi/string.h>
+#include "wpi/util/string.h"
 
 #ifdef __cplusplus
 #include <cstddef>
@@ -1956,4 +1956,4 @@ void NT_Meta_FreeClients(struct NT_Meta_Client* arr, size_t count);
 }  // extern "C"
 #endif
 
-#include "ntcore_c_types.h"
+#include "wpi/nt/ntcore_c_types.h"

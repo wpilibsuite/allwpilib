@@ -57,29 +57,29 @@ update_init = [
 
 scan_headers_ignore = [
     
-    "frc/ct_matrix.h",
-    "frc/DARE.h",
-    "frc/EigenCore.h",
-    "frc/StateSpaceUtil.h",
+    "wpi/math/linalg/ct_matrix.hpp",
+    "wpi/math/linalg/DARE.hpp",
+    "wpi/math/linalg/EigenCore.hpp",
+    "wpi/math/util/StateSpaceUtil.hpp",
 
-    "frc/fmt/Eigen.h",
+    "wpi/math/fmt/Eigen.hpp",
 
-    "frc/estimator/AngleStatistics.h",
-    "frc/estimator/KalmanFilterLatencyCompensator.h",
-    "frc/estimator/MerweScaledSigmaPoints.h",
-    "frc/estimator/MerweUKF.h",
-    "frc/estimator/S3SigmaPoints.h",
-    "frc/estimator/S3UKF.h",
-    "frc/estimator/SigmaPoints.h",
-    "frc/estimator/SteadyStateKalmanFilter.h",
-    "frc/estimator/UnscentedKalmanFilter.h",
-    "frc/estimator/UnscentedTransform.h",
+    "wpi/math/estimator/AngleStatistics.hpp",
+    "wpi/math/estimator/KalmanFilterLatencyCompensator.hpp",
+    "wpi/math/estimator/MerweScaledSigmaPoints.hpp",
+    "wpi/math/estimator/MerweUKF.hpp",
+    "wpi/math/estimator/S3SigmaPoints.hpp",
+    "wpi/math/estimator/S3UKF.hpp",
+    "wpi/math/estimator/SigmaPoints.hpp",
+    "wpi/math/estimator/SteadyStateKalmanFilter.hpp",
+    "wpi/math/estimator/UnscentedKalmanFilter.hpp",
+    "wpi/math/estimator/UnscentedTransform.hpp",
 
-    "frc/geometry/detail/RotationVectorToMatrix.h",
+    "wpi/math/geometry/detail/RotationVectorToMatrix.hpp",
 
-    "frc/system/Discretization.h",
-    "frc/system/NumericalIntegration.h",
-    "frc/system/NumericalJacobian.h",
+    "wpi/math/system/Discretization.hpp",
+    "wpi/math/system/NumericalIntegration.hpp",
+    "wpi/math/system/NumericalJacobian.hpp",
 
     "frc/proto/*",
     "frc/*/proto/*",
@@ -99,7 +99,7 @@ scan_headers_ignore = [
     "units/*",
     "wpimath/protobuf/*",
 
-    "wpimath/MathShared.h",
+    "wpi/math/util/MathShared.hpp",
 
     "rpy/geometryToString.h",
     "PyTrajectoryConstraint.h",
@@ -1463,11 +1463,11 @@ depends = ["wpiutil", "wpimath-casters"]
 
 [tool.semiwrap.extension_modules."wpimath._wpimath".headers]
 # frc
-ComputerVisionUtil = "frc/ComputerVisionUtil.h"
-# DARE = "frc/DARE.h"
-# EigenCore = "frc/EigenCore.h"
-MathUtil = "frc/MathUtil.h"
-# StateSpaceUtil = "frc/StateSpaceUtil.h"
+ComputerVisionUtil = "wpi/math/util/ComputerVisionUtil.hpp"
+# DARE = "wpi/math/linalg/DARE.hpp"
+# EigenCore = "wpi/math/linalg/EigenCore.hpp"
+MathUtil = "wpi/math/util/MathUtil.hpp"
+# StateSpaceUtil = "wpi/math/util/StateSpaceUtil.hpp"
 
 
 [tool.semiwrap.extension_modules."wpimath.filter._filter"]
@@ -1477,10 +1477,10 @@ depends = ["wpimath"]
 yaml_path = "semiwrap/filter"
 
 [tool.semiwrap.extension_modules."wpimath.filter._filter".headers]
-Debouncer = "frc/filter/Debouncer.h"
-LinearFilter = "frc/filter/LinearFilter.h"
-MedianFilter = "frc/filter/MedianFilter.h"
-SlewRateLimiter = "frc/filter/SlewRateLimiter.h"
+Debouncer = "wpi/math/filter/Debouncer.hpp"
+LinearFilter = "wpi/math/filter/LinearFilter.hpp"
+MedianFilter = "wpi/math/filter/MedianFilter.hpp"
+SlewRateLimiter = "wpi/math/filter/SlewRateLimiter.hpp"
 
 
 [tool.semiwrap.extension_modules."wpimath.geometry._geometry"]
@@ -1492,21 +1492,21 @@ yaml_path = "semiwrap/geometry"
 
 [tool.semiwrap.extension_modules."wpimath.geometry._geometry".headers]
 # frc/geometry
-CoordinateAxis = "frc/geometry/CoordinateAxis.h"
-CoordinateSystem = "frc/geometry/CoordinateSystem.h"
-Ellipse2d = "frc/geometry/Ellipse2d.h"
-Pose2d = "frc/geometry/Pose2d.h"
-Pose3d = "frc/geometry/Pose3d.h"
-Quaternion = "frc/geometry/Quaternion.h"
-Rectangle2d = "frc/geometry/Rectangle2d.h"
-Rotation2d = "frc/geometry/Rotation2d.h"
-Rotation3d = "frc/geometry/Rotation3d.h"
-Transform2d = "frc/geometry/Transform2d.h"
-Transform3d = "frc/geometry/Transform3d.h"
-Translation2d = "frc/geometry/Translation2d.h"
-Translation3d = "frc/geometry/Translation3d.h"
-Twist2d = "frc/geometry/Twist2d.h"
-Twist3d = "frc/geometry/Twist3d.h"
+CoordinateAxis = "wpi/math/geometry/CoordinateAxis.hpp"
+CoordinateSystem = "wpi/math/geometry/CoordinateSystem.hpp"
+Ellipse2d = "wpi/math/geometry/Ellipse2d.hpp"
+Pose2d = "wpi/math/geometry/Pose2d.hpp"
+Pose3d = "wpi/math/geometry/Pose3d.hpp"
+Quaternion = "wpi/math/geometry/Quaternion.hpp"
+Rectangle2d = "wpi/math/geometry/Rectangle2d.hpp"
+Rotation2d = "wpi/math/geometry/Rotation2d.hpp"
+Rotation3d = "wpi/math/geometry/Rotation3d.hpp"
+Transform2d = "wpi/math/geometry/Transform2d.hpp"
+Transform3d = "wpi/math/geometry/Transform3d.hpp"
+Translation2d = "wpi/math/geometry/Translation2d.hpp"
+Translation3d = "wpi/math/geometry/Translation3d.hpp"
+Twist2d = "wpi/math/geometry/Twist2d.hpp"
+Twist3d = "wpi/math/geometry/Twist3d.hpp"
 
 [tool.semiwrap.extension_modules."wpimath.interpolation._interpolation"]
 name = "wpimath_interpolation"
@@ -1516,7 +1516,7 @@ yaml_path = "semiwrap/interpolation"
 
 [tool.semiwrap.extension_modules."wpimath.interpolation._interpolation".headers]
 # frc/interpolation
-TimeInterpolatableBuffer = "frc/interpolation/TimeInterpolatableBuffer.h"
+TimeInterpolatableBuffer = "wpi/math/interpolation/TimeInterpolatableBuffer.hpp"
 
 
 [tool.semiwrap.extension_modules."wpimath.kinematics._kinematics"]
@@ -1527,25 +1527,25 @@ yaml_path = "semiwrap/kinematics"
 
 [tool.semiwrap.extension_modules."wpimath.kinematics._kinematics".headers]
 # frc/kinematics
-ChassisSpeeds = "frc/kinematics/ChassisSpeeds.h"
-DifferentialDriveKinematics = "frc/kinematics/DifferentialDriveKinematics.h"
-DifferentialDriveOdometry3d = "frc/kinematics/DifferentialDriveOdometry3d.h"
-DifferentialDriveOdometry = "frc/kinematics/DifferentialDriveOdometry.h"
-DifferentialDriveWheelPositions = "frc/kinematics/DifferentialDriveWheelPositions.h"
-DifferentialDriveWheelSpeeds = "frc/kinematics/DifferentialDriveWheelSpeeds.h"
-Kinematics = "frc/kinematics/Kinematics.h"
-MecanumDriveKinematics = "frc/kinematics/MecanumDriveKinematics.h"
-MecanumDriveOdometry = "frc/kinematics/MecanumDriveOdometry.h"
-MecanumDriveOdometry3d = "frc/kinematics/MecanumDriveOdometry3d.h"
-MecanumDriveWheelPositions = "frc/kinematics/MecanumDriveWheelPositions.h"
-MecanumDriveWheelSpeeds = "frc/kinematics/MecanumDriveWheelSpeeds.h"
-Odometry = "frc/kinematics/Odometry.h"
-Odometry3d = "frc/kinematics/Odometry3d.h"
-SwerveDriveKinematics = "frc/kinematics/SwerveDriveKinematics.h"
-SwerveDriveOdometry = "frc/kinematics/SwerveDriveOdometry.h"
-SwerveDriveOdometry3d = "frc/kinematics/SwerveDriveOdometry3d.h"
-SwerveModulePosition = "frc/kinematics/SwerveModulePosition.h"
-SwerveModuleState = "frc/kinematics/SwerveModuleState.h"
+ChassisSpeeds = "wpi/math/kinematics/ChassisSpeeds.hpp"
+DifferentialDriveKinematics = "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+DifferentialDriveOdometry3d = "wpi/math/kinematics/DifferentialDriveOdometry3d.hpp"
+DifferentialDriveOdometry = "wpi/math/kinematics/DifferentialDriveOdometry.hpp"
+DifferentialDriveWheelPositions = "wpi/math/kinematics/DifferentialDriveWheelPositions.hpp"
+DifferentialDriveWheelSpeeds = "wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp"
+Kinematics = "wpi/math/kinematics/Kinematics.hpp"
+MecanumDriveKinematics = "wpi/math/kinematics/MecanumDriveKinematics.hpp"
+MecanumDriveOdometry = "wpi/math/kinematics/MecanumDriveOdometry.hpp"
+MecanumDriveOdometry3d = "wpi/math/kinematics/MecanumDriveOdometry3d.hpp"
+MecanumDriveWheelPositions = "wpi/math/kinematics/MecanumDriveWheelPositions.hpp"
+MecanumDriveWheelSpeeds = "wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp"
+Odometry = "wpi/math/kinematics/Odometry.hpp"
+Odometry3d = "wpi/math/kinematics/Odometry3d.hpp"
+SwerveDriveKinematics = "wpi/math/kinematics/SwerveDriveKinematics.hpp"
+SwerveDriveOdometry = "wpi/math/kinematics/SwerveDriveOdometry.hpp"
+SwerveDriveOdometry3d = "wpi/math/kinematics/SwerveDriveOdometry3d.hpp"
+SwerveModulePosition = "wpi/math/kinematics/SwerveModulePosition.hpp"
+SwerveModuleState = "wpi/math/kinematics/SwerveModuleState.hpp"
 
 
 [tool.semiwrap.extension_modules."wpimath.spline._spline"]
@@ -1556,11 +1556,11 @@ yaml_path = "semiwrap/spline"
 
 [tool.semiwrap.extension_modules."wpimath.spline._spline".headers]
 # frc/spline
-CubicHermiteSpline = "frc/spline/CubicHermiteSpline.h"
-QuinticHermiteSpline = "frc/spline/QuinticHermiteSpline.h"
-Spline = "frc/spline/Spline.h"
-SplineHelper = "frc/spline/SplineHelper.h"
-SplineParameterizer = "frc/spline/SplineParameterizer.h"
+CubicHermiteSpline = "wpi/math/spline/CubicHermiteSpline.hpp"
+QuinticHermiteSpline = "wpi/math/spline/QuinticHermiteSpline.hpp"
+Spline = "wpi/math/spline/Spline.hpp"
+SplineHelper = "wpi/math/spline/SplineHelper.hpp"
+SplineParameterizer = "wpi/math/spline/SplineParameterizer.hpp"
 
 
 [tool.semiwrap.extension_modules."wpimath._controls._controls"]
@@ -1571,71 +1571,71 @@ yaml_path = "semiwrap/controls"
 
 [tool.semiwrap.extension_modules."wpimath._controls._controls".headers]
 # frc/controller
-ArmFeedforward = "frc/controller/ArmFeedforward.h"
-BangBangController = "frc/controller/BangBangController.h"
-ControlAffinePlantInversionFeedforward = "frc/controller/ControlAffinePlantInversionFeedforward.h"
-DifferentialDriveAccelerationLimiter = "frc/controller/DifferentialDriveAccelerationLimiter.h"
-DifferentialDriveFeedforward = "frc/controller/DifferentialDriveFeedforward.h"
-DifferentialDriveWheelVoltages = "frc/controller/DifferentialDriveWheelVoltages.h"
-ElevatorFeedforward = "frc/controller/ElevatorFeedforward.h"
-ImplicitModelFollower = "frc/controller/ImplicitModelFollower.h"
-LTVDifferentialDriveController = "frc/controller/LTVDifferentialDriveController.h"
-LTVUnicycleController = "frc/controller/LTVUnicycleController.h"
-LinearPlantInversionFeedforward = "frc/controller/LinearPlantInversionFeedforward.h"
-LinearQuadraticRegulator = "frc/controller/LinearQuadraticRegulator.h"
-PIDController = "frc/controller/PIDController.h"
-ProfiledPIDController = "frc/controller/ProfiledPIDController.h"
-SimpleMotorFeedforward = "frc/controller/SimpleMotorFeedforward.h"
+ArmFeedforward = "wpi/math/controller/ArmFeedforward.hpp"
+BangBangController = "wpi/math/controller/BangBangController.hpp"
+ControlAffinePlantInversionFeedforward = "wpi/math/controller/ControlAffinePlantInversionFeedforward.hpp"
+DifferentialDriveAccelerationLimiter = "wpi/math/controller/DifferentialDriveAccelerationLimiter.hpp"
+DifferentialDriveFeedforward = "wpi/math/controller/DifferentialDriveFeedforward.hpp"
+DifferentialDriveWheelVoltages = "wpi/math/controller/DifferentialDriveWheelVoltages.hpp"
+ElevatorFeedforward = "wpi/math/controller/ElevatorFeedforward.hpp"
+ImplicitModelFollower = "wpi/math/controller/ImplicitModelFollower.hpp"
+LTVDifferentialDriveController = "wpi/math/controller/LTVDifferentialDriveController.hpp"
+LTVUnicycleController = "wpi/math/controller/LTVUnicycleController.hpp"
+LinearPlantInversionFeedforward = "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
+LinearQuadraticRegulator = "wpi/math/controller/LinearQuadraticRegulator.hpp"
+PIDController = "wpi/math/controller/PIDController.hpp"
+ProfiledPIDController = "wpi/math/controller/ProfiledPIDController.hpp"
+SimpleMotorFeedforward = "wpi/math/controller/SimpleMotorFeedforward.hpp"
 
 # frc/estimator
-# AngleStatistics = "frc/estimator/AngleStatistics.h"
-DifferentialDrivePoseEstimator = "frc/estimator/DifferentialDrivePoseEstimator.h"
-DifferentialDrivePoseEstimator3d = "frc/estimator/DifferentialDrivePoseEstimator3d.h"
-ExtendedKalmanFilter = "frc/estimator/ExtendedKalmanFilter.h"
-KalmanFilter = "frc/estimator/KalmanFilter.h"
-# KalmanFilterLatencyCompensator = "frc/estimator/KalmanFilterLatencyCompensator.h"
-MecanumDrivePoseEstimator = "frc/estimator/MecanumDrivePoseEstimator.h"
-MecanumDrivePoseEstimator3d = "frc/estimator/MecanumDrivePoseEstimator3d.h"
-# MerweScaledSigmaPoints = "frc/estimator/MerweScaledSigmaPoints.h"
-PoseEstimator = "frc/estimator/PoseEstimator.h"
-PoseEstimator3d = "frc/estimator/PoseEstimator3d.h"
-SwerveDrivePoseEstimator = "frc/estimator/SwerveDrivePoseEstimator.h"
-SwerveDrivePoseEstimator3d = "frc/estimator/SwerveDrivePoseEstimator3d.h"
-# UnscentedKalmanFilter = "frc/estimator/UnscentedKalmanFilter.h"
-# UnscentedTransform = "frc/estimator/UnscentedTransform.h"
+# AngleStatistics = "wpi/math/estimator/AngleStatistics.hpp"
+DifferentialDrivePoseEstimator = "wpi/math/estimator/DifferentialDrivePoseEstimator.hpp"
+DifferentialDrivePoseEstimator3d = "wpi/math/estimator/DifferentialDrivePoseEstimator3d.hpp"
+ExtendedKalmanFilter = "wpi/math/estimator/ExtendedKalmanFilter.hpp"
+KalmanFilter = "wpi/math/estimator/KalmanFilter.hpp"
+# KalmanFilterLatencyCompensator = "wpi/math/estimator/KalmanFilterLatencyCompensator.hpp"
+MecanumDrivePoseEstimator = "wpi/math/estimator/MecanumDrivePoseEstimator.hpp"
+MecanumDrivePoseEstimator3d = "wpi/math/estimator/MecanumDrivePoseEstimator3d.hpp"
+# MerweScaledSigmaPoints = "wpi/math/estimator/MerweScaledSigmaPoints.hpp"
+PoseEstimator = "wpi/math/estimator/PoseEstimator.hpp"
+PoseEstimator3d = "wpi/math/estimator/PoseEstimator3d.hpp"
+SwerveDrivePoseEstimator = "wpi/math/estimator/SwerveDrivePoseEstimator.hpp"
+SwerveDrivePoseEstimator3d = "wpi/math/estimator/SwerveDrivePoseEstimator3d.hpp"
+# UnscentedKalmanFilter = "wpi/math/estimator/UnscentedKalmanFilter.hpp"
+# UnscentedTransform = "wpi/math/estimator/UnscentedTransform.hpp"
 
 # frc/optimization
-SimulatedAnnealing = "frc/optimization/SimulatedAnnealing.h"
+SimulatedAnnealing = "wpi/math/optimization/SimulatedAnnealing.hpp"
 
 # frc/path
-TravelingSalesman = "frc/path/TravelingSalesman.h"
+TravelingSalesman = "wpi/math/path/TravelingSalesman.hpp"
 
 # frc/system
-# Discretization = "frc/system/Discretization.h"
-LinearSystem = "frc/system/LinearSystem.h"
-LinearSystemLoop = "frc/system/LinearSystemLoop.h"
-# NumericalIntegration = "frc/system/NumericalIntegration.h"
-# NumericalJacobian = "frc/system/NumericalJacobian.h"
+# Discretization = "wpi/math/system/Discretization.hpp"
+LinearSystem = "wpi/math/system/LinearSystem.hpp"
+LinearSystemLoop = "wpi/math/system/LinearSystemLoop.hpp"
+# NumericalIntegration = "wpi/math/system/NumericalIntegration.hpp"
+# NumericalJacobian = "wpi/math/system/NumericalJacobian.hpp"
 
 # frc/system/plant
-DCMotor = "frc/system/plant/DCMotor.h"
-LinearSystemId = "frc/system/plant/LinearSystemId.h"
+DCMotor = "wpi/math/system/plant/DCMotor.hpp"
+LinearSystemId = "wpi/math/system/plant/LinearSystemId.hpp"
 
 # frc/trajectory
-ExponentialProfile = "frc/trajectory/ExponentialProfile.h"
-Trajectory = "frc/trajectory/Trajectory.h"
-TrajectoryConfig = "frc/trajectory/TrajectoryConfig.h"
-TrajectoryGenerator = "frc/trajectory/TrajectoryGenerator.h"
-TrajectoryParameterizer = "frc/trajectory/TrajectoryParameterizer.h"
-TrapezoidProfile = "frc/trajectory/TrapezoidProfile.h"
+ExponentialProfile = "wpi/math/trajectory/ExponentialProfile.hpp"
+Trajectory = "wpi/math/trajectory/Trajectory.hpp"
+TrajectoryConfig = "wpi/math/trajectory/TrajectoryConfig.hpp"
+TrajectoryGenerator = "wpi/math/trajectory/TrajectoryGenerator.hpp"
+TrajectoryParameterizer = "wpi/math/trajectory/TrajectoryParameterizer.hpp"
+TrapezoidProfile = "wpi/math/trajectory/TrapezoidProfile.hpp"
 
 # frc/trajectory/constraint
-CentripetalAccelerationConstraint = "frc/trajectory/constraint/CentripetalAccelerationConstraint.h"
-DifferentialDriveKinematicsConstraint = "frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
-DifferentialDriveVoltageConstraint = "frc/trajectory/constraint/DifferentialDriveVoltageConstraint.h"
-EllipticalRegionConstraint = "frc/trajectory/constraint/EllipticalRegionConstraint.h"
-MaxVelocityConstraint = "frc/trajectory/constraint/MaxVelocityConstraint.h"
-MecanumDriveKinematicsConstraint = "frc/trajectory/constraint/MecanumDriveKinematicsConstraint.h"
-RectangularRegionConstraint = "frc/trajectory/constraint/RectangularRegionConstraint.h"
-SwerveDriveKinematicsConstraint = "frc/trajectory/constraint/SwerveDriveKinematicsConstraint.h"
-TrajectoryConstraint = "frc/trajectory/constraint/TrajectoryConstraint.h"
+CentripetalAccelerationConstraint = "wpi/math/trajectory/constraint/CentripetalAccelerationConstraint.hpp"
+DifferentialDriveKinematicsConstraint = "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
+DifferentialDriveVoltageConstraint = "wpi/math/trajectory/constraint/DifferentialDriveVoltageConstraint.hpp"
+EllipticalRegionConstraint = "wpi/math/trajectory/constraint/EllipticalRegionConstraint.hpp"
+MaxVelocityConstraint = "wpi/math/trajectory/constraint/MaxVelocityConstraint.hpp"
+MecanumDriveKinematicsConstraint = "wpi/math/trajectory/constraint/MecanumDriveKinematicsConstraint.hpp"
+RectangularRegionConstraint = "wpi/math/trajectory/constraint/RectangularRegionConstraint.hpp"
+SwerveDriveKinematicsConstraint = "wpi/math/trajectory/constraint/SwerveDriveKinematicsConstraint.hpp"
+TrajectoryConstraint = "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"

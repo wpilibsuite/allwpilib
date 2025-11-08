@@ -1,6 +1,6 @@
 #include <semiwrap.h>
 #include "nt_instance.h"
-#include "ntcore_cpp.h"
+#include "wpi/nt/ntcore_cpp.hpp"
 
 #include <set>
 

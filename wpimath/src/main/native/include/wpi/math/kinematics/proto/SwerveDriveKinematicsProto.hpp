@@ -7,10 +7,10 @@
 #include <stdexcept>
 
 #include <fmt/format.h>
-#include <wpi/protobuf/Protobuf.h>
-#include <wpi/protobuf/ProtobufCallbacks.h>
+#include "wpi/util/protobuf/Protobuf.hpp"
+#include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 
-#include "frc/kinematics/SwerveDriveKinematics.h"
+#include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
 #include "wpimath/protobuf/kinematics.npb.h"
 
 template <size_t NumModules>

@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include <frc/AnalogPotentiometer.h>
-#include <frc/Compressor.h>
-#include <frc/DoubleSolenoid.h>
-#include <frc/Joystick.h>
-#include <frc/PneumaticsControlModule.h>
-#include <frc/Solenoid.h>
-#include <frc/TimedRobot.h>
+#include "wpi/hardware/rotation/AnalogPotentiometer.hpp"
+#include "wpi/hardware/pneumatic/Compressor.hpp"
+#include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
+#include "wpi/driverstation/Joystick.hpp"
+#include "wpi/hardware/pneumatic/PneumaticsControlModule.hpp"
+#include "wpi/hardware/pneumatic/Solenoid.hpp"
+#include "wpi/opmode/TimedRobot.hpp"
 
 /**
  * This is a sample program showing the use of the solenoid classes during

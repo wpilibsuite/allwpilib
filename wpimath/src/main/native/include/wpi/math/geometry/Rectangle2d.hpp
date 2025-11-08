@@ -7,14 +7,14 @@
 #include <algorithm>
 #include <stdexcept>
 
-#include <wpi/SymbolExports.h>
+#include "wpi/util/SymbolExports.hpp"
 
-#include "frc/geometry/Pose2d.h"
-#include "frc/geometry/Rotation2d.h"
-#include "frc/geometry/Transform2d.h"
-#include "frc/geometry/Translation2d.h"
-#include "units/length.h"
-#include "units/math.h"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/geometry/Transform2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/math.hpp"
 
 namespace frc {
 
@@ -206,5 +206,5 @@ class WPILIB_DLLEXPORT Rectangle2d {
 
 }  // namespace frc
 
-#include "frc/geometry/proto/Rectangle2dProto.h"
-#include "frc/geometry/struct/Rectangle2dStruct.h"
+#include "wpi/math/geometry/proto/Rectangle2dProto.hpp"
+#include "wpi/math/geometry/struct/Rectangle2dStruct.hpp"

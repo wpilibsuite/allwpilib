@@ -4,15 +4,15 @@
 
 #pragma once
 
-#include <frc/smartdashboard/SendableChooser.h>
-#include <frc2/command/Command.h>
-#include <frc2/command/Commands.h>
-#include <frc2/command/button/CommandPS4Controller.h>
+#include "wpi/smartdashboard/SendableChooser.hpp"
+#include "wpi/commands2/Command.hpp"
+#include "wpi/commands2/Commands.hpp"
+#include "wpi/commands2/button/CommandPS4Controller.hpp"
 
-#include "Constants.h"
-#include "commands/Autos.h"
-#include "subsystems/DriveSubsystem.h"
-#include "subsystems/HatchSubsystem.h"
+#include "Constants.hpp"
+#include "commands/Autos.hpp"
+#include "subsystems/DriveSubsystem.hpp"
+#include "subsystems/HatchSubsystem.hpp"
 
 namespace ac = AutoConstants;
 

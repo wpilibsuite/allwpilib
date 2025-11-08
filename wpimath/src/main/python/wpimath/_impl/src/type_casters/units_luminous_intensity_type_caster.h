@@ -1,6 +1,6 @@
 #pragma once
 
-#include <units/luminous_intensity.h>
+#include "wpi/units/luminous_intensity.hpp"
 
 namespace pybind11 {
 namespace detail {

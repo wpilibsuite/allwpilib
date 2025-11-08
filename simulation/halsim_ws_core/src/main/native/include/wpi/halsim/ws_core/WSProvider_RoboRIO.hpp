@@ -6,7 +6,7 @@
 
 #include <memory>
 
-#include "WSHalProviders.h"
+#include "wpi/halsim/ws_core/WSHalProviders.hpp"
 
 namespace wpilibws {
 

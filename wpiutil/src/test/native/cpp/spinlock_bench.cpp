@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/spinlock.h"  // NOLINT(build/include_order)
+#include "wpi/util/spinlock.hpp"  // NOLINT(build/include_order)
 
 #include <chrono>
 #include <mutex>
@@ -10,8 +10,8 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/mutex.h"
-#include "wpi/print.h"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/print.hpp"
 
 static std::mutex std_mutex;
 static std::recursive_mutex std_recursive_mutex;

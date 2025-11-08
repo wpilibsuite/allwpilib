@@ -7,10 +7,10 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/DriverStation.h"
-#include "frc/Joystick.h"
-#include "frc/simulation/DriverStationSim.h"
-#include "frc/simulation/SimHooks.h"
+#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/Joystick.hpp"
+#include "wpi/simulation/DriverStationSim.hpp"
+#include "wpi/simulation/SimHooks.hpp"
 
 class IsJoystickConnectedParametersTest
     : public ::testing::TestWithParam<std::tuple<int, int, int, bool>> {};

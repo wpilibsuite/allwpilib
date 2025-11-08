@@ -1,5 +1,5 @@
 extra_includes:
-- wpi/SmallString.h
+- wpi/util/SmallString.hpp
 
 classes:
   frc::MotorSafety:

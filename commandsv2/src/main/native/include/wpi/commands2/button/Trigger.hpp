@@ -7,14 +7,14 @@
 #include <functional>
 #include <utility>
 
-#include <frc/event/BooleanEvent.h>
-#include <frc/event/EventLoop.h>
-#include <frc/filter/Debouncer.h>
-#include <units/time.h>
-#include <wpi/FunctionExtras.h>
+#include "wpi/event/BooleanEvent.hpp"
+#include "wpi/event/EventLoop.hpp"
+#include "wpi/math/filter/Debouncer.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/util/FunctionExtras.hpp"
 
-#include "frc2/command/Command.h"
-#include "frc2/command/CommandScheduler.h"
+#include "wpi/commands2/Command.hpp"
+#include "wpi/commands2/CommandScheduler.hpp"
 
 namespace frc2 {
 class Command;

@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#import "UsbCameraDelegate.h"
-#include "UsbCameraImpl.h"
+#import "UsbCameraDelegate.hpp"
+#include "UsbCameraImpl.hpp"
 
-#include <wpi/timestamp.h>
+#include "wpi/util/timestamp.h"
 
 @implementation UsbCameraDelegate
 

@@ -8,10 +8,10 @@
 
 #include <gtest/gtest.h>
 
-#include "sysid/analysis/AnalysisManager.h"
-#include "sysid/analysis/FeedforwardAnalysis.h"
-#include "sysid/analysis/FilteringUtils.h"
-#include "sysid/analysis/Storage.h"
+#include "wpi/sysid/analysis/AnalysisManager.hpp"
+#include "wpi/sysid/analysis/FeedforwardAnalysis.hpp"
+#include "wpi/sysid/analysis/FilteringUtils.hpp"
+#include "wpi/sysid/analysis/Storage.hpp"
 
 TEST(FilterTest, MedianFilter) {
   std::vector<sysid::PreparedData> testData{

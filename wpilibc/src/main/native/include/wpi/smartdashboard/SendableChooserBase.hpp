@@ -7,9 +7,9 @@
 #include <atomic>
 #include <string>
 
-#include <wpi/mutex.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/sendable/Sendable.hpp"
+#include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace frc {
 

@@ -8,16 +8,16 @@
 #include <string_view>
 #include <vector>
 
-#include <networktables/NTSendable.h>
-#include <networktables/NetworkTable.h>
-#include <networktables/NetworkTableEntry.h>
-#include <units/length.h>
-#include <wpi/mutex.h>
-#include <wpi/sendable/SendableHelper.h>
+#include "wpi/nt/NTSendable.hpp"
+#include "wpi/nt/NetworkTable.hpp"
+#include "wpi/nt/NetworkTableEntry.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/sendable/SendableHelper.hpp"
 
-#include "frc/geometry/Pose2d.h"
-#include "frc/geometry/Rotation2d.h"
-#include "frc/smartdashboard/FieldObject2d.h"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/smartdashboard/FieldObject2d.hpp"
 
 namespace frc {
 

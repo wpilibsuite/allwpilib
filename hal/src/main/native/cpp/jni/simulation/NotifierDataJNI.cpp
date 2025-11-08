@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "org_wpilib_hardware_hal_simulation_NotifierDataJNI.h"
-#include "hal/simulation/NotifierData.h"
+#include "wpi/hal/simulation/NotifierData.h"
 
 extern "C" {
 

@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "XRP.h"
+#include "wpi/halsim/xrp/XRP.hpp"
 
 #include <bit>
 #include <string>
 
 #include <fmt/format.h>
-#include <wpi/Endian.h>
-#include <wpi/json.h>
+#include "wpi/util/Endian.hpp"
+#include "wpi/util/json.hpp"
 
 using namespace wpilibxrp;
 

@@ -4,8 +4,8 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/Errors.h"
-#include "frc/event/EventLoop.h"
+#include "wpi/system/Errors.hpp"
+#include "wpi/event/EventLoop.hpp"
 
 using namespace frc;
 

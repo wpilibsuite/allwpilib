@@ -7,11 +7,11 @@
 #include <string>
 #include <string_view>
 
-#include <wpi/DenseMap.h>
+#include "wpi/util/DenseMap.hpp"
 
-#include "net/ClientMessageQueue.h"
-#include "server/Functions.h"
-#include "server/ServerClient.h"
+#include "net/ClientMessageQueue.hpp"
+#include "server/Functions.hpp"
+#include "server/ServerClient.hpp"
 
 namespace nt::server {
 

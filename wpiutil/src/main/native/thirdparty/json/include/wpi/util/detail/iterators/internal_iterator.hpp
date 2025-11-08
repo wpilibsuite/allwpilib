@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include <wpi/detail/abi_macros.h>
-#include <wpi/detail/iterators/primitive_iterator.h>
+#include "wpi/util/detail/abi_macros.hpp"
+#include "wpi/util/detail/iterators/primitive_iterator.hpp"
 
 WPI_JSON_NAMESPACE_BEGIN
 namespace detail

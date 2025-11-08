@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <hal/Types.h>
+#include "wpi/hal/Types.h"
 #include <stdint.h>
 
 /** max length of LED strip supported by device. */

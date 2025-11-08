@@ -7,7 +7,7 @@
 
 #include <string_view>
 
-#include <wpi/Logger.h>
+#include "wpi/util/Logger.hpp"
 
 namespace cs {
 

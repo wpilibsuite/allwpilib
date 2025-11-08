@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/HAL.h"
+#include "wpi/hal/HAL.h"
 
 #include <jni.h>
 
@@ -14,12 +14,12 @@
 #include <cstring>
 
 #include <fmt/format.h>
-#include <wpi/jni_util.h>
+#include "wpi/util/jni_util.hpp"
 
 #include "HALUtil.h"
 #include "org_wpilib_hardware_hal_HAL.h"
-#include "hal/DriverStation.h"
-#include "hal/Main.h"
+#include "wpi/hal/DriverStation.h"
+#include "wpi/hal/Main.h"
 
 using namespace hal;
 using namespace wpi::java;

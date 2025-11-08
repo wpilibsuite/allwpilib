@@ -7,7 +7,7 @@
 #include <functional>
 #include <vector>
 
-#include <wpi/mutex.h>
+#include "wpi/util/mutex.hpp"
 
 namespace frc::detail {
 /**

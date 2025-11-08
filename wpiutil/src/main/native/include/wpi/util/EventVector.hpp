@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "wpi/SmallVector.h"
-#include "wpi/Synchronization.h"
-#include "wpi/mutex.h"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/Synchronization.h"
+#include "wpi/util/mutex.hpp"
 
 namespace wpi {
 struct EventVector {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <units/energy.h>
+#include "wpi/units/energy.hpp"
 
 namespace pybind11 {
 namespace detail {

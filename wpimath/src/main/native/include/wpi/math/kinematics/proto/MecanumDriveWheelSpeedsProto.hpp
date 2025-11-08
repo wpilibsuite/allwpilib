@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <wpi/SymbolExports.h>
-#include <wpi/protobuf/Protobuf.h>
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/protobuf/Protobuf.hpp"
 
-#include "frc/kinematics/MecanumDriveWheelSpeeds.h"
+#include "wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp"
 #include "wpimath/protobuf/kinematics.npb.h"
 
 template <>

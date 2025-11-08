@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <frc/TimedRobot.h>
-#include <frc2/command/Command.h>
+#include "wpi/opmode/TimedRobot.hpp"
+#include "wpi/commands2/Command.hpp"
 
-#include "RobotContainer.h"
+#include "RobotContainer.hpp"
 
 class Robot : public frc::TimedRobot {
  public:

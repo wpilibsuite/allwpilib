@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/CAN.h"
+#include "wpi/hal/CAN.h"
 
 #include <linux/can.h>
 #include <linux/can/raw.h>
@@ -17,19 +17,19 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/DenseMap.h>
-#include <wpi/circular_buffer.h>
-#include <wpi/mutex.h>
-#include <wpi/print.h>
-#include <wpi/timestamp.h>
+#include "wpi/util/DenseMap.hpp"
+#include "wpi/util/circular_buffer.hpp"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/print.hpp"
+#include "wpi/util/timestamp.h"
 
 #include "PortsInternal.h"
-#include "hal/Errors.h"
-#include "hal/Threads.h"
-#include "hal/handles/UnlimitedHandleResource.h"
-#include "wpinet/EventLoopRunner.h"
-#include "wpinet/uv/Poll.h"
-#include "wpinet/uv/Timer.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/Threads.h"
+#include "wpi/hal/handles/UnlimitedHandleResource.h"
+#include "wpi/net/EventLoopRunner.hpp"
+#include "wpi/net/uv/Poll.hpp"
+#include "wpi/net/uv/Timer.hpp"
 
 using namespace hal;
 

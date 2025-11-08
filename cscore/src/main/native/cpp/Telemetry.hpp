@@ -5,9 +5,9 @@
 #ifndef CSCORE_TELEMETRY_H_
 #define CSCORE_TELEMETRY_H_
 
-#include <wpi/SafeThread.h>
+#include "wpi/util/SafeThread.hpp"
 
-#include "cscore_cpp.h"
+#include "wpi/cs/cscore_cpp.hpp"
 
 namespace cs {
 

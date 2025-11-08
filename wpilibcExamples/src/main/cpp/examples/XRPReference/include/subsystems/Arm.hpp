@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <frc/xrp/XRPServo.h>
-#include <frc2/command/SubsystemBase.h>
-#include <units/angle.h>
+#include "wpi/xrp/XRPServo.hpp"
+#include "wpi/commands2/SubsystemBase.hpp"
+#include "wpi/units/angle.hpp"
 
 class Arm : public frc2::SubsystemBase {
  public:

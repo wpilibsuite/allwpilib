@@ -8,7 +8,7 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/datalog/FileLogger.h"
+#include "wpi/datalog/FileLogger.hpp"
 
 TEST(FileLoggerTest, BufferSingleLine) {
   std::vector<std::string> buf;

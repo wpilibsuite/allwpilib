@@ -10,7 +10,7 @@
 #include <string_view>
 
 #include <Eigen/Core>
-#include <wpi/SymbolExports.h>
+#include "wpi/util/SymbolExports.hpp"
 
 namespace frc {
 

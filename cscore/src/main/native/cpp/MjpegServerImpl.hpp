@@ -12,15 +12,15 @@
 #include <thread>
 #include <vector>
 
-#include <wpi/SafeThread.h>
-#include <wpi/SmallVector.h>
-#include <wpi/raw_istream.h>
-#include <wpi/raw_ostream.h>
-#include <wpinet/NetworkAcceptor.h>
-#include <wpinet/NetworkStream.h>
-#include <wpinet/raw_socket_ostream.h>
+#include "wpi/util/SafeThread.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/raw_istream.hpp"
+#include "wpi/util/raw_ostream.hpp"
+#include "wpi/net/NetworkAcceptor.hpp"
+#include "wpi/net/NetworkStream.hpp"
+#include "wpi/net/raw_socket_ostream.hpp"
 
-#include "SinkImpl.h"
+#include "SinkImpl.hpp"
 
 namespace cs {
 

@@ -1,5 +1,5 @@
 extra_includes:
-- frc/smartdashboard/MechanismLigament2d.h
+- wpi/smartdashboard/MechanismLigament2d.hpp
 
 classes:
   frc::MechanismRoot2d:

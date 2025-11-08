@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/array.h"
+#include "wpi/util/array.hpp"
 
 namespace {
 class MoveOnlyType {

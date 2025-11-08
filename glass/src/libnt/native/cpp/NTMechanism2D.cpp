@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/networktables/NTMechanism2D.h"
+#include "wpi/glass/networktables/NTMechanism2D.hpp"
 
 #include <algorithm>
 #include <memory>
@@ -12,10 +12,10 @@
 
 #include <fmt/format.h>
 #include <imgui.h>
-#include <ntcore_cpp.h>
-#include <wpi/StringExtras.h>
+#include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/StringExtras.hpp"
 
-#include "glass/other/Mechanism2D.h"
+#include "wpi/glass/other/Mechanism2D.hpp"
 
 using namespace glass;
 

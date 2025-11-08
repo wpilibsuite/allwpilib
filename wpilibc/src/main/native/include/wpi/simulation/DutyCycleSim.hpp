@@ -6,9 +6,9 @@
 
 #include <memory>
 
-#include <units/frequency.h>
+#include "wpi/units/frequency.hpp"
 
-#include "frc/simulation/CallbackStore.h"
+#include "wpi/simulation/CallbackStore.hpp"
 
 namespace frc {
 

@@ -9,9 +9,9 @@
 #include <vector>
 
 #include <imgui.h>
-#include <wpi/FunctionExtras.h>
+#include "wpi/util/FunctionExtras.hpp"
 
-#include "glass/Model.h"
+#include "wpi/glass/Model.hpp"
 
 namespace glass {
 

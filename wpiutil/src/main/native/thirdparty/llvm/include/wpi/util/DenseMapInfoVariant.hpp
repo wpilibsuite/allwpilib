@@ -14,7 +14,7 @@
 #ifndef WPIUTIL_WPI_DENSEMAPINFOVARIANT_H
 #define WPIUTIL_WPI_DENSEMAPINFOVARIANT_H
 
-#include "wpi/DenseMapInfo.h"
+#include "wpi/util/DenseMapInfo.hpp"
 #include <utility>
 #include <variant>
 

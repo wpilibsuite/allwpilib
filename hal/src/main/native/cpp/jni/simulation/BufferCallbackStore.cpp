@@ -9,11 +9,11 @@
 #include <cstdio>
 #include <memory>
 
-#include <wpi/jni_util.h>
+#include "wpi/util/jni_util.hpp"
 
 #include "SimulatorJNI.h"
-#include "hal/Types.h"
-#include "hal/handles/UnlimitedHandleResource.h"
+#include "wpi/hal/Types.h"
+#include "wpi/hal/handles/UnlimitedHandleResource.h"
 
 using namespace hal;
 using namespace hal::sim;

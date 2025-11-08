@@ -6,7 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/PointerIntPair.h"
+#include "wpi/util/PointerIntPair.hpp"
 #include "gtest/gtest.h"
 #include <limits>
 using namespace wpi;

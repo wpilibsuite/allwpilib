@@ -3,10 +3,10 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <fmt/format.h>
-#include <wpi/SmallString.h>
+#include "wpi/util/SmallString.hpp"
 
-#include "hal/Errors.h"
-#include "hal/HALBase.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/HALBase.h"
 
 namespace {
 struct LastErrorStorage {

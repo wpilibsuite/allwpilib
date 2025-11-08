@@ -13,7 +13,7 @@
 #include <gtest/gtest.h>
 #include <mrcal_wrapper.h>
 
-#include "path_lookup.h"
+#include "path_lookup.hpp"
 
 using namespace cv;
 

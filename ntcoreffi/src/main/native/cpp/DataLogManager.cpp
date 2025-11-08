@@ -12,13 +12,13 @@
 
 #include <fmt/chrono.h>
 #include <fmt/format.h>
-#include <networktables/NetworkTableInstance.h>
-#include <wpi/SafeThread.h>
-#include <wpi/StringExtras.h>
-#include <wpi/datalog/DataLogBackgroundWriter.h>
-#include <wpi/datalog/FileLogger.h>
-#include <wpi/fs.h>
-#include <wpi/print.h>
+#include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/util/SafeThread.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/datalog/DataLogBackgroundWriter.hpp"
+#include "wpi/datalog/FileLogger.hpp"
+#include "wpi/util/fs.hpp"
+#include "wpi/util/print.hpp"
 
 using namespace wpi;
 

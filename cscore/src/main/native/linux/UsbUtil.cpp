@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "UsbUtil.h"
+#include "UsbUtil.hpp"
 
 #include <fcntl.h>
 #include <libgen.h>
@@ -11,13 +11,13 @@
 #include <string>
 
 #include <fmt/format.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringExtras.h>
-#include <wpi/fs.h>
-#include <wpi/raw_istream.h>
-#include <wpi/raw_ostream.h>
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/fs.hpp"
+#include "wpi/util/raw_istream.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
-#include "Instance.h"
+#include "Instance.hpp"
 
 namespace cs {
 

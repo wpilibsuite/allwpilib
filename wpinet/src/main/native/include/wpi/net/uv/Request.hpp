@@ -11,7 +11,7 @@
 #include <memory>
 #include <utility>
 
-#include "wpinet/uv/Error.h"
+#include "wpi/net/uv/Error.hpp"
 
 namespace wpi::uv {
 

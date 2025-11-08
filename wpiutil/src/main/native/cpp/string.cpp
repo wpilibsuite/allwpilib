@@ -3,9 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "string"
-#include "wpi/string.h"
+#include "wpi/util/string.h"
 
-#include <wpi/MemAlloc.h>
+#include "wpi/util/MemAlloc.hpp"
 
 #include <string_view>
 

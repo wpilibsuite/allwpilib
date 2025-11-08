@@ -6,13 +6,13 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Pose2d.h"
-#include "frc/geometry/Rotation2d.h"
-#include "frc/spline/QuinticHermiteSpline.h"
-#include "frc/spline/SplineHelper.h"
-#include "frc/spline/SplineParameterizer.h"
-#include "units/angle.h"
-#include "units/length.h"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/spline/QuinticHermiteSpline.hpp"
+#include "wpi/math/spline/SplineHelper.hpp"
+#include "wpi/math/spline/SplineParameterizer.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
 
 using namespace frc;
 

@@ -6,17 +6,17 @@
 
 #include <numbers>
 
-#include <frc/Encoder.h>
-#include <frc/OnboardIMU.h>
-#include <frc/controller/PIDController.h>
-#include <frc/controller/SimpleMotorFeedforward.h>
-#include <frc/kinematics/DifferentialDriveKinematics.h>
-#include <frc/kinematics/DifferentialDriveOdometry.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
-#include <units/angle.h>
-#include <units/angular_velocity.h>
-#include <units/length.h>
-#include <units/velocity.h>
+#include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/hardware/imu/OnboardIMU.hpp"
+#include "wpi/math/controller/PIDController.hpp"
+#include "wpi/math/controller/SimpleMotorFeedforward.hpp"
+#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+#include "wpi/math/kinematics/DifferentialDriveOdometry.hpp"
+#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/velocity.hpp"
 
 /**
  * Represents a differential drive style drivetrain.

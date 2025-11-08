@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-#include <wpi/protobuf/Protobuf.h>
+#include "wpi/util/protobuf/Protobuf.hpp"
 
 #include "MrcComm.npb.h"
 #include "mrc/NetComm.h"

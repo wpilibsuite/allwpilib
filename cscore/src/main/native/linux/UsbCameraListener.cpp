@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "UsbCameraListener.h"
+#include "UsbCameraListener.hpp"
 
 #include <memory>
 
-#include <wpi/StringExtras.h>
-#include <wpinet/EventLoopRunner.h>
-#include <wpinet/uv/FsEvent.h>
-#include <wpinet/uv/Timer.h>
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/net/EventLoopRunner.hpp"
+#include "wpi/net/uv/FsEvent.hpp"
+#include "wpi/net/uv/Timer.hpp"
 
-#include "Notifier.h"
+#include "Notifier.hpp"
 
 using namespace cs;
 

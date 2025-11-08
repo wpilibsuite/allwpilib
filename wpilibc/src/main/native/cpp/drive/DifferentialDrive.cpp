@@ -2,19 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/drive/DifferentialDrive.h"
+#include "wpi/drive/DifferentialDrive.hpp"
 
 #include <algorithm>
 #include <cmath>
 #include <string>
 #include <utility>
 
-#include <hal/UsageReporting.h>
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include "wpi/hal/UsageReporting.h"
+#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/util/sendable/SendableRegistry.hpp"
 
-#include "frc/MathUtil.h"
-#include "frc/motorcontrol/MotorController.h"
+#include "wpi/math/util/MathUtil.hpp"
+#include "wpi/hardware/motor/MotorController.hpp"
 
 using namespace frc;
 

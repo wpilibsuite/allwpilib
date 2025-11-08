@@ -5,9 +5,9 @@
 #ifndef CSCORE_HANDLE_H_
 #define CSCORE_HANDLE_H_
 
-#include <wpi/Synchronization.h>
+#include "wpi/util/Synchronization.h"
 
-#include "cscore_c.h"
+#include "wpi/cs/cscore_c.h"
 
 namespace cs {
 

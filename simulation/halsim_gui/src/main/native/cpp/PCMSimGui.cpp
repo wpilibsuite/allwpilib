@@ -2,21 +2,21 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "PCMSimGui.h"
+#include "PCMSimGui.hpp"
 
 #include <cstdio>
 #include <memory>
 #include <vector>
 
-#include <glass/hardware/Pneumatic.h>
-#include <glass/other/DeviceTree.h>
-#include <hal/Ports.h>
-#include <hal/Value.h>
-#include <hal/simulation/CTREPCMData.h>
+#include "wpi/glass/hardware/Pneumatic.hpp"
+#include "wpi/glass/other/DeviceTree.hpp"
+#include "wpi/hal/Ports.h"
+#include "wpi/hal/Value.h"
+#include "wpi/hal/simulation/CTREPCMData.h"
 
-#include "HALDataSource.h"
-#include "HALSimGui.h"
-#include "SimDeviceGui.h"
+#include "wpi/halsim/gui/HALDataSource.hpp"
+#include "wpi/halsim/gui/HALSimGui.hpp"
+#include "wpi/halsim/gui/SimDeviceGui.hpp"
 
 using namespace halsimgui;
 

@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <frc/DoubleSolenoid.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
+#include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
+#include "wpi/hardware/motor/PWMSparkMax.hpp"
 
-#include "Constants.h"
+#include "Constants.hpp"
 
 class Intake {
  public:

@@ -4,15 +4,15 @@
 
 #pragma once
 
-#include <frc2/command/CommandPtr.h>
-#include <frc2/command/button/CommandXboxController.h>
+#include "wpi/commands2/CommandPtr.hpp"
+#include "wpi/commands2/button/CommandXboxController.hpp"
 
-#include "Constants.h"
-#include "subsystems/Drive.h"
-#include "subsystems/Intake.h"
-#include "subsystems/Pneumatics.h"
-#include "subsystems/Shooter.h"
-#include "subsystems/Storage.h"
+#include "Constants.hpp"
+#include "subsystems/Drive.hpp"
+#include "subsystems/Intake.hpp"
+#include "subsystems/Pneumatics.hpp"
+#include "subsystems/Shooter.hpp"
+#include "subsystems/Storage.hpp"
 
 /**
  * This class is where the bulk of the robot should be declared. Since

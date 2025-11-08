@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include <wpi/SymbolExports.h>
+#include "wpi/util/SymbolExports.hpp"
 
-#include "frc/trajectory/constraint/TrajectoryConstraint.h"
-#include "units/acceleration.h"
-#include "units/curvature.h"
-#include "units/math.h"
-#include "units/velocity.h"
+#include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/curvature.hpp"
+#include "wpi/units/math.hpp"
+#include "wpi/units/velocity.hpp"
 
 namespace frc {
 

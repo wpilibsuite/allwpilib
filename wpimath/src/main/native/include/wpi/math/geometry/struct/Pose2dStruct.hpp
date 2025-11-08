@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <wpi/SymbolExports.h>
-#include <wpi/struct/Struct.h>
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/struct/Struct.hpp"
 
-#include "frc/geometry/Pose2d.h"
+#include "wpi/math/geometry/Pose2d.hpp"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::Pose2d> {

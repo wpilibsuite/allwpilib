@@ -11,22 +11,22 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include <wpi/SpanMatcher.h>
+#include "wpi/util/SpanMatcher.hpp"
 
-#include "../MockLogger.h"
-#include "../PubSubOptionsMatcher.h"
-#include "../TestPrinters.h"
-#include "../ValueMatcher.h"
-#include "../net/MockClientMessageQueue.h"
-#include "../net/MockMessageHandler.h"
-#include "../net/MockWireConnection.h"
-#include "Handle.h"
+#include "../MockLogger.hpp"
+#include "../PubSubOptionsMatcher.hpp"
+#include "../TestPrinters.hpp"
+#include "../ValueMatcher.hpp"
+#include "../net/MockClientMessageQueue.hpp"
+#include "../net/MockMessageHandler.hpp"
+#include "../net/MockWireConnection.hpp"
+#include "Handle.hpp"
 #include "gmock/gmock.h"
-#include "net/Message.h"
-#include "net/WireEncoder.h"
-#include "ntcore_c.h"
-#include "ntcore_cpp.h"
-#include "server/ServerImpl.h"
+#include "net/Message.hpp"
+#include "net/WireEncoder.hpp"
+#include "wpi/nt/ntcore_c.h"
+#include "wpi/nt/ntcore_cpp.hpp"
+#include "server/ServerImpl.hpp"
 
 using ::testing::_;
 using ::testing::AllOf;

@@ -1,9 +1,9 @@
 
 
 #ifndef __FRC_SYSTEMCORE__
-#include <hal/Notifier.h>
-#include <hal/handles/HandlesInternal.h>
-#include <hal/simulation/NotifierData.h>
+#include "wpi/hal/Notifier.h"
+#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/hal/simulation/NotifierData.h"
 
 void HALSIM_ResetGlobalHandles() {
 

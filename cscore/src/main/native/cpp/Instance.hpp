@@ -8,17 +8,17 @@
 #include <memory>
 #include <utility>
 
-#include <wpi/Logger.h>
-#include <wpinet/EventLoopRunner.h>
+#include "wpi/util/Logger.hpp"
+#include "wpi/net/EventLoopRunner.hpp"
 
-#include "Log.h"
-#include "NetworkListener.h"
-#include "Notifier.h"
-#include "SinkImpl.h"
-#include "SourceImpl.h"
-#include "Telemetry.h"
-#include "UnlimitedHandleResource.h"
-#include "UsbCameraListener.h"
+#include "Log.hpp"
+#include "NetworkListener.hpp"
+#include "Notifier.hpp"
+#include "SinkImpl.hpp"
+#include "SourceImpl.hpp"
+#include "Telemetry.hpp"
+#include "UnlimitedHandleResource.hpp"
+#include "UsbCameraListener.hpp"
 
 namespace cs {
 

@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <wpi/SymbolExports.h>
+#include "wpi/util/SymbolExports.hpp"
 
-#include "frc/geometry/Pose3d.h"
-#include "frc/geometry/Transform3d.h"
+#include "wpi/math/geometry/Pose3d.hpp"
+#include "wpi/math/geometry/Transform3d.hpp"
 
 namespace frc {
 

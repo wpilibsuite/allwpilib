@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc2/command/Subsystem.h>
-#include <frc2/command/sysid/SysIdRoutine.h>
+#include "wpi/commands2/Subsystem.hpp"
+#include "wpi/commands2/sysid/SysIdRoutine.hpp"
 
 #include <utility>
 #include <vector>
 
-#include <frc/Timer.h>
-#include <frc/simulation/SimHooks.h>
+#include "wpi/system/Timer.hpp"
+#include "wpi/simulation/SimHooks.hpp"
 #include <gtest/gtest.h>
-#include <units/math.h>
+#include "wpi/units/math.hpp"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(units::math::abs(val1 - val2), eps)

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "frc/motorcontrol/PWMMotorController.h"
+#include "wpi/hardware/motor/PWMMotorController.hpp"
 
 namespace frc {
 

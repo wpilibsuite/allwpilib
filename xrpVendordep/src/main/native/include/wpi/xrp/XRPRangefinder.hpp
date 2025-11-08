@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <frc/AnalogInput.h>
+#include "wpi/hardware/discrete/AnalogInput.hpp"
 
-#include <units/length.h>
+#include "wpi/units/length.hpp"
 
 namespace frc {
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <units/charge.h>
+#include "wpi/units/charge.hpp"
 
 namespace pybind11 {
 namespace detail {

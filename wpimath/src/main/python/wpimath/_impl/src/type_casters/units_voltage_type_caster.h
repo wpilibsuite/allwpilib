@@ -1,6 +1,6 @@
 #pragma once
 
-#include <units/voltage.h>
+#include "wpi/units/voltage.hpp"
 
 namespace pybind11 {
 namespace detail {

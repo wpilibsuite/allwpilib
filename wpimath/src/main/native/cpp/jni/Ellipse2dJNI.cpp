@@ -4,11 +4,11 @@
 
 #include <jni.h>
 
-#include <wpi/array.h>
-#include <wpi/jni_util.h>
+#include "wpi/util/array.hpp"
+#include "wpi/util/jni_util.hpp"
 
 #include "org_wpilib_math_jni_Ellipse2dJNI.h"
-#include "frc/geometry/Ellipse2d.h"
+#include "wpi/math/geometry/Ellipse2d.hpp"
 
 using namespace wpi::java;
 

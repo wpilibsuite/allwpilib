@@ -5,9 +5,9 @@
 #include <cmath>
 
 #include <gtest/gtest.h>
-#include <wpi/array.h>
+#include "wpi/util/array.hpp"
 
-#include "frc/geometry/Pose3d.h"
+#include "wpi/math/geometry/Pose3d.hpp"
 
 using namespace frc;
 

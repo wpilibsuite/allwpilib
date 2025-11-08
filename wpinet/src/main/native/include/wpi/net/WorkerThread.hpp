@@ -11,10 +11,10 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/SafeThread.h>
-#include <wpi/future.h>
+#include "wpi/util/SafeThread.hpp"
+#include "wpi/util/future.hpp"
 
-#include "wpinet/uv/Async.h"
+#include "wpi/net/uv/Async.hpp"
 
 namespace wpi {
 

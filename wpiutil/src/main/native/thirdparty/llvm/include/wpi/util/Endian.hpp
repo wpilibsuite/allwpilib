@@ -13,9 +13,9 @@
 #ifndef WPIUTIL_WPI_ENDIAN_H
 #define WPIUTIL_WPI_ENDIAN_H
 
-#include "wpi/bit.h"
-#include "wpi/Compiler.h"
-#include "wpi/SwapByteOrder.h"
+#include "wpi/util/bit.hpp"
+#include "wpi/util/Compiler.hpp"
+#include "wpi/util/SwapByteOrder.hpp"
 #include <cassert>
 #include <cstddef>
 #include <cstdint>

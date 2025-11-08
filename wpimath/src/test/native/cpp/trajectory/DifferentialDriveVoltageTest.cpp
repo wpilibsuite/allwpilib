@@ -7,16 +7,16 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Pose2d.h"
-#include "frc/kinematics/DifferentialDriveKinematics.h"
-#include "frc/trajectory/TrajectoryGenerator.h"
-#include "frc/trajectory/constraint/DifferentialDriveVoltageConstraint.h"
-#include "trajectory/TestTrajectory.h"
-#include "units/acceleration.h"
-#include "units/length.h"
-#include "units/time.h"
-#include "units/velocity.h"
-#include "units/voltage.h"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/constraint/DifferentialDriveVoltageConstraint.hpp"
+#include "wpi/math/trajectory/TestTrajectory.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
+#include "wpi/units/voltage.hpp"
 
 using namespace frc;
 

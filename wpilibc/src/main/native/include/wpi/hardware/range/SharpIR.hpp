@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <hal/SimDevice.h>
-#include <units/length.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include "wpi/hal/SimDevice.h"
+#include "wpi/units/length.hpp"
+#include "wpi/util/sendable/Sendable.hpp"
+#include "wpi/util/sendable/SendableHelper.hpp"
 
-#include "frc/AnalogInput.h"
+#include "wpi/hardware/discrete/AnalogInput.hpp"
 
 namespace frc {
 

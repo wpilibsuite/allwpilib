@@ -5,13 +5,13 @@
 #include <string>
 #include <thread>
 
-#include <frc/simulation/DIOSim.h>
-#include <frc/simulation/DriverStationSim.h>
-#include <frc/simulation/SimHooks.h>
+#include "wpi/simulation/DIOSim.hpp"
+#include "wpi/simulation/DriverStationSim.hpp"
+#include "wpi/simulation/SimHooks.hpp"
 #include <gtest/gtest.h>
-#include <units/time.h>
+#include "wpi/units/time.hpp"
 
-#include "Robot.h"
+#include "Robot.hpp"
 
 template <typename T>
 class DigitalCommunicationTest : public testing::TestWithParam<T> {

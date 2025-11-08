@@ -6,9 +6,9 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/ConvertUTF.h"
-#include "wpi/SmallString.h"
-#include "wpi/SmallVector.h"
+#include "wpi/util/ConvertUTF.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/SmallVector.hpp"
 #include "gtest/gtest.h"
 #include <string>
 #include <vector>

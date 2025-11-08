@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/TimedRobot.h>
-#include <frc/XboxController.h>
-#include <frc/drive/DifferentialDrive.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
+#include "wpi/opmode/TimedRobot.hpp"
+#include "wpi/driverstation/XboxController.hpp"
+#include "wpi/drive/DifferentialDrive.hpp"
+#include "wpi/hardware/motor/PWMSparkMax.hpp"
 
 /**
  * This is a demo program showing the use of the DifferentialDrive class.

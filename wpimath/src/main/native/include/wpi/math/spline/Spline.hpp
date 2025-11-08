@@ -8,12 +8,12 @@
 #include <utility>
 
 #include <gcem.hpp>
-#include <wpi/array.h>
+#include "wpi/util/array.hpp"
 
-#include "frc/EigenCore.h"
-#include "frc/geometry/Pose2d.h"
-#include "units/curvature.h"
-#include "units/length.h"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/units/curvature.hpp"
+#include "wpi/units/length.hpp"
 
 namespace frc {
 

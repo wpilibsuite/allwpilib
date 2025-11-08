@@ -14,7 +14,7 @@
 #ifndef WPIUTIL_WPI_SMALLSTRING_H
 #define WPIUTIL_WPI_SMALLSTRING_H
 
-#include "wpi/SmallVector.h"
+#include "wpi/util/SmallVector.hpp"
 #include <cstddef>
 #include <string>
 #include <string_view>

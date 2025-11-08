@@ -4,15 +4,15 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/Encoder.h"
-#include "frc/RobotController.h"
-#include "frc/controller/PIDController.h"
-#include "frc/motorcontrol/PWMVictorSPX.h"
-#include "frc/simulation/BatterySim.h"
-#include "frc/simulation/DCMotorSim.h"
-#include "frc/simulation/EncoderSim.h"
-#include "frc/simulation/RoboRioSim.h"
-#include "frc/system/plant/LinearSystemId.h"
+#include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/system/RobotController.hpp"
+#include "wpi/math/controller/PIDController.hpp"
+#include "wpi/hardware/motor/PWMVictorSPX.hpp"
+#include "wpi/simulation/BatterySim.hpp"
+#include "wpi/simulation/DCMotorSim.hpp"
+#include "wpi/simulation/EncoderSim.hpp"
+#include "wpi/simulation/RoboRioSim.hpp"
+#include "wpi/math/system/plant/LinearSystemId.hpp"
 
 TEST(DCMotorSimTest, VoltageSteadyState) {
   frc::DCMotor gearbox = frc::DCMotor::NEO(1);

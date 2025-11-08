@@ -4,8 +4,8 @@
 
 #include <cstdio>
 
-#include <cameraserver/CameraServer.h>
-#include <frc/TimedRobot.h>
+#include "wpi/cameraserver/CameraServer.hpp"
+#include "wpi/opmode/TimedRobot.hpp"
 
 /**
  * Uses the CameraServer class to automatically capture video from a USB webcam

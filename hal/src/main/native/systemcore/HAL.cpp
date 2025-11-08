@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/HAL.h"
+#include "wpi/hal/HAL.h"
 
 #include <dlfcn.h>
 #include <signal.h>  // linux for kill
@@ -17,21 +17,21 @@
 #include <thread>
 #include <utility>
 
-#include <wpi/MemoryBuffer.h>
-#include <wpi/StringExtras.h>
-#include <wpi/fs.h>
-#include <wpi/mutex.h>
-#include <wpi/print.h>
-#include <wpi/timestamp.h>
+#include "wpi/util/MemoryBuffer.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/fs.hpp"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/print.hpp"
+#include "wpi/util/timestamp.h"
 
 #include "CANInternal.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "SystemServerInternal.h"
-#include "hal/DriverStation.h"
-#include "hal/Errors.h"
-#include "hal/Notifier.h"
-#include "hal/handles/HandlesInternal.h"
+#include "wpi/hal/DriverStation.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/Notifier.h"
+#include "wpi/hal/handles/HandlesInternal.h"
 
 using namespace hal;
 

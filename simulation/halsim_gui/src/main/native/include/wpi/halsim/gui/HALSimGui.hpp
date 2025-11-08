@@ -7,11 +7,11 @@
 #include <functional>
 #include <memory>
 
-#include <glass/MainMenuBar.h>
-#include <glass/WindowManager.h>
-#include <glass/networktables/NetworkTablesProvider.h>
+#include "wpi/glass/MainMenuBar.hpp"
+#include "wpi/glass/WindowManager.hpp"
+#include "wpi/glass/networktables/NetworkTablesProvider.hpp"
 
-#include "HALProvider.h"
+#include "wpi/halsim/gui/HALProvider.hpp"
 
 namespace halsimgui {
 

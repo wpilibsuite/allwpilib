@@ -2,20 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/CANAPI.h"
+#include "wpi/hal/CANAPI.h"
 
 #include <ctime>
 #include <memory>
 
-#include <wpi/DenseMap.h>
-#include <wpi/mutex.h>
-#include <wpi/timestamp.h>
+#include "wpi/util/DenseMap.hpp"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/timestamp.h"
 
 #include "HALInitializer.h"
 #include "PortsInternal.h"
-#include "hal/CAN.h"
-#include "hal/Errors.h"
-#include "hal/handles/UnlimitedHandleResource.h"
+#include "wpi/hal/CAN.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/handles/UnlimitedHandleResource.h"
 
 using namespace hal;
 

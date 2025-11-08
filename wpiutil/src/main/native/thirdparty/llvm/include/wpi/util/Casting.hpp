@@ -14,8 +14,8 @@
 #ifndef WPIUTIL_WPI_CASTING_H
 #define WPIUTIL_WPI_CASTING_H
 
-#include "wpi/Compiler.h"
-#include "wpi/type_traits.h"
+#include "wpi/util/Compiler.hpp"
+#include "wpi/util/type_traits.hpp"
 #include <cassert>
 #include <memory>
 #include <optional>

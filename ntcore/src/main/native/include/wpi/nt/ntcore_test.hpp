@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-#include "ntcore.h"
+#include "wpi/nt/ntcore.h"
 
 // Functions in this header are to be used only for testing
 

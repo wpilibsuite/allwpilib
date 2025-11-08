@@ -9,10 +9,10 @@
 
 #include <string_view>
 
-#include <wpi/Signal.h>
-#include <wpi/SmallString.h>
+#include "wpi/util/Signal.h"
+#include "wpi/util/SmallString.hpp"
 
-#include "wpinet/http_parser.h"
+#include "wpi/net/http_parser.hpp"
 
 namespace wpi {
 

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "sysid/analysis/AnalysisManager.h"
+#include "wpi/sysid/analysis/AnalysisManager.hpp"
 
 #include <cmath>
 #include <limits>
@@ -10,13 +10,13 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <units/angle.h>
-#include <wpi/MathExtras.h>
-#include <wpi/StringExtras.h>
-#include <wpi/StringMap.h>
+#include "wpi/units/angle.hpp"
+#include "wpi/util/MathExtras.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/StringMap.hpp"
 
-#include "sysid/analysis/FeedforwardAnalysis.h"
-#include "sysid/analysis/FilteringUtils.h"
+#include "wpi/sysid/analysis/FeedforwardAnalysis.hpp"
+#include "wpi/sysid/analysis/FilteringUtils.hpp"
 
 using namespace sysid;
 

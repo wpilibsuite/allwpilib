@@ -8,8 +8,8 @@
 
 #include <Eigen/Core>
 #include <gcem.hpp>
-#include <wpi/SymbolExports.h>
-#include <wpi/json_fwd.h>
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/json_fwd.hpp"
 
 namespace frc {
 
@@ -334,5 +334,5 @@ void from_json(const wpi::json& json, Quaternion& quaternion);
 
 }  // namespace frc
 
-#include "frc/geometry/proto/QuaternionProto.h"
-#include "frc/geometry/struct/QuaternionStruct.h"
+#include "wpi/math/geometry/proto/QuaternionProto.hpp"
+#include "wpi/math/geometry/struct/QuaternionStruct.hpp"

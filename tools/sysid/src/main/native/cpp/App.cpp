@@ -12,22 +12,22 @@
 #include <utility>
 #include <string_view>
 
-#include <glass/Context.h>
-#include <glass/MainMenuBar.h>
-#include <glass/Storage.h>
-#include <glass/Window.h>
-#include <glass/WindowManager.h>
-#include <glass/other/Log.h>
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/MainMenuBar.hpp"
+#include "wpi/glass/Storage.hpp"
+#include "wpi/glass/Window.hpp"
+#include "wpi/glass/WindowManager.hpp"
+#include "wpi/glass/other/Log.hpp"
 #include <imgui.h>
-#include <wpi/Logger.h>
-#include <wpi/print.h>
-#include <wpigui.h>
-#include <wpigui_openurl.h>
+#include "wpi/util/Logger.hpp"
+#include "wpi/util/print.hpp"
+#include "wpi/gui/wpigui.hpp"
+#include "wpi/gui/wpigui_openurl.hpp"
 
-#include "sysid/view/Analyzer.h"
-#include "sysid/view/DataSelector.h"
-#include "sysid/view/LogLoader.h"
-#include "sysid/view/UILayout.h"
+#include "wpi/sysid/view/Analyzer.hpp"
+#include "wpi/sysid/view/DataSelector.hpp"
+#include "wpi/sysid/view/LogLoader.hpp"
+#include "wpi/sysid/view/UILayout.hpp"
 
 namespace gui = wpi::gui;
 

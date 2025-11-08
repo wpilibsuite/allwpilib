@@ -1,6 +1,6 @@
 #pragma once
 
-#include <units/capacitance.h>
+#include "wpi/units/capacitance.hpp"
 
 namespace pybind11 {
 namespace detail {

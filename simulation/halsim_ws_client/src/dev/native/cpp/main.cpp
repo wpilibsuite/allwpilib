@@ -4,10 +4,10 @@
 
 #include <thread>
 
-#include <hal/DriverStation.h>
-#include <hal/HALBase.h>
-#include <hal/Main.h>
-#include <wpi/print.h>
+#include "wpi/hal/DriverStation.h"
+#include "wpi/hal/HALBase.h"
+#include "wpi/hal/Main.h"
+#include "wpi/util/print.hpp"
 
 extern "C" int HALSIM_InitExtension(void);
 

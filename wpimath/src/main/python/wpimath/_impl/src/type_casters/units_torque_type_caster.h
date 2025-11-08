@@ -1,6 +1,6 @@
 #pragma once
 
-#include <units/torque.h>
+#include "wpi/units/torque.hpp"
 
 namespace pybind11 {
 namespace detail {

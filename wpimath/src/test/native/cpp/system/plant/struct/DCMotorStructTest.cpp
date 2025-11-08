@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/system/plant/DCMotor.h"
+#include "wpi/math/system/plant/DCMotor.hpp"
 
 using namespace frc;
 

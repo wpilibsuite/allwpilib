@@ -3,11 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <hal/HAL.h>
+#include "wpi/hal/HAL.h"
 
-#include "frc/DoubleSolenoid.h"
-#include "frc/PneumaticsControlModule.h"
-#include "frc/Solenoid.h"
+#include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
+#include "wpi/hardware/pneumatic/PneumaticsControlModule.hpp"
+#include "wpi/hardware/pneumatic/Solenoid.hpp"
 
 namespace frc {
 

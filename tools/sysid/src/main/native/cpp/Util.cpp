@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "sysid/Util.h"
+#include "wpi/sysid/Util.hpp"
 
 #include <filesystem>
 #include <stdexcept>
 
 #include <IconsFontAwesome6.h>
 #include <imgui.h>
-#include <wpi/raw_ostream.h>
+#include "wpi/util/raw_ostream.hpp"
 
 void sysid::CreateTooltip(const char* text) {
   ImGui::SameLine();

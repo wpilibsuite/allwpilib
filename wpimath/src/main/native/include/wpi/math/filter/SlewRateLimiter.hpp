@@ -6,10 +6,10 @@
 
 #include <algorithm>
 
-#include <wpi/timestamp.h>
+#include "wpi/util/timestamp.h"
 
-#include "units/time.h"
-#include "wpimath/MathShared.h"
+#include "wpi/units/time.hpp"
+#include "wpi/math/util/MathShared.hpp"
 
 namespace frc {
 /**

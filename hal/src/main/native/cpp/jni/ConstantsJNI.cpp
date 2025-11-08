@@ -8,7 +8,7 @@
 
 #include "HALUtil.h"
 #include "org_wpilib_hardware_hal_ConstantsJNI.h"
-#include "hal/Constants.h"
+#include "wpi/hal/Constants.h"
 
 using namespace hal;
 

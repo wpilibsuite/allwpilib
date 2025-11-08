@@ -6,15 +6,15 @@
 
 #include <utility>
 
-#include <wpi/Synchronization.h>
+#include "wpi/util/Synchronization.h"
 
-#include "Handle.h"
-#include "Types_internal.h"
-#include "ValueCircularBuffer.h"
-#include "VectorSet.h"
-#include "local/LocalTopic.h"
-#include "local/PubSubConfig.h"
-#include "ntcore_c.h"
+#include "Handle.hpp"
+#include "Types_internal.hpp"
+#include "ValueCircularBuffer.hpp"
+#include "VectorSet.hpp"
+#include "local/LocalTopic.hpp"
+#include "local/PubSubConfig.hpp"
+#include "wpi/nt/ntcore_c.h"
 
 namespace nt::local {
 

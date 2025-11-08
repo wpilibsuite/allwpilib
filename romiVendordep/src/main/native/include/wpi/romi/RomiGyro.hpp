@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <hal/SimDevice.h>
-#include <units/angle.h>
-#include <units/angular_velocity.h>
+#include "wpi/hal/SimDevice.h"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/angular_velocity.hpp"
 
 namespace frc {
 

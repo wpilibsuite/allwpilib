@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <wpi/SymbolExports.h>
-#include <wpi/protobuf/Protobuf.h>
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/protobuf/Protobuf.hpp"
 
-#include "frc/geometry/Quaternion.h"
+#include "wpi/math/geometry/Quaternion.hpp"
 #include "wpimath/protobuf/geometry3d.npb.h"
 
 template <>

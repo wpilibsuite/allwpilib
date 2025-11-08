@@ -8,7 +8,7 @@
 
 #include <string_view>
 
-#include <wpi/function_ref.h>
+#include "wpi/util/function_ref.hpp"
 
 namespace wpi {
 class raw_ostream;

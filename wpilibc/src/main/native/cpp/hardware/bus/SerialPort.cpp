@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/SerialPort.h"
+#include "wpi/hardware/bus/SerialPort.hpp"
 
 #include <string>
 
-#include <hal/SerialPort.h>
-#include <hal/UsageReporting.h>
+#include "wpi/hal/SerialPort.h"
+#include "wpi/hal/UsageReporting.h"
 
-#include "frc/Errors.h"
+#include "wpi/system/Errors.hpp"
 
 using namespace frc;
 

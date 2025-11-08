@@ -7,10 +7,10 @@
 #include <stdexcept>
 
 #include <fmt/format.h>
-#include <wpi/protobuf/Protobuf.h>
-#include <wpi/protobuf/ProtobufCallbacks.h>
+#include "wpi/util/protobuf/Protobuf.hpp"
+#include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 
-#include "frc/EigenCore.h"
+#include "wpi/math/linalg/EigenCore.hpp"
 #include "wpimath/protobuf/wpimath.npb.h"
 
 template <int Rows, int Cols, int Options, int MaxRows, int MaxCols>

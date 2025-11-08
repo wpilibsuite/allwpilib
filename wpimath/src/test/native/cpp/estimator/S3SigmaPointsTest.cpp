@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/estimator/S3SigmaPoints.h"
+#include "wpi/math/estimator/S3SigmaPoints.hpp"
 
 TEST(S3SigmaPointsTest, Simplex) {
   constexpr double alpha = 1e-3;

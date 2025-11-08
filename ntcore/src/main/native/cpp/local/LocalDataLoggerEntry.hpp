@@ -9,9 +9,9 @@
 #include <string>
 #include <string_view>
 
-#include <wpi/datalog/DataLog.h>
+#include "wpi/datalog/DataLog.hpp"
 
-#include "ntcore_c.h"
+#include "wpi/nt/ntcore_c.h"
 
 namespace wpi::log {
 class DataLog;

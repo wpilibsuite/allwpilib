@@ -7,13 +7,13 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/EigenCore.h"
-#include "frc/controller/ArmFeedforward.h"
-#include "frc/system/NumericalIntegration.h"
-#include "units/angular_acceleration.h"
-#include "units/angular_velocity.h"
-#include "units/time.h"
-#include "units/voltage.h"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/controller/ArmFeedforward.hpp"
+#include "wpi/math/system/NumericalIntegration.hpp"
+#include "wpi/units/angular_acceleration.hpp"
+#include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/voltage.hpp"
 
 namespace {
 

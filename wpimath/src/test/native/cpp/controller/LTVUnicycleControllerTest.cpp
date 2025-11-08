@@ -4,10 +4,10 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/MathUtil.h"
-#include "frc/controller/LTVUnicycleController.h"
-#include "frc/trajectory/TrajectoryGenerator.h"
-#include "units/math.h"
+#include "wpi/math/util/MathUtil.hpp"
+#include "wpi/math/controller/LTVUnicycleController.hpp"
+#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
+#include "wpi/units/math.hpp"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(units::math::abs(val1 - val2), eps)

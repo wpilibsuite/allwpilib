@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include <wpi/SmallVector.h>
+#include "wpi/util/SmallVector.hpp"
 
 namespace glass {
 

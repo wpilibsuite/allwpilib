@@ -6,7 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "CountCopyAndMove.h"
+#include "CountCopyAndMove.hpp"
 
 using namespace wpi;
 

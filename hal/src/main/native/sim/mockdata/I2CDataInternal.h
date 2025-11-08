@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "hal/simulation/I2CData.h"
-#include "hal/simulation/SimCallbackRegistry.h"
-#include "hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/I2CData.h"
+#include "wpi/hal/simulation/SimCallbackRegistry.h"
+#include "wpi/hal/simulation/SimDataValue.h"
 
 namespace hal {
 class I2CData {

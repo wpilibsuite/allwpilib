@@ -17,8 +17,8 @@
 #include <utility> // pair
 #include <vector> // vector
 
-#include <wpi/detail/macro_scope.h>
-#include <wpi/detail/meta/type_traits.h>
+#include "wpi/util/detail/macro_scope.hpp"
+#include "wpi/util/detail/meta/type_traits.hpp"
 
 WPI_JSON_NAMESPACE_BEGIN
 

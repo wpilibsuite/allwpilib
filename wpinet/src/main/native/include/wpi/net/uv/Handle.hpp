@@ -13,11 +13,11 @@
 #include <string_view>
 #include <utility>
 
-#include <wpi/Signal.h>
+#include "wpi/util/Signal.h"
 
-#include "wpinet/uv/Buffer.h"
-#include "wpinet/uv/Error.h"
-#include "wpinet/uv/Loop.h"
+#include "wpi/net/uv/Buffer.hpp"
+#include "wpi/net/uv/Error.hpp"
+#include "wpi/net/uv/Loop.hpp"
 
 namespace wpi {
 class Logger;

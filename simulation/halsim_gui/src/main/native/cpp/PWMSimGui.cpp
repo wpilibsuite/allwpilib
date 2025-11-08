@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "PWMSimGui.h"
+#include "PWMSimGui.hpp"
 
 #include <memory>
 #include <vector>
 
-#include <glass/hardware/PWM.h>
-#include <hal/Ports.h>
-#include <hal/simulation/AddressableLEDData.h>
-#include <hal/simulation/PWMData.h>
+#include "wpi/glass/hardware/PWM.hpp"
+#include "wpi/hal/Ports.h"
+#include "wpi/hal/simulation/AddressableLEDData.h"
+#include "wpi/hal/simulation/PWMData.h"
 
-#include "HALDataSource.h"
-#include "HALSimGui.h"
+#include "wpi/halsim/gui/HALDataSource.hpp"
+#include "wpi/halsim/gui/HALSimGui.hpp"
 
 using namespace halsimgui;
 

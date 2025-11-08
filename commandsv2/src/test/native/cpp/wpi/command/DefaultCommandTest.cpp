@@ -4,9 +4,9 @@
 
 #include <utility>
 
-#include "CommandTestBase.h"
-#include "frc2/command/Commands.h"
-#include "frc2/command/RunCommand.h"
+#include "CommandTestBase.hpp"
+#include "wpi/commands2/Commands.hpp"
+#include "wpi/commands2/RunCommand.hpp"
 
 using namespace frc2;
 class DefaultCommandTest : public CommandTestBase {};

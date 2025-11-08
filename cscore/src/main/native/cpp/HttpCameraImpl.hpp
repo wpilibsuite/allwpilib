@@ -15,13 +15,13 @@
 #include <thread>
 #include <vector>
 
-#include <wpi/StringMap.h>
-#include <wpi/condition_variable.h>
-#include <wpi/raw_istream.h>
-#include <wpinet/HttpUtil.h>
+#include "wpi/util/StringMap.hpp"
+#include "wpi/util/condition_variable.hpp"
+#include "wpi/util/raw_istream.hpp"
+#include "wpi/net/HttpUtil.hpp"
 
-#include "SourceImpl.h"
-#include "cscore_cpp.h"
+#include "SourceImpl.hpp"
+#include "wpi/cs/cscore_cpp.hpp"
 
 namespace cs {
 

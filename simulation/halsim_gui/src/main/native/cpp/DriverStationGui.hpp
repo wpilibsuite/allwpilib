@@ -7,7 +7,7 @@
 #include <memory>
 #include <string_view>
 
-#include <glass/WindowManager.h>
+#include "wpi/glass/WindowManager.hpp"
 
 namespace halsimgui {
 

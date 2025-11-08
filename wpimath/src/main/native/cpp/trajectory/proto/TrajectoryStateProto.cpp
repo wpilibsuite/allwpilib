@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/trajectory/proto/TrajectoryStateProto.h"
+#include "wpi/math/trajectory/proto/TrajectoryStateProto.hpp"
 
 #include <utility>
 
-#include <wpi/protobuf/ProtobufCallbacks.h>
+#include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 
 #include "wpimath/protobuf/trajectory.npb.h"
 

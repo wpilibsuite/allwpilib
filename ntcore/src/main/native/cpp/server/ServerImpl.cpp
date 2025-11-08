@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "ServerImpl.h"
+#include "ServerImpl.hpp"
 
 #include <stdint.h>
 
@@ -12,12 +12,12 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/MessagePack.h>
+#include "wpi/util/MessagePack.hpp"
 
-#include "Log.h"
-#include "server/MessagePackWriter.h"
-#include "server/ServerClient4.h"
-#include "server/ServerClientLocal.h"
+#include "Log.hpp"
+#include "server/MessagePackWriter.hpp"
+#include "server/ServerClient4.hpp"
+#include "server/ServerClientLocal.hpp"
 
 using namespace nt;
 using namespace nt::server;

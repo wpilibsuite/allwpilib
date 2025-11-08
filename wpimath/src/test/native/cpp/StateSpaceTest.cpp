@@ -7,15 +7,15 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/EigenCore.h"
-#include "frc/controller/LinearPlantInversionFeedforward.h"
-#include "frc/controller/LinearQuadraticRegulator.h"
-#include "frc/estimator/KalmanFilter.h"
-#include "frc/system/LinearSystem.h"
-#include "frc/system/LinearSystemLoop.h"
-#include "frc/system/plant/DCMotor.h"
-#include "frc/system/plant/LinearSystemId.h"
-#include "units/time.h"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
+#include "wpi/math/controller/LinearQuadraticRegulator.hpp"
+#include "wpi/math/estimator/KalmanFilter.hpp"
+#include "wpi/math/system/LinearSystem.hpp"
+#include "wpi/math/system/LinearSystemLoop.hpp"
+#include "wpi/math/system/plant/DCMotor.hpp"
+#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/units/time.hpp"
 
 namespace frc {
 

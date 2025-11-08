@@ -6,16 +6,16 @@
 
 #include <functional>
 
-#include <wpi/SymbolExports.h>
-#include <wpi/array.h>
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/array.hpp"
 
-#include "frc/estimator/PoseEstimator3d.h"
-#include "frc/geometry/Pose2d.h"
-#include "frc/geometry/Rotation2d.h"
-#include "frc/interpolation/TimeInterpolatableBuffer.h"
-#include "frc/kinematics/MecanumDriveKinematics.h"
-#include "frc/kinematics/MecanumDriveOdometry3d.h"
-#include "units/time.h"
+#include "wpi/math/estimator/PoseEstimator3d.hpp"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/interpolation/TimeInterpolatableBuffer.hpp"
+#include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
+#include "wpi/math/kinematics/MecanumDriveOdometry3d.hpp"
+#include "wpi/units/time.hpp"
 
 namespace frc {
 /**

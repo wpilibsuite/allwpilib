@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "HALSimXRP.h"
+#include "wpi/halsim/xrp/HALSimXRP.hpp"
 
 #include <cstdio>
 #include <string>
 
-#include <wpi/Endian.h>
-#include <wpi/MathExtras.h>
-#include <wpi/SmallString.h>
-#include <wpi/print.h>
-#include <wpinet/raw_uv_ostream.h>
-#include <wpinet/uv/util.h>
+#include "wpi/util/Endian.hpp"
+#include "wpi/util/MathExtras.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/print.hpp"
+#include "wpi/net/raw_uv_ostream.hpp"
+#include "wpi/net/uv/util.hpp"
 
 namespace uv = wpi::uv;
 

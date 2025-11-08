@@ -33,13 +33,13 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/SymbolExports.h>
+#include "wpi/util/SymbolExports.hpp"
 
-#include "frc/spline/Spline.h"
-#include "units/angle.h"
-#include "units/curvature.h"
-#include "units/length.h"
-#include "units/math.h"
+#include "wpi/math/spline/Spline.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/curvature.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/math.hpp"
 
 namespace frc {
 

@@ -6,8 +6,8 @@
 
 #include <unsupported/Eigen/MatrixFunctions>
 
-#include "frc/EigenCore.h"
-#include "units/time.h"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/units/time.hpp"
 
 namespace frc {
 

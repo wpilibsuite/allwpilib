@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <wpi/SymbolExports.h>
-#include <wpi/protobuf/Protobuf.h>
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/protobuf/Protobuf.hpp"
 
-#include "frc/controller/DifferentialDriveFeedforward.h"
+#include "wpi/math/controller/DifferentialDriveFeedforward.hpp"
 #include "pb.h"
 #include "wpimath/protobuf/controller.npb.h"
 

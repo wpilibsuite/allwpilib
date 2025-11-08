@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/motorcontrol/PWMMotorController.h"
+#include "wpi/hardware/motor/PWMMotorController.hpp"
 
 #include <string>
 
 #include <fmt/format.h>
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/util/sendable/SendableRegistry.hpp"
 
-#include "frc/RobotController.h"
+#include "wpi/system/RobotController.hpp"
 
 using namespace frc;
 

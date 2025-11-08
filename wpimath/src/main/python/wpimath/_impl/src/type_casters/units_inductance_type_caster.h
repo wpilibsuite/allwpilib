@@ -1,6 +1,6 @@
 #pragma once
 
-#include <units/inductance.h>
+#include "wpi/units/inductance.hpp"
 
 namespace pybind11 {
 namespace detail {

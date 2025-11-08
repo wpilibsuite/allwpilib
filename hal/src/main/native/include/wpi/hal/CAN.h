@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <hal/CANAPITypes.h>
-#include <hal/Types.h>
+#include "wpi/hal/CANAPITypes.h"
+#include "wpi/hal/Types.h"
 #include <stdint.h>
 
 /**

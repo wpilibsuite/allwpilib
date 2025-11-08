@@ -2,19 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "PowerDistributionSimGui.h"
+#include "PowerDistributionSimGui.hpp"
 
 #include <cstdio>
 #include <cstring>
 #include <memory>
 #include <vector>
 
-#include <glass/hardware/PowerDistribution.h>
-#include <hal/Ports.h>
-#include <hal/simulation/PowerDistributionData.h>
+#include "wpi/glass/hardware/PowerDistribution.hpp"
+#include "wpi/hal/Ports.h"
+#include "wpi/hal/simulation/PowerDistributionData.h"
 
-#include "HALDataSource.h"
-#include "HALSimGui.h"
+#include "wpi/halsim/gui/HALDataSource.hpp"
+#include "wpi/halsim/gui/HALSimGui.hpp"
 
 using namespace halsimgui;
 

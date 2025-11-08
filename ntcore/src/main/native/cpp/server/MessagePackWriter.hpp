@@ -8,8 +8,8 @@
 
 #include <vector>
 
-#include <wpi/MessagePack.h>
-#include <wpi/raw_ostream.h>
+#include "wpi/util/MessagePack.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
 namespace nt::server {
 

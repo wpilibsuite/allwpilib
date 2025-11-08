@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/Logger.h>
+#include "wpi/util/Logger.hpp"
 
 #include "gmock/gmock.h"
 

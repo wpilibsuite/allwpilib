@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "DriverStationGui.h"
+#include "DriverStationGui.hpp"
 
 #include <algorithm>
 #include <atomic>
@@ -14,22 +14,22 @@
 
 #include <GLFW/glfw3.h>
 #include <fmt/format.h>
-#include <glass/Context.h>
-#include <glass/Storage.h>
-#include <glass/other/FMS.h>
-#include <glass/support/ExtraGuiWidgets.h>
-#include <glass/support/NameSetting.h>
-#include <hal/DriverStationTypes.h>
-#include <hal/simulation/DriverStationData.h>
-#include <hal/simulation/MockHooks.h>
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/Storage.hpp"
+#include "wpi/glass/other/FMS.hpp"
+#include "wpi/glass/support/ExtraGuiWidgets.hpp"
+#include "wpi/glass/support/NameSetting.hpp"
+#include "wpi/hal/DriverStationTypes.h"
+#include "wpi/hal/simulation/DriverStationData.h"
+#include "wpi/hal/simulation/MockHooks.h"
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <wpi/SmallVector.h>
-#include <wpi/StringExtras.h>
-#include <wpigui.h>
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/gui/wpigui.hpp"
 
-#include "HALDataSource.h"
-#include "HALSimGui.h"
+#include "wpi/halsim/gui/HALDataSource.hpp"
+#include "wpi/halsim/gui/HALSimGui.hpp"
 
 using namespace halsimgui;
 

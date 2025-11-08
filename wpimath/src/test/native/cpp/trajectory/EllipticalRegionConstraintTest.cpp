@@ -4,13 +4,13 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/trajectory/constraint/EllipticalRegionConstraint.h"
-#include "frc/trajectory/constraint/MaxVelocityConstraint.h"
-#include "trajectory/TestTrajectory.h"
-#include "units/acceleration.h"
-#include "units/angle.h"
-#include "units/length.h"
-#include "units/velocity.h"
+#include "wpi/math/trajectory/constraint/EllipticalRegionConstraint.hpp"
+#include "wpi/math/trajectory/constraint/MaxVelocityConstraint.hpp"
+#include "wpi/math/trajectory/TestTrajectory.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/velocity.hpp"
 
 using namespace frc;
 

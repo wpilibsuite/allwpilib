@@ -4,14 +4,14 @@
 
 #pragma once
 
-#include <frc/Encoder.h>
-#include <frc/drive/DifferentialDrive.h>
-#include <frc/motorcontrol/Spark.h>
-#include <frc/romi/RomiGyro.h>
-#include <frc2/command/SubsystemBase.h>
-#include <units/acceleration.h>
-#include <units/angle.h>
-#include <units/length.h>
+#include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/drive/DifferentialDrive.hpp"
+#include "wpi/hardware/motor/Spark.hpp"
+#include "wpi/romi/RomiGyro.hpp"
+#include "wpi/commands2/SubsystemBase.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
 
 class Drivetrain : public frc2::SubsystemBase {
  public:

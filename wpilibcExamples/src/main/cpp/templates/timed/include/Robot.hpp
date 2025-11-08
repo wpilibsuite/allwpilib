@@ -6,8 +6,8 @@
 
 #include <string>
 
-#include <frc/TimedRobot.h>
-#include <frc/smartdashboard/SendableChooser.h>
+#include "wpi/opmode/TimedRobot.hpp"
+#include "wpi/smartdashboard/SendableChooser.hpp"
 
 class Robot : public frc::TimedRobot {
  public:

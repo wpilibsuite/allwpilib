@@ -14,14 +14,14 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/SmallString.h>
-#include <wpi/SmallVector.h>
-#include <wpi/StringMap.h>
-#include <wpi/raw_istream.h>
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/StringMap.hpp"
+#include "wpi/util/raw_istream.hpp"
 
-#include "wpinet/NetworkStream.h"
-#include "wpinet/raw_socket_istream.h"
-#include "wpinet/raw_socket_ostream.h"
+#include "wpi/net/NetworkStream.hpp"
+#include "wpi/net/raw_socket_istream.hpp"
+#include "wpi/net/raw_socket_ostream.hpp"
 
 namespace wpi {
 

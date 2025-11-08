@@ -13,10 +13,10 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/StringMap.h>
-#include <wpi/sendable/SendableBuilder.h>
+#include "wpi/util/StringMap.hpp"
+#include "wpi/util/sendable/SendableBuilder.hpp"
 
-#include "frc/smartdashboard/SendableChooserBase.h"
+#include "wpi/smartdashboard/SendableChooserBase.hpp"
 
 namespace frc {
 

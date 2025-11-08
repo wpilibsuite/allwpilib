@@ -26,9 +26,9 @@
 
 #pragma once
 
-#include "units/base.h"
-#include "units/length.h"
-#include "units/luminous_flux.h"
+#include "wpi/units/base.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/luminous_flux.hpp"
 
 namespace units {
 /**

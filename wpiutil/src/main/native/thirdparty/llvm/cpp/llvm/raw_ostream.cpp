@@ -14,14 +14,14 @@
 #define _CRT_NONSTDC_NO_WARNINGS
 #endif
 
-#include "wpi/raw_ostream.h"
-#include "wpi/SmallString.h"
-#include "wpi/SmallVector.h"
-#include "wpi/StringExtras.h"
-#include "wpi/Compiler.h"
-#include "wpi/ErrorHandling.h"
-#include "wpi/fs.h"
-#include "wpi/MathExtras.h"
+#include "wpi/util/raw_ostream.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/Compiler.hpp"
+#include "wpi/util/ErrorHandling.hpp"
+#include "wpi/util/fs.hpp"
+#include "wpi/util/MathExtras.hpp"
 #include <algorithm>
 #include <cerrno>
 #include <cstdio>
@@ -53,7 +53,7 @@
 #endif
 
 #ifdef _WIN32
-#include "wpi/ConvertUTF.h"
+#include "wpi/util/ConvertUTF.hpp"
 #include "Windows/WindowsSupport.h"
 #endif
 

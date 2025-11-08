@@ -10,7 +10,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/StringMap.h"  // NOLINT(build/include_order)
+#include "wpi/util/StringMap.hpp"  // NOLINT(build/include_order)
 
 #include <string>
 #include <tuple>

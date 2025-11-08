@@ -40,7 +40,7 @@ SOFTWARE.
 #include <type_traits>
 #include <utility>
 
-#include "wpi/mutex.h"
+#include "wpi/util/mutex.hpp"
 
 namespace wpi {
 

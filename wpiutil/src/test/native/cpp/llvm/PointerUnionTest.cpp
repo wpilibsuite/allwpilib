@@ -6,7 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/PointerUnion.h"
+#include "wpi/util/PointerUnion.hpp"
 #include "gtest/gtest.h"
 using namespace wpi;
 

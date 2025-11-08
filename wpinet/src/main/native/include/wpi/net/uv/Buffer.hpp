@@ -13,7 +13,7 @@
 #include <string_view>
 #include <utility>
 
-#include <wpi/SmallVector.h>
+#include "wpi/util/SmallVector.hpp"
 
 namespace wpi::uv {
 

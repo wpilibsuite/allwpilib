@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "LocalStorageImpl.h"
+#include "LocalStorageImpl.hpp"
 
 #include <memory>
 #include <string_view>
@@ -11,13 +11,13 @@
 
 #include <fmt/format.h>
 #include <fmt/ranges.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringExtras.h>
-#include <wpi/datalog/DataLog.h>
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/datalog/DataLog.hpp"
 
-#include "IListenerStorage.h"
-#include "Log.h"
-#include "net/MessageHandler.h"
+#include "IListenerStorage.hpp"
+#include "Log.hpp"
+#include "net/MessageHandler.hpp"
 
 using namespace nt;
 using namespace nt::local;

@@ -2,20 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/AnalogInput.h"
+#include "wpi/hal/AnalogInput.h"
 
 #include <cstdio>
 #include <thread>
 
-#include <wpi/mutex.h>
+#include "wpi/util/mutex.hpp"
 
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
 #include "SmartIo.h"
-#include "hal/Errors.h"
-#include "hal/cpp/fpga_clock.h"
-#include "hal/handles/HandlesInternal.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/cpp/fpga_clock.h"
+#include "wpi/hal/handles/HandlesInternal.h"
 
 namespace hal::init {
 void InitializeAnalogInput() {}

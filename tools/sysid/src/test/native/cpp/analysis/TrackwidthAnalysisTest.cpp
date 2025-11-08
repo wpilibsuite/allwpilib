@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "sysid/analysis/TrackwidthAnalysis.h"
+#include "wpi/sysid/analysis/TrackwidthAnalysis.hpp"
 
 TEST(TrackwidthAnalysisTest, Calculate) {
   double result = sysid::CalculateTrackwidth(-0.5386, 0.5386, 90_deg);

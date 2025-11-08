@@ -11,15 +11,15 @@
 #include <string_view>
 #include <vector>
 
-#include <wpinet/EventLoopRunner.h>
-#include <wpinet/uv/Async.h>
-#include <wpinet/uv/Idle.h>
-#include <wpinet/uv/Timer.h>
+#include "wpi/net/EventLoopRunner.hpp"
+#include "wpi/net/uv/Async.hpp"
+#include "wpi/net/uv/Idle.hpp"
+#include "wpi/net/uv/Timer.hpp"
 
-#include "net/ClientMessageQueue.h"
-#include "net/Message.h"
-#include "ntcore_cpp.h"
-#include "server/ServerImpl.h"
+#include "net/ClientMessageQueue.hpp"
+#include "net/Message.hpp"
+#include "wpi/nt/ntcore_cpp.hpp"
+#include "server/ServerImpl.hpp"
 
 namespace wpi {
 class Logger;

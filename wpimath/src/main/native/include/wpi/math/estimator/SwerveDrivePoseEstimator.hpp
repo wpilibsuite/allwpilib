@@ -6,15 +6,15 @@
 
 #include <cmath>
 
-#include <wpi/SymbolExports.h>
-#include <wpi/array.h>
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/array.hpp"
 
-#include "frc/estimator/PoseEstimator.h"
-#include "frc/geometry/Pose2d.h"
-#include "frc/geometry/Rotation2d.h"
-#include "frc/kinematics/SwerveDriveKinematics.h"
-#include "frc/kinematics/SwerveDriveOdometry.h"
-#include "units/time.h"
+#include "wpi/math/estimator/PoseEstimator.hpp"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
+#include "wpi/math/kinematics/SwerveDriveOdometry.hpp"
+#include "wpi/units/time.hpp"
 
 namespace frc {
 

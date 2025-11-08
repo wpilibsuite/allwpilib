@@ -6,10 +6,10 @@
 
 #include <functional>
 
-#include <frc2/command/Command.h>
-#include <frc2/command/CommandHelper.h>
+#include "wpi/commands2/Command.hpp"
+#include "wpi/commands2/CommandHelper.hpp"
 
-#include "subsystems/DriveSubsystem.h"
+#include "subsystems/DriveSubsystem.hpp"
 
 /**
  * A command to drive the robot with joystick input passed in through lambdas.

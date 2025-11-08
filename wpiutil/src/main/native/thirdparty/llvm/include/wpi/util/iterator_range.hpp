@@ -18,7 +18,7 @@
 #ifndef WPIUTIL_WPI_ITERATOR_RANGE_H
 #define WPIUTIL_WPI_ITERATOR_RANGE_H
 
-#include "wpi/ADL.h"
+#include "wpi/util/ADL.hpp"
 #include <type_traits>
 #include <utility>
 

@@ -9,13 +9,13 @@
 
 #include <Eigen/Core>
 #include <gcem.hpp>
-#include <wpi/StackTrace.h>
-#include <wpi/SymbolExports.h>
-#include <wpi/json_fwd.h>
+#include "wpi/util/StackTrace.hpp"
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/json_fwd.hpp"
 
-#include "frc/ct_matrix.h"
-#include "units/angle.h"
-#include "wpimath/MathShared.h"
+#include "wpi/math/linalg/ct_matrix.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/math/util/MathShared.hpp"
 
 namespace frc {
 
@@ -248,5 +248,5 @@ void from_json(const wpi::json& json, Rotation2d& rotation);
 
 }  // namespace frc
 
-#include "frc/geometry/proto/Rotation2dProto.h"
-#include "frc/geometry/struct/Rotation2dStruct.h"
+#include "wpi/math/geometry/proto/Rotation2dProto.hpp"
+#include "wpi/math/geometry/struct/Rotation2dStruct.hpp"

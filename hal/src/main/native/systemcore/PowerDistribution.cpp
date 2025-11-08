@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/PowerDistribution.h"
+#include "wpi/hal/PowerDistribution.h"
 
 #include <cstring>
 #include <thread>
@@ -11,9 +11,9 @@
 #include "HALInternal.h"
 #include "PortsInternal.h"
 #include "REVPDH.h"
-#include "hal/Errors.h"
-#include "hal/HALBase.h"
-#include "hal/handles/HandlesInternal.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/HALBase.h"
+#include "wpi/hal/handles/HandlesInternal.h"
 
 using namespace hal;
 

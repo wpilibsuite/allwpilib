@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/apriltag/AprilTagFieldLayout.h"
+#include "wpi/apriltag/AprilTagFieldLayout.hpp"
 
 #include <system_error>
 #include <utility>
 #include <vector>
 
-#include <units/angle.h>
-#include <units/length.h>
-#include <wpi/MemoryBuffer.h>
-#include <wpi/json.h>
-#include <wpi/raw_ostream.h>
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/util/MemoryBuffer.hpp"
+#include "wpi/util/json.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
 using namespace frc;
 

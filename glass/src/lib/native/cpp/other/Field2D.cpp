@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/other/Field2D.h"
+#include "wpi/glass/other/Field2D.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -13,29 +13,29 @@
 #include <utility>
 #include <vector>
 
-#include <fields/fields.h>
-#include <frc/geometry/Pose2d.h>
-#include <frc/geometry/Rotation2d.h>
-#include <frc/geometry/Translation2d.h>
+#include "wpi/fields/fields.hpp"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
-#include <portable-file-dialogs.h>
-#include <units/angle.h>
-#include <units/length.h>
-#include <wpi/MemoryBuffer.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringExtras.h>
-#include <wpi/StringMap.h>
-#include <wpi/fs.h>
-#include <wpi/json.h>
-#include <wpi/print.h>
-#include <wpigui.h>
+#include "wpi/gui/portable-file-dialogs.h"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/util/MemoryBuffer.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/StringMap.hpp"
+#include "wpi/util/fs.hpp"
+#include "wpi/util/json.hpp"
+#include "wpi/util/print.hpp"
+#include "wpi/gui/wpigui.hpp"
 
-#include "glass/Context.h"
-#include "glass/Storage.h"
-#include "glass/support/ColorSetting.h"
-#include "glass/support/EnumSetting.h"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/Storage.hpp"
+#include "wpi/glass/support/ColorSetting.hpp"
+#include "wpi/glass/support/EnumSetting.hpp"
 
 using namespace glass;
 

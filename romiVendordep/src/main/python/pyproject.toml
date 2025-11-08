@@ -50,6 +50,6 @@ depends = [
 
 [tool.semiwrap.extension_modules."romi._romi".headers]
 # frc/romi
-OnBoardIO = "frc/romi/OnBoardIO.h"
-RomiGyro = "frc/romi/RomiGyro.h"
-RomiMotor = "frc/romi/RomiMotor.h"
+OnBoardIO = "wpi/romi/OnBoardIO.hpp"
+RomiGyro = "wpi/romi/RomiGyro.hpp"
+RomiMotor = "wpi/romi/RomiMotor.hpp"

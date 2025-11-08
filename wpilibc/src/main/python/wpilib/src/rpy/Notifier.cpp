@@ -7,11 +7,11 @@
 #include <utility>
 
 #include <fmt/format.h>
-#include <hal/Notifier.h>
-#include <hal/Threads.h>
+#include "wpi/hal/Notifier.h"
+#include "wpi/hal/Threads.h"
 
-#include "frc/Errors.h"
-#include "frc/Timer.h"
+#include "wpi/system/Errors.hpp"
+#include "wpi/system/Timer.hpp"
 
 #include <pybind11/functional.h>
 #include <gilsafe_object.h>

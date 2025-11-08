@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <networktables/BooleanTopic.h>
-#include <networktables/DoubleTopic.h>
-#include <networktables/IntegerTopic.h>
+#include "wpi/nt/BooleanTopic.hpp"
+#include "wpi/nt/DoubleTopic.hpp"
+#include "wpi/nt/IntegerTopic.hpp"
 
 namespace frc {
 class ExpansionHubMotor;

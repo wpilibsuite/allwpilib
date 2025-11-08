@@ -2,8 +2,8 @@ defaults:
   subpackage: interfaces
 
 extra_includes:
-- frc/DriverStation.h
-- frc/event/BooleanEvent.h
+- wpi/driverstation/DriverStation.hpp
+- wpi/event/BooleanEvent.hpp
 
 classes:
   frc::GenericHID:

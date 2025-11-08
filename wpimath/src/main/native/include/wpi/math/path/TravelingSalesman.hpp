@@ -10,11 +10,11 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/array.h>
+#include "wpi/util/array.hpp"
 
-#include "frc/EigenCore.h"
-#include "frc/geometry/Pose2d.h"
-#include "frc/optimization/SimulatedAnnealing.h"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/optimization/SimulatedAnnealing.hpp"
 
 namespace frc {
 

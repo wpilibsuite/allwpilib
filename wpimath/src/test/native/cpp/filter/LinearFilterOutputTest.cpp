@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/filter/LinearFilter.h"  // NOLINT(build/include_order)
+#include "wpi/math/filter/LinearFilter.hpp"  // NOLINT(build/include_order)
 
 #include <cmath>
 #include <functional>
@@ -11,9 +11,9 @@
 #include <random>
 
 #include <gtest/gtest.h>
-#include <wpi/array.h>
+#include "wpi/util/array.hpp"
 
-#include "units/time.h"
+#include "wpi/units/time.hpp"
 
 // Filter constants
 static constexpr auto kFilterStep = 5_ms;

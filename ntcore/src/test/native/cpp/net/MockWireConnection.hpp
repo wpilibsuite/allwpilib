@@ -11,10 +11,10 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/raw_ostream.h>
+#include "wpi/util/raw_ostream.hpp"
 
 #include "gmock/gmock.h"
-#include "net/WireConnection.h"
+#include "net/WireConnection.hpp"
 
 namespace nt::net {
 

@@ -5,9 +5,9 @@
 #pragma once
 
 /* C API */
-#include "ntcore_c.h"
+#include "wpi/nt/ntcore_c.h"
 
 #ifdef __cplusplus
 /* C++ API */
-#include "ntcore_cpp.h"
+#include "wpi/nt/ntcore_cpp.hpp"
 #endif /* __cplusplus */

@@ -10,13 +10,13 @@
 
 #include <fmt/format.h>
 #include <gtest/gtest.h>
-#include <wpi/print.h>
-#include <wpi/timestamp.h>
+#include "wpi/util/print.hpp"
+#include "wpi/util/timestamp.h"
 
-#include "frc/estimator/SwerveDrivePoseEstimator.h"
-#include "frc/geometry/Pose2d.h"
-#include "frc/kinematics/SwerveDriveKinematics.h"
-#include "frc/trajectory/TrajectoryGenerator.h"
+#include "wpi/math/estimator/SwerveDrivePoseEstimator.hpp"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
+#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 
 void testFollowTrajectory(
     const frc::SwerveDriveKinematics<4>& kinematics,

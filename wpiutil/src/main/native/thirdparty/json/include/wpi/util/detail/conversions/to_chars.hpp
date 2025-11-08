@@ -16,7 +16,7 @@
 #include <limits> // numeric_limits
 #include <type_traits> // conditional
 
-#include <wpi/detail/macro_scope.h>
+#include "wpi/util/detail/macro_scope.hpp"
 
 WPI_JSON_NAMESPACE_BEGIN
 namespace detail

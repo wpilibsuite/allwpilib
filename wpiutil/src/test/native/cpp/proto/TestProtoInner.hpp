@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/protobuf/Protobuf.h>
+#include "wpi/util/protobuf/Protobuf.hpp"
 
 #include <string>
 

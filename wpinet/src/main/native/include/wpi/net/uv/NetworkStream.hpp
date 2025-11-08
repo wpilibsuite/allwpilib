@@ -11,9 +11,9 @@
 #include <functional>
 #include <memory>
 
-#include <wpi/Signal.h>
+#include "wpi/util/Signal.h"
 
-#include "wpinet/uv/Stream.h"
+#include "wpi/net/uv/Stream.hpp"
 
 namespace wpi::uv {
 

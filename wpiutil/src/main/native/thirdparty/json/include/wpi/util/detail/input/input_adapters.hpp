@@ -23,9 +23,9 @@
     #include <istream>  // istream
 #endif                  // JSON_NO_IO
 
-#include <wpi/detail/iterators/iterator_traits.h>
-#include <wpi/detail/macro_scope.h>
-#include <wpi/detail/meta/type_traits.h>
+#include "wpi/util/detail/iterators/iterator_traits.hpp"
+#include "wpi/util/detail/macro_scope.hpp"
+#include "wpi/util/detail/meta/type_traits.hpp"
 
 WPI_JSON_NAMESPACE_BEGIN
 namespace detail

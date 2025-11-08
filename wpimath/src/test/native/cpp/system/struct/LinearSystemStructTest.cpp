@@ -4,9 +4,9 @@
 
 #include <gtest/gtest.h>
 
-#include "../../StructTestBase.h"
-#include "frc/system/LinearSystem.h"
-#include "frc/system/struct/LinearSystemStruct.h"
+#include "../../StructTestBase.hpp"
+#include "wpi/math/system/LinearSystem.hpp"
+#include "wpi/math/system/struct/LinearSystemStruct.hpp"
 
 using namespace frc;
 

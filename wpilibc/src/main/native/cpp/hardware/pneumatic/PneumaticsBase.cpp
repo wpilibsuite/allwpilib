@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/PneumaticsBase.h"
+#include "wpi/hardware/pneumatic/PneumaticsBase.hpp"
 
 #include <memory>
 
-#include <hal/REVPH.h>
+#include "wpi/hal/REVPH.h"
 
-#include "frc/Errors.h"
-#include "frc/PneumaticHub.h"
-#include "frc/PneumaticsControlModule.h"
-#include "frc/SensorUtil.h"
+#include "wpi/system/Errors.hpp"
+#include "wpi/hardware/pneumatic/PneumaticHub.hpp"
+#include "wpi/hardware/pneumatic/PneumaticsControlModule.hpp"
+#include "wpi/util/SensorUtil.hpp"
 
 using namespace frc;
 

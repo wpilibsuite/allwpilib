@@ -4,11 +4,11 @@
 
 #include <numbers>
 
-#include <frc/Encoder.h>
-#include <frc/Joystick.h>
-#include <frc/TimedRobot.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc/smartdashboard/SmartDashboard.h>
+#include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/driverstation/Joystick.hpp"
+#include "wpi/opmode/TimedRobot.hpp"
+#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/smartdashboard/SmartDashboard.hpp"
 
 /**
  * This sample program shows how to control a motor using a joystick. In the

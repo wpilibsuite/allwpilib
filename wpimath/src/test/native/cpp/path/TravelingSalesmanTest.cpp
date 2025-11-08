@@ -7,13 +7,13 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include <wpi/array.h>
-#include <wpi/circular_buffer.h>
+#include "wpi/util/array.hpp"
+#include "wpi/util/circular_buffer.hpp"
 
-#include "frc/EigenCore.h"
-#include "frc/geometry/Pose2d.h"
-#include "frc/geometry/Rotation2d.h"
-#include "frc/path/TravelingSalesman.h"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/path/TravelingSalesman.hpp"
 
 /**
  * Returns true if the cycles represented by the two lists match.

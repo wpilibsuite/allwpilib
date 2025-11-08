@@ -9,17 +9,17 @@
 #include <string>
 
 #include <Eigen/Cholesky>
-#include <wpi/SymbolExports.h>
-#include <wpi/array.h>
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/array.hpp"
 
-#include "frc/DARE.h"
-#include "frc/EigenCore.h"
-#include "frc/StateSpaceUtil.h"
-#include "frc/fmt/Eigen.h"
-#include "frc/system/Discretization.h"
-#include "frc/system/LinearSystem.h"
-#include "units/time.h"
-#include "wpimath/MathShared.h"
+#include "wpi/math/linalg/DARE.hpp"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/util/StateSpaceUtil.hpp"
+#include "wpi/math/fmt/Eigen.hpp"
+#include "wpi/math/system/Discretization.hpp"
+#include "wpi/math/system/LinearSystem.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/math/util/MathShared.hpp"
 
 namespace frc {
 

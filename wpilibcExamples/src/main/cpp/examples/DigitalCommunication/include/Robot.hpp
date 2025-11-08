@@ -6,8 +6,8 @@
 
 #include <array>
 
-#include <frc/DigitalOutput.h>
-#include <frc/TimedRobot.h>
+#include "wpi/hardware/discrete/DigitalOutput.hpp"
+#include "wpi/opmode/TimedRobot.hpp"
 
 /**
  * This is a sample program demonstrating how to communicate to a light

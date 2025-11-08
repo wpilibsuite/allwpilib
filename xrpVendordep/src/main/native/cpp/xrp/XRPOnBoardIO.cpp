@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/xrp/XRPOnBoardIO.h"
+#include "wpi/xrp/XRPOnBoardIO.hpp"
 
-#include <frc/DigitalInput.h>
-#include <frc/DigitalOutput.h>
-#include <frc/Errors.h>
-#include <frc/Timer.h>
+#include "wpi/hardware/discrete/DigitalInput.hpp"
+#include "wpi/hardware/discrete/DigitalOutput.hpp"
+#include "wpi/system/Errors.hpp"
+#include "wpi/system/Timer.hpp"
 
 using namespace frc;
 

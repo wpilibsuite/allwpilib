@@ -6,16 +6,16 @@
 
 #include <numbers>
 
-#include <frc/Encoder.h>
-#include <frc/OnboardIMU.h>
-#include <frc/controller/PIDController.h>
-#include <frc/controller/SimpleMotorFeedforward.h>
-#include <frc/estimator/MecanumDrivePoseEstimator.h>
-#include <frc/geometry/Translation2d.h>
-#include <frc/kinematics/MecanumDriveKinematics.h>
-#include <frc/kinematics/MecanumDriveOdometry.h>
-#include <frc/kinematics/MecanumDriveWheelSpeeds.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
+#include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/hardware/imu/OnboardIMU.hpp"
+#include "wpi/math/controller/PIDController.hpp"
+#include "wpi/math/controller/SimpleMotorFeedforward.hpp"
+#include "wpi/math/estimator/MecanumDrivePoseEstimator.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
+#include "wpi/math/kinematics/MecanumDriveOdometry.hpp"
+#include "wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp"
+#include "wpi/hardware/motor/PWMSparkMax.hpp"
 
 /**
  * Represents a mecanum drive style drivetrain.

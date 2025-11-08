@@ -6,8 +6,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/STLForwardCompat.h"
-#include "CountCopyAndMove.h"
+#include "wpi/util/STLForwardCompat.hpp"
+#include "CountCopyAndMove.hpp"
 #include "gtest/gtest.h"
 
 namespace {

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "DataLogJNI.h"
+#include "DataLogJNI.hpp"
 
 #include <jni.h>
 
@@ -11,13 +11,13 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/jni_util.h>
+#include "wpi/util/jni_util.hpp"
 
 #include "org_wpilib_datalog_DataLogJNI.h"
-#include "wpi/datalog/DataLog.h"
-#include "wpi/datalog/DataLogBackgroundWriter.h"
-#include "wpi/datalog/DataLogWriter.h"
-#include "wpi/datalog/FileLogger.h"
+#include "wpi/datalog/DataLog.hpp"
+#include "wpi/datalog/DataLogBackgroundWriter.hpp"
+#include "wpi/datalog/DataLogWriter.hpp"
+#include "wpi/datalog/FileLogger.hpp"
 
 using namespace wpi::java;
 using namespace wpi::log;

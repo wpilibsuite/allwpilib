@@ -5,8 +5,8 @@
 #pragma once
 
 #include <gtest/gtest.h>
-#include <wpi/SmallVector.h>
-#include <wpi/protobuf/Protobuf.h>
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/protobuf/Protobuf.hpp"
 
 template <typename T>
 class ProtoTest : public testing::Test {};

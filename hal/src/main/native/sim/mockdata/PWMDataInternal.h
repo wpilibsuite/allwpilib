@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "hal/simulation/PWMData.h"
-#include "hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/PWMData.h"
+#include "wpi/hal/simulation/SimDataValue.h"
 
 namespace hal {
 class PWMData {

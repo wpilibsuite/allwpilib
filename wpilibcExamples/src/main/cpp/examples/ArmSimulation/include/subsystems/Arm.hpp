@@ -4,21 +4,21 @@
 
 #pragma once
 
-#include <frc/Encoder.h>
-#include <frc/controller/ArmFeedforward.h>
-#include <frc/controller/PIDController.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc/simulation/BatterySim.h>
-#include <frc/simulation/EncoderSim.h>
-#include <frc/simulation/PWMSim.h>
-#include <frc/simulation/RoboRioSim.h>
-#include <frc/simulation/SingleJointedArmSim.h>
-#include <frc/smartdashboard/Mechanism2d.h>
-#include <frc/smartdashboard/MechanismLigament2d.h>
-#include <frc/smartdashboard/MechanismRoot2d.h>
-#include <units/length.h>
+#include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/math/controller/ArmFeedforward.hpp"
+#include "wpi/math/controller/PIDController.hpp"
+#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/simulation/BatterySim.hpp"
+#include "wpi/simulation/EncoderSim.hpp"
+#include "wpi/simulation/PWMSim.hpp"
+#include "wpi/simulation/RoboRioSim.hpp"
+#include "wpi/simulation/SingleJointedArmSim.hpp"
+#include "wpi/smartdashboard/Mechanism2d.hpp"
+#include "wpi/smartdashboard/MechanismLigament2d.hpp"
+#include "wpi/smartdashboard/MechanismRoot2d.hpp"
+#include "wpi/units/length.hpp"
 
-#include "Constants.h"
+#include "Constants.hpp"
 
 class Arm {
  public:

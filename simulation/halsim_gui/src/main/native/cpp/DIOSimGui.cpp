@@ -2,23 +2,23 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "DIOSimGui.h"
+#include "DIOSimGui.hpp"
 
 #include <memory>
 #include <vector>
 
-#include <glass/hardware/DIO.h>
-#include <glass/hardware/Encoder.h>
-#include <hal/Ports.h>
-#include <hal/simulation/DIOData.h>
-#include <hal/simulation/DigitalPWMData.h>
-#include <hal/simulation/DutyCycleData.h>
-#include <hal/simulation/EncoderData.h>
-#include <hal/simulation/SimDeviceData.h>
+#include "wpi/glass/hardware/DIO.hpp"
+#include "wpi/glass/hardware/Encoder.hpp"
+#include "wpi/hal/Ports.h"
+#include "wpi/hal/simulation/DIOData.h"
+#include "wpi/hal/simulation/DigitalPWMData.h"
+#include "wpi/hal/simulation/DutyCycleData.h"
+#include "wpi/hal/simulation/EncoderData.h"
+#include "wpi/hal/simulation/SimDeviceData.h"
 
-#include "EncoderSimGui.h"
-#include "HALDataSource.h"
-#include "HALSimGui.h"
+#include "EncoderSimGui.hpp"
+#include "wpi/halsim/gui/HALDataSource.hpp"
+#include "wpi/halsim/gui/HALSimGui.hpp"
 
 using namespace halsimgui;
 

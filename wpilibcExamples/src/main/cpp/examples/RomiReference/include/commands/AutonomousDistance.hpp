@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/SequentialCommandGroup.h>
+#include "wpi/commands2/CommandHelper.hpp"
+#include "wpi/commands2/SequentialCommandGroup.hpp"
 
-#include "commands/DriveDistance.h"
-#include "commands/TurnDegrees.h"
-#include "subsystems/Drivetrain.h"
+#include "commands/DriveDistance.hpp"
+#include "commands/TurnDegrees.hpp"
+#include "subsystems/Drivetrain.hpp"
 
 class AutonomousDistance
     : public frc2::CommandHelper<frc2::SequentialCommandGroup,

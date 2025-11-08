@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/StackTrace.h"
+#include "wpi/util/StackTrace.hpp"
 
 #ifndef __EMSCRIPTEN__
 #include <execinfo.h>
@@ -10,10 +10,10 @@
 
 #include <string>
 
-#include "wpi/Demangle.h"
-#include "wpi/SmallString.h"
-#include "wpi/StringExtras.h"
-#include "wpi/raw_ostream.h"
+#include "wpi/util/Demangle.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
 namespace wpi {
 
