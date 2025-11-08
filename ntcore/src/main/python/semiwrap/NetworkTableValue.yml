@@ -1,5 +1,5 @@
 extra_includes:
-- networktables/NetworkTableType.h
+- wpi/nt/NetworkTableType.hpp
 - src/py2value.h
 
 functions:

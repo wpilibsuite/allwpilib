@@ -1,6 +1,6 @@
 extra_includes:
-- networktables/NetworkTableInstance.h
-- networktables/Topic.h
+- wpi/nt/NetworkTableInstance.hpp
+- wpi/nt/Topic.hpp
 - src/py2value.h
 - src/pyentry.h
 

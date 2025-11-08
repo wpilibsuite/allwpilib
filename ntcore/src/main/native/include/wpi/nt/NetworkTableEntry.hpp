@@ -11,9 +11,9 @@
 #include <string_view>
 #include <vector>
 
-#include "networktables/NetworkTableType.h"
-#include "networktables/NetworkTableValue.h"
-#include "ntcore_cpp.h"
+#include "wpi/nt/NetworkTableType.hpp"
+#include "wpi/nt/NetworkTableValue.hpp"
+#include "wpi/nt/ntcore_cpp.hpp"
 
 namespace nt {
 

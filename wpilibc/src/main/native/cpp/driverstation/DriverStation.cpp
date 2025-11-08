@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/DriverStation.h"
+#include "wpi/driverstation/DriverStation.hpp"
 
 #include <stdint.h>
 
@@ -14,24 +14,24 @@
 #include <string_view>
 
 #include <fmt/format.h>
-#include <hal/DriverStation.h>
-#include <hal/DriverStationTypes.h>
-#include <hal/HALBase.h>
-#include <hal/Power.h>
-#include <networktables/BooleanTopic.h>
-#include <networktables/IntegerTopic.h>
-#include <networktables/NetworkTable.h>
-#include <networktables/NetworkTableInstance.h>
-#include <networktables/StringTopic.h>
-#include <wpi/EventVector.h>
-#include <wpi/condition_variable.h>
-#include <wpi/datalog/DataLog.h>
-#include <wpi/json.h>
-#include <wpi/mutex.h>
-#include <wpi/timestamp.h>
+#include "wpi/hal/DriverStation.h"
+#include "wpi/hal/DriverStationTypes.h"
+#include "wpi/hal/HALBase.h"
+#include "wpi/hal/Power.h"
+#include "wpi/nt/BooleanTopic.hpp"
+#include "wpi/nt/IntegerTopic.hpp"
+#include "wpi/nt/NetworkTable.hpp"
+#include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/nt/StringTopic.hpp"
+#include "wpi/util/EventVector.hpp"
+#include "wpi/util/condition_variable.hpp"
+#include "wpi/datalog/DataLog.hpp"
+#include "wpi/util/json.hpp"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/timestamp.h"
 
-#include "frc/Errors.h"
-#include "frc/Timer.h"
+#include "wpi/system/Errors.hpp"
+#include "wpi/system/Timer.hpp"
 
 using namespace frc;
 

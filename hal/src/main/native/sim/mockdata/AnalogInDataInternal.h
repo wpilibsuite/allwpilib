@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "hal/simulation/AnalogInData.h"
-#include "hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/AnalogInData.h"
+#include "wpi/hal/simulation/SimDataValue.h"
 
 namespace hal {
 class AnalogInData {

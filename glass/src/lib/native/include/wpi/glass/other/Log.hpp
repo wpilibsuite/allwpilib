@@ -8,7 +8,7 @@
 #include <string_view>
 #include <vector>
 
-#include "glass/View.h"
+#include "wpi/glass/View.hpp"
 
 namespace glass {
 

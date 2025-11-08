@@ -26,13 +26,13 @@
  * SOFTWARE.
  */
 
-#include "frc/trajectory/TrajectoryParameterizer.h"
+#include "wpi/math/trajectory/TrajectoryParameterizer.hpp"
 
 #include <vector>
 
 #include <fmt/format.h>
 
-#include "units/math.h"
+#include "wpi/units/math.hpp"
 
 using namespace frc;
 

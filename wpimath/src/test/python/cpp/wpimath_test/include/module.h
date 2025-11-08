@@ -1,8 +1,8 @@
 
 #pragma once
 
-#include <units/time.h>
-#include <units/length.h>
+#include "wpi/units/time.hpp"
+#include "wpi/units/length.hpp"
 
 struct SomeClass {
     static constexpr auto s_constant = 2_s;

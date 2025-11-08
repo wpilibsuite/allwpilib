@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/AnalogInput.h>
-#include <frc/AnalogPotentiometer.h>
-#include <frc/TimedRobot.h>
+#include "wpi/hardware/discrete/AnalogInput.hpp"
+#include "wpi/hardware/rotation/AnalogPotentiometer.hpp"
+#include "wpi/opmode/TimedRobot.hpp"
 
 /**
  * AnalogPotentiometer snippets for frc-docs.

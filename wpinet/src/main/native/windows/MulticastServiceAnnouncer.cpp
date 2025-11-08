@@ -6,20 +6,20 @@
 #define UNICODE
 #endif
 
-#include "wpinet/MulticastServiceAnnouncer.h"
+#include "wpi/net/MulticastServiceAnnouncer.h"
 
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <wpi/ConvertUTF.h>
-#include <wpi/SmallString.h>
-#include <wpi/SmallVector.h>
-#include <wpi/StringExtras.h>
+#include "wpi/util/ConvertUTF.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/StringExtras.hpp"
 
-#include "DynamicDns.h"
-#include "wpinet/hostname.h"
+#include "DynamicDns.hpp"
+#include "wpi/net/hostname.hpp"
 
 using namespace wpi;
 

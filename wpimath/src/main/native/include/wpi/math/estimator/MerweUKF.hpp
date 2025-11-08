@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <wpi/SymbolExports.h>
+#include "wpi/util/SymbolExports.hpp"
 
-#include "frc/estimator/MerweScaledSigmaPoints.h"
-#include "frc/estimator/UnscentedKalmanFilter.h"
+#include "wpi/math/estimator/MerweScaledSigmaPoints.hpp"
+#include "wpi/math/estimator/UnscentedKalmanFilter.hpp"
 
 namespace frc {
 

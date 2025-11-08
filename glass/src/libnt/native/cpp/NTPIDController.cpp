@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/networktables/NTPIDController.h"
+#include "wpi/glass/networktables/NTPIDController.hpp"
 
 #include <utility>
 
 #include <fmt/format.h>
-#include <wpi/StringExtras.h>
+#include "wpi/util/StringExtras.hpp"
 
 using namespace glass;
 

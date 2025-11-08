@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/controller/PIDController.h"
+#include "wpi/math/controller/PIDController.hpp"
 
 static constexpr double kSetpoint = 50.0;
 static constexpr double kRange = 200;

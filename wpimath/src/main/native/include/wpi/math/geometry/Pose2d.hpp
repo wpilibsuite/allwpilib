@@ -10,12 +10,12 @@
 #include <utility>
 
 #include <gcem.hpp>
-#include <wpi/SymbolExports.h>
-#include <wpi/json_fwd.h>
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/json_fwd.hpp"
 
-#include "frc/geometry/Rotation2d.h"
-#include "frc/geometry/Translation2d.h"
-#include "units/length.h"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/units/length.hpp"
 
 namespace frc {
 
@@ -272,10 +272,10 @@ void from_json(const wpi::json& json, Pose2d& pose);
 
 }  // namespace frc
 
-#include "frc/geometry/proto/Pose2dProto.h"
-#include "frc/geometry/struct/Pose2dStruct.h"
+#include "wpi/math/geometry/proto/Pose2dProto.hpp"
+#include "wpi/math/geometry/struct/Pose2dStruct.hpp"
 
-#include "frc/geometry/Transform2d.h"
+#include "wpi/math/geometry/Transform2d.hpp"
 
 namespace frc {
 

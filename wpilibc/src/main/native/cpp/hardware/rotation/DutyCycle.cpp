@@ -2,20 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/DutyCycle.h"
+#include "wpi/hardware/rotation/DutyCycle.hpp"
 
 #include <string>
 #include <utility>
 
-#include <hal/DutyCycle.h>
-#include <hal/HALBase.h>
-#include <hal/UsageReporting.h>
-#include <wpi/NullDeleter.h>
-#include <wpi/StackTrace.h>
-#include <wpi/sendable/SendableBuilder.h>
+#include "wpi/hal/DutyCycle.h"
+#include "wpi/hal/HALBase.h"
+#include "wpi/hal/UsageReporting.h"
+#include "wpi/util/NullDeleter.hpp"
+#include "wpi/util/StackTrace.hpp"
+#include "wpi/util/sendable/SendableBuilder.hpp"
 
-#include "frc/Errors.h"
-#include "frc/SensorUtil.h"
+#include "wpi/system/Errors.hpp"
+#include "wpi/util/SensorUtil.hpp"
 
 using namespace frc;
 

@@ -6,11 +6,11 @@
 
 #include <span>
 
-#include <units/length.h>
-#include <wpi/SymbolExports.h>
+#include "wpi/units/length.hpp"
+#include "wpi/util/SymbolExports.hpp"
 
-#include "frc/apriltag/AprilTagPoseEstimate.h"
-#include "frc/geometry/Transform3d.h"
+#include "wpi/apriltag/AprilTagPoseEstimate.hpp"
+#include "wpi/math/geometry/Transform3d.hpp"
 
 namespace frc {
 

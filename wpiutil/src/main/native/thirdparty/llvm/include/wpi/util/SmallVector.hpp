@@ -22,7 +22,7 @@
 #pragma GCC diagnostic warning "-Wclass-memaccess"
 #endif
 
-#include "wpi/Compiler.h"
+#include "wpi/util/Compiler.hpp"
 #include <algorithm>
 #include <cassert>
 #include <cstddef>

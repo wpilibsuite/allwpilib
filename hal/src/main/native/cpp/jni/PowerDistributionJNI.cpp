@@ -4,12 +4,12 @@
 
 #include <jni.h>
 
-#include <wpi/jni_util.h>
+#include "wpi/util/jni_util.hpp"
 
 #include "HALUtil.h"
 #include "org_wpilib_hardware_hal_PowerDistributionJNI.h"
-#include "hal/Ports.h"
-#include "hal/PowerDistribution.h"
+#include "wpi/hal/Ports.h"
+#include "wpi/hal/PowerDistribution.h"
 
 using namespace hal;
 

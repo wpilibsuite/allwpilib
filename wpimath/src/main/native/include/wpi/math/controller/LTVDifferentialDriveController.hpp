@@ -7,17 +7,17 @@
 #include <cmath>
 
 #include <Eigen/Core>
-#include <wpi/SymbolExports.h>
-#include <wpi/array.h>
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/array.hpp"
 
-#include "frc/StateSpaceUtil.h"
-#include "frc/controller/DifferentialDriveWheelVoltages.h"
-#include "frc/geometry/Pose2d.h"
-#include "frc/system/LinearSystem.h"
-#include "frc/trajectory/Trajectory.h"
-#include "units/length.h"
-#include "units/time.h"
-#include "units/velocity.h"
+#include "wpi/math/util/StateSpaceUtil.hpp"
+#include "wpi/math/controller/DifferentialDriveWheelVoltages.hpp"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/system/LinearSystem.hpp"
+#include "wpi/math/trajectory/Trajectory.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
 
 namespace frc {
 

@@ -1,7 +1,7 @@
 
 #include <semiwrap.h>
-#include <networktables/NetworkTableValue.h>
-#include <networktables/NetworkTableType.h>
+#include "wpi/nt/NetworkTableValue.hpp"
+#include "wpi/nt/NetworkTableType.hpp"
 #include <fmt/format.h>
 
 namespace pyntcore {

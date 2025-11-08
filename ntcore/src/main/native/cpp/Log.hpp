@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/Logger.h>
+#include "wpi/util/Logger.hpp"
 
 #define LOG(level, format, ...) \
   WPI_LOG(m_logger, level, format __VA_OPT__(, ) __VA_ARGS__)

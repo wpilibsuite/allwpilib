@@ -6,9 +6,9 @@
 
 #include <array>
 
-#include <units/angle.h>
+#include "wpi/units/angle.hpp"
 
-#include "frc/GenericHID.h"
+#include "wpi/driverstation/GenericHID.hpp"
 
 namespace frc {
 

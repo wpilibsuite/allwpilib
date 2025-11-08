@@ -6,7 +6,7 @@
 
 #include <string_view>
 
-#include <wpi/SymbolExports.h>
+#include "wpi/util/SymbolExports.hpp"
 
 namespace frc {
 

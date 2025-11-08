@@ -17,14 +17,14 @@
         -- Eugene Hopkinson <slowriot at voxelstorm dot com>
 */
 
-#include "wpi/sha1.h"
+#include "wpi/util/sha1.hpp"
 
 #include <string>
 
-#include "wpi/SmallVector.h"
-#include "wpi/StringExtras.h"
-#include "wpi/raw_istream.h"
-#include "wpi/raw_ostream.h"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/raw_istream.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
 using namespace wpi;
 

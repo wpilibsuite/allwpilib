@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-#include <hal/CANAPI.h>
+#include "wpi/hal/CANAPI.h"
 
 namespace frc {
 

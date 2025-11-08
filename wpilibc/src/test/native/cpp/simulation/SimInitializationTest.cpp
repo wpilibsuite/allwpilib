@@ -5,19 +5,19 @@
 #include <exception>
 
 #include <gtest/gtest.h>
-#include <hal/HAL.h>
+#include "wpi/hal/HAL.h"
 
-#include "frc/simulation/AddressableLEDSim.h"
-#include "frc/simulation/AnalogInputSim.h"
-#include "frc/simulation/CTREPCMSim.h"
-#include "frc/simulation/DIOSim.h"
-#include "frc/simulation/DigitalPWMSim.h"
-#include "frc/simulation/DriverStationSim.h"
-#include "frc/simulation/DutyCycleSim.h"
-#include "frc/simulation/EncoderSim.h"
-#include "frc/simulation/PWMSim.h"
-#include "frc/simulation/PowerDistributionSim.h"
-#include "frc/simulation/RoboRioSim.h"
+#include "wpi/simulation/AddressableLEDSim.hpp"
+#include "wpi/simulation/AnalogInputSim.hpp"
+#include "wpi/simulation/CTREPCMSim.hpp"
+#include "wpi/simulation/DIOSim.hpp"
+#include "wpi/simulation/DigitalPWMSim.hpp"
+#include "wpi/simulation/DriverStationSim.hpp"
+#include "wpi/simulation/DutyCycleSim.hpp"
+#include "wpi/simulation/EncoderSim.hpp"
+#include "wpi/simulation/PWMSim.hpp"
+#include "wpi/simulation/PowerDistributionSim.hpp"
+#include "wpi/simulation/RoboRioSim.hpp"
 
 using namespace frc::sim;
 

@@ -12,11 +12,11 @@
 #include <utility>
 #include <vector>
 
-#include <glass/View.h>
-#include <wpi/StringMap.h>
-#include <wpi/datalog/DataLogReaderThread.h>
+#include "wpi/glass/View.hpp"
+#include "wpi/util/StringMap.hpp"
+#include "wpi/datalog/DataLogReaderThread.hpp"
 
-#include "sysid/analysis/Storage.h"
+#include "wpi/sysid/analysis/Storage.hpp"
 
 namespace glass {
 class Storage;

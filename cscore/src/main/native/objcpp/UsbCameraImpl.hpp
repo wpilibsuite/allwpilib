@@ -5,16 +5,16 @@
 #pragma once
 
 #import <AVFoundation/AVFoundation.h>
-#import "UsbCameraDelegate.h"
-#import "UsbCameraImplObjc.h"
+#import "UsbCameraDelegate.hpp"
+#import "UsbCameraImplObjc.hpp"
 
 #include <memory>
 #include <string>
 #include <optional>
 
-#include <wpi/StringMap.h>
+#include "wpi/util/StringMap.hpp"
 
-#include "SourceImpl.h"
+#include "SourceImpl.hpp"
 
 namespace cs {
 struct CameraFPSRange {

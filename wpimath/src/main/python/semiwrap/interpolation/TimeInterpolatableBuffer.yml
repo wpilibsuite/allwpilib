@@ -1,5 +1,5 @@
 extra_includes:
-- "frc/geometry/Pose3d.h"
+- "wpi/math/geometry/Pose3d.hpp"
 
 classes:
   frc::TimeInterpolatableBuffer:

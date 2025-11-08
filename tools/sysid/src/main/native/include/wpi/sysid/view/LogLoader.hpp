@@ -9,8 +9,8 @@
 #include <string_view>
 #include <vector>
 
-#include <glass/View.h>
-#include <wpi/Signal.h>
+#include "wpi/glass/View.hpp"
+#include "wpi/util/Signal.h"
 
 namespace glass {
 class Storage;

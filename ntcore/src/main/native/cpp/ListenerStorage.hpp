@@ -11,17 +11,17 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/DenseMap.h>
-#include <wpi/SafeThread.h>
-#include <wpi/SmallVector.h>
-#include <wpi/Synchronization.h>
-#include <wpi/mutex.h>
+#include "wpi/util/DenseMap.hpp"
+#include "wpi/util/SafeThread.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/Synchronization.h"
+#include "wpi/util/mutex.hpp"
 
-#include "Handle.h"
-#include "HandleMap.h"
-#include "IListenerStorage.h"
-#include "VectorSet.h"
-#include "ntcore_cpp.h"
+#include "Handle.hpp"
+#include "HandleMap.hpp"
+#include "IListenerStorage.hpp"
+#include "VectorSet.hpp"
+#include "wpi/nt/ntcore_cpp.hpp"
 
 namespace nt {
 

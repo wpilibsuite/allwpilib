@@ -2,21 +2,21 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <hal/simulation/AddressableLEDData.h>
-#include <hal/simulation/AnalogInData.h>
-#include <hal/simulation/CTREPCMData.h>
-#include <hal/simulation/CanData.h>
-#include <hal/simulation/DIOData.h>
-#include <hal/simulation/DigitalPWMData.h>
-#include <hal/simulation/DriverStationData.h>
-#include <hal/simulation/DutyCycleData.h>
-#include <hal/simulation/EncoderData.h>
-#include <hal/simulation/I2CData.h>
-#include <hal/simulation/PWMData.h>
-#include <hal/simulation/PowerDistributionData.h>
-#include <hal/simulation/REVPHData.h>
-#include <hal/simulation/RoboRioData.h>
-#include <hal/simulation/SimDeviceData.h>
+#include "wpi/hal/simulation/AddressableLEDData.h"
+#include "wpi/hal/simulation/AnalogInData.h"
+#include "wpi/hal/simulation/CTREPCMData.h"
+#include "wpi/hal/simulation/CanData.h"
+#include "wpi/hal/simulation/DIOData.h"
+#include "wpi/hal/simulation/DigitalPWMData.h"
+#include "wpi/hal/simulation/DriverStationData.h"
+#include "wpi/hal/simulation/DutyCycleData.h"
+#include "wpi/hal/simulation/EncoderData.h"
+#include "wpi/hal/simulation/I2CData.h"
+#include "wpi/hal/simulation/PWMData.h"
+#include "wpi/hal/simulation/PowerDistributionData.h"
+#include "wpi/hal/simulation/REVPHData.h"
+#include "wpi/hal/simulation/RoboRioData.h"
+#include "wpi/hal/simulation/SimDeviceData.h"
 
 #include "../PortsInternal.h"
 

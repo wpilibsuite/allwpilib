@@ -3,11 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <hal/HAL.h>
+#include "wpi/hal/HAL.h"
 
-#include "frc/AnalogPotentiometer.h"
-#include "frc/simulation/AnalogInputSim.h"
-#include "frc/simulation/RoboRioSim.h"
+#include "wpi/hardware/rotation/AnalogPotentiometer.hpp"
+#include "wpi/simulation/AnalogInputSim.hpp"
+#include "wpi/simulation/RoboRioSim.hpp"
 
 namespace frc {
 using namespace frc::sim;

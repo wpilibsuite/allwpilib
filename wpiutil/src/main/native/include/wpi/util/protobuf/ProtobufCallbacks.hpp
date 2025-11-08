@@ -11,9 +11,9 @@
 #include <fmt/format.h>
 
 #include "pb.h"
-#include "wpi/SmallVector.h"
-#include "wpi/array.h"
-#include "wpi/protobuf/Protobuf.h"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/array.hpp"
+#include "wpi/util/protobuf/Protobuf.hpp"
 
 namespace wpi {
 

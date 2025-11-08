@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "sysid/view/Analyzer.h"
+#include "wpi/sysid/view/Analyzer.hpp"
 
 #include <algorithm>
 #include <exception>
@@ -13,19 +13,19 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <glass/Context.h>
-#include <glass/Storage.h>
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/Storage.hpp"
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
-#include <wpi/json.h>
+#include "wpi/util/json.hpp"
 
-#include "sysid/Util.h"
-#include "sysid/analysis/AnalysisManager.h"
-#include "sysid/analysis/AnalysisType.h"
-#include "sysid/analysis/FeedbackControllerPreset.h"
-#include "sysid/analysis/FilteringUtils.h"
-#include "sysid/view/UILayout.h"
+#include "wpi/sysid/Util.hpp"
+#include "wpi/sysid/analysis/AnalysisManager.hpp"
+#include "wpi/sysid/analysis/AnalysisType.hpp"
+#include "wpi/sysid/analysis/FeedbackControllerPreset.hpp"
+#include "wpi/sysid/analysis/FilteringUtils.hpp"
+#include "wpi/sysid/view/UILayout.hpp"
 
 using namespace sysid;
 

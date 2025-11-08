@@ -14,11 +14,11 @@
 #include <span>
 #include <utility>
 
-#include <wpi/Signal.h>
+#include "wpi/util/Signal.h"
 
-#include "wpinet/uv/Buffer.h"
-#include "wpinet/uv/Handle.h"
-#include "wpinet/uv/Request.h"
+#include "wpi/net/uv/Buffer.hpp"
+#include "wpi/net/uv/Handle.hpp"
+#include "wpi/net/uv/Request.hpp"
 
 namespace wpi::uv {
 

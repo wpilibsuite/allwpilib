@@ -32,12 +32,12 @@
 #ifndef WPIUTIL_WPI_FUNCTIONEXTRAS_H
 #define WPIUTIL_WPI_FUNCTIONEXTRAS_H
 
-#include "wpi/PointerIntPair.h"
-#include "wpi/PointerUnion.h"
-#include "wpi/STLForwardCompat.h"
-#include "wpi/Compiler.h"
-#include "wpi/MemAlloc.h"
-#include "wpi/type_traits.h"
+#include "wpi/util/PointerIntPair.hpp"
+#include "wpi/util/PointerUnion.hpp"
+#include "wpi/util/STLForwardCompat.hpp"
+#include "wpi/util/Compiler.hpp"
+#include "wpi/util/MemAlloc.hpp"
+#include "wpi/util/type_traits.hpp"
 #include <cstring>
 #include <memory>
 #include <type_traits>

@@ -4,11 +4,11 @@
 
 #include <jni.h>
 
-#include <wpi/jni_util.h>
+#include "wpi/util/jni_util.hpp"
 
 #include "HALUtil.h"
 #include "org_wpilib_hardware_hal_DutyCycleJNI.h"
-#include "hal/DutyCycle.h"
+#include "wpi/hal/DutyCycle.h"
 
 using namespace hal;
 

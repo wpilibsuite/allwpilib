@@ -4,15 +4,15 @@
 
 #pragma once
 
-#include <units/angle.h>
-#include <units/angular_acceleration.h>
-#include <units/angular_velocity.h>
-#include <units/moment_of_inertia.h>
-#include <units/torque.h>
+#include "wpi/units/angle.hpp"
+#include "wpi/units/angular_acceleration.hpp"
+#include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/moment_of_inertia.hpp"
+#include "wpi/units/torque.hpp"
 
-#include "frc/simulation/LinearSystemSim.h"
-#include "frc/system/LinearSystem.h"
-#include "frc/system/plant/DCMotor.h"
+#include "wpi/simulation/LinearSystemSim.hpp"
+#include "wpi/math/system/LinearSystem.hpp"
+#include "wpi/math/system/plant/DCMotor.hpp"
 
 namespace frc::sim {
 /**

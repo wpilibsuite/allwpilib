@@ -28,7 +28,7 @@
 #include <span>
 #include <utility>
 
-#include "wpinet/NetworkStream.h"
+#include "wpi/net/NetworkStream.hpp"
 
 namespace wpi {
 

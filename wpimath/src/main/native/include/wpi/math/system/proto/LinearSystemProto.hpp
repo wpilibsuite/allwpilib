@@ -8,11 +8,11 @@
 #include <utility>
 
 #include <fmt/format.h>
-#include <wpi/protobuf/Protobuf.h>
-#include <wpi/protobuf/ProtobufCallbacks.h>
+#include "wpi/util/protobuf/Protobuf.hpp"
+#include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 
-#include "frc/proto/MatrixProto.h"
-#include "frc/system/LinearSystem.h"
+#include "wpi/math/linalg/proto/MatrixProto.hpp"
+#include "wpi/math/system/LinearSystem.hpp"
 #include "wpimath/protobuf/system.npb.h"
 
 template <int States, int Inputs, int Outputs>

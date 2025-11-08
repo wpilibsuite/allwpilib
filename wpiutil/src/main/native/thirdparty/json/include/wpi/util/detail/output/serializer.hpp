@@ -22,14 +22,14 @@
 #include <type_traits> // is_same
 #include <utility> // move
 
-#include <wpi/detail/conversions/to_chars.h>
-#include <wpi/detail/exceptions.h>
-#include <wpi/detail/macro_scope.h>
-#include <wpi/detail/meta/cpp_future.h>
-#include <wpi/detail/output/binary_writer.h>
-#include <wpi/detail/output/output_adapters.h>
-#include <wpi/detail/string_concat.h>
-#include <wpi/detail/value_t.h>
+#include "wpi/util/detail/conversions/to_chars.hpp"
+#include "wpi/util/detail/exceptions.hpp"
+#include "wpi/util/detail/macro_scope.hpp"
+#include "wpi/util/detail/meta/cpp_future.hpp"
+#include "wpi/util/detail/output/binary_writer.hpp"
+#include "wpi/util/detail/output/output_adapters.hpp"
+#include "wpi/util/detail/string_concat.hpp"
+#include "wpi/util/detail/value_t.hpp"
 
 WPI_JSON_NAMESPACE_BEGIN
 namespace detail

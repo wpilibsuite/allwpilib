@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/SingleJointedArmSim.h"
+#include "wpi/simulation/SingleJointedArmSim.hpp"
 
 #include <cmath>
 
-#include <units/voltage.h>
-#include <wpi/MathExtras.h>
+#include "wpi/units/voltage.hpp"
+#include "wpi/util/MathExtras.hpp"
 
-#include "frc/RobotController.h"
-#include "frc/system/NumericalIntegration.h"
-#include "frc/system/plant/LinearSystemId.h"
+#include "wpi/system/RobotController.hpp"
+#include "wpi/math/system/NumericalIntegration.hpp"
+#include "wpi/math/system/plant/LinearSystemId.hpp"
 
 using namespace frc;
 using namespace frc::sim;

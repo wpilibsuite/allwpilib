@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/networktables/NTField2D.h"
+#include "wpi/glass/networktables/NTField2D.hpp"
 
 #include <algorithm>
 #include <memory>
@@ -11,13 +11,13 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <networktables/DoubleArrayTopic.h>
-#include <networktables/MultiSubscriber.h>
-#include <ntcore_cpp.h>
-#include <wpi/Endian.h>
-#include <wpi/MathExtras.h>
-#include <wpi/SmallVector.h>
-#include <wpi/StringExtras.h>
+#include "wpi/nt/DoubleArrayTopic.hpp"
+#include "wpi/nt/MultiSubscriber.hpp"
+#include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/Endian.hpp"
+#include "wpi/util/MathExtras.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/StringExtras.hpp"
 
 using namespace glass;
 

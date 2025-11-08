@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "hal/Types.h"
+#include "wpi/hal/Types.h"
 
 namespace hal::can {
 int32_t GetCANModuleFromHandle(HAL_CANHandle handle, int32_t* status);

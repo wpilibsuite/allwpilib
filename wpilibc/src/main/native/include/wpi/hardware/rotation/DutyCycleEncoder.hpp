@@ -6,12 +6,12 @@
 
 #include <memory>
 
-#include <hal/SimDevice.h>
-#include <hal/Types.h>
-#include <units/frequency.h>
-#include <units/time.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include "wpi/hal/SimDevice.h"
+#include "wpi/hal/Types.h"
+#include "wpi/units/frequency.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/util/sendable/Sendable.hpp"
+#include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace frc {
 class DutyCycle;

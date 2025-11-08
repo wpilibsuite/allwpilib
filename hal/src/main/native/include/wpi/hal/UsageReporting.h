@@ -10,7 +10,7 @@
 #include <string_view>
 #endif
 
-#include <wpi/string.h>
+#include "wpi/util/string.h"
 
 #ifdef __cplusplus
 extern "C" {

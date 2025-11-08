@@ -1,6 +1,6 @@
 #pragma once
 
-#include <frc/trajectory/constraint/TrajectoryConstraint.h>
+#include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
 #include <semiwrap.h>
 
 namespace frc {

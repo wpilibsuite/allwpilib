@@ -8,15 +8,15 @@
 #include <cstddef>
 #include <ctime>
 
-#include <wpi/SymbolExports.h>
-#include <wpi/timestamp.h>
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/timestamp.h"
 
-#include "Odometry3d.h"
-#include "SwerveDriveKinematics.h"
-#include "SwerveModulePosition.h"
-#include "SwerveModuleState.h"
-#include "frc/geometry/Pose2d.h"
-#include "units/time.h"
+#include "wpi/math/kinematics/Odometry3d.hpp"
+#include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
+#include "wpi/math/kinematics/SwerveModulePosition.hpp"
+#include "wpi/math/kinematics/SwerveModuleState.hpp"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/units/time.hpp"
 
 namespace frc {
 

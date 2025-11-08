@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "HALSimGui.h"
+#include "wpi/halsim/gui/HALSimGui.hpp"
 
 #include <memory>
 #include <utility>
 
-#include <glass/Context.h>
-#include <glass/Storage.h>
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/Storage.hpp"
 #include <imgui.h>
-#include <wpigui.h>
+#include "wpi/gui/wpigui.hpp"
 
 using namespace halsimgui;
 

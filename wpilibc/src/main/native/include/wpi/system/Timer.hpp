@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <units/time.h>
+#include "wpi/units/time.hpp"
 
 namespace frc {
 

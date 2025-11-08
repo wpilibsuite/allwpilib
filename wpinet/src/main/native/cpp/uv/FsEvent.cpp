@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/uv/FsEvent.h"
+#include "wpi/net/uv/FsEvent.hpp"
 
 #include <cstdlib>
 #include <memory>
 #include <string>
 
-#include <wpi/SmallString.h>
+#include "wpi/util/SmallString.hpp"
 
-#include "wpinet/uv/Loop.h"
+#include "wpi/net/uv/Loop.hpp"
 
 namespace wpi::uv {
 

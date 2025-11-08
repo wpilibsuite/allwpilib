@@ -7,11 +7,11 @@
 #include <memory>
 #include <string_view>
 
-#include <networktables/BooleanTopic.h>
-#include <networktables/NetworkTable.h>
-#include <networktables/NetworkTableInstance.h>
+#include "wpi/nt/BooleanTopic.hpp"
+#include "wpi/nt/NetworkTable.hpp"
+#include "wpi/nt/NetworkTableInstance.hpp"
 
-#include "Trigger.h"
+#include "wpi/commands2/button/Trigger.hpp"
 
 namespace frc2 {
 /**

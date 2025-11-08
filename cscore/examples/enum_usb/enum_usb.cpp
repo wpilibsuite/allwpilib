@@ -4,9 +4,9 @@
 
 #include <cstdio>
 
-#include <wpi/print.h>
+#include "wpi/util/print.hpp"
 
-#include "cscore.h"
+#include "wpi/cs/cscore.h"
 
 int main() {
   CS_Status status = 0;

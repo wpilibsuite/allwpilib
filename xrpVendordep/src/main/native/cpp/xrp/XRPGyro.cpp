@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/xrp/XRPGyro.h"
+#include "wpi/xrp/XRPGyro.hpp"
 
-#include <units/angle.h>
-#include <units/angular_velocity.h>
+#include "wpi/units/angle.hpp"
+#include "wpi/units/angular_velocity.hpp"
 
 using namespace frc;
 

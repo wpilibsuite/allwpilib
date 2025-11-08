@@ -6,10 +6,10 @@
 
 #include <cmath>
 
-#include "frc/kinematics/SwerveDriveKinematics.h"
-#include "frc/trajectory/constraint/TrajectoryConstraint.h"
-#include "units/math.h"
-#include "units/velocity.h"
+#include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
+#include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
+#include "wpi/units/math.hpp"
+#include "wpi/units/velocity.hpp"
 
 namespace frc {
 

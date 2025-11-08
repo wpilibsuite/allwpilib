@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "Downloader.h"
+#include "Downloader.hpp"
 
 #ifdef _WIN32
 #include <fcntl.h>
@@ -18,15 +18,15 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <glass/Storage.h>
+#include "wpi/glass/Storage.hpp"
 #include <imgui.h>
 #include <imgui_stdlib.h>
 #include <libssh/sftp.h>
-#include <portable-file-dialogs.h>
-#include <wpi/StringExtras.h>
-#include <wpi/fs.h>
+#include "wpi/gui/portable-file-dialogs.h"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/fs.hpp"
 
-#include "Sftp.h"
+#include "Sftp.hpp"
 
 Downloader::Downloader(glass::Storage& storage)
     : m_serverTeam{storage.GetString("serverTeam")},

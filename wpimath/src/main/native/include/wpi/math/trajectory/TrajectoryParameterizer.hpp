@@ -32,10 +32,10 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/SymbolExports.h>
+#include "wpi/util/SymbolExports.hpp"
 
-#include "frc/trajectory/Trajectory.h"
-#include "frc/trajectory/constraint/TrajectoryConstraint.h"
+#include "wpi/math/trajectory/Trajectory.hpp"
+#include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
 
 namespace frc {
 /**

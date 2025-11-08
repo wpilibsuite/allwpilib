@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "WSProvider_DriverStation.h"
+#include "wpi/halsim/ws_core/WSProvider_DriverStation.hpp"
 
 #include <atomic>
 #include <string>
 #include <string_view>
 
-#include <hal/DriverStation.h>
-#include <hal/Extensions.h>
-#include <hal/Ports.h>
-#include <hal/simulation/DriverStationData.h>
-#include <wpi/raw_ostream.h>
+#include "wpi/hal/DriverStation.h"
+#include "wpi/hal/Extensions.h"
+#include "wpi/hal/Ports.h"
+#include "wpi/hal/simulation/DriverStationData.h"
+#include "wpi/util/raw_ostream.hpp"
 
 #define REGISTER(halsim, jsonid, ctype, haltype)                          \
   HALSIM_RegisterDriverStation##halsim##Callback(                         \

@@ -8,13 +8,13 @@
 #include <memory>
 #include <string>
 
-#include <units/angle.h>
-#include <wpi/deprecated.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include "wpi/units/angle.hpp"
+#include "wpi/util/deprecated.hpp"
+#include "wpi/util/sendable/Sendable.hpp"
+#include "wpi/util/sendable/SendableHelper.hpp"
 
-#include "frc/drive/RobotDriveBase.h"
-#include "frc/geometry/Rotation2d.h"
+#include "wpi/drive/RobotDriveBase.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
 
 namespace frc {
 

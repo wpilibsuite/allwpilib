@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/sendable/Sendable.h>
+#include "wpi/util/sendable/Sendable.hpp"
 
 namespace nt {
 

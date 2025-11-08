@@ -6,12 +6,12 @@
 
 #include <limits>
 
-#include <wpi/SymbolExports.h>
+#include "wpi/util/SymbolExports.hpp"
 
-#include "frc/geometry/Pose2d.h"
-#include "units/acceleration.h"
-#include "units/curvature.h"
-#include "units/velocity.h"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/curvature.hpp"
+#include "wpi/units/velocity.hpp"
 
 namespace frc {
 /**

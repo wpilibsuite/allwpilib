@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/CAN.h"
+#include "wpi/hardware/bus/CAN.hpp"
 
 #include <utility>
 
-#include <hal/CAN.h>
-#include <hal/CANAPI.h>
-#include <hal/Errors.h>
-#include <hal/UsageReporting.h>
+#include "wpi/hal/CAN.h"
+#include "wpi/hal/CANAPI.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/UsageReporting.h"
 
-#include "frc/Errors.h"
+#include "wpi/system/Errors.hpp"
 
 using namespace frc;
 

@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "sysid/analysis/FeedbackAnalysis.h"
+#include "wpi/sysid/analysis/FeedbackAnalysis.hpp"
 
 #include <cmath>
 
-#include <frc/controller/LinearQuadraticRegulator.h>
-#include <frc/system/LinearSystem.h>
-#include <frc/system/plant/LinearSystemId.h>
-#include <units/acceleration.h>
-#include <units/velocity.h>
-#include <units/voltage.h>
+#include "wpi/math/controller/LinearQuadraticRegulator.hpp"
+#include "wpi/math/system/LinearSystem.hpp"
+#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/velocity.hpp"
+#include "wpi/units/voltage.hpp"
 
-#include "sysid/analysis/FeedbackControllerPreset.h"
+#include "wpi/sysid/analysis/FeedbackControllerPreset.hpp"
 
 using namespace sysid;
 

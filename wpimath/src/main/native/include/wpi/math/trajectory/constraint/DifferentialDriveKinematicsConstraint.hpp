@@ -6,11 +6,11 @@
 
 #include <utility>
 
-#include <wpi/SymbolExports.h>
+#include "wpi/util/SymbolExports.hpp"
 
-#include "frc/kinematics/DifferentialDriveKinematics.h"
-#include "frc/trajectory/constraint/TrajectoryConstraint.h"
-#include "units/velocity.h"
+#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+#include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
+#include "wpi/units/velocity.hpp"
 
 namespace frc {
 /**

@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "ConfigurableSourceImpl.h"
+#include "ConfigurableSourceImpl.hpp"
 
 #include <memory>
 #include <string>
 
-#include <wpi/timestamp.h>
+#include "wpi/util/timestamp.h"
 
-#include "Handle.h"
-#include "Instance.h"
-#include "Notifier.h"
+#include "Handle.hpp"
+#include "Instance.hpp"
+#include "Notifier.hpp"
 
 using namespace cs;
 

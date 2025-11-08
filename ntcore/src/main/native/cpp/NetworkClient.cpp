@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "NetworkClient.h"
+#include "NetworkClient.hpp"
 
 #include <stdint.h>
 
@@ -13,16 +13,16 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringExtras.h>
-#include <wpinet/HttpUtil.h>
-#include <wpinet/uv/Loop.h>
-#include <wpinet/uv/Tcp.h>
-#include <wpinet/uv/util.h>
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/net/HttpUtil.hpp"
+#include "wpi/net/uv/Loop.hpp"
+#include "wpi/net/uv/Tcp.hpp"
+#include "wpi/net/uv/util.hpp"
 
-#include "IConnectionList.h"
-#include "Log.h"
-#include "net/NetworkInterface.h"
+#include "IConnectionList.hpp"
+#include "Log.hpp"
+#include "net/NetworkInterface.hpp"
 
 using namespace nt;
 namespace uv = wpi::uv;

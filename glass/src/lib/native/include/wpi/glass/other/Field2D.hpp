@@ -7,14 +7,14 @@
 #include <span>
 #include <string_view>
 
-#include <frc/geometry/Pose2d.h>
-#include <frc/geometry/Rotation2d.h>
-#include <frc/geometry/Translation2d.h>
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
 #include <imgui.h>
-#include <wpi/function_ref.h>
+#include "wpi/util/function_ref.hpp"
 
-#include "glass/Model.h"
-#include "glass/View.h"
+#include "wpi/glass/Model.hpp"
+#include "wpi/glass/View.hpp"
 
 namespace glass {
 

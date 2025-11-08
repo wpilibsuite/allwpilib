@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/xrp/XRPServo.h"
+#include "wpi/xrp/XRPServo.hpp"
 
-#include <frc/Errors.h>
+#include "wpi/system/Errors.hpp"
 
 #include <map>
 #include <numbers>
 #include <set>
 #include <string>
 
-#include <units/angle.h>
+#include "wpi/units/angle.hpp"
 
 using namespace frc;
 

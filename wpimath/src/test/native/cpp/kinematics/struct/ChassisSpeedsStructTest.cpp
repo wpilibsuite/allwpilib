@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/kinematics/ChassisSpeeds.h"
+#include "wpi/math/kinematics/ChassisSpeeds.hpp"
 
 using namespace frc;
 

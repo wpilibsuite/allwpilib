@@ -4,11 +4,11 @@
 
 #include <memory>
 
-#include <frc/DigitalInput.h>
-#include <frc/DigitalOutput.h>
-#include <frc/Errors.h>
-#include <frc/Timer.h>
-#include <frc/romi/OnBoardIO.h>
+#include "wpi/hardware/discrete/DigitalInput.hpp"
+#include "wpi/hardware/discrete/DigitalOutput.hpp"
+#include "wpi/system/Errors.hpp"
+#include "wpi/system/Timer.hpp"
+#include "wpi/romi/OnBoardIO.hpp"
 
 using namespace frc;
 

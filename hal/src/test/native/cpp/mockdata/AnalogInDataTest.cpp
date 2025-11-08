@@ -6,10 +6,10 @@
 
 #include <gtest/gtest.h>
 
-#include "hal/AnalogInput.h"
-#include "hal/HAL.h"
-#include "hal/handles/HandlesInternal.h"
-#include "hal/simulation/AnalogInData.h"
+#include "wpi/hal/AnalogInput.h"
+#include "wpi/hal/HAL.h"
+#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/hal/simulation/AnalogInData.h"
 
 namespace hal {
 

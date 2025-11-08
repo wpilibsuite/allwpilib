@@ -9,13 +9,13 @@
 #include <span>
 
 #include <Eigen/Core>
-#include <wpi/SymbolExports.h>
-#include <wpi/json_fwd.h>
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/json_fwd.hpp"
 
-#include "frc/geometry/Rotation2d.h"
-#include "units/area.h"
-#include "units/length.h"
-#include "units/math.h"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/units/area.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/math.hpp"
 
 namespace frc {
 
@@ -327,5 +327,5 @@ void from_json(const wpi::json& json, Translation2d& state);
 
 }  // namespace frc
 
-#include "frc/geometry/proto/Translation2dProto.h"
-#include "frc/geometry/struct/Translation2dStruct.h"
+#include "wpi/math/geometry/proto/Translation2dProto.hpp"
+#include "wpi/math/geometry/struct/Translation2dStruct.hpp"

@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <frc2/command/Command.h>
-#include <frc2/command/CommandHelper.h>
+#include "wpi/commands2/Command.hpp"
+#include "wpi/commands2/CommandHelper.hpp"
 
-#include "subsystems/ExampleSubsystem.h"
+#include "subsystems/ExampleSubsystem.hpp"
 
 /**
  * An example command that uses an example subsystem.

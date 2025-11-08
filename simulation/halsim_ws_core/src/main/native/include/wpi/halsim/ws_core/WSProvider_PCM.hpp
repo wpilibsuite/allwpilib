@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include "WSHalProviders.h"
+#include "wpi/halsim/ws_core/WSHalProviders.hpp"
 
 namespace wpilibws {
 class HALSimWSProviderPCM : public HALSimWSHalChanProvider {

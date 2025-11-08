@@ -1,5 +1,5 @@
 extra_includes:
-- frc/DutyCycleEncoder.h
+- wpi/hardware/rotation/DutyCycleEncoder.hpp
 
 classes:
   frc::sim::DutyCycleEncoderSim:

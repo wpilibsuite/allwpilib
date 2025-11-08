@@ -12,11 +12,11 @@
 
 #include <Eigen/Eigenvalues>
 #include <Eigen/QR>
-#include <wpi/Algorithm.h>
-#include <wpi/SymbolExports.h>
+#include "wpi/util/Algorithm.hpp"
+#include "wpi/util/SymbolExports.hpp"
 
-#include "frc/EigenCore.h"
-#include "frc/geometry/Pose2d.h"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/geometry/Pose2d.hpp"
 
 namespace frc {
 

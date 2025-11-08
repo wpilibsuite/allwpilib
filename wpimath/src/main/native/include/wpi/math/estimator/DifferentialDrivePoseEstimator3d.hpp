@@ -4,15 +4,15 @@
 
 #pragma once
 
-#include <wpi/SymbolExports.h>
-#include <wpi/array.h>
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/array.hpp"
 
-#include "frc/estimator/PoseEstimator3d.h"
-#include "frc/geometry/Pose2d.h"
-#include "frc/geometry/Rotation2d.h"
-#include "frc/kinematics/DifferentialDriveKinematics.h"
-#include "frc/kinematics/DifferentialDriveOdometry3d.h"
-#include "units/time.h"
+#include "wpi/math/estimator/PoseEstimator3d.hpp"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+#include "wpi/math/kinematics/DifferentialDriveOdometry3d.hpp"
+#include "wpi/units/time.hpp"
 
 namespace frc {
 /**

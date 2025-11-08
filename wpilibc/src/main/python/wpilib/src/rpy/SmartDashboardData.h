@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <wpi/sendable/Sendable.h>
+#include "wpi/util/sendable/Sendable.hpp"
 #include <semiwrap.h>
 
 namespace rpy {

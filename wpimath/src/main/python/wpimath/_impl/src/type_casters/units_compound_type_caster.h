@@ -1,11 +1,11 @@
 #pragma once
 
-#include <units/acceleration.h>
-#include <units/angle.h>
-#include <units/angular_velocity.h>
-#include <units/length.h>
-#include <units/time.h>
-#include <units/voltage.h>
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/voltage.hpp"
 
 namespace pybind11 {
 namespace detail {

@@ -5,18 +5,18 @@
 #include <string>
 
 #include <gtest/gtest.h>
-#include <wpi/SmallString.h>
-#include <wpi/raw_ostream.h>
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
-#include "../MockLogger.h"
-#include "../PubSubOptionsMatcher.h"
-#include "../TestPrinters.h"
-#include "MockMessageHandler.h"
-#include "PubSubOptions.h"
+#include "../MockLogger.hpp"
+#include "../PubSubOptionsMatcher.hpp"
+#include "../TestPrinters.hpp"
+#include "MockMessageHandler.hpp"
+#include "PubSubOptions.hpp"
 #include "gmock/gmock.h"
-#include "net/MessageHandler.h"
-#include "net/WireDecoder.h"
-#include "networktables/NetworkTableValue.h"
+#include "net/MessageHandler.hpp"
+#include "net/WireDecoder.hpp"
+#include "wpi/nt/NetworkTableValue.hpp"
 
 using namespace std::string_view_literals;
 using testing::_;

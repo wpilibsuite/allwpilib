@@ -7,12 +7,12 @@
 
 #include <gtest/gtest.h>
 
-#include "callback_helpers/TestCallbackHelpers.h"
-#include "frc/DriverStation.h"
-#include "frc/Joystick.h"
-#include "frc/RobotState.h"
-#include "frc/simulation/DriverStationSim.h"
-#include "frc/simulation/SimHooks.h"
+#include "callback_helpers/TestCallbackHelpers.hpp"
+#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/Joystick.hpp"
+#include "wpi/opmode/RobotState.hpp"
+#include "wpi/simulation/DriverStationSim.hpp"
+#include "wpi/simulation/SimHooks.hpp"
 
 using namespace frc;
 using namespace frc::sim;

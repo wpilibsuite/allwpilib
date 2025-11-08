@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include <frc/Joystick.h>
-#include <frc/TimedRobot.h>
+#include "wpi/driverstation/Joystick.hpp"
+#include "wpi/opmode/TimedRobot.hpp"
 
-#include "Constants.h"
-#include "subsystems/Intake.h"
+#include "Constants.hpp"
+#include "subsystems/Intake.hpp"
 
 class Robot : public frc::TimedRobot {
  public:

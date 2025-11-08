@@ -1,6 +1,6 @@
 #pragma once
 
-#include <units/angle.h>
+#include "wpi/units/angle.hpp"
 
 namespace pybind11 {
 namespace detail {

@@ -3,10 +3,10 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #import <AVFoundation/AVFoundation.h>
-#include "UsbCameraListener.h"
+#include "UsbCameraListener.hpp"
 
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-#include "Notifier.h"
+#include "Notifier.hpp"
 
 using namespace cs;
 

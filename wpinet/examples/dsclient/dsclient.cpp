@@ -5,11 +5,11 @@
 #include <cstdio>
 #include <memory>
 
-#include <wpi/Logger.h>
-#include <wpi/print.h>
+#include "wpi/util/Logger.hpp"
+#include "wpi/util/print.hpp"
 
-#include "wpinet/DsClient.h"
-#include "wpinet/EventLoopRunner.h"
+#include "wpi/net/DsClient.hpp"
+#include "wpi/net/EventLoopRunner.hpp"
 
 namespace uv = wpi::uv;
 

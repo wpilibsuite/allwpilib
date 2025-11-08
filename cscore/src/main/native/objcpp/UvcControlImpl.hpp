@@ -11,9 +11,9 @@
 #include <memory>
 #include <string_view>
 
-#import "UsbCameraDelegate.h"
+#import "UsbCameraDelegate.hpp"
 
-#include "cscore_cpp.h"
+#include "wpi/cs/cscore_cpp.hpp"
 
 // Status code definition
 #define CS_UVC_STATUS_ERROR -3001

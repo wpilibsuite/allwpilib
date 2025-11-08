@@ -8,17 +8,17 @@
 #include <stdexcept>
 #include <vector>
 
-#include <wpi/MathExtras.h>
-#include <wpi/SymbolExports.h>
-#include <wpi/json_fwd.h>
+#include "wpi/util/MathExtras.hpp"
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/json_fwd.hpp"
 
-#include "frc/geometry/Pose2d.h"
-#include "frc/geometry/Transform2d.h"
-#include "units/acceleration.h"
-#include "units/curvature.h"
-#include "units/math.h"
-#include "units/time.h"
-#include "units/velocity.h"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Transform2d.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/curvature.hpp"
+#include "wpi/units/math.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
 
 namespace frc {
 /**
@@ -272,5 +272,5 @@ void from_json(const wpi::json& json, Trajectory::State& state);
 
 }  // namespace frc
 
-#include "frc/trajectory/proto/TrajectoryProto.h"
-#include "frc/trajectory/proto/TrajectoryStateProto.h"
+#include "wpi/math/trajectory/proto/TrajectoryProto.hpp"
+#include "wpi/math/trajectory/proto/TrajectoryStateProto.hpp"

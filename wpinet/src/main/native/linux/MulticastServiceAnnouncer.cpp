@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/MulticastServiceAnnouncer.h"
+#include "wpi/net/MulticastServiceAnnouncer.h"
 
 #include <memory>
 #include <string>
@@ -10,9 +10,9 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/mutex.h>
+#include "wpi/util/mutex.hpp"
 
-#include "AvahiClient.h"
+#include "AvahiClient.hpp"
 
 using namespace wpi;
 

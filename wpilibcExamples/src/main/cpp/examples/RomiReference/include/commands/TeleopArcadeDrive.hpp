@@ -6,10 +6,10 @@
 
 #include <functional>
 
-#include <frc2/command/Command.h>
-#include <frc2/command/CommandHelper.h>
+#include "wpi/commands2/Command.hpp"
+#include "wpi/commands2/CommandHelper.hpp"
 
-#include "subsystems/Drivetrain.h"
+#include "subsystems/Drivetrain.hpp"
 
 class TeleopArcadeDrive
     : public frc2::CommandHelper<frc2::Command, TeleopArcadeDrive> {

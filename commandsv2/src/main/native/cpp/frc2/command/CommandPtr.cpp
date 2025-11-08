@@ -2,26 +2,26 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc2/command/CommandPtr.h"
+#include "wpi/commands2/CommandPtr.hpp"
 
 #include <memory>
 #include <utility>
 #include <vector>
 
-#include <frc/Errors.h>
+#include "wpi/system/Errors.hpp"
 
-#include "frc2/command/CommandScheduler.h"
-#include "frc2/command/ConditionalCommand.h"
-#include "frc2/command/InstantCommand.h"
-#include "frc2/command/ParallelCommandGroup.h"
-#include "frc2/command/ParallelDeadlineGroup.h"
-#include "frc2/command/ParallelRaceGroup.h"
-#include "frc2/command/ProxyCommand.h"
-#include "frc2/command/RepeatCommand.h"
-#include "frc2/command/SequentialCommandGroup.h"
-#include "frc2/command/WaitCommand.h"
-#include "frc2/command/WaitUntilCommand.h"
-#include "frc2/command/WrapperCommand.h"
+#include "wpi/commands2/CommandScheduler.hpp"
+#include "wpi/commands2/ConditionalCommand.hpp"
+#include "wpi/commands2/InstantCommand.hpp"
+#include "wpi/commands2/ParallelCommandGroup.hpp"
+#include "wpi/commands2/ParallelDeadlineGroup.hpp"
+#include "wpi/commands2/ParallelRaceGroup.hpp"
+#include "wpi/commands2/ProxyCommand.hpp"
+#include "wpi/commands2/RepeatCommand.hpp"
+#include "wpi/commands2/SequentialCommandGroup.hpp"
+#include "wpi/commands2/WaitCommand.hpp"
+#include "wpi/commands2/WaitUntilCommand.hpp"
+#include "wpi/commands2/WrapperCommand.hpp"
 
 using namespace frc2;
 

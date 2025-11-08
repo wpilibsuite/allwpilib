@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "hal/Types.h"
+#include "wpi/hal/Types.h"
 #include "jni.h"
 
 using SIM_JniHandle = HAL_Handle;  // NOLINT

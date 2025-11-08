@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "sysid/analysis/AnalysisType.h"
+#include "wpi/sysid/analysis/AnalysisType.hpp"
 
 TEST(AnalysisTypeTest, FromName) {
   EXPECT_EQ(sysid::analysis::kElevator, sysid::analysis::FromName("Elevator"));

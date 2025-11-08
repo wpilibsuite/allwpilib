@@ -6,10 +6,10 @@
 
 #include <string_view>
 
-#include "net/NetworkPing.h"
-#include "net/WireConnection.h"
-#include "server/Functions.h"
-#include "server/ServerClient4Base.h"
+#include "net/NetworkPing.hpp"
+#include "net/WireConnection.hpp"
+#include "server/Functions.hpp"
+#include "server/ServerClient4Base.hpp"
 
 namespace nt::server {
 

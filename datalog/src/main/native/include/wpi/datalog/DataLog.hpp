@@ -19,14 +19,14 @@
 #include <vector>
 #include <version>
 
-#include <wpi/DenseMap.h>
-#include <wpi/SmallVector.h>
-#include <wpi/StringMap.h>
-#include <wpi/mutex.h>
-#include <wpi/protobuf/Protobuf.h>
-#include <wpi/string.h>
-#include <wpi/struct/Struct.h>
-#include <wpi/timestamp.h>
+#include "wpi/util/DenseMap.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/StringMap.hpp"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/protobuf/Protobuf.hpp"
+#include "wpi/util/string.h"
+#include "wpi/util/struct/Struct.hpp"
+#include "wpi/util/timestamp.h"
 
 #include "wpi/datalog/DataLog_c.h"
 

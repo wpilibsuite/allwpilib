@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/Logger.h>
+#include "wpi/util/Logger.hpp"
 
 #define WPINET_WEBSOCKET_VERBOSE_DEBUG_CONTENT
 

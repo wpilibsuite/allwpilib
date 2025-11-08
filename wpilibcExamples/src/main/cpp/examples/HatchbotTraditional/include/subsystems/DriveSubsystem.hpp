@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <frc/Encoder.h>
-#include <frc/drive/DifferentialDrive.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc2/command/SubsystemBase.h>
+#include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/drive/DifferentialDrive.hpp"
+#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/commands2/SubsystemBase.hpp"
 
-#include "Constants.h"
+#include "Constants.hpp"
 
 class DriveSubsystem : public frc2::SubsystemBase {
  public:

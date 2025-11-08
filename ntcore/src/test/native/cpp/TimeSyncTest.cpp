@@ -4,8 +4,8 @@
 
 #include <gtest/gtest.h>
 
-#include "networktables/NetworkTableInstance.h"
-#include "networktables/NetworkTableListener.h"
+#include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/nt/NetworkTableListener.hpp"
 
 class TimeSyncTest : public ::testing::Test {
  public:

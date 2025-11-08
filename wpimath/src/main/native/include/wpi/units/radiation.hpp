@@ -32,10 +32,10 @@
 
 #pragma once
 
-#include "units/base.h"
-#include "units/energy.h"
-#include "units/frequency.h"
-#include "units/mass.h"
+#include "wpi/units/base.hpp"
+#include "wpi/units/energy.hpp"
+#include "wpi/units/frequency.hpp"
+#include "wpi/units/mass.hpp"
 
 namespace units {
 /**

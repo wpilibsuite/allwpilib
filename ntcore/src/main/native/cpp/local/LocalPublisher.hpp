@@ -6,11 +6,11 @@
 
 #include <utility>
 
-#include <wpi/Synchronization.h>
+#include "wpi/util/Synchronization.h"
 
-#include "Handle.h"
-#include "local/LocalTopic.h"
-#include "local/PubSubConfig.h"
+#include "Handle.hpp"
+#include "local/LocalTopic.hpp"
+#include "local/PubSubConfig.hpp"
 
 namespace nt::local {
 

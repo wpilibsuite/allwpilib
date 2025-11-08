@@ -8,7 +8,7 @@
 #include <string>
 #include <string_view>
 
-#include <wpi/Signal.h>
+#include "wpi/util/Signal.h"
 
 namespace wpi {
 

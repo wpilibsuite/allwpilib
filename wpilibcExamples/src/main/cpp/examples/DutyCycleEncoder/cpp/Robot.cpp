@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/DutyCycleEncoder.h>
-#include <frc/MathUtil.h>
-#include <frc/TimedRobot.h>
-#include <frc/smartdashboard/SmartDashboard.h>
+#include "wpi/hardware/rotation/DutyCycleEncoder.hpp"
+#include "wpi/math/util/MathUtil.hpp"
+#include "wpi/opmode/TimedRobot.hpp"
+#include "wpi/smartdashboard/SmartDashboard.hpp"
 
 constexpr double fullRange = 1.3;
 constexpr double expectedZero = 0.0;

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "MessageHandler.h"
+#include "MessageHandler.hpp"
 
 namespace nt::net {
 

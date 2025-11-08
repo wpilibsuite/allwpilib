@@ -6,12 +6,12 @@
 
 #include <memory>
 
-#include <networktables/BooleanTopic.h>
-#include <networktables/IntegerTopic.h>
-#include <units/angle.h>
-#include <units/time.h>
+#include "wpi/nt/BooleanTopic.hpp"
+#include "wpi/nt/IntegerTopic.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/time.hpp"
 
-#include "frc/ExpansionHub.h"
+#include "wpi/ExpansionHub.hpp"
 
 namespace frc {
 

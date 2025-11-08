@@ -6,10 +6,10 @@
 
 #include <utility>
 
-#include <wpi/SymbolExports.h>
+#include "wpi/util/SymbolExports.hpp"
 
-#include "frc/geometry/Rotation2d.h"
-#include "frc/geometry/Translation2d.h"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
 
 namespace frc {
 
@@ -171,8 +171,8 @@ class WPILIB_DLLEXPORT Transform2d {
 
 }  // namespace frc
 
-#include "frc/geometry/Pose2d.h"
-#include "frc/geometry/Twist2d.h"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Twist2d.hpp"
 
 namespace frc {
 
@@ -213,5 +213,5 @@ constexpr Twist2d Transform2d::Log() const {
 
 }  // namespace frc
 
-#include "frc/geometry/proto/Transform2dProto.h"
-#include "frc/geometry/struct/Transform2dStruct.h"
+#include "wpi/math/geometry/proto/Transform2dProto.hpp"
+#include "wpi/math/geometry/struct/Transform2dStruct.hpp"

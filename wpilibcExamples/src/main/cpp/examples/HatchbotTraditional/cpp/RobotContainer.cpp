@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "RobotContainer.h"
+#include "RobotContainer.hpp"
 
-#include <frc/smartdashboard/SmartDashboard.h>
-#include <frc2/command/button/JoystickButton.h>
+#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/commands2/button/JoystickButton.hpp"
 
-#include "commands/DefaultDrive.h"
-#include "commands/GrabHatch.h"
-#include "commands/HalveDriveSpeed.h"
-#include "commands/ReleaseHatch.h"
+#include "commands/DefaultDrive.hpp"
+#include "commands/GrabHatch.hpp"
+#include "commands/HalveDriveSpeed.hpp"
+#include "commands/ReleaseHatch.hpp"
 
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here

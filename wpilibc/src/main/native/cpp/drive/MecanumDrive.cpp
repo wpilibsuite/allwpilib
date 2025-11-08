@@ -2,19 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/drive/MecanumDrive.h"
+#include "wpi/drive/MecanumDrive.hpp"
 
 #include <algorithm>
 #include <string>
 #include <utility>
 
-#include <hal/UsageReporting.h>
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include "wpi/hal/UsageReporting.h"
+#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/util/sendable/SendableRegistry.hpp"
 
-#include "frc/MathUtil.h"
-#include "frc/geometry/Translation2d.h"
-#include "frc/motorcontrol/MotorController.h"
+#include "wpi/math/util/MathUtil.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/hardware/motor/MotorController.hpp"
 
 using namespace frc;
 

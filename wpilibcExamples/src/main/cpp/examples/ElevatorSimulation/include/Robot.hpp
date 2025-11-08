@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <frc/Joystick.h>
-#include <frc/TimedRobot.h>
+#include "wpi/driverstation/Joystick.hpp"
+#include "wpi/opmode/TimedRobot.hpp"
 
-#include "subsystems/Elevator.h"
+#include "subsystems/Elevator.hpp"
 
 /**
  * This is a sample program to demonstrate the use of elevator simulation.

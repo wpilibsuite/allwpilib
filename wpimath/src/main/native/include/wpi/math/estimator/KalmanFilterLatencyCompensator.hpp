@@ -10,9 +10,9 @@
 #include <utility>
 #include <vector>
 
-#include "frc/EigenCore.h"
-#include "units/math.h"
-#include "units/time.h"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/units/math.hpp"
+#include "wpi/units/time.hpp"
 
 namespace frc {
 

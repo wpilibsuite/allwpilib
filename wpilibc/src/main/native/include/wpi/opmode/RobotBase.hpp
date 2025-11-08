@@ -7,17 +7,17 @@
 #include <chrono>
 #include <thread>
 
-#include <hal/DriverStation.h>
-#include <hal/HALBase.h>
-#include <hal/Main.h>
-#include <networktables/NetworkTable.h>
-#include <wpi/RuntimeCheck.h>
-#include <wpi/condition_variable.h>
-#include <wpi/mutex.h>
-#include <wpi/string.h>
+#include "wpi/hal/DriverStation.h"
+#include "wpi/hal/HALBase.h"
+#include "wpi/hal/Main.h"
+#include "wpi/nt/NetworkTable.hpp"
+#include "wpi/util/RuntimeCheck.h"
+#include "wpi/util/condition_variable.hpp"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/string.h"
 
-#include "frc/Errors.h"
-#include "frc/RuntimeType.h"
+#include "wpi/system/Errors.hpp"
+#include "wpi/system/RuntimeType.hpp"
 
 namespace frc {
 

@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <hal/SimDevice.h>
-#include <units/angle.h>
+#include "wpi/hal/SimDevice.h"
+#include "wpi/units/angle.hpp"
 
 namespace frc {
 

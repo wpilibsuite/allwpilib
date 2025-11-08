@@ -4,9 +4,9 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/EigenCore.h"
-#include "frc/controller/ControlAffinePlantInversionFeedforward.h"
-#include "units/time.h"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/controller/ControlAffinePlantInversionFeedforward.hpp"
+#include "wpi/units/time.hpp"
 
 namespace frc {
 

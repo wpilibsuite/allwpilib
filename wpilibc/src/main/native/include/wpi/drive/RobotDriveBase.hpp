@@ -8,7 +8,7 @@
 #include <span>
 #include <string>
 
-#include "frc/MotorSafety.h"
+#include "wpi/hardware/motor/MotorSafety.hpp"
 
 namespace frc {
 

@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <frc/system/LinearSystem.h>
+#include "wpi/math/system/LinearSystem.hpp"
 
 #include <Eigen/QR>
 
-#include "frc/EigenCore.h"
-#include "units/time.h"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/units/time.hpp"
 
 namespace frc {
 

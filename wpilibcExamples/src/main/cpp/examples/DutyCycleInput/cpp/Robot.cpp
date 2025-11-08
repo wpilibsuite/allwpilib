@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/DigitalInput.h>
-#include <frc/DutyCycle.h>
-#include <frc/TimedRobot.h>
-#include <frc/smartdashboard/SmartDashboard.h>
+#include "wpi/hardware/discrete/DigitalInput.hpp"
+#include "wpi/hardware/rotation/DutyCycle.hpp"
+#include "wpi/opmode/TimedRobot.hpp"
+#include "wpi/smartdashboard/SmartDashboard.hpp"
 
 class Robot : public frc::TimedRobot {
   frc::DutyCycle m_dutyCycle{0};  // Duty cycle input

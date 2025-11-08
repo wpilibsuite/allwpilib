@@ -2,22 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/hardware/Pneumatic.h"
+#include "wpi/glass/hardware/Pneumatic.hpp"
 
 #include <cstdio>
 #include <cstring>
 #include <string>
 
 #include <imgui.h>
-#include <wpi/SmallVector.h>
-#include <wpi/StringExtras.h>
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/StringExtras.hpp"
 
-#include "glass/Context.h"
-#include "glass/DataSource.h"
-#include "glass/Storage.h"
-#include "glass/other/DeviceTree.h"
-#include "glass/support/ExtraGuiWidgets.h"
-#include "glass/support/NameSetting.h"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/DataSource.hpp"
+#include "wpi/glass/Storage.hpp"
+#include "wpi/glass/other/DeviceTree.hpp"
+#include "wpi/glass/support/ExtraGuiWidgets.hpp"
+#include "wpi/glass/support/NameSetting.hpp"
 
 using namespace glass;
 

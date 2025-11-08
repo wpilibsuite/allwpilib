@@ -13,18 +13,18 @@
 #include <utility>
 #include <vector>
 
-#include <wpinet/DsClient.h>
-#include <wpinet/EventLoopRunner.h>
-#include <wpinet/ParallelTcpConnector.h>
-#include <wpinet/WebSocket.h>
-#include <wpinet/uv/Async.h>
-#include <wpinet/uv/Timer.h>
+#include "wpi/net/DsClient.hpp"
+#include "wpi/net/EventLoopRunner.hpp"
+#include "wpi/net/ParallelTcpConnector.hpp"
+#include "wpi/net/WebSocket.hpp"
+#include "wpi/net/uv/Async.hpp"
+#include "wpi/net/uv/Timer.hpp"
 
-#include "INetworkClient.h"
-#include "net/ClientImpl.h"
-#include "net/ClientMessageQueue.h"
-#include "net/Message.h"
-#include "net/WebSocketConnection.h"
+#include "INetworkClient.hpp"
+#include "net/ClientImpl.hpp"
+#include "net/ClientMessageQueue.hpp"
+#include "net/Message.hpp"
+#include "net/WebSocketConnection.hpp"
 
 namespace wpi {
 class Logger;

@@ -3,9 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #pragma once
-#include <frc/GenericHID.h>
+#include "wpi/driverstation/GenericHID.hpp"
 
-#include "Trigger.h"
+#include "wpi/commands2/button/Trigger.hpp"
 
 namespace frc2 {
 /**

@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/DutyCycleEncoder.h"
+#include "wpi/hardware/rotation/DutyCycleEncoder.hpp"
 
 #include <memory>
 #include <utility>
 
-#include <wpi/NullDeleter.h>
-#include <wpi/sendable/SendableBuilder.h>
+#include "wpi/util/NullDeleter.hpp"
+#include "wpi/util/sendable/SendableBuilder.hpp"
 
-#include "frc/DigitalInput.h"
-#include "frc/DutyCycle.h"
-#include "frc/MathUtil.h"
+#include "wpi/hardware/discrete/DigitalInput.hpp"
+#include "wpi/hardware/rotation/DutyCycle.hpp"
+#include "wpi/math/util/MathUtil.hpp"
 
 using namespace frc;
 

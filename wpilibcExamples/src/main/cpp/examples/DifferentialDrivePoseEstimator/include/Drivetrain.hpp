@@ -6,33 +6,33 @@
 
 #include <numbers>
 
-#include <frc/ComputerVisionUtil.h>
-#include <frc/Encoder.h>
-#include <frc/OnboardIMU.h>
-#include <frc/RobotController.h>
-#include <frc/Timer.h>
-#include <frc/apriltag/AprilTagFieldLayout.h>
-#include <frc/apriltag/AprilTagFields.h>
-#include <frc/controller/PIDController.h>
-#include <frc/controller/SimpleMotorFeedforward.h>
-#include <frc/estimator/DifferentialDrivePoseEstimator.h>
-#include <frc/geometry/Pose2d.h>
-#include <frc/geometry/Pose3d.h>
-#include <frc/geometry/Quaternion.h>
-#include <frc/geometry/Transform3d.h>
-#include <frc/kinematics/DifferentialDriveKinematics.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc/simulation/DifferentialDrivetrainSim.h>
-#include <frc/simulation/EncoderSim.h>
-#include <frc/smartdashboard/Field2d.h>
-#include <frc/smartdashboard/SmartDashboard.h>
-#include <frc/system/plant/LinearSystemId.h>
-#include <networktables/DoubleArrayTopic.h>
-#include <networktables/NetworkTableInstance.h>
-#include <units/angle.h>
-#include <units/angular_velocity.h>
-#include <units/length.h>
-#include <units/velocity.h>
+#include "wpi/math/util/ComputerVisionUtil.hpp"
+#include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/hardware/imu/OnboardIMU.hpp"
+#include "wpi/system/RobotController.hpp"
+#include "wpi/system/Timer.hpp"
+#include "wpi/apriltag/AprilTagFieldLayout.hpp"
+#include "wpi/apriltag/AprilTagFields.hpp"
+#include "wpi/math/controller/PIDController.hpp"
+#include "wpi/math/controller/SimpleMotorFeedforward.hpp"
+#include "wpi/math/estimator/DifferentialDrivePoseEstimator.hpp"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Pose3d.hpp"
+#include "wpi/math/geometry/Quaternion.hpp"
+#include "wpi/math/geometry/Transform3d.hpp"
+#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/simulation/DifferentialDrivetrainSim.hpp"
+#include "wpi/simulation/EncoderSim.hpp"
+#include "wpi/smartdashboard/Field2d.hpp"
+#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/nt/DoubleArrayTopic.hpp"
+#include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/velocity.hpp"
 
 /**
  * Represents a differential drive style drivetrain.

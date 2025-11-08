@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/SequentialCommandGroup.h>
+#include "wpi/commands2/CommandHelper.hpp"
+#include "wpi/commands2/SequentialCommandGroup.hpp"
 
-#include "commands/DriveTime.h"
-#include "commands/TurnTime.h"
-#include "subsystems/Drivetrain.h"
+#include "commands/DriveTime.hpp"
+#include "commands/TurnTime.hpp"
+#include "subsystems/Drivetrain.hpp"
 
 class AutonomousTime
     : public frc2::CommandHelper<frc2::SequentialCommandGroup, AutonomousTime> {

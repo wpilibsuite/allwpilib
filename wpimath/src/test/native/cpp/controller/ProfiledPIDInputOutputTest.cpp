@@ -6,10 +6,10 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/controller/ProfiledPIDController.h"
-#include "units/angle.h"
-#include "units/angular_acceleration.h"
-#include "units/angular_velocity.h"
+#include "wpi/math/controller/ProfiledPIDController.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/angular_acceleration.hpp"
+#include "wpi/units/angular_velocity.hpp"
 
 TEST(ProfiledPIDInputOutputTest, ContinuousInput1) {
   frc::ProfiledPIDController<units::degree> controller{

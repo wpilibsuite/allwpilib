@@ -4,7 +4,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include <wpi/StringMap.h>
+#include "wpi/util/StringMap.hpp"
 
 namespace pybind11
 {

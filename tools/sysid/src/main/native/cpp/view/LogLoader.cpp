@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "sysid/view/LogLoader.h"
+#include "wpi/sysid/view/LogLoader.hpp"
 
 #include <algorithm>
 #include <memory>
@@ -14,12 +14,12 @@
 
 #include <imgui.h>
 #include <imgui_stdlib.h>
-#include <portable-file-dialogs.h>
-#include <wpi/SmallVector.h>
-#include <wpi/SpanExtras.h>
-#include <wpi/StringExtras.h>
-#include <wpi/datalog/DataLogReaderThread.h>
-#include <wpi/fs.h>
+#include "wpi/gui/portable-file-dialogs.h"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/SpanExtras.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/datalog/DataLogReaderThread.hpp"
+#include "wpi/util/fs.hpp"
 
 using namespace sysid;
 

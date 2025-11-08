@@ -6,7 +6,7 @@
 #include <string_view>
 
 #include <fmt/format.h>
-#include <wpi/struct/Struct.h>
+#include "wpi/util/struct/Struct.hpp"
 
 #include <pybind11/functional.h>
 #include <pybind11/typing.h>

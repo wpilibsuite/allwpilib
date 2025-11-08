@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/MotorSafety.h"
+#include "wpi/hardware/motor/MotorSafety.hpp"
 
 #include <algorithm>
 #include <utility>
 
-#include <hal/DriverStation.h>
-#include <wpi/SafeThread.h>
-#include <wpi/SmallPtrSet.h>
+#include "wpi/hal/DriverStation.h"
+#include "wpi/util/SafeThread.hpp"
+#include "wpi/util/SmallPtrSet.hpp"
 
-#include "frc/DriverStation.h"
-#include "frc/Errors.h"
+#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/system/Errors.hpp"
 
 using namespace frc;
 

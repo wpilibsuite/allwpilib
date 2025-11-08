@@ -5,8 +5,8 @@
 #pragma once
 
 #include "../PortsInternal.h"
-#include "hal/simulation/CTREPCMData.h"
-#include "hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/CTREPCMData.h"
+#include "wpi/hal/simulation/SimDataValue.h"
 
 namespace hal {
 class CTREPCMData {

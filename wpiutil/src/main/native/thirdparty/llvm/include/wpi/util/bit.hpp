@@ -14,7 +14,7 @@
 #ifndef WPIUTIL_WPI_BIT_H
 #define WPIUTIL_WPI_BIT_H
 
-#include "wpi/Compiler.h"
+#include "wpi/util/Compiler.hpp"
 #include <cstdint>
 #include <limits>
 #include <type_traits>

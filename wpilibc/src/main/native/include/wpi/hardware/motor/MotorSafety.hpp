@@ -6,10 +6,10 @@
 
 #include <string>
 
-#include <units/time.h>
-#include <wpi/mutex.h>
+#include "wpi/units/time.hpp"
+#include "wpi/util/mutex.hpp"
 
-#include "frc/Timer.h"
+#include "wpi/system/Timer.hpp"
 
 namespace frc {
 

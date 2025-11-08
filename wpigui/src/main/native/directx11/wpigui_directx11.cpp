@@ -13,8 +13,8 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_dx11.h>
 
-#include "wpigui.h"
-#include "wpigui_internal.h"
+#include "wpi/gui/wpigui.hpp"
+#include "wpi/gui/wpigui_internal.hpp"
 
 #pragma comment(lib, "d3d11.lib")
 

@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/IterativeRobotBase.h"
+#include "wpi/opmode/IterativeRobotBase.hpp"
 
-#include <frc/DriverStation.h>
+#include "wpi/driverstation/DriverStation.hpp"
 
-#include <hal/DriverStation.h>
-#include <networktables/NetworkTableInstance.h>
-#include <wpi/print.h>
+#include "wpi/hal/DriverStation.h"
+#include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/util/print.hpp"
 
-#include "frc/DSControlWord.h"
-#include "frc/Errors.h"
-#include "frc/smartdashboard/SmartDashboard.h"
+#include "wpi/driverstation/DSControlWord.hpp"
+#include "wpi/system/Errors.hpp"
+#include "wpi/smartdashboard/SmartDashboard.hpp"
 
 using namespace frc;
 

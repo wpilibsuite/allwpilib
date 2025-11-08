@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <frc2/command/CommandPtr.h>
+#include "wpi/commands2/CommandPtr.hpp"
 
-#include "subsystems/DriveSubsystem.h"
-#include "subsystems/HatchSubsystem.h"
+#include "subsystems/DriveSubsystem.hpp"
+#include "subsystems/HatchSubsystem.hpp"
 
 /** Container for auto command factories. */
 namespace autos {

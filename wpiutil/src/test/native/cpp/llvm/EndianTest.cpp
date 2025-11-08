@@ -6,7 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/Endian.h"
+#include "wpi/util/Endian.hpp"
 #include "gtest/gtest.h"
 #include <cstdlib>
 #include <ctime>

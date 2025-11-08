@@ -7,12 +7,12 @@
 #include <memory>
 #include <string>
 
-#include <units/current.h>
-#include <units/temperature.h>
-#include <units/voltage.h>
+#include "wpi/units/current.hpp"
+#include "wpi/units/temperature.hpp"
+#include "wpi/units/voltage.hpp"
 
-#include "frc/RobotController.h"
-#include "frc/simulation/CallbackStore.h"
+#include "wpi/system/RobotController.hpp"
+#include "wpi/simulation/CallbackStore.hpp"
 
 namespace frc::sim {
 

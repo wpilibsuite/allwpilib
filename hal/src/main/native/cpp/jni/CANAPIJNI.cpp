@@ -6,13 +6,13 @@
 
 #include <cassert>
 
-#include <wpi/jni_util.h>
+#include "wpi/util/jni_util.hpp"
 
 #include "HALUtil.h"
 #include "org_wpilib_hardware_hal_CANAPIJNI.h"
-#include "hal/CAN.h"
-#include "hal/CANAPI.h"
-#include "hal/Errors.h"
+#include "wpi/hal/CAN.h"
+#include "wpi/hal/CANAPI.h"
+#include "wpi/hal/Errors.h"
 
 using namespace hal;
 using namespace wpi::java;

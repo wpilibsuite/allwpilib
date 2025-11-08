@@ -6,15 +6,15 @@
 
 #include <memory>
 
-#include <hal/Counter.h>
-#include <hal/Types.h>
-#include <units/angular_velocity.h>
-#include <units/frequency.h>
-#include <units/time.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include "wpi/hal/Counter.h"
+#include "wpi/hal/Types.h"
+#include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/frequency.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/util/sendable/Sendable.hpp"
+#include "wpi/util/sendable/SendableHelper.hpp"
 
-#include "EdgeConfiguration.h"
+#include "EdgeConfiguration.hpp"
 
 namespace frc {
 /**

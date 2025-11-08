@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/DutyCycleSim.h"
+#include "wpi/simulation/DutyCycleSim.hpp"
 
 #include <memory>
 #include <stdexcept>
 
-#include <hal/simulation/DutyCycleData.h>
+#include "wpi/hal/simulation/DutyCycleData.h"
 
-#include "frc/DutyCycle.h"
+#include "wpi/hardware/rotation/DutyCycle.hpp"
 
 using namespace frc;
 using namespace frc::sim;

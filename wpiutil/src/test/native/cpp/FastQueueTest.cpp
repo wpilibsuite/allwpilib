@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/FastQueue.h"
+#include "wpi/util/FastQueue.hpp"
 
 TEST(FastQueueTest, Basic) {
   wpi::FastQueue<int> q;

@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <wpi/MathExtras.h>
-#include <wpi/SymbolExports.h>
+#include "wpi/util/MathExtras.hpp"
+#include "wpi/util/SymbolExports.hpp"
 
-#include "units/length.h"
+#include "wpi/units/length.hpp"
 
 namespace frc {
 /**
@@ -53,5 +53,5 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelPositions {
 };
 }  // namespace frc
 
-#include "frc/kinematics/proto/MecanumDriveWheelPositionsProto.h"
-#include "frc/kinematics/struct/MecanumDriveWheelPositionsStruct.h"
+#include "wpi/math/kinematics/proto/MecanumDriveWheelPositionsProto.hpp"
+#include "wpi/math/kinematics/struct/MecanumDriveWheelPositionsStruct.hpp"

@@ -26,9 +26,9 @@
 
 #pragma once
 
-#include "units/base.h"
-#include "units/mass.h"
-#include "units/volume.h"
+#include "wpi/units/base.hpp"
+#include "wpi/units/mass.hpp"
+#include "wpi/units/volume.hpp"
 
 namespace units {
 /**

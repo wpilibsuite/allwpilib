@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "sysid/view/AnalyzerPlot.h"
+#include "wpi/sysid/view/AnalyzerPlot.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -12,14 +12,14 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <units/math.h>
+#include "wpi/units/math.hpp"
 
-#include "sysid/Util.h"
-#include "sysid/analysis/AnalysisManager.h"
-#include "sysid/analysis/ArmSim.h"
-#include "sysid/analysis/ElevatorSim.h"
-#include "sysid/analysis/FilteringUtils.h"
-#include "sysid/analysis/SimpleMotorSim.h"
+#include "wpi/sysid/Util.hpp"
+#include "wpi/sysid/analysis/AnalysisManager.hpp"
+#include "wpi/sysid/analysis/ArmSim.hpp"
+#include "wpi/sysid/analysis/ElevatorSim.hpp"
+#include "wpi/sysid/analysis/FilteringUtils.hpp"
+#include "wpi/sysid/analysis/SimpleMotorSim.hpp"
 
 using namespace sysid;
 

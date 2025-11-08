@@ -9,7 +9,7 @@
 #ifndef WPIUTIL_WPI_CHRONO_H
 #define WPIUTIL_WPI_CHRONO_H
 
-#include "wpi/Compiler.h"
+#include "wpi/util/Compiler.hpp"
 
 #include <chrono>
 #include <ctime>

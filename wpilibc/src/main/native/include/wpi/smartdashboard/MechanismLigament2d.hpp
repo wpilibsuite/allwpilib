@@ -7,12 +7,12 @@
 #include <memory>
 #include <string_view>
 
-#include <networktables/DoubleTopic.h>
-#include <networktables/StringTopic.h>
-#include <units/angle.h>
+#include "wpi/nt/DoubleTopic.hpp"
+#include "wpi/nt/StringTopic.hpp"
+#include "wpi/units/angle.hpp"
 
-#include "frc/smartdashboard/MechanismObject2d.h"
-#include "frc/util/Color8Bit.h"
+#include "wpi/smartdashboard/MechanismObject2d.hpp"
+#include "wpi/util/Color8Bit.hpp"
 
 namespace frc {
 

@@ -9,13 +9,13 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/SymbolExports.h>
+#include "wpi/util/SymbolExports.hpp"
 
-#include "frc/spline/SplineParameterizer.h"
-#include "frc/trajectory/Trajectory.h"
-#include "frc/trajectory/TrajectoryConfig.h"
-#include "frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
-#include "frc/trajectory/constraint/TrajectoryConstraint.h"
+#include "wpi/math/spline/SplineParameterizer.hpp"
+#include "wpi/math/trajectory/Trajectory.hpp"
+#include "wpi/math/trajectory/TrajectoryConfig.hpp"
+#include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
+#include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
 
 namespace frc {
 /**

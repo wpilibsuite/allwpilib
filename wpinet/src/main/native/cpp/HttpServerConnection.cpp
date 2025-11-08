@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/HttpServerConnection.h"
+#include "wpi/net/HttpServerConnection.hpp"
 
 #include <memory>
 
-#include <wpi/SmallString.h>
-#include <wpi/SmallVector.h>
-#include <wpi/SpanExtras.h>
-#include <wpi/StringExtras.h>
-#include <wpi/fmt/raw_ostream.h>
-#include <wpi/print.h>
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/SpanExtras.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/fmt/raw_ostream.hpp"
+#include "wpi/util/print.hpp"
 
-#include "wpinet/raw_uv_ostream.h"
+#include "wpi/net/raw_uv_ostream.hpp"
 
 using namespace wpi;
 

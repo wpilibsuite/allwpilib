@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/ScopedTracer.h"
+#include "wpi/system/ScopedTracer.hpp"
 
-#include <wpi/raw_ostream.h>
+#include "wpi/util/raw_ostream.hpp"
 
 using namespace frc;
 

@@ -5,10 +5,10 @@
 #pragma once
 
 #include <fmt/format.h>
-#include <wpi/ct_string.h>
-#include <wpi/struct/Struct.h>
+#include "wpi/util/ct_string.hpp"
+#include "wpi/util/struct/Struct.hpp"
 
-#include "frc/kinematics/SwerveDriveKinematics.h"
+#include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
 
 template <size_t NumModules>
 struct wpi::Struct<frc::SwerveDriveKinematics<NumModules>> {

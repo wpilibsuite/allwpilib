@@ -11,10 +11,10 @@
 #include <string_view>
 #include <utility>
 
-#include <networktables/NetworkTable.h>
-#include <wpi/StringMap.h>
+#include "wpi/nt/NetworkTable.hpp"
+#include "wpi/util/StringMap.hpp"
 
-#include "frc/Errors.h"
+#include "wpi/system/Errors.hpp"
 
 namespace frc {
 

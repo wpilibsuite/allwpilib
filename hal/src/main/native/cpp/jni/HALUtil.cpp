@@ -13,13 +13,13 @@
 #include <string>
 
 #include <fmt/format.h>
-#include <wpi/jni_util.h>
+#include "wpi/util/jni_util.hpp"
 
 #include "org_wpilib_hardware_hal_HALUtil.h"
-#include "hal/CAN.h"
-#include "hal/DriverStation.h"
-#include "hal/Errors.h"
-#include "hal/HAL.h"
+#include "wpi/hal/CAN.h"
+#include "wpi/hal/DriverStation.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/HAL.h"
 
 using namespace wpi::java;
 

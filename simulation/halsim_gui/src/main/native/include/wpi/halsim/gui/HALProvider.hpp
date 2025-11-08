@@ -10,8 +10,8 @@
 #include <string_view>
 #include <vector>
 
-#include <glass/Model.h>
-#include <glass/Provider.h>
+#include "wpi/glass/Model.hpp"
+#include "wpi/glass/Provider.hpp"
 
 namespace halsimgui {
 

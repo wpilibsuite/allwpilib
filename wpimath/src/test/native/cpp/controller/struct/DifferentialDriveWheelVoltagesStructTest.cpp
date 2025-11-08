@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/controller/DifferentialDriveWheelVoltages.h"
+#include "wpi/math/controller/DifferentialDriveWheelVoltages.hpp"
 
 using namespace frc;
 

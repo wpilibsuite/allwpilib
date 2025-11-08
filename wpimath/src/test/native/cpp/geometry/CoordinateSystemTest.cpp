@@ -4,9 +4,9 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/CoordinateSystem.h"
-#include "frc/geometry/Pose3d.h"
-#include "frc/geometry/Transform3d.h"
+#include "wpi/math/geometry/CoordinateSystem.hpp"
+#include "wpi/math/geometry/Pose3d.hpp"
+#include "wpi/math/geometry/Transform3d.hpp"
 
 using namespace frc;
 

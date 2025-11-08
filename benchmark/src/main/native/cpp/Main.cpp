@@ -3,12 +3,12 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <benchmark/benchmark.h>
-#include <frc/geometry/Pose2d.h>
-#include <frc/path/TravelingSalesman.h>
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/path/TravelingSalesman.hpp"
 
-#include <units/angle.h>
-#include <units/length.h>
-#include <wpi/array.h>
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/util/array.hpp"
 
 static constexpr wpi::array<frc::Pose2d, 6> poses{
     frc::Pose2d{-1_m, 1_m, -90_deg}, frc::Pose2d{-1_m, 2_m, 90_deg},

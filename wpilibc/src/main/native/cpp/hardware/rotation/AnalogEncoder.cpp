@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/AnalogEncoder.h"
+#include "wpi/hardware/rotation/AnalogEncoder.hpp"
 
 #include <utility>
 
-#include <hal/UsageReporting.h>
-#include <wpi/NullDeleter.h>
-#include <wpi/sendable/SendableBuilder.h>
+#include "wpi/hal/UsageReporting.h"
+#include "wpi/util/NullDeleter.hpp"
+#include "wpi/util/sendable/SendableBuilder.hpp"
 
-#include "frc/AnalogInput.h"
-#include "frc/MathUtil.h"
-#include "frc/RobotController.h"
+#include "wpi/hardware/discrete/AnalogInput.hpp"
+#include "wpi/math/util/MathUtil.hpp"
+#include "wpi/system/RobotController.hpp"
 
 using namespace frc;
 

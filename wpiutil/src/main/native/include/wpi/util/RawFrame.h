@@ -17,7 +17,7 @@
 #endif
 
 #ifdef WPI_RAWFRAME_JNI
-#include "wpi/jni_util.h"
+#include "wpi/util/jni_util.hpp"
 #endif
 
 // NOLINT

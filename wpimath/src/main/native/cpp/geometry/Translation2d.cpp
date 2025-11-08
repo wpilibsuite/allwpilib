@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/geometry/Translation2d.h"
+#include "wpi/math/geometry/Translation2d.hpp"
 
-#include <wpi/json.h>
+#include "wpi/util/json.hpp"
 
 void frc::to_json(wpi::json& json, const Translation2d& translation) {
   json =

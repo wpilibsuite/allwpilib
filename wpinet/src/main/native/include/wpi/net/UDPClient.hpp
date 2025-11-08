@@ -9,8 +9,8 @@
 #include <string>
 #include <string_view>
 
-#include <wpi/SmallVector.h>
-#include <wpi/mutex.h>
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/mutex.hpp"
 
 namespace wpi {
 

@@ -13,11 +13,11 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/MemAlloc.h>
-#include <wpi/timestamp.h>
+#include "wpi/util/MemAlloc.hpp"
+#include "wpi/util/timestamp.h"
 
-#include "Value_internal.h"
-#include "networktables/NetworkTableValue.h"
+#include "Value_internal.hpp"
+#include "wpi/nt/NetworkTableValue.hpp"
 
 using namespace nt;
 

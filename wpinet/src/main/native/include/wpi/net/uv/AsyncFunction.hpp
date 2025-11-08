@@ -16,11 +16,11 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/future.h>
-#include <wpi/mutex.h>
+#include "wpi/util/future.hpp"
+#include "wpi/util/mutex.hpp"
 
-#include "wpinet/uv/Handle.h"
-#include "wpinet/uv/Loop.h"
+#include "wpi/net/uv/Handle.hpp"
+#include "wpi/net/uv/Loop.hpp"
 
 namespace wpi::uv {
 

@@ -5,18 +5,18 @@
 #include <string>
 #include <thread>
 
-#include <frc/Preferences.h>
-#include <frc/simulation/DriverStationSim.h>
-#include <frc/simulation/JoystickSim.h>
-#include <frc/simulation/PWMMotorControllerSim.h>
-#include <frc/simulation/SimHooks.h>
+#include "wpi/util/Preferences.hpp"
+#include "wpi/simulation/DriverStationSim.hpp"
+#include "wpi/simulation/JoystickSim.hpp"
+#include "wpi/simulation/PWMMotorControllerSim.hpp"
+#include "wpi/simulation/SimHooks.hpp"
 #include <gtest/gtest.h>
-#include <hal/simulation/MockHooks.h>
-#include <units/length.h>
-#include <units/time.h>
+#include "wpi/hal/simulation/MockHooks.h"
+#include "wpi/units/length.hpp"
+#include "wpi/units/time.hpp"
 
-#include "Constants.h"
-#include "Robot.h"
+#include "Constants.hpp"
+#include "Robot.hpp"
 
 class ArmSimulationTest : public testing::TestWithParam<units::degree_t> {
   Robot m_robot;

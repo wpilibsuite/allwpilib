@@ -5,8 +5,8 @@
 #include <optional>
 #include <vector>
 
-#include "Value_internal.h"
-#include "ntcore_cpp.h"
+#include "Value_internal.hpp"
+#include "wpi/nt/ntcore_cpp.hpp"
 
 using namespace nt;
 using namespace nt::meta;

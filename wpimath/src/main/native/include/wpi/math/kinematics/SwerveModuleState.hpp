@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <wpi/SymbolExports.h>
+#include "wpi/util/SymbolExports.hpp"
 
-#include "frc/geometry/Rotation2d.h"
-#include "units/angle.h"
-#include "units/math.h"
-#include "units/velocity.h"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/math.hpp"
+#include "wpi/units/velocity.hpp"
 
 namespace frc {
 /**
@@ -86,5 +86,5 @@ struct WPILIB_DLLEXPORT SwerveModuleState {
 };
 }  // namespace frc
 
-#include "frc/kinematics/proto/SwerveModuleStateProto.h"
-#include "frc/kinematics/struct/SwerveModuleStateStruct.h"
+#include "wpi/math/kinematics/proto/SwerveModuleStateProto.hpp"
+#include "wpi/math/kinematics/struct/SwerveModuleStateStruct.hpp"

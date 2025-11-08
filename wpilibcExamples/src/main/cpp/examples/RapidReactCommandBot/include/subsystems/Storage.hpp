@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include <frc/DigitalInput.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc2/command/CommandPtr.h>
-#include <frc2/command/SubsystemBase.h>
-#include <frc2/command/button/Trigger.h>
+#include "wpi/hardware/discrete/DigitalInput.hpp"
+#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/commands2/CommandPtr.hpp"
+#include "wpi/commands2/SubsystemBase.hpp"
+#include "wpi/commands2/button/Trigger.hpp"
 
-#include "Constants.h"
+#include "Constants.hpp"
 
 class Storage : frc2::SubsystemBase {
  public:

@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "HALSimWS.h"
+#include "wpi/halsim/ws_client/HALSimWS.hpp"
 
 #include <cstdio>
 #include <memory>
 #include <string>
 
-#include <wpi/SmallString.h>
-#include <wpi/StringExtras.h>
-#include <wpi/print.h>
-#include <wpinet/uv/util.h>
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/print.hpp"
+#include "wpi/net/uv/util.hpp"
 
-#include "HALSimWSClientConnection.h"
+#include "wpi/halsim/ws_client/HALSimWSClientConnection.hpp"
 
 static constexpr int kTcpConnectAttemptTimeout = 1000;
 

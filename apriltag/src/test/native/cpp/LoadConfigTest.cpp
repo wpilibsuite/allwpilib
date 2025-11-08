@@ -6,8 +6,8 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/apriltag/AprilTagFieldLayout.h"
-#include "frc/apriltag/AprilTagFields.h"
+#include "wpi/apriltag/AprilTagFieldLayout.hpp"
+#include "wpi/apriltag/AprilTagFields.hpp"
 
 namespace frc {
 

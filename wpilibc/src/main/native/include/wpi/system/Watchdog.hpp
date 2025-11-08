@@ -8,9 +8,9 @@
 #include <string_view>
 #include <utility>
 
-#include <units/time.h>
+#include "wpi/units/time.hpp"
 
-#include "frc/Tracer.h"
+#include "wpi/system/Tracer.hpp"
 
 namespace frc {
 

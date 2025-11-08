@@ -6,10 +6,10 @@
 
 #include <jni.h>
 
-#include <wpi/jni_util.h>
+#include "wpi/util/jni_util.hpp"
 
 #include "org_wpilib_networktables_NetworkTablesJNI.h"
-#include "ntcore.h"
+#include "wpi/nt/ntcore.h"
 
 using namespace wpi::java;
 

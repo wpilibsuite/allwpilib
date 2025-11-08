@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/RoboRioSim.h"
+#include "wpi/simulation/RoboRioSim.hpp"
 
 #include <memory>
 #include <string>
 
-#include <hal/simulation/RoboRioData.h>
+#include "wpi/hal/simulation/RoboRioData.h"
 
 using namespace frc;
 using namespace frc::sim;

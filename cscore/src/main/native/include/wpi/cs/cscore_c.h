@@ -7,8 +7,8 @@
 
 #include <stdint.h>
 
-#include <wpi/RawFrame.h>
-#include <wpi/string.h>
+#include "wpi/util/RawFrame.h"
+#include "wpi/util/string.h"
 
 #ifdef __cplusplus
 #include <cstddef>

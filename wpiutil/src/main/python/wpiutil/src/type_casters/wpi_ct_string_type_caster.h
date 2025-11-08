@@ -3,7 +3,7 @@
 
 #include <pybind11/pybind11.h>
 
-#include <wpi/ct_string.h>
+#include "wpi/util/ct_string.hpp"
 
 namespace pybind11 {
 namespace detail {

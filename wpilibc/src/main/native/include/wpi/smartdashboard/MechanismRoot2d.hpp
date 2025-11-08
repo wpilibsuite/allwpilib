@@ -7,9 +7,9 @@
 #include <memory>
 #include <string_view>
 
-#include <networktables/DoubleTopic.h>
+#include "wpi/nt/DoubleTopic.hpp"
 
-#include "MechanismObject2d.h"
+#include "wpi/smartdashboard/MechanismObject2d.hpp"
 
 namespace frc {
 

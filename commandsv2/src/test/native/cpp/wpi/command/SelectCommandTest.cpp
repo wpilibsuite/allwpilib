@@ -6,10 +6,10 @@
 #include <utility>
 #include <vector>
 
-#include "CommandTestBase.h"
-#include "CompositionTestBase.h"
-#include "frc2/command/InstantCommand.h"
-#include "frc2/command/SelectCommand.h"
+#include "CommandTestBase.hpp"
+#include "CompositionTestBase.hpp"
+#include "wpi/commands2/InstantCommand.hpp"
+#include "wpi/commands2/SelectCommand.hpp"
 
 using namespace frc2;
 class SelectCommandTest : public CommandTestBase {};

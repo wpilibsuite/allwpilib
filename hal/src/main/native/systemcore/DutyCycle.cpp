@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/DutyCycle.h"
+#include "wpi/hal/DutyCycle.h"
 
 #include <cstdio>
 #include <memory>
@@ -12,10 +12,10 @@
 #include "HALInternal.h"
 #include "PortsInternal.h"
 #include "SmartIo.h"
-#include "hal/Errors.h"
-#include "hal/cpp/fpga_clock.h"
-#include "hal/handles/HandlesInternal.h"
-#include "hal/handles/LimitedHandleResource.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/cpp/fpga_clock.h"
+#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/hal/handles/LimitedHandleResource.h"
 
 using namespace hal;
 

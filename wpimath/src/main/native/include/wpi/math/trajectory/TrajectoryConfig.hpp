@@ -9,17 +9,17 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/SymbolExports.h>
+#include "wpi/util/SymbolExports.hpp"
 
-#include "frc/kinematics/DifferentialDriveKinematics.h"
-#include "frc/kinematics/MecanumDriveKinematics.h"
-#include "frc/kinematics/SwerveDriveKinematics.h"
-#include "frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
-#include "frc/trajectory/constraint/MecanumDriveKinematicsConstraint.h"
-#include "frc/trajectory/constraint/SwerveDriveKinematicsConstraint.h"
-#include "frc/trajectory/constraint/TrajectoryConstraint.h"
-#include "units/acceleration.h"
-#include "units/velocity.h"
+#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+#include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
+#include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
+#include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
+#include "wpi/math/trajectory/constraint/MecanumDriveKinematicsConstraint.hpp"
+#include "wpi/math/trajectory/constraint/SwerveDriveKinematicsConstraint.hpp"
+#include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/velocity.hpp"
 
 namespace frc {
 /**

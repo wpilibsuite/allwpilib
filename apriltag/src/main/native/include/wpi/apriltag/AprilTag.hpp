@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include <wpi/RawFrame.h>
-#include <wpi/SymbolExports.h>
-#include <wpi/json_fwd.h>
+#include "wpi/util/RawFrame.h"
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/json_fwd.hpp"
 
-#include "frc/geometry/Pose3d.h"
+#include "wpi/math/geometry/Pose3d.hpp"
 
 namespace frc {
 

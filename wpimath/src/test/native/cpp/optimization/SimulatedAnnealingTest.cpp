@@ -8,7 +8,7 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/optimization/SimulatedAnnealing.h"
+#include "wpi/math/optimization/SimulatedAnnealing.hpp"
 
 TEST(SimulatedAnnealingTest, DoubleFunctionOptimizationHeartBeat) {
   auto function = [](double x) {

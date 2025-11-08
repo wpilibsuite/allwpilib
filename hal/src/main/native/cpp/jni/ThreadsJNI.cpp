@@ -8,7 +8,7 @@
 
 #include "HALUtil.h"
 #include "org_wpilib_hardware_hal_ThreadsJNI.h"
-#include "hal/Threads.h"
+#include "wpi/hal/Threads.h"
 
 using namespace hal;
 

@@ -6,9 +6,9 @@
 
 #include <string_view>
 
-#include <wpi/function_ref.h>
+#include "wpi/util/function_ref.hpp"
 
-#include "glass/Model.h"
+#include "wpi/glass/Model.hpp"
 
 namespace glass {
 

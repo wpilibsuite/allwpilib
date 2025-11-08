@@ -14,7 +14,7 @@
 #ifndef WPIUTIL_WPI_VERSIONTUPLE_H
 #define WPIUTIL_WPI_VERSIONTUPLE_H
 
-#include "wpi/DenseMapInfo.h"
+#include "wpi/util/DenseMapInfo.hpp"
 #include <optional>
 #include <string>
 #include <tuple>

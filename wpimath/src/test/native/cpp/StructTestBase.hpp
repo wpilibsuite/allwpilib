@@ -5,7 +5,7 @@
 #pragma once
 
 #include <gtest/gtest.h>
-#include <wpi/struct/Struct.h>
+#include "wpi/util/struct/Struct.hpp"
 
 template <typename T>
 class StructTest : public testing::Test {};

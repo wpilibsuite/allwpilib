@@ -13,13 +13,13 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/imgproc.hpp>
-#include <wpi/mutex.h>
-#include <wpi/print.h>
-#include <wpi/spinlock.h>
-#include <wpigui.h>
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/print.hpp"
+#include "wpi/util/spinlock.hpp"
+#include "wpi/gui/wpigui.hpp"
 
-#include "cscore.h"
-#include "cscore_cv.h"
+#include "wpi/cs/cscore.h"
+#include "wpi/cs/cscore_cv.hpp"
 
 namespace gui = wpi::gui;
 

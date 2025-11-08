@@ -31,35 +31,35 @@
 #include <utility> // declval, forward, move, pair, swap
 #include <vector> // vector
 
-#include <wpi/adl_serializer.h>
-#include <wpi/byte_container_with_subtype.h>
-#include <wpi/detail/conversions/from_json.h>
-#include <wpi/detail/conversions/to_json.h>
-#include <wpi/detail/exceptions.h>
-#include <wpi/detail/hash.h>
-#include <wpi/detail/input/binary_reader.h>
-#include <wpi/detail/input/input_adapters.h>
-#include <wpi/detail/input/lexer.h>
-#include <wpi/detail/input/parser.h>
-#include <wpi/detail/iterators/internal_iterator.h>
-#include <wpi/detail/iterators/iter_impl.h>
-#include <wpi/detail/iterators/iteration_proxy.h>
-#include <wpi/detail/iterators/json_reverse_iterator.h>
-#include <wpi/detail/iterators/primitive_iterator.h>
-#include <wpi/detail/json_custom_base_class.h>
-#include <wpi/detail/json_pointer.h>
-#include <wpi/detail/json_ref.h>
-#include <wpi/detail/macro_scope.h>
-#include <wpi/detail/string_concat.h>
-#include <wpi/detail/string_escape.h>
-#include <wpi/detail/meta/cpp_future.h>
-#include <wpi/detail/meta/type_traits.h>
-#include <wpi/detail/output/binary_writer.h>
-#include <wpi/detail/output/output_adapters.h>
-#include <wpi/detail/output/serializer.h>
-#include <wpi/detail/value_t.h>
-#include <wpi/json_fwd.h>
-#include <wpi/ordered_map.h>
+#include "wpi/util/adl_serializer.hpp"
+#include "wpi/util/byte_container_with_subtype.hpp"
+#include "wpi/util/detail/conversions/from_json.hpp"
+#include "wpi/util/detail/conversions/to_json.hpp"
+#include "wpi/util/detail/exceptions.hpp"
+#include "wpi/util/detail/hash.hpp"
+#include "wpi/util/detail/input/binary_reader.hpp"
+#include "wpi/util/detail/input/input_adapters.hpp"
+#include "wpi/util/detail/input/lexer.hpp"
+#include "wpi/util/detail/input/parser.hpp"
+#include "wpi/util/detail/iterators/internal_iterator.hpp"
+#include "wpi/util/detail/iterators/iter_impl.hpp"
+#include "wpi/util/detail/iterators/iteration_proxy.hpp"
+#include "wpi/util/detail/iterators/json_reverse_iterator.hpp"
+#include "wpi/util/detail/iterators/primitive_iterator.hpp"
+#include "wpi/util/detail/json_custom_base_class.hpp"
+#include "wpi/util/detail/json_pointer.hpp"
+#include "wpi/util/detail/json_ref.hpp"
+#include "wpi/util/detail/macro_scope.hpp"
+#include "wpi/util/detail/string_concat.hpp"
+#include "wpi/util/detail/string_escape.hpp"
+#include "wpi/util/detail/meta/cpp_future.hpp"
+#include "wpi/util/detail/meta/type_traits.hpp"
+#include "wpi/util/detail/output/binary_writer.hpp"
+#include "wpi/util/detail/output/output_adapters.hpp"
+#include "wpi/util/detail/output/serializer.hpp"
+#include "wpi/util/detail/value_t.hpp"
+#include "wpi/util/json_fwd.hpp"
+#include "wpi/util/ordered_map.hpp"
 
 #if defined(JSON_HAS_CPP_17)
     #if JSON_HAS_STATIC_RTTI
@@ -5257,6 +5257,6 @@ inline void swap(wpi::WPI_BASIC_JSON_TPL& j1, wpi::WPI_BASIC_JSON_TPL& j2) noexc
     #endif
 #endif
 
-#include <wpi/detail/macro_unscope.h>
+#include "wpi/util/detail/macro_unscope.hpp"
 
 #endif  // INCLUDE_WPI_JSON_HPP_

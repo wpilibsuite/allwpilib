@@ -15,12 +15,12 @@
 
 #include <upb/mem/arena.h>
 #include <upb/reflection/def.h>
-#include <wpi/DenseMap.h>
-#include <wpi/Signal.h>
-#include <wpi/mutex.h>
-#include <wpi/struct/DynamicStruct.h>
+#include "wpi/util/DenseMap.hpp"
+#include "wpi/util/Signal.h"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/struct/DynamicStruct.hpp"
 
-#include "wpi/datalog/DataLogReader.h"
+#include "wpi/datalog/DataLogReader.hpp"
 
 namespace wpi::log {
 

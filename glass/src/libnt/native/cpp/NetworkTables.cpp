@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/networktables/NetworkTables.h"
+#include "wpi/glass/networktables/NetworkTables.hpp"
 
 #include <algorithm>
 #include <cinttypes>
@@ -20,29 +20,29 @@
 #include <fmt/format.h>
 #include <imgui.h>
 #include <imgui_stdlib.h>
-#include <networktables/NetworkTableInstance.h>
-#include <networktables/NetworkTableValue.h>
-#include <ntcore_c.h>
-#include <ntcore_cpp.h>
-#include <ntcore_cpp_types.h>
+#include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/nt/NetworkTableValue.hpp"
+#include "wpi/nt/ntcore_c.h"
+#include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/nt/ntcore_cpp_types.hpp"
 #include <upb/message/message.h>
 #include <upb/mini_table/message.h>
 #include <upb/reflection/def.h>
 #include <upb/reflection/message.h>
 #include <upb/reflection/stage0/google/protobuf/descriptor.upb.h>
 #include <upb/wire/decode.h>
-#include <wpi/MessagePack.h>
-#include <wpi/SmallString.h>
-#include <wpi/SpanExtras.h>
-#include <wpi/StringExtras.h>
-#include <wpi/mpack.h>
-#include <wpi/print.h>
-#include <wpi/raw_ostream.h>
+#include "wpi/util/MessagePack.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/SpanExtras.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/mpack.h"
+#include "wpi/util/print.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
-#include "glass/Context.h"
-#include "glass/DataSource.h"
-#include "glass/Storage.h"
-#include "glass/support/ExtraGuiWidgets.h"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/DataSource.hpp"
+#include "wpi/glass/Storage.hpp"
+#include "wpi/glass/support/ExtraGuiWidgets.hpp"
 
 using namespace glass;
 using namespace mpack;

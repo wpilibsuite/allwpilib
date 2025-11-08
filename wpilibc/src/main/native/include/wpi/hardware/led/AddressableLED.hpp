@@ -7,13 +7,13 @@
 #include <initializer_list>
 #include <span>
 
-#include <hal/AddressableLED.h>
-#include <hal/AddressableLEDTypes.h>
-#include <hal/Types.h>
-#include <units/time.h>
+#include "wpi/hal/AddressableLED.h"
+#include "wpi/hal/AddressableLEDTypes.h"
+#include "wpi/hal/Types.h"
+#include "wpi/units/time.hpp"
 
-#include "util/Color.h"
-#include "util/Color8Bit.h"
+#include "wpi/util/Color.hpp"
+#include "wpi/util/Color8Bit.hpp"
 
 namespace frc {
 

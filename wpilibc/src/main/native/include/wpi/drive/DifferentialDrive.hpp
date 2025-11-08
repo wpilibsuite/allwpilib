@@ -7,11 +7,11 @@
 #include <functional>
 #include <string>
 
-#include <wpi/deprecated.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include "wpi/util/deprecated.hpp"
+#include "wpi/util/sendable/Sendable.hpp"
+#include "wpi/util/sendable/SendableHelper.hpp"
 
-#include "frc/drive/RobotDriveBase.h"
+#include "wpi/drive/RobotDriveBase.hpp"
 
 namespace frc {
 

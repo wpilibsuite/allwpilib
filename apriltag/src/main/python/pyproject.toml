@@ -51,7 +51,7 @@ scan_headers_ignore = [
   "apriltag_math.h",
   "apriltag_pose.h",
 
-  "frc/apriltag/AprilTagDetector_cv.h",
+  "wpi/apriltag/AprilTagDetector_cv.hpp",
 
   "tag16h5.h",
   "tag36h11.h",
@@ -64,11 +64,11 @@ depends = ["wpiutil", "wpimath"]
 
 [tool.semiwrap.extension_modules."robotpy_apriltag._apriltag".headers]
 # frc/apriltag
-AprilTag = "frc/apriltag/AprilTag.h"
-AprilTagDetection = "frc/apriltag/AprilTagDetection.h"
-AprilTagDetector = "frc/apriltag/AprilTagDetector.h"
-# AprilTagDetector_cv = "frc/apriltag/AprilTagDetector_cv.h"
-AprilTagFieldLayout = "frc/apriltag/AprilTagFieldLayout.h"
-AprilTagFields = "frc/apriltag/AprilTagFields.h"
-AprilTagPoseEstimate = "frc/apriltag/AprilTagPoseEstimate.h"
-AprilTagPoseEstimator = "frc/apriltag/AprilTagPoseEstimator.h"
+AprilTag = "wpi/apriltag/AprilTag.hpp"
+AprilTagDetection = "wpi/apriltag/AprilTagDetection.hpp"
+AprilTagDetector = "wpi/apriltag/AprilTagDetector.hpp"
+# AprilTagDetector_cv = "wpi/apriltag/AprilTagDetector_cv.hpp"
+AprilTagFieldLayout = "wpi/apriltag/AprilTagFieldLayout.hpp"
+AprilTagFields = "wpi/apriltag/AprilTagFields.hpp"
+AprilTagPoseEstimate = "wpi/apriltag/AprilTagPoseEstimate.hpp"
+AprilTagPoseEstimator = "wpi/apriltag/AprilTagPoseEstimator.hpp"

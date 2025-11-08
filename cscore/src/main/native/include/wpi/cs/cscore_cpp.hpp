@@ -13,11 +13,11 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/RawFrame.h>
-#include <wpi/SmallVector.h>
-#include <wpi/json_fwd.h>
+#include "wpi/util/RawFrame.h"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/json_fwd.hpp"
 
-#include "cscore_c.h"
+#include "wpi/cs/cscore_c.h"
 
 #ifdef _WIN32
 // Disable uninitialized variable warnings

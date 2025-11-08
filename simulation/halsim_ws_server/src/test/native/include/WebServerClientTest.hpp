@@ -8,14 +8,14 @@
 #include <memory>
 #include <string>
 
-#include <wpi/json.h>
-#include <wpinet/WebSocket.h>
-#include <wpinet/uv/AsyncFunction.h>
-#include <wpinet/uv/Buffer.h>
-#include <wpinet/uv/Loop.h>
-#include <wpinet/uv/Stream.h>
-#include <wpinet/uv/Tcp.h>
-#include <wpinet/uv/Timer.h>
+#include "wpi/util/json.hpp"
+#include "wpi/net/WebSocket.hpp"
+#include "wpi/net/uv/AsyncFunction.hpp"
+#include "wpi/net/uv/Buffer.hpp"
+#include "wpi/net/uv/Loop.hpp"
+#include "wpi/net/uv/Stream.hpp"
+#include "wpi/net/uv/Tcp.hpp"
+#include "wpi/net/uv/Timer.hpp"
 
 namespace wpilibws {
 

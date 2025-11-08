@@ -4,16 +4,16 @@
 
 #pragma once
 
-#include <frc/XboxController.h>
-#include <frc/smartdashboard/SendableChooser.h>
-#include <frc2/command/Command.h>
+#include "wpi/driverstation/XboxController.hpp"
+#include "wpi/smartdashboard/SendableChooser.hpp"
+#include "wpi/commands2/Command.hpp"
 
-#include "Constants.h"
-#include "commands/ComplexAuto.h"
-#include "commands/DefaultDrive.h"
-#include "commands/DriveDistance.h"
-#include "subsystems/DriveSubsystem.h"
-#include "subsystems/HatchSubsystem.h"
+#include "Constants.hpp"
+#include "commands/ComplexAuto.hpp"
+#include "commands/DefaultDrive.hpp"
+#include "commands/DriveDistance.hpp"
+#include "subsystems/DriveSubsystem.hpp"
+#include "subsystems/HatchSubsystem.hpp"
 
 /**
  * This class is where the bulk of the robot should be declared.  Since

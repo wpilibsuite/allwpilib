@@ -6,8 +6,8 @@
 
 #include <stdint.h>
 
-#include <hal/I2C.h>
-#include <hal/I2CTypes.h>
+#include "wpi/hal/I2C.h"
+#include "wpi/hal/I2CTypes.h"
 
 namespace frc {
 

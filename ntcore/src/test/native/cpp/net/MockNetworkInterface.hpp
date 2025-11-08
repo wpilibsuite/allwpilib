@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <wpi/json.h>
+#include "wpi/util/json.hpp"
 
 #include "gmock/gmock.h"
-#include "net/NetworkInterface.h"
+#include "net/NetworkInterface.hpp"
 
 namespace nt::net {
 

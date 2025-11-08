@@ -15,15 +15,15 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/SmallVector.h>
-#include <wpi/condition_variable.h>
-#include <wpi/mutex.h>
-#include <wpi/raw_istream.h>
-#include <wpi/raw_ostream.h>
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/condition_variable.hpp"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/raw_istream.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
-#include "SourceImpl.h"
-#include "UsbCameraBuffer.h"
-#include "UsbCameraProperty.h"
+#include "SourceImpl.hpp"
+#include "UsbCameraBuffer.hpp"
+#include "UsbCameraProperty.hpp"
 
 namespace cs {
 

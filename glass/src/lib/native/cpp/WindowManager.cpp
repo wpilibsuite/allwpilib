@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/WindowManager.h"
+#include "wpi/glass/WindowManager.hpp"
 
 #include <algorithm>
 #include <cstdio>
@@ -10,11 +10,11 @@
 #include <utility>
 
 #include <fmt/format.h>
-#include <wpi/print.h>
-#include <wpigui.h>
+#include "wpi/util/print.hpp"
+#include "wpi/gui/wpigui.hpp"
 
-#include "glass/Context.h"
-#include "glass/Storage.h"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/Storage.hpp"
 
 using namespace glass;
 

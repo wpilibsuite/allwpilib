@@ -5,13 +5,13 @@
 #pragma once
 
 #include <gcem.hpp>
-#include <wpi/MathExtras.h>
+#include "wpi/util/MathExtras.hpp"
 
-#include "units/angle.h"
-#include "units/length.h"
-#include "units/time.h"
-#include "units/voltage.h"
-#include "wpimath/MathShared.h"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/voltage.hpp"
+#include "wpi/math/util/MathShared.hpp"
 
 namespace frc {
 

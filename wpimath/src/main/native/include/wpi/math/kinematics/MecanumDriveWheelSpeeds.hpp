@@ -8,10 +8,10 @@
 #include <array>
 #include <cmath>
 
-#include <wpi/SymbolExports.h>
+#include "wpi/util/SymbolExports.hpp"
 
-#include "units/math.h"
-#include "units/velocity.h"
+#include "wpi/units/math.hpp"
+#include "wpi/units/velocity.hpp"
 
 namespace frc {
 /**
@@ -146,5 +146,5 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelSpeeds {
 };
 }  // namespace frc
 
-#include "frc/kinematics/proto/MecanumDriveWheelSpeedsProto.h"
-#include "frc/kinematics/struct/MecanumDriveWheelSpeedsStruct.h"
+#include "wpi/math/kinematics/proto/MecanumDriveWheelSpeedsProto.hpp"
+#include "wpi/math/kinematics/struct/MecanumDriveWheelSpeedsStruct.hpp"

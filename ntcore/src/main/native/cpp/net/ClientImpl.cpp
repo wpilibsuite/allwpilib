@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "ClientImpl.h"
+#include "ClientImpl.hpp"
 
 #include <memory>
 #include <numeric>
@@ -12,17 +12,17 @@
 #include <variant>
 
 #include <fmt/format.h>
-#include <wpi/Logger.h>
-#include <wpi/raw_ostream.h>
-#include <wpi/timestamp.h>
+#include "wpi/util/Logger.hpp"
+#include "wpi/util/raw_ostream.hpp"
+#include "wpi/util/timestamp.h"
 
-#include "Handle.h"
-#include "Log.h"
-#include "Message.h"
-#include "NetworkInterface.h"
-#include "WireConnection.h"
-#include "WireEncoder.h"
-#include "networktables/NetworkTableValue.h"
+#include "Handle.hpp"
+#include "Log.hpp"
+#include "Message.hpp"
+#include "NetworkInterface.hpp"
+#include "WireConnection.hpp"
+#include "WireEncoder.hpp"
+#include "wpi/nt/NetworkTableValue.hpp"
 
 using namespace nt;
 using namespace nt::net;

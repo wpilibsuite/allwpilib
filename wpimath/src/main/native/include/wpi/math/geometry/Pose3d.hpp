@@ -12,13 +12,13 @@
 #include <utility>
 
 #include <Eigen/Core>
-#include <wpi/SymbolExports.h>
-#include <wpi/json_fwd.h>
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/json_fwd.hpp"
 
-#include "frc/ct_matrix.h"
-#include "frc/geometry/Pose2d.h"
-#include "frc/geometry/Rotation3d.h"
-#include "frc/geometry/Translation3d.h"
+#include "wpi/math/linalg/ct_matrix.hpp"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation3d.hpp"
+#include "wpi/math/geometry/Translation3d.hpp"
 
 namespace frc {
 
@@ -304,7 +304,7 @@ void from_json(const wpi::json& json, Pose3d& pose);
 
 }  // namespace frc
 
-#include "frc/geometry/Transform3d.h"
+#include "wpi/math/geometry/Transform3d.hpp"
 
 namespace frc {
 
@@ -325,5 +325,5 @@ constexpr Pose3d Pose3d::RelativeTo(const Pose3d& other) const {
 
 }  // namespace frc
 
-#include "frc/geometry/proto/Pose3dProto.h"
-#include "frc/geometry/struct/Pose3dStruct.h"
+#include "wpi/math/geometry/proto/Pose3dProto.hpp"
+#include "wpi/math/geometry/struct/Pose3dStruct.hpp"

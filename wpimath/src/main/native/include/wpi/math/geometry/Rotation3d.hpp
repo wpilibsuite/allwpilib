@@ -10,16 +10,16 @@
 #include <Eigen/Core>
 #include <fmt/format.h>
 #include <gcem.hpp>
-#include <wpi/SymbolExports.h>
-#include <wpi/json_fwd.h>
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/json_fwd.hpp"
 
-#include "frc/ct_matrix.h"
-#include "frc/fmt/Eigen.h"
-#include "frc/geometry/Quaternion.h"
-#include "frc/geometry/Rotation2d.h"
-#include "units/angle.h"
-#include "units/math.h"
-#include "wpimath/MathShared.h"
+#include "wpi/math/linalg/ct_matrix.hpp"
+#include "wpi/math/fmt/Eigen.hpp"
+#include "wpi/math/geometry/Quaternion.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/math.hpp"
+#include "wpi/math/util/MathShared.hpp"
 
 namespace frc {
 
@@ -449,5 +449,5 @@ void from_json(const wpi::json& json, Rotation3d& rotation);
 
 }  // namespace frc
 
-#include "frc/geometry/proto/Rotation3dProto.h"
-#include "frc/geometry/struct/Rotation3dStruct.h"
+#include "wpi/math/geometry/proto/Rotation3dProto.hpp"
+#include "wpi/math/geometry/struct/Rotation3dStruct.hpp"

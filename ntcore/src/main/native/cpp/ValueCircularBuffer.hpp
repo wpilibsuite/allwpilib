@@ -7,11 +7,11 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/circular_buffer.h>
+#include "wpi/util/circular_buffer.hpp"
 
-#include "Value_internal.h"
-#include "networktables/NetworkTableValue.h"
-#include "ntcore_cpp_types.h"
+#include "Value_internal.hpp"
+#include "wpi/nt/NetworkTableValue.hpp"
+#include "wpi/nt/ntcore_cpp_types.hpp"
 
 namespace nt {
 

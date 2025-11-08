@@ -26,22 +26,22 @@
 
 #pragma once
 
-#include "units/area.h"
-#include "units/capacitance.h"
-#include "units/charge.h"
-#include "units/current.h"
-#include "units/dimensionless.h"
-#include "units/energy.h"
-#include "units/force.h"
-#include "units/impedance.h"
-#include "units/length.h"
-#include "units/magnetic_field_strength.h"
-#include "units/mass.h"
-#include "units/power.h"
-#include "units/substance.h"
-#include "units/temperature.h"
-#include "units/time.h"
-#include "units/velocity.h"
+#include "wpi/units/area.hpp"
+#include "wpi/units/capacitance.hpp"
+#include "wpi/units/charge.hpp"
+#include "wpi/units/current.hpp"
+#include "wpi/units/dimensionless.hpp"
+#include "wpi/units/energy.hpp"
+#include "wpi/units/force.hpp"
+#include "wpi/units/impedance.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/magnetic_field_strength.hpp"
+#include "wpi/units/mass.hpp"
+#include "wpi/units/power.hpp"
+#include "wpi/units/substance.hpp"
+#include "wpi/units/temperature.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
 
 namespace units::constants {
 /**

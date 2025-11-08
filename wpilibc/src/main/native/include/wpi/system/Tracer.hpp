@@ -7,8 +7,8 @@
 #include <chrono>
 #include <string_view>
 
-#include <hal/cpp/fpga_clock.h>
-#include <wpi/StringMap.h>
+#include "wpi/hal/cpp/fpga_clock.h"
+#include "wpi/util/StringMap.hpp"
 
 namespace wpi {
 class raw_ostream;

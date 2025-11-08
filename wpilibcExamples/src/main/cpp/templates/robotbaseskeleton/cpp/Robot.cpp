@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "Robot.h"
+#include "Robot.hpp"
 
-#include <frc/DriverStation.h>
-#include <frc/internal/DriverStationModeThread.h>
-#include <hal/DriverStation.h>
-#include <networktables/NetworkTable.h>
+#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/internal/DriverStationModeThread.hpp"
+#include "wpi/hal/DriverStation.h"
+#include "wpi/nt/NetworkTable.hpp"
 
 Robot::Robot() {}
 

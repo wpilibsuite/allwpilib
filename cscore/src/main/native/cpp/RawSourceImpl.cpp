@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "RawSourceImpl.h"
+#include "RawSourceImpl.hpp"
 
 #include <memory>
 
-#include <wpi/timestamp.h>
+#include "wpi/util/timestamp.h"
 
-#include "Instance.h"
-#include "Notifier.h"
-#include "cscore_raw.h"
+#include "Instance.hpp"
+#include "Notifier.hpp"
+#include "wpi/cs/cscore_raw.h"
 
 using namespace cs;
 

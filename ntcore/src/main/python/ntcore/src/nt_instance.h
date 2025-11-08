@@ -1,8 +1,8 @@
 
 #pragma once
 
-#include <ntcore.h>
-#include <networktables/NetworkTableInstance.h>
+#include "wpi/nt/ntcore.h"
+#include "wpi/nt/NetworkTableInstance.hpp"
 
 namespace pyntcore {
 

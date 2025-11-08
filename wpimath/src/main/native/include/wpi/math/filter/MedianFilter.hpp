@@ -7,8 +7,8 @@
 #include <algorithm>
 #include <vector>
 
-#include <wpi/Algorithm.h>
-#include <wpi/circular_buffer.h>
+#include "wpi/util/Algorithm.hpp"
+#include "wpi/util/circular_buffer.hpp"
 
 namespace frc {
 /**

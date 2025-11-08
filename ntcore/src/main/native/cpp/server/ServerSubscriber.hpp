@@ -12,8 +12,8 @@
 #include <string_view>
 #include <vector>
 
-#include "PubSubOptions.h"
-#include "server/Constants.h"
+#include "PubSubOptions.hpp"
+#include "server/Constants.hpp"
 
 namespace nt::server {
 

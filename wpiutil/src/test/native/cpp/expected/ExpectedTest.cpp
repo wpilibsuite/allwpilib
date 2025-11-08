@@ -9,7 +9,7 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/expected"
+#include "wpi/util/expected"
 
 namespace {
 struct TakesInitAndVariadic {

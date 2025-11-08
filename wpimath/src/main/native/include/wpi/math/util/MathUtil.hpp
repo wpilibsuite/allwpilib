@@ -8,17 +8,17 @@
 #include <type_traits>
 
 #include <gcem.hpp>
-#include <wpi/SymbolExports.h>
+#include "wpi/util/SymbolExports.hpp"
 
-#include "frc/geometry/Translation2d.h"
-#include "frc/geometry/Translation3d.h"
-#include "units/angle.h"
-#include "units/base.h"
-#include "units/length.h"
-#include "units/math.h"
-#include "units/time.h"
-#include "units/velocity.h"
-#include "wpimath/MathShared.h"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/math/geometry/Translation3d.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/base.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/math.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
+#include "wpi/math/util/MathShared.hpp"
 
 namespace frc {
 

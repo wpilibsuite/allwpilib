@@ -2,19 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/Encoder.h"
+#include "wpi/hardware/rotation/Encoder.hpp"
 
 #include <memory>
 #include <utility>
 
-#include <hal/Encoder.h>
-#include <hal/UsageReporting.h>
-#include <wpi/NullDeleter.h>
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include "wpi/hal/Encoder.h"
+#include "wpi/hal/UsageReporting.h"
+#include "wpi/util/NullDeleter.hpp"
+#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/util/sendable/SendableRegistry.hpp"
 
-#include "frc/DigitalInput.h"
-#include "frc/Errors.h"
+#include "wpi/hardware/discrete/DigitalInput.hpp"
+#include "wpi/system/Errors.hpp"
 
 using namespace frc;
 

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "SimDeviceGui.h"
+#include "wpi/halsim/gui/SimDeviceGui.hpp"
 
 #include <stdint.h>
 
@@ -10,14 +10,14 @@
 #include <utility>
 
 #include <fmt/format.h>
-#include <glass/other/DeviceTree.h>
-#include <hal/SimDevice.h>
-#include <hal/simulation/SimDeviceData.h>
-#include <wpi/DenseMap.h>
-#include <wpi/StringExtras.h>
+#include "wpi/glass/other/DeviceTree.hpp"
+#include "wpi/hal/SimDevice.h"
+#include "wpi/hal/simulation/SimDeviceData.h"
+#include "wpi/util/DenseMap.hpp"
+#include "wpi/util/StringExtras.hpp"
 
-#include "HALDataSource.h"
-#include "HALSimGui.h"
+#include "wpi/halsim/gui/HALDataSource.hpp"
+#include "wpi/halsim/gui/HALSimGui.hpp"
 
 using namespace halsimgui;
 

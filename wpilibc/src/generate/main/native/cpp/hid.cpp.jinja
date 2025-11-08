@@ -8,10 +8,10 @@
 {%- endmacro %}
 #include "frc/{{ ConsoleName }}Controller.h"
 
-#include <hal/UsageReporting.h>
-#include <wpi/sendable/SendableBuilder.h>
+#include "wpi/hal/UsageReporting.h"
+#include "wpi/util/sendable/SendableBuilder.hpp"
 
-#include "frc/event/BooleanEvent.h"
+#include "wpi/event/BooleanEvent.hpp"
 
 using namespace frc;
 

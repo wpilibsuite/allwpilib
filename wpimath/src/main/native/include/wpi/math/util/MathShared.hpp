@@ -7,9 +7,9 @@
 #include <memory>
 
 #include <fmt/format.h>
-#include <wpi/SymbolExports.h>
+#include "wpi/util/SymbolExports.hpp"
 
-#include "units/time.h"
+#include "wpi/units/time.hpp"
 
 namespace wpi::math {
 

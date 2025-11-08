@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/WebServer.h"
+#include "wpi/net/WebServer.hpp"
 
 #ifndef _WIN32
 #include <unistd.h>
@@ -13,25 +13,25 @@
 #include <utility>
 
 #include <fmt/format.h>
-#include <wpi/DenseMap.h>
-#include <wpi/MemoryBuffer.h>
-#include <wpi/SmallString.h>
-#include <wpi/Signal.h>
-#include <wpi/StringMap.h>
-#include <wpi/fs.h>
-#include <wpi/json.h>
-#include <wpi/print.h>
-#include <wpi/raw_ostream.h>
+#include "wpi/util/DenseMap.hpp"
+#include "wpi/util/MemoryBuffer.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/Signal.h"
+#include "wpi/util/StringMap.hpp"
+#include "wpi/util/fs.hpp"
+#include "wpi/util/json.hpp"
+#include "wpi/util/print.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
-#include "wpinet/EventLoopRunner.h"
-#include "wpinet/HttpServerConnection.h"
-#include "wpinet/HttpUtil.h"
-#include "wpinet/UrlParser.h"
-#include "wpinet/raw_uv_ostream.h"
-#include "wpinet/uv/GetAddrInfo.h"
-#include "wpinet/uv/Stream.h"
-#include "wpinet/uv/Tcp.h"
-#include "wpinet/uv/Timer.h"
+#include "wpi/net/EventLoopRunner.hpp"
+#include "wpi/net/HttpServerConnection.hpp"
+#include "wpi/net/HttpUtil.hpp"
+#include "wpi/net/UrlParser.hpp"
+#include "wpi/net/raw_uv_ostream.hpp"
+#include "wpi/net/uv/GetAddrInfo.hpp"
+#include "wpi/net/uv/Stream.hpp"
+#include "wpi/net/uv/Tcp.hpp"
+#include "wpi/net/uv/Timer.hpp"
 
 using namespace wpi;
 

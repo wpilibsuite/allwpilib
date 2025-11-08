@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "subsystems/Drive.h"
+#include "subsystems/Drive.hpp"
 
 #include <utility>
 
-#include <frc/RobotController.h>
-#include <frc2/command/Commands.h>
+#include "wpi/system/RobotController.hpp"
+#include "wpi/commands2/Commands.hpp"
 
 Drive::Drive() {
   wpi::SendableRegistry::AddChild(&m_drive, &m_leftLeader);

@@ -6,11 +6,11 @@
 
 #include <memory>
 
-#include <wpi/spinlock.h>
+#include "wpi/util/spinlock.hpp"
 
-#include "hal/simulation/DriverStationData.h"
-#include "hal/simulation/SimCallbackRegistry.h"
-#include "hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/DriverStationData.h"
+#include "wpi/hal/simulation/SimCallbackRegistry.h"
+#include "wpi/hal/simulation/SimDataValue.h"
 
 namespace hal {
 

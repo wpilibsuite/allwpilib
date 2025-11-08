@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "EncoderSimGui.h"
+#include "EncoderSimGui.hpp"
 
 #include <stdint.h>
 
@@ -12,13 +12,13 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <glass/DataSource.h>
-#include <glass/hardware/Encoder.h>
-#include <hal/Ports.h>
-#include <hal/simulation/EncoderData.h>
-#include <hal/simulation/SimDeviceData.h>
+#include "wpi/glass/DataSource.hpp"
+#include "wpi/glass/hardware/Encoder.hpp"
+#include "wpi/hal/Ports.h"
+#include "wpi/hal/simulation/EncoderData.h"
+#include "wpi/hal/simulation/SimDeviceData.h"
 
-#include "HALSimGui.h"
+#include "wpi/halsim/gui/HALSimGui.hpp"
 
 using namespace halsimgui;
 

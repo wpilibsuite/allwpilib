@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "HALSimWSClientConnection.h"
+#include "wpi/halsim/ws_client/HALSimWSClientConnection.hpp"
 
 #include <cstdio>
 #include <string>
 
 #include <fmt/format.h>
-#include <wpi/print.h>
-#include <wpinet/raw_uv_ostream.h>
+#include "wpi/util/print.hpp"
+#include "wpi/net/raw_uv_ostream.hpp"
 
-#include "HALSimWS.h"
+#include "wpi/halsim/ws_client/HALSimWS.hpp"
 
 namespace uv = wpi::uv;
 

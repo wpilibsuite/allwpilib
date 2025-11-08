@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include <wpi/SymbolExports.h>
-#include <wpi/array.h>
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/array.hpp"
 
-#include "frc/EigenCore.h"
-#include "frc/spline/Spline.h"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/spline/Spline.hpp"
 
 namespace frc {
 /**
@@ -154,5 +154,5 @@ class WPILIB_DLLEXPORT QuinticHermiteSpline : public Spline<5> {
 };
 }  // namespace frc
 
-#include "frc/spline/proto/QuinticHermiteSplineProto.h"
-#include "frc/spline/struct/QuinticHermiteSplineStruct.h"
+#include "wpi/math/spline/proto/QuinticHermiteSplineProto.hpp"
+#include "wpi/math/spline/struct/QuinticHermiteSplineStruct.hpp"

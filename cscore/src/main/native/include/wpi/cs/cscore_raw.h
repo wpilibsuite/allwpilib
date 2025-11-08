@@ -7,11 +7,11 @@
 
 #include <functional>
 
-#include "cscore_c.h"
+#include "wpi/cs/cscore_c.h"
 
 // NOLINTBEGIN
 #ifdef __cplusplus
-#include "cscore_oo.h"
+#include "wpi/cs/cscore_oo.hpp"
 #endif
 
 #ifdef __cplusplus

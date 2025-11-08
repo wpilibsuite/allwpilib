@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "ListenerStorage.h"
+#include "ListenerStorage.hpp"
 
 #include <algorithm>
 #include <utility>
 #include <vector>
 
-#include <wpi/SmallVector.h>
+#include "wpi/util/SmallVector.hpp"
 
-#include "ntcore_c.h"
+#include "wpi/nt/ntcore_c.h"
 
 using namespace nt;
 

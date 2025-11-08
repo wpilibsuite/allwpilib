@@ -9,20 +9,20 @@
 #include <cstddef>
 
 #include <Eigen/QR>
-#include <wpi/SymbolExports.h>
-#include <wpi/array.h>
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/array.hpp"
 
-#include "frc/EigenCore.h"
-#include "frc/geometry/Rotation2d.h"
-#include "frc/geometry/Translation2d.h"
-#include "frc/geometry/Twist2d.h"
-#include "frc/kinematics/ChassisSpeeds.h"
-#include "frc/kinematics/Kinematics.h"
-#include "frc/kinematics/SwerveModulePosition.h"
-#include "frc/kinematics/SwerveModuleState.h"
-#include "units/math.h"
-#include "units/velocity.h"
-#include "wpimath/MathShared.h"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/math/geometry/Twist2d.hpp"
+#include "wpi/math/kinematics/ChassisSpeeds.hpp"
+#include "wpi/math/kinematics/Kinematics.hpp"
+#include "wpi/math/kinematics/SwerveModulePosition.hpp"
+#include "wpi/math/kinematics/SwerveModuleState.hpp"
+#include "wpi/units/math.hpp"
+#include "wpi/units/velocity.hpp"
+#include "wpi/math/util/MathShared.hpp"
 
 namespace frc {
 

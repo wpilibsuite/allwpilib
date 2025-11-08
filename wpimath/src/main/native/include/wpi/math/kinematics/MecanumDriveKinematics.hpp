@@ -5,16 +5,16 @@
 #pragma once
 
 #include <Eigen/QR>
-#include <wpi/SymbolExports.h>
+#include "wpi/util/SymbolExports.hpp"
 
-#include "frc/EigenCore.h"
-#include "frc/geometry/Translation2d.h"
-#include "frc/geometry/Twist2d.h"
-#include "frc/kinematics/ChassisSpeeds.h"
-#include "frc/kinematics/Kinematics.h"
-#include "frc/kinematics/MecanumDriveWheelPositions.h"
-#include "frc/kinematics/MecanumDriveWheelSpeeds.h"
-#include "wpimath/MathShared.h"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/math/geometry/Twist2d.hpp"
+#include "wpi/math/kinematics/ChassisSpeeds.hpp"
+#include "wpi/math/kinematics/Kinematics.hpp"
+#include "wpi/math/kinematics/MecanumDriveWheelPositions.hpp"
+#include "wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp"
+#include "wpi/math/util/MathShared.hpp"
 
 namespace frc {
 
@@ -199,5 +199,5 @@ class WPILIB_DLLEXPORT MecanumDriveKinematics
 
 }  // namespace frc
 
-#include "frc/kinematics/proto/MecanumDriveKinematicsProto.h"
-#include "frc/kinematics/struct/MecanumDriveKinematicsStruct.h"
+#include "wpi/math/kinematics/proto/MecanumDriveKinematicsProto.hpp"
+#include "wpi/math/kinematics/struct/MecanumDriveKinematicsStruct.hpp"

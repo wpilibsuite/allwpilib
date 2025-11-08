@@ -10,7 +10,7 @@
 #include <memory>
 #include <utility>
 
-#include "wpinet/uv/Stream.h"
+#include "wpi/net/uv/Stream.hpp"
 
 namespace wpi::uv {
 

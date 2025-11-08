@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "cameraserver/CameraServerShared.h"
+#include "wpi/cameraserver/CameraServerShared.hpp"
 
 #include <memory>
 #include <utility>
 
-#include <wpi/mutex.h>
+#include "wpi/util/mutex.hpp"
 
 namespace {
 class DefaultCameraServerShared : public frc::CameraServerShared {

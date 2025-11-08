@@ -10,10 +10,10 @@
 
 #include <utility>
 
-#include <wpi/detail/abi_macros.h>
-#include <wpi/detail/conversions/from_json.h>
-#include <wpi/detail/conversions/to_json.h>
-#include <wpi/detail/meta/identity_tag.h>
+#include "wpi/util/detail/abi_macros.hpp"
+#include "wpi/util/detail/conversions/from_json.hpp"
+#include "wpi/util/detail/conversions/to_json.hpp"
+#include "wpi/util/detail/meta/identity_tag.hpp"
 
 WPI_JSON_NAMESPACE_BEGIN
 

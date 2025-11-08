@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <wpi/SymbolExports.h>
-#include <wpi/timestamp.h>
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/timestamp.h"
 
-#include "units/time.h"
+#include "wpi/units/time.hpp"
 
 namespace frc {
 /**
