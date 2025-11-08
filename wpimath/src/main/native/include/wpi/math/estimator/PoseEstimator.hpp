@@ -10,16 +10,15 @@
 
 #include <Eigen/Core>
 
-#include "wpi/math/geometry/Pose2d.hpp"
-#include "wpi/math/geometry/Rotation2d.hpp"
-#include "wpi/math/geometry/Translation2d.hpp"
-#include "wpi/math/interpolation/TimeInterpolatableBuffer.hpp"
-#include "wpi/math/kinematics/Kinematics.hpp"
-#include "wpi/math/kinematics/Odometry.hpp"
-#include "wpi/math/util/MathShared.hpp"
-#include "wpi/units/time.hpp"
-#include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/array.hpp"
+#include "frc/geometry/Pose2d.h"
+#include "frc/geometry/Rotation2d.h"
+#include "frc/geometry/Transform2d.h"
+#include "frc/geometry/Translation2d.h"
+#include "frc/interpolation/TimeInterpolatableBuffer.h"
+#include "frc/kinematics/Kinematics.h"
+#include "frc/kinematics/Odometry.h"
+#include "units/time.h"
+#include "wpimath/MathShared.h"
 
 namespace wpi::math {
 
@@ -261,25 +260,26 @@ class WPILIB_DLLEXPORT PoseEstimator {
       return;
     }
 
-    // Step 4: Measure the twist between the old pose estimate and the vision
-    // pose.
-    auto twist = (visionRobotPose - visionSample.value()).Log();
+    // Step 4: Measure the transform between the old pose estimate and the
+    // vision transform.
+    auto transform = visionRobotPose - visionSample.value();
 
-    // Step 5: We should not trust the twist entirely, so instead we scale this
-    // twist by a Kalman gain matrix representing how much we trust vision
-    // measurements compared to our current pose.
-    Eigen::Vector3d k_times_twist =
-        m_visionK * Eigen::Vector3d{twist.dx.value(), twist.dy.value(),
-                                    twist.dtheta.value()};
+    // Step 5: We should not trust the transform entirely, so instead we scale
+    // this transform by a Kalman gain matrix representing how much we trust
+    // vision measurements compared to our current pose.
+    Eigen::Vector3d k_times_transform =
+        m_visionK * Eigen::Vector3d{transform.X().value(),
+                                    transform.Y().value(),
+                                    transform.Rotation().Radians().value()};
 
-    // Step 6: Convert back to Twist2d.
-    Twist2d scaledTwist{wpi::units::meter_t{k_times_twist(0)},
-                        wpi::units::meter_t{k_times_twist(1)},
-                        wpi::units::radian_t{k_times_twist(2)}};
+    // Step 6: Convert back to Transform2d.
+    Transform2d scaledTransform{
+        units::meter_t{k_times_transform(0)},
+        units::meter_t{k_times_transform(1)},
+        Rotation2d{units::radian_t{k_times_transform(2)}}};
 
     // Step 7: Calculate and record the vision update.
-    VisionUpdate visionUpdate{visionSample.value() + scaledTwist.Exp(),
-                              *odometrySample};
+    VisionUpdate visionUpdate{*visionSample + scaledTransform, *odometrySample};
     m_visionUpdates[timestamp] = visionUpdate;
 
     // Step 8: Remove later vision measurements. (Matches previous behavior)

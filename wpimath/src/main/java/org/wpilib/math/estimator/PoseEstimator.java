@@ -2,8 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.math.estimator;
+package edu.wpi.first.math.estimator;
 
+import edu.wpi.first.math.MathSharedStore;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
+import edu.wpi.first.math.kinematics.Kinematics;
+import edu.wpi.first.math.kinematics.Odometry;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import java.util.NavigableMap;
 import java.util.Optional;
 import java.util.TreeMap;
@@ -270,21 +284,28 @@ public class PoseEstimator<T> {
       return;
     }
 
-    // Step 4: Measure the twist between the old pose estimate and the vision pose.
-    var twist = visionRobotPose.minus(visionSample.get()).log();
+    // Step 4: Measure the transform between the old pose estimate and the vision pose.
+    var transform = visionRobotPoseMeters.minus(visionSample.get());
 
-    // Step 5: We should not trust the twist entirely, so instead we scale this twist by a Kalman
+    // Step 5: We should not trust the transform entirely, so instead we scale this transform by a
+    // Kalman
     // gain matrix representing how much we trust vision measurements compared to our current pose.
-    var k_times_twist = m_visionK.times(VecBuilder.fill(twist.dx, twist.dy, twist.dtheta));
+    var k_times_transform =
+        m_visionK.times(
+            VecBuilder.fill(
+                transform.getX(), transform.getY(), transform.getRotation().getRadians()));
 
-    // Step 6: Convert back to Twist2d.
-    var scaledTwist =
-        new Twist2d(k_times_twist.get(0, 0), k_times_twist.get(1, 0), k_times_twist.get(2, 0));
+    // Step 6: Convert back to Transform2d.
+    var scaledTransform =
+        new Transform2d(
+            k_times_transform.get(0, 0),
+            k_times_transform.get(1, 0),
+            Rotation2d.fromRadians(k_times_transform.get(2, 0)));
 
     // Step 7: Calculate and record the vision update.
     var visionUpdate =
-        new VisionUpdate(visionSample.get().plus(scaledTwist.exp()), odometrySample.get());
-    m_visionUpdates.put(timestamp, visionUpdate);
+        new VisionUpdate(visionSample.get().plus(scaledTransform), odometrySample.get());
+    m_visionUpdates.put(timestampSeconds, visionUpdate);
 
     // Step 8: Remove later vision measurements. (Matches previous behavior)
     m_visionUpdates.tailMap(timestamp, false).entrySet().clear();
