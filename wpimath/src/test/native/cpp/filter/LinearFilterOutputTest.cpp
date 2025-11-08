@@ -51,21 +51,21 @@ static double GetPulseData(double t) {
 class LinearFilterOutputTest
     : public testing::TestWithParam<LinearFilterOutputTestType> {
  protected:
-  frc::LinearFilter<double> m_filter = [=] {
+  wpi::math::LinearFilter<double> m_filter = [=] {
     switch (GetParam()) {
       case kTestSinglePoleIIR:
-        return frc::LinearFilter<double>::SinglePoleIIR(
+        return wpi::math::LinearFilter<double>::SinglePoleIIR(
             kSinglePoleIIRTimeConstant, kFilterStep);
         break;
       case kTestHighPass:
-        return frc::LinearFilter<double>::HighPass(kHighPassTimeConstant,
+        return wpi::math::LinearFilter<double>::HighPass(kHighPassTimeConstant,
                                                    kFilterStep);
         break;
       case kTestMovAvg:
-        return frc::LinearFilter<double>::MovingAverage(kMovAvgTaps);
+        return wpi::math::LinearFilter<double>::MovingAverage(kMovAvgTaps);
         break;
       default:
-        return frc::LinearFilter<double>::MovingAverage(kMovAvgTaps);
+        return wpi::math::LinearFilter<double>::MovingAverage(kMovAvgTaps);
         break;
     }
   }();
@@ -121,18 +121,18 @@ INSTANTIATE_TEST_SUITE_P(Tests, LinearFilterOutputTest,
                                          kTestMovAvg, kTestPulse));
 
 template <int Derivative, int Samples, typename F, typename DfDx>
-void AssertCentralResults(F&& f, DfDx&& dfdx, units::second_t h, double min,
+void AssertCentralResults(F&& f, DfDx&& dfdx, wpi::units::second_t h, double min,
                           double max) {
   static_assert(Samples % 2 != 0, "Number of samples must be odd.");
 
   // Generate stencil points from -(samples - 1)/2 to (samples - 1)/2
-  wpi::array<int, Samples> stencil{wpi::empty_array};
+  wpi::util::array<int, Samples> stencil{wpi::util::empty_array};
   for (int i = 0; i < Samples; ++i) {
     stencil[i] = -(Samples - 1) / 2 + i;
   }
 
   auto filter =
-      frc::LinearFilter<double>::FiniteDifference<Derivative, Samples>(stencil,
+      wpi::math::LinearFilter<double>::FiniteDifference<Derivative, Samples>(stencil,
                                                                        h);
 
   for (int i = min / h.value(); i < max / h.value(); ++i) {
@@ -153,10 +153,10 @@ void AssertCentralResults(F&& f, DfDx&& dfdx, units::second_t h, double min,
 }
 
 template <int Derivative, int Samples, typename F, typename DfDx>
-void AssertBackwardResults(F&& f, DfDx&& dfdx, units::second_t h, double min,
+void AssertBackwardResults(F&& f, DfDx&& dfdx, wpi::units::second_t h, double min,
                            double max) {
   auto filter =
-      frc::LinearFilter<double>::BackwardFiniteDifference<Derivative, Samples>(
+      wpi::math::LinearFilter<double>::BackwardFiniteDifference<Derivative, Samples>(
           h);
 
   for (int i = min / h.value(); i < max / h.value(); ++i) {

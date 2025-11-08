@@ -18,7 +18,7 @@
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/json_fwd.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * Represents a translation in 3D space.
@@ -43,7 +43,7 @@ class WPILIB_DLLEXPORT Translation3d {
    * @param y The y component of the translation.
    * @param z The z component of the translation.
    */
-  constexpr Translation3d(units::meter_t x, units::meter_t y, units::meter_t z)
+  constexpr Translation3d(wpi::units::meter_t x, wpi::units::meter_t y, wpi::units::meter_t z)
       : m_x{x}, m_y{y}, m_z{z} {}
 
   /**
@@ -53,7 +53,7 @@ class WPILIB_DLLEXPORT Translation3d {
    * @param distance The distance from the origin to the end of the translation.
    * @param angle The angle between the x-axis and the translation vector.
    */
-  constexpr Translation3d(units::meter_t distance, const Rotation3d& angle) {
+  constexpr Translation3d(wpi::units::meter_t distance, const Rotation3d& angle) {
     auto rectangular = Translation3d{distance, 0_m, 0_m}.RotateBy(angle);
     m_x = rectangular.X();
     m_y = rectangular.Y();
@@ -67,9 +67,9 @@ class WPILIB_DLLEXPORT Translation3d {
    * @param vector The translation vector.
    */
   constexpr explicit Translation3d(const Eigen::Vector3d& vector)
-      : m_x{units::meter_t{vector.x()}},
-        m_y{units::meter_t{vector.y()}},
-        m_z{units::meter_t{vector.z()}} {}
+      : m_x{wpi::units::meter_t{vector.x()}},
+        m_y{wpi::units::meter_t{vector.y()}},
+        m_z{wpi::units::meter_t{vector.z()}} {}
 
   /**
    * Constructs a 3D translation from a 2D translation in the X-Y plane.
@@ -91,10 +91,10 @@ class WPILIB_DLLEXPORT Translation3d {
    *
    * @return The distance between the two translations.
    */
-  constexpr units::meter_t Distance(const Translation3d& other) const {
-    return units::math::sqrt(units::math::pow<2>(other.m_x - m_x) +
-                             units::math::pow<2>(other.m_y - m_y) +
-                             units::math::pow<2>(other.m_z - m_z));
+  constexpr wpi::units::meter_t Distance(const Translation3d& other) const {
+    return wpi::units::math::sqrt(wpi::units::math::pow<2>(other.m_x - m_x) +
+                             wpi::units::math::pow<2>(other.m_y - m_y) +
+                             wpi::units::math::pow<2>(other.m_z - m_z));
   }
 
   /**
@@ -108,11 +108,11 @@ class WPILIB_DLLEXPORT Translation3d {
    * @param other The translation to compute the squared distance to.
    * @return The squared distance between the two translations.
    */
-  constexpr units::square_meter_t SquaredDistance(
+  constexpr wpi::units::square_meter_t SquaredDistance(
       const Translation3d& other) const {
-    return units::math::pow<2>(other.m_x - m_x) +
-           units::math::pow<2>(other.m_y - m_y) +
-           units::math::pow<2>(other.m_z - m_z);
+    return wpi::units::math::pow<2>(other.m_x - m_x) +
+           wpi::units::math::pow<2>(other.m_y - m_y) +
+           wpi::units::math::pow<2>(other.m_z - m_z);
   }
 
   /**
@@ -120,21 +120,21 @@ class WPILIB_DLLEXPORT Translation3d {
    *
    * @return The Z component of the translation.
    */
-  constexpr units::meter_t X() const { return m_x; }
+  constexpr wpi::units::meter_t X() const { return m_x; }
 
   /**
    * Returns the Y component of the translation.
    *
    * @return The Y component of the translation.
    */
-  constexpr units::meter_t Y() const { return m_y; }
+  constexpr wpi::units::meter_t Y() const { return m_y; }
 
   /**
    * Returns the Z component of the translation.
    *
    * @return The Z component of the translation.
    */
-  constexpr units::meter_t Z() const { return m_z; }
+  constexpr wpi::units::meter_t Z() const { return m_z; }
 
   /**
    * Returns a 3D translation vector representation of this translation.
@@ -150,8 +150,8 @@ class WPILIB_DLLEXPORT Translation3d {
    *
    * @return The norm of the translation.
    */
-  constexpr units::meter_t Norm() const {
-    return units::math::sqrt(m_x * m_x + m_y * m_y + m_z * m_z);
+  constexpr wpi::units::meter_t Norm() const {
+    return wpi::units::math::sqrt(m_x * m_x + m_y * m_y + m_z * m_z);
   }
 
   /**
@@ -161,7 +161,7 @@ class WPILIB_DLLEXPORT Translation3d {
    *
    * @return The squared norm of the translation.
    */
-  constexpr units::square_meter_t SquaredNorm() const {
+  constexpr wpi::units::square_meter_t SquaredNorm() const {
     return m_x * m_x + m_y * m_y + m_z * m_z;
   }
 
@@ -178,8 +178,8 @@ class WPILIB_DLLEXPORT Translation3d {
   constexpr Translation3d RotateBy(const Rotation3d& other) const {
     Quaternion p{0.0, m_x.value(), m_y.value(), m_z.value()};
     auto qprime = other.GetQuaternion() * p * other.GetQuaternion().Inverse();
-    return Translation3d{units::meter_t{qprime.X()}, units::meter_t{qprime.Y()},
-                         units::meter_t{qprime.Z()}};
+    return Translation3d{wpi::units::meter_t{qprime.X()}, wpi::units::meter_t{qprime.Y()},
+                         wpi::units::meter_t{qprime.Z()}};
   }
 
   /**
@@ -203,7 +203,7 @@ class WPILIB_DLLEXPORT Translation3d {
    * @param other The translation to compute the dot product with.
    * @return The dot product between the two translations.
    */
-  constexpr units::square_meter_t Dot(const Translation3d& other) const {
+  constexpr wpi::units::square_meter_t Dot(const Translation3d& other) const {
     return m_x * other.X() + m_y * other.Y() + m_z * other.Z();
   }
 
@@ -218,9 +218,9 @@ class WPILIB_DLLEXPORT Translation3d {
    * @param other The translation to compute the cross product with.
    * @return The cross product between the two translations.
    */
-  constexpr Eigen::Vector<units::square_meter_t, 3> Cross(
+  constexpr Eigen::Vector<wpi::units::square_meter_t, 3> Cross(
       const Translation3d& other) const {
-    return Eigen::Vector<units::square_meter_t, 3>{
+    return Eigen::Vector<wpi::units::square_meter_t, 3>{
         {m_y * other.Z() - other.Y() * m_z},
         {m_z * other.X() - other.Z() * m_x},
         {m_x * other.Y() - other.X() * m_y}};
@@ -305,9 +305,9 @@ class WPILIB_DLLEXPORT Translation3d {
    * @return Whether the two objects are equal.
    */
   constexpr bool operator==(const Translation3d& other) const {
-    return units::math::abs(m_x - other.m_x) < 1E-9_m &&
-           units::math::abs(m_y - other.m_y) < 1E-9_m &&
-           units::math::abs(m_z - other.m_z) < 1E-9_m;
+    return wpi::units::math::abs(m_x - other.m_x) < 1E-9_m &&
+           wpi::units::math::abs(m_y - other.m_y) < 1E-9_m &&
+           wpi::units::math::abs(m_z - other.m_z) < 1E-9_m;
   }
 
   /**
@@ -339,18 +339,18 @@ class WPILIB_DLLEXPORT Translation3d {
   }
 
  private:
-  units::meter_t m_x = 0_m;
-  units::meter_t m_y = 0_m;
-  units::meter_t m_z = 0_m;
+  wpi::units::meter_t m_x = 0_m;
+  wpi::units::meter_t m_y = 0_m;
+  wpi::units::meter_t m_z = 0_m;
 };
 
 WPILIB_DLLEXPORT
-void to_json(wpi::json& json, const Translation3d& state);
+void to_json(wpi::util::json& json, const Translation3d& state);
 
 WPILIB_DLLEXPORT
-void from_json(const wpi::json& json, Translation3d& state);
+void from_json(const wpi::util::json& json, Translation3d& state);
 
-}  // namespace frc
+}  // namespace wpi::math
 
 #include "wpi/math/geometry/proto/Translation3dProto.hpp"
 #include "wpi/math/geometry/struct/Translation3dStruct.hpp"

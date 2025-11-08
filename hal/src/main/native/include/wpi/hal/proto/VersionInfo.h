@@ -11,10 +11,10 @@
 #include "wpi/util/protobuf/Protobuf.hpp"
 
 template <>
-struct wpi::Protobuf<mrc::VersionInfo> {
+struct wpi::util::Protobuf<mrc::VersionInfo> {
   using MessageStruct = mrc_proto_ProtobufVersionInfo;
-  using InputStream = wpi::ProtoInputStream<mrc::VersionInfo>;
-  using OutputStream = wpi::ProtoOutputStream<mrc::VersionInfo>;
+  using InputStream = wpi::util::ProtoInputStream<mrc::VersionInfo>;
+  using OutputStream = wpi::util::ProtoOutputStream<mrc::VersionInfo>;
   static std::optional<mrc::VersionInfo> Unpack(InputStream& Stream);
   static bool Pack(OutputStream& Stream, const mrc::VersionInfo& Value);
 };

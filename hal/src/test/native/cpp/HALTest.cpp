@@ -6,8 +6,8 @@
 
 #include "wpi/hal/HAL.h"
 
-namespace hal {
+namespace wpi::hal {
 TEST(HALTest, RuntimeType) {
   EXPECT_EQ(HAL_RuntimeType::HAL_Runtime_Simulation, HAL_GetRuntimeType());
 }
-}  // namespace hal
+}  // namespace wpi::hal

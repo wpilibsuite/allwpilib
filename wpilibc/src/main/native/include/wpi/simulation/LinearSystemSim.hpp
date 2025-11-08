@@ -12,7 +12,7 @@
 #include "wpi/units/current.hpp"
 #include "wpi/units/time.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 /**
  * This class helps simulate linear systems. To use this class, do the following
  * in the simulationPeriodic() method.
@@ -35,12 +35,12 @@ class LinearSystemSim {
    * @param measurementStdDevs The standard deviations of the measurements.
    */
   explicit LinearSystemSim(
-      const LinearSystem<States, Inputs, Outputs>& system,
+      const wpi::math::LinearSystem<States, Inputs, Outputs>& system,
       const std::array<double, Outputs>& measurementStdDevs = {})
       : m_plant(system), m_measurementStdDevs(measurementStdDevs) {
-    m_x = Vectord<States>::Zero();
-    m_y = Vectord<Outputs>::Zero();
-    m_u = Vectord<Inputs>::Zero();
+    m_x = wpi::math::Vectord<States>::Zero();
+    m_y = wpi::math::Vectord<Outputs>::Zero();
+    m_u = wpi::math::Vectord<Inputs>::Zero();
   }
 
   virtual ~LinearSystemSim() = default;
@@ -50,7 +50,7 @@ class LinearSystemSim {
    *
    * @param dt The time between updates.
    */
-  void Update(units::second_t dt) {
+  void Update(wpi::units::second_t dt) {
     // Update x. By default, this is the linear system dynamics xₖ₊₁ = Axₖ +
     // Buₖ.
     m_x = UpdateX(m_x, m_u, dt);
@@ -61,7 +61,7 @@ class LinearSystemSim {
     // Add noise. If the user did not pass a noise vector to the
     // constructor, then this method will not do anything because
     // the standard deviations default to zero.
-    m_y += frc::MakeWhiteNoiseVector<Outputs>(m_measurementStdDevs);
+    m_y += wpi::math::MakeWhiteNoiseVector<Outputs>(m_measurementStdDevs);
   }
 
   /**
@@ -69,7 +69,7 @@ class LinearSystemSim {
    *
    * @return The current output of the plant.
    */
-  const Vectord<Outputs>& GetOutput() const { return m_y; }
+  const wpi::math::Vectord<Outputs>& GetOutput() const { return m_y; }
 
   /**
    * Returns an element of the current output of the plant.
@@ -84,7 +84,7 @@ class LinearSystemSim {
    *
    * @param u The system inputs.
    */
-  void SetInput(const Vectord<Inputs>& u) { m_u = u; }
+  void SetInput(const wpi::math::Vectord<Inputs>& u) { m_u = u; }
 
   /**
    * Sets the system inputs.
@@ -99,7 +99,7 @@ class LinearSystemSim {
    *
    * @return The current input of the plant.
    */
-  const Vectord<Inputs>& GetInput() const { return m_u; }
+  const wpi::math::Vectord<Inputs>& GetInput() const { return m_u; }
 
   /**
    * Returns an element of the current input of the plant.
@@ -114,7 +114,7 @@ class LinearSystemSim {
    *
    * @param state The new state.
    */
-  void SetState(const Vectord<States>& state) {
+  void SetState(const wpi::math::Vectord<States>& state) {
     m_x = state;
 
     // Update the output to reflect the new state.
@@ -131,9 +131,9 @@ class LinearSystemSim {
    * @param u           The system inputs (usually voltage).
    * @param dt          The time difference between controller updates.
    */
-  virtual Vectord<States> UpdateX(const Vectord<States>& currentXhat,
-                                  const Vectord<Inputs>& u,
-                                  units::second_t dt) {
+  virtual wpi::math::Vectord<States> UpdateX(const wpi::math::Vectord<States>& currentXhat,
+                                  const wpi::math::Vectord<Inputs>& u,
+                                  wpi::units::second_t dt) {
     return m_plant.CalculateX(currentXhat, u, dt);
   }
 
@@ -144,23 +144,23 @@ class LinearSystemSim {
    * @param maxInput The maximum magnitude of the input vector after clamping.
    */
   void ClampInput(double maxInput) {
-    m_u = frc::DesaturateInputVector<Inputs>(m_u, maxInput);
+    m_u = wpi::math::DesaturateInputVector<Inputs>(m_u, maxInput);
   }
 
   /// The plant that represents the linear system.
-  LinearSystem<States, Inputs, Outputs> m_plant;
+  wpi::math::LinearSystem<States, Inputs, Outputs> m_plant;
 
   /// State vector.
-  Vectord<States> m_x;
+  wpi::math::Vectord<States> m_x;
 
   /// Input vector.
-  Vectord<Inputs> m_u;
+  wpi::math::Vectord<Inputs> m_u;
 
   /// Output vector.
-  Vectord<Outputs> m_y;
+  wpi::math::Vectord<Outputs> m_y;
 
   /// The standard deviations of measurements, used for adding noise to the
   /// measurements.
   std::array<double, Outputs> m_measurementStdDevs;
 };
-}  // namespace frc::sim
+}  // namespace wpi::sim

@@ -12,7 +12,7 @@
 #include "wpi/net/HttpParser.hpp"
 #include "wpi/util/StringExtras.hpp"
 
-namespace wpi {
+namespace wpi::net {
 
 #ifdef _WIN32
 const char* WebSocketTest::pipeName = "\\\\.\\pipe\\websocket-unit-test";
@@ -111,18 +111,18 @@ TEST_F(WebSocketTest, CreateClientBasic) {
   HttpParser req{HttpParser::kRequest};
   req.url.connect([](std::string_view url) { ASSERT_EQ(url, "/test"); });
   req.header.connect([&](std::string_view name, std::string_view value) {
-    if (equals_lower(name, "host")) {
+    if (wpi::util::equals_lower(name, "host")) {
       ASSERT_EQ(value, pipeName);
       ++gotHost;
-    } else if (equals_lower(name, "upgrade")) {
+    } else if (wpi::util::equals_lower(name, "upgrade")) {
       ASSERT_EQ(value, "websocket");
       ++gotUpgrade;
-    } else if (equals_lower(name, "connection")) {
+    } else if (wpi::util::equals_lower(name, "connection")) {
       ASSERT_EQ(value, "Upgrade");
       ++gotConnection;
-    } else if (equals_lower(name, "sec-websocket-key")) {
+    } else if (wpi::util::equals_lower(name, "sec-websocket-key")) {
       ++gotKey;
-    } else if (equals_lower(name, "sec-websocket-version")) {
+    } else if (wpi::util::equals_lower(name, "sec-websocket-version")) {
       ASSERT_EQ(value, "13");
       ++gotVersion;
     } else {
@@ -163,10 +163,10 @@ TEST_F(WebSocketTest, CreateClientExtraHeaders) {
   int gotExtra2 = 0;
   HttpParser req{HttpParser::kRequest};
   req.header.connect([&](std::string_view name, std::string_view value) {
-    if (equals(name, "Extra1")) {
+    if (wpi::util::equals(name, "Extra1")) {
       ASSERT_EQ(value, "Data1");
       ++gotExtra1;
-    } else if (equals(name, "Extra2")) {
+    } else if (wpi::util::equals(name, "Extra2")) {
       ASSERT_EQ(value, "Data2");
       ++gotExtra2;
     }
@@ -186,7 +186,7 @@ TEST_F(WebSocketTest, CreateClientExtraHeaders) {
   });
   clientPipe->Connect(pipeName, [&]() {
     WebSocket::ClientOptions options;
-    SmallVector<std::pair<std::string_view, std::string_view>, 4> extraHeaders;
+    wpi::util::SmallVector<std::pair<std::string_view, std::string_view>, 4> extraHeaders;
     extraHeaders.emplace_back("Extra1", "Data1");
     extraHeaders.emplace_back("Extra2", "Data2");
     options.extraHeaders = extraHeaders;
@@ -239,13 +239,13 @@ TEST_F(WebSocketTest, CreateServerBasic) {
     ASSERT_EQ(resp.GetStatusCode(), 101u) << "status: " << status;
   });
   resp.header.connect([&](std::string_view name, std::string_view value) {
-    if (equals_lower(name, "upgrade")) {
+    if (wpi::util::equals_lower(name, "upgrade")) {
       ASSERT_EQ(value, "websocket");
       ++gotUpgrade;
-    } else if (equals_lower(name, "connection")) {
+    } else if (wpi::util::equals_lower(name, "connection")) {
       ASSERT_EQ(value, "Upgrade");
       ++gotConnection;
-    } else if (equals_lower(name, "sec-websocket-accept")) {
+    } else if (wpi::util::equals_lower(name, "sec-websocket-accept")) {
       ASSERT_EQ(value, "s3pPLMBiTxaQ9kYGzzhZRbK+xOo=");
       ++gotAccept;
     } else {
@@ -291,7 +291,7 @@ TEST_F(WebSocketTest, CreateServerProtocol) {
 
   HttpParser resp{HttpParser::kResponse};
   resp.header.connect([&](std::string_view name, std::string_view value) {
-    if (equals_lower(name, "sec-websocket-protocol")) {
+    if (wpi::util::equals_lower(name, "sec-websocket-protocol")) {
       ++gotProtocol;
       ASSERT_EQ(value, "myProtocol");
     }
@@ -337,10 +337,10 @@ TEST_F(WebSocketTest, CreateServerBadVersion) {
     ASSERT_EQ(resp.GetStatusCode(), 426u) << "status: " << status;
   });
   resp.header.connect([&](std::string_view name, std::string_view value) {
-    if (equals_lower(name, "sec-websocket-version")) {
+    if (wpi::util::equals_lower(name, "sec-websocket-version")) {
       ++gotVersion;
       ASSERT_EQ(value, "13");
-    } else if (equals_lower(name, "upgrade")) {
+    } else if (wpi::util::equals_lower(name, "upgrade")) {
       ++gotUpgrade;
       ASSERT_EQ(value, "WebSocket");
     } else {
@@ -378,4 +378,4 @@ TEST_F(WebSocketTest, CreateServerBadVersion) {
   ASSERT_EQ(gotUpgrade, 1);
 }
 
-}  // namespace wpi
+}  // namespace wpi::net

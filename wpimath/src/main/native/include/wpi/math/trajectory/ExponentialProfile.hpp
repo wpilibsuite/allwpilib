@@ -7,7 +7,7 @@
 #include "wpi/units/math.hpp"
 #include "wpi/units/time.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * A Exponential-shaped velocity profile.
@@ -40,20 +40,20 @@ namespace frc {
 template <class Distance, class Input>
 class ExponentialProfile {
  public:
-  using Distance_t = units::unit_t<Distance>;
+  using Distance_t = wpi::units::unit_t<Distance>;
   using Velocity =
-      units::compound_unit<Distance, units::inverse<units::seconds>>;
-  using Velocity_t = units::unit_t<Velocity>;
+      wpi::units::compound_unit<Distance, wpi::units::inverse<wpi::units::seconds>>;
+  using Velocity_t = wpi::units::unit_t<Velocity>;
   using Acceleration =
-      units::compound_unit<Velocity, units::inverse<units::seconds>>;
-  using Input_t = units::unit_t<Input>;
-  using A_t = units::unit_t<units::inverse<units::seconds>>;
+      wpi::units::compound_unit<Velocity, wpi::units::inverse<wpi::units::seconds>>;
+  using Input_t = wpi::units::unit_t<Input>;
+  using A_t = wpi::units::unit_t<wpi::units::inverse<wpi::units::seconds>>;
   using B_t =
-      units::unit_t<units::compound_unit<Acceleration, units::inverse<Input>>>;
-  using KV = units::compound_unit<Input, units::inverse<Velocity>>;
-  using kV_t = units::unit_t<KV>;
-  using KA = units::compound_unit<Input, units::inverse<Acceleration>>;
-  using kA_t = units::unit_t<KA>;
+      wpi::units::unit_t<wpi::units::compound_unit<Acceleration, wpi::units::inverse<Input>>>;
+  using KV = wpi::units::compound_unit<Input, wpi::units::inverse<Velocity>>;
+  using kV_t = wpi::units::unit_t<KV>;
+  using KA = wpi::units::compound_unit<Input, wpi::units::inverse<Acceleration>>;
+  using kA_t = wpi::units::unit_t<KA>;
 
   /**
    * Profile timing.
@@ -61,10 +61,10 @@ class ExponentialProfile {
   class ProfileTiming {
    public:
     /// Profile inflection time.
-    units::second_t inflectionTime;
+    wpi::units::second_t inflectionTime;
 
     /// Total profile time.
-    units::second_t totalTime;
+    wpi::units::second_t totalTime;
 
     /**
      * Decides if the profile is finished by time t.
@@ -72,7 +72,7 @@ class ExponentialProfile {
      * @param t The time since the beginning of the profile.
      * @return if the profile is finished at time t.
      */
-    constexpr bool IsFinished(const units::second_t& t) const {
+    constexpr bool IsFinished(const wpi::units::second_t& t) const {
       return t >= totalTime;
     }
   };
@@ -154,7 +154,7 @@ class ExponentialProfile {
    * @param goal The desired state when the profile is complete.
    * @return The position and velocity of the profile at time t.
    */
-  constexpr State Calculate(const units::second_t& t, const State& current,
+  constexpr State Calculate(const wpi::units::second_t& t, const State& current,
                             const State& goal) const {
     auto direction = ShouldFlipInput(current, goal) ? -1 : 1;
     auto u = direction * m_constraints.maxInput;
@@ -198,7 +198,7 @@ class ExponentialProfile {
    * @param goal The desired state when the profile is complete.
    * @return The total duration of this profile.
    */
-  constexpr units::second_t TimeLeftUntil(const State& current,
+  constexpr wpi::units::second_t TimeLeftUntil(const State& current,
                                           const State& goal) const {
     auto timing = CalculateProfileTiming(current, goal);
 
@@ -265,9 +265,9 @@ class ExponentialProfile {
                                                  const State& goal,
                                                  const Input_t& input) const {
     auto u = input;
-    auto u_dir = units::math::abs(u) / u;
+    auto u_dir = wpi::units::math::abs(u) / u;
 
-    units::second_t inflectionT_forward;
+    wpi::units::second_t inflectionT_forward;
 
     // We need to handle 5 cases here:
     //
@@ -281,17 +281,17 @@ class ExponentialProfile {
     // velocity For cases 2 and 4, we want to add epsilon to the inflection
     // point velocity. For case 5, we have reached inflection point velocity.
     auto epsilon = Velocity_t(1e-9);
-    if (units::math::abs(u_dir * m_constraints.MaxVelocity() -
+    if (wpi::units::math::abs(u_dir * m_constraints.MaxVelocity() -
                          inflectionPoint.velocity) < epsilon) {
       auto solvableV = inflectionPoint.velocity;
-      units::second_t t_to_solvable_v;
+      wpi::units::second_t t_to_solvable_v;
       Distance_t x_at_solvable_v;
-      if (units::math::abs(current.velocity - inflectionPoint.velocity) <
+      if (wpi::units::math::abs(current.velocity - inflectionPoint.velocity) <
           epsilon) {
         t_to_solvable_v = 0_s;
         x_at_solvable_v = current.position;
       } else {
-        if (units::math::abs(current.velocity) > m_constraints.MaxVelocity()) {
+        if (wpi::units::math::abs(current.velocity) > m_constraints.MaxVelocity()) {
           solvableV += u_dir * epsilon;
         } else {
           solvableV -= u_dir * epsilon;
@@ -327,7 +327,7 @@ class ExponentialProfile {
    * @param initial The initial state.
    * @return The distance travelled by this profile.
    */
-  constexpr Distance_t ComputeDistanceFromTime(const units::second_t& time,
+  constexpr Distance_t ComputeDistanceFromTime(const wpi::units::second_t& time,
                                                const Input_t& input,
                                                const State& initial) const {
     auto A = m_constraints.A;
@@ -336,7 +336,7 @@ class ExponentialProfile {
 
     return initial.position +
            (-B * u * time +
-            (initial.velocity + B * u / A) * (units::math::exp(A * time) - 1)) /
+            (initial.velocity + B * u / A) * (wpi::units::math::exp(A * time) - 1)) /
                A;
   }
 
@@ -350,14 +350,14 @@ class ExponentialProfile {
    * @param initial The initial state.
    * @return The distance travelled by this profile.
    */
-  constexpr Velocity_t ComputeVelocityFromTime(const units::second_t& time,
+  constexpr Velocity_t ComputeVelocityFromTime(const wpi::units::second_t& time,
                                                const Input_t& input,
                                                const State& initial) const {
     auto A = m_constraints.A;
     auto B = m_constraints.B;
     auto u = input;
 
-    return (initial.velocity + B * u / A) * units::math::exp(A * time) -
+    return (initial.velocity + B * u / A) * wpi::units::math::exp(A * time) -
            B * u / A;
   }
 
@@ -371,14 +371,14 @@ class ExponentialProfile {
    * @param initial The initial velocity.
    * @return The time required to reach the goal velocity.
    */
-  constexpr units::second_t ComputeTimeFromVelocity(
+  constexpr wpi::units::second_t ComputeTimeFromVelocity(
       const Velocity_t& velocity, const Input_t& input,
       const Velocity_t& initial) const {
     auto A = m_constraints.A;
     auto B = m_constraints.B;
     auto u = input;
 
-    return units::math::log((A * velocity + B * u) / (A * initial + B * u)) / A;
+    return wpi::units::math::log((A * velocity + B * u) / (A * initial + B * u)) / A;
   }
 
   /**
@@ -400,7 +400,7 @@ class ExponentialProfile {
 
     return initial.position + (velocity - initial.velocity) / A -
            B * u / (A * A) *
-               units::math::log((A * velocity + B * u) /
+               wpi::units::math::log((A * velocity + B * u) /
                                 (A * initial.velocity + B * u));
   }
 
@@ -421,7 +421,7 @@ class ExponentialProfile {
     auto B = m_constraints.B;
     auto u = input;
 
-    auto u_dir = u / units::math::abs(u);
+    auto u_dir = u / wpi::units::math::abs(u);
 
     auto position_delta = goal.position - current.position;
     auto velocity_delta = goal.velocity - current.velocity;
@@ -430,7 +430,7 @@ class ExponentialProfile {
     auto power = -A / B / u * (A * position_delta - velocity_delta);
 
     auto a = -A * A;
-    auto c = B * B * u * u + scalar * units::math::exp(power);
+    auto c = B * B * u * u + scalar * wpi::units::math::exp(power);
 
     if (-1e-9 < c.value() && c.value() < 0) {
       // numeric instability - the heuristic gets it right but c is around
@@ -438,7 +438,7 @@ class ExponentialProfile {
       return Velocity_t(0);
     }
 
-    return u_dir * units::math::sqrt(-c / a);
+    return u_dir * wpi::units::math::sqrt(-c / a);
   }
 
   /**
@@ -480,4 +480,4 @@ class ExponentialProfile {
   Constraints m_constraints;
 };
 
-}  // namespace frc
+}  // namespace wpi::math

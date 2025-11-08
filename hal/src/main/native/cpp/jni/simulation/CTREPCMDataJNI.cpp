@@ -8,7 +8,7 @@
 #include "org_wpilib_hardware_hal_simulation_CTREPCMDataJNI.h"
 #include "wpi/hal/simulation/CTREPCMData.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
 

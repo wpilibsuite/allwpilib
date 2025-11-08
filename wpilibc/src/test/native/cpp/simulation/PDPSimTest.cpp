@@ -12,7 +12,7 @@
 #include "wpi/hal/HAL.h"
 #include "wpi/hardware/power/PowerDistribution.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 
 TEST(PowerDistributionSimTest, Initialize) {
   HAL_Initialize(500, 0);
@@ -22,7 +22,7 @@ TEST(PowerDistributionSimTest, Initialize) {
   BooleanCallback callback;
 
   auto cb = sim.RegisterInitializedCallback(callback.GetCallback(), false);
-  PowerDistribution pdp(0, 2, frc::PowerDistribution::ModuleType::kCTRE);
+  PowerDistribution pdp(0, 2, wpi::PowerDistribution::ModuleType::kCTRE);
   EXPECT_TRUE(sim.GetInitialized());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_TRUE(callback.GetLastValue());
@@ -35,7 +35,7 @@ TEST(PowerDistributionSimTest, Initialize) {
 
 TEST(PowerDistributionSimTest, SetTemperature) {
   HAL_Initialize(500, 0);
-  PowerDistribution pdp{0, 2, frc::PowerDistribution::ModuleType::kCTRE};
+  PowerDistribution pdp{0, 2, wpi::PowerDistribution::ModuleType::kCTRE};
   PowerDistributionSim sim(pdp);
 
   DoubleCallback callback;
@@ -50,7 +50,7 @@ TEST(PowerDistributionSimTest, SetTemperature) {
 
 TEST(PowerDistributionSimTest, SetVoltage) {
   HAL_Initialize(500, 0);
-  PowerDistribution pdp{0, 2, frc::PowerDistribution::ModuleType::kCTRE};
+  PowerDistribution pdp{0, 2, wpi::PowerDistribution::ModuleType::kCTRE};
   PowerDistributionSim sim(pdp);
 
   DoubleCallback callback;
@@ -65,7 +65,7 @@ TEST(PowerDistributionSimTest, SetVoltage) {
 
 TEST(PowerDistributionSimTest, SetCurrent) {
   HAL_Initialize(500, 0);
-  PowerDistribution pdp{0, 2, frc::PowerDistribution::ModuleType::kCTRE};
+  PowerDistribution pdp{0, 2, wpi::PowerDistribution::ModuleType::kCTRE};
   PowerDistributionSim sim(pdp);
 
   for (int channel = 0; channel < HAL_GetNumCTREPDPChannels(); ++channel) {
@@ -84,7 +84,7 @@ TEST(PowerDistributionSimTest, SetCurrent) {
 
 TEST(PowerDistributionSimTest, GetAllCurrents) {
   HAL_Initialize(500, 0);
-  PowerDistribution pdp{0, 2, frc::PowerDistribution::ModuleType::kRev};
+  PowerDistribution pdp{0, 2, wpi::PowerDistribution::ModuleType::kRev};
   PowerDistributionSim sim(pdp);
 
   // setup
@@ -103,4 +103,4 @@ TEST(PowerDistributionSimTest, GetAllCurrents) {
   }
 }
 
-}  // namespace frc::sim
+}  // namespace wpi::sim

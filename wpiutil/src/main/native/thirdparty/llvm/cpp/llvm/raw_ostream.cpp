@@ -57,7 +57,7 @@
 #include "Windows/WindowsSupport.hpp"
 #endif
 
-using namespace wpi;
+using namespace wpi::util;
 
 constexpr raw_ostream::Colors raw_ostream::BLACK;
 constexpr raw_ostream::Colors raw_ostream::RED;
@@ -593,7 +593,7 @@ void raw_fd_ostream::anchor() {}
 //  outs(), errs(), nulls()
 //===----------------------------------------------------------------------===//
 
-raw_fd_ostream &wpi::outs() {
+raw_fd_ostream &wpi::util::outs() {
   // Set buffer settings to model stdout behavior.
   std::error_code EC;
   static raw_fd_ostream* S = new raw_fd_ostream("-", EC, fs::OF_None);
@@ -601,14 +601,14 @@ raw_fd_ostream &wpi::outs() {
   return *S;
 }
 
-raw_fd_ostream &wpi::errs() {
+raw_fd_ostream &wpi::util::errs() {
   // Set standard error to be unbuffered and tied to outs() by default.
   static raw_fd_ostream* S = new raw_fd_ostream(STDERR_FILENO, false, true);
   return *S;
 }
 
 /// nulls() - This returns a reference to a raw_ostream which discards output.
-raw_ostream &wpi::nulls() {
+raw_ostream &wpi::util::nulls() {
   static raw_null_ostream S;
   return S;
 }

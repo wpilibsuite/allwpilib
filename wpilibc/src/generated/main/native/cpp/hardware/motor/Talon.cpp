@@ -8,7 +8,7 @@
 
 #include "wpi/hal/UsageReporting.h"
 
-using namespace frc;
+using namespace wpi;
 
 Talon::Talon(int channel) : PWMMotorController("Talon", channel) {
   SetBounds(2.037_ms, 1.539_ms, 1.513_ms, 1.487_ms, 0.989_ms);

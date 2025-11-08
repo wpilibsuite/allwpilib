@@ -7,16 +7,16 @@
 #include "PortsInternal.h"
 #include "wpi/hal/handles/IndexedHandleResource.h"
 
-namespace hal {
-IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort, kNumAnalogInputs,
+namespace wpi::hal {
+IndexedHandleResource<HAL_AnalogInputHandle, wpi::hal::AnalogPort, kNumAnalogInputs,
                       HAL_HandleEnum::AnalogInput>* analogInputHandles;
-}  // namespace hal
+}  // namespace wpi::hal
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeAnalogInternal() {
-  static IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort,
+  static IndexedHandleResource<HAL_AnalogInputHandle, wpi::hal::AnalogPort,
                                kNumAnalogInputs, HAL_HandleEnum::AnalogInput>
       aiH;
   analogInputHandles = &aiH;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init

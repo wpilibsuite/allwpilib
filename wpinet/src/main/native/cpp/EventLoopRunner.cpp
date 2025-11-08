@@ -13,9 +13,9 @@
 #include "wpi/util/condition_variable.hpp"
 #include "wpi/util/mutex.hpp"
 
-using namespace wpi;
+using namespace wpi::net;
 
-class EventLoopRunner::Thread : public SafeThread {
+class EventLoopRunner::Thread : public wpi::util::SafeThread {
  public:
   using UvExecFunc = uv::AsyncFunction<void(LoopFunc)>;
 
@@ -75,7 +75,7 @@ void EventLoopRunner::ExecAsync(LoopFunc func) {
 }
 
 void EventLoopRunner::ExecSync(LoopFunc func) {
-  wpi::future<void> f;
+  wpi::util::future<void> f;
   if (auto thr = m_owner.GetThread()) {
     if (auto doExec = thr->m_doExec.lock()) {
       f = doExec->Call(std::move(func));

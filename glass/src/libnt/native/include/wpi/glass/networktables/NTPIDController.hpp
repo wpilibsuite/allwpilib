@@ -14,13 +14,13 @@
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/StringTopic.hpp"
 
-namespace glass {
+namespace wpi::glass {
 class NTPIDControllerModel : public PIDControllerModel {
  public:
   static constexpr const char* kType = "PIDController";
 
   explicit NTPIDControllerModel(std::string_view path);
-  NTPIDControllerModel(nt::NetworkTableInstance inst, std::string_view path);
+  NTPIDControllerModel(wpi::nt::NetworkTableInstance inst, std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
 
@@ -41,14 +41,14 @@ class NTPIDControllerModel : public PIDControllerModel {
   bool IsReadOnly() override { return !m_controllableValue; }
 
  private:
-  nt::NetworkTableInstance m_inst;
-  nt::StringSubscriber m_name;
-  nt::BooleanSubscriber m_controllable;
-  nt::DoubleEntry m_p;
-  nt::DoubleEntry m_i;
-  nt::DoubleEntry m_d;
-  nt::DoubleEntry m_setpoint;
-  nt::DoubleEntry m_iZone;
+  wpi::nt::NetworkTableInstance m_inst;
+  wpi::nt::StringSubscriber m_name;
+  wpi::nt::BooleanSubscriber m_controllable;
+  wpi::nt::DoubleEntry m_p;
+  wpi::nt::DoubleEntry m_i;
+  wpi::nt::DoubleEntry m_d;
+  wpi::nt::DoubleEntry m_setpoint;
+  wpi::nt::DoubleEntry m_iZone;
 
   DoubleSource m_pData;
   DoubleSource m_iData;
@@ -59,4 +59,4 @@ class NTPIDControllerModel : public PIDControllerModel {
   std::string m_nameValue;
   bool m_controllableValue = false;
 };
-}  // namespace glass
+}  // namespace wpi::glass

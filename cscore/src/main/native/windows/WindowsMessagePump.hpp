@@ -9,7 +9,7 @@
 #include <functional>
 #include <thread>
 
-namespace cs {
+namespace wpi::cs {
 class WindowsMessagePump {
  public:
   explicit WindowsMessagePump(
@@ -60,4 +60,4 @@ class WindowsMessagePump {
 
   std::thread m_mainThread;
 };
-}  // namespace cs
+}  // namespace wpi::cs

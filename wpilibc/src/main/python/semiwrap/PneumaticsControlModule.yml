@@ -5,7 +5,7 @@ extra_includes:
 - wpi/hardware/pneumatic/DoubleSolenoid.hpp
 
 classes:
-  frc::PneumaticsControlModule:
+  wpi::PneumaticsControlModule:
     methods:
       PneumaticsControlModule:
         overloads:

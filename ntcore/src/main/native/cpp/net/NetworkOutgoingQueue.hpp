@@ -20,7 +20,7 @@
 #include "wpi/nt/ntcore_c.h"
 #include "wpi/util/DenseMap.hpp"
 
-namespace nt::net {
+namespace wpi::nt::net {
 
 static constexpr uint32_t kMinPeriodMs = 5;
 
@@ -171,7 +171,7 @@ class NetworkOutgoingQueue {
     }
 
     // what queues are ready to send?
-    wpi::SmallVector<unsigned int, 16> queues;
+    wpi::util::SmallVector<unsigned int, 16> queues;
     for (unsigned int i = 0; i < m_queues.size(); ++i) {
       if (!m_queues[i].msgs.empty() &&
           (flush || curTimeMs >= m_queues[i].nextSendMs)) {
@@ -258,7 +258,7 @@ class NetworkOutgoingQueue {
  private:
   using ValueMsg = typename MessageType::ValueMsg;
 
-  void EncodeValue(wpi::raw_ostream& os, int id, const Value& value) {
+  void EncodeValue(wpi::util::raw_ostream& os, int id, const Value& value) {
     int64_t time = value.time();
     if constexpr (std::same_as<ValueMsg, ClientValueMsg>) {
       if (time != 0) {
@@ -298,7 +298,7 @@ class NetworkOutgoingQueue {
     unsigned int queueIndex = 0;
     int valuePos = -1;  // -1 if not in queue
   };
-  wpi::DenseMap<int, HandleInfo> m_idMap;
+  wpi::util::DenseMap<int, HandleInfo> m_idMap;
   size_t m_totalSize{0};
   uint64_t m_lastSendMs{0};
   int64_t m_timeOffsetUs{0};
@@ -310,4 +310,4 @@ class NetworkOutgoingQueue {
   static constexpr size_t kOutgoingLimit = 1024 * 1024;
 };
 
-}  // namespace nt::net
+}  // namespace wpi::nt::net

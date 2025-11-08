@@ -28,9 +28,9 @@
 
 #include "wpi/units/base.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::capacitance
+ * @namespace wpi::units::capacitance
  * @brief namespace for unit types and containers representing capacitance
  *        values
  * @details The SI unit for capacitance is `farads`, and the corresponding
@@ -42,10 +42,10 @@ namespace units {
     defined(ENABLE_PREDEFINED_CAPACITANCE_UNITS)
 UNIT_ADD_WITH_METRIC_PREFIXES(
     capacitance, farad, farads, F,
-    unit<std::ratio<1>, units::category::capacitance_unit>)
+    unit<std::ratio<1>, wpi::units::category::capacitance_unit>)
 
 UNIT_ADD_CATEGORY_TRAIT(capacitance)
 #endif
 
 using namespace capacitance;
-}  // namespace units
+}  // namespace wpi::units

@@ -10,7 +10,7 @@
 #include "wpi/net/uv/Pipe.hpp"
 #include "wpi/util/SmallString.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 std::shared_ptr<Process> Process::SpawnArray(Loop& loop, std::string_view file,
                                              std::span<const Option> options) {
@@ -26,22 +26,22 @@ std::shared_ptr<Process> Process::SpawnArray(Loop& loop, std::string_view file,
     h.exited(status, signal);
   };
 
-  SmallString<128> fileBuf{file};
+  wpi::util::SmallString<128> fileBuf{file};
   coptions.file = fileBuf.c_str();
   coptions.cwd = nullptr;
   coptions.flags = 0;
   coptions.uid = 0;
   coptions.gid = 0;
 
-  SmallVector<char*, 4> argsBuf;
-  SmallVector<char*, 4> envBuf;
+  wpi::util::SmallVector<char*, 4> argsBuf;
+  wpi::util::SmallVector<char*, 4> envBuf;
   struct StdioContainer : public uv_stdio_container_t {
     StdioContainer() {
       flags = UV_IGNORE;
       data.fd = 0;
     }
   };
-  SmallVector<StdioContainer, 4> stdioBuf;
+  wpi::util::SmallVector<StdioContainer, 4> stdioBuf;
 
   for (auto&& o : options) {
     switch (o.m_type) {
@@ -136,4 +136,4 @@ std::shared_ptr<Process> Process::SpawnArray(Loop& loop, std::string_view file,
   return h;
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

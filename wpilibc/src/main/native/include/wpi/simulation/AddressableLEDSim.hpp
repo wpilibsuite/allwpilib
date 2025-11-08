@@ -10,7 +10,7 @@
 
 struct HAL_AddressableLEDData;
 
-namespace frc {
+namespace wpi {
 
 class AddressableLED;
 
@@ -165,4 +165,4 @@ class AddressableLEDSim {
   int m_channel;
 };
 }  // namespace sim
-}  // namespace frc
+}  // namespace wpi

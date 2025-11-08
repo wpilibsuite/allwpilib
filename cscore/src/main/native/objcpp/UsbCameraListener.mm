@@ -8,7 +8,7 @@
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "Notifier.hpp"
 
-using namespace cs;
+using namespace wpi::cs;
 
 @interface UsbCameraListenerImpl : NSObject
 @property(nonatomic) Notifier* notifier;
@@ -99,7 +99,7 @@ class UsbCameraListener::Impl {
   }
 };
 
-UsbCameraListener::UsbCameraListener(wpi::Logger&, Notifier& notifier)
+UsbCameraListener::UsbCameraListener(wpi::util::Logger&, Notifier& notifier)
     : m_impl{std::make_unique<Impl>(notifier)} {}
 
 UsbCameraListener::~UsbCameraListener() {

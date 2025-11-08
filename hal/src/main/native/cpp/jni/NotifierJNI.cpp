@@ -12,7 +12,7 @@
 #include "wpi/hal/Notifier.h"
 #include "wpi/util/jni_util.hpp"
 
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
 
@@ -59,7 +59,7 @@ Java_org_wpilib_hardware_hal_NotifierJNI_setNotifierName
 {
   int32_t status = 0;
   HAL_SetNotifierName((HAL_NotifierHandle)notifierHandle,
-                      wpi::java::JStringRef{env, name}.c_str(), &status);
+                      wpi::util::java::JStringRef{env, name}.c_str(), &status);
   CheckStatus(env, status);
 }
 

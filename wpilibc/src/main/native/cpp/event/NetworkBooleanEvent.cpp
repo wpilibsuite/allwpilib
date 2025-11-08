@@ -11,33 +11,33 @@
 #include "wpi/nt/NetworkTable.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 NetworkBooleanEvent::NetworkBooleanEvent(EventLoop* loop,
-                                         nt::BooleanTopic topic)
+                                         wpi::nt::BooleanTopic topic)
     : NetworkBooleanEvent{loop, topic.Subscribe(false)} {}
 
 NetworkBooleanEvent::NetworkBooleanEvent(EventLoop* loop,
-                                         nt::BooleanSubscriber sub)
+                                         wpi::nt::BooleanSubscriber sub)
     : BooleanEvent{
           loop,
-          [sub = std::make_shared<nt::BooleanSubscriber>(std::move(sub))] {
+          [sub = std::make_shared<wpi::nt::BooleanSubscriber>(std::move(sub))] {
             return sub->GetTopic().GetInstance().IsConnected() && sub->Get();
           }} {}
 
 NetworkBooleanEvent::NetworkBooleanEvent(
-    EventLoop* loop, std::shared_ptr<nt::NetworkTable> table,
+    EventLoop* loop, std::shared_ptr<wpi::nt::NetworkTable> table,
     std::string_view topicName)
     : NetworkBooleanEvent{loop, table->GetBooleanTopic(topicName)} {}
 
 NetworkBooleanEvent::NetworkBooleanEvent(EventLoop* loop,
                                          std::string_view tableName,
                                          std::string_view topicName)
-    : NetworkBooleanEvent{loop, nt::NetworkTableInstance::GetDefault(),
+    : NetworkBooleanEvent{loop, wpi::nt::NetworkTableInstance::GetDefault(),
                           tableName, topicName} {}
 
 NetworkBooleanEvent::NetworkBooleanEvent(EventLoop* loop,
-                                         nt::NetworkTableInstance inst,
+                                         wpi::nt::NetworkTableInstance inst,
                                          std::string_view tableName,
                                          std::string_view topicName)
     : NetworkBooleanEvent{loop, inst.GetTable(tableName), topicName} {}

@@ -4,7 +4,7 @@
 
 #include "wpi/romi/RomiMotor.hpp"
 
-using namespace frc;
+using namespace wpi::romi;
 
 RomiMotor::RomiMotor(int channel) : PWMMotorController("Romi Motor", channel) {
   m_pwm.SetOutputPeriod(PWM::kOutputPeriod_5Ms);

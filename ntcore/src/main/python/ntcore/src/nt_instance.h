@@ -6,10 +6,10 @@
 
 namespace pyntcore {
 
-void onInstanceStart(nt::NetworkTableInstance *instance);
-void onInstancePreReset(nt::NetworkTableInstance *instance);
-void onInstancePostReset(nt::NetworkTableInstance *instance);
-void onInstanceDestroy(nt::NetworkTableInstance *instance);
+void onInstanceStart(wpi::nt::NetworkTableInstance *instance);
+void onInstancePreReset(wpi::nt::NetworkTableInstance *instance);
+void onInstancePostReset(wpi::nt::NetworkTableInstance *instance);
+void onInstanceDestroy(wpi::nt::NetworkTableInstance *instance);
 
 void resetAllInstances();
 

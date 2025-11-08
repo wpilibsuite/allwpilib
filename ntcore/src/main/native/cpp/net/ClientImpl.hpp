@@ -20,16 +20,16 @@
 #include "WireDecoder.hpp"
 #include "wpi/util/DenseMap.hpp"
 
-namespace wpi {
+namespace wpi::util {
 class Logger;
 }  // namespace wpi
 
-namespace nt {
+namespace wpi::nt {
 class PubSubOptionsImpl;
 class Value;
-}  // namespace nt
+}  // namespace wpi::nt
 
-namespace nt::net {
+namespace wpi::nt::net {
 
 struct ClientMessage;
 class WireConnection;
@@ -37,7 +37,7 @@ class WireConnection;
 class ClientImpl final : private ServerMessageHandler {
  public:
   ClientImpl(
-      uint64_t curTimeMs, WireConnection& wire, bool local, wpi::Logger& logger,
+      uint64_t curTimeMs, WireConnection& wire, bool local, wpi::util::Logger& logger,
       std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
           timeSyncUpdated,
       std::function<void(uint32_t repeatMs)> setPeriodic);
@@ -63,20 +63,20 @@ class ClientImpl final : private ServerMessageHandler {
 
   // ServerMessageHandler interface
   int ServerAnnounce(std::string_view name, int id, std::string_view typeStr,
-                     const wpi::json& properties,
+                     const wpi::util::json& properties,
                      std::optional<int> pubuid) final;
   void ServerUnannounce(std::string_view name, int id) final;
-  void ServerPropertiesUpdate(std::string_view name, const wpi::json& update,
+  void ServerPropertiesUpdate(std::string_view name, const wpi::util::json& update,
                               bool ack) final;
   void ServerSetValue(int topicId, const Value& value) final;
 
   void Publish(int pubuid, std::string_view name, std::string_view typeStr,
-               const wpi::json& properties, const PubSubOptionsImpl& options);
+               const wpi::util::json& properties, const PubSubOptionsImpl& options);
   void Unpublish(int pubuid, ClientMessage&& msg);
   void SetValue(int pubuid, const Value& value);
 
   WireConnection& m_wire;
-  wpi::Logger& m_logger;
+  wpi::util::Logger& m_logger;
   ServerMessageHandler* m_local{nullptr};
   std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
       m_timeSyncUpdated;
@@ -86,7 +86,7 @@ class ClientImpl final : private ServerMessageHandler {
   std::vector<std::unique_ptr<PublisherData>> m_publishers;
 
   // indexed by server-provided topic id
-  wpi::DenseMap<int, int> m_topicMap;
+  wpi::util::DenseMap<int, int> m_topicMap;
 
   // ping
   NetworkPing m_ping;
@@ -107,4 +107,4 @@ class ClientImpl final : private ServerMessageHandler {
   NetworkOutgoingQueue<ClientMessage> m_outgoing;
 };
 
-}  // namespace nt::net
+}  // namespace wpi::nt::net

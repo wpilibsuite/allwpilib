@@ -10,11 +10,11 @@
 
 #include "wpi/util/function_ref.hpp"
 
-namespace wpi {
+namespace wpi::util {
 class raw_ostream;
 }  // namespace wpi
 
-namespace nt::net {
+namespace wpi::nt::net {
 
 class WireConnection {
  public:
@@ -33,10 +33,10 @@ class WireConnection {
   // not sent.
   [[nodiscard]]
   virtual int WriteText(
-      wpi::function_ref<void(wpi::raw_ostream& os)> writer) = 0;
+      wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) = 0;
   [[nodiscard]]
   virtual int WriteBinary(
-      wpi::function_ref<void(wpi::raw_ostream& os)> writer) = 0;
+      wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) = 0;
 
   // Flushes any pending buffers. Return value equivalent to
   // WriteText/WriteBinary (e.g. 1 means the last WriteX call was not sent).
@@ -45,9 +45,9 @@ class WireConnection {
 
   // These immediately send the data even if the buffer is full.
   virtual void SendText(
-      wpi::function_ref<void(wpi::raw_ostream& os)> writer) = 0;
+      wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) = 0;
   virtual void SendBinary(
-      wpi::function_ref<void(wpi::raw_ostream& os)> writer) = 0;
+      wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) = 0;
 
   virtual uint64_t GetLastFlushTime() const = 0;  // in microseconds
 
@@ -60,4 +60,4 @@ class WireConnection {
   virtual void Disconnect(std::string_view reason) = 0;
 };
 
-}  // namespace nt::net
+}  // namespace wpi::nt::net

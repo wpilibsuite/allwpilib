@@ -1,5 +1,5 @@
 classes:
-  frc::DifferentialDriveWheelPositions:
+  wpi::math::DifferentialDriveWheelPositions:
     attributes:
       left:
       right:

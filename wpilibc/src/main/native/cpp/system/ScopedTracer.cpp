@@ -6,9 +6,9 @@
 
 #include "wpi/util/raw_ostream.hpp"
 
-using namespace frc;
+using namespace wpi;
 
-ScopedTracer::ScopedTracer(std::string_view name, wpi::raw_ostream& os)
+ScopedTracer::ScopedTracer(std::string_view name, wpi::util::raw_ostream& os)
     : m_name(name), m_os(os) {
   m_tracer.ResetTimer();
 }

@@ -1,5 +1,5 @@
 classes:
-  frc::CAN:
+  wpi::CAN:
     attributes:
       kTeamManufacturer:
       kTeamDeviceType:

@@ -5,7 +5,7 @@
 #include "wpi/util/sendable/SendableBuilder.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
 
-class MySendableBuilder : public wpi::SendableBuilder {
+class MySendableBuilder : public wpi::util::SendableBuilder {
 public:
   MySendableBuilder(py::dict keys) : keys(keys) {}
 
@@ -94,49 +94,49 @@ public:
 
   void AddSmallStringProperty(
       std::string_view key,
-      std::function<std::string_view(wpi::SmallVectorImpl<char> &buf)> getter,
+      std::function<std::string_view(wpi::util::SmallVectorImpl<char> &buf)> getter,
       std::function<void(std::string_view)> setter) override {}
 
   void AddSmallBooleanArrayProperty(
       std::string_view key,
-      std::function<std::span<const int>(wpi::SmallVectorImpl<int> &buf)>
+      std::function<std::span<const int>(wpi::util::SmallVectorImpl<int> &buf)>
           getter,
       std::function<void(std::span<const int>)> setter) override {}
 
   void AddSmallIntegerArrayProperty(
       std::string_view key,
       std::function<
-          std::span<const int64_t>(wpi::SmallVectorImpl<int64_t> &buf)>
+          std::span<const int64_t>(wpi::util::SmallVectorImpl<int64_t> &buf)>
           getter,
       std::function<void(std::span<const int64_t>)> setter) override {}
 
   void AddSmallFloatArrayProperty(
       std::string_view key,
-      std::function<std::span<const float>(wpi::SmallVectorImpl<float> &buf)>
+      std::function<std::span<const float>(wpi::util::SmallVectorImpl<float> &buf)>
           getter,
       std::function<void(std::span<const float>)> setter) override {}
 
   void AddSmallDoubleArrayProperty(
       std::string_view key,
-      std::function<std::span<const double>(wpi::SmallVectorImpl<double> &buf)>
+      std::function<std::span<const double>(wpi::util::SmallVectorImpl<double> &buf)>
           getter,
       std::function<void(std::span<const double>)> setter) override {}
 
   void AddSmallStringArrayProperty(
       std::string_view key,
       std::function<
-          std::span<const std::string>(wpi::SmallVectorImpl<std::string> &buf)>
+          std::span<const std::string>(wpi::util::SmallVectorImpl<std::string> &buf)>
           getter,
       std::function<void(std::span<const std::string>)> setter) override {}
 
   void AddSmallRawProperty(
       std::string_view key, std::string_view typeString,
-      std::function<std::span<uint8_t>(wpi::SmallVectorImpl<uint8_t> &buf)>
+      std::function<std::span<uint8_t>(wpi::util::SmallVectorImpl<uint8_t> &buf)>
           getter,
       std::function<void(std::span<const uint8_t>)> setter) override {}
 
-  wpi::SendableBuilder::BackendKind GetBackendKind() const override {
-    return wpi::SendableBuilder::BackendKind::kUnknown;
+  wpi::util::SendableBuilder::BackendKind GetBackendKind() const override {
+    return wpi::util::SendableBuilder::BackendKind::kUnknown;
   }
 
   bool IsPublished() const override { return false; }
@@ -146,9 +146,9 @@ public:
   py::dict keys;
 };
 
-void Publish(wpi::SendableRegistry::UID sendableUid, py::dict keys) {
+void Publish(wpi::util::SendableRegistry::UID sendableUid, py::dict keys) {
   auto builder = std::make_unique<MySendableBuilder>(keys);
-  wpi::SendableRegistry::Publish(sendableUid, std::move(builder));
+  wpi::util::SendableRegistry::Publish(sendableUid, std::move(builder));
 }
 
 void sendable_test(py::module &m) { m.def("publish", Publish); }

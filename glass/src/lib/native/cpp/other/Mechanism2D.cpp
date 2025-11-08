@@ -29,7 +29,7 @@
 #include "wpi/units/length.hpp"
 #include "wpi/util/print.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 namespace gui = wpi::gui;
 
@@ -37,19 +37,19 @@ namespace {
 
 // Per-frame data (not persistent)
 struct FrameData {
-  frc::Translation2d GetPosFromScreen(const ImVec2& cursor) const {
+  wpi::math::Translation2d GetPosFromScreen(const ImVec2& cursor) const {
     return {
-        units::meter_t{(std::clamp(cursor.x, min.x, max.x) - min.x) / scale},
-        units::meter_t{(max.y - std::clamp(cursor.y, min.y, max.y)) / scale}};
+        wpi::units::meter_t{(std::clamp(cursor.x, min.x, max.x) - min.x) / scale},
+        wpi::units::meter_t{(max.y - std::clamp(cursor.y, min.y, max.y)) / scale}};
   }
-  ImVec2 GetScreenFromPos(const frc::Translation2d& pos) const {
+  ImVec2 GetScreenFromPos(const wpi::math::Translation2d& pos) const {
     return {min.x + scale * pos.X().to<float>(),
             max.y - scale * pos.Y().to<float>()};
   }
   void DrawObject(ImDrawList* drawList, MechanismObjectModel& objModel,
-                  const frc::Pose2d& pose) const;
+                  const wpi::math::Pose2d& pose) const;
   void DrawGroup(ImDrawList* drawList, MechanismObjectGroup& group,
-                 const frc::Pose2d& pose) const;
+                 const wpi::math::Pose2d& pose) const;
 
   // in screen coordinates
   ImVec2 imageMin;
@@ -67,7 +67,7 @@ class BackgroundInfo {
   void DisplaySettings();
 
   void LoadImage();
-  FrameData GetFrameData(ImVec2 min, ImVec2 max, frc::Translation2d dims) const;
+  FrameData GetFrameData(ImVec2 min, ImVec2 max, wpi::math::Translation2d dims) const;
   void Draw(ImDrawList* drawList, const FrameData& frameData,
             ImU32 bgColor) const;
 
@@ -126,7 +126,7 @@ void BackgroundInfo::LoadImage() {
 }
 
 bool BackgroundInfo::LoadImageImpl(const std::string& fn) {
-  wpi::print("GUI: loading background image '{}'\n", fn);
+  wpi::util::print("GUI: loading background image '{}'\n", fn);
   auto texture = gui::Texture::CreateFromFile(fn.c_str());
   if (!texture) {
     std::puts("GUI: could not read background image");
@@ -140,7 +140,7 @@ bool BackgroundInfo::LoadImageImpl(const std::string& fn) {
 }
 
 FrameData BackgroundInfo::GetFrameData(ImVec2 min, ImVec2 max,
-                                       frc::Translation2d dims) const {
+                                       wpi::math::Translation2d dims) const {
   // fit the image into the window
   if (m_texture && m_imageHeight != 0 && m_imageWidth != 0) {
     gui::MaxFit(&min, &max, m_imageWidth, m_imageHeight);
@@ -170,7 +170,7 @@ void BackgroundInfo::Draw(ImDrawList* drawList, const FrameData& frameData,
   }
 }
 
-void glass::DisplayMechanism2DSettings(Mechanism2DModel* model) {
+void wpi::glass::DisplayMechanism2DSettings(Mechanism2DModel* model) {
   auto& storage = GetStorage();
   auto bg = storage.GetData<BackgroundInfo>();
   if (!bg) {
@@ -181,14 +181,14 @@ void glass::DisplayMechanism2DSettings(Mechanism2DModel* model) {
 }
 
 void FrameData::DrawObject(ImDrawList* drawList, MechanismObjectModel& objModel,
-                           const frc::Pose2d& pose) const {
+                           const wpi::math::Pose2d& pose) const {
   const char* type = objModel.GetType();
   if (std::string_view{type} == "line") {
     auto startPose =
-        pose + frc::Transform2d{frc::Translation2d{}, objModel.GetAngle()};
+        pose + wpi::math::Transform2d{wpi::math::Translation2d{}, objModel.GetAngle()};
     auto endPose =
         startPose +
-        frc::Transform2d{frc::Translation2d{objModel.GetLength(), 0_m}, 0_deg};
+        wpi::math::Transform2d{wpi::math::Translation2d{objModel.GetLength(), 0_m}, 0_deg};
     drawList->AddLine(GetScreenFromPos(startPose.Translation()),
                       GetScreenFromPos(endPose.Translation()),
                       objModel.GetColor(), objModel.GetWeight());
@@ -197,12 +197,12 @@ void FrameData::DrawObject(ImDrawList* drawList, MechanismObjectModel& objModel,
 }
 
 void FrameData::DrawGroup(ImDrawList* drawList, MechanismObjectGroup& group,
-                          const frc::Pose2d& pose) const {
+                          const wpi::math::Pose2d& pose) const {
   group.ForEachObject(
       [&](auto& objModel) { DrawObject(drawList, objModel, pose); });
 }
 
-void glass::DisplayMechanism2D(Mechanism2DModel* model,
+void wpi::glass::DisplayMechanism2D(Mechanism2DModel* model,
                                const ImVec2& contentSize) {
   auto& storage = GetStorage();
   auto bg = storage.GetData<BackgroundInfo>();
@@ -233,7 +233,7 @@ void glass::DisplayMechanism2D(Mechanism2DModel* model,
   // elements
   model->ForEachRoot([&](auto& rootModel) {
     frameData.DrawGroup(drawList, rootModel,
-                        frc::Pose2d{rootModel.GetPosition(), 0_deg});
+                        wpi::math::Pose2d{rootModel.GetPosition(), 0_deg});
   });
 
 #if 0

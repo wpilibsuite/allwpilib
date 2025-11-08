@@ -8,11 +8,11 @@
 
 #include <string_view>
 
-namespace wpi {
+namespace wpi::util {
 
 void ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg);
 void ThrowIndexOobException(JNIEnv* env, std::string_view msg);
 void ThrowIOException(JNIEnv* env, std::string_view msg);
 void ThrowNullPointerException(JNIEnv* env, std::string_view msg);
 
-}  // namespace wpi
+}  // namespace wpi::util

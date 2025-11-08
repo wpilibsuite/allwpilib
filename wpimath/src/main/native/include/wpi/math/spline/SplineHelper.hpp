@@ -12,7 +12,7 @@
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 
-namespace frc {
+namespace wpi::math {
 /**
  * Helper class that is used to generate cubic and quintic splines from user
  * provided waypoints.
@@ -28,7 +28,7 @@ class WPILIB_DLLEXPORT SplineHelper {
    * @param end               The ending pose.
    * @return 2 cubic control vectors.
    */
-  static wpi::array<Spline<3>::ControlVector, 2>
+  static wpi::util::array<Spline<3>::ControlVector, 2>
   CubicControlVectorsFromWaypoints(
       const Pose2d& start, const std::vector<Translation2d>& interiorWaypoints,
       const Pose2d& end) {
@@ -97,17 +97,17 @@ class WPILIB_DLLEXPORT SplineHelper {
       const Spline<3>::ControlVector& end) {
     std::vector<CubicHermiteSpline> splines;
 
-    wpi::array<double, 2> xInitial = start.x;
-    wpi::array<double, 2> yInitial = start.y;
-    wpi::array<double, 2> xFinal = end.x;
-    wpi::array<double, 2> yFinal = end.y;
+    wpi::util::array<double, 2> xInitial = start.x;
+    wpi::util::array<double, 2> yInitial = start.y;
+    wpi::util::array<double, 2> xFinal = end.x;
+    wpi::util::array<double, 2> yFinal = end.y;
 
     if (waypoints.size() > 1) {
       waypoints.emplace(waypoints.begin(),
-                        Translation2d{units::meter_t{xInitial[0]},
-                                      units::meter_t{yInitial[0]}});
+                        Translation2d{wpi::units::meter_t{xInitial[0]},
+                                      wpi::units::meter_t{yInitial[0]}});
       waypoints.emplace_back(
-          Translation2d{units::meter_t{xFinal[0]}, units::meter_t{yFinal[0]}});
+          Translation2d{wpi::units::meter_t{xFinal[0]}, wpi::units::meter_t{yFinal[0]}});
 
       // Populate tridiagonal system for clamped cubic
       /* See:
@@ -186,8 +186,8 @@ class WPILIB_DLLEXPORT SplineHelper {
       const double yDeriv =
           (3 * (yFinal[0] - yInitial[0]) - yFinal[1] - yInitial[1]) / 4.0;
 
-      wpi::array<double, 2> midXControlVector{waypoints[0].X().value(), xDeriv};
-      wpi::array<double, 2> midYControlVector{waypoints[0].Y().value(), yDeriv};
+      wpi::util::array<double, 2> midXControlVector{waypoints[0].X().value(), xDeriv};
+      wpi::util::array<double, 2> midYControlVector{waypoints[0].Y().value(), yDeriv};
 
       splines.emplace_back(xInitial, midXControlVector, yInitial,
                            midYControlVector);
@@ -265,8 +265,8 @@ class WPILIB_DLLEXPORT SplineHelper {
       const auto& bFinal = b.GetFinalControlVector();
 
       // Create cubic splines with the same control vectors.
-      auto Trim = [](const wpi::array<double, 3>& a) {
-        return wpi::array<double, 2>{a[0], a[1]};
+      auto Trim = [](const wpi::util::array<double, 3>& a) {
+        return wpi::util::array<double, 2>{a[0], a[1]};
       };
       CubicHermiteSpline ca{Trim(aInitial.x), Trim(aFinal.x), Trim(aInitial.y),
                             Trim(aFinal.y)};
@@ -274,8 +274,8 @@ class WPILIB_DLLEXPORT SplineHelper {
                             Trim(bFinal.y)};
 
       // Calculate the second derivatives at the knot points.
-      frc::Vectord<4> bases{1.0, 1.0, 1.0, 1.0};
-      frc::Vectord<6> combinedA = ca.Coefficients() * bases;
+      wpi::math::Vectord<4> bases{1.0, 1.0, 1.0, 1.0};
+      wpi::math::Vectord<6> combinedA = ca.Coefficients() * bases;
 
       double ddxA = combinedA(4);
       double ddyA = combinedA(5);
@@ -365,4 +365,4 @@ class WPILIB_DLLEXPORT SplineHelper {
     }
   }
 };
-}  // namespace frc
+}  // namespace wpi::math

@@ -29,9 +29,9 @@
 
 using namespace sysid;
 
-Analyzer::Analyzer(glass::Storage& storage, wpi::Logger& logger)
+Analyzer::Analyzer(wpi::glass::Storage& storage, wpi::util::Logger& logger)
     : m_logger(logger) {
-  // Fill the StringMap with preset values.
+  // Fill the wpi::util::StringMap with preset values.
   m_presets["Default"] = presets::kDefault;
   m_presets["WPILib"] = presets::kWPILib;
   m_presets["CTRE Phoenix 5"] = presets::kCTREv5;
@@ -55,8 +55,8 @@ void Analyzer::UpdateFeedforwardGains() {
     m_settings.preset.measurementDelay =
         m_settings.type == FeedbackControllerLoopType::kPosition
             // Clamp feedback measurement delay to ≥ 0
-            ? units::math::max(0_s, m_manager->GetPositionDelay())
-            : units::math::max(0_s, m_manager->GetVelocityDelay());
+            ? wpi::units::math::max(0_s, m_manager->GetPositionDelay())
+            : wpi::units::math::max(0_s, m_manager->GetVelocityDelay());
     PrepareGraphs();
   } catch (const sysid::InvalidDataError& e) {
     m_state = AnalyzerState::kGeneralDataError;
@@ -70,7 +70,7 @@ void Analyzer::UpdateFeedforwardGains() {
   } catch (const AnalysisManager::FileReadingError& e) {
     m_state = AnalyzerState::kFileError;
     HandleError(e.what());
-  } catch (const wpi::json::exception& e) {
+  } catch (const wpi::util::json::exception& e) {
     m_state = AnalyzerState::kFileError;
     HandleError(e.what());
   } catch (const std::exception& e) {
@@ -86,7 +86,7 @@ void Analyzer::UpdateFeedbackGains() {
   const auto& Ka = m_feedforwardGains.Ka;
   if (Kv.isValidGain && Ka.isValidGain) {
     const auto& fb = m_manager->CalculateFeedback(Kv, Ka);
-    m_timescale = units::second_t{Ka.gain / Kv.gain};
+    m_timescale = wpi::units::second_t{Ka.gain / Kv.gain};
     m_timescaleValid = true;
     m_Kp = fb.Kp;
     m_Kd = fb.Kd;
@@ -298,7 +298,7 @@ void Analyzer::PrepareData() {
   } catch (const AnalysisManager::FileReadingError& e) {
     m_state = AnalyzerState::kFileError;
     HandleError(e.what());
-  } catch (const wpi::json::exception& e) {
+  } catch (const wpi::util::json::exception& e) {
     m_state = AnalyzerState::kFileError;
     HandleError(e.what());
   } catch (const std::exception& e) {
@@ -475,7 +475,7 @@ void Analyzer::DisplayFeedforwardParameters(float beginX, float beginY) {
     if (ImGui::SliderFloat("Test Duration", &m_stepTestDuration,
                            m_manager->GetMinStepTime().value(),
                            m_manager->GetMaxStepTime().value(), "%.2f")) {
-      m_settings.stepTestDuration = units::second_t{m_stepTestDuration};
+      m_settings.stepTestDuration = wpi::units::second_t{m_stepTestDuration};
       PrepareData();
     }
   }
@@ -612,9 +612,9 @@ void Analyzer::DisplayFeedbackGains() {
   sysid::CreateTooltip(
       "Gain presets represent how feedback gains are calculated for your "
       "specific feedback controller:\n\n"
-      "Default, WPILib (2020-): For use with the new WPILib PIDController "
+      "Default, WPILib (2020-): For use with the new WPILib wpi::math::PIDController "
       "class.\n"
-      "WPILib (Pre-2020): For use with the old WPILib PIDController class.\n"
+      "WPILib (Pre-2020): For use with the old WPILib wpi::math::PIDController class.\n"
       "CTRE: For use with CTRE units. These are the default units that ship "
       "with CTRE motor controllers.\n"
       "REV (Brushless): For use with NEO and NEO 550 motors on a SPARK MAX.\n"

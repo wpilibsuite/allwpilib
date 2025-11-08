@@ -16,7 +16,7 @@
 #include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/json_fwd.hpp"
 
-namespace nt {
+namespace wpi::nt {
 
 class GenericEntry;
 class GenericPublisher;
@@ -55,7 +55,7 @@ class Topic {
    *
    * @return the topic's name
    */
-  std::string GetName() const { return ::nt::GetTopicName(m_handle); }
+  std::string GetName() const { return ::wpi::nt::GetTopicName(m_handle); }
 
   /**
    * Gets the type of the topic.
@@ -63,7 +63,7 @@ class Topic {
    * @return the topic's type
    */
   NetworkTableType GetType() const {
-    return static_cast<NetworkTableType>(::nt::GetTopicType(m_handle));
+    return static_cast<NetworkTableType>(::wpi::nt::GetTopicType(m_handle));
   }
 
   /**
@@ -73,7 +73,7 @@ class Topic {
    * @return the topic's type
    */
   std::string GetTypeString() const {
-    return ::nt::GetTopicTypeString(m_handle);
+    return ::wpi::nt::GetTopicTypeString(m_handle);
   }
 
   /**
@@ -82,7 +82,7 @@ class Topic {
    * @param persistent True for persistent, false for not persistent.
    */
   void SetPersistent(bool persistent) {
-    ::nt::SetTopicPersistent(m_handle, persistent);
+    ::wpi::nt::SetTopicPersistent(m_handle, persistent);
   }
 
   /**
@@ -90,7 +90,7 @@ class Topic {
    *
    * @return True if the value is persistent.
    */
-  bool IsPersistent() const { return ::nt::GetTopicPersistent(m_handle); }
+  bool IsPersistent() const { return ::wpi::nt::GetTopicPersistent(m_handle); }
 
   /**
    * Make the server retain the topic even when there are no publishers.
@@ -98,7 +98,7 @@ class Topic {
    * @param retained True for retained, false for not retained.
    */
   void SetRetained(bool retained) {
-    ::nt::SetTopicRetained(m_handle, retained);
+    ::wpi::nt::SetTopicRetained(m_handle, retained);
   }
 
   /**
@@ -107,7 +107,7 @@ class Topic {
    *
    * @return True if the topic is retained.
    */
-  bool IsRetained() const { return ::nt::GetTopicRetained(m_handle); }
+  bool IsRetained() const { return ::wpi::nt::GetTopicRetained(m_handle); }
 
   /**
    * Allow storage of the topic's last value, allowing the value to be read (and
@@ -115,21 +115,21 @@ class Topic {
    *
    * @param cached True for cached, false for not cached.
    */
-  void SetCached(bool cached) { ::nt::SetTopicCached(m_handle, cached); }
+  void SetCached(bool cached) { ::wpi::nt::SetTopicCached(m_handle, cached); }
 
   /**
    * Returns whether the topic's last value is stored.
    *
    * @return True if the topic is cached.
    */
-  bool IsCached() const { return ::nt::GetTopicCached(m_handle); }
+  bool IsCached() const { return ::wpi::nt::GetTopicCached(m_handle); }
 
   /**
    * Determines if the topic is currently being published.
    *
    * @return True if the topic exists, false otherwise.
    */
-  bool Exists() const { return nt::GetTopicExists(m_handle); }
+  bool Exists() const { return wpi::nt::GetTopicExists(m_handle); }
 
   /**
    * Gets the current value of a property (as a JSON object).
@@ -137,7 +137,7 @@ class Topic {
    * @param name property name
    * @return JSON object; null object if the property does not exist.
    */
-  wpi::json GetProperty(std::string_view name) const;
+  wpi::util::json GetProperty(std::string_view name) const;
 
   /**
    * Sets a property value.
@@ -145,7 +145,7 @@ class Topic {
    * @param name property name
    * @param value property value
    */
-  void SetProperty(std::string_view name, const wpi::json& value);
+  void SetProperty(std::string_view name, const wpi::util::json& value);
 
   /**
    * Deletes a property.  Has no effect if the property does not exist.
@@ -153,7 +153,7 @@ class Topic {
    * @param name property name
    */
   void DeleteProperty(std::string_view name) {
-    ::nt::DeleteTopicProperty(m_handle, name);
+    ::wpi::nt::DeleteTopicProperty(m_handle, name);
   }
 
   /**
@@ -162,7 +162,7 @@ class Topic {
    *
    * @return JSON object
    */
-  wpi::json GetProperties() const;
+  wpi::util::json GetProperties() const;
 
   /**
    * Updates multiple topic properties.  Each key in the passed-in object is
@@ -173,8 +173,8 @@ class Topic {
    * @param properties JSON object with keys to add/update/delete
    * @return False if properties is not an object
    */
-  bool SetProperties(const wpi::json& properties) {
-    return ::nt::SetTopicProperties(m_handle, properties);
+  bool SetProperties(const wpi::util::json& properties) {
+    return ::wpi::nt::SetTopicProperties(m_handle, properties);
   }
 
   /**
@@ -182,7 +182,7 @@ class Topic {
    *
    * @return Topic information
    */
-  TopicInfo GetInfo() const { return ::nt::GetTopicInfo(m_handle); }
+  TopicInfo GetInfo() const { return ::wpi::nt::GetTopicInfo(m_handle); }
 
   /**
    * Create a new subscriber to the topic.
@@ -257,7 +257,7 @@ class Topic {
    */
   [[nodiscard]]
   GenericPublisher GenericPublishEx(
-      std::string_view typeString, const wpi::json& properties,
+      std::string_view typeString, const wpi::util::json& properties,
       const PubSubOptions& options = kDefaultPubSubOptions);
 
   /**
@@ -319,7 +319,7 @@ class Topic {
 /** NetworkTables subscriber. */
 class Subscriber {
  public:
-  virtual ~Subscriber() { ::nt::Release(m_subHandle); }
+  virtual ~Subscriber() { ::wpi::nt::Release(m_subHandle); }
 
   Subscriber(const Subscriber&) = delete;
   Subscriber& operator=(const Subscriber&) = delete;
@@ -330,7 +330,7 @@ class Subscriber {
 
   Subscriber& operator=(Subscriber&& rhs) {
     if (m_subHandle != 0) {
-      ::nt::Release(m_subHandle);
+      ::wpi::nt::Release(m_subHandle);
     }
     m_subHandle = rhs.m_subHandle;
     rhs.m_subHandle = 0;
@@ -356,7 +356,7 @@ class Subscriber {
    *
    * @return True if the topic exists, false otherwise.
    */
-  bool Exists() const { return nt::GetTopicExists(m_subHandle); }
+  bool Exists() const { return wpi::nt::GetTopicExists(m_subHandle); }
 
   /**
    * Gets the last time the value was changed.
@@ -366,7 +366,7 @@ class Subscriber {
    * @return Topic last change time
    */
   int64_t GetLastChange() const {
-    return ::nt::GetEntryLastChange(m_subHandle);
+    return ::wpi::nt::GetEntryLastChange(m_subHandle);
   }
 
   /**
@@ -375,7 +375,7 @@ class Subscriber {
    * @return Topic
    */
   Topic GetTopic() const {
-    return Topic{::nt::GetTopicFromHandle(m_subHandle)};
+    return Topic{::wpi::nt::GetTopicFromHandle(m_subHandle)};
   }
 
  protected:
@@ -391,7 +391,7 @@ class Subscriber {
 /** NetworkTables publisher. */
 class Publisher {
  public:
-  virtual ~Publisher() { ::nt::Release(m_pubHandle); }
+  virtual ~Publisher() { ::wpi::nt::Release(m_pubHandle); }
 
   Publisher(const Publisher&) = delete;
   Publisher& operator=(const Publisher&) = delete;
@@ -402,7 +402,7 @@ class Publisher {
 
   Publisher& operator=(Publisher&& rhs) {
     if (m_pubHandle != 0) {
-      ::nt::Release(m_pubHandle);
+      ::wpi::nt::Release(m_pubHandle);
     }
     m_pubHandle = rhs.m_pubHandle;
     rhs.m_pubHandle = 0;
@@ -429,7 +429,7 @@ class Publisher {
    * @return Topic
    */
   Topic GetTopic() const {
-    return Topic{::nt::GetTopicFromHandle(m_pubHandle)};
+    return Topic{::wpi::nt::GetTopicFromHandle(m_pubHandle)};
   }
 
  protected:
@@ -443,4 +443,4 @@ class Publisher {
   void anchor();
 };
 
-}  // namespace nt
+}  // namespace wpi::nt

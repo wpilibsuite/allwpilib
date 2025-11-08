@@ -8,7 +8,7 @@
 
 #include "wpi/util/FunctionExtras.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 /**
  * A view is the contents of a window (1:1 mapping).
@@ -54,6 +54,6 @@ class View {
  * @param display Display function
  * @return unique_ptr to View
  */
-std::unique_ptr<View> MakeFunctionView(wpi::unique_function<void()> display);
+std::unique_ptr<View> MakeFunctionView(wpi::util::unique_function<void()> display);
 
-}  // namespace glass
+}  // namespace wpi::glass

@@ -20,5 +20,5 @@ void DriveDistance::End(bool interrupted) {
 }
 
 bool DriveDistance::IsFinished() {
-  return units::math::abs(m_drive->GetAverageDistance()) >= m_distance;
+  return wpi::units::math::abs(m_drive->GetAverageDistance()) >= m_distance;
 }

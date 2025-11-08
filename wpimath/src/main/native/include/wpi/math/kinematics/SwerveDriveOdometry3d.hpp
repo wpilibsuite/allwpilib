@@ -17,7 +17,7 @@
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/timestamp.h"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * Class for swerve drive odometry. Odometry allows you to track the robot's
@@ -30,8 +30,8 @@ namespace frc {
  */
 template <size_t NumModules>
 class SwerveDriveOdometry3d
-    : public Odometry3d<wpi::array<SwerveModuleState, NumModules>,
-                        wpi::array<SwerveModulePosition, NumModules>> {
+    : public Odometry3d<wpi::util::array<SwerveModuleState, NumModules>,
+                        wpi::util::array<SwerveModulePosition, NumModules>> {
  public:
   /**
    * Constructs a SwerveDriveOdometry3d object.
@@ -47,7 +47,7 @@ class SwerveDriveOdometry3d
 #endif  // defined(__GNUC__) && !defined(__clang__)
   SwerveDriveOdometry3d(
       SwerveDriveKinematics<NumModules> kinematics, const Rotation3d& gyroAngle,
-      const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
+      const wpi::util::array<SwerveModulePosition, NumModules>& modulePositions,
       const Pose3d& initialPose = Pose3d{})
       : SwerveDriveOdometry3d::Odometry3d(m_kinematicsImpl, gyroAngle,
                                           modulePositions, initialPose),
@@ -65,4 +65,4 @@ class SwerveDriveOdometry3d
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
     SwerveDriveOdometry3d<4>;
 
-}  // namespace frc
+}  // namespace wpi::math

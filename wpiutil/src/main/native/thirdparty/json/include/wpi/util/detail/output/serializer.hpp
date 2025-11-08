@@ -828,7 +828,7 @@ class serializer
     void dump_float(number_float_t x, std::true_type /*is_ieee_single_or_double*/)
     {
         auto* begin = number_buffer.data();
-        auto* end = ::wpi::detail::to_chars(begin, begin + number_buffer.size(), x);
+        auto* end = ::wpi::util::detail::to_chars(begin, begin + number_buffer.size(), x);
 
         o->write_characters(begin, static_cast<size_t>(end - begin));
     }

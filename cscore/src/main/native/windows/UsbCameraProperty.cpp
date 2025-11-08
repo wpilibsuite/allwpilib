@@ -8,7 +8,7 @@
 
 #include "ComPtr.hpp"
 
-using namespace cs;
+using namespace wpi::cs;
 
 UsbCameraProperty::UsbCameraProperty(std::string_view name_,
                                      tagVideoProcAmpProperty tag, bool autoProp,
@@ -38,7 +38,7 @@ UsbCameraProperty::UsbCameraProperty(std::string_view name_,
   }
 }
 
-bool UsbCameraProperty::DeviceGet(std::unique_lock<wpi::mutex>& lock,
+bool UsbCameraProperty::DeviceGet(std::unique_lock<wpi::util::mutex>& lock,
                                   IAMVideoProcAmp* pProcAmp) {
   if (!pProcAmp) {
     return true;
@@ -54,11 +54,11 @@ bool UsbCameraProperty::DeviceGet(std::unique_lock<wpi::mutex>& lock,
 
   return false;
 }
-bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::mutex>& lock,
+bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::util::mutex>& lock,
                                   IAMVideoProcAmp* pProcAmp) const {
   return DeviceSet(lock, pProcAmp, value);
 }
-bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::mutex>& lock,
+bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::util::mutex>& lock,
                                   IAMVideoProcAmp* pProcAmp,
                                   int newValue) const {
   if (!pProcAmp) {
@@ -104,7 +104,7 @@ UsbCameraProperty::UsbCameraProperty(std::string_view name_,
   }
 }
 
-bool UsbCameraProperty::DeviceGet(std::unique_lock<wpi::mutex>& lock,
+bool UsbCameraProperty::DeviceGet(std::unique_lock<wpi::util::mutex>& lock,
                                   IAMCameraControl* pProcAmp) {
   if (!pProcAmp) {
     return true;
@@ -120,11 +120,11 @@ bool UsbCameraProperty::DeviceGet(std::unique_lock<wpi::mutex>& lock,
 
   return false;
 }
-bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::mutex>& lock,
+bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::util::mutex>& lock,
                                   IAMCameraControl* pProcAmp) const {
   return DeviceSet(lock, pProcAmp, value);
 }
-bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::mutex>& lock,
+bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::util::mutex>& lock,
                                   IAMCameraControl* pProcAmp,
                                   int newValue) const {
   if (!pProcAmp) {
@@ -141,7 +141,7 @@ bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::mutex>& lock,
   return false;
 }
 
-bool UsbCameraProperty::DeviceGet(std::unique_lock<wpi::mutex>& lock,
+bool UsbCameraProperty::DeviceGet(std::unique_lock<wpi::util::mutex>& lock,
                                   IMFSourceReader* sourceReader) {
   if (!sourceReader) {
     return true;
@@ -167,11 +167,11 @@ bool UsbCameraProperty::DeviceGet(std::unique_lock<wpi::mutex>& lock,
     }
   }
 }
-bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::mutex>& lock,
+bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::util::mutex>& lock,
                                   IMFSourceReader* sourceReader) const {
   return DeviceSet(lock, sourceReader, value);
 }
-bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::mutex>& lock,
+bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::util::mutex>& lock,
                                   IMFSourceReader* sourceReader,
                                   int newValue) const {
   if (!sourceReader) {

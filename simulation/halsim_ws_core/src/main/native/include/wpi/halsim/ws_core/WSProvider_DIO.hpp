@@ -17,7 +17,7 @@ class HALSimWSProviderDIO : public HALSimWSHalChanProvider {
   using HALSimWSHalChanProvider::HALSimWSHalChanProvider;
   ~HALSimWSProviderDIO() override;
 
-  void OnNetValueChanged(const wpi::json& json) override;
+  void OnNetValueChanged(const wpi::util::json& json) override;
 
  protected:
   void RegisterCallbacks() override;

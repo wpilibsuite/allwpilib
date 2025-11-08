@@ -9,7 +9,7 @@
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 
-namespace frc {
+namespace wpi::math {
 /**
  * Represents a hermite spline of degree 5.
  */
@@ -29,10 +29,10 @@ class WPILIB_DLLEXPORT QuinticHermiteSpline : public Spline<5> {
    * @param yFinalControlVector The control vector for the final point in
    * the y dimension.
    */
-  QuinticHermiteSpline(wpi::array<double, 3> xInitialControlVector,
-                       wpi::array<double, 3> xFinalControlVector,
-                       wpi::array<double, 3> yInitialControlVector,
-                       wpi::array<double, 3> yFinalControlVector)
+  QuinticHermiteSpline(wpi::util::array<double, 3> xInitialControlVector,
+                       wpi::util::array<double, 3> xFinalControlVector,
+                       wpi::util::array<double, 3> yInitialControlVector,
+                       wpi::util::array<double, 3> yFinalControlVector)
       : m_initialControlVector{xInitialControlVector, yInitialControlVector},
         m_finalControlVector{xFinalControlVector, yFinalControlVector} {
     const auto hermite = MakeHermiteBasis();
@@ -145,13 +145,13 @@ class WPILIB_DLLEXPORT QuinticHermiteSpline : public Spline<5> {
    * @return The control vector matrix for a dimension.
    */
   static constexpr Vectord<6> ControlVectorFromArrays(
-      wpi::array<double, 3> initialVector, wpi::array<double, 3> finalVector) {
+      wpi::util::array<double, 3> initialVector, wpi::util::array<double, 3> finalVector) {
     return Vectord<6>{{initialVector[0]}, {initialVector[1]},
                       {initialVector[2]}, {finalVector[0]},
                       {finalVector[1]},   {finalVector[2]}};
   }
 };
-}  // namespace frc
+}  // namespace wpi::math
 
 #include "wpi/math/spline/proto/QuinticHermiteSplineProto.hpp"
 #include "wpi/math/spline/struct/QuinticHermiteSplineStruct.hpp"

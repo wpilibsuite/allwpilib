@@ -7,9 +7,9 @@
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 #include "wpimath/protobuf/geometry2d.npb.h"
 
-std::optional<frc::Ellipse2d> wpi::Protobuf<frc::Ellipse2d>::Unpack(
+std::optional<wpi::math::Ellipse2d> wpi::util::Protobuf<wpi::math::Ellipse2d>::Unpack(
     InputStream& stream) {
-  wpi::UnpackCallback<frc::Pose2d> pose;
+  wpi::util::UnpackCallback<wpi::math::Pose2d> pose;
   wpi_proto_ProtobufEllipse2d msg{
       .center = pose.Callback(),
       .xSemiAxis = 0,
@@ -25,16 +25,16 @@ std::optional<frc::Ellipse2d> wpi::Protobuf<frc::Ellipse2d>::Unpack(
     return {};
   }
 
-  return frc::Ellipse2d{
+  return wpi::math::Ellipse2d{
       ipose[0],
-      units::meter_t{msg.xSemiAxis},
-      units::meter_t{msg.ySemiAxis},
+      wpi::units::meter_t{msg.xSemiAxis},
+      wpi::units::meter_t{msg.ySemiAxis},
   };
 }
 
-bool wpi::Protobuf<frc::Ellipse2d>::Pack(OutputStream& stream,
-                                         const frc::Ellipse2d& value) {
-  wpi::PackCallback pose{&value.Center()};
+bool wpi::util::Protobuf<wpi::math::Ellipse2d>::Pack(OutputStream& stream,
+                                         const wpi::math::Ellipse2d& value) {
+  wpi::util::PackCallback pose{&value.Center()};
   wpi_proto_ProtobufEllipse2d msg{
       .center = pose.Callback(),
       .xSemiAxis = value.XSemiAxis().value(),

@@ -36,13 +36,13 @@
 #include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
-namespace frc {
+namespace wpi::math {
 /**
  * Class used to parameterize a trajectory by time.
  */
 class WPILIB_DLLEXPORT TrajectoryParameterizer {
  public:
-  using PoseWithCurvature = std::pair<Pose2d, units::curvature_t>;
+  using PoseWithCurvature = std::pair<Pose2d, wpi::units::curvature_t>;
 
   /**
    * Parameterize the trajectory by time. This is where the velocity profile is
@@ -66,10 +66,10 @@ class WPILIB_DLLEXPORT TrajectoryParameterizer {
   static Trajectory TimeParameterizeTrajectory(
       const std::vector<PoseWithCurvature>& points,
       const std::vector<std::unique_ptr<TrajectoryConstraint>>& constraints,
-      units::meters_per_second_t startVelocity,
-      units::meters_per_second_t endVelocity,
-      units::meters_per_second_t maxVelocity,
-      units::meters_per_second_squared_t maxAcceleration, bool reversed);
+      wpi::units::meters_per_second_t startVelocity,
+      wpi::units::meters_per_second_t endVelocity,
+      wpi::units::meters_per_second_t maxVelocity,
+      wpi::units::meters_per_second_squared_t maxAcceleration, bool reversed);
 
  private:
   constexpr static double kEpsilon = 1E-6;
@@ -80,11 +80,11 @@ class WPILIB_DLLEXPORT TrajectoryParameterizer {
    * the trajectory, max velocity, min acceleration and max acceleration.
    */
   struct ConstrainedState {
-    PoseWithCurvature pose = {Pose2d{}, units::curvature_t{0.0}};
-    units::meter_t distance = 0_m;
-    units::meters_per_second_t maxVelocity = 0_mps;
-    units::meters_per_second_squared_t minAcceleration = 0_mps_sq;
-    units::meters_per_second_squared_t maxAcceleration = 0_mps_sq;
+    PoseWithCurvature pose = {Pose2d{}, wpi::units::curvature_t{0.0}};
+    wpi::units::meter_t distance = 0_m;
+    wpi::units::meters_per_second_t maxVelocity = 0_mps;
+    wpi::units::meters_per_second_squared_t minAcceleration = 0_mps_sq;
+    wpi::units::meters_per_second_squared_t maxAcceleration = 0_mps_sq;
   };
 
   /**
@@ -102,4 +102,4 @@ class WPILIB_DLLEXPORT TrajectoryParameterizer {
       const std::vector<std::unique_ptr<TrajectoryConstraint>>& constraints,
       ConstrainedState* state);
 };
-}  // namespace frc
+}  // namespace wpi::math

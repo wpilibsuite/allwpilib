@@ -11,14 +11,14 @@
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Class for getting voltage, current, temperature, power and energy from the
  * CTRE Power Distribution Panel (PDP) or REV Power Distribution Hub (PDH).
  */
-class PowerDistribution : public wpi::Sendable,
-                          public wpi::SendableHelper<PowerDistribution> {
+class PowerDistribution : public wpi::util::Sendable,
+                          public wpi::util::SendableHelper<PowerDistribution> {
  public:
   /// Default module number.
   static constexpr int kDefaultModule = -1;
@@ -343,11 +343,11 @@ class PowerDistribution : public wpi::Sendable,
    */
   StickyFaults GetStickyFaults() const;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
-  hal::Handle<HAL_PowerDistributionHandle, HAL_CleanPowerDistribution> m_handle;
+  wpi::hal::Handle<HAL_PowerDistributionHandle, HAL_CleanPowerDistribution> m_handle;
   int m_module;
 };
 
-}  // namespace frc
+}  // namespace wpi

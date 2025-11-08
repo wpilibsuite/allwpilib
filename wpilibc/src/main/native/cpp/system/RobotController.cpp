@@ -12,7 +12,7 @@
 #include "wpi/hal/Power.h"
 #include "wpi/system/Errors.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 std::function<uint64_t()> RobotController::m_timeSource = [] {
   return RobotController::GetFPGATime();
@@ -21,7 +21,7 @@ std::function<uint64_t()> RobotController::m_timeSource = [] {
 std::string RobotController::GetSerialNumber() {
   WPI_String serialNum;
   HAL_GetSerialNumber(&serialNum);
-  std::string ret{wpi::to_string_view(&serialNum)};
+  std::string ret{wpi::util::to_string_view(&serialNum)};
   WPI_FreeString(&serialNum);
   return ret;
 }
@@ -29,7 +29,7 @@ std::string RobotController::GetSerialNumber() {
 std::string RobotController::GetComments() {
   WPI_String comments;
   HAL_GetComments(&comments);
-  std::string ret{wpi::to_string_view(&comments)};
+  std::string ret{wpi::util::to_string_view(&comments)};
   WPI_FreeString(&comments);
   return ret;
 }
@@ -53,11 +53,11 @@ uint64_t RobotController::GetFPGATime() {
   return time;
 }
 
-units::volt_t RobotController::GetBatteryVoltage() {
+wpi::units::volt_t RobotController::GetBatteryVoltage() {
   int32_t status = 0;
   double retVal = HAL_GetVinVoltage(&status);
   FRC_CheckErrorStatus(status, "GetBatteryVoltage");
-  return units::volt_t{retVal};
+  return wpi::units::volt_t{retVal};
 }
 
 bool RobotController::IsSysActive() {
@@ -142,24 +142,24 @@ void RobotController::ResetRailFaultCounts() {
   FRC_CheckErrorStatus(status, "ResetRailFaultCounts");
 }
 
-units::volt_t RobotController::GetBrownoutVoltage() {
+wpi::units::volt_t RobotController::GetBrownoutVoltage() {
   int32_t status = 0;
   double retVal = HAL_GetBrownoutVoltage(&status);
   FRC_CheckErrorStatus(status, "GetBrownoutVoltage");
-  return units::volt_t{retVal};
+  return wpi::units::volt_t{retVal};
 }
 
-void RobotController::SetBrownoutVoltage(units::volt_t brownoutVoltage) {
+void RobotController::SetBrownoutVoltage(wpi::units::volt_t brownoutVoltage) {
   int32_t status = 0;
   HAL_SetBrownoutVoltage(brownoutVoltage.value(), &status);
   FRC_CheckErrorStatus(status, "SetBrownoutVoltage");
 }
 
-units::celsius_t RobotController::GetCPUTemp() {
+wpi::units::celsius_t RobotController::GetCPUTemp() {
   int32_t status = 0;
   double retVal = HAL_GetCPUTemp(&status);
   FRC_CheckErrorStatus(status, "GetCPUTemp");
-  return units::celsius_t{retVal};
+  return wpi::units::celsius_t{retVal};
 }
 
 CANStatus RobotController::GetCANStatus(int busId) {

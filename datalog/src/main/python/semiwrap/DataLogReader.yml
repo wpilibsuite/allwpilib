@@ -263,7 +263,7 @@ classes:
     ignore: true
   wpi::log::DataLogReader:
     typealias:
-    - wpi::MemoryBuffer
+    - wpi::util::MemoryBuffer
     methods:
       DataLogReader:
         ignore: true
@@ -294,7 +294,7 @@ inline_code: |
 
   cls_DataLogReader
     .def(py::init([](const std::string &filename) {
-      auto mbuf = wpi::MemoryBuffer::GetFile(filename);
+      auto mbuf = wpi::util::MemoryBuffer::GetFile(filename);
       if (!mbuf) {
         py::gil_scoped_acquire gil;
         #ifdef _WIN32
@@ -318,7 +318,7 @@ inline_code: |
         throw py::value_error("buffer must only have a single dimension");
       }
 
-      auto mbuf = wpi::MemoryBuffer::GetMemBuffer(std::span((uint8_t*)req.ptr, req.size), name);
+      auto mbuf = wpi::util::MemoryBuffer::GetMemBuffer(std::span((uint8_t*)req.ptr, req.size), name);
 
       {
         py::gil_scoped_release gil;

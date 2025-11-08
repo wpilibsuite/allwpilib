@@ -17,7 +17,7 @@
 #include "wpi/util/sendable/SendableBuilder.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 AnalogInput::AnalogInput(int channel) {
   if (!SensorUtil::CheckAnalogInputChannel(channel)) {
@@ -26,13 +26,13 @@ AnalogInput::AnalogInput(int channel) {
 
   m_channel = channel;
   int32_t status = 0;
-  std::string stackTrace = wpi::GetStackTrace(1);
+  std::string stackTrace = wpi::util::GetStackTrace(1);
   m_port = HAL_InitializeAnalogInputPort(channel, stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", channel);
 
   HAL_ReportUsage("IO", channel, "AnalogInput");
 
-  wpi::SendableRegistry::Add(this, "AnalogInput", channel);
+  wpi::util::SendableRegistry::Add(this, "AnalogInput", channel);
 }
 
 int AnalogInput::GetValue() const {
@@ -124,7 +124,7 @@ void AnalogInput::SetSimDevice(HAL_SimDeviceHandle device) {
   HAL_SetAnalogInputSimDevice(m_port, device);
 }
 
-void AnalogInput::InitSendable(wpi::SendableBuilder& builder) {
+void AnalogInput::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Analog Input");
   builder.AddDoubleProperty(
       "Value", [=, this] { return GetAverageVoltage(); }, nullptr);

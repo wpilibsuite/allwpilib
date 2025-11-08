@@ -20,18 +20,18 @@
 namespace wpilibws {
 
 class HALSimHttpConnection
-    : public wpi::HttpWebSocketServerConnection<HALSimHttpConnection>,
+    : public wpi::net::HttpWebSocketServerConnection<HALSimHttpConnection>,
       public HALSimBaseWebSocketConnection {
  public:
   HALSimHttpConnection(std::shared_ptr<HALSimWeb> server,
-                       std::shared_ptr<wpi::uv::Stream> stream)
-      : wpi::HttpWebSocketServerConnection<HALSimHttpConnection>(stream, {}),
+                       std::shared_ptr<wpi::net::uv::Stream> stream)
+      : wpi::net::HttpWebSocketServerConnection<HALSimHttpConnection>(stream, {}),
         m_server(std::move(server)),
         m_buffers(128) {}
 
  public:
   // callable from any thread
-  void OnSimValueChanged(const wpi::json& msg) override;
+  void OnSimValueChanged(const wpi::util::json& msg) override;
 
  protected:
   void ProcessRequest() override;
@@ -51,7 +51,7 @@ class HALSimHttpConnection
   bool m_isWsConnected = false;
 
   // these are only valid if the websocket is connected
-  wpi::uv::SimpleBufferPool<4> m_buffers;
+  wpi::net::uv::SimpleBufferPool<4> m_buffers;
   std::mutex m_buffers_mutex;
 };
 

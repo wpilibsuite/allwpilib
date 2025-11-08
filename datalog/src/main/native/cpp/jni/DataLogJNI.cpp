@@ -19,7 +19,7 @@
 #include "wpi/datalog/FileLogger.hpp"
 #include "wpi/util/jni_util.hpp"
 
-using namespace wpi::java;
+using namespace wpi::util::java;
 using namespace wpi::log;
 
 static bool mockTimeEnabled = false;
@@ -53,12 +53,12 @@ void wpi::ThrowNullPointerException(JNIEnv* env, std::string_view msg) {
 }
 
 namespace {
-class buf_ostream : public wpi::raw_uvector_ostream {
+class buf_ostream : public wpi::util::raw_uvector_ostream {
  private:
   std::vector<uint8_t> data;
 
  public:
-  buf_ostream() : raw_uvector_ostream{data} {}
+  buf_ostream() : wpi::util::raw_uvector_ostream{data} {}
 
   void clear() { data.clear(); }
 };
@@ -181,7 +181,7 @@ Java_org_wpilib_util_WPIUtilJNI_now
   if (mockTimeEnabled) {
     return mockNow;
   } else {
-    return wpi::Now();
+    return wpi::util::Now();
   }
 }
 
@@ -599,7 +599,7 @@ Java_org_wpilib_datalog_DataLogJNI_appendIntegerArray
         entry, {reinterpret_cast<const int64_t*>(jarr.data()), jarr.size()},
         timestamp);
   } else {
-    wpi::SmallVector<int64_t, 16> arr;
+    wpi::util::SmallVector<int64_t, 16> arr;
     arr.reserve(jarr.size());
     for (auto v : jarr) {
       arr.push_back(v);

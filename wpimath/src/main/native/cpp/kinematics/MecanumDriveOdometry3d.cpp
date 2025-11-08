@@ -6,7 +6,7 @@
 
 #include "wpi/math/util/MathShared.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 MecanumDriveOdometry3d::MecanumDriveOdometry3d(
     MecanumDriveKinematics kinematics, const Rotation3d& gyroAngle,

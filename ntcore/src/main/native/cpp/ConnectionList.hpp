@@ -21,7 +21,7 @@
 #include "wpi/util/UidVector.hpp"
 #include "wpi/util/mutex.hpp"
 
-namespace nt {
+namespace wpi::nt {
 
 class IListenerStorage;
 
@@ -48,11 +48,11 @@ class ConnectionList final : public IConnectionList {
  private:
   int m_inst;
   IListenerStorage& m_listenerStorage;
-  mutable wpi::mutex m_mutex;
+  mutable wpi::util::mutex m_mutex;
 
   // shared with user (must be atomic or mutex-protected)
   std::atomic_bool m_connected{false};
-  wpi::UidVector<std::optional<ConnectionInfo>, 8> m_connections;
+  wpi::util::UidVector<std::optional<ConnectionInfo>, 8> m_connections;
 
   struct DataLoggerData {
     static constexpr auto kType = Handle::kConnectionDataLogger;
@@ -70,4 +70,4 @@ class ConnectionList final : public IConnectionList {
   HandleMap<DataLoggerData, 8> m_dataloggers;
 };
 
-}  // namespace nt
+}  // namespace wpi::nt

@@ -8,7 +8,7 @@
 
 #include "wpi/net/uv/Loop.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 std::shared_ptr<Tty> Tty::Create(Loop& loop, uv_file fd, bool readable) {
   if (loop.IsClosing()) {
@@ -24,4 +24,4 @@ std::shared_ptr<Tty> Tty::Create(Loop& loop, uv_file fd, bool readable) {
   return h;
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

@@ -5,23 +5,23 @@ extra_includes:
 - PyTrajectoryConstraint.h
 
 classes:
-  frc::EllipticalRegionConstraint:
+  wpi::math::EllipticalRegionConstraint:
     template_params:
     - typename Constraint
     typealias:
-    - frc::TrajectoryConstraint::MinMax
+    - wpi::math::TrajectoryConstraint::MinMax
     methods:
       EllipticalRegionConstraint:
         overloads:
-          const Translation2d&, units::meter_t, units::meter_t, const Rotation2d&, const Constraint&:
+          const Translation2d&, wpi::units::meter_t, wpi::units::meter_t, const Rotation2d&, const Constraint&:
           const Ellipse2d&, const Constraint&:
       MaxVelocity:
       MinMaxAcceleration:
 
     template_inline_code: |
       cls_EllipticalRegionConstraint
-        .def_static("fromFeet", [](const Translation2d& center, units::foot_t xWidth,
-                                   units::foot_t yWidth, const Rotation2d& rotation,
+        .def_static("fromFeet", [](const Translation2d& center, wpi::units::foot_t xWidth,
+                                   wpi::units::foot_t yWidth, const Rotation2d& rotation,
                                    const Constraint& constraint) {
           return std::make_shared<EllipticalRegionConstraint<Constraint>>(center, xWidth, yWidth, rotation, constraint);
         }, py::arg("center"), py::arg("xWidth"), py::arg("yWidth"), py::arg("rotation"), py::arg("constraint"))
@@ -29,6 +29,6 @@ classes:
 
 templates:
   EllipticalRegionConstraint:
-    qualname: frc::EllipticalRegionConstraint
+    qualname: wpi::math::EllipticalRegionConstraint
     params:
-    - frc::PyTrajectoryConstraint
+    - wpi::math::PyTrajectoryConstraint

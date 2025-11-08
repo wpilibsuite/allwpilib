@@ -11,7 +11,7 @@
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * This class is a non-template base class for SendableChooser.
@@ -19,8 +19,8 @@ namespace frc {
  * It contains static, non-templated variables to avoid their duplication in the
  * template class.
  */
-class SendableChooserBase : public wpi::Sendable,
-                            public wpi::SendableHelper<SendableChooserBase> {
+class SendableChooserBase : public wpi::util::Sendable,
+                            public wpi::util::SendableHelper<SendableChooserBase> {
  public:
   SendableChooserBase();
   ~SendableChooserBase() override = default;
@@ -38,10 +38,10 @@ class SendableChooserBase : public wpi::Sendable,
   std::string m_defaultChoice;
   std::string m_selected;
   bool m_haveSelected = false;
-  mutable wpi::mutex m_mutex;
+  mutable wpi::util::mutex m_mutex;
   int m_instance;
   std::string m_previousVal;
   static std::atomic_int s_instances;
 };
 
-}  // namespace frc
+}  // namespace wpi

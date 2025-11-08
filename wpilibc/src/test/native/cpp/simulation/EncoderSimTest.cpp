@@ -11,7 +11,7 @@
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/util/deprecated.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 
 namespace {
 constexpr double kDefaultDistancePerPulse = .0005;
@@ -232,4 +232,4 @@ TEST(EncoderSimTest, Reset) {
   EXPECT_EQ(0, encoder.GetDistance());
 }
 
-}  // namespace frc::sim
+}  // namespace wpi::sim

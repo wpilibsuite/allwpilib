@@ -15,18 +15,18 @@
 #include "wpi/net/uv/Stream.hpp"
 #include "wpi/util/function_ref.hpp"
 
-namespace wpi {
+namespace wpi::util {
 class Logger;
 }  // namespace wpi
 
-namespace nt::net {
+namespace wpi::nt::net {
 
 class WebSocketConnection final
     : public WireConnection,
       public std::enable_shared_from_this<WebSocketConnection> {
  public:
-  WebSocketConnection(wpi::WebSocket& ws, unsigned int version,
-                      wpi::Logger& logger);
+  WebSocketConnection(wpi::net::WebSocket& ws, unsigned int version,
+                      wpi::util::Logger& logger);
   ~WebSocketConnection() override;
   WebSocketConnection(const WebSocketConnection&) = delete;
   WebSocketConnection& operator=(const WebSocketConnection&) = delete;
@@ -37,19 +37,19 @@ class WebSocketConnection final
 
   bool Ready() const final { return !m_ws.IsWriteInProgress(); }
 
-  int WriteText(wpi::function_ref<void(wpi::raw_ostream& os)> writer) final {
+  int WriteText(wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) final {
     return Write(kText, writer);
   }
-  int WriteBinary(wpi::function_ref<void(wpi::raw_ostream& os)> writer) final {
+  int WriteBinary(wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) final {
     return Write(kBinary, writer);
   }
   int Flush() final;
 
-  void SendText(wpi::function_ref<void(wpi::raw_ostream& os)> writer) final {
-    Send(wpi::WebSocket::Frame::kText, writer);
+  void SendText(wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) final {
+    Send(wpi::net::WebSocket::Frame::kText, writer);
   }
-  void SendBinary(wpi::function_ref<void(wpi::raw_ostream& os)> writer) final {
-    Send(wpi::WebSocket::Frame::kBinary, writer);
+  void SendBinary(wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) final {
+    Send(wpi::net::WebSocket::Frame::kBinary, writer);
   }
 
   uint64_t GetLastFlushTime() const final { return m_lastFlushTime; }
@@ -78,17 +78,17 @@ class WebSocketConnection final
  private:
   enum State { kEmpty, kText, kBinary };
 
-  int Write(State kind, wpi::function_ref<void(wpi::raw_ostream& os)> writer);
+  int Write(State kind, wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer);
   void Send(uint8_t opcode,
-            wpi::function_ref<void(wpi::raw_ostream& os)> writer);
+            wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer);
 
   void StartFrame(uint8_t opcode);
   void FinishText();
-  wpi::uv::Buffer AllocBuf();
-  void ReleaseBufs(std::span<wpi::uv::Buffer> bufs);
+  wpi::net::uv::Buffer AllocBuf();
+  void ReleaseBufs(std::span<wpi::net::uv::Buffer> bufs);
 
-  wpi::WebSocket& m_ws;
-  wpi::Logger& m_logger;
+  wpi::net::WebSocket& m_ws;
+  wpi::util::Logger& m_logger;
   bool m_readActive = true;
 
   class Stream;
@@ -102,17 +102,17 @@ class WebSocketConnection final
     unsigned int count = 0;
     uint8_t opcode;
   };
-  std::vector<wpi::WebSocket::Frame> m_ws_frames;  // to reduce allocs
+  std::vector<wpi::net::WebSocket::Frame> m_ws_frames;  // to reduce allocs
   std::vector<Frame> m_frames;
-  std::vector<wpi::uv::Buffer> m_bufs;
-  std::vector<wpi::uv::Buffer> m_buf_pool;
+  std::vector<wpi::net::uv::Buffer> m_bufs;
+  std::vector<wpi::net::uv::Buffer> m_buf_pool;
   size_t m_framePos = 0;
   size_t m_written = 0;
-  wpi::uv::Error m_err;
+  wpi::net::uv::Error m_err;
   State m_state = kEmpty;
   std::string m_reason;
   uint64_t m_lastFlushTime = 0;
   unsigned int m_version;
 };
 
-}  // namespace nt::net
+}  // namespace wpi::nt::net

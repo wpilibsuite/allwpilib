@@ -10,7 +10,7 @@
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/units/time.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * Contains the controller coefficients and logic for an implicit model
@@ -123,4 +123,4 @@ class ImplicitModelFollower {
   Matrixd<Inputs, Inputs> m_B;
 };
 
-}  // namespace frc
+}  // namespace wpi::math

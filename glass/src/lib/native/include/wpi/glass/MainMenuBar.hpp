@@ -10,7 +10,7 @@
 
 #include "wpi/gui/portable-file-dialogs.h"
 
-namespace glass {
+namespace wpi::glass {
 
 /**
  * GUI main menu bar.
@@ -53,4 +53,4 @@ class MainMenuBar {
   std::unique_ptr<pfd::select_folder> m_saveFolder;
 };
 
-}  // namespace glass
+}  // namespace wpi::glass

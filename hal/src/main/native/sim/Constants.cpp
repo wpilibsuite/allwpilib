@@ -6,11 +6,11 @@
 
 #include "ConstantsInternal.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeConstants() {}
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 int32_t HAL_GetSystemClockTicksPerMicrosecond(void) {

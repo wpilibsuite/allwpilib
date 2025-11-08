@@ -16,7 +16,7 @@
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * Helper class that converts a chassis velocity (dx, dy, and dtheta components)
@@ -197,7 +197,7 @@ class WPILIB_DLLEXPORT MecanumDriveKinematics
                             Translation2d rl, Translation2d rr) const;
 };
 
-}  // namespace frc
+}  // namespace wpi::math
 
 #include "wpi/math/kinematics/proto/MecanumDriveKinematicsProto.hpp"
 #include "wpi/math/kinematics/struct/MecanumDriveKinematicsStruct.hpp"

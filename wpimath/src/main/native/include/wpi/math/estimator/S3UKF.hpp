@@ -8,7 +8,7 @@
 #include "wpi/math/estimator/UnscentedKalmanFilter.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 template <int States, int Inputs, int Outputs>
 using S3UKF =
@@ -21,4 +21,4 @@ extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
     UnscentedKalmanFilter<5, 3, 3, S3SigmaPoints<5>>;
 
-}  // namespace frc
+}  // namespace wpi::math

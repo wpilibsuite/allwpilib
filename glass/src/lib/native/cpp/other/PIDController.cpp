@@ -8,9 +8,9 @@
 
 #include "wpi/glass/DataSource.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
-void glass::DisplayPIDController(PIDControllerModel* m) {
+void wpi::glass::DisplayPIDController(PIDControllerModel* m) {
   if (auto name = m->GetName()) {
     ImGui::Text("%s", name);
     ImGui::Separator();

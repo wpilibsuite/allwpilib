@@ -6,69 +6,69 @@
 
 #include "wpi/commands2/button/CommandPS4Controller.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 CommandPS4Controller::CommandPS4Controller(int port)
-    : CommandGenericHID(port), m_hid{frc::PS4Controller(port)} {}
+    : CommandGenericHID(port), m_hid{wpi::PS4Controller(port)} {}
 
-frc::PS4Controller& CommandPS4Controller::GetHID() {
+wpi::PS4Controller& CommandPS4Controller::GetHID() {
   return m_hid;
 }
 
-Trigger CommandPS4Controller::Square(frc::EventLoop* loop) const {
-  return Button(frc::PS4Controller::Button::kSquare, loop);
+Trigger CommandPS4Controller::Square(wpi::EventLoop* loop) const {
+  return Button(wpi::PS4Controller::Button::kSquare, loop);
 }
 
-Trigger CommandPS4Controller::Cross(frc::EventLoop* loop) const {
-  return Button(frc::PS4Controller::Button::kCross, loop);
+Trigger CommandPS4Controller::Cross(wpi::EventLoop* loop) const {
+  return Button(wpi::PS4Controller::Button::kCross, loop);
 }
 
-Trigger CommandPS4Controller::Circle(frc::EventLoop* loop) const {
-  return Button(frc::PS4Controller::Button::kCircle, loop);
+Trigger CommandPS4Controller::Circle(wpi::EventLoop* loop) const {
+  return Button(wpi::PS4Controller::Button::kCircle, loop);
 }
 
-Trigger CommandPS4Controller::Triangle(frc::EventLoop* loop) const {
-  return Button(frc::PS4Controller::Button::kTriangle, loop);
+Trigger CommandPS4Controller::Triangle(wpi::EventLoop* loop) const {
+  return Button(wpi::PS4Controller::Button::kTriangle, loop);
 }
 
-Trigger CommandPS4Controller::L1(frc::EventLoop* loop) const {
-  return Button(frc::PS4Controller::Button::kL1, loop);
+Trigger CommandPS4Controller::L1(wpi::EventLoop* loop) const {
+  return Button(wpi::PS4Controller::Button::kL1, loop);
 }
 
-Trigger CommandPS4Controller::R1(frc::EventLoop* loop) const {
-  return Button(frc::PS4Controller::Button::kR1, loop);
+Trigger CommandPS4Controller::R1(wpi::EventLoop* loop) const {
+  return Button(wpi::PS4Controller::Button::kR1, loop);
 }
 
-Trigger CommandPS4Controller::L2(frc::EventLoop* loop) const {
-  return Button(frc::PS4Controller::Button::kL2, loop);
+Trigger CommandPS4Controller::L2(wpi::EventLoop* loop) const {
+  return Button(wpi::PS4Controller::Button::kL2, loop);
 }
 
-Trigger CommandPS4Controller::R2(frc::EventLoop* loop) const {
-  return Button(frc::PS4Controller::Button::kR2, loop);
+Trigger CommandPS4Controller::R2(wpi::EventLoop* loop) const {
+  return Button(wpi::PS4Controller::Button::kR2, loop);
 }
 
-Trigger CommandPS4Controller::Share(frc::EventLoop* loop) const {
-  return Button(frc::PS4Controller::Button::kShare, loop);
+Trigger CommandPS4Controller::Share(wpi::EventLoop* loop) const {
+  return Button(wpi::PS4Controller::Button::kShare, loop);
 }
 
-Trigger CommandPS4Controller::Options(frc::EventLoop* loop) const {
-  return Button(frc::PS4Controller::Button::kOptions, loop);
+Trigger CommandPS4Controller::Options(wpi::EventLoop* loop) const {
+  return Button(wpi::PS4Controller::Button::kOptions, loop);
 }
 
-Trigger CommandPS4Controller::L3(frc::EventLoop* loop) const {
-  return Button(frc::PS4Controller::Button::kL3, loop);
+Trigger CommandPS4Controller::L3(wpi::EventLoop* loop) const {
+  return Button(wpi::PS4Controller::Button::kL3, loop);
 }
 
-Trigger CommandPS4Controller::R3(frc::EventLoop* loop) const {
-  return Button(frc::PS4Controller::Button::kR3, loop);
+Trigger CommandPS4Controller::R3(wpi::EventLoop* loop) const {
+  return Button(wpi::PS4Controller::Button::kR3, loop);
 }
 
-Trigger CommandPS4Controller::PS(frc::EventLoop* loop) const {
-  return Button(frc::PS4Controller::Button::kPS, loop);
+Trigger CommandPS4Controller::PS(wpi::EventLoop* loop) const {
+  return Button(wpi::PS4Controller::Button::kPS, loop);
 }
 
-Trigger CommandPS4Controller::Touchpad(frc::EventLoop* loop) const {
-  return Button(frc::PS4Controller::Button::kTouchpad, loop);
+Trigger CommandPS4Controller::Touchpad(wpi::EventLoop* loop) const {
+  return Button(wpi::PS4Controller::Button::kTouchpad, loop);
 }
 
 double CommandPS4Controller::GetLeftX() const {

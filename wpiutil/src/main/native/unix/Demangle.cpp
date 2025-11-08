@@ -11,7 +11,7 @@
 
 #include "wpi/util/SmallString.hpp"
 
-namespace wpi {
+namespace wpi::util {
 
 std::string Demangle(std::string_view mangledSymbol) {
   SmallString<128> buf{mangledSymbol};
@@ -29,4 +29,4 @@ std::string Demangle(std::string_view mangledSymbol) {
   return std::string{mangledSymbol};
 }
 
-}  // namespace wpi
+}  // namespace wpi::util

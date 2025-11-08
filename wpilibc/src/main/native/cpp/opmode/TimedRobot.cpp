@@ -14,7 +14,7 @@
 #include "wpi/hal/UsageReporting.h"
 #include "wpi/system/Errors.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 void TimedRobot::StartCompetition() {
   if constexpr (IsSimulation()) {
@@ -75,7 +75,7 @@ void TimedRobot::EndCompetition() {
   HAL_StopNotifier(m_notifier, &status);
 }
 
-TimedRobot::TimedRobot(units::second_t period) : IterativeRobotBase(period) {
+TimedRobot::TimedRobot(wpi::units::second_t period) : IterativeRobotBase(period) {
   m_startTime = std::chrono::microseconds{RobotController::GetFPGATime()};
   AddPeriodic([=, this] { LoopFunc(); }, period);
 
@@ -87,7 +87,7 @@ TimedRobot::TimedRobot(units::second_t period) : IterativeRobotBase(period) {
   HAL_ReportUsage("Framework", "TimedRobot");
 }
 
-TimedRobot::TimedRobot(units::hertz_t frequency) : TimedRobot{1 / frequency} {}
+TimedRobot::TimedRobot(wpi::units::hertz_t frequency) : TimedRobot{1 / frequency} {}
 
 TimedRobot::~TimedRobot() {
   if (m_notifier != HAL_kInvalidHandle) {
@@ -102,7 +102,7 @@ uint64_t TimedRobot::GetLoopStartTime() {
 }
 
 void TimedRobot::AddPeriodic(std::function<void()> callback,
-                             units::second_t period, units::second_t offset) {
+                             wpi::units::second_t period, wpi::units::second_t offset) {
   m_callbacks.emplace(
       callback, m_startTime,
       std::chrono::microseconds{static_cast<int64_t>(period.value() * 1e6)},

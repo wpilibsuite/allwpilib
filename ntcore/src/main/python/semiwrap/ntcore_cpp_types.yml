@@ -6,7 +6,7 @@ defaults:
   report_ignored_missing: false
 
 classes:
-  nt::Timestamped:
+  wpi::nt::Timestamped:
     template_params:
     - T
     attributes:
@@ -29,54 +29,54 @@ classes:
 
 templates:
   TimestampedBoolean:
-    qualname: nt::Timestamped
+    qualname: wpi::nt::Timestamped
     params:
     - bool
   TimestampedInteger:
-    qualname: nt::Timestamped
+    qualname: wpi::nt::Timestamped
     params:
     - int64_t
   TimestampedFloat:
-    qualname: nt::Timestamped
+    qualname: wpi::nt::Timestamped
     params:
     - float
   TimestampedDouble:
-    qualname: nt::Timestamped
+    qualname: wpi::nt::Timestamped
     params:
     - double
   TimestampedString:
-    qualname: nt::Timestamped
+    qualname: wpi::nt::Timestamped
     params:
     - std::string
   TimestampedRaw:
-    qualname: nt::Timestamped
+    qualname: wpi::nt::Timestamped
     params:
     - std::vector<uint8_t>
   TimestampedBooleanArray:
-    qualname: nt::Timestamped
+    qualname: wpi::nt::Timestamped
     params:
     - std::vector<int>
   TimestampedIntegerArray:
-    qualname: nt::Timestamped
+    qualname: wpi::nt::Timestamped
     params:
     - std::vector<int64_t>
   TimestampedFloatArray:
-    qualname: nt::Timestamped
+    qualname: wpi::nt::Timestamped
     params:
     - std::vector<float>
   TimestampedDoubleArray:
-    qualname: nt::Timestamped
+    qualname: wpi::nt::Timestamped
     params:
     - std::vector<double>
   TimestampedStringArray:
-    qualname: nt::Timestamped
+    qualname: wpi::nt::Timestamped
     params:
     - std::vector<std::string>
   TimestampedStruct:
-    qualname: nt::Timestamped
+    qualname: wpi::nt::Timestamped
     params:
     - WPyStruct
   TimestampedStructArray:
-    qualname: nt::Timestamped
+    qualname: wpi::nt::Timestamped
     params:
     - std::vector<WPyStruct>

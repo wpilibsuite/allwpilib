@@ -13,7 +13,7 @@
 #include "wpi/nt/NetworkTableValue.hpp"
 #include "wpi/util/json.hpp"
 
-namespace nt::net {
+namespace wpi::nt::net {
 
 #if __GNUC__ >= 13
 #pragma GCC diagnostic push
@@ -25,7 +25,7 @@ struct PublishMsg {
   int pubuid{0};
   std::string name;
   std::string typeStr;
-  wpi::json properties;
+  wpi::util::json properties;
   PubSubOptionsImpl options;  // will be empty when coming from network
 };
 
@@ -37,7 +37,7 @@ struct UnpublishMsg {
 struct SetPropertiesMsg {
   static constexpr std::string_view kMethodStr = "setproperties";
   std::string name;
-  wpi::json update;
+  wpi::util::json update;
 };
 
 struct SubscribeMsg {
@@ -75,7 +75,7 @@ struct AnnounceMsg {
   int id{0};
   std::string typeStr;
   std::optional<int> pubuid;
-  wpi::json properties;
+  wpi::util::json properties;
 };
 
 struct UnannounceMsg {
@@ -87,7 +87,7 @@ struct UnannounceMsg {
 struct PropertiesUpdateMsg {
   static constexpr std::string_view kMethodStr = "properties";
   std::string name;
-  wpi::json update;
+  wpi::util::json update;
   bool ack;
 };
 
@@ -103,4 +103,4 @@ struct ServerMessage {
   Contents contents;
 };
 
-}  // namespace nt::net
+}  // namespace wpi::nt::net

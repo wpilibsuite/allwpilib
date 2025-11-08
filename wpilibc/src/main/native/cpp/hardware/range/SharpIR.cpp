@@ -12,7 +12,7 @@
 #include "wpi/util/sendable/SendableBuilder.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 SharpIR SharpIR::GP2Y0A02YK0F(int channel) {
   return SharpIR(channel, 62.28, -1.092, 20_cm, 150_cm);
@@ -30,13 +30,13 @@ SharpIR SharpIR::GP2Y0A51SK0F(int channel) {
   return SharpIR(channel, 5.2819, -1.161, 2_cm, 15_cm);
 }
 
-SharpIR::SharpIR(int channel, double a, double b, units::meter_t min,
-                 units::meter_t max)
+SharpIR::SharpIR(int channel, double a, double b, wpi::units::meter_t min,
+                 wpi::units::meter_t max)
     : m_sensor(channel), m_A(a), m_B(b), m_min(min), m_max(max) {
   HAL_ReportUsage("IO", channel, "SharpIR");
-  wpi::SendableRegistry::Add(this, "SharpIR", channel);
+  wpi::util::SendableRegistry::Add(this, "SharpIR", channel);
 
-  m_simDevice = hal::SimDevice("SharpIR", m_sensor.GetChannel());
+  m_simDevice = wpi::hal::SimDevice("SharpIR", m_sensor.GetChannel());
   if (m_simDevice) {
     m_simRange = m_simDevice.CreateDouble("Range (m)", false, 0.0);
     m_sensor.SetSimDevice(m_simDevice);
@@ -47,19 +47,19 @@ int SharpIR::GetChannel() const {
   return m_sensor.GetChannel();
 }
 
-units::meter_t SharpIR::GetRange() const {
+wpi::units::meter_t SharpIR::GetRange() const {
   if (m_simRange) {
-    return std::clamp(units::meter_t{m_simRange.Get()}, m_min, m_max);
+    return std::clamp(wpi::units::meter_t{m_simRange.Get()}, m_min, m_max);
   } else {
     // Don't allow zero/negative values
     auto v = std::max(m_sensor.GetVoltage(), 0.00001);
 
-    return std::clamp(units::meter_t{m_A * std::pow(v, m_B) * 1e-2}, m_min,
+    return std::clamp(wpi::units::meter_t{m_A * std::pow(v, m_B) * 1e-2}, m_min,
                       m_max);
   }
 }
 
-void SharpIR::InitSendable(wpi::SendableBuilder& builder) {
+void SharpIR::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Ultrasonic");
   builder.AddDoubleProperty(
       "Value", [=, this] { return GetRange().value(); }, nullptr);

@@ -25,30 +25,30 @@ struct adl_serializer
     /// @sa https://json.nlohmann.me/api/adl_serializer/from_json/
     template<typename BasicJsonType, typename TargetType = ValueType>
     static auto from_json(BasicJsonType && j, TargetType& val) noexcept(
-        noexcept(::wpi::from_json(std::forward<BasicJsonType>(j), val)))
-    -> decltype(::wpi::from_json(std::forward<BasicJsonType>(j), val), void())
+        noexcept(::wpi::util::from_json(std::forward<BasicJsonType>(j), val)))
+    -> decltype(::wpi::util::from_json(std::forward<BasicJsonType>(j), val), void())
     {
-        ::wpi::from_json(std::forward<BasicJsonType>(j), val);
+        ::wpi::util::from_json(std::forward<BasicJsonType>(j), val);
     }
 
     /// @brief convert a JSON value to any value type
     /// @sa https://json.nlohmann.me/api/adl_serializer/from_json/
     template<typename BasicJsonType, typename TargetType = ValueType>
     static auto from_json(BasicJsonType && j) noexcept(
-    noexcept(::wpi::from_json(std::forward<BasicJsonType>(j), detail::identity_tag<TargetType> {})))
-    -> decltype(::wpi::from_json(std::forward<BasicJsonType>(j), detail::identity_tag<TargetType> {}))
+    noexcept(::wpi::util::from_json(std::forward<BasicJsonType>(j), detail::identity_tag<TargetType> {})))
+    -> decltype(::wpi::util::from_json(std::forward<BasicJsonType>(j), detail::identity_tag<TargetType> {}))
     {
-        return ::wpi::from_json(std::forward<BasicJsonType>(j), detail::identity_tag<TargetType> {});
+        return ::wpi::util::from_json(std::forward<BasicJsonType>(j), detail::identity_tag<TargetType> {});
     }
 
     /// @brief convert any value type to a JSON value
     /// @sa https://json.nlohmann.me/api/adl_serializer/to_json/
     template<typename BasicJsonType, typename TargetType = ValueType>
     static auto to_json(BasicJsonType& j, TargetType && val) noexcept(
-        noexcept(::wpi::to_json(j, std::forward<TargetType>(val))))
-    -> decltype(::wpi::to_json(j, std::forward<TargetType>(val)), void())
+        noexcept(::wpi::util::to_json(j, std::forward<TargetType>(val))))
+    -> decltype(::wpi::util::to_json(j, std::forward<TargetType>(val)), void())
     {
-        ::wpi::to_json(j, std::forward<TargetType>(val));
+        ::wpi::util::to_json(j, std::forward<TargetType>(val));
     }
 };
 

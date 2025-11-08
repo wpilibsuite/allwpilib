@@ -7,8 +7,8 @@
 #include "wpi/driverstation/Joystick.hpp"
 #include "wpi/simulation/GenericHIDSim.hpp"
 
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 JoystickSim::JoystickSim(const Joystick& joystick)
     : GenericHIDSim{joystick}, m_joystick{&joystick} {

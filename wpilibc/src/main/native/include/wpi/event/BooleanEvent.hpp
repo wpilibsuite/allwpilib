@@ -12,7 +12,7 @@
 #include "wpi/units/time.hpp"
 #include "wpi/util/FunctionExtras.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * This class provides an easy way to link actions to active high logic signals.
@@ -122,9 +122,9 @@ class BooleanEvent {
    * @param type The debounce type.
    * @return The debounced event.
    */
-  BooleanEvent Debounce(units::second_t debounceTime,
-                        frc::Debouncer::DebounceType type =
-                            frc::Debouncer::DebounceType::kRising);
+  BooleanEvent Debounce(wpi::units::second_t debounceTime,
+                        wpi::math::Debouncer::DebounceType type =
+                            wpi::math::Debouncer::DebounceType::kRising);
 
  private:
   /// Poller loop.
@@ -135,4 +135,4 @@ class BooleanEvent {
   /// The state of the condition in the current loop poll.
   std::shared_ptr<bool> m_state;
 };
-}  // namespace frc
+}  // namespace wpi

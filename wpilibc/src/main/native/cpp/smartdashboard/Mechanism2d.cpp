@@ -9,7 +9,7 @@
 
 #include "wpi/nt/NTSendableBuilder.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 static constexpr std::string_view kBackgroundColor = "backgroundColor";
 static constexpr std::string_view kDims = "dims";
@@ -37,7 +37,7 @@ void Mechanism2d::SetBackgroundColor(const Color8Bit& color) {
   }
 }
 
-void Mechanism2d::InitSendable(nt::NTSendableBuilder& builder) {
+void Mechanism2d::InitSendable(wpi::nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("Mechanism2d");
 
   std::scoped_lock lock(m_mutex);

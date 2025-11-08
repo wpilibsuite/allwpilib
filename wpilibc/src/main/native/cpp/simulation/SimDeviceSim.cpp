@@ -12,8 +12,8 @@
 #include "wpi/hal/SimDevice.h"
 #include "wpi/hal/simulation/SimDeviceData.h"
 
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 SimDeviceSim::SimDeviceSim(const char* name)
     : m_handle{HALSIM_GetSimDeviceHandle(name)} {}

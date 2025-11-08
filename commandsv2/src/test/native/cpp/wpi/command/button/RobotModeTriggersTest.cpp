@@ -8,8 +8,8 @@
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/simulation/DriverStationSim.hpp"
 
-using namespace frc2;
-using namespace frc::sim;
+using namespace wpi::cmd;
+using namespace wpi::sim;
 class RobotModeTriggersTest : public CommandTestBase {};
 
 TEST(RobotModeTriggersTest, Autonomous) {

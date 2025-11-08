@@ -9,13 +9,13 @@
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/SystemServer.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 ExpansionHubPidConstants::ExpansionHubPidConstants(int usbId, int channel,
                                                    bool isVelocityPid) {
   auto systemServer = SystemServer::GetSystemServer();
 
-  nt::PubSubOptions options;
+  wpi::nt::PubSubOptions options;
   options.sendAll = true;
   options.keepDuplicates = true;
   options.periodic = 0.005;

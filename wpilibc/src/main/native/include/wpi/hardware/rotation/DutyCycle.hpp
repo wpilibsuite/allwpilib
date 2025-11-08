@@ -13,7 +13,7 @@
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
-namespace frc {
+namespace wpi {
 /**
  * Class to read a duty cycle PWM input.
  *
@@ -21,7 +21,7 @@ namespace frc {
  * low in that frequency. These can be attached to any SmartIO.
  *
  */
-class DutyCycle : public wpi::Sendable, public wpi::SendableHelper<DutyCycle> {
+class DutyCycle : public wpi::util::Sendable, public wpi::util::SendableHelper<DutyCycle> {
  public:
   /**
    * Constructs a DutyCycle input from a smartio channel.
@@ -43,7 +43,7 @@ class DutyCycle : public wpi::Sendable, public wpi::SendableHelper<DutyCycle> {
    *
    * @return frequency
    */
-  units::hertz_t GetFrequency() const;
+  wpi::units::hertz_t GetFrequency() const;
 
   /**
    * Get the output ratio of the duty cycle signal.
@@ -59,7 +59,7 @@ class DutyCycle : public wpi::Sendable, public wpi::SendableHelper<DutyCycle> {
    *
    * @return high time of last pulse
    */
-  units::second_t GetHighTime() const;
+  wpi::units::second_t GetHighTime() const;
 
   /**
    * Get the channel of the source.
@@ -69,11 +69,11 @@ class DutyCycle : public wpi::Sendable, public wpi::SendableHelper<DutyCycle> {
   int GetSourceChannel() const;
 
  protected:
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
   void InitDutyCycle();
   int m_channel;
-  hal::Handle<HAL_DutyCycleHandle, HAL_FreeDutyCycle> m_handle;
+  wpi::hal::Handle<HAL_DutyCycleHandle, HAL_FreeDutyCycle> m_handle;
 };
-}  // namespace frc
+}  // namespace wpi

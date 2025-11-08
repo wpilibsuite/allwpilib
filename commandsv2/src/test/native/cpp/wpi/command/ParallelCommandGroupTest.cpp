@@ -11,7 +11,7 @@
 #include "wpi/commands2/ParallelCommandGroup.hpp"
 #include "wpi/commands2/WaitUntilCommand.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 class ParallelCommandGroupTest : public CommandTestBase {};
 
 TEST_F(ParallelCommandGroupTest, ParallelGroupSchedule) {

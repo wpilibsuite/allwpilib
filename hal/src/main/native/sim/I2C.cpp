@@ -7,15 +7,15 @@
 #include "HALInitializer.h"
 #include "mockdata/I2CDataInternal.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeI2C() {}
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
   SimI2CData[port].initialized = true;
 }
 int32_t HAL_TransactionI2C(HAL_I2CPort port, int32_t deviceAddress,

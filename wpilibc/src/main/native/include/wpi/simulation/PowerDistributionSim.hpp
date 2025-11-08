@@ -8,7 +8,7 @@
 
 #include "wpi/simulation/CallbackStore.hpp"
 
-namespace frc {
+namespace wpi {
 
 class PowerDistribution;
 
@@ -168,4 +168,4 @@ class PowerDistributionSim {
   int m_index;
 };
 }  // namespace sim
-}  // namespace frc
+}  // namespace wpi

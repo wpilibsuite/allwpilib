@@ -15,7 +15,7 @@
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * This class wraps Swerve Drive Odometry to fuse latency-compensated
@@ -30,8 +30,8 @@ namespace frc {
  */
 template <size_t NumModules>
 class SwerveDrivePoseEstimator
-    : public PoseEstimator<wpi::array<SwerveModuleState, NumModules>,
-                           wpi::array<SwerveModulePosition, NumModules>> {
+    : public PoseEstimator<wpi::util::array<SwerveModuleState, NumModules>,
+                           wpi::util::array<SwerveModulePosition, NumModules>> {
  public:
   /**
    * Constructs a SwerveDrivePoseEstimator with default standard deviations
@@ -52,7 +52,7 @@ class SwerveDrivePoseEstimator
   SwerveDrivePoseEstimator(
       SwerveDriveKinematics<NumModules>& kinematics,
       const Rotation2d& gyroAngle,
-      const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
+      const wpi::util::array<SwerveModulePosition, NumModules>& modulePositions,
       const Pose2d& initialPose)
       : SwerveDrivePoseEstimator{kinematics,      gyroAngle,
                                  modulePositions, initialPose,
@@ -78,9 +78,9 @@ class SwerveDrivePoseEstimator
   SwerveDrivePoseEstimator(
       SwerveDriveKinematics<NumModules>& kinematics,
       const Rotation2d& gyroAngle,
-      const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
-      const Pose2d& initialPose, const wpi::array<double, 3>& stateStdDevs,
-      const wpi::array<double, 3>& visionMeasurementStdDevs)
+      const wpi::util::array<SwerveModulePosition, NumModules>& modulePositions,
+      const Pose2d& initialPose, const wpi::util::array<double, 3>& stateStdDevs,
+      const wpi::util::array<double, 3>& visionMeasurementStdDevs)
       : SwerveDrivePoseEstimator::PoseEstimator(
             kinematics, m_odometryImpl, stateStdDevs, visionMeasurementStdDevs),
         m_odometryImpl{kinematics, gyroAngle, modulePositions, initialPose} {
@@ -94,4 +94,4 @@ class SwerveDrivePoseEstimator
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
     SwerveDrivePoseEstimator<4>;
 
-}  // namespace frc
+}  // namespace wpi::math

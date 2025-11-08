@@ -10,7 +10,7 @@
 #include "wpi/units/angle.hpp"
 #include "wpi/units/math.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 TEST(QuaternionTest, Init) {
   // Identity
@@ -94,8 +94,8 @@ TEST(QuaternionTest, ScalarDivision) {
 
 TEST(QuaternionTest, Multiply) {
   // 90° CCW rotations around each axis
-  double c = units::math::cos(90_deg / 2.0);
-  double s = units::math::sin(90_deg / 2.0);
+  double c = wpi::units::math::cos(90_deg / 2.0);
+  double s = wpi::units::math::sin(90_deg / 2.0);
   Quaternion xRot{c, s, 0.0, 0.0};
   Quaternion yRot{c, 0.0, s, 0.0};
   Quaternion zRot{c, 0.0, 0.0, s};

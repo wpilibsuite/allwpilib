@@ -11,7 +11,7 @@
 #include <utility>
 #include <vector>
 
-namespace wpi {
+namespace wpi::util {
 
 /**
  * This class is the same as std::priority_queue with two changes:
@@ -111,6 +111,6 @@ class priority_queue {
   Compare comp;
 };
 
-}  // namespace wpi
+}  // namespace wpi::util
 
 #endif  // WPIUTIL_WPI_UTIL_PRIORITY_QUEUE_HPP_

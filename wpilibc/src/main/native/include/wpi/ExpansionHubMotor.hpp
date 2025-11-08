@@ -16,7 +16,7 @@
 #include "wpi/units/time.hpp"
 #include "wpi/units/voltage.hpp"
 
-namespace frc {
+namespace wpi {
 
 /** This class controls a specific motor and encoder hooked up to an
  * ExpansionHub. */
@@ -44,7 +44,7 @@ class ExpansionHubMotor {
    *
    * @param voltage The voltage to drive the motor at
    */
-  void SetVoltage(units::volt_t voltage);
+  void SetVoltage(wpi::units::volt_t voltage);
 
   /**
    * Command the motor to drive to a specific position setpoint. This value will
@@ -82,7 +82,7 @@ class ExpansionHubMotor {
    *
    * @return Motor current
    */
-  units::ampere_t GetCurrent() const;
+  wpi::units::ampere_t GetCurrent() const;
 
   /**
    * Sets the distance per count of the encoder. Used to scale encoder readings.
@@ -152,22 +152,22 @@ class ExpansionHubMotor {
   ExpansionHub m_hub;
   int m_channel;
 
-  nt::DoubleSubscriber m_encoderSubscriber;
-  nt::DoubleSubscriber m_encoderVelocitySubscriber;
-  nt::DoubleSubscriber m_currentSubscriber;
+  wpi::nt::DoubleSubscriber m_encoderSubscriber;
+  wpi::nt::DoubleSubscriber m_encoderVelocitySubscriber;
+  wpi::nt::DoubleSubscriber m_currentSubscriber;
 
-  nt::DoublePublisher m_setpointPublisher;
-  nt::BooleanPublisher m_floatOn0Publisher;
-  nt::BooleanPublisher m_enabledPublisher;
+  wpi::nt::DoublePublisher m_setpointPublisher;
+  wpi::nt::BooleanPublisher m_floatOn0Publisher;
+  wpi::nt::BooleanPublisher m_enabledPublisher;
 
-  nt::IntegerPublisher m_modePublisher;
+  wpi::nt::IntegerPublisher m_modePublisher;
 
-  nt::BooleanPublisher m_reversedPublisher;
-  nt::BooleanPublisher m_resetEncoderPublisher;
+  wpi::nt::BooleanPublisher m_reversedPublisher;
+  wpi::nt::BooleanPublisher m_resetEncoderPublisher;
 
-  nt::DoublePublisher m_distancePerCountPublisher;
+  wpi::nt::DoublePublisher m_distancePerCountPublisher;
 
   ExpansionHubPidConstants m_velocityPidConstants;
   ExpansionHubPidConstants m_positionPidConstants;
 };
-}  // namespace frc
+}  // namespace wpi

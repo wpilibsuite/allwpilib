@@ -8,7 +8,7 @@
 
 #include "wpi/hardware/motor/PWMMotorController.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Cross the Road Electronics (CTRE) Victor SPX Motor Controller with PWM control.
@@ -40,4 +40,4 @@ class PWMVictorSPX : public PWMMotorController {
   PWMVictorSPX& operator=(PWMVictorSPX&&) = default;
 };
 
-}  // namespace frc
+}  // namespace wpi

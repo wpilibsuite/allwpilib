@@ -8,7 +8,7 @@
 
 #include <wpi/opmode/RobotBase.hpp>
 
-class Robot : public frc::RobotBase {
+class Robot : public wpi::RobotBase {
  public:
   Robot();
   void Disabled();

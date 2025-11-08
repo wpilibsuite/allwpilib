@@ -6,11 +6,11 @@
 
 #include "wpi/math/kinematics/MecanumDriveWheelPositions.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 namespace {
 
-using StructType = wpi::Struct<frc::MecanumDriveWheelPositions>;
+using StructType = wpi::util::Struct<wpi::math::MecanumDriveWheelPositions>;
 const MecanumDriveWheelPositions kExpectedData{
     MecanumDriveWheelPositions{17.4_m, 2.29_m, 22.9_m, 1.74_m}};
 }  // namespace

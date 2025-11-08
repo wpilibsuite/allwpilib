@@ -16,21 +16,21 @@
 #include "wpi/hal/handles/HandlesInternal.h"
 #include "wpi/util/mutex.hpp"
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeAnalogInput() {}
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
 
 HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
     int32_t channel, const char* allocationLocation, int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
 
   if (channel < 0 || channel >= kNumSmartIo) {
     *status = RESOURCE_OUT_OF_RANGE;
-    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Analog", 0,
+    wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Analog", 0,
                                      kNumSmartIo, channel);
     return HAL_kInvalidHandle;
   }
@@ -42,10 +42,10 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
 
   if (*status != 0) {
     if (port) {
-      hal::SetLastErrorPreviouslyAllocated(status, "SmartIo", channel,
+      wpi::hal::SetLastErrorPreviouslyAllocated(status, "SmartIo", channel,
                                            port->previousAllocation);
     } else {
-      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Analog", 0,
+      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Analog", 0,
                                        kNumSmartIo, channel);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
@@ -74,9 +74,9 @@ void HAL_FreeAnalogInputPort(HAL_AnalogInputHandle analogPortHandle) {
   smartIoHandles->Free(analogPortHandle, HAL_HandleEnum::AnalogInput);
 
   // Wait for no other object to hold this handle.
-  auto start = hal::fpga_clock::now();
+  auto start = wpi::hal::fpga_clock::now();
   while (port.use_count() != 1) {
-    auto current = hal::fpga_clock::now();
+    auto current = wpi::hal::fpga_clock::now();
     if (start + std::chrono::seconds(1) < current) {
       std::puts("DIO handle free timeout");
       std::fflush(stdout);

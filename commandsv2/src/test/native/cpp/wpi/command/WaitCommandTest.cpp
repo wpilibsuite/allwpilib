@@ -8,11 +8,11 @@
 #include "wpi/commands2/WaitUntilCommand.hpp"
 #include "wpi/simulation/SimHooks.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 class WaitCommandTest : public CommandTestBase {};
 
 TEST_F(WaitCommandTest, WaitCommandSchedule) {
-  frc::sim::PauseTiming();
+  wpi::sim::PauseTiming();
 
   CommandScheduler scheduler = GetScheduler();
 
@@ -21,9 +21,9 @@ TEST_F(WaitCommandTest, WaitCommandSchedule) {
   scheduler.Schedule(command);
   scheduler.Run();
   EXPECT_TRUE(scheduler.IsScheduled(command));
-  frc::sim::StepTiming(110_ms);
+  wpi::sim::StepTiming(110_ms);
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(command));
 
-  frc::sim::ResumeTiming();
+  wpi::sim::ResumeTiming();
 }

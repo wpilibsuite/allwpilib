@@ -11,7 +11,7 @@
 
 #include "RobotContainer.hpp"
 
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   Robot();
   void RobotPeriodic() override;
@@ -28,7 +28,7 @@ class Robot : public frc::TimedRobot {
  private:
   // Have it empty by default so that if testing teleop it
   // doesn't have undefined behavior and potentially crash.
-  std::optional<frc2::CommandPtr> m_autonomousCommand;
+  std::optional<wpi::cmd::CommandPtr> m_autonomousCommand;
 
   RobotContainer m_container;
 };

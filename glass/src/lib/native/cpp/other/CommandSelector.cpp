@@ -8,9 +8,9 @@
 
 #include "wpi/glass/DataSource.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
-void glass::DisplayCommandSelector(CommandSelectorModel* m) {
+void wpi::glass::DisplayCommandSelector(CommandSelectorModel* m) {
   if (auto name = m->GetName()) {
     ImGui::Text("%s", name);
   }

@@ -15,15 +15,15 @@
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/raw_ostream.hpp"
 
-namespace wpi {
+namespace wpi::util {
 
 std::string GetStackTraceDefault(int offset) {
 #if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
   void* stackTrace[128];
   int stackSize = backtrace(stackTrace, 128);
   char** mangledSymbols = backtrace_symbols(stackTrace, stackSize);
-  wpi::SmallString<1024> buf;
-  wpi::raw_svector_ostream trace(buf);
+  wpi::util::SmallString<1024> buf;
+  wpi::util::raw_svector_ostream trace(buf);
 
   for (int i = offset; i < stackSize; i++) {
     // Only print recursive functions once in a row.
@@ -47,4 +47,4 @@ std::string GetStackTraceDefault(int offset) {
 #endif
 }
 
-}  // namespace wpi
+}  // namespace wpi::util

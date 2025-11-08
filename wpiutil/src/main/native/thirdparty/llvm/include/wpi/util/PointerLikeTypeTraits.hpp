@@ -18,7 +18,7 @@
 #include <cstdint>
 #include <type_traits>
 
-namespace wpi {
+namespace wpi::util {
 
 /// A traits type that is used to handle pointer types and things that are just
 /// wrappers for pointers as a uniform entity.
@@ -147,6 +147,6 @@ template <typename ReturnT, typename... ParamTs>
 struct PointerLikeTypeTraits<ReturnT (*)(ParamTs...)>
     : FunctionPointerLikeTypeTraits<4, ReturnT (*)(ParamTs...)> {};
 
-} // end namespace wpi
+} // end namespace wpi::util
 
 #endif

@@ -10,11 +10,11 @@
 #include "Constants.hpp"
 #include "subsystems/Intake.hpp"
 
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   void TeleopPeriodic() override;
 
  private:
   Intake m_intake;
-  frc::Joystick m_joystick{OperatorConstants::kJoystickIndex};
+  wpi::Joystick m_joystick{OperatorConstants::kJoystickIndex};
 };

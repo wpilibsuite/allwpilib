@@ -19,7 +19,7 @@
 #include "wpi/util/Synchronization.h"
 #include "wpi/util/mutex.hpp"
 
-namespace wpi {
+namespace wpi::net {
 class ResolverThread {
  private:
   struct private_init {};
@@ -38,12 +38,12 @@ class ResolverThread {
   void ThreadMain();
   bool CleanupRefs();
 
-  wpi::mutex serviceRefMutex;
+  wpi::util::mutex serviceRefMutex;
   std::vector<std::pair<DNSServiceRef, WPI_EventHandle>> serviceRefsToRemove;
   std::vector<std::pair<DNSServiceRef, dnssd_sock_t>> serviceRefs;
   std::thread thread;
   std::atomic_bool running;
 };
-}  // namespace wpi
+}  // namespace wpi::net
 
 #endif  // defined(__APPLE__)

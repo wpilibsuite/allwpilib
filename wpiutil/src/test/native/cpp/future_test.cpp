@@ -8,7 +8,7 @@
 
 #include <gtest/gtest.h>
 
-namespace wpi {
+namespace wpi::util {
 
 TEST(FutureTest, Then) {
   promise<bool> inPromise;
@@ -78,4 +78,4 @@ TEST(FutureTest, MoveVoid) {
   ASSERT_TRUE(outFuture.is_ready());
 }
 
-}  // namespace wpi
+}  // namespace wpi::util

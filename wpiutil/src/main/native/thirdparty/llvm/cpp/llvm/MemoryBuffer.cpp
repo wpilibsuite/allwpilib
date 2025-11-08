@@ -58,7 +58,7 @@
 #include "wpi/util/WindowsError.hpp"
 #endif
 
-using namespace wpi;
+using namespace wpi::util;
 
 //===----------------------------------------------------------------------===//
 // MemoryBuffer implementation itself.
@@ -259,12 +259,12 @@ static std::unique_ptr<WritableMemoryBuffer> GetMemoryBufferForStream(
   return GetMemBufferCopyImpl(buffer, bufferName, ec);
 }
 
-wpi::expected<std::unique_ptr<MemoryBuffer>, std::error_code>
+wpi::util::expected<std::unique_ptr<MemoryBuffer>, std::error_code>
 MemoryBuffer::GetFile(std::string_view filename, int64_t fileSize) {
   std::error_code ec;
   auto ret = GetFileAux<MemoryBuffer>(filename, ec, fileSize, fileSize, 0);
   if (ec) {
-    return wpi::unexpected{ec};
+    return wpi::util::unexpected{ec};
   }
   return ret;
 }
@@ -362,7 +362,7 @@ static std::unique_ptr<WriteThroughMemoryBuffer> GetReadWriteFile(
 
       LARGE_INTEGER fileSizeWin;
       if (!GetFileSizeEx(f, &fileSizeWin)) {
-        ec = wpi::mapWindowsError(GetLastError());
+        ec = wpi::util::mapWindowsError(GetLastError());
         return nullptr;
       }
       fileSize = fileSizeWin.QuadPart;

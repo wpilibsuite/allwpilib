@@ -40,7 +40,7 @@ static void dumpJson(CameraModel& camera_model,
       camera_model.distortion_coefficients.data() +
           camera_model.distortion_coefficients.size());
 
-  wpi::json result = {
+  wpi::util::json result = {
       {"camera_matrix", camera_matrix},
       {"distortion_coefficients", distortion_coefficients},
       {"avg_reprojection_error", camera_model.avg_reprojection_error}};

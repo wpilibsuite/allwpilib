@@ -14,7 +14,7 @@
 #include "wpi/hal/simulation/MockHooks.h"
 #include "wpi/util/jni_util.hpp"
 
-using namespace wpi::java;
+using namespace wpi::util::java;
 
 static JavaVM* jvm = nullptr;
 static JClass notifyCallbackCls;
@@ -24,7 +24,7 @@ static jmethodID notifyCallbackCallback;
 static jmethodID bufferCallbackCallback;
 static jmethodID constBufferCallbackCallback;
 
-namespace hal::sim {
+namespace wpi::hal::sim {
 jint SimOnLoad(JavaVM* vm, void* reserved) {
   jvm = vm;
 
@@ -108,7 +108,7 @@ jmethodID GetConstBufferCallback() {
   return constBufferCallbackCallback;
 }
 
-}  // namespace hal::sim
+}  // namespace wpi::hal::sim
 
 extern "C" {
 /*
@@ -240,6 +240,6 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_simulation_SimulatorJNI_resetHandles
   (JNIEnv*, jclass)
 {
-  hal::HandleBase::ResetGlobalHandles();
+  wpi::hal::HandleBase::ResetGlobalHandles();
 }
 }  // extern "C"

@@ -9,8 +9,8 @@
 #include "wpi/hal/simulation/PowerDistributionData.h"
 #include "wpi/hardware/power/PowerDistribution.hpp"
 
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 PowerDistributionSim::PowerDistributionSim(int module) : m_index{module} {}
 

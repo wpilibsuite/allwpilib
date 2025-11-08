@@ -12,7 +12,7 @@
 #include "wpi/glass/View.hpp"
 #include "wpi/util/Signal.h"
 
-namespace glass {
+namespace wpi::glass {
 class Storage;
 }  // namespace glass
 
@@ -25,21 +25,21 @@ namespace log {
 class DataLogReaderEntry;
 class DataLogReaderThread;
 }  // namespace log
-class Logger;
+class wpi::util::Logger;
 }  // namespace wpi
 
 namespace sysid {
 /**
  * Helps with loading datalog files.
  */
-class LogLoader : public glass::View {
+class LogLoader : public wpi::glass::View {
  public:
   /**
    * Creates a log loader widget
    *
    * @param logger The program logger
    */
-  explicit LogLoader(glass::Storage& storage, wpi::Logger& logger);
+  explicit LogLoader(wpi::glass::Storage& storage, wpi::util::Logger& logger);
 
   ~LogLoader() override;
 
@@ -52,10 +52,10 @@ class LogLoader : public glass::View {
    * Signal called when the current file is unloaded (invalidates any
    * LogEntry*).
    */
-  wpi::sig::Signal<> unload;
+  wpi::util::sig::Signal<> unload;
 
  private:
-  // wpi::Logger& m_logger;
+  // Logger& m_logger;
 
   std::string m_filename;
   std::unique_ptr<pfd::open_file> m_opener;

@@ -10,8 +10,8 @@
 #include <wpi/system/RobotController.hpp>
 
 Drive::Drive() {
-  wpi::SendableRegistry::AddChild(&m_drive, &m_leftLeader);
-  wpi::SendableRegistry::AddChild(&m_drive, &m_rightLeader);
+  wpi::util::SendableRegistry::AddChild(&m_drive, &m_leftLeader);
+  wpi::util::SendableRegistry::AddChild(&m_drive, &m_rightLeader);
 
   m_leftLeader.AddFollower(m_leftFollower);
   m_rightLeader.AddFollower(m_rightFollower);
@@ -34,7 +34,7 @@ Drive::Drive() {
                             DriveConstants::kTurnRateTolerance);
 }
 
-frc2::CommandPtr Drive::ArcadeDriveCommand(std::function<double()> fwd,
+wpi::cmd::CommandPtr Drive::ArcadeDriveCommand(std::function<double()> fwd,
                                            std::function<double()> rot) {
   return Run([this, fwd = std::move(fwd), rot = std::move(rot)] {
            m_drive.ArcadeDrive(fwd(), rot());
@@ -42,7 +42,7 @@ frc2::CommandPtr Drive::ArcadeDriveCommand(std::function<double()> fwd,
       .WithName("ArcadeDrive");
 }
 
-frc2::CommandPtr Drive::DriveDistanceCommand(units::meter_t distance,
+wpi::cmd::CommandPtr Drive::DriveDistanceCommand(wpi::units::meter_t distance,
                                              double speed) {
   return RunOnce([this] {
            // Reset encoders at the start of the command
@@ -52,15 +52,15 @@ frc2::CommandPtr Drive::DriveDistanceCommand(units::meter_t distance,
       // Drive forward at specified speed
       .AndThen(Run([this, speed] { m_drive.ArcadeDrive(speed, 0.0); }))
       .Until([this, distance] {
-        return units::math::max(units::meter_t(m_leftEncoder.GetDistance()),
-                                units::meter_t(m_rightEncoder.GetDistance())) >=
+        return wpi::units::math::max(wpi::units::meter_t(m_leftEncoder.GetDistance()),
+                                wpi::units::meter_t(m_rightEncoder.GetDistance())) >=
                distance;
       })
       // Stop the drive when the command ends
       .FinallyDo([this](bool interrupted) { m_drive.StopMotor(); });
 }
 
-frc2::CommandPtr Drive::TurnToAngleCommand(units::degree_t angle) {
+wpi::cmd::CommandPtr Drive::TurnToAngleCommand(wpi::units::degree_t angle) {
   return StartRun(
              [this] { m_controller.Reset(m_imu.GetRotation2d().Degrees()); },
              [this, angle] {
@@ -71,7 +71,7 @@ frc2::CommandPtr Drive::TurnToAngleCommand(units::degree_t angle) {
                           // normalize it to [-1, 1]
                           m_feedforward.Calculate(
                               m_controller.GetSetpoint().velocity) /
-                              frc::RobotController::GetBatteryVoltage());
+                              wpi::RobotController::GetBatteryVoltage());
              })
       .Until([this] { return m_controller.AtGoal(); })
       .FinallyDo([this] { m_drive.ArcadeDrive(0, 0); });

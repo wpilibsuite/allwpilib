@@ -9,7 +9,7 @@
 
 #include "wpi/hal/Value.h"
 
-namespace frc::sim {
+namespace wpi::sim {
 
 using NotifyCallback = std::function<void(std::string_view, const HAL_Value*)>;
 using ConstBufferCallback = std::function<void(
@@ -75,4 +75,4 @@ class CallbackStore {
   enum CancelType { Normal, Channel, NoIndex };
   CancelType cancelType;
 };
-}  // namespace frc::sim
+}  // namespace wpi::sim

@@ -9,26 +9,26 @@
 #include "wpi/util/struct/Struct.hpp"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Struct<frc::MecanumDriveKinematics> {
+struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::MecanumDriveKinematics> {
   static constexpr std::string_view GetTypeName() {
     return "MecanumDriveKinematics";
   }
   static constexpr size_t GetSize() {
-    return 4 * wpi::GetStructSize<frc::Translation2d>();
+    return 4 * wpi::util::GetStructSize<wpi::math::Translation2d>();
   }
   static constexpr std::string_view GetSchema() {
     return "Translation2d front_left;Translation2d front_right;Translation2d "
            "rear_left;Translation2d rear_right";
   }
 
-  static frc::MecanumDriveKinematics Unpack(std::span<const uint8_t> data);
+  static wpi::math::MecanumDriveKinematics Unpack(std::span<const uint8_t> data);
   static void Pack(std::span<uint8_t> data,
-                   const frc::MecanumDriveKinematics& value);
+                   const wpi::math::MecanumDriveKinematics& value);
   static void ForEachNested(
       std::invocable<std::string_view, std::string_view> auto fn) {
-    wpi::ForEachStructSchema<frc::Translation2d>(fn);
+    wpi::util::ForEachStructSchema<wpi::math::Translation2d>(fn);
   }
 };
 
-static_assert(wpi::StructSerializable<frc::MecanumDriveKinematics>);
-static_assert(wpi::HasNestedStruct<frc::MecanumDriveKinematics>);
+static_assert(wpi::util::StructSerializable<wpi::math::MecanumDriveKinematics>);
+static_assert(wpi::util::HasNestedStruct<wpi::math::MecanumDriveKinematics>);

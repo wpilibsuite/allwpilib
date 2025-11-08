@@ -6,23 +6,23 @@
 
 #include "wpimath/protobuf/kinematics.npb.h"
 
-std::optional<frc::MecanumDriveWheelSpeeds>
-wpi::Protobuf<frc::MecanumDriveWheelSpeeds>::Unpack(InputStream& stream) {
+std::optional<wpi::math::MecanumDriveWheelSpeeds>
+wpi::util::Protobuf<wpi::math::MecanumDriveWheelSpeeds>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufMecanumDriveWheelSpeeds msg;
   if (!stream.Decode(msg)) {
     return {};
   }
 
-  return frc::MecanumDriveWheelSpeeds{
-      units::meters_per_second_t{msg.front_left},
-      units::meters_per_second_t{msg.front_right},
-      units::meters_per_second_t{msg.rear_left},
-      units::meters_per_second_t{msg.rear_right},
+  return wpi::math::MecanumDriveWheelSpeeds{
+      wpi::units::meters_per_second_t{msg.front_left},
+      wpi::units::meters_per_second_t{msg.front_right},
+      wpi::units::meters_per_second_t{msg.rear_left},
+      wpi::units::meters_per_second_t{msg.rear_right},
   };
 }
 
-bool wpi::Protobuf<frc::MecanumDriveWheelSpeeds>::Pack(
-    OutputStream& stream, const frc::MecanumDriveWheelSpeeds& value) {
+bool wpi::util::Protobuf<wpi::math::MecanumDriveWheelSpeeds>::Pack(
+    OutputStream& stream, const wpi::math::MecanumDriveWheelSpeeds& value) {
   wpi_proto_ProtobufMecanumDriveWheelSpeeds msg{
       .front_left = value.frontLeft.value(),
       .front_right = value.frontRight.value(),

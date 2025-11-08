@@ -1,7 +1,7 @@
 classes:
-  frc::Gamepad:
+  wpi::Gamepad:
     ignored_bases:
-    - wpi::SendableHelper<Gamepad>
+    - wpi::util::SendableHelper<Gamepad>
     methods:
       Gamepad:
       GetLeftX:
@@ -123,7 +123,7 @@ classes:
       GetMisc6ButtonReleased:
       Misc6:
       InitSendable:
-  frc::Gamepad::Button:
+  wpi::Gamepad::Button:
     attributes:
       kSouthFace:
       kEastFace:
@@ -151,7 +151,7 @@ classes:
       kMisc4:
       kMisc5:
       kMisc6:
-  frc::Gamepad::Axis:
+  wpi::Gamepad::Axis:
     attributes:
       kLeftX:
       kLeftY:

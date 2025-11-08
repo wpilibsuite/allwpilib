@@ -16,11 +16,11 @@ namespace wpi::log {
 class DataLog;
 }  // namespace wpi::log
 
-namespace nt {
+namespace wpi::nt {
 class Value;
-}  // namespace nt
+}  // namespace wpi::nt
 
-namespace nt::local {
+namespace wpi::nt::local {
 
 struct LocalTopic;
 
@@ -41,4 +41,4 @@ struct LocalDataLoggerEntry {
   NT_DataLogger logger;
 };
 
-}  // namespace nt::local
+}  // namespace wpi::nt::local

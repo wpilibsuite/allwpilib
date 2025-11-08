@@ -6,7 +6,7 @@
 
 #include "TestPrinters.hpp"
 
-namespace nt {
+namespace wpi::nt {
 
 bool PubSubOptionsMatcher::MatchAndExplain(
     const PubSubOptionsImpl& val,
@@ -40,4 +40,4 @@ void PubSubOptionsMatcher::DescribeNegationTo(::std::ostream* os) const {
   PrintTo(good, os);
 }
 
-}  // namespace nt
+}  // namespace wpi::nt

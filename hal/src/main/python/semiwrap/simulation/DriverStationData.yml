@@ -81,19 +81,19 @@ functions:
   HALSIM_SetJoystickName:
     cpp_code: |
       [](int32_t stick, std::string_view sv) {
-        auto s = wpi::make_string(sv);
+        auto s = wpi::util::make_string(sv);
         HALSIM_SetJoystickName(stick, &s);
       }
   HALSIM_SetGameSpecificMessage:
     cpp_code: |
       [](std::string_view sv) {
-        auto s = wpi::make_string(sv);
+        auto s = wpi::util::make_string(sv);
         HALSIM_SetGameSpecificMessage(&s);
       }
   HALSIM_SetEventName:
     cpp_code: |
       [](std::string_view sv) {
-        auto s = wpi::make_string(sv);
+        auto s = wpi::util::make_string(sv);
         HALSIM_SetEventName(&s);
       }
   HALSIM_SetMatchType:

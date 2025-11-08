@@ -8,7 +8,7 @@
 #include "wpi/units/angle.hpp"
 #include "wpi/units/angular_velocity.hpp"
 
-namespace frc {
+namespace wpi::romi {
 
 /**
  * @ingroup romi_api
@@ -35,7 +35,7 @@ class RomiGyro {
    *
    * @return The current heading of the robot.
    */
-  units::radian_t GetAngle() const;
+  wpi::units::radian_t GetAngle() const;
 
   /**
    * Return the rate of rotation of the gyro
@@ -44,49 +44,49 @@ class RomiGyro {
    *
    * @return The current rate.
    */
-  units::radians_per_second_t GetRate() const;
+  wpi::units::radians_per_second_t GetRate() const;
 
   /**
    * Get the rate of turn in around the X-axis.
    *
    * @return Rate of turn.
    */
-  units::radians_per_second_t GetRateX() const;
+  wpi::units::radians_per_second_t GetRateX() const;
 
   /**
    * Get the rate of turn in around the Y-axis.
    *
    * @return Rate of turn.
    */
-  units::radians_per_second_t GetRateY() const;
+  wpi::units::radians_per_second_t GetRateY() const;
 
   /**
    * Get the rate of turn around the Z-axis.
    *
    * @return Rate of turn.
    */
-  units::radians_per_second_t GetRateZ() const;
+  wpi::units::radians_per_second_t GetRateZ() const;
 
   /**
    * Get the currently reported angle around the X-axis.
    *
    * @return Current angle around X-axis.
    */
-  units::radian_t GetAngleX() const;
+  wpi::units::radian_t GetAngleX() const;
 
   /**
    * Get the currently reported angle around the Y-axis.
    *
    * @return Current angle around Y-axis.
    */
-  units::radian_t GetAngleY() const;
+  wpi::units::radian_t GetAngleY() const;
 
   /**
    * Get the currently reported angle around the Z-axis.
    *
    * @return Current angle around Z-axis.
    */
-  units::radian_t GetAngleZ() const;
+  wpi::units::radian_t GetAngleZ() const;
 
   /**
    * Resets the gyro
@@ -109,4 +109,4 @@ class RomiGyro {
 
 /** @} */
 
-}  // namespace frc
+}  // namespace wpi::romi

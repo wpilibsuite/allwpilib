@@ -17,7 +17,7 @@
 #include "wpi/hal/handles/IndexedHandleResource.h"
 #include "wpi/util/mutex.hpp"
 
-using namespace hal;
+using namespace wpi::hal;
 
 static constexpr HAL_CANManufacturer manufacturer =
     HAL_CANManufacturer::HAL_CAN_Man_kCTRE;
@@ -118,24 +118,24 @@ struct PDP {
 static IndexedHandleResource<HAL_PDPHandle, PDP, kNumCTREPDPModules,
                              HAL_HandleEnum::CTREPDP>* pdpHandles;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeCTREPDP() {
   static IndexedHandleResource<HAL_PDPHandle, PDP, kNumCTREPDPModules,
                                HAL_HandleEnum::CTREPDP>
       pH;
   pdpHandles = &pH;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 
 HAL_PDPHandle HAL_InitializePDP(int32_t busId, int32_t module,
                                 const char* allocationLocation,
                                 int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
   if (!HAL_CheckPDPModule(module)) {
     *status = RESOURCE_OUT_OF_RANGE;
-    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for CTRE PDP", 0,
+    wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for CTRE PDP", 0,
                                      kNumCTREPDPModules - 1, module);
     return HAL_kInvalidHandle;
   }
@@ -145,10 +145,10 @@ HAL_PDPHandle HAL_InitializePDP(int32_t busId, int32_t module,
 
   if (*status != 0) {
     if (pdp) {
-      hal::SetLastErrorPreviouslyAllocated(status, "CTRE PDP", module,
+      wpi::hal::SetLastErrorPreviouslyAllocated(status, "CTRE PDP", module,
                                            pdp->previousAllocation);
     } else {
-      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for CTRE PDP", 0,
+      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for CTRE PDP", 0,
                                        kNumCTREPDPModules - 1, module);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
@@ -175,7 +175,7 @@ void HAL_CleanPDP(HAL_PDPHandle handle) {
 }
 
 int32_t HAL_GetPDPModuleNumber(HAL_PDPHandle handle, int32_t* status) {
-  return hal::getHandleIndex(handle);
+  return wpi::hal::getHandleIndex(handle);
 }
 
 HAL_Bool HAL_CheckPDPModule(int32_t module) {
@@ -232,7 +232,7 @@ double HAL_GetPDPChannelCurrent(HAL_PDPHandle handle, int32_t channel,
                                 int32_t* status) {
   if (!HAL_CheckPDPChannel(channel)) {
     *status = PARAMETER_OUT_OF_RANGE;
-    hal::SetLastError(status, fmt::format("Invalid pdp channel {}", channel));
+    wpi::hal::SetLastError(status, fmt::format("Invalid pdp channel {}", channel));
     return 0;
   }
 

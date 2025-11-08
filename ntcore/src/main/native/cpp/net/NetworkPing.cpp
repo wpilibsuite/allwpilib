@@ -6,7 +6,7 @@
 
 #include "WireConnection.hpp"
 
-using namespace nt::net;
+using namespace wpi::nt::net;
 
 bool NetworkPing::Send(uint64_t curTimeMs) {
   if (curTimeMs < m_nextPingTimeMs) {

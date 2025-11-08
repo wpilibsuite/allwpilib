@@ -12,7 +12,7 @@
 #include "wpi/hal/UsageReporting.h"
 #include "wpi/system/Errors.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 CAN::CAN(int busId, int deviceId)
     : CAN{busId, deviceId, kTeamManufacturer, kTeamDeviceType} {}

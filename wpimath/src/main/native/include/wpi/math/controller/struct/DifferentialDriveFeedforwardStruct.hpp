@@ -9,7 +9,7 @@
 #include "wpi/util/struct/Struct.hpp"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Struct<frc::DifferentialDriveFeedforward> {
+struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::DifferentialDriveFeedforward> {
   static constexpr std::string_view GetTypeName() {
     return "DifferentialDriveFeedforward";
   }
@@ -19,10 +19,10 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::DifferentialDriveFeedforward> {
            "ka_angular";
   }
 
-  static frc::DifferentialDriveFeedforward Unpack(
+  static wpi::math::DifferentialDriveFeedforward Unpack(
       std::span<const uint8_t> data);
   static void Pack(std::span<uint8_t> data,
-                   const frc::DifferentialDriveFeedforward& value);
+                   const wpi::math::DifferentialDriveFeedforward& value);
 };
 
-static_assert(wpi::StructSerializable<frc::DifferentialDriveFeedforward>);
+static_assert(wpi::util::StructSerializable<wpi::math::DifferentialDriveFeedforward>);

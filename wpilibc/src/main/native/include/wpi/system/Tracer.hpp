@@ -10,11 +10,11 @@
 #include "wpi/hal/cpp/fpga_clock.h"
 #include "wpi/util/StringMap.hpp"
 
-namespace wpi {
+namespace wpi::util {
 class raw_ostream;
 }  // namespace wpi
 
-namespace frc {
+namespace wpi {
 /**
  * A class for keeping track of how much time it takes for different parts of
  * code to execute. This is done with epochs, that are added to calls to
@@ -60,14 +60,14 @@ class Tracer {
    *
    * @param os output stream
    */
-  void PrintEpochs(wpi::raw_ostream& os);
+  void PrintEpochs(wpi::util::raw_ostream& os);
 
  private:
   static constexpr std::chrono::milliseconds kMinPrintPeriod{1000};
 
-  hal::fpga_clock::time_point m_startTime;
-  hal::fpga_clock::time_point m_lastEpochsPrintTime = hal::fpga_clock::epoch();
+  wpi::hal::fpga_clock::time_point m_startTime;
+  wpi::hal::fpga_clock::time_point m_lastEpochsPrintTime = wpi::hal::fpga_clock::epoch();
 
-  wpi::StringMap<std::chrono::nanoseconds> m_epochs;
+  wpi::util::StringMap<std::chrono::nanoseconds> m_epochs;
 };
-}  // namespace frc
+}  // namespace wpi

@@ -18,11 +18,11 @@
 #include "wpi/net/uv/Loop.hpp"
 #include "wpi/util/Signal.h"
 
-namespace wpi {
+namespace wpi::net {
 class Logger;
-}  // namespace wpi
+}  // namespace wpi::net
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 /**
  * Handle.
@@ -226,23 +226,23 @@ class Handle : public std::enable_shared_from_this<Handle> {
    * Sets logger.
    * @param logger Logger
    */
-  void SetLogger(Logger* logger) { m_logger = logger; }
+  void SetLogger(wpi::util::Logger* logger) { m_logger = logger; }
 
   /**
    * Gets logger.
    * @return Logger, or nullptr if none set
    */
-  Logger* GetLogger() const { return m_logger; }
+  wpi::util::Logger* GetLogger() const { return m_logger; }
 
   /**
    * Error signal
    */
-  sig::Signal<Error> error;
+  wpi::util::sig::Signal<Error> error;
 
   /**
    * Closed signal
    */
-  sig::Signal<> closed;
+  wpi::util::sig::Signal<> closed;
 
   /**
    * Report an error.
@@ -279,7 +279,7 @@ class Handle : public std::enable_shared_from_this<Handle> {
   std::function<Buffer(size_t)> m_allocBuf{&Buffer::Allocate};
   std::function<void(Buffer&)> m_freeBuf{&DefaultFreeBuf};
   std::shared_ptr<void> m_data;
-  Logger* m_logger = nullptr;
+  wpi::util::Logger* m_logger = nullptr;
 };
 
 /**
@@ -309,6 +309,6 @@ class HandleImpl : public Handle {
   HandleImpl() : Handle{static_cast<uv_handle_t*>(std::malloc(sizeof(U)))} {}
 };
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_HANDLE_HPP_

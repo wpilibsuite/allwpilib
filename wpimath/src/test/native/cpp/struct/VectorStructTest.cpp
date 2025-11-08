@@ -8,7 +8,7 @@
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/linalg/struct/VectorStruct.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 struct VectorStructTestData {
   using Type = Vectord<2>;

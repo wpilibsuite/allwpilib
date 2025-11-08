@@ -24,7 +24,7 @@
 
 using namespace sysid;
 
-LogLoader::LogLoader(glass::Storage& storage, wpi::Logger& logger) {}
+LogLoader::LogLoader(wpi::glass::Storage& storage, wpi::util::Logger& logger) {}
 
 LogLoader::~LogLoader() = default;
 
@@ -40,7 +40,7 @@ void LogLoader::Display() {
     if (!m_opener->result().empty()) {
       m_filename = m_opener->result()[0];
 
-      auto fileBuffer = wpi::MemoryBuffer::GetFile(m_filename);
+      auto fileBuffer = wpi::util::MemoryBuffer::GetFile(m_filename);
       if (!fileBuffer) {
         ImGui::OpenPopup("Error");
         m_error = fmt::format("Could not open file: {}",
@@ -108,7 +108,7 @@ void LogLoader::Display() {
 
 void LogLoader::RebuildEntryTree() {
   m_entryTree.clear();
-  wpi::SmallVector<std::string_view, 16> parts;
+  wpi::util::SmallVector<std::string_view, 16> parts;
   m_reader->ForEachEntryName([&](const wpi::log::DataLogReaderEntry& entry) {
     // only show double/float/string entries (TODO: support struct/protobuf)
     if (entry.type != "double" && entry.type != "float" &&
@@ -117,19 +117,19 @@ void LogLoader::RebuildEntryTree() {
     }
 
     // filter on name
-    if (!m_filter.empty() && !wpi::contains_lower(entry.name, m_filter)) {
+    if (!m_filter.empty() && !wpi::util::contains_lower(entry.name, m_filter)) {
       return;
     }
 
     parts.clear();
     // split on first : if one is present
-    auto [prefix, mainpart] = wpi::split(entry.name, ':');
-    if (mainpart.empty() || wpi::contains(prefix, '/')) {
+    auto [prefix, mainpart] = wpi::util::split(entry.name, ':');
+    if (mainpart.empty() || wpi::util::contains(prefix, '/')) {
       mainpart = entry.name;
     } else {
       parts.emplace_back(prefix);
     }
-    wpi::split(mainpart, '/', -1, false,
+    wpi::util::split(mainpart, '/', -1, false,
                [&](auto part) { parts.emplace_back(part); });
 
     // ignore a raw "/" key
@@ -139,7 +139,7 @@ void LogLoader::RebuildEntryTree() {
 
     // get to leaf
     auto nodes = &m_entryTree;
-    for (auto part : wpi::drop_back(std::span{parts.begin(), parts.end()})) {
+    for (auto part : wpi::util::drop_back(std::span{parts.begin(), parts.end()})) {
       auto it =
           std::find_if(nodes->begin(), nodes->end(),
                        [&](const auto& node) { return node.name == part; });

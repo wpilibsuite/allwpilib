@@ -19,7 +19,7 @@
 #include <string>
 #include <string_view>
 
-namespace wpi {
+namespace wpi::util {
 
 /// SmallString - A SmallString is just a SmallVector with methods and accessors
 /// that make it work better as a string (e.g. operator+ etc).
@@ -217,6 +217,6 @@ public:
   }
 };
 
-} // end namespace wpi
+} // end namespace wpi::util
 
 #endif // WPIUTIL_WPI_SMALLSTRING_H

@@ -10,7 +10,7 @@
 #include <tuple>
 #include <utility>
 
-namespace wpi {
+namespace wpi::util {
 
 struct empty_array_t {};
 constexpr empty_array_t empty_array;
@@ -59,42 +59,42 @@ class array : public std::array<T, N> {
 template <typename T, std::convertible_to<T>... Ts>
 array(T, Ts...) -> array<T, 1 + sizeof...(Ts)>;
 
-}  // namespace wpi
+}  // namespace wpi::util
 
 template <size_t I, typename T, size_t N>
   requires(I < N)
-constexpr T& get(wpi::array<T, N>& arr) noexcept {
+constexpr T& get(wpi::util::array<T, N>& arr) noexcept {
   return std::get<I>(static_cast<std::array<T, N>>(arr));
 }
 
 template <size_t I, typename T, size_t N>
   requires(I < N)
-constexpr T&& get(wpi::array<T, N>&& arr) noexcept {
+constexpr T&& get(wpi::util::array<T, N>&& arr) noexcept {
   return std::move(std::get<I>(arr));
 }
 
 template <size_t I, typename T, size_t N>
   requires(I < N)
-constexpr const T& get(const wpi::array<T, N>& arr) noexcept {
+constexpr const T& get(const wpi::util::array<T, N>& arr) noexcept {
   return std::get<I>(static_cast<std::array<T, N>>(arr));
 }
 
 template <size_t I, typename T, size_t N>
   requires(I < N)
-constexpr const T&& get(const wpi::array<T, N>&& arr) noexcept {
+constexpr const T&& get(const wpi::util::array<T, N>&& arr) noexcept {
   return std::move(std::get<I>(arr));
 }
 
 // Enables structured bindings
 namespace std {  // NOLINT
-// Partial specialization for wpi::array
+// Partial specialization for wpi::util::array
 template <typename T, size_t N>
-struct tuple_size<wpi::array<T, N>> : public integral_constant<size_t, N> {};
+struct tuple_size<wpi::util::array<T, N>> : public integral_constant<size_t, N> {};
 
-// Partial specialization for wpi::array
+// Partial specialization for wpi::util::array
 template <size_t I, typename T, size_t N>
   requires(I < N)
-struct tuple_element<I, wpi::array<T, N>> {
+struct tuple_element<I, wpi::util::array<T, N>> {
   using type = T;
 };
 }  // namespace std

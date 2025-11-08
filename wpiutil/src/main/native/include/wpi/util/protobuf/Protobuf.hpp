@@ -20,7 +20,7 @@
 #include "wpi/util/array.hpp"
 #include "wpi/util/function_ref.hpp"
 
-namespace wpi {
+namespace wpi::util {
 
 template <typename T>
 class SmallVectorImpl;
@@ -36,7 +36,7 @@ template <typename T>
 struct Protobuf {};
 
 namespace detail {
-using SmallVectorType = wpi::SmallVectorImpl<uint8_t>;
+using SmallVectorType = wpi::util::SmallVectorImpl<uint8_t>;
 using StdVectorType = std::vector<uint8_t>;
 bool WriteFromSmallVector(pb_ostream_t* stream, const pb_byte_t* buf,
                           size_t count);
@@ -232,25 +232,25 @@ class ProtoOutputStream {
  * values into a nanopb Stream and deserialization consists of
  * reading values from nanopb Stream.
  *
- * Implementations must define a template specialization for wpi::Protobuf with
+ * Implementations must define a template specialization for wpi::util::Protobuf with
  * T being the type that is being serialized/deserialized, with the following
  * static members (as enforced by this concept):
  * - using MessageStruct = nanopb_message_struct_here: typedef to the wpilib
  *   modified nanopb message struct
- * - std::optional<T> Unpack(wpi::ProtoInputStream<T>&): function
+ * - std::optional<T> Unpack(wpi::util::ProtoInputStream<T>&): function
  *   for deserialization
- * - bool Pack(wpi::ProtoOutputStream<T>&, T&& value): function
+ * - bool Pack(wpi::util::ProtoOutputStream<T>&, T&& value): function
  *   for serialization
  *
  * As a suggestion, 2 extra type usings can be added to simplify the stream
  * definitions, however these are not required.
- * - using InputStream = wpi::ProtoInputStream<T>;
- * - using OutputStream = wpi::ProtoOutputStream<T>;
+ * - using InputStream = wpi::util::ProtoInputStream<T>;
+ * - using OutputStream = wpi::util::ProtoOutputStream<T>;
  */
 template <typename T>
 concept ProtobufSerializable = requires(
-    wpi::ProtoOutputStream<std::remove_cvref_t<T>>& ostream,
-    wpi::ProtoInputStream<std::remove_cvref_t<T>>& istream, const T& value) {
+    wpi::util::ProtoOutputStream<std::remove_cvref_t<T>>& ostream,
+    wpi::util::ProtoInputStream<std::remove_cvref_t<T>>& istream, const T& value) {
   typename Protobuf<typename std::remove_cvref_t<T>>;
   {
     Protobuf<typename std::remove_cvref_t<T>>::Unpack(istream)
@@ -274,14 +274,14 @@ concept ProtobufSerializable = requires(
  * Specifies that a type is capable of in-place protobuf deserialization.
  *
  * In addition to meeting ProtobufSerializable, implementations must define a
- * wpi::Protobuf<T> static member -
- * `bool UnpackInto(T*, wpi::ProtoInputStream<T>&)` to update the pointed-to T
+ * wpi::util::Protobuf<T> static member -
+ * `bool UnpackInto(T*, wpi::util::ProtoInputStream<T>&)` to update the pointed-to T
  * with the contents of the message.
  */
 template <typename T>
 concept MutableProtobufSerializable =
     ProtobufSerializable<T> &&
-    requires(T* out, wpi::ProtoInputStream<T>& istream) {
+    requires(T* out, wpi::util::ProtoInputStream<T>& istream) {
       {
         Protobuf<typename std::remove_cvref_t<T>>::UnpackInto(out, istream)
       } -> std::same_as<bool>;
@@ -345,7 +345,7 @@ class ProtobufMessage {
    * @param[in] value value
    * @return true if successful
    */
-  bool Pack(wpi::SmallVectorImpl<uint8_t>& out, const T& value) {
+  bool Pack(wpi::util::SmallVectorImpl<uint8_t>& out, const T& value) {
     ProtoOutputStream<std::remove_cvref_t<T>> stream{out};
     return Protobuf<std::remove_cvref_t<T>>::Pack(stream, value);
   }
@@ -391,4 +391,4 @@ class ProtobufMessage {
   }
 };
 
-}  // namespace wpi
+}  // namespace wpi::util

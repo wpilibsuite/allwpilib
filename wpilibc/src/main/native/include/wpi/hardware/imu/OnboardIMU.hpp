@@ -10,7 +10,7 @@
 #include "wpi/units/angle.hpp"
 #include "wpi/units/angular_velocity.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * SystemCore onboard IMU
@@ -42,7 +42,7 @@ class OnboardIMU {
    * Get the yaw value
    * @return yaw value
    */
-  units::radian_t GetYaw();
+  wpi::units::radian_t GetYaw();
 
   /**
    * Reset the current yaw value to 0. Future reads of the yaw value will be
@@ -51,80 +51,80 @@ class OnboardIMU {
   void ResetYaw();
 
   /**
-   * Get the yaw as a Rotation2d.
+   * Get the yaw as a wpi::math::Rotation2d.
    * @return yaw
    */
-  Rotation2d GetRotation2d();
+  wpi::math::Rotation2d GetRotation2d();
 
   /**
-   * Get the 3D orientation as a Rotation3d.
+   * Get the 3D orientation as a wpi::math::Rotation3d.
    * @return 3D orientation
    */
-  Rotation3d GetRotation3d();
+  wpi::math::Rotation3d GetRotation3d();
 
   /**
-   * Get the 3D orientation as a Quaternion.
+   * Get the 3D orientation as a wpi::math::Quaternion.
    * @return 3D orientation
    */
-  Quaternion GetQuaternion();
+  wpi::math::Quaternion GetQuaternion();
 
   /**
    * Get the angle about the X axis of the IMU.
    * @return angle about the X axis
    */
-  units::radian_t GetAngleX();
+  wpi::units::radian_t GetAngleX();
 
   /**
    * Get the angle about the Y axis of the IMU.
    * @return angle about the Y axis
    */
-  units::radian_t GetAngleY();
+  wpi::units::radian_t GetAngleY();
 
   /**
    * Get the angle about the Z axis of the IMU.
    * @return angle about the Z axis
    */
-  units::radian_t GetAngleZ();
+  wpi::units::radian_t GetAngleZ();
 
   /**
    * Get the angular rate about the X axis of the IMU.
    * @return angular rate about the X axis
    */
-  units::radians_per_second_t GetGyroRateX();
+  wpi::units::radians_per_second_t GetGyroRateX();
 
   /**
    * Get the angular rate about the Y axis of the IMU.
    * @return angular rate about the Y axis
    */
-  units::radians_per_second_t GetGyroRateY();
+  wpi::units::radians_per_second_t GetGyroRateY();
 
   /**
    * Get the angular rate about the Z axis of the IMU.
    * @return angular rate about the Z axis
    */
-  units::radians_per_second_t GetGyroRateZ();
+  wpi::units::radians_per_second_t GetGyroRateZ();
 
   /**
    * Get the acceleration along the X axis of the IMU.
    * @return acceleration along the X axis
    */
-  units::meters_per_second_squared_t GetAccelX();
+  wpi::units::meters_per_second_squared_t GetAccelX();
 
   /**
    * Get the acceleration along the Z axis of the IMU.
    * @return acceleration along the Z axis
    */
-  units::meters_per_second_squared_t GetAccelY();
+  wpi::units::meters_per_second_squared_t GetAccelY();
 
   /**
    * Get the acceleration along the Z axis of the IMU.
    * @return acceleration along the Z axis
    */
-  units::meters_per_second_squared_t GetAccelZ();
+  wpi::units::meters_per_second_squared_t GetAccelZ();
 
  private:
-  units::radian_t GetYawNoOffset();
+  wpi::units::radian_t GetYawNoOffset();
   MountOrientation m_mountOrientation;
-  units::radian_t m_yawOffset{0};
+  wpi::units::radian_t m_yawOffset{0};
 };
-}  // namespace frc
+}  // namespace wpi

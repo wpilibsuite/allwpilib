@@ -9,7 +9,7 @@
 #include "wpi/glass/Model.hpp"
 #include "wpi/util/function_ref.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 class DoubleSource;
 
@@ -23,11 +23,11 @@ class PWMModel : public Model {
 class PWMsModel : public Model {
  public:
   virtual void ForEachPWM(
-      wpi::function_ref<void(PWMModel& model, int index)> func) = 0;
+      wpi::util::function_ref<void(PWMModel& model, int index)> func) = 0;
 };
 
 void DisplayPWM(PWMModel* model, int index, bool outputsEnabled);
 void DisplayPWMs(PWMsModel* model, bool outputsEnabled,
                  std::string_view noneMsg = "No PWM outputs");
 
-}  // namespace glass
+}  // namespace wpi::glass

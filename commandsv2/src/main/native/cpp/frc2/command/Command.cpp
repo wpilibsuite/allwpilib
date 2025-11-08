@@ -13,10 +13,10 @@
 #include "wpi/util/sendable/SendableBuilder.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 Command::Command() {
-  wpi::SendableRegistry::Add(this, GetTypeName(*this));
+  wpi::util::SendableRegistry::Add(this, GetTypeName(*this));
 }
 
 Command::~Command() {
@@ -32,7 +32,7 @@ void Command::Initialize() {}
 void Command::Execute() {}
 void Command::End(bool interrupted) {}
 
-wpi::SmallSet<Subsystem*, 4> Command::GetRequirements() const {
+wpi::util::SmallSet<Subsystem*, 4> Command::GetRequirements() const {
   return m_requirements;
 }
 
@@ -40,7 +40,7 @@ void Command::AddRequirements(Requirements requirements) {
   m_requirements.insert(requirements.begin(), requirements.end());
 }
 
-void Command::AddRequirements(wpi::SmallSet<Subsystem*, 4> requirements) {
+void Command::AddRequirements(wpi::util::SmallSet<Subsystem*, 4> requirements) {
   m_requirements.insert(requirements.begin(), requirements.end());
 }
 
@@ -49,22 +49,22 @@ void Command::AddRequirements(Subsystem* requirement) {
 }
 
 void Command::SetName(std::string_view name) {
-  wpi::SendableRegistry::SetName(this, name);
+  wpi::util::SendableRegistry::SetName(this, name);
 }
 
 std::string Command::GetName() const {
-  return wpi::SendableRegistry::GetName(this);
+  return wpi::util::SendableRegistry::GetName(this);
 }
 
 std::string Command::GetSubsystem() const {
-  return wpi::SendableRegistry::GetSubsystem(this);
+  return wpi::util::SendableRegistry::GetSubsystem(this);
 }
 
 void Command::SetSubsystem(std::string_view subsystem) {
-  wpi::SendableRegistry::SetSubsystem(this, subsystem);
+  wpi::util::SendableRegistry::SetSubsystem(this, subsystem);
 }
 
-CommandPtr Command::WithTimeout(units::second_t duration) && {
+CommandPtr Command::WithTimeout(wpi::units::second_t duration) && {
   return std::move(*this).ToPtr().WithTimeout(duration);
 }
 
@@ -178,7 +178,7 @@ bool Command::IsComposed() const {
 
 void Command::SetComposed(bool isComposed) {
   if (isComposed) {
-    m_previousComposition = wpi::GetStackTrace(1);
+    m_previousComposition = wpi::util::GetStackTrace(1);
   } else {
     m_previousComposition.reset();
   }
@@ -188,7 +188,7 @@ std::optional<std::string> Command::GetPreviousCompositionSite() const {
   return m_previousComposition;
 }
 
-void Command::InitSendable(wpi::SendableBuilder& builder) {
+void Command::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Command");
   builder.AddStringProperty(".name", [this] { return GetName(); }, nullptr);
   builder.AddBooleanProperty(
@@ -220,7 +220,7 @@ void Command::InitSendable(wpi::SendableBuilder& builder) {
       "runsWhenDisabled", [this] { return RunsWhenDisabled(); }, nullptr);
 }
 
-namespace frc2 {
+namespace wpi::cmd {
 bool RequirementsDisjoint(Command* first, Command* second) {
   bool disjoint = true;
   auto&& requirements = second->GetRequirements();
@@ -229,4 +229,4 @@ bool RequirementsDisjoint(Command* first, Command* second) {
   }
   return disjoint;
 }
-}  // namespace frc2
+}  // namespace wpi::cmd

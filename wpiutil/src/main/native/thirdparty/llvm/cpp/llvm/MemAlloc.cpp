@@ -12,7 +12,7 @@
 // These are out of line to have __cpp_aligned_new not affect ABI.
 
 LLVM_ATTRIBUTE_RETURNS_NONNULL LLVM_ATTRIBUTE_RETURNS_NOALIAS void *
-wpi::allocate_buffer(size_t Size, size_t Alignment) {
+wpi::util::allocate_buffer(size_t Size, size_t Alignment) {
   void *Result = ::operator new(Size,
 #ifdef __cpp_aligned_new
                                 std::align_val_t(Alignment),
@@ -24,7 +24,7 @@ wpi::allocate_buffer(size_t Size, size_t Alignment) {
   return Result;
 }
 
-void wpi::deallocate_buffer(void *Ptr, size_t Size, size_t Alignment) {
+void wpi::util::deallocate_buffer(void *Ptr, size_t Size, size_t Alignment) {
   ::operator delete(Ptr
 #ifdef __cpp_sized_deallocation
                     ,

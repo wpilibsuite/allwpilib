@@ -21,7 +21,7 @@
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * A Kalman filter combines predictions from a model and measurements to give an
@@ -54,8 +54,8 @@ class SteadyStateKalmanFilter {
   using InputVector = Vectord<Inputs>;
   using OutputVector = Vectord<Outputs>;
 
-  using StateArray = wpi::array<double, States>;
-  using OutputArray = wpi::array<double, Outputs>;
+  using StateArray = wpi::util::array<double, States>;
+  using OutputArray = wpi::util::array<double, Outputs>;
 
   /**
    * Constructs a steady-state Kalman filter with the given plant.
@@ -73,7 +73,7 @@ class SteadyStateKalmanFilter {
   SteadyStateKalmanFilter(LinearSystem<States, Inputs, Outputs>& plant,
                           const StateArray& stateStdDevs,
                           const OutputArray& measurementStdDevs,
-                          units::second_t dt) {
+                          wpi::units::second_t dt) {
     m_plant = &plant;
 
     auto contQ = MakeCovMatrix(stateStdDevs);
@@ -205,7 +205,7 @@ class SteadyStateKalmanFilter {
    * @param u  New control input from controller.
    * @param dt Timestep for prediction.
    */
-  void Predict(const InputVector& u, units::second_t dt) {
+  void Predict(const InputVector& u, wpi::units::second_t dt) {
     m_xHat = m_plant->CalculateX(m_xHat, u, dt);
   }
 
@@ -242,4 +242,4 @@ extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
     SteadyStateKalmanFilter<2, 1, 1>;
 
-}  // namespace frc
+}  // namespace wpi::math

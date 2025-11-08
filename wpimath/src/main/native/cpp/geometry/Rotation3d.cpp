@@ -6,10 +6,10 @@
 
 #include "wpi/util/json.hpp"
 
-void frc::to_json(wpi::json& json, const Rotation3d& rotation) {
-  json = wpi::json{{"quaternion", rotation.GetQuaternion()}};
+void wpi::math::to_json(wpi::util::json& json, const Rotation3d& rotation) {
+  json = wpi::util::json{{"quaternion", rotation.GetQuaternion()}};
 }
 
-void frc::from_json(const wpi::json& json, Rotation3d& rotation) {
+void wpi::math::from_json(const wpi::util::json& json, Rotation3d& rotation) {
   rotation = Rotation3d{json.at("quaternion").get<Quaternion>()};
 }

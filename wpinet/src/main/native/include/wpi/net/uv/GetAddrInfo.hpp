@@ -16,7 +16,7 @@
 #include "wpi/net/uv/Request.hpp"
 #include "wpi/util/Signal.h"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 class Loop;
 
@@ -34,7 +34,7 @@ class GetAddrInfoReq : public RequestImpl<GetAddrInfoReq, uv_getaddrinfo_t> {
    * Resolved lookup signal.
    * Parameter is resolved address info.
    */
-  sig::Signal<const addrinfo&> resolved;
+  wpi::util::sig::Signal<const addrinfo&> resolved;
 };
 
 /**
@@ -115,6 +115,6 @@ inline void GetAddrInfo(const std::shared_ptr<Loop>& loop,
   GetAddrInfo(*loop, std::move(callback), node, service, hints);
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_GETADDRINFO_HPP_

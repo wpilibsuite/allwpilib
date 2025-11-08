@@ -4,7 +4,7 @@
 
 #include "wpi/nt/NTSendableBuilder.hpp"
 
-using namespace nt;
+using namespace wpi::nt;
 
 NTSendableBuilder::BackendKind NTSendableBuilder::GetBackendKind() const {
   return kNetworkTables;

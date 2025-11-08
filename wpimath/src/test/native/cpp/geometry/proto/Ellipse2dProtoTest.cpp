@@ -7,7 +7,7 @@
 #include "wpi/math/geometry/Ellipse2d.hpp"
 #include "wpi/util/SmallVector.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 namespace {
 
@@ -16,8 +16,8 @@ const Ellipse2d kExpectedData{
 }  // namespace
 
 TEST(Ellipse2dProtoTest, Roundtrip) {
-  wpi::ProtobufMessage<decltype(kExpectedData)> message;
-  wpi::SmallVector<uint8_t, 64> buf;
+  wpi::util::ProtobufMessage<decltype(kExpectedData)> message;
+  wpi::util::SmallVector<uint8_t, 64> buf;
 
   ASSERT_TRUE(message.Pack(buf, kExpectedData));
   auto unpacked_data = message.Unpack(buf);

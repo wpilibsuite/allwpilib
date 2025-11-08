@@ -15,11 +15,11 @@
 #include "server/ServerPublisher.hpp"
 #include "wpi/util/SpanExtras.hpp"
 
-using namespace nt::server;
+using namespace wpi::nt::server;
 
 void ServerClient4Base::ClientPublish(int pubuid, std::string_view name,
                                       std::string_view typeStr,
-                                      const wpi::json& properties,
+                                      const wpi::util::json& properties,
                                       const PubSubOptionsImpl& options) {
   DEBUG3("ClientPublish({}, {}, {}, {})", m_id, name, pubuid, typeStr);
   auto topic = m_storage.CreateTopic(this, name, typeStr, properties);
@@ -67,7 +67,7 @@ void ServerClient4Base::ClientUnpublish(int pubuid) {
 }
 
 void ServerClient4Base::ClientSetProperties(std::string_view name,
-                                            const wpi::json& update) {
+                                            const wpi::util::json& update) {
   DEBUG4("ClientSetProperties({}, {}, {})", m_id, name, update.dump());
   ServerTopic* topic = m_storage.GetTopic(name);
   if (!topic || !topic->IsPublished()) {
@@ -205,7 +205,7 @@ bool ServerClient4Base::DoProcessIncomingMessages(
   DEBUG4("ProcessIncomingMessage()");
   max = (std::min)(m_msgsBuf.size(), max);
   std::span<net::ClientMessage> msgs =
-      queue.ReadQueue(wpi::take_front(std::span{m_msgsBuf}, max));
+      queue.ReadQueue(wpi::util::take_front(std::span{m_msgsBuf}, max));
 
   // just map as a normal client into client=0 calls
   bool updatepub = false;

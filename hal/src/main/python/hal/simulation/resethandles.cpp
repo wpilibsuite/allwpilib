@@ -19,7 +19,7 @@ void HALSIM_ResetGlobalHandles() {
     }
   }
 
-  hal::HandleBase::ResetGlobalHandles();
+  wpi::hal::HandleBase::ResetGlobalHandles();
 }
 
 #else

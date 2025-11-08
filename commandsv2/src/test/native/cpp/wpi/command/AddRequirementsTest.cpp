@@ -7,7 +7,7 @@
 #include "wpi/commands2/RunCommand.hpp"
 #include "wpi/util/array.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 // Class to verify the overload resolution of Command::AddRequirements. This
 // does not derive from Command because AddRequirements is non-virtual,
@@ -15,7 +15,7 @@ using namespace frc2;
 class MockAddRequirements {
  public:
   MOCK_METHOD(void, AddRequirements, (Requirements), ());
-  MOCK_METHOD(void, AddRequirements, ((wpi::SmallSet<Subsystem*, 4>)), ());
+  MOCK_METHOD(void, AddRequirements, ((wpi::util::SmallSet<Subsystem*, 4>)), ());
   MOCK_METHOD(void, AddRequirements, (Subsystem*), ());
 };
 
@@ -40,12 +40,12 @@ TEST(AddRequirementsTest, SpanOverloadResolution) {
 }
 
 TEST(AddRequirementsTest, SmallSetOverloadResolution) {
-  wpi::SmallSet<Subsystem*, 4> requirementsSet;
+  wpi::util::SmallSet<Subsystem*, 4> requirementsSet;
 
   MockAddRequirements overloadResolver;
 
   EXPECT_CALL(overloadResolver,
-              AddRequirements(testing::An<wpi::SmallSet<Subsystem*, 4>>()));
+              AddRequirements(testing::An<wpi::util::SmallSet<Subsystem*, 4>>()));
 
   overloadResolver.AddRequirements(requirementsSet);
 }
@@ -84,7 +84,7 @@ TEST(AddRequirementsTest, SpanSemantics) {
   TestSubsystem requirement1;
   TestSubsystem requirement2;
 
-  wpi::array<Subsystem* const, 2> requirementsArray(&requirement1,
+  wpi::util::array<Subsystem* const, 2> requirementsArray(&requirement1,
                                                     &requirement2);
 
   RunCommand command([] {});
@@ -97,7 +97,7 @@ TEST(AddRequirementsTest, SpanSemantics) {
 TEST(AddRequirementsTest, SpanDuplicatesSemantics) {
   TestSubsystem requirement;
 
-  wpi::array<Subsystem* const, 2> requirementsArray(&requirement, &requirement);
+  wpi::util::array<Subsystem* const, 2> requirementsArray(&requirement, &requirement);
 
   RunCommand command([] {});
   command.AddRequirements(std::span{requirementsArray});
@@ -109,7 +109,7 @@ TEST(AddRequirementsTest, SmallSetSemantics) {
   TestSubsystem requirement1;
   TestSubsystem requirement2;
 
-  wpi::SmallSet<Subsystem*, 4> requirementsSet;
+  wpi::util::SmallSet<Subsystem*, 4> requirementsSet;
   requirementsSet.insert(&requirement1);
   requirementsSet.insert(&requirement2);
 

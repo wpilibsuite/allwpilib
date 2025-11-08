@@ -7,10 +7,10 @@
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 #include "wpimath/protobuf/geometry3d.npb.h"
 
-std::optional<frc::Transform3d> wpi::Protobuf<frc::Transform3d>::Unpack(
+std::optional<wpi::math::Transform3d> wpi::util::Protobuf<wpi::math::Transform3d>::Unpack(
     InputStream& stream) {
-  wpi::UnpackCallback<frc::Translation3d> tsln;
-  wpi::UnpackCallback<frc::Rotation3d> rot;
+  wpi::util::UnpackCallback<wpi::math::Translation3d> tsln;
+  wpi::util::UnpackCallback<wpi::math::Rotation3d> rot;
   wpi_proto_ProtobufTransform3d msg{
       .translation = tsln.Callback(),
       .rotation = rot.Callback(),
@@ -26,16 +26,16 @@ std::optional<frc::Transform3d> wpi::Protobuf<frc::Transform3d>::Unpack(
     return {};
   }
 
-  return frc::Transform3d{
+  return wpi::math::Transform3d{
       itsln[0],
       irot[0],
   };
 }
 
-bool wpi::Protobuf<frc::Transform3d>::Pack(OutputStream& stream,
-                                           const frc::Transform3d& value) {
-  wpi::PackCallback tsln{&value.Translation()};
-  wpi::PackCallback rot{&value.Rotation()};
+bool wpi::util::Protobuf<wpi::math::Transform3d>::Pack(OutputStream& stream,
+                                           const wpi::math::Transform3d& value) {
+  wpi::util::PackCallback tsln{&value.Translation()};
+  wpi::util::PackCallback rot{&value.Rotation()};
   wpi_proto_ProtobufTransform3d msg{
       .translation = tsln.Callback(),
       .rotation = rot.Callback(),

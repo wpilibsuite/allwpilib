@@ -6,7 +6,7 @@
 
 #include "wpi/glass/Model.hpp"
 
-namespace glass {
+namespace wpi::glass {
 class DoubleSource;
 class MotorControllerModel : public Model {
  public:
@@ -16,4 +16,4 @@ class MotorControllerModel : public Model {
   virtual void SetPercent(double value) = 0;
 };
 void DisplayMotorController(MotorControllerModel* m);
-}  // namespace glass
+}  // namespace wpi::glass

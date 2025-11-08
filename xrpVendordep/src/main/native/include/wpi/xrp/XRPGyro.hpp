@@ -9,7 +9,7 @@
 #include "wpi/units/angle.hpp"
 #include "wpi/units/angular_velocity.hpp"
 
-namespace frc {
+namespace wpi::xrp {
 
 /**
  * @ingroup xrp_api
@@ -41,14 +41,14 @@ class XRPGyro {
    *
    * @return the current heading of the robot in radians.
    */
-  units::radian_t GetAngle() const;
+  wpi::units::radian_t GetAngle() const;
 
   /**
    * Gets the angle the robot is facing.
    *
-   * @return A Rotation2d with the current heading.
+   * @return A wpi::math::Rotation2d with the current heading.
    */
-  frc::Rotation2d GetRotation2d() const;
+  wpi::math::Rotation2d GetRotation2d() const;
 
   /**
    * Return the rate of rotation of the gyro
@@ -57,49 +57,49 @@ class XRPGyro {
    *
    * @return the current rate in radians per second
    */
-  units::radians_per_second_t GetRate() const;
+  wpi::units::radians_per_second_t GetRate() const;
 
   /**
    * Gets the rate of turn in radians-per-second around the X-axis.
    *
    * @return rate of turn in radians-per-second
    */
-  units::radians_per_second_t GetRateX() const;
+  wpi::units::radians_per_second_t GetRateX() const;
 
   /**
    * Gets the rate of turn in radians-per-second around the Y-axis.
    *
    * @return rate of turn in radians-per-second
    */
-  units::radians_per_second_t GetRateY() const;
+  wpi::units::radians_per_second_t GetRateY() const;
 
   /**
    * Gets the rate of turn in radians-per-second around the Z-axis.
    *
    * @return rate of turn in radians-per-second
    */
-  units::radians_per_second_t GetRateZ() const;
+  wpi::units::radians_per_second_t GetRateZ() const;
 
   /**
    * Gets the currently reported angle around the X-axis.
    *
    * @return current angle around X-axis in radians
    */
-  units::radian_t GetAngleX() const;
+  wpi::units::radian_t GetAngleX() const;
 
   /**
    * Gets the currently reported angle around the Y-axis.
    *
    * @return current angle around Y-axis in radians
    */
-  units::radian_t GetAngleY() const;
+  wpi::units::radian_t GetAngleY() const;
 
   /**
    * Gets the currently reported angle around the Z-axis.
    *
    * @return current angle around Z-axis in radians
    */
-  units::radian_t GetAngleZ() const;
+  wpi::units::radian_t GetAngleZ() const;
 
   /**
    * Reset the gyro angles to 0.
@@ -115,11 +115,11 @@ class XRPGyro {
   hal::SimDouble m_simAngleY;
   hal::SimDouble m_simAngleZ;
 
-  units::radian_t m_angleXOffset = 0_rad;
-  units::radian_t m_angleYOffset = 0_rad;
-  units::radian_t m_angleZOffset = 0_rad;
+  wpi::units::radian_t m_angleXOffset = 0_rad;
+  wpi::units::radian_t m_angleYOffset = 0_rad;
+  wpi::units::radian_t m_angleZOffset = 0_rad;
 };
 
 /** @} */
 
-}  // namespace frc
+}  // namespace wpi::xrp

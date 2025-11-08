@@ -11,7 +11,7 @@
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 /**
  * A base for subsystems that handles registration in the constructor, and
  * provides a more intuitive method for setting the default command.
@@ -19,10 +19,10 @@ namespace frc2 {
  * This class is provided by the NewCommands VendorDep
  */
 class SubsystemBase : public Subsystem,
-                      public wpi::Sendable,
-                      public wpi::SendableHelper<SubsystemBase> {
+                      public wpi::util::Sendable,
+                      public wpi::util::SendableHelper<SubsystemBase> {
  public:
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
   /**
    * Gets the name of this Subsystem.
@@ -59,7 +59,7 @@ class SubsystemBase : public Subsystem,
    * @param name name to give child
    * @param child sendable
    */
-  void AddChild(std::string name, wpi::Sendable* child);
+  void AddChild(std::string name, wpi::util::Sendable* child);
 
  protected:
   /**
@@ -73,4 +73,4 @@ class SubsystemBase : public Subsystem,
    */
   explicit SubsystemBase(std::string_view name);
 };
-}  // namespace frc2
+}  // namespace wpi::cmd

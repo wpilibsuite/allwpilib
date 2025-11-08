@@ -6,13 +6,13 @@
 #	include <fstream>
 #	include <string>
 
-namespace wpi {
+namespace wpi::util {
 
 bool is_debugger_present() noexcept
 {
   return false;
 }
 
-} // namespace wpi
+} // namespace wpi::util
 
 #endif

@@ -13,7 +13,7 @@
 
 #define IDT_TIMER1 1001
 
-using namespace cs;
+using namespace wpi::cs;
 
 class UsbCameraListener::Impl {
  public:
@@ -55,10 +55,10 @@ class UsbCameraListener::Impl {
   }
 
   Notifier& m_notifier;
-  std::unique_ptr<cs::WindowsMessagePump> m_messagePump;
+  std::unique_ptr<wpi::cs::WindowsMessagePump> m_messagePump;
 };
 
-UsbCameraListener::UsbCameraListener(wpi::Logger& logger, Notifier& notifier)
+UsbCameraListener::UsbCameraListener(wpi::util::Logger& logger, Notifier& notifier)
     : m_impl{std::make_unique<Impl>(notifier)} {}
 
 UsbCameraListener::~UsbCameraListener() {

@@ -5,16 +5,16 @@
 #include "../PortsInternal.h"
 #include "REVPHDataInternal.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeREVPHData() {
   static REVPHData spd[kNumREVPHModules];
-  ::hal::SimREVPHData = spd;
+  ::wpi::hal::SimREVPHData = spd;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-REVPHData* hal::SimREVPHData;
+REVPHData* wpi::hal::SimREVPHData;
 void REVPHData::ResetData() {
   for (int i = 0; i < kNumREVPHChannels; i++) {
     solenoidOutput[i].Reset(false);

@@ -15,7 +15,7 @@
 #include "wpi/glass/support/ExpressionParser.hpp"
 #include "wpi/util/DenseMap.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 void DrawLEDSources(const int* values, BooleanSource** sources, int numValues,
                     int cols, const ImU32* colors, float size, float spacing,
@@ -228,7 +228,7 @@ struct InputExprState {
   char inputBuffer[kBufferSize];
 };
 
-static wpi::DenseMap<int, InputExprState> exprStates;
+static wpi::util::DenseMap<int, InputExprState> exprStates;
 // Shared string buffer for inactive inputs
 static char previewBuffer[kBufferSize];
 
@@ -267,7 +267,7 @@ bool InputExpr(const char* label, V* v, const char* format,
     }
 
     // Attempt to parse current value
-    auto result = glass::expression::TryParseExpr<V>(state.inputBuffer);
+    auto result = wpi::glass::expression::TryParseExpr<V>(state.inputBuffer);
     if (result) {
       *v = result.value();
     } else if (active) {
@@ -289,4 +289,4 @@ template bool InputExpr(const char*, int64_t*, const char*,
 template bool InputExpr(const char*, float*, const char*, ImGuiInputTextFlags);
 template bool InputExpr(const char*, double*, const char*, ImGuiInputTextFlags);
 
-}  // namespace glass
+}  // namespace wpi::glass

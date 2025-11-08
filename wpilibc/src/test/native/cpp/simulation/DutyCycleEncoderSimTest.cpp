@@ -10,7 +10,7 @@
 #include "wpi/hal/HAL.h"
 #include "wpi/hardware/rotation/DutyCycleEncoder.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 
 TEST(DutyCycleEncoderSimTest, Set) {
   HAL_Initialize(500, 0);
@@ -34,4 +34,4 @@ TEST(DutyCycleEncoderSimTest, SetIsConnected) {
   EXPECT_FALSE(enc.IsConnected());
 }
 
-}  // namespace frc::sim
+}  // namespace wpi::sim

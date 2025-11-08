@@ -16,7 +16,7 @@
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/NetworkTableListener.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 class NTMechanism2DModel : public Mechanism2DModel {
  public:
@@ -24,7 +24,7 @@ class NTMechanism2DModel : public Mechanism2DModel {
 
   // path is to the table containing ".type", excluding the trailing /
   explicit NTMechanism2DModel(std::string_view path);
-  NTMechanism2DModel(nt::NetworkTableInstance inst, std::string_view path);
+  NTMechanism2DModel(wpi::nt::NetworkTableInstance inst, std::string_view path);
   ~NTMechanism2DModel() override;
 
   const char* GetPath() const { return m_path.c_str(); }
@@ -34,41 +34,41 @@ class NTMechanism2DModel : public Mechanism2DModel {
   bool Exists() override;
   bool IsReadOnly() override;
 
-  frc::Translation2d GetDimensions() const override {
+  wpi::math::Translation2d GetDimensions() const override {
     return m_dimensionsValue;
   }
   ImU32 GetBackgroundColor() const override { return m_bgColorValue; }
   void ForEachRoot(
-      wpi::function_ref<void(MechanismRootModel& model)> func) override;
+      wpi::util::function_ref<void(MechanismRootModel& model)> func) override;
 
  private:
-  nt::NetworkTableInstance m_inst;
+  wpi::nt::NetworkTableInstance m_inst;
   std::string m_path;
-  nt::MultiSubscriber m_tableSub;
-  nt::Topic m_nameTopic;
-  nt::Topic m_dimensionsTopic;
-  nt::Topic m_bgColorTopic;
-  nt::NetworkTableListenerPoller m_poller;
+  wpi::nt::MultiSubscriber m_tableSub;
+  wpi::nt::Topic m_nameTopic;
+  wpi::nt::Topic m_dimensionsTopic;
+  wpi::nt::Topic m_bgColorTopic;
+  wpi::nt::NetworkTableListenerPoller m_poller;
 
   std::string m_nameValue;
-  frc::Translation2d m_dimensionsValue;
+  wpi::math::Translation2d m_dimensionsValue;
   ImU32 m_bgColorValue = 0;
 
   class NTMechanismObjectModel;
   class NTMechanismGroupImpl final {
    public:
-    NTMechanismGroupImpl(nt::NetworkTableInstance inst, std::string_view path,
+    NTMechanismGroupImpl(wpi::nt::NetworkTableInstance inst, std::string_view path,
                          std::string_view name)
         : m_inst{inst}, m_path{path}, m_name{name} {}
 
     const char* GetName() const { return m_name.c_str(); }
     void ForEachObject(
-        wpi::function_ref<void(MechanismObjectModel& model)> func);
+        wpi::util::function_ref<void(MechanismObjectModel& model)> func);
 
-    void NTUpdate(const nt::Event& event, std::string_view name);
+    void NTUpdate(const wpi::nt::Event& event, std::string_view name);
 
    protected:
-    nt::NetworkTableInstance m_inst;
+    wpi::nt::NetworkTableInstance m_inst;
     std::string m_path;
     std::string m_name;
     std::vector<std::unique_ptr<NTMechanismObjectModel>> m_objects;
@@ -76,7 +76,7 @@ class NTMechanism2DModel : public Mechanism2DModel {
 
   class NTMechanismObjectModel final : public MechanismObjectModel {
    public:
-    NTMechanismObjectModel(nt::NetworkTableInstance inst, std::string_view path,
+    NTMechanismObjectModel(wpi::nt::NetworkTableInstance inst, std::string_view path,
                            std::string_view name)
         : m_group{inst, path, name},
           m_typeTopic{inst.GetTopic(fmt::format("{}/.type", path))},
@@ -87,37 +87,37 @@ class NTMechanism2DModel : public Mechanism2DModel {
 
     const char* GetName() const final { return m_group.GetName(); }
     void ForEachObject(
-        wpi::function_ref<void(MechanismObjectModel& model)> func) final {
+        wpi::util::function_ref<void(MechanismObjectModel& model)> func) final {
       m_group.ForEachObject(func);
     }
 
     const char* GetType() const final { return m_typeValue.c_str(); }
     ImU32 GetColor() const final { return m_colorValue; }
     double GetWeight() const final { return m_weightValue; }
-    frc::Rotation2d GetAngle() const final { return m_angleValue; }
-    units::meter_t GetLength() const final { return m_lengthValue; }
+    wpi::math::Rotation2d GetAngle() const final { return m_angleValue; }
+    wpi::units::meter_t GetLength() const final { return m_lengthValue; }
 
-    bool NTUpdate(const nt::Event& event, std::string_view name);
+    bool NTUpdate(const wpi::nt::Event& event, std::string_view name);
 
    private:
     NTMechanismGroupImpl m_group;
 
-    nt::Topic m_typeTopic;
-    nt::Topic m_colorTopic;
-    nt::Topic m_weightTopic;
-    nt::Topic m_angleTopic;
-    nt::Topic m_lengthTopic;
+    wpi::nt::Topic m_typeTopic;
+    wpi::nt::Topic m_colorTopic;
+    wpi::nt::Topic m_weightTopic;
+    wpi::nt::Topic m_angleTopic;
+    wpi::nt::Topic m_lengthTopic;
 
     std::string m_typeValue;
     ImU32 m_colorValue = IM_COL32_WHITE;
     double m_weightValue = 1.0;
-    frc::Rotation2d m_angleValue;
-    units::meter_t m_lengthValue = 0.0_m;
+    wpi::math::Rotation2d m_angleValue;
+    wpi::units::meter_t m_lengthValue = 0.0_m;
   };
 
   class RootModel final : public MechanismRootModel {
    public:
-    RootModel(nt::NetworkTableInstance inst, std::string_view path,
+    RootModel(wpi::nt::NetworkTableInstance inst, std::string_view path,
               std::string_view name)
         : m_group{inst, path, name},
           m_xTopic{inst.GetTopic(fmt::format("{}/x", path))},
@@ -125,22 +125,22 @@ class NTMechanism2DModel : public Mechanism2DModel {
 
     const char* GetName() const final { return m_group.GetName(); }
     void ForEachObject(
-        wpi::function_ref<void(MechanismObjectModel& model)> func) final {
+        wpi::util::function_ref<void(MechanismObjectModel& model)> func) final {
       m_group.ForEachObject(func);
     }
 
-    bool NTUpdate(const nt::Event& event, std::string_view childName);
+    bool NTUpdate(const wpi::nt::Event& event, std::string_view childName);
 
-    frc::Translation2d GetPosition() const override { return m_pos; };
+    wpi::math::Translation2d GetPosition() const override { return m_pos; };
 
    private:
     NTMechanismGroupImpl m_group;
-    nt::Topic m_xTopic;
-    nt::Topic m_yTopic;
-    frc::Translation2d m_pos;
+    wpi::nt::Topic m_xTopic;
+    wpi::nt::Topic m_yTopic;
+    wpi::math::Translation2d m_pos;
   };
 
   std::vector<std::unique_ptr<RootModel>> m_roots;
 };
 
-}  // namespace glass
+}  // namespace wpi::glass

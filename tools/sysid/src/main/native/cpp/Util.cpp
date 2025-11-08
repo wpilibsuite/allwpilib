@@ -67,7 +67,7 @@ void sysid::SaveFile(std::string_view contents,
   // Open a fd_ostream to write to file.
   std::error_code ec;
   // NOLINTNEXTLINE(build/include_what_you_use)
-  wpi::raw_fd_ostream ostream{path.string(), ec};
+  wpi::util::raw_fd_ostream ostream{path.string(), ec};
 
   // Check error code.
   if (ec) {

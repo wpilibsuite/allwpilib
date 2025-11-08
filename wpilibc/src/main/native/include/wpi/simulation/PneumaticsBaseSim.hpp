@@ -10,7 +10,7 @@
 #include "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
 #include "wpi/simulation/CallbackStore.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 
 class PneumaticsBaseSim {
  public:
@@ -195,4 +195,4 @@ class PneumaticsBaseSim {
   explicit PneumaticsBaseSim(const PneumaticsBase& module);
 };
 
-}  // namespace frc::sim
+}  // namespace wpi::sim

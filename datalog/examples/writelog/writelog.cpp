@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
 
   for (const auto& [name, fn] : testVec) {
     auto resVec = std::vector<microseconds::rep>();
-    wpi::print("{}: ", name);
+    wpi::util::print("{}: ", name);
 
     for (int i = 0; i < kNumRuns; ++i) {
       auto start = high_resolution_clock::now();
@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
       resVec.push_back(duration_cast<microseconds>(stop - start).count());
     }
 
-    wpi::print("{}us\n",
+    wpi::util::print("{}us\n",
                std::accumulate(resVec.begin(), resVec.end(), 0) / kNumRuns);
   }
 

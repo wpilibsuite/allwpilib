@@ -12,7 +12,7 @@
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 #include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
 
-namespace frc {
+namespace wpi::math {
 class TestTrajectory {
  public:
   static Trajectory GetTrajectory(TrajectoryConfig& config) {
@@ -33,4 +33,4 @@ class TestTrajectory {
   }
 };
 
-}  // namespace frc
+}  // namespace wpi::math

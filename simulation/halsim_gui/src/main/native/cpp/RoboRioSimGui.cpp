@@ -21,14 +21,14 @@ HALSIMGUI_DATASOURCE_BOOLEAN(RoboRioUserActive3V3, "Rio 3.3V Active");
 HALSIMGUI_DATASOURCE_INT(RoboRioUserFaults3V3, "Rio 3.3V Faults");
 HALSIMGUI_DATASOURCE_DOUBLE(RoboRioBrownoutVoltage, "Rio Brownout Voltage");
 
-class RoboRioUser3V3RailSimModel : public glass::RoboRioRailModel {
+class RoboRioUser3V3RailSimModel : public wpi::glass::RoboRioRailModel {
  public:
   void Update() override {}
   bool Exists() override { return true; }
-  glass::DoubleSource* GetVoltageData() override { return &m_voltage; }
-  glass::DoubleSource* GetCurrentData() override { return &m_current; }
-  glass::BooleanSource* GetActiveData() override { return &m_active; }
-  glass::IntegerSource* GetFaultsData() override { return &m_faults; }
+  wpi::glass::DoubleSource* GetVoltageData() override { return &m_voltage; }
+  wpi::glass::DoubleSource* GetCurrentData() override { return &m_current; }
+  wpi::glass::BooleanSource* GetActiveData() override { return &m_active; }
+  wpi::glass::IntegerSource* GetFaultsData() override { return &m_faults; }
 
   void SetVoltage(double val) override { HALSIM_SetRoboRioUserVoltage3V3(val); }
   void SetCurrent(double val) override { HALSIM_SetRoboRioUserCurrent3V3(val); }
@@ -42,16 +42,16 @@ class RoboRioUser3V3RailSimModel : public glass::RoboRioRailModel {
   RoboRioUserFaults3V3Source m_faults;
 };
 
-class RoboRioSimModel : public glass::RoboRioModel {
+class RoboRioSimModel : public wpi::glass::RoboRioModel {
  public:
   void Update() override {}
 
   bool Exists() override { return true; }
 
-  glass::RoboRioRailModel* GetUser3V3Rail() override { return &m_user3V3Rail; }
+  wpi::glass::RoboRioRailModel* GetUser3V3Rail() override { return &m_user3V3Rail; }
 
-  glass::DoubleSource* GetVInVoltageData() override { return &m_vInVoltage; }
-  glass::DoubleSource* GetBrownoutVoltage() override {
+  wpi::glass::DoubleSource* GetVInVoltageData() override { return &m_vInVoltage; }
+  wpi::glass::DoubleSource* GetBrownoutVoltage() override {
     return &m_brownoutVoltage;
   }
 
@@ -71,10 +71,10 @@ void RoboRioSimGui::Initialize() {
   HALSimGui::halProvider->Register(
       "RoboRIO", [] { return true; },
       [] { return std::make_unique<RoboRioSimModel>(); },
-      [](glass::Window* win, glass::Model* model) {
+      [](wpi::glass::Window* win, wpi::glass::Model* model) {
         win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
         win->SetDefaultPos(5, 125);
-        return glass::MakeFunctionView(
+        return wpi::glass::MakeFunctionView(
             [=] { DisplayRoboRio(static_cast<RoboRioSimModel*>(model)); });
       });
 }

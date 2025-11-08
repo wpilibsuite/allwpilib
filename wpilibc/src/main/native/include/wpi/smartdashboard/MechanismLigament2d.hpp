@@ -13,7 +13,7 @@
 #include "wpi/units/angle.hpp"
 #include "wpi/util/Color8Bit.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Ligament node on a Mechanism2d.
@@ -26,8 +26,8 @@ namespace frc {
 class MechanismLigament2d : public MechanismObject2d {
  public:
   MechanismLigament2d(std::string_view name, double length,
-                      units::degree_t angle, double lineWidth = 6,
-                      const frc::Color8Bit& color = {235, 137, 52});
+                      wpi::units::degree_t angle, double lineWidth = 6,
+                      const wpi::Color8Bit& color = {235, 137, 52});
 
   /**
    * Set the ligament color.
@@ -62,7 +62,7 @@ class MechanismLigament2d : public MechanismObject2d {
    *
    * @param angle the angle
    */
-  void SetAngle(units::degree_t angle);
+  void SetAngle(wpi::units::degree_t angle);
 
   /**
    * Get the ligament's angle relative to its parent.
@@ -86,17 +86,17 @@ class MechanismLigament2d : public MechanismObject2d {
   double GetLineWeight();
 
  protected:
-  void UpdateEntries(std::shared_ptr<nt::NetworkTable> table) override;
+  void UpdateEntries(std::shared_ptr<wpi::nt::NetworkTable> table) override;
 
  private:
-  nt::StringPublisher m_typePub;
+  wpi::nt::StringPublisher m_typePub;
   double m_length;
-  nt::DoubleEntry m_lengthEntry;
+  wpi::nt::DoubleEntry m_lengthEntry;
   double m_angle;
-  nt::DoubleEntry m_angleEntry;
+  wpi::nt::DoubleEntry m_angleEntry;
   double m_weight;
-  nt::DoubleEntry m_weightEntry;
+  wpi::nt::DoubleEntry m_weightEntry;
   char m_color[10];
-  nt::StringEntry m_colorEntry;
+  wpi::nt::StringEntry m_colorEntry;
 };
-}  // namespace frc
+}  // namespace wpi

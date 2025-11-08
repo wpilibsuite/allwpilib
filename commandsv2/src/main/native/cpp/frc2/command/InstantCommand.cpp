@@ -6,7 +6,7 @@
 
 #include <utility>
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 InstantCommand::InstantCommand(std::function<void()> toRun,
                                Requirements requirements)

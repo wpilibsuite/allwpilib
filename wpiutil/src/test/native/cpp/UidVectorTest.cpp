@@ -8,7 +8,7 @@
 
 #include <gtest/gtest.h>
 
-namespace wpi {
+namespace wpi::util {
 
 TEST(UidVectorTest, Empty) {
   UidVector<int, 4> v;
@@ -46,4 +46,4 @@ TEST(UidVectorTest, Iterate) {
   EXPECT_EQ(out[1], 1);
 }
 
-}  // namespace wpi
+}  // namespace wpi::util

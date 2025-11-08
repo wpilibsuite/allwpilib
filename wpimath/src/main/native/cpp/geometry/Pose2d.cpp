@@ -6,12 +6,12 @@
 
 #include "wpi/util/json.hpp"
 
-void frc::to_json(wpi::json& json, const Pose2d& pose) {
-  json = wpi::json{{"translation", pose.Translation()},
+void wpi::math::to_json(wpi::util::json& json, const Pose2d& pose) {
+  json = wpi::util::json{{"translation", pose.Translation()},
                    {"rotation", pose.Rotation()}};
 }
 
-void frc::from_json(const wpi::json& json, Pose2d& pose) {
+void wpi::math::from_json(const wpi::util::json& json, Pose2d& pose) {
   pose = Pose2d{json.at("translation").get<Translation2d>(),
                 json.at("rotation").get<Rotation2d>()};
 }

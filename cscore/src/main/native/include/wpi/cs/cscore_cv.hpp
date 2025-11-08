@@ -13,7 +13,7 @@
 #include "wpi/cs/cscore_raw.h"
 #include "wpi/util/RawFrame.h"
 
-namespace cs {
+namespace wpi::cs {
 /**
  * A source for user code to provide OpenCV images as video frames.
  *
@@ -107,7 +107,7 @@ class CvSink : public ImageSink {
    * with.
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
-   *         message); the frame time is in the same time base as wpi::Now(),
+   *         message); the frame time is in the same time base as wpi::util::Now(),
    *         and is in 1 us increments.
    */
   [[nodiscard]]
@@ -119,7 +119,7 @@ class CvSink : public ImageSink {
    * with.
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
-   *         message); the frame time is in the same time base as wpi::Now(),
+   *         message); the frame time is in the same time base as wpi::util::Now(),
    *         and is in 1 us increments.
    */
   [[nodiscard]]
@@ -133,7 +133,7 @@ class CvSink : public ImageSink {
    * any grabFrame*() call on the sink.
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
-   *         message); the frame time is in the same time base as wpi::Now(),
+   *         message); the frame time is in the same time base as wpi::util::Now(),
    *         and is in 1 us increments.
    */
   [[nodiscard]]
@@ -146,7 +146,7 @@ class CvSink : public ImageSink {
    * any grabFrame*() call on the sink.
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
-   *         message); the frame time is in the same time base as wpi::Now(),
+   *         message); the frame time is in the same time base as wpi::util::Now(),
    *         and is in 1 us increments.
    */
   [[nodiscard]]
@@ -166,7 +166,7 @@ class CvSink : public ImageSink {
    * a new frame.
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
-   *         message); the frame time is in the same time base as wpi::Now(),
+   *         message); the frame time is in the same time base as wpi::util::Now(),
    *         and is in 1 us increments.
    */
   [[nodiscard]]
@@ -175,7 +175,7 @@ class CvSink : public ImageSink {
 
   /**
    * Get the last time a frame was grabbed. This uses the same time base as
-   * wpi::Now().
+   * wpi::util::Now().
    *
    * @return Time in 1 us increments.
    */
@@ -193,7 +193,7 @@ class CvSink : public ImageSink {
  private:
   constexpr int GetCvFormat(WPI_PixelFormat pixelFormat);
 
-  wpi::RawFrame rawFrame;
+  wpi::util::RawFrame rawFrame;
   VideoMode::PixelFormat pixelFormat;
 };
 
@@ -431,6 +431,6 @@ inline WPI_TimestampSource CvSink::LastFrameTimeSource() {
   return static_cast<WPI_TimestampSource>(rawFrame.timestampSrc);
 }
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_WPI_CS_CSCORE_CV_HPP_

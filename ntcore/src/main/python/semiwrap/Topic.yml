@@ -3,7 +3,7 @@ extra_includes:
 - wpi/nt/NetworkTableInstance.hpp
 
 classes:
-  nt::Topic:
+  wpi::nt::Topic:
     methods:
       Topic:
         overloads:
@@ -47,7 +47,7 @@ classes:
         std::string name = self.cast<Topic>().GetName();
         return py::str("<{} {!r}>").format(type_name, name);
       })
-  nt::Subscriber:
+  wpi::nt::Subscriber:
     attributes:
       m_subHandle:
     methods:
@@ -68,7 +68,7 @@ classes:
         auto topic = self.cast<const Subscriber&>().GetTopic();
         return py::str("<{} {!r}>").format(type_name, topic.GetName());
       })
-  nt::Publisher:
+  wpi::nt::Publisher:
     attributes:
       m_pubHandle:
     methods:

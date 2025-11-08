@@ -10,7 +10,7 @@
 #include "wpi/math/geometry/Translation3d.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * A helper class that converts Pose3d objects between different standard
@@ -139,4 +139,4 @@ class WPILIB_DLLEXPORT CoordinateSystem {
   Rotation3d m_rotation;
 };
 
-}  // namespace frc
+}  // namespace wpi::math

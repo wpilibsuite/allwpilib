@@ -10,12 +10,12 @@
 
 #include "wpi/util/StringExtras.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 NTCommandSchedulerModel::NTCommandSchedulerModel(std::string_view path)
-    : NTCommandSchedulerModel(nt::NetworkTableInstance::GetDefault(), path) {}
+    : NTCommandSchedulerModel(wpi::nt::NetworkTableInstance::GetDefault(), path) {}
 
-NTCommandSchedulerModel::NTCommandSchedulerModel(nt::NetworkTableInstance inst,
+NTCommandSchedulerModel::NTCommandSchedulerModel(wpi::nt::NetworkTableInstance inst,
                                                  std::string_view path)
     : m_inst{inst},
       m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
@@ -25,7 +25,7 @@ NTCommandSchedulerModel::NTCommandSchedulerModel(nt::NetworkTableInstance inst,
           inst.GetIntegerArrayTopic(fmt::format("{}/Ids", path)).Subscribe({})},
       m_cancel{
           inst.GetIntegerArrayTopic(fmt::format("{}/Cancel", path)).Publish()},
-      m_nameValue{wpi::rsplit(path, '/').second} {}
+      m_nameValue{wpi::util::rsplit(path, '/').second} {}
 
 void NTCommandSchedulerModel::CancelCommand(size_t index) {
   if (index < m_idsValue.size()) {

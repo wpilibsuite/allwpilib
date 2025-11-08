@@ -8,7 +8,7 @@
 #include "wpi/math/geometry/Transform3d.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * Returns the robot's pose in the field coordinate system given an object's
@@ -25,16 +25,16 @@ namespace frc {
  *   pose. This can either be a constant for a rigidly mounted camera, or
  *   variable if the camera is mounted to a turret. If the camera was mounted 3
  *   inches in front of the "origin" (usually physical center) of the robot,
- *   this would be frc::Transform3d{3_in, 0_in, 0_in, frc::Rotation3d{}}.
+ *   this would be wpi::math::Transform3d{3_in, 0_in, 0_in, wpi::math::Rotation3d{}}.
  * @return The robot's field-relative pose.
  */
 WPILIB_DLLEXPORT
-constexpr frc::Pose3d ObjectToRobotPose(const frc::Pose3d& objectInField,
-                                        const frc::Transform3d& cameraToObject,
-                                        const frc::Transform3d& robotToCamera) {
+constexpr wpi::math::Pose3d ObjectToRobotPose(const wpi::math::Pose3d& objectInField,
+                                        const wpi::math::Transform3d& cameraToObject,
+                                        const wpi::math::Transform3d& robotToCamera) {
   const auto objectToCamera = cameraToObject.Inverse();
   const auto cameraToRobot = robotToCamera.Inverse();
   return objectInField + objectToCamera + cameraToRobot;
 }
 
-}  // namespace frc
+}  // namespace wpi::math

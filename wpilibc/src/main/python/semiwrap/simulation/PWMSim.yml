@@ -3,7 +3,7 @@ extra_includes:
 - wpi/hardware/motor/PWMMotorController.hpp
 
 classes:
-  frc::sim::PWMSim:
+  wpi::sim::PWMSim:
     force_type_casters:
     - std::function
     methods:

@@ -10,7 +10,7 @@
 #include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/util/jni_util.hpp"
 
-using namespace wpi::java;
+using namespace wpi::util::java;
 
 extern "C" {
 
@@ -36,7 +36,7 @@ Java_org_wpilib_math_jni_StateSpaceUtilJNI_isStabilizable
       B{nativeB.data(), states, inputs};
 
   bool isStabilizable =
-      frc::IsStabilizable<Eigen::Dynamic, Eigen::Dynamic>(A, B);
+      wpi::math::IsStabilizable<Eigen::Dynamic, Eigen::Dynamic>(A, B);
 
   return isStabilizable;
 }

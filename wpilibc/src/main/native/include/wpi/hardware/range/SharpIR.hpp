@@ -10,9 +10,9 @@
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
-namespace frc {
+namespace wpi {
 
-class SharpIR : public wpi::Sendable, public wpi::SendableHelper<SharpIR> {
+class SharpIR : public wpi::util::Sendable, public wpi::util::SendableHelper<SharpIR> {
  public:
   /**
    * Sharp GP2Y0A02YK0F is an analog IR sensor capable of measuring
@@ -65,8 +65,8 @@ class SharpIR : public wpi::Sendable, public wpi::SendableHelper<SharpIR> {
    * @param min Minimum distance to report
    * @param max Maximum distance to report
    */
-  SharpIR(int channel, double a, double b, units::meter_t min,
-          units::meter_t max);
+  SharpIR(int channel, double a, double b, wpi::units::meter_t min,
+          wpi::units::meter_t max);
 
   /**
    * Get the analog input channel number.
@@ -80,20 +80,20 @@ class SharpIR : public wpi::Sendable, public wpi::SendableHelper<SharpIR> {
    *
    * @return range of the target returned by the sensor
    */
-  units::meter_t GetRange() const;
+  wpi::units::meter_t GetRange() const;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
   AnalogInput m_sensor;
 
-  hal::SimDevice m_simDevice;
-  hal::SimDouble m_simRange;
+  wpi::hal::SimDevice m_simDevice;
+  wpi::hal::SimDouble m_simRange;
 
   double m_A;
   double m_B;
-  units::meter_t m_min;
-  units::meter_t m_max;
+  wpi::units::meter_t m_min;
+  wpi::units::meter_t m_max;
 };
 
-}  // namespace frc
+}  // namespace wpi

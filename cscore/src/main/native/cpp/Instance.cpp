@@ -13,12 +13,12 @@
 #include "wpi/util/fs.hpp"
 #include "wpi/util/print.hpp"
 
-using namespace cs;
+using namespace wpi::cs;
 
 static void def_log_func(unsigned int level, const char* file,
                          unsigned int line, const char* msg) {
   if (level == 20) {
-    wpi::print(stderr, "CS: {}\n", msg);
+    wpi::util::print(stderr, "CS: {}\n", msg);
     return;
   }
 
@@ -32,7 +32,7 @@ static void def_log_func(unsigned int level, const char* file,
   } else {
     return;
   }
-  wpi::print(stderr, "CS: {}: {} ({}:{})\n", levelmsg, msg,
+  wpi::util::print(stderr, "CS: {}: {} ({}:{})\n", levelmsg, msg,
              // NOLINTNEXTLINE(build/include_what_you_use)
              fs::path{file}.filename().string(), line);
 }

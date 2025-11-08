@@ -8,16 +8,16 @@
 #include "wpi/cs/cscore_cpp.hpp"
 #include "wpi/util/MemAlloc.hpp"
 
-using namespace cs;
+using namespace wpi::cs;
 
 static void ConvertToC(CS_UsbCameraInfo* out, const UsbCameraInfo& in) {
   out->dev = in.dev;
-  cs::ConvertToC(&out->path, in.path);
-  cs::ConvertToC(&out->name, in.name);
+  wpi::cs::ConvertToC(&out->path, in.path);
+  wpi::cs::ConvertToC(&out->name, in.name);
   out->otherPaths = WPI_AllocateStringArray(in.otherPaths.size());
   out->otherPathsCount = in.otherPaths.size();
   for (size_t i = 0; i < in.otherPaths.size(); ++i) {
-    cs::ConvertToC(&out->otherPaths[i], in.otherPaths[i]);
+    wpi::cs::ConvertToC(&out->otherPaths[i], in.otherPaths[i]);
   }
   out->vendorId = in.vendorId;
   out->productId = in.productId;
@@ -35,36 +35,36 @@ extern "C" {
 
 CS_Source CS_CreateUsbCameraDev(const struct WPI_String* name, int dev,
                                 CS_Status* status) {
-  return cs::CreateUsbCameraDev(wpi::to_string_view(name), dev, status);
+  return wpi::cs::CreateUsbCameraDev(wpi::util::to_string_view(name), dev, status);
 }
 
 CS_Source CS_CreateUsbCameraPath(const struct WPI_String* name,
                                  const struct WPI_String* path,
                                  CS_Status* status) {
-  return cs::CreateUsbCameraPath(wpi::to_string_view(name),
-                                 wpi::to_string_view(path), status);
+  return wpi::cs::CreateUsbCameraPath(wpi::util::to_string_view(name),
+                                 wpi::util::to_string_view(path), status);
 }
 
 void CS_SetUsbCameraPath(CS_Source source, const struct WPI_String* path,
                          CS_Status* status) {
-  cs::SetUsbCameraPath(source, wpi::to_string_view(path), status);
+  wpi::cs::SetUsbCameraPath(source, wpi::util::to_string_view(path), status);
 }
 
 void CS_GetUsbCameraPath(CS_Source source, WPI_String* path,
                          CS_Status* status) {
-  ConvertToC(path, cs::GetUsbCameraPath(source, status));
+  ConvertToC(path, wpi::cs::GetUsbCameraPath(source, status));
 }
 
 void CS_GetUsbCameraInfo(CS_Source source, CS_UsbCameraInfo* info,
                          CS_Status* status) {
-  auto info_cpp = cs::GetUsbCameraInfo(source, status);
+  auto info_cpp = wpi::cs::GetUsbCameraInfo(source, status);
   ConvertToC(info, info_cpp);
 }
 
 CS_UsbCameraInfo* CS_EnumerateUsbCameras(int* count, CS_Status* status) {
-  auto cameras = cs::EnumerateUsbCameras(status);
+  auto cameras = wpi::cs::EnumerateUsbCameras(status);
   CS_UsbCameraInfo* out = static_cast<CS_UsbCameraInfo*>(
-      wpi::safe_malloc(cameras.size() * sizeof(CS_UsbCameraInfo)));
+      wpi::util::safe_malloc(cameras.size() * sizeof(CS_UsbCameraInfo)));
   *count = cameras.size();
   for (size_t i = 0; i < cameras.size(); ++i) {
     ConvertToC(&out[i], cameras[i]);

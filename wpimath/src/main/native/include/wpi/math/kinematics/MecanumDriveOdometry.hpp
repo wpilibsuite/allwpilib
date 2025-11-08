@@ -13,7 +13,7 @@
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/timestamp.h"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * Class for mecanum drive odometry. Odometry allows you to track the robot's
@@ -44,4 +44,4 @@ class WPILIB_DLLEXPORT MecanumDriveOdometry
   MecanumDriveKinematics m_kinematicsImpl;
 };
 
-}  // namespace frc
+}  // namespace wpi::math

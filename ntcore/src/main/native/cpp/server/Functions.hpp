@@ -9,10 +9,10 @@
 #include <functional>
 #include <string_view>
 
-namespace nt::server {
+namespace wpi::nt::server {
 
 using SetPeriodicFunc = std::function<void(uint32_t repeatMs)>;
 using Connected3Func =
     std::function<void(std::string_view name, uint16_t proto)>;
 
-}  // namespace nt::server
+}  // namespace wpi::nt::server

@@ -9,7 +9,7 @@
 
 #include "wpi/net/NetworkStream.hpp"
 
-namespace wpi {
+namespace wpi::net {
 
 class NetworkAcceptor {
  public:
@@ -24,6 +24,6 @@ class NetworkAcceptor {
   NetworkAcceptor& operator=(const NetworkAcceptor&) = delete;
 };
 
-}  // namespace wpi
+}  // namespace wpi::net
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_NETWORKACCEPTOR_HPP_

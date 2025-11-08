@@ -8,7 +8,7 @@
 #include "org_wpilib_hardware_hal_simulation_EncoderDataJNI.h"
 #include "wpi/hal/simulation/EncoderData.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
 

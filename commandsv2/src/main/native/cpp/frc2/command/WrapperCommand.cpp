@@ -8,7 +8,7 @@
 
 #include "wpi/commands2/Command.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 WrapperCommand::WrapperCommand(std::unique_ptr<Command>&& command) {
   CommandScheduler::GetInstance().RequireUngroupedAndUnscheduled(command.get());
@@ -42,6 +42,6 @@ Command::InterruptionBehavior WrapperCommand::GetInterruptionBehavior() const {
   return m_command->GetInterruptionBehavior();
 }
 
-wpi::SmallSet<Subsystem*, 4> WrapperCommand::GetRequirements() const {
+wpi::util::SmallSet<Subsystem*, 4> WrapperCommand::GetRequirements() const {
   return m_command->GetRequirements();
 }

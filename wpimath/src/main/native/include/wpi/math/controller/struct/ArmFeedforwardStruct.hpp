@@ -9,15 +9,15 @@
 #include "wpi/util/struct/Struct.hpp"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Struct<frc::ArmFeedforward> {
+struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::ArmFeedforward> {
   static constexpr std::string_view GetTypeName() { return "ArmFeedforward"; }
   static constexpr size_t GetSize() { return 32; }
   static constexpr std::string_view GetSchema() {
     return "double ks;double kg;double kv;double ka";
   }
 
-  static frc::ArmFeedforward Unpack(std::span<const uint8_t> data);
-  static void Pack(std::span<uint8_t> data, const frc::ArmFeedforward& value);
+  static wpi::math::ArmFeedforward Unpack(std::span<const uint8_t> data);
+  static void Pack(std::span<uint8_t> data, const wpi::math::ArmFeedforward& value);
 };
 
-static_assert(wpi::StructSerializable<frc::ArmFeedforward>);
+static_assert(wpi::util::StructSerializable<wpi::math::ArmFeedforward>);

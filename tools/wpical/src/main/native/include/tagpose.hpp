@@ -20,6 +20,6 @@ class Pose {
   Eigen::Quaterniond quaternion;
   Eigen::Matrix3d rotationMatrix;
   Eigen::Matrix4d transformMatrixFmap;
-  wpi::json toJson();
+  wpi::util::json toJson();
 };
 }  // namespace tag

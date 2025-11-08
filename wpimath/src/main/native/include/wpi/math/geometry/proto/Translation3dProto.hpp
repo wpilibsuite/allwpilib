@@ -10,10 +10,10 @@
 #include "wpimath/protobuf/geometry3d.npb.h"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Translation3d> {
+struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::Translation3d> {
   using MessageStruct = wpi_proto_ProtobufTranslation3d;
-  using InputStream = wpi::ProtoInputStream<frc::Translation3d>;
-  using OutputStream = wpi::ProtoOutputStream<frc::Translation3d>;
-  static std::optional<frc::Translation3d> Unpack(InputStream& stream);
-  static bool Pack(OutputStream& stream, const frc::Translation3d& value);
+  using InputStream = wpi::util::ProtoInputStream<wpi::math::Translation3d>;
+  using OutputStream = wpi::util::ProtoOutputStream<wpi::math::Translation3d>;
+  static std::optional<wpi::math::Translation3d> Unpack(InputStream& stream);
+  static bool Pack(OutputStream& stream, const wpi::math::Translation3d& value);
 };

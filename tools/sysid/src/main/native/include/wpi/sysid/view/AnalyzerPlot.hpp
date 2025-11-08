@@ -37,7 +37,7 @@ class AnalyzerPlot {
    *
    * @param logger The program logger
    */
-  explicit AnalyzerPlot(wpi::Logger& logger);
+  explicit AnalyzerPlot(wpi::util::Logger& logger);
 
   /**
    * Sets the data to be displayed on the plots.
@@ -55,7 +55,7 @@ class AnalyzerPlot {
   void SetData(const Storage& rawData, const Storage& filteredData,
                std::string_view unit,
                const AnalysisManager::FeedforwardGains& ff,
-               const std::array<units::second_t, 4>& startTimes,
+               const std::array<wpi::units::second_t, 4>& startTimes,
                AnalysisType type, std::atomic<bool>& abort);
 
   /**
@@ -189,10 +189,10 @@ class AnalyzerPlot {
   std::string m_velPortionAccelLabel;
 
   // Thread safety
-  wpi::spinlock m_mutex;
+  wpi::util::spinlock m_mutex;
 
   // Logger
-  wpi::Logger& m_logger;
+  wpi::util::Logger& m_logger;
 
   FilteredDataVsTimePlot m_quasistaticData;
   FilteredDataVsTimePlot m_dynamicData;

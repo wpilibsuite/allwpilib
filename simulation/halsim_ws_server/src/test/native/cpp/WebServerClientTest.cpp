@@ -17,15 +17,15 @@
 
 static constexpr int kTcpConnectAttemptTimeout = 1000;
 
-namespace uv = wpi::uv;
+namespace uv = wpi::net::uv;
 
 namespace wpilibws {
 
 // Create Web Socket and specify event callbacks
 void WebServerClientTest::InitializeWebSocket(const std::string& host, int port,
                                               const std::string& uri) {
-  wpi::print("Will attempt to connect to: {}:{}{}\n", host, port, uri);
-  m_websocket = wpi::WebSocket::CreateClient(*m_tcp_client.get(), uri,
+  wpi::util::print("Will attempt to connect to: {}:{}{}\n", host, port, uri);
+  m_websocket = wpi::net::WebSocket::CreateClient(*m_tcp_client.get(), uri,
                                              fmt::format("{}:{}", host, port));
 
   // Hook up events
@@ -44,13 +44,13 @@ void WebServerClientTest::InitializeWebSocket(const std::string& host, int port,
   });
 
   m_websocket->text.connect([this](auto msg, bool) {
-    wpi::json j;
+    wpi::util::json j;
     try {
-      j = wpi::json::parse(msg);
-    } catch (const wpi::json::parse_error& e) {
+      j = wpi::util::json::parse(msg);
+    } catch (const wpi::util::json::parse_error& e) {
       std::string err("JSON parse failed: ");
       err += e.what();
-      wpi::print(stderr, "{}\n", err);
+      wpi::util::print(stderr, "{}\n", err);
       m_websocket->Fail(1003, err);
       return;
     }
@@ -69,7 +69,7 @@ void WebServerClientTest::InitializeWebSocket(const std::string& host, int port,
 // Create tcp client, specify callbacks, and create timers for loop
 bool WebServerClientTest::Initialize() {
   m_loop.error.connect(
-      [](uv::Error err) { wpi::print(stderr, "uv Error: {}\n", err.str()); });
+      [](uv::Error err) { wpi::util::print(stderr, "uv Error: {}\n", err.str()); });
 
   m_tcp_client = uv::Tcp::Create(m_loop);
   if (!m_tcp_client) {
@@ -79,7 +79,7 @@ bool WebServerClientTest::Initialize() {
 
   // Hook up TCP client events
   m_tcp_client->error.connect(
-      [this, socket = m_tcp_client.get()](wpi::uv::Error err) {
+      [this, socket = m_tcp_client.get()](wpi::net::uv::Error err) {
         if (m_tcp_connected) {
           m_tcp_connected = false;
           m_connect_attempts = 0;
@@ -110,7 +110,7 @@ bool WebServerClientTest::Initialize() {
 
 void WebServerClientTest::AttemptConnect() {
   m_connect_attempts++;
-  wpi::print("Test Client Connection Attempt {}\n", m_connect_attempts);
+  wpi::util::print("Test Client Connection Attempt {}\n", m_connect_attempts);
 
   if (m_connect_attempts >= 5) {
     std::fputs("Test Client Timeout. Unable to connect\n", stderr);
@@ -126,15 +126,15 @@ void WebServerClientTest::AttemptConnect() {
   });
 }
 
-void WebServerClientTest::SendMessage(const wpi::json& msg) {
+void WebServerClientTest::SendMessage(const wpi::util::json& msg) {
   if (msg.empty()) {
     std::fputs("Message to send is empty\n", stderr);
     return;
   }
 
-  wpi::SmallVector<uv::Buffer, 4> sendBufs;
+  wpi::util::SmallVector<uv::Buffer, 4> sendBufs;
 
-  wpi::raw_uv_ostream os{sendBufs, [this]() -> uv::Buffer {
+  wpi::net::raw_uv_ostream os{sendBufs, [this]() -> uv::Buffer {
                            std::lock_guard lock(m_buffers_mutex);
                            return m_buffers->Allocate();
                          }};
@@ -142,20 +142,20 @@ void WebServerClientTest::SendMessage(const wpi::json& msg) {
 
   // Call the websocket send function on the uv loop
   m_exec->Call([this, sendBufs]() mutable {
-    m_websocket->SendText(sendBufs, [this](auto bufs, wpi::uv::Error err) {
+    m_websocket->SendText(sendBufs, [this](auto bufs, wpi::net::uv::Error err) {
       {
         std::lock_guard lock(m_buffers_mutex);
         m_buffers->Release(bufs);
       }
       if (err) {
-        wpi::print(stderr, "{}\n", err.str());
+        wpi::util::print(stderr, "{}\n", err.str());
         std::fflush(stderr);
       }
     });
   });
 }
 
-const wpi::json& WebServerClientTest::GetLastMessage() {
+const wpi::util::json& WebServerClientTest::GetLastMessage() {
   return m_json;
 }
 

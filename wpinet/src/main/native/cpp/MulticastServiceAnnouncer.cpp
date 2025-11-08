@@ -16,17 +16,17 @@ WPI_MulticastServiceAnnouncerHandle WPI_CreateMulticastServiceAnnouncer(
     int32_t txtCount, const char** keys, const char** values)
 
 {
-  auto& manager = wpi::GetMulticastManager();
+  auto& manager = wpi::net::GetMulticastManager();
   std::scoped_lock lock{manager.mutex};
 
-  wpi::SmallVector<std::pair<std::string_view, std::string_view>, 8> txts;
+  wpi::util::SmallVector<std::pair<std::string_view, std::string_view>, 8> txts;
 
   for (int32_t i = 0; i < txtCount; i++) {
     txts.emplace_back(
         std::pair<std::string_view, std::string_view>{keys[i], values[i]});
   }
 
-  auto announcer = std::make_unique<wpi::MulticastServiceAnnouncer>(
+  auto announcer = std::make_unique<wpi::net::MulticastServiceAnnouncer>(
       serviceName, serviceType, port, txts);
 
   size_t index = manager.handleIds.emplace_back(3);
@@ -37,7 +37,7 @@ WPI_MulticastServiceAnnouncerHandle WPI_CreateMulticastServiceAnnouncer(
 
 void WPI_FreeMulticastServiceAnnouncer(
     WPI_MulticastServiceAnnouncerHandle handle) {
-  auto& manager = wpi::GetMulticastManager();
+  auto& manager = wpi::net::GetMulticastManager();
   std::scoped_lock lock{manager.mutex};
   manager.announcers[handle] = nullptr;
   manager.handleIds.erase(handle);
@@ -45,7 +45,7 @@ void WPI_FreeMulticastServiceAnnouncer(
 
 void WPI_StartMulticastServiceAnnouncer(
     WPI_MulticastServiceAnnouncerHandle handle) {
-  auto& manager = wpi::GetMulticastManager();
+  auto& manager = wpi::net::GetMulticastManager();
   std::scoped_lock lock{manager.mutex};
   auto& announcer = manager.announcers[handle];
   announcer->Start();
@@ -53,7 +53,7 @@ void WPI_StartMulticastServiceAnnouncer(
 
 void WPI_StopMulticastServiceAnnouncer(
     WPI_MulticastServiceAnnouncerHandle handle) {
-  auto& manager = wpi::GetMulticastManager();
+  auto& manager = wpi::net::GetMulticastManager();
   std::scoped_lock lock{manager.mutex};
   auto& announcer = manager.announcers[handle];
   announcer->Stop();
@@ -61,7 +61,7 @@ void WPI_StopMulticastServiceAnnouncer(
 
 int32_t WPI_GetMulticastServiceAnnouncerHasImplementation(
     WPI_MulticastServiceAnnouncerHandle handle) {
-  auto& manager = wpi::GetMulticastManager();
+  auto& manager = wpi::net::GetMulticastManager();
   std::scoped_lock lock{manager.mutex};
   auto& announcer = manager.announcers[handle];
   return announcer->HasImplementation();

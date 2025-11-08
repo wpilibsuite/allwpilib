@@ -12,7 +12,7 @@
 #include "wpi/nt/NetworkTable.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 /**
  * A Button that uses a NetworkTable boolean field.
  *
@@ -25,14 +25,14 @@ class NetworkButton : public Trigger {
    *
    * @param topic The boolean topic that contains the value.
    */
-  explicit NetworkButton(nt::BooleanTopic topic);
+  explicit NetworkButton(wpi::nt::BooleanTopic topic);
 
   /**
    * Creates a NetworkButton that commands can be bound to.
    *
    * @param sub The boolean subscriber that provides the value.
    */
-  explicit NetworkButton(nt::BooleanSubscriber sub);
+  explicit NetworkButton(wpi::nt::BooleanSubscriber sub);
 
   /**
    * Creates a NetworkButton that commands can be bound to.
@@ -40,7 +40,7 @@ class NetworkButton : public Trigger {
    * @param table The table where the networktable value is located.
    * @param field The field that is the value.
    */
-  NetworkButton(std::shared_ptr<nt::NetworkTable> table,
+  NetworkButton(std::shared_ptr<wpi::nt::NetworkTable> table,
                 std::string_view field);
 
   /**
@@ -58,7 +58,7 @@ class NetworkButton : public Trigger {
    * @param table The table where the networktable value is located.
    * @param field The field that is the value.
    */
-  NetworkButton(nt::NetworkTableInstance inst, std::string_view table,
+  NetworkButton(wpi::nt::NetworkTableInstance inst, std::string_view table,
                 std::string_view field);
 };
-}  // namespace frc2
+}  // namespace wpi::cmd

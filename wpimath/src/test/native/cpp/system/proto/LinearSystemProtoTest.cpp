@@ -8,7 +8,7 @@
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/math/system/proto/LinearSystemProto.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 struct LinearSystemProtoTestData {
   using Type = LinearSystem<2, 3, 4>;

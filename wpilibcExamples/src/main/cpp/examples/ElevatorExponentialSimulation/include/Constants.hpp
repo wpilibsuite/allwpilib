@@ -34,20 +34,20 @@ inline constexpr double kElevatorKp = 0.75;
 inline constexpr double kElevatorKi = 0.0;
 inline constexpr double kElevatorKd = 0.0;
 
-inline constexpr units::volt_t kElevatorMaxV = 10_V;
-inline constexpr units::volt_t kElevatorkS = 0.0_V;
-inline constexpr units::volt_t kElevatorkG = 0.62_V;
+inline constexpr wpi::units::volt_t kElevatorMaxV = 10_V;
+inline constexpr wpi::units::volt_t kElevatorkS = 0.0_V;
+inline constexpr wpi::units::volt_t kElevatorkG = 0.62_V;
 inline constexpr auto kElevatorkV = 3.9_V / 1_mps;
 inline constexpr auto kElevatorkA = 0.06_V / 1_mps_sq;
 
 inline constexpr double kElevatorGearing = 5.0;
-inline constexpr units::meter_t kElevatorDrumRadius = 1_in;
-inline constexpr units::kilogram_t kCarriageMass = 12_lb;
+inline constexpr wpi::units::meter_t kElevatorDrumRadius = 1_in;
+inline constexpr wpi::units::kilogram_t kCarriageMass = 12_lb;
 
-inline constexpr units::meter_t kSetpoint = 42.875_in;
-inline constexpr units::meter_t kLowerSetpoint = 15_in;
-inline constexpr units::meter_t kMinElevatorHeight = 0_cm;
-inline constexpr units::meter_t kMaxElevatorHeight = 50_in;
+inline constexpr wpi::units::meter_t kSetpoint = 42.875_in;
+inline constexpr wpi::units::meter_t kLowerSetpoint = 15_in;
+inline constexpr wpi::units::meter_t kMinElevatorHeight = 0_cm;
+inline constexpr wpi::units::meter_t kMaxElevatorHeight = 50_in;
 
 // distance per pulse = (distance per revolution) / (pulses per revolution)
 //  = (Pi * D) / ppr

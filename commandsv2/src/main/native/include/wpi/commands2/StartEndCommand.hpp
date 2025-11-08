@@ -10,7 +10,7 @@
 #include "wpi/commands2/FunctionalCommand.hpp"
 #include "wpi/commands2/Requirements.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 /**
  * A command that runs a given runnable when it is initialized, and another
  * runnable when it ends. Useful for running and then stopping a motor, or
@@ -38,4 +38,4 @@ class StartEndCommand
 
   StartEndCommand(const StartEndCommand& other) = default;
 };
-}  // namespace frc2
+}  // namespace wpi::cmd

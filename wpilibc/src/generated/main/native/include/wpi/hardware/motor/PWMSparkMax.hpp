@@ -8,7 +8,7 @@
 
 #include "wpi/hardware/motor/PWMMotorController.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * REV Robotics SPARK MAX Motor Controller with PWM control.
@@ -40,4 +40,4 @@ class PWMSparkMax : public PWMMotorController {
   PWMSparkMax& operator=(PWMSparkMax&&) = default;
 };
 
-}  // namespace frc
+}  // namespace wpi

@@ -9,20 +9,20 @@
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 class NetworkBooleanEventTest : public ::testing::Test {
  public:
   NetworkBooleanEventTest() {
-    m_inst = nt::NetworkTableInstance::Create();
+    m_inst = wpi::nt::NetworkTableInstance::Create();
     m_inst.StartLocal();
   }
 
   ~NetworkBooleanEventTest() override {
-    nt::NetworkTableInstance::Destroy(m_inst);
+    wpi::nt::NetworkTableInstance::Destroy(m_inst);
   }
 
-  nt::NetworkTableInstance m_inst;
+  wpi::nt::NetworkTableInstance m_inst;
 };
 
 TEST_F(NetworkBooleanEventTest, Set) {

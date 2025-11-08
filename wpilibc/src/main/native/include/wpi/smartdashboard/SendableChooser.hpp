@@ -17,7 +17,7 @@
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * The SendableChooser class is a useful tool for presenting a selection of
@@ -35,7 +35,7 @@ namespace frc {
 template <class T>
   requires std::copy_constructible<T> && std::default_initializable<T>
 class SendableChooser : public SendableChooserBase {
-  wpi::StringMap<T> m_choices;
+  wpi::util::StringMap<T> m_choices;
   std::function<void(T)> m_listener;
   template <class U>
   static U _unwrap_smart_ptr(const U& value) {
@@ -123,7 +123,7 @@ class SendableChooser : public SendableChooserBase {
     m_listener = listener;
   }
 
-  void InitSendable(wpi::SendableBuilder& builder) override {
+  void InitSendable(wpi::util::SendableBuilder& builder) override {
     builder.SetSmartDashboardType("String Chooser");
     builder.PublishConstInteger(kInstance, m_instance);
     builder.AddStringArrayProperty(
@@ -138,13 +138,13 @@ class SendableChooser : public SendableChooserBase {
         nullptr);
     builder.AddSmallStringProperty(
         kDefault,
-        [=, this](wpi::SmallVectorImpl<char>&) -> std::string_view {
+        [=, this](wpi::util::SmallVectorImpl<char>&) -> std::string_view {
           return m_defaultChoice;
         },
         nullptr);
     builder.AddSmallStringProperty(
         kActive,
-        [=, this](wpi::SmallVectorImpl<char>& buf) -> std::string_view {
+        [=, this](wpi::util::SmallVectorImpl<char>& buf) -> std::string_view {
           std::scoped_lock lock(m_mutex);
           if (m_haveSelected) {
             buf.assign(m_selected.begin(), m_selected.end());
@@ -175,4 +175,4 @@ class SendableChooser : public SendableChooserBase {
   }
 };
 
-}  // namespace frc
+}  // namespace wpi

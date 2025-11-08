@@ -23,7 +23,7 @@
 #include <limits>
 #include <type_traits>
 
-namespace wpi {
+namespace wpi::util {
 /// Some template parameter helpers to optimize for bitwidth, for functions that
 /// take multiple arguments.
 
@@ -301,7 +301,7 @@ inline bool isShiftedMask_64(uint64_t Value, unsigned &MaskIdx,
 /// Compile time Log2.
 /// Valid only for positive powers of two.
 template <size_t kValue> constexpr size_t CTLog2() {
-  static_assert(kValue > 0 && wpi::isPowerOf2_64(kValue),
+  static_assert(kValue > 0 && wpi::util::isPowerOf2_64(kValue),
                 "Value is not a valid power of 2");
   return 1 + CTLog2<kValue / 2>();
 }
@@ -781,6 +781,6 @@ constexpr T Lerp(const T& startValue, const T& endValue, double t) {
   return startValue + (endValue - startValue) * t;
 }
 
-} // namespace wpi
+} // namespace wpi::util
 
 #endif

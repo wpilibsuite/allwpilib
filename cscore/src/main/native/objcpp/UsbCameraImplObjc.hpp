@@ -38,7 +38,7 @@
 #define kPropertyAutoWhiteBalance "white_balance_automatic"
 #define kPropertyAutoFocus "focus_auto"
 
-namespace cs {
+namespace wpi::cs {
 class UsbCameraImpl;
 }
 
@@ -46,7 +46,7 @@ class UsbCameraImpl;
 
 @property(nonatomic) AVCaptureDeviceFormat* currentFormat;
 @property(nonatomic) int currentFPS;
-@property(nonatomic) std::weak_ptr<cs::UsbCameraImpl> cppImpl;
+@property(nonatomic) std::weak_ptr<wpi::cs::UsbCameraImpl> cppImpl;
 @property(nonatomic) dispatch_queue_t sessionQueue;
 @property(nonatomic) NSString* path;
 @property(nonatomic) int deviceId;
@@ -82,8 +82,8 @@ class UsbCameraImpl;
 - (void)setExposureHoldCurrent:(CS_Status*)status;
 - (void)setExposureManual:(int)value status:(CS_Status*)status;
 
-- (bool)setVideoMode:(const cs::VideoMode&)mode status:(CS_Status*)status;
-- (bool)setPixelFormat:(cs::VideoMode::PixelFormat)pixelFormat
+- (bool)setVideoMode:(const wpi::cs::VideoMode&)mode status:(CS_Status*)status;
+- (bool)setPixelFormat:(wpi::cs::VideoMode::PixelFormat)pixelFormat
                 status:(CS_Status*)status;
 - (bool)setResolutionWidth:(int)width
                 withHeight:(int)height

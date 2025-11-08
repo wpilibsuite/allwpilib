@@ -19,21 +19,21 @@
 #include "wpi/hal/cpp/fpga_clock.h"
 #include "wpi/hal/handles/LimitedHandleResource.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeCounter() {}
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 
 HAL_CounterHandle HAL_InitializeCounter(int channel, HAL_Bool risingEdge,
                                         const char* allocationLocation,
                                         int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
   if (channel == InvalidHandleIndex || channel >= kNumSmartIo) {
     *status = RESOURCE_OUT_OF_RANGE;
-    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Counter", 0,
+    wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Counter", 0,
                                      kNumSmartIo, channel);
     return HAL_kInvalidHandle;
   }
@@ -45,10 +45,10 @@ HAL_CounterHandle HAL_InitializeCounter(int channel, HAL_Bool risingEdge,
 
   if (*status != 0) {
     if (port) {
-      hal::SetLastErrorPreviouslyAllocated(status, "SmartIo", channel,
+      wpi::hal::SetLastErrorPreviouslyAllocated(status, "SmartIo", channel,
                                            port->previousAllocation);
     } else {
-      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Counter", 0,
+      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Counter", 0,
                                        kNumSmartIo, channel);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
@@ -78,9 +78,9 @@ void HAL_FreeCounter(HAL_CounterHandle counterHandle) {
   smartIoHandles->Free(counterHandle, HAL_HandleEnum::Counter);
 
   // Wait for no other object to hold this handle.
-  auto start = hal::fpga_clock::now();
+  auto start = wpi::hal::fpga_clock::now();
   while (port.use_count() != 1) {
-    auto current = hal::fpga_clock::now();
+    auto current = wpi::hal::fpga_clock::now();
     if (start + std::chrono::seconds(1) < current) {
       std::puts("DIO handle free timeout");
       std::fflush(stdout);

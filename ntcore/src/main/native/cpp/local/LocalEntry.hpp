@@ -8,7 +8,7 @@
 #include "local/LocalSubscriber.hpp"
 #include "wpi/util/Synchronization.h"
 
-namespace nt::local {
+namespace wpi::nt::local {
 
 struct LocalPublisher;
 
@@ -19,7 +19,7 @@ struct LocalEntry {
       : handle{handle}, topic{subscriber->topic}, subscriber{subscriber} {}
 
   // invariants
-  wpi::SignalObject<NT_Entry> handle;
+  wpi::util::SignalObject<NT_Entry> handle;
   LocalTopic* topic;
   LocalSubscriber* subscriber;
 
@@ -27,4 +27,4 @@ struct LocalEntry {
   LocalPublisher* publisher{nullptr};
 };
 
-}  // namespace nt::local
+}  // namespace wpi::nt::local

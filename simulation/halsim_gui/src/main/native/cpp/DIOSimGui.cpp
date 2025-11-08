@@ -26,7 +26,7 @@ HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED(DIOValue, "DIO");
 HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(DigitalPWMDutyCycle, "DPWM");
 HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(DutyCycleOutput, "DutyCycle");
 
-class DPWMSimModel : public glass::DPWMModel {
+class DPWMSimModel : public wpi::glass::DPWMModel {
  public:
   DPWMSimModel(int32_t index, int32_t dioChannel)
       : m_dioChannel{dioChannel}, m_index{index}, m_valueData{index} {}
@@ -43,7 +43,7 @@ class DPWMSimModel : public glass::DPWMModel {
     }
   }
 
-  glass::DoubleSource* GetValueData() override { return &m_valueData; }
+  wpi::glass::DoubleSource* GetValueData() override { return &m_valueData; }
 
   void SetValue(double val) override {
     HALSIM_SetDigitalPWMDutyCycle(m_index, val);
@@ -55,7 +55,7 @@ class DPWMSimModel : public glass::DPWMModel {
   DigitalPWMDutyCycleSource m_valueData;
 };
 
-class DutyCycleSimModel : public glass::DutyCycleModel {
+class DutyCycleSimModel : public wpi::glass::DutyCycleModel {
  public:
   explicit DutyCycleSimModel(int32_t index)
       : m_index{index}, m_valueData{index} {}
@@ -72,7 +72,7 @@ class DutyCycleSimModel : public glass::DutyCycleModel {
     }
   }
 
-  glass::DoubleSource* GetValueData() override { return &m_valueData; }
+  wpi::glass::DoubleSource* GetValueData() override { return &m_valueData; }
 
   void SetValue(double val) override {
     HALSIM_SetDutyCycleOutput(m_index, val);
@@ -83,7 +83,7 @@ class DutyCycleSimModel : public glass::DutyCycleModel {
   DutyCycleOutputSource m_valueData;
 };
 
-class DIOSimModel : public glass::DIOModel {
+class DIOSimModel : public wpi::glass::DIOModel {
  public:
   explicit DIOSimModel(int32_t channel)
       : m_channel{channel}, m_valueData{channel} {}
@@ -106,15 +106,15 @@ class DIOSimModel : public glass::DIOModel {
 
   DPWMSimModel* GetDPWM() override { return m_dpwmSource; }
   DutyCycleSimModel* GetDutyCycle() override { return m_dutyCycleSource; }
-  glass::EncoderModel* GetEncoder() override { return m_encoderSource; }
+  wpi::glass::EncoderModel* GetEncoder() override { return m_encoderSource; }
 
   void SetDPWM(DPWMSimModel* model) { m_dpwmSource = model; }
   void SetDutyCycle(DutyCycleSimModel* model) { m_dutyCycleSource = model; }
-  void SetEncoder(glass::EncoderModel* model) { m_encoderSource = model; }
+  void SetEncoder(wpi::glass::EncoderModel* model) { m_encoderSource = model; }
 
   bool IsInput() const override { return HALSIM_GetDIOIsInput(m_channel); }
 
-  glass::BooleanSource* GetValueData() override { return &m_valueData; }
+  wpi::glass::BooleanSource* GetValueData() override { return &m_valueData; }
 
   void SetValue(bool val) override { HALSIM_SetDIOValue(m_channel, val); }
 
@@ -123,10 +123,10 @@ class DIOSimModel : public glass::DIOModel {
   DIOValueSource m_valueData;
   DPWMSimModel* m_dpwmSource = nullptr;
   DutyCycleSimModel* m_dutyCycleSource = nullptr;
-  glass::EncoderModel* m_encoderSource = nullptr;
+  wpi::glass::EncoderModel* m_encoderSource = nullptr;
 };
 
-class DIOsSimModel : public glass::DIOsModel {
+class DIOsSimModel : public wpi::glass::DIOsModel {
  public:
   DIOsSimModel()
       : m_dioModels(HAL_GetNumDigitalChannels()),
@@ -138,7 +138,7 @@ class DIOsSimModel : public glass::DIOsModel {
   bool Exists() override { return true; }
 
   void ForEachDIO(
-      wpi::function_ref<void(glass::DIOModel& model, int index)> func) override;
+      wpi::util::function_ref<void(wpi::glass::DIOModel& model, int index)> func) override;
 
  private:
   // indexed by channel
@@ -210,7 +210,7 @@ void DIOsSimModel::Update() {
 }
 
 void DIOsSimModel::ForEachDIO(
-    wpi::function_ref<void(glass::DIOModel& model, int index)> func) {
+    wpi::util::function_ref<void(wpi::glass::DIOModel& model, int index)> func) {
   const int32_t numDIO = m_dioModels.size();
   for (int32_t i = 0; i < numDIO; ++i) {
     if (auto model = m_dioModels[i].get()) {
@@ -232,11 +232,11 @@ static bool DIOAnyInitialized() {
 void DIOSimGui::Initialize() {
   HALSimGui::halProvider->Register(
       "DIO", DIOAnyInitialized, [] { return std::make_unique<DIOsSimModel>(); },
-      [](glass::Window* win, glass::Model* model) {
+      [](wpi::glass::Window* win, wpi::glass::Model* model) {
         win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
         win->SetDefaultPos(470, 20);
-        return glass::MakeFunctionView([=] {
-          glass::DisplayDIOs(static_cast<DIOsSimModel*>(model),
+        return wpi::glass::MakeFunctionView([=] {
+          wpi::glass::DisplayDIOs(static_cast<DIOsSimModel*>(model),
                              HALSimGui::halProvider->AreOutputsEnabled());
         });
       });

@@ -16,14 +16,14 @@
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/json_fwd.hpp"
 
-namespace frc {
+namespace wpi::apriltag {
 /**
  * Class for representing a layout of AprilTags on a field and reading them from
  * a JSON format.
  *
  * The JSON format contains two top-level objects, "tags" and "field".
  * The "tags" object is a list of all AprilTags contained within a layout. Each
- * AprilTag serializes to a JSON object containing an ID and a Pose3d. The
+ * AprilTag serializes to a JSON object containing an ID and a wpi::math::Pose3d. The
  * "field" object is a descriptor of the size of the field in meters with
  * "width" and "length" values.  This is to account for arbitrary field sizes
  * when transforming the poses.
@@ -73,19 +73,19 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
    * @param fieldWidth Width of field the layout is representing.
    */
   AprilTagFieldLayout(std::vector<AprilTag> apriltags,
-                      units::meter_t fieldLength, units::meter_t fieldWidth);
+                      wpi::units::meter_t fieldLength, wpi::units::meter_t fieldWidth);
 
   /**
    * Returns the length of the field the layout is representing.
    * @return length
    */
-  units::meter_t GetFieldLength() const;
+  wpi::units::meter_t GetFieldLength() const;
 
   /**
    * Returns the length of the field the layout is representing.
    * @return width
    */
-  units::meter_t GetFieldWidth() const;
+  wpi::units::meter_t GetFieldWidth() const;
 
   /**
    * Returns a vector of all the april tags used in this layout.
@@ -112,13 +112,13 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
    *
    * @param origin The new origin for tag transformations
    */
-  void SetOrigin(const Pose3d& origin);
+  void SetOrigin(const wpi::math::Pose3d& origin);
 
   /**
    * Returns the origin used for tag pose transformation.
    * @return the origin
    */
-  Pose3d GetOrigin() const;
+  wpi::math::Pose3d GetOrigin() const;
 
   /**
    * Gets an AprilTag pose by its ID.
@@ -127,7 +127,7 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
    * @return The pose corresponding to the ID that was passed in or an empty
    * optional if a tag with that ID is not found.
    */
-  std::optional<Pose3d> GetTagPose(int ID) const;
+  std::optional<wpi::math::Pose3d> GetTagPose(int ID) const;
 
   /**
    * Serializes an AprilTagFieldLayout to a JSON file.
@@ -143,22 +143,22 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
 
  private:
   std::unordered_map<int, AprilTag> m_apriltags;
-  units::meter_t m_fieldLength;
-  units::meter_t m_fieldWidth;
-  Pose3d m_origin;
+  wpi::units::meter_t m_fieldLength;
+  wpi::units::meter_t m_fieldWidth;
+  wpi::math::Pose3d m_origin;
 
-  friend WPILIB_DLLEXPORT void to_json(wpi::json& json,
+  friend WPILIB_DLLEXPORT void to_json(wpi::util::json& json,
                                        const AprilTagFieldLayout& layout);
 
-  friend WPILIB_DLLEXPORT void from_json(const wpi::json& json,
+  friend WPILIB_DLLEXPORT void from_json(const wpi::util::json& json,
                                          AprilTagFieldLayout& layout);
 };
 
 WPILIB_DLLEXPORT
-void to_json(wpi::json& json, const AprilTagFieldLayout& layout);
+void to_json(wpi::util::json& json, const AprilTagFieldLayout& layout);
 
 WPILIB_DLLEXPORT
-void from_json(const wpi::json& json, AprilTagFieldLayout& layout);
+void from_json(const wpi::util::json& json, AprilTagFieldLayout& layout);
 
 /**
  * Loads an AprilTagFieldLayout from a predefined field
@@ -171,4 +171,4 @@ void from_json(const wpi::json& json, AprilTagFieldLayout& layout);
 WPILIB_DLLEXPORT AprilTagFieldLayout
 LoadAprilTagLayoutField(AprilTagField field);
 
-}  // namespace frc
+}  // namespace wpi::apriltag

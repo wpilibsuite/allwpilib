@@ -18,7 +18,7 @@
 #include "wpi/util/Algorithm.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * Creates a cost matrix from the given vector for use with LQR.
@@ -46,7 +46,7 @@ constexpr Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCostMatrix(
     }
   }
 
-  wpi::for_each(
+  wpi::util::for_each(
       [&](int i, double tolerance) {
         if (tolerance == std::numeric_limits<double>::infinity()) {
           result(i, i) = 0.0;
@@ -83,7 +83,7 @@ constexpr Matrixd<sizeof...(Ts), sizeof...(Ts)> MakeCovMatrix(Ts... stdDevs) {
     }
   }
 
-  wpi::for_each([&](int i, double stdDev) { result(i, i) = stdDev * stdDev; },
+  wpi::util::for_each([&](int i, double stdDev) { result(i, i) = stdDev * stdDev; },
                 stdDevs...);
 
   return result;
@@ -189,7 +189,7 @@ Vectord<sizeof...(Ts)> MakeWhiteNoiseVector(Ts... stdDevs) {
   std::mt19937 gen{rd()};
 
   Vectord<sizeof...(Ts)> result;
-  wpi::for_each(
+  wpi::util::for_each(
       [&](int i, double stdDev) {
         // Passing a standard deviation of 0.0 to std::normal_distribution is
         // undefined behavior
@@ -422,4 +422,4 @@ extern template WPILIB_DLLEXPORT Eigen::VectorXd
 DesaturateInputVector<Eigen::Dynamic>(const Eigen::VectorXd& u,
                                       double maxMagnitude);
 
-}  // namespace frc
+}  // namespace wpi::math

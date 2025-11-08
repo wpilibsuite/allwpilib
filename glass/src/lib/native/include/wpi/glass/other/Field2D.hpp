@@ -16,17 +16,17 @@
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/util/function_ref.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 class FieldObjectModel : public Model {
  public:
   virtual const char* GetName() const = 0;
 
-  virtual std::span<const frc::Pose2d> GetPoses() = 0;
-  virtual void SetPoses(std::span<const frc::Pose2d> poses) = 0;
-  virtual void SetPose(size_t i, frc::Pose2d pose) = 0;
-  virtual void SetPosition(size_t i, frc::Translation2d pos) = 0;
-  virtual void SetRotation(size_t i, frc::Rotation2d rot) = 0;
+  virtual std::span<const wpi::math::Pose2d> GetPoses() = 0;
+  virtual void SetPoses(std::span<const wpi::math::Pose2d> poses) = 0;
+  virtual void SetPose(size_t i, wpi::math::Pose2d pose) = 0;
+  virtual void SetPosition(size_t i, wpi::math::Translation2d pos) = 0;
+  virtual void SetRotation(size_t i, wpi::math::Rotation2d rot) = 0;
 };
 
 class Field2DModel : public Model {
@@ -34,7 +34,7 @@ class Field2DModel : public Model {
   virtual FieldObjectModel* AddFieldObject(std::string_view name) = 0;
   virtual void RemoveFieldObject(std::string_view name) = 0;
   virtual void ForEachFieldObject(
-      wpi::function_ref<void(FieldObjectModel& model, std::string_view name)>
+      wpi::util::function_ref<void(FieldObjectModel& model, std::string_view name)>
           func) = 0;
 };
 
@@ -53,4 +53,4 @@ class Field2DView : public View {
   Field2DModel* m_model;
 };
 
-}  // namespace glass
+}  // namespace wpi::glass

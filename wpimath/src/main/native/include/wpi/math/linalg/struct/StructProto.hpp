@@ -12,23 +12,23 @@
 
 template <int Rows, int Cols, int Options, int MaxRows, int MaxCols>
   requires(Cols != 1)
-struct wpi::Struct<frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>> {
+struct wpi::util::Struct<wpi::math::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>> {
   static constexpr ct_string kTypeName =
-      wpi::Concat("Matrix__"_ct_string, wpi::NumToCtString<Rows>(),
-                  "_"_ct_string, wpi::NumToCtString<Cols>());
+      wpi::util::Concat("Matrix__"_ct_string, wpi::util::NumToCtString<Rows>(),
+                  "_"_ct_string, wpi::util::NumToCtString<Cols>());
   static constexpr std::string_view GetTypeName() { return kTypeName; }
   static constexpr size_t GetSize() { return Rows * Cols * 8; }
   static constexpr ct_string kSchema =
-      wpi::Concat("double data["_ct_string, wpi::NumToCtString<Rows * Cols>(),
+      wpi::util::Concat("double data["_ct_string, wpi::util::NumToCtString<Rows * Cols>(),
                   "]"_ct_string);
   static constexpr std::string_view GetSchema() { return kSchema; }
 
-  static frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols> Unpack(
+  static wpi::math::Matrixd<Rows, Cols, Options, MaxRows, MaxCols> Unpack(
       std::span<const uint8_t> data) {
     constexpr size_t kDataOff = 0;
-    wpi::array<double, Rows * Cols> mat_data =
-        wpi::UnpackStructArray<double, kDataOff, Rows * Cols>(data);
-    frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols> mat;
+    wpi::util::array<double, Rows * Cols> mat_data =
+        wpi::util::UnpackStructArray<double, kDataOff, Rows * Cols>(data);
+    wpi::math::Matrixd<Rows, Cols, Options, MaxRows, MaxCols> mat;
     for (int i = 0; i < Rows * Cols; i++) {
       mat(i) = mat_data[i];
     }
@@ -37,15 +37,15 @@ struct wpi::Struct<frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>> {
 
   static void Pack(
       std::span<uint8_t> data,
-      const frc::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>& value) {
+      const wpi::math::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>& value) {
     constexpr size_t kDataOff = 0;
-    wpi::array<double, Rows * Cols> mat_data(wpi::empty_array);
+    wpi::util::array<double, Rows * Cols> mat_data(wpi::util::empty_array);
     for (int i = 0; i < Rows * Cols; i++) {
       mat_data[i] = value(i);
     }
-    wpi::PackStructArray<kDataOff, Rows * Cols>(data, mat_data);
+    wpi::util::PackStructArray<kDataOff, Rows * Cols>(data, mat_data);
   }
 };
 
-static_assert(wpi::StructSerializable<frc::Matrixd<1, 2>>);
-static_assert(wpi::StructSerializable<frc::Matrixd<3, 3>>);
+static_assert(wpi::util::StructSerializable<wpi::math::Matrixd<1, 2>>);
+static_assert(wpi::util::StructSerializable<wpi::math::Matrixd<3, 3>>);

@@ -11,12 +11,12 @@
 #include "wpi/commands2/CommandScheduler.hpp"
 #include "wpi/commands2/button/CommandGenericHID.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 /**
- * A version of {@link frc::PS5Controller} with {@link Trigger} factories for
+ * A version of {@link wpi::PS5Controller} with {@link Trigger} factories for
  * command-based.
  *
- * @see frc::PS5Controller
+ * @see wpi::PS5Controller
  */
 class CommandPS5Controller : public CommandGenericHID {
  public:
@@ -33,7 +33,7 @@ class CommandPS5Controller : public CommandGenericHID {
    *
    * @return the wrapped GenericHID object
    */
-  frc::PS5Controller& GetHID();
+  wpi::PS5Controller& GetHID();
 
   /**
    * Constructs a Trigger instance around the square button's
@@ -44,7 +44,7 @@ class CommandPS5Controller : public CommandGenericHID {
    * @return a Trigger instance representing the square button's
    * digital signal attached to the given loop.
    */
-  Trigger Square(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger Square(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 
   /**
@@ -56,7 +56,7 @@ class CommandPS5Controller : public CommandGenericHID {
    * @return a Trigger instance representing the cross button's
    * digital signal attached to the given loop.
    */
-  Trigger Cross(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger Cross(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 
   /**
@@ -68,7 +68,7 @@ class CommandPS5Controller : public CommandGenericHID {
    * @return a Trigger instance representing the circle button's
    * digital signal attached to the given loop.
    */
-  Trigger Circle(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger Circle(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 
   /**
@@ -80,7 +80,7 @@ class CommandPS5Controller : public CommandGenericHID {
    * @return a Trigger instance representing the triangle button's
    * digital signal attached to the given loop.
    */
-  Trigger Triangle(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger Triangle(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 
   /**
@@ -92,7 +92,7 @@ class CommandPS5Controller : public CommandGenericHID {
    * @return a Trigger instance representing the left trigger 1 button's
    * digital signal attached to the given loop.
    */
-  Trigger L1(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger L1(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 
   /**
@@ -104,7 +104,7 @@ class CommandPS5Controller : public CommandGenericHID {
    * @return a Trigger instance representing the right trigger 1 button's
    * digital signal attached to the given loop.
    */
-  Trigger R1(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger R1(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 
   /**
@@ -116,7 +116,7 @@ class CommandPS5Controller : public CommandGenericHID {
    * @return a Trigger instance representing the left trigger 2 button's
    * digital signal attached to the given loop.
    */
-  Trigger L2(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger L2(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 
   /**
@@ -128,7 +128,7 @@ class CommandPS5Controller : public CommandGenericHID {
    * @return a Trigger instance representing the right trigger 2 button's
    * digital signal attached to the given loop.
    */
-  Trigger R2(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger R2(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 
   /**
@@ -140,7 +140,7 @@ class CommandPS5Controller : public CommandGenericHID {
    * @return a Trigger instance representing the create button's
    * digital signal attached to the given loop.
    */
-  Trigger Create(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger Create(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 
   /**
@@ -152,7 +152,7 @@ class CommandPS5Controller : public CommandGenericHID {
    * @return a Trigger instance representing the options button's
    * digital signal attached to the given loop.
    */
-  Trigger Options(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger Options(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 
   /**
@@ -164,7 +164,7 @@ class CommandPS5Controller : public CommandGenericHID {
    * @return a Trigger instance representing the L3 (left stick) button's
    * digital signal attached to the given loop.
    */
-  Trigger L3(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger L3(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 
   /**
@@ -176,7 +176,7 @@ class CommandPS5Controller : public CommandGenericHID {
    * @return a Trigger instance representing the R3 (right stick) button's
    * digital signal attached to the given loop.
    */
-  Trigger R3(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger R3(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 
   /**
@@ -188,7 +188,7 @@ class CommandPS5Controller : public CommandGenericHID {
    * @return a Trigger instance representing the PlayStation button's
    * digital signal attached to the given loop.
    */
-  Trigger PS(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger PS(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 
   /**
@@ -200,7 +200,7 @@ class CommandPS5Controller : public CommandGenericHID {
    * @return a Trigger instance representing the touchpad button's
    * digital signal attached to the given loop.
    */
-  Trigger Touchpad(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger Touchpad(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 
   /**
@@ -248,6 +248,6 @@ class CommandPS5Controller : public CommandGenericHID {
   double GetR2Axis() const;
 
  private:
-  frc::PS5Controller m_hid;
+  wpi::PS5Controller m_hid;
 };
-}  // namespace frc2
+}  // namespace wpi::cmd

@@ -15,7 +15,7 @@
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/ct_string.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Represents colors that can be used with Addressable LEDs.
@@ -782,19 +782,19 @@ class Color {
    */
   explicit constexpr Color(std::string_view hexString) {
     if (hexString.length() != 7 || !hexString.starts_with("#") ||
-        !wpi::isHexDigit(hexString[1]) || !wpi::isHexDigit(hexString[2]) ||
-        !wpi::isHexDigit(hexString[3]) || !wpi::isHexDigit(hexString[4]) ||
-        !wpi::isHexDigit(hexString[5]) || !wpi::isHexDigit(hexString[6])) {
+        !wpi::util::isHexDigit(hexString[1]) || !wpi::util::isHexDigit(hexString[2]) ||
+        !wpi::util::isHexDigit(hexString[3]) || !wpi::util::isHexDigit(hexString[4]) ||
+        !wpi::util::isHexDigit(hexString[5]) || !wpi::util::isHexDigit(hexString[6])) {
       throw std::invalid_argument(
           fmt::format("Invalid hex string for Color \"{}\"", hexString));
     }
 
-    int r = wpi::hexDigitValue(hexString[1]) * 16 +
-            wpi::hexDigitValue(hexString[2]);
-    int g = wpi::hexDigitValue(hexString[3]) * 16 +
-            wpi::hexDigitValue(hexString[4]);
-    int b = wpi::hexDigitValue(hexString[5]) * 16 +
-            wpi::hexDigitValue(hexString[6]);
+    int r = wpi::util::hexDigitValue(hexString[1]) * 16 +
+            wpi::util::hexDigitValue(hexString[2]);
+    int g = wpi::util::hexDigitValue(hexString[3]) * 16 +
+            wpi::util::hexDigitValue(hexString[4]);
+    int b = wpi::util::hexDigitValue(hexString[5]) * 16 +
+            wpi::util::hexDigitValue(hexString[6]);
 
     red = r / 255.0;
     green = g / 255.0;
@@ -859,10 +859,10 @@ class Color {
     const int g = 255.0 * green;
     const int b = 255.0 * blue;
 
-    return wpi::ct_string<char, std::char_traits<char>, 7>{
-        {'#', wpi::hexdigit(r / 16), wpi::hexdigit(r % 16),
-         wpi::hexdigit(g / 16), wpi::hexdigit(g % 16), wpi::hexdigit(b / 16),
-         wpi::hexdigit(b % 16)}};
+    return wpi::util::ct_string<char, std::char_traits<char>, 7>{
+        {'#', wpi::util::hexdigit(r / 16), wpi::util::hexdigit(r % 16),
+         wpi::util::hexdigit(g / 16), wpi::util::hexdigit(g % 16), wpi::util::hexdigit(b / 16),
+         wpi::util::hexdigit(b % 16)}};
   }
 
   /// Red component (0-1).
@@ -1053,4 +1053,4 @@ inline constexpr Color Color::kWhiteSmoke{0.9607843f, 0.9607843f, 0.9607843f};
 inline constexpr Color Color::kYellow{1.0f, 1.0f, 0.0f};
 inline constexpr Color Color::kYellowGreen{0.6039216f, 0.8039216f, 0.19607843f};
 
-}  // namespace frc
+}  // namespace wpi

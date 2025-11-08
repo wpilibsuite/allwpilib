@@ -10,7 +10,7 @@
 
 #include <fmt/format.h>
 
-namespace wpi {
+namespace wpi::util {
 
 enum LogLevel {
   WPI_LOG_CRITICAL = 50,
@@ -73,22 +73,22 @@ class Logger {
   }
 
 #define WPI_ERROR(inst, format, ...) \
-  WPI_LOG(inst, ::wpi::WPI_LOG_ERROR, format __VA_OPT__(, ) __VA_ARGS__)
+  WPI_LOG(inst, ::wpi::util::WPI_LOG_ERROR, format __VA_OPT__(, ) __VA_ARGS__)
 #define WPI_WARNING(inst, format, ...) \
-  WPI_LOG(inst, ::wpi::WPI_LOG_WARNING, format __VA_OPT__(, ) __VA_ARGS__)
+  WPI_LOG(inst, ::wpi::util::WPI_LOG_WARNING, format __VA_OPT__(, ) __VA_ARGS__)
 #define WPI_INFO(inst, format, ...) \
-  WPI_LOG(inst, ::wpi::WPI_LOG_INFO, format __VA_OPT__(, ) __VA_ARGS__)
+  WPI_LOG(inst, ::wpi::util::WPI_LOG_INFO, format __VA_OPT__(, ) __VA_ARGS__)
 #define WPI_DEBUG(inst, format, ...) \
-  WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG, format __VA_OPT__(, ) __VA_ARGS__)
+  WPI_LOG(inst, ::wpi::util::WPI_LOG_DEBUG, format __VA_OPT__(, ) __VA_ARGS__)
 #define WPI_DEBUG1(inst, format, ...) \
-  WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG1, format __VA_OPT__(, ) __VA_ARGS__)
+  WPI_LOG(inst, ::wpi::util::WPI_LOG_DEBUG1, format __VA_OPT__(, ) __VA_ARGS__)
 #define WPI_DEBUG2(inst, format, ...) \
-  WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG2, format __VA_OPT__(, ) __VA_ARGS__)
+  WPI_LOG(inst, ::wpi::util::WPI_LOG_DEBUG2, format __VA_OPT__(, ) __VA_ARGS__)
 #define WPI_DEBUG3(inst, format, ...) \
-  WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG3, format __VA_OPT__(, ) __VA_ARGS__)
+  WPI_LOG(inst, ::wpi::util::WPI_LOG_DEBUG3, format __VA_OPT__(, ) __VA_ARGS__)
 #define WPI_DEBUG4(inst, format, ...) \
-  WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG4, format __VA_OPT__(, ) __VA_ARGS__)
+  WPI_LOG(inst, ::wpi::util::WPI_LOG_DEBUG4, format __VA_OPT__(, ) __VA_ARGS__)
 
-}  // namespace wpi
+}  // namespace wpi::util
 
 #endif  // WPIUTIL_WPI_UTIL_LOGGER_HPP_

@@ -4,7 +4,7 @@
 
 #include "wpi/opmode/TimedRobot.hpp"
 
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   /**
    * This function is run when the robot is first started up and should be
@@ -44,5 +44,5 @@ class Robot : public frc::TimedRobot {
 };
 
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }

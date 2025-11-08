@@ -15,7 +15,7 @@
 #include "wpi/units/time.hpp"
 #include "wpi/util/FunctionExtras.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 class Command;
 /**
  * This class provides an easy way to link commands to conditions.
@@ -47,7 +47,7 @@ class Trigger {
    * @param loop The loop instance that polls this trigger.
    * @param condition the condition represented by this trigger
    */
-  Trigger(frc::EventLoop* loop, std::function<bool()> condition)
+  Trigger(wpi::EventLoop* loop, std::function<bool()> condition)
       : m_loop{loop}, m_condition{std::move(condition)} {}
 
   /**
@@ -279,9 +279,9 @@ class Trigger {
    * @param type The debounce type.
    * @return The debounced trigger.
    */
-  Trigger Debounce(units::second_t debounceTime,
-                   frc::Debouncer::DebounceType type =
-                       frc::Debouncer::DebounceType::kRising);
+  Trigger Debounce(wpi::units::second_t debounceTime,
+                   wpi::math::Debouncer::DebounceType type =
+                       wpi::math::Debouncer::DebounceType::kRising);
 
   /**
    * Returns the current state of this trigger.
@@ -296,9 +296,9 @@ class Trigger {
    *
    * @param body The body of the binding to add.
    */
-  void AddBinding(wpi::unique_function<void(bool, bool)>&& body);
+  void AddBinding(wpi::util::unique_function<void(bool, bool)>&& body);
 
-  frc::EventLoop* m_loop;
+  wpi::EventLoop* m_loop;
   std::function<bool()> m_condition;
 };
-}  // namespace frc2
+}  // namespace wpi::cmd

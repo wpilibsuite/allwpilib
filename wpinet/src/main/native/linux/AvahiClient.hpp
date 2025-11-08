@@ -223,7 +223,7 @@ enum {
   AVAHI_ERR_MAX = -54
 };
 
-namespace wpi {
+namespace wpi::net {
 class AvahiFunctionTable {
  public:
 #define AvahiFunction(CapName, RetType, Parameters) \
@@ -319,4 +319,4 @@ class AvahiThread {
   AvahiFunctionTable& table = AvahiFunctionTable::Get();
 };
 
-}  // namespace wpi
+}  // namespace wpi::net

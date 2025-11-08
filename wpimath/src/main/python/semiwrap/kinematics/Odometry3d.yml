@@ -6,7 +6,7 @@ extra_includes:
 - wpi/math/kinematics/SwerveDriveKinematics.hpp
 
 classes:
-  frc::Odometry3d:
+  wpi::math::Odometry3d:
     template_params:
     - WheelSpeeds
     - WheelPositions
@@ -22,32 +22,32 @@ classes:
 
 templates:
   DifferentialDriveOdometry3dBase:
-    qualname: frc::Odometry3d
+    qualname: wpi::math::Odometry3d
     params:
-    - frc::DifferentialDriveWheelSpeeds
-    - frc::DifferentialDriveWheelPositions
+    - wpi::math::DifferentialDriveWheelSpeeds
+    - wpi::math::DifferentialDriveWheelPositions
   MecanumDriveOdometry3dBase:
-    qualname: frc::Odometry3d
+    qualname: wpi::math::Odometry3d
     params:
-    - frc::MecanumDriveWheelSpeeds
-    - frc::MecanumDriveWheelPositions
+    - wpi::math::MecanumDriveWheelSpeeds
+    - wpi::math::MecanumDriveWheelPositions
   SwerveDrive2Odometry3dBase:
-    qualname: frc::Odometry3d
+    qualname: wpi::math::Odometry3d
     params:
-    - wpi::array<frc::SwerveModuleState,2>
-    - wpi::array<frc::SwerveModulePosition,2>
+    - wpi::util::array<wpi::math::SwerveModuleState,2>
+    - wpi::util::array<wpi::math::SwerveModulePosition,2>
   SwerveDrive3Odometry3dBase:
-    qualname: frc::Odometry3d
+    qualname: wpi::math::Odometry3d
     params:
-    - wpi::array<frc::SwerveModuleState,3>
-    - wpi::array<frc::SwerveModulePosition,3>
+    - wpi::util::array<wpi::math::SwerveModuleState,3>
+    - wpi::util::array<wpi::math::SwerveModulePosition,3>
   SwerveDrive4Odometry3dBase:
-    qualname: frc::Odometry3d
+    qualname: wpi::math::Odometry3d
     params:
-    - wpi::array<frc::SwerveModuleState,4>
-    - wpi::array<frc::SwerveModulePosition,4>
+    - wpi::util::array<wpi::math::SwerveModuleState,4>
+    - wpi::util::array<wpi::math::SwerveModulePosition,4>
   SwerveDrive6Odometry3dBase:
-    qualname: frc::Odometry3d
+    qualname: wpi::math::Odometry3d
     params:
-    - wpi::array<frc::SwerveModuleState,6>
-    - wpi::array<frc::SwerveModulePosition,6>
+    - wpi::util::array<wpi::math::SwerveModuleState,6>
+    - wpi::util::array<wpi::math::SwerveModulePosition,6>

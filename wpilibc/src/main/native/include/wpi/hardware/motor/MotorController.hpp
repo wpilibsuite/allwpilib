@@ -6,7 +6,7 @@
 
 #include "wpi/units/voltage.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Interface for motor controlling devices.
@@ -34,7 +34,7 @@ class MotorController {
    *
    * @param output The voltage to output.
    */
-  virtual void SetVoltage(units::volt_t output);
+  virtual void SetVoltage(wpi::units::volt_t output);
 
   /**
    * Common interface for getting the current set speed of a motor controller.
@@ -68,4 +68,4 @@ class MotorController {
   virtual void StopMotor() = 0;
 };
 
-}  // namespace frc
+}  // namespace wpi

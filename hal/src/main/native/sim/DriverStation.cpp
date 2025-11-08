@@ -25,12 +25,12 @@
 #include "wpi/util/condition_variable.hpp"
 #include "wpi/util/mutex.hpp"
 
-static wpi::mutex msgMutex;
+static wpi::util::mutex msgMutex;
 static std::atomic<HALSIM_SendErrorHandler> sendErrorHandler{nullptr};
 static std::atomic<HALSIM_SendConsoleLineHandler> sendConsoleLineHandler{
     nullptr};
 
-using namespace hal;
+using namespace wpi::hal;
 
 static constexpr int kJoystickPorts = 6;
 
@@ -53,9 +53,9 @@ static std::atomic_bool gShutdown{false};
 
 struct FRCDriverStation {
   ~FRCDriverStation() { gShutdown = true; }
-  wpi::EventVector newDataEvents;
-  wpi::mutex cacheMutex;
-  wpi::mutex tcpCacheMutex;
+  wpi::util::EventVector newDataEvents;
+  wpi::util::mutex cacheMutex;
+  wpi::util::mutex tcpCacheMutex;
 };
 }  // namespace
 
@@ -116,21 +116,21 @@ void TcpCache::Update() {
 
 static ::FRCDriverStation* driverStation;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeDriverStation() {
   static FRCDriverStation ds;
   driverStation = &ds;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-namespace hal {
+namespace wpi::hal {
 static void DefaultPrintErrorImpl(const char* line, size_t size) {
   std::fwrite(line, size, 1, stderr);
 }
-}  // namespace hal
+}  // namespace wpi::hal
 
 static std::atomic<void (*)(const char* line, size_t size)> gPrintErrorImpl{
-    hal::DefaultPrintErrorImpl};
+    wpi::hal::DefaultPrintErrorImpl};
 
 extern "C" {
 
@@ -205,7 +205,7 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
 }
 
 void HAL_SetPrintErrorImpl(void (*func)(const char* line, size_t size)) {
-  gPrintErrorImpl.store(func ? func : hal::DefaultPrintErrorImpl);
+  gPrintErrorImpl.store(func ? func : wpi::hal::DefaultPrintErrorImpl);
 }
 
 int32_t HAL_SendConsoleLine(const char* line) {
@@ -404,7 +404,7 @@ void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle) {
   if (gShutdown) {
     return;
   }
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
   driverStation->newDataEvents.Add(handle);
 }
 
@@ -425,7 +425,7 @@ HAL_Bool HAL_GetOutputsEnabled(void) {
 
 }  // extern "C"
 
-namespace hal {
+namespace wpi::hal {
 void NewDriverStationData() {
   if (gShutdown) {
     return;
@@ -451,4 +451,4 @@ void NewDriverStationData() {
 void InitializeDriverStation() {
   SimDriverStationData->ResetData();
 }
-}  // namespace hal
+}  // namespace wpi::hal

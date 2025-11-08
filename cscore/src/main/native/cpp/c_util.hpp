@@ -10,13 +10,13 @@
 
 #include "wpi/util/string.h"
 
-namespace cs {
+namespace wpi::cs {
 
 inline void ConvertToC(struct WPI_String* output, std::string_view str) {
   char* write = WPI_AllocateString(output, str.size());
   std::memcpy(write, str.data(), str.size());
 }
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_C_UTIL_HPP_

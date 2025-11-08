@@ -6,7 +6,7 @@
 
 #include <jni.h>
 
-namespace hal::sim {
+namespace wpi::hal::sim {
 bool InitializeSimDeviceDataJNI(JNIEnv* env);
 void FreeSimDeviceDataJNI(JNIEnv* env);
-}  // namespace hal::sim
+}  // namespace wpi::hal::sim

@@ -27,7 +27,7 @@
 #include <cstdlib>  // for _byteswap_{ushort,ulong,uint64}
 #endif
 
-namespace wpi {
+namespace wpi::util {
 
 enum class endianness {
   big,
@@ -94,8 +94,8 @@ template <typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
 #elif defined(_MSC_VER) && !defined(_DEBUG)
     return _byteswap_uint64(UV);
 #else
-    uint64_t Hi = wpi::byteswap<uint32_t>(UV);
-    uint32_t Lo = wpi::byteswap<uint32_t>(UV >> 32);
+    uint64_t Hi = wpi::util::byteswap<uint32_t>(UV);
+    uint32_t Lo = wpi::util::byteswap<uint32_t>(UV >> 32);
     return (Hi << 32) | Lo;
 #endif
   } else {
@@ -104,6 +104,6 @@ template <typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
   }
 }
 
-} // namespace wpi
+} // namespace wpi::util
 
 #endif

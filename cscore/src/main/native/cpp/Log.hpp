@@ -9,14 +9,14 @@
 
 #include "wpi/util/Logger.hpp"
 
-namespace cs {
+namespace wpi::cs {
 
-void NamedLogV(wpi::Logger& logger, unsigned int level, const char* file,
+void NamedLogV(wpi::util::Logger& logger, unsigned int level, const char* file,
                unsigned int line, std::string_view name,
                fmt::string_view format, fmt::format_args args);
 
 template <typename S, typename... Args>
-inline void NamedLog(wpi::Logger& logger, unsigned int level, const char* file,
+inline void NamedLog(wpi::util::Logger& logger, unsigned int level, const char* file,
                      unsigned int line, std::string_view name, const S& format,
                      Args&&... args) {
   if (logger.HasLogger() && level >= logger.min_level()) {
@@ -25,7 +25,7 @@ inline void NamedLog(wpi::Logger& logger, unsigned int level, const char* file,
   }
 }
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #define LOG(level, format, ...) \
   WPI_LOG(m_logger, level, format __VA_OPT__(, ) __VA_ARGS__)
@@ -53,11 +53,11 @@ inline void NamedLog(wpi::Logger& logger, unsigned int level, const char* file,
            format __VA_OPT__(, ) __VA_ARGS__)
 
 #define SERROR(format, ...) \
-  SLOG(::wpi::WPI_LOG_ERROR, format __VA_OPT__(, ) __VA_ARGS__)
+  SLOG(::wpi::util::WPI_LOG_ERROR, format __VA_OPT__(, ) __VA_ARGS__)
 #define SWARNING(format, ...) \
-  SLOG(::wpi::WPI_LOG_WARNING, format __VA_OPT__(, ) __VA_ARGS__)
+  SLOG(::wpi::util::WPI_LOG_WARNING, format __VA_OPT__(, ) __VA_ARGS__)
 #define SINFO(format, ...) \
-  SLOG(::wpi::WPI_LOG_INFO, format __VA_OPT__(, ) __VA_ARGS__)
+  SLOG(::wpi::util::WPI_LOG_INFO, format __VA_OPT__(, ) __VA_ARGS__)
 
 #ifdef NDEBUG
 #define SDEBUG(format, ...) \
@@ -77,15 +77,15 @@ inline void NamedLog(wpi::Logger& logger, unsigned int level, const char* file,
   } while (0)
 #else
 #define SDEBUG(format, ...) \
-  SLOG(::wpi::WPI_LOG_DEBUG, format __VA_OPT__(, ) __VA_ARGS__)
+  SLOG(::wpi::util::WPI_LOG_DEBUG, format __VA_OPT__(, ) __VA_ARGS__)
 #define SDEBUG1(format, ...) \
-  SLOG(::wpi::WPI_LOG_DEBUG1, format __VA_OPT__(, ) __VA_ARGS__)
+  SLOG(::wpi::util::WPI_LOG_DEBUG1, format __VA_OPT__(, ) __VA_ARGS__)
 #define SDEBUG2(format, ...) \
-  SLOG(::wpi::WPI_LOG_DEBUG2, format __VA_OPT__(, ) __VA_ARGS__)
+  SLOG(::wpi::util::WPI_LOG_DEBUG2, format __VA_OPT__(, ) __VA_ARGS__)
 #define SDEBUG3(format, ...) \
-  SLOG(::wpi::WPI_LOG_DEBUG3, format __VA_OPT__(, ) __VA_ARGS__)
+  SLOG(::wpi::util::WPI_LOG_DEBUG3, format __VA_OPT__(, ) __VA_ARGS__)
 #define SDEBUG4(format, ...) \
-  SLOG(::wpi::WPI_LOG_DEBUG4, format __VA_OPT__(, ) __VA_ARGS__)
+  SLOG(::wpi::util::WPI_LOG_DEBUG4, format __VA_OPT__(, ) __VA_ARGS__)
 #endif
 
 #endif  // CSCORE_LOG_HPP_

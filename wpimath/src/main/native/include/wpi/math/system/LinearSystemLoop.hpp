@@ -15,7 +15,7 @@
 #include "wpi/units/voltage.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * Combines a controller, feedforward, and observer for controlling a mechanism
@@ -57,11 +57,11 @@ class LinearSystemLoop {
   LinearSystemLoop(LinearSystem<States, Inputs, Outputs>& plant,
                    LinearQuadraticRegulator<States, Inputs>& controller,
                    KalmanFilter<States, Inputs, Outputs>& observer,
-                   units::volt_t maxVoltage, units::second_t dt)
+                   wpi::units::volt_t maxVoltage, wpi::units::second_t dt)
       : LinearSystemLoop(
             plant, controller, observer,
             [=](const InputVector& u) {
-              return frc::DesaturateInputVector<Inputs>(u, maxVoltage.value());
+              return wpi::math::DesaturateInputVector<Inputs>(u, maxVoltage.value());
             },
             dt) {}
 
@@ -81,7 +81,7 @@ class LinearSystemLoop {
                    LinearQuadraticRegulator<States, Inputs>& controller,
                    KalmanFilter<States, Inputs, Outputs>& observer,
                    std::function<InputVector(const InputVector&)> clampFunction,
-                   units::second_t dt)
+                   wpi::units::second_t dt)
       : LinearSystemLoop(
             controller,
             LinearPlantInversionFeedforward<States, Inputs>{plant, dt},
@@ -101,10 +101,10 @@ class LinearSystemLoop {
   LinearSystemLoop(
       LinearQuadraticRegulator<States, Inputs>& controller,
       const LinearPlantInversionFeedforward<States, Inputs>& feedforward,
-      KalmanFilter<States, Inputs, Outputs>& observer, units::volt_t maxVoltage)
+      KalmanFilter<States, Inputs, Outputs>& observer, wpi::units::volt_t maxVoltage)
       : LinearSystemLoop(
             controller, feedforward, observer, [=](const InputVector& u) {
-              return frc::DesaturateInputVector<Inputs>(u, maxVoltage.value());
+              return wpi::math::DesaturateInputVector<Inputs>(u, maxVoltage.value());
             }) {}
 
   /**
@@ -251,7 +251,7 @@ class LinearSystemLoop {
    *
    * @param dt Timestep for model update.
    */
-  void Predict(units::second_t dt) {
+  void Predict(wpi::units::second_t dt) {
     InputVector u =
         ClampInput(m_controller->Calculate(m_observer->Xhat(), m_nextR) +
                    m_feedforward.Calculate(m_nextR));
@@ -290,4 +290,4 @@ extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
     LinearSystemLoop<2, 1, 1>;
 
-}  // namespace frc
+}  // namespace wpi::math

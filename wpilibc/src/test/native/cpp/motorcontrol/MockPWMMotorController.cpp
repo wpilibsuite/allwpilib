@@ -4,7 +4,7 @@
 
 #include "motorcontrol/MockPWMMotorController.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 void MockPWMMotorController::Set(double speed) {
   m_speed = m_isInverted ? -speed : speed;

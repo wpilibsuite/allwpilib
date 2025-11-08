@@ -21,12 +21,12 @@
 #include "wpi/nt/Topic.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
 
-namespace wpi {
+namespace wpi::util {
 template <typename T>
 class SmallVectorImpl;
 }  // namespace wpi
 
-namespace nt {
+namespace wpi::nt {
 
 class StringTopic;
 
@@ -76,7 +76,7 @@ class StringSubscriber : public Subscriber {
    * @return value
    */
   ValueType Get(ParamType defaultValue) const {
-    return ::nt::GetString(m_subHandle, defaultValue);
+    return ::wpi::nt::GetString(m_subHandle, defaultValue);
   }
 
   /**
@@ -86,7 +86,7 @@ class StringSubscriber : public Subscriber {
    * @param buf storage for returned value
    * @return value
    */
-  SmallRetType Get(wpi::SmallVectorImpl<SmallElemType>& buf) const {
+  SmallRetType Get(wpi::util::SmallVectorImpl<SmallElemType>& buf) const {
     return Get(buf, m_defaultValue);
   }
 
@@ -98,8 +98,8 @@ class StringSubscriber : public Subscriber {
    * @param defaultValue default value to return if no value has been published
    * @return value
    */
-  SmallRetType Get(wpi::SmallVectorImpl<SmallElemType>& buf, ParamType defaultValue) const {
-    return nt::GetString(m_subHandle, buf, defaultValue);
+  SmallRetType Get(wpi::util::SmallVectorImpl<SmallElemType>& buf, ParamType defaultValue) const {
+    return wpi::nt::GetString(m_subHandle, buf, defaultValue);
   }
 
   /**
@@ -122,7 +122,7 @@ class StringSubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueType GetAtomic(ParamType defaultValue) const {
-    return ::nt::GetAtomicString(m_subHandle, defaultValue);
+    return ::wpi::nt::GetAtomicString(m_subHandle, defaultValue);
   }
 
   /**
@@ -134,7 +134,7 @@ class StringSubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueViewType GetAtomic(
-      wpi::SmallVectorImpl<SmallElemType>& buf) const {
+      wpi::util::SmallVectorImpl<SmallElemType>& buf) const {
     return GetAtomic(buf, m_defaultValue);
   }
 
@@ -148,9 +148,9 @@ class StringSubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueViewType GetAtomic(
-      wpi::SmallVectorImpl<SmallElemType>& buf,
+      wpi::util::SmallVectorImpl<SmallElemType>& buf,
       ParamType defaultValue) const {
-    return nt::GetAtomicString(m_subHandle, buf, defaultValue);
+    return wpi::nt::GetAtomicString(m_subHandle, buf, defaultValue);
   }
 
   /**
@@ -164,7 +164,7 @@ class StringSubscriber : public Subscriber {
    *     been published since the previous call.
    */
   std::vector<TimestampedValueType> ReadQueue() {
-    return ::nt::ReadQueueString(m_subHandle);
+    return ::wpi::nt::ReadQueueString(m_subHandle);
   }
 
   /**
@@ -209,7 +209,7 @@ class StringPublisher : public Publisher {
    * @param time timestamp; 0 indicates current NT time should be used
    */
   void Set(ParamType value, int64_t time = 0) {
-    ::nt::SetString(m_pubHandle, value, time);
+    ::wpi::nt::SetString(m_pubHandle, value, time);
   }
 
   /**
@@ -220,7 +220,7 @@ class StringPublisher : public Publisher {
    * @param value value
    */
   void SetDefault(ParamType value) {
-    ::nt::SetDefaultString(m_pubHandle, value);
+    ::wpi::nt::SetDefaultString(m_pubHandle, value);
   }
 
   /**
@@ -288,7 +288,7 @@ class StringEntry final : public StringSubscriber,
    * Stops publishing the entry if it's published.
    */
   void Unpublish() {
-    ::nt::Unpublish(m_pubHandle);
+    ::wpi::nt::Unpublish(m_pubHandle);
   }
 };
 
@@ -343,7 +343,7 @@ class StringTopic final : public Topic {
       ParamType defaultValue,
       const PubSubOptions& options = kDefaultPubSubOptions) {
     return StringSubscriber{
-        ::nt::Subscribe(m_handle, NT_STRING, "string", options),
+        ::wpi::nt::Subscribe(m_handle, NT_STRING, "string", options),
         defaultValue};
   }
   /**
@@ -367,7 +367,7 @@ class StringTopic final : public Topic {
       std::string_view typeString, ParamType defaultValue,
       const PubSubOptions& options = kDefaultPubSubOptions) {
     return StringSubscriber{
-        ::nt::Subscribe(m_handle, NT_STRING, typeString, options),
+        ::wpi::nt::Subscribe(m_handle, NT_STRING, typeString, options),
         defaultValue};
   }
 
@@ -389,7 +389,7 @@ class StringTopic final : public Topic {
   [[nodiscard]]
   PublisherType Publish(const PubSubOptions& options = kDefaultPubSubOptions) {
     return StringPublisher{
-        ::nt::Publish(m_handle, NT_STRING, "string", options)};
+        ::wpi::nt::Publish(m_handle, NT_STRING, "string", options)};
   }
 
   /**
@@ -412,9 +412,9 @@ class StringTopic final : public Topic {
    */
   [[nodiscard]]
   PublisherType PublishEx(std::string_view typeString,
-    const wpi::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
+    const wpi::util::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
     return StringPublisher{
-        ::nt::PublishEx(m_handle, NT_STRING, typeString, properties, options)};
+        ::wpi::nt::PublishEx(m_handle, NT_STRING, typeString, properties, options)};
   }
 
   /**
@@ -441,7 +441,7 @@ class StringTopic final : public Topic {
   EntryType GetEntry(ParamType defaultValue,
                      const PubSubOptions& options = kDefaultPubSubOptions) {
     return StringEntry{
-        ::nt::GetEntry(m_handle, NT_STRING, "string", options),
+        ::wpi::nt::GetEntry(m_handle, NT_STRING, "string", options),
         defaultValue};
   }
   /**
@@ -469,22 +469,22 @@ class StringTopic final : public Topic {
   EntryType GetEntryEx(std::string_view typeString, ParamType defaultValue,
                        const PubSubOptions& options = kDefaultPubSubOptions) {
     return StringEntry{
-        ::nt::GetEntry(m_handle, NT_STRING, typeString, options),
+        ::wpi::nt::GetEntry(m_handle, NT_STRING, typeString, options),
         defaultValue};
   }
 
 };
 
 inline StringTopic StringSubscriber::GetTopic() const {
-  return StringTopic{::nt::GetTopicFromHandle(m_subHandle)};
+  return StringTopic{::wpi::nt::GetTopicFromHandle(m_subHandle)};
 }
 
 inline StringTopic StringPublisher::GetTopic() const {
-  return StringTopic{::nt::GetTopicFromHandle(m_pubHandle)};
+  return StringTopic{::wpi::nt::GetTopicFromHandle(m_pubHandle)};
 }
 
 inline StringTopic StringEntry::GetTopic() const {
-  return StringTopic{::nt::GetTopicFromHandle(m_subHandle)};
+  return StringTopic{::wpi::nt::GetTopicFromHandle(m_subHandle)};
 }
 
-}  // namespace nt
+}  // namespace wpi::nt

@@ -10,7 +10,7 @@
 #include "wpi/util/Algorithm.hpp"
 #include "wpi/util/circular_buffer.hpp"
 
-namespace frc {
+namespace wpi::math {
 /**
  * A class that implements a moving-window median filter.  Useful for reducing
  * measurement noise, especially with processes that generate occasional,
@@ -36,7 +36,7 @@ class MedianFilter {
    */
   constexpr T Calculate(T next) {
     // Insert next value at proper point in sorted array
-    wpi::insert_sorted(m_orderedValues, next);
+    wpi::util::insert_sorted(m_orderedValues, next);
 
     size_t curSize = m_orderedValues.size();
 
@@ -78,8 +78,8 @@ class MedianFilter {
   }
 
  private:
-  wpi::circular_buffer<T> m_valueBuffer;
+  wpi::util::circular_buffer<T> m_valueBuffer;
   std::vector<T> m_orderedValues;
   size_t m_size;
 };
-}  // namespace frc
+}  // namespace wpi::math

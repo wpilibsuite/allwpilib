@@ -19,7 +19,7 @@
 #include <cassert>
 #include <cstdlib>
 
-using namespace wpi;
+using namespace wpi::util;
 
 void SmallPtrSetImplBase::shrink_and_clear() {
   assert(!isSmall() && "Can't shrink a small set!");

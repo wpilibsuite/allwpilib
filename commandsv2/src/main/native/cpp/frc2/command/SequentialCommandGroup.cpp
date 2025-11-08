@@ -9,7 +9,7 @@
 
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 SequentialCommandGroup::SequentialCommandGroup(
     std::vector<std::unique_ptr<Command>>&& commands) {
@@ -68,7 +68,7 @@ void SequentialCommandGroup::AddCommands(
   CommandScheduler::GetInstance().RequireUngroupedAndUnscheduled(commands);
 
   if (m_currentCommandIndex != invalid_index) {
-    throw FRC_MakeError(frc::err::CommandIllegalUse,
+    throw FRC_MakeError(wpi::err::CommandIllegalUse,
                         "Commands cannot be added to a CommandGroup "
                         "while the group is running");
   }
@@ -85,7 +85,7 @@ void SequentialCommandGroup::AddCommands(
   }
 }
 
-void SequentialCommandGroup::InitSendable(wpi::SendableBuilder& builder) {
+void SequentialCommandGroup::InitSendable(wpi::util::SendableBuilder& builder) {
   Command::InitSendable(builder);
   builder.AddIntegerProperty(
       "index", [this] { return m_currentCommandIndex; }, nullptr);

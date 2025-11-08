@@ -14,7 +14,7 @@
 #include "wpi/net/uv/Handle.hpp"
 #include "wpi/util/Signal.h"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 class Loop;
 
@@ -71,9 +71,9 @@ class FsEvent final : public HandleImpl<FsEvent, uv_fs_event_t> {
    * relative to that directory).  The second parameter is an ORed mask of
    * UV_RENAME and UV_CHANGE.
    */
-  sig::Signal<const char*, int> fsEvent;
+  wpi::util::sig::Signal<const char*, int> fsEvent;
 };
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_FSEVENT_HPP_

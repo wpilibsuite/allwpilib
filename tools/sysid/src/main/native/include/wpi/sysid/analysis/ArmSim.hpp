@@ -36,7 +36,7 @@ class ArmSim {
    * @param voltage Voltage to apply over the timestep.
    * @param dt      Sample period.
    */
-  void Update(units::volt_t voltage, units::second_t dt);
+  void Update(wpi::units::volt_t voltage, wpi::units::second_t dt);
 
   /**
    * Returns the position.
@@ -58,7 +58,7 @@ class ArmSim {
    * @param voltage The voltage that is being applied to the mechanism / input
    * @return The acceleration given the state and input
    */
-  double GetAcceleration(units::volt_t voltage) const;
+  double GetAcceleration(wpi::units::volt_t voltage) const;
 
   /**
    * Resets model position and velocity.

@@ -12,7 +12,7 @@
 #include "subsystems/Drivetrain.hpp"
 
 class AutonomousDistance
-    : public frc2::CommandHelper<frc2::SequentialCommandGroup,
+    : public wpi::cmd::CommandHelper<wpi::cmd::SequentialCommandGroup,
                                  AutonomousDistance> {
  public:
   /**

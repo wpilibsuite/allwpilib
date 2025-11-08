@@ -12,13 +12,13 @@
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/StringTopic.hpp"
 
-namespace glass {
+namespace wpi::glass {
 class NTSubsystemModel : public SubsystemModel {
  public:
   static constexpr const char* kType = "Subsystem";
 
   explicit NTSubsystemModel(std::string_view path);
-  NTSubsystemModel(nt::NetworkTableInstance inst, std::string_view path);
+  NTSubsystemModel(wpi::nt::NetworkTableInstance inst, std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
   const char* GetDefaultCommand() const override {
@@ -33,13 +33,13 @@ class NTSubsystemModel : public SubsystemModel {
   bool IsReadOnly() override { return true; }
 
  private:
-  nt::NetworkTableInstance m_inst;
-  nt::StringSubscriber m_name;
-  nt::StringSubscriber m_defaultCommand;
-  nt::StringSubscriber m_currentCommand;
+  wpi::nt::NetworkTableInstance m_inst;
+  wpi::nt::StringSubscriber m_name;
+  wpi::nt::StringSubscriber m_defaultCommand;
+  wpi::nt::StringSubscriber m_currentCommand;
 
   std::string m_nameValue;
   std::string m_defaultCommandValue;
   std::string m_currentCommandValue;
 };
-}  // namespace glass
+}  // namespace wpi::glass

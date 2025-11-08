@@ -14,7 +14,7 @@
 #include "wpi/glass/Storage.hpp"
 #include "wpi/glass/support/ExtraGuiWidgets.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 Window::Window(Storage& storage, std::string_view id,
                Visibility defaultVisibility)

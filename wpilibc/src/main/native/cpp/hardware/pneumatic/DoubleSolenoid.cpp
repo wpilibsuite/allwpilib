@@ -13,7 +13,7 @@
 #include "wpi/util/sendable/SendableBuilder.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 DoubleSolenoid::DoubleSolenoid(int busId, int module,
                                PneumaticsModuleType moduleType,
@@ -52,7 +52,7 @@ DoubleSolenoid::DoubleSolenoid(int busId, int module,
       fmt::format("Solenoid[{},{}]", m_forwardChannel, m_reverseChannel),
       "DoubleSolenoid");
 
-  wpi::SendableRegistry::Add(this, "DoubleSolenoid",
+  wpi::util::SendableRegistry::Add(this, "DoubleSolenoid",
                              m_module->GetModuleNumber(), m_forwardChannel);
 }
 
@@ -123,12 +123,12 @@ bool DoubleSolenoid::IsRevSolenoidDisabled() const {
   return (m_module->GetSolenoidDisabledList() & m_reverseMask) != 0;
 }
 
-void DoubleSolenoid::InitSendable(wpi::SendableBuilder& builder) {
+void DoubleSolenoid::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Double Solenoid");
   builder.SetActuator(true);
   builder.AddSmallStringProperty(
       "Value",
-      [=, this](wpi::SmallVectorImpl<char>& buf) -> std::string_view {
+      [=, this](wpi::util::SmallVectorImpl<char>& buf) -> std::string_view {
         switch (Get()) {
           case kForward:
             return "Forward";

@@ -11,7 +11,7 @@
 #include "wpi/util/FunctionExtras.hpp"
 #include "wpi/util/deprecated.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 /**
  * Schedules a given command when this command is initialized and ends when it
  * ends, but does not directly run it. Use this for including a command in a
@@ -45,7 +45,7 @@ class ProxyCommand : public CommandHelper<Command, ProxyCommand> {
    */
   WPI_IGNORE_DEPRECATED
   [[deprecated("Defer a proxy command instead.")]]
-  explicit ProxyCommand(wpi::unique_function<Command*()> supplier);
+  explicit ProxyCommand(wpi::util::unique_function<Command*()> supplier);
 
   /**
    * Creates a new ProxyCommand that schedules the supplied command when
@@ -64,7 +64,7 @@ class ProxyCommand : public CommandHelper<Command, ProxyCommand> {
    * @see DeferredCommand
    */
   [[deprecated("Defer a proxy command instead.")]]
-  explicit ProxyCommand(wpi::unique_function<CommandPtr()> supplier);
+  explicit ProxyCommand(wpi::util::unique_function<CommandPtr()> supplier);
   WPI_UNIGNORE_DEPRECATED
 
   /**
@@ -94,10 +94,10 @@ class ProxyCommand : public CommandHelper<Command, ProxyCommand> {
 
   bool IsFinished() override;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
-  wpi::unique_function<Command*()> m_supplier;
+  wpi::util::unique_function<Command*()> m_supplier;
   Command* m_command = nullptr;
 };
-}  // namespace frc2
+}  // namespace wpi::cmd

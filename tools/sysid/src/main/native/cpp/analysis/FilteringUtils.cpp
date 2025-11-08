@@ -49,7 +49,7 @@ static void CheckSize(const std::vector<PreparedData>& data, size_t window,
  * @return True, if the key corresponds to a raw dataset.
  */
 static bool IsRaw(std::string_view key) {
-  return wpi::contains(key, "raw") && !wpi::contains(key, "original");
+  return wpi::util::contains(key, "raw") && !wpi::util::contains(key, "original");
 }
 
 /**
@@ -60,7 +60,7 @@ static bool IsRaw(std::string_view key) {
  * @return True, if the key corresponds to a filtered dataset.
  */
 static bool IsFiltered(std::string_view key) {
-  return !wpi::contains(key, "raw") && !wpi::contains(key, "original");
+  return !wpi::util::contains(key, "raw") && !wpi::util::contains(key, "original");
 }
 
 /**
@@ -116,16 +116,16 @@ static void PrepareMechData(std::vector<PreparedData>* data,
   }
 }
 
-std::tuple<units::second_t, units::second_t, units::second_t>
+std::tuple<wpi::units::second_t, wpi::units::second_t, wpi::units::second_t>
 sysid::TrimStepVoltageData(std::vector<PreparedData>* data,
                            AnalysisManager::Settings* settings,
-                           units::second_t minStepTime,
-                           units::second_t maxStepTime) {
+                           wpi::units::second_t minStepTime,
+                           wpi::units::second_t maxStepTime) {
   auto voltageBegins =
       std::find_if(data->begin(), data->end(),
                    [](auto& datum) { return std::abs(datum.voltage) > 0; });
 
-  units::second_t firstTimestamp = voltageBegins->timestamp;
+  wpi::units::second_t firstTimestamp = voltageBegins->timestamp;
   double firstPosition = voltageBegins->position;
 
   auto motionBegins = std::find_if(
@@ -134,7 +134,7 @@ sysid::TrimStepVoltageData(std::vector<PreparedData>* data,
                (settings->velocityThreshold * datum.dt.value());
       });
 
-  units::second_t positionDelay;
+  wpi::units::second_t positionDelay;
   if (motionBegins != data->end()) {
     positionDelay = motionBegins->timestamp - firstTimestamp;
   } else {
@@ -146,8 +146,8 @@ sysid::TrimStepVoltageData(std::vector<PreparedData>* data,
         // Since we don't know if its a forward or backwards test here, we use
         // the sign of each point's velocity to determine how to compare their
         // accelerations.
-        return wpi::sgn(a.velocity) * a.acceleration <
-               wpi::sgn(b.velocity) * b.acceleration;
+        return wpi::util::sgn(a.velocity) * a.acceleration <
+               wpi::util::sgn(b.velocity) * b.acceleration;
       });
 
   // Current limiting can delay onset of the peak acceleration, so we need to
@@ -155,11 +155,11 @@ sysid::TrimStepVoltageData(std::vector<PreparedData>* data,
   // because this whole file is tech debt already
   auto accelBegins = std::find_if(
       data->begin(), data->end(), [&maxAccel](const auto& measurement) {
-        return wpi::sgn(measurement.velocity) * measurement.acceleration >
-               0.8 * wpi::sgn(maxAccel->velocity) * maxAccel->acceleration;
+        return wpi::util::sgn(measurement.velocity) * measurement.acceleration >
+               0.8 * wpi::util::sgn(maxAccel->velocity) * maxAccel->acceleration;
       });
 
-  units::second_t velocityDelay;
+  wpi::units::second_t velocityDelay;
   if (accelBegins != data->end()) {
     velocityDelay = accelBegins->timestamp - firstTimestamp;
 
@@ -209,7 +209,7 @@ double sysid::GetNoiseFloor(
     std::function<double(const PreparedData&)> accessorFunction) {
   double sum = 0.0;
   size_t step = window / 2;
-  auto averageFilter = frc::LinearFilter<double>::MovingAverage(window);
+  auto averageFilter = wpi::math::LinearFilter<double>::MovingAverage(window);
   for (size_t i = 0; i < data.size(); i++) {
     double mean = averageFilter.Calculate(accessorFunction(data[i]));
     if (i >= step) {
@@ -229,8 +229,8 @@ double sysid::GetMaxSpeed(
   return max;
 }
 
-units::second_t sysid::GetMeanTimeDelta(const std::vector<PreparedData>& data) {
-  std::vector<units::second_t> dts;
+wpi::units::second_t sysid::GetMeanTimeDelta(const std::vector<PreparedData>& data) {
+  std::vector<wpi::units::second_t> dts;
 
   for (const auto& pt : data) {
     if (pt.dt > 0_s && pt.dt < 500_ms) {
@@ -241,8 +241,8 @@ units::second_t sysid::GetMeanTimeDelta(const std::vector<PreparedData>& data) {
   return std::accumulate(dts.begin(), dts.end(), 0_s) / dts.size();
 }
 
-units::second_t sysid::GetMeanTimeDelta(const Storage& data) {
-  std::vector<units::second_t> dts;
+wpi::units::second_t sysid::GetMeanTimeDelta(const Storage& data) {
+  std::vector<wpi::units::second_t> dts;
 
   for (const auto& pt : data.slowForward) {
     if (pt.dt > 0_s && pt.dt < 500_ms) {
@@ -274,7 +274,7 @@ units::second_t sysid::GetMeanTimeDelta(const Storage& data) {
 void sysid::ApplyMedianFilter(std::vector<PreparedData>* data, int window) {
   CheckSize(*data, window, "Median Filter");
 
-  frc::MedianFilter<double> medianFilter(window);
+  wpi::math::MedianFilter<double> medianFilter(window);
 
   // Load the median filter with the first value for accurate initial behavior
   for (int i = 0; i < window; i++) {
@@ -319,14 +319,14 @@ static std::string RemoveStr(std::string_view str, std::string_view removeStr) {
  *
  * @return The maximum duration of the Dynamic Tests
  */
-static units::second_t GetMaxStepTime(
-    wpi::StringMap<std::vector<PreparedData>>& data) {
+static wpi::units::second_t GetMaxStepTime(
+    wpi::util::StringMap<std::vector<PreparedData>>& data) {
   auto maxStepTime = 0_s;
   for (auto& it : data) {
     auto& key = it.first;
     auto& dataset = it.second;
 
-    if (IsRaw(key) && wpi::contains(key, "dynamic")) {
+    if (IsRaw(key) && wpi::util::contains(key, "dynamic")) {
       if (!dataset.empty()) {
         auto duration = dataset.back().timestamp - dataset.front().timestamp;
         if (duration > maxStepTime) {
@@ -339,11 +339,11 @@ static units::second_t GetMaxStepTime(
 }
 
 void sysid::InitialTrimAndFilter(
-    wpi::StringMap<std::vector<PreparedData>>* data,
+    wpi::util::StringMap<std::vector<PreparedData>>* data,
     AnalysisManager::Settings* settings,
-    std::vector<units::second_t>& positionDelays,
-    std::vector<units::second_t>& velocityDelays, units::second_t& minStepTime,
-    units::second_t& maxStepTime, std::string_view unit) {
+    std::vector<wpi::units::second_t>& positionDelays,
+    std::vector<wpi::units::second_t>& velocityDelays, wpi::units::second_t& minStepTime,
+    wpi::units::second_t& maxStepTime, std::string_view unit) {
   auto& preparedData = *data;
 
   // Find the maximum Step Test Duration of the dynamic tests
@@ -354,7 +354,7 @@ void sysid::InitialTrimAndFilter(
     for (auto& it : preparedData) {
       auto& key = it.first;
       auto& dataset = it.second;
-      if (wpi::contains(key, "quasistatic")) {
+      if (wpi::util::contains(key, "quasistatic")) {
         settings->velocityThreshold =
             std::min(settings->velocityThreshold,
                      GetNoiseFloor(dataset, kNoiseMeanWindow,
@@ -369,7 +369,7 @@ void sysid::InitialTrimAndFilter(
 
     // Trim quasistatic test data to remove all points where voltage is zero or
     // velocity < velocity threshold.
-    if (wpi::contains(key, "quasistatic")) {
+    if (wpi::util::contains(key, "quasistatic")) {
       dataset.erase(std::remove_if(dataset.begin(), dataset.end(),
                                    [&](const auto& pt) {
                                      return std::abs(pt.voltage) <= 0 ||
@@ -393,7 +393,7 @@ void sysid::InitialTrimAndFilter(
     PrepareMechData(&dataset, unit);
 
     // Trims filtered Dynamic Test Data
-    if (IsFiltered(key) && wpi::contains(key, "dynamic")) {
+    if (IsFiltered(key) && wpi::util::contains(key, "dynamic")) {
       // Get the filtered dataset name
       auto filteredKey = RemoveStr(key, "raw-");
 
@@ -420,7 +420,7 @@ void sysid::InitialTrimAndFilter(
   }
 }
 
-void sysid::AccelFilter(wpi::StringMap<std::vector<PreparedData>>* data) {
+void sysid::AccelFilter(wpi::util::StringMap<std::vector<PreparedData>>* data) {
   auto& preparedData = *data;
 
   // Remove points with acceleration = 0

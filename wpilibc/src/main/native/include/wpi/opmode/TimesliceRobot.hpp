@@ -9,7 +9,7 @@
 #include "wpi/opmode/TimedRobot.hpp"
 #include "wpi/units/time.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * TimesliceRobot extends the TimedRobot robot program framework to provide
@@ -75,7 +75,7 @@ namespace frc {
  * If the robot periodic functions and the controller periodic functions have a
  * lot of scheduling jitter that cause them to occasionally overlap with later
  * timeslices, consider giving the main robot thread a real-time priority using
- * frc::SetCurrentThreadPriority(). An RT priority of 15 is a reasonable choice.
+ * wpi::SetCurrentThreadPriority(). An RT priority of 15 is a reasonable choice.
  *
  * If you do enable RT though, <i>make sure your periodic functions do not
  * block</i>. If they do, the operating system will lock up, and you'll have to
@@ -92,8 +92,8 @@ class TimesliceRobot : public TimedRobot {
    *                         allocations should be less than or equal to this
    *                         value.
    */
-  explicit TimesliceRobot(units::second_t robotPeriodicAllocation,
-                          units::second_t controllerPeriod);
+  explicit TimesliceRobot(wpi::units::second_t robotPeriodicAllocation,
+                          wpi::units::second_t controllerPeriod);
 
   /**
    * Schedule a periodic function with the constructor's controller period and
@@ -109,11 +109,11 @@ class TimesliceRobot : public TimedRobot {
    * @param allocation The function's runtime allocation out of the controller
    *                   period.
    */
-  void Schedule(std::function<void()> func, units::second_t allocation);
+  void Schedule(std::function<void()> func, wpi::units::second_t allocation);
 
  private:
-  units::second_t m_nextOffset;
-  units::second_t m_controllerPeriod;
+  wpi::units::second_t m_nextOffset;
+  wpi::units::second_t m_controllerPeriod;
 };
 
-}  // namespace frc
+}  // namespace wpi

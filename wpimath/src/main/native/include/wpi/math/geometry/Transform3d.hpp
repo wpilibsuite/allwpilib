@@ -10,7 +10,7 @@
 #include "wpi/math/geometry/Translation3d.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 class Pose3d;
 struct Twist3d;
@@ -47,7 +47,7 @@ class WPILIB_DLLEXPORT Transform3d {
    * @param z The z component of the translational component of the transform.
    * @param rotation The rotational component of the transform.
    */
-  constexpr Transform3d(units::meter_t x, units::meter_t y, units::meter_t z,
+  constexpr Transform3d(wpi::units::meter_t x, wpi::units::meter_t y, wpi::units::meter_t z,
                         Rotation3d rotation)
       : m_translation{x, y, z}, m_rotation{std::move(rotation)} {}
 
@@ -82,9 +82,9 @@ class WPILIB_DLLEXPORT Transform3d {
    * @see Rotation3d(Rotation2d)
    * @see Translation3d(Translation2d)
    */
-  constexpr explicit Transform3d(const frc::Transform2d& transform)
-      : m_translation{frc::Translation3d{transform.Translation()}},
-        m_rotation{frc::Rotation3d{transform.Rotation()}} {}
+  constexpr explicit Transform3d(const wpi::math::Transform2d& transform)
+      : m_translation{wpi::math::Translation3d{transform.Translation()}},
+        m_rotation{wpi::math::Rotation3d{transform.Rotation()}} {}
 
   /**
    * Returns the translation component of the transformation.
@@ -98,21 +98,21 @@ class WPILIB_DLLEXPORT Transform3d {
    *
    * @return The x component of the transformation's translation.
    */
-  constexpr units::meter_t X() const { return m_translation.X(); }
+  constexpr wpi::units::meter_t X() const { return m_translation.X(); }
 
   /**
    * Returns the Y component of the transformation's translation.
    *
    * @return The y component of the transformation's translation.
    */
-  constexpr units::meter_t Y() const { return m_translation.Y(); }
+  constexpr wpi::units::meter_t Y() const { return m_translation.Y(); }
 
   /**
    * Returns the Z component of the transformation's translation.
    *
    * @return The z component of the transformation's translation.
    */
-  constexpr units::meter_t Z() const { return m_translation.Z(); }
+  constexpr wpi::units::meter_t Z() const { return m_translation.Z(); }
 
   /**
    * Returns an affine transformation matrix representation of this
@@ -193,13 +193,13 @@ class WPILIB_DLLEXPORT Transform3d {
   Rotation3d m_rotation;
 };
 
-}  // namespace frc
+}  // namespace wpi::math
 
 #include "wpi/math/geometry/Pose3d.hpp"
 #include "wpi/math/geometry/Twist3d.hpp"
 #include "wpi/math/geometry/detail/RotationVectorToMatrix.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 constexpr Transform3d::Transform3d(const Pose3d& initial, const Pose3d& final) {
   // We are rotating the difference between the translations
@@ -254,12 +254,12 @@ constexpr Twist3d Transform3d::Log() const {
 
     Vector3d translation_component = V_inv * u;
 
-    return Twist3d{units::meter_t{translation_component(0)},
-                   units::meter_t{translation_component(1)},
-                   units::meter_t{translation_component(2)},
-                   units::radian_t{rvec(0)},
-                   units::radian_t{rvec(1)},
-                   units::radian_t{rvec(2)}};
+    return Twist3d{wpi::units::meter_t{translation_component(0)},
+                   wpi::units::meter_t{translation_component(1)},
+                   wpi::units::meter_t{translation_component(2)},
+                   wpi::units::radian_t{rvec(0)},
+                   wpi::units::radian_t{rvec(1)},
+                   wpi::units::radian_t{rvec(2)}};
   };
 
   if (std::is_constant_evaluated()) {
@@ -268,7 +268,7 @@ constexpr Twist3d Transform3d::Log() const {
   return impl.template operator()<Eigen::Matrix3d, Eigen::Vector3d>();
 }
 
-}  // namespace frc
+}  // namespace wpi::math
 
 #include "wpi/math/geometry/proto/Transform3dProto.hpp"
 #include "wpi/math/geometry/struct/Transform3dStruct.hpp"

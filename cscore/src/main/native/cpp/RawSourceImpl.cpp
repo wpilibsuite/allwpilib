@@ -11,9 +11,9 @@
 #include "wpi/cs/cscore_raw.h"
 #include "wpi/util/timestamp.h"
 
-using namespace cs;
+using namespace wpi::cs;
 
-RawSourceImpl::RawSourceImpl(std::string_view name, wpi::Logger& logger,
+RawSourceImpl::RawSourceImpl(std::string_view name, wpi::util::Logger& logger,
                              Notifier& notifier, Telemetry& telemetry,
                              const VideoMode& mode)
     : ConfigurableSourceImpl{name, logger, notifier, telemetry, mode} {}
@@ -21,13 +21,13 @@ RawSourceImpl::RawSourceImpl(std::string_view name, wpi::Logger& logger,
 RawSourceImpl::~RawSourceImpl() = default;
 
 void RawSourceImpl::PutFrame(const WPI_RawFrame& image) {
-  auto currentTime = wpi::Now();
+  auto currentTime = wpi::util::Now();
   std::string_view data_view{reinterpret_cast<char*>(image.data), image.size};
   SourceImpl::PutFrame(static_cast<VideoMode::PixelFormat>(image.pixelFormat),
                        image.width, image.height, data_view, currentTime);
 }
 
-namespace cs {
+namespace wpi::cs {
 static constexpr unsigned SourceMask = CS_SOURCE_CV | CS_SOURCE_RAW;
 
 CS_Source CreateRawSource(std::string_view name, bool isCv,
@@ -49,18 +49,18 @@ void PutSourceFrame(CS_Source source, const WPI_RawFrame& image,
   static_cast<RawSourceImpl&>(*data->source).PutFrame(image);
 }
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 extern "C" {
 CS_Source CS_CreateRawSource(const struct WPI_String* name, CS_Bool isCv,
                              const CS_VideoMode* mode, CS_Status* status) {
-  return cs::CreateRawSource(wpi::to_string_view(name), isCv,
-                             static_cast<const cs::VideoMode&>(*mode), status);
+  return wpi::cs::CreateRawSource(wpi::util::to_string_view(name), isCv,
+                             static_cast<const wpi::cs::VideoMode&>(*mode), status);
 }
 
 void CS_PutRawSourceFrame(CS_Source source, const struct WPI_RawFrame* image,
                           CS_Status* status) {
-  return cs::PutSourceFrame(source, *image, status);
+  return wpi::cs::PutSourceFrame(source, *image, status);
 }
 
 }  // extern "C"

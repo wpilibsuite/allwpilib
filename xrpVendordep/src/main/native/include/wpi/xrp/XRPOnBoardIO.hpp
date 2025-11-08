@@ -10,7 +10,7 @@
 #include "wpi/hardware/discrete/DigitalOutput.hpp"
 #include "wpi/units/time.hpp"
 
-namespace frc {
+namespace wpi::xrp {
 
 /**
  * @ingroup xrp_api
@@ -30,7 +30,7 @@ class XRPOnBoardIO {
   XRPOnBoardIO() {}  // No need to do anything. No configurable IO
 
   static constexpr auto kMessageInterval = 1_s;
-  units::second_t m_nextMessageTime = 0_s;
+  wpi::units::second_t m_nextMessageTime = 0_s;
 
   /**
    * Gets if the USER button is pressed.
@@ -54,10 +54,10 @@ class XRPOnBoardIO {
   bool GetLed() const;
 
  private:
-  frc::DigitalInput m_userButton{0};
-  frc::DigitalOutput m_led{1};
+  wpi::DigitalInput m_userButton{0};
+  wpi::DigitalOutput m_led{1};
 };
 
 /** @} */
 
-}  // namespace frc
+}  // namespace wpi::xrp

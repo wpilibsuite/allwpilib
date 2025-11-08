@@ -6,5 +6,5 @@
 #include "wpi/util/print.hpp"
 
 int main() {
-  wpi::print("{}\n", cs::GetHostname());
+  wpi::util::print("{}\n", wpi::cs::GetHostname());
 }

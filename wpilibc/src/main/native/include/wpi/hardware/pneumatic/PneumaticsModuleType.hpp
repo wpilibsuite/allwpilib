@@ -4,7 +4,7 @@
 
 #pragma once
 
-namespace frc {
+namespace wpi {
 /**
  * Pneumatics module type.
  */
@@ -14,4 +14,4 @@ enum class PneumaticsModuleType {
   /// REV PH.
   REVPH
 };
-}  // namespace frc
+}  // namespace wpi

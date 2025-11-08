@@ -7,7 +7,7 @@
 #include "wpi/hal/SimDevice.h"
 #include "wpi/hal/simulation/SimDeviceData.h"
 
-namespace hal {
+namespace wpi::hal {
 
 TEST(SimDeviceSimTest, Enabled) {
   ASSERT_TRUE(HALSIM_IsSimDeviceEnabled("foo"));
@@ -20,4 +20,4 @@ TEST(SimDeviceSimTest, Enabled) {
   ASSERT_EQ(HAL_CreateSimDevice("foo"), 0);
 }
 
-}  // namespace hal
+}  // namespace wpi::hal

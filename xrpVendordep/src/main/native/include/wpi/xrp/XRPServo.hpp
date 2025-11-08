@@ -11,7 +11,7 @@
 #include "wpi/hal/SimDevice.h"
 #include "wpi/units/angle.hpp"
 
-namespace frc {
+namespace wpi::xrp {
 
 /**
  * @ingroup xrp_api
@@ -37,14 +37,14 @@ class XRPServo {
    *
    * @param angle Desired angle in radians
    */
-  void SetAngle(units::radian_t angle);
+  void SetAngle(wpi::units::radian_t angle);
 
   /**
    * Get the servo angle.
    *
    * @return Current servo angle in radians
    */
-  units::radian_t GetAngle() const;
+  wpi::units::radian_t GetAngle() const;
 
   /**
    * Set the servo position.
@@ -78,4 +78,4 @@ class XRPServo {
 
 /** @} */
 
-}  // namespace frc
+}  // namespace wpi::xrp

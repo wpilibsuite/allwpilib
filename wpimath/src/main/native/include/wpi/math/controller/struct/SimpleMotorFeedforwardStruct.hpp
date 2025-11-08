@@ -9,12 +9,12 @@
 #include "wpi/util/struct/Struct.hpp"
 
 // Everything is converted into units for
-// frc::SimpleMotorFeedforward<units::meters> or
-// frc::SimpleMotorFeedforward<units::radians>
+// wpi::math::SimpleMotorFeedforward<wpi::units::meters> or
+// wpi::math::SimpleMotorFeedforward<wpi::units::radians>
 
 template <class Distance>
-  requires units::length_unit<Distance> || units::angle_unit<Distance>
-struct wpi::Struct<frc::SimpleMotorFeedforward<Distance>> {
+  requires wpi::units::length_unit<Distance> || wpi::units::angle_unit<Distance>
+struct wpi::util::Struct<wpi::math::SimpleMotorFeedforward<Distance>> {
   static constexpr std::string_view GetTypeName() {
     return "SimpleMotorFeedforward";
   }
@@ -23,46 +23,46 @@ struct wpi::Struct<frc::SimpleMotorFeedforward<Distance>> {
     return "double ks;double kv;double ka;double dt";
   }
 
-  static frc::SimpleMotorFeedforward<Distance> Unpack(
+  static wpi::math::SimpleMotorFeedforward<Distance> Unpack(
       std::span<const uint8_t> data) {
     using BaseUnit =
-        units::unit<std::ratio<1>, units::traits::base_unit_of<Distance>>;
-    using BaseFeedforward = frc::SimpleMotorFeedforward<BaseUnit>;
+        wpi::units::unit<std::ratio<1>, wpi::units::traits::base_unit_of<Distance>>;
+    using BaseFeedforward = wpi::math::SimpleMotorFeedforward<BaseUnit>;
     constexpr size_t kKsOff = 0;
     constexpr size_t kKvOff = kKsOff + 8;
     constexpr size_t kKaOff = kKvOff + 8;
     constexpr size_t kDtOff = kKaOff + 8;
-    return {units::volt_t{wpi::UnpackStruct<double, kKsOff>(data)},
-            units::unit_t<typename BaseFeedforward::kv_unit>{
-                wpi::UnpackStruct<double, kKvOff>(data)},
-            units::unit_t<typename BaseFeedforward::ka_unit>{
-                wpi::UnpackStruct<double, kKaOff>(data)},
-            units::second_t{wpi::UnpackStruct<double, kDtOff>(data)}};
+    return {wpi::units::volt_t{wpi::util::UnpackStruct<double, kKsOff>(data)},
+            wpi::units::unit_t<typename BaseFeedforward::kv_unit>{
+                wpi::util::UnpackStruct<double, kKvOff>(data)},
+            wpi::units::unit_t<typename BaseFeedforward::ka_unit>{
+                wpi::util::UnpackStruct<double, kKaOff>(data)},
+            wpi::units::second_t{wpi::util::UnpackStruct<double, kDtOff>(data)}};
   }
 
   static void Pack(std::span<uint8_t> data,
-                   const frc::SimpleMotorFeedforward<Distance>& value) {
+                   const wpi::math::SimpleMotorFeedforward<Distance>& value) {
     using BaseUnit =
-        units::unit<std::ratio<1>, units::traits::base_unit_of<Distance>>;
-    using BaseFeedforward = frc::SimpleMotorFeedforward<BaseUnit>;
+        wpi::units::unit<std::ratio<1>, wpi::units::traits::base_unit_of<Distance>>;
+    using BaseFeedforward = wpi::math::SimpleMotorFeedforward<BaseUnit>;
     constexpr size_t kKsOff = 0;
     constexpr size_t kKvOff = kKsOff + 8;
     constexpr size_t kKaOff = kKvOff + 8;
     constexpr size_t kDtOff = kKaOff + 8;
-    wpi::PackStruct<kKsOff>(data, value.GetKs().value());
-    wpi::PackStruct<kKvOff>(
-        data, units::unit_t<typename BaseFeedforward::kv_unit>{value.GetKv()}
+    wpi::util::PackStruct<kKsOff>(data, value.GetKs().value());
+    wpi::util::PackStruct<kKvOff>(
+        data, wpi::units::unit_t<typename BaseFeedforward::kv_unit>{value.GetKv()}
                   .value());
-    wpi::PackStruct<kKaOff>(
-        data, units::unit_t<typename BaseFeedforward::ka_unit>{value.GetKa()}
+    wpi::util::PackStruct<kKaOff>(
+        data, wpi::units::unit_t<typename BaseFeedforward::ka_unit>{value.GetKa()}
                   .value());
-    wpi::PackStruct<kDtOff>(data, units::second_t{value.GetDt()}.value());
+    wpi::util::PackStruct<kDtOff>(data, wpi::units::second_t{value.GetDt()}.value());
   }
 };
 
 static_assert(
-    wpi::StructSerializable<frc::SimpleMotorFeedforward<units::meters>>);
+    wpi::util::StructSerializable<wpi::math::SimpleMotorFeedforward<wpi::units::meters>>);
 static_assert(
-    wpi::StructSerializable<frc::SimpleMotorFeedforward<units::feet>>);
+    wpi::util::StructSerializable<wpi::math::SimpleMotorFeedforward<wpi::units::feet>>);
 static_assert(
-    wpi::StructSerializable<frc::SimpleMotorFeedforward<units::radians>>);
+    wpi::util::StructSerializable<wpi::math::SimpleMotorFeedforward<wpi::units::radians>>);

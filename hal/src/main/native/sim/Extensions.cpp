@@ -38,14 +38,14 @@
 #define DLERROR dlerror()
 #endif
 
-static wpi::recursive_spinlock gExtensionRegistryMutex;
+static wpi::util::recursive_spinlock gExtensionRegistryMutex;
 static std::vector<std::pair<const char*, void*>> gExtensionRegistry;
 static std::vector<std::pair<void*, void (*)(void*, const char*, void*)>>
     gExtensionListeners;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeExtensions() {}
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 static bool& GetShowNotFoundMessage() {
   static bool showMsg = true;
@@ -56,7 +56,7 @@ extern "C" {
 
 int HAL_LoadOneExtension(const char* library) {
   int rc = 1;  // It is expected and reasonable not to find an extra simulation
-  wpi::print("HAL Extensions: Attempting to load: {}\n",
+  wpi::util::print("HAL Extensions: Attempting to load: {}\n",
              fs::path{library}.stem().string());
   std::fflush(stdout);
   HTYPE handle = DLOPEN(library);
@@ -67,14 +67,14 @@ int HAL_LoadOneExtension(const char* library) {
 #else
     auto libraryName = fmt::format("lib{}.so", library);
 #endif
-    wpi::print("HAL Extensions: Load failed: {}\nTrying modified name: {}\n",
+    wpi::util::print("HAL Extensions: Load failed: {}\nTrying modified name: {}\n",
                DLERROR, fs::path{libraryName}.stem().string());
     std::fflush(stdout);
     handle = DLOPEN(libraryName.c_str());
   }
 #endif
   if (!handle) {
-    wpi::print("HAL Extensions: Failed to load library: {}\n", DLERROR);
+    wpi::util::print("HAL Extensions: Failed to load library: {}\n", DLERROR);
     std::fflush(stdout);
     return rc;
   }
@@ -107,7 +107,7 @@ int HAL_LoadExtensions(void) {
     }
     return rc;
   }
-  wpi::split(e, DELIM, -1, false, [&](auto library) {
+  wpi::util::split(e, DELIM, -1, false, [&](auto library) {
     if (rc >= 0) {
       rc = HAL_LoadOneExtension(std::string(library).c_str());
     }

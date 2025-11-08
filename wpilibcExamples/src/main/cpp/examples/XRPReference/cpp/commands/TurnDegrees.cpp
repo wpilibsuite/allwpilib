@@ -33,8 +33,8 @@ bool TurnDegrees::IsFinished() {
   return GetAverageTurningDistance() >= inchPerDegree * m_angle;
 }
 
-units::meter_t TurnDegrees::GetAverageTurningDistance() {
-  auto l = units::math::abs(m_drive->GetLeftDistance());
-  auto r = units::math::abs(m_drive->GetRightDistance());
+wpi::units::meter_t TurnDegrees::GetAverageTurningDistance() {
+  auto l = wpi::units::math::abs(m_drive->GetLeftDistance());
+  auto r = wpi::units::math::abs(m_drive->GetRightDistance());
   return (l + r) / 2;
 }

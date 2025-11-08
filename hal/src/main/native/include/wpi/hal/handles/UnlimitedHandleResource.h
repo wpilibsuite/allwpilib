@@ -14,7 +14,7 @@
 #include "wpi/hal/handles/HandlesInternal.h"
 #include "wpi/util/mutex.hpp"
 
-namespace hal {
+namespace wpi::hal {
 
 /**
  * The UnlimitedHandleResource class is a way to track handles. This version
@@ -56,7 +56,7 @@ class UnlimitedHandleResource : public HandleBase {
 
  private:
   std::vector<std::shared_ptr<TStruct>> m_structures;
-  wpi::mutex m_handleMutex;
+  wpi::util::mutex m_handleMutex;
 };
 
 template <typename THandle, typename TStruct, HAL_HandleEnum enumValue>
@@ -126,4 +126,4 @@ void UnlimitedHandleResource<THandle, TStruct, enumValue>::ForEach(
   }
 }
 
-}  // namespace hal
+}  // namespace wpi::hal

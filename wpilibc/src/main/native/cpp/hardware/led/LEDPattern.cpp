@@ -15,20 +15,20 @@
 #include "wpi/util/MathExtras.hpp"
 #include "wpi/util/timestamp.h"
 
-using namespace frc;
+using namespace wpi;
 
-LEDPattern::LEDPattern(std::function<void(frc::LEDPattern::LEDReader,
-                                          std::function<void(int, frc::Color)>)>
+LEDPattern::LEDPattern(std::function<void(wpi::LEDPattern::LEDReader,
+                                          std::function<void(int, wpi::Color)>)>
                            impl)
     : m_impl(std::move(impl)) {}
 
 void LEDPattern::ApplyTo(LEDPattern::LEDReader reader,
-                         std::function<void(int, frc::Color)> writer) const {
+                         std::function<void(int, wpi::Color)> writer) const {
   m_impl(reader, writer);
 }
 
 void LEDPattern::ApplyTo(std::span<AddressableLED::LEDData> data,
-                         std::function<void(int, frc::Color)> writer) const {
+                         std::function<void(int, wpi::Color)> writer) const {
   ApplyTo(LEDPattern::LEDReader{[=](size_t i) { return data[i]; }, data.size()},
           writer);
 }
@@ -54,39 +54,39 @@ LEDPattern LEDPattern::Reversed() {
 
 LEDPattern LEDPattern::OffsetBy(int offset) {
   return MapIndex([offset](size_t bufLen, size_t i) {
-    return frc::FloorMod(static_cast<int>(i) + offset,
+    return wpi::math::FloorMod(static_cast<int>(i) + offset,
                          static_cast<int>(bufLen));
   });
 }
 
-LEDPattern LEDPattern::ScrollAtRelativeSpeed(units::hertz_t velocity) {
+LEDPattern LEDPattern::ScrollAtRelativeSpeed(wpi::units::hertz_t velocity) {
   // velocity is in terms of LED lengths per second (1_hz = full cycle per
   // second, 0.5_hz = half cycle per second, 2_hz = two cycles per second)
   // Invert and multiply by 1,000,000 to get microseconds
   double periodMicros = 1e6 / velocity.value();
 
   return MapIndex([=](size_t bufLen, size_t i) {
-    auto now = wpi::Now();
+    auto now = wpi::util::Now();
 
     // index should move by (bufLen) / (period)
     double t =
         (now % static_cast<int64_t>(std::floor(periodMicros))) / periodMicros;
     int offset = static_cast<int>(std::floor(t * bufLen));
 
-    return frc::FloorMod(static_cast<int>(i) + offset,
+    return wpi::math::FloorMod(static_cast<int>(i) + offset,
                          static_cast<int>(bufLen));
   });
 }
 
 LEDPattern LEDPattern::ScrollAtAbsoluteSpeed(
-    units::meters_per_second_t velocity, units::meter_t ledSpacing) {
+    wpi::units::meters_per_second_t velocity, wpi::units::meter_t ledSpacing) {
   // Velocity is in terms of meters per second
   // Multiply by 1,000,000 to use microseconds instead of seconds
   auto microsPerLed =
       static_cast<int64_t>(std::floor((ledSpacing / velocity).value() * 1e6));
 
   return MapIndex([=](size_t bufLen, size_t i) {
-    auto now = wpi::Now();
+    auto now = wpi::util::Now();
 
     // every step in time that's a multiple of microsPerLED will increment
     // the offset by 1
@@ -94,17 +94,17 @@ LEDPattern LEDPattern::ScrollAtAbsoluteSpeed(
     // offset values for negative velocities
     auto offset = static_cast<int64_t>(now) / microsPerLed;
 
-    return frc::FloorMod(static_cast<int>(i) + offset,
+    return wpi::math::FloorMod(static_cast<int>(i) + offset,
                          static_cast<int>(bufLen));
   });
 }
 
-LEDPattern LEDPattern::Blink(units::second_t onTime, units::second_t offTime) {
-  auto totalMicros = units::microsecond_t{onTime + offTime}.to<uint64_t>();
-  auto onMicros = units::microsecond_t{onTime}.to<uint64_t>();
+LEDPattern LEDPattern::Blink(wpi::units::second_t onTime, wpi::units::second_t offTime) {
+  auto totalMicros = wpi::units::microsecond_t{onTime + offTime}.to<uint64_t>();
+  auto onMicros = wpi::units::microsecond_t{onTime}.to<uint64_t>();
 
   return LEDPattern{[=, self = *this](auto data, auto writer) {
-    if (wpi::Now() % totalMicros < onMicros) {
+    if (wpi::util::Now() % totalMicros < onMicros) {
       self.ApplyTo(data, writer);
     } else {
       LEDPattern::Off().ApplyTo(data, writer);
@@ -112,7 +112,7 @@ LEDPattern LEDPattern::Blink(units::second_t onTime, units::second_t offTime) {
   }};
 }
 
-LEDPattern LEDPattern::Blink(units::second_t onTime) {
+LEDPattern LEDPattern::Blink(wpi::units::second_t onTime) {
   return LEDPattern::Blink(onTime, onTime);
 }
 
@@ -126,12 +126,12 @@ LEDPattern LEDPattern::SynchronizedBlink(std::function<bool()> signal) {
   }};
 }
 
-LEDPattern LEDPattern::Breathe(units::second_t period) {
-  auto periodMicros = units::microsecond_t{period};
+LEDPattern LEDPattern::Breathe(wpi::units::second_t period) {
+  auto periodMicros = wpi::units::microsecond_t{period};
 
   return LEDPattern{[periodMicros, self = *this](auto data, auto writer) {
     self.ApplyTo(data, [&writer, periodMicros](int i, Color color) {
-      double t = (wpi::Now() % periodMicros.to<uint64_t>()) /
+      double t = (wpi::util::Now() % periodMicros.to<uint64_t>()) /
                  periodMicros.to<double>();
       double phase = t * 2 * std::numbers::pi;
 
@@ -299,9 +299,9 @@ LEDPattern LEDPattern::Gradient(GradientType type,
       auto color = colors[colorIndex];
       auto nextColor = colors[nextColorIndex];
 
-      Color gradientColor{wpi::Lerp(color.red, nextColor.red, t),
-                          wpi::Lerp(color.green, nextColor.green, t),
-                          wpi::Lerp(color.blue, nextColor.blue, t)};
+      Color gradientColor{wpi::util::Lerp(color.red, nextColor.red, t),
+                          wpi::util::Lerp(color.green, nextColor.green, t),
+                          wpi::util::Lerp(color.blue, nextColor.blue, t)};
       writer(led, gradientColor);
     }
   }};

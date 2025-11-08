@@ -12,8 +12,8 @@
 #include "wpi/hal/Errors.h"
 #include "wpi/util/jni_util.hpp"
 
-using namespace hal;
-using namespace wpi::java;
+using namespace wpi::hal;
+using namespace wpi::util::java;
 
 extern "C" {
 
@@ -180,7 +180,7 @@ Java_org_wpilib_hardware_hal_can_CANJNI_readCANStreamSession
   uint32_t handle = static_cast<uint32_t>(sessionHandle);
   uint32_t messagesRead = 0;
 
-  wpi::SmallVector<HAL_CANStreamMessage, 16> messageBuffer;
+  wpi::util::SmallVector<HAL_CANStreamMessage, 16> messageBuffer;
   messageBuffer.resize_for_overwrite(messagesToRead);
 
   int32_t status = 0;

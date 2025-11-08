@@ -13,7 +13,7 @@
 
 #include "wpi/glass/View.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 class Storage;
 
@@ -137,4 +137,4 @@ class Window {
   ImVec2 m_padding;
 };
 
-}  // namespace glass
+}  // namespace wpi::glass

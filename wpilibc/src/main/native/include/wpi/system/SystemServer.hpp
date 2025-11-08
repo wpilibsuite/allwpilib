@@ -6,13 +6,13 @@
 
 #include "wpi/nt/NetworkTableInstance.hpp"
 
-namespace frc {
+namespace wpi {
 
 class SystemServer {
  public:
   SystemServer() = delete;
 
-  static nt::NetworkTableInstance GetSystemServer();
+  static wpi::nt::NetworkTableInstance GetSystemServer();
 };
 
-}  // namespace frc
+}  // namespace wpi

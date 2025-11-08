@@ -6,14 +6,14 @@
 
 #include "wpi/util/sendable/Sendable.hpp"
 
-namespace nt {
+namespace wpi::nt {
 
 class NTSendableBuilder;
 
 /**
  * Interface for NetworkTable Sendable objects.
  */
-class NTSendable : public wpi::Sendable {
+class NTSendable : public wpi::util::Sendable {
  public:
   /**
    * Initializes this Sendable object.
@@ -22,7 +22,7 @@ class NTSendable : public wpi::Sendable {
    */
   virtual void InitSendable(NTSendableBuilder& builder) = 0;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 };
 
-}  // namespace nt
+}  // namespace wpi::nt

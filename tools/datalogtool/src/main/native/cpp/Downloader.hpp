@@ -12,7 +12,7 @@
 #include "wpi/util/condition_variable.hpp"
 #include "wpi/util/mutex.hpp"
 
-namespace glass {
+namespace wpi::glass {
 class Storage;
 }  // namespace glass
 
@@ -22,7 +22,7 @@ class select_folder;
 
 class Downloader {
  public:
-  explicit Downloader(glass::Storage& storage);
+  explicit Downloader(wpi::glass::Storage& storage);
   ~Downloader();
 
   void Display();
@@ -36,7 +36,7 @@ class Downloader {
 
   void ThreadMain();
 
-  wpi::mutex m_mutex;
+  wpi::util::mutex m_mutex;
   enum State {
     kDisconnected,
     kConnecting,

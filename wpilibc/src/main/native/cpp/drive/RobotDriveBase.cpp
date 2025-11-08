@@ -10,7 +10,7 @@
 
 #include "wpi/hardware/motor/MotorController.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 RobotDriveBase::RobotDriveBase() {
   SetSafetyEnabled(true);

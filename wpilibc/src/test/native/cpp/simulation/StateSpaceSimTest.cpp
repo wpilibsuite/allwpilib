@@ -22,31 +22,31 @@
 #include "wpi/units/angular_velocity.hpp"
 
 TEST(StateSpaceSimTest, FlywheelSim) {
-  const frc::LinearSystem<1, 1, 1> plant =
-      frc::LinearSystemId::IdentifyVelocitySystem<units::radian>(
+  const wpi::math::LinearSystem<1, 1, 1> plant =
+      wpi::math::LinearSystemId::IdentifyVelocitySystem<wpi::units::radian>(
           0.02_V / 1_rad_per_s, 0.01_V / 1_rad_per_s_sq);
-  frc::sim::FlywheelSim sim{plant, frc::DCMotor::NEO(2)};
-  frc::PIDController controller{0.2, 0.0, 0.0};
-  frc::SimpleMotorFeedforward<units::radian> feedforward{
+  wpi::sim::FlywheelSim sim{plant, wpi::math::DCMotor::NEO(2)};
+  wpi::math::PIDController controller{0.2, 0.0, 0.0};
+  wpi::math::SimpleMotorFeedforward<wpi::units::radian> feedforward{
       0_V, 0.02_V / 1_rad_per_s, 0.01_V / 1_rad_per_s_sq};
-  frc::Encoder encoder{0, 1};
-  frc::sim::EncoderSim encoderSim{encoder};
-  frc::PWMVictorSPX motor{0};
+  wpi::Encoder encoder{0, 1};
+  wpi::sim::EncoderSim encoderSim{encoder};
+  wpi::PWMVictorSPX motor{0};
 
-  frc::sim::RoboRioSim::ResetData();
+  wpi::sim::RoboRioSim::ResetData();
   encoderSim.ResetData();
 
   for (int i = 0; i < 100; i++) {
     // RobotPeriodic runs first
     auto voltageOut = controller.Calculate(encoder.GetRate(), 200.0);
-    motor.SetVoltage(units::volt_t{voltageOut} +
+    motor.SetVoltage(wpi::units::volt_t{voltageOut} +
                      feedforward.Calculate(200_rad_per_s));
 
     // Then, SimulationPeriodic runs
-    frc::sim::RoboRioSim::SetVInVoltage(
-        frc::sim::BatterySim::Calculate({sim.GetCurrentDraw()}));
+    wpi::sim::RoboRioSim::SetVInVoltage(
+        wpi::sim::BatterySim::Calculate({sim.GetCurrentDraw()}));
     sim.SetInput(
-        frc::Vectord<1>{motor.Get() * frc::RobotController::GetInputVoltage()});
+        wpi::math::Vectord<1>{motor.Get() * wpi::RobotController::GetInputVoltage()});
     sim.Update(20_ms);
     encoderSim.SetRate(sim.GetAngularVelocity().value());
   }

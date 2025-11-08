@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-namespace nt::net {
+namespace wpi::nt::net {
 
 class WireConnection;
 
@@ -25,4 +25,4 @@ class NetworkPing {
   uint64_t m_pongTimeMs{0};
 };
 
-}  // namespace nt::net
+}  // namespace wpi::nt::net

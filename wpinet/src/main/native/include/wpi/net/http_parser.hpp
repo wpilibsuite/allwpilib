@@ -47,7 +47,7 @@
 # define HTTP_MAX_HEADER_SIZE (80*1024)
 #endif
 
-namespace wpi {
+namespace wpi::net {
 
 struct http_parser;
 struct http_parser_settings;
@@ -273,7 +273,7 @@ enum http_errno {
 
 
 /* Get an http_errno value from an http_parser */
-#define HTTP_PARSER_ERRNO(p)            ((::wpi::http_errno) (p)->http_errno)
+#define HTTP_PARSER_ERRNO(p)            ((::wpi::net::http_errno) (p)->http_errno)
 
 
 struct http_parser {
@@ -416,6 +416,6 @@ void http_parser_pause(http_parser *parser, int paused);
 /* Checks if this is the final chunk of the body. */
 int http_body_is_final(const http_parser *parser);
 
-}  // namespace wpi
+}  // namespace wpi::net
 
 #endif

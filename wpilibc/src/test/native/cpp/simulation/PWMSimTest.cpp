@@ -10,7 +10,7 @@
 #include "wpi/hal/HAL.h"
 #include "wpi/hardware/discrete/PWM.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 
 TEST(PWMSimTest, Initialize) {
   HAL_Initialize(500, 0);
@@ -61,4 +61,4 @@ TEST(PWMSimTest, SetOutputPeriod) {
   EXPECT_EQ(3504, callback.GetLastValue());
 }
 
-}  // namespace frc::sim
+}  // namespace wpi::sim

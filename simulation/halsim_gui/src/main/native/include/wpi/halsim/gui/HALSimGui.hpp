@@ -18,11 +18,11 @@ class HALSimGui {
  public:
   static void GlobalInit();
 
-  static glass::MainMenuBar mainMenu;
-  static std::unique_ptr<glass::WindowManager> manager;
+  static wpi::glass::MainMenuBar mainMenu;
+  static std::unique_ptr<wpi::glass::WindowManager> manager;
 
   static std::unique_ptr<HALProvider> halProvider;
-  static std::unique_ptr<glass::NetworkTablesProvider> ntProvider;
+  static std::unique_ptr<wpi::glass::NetworkTablesProvider> ntProvider;
 };
 
 void AddGuiInit(std::function<void()> initialize);

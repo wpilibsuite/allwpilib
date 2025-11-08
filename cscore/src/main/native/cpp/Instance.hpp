@@ -20,7 +20,7 @@
 #include "UsbCameraListener.hpp"
 #include "wpi/util/Logger.hpp"
 
-namespace cs {
+namespace wpi::cs {
 
 struct SourceData {
   SourceData(CS_SourceKind kind_, std::shared_ptr<SourceImpl> source_)
@@ -51,7 +51,7 @@ class Instance {
 
   void Shutdown();
 
-  wpi::Logger logger;
+  wpi::util::Logger logger;
   Notifier notifier;
   Telemetry telemetry;
   NetworkListener networkListener;
@@ -62,7 +62,7 @@ class Instance {
   UnlimitedHandleResource<Handle, SinkData, Handle::kSink> m_sinks;
 
  public:
-  wpi::EventLoopRunner eventLoop;
+  wpi::net::EventLoopRunner eventLoop;
 
   std::pair<CS_Sink, std::shared_ptr<SinkData>> FindSink(const SinkImpl& sink);
   std::pair<CS_Source, std::shared_ptr<SourceData>> FindSource(
@@ -87,16 +87,16 @@ class Instance {
   void DestroySink(CS_Sink handle);
 
   std::span<CS_Source> EnumerateSourceHandles(
-      wpi::SmallVectorImpl<CS_Source>& vec) {
+      wpi::util::SmallVectorImpl<CS_Source>& vec) {
     return m_sources.GetAll(vec);
   }
 
-  std::span<CS_Sink> EnumerateSinkHandles(wpi::SmallVectorImpl<CS_Sink>& vec) {
+  std::span<CS_Sink> EnumerateSinkHandles(wpi::util::SmallVectorImpl<CS_Sink>& vec) {
     return m_sinks.GetAll(vec);
   }
 
   std::span<CS_Sink> EnumerateSourceSinks(CS_Source source,
-                                          wpi::SmallVectorImpl<CS_Sink>& vec) {
+                                          wpi::util::SmallVectorImpl<CS_Sink>& vec) {
     vec.clear();
     m_sinks.ForEach([&](CS_Sink sinkHandle, const SinkData& data) {
       if (source == data.sourceHandle.load()) {
@@ -110,6 +110,6 @@ class Instance {
   Instance();
 };
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_INSTANCE_HPP_

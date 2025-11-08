@@ -7,7 +7,7 @@
 #include "wpi/hal/HALBase.h"
 
 #ifndef __FRC_SYSTEMCORE__
-namespace frc::impl {
+namespace wpi::impl {
 void ResetMotorSafety();
 }
 #endif
@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();
 #ifndef __FRC_SYSTEMCORE__
-  frc::impl::ResetMotorSafety();
+  wpi::impl::ResetMotorSafety();
 #endif
   return ret;
 }

@@ -11,9 +11,9 @@
 
 #include "wpi/util/StringExtras.hpp"
 
-using namespace wpi::structparser;
+using namespace wpi::util::structparser;
 
-std::string_view wpi::structparser::ToString(Token::Kind kind) {
+std::string_view wpi::util::structparser::ToString(Token::Kind kind) {
   switch (kind) {
     case Token::kInteger:
       return "integer";

@@ -16,12 +16,12 @@
 
 #include "wpi/nt/ntcore_c.h"
 
-namespace wpi {
+namespace wpi::util {
 template <typename T>
 class SmallVectorImpl;
 }  // namespace wpi
 
-namespace nt {
+namespace wpi::nt {
 /**
  * Timestamped value.
  * @ingroup ntcore_cpp_handle_api
@@ -55,7 +55,7 @@ struct Timestamped {
 using Timestamped{{ t.TypeName }} = Timestamped<{{ t.cpp.ValueType }}>;
 {% if t.cpp.SmallRetType %}
 /**
- * Timestamped {{ t.TypeName }} view (for SmallVector-taking functions).
+ * Timestamped {{ t.TypeName }} view (for wpi::util::SmallVector-taking functions).
  * @ingroup ntcore_cpp_handle_api
  */
 using Timestamped{{ t.TypeName }}View = Timestamped<{{ t.cpp.SmallRetType }}>;
@@ -131,14 +131,14 @@ std::vector<Timestamped{{ t.TypeName }}> ReadQueue{{ t.TypeName }}(NT_Handle sub
  */
 std::vector<{% if t.cpp.ValueType == "bool" %}int{% else %}{{ t.cpp.ValueType }}{% endif %}> ReadQueueValues{{ t.TypeName }}(NT_Handle subentry);
 {% if t.cpp.SmallRetType and t.cpp.SmallElemType %}
-{{ t.cpp.SmallRetType }} Get{{ t.TypeName }}(NT_Handle subentry, wpi::SmallVectorImpl<{{ t.cpp.SmallElemType }}>& buf, {{ t.cpp.ParamType }} defaultValue);
+{{ t.cpp.SmallRetType }} Get{{ t.TypeName }}(NT_Handle subentry, wpi::util::SmallVectorImpl<{{ t.cpp.SmallElemType }}>& buf, {{ t.cpp.ParamType }} defaultValue);
 
 Timestamped{{ t.TypeName }}View GetAtomic{{ t.TypeName }}(
       NT_Handle subentry,
-      wpi::SmallVectorImpl<{{ t.cpp.SmallElemType }}>& buf,
+      wpi::util::SmallVectorImpl<{{ t.cpp.SmallElemType }}>& buf,
       {{ t.cpp.ParamType }} defaultValue);
 {% endif %}
 /** @} */
 {% endfor %}
-}  // namespace nt
+}  // namespace wpi::nt
 

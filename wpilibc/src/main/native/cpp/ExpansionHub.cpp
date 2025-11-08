@@ -13,9 +13,9 @@
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/SystemServer.hpp"
 
-using namespace frc;
+using namespace wpi;
 
-wpi::mutex ExpansionHub::m_handleLock;
+wpi::util::mutex ExpansionHub::m_handleLock;
 std::weak_ptr<ExpansionHub::DataStore> ExpansionHub::m_storeMap[4];
 
 class ExpansionHub::DataStore {
@@ -33,11 +33,11 @@ class ExpansionHub::DataStore {
   DataStore& operator=(DataStore&) = delete;
   DataStore& operator=(DataStore&&) = delete;
 
-  nt::BooleanSubscriber m_hubConnectedSubscriber;
+  wpi::nt::BooleanSubscriber m_hubConnectedSubscriber;
 
   uint32_t m_reservedMotorMask{0};
   uint32_t m_reservedServoMask{0};
-  wpi::mutex m_reservedLock;
+  wpi::util::mutex m_reservedLock;
 
   int m_usbId;
 };

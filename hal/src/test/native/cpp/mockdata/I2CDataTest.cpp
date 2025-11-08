@@ -9,7 +9,7 @@
 #include "wpi/hal/I2C.h"
 #include "wpi/hal/simulation/I2CData.h"
 
-namespace hal {
+namespace wpi::hal {
 
 std::string gTestI2CCallbackName;
 HAL_Value gTestI2CCallbackValue;
@@ -37,4 +37,4 @@ TEST(I2CSimTest, I2CInitialization) {
   EXPECT_STREQ("Initialized", gTestI2CCallbackName.c_str());
 }
 
-}  // namespace hal
+}  // namespace wpi::hal

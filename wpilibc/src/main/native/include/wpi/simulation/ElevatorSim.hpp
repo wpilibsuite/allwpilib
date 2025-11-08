@@ -12,27 +12,27 @@
 #include "wpi/units/mass.hpp"
 #include "wpi/units/velocity.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 /**
  * Represents a simulated elevator mechanism.
  */
 class ElevatorSim : public LinearSystemSim<2, 1, 2> {
  public:
   template <typename Distance>
-  using Velocity_t = units::unit_t<
-      units::compound_unit<Distance, units::inverse<units::seconds>>>;
+  using Velocity_t = wpi::units::unit_t<
+      wpi::units::compound_unit<Distance, wpi::units::inverse<wpi::units::seconds>>>;
 
   template <typename Distance>
-  using Acceleration_t = units::unit_t<units::compound_unit<
-      units::compound_unit<Distance, units::inverse<units::seconds>>,
-      units::inverse<units::seconds>>>;
+  using Acceleration_t = wpi::units::unit_t<wpi::units::compound_unit<
+      wpi::units::compound_unit<Distance, wpi::units::inverse<wpi::units::seconds>>,
+      wpi::units::inverse<wpi::units::seconds>>>;
 
   /**
    * Constructs a simulated elevator mechanism.
    *
    * @param plant              The linear system that represents the elevator.
    *                           This system can be created with
-   *                           LinearSystemId::ElevatorSystem().
+   *                           wpi::math::LinearSystemId::ElevatorSystem().
    * @param gearbox            The type of and number of motors in your
    *                           elevator gearbox.
    * @param minHeight          The minimum allowed height of the elevator.
@@ -41,9 +41,9 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
    * @param startingHeight     The starting height of the elevator.
    * @param measurementStdDevs The standard deviation of the measurements.
    */
-  ElevatorSim(const LinearSystem<2, 1, 2>& plant, const DCMotor& gearbox,
-              units::meter_t minHeight, units::meter_t maxHeight,
-              bool simulateGravity, units::meter_t startingHeight,
+  ElevatorSim(const wpi::math::LinearSystem<2, 1, 2>& plant, const wpi::math::DCMotor& gearbox,
+              wpi::units::meter_t minHeight, wpi::units::meter_t maxHeight,
+              bool simulateGravity, wpi::units::meter_t startingHeight,
               const std::array<double, 2>& measurementStdDevs = {0.0, 0.0});
 
   /**
@@ -62,10 +62,10 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
    * @param startingHeight     The starting height of the elevator.
    * @param measurementStdDevs The standard deviation of the measurements.
    */
-  ElevatorSim(const DCMotor& gearbox, double gearing,
-              units::kilogram_t carriageMass, units::meter_t drumRadius,
-              units::meter_t minHeight, units::meter_t maxHeight,
-              bool simulateGravity, units::meter_t startingHeight,
+  ElevatorSim(const wpi::math::DCMotor& gearbox, double gearing,
+              wpi::units::kilogram_t carriageMass, wpi::units::meter_t drumRadius,
+              wpi::units::meter_t minHeight, wpi::units::meter_t maxHeight,
+              bool simulateGravity, wpi::units::meter_t startingHeight,
               const std::array<double, 2>& measurementStdDevs = {0.0, 0.0});
 
   /**
@@ -82,13 +82,13 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
    * @param measurementStdDevs The standard deviation of the measurements.
    */
   template <typename Distance>
-    requires std::same_as<units::meter, Distance> ||
-             std::same_as<units::radian, Distance>
+    requires std::same_as<wpi::units::meter, Distance> ||
+             std::same_as<wpi::units::radian, Distance>
   ElevatorSim(decltype(1_V / Velocity_t<Distance>(1)) kV,
               decltype(1_V / Acceleration_t<Distance>(1)) kA,
-              const DCMotor& gearbox, units::meter_t minHeight,
-              units::meter_t maxHeight, bool simulateGravity,
-              units::meter_t startingHeight,
+              const wpi::math::DCMotor& gearbox, wpi::units::meter_t minHeight,
+              wpi::units::meter_t maxHeight, bool simulateGravity,
+              wpi::units::meter_t startingHeight,
               const std::array<double, 2>& measurementStdDevs = {0.0, 0.0});
   using LinearSystemSim::SetState;
 
@@ -98,7 +98,7 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
    * @param position The new position
    * @param velocity The new velocity
    */
-  void SetState(units::meter_t position, units::meters_per_second_t velocity);
+  void SetState(wpi::units::meter_t position, wpi::units::meters_per_second_t velocity);
 
   /**
    * Returns whether the elevator would hit the lower limit.
@@ -106,7 +106,7 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
    * @param elevatorHeight The elevator height.
    * @return Whether the elevator would hit the lower limit.
    */
-  bool WouldHitLowerLimit(units::meter_t elevatorHeight) const;
+  bool WouldHitLowerLimit(wpi::units::meter_t elevatorHeight) const;
 
   /**
    * Returns whether the elevator would hit the upper limit.
@@ -114,7 +114,7 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
    * @param elevatorHeight The elevator height.
    * @return Whether the elevator would hit the upper limit.
    */
-  bool WouldHitUpperLimit(units::meter_t elevatorHeight) const;
+  bool WouldHitUpperLimit(wpi::units::meter_t elevatorHeight) const;
 
   /**
    * Returns whether the elevator has hit the lower limit.
@@ -135,28 +135,28 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
    *
    * @return The position of the elevator.
    */
-  units::meter_t GetPosition() const;
+  wpi::units::meter_t GetPosition() const;
 
   /**
    * Returns the velocity of the elevator.
    *
    * @return The velocity of the elevator.
    */
-  units::meters_per_second_t GetVelocity() const;
+  wpi::units::meters_per_second_t GetVelocity() const;
 
   /**
    * Returns the elevator current draw.
    *
    * @return The elevator current draw.
    */
-  units::ampere_t GetCurrentDraw() const;
+  wpi::units::ampere_t GetCurrentDraw() const;
 
   /**
    * Sets the input voltage for the elevator.
    *
    * @param voltage The input voltage.
    */
-  void SetInputVoltage(units::volt_t voltage);
+  void SetInputVoltage(wpi::units::volt_t voltage);
 
  protected:
   /**
@@ -166,13 +166,13 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
    * @param u           The system inputs (voltage).
    * @param dt          The time difference between controller updates.
    */
-  Vectord<2> UpdateX(const Vectord<2>& currentXhat, const Vectord<1>& u,
-                     units::second_t dt) override;
+  wpi::math::Vectord<2> UpdateX(const wpi::math::Vectord<2>& currentXhat, const wpi::math::Vectord<1>& u,
+                     wpi::units::second_t dt) override;
 
  private:
-  DCMotor m_gearbox;
-  units::meter_t m_minHeight;
-  units::meter_t m_maxHeight;
+  wpi::math::DCMotor m_gearbox;
+  wpi::units::meter_t m_minHeight;
+  wpi::units::meter_t m_maxHeight;
   bool m_simulateGravity;
 };
-}  // namespace frc::sim
+}  // namespace wpi::sim

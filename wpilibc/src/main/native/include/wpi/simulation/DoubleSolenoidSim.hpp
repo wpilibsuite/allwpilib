@@ -10,7 +10,7 @@
 #include "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
 #include "wpi/simulation/PneumaticsBaseSim.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 
 class DoubleSolenoidSim {
  public:
@@ -30,4 +30,4 @@ class DoubleSolenoidSim {
   int m_rev;
 };
 
-}  // namespace frc::sim
+}  // namespace wpi::sim

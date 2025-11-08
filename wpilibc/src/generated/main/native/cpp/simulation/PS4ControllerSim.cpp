@@ -8,8 +8,8 @@
 
 #include "wpi/driverstation/PS4Controller.hpp"
 
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 PS4ControllerSim::PS4ControllerSim(const PS4Controller& joystick)
     : GenericHIDSim{joystick} {

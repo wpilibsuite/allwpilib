@@ -6,14 +6,14 @@
 
 #include "wpi/util/json.hpp"
 
-void frc::to_json(wpi::json& json, const Translation3d& translation) {
-  json = wpi::json{{"x", translation.X().value()},
+void wpi::math::to_json(wpi::util::json& json, const Translation3d& translation) {
+  json = wpi::util::json{{"x", translation.X().value()},
                    {"y", translation.Y().value()},
                    {"z", translation.Z().value()}};
 }
 
-void frc::from_json(const wpi::json& json, Translation3d& translation) {
-  translation = Translation3d{units::meter_t{json.at("x").get<double>()},
-                              units::meter_t{json.at("y").get<double>()},
-                              units::meter_t{json.at("z").get<double>()}};
+void wpi::math::from_json(const wpi::util::json& json, Translation3d& translation) {
+  translation = Translation3d{wpi::units::meter_t{json.at("x").get<double>()},
+                              wpi::units::meter_t{json.at("y").get<double>()},
+                              wpi::units::meter_t{json.at("z").get<double>()}};
 }

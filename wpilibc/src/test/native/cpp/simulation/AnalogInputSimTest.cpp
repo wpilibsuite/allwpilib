@@ -10,7 +10,7 @@
 #include "wpi/hal/HAL.h"
 #include "wpi/hardware/discrete/AnalogInput.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 
 TEST(AnalogInputSimTest, SetInitialized) {
   HAL_Initialize(500, 0);
@@ -92,4 +92,4 @@ TEST(AnalogInputSimTest, SetAverageBits) {
   EXPECT_EQ(3504, callback.GetLastValue());
 }
 
-}  // namespace frc::sim
+}  // namespace wpi::sim

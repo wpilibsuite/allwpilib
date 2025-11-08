@@ -10,7 +10,7 @@
 #include "wpi/commands2/CommandHelper.hpp"
 #include "wpi/units/time.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 /**
  * A command that does nothing but ends after a specified match time or
  * condition.  Useful for CommandGroups.
@@ -37,7 +37,7 @@ class WaitUntilCommand : public CommandHelper<Command, WaitUntilCommand> {
    *
    * @param time the match time after which to end, in seconds
    */
-  explicit WaitUntilCommand(units::second_t time);
+  explicit WaitUntilCommand(wpi::units::second_t time);
 
   WaitUntilCommand(WaitUntilCommand&& other) = default;
 
@@ -50,4 +50,4 @@ class WaitUntilCommand : public CommandHelper<Command, WaitUntilCommand> {
  private:
   std::function<bool()> m_condition;
 };
-}  // namespace frc2
+}  // namespace wpi::cmd

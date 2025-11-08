@@ -6,7 +6,7 @@
 
 #include <utility>
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 FunctionalCommand::FunctionalCommand(std::function<void()> onInit,
                                      std::function<void()> onExecute,

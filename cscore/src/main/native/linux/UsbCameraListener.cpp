@@ -13,7 +13,7 @@
 #include "Notifier.hpp"
 #include "wpi/util/StringExtras.hpp"
 
-using namespace cs;
+using namespace wpi::cs;
 
 class UsbCameraListener::Impl {
  public:
@@ -21,28 +21,28 @@ class UsbCameraListener::Impl {
 
   Notifier& m_notifier;
 
-  std::unique_ptr<wpi::EventLoopRunner> m_runner;
+  std::unique_ptr<wpi::net::EventLoopRunner> m_runner;
 };
 
-UsbCameraListener::UsbCameraListener(wpi::Logger& logger, Notifier& notifier)
+UsbCameraListener::UsbCameraListener(wpi::util::Logger& logger, Notifier& notifier)
     : m_impl(std::make_unique<Impl>(notifier)) {}
 
 UsbCameraListener::~UsbCameraListener() = default;
 
 void UsbCameraListener::Start() {
   if (!m_impl->m_runner) {
-    m_impl->m_runner = std::make_unique<wpi::EventLoopRunner>();
-    m_impl->m_runner->ExecAsync([impl = m_impl.get()](wpi::uv::Loop& loop) {
-      auto refreshTimer = wpi::uv::Timer::Create(loop);
+    m_impl->m_runner = std::make_unique<wpi::net::EventLoopRunner>();
+    m_impl->m_runner->ExecAsync([impl = m_impl.get()](wpi::net::uv::Loop& loop) {
+      auto refreshTimer = wpi::net::uv::Timer::Create(loop);
       refreshTimer->timeout.connect([notifier = &impl->m_notifier] {
         notifier->NotifyUsbCamerasChanged();
       });
       refreshTimer->Unreference();
 
-      auto devEvents = wpi::uv::FsEvent::Create(loop);
+      auto devEvents = wpi::net::uv::FsEvent::Create(loop);
       devEvents->fsEvent.connect([refreshTimer](const char* fn, int flags) {
-        if (wpi::starts_with(fn, "video")) {
-          refreshTimer->Start(wpi::uv::Timer::Time(200));
+        if (wpi::util::starts_with(fn, "video")) {
+          refreshTimer->Start(wpi::net::uv::Timer::Time(200));
         }
       });
       devEvents->Start("/dev");

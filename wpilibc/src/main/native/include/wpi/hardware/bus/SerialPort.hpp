@@ -11,7 +11,7 @@
 #include "wpi/hal/Types.h"
 #include "wpi/units/time.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Driver for the RS-232 serial port on the roboRIO.
@@ -199,7 +199,7 @@ class SerialPort {
    *
    * @param timeout The time to wait for I/O.
    */
-  void SetTimeout(units::second_t timeout);
+  void SetTimeout(wpi::units::second_t timeout);
 
   /**
    * Specify the size of the input buffer.
@@ -254,7 +254,7 @@ class SerialPort {
   void Reset();
 
  private:
-  hal::Handle<HAL_SerialPortHandle, HAL_CloseSerial> m_portHandle;
+  wpi::hal::Handle<HAL_SerialPortHandle, HAL_CloseSerial> m_portHandle;
 };
 
-}  // namespace frc
+}  // namespace wpi

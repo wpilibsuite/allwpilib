@@ -4,7 +4,7 @@
 
 #include "wpi/util/Logger.hpp"
 
-using namespace wpi;
+using namespace wpi::util;
 
 void Logger::DoLog(unsigned int level, const char* file, unsigned int line,
                    const char* msg) {

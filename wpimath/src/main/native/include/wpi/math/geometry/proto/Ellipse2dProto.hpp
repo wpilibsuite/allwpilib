@@ -10,10 +10,10 @@
 #include "wpimath/protobuf/geometry2d.npb.h"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Ellipse2d> {
+struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::Ellipse2d> {
   using MessageStruct = wpi_proto_ProtobufEllipse2d;
-  using InputStream = wpi::ProtoInputStream<frc::Ellipse2d>;
-  using OutputStream = wpi::ProtoOutputStream<frc::Ellipse2d>;
-  static std::optional<frc::Ellipse2d> Unpack(InputStream& stream);
-  static bool Pack(OutputStream& stream, const frc::Ellipse2d& value);
+  using InputStream = wpi::util::ProtoInputStream<wpi::math::Ellipse2d>;
+  using OutputStream = wpi::util::ProtoOutputStream<wpi::math::Ellipse2d>;
+  static std::optional<wpi::math::Ellipse2d> Unpack(InputStream& stream);
+  static bool Pack(OutputStream& stream, const wpi::math::Ellipse2d& value);
 };

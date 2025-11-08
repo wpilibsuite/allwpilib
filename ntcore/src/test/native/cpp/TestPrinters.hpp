@@ -13,7 +13,7 @@
 
 #include "wpi/util/TestPrinters.hpp"
 
-namespace nt {
+namespace wpi::nt {
 
 namespace net3 {
 class Message3;
@@ -37,4 +37,4 @@ void PrintTo(const net::ServerMessage& msg, std::ostream* os);
 void PrintTo(const Value& value, std::ostream* os);
 void PrintTo(const PubSubOptionsImpl& options, std::ostream* os);
 
-}  // namespace nt
+}  // namespace wpi::nt

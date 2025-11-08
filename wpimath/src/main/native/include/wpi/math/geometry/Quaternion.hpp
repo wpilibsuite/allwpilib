@@ -12,7 +12,7 @@
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/json_fwd.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * Represents a quaternion.
@@ -328,12 +328,12 @@ class WPILIB_DLLEXPORT Quaternion {
 };
 
 WPILIB_DLLEXPORT
-void to_json(wpi::json& json, const Quaternion& quaternion);
+void to_json(wpi::util::json& json, const Quaternion& quaternion);
 
 WPILIB_DLLEXPORT
-void from_json(const wpi::json& json, Quaternion& quaternion);
+void from_json(const wpi::util::json& json, Quaternion& quaternion);
 
-}  // namespace frc
+}  // namespace wpi::math
 
 #include "wpi/math/geometry/proto/QuaternionProto.hpp"
 #include "wpi/math/geometry/struct/QuaternionStruct.hpp"

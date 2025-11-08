@@ -8,12 +8,12 @@
 #include "wpi/commands2/button/Trigger.hpp"
 #include "wpi/driverstation/Gamepad.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 /**
- * A version of {@link frc::Gamepad} with {@link Trigger} factories for
+ * A version of {@link wpi::Gamepad} with {@link Trigger} factories for
  * command-based.
  *
- * @see frc::Gamepad
+ * @see wpi::Gamepad
  */
 class CommandGamepad : public CommandGenericHID {
  public:
@@ -30,7 +30,7 @@ class CommandGamepad : public CommandGenericHID {
    *
    * @return the wrapped GenericHID object
    */
-  frc::Gamepad& GetHID();
+  wpi::Gamepad& GetHID();
 
   /**
    * Constructs a Trigger instance around the South Face button's
@@ -41,7 +41,7 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the South Face button's
    * digital signal attached to the given loop.
    */
-  Trigger SouthFace(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger SouthFace(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                .GetDefaultButtonLoop()) const;
 
   /**
@@ -53,7 +53,7 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the East Face button's
    * digital signal attached to the given loop.
    */
-  Trigger EastFace(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger EastFace(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                               .GetDefaultButtonLoop()) const;
 
   /**
@@ -65,7 +65,7 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the West Face button's
    * digital signal attached to the given loop.
    */
-  Trigger WestFace(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger WestFace(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                               .GetDefaultButtonLoop()) const;
 
   /**
@@ -77,7 +77,7 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the North Face button's
    * digital signal attached to the given loop.
    */
-  Trigger NorthFace(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger NorthFace(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                .GetDefaultButtonLoop()) const;
 
   /**
@@ -89,7 +89,7 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the Back button's
    * digital signal attached to the given loop.
    */
-  Trigger Back(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger Back(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                           .GetDefaultButtonLoop()) const;
 
   /**
@@ -101,7 +101,7 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the Guide button's
    * digital signal attached to the given loop.
    */
-  Trigger Guide(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger Guide(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                            .GetDefaultButtonLoop()) const;
 
   /**
@@ -113,7 +113,7 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the Start button's
    * digital signal attached to the given loop.
    */
-  Trigger Start(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger Start(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                            .GetDefaultButtonLoop()) const;
 
   /**
@@ -125,7 +125,7 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the left stick button's
    * digital signal attached to the given loop.
    */
-  Trigger LeftStick(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger LeftStick(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                .GetDefaultButtonLoop()) const;
 
   /**
@@ -137,7 +137,7 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the right stick button's
    * digital signal attached to the given loop.
    */
-  Trigger RightStick(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger RightStick(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 
   /**
@@ -150,7 +150,7 @@ class CommandGamepad : public CommandGenericHID {
    * digital signal attached to the given loop.
    */
   Trigger LeftShoulder(
-      frc::EventLoop* loop =
+      wpi::EventLoop* loop =
           CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 
   /**
@@ -163,7 +163,7 @@ class CommandGamepad : public CommandGenericHID {
    * digital signal attached to the given loop.
    */
   Trigger RightShoulder(
-      frc::EventLoop* loop =
+      wpi::EventLoop* loop =
           CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 
   /**
@@ -175,7 +175,7 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the D-pad up button's
    * digital signal attached to the given loop.
    */
-  Trigger DpadUp(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger DpadUp(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                             .GetDefaultButtonLoop()) const;
 
   /**
@@ -187,7 +187,7 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the D-pad down button's
    * digital signal attached to the given loop.
    */
-  Trigger DpadDown(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger DpadDown(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                               .GetDefaultButtonLoop()) const;
 
   /**
@@ -199,7 +199,7 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the D-pad left button's
    * digital signal attached to the given loop.
    */
-  Trigger DpadLeft(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger DpadLeft(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                               .GetDefaultButtonLoop()) const;
 
   /**
@@ -211,7 +211,7 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the D-pad right button's
    * digital signal attached to the given loop.
    */
-  Trigger DpadRight(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger DpadRight(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                .GetDefaultButtonLoop()) const;
 
   /**
@@ -223,7 +223,7 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the Miscellaneous 1 button's
    * digital signal attached to the given loop.
    */
-  Trigger Misc1(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger Misc1(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                            .GetDefaultButtonLoop()) const;
 
   /**
@@ -236,7 +236,7 @@ class CommandGamepad : public CommandGenericHID {
    * digital signal attached to the given loop.
    */
   Trigger RightPaddle1(
-      frc::EventLoop* loop =
+      wpi::EventLoop* loop =
           CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 
   /**
@@ -248,7 +248,7 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the Left Paddle 1 button's
    * digital signal attached to the given loop.
    */
-  Trigger LeftPaddle1(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger LeftPaddle1(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                  .GetDefaultButtonLoop()) const;
 
   /**
@@ -261,7 +261,7 @@ class CommandGamepad : public CommandGenericHID {
    * digital signal attached to the given loop.
    */
   Trigger RightPaddle2(
-      frc::EventLoop* loop =
+      wpi::EventLoop* loop =
           CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 
   /**
@@ -273,7 +273,7 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the Left Paddle 2 button's
    * digital signal attached to the given loop.
    */
-  Trigger LeftPaddle2(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger LeftPaddle2(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                  .GetDefaultButtonLoop()) const;
 
   /**
@@ -285,7 +285,7 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the Touchpad button's
    * digital signal attached to the given loop.
    */
-  Trigger Touchpad(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger Touchpad(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                               .GetDefaultButtonLoop()) const;
 
   /**
@@ -297,7 +297,7 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the Miscellaneous 2 button's
    * digital signal attached to the given loop.
    */
-  Trigger Misc2(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger Misc2(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                            .GetDefaultButtonLoop()) const;
 
   /**
@@ -309,7 +309,7 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the Miscellaneous 3 button's
    * digital signal attached to the given loop.
    */
-  Trigger Misc3(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger Misc3(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                            .GetDefaultButtonLoop()) const;
 
   /**
@@ -321,7 +321,7 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the Miscellaneous 4 button's
    * digital signal attached to the given loop.
    */
-  Trigger Misc4(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger Misc4(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                            .GetDefaultButtonLoop()) const;
 
   /**
@@ -333,7 +333,7 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the Miscellaneous 5 button's
    * digital signal attached to the given loop.
    */
-  Trigger Misc5(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger Misc5(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                            .GetDefaultButtonLoop()) const;
 
   /**
@@ -345,7 +345,7 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the Miscellaneous 6 button's
    * digital signal attached to the given loop.
    */
-  Trigger Misc6(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger Misc6(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                            .GetDefaultButtonLoop()) const;
 
   /**
@@ -362,7 +362,7 @@ class CommandGamepad : public CommandGenericHID {
    * exceeds the provided threshold, attached to the given loop
    */
   Trigger LeftTrigger(double threshold = 0.5,
-                      frc::EventLoop* loop = CommandScheduler::GetInstance()
+                      wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                  .GetDefaultButtonLoop()) const;
 
   /**
@@ -380,7 +380,7 @@ class CommandGamepad : public CommandGenericHID {
    */
   Trigger RightTrigger(
       double threshold = 0.5,
-      frc::EventLoop* loop =
+      wpi::EventLoop* loop =
           CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 
   /**
@@ -428,6 +428,6 @@ class CommandGamepad : public CommandGenericHID {
   double GetRightTriggerAxis() const;
 
  private:
-  frc::Gamepad m_hid;
+  wpi::Gamepad m_hid;
 };
-}  // namespace frc2
+}  // namespace wpi::cmd

@@ -18,7 +18,7 @@ Robot::Robot() {}
  * LiveWindow and SmartDashboard integrated updating.
  */
 void Robot::RobotPeriodic() {
-  frc2::CommandScheduler::GetInstance().Run();
+  wpi::cmd::CommandScheduler::GetInstance().Run();
 }
 
 /**
@@ -38,7 +38,7 @@ void Robot::AutonomousInit() {
   m_autonomousCommand = m_container.GetAutonomousCommand();
 
   if (m_autonomousCommand != nullptr) {
-    frc2::CommandScheduler::GetInstance().Schedule(m_autonomousCommand);
+    wpi::cmd::CommandScheduler::GetInstance().Schedule(m_autonomousCommand);
   }
 }
 
@@ -67,6 +67,6 @@ void Robot::TestPeriodic() {}
 
 #ifndef RUNNING_FRC_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

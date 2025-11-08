@@ -9,7 +9,7 @@
 
 namespace wpi {
 
-class MockLogger : public Logger,
+class MockLogger : public wpi::util::Logger,
                    public ::testing::MockFunction<void(
                        unsigned int level, std::string_view file,
                        unsigned int line, std::string_view msg)> {

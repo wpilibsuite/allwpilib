@@ -25,7 +25,7 @@
 #include <cstdint>
 #include <type_traits>
 
-namespace wpi {
+namespace wpi::util {
 
 namespace detail {
 template <typename T, typename... Us> struct TypesAreDistinct;
@@ -189,7 +189,7 @@ public:
   explicit operator bool() const { return !isNull(); }
 
   // FIXME: Replace the uses of is(), get() and dyn_cast() with
-  //        isa<T>, cast<T> and the wpi::dyn_cast<T>
+  //        isa<T>, cast<T> and the wpi::util::dyn_cast<T>
 
   /// Test if the Union currently holds the type matching T.
   template <typename T>
@@ -211,7 +211,7 @@ public:
   /// Returns the current pointer if it is of the specified pointer type,
   /// otherwise returns null.
   template <typename T> inline T dyn_cast() const {
-    return wpi::dyn_cast_if_present<T>(*this);
+    return wpi::util::dyn_cast_if_present<T>(*this);
   }
 
   /// If the union is set to the first pointer type get an address pointing to
@@ -350,6 +350,6 @@ template <typename ...PTs> struct DenseMapInfo<PointerUnion<PTs...>> {
   }
 };
 
-} // end namespace wpi
+} // end namespace wpi::util
 
 #endif // WPIUTIL_WPI_POINTERUNION_H

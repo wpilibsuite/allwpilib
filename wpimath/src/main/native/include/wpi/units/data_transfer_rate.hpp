@@ -28,9 +28,9 @@
 
 #include "wpi/units/base.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::data_transfer_rate
+ * @namespace wpi::units::data_transfer_rate
  * @brief namespace for unit types and containers representing data values
  * @details The base unit for data is `bytes`, and the corresponding `base_unit`
  *          category is `data_unit`.
@@ -41,7 +41,7 @@ namespace units {
     defined(ENABLE_PREDEFINED_DATA_TRANSFER_RATE_UNITS)
 UNIT_ADD_WITH_METRIC_AND_BINARY_PREFIXES(
     data_transfer_rate, bytes_per_second, bytes_per_second, Bps,
-    unit<std::ratio<1>, units::category::data_transfer_rate_unit>)
+    unit<std::ratio<1>, wpi::units::category::data_transfer_rate_unit>)
 UNIT_ADD(data_transfer_rate, exabytes_per_second, exabytes_per_second, EBps,
          unit<std::ratio<1000>, petabytes_per_second>)
 UNIT_ADD_WITH_METRIC_AND_BINARY_PREFIXES(
@@ -54,4 +54,4 @@ UNIT_ADD_CATEGORY_TRAIT(data_transfer_rate)
 #endif
 
 using namespace data_transfer_rate;
-}  // namespace units
+}  // namespace wpi::units

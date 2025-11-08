@@ -10,7 +10,7 @@
 
 #include "wpi/net/uv/Loop.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 std::shared_ptr<Timer> Timer::Create(Loop& loop) {
   if (loop.IsClosing()) {
@@ -51,4 +51,4 @@ void Timer::Start(Time timeout, Time repeat) {
       timeout.count(), repeat.count());
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

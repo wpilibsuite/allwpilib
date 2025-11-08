@@ -12,12 +12,12 @@
 #include "wpi/util/MathExtras.hpp"
 #include "wpi/util/StringExtras.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 NTMecanumDriveModel::NTMecanumDriveModel(std::string_view path)
-    : NTMecanumDriveModel(nt::NetworkTableInstance::GetDefault(), path) {}
+    : NTMecanumDriveModel(wpi::nt::NetworkTableInstance::GetDefault(), path) {}
 
-NTMecanumDriveModel::NTMecanumDriveModel(nt::NetworkTableInstance inst,
+NTMecanumDriveModel::NTMecanumDriveModel(wpi::nt::NetworkTableInstance inst,
                                          std::string_view path)
     : m_inst{inst},
       m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
@@ -35,7 +35,7 @@ NTMecanumDriveModel::NTMecanumDriveModel(nt::NetworkTableInstance inst,
       m_rrPercent{
           inst.GetDoubleTopic(fmt::format("{}/Rear Right Motor Speed", path))
               .GetEntry(0)},
-      m_nameValue{wpi::rsplit(path, '/').second},
+      m_nameValue{wpi::util::rsplit(path, '/').second},
       m_flPercentData{fmt::format("NTMcnmDriveFL:{}", path)},
       m_frPercentData{fmt::format("NTMcnmDriveFR:{}", path)},
       m_rlPercentData{fmt::format("NTMcnmDriveRL:{}", path)},

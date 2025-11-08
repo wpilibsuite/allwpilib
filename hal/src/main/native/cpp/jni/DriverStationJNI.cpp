@@ -37,8 +37,8 @@ static_assert(org_wpilib_hardware_hal_DriverStationJNI_kMaxJoystickPOVs ==
 static_assert(org_wpilib_hardware_hal_DriverStationJNI_kMaxJoysticks ==
               HAL_kMaxJoysticks);
 
-using namespace hal;
-using namespace wpi::java;
+using namespace wpi::hal;
+using namespace wpi::util::java;
 
 extern "C" {
 
@@ -216,7 +216,7 @@ Java_org_wpilib_hardware_hal_DriverStationJNI_getJoystickName
 {
   WPI_String joystickName;
   HAL_GetJoystickName(&joystickName, port);
-  jstring str = MakeJString(env, wpi::to_string_view(&joystickName));
+  jstring str = MakeJString(env, wpi::util::to_string_view(&joystickName));
   WPI_FreeString(&joystickName);
   return str;
 }

@@ -11,10 +11,10 @@
 #include "wpi/util/protobuf/Protobuf.hpp"
 
 template <>
-struct wpi::Protobuf<mrc::JoystickRumbleData> {
+struct wpi::util::Protobuf<mrc::JoystickRumbleData> {
   using MessageStruct = mrc_proto_ProtobufJoystickRumbleData;
-  using InputStream = wpi::ProtoInputStream<mrc::JoystickRumbleData>;
-  using OutputStream = wpi::ProtoOutputStream<mrc::JoystickRumbleData>;
+  using InputStream = wpi::util::ProtoInputStream<mrc::JoystickRumbleData>;
+  using OutputStream = wpi::util::ProtoOutputStream<mrc::JoystickRumbleData>;
   static std::optional<mrc::JoystickRumbleData> Unpack(InputStream& Stream);
   static bool Pack(OutputStream& Stream, const mrc::JoystickRumbleData& Value);
 };

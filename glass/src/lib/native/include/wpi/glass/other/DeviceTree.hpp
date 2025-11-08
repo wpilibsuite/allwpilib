@@ -13,7 +13,7 @@
 #include "wpi/glass/Model.hpp"
 #include "wpi/util/FunctionExtras.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 class DataSource;
 
@@ -22,7 +22,7 @@ class DataSource;
  */
 class DeviceTreeModel : public Model {
  public:
-  using DisplayFunc = wpi::unique_function<void(Model*)>;
+  using DisplayFunc = wpi::util::unique_function<void(Model*)>;
 
   /**
    * Add a display to the device tree.
@@ -137,4 +137,4 @@ bool DeviceInt(const char* name, bool readonly, int32_t* value,
 bool DeviceLong(const char* name, bool readonly, int64_t* value,
                 const DataSource* source = nullptr);
 
-}  // namespace glass
+}  // namespace wpi::glass

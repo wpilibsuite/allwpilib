@@ -2,7 +2,7 @@ extra_includes:
 - wpi/driverstation/Gamepad.hpp
 
 classes:
-  frc::sim::GamepadSim:
+  wpi::sim::GamepadSim:
     force_no_trampoline: true
     methods:
       GamepadSim:

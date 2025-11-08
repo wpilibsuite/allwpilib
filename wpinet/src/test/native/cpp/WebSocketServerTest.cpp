@@ -14,7 +14,7 @@
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/sha1.hpp"
 
-namespace wpi {
+namespace wpi::net {
 
 class WebSocketServerTest : public WebSocketTest {
  public:
@@ -793,4 +793,4 @@ TEST_P(WebSocketServerDataTest, ReceiveUnmasked) {
   ASSERT_EQ(gotCallback, 1);
 }
 
-}  // namespace wpi
+}  // namespace wpi::net

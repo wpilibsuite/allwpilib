@@ -9,7 +9,7 @@
 
 #include "wpi/util/FunctionExtras.hpp"
 
-namespace frc {
+namespace wpi {
 /** A declarative way to bind a set of actions to a loop and execute them when
  * the loop is polled. */
 class EventLoop {
@@ -24,7 +24,7 @@ class EventLoop {
    *
    * @param action the action to run.
    */
-  void Bind(wpi::unique_function<void()> action);
+  void Bind(wpi::util::unique_function<void()> action);
 
   /**
    * Poll all bindings.
@@ -37,7 +37,7 @@ class EventLoop {
   void Clear();
 
  private:
-  std::vector<wpi::unique_function<void()>> m_bindings;
+  std::vector<wpi::util::unique_function<void()>> m_bindings;
   bool m_running{false};
 };
-}  // namespace frc
+}  // namespace wpi

@@ -13,7 +13,7 @@
 #include "wpi/hal/handles/HandlesInternal.h"
 #include "wpi/util/mutex.hpp"
 
-namespace hal {
+namespace wpi::hal {
 
 /**
  * The LimitedClassedHandleResource class is a way to track handles. This
@@ -47,8 +47,8 @@ class LimitedClassedHandleResource : public HandleBase {
 
  private:
   std::array<std::shared_ptr<TStruct>, size> m_structures;
-  std::array<wpi::mutex, size> m_handleMutexes;
-  wpi::mutex m_allocateMutex;
+  std::array<wpi::util::mutex, size> m_handleMutexes;
+  wpi::util::mutex m_allocateMutex;
 };
 
 template <typename THandle, typename TStruct, int16_t size,
@@ -114,4 +114,4 @@ void LimitedClassedHandleResource<THandle, TStruct, size,
   }
   HandleBase::ResetHandles();
 }
-}  // namespace hal
+}  // namespace wpi::hal

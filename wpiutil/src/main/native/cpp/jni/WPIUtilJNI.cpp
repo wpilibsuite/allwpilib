@@ -14,7 +14,7 @@
 #include "wpi/util/print.hpp"
 #include "wpi/util/timestamp.h"
 
-using namespace wpi::java;
+using namespace wpi::util::java;
 
 static bool mockTimeEnabled = false;
 static uint64_t mockNow = 0;
@@ -34,19 +34,19 @@ static const JExceptionInit exceptions[] = {
     {"java/lang/NullPointerException", &nullPointerEx},
     {"org/wpilib/util/runtime/MsvcRuntimeException", &msvcRuntimeEx}};
 
-void wpi::ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg) {
+void wpi::util::ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg) {
   illegalArgEx.Throw(env, msg);
 }
 
-void wpi::ThrowIndexOobException(JNIEnv* env, std::string_view msg) {
+void wpi::util::ThrowIndexOobException(JNIEnv* env, std::string_view msg) {
   indexOobEx.Throw(env, msg);
 }
 
-void wpi::ThrowIOException(JNIEnv* env, std::string_view msg) {
+void wpi::util::ThrowIOException(JNIEnv* env, std::string_view msg) {
   ioEx.Throw(env, msg);
 }
 
-void wpi::ThrowNullPointerException(JNIEnv* env, std::string_view msg) {
+void wpi::util::ThrowNullPointerException(JNIEnv* env, std::string_view msg) {
   nullPointerEx.Throw(env, msg);
 }
 
@@ -98,7 +98,7 @@ Java_org_wpilib_util_WPIUtilJNI_checkMsvcRuntime
                           &expectedMinor, &runtimePath)) {
     static jmethodID ctor =
         env->GetMethodID(msvcRuntimeEx, "<init>", "(IIIILjava/lang/String;)V");
-    jstring jmsvcruntime = MakeJString(env, wpi::to_string_view(&runtimePath));
+    jstring jmsvcruntime = MakeJString(env, wpi::util::to_string_view(&runtimePath));
     jobject exception =
         env->NewObject(msvcRuntimeEx, ctor, foundMajor, foundMinor,
                        expectedMajor, expectedMinor, jmsvcruntime);
@@ -116,7 +116,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_util_WPIUtilJNI_writeStderr
   (JNIEnv* env, jclass, jstring str)
 {
-  wpi::print(stderr, "{}", JStringRef{env, str}.str());
+  wpi::util::print(stderr, "{}", JStringRef{env, str}.str());
 }
 
 /*
@@ -129,10 +129,10 @@ Java_org_wpilib_util_WPIUtilJNI_enableMockTime
   (JNIEnv*, jclass)
 {
 #ifdef __FRC_SYSTEMCORE__
-  wpi::print(stderr, "WPIUtil: Mocking time is not available on systemcore\n");
+  wpi::util::print(stderr, "WPIUtil: Mocking time is not available on systemcore\n");
 #else
   mockTimeEnabled = true;
-  wpi::SetNowImpl([] { return mockNow; });
+  wpi::util::SetNowImpl([] { return mockNow; });
 #endif
 }
 
@@ -146,7 +146,7 @@ Java_org_wpilib_util_WPIUtilJNI_disableMockTime
   (JNIEnv*, jclass)
 {
   mockTimeEnabled = false;
-  wpi::SetNowImpl(nullptr);
+  wpi::util::SetNowImpl(nullptr);
 }
 
 /*
@@ -173,7 +173,7 @@ Java_org_wpilib_util_WPIUtilJNI_now
   if (mockTimeEnabled) {
     return mockNow;
   } else {
-    return wpi::Now();
+    return wpi::util::Now();
   }
 }
 
@@ -186,7 +186,7 @@ JNIEXPORT jlong JNICALL
 Java_org_wpilib_util_WPIUtilJNI_getSystemTime
   (JNIEnv*, jclass)
 {
-  return wpi::GetSystemTime();
+  return wpi::util::GetSystemTime();
 }
 
 /*
@@ -198,7 +198,7 @@ JNIEXPORT jint JNICALL
 Java_org_wpilib_util_WPIUtilJNI_createEvent
   (JNIEnv*, jclass, jboolean manualReset, jboolean initialState)
 {
-  return wpi::CreateEvent(manualReset, initialState);
+  return wpi::util::CreateEvent(manualReset, initialState);
 }
 
 /*
@@ -210,7 +210,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_util_WPIUtilJNI_destroyEvent
   (JNIEnv*, jclass, jint eventHandle)
 {
-  wpi::DestroyEvent(eventHandle);
+  wpi::util::DestroyEvent(eventHandle);
 }
 
 /*
@@ -222,7 +222,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_util_WPIUtilJNI_setEvent
   (JNIEnv*, jclass, jint eventHandle)
 {
-  wpi::SetEvent(eventHandle);
+  wpi::util::SetEvent(eventHandle);
 }
 
 /*
@@ -234,7 +234,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_util_WPIUtilJNI_resetEvent
   (JNIEnv*, jclass, jint eventHandle)
 {
-  wpi::ResetEvent(eventHandle);
+  wpi::util::ResetEvent(eventHandle);
 }
 
 /*
@@ -246,7 +246,7 @@ JNIEXPORT jint JNICALL
 Java_org_wpilib_util_WPIUtilJNI_createSemaphore
   (JNIEnv*, jclass, jint initialCount, jint maximumCount)
 {
-  return wpi::CreateSemaphore(initialCount, maximumCount);
+  return wpi::util::CreateSemaphore(initialCount, maximumCount);
 }
 
 /*
@@ -258,7 +258,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_util_WPIUtilJNI_destroySemaphore
   (JNIEnv*, jclass, jint semHandle)
 {
-  wpi::DestroySemaphore(semHandle);
+  wpi::util::DestroySemaphore(semHandle);
 }
 
 /*
@@ -270,7 +270,7 @@ JNIEXPORT jboolean JNICALL
 Java_org_wpilib_util_WPIUtilJNI_releaseSemaphore
   (JNIEnv*, jclass, jint semHandle, jint releaseCount)
 {
-  return wpi::ReleaseSemaphore(semHandle, releaseCount);
+  return wpi::util::ReleaseSemaphore(semHandle, releaseCount);
 }
 
 /*
@@ -282,7 +282,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_util_WPIUtilJNI_waitForObject
   (JNIEnv* env, jclass, jint handle)
 {
-  if (!wpi::WaitForObject(handle)) {
+  if (!wpi::util::WaitForObject(handle)) {
     interruptedEx.Throw(env, "WaitForObject interrupted");
   }
 }
@@ -297,7 +297,7 @@ Java_org_wpilib_util_WPIUtilJNI_waitForObjectTimeout
   (JNIEnv* env, jclass, jint handle, jdouble timeout)
 {
   bool timedOut;
-  if (!wpi::WaitForObject(handle, timeout, &timedOut) && !timedOut) {
+  if (!wpi::util::WaitForObject(handle, timeout, &timedOut) && !timedOut) {
     interruptedEx.Throw(env, "WaitForObject interrupted");
     return false;
   }
@@ -314,13 +314,13 @@ Java_org_wpilib_util_WPIUtilJNI_waitForObjects
   (JNIEnv* env, jclass, jintArray handles)
 {
   JSpan<const jint> handlesArr{env, handles};
-  wpi::SmallVector<WPI_Handle, 8> signaledBuf;
+  wpi::util::SmallVector<WPI_Handle, 8> signaledBuf;
   signaledBuf.resize(handlesArr.size());
   std::span<const WPI_Handle> handlesArr2{
       reinterpret_cast<const WPI_Handle*>(handlesArr.data()),
       handlesArr.size()};
 
-  auto signaled = wpi::WaitForObjects(handlesArr2, signaledBuf);
+  auto signaled = wpi::util::WaitForObjects(handlesArr2, signaledBuf);
   if (signaled.empty()) {
     interruptedEx.Throw(env, "WaitForObjects interrupted");
     return nullptr;
@@ -338,7 +338,7 @@ Java_org_wpilib_util_WPIUtilJNI_waitForObjectsTimeout
   (JNIEnv* env, jclass, jintArray handles, jdouble timeout)
 {
   JSpan<const jint> handlesArr{env, handles};
-  wpi::SmallVector<WPI_Handle, 8> signaledBuf;
+  wpi::util::SmallVector<WPI_Handle, 8> signaledBuf;
   signaledBuf.resize(handlesArr.size());
   std::span<const WPI_Handle> handlesArr2{
       reinterpret_cast<const WPI_Handle*>(handlesArr.data()),
@@ -346,7 +346,7 @@ Java_org_wpilib_util_WPIUtilJNI_waitForObjectsTimeout
 
   bool timedOut;
   auto signaled =
-      wpi::WaitForObjects(handlesArr2, signaledBuf, timeout, &timedOut);
+      wpi::util::WaitForObjects(handlesArr2, signaledBuf, timeout, &timedOut);
   if (signaled.empty() && !timedOut) {
     interruptedEx.Throw(env, "WaitForObjects interrupted");
     return nullptr;
@@ -363,7 +363,7 @@ JNIEXPORT jlong JNICALL
 Java_org_wpilib_util_WPIUtilJNI_allocateRawFrame
   (JNIEnv*, jclass)
 {
-  return reinterpret_cast<jlong>(new wpi::RawFrame);
+  return reinterpret_cast<jlong>(new wpi::util::RawFrame);
 }
 
 /*
@@ -375,7 +375,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_util_WPIUtilJNI_freeRawFrame
   (JNIEnv*, jclass, jlong frame)
 {
-  delete reinterpret_cast<wpi::RawFrame*>(frame);
+  delete reinterpret_cast<wpi::util::RawFrame*>(frame);
 }
 
 /*
@@ -387,9 +387,9 @@ JNIEXPORT jlong JNICALL
 Java_org_wpilib_util_WPIUtilJNI_getRawFrameDataPtr
   (JNIEnv* env, jclass, jlong frame)
 {
-  auto* f = reinterpret_cast<wpi::RawFrame*>(frame);
+  auto* f = reinterpret_cast<wpi::util::RawFrame*>(frame);
   if (!f) {
-    wpi::ThrowNullPointerException(env, "frame is null");
+    wpi::util::ThrowNullPointerException(env, "frame is null");
     return 0;
   }
   return reinterpret_cast<jlong>(f->data);
@@ -405,14 +405,14 @@ Java_org_wpilib_util_WPIUtilJNI_setRawFrameData
   (JNIEnv* env, jclass, jlong frame, jobject data, jint size, jint width,
    jint height, jint stride, jint pixelFormat)
 {
-  auto* f = reinterpret_cast<wpi::RawFrame*>(frame);
+  auto* f = reinterpret_cast<wpi::util::RawFrame*>(frame);
   if (!f) {
-    wpi::ThrowNullPointerException(env, "frame is null");
+    wpi::util::ThrowNullPointerException(env, "frame is null");
     return;
   }
   auto buf = env->GetDirectBufferAddress(data);
   if (!buf) {
-    wpi::ThrowNullPointerException(env, "data is null");
+    wpi::util::ThrowNullPointerException(env, "data is null");
     return;
   }
   // there's no way to free a passed-in direct byte buffer
@@ -433,9 +433,9 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_util_WPIUtilJNI_setRawFrameTime
   (JNIEnv* env, jclass, jlong frame, jlong time, jint timeSource)
 {
-  auto* f = reinterpret_cast<wpi::RawFrame*>(frame);
+  auto* f = reinterpret_cast<wpi::util::RawFrame*>(frame);
   if (!f) {
-    wpi::ThrowNullPointerException(env, "frame is null");
+    wpi::util::ThrowNullPointerException(env, "frame is null");
     return;
   }
   f->timestamp = time;
@@ -452,9 +452,9 @@ Java_org_wpilib_util_WPIUtilJNI_setRawFrameInfo
   (JNIEnv* env, jclass, jlong frame, jint size, jint width, jint height,
    jint stride, jint pixelFormat)
 {
-  auto* f = reinterpret_cast<wpi::RawFrame*>(frame);
+  auto* f = reinterpret_cast<wpi::util::RawFrame*>(frame);
   if (!f) {
-    wpi::ThrowNullPointerException(env, "frame is null");
+    wpi::util::ThrowNullPointerException(env, "frame is null");
     return;
   }
   f->width = width;

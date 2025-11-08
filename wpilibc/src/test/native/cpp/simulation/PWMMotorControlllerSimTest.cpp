@@ -9,10 +9,10 @@
 #include "wpi/hal/HAL.h"
 #include "wpi/hardware/motor/Spark.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 TEST(PWMMotorControllerSimTest, TestMotor) {
-  frc::Spark spark{0};
-  frc::sim::PWMMotorControllerSim sim{spark};
+  wpi::Spark spark{0};
+  wpi::sim::PWMMotorControllerSim sim{spark};
 
   spark.Set(0);
   EXPECT_EQ(0, sim.GetSpeed());
@@ -23,4 +23,4 @@ TEST(PWMMotorControllerSimTest, TestMotor) {
   spark.Set(-0.785);
   EXPECT_EQ(-0.785, sim.GetSpeed());
 }
-}  // namespace frc::sim
+}  // namespace wpi::sim

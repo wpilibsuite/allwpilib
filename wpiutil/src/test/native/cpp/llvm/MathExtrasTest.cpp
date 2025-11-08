@@ -10,7 +10,7 @@
 #include "gtest/gtest.h"
 #include <limits>
 
-using namespace wpi;
+using namespace wpi::util;
 
 namespace {
 

@@ -15,7 +15,7 @@
 #include "wpi/util/SafeThread.hpp"
 #include "wpi/util/future.hpp"
 
-namespace wpi {
+namespace wpi::net {
 
 namespace detail {
 
@@ -89,14 +89,14 @@ struct WorkerThreadRequest {
 };
 
 template <typename R, typename... T>
-class WorkerThreadThread : public SafeThread {
+class WorkerThreadThread : public wpi::util::SafeThread {
  public:
   using Request = WorkerThreadRequest<R, T...>;
 
   void Main() override;
 
   std::vector<Request> m_requests;
-  PromiseFactory<R> m_promises;
+  wpi::util::PromiseFactory<R> m_promises;
   detail::WorkerThreadAsync<R> m_async;
 };
 
@@ -228,7 +228,7 @@ class WorkerThread<R(T...)> final {
    * @param u Arguments to work function
    */
   template <typename... U>
-  future<R> QueueWork(WorkFunction work, U&&... u) {
+  wpi::util::future<R> QueueWork(WorkFunction work, U&&... u) {
     if (auto thr = m_owner.GetThread()) {
       // create the future
       uint64_t req = thr->m_promises.CreateRequest();
@@ -245,7 +245,7 @@ class WorkerThread<R(T...)> final {
     }
 
     // XXX: is this the right thing to do?
-    return future<R>();
+    return wpi::util::future<R>();
   }
 
   /**
@@ -277,9 +277,9 @@ class WorkerThread<R(T...)> final {
   }
 
  private:
-  SafeThreadOwner<Thread> m_owner;
+  wpi::util::SafeThreadOwner<Thread> m_owner;
 };
 
-}  // namespace wpi
+}  // namespace wpi::net
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_WORKERTHREAD_HPP_

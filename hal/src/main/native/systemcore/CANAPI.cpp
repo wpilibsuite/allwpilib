@@ -16,7 +16,7 @@
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/timestamp.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
 namespace {
 struct CANStorage {
@@ -24,23 +24,23 @@ struct CANStorage {
   HAL_CANDeviceType deviceType;
   int32_t busId;
   uint8_t deviceId;
-  wpi::mutex periodicSendsMutex;
-  wpi::SmallDenseMap<int32_t, int32_t> periodicSends;
-  wpi::mutex receivesMutex;
-  wpi::SmallDenseMap<int32_t, HAL_CANReceiveMessage> receives;
+  wpi::util::mutex periodicSendsMutex;
+  wpi::util::SmallDenseMap<int32_t, int32_t> periodicSends;
+  wpi::util::mutex receivesMutex;
+  wpi::util::SmallDenseMap<int32_t, HAL_CANReceiveMessage> receives;
 };
 }  // namespace
 
 static UnlimitedHandleResource<HAL_CANHandle, CANStorage, HAL_HandleEnum::CAN>*
     canHandles;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeCANAPI() {
   static UnlimitedHandleResource<HAL_CANHandle, CANStorage, HAL_HandleEnum::CAN>
       cH;
   canHandles = &cH;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 static int32_t CreateCANId(CANStorage* storage, int32_t apiId) {
   int32_t createdId = 0;
@@ -56,9 +56,9 @@ extern "C" {
 HAL_CANHandle HAL_InitializeCAN(int32_t busId, HAL_CANManufacturer manufacturer,
                                 int32_t deviceId, HAL_CANDeviceType deviceType,
                                 int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
 
-  if (busId < 0 || busId > hal::kNumCanBuses) {
+  if (busId < 0 || busId > wpi::hal::kNumCanBuses) {
     *status = PARAMETER_OUT_OF_RANGE;
     return HAL_kInvalidHandle;
   }
@@ -231,7 +231,7 @@ void HAL_ReadCANPacketTimeout(HAL_CANHandle handle, int32_t apiId,
     auto i = can->receives.find(messageId);
     if (i != can->receives.end()) {
       // Found, check if new enough
-      uint64_t now = wpi::Now();
+      uint64_t now = wpi::util::Now();
       if (now - i->second.timeStamp >
           (static_cast<uint64_t>(timeoutMs) * 1000)) {
         // Timeout, return bad status

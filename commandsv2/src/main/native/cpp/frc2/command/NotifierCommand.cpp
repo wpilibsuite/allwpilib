@@ -6,10 +6,10 @@
 
 #include <utility>
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 NotifierCommand::NotifierCommand(std::function<void()> toRun,
-                                 units::second_t period,
+                                 wpi::units::second_t period,
                                  Requirements requirements)
     : m_toRun(toRun), m_notifier{std::move(toRun)}, m_period{period} {
   AddRequirements(requirements);
@@ -24,7 +24,7 @@ NotifierCommand::NotifierCommand(NotifierCommand&& other)
 NotifierCommand::NotifierCommand(const NotifierCommand& other)
     : CommandHelper(other),
       m_toRun(other.m_toRun),
-      m_notifier(frc::Notifier(other.m_toRun)),
+      m_notifier(wpi::Notifier(other.m_toRun)),
       m_period(other.m_period) {}
 
 void NotifierCommand::Initialize() {

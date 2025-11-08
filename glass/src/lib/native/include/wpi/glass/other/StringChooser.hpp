@@ -10,7 +10,7 @@
 
 #include "wpi/glass/Model.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 class StringChooserModel : public Model {
  public:
@@ -24,4 +24,4 @@ class StringChooserModel : public Model {
 
 void DisplayStringChooser(StringChooserModel* model);
 
-}  // namespace glass
+}  // namespace wpi::glass

@@ -51,7 +51,7 @@ class ProviderContainer {
 
  private:
   std::shared_mutex m_mutex;
-  wpi::StringMap<std::shared_ptr<HALSimWSBaseProvider>> m_providers;
+  wpi::util::StringMap<std::shared_ptr<HALSimWSBaseProvider>> m_providers;
 };
 
 }  // namespace wpilibws

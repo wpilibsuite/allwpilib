@@ -16,7 +16,7 @@
 
 #include "apriltag.h"
 
-using namespace frc;
+using namespace wpi::apriltag;
 
 static_assert(sizeof(AprilTagDetection) == sizeof(apriltag_detection_t),
               "structure sizes don't match");

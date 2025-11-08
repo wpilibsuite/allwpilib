@@ -29,15 +29,15 @@ struct Notifier {
   uint64_t waitTime = UINT64_MAX;
   bool active = true;
   bool waitTimeValid = false;  // True if waitTime is set and in the future
-  wpi::mutex mutex;
-  wpi::condition_variable cond;
+  wpi::util::mutex mutex;
+  wpi::util::condition_variable cond;
 };
 }  // namespace
 
-using namespace hal;
+using namespace wpi::hal;
 
-static wpi::mutex notifiersWaiterMutex;
-static wpi::condition_variable notifiersWaiterCond;
+static wpi::util::mutex notifiersWaiterMutex;
+static wpi::util::condition_variable notifiersWaiterCond;
 
 class NotifierHandleContainer
     : public UnlimitedHandleResource<HAL_NotifierHandle, Notifier,
@@ -58,17 +58,17 @@ class NotifierHandleContainer
 
 static NotifierHandleContainer* notifierHandles;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeNotifier() {
   static NotifierHandleContainer nH;
   notifierHandles = &nH;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 
 HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
   std::shared_ptr<Notifier> notifier = std::make_shared<Notifier>();
   HAL_NotifierHandle handle = notifierHandles->Allocate(notifier);
   if (handle == HAL_kInvalidHandle) {

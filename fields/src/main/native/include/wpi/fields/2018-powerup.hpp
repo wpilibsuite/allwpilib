@@ -6,7 +6,7 @@
 
 #include <string_view>
 
-namespace fields {
+namespace wpi::fields {
 std::string_view GetResource_2018_powerup_json();
 std::string_view GetResource_2018_field_jpg();
-}  // namespace fields
+}  // namespace wpi::fields

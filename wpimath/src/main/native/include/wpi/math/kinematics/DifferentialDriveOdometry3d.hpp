@@ -12,7 +12,7 @@
 #include "wpi/units/length.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
-namespace frc {
+namespace wpi::math {
 /**
  * Class for differential drive odometry. Odometry allows you to track the
  * robot's position on the field over the course of a match using readings from
@@ -41,8 +41,8 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry3d
    * @param initialPose The starting position of the robot on the field.
    */
   explicit DifferentialDriveOdometry3d(const Rotation3d& gyroAngle,
-                                       units::meter_t leftDistance,
-                                       units::meter_t rightDistance,
+                                       wpi::units::meter_t leftDistance,
+                                       wpi::units::meter_t rightDistance,
                                        const Pose3d& initialPose = Pose3d{});
 
   /**
@@ -59,8 +59,8 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry3d
    * @param leftDistance The distance traveled by the left encoder.
    * @param rightDistance The distance traveled by the right encoder.
    */
-  void ResetPosition(const Rotation3d& gyroAngle, units::meter_t leftDistance,
-                     units::meter_t rightDistance, const Pose3d& pose) {
+  void ResetPosition(const Rotation3d& gyroAngle, wpi::units::meter_t leftDistance,
+                     wpi::units::meter_t rightDistance, const Pose3d& pose) {
     Odometry3d::ResetPosition(gyroAngle, {leftDistance, rightDistance}, pose);
   }
 
@@ -75,12 +75,12 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry3d
    * @param rightDistance The distance traveled by the right encoder.
    * @return The new pose of the robot.
    */
-  const Pose3d& Update(const Rotation3d& gyroAngle, units::meter_t leftDistance,
-                       units::meter_t rightDistance) {
+  const Pose3d& Update(const Rotation3d& gyroAngle, wpi::units::meter_t leftDistance,
+                       wpi::units::meter_t rightDistance) {
     return Odometry3d::Update(gyroAngle, {leftDistance, rightDistance});
   }
 
  private:
-  DifferentialDriveKinematics m_kinematicsImpl{units::meter_t{1}};
+  DifferentialDriveKinematics m_kinematicsImpl{wpi::units::meter_t{1}};
 };
-}  // namespace frc
+}  // namespace wpi::math

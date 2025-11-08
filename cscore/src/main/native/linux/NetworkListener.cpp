@@ -20,31 +20,31 @@
 #include "Notifier.hpp"
 #include "wpi/util/SafeThread.hpp"
 
-using namespace cs;
+using namespace wpi::cs;
 
 class NetworkListener::Impl {
  public:
-  Impl(wpi::Logger& logger, Notifier& notifier)
+  Impl(wpi::util::Logger& logger, Notifier& notifier)
       : m_logger(logger), m_notifier(notifier) {}
 
-  wpi::Logger& m_logger;
+  wpi::util::Logger& m_logger;
   Notifier& m_notifier;
 
-  class Thread : public wpi::SafeThread {
+  class Thread : public wpi::util::SafeThread {
    public:
-    Thread(wpi::Logger& logger, Notifier& notifier)
+    Thread(wpi::util::Logger& logger, Notifier& notifier)
         : m_logger(logger), m_notifier(notifier) {}
     void Main() override;
 
-    wpi::Logger& m_logger;
+    wpi::util::Logger& m_logger;
     Notifier& m_notifier;
     int m_command_fd = -1;
   };
 
-  wpi::SafeThreadOwner<Thread> m_owner;
+  wpi::util::SafeThreadOwner<Thread> m_owner;
 };
 
-NetworkListener::NetworkListener(wpi::Logger& logger, Notifier& notifier)
+NetworkListener::NetworkListener(wpi::util::Logger& logger, Notifier& notifier)
     : m_impl(std::make_unique<Impl>(logger, notifier)) {}
 
 NetworkListener::~NetworkListener() {

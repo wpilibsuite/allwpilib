@@ -1,5 +1,5 @@
 classes:
-  frc::ExpansionHubMotor:
+  wpi::ExpansionHubMotor:
     methods:
       ExpansionHubMotor:
       SetPercentagePower:

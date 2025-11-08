@@ -11,7 +11,7 @@
 #include "wpi/commands2/Commands.hpp"
 #include "wpi/util/Demangle.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 Subsystem::~Subsystem() {
   CommandScheduler::GetInstance().UnregisterSubsystem(this);
 }
@@ -21,7 +21,7 @@ void Subsystem::Periodic() {}
 void Subsystem::SimulationPeriodic() {}
 
 std::string Subsystem::GetName() const {
-  return wpi::GetTypeName(*this);
+  return wpi::util::GetTypeName(*this);
 }
 
 void Subsystem::SetDefaultCommand(CommandPtr&& defaultCommand) {
@@ -72,6 +72,6 @@ CommandPtr Subsystem::StartRun(std::function<void()> start,
   return cmd::StartRun(std::move(start), std::move(run), {this});
 }
 
-CommandPtr Subsystem::Defer(wpi::unique_function<CommandPtr()> supplier) {
+CommandPtr Subsystem::Defer(wpi::util::unique_function<CommandPtr()> supplier) {
   return cmd::Defer(std::move(supplier), {this});
 }

@@ -7,7 +7,7 @@
 #include <string>
 
 /** WPILib FileSystem namespace */
-namespace frc::filesystem {
+namespace wpi::filesystem {
 
 /**
  * Obtains the current working path that the program was launched with.
@@ -36,4 +36,4 @@ std::string GetOperatingDirectory();
  */
 std::string GetDeployDirectory();
 
-}  // namespace frc::filesystem
+}  // namespace wpi::filesystem

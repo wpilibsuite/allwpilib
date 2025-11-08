@@ -15,8 +15,8 @@ class ProtoTest : public testing::Test {};
 TYPED_TEST_SUITE_P(ProtoTest);
 
 TYPED_TEST_P(ProtoTest, RoundTrip) {
-  wpi::ProtobufMessage<decltype(TypeParam::kTestData)> message;
-  wpi::SmallVector<uint8_t, 64> buf;
+  wpi::util::ProtobufMessage<decltype(TypeParam::kTestData)> message;
+  wpi::util::SmallVector<uint8_t, 64> buf;
 
   ASSERT_TRUE(message.Pack(buf, TypeParam::kTestData));
   auto unpacked_data = message.Unpack(buf);

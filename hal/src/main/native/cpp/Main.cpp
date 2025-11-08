@@ -16,8 +16,8 @@ static void (*gMainFunc)(void*) = DefaultMain;
 static void (*gExitFunc)(void*) = DefaultExit;
 static bool gExited = false;
 struct MainObj {
-  wpi::mutex gExitMutex;
-  wpi::condition_variable gExitCv;
+  wpi::util::mutex gExitMutex;
+  wpi::util::condition_variable gExitCv;
 };
 
 static MainObj* mainObj;
@@ -33,12 +33,12 @@ static void DefaultExit(void*) {
   mainObj->gExitCv.notify_all();
 }
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeMain() {
   static MainObj mO;
   mainObj = &mO;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 

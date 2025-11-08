@@ -6,22 +6,22 @@
 
 #include "wpimath/protobuf/geometry2d.npb.h"
 
-std::optional<frc::Twist2d> wpi::Protobuf<frc::Twist2d>::Unpack(
+std::optional<wpi::math::Twist2d> wpi::util::Protobuf<wpi::math::Twist2d>::Unpack(
     InputStream& stream) {
   wpi_proto_ProtobufTwist2d msg;
   if (!stream.Decode(msg)) {
     return {};
   }
 
-  return frc::Twist2d{
-      units::meter_t{msg.dx},
-      units::meter_t{msg.dy},
-      units::radian_t{msg.dtheta},
+  return wpi::math::Twist2d{
+      wpi::units::meter_t{msg.dx},
+      wpi::units::meter_t{msg.dy},
+      wpi::units::radian_t{msg.dtheta},
   };
 }
 
-bool wpi::Protobuf<frc::Twist2d>::Pack(OutputStream& stream,
-                                       const frc::Twist2d& value) {
+bool wpi::util::Protobuf<wpi::math::Twist2d>::Pack(OutputStream& stream,
+                                       const wpi::math::Twist2d& value) {
   wpi_proto_ProtobufTwist2d msg{
       .dx = value.dx.value(),
       .dy = value.dy.value(),

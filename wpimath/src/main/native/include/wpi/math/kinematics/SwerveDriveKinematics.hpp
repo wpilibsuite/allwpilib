@@ -24,7 +24,7 @@
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * Helper class that converts a chassis velocity (dx, dy, and dtheta components)
@@ -50,8 +50,8 @@ namespace frc {
  */
 template <size_t NumModules>
 class SwerveDriveKinematics
-    : public Kinematics<wpi::array<SwerveModuleState, NumModules>,
-                        wpi::array<SwerveModulePosition, NumModules>> {
+    : public Kinematics<wpi::util::array<SwerveModuleState, NumModules>,
+                        wpi::util::array<SwerveModulePosition, NumModules>> {
  public:
   /**
    * Constructs a swerve drive kinematics object. This takes in a variable
@@ -67,7 +67,7 @@ class SwerveDriveKinematics
   template <std::convertible_to<Translation2d>... ModuleTranslations>
     requires(sizeof...(ModuleTranslations) == NumModules)
   explicit SwerveDriveKinematics(ModuleTranslations&&... moduleTranslations)
-      : m_modules{moduleTranslations...}, m_moduleHeadings(wpi::empty_array) {
+      : m_modules{moduleTranslations...}, m_moduleHeadings(wpi::util::empty_array) {
     for (size_t i = 0; i < NumModules; i++) {
       // clang-format off
       m_inverseKinematics.template block<2, 3>(i * 2, 0) <<
@@ -82,8 +82,8 @@ class SwerveDriveKinematics
   }
 
   explicit SwerveDriveKinematics(
-      const wpi::array<Translation2d, NumModules>& modules)
-      : m_modules{modules}, m_moduleHeadings(wpi::empty_array) {
+      const wpi::util::array<Translation2d, NumModules>& modules)
+      : m_modules{modules}, m_moduleHeadings(wpi::util::empty_array) {
     for (size_t i = 0; i < NumModules; i++) {
       // clang-format off
       m_inverseKinematics.template block<2, 3>(i * 2, 0) <<
@@ -108,7 +108,7 @@ class SwerveDriveKinematics
     requires(sizeof...(ModuleHeadings) == NumModules)
   void ResetHeadings(ModuleHeadings&&... moduleHeadings) {
     return this->ResetHeadings(
-        wpi::array<Rotation2d, NumModules>{moduleHeadings...});
+        wpi::util::array<Rotation2d, NumModules>{moduleHeadings...});
   }
 
   /**
@@ -116,7 +116,7 @@ class SwerveDriveKinematics
    * @param moduleHeadings The swerve module headings. The order of the module
    * headings should be same as passed into the constructor of this class.
    */
-  void ResetHeadings(wpi::array<Rotation2d, NumModules> moduleHeadings) {
+  void ResetHeadings(wpi::util::array<Rotation2d, NumModules> moduleHeadings) {
     for (size_t i = 0; i < NumModules; i++) {
       m_moduleHeadings[i] = moduleHeadings[i];
     }
@@ -144,8 +144,8 @@ class SwerveDriveKinematics
    * @return An array containing the module states. Use caution because these
    * module states are not normalized. Sometimes, a user input may cause one of
    * the module speeds to go above the attainable max velocity. Use the
-   * DesaturateWheelSpeeds(wpi::array<SwerveModuleState, NumModules>*,
-   * units::meters_per_second_t) function to rectify this issue. In addition,
+   * DesaturateWheelSpeeds(wpi::util::array<SwerveModuleState, NumModules>*,
+   * wpi::units::meters_per_second_t) function to rectify this issue. In addition,
    * you can leverage the power of C++17 to directly assign the module states to
    * variables:
    *
@@ -153,10 +153,10 @@ class SwerveDriveKinematics
    * auto [fl, fr, bl, br] = kinematics.ToSwerveModuleStates(chassisSpeeds);
    * @endcode
    */
-  wpi::array<SwerveModuleState, NumModules> ToSwerveModuleStates(
+  wpi::util::array<SwerveModuleState, NumModules> ToSwerveModuleStates(
       const ChassisSpeeds& chassisSpeeds,
       const Translation2d& centerOfRotation = Translation2d{}) const {
-    wpi::array<SwerveModuleState, NumModules> moduleStates(wpi::empty_array);
+    wpi::util::array<SwerveModuleState, NumModules> moduleStates(wpi::util::empty_array);
 
     if (chassisSpeeds.vx == 0_mps && chassisSpeeds.vy == 0_mps &&
         chassisSpeeds.omega == 0_rad_per_s) {
@@ -188,10 +188,10 @@ class SwerveDriveKinematics
         m_inverseKinematics * chassisSpeedsVector;
 
     for (size_t i = 0; i < NumModules; i++) {
-      units::meters_per_second_t x{moduleStateMatrix(i * 2, 0)};
-      units::meters_per_second_t y{moduleStateMatrix(i * 2 + 1, 0)};
+      wpi::units::meters_per_second_t x{moduleStateMatrix(i * 2, 0)};
+      wpi::units::meters_per_second_t y{moduleStateMatrix(i * 2 + 1, 0)};
 
-      auto speed = units::math::hypot(x, y);
+      auto speed = wpi::units::math::hypot(x, y);
       auto rotation = speed > 1e-6_mps ? Rotation2d{x.value(), y.value()}
                                        : m_moduleHeadings[i];
 
@@ -202,7 +202,7 @@ class SwerveDriveKinematics
     return moduleStates;
   }
 
-  wpi::array<SwerveModuleState, NumModules> ToWheelSpeeds(
+  wpi::util::array<SwerveModuleState, NumModules> ToWheelSpeeds(
       const ChassisSpeeds& chassisSpeeds) const override {
     return ToSwerveModuleStates(chassisSpeeds);
   }
@@ -223,7 +223,7 @@ class SwerveDriveKinematics
     requires(sizeof...(ModuleStates) == NumModules)
   ChassisSpeeds ToChassisSpeeds(ModuleStates&&... moduleStates) const {
     return this->ToChassisSpeeds(
-        wpi::array<SwerveModuleState, NumModules>{moduleStates...});
+        wpi::util::array<SwerveModuleState, NumModules>{moduleStates...});
   }
 
   /**
@@ -232,14 +232,14 @@ class SwerveDriveKinematics
    * the robot's position on the field using data from the real-world speed and
    * angle of each module on the robot.
    *
-   * @param moduleStates The state of the modules as an wpi::array of type
+   * @param moduleStates The state of the modules as an wpi::util::array of type
    * SwerveModuleState, NumModules long as measured from respective encoders
    * and gyros. The order of the swerve module states should be same as passed
    * into the constructor of this class.
    *
    * @return The resulting chassis speed.
    */
-  ChassisSpeeds ToChassisSpeeds(const wpi::array<SwerveModuleState, NumModules>&
+  ChassisSpeeds ToChassisSpeeds(const wpi::util::array<SwerveModuleState, NumModules>&
                                     moduleStates) const override {
     Matrixd<NumModules * 2, 1> moduleStateMatrix;
 
@@ -253,9 +253,9 @@ class SwerveDriveKinematics
     Eigen::Vector3d chassisSpeedsVector =
         m_forwardKinematics.solve(moduleStateMatrix);
 
-    return {units::meters_per_second_t{chassisSpeedsVector(0)},
-            units::meters_per_second_t{chassisSpeedsVector(1)},
-            units::radians_per_second_t{chassisSpeedsVector(2)}};
+    return {wpi::units::meters_per_second_t{chassisSpeedsVector(0)},
+            wpi::units::meters_per_second_t{chassisSpeedsVector(1)},
+            wpi::units::radians_per_second_t{chassisSpeedsVector(2)}};
   }
 
   /**
@@ -275,7 +275,7 @@ class SwerveDriveKinematics
     requires(sizeof...(ModuleDeltas) == NumModules)
   Twist2d ToTwist2d(ModuleDeltas&&... moduleDeltas) const {
     return this->ToTwist2d(
-        wpi::array<SwerveModulePosition, NumModules>{moduleDeltas...});
+        wpi::util::array<SwerveModulePosition, NumModules>{moduleDeltas...});
   }
 
   /**
@@ -292,7 +292,7 @@ class SwerveDriveKinematics
    * @return The resulting Twist2d.
    */
   Twist2d ToTwist2d(
-      wpi::array<SwerveModulePosition, NumModules> moduleDeltas) const {
+      wpi::util::array<SwerveModulePosition, NumModules> moduleDeltas) const {
     Matrixd<NumModules * 2, 1> moduleDeltaMatrix;
 
     for (size_t i = 0; i < NumModules; ++i) {
@@ -306,16 +306,16 @@ class SwerveDriveKinematics
     Eigen::Vector3d chassisDeltaVector =
         m_forwardKinematics.solve(moduleDeltaMatrix);
 
-    return {units::meter_t{chassisDeltaVector(0)},
-            units::meter_t{chassisDeltaVector(1)},
-            units::radian_t{chassisDeltaVector(2)}};
+    return {wpi::units::meter_t{chassisDeltaVector(0)},
+            wpi::units::meter_t{chassisDeltaVector(1)},
+            wpi::units::radian_t{chassisDeltaVector(2)}};
   }
 
   Twist2d ToTwist2d(
-      const wpi::array<SwerveModulePosition, NumModules>& start,
-      const wpi::array<SwerveModulePosition, NumModules>& end) const override {
+      const wpi::util::array<SwerveModulePosition, NumModules>& start,
+      const wpi::util::array<SwerveModulePosition, NumModules>& end) const override {
     auto result =
-        wpi::array<SwerveModulePosition, NumModules>(wpi::empty_array);
+        wpi::util::array<SwerveModulePosition, NumModules>(wpi::util::empty_array);
     for (size_t i = 0; i < NumModules; i++) {
       result[i] = {end[i].distance - start[i].distance, end[i].angle};
     }
@@ -343,14 +343,14 @@ class SwerveDriveKinematics
    * @param attainableMaxSpeed The absolute max speed that a module can reach.
    */
   static void DesaturateWheelSpeeds(
-      wpi::array<SwerveModuleState, NumModules>* moduleStates,
-      units::meters_per_second_t attainableMaxSpeed) {
+      wpi::util::array<SwerveModuleState, NumModules>* moduleStates,
+      wpi::units::meters_per_second_t attainableMaxSpeed) {
     auto& states = *moduleStates;
     auto realMaxSpeed =
-        units::math::abs(std::max_element(states.begin(), states.end(),
+        wpi::units::math::abs(std::max_element(states.begin(), states.end(),
                                           [](const auto& a, const auto& b) {
-                                            return units::math::abs(a.speed) <
-                                                   units::math::abs(b.speed);
+                                            return wpi::units::math::abs(a.speed) <
+                                                   wpi::units::math::abs(b.speed);
                                           })
                              ->speed);
 
@@ -388,18 +388,18 @@ class SwerveDriveKinematics
    * reach while rotating
    */
   static void DesaturateWheelSpeeds(
-      wpi::array<SwerveModuleState, NumModules>* moduleStates,
+      wpi::util::array<SwerveModuleState, NumModules>* moduleStates,
       ChassisSpeeds desiredChassisSpeed,
-      units::meters_per_second_t attainableMaxModuleSpeed,
-      units::meters_per_second_t attainableMaxRobotTranslationSpeed,
-      units::radians_per_second_t attainableMaxRobotRotationSpeed) {
+      wpi::units::meters_per_second_t attainableMaxModuleSpeed,
+      wpi::units::meters_per_second_t attainableMaxRobotTranslationSpeed,
+      wpi::units::radians_per_second_t attainableMaxRobotRotationSpeed) {
     auto& states = *moduleStates;
 
     auto realMaxSpeed =
-        units::math::abs(std::max_element(states.begin(), states.end(),
+        wpi::units::math::abs(std::max_element(states.begin(), states.end(),
                                           [](const auto& a, const auto& b) {
-                                            return units::math::abs(a.speed) <
-                                                   units::math::abs(b.speed);
+                                            return wpi::units::math::abs(a.speed) <
+                                                   wpi::units::math::abs(b.speed);
                                           })
                              ->speed);
 
@@ -410,42 +410,42 @@ class SwerveDriveKinematics
     }
 
     auto translationalK =
-        units::math::hypot(desiredChassisSpeed.vx, desiredChassisSpeed.vy) /
+        wpi::units::math::hypot(desiredChassisSpeed.vx, desiredChassisSpeed.vy) /
         attainableMaxRobotTranslationSpeed;
 
-    auto rotationalK = units::math::abs(desiredChassisSpeed.omega) /
+    auto rotationalK = wpi::units::math::abs(desiredChassisSpeed.omega) /
                        attainableMaxRobotRotationSpeed;
 
-    auto k = units::math::max(translationalK, rotationalK);
+    auto k = wpi::units::math::max(translationalK, rotationalK);
 
-    auto scale = units::math::min(k * attainableMaxModuleSpeed / realMaxSpeed,
-                                  units::scalar_t{1});
+    auto scale = wpi::units::math::min(k * attainableMaxModuleSpeed / realMaxSpeed,
+                                  wpi::units::scalar_t{1});
     for (auto& module : states) {
       module.speed = module.speed * scale;
     }
   }
 
-  wpi::array<SwerveModulePosition, NumModules> Interpolate(
-      const wpi::array<SwerveModulePosition, NumModules>& start,
-      const wpi::array<SwerveModulePosition, NumModules>& end,
+  wpi::util::array<SwerveModulePosition, NumModules> Interpolate(
+      const wpi::util::array<SwerveModulePosition, NumModules>& start,
+      const wpi::util::array<SwerveModulePosition, NumModules>& end,
       double t) const override {
     auto result =
-        wpi::array<SwerveModulePosition, NumModules>(wpi::empty_array);
+        wpi::util::array<SwerveModulePosition, NumModules>(wpi::util::empty_array);
     for (size_t i = 0; i < NumModules; ++i) {
       result[i] = start[i].Interpolate(end[i], t);
     }
     return {result};
   }
 
-  const wpi::array<Translation2d, NumModules>& GetModules() const {
+  const wpi::util::array<Translation2d, NumModules>& GetModules() const {
     return m_modules;
   }
 
  private:
-  wpi::array<Translation2d, NumModules> m_modules;
+  wpi::util::array<Translation2d, NumModules> m_modules;
   mutable Matrixd<NumModules * 2, 3> m_inverseKinematics;
   Eigen::HouseholderQR<Matrixd<NumModules * 2, 3>> m_forwardKinematics;
-  mutable wpi::array<Rotation2d, NumModules> m_moduleHeadings;
+  mutable wpi::util::array<Rotation2d, NumModules> m_moduleHeadings;
 
   mutable Translation2d m_previousCoR;
 };
@@ -457,4 +457,4 @@ SwerveDriveKinematics(ModuleTranslation, ModuleTranslations...)
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
     SwerveDriveKinematics<4>;
 
-}  // namespace frc
+}  // namespace wpi::math

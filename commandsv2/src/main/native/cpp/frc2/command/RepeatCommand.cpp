@@ -9,7 +9,7 @@
 
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 RepeatCommand::RepeatCommand(std::unique_ptr<Command>&& command) {
   CommandScheduler::GetInstance().RequireUngroupedAndUnscheduled(command.get());
@@ -58,7 +58,7 @@ Command::InterruptionBehavior RepeatCommand::GetInterruptionBehavior() const {
   return m_command->GetInterruptionBehavior();
 }
 
-void RepeatCommand::InitSendable(wpi::SendableBuilder& builder) {
+void RepeatCommand::InitSendable(wpi::util::SendableBuilder& builder) {
   Command::InitSendable(builder);
   builder.AddStringProperty(
       "command", [this] { return m_command->GetName(); }, nullptr);

@@ -25,7 +25,7 @@
 #include "wpi/util/json.hpp"
 #include "wpi/util/struct/DynamicStruct.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 class DataSource;
 
@@ -43,7 +43,7 @@ class NetworkTablesModel : public Model {
                         int64_t time);
 
     /** The latest value. */
-    nt::Value value;
+    wpi::nt::Value value;
 
     /** String representation of the value (for arrays / complex values). */
     std::string valueStr;
@@ -91,18 +91,18 @@ class NetworkTablesModel : public Model {
       ValueSource::UpdateFromValue(model, info.name, info.type_str);
     }
 
-    void UpdateTopic(nt::Event&& event) {
-      if (std::holds_alternative<nt::TopicInfo>(event.data)) {
-        UpdateInfo(std::get<nt::TopicInfo>(std::move(event.data)));
+    void UpdateTopic(wpi::nt::Event&& event) {
+      if (std::holds_alternative<wpi::nt::TopicInfo>(event.data)) {
+        UpdateInfo(std::get<wpi::nt::TopicInfo>(std::move(event.data)));
       }
     }
-    void UpdateInfo(nt::TopicInfo&& info_);
+    void UpdateInfo(wpi::nt::TopicInfo&& info_);
 
     /** Topic information. */
-    nt::TopicInfo info;
+    wpi::nt::TopicInfo info;
 
     /** JSON representation of the topic properties. */
-    wpi::json properties;
+    wpi::util::json properties;
 
     /** Specific common property flags. */
     bool persistent{false};
@@ -111,8 +111,8 @@ class NetworkTablesModel : public Model {
     /** Publisher (created when the value changes). */
     NT_Publisher publisher{0};
 
-    std::vector<nt::meta::TopicPublisher> publishers;
-    std::vector<nt::meta::TopicSubscriber> subscribers;
+    std::vector<wpi::nt::meta::TopicPublisher> publishers;
+    std::vector<wpi::nt::meta::TopicSubscriber> subscribers;
   };
 
   struct TreeNode {
@@ -134,17 +134,17 @@ class NetworkTablesModel : public Model {
     std::vector<TreeNode> children;
   };
 
-  struct Client : public nt::meta::Client {
+  struct Client : public wpi::nt::meta::Client {
     Client() = default;
-    /*implicit*/ Client(nt::meta::Client&& oth)  // NOLINT
-        : nt::meta::Client{std::move(oth)} {}
+    /*implicit*/ Client(wpi::nt::meta::Client&& oth)  // NOLINT
+        : wpi::nt::meta::Client{std::move(oth)} {}
 
-    struct Subscriber : public nt::meta::ClientSubscriber {
-      /*implicit*/ Subscriber(nt::meta::ClientSubscriber&& oth);  // NOLINT
+    struct Subscriber : public wpi::nt::meta::ClientSubscriber {
+      /*implicit*/ Subscriber(wpi::nt::meta::ClientSubscriber&& oth);  // NOLINT
       std::string topicsStr;
     };
 
-    std::vector<nt::meta::ClientPublisher> publishers;
+    std::vector<wpi::nt::meta::ClientPublisher> publishers;
     std::vector<Subscriber> subscribers;
 
     void UpdatePublishers(std::span<const uint8_t> data);
@@ -152,12 +152,12 @@ class NetworkTablesModel : public Model {
   };
 
   NetworkTablesModel();
-  explicit NetworkTablesModel(nt::NetworkTableInstance inst);
+  explicit NetworkTablesModel(wpi::nt::NetworkTableInstance inst);
 
   void Update() override;
   bool Exists() override;
 
-  nt::NetworkTableInstance GetInstance() { return m_inst; }
+  wpi::nt::NetworkTableInstance GetInstance() { return m_inst; }
   const std::vector<Entry*>& GetEntries() const { return m_sortedEntries; }
   const std::vector<TreeNode>& GetTreeRoot() const { return m_root; }
   const std::vector<TreeNode>& GetPersistentTreeRoot() const {
@@ -176,7 +176,7 @@ class NetworkTablesModel : public Model {
   Entry* GetEntry(std::string_view name);
   Entry* AddEntry(NT_Topic topic);
 
-  wpi::StructDescriptorDatabase& GetStructDatabase() { return m_structDb; }
+  wpi::util::StructDescriptorDatabase& GetStructDatabase() { return m_structDb; }
   upb_DefPool* GetProtobufDatabase() { return m_protoPool; }
   upb_Arena* GetProtobufArena() { return m_arena; }
 
@@ -185,9 +185,9 @@ class NetworkTablesModel : public Model {
   void RebuildTreeImpl(std::vector<TreeNode>* tree, int category);
   void UpdateClients(std::span<const uint8_t> data);
 
-  nt::NetworkTableInstance m_inst;
-  nt::NetworkTableListenerPoller m_poller;
-  wpi::DenseMap<NT_Topic, std::unique_ptr<Entry>> m_entries;
+  wpi::nt::NetworkTableInstance m_inst;
+  wpi::nt::NetworkTableListenerPoller m_poller;
+  wpi::util::DenseMap<NT_Topic, std::unique_ptr<Entry>> m_entries;
 
   // sorted by name
   std::vector<Entry*> m_sortedEntries;
@@ -200,7 +200,7 @@ class NetworkTablesModel : public Model {
   std::map<std::string, Client, std::less<>> m_clients;
   Client m_server;
 
-  wpi::StructDescriptorDatabase m_structDb;
+  wpi::util::StructDescriptorDatabase m_structDb;
   upb_DefPool* m_protoPool = upb_DefPool_New();
   upb_Arena* m_arena = upb_Arena_New();
 };
@@ -273,4 +273,4 @@ class NetworkTablesView : public View {
   NetworkTablesFlagsSettings m_flags;
 };
 
-}  // namespace glass
+}  // namespace wpi::glass

@@ -6,9 +6,9 @@
 
 #include "wpi/system/RobotController.hpp"
 
-using namespace frc;
+using namespace wpi;
 
-void MotorController::SetVoltage(units::volt_t output) {
+void MotorController::SetVoltage(wpi::units::volt_t output) {
   // NOLINTNEXTLINE(bugprone-integer-division)
   Set(output / RobotController::GetBatteryVoltage());
 }

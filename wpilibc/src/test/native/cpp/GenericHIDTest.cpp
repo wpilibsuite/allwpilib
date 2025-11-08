@@ -7,7 +7,7 @@
 #include "wpi/driverstation/GenericHID.hpp"
 #include "wpi/simulation/GenericHIDSim.hpp"
 
-using namespace frc;
+using namespace wpi;
 using RumbleType = GenericHID::RumbleType;
 static constexpr double kEpsilon = 0.0001;
 TEST(GenericHIDTest, RumbleRange) {

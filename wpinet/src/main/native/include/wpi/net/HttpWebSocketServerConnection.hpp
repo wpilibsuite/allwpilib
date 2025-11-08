@@ -17,7 +17,7 @@
 #include "wpi/net/uv/Stream.hpp"
 #include "wpi/util/SmallVector.hpp"
 
-namespace wpi {
+namespace wpi::net {
 
 /**
  * A server-side HTTP connection that also accepts WebSocket upgrades.
@@ -43,7 +43,7 @@ class HttpWebSocketServerConnection
     // Handle upgrade event
     m_helper.upgrade.connect([this] {
       // Negotiate sub-protocol
-      SmallVector<std::string_view, 2> protocols{m_protocols.begin(),
+      wpi::util::SmallVector<std::string_view, 2> protocols{m_protocols.begin(),
                                                  m_protocols.end()};
       std::string_view protocol = m_helper.MatchProtocol(protocols).second;
 
@@ -118,9 +118,9 @@ class HttpWebSocketServerConnection
 
  private:
   WebSocketServerHelper m_helper;
-  SmallVector<std::string, 2> m_protocols;
+  wpi::util::SmallVector<std::string, 2> m_protocols;
 };
 
-}  // namespace wpi
+}  // namespace wpi::net
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_HTTPWEBSOCKETSERVERCONNECTION_HPP_

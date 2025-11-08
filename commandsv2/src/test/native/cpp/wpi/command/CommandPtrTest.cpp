@@ -10,7 +10,7 @@
 #include "wpi/commands2/Commands.hpp"
 #include "wpi/system/Errors.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 class CommandPtrTest : public CommandTestBase {};
 
 TEST_F(CommandPtrTest, MovedFrom) {
@@ -27,16 +27,16 @@ TEST_F(CommandPtrTest, MovedFrom) {
   EXPECT_EQ(1, counter);
   EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(movedTo));
 
-  EXPECT_THROW(scheduler.Schedule(movedFrom), frc::RuntimeError);
+  EXPECT_THROW(scheduler.Schedule(movedFrom), wpi::RuntimeError);
   // NOLINTNEXTLINE(clang-analyzer-cplusplus.Move)
-  EXPECT_THROW(movedFrom.IsScheduled(), frc::RuntimeError);
+  EXPECT_THROW(movedFrom.IsScheduled(), wpi::RuntimeError);
   EXPECT_THROW(static_cast<void>(std::move(movedFrom).Repeatedly()),
-               frc::RuntimeError);
+               wpi::RuntimeError);
 
   EXPECT_EQ(1, counter);
 }
 
 TEST_F(CommandPtrTest, NullInitialization) {
   EXPECT_THROW(auto cmd = CommandPtr{std::unique_ptr<Command>{}},
-               frc::RuntimeError);
+               wpi::RuntimeError);
 }

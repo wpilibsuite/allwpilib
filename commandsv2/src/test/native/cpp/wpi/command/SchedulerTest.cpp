@@ -10,7 +10,7 @@
 #include "wpi/commands2/RunCommand.hpp"
 #include "wpi/commands2/StartEndCommand.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 class SchedulerTest : public CommandTestBase {};
 
 TEST_F(SchedulerTest, SchedulerLambdaTestNoInterrupt) {
@@ -176,9 +176,9 @@ TEST_F(SchedulerTest, ScheduleScheduledNoOp) {
 }
 
 class TrackDestroyCommand
-    : public frc2::CommandHelper<Command, TrackDestroyCommand> {
+    : public wpi::cmd::CommandHelper<Command, TrackDestroyCommand> {
  public:
-  explicit TrackDestroyCommand(wpi::unique_function<void()> deleteFunc)
+  explicit TrackDestroyCommand(wpi::util::unique_function<void()> deleteFunc)
       : m_deleteFunc{std::move(deleteFunc)} {}
   TrackDestroyCommand(TrackDestroyCommand&& other)
       : m_deleteFunc{std::exchange(other.m_deleteFunc, [] {})} {}
@@ -189,7 +189,7 @@ class TrackDestroyCommand
   ~TrackDestroyCommand() override { m_deleteFunc(); }
 
  private:
-  wpi::unique_function<void()> m_deleteFunc;
+  wpi::util::unique_function<void()> m_deleteFunc;
 };
 
 TEST_F(SchedulerTest, ScheduleCommandPtr) {
@@ -203,7 +203,7 @@ TEST_F(SchedulerTest, ScheduleCommandPtr) {
     auto commandPtr =
         TrackDestroyCommand([&destructionCounter] { destructionCounter++; })
             .AlongWith(
-                frc2::InstantCommand([&runCounter] { runCounter++; }).ToPtr())
+                wpi::cmd::InstantCommand([&runCounter] { runCounter++; }).ToPtr())
             .Until([&finish] { return finish; });
     EXPECT_EQ(destructionCounter, 0) << "Composition should not delete command";
 

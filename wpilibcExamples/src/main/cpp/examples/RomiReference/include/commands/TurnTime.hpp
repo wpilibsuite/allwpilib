@@ -11,7 +11,7 @@
 
 #include "subsystems/Drivetrain.hpp"
 
-class TurnTime : public frc2::CommandHelper<frc2::Command, TurnTime> {
+class TurnTime : public wpi::cmd::CommandHelper<wpi::cmd::Command, TurnTime> {
  public:
   /**
    * Creates a new TurnTime.
@@ -20,7 +20,7 @@ class TurnTime : public frc2::CommandHelper<frc2::Command, TurnTime> {
    * @param time How much time to turn
    * @param drive The drive subsystem on which this command will run
    */
-  TurnTime(double speed, units::second_t time, Drivetrain* drive)
+  TurnTime(double speed, wpi::units::second_t time, Drivetrain* drive)
       : m_speed(speed), m_duration(time), m_drive(drive) {
     AddRequirements(m_drive);
   }
@@ -32,7 +32,7 @@ class TurnTime : public frc2::CommandHelper<frc2::Command, TurnTime> {
 
  private:
   double m_speed;
-  units::second_t m_duration;
+  wpi::units::second_t m_duration;
   Drivetrain* m_drive;
-  frc::Timer m_timer;
+  wpi::Timer m_timer;
 };

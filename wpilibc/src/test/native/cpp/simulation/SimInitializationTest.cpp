@@ -19,7 +19,7 @@
 #include "wpi/simulation/PowerDistributionSim.hpp"
 #include "wpi/simulation/RoboRioSim.hpp"
 
-using namespace frc::sim;
+using namespace wpi::sim;
 
 TEST(SimInitializationTest, AllInitialize) {
   HAL_Initialize(500, 0);

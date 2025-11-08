@@ -8,7 +8,7 @@
 
 #include "wpi/util/SymbolExports.hpp"
 
-namespace frc {
+namespace wpi::apriltag {
 
 /**
  * Loadable AprilTag field layouts.
@@ -32,4 +32,4 @@ enum class AprilTagField {
   kNumFields,
 };
 
-}  // namespace frc
+}  // namespace wpi::apriltag

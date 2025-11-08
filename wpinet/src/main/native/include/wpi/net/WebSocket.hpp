@@ -21,7 +21,7 @@
 #include "wpi/util/Signal.h"
 #include "wpi/util/SmallVector.hpp"
 
-namespace wpi {
+namespace wpi::net {
 
 namespace uv {
 class Stream;
@@ -466,7 +466,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    * Open event.  Emitted when the connection is open and ready to communicate.
    * The parameter is the selected subprotocol.
    */
-  sig::Signal<std::string_view> open;
+  wpi::util::sig::Signal<std::string_view> open;
 
   /**
    * Close event.  Emitted when the connection is closed.  The first parameter
@@ -474,32 +474,32 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    * has been closed.  The second parameter is a human-readable string
    * explaining the reason why the connection has been closed.
    */
-  sig::Signal<uint16_t, std::string_view> closed;
+  wpi::util::sig::Signal<uint16_t, std::string_view> closed;
 
   /**
    * Text message event.  Emitted when a text message is received.
    * The first parameter is the data, the second parameter is true if the
    * data is the last fragment of the message.
    */
-  sig::Signal<std::string_view, bool> text;
+  wpi::util::sig::Signal<std::string_view, bool> text;
 
   /**
    * Binary message event.  Emitted when a binary message is received.
    * The first parameter is the data, the second parameter is true if the
    * data is the last fragment of the message.
    */
-  sig::Signal<std::span<const uint8_t>, bool> binary;
+  wpi::util::sig::Signal<std::span<const uint8_t>, bool> binary;
 
   /**
    * Ping event.  Emitted when a ping message is received.  A pong message is
    * automatically sent in response, so this is simply a notification.
    */
-  sig::Signal<std::span<const uint8_t>> ping;
+  wpi::util::sig::Signal<std::span<const uint8_t>> ping;
 
   /**
    * Pong event.  Emitted when a pong message is received.
    */
-  sig::Signal<std::span<const uint8_t>> pong;
+  wpi::util::sig::Signal<std::span<const uint8_t>> pong;
 
  private:
   // user data
@@ -527,10 +527,10 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
 
   // incoming message buffers/state
   uint64_t m_lastReceivedTime = 0;
-  SmallVector<uint8_t, 14> m_header;
+  wpi::util::SmallVector<uint8_t, 14> m_header;
   size_t m_headerSize = 0;
-  SmallVector<uint8_t, 1024> m_payload;
-  SmallVector<uint8_t, 64> m_controlPayload;
+  wpi::util::SmallVector<uint8_t, 1024> m_payload;
+  wpi::util::SmallVector<uint8_t, 64> m_controlPayload;
   size_t m_frameStart = 0;
   uint64_t m_frameSize = UINT64_MAX;
   uint8_t m_fragmentOpcode = 0;
@@ -559,6 +559,6 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
       const std::function<void(std::span<uv::Buffer>, uv::Error)>& callback);
 };
 
-}  // namespace wpi
+}  // namespace wpi::net
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_WEBSOCKET_HPP_

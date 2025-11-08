@@ -13,13 +13,13 @@
 #include "wpi/commands2/WaitUntilCommand.hpp"
 #include "wpi/simulation/SimHooks.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 class CommandDecoratorTest : public CommandTestBase {};
 
 TEST_F(CommandDecoratorTest, WithTimeout) {
   CommandScheduler scheduler = GetScheduler();
 
-  frc::sim::PauseTiming();
+  wpi::sim::PauseTiming();
 
   auto command = cmd::Idle().WithTimeout(100_ms);
 
@@ -28,13 +28,13 @@ TEST_F(CommandDecoratorTest, WithTimeout) {
 
   EXPECT_TRUE(scheduler.IsScheduled(command));
 
-  frc::sim::StepTiming(150_ms);
+  wpi::sim::StepTiming(150_ms);
 
   scheduler.Run();
 
   EXPECT_FALSE(scheduler.IsScheduled(command));
 
-  frc::sim::ResumeTiming();
+  wpi::sim::ResumeTiming();
 }
 
 TEST_F(CommandDecoratorTest, Until) {

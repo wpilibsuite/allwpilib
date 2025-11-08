@@ -28,9 +28,9 @@
 
 #include "wpi/units/base.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::magnetic_flux
+ * @namespace wpi::units::magnetic_flux
  * @brief namespace for unit types and containers representing magnetic_flux
  *        values
  * @details The SI unit for magnetic_flux is `webers`, and the corresponding
@@ -42,7 +42,7 @@ namespace units {
     defined(ENABLE_PREDEFINED_MAGNETIC_FLUX_UNITS)
 UNIT_ADD_WITH_METRIC_PREFIXES(
     magnetic_flux, weber, webers, Wb,
-    unit<std::ratio<1>, units::category::magnetic_flux_unit>)
+    unit<std::ratio<1>, wpi::units::category::magnetic_flux_unit>)
 UNIT_ADD(magnetic_flux, maxwell, maxwells, Mx,
          unit<std::ratio<1, 100000000>, webers>)
 
@@ -50,4 +50,4 @@ UNIT_ADD_CATEGORY_TRAIT(magnetic_flux)
 #endif
 
 using namespace magnetic_flux;
-}  // namespace units
+}  // namespace wpi::units

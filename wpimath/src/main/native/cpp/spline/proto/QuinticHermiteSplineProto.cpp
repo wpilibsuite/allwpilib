@@ -7,12 +7,12 @@
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 #include "wpimath/protobuf/spline.npb.h"
 
-std::optional<frc::QuinticHermiteSpline>
-wpi::Protobuf<frc::QuinticHermiteSpline>::Unpack(InputStream& stream) {
-  wpi::WpiArrayUnpackCallback<double, 3> xInitial;
-  wpi::WpiArrayUnpackCallback<double, 3> xFinal;
-  wpi::WpiArrayUnpackCallback<double, 3> yInitial;
-  wpi::WpiArrayUnpackCallback<double, 3> yFinal;
+std::optional<wpi::math::QuinticHermiteSpline>
+wpi::util::Protobuf<wpi::math::QuinticHermiteSpline>::Unpack(InputStream& stream) {
+  wpi::util::WpiArrayUnpackCallback<double, 3> xInitial;
+  wpi::util::WpiArrayUnpackCallback<double, 3> xFinal;
+  wpi::util::WpiArrayUnpackCallback<double, 3> yInitial;
+  wpi::util::WpiArrayUnpackCallback<double, 3> yFinal;
   wpi_proto_ProtobufQuinticHermiteSpline msg{
       .x_initial = xInitial.Callback(),
       .x_final = xFinal.Callback(),
@@ -28,7 +28,7 @@ wpi::Protobuf<frc::QuinticHermiteSpline>::Unpack(InputStream& stream) {
     return {};
   }
 
-  return frc::QuinticHermiteSpline{
+  return wpi::math::QuinticHermiteSpline{
       xInitial.Array(),
       xFinal.Array(),
       yInitial.Array(),
@@ -36,12 +36,12 @@ wpi::Protobuf<frc::QuinticHermiteSpline>::Unpack(InputStream& stream) {
   };
 }
 
-bool wpi::Protobuf<frc::QuinticHermiteSpline>::Pack(
-    OutputStream& stream, const frc::QuinticHermiteSpline& value) {
-  wpi::PackCallback<double> xInitial{value.GetInitialControlVector().x};
-  wpi::PackCallback<double> xFinal{value.GetFinalControlVector().x};
-  wpi::PackCallback<double> yInitial{value.GetInitialControlVector().y};
-  wpi::PackCallback<double> yFinal{value.GetFinalControlVector().y};
+bool wpi::util::Protobuf<wpi::math::QuinticHermiteSpline>::Pack(
+    OutputStream& stream, const wpi::math::QuinticHermiteSpline& value) {
+  wpi::util::PackCallback<double> xInitial{value.GetInitialControlVector().x};
+  wpi::util::PackCallback<double> xFinal{value.GetFinalControlVector().x};
+  wpi::util::PackCallback<double> yInitial{value.GetInitialControlVector().y};
+  wpi::util::PackCallback<double> yFinal{value.GetFinalControlVector().y};
   wpi_proto_ProtobufQuinticHermiteSpline msg{
       .x_initial = xInitial.Callback(),
       .x_final = xFinal.Callback(),

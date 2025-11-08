@@ -20,7 +20,7 @@
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/json_fwd.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 class Transform3d;
 
@@ -53,7 +53,7 @@ class WPILIB_DLLEXPORT Pose3d {
    * @param z The z component of the translational component of the pose.
    * @param rotation The rotational component of the pose.
    */
-  constexpr Pose3d(units::meter_t x, units::meter_t y, units::meter_t z,
+  constexpr Pose3d(wpi::units::meter_t x, wpi::units::meter_t y, wpi::units::meter_t z,
                    Rotation3d rotation)
       : m_translation{x, y, z}, m_rotation{std::move(rotation)} {}
 
@@ -126,21 +126,21 @@ class WPILIB_DLLEXPORT Pose3d {
    *
    * @return The x component of the pose's translation.
    */
-  constexpr units::meter_t X() const { return m_translation.X(); }
+  constexpr wpi::units::meter_t X() const { return m_translation.X(); }
 
   /**
    * Returns the Y component of the pose's translation.
    *
    * @return The y component of the pose's translation.
    */
-  constexpr units::meter_t Y() const { return m_translation.Y(); }
+  constexpr wpi::units::meter_t Y() const { return m_translation.Y(); }
 
   /**
    * Returns the Z component of the pose's translation.
    *
    * @return The z component of the pose's translation.
    */
-  constexpr units::meter_t Z() const { return m_translation.Z(); }
+  constexpr wpi::units::meter_t Z() const { return m_translation.Z(); }
 
   /**
    * Returns the underlying rotation.
@@ -297,16 +297,16 @@ class WPILIB_DLLEXPORT Pose3d {
 };
 
 WPILIB_DLLEXPORT
-void to_json(wpi::json& json, const Pose3d& pose);
+void to_json(wpi::util::json& json, const Pose3d& pose);
 
 WPILIB_DLLEXPORT
-void from_json(const wpi::json& json, Pose3d& pose);
+void from_json(const wpi::util::json& json, Pose3d& pose);
 
-}  // namespace frc
+}  // namespace wpi::math
 
 #include "wpi/math/geometry/Transform3d.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 constexpr Transform3d Pose3d::operator-(const Pose3d& other) const {
   const auto pose = this->RelativeTo(other);
@@ -323,7 +323,7 @@ constexpr Pose3d Pose3d::RelativeTo(const Pose3d& other) const {
   return {transform.Translation(), transform.Rotation()};
 }
 
-}  // namespace frc
+}  // namespace wpi::math
 
 #include "wpi/math/geometry/proto/Pose3dProto.hpp"
 #include "wpi/math/geometry/struct/Pose3dStruct.hpp"

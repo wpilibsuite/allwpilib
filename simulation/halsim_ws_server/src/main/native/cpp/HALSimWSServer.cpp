@@ -24,7 +24,7 @@ using namespace wpilibws;
 
 bool HALSimWSServer::Initialize() {
   bool result = true;
-  runner.ExecSync([&](wpi::uv::Loop& loop) {
+  runner.ExecSync([&](wpi::net::uv::Loop& loop) {
     simWeb = std::make_shared<HALSimWeb>(loop, providers, simDevices);
 
     if (!simWeb->Initialize()) {

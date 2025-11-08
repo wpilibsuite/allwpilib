@@ -10,7 +10,7 @@
 
 #include "wpi/hardware/motor/MotorSafety.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Common base class for drive platforms.
@@ -50,7 +50,7 @@ class RobotDriveBase : public MotorSafety {
    *
    * The default value is 0.02. Inputs smaller than the deadband are set to 0.0
    * while inputs larger than the deadband are scaled from 0.0 to 1.0. See
-   * frc::ApplyDeadband().
+   * wpi::math::ApplyDeadband().
    *
    * @param deadband The deadband to set.
    */
@@ -96,4 +96,4 @@ class RobotDriveBase : public MotorSafety {
   double m_maxOutput = kDefaultMaxOutput;
 };
 
-}  // namespace frc
+}  // namespace wpi

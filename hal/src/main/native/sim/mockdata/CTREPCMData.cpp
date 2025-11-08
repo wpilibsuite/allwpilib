@@ -5,16 +5,16 @@
 #include "../PortsInternal.h"
 #include "CTREPCMDataInternal.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeCTREPCMData() {
   static CTREPCMData spd[kNumCTREPCMModules];
-  ::hal::SimCTREPCMData = spd;
+  ::wpi::hal::SimCTREPCMData = spd;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-CTREPCMData* hal::SimCTREPCMData;
+CTREPCMData* wpi::hal::SimCTREPCMData;
 void CTREPCMData::ResetData() {
   for (int i = 0; i < kNumCTRESolenoidChannels; i++) {
     solenoidOutput[i].Reset(false);

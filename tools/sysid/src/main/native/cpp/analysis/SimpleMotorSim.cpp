@@ -17,16 +17,16 @@ SimpleMotorSim::SimpleMotorSim(double Ks, double Kv, double Ka,
   Reset(initialPosition, initialVelocity);
 }
 
-void SimpleMotorSim::Update(units::volt_t voltage, units::second_t dt) {
+void SimpleMotorSim::Update(wpi::units::volt_t voltage, wpi::units::second_t dt) {
   Eigen::Vector<double, 1> u{voltage.value()};
 
   // Given dx/dt = Ax + Bu + c sgn(x),
   // x_k+1 = e^(AT) x_k + A^-1 (e^(AT) - 1) (Bu + c sgn(x))
   Eigen::Matrix<double, 2, 2> Ad;
   Eigen::Matrix<double, 2, 1> Bd;
-  frc::DiscretizeAB<2, 1>(m_A, m_B, dt, &Ad, &Bd);
+  wpi::math::DiscretizeAB<2, 1>(m_A, m_B, dt, &Ad, &Bd);
   m_x = Ad * m_x + Bd * u +
-        Bd * m_B.householderQr().solve(m_c * wpi::sgn(GetVelocity()));
+        Bd * m_B.householderQr().solve(m_c * wpi::util::sgn(GetVelocity()));
 }
 
 double SimpleMotorSim::GetPosition() const {
@@ -37,9 +37,9 @@ double SimpleMotorSim::GetVelocity() const {
   return m_x(1);
 }
 
-double SimpleMotorSim::GetAcceleration(units::volt_t voltage) const {
+double SimpleMotorSim::GetAcceleration(wpi::units::volt_t voltage) const {
   Eigen::Vector<double, 1> u{voltage.value()};
-  return (m_A * m_x + m_B * u + m_c * wpi::sgn(GetVelocity()))(1);
+  return (m_A * m_x + m_B * u + m_c * wpi::util::sgn(GetVelocity()))(1);
 }
 
 void SimpleMotorSim::Reset(double position, double velocity) {

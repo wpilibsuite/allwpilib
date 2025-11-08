@@ -9,7 +9,7 @@
 
 #include "wpi/util/mutex.hpp"
 
-namespace frc {
+namespace wpi {
 class ExpansionHubServo;
 class ExpansionHubMotor;
 
@@ -83,10 +83,10 @@ class ExpansionHub {
   std::shared_ptr<DataStore> m_dataStore;
   int m_usbId;
 
-  static wpi::mutex m_handleLock;
+  static wpi::util::mutex m_handleLock;
   static std::weak_ptr<DataStore> m_storeMap[4];
 
   static std::shared_ptr<DataStore> GetForUsbId(int usbId);
 };
 
-}  // namespace frc
+}  // namespace wpi

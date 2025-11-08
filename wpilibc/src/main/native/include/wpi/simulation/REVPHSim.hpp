@@ -10,7 +10,7 @@
 #include "wpi/simulation/CallbackStore.hpp"
 #include "wpi/simulation/PneumaticsBaseSim.hpp"
 
-namespace frc {
+namespace wpi {
 
 class Compressor;
 
@@ -120,4 +120,4 @@ class REVPHSim : public PneumaticsBaseSim {
   void ResetData() override;
 };
 }  // namespace sim
-}  // namespace frc
+}  // namespace wpi

@@ -15,7 +15,7 @@
 #include "wpi/util/sendable/SendableBuilder.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 WPI_IGNORE_DEPRECATED
 
@@ -23,8 +23,8 @@ DifferentialDrive::DifferentialDrive(MotorController& leftMotor,
                                      MotorController& rightMotor)
     : DifferentialDrive{[&](double output) { leftMotor.Set(output); },
                         [&](double output) { rightMotor.Set(output); }} {
-  wpi::SendableRegistry::AddChild(this, &leftMotor);
-  wpi::SendableRegistry::AddChild(this, &rightMotor);
+  wpi::util::SendableRegistry::AddChild(this, &leftMotor);
+  wpi::util::SendableRegistry::AddChild(this, &rightMotor);
 }
 
 WPI_UNIGNORE_DEPRECATED
@@ -34,7 +34,7 @@ DifferentialDrive::DifferentialDrive(std::function<void(double)> leftMotor,
     : m_leftMotor{std::move(leftMotor)}, m_rightMotor{std::move(rightMotor)} {
   static int instances = 0;
   ++instances;
-  wpi::SendableRegistry::Add(this, "DifferentialDrive", instances);
+  wpi::util::SendableRegistry::Add(this, "DifferentialDrive", instances);
 }
 
 void DifferentialDrive::ArcadeDrive(double xSpeed, double zRotation,
@@ -45,8 +45,8 @@ void DifferentialDrive::ArcadeDrive(double xSpeed, double zRotation,
     reported = true;
   }
 
-  xSpeed = ApplyDeadband(xSpeed, m_deadband);
-  zRotation = ApplyDeadband(zRotation, m_deadband);
+  xSpeed = wpi::math::ApplyDeadband(xSpeed, m_deadband);
+  zRotation = wpi::math::ApplyDeadband(zRotation, m_deadband);
 
   auto [left, right] = ArcadeDriveIK(xSpeed, zRotation, squareInputs);
 
@@ -67,8 +67,8 @@ void DifferentialDrive::CurvatureDrive(double xSpeed, double zRotation,
     reported = true;
   }
 
-  xSpeed = ApplyDeadband(xSpeed, m_deadband);
-  zRotation = ApplyDeadband(zRotation, m_deadband);
+  xSpeed = wpi::math::ApplyDeadband(xSpeed, m_deadband);
+  zRotation = wpi::math::ApplyDeadband(zRotation, m_deadband);
 
   auto [left, right] = CurvatureDriveIK(xSpeed, zRotation, allowTurnInPlace);
 
@@ -89,8 +89,8 @@ void DifferentialDrive::TankDrive(double leftSpeed, double rightSpeed,
     reported = true;
   }
 
-  leftSpeed = ApplyDeadband(leftSpeed, m_deadband);
-  rightSpeed = ApplyDeadband(rightSpeed, m_deadband);
+  leftSpeed = wpi::math::ApplyDeadband(leftSpeed, m_deadband);
+  rightSpeed = wpi::math::ApplyDeadband(rightSpeed, m_deadband);
 
   auto [left, right] = TankDriveIK(leftSpeed, rightSpeed, squareInputs);
 
@@ -111,8 +111,8 @@ DifferentialDrive::WheelSpeeds DifferentialDrive::ArcadeDriveIK(
   // Square the inputs (while preserving the sign) to increase fine control
   // while permitting full power.
   if (squareInputs) {
-    xSpeed = CopyDirectionPow(xSpeed, 2);
-    zRotation = CopyDirectionPow(zRotation, 2);
+    xSpeed = wpi::math::CopyDirectionPow(xSpeed, 2);
+    zRotation = wpi::math::CopyDirectionPow(zRotation, 2);
   }
 
   double leftSpeed = xSpeed - zRotation;
@@ -166,8 +166,8 @@ DifferentialDrive::WheelSpeeds DifferentialDrive::TankDriveIK(
   // Square the inputs (while preserving the sign) to increase fine control
   // while permitting full power.
   if (squareInputs) {
-    leftSpeed = CopyDirectionPow(leftSpeed, 2);
-    rightSpeed = CopyDirectionPow(rightSpeed, 2);
+    leftSpeed = wpi::math::CopyDirectionPow(leftSpeed, 2);
+    rightSpeed = wpi::math::CopyDirectionPow(rightSpeed, 2);
   }
 
   return {leftSpeed, rightSpeed};
@@ -187,7 +187,7 @@ std::string DifferentialDrive::GetDescription() const {
   return "DifferentialDrive";
 }
 
-void DifferentialDrive::InitSendable(wpi::SendableBuilder& builder) {
+void DifferentialDrive::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("DifferentialDrive");
   builder.SetActuator(true);
   builder.AddDoubleProperty(

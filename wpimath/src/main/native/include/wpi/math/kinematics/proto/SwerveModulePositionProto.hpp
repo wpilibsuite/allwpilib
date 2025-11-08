@@ -10,11 +10,11 @@
 #include "wpimath/protobuf/kinematics.npb.h"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Protobuf<frc::SwerveModulePosition> {
+struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::SwerveModulePosition> {
   using MessageStruct = wpi_proto_ProtobufSwerveModulePosition;
-  using InputStream = wpi::ProtoInputStream<frc::SwerveModulePosition>;
-  using OutputStream = wpi::ProtoOutputStream<frc::SwerveModulePosition>;
-  static std::optional<frc::SwerveModulePosition> Unpack(InputStream& stream);
+  using InputStream = wpi::util::ProtoInputStream<wpi::math::SwerveModulePosition>;
+  using OutputStream = wpi::util::ProtoOutputStream<wpi::math::SwerveModulePosition>;
+  static std::optional<wpi::math::SwerveModulePosition> Unpack(InputStream& stream);
   static bool Pack(OutputStream& stream,
-                   const frc::SwerveModulePosition& value);
+                   const wpi::math::SwerveModulePosition& value);
 };

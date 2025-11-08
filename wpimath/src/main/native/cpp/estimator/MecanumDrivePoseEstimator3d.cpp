@@ -9,9 +9,9 @@
 #include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/util/timestamp.h"
 
-using namespace frc;
+using namespace wpi::math;
 
-frc::MecanumDrivePoseEstimator3d::MecanumDrivePoseEstimator3d(
+wpi::math::MecanumDrivePoseEstimator3d::MecanumDrivePoseEstimator3d(
     MecanumDriveKinematics& kinematics, const Rotation3d& gyroAngle,
     const MecanumDriveWheelPositions& wheelPositions, const Pose3d& initialPose)
     : MecanumDrivePoseEstimator3d{
@@ -19,11 +19,11 @@ frc::MecanumDrivePoseEstimator3d::MecanumDrivePoseEstimator3d(
           wheelPositions,       initialPose,
           {0.1, 0.1, 0.1, 0.1}, {0.45, 0.45, 0.45, 0.45}} {}
 
-frc::MecanumDrivePoseEstimator3d::MecanumDrivePoseEstimator3d(
+wpi::math::MecanumDrivePoseEstimator3d::MecanumDrivePoseEstimator3d(
     MecanumDriveKinematics& kinematics, const Rotation3d& gyroAngle,
     const MecanumDriveWheelPositions& wheelPositions, const Pose3d& initialPose,
-    const wpi::array<double, 4>& stateStdDevs,
-    const wpi::array<double, 4>& visionMeasurementStdDevs)
+    const wpi::util::array<double, 4>& stateStdDevs,
+    const wpi::util::array<double, 4>& visionMeasurementStdDevs)
     : PoseEstimator3d(kinematics, m_odometryImpl, stateStdDevs,
                       visionMeasurementStdDevs),
       m_odometryImpl(kinematics, gyroAngle, wheelPositions, initialPose) {

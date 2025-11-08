@@ -10,11 +10,11 @@
 #include "wpimath/protobuf/spline.npb.h"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Protobuf<frc::QuinticHermiteSpline> {
+struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::QuinticHermiteSpline> {
   using MessageStruct = wpi_proto_ProtobufQuinticHermiteSpline;
-  using InputStream = wpi::ProtoInputStream<frc::QuinticHermiteSpline>;
-  using OutputStream = wpi::ProtoOutputStream<frc::QuinticHermiteSpline>;
-  static std::optional<frc::QuinticHermiteSpline> Unpack(InputStream& stream);
+  using InputStream = wpi::util::ProtoInputStream<wpi::math::QuinticHermiteSpline>;
+  using OutputStream = wpi::util::ProtoOutputStream<wpi::math::QuinticHermiteSpline>;
+  static std::optional<wpi::math::QuinticHermiteSpline> Unpack(InputStream& stream);
   static bool Pack(OutputStream& stream,
-                   const frc::QuinticHermiteSpline& value);
+                   const wpi::math::QuinticHermiteSpline& value);
 };

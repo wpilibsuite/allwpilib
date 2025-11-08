@@ -17,7 +17,7 @@
 #include "wpi/commands2/CommandHelper.hpp"
 #include "wpi/util/DecayedDerivedFrom.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 /**
  * A composition that runs a set of commands in parallel, ending when any one of
  * the commands ends and interrupting all the others.
@@ -40,7 +40,7 @@ class ParallelRaceGroup : public CommandHelper<Command, ParallelRaceGroup> {
    */
   explicit ParallelRaceGroup(std::vector<std::unique_ptr<Command>>&& commands);
 
-  template <wpi::DecayedDerivedFrom<Command>... Commands>
+  template <wpi::util::DecayedDerivedFrom<Command>... Commands>
   explicit ParallelRaceGroup(Commands&&... commands) {
     AddCommands(std::forward<Commands>(commands)...);
   }
@@ -58,7 +58,7 @@ class ParallelRaceGroup : public CommandHelper<Command, ParallelRaceGroup> {
    *
    * @param commands Commands to add to the group.
    */
-  template <wpi::DecayedDerivedFrom<Command>... Commands>
+  template <wpi::util::DecayedDerivedFrom<Command>... Commands>
   void AddCommands(Commands&&... commands) {
     std::vector<std::unique_ptr<Command>> foo;
     ((void)foo.emplace_back(std::make_unique<std::decay_t<Commands>>(
@@ -89,7 +89,7 @@ class ParallelRaceGroup : public CommandHelper<Command, ParallelRaceGroup> {
   bool m_finished{false};
   bool isRunning = false;
 };
-}  // namespace frc2
+}  // namespace wpi::cmd
 
 #ifdef _WIN32
 #pragma warning(pop)

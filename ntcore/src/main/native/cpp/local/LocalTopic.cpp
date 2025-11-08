@@ -8,7 +8,7 @@
 
 #include "local/LocalDataLogger.hpp"
 
-using namespace nt::local;
+using namespace wpi::nt::local;
 
 void LocalTopic::StartStopDataLog(LocalDataLogger* logger, int64_t timestamp,
                                   bool publish) {
@@ -40,28 +40,28 @@ void LocalTopic::UpdateDataLogProperties() {
   }
 }
 
-wpi::json LocalTopic::SetFlags(unsigned int flags) {
-  wpi::json update = wpi::json::object();
+wpi::util::json LocalTopic::SetFlags(unsigned int flags) {
+  wpi::util::json update = wpi::util::json::object();
   if ((flags & NT_PERSISTENT) != 0) {
     properties["persistent"] = true;
     update["persistent"] = true;
   } else {
     properties.erase("persistent");
-    update["persistent"] = wpi::json();
+    update["persistent"] = wpi::util::json();
   }
   if ((flags & NT_RETAINED) != 0) {
     properties["retained"] = true;
     update["retained"] = true;
   } else {
     properties.erase("retained");
-    update["retained"] = wpi::json();
+    update["retained"] = wpi::util::json();
   }
   if ((flags & NT_UNCACHED) != 0) {
     properties["cached"] = false;
     update["cached"] = false;
   } else {
     properties.erase("cached");
-    update["cached"] = wpi::json();
+    update["cached"] = wpi::util::json();
   }
   if ((flags & NT_UNCACHED) != 0) {
     lastValue = {};
@@ -72,8 +72,8 @@ wpi::json LocalTopic::SetFlags(unsigned int flags) {
   return update;
 }
 
-wpi::json LocalTopic::SetPersistent(bool value) {
-  wpi::json update = wpi::json::object();
+wpi::util::json LocalTopic::SetPersistent(bool value) {
+  wpi::util::json update = wpi::util::json::object();
   if (value) {
     m_flags |= NT_PERSISTENT;
     properties["persistent"] = true;
@@ -81,13 +81,13 @@ wpi::json LocalTopic::SetPersistent(bool value) {
   } else {
     m_flags &= ~NT_PERSISTENT;
     properties.erase("persistent");
-    update["persistent"] = wpi::json();
+    update["persistent"] = wpi::util::json();
   }
   return update;
 }
 
-wpi::json LocalTopic::SetRetained(bool value) {
-  wpi::json update = wpi::json::object();
+wpi::util::json LocalTopic::SetRetained(bool value) {
+  wpi::util::json update = wpi::util::json::object();
   if (value) {
     m_flags |= NT_RETAINED;
     properties["retained"] = true;
@@ -95,17 +95,17 @@ wpi::json LocalTopic::SetRetained(bool value) {
   } else {
     m_flags &= ~NT_RETAINED;
     properties.erase("retained");
-    update["retained"] = wpi::json();
+    update["retained"] = wpi::util::json();
   }
   return update;
 }
 
-wpi::json LocalTopic::SetCached(bool value) {
-  wpi::json update = wpi::json::object();
+wpi::util::json LocalTopic::SetCached(bool value) {
+  wpi::util::json update = wpi::util::json::object();
   if (value) {
     m_flags &= ~NT_UNCACHED;
     properties.erase("cached");
-    update["cached"] = wpi::json();
+    update["cached"] = wpi::util::json();
   } else {
     m_flags |= NT_UNCACHED;
     properties["cached"] = false;
@@ -114,26 +114,26 @@ wpi::json LocalTopic::SetCached(bool value) {
   return update;
 }
 
-wpi::json LocalTopic::SetProperty(std::string_view name,
-                                  const wpi::json& value) {
+wpi::util::json LocalTopic::SetProperty(std::string_view name,
+                                  const wpi::util::json& value) {
   if (value.is_null()) {
     properties.erase(name);
   } else {
     properties[name] = value;
   }
-  wpi::json update = wpi::json::object();
+  wpi::util::json update = wpi::util::json::object();
   update[name] = value;
   return update;
 }
 
-wpi::json LocalTopic::DeleteProperty(std::string_view name) {
+wpi::util::json LocalTopic::DeleteProperty(std::string_view name) {
   properties.erase(name);
-  wpi::json update = wpi::json::object();
-  update[name] = wpi::json();
+  wpi::util::json update = wpi::util::json::object();
+  update[name] = wpi::util::json();
   return update;
 }
 
-bool LocalTopic::SetProperties(const wpi::json& update) {
+bool LocalTopic::SetProperties(const wpi::util::json& update) {
   if (!update.is_object()) {
     return false;
   }
@@ -154,8 +154,8 @@ void LocalTopic::RefreshProperties(bool updateFlags) {
   m_propertiesStr = properties.dump();
 }
 
-wpi::json LocalTopic::CompareProperties(const wpi::json props) {
-  wpi::json update = wpi::json::object();
+wpi::util::json LocalTopic::CompareProperties(const wpi::util::json props) {
+  wpi::util::json update = wpi::util::json::object();
   // added/changed
   for (auto&& prop : props.items()) {
     auto it = properties.find(prop.key());
@@ -166,7 +166,7 @@ wpi::json LocalTopic::CompareProperties(const wpi::json props) {
   // removed
   for (auto&& prop : properties.items()) {
     if (props.find(prop.key()) == props.end()) {
-      update[prop.key()] = wpi::json();
+      update[prop.key()] = wpi::util::json();
     }
   }
   return update;
@@ -182,7 +182,7 @@ void LocalTopic::ResetIfDoesNotExist() {
   type = NT_UNASSIGNED;
   typeStr.clear();
   m_flags = 0;
-  properties = wpi::json::object();
+  properties = wpi::util::json::object();
   m_propertiesStr = "{}";
 }
 

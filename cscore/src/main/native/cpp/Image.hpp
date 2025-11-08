@@ -13,7 +13,7 @@
 #include "default_init_allocator.hpp"
 #include "wpi/cs/cscore_cpp.hpp"
 
-namespace cs {
+namespace wpi::cs {
 
 class Frame;
 
@@ -129,6 +129,6 @@ class Image {
   int jpegQuality{-1};
 };
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_IMAGE_HPP_

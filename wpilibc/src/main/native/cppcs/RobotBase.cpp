@@ -27,20 +27,20 @@
 #include "wpi/util/print.hpp"
 #include "wpi/util/timestamp.h"
 
-static_assert(frc::RuntimeType::kRoboRIO ==
-              static_cast<frc::RuntimeType>(HAL_Runtime_RoboRIO));
-static_assert(frc::RuntimeType::kRoboRIO2 ==
-              static_cast<frc::RuntimeType>(HAL_Runtime_RoboRIO2));
-static_assert(frc::RuntimeType::kSimulation ==
-              static_cast<frc::RuntimeType>(HAL_Runtime_Simulation));
-static_assert(frc::RuntimeType::kSystemCore ==
-              static_cast<frc::RuntimeType>(HAL_Runtime_SystemCore));
+static_assert(wpi::RuntimeType::kRoboRIO ==
+              static_cast<wpi::RuntimeType>(HAL_Runtime_RoboRIO));
+static_assert(wpi::RuntimeType::kRoboRIO2 ==
+              static_cast<wpi::RuntimeType>(HAL_Runtime_RoboRIO2));
+static_assert(wpi::RuntimeType::kSimulation ==
+              static_cast<wpi::RuntimeType>(HAL_Runtime_Simulation));
+static_assert(wpi::RuntimeType::kSystemCore ==
+              static_cast<wpi::RuntimeType>(HAL_Runtime_SystemCore));
 
-using SetCameraServerSharedFP = void (*)(frc::CameraServerShared*);
+using SetCameraServerSharedFP = void (*)(wpi::CameraServerShared*);
 
-using namespace frc;
+using namespace wpi;
 
-int frc::RunHALInitialization() {
+int wpi::RunHALInitialization() {
   if (!HAL_Initialize(500, 0)) {
     std::puts("FATAL ERROR: HAL could not be initialized");
     return -1;
@@ -49,7 +49,7 @@ int frc::RunHALInitialization() {
   HAL_ReportUsage("Language", "C++");
   HAL_ReportUsage("WPILibVersion", GetWPILibVersion());
 
-  if (!frc::Notifier::SetHALThreadPriority(true, 40)) {
+  if (!wpi::Notifier::SetHALThreadPriority(true, 40)) {
     FRC_ReportWarning("Setting HAL Notifier RT priority to 40 failed\n");
   }
 
@@ -60,7 +60,7 @@ int frc::RunHALInitialization() {
 std::thread::id RobotBase::m_threadId;
 
 namespace {
-class WPILibCameraServerShared : public frc::CameraServerShared {
+class WPILibCameraServerShared : public wpi::CameraServerShared {
  public:
   void ReportUsage(std::string_view resource, std::string_view data) override {
     HAL_ReportUsage(resource, data);
@@ -85,12 +85,12 @@ class WPILibCameraServerShared : public frc::CameraServerShared {
 class WPILibMathShared : public wpi::math::MathShared {
  public:
   void ReportErrorV(fmt::string_view format, fmt::format_args args) override {
-    frc::ReportErrorV(err::Error, __FILE__, __LINE__, __FUNCTION__, format,
+    wpi::ReportErrorV(err::Error, __FILE__, __LINE__, __FUNCTION__, format,
                       args);
   }
 
   void ReportWarningV(fmt::string_view format, fmt::format_args args) override {
-    frc::ReportErrorV(warn::Warning, __FILE__, __LINE__, __FUNCTION__, format,
+    wpi::ReportErrorV(warn::Warning, __FILE__, __LINE__, __FUNCTION__, format,
                       args);
   }
 
@@ -98,8 +98,8 @@ class WPILibMathShared : public wpi::math::MathShared {
     HAL_ReportUsage(resource, data);
   }
 
-  units::second_t GetTimestamp() override {
-    return units::second_t{wpi::Now() * 1.0e-6};
+  wpi::units::second_t GetTimestamp() override {
+    return wpi::units::second_t{wpi::util::Now() * 1.0e-6};
   }
 };
 }  // namespace
@@ -186,9 +186,9 @@ RobotBase::RobotBase() {
   SetupCameraServerShared();
   SetupMathShared();
 
-  auto inst = nt::NetworkTableInstance::GetDefault();
+  auto inst = wpi::nt::NetworkTableInstance::GetDefault();
   // subscribe to "" to force persistent values to propagate to local
-  nt::SubscribeMultiple(inst.GetHandle(), {{std::string_view{}}});
+  wpi::nt::SubscribeMultiple(inst.GetHandle(), {{std::string_view{}}});
   if constexpr (!IsSimulation()) {
     inst.StartServer("/home/systemcore/networktables.json");
   } else {
@@ -202,14 +202,14 @@ RobotBase::RobotBase() {
     std::this_thread::sleep_for(10ms);
     ++count;
     if (count > 100) {
-      wpi::print(stderr, "timed out while waiting for NT server to start\n");
+      wpi::util::print(stderr, "timed out while waiting for NT server to start\n");
       break;
     }
   }
 
   connListenerHandle =
-      inst.AddConnectionListener(false, [&](const nt::Event& event) {
-        if (event.Is(nt::EventFlags::kConnected)) {
+      inst.AddConnectionListener(false, [&](const wpi::nt::Event& event) {
+        if (event.Is(wpi::nt::EventFlags::kConnected)) {
           auto connInfo = event.GetConnectionInfo();
           HAL_ReportUsage(fmt::format("NT/{}", connInfo->remote_id), "");
         }

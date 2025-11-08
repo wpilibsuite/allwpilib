@@ -7,13 +7,13 @@
 #include "wpi/math/controller/BangBangController.hpp"
 
 TEST(BangBangInputOutputTest, ShouldOutput) {
-  frc::BangBangController controller;
+  wpi::math::BangBangController controller;
 
   EXPECT_DOUBLE_EQ(controller.Calculate(0, 1), 1);
 }
 
 TEST(BangBangInputOutputTest, ShouldNotOutput) {
-  frc::BangBangController controller;
+  wpi::math::BangBangController controller;
 
   EXPECT_DOUBLE_EQ(controller.Calculate(1, 0), 0);
 }

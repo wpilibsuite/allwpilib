@@ -16,7 +16,7 @@
 #include "wpi/cs/cscore_cpp.hpp"
 #include "wpi/util/deprecated.hpp"
 
-namespace cs {
+namespace wpi::cs {
 
 /**
  * @defgroup cscore_oo cscore C++ object-oriented API
@@ -191,7 +191,7 @@ class VideoProperty {
    * @param buf The backing storage to which to write the property value.
    * @return The string property value as a reference to the given buffer.
    */
-  std::string_view GetString(wpi::SmallVectorImpl<char>& buf) const {
+  std::string_view GetString(wpi::util::SmallVectorImpl<char>& buf) const {
     m_status = 0;
     return GetStringProperty(m_handle, buf, &m_status);
   }
@@ -349,7 +349,7 @@ class VideoSource {
 
   /**
    * Get the last time a frame was captured.
-   * This uses the same time base as wpi::Now().
+   * This uses the same time base as wpi::util::Now().
    *
    * @return Time in 1 us increments.
    */
@@ -515,7 +515,7 @@ class VideoSource {
    * @param config configuration
    * @return True if set successfully
    */
-  bool SetConfigJson(const wpi::json& config) {
+  bool SetConfigJson(const wpi::util::json& config) {
     m_status = 0;
     return SetSourceConfigJson(m_handle, config, &m_status);
   }
@@ -535,7 +535,7 @@ class VideoSource {
    *
    * @return JSON configuration object
    */
-  wpi::json GetConfigJsonObject() const;
+  wpi::util::json GetConfigJsonObject() const;
 
   /**
    * Get the actual FPS.
@@ -546,7 +546,7 @@ class VideoSource {
    */
   double GetActualFPS() const {
     m_status = 0;
-    return cs::GetTelemetryAverageValue(m_handle, CS_SOURCE_FRAMES_RECEIVED,
+    return wpi::cs::GetTelemetryAverageValue(m_handle, CS_SOURCE_FRAMES_RECEIVED,
                                         &m_status);
   }
 
@@ -559,7 +559,7 @@ class VideoSource {
    */
   double GetActualDataRate() const {
     m_status = 0;
-    return cs::GetTelemetryAverageValue(m_handle, CS_SOURCE_BYTES_RECEIVED,
+    return wpi::cs::GetTelemetryAverageValue(m_handle, CS_SOURCE_BYTES_RECEIVED,
                                         &m_status);
   }
 
@@ -727,7 +727,7 @@ class UsbCamera : public VideoCamera {
    */
   static std::vector<UsbCameraInfo> EnumerateUsbCameras() {
     CS_Status status = 0;
-    return ::cs::EnumerateUsbCameras(&status);
+    return ::wpi::cs::EnumerateUsbCameras(&status);
   }
 
   /**
@@ -735,7 +735,7 @@ class UsbCamera : public VideoCamera {
    */
   void SetPath(std::string_view path) {
     m_status = 0;
-    return ::cs::SetUsbCameraPath(m_handle, path, &m_status);
+    return ::wpi::cs::SetUsbCameraPath(m_handle, path, &m_status);
   }
 
   /**
@@ -743,7 +743,7 @@ class UsbCamera : public VideoCamera {
    */
   std::string GetPath() const {
     m_status = 0;
-    return ::cs::GetUsbCameraPath(m_handle, &m_status);
+    return ::wpi::cs::GetUsbCameraPath(m_handle, &m_status);
   }
 
   /**
@@ -751,7 +751,7 @@ class UsbCamera : public VideoCamera {
    */
   UsbCameraInfo GetInfo() const {
     m_status = 0;
-    return ::cs::GetUsbCameraInfo(m_handle, &m_status);
+    return ::wpi::cs::GetUsbCameraInfo(m_handle, &m_status);
   }
 
   /**
@@ -867,7 +867,7 @@ class HttpCamera : public VideoCamera {
   HttpCameraKind GetHttpCameraKind() const {
     m_status = 0;
     return static_cast<HttpCameraKind>(
-        static_cast<int>(::cs::GetHttpCameraKind(m_handle, &m_status)));
+        static_cast<int>(::wpi::cs::GetHttpCameraKind(m_handle, &m_status)));
   }
 
   /**
@@ -875,7 +875,7 @@ class HttpCamera : public VideoCamera {
    */
   void SetUrls(std::span<const std::string> urls) {
     m_status = 0;
-    ::cs::SetHttpCameraUrls(m_handle, urls, &m_status);
+    ::wpi::cs::SetHttpCameraUrls(m_handle, urls, &m_status);
   }
 
   /**
@@ -889,7 +889,7 @@ class HttpCamera : public VideoCamera {
       vec.emplace_back(url);
     }
     m_status = 0;
-    ::cs::SetHttpCameraUrls(m_handle, vec, &m_status);
+    ::wpi::cs::SetHttpCameraUrls(m_handle, vec, &m_status);
   }
 
   /**
@@ -897,7 +897,7 @@ class HttpCamera : public VideoCamera {
    */
   std::vector<std::string> GetUrls() const {
     m_status = 0;
-    return ::cs::GetHttpCameraUrls(m_handle, &m_status);
+    return ::wpi::cs::GetHttpCameraUrls(m_handle, &m_status);
   }
 };
 
@@ -1256,7 +1256,7 @@ class VideoSink {
    * @param config configuration
    * @return True if set successfully
    */
-  bool SetConfigJson(const wpi::json& config) {
+  bool SetConfigJson(const wpi::util::json& config) {
     m_status = 0;
     return SetSinkConfigJson(m_handle, config, &m_status);
   }
@@ -1276,7 +1276,7 @@ class VideoSink {
    *
    * @return JSON configuration object
    */
-  wpi::json GetConfigJsonObject() const;
+  wpi::util::json GetConfigJsonObject() const;
 
   /**
    * Configure which source should provide frames to this sink.  Each sink
@@ -1370,7 +1370,7 @@ class MjpegServer : public VideoSink {
    */
   std::string GetListenAddress() const {
     m_status = 0;
-    return cs::GetMjpegServerListenAddress(m_handle, &m_status);
+    return wpi::cs::GetMjpegServerListenAddress(m_handle, &m_status);
   }
 
   /**
@@ -1378,7 +1378,7 @@ class MjpegServer : public VideoSink {
    */
   int GetPort() const {
     m_status = 0;
-    return cs::GetMjpegServerPort(m_handle, &m_status);
+    return wpi::cs::GetMjpegServerPort(m_handle, &m_status);
   }
 
   /**
@@ -1577,6 +1577,6 @@ class VideoListener {
 
 /** @} */
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_WPI_CS_CSCORE_OO_HPP_

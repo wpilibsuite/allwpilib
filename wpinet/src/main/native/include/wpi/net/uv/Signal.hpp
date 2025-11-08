@@ -12,7 +12,7 @@
 #include "wpi/net/uv/Handle.hpp"
 #include "wpi/util/Signal.h"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 class Loop;
 
@@ -71,9 +71,9 @@ class Signal final : public HandleImpl<Signal, uv_signal_t> {
   /**
    * Signal generated when a signal occurs.
    */
-  sig::Signal<int> signal;
+  wpi::util::sig::Signal<int> signal;
 };
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_SIGNAL_HPP_
