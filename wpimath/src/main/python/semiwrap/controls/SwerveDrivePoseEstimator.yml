@@ -30,7 +30,8 @@ classes:
     methods:
       SwerveDrivePoseEstimator:
         overloads:
-          SwerveDriveKinematics<NumModules>&, const Rotation2d&, const wpi::util::array<SwerveModulePosition, NumModules>&, const Pose2d&:
+          ? SwerveDriveKinematics<NumModules>&, const Rotation2d&, const wpi::util::array<SwerveModulePosition, NumModules>&, const Pose2d&
+          :
           ? SwerveDriveKinematics<NumModules>&, const Rotation2d&, const wpi::util::array<SwerveModulePosition, NumModules>&, const Pose2d&, const wpi::util::array<double, 3>&, const wpi::util::array<double, 3>&
           :
 
