@@ -37,7 +37,7 @@ wpilib_java_library(
     srcs = glob(["src/main/java/**/*.java"]),
     extra_source_pkgs = ["resources"],
     maven_artifact_name = "fields-java",
-    maven_group_id = "edu.wpi.first.fields",
+    maven_group_id = "org.wpilib.fields",
     resource_strip_prefix = "fields/src/main/native/resources",
     resources = glob(["src/main/native/resources/**"]),
     visibility = ["//visibility:public"],
@@ -64,5 +64,5 @@ wpilib_java_junit5_test(
 package_minimal_cc_project(
     name = "fields",
     maven_artifact_name = "fields-cpp",
-    maven_group_id = "edu.wpi.first.fields",
+    maven_group_id = "org.wpilib.fields",
 )

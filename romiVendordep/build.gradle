@@ -1,6 +1,6 @@
 ext {
     nativeName = 'romiVendordep'
-    devMain = 'edu.wpi.first.wpilibj.romi.DevMain'
+    devMain = 'org.wpilib.romi.DevMain'
 }
 
 evaluationDependsOn(":ntcore")

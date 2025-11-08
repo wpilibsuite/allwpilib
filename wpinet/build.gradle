@@ -1,9 +1,9 @@
 ext {
     baseId = 'wpinet'
-    groupId = 'edu.wpi.first.net'
+    groupId = 'org.wpilib.net'
 
     nativeName = 'wpinet'
-    devMain = 'edu.wpi.first.net.DevMain'
+    devMain = 'org.wpilib.net.DevMain'
 
     splitSetup = {
         it.sources {

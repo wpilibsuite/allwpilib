@@ -22,8 +22,8 @@ dependencies {
 ext {
     nativeName = 'fields'
     baseId = nativeName
-    groupId = 'edu.wpi.first.fields'
-    devMain = "edu.wpi.first.fields.DevMain"
+    groupId = 'org.wpilib.fields'
+    devMain = "org.wpilib.fields.DevMain"
 }
 
 apply from: "${rootDir}/shared/resources.gradle"
