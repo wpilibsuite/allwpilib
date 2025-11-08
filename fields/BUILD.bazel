@@ -12,7 +12,7 @@ generate_resources(
 )
 
 wpilib_cc_library(
-    name = "fieldImages",
+    name = "fields",
     srcs = [":generate-resources"] + glob(["src/main/native/cpp/**"]),
     hdrs = glob(["src/main/native/include/**/*"]),
     include_license_files = True,
@@ -21,24 +21,24 @@ wpilib_cc_library(
 )
 
 wpilib_cc_static_library(
-    name = "static/fieldImages",
+    name = "static/fields",
     static_lib_name = select({
-        "@platforms//os:windows": "static/fieldImages.lib",
-        "//conditions:default": "static/libfieldImages.a",
+        "@platforms//os:windows": "static/fields.lib",
+        "//conditions:default": "static/libfields.a",
     }),
     visibility = ["//visibility:public"],
     deps = [
-        ":fieldImages",
+        ":fields",
     ],
 )
 
 wpilib_java_library(
-    name = "fieldImages-java",
+    name = "fields-java",
     srcs = glob(["src/main/java/**/*.java"]),
     extra_source_pkgs = ["resources"],
-    maven_artifact_name = "fieldImages-java",
-    maven_group_id = "edu.wpi.first.fieldImages",
-    resource_strip_prefix = "fieldImages/src/main/native/resources",
+    maven_artifact_name = "fields-java",
+    maven_group_id = "edu.wpi.first.fields",
+    resource_strip_prefix = "fields/src/main/native/resources",
     resources = glob(["src/main/native/resources/**"]),
     visibility = ["//visibility:public"],
     deps = [
@@ -54,15 +54,15 @@ pkg_files(
 )
 
 wpilib_java_junit5_test(
-    name = "fieldImages-test",
+    name = "fields-test",
     srcs = glob(["src/test/java/**/*.java"]),
     deps = [
-        ":fieldImages-java",
+        ":fields-java",
     ],
 )
 
 package_minimal_cc_project(
-    name = "fieldImages",
-    maven_artifact_name = "fieldImages-cpp",
-    maven_group_id = "edu.wpi.first.fieldImages",
+    name = "fields",
+    maven_artifact_name = "fields-cpp",
+    maven_group_id = "edu.wpi.first.fields",
 )

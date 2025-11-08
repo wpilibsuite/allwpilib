@@ -15,7 +15,7 @@ target_link_libraries(
     PUBLIC
         $<TARGET_NAME_IF_EXISTS:apriltag>
         $<TARGET_NAME_IF_EXISTS:wpilibc>
-        $<TARGET_NAME_IF_EXISTS:wpilibNewCommands>
+        $<TARGET_NAME_IF_EXISTS:commandsv2>
         $<TARGET_NAME_IF_EXISTS:wpimath>
         $<TARGET_NAME_IF_EXISTS:wpiutil>
 )

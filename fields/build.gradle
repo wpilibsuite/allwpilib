@@ -20,10 +20,10 @@ dependencies {
 }
 
 ext {
-    nativeName = 'fieldImages'
+    nativeName = 'fields'
     baseId = nativeName
-    groupId = 'edu.wpi.first.fieldImages'
-    devMain = "edu.wpi.first.fieldImages.DevMain"
+    groupId = 'edu.wpi.first.fields'
+    devMain = "edu.wpi.first.fields.DevMain"
 }
 
 apply from: "${rootDir}/shared/resources.gradle"
@@ -44,7 +44,7 @@ sourceSets.main.resources {
 model {
     components {
         "${nativeName}"(NativeLibrarySpec) {
-            baseName = 'fieldImages'
+            baseName = 'fields'
             sources {
                 cpp {
                     source {

@@ -13,7 +13,7 @@ repoRootNameOverride {
 }
 
 generatedFileExclude {
-  wpilibNewCommands/src/generated/
+  commandsv2/src/generated/
 }
 
 includeOtherLibs {
