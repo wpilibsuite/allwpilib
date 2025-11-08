@@ -59,7 +59,7 @@ wpilib_java_library(
     name = "romiVendordep-java",
     srcs = glob(["src/main/java/**/*.java"]),
     maven_artifact_name = "romiVendordep-java",
-    maven_group_id = "edu.wpi.first.romiVendordep",
+    maven_group_id = "org.wpilib.romiVendordep",
     visibility = ["//visibility:public"],
     deps = [
         "//hal:hal-java",
@@ -99,5 +99,5 @@ java_binary(
 package_minimal_cc_project(
     name = "romiVendordep",
     maven_artifact_name = "romiVendordep-cpp",
-    maven_group_id = "edu.wpi.first.romiVendordep",
+    maven_group_id = "org.wpilib.romiVendordep",
 )

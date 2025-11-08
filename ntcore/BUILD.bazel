@@ -162,7 +162,7 @@ wpilib_jni_java_library(
     name = "ntcore-java",
     srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
     maven_artifact_name = "ntcore-java",
-    maven_group_id = "edu.wpi.first.ntcore",
+    maven_group_id = "org.wpilib.ntcore",
     native_libs = [":ntcorejni"],
     visibility = ["//visibility:public"],
     deps = [
@@ -222,5 +222,5 @@ java_binary(
 package_default_jni_project(
     name = "ntcore",
     maven_artifact_name = "ntcore-cpp",
-    maven_group_id = "edu.wpi.first.ntcore",
+    maven_group_id = "org.wpilib.ntcore",
 )

@@ -60,5 +60,5 @@ cc_binary(
 package_binary_cc_project(
     name = "datalogtool",
     maven_artifact_name = "DataLogTool",
-    maven_group_id = "edu.wpi.first.tools",
+    maven_group_id = "org.wpilib.tools",
 )

@@ -10,7 +10,7 @@ apply from: "${rootDir}/shared/config.gradle"
 
 ext {
     baseId = nativeName
-    groupId = "edu.wpi.first.${nativeName}"
+    groupId = "org.wpilib.${nativeName}"
 }
 
 apply from: "${rootDir}/shared/java/javacommon.gradle"
