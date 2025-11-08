@@ -30,10 +30,11 @@
 
 #include "wpi/net/NetworkStream.hpp"
 
-namespace wpi::net {
-
+namespace wpi::util {
 class Logger;
+}
 
+namespace wpi::net {
 class TCPConnector {
  public:
   static std::unique_ptr<NetworkStream> connect(const char* server, int port,

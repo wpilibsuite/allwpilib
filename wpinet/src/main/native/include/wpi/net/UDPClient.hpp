@@ -12,10 +12,11 @@
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/mutex.hpp"
 
-namespace wpi::net {
-
+namespace wpi::util {
 class Logger;
+}
 
+namespace wpi::net {
 class UDPClient {
   int m_lsd;
   int m_port;

@@ -161,7 +161,7 @@ class DataLog {
   template <wpi::util::ProtobufSerializable T>
   void AddProtobufSchema(wpi::util::ProtobufMessage<T>& msg, int64_t timestamp = 0) {
     if (timestamp == 0) {
-      timestamp = Now();
+      timestamp = wpi::util::Now();
     }
     msg.ForEachProtobufDescriptor(
         [this](auto typeString) { return HasSchema(typeString); },
@@ -182,7 +182,7 @@ class DataLog {
     requires wpi::util::StructSerializable<T, I...>
   void AddStructSchema(const I&... info, int64_t timestamp = 0) {
     if (timestamp == 0) {
-      timestamp = Now();
+      timestamp = wpi::util::Now();
     }
     wpi::util::ForEachStructSchema<T>(
         [this, timestamp](auto typeString, auto schema) {

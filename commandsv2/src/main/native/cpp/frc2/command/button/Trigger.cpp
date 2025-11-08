@@ -9,7 +9,7 @@
 #include "wpi/commands2/CommandPtr.hpp"
 #include "wpi/math/filter/Debouncer.hpp"
 
-using namespace frc;
+using namespace wpi;
 using namespace wpi::cmd;
 
 Trigger::Trigger(const Trigger& other) = default;

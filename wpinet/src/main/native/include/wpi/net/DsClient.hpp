@@ -10,10 +10,11 @@
 
 #include "wpi/util/Signal.h"
 
-namespace wpi::net {
-
+namespace wpi::util {
 class Logger;
+}
 
+namespace wpi::net {
 namespace uv {
 class Loop;
 class Tcp;

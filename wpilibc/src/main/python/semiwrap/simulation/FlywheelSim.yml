@@ -2,7 +2,7 @@ classes:
   wpi::sim::FlywheelSim:
     typealias:
     - wpi::math::DCMotor
-    - template <int S, int I, int O> using wpi::math::LinearSystem = wpi::math::LinearSystem<S, I, O>
+    - template <int S, int I, int O> using LinearSystem = wpi::math::LinearSystem<S, I, O>
     methods:
       FlywheelSim:
         overloads:
