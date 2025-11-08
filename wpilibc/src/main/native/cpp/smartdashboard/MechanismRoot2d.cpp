@@ -6,6 +6,8 @@
 
 #include "wpi/util/Color8Bit.hpp"
 
+#include <memory>
+
 using namespace wpi;
 
 MechanismRoot2d::MechanismRoot2d(std::string_view name, double x, double y,

@@ -32,10 +32,11 @@
 #include "wpi/net/NetworkAcceptor.hpp"
 #include "wpi/net/TCPStream.h"
 
-namespace wpi::net {
-
+namespace wpi::util {
 class Logger;
+}
 
+namespace wpi::net {
 class TCPAcceptor : public NetworkAcceptor {
   int m_lsd;
   int m_port;

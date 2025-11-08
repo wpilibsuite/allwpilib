@@ -36,8 +36,8 @@ TEST(WorkerThreadTest, FutureVoid) {
 }
 
 TEST(WorkerThreadTest, Loop) {
-  mutex m;
-  condition_variable cv;
+  wpi::util::mutex m;
+  wpi::util::condition_variable cv;
   int callbacks = 0;
 
   WorkerThread<int(bool)> worker;
@@ -60,8 +60,8 @@ TEST(WorkerThreadTest, Loop) {
 }
 
 TEST(WorkerThreadTest, LoopVoid) {
-  mutex m;
-  condition_variable cv;
+  wpi::util::mutex m;
+  wpi::util::condition_variable cv;
   int callbacks = 0;
 
   WorkerThread<void(bool)> worker;

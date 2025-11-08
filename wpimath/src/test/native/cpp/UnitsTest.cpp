@@ -87,7 +87,7 @@ using namespace wpi::units::torque;
 using namespace wpi::units::velocity;
 using namespace wpi::units::voltage;
 using namespace wpi::units::volume;
-using namespace units;
+using namespace wpi::units;
 
 #if !defined(_MSC_VER) || _MSC_VER > 1800
 using namespace wpi::units::literals;
