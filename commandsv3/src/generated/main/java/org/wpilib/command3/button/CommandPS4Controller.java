@@ -6,10 +6,10 @@
 
 package org.wpilib.command3.button;
 
-import org.wpilib.driverstation.PS4Controller;
-import org.wpilib.event.EventLoop;
 import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.Trigger;
+import org.wpilib.driverstation.PS4Controller;
+import org.wpilib.event.EventLoop;
 
 /**
  * A version of {@link PS4Controller} with {@link Trigger} factories for command-based.

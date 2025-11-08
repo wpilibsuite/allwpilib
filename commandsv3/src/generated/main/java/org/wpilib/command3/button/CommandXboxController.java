@@ -6,10 +6,10 @@
 
 package org.wpilib.command3.button;
 
-import org.wpilib.driverstation.XboxController;
-import org.wpilib.event.EventLoop;
 import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.Trigger;
+import org.wpilib.driverstation.XboxController;
+import org.wpilib.event.EventLoop;
 
 /**
  * A version of {@link XboxController} with {@link Trigger} factories for command-based.
