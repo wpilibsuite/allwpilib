@@ -25,7 +25,9 @@ namespace wpi {
 namespace log {
 class DataLogReaderEntry;
 }  // namespace log
-class wpi::util::Logger;
+namespace util {
+class Logger;
+}
 }  // namespace wpi
 
 namespace sysid {

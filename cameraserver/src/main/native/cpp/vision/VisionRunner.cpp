@@ -24,7 +24,7 @@ VisionRunnerBase::VisionRunnerBase(cs::VideoSource videoSource)
 VisionRunnerBase::~VisionRunnerBase() = default;
 
 void VisionRunnerBase::RunOnce() {
-  auto csShared = wpi::vision::GetCameraServerShared();
+  auto csShared = wpi::GetCameraServerShared();
   auto res = csShared->GetRobotMainThreadId();
   if (res.second && (std::this_thread::get_id() == res.first)) {
     csShared->SetVisionRunnerError(
@@ -41,7 +41,7 @@ void VisionRunnerBase::RunOnce() {
 }
 
 void VisionRunnerBase::RunForever() {
-  auto csShared = wpi::vision::GetCameraServerShared();
+  auto csShared = wpi::GetCameraServerShared();
   auto res = csShared->GetRobotMainThreadId();
   if (res.second && (std::this_thread::get_id() == res.first)) {
     csShared->SetVisionRunnerError(

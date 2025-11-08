@@ -271,7 +271,7 @@ public final class DataLogManager {
       return filenameOverride;
     }
     Random rnd = new Random();
-    StringBuilder filename = new StringBuilder();
+    StringBuilder filename = new StringBuilder(18);
     filename.append("FRC_TBD_");
     for (int i = 0; i < 4; i++) {
       filename.append(String.format("%04x", rnd.nextInt(0x10000)));

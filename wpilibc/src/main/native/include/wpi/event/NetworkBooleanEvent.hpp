@@ -9,7 +9,7 @@
 
 #include "wpi/event/BooleanEvent.hpp"
 
-namespace nt {
+namespace wpi::nt {
 class BooleanSubscriber;
 class BooleanTopic;
 class NetworkTable;
