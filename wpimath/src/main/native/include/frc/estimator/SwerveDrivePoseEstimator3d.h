@@ -35,8 +35,10 @@ namespace frc {
  */
 template <size_t NumModules>
 class SwerveDrivePoseEstimator3d
-    : public PoseEstimator3d<wpi::array<SwerveModuleState, NumModules>,
-                             wpi::array<SwerveModulePosition, NumModules>> {
+    : public PoseEstimator3d<
+          wpi::array<SwerveModuleState, NumModules>,
+          wpi::array<SwerveModulePosition, NumModules>,
+          wpi::array<SwerveModuleAccelerations, NumModules>> {
  public:
   /**
    * Constructs a SwerveDrivePoseEstimator3d with default standard deviations

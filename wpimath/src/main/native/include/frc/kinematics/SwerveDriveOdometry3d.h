@@ -32,7 +32,8 @@ namespace frc {
 template <size_t NumModules>
 class SwerveDriveOdometry3d
     : public Odometry3d<wpi::array<SwerveModuleState, NumModules>,
-                        wpi::array<SwerveModulePosition, NumModules>> {
+                        wpi::array<SwerveModulePosition, NumModules>,
+                        wpi::array<SwerveModuleAccelerations, NumModules>> {
  public:
   /**
    * Constructs a SwerveDriveOdometry3d object.
