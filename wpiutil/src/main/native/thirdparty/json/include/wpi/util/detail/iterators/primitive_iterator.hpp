@@ -11,7 +11,7 @@
 #include <cstddef> // ptrdiff_t
 #include <limits>  // numeric_limits
 
-#include "wpi/util/detail/macro_scope.hpp"
+#include <wpi/util/detail/macro_scope.hpp>
 
 WPI_JSON_NAMESPACE_BEGIN
 namespace detail

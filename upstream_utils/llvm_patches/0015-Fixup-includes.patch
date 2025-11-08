@@ -67,7 +67,7 @@ index 4de36d969b3776b72ff85888355b64f7f3262ccc..e813fd3faa9f76148f9802c4b7308e51
  #include <ntstatus.h>
  #include <winerror.h>
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index a74b6b00d616828a8e5ab25c1fd15f2528b4d76d..a59603f9f2518428ae331e339dca2562de1ac4ff 100644
+index a74b6b00d616828a8e5ab25c1fd15f2528b4d76d..d8f0c5c7f0f4d5e468b30d53dc6eb8d777a0da9f 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -15,6 +15,8 @@

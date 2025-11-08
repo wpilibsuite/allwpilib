@@ -20,9 +20,9 @@
     #include <ostream>  // basic_ostream
 #endif  // JSON_NO_IO
 
-#include "wpi/util/detail/macro_scope.hpp"
+#include <wpi/util/detail/macro_scope.hpp>
 
-#include "wpi/util/raw_ostream.hpp"
+#include <wpi/util/raw_ostream.hpp>
 
 WPI_JSON_NAMESPACE_BEGIN
 namespace detail

@@ -12,9 +12,9 @@
 #include <utility> // declval
 #include <string> // string
 
-#include "wpi/util/detail/abi_macros.hpp"
-#include "wpi/util/detail/meta/detected.hpp"
-#include "wpi/util/detail/meta/type_traits.hpp"
+#include <wpi/util/detail/abi_macros.hpp>
+#include <wpi/util/detail/meta/detected.hpp>
+#include <wpi/util/detail/meta/type_traits.hpp>
 
 WPI_JSON_NAMESPACE_BEGIN
 namespace detail

@@ -18,10 +18,10 @@
 #include <utility> // move
 #include <vector> // vector
 
-#include "wpi/util/detail/input/input_adapters.hpp"
-#include "wpi/util/detail/input/position_t.hpp"
-#include "wpi/util/detail/macro_scope.hpp"
-#include "wpi/util/detail/meta/type_traits.hpp"
+#include <wpi/util/detail/input/input_adapters.hpp>
+#include <wpi/util/detail/input/position_t.hpp>
+#include <wpi/util/detail/macro_scope.hpp>
+#include <wpi/util/detail/meta/type_traits.hpp>
 
 WPI_JSON_NAMESPACE_BEGIN
 namespace detail
