@@ -36,6 +36,6 @@ public:
   ~raw_os_ostream() override;
 };
 
-} // end wpi namespace
+} // end wpi::util namespace
 
 #endif
