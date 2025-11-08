@@ -22,7 +22,7 @@ Java_org_wpilib_hardware_hal_DutyCycleJNI_initialize
   (JNIEnv* env, jclass, jint channel)
 {
   int32_t status = 0;
-  auto stack = wpi::util::java::GetJavaStackTrace(env, "edu.wpi.first");
+  auto stack = wpi::util::java::GetJavaStackTrace(env, "org.wpilib");
   auto handle = HAL_InitializeDutyCycle(channel, stack.c_str(), &status);
   CheckStatus(env, status);
   return handle;
