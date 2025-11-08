@@ -9,6 +9,7 @@
 #include <vector>
 
 #include <Eigen/Core>
+
 #include "wpi/util/json.hpp"
 
 namespace cameracalibration {

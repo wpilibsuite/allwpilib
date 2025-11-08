@@ -5,9 +5,8 @@
 #include <string>
 #include <utility>
 
-#include "wpi/util/protobuf/ProtobufCallbacks.hpp"
-
 #include "wpi/hal/proto/MatchInfo.h"
+#include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 
 std::optional<mrc::MatchInfo> wpi::Protobuf<mrc::MatchInfo>::Unpack(
     InputStream& Stream) {

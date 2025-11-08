@@ -10,13 +10,12 @@
 #include <utility>
 #include <vector>
 
+#include "wpi/glass/other/Field2D.hpp"
 #include "wpi/nt/MultiSubscriber.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/NetworkTableListener.hpp"
 #include "wpi/nt/StringTopic.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
-
-#include "wpi/glass/other/Field2D.hpp"
 
 namespace glass {
 

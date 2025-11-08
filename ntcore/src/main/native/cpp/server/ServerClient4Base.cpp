@@ -9,11 +9,11 @@
 #include <vector>
 
 #include <fmt/ranges.h>
-#include "wpi/util/SpanExtras.hpp"
 
 #include "Log.hpp"
 #include "server/ServerImpl.hpp"
 #include "server/ServerPublisher.hpp"
+#include "wpi/util/SpanExtras.hpp"
 
 using namespace nt::server;
 

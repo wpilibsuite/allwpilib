@@ -2,18 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_SINKIMPL_H_
-#define CSCORE_SINKIMPL_H_
+#ifndef CSCORE_SINKIMPL_HPP_
+#define CSCORE_SINKIMPL_HPP_
 
 #include <memory>
 #include <string>
 #include <string_view>
 
+#include "SourceImpl.hpp"
 #include "wpi/util/Logger.hpp"
 #include "wpi/util/json_fwd.hpp"
 #include "wpi/util/mutex.hpp"
-
-#include "SourceImpl.hpp"
 
 namespace cs {
 
@@ -75,4 +74,4 @@ class SinkImpl : public PropertyContainer {
 
 }  // namespace cs
 
-#endif  // CSCORE_SINKIMPL_H_
+#endif  // CSCORE_SINKIMPL_HPP_

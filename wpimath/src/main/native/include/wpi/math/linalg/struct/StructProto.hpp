@@ -5,10 +5,10 @@
 #pragma once
 
 #include <fmt/format.h>
-#include "wpi/util/ct_string.hpp"
-#include "wpi/util/struct/Struct.hpp"
 
 #include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/util/ct_string.hpp"
+#include "wpi/util/struct/Struct.hpp"
 
 template <int Rows, int Cols, int Options, int MaxRows, int MaxCols>
   requires(Cols != 1)

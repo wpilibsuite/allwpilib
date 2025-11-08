@@ -8,8 +8,6 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/system/Errors.hpp"
-
 #include "wpi/commands2/CommandScheduler.hpp"
 #include "wpi/commands2/ConditionalCommand.hpp"
 #include "wpi/commands2/InstantCommand.hpp"
@@ -22,6 +20,7 @@
 #include "wpi/commands2/WaitCommand.hpp"
 #include "wpi/commands2/WaitUntilCommand.hpp"
 #include "wpi/commands2/WrapperCommand.hpp"
+#include "wpi/system/Errors.hpp"
 
 using namespace frc2;
 

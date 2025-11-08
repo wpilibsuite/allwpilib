@@ -9,6 +9,7 @@
 #include <utility>
 
 #include <fmt/format.h>
+
 #include "wpi/util/Base64.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/raw_ostream.hpp"

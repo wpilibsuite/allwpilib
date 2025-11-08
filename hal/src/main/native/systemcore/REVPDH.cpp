@@ -4,13 +4,6 @@
 
 #include "REVPDH.h"
 
-#include "wpi/hal/CAN.h"
-#include "wpi/hal/CANAPI.h"
-#include "wpi/hal/CANAPITypes.h"
-#include "wpi/hal/Errors.h"
-#include "wpi/hal/handles/HandlesInternal.h"
-#include "wpi/hal/handles/IndexedHandleResource.h"
-
 #include <cstring>
 #include <string>
 #include <thread>
@@ -21,6 +14,12 @@
 #include "HALInternal.h"
 #include "PortsInternal.h"
 #include "rev/PDHFrames.h"
+#include "wpi/hal/CAN.h"
+#include "wpi/hal/CANAPI.h"
+#include "wpi/hal/CANAPITypes.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/hal/handles/IndexedHandleResource.h"
 
 using namespace hal;
 

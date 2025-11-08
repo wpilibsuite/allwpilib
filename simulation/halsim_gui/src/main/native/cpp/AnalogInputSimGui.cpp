@@ -12,7 +12,6 @@
 #include "wpi/hal/Ports.h"
 #include "wpi/hal/simulation/AnalogInData.h"
 #include "wpi/hal/simulation/SimDeviceData.h"
-
 #include "wpi/halsim/gui/HALDataSource.hpp"
 #include "wpi/halsim/gui/HALSimGui.hpp"
 

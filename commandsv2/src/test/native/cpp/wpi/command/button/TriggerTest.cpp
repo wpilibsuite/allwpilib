@@ -4,7 +4,6 @@
 
 #include <utility>
 
-#include "wpi/simulation/SimHooks.hpp"
 #include <gtest/gtest.h>
 
 #include "../CommandTestBase.hpp"
@@ -14,6 +13,7 @@
 #include "wpi/commands2/RunCommand.hpp"
 #include "wpi/commands2/WaitUntilCommand.hpp"
 #include "wpi/commands2/button/Trigger.hpp"
+#include "wpi/simulation/SimHooks.hpp"
 
 using namespace frc2;
 class TriggerTest : public CommandTestBase {};

@@ -5,11 +5,11 @@
 #include <string>
 #include <thread>
 
-#include "wpi/simulation/DriverStationSim.hpp"
-#include "wpi/simulation/SimHooks.hpp"
 #include <gtest/gtest.h>
-#include "wpi/hal/simulation/I2CData.h"
-#include "wpi/units/time.hpp"
+#include <wpi/hal/simulation/I2CData.h>
+#include <wpi/simulation/DriverStationSim.hpp>
+#include <wpi/simulation/SimHooks.hpp>
+#include <wpi/units/time.hpp>
 
 #include "Robot.hpp"
 

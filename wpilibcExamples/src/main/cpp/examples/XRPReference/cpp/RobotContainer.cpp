@@ -4,9 +4,9 @@
 
 #include "RobotContainer.hpp"
 
-#include "wpi/smartdashboard/SmartDashboard.hpp"
-#include "wpi/commands2/Commands.hpp"
-#include "wpi/commands2/button/JoystickButton.hpp"
+#include <wpi/commands2/Commands.hpp>
+#include <wpi/commands2/button/JoystickButton.hpp>
+#include <wpi/smartdashboard/SmartDashboard.hpp>
 
 #include "commands/TeleopArcadeDrive.hpp"
 

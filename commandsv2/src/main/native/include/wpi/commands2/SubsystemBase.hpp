@@ -7,10 +7,9 @@
 #include <string>
 #include <string_view>
 
+#include "wpi/commands2/Subsystem.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
-
-#include "wpi/commands2/Subsystem.hpp"
 
 namespace frc2 {
 /**

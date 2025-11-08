@@ -5,17 +5,17 @@
 #pragma once
 
 #include <Eigen/Core>
-#include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/array.hpp"
 
-#include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/kinematics/ChassisSpeeds.hpp"
 #include "wpi/math/trajectory/Trajectory.hpp"
+#include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/math.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/array.hpp"
 
 namespace frc {
 

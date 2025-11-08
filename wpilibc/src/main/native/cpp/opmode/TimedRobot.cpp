@@ -12,7 +12,6 @@
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/Notifier.h"
 #include "wpi/hal/UsageReporting.h"
-
 #include "wpi/system/Errors.hpp"
 
 using namespace frc;

@@ -11,10 +11,9 @@
 #include <string_view>
 #include <vector>
 
-#include "wpi/util/raw_ostream.hpp"
-
 #include "gmock/gmock.h"
 #include "net/WireConnection.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
 namespace nt::net {
 

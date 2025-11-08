@@ -3,13 +3,13 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include "wpi/util/StringExtras.hpp"
-#include "wpi/util/Synchronization.h"
 
 #include "TestPrinters.hpp"
 #include "ValueMatcher.hpp"
 #include "wpi/nt/ntcore_c.h"
 #include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/Synchronization.h"
 
 using ::testing::_;
 using ::testing::AnyNumber;

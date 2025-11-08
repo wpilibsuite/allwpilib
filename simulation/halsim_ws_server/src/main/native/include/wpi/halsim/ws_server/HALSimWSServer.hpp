@@ -8,9 +8,8 @@
 
 #include "wpi/halsim/ws_core/WSProviderContainer.hpp"
 #include "wpi/halsim/ws_core/WSProvider_SimDevice.hpp"
-#include "wpi/net/EventLoopRunner.hpp"
-
 #include "wpi/halsim/ws_server/HALSimWeb.hpp"
+#include "wpi/net/EventLoopRunner.hpp"
 
 namespace wpilibws {
 

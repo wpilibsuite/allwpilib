@@ -4,9 +4,8 @@
 
 #include "wpi/nt/NTSendable.hpp"
 
-#include "wpi/util/sendable/SendableBuilder.hpp"
-
 #include "wpi/nt/NTSendableBuilder.hpp"
+#include "wpi/util/sendable/SendableBuilder.hpp"
 
 using namespace nt;
 

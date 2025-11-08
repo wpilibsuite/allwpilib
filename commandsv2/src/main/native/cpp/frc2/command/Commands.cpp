@@ -7,9 +7,6 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/util/FunctionExtras.hpp"
-#include "wpi/util/deprecated.hpp"
-
 #include "wpi/commands2/ConditionalCommand.hpp"
 #include "wpi/commands2/DeferredCommand.hpp"
 #include "wpi/commands2/FunctionalCommand.hpp"
@@ -23,6 +20,8 @@
 #include "wpi/commands2/SequentialCommandGroup.hpp"
 #include "wpi/commands2/WaitCommand.hpp"
 #include "wpi/commands2/WaitUntilCommand.hpp"
+#include "wpi/util/FunctionExtras.hpp"
+#include "wpi/util/deprecated.hpp"
 
 using namespace frc2;
 

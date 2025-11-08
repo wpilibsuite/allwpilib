@@ -9,8 +9,6 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/util/SymbolExports.hpp"
-
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
 #include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
@@ -20,6 +18,7 @@
 #include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/velocity.hpp"
+#include "wpi/util/SymbolExports.hpp"
 
 namespace frc {
 /**

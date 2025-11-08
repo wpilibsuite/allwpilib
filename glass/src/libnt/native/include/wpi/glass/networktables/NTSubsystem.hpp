@@ -7,11 +7,10 @@
 #include <string>
 #include <string_view>
 
-#include "wpi/nt/NetworkTableInstance.hpp"
-#include "wpi/nt/StringTopic.hpp"
-
 #include "wpi/glass/DataSource.hpp"
 #include "wpi/glass/other/Subsystem.hpp"
+#include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/nt/StringTopic.hpp"
 
 namespace glass {
 class NTSubsystemModel : public SubsystemModel {

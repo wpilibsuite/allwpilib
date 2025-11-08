@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_MJPEGSERVERIMPL_H_
-#define CSCORE_MJPEGSERVERIMPL_H_
+#ifndef CSCORE_MJPEGSERVERIMPL_HPP_
+#define CSCORE_MJPEGSERVERIMPL_HPP_
 
 #include <atomic>
 #include <memory>
@@ -12,15 +12,15 @@
 #include <thread>
 #include <vector>
 
+#include <wpi/net/NetworkAcceptor.hpp>
+#include <wpi/net/NetworkStream.hpp>
+#include <wpi/net/raw_socket_ostream.hpp>
+
+#include "SinkImpl.hpp"
 #include "wpi/util/SafeThread.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/raw_istream.hpp"
 #include "wpi/util/raw_ostream.hpp"
-#include "wpi/net/NetworkAcceptor.hpp"
-#include "wpi/net/NetworkStream.hpp"
-#include "wpi/net/raw_socket_ostream.hpp"
-
-#include "SinkImpl.hpp"
 
 namespace cs {
 
@@ -65,4 +65,4 @@ class MjpegServerImpl : public SinkImpl {
 
 }  // namespace cs
 
-#endif  // CSCORE_MJPEGSERVERIMPL_H_
+#endif  // CSCORE_MJPEGSERVERIMPL_HPP_

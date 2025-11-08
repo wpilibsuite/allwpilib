@@ -7,10 +7,9 @@
 #include <string>
 #include <utility>
 
-#include "wpi/util/Demangle.hpp"
-
 #include "wpi/commands2/CommandPtr.hpp"
 #include "wpi/commands2/Commands.hpp"
+#include "wpi/util/Demangle.hpp"
 
 using namespace frc2;
 Subsystem::~Subsystem() {

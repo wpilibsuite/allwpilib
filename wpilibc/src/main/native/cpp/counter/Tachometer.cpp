@@ -8,10 +8,9 @@
 
 #include "wpi/hal/Counter.h"
 #include "wpi/hal/UsageReporting.h"
+#include "wpi/system/Errors.hpp"
 #include "wpi/util/StackTrace.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
-
-#include "wpi/system/Errors.hpp"
 
 using namespace frc;
 

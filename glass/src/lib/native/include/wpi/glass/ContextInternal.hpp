@@ -10,11 +10,10 @@
 #include <string>
 #include <vector>
 
-#include "wpi/util/SmallVector.hpp"
-#include "wpi/util/StringMap.hpp"
-
 #include "wpi/glass/Context.hpp"
 #include "wpi/glass/Storage.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/StringMap.hpp"
 
 namespace glass {
 

@@ -5,9 +5,9 @@
 #include "string"
 #include "wpi/util/string.h"
 
-#include "wpi/util/MemAlloc.hpp"
-
 #include <string_view>
+
+#include "wpi/util/MemAlloc.hpp"
 
 extern "C" {
 

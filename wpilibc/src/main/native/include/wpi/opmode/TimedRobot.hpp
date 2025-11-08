@@ -11,13 +11,12 @@
 
 #include "wpi/hal/Notifier.h"
 #include "wpi/hal/Types.h"
+#include "wpi/opmode/IterativeRobotBase.hpp"
+#include "wpi/system/RobotController.hpp"
 #include "wpi/units/frequency.hpp"
 #include "wpi/units/math.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/priority_queue.hpp"
-
-#include "wpi/opmode/IterativeRobotBase.hpp"
-#include "wpi/system/RobotController.hpp"
 
 namespace frc {
 

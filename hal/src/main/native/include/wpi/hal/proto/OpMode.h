@@ -8,10 +8,9 @@
 
 #include <vector>
 
-#include "wpi/util/protobuf/Protobuf.hpp"
-
 #include "MrcComm.npb.h"
 #include "mrc/NetComm.h"
+#include "wpi/util/protobuf/Protobuf.hpp"
 
 template <>
 struct wpi::Protobuf<mrc::OpMode> {

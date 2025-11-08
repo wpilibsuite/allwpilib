@@ -10,13 +10,12 @@
 #include <string_view>
 #include <vector>
 
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/nt/DoubleArrayTopic.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/mutex.hpp"
-
-#include "wpi/math/geometry/Pose2d.hpp"
-#include "wpi/math/geometry/Rotation2d.hpp"
 
 namespace frc {
 

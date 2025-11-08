@@ -7,11 +7,10 @@
 #include <cstddef>
 #include <vector>
 
-#include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/array.hpp"
-
 #include "wpi/math/spline/CubicHermiteSpline.hpp"
 #include "wpi/math/spline/QuinticHermiteSpline.hpp"
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/array.hpp"
 
 namespace frc {
 /**

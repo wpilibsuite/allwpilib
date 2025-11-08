@@ -7,7 +7,6 @@
 #include <memory>
 
 #include "wpi/hal/simulation/PowerDistributionData.h"
-
 #include "wpi/hardware/power/PowerDistribution.hpp"
 
 using namespace frc;

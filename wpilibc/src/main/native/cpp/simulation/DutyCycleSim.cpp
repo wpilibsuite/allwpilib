@@ -8,7 +8,6 @@
 #include <stdexcept>
 
 #include "wpi/hal/simulation/DutyCycleData.h"
-
 #include "wpi/hardware/rotation/DutyCycle.hpp"
 
 using namespace frc;

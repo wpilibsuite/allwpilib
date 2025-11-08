@@ -5,11 +5,11 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include "wpi/util/Synchronization.h"
 
 #include "Handle.hpp"
 #include "TestPrinters.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/Synchronization.h"
 
 class LoggerTest : public ::testing::Test {
  public:

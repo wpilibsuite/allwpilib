@@ -6,12 +6,11 @@
 
 #include <array>
 
+#include "wpi/math/system/plant/DCMotor.hpp"
+#include "wpi/simulation/LinearSystemSim.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/mass.hpp"
 #include "wpi/units/velocity.hpp"
-
-#include "wpi/simulation/LinearSystemSim.hpp"
-#include "wpi/math/system/plant/DCMotor.hpp"
 
 namespace frc::sim {
 /**

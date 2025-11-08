@@ -4,9 +4,8 @@
 
 #include "wpi/simulation/DCMotorSim.hpp"
 
-#include "wpi/util/MathExtras.hpp"
-
 #include "wpi/system/RobotController.hpp"
+#include "wpi/util/MathExtras.hpp"
 
 using namespace frc;
 using namespace frc::sim;

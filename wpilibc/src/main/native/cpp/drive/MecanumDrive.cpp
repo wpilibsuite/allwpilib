@@ -9,12 +9,11 @@
 #include <utility>
 
 #include "wpi/hal/UsageReporting.h"
+#include "wpi/hardware/motor/MotorController.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/math/util/MathUtil.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
-
-#include "wpi/math/util/MathUtil.hpp"
-#include "wpi/math/geometry/Translation2d.hpp"
-#include "wpi/hardware/motor/MotorController.hpp"
 
 using namespace frc;
 

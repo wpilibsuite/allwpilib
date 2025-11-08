@@ -5,10 +5,10 @@
 #include "wpi/system/Tracer.hpp"
 
 #include <fmt/format.h>
-#include "wpi/util/SmallString.hpp"
-#include "wpi/util/raw_ostream.hpp"
 
 #include "wpi/system/Errors.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
 using namespace frc;
 

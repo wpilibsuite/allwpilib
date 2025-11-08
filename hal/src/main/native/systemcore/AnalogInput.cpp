@@ -7,8 +7,6 @@
 #include <cstdio>
 #include <thread>
 
-#include "wpi/util/mutex.hpp"
-
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
@@ -16,6 +14,7 @@
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/cpp/fpga_clock.h"
 #include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/util/mutex.hpp"
 
 namespace hal::init {
 void InitializeAnalogInput() {}

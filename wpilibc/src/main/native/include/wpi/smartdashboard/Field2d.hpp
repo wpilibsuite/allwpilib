@@ -8,16 +8,15 @@
 #include <string_view>
 #include <vector>
 
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/nt/NTSendable.hpp"
 #include "wpi/nt/NetworkTable.hpp"
 #include "wpi/nt/NetworkTableEntry.hpp"
+#include "wpi/smartdashboard/FieldObject2d.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
-
-#include "wpi/math/geometry/Pose2d.hpp"
-#include "wpi/math/geometry/Rotation2d.hpp"
-#include "wpi/smartdashboard/FieldObject2d.hpp"
 
 namespace frc {
 

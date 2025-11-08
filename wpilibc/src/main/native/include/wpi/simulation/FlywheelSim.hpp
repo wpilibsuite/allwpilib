@@ -4,14 +4,13 @@
 
 #pragma once
 
+#include "wpi/math/system/LinearSystem.hpp"
+#include "wpi/math/system/plant/DCMotor.hpp"
+#include "wpi/simulation/LinearSystemSim.hpp"
 #include "wpi/units/angular_acceleration.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
 #include "wpi/units/torque.hpp"
-
-#include "wpi/simulation/LinearSystemSim.hpp"
-#include "wpi/math/system/LinearSystem.hpp"
-#include "wpi/math/system/plant/DCMotor.hpp"
 
 namespace frc::sim {
 /**

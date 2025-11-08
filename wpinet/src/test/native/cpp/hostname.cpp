@@ -5,6 +5,7 @@
 #include "wpi/net/hostname.hpp"
 
 #include <gtest/gtest.h>
+
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/SmallVector.hpp"
 

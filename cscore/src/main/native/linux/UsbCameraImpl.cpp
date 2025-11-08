@@ -26,12 +26,6 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include "wpi/util/MemAlloc.hpp"
-#include "wpi/util/SmallString.hpp"
-#include "wpi/util/StringExtras.hpp"
-#include "wpi/util/fs.hpp"
-#include "wpi/util/raw_ostream.hpp"
-#include "wpi/util/timestamp.h"
 
 #include "Instance.hpp"
 #include "JpegUtil.hpp"
@@ -40,6 +34,12 @@
 #include "Telemetry.hpp"
 #include "UsbUtil.hpp"
 #include "wpi/cs/cscore_cpp.hpp"
+#include "wpi/util/MemAlloc.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/fs.hpp"
+#include "wpi/util/raw_ostream.hpp"
+#include "wpi/util/timestamp.h"
 
 using namespace cs;
 

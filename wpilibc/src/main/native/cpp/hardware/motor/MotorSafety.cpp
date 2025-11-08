@@ -7,12 +7,11 @@
 #include <algorithm>
 #include <utility>
 
+#include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/hal/DriverStation.h"
+#include "wpi/system/Errors.hpp"
 #include "wpi/util/SafeThread.hpp"
 #include "wpi/util/SmallPtrSet.hpp"
-
-#include "wpi/driverstation/DriverStation.hpp"
-#include "wpi/system/Errors.hpp"
 
 using namespace frc;
 

@@ -4,10 +4,9 @@
 
 #pragma once
 
+#include "wpi/commands2/button/Trigger.hpp"
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/driverstation/GenericHID.hpp"
-
-#include "wpi/commands2/button/Trigger.hpp"
 
 namespace frc2 {
 /**

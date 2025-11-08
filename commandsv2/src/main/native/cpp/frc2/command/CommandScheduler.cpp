@@ -10,20 +10,19 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/opmode/RobotBase.hpp"
-#include "wpi/opmode/RobotState.hpp"
-#include "wpi/opmode/TimedRobot.hpp"
+#include "wpi/commands2/CommandPtr.hpp"
+#include "wpi/commands2/Subsystem.hpp"
 #include "wpi/hal/HALBase.h"
 #include "wpi/hal/UsageReporting.h"
 #include "wpi/nt/IntegerArrayTopic.hpp"
 #include "wpi/nt/StringArrayTopic.hpp"
+#include "wpi/opmode/RobotBase.hpp"
+#include "wpi/opmode/RobotState.hpp"
+#include "wpi/opmode/TimedRobot.hpp"
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
-
-#include "wpi/commands2/CommandPtr.hpp"
-#include "wpi/commands2/Subsystem.hpp"
 
 using namespace frc2;
 

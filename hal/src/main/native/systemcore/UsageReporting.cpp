@@ -5,12 +5,12 @@
 #include <stdint.h>
 
 #include <fmt/format.h>
+
+#include "SystemServerInternal.h"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/StringTopic.hpp"
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/string.h"
-
-#include "SystemServerInternal.h"
 
 namespace {
 struct SystemServerUsageReporting {

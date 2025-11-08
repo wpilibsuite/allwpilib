@@ -6,7 +6,6 @@
 #include <memory>
 
 #include "wpi/hal/Extensions.h"
-
 #include "wpi/halsim/ws_server/HALSimWSServer.hpp"
 
 using namespace std::placeholders;

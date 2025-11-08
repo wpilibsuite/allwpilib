@@ -4,15 +4,13 @@
 
 #pragma once
 
-#include "wpi/math/filter/Debouncer.hpp"
-
 #include <functional>
 #include <memory>
 
+#include "EventLoop.hpp"
+#include "wpi/math/filter/Debouncer.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/FunctionExtras.hpp"
-
-#include "EventLoop.hpp"
 
 namespace frc {
 

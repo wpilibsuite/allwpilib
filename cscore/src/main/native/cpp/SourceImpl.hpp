@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_SOURCEIMPL_H_
-#define CSCORE_SOURCEIMPL_H_
+#ifndef CSCORE_SOURCEIMPL_HPP_
+#define CSCORE_SOURCEIMPL_HPP_
 
 #include <atomic>
 #include <cstddef>
@@ -12,17 +12,16 @@
 #include <string_view>
 #include <vector>
 
-#include "wpi/util/Logger.hpp"
-#include "wpi/util/RawFrame.h"
-#include "wpi/util/condition_variable.hpp"
-#include "wpi/util/json_fwd.hpp"
-#include "wpi/util/mutex.hpp"
-
 #include "Frame.hpp"
 #include "Handle.hpp"
 #include "Image.hpp"
 #include "PropertyContainer.hpp"
 #include "wpi/cs/cscore_cpp.hpp"
+#include "wpi/util/Logger.hpp"
+#include "wpi/util/RawFrame.h"
+#include "wpi/util/condition_variable.hpp"
+#include "wpi/util/json_fwd.hpp"
+#include "wpi/util/mutex.hpp"
 
 namespace cs {
 
@@ -196,4 +195,4 @@ class SourceImpl : public PropertyContainer {
 
 }  // namespace cs
 
-#endif  // CSCORE_SOURCEIMPL_H_
+#endif  // CSCORE_SOURCEIMPL_HPP_

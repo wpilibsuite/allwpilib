@@ -7,6 +7,7 @@
 #include <utility>
 
 #include <fmt/format.h>
+
 #include "wpi/util/StringExtras.hpp"
 
 using namespace glass;

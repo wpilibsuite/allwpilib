@@ -7,15 +7,15 @@
 #include <thread>
 
 #include <gtest/gtest.h>
+
+#include "WebServerClientTest.hpp"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/HALBase.h"
 #include "wpi/hal/Main.h"
 #include "wpi/hal/simulation/DIOData.h"
-#include "wpi/util/print.hpp"
-#include "wpi/net/uv/Loop.hpp"
-
 #include "wpi/halsim/ws_server/HALSimWSServer.hpp"
-#include "WebServerClientTest.hpp"
+#include "wpi/net/uv/Loop.hpp"
+#include "wpi/util/print.hpp"
 
 namespace uv = wpi::uv;
 

@@ -4,12 +4,11 @@
 
 #pragma once
 
-#include "wpi/util/SymbolExports.hpp"
-
 #include "wpi/math/geometry/CoordinateAxis.hpp"
 #include "wpi/math/geometry/Pose3d.hpp"
 #include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/geometry/Translation3d.hpp"
+#include "wpi/util/SymbolExports.hpp"
 
 namespace frc {
 

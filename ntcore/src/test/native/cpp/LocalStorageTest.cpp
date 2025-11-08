@@ -6,7 +6,6 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include "wpi/util/SpanMatcher.hpp"
 
 #include "LocalStorage.hpp"
 #include "MockListenerStorage.hpp"
@@ -19,6 +18,7 @@
 #include "net/MockNetworkInterface.hpp"
 #include "wpi/nt/ntcore_c.h"
 #include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/SpanMatcher.hpp"
 
 using ::testing::_;
 using ::testing::AllOf;

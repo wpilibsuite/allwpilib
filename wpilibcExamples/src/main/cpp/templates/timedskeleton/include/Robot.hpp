@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "wpi/opmode/TimedRobot.hpp"
+#include <wpi/opmode/TimedRobot.hpp>
 
 class Robot : public frc::TimedRobot {
  public:

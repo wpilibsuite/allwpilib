@@ -13,10 +13,10 @@
 #include <Eigen/Eigenvalues>
 #include <fmt/format.h>
 #include <fmt/ranges.h>
-#include "wpi/units/math.hpp"
-#include "wpi/units/time.hpp"
 
 #include "wpi/sysid/analysis/OLS.hpp"
+#include "wpi/units/math.hpp"
+#include "wpi/units/time.hpp"
 
 namespace sysid {
 

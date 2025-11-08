@@ -6,6 +6,7 @@
 
 #include <memory>
 
+#include "EdgeConfiguration.hpp"
 #include "wpi/hal/Counter.h"
 #include "wpi/hal/Types.h"
 #include "wpi/units/angular_velocity.hpp"
@@ -13,8 +14,6 @@
 #include "wpi/units/time.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
-
-#include "EdgeConfiguration.hpp"
 
 namespace frc {
 /**

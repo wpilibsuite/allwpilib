@@ -7,16 +7,15 @@
 #include <memory>
 #include <string>
 
-#include "wpi/util/SmallString.hpp"
-#include "wpi/util/fs.hpp"
-#include "wpi/util/print.hpp"
+#include "wpi/halsim/ws_server/HALSimHttpConnection.hpp"
 #include "wpi/net/UrlParser.hpp"
 #include "wpi/net/WebSocketServer.hpp"
 #include "wpi/net/raw_uv_ostream.hpp"
 #include "wpi/net/uv/Loop.hpp"
 #include "wpi/net/uv/Tcp.hpp"
-
-#include "wpi/halsim/ws_server/HALSimHttpConnection.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/fs.hpp"
+#include "wpi/util/print.hpp"
 
 namespace uv = wpi::uv;
 

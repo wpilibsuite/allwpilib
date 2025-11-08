@@ -13,7 +13,6 @@
 #include "wpi/hal/Ports.h"
 #include "wpi/hal/Value.h"
 #include "wpi/hal/simulation/CTREPCMData.h"
-
 #include "wpi/halsim/gui/HALDataSource.hpp"
 #include "wpi/halsim/gui/HALSimGui.hpp"
 #include "wpi/halsim/gui/SimDeviceGui.hpp"

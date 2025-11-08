@@ -8,9 +8,9 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include "wpi/util/deprecated.hpp"
 
 #include "motorcontrol/MockMotorController.hpp"
+#include "wpi/util/deprecated.hpp"
 
 using namespace frc;
 

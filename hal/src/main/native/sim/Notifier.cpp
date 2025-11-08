@@ -12,11 +12,6 @@
 #include <string>
 #include <utility>
 
-#include "wpi/util/SmallVector.hpp"
-#include "wpi/util/StringExtras.hpp"
-#include "wpi/util/condition_variable.hpp"
-#include "wpi/util/mutex.hpp"
-
 #include "HALInitializer.h"
 #include "NotifierInternal.h"
 #include "wpi/hal/Errors.h"
@@ -24,6 +19,10 @@
 #include "wpi/hal/cpp/fpga_clock.h"
 #include "wpi/hal/handles/UnlimitedHandleResource.h"
 #include "wpi/hal/simulation/NotifierData.h"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/condition_variable.hpp"
+#include "wpi/util/mutex.hpp"
 
 namespace {
 struct Notifier {

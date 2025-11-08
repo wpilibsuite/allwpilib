@@ -12,13 +12,13 @@
 #include <utility>
 
 #include <Eigen/Core>
-#include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/json_fwd.hpp"
 
-#include "wpi/math/linalg/ct_matrix.hpp"
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/geometry/Translation3d.hpp"
+#include "wpi/math/linalg/ct_matrix.hpp"
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/json_fwd.hpp"
 
 namespace frc {
 

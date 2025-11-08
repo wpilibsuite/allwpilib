@@ -6,6 +6,8 @@
 
 #include <memory>
 
+#include "wpi/ExpansionHub.hpp"
+#include "wpi/ExpansionHubPidConstants.hpp"
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/DoubleTopic.hpp"
 #include "wpi/nt/IntegerTopic.hpp"
@@ -13,9 +15,6 @@
 #include "wpi/units/current.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/voltage.hpp"
-
-#include "wpi/ExpansionHub.hpp"
-#include "wpi/ExpansionHubPidConstants.hpp"
 
 namespace frc {
 

@@ -9,9 +9,8 @@
 #include <string>
 #include <vector>
 
-#include "wpi/util/deprecated.hpp"
-
 #include "wpi/system/Errors.hpp"
+#include "wpi/util/deprecated.hpp"
 
 WPI_IGNORE_DEPRECATED
 using namespace frc;

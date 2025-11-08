@@ -4,9 +4,8 @@
 
 #include <cstdio>
 
-#include "wpi/util/print.hpp"
-
 #include "wpi/cs/cscore.h"
+#include "wpi/util/print.hpp"
 
 int main() {
   wpi::print("hostname: {}\n", cs::GetHostname());

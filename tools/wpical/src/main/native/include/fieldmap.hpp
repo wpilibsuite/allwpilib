@@ -7,9 +7,8 @@
 #include <cmath>
 #include <map>
 
-#include "wpi/util/json.hpp"
-
 #include "tagpose.hpp"
+#include "wpi/util/json.hpp"
 
 class Fieldmap {
  public:

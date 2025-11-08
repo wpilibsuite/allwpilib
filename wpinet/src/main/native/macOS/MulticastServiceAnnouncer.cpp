@@ -10,9 +10,8 @@
 #include <string>
 #include <utility>
 
-#include "wpi/util/SmallString.hpp"
-
 #include "dns_sd.h"
+#include "wpi/util/SmallString.hpp"
 
 using namespace wpi;
 

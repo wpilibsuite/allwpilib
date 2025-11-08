@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include "wpi/hal/Types.h"
 #include <stdint.h>
+
+#include "wpi/hal/Types.h"
 
 /** max length of LED strip supported by device. */
 #define HAL_kAddressableLEDMaxLength 1024

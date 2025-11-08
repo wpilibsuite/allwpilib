@@ -14,22 +14,22 @@
 
 #include <GLFW/glfw3.h>
 #include <fmt/format.h>
+#include <imgui.h>
+#include <imgui_internal.h>
+
 #include "wpi/glass/Context.hpp"
 #include "wpi/glass/Storage.hpp"
 #include "wpi/glass/other/FMS.hpp"
 #include "wpi/glass/support/ExtraGuiWidgets.hpp"
 #include "wpi/glass/support/NameSetting.hpp"
+#include "wpi/gui/wpigui.hpp"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/hal/simulation/MockHooks.h"
-#include <imgui.h>
-#include <imgui_internal.h>
-#include "wpi/util/SmallVector.hpp"
-#include "wpi/util/StringExtras.hpp"
-#include "wpi/gui/wpigui.hpp"
-
 #include "wpi/halsim/gui/HALDataSource.hpp"
 #include "wpi/halsim/gui/HALSimGui.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/StringExtras.hpp"
 
 using namespace halsimgui;
 

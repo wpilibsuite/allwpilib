@@ -13,18 +13,17 @@
 #include <utility>
 #include <vector>
 
+#include "INetworkClient.hpp"
+#include "net/ClientImpl.hpp"
+#include "net/ClientMessageQueue.hpp"
+#include "net/Message.hpp"
+#include "net/WebSocketConnection.hpp"
 #include "wpi/net/DsClient.hpp"
 #include "wpi/net/EventLoopRunner.hpp"
 #include "wpi/net/ParallelTcpConnector.hpp"
 #include "wpi/net/WebSocket.hpp"
 #include "wpi/net/uv/Async.hpp"
 #include "wpi/net/uv/Timer.hpp"
-
-#include "INetworkClient.hpp"
-#include "net/ClientImpl.hpp"
-#include "net/ClientMessageQueue.hpp"
-#include "net/Message.hpp"
-#include "net/WebSocketConnection.hpp"
 
 namespace wpi {
 class Logger;

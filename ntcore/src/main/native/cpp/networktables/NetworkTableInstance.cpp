@@ -9,9 +9,6 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/util/SmallVector.hpp"
-#include "wpi/util/print.hpp"
-
 #include "wpi/nt/BooleanArrayTopic.hpp"
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/DoubleArrayTopic.hpp"
@@ -24,6 +21,8 @@
 #include "wpi/nt/RawTopic.hpp"
 #include "wpi/nt/StringArrayTopic.hpp"
 #include "wpi/nt/StringTopic.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/print.hpp"
 
 using namespace nt;
 

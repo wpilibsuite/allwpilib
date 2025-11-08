@@ -5,6 +5,7 @@
 #pragma once
 
 #include <gcem.hpp>
+
 #include "wpi/units/angle.hpp"
 
 namespace sysid {

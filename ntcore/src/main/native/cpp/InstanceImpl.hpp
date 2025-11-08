@@ -12,8 +12,6 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/util/mutex.hpp"
-
 #include "ConnectionList.hpp"
 #include "Handle.hpp"
 #include "ListenerStorage.hpp"
@@ -22,6 +20,7 @@
 #include "LoggerImpl.hpp"
 #include "NetworkClient.hpp"
 #include "NetworkServer.hpp"
+#include "wpi/util/mutex.hpp"
 
 namespace nt {
 

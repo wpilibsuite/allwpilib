@@ -5,7 +5,6 @@
 #include "wpi/math/kinematics/proto/MecanumDriveKinematicsProto.hpp"
 
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
-
 #include "wpimath/protobuf/kinematics.npb.h"
 
 std::optional<frc::MecanumDriveKinematics>

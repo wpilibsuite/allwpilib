@@ -12,11 +12,10 @@
 
 #include "wpi/hal/SimDevice.h"
 #include "wpi/hal/simulation/SimDeviceData.h"
-#include "wpi/util/StringMap.hpp"
-#include "wpi/net/uv/AsyncFunction.hpp"
-
 #include "wpi/halsim/ws_core/WSBaseProvider.hpp"
 #include "wpi/halsim/ws_core/WSProviderContainer.hpp"
+#include "wpi/net/uv/AsyncFunction.hpp"
+#include "wpi/util/StringMap.hpp"
 
 namespace wpilibws {
 

@@ -7,7 +7,6 @@
 #include <memory>
 
 #include "wpi/hal/simulation/AnalogInData.h"
-
 #include "wpi/hardware/discrete/AnalogInput.hpp"
 
 using namespace frc;

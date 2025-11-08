@@ -9,13 +9,13 @@
 #include <memory>
 #include <vector>
 
+#include <imgui.h>
+
 #include "wpi/glass/Model.hpp"
 #include "wpi/glass/View.hpp"
 #include "wpi/hal/HALBase.h"
 #include "wpi/hal/simulation/MockHooks.h"
 #include "wpi/hal/simulation/NotifierData.h"
-#include <imgui.h>
-
 #include "wpi/halsim/gui/HALSimGui.hpp"
 
 using namespace halsimgui;

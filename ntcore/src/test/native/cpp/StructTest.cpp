@@ -3,12 +3,12 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include "wpi/util/SpanMatcher.hpp"
-#include "wpi/util/struct/Struct.hpp"
 
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/StructArrayTopic.hpp"
 #include "wpi/nt/StructTopic.hpp"
+#include "wpi/util/SpanMatcher.hpp"
+#include "wpi/util/struct/Struct.hpp"
 
 namespace {
 struct Inner {

@@ -2,19 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/hal/PowerDistribution.h"
 #include "wpi/hardware/power/PowerDistribution.hpp"
 
 #include <vector>
 
 #include <fmt/format.h>
+
 #include "wpi/hal/Ports.h"
-#include "wpi/hal/PowerDistribution.h"
 #include "wpi/hal/UsageReporting.h"
+#include "wpi/system/Errors.hpp"
 #include "wpi/util/StackTrace.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
-
-#include "wpi/system/Errors.hpp"
 
 static_assert(static_cast<HAL_PowerDistributionType>(
                   frc::PowerDistribution::ModuleType::kCTRE) ==

@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "wpi/commands2/CommandHelper.hpp"
-#include "wpi/commands2/SequentialCommandGroup.hpp"
+#include <wpi/commands2/CommandHelper.hpp>
+#include <wpi/commands2/SequentialCommandGroup.hpp>
 
 #include "commands/DriveTime.hpp"
 #include "commands/TurnTime.hpp"

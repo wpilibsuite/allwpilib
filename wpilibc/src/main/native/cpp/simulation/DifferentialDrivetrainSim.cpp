@@ -4,15 +4,13 @@
 
 #include "wpi/simulation/DifferentialDrivetrainSim.hpp"
 
-#include "wpi/math/system/plant/LinearSystemId.hpp"
-
 #include <utility>
 
-#include "wpi/util/MathExtras.hpp"
-
-#include "wpi/system/RobotController.hpp"
-#include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
+#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/math/util/StateSpaceUtil.hpp"
+#include "wpi/system/RobotController.hpp"
+#include "wpi/util/MathExtras.hpp"
 
 using namespace frc;
 using namespace frc::sim;

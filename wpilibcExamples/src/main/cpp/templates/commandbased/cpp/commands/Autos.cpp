@@ -4,7 +4,7 @@
 
 #include "commands/Autos.hpp"
 
-#include "wpi/commands2/Commands.hpp"
+#include <wpi/commands2/Commands.hpp>
 
 #include "commands/ExampleCommand.hpp"
 

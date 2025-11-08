@@ -7,9 +7,9 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include "wpi/hal/HAL.h"
 
 #include "callback_helpers/TestCallbackHelpers.hpp"
+#include "wpi/hal/HAL.h"
 #include "wpi/hardware/power/PowerDistribution.hpp"
 
 namespace frc::sim {

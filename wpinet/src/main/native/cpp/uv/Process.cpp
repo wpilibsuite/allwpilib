@@ -6,10 +6,9 @@
 
 #include <memory>
 
-#include "wpi/util/SmallString.hpp"
-
 #include "wpi/net/uv/Loop.hpp"
 #include "wpi/net/uv/Pipe.hpp"
+#include "wpi/util/SmallString.hpp"
 
 namespace wpi::uv {
 

@@ -6,11 +6,10 @@
 
 #include <memory>
 
-#include "wpi/util/DenseMap.hpp"
-#include "wpi/util/UidVector.hpp"
-
 #include "wpi/net/MulticastServiceAnnouncer.h"
 #include "wpi/net/MulticastServiceResolver.h"
+#include "wpi/util/DenseMap.hpp"
+#include "wpi/util/UidVector.hpp"
 
 namespace wpi {
 struct MulticastHandleManager {

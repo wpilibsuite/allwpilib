@@ -10,9 +10,9 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include "wpi/util/mutex.hpp"
 
 #include "AvahiClient.hpp"
+#include "wpi/util/mutex.hpp"
 
 using namespace wpi;
 

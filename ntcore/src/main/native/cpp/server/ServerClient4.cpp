@@ -6,12 +6,11 @@
 
 #include <string>
 
-#include "wpi/util/timestamp.h"
-
 #include "Log.hpp"
 #include "net/WireDecoder.hpp"
 #include "server/ServerStorage.hpp"
 #include "server/ServerTopic.hpp"
+#include "wpi/util/timestamp.h"
 
 using namespace nt::server;
 

@@ -6,9 +6,9 @@
 
 #include <array>
 
-#include "wpi/hardware/led/AddressableLED.hpp"
-#include "wpi/hardware/led/LEDPattern.hpp"
-#include "wpi/opmode/TimedRobot.hpp"
+#include <wpi/hardware/led/AddressableLED.hpp>
+#include <wpi/hardware/led/LEDPattern.hpp>
+#include <wpi/opmode/TimedRobot.hpp>
 
 class Robot : public frc::TimedRobot {
  public:

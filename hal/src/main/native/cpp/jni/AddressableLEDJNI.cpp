@@ -4,11 +4,10 @@
 
 #include <jni.h>
 
-#include "wpi/util/jni_util.hpp"
-
 #include "HALUtil.h"
 #include "org_wpilib_hardware_hal_AddressableLEDJNI.h"
 #include "wpi/hal/AddressableLED.h"
+#include "wpi/util/jni_util.hpp"
 
 using namespace hal;
 using namespace wpi::java;

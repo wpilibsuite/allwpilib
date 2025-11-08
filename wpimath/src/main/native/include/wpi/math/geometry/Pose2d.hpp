@@ -10,12 +10,12 @@
 #include <utility>
 
 #include <gcem.hpp>
-#include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/json_fwd.hpp"
 
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/units/length.hpp"
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/json_fwd.hpp"
 
 namespace frc {
 

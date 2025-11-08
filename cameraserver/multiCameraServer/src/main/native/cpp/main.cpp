@@ -9,6 +9,7 @@
 #include <utility>
 #include <vector>
 
+#include "wpi/cameraserver/CameraServer.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/util/MemoryBuffer.hpp"
 #include "wpi/util/StringExtras.hpp"
@@ -16,8 +17,6 @@
 #include "wpi/util/json.hpp"
 #include "wpi/util/print.hpp"
 #include "wpi/util/raw_ostream.hpp"
-
-#include "wpi/cameraserver/CameraServer.hpp"
 
 /*
    JSON format:

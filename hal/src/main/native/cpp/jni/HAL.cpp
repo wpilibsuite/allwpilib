@@ -14,12 +14,12 @@
 #include <cstring>
 
 #include <fmt/format.h>
-#include "wpi/util/jni_util.hpp"
 
 #include "HALUtil.h"
 #include "org_wpilib_hardware_hal_HAL.h"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/Main.h"
+#include "wpi/util/jni_util.hpp"
 
 using namespace hal;
 using namespace wpi::java;

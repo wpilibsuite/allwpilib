@@ -6,9 +6,8 @@
 
 #include <cstring>
 
-#include "wpi/util/MemAlloc.hpp"
-
 #include "Value_internal.hpp"
+#include "wpi/util/MemAlloc.hpp"
 
 extern "C" {
 struct WPI_String* NT_GetStringForTesting(const char* str, int* struct_size) {

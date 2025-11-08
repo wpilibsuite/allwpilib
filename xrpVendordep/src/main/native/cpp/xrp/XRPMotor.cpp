@@ -4,11 +4,11 @@
 
 #include "wpi/xrp/XRPMotor.hpp"
 
-#include "wpi/system/Errors.hpp"
-
 #include <map>
 #include <set>
 #include <string>
+
+#include "wpi/system/Errors.hpp"
 
 using namespace frc;
 

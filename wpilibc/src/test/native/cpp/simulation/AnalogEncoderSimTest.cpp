@@ -5,12 +5,12 @@
 #include <numbers>
 
 #include <gtest/gtest.h>
-#include "wpi/hal/HAL.h"
-#include "wpi/units/math.hpp"
 
-#include "wpi/hardware/rotation/AnalogEncoder.hpp"
+#include "wpi/hal/HAL.h"
 #include "wpi/hardware/discrete/AnalogInput.hpp"
+#include "wpi/hardware/rotation/AnalogEncoder.hpp"
 #include "wpi/simulation/AnalogEncoderSim.hpp"
+#include "wpi/units/math.hpp"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(units::math::abs(val1 - val2), eps)

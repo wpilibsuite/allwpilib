@@ -2,6 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "../PortsInternal.h"
 #include "wpi/hal/simulation/AddressableLEDData.h"
 #include "wpi/hal/simulation/AnalogInData.h"
 #include "wpi/hal/simulation/CTREPCMData.h"
@@ -17,8 +18,6 @@
 #include "wpi/hal/simulation/REVPHData.h"
 #include "wpi/hal/simulation/RoboRioData.h"
 #include "wpi/hal/simulation/SimDeviceData.h"
-
-#include "../PortsInternal.h"
 
 extern "C" void HALSIM_ResetAllSimData(void) {
   for (int32_t i = 0; i < hal::kNumAddressableLEDs; i++) {

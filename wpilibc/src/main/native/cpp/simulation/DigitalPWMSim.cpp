@@ -8,7 +8,6 @@
 #include <stdexcept>
 
 #include "wpi/hal/simulation/DigitalPWMData.h"
-
 #include "wpi/hardware/discrete/DigitalOutput.hpp"
 
 using namespace frc;

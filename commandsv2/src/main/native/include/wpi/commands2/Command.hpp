@@ -9,14 +9,13 @@
 #include <optional>
 #include <string>
 
+#include "wpi/commands2/Requirements.hpp"
+#include "wpi/commands2/Subsystem.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/Demangle.hpp"
 #include "wpi/util/SmallSet.hpp"
 #include "wpi/util/StackTrace.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
-
-#include "wpi/commands2/Requirements.hpp"
-#include "wpi/commands2/Subsystem.hpp"
 
 namespace frc2 {
 

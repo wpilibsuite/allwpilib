@@ -18,10 +18,9 @@
 
 #include <utility>
 
+#include "wpi/net/SocketError.hpp"
 #include "wpi/util/Logger.hpp"
 #include "wpi/util/SmallString.hpp"
-
-#include "wpi/net/SocketError.hpp"
 
 using namespace wpi;
 

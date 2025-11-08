@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_USBCAMERAIMPL_H_
-#define CSCORE_USBCAMERAIMPL_H_
+#ifndef CSCORE_USBCAMERAIMPL_HPP_
+#define CSCORE_USBCAMERAIMPL_HPP_
 
 #include <linux/videodev2.h>
 
@@ -15,15 +15,14 @@
 #include <utility>
 #include <vector>
 
+#include "SourceImpl.hpp"
+#include "UsbCameraBuffer.hpp"
+#include "UsbCameraProperty.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/condition_variable.hpp"
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/raw_istream.hpp"
 #include "wpi/util/raw_ostream.hpp"
-
-#include "SourceImpl.hpp"
-#include "UsbCameraBuffer.hpp"
-#include "UsbCameraProperty.hpp"
 
 namespace cs {
 
@@ -179,4 +178,4 @@ class UsbCameraImpl : public SourceImpl {
 
 }  // namespace cs
 
-#endif  // CSCORE_USBCAMERAIMPL_H_
+#endif  // CSCORE_USBCAMERAIMPL_HPP_

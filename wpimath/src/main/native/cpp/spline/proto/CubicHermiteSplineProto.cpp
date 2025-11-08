@@ -5,7 +5,6 @@
 #include "wpi/math/spline/proto/CubicHermiteSplineProto.hpp"
 
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
-
 #include "wpimath/protobuf/spline.npb.h"
 
 std::optional<frc::CubicHermiteSpline>

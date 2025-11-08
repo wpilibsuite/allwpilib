@@ -11,6 +11,7 @@
 
 #include <fmt/format.h>
 #include <gcem.hpp>
+
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/ct_string.hpp"
 

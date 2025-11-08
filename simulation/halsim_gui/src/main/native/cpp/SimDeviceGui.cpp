@@ -10,14 +10,14 @@
 #include <utility>
 
 #include <fmt/format.h>
+
 #include "wpi/glass/other/DeviceTree.hpp"
 #include "wpi/hal/SimDevice.h"
 #include "wpi/hal/simulation/SimDeviceData.h"
-#include "wpi/util/DenseMap.hpp"
-#include "wpi/util/StringExtras.hpp"
-
 #include "wpi/halsim/gui/HALDataSource.hpp"
 #include "wpi/halsim/gui/HALSimGui.hpp"
+#include "wpi/util/DenseMap.hpp"
+#include "wpi/util/StringExtras.hpp"
 
 using namespace halsimgui;
 

@@ -12,6 +12,11 @@
 #include <string_view>
 #include <utility>
 
+#include "WebSocketDebug.hpp"
+#include "WebSocketSerializer.hpp"
+#include "wpi/net/HttpParser.hpp"
+#include "wpi/net/raw_uv_ostream.hpp"
+#include "wpi/net/uv/Stream.hpp"
 #include "wpi/util/Base64.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/SmallVector.hpp"
@@ -19,12 +24,6 @@
 #include "wpi/util/print.hpp"
 #include "wpi/util/raw_ostream.hpp"
 #include "wpi/util/sha1.hpp"
-
-#include "WebSocketDebug.hpp"
-#include "WebSocketSerializer.hpp"
-#include "wpi/net/HttpParser.hpp"
-#include "wpi/net/raw_uv_ostream.hpp"
-#include "wpi/net/uv/Stream.hpp"
 
 using namespace wpi;
 

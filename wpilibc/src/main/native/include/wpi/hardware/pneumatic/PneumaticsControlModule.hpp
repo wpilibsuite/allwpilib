@@ -6,11 +6,10 @@
 
 #include <memory>
 
+#include "PneumaticsBase.hpp"
 #include "wpi/hal/Types.h"
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/mutex.hpp"
-
-#include "PneumaticsBase.hpp"
 
 namespace frc {
 /** Module class for controlling a Cross The Road Electronics Pneumatics Control

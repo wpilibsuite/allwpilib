@@ -10,10 +10,10 @@
 #include <string_view>
 
 #include <fmt/format.h>
-#include "wpi/util/StringExtras.hpp"
-#include "wpi/util/ct_string.hpp"
 
 #include "wpi/util/Color.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/ct_string.hpp"
 
 namespace frc {
 

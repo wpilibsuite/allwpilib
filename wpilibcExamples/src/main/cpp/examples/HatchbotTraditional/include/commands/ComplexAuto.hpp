@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "wpi/commands2/CommandHelper.hpp"
-#include "wpi/commands2/SequentialCommandGroup.hpp"
+#include <wpi/commands2/CommandHelper.hpp>
+#include <wpi/commands2/SequentialCommandGroup.hpp>
 
 #include "Constants.hpp"
 #include "commands/DriveDistance.hpp"

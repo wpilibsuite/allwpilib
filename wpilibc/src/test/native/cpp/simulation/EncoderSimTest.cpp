@@ -5,11 +5,11 @@
 #include "wpi/simulation/EncoderSim.hpp"  // NOLINT(build/include_order)
 
 #include <gtest/gtest.h>
-#include "wpi/hal/HAL.h"
-#include "wpi/util/deprecated.hpp"
 
 #include "callback_helpers/TestCallbackHelpers.hpp"
+#include "wpi/hal/HAL.h"
 #include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/util/deprecated.hpp"
 
 namespace frc::sim {
 

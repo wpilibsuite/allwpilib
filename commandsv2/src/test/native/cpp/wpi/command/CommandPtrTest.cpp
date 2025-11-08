@@ -4,12 +4,11 @@
 
 #include <utility>
 
-#include "wpi/system/Errors.hpp"
-
 #include "CommandTestBase.hpp"
 #include "wpi/commands2/CommandPtr.hpp"
 #include "wpi/commands2/CommandScheduler.hpp"
 #include "wpi/commands2/Commands.hpp"
+#include "wpi/system/Errors.hpp"
 
 using namespace frc2;
 class CommandPtrTest : public CommandTestBase {};

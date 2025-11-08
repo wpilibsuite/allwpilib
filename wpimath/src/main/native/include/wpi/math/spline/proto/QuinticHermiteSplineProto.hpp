@@ -4,10 +4,9 @@
 
 #pragma once
 
+#include "wpi/math/spline/QuinticHermiteSpline.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
-
-#include "wpi/math/spline/QuinticHermiteSpline.hpp"
 #include "wpimath/protobuf/spline.npb.h"
 
 template <>

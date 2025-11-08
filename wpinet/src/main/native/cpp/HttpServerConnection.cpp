@@ -6,14 +6,13 @@
 
 #include <memory>
 
+#include "wpi/net/raw_uv_ostream.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/SpanExtras.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/fmt/raw_ostream.hpp"
 #include "wpi/util/print.hpp"
-
-#include "wpi/net/raw_uv_ostream.hpp"
 
 using namespace wpi;
 

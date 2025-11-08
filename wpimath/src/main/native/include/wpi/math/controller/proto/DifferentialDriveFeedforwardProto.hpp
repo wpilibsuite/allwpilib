@@ -4,11 +4,10 @@
 
 #pragma once
 
+#include "pb.h"
+#include "wpi/math/controller/DifferentialDriveFeedforward.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
-
-#include "wpi/math/controller/DifferentialDriveFeedforward.hpp"
-#include "pb.h"
 #include "wpimath/protobuf/controller.npb.h"
 
 template <>

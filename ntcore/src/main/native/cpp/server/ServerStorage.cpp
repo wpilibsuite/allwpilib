@@ -10,13 +10,13 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include "wpi/util/Base64.hpp"
-#include "wpi/util/MessagePack.hpp"
-#include "wpi/util/json.hpp"
 
 #include "Log.hpp"
 #include "server/MessagePackWriter.hpp"
 #include "server/ServerClient.hpp"
+#include "wpi/util/Base64.hpp"
+#include "wpi/util/MessagePack.hpp"
+#include "wpi/util/json.hpp"
 
 using namespace nt;
 using namespace nt::server;

@@ -7,13 +7,13 @@
 #include <algorithm>
 #include <span>
 
+#include "wpi/net/WebSocket.hpp"
+#include "wpi/net/raw_uv_ostream.hpp"
 #include "wpi/util/Endian.hpp"
 #include "wpi/util/Logger.hpp"
 #include "wpi/util/SpanExtras.hpp"
 #include "wpi/util/raw_ostream.hpp"
 #include "wpi/util/timestamp.h"
-#include "wpi/net/WebSocket.hpp"
-#include "wpi/net/raw_uv_ostream.hpp"
 
 using namespace nt;
 using namespace nt::net;

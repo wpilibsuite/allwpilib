@@ -5,11 +5,10 @@
 #pragma once
 
 #include "wpi/hal/SimDevice.h"
+#include "wpi/hardware/discrete/AnalogInput.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
-
-#include "wpi/hardware/discrete/AnalogInput.hpp"
 
 namespace frc {
 

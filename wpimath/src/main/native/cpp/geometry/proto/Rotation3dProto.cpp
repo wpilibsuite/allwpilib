@@ -5,7 +5,6 @@
 #include "wpi/math/geometry/proto/Rotation3dProto.hpp"
 
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
-
 #include "wpimath/protobuf/geometry3d.npb.h"
 
 std::optional<frc::Rotation3d> wpi::Protobuf<frc::Rotation3d>::Unpack(

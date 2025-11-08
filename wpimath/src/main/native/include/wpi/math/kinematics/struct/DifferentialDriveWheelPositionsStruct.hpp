@@ -4,10 +4,9 @@
 
 #pragma once
 
+#include "wpi/math/kinematics/DifferentialDriveWheelPositions.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/struct/Struct.hpp"
-
-#include "wpi/math/kinematics/DifferentialDriveWheelPositions.hpp"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::DifferentialDriveWheelPositions> {

@@ -8,15 +8,14 @@
 #include <limits>
 #include <type_traits>
 
+#include "wpi/math/controller/PIDController.hpp"
+#include "wpi/math/trajectory/TrapezoidProfile.hpp"
+#include "wpi/math/util/MathUtil.hpp"
+#include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
-
-#include "wpi/math/util/MathUtil.hpp"
-#include "wpi/math/controller/PIDController.hpp"
-#include "wpi/math/trajectory/TrapezoidProfile.hpp"
-#include "wpi/units/time.hpp"
 
 namespace frc {
 namespace detail {

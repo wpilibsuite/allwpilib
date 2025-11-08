@@ -12,11 +12,12 @@
 
 #include <fmt/chrono.h>
 #include <fmt/format.h>
+
+#include "wpi/datalog/DataLogBackgroundWriter.hpp"
+#include "wpi/datalog/FileLogger.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/util/SafeThread.hpp"
 #include "wpi/util/StringExtras.hpp"
-#include "wpi/datalog/DataLogBackgroundWriter.hpp"
-#include "wpi/datalog/FileLogger.hpp"
 #include "wpi/util/fs.hpp"
 #include "wpi/util/print.hpp"
 

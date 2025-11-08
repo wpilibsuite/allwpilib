@@ -6,8 +6,8 @@
 
 #include <string>
 
-#include "wpi/opmode/TimesliceRobot.hpp"
-#include "wpi/smartdashboard/SendableChooser.hpp"
+#include <wpi/opmode/TimesliceRobot.hpp>
+#include <wpi/smartdashboard/SendableChooser.hpp>
 
 class Robot : public frc::TimesliceRobot {
  public:

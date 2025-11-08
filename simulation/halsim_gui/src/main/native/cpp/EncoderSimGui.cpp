@@ -12,12 +12,12 @@
 #include <vector>
 
 #include <fmt/format.h>
+
 #include "wpi/glass/DataSource.hpp"
 #include "wpi/glass/hardware/Encoder.hpp"
 #include "wpi/hal/Ports.h"
 #include "wpi/hal/simulation/EncoderData.h"
 #include "wpi/hal/simulation/SimDeviceData.h"
-
 #include "wpi/halsim/gui/HALSimGui.hpp"
 
 using namespace halsimgui;

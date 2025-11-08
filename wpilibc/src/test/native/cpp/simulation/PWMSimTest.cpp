@@ -5,9 +5,9 @@
 #include "wpi/simulation/PWMSim.hpp"  // NOLINT(build/include_order)
 
 #include <gtest/gtest.h>
-#include "wpi/hal/HAL.h"
 
 #include "callback_helpers/TestCallbackHelpers.hpp"
+#include "wpi/hal/HAL.h"
 #include "wpi/hardware/discrete/PWM.hpp"
 
 namespace frc::sim {

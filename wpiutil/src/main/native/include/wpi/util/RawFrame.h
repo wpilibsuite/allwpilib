@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef WPIUTIL_WPI_RAWFRAME_H_
-#define WPIUTIL_WPI_RAWFRAME_H_
+#ifndef WPIUTIL_WPI_UTIL_RAWFRAME_H_
+#define WPIUTIL_WPI_UTIL_RAWFRAME_H_
 
 #include <stdint.h>
 
@@ -163,4 +163,4 @@ void SetFrameData(JNIEnv* env, jclass rawFrameCls, jobject jframe,
 }  // namespace wpi
 #endif
 
-#endif  // WPIUTIL_WPI_RAWFRAME_H_
+#endif  // WPIUTIL_WPI_UTIL_RAWFRAME_H_

@@ -9,6 +9,7 @@
 
 #include <IconsFontAwesome6.h>
 #include <imgui.h>
+
 #include "wpi/util/raw_ostream.hpp"
 
 void sysid::CreateTooltip(const char* text) {

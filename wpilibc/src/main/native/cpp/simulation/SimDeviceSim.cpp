@@ -8,6 +8,7 @@
 #include <vector>
 
 #include <fmt/format.h>
+
 #include "wpi/hal/SimDevice.h"
 #include "wpi/hal/simulation/SimDeviceData.h"
 

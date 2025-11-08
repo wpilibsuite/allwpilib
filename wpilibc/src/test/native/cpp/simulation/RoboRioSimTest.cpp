@@ -7,10 +7,10 @@
 #include <string>
 
 #include <gtest/gtest.h>
-#include "wpi/hal/HAL.h"
-#include "wpi/hal/HALBase.h"
 
 #include "callback_helpers/TestCallbackHelpers.hpp"
+#include "wpi/hal/HAL.h"
+#include "wpi/hal/HALBase.h"
 #include "wpi/system/RobotController.hpp"
 
 namespace frc::sim {

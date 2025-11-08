@@ -12,12 +12,11 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/util/MessagePack.hpp"
-
 #include "Log.hpp"
 #include "server/MessagePackWriter.hpp"
 #include "server/ServerClient4.hpp"
 #include "server/ServerClientLocal.hpp"
+#include "wpi/util/MessagePack.hpp"
 
 using namespace nt;
 using namespace nt::server;

@@ -6,9 +6,8 @@
 
 #include <string>
 
-#include "wpi/util/fs.hpp"
-
 #include "wpi/opmode/RobotBase.hpp"
+#include "wpi/util/fs.hpp"
 
 std::string frc::filesystem::GetLaunchDirectory() {
   return fs::current_path().string();

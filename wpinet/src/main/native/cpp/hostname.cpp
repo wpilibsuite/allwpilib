@@ -8,9 +8,8 @@
 #include <string>
 #include <string_view>
 
-#include "wpi/util/SmallVector.hpp"
-
 #include "uv.h"
+#include "wpi/util/SmallVector.hpp"
 
 namespace wpi {
 

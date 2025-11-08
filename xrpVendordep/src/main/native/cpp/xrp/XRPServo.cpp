@@ -4,13 +4,12 @@
 
 #include "wpi/xrp/XRPServo.hpp"
 
-#include "wpi/system/Errors.hpp"
-
 #include <map>
 #include <numbers>
 #include <set>
 #include <string>
 
+#include "wpi/system/Errors.hpp"
 #include "wpi/units/angle.hpp"
 
 using namespace frc;

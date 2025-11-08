@@ -13,19 +13,19 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include "wpi/glass/Context.hpp"
-#include "wpi/glass/Storage.hpp"
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
-#include "wpi/util/json.hpp"
 
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/Storage.hpp"
 #include "wpi/sysid/Util.hpp"
 #include "wpi/sysid/analysis/AnalysisManager.hpp"
 #include "wpi/sysid/analysis/AnalysisType.hpp"
 #include "wpi/sysid/analysis/FeedbackControllerPreset.hpp"
 #include "wpi/sysid/analysis/FilteringUtils.hpp"
 #include "wpi/sysid/view/UILayout.hpp"
+#include "wpi/util/json.hpp"
 
 using namespace sysid;
 

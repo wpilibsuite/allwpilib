@@ -11,13 +11,13 @@
 #include <vector>
 
 #include <fmt/format.h>
+
+#include "Message.hpp"
+#include "MessageHandler.hpp"
 #include "wpi/util/Logger.hpp"
 #include "wpi/util/SpanExtras.hpp"
 #include "wpi/util/json.hpp"
 #include "wpi/util/mpack.h"
-
-#include "Message.hpp"
-#include "MessageHandler.hpp"
 
 using namespace nt;
 using namespace nt::net;

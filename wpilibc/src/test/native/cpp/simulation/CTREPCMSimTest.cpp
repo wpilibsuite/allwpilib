@@ -5,9 +5,9 @@
 #include "wpi/simulation/CTREPCMSim.hpp"  // NOLINT(build/include_order)
 
 #include <gtest/gtest.h>
-#include "wpi/hal/HAL.h"
 
 #include "callback_helpers/TestCallbackHelpers.hpp"
+#include "wpi/hal/HAL.h"
 #include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsControlModule.hpp"
 

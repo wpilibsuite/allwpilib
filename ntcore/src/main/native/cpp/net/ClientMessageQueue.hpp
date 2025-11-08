@@ -7,12 +7,11 @@
 #include <span>
 #include <string>
 
+#include "Message.hpp"
+#include "MessageHandler.hpp"
 #include "wpi/util/FastQueue.hpp"
 #include "wpi/util/Logger.hpp"
 #include "wpi/util/mutex.hpp"
-
-#include "Message.hpp"
-#include "MessageHandler.hpp"
 
 namespace wpi {
 class Logger;

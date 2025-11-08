@@ -7,11 +7,11 @@
 #include <limits>
 
 #include <gcem.hpp>
+
+#include "wpi/math/util/MathShared.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
-
-#include "wpi/math/util/MathShared.hpp"
 
 namespace frc {
 

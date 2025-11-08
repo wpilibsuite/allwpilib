@@ -7,8 +7,8 @@
 #include <string>
 
 #include <fmt/format.h>
-#include "wpi/driverstation/DriverStation.hpp"
-#include "wpi/system/Timer.hpp"
+#include <wpi/driverstation/DriverStation.hpp>
+#include <wpi/system/Timer.hpp>
 
 void Robot::RobotPeriodic() {
   // Creates a string to hold current robot state information, including

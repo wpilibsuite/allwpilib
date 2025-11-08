@@ -8,10 +8,10 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include "wpi/util/Logger.hpp"
-#include "wpi/util/raw_ostream.hpp"
 
 #include "wpi/datalog/DataLogWriter.hpp"
+#include "wpi/util/Logger.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
 namespace {
 struct ThingA {

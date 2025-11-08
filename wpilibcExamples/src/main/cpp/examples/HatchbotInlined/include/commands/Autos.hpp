@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "wpi/commands2/CommandPtr.hpp"
+#include <wpi/commands2/CommandPtr.hpp>
 
 #include "subsystems/DriveSubsystem.hpp"
 #include "subsystems/HatchSubsystem.hpp"

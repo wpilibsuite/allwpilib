@@ -6,8 +6,8 @@
 
 #include <optional>
 
-#include "wpi/opmode/TimedRobot.hpp"
-#include "wpi/commands2/CommandPtr.hpp"
+#include <wpi/commands2/CommandPtr.hpp>
+#include <wpi/opmode/TimedRobot.hpp>
 
 #include "RapidReactCommandBot.hpp"
 

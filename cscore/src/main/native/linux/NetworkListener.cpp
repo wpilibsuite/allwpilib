@@ -16,10 +16,9 @@
 #include <algorithm>
 #include <cerrno>
 
-#include "wpi/util/SafeThread.hpp"
-
 #include "Log.hpp"
 #include "Notifier.hpp"
+#include "wpi/util/SafeThread.hpp"
 
 using namespace cs;
 

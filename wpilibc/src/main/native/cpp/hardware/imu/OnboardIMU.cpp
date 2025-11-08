@@ -5,7 +5,6 @@
 #include "wpi/hardware/imu/OnboardIMU.hpp"
 
 #include "wpi/hal/IMU.h"
-
 #include "wpi/system/Errors.hpp"
 
 using namespace frc;

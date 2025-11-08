@@ -10,11 +10,11 @@
 #include <utility>
 
 #include <fmt/format.h>
-#include "wpi/util/print.hpp"
-#include "wpi/gui/wpigui.hpp"
 
 #include "wpi/glass/Context.hpp"
 #include "wpi/glass/Storage.hpp"
+#include "wpi/gui/wpigui.hpp"
+#include "wpi/util/print.hpp"
 
 using namespace glass;
 

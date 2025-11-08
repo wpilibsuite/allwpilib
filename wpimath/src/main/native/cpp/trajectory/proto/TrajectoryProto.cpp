@@ -7,7 +7,6 @@
 #include <vector>
 
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
-
 #include "wpimath/protobuf/trajectory.npb.h"
 
 std::optional<frc::Trajectory> wpi::Protobuf<frc::Trajectory>::Unpack(

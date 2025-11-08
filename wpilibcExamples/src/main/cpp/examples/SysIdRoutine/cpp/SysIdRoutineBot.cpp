@@ -4,7 +4,7 @@
 
 #include "SysIdRoutineBot.hpp"
 
-#include "wpi/commands2/Commands.hpp"
+#include <wpi/commands2/Commands.hpp>
 
 SysIdRoutineBot::SysIdRoutineBot() {
   ConfigureBindings();
