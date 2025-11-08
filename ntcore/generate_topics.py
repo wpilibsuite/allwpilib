@@ -25,7 +25,7 @@ def generate_topics(
         loader=FileSystemLoader(java_template_directory), autoescape=False
     )
 
-    generated_output_dir = output_directory / "main/java/edu/wpi/first/networktables"
+    generated_output_dir = output_directory / "main/java/org/wpilib/networktables"
     for fn in java_template_directory.glob("*.jinja"):
         template = env.get_template(fn.name)
         outfn = fn.stem
@@ -42,7 +42,7 @@ def generate_topics(
                 Output(generated_output_dir, outfn2, output)
 
     # C++ classes
-    cpp_subdirectory = "main/native/include/networktables"
+    cpp_subdirectory = "main/native/include/wpi/nt"
     cpp_template_directory = template_root / cpp_subdirectory
     env = Environment(
         loader=FileSystemLoader(cpp_template_directory),
@@ -65,11 +65,11 @@ def generate_topics(
         loader=FileSystemLoader(hdr_template_directory),
         autoescape=False,
     )
-    template = env.get_template("ntcore_cpp_types.h.jinja")
+    template = env.get_template("ntcore_cpp_types.hpp.jinja")
     output = template.render(types=types)
     Output(
-        output_directory / hdr_subdirectory,
-        "ntcore_cpp_types.h",
+        output_directory / hdr_subdirectory / "wpi/nt",
+        "ntcore_cpp_types.hpp",
         output,
     )
 
@@ -97,7 +97,9 @@ def generate_topics(
     )
     template = env.get_template("ntcore_c_types.h.jinja")
     output = template.render(types=types)
-    Output(output_directory / hdr_subdirectory, "ntcore_c_types.h", output)
+    Output(
+        output_directory / hdr_subdirectory / "wpi/nt", "ntcore_c_types.h", output
+    )
 
     # C handle API (source)
     c_subdirectory = "main/native/cpp"
