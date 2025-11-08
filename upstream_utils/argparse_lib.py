@@ -17,8 +17,8 @@ def copy_upstream_src(wpilib_root: Path):
     # Rename namespace from argparse to wpi
     with open(dest_filename) as f:
         content = f.read()
-    content = content.replace("namespace argparse", "namespace wpi")
-    content = content.replace("argparse::", "wpi::")
+    content = content.replace("namespace argparse", "namespace wpi::util")
+    content = content.replace("argparse::", "wpi::util::")
     content = content.replace("ARGPARSE_", "WPI_")
     with open(dest_filename, "w") as f:
         f.write(content)
