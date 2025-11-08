@@ -8,18 +8,18 @@
   "jsonUrl": "",
   "javaDependencies": [
     {
-      "groupId": "edu.wpi.first.wpilibNewCommands",
-      "artifactId": "wpilibNewCommands-java",
+      "groupId": "edu.wpi.first.commandsv2",
+      "artifactId": "commandsv2-java",
       "version": "wpilib"
     }
   ],
   "jniDependencies": [],
   "cppDependencies": [
     {
-      "groupId": "edu.wpi.first.wpilibNewCommands",
-      "artifactId": "wpilibNewCommands-cpp",
+      "groupId": "edu.wpi.first.commandsv2",
+      "artifactId": "commandsv2-cpp",
       "version": "wpilib",
-      "libName": "wpilibNewCommands",
+      "libName": "commandsv2",
       "headerClassifier": "headers",
       "sourcesClassifier": "sources",
       "sharedLibrary": true,

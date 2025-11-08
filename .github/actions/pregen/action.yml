@@ -33,7 +33,7 @@ runs:
       run: |
         ./wpilibc/generate_hids.py
         ./wpilibj/generate_hids.py
-        ./wpilibNewCommands/generate_hids.py
+        ./commandsv2/generate_hids.py
       shell: bash
 
     - name: Regenerate PWM motor controllers
