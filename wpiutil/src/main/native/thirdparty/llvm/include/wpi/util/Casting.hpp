@@ -806,7 +806,7 @@ template <class X, class Y>
 //===----------------------------------------------------------------------===//
 
 /// These are wrappers over isa* function that allow them to be used in generic
-/// algorithms such as `wpi:all_of`, `wpi::util::none_of`, etc. This is accomplished
+/// algorithms such as `wpi::util:all_of`, `wpi::util::none_of`, etc. This is accomplished
 /// by exposing the isa* functions through function objects with a generic
 /// function call operator.
 
