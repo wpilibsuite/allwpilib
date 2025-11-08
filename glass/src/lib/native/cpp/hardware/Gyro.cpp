@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/hardware/Gyro.h"
+#include "wpi/glass/hardware/Gyro.hpp"
 
 #include <cmath>
 #include <numbers>
 
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <wpi/StringExtras.h>
+#include "wpi/util/StringExtras.hpp"
 
-#include "glass/Context.h"
-#include "glass/DataSource.h"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/DataSource.hpp"
 
 using namespace glass;
 

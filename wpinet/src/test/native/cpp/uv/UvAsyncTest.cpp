@@ -23,17 +23,17 @@
  * IN THE SOFTWARE.
  */
 
-#include "wpinet/uv/Async.h"  // NOLINT(build/include_order)
+#include "wpi/net/uv/Async.hpp"  // NOLINT(build/include_order)
 
 #include <atomic>
 #include <functional>
 #include <thread>
 
 #include <gtest/gtest.h>
-#include <wpi/mutex.h>
+#include "wpi/util/mutex.hpp"
 
-#include "wpinet/uv/Loop.h"
-#include "wpinet/uv/Prepare.h"
+#include "wpi/net/uv/Loop.hpp"
+#include "wpi/net/uv/Prepare.hpp"
 
 namespace wpi::uv {
 

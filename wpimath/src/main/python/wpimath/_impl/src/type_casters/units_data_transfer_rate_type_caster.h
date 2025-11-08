@@ -1,6 +1,6 @@
 #pragma once
 
-#include <units/data_transfer_rate.h>
+#include "wpi/units/data_transfer_rate.hpp"
 
 namespace pybind11 {
 namespace detail {

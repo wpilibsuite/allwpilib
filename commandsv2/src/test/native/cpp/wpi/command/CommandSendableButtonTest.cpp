@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc2/command/Commands.h>
+#include "wpi/commands2/Commands.hpp"
 
-#include <frc/smartdashboard/SmartDashboard.h>
-#include <networktables/BooleanTopic.h>
-#include <networktables/NetworkTableInstance.h>
+#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/nt/BooleanTopic.hpp"
+#include "wpi/nt/NetworkTableInstance.hpp"
 
-#include "CommandTestBase.h"
+#include "CommandTestBase.hpp"
 
 using namespace frc2;
 

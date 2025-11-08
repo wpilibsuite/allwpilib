@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/Synchronization.h"
+#include "wpi/util/Synchronization.h"
 
 #include <algorithm>
 #include <atomic>
 #include <cstring>
 #include <mutex>
 
-#include "wpi/DenseMap.h"
-#include "wpi/SmallVector.h"
-#include "wpi/UidVector.h"
-#include "wpi/condition_variable.h"
-#include "wpi/mutex.h"
+#include "wpi/util/DenseMap.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/UidVector.hpp"
+#include "wpi/util/condition_variable.hpp"
+#include "wpi/util/mutex.hpp"
 
 using namespace wpi;
 

@@ -7,7 +7,7 @@
 #include <ostream>
 #include <utility>
 
-#include "PubSubOptions.h"
+#include "PubSubOptions.hpp"
 #include "gmock/gmock.h"
 
 namespace nt {

@@ -6,12 +6,12 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/EigenCore.h"
-#include "frc/controller/ElevatorFeedforward.h"
-#include "frc/controller/LinearPlantInversionFeedforward.h"
-#include "units/acceleration.h"
-#include "units/length.h"
-#include "units/time.h"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/controller/ElevatorFeedforward.hpp"
+#include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/time.hpp"
 
 static constexpr auto Ks = 0.5_V;
 static constexpr auto Kv = 1.5_V * 1_s / 1_m;

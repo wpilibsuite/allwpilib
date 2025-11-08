@@ -7,10 +7,10 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/kinematics/DifferentialDriveKinematics.h"
-#include "frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
-#include "trajectory/TestTrajectory.h"
-#include "units/time.h"
+#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+#include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
+#include "wpi/math/trajectory/TestTrajectory.hpp"
+#include "wpi/units/time.hpp"
 
 using namespace frc;
 

@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "commands/TurnDegrees.h"
+#include "commands/TurnDegrees.hpp"
 
 #include <numbers>
 
-#include <units/math.h>
+#include "wpi/units/math.hpp"
 
 void TurnDegrees::Initialize() {
   // Set motors to stop, read encoder values for starting point

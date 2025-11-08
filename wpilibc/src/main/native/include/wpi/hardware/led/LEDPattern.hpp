@@ -8,13 +8,13 @@
 #include <span>
 #include <utility>
 
-#include <units/frequency.h>
-#include <units/length.h>
-#include <units/time.h>
-#include <units/velocity.h>
+#include "wpi/units/frequency.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
 
-#include "frc/AddressableLED.h"
-#include "util/Color.h"
+#include "wpi/hardware/led/AddressableLED.hpp"
+#include "wpi/util/Color.hpp"
 
 namespace frc {
 

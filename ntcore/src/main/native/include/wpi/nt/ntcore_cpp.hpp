@@ -17,11 +17,11 @@
 #include <variant>
 #include <vector>
 
-#include <wpi/json_fwd.h>
+#include "wpi/util/json_fwd.hpp"
 
-#include "networktables/NetworkTableValue.h"
-#include "ntcore_c.h"
-#include "ntcore_cpp_types.h"
+#include "wpi/nt/NetworkTableValue.hpp"
+#include "wpi/nt/ntcore_c.h"
+#include "wpi/nt/ntcore_cpp_types.hpp"
 
 namespace wpi {
 template <typename T>

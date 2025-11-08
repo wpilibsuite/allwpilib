@@ -9,14 +9,14 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/jni_util.h>
+#include "wpi/util/jni_util.hpp"
 
-#include "../MulticastHandleManager.h"
+#include "../MulticastHandleManager.hpp"
 #include "org_wpilib_net_WPINetJNI.h"
-#include "wpinet/MulticastServiceAnnouncer.h"
-#include "wpinet/MulticastServiceResolver.h"
-#include "wpinet/PortForwarder.h"
-#include "wpinet/WebServer.h"
+#include "wpi/net/MulticastServiceAnnouncer.h"
+#include "wpi/net/MulticastServiceResolver.h"
+#include "wpi/net/PortForwarder.hpp"
+#include "wpi/net/WebServer.hpp"
 
 using namespace wpi::java;
 

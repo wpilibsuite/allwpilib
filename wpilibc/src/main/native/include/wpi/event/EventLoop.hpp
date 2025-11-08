@@ -7,7 +7,7 @@
 #include <functional>
 #include <vector>
 
-#include <wpi/FunctionExtras.h>
+#include "wpi/util/FunctionExtras.hpp"
 
 namespace frc {
 /** A declarative way to bind a set of actions to a loop and execute them when

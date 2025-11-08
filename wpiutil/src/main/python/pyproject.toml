@@ -67,15 +67,15 @@ depends = ["wpiutil-casters"]
 
 [tool.semiwrap.extension_modules."wpiutil._wpiutil".headers]
 # wpi
-StackTrace = "wpi/StackTrace.h"
-Synchronization = "wpi/Synchronization.h"
-RawFrame = "wpi/RawFrame.h"
+StackTrace = "wpi/util/StackTrace.hpp"
+Synchronization = "wpi/util/Synchronization.h"
+RawFrame = "wpi/util/RawFrame.h"
 
 # wpi/sendable
-Sendable = "wpi/sendable/Sendable.h"
-SendableBuilder = "wpi/sendable/SendableBuilder.h"
-#SendableHelper = "wpi/sendable/SendableHelper.h"
-SendableRegistry = "wpi/sendable/SendableRegistry.h"
+Sendable = "wpi/util/sendable/Sendable.hpp"
+SendableBuilder = "wpi/util/sendable/SendableBuilder.hpp"
+#SendableHelper = "wpi/util/sendable/SendableHelper.hpp"
+SendableRegistry = "wpi/util/sendable/SendableRegistry.hpp"
 
 WPyStruct = "src/wpistruct/wpystruct_fns.h"
 

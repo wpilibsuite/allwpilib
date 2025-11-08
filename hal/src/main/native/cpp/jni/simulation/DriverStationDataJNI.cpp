@@ -4,13 +4,13 @@
 
 #include <jni.h>
 
-#include <wpi/StringExtras.h>
-#include <wpi/jni_util.h>
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/jni_util.hpp"
 
 #include "CallbackStore.h"
 #include "org_wpilib_hardware_hal_simulation_DriverStationDataJNI.h"
-#include "hal/simulation/DriverStationData.h"
-#include "hal/simulation/MockHooks.h"
+#include "wpi/hal/simulation/DriverStationData.h"
+#include "wpi/hal/simulation/MockHooks.h"
 
 using namespace hal;
 using namespace wpi::java;

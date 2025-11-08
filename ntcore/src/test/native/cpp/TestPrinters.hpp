@@ -10,7 +10,7 @@
 #include <string_view>
 
 #include <gtest/gtest.h>
-#include <wpi/TestPrinters.h>
+#include "wpi/util/TestPrinters.hpp"
 
 namespace nt {
 

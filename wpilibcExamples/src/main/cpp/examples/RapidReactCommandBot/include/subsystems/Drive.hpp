@@ -6,18 +6,18 @@
 
 #include <functional>
 
-#include <frc/Encoder.h>
-#include <frc/OnboardIMU.h>
-#include <frc/controller/ProfiledPIDController.h>
-#include <frc/controller/SimpleMotorFeedforward.h>
-#include <frc/drive/DifferentialDrive.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc2/command/CommandPtr.h>
-#include <frc2/command/SubsystemBase.h>
-#include <units/angle.h>
-#include <units/length.h>
+#include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/hardware/imu/OnboardIMU.hpp"
+#include "wpi/math/controller/ProfiledPIDController.hpp"
+#include "wpi/math/controller/SimpleMotorFeedforward.hpp"
+#include "wpi/drive/DifferentialDrive.hpp"
+#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/commands2/CommandPtr.hpp"
+#include "wpi/commands2/SubsystemBase.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
 
-#include "Constants.h"
+#include "Constants.hpp"
 
 class Drive : public frc2::SubsystemBase {
  public:

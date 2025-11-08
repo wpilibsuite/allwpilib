@@ -12,16 +12,16 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/mutex.h>
+#include "wpi/util/mutex.hpp"
 
-#include "ConnectionList.h"
-#include "Handle.h"
-#include "ListenerStorage.h"
-#include "LocalStorage.h"
-#include "Log.h"
-#include "LoggerImpl.h"
-#include "NetworkClient.h"
-#include "NetworkServer.h"
+#include "ConnectionList.hpp"
+#include "Handle.hpp"
+#include "ListenerStorage.hpp"
+#include "LocalStorage.hpp"
+#include "Log.hpp"
+#include "LoggerImpl.hpp"
+#include "NetworkClient.hpp"
+#include "NetworkServer.hpp"
 
 namespace nt {
 

@@ -9,13 +9,13 @@
 #include <unordered_map>
 #include <vector>
 
-#include <units/length.h>
-#include <wpi/SymbolExports.h>
-#include <wpi/json_fwd.h>
+#include "wpi/units/length.hpp"
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/json_fwd.hpp"
 
-#include "frc/apriltag/AprilTag.h"
-#include "frc/apriltag/AprilTagFields.h"
-#include "frc/geometry/Pose3d.h"
+#include "wpi/apriltag/AprilTag.hpp"
+#include "wpi/apriltag/AprilTagFields.hpp"
+#include "wpi/math/geometry/Pose3d.hpp"
 
 namespace frc {
 /**

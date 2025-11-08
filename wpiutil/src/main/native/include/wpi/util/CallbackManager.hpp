@@ -13,11 +13,11 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/SafeThread.h"
-#include "wpi/UidVector.h"
-#include "wpi/condition_variable.h"
-#include "wpi/mutex.h"
-#include "wpi/raw_ostream.h"
+#include "wpi/util/SafeThread.hpp"
+#include "wpi/util/UidVector.hpp"
+#include "wpi/util/condition_variable.hpp"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
 namespace wpi {
 

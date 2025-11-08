@@ -1,5 +1,5 @@
 extra_includes:
-- frc/AnalogEncoder.h
+- wpi/hardware/rotation/AnalogEncoder.hpp
 
 classes:
   frc::sim::AnalogEncoderSim:

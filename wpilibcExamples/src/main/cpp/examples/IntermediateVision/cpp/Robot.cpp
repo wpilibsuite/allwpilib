@@ -5,8 +5,8 @@
 #include <cstdio>
 #include <thread>
 
-#include <cameraserver/CameraServer.h>
-#include <frc/TimedRobot.h>
+#include "wpi/cameraserver/CameraServer.hpp"
+#include "wpi/opmode/TimedRobot.hpp"
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/types.hpp>
 #include <opencv2/imgproc/imgproc.hpp>

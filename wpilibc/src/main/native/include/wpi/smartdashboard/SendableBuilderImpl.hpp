@@ -12,12 +12,12 @@
 #include <utility>
 #include <vector>
 
-#include <networktables/BooleanTopic.h>
-#include <networktables/NTSendableBuilder.h>
-#include <networktables/NetworkTable.h>
-#include <networktables/StringTopic.h>
-#include <wpi/FunctionExtras.h>
-#include <wpi/SmallVector.h>
+#include "wpi/nt/BooleanTopic.hpp"
+#include "wpi/nt/NTSendableBuilder.hpp"
+#include "wpi/nt/NetworkTable.hpp"
+#include "wpi/nt/StringTopic.hpp"
+#include "wpi/util/FunctionExtras.hpp"
+#include "wpi/util/SmallVector.hpp"
 
 namespace frc {
 

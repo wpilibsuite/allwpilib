@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "NetworkListener.h"
+#include "NetworkListener.hpp"
 
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
@@ -16,10 +16,10 @@
 #include <algorithm>
 #include <cerrno>
 
-#include <wpi/SafeThread.h>
+#include "wpi/util/SafeThread.hpp"
 
-#include "Log.h"
-#include "Notifier.h"
+#include "Log.hpp"
+#include "Notifier.hpp"
 
 using namespace cs;
 

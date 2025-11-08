@@ -8,20 +8,20 @@
 #include <thread>
 #include <vector>
 
-#include <cameraserver/CameraServer.h>
+#include "wpi/cameraserver/CameraServer.hpp"
 #include <fmt/format.h>
-#include <frc/TimedRobot.h>
-#include <frc/apriltag/AprilTagDetection.h>
-#include <frc/apriltag/AprilTagDetector.h>
-#include <frc/apriltag/AprilTagPoseEstimator.h>
-#include <frc/geometry/Transform3d.h>
-#include <networktables/IntegerArrayTopic.h>
-#include <networktables/NetworkTableInstance.h>
+#include "wpi/opmode/TimedRobot.hpp"
+#include "wpi/apriltag/AprilTagDetection.hpp"
+#include "wpi/apriltag/AprilTagDetector.hpp"
+#include "wpi/apriltag/AprilTagPoseEstimator.hpp"
+#include "wpi/math/geometry/Transform3d.hpp"
+#include "wpi/nt/IntegerArrayTopic.hpp"
+#include "wpi/nt/NetworkTableInstance.hpp"
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/types.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <units/angle.h>
-#include <units/length.h>
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
 
 /**
  * This is a demo program showing the detection of AprilTags.

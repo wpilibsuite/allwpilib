@@ -14,8 +14,8 @@
 #ifndef WPIUTIL_WPI_SWAPBYTEORDER_H
 #define WPIUTIL_WPI_SWAPBYTEORDER_H
 
-#include "wpi/STLForwardCompat.h"
-#include "wpi/bit.h"
+#include "wpi/util/STLForwardCompat.hpp"
+#include "wpi/util/bit.hpp"
 #include <cstdint>
 #include <type_traits>
 

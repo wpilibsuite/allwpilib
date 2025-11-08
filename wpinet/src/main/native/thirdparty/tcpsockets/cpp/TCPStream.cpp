@@ -21,7 +21,7 @@
    limitations under the License.
 */
 
-#include "wpinet/TCPStream.h"
+#include "wpi/net/TCPStream.h"
 
 #include <fcntl.h>
 
@@ -36,7 +36,7 @@
 
 #include <cerrno>
 
-#include <wpi/StringExtras.h>
+#include "wpi/util/StringExtras.hpp"
 
 using namespace wpi;
 

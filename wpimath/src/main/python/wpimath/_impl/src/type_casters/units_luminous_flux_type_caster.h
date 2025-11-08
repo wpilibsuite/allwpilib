@@ -1,6 +1,6 @@
 #pragma once
 
-#include <units/luminous_flux.h>
+#include "wpi/units/luminous_flux.hpp"
 
 namespace pybind11 {
 namespace detail {

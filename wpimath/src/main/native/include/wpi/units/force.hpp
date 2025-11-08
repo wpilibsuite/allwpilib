@@ -26,11 +26,11 @@
 
 #pragma once
 
-#include "units/acceleration.h"
-#include "units/base.h"
-#include "units/length.h"
-#include "units/mass.h"
-#include "units/time.h"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/base.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/mass.hpp"
+#include "wpi/units/time.hpp"
 
 namespace units {
 /**

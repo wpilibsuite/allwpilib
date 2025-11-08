@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/estimator/MerweScaledSigmaPoints.h"
+#include "wpi/math/estimator/MerweScaledSigmaPoints.hpp"
 
 TEST(MerweScaledSigmaPointsTest, ZeroMean) {
   frc::MerweScaledSigmaPoints<2> sigmaPoints;

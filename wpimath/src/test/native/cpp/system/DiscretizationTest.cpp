@@ -7,9 +7,9 @@
 #include <Eigen/Eigenvalues>
 #include <gtest/gtest.h>
 
-#include "frc/EigenCore.h"
-#include "frc/system/Discretization.h"
-#include "frc/system/NumericalIntegration.h"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/system/Discretization.hpp"
+#include "wpi/math/system/NumericalIntegration.hpp"
 
 // Check that for a simple second-order system that we can easily analyze
 // analytically,

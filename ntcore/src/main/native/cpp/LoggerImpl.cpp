@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "LoggerImpl.h"
+#include "LoggerImpl.hpp"
 
 #include <string>
 
-#include <wpi/Logger.h>
-#include <wpi/SmallVector.h>
-#include <wpi/fs.h>
-#include <wpi/print.h>
+#include "wpi/util/Logger.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/fs.hpp"
+#include "wpi/util/print.hpp"
 
-#include "IListenerStorage.h"
+#include "IListenerStorage.hpp"
 
 using namespace nt;
 

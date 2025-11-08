@@ -6,19 +6,19 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include <wpi/SpanMatcher.h>
+#include "wpi/util/SpanMatcher.hpp"
 
-#include "LocalStorage.h"
-#include "MockListenerStorage.h"
-#include "MockLogger.h"
-#include "PubSubOptionsMatcher.h"
-#include "TestPrinters.h"
-#include "ValueMatcher.h"
+#include "LocalStorage.hpp"
+#include "MockListenerStorage.hpp"
+#include "MockLogger.hpp"
+#include "PubSubOptionsMatcher.hpp"
+#include "TestPrinters.hpp"
+#include "ValueMatcher.hpp"
 #include "gmock/gmock.h"
-#include "net/MockMessageHandler.h"
-#include "net/MockNetworkInterface.h"
-#include "ntcore_c.h"
-#include "ntcore_cpp.h"
+#include "net/MockMessageHandler.hpp"
+#include "net/MockNetworkInterface.hpp"
+#include "wpi/nt/ntcore_c.h"
+#include "wpi/nt/ntcore_cpp.hpp"
 
 using ::testing::_;
 using ::testing::AllOf;

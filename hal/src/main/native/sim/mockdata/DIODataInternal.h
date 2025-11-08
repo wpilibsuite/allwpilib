@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "hal/simulation/DIOData.h"
-#include "hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/DIOData.h"
+#include "wpi/hal/simulation/SimDataValue.h"
 
 namespace hal {
 class DIOData {

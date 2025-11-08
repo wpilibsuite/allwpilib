@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "Telemetry.h"
+#include "Telemetry.hpp"
 
 #include <chrono>
 #include <utility>
 
-#include <wpi/DenseMap.h>
-#include <wpi/timestamp.h>
+#include "wpi/util/DenseMap.hpp"
+#include "wpi/util/timestamp.h"
 
-#include "Handle.h"
-#include "Instance.h"
-#include "Notifier.h"
-#include "SourceImpl.h"
+#include "Handle.hpp"
+#include "Instance.hpp"
+#include "Notifier.hpp"
+#include "SourceImpl.hpp"
 
 using namespace cs;
 

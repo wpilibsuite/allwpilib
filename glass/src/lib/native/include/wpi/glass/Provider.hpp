@@ -12,10 +12,10 @@
 #include <utility>
 #include <vector>
 
-#include <wpigui.h>
+#include "wpi/gui/wpigui.hpp"
 
-#include "glass/Model.h"
-#include "glass/WindowManager.h"
+#include "wpi/glass/Model.hpp"
+#include "wpi/glass/WindowManager.hpp"
 
 namespace glass {
 

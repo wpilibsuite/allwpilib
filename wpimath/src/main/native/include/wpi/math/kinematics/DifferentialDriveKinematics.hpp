@@ -6,16 +6,16 @@
 
 #include <type_traits>
 
-#include <wpi/SymbolExports.h>
+#include "wpi/util/SymbolExports.hpp"
 
-#include "frc/geometry/Twist2d.h"
-#include "frc/kinematics/ChassisSpeeds.h"
-#include "frc/kinematics/DifferentialDriveWheelPositions.h"
-#include "frc/kinematics/DifferentialDriveWheelSpeeds.h"
-#include "frc/kinematics/Kinematics.h"
-#include "units/angle.h"
-#include "units/length.h"
-#include "wpimath/MathShared.h"
+#include "wpi/math/geometry/Twist2d.hpp"
+#include "wpi/math/kinematics/ChassisSpeeds.hpp"
+#include "wpi/math/kinematics/DifferentialDriveWheelPositions.hpp"
+#include "wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp"
+#include "wpi/math/kinematics/Kinematics.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/math/util/MathShared.hpp"
 
 namespace frc {
 /**
@@ -104,5 +104,5 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
 };
 }  // namespace frc
 
-#include "frc/kinematics/proto/DifferentialDriveKinematicsProto.h"
-#include "frc/kinematics/struct/DifferentialDriveKinematicsStruct.h"
+#include "wpi/math/kinematics/proto/DifferentialDriveKinematicsProto.hpp"
+#include "wpi/math/kinematics/struct/DifferentialDriveKinematicsStruct.hpp"

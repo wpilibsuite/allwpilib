@@ -8,7 +8,7 @@
 
 #include <string>
 
-#include <wpi/expected>
+#include "wpi/util/expected"
 
 namespace glass::expression {
 

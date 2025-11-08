@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <wpi/SymbolExports.h>
+#include "wpi/util/SymbolExports.hpp"
 
-#include "units/math.h"
-#include "units/velocity.h"
+#include "wpi/units/math.hpp"
+#include "wpi/units/velocity.hpp"
 
 namespace frc {
 /**
@@ -122,5 +122,5 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelSpeeds {
 };
 }  // namespace frc
 
-#include "frc/kinematics/proto/DifferentialDriveWheelSpeedsProto.h"
-#include "frc/kinematics/struct/DifferentialDriveWheelSpeedsStruct.h"
+#include "wpi/math/kinematics/proto/DifferentialDriveWheelSpeedsProto.hpp"
+#include "wpi/math/kinematics/struct/DifferentialDriveWheelSpeedsStruct.hpp"

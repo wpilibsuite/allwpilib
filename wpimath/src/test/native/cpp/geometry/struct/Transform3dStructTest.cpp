@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Transform3d.h"
+#include "wpi/math/geometry/Transform3d.hpp"
 
 using namespace frc;
 

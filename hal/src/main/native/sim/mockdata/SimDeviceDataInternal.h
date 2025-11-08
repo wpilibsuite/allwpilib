@@ -11,14 +11,14 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/StringExtras.h>
-#include <wpi/StringMap.h>
-#include <wpi/UidVector.h>
-#include <wpi/spinlock.h>
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/StringMap.hpp"
+#include "wpi/util/UidVector.hpp"
+#include "wpi/util/spinlock.hpp"
 
-#include "hal/Value.h"
-#include "hal/simulation/SimCallbackRegistry.h"
-#include "hal/simulation/SimDeviceData.h"
+#include "wpi/hal/Value.h"
+#include "wpi/hal/simulation/SimCallbackRegistry.h"
+#include "wpi/hal/simulation/SimDeviceData.h"
 
 namespace hal {
 

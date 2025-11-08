@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <wpi/SymbolExports.h>
-#include <wpi/protobuf/Protobuf.h>
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/protobuf/Protobuf.hpp"
 
-#include "frc/trajectory/Trajectory.h"
+#include "wpi/math/trajectory/Trajectory.hpp"
 #include "wpimath/protobuf/trajectory.npb.h"
 
 template <>

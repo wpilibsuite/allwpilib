@@ -16,7 +16,7 @@
 #include <utility>
 #include <vector>
 
-#include "ntcore_c.h"
+#include "wpi/nt/ntcore_c.h"
 
 namespace nt {
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <units/data.h>
+#include "wpi/units/data.hpp"
 
 namespace pybind11 {
 namespace detail {

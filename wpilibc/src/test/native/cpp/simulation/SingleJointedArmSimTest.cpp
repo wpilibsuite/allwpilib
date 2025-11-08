@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/simulation/SingleJointedArmSim.h"
+#include "wpi/simulation/SingleJointedArmSim.hpp"
 
 TEST(SingleJointedArmTest, Disabled) {
   frc::sim::SingleJointedArmSim sim(frc::DCMotor::Vex775Pro(2), 300, 3_kg_sq_m,

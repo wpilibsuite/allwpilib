@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <cameracalibration.h>
-#include <fieldcalibration.h>
+#include "cameracalibration.hpp"
+#include "fieldcalibration.hpp"
 
 #include <string>
 
 #include <gtest/gtest.h>
-#include <wpi/json.h>
+#include "wpi/util/json.hpp"
 
-#include "path_lookup.h"
+#include "path_lookup.hpp"
 
 const std::string projectRootPath = PROJECT_ROOT_PATH;
 

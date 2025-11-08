@@ -6,11 +6,11 @@
 
 #include <gtest/gtest.h>
 
-#include "TestPrinters.h"
+#include "TestPrinters.hpp"
 #include "gmock/gmock.h"
-#include "networktables/DoubleTopic.h"
-#include "networktables/NetworkTableInstance.h"
-#include "ntcore_cpp.h"
+#include "wpi/nt/DoubleTopic.hpp"
+#include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/nt/ntcore_cpp.hpp"
 
 using ::testing::_;
 

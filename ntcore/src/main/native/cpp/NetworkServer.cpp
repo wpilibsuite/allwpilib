@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "NetworkServer.h"
+#include "NetworkServer.hpp"
 
 #include <stdint.h>
 
@@ -14,26 +14,26 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/MemoryBuffer.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringExtras.h>
-#include <wpi/fs.h>
-#include <wpi/mutex.h>
-#include <wpi/raw_ostream.h>
-#include <wpi/timestamp.h>
-#include <wpinet/HttpUtil.h>
-#include <wpinet/HttpWebSocketServerConnection.h>
-#include <wpinet/UrlParser.h>
-#include <wpinet/uv/Tcp.h>
-#include <wpinet/uv/Work.h>
-#include <wpinet/uv/util.h>
+#include "wpi/util/MemoryBuffer.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/fs.hpp"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/raw_ostream.hpp"
+#include "wpi/util/timestamp.h"
+#include "wpi/net/HttpUtil.hpp"
+#include "wpi/net/HttpWebSocketServerConnection.hpp"
+#include "wpi/net/UrlParser.hpp"
+#include "wpi/net/uv/Tcp.hpp"
+#include "wpi/net/uv/Work.hpp"
+#include "wpi/net/uv/util.hpp"
 
-#include "IConnectionList.h"
-#include "InstanceImpl.h"
-#include "Log.h"
-#include "net/WebSocketConnection.h"
-#include "net/WireDecoder.h"
-#include "net/WireEncoder.h"
+#include "IConnectionList.hpp"
+#include "InstanceImpl.hpp"
+#include "Log.hpp"
+#include "net/WebSocketConnection.hpp"
+#include "net/WireDecoder.hpp"
+#include "net/WireEncoder.hpp"
 
 using namespace nt;
 namespace uv = wpi::uv;

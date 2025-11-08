@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/Encoder.h>
-#include <frc/Joystick.h>
-#include <frc/TimedRobot.h>
-#include <frc/controller/BangBangController.h>
-#include <frc/controller/SimpleMotorFeedforward.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc/simulation/EncoderSim.h>
-#include <frc/simulation/FlywheelSim.h>
-#include <frc/smartdashboard/SmartDashboard.h>
-#include <frc/system/plant/LinearSystemId.h>
-#include <units/moment_of_inertia.h>
+#include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/driverstation/Joystick.hpp"
+#include "wpi/opmode/TimedRobot.hpp"
+#include "wpi/math/controller/BangBangController.hpp"
+#include "wpi/math/controller/SimpleMotorFeedforward.hpp"
+#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/simulation/EncoderSim.hpp"
+#include "wpi/simulation/FlywheelSim.hpp"
+#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/units/moment_of_inertia.hpp"
 
 /**
  * This is a sample program to demonstrate the use of a BangBangController with

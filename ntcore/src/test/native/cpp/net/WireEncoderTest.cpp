@@ -8,17 +8,17 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include <wpi/SpanMatcher.h>
-#include <wpi/json.h>
-#include <wpi/raw_ostream.h>
+#include "wpi/util/SpanMatcher.hpp"
+#include "wpi/util/json.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
-#include "../TestPrinters.h"
-#include "Handle.h"
-#include "PubSubOptions.h"
+#include "../TestPrinters.hpp"
+#include "Handle.hpp"
+#include "PubSubOptions.hpp"
 #include "gmock/gmock-matchers.h"
-#include "net/Message.h"
-#include "net/WireEncoder.h"
-#include "networktables/NetworkTableValue.h"
+#include "net/Message.hpp"
+#include "net/WireEncoder.hpp"
+#include "wpi/nt/NetworkTableValue.hpp"
 
 using namespace std::string_view_literals;
 

@@ -5,10 +5,10 @@
 #include <memory>
 #include <utility>
 
-#include "CommandTestBase.h"
-#include "frc2/command/Commands.h"
-#include "frc2/command/ConditionalCommand.h"
-#include "frc2/command/InstantCommand.h"
+#include "CommandTestBase.hpp"
+#include "wpi/commands2/Commands.hpp"
+#include "wpi/commands2/ConditionalCommand.hpp"
+#include "wpi/commands2/InstantCommand.hpp"
 
 using namespace frc2;
 class ConditionalCommandTest : public CommandTestBase {};

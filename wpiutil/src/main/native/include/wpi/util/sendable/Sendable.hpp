@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "wpi/SymbolExports.h"
+#include "wpi/util/SymbolExports.hpp"
 
 namespace wpi {
 

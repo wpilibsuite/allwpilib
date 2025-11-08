@@ -4,7 +4,7 @@
 
 #include "HALInitializer.h"
 
-#include "hal/HALBase.h"
+#include "wpi/hal/HALBase.h"
 
 namespace hal::init {
 std::atomic_bool HAL_IsInitialized{false};

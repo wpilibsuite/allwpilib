@@ -15,8 +15,8 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/condition_variable.h"
-#include "wpi/mutex.h"
+#include "wpi/util/condition_variable.hpp"
+#include "wpi/util/mutex.hpp"
 
 namespace wpi {
 

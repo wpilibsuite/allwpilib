@@ -10,9 +10,9 @@
 #include <memory>
 #include <string_view>
 
-#include <wpi/mutex.h>
+#include "wpi/util/mutex.hpp"
 
-#include "PropertyImpl.h"
+#include "PropertyImpl.hpp"
 
 namespace cs {
 

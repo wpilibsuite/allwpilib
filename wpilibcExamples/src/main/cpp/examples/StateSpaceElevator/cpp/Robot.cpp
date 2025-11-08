@@ -4,21 +4,21 @@
 
 #include <numbers>
 
-#include <frc/Encoder.h>
-#include <frc/TimedRobot.h>
-#include <frc/XboxController.h>
-#include <frc/controller/LinearQuadraticRegulator.h>
-#include <frc/drive/DifferentialDrive.h>
-#include <frc/estimator/KalmanFilter.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc/system/LinearSystemLoop.h>
-#include <frc/system/plant/DCMotor.h>
-#include <frc/system/plant/LinearSystemId.h>
-#include <frc/trajectory/TrapezoidProfile.h>
-#include <units/acceleration.h>
-#include <units/length.h>
-#include <units/mass.h>
-#include <units/velocity.h>
+#include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/opmode/TimedRobot.hpp"
+#include "wpi/driverstation/XboxController.hpp"
+#include "wpi/math/controller/LinearQuadraticRegulator.hpp"
+#include "wpi/drive/DifferentialDrive.hpp"
+#include "wpi/math/estimator/KalmanFilter.hpp"
+#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/math/system/LinearSystemLoop.hpp"
+#include "wpi/math/system/plant/DCMotor.hpp"
+#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/math/trajectory/TrapezoidProfile.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/mass.hpp"
+#include "wpi/units/velocity.hpp"
 
 /**
  * This is a sample program to demonstrate how to use a state-space controller

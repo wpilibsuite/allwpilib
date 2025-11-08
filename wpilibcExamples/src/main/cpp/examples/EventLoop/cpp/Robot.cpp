@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/Encoder.h>
-#include <frc/Joystick.h>
-#include <frc/TimedRobot.h>
-#include <frc/controller/PIDController.h>
-#include <frc/controller/SimpleMotorFeedforward.h>
-#include <frc/event/BooleanEvent.h>
-#include <frc/event/EventLoop.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
-#include <units/angular_velocity.h>
-#include <units/length.h>
-#include <units/time.h>
-#include <units/voltage.h>
+#include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/driverstation/Joystick.hpp"
+#include "wpi/opmode/TimedRobot.hpp"
+#include "wpi/math/controller/PIDController.hpp"
+#include "wpi/math/controller/SimpleMotorFeedforward.hpp"
+#include "wpi/event/BooleanEvent.hpp"
+#include "wpi/event/EventLoop.hpp"
+#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/voltage.hpp"
 
 static const auto SHOT_VELOCITY = 200_rpm;
 static const auto TOLERANCE = 8_rpm;

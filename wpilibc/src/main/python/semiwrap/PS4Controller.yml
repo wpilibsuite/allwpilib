@@ -1,6 +1,6 @@
 extra_includes:
-- wpi/sendable/SendableBuilder.h
-- frc/event/BooleanEvent.h
+- wpi/util/sendable/SendableBuilder.hpp
+- wpi/event/BooleanEvent.hpp
 
 classes:
   frc::PS4Controller:

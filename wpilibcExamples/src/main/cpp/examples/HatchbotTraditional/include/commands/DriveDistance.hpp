@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <frc2/command/Command.h>
-#include <frc2/command/CommandHelper.h>
+#include "wpi/commands2/Command.hpp"
+#include "wpi/commands2/CommandHelper.hpp"
 
-#include "subsystems/DriveSubsystem.h"
+#include "subsystems/DriveSubsystem.hpp"
 
 class DriveDistance : public frc2::CommandHelper<frc2::Command, DriveDistance> {
  public:

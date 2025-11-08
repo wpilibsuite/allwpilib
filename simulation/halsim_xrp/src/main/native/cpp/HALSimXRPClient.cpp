@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "HALSimXRPClient.h"
+#include "wpi/halsim/xrp/HALSimXRPClient.hpp"
 
 #include <memory>
 
-#include <WSProviderContainer.h>
-#include <WSProvider_Analog.h>
-#include <WSProvider_DIO.h>
-#include <WSProvider_DriverStation.h>
-#include <WSProvider_Encoder.h>
-#include <WSProvider_HAL.h>
-#include <WSProvider_SimDevice.h>
-#include <wpinet/EventLoopRunner.h>
+#include "wpi/halsim/ws_core/WSProviderContainer.hpp"
+#include "wpi/halsim/ws_core/WSProvider_Analog.hpp"
+#include "wpi/halsim/ws_core/WSProvider_DIO.hpp"
+#include "wpi/halsim/ws_core/WSProvider_DriverStation.hpp"
+#include "wpi/halsim/ws_core/WSProvider_Encoder.hpp"
+#include "wpi/halsim/ws_core/WSProvider_HAL.hpp"
+#include "wpi/halsim/ws_core/WSProvider_SimDevice.hpp"
+#include "wpi/net/EventLoopRunner.hpp"
 
 using namespace wpilibxrp;
 using namespace wpilibws;

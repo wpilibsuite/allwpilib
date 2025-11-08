@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "glass/WindowManager.h"
+#include "wpi/glass/WindowManager.hpp"
 
 namespace glass {
 

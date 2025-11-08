@@ -10,13 +10,13 @@
 #include <string_view>
 #include <vector>
 
-#include <networktables/DoubleArrayTopic.h>
-#include <units/length.h>
-#include <wpi/SmallVector.h>
-#include <wpi/mutex.h>
+#include "wpi/nt/DoubleArrayTopic.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/mutex.hpp"
 
-#include "frc/geometry/Pose2d.h"
-#include "frc/geometry/Rotation2d.h"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
 
 namespace frc {
 

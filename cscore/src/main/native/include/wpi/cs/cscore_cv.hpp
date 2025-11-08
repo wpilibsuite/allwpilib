@@ -8,10 +8,10 @@
 #include <functional>
 
 #include <opencv2/core/mat.hpp>
-#include <wpi/RawFrame.h>
+#include "wpi/util/RawFrame.h"
 
-#include "cscore_oo.h"
-#include "cscore_raw.h"
+#include "wpi/cs/cscore_oo.hpp"
+#include "wpi/cs/cscore_raw.h"
 
 namespace cs {
 /**

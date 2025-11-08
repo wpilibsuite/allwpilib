@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "TestPrinters.h"
+#include "TestPrinters.hpp"
 
-#include "Handle.h"
-#include "PubSubOptions.h"
-#include "net/Message.h"
-#include "networktables/NetworkTableValue.h"
-#include "ntcore_cpp.h"
+#include "Handle.hpp"
+#include "PubSubOptions.hpp"
+#include "net/Message.hpp"
+#include "wpi/nt/NetworkTableValue.hpp"
+#include "wpi/nt/ntcore_cpp.hpp"
 
 namespace nt {
 

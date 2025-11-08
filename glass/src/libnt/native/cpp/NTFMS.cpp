@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/networktables/NTFMS.h"
+#include "wpi/glass/networktables/NTFMS.hpp"
 
 #include <stdint.h>
 
 #include <utility>
 
 #include <fmt/format.h>
-#include <wpi/SmallVector.h>
-#include <wpi/timestamp.h>
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/timestamp.h"
 
 using namespace glass;
 

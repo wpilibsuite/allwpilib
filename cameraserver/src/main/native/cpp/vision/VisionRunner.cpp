@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "vision/VisionRunner.h"
+#include "wpi/vision/VisionRunner.hpp"
 
 #include <memory>
 #include <thread>
 
 #include <opencv2/core/mat.hpp>
 
-#include "cameraserver/CameraServerShared.h"
+#include "wpi/cameraserver/CameraServerShared.hpp"
 
 using namespace frc;
 

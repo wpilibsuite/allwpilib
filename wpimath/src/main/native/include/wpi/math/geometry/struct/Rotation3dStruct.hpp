@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <wpi/SymbolExports.h>
-#include <wpi/struct/Struct.h>
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/struct/Struct.hpp"
 
-#include "frc/geometry/Rotation3d.h"
+#include "wpi/math/geometry/Rotation3d.hpp"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::Rotation3d> {

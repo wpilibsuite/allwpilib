@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/geometry/struct/Twist2dStruct.h"
+#include "wpi/math/geometry/struct/Twist2dStruct.hpp"
 
 namespace {
 constexpr size_t kDxOff = 0;

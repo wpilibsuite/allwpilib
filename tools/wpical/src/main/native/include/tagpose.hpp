@@ -6,7 +6,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-#include <wpi/json.h>
+#include "wpi/util/json.hpp"
 
 namespace tag {
 class Pose {

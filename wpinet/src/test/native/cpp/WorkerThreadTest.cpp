@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/WorkerThread.h"  // NOLINT(build/include_order)
+#include "wpi/net/WorkerThread.hpp"  // NOLINT(build/include_order)
 
 #include <thread>
 
 #include <gtest/gtest.h>
-#include <wpi/condition_variable.h>
-#include <wpi/mutex.h>
+#include "wpi/util/condition_variable.hpp"
+#include "wpi/util/mutex.hpp"
 
-#include "wpinet/EventLoopRunner.h"
-#include "wpinet/uv/Loop.h"
+#include "wpi/net/EventLoopRunner.hpp"
+#include "wpi/net/uv/Loop.hpp"
 
 namespace wpi {
 

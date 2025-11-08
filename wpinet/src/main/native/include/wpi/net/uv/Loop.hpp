@@ -14,10 +14,10 @@
 #include <thread>
 #include <utility>
 
-#include <wpi/Signal.h>
-#include <wpi/function_ref.h>
+#include "wpi/util/Signal.h"
+#include "wpi/util/function_ref.hpp"
 
-#include "wpinet/uv/Error.h"
+#include "wpi/net/uv/Error.hpp"
 
 namespace wpi::uv {
 

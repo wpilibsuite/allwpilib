@@ -9,9 +9,9 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/Signal.h>
+#include "wpi/util/Signal.h"
 
-#include "cscore_c.h"
+#include "wpi/cs/cscore_c.h"
 
 namespace cs {
 

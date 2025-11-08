@@ -8,8 +8,8 @@
 
 #include <gtest/gtest.h>
 
-#include "TestProtoInner.h"
-#include "wpi/protobuf/ProtobufCallbacks.h"
+#include "TestProtoInner.hpp"
+#include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 #include "wpiutil.npb.h"
 
 struct TestProto {

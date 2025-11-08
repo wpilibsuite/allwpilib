@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <wpi/expected>
+#include "wpi/util/expected"
 
-#include "frc/DARE.h"
+#include "wpi/math/linalg/DARE.hpp"
 
 template wpi::expected<Eigen::Matrix<double, 4, 4>, frc::DAREError>
 frc::DARE<4, 1>(const Eigen::Matrix<double, 4, 4>& A,

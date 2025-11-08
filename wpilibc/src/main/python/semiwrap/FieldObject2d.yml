@@ -1,5 +1,5 @@
 extra_includes:
-- frc/trajectory/Trajectory.h
+- wpi/math/trajectory/Trajectory.hpp
 
 classes:
   frc::FieldObject2d:

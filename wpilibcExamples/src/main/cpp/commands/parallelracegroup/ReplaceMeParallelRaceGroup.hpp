@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/ParallelRaceGroup.h>
+#include "wpi/commands2/CommandHelper.hpp"
+#include "wpi/commands2/ParallelRaceGroup.hpp"
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.
 // For more information, see:

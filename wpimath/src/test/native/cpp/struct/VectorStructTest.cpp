@@ -4,9 +4,9 @@
 
 #include <gtest/gtest.h>
 
-#include "../StructTestBase.h"
-#include "frc/EigenCore.h"
-#include "frc/struct/VectorStruct.h"
+#include "../StructTestBase.hpp"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/linalg/struct/VectorStruct.hpp"
 
 using namespace frc;
 

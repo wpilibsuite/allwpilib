@@ -6,11 +6,11 @@
 
 #include <memory>
 
-#include <WSProviderContainer.h>
-#include <WSProvider_SimDevice.h>
-#include <wpinet/EventLoopRunner.h>
+#include "wpi/halsim/ws_core/WSProviderContainer.hpp"
+#include "wpi/halsim/ws_core/WSProvider_SimDevice.hpp"
+#include "wpi/net/EventLoopRunner.hpp"
 
-#include "HALSimXRP.h"
+#include "wpi/halsim/xrp/HALSimXRP.hpp"
 
 namespace wpilibxrp {
 

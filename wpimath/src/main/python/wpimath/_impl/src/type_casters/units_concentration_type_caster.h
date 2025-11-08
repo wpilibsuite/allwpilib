@@ -1,6 +1,6 @@
 #pragma once
 
-#include <units/concentration.h>
+#include "wpi/units/concentration.hpp"
 
 namespace pybind11 {
 namespace detail {

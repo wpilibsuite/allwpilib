@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <frc2/command/CommandPtr.h>
+#include "wpi/commands2/CommandPtr.hpp"
 
 class RobotContainer {
  public:

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "frc2/command/button/Trigger.h"
+#include "wpi/commands2/button/Trigger.hpp"
 
 namespace frc2 {
 

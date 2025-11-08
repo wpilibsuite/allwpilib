@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/ADXL345_I2C.h"
+#include "wpi/hardware/accelerometer/ADXL345_I2C.hpp"
 
-#include <hal/UsageReporting.h>
-#include <networktables/DoubleTopic.h>
-#include <networktables/NTSendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include "wpi/hal/UsageReporting.h"
+#include "wpi/nt/DoubleTopic.hpp"
+#include "wpi/nt/NTSendableBuilder.hpp"
+#include "wpi/util/sendable/SendableRegistry.hpp"
 
 using namespace frc;
 

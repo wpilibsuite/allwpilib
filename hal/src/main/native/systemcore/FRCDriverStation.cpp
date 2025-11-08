@@ -14,29 +14,29 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <networktables/BooleanTopic.h>
-#include <networktables/IntegerTopic.h>
-#include <networktables/NetworkTableInstance.h>
-#include <networktables/ProtobufTopic.h>
-#include <networktables/StringArrayTopic.h>
-#include <networktables/StringTopic.h>
-#include <wpi/EventVector.h>
-#include <wpi/SafeThread.h>
-#include <wpi/SmallVector.h>
-#include <wpi/condition_variable.h>
-#include <wpi/mutex.h>
-#include <wpi/timestamp.h>
+#include "wpi/nt/BooleanTopic.hpp"
+#include "wpi/nt/IntegerTopic.hpp"
+#include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/nt/ProtobufTopic.hpp"
+#include "wpi/nt/StringArrayTopic.hpp"
+#include "wpi/nt/StringTopic.hpp"
+#include "wpi/util/EventVector.hpp"
+#include "wpi/util/SafeThread.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/condition_variable.hpp"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/timestamp.h"
 
 #include "HALInitializer.h"
 #include "SystemServerInternal.h"
-#include "hal/DriverStation.h"
-#include "hal/Errors.h"
-#include "hal/proto/ControlData.h"
-#include "hal/proto/ErrorInfo.h"
-#include "hal/proto/JoystickDescriptor.h"
-#include "hal/proto/JoystickRumbleData.h"
-#include "hal/proto/MatchInfo.h"
-#include "hal/proto/OpMode.h"
+#include "wpi/hal/DriverStation.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/proto/ControlData.h"
+#include "wpi/hal/proto/ErrorInfo.h"
+#include "wpi/hal/proto/JoystickDescriptor.h"
+#include "wpi/hal/proto/JoystickRumbleData.h"
+#include "wpi/hal/proto/MatchInfo.h"
+#include "wpi/hal/proto/OpMode.h"
 #include "mrc/NtNetComm.h"
 
 static_assert(sizeof(int32_t) >= sizeof(int),

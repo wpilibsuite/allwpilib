@@ -4,18 +4,18 @@
 
 #include <numbers>
 
-#include <frc/Encoder.h>
-#include <frc/Joystick.h>
-#include <frc/TimedRobot.h>
-#include <frc/controller/ElevatorFeedforward.h>
-#include <frc/controller/ProfiledPIDController.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc/trajectory/TrapezoidProfile.h>
-#include <units/acceleration.h>
-#include <units/length.h>
-#include <units/time.h>
-#include <units/velocity.h>
-#include <units/voltage.h>
+#include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/driverstation/Joystick.hpp"
+#include "wpi/opmode/TimedRobot.hpp"
+#include "wpi/math/controller/ElevatorFeedforward.hpp"
+#include "wpi/math/controller/ProfiledPIDController.hpp"
+#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/math/trajectory/TrapezoidProfile.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
+#include "wpi/units/voltage.hpp"
 
 class Robot : public frc::TimedRobot {
  public:

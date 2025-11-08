@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "WebSocketConnection.h"
+#include "WebSocketConnection.hpp"
 
 #include <algorithm>
 #include <span>
 
-#include <wpi/Endian.h>
-#include <wpi/Logger.h>
-#include <wpi/SpanExtras.h>
-#include <wpi/raw_ostream.h>
-#include <wpi/timestamp.h>
-#include <wpinet/WebSocket.h>
-#include <wpinet/raw_uv_ostream.h>
+#include "wpi/util/Endian.hpp"
+#include "wpi/util/Logger.hpp"
+#include "wpi/util/SpanExtras.hpp"
+#include "wpi/util/raw_ostream.hpp"
+#include "wpi/util/timestamp.h"
+#include "wpi/net/WebSocket.hpp"
+#include "wpi/net/raw_uv_ostream.hpp"
 
 using namespace nt;
 using namespace nt::net;

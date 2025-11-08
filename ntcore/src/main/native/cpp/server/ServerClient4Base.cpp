@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "ServerClient4Base.h"
+#include "ServerClient4Base.hpp"
 
 #include <memory>
 #include <string>
 #include <vector>
 
 #include <fmt/ranges.h>
-#include <wpi/SpanExtras.h>
+#include "wpi/util/SpanExtras.hpp"
 
-#include "Log.h"
-#include "server/ServerImpl.h"
-#include "server/ServerPublisher.h"
+#include "Log.hpp"
+#include "server/ServerImpl.hpp"
+#include "server/ServerPublisher.hpp"
 
 using namespace nt::server;
 

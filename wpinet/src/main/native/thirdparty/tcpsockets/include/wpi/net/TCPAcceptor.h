@@ -29,8 +29,8 @@
 #include <string>
 #include <string_view>
 
-#include "wpinet/NetworkAcceptor.h"
-#include "wpinet/TCPStream.h"
+#include "wpi/net/NetworkAcceptor.hpp"
+#include "wpi/net/TCPStream.h"
 
 namespace wpi {
 

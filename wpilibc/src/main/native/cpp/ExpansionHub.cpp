@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/ExpansionHub.h"
+#include "wpi/ExpansionHub.hpp"
 
 #include <memory>
 
-#include <hal/UsageReporting.h>
-#include <networktables/BooleanTopic.h>
+#include "wpi/hal/UsageReporting.h"
+#include "wpi/nt/BooleanTopic.hpp"
 
-#include "frc/Errors.h"
-#include "frc/ExpansionHubMotor.h"
-#include "frc/ExpansionHubServo.h"
-#include "frc/SystemServer.h"
+#include "wpi/system/Errors.hpp"
+#include "wpi/ExpansionHubMotor.hpp"
+#include "wpi/ExpansionHubServo.hpp"
+#include "wpi/system/SystemServer.hpp"
 
 using namespace frc;
 

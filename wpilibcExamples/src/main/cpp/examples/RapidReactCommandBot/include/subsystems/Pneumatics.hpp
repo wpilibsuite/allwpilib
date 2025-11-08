@@ -4,14 +4,14 @@
 
 #pragma once
 
-#include <frc/AnalogPotentiometer.h>
-#include <frc/Compressor.h>
-#include <frc/PneumaticsControlModule.h>
-#include <frc2/command/CommandPtr.h>
-#include <frc2/command/SubsystemBase.h>
-#include <units/pressure.h>
+#include "wpi/hardware/rotation/AnalogPotentiometer.hpp"
+#include "wpi/hardware/pneumatic/Compressor.hpp"
+#include "wpi/hardware/pneumatic/PneumaticsControlModule.hpp"
+#include "wpi/commands2/CommandPtr.hpp"
+#include "wpi/commands2/SubsystemBase.hpp"
+#include "wpi/units/pressure.hpp"
 
-#include "Constants.h"
+#include "Constants.hpp"
 
 class Pneumatics : frc2::SubsystemBase {
  public:

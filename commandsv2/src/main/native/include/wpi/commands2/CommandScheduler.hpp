@@ -12,13 +12,13 @@
 #include <span>
 #include <utility>
 
-#include <frc/Errors.h>
-#include <frc/Watchdog.h>
-#include <frc/event/EventLoop.h>
-#include <units/time.h>
-#include <wpi/FunctionExtras.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include "wpi/system/Errors.hpp"
+#include "wpi/system/Watchdog.hpp"
+#include "wpi/event/EventLoop.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/util/FunctionExtras.hpp"
+#include "wpi/util/sendable/Sendable.hpp"
+#include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace frc2 {
 class Command;

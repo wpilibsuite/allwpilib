@@ -1,5 +1,5 @@
 extra_includes:
-- frc/PS5Controller.h
+- wpi/driverstation/PS5Controller.hpp
 
 classes:
   frc::sim::PS5ControllerSim:

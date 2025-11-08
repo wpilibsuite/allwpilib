@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <glass/DataSource.h>
+#include "wpi/glass/DataSource.hpp"
 
 #define HALSIMGUI_DATASOURCE(cbname, id, TYPE, Type, vtype)                   \
   class cbname##Source : public ::glass::Type##Source {                       \

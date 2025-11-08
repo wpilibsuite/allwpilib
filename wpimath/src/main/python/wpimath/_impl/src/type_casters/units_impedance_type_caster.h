@@ -1,6 +1,6 @@
 #pragma once
 
-#include <units/impedance.h>
+#include "wpi/units/impedance.hpp"
 
 namespace pybind11 {
 namespace detail {

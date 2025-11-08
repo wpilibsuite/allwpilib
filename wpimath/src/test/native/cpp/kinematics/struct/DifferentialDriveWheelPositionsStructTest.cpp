@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/kinematics/DifferentialDriveWheelPositions.h"
+#include "wpi/math/kinematics/DifferentialDriveWheelPositions.hpp"
 
 using namespace frc;
 

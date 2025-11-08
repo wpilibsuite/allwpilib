@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/controller/ElevatorFeedforward.h"
+#include "wpi/math/controller/ElevatorFeedforward.hpp"
 
 using namespace frc;
 

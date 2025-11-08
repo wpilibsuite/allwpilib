@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/AnalogPotentiometer.h>
-#include <frc/Encoder.h>
-#include <frc/Joystick.h>
-#include <frc/TimedRobot.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc/simulation/SimHooks.h>
-#include <frc/smartdashboard/Mechanism2d.h>
-#include <frc/smartdashboard/MechanismLigament2d.h>
-#include <frc/smartdashboard/SmartDashboard.h>
-#include <frc/util/Color.h>
-#include <frc/util/Color8Bit.h>
-#include <units/angle.h>
+#include "wpi/hardware/rotation/AnalogPotentiometer.hpp"
+#include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/driverstation/Joystick.hpp"
+#include "wpi/opmode/TimedRobot.hpp"
+#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/simulation/SimHooks.hpp"
+#include "wpi/smartdashboard/Mechanism2d.hpp"
+#include "wpi/smartdashboard/MechanismLigament2d.hpp"
+#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/util/Color.hpp"
+#include "wpi/util/Color8Bit.hpp"
+#include "wpi/units/angle.hpp"
 
 /**
  * This sample program shows how to use Mechanism2d - a visual representation of

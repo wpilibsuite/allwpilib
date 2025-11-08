@@ -10,9 +10,9 @@
 #include <functional>
 #include <memory>
 
-#include <wpi/Signal.h>
+#include "wpi/util/Signal.h"
 
-#include "wpinet/uv/Handle.h"
+#include "wpi/net/uv/Handle.hpp"
 
 namespace wpi::uv {
 

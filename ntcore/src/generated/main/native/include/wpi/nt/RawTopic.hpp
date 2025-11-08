@@ -13,11 +13,11 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/json_fwd.h>
+#include "wpi/util/json_fwd.hpp"
 
-#include "networktables/NetworkTableType.h"
-#include "networktables/Topic.h"
-#include "ntcore_cpp.h"
+#include "wpi/nt/NetworkTableType.hpp"
+#include "wpi/nt/Topic.hpp"
+#include "wpi/nt/ntcore_cpp.hpp"
 
 namespace wpi {
 template <typename T>

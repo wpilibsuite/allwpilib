@@ -11,7 +11,7 @@
 #include <string_view>
 #include <vector>
 
-#include "wpi/SmallVector.h"
+#include "wpi/util/SmallVector.hpp"
 
 namespace wpi {
 

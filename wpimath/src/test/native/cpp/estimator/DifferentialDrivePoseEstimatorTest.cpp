@@ -10,17 +10,17 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include <wpi/print.h>
+#include "wpi/util/print.hpp"
 
-#include "frc/StateSpaceUtil.h"
-#include "frc/estimator/DifferentialDrivePoseEstimator.h"
-#include "frc/geometry/Pose2d.h"
-#include "frc/geometry/Rotation2d.h"
-#include "frc/kinematics/DifferentialDriveKinematics.h"
-#include "frc/trajectory/TrajectoryGenerator.h"
-#include "units/angle.h"
-#include "units/length.h"
-#include "units/time.h"
+#include "wpi/math/util/StateSpaceUtil.hpp"
+#include "wpi/math/estimator/DifferentialDrivePoseEstimator.hpp"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/time.hpp"
 
 void testFollowTrajectory(
     const frc::DifferentialDriveKinematics& kinematics,

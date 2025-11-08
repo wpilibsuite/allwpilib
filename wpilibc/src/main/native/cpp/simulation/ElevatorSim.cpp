@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/ElevatorSim.h"
+#include "wpi/simulation/ElevatorSim.hpp"
 
-#include <wpi/MathExtras.h>
+#include "wpi/util/MathExtras.hpp"
 
-#include "frc/RobotController.h"
-#include "frc/system/NumericalIntegration.h"
-#include "frc/system/plant/LinearSystemId.h"
+#include "wpi/system/RobotController.hpp"
+#include "wpi/math/system/NumericalIntegration.hpp"
+#include "wpi/math/system/plant/LinearSystemId.hpp"
 
 using namespace frc;
 using namespace frc::sim;

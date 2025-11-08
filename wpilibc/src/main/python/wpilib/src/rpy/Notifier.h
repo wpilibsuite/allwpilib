@@ -13,9 +13,9 @@
 #include <type_traits>
 #include <utility>
 
-#include <hal/Types.h>
-#include <units/time.h>
-#include <wpi/mutex.h>
+#include "wpi/hal/Types.h"
+#include "wpi/units/time.hpp"
+#include "wpi/util/mutex.hpp"
 
 #include <semiwrap.h>
 

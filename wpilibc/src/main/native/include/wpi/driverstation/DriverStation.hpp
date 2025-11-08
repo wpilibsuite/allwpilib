@@ -4,14 +4,14 @@
 
 #pragma once
 
-#include <frc/geometry/Rotation2d.h>
+#include "wpi/math/geometry/Rotation2d.hpp"
 
 #include <optional>
 #include <string>
 
-#include <hal/DriverStationTypes.h>
-#include <units/time.h>
-#include <wpi/Synchronization.h>
+#include "wpi/hal/DriverStationTypes.h"
+#include "wpi/units/time.hpp"
+#include "wpi/util/Synchronization.h"
 
 namespace wpi::log {
 class DataLog;

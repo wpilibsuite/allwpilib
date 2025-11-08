@@ -5,12 +5,12 @@
 #include <cstdio>
 #include <memory>
 
-#include <wpi/Logger.h>
+#include "wpi/util/Logger.hpp"
 
-#include "wpinet/EventLoopRunner.h"
-#include "wpinet/ParallelTcpConnector.h"
-#include "wpinet/uv/Error.h"
-#include "wpinet/uv/Tcp.h"
+#include "wpi/net/EventLoopRunner.hpp"
+#include "wpi/net/ParallelTcpConnector.hpp"
+#include "wpi/net/uv/Error.hpp"
+#include "wpi/net/uv/Tcp.hpp"
 
 namespace uv = wpi::uv;
 

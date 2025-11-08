@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/RobotState.h"
+#include "wpi/opmode/RobotState.hpp"
 
-#include "frc/DriverStation.h"
+#include "wpi/driverstation/DriverStation.hpp"
 
 using namespace frc;
 

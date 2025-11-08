@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "ntcore_test.h"
+#include "wpi/nt/ntcore_test.hpp"
 
 #include <cstring>
 
-#include <wpi/MemAlloc.h>
+#include "wpi/util/MemAlloc.hpp"
 
-#include "Value_internal.h"
+#include "Value_internal.hpp"
 
 extern "C" {
 struct WPI_String* NT_GetStringForTesting(const char* str, int* struct_size) {

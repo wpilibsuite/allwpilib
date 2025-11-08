@@ -6,10 +6,10 @@
 
 #include <optional>
 
-#include <frc/TimedRobot.h>
-#include <frc2/command/CommandPtr.h>
+#include "wpi/opmode/TimedRobot.hpp"
+#include "wpi/commands2/CommandPtr.hpp"
 
-#include "SysIdRoutineBot.h"
+#include "SysIdRoutineBot.hpp"
 
 class Robot : public frc::TimedRobot {
  public:

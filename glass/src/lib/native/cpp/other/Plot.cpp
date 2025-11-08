@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/other/Plot.h"
+#include "wpi/glass/other/Plot.hpp"
 
 #include <stdint.h>
 
@@ -16,7 +16,7 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/StringExtras.h>
+#include "wpi/util/StringExtras.hpp"
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
@@ -26,17 +26,17 @@
 #include <imgui_stdlib.h>
 #include <implot.h>
 #include <implot_internal.h>
-#include <wpi/Signal.h>
-#include <wpi/SmallString.h>
-#include <wpi/SmallVector.h>
-#include <wpi/timestamp.h>
+#include "wpi/util/Signal.h"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/timestamp.h"
 
-#include "glass/Context.h"
-#include "glass/DataSource.h"
-#include "glass/Storage.h"
-#include "glass/support/ColorSetting.h"
-#include "glass/support/EnumSetting.h"
-#include "glass/support/ExtraGuiWidgets.h"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/DataSource.hpp"
+#include "wpi/glass/Storage.hpp"
+#include "wpi/glass/support/ColorSetting.hpp"
+#include "wpi/glass/support/EnumSetting.hpp"
+#include "wpi/glass/support/ExtraGuiWidgets.hpp"
 
 using namespace glass;
 

@@ -9,11 +9,11 @@
 #include <string>
 #include <string_view>
 
-#include <wpi/Logger.h>
-#include <wpi/json_fwd.h>
-#include <wpi/mutex.h>
+#include "wpi/util/Logger.hpp"
+#include "wpi/util/json_fwd.hpp"
+#include "wpi/util/mutex.hpp"
 
-#include "SourceImpl.h"
+#include "SourceImpl.hpp"
 
 namespace cs {
 

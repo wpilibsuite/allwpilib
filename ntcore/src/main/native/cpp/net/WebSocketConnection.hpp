@@ -9,12 +9,12 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/function_ref.h>
-#include <wpinet/WebSocket.h>
-#include <wpinet/uv/Buffer.h>
-#include <wpinet/uv/Stream.h>
+#include "wpi/util/function_ref.hpp"
+#include "wpi/net/WebSocket.hpp"
+#include "wpi/net/uv/Buffer.hpp"
+#include "wpi/net/uv/Stream.hpp"
 
-#include "WireConnection.h"
+#include "WireConnection.hpp"
 
 namespace wpi {
 class Logger;

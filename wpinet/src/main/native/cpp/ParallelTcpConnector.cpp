@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/ParallelTcpConnector.h"
+#include "wpi/net/ParallelTcpConnector.hpp"
 
 #include <cstring>
 #include <functional>
@@ -11,13 +11,13 @@
 #include <utility>
 
 #include <fmt/format.h>
-#include <wpi/Logger.h>
+#include "wpi/util/Logger.hpp"
 
-#include "wpinet/uv/GetAddrInfo.h"
-#include "wpinet/uv/Loop.h"
-#include "wpinet/uv/Tcp.h"
-#include "wpinet/uv/Timer.h"
-#include "wpinet/uv/util.h"
+#include "wpi/net/uv/GetAddrInfo.hpp"
+#include "wpi/net/uv/Loop.hpp"
+#include "wpi/net/uv/Tcp.hpp"
+#include "wpi/net/uv/Timer.hpp"
+#include "wpi/net/uv/util.hpp"
 
 using namespace wpi;
 

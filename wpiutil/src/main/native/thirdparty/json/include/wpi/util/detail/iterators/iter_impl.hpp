@@ -11,13 +11,13 @@
 #include <iterator> // iterator, random_access_iterator_tag, bidirectional_iterator_tag, advance, next
 #include <type_traits> // conditional, is_const, remove_const
 
-#include <wpi/detail/exceptions.h>
-#include <wpi/detail/iterators/internal_iterator.h>
-#include <wpi/detail/iterators/primitive_iterator.h>
-#include <wpi/detail/macro_scope.h>
-#include <wpi/detail/meta/cpp_future.h>
-#include <wpi/detail/meta/type_traits.h>
-#include <wpi/detail/value_t.h>
+#include "wpi/util/detail/exceptions.hpp"
+#include "wpi/util/detail/iterators/internal_iterator.hpp"
+#include "wpi/util/detail/iterators/primitive_iterator.hpp"
+#include "wpi/util/detail/macro_scope.hpp"
+#include "wpi/util/detail/meta/cpp_future.hpp"
+#include "wpi/util/detail/meta/type_traits.hpp"
+#include "wpi/util/detail/value_t.hpp"
 
 WPI_JSON_NAMESPACE_BEGIN
 namespace detail

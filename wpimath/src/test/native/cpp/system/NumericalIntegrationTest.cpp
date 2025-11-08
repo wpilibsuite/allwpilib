@@ -6,8 +6,8 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/EigenCore.h"
-#include "frc/system/NumericalIntegration.h"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/system/NumericalIntegration.hpp"
 
 // Test that integrating dx/dt = eˣ works
 TEST(NumericalIntegrationTest, Exponential) {

@@ -6,12 +6,12 @@
 #define CSCORE_CSCORE_H_
 
 /* C API */
-#include "cscore_c.h"
+#include "wpi/cs/cscore_c.h"
 
 #ifdef __cplusplus
 /* C++ API */
-#include "cscore_cpp.h"
-#include "cscore_oo.h"
+#include "wpi/cs/cscore_cpp.hpp"
+#include "wpi/cs/cscore_oo.hpp"
 #endif /* __cplusplus */
 
 #endif  // CSCORE_CSCORE_H_

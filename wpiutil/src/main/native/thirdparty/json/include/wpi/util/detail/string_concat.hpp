@@ -12,8 +12,8 @@
 #include <string> // string
 #include <utility> // forward
 
-#include <wpi/detail/meta/cpp_future.h>
-#include <wpi/detail/meta/detected.h>
+#include "wpi/util/detail/meta/cpp_future.hpp"
+#include "wpi/util/detail/meta/detected.hpp"
 
 WPI_JSON_NAMESPACE_BEGIN
 namespace detail

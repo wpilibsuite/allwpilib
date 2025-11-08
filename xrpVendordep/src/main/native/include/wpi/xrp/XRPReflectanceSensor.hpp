@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <frc/AnalogInput.h>
+#include "wpi/hardware/discrete/AnalogInput.hpp"
 
 namespace frc {
 

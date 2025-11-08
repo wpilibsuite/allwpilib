@@ -1,6 +1,6 @@
 #pragma once
 
-#include <units/density.h>
+#include "wpi/units/density.hpp"
 
 namespace pybind11 {
 namespace detail {

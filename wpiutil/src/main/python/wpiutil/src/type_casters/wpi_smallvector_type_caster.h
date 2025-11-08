@@ -4,7 +4,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include <wpi/SmallVector.h>
+#include "wpi/util/SmallVector.hpp"
 
 namespace pybind11
 {

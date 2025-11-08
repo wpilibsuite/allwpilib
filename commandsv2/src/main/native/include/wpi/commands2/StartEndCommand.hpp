@@ -6,9 +6,9 @@
 
 #include <functional>
 
-#include "frc2/command/CommandHelper.h"
-#include "frc2/command/FunctionalCommand.h"
-#include "frc2/command/Requirements.h"
+#include "wpi/commands2/CommandHelper.hpp"
+#include "wpi/commands2/FunctionalCommand.hpp"
+#include "wpi/commands2/Requirements.hpp"
 
 namespace frc2 {
 /**

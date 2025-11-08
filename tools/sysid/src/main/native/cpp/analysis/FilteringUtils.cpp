@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "sysid/analysis/FilteringUtils.h"
+#include "wpi/sysid/analysis/FilteringUtils.hpp"
 
 #include <algorithm>
 #include <functional>
@@ -14,11 +14,11 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <frc/filter/LinearFilter.h>
-#include <frc/filter/MedianFilter.h>
-#include <units/math.h>
-#include <wpi/MathExtras.h>
-#include <wpi/StringExtras.h>
+#include "wpi/math/filter/LinearFilter.hpp"
+#include "wpi/math/filter/MedianFilter.hpp"
+#include "wpi/units/math.hpp"
+#include "wpi/util/MathExtras.hpp"
+#include "wpi/util/StringExtras.hpp"
 
 using namespace sysid;
 

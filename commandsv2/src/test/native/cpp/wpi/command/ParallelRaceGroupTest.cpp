@@ -5,12 +5,12 @@
 #include <memory>
 #include <utility>
 
-#include "CommandTestBase.h"
-#include "CompositionTestBase.h"
-#include "frc2/command/InstantCommand.h"
-#include "frc2/command/ParallelRaceGroup.h"
-#include "frc2/command/SequentialCommandGroup.h"
-#include "frc2/command/WaitUntilCommand.h"
+#include "CommandTestBase.hpp"
+#include "CompositionTestBase.hpp"
+#include "wpi/commands2/InstantCommand.hpp"
+#include "wpi/commands2/ParallelRaceGroup.hpp"
+#include "wpi/commands2/SequentialCommandGroup.hpp"
+#include "wpi/commands2/WaitUntilCommand.hpp"
 
 using namespace frc2;
 class ParallelRaceGroupTest : public CommandTestBase {};

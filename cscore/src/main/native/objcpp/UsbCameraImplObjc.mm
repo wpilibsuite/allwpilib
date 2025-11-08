@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <wpi/SmallString.h>
+#include "wpi/util/SmallString.hpp"
 
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-#import "UsbCameraImplObjc.h"
+#import "UsbCameraImplObjc.hpp"
 
-#include "Notifier.h"
-#include "Log.h"
-#include "UsbCameraImpl.h"
+#include "Notifier.hpp"
+#include "Log.hpp"
+#include "UsbCameraImpl.hpp"
 
 template <typename S, typename... Args>
 inline void NamedLog(UsbCameraImplObjc* objc, unsigned int level,

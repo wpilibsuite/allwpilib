@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/controller/ArmFeedforward.h"
+#include "wpi/math/controller/ArmFeedforward.hpp"
 
 #include <algorithm>
 #include <limits>
@@ -10,8 +10,8 @@
 #include <sleipnir/autodiff/gradient.hpp>
 #include <sleipnir/autodiff/hessian.hpp>
 
-#include "frc/EigenCore.h"
-#include "frc/system/NumericalIntegration.h"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/system/NumericalIntegration.hpp"
 
 using namespace frc;
 

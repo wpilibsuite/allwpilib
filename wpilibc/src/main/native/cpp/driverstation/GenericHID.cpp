@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/GenericHID.h"
+#include "wpi/driverstation/GenericHID.hpp"
 
 #include <string>
 
-#include <hal/DriverStation.h>
+#include "wpi/hal/DriverStation.h"
 
-#include "frc/DriverStation.h"
-#include "frc/Errors.h"
-#include "frc/event/BooleanEvent.h"
+#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/system/Errors.hpp"
+#include "wpi/event/BooleanEvent.hpp"
 
 using namespace frc;
 

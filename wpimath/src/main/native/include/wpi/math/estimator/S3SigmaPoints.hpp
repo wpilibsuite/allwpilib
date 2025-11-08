@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <wpi/array.h>
+#include "wpi/util/array.hpp"
 
-#include "frc/EigenCore.h"
-#include "frc/estimator/SigmaPoints.h"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/estimator/SigmaPoints.hpp"
 
 namespace frc {
 

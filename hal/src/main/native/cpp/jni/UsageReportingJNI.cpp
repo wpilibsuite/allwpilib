@@ -6,11 +6,11 @@
 
 #include <cassert>
 
-#include <wpi/jni_util.h>
-#include <wpi/string.h>
+#include "wpi/util/jni_util.hpp"
+#include "wpi/util/string.h"
 
 #include "org_wpilib_hardware_hal_UsageReportingJNI.h"
-#include "hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.h"
 
 using namespace wpi::java;
 

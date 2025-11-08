@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <hal/HALBase.h>
+#include "wpi/hal/HALBase.h"
 
 #ifndef __FRC_SYSTEMCORE__
 namespace frc::impl {

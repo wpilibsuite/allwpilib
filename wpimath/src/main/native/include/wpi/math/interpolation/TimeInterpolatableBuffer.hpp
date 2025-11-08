@@ -10,11 +10,11 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/MathExtras.h>
-#include <wpi/SymbolExports.h>
+#include "wpi/util/MathExtras.hpp"
+#include "wpi/util/SymbolExports.hpp"
 
-#include "frc/geometry/Pose2d.h"
-#include "units/time.h"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/units/time.hpp"
 
 namespace frc {
 

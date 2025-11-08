@@ -8,9 +8,9 @@
 #include <memory>
 #include <utility>
 
-#include <wpi/UidVector.h>
+#include "wpi/util/UidVector.hpp"
 
-#include "Handle.h"
+#include "Handle.hpp"
 
 namespace nt {
 

@@ -2,29 +2,29 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "MjpegServerImpl.h"
+#include "MjpegServerImpl.hpp"
 
 #include <chrono>
 #include <memory>
 #include <string>
 #include <utility>
 
-#include <wpi/SmallString.h>
-#include <wpi/StringExtras.h>
-#include <wpi/fmt/raw_ostream.h>
-#include <wpi/print.h>
-#include <wpinet/HttpUtil.h>
-#include <wpinet/TCPAcceptor.h>
-#include <wpinet/raw_socket_istream.h>
-#include <wpinet/raw_socket_ostream.h>
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/fmt/raw_ostream.hpp"
+#include "wpi/util/print.hpp"
+#include "wpi/net/HttpUtil.hpp"
+#include "wpi/net/TCPAcceptor.h"
+#include "wpi/net/raw_socket_istream.hpp"
+#include "wpi/net/raw_socket_ostream.hpp"
 
-#include "Instance.h"
-#include "JpegUtil.h"
-#include "Log.h"
-#include "Notifier.h"
-#include "SourceImpl.h"
-#include "c_util.h"
-#include "cscore_cpp.h"
+#include "Instance.hpp"
+#include "JpegUtil.hpp"
+#include "Log.hpp"
+#include "Notifier.hpp"
+#include "SourceImpl.hpp"
+#include "c_util.hpp"
+#include "wpi/cs/cscore_cpp.hpp"
 
 using namespace cs;
 

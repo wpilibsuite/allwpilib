@@ -6,10 +6,10 @@
 
 #include <utility>
 
-#include <wpi/SymbolExports.h>
+#include "wpi/util/SymbolExports.hpp"
 
-#include "frc/geometry/Transform2d.h"
-#include "frc/geometry/Translation3d.h"
+#include "wpi/math/geometry/Transform2d.hpp"
+#include "wpi/math/geometry/Translation3d.hpp"
 
 namespace frc {
 
@@ -196,9 +196,9 @@ class WPILIB_DLLEXPORT Transform3d {
 
 }  // namespace frc
 
-#include "frc/geometry/Pose3d.h"
-#include "frc/geometry/Twist3d.h"
-#include "frc/geometry/detail/RotationVectorToMatrix.h"
+#include "wpi/math/geometry/Pose3d.hpp"
+#include "wpi/math/geometry/Twist3d.hpp"
+#include "wpi/math/geometry/detail/RotationVectorToMatrix.hpp"
 
 namespace frc {
 
@@ -271,5 +271,5 @@ constexpr Twist3d Transform3d::Log() const {
 
 }  // namespace frc
 
-#include "frc/geometry/proto/Transform3dProto.h"
-#include "frc/geometry/struct/Transform3dStruct.h"
+#include "wpi/math/geometry/proto/Transform3dProto.hpp"
+#include "wpi/math/geometry/struct/Transform3dStruct.hpp"

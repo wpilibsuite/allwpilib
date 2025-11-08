@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/I2C.h"
+#include "wpi/hal/I2C.h"
 
 #include <fcntl.h>
 #include <linux/i2c-dev.h>
@@ -13,14 +13,14 @@
 #include <cstring>
 
 #include <fmt/format.h>
-#include <wpi/mutex.h>
-#include <wpi/print.h>
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/print.hpp"
 
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
-#include "hal/DIO.h"
-#include "hal/HAL.h"
+#include "wpi/hal/DIO.h"
+#include "wpi/hal/HAL.h"
 
 using namespace hal;
 

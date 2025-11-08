@@ -9,7 +9,7 @@
 
 #include <Windows.h>
 
-#include "UsbCameraImpl.h"
+#include "UsbCameraImpl.hpp"
 
 // https://github.com/opencv/opencv/blob/master/modules/videoio/src/cap_msmf.cpp
 
@@ -20,8 +20,8 @@
 
 #include <memory>
 
-#include "COMCreators.h"
-#include "ComPtr.h"
+#include "COMCreators.hpp"
+#include "ComPtr.hpp"
 
 #pragma comment(lib, "Mfplat.lib")
 #pragma comment(lib, "Mf.lib")

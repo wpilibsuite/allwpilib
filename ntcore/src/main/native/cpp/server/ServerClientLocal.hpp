@@ -7,7 +7,7 @@
 #include <span>
 #include <string_view>
 
-#include "server/ServerClient4Base.h"
+#include "server/ServerClient4Base.hpp"
 
 namespace nt::server {
 

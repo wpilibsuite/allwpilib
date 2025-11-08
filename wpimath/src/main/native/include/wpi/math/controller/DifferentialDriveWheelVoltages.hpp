@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "units/voltage.h"
+#include "wpi/units/voltage.hpp"
 
 namespace frc {
 
@@ -21,5 +21,5 @@ struct DifferentialDriveWheelVoltages {
 
 }  // namespace frc
 
-#include "frc/controller/proto/DifferentialDriveWheelVoltagesProto.h"
-#include "frc/controller/struct/DifferentialDriveWheelVoltagesStruct.h"
+#include "wpi/math/controller/proto/DifferentialDriveWheelVoltagesProto.hpp"
+#include "wpi/math/controller/struct/DifferentialDriveWheelVoltagesStruct.hpp"

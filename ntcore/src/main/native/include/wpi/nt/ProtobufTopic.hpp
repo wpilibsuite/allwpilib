@@ -11,14 +11,14 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/SmallVector.h>
-#include <wpi/json_fwd.h>
-#include <wpi/mutex.h>
-#include <wpi/protobuf/Protobuf.h>
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/json_fwd.hpp"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/protobuf/Protobuf.hpp"
 
-#include "networktables/NetworkTableInstance.h"
-#include "networktables/Topic.h"
-#include "ntcore_cpp.h"
+#include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/nt/Topic.hpp"
+#include "wpi/nt/ntcore_cpp.hpp"
 
 namespace nt {
 

@@ -21,7 +21,7 @@
    limitations under the License.
 */
 
-#include "wpinet/TCPAcceptor.h"
+#include "wpi/net/TCPAcceptor.h"
 
 #include <cstdio>
 #include <cstring>
@@ -38,10 +38,10 @@
 #include <unistd.h>
 #endif
 
-#include <wpi/Logger.h>
-#include <wpi/SmallString.h>
+#include "wpi/util/Logger.hpp"
+#include "wpi/util/SmallString.hpp"
 
-#include "wpinet/SocketError.h"
+#include "wpi/net/SocketError.hpp"
 
 using namespace wpi;
 

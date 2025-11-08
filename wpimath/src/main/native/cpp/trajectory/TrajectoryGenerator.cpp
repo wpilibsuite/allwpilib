@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/trajectory/TrajectoryGenerator.h"
+#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 
 #include <utility>
 #include <vector>
 
-#include <wpi/print.h>
+#include "wpi/util/print.hpp"
 
-#include "frc/spline/SplineHelper.h"
-#include "frc/spline/SplineParameterizer.h"
-#include "frc/trajectory/TrajectoryParameterizer.h"
+#include "wpi/math/spline/SplineHelper.hpp"
+#include "wpi/math/spline/SplineParameterizer.hpp"
+#include "wpi/math/trajectory/TrajectoryParameterizer.hpp"
 
 using namespace frc;
 

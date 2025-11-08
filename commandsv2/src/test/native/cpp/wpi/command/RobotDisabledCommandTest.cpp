@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "CommandTestBase.h"
-#include "frc2/command/ConditionalCommand.h"
-#include "frc2/command/ParallelCommandGroup.h"
-#include "frc2/command/ParallelDeadlineGroup.h"
-#include "frc2/command/ParallelRaceGroup.h"
-#include "frc2/command/SelectCommand.h"
-#include "frc2/command/SequentialCommandGroup.h"
+#include "CommandTestBase.hpp"
+#include "wpi/commands2/ConditionalCommand.hpp"
+#include "wpi/commands2/ParallelCommandGroup.hpp"
+#include "wpi/commands2/ParallelDeadlineGroup.hpp"
+#include "wpi/commands2/ParallelRaceGroup.hpp"
+#include "wpi/commands2/SelectCommand.hpp"
+#include "wpi/commands2/SequentialCommandGroup.hpp"
 
 using namespace frc2;
 class RobotDisabledCommandTest : public CommandTestBase {};

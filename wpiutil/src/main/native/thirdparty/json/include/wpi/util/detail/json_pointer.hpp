@@ -21,11 +21,11 @@
 #include <utility> // move
 #include <vector> // vector
 
-#include <wpi/detail/exceptions.h>
-#include <wpi/detail/macro_scope.h>
-#include <wpi/detail/string_concat.h>
-#include <wpi/detail/string_escape.h>
-#include <wpi/detail/value_t.h>
+#include "wpi/util/detail/exceptions.hpp"
+#include "wpi/util/detail/macro_scope.hpp"
+#include "wpi/util/detail/string_concat.hpp"
+#include "wpi/util/detail/string_escape.hpp"
+#include "wpi/util/detail/value_t.hpp"
 
 WPI_JSON_NAMESPACE_BEGIN
 

@@ -6,13 +6,13 @@
 
 #include <string_view>
 
-#include <networktables/BooleanTopic.h>
-#include <networktables/IntegerTopic.h>
-#include <networktables/NetworkTableInstance.h>
-#include <networktables/StringTopic.h>
+#include "wpi/nt/BooleanTopic.hpp"
+#include "wpi/nt/IntegerTopic.hpp"
+#include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/nt/StringTopic.hpp"
 
-#include "glass/DataSource.h"
-#include "glass/other/FMS.h"
+#include "wpi/glass/DataSource.hpp"
+#include "wpi/glass/other/FMS.hpp"
 
 namespace glass {
 

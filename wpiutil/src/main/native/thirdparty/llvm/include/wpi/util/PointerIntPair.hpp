@@ -14,9 +14,9 @@
 #ifndef WPIUTIL_WPI_POINTERINTPAIR_H
 #define WPIUTIL_WPI_POINTERINTPAIR_H
 
-#include "wpi/Compiler.h"
-#include "wpi/PointerLikeTypeTraits.h"
-#include "wpi/type_traits.h"
+#include "wpi/util/Compiler.hpp"
+#include "wpi/util/PointerLikeTypeTraits.hpp"
+#include "wpi/util/type_traits.hpp"
 #include <cassert>
 #include <cstdint>
 #include <cstring>

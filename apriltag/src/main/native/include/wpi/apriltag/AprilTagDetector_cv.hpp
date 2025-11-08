@@ -6,7 +6,7 @@
 
 #include <opencv2/core/mat.hpp>
 
-#include "frc/apriltag/AprilTagDetector.h"
+#include "wpi/apriltag/AprilTagDetector.hpp"
 
 namespace frc {
 

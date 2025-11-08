@@ -2,24 +2,24 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "cscore_cpp.h"
+#include "wpi/cs/cscore_cpp.hpp"
 
 #include <memory>
 #include <string>
 #include <vector>
 
-#include <wpi/SmallString.h>
-#include <wpi/json.h>
-#include <wpinet/hostname.h>
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/json.hpp"
+#include "wpi/net/hostname.hpp"
 
-#include "Handle.h"
-#include "Instance.h"
-#include "NetworkListener.h"
-#include "Notifier.h"
-#include "PropertyContainer.h"
-#include "SinkImpl.h"
-#include "SourceImpl.h"
-#include "Telemetry.h"
+#include "Handle.hpp"
+#include "Instance.hpp"
+#include "NetworkListener.hpp"
+#include "Notifier.hpp"
+#include "PropertyContainer.hpp"
+#include "SinkImpl.hpp"
+#include "SourceImpl.hpp"
+#include "Telemetry.hpp"
 
 using namespace cs;
 

@@ -9,9 +9,9 @@
 #include <memory>
 
 
-#include "frc/motorcontrol/MotorController.h"
-#include "wpi/sendable/Sendable.h"
-#include "wpi/sendable/SendableHelper.h"
+#include "wpi/hardware/motor/MotorController.hpp"
+#include "wpi/util/sendable/Sendable.hpp"
+#include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace frc {
 

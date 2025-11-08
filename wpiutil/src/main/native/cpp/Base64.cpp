@@ -55,13 +55,13 @@
  *
  */
 
-#include "wpi/Base64.h"
+#include "wpi/util/Base64.hpp"
 
 #include <string>
 #include <vector>
 
-#include "wpi/SmallVector.h"
-#include "wpi/raw_ostream.h"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
 namespace wpi {
 

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/Synchronization.h>
+#include "wpi/util/Synchronization.h"
 
 #ifdef __cplusplus
 #include <functional>
@@ -14,7 +14,7 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/mutex.h>
+#include "wpi/util/mutex.hpp"
 namespace wpi {
 class MulticastServiceResolver {
  public:

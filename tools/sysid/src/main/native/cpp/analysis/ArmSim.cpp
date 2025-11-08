@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "sysid/analysis/ArmSim.h"
+#include "wpi/sysid/analysis/ArmSim.hpp"
 
 #include <cmath>
 
-#include <frc/StateSpaceUtil.h>
-#include <frc/system/NumericalIntegration.h>
-#include <wpi/MathExtras.h>
+#include "wpi/math/util/StateSpaceUtil.hpp"
+#include "wpi/math/system/NumericalIntegration.hpp"
+#include "wpi/util/MathExtras.hpp"
 
 using namespace sysid;
 

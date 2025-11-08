@@ -13,12 +13,12 @@
 #include <string_view>
 #include <utility>
 
-#include <wpi/json_fwd.h>
+#include "wpi/util/json_fwd.hpp"
 
-#include "net/NetworkOutgoingQueue.h"
-#include "server/Functions.h"
-#include "server/ServerPublisher.h"
-#include "server/ServerSubscriber.h"
+#include "net/NetworkOutgoingQueue.hpp"
+#include "server/Functions.hpp"
+#include "server/ServerPublisher.hpp"
+#include "server/ServerSubscriber.hpp"
 
 namespace wpi {
 class Logger;

@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/ADXL345Sim.h"
+#include "wpi/simulation/ADXL345Sim.hpp"
 
-#include "frc/ADXL345_I2C.h"
-#include "frc/simulation/SimDeviceSim.h"
+#include "wpi/hardware/accelerometer/ADXL345_I2C.hpp"
+#include "wpi/simulation/SimDeviceSim.hpp"
 
 using namespace frc::sim;
 

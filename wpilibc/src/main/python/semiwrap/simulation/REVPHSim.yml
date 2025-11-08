@@ -1,5 +1,5 @@
 extra_includes:
-- frc/Compressor.h
+- wpi/hardware/pneumatic/Compressor.hpp
 
 classes:
   frc::sim::REVPHSim:

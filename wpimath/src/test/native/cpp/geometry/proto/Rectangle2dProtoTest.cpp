@@ -3,9 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <wpi/SmallVector.h>
+#include "wpi/util/SmallVector.hpp"
 
-#include "frc/geometry/Rectangle2d.h"
+#include "wpi/math/geometry/Rectangle2d.hpp"
 
 using namespace frc;
 

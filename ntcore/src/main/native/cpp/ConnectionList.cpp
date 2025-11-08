@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "ConnectionList.h"
+#include "ConnectionList.hpp"
 
 #include <string>
 #include <vector>
 
-#include <wpi/SmallVector.h>
-#include <wpi/json.h>
-#include <wpi/raw_ostream.h>
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/json.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
-#include "IListenerStorage.h"
-#include "ntcore_c.h"
-#include "ntcore_cpp.h"
+#include "IListenerStorage.hpp"
+#include "wpi/nt/ntcore_c.h"
+#include "wpi/nt/ntcore_cpp.hpp"
 
 using namespace nt;
 

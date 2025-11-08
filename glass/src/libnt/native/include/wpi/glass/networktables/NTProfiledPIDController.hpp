@@ -7,13 +7,13 @@
 #include <string>
 #include <string_view>
 
-#include <networktables/BooleanTopic.h>
-#include <networktables/DoubleTopic.h>
-#include <networktables/NetworkTableInstance.h>
-#include <networktables/StringTopic.h>
+#include "wpi/nt/BooleanTopic.hpp"
+#include "wpi/nt/DoubleTopic.hpp"
+#include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/nt/StringTopic.hpp"
 
-#include "glass/DataSource.h"
-#include "glass/other/ProfiledPIDController.h"
+#include "wpi/glass/DataSource.hpp"
+#include "wpi/glass/other/ProfiledPIDController.hpp"
 
 namespace glass {
 class NTProfiledPIDControllerModel : public ProfiledPIDControllerModel {

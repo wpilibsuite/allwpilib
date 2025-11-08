@@ -14,9 +14,9 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/StringMap.h>
-#include <wpi/iterator_range.h>
-#include <wpi/json_fwd.h>
+#include "wpi/util/StringMap.hpp"
+#include "wpi/util/iterator_range.hpp"
+#include "wpi/util/json_fwd.hpp"
 
 namespace glass {
 

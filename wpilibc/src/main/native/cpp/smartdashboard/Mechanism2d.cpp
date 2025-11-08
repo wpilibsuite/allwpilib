@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/smartdashboard/Mechanism2d.h"
+#include "wpi/smartdashboard/Mechanism2d.hpp"
 
 #include <memory>
 #include <string_view>
 
-#include <networktables/NTSendableBuilder.h>
+#include "wpi/nt/NTSendableBuilder.hpp"
 
 using namespace frc;
 

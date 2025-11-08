@@ -7,12 +7,12 @@
 #include <cassert>
 
 #include <fmt/format.h>
-#include <wpi/jni_util.h>
+#include "wpi/util/jni_util.hpp"
 
 #include "HALUtil.h"
 #include "org_wpilib_hardware_hal_DriverStationJNI.h"
-#include "hal/DriverStation.h"
-#include "hal/HALBase.h"
+#include "wpi/hal/DriverStation.h"
+#include "wpi/hal/HALBase.h"
 
 static_assert(org_wpilib_hardware_hal_DriverStationJNI_kUnknownAllianceStation ==
               HAL_AllianceStationID_kUnknown);

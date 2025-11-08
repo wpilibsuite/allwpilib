@@ -1,5 +1,5 @@
 extra_includes:
-- frc/DigitalOutput.h
+- wpi/hardware/discrete/DigitalOutput.hpp
 
 classes:
   frc::sim::DigitalPWMSim:

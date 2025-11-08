@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/Extensions.h"
+#include "wpi/hal/Extensions.h"
 
 #include <cstdio>
 #include <string>
@@ -10,10 +10,10 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/StringExtras.h>
-#include <wpi/fs.h>
-#include <wpi/print.h>
-#include <wpi/spinlock.h>
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/fs.hpp"
+#include "wpi/util/print.hpp"
+#include "wpi/util/spinlock.hpp"
 
 #if defined(WIN32) || defined(_WIN32)
 #include <windows.h>

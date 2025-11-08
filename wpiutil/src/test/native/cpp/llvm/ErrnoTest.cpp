@@ -6,7 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/Errno.h"
+#include "wpi/util/Errno.hpp"
 #include "gtest/gtest.h"
 
 using namespace wpi::sys;

@@ -6,16 +6,16 @@
 
 #include <memory>
 
-#include <networktables/BooleanTopic.h>
-#include <networktables/DoubleTopic.h>
-#include <networktables/IntegerTopic.h>
-#include <units/angle.h>
-#include <units/current.h>
-#include <units/time.h>
-#include <units/voltage.h>
+#include "wpi/nt/BooleanTopic.hpp"
+#include "wpi/nt/DoubleTopic.hpp"
+#include "wpi/nt/IntegerTopic.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/current.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/voltage.hpp"
 
-#include "frc/ExpansionHub.h"
-#include "frc/ExpansionHubPidConstants.h"
+#include "wpi/ExpansionHub.hpp"
+#include "wpi/ExpansionHubPidConstants.hpp"
 
 namespace frc {
 

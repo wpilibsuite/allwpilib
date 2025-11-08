@@ -11,12 +11,12 @@
 
 #include <fmt/format.h>
 #include <gtest/gtest.h>
-#include <networktables/NetworkTableInstance.h>
-#include <networktables/StringArrayTopic.h>
+#include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/nt/StringArrayTopic.hpp"
 
-#include "frc/Alert.h"
-#include "frc/simulation/SimHooks.h"
-#include "frc/smartdashboard/SmartDashboard.h"
+#include "wpi/util/Alert.hpp"
+#include "wpi/simulation/SimHooks.hpp"
+#include "wpi/smartdashboard/SmartDashboard.hpp"
 
 using namespace frc;
 using enum Alert::AlertType;

@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/ExpansionHubServo.h"
+#include "wpi/ExpansionHubServo.hpp"
 
-#include "frc/Errors.h"
-#include "frc/SystemServer.h"
+#include "wpi/system/Errors.hpp"
+#include "wpi/system/SystemServer.hpp"
 
 using namespace frc;
 

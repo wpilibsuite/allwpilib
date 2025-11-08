@@ -6,13 +6,13 @@
 
 #include <array>
 
-#include <units/angle.h>
-#include <units/length.h>
-#include <units/mass.h>
-#include <units/moment_of_inertia.h>
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/mass.hpp"
+#include "wpi/units/moment_of_inertia.hpp"
 
-#include "frc/simulation/LinearSystemSim.h"
-#include "frc/system/plant/DCMotor.h"
+#include "wpi/simulation/LinearSystemSim.hpp"
+#include "wpi/math/system/plant/DCMotor.hpp"
 
 namespace frc::sim {
 /**

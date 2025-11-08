@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <wpi/SymbolExports.h>
-#include <wpi/protobuf/Protobuf.h>
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/protobuf/Protobuf.hpp"
 
-#include "frc/system/plant/DCMotor.h"
+#include "wpi/math/system/plant/DCMotor.hpp"
 #include "wpimath/protobuf/plant.npb.h"
 
 template <>

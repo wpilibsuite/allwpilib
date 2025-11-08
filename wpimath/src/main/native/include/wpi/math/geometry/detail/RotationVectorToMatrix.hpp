@@ -6,7 +6,7 @@
 
 #include <Eigen/Core>
 
-#include "frc/ct_matrix.h"
+#include "wpi/math/linalg/ct_matrix.hpp"
 
 namespace frc::detail {
 

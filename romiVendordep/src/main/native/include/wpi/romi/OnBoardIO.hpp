@@ -6,9 +6,9 @@
 
 #include <memory>
 
-#include <frc/DigitalInput.h>
-#include <frc/DigitalOutput.h>
-#include <units/time.h>
+#include "wpi/hardware/discrete/DigitalInput.hpp"
+#include "wpi/hardware/discrete/DigitalOutput.hpp"
+#include "wpi/units/time.hpp"
 
 namespace frc {
 

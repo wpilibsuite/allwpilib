@@ -8,8 +8,8 @@
 #include <string>
 #include <vector>
 
-#include <hal/SimDevice.h>
-#include <hal/simulation/SimDeviceData.h>
+#include "wpi/hal/SimDevice.h"
+#include "wpi/hal/simulation/SimDeviceData.h"
 
 namespace frc::sim {
 

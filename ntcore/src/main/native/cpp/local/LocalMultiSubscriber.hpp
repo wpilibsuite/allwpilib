@@ -9,13 +9,13 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/StringExtras.h>
-#include <wpi/Synchronization.h>
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/Synchronization.h"
 
-#include "Handle.h"
-#include "PubSubOptions.h"
-#include "VectorSet.h"
-#include "ntcore_c.h"
+#include "Handle.hpp"
+#include "PubSubOptions.hpp"
+#include "VectorSet.hpp"
+#include "wpi/nt/ntcore_c.h"
 
 namespace nt::local {
 

@@ -11,7 +11,7 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/json.h"
+#include "wpi/util/json.hpp"
 
 namespace wpi {
 

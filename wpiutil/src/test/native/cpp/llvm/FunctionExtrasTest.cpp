@@ -6,8 +6,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/FunctionExtras.h"
-#include "CountCopyAndMove.h"
+#include "wpi/util/FunctionExtras.hpp"
+#include "CountCopyAndMove.hpp"
 #include "gtest/gtest.h"
 
 #include <memory>

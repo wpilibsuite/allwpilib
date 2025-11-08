@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "WSProvider_dPWM.h"
+#include "wpi/halsim/ws_core/WSProvider_dPWM.hpp"
 
-#include <hal/Ports.h>
-#include <hal/simulation/DigitalPWMData.h>
+#include "wpi/hal/Ports.h"
+#include "wpi/hal/simulation/DigitalPWMData.h"
 
 #define REGISTER(halsim, jsonid, ctype, haltype)                             \
   HALSIM_RegisterDigitalPWM##halsim##Callback(                               \

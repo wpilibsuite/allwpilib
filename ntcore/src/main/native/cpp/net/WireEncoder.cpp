@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "WireEncoder.h"
+#include "WireEncoder.hpp"
 
 #include <optional>
 #include <string>
 
-#include <wpi/json.h>
-#include <wpi/mpack.h>
-#include <wpi/raw_ostream.h>
+#include "wpi/util/json.hpp"
+#include "wpi/util/mpack.h"
+#include "wpi/util/raw_ostream.hpp"
 
-#include "Message.h"
-#include "PubSubOptions.h"
-#include "networktables/NetworkTableValue.h"
+#include "Message.hpp"
+#include "PubSubOptions.hpp"
+#include "wpi/nt/NetworkTableValue.hpp"
 
 using namespace nt;
 using namespace nt::net;

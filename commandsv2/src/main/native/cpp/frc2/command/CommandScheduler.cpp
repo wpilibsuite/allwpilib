@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc2/command/CommandScheduler.h"
+#include "wpi/commands2/CommandScheduler.hpp"
 
 #include <cstdio>
 #include <memory>
@@ -10,20 +10,20 @@
 #include <utility>
 #include <vector>
 
-#include <frc/RobotBase.h>
-#include <frc/RobotState.h>
-#include <frc/TimedRobot.h>
-#include <hal/HALBase.h>
-#include <hal/UsageReporting.h>
-#include <networktables/IntegerArrayTopic.h>
-#include <networktables/StringArrayTopic.h>
-#include <wpi/DenseMap.h>
-#include <wpi/SmallVector.h>
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include "wpi/opmode/RobotBase.hpp"
+#include "wpi/opmode/RobotState.hpp"
+#include "wpi/opmode/TimedRobot.hpp"
+#include "wpi/hal/HALBase.h"
+#include "wpi/hal/UsageReporting.h"
+#include "wpi/nt/IntegerArrayTopic.hpp"
+#include "wpi/nt/StringArrayTopic.hpp"
+#include "wpi/util/DenseMap.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/util/sendable/SendableRegistry.hpp"
 
-#include "frc2/command/CommandPtr.h"
-#include "frc2/command/Subsystem.h"
+#include "wpi/commands2/CommandPtr.hpp"
+#include "wpi/commands2/Subsystem.hpp"
 
 using namespace frc2;
 

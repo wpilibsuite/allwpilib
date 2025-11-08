@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include <wpi/SymbolExports.h>
+#include "wpi/util/SymbolExports.hpp"
 
-#include "units/angular_velocity.h"
-#include "units/current.h"
-#include "units/impedance.h"
-#include "units/torque.h"
-#include "units/voltage.h"
+#include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/current.hpp"
+#include "wpi/units/impedance.hpp"
+#include "wpi/units/torque.hpp"
+#include "wpi/units/voltage.hpp"
 
 namespace frc {
 
@@ -283,5 +283,5 @@ class WPILIB_DLLEXPORT DCMotor {
 
 }  // namespace frc
 
-#include "frc/system/plant/proto/DCMotorProto.h"
-#include "frc/system/plant/struct/DCMotorStruct.h"
+#include "wpi/math/system/plant/proto/DCMotorProto.hpp"
+#include "wpi/math/system/plant/struct/DCMotorStruct.hpp"

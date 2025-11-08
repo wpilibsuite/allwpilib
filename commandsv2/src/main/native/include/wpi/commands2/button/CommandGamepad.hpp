@@ -3,11 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #pragma once
-#include <frc/Gamepad.h>
+#include "wpi/driverstation/Gamepad.hpp"
 
-#include "frc2/command/CommandScheduler.h"
-#include "frc2/command/button/CommandGenericHID.h"
-#include "frc2/command/button/Trigger.h"
+#include "wpi/commands2/CommandScheduler.hpp"
+#include "wpi/commands2/button/CommandGenericHID.hpp"
+#include "wpi/commands2/button/Trigger.hpp"
 
 namespace frc2 {
 /**

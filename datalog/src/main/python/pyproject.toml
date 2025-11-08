@@ -43,8 +43,8 @@ update_init = [
 scan_headers_ignore = [
     # wpi/datalog
     "wpi/datalog/DataLog_c.h",
-    "wpi/datalog/DataLogReaderThread.h",
-    "wpi/datalog/FileLogger.h",
+    "wpi/datalog/DataLogReaderThread.hpp",
+    "wpi/datalog/FileLogger.hpp",
 ]
 
 [tool.semiwrap.extension_modules."wpilog._wpilog"]
@@ -54,10 +54,10 @@ depends = ["wpiutil"]
 
 [tool.semiwrap.extension_modules."wpilog._wpilog".headers]
 # wpi/datalog
-DataLog = "wpi/datalog/DataLog.h"
-DataLogBackgroundWriter = "wpi/datalog/DataLogBackgroundWriter.h"
-DataLogReader = "wpi/datalog/DataLogReader.h"
-# DataLogReaderThread = "wpi/datalog/DataLogReaderThread.h"
-DataLogWriter = "wpi/datalog/DataLogWriter.h"
+DataLog = "wpi/datalog/DataLog.hpp"
+DataLogBackgroundWriter = "wpi/datalog/DataLogBackgroundWriter.hpp"
+DataLogReader = "wpi/datalog/DataLogReader.hpp"
+# DataLogReaderThread = "wpi/datalog/DataLogReaderThread.hpp"
+DataLogWriter = "wpi/datalog/DataLogWriter.hpp"
 # DataLog_c = "wpi/datalog/DataLog_c.h"
-# FileLogger = "wpi/datalog/FileLogger.h"
+# FileLogger = "wpi/datalog/FileLogger.hpp"

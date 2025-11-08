@@ -9,12 +9,12 @@
 #include <fmt/format.h>
 
 #define WPI_RAWFRAME_JNI
-#include <wpi/RawFrame.h>
-#include <wpi/SmallString.h>
-#include <wpi/jni_util.h>
+#include "wpi/util/RawFrame.h"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/jni_util.hpp"
 
-#include "cscore_raw.h"
-#include "cscore_runloop.h"
+#include "wpi/cs/cscore_raw.h"
+#include "wpi/cs/cscore_runloop.hpp"
 #include "org_wpilib_vision_camera_CameraServerJNI.h"
 
 namespace cv {

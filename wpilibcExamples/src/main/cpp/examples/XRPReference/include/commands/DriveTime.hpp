@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <frc/Timer.h>
-#include <frc2/command/Command.h>
-#include <frc2/command/CommandHelper.h>
-#include <units/time.h>
+#include "wpi/system/Timer.hpp"
+#include "wpi/commands2/Command.hpp"
+#include "wpi/commands2/CommandHelper.hpp"
+#include "wpi/units/time.hpp"
 
-#include "subsystems/Drivetrain.h"
+#include "subsystems/Drivetrain.hpp"
 
 class DriveTime : public frc2::CommandHelper<frc2::Command, DriveTime> {
  public:

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <units/velocity.h>
+#include "wpi/units/velocity.hpp"
 
 namespace pybind11 {
 namespace detail {

@@ -1,7 +1,7 @@
 extra_includes:
 - src/rpy/SmartDashboardData.h
-- frc/Errors.h
-- wpi/sendable/SendableRegistry.h
+- wpi/system/Errors.hpp
+- wpi/util/sendable/SendableRegistry.hpp
 
 classes:
   frc::SmartDashboard:

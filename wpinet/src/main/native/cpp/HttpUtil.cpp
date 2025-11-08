@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/HttpUtil.h"
+#include "wpi/net/HttpUtil.hpp"
 
 #include <cctype>
 #include <string>
 #include <utility>
 
 #include <fmt/format.h>
-#include <wpi/Base64.h>
-#include <wpi/StringExtras.h>
-#include <wpi/raw_ostream.h>
+#include "wpi/util/Base64.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
 namespace wpi {
 

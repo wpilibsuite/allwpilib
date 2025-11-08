@@ -6,17 +6,17 @@
 
 #include <numbers>
 
-#include <frc/Encoder.h>
-#include <frc/controller/PIDController.h>
-#include <frc/controller/ProfiledPIDController.h>
-#include <frc/controller/SimpleMotorFeedforward.h>
-#include <frc/kinematics/SwerveModulePosition.h>
-#include <frc/kinematics/SwerveModuleState.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
-#include <units/angular_velocity.h>
-#include <units/time.h>
-#include <units/velocity.h>
-#include <units/voltage.h>
+#include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/math/controller/PIDController.hpp"
+#include "wpi/math/controller/ProfiledPIDController.hpp"
+#include "wpi/math/controller/SimpleMotorFeedforward.hpp"
+#include "wpi/math/kinematics/SwerveModulePosition.hpp"
+#include "wpi/math/kinematics/SwerveModuleState.hpp"
+#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
+#include "wpi/units/voltage.hpp"
 
 class SwerveModule {
  public:

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <units/force.h>
+#include "wpi/units/force.hpp"
 
 namespace pybind11 {
 namespace detail {

@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/scope"
+#include "wpi/util/scope"
 
 TEST(ScopeExitTest, ScopeExit) {
   int exitCount = 0;

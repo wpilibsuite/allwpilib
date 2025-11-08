@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include <wpi/SymbolExports.h>
+#include "wpi/util/SymbolExports.hpp"
 
-#include "units/angle.h"
-#include "units/length.h"
-#include "units/math.h"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/math.hpp"
 
 namespace frc {
 
@@ -99,8 +99,8 @@ struct WPILIB_DLLEXPORT Twist3d {
 
 }  // namespace frc
 
-#include "frc/geometry/Transform3d.h"
-#include "frc/geometry/detail/RotationVectorToMatrix.h"
+#include "wpi/math/geometry/Transform3d.hpp"
+#include "wpi/math/geometry/detail/RotationVectorToMatrix.hpp"
 
 namespace frc {
 
@@ -164,5 +164,5 @@ constexpr Transform3d Twist3d::Exp() const {
 
 }  // namespace frc
 
-#include "frc/geometry/proto/Twist3dProto.h"
-#include "frc/geometry/struct/Twist3dStruct.h"
+#include "wpi/math/geometry/proto/Twist3dProto.hpp"
+#include "wpi/math/geometry/struct/Twist3dStruct.hpp"

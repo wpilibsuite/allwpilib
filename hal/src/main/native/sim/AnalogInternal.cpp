@@ -5,7 +5,7 @@
 #include "AnalogInternal.h"
 
 #include "PortsInternal.h"
-#include "hal/handles/IndexedHandleResource.h"
+#include "wpi/hal/handles/IndexedHandleResource.h"
 
 namespace hal {
 IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort, kNumAnalogInputs,

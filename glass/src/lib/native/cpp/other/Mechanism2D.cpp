@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/other/Mechanism2D.h"
+#include "wpi/glass/other/Mechanism2D.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -13,21 +13,21 @@
 #include <utility>
 #include <vector>
 
-#include <frc/geometry/Pose2d.h>
-#include <frc/geometry/Rotation2d.h>
-#include <frc/geometry/Transform2d.h>
-#include <frc/geometry/Translation2d.h>
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/geometry/Transform2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
-#include <portable-file-dialogs.h>
-#include <units/angle.h>
-#include <units/length.h>
-#include <wpi/print.h>
-#include <wpigui.h>
+#include "wpi/gui/portable-file-dialogs.h"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/util/print.hpp"
+#include "wpi/gui/wpigui.hpp"
 
-#include "glass/Context.h"
-#include "glass/Storage.h"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/Storage.hpp"
 
 using namespace glass;
 

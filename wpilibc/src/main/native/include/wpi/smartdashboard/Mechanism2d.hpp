@@ -7,16 +7,16 @@
 #include <memory>
 #include <string>
 
-#include <networktables/DoubleArrayTopic.h>
-#include <networktables/NTSendable.h>
-#include <networktables/NetworkTable.h>
-#include <networktables/StringTopic.h>
-#include <wpi/StringMap.h>
-#include <wpi/mutex.h>
-#include <wpi/sendable/SendableHelper.h>
+#include "wpi/nt/DoubleArrayTopic.hpp"
+#include "wpi/nt/NTSendable.hpp"
+#include "wpi/nt/NetworkTable.hpp"
+#include "wpi/nt/StringTopic.hpp"
+#include "wpi/util/StringMap.hpp"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/sendable/SendableHelper.hpp"
 
-#include "frc/smartdashboard/MechanismRoot2d.h"
-#include "frc/util/Color8Bit.h"
+#include "wpi/smartdashboard/MechanismRoot2d.hpp"
+#include "wpi/util/Color8Bit.hpp"
 
 namespace frc {
 

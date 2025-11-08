@@ -8,20 +8,20 @@
 #include <GLFW/glfw3.h>
 #include <fmt/format.h>
 #include <imgui.h>
-#include <ntcore_cpp.h>
-#include <wpi/StringExtras.h>
-#include <wpigui.h>
-#include <wpigui_openurl.h>
+#include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/gui/wpigui.hpp"
+#include "wpi/gui/wpigui_openurl.hpp"
 
-#include "glass/Context.h"
-#include "glass/MainMenuBar.h"
-#include "glass/Storage.h"
-#include "glass/View.h"
-#include "glass/networktables/NetworkTables.h"
-#include "glass/networktables/NetworkTablesProvider.h"
-#include "glass/networktables/NetworkTablesSettings.h"
-#include "glass/other/Log.h"
-#include "glass/other/Plot.h"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/MainMenuBar.hpp"
+#include "wpi/glass/Storage.hpp"
+#include "wpi/glass/View.hpp"
+#include "wpi/glass/networktables/NetworkTables.hpp"
+#include "wpi/glass/networktables/NetworkTablesProvider.hpp"
+#include "wpi/glass/networktables/NetworkTablesSettings.hpp"
+#include "wpi/glass/other/Log.hpp"
+#include "wpi/glass/other/Plot.hpp"
 
 namespace gui = wpi::gui;
 

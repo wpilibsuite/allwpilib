@@ -12,15 +12,15 @@
 #include <utility>
 #include <vector>
 
-#include <hal/SimDevice.h>
-#include <units/voltage.h>
-#include <wpi/deprecated.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include "wpi/hal/SimDevice.h"
+#include "wpi/units/voltage.hpp"
+#include "wpi/util/deprecated.hpp"
+#include "wpi/util/sendable/Sendable.hpp"
+#include "wpi/util/sendable/SendableHelper.hpp"
 
-#include "frc/MotorSafety.h"
-#include "frc/PWM.h"
-#include "frc/motorcontrol/MotorController.h"
+#include "wpi/hardware/motor/MotorSafety.hpp"
+#include "wpi/hardware/discrete/PWM.hpp"
+#include "wpi/hardware/motor/MotorController.hpp"
 
 namespace frc {
 

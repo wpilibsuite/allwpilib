@@ -2,7 +2,7 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include <wpi/array.h>
+#include "wpi/util/array.hpp"
 
 namespace pybind11 {
 namespace detail {

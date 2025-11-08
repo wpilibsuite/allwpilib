@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "HALSimHttpConnection.h"
+#include "wpi/halsim/ws_server/HALSimHttpConnection.hpp"
 
 #include <uv.h>
 
@@ -10,15 +10,15 @@
 #include <string>
 #include <string_view>
 
-#include <wpi/MemoryBuffer.h>
-#include <wpi/SmallVector.h>
-#include <wpi/StringExtras.h>
-#include <wpi/fs.h>
-#include <wpi/print.h>
-#include <wpinet/MimeTypes.h>
-#include <wpinet/UrlParser.h>
-#include <wpinet/raw_uv_ostream.h>
-#include <wpinet/uv/Request.h>
+#include "wpi/util/MemoryBuffer.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/fs.hpp"
+#include "wpi/util/print.hpp"
+#include "wpi/net/MimeTypes.hpp"
+#include "wpi/net/UrlParser.hpp"
+#include "wpi/net/raw_uv_ostream.hpp"
+#include "wpi/net/uv/Request.hpp"
 
 namespace uv = wpi::uv;
 

@@ -1,5 +1,5 @@
 extra_includes:
-- frc/DutyCycle.h
+- wpi/hardware/rotation/DutyCycle.hpp
 
 classes:
   frc::sim::DutyCycleSim:

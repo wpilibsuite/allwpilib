@@ -9,14 +9,14 @@
 #include <string_view>
 #include <utility>
 
-#include <HALSimBaseWebSocketConnection.h>
-#include <wpi/json_fwd.h>
-#include <wpi/mutex.h>
-#include <wpinet/HttpWebSocketServerConnection.h>
-#include <wpinet/uv/AsyncFunction.h>
-#include <wpinet/uv/Buffer.h>
+#include "wpi/halsim/ws_core/HALSimBaseWebSocketConnection.hpp"
+#include "wpi/util/json_fwd.hpp"
+#include "wpi/util/mutex.hpp"
+#include "wpi/net/HttpWebSocketServerConnection.hpp"
+#include "wpi/net/uv/AsyncFunction.hpp"
+#include "wpi/net/uv/Buffer.hpp"
 
-#include "HALSimWeb.h"
+#include "wpi/halsim/ws_server/HALSimWeb.hpp"
 
 namespace wpilibws {
 

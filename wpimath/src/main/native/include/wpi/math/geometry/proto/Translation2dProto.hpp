@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <wpi/SymbolExports.h>
-#include <wpi/protobuf/Protobuf.h>
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/protobuf/Protobuf.hpp"
 
-#include "frc/geometry/Translation2d.h"
+#include "wpi/math/geometry/Translation2d.hpp"
 #include "pb.h"
 #include "wpimath/protobuf/geometry2d.npb.h"
 

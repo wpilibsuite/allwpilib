@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/DoubleSolenoid.h>
-#include <frc/simulation/DoubleSolenoidSim.h>
-#include <frc/simulation/PWMMotorControllerSim.h>
+#include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
+#include "wpi/simulation/DoubleSolenoidSim.hpp"
+#include "wpi/simulation/PWMMotorControllerSim.hpp"
 #include <gtest/gtest.h>
 
-#include "Constants.h"
-#include "subsystems/Intake.h"
+#include "Constants.hpp"
+#include "subsystems/Intake.hpp"
 
 class IntakeTest : public testing::Test {
  protected:

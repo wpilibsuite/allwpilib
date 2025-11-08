@@ -4,15 +4,15 @@
 
 #pragma once
 
-#include <frc/EigenCore.h>
-#include <frc/kinematics/DifferentialDriveKinematics.h>
-#include <frc/system/LinearSystem.h>
-#include <frc/system/plant/DCMotor.h>
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+#include "wpi/math/system/LinearSystem.hpp"
+#include "wpi/math/system/plant/DCMotor.hpp"
 
-#include <units/length.h>
-#include <units/moment_of_inertia.h>
-#include <units/time.h>
-#include <units/voltage.h>
+#include "wpi/units/length.hpp"
+#include "wpi/units/moment_of_inertia.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/voltage.hpp"
 
 namespace frc::sim {
 

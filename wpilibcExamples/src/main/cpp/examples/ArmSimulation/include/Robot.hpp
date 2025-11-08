@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <frc/Joystick.h>
-#include <frc/TimedRobot.h>
+#include "wpi/driverstation/Joystick.hpp"
+#include "wpi/opmode/TimedRobot.hpp"
 
-#include "subsystems/Arm.h"
+#include "subsystems/Arm.hpp"
 
 /**
  * This is a sample program to demonstrate the use of arm simulation.

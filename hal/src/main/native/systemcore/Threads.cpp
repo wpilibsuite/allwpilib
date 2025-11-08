@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/Threads.h"
+#include "wpi/hal/Threads.h"
 
 #include <pthread.h>
 #include <sched.h>
 
-#include "hal/Errors.h"
+#include "wpi/hal/Errors.h"
 
 namespace hal::init {
 void InitializeThreads() {}

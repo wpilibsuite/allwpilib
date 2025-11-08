@@ -8,9 +8,9 @@
 #include <functional>
 #include <memory>
 
-#include <wpi/SafeThread.h>
+#include "wpi/util/SafeThread.hpp"
 
-#include "wpinet/uv/Loop.h"
+#include "wpi/net/uv/Loop.hpp"
 
 namespace wpi {
 

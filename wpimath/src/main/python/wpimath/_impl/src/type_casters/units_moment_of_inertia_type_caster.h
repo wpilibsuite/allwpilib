@@ -1,6 +1,6 @@
 #pragma once
 
-#include <units/moment_of_inertia.h>
+#include "wpi/units/moment_of_inertia.hpp"
 
 namespace pybind11 {
 namespace detail {

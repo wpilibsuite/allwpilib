@@ -4,17 +4,17 @@
 
 #include <numbers>
 
-#include <frc/Joystick.h>
-#include <frc/TimedRobot.h>
-#include <frc/controller/SimpleMotorFeedforward.h>
-#include <frc/trajectory/ExponentialProfile.h>
-#include <units/acceleration.h>
-#include <units/length.h>
-#include <units/time.h>
-#include <units/velocity.h>
-#include <units/voltage.h>
+#include "wpi/driverstation/Joystick.hpp"
+#include "wpi/opmode/TimedRobot.hpp"
+#include "wpi/math/controller/SimpleMotorFeedforward.hpp"
+#include "wpi/math/trajectory/ExponentialProfile.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
+#include "wpi/units/voltage.hpp"
 
-#include "ExampleSmartMotorController.h"
+#include "ExampleSmartMotorController.hpp"
 
 class Robot : public frc::TimedRobot {
  public:

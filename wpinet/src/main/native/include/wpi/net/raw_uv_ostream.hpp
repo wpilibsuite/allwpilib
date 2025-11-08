@@ -9,10 +9,10 @@
 #include <span>
 #include <utility>
 
-#include <wpi/SmallVector.h>
-#include <wpi/raw_ostream.h>
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
-#include "wpinet/uv/Buffer.h"
+#include "wpi/net/uv/Buffer.hpp"
 
 namespace wpi {
 

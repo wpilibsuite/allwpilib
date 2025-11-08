@@ -22,17 +22,17 @@
 #include <vector>
 
 #include <Dbt.h>
-#include <wpi/SmallVector.h>
-#include <wpi/condition_variable.h>
-#include <wpi/mutex.h>
-#include <wpi/raw_istream.h>
-#include <wpi/raw_ostream.h>
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/condition_variable.hpp"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/raw_istream.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
-#include "ComCreators.h"
-#include "ComPtr.h"
-#include "SourceImpl.h"
-#include "UsbCameraProperty.h"
-#include "WindowsMessagePump.h"
+#include "COMCreators.hpp"
+#include "ComPtr.hpp"
+#include "SourceImpl.hpp"
+#include "UsbCameraProperty.hpp"
+#include "WindowsMessagePump.hpp"
 
 namespace cs {
 

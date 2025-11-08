@@ -15,14 +15,14 @@
 #include <utility> // move
 #include <vector> // vector
 
-#include <wpi/detail/exceptions.h>
-#include <wpi/detail/input/input_adapters.h>
-#include <wpi/detail/input/json_sax.h>
-#include <wpi/detail/input/lexer.h>
-#include <wpi/detail/macro_scope.h>
-#include <wpi/detail/meta/is_sax.h>
-#include <wpi/detail/string_concat.h>
-#include <wpi/detail/value_t.h>
+#include "wpi/util/detail/exceptions.hpp"
+#include "wpi/util/detail/input/input_adapters.hpp"
+#include "wpi/util/detail/input/json_sax.hpp"
+#include "wpi/util/detail/input/lexer.hpp"
+#include "wpi/util/detail/macro_scope.hpp"
+#include "wpi/util/detail/meta/is_sax.hpp"
+#include "wpi/util/detail/string_concat.hpp"
+#include "wpi/util/detail/value_t.hpp"
 
 WPI_JSON_NAMESPACE_BEGIN
 namespace detail

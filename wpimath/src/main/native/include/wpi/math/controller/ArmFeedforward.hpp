@@ -6,14 +6,14 @@
 
 #include <cstdlib>
 
-#include <wpi/MathExtras.h>
-#include <wpi/SymbolExports.h>
+#include "wpi/util/MathExtras.hpp"
+#include "wpi/util/SymbolExports.hpp"
 
-#include "units/angle.h"
-#include "units/angular_velocity.h"
-#include "units/math.h"
-#include "units/voltage.h"
-#include "wpimath/MathShared.h"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/math.hpp"
+#include "wpi/units/voltage.hpp"
+#include "wpi/math/util/MathShared.hpp"
 
 namespace frc {
 /**
@@ -318,5 +318,5 @@ class WPILIB_DLLEXPORT ArmFeedforward {
 };
 }  // namespace frc
 
-#include "frc/controller/proto/ArmFeedforwardProto.h"
-#include "frc/controller/struct/ArmFeedforwardStruct.h"
+#include "wpi/math/controller/proto/ArmFeedforwardProto.hpp"
+#include "wpi/math/controller/struct/ArmFeedforwardStruct.hpp"

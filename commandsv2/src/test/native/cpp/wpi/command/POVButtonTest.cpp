@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/DriverStation.h>
-#include <frc/Joystick.h>
-#include <frc/simulation/JoystickSim.h>
+#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/Joystick.hpp"
+#include "wpi/simulation/JoystickSim.hpp"
 #include <gtest/gtest.h>
 
-#include "CommandTestBase.h"
-#include "frc2/command/CommandScheduler.h"
-#include "frc2/command/RunCommand.h"
-#include "frc2/command/WaitUntilCommand.h"
-#include "frc2/command/button/POVButton.h"
+#include "CommandTestBase.hpp"
+#include "wpi/commands2/CommandScheduler.hpp"
+#include "wpi/commands2/RunCommand.hpp"
+#include "wpi/commands2/WaitUntilCommand.hpp"
+#include "wpi/commands2/button/POVButton.hpp"
 
 using namespace frc2;
 class POVButtonTest : public CommandTestBase {};

@@ -6,12 +6,12 @@
 
 #include <array>
 
-#include <units/current.h>
-#include <units/time.h>
+#include "wpi/units/current.hpp"
+#include "wpi/units/time.hpp"
 
-#include "frc/EigenCore.h"
-#include "frc/StateSpaceUtil.h"
-#include "frc/system/LinearSystem.h"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/util/StateSpaceUtil.hpp"
+#include "wpi/math/system/LinearSystem.hpp"
 
 namespace frc::sim {
 /**

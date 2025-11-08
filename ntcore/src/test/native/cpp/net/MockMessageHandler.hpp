@@ -6,11 +6,11 @@
 
 #include <string>
 
-#include <wpi/json.h>
+#include "wpi/util/json.hpp"
 
-#include "PubSubOptions.h"
+#include "PubSubOptions.hpp"
 #include "gmock/gmock.h"
-#include "net/MessageHandler.h"
+#include "net/MessageHandler.hpp"
 
 namespace nt::net {
 

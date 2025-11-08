@@ -6,7 +6,7 @@
 
 #include <memory>
 
-#include <wpi/FunctionExtras.h>
+#include "wpi/util/FunctionExtras.hpp"
 
 namespace glass {
 

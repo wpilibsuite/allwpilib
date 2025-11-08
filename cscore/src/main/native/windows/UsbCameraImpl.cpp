@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #define _WINSOCKAPI_
-#include "UsbCameraImpl.h"
+#include "UsbCameraImpl.hpp"
 
 #include <ks.h>
 #include <ksmedia.h>
@@ -22,24 +22,24 @@
 #include <Dbt.h>
 #include <Dshow.h>
 #include <Windows.h>
-#include <wpi/ConvertUTF.h>
-#include <wpi/MemAlloc.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringExtras.h>
-#include <wpi/timestamp.h>
+#include "wpi/util/ConvertUTF.hpp"
+#include "wpi/util/MemAlloc.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/timestamp.h"
 
-#include "COMCreators.h"
-#include "ComPtr.h"
-#include "Handle.h"
-#include "Instance.h"
-#include "JpegUtil.h"
-#include "Log.h"
-#include "Notifier.h"
-#include "PropertyImpl.h"
-#include "Telemetry.h"
-#include "WindowsMessagePump.h"
-#include "c_util.h"
-#include "cscore_cpp.h"
+#include "COMCreators.hpp"
+#include "ComPtr.hpp"
+#include "Handle.hpp"
+#include "Instance.hpp"
+#include "JpegUtil.hpp"
+#include "Log.hpp"
+#include "Notifier.hpp"
+#include "PropertyImpl.hpp"
+#include "Telemetry.hpp"
+#include "WindowsMessagePump.hpp"
+#include "c_util.hpp"
+#include "wpi/cs/cscore_cpp.hpp"
 
 #pragma comment(lib, "Mfplat.lib")
 #pragma comment(lib, "Mf.lib")

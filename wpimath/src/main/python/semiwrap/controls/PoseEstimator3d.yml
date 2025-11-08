@@ -2,11 +2,11 @@ defaults:
   subpackage: estimator
 
 extra_includes:
-- frc/kinematics/DifferentialDriveWheelPositions.h
-- frc/kinematics/DifferentialDriveWheelSpeeds.h
-- frc/kinematics/MecanumDriveWheelPositions.h
-- frc/kinematics/MecanumDriveWheelSpeeds.h
-- frc/kinematics/SwerveDriveKinematics.h
+- wpi/math/kinematics/DifferentialDriveWheelPositions.hpp
+- wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp
+- wpi/math/kinematics/MecanumDriveWheelPositions.hpp
+- wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp
+- wpi/math/kinematics/SwerveDriveKinematics.hpp
 
 classes:
   frc::PoseEstimator3d:

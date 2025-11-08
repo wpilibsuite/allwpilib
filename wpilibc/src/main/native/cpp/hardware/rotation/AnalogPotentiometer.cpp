@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/AnalogPotentiometer.h"
+#include "wpi/hardware/rotation/AnalogPotentiometer.hpp"
 
 #include <memory>
 #include <utility>
 
-#include <wpi/NullDeleter.h>
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include "wpi/util/NullDeleter.hpp"
+#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/util/sendable/SendableRegistry.hpp"
 
-#include "frc/RobotController.h"
+#include "wpi/system/RobotController.hpp"
 
 using namespace frc;
 

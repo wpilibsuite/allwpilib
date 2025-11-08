@@ -4,14 +4,14 @@
 
 #pragma once
 
-#include <wpi/SymbolExports.h>
+#include "wpi/util/SymbolExports.hpp"
 
-#include "frc/geometry/Pose2d.h"
-#include "frc/kinematics/DifferentialDriveKinematics.h"
-#include "frc/kinematics/DifferentialDriveWheelPositions.h"
-#include "frc/kinematics/DifferentialDriveWheelSpeeds.h"
-#include "frc/kinematics/Odometry3d.h"
-#include "units/length.h"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+#include "wpi/math/kinematics/DifferentialDriveWheelPositions.hpp"
+#include "wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp"
+#include "wpi/math/kinematics/Odometry3d.hpp"
+#include "wpi/units/length.hpp"
 
 namespace frc {
 /**

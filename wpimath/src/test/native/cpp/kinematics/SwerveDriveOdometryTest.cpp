@@ -7,11 +7,11 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/kinematics/SwerveDriveKinematics.h"
-#include "frc/kinematics/SwerveDriveOdometry.h"
-#include "frc/trajectory/Trajectory.h"
-#include "frc/trajectory/TrajectoryConfig.h"
-#include "frc/trajectory/TrajectoryGenerator.h"
+#include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
+#include "wpi/math/kinematics/SwerveDriveOdometry.hpp"
+#include "wpi/math/trajectory/Trajectory.hpp"
+#include "wpi/math/trajectory/TrajectoryConfig.hpp"
+#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 
 using namespace frc;
 

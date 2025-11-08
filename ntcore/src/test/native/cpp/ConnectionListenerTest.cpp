@@ -7,11 +7,11 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include <wpi/Synchronization.h>
-#include <wpi/mutex.h>
+#include "wpi/util/Synchronization.h"
+#include "wpi/util/mutex.hpp"
 
-#include "TestPrinters.h"
-#include "ntcore_cpp.h"
+#include "TestPrinters.hpp"
+#include "wpi/nt/ntcore_cpp.hpp"
 
 class ConnectionListenerTest : public ::testing::Test {
  public:

@@ -1,7 +1,7 @@
 #ifndef WPIUTIL_WPI_REVERSEITERATION_H
 #define WPIUTIL_WPI_REVERSEITERATION_H
 
-#include "wpi/PointerLikeTypeTraits.h"
+#include "wpi/util/PointerLikeTypeTraits.hpp"
 
 namespace wpi {
 

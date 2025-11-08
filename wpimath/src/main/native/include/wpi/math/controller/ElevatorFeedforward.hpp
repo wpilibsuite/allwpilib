@@ -4,15 +4,15 @@
 
 #pragma once
 
-#include <wpi/MathExtras.h>
+#include "wpi/util/MathExtras.hpp"
 
-#include "frc/EigenCore.h"
-#include "frc/controller/LinearPlantInversionFeedforward.h"
-#include "frc/system/plant/LinearSystemId.h"
-#include "units/length.h"
-#include "units/time.h"
-#include "units/voltage.h"
-#include "wpimath/MathShared.h"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
+#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/voltage.hpp"
+#include "wpi/math/util/MathShared.hpp"
 
 namespace frc {
 /**
@@ -290,5 +290,5 @@ class ElevatorFeedforward {
 };
 }  // namespace frc
 
-#include "frc/controller/proto/ElevatorFeedforwardProto.h"
-#include "frc/controller/struct/ElevatorFeedforwardStruct.h"
+#include "wpi/math/controller/proto/ElevatorFeedforwardProto.hpp"
+#include "wpi/math/controller/struct/ElevatorFeedforwardStruct.hpp"

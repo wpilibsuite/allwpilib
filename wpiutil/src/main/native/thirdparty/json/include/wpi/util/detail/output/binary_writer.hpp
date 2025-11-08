@@ -19,10 +19,10 @@
 #include <utility> // move
 #include <vector> // vector
 
-#include <wpi/detail/input/binary_reader.h>
-#include <wpi/detail/macro_scope.h>
-#include <wpi/detail/output/output_adapters.h>
-#include <wpi/detail/string_concat.h>
+#include "wpi/util/detail/input/binary_reader.hpp"
+#include "wpi/util/detail/macro_scope.hpp"
+#include "wpi/util/detail/output/output_adapters.hpp"
+#include "wpi/util/detail/string_concat.hpp"
 
 WPI_JSON_NAMESPACE_BEGIN
 namespace detail

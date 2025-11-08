@@ -12,11 +12,11 @@
 #include <string_view>
 #include <thread>
 
-#include <wpi/condition_variable.h>
+#include "wpi/util/condition_variable.hpp"
 
-#include "Frame.h"
-#include "SinkImpl.h"
-#include "cscore_raw.h"
+#include "Frame.hpp"
+#include "SinkImpl.hpp"
+#include "wpi/cs/cscore_raw.h"
 
 namespace cs {
 class SourceImpl;

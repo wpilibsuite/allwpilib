@@ -7,8 +7,8 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/kinematics/MecanumDriveOdometry.h"
-#include "frc/trajectory/TrajectoryGenerator.h"
+#include "wpi/math/kinematics/MecanumDriveOdometry.hpp"
+#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 
 using namespace frc;
 

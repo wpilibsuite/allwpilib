@@ -4,11 +4,11 @@
 
 #include <cmath>
 
-#include <frc/Joystick.h>
-#include <frc/OnboardIMU.h>
-#include <frc/TimedRobot.h>
-#include <frc/drive/DifferentialDrive.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
+#include "wpi/driverstation/Joystick.hpp"
+#include "wpi/hardware/imu/OnboardIMU.hpp"
+#include "wpi/opmode/TimedRobot.hpp"
+#include "wpi/drive/DifferentialDrive.hpp"
+#include "wpi/hardware/motor/PWMSparkMax.hpp"
 
 /**
  * This is a sample program to demonstrate how to use a gyro sensor to make a

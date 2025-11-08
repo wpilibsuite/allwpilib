@@ -4,15 +4,15 @@
 
 #pragma once
 
-#include <wpi/SymbolExports.h>
+#include "wpi/util/SymbolExports.hpp"
 
-#include "frc/geometry/Pose2d.h"
-#include "frc/geometry/Pose3d.h"
-#include "frc/geometry/Rotation2d.h"
-#include "frc/geometry/Rotation3d.h"
-#include "frc/geometry/Translation2d.h"
-#include "frc/geometry/Translation3d.h"
-#include "frc/kinematics/Kinematics.h"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Pose3d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/geometry/Rotation3d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/math/geometry/Translation3d.hpp"
+#include "wpi/math/kinematics/Kinematics.hpp"
 
 namespace frc {
 

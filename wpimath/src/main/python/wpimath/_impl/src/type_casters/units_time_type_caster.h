@@ -1,6 +1,6 @@
 #pragma once
 
-#include <units/time.h>
+#include "wpi/units/time.hpp"
 
 namespace pybind11 {
 namespace detail {

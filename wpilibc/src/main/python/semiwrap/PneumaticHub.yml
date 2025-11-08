@@ -1,8 +1,8 @@
 extra_includes:
-- wpi/sendable/SendableBuilder.h
-- frc/Compressor.h
-- frc/Solenoid.h
-- frc/DoubleSolenoid.h
+- wpi/util/sendable/SendableBuilder.hpp
+- wpi/hardware/pneumatic/Compressor.hpp
+- wpi/hardware/pneumatic/Solenoid.hpp
+- wpi/hardware/pneumatic/DoubleSolenoid.hpp
 
 classes:
   frc::PneumaticHub:
