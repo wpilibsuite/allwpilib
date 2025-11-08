@@ -803,9 +803,9 @@ void Frame::ReleaseFrame() {
 }
 
 namespace wpi::cs {
-std::unique_ptr<Image> CreateImageFromBGRA(wpi::cs::SourceImpl* source, size_t width,
-                                           size_t height, size_t stride,
-                                           const uint8_t* data) {
+std::unique_ptr<Image> CreateImageFromBGRA(wpi::cs::SourceImpl* source,
+                                           size_t width, size_t height,
+                                           size_t stride, const uint8_t* data) {
   cv::Mat finalImage{static_cast<int>(height), static_cast<int>(width), CV_8UC4,
                      const_cast<uint8_t*>(data), stride};
   std::unique_ptr<Image> dest = source->AllocImage(

@@ -23,7 +23,8 @@ class NTCommandSchedulerModel : public CommandSchedulerModel {
   static constexpr const char* kType = "Scheduler";
 
   explicit NTCommandSchedulerModel(std::string_view path);
-  NTCommandSchedulerModel(wpi::nt::NetworkTableInstance inst, std::string_view path);
+  NTCommandSchedulerModel(wpi::nt::NetworkTableInstance inst,
+                          std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
   const std::vector<std::string>& GetCurrentCommands() override {

@@ -132,9 +132,9 @@ class WebSocket::ClientHandshakeData {
     }
   }
 
-  wpi::util::SmallString<64> key;                       // the key sent to the server
-  wpi::util::SmallVector<std::string, 2> protocols;     // valid protocols
-  HttpParser parser{HttpParser::kResponse};  // server response parser
+  wpi::util::SmallString<64> key;  // the key sent to the server
+  wpi::util::SmallVector<std::string, 2> protocols;  // valid protocols
+  HttpParser parser{HttpParser::kResponse};          // server response parser
   bool hasUpgrade = false;
   bool hasConnection = false;
   bool hasAccept = false;
@@ -286,7 +286,8 @@ void WebSocket::StartClient(std::string_view uri, std::string_view host,
         } else if (wpi::util::equals_lower(name, "sec-websocket-accept")) {
           // Check against expected response
           wpi::util::SmallString<64> acceptBuf;
-          if (!wpi::util::equals(value, AcceptHash(m_clientHandshake->key, acceptBuf))) {
+          if (!wpi::util::equals(
+                  value, AcceptHash(m_clientHandshake->key, acceptBuf))) {
             return Terminate(1002, "invalid accept key");
           }
           m_clientHandshake->hasAccept = true;
@@ -640,10 +641,10 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
             } else {
               code = (static_cast<uint16_t>(m_controlPayload[0]) << 8) |
                      static_cast<uint16_t>(m_controlPayload[1]);
-              reason =
-                  wpi::util::drop_front({reinterpret_cast<char*>(m_controlPayload.data()),
-                              m_controlPayload.size()},
-                             2);
+              reason = wpi::util::drop_front(
+                  {reinterpret_cast<char*>(m_controlPayload.data()),
+                   m_controlPayload.size()},
+                  2);
             }
             // Echo the close if we didn't previously send it
             if (m_state != CLOSING) {

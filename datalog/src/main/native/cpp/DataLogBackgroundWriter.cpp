@@ -469,8 +469,8 @@ struct WPI_DataLog* WPI_DataLog_CreateBackgroundWriter(
     const struct WPI_String* dir, const struct WPI_String* filename,
     double period, const struct WPI_String* extraHeader) {
   return reinterpret_cast<WPI_DataLog*>(new DataLogBackgroundWriter{
-      wpi::util::to_string_view(dir), wpi::util::to_string_view(filename), period,
-      wpi::util::to_string_view(extraHeader)});
+      wpi::util::to_string_view(dir), wpi::util::to_string_view(filename),
+      period, wpi::util::to_string_view(extraHeader)});
 }
 
 struct WPI_DataLog* WPI_DataLog_CreateBackgroundWriter_Func(

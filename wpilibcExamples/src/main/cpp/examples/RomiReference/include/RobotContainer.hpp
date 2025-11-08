@@ -48,7 +48,7 @@ class RobotContainer {
   // The robot's subsystems
   Drivetrain m_drive;
   wpi::romi::OnBoardIO m_onboardIO{wpi::romi::OnBoardIO::ChannelMode::INPUT,
-                             wpi::romi::OnBoardIO::ChannelMode::INPUT};
+                                   wpi::romi::OnBoardIO::ChannelMode::INPUT};
 
   // Example button
   wpi::cmd::Trigger m_onboardButtonA{

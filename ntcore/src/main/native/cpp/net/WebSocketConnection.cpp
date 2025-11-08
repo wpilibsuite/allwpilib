@@ -124,7 +124,8 @@ void WebSocketConnection::SendPing(uint64_t time) {
   WPI_DEBUG4(m_logger, "conn: sending ping {}", time);
   auto buf = AllocBuf();
   buf.len = 8;
-  wpi::util::support::endian::write64<wpi::util::endianness::native>(buf.base, time);
+  wpi::util::support::endian::write64<wpi::util::endianness::native>(buf.base,
+                                                                     time);
   m_ws.SendPing({buf}, [selfweak = weak_from_this()](auto bufs, auto err) {
     if (auto self = selfweak.lock()) {
       self->m_err = err;
@@ -153,7 +154,8 @@ void WebSocketConnection::FinishText() {
 }
 
 int WebSocketConnection::Write(
-    State kind, wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) {
+    State kind,
+    wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) {
   bool first = false;
   if (m_state != kind ||
       (m_state == kind && m_framePos >= kNewFrameThresholdBytes)) {
@@ -243,7 +245,8 @@ int WebSocketConnection::Flush() {
 }
 
 void WebSocketConnection::Send(
-    uint8_t opcode, wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) {
+    uint8_t opcode,
+    wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) {
   wpi::util::SmallVector<wpi::net::uv::Buffer, 4> bufs;
   wpi::net::raw_uv_ostream os{bufs, [this] { return AllocBuf(); }};
   if (opcode == wpi::net::WebSocket::Frame::kText) {

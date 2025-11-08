@@ -57,7 +57,7 @@ class Robot : public wpi::TimedRobot {
     // to be changed.
     double percentOfRange = fullRange * 0.1;
     double shiftedOutput = wpi::math::InputModulus(output, 0 - percentOfRange,
-                                             fullRange - percentOfRange);
+                                                   fullRange - percentOfRange);
 
     wpi::SmartDashboard::PutBoolean("Connected", connected);
     wpi::SmartDashboard::PutNumber("Frequency", frequency.value());

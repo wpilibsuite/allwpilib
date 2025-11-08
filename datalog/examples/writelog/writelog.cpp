@@ -74,8 +74,8 @@ int main(int argc, char** argv) {
       resVec.push_back(duration_cast<microseconds>(stop - start).count());
     }
 
-    wpi::util::print("{}us\n",
-               std::accumulate(resVec.begin(), resVec.end(), 0) / kNumRuns);
+    wpi::util::print(
+        "{}us\n", std::accumulate(resVec.begin(), resVec.end(), 0) / kNumRuns);
   }
 
   return EXIT_SUCCESS;

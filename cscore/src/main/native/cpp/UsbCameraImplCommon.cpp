@@ -35,14 +35,15 @@ extern "C" {
 
 CS_Source CS_CreateUsbCameraDev(const struct WPI_String* name, int dev,
                                 CS_Status* status) {
-  return wpi::cs::CreateUsbCameraDev(wpi::util::to_string_view(name), dev, status);
+  return wpi::cs::CreateUsbCameraDev(wpi::util::to_string_view(name), dev,
+                                     status);
 }
 
 CS_Source CS_CreateUsbCameraPath(const struct WPI_String* name,
                                  const struct WPI_String* path,
                                  CS_Status* status) {
   return wpi::cs::CreateUsbCameraPath(wpi::util::to_string_view(name),
-                                 wpi::util::to_string_view(path), status);
+                                      wpi::util::to_string_view(path), status);
 }
 
 void CS_SetUsbCameraPath(CS_Source source, const struct WPI_String* path,

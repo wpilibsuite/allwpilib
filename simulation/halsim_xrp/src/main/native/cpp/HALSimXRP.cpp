@@ -52,7 +52,8 @@ bool HALSimXRP::Initialize() {
     try {
       m_port = std::stoi(port);
     } catch (const std::invalid_argument& err) {
-      wpi::util::print(stderr, "Error decoding HALSIMXRP_PORT ({})\n", err.what());
+      wpi::util::print(stderr, "Error decoding HALSIMXRP_PORT ({})\n",
+                       err.what());
       return false;
     }
   } else {
@@ -145,9 +146,9 @@ uv::SimpleBufferPool<4>& HALSimXRP::GetBufferPool() {
 void HALSimXRP::SendStateToXRP() {
   wpi::util::SmallVector<uv::Buffer, 4> sendBufs;
   wpi::net::raw_uv_ostream stream{sendBufs, [&] {
-                               std::lock_guard lock(m_buffer_mutex);
-                               return GetBufferPool().Allocate();
-                             }};
+                                    std::lock_guard lock(m_buffer_mutex);
+                                    return GetBufferPool().Allocate();
+                                  }};
   m_xrp.SetupXRPSendBuffer(stream);
 
   m_exec->Send([this, sendBufs]() mutable {

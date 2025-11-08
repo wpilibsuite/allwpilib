@@ -63,13 +63,15 @@ void Compressor::EnableDigital() {
   m_module->EnableCompressorDigital();
 }
 
-void Compressor::EnableAnalog(wpi::units::pounds_per_square_inch_t minPressure,
-                              wpi::units::pounds_per_square_inch_t maxPressure) {
+void Compressor::EnableAnalog(
+    wpi::units::pounds_per_square_inch_t minPressure,
+    wpi::units::pounds_per_square_inch_t maxPressure) {
   m_module->EnableCompressorAnalog(minPressure, maxPressure);
 }
 
-void Compressor::EnableHybrid(wpi::units::pounds_per_square_inch_t minPressure,
-                              wpi::units::pounds_per_square_inch_t maxPressure) {
+void Compressor::EnableHybrid(
+    wpi::units::pounds_per_square_inch_t minPressure,
+    wpi::units::pounds_per_square_inch_t maxPressure) {
   m_module->EnableCompressorHybrid(minPressure, maxPressure);
 }
 

@@ -8,8 +8,8 @@
 
 #include "wpimath/protobuf/controller.npb.h"
 
-std::optional<wpi::math::ArmFeedforward> wpi::util::Protobuf<wpi::math::ArmFeedforward>::Unpack(
-    InputStream& stream) {
+std::optional<wpi::math::ArmFeedforward>
+wpi::util::Protobuf<wpi::math::ArmFeedforward>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufArmFeedforward msg;
   if (!stream.Decode(msg)) {
     return {};

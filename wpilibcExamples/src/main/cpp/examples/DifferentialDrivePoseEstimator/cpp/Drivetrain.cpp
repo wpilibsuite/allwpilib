@@ -32,7 +32,8 @@ Drivetrain::Drivetrain() {
   wpi::SmartDashboard::PutData("Approximation", &m_fieldApproximation);
 }
 
-void Drivetrain::SetSpeeds(const wpi::math::DifferentialDriveWheelSpeeds& speeds) {
+void Drivetrain::SetSpeeds(
+    const wpi::math::DifferentialDriveWheelSpeeds& speeds) {
   const auto leftFeedforward = m_feedforward.Calculate(speeds.left);
   const auto rightFeedforward = m_feedforward.Calculate(speeds.right);
   const double leftOutput = m_leftPIDController.Calculate(
@@ -75,12 +76,15 @@ wpi::math::Pose3d Drivetrain::ObjectToRobotPose(
   std::vector<double> val{cameraToObjectEntry.Get()};
 
   // Reconstruct cameraToObject Transform3D from networktables.
-  wpi::math::Translation3d translation{wpi::units::meter_t{val[0]}, wpi::units::meter_t{val[1]},
-                                 wpi::units::meter_t{val[2]}};
-  wpi::math::Rotation3d rotation{wpi::math::Quaternion{val[3], val[4], val[5], val[6]}};
+  wpi::math::Translation3d translation{wpi::units::meter_t{val[0]},
+                                       wpi::units::meter_t{val[1]},
+                                       wpi::units::meter_t{val[2]}};
+  wpi::math::Rotation3d rotation{
+      wpi::math::Quaternion{val[3], val[4], val[5], val[6]}};
   wpi::math::Transform3d cameraToObject{translation, rotation};
 
-  return wpi::math::ObjectToRobotPose(objectInField, cameraToObject, robotToCamera);
+  return wpi::math::ObjectToRobotPose(objectInField, cameraToObject,
+                                      robotToCamera);
 }
 
 void Drivetrain::UpdateOdometry() {
@@ -98,8 +102,8 @@ void Drivetrain::UpdateOdometry() {
   wpi::math::Pose3d visionMeasurement3d = ObjectToRobotPose(
       m_objectInField, m_robotToCamera, m_cameraToObjectEntryRef);
 
-  // Convert robot's pose from wpi::math::Pose3d to wpi::math::Pose2d needed to apply vision
-  // measurements.
+  // Convert robot's pose from wpi::math::Pose3d to wpi::math::Pose2d needed to
+  // apply vision measurements.
   wpi::math::Pose2d visionMeasurement2d = visionMeasurement3d.ToPose2d();
 
   // Apply vision measurements. For simulation purposes only, we don't input a

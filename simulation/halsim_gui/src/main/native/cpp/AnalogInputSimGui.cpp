@@ -56,9 +56,9 @@ class AnalogInputsSimModel : public wpi::glass::AnalogInputsModel {
 
   bool Exists() override { return true; }
 
-  void ForEachAnalogInput(
-      wpi::util::function_ref<void(wpi::glass::AnalogInputModel& model, int index)> func)
-      override;
+  void ForEachAnalogInput(wpi::util::function_ref<
+                          void(wpi::glass::AnalogInputModel& model, int index)>
+                              func) override;
 
  private:
   // indexed by channel
@@ -81,7 +81,9 @@ void AnalogInputsSimModel::Update() {
 }
 
 void AnalogInputsSimModel::ForEachAnalogInput(
-    wpi::util::function_ref<void(wpi::glass::AnalogInputModel& model, int index)> func) {
+    wpi::util::function_ref<void(wpi::glass::AnalogInputModel& model,
+                                 int index)>
+        func) {
   for (int32_t i = 0, iend = static_cast<int32_t>(m_models.size()); i < iend;
        ++i) {
     if (auto model = m_models[i].get()) {
@@ -108,7 +110,8 @@ void AnalogInputSimGui::Initialize() {
         win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
         win->SetDefaultPos(640, 20);
         return wpi::glass::MakeFunctionView([=] {
-          wpi::glass::DisplayAnalogInputs(static_cast<AnalogInputsSimModel*>(model));
+          wpi::glass::DisplayAnalogInputs(
+              static_cast<AnalogInputsSimModel*>(model));
         });
       });
 }

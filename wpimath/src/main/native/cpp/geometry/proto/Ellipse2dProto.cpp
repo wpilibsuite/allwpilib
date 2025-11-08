@@ -7,8 +7,8 @@
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 #include "wpimath/protobuf/geometry2d.npb.h"
 
-std::optional<wpi::math::Ellipse2d> wpi::util::Protobuf<wpi::math::Ellipse2d>::Unpack(
-    InputStream& stream) {
+std::optional<wpi::math::Ellipse2d>
+wpi::util::Protobuf<wpi::math::Ellipse2d>::Unpack(InputStream& stream) {
   wpi::util::UnpackCallback<wpi::math::Pose2d> pose;
   wpi_proto_ProtobufEllipse2d msg{
       .center = pose.Callback(),
@@ -32,8 +32,8 @@ std::optional<wpi::math::Ellipse2d> wpi::util::Protobuf<wpi::math::Ellipse2d>::U
   };
 }
 
-bool wpi::util::Protobuf<wpi::math::Ellipse2d>::Pack(OutputStream& stream,
-                                         const wpi::math::Ellipse2d& value) {
+bool wpi::util::Protobuf<wpi::math::Ellipse2d>::Pack(
+    OutputStream& stream, const wpi::math::Ellipse2d& value) {
   wpi::util::PackCallback pose{&value.Center()};
   wpi_proto_ProtobufEllipse2d msg{
       .center = pose.Callback(),

@@ -34,7 +34,8 @@ class Watchdog {
   Watchdog(wpi::units::second_t timeout, std::function<void()> callback);
 
   template <typename Callable, typename Arg, typename... Args>
-  Watchdog(wpi::units::second_t timeout, Callable&& f, Arg&& arg, Args&&... args)
+  Watchdog(wpi::units::second_t timeout, Callable&& f, Arg&& arg,
+           Args&&... args)
       : Watchdog(timeout,
                  std::bind(std::forward<Callable>(f), std::forward<Arg>(arg),
                            std::forward<Args>(args)...)) {}

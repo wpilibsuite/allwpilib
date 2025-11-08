@@ -53,7 +53,8 @@ class NotifierThread
 
 }  // namespace impl
 
-class Notifier : public wpi::util::CallbackManager<Notifier, impl::NotifierThread> {
+class Notifier
+    : public wpi::util::CallbackManager<Notifier, impl::NotifierThread> {
   friend class NotifierTest;
 
  public:

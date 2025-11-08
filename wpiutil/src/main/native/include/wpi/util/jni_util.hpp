@@ -161,7 +161,7 @@ class JStringRef {
       }
     } else {
       wpi::util::print(stderr, "JStringRef was passed a null pointer at\n",
-                 GetJavaStackTrace(env));
+                       GetJavaStackTrace(env));
     }
     // Ensure str is null-terminated.
     m_str.push_back('\0');
@@ -285,7 +285,7 @@ class JSpanBase {
             bb ? env->GetDirectBufferAddress(bb) : nullptr)} {
     if (!bb) {
       wpi::util::print(stderr, "JSpan was passed a null pointer at\n",
-                 GetJavaStackTrace(env));
+                       GetJavaStackTrace(env));
     }
   }
 
@@ -304,7 +304,7 @@ class JSpanBase {
       }
     } else {
       wpi::util::print(stderr, "JSpan was passed a null pointer at\n",
-                 GetJavaStackTrace(env));
+                       GetJavaStackTrace(env));
     }
   }
 

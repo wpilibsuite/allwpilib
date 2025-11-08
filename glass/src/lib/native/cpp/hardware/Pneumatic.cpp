@@ -22,7 +22,8 @@
 using namespace wpi::glass;
 
 bool wpi::glass::DisplayPneumaticControlSolenoids(PneumaticControlModel* model,
-                                             int index, bool outputsEnabled) {
+                                                  int index,
+                                                  bool outputsEnabled) {
   wpi::util::SmallVector<int, 16> channels;
   model->ForEachSolenoid([&](SolenoidModel& solenoid, int j) {
     if (auto data = solenoid.GetOutputData()) {
@@ -49,10 +50,10 @@ bool wpi::glass::DisplayPneumaticControlSolenoids(PneumaticControlModel* model,
   char label[128];
   if (!name.empty()) {
     wpi::util::format_to_n_c_str(label, sizeof(label), "{} [{}]###header", name,
-                           index);
+                                 index);
   } else {
     wpi::util::format_to_n_c_str(label, sizeof(label), "{}[{}]###header",
-                           model->GetName(), index);
+                                 model->GetName(), index);
   }
 
   // header
@@ -87,9 +88,9 @@ bool wpi::glass::DisplayPneumaticControlSolenoids(PneumaticControlModel* model,
   return true;
 }
 
-void wpi::glass::DisplayPneumaticControlsSolenoids(PneumaticControlsModel* model,
-                                              bool outputsEnabled,
-                                              std::string_view noneMsg) {
+void wpi::glass::DisplayPneumaticControlsSolenoids(
+    PneumaticControlsModel* model, bool outputsEnabled,
+    std::string_view noneMsg) {
   bool hasAny = false;
   model->ForEachPneumaticControl(
       [&](PneumaticControlModel& pneumaticControl, int i) {
@@ -106,7 +107,7 @@ void wpi::glass::DisplayPneumaticControlsSolenoids(PneumaticControlsModel* model
 }
 
 void wpi::glass::DisplayCompressorDevice(CompressorModel* model, int index,
-                                    bool outputsEnabled) {
+                                         bool outputsEnabled) {
   if (!model || !model->Exists()) {
     return;
   }
@@ -155,7 +156,7 @@ void wpi::glass::DisplayCompressorDevice(CompressorModel* model, int index,
 }
 
 void wpi::glass::DisplayCompressorsDevice(PneumaticControlsModel* model,
-                                     bool outputsEnabled) {
+                                          bool outputsEnabled) {
   model->ForEachPneumaticControl(
       [&](PneumaticControlModel& pneumaticControl, int i) {
         DisplayCompressorDevice(pneumaticControl.GetCompressor(), i,

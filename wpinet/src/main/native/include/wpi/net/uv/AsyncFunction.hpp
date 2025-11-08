@@ -38,7 +38,8 @@ class AsyncFunction<R(T...)> final
 
  public:
   AsyncFunction(const std::shared_ptr<Loop>& loop,
-                std::function<void(wpi::util::promise<R>, T...)> func, const private_init&)
+                std::function<void(wpi::util::promise<R>, T...)> func,
+                const private_init&)
       : wakeup{std::move(func)}, m_loop{loop} {}
   ~AsyncFunction() noexcept override {
     if (auto loop = m_loop.lock()) {
@@ -58,7 +59,8 @@ class AsyncFunction<R(T...)> final
    *             wakeup function, a default-constructed value is "returned".
    */
   static std::shared_ptr<AsyncFunction> Create(
-      Loop& loop, std::function<void(wpi::util::promise<R>, T...)> func = nullptr) {
+      Loop& loop,
+      std::function<void(wpi::util::promise<R>, T...)> func = nullptr) {
     return Create(loop.shared_from_this(), std::move(func));
   }
 

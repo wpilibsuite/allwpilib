@@ -47,9 +47,9 @@ struct Struct {};
  * values into a mutable std::span and deserialization consists of reading
  * values from an immutable std::span.
  *
- * Implementations must define a template specialization for wpi::util::Struct with
- * T being the type that is being serialized/deserialized, with the following
- * static members (as enforced by this concept):
+ * Implementations must define a template specialization for wpi::util::Struct
+ * with T being the type that is being serialized/deserialized, with the
+ * following static members (as enforced by this concept):
  * - std::string_view GetTypeName(): function that returns the type name
  * - size_t GetSize(): function that returns the structure size in bytes
  * - std::string_view GetSchema(): function that returns the struct schema
@@ -96,8 +96,8 @@ concept StructSerializable = requires(std::span<const uint8_t> in,
  * Specifies that a type is capable of in-place raw struct deserialization.
  *
  * In addition to meeting StructSerializable, implementations must define a
- * wpi::util::Struct<T> static member `void UnpackInto(T*, std::span<const uint8_t>)`
- * to update the pointed-to T with the contents of the span.
+ * wpi::util::Struct<T> static member `void UnpackInto(T*, std::span<const
+ * uint8_t>)` to update the pointed-to T with the contents of the span.
  */
 template <typename T, typename... I>
 concept MutableStructSerializable =

@@ -79,7 +79,8 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator3d
   MecanumDrivePoseEstimator3d(
       MecanumDriveKinematics& kinematics, const Rotation3d& gyroAngle,
       const MecanumDriveWheelPositions& wheelPositions,
-      const Pose3d& initialPose, const wpi::util::array<double, 4>& stateStdDevs,
+      const Pose3d& initialPose,
+      const wpi::util::array<double, 4>& stateStdDevs,
       const wpi::util::array<double, 4>& visionMeasurementStdDevs);
 
  private:

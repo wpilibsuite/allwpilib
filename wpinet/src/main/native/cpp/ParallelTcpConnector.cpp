@@ -23,8 +23,9 @@ using namespace wpi::net;
 
 ParallelTcpConnector::ParallelTcpConnector(
     wpi::net::uv::Loop& loop, wpi::net::uv::Timer::Time reconnectRate,
-    wpi::util::Logger& logger, std::function<void(wpi::net::uv::Tcp& tcp)> connected,
-    bool ipv4Only, const private_init&)
+    wpi::util::Logger& logger,
+    std::function<void(wpi::net::uv::Tcp& tcp)> connected, bool ipv4Only,
+    const private_init&)
     : m_loop{loop},
       m_logger{logger},
       m_reconnectRate{reconnectRate},

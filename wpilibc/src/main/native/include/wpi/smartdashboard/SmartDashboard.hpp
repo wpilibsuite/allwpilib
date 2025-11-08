@@ -16,7 +16,7 @@
 
 namespace wpi::util {
 class Sendable;
-}  // namespace wpi
+}  // namespace wpi::util
 
 namespace wpi {
 

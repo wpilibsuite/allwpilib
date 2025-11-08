@@ -12,15 +12,16 @@
 
 template <int Rows, int Cols, int Options, int MaxRows, int MaxCols>
   requires(Cols != 1)
-struct wpi::util::Struct<wpi::math::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>> {
+struct wpi::util::Struct<
+    wpi::math::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>> {
   static constexpr ct_string kTypeName =
       wpi::util::Concat("Matrix__"_ct_string, wpi::util::NumToCtString<Rows>(),
-                  "_"_ct_string, wpi::util::NumToCtString<Cols>());
+                        "_"_ct_string, wpi::util::NumToCtString<Cols>());
   static constexpr std::string_view GetTypeName() { return kTypeName; }
   static constexpr size_t GetSize() { return Rows * Cols * 8; }
   static constexpr ct_string kSchema =
-      wpi::util::Concat("double data["_ct_string, wpi::util::NumToCtString<Rows * Cols>(),
-                  "]"_ct_string);
+      wpi::util::Concat("double data["_ct_string,
+                        wpi::util::NumToCtString<Rows * Cols>(), "]"_ct_string);
   static constexpr std::string_view GetSchema() { return kSchema; }
 
   static wpi::math::Matrixd<Rows, Cols, Options, MaxRows, MaxCols> Unpack(

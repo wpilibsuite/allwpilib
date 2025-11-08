@@ -19,7 +19,8 @@ wpi::math::Transform3d StructType::Unpack(std::span<const uint8_t> data) {
   };
 }
 
-void StructType::Pack(std::span<uint8_t> data, const wpi::math::Transform3d& value) {
+void StructType::Pack(std::span<uint8_t> data,
+                      const wpi::math::Transform3d& value) {
   wpi::util::PackStruct<kTranslationOff>(data, value.Translation());
   wpi::util::PackStruct<kRotationOff>(data, value.Rotation());
 }

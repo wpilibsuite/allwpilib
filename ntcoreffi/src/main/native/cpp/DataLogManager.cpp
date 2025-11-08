@@ -57,12 +57,12 @@ inline void ReportError(int32_t status, const char* fileName, int lineNumber,
 }
 }  // namespace wpi
 
-#define WPILIB_ReportError(status, format, ...)                       \
-  do {                                                             \
-    if ((status) != 0) {                                           \
+#define WPILIB_ReportError(status, format, ...)                  \
+  do {                                                           \
+    if ((status) != 0) {                                         \
       wpi::ReportError(status, __FILE__, __LINE__, __FUNCTION__, \
-                         format __VA_OPT__(, ) __VA_ARGS__);       \
-    }                                                              \
+                       format __VA_OPT__(, ) __VA_ARGS__);       \
+    }                                                            \
   } while (0)
 
 namespace RobotController {
@@ -282,8 +282,8 @@ void Thread::Main() {
       freeSpace = UINTMAX_MAX;
     }
     if (freeSpace < kFreeSpaceThreshold) {
-      // Delete oldest WPILIB_*.wpilog files (ignore WPILIB_TBD_*.wpilog as we just
-      // created one)
+      // Delete oldest WPILIB_*.wpilog files (ignore WPILIB_TBD_*.wpilog as we
+      // just created one)
       std::vector<fs::directory_entry> entries;
       for (auto&& entry : fs::directory_iterator{m_logDir, ec}) {
         auto stem = entry.path().stem().string();
@@ -307,14 +307,14 @@ void Thread::Main() {
         auto size = entry.file_size();
         if (fs::remove(entry.path(), ec)) {
           WPILIB_ReportError(warn::Warning, "DataLogManager: Deleted {}",
-                          entry.path().string());
+                             entry.path().string());
           freeSpace += size;
           if (freeSpace >= kFreeSpaceThreshold) {
             break;
           }
         } else {
           ::wpi::util::print(stderr, "DataLogManager: could not delete {}\n",
-                     entry.path().string());
+                             entry.path().string());
         }
       }
     } else if (freeSpace < 2 * kFreeSpaceThreshold) {
@@ -456,7 +456,8 @@ void Thread::StopNTLog() {
 void Thread::StartConsoleLog() {
   if (!m_consoleLoggerEnabled) {
     m_consoleLoggerEnabled = true;
-    m_consoleLogger = {"/home/systemcore/WPILIB_UserProgram.log", m_log, "output"};
+    m_consoleLogger = {"/home/systemcore/WPILIB_UserProgram.log", m_log,
+                       "output"};
   }
 }
 
@@ -479,7 +480,7 @@ Instance::Instance(std::string_view dir, std::string_view filename,
         entry.path().extension() == ".wpilog") {
       if (!fs::remove(entry, ec)) {
         ::wpi::util::print(stderr, "DataLogManager: could not delete {}\n",
-                   entry.path().string());
+                           entry.path().string());
       }
     }
   }
@@ -549,8 +550,8 @@ extern "C" {
 
 void DLM_Start(const struct WPI_String* dir, const struct WPI_String* filename,
                double period) {
-  DataLogManager::Start(::wpi::util::to_string_view(dir), ::wpi::util::to_string_view(filename),
-                        period);
+  DataLogManager::Start(::wpi::util::to_string_view(dir),
+                        ::wpi::util::to_string_view(filename), period);
 }
 
 void DLM_Stop(void) {

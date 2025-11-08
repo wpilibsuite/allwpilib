@@ -89,7 +89,8 @@ constexpr const T&& get(const wpi::util::array<T, N>&& arr) noexcept {
 namespace std {  // NOLINT
 // Partial specialization for wpi::util::array
 template <typename T, size_t N>
-struct tuple_size<wpi::util::array<T, N>> : public integral_constant<size_t, N> {};
+struct tuple_size<wpi::util::array<T, N>>
+    : public integral_constant<size_t, N> {};
 
 // Partial specialization for wpi::util::array
 template <size_t I, typename T, size_t N>

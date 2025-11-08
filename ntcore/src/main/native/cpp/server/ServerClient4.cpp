@@ -142,7 +142,8 @@ void ServerClient4::SendUnannounce(ServerTopic* topic) {
 }
 
 void ServerClient4::SendPropertiesUpdate(ServerTopic* topic,
-                                         const wpi::util::json& update, bool ack) {
+                                         const wpi::util::json& update,
+                                         bool ack) {
   if (!m_announceSent.lookup(topic)) {
     return;
   }

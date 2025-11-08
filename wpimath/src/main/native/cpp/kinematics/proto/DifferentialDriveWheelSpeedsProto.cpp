@@ -6,8 +6,8 @@
 
 #include "wpimath/protobuf/kinematics.npb.h"
 
-std::optional<wpi::math::DifferentialDriveWheelSpeeds>
-wpi::util::Protobuf<wpi::math::DifferentialDriveWheelSpeeds>::Unpack(InputStream& stream) {
+std::optional<wpi::math::DifferentialDriveWheelSpeeds> wpi::util::Protobuf<
+    wpi::math::DifferentialDriveWheelSpeeds>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufDifferentialDriveWheelSpeeds msg;
   if (!stream.Decode(msg)) {
     return {};
@@ -20,7 +20,8 @@ wpi::util::Protobuf<wpi::math::DifferentialDriveWheelSpeeds>::Unpack(InputStream
 }
 
 bool wpi::util::Protobuf<wpi::math::DifferentialDriveWheelSpeeds>::Pack(
-    OutputStream& stream, const wpi::math::DifferentialDriveWheelSpeeds& value) {
+    OutputStream& stream,
+    const wpi::math::DifferentialDriveWheelSpeeds& value) {
   wpi_proto_ProtobufDifferentialDriveWheelSpeeds msg{
       .left = value.left.value(),
       .right = value.right.value(),

@@ -20,7 +20,8 @@ void RunMainRunLoop() {
 int RunMainRunLoopTimeout(double timeout) {
   wpi::util::Event& event = GetInstance();
   bool timedOut = false;
-  bool signaled = wpi::util::WaitForObject(event.GetHandle(), timeout, &timedOut);
+  bool signaled =
+      wpi::util::WaitForObject(event.GetHandle(), timeout, &timedOut);
   if (timedOut) {
     return 3;
   }

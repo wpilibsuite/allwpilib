@@ -19,7 +19,8 @@ class NTCommandSelectorModel : public CommandSelectorModel {
   static constexpr const char* kType = "Command";
 
   explicit NTCommandSelectorModel(std::string_view path);
-  NTCommandSelectorModel(wpi::nt::NetworkTableInstance inst, std::string_view path);
+  NTCommandSelectorModel(wpi::nt::NetworkTableInstance inst,
+                         std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
   BooleanSource* GetRunningData() override { return &m_runningData; }

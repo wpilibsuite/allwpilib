@@ -44,7 +44,7 @@ class ExpansionHub::DataStore {
 
 std::shared_ptr<ExpansionHub::DataStore> ExpansionHub::GetForUsbId(int usbId) {
   WPILIB_AssertMessage(usbId >= 0 && usbId < NumUsbPorts, "USB {} out of range",
-                    usbId);
+                       usbId);
   std::scoped_lock lock{m_handleLock};
   std::weak_ptr<DataStore>& weakStore = m_storeMap[usbId];
   auto strongStore = weakStore.lock();

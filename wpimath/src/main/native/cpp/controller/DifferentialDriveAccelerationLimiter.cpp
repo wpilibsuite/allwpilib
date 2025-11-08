@@ -10,8 +10,8 @@ using namespace wpi::math;
 
 DifferentialDriveWheelVoltages DifferentialDriveAccelerationLimiter::Calculate(
     wpi::units::meters_per_second_t leftVelocity,
-    wpi::units::meters_per_second_t rightVelocity, wpi::units::volt_t leftVoltage,
-    wpi::units::volt_t rightVoltage) {
+    wpi::units::meters_per_second_t rightVelocity,
+    wpi::units::volt_t leftVoltage, wpi::units::volt_t rightVoltage) {
   Vectord<2> u{leftVoltage.value(), rightVoltage.value()};
 
   // Find unconstrained wheel accelerations

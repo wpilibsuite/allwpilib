@@ -58,13 +58,15 @@ wpi::units::radians_per_second_t DCMotorSim::GetAngularVelocity() const {
   return wpi::units::radians_per_second_t{GetOutput(1)};
 }
 
-wpi::units::radians_per_second_squared_t DCMotorSim::GetAngularAcceleration() const {
+wpi::units::radians_per_second_squared_t DCMotorSim::GetAngularAcceleration()
+    const {
   return wpi::units::radians_per_second_squared_t{
       (m_plant.A() * m_x + m_plant.B() * m_u)(1, 0)};
 }
 
 wpi::units::newton_meter_t DCMotorSim::GetTorque() const {
-  return wpi::units::newton_meter_t{GetAngularAcceleration().value() * m_j.value()};
+  return wpi::units::newton_meter_t{GetAngularAcceleration().value() *
+                                    m_j.value()};
 }
 
 wpi::units::ampere_t DCMotorSim::GetCurrentDraw() const {

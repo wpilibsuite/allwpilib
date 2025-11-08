@@ -16,6 +16,7 @@ wpi::math::Rotation2d StructType::Unpack(std::span<const uint8_t> data) {
   };
 }
 
-void StructType::Pack(std::span<uint8_t> data, const wpi::math::Rotation2d& value) {
+void StructType::Pack(std::span<uint8_t> data,
+                      const wpi::math::Rotation2d& value) {
   wpi::util::PackStruct<kValueOff>(data, value.Radians().value());
 }

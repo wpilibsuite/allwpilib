@@ -13,7 +13,10 @@ template <>
 struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::Trajectory::State> {
   using MessageStruct = wpi_proto_ProtobufTrajectoryState;
   using InputStream = wpi::util::ProtoInputStream<wpi::math::Trajectory::State>;
-  using OutputStream = wpi::util::ProtoOutputStream<wpi::math::Trajectory::State>;
-  static std::optional<wpi::math::Trajectory::State> Unpack(InputStream& stream);
-  static bool Pack(OutputStream& stream, const wpi::math::Trajectory::State& value);
+  using OutputStream =
+      wpi::util::ProtoOutputStream<wpi::math::Trajectory::State>;
+  static std::optional<wpi::math::Trajectory::State> Unpack(
+      InputStream& stream);
+  static bool Pack(OutputStream& stream,
+                   const wpi::math::Trajectory::State& value);
 };

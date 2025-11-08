@@ -22,12 +22,15 @@ class ElevatorFeedforward {
  public:
   using Distance = wpi::units::meters;
   using Velocity =
-      wpi::units::compound_unit<Distance, wpi::units::inverse<wpi::units::seconds>>;
+      wpi::units::compound_unit<Distance,
+                                wpi::units::inverse<wpi::units::seconds>>;
   using Acceleration =
-      wpi::units::compound_unit<Velocity, wpi::units::inverse<wpi::units::seconds>>;
-  using kv_unit = wpi::units::compound_unit<wpi::units::volts, wpi::units::inverse<Velocity>>;
-  using ka_unit =
-      wpi::units::compound_unit<wpi::units::volts, wpi::units::inverse<Acceleration>>;
+      wpi::units::compound_unit<Velocity,
+                                wpi::units::inverse<wpi::units::seconds>>;
+  using kv_unit = wpi::units::compound_unit<wpi::units::volts,
+                                            wpi::units::inverse<Velocity>>;
+  using ka_unit = wpi::units::compound_unit<wpi::units::volts,
+                                            wpi::units::inverse<Acceleration>>;
 
   /**
    * Creates a new ElevatorFeedforward with the specified gains.
@@ -42,7 +45,8 @@ class ElevatorFeedforward {
    * @throws IllegalArgumentException for period &le; zero.
    */
   constexpr ElevatorFeedforward(
-      wpi::units::volt_t kS, wpi::units::volt_t kG, wpi::units::unit_t<kv_unit> kV,
+      wpi::units::volt_t kS, wpi::units::volt_t kG,
+      wpi::units::unit_t<kv_unit> kV,
       wpi::units::unit_t<ka_unit> kA = wpi::units::unit_t<ka_unit>(0),
       wpi::units::second_t dt = 20_ms)
       : kS(kS), kG(kG), kV(kV), kA(kA), m_dt(dt) {
@@ -79,7 +83,8 @@ class ElevatorFeedforward {
   constexpr wpi::units::volt_t Calculate(
       wpi::units::unit_t<Velocity> velocity,
       wpi::units::unit_t<Acceleration> acceleration) const {
-    return kS * wpi::util::sgn(velocity) + kG + kV * velocity + kA * acceleration;
+    return kS * wpi::util::sgn(velocity) + kG + kV * velocity +
+           kA * acceleration;
   }
 
   /**
@@ -93,8 +98,8 @@ class ElevatorFeedforward {
    */
   [[deprecated("Use the current/next velocity overload instead.")]]
   wpi::units::volt_t Calculate(wpi::units::unit_t<Velocity> currentVelocity,
-                          wpi::units::unit_t<Velocity> nextVelocity,
-                          wpi::units::second_t dt) const {
+                               wpi::units::unit_t<Velocity> nextVelocity,
+                               wpi::units::second_t dt) const {
     // See wpimath/algorithms.md#Elevator_feedforward for derivation
     auto plant = LinearSystemId::IdentifyVelocitySystem<Distance>(kV, kA);
     LinearPlantInversionFeedforward<1, 1> feedforward{plant, dt};
@@ -161,7 +166,8 @@ class ElevatorFeedforward {
    * @return The maximum possible velocity at the given acceleration.
    */
   constexpr wpi::units::unit_t<Velocity> MaxAchievableVelocity(
-      wpi::units::volt_t maxVoltage, wpi::units::unit_t<Acceleration> acceleration) {
+      wpi::units::volt_t maxVoltage,
+      wpi::units::unit_t<Acceleration> acceleration) {
     // Assume max velocity is positive
     return (maxVoltage - kS - kG - kA * acceleration) / kV;
   }
@@ -178,7 +184,8 @@ class ElevatorFeedforward {
    * @return The minimum possible velocity at the given acceleration.
    */
   constexpr wpi::units::unit_t<Velocity> MinAchievableVelocity(
-      wpi::units::volt_t maxVoltage, wpi::units::unit_t<Acceleration> acceleration) {
+      wpi::units::volt_t maxVoltage,
+      wpi::units::unit_t<Acceleration> acceleration) {
     // Assume min velocity is negative, ks flips sign
     return (-maxVoltage + kS - kG - kA * acceleration) / kV;
   }
@@ -196,7 +203,8 @@ class ElevatorFeedforward {
    */
   constexpr wpi::units::unit_t<Acceleration> MaxAchievableAcceleration(
       wpi::units::volt_t maxVoltage, wpi::units::unit_t<Velocity> velocity) {
-    return (maxVoltage - kS * wpi::util::sgn(velocity) - kG - kV * velocity) / kA;
+    return (maxVoltage - kS * wpi::util::sgn(velocity) - kG - kV * velocity) /
+           kA;
   }
 
   /**

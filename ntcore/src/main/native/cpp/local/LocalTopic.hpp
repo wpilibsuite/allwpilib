@@ -52,7 +52,8 @@ struct LocalTopic {
   wpi::util::json SetPersistent(bool value);
   wpi::util::json SetRetained(bool value);
   wpi::util::json SetCached(bool value);
-  wpi::util::json SetProperty(std::string_view name, const wpi::util::json& value);
+  wpi::util::json SetProperty(std::string_view name,
+                              const wpi::util::json& value);
   wpi::util::json DeleteProperty(std::string_view name);
 
   // returns false if not object

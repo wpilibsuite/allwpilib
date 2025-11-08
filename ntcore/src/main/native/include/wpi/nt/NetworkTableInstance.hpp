@@ -567,7 +567,7 @@ class NetworkTableInstance final {
   NT_Listener AddListener(std::span<const std::string_view> prefixes,
                           int eventMask, ListenerCallback listener) {
     return ::wpi::nt::AddListener(m_handle, prefixes, eventMask,
-                             std::move(listener));
+                                  std::move(listener));
   }
 
   /** @} */
@@ -582,7 +582,9 @@ class NetworkTableInstance final {
    *
    * @return Bitmask of NetworkMode.
    */
-  unsigned int GetNetworkMode() const { return ::wpi::nt::GetNetworkMode(m_handle); }
+  unsigned int GetNetworkMode() const {
+    return ::wpi::nt::GetNetworkMode(m_handle);
+  }
 
   /**
    * Starts local-only operation.  Prevents calls to StartServer or StartClient

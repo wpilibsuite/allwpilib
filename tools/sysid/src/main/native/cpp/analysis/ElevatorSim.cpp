@@ -28,8 +28,9 @@ void ElevatorSim::Update(wpi::units::volt_t voltage, wpi::units::second_t dt) {
   Eigen::Matrix<double, 2, 2> Ad;
   Eigen::Matrix<double, 2, 1> Bd;
   wpi::math::DiscretizeAB<2, 1>(m_A, m_B, dt, &Ad, &Bd);
-  m_x = Ad * m_x + Bd * u +
-        Bd * m_B.householderQr().solve(m_c * wpi::util::sgn(GetVelocity()) + m_d);
+  m_x =
+      Ad * m_x + Bd * u +
+      Bd * m_B.householderQr().solve(m_c * wpi::util::sgn(GetVelocity()) + m_d);
 }
 
 double ElevatorSim::GetPosition() const {

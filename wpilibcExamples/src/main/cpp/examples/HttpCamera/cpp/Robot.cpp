@@ -27,7 +27,8 @@ class Robot : public wpi::TimedRobot {
   static void VisionThread() {
     // Create an HTTP camera. The address will need to be modified to have the
     // correct team number. The exact path will depend on the source.
-    wpi::cs::HttpCamera camera{"My Camera", "http://10.x.y.11/video/stream.mjpg"};
+    wpi::cs::HttpCamera camera{"My Camera",
+                               "http://10.x.y.11/video/stream.mjpg"};
     // Start capturing images
     wpi::CameraServer::StartAutomaticCapture(camera);
     // Set the resolution

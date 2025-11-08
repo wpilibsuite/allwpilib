@@ -22,9 +22,9 @@ NTStringChooserModel::NTStringChooserModel(wpi::nt::NetworkTableInstance inst,
           m_inst.GetStringTopic(fmt::format("{}/default", path)).Subscribe("")},
       m_selected{m_inst.GetStringTopic(fmt::format("{}/selected", path))
                      .Subscribe("")},
-      m_selectedPub{
-          m_inst.GetStringTopic(fmt::format("{}/selected", path))
-              .PublishEx(wpi::nt::StringTopic::kTypeString, {{"retained", true}})},
+      m_selectedPub{m_inst.GetStringTopic(fmt::format("{}/selected", path))
+                        .PublishEx(wpi::nt::StringTopic::kTypeString,
+                                   {{"retained", true}})},
       m_active{
           m_inst.GetStringTopic(fmt::format("{}/active", path)).Subscribe("")},
       m_options{m_inst.GetStringArrayTopic(fmt::format("{}/options", path))

@@ -20,7 +20,8 @@ struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::Transform3d> {
   }
 
   static wpi::math::Transform3d Unpack(std::span<const uint8_t> data);
-  static void Pack(std::span<uint8_t> data, const wpi::math::Transform3d& value);
+  static void Pack(std::span<uint8_t> data,
+                   const wpi::math::Transform3d& value);
   static void ForEachNested(
       std::invocable<std::string_view, std::string_view> auto fn) {
     wpi::util::ForEachStructSchema<wpi::math::Translation3d>(fn);

@@ -63,9 +63,9 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_net_WPINetJNI_addPortForwarder
   (JNIEnv* env, jclass, jint port, jstring remoteHost, jint remotePort)
 {
-  wpi::net::PortForwarder::GetInstance().Add(static_cast<unsigned int>(port),
-                                        JStringRef{env, remoteHost}.str(),
-                                        static_cast<unsigned int>(remotePort));
+  wpi::net::PortForwarder::GetInstance().Add(
+      static_cast<unsigned int>(port), JStringRef{env, remoteHost}.str(),
+      static_cast<unsigned int>(remotePort));
 }
 
 /*
@@ -90,7 +90,7 @@ Java_org_wpilib_net_WPINetJNI_startWebServer
   (JNIEnv* env, jclass, jint port, jstring path)
 {
   wpi::net::WebServer::GetInstance().Start(static_cast<unsigned int>(port),
-                                      JStringRef{env, path}.str());
+                                           JStringRef{env, path}.str());
 }
 
 /*
@@ -221,8 +221,8 @@ Java_org_wpilib_net_WPINetJNI_createMulticastServiceResolver
   std::scoped_lock lock{manager.mutex};
   JStringRef serviceTypeRef{env, serviceType};
 
-  auto resolver =
-      std::make_unique<wpi::net::MulticastServiceResolver>(serviceTypeRef.str());
+  auto resolver = std::make_unique<wpi::net::MulticastServiceResolver>(
+      serviceTypeRef.str());
 
   size_t index = manager.handleIds.emplace_back(2);
 

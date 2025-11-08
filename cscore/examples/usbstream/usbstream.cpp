@@ -22,7 +22,7 @@ int main() {
   wpi::cs::AddListener(
       [&](const wpi::cs::RawEvent& event) {
         wpi::util::print("FPS={} MBPS={}\n", camera.GetActualFPS(),
-                   (camera.GetActualDataRate() / 1000000.0));
+                         (camera.GetActualDataRate() / 1000000.0));
       },
       wpi::cs::RawEvent::kTelemetryUpdated, false, &status);
   wpi::cs::SetTelemetryPeriod(1.0);

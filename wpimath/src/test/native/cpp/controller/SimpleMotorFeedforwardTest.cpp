@@ -47,7 +47,8 @@ TEST(SimpleMotorFeedforwardTest, NegativeGains) {
   constexpr auto Kv = -3_V / 1_mps;
   constexpr auto Ka = -0.6_V / 1_mps_sq;
   constexpr wpi::units::second_t dt = 0_ms;
-  wpi::math::SimpleMotorFeedforward<wpi::units::meter> simpleMotor{Ks, Kv, Ka, dt};
+  wpi::math::SimpleMotorFeedforward<wpi::units::meter> simpleMotor{Ks, Kv, Ka,
+                                                                   dt};
   EXPECT_EQ(simpleMotor.GetKv().value(), 0);
   EXPECT_EQ(simpleMotor.GetKa().value(), 0);
   EXPECT_EQ(simpleMotor.GetDt().value(), 0.02);

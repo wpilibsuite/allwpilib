@@ -26,8 +26,9 @@ TEST(ProfiledPIDInputOutputTest, ContinuousInput1) {
   EXPECT_LT(controller.Calculate(kMeasurement, kGoal), 0.0);
 
   // Error must be less than half the input range at all times
-  EXPECT_LT(wpi::units::math::abs(controller.GetSetpoint().position - kMeasurement),
-            180_deg);
+  EXPECT_LT(
+      wpi::units::math::abs(controller.GetSetpoint().position - kMeasurement),
+      180_deg);
 }
 
 TEST(ProfiledPIDInputOutputTest, ContinuousInput2) {
@@ -46,8 +47,9 @@ TEST(ProfiledPIDInputOutputTest, ContinuousInput2) {
   EXPECT_LT(controller.Calculate(kMeasurement, kGoal), 0.0);
 
   // Error must be less than half the input range at all times
-  EXPECT_LT(wpi::units::math::abs(controller.GetSetpoint().position - kMeasurement),
-            wpi::units::radian_t{std::numbers::pi});
+  EXPECT_LT(
+      wpi::units::math::abs(controller.GetSetpoint().position - kMeasurement),
+      wpi::units::radian_t{std::numbers::pi});
 }
 
 TEST(ProfiledPIDInputOutputTest, ContinuousInput3) {
@@ -66,8 +68,9 @@ TEST(ProfiledPIDInputOutputTest, ContinuousInput3) {
   EXPECT_LT(controller.Calculate(kMeasurement, kGoal), 0.0);
 
   // Error must be less than half the input range at all times
-  EXPECT_LT(wpi::units::math::abs(controller.GetSetpoint().position - kMeasurement),
-            wpi::units::radian_t{std::numbers::pi});
+  EXPECT_LT(
+      wpi::units::math::abs(controller.GetSetpoint().position - kMeasurement),
+      wpi::units::radian_t{std::numbers::pi});
 }
 
 TEST(ProfiledPIDInputOutputTest, ContinuousInput4) {
@@ -75,8 +78,8 @@ TEST(ProfiledPIDInputOutputTest, ContinuousInput4) {
       0.0, 0.0, 0.0, {360_deg_per_s, 180_deg_per_s_sq}};
 
   controller.SetP(1);
-  controller.EnableContinuousInput(0_rad,
-                                   wpi::units::radian_t{2.0 * std::numbers::pi});
+  controller.EnableContinuousInput(
+      0_rad, wpi::units::radian_t{2.0 * std::numbers::pi});
 
   static constexpr wpi::units::radian_t kSetpoint{2.78};
   static constexpr wpi::units::radian_t kMeasurement{3.12};
@@ -86,8 +89,9 @@ TEST(ProfiledPIDInputOutputTest, ContinuousInput4) {
   EXPECT_LT(controller.Calculate(kMeasurement, kGoal), 0.0);
 
   // Error must be less than half the input range at all times
-  EXPECT_LT(wpi::units::math::abs(controller.GetSetpoint().position - kMeasurement),
-            wpi::units::radian_t{std::numbers::pi});
+  EXPECT_LT(
+      wpi::units::math::abs(controller.GetSetpoint().position - kMeasurement),
+      wpi::units::radian_t{std::numbers::pi});
 }
 
 TEST(ProfiledPIDInputOutputTest, ProportionalGainOutput) {

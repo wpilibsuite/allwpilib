@@ -23,8 +23,9 @@ class HALSimWSClientConnection
     : public HALSimBaseWebSocketConnection,
       public std::enable_shared_from_this<HALSimWSClientConnection> {
  public:
-  explicit HALSimWSClientConnection(std::shared_ptr<HALSimWS> client,
-                                    std::shared_ptr<wpi::net::uv::Stream> stream)
+  explicit HALSimWSClientConnection(
+      std::shared_ptr<HALSimWS> client,
+      std::shared_ptr<wpi::net::uv::Stream> stream)
       : m_client(std::move(client)),
         m_stream(std::move(stream)),
         m_buffers(128) {}

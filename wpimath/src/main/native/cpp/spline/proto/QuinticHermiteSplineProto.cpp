@@ -7,8 +7,8 @@
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 #include "wpimath/protobuf/spline.npb.h"
 
-std::optional<wpi::math::QuinticHermiteSpline>
-wpi::util::Protobuf<wpi::math::QuinticHermiteSpline>::Unpack(InputStream& stream) {
+std::optional<wpi::math::QuinticHermiteSpline> wpi::util::Protobuf<
+    wpi::math::QuinticHermiteSpline>::Unpack(InputStream& stream) {
   wpi::util::WpiArrayUnpackCallback<double, 3> xInitial;
   wpi::util::WpiArrayUnpackCallback<double, 3> xFinal;
   wpi::util::WpiArrayUnpackCallback<double, 3> yInitial;

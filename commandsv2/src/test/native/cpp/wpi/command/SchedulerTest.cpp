@@ -202,8 +202,9 @@ TEST_F(SchedulerTest, ScheduleCommandPtr) {
   {
     auto commandPtr =
         TrackDestroyCommand([&destructionCounter] { destructionCounter++; })
-            .AlongWith(
-                wpi::cmd::InstantCommand([&runCounter] { runCounter++; }).ToPtr())
+            .AlongWith(wpi::cmd::InstantCommand([&runCounter] {
+                         runCounter++;
+                       }).ToPtr())
             .Until([&finish] { return finish; });
     EXPECT_EQ(destructionCounter, 0) << "Composition should not delete command";
 

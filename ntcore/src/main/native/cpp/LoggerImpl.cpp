@@ -71,31 +71,40 @@ static unsigned int LevelToFlag(unsigned int level) {
 static unsigned int LevelsToEventMask(unsigned int minLevel,
                                       unsigned int maxLevel) {
   unsigned int mask = 0;
-  if (minLevel <= wpi::util::WPI_LOG_CRITICAL && maxLevel >= wpi::util::WPI_LOG_CRITICAL) {
+  if (minLevel <= wpi::util::WPI_LOG_CRITICAL &&
+      maxLevel >= wpi::util::WPI_LOG_CRITICAL) {
     mask |= kFlagCritical;
   }
-  if (minLevel <= wpi::util::WPI_LOG_ERROR && maxLevel >= wpi::util::WPI_LOG_ERROR) {
+  if (minLevel <= wpi::util::WPI_LOG_ERROR &&
+      maxLevel >= wpi::util::WPI_LOG_ERROR) {
     mask |= kFlagError;
   }
-  if (minLevel <= wpi::util::WPI_LOG_WARNING && maxLevel >= wpi::util::WPI_LOG_WARNING) {
+  if (minLevel <= wpi::util::WPI_LOG_WARNING &&
+      maxLevel >= wpi::util::WPI_LOG_WARNING) {
     mask |= kFlagWarning;
   }
-  if (minLevel <= wpi::util::WPI_LOG_INFO && maxLevel >= wpi::util::WPI_LOG_INFO) {
+  if (minLevel <= wpi::util::WPI_LOG_INFO &&
+      maxLevel >= wpi::util::WPI_LOG_INFO) {
     mask |= kFlagInfo;
   }
-  if (minLevel <= wpi::util::WPI_LOG_DEBUG && maxLevel >= wpi::util::WPI_LOG_DEBUG) {
+  if (minLevel <= wpi::util::WPI_LOG_DEBUG &&
+      maxLevel >= wpi::util::WPI_LOG_DEBUG) {
     mask |= kFlagDebug;
   }
-  if (minLevel <= wpi::util::WPI_LOG_DEBUG1 && maxLevel >= wpi::util::WPI_LOG_DEBUG1) {
+  if (minLevel <= wpi::util::WPI_LOG_DEBUG1 &&
+      maxLevel >= wpi::util::WPI_LOG_DEBUG1) {
     mask |= kFlagDebug1;
   }
-  if (minLevel <= wpi::util::WPI_LOG_DEBUG2 && maxLevel >= wpi::util::WPI_LOG_DEBUG2) {
+  if (minLevel <= wpi::util::WPI_LOG_DEBUG2 &&
+      maxLevel >= wpi::util::WPI_LOG_DEBUG2) {
     mask |= kFlagDebug2;
   }
-  if (minLevel <= wpi::util::WPI_LOG_DEBUG3 && maxLevel >= wpi::util::WPI_LOG_DEBUG3) {
+  if (minLevel <= wpi::util::WPI_LOG_DEBUG3 &&
+      maxLevel >= wpi::util::WPI_LOG_DEBUG3) {
     mask |= kFlagDebug3;
   }
-  if (minLevel <= wpi::util::WPI_LOG_DEBUG4 && maxLevel >= wpi::util::WPI_LOG_DEBUG4) {
+  if (minLevel <= wpi::util::WPI_LOG_DEBUG4 &&
+      maxLevel >= wpi::util::WPI_LOG_DEBUG4) {
     mask |= kFlagDebug4;
   }
   if (mask == 0) {

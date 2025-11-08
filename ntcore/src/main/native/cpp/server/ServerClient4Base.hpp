@@ -25,7 +25,8 @@ class ServerClient4Base : public ServerClient,
  protected:
   // ClientMessageHandler interface
   void ClientPublish(int pubuid, std::string_view name,
-                     std::string_view typeStr, const wpi::util::json& properties,
+                     std::string_view typeStr,
+                     const wpi::util::json& properties,
                      const PubSubOptionsImpl& options) final;
   void ClientUnpublish(int pubuid) final;
   void ClientSetProperties(std::string_view name,

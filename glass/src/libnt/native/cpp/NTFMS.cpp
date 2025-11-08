@@ -18,7 +18,8 @@ using namespace wpi::glass;
 NTFMSModel::NTFMSModel(std::string_view path)
     : NTFMSModel{wpi::nt::NetworkTableInstance::GetDefault(), path} {}
 
-NTFMSModel::NTFMSModel(wpi::nt::NetworkTableInstance inst, std::string_view path)
+NTFMSModel::NTFMSModel(wpi::nt::NetworkTableInstance inst,
+                       std::string_view path)
     : m_inst{inst},
       m_gameSpecificMessage{
           inst.GetStringTopic(fmt::format("{}/GameSpecificMessage", path))

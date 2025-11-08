@@ -91,8 +91,8 @@ std::optional<mrc::ControlData> wpi::util::Protobuf<mrc::ControlData>::Unpack(
   return ControlData;
 }
 
-bool wpi::util::Protobuf<mrc::ControlData>::Pack(OutputStream& Stream,
-                                           const mrc::ControlData& Value) {
+bool wpi::util::Protobuf<mrc::ControlData>::Pack(
+    OutputStream& Stream, const mrc::ControlData& Value) {
   std::span<const mrc::Joystick> Sticks = Value.Joysticks();
   wpi::util::PackCallback Joysticks{Sticks};
 
@@ -149,7 +149,7 @@ std::optional<mrc::Joystick> wpi::util::Protobuf<mrc::Joystick>::Unpack(
 }
 
 bool wpi::util::Protobuf<mrc::Joystick>::Pack(OutputStream& Stream,
-                                        const mrc::Joystick& Value) {
+                                              const mrc::Joystick& Value) {
   wpi::util::PackCallback AxesCb{Value.Axes.Axes()};
 
   uint32_t PovsStore = 0;

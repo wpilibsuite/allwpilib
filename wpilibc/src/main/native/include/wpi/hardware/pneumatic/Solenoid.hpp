@@ -22,7 +22,8 @@ namespace wpi {
  * The Solenoid class is typically used for pneumatics solenoids, but could be
  * used for any device within the current spec of the module.
  */
-class Solenoid : public wpi::util::Sendable, public wpi::util::SendableHelper<Solenoid> {
+class Solenoid : public wpi::util::Sendable,
+                 public wpi::util::SendableHelper<Solenoid> {
  public:
   /**
    * Constructs a solenoid for a specified module and type.

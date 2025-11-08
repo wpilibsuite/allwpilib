@@ -120,7 +120,8 @@ class static_circular_buffer {
    * Returns const end iterator.
    */
   constexpr const_iterator end() const {
-    return const_iterator(this, ::wpi::util::static_circular_buffer<T, N>::size());
+    return const_iterator(this,
+                          ::wpi::util::static_circular_buffer<T, N>::size());
   }
 
   /**
@@ -132,7 +133,8 @@ class static_circular_buffer {
    * Returns const end iterator.
    */
   constexpr const_iterator cend() const {
-    return const_iterator(this, ::wpi::util::static_circular_buffer<T, N>::size());
+    return const_iterator(this,
+                          ::wpi::util::static_circular_buffer<T, N>::size());
   }
 
   /**

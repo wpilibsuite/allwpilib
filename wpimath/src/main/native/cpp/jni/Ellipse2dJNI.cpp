@@ -26,8 +26,9 @@ Java_org_wpilib_math_jni_Ellipse2dJNI_nearest
 {
   auto point =
       wpi::math::Ellipse2d{
-          wpi::math::Pose2d{wpi::units::meter_t{centerX}, wpi::units::meter_t{centerY},
-                      wpi::units::radian_t{centerHeading}},
+          wpi::math::Pose2d{wpi::units::meter_t{centerX},
+                            wpi::units::meter_t{centerY},
+                            wpi::units::radian_t{centerHeading}},
           wpi::units::meter_t{xSemiAxis}, wpi::units::meter_t{ySemiAxis}}
           .Nearest({wpi::units::meter_t{pointX}, wpi::units::meter_t{pointY}});
 

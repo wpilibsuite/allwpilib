@@ -184,7 +184,8 @@ void wpi::nt::ConvertToC(const Value& in, NT_Value* out) {
       break;
     case NT_RAW: {
       auto v = in.GetRaw();
-      out->data.v_raw.data = static_cast<uint8_t*>(wpi::util::safe_malloc(v.size()));
+      out->data.v_raw.data =
+          static_cast<uint8_t*>(wpi::util::safe_malloc(v.size()));
       out->data.v_raw.size = v.size();
       std::memcpy(out->data.v_raw.data, v.data(), v.size());
       break;
@@ -199,8 +200,8 @@ void wpi::nt::ConvertToC(const Value& in, NT_Value* out) {
     }
     case NT_INTEGER_ARRAY: {
       auto v = in.GetIntegerArray();
-      out->data.arr_int.arr =
-          static_cast<int64_t*>(wpi::util::safe_malloc(v.size() * sizeof(int64_t)));
+      out->data.arr_int.arr = static_cast<int64_t*>(
+          wpi::util::safe_malloc(v.size() * sizeof(int64_t)));
       out->data.arr_int.size = v.size();
       std::copy(v.begin(), v.end(), out->data.arr_int.arr);
       break;
@@ -215,8 +216,8 @@ void wpi::nt::ConvertToC(const Value& in, NT_Value* out) {
     }
     case NT_DOUBLE_ARRAY: {
       auto v = in.GetDoubleArray();
-      out->data.arr_double.arr =
-          static_cast<double*>(wpi::util::safe_malloc(v.size() * sizeof(double)));
+      out->data.arr_double.arr = static_cast<double*>(
+          wpi::util::safe_malloc(v.size() * sizeof(double)));
       out->data.arr_double.size = v.size();
       std::copy(v.begin(), v.end(), out->data.arr_double.arr);
       break;

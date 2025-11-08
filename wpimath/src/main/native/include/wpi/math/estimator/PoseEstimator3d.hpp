@@ -279,14 +279,16 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
     // measurements compared to our current pose.
     wpi::math::Vectord<6> k_times_twist =
         m_visionK * wpi::math::Vectord<6>{twist.dx.value(), twist.dy.value(),
-                                    twist.dz.value(), twist.rx.value(),
-                                    twist.ry.value(), twist.rz.value()};
+                                          twist.dz.value(), twist.rx.value(),
+                                          twist.ry.value(), twist.rz.value()};
 
     // Step 6: Convert back to Twist3d.
-    Twist3d scaledTwist{
-        wpi::units::meter_t{k_times_twist(0)},  wpi::units::meter_t{k_times_twist(1)},
-        wpi::units::meter_t{k_times_twist(2)},  wpi::units::radian_t{k_times_twist(3)},
-        wpi::units::radian_t{k_times_twist(4)}, wpi::units::radian_t{k_times_twist(5)}};
+    Twist3d scaledTwist{wpi::units::meter_t{k_times_twist(0)},
+                        wpi::units::meter_t{k_times_twist(1)},
+                        wpi::units::meter_t{k_times_twist(2)},
+                        wpi::units::radian_t{k_times_twist(3)},
+                        wpi::units::radian_t{k_times_twist(4)},
+                        wpi::units::radian_t{k_times_twist(5)}};
 
     // Step 7: Calculate and record the vision update.
     VisionUpdate visionUpdate{visionSample.value() + scaledTwist.Exp(),

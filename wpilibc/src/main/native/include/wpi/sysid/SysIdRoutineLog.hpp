@@ -116,7 +116,8 @@ class SysIdRoutineLog {
      * @param acceleration The linear acceleration to record.
      * @return The motor log (for call chaining).
      */
-    MotorLog& acceleration(wpi::units::meters_per_second_squared_t acceleration) {
+    MotorLog& acceleration(
+        wpi::units::meters_per_second_squared_t acceleration) {
       return value("acceleration", acceleration.value(), acceleration.name());
     }
 
@@ -128,7 +129,8 @@ class SysIdRoutineLog {
      * @param acceleration The angular acceleration to record.
      * @return The motor log (for call chaining).
      */
-    MotorLog& acceleration(wpi::units::turns_per_second_squared_t acceleration) {
+    MotorLog& acceleration(
+        wpi::units::turns_per_second_squared_t acceleration) {
       return value("acceleration", acceleration.value(), acceleration.name());
     }
 

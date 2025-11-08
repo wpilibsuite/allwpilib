@@ -55,14 +55,14 @@ TEST(MathUtilTest, ApplyDeadbandArbitraryScale) {
 
 TEST(MathUtilTest, ApplyDeadbandUnits) {
   // < 0
-  EXPECT_UNITS_EQ(-20_rad,
-                  wpi::math::ApplyDeadband<wpi::units::radian_t>(-20_rad, 1_rad, 20_rad));
+  EXPECT_UNITS_EQ(-20_rad, wpi::math::ApplyDeadband<wpi::units::radian_t>(
+                               -20_rad, 1_rad, 20_rad));
 }
 
 TEST(MathUtilTest, ApplyDeadbandLargeMaxMagnitude) {
   EXPECT_DOUBLE_EQ(
-      80.0,
-      wpi::math::ApplyDeadband(100.0, 20.0, std::numeric_limits<double>::infinity()));
+      80.0, wpi::math::ApplyDeadband(100.0, 20.0,
+                                     std::numeric_limits<double>::infinity()));
 }
 
 TEST(MathUtilTest, ApplyDeadband2dUnityScale) {
@@ -91,35 +91,41 @@ TEST(MathUtilTest, ApplyDeadband2dUnityScale) {
 TEST(MathUtilTest, ApplyDeadband2dArbitraryScale) {
   EXPECT_EQ((Eigen::Vector2d{{0.0}, {2.5}}),
             wpi::math::ApplyDeadband(Eigen::Vector2d{{0.0}, {2.5}}, 0.02, 2.5));
-  EXPECT_EQ((Eigen::Vector2d{{0.0}, {-2.5}}),
-            wpi::math::ApplyDeadband(Eigen::Vector2d{{0.0}, {-2.5}}, 0.02, 2.5));
-  EXPECT_EQ((Eigen::Vector2d{{-2.5}, {0.0}}),
-            wpi::math::ApplyDeadband(Eigen::Vector2d{{-2.5}, {0.0}}, 0.02, 2.5));
+  EXPECT_EQ(
+      (Eigen::Vector2d{{0.0}, {-2.5}}),
+      wpi::math::ApplyDeadband(Eigen::Vector2d{{0.0}, {-2.5}}, 0.02, 2.5));
+  EXPECT_EQ(
+      (Eigen::Vector2d{{-2.5}, {0.0}}),
+      wpi::math::ApplyDeadband(Eigen::Vector2d{{-2.5}, {0.0}}, 0.02, 2.5));
 
   // == 0
   EXPECT_EQ((Eigen::Vector2d{{0.0}, {0.0}}),
             wpi::math::ApplyDeadband(Eigen::Vector2d{{0.0}, {0.0}}, 0.02, 2.5));
 
   // > 0
-  EXPECT_EQ((Eigen::Vector2d{{0.0}, {0.0}}),
-            wpi::math::ApplyDeadband(Eigen::Vector2d{{0.01}, {0.0}}, 0.02, 2.5));
-  EXPECT_EQ((Eigen::Vector2d{{0.0}, {0.0}}),
-            wpi::math::ApplyDeadband(Eigen::Vector2d{{0.02}, {0.0}}, 0.02, 2.5));
+  EXPECT_EQ(
+      (Eigen::Vector2d{{0.0}, {0.0}}),
+      wpi::math::ApplyDeadband(Eigen::Vector2d{{0.01}, {0.0}}, 0.02, 2.5));
+  EXPECT_EQ(
+      (Eigen::Vector2d{{0.0}, {0.0}}),
+      wpi::math::ApplyDeadband(Eigen::Vector2d{{0.02}, {0.0}}, 0.02, 2.5));
   EXPECT_EQ((Eigen::Vector2d{{2.5}, {0.0}}),
             wpi::math::ApplyDeadband(Eigen::Vector2d{{2.5}, {0.0}}, 0.02, 2.5));
 }
 
 TEST(MathUtilTest, ApplyDeadband2dLargeMaxMagnitude) {
-  EXPECT_EQ((Eigen::Vector2d{{80.0}, {0.0}}),
-            (wpi::math::ApplyDeadband(Eigen::Vector2d{{100.0}, {0.0}}, 20.0,
+  EXPECT_EQ(
+      (Eigen::Vector2d{{80.0}, {0.0}}),
+      (wpi::math::ApplyDeadband(Eigen::Vector2d{{100.0}, {0.0}}, 20.0,
                                 std::numeric_limits<double>::infinity())));
 }
 
 TEST(MathUtilTest, ApplyDeadband2dUnits) {
-  EXPECT_EQ((Eigen::Vector<wpi::units::meters_per_second_t, 2>{0_mps, 2.5_mps}),
-            wpi::math::ApplyDeadband(
-                Eigen::Vector<wpi::units::meters_per_second_t, 2>{0_mps, 2.5_mps},
-                0.02_mps, 2.5_mps));
+  EXPECT_EQ(
+      (Eigen::Vector<wpi::units::meters_per_second_t, 2>{0_mps, 2.5_mps}),
+      wpi::math::ApplyDeadband(
+          Eigen::Vector<wpi::units::meters_per_second_t, 2>{0_mps, 2.5_mps},
+          0.02_mps, 2.5_mps));
   EXPECT_EQ((Eigen::Vector<wpi::units::meters_per_second_t, 2>{1_mps, 0_mps}),
             wpi::math::ApplyDeadband(
                 Eigen::Vector<wpi::units::meters_per_second_t, 2>{1_mps, 0_mps},
@@ -154,9 +160,11 @@ TEST(MathUtilTest, CopyDirectionPowWithMaxMagnitude) {
   EXPECT_DOUBLE_EQ(-5.0, wpi::math::CopyDirectionPow(-5.0, 1.0, 10.0));
 
   EXPECT_DOUBLE_EQ(0.5 * 0.5 * 10, wpi::math::CopyDirectionPow(5.0, 2.0, 10.0));
-  EXPECT_DOUBLE_EQ(-0.5 * 0.5 * 10, wpi::math::CopyDirectionPow(-5.0, 2.0, 10.0));
+  EXPECT_DOUBLE_EQ(-0.5 * 0.5 * 10,
+                   wpi::math::CopyDirectionPow(-5.0, 2.0, 10.0));
 
-  EXPECT_DOUBLE_EQ(std::sqrt(0.5) * 10, wpi::math::CopyDirectionPow(5.0, 0.5, 10.0));
+  EXPECT_DOUBLE_EQ(std::sqrt(0.5) * 10,
+                   wpi::math::CopyDirectionPow(5.0, 0.5, 10.0));
   EXPECT_DOUBLE_EQ(-std::sqrt(0.5) * 10,
                    wpi::math::CopyDirectionPow(-5.0, 0.5, 10.0));
 
@@ -172,18 +180,21 @@ TEST(MathUtilTest, CopyDirectionPowWithMaxMagnitude) {
 
 TEST(MathUtilTest, CopyDirectionPowWithUnits) {
   EXPECT_UNITS_EQ(
-      0_mps, wpi::math::CopyDirectionPow<wpi::units::meters_per_second_t>(0_mps, 2.0));
+      0_mps,
+      wpi::math::CopyDirectionPow<wpi::units::meters_per_second_t>(0_mps, 2.0));
   EXPECT_UNITS_EQ(
-      1_mps, wpi::math::CopyDirectionPow<wpi::units::meters_per_second_t>(1_mps, 2.0));
-  EXPECT_UNITS_EQ(
-      -1_mps, wpi::math::CopyDirectionPow<wpi::units::meters_per_second_t>(-1_mps, 2.0));
+      1_mps,
+      wpi::math::CopyDirectionPow<wpi::units::meters_per_second_t>(1_mps, 2.0));
+  EXPECT_UNITS_EQ(-1_mps,
+                  wpi::math::CopyDirectionPow<wpi::units::meters_per_second_t>(
+                      -1_mps, 2.0));
 
-  EXPECT_UNITS_EQ(
-      wpi::units::meters_per_second_t{0.5 * 0.5 * 10},
-      wpi::math::CopyDirectionPow<wpi::units::meters_per_second_t>(5_mps, 2.0, 10_mps));
-  EXPECT_UNITS_EQ(
-      wpi::units::meters_per_second_t{-0.5 * 0.5 * 10},
-      wpi::math::CopyDirectionPow<wpi::units::meters_per_second_t>(-5_mps, 2.0, 10_mps));
+  EXPECT_UNITS_EQ(wpi::units::meters_per_second_t{0.5 * 0.5 * 10},
+                  wpi::math::CopyDirectionPow<wpi::units::meters_per_second_t>(
+                      5_mps, 2.0, 10_mps));
+  EXPECT_UNITS_EQ(wpi::units::meters_per_second_t{-0.5 * 0.5 * 10},
+                  wpi::math::CopyDirectionPow<wpi::units::meters_per_second_t>(
+                      -5_mps, 2.0, 10_mps));
 }
 
 TEST(MathUtilTest, CopyDirectionPow2d) {
@@ -221,57 +232,70 @@ TEST(MathUtilTest, CopyDirectionPow2d) {
 }
 
 TEST(MathUtilTest, CopyDirectionPow2dMaxDistance) {
-  EXPECT_EQ((Eigen::Vector2d{{5.0}, {0.0}}),
-            wpi::math::CopyDirectionPow(Eigen::Vector2d{{5.0}, {0.0}}, 1.0, 10.0));
-  EXPECT_EQ((Eigen::Vector2d{{-5.0}, {0.0}}),
-            wpi::math::CopyDirectionPow(Eigen::Vector2d{{-5.0}, {0.0}}, 1.0, 10.0));
+  EXPECT_EQ(
+      (Eigen::Vector2d{{5.0}, {0.0}}),
+      wpi::math::CopyDirectionPow(Eigen::Vector2d{{5.0}, {0.0}}, 1.0, 10.0));
+  EXPECT_EQ(
+      (Eigen::Vector2d{{-5.0}, {0.0}}),
+      wpi::math::CopyDirectionPow(Eigen::Vector2d{{-5.0}, {0.0}}, 1.0, 10.0));
 
-  EXPECT_EQ((Eigen::Vector2d{{2.5}, {0.0}}),
-            wpi::math::CopyDirectionPow(Eigen::Vector2d{{5.0}, {0.0}}, 2.0, 10.0));
-  EXPECT_EQ((Eigen::Vector2d{{-2.5}, {0.0}}),
-            wpi::math::CopyDirectionPow(Eigen::Vector2d{{-5.0}, {0.0}}, 2.0, 10.0));
+  EXPECT_EQ(
+      (Eigen::Vector2d{{2.5}, {0.0}}),
+      wpi::math::CopyDirectionPow(Eigen::Vector2d{{5.0}, {0.0}}, 2.0, 10.0));
+  EXPECT_EQ(
+      (Eigen::Vector2d{{-2.5}, {0.0}}),
+      wpi::math::CopyDirectionPow(Eigen::Vector2d{{-5.0}, {0.0}}, 2.0, 10.0));
 
-  EXPECT_EQ((Eigen::Vector2d{{std::sqrt(0.5) * 10.0}, {0.0}}),
-            wpi::math::CopyDirectionPow(Eigen::Vector2d{{5.0}, {0.0}}, 0.5, 10.0));
-  EXPECT_EQ((Eigen::Vector2d{{-std::sqrt(0.5) * 10.0}, {0.0}}),
-            wpi::math::CopyDirectionPow(Eigen::Vector2d{{-5.0}, {0.0}}, 0.5, 10.0));
+  EXPECT_EQ(
+      (Eigen::Vector2d{{std::sqrt(0.5) * 10.0}, {0.0}}),
+      wpi::math::CopyDirectionPow(Eigen::Vector2d{{5.0}, {0.0}}, 0.5, 10.0));
+  EXPECT_EQ(
+      (Eigen::Vector2d{{-std::sqrt(0.5) * 10.0}, {0.0}}),
+      wpi::math::CopyDirectionPow(Eigen::Vector2d{{-5.0}, {0.0}}, 0.5, 10.0));
 
-  EXPECT_EQ((Eigen::Vector2d{{0.0}, {0.0}}),
-            wpi::math::CopyDirectionPow(Eigen::Vector2d{{0.0}, {0.0}}, 2.0, 5.0));
-  EXPECT_EQ((Eigen::Vector2d{{5.0}, {0.0}}),
-            wpi::math::CopyDirectionPow(Eigen::Vector2d{{5.0}, {0.0}}, 2.0, 5.0));
-  EXPECT_EQ((Eigen::Vector2d{{-5.0}, {0.0}}),
-            wpi::math::CopyDirectionPow(Eigen::Vector2d{{-5.0}, {0.0}}, 2.0, 5.0));
+  EXPECT_EQ(
+      (Eigen::Vector2d{{0.0}, {0.0}}),
+      wpi::math::CopyDirectionPow(Eigen::Vector2d{{0.0}, {0.0}}, 2.0, 5.0));
+  EXPECT_EQ(
+      (Eigen::Vector2d{{5.0}, {0.0}}),
+      wpi::math::CopyDirectionPow(Eigen::Vector2d{{5.0}, {0.0}}, 2.0, 5.0));
+  EXPECT_EQ(
+      (Eigen::Vector2d{{-5.0}, {0.0}}),
+      wpi::math::CopyDirectionPow(Eigen::Vector2d{{-5.0}, {0.0}}, 2.0, 5.0));
 
-  EXPECT_EQ((Eigen::Vector2d{{0.0}, {std::pow(0.8, 0.3) * 100.0}}),
-            wpi::math::CopyDirectionPow(Eigen::Vector2d{{0.0}, {80.0}}, 0.3, 100.0));
-  EXPECT_EQ((Eigen::Vector2d{{0.0}, {-std::pow(0.8, 0.3) * 100.0}}),
-            wpi::math::CopyDirectionPow(Eigen::Vector2d{{0.0}, {-80.0}}, 0.3, 100.0));
+  EXPECT_EQ(
+      (Eigen::Vector2d{{0.0}, {std::pow(0.8, 0.3) * 100.0}}),
+      wpi::math::CopyDirectionPow(Eigen::Vector2d{{0.0}, {80.0}}, 0.3, 100.0));
+  EXPECT_EQ(
+      (Eigen::Vector2d{{0.0}, {-std::pow(0.8, 0.3) * 100.0}}),
+      wpi::math::CopyDirectionPow(Eigen::Vector2d{{0.0}, {-80.0}}, 0.3, 100.0));
 }
 
 TEST(MathUtilTest, CopyDirectionPow2dUnits) {
-  EXPECT_EQ(
-      (Eigen::Vector<wpi::units::meters_per_second_t, 2>{1_mps, 0_mps}),
-      wpi::math::CopyDirectionPow(
-          Eigen::Vector<wpi::units::meters_per_second_t, 2>{1_mps, 0_mps}, 2.0));
+  EXPECT_EQ((Eigen::Vector<wpi::units::meters_per_second_t, 2>{1_mps, 0_mps}),
+            wpi::math::CopyDirectionPow(
+                Eigen::Vector<wpi::units::meters_per_second_t, 2>{1_mps, 0_mps},
+                2.0));
   EXPECT_EQ(
       (Eigen::Vector<wpi::units::meters_per_second_t, 2>{-1_mps, 0_mps}),
       wpi::math::CopyDirectionPow(
-          Eigen::Vector<wpi::units::meters_per_second_t, 2>{-1_mps, 0_mps}, 2.0));
+          Eigen::Vector<wpi::units::meters_per_second_t, 2>{-1_mps, 0_mps},
+          2.0));
 
   EXPECT_EQ((Eigen::Vector<wpi::units::meters_per_second_t, 2>{0_mps, 0_mps}),
             wpi::math::CopyDirectionPow(
-                Eigen::Vector<wpi::units::meters_per_second_t, 2>{0_mps, 0_mps}, 2.0,
-                5_mps));
+                Eigen::Vector<wpi::units::meters_per_second_t, 2>{0_mps, 0_mps},
+                2.0, 5_mps));
 
   EXPECT_EQ((Eigen::Vector<wpi::units::meters_per_second_t, 2>{5_mps, 0_mps}),
             wpi::math::CopyDirectionPow(
-                Eigen::Vector<wpi::units::meters_per_second_t, 2>{5_mps, 0_mps}, 2.0,
-                5_mps));
-  EXPECT_EQ((Eigen::Vector<wpi::units::meters_per_second_t, 2>{-5_mps, 0_mps}),
-            wpi::math::CopyDirectionPow(
-                Eigen::Vector<wpi::units::meters_per_second_t, 2>{-5_mps, 0_mps},
+                Eigen::Vector<wpi::units::meters_per_second_t, 2>{5_mps, 0_mps},
                 2.0, 5_mps));
+  EXPECT_EQ(
+      (Eigen::Vector<wpi::units::meters_per_second_t, 2>{-5_mps, 0_mps}),
+      wpi::math::CopyDirectionPow(
+          Eigen::Vector<wpi::units::meters_per_second_t, 2>{-5_mps, 0_mps}, 2.0,
+          5_mps));
 }
 
 TEST(MathUtilTest, InputModulus) {
@@ -279,25 +303,29 @@ TEST(MathUtilTest, InputModulus) {
   // result of an angle reference minus the measurement.
 
   // Test symmetric range
-  EXPECT_DOUBLE_EQ(-20.0, wpi::math::InputModulus(170.0 - (-170.0), -180.0, 180.0));
   EXPECT_DOUBLE_EQ(-20.0,
-                   wpi::math::InputModulus(170.0 + 360.0 - (-170.0), -180.0, 180.0));
-  EXPECT_DOUBLE_EQ(-20.0,
-                   wpi::math::InputModulus(170.0 - (-170.0 + 360.0), -180.0, 180.0));
-  EXPECT_DOUBLE_EQ(20.0, wpi::math::InputModulus(-170.0 - 170.0, -180.0, 180.0));
+                   wpi::math::InputModulus(170.0 - (-170.0), -180.0, 180.0));
+  EXPECT_DOUBLE_EQ(
+      -20.0, wpi::math::InputModulus(170.0 + 360.0 - (-170.0), -180.0, 180.0));
+  EXPECT_DOUBLE_EQ(
+      -20.0, wpi::math::InputModulus(170.0 - (-170.0 + 360.0), -180.0, 180.0));
   EXPECT_DOUBLE_EQ(20.0,
-                   wpi::math::InputModulus(-170.0 + 360.0 - 170.0, -180.0, 180.0));
-  EXPECT_DOUBLE_EQ(20.0,
-                   wpi::math::InputModulus(-170.0 - (170.0 + 360.0), -180.0, 180.0));
+                   wpi::math::InputModulus(-170.0 - 170.0, -180.0, 180.0));
+  EXPECT_DOUBLE_EQ(
+      20.0, wpi::math::InputModulus(-170.0 + 360.0 - 170.0, -180.0, 180.0));
+  EXPECT_DOUBLE_EQ(
+      20.0, wpi::math::InputModulus(-170.0 - (170.0 + 360.0), -180.0, 180.0));
 
   // Test range starting at zero
   EXPECT_DOUBLE_EQ(340.0, wpi::math::InputModulus(170.0 - 190.0, 0.0, 360.0));
-  EXPECT_DOUBLE_EQ(340.0, wpi::math::InputModulus(170.0 + 360.0 - 190.0, 0.0, 360.0));
   EXPECT_DOUBLE_EQ(340.0,
-                   wpi::math::InputModulus(170.0 - (190.0 + 360.0), 0.0, 360.0));
+                   wpi::math::InputModulus(170.0 + 360.0 - 190.0, 0.0, 360.0));
+  EXPECT_DOUBLE_EQ(
+      340.0, wpi::math::InputModulus(170.0 - (190.0 + 360.0), 0.0, 360.0));
 
   // Test asymmetric range that doesn't start at zero
-  EXPECT_DOUBLE_EQ(-20.0, wpi::math::InputModulus(170.0 - (-170.0), -170.0, 190.0));
+  EXPECT_DOUBLE_EQ(-20.0,
+                   wpi::math::InputModulus(170.0 - (-170.0), -170.0, 190.0));
 
   // Test range with both positive endpoints
   EXPECT_DOUBLE_EQ(2.0, wpi::math::InputModulus(0.0, 1.0, 3.0));
@@ -307,31 +335,36 @@ TEST(MathUtilTest, InputModulus) {
   EXPECT_DOUBLE_EQ(2.0, wpi::math::InputModulus(4.0, 1.0, 3.0));
 
   // Test all supported types
-  EXPECT_DOUBLE_EQ(-20.0,
-                   wpi::math::InputModulus<double>(170.0 - (-170.0), -170.0, 190.0));
+  EXPECT_DOUBLE_EQ(
+      -20.0, wpi::math::InputModulus<double>(170.0 - (-170.0), -170.0, 190.0));
   EXPECT_EQ(-20, wpi::math::InputModulus<int>(170 - (-170), -170, 190));
-  EXPECT_EQ(-20_deg, wpi::math::InputModulus<wpi::units::degree_t>(170_deg - (-170_deg),
-                                                        -170_deg, 190_deg));
+  EXPECT_EQ(-20_deg, wpi::math::InputModulus<wpi::units::degree_t>(
+                         170_deg - (-170_deg), -170_deg, 190_deg));
 }
 
 TEST(MathUtilTest, AngleModulus) {
+  EXPECT_UNITS_NEAR(wpi::math::AngleModulus(
+                        wpi::units::radian_t{-2000 * std::numbers::pi / 180}),
+                    wpi::units::radian_t{160 * std::numbers::pi / 180}, 1e-10);
+  EXPECT_UNITS_NEAR(wpi::math::AngleModulus(
+                        wpi::units::radian_t{358 * std::numbers::pi / 180}),
+                    wpi::units::radian_t{-2 * std::numbers::pi / 180}, 1e-10);
   EXPECT_UNITS_NEAR(
-      wpi::math::AngleModulus(wpi::units::radian_t{-2000 * std::numbers::pi / 180}),
-      wpi::units::radian_t{160 * std::numbers::pi / 180}, 1e-10);
-  EXPECT_UNITS_NEAR(
-      wpi::math::AngleModulus(wpi::units::radian_t{358 * std::numbers::pi / 180}),
-      wpi::units::radian_t{-2 * std::numbers::pi / 180}, 1e-10);
-  EXPECT_UNITS_NEAR(wpi::math::AngleModulus(wpi::units::radian_t{2.0 * std::numbers::pi}),
-                    0_rad, 1e-10);
+      wpi::math::AngleModulus(wpi::units::radian_t{2.0 * std::numbers::pi}),
+      0_rad, 1e-10);
 
-  EXPECT_UNITS_EQ(wpi::math::AngleModulus(wpi::units::radian_t{5 * std::numbers::pi}),
-                  wpi::units::radian_t{std::numbers::pi});
-  EXPECT_UNITS_EQ(wpi::math::AngleModulus(wpi::units::radian_t{-5 * std::numbers::pi}),
-                  wpi::units::radian_t{std::numbers::pi});
-  EXPECT_UNITS_EQ(wpi::math::AngleModulus(wpi::units::radian_t{std::numbers::pi / 2}),
-                  wpi::units::radian_t{std::numbers::pi / 2});
-  EXPECT_UNITS_EQ(wpi::math::AngleModulus(wpi::units::radian_t{-std::numbers::pi / 2}),
-                  wpi::units::radian_t{-std::numbers::pi / 2});
+  EXPECT_UNITS_EQ(
+      wpi::math::AngleModulus(wpi::units::radian_t{5 * std::numbers::pi}),
+      wpi::units::radian_t{std::numbers::pi});
+  EXPECT_UNITS_EQ(
+      wpi::math::AngleModulus(wpi::units::radian_t{-5 * std::numbers::pi}),
+      wpi::units::radian_t{std::numbers::pi});
+  EXPECT_UNITS_EQ(
+      wpi::math::AngleModulus(wpi::units::radian_t{std::numbers::pi / 2}),
+      wpi::units::radian_t{std::numbers::pi / 2});
+  EXPECT_UNITS_EQ(
+      wpi::math::AngleModulus(wpi::units::radian_t{-std::numbers::pi / 2}),
+      wpi::units::radian_t{-std::numbers::pi / 2});
 }
 
 TEST(MathUtilTest, IsNear) {

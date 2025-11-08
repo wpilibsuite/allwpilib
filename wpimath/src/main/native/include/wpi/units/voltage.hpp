@@ -40,7 +40,8 @@ namespace wpi::units {
 #if !defined(DISABLE_PREDEFINED_UNITS) || \
     defined(ENABLE_PREDEFINED_VOLTAGE_UNITS)
 UNIT_ADD_WITH_METRIC_PREFIXES(
-    voltage, volt, volts, V, unit<std::ratio<1>, wpi::units::category::voltage_unit>)
+    voltage, volt, volts, V,
+    unit<std::ratio<1>, wpi::units::category::voltage_unit>)
 UNIT_ADD(voltage, statvolt, statvolts, statV,
          unit<std::ratio<1000000, 299792458>, volts>)
 UNIT_ADD(voltage, abvolt, abvolts, abV, unit<std::ratio<1, 100000000>, volts>)

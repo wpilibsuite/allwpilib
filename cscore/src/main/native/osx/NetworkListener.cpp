@@ -8,7 +8,8 @@ using namespace wpi::cs;
 
 class NetworkListener::Impl {};
 
-NetworkListener::NetworkListener(wpi::util::Logger& logger, Notifier& notifier) {}
+NetworkListener::NetworkListener(wpi::util::Logger& logger,
+                                 Notifier& notifier) {}
 
 NetworkListener::~NetworkListener() = default;
 

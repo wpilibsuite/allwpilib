@@ -48,9 +48,13 @@ class RoboRioSimModel : public wpi::glass::RoboRioModel {
 
   bool Exists() override { return true; }
 
-  wpi::glass::RoboRioRailModel* GetUser3V3Rail() override { return &m_user3V3Rail; }
+  wpi::glass::RoboRioRailModel* GetUser3V3Rail() override {
+    return &m_user3V3Rail;
+  }
 
-  wpi::glass::DoubleSource* GetVInVoltageData() override { return &m_vInVoltage; }
+  wpi::glass::DoubleSource* GetVInVoltageData() override {
+    return &m_vInVoltage;
+  }
   wpi::glass::DoubleSource* GetBrownoutVoltage() override {
     return &m_brownoutVoltage;
   }

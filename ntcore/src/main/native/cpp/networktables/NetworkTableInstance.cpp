@@ -112,18 +112,20 @@ NT_Listener NetworkTableInstance::AddListener(Topic topic,
     wpi::util::print(stderr, "AddListener: topic is not from this instance\n");
     return 0;
   }
-  return ::wpi::nt::AddListener(topic.GetHandle(), eventMask, std::move(listener));
+  return ::wpi::nt::AddListener(topic.GetHandle(), eventMask,
+                                std::move(listener));
 }
 
 NT_Listener NetworkTableInstance::AddListener(Subscriber& subscriber,
                                               unsigned int eventMask,
                                               ListenerCallback listener) {
   if (::wpi::nt::GetInstanceFromHandle(subscriber.GetHandle()) != m_handle) {
-    wpi::util::print(stderr, "AddListener: subscriber is not from this instance\n");
+    wpi::util::print(stderr,
+                     "AddListener: subscriber is not from this instance\n");
     return 0;
   }
   return ::wpi::nt::AddListener(subscriber.GetHandle(), eventMask,
-                           std::move(listener));
+                                std::move(listener));
 }
 
 NT_Listener NetworkTableInstance::AddListener(const NetworkTableEntry& entry,
@@ -133,16 +135,18 @@ NT_Listener NetworkTableInstance::AddListener(const NetworkTableEntry& entry,
     wpi::util::print(stderr, "AddListener: entry is not from this instance\n");
     return 0;
   }
-  return ::wpi::nt::AddListener(entry.GetHandle(), eventMask, std::move(listener));
+  return ::wpi::nt::AddListener(entry.GetHandle(), eventMask,
+                                std::move(listener));
 }
 
 NT_Listener NetworkTableInstance::AddListener(MultiSubscriber& subscriber,
                                               int eventMask,
                                               ListenerCallback listener) {
   if (::wpi::nt::GetInstanceFromHandle(subscriber.GetHandle()) != m_handle) {
-    wpi::util::print(stderr, "AddListener: subscriber is not from this instance\n");
+    wpi::util::print(stderr,
+                     "AddListener: subscriber is not from this instance\n");
     return 0;
   }
   return ::wpi::nt::AddListener(subscriber.GetHandle(), eventMask,
-                           std::move(listener));
+                                std::move(listener));
 }

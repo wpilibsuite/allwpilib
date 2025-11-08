@@ -60,7 +60,8 @@ Twist2d MecanumDriveKinematics::ToTwist2d(
 
   Eigen::Vector3d twistVector = m_forwardKinematics.solve(wheelDeltasVector);
 
-  return {wpi::units::meter_t{twistVector(0)}, wpi::units::meter_t{twistVector(1)},
+  return {wpi::units::meter_t{twistVector(0)},
+          wpi::units::meter_t{twistVector(1)},
           wpi::units::radian_t{twistVector(2)}};
 }
 
@@ -72,7 +73,8 @@ Twist2d MecanumDriveKinematics::ToTwist2d(
 
   Eigen::Vector3d twistVector = m_forwardKinematics.solve(wheelDeltasVector);
 
-  return {wpi::units::meter_t{twistVector(0)}, wpi::units::meter_t{twistVector(1)},
+  return {wpi::units::meter_t{twistVector(0)},
+          wpi::units::meter_t{twistVector(1)},
           wpi::units::radian_t{twistVector(2)}};
 }
 

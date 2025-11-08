@@ -16,7 +16,8 @@
 using namespace wpi::math;
 
 wpi::units::volt_t ArmFeedforward::Calculate(
-    wpi::units::unit_t<Angle> currentAngle, wpi::units::unit_t<Velocity> currentVelocity,
+    wpi::units::unit_t<Angle> currentAngle,
+    wpi::units::unit_t<Velocity> currentVelocity,
     wpi::units::unit_t<Velocity> nextVelocity) const {
   using VarMat = slp::VariableMatrix;
 
@@ -43,8 +44,9 @@ wpi::units::volt_t ArmFeedforward::Calculate(
 
   // Initial guess
   auto acceleration = (nextVelocity - currentVelocity) / m_dt;
-  u_k.set_value((kS * wpi::util::sgn(currentVelocity.value()) + kV * currentVelocity +
-                 kA * acceleration + kG * wpi::units::math::cos(currentAngle))
+  u_k.set_value((kS * wpi::util::sgn(currentVelocity.value()) +
+                 kV * currentVelocity + kA * acceleration +
+                 kG * wpi::units::math::cos(currentAngle))
                     .value());
 
   auto r_k1 = RK4<decltype(f), VarMat, VarMat>(f, r_k, u_k, m_dt);

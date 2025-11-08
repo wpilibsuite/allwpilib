@@ -62,7 +62,8 @@ void NTField2DModel::ObjectModel::NTUpdate(const wpi::nt::Value& value) {
     m_poses.resize(size / 3);
     for (size_t i = 0; i < size / 3; ++i) {
       m_poses[i] = wpi::math::Pose2d{
-          wpi::units::meter_t{arr[i * 3 + 0]}, wpi::units::meter_t{arr[i * 3 + 1]},
+          wpi::units::meter_t{arr[i * 3 + 0]},
+          wpi::units::meter_t{arr[i * 3 + 1]},
           wpi::math::Rotation2d{wpi::units::degree_t{arr[i * 3 + 2]}}};
     }
   }
@@ -82,7 +83,8 @@ void NTField2DModel::ObjectModel::UpdateNT() {
   m_pub.Set(arr);
 }
 
-void NTField2DModel::ObjectModel::SetPoses(std::span<const wpi::math::Pose2d> poses) {
+void NTField2DModel::ObjectModel::SetPoses(
+    std::span<const wpi::math::Pose2d> poses) {
   m_poses.assign(poses.begin(), poses.end());
   UpdateNT();
 }
@@ -102,7 +104,8 @@ void NTField2DModel::ObjectModel::SetPosition(size_t i,
   }
 }
 
-void NTField2DModel::ObjectModel::SetRotation(size_t i, wpi::math::Rotation2d rot) {
+void NTField2DModel::ObjectModel::SetRotation(size_t i,
+                                              wpi::math::Rotation2d rot) {
   if (i < m_poses.size()) {
     m_poses[i] = wpi::math::Pose2d{m_poses[i].Translation(), rot};
     UpdateNT();
@@ -198,7 +201,8 @@ void NTField2DModel::RemoveFieldObject(std::string_view name) {
 }
 
 void NTField2DModel::ForEachFieldObject(
-    wpi::util::function_ref<void(FieldObjectModel& model, std::string_view name)>
+    wpi::util::function_ref<void(FieldObjectModel& model,
+                                 std::string_view name)>
         func) {
   for (auto&& obj : m_objects) {
     if (obj->Exists()) {

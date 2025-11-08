@@ -50,7 +50,7 @@ std::optional<mrc::ErrorInfo> wpi::util::Protobuf<mrc::ErrorInfo>::Unpack(
 }
 
 bool wpi::util::Protobuf<mrc::ErrorInfo>::Pack(OutputStream& Stream,
-                                         const mrc::ErrorInfo& Value) {
+                                               const mrc::ErrorInfo& Value) {
   std::string_view DetailsView = Value.GetDetails();
   std::string_view LocationView = Value.GetLocation();
   std::string_view CallStackView = Value.GetCallStack();

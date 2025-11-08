@@ -28,10 +28,11 @@ WPI_IGNORE_DEPRECATED
 /**
  * Common base class for all PWM Motor Controllers.
  */
-class PWMMotorController : public MotorController,
-                           public MotorSafety,
-                           public wpi::util::Sendable,
-                           public wpi::util::SendableHelper<PWMMotorController> {
+class PWMMotorController
+    : public MotorController,
+      public MotorSafety,
+      public wpi::util::Sendable,
+      public wpi::util::SendableHelper<PWMMotorController> {
  public:
   PWMMotorController(PWMMotorController&&) = default;
   PWMMotorController& operator=(PWMMotorController&&) = default;

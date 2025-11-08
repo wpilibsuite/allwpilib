@@ -45,9 +45,9 @@ Java_org_wpilib_math_jni_DAREJNI_dareNoPrecondABQR
                                  Eigen::RowMajor>>
       Rmat{nativeR.data(), inputs, inputs};
 
-  auto result =
-      wpi::math::DARE<Eigen::Dynamic, Eigen::Dynamic>(Amat, Bmat, Qmat, Rmat, false)
-          .value();
+  auto result = wpi::math::DARE<Eigen::Dynamic, Eigen::Dynamic>(
+                    Amat, Bmat, Qmat, Rmat, false)
+                    .value();
 
   env->SetDoubleArrayRegion(S, 0, states * states, result.data());
 }
@@ -84,8 +84,8 @@ Java_org_wpilib_math_jni_DAREJNI_dareNoPrecondABQRN
                                  Eigen::RowMajor>>
       Nmat{nativeN.data(), states, inputs};
 
-  auto result = wpi::math::DARE<Eigen::Dynamic, Eigen::Dynamic>(Amat, Bmat, Qmat,
-                                                          Rmat, Nmat, false)
+  auto result = wpi::math::DARE<Eigen::Dynamic, Eigen::Dynamic>(
+                    Amat, Bmat, Qmat, Rmat, Nmat, false)
                     .value();
 
   env->SetDoubleArrayRegion(S, 0, states * states, result.data());
@@ -119,8 +119,8 @@ Java_org_wpilib_math_jni_DAREJNI_dareABQR
                                  Eigen::RowMajor>>
       Rmat{nativeR.data(), inputs, inputs};
 
-  if (auto result =
-          wpi::math::DARE<Eigen::Dynamic, Eigen::Dynamic>(Amat, Bmat, Qmat, Rmat)) {
+  if (auto result = wpi::math::DARE<Eigen::Dynamic, Eigen::Dynamic>(
+          Amat, Bmat, Qmat, Rmat)) {
     env->SetDoubleArrayRegion(S, 0, states * states, result.value().data());
     // K = (BᵀSB + R)⁻¹BᵀSA
   } else if (result.error() == wpi::math::DAREError::QNotSymmetric ||
@@ -172,8 +172,8 @@ Java_org_wpilib_math_jni_DAREJNI_dareABQRN
                                  Eigen::RowMajor>>
       Nmat{nativeN.data(), states, inputs};
 
-  if (auto result = wpi::math::DARE<Eigen::Dynamic, Eigen::Dynamic>(Amat, Bmat, Qmat,
-                                                              Rmat, Nmat)) {
+  if (auto result = wpi::math::DARE<Eigen::Dynamic, Eigen::Dynamic>(
+          Amat, Bmat, Qmat, Rmat, Nmat)) {
     env->SetDoubleArrayRegion(S, 0, states * states, result.value().data());
   } else if (result.error() == wpi::math::DAREError::QNotSymmetric ||
              result.error() == wpi::math::DAREError::QNotPositiveSemidefinite) {

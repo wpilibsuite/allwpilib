@@ -131,7 +131,8 @@ class LEDPattern {
    *
    * <pre>
    *   // LEDs per meter, a known value taken from the spec sheet of our
-   * particular LED strip wpi::units::meter_t LED_SPACING = wpi::units::meter_t{1 /60.0};
+   * particular LED strip wpi::units::meter_t LED_SPACING =
+   * wpi::units::meter_t{1 /60.0};
    *
    *   wpi::LEDPattern rainbow = wpi::LEDPattern::Rainbow();
    *   wpi::LEDPattern scrollingRainbow =

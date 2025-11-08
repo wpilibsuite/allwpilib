@@ -78,7 +78,7 @@ ChassisSpeeds LTVUnicycleController::Calculate(
                     m_poseError.Rotation().Radians().value()};
   Eigen::Vector2d u = K * e;
 
-  return ChassisSpeeds{linearVelocityRef + wpi::units::meters_per_second_t{u(0)},
-                       0_mps,
-                       angularVelocityRef + wpi::units::radians_per_second_t{u(1)}};
+  return ChassisSpeeds{
+      linearVelocityRef + wpi::units::meters_per_second_t{u(0)}, 0_mps,
+      angularVelocityRef + wpi::units::radians_per_second_t{u(1)}};
 }

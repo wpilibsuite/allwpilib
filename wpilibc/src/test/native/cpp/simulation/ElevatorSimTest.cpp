@@ -20,8 +20,8 @@
   EXPECT_LE(wpi::units::math::abs(val1 - val2), eps)
 
 TEST(ElevatorSimTest, StateSpaceSim) {
-  wpi::sim::ElevatorSim sim(wpi::math::DCMotor::Vex775Pro(4), 14.67, 8_kg, 0.75_in,
-                            0_m, 3_m, true, 0_m, {0.01});
+  wpi::sim::ElevatorSim sim(wpi::math::DCMotor::Vex775Pro(4), 14.67, 8_kg,
+                            0.75_in, 0_m, 3_m, true, 0_m, {0.01});
   wpi::math::PIDController controller(10, 0.0, 0.0);
 
   wpi::PWMVictorSPX motor(0);
@@ -33,7 +33,8 @@ TEST(ElevatorSimTest, StateSpaceSim) {
     auto nextVoltage = controller.Calculate(encoderSim.GetDistance());
     motor.Set(nextVoltage / wpi::RobotController::GetInputVoltage());
 
-    wpi::math::Vectord<1> u{motor.Get() * wpi::RobotController::GetInputVoltage()};
+    wpi::math::Vectord<1> u{motor.Get() *
+                            wpi::RobotController::GetInputVoltage()};
     sim.SetInput(u);
     sim.Update(20_ms);
 
@@ -46,16 +47,16 @@ TEST(ElevatorSimTest, StateSpaceSim) {
 
 TEST(ElevatorSimTest, InitialState) {
   constexpr auto startingHeight = 0.5_m;
-  wpi::sim::ElevatorSim sim(wpi::math::DCMotor::KrakenX60(2), 20, 8_kg, 0.1_m, 0_m,
-                            1_m, true, startingHeight, {0.01, 0.0});
+  wpi::sim::ElevatorSim sim(wpi::math::DCMotor::KrakenX60(2), 20, 8_kg, 0.1_m,
+                            0_m, 1_m, true, startingHeight, {0.01, 0.0});
 
   EXPECT_DOUBLE_EQ(startingHeight.value(), sim.GetPosition().value());
   EXPECT_DOUBLE_EQ(0, sim.GetVelocity().value());
 }
 
 TEST(ElevatorSimTest, MinMax) {
-  wpi::sim::ElevatorSim sim(wpi::math::DCMotor::Vex775Pro(4), 14.67, 8_kg, 0.75_in,
-                            0_m, 1_m, true, 0_m, {0.01});
+  wpi::sim::ElevatorSim sim(wpi::math::DCMotor::Vex775Pro(4), 14.67, 8_kg,
+                            0.75_in, 0_m, 1_m, true, 0_m, {0.01});
   for (size_t i = 0; i < 100; ++i) {
     sim.SetInput(wpi::math::Vectord<1>{0.0});
     sim.Update(20_ms);
@@ -74,8 +75,14 @@ TEST(ElevatorSimTest, MinMax) {
 }
 
 TEST(ElevatorSimTest, Stability) {
-  wpi::sim::ElevatorSim sim{
-      wpi::math::DCMotor::Vex775Pro(4), 100, 4_kg, 0.5_in, 0_m, 10_m, false, 0_m};
+  wpi::sim::ElevatorSim sim{wpi::math::DCMotor::Vex775Pro(4),
+                            100,
+                            4_kg,
+                            0.5_in,
+                            0_m,
+                            10_m,
+                            false,
+                            0_m};
 
   sim.SetState(wpi::math::Vectord<2>{0.0, 0.0});
   sim.SetInput(wpi::math::Vectord<1>{12.0});
@@ -84,11 +91,11 @@ TEST(ElevatorSimTest, Stability) {
   }
 
   wpi::math::LinearSystem<2, 1, 1> system =
-      wpi::math::LinearSystemId::ElevatorSystem(wpi::math::DCMotor::Vex775Pro(4), 4_kg,
-                                          0.5_in, 100)
+      wpi::math::LinearSystemId::ElevatorSystem(
+          wpi::math::DCMotor::Vex775Pro(4), 4_kg, 0.5_in, 100)
           .Slice(0);
-  EXPECT_NEAR_UNITS(
-      wpi::units::meter_t{system.CalculateX(wpi::math::Vectord<2>{0.0, 0.0},
-                                       wpi::math::Vectord<1>{12.0}, 20_ms * 50)(0)},
-      sim.GetPosition(), 1_cm);
+  EXPECT_NEAR_UNITS(wpi::units::meter_t{system.CalculateX(
+                        wpi::math::Vectord<2>{0.0, 0.0},
+                        wpi::math::Vectord<1>{12.0}, 20_ms * 50)(0)},
+                    sim.GetPosition(), 1_cm);
 }

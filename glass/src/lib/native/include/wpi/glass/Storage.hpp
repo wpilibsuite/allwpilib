@@ -213,7 +213,8 @@ class Storage {
    * @param toJson replacement for ToJson()
    */
   void SetCustomJson(
-      std::function<bool(const wpi::util::json& json, const char* filename)> fromJson,
+      std::function<bool(const wpi::util::json& json, const char* filename)>
+          fromJson,
       std::function<wpi::util::json()> toJson) {
     m_fromJson = std::move(fromJson);
     m_toJson = std::move(toJson);
@@ -230,7 +231,8 @@ class Storage {
  private:
   mutable ValueMap m_values;
   std::shared_ptr<void> m_data;
-  std::function<bool(const wpi::util::json& json, const char* filename)> m_fromJson;
+  std::function<bool(const wpi::util::json& json, const char* filename)>
+      m_fromJson;
   std::function<wpi::util::json()> m_toJson;
   std::function<void()> m_clear;
   std::function<void()> m_apply;

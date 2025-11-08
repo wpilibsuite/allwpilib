@@ -40,11 +40,11 @@ void SetLastErrorIndexOutOfRange(int32_t* status, std::string_view message,
 void SetLastErrorPreviouslyAllocated(int32_t* status, std::string_view message,
                                      int32_t channel,
                                      std::string_view previousAllocation) {
-  wpi::hal::SetLastError(status,
-                    fmt::format("{} {} previously allocated.\n"
-                                "Location of the previous allocation:\n{}\n"
-                                "Location of the current allocation:",
-                                message, channel, previousAllocation));
+  wpi::hal::SetLastError(
+      status, fmt::format("{} {} previously allocated.\n"
+                          "Location of the previous allocation:\n{}\n"
+                          "Location of the current allocation:",
+                          message, channel, previousAllocation));
 }
 }  // namespace wpi::hal
 

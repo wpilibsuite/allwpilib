@@ -345,7 +345,8 @@ void Storage::EraseChildren() {
   });
 }
 
-static bool JsonArrayToStorage(Storage::Value* valuePtr, const wpi::util::json& jarr,
+static bool JsonArrayToStorage(Storage::Value* valuePtr,
+                               const wpi::util::json& jarr,
                                const char* filename) {
   auto& arr = jarr.get_ref<const wpi::util::json::array_t&>();
   if (arr.empty()) {

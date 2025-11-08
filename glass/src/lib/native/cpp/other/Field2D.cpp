@@ -48,9 +48,10 @@ enum DisplayUnits { kDisplayMeters = 0, kDisplayFeet, kDisplayInches };
 // Per-frame field data (not persistent)
 struct FieldFrameData {
   wpi::math::Translation2d GetPosFromScreen(const ImVec2& cursor) const {
-    return {
-        wpi::units::meter_t{(std::clamp(cursor.x, min.x, max.x) - min.x) / scale},
-        wpi::units::meter_t{(max.y - std::clamp(cursor.y, min.y, max.y)) / scale}};
+    return {wpi::units::meter_t{(std::clamp(cursor.x, min.x, max.x) - min.x) /
+                                scale},
+            wpi::units::meter_t{(max.y - std::clamp(cursor.y, min.y, max.y)) /
+                                scale}};
   }
   ImVec2 GetScreenFromPos(const wpi::math::Translation2d& pos) const {
     return {min.x + scale * pos.X().to<float>(),
@@ -94,7 +95,9 @@ class PopupState {
 
   SelectedTargetInfo* GetTarget() { return &m_target; }
   FieldObjectModel* GetInsertModel() { return m_insertModel; }
-  std::span<const wpi::math::Pose2d> GetInsertPoses() const { return m_insertPoses; }
+  std::span<const wpi::math::Pose2d> GetInsertPoses() const {
+    return m_insertPoses;
+  }
 
   void Display(Field2DModel* model, const FieldFrameData& ffd);
 
@@ -282,8 +285,9 @@ static double ConvertDisplayAngle(wpi::units::degree_t v) {
   return v.value();
 }
 
-static bool InputLength(const char* label, wpi::units::meter_t* v, double step = 0.0,
-                        double step_fast = 0.0, const char* format = "%.6f",
+static bool InputLength(const char* label, wpi::units::meter_t* v,
+                        double step = 0.0, double step_fast = 0.0,
+                        const char* format = "%.6f",
                         ImGuiInputTextFlags flags = 0) {
   double dv = ConvertDisplayLength(*v);
   if (ImGui::InputDouble(label, &dv, step, step_fast, format, flags)) {
@@ -316,8 +320,9 @@ static bool InputFloatLength(const char* label, float* v, double step = 0.0,
   return false;
 }
 
-static bool InputAngle(const char* label, wpi::units::degree_t* v, double step = 0.0,
-                       double step_fast = 0.0, const char* format = "%.6f",
+static bool InputAngle(const char* label, wpi::units::degree_t* v,
+                       double step = 0.0, double step_fast = 0.0,
+                       const char* format = "%.6f",
                        ImGuiInputTextFlags flags = 0) {
   double dv = ConvertDisplayAngle(*v);
   if (ImGui::InputDouble(label, &dv, step, step_fast, format, flags)) {
@@ -465,7 +470,8 @@ bool FieldInfo::LoadJson(std::span<const char> is, std::string_view filename) {
   try {
     image = j.at("field-image").get<std::string>();
   } catch (const wpi::util::json::exception& e) {
-    wpi::util::print(stderr, "GUI: JSON: could not read field-image: {}\n", e.what());
+    wpi::util::print(stderr, "GUI: JSON: could not read field-image: {}\n",
+                     e.what());
     return false;
   }
 
@@ -478,7 +484,7 @@ bool FieldInfo::LoadJson(std::span<const char> is, std::string_view filename) {
     right = j.at("field-corners").at("bottom-right").at(0).get<int>();
   } catch (const wpi::util::json::exception& e) {
     wpi::util::print(stderr, "GUI: JSON: could not read field-corners: {}\n",
-               e.what());
+                     e.what());
     return false;
   }
 
@@ -489,7 +495,8 @@ bool FieldInfo::LoadJson(std::span<const char> is, std::string_view filename) {
     width = j.at("field-size").at(0).get<float>();
     height = j.at("field-size").at(1).get<float>();
   } catch (const wpi::util::json::exception& e) {
-    wpi::util::print(stderr, "GUI: JSON: could not read field-size: {}\n", e.what());
+    wpi::util::print(stderr, "GUI: JSON: could not read field-size: {}\n",
+                     e.what());
     return false;
   }
 
@@ -498,7 +505,8 @@ bool FieldInfo::LoadJson(std::span<const char> is, std::string_view filename) {
   try {
     unit = j.at("field-unit").get<std::string>();
   } catch (const wpi::util::json::exception& e) {
-    wpi::util::print(stderr, "GUI: JSON: could not read field-unit: {}\n", e.what());
+    wpi::util::print(stderr, "GUI: JSON: could not read field-unit: {}\n",
+                     e.what());
     return false;
   }
 
@@ -513,9 +521,9 @@ bool FieldInfo::LoadJson(std::span<const char> is, std::string_view filename) {
   int fieldHeight = m_bottom - m_top;
   if (std::abs((fieldWidth / width) - (fieldHeight / height)) > 0.3) {
     wpi::util::print(stderr,
-               "GUI: Field X and Y scaling substantially different: "
-               "xscale={} yscale={}\n",
-               (fieldWidth / width), (fieldHeight / height));
+                     "GUI: Field X and Y scaling substantially different: "
+                     "xscale={} yscale={}\n",
+                     (fieldWidth / width), (fieldHeight / height));
   }
 
   if (!filename.empty()) {
@@ -772,8 +780,9 @@ bool ObjectInfo::LoadImageImpl(const std::string& fn) {
   return true;
 }
 
-PoseFrameData::PoseFrameData(const wpi::math::Pose2d& pose, FieldObjectModel& model,
-                             size_t index, const FieldFrameData& ffd,
+PoseFrameData::PoseFrameData(const wpi::math::Pose2d& pose,
+                             FieldObjectModel& model, size_t index,
+                             const FieldFrameData& ffd,
                              const DisplayOptions& displayOptions)
     : m_model{model},
       m_index{index},
@@ -1086,7 +1095,7 @@ void FieldDisplay::Display(FieldInfo* field, Field2DModel* model,
       if (target->corner != 1) {
         gDragState.initialAngle =
             wpi::units::radian_t{std::atan2(gDragState.initialOffset.y,
-                                       gDragState.initialOffset.x)} +
+                                            gDragState.initialOffset.x)} +
             target->rot;
       }
     }
@@ -1182,7 +1191,8 @@ void PopupState::Display(Field2DModel* model, const FieldFrameData& ffd) {
 void PopupState::DisplayTarget(Field2DModel* model, const FieldFrameData& ffd) {
   ImGui::Text("%s[%d]", m_target.name.c_str(),
               static_cast<int>(m_target.index));
-  wpi::math::Pose2d pose{ffd.GetPosFromScreen(m_target.poseCenter), m_target.rot};
+  wpi::math::Pose2d pose{ffd.GetPosFromScreen(m_target.poseCenter),
+                         m_target.rot};
   if (InputPose(&pose)) {
     m_target.poseCenter = ffd.GetScreenFromPos(pose.Translation());
     m_target.rot = pose.Rotation().Radians();
@@ -1277,7 +1287,8 @@ void PopupState::DisplayInsert(Field2DModel* model) {
   }
 }
 
-void wpi::glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
+void wpi::glass::DisplayField2D(Field2DModel* model,
+                                const ImVec2& contentSize) {
   auto& storage = GetStorage();
   auto field = storage.GetData<FieldInfo>();
   if (!field) {

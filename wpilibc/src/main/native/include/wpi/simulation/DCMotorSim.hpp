@@ -24,13 +24,14 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
    *
    * @param plant              The linear system representing the DC motor. This
    * system can be created with wpi::math::LinearSystemId::DCMotorSystem(). If
-   * wpi::math::LinearSystemId::DCMotorSystem(kV, kA) is used, the distance unit must be
-   * radians.
+   * wpi::math::LinearSystemId::DCMotorSystem(kV, kA) is used, the distance unit
+   * must be radians.
    * @param gearbox            The type of and number of motors in the DC motor
    * gearbox.
    * @param measurementStdDevs The standard deviation of the measurement noise.
    */
-  DCMotorSim(const wpi::math::LinearSystem<2, 1, 2>& plant, const wpi::math::DCMotor& gearbox,
+  DCMotorSim(const wpi::math::LinearSystem<2, 1, 2>& plant,
+             const wpi::math::DCMotor& gearbox,
              const std::array<double, 2>& measurementStdDevs = {0.0, 0.0});
 
   using LinearSystemSim::SetState;

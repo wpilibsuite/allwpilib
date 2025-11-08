@@ -84,7 +84,8 @@ class ExpansionHubServo {
    * @param minAngle Minimum angle
    * @param maxAngle Maximum angle
    */
-  void SetAngleRange(wpi::units::degree_t minAngle, wpi::units::degree_t maxAngle);
+  void SetAngleRange(wpi::units::degree_t minAngle,
+                     wpi::units::degree_t maxAngle);
 
   /**
    * Sets the PWM range for the servo.
@@ -95,7 +96,8 @@ class ExpansionHubServo {
    * @param minPwm Minimum PWM
    * @param maxPwm Maximum PWM
    */
-  void SetPWMRange(wpi::units::microsecond_t minPwm, wpi::units::microsecond_t maxPwm);
+  void SetPWMRange(wpi::units::microsecond_t minPwm,
+                   wpi::units::microsecond_t maxPwm);
 
   /**
    * Sets whether the servo is reversed.

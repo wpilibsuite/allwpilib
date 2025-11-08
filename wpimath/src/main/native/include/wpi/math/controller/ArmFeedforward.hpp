@@ -23,13 +23,13 @@ class WPILIB_DLLEXPORT ArmFeedforward {
  public:
   using Angle = wpi::units::radians;
   using Velocity = wpi::units::radians_per_second;
-  using Acceleration = wpi::units::compound_unit<wpi::units::radians_per_second,
-                                            wpi::units::inverse<wpi::units::second>>;
-  using kv_unit =
-      wpi::units::compound_unit<wpi::units::volts,
-                           wpi::units::inverse<wpi::units::radians_per_second>>;
-  using ka_unit =
-      wpi::units::compound_unit<wpi::units::volts, wpi::units::inverse<Acceleration>>;
+  using Acceleration =
+      wpi::units::compound_unit<wpi::units::radians_per_second,
+                                wpi::units::inverse<wpi::units::second>>;
+  using kv_unit = wpi::units::compound_unit<
+      wpi::units::volts, wpi::units::inverse<wpi::units::radians_per_second>>;
+  using ka_unit = wpi::units::compound_unit<wpi::units::volts,
+                                            wpi::units::inverse<Acceleration>>;
 
   /**
    * Creates a new ArmFeedforward with the specified gains.
@@ -44,7 +44,8 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    * @throws IllegalArgumentException for period &le; zero.
    */
   constexpr ArmFeedforward(
-      wpi::units::volt_t kS, wpi::units::volt_t kG, wpi::units::unit_t<kv_unit> kV,
+      wpi::units::volt_t kS, wpi::units::volt_t kG,
+      wpi::units::unit_t<kv_unit> kV,
       wpi::units::unit_t<ka_unit> kA = wpi::units::unit_t<ka_unit>(0),
       wpi::units::second_t dt = 20_ms)
       : kS(kS), kG(kG), kV(kV), kA(kA), m_dt(dt) {
@@ -104,9 +105,9 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    */
   [[deprecated("Use the current/next velocity overload instead.")]]
   wpi::units::volt_t Calculate(wpi::units::unit_t<Angle> currentAngle,
-                          wpi::units::unit_t<Velocity> currentVelocity,
-                          wpi::units::unit_t<Velocity> nextVelocity,
-                          wpi::units::second_t dt) const {
+                               wpi::units::unit_t<Velocity> currentVelocity,
+                               wpi::units::unit_t<Velocity> nextVelocity,
+                               wpi::units::second_t dt) const {
     return Calculate(currentAngle, currentVelocity, nextVelocity);
   }
 
@@ -141,8 +142,8 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    * @return The computed feedforward in volts.
    */
   wpi::units::volt_t Calculate(wpi::units::unit_t<Angle> currentAngle,
-                          wpi::units::unit_t<Velocity> currentVelocity,
-                          wpi::units::unit_t<Velocity> nextVelocity) const;
+                               wpi::units::unit_t<Velocity> currentVelocity,
+                               wpi::units::unit_t<Velocity> nextVelocity) const;
 
   // Rearranging the main equation from the calculate() method yields the
   // formulas for the methods below:

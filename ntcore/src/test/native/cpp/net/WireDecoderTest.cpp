@@ -108,17 +108,19 @@ TEST_F(WireDecodeTextClientTest, ErrorUnknownMethod) {
 }
 
 TEST_F(WireDecodeTextClientTest, PublishPropsEmpty) {
-  EXPECT_CALL(handler, ClientPublish(5, std::string_view{"test"},
-                                     std::string_view{"double"},
-                                     wpi::util::json::object(), PubSubOptionsEq({})));
+  EXPECT_CALL(
+      handler,
+      ClientPublish(5, std::string_view{"test"}, std::string_view{"double"},
+                    wpi::util::json::object(), PubSubOptionsEq({})));
   net::WireDecodeText(
       "[{\"method\":\"publish\",\"params\":{"
       "\"name\":\"test\",\"properties\":{},\"pubuid\":5,\"type\":\"double\"}}]",
       handler, logger);
 
-  EXPECT_CALL(handler, ClientPublish(5, std::string_view{"test"},
-                                     std::string_view{"double"},
-                                     wpi::util::json::object(), PubSubOptionsEq({})));
+  EXPECT_CALL(
+      handler,
+      ClientPublish(5, std::string_view{"test"}, std::string_view{"double"},
+                    wpi::util::json::object(), PubSubOptionsEq({})));
   net::WireDecodeText(
       "[{\"method\":\"publish\",\"params\":{"
       "\"name\":\"test\",\"pubuid\":5,\"type\":\"double\"}}]",

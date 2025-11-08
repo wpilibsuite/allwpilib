@@ -47,8 +47,8 @@ static wpi::math::Transform3d MakePose(const apriltag_pose_t& pose) {
     return {};
   }
   return {wpi::math::Translation3d{wpi::units::meter_t{pose.t->data[0]},
-                        wpi::units::meter_t{pose.t->data[1]},
-                        wpi::units::meter_t{pose.t->data[2]}},
+                                   wpi::units::meter_t{pose.t->data[1]},
+                                   wpi::units::meter_t{pose.t->data[2]}},
           wpi::math::Rotation3d{OrthogonalizeRotationMatrix(
               Eigen::Map<Eigen::Matrix<double, 3, 3, Eigen::RowMajor>>{
                   pose.R->data})}};
@@ -130,8 +130,9 @@ AprilTagPoseEstimate AprilTagPoseEstimator::EstimateOrthogonalIteration(
   return rv;
 }
 
-static wpi::math::Transform3d DoEstimate(const apriltag_detection_t* detection,
-                              const AprilTagPoseEstimator::Config& config) {
+static wpi::math::Transform3d DoEstimate(
+    const apriltag_detection_t* detection,
+    const AprilTagPoseEstimator::Config& config) {
   auto info = MakeDetectionInfo(detection, config);
   apriltag_pose_t pose;
   estimate_tag_pose(&info, &pose);

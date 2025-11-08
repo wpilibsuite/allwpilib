@@ -338,7 +338,8 @@ class UnpackCallback
    * Constructs an UnpackCallback.
    */
   UnpackCallback()
-      : DirectUnpackCallback<T, wpi::util::SmallVector<T, N>, N>{m_storedBuffer} {
+      : DirectUnpackCallback<T, wpi::util::SmallVector<T, N>, N>{
+            m_storedBuffer} {
     this->SetLimits(DecodeLimits::Ignore);
   }
 

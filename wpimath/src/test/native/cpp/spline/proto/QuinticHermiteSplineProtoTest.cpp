@@ -12,10 +12,11 @@ using namespace wpi::math;
 struct QuinticHermiteSplineProtoTestData {
   using Type = QuinticHermiteSpline;
 
-  inline static const Type kTestData{wpi::util::array<double, 3>{{0.01, 0.02, 0.03}},
-                                     wpi::util::array<double, 3>{{0.04, 0.05, 0.06}},
-                                     wpi::util::array<double, 3>{{0.07, 0.08, 0.09}},
-                                     wpi::util::array<double, 3>{{0.10, 0.11, 0.11}}};
+  inline static const Type kTestData{
+      wpi::util::array<double, 3>{{0.01, 0.02, 0.03}},
+      wpi::util::array<double, 3>{{0.04, 0.05, 0.06}},
+      wpi::util::array<double, 3>{{0.07, 0.08, 0.09}},
+      wpi::util::array<double, 3>{{0.10, 0.11, 0.11}}};
 
   static void CheckEq(const Type& testData, const Type& data) {
     EXPECT_EQ(testData.GetInitialControlVector().x,

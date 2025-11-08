@@ -53,8 +53,8 @@ class WPILIB_DLLEXPORT Pose3d {
    * @param z The z component of the translational component of the pose.
    * @param rotation The rotational component of the pose.
    */
-  constexpr Pose3d(wpi::units::meter_t x, wpi::units::meter_t y, wpi::units::meter_t z,
-                   Rotation3d rotation)
+  constexpr Pose3d(wpi::units::meter_t x, wpi::units::meter_t y,
+                   wpi::units::meter_t z, Rotation3d rotation)
       : m_translation{x, y, z}, m_rotation{std::move(rotation)} {}
 
   /**

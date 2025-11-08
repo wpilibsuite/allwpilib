@@ -38,8 +38,9 @@ namespace wpi::units {
  * @sa See unit_t for more information on unit type containers.
  */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_ANGLE_UNITS)
-UNIT_ADD_WITH_METRIC_PREFIXES(angle, radian, radians, rad,
-                              unit<std::ratio<1>, wpi::units::category::angle_unit>)
+UNIT_ADD_WITH_METRIC_PREFIXES(
+    angle, radian, radians, rad,
+    unit<std::ratio<1>, wpi::units::category::angle_unit>)
 UNIT_ADD(angle, degree, degrees, deg,
          unit<std::ratio<1, 180>, radians, std::ratio<1>>)
 UNIT_ADD(angle, arcminute, arcminutes, arcmin, unit<std::ratio<1, 60>, degrees>)

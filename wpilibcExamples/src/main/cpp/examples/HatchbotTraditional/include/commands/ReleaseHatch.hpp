@@ -16,7 +16,8 @@
  *
  * @see InstantCommand
  */
-class ReleaseHatch : public wpi::cmd::CommandHelper<wpi::cmd::Command, ReleaseHatch> {
+class ReleaseHatch
+    : public wpi::cmd::CommandHelper<wpi::cmd::Command, ReleaseHatch> {
  public:
   explicit ReleaseHatch(HatchSubsystem* subsystem);
 

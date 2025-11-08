@@ -20,7 +20,9 @@ class NetworkButtonTest : public CommandTestBase {
     inst.StartLocal();
   }
 
-  ~NetworkButtonTest() override { wpi::nt::NetworkTableInstance::Destroy(inst); }
+  ~NetworkButtonTest() override {
+    wpi::nt::NetworkTableInstance::Destroy(inst);
+  }
 
   wpi::nt::NetworkTableInstance inst;
 };

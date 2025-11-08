@@ -138,7 +138,8 @@ class DIOsSimModel : public wpi::glass::DIOsModel {
   bool Exists() override { return true; }
 
   void ForEachDIO(
-      wpi::util::function_ref<void(wpi::glass::DIOModel& model, int index)> func) override;
+      wpi::util::function_ref<void(wpi::glass::DIOModel& model, int index)>
+          func) override;
 
  private:
   // indexed by channel
@@ -210,7 +211,8 @@ void DIOsSimModel::Update() {
 }
 
 void DIOsSimModel::ForEachDIO(
-    wpi::util::function_ref<void(wpi::glass::DIOModel& model, int index)> func) {
+    wpi::util::function_ref<void(wpi::glass::DIOModel& model, int index)>
+        func) {
   const int32_t numDIO = m_dioModels.size();
   for (int32_t i = 0; i < numDIO; ++i) {
     if (auto model = m_dioModels[i].get()) {
@@ -237,7 +239,7 @@ void DIOSimGui::Initialize() {
         win->SetDefaultPos(470, 20);
         return wpi::glass::MakeFunctionView([=] {
           wpi::glass::DisplayDIOs(static_cast<DIOsSimModel*>(model),
-                             HALSimGui::halProvider->AreOutputsEnabled());
+                                  HALSimGui::halProvider->AreOutputsEnabled());
         });
       });
 }

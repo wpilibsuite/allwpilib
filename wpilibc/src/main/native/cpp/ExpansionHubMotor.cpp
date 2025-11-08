@@ -21,10 +21,11 @@ ExpansionHubMotor::ExpansionHubMotor(int usbId, int channel)
       m_velocityPidConstants{usbId, channel, true},
       m_positionPidConstants{usbId, channel, false} {
   WPILIB_AssertMessage(channel >= 0 && channel < ExpansionHub::NumMotorPorts,
-                    "ExHub Motor Channel {} out of range", channel);
+                       "ExHub Motor Channel {} out of range", channel);
 
   if (!m_hub.CheckAndReserveMotor(channel)) {
-    throw WPILIB_MakeError(err::ResourceAlreadyAllocated, "Channel {}", channel);
+    throw WPILIB_MakeError(err::ResourceAlreadyAllocated, "Channel {}",
+                           channel);
   }
 
   m_hub.ReportUsage(fmt::format("ExHubServo[{}]", channel), "ExHubServo");
@@ -154,7 +155,7 @@ ExpansionHubPidConstants& ExpansionHubMotor::GetPositionPidConstants() {
 void ExpansionHubMotor::Follow(const ExpansionHubMotor& leader) {
   if (m_hub.GetUsbId() != leader.m_hub.GetUsbId()) {
     throw WPILIB_MakeError(err::InvalidParameter,
-                        "Cannot follow motor on different hub");
+                           "Cannot follow motor on different hub");
   }
   m_modePublisher.Set(kFollowerMode);
   m_setpointPublisher.Set(leader.m_channel);

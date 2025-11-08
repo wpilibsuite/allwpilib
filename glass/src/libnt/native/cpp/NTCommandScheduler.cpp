@@ -13,10 +13,11 @@
 using namespace wpi::glass;
 
 NTCommandSchedulerModel::NTCommandSchedulerModel(std::string_view path)
-    : NTCommandSchedulerModel(wpi::nt::NetworkTableInstance::GetDefault(), path) {}
+    : NTCommandSchedulerModel(wpi::nt::NetworkTableInstance::GetDefault(),
+                              path) {}
 
-NTCommandSchedulerModel::NTCommandSchedulerModel(wpi::nt::NetworkTableInstance inst,
-                                                 std::string_view path)
+NTCommandSchedulerModel::NTCommandSchedulerModel(
+    wpi::nt::NetworkTableInstance inst, std::string_view path)
     : m_inst{inst},
       m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
       m_commands{inst.GetStringArrayTopic(fmt::format("{}/Names", path))

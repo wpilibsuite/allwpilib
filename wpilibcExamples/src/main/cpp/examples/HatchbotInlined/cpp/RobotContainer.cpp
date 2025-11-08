@@ -42,7 +42,8 @@ void RobotContainer::ConfigureButtonBindings() {
   // While holding R1, drive at half speed
   m_driverController.R1()
       .OnTrue(wpi::cmd::cmd::RunOnce([this] { m_drive.SetMaxOutput(0.5); }, {}))
-      .OnFalse(wpi::cmd::cmd::RunOnce([this] { m_drive.SetMaxOutput(1.0); }, {}));
+      .OnFalse(
+          wpi::cmd::cmd::RunOnce([this] { m_drive.SetMaxOutput(1.0); }, {}));
 }
 
 wpi::cmd::Command* RobotContainer::GetAutonomousCommand() {

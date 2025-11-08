@@ -16,7 +16,8 @@ TEST(ChassisSpeedsTest, Discretize) {
   constexpr wpi::units::second_t dt = 10_ms;
 
   const auto speeds = target.Discretize(duration);
-  const wpi::math::Twist2d twist{speeds.vx * dt, speeds.vy * dt, speeds.omega * dt};
+  const wpi::math::Twist2d twist{speeds.vx * dt, speeds.vy * dt,
+                                 speeds.omega * dt};
 
   wpi::math::Pose2d pose;
   for (wpi::units::second_t time = 0_s; time < duration; time += dt) {
@@ -41,7 +42,8 @@ TEST(ChassisSpeedsTest, ToRobotRelative) {
 
 TEST(ChassisSpeedsTest, ToFieldRelative) {
   const auto chassisSpeeds =
-      wpi::math::ChassisSpeeds{1_mps, 0_mps, 0.5_rad_per_s}.ToFieldRelative(45.0_deg);
+      wpi::math::ChassisSpeeds{1_mps, 0_mps, 0.5_rad_per_s}.ToFieldRelative(
+          45.0_deg);
 
   EXPECT_NEAR(1.0 / std::sqrt(2.0), chassisSpeeds.vx.value(), kEpsilon);
   EXPECT_NEAR(1.0 / std::sqrt(2.0), chassisSpeeds.vy.value(), kEpsilon);

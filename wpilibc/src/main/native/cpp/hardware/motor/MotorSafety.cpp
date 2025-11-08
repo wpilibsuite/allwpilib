@@ -158,18 +158,20 @@ void MotorSafety::Check() {
   }
 
   if (stopTime < Timer::GetFPGATimestamp()) {
-    WPILIB_ReportError(err::Timeout,
-                    "{}... Output not updated often enough. See "
-                    "https://docs.wpilib.org/motorsafety for more information.",
-                    GetDescription());
+    WPILIB_ReportError(
+        err::Timeout,
+        "{}... Output not updated often enough. See "
+        "https://docs.wpilib.org/motorsafety for more information.",
+        GetDescription());
 
     try {
       StopMotor();
     } catch (wpi::RuntimeError& e) {
       e.Report();
     } catch (std::exception& e) {
-      WPILIB_ReportError(err::Error, "{} StopMotor threw unexpected exception: {}",
-                      GetDescription(), e.what());
+      WPILIB_ReportError(err::Error,
+                         "{} StopMotor threw unexpected exception: {}",
+                         GetDescription(), e.what());
     }
   }
 }

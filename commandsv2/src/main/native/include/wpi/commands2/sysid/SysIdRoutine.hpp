@@ -16,8 +16,8 @@
 
 namespace wpi::cmd::sysid {
 
-using ramp_rate_t = wpi::units::unit_t<
-    wpi::units::compound_unit<wpi::units::volt, wpi::units::inverse<wpi::units::second>>>;
+using ramp_rate_t = wpi::units::unit_t<wpi::units::compound_unit<
+    wpi::units::volt, wpi::units::inverse<wpi::units::second>>>;
 
 /** Hardware-independent configuration for a SysId test routine. */
 class Config {

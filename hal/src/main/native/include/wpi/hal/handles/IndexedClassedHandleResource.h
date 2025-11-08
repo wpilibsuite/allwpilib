@@ -72,7 +72,8 @@ IndexedClassedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
     return HAL_kInvalidHandle;
   }
   m_structures[index] = toSet;
-  return static_cast<THandle>(wpi::hal::createHandle(index, enumValue, m_version));
+  return static_cast<THandle>(
+      wpi::hal::createHandle(index, enumValue, m_version));
 }
 
 template <typename THandle, typename TStruct, int16_t size,

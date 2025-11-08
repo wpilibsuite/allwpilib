@@ -85,7 +85,9 @@ class DataLogReaderThread {
     return it->second;
   }
 
-  wpi::util::StructDescriptorDatabase& GetStructDatabase() { return m_structDb; }
+  wpi::util::StructDescriptorDatabase& GetStructDatabase() {
+    return m_structDb;
+  }
   upb_DefPool* GetProtobufDatabase() { return m_protoPool; }
   upb_Arena* GetProtobufArena() { return m_arena; }
 

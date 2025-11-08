@@ -54,34 +54,34 @@ class UrlParser {
 
   std::string_view GetSchema() const {
     return wpi::util::substr(m_data, m_url.field_data[UF_SCHEMA].off,
-                       m_url.field_data[UF_SCHEMA].len);
+                             m_url.field_data[UF_SCHEMA].len);
   }
 
   std::string_view GetHost() const {
     return wpi::util::substr(m_data, m_url.field_data[UF_HOST].off,
-                       m_url.field_data[UF_HOST].len);
+                             m_url.field_data[UF_HOST].len);
   }
 
   unsigned int GetPort() const { return m_url.port; }
 
   std::string_view GetPath() const {
     return wpi::util::substr(m_data, m_url.field_data[UF_PATH].off,
-                       m_url.field_data[UF_PATH].len);
+                             m_url.field_data[UF_PATH].len);
   }
 
   std::string_view GetQuery() const {
     return wpi::util::substr(m_data, m_url.field_data[UF_QUERY].off,
-                       m_url.field_data[UF_QUERY].len);
+                             m_url.field_data[UF_QUERY].len);
   }
 
   std::string_view GetFragment() const {
     return wpi::util::substr(m_data, m_url.field_data[UF_FRAGMENT].off,
-                       m_url.field_data[UF_FRAGMENT].len);
+                             m_url.field_data[UF_FRAGMENT].len);
   }
 
   std::string_view GetUserInfo() const {
     return wpi::util::substr(m_data, m_url.field_data[UF_USERINFO].off,
-                       m_url.field_data[UF_USERINFO].len);
+                             m_url.field_data[UF_USERINFO].len);
   }
 
  private:

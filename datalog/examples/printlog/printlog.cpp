@@ -23,7 +23,7 @@ int main(int argc, const char** argv) {
   auto fileBuffer = wpi::util::MemoryBuffer::GetFile(argv[1]);
   if (!fileBuffer) {
     wpi::util::print(stderr, "could not open file: {}\n",
-               fileBuffer.error().message());
+                     fileBuffer.error().message());
     return EXIT_FAILURE;
   }
   wpi::log::DataLogReader reader{std::move(*fileBuffer)};
@@ -37,9 +37,10 @@ int main(int argc, const char** argv) {
     if (record.IsStart()) {
       wpi::log::StartRecordData data;
       if (record.GetStartData(&data)) {
-        wpi::util::print("Start({}, name='{}', type='{}', metadata='{}') [{}]\n",
-                   data.entry, data.name, data.type, data.metadata,
-                   record.GetTimestamp() / 1000000.0);
+        wpi::util::print(
+            "Start({}, name='{}', type='{}', metadata='{}') [{}]\n", data.entry,
+            data.name, data.type, data.metadata,
+            record.GetTimestamp() / 1000000.0);
         if (entries.find(data.entry) != entries.end()) {
           wpi::util::print("...DUPLICATE entry ID, overriding\n");
         }
@@ -51,7 +52,7 @@ int main(int argc, const char** argv) {
       int entry;
       if (record.GetFinishEntry(&entry)) {
         wpi::util::print("Finish({}) [{}]\n", entry,
-                   record.GetTimestamp() / 1000000.0);
+                         record.GetTimestamp() / 1000000.0);
         auto it = entries.find(entry);
         if (it == entries.end()) {
           wpi::util::print("...ID not found\n");
@@ -64,8 +65,8 @@ int main(int argc, const char** argv) {
     } else if (record.IsSetMetadata()) {
       wpi::log::MetadataRecordData data;
       if (record.GetSetMetadataData(&data)) {
-        wpi::util::print("SetMetadata({}, '{}') [{}]\n", data.entry, data.metadata,
-                   record.GetTimestamp() / 1000000.0);
+        wpi::util::print("SetMetadata({}, '{}') [{}]\n", data.entry,
+                         data.metadata, record.GetTimestamp() / 1000000.0);
         auto it = entries.find(data.entry);
         if (it == entries.end()) {
           wpi::util::print("...ID not found\n");
@@ -78,14 +79,15 @@ int main(int argc, const char** argv) {
     } else if (record.IsControl()) {
       wpi::util::print("Unrecognized control record\n");
     } else {
-      wpi::util::print("Data({}, size={}) ", record.GetEntry(), record.GetSize());
+      wpi::util::print("Data({}, size={}) ", record.GetEntry(),
+                       record.GetSize());
       auto entry = entries.find(record.GetEntry());
       if (entry == entries.end()) {
         wpi::util::print("<ID not found>\n");
         continue;
       }
       wpi::util::print("<name='{}', type='{}'> [{}]\n", entry->second.name,
-                 entry->second.type, record.GetTimestamp() / 1000000.0);
+                       entry->second.type, record.GetTimestamp() / 1000000.0);
 
       // handle systemTime specially
       if (entry->second.name == "systemTime" && entry->second.type == "int64") {
@@ -93,7 +95,7 @@ int main(int argc, const char** argv) {
         if (record.GetInteger(&val)) {
           std::time_t timeval = val / 1000000;
           wpi::util::print("  {:%Y-%m-%d %H:%M:%S}.{:06}\n",
-                     *std::localtime(&timeval), val % 1000000);
+                           *std::localtime(&timeval), val % 1000000);
         } else {
           wpi::util::print("  invalid\n");
         }

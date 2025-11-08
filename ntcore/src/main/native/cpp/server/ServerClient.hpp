@@ -23,7 +23,7 @@ namespace wpi::util {
 class Logger;
 template <typename T>
 class SmallVectorImpl;
-}  // namespace wpi
+}  // namespace wpi::util
 
 namespace wpi::nt::server {
 
@@ -55,7 +55,8 @@ class ServerClient {
                          net::ValueSendMode mode) = 0;
   virtual void SendAnnounce(ServerTopic* topic, std::optional<int> pubuid) = 0;
   virtual void SendUnannounce(ServerTopic* topic) = 0;
-  virtual void SendPropertiesUpdate(ServerTopic* topic, const wpi::util::json& update,
+  virtual void SendPropertiesUpdate(ServerTopic* topic,
+                                    const wpi::util::json& update,
                                     bool ack) = 0;
   virtual void SendOutgoing(uint64_t curTimeMs, bool flush) = 0;
   virtual void Flush() = 0;

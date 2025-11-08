@@ -57,9 +57,12 @@ class Color8Bit {
    */
   explicit constexpr Color8Bit(std::string_view hexString) {
     if (hexString.length() != 7 || !hexString.starts_with("#") ||
-        !wpi::util::isHexDigit(hexString[1]) || !wpi::util::isHexDigit(hexString[2]) ||
-        !wpi::util::isHexDigit(hexString[3]) || !wpi::util::isHexDigit(hexString[4]) ||
-        !wpi::util::isHexDigit(hexString[5]) || !wpi::util::isHexDigit(hexString[6])) {
+        !wpi::util::isHexDigit(hexString[1]) ||
+        !wpi::util::isHexDigit(hexString[2]) ||
+        !wpi::util::isHexDigit(hexString[3]) ||
+        !wpi::util::isHexDigit(hexString[4]) ||
+        !wpi::util::isHexDigit(hexString[5]) ||
+        !wpi::util::isHexDigit(hexString[6])) {
       throw std::invalid_argument(
           fmt::format("Invalid hex string for Color \"{}\"", hexString));
     }
@@ -87,9 +90,12 @@ class Color8Bit {
    */
   static constexpr Color8Bit FromHexString(std::string_view hexString) {
     if (hexString.length() != 7 || !hexString.starts_with("#") ||
-        !wpi::util::isHexDigit(hexString[1]) || !wpi::util::isHexDigit(hexString[2]) ||
-        !wpi::util::isHexDigit(hexString[3]) || !wpi::util::isHexDigit(hexString[4]) ||
-        !wpi::util::isHexDigit(hexString[5]) || !wpi::util::isHexDigit(hexString[6])) {
+        !wpi::util::isHexDigit(hexString[1]) ||
+        !wpi::util::isHexDigit(hexString[2]) ||
+        !wpi::util::isHexDigit(hexString[3]) ||
+        !wpi::util::isHexDigit(hexString[4]) ||
+        !wpi::util::isHexDigit(hexString[5]) ||
+        !wpi::util::isHexDigit(hexString[6])) {
       throw std::invalid_argument(
           fmt::format("Invalid hex string for Color \"{}\"", hexString));
     }

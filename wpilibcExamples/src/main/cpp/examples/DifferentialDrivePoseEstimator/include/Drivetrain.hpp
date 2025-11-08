@@ -106,9 +106,9 @@ class Drivetrain {
    * @param cameraToObjectEntry The networktables entry publishing and querying
    * example computer vision measurements.
    */
-  wpi::math::Pose3d ObjectToRobotPose(wpi::math::Pose3d objectInField,
-                                wpi::math::Transform3d robotToCamera,
-                                wpi::nt::DoubleArrayEntry& cameraToObjectEntry);
+  wpi::math::Pose3d ObjectToRobotPose(
+      wpi::math::Pose3d objectInField, wpi::math::Transform3d robotToCamera,
+      wpi::nt::DoubleArrayEntry& cameraToObjectEntry);
 
  private:
   static constexpr wpi::units::meter_t kTrackwidth = 0.381_m * 2;
@@ -120,9 +120,11 @@ class Drivetrain {
 
   wpi::math::Transform3d m_robotToCamera{
       wpi::math::Translation3d{1_m, 1_m, 1_m},
-      wpi::math::Rotation3d{0_rad, 0_rad, wpi::units::radian_t{std::numbers::pi / 2}}};
+      wpi::math::Rotation3d{0_rad, 0_rad,
+                            wpi::units::radian_t{std::numbers::pi / 2}}};
 
-  wpi::nt::NetworkTableInstance m_inst{wpi::nt::NetworkTableInstance::GetDefault()};
+  wpi::nt::NetworkTableInstance m_inst{
+      wpi::nt::NetworkTableInstance::GetDefault()};
   wpi::nt::DoubleArrayTopic m_cameraToObjectTopic{
       m_inst.GetDoubleArrayTopic("m_cameraToObjectTopic")};
   wpi::nt::DoubleArrayEntry m_cameraToObjectEntry =
@@ -130,8 +132,10 @@ class Drivetrain {
   wpi::nt::DoubleArrayEntry& m_cameraToObjectEntryRef = m_cameraToObjectEntry;
 
   wpi::apriltag::AprilTagFieldLayout m_aprilTagFieldLayout{
-      wpi::apriltag::AprilTagFieldLayout::LoadField(wpi::apriltag::AprilTagField::k2024Crescendo)};
-  wpi::math::Pose3d m_objectInField{m_aprilTagFieldLayout.GetTagPose(0).value()};
+      wpi::apriltag::AprilTagFieldLayout::LoadField(
+          wpi::apriltag::AprilTagField::k2024Crescendo)};
+  wpi::math::Pose3d m_objectInField{
+      m_aprilTagFieldLayout.GetTagPose(0).value()};
 
   wpi::PWMSparkMax m_leftLeader{1};
   wpi::PWMSparkMax m_leftFollower{2};
@@ -161,7 +165,8 @@ class Drivetrain {
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
-  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_feedforward{1_V, 3_V / 1_mps};
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_feedforward{
+      1_V, 3_V / 1_mps};
 
   // Simulation classes
   wpi::sim::EncoderSim m_leftEncoderSim{m_leftEncoder};

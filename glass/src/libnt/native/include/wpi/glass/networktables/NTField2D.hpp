@@ -37,9 +37,9 @@ class NTField2DModel : public Field2DModel {
 
   FieldObjectModel* AddFieldObject(std::string_view name) override;
   void RemoveFieldObject(std::string_view name) override;
-  void ForEachFieldObject(
-      wpi::util::function_ref<void(FieldObjectModel& model, std::string_view name)>
-          func) override;
+  void ForEachFieldObject(wpi::util::function_ref<void(FieldObjectModel& model,
+                                                       std::string_view name)>
+                              func) override;
 
  private:
   std::string m_path;

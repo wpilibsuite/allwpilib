@@ -15,56 +15,72 @@
 #include "wpi/util/print.hpp"
 
 // 2x1
-extern template wpi::util::expected<Eigen::Matrix<double, 2, 2>, wpi::math::DAREError>
+extern template wpi::util::expected<Eigen::Matrix<double, 2, 2>,
+                                    wpi::math::DAREError>
 wpi::math::DARE<2, 1>(const Eigen::Matrix<double, 2, 2>& A,
-                const Eigen::Matrix<double, 2, 1>& B,
-                const Eigen::Matrix<double, 2, 2>& Q,
-                const Eigen::Matrix<double, 1, 1>& R, bool checkPreconditions);
-extern template wpi::util::expected<Eigen::Matrix<double, 2, 2>, wpi::math::DAREError>
+                      const Eigen::Matrix<double, 2, 1>& B,
+                      const Eigen::Matrix<double, 2, 2>& Q,
+                      const Eigen::Matrix<double, 1, 1>& R,
+                      bool checkPreconditions);
+extern template wpi::util::expected<Eigen::Matrix<double, 2, 2>,
+                                    wpi::math::DAREError>
 wpi::math::DARE<2, 1>(const Eigen::Matrix<double, 2, 2>& A,
-                const Eigen::Matrix<double, 2, 1>& B,
-                const Eigen::Matrix<double, 2, 2>& Q,
-                const Eigen::Matrix<double, 1, 1>& R,
-                const Eigen::Matrix<double, 2, 1>& N, bool checkPreconditions);
+                      const Eigen::Matrix<double, 2, 1>& B,
+                      const Eigen::Matrix<double, 2, 2>& Q,
+                      const Eigen::Matrix<double, 1, 1>& R,
+                      const Eigen::Matrix<double, 2, 1>& N,
+                      bool checkPreconditions);
 
 // 4x1
-extern template wpi::util::expected<Eigen::Matrix<double, 4, 4>, wpi::math::DAREError>
+extern template wpi::util::expected<Eigen::Matrix<double, 4, 4>,
+                                    wpi::math::DAREError>
 wpi::math::DARE<4, 1>(const Eigen::Matrix<double, 4, 4>& A,
-                const Eigen::Matrix<double, 4, 1>& B,
-                const Eigen::Matrix<double, 4, 4>& Q,
-                const Eigen::Matrix<double, 1, 1>& R, bool checkPreconditions);
-extern template wpi::util::expected<Eigen::Matrix<double, 4, 4>, wpi::math::DAREError>
+                      const Eigen::Matrix<double, 4, 1>& B,
+                      const Eigen::Matrix<double, 4, 4>& Q,
+                      const Eigen::Matrix<double, 1, 1>& R,
+                      bool checkPreconditions);
+extern template wpi::util::expected<Eigen::Matrix<double, 4, 4>,
+                                    wpi::math::DAREError>
 wpi::math::DARE<4, 1>(const Eigen::Matrix<double, 4, 4>& A,
-                const Eigen::Matrix<double, 4, 1>& B,
-                const Eigen::Matrix<double, 4, 4>& Q,
-                const Eigen::Matrix<double, 1, 1>& R,
-                const Eigen::Matrix<double, 4, 1>& N, bool checkPreconditions);
+                      const Eigen::Matrix<double, 4, 1>& B,
+                      const Eigen::Matrix<double, 4, 4>& Q,
+                      const Eigen::Matrix<double, 1, 1>& R,
+                      const Eigen::Matrix<double, 4, 1>& N,
+                      bool checkPreconditions);
 
 // 2x2
-extern template wpi::util::expected<Eigen::Matrix<double, 2, 2>, wpi::math::DAREError>
+extern template wpi::util::expected<Eigen::Matrix<double, 2, 2>,
+                                    wpi::math::DAREError>
 wpi::math::DARE<2, 2>(const Eigen::Matrix<double, 2, 2>& A,
-                const Eigen::Matrix<double, 2, 2>& B,
-                const Eigen::Matrix<double, 2, 2>& Q,
-                const Eigen::Matrix<double, 2, 2>& R, bool checkPreconditions);
-extern template wpi::util::expected<Eigen::Matrix<double, 2, 2>, wpi::math::DAREError>
+                      const Eigen::Matrix<double, 2, 2>& B,
+                      const Eigen::Matrix<double, 2, 2>& Q,
+                      const Eigen::Matrix<double, 2, 2>& R,
+                      bool checkPreconditions);
+extern template wpi::util::expected<Eigen::Matrix<double, 2, 2>,
+                                    wpi::math::DAREError>
 wpi::math::DARE<2, 2>(const Eigen::Matrix<double, 2, 2>& A,
-                const Eigen::Matrix<double, 2, 2>& B,
-                const Eigen::Matrix<double, 2, 2>& Q,
-                const Eigen::Matrix<double, 2, 2>& R,
-                const Eigen::Matrix<double, 2, 2>& N, bool checkPreconditions);
+                      const Eigen::Matrix<double, 2, 2>& B,
+                      const Eigen::Matrix<double, 2, 2>& Q,
+                      const Eigen::Matrix<double, 2, 2>& R,
+                      const Eigen::Matrix<double, 2, 2>& N,
+                      bool checkPreconditions);
 
 // 2x3
-extern template wpi::util::expected<Eigen::Matrix<double, 2, 2>, wpi::math::DAREError>
+extern template wpi::util::expected<Eigen::Matrix<double, 2, 2>,
+                                    wpi::math::DAREError>
 wpi::math::DARE<2, 3>(const Eigen::Matrix<double, 2, 2>& A,
-                const Eigen::Matrix<double, 2, 3>& B,
-                const Eigen::Matrix<double, 2, 2>& Q,
-                const Eigen::Matrix<double, 3, 3>& R, bool checkPreconditions);
-extern template wpi::util::expected<Eigen::Matrix<double, 2, 2>, wpi::math::DAREError>
+                      const Eigen::Matrix<double, 2, 3>& B,
+                      const Eigen::Matrix<double, 2, 2>& Q,
+                      const Eigen::Matrix<double, 3, 3>& R,
+                      bool checkPreconditions);
+extern template wpi::util::expected<Eigen::Matrix<double, 2, 2>,
+                                    wpi::math::DAREError>
 wpi::math::DARE<2, 3>(const Eigen::Matrix<double, 2, 2>& A,
-                const Eigen::Matrix<double, 2, 3>& B,
-                const Eigen::Matrix<double, 2, 2>& Q,
-                const Eigen::Matrix<double, 3, 3>& R,
-                const Eigen::Matrix<double, 2, 3>& N, bool checkPreconditions);
+                      const Eigen::Matrix<double, 2, 3>& B,
+                      const Eigen::Matrix<double, 2, 2>& Q,
+                      const Eigen::Matrix<double, 3, 3>& R,
+                      const Eigen::Matrix<double, 2, 3>& N,
+                      bool checkPreconditions);
 
 void ExpectMatrixEqual(const Eigen::MatrixXd& lhs, const Eigen::MatrixXd& rhs,
                        double tolerance) {
@@ -134,7 +150,8 @@ TEST(DARETest, NonInvertibleA_ABQR) {
   wpi::math::Matrixd<4, 4> A{
       {0.5, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}, {0, 0, 0, 0}};
   wpi::math::Matrixd<4, 1> B{{0}, {0}, {0}, {1}};
-  wpi::math::Matrixd<4, 4> Q{{1, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
+  wpi::math::Matrixd<4, 4> Q{
+      {1, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
   wpi::math::Matrixd<1, 1> R{0.25};
 
   auto ret = wpi::math::DARE<4, 1>(A, B, Q, R);
@@ -153,7 +170,8 @@ TEST(DARETest, NonInvertibleA_ABQRN) {
   wpi::math::Matrixd<4, 4> A{
       {0.5, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}, {0, 0, 0, 0}};
   wpi::math::Matrixd<4, 1> B{{0}, {0}, {0}, {1}};
-  wpi::math::Matrixd<4, 4> Q{{1, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
+  wpi::math::Matrixd<4, 4> Q{
+      {1, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
   wpi::math::Matrixd<1, 1> R{0.25};
 
   wpi::math::Matrixd<4, 4> Aref{

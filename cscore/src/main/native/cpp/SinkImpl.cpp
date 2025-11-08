@@ -113,7 +113,8 @@ std::string SinkImpl::GetError() const {
   return std::string{m_source->GetCurFrame().GetError()};
 }
 
-std::string_view SinkImpl::GetError(wpi::util::SmallVectorImpl<char>& buf) const {
+std::string_view SinkImpl::GetError(
+    wpi::util::SmallVectorImpl<char>& buf) const {
   std::scoped_lock lock(m_mutex);
   if (!m_source) {
     return "no source connected";
@@ -221,7 +222,8 @@ std::string GetSinkError(CS_Sink sink, CS_Status* status) {
   return data->sink->GetError();
 }
 
-std::string_view GetSinkError(CS_Sink sink, wpi::util::SmallVectorImpl<char>& buf,
+std::string_view GetSinkError(CS_Sink sink,
+                              wpi::util::SmallVectorImpl<char>& buf,
                               CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data || (data->kind & SinkMask) == 0) {
@@ -245,7 +247,8 @@ void SetSinkEnabled(CS_Sink sink, bool enabled, CS_Status* status) {
 extern "C" {
 void CS_SetSinkDescription(CS_Sink sink, const struct WPI_String* description,
                            CS_Status* status) {
-  return wpi::cs::SetSinkDescription(sink, wpi::util::to_string_view(description), status);
+  return wpi::cs::SetSinkDescription(
+      sink, wpi::util::to_string_view(description), status);
 }
 
 void CS_GetSinkError(CS_Sink sink, struct WPI_String* error,

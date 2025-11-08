@@ -509,7 +509,8 @@ void DataLog::AppendFloatArray(int entry, std::span<const float> arr,
     while ((arr.size() * 4) > kBlockSize) {
       buf = Reserve(kBlockSize);
       for (auto val : arr.subspan(0, kBlockSize / 4)) {
-        wpi::util::support::endian::write32le(buf, std::bit_cast<uint32_t>(val));
+        wpi::util::support::endian::write32le(buf,
+                                              std::bit_cast<uint32_t>(val));
         buf += 4;
       }
       arr = arr.subspan(kBlockSize / 4);
@@ -541,7 +542,8 @@ void DataLog::AppendDoubleArray(int entry, std::span<const double> arr,
     while ((arr.size() * 8) > kBlockSize) {
       buf = Reserve(kBlockSize);
       for (auto val : arr.subspan(0, kBlockSize / 8)) {
-        wpi::util::support::endian::write64le(buf, std::bit_cast<uint64_t>(val));
+        wpi::util::support::endian::write64le(buf,
+                                              std::bit_cast<uint64_t>(val));
         buf += 8;
       }
       arr = arr.subspan(kBlockSize / 8);

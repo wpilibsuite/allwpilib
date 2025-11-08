@@ -32,9 +32,11 @@ void NameSetting::GetName(char* buf, size_t size, const char* defaultName,
 void NameSetting::GetName(char* buf, size_t size, const char* defaultName,
                           int index, int index2) const {
   if (!m_name.empty()) {
-    wpi::util::format_to_n_c_str(buf, size, "{} [{},{}]", m_name, index, index2);
+    wpi::util::format_to_n_c_str(buf, size, "{} [{},{}]", m_name, index,
+                                 index2);
   } else {
-    wpi::util::format_to_n_c_str(buf, size, "{}[{},{}]", defaultName, index, index2);
+    wpi::util::format_to_n_c_str(buf, size, "{}[{},{}]", defaultName, index,
+                                 index2);
   }
 }
 
@@ -43,28 +45,30 @@ void NameSetting::GetLabel(char* buf, size_t size,
   if (!m_name.empty()) {
     wpi::util::format_to_n_c_str(buf, size, "{}###Name{}", m_name, defaultName);
   } else {
-    wpi::util::format_to_n_c_str(buf, size, "{}###Name{}", defaultName, defaultName);
+    wpi::util::format_to_n_c_str(buf, size, "{}###Name{}", defaultName,
+                                 defaultName);
   }
 }
 
 void NameSetting::GetLabel(char* buf, size_t size, const char* defaultName,
                            int index) const {
   if (!m_name.empty()) {
-    wpi::util::format_to_n_c_str(buf, size, "{} [{}]###Name{}", m_name, index, index);
+    wpi::util::format_to_n_c_str(buf, size, "{} [{}]###Name{}", m_name, index,
+                                 index);
   } else {
-    wpi::util::format_to_n_c_str(buf, size, "{}[{}]###Name{}", defaultName, index,
-                           index);
+    wpi::util::format_to_n_c_str(buf, size, "{}[{}]###Name{}", defaultName,
+                                 index, index);
   }
 }
 
 void NameSetting::GetLabel(char* buf, size_t size, const char* defaultName,
                            int index, int index2) const {
   if (!m_name.empty()) {
-    wpi::util::format_to_n_c_str(buf, size, "{} [{},{}]###Name{}", m_name, index,
-                           index2, index);
+    wpi::util::format_to_n_c_str(buf, size, "{} [{},{}]###Name{}", m_name,
+                                 index, index2, index);
   } else {
-    wpi::util::format_to_n_c_str(buf, size, "{}[{},{}]###Name{}", defaultName, index,
-                           index2, index);
+    wpi::util::format_to_n_c_str(buf, size, "{}[{},{}]###Name{}", defaultName,
+                                 index, index2, index);
   }
 }
 

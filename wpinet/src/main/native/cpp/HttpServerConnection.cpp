@@ -67,7 +67,7 @@ void HttpServerConnection::BuildHeader(wpi::util::raw_ostream& os, int code,
                                        uint64_t contentLength,
                                        std::string_view extra) {
   wpi::util::print(os, "HTTP/{}.{} {} {}\r\n", m_request.GetMajor(),
-             m_request.GetMinor(), code, codeText);
+                   m_request.GetMinor(), code, codeText);
   if (contentLength == 0) {
     m_keepAlive = false;
   }

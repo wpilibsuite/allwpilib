@@ -23,7 +23,8 @@ TEST(DiscretizationTest, DiscretizeA) {
   wpi::math::Vectord<2> x1Discrete = discA * x0;
 
   // We now have pos = vel = 1 and accel = 0, which should give us:
-  wpi::math::Vectord<2> x1Truth{1.0 * x0(0) + 1.0 * x0(1), 0.0 * x0(0) + 1.0 * x0(1)};
+  wpi::math::Vectord<2> x1Truth{1.0 * x0(0) + 1.0 * x0(1),
+                                0.0 * x0(0) + 1.0 * x0(1)};
 
   EXPECT_EQ(x1Truth, x1Discrete);
 }
@@ -44,7 +45,7 @@ TEST(DiscretizationTest, DiscretizeAB) {
 
   // We now have pos = vel = accel = 1, which should give us:
   wpi::math::Vectord<2> x1Truth{1.0 * x0(0) + 1.0 * x0(1) + 0.5 * u(0),
-                          0.0 * x0(0) + 1.0 * x0(1) + 1.0 * u(0)};
+                                0.0 * x0(0) + 1.0 * x0(1) + 1.0 * u(0)};
 
   EXPECT_EQ(x1Truth, x1Discrete);
 }
@@ -61,15 +62,15 @@ TEST(DiscretizationTest, DiscretizeSlowModelAQ) {
   //       T
   // Q_d ≈ ∫ e^(Aτ) Q e^(Aᵀτ) dτ
   //       0
-  wpi::math::Matrixd<2, 2> discQIntegrated =
-      wpi::math::RKDP<std::function<wpi::math::Matrixd<2, 2>(wpi::units::second_t,
-                                                 const wpi::math::Matrixd<2, 2>&)>,
-                wpi::math::Matrixd<2, 2>>(
-          [&](wpi::units::second_t t, const wpi::math::Matrixd<2, 2>&) {
-            return wpi::math::Matrixd<2, 2>((contA * t.value()).exp() * contQ *
-                                      (contA.transpose() * t.value()).exp());
-          },
-          0_s, wpi::math::Matrixd<2, 2>::Zero(), dt);
+  wpi::math::Matrixd<2, 2> discQIntegrated = wpi::math::RKDP<
+      std::function<wpi::math::Matrixd<2, 2>(wpi::units::second_t,
+                                             const wpi::math::Matrixd<2, 2>&)>,
+      wpi::math::Matrixd<2, 2>>(
+      [&](wpi::units::second_t t, const wpi::math::Matrixd<2, 2>&) {
+        return wpi::math::Matrixd<2, 2>((contA * t.value()).exp() * contQ *
+                                        (contA.transpose() * t.value()).exp());
+      },
+      0_s, wpi::math::Matrixd<2, 2>::Zero(), dt);
 
   wpi::math::Matrixd<2, 2> discA;
   wpi::math::Matrixd<2, 2> discQ;
@@ -93,15 +94,15 @@ TEST(DiscretizationTest, DiscretizeFastModelAQ) {
   //       T
   // Q_d = ∫ e^(Aτ) Q e^(Aᵀτ) dτ
   //       0
-  wpi::math::Matrixd<2, 2> discQIntegrated =
-      wpi::math::RKDP<std::function<wpi::math::Matrixd<2, 2>(wpi::units::second_t,
-                                                 const wpi::math::Matrixd<2, 2>&)>,
-                wpi::math::Matrixd<2, 2>>(
-          [&](wpi::units::second_t t, const wpi::math::Matrixd<2, 2>&) {
-            return wpi::math::Matrixd<2, 2>((contA * t.value()).exp() * contQ *
-                                      (contA.transpose() * t.value()).exp());
-          },
-          0_s, wpi::math::Matrixd<2, 2>::Zero(), dt);
+  wpi::math::Matrixd<2, 2> discQIntegrated = wpi::math::RKDP<
+      std::function<wpi::math::Matrixd<2, 2>(wpi::units::second_t,
+                                             const wpi::math::Matrixd<2, 2>&)>,
+      wpi::math::Matrixd<2, 2>>(
+      [&](wpi::units::second_t t, const wpi::math::Matrixd<2, 2>&) {
+        return wpi::math::Matrixd<2, 2>((contA * t.value()).exp() * contQ *
+                                        (contA.transpose() * t.value()).exp());
+      },
+      0_s, wpi::math::Matrixd<2, 2>::Zero(), dt);
 
   wpi::math::Matrixd<2, 2> discA;
   wpi::math::Matrixd<2, 2> discQ;

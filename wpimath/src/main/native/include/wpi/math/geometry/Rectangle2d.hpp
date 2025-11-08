@@ -114,12 +114,12 @@ class WPILIB_DLLEXPORT Rectangle2d {
     auto pointInRect = point - m_center.Translation();
     pointInRect = pointInRect.RotateBy(-m_center.Rotation());
 
-    if (wpi::units::math::abs(wpi::units::math::abs(pointInRect.X()) - m_xWidth / 2.0) <=
-        1E-9_m) {
+    if (wpi::units::math::abs(wpi::units::math::abs(pointInRect.X()) -
+                              m_xWidth / 2.0) <= 1E-9_m) {
       // Point rests on left/right perimeter
       return wpi::units::math::abs(pointInRect.Y()) <= m_yWidth / 2.0;
     } else if (wpi::units::math::abs(wpi::units::math::abs(pointInRect.Y()) -
-                                m_yWidth / 2.0) <= 1E-9_m) {
+                                     m_yWidth / 2.0) <= 1E-9_m) {
       // Point rests on top/bottom perimeter
       return wpi::units::math::abs(pointInRect.X()) <= m_xWidth / 2.0;
     }

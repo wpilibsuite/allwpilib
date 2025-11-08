@@ -10,7 +10,8 @@ using namespace wpi::math;
 
 namespace {
 
-using StructType = wpi::util::Struct<wpi::math::DifferentialDriveWheelPositions>;
+using StructType =
+    wpi::util::Struct<wpi::math::DifferentialDriveWheelPositions>;
 const DifferentialDriveWheelPositions kExpectedData{
     DifferentialDriveWheelPositions{1.74_m, 35.04_m}};
 }  // namespace

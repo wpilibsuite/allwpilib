@@ -34,8 +34,8 @@ std::optional<wpi::math::Pose3d> wpi::util::Protobuf<wpi::math::Pose3d>::Unpack(
   };
 }
 
-bool wpi::util::Protobuf<wpi::math::Pose3d>::Pack(OutputStream& stream,
-                                      const wpi::math::Pose3d& value) {
+bool wpi::util::Protobuf<wpi::math::Pose3d>::Pack(
+    OutputStream& stream, const wpi::math::Pose3d& value) {
   wpi::util::PackCallback tsln{&value.Translation()};
   wpi::util::PackCallback rot{&value.Rotation()};
   wpi_proto_ProtobufPose3d msg{

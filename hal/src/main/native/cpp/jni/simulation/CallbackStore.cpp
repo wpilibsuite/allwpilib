@@ -19,14 +19,14 @@ using namespace wpi::hal;
 using namespace wpi::hal::sim;
 using namespace wpi::util::java;
 
-static wpi::hal::UnlimitedHandleResource<SIM_JniHandle, CallbackStore,
-                                    wpi::hal::HAL_HandleEnum::SimulationJni>*
+static wpi::hal::UnlimitedHandleResource<
+    SIM_JniHandle, CallbackStore, wpi::hal::HAL_HandleEnum::SimulationJni>*
     callbackHandles;
 
 namespace wpi::hal::sim {
 void InitializeStore() {
-  static wpi::hal::UnlimitedHandleResource<SIM_JniHandle, CallbackStore,
-                                      wpi::hal::HAL_HandleEnum::SimulationJni>
+  static wpi::hal::UnlimitedHandleResource<
+      SIM_JniHandle, CallbackStore, wpi::hal::HAL_HandleEnum::SimulationJni>
       cb;
   callbackHandles = &cb;
 }

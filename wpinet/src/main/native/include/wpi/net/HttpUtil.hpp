@@ -28,20 +28,23 @@ namespace wpi::net {
 // @param buf Buffer for output
 // @param error Set to true if an error occurred
 // @return Escaped string
-std::string_view UnescapeURI(std::string_view str, wpi::util::SmallVectorImpl<char>& buf,
+std::string_view UnescapeURI(std::string_view str,
+                             wpi::util::SmallVectorImpl<char>& buf,
                              bool* error);
 
 // Escape a string with %xx-encoding.
 // @param buf Buffer for output
 // @param spacePlus If true, encodes spaces to '+' rather than "%20"
 // @return Escaped string
-std::string_view EscapeURI(std::string_view str, wpi::util::SmallVectorImpl<char>& buf,
+std::string_view EscapeURI(std::string_view str,
+                           wpi::util::SmallVectorImpl<char>& buf,
                            bool spacePlus = true);
 
 // Escape a string for HTML output.
 // @param buf Buffer for output
 // @return Escaped string
-std::string_view EscapeHTML(std::string_view str, wpi::util::SmallVectorImpl<char>& buf);
+std::string_view EscapeHTML(std::string_view str,
+                            wpi::util::SmallVectorImpl<char>& buf);
 
 // Parse a set of HTTP headers.  Saves just the Content-Type and Content-Length
 // fields.
@@ -49,7 +52,8 @@ std::string_view EscapeHTML(std::string_view str, wpi::util::SmallVectorImpl<cha
 // @param contentType If not null, Content-Type contents are saved here.
 // @param contentLength If not null, Content-Length contents are saved here.
 // @return False if error occurred in input stream
-bool ParseHttpHeaders(wpi::util::raw_istream& is, wpi::util::SmallVectorImpl<char>* contentType,
+bool ParseHttpHeaders(wpi::util::raw_istream& is,
+                      wpi::util::SmallVectorImpl<char>* contentType,
                       wpi::util::SmallVectorImpl<char>* contentLength);
 
 // Look for a MIME multi-part boundary.  On return, the input stream will
@@ -59,8 +63,8 @@ bool ParseHttpHeaders(wpi::util::raw_istream& is, wpi::util::SmallVectorImpl<cha
 // @param saveBuf If not null, all scanned characters up to but not including
 //     the boundary are saved to this string
 // @return False if error occurred on input stream, true if boundary found.
-bool FindMultipartBoundary(wpi::util::raw_istream& is, std::string_view boundary,
-                           std::string* saveBuf);
+bool FindMultipartBoundary(wpi::util::raw_istream& is,
+                           std::string_view boundary, std::string* saveBuf);
 
 /**
  * Map for looking up elements of the query portion of a URI.  Does not
@@ -92,8 +96,8 @@ class HttpQueryMap {
    * @return Optional unescaped value.  Returns an empty optional if the
    *         name is not present in the query map.
    */
-  std::optional<std::string_view> Get(std::string_view name,
-                                      wpi::util::SmallVectorImpl<char>& buf) const;
+  std::optional<std::string_view> Get(
+      std::string_view name, wpi::util::SmallVectorImpl<char>& buf) const;
 
  private:
   wpi::util::StringMap<std::string_view> m_elems;
@@ -322,7 +326,8 @@ class HttpRequest {
   template <typename T>
   HttpRequest(const HttpLocation& loc, const T& extraParams)
       : host{loc.host}, port{loc.port} {
-    wpi::util::SmallVector<std::pair<std::string_view, std::string_view>, 4> params;
+    wpi::util::SmallVector<std::pair<std::string_view, std::string_view>, 4>
+        params;
     for (const auto& p : loc.params) {
       params.emplace_back(std::pair{GetFirst(p), GetSecond(p)});
     }

@@ -63,7 +63,8 @@ static std::string MakeTitle(NT_Inst inst, wpi::nt::Event event) {
 static void NtInitialize() {
   auto inst = wpi::nt::GetDefaultInstance();
   auto poller = wpi::nt::CreateListenerPoller(inst);
-  wpi::nt::AddPolledListener(poller, inst, NT_EVENT_CONNECTION | NT_EVENT_IMMEDIATE);
+  wpi::nt::AddPolledListener(poller, inst,
+                             NT_EVENT_CONNECTION | NT_EVENT_IMMEDIATE);
   wpi::nt::AddPolledLogger(poller, NT_LOG_INFO, 100);
   gui::AddEarlyExecute([inst, poller] {
     auto win = gui::GetSystemWindow();
@@ -255,7 +256,7 @@ int main(int argc, char** argv) {
 
   wpi::glass::SetStorageName("outlineviewer");
   wpi::glass::SetStorageDir(saveDir.empty() ? gui::GetPlatformSaveFileDir()
-                                       : saveDir);
+                                            : saveDir);
 
   gui::AddInit(NtInitialize);
 

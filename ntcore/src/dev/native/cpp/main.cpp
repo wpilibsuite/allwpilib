@@ -72,9 +72,12 @@ void PrintTimes(std::vector<int64_t>& times) {
       std::inner_product(times.begin(), times.end(), times.begin(), 0);
   double stdev = std::sqrt(sq_sum / times.size() - mean * mean);
 
-  wpi::util::print("min: {} max: {}, mean: {}, stdev: {}\n", min, max, mean, stdev);
-  wpi::util::print("min 10: {}\n", fmt::join(times.begin(), times.begin() + 10, ","));
-  wpi::util::print("max 10: {}\n", fmt::join(times.end() - 10, times.end(), ","));
+  wpi::util::print("min: {} max: {}, mean: {}, stdev: {}\n", min, max, mean,
+                   stdev);
+  wpi::util::print("min 10: {}\n",
+                   fmt::join(times.begin(), times.begin() + 10, ","));
+  wpi::util::print("max 10: {}\n",
+                   fmt::join(times.end() - 10, times.end(), ","));
 }
 
 // benchmark
@@ -94,9 +97,10 @@ void bench() {
   // add "typical" set of subscribers on client and server
   wpi::nt::SubscribeMultiple(client, {{std::string_view{}}});
   wpi::nt::Subscribe(wpi::nt::GetTopic(client, "highrate"), NT_DOUBLE, "double",
-                {.sendAll = true, .keepDuplicates = true});
+                     {.sendAll = true, .keepDuplicates = true});
   wpi::nt::SubscribeMultiple(server, {{std::string_view{}}});
-  auto pub = wpi::nt::Publish(wpi::nt::GetTopic(server, "highrate"), NT_DOUBLE, "double");
+  auto pub = wpi::nt::Publish(wpi::nt::GetTopic(server, "highrate"), NT_DOUBLE,
+                              "double");
   wpi::nt::SetDouble(pub, 0);
 
   // warm up
@@ -130,9 +134,10 @@ void bench() {
   }
   auto stop = std::chrono::high_resolution_clock::now();
 
-  wpi::util::print("total time: {}us\n",
-             std::chrono::duration_cast<std::chrono::microseconds>(stop - start)
-                 .count());
+  wpi::util::print(
+      "total time: {}us\n",
+      std::chrono::duration_cast<std::chrono::microseconds>(stop - start)
+          .count());
   PrintTimes(times);
   wpi::util::print("-- Flush --\n");
   PrintTimes(flushTimes);
@@ -163,8 +168,8 @@ void bench2() {
   std::array<NT_Entry, 1000> pubs;
   for (int i = 0; i < 1000; ++i) {
     pubs[i] = wpi::nt::GetEntry(
-        wpi::nt::GetTopic(server,
-                     fmt::format("/some/long/name/with/lots/of/slashes/{}", i)),
+        wpi::nt::GetTopic(
+            server, fmt::format("/some/long/name/with/lots/of/slashes/{}", i)),
         NT_DOUBLE_ARRAY, "double[]");
   }
 
@@ -203,9 +208,10 @@ void bench2() {
   }
   auto stop = std::chrono::high_resolution_clock::now();
 
-  wpi::util::print("total time: {}us\n",
-             std::chrono::duration_cast<std::chrono::microseconds>(stop - start)
-                 .count());
+  wpi::util::print(
+      "total time: {}us\n",
+      std::chrono::duration_cast<std::chrono::microseconds>(stop - start)
+          .count());
   PrintTimes(times);
   wpi::util::print("-- Flush --\n");
   PrintTimes(flushTimes);
@@ -251,9 +257,9 @@ void stress() {
         // create publishers
         NT_Publisher pub[30];
         for (int i = 0; i < 30; ++i) {
-          pub[i] =
-              wpi::nt::Publish(wpi::nt::GetTopic(server, fmt::format("{}_{}", count, i)),
-                          NT_DOUBLE, "double", {});
+          pub[i] = wpi::nt::Publish(
+              wpi::nt::GetTopic(server, fmt::format("{}_{}", count, i)),
+              NT_DOUBLE, "double", {});
         }
 
         // publish values
@@ -348,13 +354,13 @@ void latency() {
   std::this_thread::sleep_for(1s);
 
   // create publishers and subscribers
-  auto pub =
-      wpi::nt::Publish(wpi::nt::GetTopic(client1, "highrate"), NT_DOUBLE, "double");
+  auto pub = wpi::nt::Publish(wpi::nt::GetTopic(client1, "highrate"), NT_DOUBLE,
+                              "double");
   wpi::nt::SubscribeMultiple(server, {{std::string_view{}}});
-  auto sub =
-      wpi::nt::Subscribe(wpi::nt::GetTopic(server, "highrate"), NT_DOUBLE, "double");
-  auto sub2 =
-      wpi::nt::Subscribe(wpi::nt::GetTopic(client2, "highrate"), NT_DOUBLE, "double");
+  auto sub = wpi::nt::Subscribe(wpi::nt::GetTopic(server, "highrate"),
+                                NT_DOUBLE, "double");
+  auto sub2 = wpi::nt::Subscribe(wpi::nt::GetTopic(client2, "highrate"),
+                                 NT_DOUBLE, "double");
 
   std::this_thread::sleep_for(1s);
 

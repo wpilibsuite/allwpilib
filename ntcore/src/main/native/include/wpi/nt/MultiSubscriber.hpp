@@ -31,8 +31,8 @@ class MultiSubscriber final {
   MultiSubscriber(NetworkTableInstance inst,
                   std::span<const std::string_view> prefixes,
                   const PubSubOptions& options = kDefaultPubSubOptions)
-      : m_handle{::wpi::nt::SubscribeMultiple(inst.GetHandle(), prefixes, options)} {
-  }
+      : m_handle{::wpi::nt::SubscribeMultiple(inst.GetHandle(), prefixes,
+                                              options)} {}
 
   MultiSubscriber(const MultiSubscriber&) = delete;
   MultiSubscriber& operator=(const MultiSubscriber&) = delete;

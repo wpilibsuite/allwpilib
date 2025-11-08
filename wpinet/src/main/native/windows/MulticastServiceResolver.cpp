@@ -161,7 +161,7 @@ static _Function_class_(DNS_QUERY_COMPLETION_ROUTINE) VOID WINAPI
               storage.clear();
               wideStr = std::span<const wpi::util::UTF16>{
                   reinterpret_cast<const wpi::util::UTF16*>(wideView.data() +
-                                                      splitIndex + 1),
+                                                            splitIndex + 1),
                   wideView.size() - splitIndex - 1};
               wpi::util::convertUTF16ToUTF8String(wideStr, storage);
               pair.second = std::string{storage};
@@ -171,7 +171,8 @@ static _Function_class_(DNS_QUERY_COMPLETION_ROUTINE) VOID WINAPI
 
         storage.clear();
         std::span<const wpi::util::UTF16> wideHostName{
-            reinterpret_cast<const wpi::util::UTF16*>(A->pName), wcslen(A->pName)};
+            reinterpret_cast<const wpi::util::UTF16*>(A->pName),
+            wcslen(A->pName)};
         wpi::util::convertUTF16ToUTF8String(wideHostName, storage);
         storage.append(".");
 

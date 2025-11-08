@@ -21,7 +21,8 @@ class NTMecanumDriveModel : public DriveModel {
   static constexpr const char* kType = "MecanumDrive";
 
   explicit NTMecanumDriveModel(std::string_view path);
-  NTMecanumDriveModel(wpi::nt::NetworkTableInstance inst, std::string_view path);
+  NTMecanumDriveModel(wpi::nt::NetworkTableInstance inst,
+                      std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
   const std::vector<DriveModel::WheelInfo>& GetWheels() const override {

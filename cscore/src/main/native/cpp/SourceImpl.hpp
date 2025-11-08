@@ -32,8 +32,8 @@ class SourceImpl : public PropertyContainer {
   friend class Frame;
 
  public:
-  SourceImpl(std::string_view name, wpi::util::Logger& logger, Notifier& notifier,
-             Telemetry& telemetry);
+  SourceImpl(std::string_view name, wpi::util::Logger& logger,
+             Notifier& notifier, Telemetry& telemetry);
   ~SourceImpl() override;
   SourceImpl(const SourceImpl& oth) = delete;
   SourceImpl& operator=(const SourceImpl& oth) = delete;

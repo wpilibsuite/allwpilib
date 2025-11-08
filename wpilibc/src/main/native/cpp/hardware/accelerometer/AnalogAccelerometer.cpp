@@ -55,5 +55,5 @@ void AnalogAccelerometer::InitAccelerometer() {
   HAL_ReportUsage("IO", m_analogInput->GetChannel(), "Accelerometer");
 
   wpi::util::SendableRegistry::Add(this, "Accelerometer",
-                             m_analogInput->GetChannel());
+                                   m_analogInput->GetChannel());
 }

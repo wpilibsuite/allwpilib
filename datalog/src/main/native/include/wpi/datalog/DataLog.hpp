@@ -31,7 +31,7 @@
 
 namespace wpi::util {
 class Logger;
-}  // namespace wpi
+}  // namespace wpi::util
 
 namespace wpi::log {
 
@@ -159,7 +159,8 @@ class DataLog {
    * @param timestamp Time stamp (0 to indicate now)
    */
   template <wpi::util::ProtobufSerializable T>
-  void AddProtobufSchema(wpi::util::ProtobufMessage<T>& msg, int64_t timestamp = 0) {
+  void AddProtobufSchema(wpi::util::ProtobufMessage<T>& msg,
+                         int64_t timestamp = 0) {
     if (timestamp == 0) {
       timestamp = wpi::util::Now();
     }
@@ -1313,8 +1314,8 @@ class StructLogEntry : public DataLogEntry {
       : m_info{std::move(info)...} {
     m_log = &log;
     log.AddStructSchema<T, I...>(info..., timestamp);
-    m_entry =
-        log.Start(name, wpi::util::GetStructTypeString<T>(info...), metadata, timestamp);
+    m_entry = log.Start(name, wpi::util::GetStructTypeString<T>(info...),
+                        metadata, timestamp);
   }
 
   StructLogEntry(StructLogEntry&& rhs)
@@ -1443,7 +1444,8 @@ class StructArrayLogEntry : public DataLogEntry {
     m_log = &log;
     log.AddStructSchema<T, I...>(info..., timestamp);
     m_entry = log.Start(
-        name, wpi::util::MakeStructArrayTypeString<T, std::dynamic_extent>(info...),
+        name,
+        wpi::util::MakeStructArrayTypeString<T, std::dynamic_extent>(info...),
         metadata, timestamp);
   }
 
