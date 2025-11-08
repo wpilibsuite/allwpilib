@@ -9,7 +9,7 @@
 #include "wpi/glass/Model.hpp"
 #include "wpi/util/function_ref.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 class DoubleSource;
 
@@ -25,11 +25,11 @@ class AnalogInputModel : public Model {
 class AnalogInputsModel : public Model {
  public:
   virtual void ForEachAnalogInput(
-      wpi::function_ref<void(AnalogInputModel& model, int index)> func) = 0;
+      wpi::util::function_ref<void(AnalogInputModel& model, int index)> func) = 0;
 };
 
 void DisplayAnalogInput(AnalogInputModel* model, int index);
 void DisplayAnalogInputs(AnalogInputsModel* model,
                          std::string_view noneMsg = "No analog inputs");
 
-}  // namespace glass
+}  // namespace wpi::glass

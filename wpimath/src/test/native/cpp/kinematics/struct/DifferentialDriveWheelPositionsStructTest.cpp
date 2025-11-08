@@ -6,11 +6,11 @@
 
 #include "wpi/math/kinematics/DifferentialDriveWheelPositions.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 namespace {
 
-using StructType = wpi::Struct<frc::DifferentialDriveWheelPositions>;
+using StructType = wpi::util::Struct<wpi::math::DifferentialDriveWheelPositions>;
 const DifferentialDriveWheelPositions kExpectedData{
     DifferentialDriveWheelPositions{1.74_m, 35.04_m}};
 }  // namespace

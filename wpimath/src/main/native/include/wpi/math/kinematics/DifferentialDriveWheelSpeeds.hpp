@@ -8,7 +8,7 @@
 #include "wpi/units/velocity.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
-namespace frc {
+namespace wpi::math {
 /**
  * Represents the wheel speeds for a differential drive drivetrain.
  */
@@ -16,12 +16,12 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelSpeeds {
   /**
    * Speed of the left side of the robot.
    */
-  units::meters_per_second_t left = 0_mps;
+  wpi::units::meters_per_second_t left = 0_mps;
 
   /**
    * Speed of the right side of the robot.
    */
-  units::meters_per_second_t right = 0_mps;
+  wpi::units::meters_per_second_t right = 0_mps;
 
   /**
    * Renormalizes the wheel speeds if either side is above the specified
@@ -35,9 +35,9 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelSpeeds {
    *
    * @param attainableMaxSpeed The absolute max speed that a wheel can reach.
    */
-  constexpr void Desaturate(units::meters_per_second_t attainableMaxSpeed) {
+  constexpr void Desaturate(wpi::units::meters_per_second_t attainableMaxSpeed) {
     auto realMaxSpeed =
-        units::math::max(units::math::abs(left), units::math::abs(right));
+        wpi::units::math::max(wpi::units::math::abs(left), wpi::units::math::abs(right));
 
     if (realMaxSpeed > attainableMaxSpeed) {
       left = left / realMaxSpeed * attainableMaxSpeed;
@@ -119,7 +119,7 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelSpeeds {
     return operator*(1.0 / scalar);
   }
 };
-}  // namespace frc
+}  // namespace wpi::math
 
 #include "wpi/math/kinematics/proto/DifferentialDriveWheelSpeedsProto.hpp"
 #include "wpi/math/kinematics/struct/DifferentialDriveWheelSpeedsStruct.hpp"

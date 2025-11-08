@@ -11,7 +11,7 @@
 #include "wpi/commands2/SequentialCommandGroup.hpp"
 #include "wpi/commands2/WaitUntilCommand.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 class SequentialCommandGroupTest : public CommandTestBase {};
 
 TEST_F(SequentialCommandGroupTest, SequentialGroupSchedule) {

@@ -10,15 +10,15 @@
 
 #include "wpi/util/StringExtras.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 NTProfiledPIDControllerModel::NTProfiledPIDControllerModel(
     std::string_view path)
-    : NTProfiledPIDControllerModel(nt::NetworkTableInstance::GetDefault(),
+    : NTProfiledPIDControllerModel(wpi::nt::NetworkTableInstance::GetDefault(),
                                    path) {}
 
 NTProfiledPIDControllerModel::NTProfiledPIDControllerModel(
-    nt::NetworkTableInstance inst, std::string_view path)
+    wpi::nt::NetworkTableInstance inst, std::string_view path)
     : m_inst{inst},
       m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
       m_controllable{inst.GetBooleanTopic(fmt::format("{}/.controllable", path))
@@ -40,7 +40,7 @@ NTProfiledPIDControllerModel::NTProfiledPIDControllerModel(
       m_maxVelocityData{fmt::format("NTPIDCtrlMaxVelo:{}", path)},
       m_maxAccelerationData{fmt::format("NTPIDCtrlMaxAccel:{}", path)},
       m_goalData{fmt::format("NTPIDCtrlGoal:{}", path)},
-      m_nameValue{wpi::rsplit(path, '/').second} {}
+      m_nameValue{wpi::util::rsplit(path, '/').second} {}
 
 void NTProfiledPIDControllerModel::SetP(double value) {
   m_p.Set(value);

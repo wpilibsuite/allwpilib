@@ -19,12 +19,12 @@
 #include "wpi/nt/Topic.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
 
-namespace wpi {
+namespace wpi::util {
 template <typename T>
 class SmallVectorImpl;
 }  // namespace wpi
 
-namespace nt {
+namespace wpi::nt {
 
 class IntegerArrayTopic;
 
@@ -74,7 +74,7 @@ class IntegerArraySubscriber : public Subscriber {
    * @return value
    */
   ValueType Get(ParamType defaultValue) const {
-    return ::nt::GetIntegerArray(m_subHandle, defaultValue);
+    return ::wpi::nt::GetIntegerArray(m_subHandle, defaultValue);
   }
 
   /**
@@ -84,7 +84,7 @@ class IntegerArraySubscriber : public Subscriber {
    * @param buf storage for returned value
    * @return value
    */
-  SmallRetType Get(wpi::SmallVectorImpl<SmallElemType>& buf) const {
+  SmallRetType Get(wpi::util::SmallVectorImpl<SmallElemType>& buf) const {
     return Get(buf, m_defaultValue);
   }
 
@@ -96,8 +96,8 @@ class IntegerArraySubscriber : public Subscriber {
    * @param defaultValue default value to return if no value has been published
    * @return value
    */
-  SmallRetType Get(wpi::SmallVectorImpl<SmallElemType>& buf, ParamType defaultValue) const {
-    return nt::GetIntegerArray(m_subHandle, buf, defaultValue);
+  SmallRetType Get(wpi::util::SmallVectorImpl<SmallElemType>& buf, ParamType defaultValue) const {
+    return wpi::nt::GetIntegerArray(m_subHandle, buf, defaultValue);
   }
 
   /**
@@ -120,7 +120,7 @@ class IntegerArraySubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueType GetAtomic(ParamType defaultValue) const {
-    return ::nt::GetAtomicIntegerArray(m_subHandle, defaultValue);
+    return ::wpi::nt::GetAtomicIntegerArray(m_subHandle, defaultValue);
   }
 
   /**
@@ -132,7 +132,7 @@ class IntegerArraySubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueViewType GetAtomic(
-      wpi::SmallVectorImpl<SmallElemType>& buf) const {
+      wpi::util::SmallVectorImpl<SmallElemType>& buf) const {
     return GetAtomic(buf, m_defaultValue);
   }
 
@@ -146,9 +146,9 @@ class IntegerArraySubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueViewType GetAtomic(
-      wpi::SmallVectorImpl<SmallElemType>& buf,
+      wpi::util::SmallVectorImpl<SmallElemType>& buf,
       ParamType defaultValue) const {
-    return nt::GetAtomicIntegerArray(m_subHandle, buf, defaultValue);
+    return wpi::nt::GetAtomicIntegerArray(m_subHandle, buf, defaultValue);
   }
 
   /**
@@ -162,7 +162,7 @@ class IntegerArraySubscriber : public Subscriber {
    *     been published since the previous call.
    */
   std::vector<TimestampedValueType> ReadQueue() {
-    return ::nt::ReadQueueIntegerArray(m_subHandle);
+    return ::wpi::nt::ReadQueueIntegerArray(m_subHandle);
   }
 
   /**
@@ -207,7 +207,7 @@ class IntegerArrayPublisher : public Publisher {
    * @param time timestamp; 0 indicates current NT time should be used
    */
   void Set(ParamType value, int64_t time = 0) {
-    ::nt::SetIntegerArray(m_pubHandle, value, time);
+    ::wpi::nt::SetIntegerArray(m_pubHandle, value, time);
   }
 
   /**
@@ -218,7 +218,7 @@ class IntegerArrayPublisher : public Publisher {
    * @param value value
    */
   void SetDefault(ParamType value) {
-    ::nt::SetDefaultIntegerArray(m_pubHandle, value);
+    ::wpi::nt::SetDefaultIntegerArray(m_pubHandle, value);
   }
 
   /**
@@ -286,7 +286,7 @@ class IntegerArrayEntry final : public IntegerArraySubscriber,
    * Stops publishing the entry if it's published.
    */
   void Unpublish() {
-    ::nt::Unpublish(m_pubHandle);
+    ::wpi::nt::Unpublish(m_pubHandle);
   }
 };
 
@@ -341,7 +341,7 @@ class IntegerArrayTopic final : public Topic {
       ParamType defaultValue,
       const PubSubOptions& options = kDefaultPubSubOptions) {
     return IntegerArraySubscriber{
-        ::nt::Subscribe(m_handle, NT_INTEGER_ARRAY, "int[]", options),
+        ::wpi::nt::Subscribe(m_handle, NT_INTEGER_ARRAY, "int[]", options),
         defaultValue};
   }
   /**
@@ -365,7 +365,7 @@ class IntegerArrayTopic final : public Topic {
       std::string_view typeString, ParamType defaultValue,
       const PubSubOptions& options = kDefaultPubSubOptions) {
     return IntegerArraySubscriber{
-        ::nt::Subscribe(m_handle, NT_INTEGER_ARRAY, typeString, options),
+        ::wpi::nt::Subscribe(m_handle, NT_INTEGER_ARRAY, typeString, options),
         defaultValue};
   }
 
@@ -387,7 +387,7 @@ class IntegerArrayTopic final : public Topic {
   [[nodiscard]]
   PublisherType Publish(const PubSubOptions& options = kDefaultPubSubOptions) {
     return IntegerArrayPublisher{
-        ::nt::Publish(m_handle, NT_INTEGER_ARRAY, "int[]", options)};
+        ::wpi::nt::Publish(m_handle, NT_INTEGER_ARRAY, "int[]", options)};
   }
 
   /**
@@ -410,9 +410,9 @@ class IntegerArrayTopic final : public Topic {
    */
   [[nodiscard]]
   PublisherType PublishEx(std::string_view typeString,
-    const wpi::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
+    const wpi::util::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
     return IntegerArrayPublisher{
-        ::nt::PublishEx(m_handle, NT_INTEGER_ARRAY, typeString, properties, options)};
+        ::wpi::nt::PublishEx(m_handle, NT_INTEGER_ARRAY, typeString, properties, options)};
   }
 
   /**
@@ -439,7 +439,7 @@ class IntegerArrayTopic final : public Topic {
   EntryType GetEntry(ParamType defaultValue,
                      const PubSubOptions& options = kDefaultPubSubOptions) {
     return IntegerArrayEntry{
-        ::nt::GetEntry(m_handle, NT_INTEGER_ARRAY, "int[]", options),
+        ::wpi::nt::GetEntry(m_handle, NT_INTEGER_ARRAY, "int[]", options),
         defaultValue};
   }
   /**
@@ -467,22 +467,22 @@ class IntegerArrayTopic final : public Topic {
   EntryType GetEntryEx(std::string_view typeString, ParamType defaultValue,
                        const PubSubOptions& options = kDefaultPubSubOptions) {
     return IntegerArrayEntry{
-        ::nt::GetEntry(m_handle, NT_INTEGER_ARRAY, typeString, options),
+        ::wpi::nt::GetEntry(m_handle, NT_INTEGER_ARRAY, typeString, options),
         defaultValue};
   }
 
 };
 
 inline IntegerArrayTopic IntegerArraySubscriber::GetTopic() const {
-  return IntegerArrayTopic{::nt::GetTopicFromHandle(m_subHandle)};
+  return IntegerArrayTopic{::wpi::nt::GetTopicFromHandle(m_subHandle)};
 }
 
 inline IntegerArrayTopic IntegerArrayPublisher::GetTopic() const {
-  return IntegerArrayTopic{::nt::GetTopicFromHandle(m_pubHandle)};
+  return IntegerArrayTopic{::wpi::nt::GetTopicFromHandle(m_pubHandle)};
 }
 
 inline IntegerArrayTopic IntegerArrayEntry::GetTopic() const {
-  return IntegerArrayTopic{::nt::GetTopicFromHandle(m_subHandle)};
+  return IntegerArrayTopic{::wpi::nt::GetTopicFromHandle(m_subHandle)};
 }
 
-}  // namespace nt
+}  // namespace wpi::nt

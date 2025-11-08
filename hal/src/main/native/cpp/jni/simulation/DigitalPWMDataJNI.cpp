@@ -8,7 +8,7 @@
 #include "org_wpilib_hardware_hal_simulation_DigitalPWMDataJNI.h"
 #include "wpi/hal/simulation/DigitalPWMData.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
 

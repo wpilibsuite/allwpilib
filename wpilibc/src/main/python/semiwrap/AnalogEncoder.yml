@@ -3,9 +3,9 @@ extra_includes:
 - wpi/hardware/discrete/AnalogInput.hpp
 
 classes:
-  frc::AnalogEncoder:
+  wpi::AnalogEncoder:
     ignored_bases:
-    - wpi::SendableHelper<AnalogEncoder>
+    - wpi::util::SendableHelper<AnalogEncoder>
     methods:
       AnalogEncoder:
         overloads:

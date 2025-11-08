@@ -25,9 +25,9 @@ class HALSimWSClientConnection;
 class HALSimWS : public std::enable_shared_from_this<HALSimWS> {
  public:
   using LoopFunc = std::function<void()>;
-  using UvExecFunc = wpi::uv::Async<LoopFunc>;
+  using UvExecFunc = wpi::net::uv::Async<LoopFunc>;
 
-  HALSimWS(wpi::uv::Loop& loop, ProviderContainer& providers,
+  HALSimWS(wpi::net::uv::Loop& loop, ProviderContainer& providers,
            HALSimWSProviderSimDevices& simDevicesProvider);
   HALSimWS(const HALSimWS&) = delete;
   HALSimWS& operator=(const HALSimWS&) = delete;
@@ -38,14 +38,14 @@ class HALSimWS : public std::enable_shared_from_this<HALSimWS> {
   bool RegisterWebsocket(std::shared_ptr<HALSimBaseWebSocketConnection> hws);
   void CloseWebsocket(std::shared_ptr<HALSimBaseWebSocketConnection> hws);
 
-  void OnNetValueChanged(const wpi::json& msg);
+  void OnNetValueChanged(const wpi::util::json& msg);
 
   bool CanSendMessage(std::string_view type);
 
   const std::string& GetTargetHost() const { return m_host; }
   const std::string& GetTargetUri() const { return m_uri; }
   int GetTargetPort() const { return m_port; }
-  wpi::uv::Loop& GetLoop() { return m_loop; }
+  wpi::net::uv::Loop& GetLoop() { return m_loop; }
 
   UvExecFunc& GetExec() { return *m_exec; }
 
@@ -53,13 +53,13 @@ class HALSimWS : public std::enable_shared_from_this<HALSimWS> {
   void AttemptConnect();
 
   bool m_tcp_connected = false;
-  std::shared_ptr<wpi::uv::Timer> m_connect_timer;
+  std::shared_ptr<wpi::net::uv::Timer> m_connect_timer;
   int m_connect_attempts = 0;
 
   std::weak_ptr<HALSimBaseWebSocketConnection> m_hws;
 
-  wpi::uv::Loop& m_loop;
-  std::shared_ptr<wpi::uv::Tcp> m_tcp_client;
+  wpi::net::uv::Loop& m_loop;
+  std::shared_ptr<wpi::net::uv::Tcp> m_tcp_client;
   std::shared_ptr<UvExecFunc> m_exec;
 
   ProviderContainer& m_providers;
@@ -70,7 +70,7 @@ class HALSimWS : public std::enable_shared_from_this<HALSimWS> {
   int m_port;
 
   bool m_useMsgFiltering;
-  wpi::StringMap<bool> m_msgFilters;
+  wpi::util::StringMap<bool> m_msgFilters;
 };
 
 }  // namespace wpilibws

@@ -13,9 +13,9 @@
 
 #include "wpi/glass/DataSource.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
-void glass::DisplayDrive(DriveModel* m) {
+void wpi::glass::DisplayDrive(DriveModel* m) {
   // Check if the model exists.
   if (!m->Exists()) {
     ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));

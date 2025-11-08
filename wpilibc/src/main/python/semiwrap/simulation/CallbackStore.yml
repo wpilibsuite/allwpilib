@@ -4,7 +4,7 @@ functions:
   ConstBufferCallbackStoreThunk:
     ignore: true
 classes:
-  frc::sim::CallbackStore:
+  wpi::sim::CallbackStore:
     force_type_casters:
     - std::function
     methods:

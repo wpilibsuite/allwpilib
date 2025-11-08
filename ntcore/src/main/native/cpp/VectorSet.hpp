@@ -6,7 +6,7 @@
 
 #include <vector>
 
-namespace nt {
+namespace wpi::nt {
 
 // Utility wrapper for making a set-like vector
 template <typename T>
@@ -18,4 +18,4 @@ class VectorSet : public std::vector<T> {
   bool Remove(T value) { return std::erase(*this, value) != 0; }
 };
 
-}  // namespace nt
+}  // namespace wpi::nt

@@ -13,12 +13,12 @@
 #include "wpi/driverstation/Joystick.hpp"
 #include "wpi/simulation/JoystickSim.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 class POVButtonTest : public CommandTestBase {};
 
 TEST_F(POVButtonTest, SetPOV) {
-  frc::sim::JoystickSim joysim(1);
-  joysim.SetPOV(frc::DriverStation::kUp);
+  wpi::sim::JoystickSim joysim(1);
+  joysim.SetPOV(wpi::DriverStation::kUp);
   joysim.NotifyNewData();
 
   auto& scheduler = CommandScheduler::GetInstance();
@@ -26,12 +26,12 @@ TEST_F(POVButtonTest, SetPOV) {
 
   WaitUntilCommand command([&finished] { return finished; });
 
-  frc::Joystick joy(1);
-  POVButton(&joy, frc::DriverStation::kRight).OnTrue(&command);
+  wpi::Joystick joy(1);
+  POVButton(&joy, wpi::DriverStation::kRight).OnTrue(&command);
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(&command));
 
-  joysim.SetPOV(frc::DriverStation::kRight);
+  joysim.SetPOV(wpi::DriverStation::kRight);
   joysim.NotifyNewData();
 
   scheduler.Run();

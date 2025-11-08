@@ -9,14 +9,14 @@
 #include "wpi/math/geometry/Pose3d.hpp"
 #include "wpi/util/array.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 TEST(Pose3dTest, RotateBy) {
   constexpr auto x = 1_m;
   constexpr auto y = 2_m;
   const Pose3d initial{x, y, 0_m, Rotation3d{0_deg, 0_deg, 45_deg}};
 
-  constexpr units::radian_t yaw = 5_deg;
+  constexpr wpi::units::radian_t yaw = 5_deg;
   const Rotation3d rotation{0_deg, 0_deg, yaw};
   const auto rotated = initial.RotateBy(rotation);
 
@@ -67,7 +67,7 @@ TEST(Pose3dTest, TransformBy) {
   EXPECT_DOUBLE_EQ(1.0 + 5.0 / std::sqrt(2.0), transformed.X().value());
   EXPECT_DOUBLE_EQ(2.0 + 5.0 / std::sqrt(2.0), transformed.Y().value());
   EXPECT_DOUBLE_EQ(transformed.Rotation().Z().value(),
-                   units::radian_t{50_deg}.value());
+                   wpi::units::radian_t{50_deg}.value());
 }
 
 TEST(Pose3dTest, RelativeTo) {
@@ -92,7 +92,7 @@ TEST(Pose3dTest, RotateAround) {
 
   EXPECT_NEAR(-5.0, rotated.X().value(), 1e-9);
   EXPECT_NEAR(0.0, rotated.Y().value(), 1e-9);
-  EXPECT_NEAR(units::radian_t{180_deg}.value(), rotated.Rotation().Z().value(),
+  EXPECT_NEAR(wpi::units::radian_t{180_deg}.value(), rotated.Rotation().Z().value(),
               1e-9);
 }
 
@@ -140,7 +140,7 @@ TEST(Pose3dTest, ToPose2d) {
 }
 
 TEST(Pose3dTest, ComplexTwists) {
-  wpi::array<Pose3d, 5> initial_poses{
+  wpi::util::array<Pose3d, 5> initial_poses{
       Pose3d{0.698303_m, -0.959096_m, 0.271076_m,
              Rotation3d{Quaternion{0.86403, -0.076866, 0.147234, 0.475254}}},
       Pose3d{0.634892_m, -0.765209_m, 0.117543_m,
@@ -153,7 +153,7 @@ TEST(Pose3dTest, ComplexTwists) {
              Rotation3d{Quaternion{0.807886, 0.029298, 0.257788, 0.529157}}},
   };
 
-  wpi::array<Pose3d, 5> final_poses{
+  wpi::util::array<Pose3d, 5> final_poses{
       Pose3d{-0.230448_m, -0.511957_m, 0.198406_m,
              Rotation3d{Quaternion{0.753984, 0.347016, 0.409105, 0.379106}}},
       Pose3d{-0.088932_m, -0.343253_m, 0.095018_m,
@@ -190,7 +190,7 @@ TEST(Pose3dTest, ComplexTwists) {
 }
 
 TEST(Pose3dTest, TwistNaN) {
-  wpi::array<Pose3d, 2> initial_poses{
+  wpi::util::array<Pose3d, 2> initial_poses{
       Pose3d{6.32_m, 4.12_m, 0.00_m,
              Rotation3d{Quaternion{-0.9999999999999999, 0.0, 0.0,
                                    1.9208309264993548E-8}}},
@@ -199,7 +199,7 @@ TEST(Pose3dTest, TwistNaN) {
                                    2.0352360299846772E-7}}},
   };
 
-  wpi::array<Pose3d, 2> final_poses{
+  wpi::util::array<Pose3d, 2> final_poses{
       Pose3d{6.33_m, 4.15_m, 0.00_m,
              Rotation3d{Quaternion{-0.9999999999999999, 0.0, 0.0,
                                    2.416890209039172E-8}}},

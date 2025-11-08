@@ -1,4 +1,4 @@
 classes:
-  frc::SystemServer:
+  wpi::SystemServer:
     methods:
       GetSystemServer:

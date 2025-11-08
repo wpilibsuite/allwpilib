@@ -10,7 +10,7 @@
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Class to write to digital outputs.
@@ -19,8 +19,8 @@ namespace frc {
  * elsewhere will allocate channels automatically so for those devices it
  * shouldn't be done here.
  */
-class DigitalOutput : public wpi::Sendable,
-                      public wpi::SendableHelper<DigitalOutput> {
+class DigitalOutput : public wpi::util::Sendable,
+                      public wpi::util::SendableHelper<DigitalOutput> {
  public:
   /**
    * Create an instance of a digital output.
@@ -66,7 +66,7 @@ class DigitalOutput : public wpi::Sendable,
    *
    * @param pulseLength The pulse length in seconds
    */
-  void Pulse(units::second_t pulseLength);
+  void Pulse(wpi::units::second_t pulseLength);
 
   /**
    * Determine if the pulse is still going.
@@ -139,12 +139,12 @@ class DigitalOutput : public wpi::Sendable,
    */
   void SetSimDevice(HAL_SimDeviceHandle device);
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
   int m_channel;
-  hal::Handle<HAL_DigitalHandle, HAL_FreeDIOPort> m_handle;
-  hal::Handle<HAL_DigitalPWMHandle> m_pwmGenerator;
+  wpi::hal::Handle<HAL_DigitalHandle, HAL_FreeDIOPort> m_handle;
+  wpi::hal::Handle<HAL_DigitalPWMHandle> m_pwmGenerator;
 };
 
-}  // namespace frc
+}  // namespace wpi

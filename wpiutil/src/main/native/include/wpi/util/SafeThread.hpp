@@ -14,7 +14,7 @@
 #include "wpi/util/condition_variable.hpp"
 #include "wpi/util/mutex.hpp"
 
-namespace wpi {
+namespace wpi::util {
 
 /**
  * Base class for SafeThreadOwner threads.
@@ -25,7 +25,7 @@ class SafeThreadBase {
   virtual void Main() = 0;
   virtual void Stop() = 0;
 
-  mutable wpi::mutex m_mutex;
+  mutable wpi::util::mutex m_mutex;
   std::atomic_bool m_active{true};
   std::thread::id m_threadId;
 };
@@ -34,7 +34,7 @@ class SafeThread : public SafeThreadBase {
  public:
   void Stop() override;
 
-  wpi::condition_variable m_cond;
+  wpi::util::condition_variable m_cond;
 };
 
 class SafeThreadEvent : public SafeThreadBase {
@@ -55,11 +55,11 @@ class SafeThreadProxyBase {
  public:
   explicit SafeThreadProxyBase(std::shared_ptr<SafeThreadBase> thr);
   explicit operator bool() const { return m_thread != nullptr; }
-  std::unique_lock<wpi::mutex>& GetLock() { return m_lock; }
+  std::unique_lock<wpi::util::mutex>& GetLock() { return m_lock; }
 
  protected:
   std::shared_ptr<SafeThreadBase> m_thread;
-  std::unique_lock<wpi::mutex> m_lock;
+  std::unique_lock<wpi::util::mutex> m_lock;
 };
 
 /**
@@ -110,7 +110,7 @@ class SafeThreadOwnerBase {
   std::shared_ptr<SafeThreadBase> GetThreadSharedPtr() const;
 
  private:
-  mutable wpi::mutex m_mutex;
+  mutable wpi::util::mutex m_mutex;
   std::thread m_stdThread;
   std::weak_ptr<SafeThreadBase> m_thread;
   std::atomic_bool m_joinAtExit{true};
@@ -140,6 +140,6 @@ class SafeThreadOwner : public detail::SafeThreadOwnerBase {
   }
 };
 
-}  // namespace wpi
+}  // namespace wpi::util
 
 #endif  // WPIUTIL_WPI_UTIL_SAFETHREAD_HPP_

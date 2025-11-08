@@ -8,7 +8,7 @@
 #include "wpi/hal/UsageReporting.h"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 Gamepad::Gamepad(int port) : GenericHID(port) {
   HAL_ReportUsage("HID", port, "Gamepad");
@@ -484,7 +484,7 @@ bool Gamepad::GetButtonForSendable(int button) const {
       .value_or(false);
 }
 
-void Gamepad::InitSendable(wpi::SendableBuilder& builder) {
+void Gamepad::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("HID");
   builder.PublishConstString("ControllerType", "Gamepad");
   builder.AddDoubleProperty(

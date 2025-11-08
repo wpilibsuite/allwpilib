@@ -8,7 +8,7 @@
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/units/angle.hpp"
 
-namespace frc {
+namespace wpi {
 
 class AnalogEncoder;
 
@@ -39,7 +39,7 @@ class AnalogEncoderSim {
   double Get();
 
  private:
-  hal::SimDouble m_positionSim;
+  wpi::hal::SimDouble m_positionSim;
 };
 }  // namespace sim
-}  // namespace frc
+}  // namespace wpi

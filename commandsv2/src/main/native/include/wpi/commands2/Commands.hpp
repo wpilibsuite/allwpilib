@@ -17,7 +17,7 @@
 #include "wpi/commands2/SelectCommand.hpp"
 #include "wpi/util/deprecated.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 class Subsystem;
 
 /**
@@ -104,7 +104,7 @@ CommandPtr Print(std::string_view msg);
  *
  * @param duration after how long the command finishes
  */
-CommandPtr Wait(units::second_t duration);
+CommandPtr Wait(wpi::units::second_t duration);
 
 /**
  * Constructs a command that does nothing, finishing once a condition becomes
@@ -149,7 +149,7 @@ CommandPtr Select(std::function<Key()> selector,
  * @param supplier the command supplier
  * @param requirements the set of requirements for this command
  */
-CommandPtr Defer(wpi::unique_function<CommandPtr()> supplier,
+CommandPtr Defer(wpi::util::unique_function<CommandPtr()> supplier,
                  Requirements requirements);
 
 /**
@@ -159,7 +159,7 @@ CommandPtr Defer(wpi::unique_function<CommandPtr()> supplier,
  *
  * @param supplier the command supplier
  */
-CommandPtr DeferredProxy(wpi::unique_function<Command*()> supplier);
+CommandPtr DeferredProxy(wpi::util::unique_function<Command*()> supplier);
 
 /**
  * Constructs a command that schedules the command returned from the supplier
@@ -168,7 +168,7 @@ CommandPtr DeferredProxy(wpi::unique_function<Command*()> supplier);
  *
  * @param supplier the command supplier
  */
-CommandPtr DeferredProxy(wpi::unique_function<CommandPtr()> supplier);
+CommandPtr DeferredProxy(wpi::util::unique_function<CommandPtr()> supplier);
 // Command Groups
 
 namespace impl {
@@ -263,4 +263,4 @@ CommandPtr Deadline(CommandPtr&& deadline, CommandPtrs&&... commands) {
 
 }  // namespace cmd
 
-}  // namespace frc2
+}  // namespace wpi::cmd

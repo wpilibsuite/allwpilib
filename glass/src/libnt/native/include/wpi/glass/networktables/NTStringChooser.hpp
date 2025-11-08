@@ -12,7 +12,7 @@
 #include "wpi/nt/StringArrayTopic.hpp"
 #include "wpi/nt/StringTopic.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 class NTStringChooserModel : public StringChooserModel {
  public:
@@ -20,7 +20,7 @@ class NTStringChooserModel : public StringChooserModel {
 
   // path is to the table containing ".type", excluding the trailing /
   explicit NTStringChooserModel(std::string_view path);
-  NTStringChooserModel(nt::NetworkTableInstance inst, std::string_view path);
+  NTStringChooserModel(wpi::nt::NetworkTableInstance inst, std::string_view path);
 
   const std::string& GetDefault() override { return m_defaultValue; }
   const std::string& GetSelected() override { return m_selectedValue; }
@@ -36,12 +36,12 @@ class NTStringChooserModel : public StringChooserModel {
   bool IsReadOnly() override { return false; }
 
  private:
-  nt::NetworkTableInstance m_inst;
-  nt::StringSubscriber m_default;
-  nt::StringSubscriber m_selected;
-  nt::StringPublisher m_selectedPub;
-  nt::StringSubscriber m_active;
-  nt::StringArraySubscriber m_options;
+  wpi::nt::NetworkTableInstance m_inst;
+  wpi::nt::StringSubscriber m_default;
+  wpi::nt::StringSubscriber m_selected;
+  wpi::nt::StringPublisher m_selectedPub;
+  wpi::nt::StringSubscriber m_active;
+  wpi::nt::StringArraySubscriber m_options;
 
   std::string m_defaultValue;
   std::string m_selectedValue;
@@ -49,4 +49,4 @@ class NTStringChooserModel : public StringChooserModel {
   std::vector<std::string> m_optionsValue;
 };
 
-}  // namespace glass
+}  // namespace wpi::glass

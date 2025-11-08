@@ -2,7 +2,7 @@ extra_includes:
 - wpystruct.h
 
 classes:
-  frc::Twist3d:
+  wpi::math::Twist3d:
     force_no_default_constructor: true
     attributes:
       dx:
@@ -19,62 +19,62 @@ classes:
 inline_code: |-
   cls_Twist3d
     .def(
-      py::init<units::meter_t, units::meter_t, units::meter_t,
-               units::radian_t, units::radian_t, units::radian_t>(),
+      py::init<wpi::units::meter_t, wpi::units::meter_t, wpi::units::meter_t,
+               wpi::units::radian_t, wpi::units::radian_t, wpi::units::radian_t>(),
       py::arg("dx") = 0, py::arg("dy") = 0, py::arg("dz") = 0,
       py::arg("rx") = 0, py::arg("ry") = 0, py::arg("rz") = 0)
     .def_static("fromFeet", [](
-      units::foot_t dx, units::foot_t dy, units::foot_t dz,
-      units::radian_t rx, units::radian_t ry, units::radian_t rz){
+      wpi::units::foot_t dx, wpi::units::foot_t dy, wpi::units::foot_t dz,
+      wpi::units::radian_t rx, wpi::units::radian_t ry, wpi::units::radian_t rz){
       return Twist3d{dx, dy, dz, rx, ry, rz};
     },
       py::arg("dx") = 0, py::arg("dy") = 0, py::arg("dz") = 0,
       py::arg("rx") = 0, py::arg("ry") = 0, py::arg("rz") = 0)
     .def_property("dx_feet", 
-      [](Twist3d * self) -> units::foot_t {
+      [](Twist3d * self) -> wpi::units::foot_t {
         return self->dx;
       },
-      [](Twist3d * self, units::foot_t dx) {
+      [](Twist3d * self, wpi::units::foot_t dx) {
         self->dx = dx;
       }
     )
     .def_property("dy_feet", 
-      [](Twist3d * self) -> units::foot_t {
+      [](Twist3d * self) -> wpi::units::foot_t {
         return self->dy;
       },
-      [](Twist3d * self, units::foot_t dy) {
+      [](Twist3d * self, wpi::units::foot_t dy) {
         self->dy = dy;
       }
     )
     .def_property("dz_feet", 
-      [](Twist3d * self) -> units::foot_t {
+      [](Twist3d * self) -> wpi::units::foot_t {
         return self->dz;
       },
-      [](Twist3d * self, units::foot_t dz) {
+      [](Twist3d * self, wpi::units::foot_t dz) {
         self->dz = dz;
       }
     )
     .def_property("rx_degrees", 
-      [](Twist3d * self) -> units::degree_t {
+      [](Twist3d * self) -> wpi::units::degree_t {
         return self->rx;
       },
-      [](Twist3d * self, units::degree_t rx) {
+      [](Twist3d * self, wpi::units::degree_t rx) {
         self->rx = rx;
       }
     )
     .def_property("ry_degrees", 
-      [](Twist3d * self) -> units::degree_t {
+      [](Twist3d * self) -> wpi::units::degree_t {
         return self->ry;
       },
-      [](Twist3d * self, units::degree_t ry) {
+      [](Twist3d * self, wpi::units::degree_t ry) {
         self->ry = ry;
       }
     )
     .def_property("rz_degrees", 
-      [](Twist3d * self) -> units::degree_t {
+      [](Twist3d * self) -> wpi::units::degree_t {
         return self->rz;
       },
-      [](Twist3d * self, units::degree_t rz) {
+      [](Twist3d * self, wpi::units::degree_t rz) {
         self->rz = rz;
       }
     )
@@ -88,4 +88,4 @@ inline_code: |-
     })
   ;
 
-  SetupWPyStruct<frc::Twist3d>(cls_Twist3d);
+  SetupWPyStruct<wpi::math::Twist3d>(cls_Twist3d);

@@ -6,11 +6,11 @@
 
 #include "wpi/math/geometry/Pose2d.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 namespace {
 
-using StructType = wpi::Struct<frc::Pose2d>;
+using StructType = wpi::util::Struct<wpi::math::Pose2d>;
 const Pose2d kExpectedData{
     Pose2d{Translation2d{0.191_m, 2.2_m}, Rotation2d{22.9_rad}}};
 }  // namespace

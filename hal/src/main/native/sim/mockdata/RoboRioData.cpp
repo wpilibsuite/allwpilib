@@ -6,16 +6,16 @@
 
 #include "RoboRioDataInternal.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeRoboRioData() {
   static RoboRioData srrd;
-  ::hal::SimRoboRioData = &srrd;
+  ::wpi::hal::SimRoboRioData = &srrd;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-RoboRioData* hal::SimRoboRioData;
+RoboRioData* wpi::hal::SimRoboRioData;
 void RoboRioData::ResetData() {
   vInVoltage.Reset(12.0);
   userVoltage3V3.Reset(3.3);
@@ -121,7 +121,7 @@ void HALSIM_GetRoboRioSerialNumber(struct WPI_String* serialNumber) {
   SimRoboRioData->GetSerialNumber(serialNumber);
 }
 void HALSIM_SetRoboRioSerialNumber(const struct WPI_String* serialNumber) {
-  SimRoboRioData->SetSerialNumber(wpi::to_string_view(serialNumber));
+  SimRoboRioData->SetSerialNumber(wpi::util::to_string_view(serialNumber));
 }
 
 int32_t HALSIM_RegisterRoboRioCommentsCallback(
@@ -136,7 +136,7 @@ void HALSIM_GetRoboRioComments(struct WPI_String* comments) {
   SimRoboRioData->GetComments(comments);
 }
 void HALSIM_SetRoboRioComments(const struct WPI_String* comments) {
-  SimRoboRioData->SetComments(wpi::to_string_view(comments));
+  SimRoboRioData->SetComments(wpi::util::to_string_view(comments));
 }
 
 void HALSIM_RegisterRoboRioAllCallbacks(HAL_NotifyCallback callback,

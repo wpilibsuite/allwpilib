@@ -19,7 +19,7 @@
 
 #include "Constants.hpp"
 
-class Drive : public frc2::SubsystemBase {
+class Drive : public wpi::cmd::SubsystemBase {
  public:
   Drive();
   /**
@@ -28,7 +28,7 @@ class Drive : public frc2::SubsystemBase {
    * @param fwd the commanded forward movement
    * @param rot the commanded rotation
    */
-  frc2::CommandPtr ArcadeDriveCommand(std::function<double()> fwd,
+  wpi::cmd::CommandPtr ArcadeDriveCommand(std::function<double()> fwd,
                                       std::function<double()> rot);
 
   /**
@@ -38,7 +38,7 @@ class Drive : public frc2::SubsystemBase {
    * @param distance The distance to drive forward in meters
    * @param speed The fraction of max speed at which to drive
    */
-  frc2::CommandPtr DriveDistanceCommand(units::meter_t distance, double speed);
+  wpi::cmd::CommandPtr DriveDistanceCommand(wpi::units::meter_t distance, double speed);
 
   /**
    * Returns a command that turns to robot to the specified angle using a motion
@@ -46,32 +46,32 @@ class Drive : public frc2::SubsystemBase {
    *
    * @param angle The angle to turn to
    */
-  frc2::CommandPtr TurnToAngleCommand(units::degree_t angle);
+  wpi::cmd::CommandPtr TurnToAngleCommand(wpi::units::degree_t angle);
 
  private:
-  frc::PWMSparkMax m_leftLeader{DriveConstants::kLeftMotor1Port};
-  frc::PWMSparkMax m_leftFollower{DriveConstants::kLeftMotor2Port};
-  frc::PWMSparkMax m_rightLeader{DriveConstants::kRightMotor1Port};
-  frc::PWMSparkMax m_rightFollower{DriveConstants::kRightMotor2Port};
+  wpi::PWMSparkMax m_leftLeader{DriveConstants::kLeftMotor1Port};
+  wpi::PWMSparkMax m_leftFollower{DriveConstants::kLeftMotor2Port};
+  wpi::PWMSparkMax m_rightLeader{DriveConstants::kRightMotor1Port};
+  wpi::PWMSparkMax m_rightFollower{DriveConstants::kRightMotor2Port};
 
-  frc::DifferentialDrive m_drive{
+  wpi::DifferentialDrive m_drive{
       [&](double output) { m_leftLeader.Set(output); },
       [&](double output) { m_rightLeader.Set(output); }};
 
-  frc::Encoder m_leftEncoder{DriveConstants::kLeftEncoderPorts[0],
+  wpi::Encoder m_leftEncoder{DriveConstants::kLeftEncoderPorts[0],
                              DriveConstants::kLeftEncoderPorts[1],
                              DriveConstants::kLeftEncoderReversed};
-  frc::Encoder m_rightEncoder{DriveConstants::kRightEncoderPorts[0],
+  wpi::Encoder m_rightEncoder{DriveConstants::kRightEncoderPorts[0],
                               DriveConstants::kRightEncoderPorts[1],
                               DriveConstants::kRightEncoderReversed};
 
-  frc::OnboardIMU m_imu{frc::OnboardIMU::kFlat};
+  wpi::OnboardIMU m_imu{wpi::OnboardIMU::kFlat};
 
-  frc::ProfiledPIDController<units::radians> m_controller{
+  wpi::math::ProfiledPIDController<wpi::units::radians> m_controller{
       DriveConstants::kTurnP,
       DriveConstants::kTurnI,
       DriveConstants::kTurnD,
       {DriveConstants::kMaxTurnRate, DriveConstants::kMaxTurnAcceleration}};
-  frc::SimpleMotorFeedforward<units::radians> m_feedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::radians> m_feedforward{
       DriveConstants::ks, DriveConstants::kv, DriveConstants::ka};
 };

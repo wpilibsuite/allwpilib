@@ -6,20 +6,20 @@
 
 #include "wpi/driverstation/DriverStation.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 Trigger RobotModeTriggers::Autonomous() {
-  return Trigger{&frc::DriverStation::IsAutonomousEnabled};
+  return Trigger{&wpi::DriverStation::IsAutonomousEnabled};
 }
 
 Trigger RobotModeTriggers::Teleop() {
-  return Trigger{&frc::DriverStation::IsTeleopEnabled};
+  return Trigger{&wpi::DriverStation::IsTeleopEnabled};
 }
 
 Trigger RobotModeTriggers::Disabled() {
-  return Trigger{&frc::DriverStation::IsDisabled};
+  return Trigger{&wpi::DriverStation::IsDisabled};
 }
 
 Trigger RobotModeTriggers::Test() {
-  return Trigger{&frc::DriverStation::IsTestEnabled};
+  return Trigger{&wpi::DriverStation::IsTestEnabled};
 }

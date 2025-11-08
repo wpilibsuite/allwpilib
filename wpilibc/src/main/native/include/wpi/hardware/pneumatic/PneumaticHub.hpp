@@ -12,7 +12,7 @@
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/mutex.hpp"
 
-namespace frc {
+namespace wpi {
 /** Module class for controlling a REV Robotics Pneumatic Hub. */
 class PneumaticHub : public PneumaticsBase {
  public:
@@ -57,8 +57,8 @@ class PneumaticHub : public PneumaticsBase {
    * minPressure.
    */
   void EnableCompressorAnalog(
-      units::pounds_per_square_inch_t minPressure,
-      units::pounds_per_square_inch_t maxPressure) override;
+      wpi::units::pounds_per_square_inch_t minPressure,
+      wpi::units::pounds_per_square_inch_t maxPressure) override;
 
   /**
    * Enables the compressor in hybrid mode. This mode uses both a digital
@@ -87,14 +87,14 @@ class PneumaticHub : public PneumaticsBase {
    * minPressure.
    */
   void EnableCompressorHybrid(
-      units::pounds_per_square_inch_t minPressure,
-      units::pounds_per_square_inch_t maxPressure) override;
+      wpi::units::pounds_per_square_inch_t minPressure,
+      wpi::units::pounds_per_square_inch_t maxPressure) override;
 
   CompressorConfigType GetCompressorConfigType() const override;
 
   bool GetPressureSwitch() const override;
 
-  units::ampere_t GetCompressorCurrent() const override;
+  wpi::units::ampere_t GetCompressorCurrent() const override;
 
   void SetSolenoids(int mask, int values) override;
 
@@ -106,7 +106,7 @@ class PneumaticHub : public PneumaticsBase {
 
   void FireOneShot(int index) override;
 
-  void SetOneShotDuration(int index, units::second_t duration) override;
+  void SetOneShotDuration(int index, wpi::units::second_t duration) override;
 
   bool CheckSolenoidChannel(int channel) const override;
 
@@ -255,28 +255,28 @@ class PneumaticHub : public PneumaticsBase {
    *
    * @return The input voltage.
    */
-  units::volt_t GetInputVoltage() const;
+  wpi::units::volt_t GetInputVoltage() const;
 
   /**
    * Returns the current voltage of the regulated 5v supply.
    *
    * @return The current voltage of the 5v supply.
    */
-  units::volt_t Get5VRegulatedVoltage() const;
+  wpi::units::volt_t Get5VRegulatedVoltage() const;
 
   /**
    * Returns the total current drawn by all solenoids.
    *
    * @return Total current drawn by all solenoids.
    */
-  units::ampere_t GetSolenoidsTotalCurrent() const;
+  wpi::units::ampere_t GetSolenoidsTotalCurrent() const;
 
   /**
    * Returns the current voltage of the solenoid power supply.
    *
    * @return The current voltage of the solenoid power supply.
    */
-  units::volt_t GetSolenoidsVoltage() const;
+  wpi::units::volt_t GetSolenoidsVoltage() const;
 
   /**
    * Returns the raw voltage of the specified analog input channel.
@@ -284,7 +284,7 @@ class PneumaticHub : public PneumaticsBase {
    * @param channel The analog input channel to read voltage from.
    * @return The voltage of the specified analog input channel.
    */
-  units::volt_t GetAnalogVoltage(int channel) const override;
+  wpi::units::volt_t GetAnalogVoltage(int channel) const override;
 
   /**
    * Returns the pressure read by an analog pressure sensor on the specified
@@ -294,7 +294,7 @@ class PneumaticHub : public PneumaticsBase {
    * @return The pressure read by an analog pressure sensor on the specified
    * analog input channel.
    */
-  units::pounds_per_square_inch_t GetPressure(int channel) const override;
+  wpi::units::pounds_per_square_inch_t GetPressure(int channel) const override;
 
  private:
   class DataStore;
@@ -308,9 +308,9 @@ class PneumaticHub : public PneumaticsBase {
   HAL_REVPHHandle m_handle;
   int m_module;
 
-  static wpi::mutex m_handleLock;
-  static std::unique_ptr<wpi::DenseMap<int, std::weak_ptr<DataStore>>[]>
+  static wpi::util::mutex m_handleLock;
+  static std::unique_ptr<wpi::util::DenseMap<int, std::weak_ptr<DataStore>>[]>
       m_handleMaps;
   static std::weak_ptr<DataStore>& GetDataStore(int busId, int module);
 };
-}  // namespace frc
+}  // namespace wpi

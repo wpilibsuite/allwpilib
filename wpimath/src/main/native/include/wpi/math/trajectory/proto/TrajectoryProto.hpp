@@ -10,10 +10,10 @@
 #include "wpimath/protobuf/trajectory.npb.h"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Trajectory> {
+struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::Trajectory> {
   using MessageStruct = wpi_proto_ProtobufTrajectory;
-  using InputStream = wpi::ProtoInputStream<frc::Trajectory>;
-  using OutputStream = wpi::ProtoOutputStream<frc::Trajectory>;
-  static std::optional<frc::Trajectory> Unpack(InputStream& stream);
-  static bool Pack(OutputStream& stream, const frc::Trajectory& value);
+  using InputStream = wpi::util::ProtoInputStream<wpi::math::Trajectory>;
+  using OutputStream = wpi::util::ProtoOutputStream<wpi::math::Trajectory>;
+  static std::optional<wpi::math::Trajectory> Unpack(InputStream& stream);
+  static bool Pack(OutputStream& stream, const wpi::math::Trajectory& value);
 };

@@ -9,7 +9,7 @@
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/json_fwd.hpp"
 
-namespace frc {
+namespace wpi::apriltag {
 
 /**
  * Represents an AprilTag's metadata.
@@ -19,18 +19,18 @@ struct WPILIB_DLLEXPORT AprilTag {
   int ID;
 
   /// The tag's pose.
-  Pose3d pose;
+  wpi::math::Pose3d pose;
 
   bool operator==(const AprilTag&) const = default;
 
-  static bool Generate36h11AprilTagImage(wpi::RawFrame* frame, int id);
-  static bool Generate16h5AprilTagImage(wpi::RawFrame* frame, int id);
+  static bool Generate36h11AprilTagImage(wpi::util::RawFrame* frame, int id);
+  static bool Generate16h5AprilTagImage(wpi::util::RawFrame* frame, int id);
 };
 
 WPILIB_DLLEXPORT
-void to_json(wpi::json& json, const AprilTag& apriltag);
+void to_json(wpi::util::json& json, const AprilTag& apriltag);
 
 WPILIB_DLLEXPORT
-void from_json(const wpi::json& json, AprilTag& apriltag);
+void from_json(const wpi::util::json& json, AprilTag& apriltag);
 
-}  // namespace frc
+}  // namespace wpi::apriltag

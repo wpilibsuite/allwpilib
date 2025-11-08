@@ -17,7 +17,7 @@
  * Command will *not* work!
  */
 class ExampleCommand
-    : public frc2::CommandHelper<frc2::Command, ExampleCommand> {
+    : public wpi::cmd::CommandHelper<wpi::cmd::Command, ExampleCommand> {
  public:
   /**
    * Creates a new ExampleCommand.

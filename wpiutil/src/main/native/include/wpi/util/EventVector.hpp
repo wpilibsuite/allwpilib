@@ -8,10 +8,10 @@
 #include "wpi/util/Synchronization.h"
 #include "wpi/util/mutex.hpp"
 
-namespace wpi {
+namespace wpi::util {
 struct EventVector {
-  wpi::mutex mutex;
-  wpi::SmallVector<WPI_EventHandle, 4> events;
+  wpi::util::mutex mutex;
+  wpi::util::SmallVector<WPI_EventHandle, 4> events;
 
   /**
    * Adds an event to the event vector.
@@ -44,8 +44,8 @@ struct EventVector {
   void Wakeup() {
     std::scoped_lock lock{mutex};
     for (auto&& handle : events) {
-      wpi::SetEvent(handle);
+      wpi::util::SetEvent(handle);
     }
   }
 };
-}  // namespace wpi
+}  // namespace wpi::util

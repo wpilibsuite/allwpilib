@@ -9,7 +9,7 @@
 #include "wpi/driverstation/GenericHID.hpp"
 #include "wpi/units/angle.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Handle input from standard Joysticks connected to the Driver Station.
@@ -259,7 +259,7 @@ class Joystick : public GenericHID {
    *
    * @return The direction of the vector.
    */
-  units::radian_t GetDirection() const;
+  wpi::units::radian_t GetDirection() const;
 
  private:
   enum Axis { kX, kY, kZ, kTwist, kThrottle, kNumAxes };
@@ -268,4 +268,4 @@ class Joystick : public GenericHID {
   std::array<int, Axis::kNumAxes> m_axes;
 };
 
-}  // namespace frc
+}  // namespace wpi

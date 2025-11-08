@@ -10,7 +10,7 @@
 #include <span>
 #include <type_traits>
 
-namespace wpi {
+namespace wpi::util {
 
 /**
  * This is a simple rotated span view.  Indexed/iterated access provides a
@@ -251,4 +251,4 @@ as_writable_bytes(rotated_span<Type, Extent> sp) noexcept {
   return {std::as_writable_bytes(sp.data()), sp.offset() * sizeof(Type)};
 }
 
-}  // namespace wpi
+}  // namespace wpi::util

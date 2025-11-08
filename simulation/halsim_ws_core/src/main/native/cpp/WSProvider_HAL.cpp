@@ -52,7 +52,7 @@ void HALSimWSProviderHAL::DoCancelCallbacks() {
   m_simPeriodicAfterCbKey = 0;
 }
 
-void HALSimWSProviderHAL::OnNetValueChanged(const wpi::json& json) {
+void HALSimWSProviderHAL::OnNetValueChanged(const wpi::util::json& json) {
   // no-op. This is all one way
 }
 

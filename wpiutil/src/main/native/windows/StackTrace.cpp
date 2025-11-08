@@ -8,13 +8,13 @@
 
 #if defined(_MSC_VER)
 
-namespace wpi {
+namespace wpi::util {
 
 std::string GetStackTraceDefault(int offset) {
   // FIXME: Use C++23 std::stacktrace
   return "";
 }
 
-}  // namespace wpi
+}  // namespace wpi::util
 
 #endif  // defined(_MSC_VER)

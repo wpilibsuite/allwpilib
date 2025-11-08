@@ -9,7 +9,7 @@
 #include "wpi/commands2/FunctionalCommand.hpp"
 #include "wpi/system/Errors.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 class CommandRequirementsTest : public CommandTestBase {};
 
 TEST_F(CommandRequirementsTest, RequirementInterrupt) {
@@ -81,5 +81,5 @@ TEST_F(CommandRequirementsTest, DefaultCommandRequirementError) {
   MockCommand command1;
 
   ASSERT_THROW(requirement1.SetDefaultCommand(std::move(command1)),
-               frc::RuntimeError);
+               wpi::RuntimeError);
 }

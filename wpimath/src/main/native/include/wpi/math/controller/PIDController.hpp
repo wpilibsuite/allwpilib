@@ -19,14 +19,14 @@
 #include "wpi/util/sendable/SendableHelper.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * Implements a PID control loop.
  */
 class WPILIB_DLLEXPORT PIDController
-    : public wpi::Sendable,
-      public wpi::SendableHelper<PIDController> {
+    : public wpi::util::Sendable,
+      public wpi::util::SendableHelper<PIDController> {
  public:
   /**
    * Allocates a PIDController with the given constants for Kp, Ki, and Kd.
@@ -38,7 +38,7 @@ class WPILIB_DLLEXPORT PIDController
    *               default is 20 milliseconds. Must be positive.
    */
   constexpr PIDController(double Kp, double Ki, double Kd,
-                          units::second_t period = 20_ms)
+                          wpi::units::second_t period = 20_ms)
       : m_Kp(Kp), m_Ki(Ki), m_Kd(Kd), m_period(period) {
     bool invalidGains = false;
     if (Kp < 0.0) {
@@ -76,7 +76,7 @@ class WPILIB_DLLEXPORT PIDController
 
       wpi::math::MathSharedStore::ReportUsage("PIDController",
                                               std::to_string(instances));
-      wpi::SendableRegistry::Add(this, "PIDController", instances);
+      wpi::util::SendableRegistry::Add(this, "PIDController", instances);
     }
   }
 
@@ -175,7 +175,7 @@ class WPILIB_DLLEXPORT PIDController
    *
    * @return The period of the controller.
    */
-  constexpr units::second_t GetPeriod() const { return m_period; }
+  constexpr wpi::units::second_t GetPeriod() const { return m_period; }
 
   /**
    * Gets the error tolerance of this controller. Defaults to 0.05.
@@ -403,7 +403,7 @@ class WPILIB_DLLEXPORT PIDController
     m_haveMeasurement = false;
   }
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
   // Factor for "proportional" control
@@ -419,7 +419,7 @@ class WPILIB_DLLEXPORT PIDController
   double m_iZone = std::numeric_limits<double>::infinity();
 
   // The period (in seconds) of the control loop running this controller
-  units::second_t m_period;
+  wpi::units::second_t m_period;
 
   double m_maximumIntegral = 1.0;
 
@@ -457,4 +457,4 @@ class WPILIB_DLLEXPORT PIDController
   inline static int instances = 0;
 };
 
-}  // namespace frc
+}  // namespace wpi::math

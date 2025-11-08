@@ -12,7 +12,7 @@
 #include "wpi/net/HttpParser.hpp"
 #include "wpi/net/uv/Stream.hpp"
 
-namespace wpi {
+namespace wpi::net {
 
 class raw_ostream;
 
@@ -49,7 +49,7 @@ class HttpServerConnection {
    *
    * @param os response stream
    */
-  virtual void BuildCommonHeaders(raw_ostream& os);
+  virtual void BuildCommonHeaders(wpi::util::raw_ostream& os);
 
   /**
    * Build HTTP response header, along with other header information like
@@ -63,7 +63,7 @@ class HttpServerConnection {
    *                      be set to false.
    * @param extra Extra HTTP headers to send, including final "\r\n"
    */
-  virtual void BuildHeader(raw_ostream& os, int code, std::string_view codeText,
+  virtual void BuildHeader(wpi::util::raw_ostream& os, int code, std::string_view codeText,
                            std::string_view contentType, uint64_t contentLength,
                            std::string_view extra = {});
 
@@ -138,15 +138,15 @@ class HttpServerConnection {
   uv::Stream& m_stream;
 
   /** The header reader connection. */
-  sig::ScopedConnection m_dataConn;
+  wpi::util::sig::ScopedConnection m_dataConn;
 
   /** The end stream connection. */
-  sig::ScopedConnection m_endConn;
+  wpi::util::sig::ScopedConnection m_endConn;
 
   /** The message complete connection. */
-  sig::Connection m_messageCompleteConn;
+  wpi::util::sig::Connection m_messageCompleteConn;
 };
 
-}  // namespace wpi
+}  // namespace wpi::net
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_HTTPSERVERCONNECTION_HPP_

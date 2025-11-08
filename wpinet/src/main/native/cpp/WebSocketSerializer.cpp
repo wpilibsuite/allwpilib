@@ -6,14 +6,14 @@
 
 #include <random>
 
-using namespace wpi::detail;
+using namespace wpi::net::detail;
 
 static constexpr uint8_t kFlagMasking = 0x80;
 static constexpr size_t kWriteAllocSize = 4096;
 
 static std::span<uint8_t> BuildHeader(std::span<uint8_t, 10> header,
                                       bool server,
-                                      const wpi::WebSocket::Frame& frame) {
+                                      const wpi::net::WebSocket::Frame& frame) {
   uint8_t* pHeader = header.data();
 
   // opcode (includes FIN bit)

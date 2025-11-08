@@ -12,11 +12,11 @@
 #include "wpi/units/length.hpp"
 #include "wpi/units/velocity.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 TEST(EllipticalRegionConstraintTest, Constraint) {
   constexpr auto maxVelocity = 2_fps;
-  constexpr frc::Ellipse2d ellipse{{5_ft, 2.5_ft, 180_deg}, 5_ft, 2.5_ft};
+  constexpr wpi::math::Ellipse2d ellipse{{5_ft, 2.5_ft, 180_deg}, 5_ft, 2.5_ft};
 
   auto config = TrajectoryConfig(13_fps, 13_fps_sq);
   config.AddConstraint(
@@ -26,8 +26,8 @@ TEST(EllipticalRegionConstraintTest, Constraint) {
   bool exceededConstraintOutsideRegion = false;
   for (auto& point : trajectory.States()) {
     if (ellipse.Contains(point.pose.Translation())) {
-      EXPECT_TRUE(units::math::abs(point.velocity) < maxVelocity + 0.05_mps);
-    } else if (units::math::abs(point.velocity) >= maxVelocity + 0.05_mps) {
+      EXPECT_TRUE(wpi::units::math::abs(point.velocity) < maxVelocity + 0.05_mps);
+    } else if (wpi::units::math::abs(point.velocity) >= maxVelocity + 0.05_mps) {
       exceededConstraintOutsideRegion = true;
     }
   }

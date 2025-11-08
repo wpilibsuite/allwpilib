@@ -21,7 +21,7 @@
 #include "wpi/util/future.hpp"
 #include "wpi/util/mutex.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 template <typename T>
 class AsyncFunction;
@@ -38,7 +38,7 @@ class AsyncFunction<R(T...)> final
 
  public:
   AsyncFunction(const std::shared_ptr<Loop>& loop,
-                std::function<void(promise<R>, T...)> func, const private_init&)
+                std::function<void(wpi::util::promise<R>, T...)> func, const private_init&)
       : wakeup{std::move(func)}, m_loop{loop} {}
   ~AsyncFunction() noexcept override {
     if (auto loop = m_loop.lock()) {
@@ -58,7 +58,7 @@ class AsyncFunction<R(T...)> final
    *             wakeup function, a default-constructed value is "returned".
    */
   static std::shared_ptr<AsyncFunction> Create(
-      Loop& loop, std::function<void(promise<R>, T...)> func = nullptr) {
+      Loop& loop, std::function<void(wpi::util::promise<R>, T...)> func = nullptr) {
     return Create(loop.shared_from_this(), std::move(func));
   }
 
@@ -73,7 +73,7 @@ class AsyncFunction<R(T...)> final
    */
   static std::shared_ptr<AsyncFunction> Create(
       const std::shared_ptr<Loop>& loop,
-      std::function<void(promise<R>, T...)> func = nullptr) {
+      std::function<void(wpi::util::promise<R>, T...)> func = nullptr) {
     if (loop->IsClosing()) {
       return nullptr;
     }
@@ -121,7 +121,7 @@ class AsyncFunction<R(T...)> final
    * destroyed while waiting for a result.
    */
   template <typename... U>
-  future<R> Call(U&&... u) {
+  wpi::util::future<R> Call(U&&... u) {
     // create the future
     uint64_t req = m_promises.CreateRequest();
 
@@ -157,22 +157,22 @@ class AsyncFunction<R(T...)> final
   }
 
   template <typename... U>
-  future<R> operator()(U&&... u) {
+  wpi::util::future<R> operator()(U&&... u) {
     return Call(std::forward<U>(u)...);
   }
 
   /**
    * Function called (on event loop thread) when the async is called.
    */
-  std::function<void(promise<R>, T...)> wakeup;
+  std::function<void(wpi::util::promise<R>, T...)> wakeup;
 
  private:
-  wpi::mutex m_mutex;
+  wpi::util::mutex m_mutex;
   std::vector<std::pair<uint64_t, std::tuple<T...>>> m_params;
-  PromiseFactory<R> m_promises;
+  wpi::util::PromiseFactory<R> m_promises;
   std::weak_ptr<Loop> m_loop;
 };
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_ASYNCFUNCTION_HPP_

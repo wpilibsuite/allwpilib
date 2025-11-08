@@ -9,9 +9,9 @@
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 #include "wpimath/protobuf/trajectory.npb.h"
 
-std::optional<frc::Trajectory::State>
-wpi::Protobuf<frc::Trajectory::State>::Unpack(InputStream& stream) {
-  wpi::UnpackCallback<frc::Pose2d> pose;
+std::optional<wpi::math::Trajectory::State>
+wpi::util::Protobuf<wpi::math::Trajectory::State>::Unpack(InputStream& stream) {
+  wpi::util::UnpackCallback<wpi::math::Pose2d> pose;
   wpi_proto_ProtobufTrajectoryState msg;
   msg.pose = pose.Callback();
 
@@ -25,18 +25,18 @@ wpi::Protobuf<frc::Trajectory::State>::Unpack(InputStream& stream) {
     return {};
   }
 
-  return frc::Trajectory::State{
-      units::second_t{msg.time},
-      units::meters_per_second_t{msg.velocity},
-      units::meters_per_second_squared_t{msg.acceleration},
+  return wpi::math::Trajectory::State{
+      wpi::units::second_t{msg.time},
+      wpi::units::meters_per_second_t{msg.velocity},
+      wpi::units::meters_per_second_squared_t{msg.acceleration},
       std::move(ipose[0]),
-      units::curvature_t{msg.curvature},
+      wpi::units::curvature_t{msg.curvature},
   };
 }
 
-bool wpi::Protobuf<frc::Trajectory::State>::Pack(
-    OutputStream& stream, const frc::Trajectory::State& value) {
-  wpi::PackCallback pose{&value.pose};
+bool wpi::util::Protobuf<wpi::math::Trajectory::State>::Pack(
+    OutputStream& stream, const wpi::math::Trajectory::State& value) {
+  wpi::util::PackCallback pose{&value.pose};
   wpi_proto_ProtobufTrajectoryState msg{
       .time = value.t.value(),
       .velocity = value.velocity.value(),

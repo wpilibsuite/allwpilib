@@ -16,7 +16,7 @@
 #include <cstring>
 #include <stdarg.h>
 
-using namespace wpi;
+using namespace wpi::util;
 
 namespace {
 

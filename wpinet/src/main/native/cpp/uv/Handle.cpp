@@ -4,7 +4,7 @@
 
 #include "wpi/net/uv/Handle.hpp"
 
-using namespace wpi::uv;
+using namespace wpi::net::uv;
 
 Handle::~Handle() noexcept {
   if (!m_closed && m_uv_handle->type != UV_UNKNOWN_HANDLE) {

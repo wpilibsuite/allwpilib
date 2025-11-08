@@ -19,24 +19,24 @@
 #include "wpi/util/json_fwd.hpp"
 #include "wpi/util/mutex.hpp"
 
-namespace wpi {
+namespace wpi::util {
 class Logger;
 template <typename T>
 class SmallVectorImpl;
 }  // namespace wpi
 
-namespace cs {
+namespace wpi::cs {
 
 class PropertyContainer {
  public:
   virtual ~PropertyContainer() = default;
 
   int GetPropertyIndex(std::string_view name) const;
-  std::span<int> EnumerateProperties(wpi::SmallVectorImpl<int>& vec,
+  std::span<int> EnumerateProperties(wpi::util::SmallVectorImpl<int>& vec,
                                      CS_Status* status) const;
   CS_PropertyKind GetPropertyKind(int property) const;
   std::string_view GetPropertyName(int property,
-                                   wpi::SmallVectorImpl<char>& buf,
+                                   wpi::util::SmallVectorImpl<char>& buf,
                                    CS_Status* status) const;
   int GetProperty(int property, CS_Status* status) const;
   virtual void SetProperty(int property, int value, CS_Status* status);
@@ -45,16 +45,16 @@ class PropertyContainer {
   int GetPropertyStep(int property, CS_Status* status) const;
   int GetPropertyDefault(int property, CS_Status* status) const;
   std::string_view GetStringProperty(int property,
-                                     wpi::SmallVectorImpl<char>& buf,
+                                     wpi::util::SmallVectorImpl<char>& buf,
                                      CS_Status* status) const;
   virtual void SetStringProperty(int property, std::string_view value,
                                  CS_Status* status);
   std::vector<std::string> GetEnumPropertyChoices(int property,
                                                   CS_Status* status) const;
 
-  bool SetPropertiesJson(const wpi::json& config, wpi::Logger& logger,
+  bool SetPropertiesJson(const wpi::util::json& config, wpi::util::Logger& logger,
                          std::string_view logName, CS_Status* status);
-  wpi::json GetPropertiesJsonObject(CS_Status* status);
+  wpi::util::json GetPropertiesJsonObject(CS_Status* status);
 
  protected:
   // Get a property; must be called with m_mutex held.
@@ -116,13 +116,13 @@ class PropertyContainer {
   // should not be called again)
   mutable std::atomic_bool m_properties_cached{false};
 
-  mutable wpi::mutex m_mutex;
+  mutable wpi::util::mutex m_mutex;
 
   // Cached properties (protected with m_mutex)
   mutable std::vector<std::unique_ptr<PropertyImpl>> m_propertyData;
-  mutable wpi::StringMap<int> m_properties;
+  mutable wpi::util::StringMap<int> m_properties;
 };
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_PROPERTYCONTAINER_HPP_

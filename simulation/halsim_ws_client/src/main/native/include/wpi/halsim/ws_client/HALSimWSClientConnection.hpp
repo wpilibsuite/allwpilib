@@ -24,23 +24,23 @@ class HALSimWSClientConnection
       public std::enable_shared_from_this<HALSimWSClientConnection> {
  public:
   explicit HALSimWSClientConnection(std::shared_ptr<HALSimWS> client,
-                                    std::shared_ptr<wpi::uv::Stream> stream)
+                                    std::shared_ptr<wpi::net::uv::Stream> stream)
       : m_client(std::move(client)),
         m_stream(std::move(stream)),
         m_buffers(128) {}
 
  public:
-  void OnSimValueChanged(const wpi::json& msg) override;
+  void OnSimValueChanged(const wpi::util::json& msg) override;
   void Initialize();
 
  private:
   std::shared_ptr<HALSimWS> m_client;
-  std::shared_ptr<wpi::uv::Stream> m_stream;
+  std::shared_ptr<wpi::net::uv::Stream> m_stream;
 
   bool m_ws_connected = false;
-  wpi::WebSocket* m_websocket = nullptr;
+  wpi::net::WebSocket* m_websocket = nullptr;
 
-  wpi::uv::SimpleBufferPool<4> m_buffers;
+  wpi::net::uv::SimpleBufferPool<4> m_buffers;
   std::mutex m_buffers_mutex;
 };
 

@@ -20,51 +20,51 @@
 #include "wpi/hal/simulation/SimDeviceData.h"
 
 extern "C" void HALSIM_ResetAllSimData(void) {
-  for (int32_t i = 0; i < hal::kNumAddressableLEDs; i++) {
+  for (int32_t i = 0; i < wpi::hal::kNumAddressableLEDs; i++) {
     HALSIM_ResetAddressableLEDData(i);
   }
 
-  for (int32_t i = 0; i < hal::kNumAnalogInputs; i++) {
+  for (int32_t i = 0; i < wpi::hal::kNumAnalogInputs; i++) {
     HALSIM_ResetAnalogInData(i);
   }
 
   HALSIM_ResetCanData();
 
-  for (int32_t i = 0; i < hal::kNumCTREPCMModules; i++) {
+  for (int32_t i = 0; i < wpi::hal::kNumCTREPCMModules; i++) {
     HALSIM_ResetCTREPCMData(i);
   }
 
-  for (int32_t i = 0; i < hal::kNumDigitalPWMOutputs; i++) {
+  for (int32_t i = 0; i < wpi::hal::kNumDigitalPWMOutputs; i++) {
     HALSIM_ResetDigitalPWMData(i);
   }
 
-  for (int32_t i = 0; i < hal::kNumDigitalChannels; i++) {
+  for (int32_t i = 0; i < wpi::hal::kNumDigitalChannels; i++) {
     HALSIM_ResetDIOData(i);
   }
 
   HALSIM_ResetDriverStationData();
 
-  for (int32_t i = 0; i < hal::kNumDutyCycles; i++) {
+  for (int32_t i = 0; i < wpi::hal::kNumDutyCycles; i++) {
     HALSIM_ResetDutyCycleData(i);
   }
 
-  for (int32_t i = 0; i < hal::kNumEncoders; i++) {
+  for (int32_t i = 0; i < wpi::hal::kNumEncoders; i++) {
     HALSIM_ResetEncoderData(i);
   }
 
-  for (int32_t i = 0; i < hal::kI2CPorts; i++) {
+  for (int32_t i = 0; i < wpi::hal::kI2CPorts; i++) {
     HALSIM_ResetI2CData(i);
   }
 
-  for (int32_t i = 0; i < hal::kNumPDSimModules; i++) {
+  for (int32_t i = 0; i < wpi::hal::kNumPDSimModules; i++) {
     HALSIM_ResetPowerDistributionData(i);
   }
 
-  for (int32_t i = 0; i < hal::kNumPWMChannels; i++) {
+  for (int32_t i = 0; i < wpi::hal::kNumPWMChannels; i++) {
     HALSIM_ResetPWMData(i);
   }
 
-  for (int32_t i = 0; i < hal::kNumREVPHModules; i++) {
+  for (int32_t i = 0; i < wpi::hal::kNumREVPHModules; i++) {
     HALSIM_ResetREVPHData(i);
   }
 

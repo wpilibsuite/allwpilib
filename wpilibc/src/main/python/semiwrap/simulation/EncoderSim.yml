@@ -2,7 +2,7 @@ extra_includes:
 - wpi/hardware/rotation/Encoder.hpp
 
 classes:
-  frc::sim::EncoderSim:
+  wpi::sim::EncoderSim:
     force_type_casters:
     - std::function
     methods:

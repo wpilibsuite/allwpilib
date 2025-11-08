@@ -15,7 +15,7 @@
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/json.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 template <typename To>
 bool ConvertFromString(To* out, std::string_view str) {
@@ -24,19 +24,19 @@ bool ConvertFromString(To* out, std::string_view str) {
       *out = true;
     } else if (str == "false") {
       *out = false;
-    } else if (auto val = wpi::parse_integer<int>(str, 10)) {
+    } else if (auto val = wpi::util::parse_integer<int>(str, 10)) {
       *out = val.value() != 0;
     } else {
       return false;
     }
   } else if constexpr (std::floating_point<To>) {
-    if (auto val = wpi::parse_float<To>(str)) {
+    if (auto val = wpi::util::parse_float<To>(str)) {
       *out = val.value();
     } else {
       return false;
     }
   } else {
-    if (auto val = wpi::parse_integer<To>(str, 10)) {
+    if (auto val = wpi::util::parse_integer<To>(str, 10)) {
       *out = val.value();
     } else {
       return false;
@@ -300,7 +300,7 @@ DEFUN(Double, double, double, double, double)
 DEFUN(String, string, std::string, std::string_view, std::string)
 
 Storage& Storage::GetChild(std::string_view label_id) {
-  auto [label, id] = wpi::split(label_id, "###");
+  auto [label, id] = wpi::util::split(label_id, "###");
   if (id.empty()) {
     id = label;
   }
@@ -345,9 +345,9 @@ void Storage::EraseChildren() {
   });
 }
 
-static bool JsonArrayToStorage(Storage::Value* valuePtr, const wpi::json& jarr,
+static bool JsonArrayToStorage(Storage::Value* valuePtr, const wpi::util::json& jarr,
                                const char* filename) {
-  auto& arr = jarr.get_ref<const wpi::json::array_t&>();
+  auto& arr = jarr.get_ref<const wpi::util::json::array_t&>();
   if (arr.empty()) {
     ImGui::LogText("empty array in %s, ignoring", filename);
     return false;
@@ -355,42 +355,42 @@ static bool JsonArrayToStorage(Storage::Value* valuePtr, const wpi::json& jarr,
 
   // guess array type from first element
   switch (arr[0].type()) {
-    case wpi::json::value_t::boolean:
+    case wpi::util::json::value_t::boolean:
       if (valuePtr->type != Storage::Value::kBoolArray) {
         valuePtr->Reset(Storage::Value::kBoolArray);
         valuePtr->boolArray = new std::vector<int>();
         valuePtr->boolArrayDefault = nullptr;
       }
       break;
-    case wpi::json::value_t::number_float:
+    case wpi::util::json::value_t::number_float:
       if (valuePtr->type != Storage::Value::kDoubleArray) {
         valuePtr->Reset(Storage::Value::kDoubleArray);
         valuePtr->doubleArray = new std::vector<double>();
         valuePtr->doubleArrayDefault = nullptr;
       }
       break;
-    case wpi::json::value_t::number_integer:
-    case wpi::json::value_t::number_unsigned:
+    case wpi::util::json::value_t::number_integer:
+    case wpi::util::json::value_t::number_unsigned:
       if (valuePtr->type != Storage::Value::kInt64Array) {
         valuePtr->Reset(Storage::Value::kInt64Array);
         valuePtr->int64Array = new std::vector<int64_t>();
         valuePtr->int64ArrayDefault = nullptr;
       }
       break;
-    case wpi::json::value_t::string:
+    case wpi::util::json::value_t::string:
       if (valuePtr->type != Storage::Value::kStringArray) {
         valuePtr->Reset(Storage::Value::kStringArray);
         valuePtr->stringArray = new std::vector<std::string>();
         valuePtr->stringArrayDefault = nullptr;
       }
       break;
-    case wpi::json::value_t::object:
+    case wpi::util::json::value_t::object:
       if (valuePtr->type != Storage::Value::kChildArray) {
         valuePtr->Reset(Storage::Value::kChildArray);
         valuePtr->childArray = new std::vector<std::unique_ptr<Storage>>();
       }
       break;
-    case wpi::json::value_t::array:
+    case wpi::util::json::value_t::array:
       ImGui::LogText("nested array in %s, ignoring", filename);
       return false;
     default:
@@ -401,21 +401,21 @@ static bool JsonArrayToStorage(Storage::Value* valuePtr, const wpi::json& jarr,
   // loop over array to store elements
   for (auto jvalue : arr) {
     switch (jvalue.type()) {
-      case wpi::json::value_t::boolean:
+      case wpi::util::json::value_t::boolean:
         if (valuePtr->type == Storage::Value::kBoolArray) {
           valuePtr->boolArray->push_back(jvalue.get<bool>());
         } else {
           goto error;
         }
         break;
-      case wpi::json::value_t::number_float:
+      case wpi::util::json::value_t::number_float:
         if (valuePtr->type == Storage::Value::kDoubleArray) {
           valuePtr->doubleArray->push_back(jvalue.get<double>());
         } else {
           goto error;
         }
         break;
-      case wpi::json::value_t::number_integer:
+      case wpi::util::json::value_t::number_integer:
         if (valuePtr->type == Storage::Value::kInt64Array) {
           valuePtr->int64Array->push_back(jvalue.get<int64_t>());
         } else if (valuePtr->type == Storage::Value::kDoubleArray) {
@@ -424,7 +424,7 @@ static bool JsonArrayToStorage(Storage::Value* valuePtr, const wpi::json& jarr,
           goto error;
         }
         break;
-      case wpi::json::value_t::number_unsigned:
+      case wpi::util::json::value_t::number_unsigned:
         if (valuePtr->type == Storage::Value::kInt64Array) {
           valuePtr->int64Array->push_back(jvalue.get<uint64_t>());
         } else if (valuePtr->type == Storage::Value::kDoubleArray) {
@@ -433,7 +433,7 @@ static bool JsonArrayToStorage(Storage::Value* valuePtr, const wpi::json& jarr,
           goto error;
         }
         break;
-      case wpi::json::value_t::string:
+      case wpi::util::json::value_t::string:
         if (valuePtr->type == Storage::Value::kStringArray) {
           valuePtr->stringArray->emplace_back(
               jvalue.get_ref<const std::string&>());
@@ -441,7 +441,7 @@ static bool JsonArrayToStorage(Storage::Value* valuePtr, const wpi::json& jarr,
           goto error;
         }
         break;
-      case wpi::json::value_t::object:
+      case wpi::util::json::value_t::object:
         if (valuePtr->type == Storage::Value::kChildArray) {
           valuePtr->childArray->emplace_back(std::make_unique<Storage>());
           valuePtr->childArray->back()->FromJson(jvalue, filename);
@@ -449,7 +449,7 @@ static bool JsonArrayToStorage(Storage::Value* valuePtr, const wpi::json& jarr,
           goto error;
         }
         break;
-      case wpi::json::value_t::array:
+      case wpi::util::json::value_t::array:
         ImGui::LogText("nested array in %s, ignoring", filename);
         return false;
       default:
@@ -464,7 +464,7 @@ error:
   return false;
 }
 
-bool Storage::FromJson(const wpi::json& json, const char* filename) {
+bool Storage::FromJson(const wpi::util::json& json, const char* filename) {
   if (m_fromJson) {
     return m_fromJson(json, filename);
   }
@@ -482,34 +482,34 @@ bool Storage::FromJson(const wpi::json& json, const char* filename) {
     }
     auto& jvalue = jkv.value();
     switch (jvalue.type()) {
-      case wpi::json::value_t::boolean:
+      case wpi::util::json::value_t::boolean:
         valuePtr->Reset(Value::kBool);
         valuePtr->boolVal = jvalue.get<bool>();
         break;
-      case wpi::json::value_t::number_float:
+      case wpi::util::json::value_t::number_float:
         valuePtr->Reset(Value::kDouble);
         valuePtr->doubleVal = jvalue.get<double>();
         break;
-      case wpi::json::value_t::number_integer:
+      case wpi::util::json::value_t::number_integer:
         valuePtr->Reset(Value::kInt64);
         valuePtr->int64Val = jvalue.get<int64_t>();
         break;
-      case wpi::json::value_t::number_unsigned:
+      case wpi::util::json::value_t::number_unsigned:
         valuePtr->Reset(Value::kInt64);
         valuePtr->int64Val = jvalue.get<uint64_t>();
         break;
-      case wpi::json::value_t::string:
+      case wpi::util::json::value_t::string:
         valuePtr->Reset(Value::kString);
         valuePtr->stringVal = jvalue.get_ref<const std::string&>();
         break;
-      case wpi::json::value_t::object:
+      case wpi::util::json::value_t::object:
         if (valuePtr->type != Value::kChild) {
           valuePtr->Reset(Value::kChild);
           valuePtr->child = new Storage;
         }
         valuePtr->child->FromJson(jvalue, filename);  // recurse
         break;
-      case wpi::json::value_t::array:
+      case wpi::util::json::value_t::array:
         if (!JsonArrayToStorage(valuePtr.get(), jvalue, filename)) {
           if (created) {
             m_values.erase(jkv.key());
@@ -528,8 +528,8 @@ bool Storage::FromJson(const wpi::json& json, const char* filename) {
 }
 
 template <typename T>
-static wpi::json StorageToJsonArray(const std::vector<T>& arr) {
-  wpi::json jarr = wpi::json::array();
+static wpi::util::json StorageToJsonArray(const std::vector<T>& arr) {
+  wpi::util::json jarr = wpi::util::json::array();
   for (auto&& v : arr) {
     jarr.emplace_back(v);
   }
@@ -537,27 +537,27 @@ static wpi::json StorageToJsonArray(const std::vector<T>& arr) {
 }
 
 template <>
-wpi::json StorageToJsonArray<std::unique_ptr<Storage>>(
+wpi::util::json StorageToJsonArray<std::unique_ptr<Storage>>(
     const std::vector<std::unique_ptr<Storage>>& arr) {
-  wpi::json jarr = wpi::json::array();
+  wpi::util::json jarr = wpi::util::json::array();
   for (auto&& v : arr) {
     jarr.emplace_back(v->ToJson());
   }
   // remove any trailing empty items
   while (!jarr.empty() && jarr.back().empty()) {
-    jarr.get_ref<wpi::json::array_t&>().pop_back();
+    jarr.get_ref<wpi::util::json::array_t&>().pop_back();
   }
   return jarr;
 }
 
-wpi::json Storage::ToJson() const {
+wpi::util::json Storage::ToJson() const {
   if (m_toJson) {
     return m_toJson();
   }
 
-  wpi::json j = wpi::json::object();
+  wpi::util::json j = wpi::util::json::object();
   for (auto&& kv : m_values) {
-    wpi::json jelem;
+    wpi::util::json jelem;
     auto& value = *kv.second;
     switch (value.type) {
 #define CASE(CapsName, LowerName)                                        \

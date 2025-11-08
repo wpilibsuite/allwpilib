@@ -10,8 +10,8 @@
 #include "wpi/hardware/discrete/PWM.hpp"
 #include "wpi/hardware/motor/PWMMotorController.hpp"
 
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 PWMSim::PWMSim(const PWM& pwm) : m_index{pwm.GetChannel()} {}
 

@@ -9,7 +9,7 @@
 #include "wpi/glass/Model.hpp"
 #include "wpi/util/function_ref.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 class DoubleSource;
 
@@ -29,7 +29,7 @@ class PowerDistributionModel : public Model {
 class PowerDistributionsModel : public Model {
  public:
   virtual void ForEachPowerDistribution(
-      wpi::function_ref<void(PowerDistributionModel& model, int index)>
+      wpi::util::function_ref<void(PowerDistributionModel& model, int index)>
           func) = 0;
 };
 
@@ -38,4 +38,4 @@ void DisplayPowerDistributions(
     PowerDistributionsModel* model,
     std::string_view noneMsg = "No Power Distributions");
 
-}  // namespace glass
+}  // namespace wpi::glass

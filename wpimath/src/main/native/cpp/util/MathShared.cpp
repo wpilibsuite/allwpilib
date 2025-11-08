@@ -20,14 +20,14 @@ class DefaultMathShared : public MathShared {
   void ReportWarningV(fmt::string_view format, fmt::format_args args) override {
   }
   void ReportUsage(std::string_view resource, std::string_view data) override {}
-  units::second_t GetTimestamp() override {
-    return units::second_t{wpi::Now() * 1.0e-6};
+  wpi::units::second_t GetTimestamp() override {
+    return wpi::units::second_t{wpi::util::Now() * 1.0e-6};
   }
 };
 }  // namespace
 
 static std::unique_ptr<MathShared> mathShared;
-static wpi::mutex setLock;
+static wpi::util::mutex setLock;
 
 MathShared& MathSharedStore::GetMathShared() {
   std::scoped_lock lock(setLock);

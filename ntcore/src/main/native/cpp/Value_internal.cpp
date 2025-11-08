@@ -4,9 +4,9 @@
 
 #include "Value_internal.hpp"
 
-using namespace nt;
+using namespace wpi::nt;
 
-Value nt::ConvertNumericValue(const Value& value, NT_Type type) {
+Value wpi::nt::ConvertNumericValue(const Value& value, NT_Type type) {
   switch (type) {
     case NT_INTEGER: {
       Value newval =

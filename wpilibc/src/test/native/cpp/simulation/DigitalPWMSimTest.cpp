@@ -10,7 +10,7 @@
 #include "wpi/hal/HAL.h"
 #include "wpi/hardware/discrete/DigitalOutput.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 
 TEST(DigitalPWMSimTest, Initialize) {
   HAL_Initialize(500, 0);
@@ -54,4 +54,4 @@ TEST(DigitalPWMSimTest, SetPin) {
   EXPECT_EQ(191, callback.GetLastValue());
 }
 
-}  // namespace frc::sim
+}  // namespace wpi::sim

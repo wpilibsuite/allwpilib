@@ -10,7 +10,7 @@
 
 #include "wpi/commands2/Subsystem.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 
 /**
  * Represents requirements for a command, which is a set of (pointers to)
@@ -43,4 +43,4 @@ class Requirements {
   std::vector<Subsystem*> m_subsystems;
 };
 
-}  // namespace frc2
+}  // namespace wpi::cmd

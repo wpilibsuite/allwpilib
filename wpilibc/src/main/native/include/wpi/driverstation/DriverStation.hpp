@@ -16,7 +16,7 @@ namespace wpi::log {
 class DataLog;
 }  // namespace wpi::log
 
-namespace frc {
+namespace wpi {
 
 /**
  * Provide access to the network communication data to / from the Driver
@@ -79,26 +79,26 @@ class DriverStation final {
    * @return The angle clockwise from straight up, or std::nullopt if the
    * POVDirection is kCenter.
    */
-  static constexpr std::optional<Rotation2d> GetAngle(POVDirection angle) {
+  static constexpr std::optional<wpi::math::Rotation2d> GetAngle(POVDirection angle) {
     switch (angle) {
       case kCenter:
         return std::nullopt;
       case kUp:
-        return Rotation2d{0_deg};
+        return wpi::math::Rotation2d{0_deg};
       case kUpRight:
-        return Rotation2d{45_deg};
+        return wpi::math::Rotation2d{45_deg};
       case kRight:
-        return Rotation2d{90_deg};
+        return wpi::math::Rotation2d{90_deg};
       case kDownRight:
-        return Rotation2d{135_deg};
+        return wpi::math::Rotation2d{135_deg};
       case kDown:
-        return Rotation2d{180_deg};
+        return wpi::math::Rotation2d{180_deg};
       case kDownLeft:
-        return Rotation2d{225_deg};
+        return wpi::math::Rotation2d{225_deg};
       case kLeft:
-        return Rotation2d{270_deg};
+        return wpi::math::Rotation2d{270_deg};
       case kUpLeft:
-        return Rotation2d{315_deg};
+        return wpi::math::Rotation2d{315_deg};
       default:
         return std::nullopt;
     }
@@ -433,7 +433,7 @@ class DriverStation final {
    *
    * @return Time remaining in current match period (auto or teleop) in seconds
    */
-  static units::second_t GetMatchTime();
+  static wpi::units::second_t GetMatchTime();
 
   /**
    * Read the battery voltage.
@@ -492,4 +492,4 @@ class DriverStation final {
   DriverStation() = default;
 };
 
-}  // namespace frc
+}  // namespace wpi

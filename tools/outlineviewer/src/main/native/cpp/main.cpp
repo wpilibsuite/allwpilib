@@ -34,21 +34,21 @@ std::string_view GetResource_ov_256_png();
 std::string_view GetResource_ov_512_png();
 }  // namespace ov
 
-static std::unique_ptr<glass::NetworkTablesModel> gModel;
-static std::unique_ptr<glass::NetworkTablesSettings> gSettings;
-static glass::LogData gLog;
-static glass::NetworkTablesFlagsSettings gFlagsSettings;
-static glass::MainMenuBar gMainMenu;
+static std::unique_ptr<wpi::glass::NetworkTablesModel> gModel;
+static std::unique_ptr<wpi::glass::NetworkTablesSettings> gSettings;
+static wpi::glass::LogData gLog;
+static wpi::glass::NetworkTablesFlagsSettings gFlagsSettings;
+static wpi::glass::MainMenuBar gMainMenu;
 static unsigned int gPrevMode = NT_NET_MODE_NONE;
 
 /**
  * Generates the proper title bar title based on current instance state and
  * event.
  */
-static std::string MakeTitle(NT_Inst inst, nt::Event event) {
-  auto mode = nt::GetNetworkMode(inst);
+static std::string MakeTitle(NT_Inst inst, wpi::nt::Event event) {
+  auto mode = wpi::nt::GetNetworkMode(inst);
   if (mode & NT_NET_MODE_SERVER) {
-    auto numClients = nt::GetConnections(inst).size();
+    auto numClients = wpi::nt::GetConnections(inst).size();
     return fmt::format("OutlineViewer - {} Client{} Connected", numClients,
                        (numClients == 1 ? "" : "s"));
   } else if (mode & NT_NET_MODE_CLIENT) {
@@ -61,22 +61,22 @@ static std::string MakeTitle(NT_Inst inst, nt::Event event) {
 }
 
 static void NtInitialize() {
-  auto inst = nt::GetDefaultInstance();
-  auto poller = nt::CreateListenerPoller(inst);
-  nt::AddPolledListener(poller, inst, NT_EVENT_CONNECTION | NT_EVENT_IMMEDIATE);
-  nt::AddPolledLogger(poller, NT_LOG_INFO, 100);
+  auto inst = wpi::nt::GetDefaultInstance();
+  auto poller = wpi::nt::CreateListenerPoller(inst);
+  wpi::nt::AddPolledListener(poller, inst, NT_EVENT_CONNECTION | NT_EVENT_IMMEDIATE);
+  wpi::nt::AddPolledLogger(poller, NT_LOG_INFO, 100);
   gui::AddEarlyExecute([inst, poller] {
     auto win = gui::GetSystemWindow();
     if (!win) {
       return;
     }
     bool updateTitle = false;
-    nt::Event connectionEvent;
-    if (nt::GetNetworkMode(inst) != gPrevMode) {
-      gPrevMode = nt::GetNetworkMode(inst);
+    wpi::nt::Event connectionEvent;
+    if (wpi::nt::GetNetworkMode(inst) != gPrevMode) {
+      gPrevMode = wpi::nt::GetNetworkMode(inst);
       updateTitle = true;
     }
-    for (auto&& event : nt::ReadListenerQueue(poller)) {
+    for (auto&& event : wpi::nt::ReadListenerQueue(poller)) {
       if (event.Is(NT_EVENT_CONNECTION)) {
         updateTitle = true;
         connectionEvent = event;
@@ -101,13 +101,13 @@ static void NtInitialize() {
   });
 
   // NetworkTables table window
-  gModel = std::make_unique<glass::NetworkTablesModel>();
+  gModel = std::make_unique<wpi::glass::NetworkTablesModel>();
   gui::AddEarlyExecute([] { gModel->Update(); });
 
   // NetworkTables settings window
-  gSettings = std::make_unique<glass::NetworkTablesSettings>(
+  gSettings = std::make_unique<wpi::glass::NetworkTablesSettings>(
       "outlineviewer",
-      glass::GetStorageRoot().GetChild("NetworkTables Settings"));
+      wpi::glass::GetStorageRoot().GetChild("NetworkTables Settings"));
   gui::AddEarlyExecute([] { gSettings->Update(); });
 }
 
@@ -139,7 +139,7 @@ static void DisplayGui() {
   gui::EmitViewMenu();
   if (ImGui::BeginMenu("View")) {
     gFlagsSettings.DisplayMenu();
-    glass::DisplayNetworkTablesAddMenu(gModel.get());
+    wpi::glass::DisplayNetworkTablesAddMenu(gModel.get());
     ImGui::EndMenu();
   }
 
@@ -197,7 +197,7 @@ static void DisplayGui() {
       ImGui::CloseCurrentPopup();
     }
     ImGui::BeginChild("Lines", ImVec2(width * 0.75f, height * 0.75f));
-    glass::DisplayLog(&gLog, true);
+    wpi::glass::DisplayLog(&gLog, true);
     ImGui::EndChild();
     ImGui::EndPopup();
   }
@@ -212,7 +212,7 @@ static void DisplayGui() {
     ImGui::Separator();
     ImGui::Text("v%s", GetWPILibVersion());
     ImGui::Separator();
-    ImGui::Text("Save location: %s", glass::GetStorageDir().c_str());
+    ImGui::Text("Save location: %s", wpi::glass::GetStorageDir().c_str());
     ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
                 ImGui::GetIO().Framerate);
     if (ImGui::Button("Close")) {
@@ -222,9 +222,9 @@ static void DisplayGui() {
   }
 
   // display table view
-  glass::DisplayNetworkTablesInfo(gModel.get());
+  wpi::glass::DisplayNetworkTablesInfo(gModel.get());
   ImGui::Separator();
-  glass::DisplayNetworkTables(gModel.get(), gFlagsSettings.GetFlags());
+  wpi::glass::DisplayNetworkTables(gModel.get(), gFlagsSettings.GetFlags());
 
   ImGui::End();
 }
@@ -243,7 +243,7 @@ int main(int argc, char** argv) {
   }
 
   gui::CreateContext();
-  glass::CreateContext();
+  wpi::glass::CreateContext();
 
   gui::AddIcon(ov::GetResource_ov_16_png());
   gui::AddIcon(ov::GetResource_ov_32_png());
@@ -253,8 +253,8 @@ int main(int argc, char** argv) {
   gui::AddIcon(ov::GetResource_ov_256_png());
   gui::AddIcon(ov::GetResource_ov_512_png());
 
-  glass::SetStorageName("outlineviewer");
-  glass::SetStorageDir(saveDir.empty() ? gui::GetPlatformSaveFileDir()
+  wpi::glass::SetStorageName("outlineviewer");
+  wpi::glass::SetStorageDir(saveDir.empty() ? gui::GetPlatformSaveFileDir()
                                        : saveDir);
 
   gui::AddInit(NtInitialize);
@@ -267,7 +267,7 @@ int main(int argc, char** argv) {
   gModel.reset();
   gSettings.reset();
 
-  glass::DestroyContext();
+  wpi::glass::DestroyContext();
   gui::DestroyContext();
 
   return 0;

@@ -8,7 +8,7 @@
 #include "wpi/hardware/range/SharpIR.hpp"
 #include "wpi/units/length.hpp"
 
-namespace frc {
+namespace wpi {
 
 /** Simulation class for Sharp IR sensors. */
 class SharpIRSim {
@@ -32,10 +32,10 @@ class SharpIRSim {
    *
    * @param range range of the target returned by the sensor
    */
-  void SetRange(units::meter_t range);
+  void SetRange(wpi::units::meter_t range);
 
  private:
-  hal::SimDouble m_simRange;
+  wpi::hal::SimDouble m_simRange;
 };
 
-}  // namespace frc
+}  // namespace wpi

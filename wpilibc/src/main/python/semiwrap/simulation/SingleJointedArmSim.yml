@@ -1,17 +1,17 @@
 classes:
-  frc::sim::SingleJointedArmSim:
+  wpi::sim::SingleJointedArmSim:
     typealias:
-    - frc::DCMotor
-    - template <int S, int I, int O> using LinearSystem = frc::LinearSystem<S, I, O>
-    - template <int I> using Vectord = frc::Vectord<I>
+    - wpi::math::DCMotor
+    - template <int S, int I, int O> using wpi::math::LinearSystem = wpi::math::LinearSystem<S, I, O>
+    - template <int I> using wpi::math::Vectord = wpi::math::Vectord<I>
     methods:
       SingleJointedArmSim:
         overloads:
-          ? const LinearSystem<2, 1, 2>&, const DCMotor&, double, units::meter_t, units::radian_t, units::radian_t, bool, units::radian_t, const std::array<double, 2>&
+          ? const wpi::math::LinearSystem<2, 1, 2>&, const wpi::math::DCMotor&, double, wpi::units::meter_t, wpi::units::radian_t, wpi::units::radian_t, bool, wpi::units::radian_t, const std::array<double, 2>&
           : param_override:
               measurementStdDevs:
                 default: std::array<double, 2>{0.0, 0.0}
-          ? const DCMotor&, double, units::kilogram_square_meter_t, units::meter_t, units::radian_t, units::radian_t, bool, units::radian_t, const std::array<double, 2>&
+          ? const wpi::math::DCMotor&, double, wpi::units::kilogram_square_meter_t, wpi::units::meter_t, wpi::units::radian_t, wpi::units::radian_t, bool, wpi::units::radian_t, const std::array<double, 2>&
           : param_override:
               measurementStdDevs:
                 default: std::array<double, 2>{0.0, 0.0}
@@ -29,10 +29,10 @@ classes:
 
 inline_code: |-
   cls_SingleJointedArmSim
-    .def("getAngleDegrees", [](SingleJointedArmSim * self) -> units::degree_t {
+    .def("getAngleDegrees", [](SingleJointedArmSim * self) -> wpi::units::degree_t {
       return self->GetAngle();
     })
-    .def("getVelocityDps", [](SingleJointedArmSim * self) -> units::degrees_per_second_t {
+    .def("getVelocityDps", [](SingleJointedArmSim * self) -> wpi::units::degrees_per_second_t {
       return self->GetVelocity();
     })
   ;

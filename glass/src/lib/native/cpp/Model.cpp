@@ -4,7 +4,7 @@
 
 #include "wpi/glass/Model.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 bool Model::IsReadOnly() {
   return false;

@@ -8,13 +8,13 @@
 
 #include "wpi/system/Timer.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 WaitUntilCommand::WaitUntilCommand(std::function<bool()> condition)
     : m_condition{std::move(condition)} {}
 
-WaitUntilCommand::WaitUntilCommand(units::second_t time)
-    : m_condition{[=] { return frc::Timer::GetMatchTime() - time > 0_s; }} {}
+WaitUntilCommand::WaitUntilCommand(wpi::units::second_t time)
+    : m_condition{[=] { return wpi::Timer::GetMatchTime() - time > 0_s; }} {}
 
 bool WaitUntilCommand::IsFinished() {
   return m_condition();

@@ -6,7 +6,7 @@
 
 #include "wpi/net/NetworkStream.hpp"
 
-using namespace wpi;
+using namespace wpi::net;
 
 raw_socket_ostream::~raw_socket_ostream() {
   flush();

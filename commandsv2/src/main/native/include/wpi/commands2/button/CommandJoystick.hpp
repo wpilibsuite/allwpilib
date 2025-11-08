@@ -8,12 +8,12 @@
 #include "wpi/commands2/button/Trigger.hpp"
 #include "wpi/driverstation/Joystick.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 /**
- * A version of {@link frc::Joystick} with {@link Trigger} factories for
+ * A version of {@link wpi::Joystick} with {@link Trigger} factories for
  * command-based.
  *
- * @see frc::Joystick
+ * @see wpi::Joystick
  */
 class CommandJoystick : public CommandGenericHID {
  public:
@@ -30,7 +30,7 @@ class CommandJoystick : public CommandGenericHID {
    *
    * @return the wrapped GenericHID object
    */
-  frc::Joystick& GetHID();
+  wpi::Joystick& GetHID();
 
   /**
    * Constructs an event instance around the trigger button's digital signal.
@@ -41,7 +41,7 @@ class CommandJoystick : public CommandGenericHID {
    * attached to the given loop.
    */
   class Trigger Trigger(
-      frc::EventLoop* loop =
+      wpi::EventLoop* loop =
           CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 
   /**
@@ -52,7 +52,7 @@ class CommandJoystick : public CommandGenericHID {
    * @return an event instance representing the top button's digital signal
    * attached to the given loop.
    */
-  class Trigger Top(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  class Trigger Top(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                .GetDefaultButtonLoop()) const;
   /**
    * Get the magnitude of the vector formed by the joystick's
@@ -69,9 +69,9 @@ class CommandJoystick : public CommandGenericHID {
    *
    * @return The direction of the vector.
    */
-  units::radian_t GetDirection() const;
+  wpi::units::radian_t GetDirection() const;
 
  private:
-  frc::Joystick m_hid;
+  wpi::Joystick m_hid;
 };
-}  // namespace frc2
+}  // namespace wpi::cmd

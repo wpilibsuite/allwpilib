@@ -25,12 +25,12 @@
 #include "wpi/util/raw_ostream.hpp"
 #include "wpi/util/sha1.hpp"
 
-using namespace wpi;
+using namespace wpi::net;
 
 static std::string DebugBinary(std::span<const uint8_t> val) {
 #ifdef WPINET_WEBSOCKET_VERBOSE_DEBUG_CONTENT
   std::string str;
-  wpi::raw_string_ostream stros{str};
+  wpi::util::raw_string_ostream stros{str};
   size_t limited = 0;
   if (val.size() > 30) {
     limited = val.size();
@@ -122,8 +122,8 @@ class WebSocket::ClientHandshakeData {
     for (char& v : nonce) {
       v = static_cast<char>(dist(gen));
     }
-    raw_svector_ostream os(key);
-    Base64Encode(os, {nonce, 16});
+    wpi::util::raw_svector_ostream os(key);
+    wpi::util::Base64Encode(os, {nonce, 16});
   }
   ~ClientHandshakeData() {
     if (auto t = timer.lock()) {
@@ -132,8 +132,8 @@ class WebSocket::ClientHandshakeData {
     }
   }
 
-  SmallString<64> key;                       // the key sent to the server
-  SmallVector<std::string, 2> protocols;     // valid protocols
+  wpi::util::SmallString<64> key;                       // the key sent to the server
+  wpi::util::SmallVector<std::string, 2> protocols;     // valid protocols
   HttpParser parser{HttpParser::kResponse};  // server response parser
   bool hasUpgrade = false;
   bool hasConnection = false;
@@ -144,12 +144,12 @@ class WebSocket::ClientHandshakeData {
 };
 
 static std::string_view AcceptHash(std::string_view key,
-                                   SmallVectorImpl<char>& buf) {
-  SHA1 hash;
+                                   wpi::util::SmallVectorImpl<char>& buf) {
+  wpi::util::SHA1 hash;
   hash.Update(key);
   hash.Update("258EAFA5-E914-47DA-95CA-C5AB0DC85B11");
-  SmallString<64> hashBuf;
-  return Base64Encode(hash.RawFinal(hashBuf), buf);
+  wpi::util::SmallString<64> hashBuf;
+  return wpi::util::Base64Encode(hash.RawFinal(hashBuf), buf);
 }
 
 WebSocket::WebSocket(uv::Stream& stream, bool server, const private_init&)
@@ -221,7 +221,7 @@ void WebSocket::StartClient(std::string_view uri, std::string_view host,
   m_clientHandshake = std::make_unique<ClientHandshakeData>();
 
   // Build client request
-  SmallVector<uv::Buffer, 4> bufs;
+  wpi::util::SmallVector<uv::Buffer, 4> bufs;
   raw_uv_ostream os{bufs, kWriteAllocSize};
 
   os << "GET " << uri << " HTTP/1.1\r\n";
@@ -272,34 +272,34 @@ void WebSocket::StartClient(std::string_view uri, std::string_view host,
   });
   m_clientHandshake->parser.header.connect(
       [this](std::string_view name, std::string_view value) {
-        value = trim(value);
-        if (equals_lower(name, "upgrade")) {
-          if (!equals_lower(value, "websocket")) {
+        value = wpi::util::trim(value);
+        if (wpi::util::equals_lower(name, "upgrade")) {
+          if (!wpi::util::equals_lower(value, "websocket")) {
             return Terminate(1002, "invalid upgrade response value");
           }
           m_clientHandshake->hasUpgrade = true;
-        } else if (equals_lower(name, "connection")) {
-          if (!equals_lower(value, "upgrade")) {
+        } else if (wpi::util::equals_lower(name, "connection")) {
+          if (!wpi::util::equals_lower(value, "upgrade")) {
             return Terminate(1002, "invalid connection response value");
           }
           m_clientHandshake->hasConnection = true;
-        } else if (equals_lower(name, "sec-websocket-accept")) {
+        } else if (wpi::util::equals_lower(name, "sec-websocket-accept")) {
           // Check against expected response
-          SmallString<64> acceptBuf;
-          if (!equals(value, AcceptHash(m_clientHandshake->key, acceptBuf))) {
+          wpi::util::SmallString<64> acceptBuf;
+          if (!wpi::util::equals(value, AcceptHash(m_clientHandshake->key, acceptBuf))) {
             return Terminate(1002, "invalid accept key");
           }
           m_clientHandshake->hasAccept = true;
-        } else if (equals_lower(name, "sec-websocket-extensions")) {
+        } else if (wpi::util::equals_lower(name, "sec-websocket-extensions")) {
           // No extensions are supported
           if (!value.empty()) {
             return Terminate(1010, "unsupported extension");
           }
-        } else if (equals_lower(name, "sec-websocket-protocol")) {
+        } else if (wpi::util::equals_lower(name, "sec-websocket-protocol")) {
           // Make sure it was one of the provided protocols
           bool match = false;
           for (auto&& protocol : m_clientHandshake->protocols) {
-            if (equals_lower(value, protocol)) {
+            if (wpi::util::equals_lower(value, protocol)) {
               match = true;
               break;
             }
@@ -340,7 +340,7 @@ void WebSocket::StartServer(std::string_view key, std::string_view version,
   m_protocol = protocol;
 
   // Build server response
-  SmallVector<uv::Buffer, 4> bufs;
+  wpi::util::SmallVector<uv::Buffer, 4> bufs;
   raw_uv_ostream os{bufs, kWriteAllocSize};
 
   // Handle unsupported version
@@ -364,7 +364,7 @@ void WebSocket::StartServer(std::string_view key, std::string_view version,
   os << "Connection: Upgrade\r\n";
 
   // accept hash
-  SmallString<64> acceptBuf;
+  wpi::util::SmallString<64> acceptBuf;
   os << "Sec-WebSocket-Accept: " << AcceptHash(key, acceptBuf) << "\r\n";
 
   if (!protocol.empty()) {
@@ -387,7 +387,7 @@ void WebSocket::StartServer(std::string_view key, std::string_view version,
 }
 
 void WebSocket::SendClose(uint16_t code, std::string_view reason) {
-  SmallVector<uv::Buffer, 4> bufs;
+  wpi::util::SmallVector<uv::Buffer, 4> bufs;
   if (code != 1005) {
     raw_uv_ostream os{bufs, kWriteAllocSize};
     const uint8_t codeMsb[] = {static_cast<uint8_t>((code >> 8) & 0xff),
@@ -641,7 +641,7 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
               code = (static_cast<uint16_t>(m_controlPayload[0]) << 8) |
                      static_cast<uint16_t>(m_controlPayload[1]);
               reason =
-                  drop_front({reinterpret_cast<char*>(m_controlPayload.data()),
+                  wpi::util::drop_front({reinterpret_cast<char*>(m_controlPayload.data()),
                               m_controlPayload.size()},
                              2);
             }
@@ -662,7 +662,7 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
             }
             // If the connection is open, send a Pong in response
             if (m_state == OPEN) {
-              SmallVector<uv::Buffer, 4> bufs;
+              wpi::util::SmallVector<uv::Buffer, 4> bufs;
               {
                 raw_uv_ostream os{bufs, kWriteAllocSize};
                 os << m_controlPayload;
@@ -710,35 +710,35 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
 static void VerboseDebug(const WebSocket::Frame& frame) {
 #ifdef WPINET_WEBSOCKET_VERBOSE_DEBUG
   if ((frame.opcode & 0x7f) == 0x01) {
-    SmallString<128> str;
+    wpi::util::SmallString<128> str;
 #ifdef WPINET_WEBSOCKET_VERBOSE_DEBUG_CONTENT
     for (auto&& d : frame.data) {
       str.append(std::string_view(d.base, d.len));
     }
 #endif
-    wpi::print("WS SendText({})\n", str.str());
+    wpi::util::print("WS SendText({})\n", str.str());
   } else if ((frame.opcode & 0x7f) == 0x02) {
-    SmallString<128> str;
+    wpi::util::SmallString<128> str;
 #ifdef WPINET_WEBSOCKET_VERBOSE_DEBUG_CONTENT
-    raw_svector_ostream stros{str};
+    wpi::util::raw_svector_ostream stros{str};
     for (auto&& d : frame.data) {
       for (auto ch : d.data()) {
         stros << fmt::format("{:02x},", static_cast<unsigned int>(ch) & 0xff);
       }
     }
 #endif
-    wpi::print("WS SendBinary({})\n", str.str());
+    wpi::util::print("WS SendBinary({})\n", str.str());
   } else {
-    SmallString<128> str;
+    wpi::util::SmallString<128> str;
 #ifdef WPINET_WEBSOCKET_VERBOSE_DEBUG_CONTENT
-    raw_svector_ostream stros{str};
+    wpi::util::raw_svector_ostream stros{str};
     for (auto&& d : frame.data) {
       for (auto ch : d.data()) {
         stros << fmt::format("{:02x},", static_cast<unsigned int>(ch) & 0xff);
       }
     }
 #endif
-    wpi::print("WS SendOp({}, {})\n", frame.opcode, str.str());
+    wpi::util::print("WS SendOp({}, {})\n", frame.opcode, str.str());
   }
 #endif
 }
@@ -855,7 +855,7 @@ void WebSocket::SendError(
   } else {
     err = UV_ESHUTDOWN;
   }
-  SmallVector<uv::Buffer, 4> bufs;
+  wpi::util::SmallVector<uv::Buffer, 4> bufs;
   for (auto&& frame : frames) {
     bufs.append(frame.data.begin(), frame.data.end());
   }

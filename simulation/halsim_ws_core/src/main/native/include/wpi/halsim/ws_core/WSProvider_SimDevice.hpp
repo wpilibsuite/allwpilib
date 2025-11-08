@@ -48,9 +48,9 @@ class HALSimWSProviderSimDevice : public HALSimWSBaseProvider {
 
   void OnNetworkDisconnected() override;
 
-  void OnNetValueChanged(const wpi::json& json) override;
+  void OnNetValueChanged(const wpi::util::json& json) override;
 
-  void ProcessHalCallback(const wpi::json& payload);
+  void ProcessHalCallback(const wpi::util::json& payload);
 
  private:
   static void OnValueCreatedStatic(const char* name, void* param,
@@ -73,7 +73,7 @@ class HALSimWSProviderSimDevice : public HALSimWSBaseProvider {
 
   void CancelCallbacks();
 
-  wpi::StringMap<SimDeviceValueData> m_valueHandles;
+  wpi::util::StringMap<SimDeviceValueData> m_valueHandles;
   std::shared_mutex m_vhLock;
 
   HAL_SimDeviceHandle m_handle;
@@ -81,19 +81,19 @@ class HALSimWSProviderSimDevice : public HALSimWSBaseProvider {
   std::shared_ptr<HALSimWSProviderSimDevices> m_simDevicesBase;
 
   int32_t m_simValueCreatedCbKey = 0;
-  wpi::StringMap<int32_t> m_simValueChangedCbKeys;
+  wpi::util::StringMap<int32_t> m_simValueChangedCbKeys;
 };
 
 class HALSimWSProviderSimDevices {
  public:
   using LoopFn = std::function<void()>;
-  using UvExecFn = wpi::uv::AsyncFunction<void(LoopFn)>;
+  using UvExecFn = wpi::net::uv::AsyncFunction<void(LoopFn)>;
 
   explicit HALSimWSProviderSimDevices(ProviderContainer& providers)
       : m_providers(providers) {}
   ~HALSimWSProviderSimDevices();
 
-  void Initialize(wpi::uv::Loop& loop);
+  void Initialize(wpi::net::uv::Loop& loop);
 
   void OnNetworkConnected(std::shared_ptr<HALSimBaseWebSocketConnection> hws);
   void OnNetworkDisconnected();

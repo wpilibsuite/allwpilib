@@ -19,7 +19,7 @@
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/json_fwd.hpp"
 
-namespace frc {
+namespace wpi::math {
 /**
  * Represents a time-parameterized trajectory. The trajectory contains of
  * various States that represent the pose, curvature, time elapsed, velocity,
@@ -32,19 +32,19 @@ class WPILIB_DLLEXPORT Trajectory {
    */
   struct WPILIB_DLLEXPORT State {
     /// The time elapsed since the beginning of the trajectory.
-    units::second_t t = 0_s;
+    wpi::units::second_t t = 0_s;
 
     /// The speed at that point of the trajectory.
-    units::meters_per_second_t velocity = 0_mps;
+    wpi::units::meters_per_second_t velocity = 0_mps;
 
     /// The acceleration at that point of the trajectory.
-    units::meters_per_second_squared_t acceleration = 0_mps_sq;
+    wpi::units::meters_per_second_squared_t acceleration = 0_mps_sq;
 
     /// The pose at that point of the trajectory.
     Pose2d pose;
 
     /// The curvature at that point of the trajectory.
-    units::curvature_t curvature{0.0};
+    wpi::units::curvature_t curvature{0.0};
 
     /**
      * Checks equality between this State and another object.
@@ -61,7 +61,7 @@ class WPILIB_DLLEXPORT Trajectory {
      */
     constexpr State Interpolate(State endValue, double i) const {
       // Find the new [t] value.
-      const auto newT = wpi::Lerp(t, endValue.t, i);
+      const auto newT = wpi::util::Lerp(t, endValue.t, i);
 
       // Find the delta time between the current state and the interpolated
       // state.
@@ -75,16 +75,16 @@ class WPILIB_DLLEXPORT Trajectory {
       // Check whether the robot is reversing at this stage.
       const auto reversing =
           velocity < 0_mps ||
-          (units::math::abs(velocity) < 1E-9_mps && acceleration < 0_mps_sq);
+          (wpi::units::math::abs(velocity) < 1E-9_mps && acceleration < 0_mps_sq);
 
       // Calculate the new velocity.
       // v = v_0 + at
-      const units::meters_per_second_t newV =
+      const wpi::units::meters_per_second_t newV =
           velocity + (acceleration * deltaT);
 
       // Calculate the change in position.
       // delta_s = v_0 t + 0.5at²
-      const units::meter_t newS =
+      const wpi::units::meter_t newS =
           (velocity * deltaT + 0.5 * acceleration * deltaT * deltaT) *
           (reversing ? -1.0 : 1.0);
 
@@ -96,8 +96,8 @@ class WPILIB_DLLEXPORT Trajectory {
           newS / endValue.pose.Translation().Distance(pose.Translation());
 
       return {newT, newV, acceleration,
-              wpi::Lerp(pose, endValue.pose, interpolationFrac),
-              wpi::Lerp(curvature, endValue.curvature, interpolationFrac)};
+              wpi::util::Lerp(pose, endValue.pose, interpolationFrac),
+              wpi::util::Lerp(curvature, endValue.curvature, interpolationFrac)};
     }
   };
 
@@ -121,7 +121,7 @@ class WPILIB_DLLEXPORT Trajectory {
    * Returns the overall duration of the trajectory.
    * @return The duration of the trajectory.
    */
-  units::second_t TotalTime() const { return m_totalTime; }
+  wpi::units::second_t TotalTime() const { return m_totalTime; }
 
   /**
    * Return the states of the trajectory.
@@ -137,7 +137,7 @@ class WPILIB_DLLEXPORT Trajectory {
    * @return The state at that point in time.
    * @throws std::runtime_error if the trajectory has no states.
    */
-  State Sample(units::second_t t) const {
+  State Sample(wpi::units::second_t t) const {
     if (m_states.empty()) {
       throw std::runtime_error(
           "Trajectory cannot be sampled if it has no states.");
@@ -165,7 +165,7 @@ class WPILIB_DLLEXPORT Trajectory {
     // want.
 
     // If the difference in states is negligible, then we are spot on!
-    if (units::math::abs(sample->t - prevSample->t) < 1E-9_s) {
+    if (wpi::units::math::abs(sample->t - prevSample->t) < 1E-9_s) {
       return *sample;
     }
     // Interpolate between the two states for the state that we want.
@@ -260,16 +260,16 @@ class WPILIB_DLLEXPORT Trajectory {
 
  private:
   std::vector<State> m_states;
-  units::second_t m_totalTime = 0_s;
+  wpi::units::second_t m_totalTime = 0_s;
 };
 
 WPILIB_DLLEXPORT
-void to_json(wpi::json& json, const Trajectory::State& state);
+void to_json(wpi::util::json& json, const Trajectory::State& state);
 
 WPILIB_DLLEXPORT
-void from_json(const wpi::json& json, Trajectory::State& state);
+void from_json(const wpi::util::json& json, Trajectory::State& state);
 
-}  // namespace frc
+}  // namespace wpi::math
 
 #include "wpi/math/trajectory/proto/TrajectoryProto.hpp"
 #include "wpi/math/trajectory/proto/TrajectoryStateProto.hpp"

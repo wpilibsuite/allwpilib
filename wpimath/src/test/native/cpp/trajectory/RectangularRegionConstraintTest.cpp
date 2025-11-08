@@ -12,11 +12,11 @@
 #include "wpi/units/math.hpp"
 #include "wpi/units/velocity.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 TEST(RectangularRegionConstraintTest, Constraint) {
   constexpr auto maxVelocity = 2_fps;
-  constexpr frc::Rectangle2d rectangle{{1_ft, 1_ft}, {5_ft, 27_ft}};
+  constexpr wpi::math::Rectangle2d rectangle{{1_ft, 1_ft}, {5_ft, 27_ft}};
 
   auto config = TrajectoryConfig(13_fps, 13_fps_sq);
   config.AddConstraint(RectangularRegionConstraint{
@@ -26,8 +26,8 @@ TEST(RectangularRegionConstraintTest, Constraint) {
   bool exceededConstraintOutsideRegion = false;
   for (auto& point : trajectory.States()) {
     if (rectangle.Contains(point.pose.Translation())) {
-      EXPECT_TRUE(units::math::abs(point.velocity) < maxVelocity + 0.05_mps);
-    } else if (units::math::abs(point.velocity) >= maxVelocity + 0.05_mps) {
+      EXPECT_TRUE(wpi::units::math::abs(point.velocity) < maxVelocity + 0.05_mps);
+    } else if (wpi::units::math::abs(point.velocity) >= maxVelocity + 0.05_mps) {
       exceededConstraintOutsideRegion = true;
     }
   }

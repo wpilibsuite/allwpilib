@@ -11,7 +11,7 @@
 #include "gmock/gmock.h"
 #include "wpi/nt/NetworkTableValue.hpp"
 
-namespace nt {
+namespace wpi::nt {
 
 class ValueMatcher : public ::testing::MatcherInterface<Value> {
  public:
@@ -30,4 +30,4 @@ inline ::testing::Matcher<Value> ValueEq(const Value& goodval) {
   return ::testing::MakeMatcher(new ValueMatcher(goodval));
 }
 
-}  // namespace nt
+}  // namespace wpi::nt

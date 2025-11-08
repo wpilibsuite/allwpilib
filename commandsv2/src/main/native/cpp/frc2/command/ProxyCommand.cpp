@@ -12,13 +12,13 @@
 #include "wpi/util/deprecated.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 WPI_IGNORE_DEPRECATED
-ProxyCommand::ProxyCommand(wpi::unique_function<Command*()> supplier)
+ProxyCommand::ProxyCommand(wpi::util::unique_function<Command*()> supplier)
     : m_supplier(std::move(supplier)) {}
 
-ProxyCommand::ProxyCommand(wpi::unique_function<CommandPtr()> supplier)
+ProxyCommand::ProxyCommand(wpi::util::unique_function<CommandPtr()> supplier)
     : ProxyCommand([supplier = std::move(supplier),
                     holder = std::optional<CommandPtr>{}]() mutable {
         holder = supplier();
@@ -38,7 +38,7 @@ ProxyCommand::ProxyCommand(std::unique_ptr<Command> command) {
 
 void ProxyCommand::Initialize() {
   m_command = m_supplier();
-  frc2::CommandScheduler::GetInstance().Schedule(m_command);
+  wpi::cmd::CommandScheduler::GetInstance().Schedule(m_command);
 }
 
 void ProxyCommand::End(bool interrupted) {
@@ -55,7 +55,7 @@ bool ProxyCommand::IsFinished() {
   return m_command == nullptr || !m_command->IsScheduled();
 }
 
-void ProxyCommand::InitSendable(wpi::SendableBuilder& builder) {
+void ProxyCommand::InitSendable(wpi::util::SendableBuilder& builder) {
   Command::InitSendable(builder);
   builder.AddStringProperty(
       "proxied",

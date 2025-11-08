@@ -1,8 +1,8 @@
 classes:
-  frc::sim::SendableChooserSim:
+  wpi::sim::SendableChooserSim:
     methods:
       SendableChooserSim:
         overloads:
           std::string_view:
-          nt::NetworkTableInstance, std::string_view:
+          wpi::nt::NetworkTableInstance, std::string_view:
       SetSelected:

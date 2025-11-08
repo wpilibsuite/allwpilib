@@ -22,7 +22,7 @@ WPI_JSON_NAMESPACE_BEGIN
 /*!
 @brief SAX interface
 
-This class describes the SAX interface used by @ref wpi::json::sax_parse.
+This class describes the SAX interface used by @ref wpi::util::json::sax_parse.
 Each function is called in different situations while the input is parsed. The
 boolean return value informs the parser whether to continue processing the
 input.

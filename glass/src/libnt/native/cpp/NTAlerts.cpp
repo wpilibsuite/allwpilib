@@ -8,12 +8,12 @@
 
 #include <fmt/format.h>
 
-using namespace glass;
+using namespace wpi::glass;
 
 NTAlertsModel::NTAlertsModel(std::string_view path)
-    : NTAlertsModel{nt::NetworkTableInstance::GetDefault(), path} {}
+    : NTAlertsModel{wpi::nt::NetworkTableInstance::GetDefault(), path} {}
 
-NTAlertsModel::NTAlertsModel(nt::NetworkTableInstance inst,
+NTAlertsModel::NTAlertsModel(wpi::nt::NetworkTableInstance inst,
                              std::string_view path)
     : m_inst{inst},
       m_infos{m_inst.GetStringArrayTopic(fmt::format("{}/infos", path))

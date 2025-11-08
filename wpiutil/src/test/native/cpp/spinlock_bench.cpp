@@ -15,12 +15,12 @@
 
 static std::mutex std_mutex;
 static std::recursive_mutex std_recursive_mutex;
-static wpi::mutex wpi_mutex;
-static wpi::recursive_mutex wpi_recursive_mutex;
-static wpi::spinlock spinlock;
-static wpi::recursive_spinlock1 recursive_spinlock1;
-static wpi::recursive_spinlock2 recursive_spinlock2;
-static wpi::recursive_spinlock recursive_spinlock;
+static wpi::util::mutex wpi_mutex;
+static wpi::util::recursive_mutex wpi_recursive_mutex;
+static wpi::util::spinlock spinlock;
+static wpi::util::recursive_spinlock1 recursive_spinlock1;
+static wpi::util::recursive_spinlock2 recursive_spinlock2;
+static wpi::util::recursive_spinlock recursive_spinlock;
 
 TEST(SpinlockTest, Benchmark) {
   using std::chrono::duration_cast;
@@ -52,7 +52,7 @@ TEST(SpinlockTest, Benchmark) {
       ++value;
     }
     auto stop = high_resolution_clock::now();
-    wpi::print("std::mutex sizeof: {} time: {} value: {}\n", sizeof(std_mutex),
+    wpi::util::print("std::mutex sizeof: {} time: {} value: {}\n", sizeof(std_mutex),
                duration_cast<microseconds>(stop - start).count(), value);
   });
   thrb.join();
@@ -66,7 +66,7 @@ TEST(SpinlockTest, Benchmark) {
       ++value;
     }
     auto stop = high_resolution_clock::now();
-    wpi::print("std::recursive_mutex sizeof: {} time: {} value: {}\n",
+    wpi::util::print("std::recursive_mutex sizeof: {} time: {} value: {}\n",
                sizeof(std_recursive_mutex),
                duration_cast<microseconds>(stop - start).count(), value);
   });
@@ -81,7 +81,7 @@ TEST(SpinlockTest, Benchmark) {
       ++value;
     }
     auto stop = high_resolution_clock::now();
-    wpi::print("wpi::mutex sizeof: {} time: {} value: {}\n", sizeof(wpi_mutex),
+    wpi::util::print("wpi::util::mutex sizeof: {} time: {} value: {}\n", sizeof(wpi_mutex),
                duration_cast<microseconds>(stop - start).count(), value);
   });
   thr2.join();
@@ -95,7 +95,7 @@ TEST(SpinlockTest, Benchmark) {
       ++value;
     }
     auto stop = high_resolution_clock::now();
-    wpi::print("wpi::recursive_mutex sizeof: {} time: {} value: {}\n",
+    wpi::util::print("wpi::util::recursive_mutex sizeof: {} time: {} value: {}\n",
                sizeof(wpi_recursive_mutex),
                duration_cast<microseconds>(stop - start).count(), value);
   });
@@ -110,7 +110,7 @@ TEST(SpinlockTest, Benchmark) {
       ++value;
     }
     auto stop = high_resolution_clock::now();
-    wpi::print("spinlock sizeof: {} time: {} value: {}\n", sizeof(spinlock),
+    wpi::util::print("spinlock sizeof: {} time: {} value: {}\n", sizeof(spinlock),
                duration_cast<microseconds>(stop - start).count(), value);
   });
   thr3.join();
@@ -124,7 +124,7 @@ TEST(SpinlockTest, Benchmark) {
       ++value;
     }
     auto stop = high_resolution_clock::now();
-    wpi::print("recursive_spinlock1 sizeof: {} time: {} value: {}\n",
+    wpi::util::print("recursive_spinlock1 sizeof: {} time: {} value: {}\n",
                sizeof(recursive_spinlock1),
                duration_cast<microseconds>(stop - start).count(), value);
   });
@@ -139,7 +139,7 @@ TEST(SpinlockTest, Benchmark) {
       ++value;
     }
     auto stop = high_resolution_clock::now();
-    wpi::print("recursive_spinlock2 sizeof: {} time: {} value: {}\n",
+    wpi::util::print("recursive_spinlock2 sizeof: {} time: {} value: {}\n",
                sizeof(recursive_spinlock2),
                duration_cast<microseconds>(stop - start).count(), value);
   });
@@ -154,7 +154,7 @@ TEST(SpinlockTest, Benchmark) {
       ++value;
     }
     auto stop = high_resolution_clock::now();
-    wpi::print("recursive_spinlock sizeof: {} time: {} value: {}\n",
+    wpi::util::print("recursive_spinlock sizeof: {} time: {} value: {}\n",
                sizeof(recursive_spinlock),
                duration_cast<microseconds>(stop - start).count(), value);
   });

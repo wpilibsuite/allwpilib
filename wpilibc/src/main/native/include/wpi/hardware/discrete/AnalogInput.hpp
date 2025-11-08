@@ -11,7 +11,7 @@
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Analog input class.
@@ -25,8 +25,8 @@ namespace frc {
  * are divided by the number of samples to retain the resolution, but get more
  * stable values.
  */
-class AnalogInput : public wpi::Sendable,
-                    public wpi::SendableHelper<AnalogInput> {
+class AnalogInput : public wpi::util::Sendable,
+                    public wpi::util::SendableHelper<AnalogInput> {
  public:
   /**
    * Construct an analog input.
@@ -194,11 +194,11 @@ class AnalogInput : public wpi::Sendable,
    */
   void SetSimDevice(HAL_SimDeviceHandle device);
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
   int m_channel;
-  hal::Handle<HAL_AnalogInputHandle, HAL_FreeAnalogInputPort> m_port;
+  wpi::hal::Handle<HAL_AnalogInputHandle, HAL_FreeAnalogInputPort> m_port;
 };
 
-}  // namespace frc
+}  // namespace wpi

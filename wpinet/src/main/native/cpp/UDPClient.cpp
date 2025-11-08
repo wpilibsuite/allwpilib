@@ -22,11 +22,11 @@
 #include "wpi/util/Logger.hpp"
 #include "wpi/util/SmallString.hpp"
 
-using namespace wpi;
+using namespace wpi::net;
 
-UDPClient::UDPClient(Logger& logger) : UDPClient("", logger) {}
+UDPClient::UDPClient(wpi::util::Logger& logger) : UDPClient("", logger) {}
 
-UDPClient::UDPClient(std::string_view address, Logger& logger)
+UDPClient::UDPClient(std::string_view address, wpi::util::Logger& logger)
     : m_lsd(0), m_port(0), m_address(address), m_logger(logger) {}
 
 UDPClient::UDPClient(UDPClient&& other)
@@ -85,7 +85,7 @@ int UDPClient::start(int port) {
   addr.sin_family = AF_INET;
   if (m_address.size() > 0) {
 #ifdef _WIN32
-    SmallString<128> addr_copy(m_address);
+    wpi::util::SmallString<128> addr_copy(m_address);
     addr_copy.push_back('\0');
     int res = InetPton(PF_INET, addr_copy.data(), &(addr.sin_addr));
 #else
@@ -143,7 +143,7 @@ int UDPClient::send(std::span<const uint8_t> data, std::string_view server,
   struct sockaddr_in addr;
   std::memset(&addr, 0, sizeof(addr));
   addr.sin_family = AF_INET;
-  SmallString<128> remoteAddr{server};
+  wpi::util::SmallString<128> remoteAddr{server};
   if (remoteAddr.empty()) {
     WPI_ERROR(m_logger, "server must be passed");
     return -1;
@@ -172,7 +172,7 @@ int UDPClient::send(std::string_view data, std::string_view server, int port) {
   struct sockaddr_in addr;
   std::memset(&addr, 0, sizeof(addr));
   addr.sin_family = AF_INET;
-  SmallString<128> remoteAddr{server};
+  wpi::util::SmallString<128> remoteAddr{server};
   if (remoteAddr.empty()) {
     WPI_ERROR(m_logger, "server must be passed");
     return -1;
@@ -203,7 +203,7 @@ int UDPClient::receive(uint8_t* data_received, int receive_len) {
 }
 
 int UDPClient::receive(uint8_t* data_received, int receive_len,
-                       SmallVectorImpl<char>* addr_received,
+                       wpi::util::SmallVectorImpl<char>* addr_received,
                        int* port_received) {
   if (m_port == 0) {
     return -1;  // return if not receiving

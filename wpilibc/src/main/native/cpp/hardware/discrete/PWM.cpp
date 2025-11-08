@@ -16,14 +16,14 @@
 #include "wpi/util/sendable/SendableBuilder.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 PWM::PWM(int channel, bool registerSendable) {
   if (!SensorUtil::CheckPWMChannel(channel)) {
     throw FRC_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
   }
 
-  auto stack = wpi::GetStackTrace(1);
+  auto stack = wpi::util::GetStackTrace(1);
   int32_t status = 0;
   m_handle = HAL_InitializePWMPort(channel, stack.c_str(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", channel);
@@ -34,7 +34,7 @@ PWM::PWM(int channel, bool registerSendable) {
 
   HAL_ReportUsage("IO", channel, "PWM");
   if (registerSendable) {
-    wpi::SendableRegistry::Add(this, "PWM", channel);
+    wpi::util::SendableRegistry::Add(this, "PWM", channel);
   }
 }
 
@@ -44,18 +44,18 @@ PWM::~PWM() {
   }
 }
 
-void PWM::SetPulseTime(units::microsecond_t time) {
+void PWM::SetPulseTime(wpi::units::microsecond_t time) {
   int32_t status = 0;
   HAL_SetPWMPulseTimeMicroseconds(m_handle, time.value(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
-units::microsecond_t PWM::GetPulseTime() const {
+wpi::units::microsecond_t PWM::GetPulseTime() const {
   int32_t status = 0;
   double value = HAL_GetPWMPulseTimeMicroseconds(m_handle, &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 
-  return units::microsecond_t{value};
+  return wpi::units::microsecond_t{value};
 }
 
 void PWM::SetDisabled() {
@@ -96,10 +96,10 @@ void PWM::SetSimDevice(HAL_SimDeviceHandle device) {
   HAL_SetPWMSimDevice(m_handle, device);
 }
 
-void PWM::InitSendable(wpi::SendableBuilder& builder) {
+void PWM::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("PWM");
   builder.SetActuator(true);
   builder.AddDoubleProperty(
       "Value", [=, this] { return GetPulseTime().value(); },
-      [=, this](double value) { SetPulseTime(units::millisecond_t{value}); });
+      [=, this](double value) { SetPulseTime(wpi::units::millisecond_t{value}); });
 }

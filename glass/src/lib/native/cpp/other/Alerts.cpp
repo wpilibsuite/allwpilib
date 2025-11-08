@@ -7,9 +7,9 @@
 #include <IconsFontAwesome6.h>
 #include <imgui.h>
 
-using namespace glass;
+using namespace wpi::glass;
 
-void glass::DisplayAlerts(AlertsModel* model) {
+void wpi::glass::DisplayAlerts(AlertsModel* model) {
   auto& infos = model->GetInfos();
   auto& warnings = model->GetWarnings();
   auto& errors = model->GetErrors();

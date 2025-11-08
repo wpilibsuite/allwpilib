@@ -14,7 +14,7 @@
 #include "wpi/util/json_fwd.hpp"
 #include "wpi/util/mutex.hpp"
 
-namespace cs {
+namespace wpi::cs {
 
 class Frame;
 class Notifier;
@@ -22,7 +22,7 @@ class Telemetry;
 
 class SinkImpl : public PropertyContainer {
  public:
-  explicit SinkImpl(std::string_view name, wpi::Logger& logger,
+  explicit SinkImpl(std::string_view name, wpi::util::Logger& logger,
                     Notifier& notifier, Telemetry& telemetry);
   ~SinkImpl() override;
   SinkImpl(const SinkImpl& queue) = delete;
@@ -31,7 +31,7 @@ class SinkImpl : public PropertyContainer {
   std::string_view GetName() const { return m_name; }
 
   void SetDescription(std::string_view description);
-  std::string_view GetDescription(wpi::SmallVectorImpl<char>& buf) const;
+  std::string_view GetDescription(wpi::util::SmallVectorImpl<char>& buf) const;
 
   void Enable();
   void Disable();
@@ -45,12 +45,12 @@ class SinkImpl : public PropertyContainer {
   }
 
   std::string GetError() const;
-  std::string_view GetError(wpi::SmallVectorImpl<char>& buf) const;
+  std::string_view GetError(wpi::util::SmallVectorImpl<char>& buf) const;
 
   bool SetConfigJson(std::string_view config, CS_Status* status);
-  virtual bool SetConfigJson(const wpi::json& config, CS_Status* status);
+  virtual bool SetConfigJson(const wpi::util::json& config, CS_Status* status);
   std::string GetConfigJson(CS_Status* status);
-  virtual wpi::json GetConfigJsonObject(CS_Status* status);
+  virtual wpi::util::json GetConfigJsonObject(CS_Status* status);
 
  protected:
   // PropertyContainer implementation
@@ -61,7 +61,7 @@ class SinkImpl : public PropertyContainer {
   virtual void SetSourceImpl(std::shared_ptr<SourceImpl> source);
 
  protected:
-  wpi::Logger& m_logger;
+  wpi::util::Logger& m_logger;
   Notifier& m_notifier;
   Telemetry& m_telemetry;
 
@@ -72,6 +72,6 @@ class SinkImpl : public PropertyContainer {
   int m_enabledCount{0};
 };
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_SINKIMPL_HPP_

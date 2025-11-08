@@ -16,23 +16,23 @@
 #include "wpimath/protobuf/system.npb.h"
 
 template <int States, int Inputs, int Outputs>
-struct wpi::Protobuf<frc::LinearSystem<States, Inputs, Outputs>> {
+struct wpi::util::Protobuf<wpi::math::LinearSystem<States, Inputs, Outputs>> {
   using MessageStruct = wpi_proto_ProtobufLinearSystem;
   using InputStream =
-      wpi::ProtoInputStream<frc::LinearSystem<States, Inputs, Outputs>>;
+      wpi::util::ProtoInputStream<wpi::math::LinearSystem<States, Inputs, Outputs>>;
   using OutputStream =
-      wpi::ProtoOutputStream<frc::LinearSystem<States, Inputs, Outputs>>;
+      wpi::util::ProtoOutputStream<wpi::math::LinearSystem<States, Inputs, Outputs>>;
 
-  static std::optional<frc::LinearSystem<States, Inputs, Outputs>> Unpack(
+  static std::optional<wpi::math::LinearSystem<States, Inputs, Outputs>> Unpack(
       InputStream& stream) {
-    wpi::UnpackCallback<frc::Matrixd<States, States>> a;
-    a.SetLimits(wpi::DecodeLimits::Fail);
-    wpi::UnpackCallback<frc::Matrixd<States, Inputs>> b;
-    a.SetLimits(wpi::DecodeLimits::Fail);
-    wpi::UnpackCallback<frc::Matrixd<Outputs, States>> c;
-    a.SetLimits(wpi::DecodeLimits::Fail);
-    wpi::UnpackCallback<frc::Matrixd<Outputs, Inputs>> d;
-    a.SetLimits(wpi::DecodeLimits::Fail);
+    wpi::util::UnpackCallback<wpi::math::Matrixd<States, States>> a;
+    a.SetLimits(wpi::util::DecodeLimits::Fail);
+    wpi::util::UnpackCallback<wpi::math::Matrixd<States, Inputs>> b;
+    a.SetLimits(wpi::util::DecodeLimits::Fail);
+    wpi::util::UnpackCallback<wpi::math::Matrixd<Outputs, States>> c;
+    a.SetLimits(wpi::util::DecodeLimits::Fail);
+    wpi::util::UnpackCallback<wpi::math::Matrixd<Outputs, Inputs>> d;
+    a.SetLimits(wpi::util::DecodeLimits::Fail);
 
     wpi_proto_ProtobufLinearSystem msg;
     msg.a = a.Callback();
@@ -58,7 +58,7 @@ struct wpi::Protobuf<frc::LinearSystem<States, Inputs, Outputs>> {
       return {};
     }
 
-    return frc::LinearSystem<States, Inputs, Outputs>{
+    return wpi::math::LinearSystem<States, Inputs, Outputs>{
         std::move(ai[0]),
         std::move(bi[0]),
         std::move(ci[0]),
@@ -67,11 +67,11 @@ struct wpi::Protobuf<frc::LinearSystem<States, Inputs, Outputs>> {
   }
 
   static bool Pack(OutputStream& stream,
-                   const frc::LinearSystem<States, Inputs, Outputs>& value) {
-    wpi::PackCallback a{&value.A()};
-    wpi::PackCallback b{&value.B()};
-    wpi::PackCallback c{&value.C()};
-    wpi::PackCallback d{&value.D()};
+                   const wpi::math::LinearSystem<States, Inputs, Outputs>& value) {
+    wpi::util::PackCallback a{&value.A()};
+    wpi::util::PackCallback b{&value.B()};
+    wpi::util::PackCallback c{&value.C()};
+    wpi::util::PackCallback d{&value.D()};
 
     wpi_proto_ProtobufLinearSystem msg{
         .num_states = States,

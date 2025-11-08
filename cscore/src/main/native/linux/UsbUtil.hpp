@@ -7,7 +7,7 @@
 
 #include <string>
 
-namespace cs {
+namespace wpi::cs {
 
 std::string GetUsbNameFromId(int vendor, int product);
 
@@ -19,6 +19,6 @@ int CheckedIoctl(int fd, unsigned long req, void* data,  // NOLINT(runtime/int)
 #define TryIoctl(fd, req, data) \
   CheckedIoctl(fd, req, data, #req, __FILE__, __LINE__, true)
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_USBUTIL_HPP_

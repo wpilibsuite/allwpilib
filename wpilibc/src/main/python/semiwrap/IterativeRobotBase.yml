@@ -1,5 +1,5 @@
 classes:
-  frc::IterativeRobotBase:
+  wpi::IterativeRobotBase:
     methods:
       DriverStationConnected:
       DisabledInit:
@@ -15,7 +15,7 @@ classes:
         overloads:
           double:
             ignore: true
-          units::second_t:
+          wpi::units::second_t:
       LoopFunc:
       SimulationInit:
         internal: true

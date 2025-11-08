@@ -6,15 +6,15 @@
 
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 void PyMotorControllerGroup::Initialize() {
   for (auto motorController : m_motorControllers) {
-    wpi::SendableRegistry::AddChild(this, motorController.get());
+    wpi::util::SendableRegistry::AddChild(this, motorController.get());
   }
   static int instances = 0;
   ++instances;
-  wpi::SendableRegistry::Add(this, "MotorControllerGroup", instances);
+  wpi::util::SendableRegistry::Add(this, "MotorControllerGroup", instances);
 }
 
 void PyMotorControllerGroup::Set(double speed) {
@@ -23,7 +23,7 @@ void PyMotorControllerGroup::Set(double speed) {
   }
 }
 
-void PyMotorControllerGroup::SetVoltage(units::volt_t output) {
+void PyMotorControllerGroup::SetVoltage(wpi::units::volt_t output) {
   for (auto motorController : m_motorControllers) {
     motorController->SetVoltage(m_isInverted ? -output : output);
   }
@@ -54,7 +54,7 @@ void PyMotorControllerGroup::StopMotor() {
   }
 }
 
-void PyMotorControllerGroup::InitSendable(wpi::SendableBuilder& builder) {
+void PyMotorControllerGroup::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Motor Controller");
   builder.SetActuator(true);
   builder.AddDoubleProperty("Value", [=, this]() { return Get(); },

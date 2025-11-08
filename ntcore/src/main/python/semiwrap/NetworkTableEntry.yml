@@ -7,7 +7,7 @@ extra_includes:
 inline_code: |
   #include <src/NetworkTableEntry.cpp.inl>
 classes:
-  nt::NetworkTableEntry:
+  wpi::nt::NetworkTableEntry:
     methods:
       NetworkTableEntry:
         overloads:

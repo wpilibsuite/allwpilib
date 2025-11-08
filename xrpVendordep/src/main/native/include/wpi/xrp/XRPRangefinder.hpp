@@ -7,7 +7,7 @@
 #include "wpi/hardware/discrete/AnalogInput.hpp"
 #include "wpi/units/length.hpp"
 
-namespace frc {
+namespace wpi::xrp {
 
 /**
  * @ingroup xrp_api
@@ -23,12 +23,12 @@ class XRPRangefinder {
    *
    * @return distance in meters
    */
-  units::meter_t GetDistance() const;
+  wpi::units::meter_t GetDistance() const;
 
  private:
-  frc::AnalogInput m_rangefinder{2};
+  wpi::AnalogInput m_rangefinder{2};
 };
 
 /** @} */
 
-}  // namespace frc
+}  // namespace wpi::xrp

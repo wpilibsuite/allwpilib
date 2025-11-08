@@ -14,18 +14,18 @@
 #include "wpi/util/UidVector.hpp"
 #include "wpi/util/json_fwd.hpp"
 
-namespace wpi {
+namespace wpi::util {
 class Logger;
 class raw_ostream;
 }  // namespace wpi
 
-namespace nt::server {
+namespace wpi::nt::server {
 
 class ServerClient;
 
 class ServerStorage final {
  public:
-  ServerStorage(wpi::Logger& logger,
+  ServerStorage(wpi::util::Logger& logger,
                 std::function<void(ServerTopic* topic, ServerClient* client)>
                     sendAnnounce)
       : m_logger{logger}, m_sendAnnounce{std::move(sendAnnounce)} {}
@@ -34,18 +34,18 @@ class ServerStorage final {
 
   ServerTopic* CreateTopic(ServerClient* client, std::string_view name,
                            std::string_view typeStr,
-                           const wpi::json& properties, bool special = false);
+                           const wpi::util::json& properties, bool special = false);
   ServerTopic* CreateMetaTopic(std::string_view name);
   void DeleteTopic(ServerTopic* topic);
   void SetProperties(ServerClient* client, ServerTopic* topic,
-                     const wpi::json& update);
+                     const wpi::util::json& update);
   void SetFlags(ServerClient* client, ServerTopic* topic, unsigned int flags);
   void SetValue(ServerClient* client, ServerTopic* topic, const Value& value);
 
   void RemoveClient(ServerClient* client);
 
   void PropertiesChanged(ServerClient* client, ServerTopic* topic,
-                         const wpi::json& update);
+                         const wpi::util::json& update);
 
   ServerTopic* GetTopic(unsigned int id) const {
     return id < m_topics.size() ? m_topics[id].get() : nullptr;
@@ -78,17 +78,17 @@ class ServerStorage final {
     return rv;
   }
 
-  void DumpPersistent(wpi::raw_ostream& os);
+  void DumpPersistent(wpi::util::raw_ostream& os);
   // returns newline-separated errors
   std::string LoadPersistent(std::string_view in);
 
  private:
-  wpi::Logger& m_logger;
+  wpi::util::Logger& m_logger;
   std::function<void(ServerTopic* topic, ServerClient* client)> m_sendAnnounce;
 
-  wpi::UidVector<std::unique_ptr<ServerTopic>, 16> m_topics;
-  wpi::StringMap<ServerTopic*> m_nameTopics;
+  wpi::util::UidVector<std::unique_ptr<ServerTopic>, 16> m_topics;
+  wpi::util::StringMap<ServerTopic*> m_nameTopics;
   bool m_persistentChanged{false};
 };
 
-}  // namespace nt::server
+}  // namespace wpi::nt::server

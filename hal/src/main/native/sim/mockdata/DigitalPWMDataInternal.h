@@ -7,7 +7,7 @@
 #include "wpi/hal/simulation/DigitalPWMData.h"
 #include "wpi/hal/simulation/SimDataValue.h"
 
-namespace hal {
+namespace wpi::hal {
 class DigitalPWMData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(DutyCycle)
@@ -22,4 +22,4 @@ class DigitalPWMData {
   virtual void ResetData();
 };
 extern DigitalPWMData* SimDigitalPWMData;
-}  // namespace hal
+}  // namespace wpi::hal

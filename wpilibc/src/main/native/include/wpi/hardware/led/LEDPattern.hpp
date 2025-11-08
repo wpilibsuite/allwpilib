@@ -15,7 +15,7 @@
 #include "wpi/units/velocity.hpp"
 #include "wpi/util/Color.hpp"
 
-namespace frc {
+namespace wpi {
 
 class LEDPattern {
  public:
@@ -26,27 +26,27 @@ class LEDPattern {
    */
   class LEDReader {
    public:
-    LEDReader(std::function<frc::AddressableLED::LEDData(int)> impl,
+    LEDReader(std::function<wpi::AddressableLED::LEDData(int)> impl,
               size_t size)
         : m_impl{std::move(impl)}, m_size{size} {}
 
-    frc::AddressableLED::LEDData operator[](size_t index) const {
+    wpi::AddressableLED::LEDData operator[](size_t index) const {
       return m_impl(index);
     }
 
     size_t size() const { return m_size; }
 
    private:
-    std::function<frc::AddressableLED::LEDData(int)> m_impl;
+    std::function<wpi::AddressableLED::LEDData(int)> m_impl;
     size_t m_size;
   };
 
-  explicit LEDPattern(std::function<void(frc::LEDPattern::LEDReader,
-                                         std::function<void(int, frc::Color)>)>
+  explicit LEDPattern(std::function<void(wpi::LEDPattern::LEDReader,
+                                         std::function<void(int, wpi::Color)>)>
                           impl);
 
   void ApplyTo(LEDReader reader,
-               std::function<void(int, frc::Color)> writer) const;
+               std::function<void(int, wpi::Color)> writer) const;
 
   /**
    * Writes the pattern to an LED buffer. Dynamic animations should be called
@@ -61,8 +61,8 @@ class LEDPattern {
    * @param data the current data of the LED strip
    * @param writer data writer for setting new LED colors on the LED strip
    */
-  void ApplyTo(std::span<frc::AddressableLED::LEDData> data,
-               std::function<void(int, frc::Color)> writer) const;
+  void ApplyTo(std::span<wpi::AddressableLED::LEDData> data,
+               std::function<void(int, wpi::Color)> writer) const;
 
   /**
    * Writes the pattern to an LED buffer. Dynamic animations should be called
@@ -76,7 +76,7 @@ class LEDPattern {
    *
    * @param data the current data of the LED strip
    */
-  void ApplyTo(std::span<frc::AddressableLED::LEDData> data) const;
+  void ApplyTo(std::span<wpi::AddressableLED::LEDData> data) const;
 
   /**
    * Creates a pattern with remapped indices.
@@ -120,7 +120,7 @@ class LEDPattern {
    * long (assuming equal LED density on both segments).
    */
   [[nodiscard]]
-  LEDPattern ScrollAtRelativeSpeed(units::hertz_t velocity);
+  LEDPattern ScrollAtRelativeSpeed(wpi::units::hertz_t velocity);
 
   /**
    * Creates a pattern that plays this one scrolling up an LED strip. A negative
@@ -131,11 +131,11 @@ class LEDPattern {
    *
    * <pre>
    *   // LEDs per meter, a known value taken from the spec sheet of our
-   * particular LED strip units::meter_t LED_SPACING = units::meter_t{1 /60.0};
+   * particular LED strip wpi::units::meter_t LED_SPACING = wpi::units::meter_t{1 /60.0};
    *
-   *   frc::LEDPattern rainbow = frc::LEDPattern::Rainbow();
-   *   frc::LEDPattern scrollingRainbow =
-   *     rainbow.ScrollAtAbsoluteSpeed(units::feet_per_second_t{1 / 3.0},
+   *   wpi::LEDPattern rainbow = wpi::LEDPattern::Rainbow();
+   *   wpi::LEDPattern scrollingRainbow =
+   *     rainbow.ScrollAtAbsoluteSpeed(wpi::units::feet_per_second_t{1 / 3.0},
    * LED_SPACING);
    * </pre>
    *
@@ -149,8 +149,8 @@ class LEDPattern {
    * @return the scrolling pattern
    */
   [[nodiscard]]
-  LEDPattern ScrollAtAbsoluteSpeed(units::meters_per_second_t velocity,
-                                   units::meter_t ledSpacing);
+  LEDPattern ScrollAtAbsoluteSpeed(wpi::units::meters_per_second_t velocity,
+                                   wpi::units::meter_t ledSpacing);
 
   /**
    * Creates a pattern that switches between playing this pattern and turning
@@ -161,10 +161,10 @@ class LEDPattern {
    * @return the blinking pattern
    */
   [[nodiscard]]
-  LEDPattern Blink(units::second_t onTime, units::second_t offTime);
+  LEDPattern Blink(wpi::units::second_t onTime, wpi::units::second_t offTime);
 
   /**
-   * Like {@link LEDPattern::Blink(units::second_t)}, but where the
+   * Like {@link LEDPattern::Blink(wpi::units::second_t)}, but where the
    * "off" time is exactly equal to the "on" time.
    *
    * @param onTime how long the pattern should play for (and be turned off for),
@@ -172,7 +172,7 @@ class LEDPattern {
    * @return the blinking pattern
    */
   [[nodiscard]]
-  LEDPattern Blink(units::second_t onTime);
+  LEDPattern Blink(wpi::units::second_t onTime);
 
   /**
    * Creates a pattern that blinks this one on and off in sync with a true/false
@@ -194,11 +194,11 @@ class LEDPattern {
    * @return the breathing pattern
    */
   [[nodiscard]]
-  LEDPattern Breathe(units::second_t period);
+  LEDPattern Breathe(wpi::units::second_t period);
 
   /**
    * Creates a pattern that plays this pattern overlaid on another. Anywhere
-   * this pattern sets an LED to off (or {@link frc::Color::kBlack}), the base
+   * this pattern sets an LED to off (or {@link wpi::Color::kBlack}), the base
    * pattern will be displayed instead.
    *
    * @param base the base pattern to overlay on top of
@@ -255,10 +255,10 @@ class LEDPattern {
    *
    * <pre>
    *   // Solid red, but at 50% brightness
-   *   frc::LEDPattern::Solid(frc::Color::kRed).AtBrightness(0.5);
+   *   wpi::LEDPattern::Solid(wpi::Color::kRed).AtBrightness(0.5);
    *
    *   // Solid white, but at only 10% (i.e. ~0.5V)
-   *   frc::LEDPattern::Solid(frc:Color::kWhite).AtBrightness(0.1);
+   *   wpi::LEDPattern::Solid(frc:Color::kWhite).AtBrightness(0.1);
    * </pre>
    *
    * @param relativeBrightness the multiplier to apply to all channels to modify
@@ -294,10 +294,10 @@ class LEDPattern {
    * travel.
    *
    * <pre>
-   * frc::LEDPattern basePattern =
-   *   frc::LEDPattern::Gradient(frc::Color::kRed, frc::Color::kBlue);
-   * frc::LEDPattern progressPattern =
-   *   basePattern.Mask(frc::LEDPattern::ProgressMaskLayer([&]() {
+   * wpi::LEDPattern basePattern =
+   *   wpi::LEDPattern::Gradient(wpi::Color::kRed, wpi::Color::kBlue);
+   * wpi::LEDPattern progressPattern =
+   *   basePattern.Mask(wpi::LEDPattern::ProgressMaskLayer([&]() {
    *     return elevator.GetHeight() / elevator.MaxHeight();
    *   });
    * </pre>
@@ -396,8 +396,8 @@ class LEDPattern {
   static LEDPattern Rainbow(int saturation, int value);
 
  private:
-  std::function<void(frc::LEDPattern::LEDReader,
-                     std::function<void(int, frc::Color)>)>
+  std::function<void(wpi::LEDPattern::LEDReader,
+                     std::function<void(int, wpi::Color)>)>
       m_impl;
 };
-}  // namespace frc
+}  // namespace wpi

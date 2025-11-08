@@ -21,7 +21,7 @@
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * Contains the controller coefficients and logic for a linear-quadratic
@@ -40,8 +40,8 @@ class LinearQuadraticRegulator {
   using StateVector = Vectord<States>;
   using InputVector = Vectord<Inputs>;
 
-  using StateArray = wpi::array<double, States>;
-  using InputArray = wpi::array<double, Inputs>;
+  using StateArray = wpi::util::array<double, States>;
+  using InputArray = wpi::util::array<double, Inputs>;
 
   /**
    * Constructs a controller with the given coefficients and plant.
@@ -60,7 +60,7 @@ class LinearQuadraticRegulator {
   template <int Outputs>
   LinearQuadraticRegulator(const LinearSystem<States, Inputs, Outputs>& plant,
                            const StateArray& Qelems, const InputArray& Relems,
-                           units::second_t dt)
+                           wpi::units::second_t dt)
       : LinearQuadraticRegulator(plant.A(), plant.B(), Qelems, Relems, dt) {}
 
   /**
@@ -80,7 +80,7 @@ class LinearQuadraticRegulator {
   LinearQuadraticRegulator(const Matrixd<States, States>& A,
                            const Matrixd<States, Inputs>& B,
                            const StateArray& Qelems, const InputArray& Relems,
-                           units::second_t dt)
+                           wpi::units::second_t dt)
       : LinearQuadraticRegulator(A, B, MakeCostMatrix(Qelems),
                                  MakeCostMatrix(Relems), dt) {}
 
@@ -98,7 +98,7 @@ class LinearQuadraticRegulator {
                            const Matrixd<States, Inputs>& B,
                            const Matrixd<States, States>& Q,
                            const Matrixd<Inputs, Inputs>& R,
-                           units::second_t dt) {
+                           wpi::units::second_t dt) {
     Matrixd<States, States> discA;
     Matrixd<States, Inputs> discB;
     DiscretizeAB<States, Inputs>(A, B, dt, &discA, &discB);
@@ -153,7 +153,7 @@ class LinearQuadraticRegulator {
                            const Matrixd<States, States>& Q,
                            const Matrixd<Inputs, Inputs>& R,
                            const Matrixd<States, Inputs>& N,
-                           units::second_t dt) {
+                           wpi::units::second_t dt) {
     Matrixd<States, States> discA;
     Matrixd<States, Inputs> discB;
     DiscretizeAB<States, Inputs>(A, B, dt, &discA, &discB);
@@ -291,7 +291,7 @@ class LinearQuadraticRegulator {
    */
   template <int Outputs>
   void LatencyCompensate(const LinearSystem<States, Inputs, Outputs>& plant,
-                         units::second_t dt, units::second_t inputDelay) {
+                         wpi::units::second_t dt, wpi::units::second_t inputDelay) {
     Matrixd<States, States> discA;
     Matrixd<States, Inputs> discB;
     DiscretizeAB<States, Inputs>(plant.A(), plant.B(), dt, &discA, &discB);
@@ -317,4 +317,4 @@ extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
     LinearQuadraticRegulator<2, 2>;
 
-}  // namespace frc
+}  // namespace wpi::math

@@ -32,7 +32,7 @@ Pose::Pose(int tag_id, double xpos, double ypos, double zpos, double w,
   yawRot = eulerAngles[2];
 }
 
-wpi::json Pose::toJson() {
+wpi::util::json Pose::toJson() {
   return {{"ID", tagId},
           {"pose",
            {{"translation", {{"x", xPos}, {"y", yPos}, {"z", zPos}}},

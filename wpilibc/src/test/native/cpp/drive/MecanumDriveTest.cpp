@@ -9,35 +9,35 @@
 
 TEST(MecanumDriveTest, CartesianIK) {
   // Forward
-  auto speeds = frc::MecanumDrive::DriveCartesianIK(1.0, 0.0, 0.0);
+  auto speeds = wpi::MecanumDrive::DriveCartesianIK(1.0, 0.0, 0.0);
   EXPECT_DOUBLE_EQ(1.0, speeds.frontLeft);
   EXPECT_DOUBLE_EQ(1.0, speeds.frontRight);
   EXPECT_DOUBLE_EQ(1.0, speeds.rearLeft);
   EXPECT_DOUBLE_EQ(1.0, speeds.rearRight);
 
   // Left
-  speeds = frc::MecanumDrive::DriveCartesianIK(0.0, -1.0, 0.0);
+  speeds = wpi::MecanumDrive::DriveCartesianIK(0.0, -1.0, 0.0);
   EXPECT_DOUBLE_EQ(-1.0, speeds.frontLeft);
   EXPECT_DOUBLE_EQ(1.0, speeds.frontRight);
   EXPECT_DOUBLE_EQ(1.0, speeds.rearLeft);
   EXPECT_DOUBLE_EQ(-1.0, speeds.rearRight);
 
   // Right
-  speeds = frc::MecanumDrive::DriveCartesianIK(0.0, 1.0, 0.0);
+  speeds = wpi::MecanumDrive::DriveCartesianIK(0.0, 1.0, 0.0);
   EXPECT_DOUBLE_EQ(1.0, speeds.frontLeft);
   EXPECT_DOUBLE_EQ(-1.0, speeds.frontRight);
   EXPECT_DOUBLE_EQ(-1.0, speeds.rearLeft);
   EXPECT_DOUBLE_EQ(1.0, speeds.rearRight);
 
   // Rotate CCW
-  speeds = frc::MecanumDrive::DriveCartesianIK(0.0, 0.0, -1.0);
+  speeds = wpi::MecanumDrive::DriveCartesianIK(0.0, 0.0, -1.0);
   EXPECT_DOUBLE_EQ(-1.0, speeds.frontLeft);
   EXPECT_DOUBLE_EQ(1.0, speeds.frontRight);
   EXPECT_DOUBLE_EQ(-1.0, speeds.rearLeft);
   EXPECT_DOUBLE_EQ(1.0, speeds.rearRight);
 
   // Rotate CW
-  speeds = frc::MecanumDrive::DriveCartesianIK(0.0, 0.0, 1.0);
+  speeds = wpi::MecanumDrive::DriveCartesianIK(0.0, 0.0, 1.0);
   EXPECT_DOUBLE_EQ(1.0, speeds.frontLeft);
   EXPECT_DOUBLE_EQ(-1.0, speeds.frontRight);
   EXPECT_DOUBLE_EQ(1.0, speeds.rearLeft);
@@ -46,35 +46,35 @@ TEST(MecanumDriveTest, CartesianIK) {
 
 TEST(MecanumDriveTest, CartesianIKGyro90CW) {
   // Forward in global frame; left in robot frame
-  auto speeds = frc::MecanumDrive::DriveCartesianIK(1.0, 0.0, 0.0, 90_deg);
+  auto speeds = wpi::MecanumDrive::DriveCartesianIK(1.0, 0.0, 0.0, 90_deg);
   EXPECT_DOUBLE_EQ(-1.0, speeds.frontLeft);
   EXPECT_DOUBLE_EQ(1.0, speeds.frontRight);
   EXPECT_DOUBLE_EQ(1.0, speeds.rearLeft);
   EXPECT_DOUBLE_EQ(-1.0, speeds.rearRight);
 
   // Left in global frame; backward in robot frame
-  speeds = frc::MecanumDrive::DriveCartesianIK(0.0, -1.0, 0.0, 90_deg);
+  speeds = wpi::MecanumDrive::DriveCartesianIK(0.0, -1.0, 0.0, 90_deg);
   EXPECT_DOUBLE_EQ(-1.0, speeds.frontLeft);
   EXPECT_DOUBLE_EQ(-1.0, speeds.frontRight);
   EXPECT_DOUBLE_EQ(-1.0, speeds.rearLeft);
   EXPECT_DOUBLE_EQ(-1.0, speeds.rearRight);
 
   // Right in global frame; forward in robot frame
-  speeds = frc::MecanumDrive::DriveCartesianIK(0.0, 1.0, 0.0, 90_deg);
+  speeds = wpi::MecanumDrive::DriveCartesianIK(0.0, 1.0, 0.0, 90_deg);
   EXPECT_DOUBLE_EQ(1.0, speeds.frontLeft);
   EXPECT_DOUBLE_EQ(1.0, speeds.frontRight);
   EXPECT_DOUBLE_EQ(1.0, speeds.rearLeft);
   EXPECT_DOUBLE_EQ(1.0, speeds.rearRight);
 
   // Rotate CCW
-  speeds = frc::MecanumDrive::DriveCartesianIK(0.0, 0.0, -1.0, 90_deg);
+  speeds = wpi::MecanumDrive::DriveCartesianIK(0.0, 0.0, -1.0, 90_deg);
   EXPECT_DOUBLE_EQ(-1.0, speeds.frontLeft);
   EXPECT_DOUBLE_EQ(1.0, speeds.frontRight);
   EXPECT_DOUBLE_EQ(-1.0, speeds.rearLeft);
   EXPECT_DOUBLE_EQ(1.0, speeds.rearRight);
 
   // Rotate CW
-  speeds = frc::MecanumDrive::DriveCartesianIK(0.0, 0.0, 1.0, 90_deg);
+  speeds = wpi::MecanumDrive::DriveCartesianIK(0.0, 0.0, 1.0, 90_deg);
   EXPECT_DOUBLE_EQ(1.0, speeds.frontLeft);
   EXPECT_DOUBLE_EQ(-1.0, speeds.frontRight);
   EXPECT_DOUBLE_EQ(1.0, speeds.rearLeft);
@@ -82,11 +82,11 @@ TEST(MecanumDriveTest, CartesianIKGyro90CW) {
 }
 
 TEST(MecanumDriveTest, Cartesian) {
-  frc::MockPWMMotorController fl;
-  frc::MockPWMMotorController rl;
-  frc::MockPWMMotorController fr;
-  frc::MockPWMMotorController rr;
-  frc::MecanumDrive drive{[&](double output) { fl.Set(output); },
+  wpi::MockPWMMotorController fl;
+  wpi::MockPWMMotorController rl;
+  wpi::MockPWMMotorController fr;
+  wpi::MockPWMMotorController rr;
+  wpi::MecanumDrive drive{[&](double output) { fl.Set(output); },
                           [&](double output) { rl.Set(output); },
                           [&](double output) { fr.Set(output); },
                           [&](double output) { rr.Set(output); }};
@@ -129,11 +129,11 @@ TEST(MecanumDriveTest, Cartesian) {
 }
 
 TEST(MecanumDriveTest, CartesianGyro90CW) {
-  frc::MockPWMMotorController fl;
-  frc::MockPWMMotorController rl;
-  frc::MockPWMMotorController fr;
-  frc::MockPWMMotorController rr;
-  frc::MecanumDrive drive{[&](double output) { fl.Set(output); },
+  wpi::MockPWMMotorController fl;
+  wpi::MockPWMMotorController rl;
+  wpi::MockPWMMotorController fr;
+  wpi::MockPWMMotorController rr;
+  wpi::MecanumDrive drive{[&](double output) { fl.Set(output); },
                           [&](double output) { rl.Set(output); },
                           [&](double output) { fr.Set(output); },
                           [&](double output) { rr.Set(output); }};
@@ -176,11 +176,11 @@ TEST(MecanumDriveTest, CartesianGyro90CW) {
 }
 
 TEST(MecanumDriveTest, Polar) {
-  frc::MockPWMMotorController fl;
-  frc::MockPWMMotorController rl;
-  frc::MockPWMMotorController fr;
-  frc::MockPWMMotorController rr;
-  frc::MecanumDrive drive{[&](double output) { fl.Set(output); },
+  wpi::MockPWMMotorController fl;
+  wpi::MockPWMMotorController rl;
+  wpi::MockPWMMotorController fr;
+  wpi::MockPWMMotorController rr;
+  wpi::MecanumDrive drive{[&](double output) { fl.Set(output); },
                           [&](double output) { rl.Set(output); },
                           [&](double output) { fr.Set(output); },
                           [&](double output) { rr.Set(output); }};

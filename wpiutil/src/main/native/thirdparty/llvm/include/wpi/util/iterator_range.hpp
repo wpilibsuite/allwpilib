@@ -22,7 +22,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace wpi {
+namespace wpi::util {
 
 template <typename From, typename To, typename = void>
 struct explicitly_convertible : std::false_type {};
@@ -52,7 +52,7 @@ public:
   template <
       typename Container,
       std::enable_if_t<explicitly_convertible<
-          wpi::detail::IterOfRange<Container>, IteratorT>::value> * = nullptr>
+          wpi::util::detail::IterOfRange<Container>, IteratorT>::value> * = nullptr>
 #endif
   iterator_range(Container &&c)
       : begin_iterator(adl_begin(c)), end_iterator(adl_end(c)) {
@@ -68,7 +68,7 @@ public:
 
 template <typename Container>
 iterator_range(Container &&)
-    -> iterator_range<wpi::detail::IterOfRange<Container>>;
+    -> iterator_range<wpi::util::detail::IterOfRange<Container>>;
 
 /// Convenience function for iterating over sub-ranges.
 ///

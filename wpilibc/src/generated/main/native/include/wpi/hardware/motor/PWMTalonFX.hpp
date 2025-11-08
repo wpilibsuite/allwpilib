@@ -8,7 +8,7 @@
 
 #include "wpi/hardware/motor/PWMMotorController.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Cross the Road Electronics (CTRE) Talon FX Motor Controller with PWM control.
@@ -40,4 +40,4 @@ class PWMTalonFX : public PWMMotorController {
   PWMTalonFX& operator=(PWMTalonFX&&) = default;
 };
 
-}  // namespace frc
+}  // namespace wpi

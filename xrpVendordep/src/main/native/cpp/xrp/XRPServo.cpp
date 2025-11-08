@@ -12,7 +12,7 @@
 #include "wpi/system/Errors.hpp"
 #include "wpi/units/angle.hpp"
 
-using namespace frc;
+using namespace wpi::xrp;
 
 std::map<int, std::string> XRPServo::s_simDeviceMap = {
     {4, "servo1"}, {5, "servo2"}, {6, "servo3"}, {7, "servo4"}};
@@ -21,12 +21,12 @@ std::set<int> XRPServo::s_registeredDevices = {};
 
 void XRPServo::CheckDeviceAllocation(int deviceNum) {
   if (s_simDeviceMap.count(deviceNum) == 0) {
-    throw FRC_MakeError(frc::err::ChannelIndexOutOfRange, "Channel {}",
+    throw FRC_MakeError(wpi::err::ChannelIndexOutOfRange, "Channel {}",
                         deviceNum);
   }
 
   if (s_registeredDevices.count(deviceNum) > 0) {
-    throw FRC_MakeError(frc::err::ResourceAlreadyAllocated, "Channel {}",
+    throw FRC_MakeError(wpi::err::ResourceAlreadyAllocated, "Channel {}",
                         deviceNum);
   }
 
@@ -46,8 +46,8 @@ XRPServo::XRPServo(int deviceNum) {
   }
 }
 
-void XRPServo::SetAngle(units::radian_t angle) {
-  angle = std::clamp<units::radian_t>(angle, 0_deg, 180_deg);
+void XRPServo::SetAngle(wpi::units::radian_t angle) {
+  angle = std::clamp<wpi::units::radian_t>(angle, 0_deg, 180_deg);
   double pos = angle.value() / std::numbers::pi;
 
   if (m_simPosition) {
@@ -55,9 +55,9 @@ void XRPServo::SetAngle(units::radian_t angle) {
   }
 }
 
-units::radian_t XRPServo::GetAngle() const {
+wpi::units::radian_t XRPServo::GetAngle() const {
   if (m_simPosition) {
-    return units::radian_t{m_simPosition.Get() * std::numbers::pi};
+    return wpi::units::radian_t{m_simPosition.Get() * std::numbers::pi};
   }
 
   return 90_deg;

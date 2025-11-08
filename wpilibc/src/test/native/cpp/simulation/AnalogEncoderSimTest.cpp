@@ -13,12 +13,12 @@
 #include "wpi/units/math.hpp"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
-  EXPECT_LE(units::math::abs(val1 - val2), eps)
+  EXPECT_LE(wpi::units::math::abs(val1 - val2), eps)
 
 TEST(AnalogEncoderSimTest, Basic) {
-  frc::AnalogInput ai(0);
-  frc::AnalogEncoder encoder{ai, 360, 0};
-  frc::sim::AnalogEncoderSim encoderSim{encoder};
+  wpi::AnalogInput ai(0);
+  wpi::AnalogEncoder encoder{ai, 360, 0};
+  wpi::sim::AnalogEncoderSim encoderSim{encoder};
 
   encoderSim.Set(180);
   EXPECT_NEAR(encoder.Get(), 180, 1E-8);

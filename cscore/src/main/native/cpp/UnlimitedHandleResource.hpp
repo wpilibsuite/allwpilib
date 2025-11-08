@@ -13,7 +13,7 @@
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/mutex.hpp"
 
-namespace cs {
+namespace wpi::cs {
 
 // The UnlimitedHandleResource class is a way to track handles. This version
 // allows an unlimited number of handles that are allocated sequentially. When
@@ -34,7 +34,7 @@ namespace cs {
 // @tparam typeValue The type value stored in the handle
 // @tparam TMutex The mutex type to use
 template <typename THandle, typename TStruct, int typeValue,
-          typename TMutex = wpi::mutex>
+          typename TMutex = wpi::util::mutex>
 class UnlimitedHandleResource {
  public:
   UnlimitedHandleResource(const UnlimitedHandleResource&) = delete;
@@ -50,7 +50,7 @@ class UnlimitedHandleResource {
   std::shared_ptr<TStruct> Free(THandle handle);
 
   template <typename T>
-  std::span<T> GetAll(wpi::SmallVectorImpl<T>& vec);
+  std::span<T> GetAll(wpi::util::SmallVectorImpl<T>& vec);
 
   std::vector<std::shared_ptr<TStruct>> FreeAll();
 
@@ -149,7 +149,7 @@ template <typename THandle, typename TStruct, int typeValue, typename TMutex>
 template <typename T>
 inline std::span<T>
 UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::GetAll(
-    wpi::SmallVectorImpl<T>& vec) {
+    wpi::util::SmallVectorImpl<T>& vec) {
   ForEach([&](THandle handle, const TStruct&) { vec.push_back(handle); });
   return vec;
 }
@@ -189,6 +189,6 @@ UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::FindIf(F func) {
   return std::pair{0, nullptr};
 }
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_UNLIMITEDHANDLERESOURCE_HPP_

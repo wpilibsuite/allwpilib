@@ -1,5 +1,5 @@
 classes:
-  frc::ExpansionHubServo:
+  wpi::ExpansionHubServo:
     methods:
       ExpansionHubServo:
       Set:

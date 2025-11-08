@@ -11,7 +11,7 @@
 // For more information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 class ReplaceMeInstantCommand2
-    : public frc2::CommandHelper<frc2::InstantCommand,
+    : public wpi::cmd::CommandHelper<wpi::cmd::InstantCommand,
                                  ReplaceMeInstantCommand2> {
  public:
   ReplaceMeInstantCommand2();

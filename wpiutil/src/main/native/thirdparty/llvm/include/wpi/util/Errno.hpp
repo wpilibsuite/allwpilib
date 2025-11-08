@@ -16,7 +16,7 @@
 #include <cerrno>
 #include <string>
 
-namespace wpi {
+namespace wpi::util {
 namespace sys {
 
 template <typename FailT, typename Fun, typename... Args>
@@ -31,6 +31,6 @@ inline decltype(auto) RetryAfterSignal(const FailT &Fail, const Fun &F,
 }
 
 }  // namespace sys
-}  // namespace wpi
+}  // namespace wpi::util
 
 #endif // WPIUTIL_WPI_ERRNO_H

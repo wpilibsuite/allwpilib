@@ -15,7 +15,7 @@
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/mutex.hpp"
 
-using namespace wpi;
+using namespace wpi::net;
 
 struct MulticastServiceResolver::Impl {
   AvahiFunctionTable& table = AvahiFunctionTable::Get();
@@ -88,12 +88,12 @@ static void ResolveCallback(AvahiServiceResolver* r, AvahiIfIndex interface,
           // Todo make this just do key
           continue;
         }
-        std::string_view key = wpi::substr(value, 0, splitIndex);
+        std::string_view key = wpi::util::substr(value, 0, splitIndex);
         value =
-            wpi::substr(value, splitIndex + 1, value.size() - splitIndex - 1);
+            wpi::util::substr(value, splitIndex + 1, value.size() - splitIndex - 1);
         data.txt.emplace_back(std::pair<std::string, std::string>{key, value});
       }
-      wpi::SmallString<256> outputHostName;
+      wpi::util::SmallString<256> outputHostName;
       char label[256];
       do {
         impl->table.unescape_label(&host_name, label, sizeof(label));

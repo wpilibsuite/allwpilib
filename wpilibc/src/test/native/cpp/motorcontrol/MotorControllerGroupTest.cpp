@@ -12,7 +12,7 @@
 #include "motorcontrol/MockMotorController.hpp"
 #include "wpi/util/deprecated.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 enum MotorControllerGroupTestType { TEST_ONE, TEST_TWO, TEST_THREE };
 

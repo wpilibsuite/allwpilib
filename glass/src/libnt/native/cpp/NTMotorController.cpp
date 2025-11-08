@@ -10,12 +10,12 @@
 
 #include "wpi/util/StringExtras.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 NTMotorControllerModel::NTMotorControllerModel(std::string_view path)
-    : NTMotorControllerModel(nt::NetworkTableInstance::GetDefault(), path) {}
+    : NTMotorControllerModel(wpi::nt::NetworkTableInstance::GetDefault(), path) {}
 
-NTMotorControllerModel::NTMotorControllerModel(nt::NetworkTableInstance inst,
+NTMotorControllerModel::NTMotorControllerModel(wpi::nt::NetworkTableInstance inst,
                                                std::string_view path)
     : m_inst{inst},
       m_value{inst.GetDoubleTopic(fmt::format("{}/Value", path)).GetEntry(0)},
@@ -23,7 +23,7 @@ NTMotorControllerModel::NTMotorControllerModel(nt::NetworkTableInstance inst,
       m_controllable{inst.GetBooleanTopic(fmt::format("{}/.controllable", path))
                          .Subscribe(false)},
       m_valueData{fmt::format("NT_SpdCtrl:{}", path)},
-      m_nameValue{wpi::rsplit(path, '/').second} {}
+      m_nameValue{wpi::util::rsplit(path, '/').second} {}
 
 void NTMotorControllerModel::SetPercent(double value) {
   m_value.Set(value);

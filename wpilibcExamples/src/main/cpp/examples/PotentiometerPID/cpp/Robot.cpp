@@ -12,7 +12,7 @@ void Robot::TeleopInit() {
 
 void Robot::TeleopPeriodic() {
   // Read from the sensor
-  units::meter_t position = units::meter_t{m_potentiometer.Get()};
+  wpi::units::meter_t position = wpi::units::meter_t{m_potentiometer.Get()};
 
   // Run the PID Controller
   double pidOut = m_pidController.Calculate(position.value());
@@ -31,6 +31,6 @@ void Robot::TeleopPeriodic() {
 
 #ifndef RUNNING_FRC_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

@@ -11,19 +11,19 @@
 #include "wpi/nt/ntcore_c.h"
 #include "wpi/util/SmallVector.hpp"
 
-using namespace nt;
+using namespace wpi::nt;
 
 void ListenerStorage::Thread::Main() {
   while (m_active) {
     WPI_Handle signaledBuf[3];
-    auto signaled = wpi::WaitForObjects(
+    auto signaled = wpi::util::WaitForObjects(
         {m_poller, m_stopEvent.GetHandle(), m_waitQueueWakeup.GetHandle()},
         signaledBuf);
     if (signaled.empty() || !m_active) {
       return;
     }
     // call all the way back out to the C++ API to ensure valid handle
-    auto events = nt::ReadListenerQueue(m_poller);
+    auto events = wpi::nt::ReadListenerQueue(m_poller);
     if (!events.empty()) {
       std::unique_lock lock{m_mutex};
       for (auto&& event : events) {
@@ -299,7 +299,7 @@ ListenerStorage::DestroyListenerPoller(NT_ListenerPoller pollerHandle) {
   std::scoped_lock lock{m_mutex};
   if (auto poller = m_pollers.Remove(pollerHandle)) {
     // ensure all listeners that use this poller are removed
-    wpi::SmallVector<NT_Listener, 16> toRemove;
+    wpi::util::SmallVector<NT_Listener, 16> toRemove;
     for (auto&& listener : m_listeners) {
       if (listener->poller == poller.get()) {
         toRemove.emplace_back(listener->handle);
@@ -341,7 +341,7 @@ bool ListenerStorage::WaitForListenerQueue(double timeout) {
     }
   }
   bool timedOut;
-  wpi::WaitForObject(h, timeout, &timedOut);
+  wpi::util::WaitForObject(h, timeout, &timedOut);
   return !timedOut;
 }
 

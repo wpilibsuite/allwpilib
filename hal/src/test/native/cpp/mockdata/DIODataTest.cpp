@@ -11,7 +11,7 @@
 #include "wpi/hal/handles/HandlesInternal.h"
 #include "wpi/hal/simulation/DIOData.h"
 
-namespace hal {
+namespace wpi::hal {
 
 std::string gTestDigitalIoCallbackName;
 HAL_Value gTestDigitalIoCallbackValue;
@@ -66,7 +66,7 @@ TEST(DigitalIoSimTest, DigitalIoInitialization) {
   EXPECT_STREQ("Unset", gTestDigitalIoCallbackName.c_str());
 
   // Reset, should allow you to re-register
-  hal::HandleBase::ResetGlobalHandles();
+  wpi::hal::HandleBase::ResetGlobalHandles();
   HALSIM_ResetDIOData(INDEX_TO_TEST);
   callbackId = HALSIM_RegisterDIOInitializedCallback(
       INDEX_TO_TEST, &TestDigitalIoInitializationCallback, &callbackParam,
@@ -82,4 +82,4 @@ TEST(DigitalIoSimTest, DigitalIoInitialization) {
   HALSIM_CancelDIOInitializedCallback(INDEX_TO_TEST, callbackId);
 }
 
-}  // namespace hal
+}  // namespace wpi::hal

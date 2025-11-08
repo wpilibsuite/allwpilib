@@ -10,7 +10,7 @@
 
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 ConditionalCommand::ConditionalCommand(std::unique_ptr<Command>&& onTrue,
                                        std::unique_ptr<Command>&& onFalse,
@@ -69,7 +69,7 @@ Command::InterruptionBehavior ConditionalCommand::GetInterruptionBehavior()
   }
 }
 
-void ConditionalCommand::InitSendable(wpi::SendableBuilder& builder) {
+void ConditionalCommand::InitSendable(wpi::util::SendableBuilder& builder) {
   Command::InitSendable(builder);
   builder.AddStringProperty(
       "onTrue", [this] { return m_onTrue->GetName(); }, nullptr);

@@ -11,7 +11,7 @@
 #include "wpi/util/MessagePack.hpp"
 #include "wpi/util/raw_ostream.hpp"
 
-namespace nt::server {
+namespace wpi::nt::server {
 
 struct Writer : public mpack::mpack_writer_t {
   Writer() {
@@ -19,13 +19,13 @@ struct Writer : public mpack::mpack_writer_t {
     mpack::mpack_writer_set_context(this, &os);
     mpack::mpack_writer_set_flush(
         this, [](mpack::mpack_writer_t* w, const char* buffer, size_t count) {
-          static_cast<wpi::raw_ostream*>(w->context)->write(buffer, count);
+          static_cast<wpi::util::raw_ostream*>(w->context)->write(buffer, count);
         });
   }
 
   std::vector<uint8_t> bytes;
-  wpi::raw_uvector_ostream os{bytes};
+  wpi::util::raw_uvector_ostream os{bytes};
   char buf[128];
 };
 
-}  // namespace nt::server
+}  // namespace wpi::nt::server

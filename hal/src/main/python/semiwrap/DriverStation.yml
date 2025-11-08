@@ -22,7 +22,7 @@ functions:
       [](int32_t joystickNum) {
         WPI_String name;
         HAL_GetJoystickName(&name, joystickNum);
-        std::string sname(wpi::to_string_view(&name));
+        std::string sname(wpi::util::to_string_view(&name));
         WPI_FreeString(&name);
         return sname;
       }

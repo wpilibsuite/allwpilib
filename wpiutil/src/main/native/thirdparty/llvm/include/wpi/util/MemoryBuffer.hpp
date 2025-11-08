@@ -36,7 +36,7 @@ using file_t = int;
 #endif
 }  // namespace fs
 
-namespace wpi {
+namespace wpi::util {
 
 class MemoryBufferRef;
 
@@ -78,7 +78,7 @@ class MemoryBuffer {
   /// if successful, otherwise returning null. If FileSize is specified, this
   /// means that the client knows that the file exists and that it has the
   /// specified size.
-  static wpi::expected<std::unique_ptr<MemoryBuffer>, std::error_code>
+  static wpi::util::expected<std::unique_ptr<MemoryBuffer>, std::error_code>
   GetFile(std::string_view filename, int64_t fileSize = -1);
 
   /// Read all of the specified file into a MemoryBuffer as a stream
@@ -249,4 +249,4 @@ class MemoryBufferRef {
   size_t size() const { return m_buffer.size(); }
 };
 
-}  // namespace wpi
+}  // namespace wpi::util

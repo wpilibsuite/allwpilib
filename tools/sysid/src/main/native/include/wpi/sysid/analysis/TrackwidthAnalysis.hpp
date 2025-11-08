@@ -19,7 +19,7 @@ namespace sysid {
  * @param accum The accumulated gyro angle.
  */
 constexpr double CalculateTrackwidth(double l, double r,
-                                     units::radian_t accum) {
+                                     wpi::units::radian_t accum) {
   // The below comes from solving ω = (vr − vl) / 2r for 2r.
   return (gcem::abs(r) + gcem::abs(l)) / gcem::abs(accum.value());
 }

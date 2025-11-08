@@ -145,10 +145,10 @@ void ApplyMedianFilter(std::vector<PreparedData>* data, int window);
  * @param maxStepTime The maximum step test duration.
  * @return The updated minimum step test duration.
  */
-std::tuple<units::second_t, units::second_t, units::second_t>
+std::tuple<wpi::units::second_t, wpi::units::second_t, wpi::units::second_t>
 TrimStepVoltageData(std::vector<PreparedData>* data,
                     AnalysisManager::Settings* settings,
-                    units::second_t minStepTime, units::second_t maxStepTime);
+                    wpi::units::second_t minStepTime, wpi::units::second_t maxStepTime);
 
 /**
  * Compute the mean time delta of the given data.
@@ -156,7 +156,7 @@ TrimStepVoltageData(std::vector<PreparedData>* data,
  * @param data A reference to all of the collected PreparedData
  * @return The mean time delta for all the data points
  */
-units::second_t GetMeanTimeDelta(const std::vector<PreparedData>& data);
+wpi::units::second_t GetMeanTimeDelta(const std::vector<PreparedData>& data);
 
 /**
  * Compute the mean time delta of the given data.
@@ -164,7 +164,7 @@ units::second_t GetMeanTimeDelta(const std::vector<PreparedData>& data);
  * @param data A reference to all of the collected PreparedData
  * @return The mean time delta for all the data points
  */
-units::second_t GetMeanTimeDelta(const Storage& data);
+wpi::units::second_t GetMeanTimeDelta(const Storage& data);
 
 /**
  * Creates a central finite difference filter that computes the nth
@@ -187,16 +187,16 @@ units::second_t GetMeanTimeDelta(const Storage& data);
  * @param period      The period in seconds between samples taken by the user.
  */
 template <int Derivative, int Samples>
-frc::LinearFilter<double> CentralFiniteDifference(units::second_t period) {
+wpi::math::LinearFilter<double> CentralFiniteDifference(wpi::units::second_t period) {
   static_assert(Samples % 2 != 0, "Number of samples must be odd.");
 
   // Generate stencil points from -(samples - 1)/2 to (samples - 1)/2
-  wpi::array<int, Samples> stencil{wpi::empty_array};
+  wpi::util::array<int, Samples> stencil{wpi::util::empty_array};
   for (int i = 0; i < Samples; ++i) {
     stencil[i] = -(Samples - 1) / 2 + i;
   }
 
-  return frc::LinearFilter<double>::FiniteDifference<Derivative, Samples>(
+  return wpi::math::LinearFilter<double>::FiniteDifference<Derivative, Samples>(
       stencil, period);
 }
 
@@ -219,12 +219,12 @@ frc::LinearFilter<double> CentralFiniteDifference(units::second_t period) {
  * @param unit The angular unit that the arm test is in (only for calculating
  *             cosine data)
  */
-void InitialTrimAndFilter(wpi::StringMap<std::vector<PreparedData>>* data,
+void InitialTrimAndFilter(wpi::util::StringMap<std::vector<PreparedData>>* data,
                           AnalysisManager::Settings* settings,
-                          std::vector<units::second_t>& positionDelays,
-                          std::vector<units::second_t>& velocityDelays,
-                          units::second_t& minStepTime,
-                          units::second_t& maxStepTime,
+                          std::vector<wpi::units::second_t>& positionDelays,
+                          std::vector<wpi::units::second_t>& velocityDelays,
+                          wpi::units::second_t& minStepTime,
+                          wpi::units::second_t& maxStepTime,
                           std::string_view unit = "");
 
 /**
@@ -232,6 +232,6 @@ void InitialTrimAndFilter(wpi::StringMap<std::vector<PreparedData>>* data,
  *
  * @param data A pointer to a PreparedData vector
  */
-void AccelFilter(wpi::StringMap<std::vector<PreparedData>>* data);
+void AccelFilter(wpi::util::StringMap<std::vector<PreparedData>>* data);
 
 }  // namespace sysid

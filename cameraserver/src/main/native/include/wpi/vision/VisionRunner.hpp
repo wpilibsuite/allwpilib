@@ -11,7 +11,7 @@
 #include "wpi/cs/cscore_cv.hpp"
 #include "wpi/vision/VisionPipeline.hpp"
 
-namespace frc {
+namespace wpi::vision {
 
 /**
  * Non-template base class for VisionRunner.
@@ -111,4 +111,4 @@ class VisionRunner : public VisionRunnerBase {
   std::function<void(T&)> m_listener;
 };
 
-}  // namespace frc
+}  // namespace wpi::vision

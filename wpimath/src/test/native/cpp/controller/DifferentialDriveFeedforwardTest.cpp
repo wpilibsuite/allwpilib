@@ -20,12 +20,12 @@ TEST(DifferentialDriveFeedforwardTest, CalculateWithTrackwidth) {
   constexpr auto kVAngular = 1_V / 1_rad_per_s;
   constexpr auto kAAngular = 1_V / 1_rad_per_s_sq;
   constexpr auto trackwidth = 1_m;
-  constexpr units::second_t dt = 20_ms;
+  constexpr wpi::units::second_t dt = 20_ms;
 
-  frc::DifferentialDriveFeedforward differentialDriveFeedforward{
+  wpi::math::DifferentialDriveFeedforward differentialDriveFeedforward{
       kVLinear, kALinear, kVAngular, kAAngular, trackwidth};
-  frc::LinearSystem<2, 2, 2> plant =
-      frc::LinearSystemId::IdentifyDrivetrainSystem(
+  wpi::math::LinearSystem<2, 2, 2> plant =
+      wpi::math::LinearSystemId::IdentifyDrivetrainSystem(
           kVLinear, kALinear, kVAngular, kAAngular, trackwidth);
   for (auto currentLeftVelocity = -4_mps; currentLeftVelocity <= 4_mps;
        currentLeftVelocity += 2_mps) {
@@ -54,12 +54,12 @@ TEST(DifferentialDriveFeedforwardTest, CalculateWithoutTrackwidth) {
   constexpr auto kALinear = 1_V / 1_mps_sq;
   constexpr auto kVAngular = 1_V / 1_mps;
   constexpr auto kAAngular = 1_V / 1_mps_sq;
-  constexpr units::second_t dt = 20_ms;
+  constexpr wpi::units::second_t dt = 20_ms;
 
-  frc::DifferentialDriveFeedforward differentialDriveFeedforward{
+  wpi::math::DifferentialDriveFeedforward differentialDriveFeedforward{
       kVLinear, kALinear, kVAngular, kAAngular};
-  frc::LinearSystem<2, 2, 2> plant =
-      frc::LinearSystemId::IdentifyDrivetrainSystem(kVLinear, kALinear,
+  wpi::math::LinearSystem<2, 2, 2> plant =
+      wpi::math::LinearSystemId::IdentifyDrivetrainSystem(kVLinear, kALinear,
                                                     kVAngular, kAAngular);
   for (auto currentLeftVelocity = -4_mps; currentLeftVelocity <= 4_mps;
        currentLeftVelocity += 2_mps) {

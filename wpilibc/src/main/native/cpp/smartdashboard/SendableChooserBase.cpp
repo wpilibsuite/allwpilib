@@ -8,12 +8,12 @@
 
 #include "wpi/util/sendable/SendableRegistry.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 std::atomic_int SendableChooserBase::s_instances{0};
 
 SendableChooserBase::SendableChooserBase() : m_instance{s_instances++} {
-  wpi::SendableRegistry::Add(this, "SendableChooser", m_instance);
+  wpi::util::SendableRegistry::Add(this, "SendableChooser", m_instance);
 }
 
 SendableChooserBase::SendableChooserBase(SendableChooserBase&& oth)

@@ -2,6 +2,6 @@ extra_includes:
 - wpi/util/sendable/SendableBuilder.hpp
 
 classes:
-  frc::PWMTalonFX:
+  wpi::PWMTalonFX:
     methods:
       PWMTalonFX:

@@ -9,7 +9,7 @@
 #include "wpi/hal/HALBase.h"
 #include "wpi/units/time.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 
 /**
  * Override the HAL runtime type (simulated/real).
@@ -51,13 +51,13 @@ bool IsTimingPaused();
  *
  * @param delta the amount to advance (in seconds)
  */
-void StepTiming(units::second_t delta);
+void StepTiming(wpi::units::second_t delta);
 
 /**
  * Advance the simulator time and return immediately.
  *
  * @param delta the amount to advance (in seconds)
  */
-void StepTimingAsync(units::second_t delta);
+void StepTimingAsync(wpi::units::second_t delta);
 
-}  // namespace frc::sim
+}  // namespace wpi::sim

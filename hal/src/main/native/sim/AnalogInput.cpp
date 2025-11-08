@@ -11,19 +11,19 @@
 #include "mockdata/AnalogInDataInternal.h"
 #include "wpi/hal/handles/HandlesInternal.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeAnalogInput() {}
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
     int32_t channel, const char* allocationLocation, int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
   if (channel < 0 || channel >= kNumAnalogInputs) {
     *status = RESOURCE_OUT_OF_RANGE;
-    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Analog Input",
+    wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Analog Input",
                                      0, kNumAnalogInputs, channel);
     return HAL_kInvalidHandle;
   }
@@ -33,10 +33,10 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
 
   if (*status != 0) {
     if (analog_port) {
-      hal::SetLastErrorPreviouslyAllocated(status, "Analog Input", channel,
+      wpi::hal::SetLastErrorPreviouslyAllocated(status, "Analog Input", channel,
                                            analog_port->previousAllocation);
     } else {
-      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Analog Input",
+      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Analog Input",
                                        0, kNumAnalogInputs, channel);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.

@@ -19,11 +19,11 @@
 #include "wpi/net/uv/util.hpp"
 #include "wpi/util/Logger.hpp"
 
-using namespace wpi;
+using namespace wpi::net;
 
 ParallelTcpConnector::ParallelTcpConnector(
-    wpi::uv::Loop& loop, wpi::uv::Timer::Time reconnectRate,
-    wpi::Logger& logger, std::function<void(wpi::uv::Tcp& tcp)> connected,
+    wpi::net::uv::Loop& loop, wpi::net::uv::Timer::Time reconnectRate,
+    wpi::util::Logger& logger, std::function<void(wpi::net::uv::Tcp& tcp)> connected,
     bool ipv4Only, const private_init&)
     : m_loop{loop},
       m_logger{logger},
@@ -141,7 +141,7 @@ void ParallelTcpConnector::Connect() {
             auto connreq = std::make_shared<uv::TcpConnectReq>();
             connreq->connected.connect(
                 [this, tcp = tcp.get()] {
-                  if (m_logger.min_level() <= wpi::WPI_LOG_DEBUG4) {
+                  if (m_logger.min_level() <= wpi::util::WPI_LOG_DEBUG4) {
                     std::string ip;
                     unsigned int port = 0;
                     uv::AddrToName(tcp->GetPeer(), &ip, &port);
@@ -167,7 +167,7 @@ void ParallelTcpConnector::Connect() {
               }
             };
 
-            if (m_logger.min_level() <= wpi::WPI_LOG_DEBUG4) {
+            if (m_logger.min_level() <= wpi::util::WPI_LOG_DEBUG4) {
               std::string ip;
               unsigned int port = 0;
               uv::AddrToName(*reinterpret_cast<sockaddr_storage*>(ai->ai_addr),
@@ -203,7 +203,7 @@ void ParallelTcpConnector::Connect() {
   }
 }
 
-void ParallelTcpConnector::CancelAll(wpi::uv::Tcp* except) {
+void ParallelTcpConnector::CancelAll(wpi::net::uv::Tcp* except) {
   WPI_DEBUG4(m_logger, "canceling previous attempts");
   for (auto&& resolverWeak : m_resolvers) {
     if (auto resolver = resolverWeak.lock()) {

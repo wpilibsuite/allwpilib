@@ -11,7 +11,7 @@
 #include "wpi/net/uv/Tcp.hpp"
 #include "wpi/util/Logger.hpp"
 
-namespace uv = wpi::uv;
+namespace uv = wpi::net::uv;
 
 static void logfunc(unsigned int level, const char* file, unsigned int line,
                     const char* msg) {
@@ -19,13 +19,13 @@ static void logfunc(unsigned int level, const char* file, unsigned int line,
 }
 
 int main() {
-  wpi::Logger logger{logfunc, 0};
+  wpi::util::Logger logger{logfunc, 0};
 
   // Kick off the event loop on a separate thread
-  wpi::EventLoopRunner loop;
-  std::shared_ptr<wpi::ParallelTcpConnector> connect;
+  wpi::net::EventLoopRunner loop;
+  std::shared_ptr<wpi::net::ParallelTcpConnector> connect;
   loop.ExecAsync([&](uv::Loop& loop) {
-    connect = wpi::ParallelTcpConnector::Create(
+    connect = wpi::net::ParallelTcpConnector::Create(
         loop, uv::Timer::Time{2000}, logger, [&](uv::Tcp& tcp) {
           std::fputs("Got connection, accepting!\n", stdout);
           tcp.StartRead();

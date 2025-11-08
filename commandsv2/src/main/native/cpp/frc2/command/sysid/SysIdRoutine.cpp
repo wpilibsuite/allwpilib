@@ -6,14 +6,14 @@
 
 #include "wpi/sysid/SysIdRoutineLog.hpp"
 
-using namespace frc2::sysid;
+using namespace wpi::cmd::sysid;
 
-frc2::CommandPtr SysIdRoutine::Quasistatic(Direction direction) {
-  frc::sysid::State state;
+wpi::cmd::CommandPtr SysIdRoutine::Quasistatic(Direction direction) {
+  wpi::sysid::State state;
   if (direction == Direction::kForward) {
-    state = frc::sysid::State::kQuasistaticForward;
+    state = wpi::sysid::State::kQuasistaticForward;
   } else {  // if (direction == Direction::kReverse) {
-    state = frc::sysid::State::kQuasistaticReverse;
+    state = wpi::sysid::State::kQuasistaticReverse;
   }
 
   double outputSign = direction == Direction::kForward ? 1.0 : -1.0;
@@ -29,21 +29,21 @@ frc2::CommandPtr SysIdRoutine::Quasistatic(Direction direction) {
               })
               .FinallyDo([this] {
                 m_mechanism.m_drive(0_V);
-                m_recordState(frc::sysid::State::kNone);
+                m_recordState(wpi::sysid::State::kNone);
                 timer.Stop();
               })
               .WithName("sysid-" +
-                        frc::sysid::SysIdRoutineLog::StateEnumToString(state) +
+                        wpi::sysid::SysIdRoutineLog::StateEnumToString(state) +
                         "-" + m_mechanism.m_name)
               .WithTimeout(m_config.m_timeout));
 }
 
-frc2::CommandPtr SysIdRoutine::Dynamic(Direction direction) {
-  frc::sysid::State state;
+wpi::cmd::CommandPtr SysIdRoutine::Dynamic(Direction direction) {
+  wpi::sysid::State state;
   if (direction == Direction::kForward) {
-    state = frc::sysid::State::kDynamicForward;
+    state = wpi::sysid::State::kDynamicForward;
   } else {  // if (direction == Direction::kReverse) {
-    state = frc::sysid::State::kDynamicReverse;
+    state = wpi::sysid::State::kDynamicReverse;
   }
 
   double outputSign = direction == Direction::kForward ? 1.0 : -1.0;
@@ -57,10 +57,10 @@ frc2::CommandPtr SysIdRoutine::Dynamic(Direction direction) {
       }))
       .FinallyDo([this] {
         m_mechanism.m_drive(0_V);
-        m_recordState(frc::sysid::State::kNone);
+        m_recordState(wpi::sysid::State::kNone);
       })
       .WithName("sysid-" +
-                frc::sysid::SysIdRoutineLog::StateEnumToString(state) + "-" +
+                wpi::sysid::SysIdRoutineLog::StateEnumToString(state) + "-" +
                 m_mechanism.m_name)
       .WithTimeout(m_config.m_timeout);
 }

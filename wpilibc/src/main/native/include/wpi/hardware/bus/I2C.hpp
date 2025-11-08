@@ -9,7 +9,7 @@
 #include "wpi/hal/I2C.h"
 #include "wpi/hal/I2CTypes.h"
 
-namespace frc {
+namespace wpi {
 
 /**
  * I2C bus interface class.
@@ -153,8 +153,8 @@ class I2C {
   bool VerifySensor(int registerAddress, int count, const uint8_t* expected);
 
  private:
-  hal::Handle<HAL_I2CPort, HAL_CloseI2C, HAL_I2C_kInvalid> m_port;
+  wpi::hal::Handle<HAL_I2CPort, HAL_CloseI2C, HAL_I2C_kInvalid> m_port;
   int m_deviceAddress;
 };
 
-}  // namespace frc
+}  // namespace wpi

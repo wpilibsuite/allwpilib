@@ -10,7 +10,7 @@
 #include "wpi/commands2/CommandHelper.hpp"
 #include "wpi/commands2/Requirements.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 /**
  * A command that allows the user to pass in functions for each of the basic
  * command methods through the constructor.  Useful for inline definitions of
@@ -56,4 +56,4 @@ class FunctionalCommand : public CommandHelper<Command, FunctionalCommand> {
   std::function<void(bool)> m_onEnd;
   std::function<bool()> m_isFinished;
 };
-}  // namespace frc2
+}  // namespace wpi::cmd

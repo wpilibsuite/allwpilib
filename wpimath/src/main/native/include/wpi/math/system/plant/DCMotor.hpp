@@ -11,7 +11,7 @@
 #include "wpi/units/voltage.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * Holds the constants for a DC motor.
@@ -19,29 +19,29 @@ namespace frc {
 class WPILIB_DLLEXPORT DCMotor {
  public:
   using radians_per_second_per_volt_t =
-      units::unit_t<units::compound_unit<units::radians_per_second,
-                                         units::inverse<units::volt>>>;
+      wpi::units::unit_t<wpi::units::compound_unit<wpi::units::radians_per_second,
+                                         wpi::units::inverse<wpi::units::volt>>>;
   using newton_meters_per_ampere_t =
-      units::unit_t<units::compound_unit<units::newton_meters,
-                                         units::inverse<units::ampere>>>;
+      wpi::units::unit_t<wpi::units::compound_unit<wpi::units::newton_meters,
+                                         wpi::units::inverse<wpi::units::ampere>>>;
 
   /// Voltage at which the motor constants were measured.
-  units::volt_t nominalVoltage;
+  wpi::units::volt_t nominalVoltage;
 
   /// Torque when stalled.
-  units::newton_meter_t stallTorque;
+  wpi::units::newton_meter_t stallTorque;
 
   /// Current draw when stalled.
-  units::ampere_t stallCurrent;
+  wpi::units::ampere_t stallCurrent;
 
   /// Current draw under no load.
-  units::ampere_t freeCurrent;
+  wpi::units::ampere_t freeCurrent;
 
   /// Angular velocity under no load.
-  units::radians_per_second_t freeSpeed;
+  wpi::units::radians_per_second_t freeSpeed;
 
   /// Motor internal resistance.
-  units::ohm_t R;
+  wpi::units::ohm_t R;
 
   /// Motor velocity constant.
   radians_per_second_per_volt_t Kv;
@@ -59,10 +59,10 @@ class WPILIB_DLLEXPORT DCMotor {
    * @param freeSpeed      Angular velocity under no load.
    * @param numMotors      Number of motors in a gearbox.
    */
-  constexpr DCMotor(units::volt_t nominalVoltage,
-                    units::newton_meter_t stallTorque,
-                    units::ampere_t stallCurrent, units::ampere_t freeCurrent,
-                    units::radians_per_second_t freeSpeed, int numMotors = 1)
+  constexpr DCMotor(wpi::units::volt_t nominalVoltage,
+                    wpi::units::newton_meter_t stallTorque,
+                    wpi::units::ampere_t stallCurrent, wpi::units::ampere_t freeCurrent,
+                    wpi::units::radians_per_second_t freeSpeed, int numMotors = 1)
       : nominalVoltage(nominalVoltage),
         stallTorque(stallTorque * numMotors),
         stallCurrent(stallCurrent * numMotors),
@@ -78,8 +78,8 @@ class WPILIB_DLLEXPORT DCMotor {
    * @param speed        The current angular velocity of the motor.
    * @param inputVoltage The voltage being applied to the motor.
    */
-  constexpr units::ampere_t Current(units::radians_per_second_t speed,
-                                    units::volt_t inputVoltage) const {
+  constexpr wpi::units::ampere_t Current(wpi::units::radians_per_second_t speed,
+                                    wpi::units::volt_t inputVoltage) const {
     return -1.0 / Kv / R * speed + 1.0 / R * inputVoltage;
   }
 
@@ -88,7 +88,7 @@ class WPILIB_DLLEXPORT DCMotor {
    *
    * @param torque The torque produced by the motor.
    */
-  constexpr units::ampere_t Current(units::newton_meter_t torque) const {
+  constexpr wpi::units::ampere_t Current(wpi::units::newton_meter_t torque) const {
     return torque / Kt;
   }
 
@@ -97,7 +97,7 @@ class WPILIB_DLLEXPORT DCMotor {
    *
    * @param current     The current drawn by the motor.
    */
-  constexpr units::newton_meter_t Torque(units::ampere_t current) const {
+  constexpr wpi::units::newton_meter_t Torque(wpi::units::ampere_t current) const {
     return current * Kt;
   }
 
@@ -108,8 +108,8 @@ class WPILIB_DLLEXPORT DCMotor {
    * @param torque      The torque produced by the motor.
    * @param speed       The current angular velocity of the motor.
    */
-  constexpr units::volt_t Voltage(units::newton_meter_t torque,
-                                  units::radians_per_second_t speed) const {
+  constexpr wpi::units::volt_t Voltage(wpi::units::newton_meter_t torque,
+                                  wpi::units::radians_per_second_t speed) const {
     return 1.0 / Kv * speed + 1.0 / Kt * R * torque;
   }
 
@@ -120,8 +120,8 @@ class WPILIB_DLLEXPORT DCMotor {
    * @param torque        The torque produced by the motor.
    * @param inputVoltage  The input voltage provided to the motor.
    */
-  constexpr units::radians_per_second_t Speed(
-      units::newton_meter_t torque, units::volt_t inputVoltage) const {
+  constexpr wpi::units::radians_per_second_t Speed(
+      wpi::units::newton_meter_t torque, wpi::units::volt_t inputVoltage) const {
     return inputVoltage * Kv - 1.0 / Kt * torque * R * Kv;
   }
 
@@ -280,7 +280,7 @@ class WPILIB_DLLEXPORT DCMotor {
   }
 };
 
-}  // namespace frc
+}  // namespace wpi::math
 
 #include "wpi/math/system/plant/proto/DCMotorProto.hpp"
 #include "wpi/math/system/plant/struct/DCMotorStruct.hpp"

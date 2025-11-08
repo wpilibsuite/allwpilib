@@ -9,14 +9,14 @@
 #include "wpi/glass/Model.hpp"
 #include "wpi/util/function_ref.hpp"
 
-namespace wpi {
+namespace wpi::util {
 template <typename T>
 class SmallVectorImpl;
 }  // namespace wpi
 
-namespace glass {
+namespace wpi::glass {
 
-class LEDDisplayModel : public glass::Model {
+class LEDDisplayModel : public wpi::glass::Model {
  public:
   struct Data {
     uint8_t r;
@@ -24,18 +24,18 @@ class LEDDisplayModel : public glass::Model {
     uint8_t b;
   };
 
-  virtual std::span<const Data> GetData(wpi::SmallVectorImpl<Data>& buf) = 0;
+  virtual std::span<const Data> GetData(wpi::util::SmallVectorImpl<Data>& buf) = 0;
 };
 
-class LEDDisplaysModel : public glass::Model {
+class LEDDisplaysModel : public wpi::glass::Model {
  public:
   virtual size_t GetNumLEDDisplays() = 0;
 
   virtual void ForEachLEDDisplay(
-      wpi::function_ref<void(LEDDisplayModel& model, int index)> func) = 0;
+      wpi::util::function_ref<void(LEDDisplayModel& model, int index)> func) = 0;
 };
 
 void DisplayLEDDisplay(LEDDisplayModel* model, int index);
 void DisplayLEDDisplays(LEDDisplaysModel* model);
 
-}  // namespace glass
+}  // namespace wpi::glass

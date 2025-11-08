@@ -9,16 +9,16 @@
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/SmallVector.hpp"
 
-namespace wpi {
+namespace wpi::net {
 TEST(HostNameTest, HostNameNotEmpty) {
   ASSERT_NE(GetHostname(), "");
 }
 TEST(HostNameTest, HostNameNotEmptySmallVector) {
-  SmallVector<char, 256> name;
+  wpi::util::SmallVector<char, 256> name;
   ASSERT_NE(GetHostname(name), "");
 }
 TEST(HostNameTest, HostNameEq) {
-  SmallVector<char, 256> nameBuf;
+  wpi::util::SmallVector<char, 256> nameBuf;
   ASSERT_EQ(GetHostname(nameBuf), GetHostname());
 }
-}  // namespace wpi
+}  // namespace wpi::net

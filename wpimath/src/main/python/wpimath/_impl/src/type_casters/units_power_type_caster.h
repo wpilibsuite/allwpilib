@@ -4,51 +4,51 @@
 
 namespace pybind11 {
 namespace detail {
-template <> struct handle_type_name<units::watt_t> {
+template <> struct handle_type_name<wpi::units::watt_t> {
   static constexpr auto name = _("wpimath.units.watts");
 };
 
-template <> struct handle_type_name<units::watts> {
+template <> struct handle_type_name<wpi::units::watts> {
   static constexpr auto name = _("wpimath.units.watts");
 };
 
-template <> struct handle_type_name<units::nanowatt_t> {
+template <> struct handle_type_name<wpi::units::nanowatt_t> {
   static constexpr auto name = _("wpimath.units.nanowatts");
 };
 
-template <> struct handle_type_name<units::nanowatts> {
+template <> struct handle_type_name<wpi::units::nanowatts> {
   static constexpr auto name = _("wpimath.units.nanowatts");
 };
 
-template <> struct handle_type_name<units::microwatt_t> {
+template <> struct handle_type_name<wpi::units::microwatt_t> {
   static constexpr auto name = _("wpimath.units.microwatts");
 };
 
-template <> struct handle_type_name<units::microwatts> {
+template <> struct handle_type_name<wpi::units::microwatts> {
   static constexpr auto name = _("wpimath.units.microwatts");
 };
 
-template <> struct handle_type_name<units::milliwatt_t> {
+template <> struct handle_type_name<wpi::units::milliwatt_t> {
   static constexpr auto name = _("wpimath.units.milliwatts");
 };
 
-template <> struct handle_type_name<units::milliwatts> {
+template <> struct handle_type_name<wpi::units::milliwatts> {
   static constexpr auto name = _("wpimath.units.milliwatts");
 };
 
-template <> struct handle_type_name<units::kilowatt_t> {
+template <> struct handle_type_name<wpi::units::kilowatt_t> {
   static constexpr auto name = _("wpimath.units.kilowatts");
 };
 
-template <> struct handle_type_name<units::kilowatts> {
+template <> struct handle_type_name<wpi::units::kilowatts> {
   static constexpr auto name = _("wpimath.units.kilowatts");
 };
 
-template <> struct handle_type_name<units::horsepower_t> {
+template <> struct handle_type_name<wpi::units::horsepower_t> {
   static constexpr auto name = _("wpimath.units.horsepower");
 };
 
-template <> struct handle_type_name<units::horsepower> {
+template <> struct handle_type_name<wpi::units::horsepower> {
   static constexpr auto name = _("wpimath.units.horsepower");
 };
 

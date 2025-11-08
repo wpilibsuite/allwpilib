@@ -1,5 +1,5 @@
 classes:
-  frc::MedianFilter:
+  wpi::math::MedianFilter:
     template_params:
     - T
     methods:
@@ -10,6 +10,6 @@ classes:
 
 templates:
   MedianFilter:
-    qualname: frc::MedianFilter
+    qualname: wpi::math::MedianFilter
     params:
     - double

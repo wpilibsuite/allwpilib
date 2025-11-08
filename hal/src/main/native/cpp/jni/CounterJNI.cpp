@@ -12,7 +12,7 @@
 #include "wpi/hal/Errors.h"
 #include "wpi/util/jni_util.hpp"
 
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
 
@@ -26,7 +26,7 @@ Java_org_wpilib_hardware_hal_CounterJNI_initializeCounter
   (JNIEnv* env, jclass, jint channel, jboolean risingEdge)
 {
   int32_t status = 0;
-  auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
+  auto stack = wpi::util::java::GetJavaStackTrace(env, "edu.wpi.first");
   auto counter =
       HAL_InitializeCounter(channel, risingEdge, stack.c_str(), &status);
   CheckStatusForceThrow(env, status);

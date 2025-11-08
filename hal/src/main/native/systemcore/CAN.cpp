@@ -30,7 +30,7 @@
 #include "wpi/util/print.hpp"
 #include "wpi/util/timestamp.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
 namespace {
 
@@ -72,7 +72,7 @@ struct CANStreamStorage {
         canMask{mask},
         canFilter{filter} {}
 
-  wpi::circular_buffer<struct HAL_CANStreamMessage> receivedMessages;
+  wpi::util::circular_buffer<struct HAL_CANStreamMessage> receivedMessages;
   bool didOverflow{false};
   uint32_t allowedMessages;
   uint8_t canBusId;
@@ -83,31 +83,31 @@ struct CANStreamStorage {
 };
 
 struct SocketCanState {
-  wpi::EventLoopRunner readLoopRunner;
-  wpi::EventLoopRunner writeLoopRunner;
-  wpi::mutex writeMutex[hal::kNumCanBuses];
-  int socketHandle[hal::kNumCanBuses];
+  wpi::net::EventLoopRunner readLoopRunner;
+  wpi::net::EventLoopRunner writeLoopRunner;
+  wpi::util::mutex writeMutex[wpi::hal::kNumCanBuses];
+  int socketHandle[wpi::hal::kNumCanBuses];
   // ms to count/timer map
-  wpi::DenseMap<uint16_t, std::pair<size_t, std::weak_ptr<wpi::uv::Timer>>>
+  wpi::util::DenseMap<uint16_t, std::pair<size_t, std::weak_ptr<wpi::net::uv::Timer>>>
       timers;
   // ms to bus mask/packet
-  wpi::DenseMap<uint16_t,
-                std::array<std::optional<canfd_frame>, hal::kNumCanBuses>>
+  wpi::util::DenseMap<uint16_t,
+                std::array<std::optional<canfd_frame>, wpi::hal::kNumCanBuses>>
       timedFrames;
   // packet to time
-  wpi::DenseMap<uint32_t, std::array<uint16_t, hal::kNumCanBuses>> packetToTime;
+  wpi::util::DenseMap<uint32_t, std::array<uint16_t, wpi::hal::kNumCanBuses>> packetToTime;
 
-  wpi::mutex readMutex[hal::kNumCanBuses];
+  wpi::util::mutex readMutex[wpi::hal::kNumCanBuses];
   // TODO(thadhouse) we need a MUCH better way of doing this masking
-  wpi::DenseMap<uint32_t, HAL_CANStreamMessage> readFrames[hal::kNumCanBuses];
-  std::vector<CANStreamStorage*> canStreams[hal::kNumCanBuses];
+  wpi::util::DenseMap<uint32_t, HAL_CANStreamMessage> readFrames[wpi::hal::kNumCanBuses];
+  std::vector<CANStreamStorage*> canStreams[wpi::hal::kNumCanBuses];
 
   bool InitializeBuses();
 
   void TimerCallback(uint16_t time);
 
   void RemovePeriodic(uint8_t busMask, uint32_t messageId);
-  void AddPeriodic(wpi::uv::Loop& loop, uint8_t busMask, uint16_t time,
+  void AddPeriodic(wpi::net::uv::Loop& loop, uint8_t busMask, uint16_t time,
                    const canfd_frame& frame);
 };
 
@@ -118,7 +118,7 @@ static UnlimitedHandleResource<HAL_CANStreamHandle, CANStreamStorage,
 
 static SocketCanState* canState;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeCAN() {
   canState = new SocketCanState{};
   static UnlimitedHandleResource<HAL_CANStreamHandle, CANStreamStorage,
@@ -126,7 +126,7 @@ void InitializeCAN() {
       cSH;
   canStreamHandles = &cSH;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 void CANStreamStorage::CheckFrame(const HAL_CANStreamMessage& message) {
   if ((message.messageId & canMask) != canFilter) {
@@ -145,18 +145,18 @@ void CANStreamStorage::CheckFrame(const HAL_CANStreamMessage& message) {
 
 bool SocketCanState::InitializeBuses() {
   bool success = true;
-  readLoopRunner.ExecSync([this, &success](wpi::uv::Loop& loop) {
+  readLoopRunner.ExecSync([this, &success](wpi::net::uv::Loop& loop) {
     int32_t status = 0;
     HAL_SetCurrentThreadPriority(true, 50, &status);
     if (status != 0) {
-      wpi::print("Failed to set CAN thread priority\n");
+      wpi::util::print("Failed to set CAN thread priority\n");
     }
 
-    for (int i = 0; i < hal::kNumCanBuses; i++) {
+    for (int i = 0; i < wpi::hal::kNumCanBuses; i++) {
       std::scoped_lock lock{writeMutex[i]};
       socketHandle[i] = socket(PF_CAN, SOCK_RAW, CAN_RAW);
       if (socketHandle[i] == -1) {
-        wpi::print("socket() for CAN {} failed with {}\n", i,
+        wpi::util::print("socket() for CAN {} failed with {}\n", i,
                    std::strerror(errno));
         success = false;
         return;
@@ -166,7 +166,7 @@ bool SocketCanState::InitializeBuses() {
       std::snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "can_s%d", i);
 
       if (ioctl(socketHandle[i], SIOCGIFINDEX, &ifr) == -1) {
-        wpi::print("ioctl(SIOCGIFINDEX) for CAN {} failed with {}\n",
+        wpi::util::print("ioctl(SIOCGIFINDEX) for CAN {} failed with {}\n",
                    ifr.ifr_name, std::strerror(errno));
         success = false;
         return;
@@ -179,14 +179,14 @@ bool SocketCanState::InitializeBuses() {
 
       if (bind(socketHandle[i], reinterpret_cast<const sockaddr*>(&addr),
                sizeof(addr)) == -1) {
-        wpi::print("bind() for CAN {} failed with {}\n", ifr.ifr_name,
+        wpi::util::print("bind() for CAN {} failed with {}\n", ifr.ifr_name,
                    std::strerror(errno));
         success = false;
         return;
       }
 
       if (ioctl(socketHandle[i], SIOCGIFMTU, &ifr) == -1) {
-        wpi::print("ioctl(SIOCGIFMTU) for CAN {} failed with {}\n",
+        wpi::util::print("ioctl(SIOCGIFMTU) for CAN {} failed with {}\n",
                    ifr.ifr_name, std::strerror(errno));
         success = false;
         return;
@@ -196,7 +196,7 @@ bool SocketCanState::InitializeBuses() {
         int fdSet = 1;
         if (setsockopt(socketHandle[i], SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &fdSet,
                        sizeof(fdSet)) != 0) {
-          wpi::print(
+          wpi::util::print(
               "setsockopt(CAN_RAW_FD_FRAMES) for CAN {} failed with {}\n",
               ifr.ifr_name, std::strerror(errno));
           success = false;
@@ -204,9 +204,9 @@ bool SocketCanState::InitializeBuses() {
         }
       }
 
-      auto poll = wpi::uv::Poll::Create(loop, socketHandle[i]);
+      auto poll = wpi::net::uv::Poll::Create(loop, socketHandle[i]);
       if (!poll) {
-        wpi::print("wpi::uv::Poll::Create for CAN {} failed\n", ifr.ifr_name);
+        wpi::util::print("wpi::net::uv::Poll::Create for CAN {} failed\n", ifr.ifr_name);
         success = false;
         return;
       }
@@ -226,7 +226,7 @@ bool SocketCanState::InitializeBuses() {
           }
 
           uint32_t messageId = MapSocketCanToMessageId(frame.can_id);
-          uint64_t timestamp = wpi::Now();
+          uint64_t timestamp = wpi::util::Now();
           // Ensure FDF flag is set for the read later.
           if (rVal == CANFD_MTU) {
             frame.flags = CANFD_FDF;
@@ -300,24 +300,24 @@ void SocketCanState::RemovePeriodic(uint8_t busId, uint32_t messageId) {
   }
 }
 
-void SocketCanState::AddPeriodic(wpi::uv::Loop& loop, uint8_t busId,
+void SocketCanState::AddPeriodic(wpi::net::uv::Loop& loop, uint8_t busId,
                                  uint16_t time, const canfd_frame& frame) {
   packetToTime[frame.can_id][busId] = time;
   timedFrames[time][busId] = frame;
   auto& timer = timers[time];
   timer.first++;
   if (timer.first == 1) {
-    auto newTimer = wpi::uv::Timer::Create(loop);
+    auto newTimer = wpi::net::uv::Timer::Create(loop);
     newTimer->timeout.connect([this, time] { TimerCallback(time); });
-    newTimer->Start(wpi::uv::Timer::Time{time}, wpi::uv::Timer::Time{time});
+    newTimer->Start(wpi::net::uv::Timer::Time{time}, wpi::net::uv::Timer::Time{time});
   }
 }
 
-namespace hal {
+namespace wpi::hal {
 bool InitializeCanBuses() {
   return canState->InitializeBuses();
 }
-}  // namespace hal
+}  // namespace wpi::hal
 
 namespace {}  // namespace
 
@@ -326,7 +326,7 @@ extern "C" {
 void HAL_CAN_SendMessage(int32_t busId, uint32_t messageId,
                          const struct HAL_CANMessage* message, int32_t periodMs,
                          int32_t* status) {
-  if (busId < 0 || busId >= hal::kNumCanBuses) {
+  if (busId < 0 || busId >= wpi::hal::kNumCanBuses) {
     *status = PARAMETER_OUT_OF_RANGE;
     return;
   }
@@ -336,7 +336,7 @@ void HAL_CAN_SendMessage(int32_t busId, uint32_t messageId,
   // TODO determine on the real roborio is a non periodic send removes any
   // periodic send.
   if (periodMs == HAL_CAN_SEND_PERIOD_STOP_REPEATING) {
-    canState->writeLoopRunner.ExecSync([messageId, busId](wpi::uv::Loop&) {
+    canState->writeLoopRunner.ExecSync([messageId, busId](wpi::net::uv::Loop&) {
       canState->RemovePeriodic(busId, messageId);
     });
 
@@ -385,7 +385,7 @@ void HAL_CAN_SendMessage(int32_t busId, uint32_t messageId,
 
   if (periodMs > 0) {
     canState->writeLoopRunner.ExecAsync(
-        [busId, periodMs, frame](wpi::uv::Loop& loop) {
+        [busId, periodMs, frame](wpi::net::uv::Loop& loop) {
           canState->AddPeriodic(loop, busId, periodMs, frame);
         });
   }
@@ -393,7 +393,7 @@ void HAL_CAN_SendMessage(int32_t busId, uint32_t messageId,
 void HAL_CAN_ReceiveMessage(int32_t busId, uint32_t messageId,
                             struct HAL_CANReceiveMessage* message,
                             int32_t* status) {
-  if (busId < 0 || busId >= hal::kNumCanBuses) {
+  if (busId < 0 || busId >= wpi::hal::kNumCanBuses) {
     message->message.dataSize = 0;
     message->timeStamp = 0;
     *status = PARAMETER_OUT_OF_RANGE;
@@ -421,7 +421,7 @@ HAL_CANStreamHandle HAL_CAN_OpenStreamSession(int32_t busId, uint32_t messageId,
                                               uint32_t messageIdMask,
                                               uint32_t maxMessages,
                                               int32_t* status) {
-  if (busId < 0 || busId >= hal::kNumCanBuses) {
+  if (busId < 0 || busId >= wpi::hal::kNumCanBuses) {
     *status = PARAMETER_OUT_OF_RANGE;
     return HAL_kInvalidHandle;
   }

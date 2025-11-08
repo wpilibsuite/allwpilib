@@ -11,19 +11,19 @@
 #include "wpi/util/sendable/SendableBuilder.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 SubsystemBase::SubsystemBase() {
-  wpi::SendableRegistry::Add(this, GetTypeName(*this));
+  wpi::util::SendableRegistry::Add(this, GetTypeName(*this));
   CommandScheduler::GetInstance().RegisterSubsystem({this});
 }
 
 SubsystemBase::SubsystemBase(std::string_view name) {
-  wpi::SendableRegistry::Add(this, name);
+  wpi::util::SendableRegistry::Add(this, name);
   CommandScheduler::GetInstance().RegisterSubsystem({this});
 }
 
-void SubsystemBase::InitSendable(wpi::SendableBuilder& builder) {
+void SubsystemBase::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Subsystem");
   builder.AddBooleanProperty(
       ".hasDefault", [this] { return GetDefaultCommand() != nullptr; },
@@ -54,21 +54,21 @@ void SubsystemBase::InitSendable(wpi::SendableBuilder& builder) {
 }
 
 std::string SubsystemBase::GetName() const {
-  return wpi::SendableRegistry::GetName(this);
+  return wpi::util::SendableRegistry::GetName(this);
 }
 
 void SubsystemBase::SetName(std::string_view name) {
-  wpi::SendableRegistry::SetName(this, name);
+  wpi::util::SendableRegistry::SetName(this, name);
 }
 
 std::string SubsystemBase::GetSubsystem() const {
-  return wpi::SendableRegistry::GetSubsystem(this);
+  return wpi::util::SendableRegistry::GetSubsystem(this);
 }
 
 void SubsystemBase::SetSubsystem(std::string_view name) {
-  wpi::SendableRegistry::SetSubsystem(this, name);
+  wpi::util::SendableRegistry::SetSubsystem(this, name);
 }
 
-void SubsystemBase::AddChild(std::string name, wpi::Sendable* child) {
-  wpi::SendableRegistry::Add(child, GetSubsystem(), name);
+void SubsystemBase::AddChild(std::string name, wpi::util::Sendable* child) {
+  wpi::util::SendableRegistry::Add(child, GetSubsystem(), name);
 }

@@ -9,7 +9,7 @@
 #include "JoystickTestMacros.hpp"
 #include "wpi/simulation/XboxControllerSim.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 BUTTON_TEST(XboxController, LeftBumperButton)
 BUTTON_TEST(XboxController, RightBumperButton)

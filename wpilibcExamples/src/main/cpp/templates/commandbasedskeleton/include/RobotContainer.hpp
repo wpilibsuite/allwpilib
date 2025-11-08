@@ -10,7 +10,7 @@ class RobotContainer {
  public:
   RobotContainer();
 
-  frc2::CommandPtr GetAutonomousCommand();
+  wpi::cmd::CommandPtr GetAutonomousCommand();
 
  private:
   void ConfigureBindings();

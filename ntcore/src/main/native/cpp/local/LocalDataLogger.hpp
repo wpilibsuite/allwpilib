@@ -16,7 +16,7 @@ namespace wpi::log {
 class DataLog;
 }  // namespace wpi::log
 
-namespace nt::local {
+namespace wpi::nt::local {
 
 struct LocalTopic;
 
@@ -36,4 +36,4 @@ struct LocalDataLogger {
   std::string logPrefix;
 };
 
-}  // namespace nt::local
+}  // namespace wpi::nt::local

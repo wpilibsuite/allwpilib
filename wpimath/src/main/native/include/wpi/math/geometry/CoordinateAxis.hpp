@@ -11,7 +11,7 @@
 #include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * A class representing a coordinate system axis within the NWU coordinate
@@ -74,4 +74,4 @@ class WPILIB_DLLEXPORT CoordinateAxis {
   Eigen::Vector3d m_axis;
 };
 
-}  // namespace frc
+}  // namespace wpi::math

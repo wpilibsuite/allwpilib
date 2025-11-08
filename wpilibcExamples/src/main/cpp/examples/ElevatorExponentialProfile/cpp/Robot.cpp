@@ -16,9 +16,9 @@
 
 #include "ExampleSmartMotorController.hpp"
 
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
-  static constexpr units::second_t kDt = 20_ms;
+  static constexpr wpi::units::second_t kDt = 20_ms;
 
   Robot() {
     // Note: These gains are fake, and will have to be tuned for your robot.
@@ -46,22 +46,22 @@ class Robot : public frc::TimedRobot {
   }
 
  private:
-  frc::Joystick m_joystick{1};
+  wpi::Joystick m_joystick{1};
   ExampleSmartMotorController m_motor{1};
-  frc::SimpleMotorFeedforward<units::meters> m_feedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_feedforward{
       // Note: These gains are fake, and will have to be tuned for your robot.
       1_V, 1_V / 1_mps, 1_V / 1_mps_sq};
 
   // Create a motion profile with the given maximum velocity and maximum
   // acceleration constraints for the next setpoint.
-  frc::ExponentialProfile<units::meters, units::volts> m_profile{
+  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts> m_profile{
       {10_V, 1_V / 1_mps, 1_V / 1_mps_sq}};
-  frc::ExponentialProfile<units::meters, units::volts>::State m_goal;
-  frc::ExponentialProfile<units::meters, units::volts>::State m_setpoint;
+  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>::State m_goal;
+  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>::State m_setpoint;
 };
 
 #ifndef RUNNING_FRC_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

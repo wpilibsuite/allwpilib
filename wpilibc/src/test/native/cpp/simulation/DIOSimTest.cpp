@@ -11,7 +11,7 @@
 #include "wpi/hardware/discrete/DigitalInput.hpp"
 #include "wpi/hardware/discrete/DigitalOutput.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 
 TEST(DIOSimTest, Initialization) {
   HAL_Initialize(500, 0);
@@ -77,4 +77,4 @@ TEST(DIOSimTest, Output) {
   EXPECT_TRUE(valueCallback.WasTriggered());
   EXPECT_FALSE(valueCallback.GetLastValue());
 }
-}  // namespace frc::sim
+}  // namespace wpi::sim

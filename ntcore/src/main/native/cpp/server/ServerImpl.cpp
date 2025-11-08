@@ -18,11 +18,11 @@
 #include "server/ServerClientLocal.hpp"
 #include "wpi/util/MessagePack.hpp"
 
-using namespace nt;
-using namespace nt::server;
+using namespace wpi::nt;
+using namespace wpi::nt::server;
 using namespace mpack;
 
-ServerImpl::ServerImpl(wpi::Logger& logger)
+ServerImpl::ServerImpl(wpi::util::Logger& logger)
     : m_logger{logger},
       m_storage{logger, [this](ServerTopic* topic, ServerClient* client) {
                   SendAnnounce(topic, client);
@@ -87,7 +87,7 @@ void ServerImpl::SendAnnounce(ServerTopic* topic, ServerClient* client) {
     }
 
     // look for subscriber matching prefixes
-    wpi::SmallVector<ServerSubscriber*, 16> subscribersBuf;
+    wpi::util::SmallVector<ServerSubscriber*, 16> subscribersBuf;
     auto subscribers =
         aClient->GetSubscribers(topic->name, topic->special, subscribersBuf);
 
@@ -201,7 +201,7 @@ bool ServerImpl::ProcessLocalMessages(size_t max) {
 
 std::string ServerImpl::DumpPersistent() {
   std::string rv;
-  wpi::raw_string_ostream os{rv};
+  wpi::util::raw_string_ostream os{rv};
   m_storage.DumpPersistent(os);
   os.flush();
   return rv;

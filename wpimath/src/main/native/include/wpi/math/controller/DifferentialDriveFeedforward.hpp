@@ -16,13 +16,13 @@
 #include "wpi/units/voltage.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
-namespace frc {
+namespace wpi::math {
 /**
  * A helper class which computes the feedforward outputs for a differential
  * drive drivetrain.
  */
 class WPILIB_DLLEXPORT DifferentialDriveFeedforward {
-  frc::LinearSystem<2, 2, 2> m_plant;
+  wpi::math::LinearSystem<2, 2, 2> m_plant;
 
  public:
   /**
@@ -41,7 +41,7 @@ class WPILIB_DLLEXPORT DifferentialDriveFeedforward {
   constexpr DifferentialDriveFeedforward(
       decltype(1_V / 1_mps) kVLinear, decltype(1_V / 1_mps_sq) kALinear,
       decltype(1_V / 1_rad_per_s) kVAngular,
-      decltype(1_V / 1_rad_per_s_sq) kAAngular, units::meter_t trackwidth)
+      decltype(1_V / 1_rad_per_s_sq) kAAngular, wpi::units::meter_t trackwidth)
       // See LinearSystemId::IdentifyDrivetrainSystem(decltype(1_V / 1_mps),
       // decltype(1_V / 1_mps_sq), decltype(1_V / 1_rad_per_s), decltype(1_V /
       // 1_rad_per_s_sq))
@@ -64,7 +64,7 @@ class WPILIB_DLLEXPORT DifferentialDriveFeedforward {
                                          decltype(1_V / 1_mps_sq) kALinear,
                                          decltype(1_V / 1_mps) kVAngular,
                                          decltype(1_V / 1_mps_sq) kAAngular)
-      : m_plant{frc::LinearSystemId::IdentifyDrivetrainSystem(
+      : m_plant{wpi::math::LinearSystemId::IdentifyDrivetrainSystem(
             kVLinear, kALinear, kVAngular, kAAngular)},
         m_kVLinear{kVLinear},
         m_kALinear{kALinear},
@@ -86,17 +86,17 @@ class WPILIB_DLLEXPORT DifferentialDriveFeedforward {
    * @param dt Discretization timestep.
    */
   DifferentialDriveWheelVoltages Calculate(
-      units::meters_per_second_t currentLeftVelocity,
-      units::meters_per_second_t nextLeftVelocity,
-      units::meters_per_second_t currentRightVelocity,
-      units::meters_per_second_t nextRightVelocity, units::second_t dt);
+      wpi::units::meters_per_second_t currentLeftVelocity,
+      wpi::units::meters_per_second_t nextLeftVelocity,
+      wpi::units::meters_per_second_t currentRightVelocity,
+      wpi::units::meters_per_second_t nextRightVelocity, wpi::units::second_t dt);
 
   decltype(1_V / 1_mps) m_kVLinear;
   decltype(1_V / 1_mps_sq) m_kALinear;
   decltype(1_V / 1_mps) m_kVAngular;
   decltype(1_V / 1_mps_sq) m_kAAngular;
 };
-}  // namespace frc
+}  // namespace wpi::math
 
 #include "wpi/math/controller/proto/DifferentialDriveFeedforwardProto.hpp"
 #include "wpi/math/controller/struct/DifferentialDriveFeedforwardStruct.hpp"

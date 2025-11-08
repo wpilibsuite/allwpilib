@@ -9,7 +9,7 @@
 #include "wpi/glass/Model.hpp"
 #include "wpi/util/function_ref.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 class BooleanSource;
 class DoubleSource;
@@ -48,11 +48,11 @@ class EncoderModel : public Model {
 class EncodersModel : public Model {
  public:
   virtual void ForEachEncoder(
-      wpi::function_ref<void(EncoderModel& model, int index)> func) = 0;
+      wpi::util::function_ref<void(EncoderModel& model, int index)> func) = 0;
 };
 
 void DisplayEncoder(EncoderModel* model);
 void DisplayEncoders(EncodersModel* model,
                      std::string_view noneMsg = "No encoders");
 
-}  // namespace glass
+}  // namespace wpi::glass

@@ -17,7 +17,7 @@
 
 #include "wpi/util/TestPrinters.hpp"
 
-namespace wpi {
+namespace wpi::util {
 
 template <typename T>
 class SpanMatcher : public ::testing::MatcherInterface<std::span<T>> {
@@ -68,7 +68,7 @@ void SpanMatcher<T>::DescribeNegationTo(::std::ostream* os) const {
   PrintTo(std::span<T>{good}, os);
 }
 
-}  // namespace wpi
+}  // namespace wpi::util
 
 inline std::span<const uint8_t> operator""_us(const char* str, size_t len) {
   return {reinterpret_cast<const uint8_t*>(str), len};

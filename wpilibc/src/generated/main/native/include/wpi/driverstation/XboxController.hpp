@@ -11,7 +11,7 @@
 
 #include "wpi/driverstation/GenericHID.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Handle input from Xbox controllers connected to the Driver Station.
@@ -26,8 +26,8 @@ namespace frc {
  * to have the same mapping, as well as any 3rd party controllers.
  */
 class XboxController : public GenericHID,
-                                    public wpi::Sendable,
-                                    public wpi::SendableHelper<XboxController> {
+                                    public wpi::util::Sendable,
+                                    public wpi::util::SendableHelper<XboxController> {
  public:
   /**
    * Construct an instance of a controller.
@@ -548,7 +548,7 @@ class XboxController : public GenericHID,
     static constexpr int kRightTrigger = 3;
   };
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 };
 
-}  // namespace frc
+}  // namespace wpi

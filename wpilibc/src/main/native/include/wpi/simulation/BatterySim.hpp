@@ -12,7 +12,7 @@
 #include "wpi/units/impedance.hpp"
 #include "wpi/units/voltage.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 
 /**
  * A utility class to simulate the robot battery.
@@ -31,9 +31,9 @@ class BatterySim {
    * @param currents       The currents drawn from the battery.
    * @return The battery's voltage under load.
    */
-  static units::volt_t Calculate(units::volt_t nominalVoltage,
-                                 units::ohm_t resistance,
-                                 std::span<const units::ampere_t> currents) {
+  static wpi::units::volt_t Calculate(wpi::units::volt_t nominalVoltage,
+                                 wpi::units::ohm_t resistance,
+                                 std::span<const wpi::units::ampere_t> currents) {
     return std::max(0_V, nominalVoltage - std::accumulate(currents.begin(),
                                                           currents.end(), 0_A) *
                                               resistance);
@@ -51,9 +51,9 @@ class BatterySim {
    * @param currents       The currents drawn from the battery.
    * @return The battery's voltage under load.
    */
-  static units::volt_t Calculate(
-      units::volt_t nominalVoltage, units::ohm_t resistance,
-      std::initializer_list<units::ampere_t> currents) {
+  static wpi::units::volt_t Calculate(
+      wpi::units::volt_t nominalVoltage, wpi::units::ohm_t resistance,
+      std::initializer_list<wpi::units::ampere_t> currents) {
     return std::max(0_V, nominalVoltage - std::accumulate(currents.begin(),
                                                           currents.end(), 0_A) *
                                               resistance);
@@ -69,7 +69,7 @@ class BatterySim {
    * @param currents The currents drawn from the battery.
    * @return The battery's voltage under load.
    */
-  static units::volt_t Calculate(std::span<const units::ampere_t> currents) {
+  static wpi::units::volt_t Calculate(std::span<const wpi::units::ampere_t> currents) {
     return Calculate(12_V, 0.02_Ohm, currents);
   }
 
@@ -83,10 +83,10 @@ class BatterySim {
    * @param currents The currents drawn from the battery.
    * @return The battery's voltage under load.
    */
-  static units::volt_t Calculate(
-      std::initializer_list<units::ampere_t> currents) {
+  static wpi::units::volt_t Calculate(
+      std::initializer_list<wpi::units::ampere_t> currents) {
     return Calculate(12_V, 0.02_Ohm, currents);
   }
 };
 
-}  // namespace frc::sim
+}  // namespace wpi::sim

@@ -2,9 +2,9 @@ defaults:
   subpackage: constraint
 
 classes:
-  frc::MaxVelocityConstraint:
+  wpi::math::MaxVelocityConstraint:
     typealias:
-    - frc::TrajectoryConstraint::MinMax
+    - wpi::math::TrajectoryConstraint::MinMax
     methods:
       MaxVelocityConstraint:
       MaxVelocity:
@@ -12,7 +12,7 @@ classes:
 
 inline_code: |-
   cls_MaxVelocityConstraint
-    .def_static("fromFps", [](units::feet_per_second_t maxVelocity) {
-      return std::make_shared<frc::MaxVelocityConstraint>(maxVelocity);
+    .def_static("fromFps", [](wpi::units::feet_per_second_t maxVelocity) {
+      return std::make_shared<wpi::math::MaxVelocityConstraint>(maxVelocity);
     }, py::arg("maxVelocity"))
   ;

@@ -11,7 +11,7 @@
 #include "wpi/util/jni_util.hpp"
 #include "wpi/util/string.h"
 
-using namespace wpi::java;
+using namespace wpi::util::java;
 
 extern "C" {
 
@@ -26,8 +26,8 @@ Java_org_wpilib_hardware_hal_UsageReportingJNI_report
 {
   JStringRef resourceStr{env, resource};
   JStringRef dataStr{env, data};
-  WPI_String resourceWpiStr = wpi::make_string(resourceStr);
-  WPI_String dataWpiStr = wpi::make_string(dataStr);
+  WPI_String resourceWpiStr = wpi::util::make_string(resourceStr);
+  WPI_String dataWpiStr = wpi::util::make_string(dataStr);
   return HAL_ReportUsage(&resourceWpiStr, &dataWpiStr);
 }
 

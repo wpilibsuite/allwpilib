@@ -25,7 +25,7 @@
 
 struct ImPlotPoint;
 
-namespace glass {
+namespace wpi::glass {
 class Storage;
 }  // namespace glass
 
@@ -35,7 +35,7 @@ namespace sysid {
  * load their data, visualize the data, adjust certain variables, and then view
  * the calculated gains.
  */
-class Analyzer : public glass::View {
+class Analyzer : public wpi::glass::View {
  public:
   TestData m_data;
   /**
@@ -78,7 +78,7 @@ class Analyzer : public glass::View {
    * @param storage Glass Storage
    * @param logger The program logger
    */
-  Analyzer(glass::Storage& storage, wpi::Logger& logger);
+  Analyzer(wpi::glass::Storage& storage, wpi::util::Logger& logger);
 
   /**
    * Displays the analyzer widget
@@ -212,7 +212,7 @@ class Analyzer : public glass::View {
 
   // Everything related to feedback controller calculations.
   AnalysisManager::Settings m_settings;
-  wpi::StringMap<FeedbackControllerPreset> m_presets;
+  wpi::util::StringMap<FeedbackControllerPreset> m_presets;
 
   int m_selectedLoopType = 1;
   int m_selectedPreset = 0;
@@ -223,7 +223,7 @@ class Analyzer : public glass::View {
   double m_accelRMSE;
   double m_Kp;
   double m_Kd;
-  units::millisecond_t m_timescale;
+  wpi::units::millisecond_t m_timescale;
   bool m_timescaleValid = false;
 
   // Units
@@ -235,7 +235,7 @@ class Analyzer : public glass::View {
   float m_stepTestDuration = 0;
 
   // Logger
-  wpi::Logger& m_logger;
+  wpi::util::Logger& m_logger;
 
   // Plot
   AnalyzerPlot m_plot{m_logger};

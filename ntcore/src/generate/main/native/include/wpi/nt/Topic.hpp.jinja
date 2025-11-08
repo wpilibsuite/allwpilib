@@ -19,12 +19,12 @@
 #include "wpi/nt/Topic.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
 
-namespace wpi {
+namespace wpi::util {
 template <typename T>
 class SmallVectorImpl;
 }  // namespace wpi
 
-namespace nt {
+namespace wpi::nt {
 
 class {{ TypeName }}Topic;
 
@@ -74,7 +74,7 @@ class {{ TypeName }}Subscriber : public Subscriber {
    * @return value
    */
   ValueType Get(ParamType defaultValue) const {
-    return ::nt::Get{{ TypeName }}(m_subHandle, defaultValue);
+    return ::wpi::nt::Get{{ TypeName }}(m_subHandle, defaultValue);
   }
 {% if cpp.SmallRetType and cpp.SmallElemType %}
   /**
@@ -84,7 +84,7 @@ class {{ TypeName }}Subscriber : public Subscriber {
    * @param buf storage for returned value
    * @return value
    */
-  SmallRetType Get(wpi::SmallVectorImpl<SmallElemType>& buf) const {
+  SmallRetType Get(wpi::util::SmallVectorImpl<SmallElemType>& buf) const {
     return Get(buf, m_defaultValue);
   }
 
@@ -96,8 +96,8 @@ class {{ TypeName }}Subscriber : public Subscriber {
    * @param defaultValue default value to return if no value has been published
    * @return value
    */
-  SmallRetType Get(wpi::SmallVectorImpl<SmallElemType>& buf, ParamType defaultValue) const {
-    return nt::Get{{ TypeName }}(m_subHandle, buf, defaultValue);
+  SmallRetType Get(wpi::util::SmallVectorImpl<SmallElemType>& buf, ParamType defaultValue) const {
+    return wpi::nt::Get{{ TypeName }}(m_subHandle, buf, defaultValue);
   }
 {% endif %}
   /**
@@ -120,7 +120,7 @@ class {{ TypeName }}Subscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueType GetAtomic(ParamType defaultValue) const {
-    return ::nt::GetAtomic{{ TypeName }}(m_subHandle, defaultValue);
+    return ::wpi::nt::GetAtomic{{ TypeName }}(m_subHandle, defaultValue);
   }
 {% if cpp.SmallRetType and cpp.SmallElemType %}
   /**
@@ -132,7 +132,7 @@ class {{ TypeName }}Subscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueViewType GetAtomic(
-      wpi::SmallVectorImpl<SmallElemType>& buf) const {
+      wpi::util::SmallVectorImpl<SmallElemType>& buf) const {
     return GetAtomic(buf, m_defaultValue);
   }
 
@@ -146,9 +146,9 @@ class {{ TypeName }}Subscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueViewType GetAtomic(
-      wpi::SmallVectorImpl<SmallElemType>& buf,
+      wpi::util::SmallVectorImpl<SmallElemType>& buf,
       ParamType defaultValue) const {
-    return nt::GetAtomic{{ TypeName }}(m_subHandle, buf, defaultValue);
+    return wpi::nt::GetAtomic{{ TypeName }}(m_subHandle, buf, defaultValue);
   }
 {% endif %}
   /**
@@ -162,7 +162,7 @@ class {{ TypeName }}Subscriber : public Subscriber {
    *     been published since the previous call.
    */
   std::vector<TimestampedValueType> ReadQueue() {
-    return ::nt::ReadQueue{{ TypeName }}(m_subHandle);
+    return ::wpi::nt::ReadQueue{{ TypeName }}(m_subHandle);
   }
 
   /**
@@ -207,7 +207,7 @@ class {{ TypeName }}Publisher : public Publisher {
    * @param time timestamp; 0 indicates current NT time should be used
    */
   void Set(ParamType value, int64_t time = 0) {
-    ::nt::Set{{ TypeName }}(m_pubHandle, value, time);
+    ::wpi::nt::Set{{ TypeName }}(m_pubHandle, value, time);
   }
 
   /**
@@ -218,7 +218,7 @@ class {{ TypeName }}Publisher : public Publisher {
    * @param value value
    */
   void SetDefault(ParamType value) {
-    ::nt::SetDefault{{ TypeName }}(m_pubHandle, value);
+    ::wpi::nt::SetDefault{{ TypeName }}(m_pubHandle, value);
   }
 
   /**
@@ -286,7 +286,7 @@ class {{ TypeName }}Entry final : public {{ TypeName }}Subscriber,
    * Stops publishing the entry if it's published.
    */
   void Unpublish() {
-    ::nt::Unpublish(m_pubHandle);
+    ::wpi::nt::Unpublish(m_pubHandle);
   }
 };
 
@@ -346,7 +346,7 @@ class {{ TypeName }}Topic final : public Topic {
       {% if not TypeString %}std::string_view typeString, {% endif %}ParamType defaultValue,
       const PubSubOptions& options = kDefaultPubSubOptions) {
     return {{ TypeName }}Subscriber{
-        ::nt::Subscribe(m_handle, NT_{{ cpp.TYPE_NAME }}, {{ TypeString|default('typeString') }}, options),
+        ::wpi::nt::Subscribe(m_handle, NT_{{ cpp.TYPE_NAME }}, {{ TypeString|default('typeString') }}, options),
         defaultValue};
   }
 {%- if TypeString %}
@@ -371,7 +371,7 @@ class {{ TypeName }}Topic final : public Topic {
       std::string_view typeString, ParamType defaultValue,
       const PubSubOptions& options = kDefaultPubSubOptions) {
     return {{ TypeName }}Subscriber{
-        ::nt::Subscribe(m_handle, NT_{{ cpp.TYPE_NAME }}, typeString, options),
+        ::wpi::nt::Subscribe(m_handle, NT_{{ cpp.TYPE_NAME }}, typeString, options),
         defaultValue};
   }
 {% endif %}
@@ -396,7 +396,7 @@ class {{ TypeName }}Topic final : public Topic {
   [[nodiscard]]
   PublisherType Publish({% if not TypeString %}std::string_view typeString, {% endif %}const PubSubOptions& options = kDefaultPubSubOptions) {
     return {{ TypeName }}Publisher{
-        ::nt::Publish(m_handle, NT_{{ cpp.TYPE_NAME }}, {{ TypeString|default('typeString') }}, options)};
+        ::wpi::nt::Publish(m_handle, NT_{{ cpp.TYPE_NAME }}, {{ TypeString|default('typeString') }}, options)};
   }
 
   /**
@@ -419,9 +419,9 @@ class {{ TypeName }}Topic final : public Topic {
    */
   [[nodiscard]]
   PublisherType PublishEx(std::string_view typeString,
-    const wpi::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
+    const wpi::util::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
     return {{ TypeName }}Publisher{
-        ::nt::PublishEx(m_handle, NT_{{ cpp.TYPE_NAME }}, typeString, properties, options)};
+        ::wpi::nt::PublishEx(m_handle, NT_{{ cpp.TYPE_NAME }}, typeString, properties, options)};
   }
 
   /**
@@ -451,7 +451,7 @@ class {{ TypeName }}Topic final : public Topic {
   EntryType GetEntry({% if not TypeString %}std::string_view typeString, {% endif %}ParamType defaultValue,
                      const PubSubOptions& options = kDefaultPubSubOptions) {
     return {{ TypeName }}Entry{
-        ::nt::GetEntry(m_handle, NT_{{ cpp.TYPE_NAME }}, {{ TypeString|default('typeString') }}, options),
+        ::wpi::nt::GetEntry(m_handle, NT_{{ cpp.TYPE_NAME }}, {{ TypeString|default('typeString') }}, options),
         defaultValue};
   }
 {%- if TypeString %}
@@ -480,23 +480,23 @@ class {{ TypeName }}Topic final : public Topic {
   EntryType GetEntryEx(std::string_view typeString, ParamType defaultValue,
                        const PubSubOptions& options = kDefaultPubSubOptions) {
     return {{ TypeName }}Entry{
-        ::nt::GetEntry(m_handle, NT_{{ cpp.TYPE_NAME }}, typeString, options),
+        ::wpi::nt::GetEntry(m_handle, NT_{{ cpp.TYPE_NAME }}, typeString, options),
         defaultValue};
   }
 {% endif %}
 };
 
 inline {{ TypeName }}Topic {{ TypeName }}Subscriber::GetTopic() const {
-  return {{ TypeName }}Topic{::nt::GetTopicFromHandle(m_subHandle)};
+  return {{ TypeName }}Topic{::wpi::nt::GetTopicFromHandle(m_subHandle)};
 }
 
 inline {{ TypeName }}Topic {{ TypeName }}Publisher::GetTopic() const {
-  return {{ TypeName }}Topic{::nt::GetTopicFromHandle(m_pubHandle)};
+  return {{ TypeName }}Topic{::wpi::nt::GetTopicFromHandle(m_pubHandle)};
 }
 
 inline {{ TypeName }}Topic {{ TypeName }}Entry::GetTopic() const {
-  return {{ TypeName }}Topic{::nt::GetTopicFromHandle(m_subHandle)};
+  return {{ TypeName }}Topic{::wpi::nt::GetTopicFromHandle(m_subHandle)};
 }
 
-}  // namespace nt
+}  // namespace wpi::nt
 

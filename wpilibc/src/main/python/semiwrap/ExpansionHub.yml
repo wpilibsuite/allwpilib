@@ -3,7 +3,7 @@ extra_includes:
 - wpi/ExpansionHubServo.hpp
 
 classes:
-  frc::ExpansionHub:
+  wpi::ExpansionHub:
     attributes:
       NumUsbPorts:
       NumServoPorts:

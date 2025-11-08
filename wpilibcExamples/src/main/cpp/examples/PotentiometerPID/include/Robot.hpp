@@ -18,7 +18,7 @@
  * PID controller to reach and maintain position setpoints on an elevator
  * mechanism.
  */
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   void TeleopInit() override;
   void TeleopPeriodic() override;
@@ -28,10 +28,10 @@ class Robot : public frc::TimedRobot {
   static constexpr int kJoystickChannel = 3;
 
   // The elevator can move 1.5 meters from top to bottom
-  static constexpr units::meter_t kFullHeight = 1.5_m;
+  static constexpr wpi::units::meter_t kFullHeight = 1.5_m;
 
   // Bottom, middle, and top elevator setpoints
-  static constexpr std::array<units::meter_t, 3> kSetpoints = {
+  static constexpr std::array<wpi::units::meter_t, 3> kSetpoints = {
       {0.2_m, 0.8_m, 1.4_m}};
 
  private:
@@ -45,11 +45,11 @@ class Robot : public frc::TimedRobot {
   static constexpr double kD = 0.25;
 
   // Scaling is handled internally
-  frc::AnalogPotentiometer m_potentiometer{kPotChannel, kFullHeight.value()};
+  wpi::AnalogPotentiometer m_potentiometer{kPotChannel, kFullHeight.value()};
 
-  frc::PWMSparkMax m_elevatorMotor{kMotorChannel};
-  frc::PIDController m_pidController{kP, kI, kD};
-  frc::Joystick m_joystick{kJoystickChannel};
+  wpi::PWMSparkMax m_elevatorMotor{kMotorChannel};
+  wpi::math::PIDController m_pidController{kP, kI, kD};
+  wpi::Joystick m_joystick{kJoystickChannel};
 
   size_t m_index;
 };

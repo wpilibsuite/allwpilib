@@ -21,7 +21,7 @@
 #include <optional>
 #include <type_traits>
 
-namespace wpi {
+namespace wpi::util {
 
 //===----------------------------------------------------------------------===//
 // simplify_type
@@ -806,7 +806,7 @@ template <class X, class Y>
 //===----------------------------------------------------------------------===//
 
 /// These are wrappers over isa* function that allow them to be used in generic
-/// algorithms such as `wpi:all_of`, `wpi::none_of`, etc. This is accomplished
+/// algorithms such as `wpi:all_of`, `wpi::util::none_of`, etc. This is accomplished
 /// by exposing the isa* functions through function objects with a generic
 /// function call operator.
 
@@ -824,29 +824,29 @@ template <typename... Types> struct IsaAndPresentCheckPredicate {
 };
 } // namespace detail
 
-/// Function object wrapper for the `wpi::isa` type check. The function call
+/// Function object wrapper for the `wpi::util::isa` type check. The function call
 /// operator returns true when the value can be cast to any type in `Types`.
 /// Example:
 /// ```
 /// SmallVector<Type> myTypes = ...;
-/// if (wpi::all_of(myTypes, wpi::IsaPred<VectorType>))
+/// if (wpi::util::all_of(myTypes, wpi::util::IsaPred<VectorType>))
 ///   ...
 /// ```
 template <typename... Types>
 inline constexpr detail::IsaCheckPredicate<Types...> IsaPred{};
 
-/// Function object wrapper for the `wpi::isa_and_present` type check. The
+/// Function object wrapper for the `wpi::util::isa_and_present` type check. The
 /// function call operator returns true when the value can be cast to any type
 /// in `Types`, or if the value is not present (e.g., nullptr). Example:
 /// ```
 /// SmallVector<Type> myTypes = ...;
-/// if (wpi::all_of(myTypes, wpi::IsaAndPresentPred<VectorType>))
+/// if (wpi::util::all_of(myTypes, wpi::util::IsaAndPresentPred<VectorType>))
 ///   ...
 /// ```
 template <typename... Types>
 inline constexpr detail::IsaAndPresentCheckPredicate<Types...>
     IsaAndPresentPred{};
 
-} // end namespace wpi
+} // end namespace wpi::util
 
 #endif // WPIUTIL_WPI_CASTING_H

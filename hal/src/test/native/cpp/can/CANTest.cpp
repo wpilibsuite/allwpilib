@@ -10,7 +10,7 @@
 #include "wpi/hal/CANAPI.h"
 #include "wpi/hal/simulation/CanData.h"
 
-namespace hal {
+namespace wpi::hal {
 struct CANTestStore {
   CANTestStore(int32_t busId, int32_t deviceId, int32_t* status) {
     this->deviceId = deviceId;
@@ -83,4 +83,4 @@ TEST(CANTest, CanIdPacking) {
   ASSERT_EQ(static_cast<int32_t>(HAL_CANDeviceType::HAL_CAN_Dev_kMiscellaneous),
             (storePair.first & 0x1F000000) >> 24);
 }
-}  // namespace hal
+}  // namespace wpi::hal

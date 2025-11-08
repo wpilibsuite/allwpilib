@@ -16,17 +16,17 @@
 #include "wpi/util/SmallPtrSet.hpp"
 #include "wpi/util/json.hpp"
 
-namespace wpi {
+namespace wpi::util {
 class Logger;
 }  // namespace wpi
 
-namespace nt::server {
+namespace wpi::nt::server {
 
 class ServerClient;
 
 struct TopicClientData {
-  wpi::SmallPtrSet<ServerPublisher*, 2> publishers;
-  wpi::SmallPtrSet<ServerSubscriber*, 2> subscribers;
+  wpi::util::SmallPtrSet<ServerPublisher*, 2> publishers;
+  wpi::util::SmallPtrSet<ServerSubscriber*, 2> subscribers;
   net::ValueSendMode sendMode = net::ValueSendMode::kDisabled;
 
   bool AddSubscriber(ServerSubscriber* sub) {
@@ -44,11 +44,11 @@ struct TopicClientData {
 };
 
 struct ServerTopic {
-  ServerTopic(wpi::Logger& logger, std::string_view name,
+  ServerTopic(wpi::util::Logger& logger, std::string_view name,
               std::string_view typeStr)
       : m_logger{logger}, name{name}, typeStr{typeStr} {}
-  ServerTopic(wpi::Logger& logger, std::string_view name,
-              std::string_view typeStr, wpi::json properties)
+  ServerTopic(wpi::util::Logger& logger, std::string_view name,
+              std::string_view typeStr, wpi::util::json properties)
       : m_logger{logger},
         name{name},
         typeStr{typeStr},
@@ -63,17 +63,17 @@ struct ServerTopic {
   }
 
   // returns true if properties changed
-  bool SetProperties(const wpi::json& update);
+  bool SetProperties(const wpi::util::json& update);
   void RefreshProperties();
   bool SetFlags(unsigned int flags_);
 
-  wpi::Logger& m_logger;  // Must be m_logger for WARN macro to work
+  wpi::util::Logger& m_logger;  // Must be m_logger for WARN macro to work
   std::string name;
   unsigned int id;
   Value lastValue;
   ServerClient* lastValueClient = nullptr;
   std::string typeStr;
-  wpi::json properties = wpi::json::object();
+  wpi::util::json properties = wpi::util::json::object();
   unsigned int publisherCount{0};
   bool persistent{false};
   bool retained{false};
@@ -93,11 +93,11 @@ struct ServerTopic {
     }
   }
 
-  wpi::SmallDenseMap<ServerClient*, TopicClientData, 4> clients;
+  wpi::util::SmallDenseMap<ServerClient*, TopicClientData, 4> clients;
 
   // meta topics
   ServerTopic* metaPub = nullptr;
   ServerTopic* metaSub = nullptr;
 };
 
-}  // namespace nt::server
+}  // namespace wpi::nt::server

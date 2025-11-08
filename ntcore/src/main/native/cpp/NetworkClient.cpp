@@ -24,8 +24,8 @@
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
 
-using namespace nt;
-namespace uv = wpi::uv;
+using namespace wpi::nt;
+namespace uv = wpi::net::uv;
 
 static constexpr uv::Timer::Time kReconnectRate{1000};
 static constexpr uv::Timer::Time kWebsocketHandshakeTimeout{500};
@@ -35,7 +35,7 @@ static constexpr size_t kMaxMessageSize = 2 * 1024 * 1024;
 NetworkClientBase::NetworkClientBase(int inst, std::string_view id,
                                      net::ILocalStorage& localStorage,
                                      IConnectionList& connList,
-                                     wpi::Logger& logger)
+                                     wpi::util::Logger& logger)
     : m_inst{inst},
       m_localStorage{localStorage},
       m_connList{connList},
@@ -62,7 +62,7 @@ void NetworkClientBase::StartDSClient(unsigned int port) {
       return;
     }
     m_dsClientServer.second = port == 0 ? NT_DEFAULT_PORT : port;
-    m_dsClient = wpi::DsClient::Create(m_loop, m_logger);
+    m_dsClient = wpi::net::DsClient::Create(m_loop, m_logger);
     if (m_dsClient) {
       m_dsClient->setIp.connect([this](std::string_view ip) {
         m_dsClientServer.first = ip;
@@ -107,7 +107,7 @@ void NetworkClientBase::DoSetServers(
   std::vector<std::pair<std::string, unsigned int>> serversCopy;
   serversCopy.reserve(servers.size());
   for (auto&& server : servers) {
-    serversCopy.emplace_back(wpi::trim(server.first),
+    serversCopy.emplace_back(wpi::util::trim(server.first),
                              server.second == 0 ? defaultPort : server.second);
   }
 
@@ -144,13 +144,13 @@ void NetworkClientBase::DoDisconnect(std::string_view reason) {
 
 NetworkClient::NetworkClient(
     int inst, std::string_view id, net::ILocalStorage& localStorage,
-    IConnectionList& connList, wpi::Logger& logger,
+    IConnectionList& connList, wpi::util::Logger& logger,
     std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
         timeSyncUpdated)
     : NetworkClientBase{inst, id, localStorage, connList, logger},
       m_timeSyncUpdated{std::move(timeSyncUpdated)} {
   m_loopRunner.ExecAsync([this](uv::Loop& loop) {
-    m_parallelConnect = wpi::ParallelTcpConnector::Create(
+    m_parallelConnect = wpi::net::ParallelTcpConnector::Create(
         loop, kReconnectRate, m_logger,
         [this](uv::Tcp& tcp) { TcpConnected(tcp); }, true);
 
@@ -221,17 +221,17 @@ void NetworkClient::TcpConnected(uv::Tcp& tcp) {
   tcp.SetLogger(&m_logger);
   tcp.SetNoDelay(true);
   // Start the WS client
-  if (m_logger.min_level() >= wpi::WPI_LOG_DEBUG4) {
+  if (m_logger.min_level() >= wpi::util::WPI_LOG_DEBUG4) {
     std::string ip;
     unsigned int port = 0;
     uv::AddrToName(tcp.GetPeer(), &ip, &port);
     DEBUG4("Starting WebSocket client on {} port {}", ip, port);
   }
-  wpi::WebSocket::ClientOptions options;
+  wpi::net::WebSocket::ClientOptions options;
   options.handshakeTimeout = kWebsocketHandshakeTimeout;
-  wpi::SmallString<128> idBuf;
-  auto ws = wpi::WebSocket::CreateClient(
-      tcp, fmt::format("/nt/{}", wpi::EscapeURI(m_id, idBuf)), "",
+  wpi::util::SmallString<128> idBuf;
+  auto ws = wpi::net::WebSocket::CreateClient(
+      tcp, fmt::format("/nt/{}", wpi::net::EscapeURI(m_id, idBuf)), "",
       {"v4.1.networktables.first.wpi.edu", "networktables.first.wpi.edu"},
       options);
   ws->SetMaxMessageSize(kMaxMessageSize);
@@ -244,7 +244,7 @@ void NetworkClient::TcpConnected(uv::Tcp& tcp) {
   });
 }
 
-void NetworkClient::WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp,
+void NetworkClient::WsConnected(wpi::net::WebSocket& ws, uv::Tcp& tcp,
                                 std::string_view protocol) {
   if (m_parallelConnect) {
     m_parallelConnect->Succeeded(tcp);
@@ -258,7 +258,7 @@ void NetworkClient::WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp,
   INFO("CONNECTED NT4 to {} port {}", connInfo.remote_ip, connInfo.remote_port);
   m_connHandle = m_connList.AddConnection(connInfo);
 
-  bool local = wpi::starts_with(connInfo.remote_ip, "127.");
+  bool local = wpi::util::starts_with(connInfo.remote_ip, "127.");
 
   m_wire = std::make_shared<net::WebSocketConnection>(
       ws, connInfo.protocol_version, m_logger);

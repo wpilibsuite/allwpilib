@@ -9,11 +9,11 @@
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/mutex.hpp"
 
-namespace hal {
-static wpi::SmallVector<HandleBase*, 32>* globalHandles = nullptr;
-static wpi::mutex globalHandleMutex;
+namespace wpi::hal {
+static wpi::util::SmallVector<HandleBase*, 32>* globalHandles = nullptr;
+static wpi::util::mutex globalHandleMutex;
 HandleBase::HandleBase() {
-  static wpi::SmallVector<HandleBase*, 32> gH;
+  static wpi::util::SmallVector<HandleBase*, 32> gH;
   std::scoped_lock lock(globalHandleMutex);
   if (!globalHandles) {
     globalHandles = &gH;
@@ -67,4 +67,4 @@ HAL_Handle createHandle(int16_t index, HAL_HandleEnum handleType,
   handle += index;
   return handle;
 }
-}  // namespace hal
+}  // namespace wpi::hal

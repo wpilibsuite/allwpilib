@@ -15,11 +15,11 @@ class SysIdRoutineBot {
  public:
   SysIdRoutineBot();
 
-  frc2::CommandPtr GetAutonomousCommand();
+  wpi::cmd::CommandPtr GetAutonomousCommand();
 
  private:
   void ConfigureBindings();
-  frc2::CommandXboxController m_driverController{
+  wpi::cmd::CommandXboxController m_driverController{
       constants::oi::kDriverControllerPort};
   Drive m_drive;
   Shooter m_shooter;

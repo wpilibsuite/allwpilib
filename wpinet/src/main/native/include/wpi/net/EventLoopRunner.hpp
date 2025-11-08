@@ -11,7 +11,7 @@
 #include "wpi/net/uv/Loop.hpp"
 #include "wpi/util/SafeThread.hpp"
 
-namespace wpi {
+namespace wpi::net {
 
 /**
  * Executes an event loop on a separate thread.
@@ -54,9 +54,9 @@ class EventLoopRunner {
 
  private:
   class Thread;
-  SafeThreadOwner<Thread> m_owner;
+  wpi::util::SafeThreadOwner<Thread> m_owner;
 };
 
-}  // namespace wpi
+}  // namespace wpi::net
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_EVENTLOOPRUNNER_HPP_

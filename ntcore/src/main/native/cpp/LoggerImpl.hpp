@@ -12,7 +12,7 @@
 #include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/mutex.hpp"
 
-namespace nt {
+namespace wpi::nt {
 
 class IListenerStorage;
 
@@ -35,7 +35,7 @@ class LoggerImpl {
  private:
   IListenerStorage& m_listenerStorage;
   std::atomic_int m_listenerCount{0};
-  wpi::mutex m_mutex;
+  wpi::util::mutex m_mutex;
 
   struct ListenerLevels {
     ListenerLevels(NT_Listener listener, unsigned int minLevel,
@@ -49,4 +49,4 @@ class LoggerImpl {
   std::vector<ListenerLevels> m_listenerLevels;
 };
 
-}  // namespace nt
+}  // namespace wpi::nt

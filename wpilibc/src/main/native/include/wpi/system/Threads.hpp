@@ -6,7 +6,7 @@
 
 #include <thread>
 
-namespace frc {
+namespace wpi {
 
 /**
  * Get the thread priority for the specified thread.
@@ -54,4 +54,4 @@ bool SetThreadPriority(std::thread& thread, bool realTime, int priority);
  */
 bool SetCurrentThreadPriority(bool realTime, int priority);
 
-}  // namespace frc
+}  // namespace wpi

@@ -9,7 +9,7 @@
 #include <limits>
 #include <random>
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * An implementation of the Simulated Annealing stochastic nonlinear
@@ -98,4 +98,4 @@ class SimulatedAnnealing {
   std::function<double(const State&)> m_cost;
 };
 
-}  // namespace frc
+}  // namespace wpi::math

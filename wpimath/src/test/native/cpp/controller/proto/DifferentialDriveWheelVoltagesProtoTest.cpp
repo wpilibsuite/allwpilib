@@ -7,19 +7,19 @@
 #include "wpi/math/controller/DifferentialDriveWheelVoltages.hpp"
 #include "wpi/util/SmallVector.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 namespace {
 
-using ProtoType = wpi::Protobuf<frc::DifferentialDriveWheelVoltages>;
+using ProtoType = wpi::util::Protobuf<wpi::math::DifferentialDriveWheelVoltages>;
 
 const DifferentialDriveWheelVoltages kExpectedData =
     DifferentialDriveWheelVoltages{0.174_V, 0.191_V};
 }  // namespace
 
 TEST(DifferentialDriveWheelVoltagesProtoTest, Roundtrip) {
-  wpi::ProtobufMessage<decltype(kExpectedData)> message;
-  wpi::SmallVector<uint8_t, 64> buf;
+  wpi::util::ProtobufMessage<decltype(kExpectedData)> message;
+  wpi::util::SmallVector<uint8_t, 64> buf;
 
   ASSERT_TRUE(message.Pack(buf, kExpectedData));
   auto unpacked_data = message.Unpack(buf);

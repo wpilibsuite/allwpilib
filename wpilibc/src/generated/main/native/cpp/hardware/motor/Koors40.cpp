@@ -8,7 +8,7 @@
 
 #include "wpi/hal/UsageReporting.h"
 
-using namespace frc;
+using namespace wpi;
 
 Koors40::Koors40(int channel) : PWMMotorController("Koors40", channel) {
   SetBounds(2.004_ms, 1.52_ms, 1.5_ms, 1.48_ms, 0.997_ms);

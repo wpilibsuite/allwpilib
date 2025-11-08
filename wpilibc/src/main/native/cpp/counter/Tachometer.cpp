@@ -12,19 +12,19 @@
 #include "wpi/util/StackTrace.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 Tachometer::Tachometer(int channel, EdgeConfiguration configuration)
     : m_channel{channel} {
   int32_t status = 0;
-  std::string stackTrace = wpi::GetStackTrace(1);
+  std::string stackTrace = wpi::util::GetStackTrace(1);
   m_handle = HAL_InitializeCounter(
       channel, configuration == EdgeConfiguration::kRisingEdge,
       stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "{}", channel);
 
   HAL_ReportUsage("IO", channel, "Tachometer");
-  wpi::SendableRegistry::Add(this, "Tachometer", channel);
+  wpi::util::SendableRegistry::Add(this, "Tachometer", channel);
 }
 
 void Tachometer::SetEdgeConfiguration(EdgeConfiguration configuration) {
@@ -34,7 +34,7 @@ void Tachometer::SetEdgeConfiguration(EdgeConfiguration configuration) {
   FRC_CheckErrorStatus(status, "{}", m_channel);
 }
 
-units::hertz_t Tachometer::GetFrequency() const {
+wpi::units::hertz_t Tachometer::GetFrequency() const {
   auto period = GetPeriod();
   if (period.value() == 0) {
     return 0_Hz;
@@ -42,11 +42,11 @@ units::hertz_t Tachometer::GetFrequency() const {
   return 1 / period;
 }
 
-units::second_t Tachometer::GetPeriod() const {
+wpi::units::second_t Tachometer::GetPeriod() const {
   int32_t status = 0;
   double period = HAL_GetCounterPeriod(m_handle, &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
-  return units::second_t{period};
+  return wpi::units::second_t{period};
 }
 
 int Tachometer::GetEdgesPerRevolution() const {
@@ -56,7 +56,7 @@ void Tachometer::SetEdgesPerRevolution(int edges) {
   m_edgesPerRevolution = edges;
 }
 
-units::turns_per_second_t Tachometer::GetRevolutionsPerSecond() const {
+wpi::units::turns_per_second_t Tachometer::GetRevolutionsPerSecond() const {
   auto period = GetPeriod();
   if (period.value() == 0) {
     return 0_tps;
@@ -66,11 +66,11 @@ units::turns_per_second_t Tachometer::GetRevolutionsPerSecond() const {
     return 0_tps;
   }
   auto rotationHz = ((1.0 / edgesPerRevolution) / period);
-  return units::turns_per_second_t{rotationHz.value()};
+  return wpi::units::turns_per_second_t{rotationHz.value()};
 }
 
-units::revolutions_per_minute_t Tachometer::GetRevolutionsPerMinute() const {
-  return units::revolutions_per_minute_t{GetRevolutionsPerSecond()};
+wpi::units::revolutions_per_minute_t Tachometer::GetRevolutionsPerMinute() const {
+  return wpi::units::revolutions_per_minute_t{GetRevolutionsPerSecond()};
 }
 
 bool Tachometer::GetStopped() const {
@@ -80,13 +80,13 @@ bool Tachometer::GetStopped() const {
   return stopped;
 }
 
-void Tachometer::SetMaxPeriod(units::second_t maxPeriod) {
+void Tachometer::SetMaxPeriod(wpi::units::second_t maxPeriod) {
   int32_t status = 0;
   HAL_SetCounterMaxPeriod(m_handle, maxPeriod.value(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
-void Tachometer::InitSendable(wpi::SendableBuilder& builder) {
+void Tachometer::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Tachometer");
   builder.AddDoubleProperty(
       "RPS", [&] { return GetRevolutionsPerSecond().value(); }, nullptr);

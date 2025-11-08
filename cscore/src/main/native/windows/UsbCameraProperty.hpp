@@ -16,7 +16,7 @@
 #include "PropertyImpl.hpp"
 #include "wpi/util/mutex.hpp"
 
-namespace cs {
+namespace wpi::cs {
 
 // Property data
 class UsbCameraProperty : public PropertyImpl {
@@ -54,11 +54,11 @@ class UsbCameraProperty : public PropertyImpl {
   UsbCameraProperty(std::string_view name_, tagCameraControlProperty tag,
                     bool autoProp, IAMCameraControl* pProcAmp, bool* isValid);
 
-  bool DeviceGet(std::unique_lock<wpi::mutex>& lock,
+  bool DeviceGet(std::unique_lock<wpi::util::mutex>& lock,
                  IMFSourceReader* sourceReader);
-  bool DeviceSet(std::unique_lock<wpi::mutex>& lock,
+  bool DeviceSet(std::unique_lock<wpi::util::mutex>& lock,
                  IMFSourceReader* sourceReader) const;
-  bool DeviceSet(std::unique_lock<wpi::mutex>& lock,
+  bool DeviceSet(std::unique_lock<wpi::util::mutex>& lock,
                  IMFSourceReader* sourceReader, int newValue) const;
 
   // If this is a device (rather than software) property
@@ -81,17 +81,17 @@ class UsbCameraProperty : public PropertyImpl {
   int type{0};     // implementation type, not CS_PropertyKind!
 
  private:
-  bool DeviceGet(std::unique_lock<wpi::mutex>& lock,
+  bool DeviceGet(std::unique_lock<wpi::util::mutex>& lock,
                  IAMCameraControl* pProcAmp);
-  bool DeviceSet(std::unique_lock<wpi::mutex>& lock,
+  bool DeviceSet(std::unique_lock<wpi::util::mutex>& lock,
                  IAMCameraControl* pProcAmp) const;
-  bool DeviceSet(std::unique_lock<wpi::mutex>& lock, IAMCameraControl* pProcAmp,
+  bool DeviceSet(std::unique_lock<wpi::util::mutex>& lock, IAMCameraControl* pProcAmp,
                  int newValue) const;
 
-  bool DeviceGet(std::unique_lock<wpi::mutex>& lock, IAMVideoProcAmp* pProcAmp);
-  bool DeviceSet(std::unique_lock<wpi::mutex>& lock,
+  bool DeviceGet(std::unique_lock<wpi::util::mutex>& lock, IAMVideoProcAmp* pProcAmp);
+  bool DeviceSet(std::unique_lock<wpi::util::mutex>& lock,
                  IAMVideoProcAmp* pProcAmp) const;
-  bool DeviceSet(std::unique_lock<wpi::mutex>& lock, IAMVideoProcAmp* pProcAmp,
+  bool DeviceSet(std::unique_lock<wpi::util::mutex>& lock, IAMVideoProcAmp* pProcAmp,
                  int newValue) const;
 };
-}  // namespace cs
+}  // namespace wpi::cs

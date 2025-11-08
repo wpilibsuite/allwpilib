@@ -28,7 +28,7 @@
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/fs.hpp"
 
-Downloader::Downloader(glass::Storage& storage)
+Downloader::Downloader(wpi::glass::Storage& storage)
     : m_serverTeam{storage.GetString("serverTeam")},
       m_remoteDir{storage.GetString("remoteDir", "/home/systemcore/logs")},
       m_username{storage.GetString("username", "systemcore")},
@@ -104,15 +104,15 @@ void Downloader::DisplayRemoteDirSelector() {
   for (auto&& dir : m_dirList) {
     if (ImGui::Selectable(dir.c_str())) {
       if (dir == "..") {
-        if (wpi::ends_with(m_remoteDir, '/')) {
+        if (wpi::util::ends_with(m_remoteDir, '/')) {
           m_remoteDir.resize(m_remoteDir.size() - 1);
         }
-        m_remoteDir = wpi::rsplit(m_remoteDir, '/').first;
+        m_remoteDir = wpi::util::rsplit(m_remoteDir, '/').first;
         if (m_remoteDir.empty()) {
           m_remoteDir = "/";
         }
       } else {
-        if (!wpi::ends_with(m_remoteDir, '/')) {
+        if (!wpi::util::ends_with(m_remoteDir, '/')) {
           m_remoteDir += '/';
         }
         m_remoteDir += dir;
@@ -286,7 +286,7 @@ void Downloader::ThreadMain() {
     try {
       switch (m_state) {
         case kConnecting:
-          if (auto team = wpi::parse_integer<unsigned int>(m_serverTeam, 10)) {
+          if (auto team = wpi::util::parse_integer<unsigned int>(m_serverTeam, 10)) {
             // team number
             session = std::make_unique<sftp::Session>(
                 fmt::format("roborio-{}-frc.local", team.value()), 22,
@@ -335,7 +335,7 @@ void Downloader::ThreadMain() {
               }
             } else if (attr.type == SSH_FILEXFER_TYPE_REGULAR &&
                        (attr.flags & SSH_FILEXFER_ATTR_SIZE) != 0 &&
-                       wpi::ends_with(attr.name, ".wpilog")) {
+                       wpi::util::ends_with(attr.name, ".wpilog")) {
               m_fileList.emplace_back(attr.name, attr.size);
             }
           }
@@ -359,7 +359,7 @@ void Downloader::ThreadMain() {
 
             auto remoteFilename = fmt::format(
                 "{}{}{}", m_remoteDir,
-                wpi::ends_with(m_remoteDir, '/') ? "" : "/", file.name);
+                wpi::util::ends_with(m_remoteDir, '/') ? "" : "/", file.name);
             auto localFilename = fs::path{m_localDir} / file.name;
             uint64_t fileSize = file.size;
 
@@ -450,7 +450,7 @@ void Downloader::ThreadMain() {
 
             auto remoteFilename = fmt::format(
                 "{}{}{}", m_remoteDir,
-                wpi::ends_with(m_remoteDir, '/') ? "" : "/", file.name);
+                wpi::util::ends_with(m_remoteDir, '/') ? "" : "/", file.name);
 
             lock.unlock();
             try {

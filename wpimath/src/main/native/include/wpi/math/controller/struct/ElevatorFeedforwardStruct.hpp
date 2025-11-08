@@ -9,7 +9,7 @@
 #include "wpi/util/struct/Struct.hpp"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Struct<frc::ElevatorFeedforward> {
+struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::ElevatorFeedforward> {
   static constexpr std::string_view GetTypeName() {
     return "ElevatorFeedforward";
   }
@@ -18,9 +18,9 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::ElevatorFeedforward> {
     return "double ks;double kg;double kv;double ka";
   }
 
-  static frc::ElevatorFeedforward Unpack(std::span<const uint8_t> data);
+  static wpi::math::ElevatorFeedforward Unpack(std::span<const uint8_t> data);
   static void Pack(std::span<uint8_t> data,
-                   const frc::ElevatorFeedforward& value);
+                   const wpi::math::ElevatorFeedforward& value);
 };
 
-static_assert(wpi::StructSerializable<frc::ElevatorFeedforward>);
+static_assert(wpi::util::StructSerializable<wpi::math::ElevatorFeedforward>);

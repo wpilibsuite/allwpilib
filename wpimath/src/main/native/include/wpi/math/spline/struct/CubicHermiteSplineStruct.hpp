@@ -9,7 +9,7 @@
 #include "wpi/util/struct/Struct.hpp"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Struct<frc::CubicHermiteSpline> {
+struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::CubicHermiteSpline> {
   static constexpr std::string_view GetTypeName() {
     return "CubicHermiteSpline";
   }
@@ -19,9 +19,9 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::CubicHermiteSpline> {
            "yFinal[2]";
   }
 
-  static frc::CubicHermiteSpline Unpack(std::span<const uint8_t> data);
+  static wpi::math::CubicHermiteSpline Unpack(std::span<const uint8_t> data);
   static void Pack(std::span<uint8_t> data,
-                   const frc::CubicHermiteSpline& value);
+                   const wpi::math::CubicHermiteSpline& value);
 };
 
-static_assert(wpi::StructSerializable<frc::CubicHermiteSpline>);
+static_assert(wpi::util::StructSerializable<wpi::math::CubicHermiteSpline>);

@@ -31,7 +31,7 @@
 #endif
 #endif
 
-using namespace wpi;
+using namespace wpi::util;
 
 std::string_view raw_istream::getline(SmallVectorImpl<char>& buf, int maxLen) {
   buf.clear();

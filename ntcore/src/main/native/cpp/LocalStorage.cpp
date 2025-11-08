@@ -6,7 +6,7 @@
 
 #include <vector>
 
-using namespace nt;
+using namespace wpi::nt;
 
 std::vector<NT_Topic> LocalStorage::GetTopics(std::string_view prefix,
                                               unsigned int types) {

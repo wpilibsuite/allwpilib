@@ -9,7 +9,7 @@
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/Timer.hpp"
 
-using namespace frc;
+using namespace wpi::xrp;
 
 bool XRPOnBoardIO::GetUserButtonPressed() {
   return m_userButton.Get();

@@ -19,12 +19,12 @@
 #include "wpi/util/FunctionExtras.hpp"
 #include "wpi/util/SmallVector.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Implementation detail for SendableBuilder.
  */
-class SendableBuilderImpl : public nt::NTSendableBuilder {
+class SendableBuilderImpl : public wpi::nt::NTSendableBuilder {
  public:
   SendableBuilderImpl() = default;
   ~SendableBuilderImpl() override = default;
@@ -37,13 +37,13 @@ class SendableBuilderImpl : public nt::NTSendableBuilder {
    * called.
    * @param table Network table
    */
-  void SetTable(std::shared_ptr<nt::NetworkTable> table);
+  void SetTable(std::shared_ptr<wpi::nt::NetworkTable> table);
 
   /**
    * Get the network table.
    * @return The network table
    */
-  std::shared_ptr<nt::NetworkTable> GetTable() override;
+  std::shared_ptr<wpi::nt::NetworkTable> GetTable() override;
 
   /**
    * Return whether this sendable has an associated table.
@@ -80,8 +80,8 @@ class SendableBuilderImpl : public nt::NTSendableBuilder {
 
   void SetSmartDashboardType(std::string_view type) override;
   void SetActuator(bool value) override;
-  void SetUpdateTable(wpi::unique_function<void()> func) override;
-  nt::Topic GetTopic(std::string_view key) override;
+  void SetUpdateTable(wpi::util::unique_function<void()> func) override;
+  wpi::nt::Topic GetTopic(std::string_view key) override;
 
   void AddBooleanProperty(std::string_view key, std::function<bool()> getter,
                           std::function<void(bool)> setter) override;
@@ -155,44 +155,44 @@ class SendableBuilderImpl : public nt::NTSendableBuilder {
 
   void AddSmallStringProperty(
       std::string_view key,
-      std::function<std::string_view(wpi::SmallVectorImpl<char>& buf)> getter,
+      std::function<std::string_view(wpi::util::SmallVectorImpl<char>& buf)> getter,
       std::function<void(std::string_view)> setter) override;
 
   void AddSmallBooleanArrayProperty(
       std::string_view key,
-      std::function<std::span<const int>(wpi::SmallVectorImpl<int>& buf)>
+      std::function<std::span<const int>(wpi::util::SmallVectorImpl<int>& buf)>
           getter,
       std::function<void(std::span<const int>)> setter) override;
 
   void AddSmallIntegerArrayProperty(
       std::string_view key,
       std::function<
-          std::span<const int64_t>(wpi::SmallVectorImpl<int64_t>& buf)>
+          std::span<const int64_t>(wpi::util::SmallVectorImpl<int64_t>& buf)>
           getter,
       std::function<void(std::span<const int64_t>)> setter) override;
 
   void AddSmallFloatArrayProperty(
       std::string_view key,
-      std::function<std::span<const float>(wpi::SmallVectorImpl<float>& buf)>
+      std::function<std::span<const float>(wpi::util::SmallVectorImpl<float>& buf)>
           getter,
       std::function<void(std::span<const float>)> setter) override;
 
   void AddSmallDoubleArrayProperty(
       std::string_view key,
-      std::function<std::span<const double>(wpi::SmallVectorImpl<double>& buf)>
+      std::function<std::span<const double>(wpi::util::SmallVectorImpl<double>& buf)>
           getter,
       std::function<void(std::span<const double>)> setter) override;
 
   void AddSmallStringArrayProperty(
       std::string_view key,
       std::function<
-          std::span<const std::string>(wpi::SmallVectorImpl<std::string>& buf)>
+          std::span<const std::string>(wpi::util::SmallVectorImpl<std::string>& buf)>
           getter,
       std::function<void(std::span<const std::string>)> setter) override;
 
   void AddSmallRawProperty(
       std::string_view key, std::string_view typeString,
-      std::function<std::span<uint8_t>(wpi::SmallVectorImpl<uint8_t>& buf)>
+      std::function<std::span<uint8_t>(wpi::util::SmallVectorImpl<uint8_t>& buf)>
           getter,
       std::function<void(std::span<const uint8_t>)> setter) override;
 
@@ -225,14 +225,14 @@ class SendableBuilderImpl : public nt::NTSendableBuilder {
   void AddSmallPropertyImpl(Topic topic, Getter getter, Setter setter);
 
   std::vector<std::unique_ptr<Property>> m_properties;
-  std::vector<wpi::unique_function<void()>> m_updateTables;
-  std::shared_ptr<nt::NetworkTable> m_table;
+  std::vector<wpi::util::unique_function<void()>> m_updateTables;
+  std::shared_ptr<wpi::nt::NetworkTable> m_table;
   bool m_controllable = false;
   bool m_actuator = false;
 
-  nt::BooleanPublisher m_controllablePublisher;
-  nt::StringPublisher m_typePublisher;
-  nt::BooleanPublisher m_actuatorPublisher;
+  wpi::nt::BooleanPublisher m_controllablePublisher;
+  wpi::nt::StringPublisher m_typePublisher;
+  wpi::nt::BooleanPublisher m_actuatorPublisher;
 };
 
-}  // namespace frc
+}  // namespace wpi

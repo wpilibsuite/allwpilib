@@ -11,7 +11,7 @@
 
 #include "subsystems/Drivetrain.hpp"
 
-class DriveTime : public frc2::CommandHelper<frc2::Command, DriveTime> {
+class DriveTime : public wpi::cmd::CommandHelper<wpi::cmd::Command, DriveTime> {
  public:
   /**
    * Creates a new DriveTime. This command will drive your robot for a desired
@@ -21,7 +21,7 @@ class DriveTime : public frc2::CommandHelper<frc2::Command, DriveTime> {
    * @param time How much time to drive
    * @param drive The drivetrain subsystem on which this command will run
    */
-  DriveTime(double speed, units::second_t time, Drivetrain* drive)
+  DriveTime(double speed, wpi::units::second_t time, Drivetrain* drive)
       : m_speed(speed), m_duration(time), m_drive(drive) {
     AddRequirements(m_drive);
   }
@@ -33,7 +33,7 @@ class DriveTime : public frc2::CommandHelper<frc2::Command, DriveTime> {
 
  private:
   double m_speed;
-  units::second_t m_duration;
+  wpi::units::second_t m_duration;
   Drivetrain* m_drive;
-  frc::Timer m_timer;
+  wpi::Timer m_timer;
 };

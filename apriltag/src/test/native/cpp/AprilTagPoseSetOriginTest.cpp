@@ -11,23 +11,23 @@
 #include "wpi/math/geometry/Pose3d.hpp"
 #include "wpi/util/json.hpp"
 
-using namespace frc;
+using namespace wpi::apriltag;
 
 TEST(AprilTagPoseSetOriginTest, TransformationMatches) {
   auto layout = AprilTagFieldLayout{
       std::vector<AprilTag>{
           AprilTag{1,
-                   Pose3d{0_ft, 0_ft, 0_ft, Rotation3d{0_deg, 0_deg, 0_deg}}},
+                   wpi::math::Pose3d{0_ft, 0_ft, 0_ft, wpi::math::Rotation3d{0_deg, 0_deg, 0_deg}}},
           AprilTag{
-              2, Pose3d{4_ft, 4_ft, 4_ft, Rotation3d{0_deg, 0_deg, 180_deg}}}},
+              2, wpi::math::Pose3d{4_ft, 4_ft, 4_ft, wpi::math::Rotation3d{0_deg, 0_deg, 180_deg}}}},
       54_ft, 27_ft};
 
   layout.SetOrigin(
       AprilTagFieldLayout::OriginPosition::kRedAllianceWallRightSide);
 
   auto mirrorPose =
-      Pose3d{54_ft, 27_ft, 0_ft, Rotation3d{0_deg, 0_deg, 180_deg}};
+      wpi::math::Pose3d{54_ft, 27_ft, 0_ft, wpi::math::Rotation3d{0_deg, 0_deg, 180_deg}};
   EXPECT_EQ(mirrorPose, *layout.GetTagPose(1));
-  mirrorPose = Pose3d{50_ft, 23_ft, 4_ft, Rotation3d{0_deg, 0_deg, 0_deg}};
+  mirrorPose = wpi::math::Pose3d{50_ft, 23_ft, 4_ft, wpi::math::Rotation3d{0_deg, 0_deg, 0_deg}};
   EXPECT_EQ(mirrorPose, *layout.GetTagPose(2));
 }

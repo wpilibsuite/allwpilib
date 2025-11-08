@@ -21,7 +21,7 @@
 #include "wpi/commands2/PrintCommand.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 /**
  * A command composition that runs one of a selection of commands using a
  * selector and a key to command mapping.
@@ -117,7 +117,7 @@ class SelectCommand : public CommandHelper<Command, SelectCommand<Key>> {
     return m_interruptBehavior;
   }
 
-  void InitSendable(wpi::SendableBuilder& builder) override {
+  void InitSendable(wpi::util::SendableBuilder& builder) override {
     Command::InitSendable(builder);
 
     builder.AddStringProperty(
@@ -155,7 +155,7 @@ void SelectCommand<T>::Initialize() {
   m_selectedCommand->Initialize();
 }
 
-}  // namespace frc2
+}  // namespace wpi::cmd
 
 #ifdef _WIN32
 #pragma warning(pop)

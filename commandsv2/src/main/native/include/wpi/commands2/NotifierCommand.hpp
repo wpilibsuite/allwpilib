@@ -12,7 +12,7 @@
 #include "wpi/system/Notifier.hpp"
 #include "wpi/units/time.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 /**
  * A command that starts a notifier to run the given runnable periodically in a
  * separate thread. Has no end condition as-is; either subclass it or use
@@ -34,7 +34,7 @@ class NotifierCommand : public CommandHelper<Command, NotifierCommand> {
    * @param period       the period at which the notifier should run
    * @param requirements the subsystems required by this command
    */
-  NotifierCommand(std::function<void()> toRun, units::second_t period,
+  NotifierCommand(std::function<void()> toRun, wpi::units::second_t period,
                   Requirements requirements = {});
 
   NotifierCommand(NotifierCommand&& other);
@@ -47,7 +47,7 @@ class NotifierCommand : public CommandHelper<Command, NotifierCommand> {
 
  private:
   std::function<void()> m_toRun;
-  frc::Notifier m_notifier;
-  units::second_t m_period;
+  wpi::Notifier m_notifier;
+  wpi::units::second_t m_period;
 };
-}  // namespace frc2
+}  // namespace wpi::cmd

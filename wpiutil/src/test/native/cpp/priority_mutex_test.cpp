@@ -10,7 +10,7 @@
 
 #include <gtest/gtest.h>
 
-namespace wpi {
+namespace wpi::util {
 
 #ifdef WPI_HAVE_PRIORITY_MUTEX
 
@@ -265,4 +265,4 @@ TEST(MutexTest, ReentrantTryLock) {
 
 #endif  // WPI_HAVE_PRIORITY_MUTEX
 
-}  // namespace wpi
+}  // namespace wpi::util

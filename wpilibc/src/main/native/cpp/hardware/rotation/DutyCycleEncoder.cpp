@@ -13,7 +13,7 @@
 #include "wpi/util/NullDeleter.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 DutyCycleEncoder::DutyCycleEncoder(int channel)
     : m_dutyCycle{std::make_shared<DutyCycle>(channel)} {
@@ -21,12 +21,12 @@ DutyCycleEncoder::DutyCycleEncoder(int channel)
 }
 
 DutyCycleEncoder::DutyCycleEncoder(DutyCycle& dutyCycle)
-    : m_dutyCycle{&dutyCycle, wpi::NullDeleter<DutyCycle>{}} {
+    : m_dutyCycle{&dutyCycle, wpi::util::NullDeleter<DutyCycle>{}} {
   Init(1.0, 0.0);
 }
 
 DutyCycleEncoder::DutyCycleEncoder(DutyCycle* dutyCycle)
-    : m_dutyCycle{dutyCycle, wpi::NullDeleter<DutyCycle>{}} {
+    : m_dutyCycle{dutyCycle, wpi::util::NullDeleter<DutyCycle>{}} {
   Init(1.0, 0.0);
 }
 
@@ -43,13 +43,13 @@ DutyCycleEncoder::DutyCycleEncoder(int channel, double fullRange,
 
 DutyCycleEncoder::DutyCycleEncoder(DutyCycle& dutyCycle, double fullRange,
                                    double expectedZero)
-    : m_dutyCycle{&dutyCycle, wpi::NullDeleter<DutyCycle>{}} {
+    : m_dutyCycle{&dutyCycle, wpi::util::NullDeleter<DutyCycle>{}} {
   Init(fullRange, expectedZero);
 }
 
 DutyCycleEncoder::DutyCycleEncoder(DutyCycle* dutyCycle, double fullRange,
                                    double expectedZero)
-    : m_dutyCycle{dutyCycle, wpi::NullDeleter<DutyCycle>{}} {
+    : m_dutyCycle{dutyCycle, wpi::util::NullDeleter<DutyCycle>{}} {
   Init(fullRange, expectedZero);
 }
 
@@ -60,19 +60,19 @@ DutyCycleEncoder::DutyCycleEncoder(std::shared_ptr<DutyCycle> dutyCycle,
 }
 
 void DutyCycleEncoder::Init(double fullRange, double expectedZero) {
-  m_simDevice = hal::SimDevice{"DutyCycle:DutyCycleEncoder",
+  m_simDevice = wpi::hal::SimDevice{"DutyCycle:DutyCycleEncoder",
                                m_dutyCycle->GetSourceChannel()};
 
   if (m_simDevice) {
     m_simPosition = m_simDevice.CreateDouble("Position", false, 0.0);
     m_simIsConnected =
-        m_simDevice.CreateBoolean("Connected", hal::SimDevice::kInput, true);
+        m_simDevice.CreateBoolean("Connected", wpi::hal::SimDevice::kInput, true);
   }
 
   m_fullRange = fullRange;
   m_expectedZero = expectedZero;
 
-  wpi::SendableRegistry::Add(this, "DutyCycle Encoder",
+  wpi::util::SendableRegistry::Add(this, "DutyCycle Encoder",
                              m_dutyCycle->GetSourceChannel());
 }
 
@@ -97,7 +97,7 @@ double DutyCycleEncoder::Get() const {
   pos = pos * m_fullRange - m_expectedZero;
 
   // Map from 0 - Full Range
-  double result = InputModulus(pos, 0.0, m_fullRange);
+  double result = wpi::math::InputModulus(pos, 0.0, m_fullRange);
   // Invert if necessary
   if (m_isInverted) {
     return m_fullRange - result;
@@ -121,7 +121,7 @@ void DutyCycleEncoder::SetDutyCycleRange(double min, double max) {
   m_sensorMax = std::clamp(max, 0.0, 1.0);
 }
 
-units::hertz_t DutyCycleEncoder::GetFrequency() const {
+wpi::units::hertz_t DutyCycleEncoder::GetFrequency() const {
   return m_dutyCycle->GetFrequency();
 }
 
@@ -133,7 +133,7 @@ bool DutyCycleEncoder::IsConnected() const {
 }
 
 void DutyCycleEncoder::SetConnectedFrequencyThreshold(
-    units::hertz_t frequency) {
+    wpi::units::hertz_t frequency) {
   if (frequency < 0_Hz) {
     frequency = 0_Hz;
   }
@@ -144,7 +144,7 @@ void DutyCycleEncoder::SetInverted(bool inverted) {
   m_isInverted = inverted;
 }
 
-void DutyCycleEncoder::SetAssumedFrequency(units::hertz_t frequency) {
+void DutyCycleEncoder::SetAssumedFrequency(wpi::units::hertz_t frequency) {
   if (frequency.value() == 0) {
     m_period = 0_s;
   } else {
@@ -156,7 +156,7 @@ int DutyCycleEncoder::GetSourceChannel() const {
   return m_dutyCycle->GetSourceChannel();
 }
 
-void DutyCycleEncoder::InitSendable(wpi::SendableBuilder& builder) {
+void DutyCycleEncoder::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("AbsoluteEncoder");
   builder.AddDoubleProperty(
       "Position", [this] { return this->Get(); }, nullptr);

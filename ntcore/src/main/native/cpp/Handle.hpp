@@ -7,7 +7,7 @@
 #include "wpi/nt/ntcore_c.h"
 #include "wpi/util/Synchronization.h"
 
-namespace nt {
+namespace wpi::nt {
 
 // Handle data layout:
 // Bits 30-24: Type
@@ -17,7 +17,7 @@ namespace nt {
 class Handle {
  public:
   enum Type {
-    kListener = wpi::kHandleTypeNTBase,
+    kListener = wpi::util::kHandleTypeNTBase,
     kListenerPoller,
     kEntry,
     kInstance,
@@ -29,7 +29,7 @@ class Handle {
     kPublisher,
     kTypeMax
   };
-  static_assert(kTypeMax <= wpi::kHandleTypeHALBase);
+  static_assert(kTypeMax <= wpi::util::kHandleTypeHALBase);
   enum { kIndexMax = 0xfffff };
 
   constexpr explicit Handle(NT_Handle handle) : m_handle(handle) {}
@@ -67,4 +67,4 @@ class Handle {
   NT_Handle m_handle;
 };
 
-}  // namespace nt
+}  // namespace wpi::nt

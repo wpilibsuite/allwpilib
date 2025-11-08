@@ -9,19 +9,19 @@
 #include "wpi/opmode/RobotBase.hpp"
 #include "wpi/util/fs.hpp"
 
-std::string frc::filesystem::GetLaunchDirectory() {
+std::string wpi::filesystem::GetLaunchDirectory() {
   return fs::current_path().string();
 }
 
-std::string frc::filesystem::GetOperatingDirectory() {
+std::string wpi::filesystem::GetOperatingDirectory() {
   if constexpr (!RobotBase::IsSimulation()) {
     return "/home/systemcore";
   } else {
-    return frc::filesystem::GetLaunchDirectory();
+    return wpi::filesystem::GetLaunchDirectory();
   }
 }
 
-std::string frc::filesystem::GetDeployDirectory() {
+std::string wpi::filesystem::GetDeployDirectory() {
   if constexpr (!RobotBase::IsSimulation()) {
     return "/home/systemcore/deploy";
   } else {

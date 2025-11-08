@@ -9,13 +9,13 @@
 
 #include "wpi/util/Logger.hpp"
 
-namespace cs {
+namespace wpi::cs {
 
 class Notifier;
 
 class UsbCameraListener {
  public:
-  UsbCameraListener(wpi::Logger& logger, Notifier& notifier);
+  UsbCameraListener(wpi::util::Logger& logger, Notifier& notifier);
   ~UsbCameraListener();
 
   void Start();
@@ -26,6 +26,6 @@ class UsbCameraListener {
   std::unique_ptr<Impl> m_impl;
 };
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_USBCAMERALISTENER_HPP_

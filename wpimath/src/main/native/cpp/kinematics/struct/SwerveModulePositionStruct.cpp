@@ -9,17 +9,17 @@ constexpr size_t kDistanceOff = 0;
 constexpr size_t kAngleOff = kDistanceOff + 8;
 }  // namespace
 
-using StructType = wpi::Struct<frc::SwerveModulePosition>;
+using StructType = wpi::util::Struct<wpi::math::SwerveModulePosition>;
 
-frc::SwerveModulePosition StructType::Unpack(std::span<const uint8_t> data) {
-  return frc::SwerveModulePosition{
-      units::meter_t{wpi::UnpackStruct<double, kDistanceOff>(data)},
-      wpi::UnpackStruct<frc::Rotation2d, kAngleOff>(data),
+wpi::math::SwerveModulePosition StructType::Unpack(std::span<const uint8_t> data) {
+  return wpi::math::SwerveModulePosition{
+      wpi::units::meter_t{wpi::util::UnpackStruct<double, kDistanceOff>(data)},
+      wpi::util::UnpackStruct<wpi::math::Rotation2d, kAngleOff>(data),
   };
 }
 
 void StructType::Pack(std::span<uint8_t> data,
-                      const frc::SwerveModulePosition& value) {
-  wpi::PackStruct<kDistanceOff>(data, value.distance.value());
-  wpi::PackStruct<kAngleOff>(data, value.angle);
+                      const wpi::math::SwerveModulePosition& value) {
+  wpi::util::PackStruct<kDistanceOff>(data, value.distance.value());
+  wpi::util::PackStruct<kAngleOff>(data, value.angle);
 }

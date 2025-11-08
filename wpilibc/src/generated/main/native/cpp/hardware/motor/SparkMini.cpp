@@ -8,7 +8,7 @@
 
 #include "wpi/hal/UsageReporting.h"
 
-using namespace frc;
+using namespace wpi;
 
 SparkMini::SparkMini(int channel) : PWMMotorController("SparkMini", channel) {
   SetBounds(2.5_ms, 1.51_ms, 1.5_ms, 1.49_ms, 0.5_ms);

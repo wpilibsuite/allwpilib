@@ -12,10 +12,10 @@
 #include "Notifier.hpp"
 #include "wpi/util/timestamp.h"
 
-using namespace cs;
+using namespace wpi::cs;
 
 ConfigurableSourceImpl::ConfigurableSourceImpl(std::string_view name,
-                                               wpi::Logger& logger,
+                                               wpi::util::Logger& logger,
                                                Notifier& notifier,
                                                Telemetry& telemetry,
                                                const VideoMode& mode)
@@ -52,7 +52,7 @@ void ConfigurableSourceImpl::NumSinksEnabledChanged() {
 }
 
 void ConfigurableSourceImpl::NotifyError(std::string_view msg) {
-  PutError(msg, wpi::Now());
+  PutError(msg, wpi::util::Now());
 }
 
 int ConfigurableSourceImpl::CreateProperty(std::string_view name,
@@ -106,7 +106,7 @@ void ConfigurableSourceImpl::SetEnumPropertyChoices(
                                   prop->value, {});
 }
 
-namespace cs {
+namespace wpi::cs {
 static constexpr unsigned SourceMask = CS_SOURCE_CV | CS_SOURCE_RAW;
 
 void NotifySourceError(CS_Source source, std::string_view msg,
@@ -195,23 +195,23 @@ void SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
       .SetEnumPropertyChoices(propertyIndex, choices, status);
 }
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 extern "C" {
 void CS_NotifySourceError(CS_Source source, const struct WPI_String* msg,
                           CS_Status* status) {
-  return cs::NotifySourceError(source, wpi::to_string_view(msg), status);
+  return wpi::cs::NotifySourceError(source, wpi::util::to_string_view(msg), status);
 }
 
 void CS_SetSourceConnected(CS_Source source, CS_Bool connected,
                            CS_Status* status) {
-  return cs::SetSourceConnected(source, connected, status);
+  return wpi::cs::SetSourceConnected(source, connected, status);
 }
 
 void CS_SetSourceDescription(CS_Source source,
                              const struct WPI_String* description,
                              CS_Status* status) {
-  return cs::SetSourceDescription(source, wpi::to_string_view(description),
+  return wpi::cs::SetSourceDescription(source, wpi::util::to_string_view(description),
                                   status);
 }
 
@@ -220,7 +220,7 @@ CS_Property CS_CreateSourceProperty(CS_Source source,
                                     enum CS_PropertyKind kind, int minimum,
                                     int maximum, int step, int defaultValue,
                                     int value, CS_Status* status) {
-  return cs::CreateSourceProperty(source, wpi::to_string_view(name), kind,
+  return wpi::cs::CreateSourceProperty(source, wpi::util::to_string_view(name), kind,
                                   minimum, maximum, step, defaultValue, value,
                                   status);
 }
@@ -229,7 +229,7 @@ CS_Property CS_CreateSourcePropertyCallback(
     CS_Source source, const char* name, enum CS_PropertyKind kind, int minimum,
     int maximum, int step, int defaultValue, int value, void* data,
     void (*onChange)(void* data, CS_Property property), CS_Status* status) {
-  return cs::CreateSourcePropertyCallback(
+  return wpi::cs::CreateSourcePropertyCallback(
       source, name, kind, minimum, maximum, step, defaultValue, value,
       [=](CS_Property property) { onChange(data, property); }, status);
 }
@@ -237,12 +237,12 @@ CS_Property CS_CreateSourcePropertyCallback(
 void CS_SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
                                      const struct WPI_String* choices,
                                      int count, CS_Status* status) {
-  wpi::SmallVector<std::string, 8> vec;
+  wpi::util::SmallVector<std::string, 8> vec;
   vec.reserve(count);
   for (int i = 0; i < count; ++i) {
-    vec.emplace_back(wpi::to_string_view(&choices[i]));
+    vec.emplace_back(wpi::util::to_string_view(&choices[i]));
   }
-  return cs::SetSourceEnumPropertyChoices(source, property, vec, status);
+  return wpi::cs::SetSourceEnumPropertyChoices(source, property, vec, status);
 }
 
 }  // extern "C"

@@ -4,7 +4,7 @@
 
 #pragma once
 
-namespace frc {
+namespace wpi {
 
 class MockPWMMotorController {
  public:
@@ -20,4 +20,4 @@ class MockPWMMotorController {
   bool m_isInverted = false;
 };
 
-}  // namespace frc
+}  // namespace wpi

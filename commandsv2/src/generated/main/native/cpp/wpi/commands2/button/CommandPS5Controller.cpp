@@ -6,69 +6,69 @@
 
 #include "wpi/commands2/button/CommandPS5Controller.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 CommandPS5Controller::CommandPS5Controller(int port)
-    : CommandGenericHID(port), m_hid{frc::PS5Controller(port)} {}
+    : CommandGenericHID(port), m_hid{wpi::PS5Controller(port)} {}
 
-frc::PS5Controller& CommandPS5Controller::GetHID() {
+wpi::PS5Controller& CommandPS5Controller::GetHID() {
   return m_hid;
 }
 
-Trigger CommandPS5Controller::Square(frc::EventLoop* loop) const {
-  return Button(frc::PS5Controller::Button::kSquare, loop);
+Trigger CommandPS5Controller::Square(wpi::EventLoop* loop) const {
+  return Button(wpi::PS5Controller::Button::kSquare, loop);
 }
 
-Trigger CommandPS5Controller::Cross(frc::EventLoop* loop) const {
-  return Button(frc::PS5Controller::Button::kCross, loop);
+Trigger CommandPS5Controller::Cross(wpi::EventLoop* loop) const {
+  return Button(wpi::PS5Controller::Button::kCross, loop);
 }
 
-Trigger CommandPS5Controller::Circle(frc::EventLoop* loop) const {
-  return Button(frc::PS5Controller::Button::kCircle, loop);
+Trigger CommandPS5Controller::Circle(wpi::EventLoop* loop) const {
+  return Button(wpi::PS5Controller::Button::kCircle, loop);
 }
 
-Trigger CommandPS5Controller::Triangle(frc::EventLoop* loop) const {
-  return Button(frc::PS5Controller::Button::kTriangle, loop);
+Trigger CommandPS5Controller::Triangle(wpi::EventLoop* loop) const {
+  return Button(wpi::PS5Controller::Button::kTriangle, loop);
 }
 
-Trigger CommandPS5Controller::L1(frc::EventLoop* loop) const {
-  return Button(frc::PS5Controller::Button::kL1, loop);
+Trigger CommandPS5Controller::L1(wpi::EventLoop* loop) const {
+  return Button(wpi::PS5Controller::Button::kL1, loop);
 }
 
-Trigger CommandPS5Controller::R1(frc::EventLoop* loop) const {
-  return Button(frc::PS5Controller::Button::kR1, loop);
+Trigger CommandPS5Controller::R1(wpi::EventLoop* loop) const {
+  return Button(wpi::PS5Controller::Button::kR1, loop);
 }
 
-Trigger CommandPS5Controller::L2(frc::EventLoop* loop) const {
-  return Button(frc::PS5Controller::Button::kL2, loop);
+Trigger CommandPS5Controller::L2(wpi::EventLoop* loop) const {
+  return Button(wpi::PS5Controller::Button::kL2, loop);
 }
 
-Trigger CommandPS5Controller::R2(frc::EventLoop* loop) const {
-  return Button(frc::PS5Controller::Button::kR2, loop);
+Trigger CommandPS5Controller::R2(wpi::EventLoop* loop) const {
+  return Button(wpi::PS5Controller::Button::kR2, loop);
 }
 
-Trigger CommandPS5Controller::Create(frc::EventLoop* loop) const {
-  return Button(frc::PS5Controller::Button::kCreate, loop);
+Trigger CommandPS5Controller::Create(wpi::EventLoop* loop) const {
+  return Button(wpi::PS5Controller::Button::kCreate, loop);
 }
 
-Trigger CommandPS5Controller::Options(frc::EventLoop* loop) const {
-  return Button(frc::PS5Controller::Button::kOptions, loop);
+Trigger CommandPS5Controller::Options(wpi::EventLoop* loop) const {
+  return Button(wpi::PS5Controller::Button::kOptions, loop);
 }
 
-Trigger CommandPS5Controller::L3(frc::EventLoop* loop) const {
-  return Button(frc::PS5Controller::Button::kL3, loop);
+Trigger CommandPS5Controller::L3(wpi::EventLoop* loop) const {
+  return Button(wpi::PS5Controller::Button::kL3, loop);
 }
 
-Trigger CommandPS5Controller::R3(frc::EventLoop* loop) const {
-  return Button(frc::PS5Controller::Button::kR3, loop);
+Trigger CommandPS5Controller::R3(wpi::EventLoop* loop) const {
+  return Button(wpi::PS5Controller::Button::kR3, loop);
 }
 
-Trigger CommandPS5Controller::PS(frc::EventLoop* loop) const {
-  return Button(frc::PS5Controller::Button::kPS, loop);
+Trigger CommandPS5Controller::PS(wpi::EventLoop* loop) const {
+  return Button(wpi::PS5Controller::Button::kPS, loop);
 }
 
-Trigger CommandPS5Controller::Touchpad(frc::EventLoop* loop) const {
-  return Button(frc::PS5Controller::Button::kTouchpad, loop);
+Trigger CommandPS5Controller::Touchpad(wpi::EventLoop* loop) const {
+  return Button(wpi::PS5Controller::Button::kTouchpad, loop);
 }
 
 double CommandPS5Controller::GetLeftX() const {

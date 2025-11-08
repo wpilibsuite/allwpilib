@@ -7,13 +7,13 @@
 #include "wpi/hardware/rotation/DutyCycleEncoder.hpp"
 #include "wpi/simulation/SimDeviceSim.hpp"
 
-using namespace frc::sim;
+using namespace wpi::sim;
 
-DutyCycleEncoderSim::DutyCycleEncoderSim(const frc::DutyCycleEncoder& encoder)
+DutyCycleEncoderSim::DutyCycleEncoderSim(const wpi::DutyCycleEncoder& encoder)
     : DutyCycleEncoderSim{encoder.GetSourceChannel()} {}
 
 DutyCycleEncoderSim::DutyCycleEncoderSim(int channel) {
-  frc::sim::SimDeviceSim deviceSim{"DutyCycle:DutyCycleEncoder", channel};
+  wpi::sim::SimDeviceSim deviceSim{"DutyCycle:DutyCycleEncoder", channel};
   m_simPosition = deviceSim.GetDouble("Position");
   m_simIsConnected = deviceSim.GetBoolean("Connected");
 }

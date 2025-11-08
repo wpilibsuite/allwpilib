@@ -17,7 +17,7 @@
 #include "wpi/nt/StringTopic.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 class NTField2DModel : public Field2DModel {
  public:
@@ -25,7 +25,7 @@ class NTField2DModel : public Field2DModel {
 
   // path is to the table containing ".type", excluding the trailing /
   explicit NTField2DModel(std::string_view path);
-  NTField2DModel(nt::NetworkTableInstance inst, std::string_view path);
+  NTField2DModel(wpi::nt::NetworkTableInstance inst, std::string_view path);
   ~NTField2DModel() override;
 
   const char* GetPath() const { return m_path.c_str(); }
@@ -38,15 +38,15 @@ class NTField2DModel : public Field2DModel {
   FieldObjectModel* AddFieldObject(std::string_view name) override;
   void RemoveFieldObject(std::string_view name) override;
   void ForEachFieldObject(
-      wpi::function_ref<void(FieldObjectModel& model, std::string_view name)>
+      wpi::util::function_ref<void(FieldObjectModel& model, std::string_view name)>
           func) override;
 
  private:
   std::string m_path;
-  nt::NetworkTableInstance m_inst;
-  nt::MultiSubscriber m_tableSub;
-  nt::StringTopic m_nameTopic;
-  nt::NetworkTableListenerPoller m_poller;
+  wpi::nt::NetworkTableInstance m_inst;
+  wpi::nt::MultiSubscriber m_tableSub;
+  wpi::nt::StringTopic m_nameTopic;
+  wpi::nt::NetworkTableListenerPoller m_poller;
   std::string m_nameValue;
 
   class ObjectModel;
@@ -56,4 +56,4 @@ class NTField2DModel : public Field2DModel {
   std::pair<Objects::iterator, bool> Find(std::string_view fullName);
 };
 
-}  // namespace glass
+}  // namespace wpi::glass

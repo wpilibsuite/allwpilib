@@ -4,16 +4,16 @@
 
 #include "subsystems/Intake.hpp"
 
-frc2::CommandPtr Intake::IntakeCommand() {
-  return RunOnce([this] { m_piston.Set(frc::DoubleSolenoid::kForward); })
+wpi::cmd::CommandPtr Intake::IntakeCommand() {
+  return RunOnce([this] { m_piston.Set(wpi::DoubleSolenoid::kForward); })
       .AndThen(Run([this] { m_motor.Set(1.0); }))
       .WithName("Intake");
 }
 
-frc2::CommandPtr Intake::RetractCommand() {
+wpi::cmd::CommandPtr Intake::RetractCommand() {
   return RunOnce([this] {
            m_motor.Disable();
-           m_piston.Set(frc::DoubleSolenoid::kReverse);
+           m_piston.Set(wpi::DoubleSolenoid::kReverse);
          })
       .WithName("Retract");
 }

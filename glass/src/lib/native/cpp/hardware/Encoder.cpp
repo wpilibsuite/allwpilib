@@ -14,7 +14,7 @@
 #include "wpi/glass/Storage.hpp"
 #include "wpi/util/StringExtras.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 void EncoderModel::SetName(std::string_view name) {
   if (name.empty()) {
@@ -58,7 +58,7 @@ void EncoderModel::SetName(std::string_view name) {
   }
 }
 
-void glass::DisplayEncoder(EncoderModel* model) {
+void wpi::glass::DisplayEncoder(EncoderModel* model) {
   if (auto simDevice = model->GetSimDevice()) {
     ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
     ImGui::TextUnformatted(simDevice);
@@ -73,10 +73,10 @@ void glass::DisplayEncoder(EncoderModel* model) {
   std::string& name = GetStorage().GetString("name");
   char label[128];
   if (!name.empty()) {
-    wpi::format_to_n_c_str(label, sizeof(label), "{} [{},{}]###header", name,
+    wpi::util::format_to_n_c_str(label, sizeof(label), "{} [{},{}]###header", name,
                            chA, chB);
   } else {
-    wpi::format_to_n_c_str(label, sizeof(label), "Encoder[{},{}]###header", chA,
+    wpi::util::format_to_n_c_str(label, sizeof(label), "Encoder[{},{}]###header", chA,
                            chB);
   }
 
@@ -159,7 +159,7 @@ void glass::DisplayEncoder(EncoderModel* model) {
   ImGui::PopItemWidth();
 }
 
-void glass::DisplayEncoders(EncodersModel* model, std::string_view noneMsg) {
+void wpi::glass::DisplayEncoders(EncodersModel* model, std::string_view noneMsg) {
   bool hasAny = false;
   model->ForEachEncoder([&](EncoderModel& encoder, int i) {
     hasAny = true;

@@ -18,7 +18,7 @@ typedef void (*HAL_ConstBufferCallback)(const char* name, void* param,
 
 #ifdef __cplusplus
 
-namespace hal {
+namespace wpi::hal {
 
 template <typename CallbackFunction>
 struct HalCallbackListener {
@@ -32,6 +32,6 @@ struct HalCallbackListener {
   void* param = nullptr;
 };
 
-}  // namespace hal
+}  // namespace wpi::hal
 
 #endif

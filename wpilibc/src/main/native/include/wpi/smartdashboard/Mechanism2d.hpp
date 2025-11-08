@@ -17,7 +17,7 @@
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Visual 2D representation of arms, elevators, and general mechanisms through
@@ -38,8 +38,8 @@ namespace frc {
  * @see MechanismLigament2d
  * @see MechanismRoot2d
  */
-class Mechanism2d : public nt::NTSendable,
-                    public wpi::SendableHelper<Mechanism2d> {
+class Mechanism2d : public wpi::nt::NTSendable,
+                    public wpi::util::SendableHelper<Mechanism2d> {
  public:
   /**
    * Create a new Mechanism2d with the given dimensions and background color.
@@ -75,16 +75,16 @@ class Mechanism2d : public nt::NTSendable,
    */
   void SetBackgroundColor(const Color8Bit& color);
 
-  void InitSendable(nt::NTSendableBuilder& builder) override;
+  void InitSendable(wpi::nt::NTSendableBuilder& builder) override;
 
  private:
   double m_width;
   double m_height;
   std::string m_color;
-  mutable wpi::mutex m_mutex;
-  std::shared_ptr<nt::NetworkTable> m_table;
-  wpi::StringMap<MechanismRoot2d> m_roots;
-  nt::DoubleArrayPublisher m_dimsPub;
-  nt::StringPublisher m_colorPub;
+  mutable wpi::util::mutex m_mutex;
+  std::shared_ptr<wpi::nt::NetworkTable> m_table;
+  wpi::util::StringMap<MechanismRoot2d> m_roots;
+  wpi::nt::DoubleArrayPublisher m_dimsPub;
+  wpi::nt::StringPublisher m_colorPub;
 };
-}  // namespace frc
+}  // namespace wpi

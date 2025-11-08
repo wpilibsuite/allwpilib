@@ -19,12 +19,12 @@
 #include "wpi/nt/Topic.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
 
-namespace wpi {
+namespace wpi::util {
 template <typename T>
 class SmallVectorImpl;
 }  // namespace wpi
 
-namespace nt {
+namespace wpi::nt {
 
 class DoubleTopic;
 
@@ -70,7 +70,7 @@ class DoubleSubscriber : public Subscriber {
    * @return value
    */
   ValueType Get(ParamType defaultValue) const {
-    return ::nt::GetDouble(m_subHandle, defaultValue);
+    return ::wpi::nt::GetDouble(m_subHandle, defaultValue);
   }
 
   /**
@@ -93,7 +93,7 @@ class DoubleSubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueType GetAtomic(ParamType defaultValue) const {
-    return ::nt::GetAtomicDouble(m_subHandle, defaultValue);
+    return ::wpi::nt::GetAtomicDouble(m_subHandle, defaultValue);
   }
 
   /**
@@ -107,7 +107,7 @@ class DoubleSubscriber : public Subscriber {
    *     been published since the previous call.
    */
   std::vector<TimestampedValueType> ReadQueue() {
-    return ::nt::ReadQueueDouble(m_subHandle);
+    return ::wpi::nt::ReadQueueDouble(m_subHandle);
   }
 
   /**
@@ -149,7 +149,7 @@ class DoublePublisher : public Publisher {
    * @param time timestamp; 0 indicates current NT time should be used
    */
   void Set(ParamType value, int64_t time = 0) {
-    ::nt::SetDouble(m_pubHandle, value, time);
+    ::wpi::nt::SetDouble(m_pubHandle, value, time);
   }
 
   /**
@@ -160,7 +160,7 @@ class DoublePublisher : public Publisher {
    * @param value value
    */
   void SetDefault(ParamType value) {
-    ::nt::SetDefaultDouble(m_pubHandle, value);
+    ::wpi::nt::SetDefaultDouble(m_pubHandle, value);
   }
 
   /**
@@ -225,7 +225,7 @@ class DoubleEntry final : public DoubleSubscriber,
    * Stops publishing the entry if it's published.
    */
   void Unpublish() {
-    ::nt::Unpublish(m_pubHandle);
+    ::wpi::nt::Unpublish(m_pubHandle);
   }
 };
 
@@ -280,7 +280,7 @@ class DoubleTopic final : public Topic {
       ParamType defaultValue,
       const PubSubOptions& options = kDefaultPubSubOptions) {
     return DoubleSubscriber{
-        ::nt::Subscribe(m_handle, NT_DOUBLE, "double", options),
+        ::wpi::nt::Subscribe(m_handle, NT_DOUBLE, "double", options),
         defaultValue};
   }
   /**
@@ -304,7 +304,7 @@ class DoubleTopic final : public Topic {
       std::string_view typeString, ParamType defaultValue,
       const PubSubOptions& options = kDefaultPubSubOptions) {
     return DoubleSubscriber{
-        ::nt::Subscribe(m_handle, NT_DOUBLE, typeString, options),
+        ::wpi::nt::Subscribe(m_handle, NT_DOUBLE, typeString, options),
         defaultValue};
   }
 
@@ -326,7 +326,7 @@ class DoubleTopic final : public Topic {
   [[nodiscard]]
   PublisherType Publish(const PubSubOptions& options = kDefaultPubSubOptions) {
     return DoublePublisher{
-        ::nt::Publish(m_handle, NT_DOUBLE, "double", options)};
+        ::wpi::nt::Publish(m_handle, NT_DOUBLE, "double", options)};
   }
 
   /**
@@ -349,9 +349,9 @@ class DoubleTopic final : public Topic {
    */
   [[nodiscard]]
   PublisherType PublishEx(std::string_view typeString,
-    const wpi::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
+    const wpi::util::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
     return DoublePublisher{
-        ::nt::PublishEx(m_handle, NT_DOUBLE, typeString, properties, options)};
+        ::wpi::nt::PublishEx(m_handle, NT_DOUBLE, typeString, properties, options)};
   }
 
   /**
@@ -378,7 +378,7 @@ class DoubleTopic final : public Topic {
   EntryType GetEntry(ParamType defaultValue,
                      const PubSubOptions& options = kDefaultPubSubOptions) {
     return DoubleEntry{
-        ::nt::GetEntry(m_handle, NT_DOUBLE, "double", options),
+        ::wpi::nt::GetEntry(m_handle, NT_DOUBLE, "double", options),
         defaultValue};
   }
   /**
@@ -406,22 +406,22 @@ class DoubleTopic final : public Topic {
   EntryType GetEntryEx(std::string_view typeString, ParamType defaultValue,
                        const PubSubOptions& options = kDefaultPubSubOptions) {
     return DoubleEntry{
-        ::nt::GetEntry(m_handle, NT_DOUBLE, typeString, options),
+        ::wpi::nt::GetEntry(m_handle, NT_DOUBLE, typeString, options),
         defaultValue};
   }
 
 };
 
 inline DoubleTopic DoubleSubscriber::GetTopic() const {
-  return DoubleTopic{::nt::GetTopicFromHandle(m_subHandle)};
+  return DoubleTopic{::wpi::nt::GetTopicFromHandle(m_subHandle)};
 }
 
 inline DoubleTopic DoublePublisher::GetTopic() const {
-  return DoubleTopic{::nt::GetTopicFromHandle(m_pubHandle)};
+  return DoubleTopic{::wpi::nt::GetTopicFromHandle(m_pubHandle)};
 }
 
 inline DoubleTopic DoubleEntry::GetTopic() const {
-  return DoubleTopic{::nt::GetTopicFromHandle(m_subHandle)};
+  return DoubleTopic{::wpi::nt::GetTopicFromHandle(m_subHandle)};
 }
 
-}  // namespace nt
+}  // namespace wpi::nt

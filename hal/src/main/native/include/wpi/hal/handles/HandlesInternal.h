@@ -19,7 +19,7 @@
  * always reserved for type and error handling.
  */
 
-namespace hal {
+namespace wpi::hal {
 
 /**
  * Base for all HAL Handles.
@@ -44,7 +44,7 @@ constexpr int16_t InvalidHandleIndex = -1;
  */
 enum class HAL_HandleEnum {
   Undefined = 0,
-  DIO = wpi::kHandleTypeHALBase,
+  DIO = wpi::util::kHandleTypeHALBase,
   Port = 2,
   Notifier = 3,
   Interrupt = 4,
@@ -165,4 +165,4 @@ inline int16_t getHandleTypedIndex(HAL_Handle handle, HAL_HandleEnum enumType,
  */
 HAL_Handle createHandle(int16_t index, HAL_HandleEnum handleType,
                         int16_t version);
-}  // namespace hal
+}  // namespace wpi::hal

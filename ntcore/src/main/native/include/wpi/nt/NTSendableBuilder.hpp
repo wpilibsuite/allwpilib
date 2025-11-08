@@ -12,13 +12,13 @@
 #include "wpi/util/FunctionExtras.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
-namespace nt {
+namespace wpi::nt {
 
 /**
  * Helper class for building Sendable dashboard representations for
  * NetworkTables.
  */
-class NTSendableBuilder : public wpi::SendableBuilder {
+class NTSendableBuilder : public wpi::util::SendableBuilder {
  public:
   /**
    * Set the function that should be called to update the network table
@@ -28,7 +28,7 @@ class NTSendableBuilder : public wpi::SendableBuilder {
    *
    * @param func    function
    */
-  virtual void SetUpdateTable(wpi::unique_function<void()> func) = 0;
+  virtual void SetUpdateTable(wpi::util::unique_function<void()> func) = 0;
 
   /**
    * Add a property without getters or setters.  This can be used to get
@@ -53,4 +53,4 @@ class NTSendableBuilder : public wpi::SendableBuilder {
   BackendKind GetBackendKind() const override;
 };
 
-}  // namespace nt
+}  // namespace wpi::nt

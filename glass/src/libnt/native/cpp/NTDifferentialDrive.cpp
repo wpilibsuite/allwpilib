@@ -12,13 +12,13 @@
 #include "wpi/util/MathExtras.hpp"
 #include "wpi/util/StringExtras.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 NTDifferentialDriveModel::NTDifferentialDriveModel(std::string_view path)
-    : NTDifferentialDriveModel(nt::NetworkTableInstance::GetDefault(), path) {}
+    : NTDifferentialDriveModel(wpi::nt::NetworkTableInstance::GetDefault(), path) {}
 
 NTDifferentialDriveModel::NTDifferentialDriveModel(
-    nt::NetworkTableInstance inst, std::string_view path)
+    wpi::nt::NetworkTableInstance inst, std::string_view path)
     : m_inst{inst},
       m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
       m_controllable{inst.GetBooleanTopic(fmt::format("{}/.controllable", path))
@@ -27,7 +27,7 @@ NTDifferentialDriveModel::NTDifferentialDriveModel(
                      .GetEntry(0)},
       m_rPercent{inst.GetDoubleTopic(fmt::format("{}/Right Motor Speed", path))
                      .GetEntry(0)},
-      m_nameValue{wpi::rsplit(path, '/').second},
+      m_nameValue{wpi::util::rsplit(path, '/').second},
       m_lPercentData{fmt::format("NTDiffDriveL:{}", path)},
       m_rPercentData{fmt::format("NTDiffDriveR:{}", path)} {
   m_wheels.emplace_back("L % Output", &m_lPercentData,

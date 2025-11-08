@@ -6,7 +6,7 @@
 
 #include "wpi/hardware/motor/PWMMotorController.hpp"
 
-namespace frc {
+namespace wpi::romi {
 
 /**
  * @defgroup romi_api Romi Hardware API
@@ -34,4 +34,4 @@ class RomiMotor : public PWMMotorController {
 
 /** @} */
 
-}  // namespace frc
+}  // namespace wpi::romi

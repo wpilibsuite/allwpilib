@@ -29,7 +29,7 @@
 
 #include "wpi/net/uv/Timer.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 TEST(UvLoopTest, Walk) {
   int seen_timer_handle = 0;
@@ -66,4 +66,4 @@ TEST(UvLoopTest, Walk) {
   ASSERT_EQ(seen_timer_handle, 0);
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

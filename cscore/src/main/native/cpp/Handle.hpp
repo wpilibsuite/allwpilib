@@ -8,7 +8,7 @@
 #include "wpi/cs/cscore_c.h"
 #include "wpi/util/Synchronization.h"
 
-namespace cs {
+namespace wpi::cs {
 
 // Handle data layout:
 // Bits 0-15:  Handle index
@@ -19,7 +19,7 @@ class Handle {
  public:
   enum Type {
     kUndefined = 0,
-    kProperty = wpi::kHandleTypeCSBase,
+    kProperty = wpi::util::kHandleTypeCSBase,
     kSource,
     kSink,
     kListener,
@@ -63,6 +63,6 @@ class Handle {
   CS_Handle m_handle;
 };
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_HANDLE_HPP_

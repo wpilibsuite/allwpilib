@@ -6,15 +6,15 @@
 
 #include "wpi/system/Errors.hpp"
 
-using namespace frc;
+using namespace wpi;
 
-TimesliceRobot::TimesliceRobot(units::second_t robotPeriodicAllocation,
-                               units::second_t controllerPeriod)
+TimesliceRobot::TimesliceRobot(wpi::units::second_t robotPeriodicAllocation,
+                               wpi::units::second_t controllerPeriod)
     : m_nextOffset{robotPeriodicAllocation},
       m_controllerPeriod{controllerPeriod} {}
 
 void TimesliceRobot::Schedule(std::function<void()> func,
-                              units::second_t allocation) {
+                              wpi::units::second_t allocation) {
   if (m_nextOffset + allocation > m_controllerPeriod) {
     throw FRC_MakeError(err::Error,
                         "Function scheduled at offset {} with allocation {} "

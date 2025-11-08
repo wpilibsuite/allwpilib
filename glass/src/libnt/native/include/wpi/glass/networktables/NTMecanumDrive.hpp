@@ -15,13 +15,13 @@
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/StringTopic.hpp"
 
-namespace glass {
+namespace wpi::glass {
 class NTMecanumDriveModel : public DriveModel {
  public:
   static constexpr const char* kType = "MecanumDrive";
 
   explicit NTMecanumDriveModel(std::string_view path);
-  NTMecanumDriveModel(nt::NetworkTableInstance inst, std::string_view path);
+  NTMecanumDriveModel(wpi::nt::NetworkTableInstance inst, std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
   const std::vector<DriveModel::WheelInfo>& GetWheels() const override {
@@ -36,13 +36,13 @@ class NTMecanumDriveModel : public DriveModel {
   bool IsReadOnly() override { return !m_controllableValue; }
 
  private:
-  nt::NetworkTableInstance m_inst;
-  nt::StringSubscriber m_name;
-  nt::BooleanSubscriber m_controllable;
-  nt::DoubleEntry m_flPercent;
-  nt::DoubleEntry m_frPercent;
-  nt::DoubleEntry m_rlPercent;
-  nt::DoubleEntry m_rrPercent;
+  wpi::nt::NetworkTableInstance m_inst;
+  wpi::nt::StringSubscriber m_name;
+  wpi::nt::BooleanSubscriber m_controllable;
+  wpi::nt::DoubleEntry m_flPercent;
+  wpi::nt::DoubleEntry m_frPercent;
+  wpi::nt::DoubleEntry m_rlPercent;
+  wpi::nt::DoubleEntry m_rrPercent;
 
   std::string m_nameValue;
   bool m_controllableValue = false;
@@ -55,4 +55,4 @@ class NTMecanumDriveModel : public DriveModel {
   ImVec2 m_speedVector;
   double m_rotation;
 };
-}  // namespace glass
+}  // namespace wpi::glass

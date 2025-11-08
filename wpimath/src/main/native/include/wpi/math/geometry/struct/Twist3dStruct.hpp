@@ -9,15 +9,15 @@
 #include "wpi/util/struct/Struct.hpp"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Struct<frc::Twist3d> {
+struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::Twist3d> {
   static constexpr std::string_view GetTypeName() { return "Twist3d"; }
   static constexpr size_t GetSize() { return 48; }
   static constexpr std::string_view GetSchema() {
     return "double dx;double dy;double dz;double rx;double ry;double rz";
   }
 
-  static frc::Twist3d Unpack(std::span<const uint8_t> data);
-  static void Pack(std::span<uint8_t> data, const frc::Twist3d& value);
+  static wpi::math::Twist3d Unpack(std::span<const uint8_t> data);
+  static void Pack(std::span<uint8_t> data, const wpi::math::Twist3d& value);
 };
 
-static_assert(wpi::StructSerializable<frc::Twist3d>);
+static_assert(wpi::util::StructSerializable<wpi::math::Twist3d>);

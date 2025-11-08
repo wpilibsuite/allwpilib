@@ -29,9 +29,9 @@
 #include "wpi/units/base.hpp"
 #include "wpi/units/length.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::area
+ * @namespace wpi::units::area
  * @brief namespace for unit types and containers representing area values
  * @details The SI unit for area is `square_meters`, and the corresponding
  *          `base_unit` category is `area_unit`.
@@ -40,7 +40,7 @@ namespace units {
  */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_AREA_UNITS)
 UNIT_ADD(area, square_meter, square_meters, sq_m,
-         unit<std::ratio<1>, units::category::area_unit>)
+         unit<std::ratio<1>, wpi::units::category::area_unit>)
 UNIT_ADD(area, square_foot, square_feet, sq_ft, squared<length::feet>)
 UNIT_ADD(area, square_inch, square_inches, sq_in, squared<length::inch>)
 UNIT_ADD(area, square_mile, square_miles, sq_mi, squared<length::miles>)
@@ -53,4 +53,4 @@ UNIT_ADD_CATEGORY_TRAIT(area)
 #endif
 
 using namespace area;
-}  // namespace units
+}  // namespace wpi::units

@@ -23,7 +23,7 @@ class HALSimXRPClient {
 
   wpilibws::ProviderContainer providers;
   wpilibws::HALSimWSProviderSimDevices simDevices{providers};
-  wpi::EventLoopRunner runner;
+  wpi::net::EventLoopRunner runner;
   std::shared_ptr<HALSimXRP> simxrp;
 };
 

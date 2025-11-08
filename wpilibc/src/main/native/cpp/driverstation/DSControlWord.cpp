@@ -6,7 +6,7 @@
 
 #include "wpi/hal/DriverStation.h"
 
-using namespace frc;
+using namespace wpi;
 
 DSControlWord::DSControlWord() {
   HAL_GetControlWord(&m_controlWord);

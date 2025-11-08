@@ -43,7 +43,7 @@
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
 
-namespace units::constants {
+namespace wpi::units::constants {
 /**
  * @name Unit Containers
  * @anchor constantContainers
@@ -64,7 +64,7 @@ static constexpr const unit_t<compound_unit<energy::joule, time::seconds>> h(
 static constexpr const unit_t<
     compound_unit<force::newtons, inverse<squared<current::ampere>>>>
     mu0(pi * 4.0e-7 * force::newton_t(1) /
-        units::math::cpow<2>(current::ampere_t(1)));  ///< vacuum permeability.
+        wpi::units::math::cpow<2>(current::ampere_t(1)));  ///< vacuum permeability.
 static constexpr const unit_t<
     compound_unit<capacitance::farad, inverse<length::meter>>>
     epsilon0(1.0 / (mu0 * math::cpow<2>(c)));  ///< vacuum permitivity.
@@ -99,4 +99,4 @@ static constexpr const unit_t<
           (15 * math::cpow<3>(h) * math::cpow<2>(c) *
            math::cpow<4>(N_A)));  ///< Stefan-Boltzmann constant.
 /** @} */
-}  // namespace units::constants
+}  // namespace wpi::units::constants

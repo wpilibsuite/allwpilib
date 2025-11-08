@@ -21,24 +21,24 @@
 #include "wpi/util/json.hpp"
 #include "wpi/util/mutex.hpp"
 
-namespace wpi {
+namespace wpi::util {
 class Logger;
 }  // namespace wpi
 
-namespace nt {
+namespace wpi::nt {
 
 class IListenerStorage;
 
 class LocalStorage final : public net::ILocalStorage {
  public:
-  LocalStorage(int inst, IListenerStorage& listenerStorage, wpi::Logger& logger)
+  LocalStorage(int inst, IListenerStorage& listenerStorage, wpi::util::Logger& logger)
       : m_impl{inst, listenerStorage, logger} {}
   LocalStorage(const LocalStorage&) = delete;
   LocalStorage& operator=(const LocalStorage&) = delete;
 
   // network interface functions
   int ServerAnnounce(std::string_view name, int id, std::string_view typeStr,
-                     const wpi::json& properties,
+                     const wpi::util::json& properties,
                      std::optional<int> pubuid) final {
     std::scoped_lock lock{m_mutex};
     auto topic = m_impl.GetOrCreateTopic(name);
@@ -51,7 +51,7 @@ class LocalStorage final : public net::ILocalStorage {
     m_impl.RemoveNetworkPublisher(m_impl.GetOrCreateTopic(name));
   }
 
-  void ServerPropertiesUpdate(std::string_view name, const wpi::json& update,
+  void ServerPropertiesUpdate(std::string_view name, const wpi::util::json& update,
                               bool ack) final {
     std::scoped_lock lock{m_mutex};
     if (auto topic = m_impl.GetTopicByName(name)) {
@@ -177,17 +177,17 @@ class LocalStorage final : public net::ILocalStorage {
     return topic && topic->Exists();
   }
 
-  wpi::json GetTopicProperty(NT_Topic topicHandle, std::string_view name) {
+  wpi::util::json GetTopicProperty(NT_Topic topicHandle, std::string_view name) {
     std::scoped_lock lock{m_mutex};
     if (auto topic = m_impl.GetTopicByHandle(topicHandle)) {
-      return topic->properties.value(name, wpi::json{});
+      return topic->properties.value(name, wpi::util::json{});
     } else {
       return {};
     }
   }
 
   void SetTopicProperty(NT_Topic topicHandle, std::string_view name,
-                        const wpi::json& value) {
+                        const wpi::util::json& value) {
     std::scoped_lock lock{m_mutex};
     if (auto topic = m_impl.GetTopicByHandle(topicHandle)) {
       m_impl.SetProperty(topic, name, value);
@@ -201,16 +201,16 @@ class LocalStorage final : public net::ILocalStorage {
     }
   }
 
-  wpi::json GetTopicProperties(NT_Topic topicHandle) {
+  wpi::util::json GetTopicProperties(NT_Topic topicHandle) {
     std::scoped_lock lock{m_mutex};
     if (auto topic = m_impl.GetTopicByHandle(topicHandle)) {
       return topic->properties;
     } else {
-      return wpi::json::object();
+      return wpi::util::json::object();
     }
   }
 
-  bool SetTopicProperties(NT_Topic topicHandle, const wpi::json& update) {
+  bool SetTopicProperties(NT_Topic topicHandle, const wpi::util::json& update) {
     std::scoped_lock lock{m_mutex};
     if (auto topic = m_impl.GetTopicByHandle(topicHandle)) {
       return m_impl.SetProperties(topic, update, true);
@@ -262,7 +262,7 @@ class LocalStorage final : public net::ILocalStorage {
   }
 
   NT_Publisher Publish(NT_Topic topicHandle, NT_Type type,
-                       std::string_view typeStr, const wpi::json& properties,
+                       std::string_view typeStr, const wpi::util::json& properties,
                        const PubSubOptions& options) {
     std::scoped_lock lock{m_mutex};
     if (auto topic = m_impl.GetTopicByHandle(topicHandle)) {
@@ -334,7 +334,7 @@ class LocalStorage final : public net::ILocalStorage {
   template <SmallArrayType T>
   Timestamped<typename TypeInfo<T>::SmallRet> GetAtomic(
       NT_Handle subentry,
-      wpi::SmallVectorImpl<typename TypeInfo<T>::SmallElem>& buf,
+      wpi::util::SmallVectorImpl<typename TypeInfo<T>::SmallElem>& buf,
       typename TypeInfo<T>::View defaultValue) {
     std::scoped_lock lock{m_mutex};
     Value* value = m_impl.GetSubEntryValue(subentry);
@@ -485,8 +485,8 @@ class LocalStorage final : public net::ILocalStorage {
   }
 
  private:
-  wpi::mutex m_mutex;
+  wpi::util::mutex m_mutex;
   local::StorageImpl m_impl;
 };
 
-}  // namespace nt
+}  // namespace wpi::nt

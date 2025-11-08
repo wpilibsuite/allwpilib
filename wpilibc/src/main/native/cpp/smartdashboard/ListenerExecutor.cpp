@@ -6,7 +6,7 @@
 
 #include <utility>
 
-using namespace frc::detail;
+using namespace wpi::detail;
 
 void ListenerExecutor::Execute(std::function<void()> task) {
   std::scoped_lock lock(m_lock);

@@ -3,9 +3,9 @@ extra_includes:
 - wpi/event/BooleanEvent.hpp
 
 classes:
-  frc::PS4Controller:
+  wpi::PS4Controller:
     ignored_bases:
-    - wpi::SendableHelper<PS4Controller>
+    - wpi::util::SendableHelper<PS4Controller>
     methods:
       PS4Controller:
       GetLeftX:
@@ -74,7 +74,7 @@ classes:
       GetTouchpadButtonPressed:
       GetTouchpadButtonReleased:
       InitSendable:
-  frc::PS4Controller::Button:
+  wpi::PS4Controller::Button:
     attributes:
       kSquare:
       kCross:
@@ -90,7 +90,7 @@ classes:
       kR3:
       kPS:
       kTouchpad:
-  frc::PS4Controller::Axis:
+  wpi::PS4Controller::Axis:
     attributes:
       kLeftX:
       kLeftY:

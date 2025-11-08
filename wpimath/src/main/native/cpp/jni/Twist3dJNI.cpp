@@ -11,7 +11,7 @@
 #include "wpi/units/length.hpp"
 #include "wpi/util/jni_util.hpp"
 
-using namespace wpi::java;
+using namespace wpi::util::java;
 
 extern "C" {
 
@@ -25,11 +25,11 @@ Java_org_wpilib_math_jni_Twist3dJNI_exp
   (JNIEnv* env, jclass, jdouble twistDx, jdouble twistDy, jdouble twistDz,
    jdouble twistRx, jdouble twistRy, jdouble twistRz)
 {
-  frc::Twist3d twist{units::meter_t{twistDx},  units::meter_t{twistDy},
-                     units::meter_t{twistDz},  units::radian_t{twistRx},
-                     units::radian_t{twistRy}, units::radian_t{twistRz}};
+  wpi::math::Twist3d twist{wpi::units::meter_t{twistDx},  wpi::units::meter_t{twistDy},
+                     wpi::units::meter_t{twistDz},  wpi::units::radian_t{twistRx},
+                     wpi::units::radian_t{twistRy}, wpi::units::radian_t{twistRz}};
 
-  frc::Transform3d result = twist.Exp();
+  wpi::math::Transform3d result = twist.Exp();
 
   const auto& resultQuaternion = result.Rotation().GetQuaternion();
   return MakeJDoubleArray(

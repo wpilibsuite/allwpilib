@@ -10,7 +10,7 @@
 
 #include "wpi/glass/View.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 class LogData {
   friend void DisplayLog(LogData*, bool);
@@ -43,4 +43,4 @@ class LogView : public View {
   bool m_autoScroll{true};
 };
 
-}  // namespace glass
+}  // namespace wpi::glass

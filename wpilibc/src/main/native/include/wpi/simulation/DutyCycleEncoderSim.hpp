@@ -7,7 +7,7 @@
 #include "wpi/hal/SimDevice.h"
 #include "wpi/units/angle.hpp"
 
-namespace frc {
+namespace wpi {
 
 class DutyCycleEncoder;
 
@@ -61,9 +61,9 @@ class DutyCycleEncoderSim {
   void SetConnected(bool isConnected);
 
  private:
-  hal::SimDouble m_simPosition;
-  hal::SimBoolean m_simIsConnected;
+  wpi::hal::SimDouble m_simPosition;
+  wpi::hal::SimBoolean m_simIsConnected;
 };
 
 }  // namespace sim
-}  // namespace frc
+}  // namespace wpi

@@ -1,5 +1,5 @@
 classes:
-  wpi::WebServer:
+  wpi::net::WebServer:
     nodelete: true
     methods:
       GetInstance:

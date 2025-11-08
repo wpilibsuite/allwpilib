@@ -11,7 +11,7 @@
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/util/StringExtras.hpp"
 
-namespace hal {
+namespace wpi::hal {
 
 TEST(DriverStationTest, Joystick) {
   HAL_JoystickAxes axes;
@@ -122,8 +122,8 @@ TEST(DriverStationTest, EventInfo) {
   constexpr std::string_view eventName = "UnitTest";
   constexpr std::string_view gameData = "Insert game specific info here :D";
   HAL_MatchInfo info;
-  wpi::format_to_n_c_str(info.eventName, sizeof(info.eventName), eventName);
-  wpi::format_to_n_c_str(reinterpret_cast<char*>(info.gameSpecificMessage),
+  wpi::util::format_to_n_c_str(info.eventName, sizeof(info.eventName), eventName);
+  wpi::util::format_to_n_c_str(reinterpret_cast<char*>(info.gameSpecificMessage),
                          sizeof(info.gameSpecificMessage), gameData);
   info.gameSpecificMessageSize = gameData.size();
   info.matchNumber = 5;
@@ -146,4 +146,4 @@ TEST(DriverStationTest, EventInfo) {
   EXPECT_EQ(42, dataBack.replayNumber);
 }
 
-}  // namespace hal
+}  // namespace wpi::hal

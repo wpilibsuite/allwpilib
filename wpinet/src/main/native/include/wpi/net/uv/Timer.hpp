@@ -15,7 +15,7 @@
 #include "wpi/net/uv/Handle.hpp"
 #include "wpi/util/Signal.h"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 class Loop;
 
@@ -136,9 +136,9 @@ class Timer final : public HandleImpl<Timer, uv_timer_t> {
   /**
    * Signal generated when the timeout event occurs.
    */
-  sig::Signal<> timeout;
+  wpi::util::sig::Signal<> timeout;
 };
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_TIMER_HPP_

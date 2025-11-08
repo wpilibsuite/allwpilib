@@ -28,9 +28,9 @@
 
 #include "wpi/units/base.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::angle
+ * @namespace wpi::units::angle
  * @brief namespace for unit types and containers representing angle values
  * @details The SI unit for angle is `radians`, and the corresponding
  *          `base_unit` category is`angle_unit`.
@@ -39,7 +39,7 @@ namespace units {
  */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_ANGLE_UNITS)
 UNIT_ADD_WITH_METRIC_PREFIXES(angle, radian, radians, rad,
-                              unit<std::ratio<1>, units::category::angle_unit>)
+                              unit<std::ratio<1>, wpi::units::category::angle_unit>)
 UNIT_ADD(angle, degree, degrees, deg,
          unit<std::ratio<1, 180>, radians, std::ratio<1>>)
 UNIT_ADD(angle, arcminute, arcminutes, arcmin, unit<std::ratio<1, 60>, degrees>)
@@ -53,4 +53,4 @@ UNIT_ADD_CATEGORY_TRAIT(angle)
 #endif
 
 using namespace angle;
-}  // namespace units
+}  // namespace wpi::units

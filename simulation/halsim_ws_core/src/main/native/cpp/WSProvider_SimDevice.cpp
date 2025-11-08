@@ -61,7 +61,7 @@ void HALSimWSProviderSimDevice::CancelCallbacks() {
   m_simValueChangedCbKeys.clear();
 }
 
-void HALSimWSProviderSimDevice::OnNetValueChanged(const wpi::json& json) {
+void HALSimWSProviderSimDevice::OnNetValueChanged(const wpi::util::json& json) {
   auto it = json.cbegin();
   auto end = json.cend();
 
@@ -250,10 +250,10 @@ void HALSimWSProviderSimDevice::OnValueReset(SimDeviceValueData* valueData,
   }
 }
 
-void HALSimWSProviderSimDevice::ProcessHalCallback(const wpi::json& payload) {
+void HALSimWSProviderSimDevice::ProcessHalCallback(const wpi::util::json& payload) {
   auto ws = m_ws.lock();
   if (ws) {
-    wpi::json netValue = {
+    wpi::util::json netValue = {
         {"type", m_type}, {"device", m_deviceId}, {"data", payload}};
     ws->OnSimValueChanged(netValue);
   }
@@ -266,7 +266,7 @@ HALSimWSProviderSimDevices::~HALSimWSProviderSimDevices() {
 void HALSimWSProviderSimDevices::DeviceCreatedCallback(
     const char* name, HAL_SimDeviceHandle handle) {
   // Map "Accel:Foo" -> type=Accel, device=Foo
-  auto [type, id] = wpi::split(name, ':');
+  auto [type, id] = wpi::util::split(name, ':');
   std::shared_ptr<HALSimWSProviderSimDevice> dev;
   if (id.empty()) {
     auto key = fmt::format("SimDevice/{}", type);
@@ -289,7 +289,7 @@ void HALSimWSProviderSimDevices::DeviceFreedCallback(
   m_providers.Delete(name);
 }
 
-void HALSimWSProviderSimDevices::Initialize(wpi::uv::Loop& loop) {
+void HALSimWSProviderSimDevices::Initialize(wpi::net::uv::Loop& loop) {
   m_deviceCreatedCbKey = HALSIM_RegisterSimDeviceCreatedCallback(
       "", this, HALSimWSProviderSimDevices::DeviceCreatedCallbackStatic, 1);
   m_deviceFreedCbKey = HALSIM_RegisterSimDeviceFreedCallback(

@@ -11,7 +11,7 @@
 #include "wpi/hardware/discrete/DigitalInput.hpp"
 #include "wpi/hardware/rotation/DutyCycle.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 
 TEST(DutyCycleSimTest, Initialization) {
   HAL_Initialize(500, 0);
@@ -64,4 +64,4 @@ TEST(DutyCycleSimTest, SetOutput) {
   EXPECT_EQ(229.174, callback.GetLastValue());
 }
 
-}  // namespace frc::sim
+}  // namespace wpi::sim

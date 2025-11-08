@@ -17,11 +17,11 @@
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/mutex.hpp"
 
-namespace cs {
+namespace wpi::cs {
 
 class SourceImpl;
 
-std::unique_ptr<Image> CreateImageFromBGRA(cs::SourceImpl* source, size_t width,
+std::unique_ptr<Image> CreateImageFromBGRA(wpi::cs::SourceImpl* source, size_t width,
                                            size_t height, size_t stride,
                                            const uint8_t* data);
 
@@ -35,13 +35,13 @@ class Frame {
   struct Impl {
     explicit Impl(SourceImpl& source_) : source(source_) {}
 
-    wpi::recursive_mutex mutex;
+    wpi::util::recursive_mutex mutex;
     std::atomic_int refcount{0};
     Time time{0};
     WPI_TimestampSource timeSource{WPI_TIMESRC_UNKNOWN};
     SourceImpl& source;
     std::string error;
-    wpi::SmallVector<Image*, 4> images;
+    wpi::util::SmallVector<Image*, 4> images;
     std::vector<int> compressionParams;
   };
 
@@ -250,6 +250,6 @@ class Frame {
   Impl* m_impl{nullptr};
 };
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_FRAME_HPP_

@@ -13,7 +13,7 @@
 #include "wpi/math/system/plant/LinearSystemId.hpp"
 #include "wpi/units/time.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 TEST(LinearQuadraticRegulatorTest, ElevatorGains) {
   LinearSystem<2, 1, 1> plant = [] {
@@ -28,7 +28,7 @@ TEST(LinearQuadraticRegulatorTest, ElevatorGains) {
     // Gear ratio
     constexpr double G = 40.0 / 40.0;
 
-    return frc::LinearSystemId::ElevatorSystem(motors, m, r, G).Slice(0);
+    return wpi::math::LinearSystemId::ElevatorSystem(motors, m, r, G).Slice(0);
   }();
   Matrixd<1, 2> K =
       LinearQuadraticRegulator<2, 1>{plant, {0.02, 0.4}, {12.0}, 5_ms}.K();
@@ -50,7 +50,7 @@ TEST(LinearQuadraticRegulatorTest, ArmGains) {
     // Gear ratio
     constexpr double G = 100.0;
 
-    return frc::LinearSystemId::SingleJointedArmSystem(motors,
+    return wpi::math::LinearSystemId::SingleJointedArmSystem(motors,
                                                        1.0 / 3.0 * m * r * r, G)
         .Slice(0);
   }();
@@ -76,7 +76,7 @@ TEST(LinearQuadraticRegulatorTest, FourMotorElevator) {
     // Gear ratio
     constexpr double G = 14.67;
 
-    return frc::LinearSystemId::ElevatorSystem(motors, m, r, G).Slice(0);
+    return wpi::math::LinearSystemId::ElevatorSystem(motors, m, r, G).Slice(0);
   }();
   Matrixd<1, 2> K =
       LinearQuadraticRegulator<2, 1>{plant, {0.1, 0.2}, {12.0}, 20_ms}.K();
@@ -103,7 +103,7 @@ template <int States, int Inputs>
 Matrixd<Inputs, States> GetImplicitModelFollowingK(
     const Matrixd<States, States>& A, const Matrixd<States, Inputs>& B,
     const Matrixd<States, States>& Q, const Matrixd<Inputs, Inputs>& R,
-    const Matrixd<States, States>& Aref, units::second_t dt) {
+    const Matrixd<States, States>& Aref, wpi::units::second_t dt) {
   // Discretize real dynamics
   Matrixd<States, States> discA;
   Matrixd<States, Inputs> discB;
@@ -178,7 +178,7 @@ TEST(LinearQuadraticRegulatorTest, LatencyCompensate) {
     // Gear ratio
     constexpr double G = 14.67;
 
-    return frc::LinearSystemId::ElevatorSystem(motors, m, r, G).Slice(0);
+    return wpi::math::LinearSystemId::ElevatorSystem(motors, m, r, G).Slice(0);
   }();
   LinearQuadraticRegulator<2, 1> controller{plant, {0.1, 0.2}, {12.0}, 20_ms};
 
@@ -188,4 +188,4 @@ TEST(LinearQuadraticRegulatorTest, LatencyCompensate) {
   EXPECT_NEAR(0.07904881, controller.K(0, 1), 1e-3);
 }
 
-}  // namespace frc
+}  // namespace wpi::math

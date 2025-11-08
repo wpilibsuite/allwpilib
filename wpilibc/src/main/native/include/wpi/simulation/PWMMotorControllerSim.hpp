@@ -8,7 +8,7 @@
 #include "wpi/hardware/motor/PWMMotorController.hpp"
 #include "wpi/units/length.hpp"
 
-namespace frc {
+namespace wpi {
 
 class PWMMotorController;
 
@@ -23,7 +23,7 @@ class PWMMotorControllerSim {
   double GetSpeed() const;
 
  private:
-  hal::SimDouble m_simSpeed;
+  wpi::hal::SimDouble m_simSpeed;
 };
 }  // namespace sim
-}  // namespace frc
+}  // namespace wpi

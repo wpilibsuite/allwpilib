@@ -19,7 +19,7 @@
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/SmallVector.hpp"
 
-namespace wpi {
+namespace wpi::net {
 
 namespace uv {
 class Stream;
@@ -97,14 +97,14 @@ class WebSocketServerHelper {
   /**
    * Upgrade event.  Call Accept() to accept the upgrade.
    */
-  sig::Signal<> upgrade;
+  wpi::util::sig::Signal<> upgrade;
 
  private:
   bool m_gotHost = false;
   bool m_websocket = false;
-  SmallVector<std::string, 2> m_protocols;
-  SmallString<64> m_key;
-  SmallString<16> m_version;
+  wpi::util::SmallVector<std::string, 2> m_protocols;
+  wpi::util::SmallString<64> m_key;
+  wpi::util::SmallString<16> m_version;
 };
 
 /**
@@ -169,22 +169,22 @@ class WebSocketServer : public std::enable_shared_from_this<WebSocketServer> {
   /**
    * Connected event.  First parameter is the URL, second is the websocket.
    */
-  sig::Signal<std::string_view, WebSocket&> connected;
+  wpi::util::sig::Signal<std::string_view, WebSocket&> connected;
 
  private:
   uv::Stream& m_stream;
   HttpParser m_req{HttpParser::kRequest};
   WebSocketServerHelper m_helper;
-  SmallVector<std::string, 2> m_protocols;
+  wpi::util::SmallVector<std::string, 2> m_protocols;
   ServerOptions m_options;
   bool m_aborted = false;
-  sig::ScopedConnection m_dataConn;
-  sig::ScopedConnection m_errorConn;
-  sig::ScopedConnection m_endConn;
+  wpi::util::sig::ScopedConnection m_dataConn;
+  wpi::util::sig::ScopedConnection m_errorConn;
+  wpi::util::sig::ScopedConnection m_endConn;
 
   void Abort(uint16_t code, std::string_view reason);
 };
 
-}  // namespace wpi
+}  // namespace wpi::net
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_WEBSOCKETSERVER_HPP_

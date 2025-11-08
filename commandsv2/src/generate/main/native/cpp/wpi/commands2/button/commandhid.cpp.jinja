@@ -8,23 +8,23 @@
 {%- endmacro %}
 #include "wpi/commands2/button/Command{{ ConsoleName }}Controller.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 Command{{ ConsoleName }}Controller::Command{{ ConsoleName }}Controller(int port)
-    : CommandGenericHID(port), m_hid{frc::{{ ConsoleName }}Controller(port)} {}
+    : CommandGenericHID(port), m_hid{wpi::{{ ConsoleName }}Controller(port)} {}
 
-frc::{{ ConsoleName }}Controller& Command{{ ConsoleName }}Controller::GetHID() {
+wpi::{{ ConsoleName }}Controller& Command{{ ConsoleName }}Controller::GetHID() {
   return m_hid;
 }
 {% for button in buttons %}
-Trigger Command{{ ConsoleName }}Controller::{{ capitalize_first(button.name) }}(frc::EventLoop* loop) const {
-  return Button(frc::{{ ConsoleName }}Controller::Button::k{{ capitalize_first(button.name) }}, loop);
+Trigger Command{{ ConsoleName }}Controller::{{ capitalize_first(button.name) }}(wpi::EventLoop* loop) const {
+  return Button(wpi::{{ ConsoleName }}Controller::Button::k{{ capitalize_first(button.name) }}, loop);
 }
 {% endfor -%}
 {% for trigger in triggers -%}
 {% if trigger.UseThresholdMethods %}
 Trigger Command{{ ConsoleName }}Controller::{{ capitalize_first(trigger.name) }}(double threshold,
-                                           frc::EventLoop* loop) const {
+                                           wpi::EventLoop* loop) const {
   return Trigger(loop, [this, threshold] {
     return m_hid.Get{{ capitalize_first(trigger.name) }}Axis() > threshold;
   });

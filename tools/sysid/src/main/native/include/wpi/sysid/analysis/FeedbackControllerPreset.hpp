@@ -29,7 +29,7 @@ struct FeedbackControllerPreset {
   /**
    * The period at which the controller runs.
    */
-  units::millisecond_t period;
+  wpi::units::millisecond_t period;
 
   /**
    * Whether the controller gains are time-normalized.
@@ -39,7 +39,7 @@ struct FeedbackControllerPreset {
   /**
    * The measurement delay in the encoder measurements.
    */
-  units::millisecond_t measurementDelay;
+  wpi::units::millisecond_t measurementDelay;
 
   /**
    * Checks equality between two feedback controller presets.

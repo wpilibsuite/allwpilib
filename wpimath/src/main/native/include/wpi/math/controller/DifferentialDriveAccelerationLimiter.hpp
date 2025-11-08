@@ -17,7 +17,7 @@
 #include "wpi/units/voltage.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * Filters the provided voltages to limit a differential drive's linear and
@@ -38,9 +38,9 @@ class WPILIB_DLLEXPORT DifferentialDriveAccelerationLimiter {
    * @param maxAngularAccel The maximum angular acceleration.
    */
   DifferentialDriveAccelerationLimiter(
-      LinearSystem<2, 2, 2> system, units::meter_t trackwidth,
-      units::meters_per_second_squared_t maxLinearAccel,
-      units::radians_per_second_squared_t maxAngularAccel)
+      LinearSystem<2, 2, 2> system, wpi::units::meter_t trackwidth,
+      wpi::units::meters_per_second_squared_t maxLinearAccel,
+      wpi::units::radians_per_second_squared_t maxAngularAccel)
       : DifferentialDriveAccelerationLimiter(system, trackwidth,
                                              -maxLinearAccel, maxLinearAccel,
                                              maxAngularAccel) {}
@@ -58,10 +58,10 @@ class WPILIB_DLLEXPORT DifferentialDriveAccelerationLimiter {
    * than maximum linear acceleration
    */
   DifferentialDriveAccelerationLimiter(
-      LinearSystem<2, 2, 2> system, units::meter_t trackwidth,
-      units::meters_per_second_squared_t minLinearAccel,
-      units::meters_per_second_squared_t maxLinearAccel,
-      units::radians_per_second_squared_t maxAngularAccel)
+      LinearSystem<2, 2, 2> system, wpi::units::meter_t trackwidth,
+      wpi::units::meters_per_second_squared_t minLinearAccel,
+      wpi::units::meters_per_second_squared_t maxLinearAccel,
+      wpi::units::radians_per_second_squared_t maxAngularAccel)
       : m_system{std::move(system)},
         m_trackwidth{trackwidth},
         m_minLinearAccel{minLinearAccel},
@@ -83,16 +83,16 @@ class WPILIB_DLLEXPORT DifferentialDriveAccelerationLimiter {
    * @return The constrained wheel voltages.
    */
   DifferentialDriveWheelVoltages Calculate(
-      units::meters_per_second_t leftVelocity,
-      units::meters_per_second_t rightVelocity, units::volt_t leftVoltage,
-      units::volt_t rightVoltage);
+      wpi::units::meters_per_second_t leftVelocity,
+      wpi::units::meters_per_second_t rightVelocity, wpi::units::volt_t leftVoltage,
+      wpi::units::volt_t rightVoltage);
 
  private:
   LinearSystem<2, 2, 2> m_system;
-  units::meter_t m_trackwidth;
-  units::meters_per_second_squared_t m_minLinearAccel;
-  units::meters_per_second_squared_t m_maxLinearAccel;
-  units::radians_per_second_squared_t m_maxAngularAccel;
+  wpi::units::meter_t m_trackwidth;
+  wpi::units::meters_per_second_squared_t m_minLinearAccel;
+  wpi::units::meters_per_second_squared_t m_maxLinearAccel;
+  wpi::units::radians_per_second_squared_t m_maxAngularAccel;
 };
 
-}  // namespace frc
+}  // namespace wpi::math

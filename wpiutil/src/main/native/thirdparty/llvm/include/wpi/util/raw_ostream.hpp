@@ -34,7 +34,7 @@ enum CreationDisposition : unsigned;
 class FileLocker;
 } // end namespace fs
 
-namespace wpi {
+namespace wpi::util {
 
 /// This class implements an extremely fast bulk output stream that can *only*
 /// output to a stream.  It does not support seeking, reopening, rewinding, line
@@ -281,7 +281,7 @@ public:
   }
 
   /// Output \p Str, turning '\\', '\t', '\n', '"', and anything that doesn't
-  /// satisfy wpi::isPrint into an escape sequence.
+  /// satisfy wpi::util::isPrint into an escape sequence.
   raw_ostream &write_escaped(std::string_view Str, bool UseHexEscapes = false);
 
   raw_ostream &write(unsigned char C);
@@ -799,6 +799,6 @@ public:
   ~buffer_unique_ostream() override { *OS << str(); }
 };
 
-} // end namespace wpi
+} // end namespace wpi::util
 
 #endif // WPIUTIL_WPI_RAW_OSTREAM_H

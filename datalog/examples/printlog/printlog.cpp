@@ -17,74 +17,74 @@
 
 int main(int argc, const char** argv) {
   if (argc != 2) {
-    wpi::print(stderr, "Usage: printlog <file>\n");
+    wpi::util::print(stderr, "Usage: printlog <file>\n");
     return EXIT_FAILURE;
   }
-  auto fileBuffer = wpi::MemoryBuffer::GetFile(argv[1]);
+  auto fileBuffer = wpi::util::MemoryBuffer::GetFile(argv[1]);
   if (!fileBuffer) {
-    wpi::print(stderr, "could not open file: {}\n",
+    wpi::util::print(stderr, "could not open file: {}\n",
                fileBuffer.error().message());
     return EXIT_FAILURE;
   }
   wpi::log::DataLogReader reader{std::move(*fileBuffer)};
   if (!reader) {
-    wpi::print(stderr, "not a log file\n");
+    wpi::util::print(stderr, "not a log file\n");
     return EXIT_FAILURE;
   }
 
-  wpi::DenseMap<int, wpi::log::StartRecordData> entries;
+  wpi::util::DenseMap<int, wpi::log::StartRecordData> entries;
   for (auto&& record : reader) {
     if (record.IsStart()) {
       wpi::log::StartRecordData data;
       if (record.GetStartData(&data)) {
-        wpi::print("Start({}, name='{}', type='{}', metadata='{}') [{}]\n",
+        wpi::util::print("Start({}, name='{}', type='{}', metadata='{}') [{}]\n",
                    data.entry, data.name, data.type, data.metadata,
                    record.GetTimestamp() / 1000000.0);
         if (entries.find(data.entry) != entries.end()) {
-          wpi::print("...DUPLICATE entry ID, overriding\n");
+          wpi::util::print("...DUPLICATE entry ID, overriding\n");
         }
         entries[data.entry] = data;
       } else {
-        wpi::print("Start(INVALID)\n");
+        wpi::util::print("Start(INVALID)\n");
       }
     } else if (record.IsFinish()) {
       int entry;
       if (record.GetFinishEntry(&entry)) {
-        wpi::print("Finish({}) [{}]\n", entry,
+        wpi::util::print("Finish({}) [{}]\n", entry,
                    record.GetTimestamp() / 1000000.0);
         auto it = entries.find(entry);
         if (it == entries.end()) {
-          wpi::print("...ID not found\n");
+          wpi::util::print("...ID not found\n");
         } else {
           entries.erase(it);
         }
       } else {
-        wpi::print("Finish(INVALID)\n");
+        wpi::util::print("Finish(INVALID)\n");
       }
     } else if (record.IsSetMetadata()) {
       wpi::log::MetadataRecordData data;
       if (record.GetSetMetadataData(&data)) {
-        wpi::print("SetMetadata({}, '{}') [{}]\n", data.entry, data.metadata,
+        wpi::util::print("SetMetadata({}, '{}') [{}]\n", data.entry, data.metadata,
                    record.GetTimestamp() / 1000000.0);
         auto it = entries.find(data.entry);
         if (it == entries.end()) {
-          wpi::print("...ID not found\n");
+          wpi::util::print("...ID not found\n");
         } else {
           it->second.metadata = data.metadata;
         }
       } else {
-        wpi::print("SetMetadata(INVALID)\n");
+        wpi::util::print("SetMetadata(INVALID)\n");
       }
     } else if (record.IsControl()) {
-      wpi::print("Unrecognized control record\n");
+      wpi::util::print("Unrecognized control record\n");
     } else {
-      wpi::print("Data({}, size={}) ", record.GetEntry(), record.GetSize());
+      wpi::util::print("Data({}, size={}) ", record.GetEntry(), record.GetSize());
       auto entry = entries.find(record.GetEntry());
       if (entry == entries.end()) {
-        wpi::print("<ID not found>\n");
+        wpi::util::print("<ID not found>\n");
         continue;
       }
-      wpi::print("<name='{}', type='{}'> [{}]\n", entry->second.name,
+      wpi::util::print("<name='{}', type='{}'> [{}]\n", entry->second.name,
                  entry->second.type, record.GetTimestamp() / 1000000.0);
 
       // handle systemTime specially
@@ -92,10 +92,10 @@ int main(int argc, const char** argv) {
         int64_t val;
         if (record.GetInteger(&val)) {
           std::time_t timeval = val / 1000000;
-          wpi::print("  {:%Y-%m-%d %H:%M:%S}.{:06}\n",
+          wpi::util::print("  {:%Y-%m-%d %H:%M:%S}.{:06}\n",
                      *std::localtime(&timeval), val % 1000000);
         } else {
-          wpi::print("  invalid\n");
+          wpi::util::print("  invalid\n");
         }
         continue;
       }
@@ -103,63 +103,63 @@ int main(int argc, const char** argv) {
       if (entry->second.type == "double") {
         double val;
         if (record.GetDouble(&val)) {
-          wpi::print("  {}\n", val);
+          wpi::util::print("  {}\n", val);
         } else {
-          wpi::print("  invalid\n");
+          wpi::util::print("  invalid\n");
         }
       } else if (entry->second.type == "int64") {
         int64_t val;
         if (record.GetInteger(&val)) {
-          wpi::print("  {}\n", val);
+          wpi::util::print("  {}\n", val);
         } else {
-          wpi::print("  invalid\n");
+          wpi::util::print("  invalid\n");
         }
       } else if (entry->second.type == "string" ||
                  entry->second.type == "json") {
         std::string_view val;
         record.GetString(&val);
-        wpi::print("  '{}'\n", val);
+        wpi::util::print("  '{}'\n", val);
       } else if (entry->second.type == "boolean") {
         bool val;
         if (record.GetBoolean(&val)) {
-          wpi::print("  {}\n", val);
+          wpi::util::print("  {}\n", val);
         } else {
-          wpi::print("  invalid\n");
+          wpi::util::print("  invalid\n");
         }
       } else if (entry->second.type == "boolean[]") {
         std::vector<int> val;
         if (record.GetBooleanArray(&val)) {
-          wpi::print("  {}\n", fmt::join(val, ", "));
+          wpi::util::print("  {}\n", fmt::join(val, ", "));
         } else {
-          wpi::print("  invalid\n");
+          wpi::util::print("  invalid\n");
         }
       } else if (entry->second.type == "double[]") {
         std::vector<double> val;
         if (record.GetDoubleArray(&val)) {
-          wpi::print("  {}\n", fmt::join(val, ", "));
+          wpi::util::print("  {}\n", fmt::join(val, ", "));
         } else {
-          wpi::print("  invalid\n");
+          wpi::util::print("  invalid\n");
         }
       } else if (entry->second.type == "float[]") {
         std::vector<float> val;
         if (record.GetFloatArray(&val)) {
-          wpi::print("  {}\n", fmt::join(val, ", "));
+          wpi::util::print("  {}\n", fmt::join(val, ", "));
         } else {
-          wpi::print("  invalid\n");
+          wpi::util::print("  invalid\n");
         }
       } else if (entry->second.type == "int64[]") {
         std::vector<int64_t> val;
         if (record.GetIntegerArray(&val)) {
-          wpi::print("  {}\n", fmt::join(val, ", "));
+          wpi::util::print("  {}\n", fmt::join(val, ", "));
         } else {
-          wpi::print("  invalid\n");
+          wpi::util::print("  invalid\n");
         }
       } else if (entry->second.type == "string[]") {
         std::vector<std::string_view> val;
         if (record.GetStringArray(&val)) {
-          wpi::print("  {}\n", fmt::join(val, ", "));
+          wpi::util::print("  {}\n", fmt::join(val, ", "));
         } else {
-          wpi::print("  invalid\n");
+          wpi::util::print("  invalid\n");
         }
       }
     }

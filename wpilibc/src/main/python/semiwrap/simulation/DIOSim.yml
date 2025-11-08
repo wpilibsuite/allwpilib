@@ -3,7 +3,7 @@ extra_includes:
 - wpi/hardware/discrete/DigitalOutput.hpp
 
 classes:
-  frc::sim::DIOSim:
+  wpi::sim::DIOSim:
     force_type_casters:
     - std::function
     methods:

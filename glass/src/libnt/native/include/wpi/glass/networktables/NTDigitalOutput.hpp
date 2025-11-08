@@ -13,7 +13,7 @@
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/StringTopic.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 class NTDigitalOutputModel : public DIOModel {
  public:
@@ -21,7 +21,7 @@ class NTDigitalOutputModel : public DIOModel {
 
   // path is to the table containing ".type", excluding the trailing /
   explicit NTDigitalOutputModel(std::string_view path);
-  NTDigitalOutputModel(nt::NetworkTableInstance inst, std::string_view path);
+  NTDigitalOutputModel(wpi::nt::NetworkTableInstance inst, std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
 
@@ -42,14 +42,14 @@ class NTDigitalOutputModel : public DIOModel {
   bool IsReadOnly() override { return !m_controllableValue; }
 
  private:
-  nt::NetworkTableInstance m_inst;
-  nt::BooleanEntry m_value;
-  nt::StringSubscriber m_name;
-  nt::BooleanSubscriber m_controllable;
+  wpi::nt::NetworkTableInstance m_inst;
+  wpi::nt::BooleanEntry m_value;
+  wpi::nt::StringSubscriber m_name;
+  wpi::nt::BooleanSubscriber m_controllable;
 
   BooleanSource m_valueData;
   std::string m_nameValue;
   bool m_controllableValue = false;
 };
 
-}  // namespace glass
+}  // namespace wpi::glass

@@ -10,19 +10,19 @@
 #include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/SafeThread.hpp"
 
-namespace wpi {
+namespace wpi::util {
 template <typename T>
 class SmallVectorImpl;
 }  // namespace wpi
 
-namespace glass {
+namespace wpi::glass {
 
 class Storage;
 
 class NetworkTablesSettings {
  public:
   explicit NetworkTablesSettings(std::string_view clientName, Storage& storage,
-                                 NT_Inst inst = nt::GetDefaultInstance());
+                                 NT_Inst inst = wpi::nt::GetDefaultInstance());
 
   /**
    * Enables or disables the server option.  Default is enabled.
@@ -43,7 +43,7 @@ class NetworkTablesSettings {
   int& m_port;
   bool& m_dsClient;
 
-  class Thread : public wpi::SafeThread {
+  class Thread : public wpi::util::SafeThread {
    public:
     explicit Thread(NT_Inst inst) : m_inst{inst} {}
 
@@ -59,7 +59,7 @@ class NetworkTablesSettings {
     int m_port;
     bool m_dsClient;
   };
-  wpi::SafeThreadOwner<Thread> m_thread;
+  wpi::util::SafeThreadOwner<Thread> m_thread;
 };
 
-}  // namespace glass
+}  // namespace wpi::glass

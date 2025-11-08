@@ -30,9 +30,9 @@
 #include "wpi/units/force.hpp"
 #include "wpi/units/length.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::pressure
+ * @namespace wpi::units::pressure
  * @brief namespace for unit types and containers representing pressure values
  * @details The SI unit for pressure is `pascals`, and the corresponding
  *          `base_unit` category is `pressure_unit`.
@@ -43,7 +43,7 @@ namespace units {
     defined(ENABLE_PREDEFINED_PRESSURE_UNITS)
 UNIT_ADD_WITH_METRIC_PREFIXES(
     pressure, pascal, pascals, Pa,
-    unit<std::ratio<1>, units::category::pressure_unit>)
+    unit<std::ratio<1>, wpi::units::category::pressure_unit>)
 UNIT_ADD(pressure, bar, bars, bar, unit<std::ratio<100>, kilo<pascals>>)
 UNIT_ADD(pressure, mbar, mbars, mbar, unit<std::ratio<1>, milli<bar>>)
 UNIT_ADD(pressure, atmosphere, atmospheres, atm,
@@ -56,4 +56,4 @@ UNIT_ADD_CATEGORY_TRAIT(pressure)
 #endif
 
 using namespace pressure;
-}  // namespace units
+}  // namespace wpi::units

@@ -12,7 +12,7 @@
 #include "wpi/util/UidVector.hpp"
 #include "wpi/util/spinlock.hpp"
 
-namespace hal {
+namespace wpi::hal {
 
 namespace impl {
 
@@ -21,7 +21,7 @@ class SimCallbackRegistryBase {
   using RawFunctor = void (*)();
 
  protected:
-  using CallbackVector = wpi::UidVector<HalCallbackListener<RawFunctor>, 4>;
+  using CallbackVector = wpi::util::UidVector<HalCallbackListener<RawFunctor>, 4>;
 
  public:
   void Cancel(int32_t uid) {
@@ -36,7 +36,7 @@ class SimCallbackRegistryBase {
     DoReset();
   }
 
-  wpi::recursive_spinlock& GetMutex() { return m_mutex; }
+  wpi::util::recursive_spinlock& GetMutex() { return m_mutex; }
 
  protected:
   int32_t DoRegister(RawFunctor callback, void* param) {
@@ -56,7 +56,7 @@ class SimCallbackRegistryBase {
     }
   }
 
-  mutable wpi::recursive_spinlock m_mutex;
+  mutable wpi::util::recursive_spinlock m_mutex;
   std::unique_ptr<CallbackVector> m_callbacks;
 };
 
@@ -191,4 +191,4 @@ class SimCallbackRegistry : public impl::SimCallbackRegistryBase {
                                                                           \
   void NS##_Cancel##CAPINAME##Callback(int32_t uid) {}
 
-}  // namespace hal
+}  // namespace wpi::hal

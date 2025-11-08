@@ -11,7 +11,7 @@
 #include "IListenerStorage.hpp"
 #include "gmock/gmock.h"
 
-namespace nt {
+namespace wpi::nt {
 
 class MockListenerStorage : public IListenerStorage {
  public:
@@ -42,4 +42,4 @@ class MockListenerStorage : public IListenerStorage {
               (override));
 };
 
-}  // namespace nt
+}  // namespace wpi::nt

@@ -21,7 +21,7 @@
 using namespace halsimgui;
 
 namespace {
-class TimingModel : public glass::Model {
+class TimingModel : public wpi::glass::Model {
  public:
   void Update() override {}
   bool Exists() override { return true; }
@@ -74,11 +74,11 @@ void TimingGui::Initialize() {
   HALSimGui::halProvider->Register(
       "Timing", [] { return true; },
       [] { return std::make_unique<TimingModel>(); },
-      [](glass::Window* win, glass::Model* model) {
+      [](wpi::glass::Window* win, wpi::glass::Model* model) {
         win->DisableRenamePopup();
         win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
         win->SetDefaultPos(5, 150);
-        return glass::MakeFunctionView(DisplayTiming);
+        return wpi::glass::MakeFunctionView(DisplayTiming);
       });
   HALSimGui::halProvider->ShowDefault("Timing");
 }

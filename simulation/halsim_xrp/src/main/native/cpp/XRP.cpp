@@ -15,7 +15,7 @@
 using namespace wpilibxrp;
 
 XRP::XRP()
-    : m_gyro_name{"XRPGyro"}, m_wpilib_update_func([](const wpi::json&) {}) {
+    : m_gyro_name{"XRPGyro"}, m_wpilib_update_func([](const wpi::util::json&) {}) {
   // Set up the inputs and outputs
   m_motor_outputs.emplace(0, 0.0f);
   m_motor_outputs.emplace(1, 0.0f);
@@ -31,7 +31,7 @@ XRP::XRP()
   m_encoder_inputs.emplace(3, 0);
 }
 
-void XRP::HandleWPILibUpdate(const wpi::json& data) {
+void XRP::HandleWPILibUpdate(const wpi::util::json& data) {
   if (data.count("type") == 0) {
     return;
   }
@@ -97,7 +97,7 @@ void XRP::HandleXRPUpdate(std::span<const uint8_t> packet) {
   }
 }
 
-void XRP::SetupXRPSendBuffer(wpi::raw_uv_ostream& buf) {
+void XRP::SetupXRPSendBuffer(wpi::net::raw_uv_ostream& buf) {
   SetupSendHeader(buf);
   SetupMotorTag(buf);
   SetupServoTag(buf);
@@ -106,14 +106,14 @@ void XRP::SetupXRPSendBuffer(wpi::raw_uv_ostream& buf) {
 }
 
 // WPILib Sim Handlers
-void XRP::HandleDriverStationSimValueChanged(const wpi::json& data) {
+void XRP::HandleDriverStationSimValueChanged(const wpi::util::json& data) {
   auto dsData = data["data"];
   if (dsData.find(">enabled") != dsData.end()) {
     m_robot_enabled = dsData[">enabled"];
   }
 }
 
-void XRP::HandleMotorSimValueChanged(const wpi::json& data) {
+void XRP::HandleMotorSimValueChanged(const wpi::util::json& data) {
   int deviceId = -1;
   auto motorData = data["data"];
 
@@ -132,7 +132,7 @@ void XRP::HandleMotorSimValueChanged(const wpi::json& data) {
   }
 }
 
-void XRP::HandleServoSimValueChanged(const wpi::json& data) {
+void XRP::HandleServoSimValueChanged(const wpi::util::json& data) {
   int deviceId = -1;
   auto servoData = data["data"];
 
@@ -151,7 +151,7 @@ void XRP::HandleServoSimValueChanged(const wpi::json& data) {
   }
 }
 
-void XRP::HandleDIOSimValueChanged(const wpi::json& data) {
+void XRP::HandleDIOSimValueChanged(const wpi::util::json& data) {
   int deviceId = -1;
   auto dioData = data["data"];
 
@@ -184,11 +184,11 @@ void XRP::HandleDIOSimValueChanged(const wpi::json& data) {
   }
 }
 
-void XRP::HandleGyroSimValueChanged(const wpi::json& data) {
+void XRP::HandleGyroSimValueChanged(const wpi::util::json& data) {
   m_gyro_name = data["device"].get<std::string>();
 }
 
-void XRP::HandleEncoderSimValueChanged(const wpi::json& data) {
+void XRP::HandleEncoderSimValueChanged(const wpi::util::json& data) {
   // We need to handle the various encoder cases
   // 4/5 -> Encoder 0
   // 6/7 -> Encoder 1
@@ -228,15 +228,15 @@ void XRP::HandleEncoderSimValueChanged(const wpi::json& data) {
 // XRP Buffer Generation/Read Methods
 // ==================================
 
-void XRP::SetupSendHeader(wpi::raw_uv_ostream& buf) {
+void XRP::SetupSendHeader(wpi::net::raw_uv_ostream& buf) {
   uint8_t pktSeq[2];
-  wpi::support::endian::write16be(pktSeq, m_xrp_bound_seq);
+  wpi::util::support::endian::write16be(pktSeq, m_xrp_bound_seq);
 
   buf << pktSeq[0] << pktSeq[1]
       << static_cast<uint8_t>(m_robot_enabled ? 1 : 0);
 }
 
-void XRP::SetupMotorTag(wpi::raw_uv_ostream& buf) {
+void XRP::SetupMotorTag(wpi::net::raw_uv_ostream& buf) {
   uint8_t value[4];
 
   for (auto motor : m_motor_outputs) {
@@ -246,13 +246,13 @@ void XRP::SetupMotorTag(wpi::raw_uv_ostream& buf) {
         << static_cast<uint8_t>(motor.first);   // Channel
 
     // Convert the value
-    wpi::support::endian::write32be(value,
+    wpi::util::support::endian::write32be(value,
                                     std::bit_cast<uint32_t>(motor.second));
     buf << value[0] << value[1] << value[2] << value[3];
   }
 }
 
-void XRP::SetupServoTag(wpi::raw_uv_ostream& buf) {
+void XRP::SetupServoTag(wpi::net::raw_uv_ostream& buf) {
   uint8_t value[4];
 
   for (auto servo : m_servo_outputs) {
@@ -262,13 +262,13 @@ void XRP::SetupServoTag(wpi::raw_uv_ostream& buf) {
         << static_cast<uint8_t>(servo.first);   // Channel
 
     // Convert the value
-    wpi::support::endian::write32be(value,
+    wpi::util::support::endian::write32be(value,
                                     std::bit_cast<uint32_t>(servo.second));
     buf << value[0] << value[1] << value[2] << value[3];
   }
 }
 
-void XRP::SetupDigitalOutTag(wpi::raw_uv_ostream& buf) {
+void XRP::SetupDigitalOutTag(wpi::net::raw_uv_ostream& buf) {
   for (auto digitalOut : m_digital_outputs) {
     // DIO payload is 3 bytes
     buf << static_cast<uint8_t>(3)                           // Size
@@ -285,20 +285,20 @@ void XRP::ReadGyroTag(std::span<const uint8_t> packet) {
 
   packet = packet.subspan(2);  // Skip past the size and tag
   float rate_x =
-      std::bit_cast<float>(wpi::support::endian::read32be(&packet[0]));
+      std::bit_cast<float>(wpi::util::support::endian::read32be(&packet[0]));
   float rate_y =
-      std::bit_cast<float>(wpi::support::endian::read32be(&packet[4]));
+      std::bit_cast<float>(wpi::util::support::endian::read32be(&packet[4]));
   float rate_z =
-      std::bit_cast<float>(wpi::support::endian::read32be(&packet[8]));
+      std::bit_cast<float>(wpi::util::support::endian::read32be(&packet[8]));
   float angle_x =
-      std::bit_cast<float>(wpi::support::endian::read32be(&packet[12]));
+      std::bit_cast<float>(wpi::util::support::endian::read32be(&packet[12]));
   float angle_y =
-      std::bit_cast<float>(wpi::support::endian::read32be(&packet[16]));
+      std::bit_cast<float>(wpi::util::support::endian::read32be(&packet[16]));
   float angle_z =
-      std::bit_cast<float>(wpi::support::endian::read32be(&packet[20]));
+      std::bit_cast<float>(wpi::util::support::endian::read32be(&packet[20]));
 
   // Make the json object
-  wpi::json gyroJson;
+  wpi::util::json gyroJson;
   gyroJson["type"] = "Gyro";
   gyroJson["device"] = m_gyro_name;
   gyroJson["data"] = {{">rate_x", rate_x},   {">rate_y", rate_y},
@@ -314,7 +314,7 @@ void XRP::ReadDIOTag(std::span<const uint8_t> packet) {
     return;  // size(1) + tag(1) + id(1) + value(1)
   }
 
-  wpi::json dioJson;
+  wpi::util::json dioJson;
   dioJson["type"] = "DIO";
   dioJson["device"] = std::to_string(packet[2]);
   dioJson["data"] = {{"<>value", packet[3] == 1}};
@@ -335,7 +335,7 @@ void XRP::ReadEncoderTag(std::span<const uint8_t> packet) {
 
   packet = packet.subspan(3);  // Skip past the size and tag and ID
   int32_t count =
-      static_cast<int32_t>(wpi::support::endian::read32be(&packet[0]));
+      static_cast<int32_t>(wpi::util::support::endian::read32be(&packet[0]));
 
   // Look up the registered encoders
   if (m_encoder_channel_map.count(encoderId) == 0) {
@@ -344,7 +344,7 @@ void XRP::ReadEncoderTag(std::span<const uint8_t> packet) {
 
   uint8_t wpilibEncoderChannel = m_encoder_channel_map[encoderId];
 
-  wpi::json encJson;
+  wpi::util::json encJson;
   encJson["type"] = "Encoder";
   encJson["device"] = std::to_string(wpilibEncoderChannel);
   encJson["data"] = {{">count", count}};
@@ -360,11 +360,11 @@ void XRP::ReadEncoderTag(std::span<const uint8_t> packet) {
 
     size_t i = sizeof(count);
     uint32_t period_numerator =
-        static_cast<uint32_t>(wpi::support::endian::read32be(&packet[i]));
+        static_cast<uint32_t>(wpi::util::support::endian::read32be(&packet[i]));
 
     i += sizeof(period_numerator);
     uint32_t period_denominator =
-        static_cast<uint32_t>(wpi::support::endian::read32be(&packet[i]));
+        static_cast<uint32_t>(wpi::util::support::endian::read32be(&packet[i]));
 
     double period =
         static_cast<double>(period_numerator >> 1) / period_denominator;
@@ -374,7 +374,7 @@ void XRP::ReadEncoderTag(std::span<const uint8_t> packet) {
       period = -period;
     }
 
-    encJson["data"].push_back({wpi::json(">period"), wpi::json(period)});
+    encJson["data"].push_back({wpi::util::json(">period"), wpi::util::json(period)});
   }
 
   m_wpilib_update_func(encJson);
@@ -389,9 +389,9 @@ void XRP::ReadAnalogTag(std::span<const uint8_t> packet) {
 
   packet = packet.subspan(3);
   float voltage =
-      std::bit_cast<float>(wpi::support::endian::read32be(&packet[0]));
+      std::bit_cast<float>(wpi::util::support::endian::read32be(&packet[0]));
 
-  wpi::json analogJson;
+  wpi::util::json analogJson;
   analogJson["type"] = "AI";
   analogJson["device"] = std::to_string(analogId);
   analogJson["data"] = {{">voltage", voltage}};

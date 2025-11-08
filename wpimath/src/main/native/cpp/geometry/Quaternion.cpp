@@ -6,14 +6,14 @@
 
 #include "wpi/util/json.hpp"
 
-void frc::to_json(wpi::json& json, const Quaternion& quaternion) {
-  json = wpi::json{{"W", quaternion.W()},
+void wpi::math::to_json(wpi::util::json& json, const Quaternion& quaternion) {
+  json = wpi::util::json{{"W", quaternion.W()},
                    {"X", quaternion.X()},
                    {"Y", quaternion.Y()},
                    {"Z", quaternion.Z()}};
 }
 
-void frc::from_json(const wpi::json& json, Quaternion& quaternion) {
+void wpi::math::from_json(const wpi::util::json& json, Quaternion& quaternion) {
   quaternion =
       Quaternion{json.at("W").get<double>(), json.at("X").get<double>(),
                  json.at("Y").get<double>(), json.at("Z").get<double>()};

@@ -11,24 +11,24 @@ constexpr size_t kRearLeftOff = kFrontRightOff + 8;
 constexpr size_t kRearRightOff = kRearLeftOff + 8;
 }  // namespace
 
-using StructType = wpi::Struct<frc::MecanumDriveWheelSpeeds>;
+using StructType = wpi::util::Struct<wpi::math::MecanumDriveWheelSpeeds>;
 
-frc::MecanumDriveWheelSpeeds StructType::Unpack(std::span<const uint8_t> data) {
-  return frc::MecanumDriveWheelSpeeds{
-      units::meters_per_second_t{
-          wpi::UnpackStruct<double, kFrontLeftOff>(data)},
-      units::meters_per_second_t{
-          wpi::UnpackStruct<double, kFrontRightOff>(data)},
-      units::meters_per_second_t{wpi::UnpackStruct<double, kRearLeftOff>(data)},
-      units::meters_per_second_t{
-          wpi::UnpackStruct<double, kRearRightOff>(data)},
+wpi::math::MecanumDriveWheelSpeeds StructType::Unpack(std::span<const uint8_t> data) {
+  return wpi::math::MecanumDriveWheelSpeeds{
+      wpi::units::meters_per_second_t{
+          wpi::util::UnpackStruct<double, kFrontLeftOff>(data)},
+      wpi::units::meters_per_second_t{
+          wpi::util::UnpackStruct<double, kFrontRightOff>(data)},
+      wpi::units::meters_per_second_t{wpi::util::UnpackStruct<double, kRearLeftOff>(data)},
+      wpi::units::meters_per_second_t{
+          wpi::util::UnpackStruct<double, kRearRightOff>(data)},
   };
 }
 
 void StructType::Pack(std::span<uint8_t> data,
-                      const frc::MecanumDriveWheelSpeeds& value) {
-  wpi::PackStruct<kFrontLeftOff>(data, value.frontLeft.value());
-  wpi::PackStruct<kFrontRightOff>(data, value.frontRight.value());
-  wpi::PackStruct<kRearLeftOff>(data, value.rearLeft.value());
-  wpi::PackStruct<kRearRightOff>(data, value.rearRight.value());
+                      const wpi::math::MecanumDriveWheelSpeeds& value) {
+  wpi::util::PackStruct<kFrontLeftOff>(data, value.frontLeft.value());
+  wpi::util::PackStruct<kFrontRightOff>(data, value.frontRight.value());
+  wpi::util::PackStruct<kRearLeftOff>(data, value.rearLeft.value());
+  wpi::util::PackStruct<kRearRightOff>(data, value.rearRight.value());
 }

@@ -11,8 +11,8 @@ namespace pybind11
 namespace detail
 {
 
-template <typename Type, unsigned Size> struct type_caster<wpi::SmallVector<Type, Size>>
- : list_caster<wpi::SmallVector<Type, Size>, Type> { };
+template <typename Type, unsigned Size> struct type_caster<wpi::util::SmallVector<Type, Size>>
+ : list_caster<wpi::util::SmallVector<Type, Size>, Type> { };
 
 } // namespace detail
 } // namespace pybind11

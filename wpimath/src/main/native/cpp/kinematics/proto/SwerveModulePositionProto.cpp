@@ -7,9 +7,9 @@
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 #include "wpimath/protobuf/kinematics.npb.h"
 
-std::optional<frc::SwerveModulePosition>
-wpi::Protobuf<frc::SwerveModulePosition>::Unpack(InputStream& stream) {
-  wpi::UnpackCallback<frc::Rotation2d> angle;
+std::optional<wpi::math::SwerveModulePosition>
+wpi::util::Protobuf<wpi::math::SwerveModulePosition>::Unpack(InputStream& stream) {
+  wpi::util::UnpackCallback<wpi::math::Rotation2d> angle;
   wpi_proto_ProtobufSwerveModulePosition msg{
       .distance = 0,
       .angle = angle.Callback(),
@@ -24,15 +24,15 @@ wpi::Protobuf<frc::SwerveModulePosition>::Unpack(InputStream& stream) {
     return {};
   }
 
-  return frc::SwerveModulePosition{
-      units::meter_t{msg.distance},
+  return wpi::math::SwerveModulePosition{
+      wpi::units::meter_t{msg.distance},
       iangle[0],
   };
 }
 
-bool wpi::Protobuf<frc::SwerveModulePosition>::Pack(
-    OutputStream& stream, const frc::SwerveModulePosition& value) {
-  wpi::PackCallback angle{&value.angle};
+bool wpi::util::Protobuf<wpi::math::SwerveModulePosition>::Pack(
+    OutputStream& stream, const wpi::math::SwerveModulePosition& value) {
+  wpi::util::PackCallback angle{&value.angle};
   wpi_proto_ProtobufSwerveModulePosition msg{
       .distance = value.distance.value(),
       .angle = angle.Callback(),

@@ -14,7 +14,7 @@
 #include "wpi/hal/handles/HandlesInternal.h"
 #include "wpi/util/jni_util.hpp"
 
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
 
@@ -28,7 +28,7 @@ Java_org_wpilib_hardware_hal_PWMJNI_initializePWMPort
   (JNIEnv* env, jclass, jint channel)
 {
   int32_t status = 0;
-  auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
+  auto stack = wpi::util::java::GetJavaStackTrace(env, "edu.wpi.first");
   auto pwm = HAL_InitializePWMPort(channel, stack.c_str(), &status);
   CheckStatusForceThrow(env, status);
   return (jint)pwm;

@@ -10,28 +10,28 @@
 #include <gtest/gtest.h>
 
 TEST(CtStringTest, Concat) {
-  using namespace wpi::literals;
+  using namespace wpi::util::literals;
   constexpr std::string_view astring = "name";
   constexpr int arrsize = 5;
   constexpr auto str = Concat(
-      wpi::ct_string<char, std::char_traits<char>, astring.size()>{astring},
-      "["_ct_string, wpi::NumToCtString<arrsize>(), "]"_ct_string);
+      wpi::util::ct_string<char, std::char_traits<char>, astring.size()>{astring},
+      "["_ct_string, wpi::util::NumToCtString<arrsize>(), "]"_ct_string);
   static_assert(str.size() == 7);
   ASSERT_EQ(std::string{str}, "name[5]");
 }
 
 TEST(CtStringTest, OperatorPlus) {
-  using namespace wpi::literals;
+  using namespace wpi::util::literals;
   constexpr std::string_view astring = "name";
   constexpr auto str =
-      wpi::ct_string<char, std::char_traits<char>, astring.size()>{astring} +
+      wpi::util::ct_string<char, std::char_traits<char>, astring.size()>{astring} +
       "[]"_ct_string;
   static_assert(str.size() == 6);
   ASSERT_EQ(std::string{str}, "name[]");
 }
 
 TEST(CtStringTest, StringViewConversion) {
-  using namespace wpi::literals;
+  using namespace wpi::util::literals;
   constexpr auto str = "[]"_ct_string;
   std::string_view sv = str;
   ASSERT_EQ(sv, "[]");

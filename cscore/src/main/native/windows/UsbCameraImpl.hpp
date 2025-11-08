@@ -34,14 +34,14 @@
 #include "wpi/util/raw_istream.hpp"
 #include "wpi/util/raw_ostream.hpp"
 
-namespace cs {
+namespace wpi::cs {
 
 class UsbCameraImpl : public SourceImpl,
                       public std::enable_shared_from_this<UsbCameraImpl> {
  public:
-  UsbCameraImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
+  UsbCameraImpl(std::string_view name, wpi::util::Logger& logger, Notifier& notifier,
                 Telemetry& telemetry, std::string_view path);
-  UsbCameraImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
+  UsbCameraImpl(std::string_view name, wpi::util::Logger& logger, Notifier& notifier,
                 Telemetry& telemetry, int deviceId);
   ~UsbCameraImpl() override;
 
@@ -137,12 +137,12 @@ class UsbCameraImpl : public SourceImpl,
   ComPtr<IMFMediaType> DeviceCheckModeValid(const VideoMode& toCheck);
 
   // Command helper functions
-  CS_StatusValue DeviceProcessCommand(std::unique_lock<wpi::mutex>& lock,
+  CS_StatusValue DeviceProcessCommand(std::unique_lock<wpi::util::mutex>& lock,
                                       Message::Kind msgKind,
                                       const Message* msg);
-  CS_StatusValue DeviceCmdSetMode(std::unique_lock<wpi::mutex>& lock,
+  CS_StatusValue DeviceCmdSetMode(std::unique_lock<wpi::util::mutex>& lock,
                                   const Message& msg);
-  CS_StatusValue DeviceCmdSetProperty(std::unique_lock<wpi::mutex>& lock,
+  CS_StatusValue DeviceCmdSetProperty(std::unique_lock<wpi::util::mutex>& lock,
                                       const Message& msg);
 
   // Property helper functions
@@ -163,7 +163,7 @@ class UsbCameraImpl : public SourceImpl,
   ComPtr<IMFMediaSource> m_mediaSource;
   ComPtr<IMFSourceReader> m_sourceReader;
   ComPtr<SourceReaderCB> m_imageCallback;
-  std::unique_ptr<cs::WindowsMessagePump> m_messagePump;
+  std::unique_ptr<wpi::cs::WindowsMessagePump> m_messagePump;
   ComPtr<IMFMediaType> m_currentMode;
 
   std::string m_path;
@@ -174,6 +174,6 @@ class UsbCameraImpl : public SourceImpl,
   std::vector<std::pair<VideoMode, ComPtr<IMFMediaType>>> m_windowsVideoModes;
 };
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_USBCAMERAIMPL_HPP_

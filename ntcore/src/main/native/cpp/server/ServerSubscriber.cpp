@@ -11,8 +11,8 @@
 #include "wpi/util/MessagePack.hpp"
 #include "wpi/util/StringExtras.hpp"
 
-using namespace nt;
-using namespace nt::server;
+using namespace wpi::nt;
+using namespace wpi::nt::server;
 using namespace mpack;
 
 static void WriteOptions(mpack_writer_t& w, const PubSubOptionsImpl& options) {
@@ -44,7 +44,7 @@ bool ServerSubscriber::Matches(std::string_view name, bool special) {
   for (auto&& topicName : m_topicNames) {
     if ((!m_options.prefixMatch && name == topicName) ||
         (m_options.prefixMatch && (!special || !topicName.empty()) &&
-         wpi::starts_with(name, topicName))) {
+         wpi::util::starts_with(name, topicName))) {
       return true;
     }
   }

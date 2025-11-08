@@ -25,15 +25,15 @@
 #include "wpi/net/uv/Async.hpp"
 #include "wpi/net/uv/Timer.hpp"
 
-namespace wpi {
+namespace wpi::util {
 class Logger;
 }  // namespace wpi
 
-namespace nt::net {
+namespace wpi::nt::net {
 class ILocalStorage;
-}  // namespace nt::net
+}  // namespace wpi::nt::net
 
-namespace nt {
+namespace wpi::nt {
 
 class IConnectionList;
 
@@ -41,7 +41,7 @@ class NetworkClientBase : public INetworkClient {
  public:
   NetworkClientBase(int inst, std::string_view id,
                     net::ILocalStorage& localStorage, IConnectionList& connList,
-                    wpi::Logger& logger);
+                    wpi::util::Logger& logger);
   ~NetworkClientBase() override;
 
   void Disconnect() override;
@@ -57,7 +57,7 @@ class NetworkClientBase : public INetworkClient {
       std::span<const std::pair<std::string, unsigned int>> servers,
       unsigned int defaultPort);
 
-  virtual void TcpConnected(wpi::uv::Tcp& tcp) = 0;
+  virtual void TcpConnected(wpi::net::uv::Tcp& tcp) = 0;
   virtual void ForceDisconnect(std::string_view reason) = 0;
   virtual void DoDisconnect(std::string_view reason);
 
@@ -65,15 +65,15 @@ class NetworkClientBase : public INetworkClient {
   int m_inst;
   net::ILocalStorage& m_localStorage;
   IConnectionList& m_connList;
-  wpi::Logger& m_logger;
+  wpi::util::Logger& m_logger;
   std::string m_id;
 
   // used only from loop
-  std::shared_ptr<wpi::ParallelTcpConnector> m_parallelConnect;
-  std::shared_ptr<wpi::uv::Timer> m_readLocalTimer;
-  std::shared_ptr<wpi::uv::Timer> m_sendOutgoingTimer;
-  std::shared_ptr<wpi::uv::Async<>> m_flushLocal;
-  std::shared_ptr<wpi::uv::Async<>> m_flush;
+  std::shared_ptr<wpi::net::ParallelTcpConnector> m_parallelConnect;
+  std::shared_ptr<wpi::net::uv::Timer> m_readLocalTimer;
+  std::shared_ptr<wpi::net::uv::Timer> m_sendOutgoingTimer;
+  std::shared_ptr<wpi::net::uv::Async<>> m_flushLocal;
+  std::shared_ptr<wpi::net::uv::Async<>> m_flush;
 
   using Queue = net::LocalClientMessageQueue;
   net::ClientMessage m_localMsgs[Queue::kBlockSize];
@@ -81,25 +81,25 @@ class NetworkClientBase : public INetworkClient {
   std::vector<std::pair<std::string, unsigned int>> m_servers;
 
   std::pair<std::string, unsigned int> m_dsClientServer{"", 0};
-  std::shared_ptr<wpi::DsClient> m_dsClient;
+  std::shared_ptr<wpi::net::DsClient> m_dsClient;
 
   // shared with user
-  std::atomic<wpi::uv::Async<>*> m_flushLocalAtomic{nullptr};
-  std::atomic<wpi::uv::Async<>*> m_flushAtomic{nullptr};
+  std::atomic<wpi::net::uv::Async<>*> m_flushLocalAtomic{nullptr};
+  std::atomic<wpi::net::uv::Async<>*> m_flushAtomic{nullptr};
 
   Queue m_localQueue;
 
   int m_connHandle = 0;
 
-  wpi::EventLoopRunner m_loopRunner;
-  wpi::uv::Loop& m_loop;
+  wpi::net::EventLoopRunner m_loopRunner;
+  wpi::net::uv::Loop& m_loop;
 };
 
 class NetworkClient final : public NetworkClientBase {
  public:
   NetworkClient(
       int inst, std::string_view id, net::ILocalStorage& localStorage,
-      IConnectionList& connList, wpi::Logger& logger,
+      IConnectionList& connList, wpi::util::Logger& logger,
       std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
           timeSyncUpdated);
   ~NetworkClient() final;
@@ -111,8 +111,8 @@ class NetworkClient final : public NetworkClientBase {
 
  private:
   void HandleLocal();
-  void TcpConnected(wpi::uv::Tcp& tcp) final;
-  void WsConnected(wpi::WebSocket& ws, wpi::uv::Tcp& tcp,
+  void TcpConnected(wpi::net::uv::Tcp& tcp) final;
+  void WsConnected(wpi::net::WebSocket& ws, wpi::net::uv::Tcp& tcp,
                    std::string_view protocol);
   void ForceDisconnect(std::string_view reason) override;
   void DoDisconnect(std::string_view reason) override;
@@ -123,4 +123,4 @@ class NetworkClient final : public NetworkClientBase {
   std::unique_ptr<net::ClientImpl> m_clientImpl;
 };
 
-}  // namespace nt
+}  // namespace wpi::nt

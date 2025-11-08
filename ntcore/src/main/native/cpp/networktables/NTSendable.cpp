@@ -7,10 +7,10 @@
 #include "wpi/nt/NTSendableBuilder.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
-using namespace nt;
+using namespace wpi::nt;
 
-void NTSendable::InitSendable(wpi::SendableBuilder& builder) {
-  if (builder.GetBackendKind() == wpi::SendableBuilder::kNetworkTables) {
+void NTSendable::InitSendable(wpi::util::SendableBuilder& builder) {
+  if (builder.GetBackendKind() == wpi::util::SendableBuilder::kNetworkTables) {
     InitSendable(static_cast<NTSendableBuilder&>(builder));
   }
 }

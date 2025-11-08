@@ -44,18 +44,18 @@
 
 #ifndef WPI_JSON_NAMESPACE
 #define WPI_JSON_NAMESPACE               \
-    wpi::WPI_JSON_NAMESPACE_CONCAT( \
+    wpi::util::WPI_JSON_NAMESPACE_CONCAT( \
             WPI_JSON_ABI_TAGS,           \
             WPI_JSON_NAMESPACE_VERSION)
 #endif
 
 #ifndef WPI_JSON_NAMESPACE_BEGIN
 #define WPI_JSON_NAMESPACE_BEGIN \
-    namespace wpi                \
+    namespace wpi::util                \
     {
 #endif
 
 #ifndef WPI_JSON_NAMESPACE_END
 #define WPI_JSON_NAMESPACE_END \
-    }  // namespace wpi
+    }  // namespace wpi::util
 #endif

@@ -23,12 +23,12 @@
 #include "wpi/util/condition_variable.hpp"
 #include "wpi/util/raw_istream.hpp"
 
-namespace cs {
+namespace wpi::cs {
 
 class HttpCameraImpl : public SourceImpl {
  public:
   HttpCameraImpl(std::string_view name, CS_HttpCameraKind kind,
-                 wpi::Logger& logger, Notifier& notifier, Telemetry& telemetry);
+                 wpi::util::Logger& logger, Notifier& notifier, Telemetry& telemetry);
   ~HttpCameraImpl() override;
 
   void Start() override;
@@ -99,14 +99,14 @@ class HttpCameraImpl : public SourceImpl {
   void StreamThreadMain();
 
   // Functions used by StreamThreadMain()
-  wpi::HttpConnection* DeviceStreamConnect(
-      wpi::SmallVectorImpl<char>& boundary);
-  void DeviceStream(wpi::raw_istream& is, std::string_view boundary);
-  bool DeviceStreamFrame(wpi::raw_istream& is, std::string& imageBuf);
+  wpi::net::HttpConnection* DeviceStreamConnect(
+      wpi::util::SmallVectorImpl<char>& boundary);
+  void DeviceStream(wpi::util::raw_istream& is, std::string_view boundary);
+  bool DeviceStreamFrame(wpi::util::raw_istream& is, std::string& imageBuf);
 
   // The camera settings thread
   void SettingsThreadMain();
-  void DeviceSendSettings(wpi::HttpRequest& req);
+  void DeviceSendSettings(wpi::net::HttpRequest& req);
 
   // The monitor thread
   void MonitorThreadMain();
@@ -122,31 +122,31 @@ class HttpCameraImpl : public SourceImpl {
   //
 
   // The camera connections
-  std::unique_ptr<wpi::HttpConnection> m_streamConn;
-  std::unique_ptr<wpi::HttpConnection> m_settingsConn;
+  std::unique_ptr<wpi::net::HttpConnection> m_streamConn;
+  std::unique_ptr<wpi::net::HttpConnection> m_settingsConn;
 
   CS_HttpCameraKind m_kind;
 
-  std::vector<wpi::HttpLocation> m_locations;
+  std::vector<wpi::net::HttpLocation> m_locations;
   size_t m_nextLocation{0};
   int m_prefLocation{-1};  // preferred location
 
   std::atomic_int m_frameCount{0};
 
-  wpi::condition_variable m_sinkEnabledCond;
+  wpi::util::condition_variable m_sinkEnabledCond;
 
-  wpi::StringMap<std::string> m_settings;
-  wpi::condition_variable m_settingsCond;
+  wpi::util::StringMap<std::string> m_settings;
+  wpi::util::condition_variable m_settingsCond;
 
-  wpi::StringMap<std::string> m_streamSettings;
+  wpi::util::StringMap<std::string> m_streamSettings;
   std::atomic_bool m_streamSettingsUpdated{false};
 
-  wpi::condition_variable m_monitorCond;
+  wpi::util::condition_variable m_monitorCond;
 };
 
 class AxisCameraImpl : public HttpCameraImpl {
  public:
-  AxisCameraImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
+  AxisCameraImpl(std::string_view name, wpi::util::Logger& logger, Notifier& notifier,
                  Telemetry& telemetry)
       : HttpCameraImpl{name, CS_HTTP_AXIS, logger, notifier, telemetry} {}
 #if 0
@@ -158,6 +158,6 @@ class AxisCameraImpl : public HttpCameraImpl {
   bool CacheProperties(CS_Status* status) const override;
 };
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_HTTPCAMERAIMPL_HPP_

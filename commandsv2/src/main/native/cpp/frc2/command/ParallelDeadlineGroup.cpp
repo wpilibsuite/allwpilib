@@ -10,7 +10,7 @@
 
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 ParallelDeadlineGroup::ParallelDeadlineGroup(
     std::unique_ptr<Command>&& deadline,
@@ -69,7 +69,7 @@ void ParallelDeadlineGroup::AddCommands(
   CommandScheduler::GetInstance().RequireUngroupedAndUnscheduled(commands);
 
   if (!m_finished) {
-    throw FRC_MakeError(frc::err::CommandIllegalUse,
+    throw FRC_MakeError(wpi::err::CommandIllegalUse,
                         "Commands cannot be added to a CommandGroup "
                         "while the group is running");
   }
@@ -85,7 +85,7 @@ void ParallelDeadlineGroup::AddCommands(
       }
       m_commands.emplace_back(std::move(command), false);
     } else {
-      throw FRC_MakeError(frc::err::CommandIllegalUse,
+      throw FRC_MakeError(wpi::err::CommandIllegalUse,
                           "Multiple commands in a parallel group cannot "
                           "require the same subsystems");
     }
@@ -100,7 +100,7 @@ void ParallelDeadlineGroup::SetDeadline(std::unique_ptr<Command>&& deadline) {
   m_runWhenDisabled &= m_deadline->RunsWhenDisabled();
 }
 
-void ParallelDeadlineGroup::InitSendable(wpi::SendableBuilder& builder) {
+void ParallelDeadlineGroup::InitSendable(wpi::util::SendableBuilder& builder) {
   Command::InitSendable(builder);
 
   builder.AddStringProperty(

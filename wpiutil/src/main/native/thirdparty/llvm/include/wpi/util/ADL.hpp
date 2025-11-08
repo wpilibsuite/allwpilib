@@ -13,7 +13,7 @@
 #include <iterator>
 #include <utility>
 
-namespace wpi {
+namespace wpi::util {
 
 // Only used by compiler if both template types are the same.  Useful when
 // using SFINAE to test for the existence of member functions.
@@ -130,6 +130,6 @@ using ValueOfRange =
     std::remove_reference_t<decltype(*adl_begin(std::declval<RangeT &>()))>;
 
 } // namespace detail
-} // namespace wpi
+} // namespace wpi::util
 
 #endif // WPIUTIL_WPI_ADL_H

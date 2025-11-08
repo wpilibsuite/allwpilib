@@ -23,11 +23,11 @@ class RobotContainer {
  public:
   RobotContainer();
 
-  frc2::CommandPtr GetAutonomousCommand();
+  wpi::cmd::CommandPtr GetAutonomousCommand();
 
  private:
   // The driver's controller
-  frc2::CommandXboxController m_driverController{
+  wpi::cmd::CommandXboxController m_driverController{
       OIConstants::kDriverControllerPort};
 
   // The robot's subsystems and commands are defined here...
@@ -36,10 +36,10 @@ class RobotContainer {
   DriveSubsystem m_drive;
 
   // RobotContainer-owned commands
-  frc2::CommandPtr m_driveHalfSpeed =
-      frc2::cmd::RunOnce([this] { m_drive.SetMaxOutput(0.5); }, {});
-  frc2::CommandPtr m_driveFullSpeed =
-      frc2::cmd::RunOnce([this] { m_drive.SetMaxOutput(1); }, {});
+  wpi::cmd::CommandPtr m_driveHalfSpeed =
+      wpi::cmd::cmd::RunOnce([this] { m_drive.SetMaxOutput(0.5); }, {});
+  wpi::cmd::CommandPtr m_driveFullSpeed =
+      wpi::cmd::cmd::RunOnce([this] { m_drive.SetMaxOutput(1); }, {});
 
   void ConfigureButtonBindings();
 };

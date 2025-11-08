@@ -6,8 +6,8 @@
 
 #include "wpi/driverstation/Gamepad.hpp"
 
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 GamepadSim::GamepadSim(const Gamepad& joystick) : GenericHIDSim{joystick} {
   SetAxesMaximumIndex(6);

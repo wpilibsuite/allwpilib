@@ -16,7 +16,7 @@
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 
-namespace frc {
+namespace wpi::math {
 /**
  * This class wraps Mecanum Drive Odometry to fuse latency-compensated
  * vision measurements with mecanum drive encoder velocity measurements. It will
@@ -79,11 +79,11 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator3d
   MecanumDrivePoseEstimator3d(
       MecanumDriveKinematics& kinematics, const Rotation3d& gyroAngle,
       const MecanumDriveWheelPositions& wheelPositions,
-      const Pose3d& initialPose, const wpi::array<double, 4>& stateStdDevs,
-      const wpi::array<double, 4>& visionMeasurementStdDevs);
+      const Pose3d& initialPose, const wpi::util::array<double, 4>& stateStdDevs,
+      const wpi::util::array<double, 4>& visionMeasurementStdDevs);
 
  private:
   MecanumDriveOdometry3d m_odometryImpl;
 };
 
-}  // namespace frc
+}  // namespace wpi::math

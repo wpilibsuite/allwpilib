@@ -6,10 +6,10 @@
 
 #include "wpi/util/json.hpp"
 
-void frc::to_json(wpi::json& json, const Rotation2d& rotation) {
-  json = wpi::json{{"radians", rotation.Radians().value()}};
+void wpi::math::to_json(wpi::util::json& json, const Rotation2d& rotation) {
+  json = wpi::util::json{{"radians", rotation.Radians().value()}};
 }
 
-void frc::from_json(const wpi::json& json, Rotation2d& rotation) {
-  rotation = Rotation2d{units::radian_t{json.at("radians").get<double>()}};
+void wpi::math::from_json(const wpi::util::json& json, Rotation2d& rotation) {
+  rotation = Rotation2d{wpi::units::radian_t{json.at("radians").get<double>()}};
 }

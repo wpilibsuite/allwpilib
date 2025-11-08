@@ -17,7 +17,7 @@
 #include "wpi/units/velocity.hpp"
 #include "wpi/units/voltage.hpp"
 
-namespace frc::sysid {
+namespace wpi::sysid {
 
 /**
  * Possible state of a SysId routine.
@@ -41,8 +41,8 @@ enum class State {
  * SysIdRoutineLog instance, with a unique log name.
  */
 class SysIdRoutineLog {
-  using MotorEntries = wpi::StringMap<wpi::log::DoubleLogEntry>;
-  using LogEntries = wpi::StringMap<MotorEntries>;
+  using MotorEntries = wpi::util::StringMap<wpi::log::DoubleLogEntry>;
+  using LogEntries = wpi::util::StringMap<MotorEntries>;
 
  public:
   /** Logs data from a single motor during a SysIdRoutine. */
@@ -64,7 +64,7 @@ class SysIdRoutineLog {
      * @param voltage The voltage to record.
      * @return The motor log (for call chaining).
      */
-    MotorLog& voltage(units::volt_t voltage) {
+    MotorLog& voltage(wpi::units::volt_t voltage) {
       return value("voltage", voltage.value(), voltage.name());
     }
 
@@ -74,7 +74,7 @@ class SysIdRoutineLog {
      * @param position The linear position to record.
      * @return The motor log (for call chaining).
      */
-    MotorLog& position(units::meter_t position) {
+    MotorLog& position(wpi::units::meter_t position) {
       return value("position", position.value(), position.name());
     }
 
@@ -84,7 +84,7 @@ class SysIdRoutineLog {
      * @param position The angular position to record.
      * @return The motor log (for call chaining).
      */
-    MotorLog& position(units::turn_t position) {
+    MotorLog& position(wpi::units::turn_t position) {
       return value("position", position.value(), position.name());
     }
 
@@ -94,7 +94,7 @@ class SysIdRoutineLog {
      * @param velocity The linear velocity to record.
      * @return The motor log (for call chaining).
      */
-    MotorLog& velocity(units::meters_per_second_t velocity) {
+    MotorLog& velocity(wpi::units::meters_per_second_t velocity) {
       return value("velocity", velocity.value(), velocity.name());
     }
 
@@ -104,7 +104,7 @@ class SysIdRoutineLog {
      * @param velocity The angular velocity to record.
      * @return The motor log (for call chaining).
      */
-    MotorLog& velocity(units::turns_per_second_t velocity) {
+    MotorLog& velocity(wpi::units::turns_per_second_t velocity) {
       return value("velocity", velocity.value(), velocity.name());
     }
 
@@ -116,7 +116,7 @@ class SysIdRoutineLog {
      * @param acceleration The linear acceleration to record.
      * @return The motor log (for call chaining).
      */
-    MotorLog& acceleration(units::meters_per_second_squared_t acceleration) {
+    MotorLog& acceleration(wpi::units::meters_per_second_squared_t acceleration) {
       return value("acceleration", acceleration.value(), acceleration.name());
     }
 
@@ -128,7 +128,7 @@ class SysIdRoutineLog {
      * @param acceleration The angular acceleration to record.
      * @return The motor log (for call chaining).
      */
-    MotorLog& acceleration(units::turns_per_second_squared_t acceleration) {
+    MotorLog& acceleration(wpi::units::turns_per_second_squared_t acceleration) {
       return value("acceleration", acceleration.value(), acceleration.name());
     }
 
@@ -140,7 +140,7 @@ class SysIdRoutineLog {
      * @param current The current to record.
      * @return The motor log (for call chaining).
      */
-    MotorLog& current(units::ampere_t current) {
+    MotorLog& current(wpi::units::ampere_t current) {
       return value("current", current.value(), current.name());
     }
 
@@ -197,4 +197,4 @@ class SysIdRoutineLog {
   bool m_stateInitialized = false;
   wpi::log::StringLogEntry m_state;
 };
-}  // namespace frc::sysid
+}  // namespace wpi::sysid

@@ -11,14 +11,14 @@
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
-namespace frc {
+namespace wpi {
 class AnalogInput;
 
 /**
  * Class for supporting continuous analog encoders, such as the US Digital MA3.
  */
-class AnalogEncoder : public wpi::Sendable,
-                      public wpi::SendableHelper<AnalogEncoder> {
+class AnalogEncoder : public wpi::util::Sendable,
+                      public wpi::util::SendableHelper<AnalogEncoder> {
  public:
   /**
    * Construct a new AnalogEncoder attached to a specific AnalogIn channel.
@@ -131,7 +131,7 @@ class AnalogEncoder : public wpi::Sendable,
    */
   int GetChannel() const;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
   void Init(double fullRange, double expectedZero);
@@ -144,7 +144,7 @@ class AnalogEncoder : public wpi::Sendable,
   double m_sensorMax{1.0};
   bool m_isInverted{false};
 
-  hal::SimDevice m_simDevice;
-  hal::SimDouble m_simPosition;
+  wpi::hal::SimDevice m_simDevice;
+  wpi::hal::SimDouble m_simPosition;
 };
-}  // namespace frc
+}  // namespace wpi

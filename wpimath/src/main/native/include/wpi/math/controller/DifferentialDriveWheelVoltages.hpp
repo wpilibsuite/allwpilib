@@ -6,20 +6,20 @@
 
 #include "wpi/units/voltage.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * Motor voltages for a differential drive.
  */
 struct DifferentialDriveWheelVoltages {
   /// Left wheel voltage.
-  units::volt_t left = 0_V;
+  wpi::units::volt_t left = 0_V;
 
   /// Right wheel voltage.
-  units::volt_t right = 0_V;
+  wpi::units::volt_t right = 0_V;
 };
 
-}  // namespace frc
+}  // namespace wpi::math
 
 #include "wpi/math/controller/proto/DifferentialDriveWheelVoltagesProto.hpp"
 #include "wpi/math/controller/struct/DifferentialDriveWheelVoltagesStruct.hpp"

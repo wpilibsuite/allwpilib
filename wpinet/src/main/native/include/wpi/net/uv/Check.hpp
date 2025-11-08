@@ -12,7 +12,7 @@
 #include "wpi/net/uv/Handle.hpp"
 #include "wpi/util/Signal.h"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 class Loop;
 
@@ -57,9 +57,9 @@ class Check final : public HandleImpl<Check, uv_check_t> {
   /**
    * Signal generated once per loop iteration after polling for I/O.
    */
-  sig::Signal<> check;
+  wpi::util::sig::Signal<> check;
 };
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_CHECK_HPP_

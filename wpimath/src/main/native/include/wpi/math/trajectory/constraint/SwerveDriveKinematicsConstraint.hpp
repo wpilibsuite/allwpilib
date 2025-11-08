@@ -11,7 +11,7 @@
 #include "wpi/units/math.hpp"
 #include "wpi/units/velocity.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * A class that enforces constraints on the swerve drive kinematics.
@@ -22,13 +22,13 @@ template <size_t NumModules>
 class SwerveDriveKinematicsConstraint : public TrajectoryConstraint {
  public:
   SwerveDriveKinematicsConstraint(
-      const frc::SwerveDriveKinematics<NumModules>& kinematics,
-      units::meters_per_second_t maxSpeed)
+      const wpi::math::SwerveDriveKinematics<NumModules>& kinematics,
+      wpi::units::meters_per_second_t maxSpeed)
       : m_kinematics(kinematics), m_maxSpeed(maxSpeed) {}
 
-  units::meters_per_second_t MaxVelocity(
-      const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t velocity) const override {
+  wpi::units::meters_per_second_t MaxVelocity(
+      const Pose2d& pose, wpi::units::curvature_t curvature,
+      wpi::units::meters_per_second_t velocity) const override {
     auto xVelocity = velocity * pose.Rotation().Cos();
     auto yVelocity = velocity * pose.Rotation().Sin();
     auto wheelSpeeds = m_kinematics.ToSwerveModuleStates(
@@ -37,17 +37,17 @@ class SwerveDriveKinematicsConstraint : public TrajectoryConstraint {
 
     auto normSpeeds = m_kinematics.ToChassisSpeeds(wheelSpeeds);
 
-    return units::math::hypot(normSpeeds.vx, normSpeeds.vy);
+    return wpi::units::math::hypot(normSpeeds.vx, normSpeeds.vy);
   }
 
-  MinMax MinMaxAcceleration(const Pose2d& pose, units::curvature_t curvature,
-                            units::meters_per_second_t speed) const override {
+  MinMax MinMaxAcceleration(const Pose2d& pose, wpi::units::curvature_t curvature,
+                            wpi::units::meters_per_second_t speed) const override {
     return {};
   }
 
  private:
-  frc::SwerveDriveKinematics<NumModules> m_kinematics;
-  units::meters_per_second_t m_maxSpeed;
+  wpi::math::SwerveDriveKinematics<NumModules> m_kinematics;
+  wpi::units::meters_per_second_t m_maxSpeed;
 };
 
-}  // namespace frc
+}  // namespace wpi::math

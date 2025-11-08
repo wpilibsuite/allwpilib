@@ -6,9 +6,9 @@
 
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
-void PIDController::InitSendable(wpi::SendableBuilder& builder) {
+void PIDController::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("PIDController");
   builder.AddDoubleProperty(
       "p", [this] { return GetP(); }, [this](double value) { SetP(value); });

@@ -8,7 +8,7 @@
 
 #include "wpi/hardware/motor/PWMMotorController.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * REV Robotics SPARK Motor Controller with PWM control.
@@ -40,4 +40,4 @@ class Spark : public PWMMotorController {
   Spark& operator=(Spark&&) = default;
 };
 
-}  // namespace frc
+}  // namespace wpi

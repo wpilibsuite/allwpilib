@@ -22,7 +22,7 @@
 #include "NetworkServer.hpp"
 #include "wpi/util/mutex.hpp"
 
-namespace nt {
+namespace wpi::nt {
 
 class InstanceImpl {
  public:
@@ -61,7 +61,7 @@ class InstanceImpl {
 
   ListenerStorage listenerStorage;
   LoggerImpl logger_impl;
-  wpi::Logger logger;
+  wpi::util::Logger logger;
   ConnectionList connectionList;
   LocalStorage localStorage;
   std::atomic<int> networkMode{NT_NET_MODE_NONE};
@@ -72,7 +72,7 @@ class InstanceImpl {
   static std::atomic<int> s_default;
   static constexpr int kNumInstances = 16;
   static std::atomic<InstanceImpl*> s_instances[kNumInstances];
-  static wpi::mutex s_mutex;
+  static wpi::util::mutex s_mutex;
 
   struct Cleanup {
     ~Cleanup() {
@@ -87,7 +87,7 @@ class InstanceImpl {
   };
   static Cleanup s_cleanup;
 
-  wpi::mutex m_mutex;
+  wpi::util::mutex m_mutex;
   std::shared_ptr<NetworkServer> m_networkServer;
   std::shared_ptr<INetworkClient> m_networkClient;
   std::vector<std::pair<std::string, unsigned int>> m_servers;
@@ -96,4 +96,4 @@ class InstanceImpl {
   int m_inst;
 };
 
-}  // namespace nt
+}  // namespace wpi::nt

@@ -12,7 +12,7 @@
 #include "wpi/units/velocity.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
-namespace frc {
+namespace wpi::math {
 /**
  * Represents the wheel speeds for a mecanum drive drivetrain.
  */
@@ -20,22 +20,22 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelSpeeds {
   /**
    * Speed of the front-left wheel.
    */
-  units::meters_per_second_t frontLeft = 0_mps;
+  wpi::units::meters_per_second_t frontLeft = 0_mps;
 
   /**
    * Speed of the front-right wheel.
    */
-  units::meters_per_second_t frontRight = 0_mps;
+  wpi::units::meters_per_second_t frontRight = 0_mps;
 
   /**
    * Speed of the rear-left wheel.
    */
-  units::meters_per_second_t rearLeft = 0_mps;
+  wpi::units::meters_per_second_t rearLeft = 0_mps;
 
   /**
    * Speed of the rear-right wheel.
    */
-  units::meters_per_second_t rearRight = 0_mps;
+  wpi::units::meters_per_second_t rearRight = 0_mps;
 
   /**
    * Renormalizes the wheel speeds if any individual speed is above the
@@ -51,13 +51,13 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelSpeeds {
    * @return Desaturated MecanumDriveWheelSpeeds.
    */
   constexpr MecanumDriveWheelSpeeds Desaturate(
-      units::meters_per_second_t attainableMaxSpeed) const {
-    std::array<units::meters_per_second_t, 4> wheelSpeeds{frontLeft, frontRight,
+      wpi::units::meters_per_second_t attainableMaxSpeed) const {
+    std::array<wpi::units::meters_per_second_t, 4> wheelSpeeds{frontLeft, frontRight,
                                                           rearLeft, rearRight};
-    units::meters_per_second_t realMaxSpeed = units::math::abs(
+    wpi::units::meters_per_second_t realMaxSpeed = wpi::units::math::abs(
         *std::max_element(wheelSpeeds.begin(), wheelSpeeds.end(),
                           [](const auto& a, const auto& b) {
-                            return units::math::abs(a) < units::math::abs(b);
+                            return wpi::units::math::abs(a) < wpi::units::math::abs(b);
                           }));
 
     if (realMaxSpeed > attainableMaxSpeed) {
@@ -143,7 +143,7 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelSpeeds {
     return operator*(1.0 / scalar);
   }
 };
-}  // namespace frc
+}  // namespace wpi::math
 
 #include "wpi/math/kinematics/proto/MecanumDriveWheelSpeedsProto.hpp"
 #include "wpi/math/kinematics/struct/MecanumDriveWheelSpeedsStruct.hpp"

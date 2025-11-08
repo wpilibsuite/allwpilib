@@ -13,23 +13,23 @@
 #include "wpi/util/SafeThread.hpp"
 #include "wpi/util/SmallPtrSet.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 namespace {
-class Thread : public wpi::SafeThread {
+class Thread : public wpi::util::SafeThread {
  public:
   Thread() {}
   void Main() override;
 };
 
 void Thread::Main() {
-  wpi::Event event{false, false};
+  wpi::util::Event event{false, false};
   HAL_ProvideNewDataEventHandle(event.GetHandle());
 
   int safetyCounter = 0;
   while (m_active) {
     bool timedOut = false;
-    bool signaled = wpi::WaitForObject(event.GetHandle(), 0.1, &timedOut);
+    bool signaled = wpi::util::WaitForObject(event.GetHandle(), 0.1, &timedOut);
     if (signaled) {
       HAL_ControlWord controlWord;
       std::memset(&controlWord, 0, sizeof(controlWord));
@@ -56,9 +56,9 @@ namespace {
 struct MotorSafetyManager {
   ~MotorSafetyManager() { gShutdown = true; }
 
-  wpi::SafeThreadOwner<Thread> thread;
-  wpi::SmallPtrSet<MotorSafety*, 32> instanceList;
-  wpi::mutex listMutex;
+  wpi::util::SafeThreadOwner<Thread> thread;
+  wpi::util::SmallPtrSet<MotorSafety*, 32> instanceList;
+  wpi::util::mutex listMutex;
   bool threadStarted = false;
 };
 }  // namespace
@@ -69,17 +69,17 @@ static MotorSafetyManager& GetManager() {
 }
 
 #ifndef __FRC_SYSTEMCORE__
-namespace frc::impl {
+namespace wpi::impl {
 void ResetMotorSafety() {
   auto& manager = GetManager();
   std::scoped_lock lock(manager.listMutex);
   manager.instanceList.clear();
   manager.thread.Stop();
   manager.thread.Join();
-  manager.thread = wpi::SafeThreadOwner<Thread>{};
+  manager.thread = wpi::util::SafeThreadOwner<Thread>{};
   manager.threadStarted = false;
 }
-}  // namespace frc::impl
+}  // namespace wpi::impl
 #endif
 
 MotorSafety::MotorSafety() {
@@ -118,12 +118,12 @@ void MotorSafety::Feed() {
   m_stopTime = Timer::GetFPGATimestamp() + m_expiration;
 }
 
-void MotorSafety::SetExpiration(units::second_t expirationTime) {
+void MotorSafety::SetExpiration(wpi::units::second_t expirationTime) {
   std::scoped_lock lock(m_thisMutex);
   m_expiration = expirationTime;
 }
 
-units::second_t MotorSafety::GetExpiration() const {
+wpi::units::second_t MotorSafety::GetExpiration() const {
   std::scoped_lock lock(m_thisMutex);
   return m_expiration;
 }
@@ -145,7 +145,7 @@ bool MotorSafety::IsSafetyEnabled() const {
 
 void MotorSafety::Check() {
   bool enabled;
-  units::second_t stopTime;
+  wpi::units::second_t stopTime;
 
   {
     std::scoped_lock lock(m_thisMutex);
@@ -165,7 +165,7 @@ void MotorSafety::Check() {
 
     try {
       StopMotor();
-    } catch (frc::RuntimeError& e) {
+    } catch (wpi::RuntimeError& e) {
       e.Report();
     } catch (std::exception& e) {
       FRC_ReportError(err::Error, "{} StopMotor threw unexpected exception: {}",

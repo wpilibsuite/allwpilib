@@ -8,7 +8,7 @@
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Class to read a digital input.
@@ -19,8 +19,8 @@ namespace frc {
  * as required. This class is only for devices like switches etc. that aren't
  * implemented anywhere else.
  */
-class DigitalInput : public wpi::Sendable,
-                     public wpi::SendableHelper<DigitalInput> {
+class DigitalInput : public wpi::util::Sendable,
+                     public wpi::util::SendableHelper<DigitalInput> {
  public:
   /**
    * Create an instance of a Digital Input class.
@@ -55,11 +55,11 @@ class DigitalInput : public wpi::Sendable,
    */
   void SetSimDevice(HAL_SimDeviceHandle device);
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
   int m_channel;
-  hal::Handle<HAL_DigitalHandle, HAL_FreeDIOPort> m_handle;
+  wpi::hal::Handle<HAL_DigitalHandle, HAL_FreeDIOPort> m_handle;
 };
 
-}  // namespace frc
+}  // namespace wpi

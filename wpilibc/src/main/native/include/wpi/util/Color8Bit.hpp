@@ -15,7 +15,7 @@
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/ct_string.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Represents colors that can be used with Addressable LEDs.
@@ -57,19 +57,19 @@ class Color8Bit {
    */
   explicit constexpr Color8Bit(std::string_view hexString) {
     if (hexString.length() != 7 || !hexString.starts_with("#") ||
-        !wpi::isHexDigit(hexString[1]) || !wpi::isHexDigit(hexString[2]) ||
-        !wpi::isHexDigit(hexString[3]) || !wpi::isHexDigit(hexString[4]) ||
-        !wpi::isHexDigit(hexString[5]) || !wpi::isHexDigit(hexString[6])) {
+        !wpi::util::isHexDigit(hexString[1]) || !wpi::util::isHexDigit(hexString[2]) ||
+        !wpi::util::isHexDigit(hexString[3]) || !wpi::util::isHexDigit(hexString[4]) ||
+        !wpi::util::isHexDigit(hexString[5]) || !wpi::util::isHexDigit(hexString[6])) {
       throw std::invalid_argument(
           fmt::format("Invalid hex string for Color \"{}\"", hexString));
     }
 
-    red = wpi::hexDigitValue(hexString[1]) * 16 +
-          wpi::hexDigitValue(hexString[2]);
-    green = wpi::hexDigitValue(hexString[3]) * 16 +
-            wpi::hexDigitValue(hexString[4]);
-    blue = wpi::hexDigitValue(hexString[5]) * 16 +
-           wpi::hexDigitValue(hexString[6]);
+    red = wpi::util::hexDigitValue(hexString[1]) * 16 +
+          wpi::util::hexDigitValue(hexString[2]);
+    green = wpi::util::hexDigitValue(hexString[3]) * 16 +
+            wpi::util::hexDigitValue(hexString[4]);
+    blue = wpi::util::hexDigitValue(hexString[5]) * 16 +
+           wpi::util::hexDigitValue(hexString[6]);
   }
 
   constexpr bool operator==(const Color8Bit&) const = default;
@@ -87,19 +87,19 @@ class Color8Bit {
    */
   static constexpr Color8Bit FromHexString(std::string_view hexString) {
     if (hexString.length() != 7 || !hexString.starts_with("#") ||
-        !wpi::isHexDigit(hexString[1]) || !wpi::isHexDigit(hexString[2]) ||
-        !wpi::isHexDigit(hexString[3]) || !wpi::isHexDigit(hexString[4]) ||
-        !wpi::isHexDigit(hexString[5]) || !wpi::isHexDigit(hexString[6])) {
+        !wpi::util::isHexDigit(hexString[1]) || !wpi::util::isHexDigit(hexString[2]) ||
+        !wpi::util::isHexDigit(hexString[3]) || !wpi::util::isHexDigit(hexString[4]) ||
+        !wpi::util::isHexDigit(hexString[5]) || !wpi::util::isHexDigit(hexString[6])) {
       throw std::invalid_argument(
           fmt::format("Invalid hex string for Color \"{}\"", hexString));
     }
 
-    int r = wpi::hexDigitValue(hexString[0]) * 16 +
-            wpi::hexDigitValue(hexString[1]);
-    int g = wpi::hexDigitValue(hexString[2]) * 16 +
-            wpi::hexDigitValue(hexString[3]);
-    int b = wpi::hexDigitValue(hexString[4]) * 16 +
-            wpi::hexDigitValue(hexString[5]);
+    int r = wpi::util::hexDigitValue(hexString[0]) * 16 +
+            wpi::util::hexDigitValue(hexString[1]);
+    int g = wpi::util::hexDigitValue(hexString[2]) * 16 +
+            wpi::util::hexDigitValue(hexString[3]);
+    int b = wpi::util::hexDigitValue(hexString[4]) * 16 +
+            wpi::util::hexDigitValue(hexString[5]);
     return Color8Bit{r, g, b};
   }
 
@@ -109,10 +109,10 @@ class Color8Bit {
    * @return a string of the format <tt>\#RRGGBB</tt>
    */
   constexpr auto HexString() const {
-    return wpi::ct_string<char, std::char_traits<char>, 7>{
-        {'#', wpi::hexdigit(red / 16), wpi::hexdigit(red % 16),
-         wpi::hexdigit(green / 16), wpi::hexdigit(green % 16),
-         wpi::hexdigit(blue / 16), wpi::hexdigit(blue % 16)}};
+    return wpi::util::ct_string<char, std::char_traits<char>, 7>{
+        {'#', wpi::util::hexdigit(red / 16), wpi::util::hexdigit(red % 16),
+         wpi::util::hexdigit(green / 16), wpi::util::hexdigit(green % 16),
+         wpi::util::hexdigit(blue / 16), wpi::util::hexdigit(blue % 16)}};
   }
 
   /// Red component (0-255).
@@ -125,4 +125,4 @@ class Color8Bit {
   int blue = 0;
 };
 
-}  // namespace frc
+}  // namespace wpi

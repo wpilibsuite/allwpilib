@@ -14,7 +14,7 @@
 
 struct ImVec2;
 
-namespace glass {
+namespace wpi::glass {
 class DoubleSource;
 class DriveModel : public Model {
  public:
@@ -37,4 +37,4 @@ class DriveModel : public Model {
   virtual double GetRotation() const = 0;
 };
 void DisplayDrive(DriveModel* m);
-}  // namespace glass
+}  // namespace wpi::glass

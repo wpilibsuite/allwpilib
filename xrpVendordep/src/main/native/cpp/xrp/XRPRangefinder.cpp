@@ -4,8 +4,8 @@
 
 #include "wpi/xrp/XRPRangefinder.hpp"
 
-using namespace frc;
+using namespace wpi::xrp;
 
-units::meter_t XRPRangefinder::GetDistance() const {
-  return units::meter_t{m_rangefinder.GetVoltage() / 5.0 * 4.0};
+wpi::units::meter_t XRPRangefinder::GetDistance() const {
+  return wpi::units::meter_t{m_rangefinder.GetVoltage() / 5.0 * 4.0};
 }

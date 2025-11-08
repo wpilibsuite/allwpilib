@@ -6,6 +6,6 @@
 #include "wpi/util/print.hpp"
 
 int main() {
-  wpi::print("Hello World\n");
-  wpi::print("{}\n", static_cast<int32_t>(HAL_GetRuntimeType()));
+  wpi::util::print("Hello World\n");
+  wpi::util::print("{}\n", static_cast<int32_t>(HAL_GetRuntimeType()));
 }

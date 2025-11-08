@@ -9,7 +9,7 @@
 #include "WebSocketTest.hpp"
 #include "wpi/util/SmallString.hpp"
 
-namespace wpi {
+namespace wpi::net {
 
 class WebSocketIntegrationTest : public WebSocketTest {};
 
@@ -199,4 +199,4 @@ TEST_F(WebSocketIntegrationTest, ServerSendPing) {
   ASSERT_EQ(gotData, 2);
 }
 
-}  // namespace wpi
+}  // namespace wpi::net

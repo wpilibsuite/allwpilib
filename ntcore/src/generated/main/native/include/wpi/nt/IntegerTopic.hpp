@@ -19,12 +19,12 @@
 #include "wpi/nt/Topic.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
 
-namespace wpi {
+namespace wpi::util {
 template <typename T>
 class SmallVectorImpl;
 }  // namespace wpi
 
-namespace nt {
+namespace wpi::nt {
 
 class IntegerTopic;
 
@@ -70,7 +70,7 @@ class IntegerSubscriber : public Subscriber {
    * @return value
    */
   ValueType Get(ParamType defaultValue) const {
-    return ::nt::GetInteger(m_subHandle, defaultValue);
+    return ::wpi::nt::GetInteger(m_subHandle, defaultValue);
   }
 
   /**
@@ -93,7 +93,7 @@ class IntegerSubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueType GetAtomic(ParamType defaultValue) const {
-    return ::nt::GetAtomicInteger(m_subHandle, defaultValue);
+    return ::wpi::nt::GetAtomicInteger(m_subHandle, defaultValue);
   }
 
   /**
@@ -107,7 +107,7 @@ class IntegerSubscriber : public Subscriber {
    *     been published since the previous call.
    */
   std::vector<TimestampedValueType> ReadQueue() {
-    return ::nt::ReadQueueInteger(m_subHandle);
+    return ::wpi::nt::ReadQueueInteger(m_subHandle);
   }
 
   /**
@@ -149,7 +149,7 @@ class IntegerPublisher : public Publisher {
    * @param time timestamp; 0 indicates current NT time should be used
    */
   void Set(ParamType value, int64_t time = 0) {
-    ::nt::SetInteger(m_pubHandle, value, time);
+    ::wpi::nt::SetInteger(m_pubHandle, value, time);
   }
 
   /**
@@ -160,7 +160,7 @@ class IntegerPublisher : public Publisher {
    * @param value value
    */
   void SetDefault(ParamType value) {
-    ::nt::SetDefaultInteger(m_pubHandle, value);
+    ::wpi::nt::SetDefaultInteger(m_pubHandle, value);
   }
 
   /**
@@ -225,7 +225,7 @@ class IntegerEntry final : public IntegerSubscriber,
    * Stops publishing the entry if it's published.
    */
   void Unpublish() {
-    ::nt::Unpublish(m_pubHandle);
+    ::wpi::nt::Unpublish(m_pubHandle);
   }
 };
 
@@ -280,7 +280,7 @@ class IntegerTopic final : public Topic {
       ParamType defaultValue,
       const PubSubOptions& options = kDefaultPubSubOptions) {
     return IntegerSubscriber{
-        ::nt::Subscribe(m_handle, NT_INTEGER, "int", options),
+        ::wpi::nt::Subscribe(m_handle, NT_INTEGER, "int", options),
         defaultValue};
   }
   /**
@@ -304,7 +304,7 @@ class IntegerTopic final : public Topic {
       std::string_view typeString, ParamType defaultValue,
       const PubSubOptions& options = kDefaultPubSubOptions) {
     return IntegerSubscriber{
-        ::nt::Subscribe(m_handle, NT_INTEGER, typeString, options),
+        ::wpi::nt::Subscribe(m_handle, NT_INTEGER, typeString, options),
         defaultValue};
   }
 
@@ -326,7 +326,7 @@ class IntegerTopic final : public Topic {
   [[nodiscard]]
   PublisherType Publish(const PubSubOptions& options = kDefaultPubSubOptions) {
     return IntegerPublisher{
-        ::nt::Publish(m_handle, NT_INTEGER, "int", options)};
+        ::wpi::nt::Publish(m_handle, NT_INTEGER, "int", options)};
   }
 
   /**
@@ -349,9 +349,9 @@ class IntegerTopic final : public Topic {
    */
   [[nodiscard]]
   PublisherType PublishEx(std::string_view typeString,
-    const wpi::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
+    const wpi::util::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
     return IntegerPublisher{
-        ::nt::PublishEx(m_handle, NT_INTEGER, typeString, properties, options)};
+        ::wpi::nt::PublishEx(m_handle, NT_INTEGER, typeString, properties, options)};
   }
 
   /**
@@ -378,7 +378,7 @@ class IntegerTopic final : public Topic {
   EntryType GetEntry(ParamType defaultValue,
                      const PubSubOptions& options = kDefaultPubSubOptions) {
     return IntegerEntry{
-        ::nt::GetEntry(m_handle, NT_INTEGER, "int", options),
+        ::wpi::nt::GetEntry(m_handle, NT_INTEGER, "int", options),
         defaultValue};
   }
   /**
@@ -406,22 +406,22 @@ class IntegerTopic final : public Topic {
   EntryType GetEntryEx(std::string_view typeString, ParamType defaultValue,
                        const PubSubOptions& options = kDefaultPubSubOptions) {
     return IntegerEntry{
-        ::nt::GetEntry(m_handle, NT_INTEGER, typeString, options),
+        ::wpi::nt::GetEntry(m_handle, NT_INTEGER, typeString, options),
         defaultValue};
   }
 
 };
 
 inline IntegerTopic IntegerSubscriber::GetTopic() const {
-  return IntegerTopic{::nt::GetTopicFromHandle(m_subHandle)};
+  return IntegerTopic{::wpi::nt::GetTopicFromHandle(m_subHandle)};
 }
 
 inline IntegerTopic IntegerPublisher::GetTopic() const {
-  return IntegerTopic{::nt::GetTopicFromHandle(m_pubHandle)};
+  return IntegerTopic{::wpi::nt::GetTopicFromHandle(m_pubHandle)};
 }
 
 inline IntegerTopic IntegerEntry::GetTopic() const {
-  return IntegerTopic{::nt::GetTopicFromHandle(m_subHandle)};
+  return IntegerTopic{::wpi::nt::GetTopicFromHandle(m_subHandle)};
 }
 
-}  // namespace nt
+}  // namespace wpi::nt

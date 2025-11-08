@@ -87,7 +87,7 @@
 //	STRING FORMATTER
 //------------------------------
 
-namespace units
+namespace wpi::units
 {
   namespace detail
   {
@@ -107,7 +107,7 @@ namespace units
   }
 }
 
-namespace units
+namespace wpi::units
 {
 	template<typename T> constexpr const char* name(const T&);
 	template<typename T> constexpr const char* abbreviation(const T&);
@@ -128,7 +128,7 @@ namespace units
  * @param		namePlural - plural version of the unit name, e.g. 'meters'
  * @param		abbreviation - abbreviated unit name, e.g. 'm'
  * @param		definition - the variadic parameter is used for the definition of the unit
- *				(e.g. `unit<std::ratio<1>, units::category::length_unit>`)
+ *				(e.g. `unit<std::ratio<1>, wpi::units::category::length_unit>`)
  * @note		a variadic template is used for the definition to allow templates with
  *				commas to be easily expanded. All the variadic 'arguments' should together
  *				comprise the unit definition.
@@ -181,12 +181,12 @@ namespace units
 	#define UNIT_ADD_IO(namespaceName, nameSingular, abbrev)\
 	}\
 	template <>\
-	struct fmt::formatter<units::namespaceName::nameSingular ## _t> \
+	struct fmt::formatter<wpi::units::namespaceName::nameSingular ## _t> \
 		: fmt::formatter<double> \
 	{\
 		template <typename FmtContext>\
 		auto format(\
-				const units::namespaceName::nameSingular ## _t& obj,\
+				const wpi::units::namespaceName::nameSingular ## _t& obj,\
 				FmtContext& ctx) const\
 		{\
 			auto out = ctx.out();\
@@ -194,13 +194,13 @@ namespace units
 			return fmt::format_to(out, " " #abbrev);\
 		}\
 	};\
-	namespace units\
+	namespace wpi::units\
 	{\
 	namespace namespaceName\
 	{\
 		inline std::string to_string(const nameSingular ## _t& obj)\
 		{\
-			return units::detail::to_string(obj()) + std::string(" "#abbrev);\
+			return wpi::units::detail::to_string(obj()) + std::string(" "#abbrev);\
 		}\
 	}
 #elif defined(UNIT_LIB_ENABLE_IOSTREAM)
@@ -213,7 +213,7 @@ namespace units
 		}\
 		inline std::string to_string(const nameSingular ## _t& obj)\
 		{\
-			return units::detail::to_string(obj()) + std::string(" "#abbrev);\
+			return wpi::units::detail::to_string(obj()) + std::string(" "#abbrev);\
 		}\
 	}
 #else
@@ -226,7 +226,7 @@ namespace units
   * @details	The macro generates names for units. E.g. name() of 1_m would be "meter", and
   *				abbreviation would be "m".
   * @param		namespaceName namespace in which the new units will be encapsulated. All literal values
-  *				are placed in the `units::literals` namespace.
+  *				are placed in the `wpi::units::literals` namespace.
   * @param		nameSingular singular version of the unit name, e.g. 'meter'
   * @param		abbreviation - abbreviated unit name, e.g. 'm'
   */
@@ -246,7 +246,7 @@ template<> constexpr const char* abbreviation(const namespaceName::nameSingular 
  * @details		The macro generates user-defined literals for units. A literal suffix is created
  *				using the abbreviation (e.g. `10.0_m`).
  * @param		namespaceName namespace in which the new units will be encapsulated. All literal values
- *				are placed in the `units::literals` namespace.
+ *				are placed in the `wpi::units::literals` namespace.
  * @param		nameSingular singular version of the unit name, e.g. 'meter'
  * @param		abbreviation - abbreviated unit name, e.g. 'm'
  * @note		When UNIT_HAS_LITERAL_SUPPORT is not defined, the macro does not generate any code
@@ -277,12 +277,12 @@ template<> constexpr const char* abbreviation(const namespaceName::nameSingular 
  *				using the abbreviation (e.g. `10.0_m`). It also defines a class-specific
  *				cout function which prints both the value and abbreviation of the unit when invoked.
  * @param		namespaceName namespace in which the new units will be encapsulated. All literal values
- *				are placed in the `units::literals` namespace.
+ *				are placed in the `wpi::units::literals` namespace.
  * @param		nameSingular singular version of the unit name, e.g. 'meter'
  * @param		namePlural - plural version of the unit name, e.g. 'meters'
  * @param		abbreviation - abbreviated unit name, e.g. 'm'
  * @param		definition - the variadic parameter is used for the definition of the unit
- *				(e.g. `unit<std::ratio<1>, units::category::length_unit>`)
+ *				(e.g. `unit<std::ratio<1>, wpi::units::category::length_unit>`)
  * @note		a variadic template is used for the definition to allow templates with
  *				commas to be easily expanded. All the variadic 'arguments' should together
  *				comprise the unit definition.
@@ -303,13 +303,13 @@ template<> constexpr const char* abbreviation(const namespaceName::nameSingular 
  *				using the abbreviation (e.g. `10.0_m`). It also defines a class-specific
  *				cout function which prints both the value and abbreviation of the unit when invoked.
  * @param		namespaceName namespace in which the new units will be encapsulated. All literal values
- *				are placed in the `units::literals` namespace.
+ *				are placed in the `wpi::units::literals` namespace.
  * @param		nameSingular singular version of the unit name, e.g. 'meter'
  * @param		namePlural - plural version of the unit name, e.g. 'meters'
  * @param		abbreviation - abbreviated unit name, e.g. 'm'
  * @param		underlyingType - the underlying type, e.g. 'int' or 'float'
  * @param		definition - the variadic parameter is used for the definition of the unit
- *				(e.g. `unit<std::ratio<1>, units::category::length_unit>`)
+ *				(e.g. `unit<std::ratio<1>, wpi::units::category::length_unit>`)
  * @note		a variadic template is used for the definition to allow templates with
  *				commas to be easily expanded. All the variadic 'arguments' should together
  *				comprise the unit definition.
@@ -325,14 +325,14 @@ template<> constexpr const char* abbreviation(const namespaceName::nameSingular 
  * @brief		Macro to create decibel container and literals for an existing unit type.
  * @details		This macro generates the decibel unit container, cout overload, and literal definitions.
  * @param		namespaceName namespace in which the new units will be encapsulated. All literal values
- *				are placed in the `units::literals` namespace.
+ *				are placed in the `wpi::units::literals` namespace.
  * @param		nameSingular singular version of the base unit name, e.g. 'watt'
  * @param		abbreviation - abbreviated decibel unit name, e.g. 'dBW'
  */
 #define UNIT_ADD_DECIBEL(namespaceName, nameSingular, abbreviation)\
 	namespace namespaceName\
 	{\
-		/** @name Unit Containers */ /** @{ */ typedef unit_t<nameSingular, UNIT_LIB_DEFAULT_TYPE, units::decibel_scale> abbreviation ## _t; /** @} */\
+		/** @name Unit Containers */ /** @{ */ typedef unit_t<nameSingular, UNIT_LIB_DEFAULT_TYPE, wpi::units::decibel_scale> abbreviation ## _t; /** @} */\
 	}\
 	UNIT_ADD_IO(namespaceName, abbreviation, abbreviation)\
 	UNIT_ADD_LITERALS(namespaceName, abbreviation, abbreviation)
@@ -354,9 +354,9 @@ template<> constexpr const char* abbreviation(const namespaceName::nameSingular 
 		{\
 			template<typename T> struct is_ ## unitCategory ## _unit_impl : std::false_type {};\
 			template<typename C, typename U, typename P, typename T>\
-			struct is_ ## unitCategory ## _unit_impl<units::unit<C, U, P, T>> : std::is_same<units::traits::base_unit_of<typename units::traits::unit_traits<units::unit<C, U, P, T>>::base_unit_type>, units::category::unitCategory ## _unit>::type {};\
+			struct is_ ## unitCategory ## _unit_impl<wpi::units::unit<C, U, P, T>> : std::is_same<wpi::units::traits::base_unit_of<typename wpi::units::traits::unit_traits<wpi::units::unit<C, U, P, T>>::base_unit_type>, wpi::units::category::unitCategory ## _unit>::type {};\
 			template<typename U, typename S, template<typename> class N>\
-			struct is_ ## unitCategory ## _unit_impl<units::unit_t<U, S, N>> : std::is_same<units::traits::base_unit_of<typename units::traits::unit_t_traits<units::unit_t<U, S, N>>::unit_type>, units::category::unitCategory ## _unit>::type {};\
+			struct is_ ## unitCategory ## _unit_impl<wpi::units::unit_t<U, S, N>> : std::is_same<wpi::units::traits::base_unit_of<typename wpi::units::traits::unit_t_traits<wpi::units::unit_t<U, S, N>>::unit_type>, wpi::units::category::unitCategory ## _unit>::type {};\
 		}\
 		/** @endcond */\
 	}
@@ -364,7 +364,7 @@ template<> constexpr const char* abbreviation(const namespaceName::nameSingular 
 #define UNIT_ADD_IS_UNIT_CATEGORY_TRAIT(unitCategory)\
 	namespace traits\
 	{\
-		template<typename... T> struct is_ ## unitCategory ## _unit : std::integral_constant<bool, units::all_true<units::traits::detail::is_ ## unitCategory ## _unit_impl<std::decay_t<T>>::value...>::value> {};\
+		template<typename... T> struct is_ ## unitCategory ## _unit : std::integral_constant<bool, wpi::units::all_true<wpi::units::traits::detail::is_ ## unitCategory ## _unit_impl<std::decay_t<T>>::value...>::value> {};\
 		template<typename... T> constexpr bool is_ ## unitCategory ## _unit_v = is_ ## unitCategory ## _unit<T...>::value;\
 	}\
 	template <typename T>\
@@ -386,12 +386,12 @@ template<> constexpr const char* abbreviation(const namespaceName::nameSingular 
  *				it also creates corresponding units with metric suffixes such as `millimeters`, and `millimeter_t`), as well as the
  *				literal suffixes (e.g. `10.0_mm`).
  * @param		namespaceName namespace in which the new units will be encapsulated. All literal values
- *				are placed in the `units::literals` namespace.
+ *				are placed in the `wpi::units::literals` namespace.
  * @param		nameSingular singular version of the unit name, e.g. 'meter'
  * @param		namePlural - plural version of the unit name, e.g. 'meters'
  * @param		abbreviation - abbreviated unit name, e.g. 'm'
  * @param		definition - the variadic parameter is used for the definition of the unit
- *				(e.g. `unit<std::ratio<1>, units::category::length_unit>`)
+ *				(e.g. `unit<std::ratio<1>, wpi::units::category::length_unit>`)
  * @note		a variadic template is used for the definition to allow templates with
  *				commas to be easily expanded. All the variadic 'arguments' should together
  *				comprise the unit definition.
@@ -421,12 +421,12 @@ template<> constexpr const char* abbreviation(const namespaceName::nameSingular 
   *				it also creates corresponding units with metric suffixes such as `millimeters`, and `millimeter_t`), as well as the
   *				literal suffixes (e.g. `10.0_B`).
   * @param		namespaceName namespace in which the new units will be encapsulated. All literal values
-  *				are placed in the `units::literals` namespace.
+  *				are placed in the `wpi::units::literals` namespace.
   * @param		nameSingular singular version of the unit name, e.g. 'byte'
   * @param		namePlural - plural version of the unit name, e.g. 'bytes'
   * @param		abbreviation - abbreviated unit name, e.g. 'B'
   * @param		definition - the variadic parameter is used for the definition of the unit
-  *				(e.g. `unit<std::ratio<1>, units::category::data_unit>`)
+  *				(e.g. `unit<std::ratio<1>, wpi::units::category::data_unit>`)
   * @note		a variadic template is used for the definition to allow templates with
   *				commas to be easily expanded. All the variadic 'arguments' should together
   *				comprise the unit definition.
@@ -445,10 +445,10 @@ template<> constexpr const char* abbreviation(const namespaceName::nameSingular 
 //--------------------
 
 /**
- * @namespace units
+ * @namespace wpi::units
  * @brief Unit Conversion Library namespace
  */
-namespace units
+namespace wpi::units
 {
 	//----------------------------------
 	//	DOXYGEN
@@ -553,7 +553,7 @@ namespace units
 	 *				whether `class T` has a numerator static member.
 	 */
 	template<class T>
-	struct has_num : units::detail::has_num_impl<T>::type {};
+	struct has_num : wpi::units::detail::has_num_impl<T>::type {};
 
 	namespace detail
 	{
@@ -576,7 +576,7 @@ namespace units
 	 *				whether `class T` has a denominator static member.
 	 */
 	template<class T>
-	struct has_den : units::detail::has_den_impl<T>::type {};
+	struct has_den : wpi::units::detail::has_den_impl<T>::type {};
 
 	/** @endcond */	// END DOXYGEN IGNORE
 
@@ -617,7 +617,7 @@ namespace units
 	 * @brief		Trait which tests that a set of other traits are all true.
 	 */
 	template<bool... Args>
-	struct all_true : std::is_same<units::bool_pack<true, Args...>, units::bool_pack<Args..., true>> {};
+	struct all_true : std::is_same<wpi::units::bool_pack<true, Args...>, wpi::units::bool_pack<Args..., true>> {};
 	template<bool... Args>
 	constexpr bool all_true_t_v = all_true<Args...>::type::value;
 	/** @endcond */	// DOXYGEN IGNORE
@@ -693,7 +693,7 @@ namespace units
 		 *				whether `class T` implements a `base_unit`.
 		 */
 		template<class T>
-		struct is_base_unit : std::is_base_of<units::detail::_base_unit_t, T> {};
+		struct is_base_unit : std::is_base_of<wpi::units::detail::_base_unit_t, T> {};
 	}
 
 	/** @cond */	// DOXYGEN IGNORE
@@ -719,7 +719,7 @@ namespace units
 		 *				whether `class T` implements a `unit`.
 		 */
 		template<class T>
-		struct is_unit : std::is_base_of<units::detail::_unit, T>::type {};
+		struct is_unit : std::is_base_of<wpi::units::detail::_unit, T>::type {};
 		template<class T>
 		constexpr bool is_unit_v = is_unit<T>::value;
 	}
@@ -757,7 +757,7 @@ namespace units
 	class Mole = std::ratio<0>,
 	class Candela = std::ratio<0>,
 	class Byte = std::ratio<0>>
-	struct base_unit : units::detail::_base_unit_t
+	struct base_unit : wpi::units::detail::_base_unit_t
 	{
 		static_assert(traits::is_ratio<Meter>::value, "Template parameter `Meter` must be a `std::ratio` representing the exponent of meters the unit has");
 		static_assert(traits::is_ratio<Kilogram>::value, "Template parameter `Kilogram` must be a `std::ratio` representing the exponent of kilograms the unit has");
@@ -851,13 +851,13 @@ namespace units
 	 */
 	template <class, class, class, class> struct unit;
 	template<class Conversion, class... Exponents, class PiExponent, class Translation>
-	struct unit<Conversion, base_unit<Exponents...>, PiExponent, Translation> : units::detail::_unit
+	struct unit<Conversion, base_unit<Exponents...>, PiExponent, Translation> : wpi::units::detail::_unit
 	{
 		static_assert(traits::is_ratio<Conversion>::value, "Template parameter `Conversion` must be a `std::ratio` representing the conversion factor to `BaseUnit`.");
 		static_assert(traits::is_ratio<PiExponent>::value, "Template parameter `PiExponent` must be a `std::ratio` representing the exponents of Pi the unit has.");
 		static_assert(traits::is_ratio<Translation>::value, "Template parameter `Translation` must be a `std::ratio` representing an additive translation required by the unit conversion.");
 
-		typedef typename units::base_unit<Exponents...> base_unit_type;
+		typedef typename wpi::units::base_unit<Exponents...> base_unit_type;
 		typedef Conversion conversion_ratio;
 		typedef Translation translation_ratio;
 		typedef PiExponent pi_exponent_ratio;
@@ -876,7 +876,7 @@ namespace units
 	 *				- a ratio representing a datum translation required for the conversion (e.g. `std::ratio<32>` for a fahrenheit to celsius conversion)
 	 *
 	 *				Typically, a specific unit, like `meters`, would be implemented as a type alias
-	 *				of `unit`, i.e. `using meters = unit<std::ratio<1>, units::category::length_unit`, or
+	 *				of `unit`, i.e. `using meters = unit<std::ratio<1>, wpi::units::category::length_unit`, or
 	 *				`using inches = unit<std::ratio<1,12>, feet>`.
 	 * @tparam		Conversion	std::ratio representing scalar multiplication factor.
 	 * @tparam		BaseUnit	Unit type which this unit is derived from. May be a `base_unit`, or another `unit`.
@@ -884,13 +884,13 @@ namespace units
 	 * @tparam		Translation	std::ratio representing any datum translation required by the conversion.
 	 */
 	template<class Conversion, class BaseUnit, class PiExponent = std::ratio<0>, class Translation = std::ratio<0>>
-	struct unit : units::detail::_unit
+	struct unit : wpi::units::detail::_unit
 	{
 		static_assert(traits::is_unit<BaseUnit>::value, "Template parameter `BaseUnit` must be a `unit` type.");
 		static_assert(traits::is_ratio<Conversion>::value, "Template parameter `Conversion` must be a `std::ratio` representing the conversion factor to `BaseUnit`.");
 		static_assert(traits::is_ratio<PiExponent>::value, "Template parameter `PiExponent` must be a `std::ratio` representing the exponents of Pi the unit has.");
 
-		typedef typename units::traits::unit_traits<BaseUnit>::base_unit_type base_unit_type;
+		typedef typename wpi::units::traits::unit_traits<BaseUnit>::base_unit_type base_unit_type;
 		typedef typename std::ratio_multiply<typename BaseUnit::conversion_ratio, Conversion> conversion_ratio;
 		typedef typename std::ratio_add<typename BaseUnit::pi_exponent_ratio, PiExponent> pi_exponent_ratio;
 		typedef typename std::ratio_add<std::ratio_multiply<typename BaseUnit::conversion_ratio, Translation>, typename BaseUnit::translation_ratio> translation_ratio;
@@ -933,7 +933,7 @@ namespace units
 		 *				Since compatible
 		 */
 		template<class U>
-		using base_unit_of = typename units::detail::base_unit_of_impl<U>::type;
+		using base_unit_of = typename wpi::units::detail::base_unit_of_impl<U>::type;
 	}
 
 	/** @cond */	// DOXYGEN IGNORE
@@ -1122,8 +1122,8 @@ namespace units
 		struct inverse_impl
 		{
 			using type = unit < std::ratio<Unit::conversion_ratio::den, Unit::conversion_ratio::num>,
-				inverse_base<traits::base_unit_of<typename units::traits::unit_traits<Unit>::base_unit_type>>,
-				std::ratio_multiply<typename units::traits::unit_traits<Unit>::pi_exponent_ratio, std::ratio<-1>>,
+				inverse_base<traits::base_unit_of<typename wpi::units::traits::unit_traits<Unit>::base_unit_type>>,
+				std::ratio_multiply<typename wpi::units::traits::unit_traits<Unit>::pi_exponent_ratio, std::ratio<-1>>,
 				std::ratio < 0 >> ;	// inverses are rates or change, the translation factor goes away.
 		};
 	}
@@ -1135,7 +1135,7 @@ namespace units
 	 * @tparam		U	`unit` type to invert.
 	 * @details		E.g. `inverse<meters>` will represent meters^-1 (i.e. 1/meters).
 	 */
-	template<class U> using inverse = typename units::detail::inverse_impl<U>::type;
+	template<class U> using inverse = typename wpi::units::detail::inverse_impl<U>::type;
 
 	/** @cond */	// DOXYGEN IGNORE
 	namespace detail
@@ -1166,7 +1166,7 @@ namespace units
 	 * @details		E.g. `square<meters>` will represent meters^2.
 	 */
 	template<class U>
-	using squared = typename units::detail::squared_impl<U>::type;
+	using squared = typename wpi::units::detail::squared_impl<U>::type;
 
 	/** @cond */	// DOXYGEN IGNORE
 	namespace detail
@@ -1196,7 +1196,7 @@ namespace units
 	 * @details		E.g. `cubed<meters>` will represent meters^3.
 	 */
 	template<class U>
-	using cubed = typename units::detail::cubed_impl<U>::type;
+	using cubed = typename wpi::units::detail::cubed_impl<U>::type;
 
 	/** @cond */	// DOXYGEN IGNORE
 	namespace detail
@@ -1357,7 +1357,7 @@ namespace units
 	 *						integer overflow errors occur in the compiler.
 	 */
 	template<typename Ratio, std::intmax_t Eps = 10000000000>
-	using ratio_sqrt = typename  units::detail::Sqrt<Ratio, std::ratio<1, Eps>>::type;
+	using ratio_sqrt = typename  wpi::units::detail::Sqrt<Ratio, std::ratio<1, Eps>>::type;
 
 	/** @cond */	// DOXYGEN IGNORE
 	namespace detail
@@ -1402,7 +1402,7 @@ namespace units
 	 *				Use only when absolutely necessary.
 	 */
 	template<class U, std::intmax_t Eps = 10000000000>
-	using square_root = typename units::detail::sqrt_impl<U, Eps>::type;
+	using square_root = typename wpi::units::detail::sqrt_impl<U, Eps>::type;
 
 	//------------------------------
 	//	COMPOUND UNITS
@@ -1435,7 +1435,7 @@ namespace units
 	 * @ingroup		UnitTypes
 	 */
 	template<class U, class... Us>
-	using compound_unit = typename units::detail::compound_impl<U, Us...>::type;
+	using compound_unit = typename wpi::units::detail::compound_impl<U, Us...>::type;
 
 	//------------------------------
 	//	PREFIXES
@@ -1453,7 +1453,7 @@ namespace units
 		{
 			static_assert(traits::is_ratio<Ratio>::value, "Template parameter `Ratio` must be a `std::ratio`.");
 			static_assert(traits::is_unit<Unit>::value, "Template parameter `Unit` must be a `unit` type.");
-			typedef typename units::unit<Ratio, Unit> type;
+			typedef typename wpi::units::unit<Ratio, Unit> type;
 		};
 
 		/// recursive exponential implementation
@@ -1478,22 +1478,22 @@ namespace units
 	 * @ingroup Decimal Prefixes
 	 * @{
 	 */
-	template<class U> using atto	= typename units::detail::prefix<std::atto,	U>::type;			///< Represents the type of `class U` with the metric 'atto' prefix appended.	@details E.g. atto<meters> represents meters*10^-18		@tparam U unit type to apply the prefix to.
-	template<class U> using femto	= typename units::detail::prefix<std::femto,U>::type;			///< Represents the type of `class U` with the metric 'femto' prefix appended.  @details E.g. femto<meters> represents meters*10^-15	@tparam U unit type to apply the prefix to.
-	template<class U> using pico	= typename units::detail::prefix<std::pico,	U>::type;			///< Represents the type of `class U` with the metric 'pico' prefix appended.	@details E.g. pico<meters> represents meters*10^-12		@tparam U unit type to apply the prefix to.
-	template<class U> using nano	= typename units::detail::prefix<std::nano,	U>::type;			///< Represents the type of `class U` with the metric 'nano' prefix appended.	@details E.g. nano<meters> represents meters*10^-9		@tparam U unit type to apply the prefix to.
-	template<class U> using micro	= typename units::detail::prefix<std::micro,U>::type;			///< Represents the type of `class U` with the metric 'micro' prefix appended.	@details E.g. micro<meters> represents meters*10^-6		@tparam U unit type to apply the prefix to.
-	template<class U> using milli	= typename units::detail::prefix<std::milli,U>::type;			///< Represents the type of `class U` with the metric 'milli' prefix appended.	@details E.g. milli<meters> represents meters*10^-3		@tparam U unit type to apply the prefix to.
-	template<class U> using centi	= typename units::detail::prefix<std::centi,U>::type;			///< Represents the type of `class U` with the metric 'centi' prefix appended.	@details E.g. centi<meters> represents meters*10^-2		@tparam U unit type to apply the prefix to.
-	template<class U> using deci	= typename units::detail::prefix<std::deci,	U>::type;			///< Represents the type of `class U` with the metric 'deci' prefix appended.	@details E.g. deci<meters> represents meters*10^-1		@tparam U unit type to apply the prefix to.
-	template<class U> using deca	= typename units::detail::prefix<std::deca,	U>::type;			///< Represents the type of `class U` with the metric 'deca' prefix appended.	@details E.g. deca<meters> represents meters*10^1		@tparam U unit type to apply the prefix to.
-	template<class U> using hecto	= typename units::detail::prefix<std::hecto,U>::type;			///< Represents the type of `class U` with the metric 'hecto' prefix appended.	@details E.g. hecto<meters> represents meters*10^2		@tparam U unit type to apply the prefix to.
-	template<class U> using kilo	= typename units::detail::prefix<std::kilo,	U>::type;			///< Represents the type of `class U` with the metric 'kilo' prefix appended.	@details E.g. kilo<meters> represents meters*10^3		@tparam U unit type to apply the prefix to.
-	template<class U> using mega	= typename units::detail::prefix<std::mega,	U>::type;			///< Represents the type of `class U` with the metric 'mega' prefix appended.	@details E.g. mega<meters> represents meters*10^6		@tparam U unit type to apply the prefix to.
-	template<class U> using giga	= typename units::detail::prefix<std::giga,	U>::type;			///< Represents the type of `class U` with the metric 'giga' prefix appended.	@details E.g. giga<meters> represents meters*10^9		@tparam U unit type to apply the prefix to.
-	template<class U> using tera	= typename units::detail::prefix<std::tera,	U>::type;			///< Represents the type of `class U` with the metric 'tera' prefix appended.	@details E.g. tera<meters> represents meters*10^12		@tparam U unit type to apply the prefix to.
-	template<class U> using peta	= typename units::detail::prefix<std::peta,	U>::type;			///< Represents the type of `class U` with the metric 'peta' prefix appended.	@details E.g. peta<meters> represents meters*10^15		@tparam U unit type to apply the prefix to.
-	template<class U> using exa		= typename units::detail::prefix<std::exa,	U>::type;			///< Represents the type of `class U` with the metric 'exa' prefix appended.	@details E.g. exa<meters> represents meters*10^18		@tparam U unit type to apply the prefix to.
+	template<class U> using atto	= typename wpi::units::detail::prefix<std::atto,	U>::type;			///< Represents the type of `class U` with the metric 'atto' prefix appended.	@details E.g. atto<meters> represents meters*10^-18		@tparam U unit type to apply the prefix to.
+	template<class U> using femto	= typename wpi::units::detail::prefix<std::femto,U>::type;			///< Represents the type of `class U` with the metric 'femto' prefix appended.  @details E.g. femto<meters> represents meters*10^-15	@tparam U unit type to apply the prefix to.
+	template<class U> using pico	= typename wpi::units::detail::prefix<std::pico,	U>::type;			///< Represents the type of `class U` with the metric 'pico' prefix appended.	@details E.g. pico<meters> represents meters*10^-12		@tparam U unit type to apply the prefix to.
+	template<class U> using nano	= typename wpi::units::detail::prefix<std::nano,	U>::type;			///< Represents the type of `class U` with the metric 'nano' prefix appended.	@details E.g. nano<meters> represents meters*10^-9		@tparam U unit type to apply the prefix to.
+	template<class U> using micro	= typename wpi::units::detail::prefix<std::micro,U>::type;			///< Represents the type of `class U` with the metric 'micro' prefix appended.	@details E.g. micro<meters> represents meters*10^-6		@tparam U unit type to apply the prefix to.
+	template<class U> using milli	= typename wpi::units::detail::prefix<std::milli,U>::type;			///< Represents the type of `class U` with the metric 'milli' prefix appended.	@details E.g. milli<meters> represents meters*10^-3		@tparam U unit type to apply the prefix to.
+	template<class U> using centi	= typename wpi::units::detail::prefix<std::centi,U>::type;			///< Represents the type of `class U` with the metric 'centi' prefix appended.	@details E.g. centi<meters> represents meters*10^-2		@tparam U unit type to apply the prefix to.
+	template<class U> using deci	= typename wpi::units::detail::prefix<std::deci,	U>::type;			///< Represents the type of `class U` with the metric 'deci' prefix appended.	@details E.g. deci<meters> represents meters*10^-1		@tparam U unit type to apply the prefix to.
+	template<class U> using deca	= typename wpi::units::detail::prefix<std::deca,	U>::type;			///< Represents the type of `class U` with the metric 'deca' prefix appended.	@details E.g. deca<meters> represents meters*10^1		@tparam U unit type to apply the prefix to.
+	template<class U> using hecto	= typename wpi::units::detail::prefix<std::hecto,U>::type;			///< Represents the type of `class U` with the metric 'hecto' prefix appended.	@details E.g. hecto<meters> represents meters*10^2		@tparam U unit type to apply the prefix to.
+	template<class U> using kilo	= typename wpi::units::detail::prefix<std::kilo,	U>::type;			///< Represents the type of `class U` with the metric 'kilo' prefix appended.	@details E.g. kilo<meters> represents meters*10^3		@tparam U unit type to apply the prefix to.
+	template<class U> using mega	= typename wpi::units::detail::prefix<std::mega,	U>::type;			///< Represents the type of `class U` with the metric 'mega' prefix appended.	@details E.g. mega<meters> represents meters*10^6		@tparam U unit type to apply the prefix to.
+	template<class U> using giga	= typename wpi::units::detail::prefix<std::giga,	U>::type;			///< Represents the type of `class U` with the metric 'giga' prefix appended.	@details E.g. giga<meters> represents meters*10^9		@tparam U unit type to apply the prefix to.
+	template<class U> using tera	= typename wpi::units::detail::prefix<std::tera,	U>::type;			///< Represents the type of `class U` with the metric 'tera' prefix appended.	@details E.g. tera<meters> represents meters*10^12		@tparam U unit type to apply the prefix to.
+	template<class U> using peta	= typename wpi::units::detail::prefix<std::peta,	U>::type;			///< Represents the type of `class U` with the metric 'peta' prefix appended.	@details E.g. peta<meters> represents meters*10^15		@tparam U unit type to apply the prefix to.
+	template<class U> using exa		= typename wpi::units::detail::prefix<std::exa,	U>::type;			///< Represents the type of `class U` with the metric 'exa' prefix appended.	@details E.g. exa<meters> represents meters*10^18		@tparam U unit type to apply the prefix to.
 	/** @} @} */
 
 	/**
@@ -1502,12 +1502,12 @@ namespace units
 	 * @ingroup Binary Prefixes
 	 * @{
 	 */
-	template<class U> using kibi	= typename units::detail::prefix<std::ratio<1024>,					U>::type;	///< Represents the type of `class U` with the binary 'kibi' prefix appended.	@details E.g. kibi<bytes> represents bytes*2^10	@tparam U unit type to apply the prefix to.
-	template<class U> using mebi	= typename units::detail::prefix<std::ratio<1048576>,				U>::type;	///< Represents the type of `class U` with the binary 'mibi' prefix appended.	@details E.g. mebi<bytes> represents bytes*2^20	@tparam U unit type to apply the prefix to.
-	template<class U> using gibi	= typename units::detail::prefix<std::ratio<1073741824>,			U>::type;	///< Represents the type of `class U` with the binary 'gibi' prefix appended.	@details E.g. gibi<bytes> represents bytes*2^30	@tparam U unit type to apply the prefix to.
-	template<class U> using tebi	= typename units::detail::prefix<std::ratio<1099511627776>,			U>::type;	///< Represents the type of `class U` with the binary 'tebi' prefix appended.	@details E.g. tebi<bytes> represents bytes*2^40	@tparam U unit type to apply the prefix to.
-	template<class U> using pebi	= typename units::detail::prefix<std::ratio<1125899906842624>,		U>::type;	///< Represents the type of `class U` with the binary 'pebi' prefix appended.	@details E.g. pebi<bytes> represents bytes*2^50	@tparam U unit type to apply the prefix to.
-	template<class U> using exbi	= typename units::detail::prefix<std::ratio<1152921504606846976>,	U>::type;	///< Represents the type of `class U` with the binary 'exbi' prefix appended.	@details E.g. exbi<bytes> represents bytes*2^60	@tparam U unit type to apply the prefix to.
+	template<class U> using kibi	= typename wpi::units::detail::prefix<std::ratio<1024>,					U>::type;	///< Represents the type of `class U` with the binary 'kibi' prefix appended.	@details E.g. kibi<bytes> represents bytes*2^10	@tparam U unit type to apply the prefix to.
+	template<class U> using mebi	= typename wpi::units::detail::prefix<std::ratio<1048576>,				U>::type;	///< Represents the type of `class U` with the binary 'mibi' prefix appended.	@details E.g. mebi<bytes> represents bytes*2^20	@tparam U unit type to apply the prefix to.
+	template<class U> using gibi	= typename wpi::units::detail::prefix<std::ratio<1073741824>,			U>::type;	///< Represents the type of `class U` with the binary 'gibi' prefix appended.	@details E.g. gibi<bytes> represents bytes*2^30	@tparam U unit type to apply the prefix to.
+	template<class U> using tebi	= typename wpi::units::detail::prefix<std::ratio<1099511627776>,			U>::type;	///< Represents the type of `class U` with the binary 'tebi' prefix appended.	@details E.g. tebi<bytes> represents bytes*2^40	@tparam U unit type to apply the prefix to.
+	template<class U> using pebi	= typename wpi::units::detail::prefix<std::ratio<1125899906842624>,		U>::type;	///< Represents the type of `class U` with the binary 'pebi' prefix appended.	@details E.g. pebi<bytes> represents bytes*2^50	@tparam U unit type to apply the prefix to.
+	template<class U> using exbi	= typename wpi::units::detail::prefix<std::ratio<1152921504606846976>,	U>::type;	///< Represents the type of `class U` with the binary 'exbi' prefix appended.	@details E.g. exbi<bytes> represents bytes*2^60	@tparam U unit type to apply the prefix to.
 	/** @} @} */
 
 	//------------------------------
@@ -1529,8 +1529,8 @@ namespace units
 		 * @sa			is_convertible_unit_t
 		 */
 		template<class U1, class U2>
-		struct is_convertible_unit : std::is_same <traits::base_unit_of<typename units::traits::unit_traits<U1>::base_unit_type>,
-			base_unit_of<typename units::traits::unit_traits<U2>::base_unit_type >> {};
+		struct is_convertible_unit : std::is_same <traits::base_unit_of<typename wpi::units::traits::unit_traits<U1>::base_unit_type>,
+			base_unit_of<typename wpi::units::traits::unit_traits<U2>::base_unit_type >> {};
 		template<class U1, class U2>
 		constexpr bool is_convertible_unit_v = is_convertible_unit<U1, U2>::value;
 	}
@@ -1663,7 +1663,7 @@ namespace units
 		using piRequired = std::integral_constant<bool, !(std::is_same<std::ratio<0>, PiRatio>::value)>;
 		using translationRequired = std::integral_constant<bool, !(std::is_same<std::ratio<0>, Translation>::value)>;
 
-		return units::detail::convert<UnitFrom, UnitTo, Ratio, PiRatio, Translation, T>
+		return wpi::units::detail::convert<UnitFrom, UnitTo, Ratio, PiRatio, Translation, T>
 			(value, isSame{}, piRequired{}, translationRequired{});
 	}
 
@@ -1741,7 +1741,7 @@ namespace units
 		 *				- have an `operator()` member which returns the non-linear value stored in the scale
 		 *				- have an accessible `m_value` member type which stores the linearized value in the scale.
 		 *
-		 *				Linear/nonlinear scales are used by `units::unit` to store values and scale them
+		 *				Linear/nonlinear scales are used by `wpi::units::unit` to store values and scale them
 		 *				if they represent things like dB.
 		 */
 		template<class T, class Ret>
@@ -1762,7 +1762,7 @@ namespace units
 #ifdef FOR_DOXYGEN_PURPOSES_ONLY
 		/**
 		* @ingroup		TypeTraits
-		* @brief		Trait for accessing the publicly defined types of `units::unit_t`
+		* @brief		Trait for accessing the publicly defined types of `wpi::units::unit_t`
 		* @details		The units library determines certain properties of the unit_t types passed to them
 		*				and what they represent by using the members of the corresponding unit_t_traits instantiation.
 		*/
@@ -1792,7 +1792,7 @@ namespace units
 
 		/**
 		 * @ingroup		TypeTraits
-		 * @brief		Trait for accessing the publicly defined types of `units::unit_t`
+		 * @brief		Trait for accessing the publicly defined types of `wpi::units::unit_t`
 		 * @details
 		 */
 		template<typename T>
@@ -1826,7 +1826,7 @@ namespace units
 		 */
 		template<class U1, class U2>
 		struct is_convertible_unit_t : std::integral_constant<bool,
-			is_convertible_unit<typename units::traits::unit_t_traits<U1>::unit_type, typename units::traits::unit_t_traits<U2>::unit_type>::value>
+			is_convertible_unit<typename wpi::units::traits::unit_t_traits<U1>::unit_type, typename wpi::units::traits::unit_t_traits<U2>::unit_type>::value>
 		{};
 	}
 
@@ -1865,7 +1865,7 @@ namespace units
 		 *				whether `class T` implements a `unit`.
 		 */
 		template<class T>
-		struct is_unit_t : std::is_base_of<units::detail::_unit_t, T>::type {};
+		struct is_unit_t : std::is_base_of<wpi::units::detail::_unit_t, T>::type {};
 		template<class T>
 		constexpr bool is_unit_t_v = is_unit_t<T>::value;
 	}
@@ -1926,7 +1926,7 @@ namespace units
 	 *				- \ref constantContainers "constant unit containers"
 	 */
 	template<class Units, typename T = UNIT_LIB_DEFAULT_TYPE, template<typename> class NonLinearScale = linear_scale>
-	class unit_t : public NonLinearScale<T>, units::detail::_unit_t
+	class unit_t : public NonLinearScale<T>, wpi::units::detail::_unit_t
 	{
 		static_assert(traits::is_unit<Units>::value, "Template parameter `Units` must be a unit tag. Check that you aren't using a unit type (_t).");
 		static_assert(traits::is_nonlinear_scale<NonLinearScale<T>, T>::value, "Template parameter `NonLinearScale` does not conform to the `is_nonlinear_scale` concept.");
@@ -1981,7 +1981,7 @@ namespace units
 		 */
 		template<class Rep, class Period, class = std::enable_if_t<std::is_arithmetic<Rep>::value && traits::is_ratio<Period>::value>>
 		constexpr unit_t(const std::chrono::duration<Rep, Period>& value) noexcept :
-		nls(units::convert<unit<std::ratio<1,1000000000>, category::time_unit>, Units>(static_cast<T>(std::chrono::duration_cast<std::chrono::nanoseconds>(value).count())))
+		nls(wpi::units::convert<unit<std::ratio<1,1000000000>, category::time_unit>, Units>(static_cast<T>(std::chrono::duration_cast<std::chrono::nanoseconds>(value).count())))
 		{
 
 		}
@@ -1994,7 +1994,7 @@ namespace units
 		template<class UnitsRhs, typename Ty, template<typename> class NlsRhs>
 			requires traits::is_unit_v<UnitsRhs> && traits::is_unit_v<Units> && traits::is_convertible_unit_v<UnitsRhs, Units>
 		constexpr unit_t(const unit_t<UnitsRhs, Ty, NlsRhs>& rhs) noexcept :
-		nls(units::convert<UnitsRhs, Units, T>(rhs.m_value), std::true_type() /*store linear value*/)
+		nls(wpi::units::convert<UnitsRhs, Units, T>(rhs.m_value), std::true_type() /*store linear value*/)
 		{
 
 		}
@@ -2007,7 +2007,7 @@ namespace units
 		template<class UnitsRhs, typename Ty, template<typename> class NlsRhs>
 		inline unit_t& operator=(const unit_t<UnitsRhs, Ty, NlsRhs>& rhs) noexcept
 		{
-			nls::m_value = units::convert<UnitsRhs, Units, T>(rhs.m_value);
+			nls::m_value = wpi::units::convert<UnitsRhs, Units, T>(rhs.m_value);
 			return *this;
 		}
 
@@ -2032,7 +2032,7 @@ namespace units
 		template<class UnitsRhs, typename Ty, template<typename> class NlsRhs>
 		constexpr bool operator<(const unit_t<UnitsRhs, Ty, NlsRhs>& rhs) const noexcept
 		{
-			return (nls::m_value < units::convert<UnitsRhs, Units>(rhs.m_value));
+			return (nls::m_value < wpi::units::convert<UnitsRhs, Units>(rhs.m_value));
 		}
 
 		/**
@@ -2044,7 +2044,7 @@ namespace units
 		template<class UnitsRhs, typename Ty, template<typename> class NlsRhs>
 		constexpr bool operator<=(const unit_t<UnitsRhs, Ty, NlsRhs>& rhs) const noexcept
 		{
-			return (nls::m_value <= units::convert<UnitsRhs, Units>(rhs.m_value));
+			return (nls::m_value <= wpi::units::convert<UnitsRhs, Units>(rhs.m_value));
 		}
 
 		/**
@@ -2056,7 +2056,7 @@ namespace units
 		template<class UnitsRhs, typename Ty, template<typename> class NlsRhs>
 		constexpr bool operator>(const unit_t<UnitsRhs, Ty, NlsRhs>& rhs) const noexcept
 		{
-			return (nls::m_value > units::convert<UnitsRhs, Units>(rhs.m_value));
+			return (nls::m_value > wpi::units::convert<UnitsRhs, Units>(rhs.m_value));
 		}
 
 		/**
@@ -2068,7 +2068,7 @@ namespace units
 		template<class UnitsRhs, typename Ty, template<typename> class NlsRhs>
 		constexpr bool operator>=(const unit_t<UnitsRhs, Ty, NlsRhs>& rhs) const noexcept
 		{
-			return (nls::m_value >= units::convert<UnitsRhs, Units>(rhs.m_value));
+			return (nls::m_value >= wpi::units::convert<UnitsRhs, Units>(rhs.m_value));
 		}
 
 		/**
@@ -2081,15 +2081,15 @@ namespace units
 		template<class UnitsRhs, typename Ty, template<typename> class NlsRhs, std::enable_if_t<std::is_floating_point<T>::value || std::is_floating_point<Ty>::value, int> = 0>
 		constexpr bool operator==(const unit_t<UnitsRhs, Ty, NlsRhs>& rhs) const noexcept
 		{
-			return detail::abs(nls::m_value - units::convert<UnitsRhs, Units>(rhs.m_value)) < std::numeric_limits<T>::epsilon() *
-				detail::abs(nls::m_value + units::convert<UnitsRhs, Units>(rhs.m_value)) ||
-				detail::abs(nls::m_value - units::convert<UnitsRhs, Units>(rhs.m_value)) < (std::numeric_limits<T>::min)();
+			return detail::abs(nls::m_value - wpi::units::convert<UnitsRhs, Units>(rhs.m_value)) < std::numeric_limits<T>::epsilon() *
+				detail::abs(nls::m_value + wpi::units::convert<UnitsRhs, Units>(rhs.m_value)) ||
+				detail::abs(nls::m_value - wpi::units::convert<UnitsRhs, Units>(rhs.m_value)) < (std::numeric_limits<T>::min)();
 		}
 
 		template<class UnitsRhs, typename Ty, template<typename> class NlsRhs, std::enable_if_t<std::is_integral<T>::value && std::is_integral<Ty>::value, int> = 0>
 		constexpr bool operator==(const unit_t<UnitsRhs, Ty, NlsRhs>& rhs) const noexcept
 		{
-			return nls::m_value == units::convert<UnitsRhs, Units>(rhs.m_value);
+			return nls::m_value == wpi::units::convert<UnitsRhs, Units>(rhs.m_value);
 		}
 
 		/**
@@ -2159,7 +2159,7 @@ namespace units
 		constexpr operator Ty() const noexcept
 		{
 			// this conversion also resolves any PI exponents, by converting from a non-zero PI ratio to a zero-pi ratio.
-			return static_cast<Ty>(units::convert<Units, unit<std::ratio<1>, units::category::scalar_unit>>((*this)()));
+			return static_cast<Ty>(wpi::units::convert<Units, unit<std::ratio<1>, wpi::units::category::scalar_unit>>((*this)()));
 		}
 
 		/**
@@ -2176,10 +2176,10 @@ namespace units
 		 * @brief		chrono implicit type conversion.
 		 * @details		only enabled for time unit types.
 		 */
-		template<typename U = Units, std::enable_if_t<units::traits::is_convertible_unit<U, unit<std::ratio<1>, category::time_unit>>::value, int> = 0>
+		template<typename U = Units, std::enable_if_t<wpi::units::traits::is_convertible_unit<U, unit<std::ratio<1>, category::time_unit>>::value, int> = 0>
 		constexpr operator std::chrono::nanoseconds() const noexcept
 		{
-			return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::duration<double, std::nano>(units::convert<Units, unit<std::ratio<1,1000000000>, category::time_unit>>((*this)())));
+			return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::duration<double, std::nano>(wpi::units::convert<Units, unit<std::ratio<1,1000000000>, category::time_unit>>((*this)())));
 		}
 
 		/**
@@ -2187,7 +2187,7 @@ namespace units
 		 */
 		constexpr const char* name() const noexcept
 		{
-			return units::name(*this);
+			return wpi::units::name(*this);
 		}
 
 		/**
@@ -2195,7 +2195,7 @@ namespace units
 		 */
 		constexpr const char* abbreviation() const noexcept
 		{
-			return units::abbreviation(*this);
+			return wpi::units::abbreviation(*this);
 		}
 
 	public:
@@ -2387,7 +2387,7 @@ namespace units
 	 *				to a built-in arithmetic type. This may be useful for compatibility with libraries
 	 *				and legacy code that don't support `unit_t` types. E.g
 	 * @code		meter_t unitVal(5);
-	 *  double value = units::unit_cast<double>(unitVal);	// value = 5.0
+	 *  double value = wpi::units::unit_cast<double>(unitVal);	// value = 5.0
 	 * @endcode
 	 * @tparam		T		Type to cast the unit type to. Must be a built-in arithmetic type.
 	 * @param		value	Unit value to cast.
@@ -2417,15 +2417,15 @@ namespace units
 		 */
 #if !defined(_MSC_VER) || _MSC_VER > 1800	// bug in VS2013 prevents this from working
 		template<typename... T>
-		struct has_linear_scale : std::integral_constant<bool, units::all_true<std::is_base_of<units::linear_scale<typename units::traits::unit_t_traits<T>::underlying_type>, T>::value...>::value > {};
+		struct has_linear_scale : std::integral_constant<bool, wpi::units::all_true<std::is_base_of<wpi::units::linear_scale<typename wpi::units::traits::unit_t_traits<T>::underlying_type>, T>::value...>::value > {};
 		template<typename... T>
 		constexpr bool has_linear_scale_v = has_linear_scale<T...>::value;
 #else
 		template<typename T1, typename T2 = T1, typename T3 = T1>
 		struct has_linear_scale : std::integral_constant<bool,
-			std::is_base_of<units::linear_scale<typename units::traits::unit_t_traits<T1>::underlying_type>, T1>::value &&
-			std::is_base_of<units::linear_scale<typename units::traits::unit_t_traits<T2>::underlying_type>, T2>::value &&
-			std::is_base_of<units::linear_scale<typename units::traits::unit_t_traits<T3>::underlying_type>, T3>::value> {};
+			std::is_base_of<wpi::units::linear_scale<typename wpi::units::traits::unit_t_traits<T1>::underlying_type>, T1>::value &&
+			std::is_base_of<wpi::units::linear_scale<typename wpi::units::traits::unit_t_traits<T2>::underlying_type>, T2>::value &&
+			std::is_base_of<wpi::units::linear_scale<typename wpi::units::traits::unit_t_traits<T3>::underlying_type>, T3>::value> {};
 		template<typename T1, typename T2 = T1, typename T3 = T1>
 		constexpr bool has_linear_scale_v = has_linear_scale<T1, T2, T3>::value;
 #endif
@@ -2439,15 +2439,15 @@ namespace units
 		 */
 #if !defined(_MSC_VER) || _MSC_VER > 1800	// bug in VS2013 prevents this from working
 		template<typename... T>
-		struct has_decibel_scale : std::integral_constant<bool,	units::all_true<std::is_base_of<units::decibel_scale<typename units::traits::unit_t_traits<T>::underlying_type>, T>::value...>::value> {};
+		struct has_decibel_scale : std::integral_constant<bool,	wpi::units::all_true<std::is_base_of<wpi::units::decibel_scale<typename wpi::units::traits::unit_t_traits<T>::underlying_type>, T>::value...>::value> {};
 		template<typename... T>
 		constexpr bool has_decibel_scale_v = has_decibel_scale<T...>::value;
 #else
 		template<typename T1, typename T2 = T1, typename T3 = T1>
 		struct has_decibel_scale : std::integral_constant<bool,
-			std::is_base_of<units::decibel_scale<typename units::traits::unit_t_traits<T1>::underlying_type>, T1>::value &&
-			std::is_base_of<units::decibel_scale<typename units::traits::unit_t_traits<T2>::underlying_type>, T2>::value &&
-			std::is_base_of<units::decibel_scale<typename units::traits::unit_t_traits<T2>::underlying_type>, T3>::value> {};
+			std::is_base_of<wpi::units::decibel_scale<typename wpi::units::traits::unit_t_traits<T1>::underlying_type>, T1>::value &&
+			std::is_base_of<wpi::units::decibel_scale<typename wpi::units::traits::unit_t_traits<T2>::underlying_type>, T2>::value &&
+			std::is_base_of<wpi::units::decibel_scale<typename wpi::units::traits::unit_t_traits<T2>::underlying_type>, T3>::value> {};
 		template<typename T1, typename T2 = T1, typename T3 = T1>
 		constexpr bool has_decibel_scale_v = has_decibel_scale<T1, T2, T3>::value;
 #endif
@@ -2462,7 +2462,7 @@ namespace units
 		 */
 		template<typename T1, typename T2>
 		struct is_same_scale : std::integral_constant<bool,
-			std::is_same<typename units::traits::unit_t_traits<T1>::non_linear_scale_type, typename units::traits::unit_t_traits<T2>::non_linear_scale_type>::value>
+			std::is_same<typename wpi::units::traits::unit_t_traits<T1>::non_linear_scale_type, typename wpi::units::traits::unit_t_traits<T2>::non_linear_scale_type>::value>
 		{};
 		template<typename T1, typename T2>
 		constexpr bool is_same_scale_v = is_same_scale<T1, T2>::value;
@@ -2512,8 +2512,8 @@ namespace units
 	// Scalar units are the *ONLY* units implicitly convertible to/from built-in types.
 	namespace dimensionless
 	{
-		typedef unit<std::ratio<1>, units::category::scalar_unit> scalar;
-		typedef unit<std::ratio<1>, units::category::dimensionless_unit> dimensionless;
+		typedef unit<std::ratio<1>, wpi::units::category::scalar_unit> scalar;
+		typedef unit<std::ratio<1>, wpi::units::category::dimensionless_unit> dimensionless;
 
 		typedef unit_t<scalar> scalar_t;
 		typedef scalar_t dimensionless_t;
@@ -2545,8 +2545,8 @@ namespace units
 	template<class UnitTypeLhs, class UnitTypeRhs, std::enable_if_t<traits::has_linear_scale<UnitTypeLhs, UnitTypeRhs>::value, int> = 0>
 	constexpr UnitTypeLhs operator+(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs) noexcept
 	{
-		using UnitsLhs = typename units::traits::unit_t_traits<UnitTypeLhs>::unit_type;
-		using UnitsRhs = typename units::traits::unit_t_traits<UnitTypeRhs>::unit_type;
+		using UnitsLhs = typename wpi::units::traits::unit_t_traits<UnitTypeLhs>::unit_type;
+		using UnitsRhs = typename wpi::units::traits::unit_t_traits<UnitTypeRhs>::unit_type;
 		return UnitTypeLhs(lhs() + convert<UnitsRhs, UnitsLhs>(rhs()));
 	}
 
@@ -2568,8 +2568,8 @@ namespace units
 	template<class UnitTypeLhs, class UnitTypeRhs, std::enable_if_t<traits::has_linear_scale<UnitTypeLhs, UnitTypeRhs>::value, int> = 0>
 	constexpr UnitTypeLhs operator-(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs) noexcept
 	{
-		using UnitsLhs = typename units::traits::unit_t_traits<UnitTypeLhs>::unit_type;
-		using UnitsRhs = typename units::traits::unit_t_traits<UnitTypeRhs>::unit_type;
+		using UnitsLhs = typename wpi::units::traits::unit_t_traits<UnitTypeLhs>::unit_type;
+		using UnitsRhs = typename wpi::units::traits::unit_t_traits<UnitTypeRhs>::unit_type;
 		return UnitTypeLhs(lhs() - convert<UnitsRhs, UnitsLhs>(rhs()));
 	}
 
@@ -2590,21 +2590,21 @@ namespace units
 	/// Multiplication type for convertible unit_t types with a linear scale. @returns the multiplied value, with the same type as left-hand side unit.
 	template<class UnitTypeLhs, class UnitTypeRhs,
 		std::enable_if_t<traits::is_convertible_unit_t<UnitTypeLhs, UnitTypeRhs>::value && traits::has_linear_scale<UnitTypeLhs, UnitTypeRhs>::value, int> = 0>
-		constexpr auto operator*(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs) noexcept -> unit_t<compound_unit<squared<typename units::traits::unit_t_traits<UnitTypeLhs>::unit_type>>>
+		constexpr auto operator*(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs) noexcept -> unit_t<compound_unit<squared<typename wpi::units::traits::unit_t_traits<UnitTypeLhs>::unit_type>>>
 	{
-		using UnitsLhs = typename units::traits::unit_t_traits<UnitTypeLhs>::unit_type;
-		using UnitsRhs = typename units::traits::unit_t_traits<UnitTypeRhs>::unit_type;
-		return  unit_t<compound_unit<squared<typename units::traits::unit_t_traits<UnitTypeLhs>::unit_type>>>
+		using UnitsLhs = typename wpi::units::traits::unit_t_traits<UnitTypeLhs>::unit_type;
+		using UnitsRhs = typename wpi::units::traits::unit_t_traits<UnitTypeRhs>::unit_type;
+		return  unit_t<compound_unit<squared<typename wpi::units::traits::unit_t_traits<UnitTypeLhs>::unit_type>>>
 			(lhs() * convert<UnitsRhs, UnitsLhs>(rhs()));
 	}
 
 	/// Multiplication type for non-convertible unit_t types with a linear scale. @returns the multiplied value, whose type is a compound unit of the left and right hand side values.
 	template<class UnitTypeLhs, class UnitTypeRhs,
 		std::enable_if_t<!traits::is_convertible_unit_t<UnitTypeLhs, UnitTypeRhs>::value && traits::has_linear_scale<UnitTypeLhs, UnitTypeRhs>::value && !traits::is_dimensionless_unit<UnitTypeLhs>::value && !traits::is_dimensionless_unit<UnitTypeRhs>::value, int> = 0>
-		constexpr auto operator*(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs) noexcept -> unit_t<compound_unit<typename units::traits::unit_t_traits<UnitTypeLhs>::unit_type, typename units::traits::unit_t_traits<UnitTypeRhs>::unit_type>>
+		constexpr auto operator*(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs) noexcept -> unit_t<compound_unit<typename wpi::units::traits::unit_t_traits<UnitTypeLhs>::unit_type, typename wpi::units::traits::unit_t_traits<UnitTypeRhs>::unit_type>>
 	{
-		using UnitsLhs = typename units::traits::unit_t_traits<UnitTypeLhs>::unit_type;
-		using UnitsRhs = typename units::traits::unit_t_traits<UnitTypeRhs>::unit_type;
+		using UnitsLhs = typename wpi::units::traits::unit_t_traits<UnitTypeLhs>::unit_type;
+		using UnitsRhs = typename wpi::units::traits::unit_t_traits<UnitTypeRhs>::unit_type;
 		return unit_t<compound_unit<UnitsLhs, UnitsRhs>>
 			(lhs() * rhs());
 	}
@@ -2648,18 +2648,18 @@ namespace units
 		std::enable_if_t<traits::is_convertible_unit_t<UnitTypeLhs, UnitTypeRhs>::value && traits::has_linear_scale<UnitTypeLhs, UnitTypeRhs>::value, int> = 0>
 		constexpr dimensionless::scalar_t operator/(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs) noexcept
 	{
-		using UnitsLhs = typename units::traits::unit_t_traits<UnitTypeLhs>::unit_type;
-		using UnitsRhs = typename units::traits::unit_t_traits<UnitTypeRhs>::unit_type;
+		using UnitsLhs = typename wpi::units::traits::unit_t_traits<UnitTypeLhs>::unit_type;
+		using UnitsRhs = typename wpi::units::traits::unit_t_traits<UnitTypeRhs>::unit_type;
 		return dimensionless::scalar_t(lhs() / convert<UnitsRhs, UnitsLhs>(rhs()));
 	}
 
 	/// Division for non-convertible unit_t types with a linear scale. @returns the lhs divided by the rhs, with a compound unit type of lhs/rhs
 	template<class UnitTypeLhs, class UnitTypeRhs,
 		std::enable_if_t<!traits::is_convertible_unit_t<UnitTypeLhs, UnitTypeRhs>::value && traits::has_linear_scale<UnitTypeLhs, UnitTypeRhs>::value && !traits::is_dimensionless_unit<UnitTypeLhs>::value && !traits::is_dimensionless_unit<UnitTypeRhs>::value, int> = 0>
-		constexpr auto operator/(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs) noexcept ->  unit_t<compound_unit<typename units::traits::unit_t_traits<UnitTypeLhs>::unit_type, inverse<typename units::traits::unit_t_traits<UnitTypeRhs>::unit_type>>>
+		constexpr auto operator/(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs) noexcept ->  unit_t<compound_unit<typename wpi::units::traits::unit_t_traits<UnitTypeLhs>::unit_type, inverse<typename wpi::units::traits::unit_t_traits<UnitTypeRhs>::unit_type>>>
 	{
-		using UnitsLhs = typename units::traits::unit_t_traits<UnitTypeLhs>::unit_type;
-		using UnitsRhs = typename units::traits::unit_t_traits<UnitTypeRhs>::unit_type;
+		using UnitsLhs = typename wpi::units::traits::unit_t_traits<UnitTypeLhs>::unit_type;
+		using UnitsRhs = typename wpi::units::traits::unit_t_traits<UnitTypeRhs>::unit_type;
 		return unit_t<compound_unit<UnitsLhs, inverse<UnitsRhs>>>
 			(lhs() / rhs());
 	}
@@ -2675,9 +2675,9 @@ namespace units
 	/// Division of a dimensionless unit  by a unit_t type with a linear scale
 	template<class UnitTypeLhs, class UnitTypeRhs,
 		std::enable_if_t<traits::has_linear_scale<UnitTypeLhs, UnitTypeRhs>::value && traits::is_dimensionless_unit<UnitTypeLhs>::value && !traits::is_dimensionless_unit<UnitTypeRhs>::value, int> = 0>
-		constexpr auto operator/(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs) noexcept -> unit_t<inverse<typename units::traits::unit_t_traits<UnitTypeRhs>::unit_type>>
+		constexpr auto operator/(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs) noexcept -> unit_t<inverse<typename wpi::units::traits::unit_t_traits<UnitTypeRhs>::unit_type>>
 	{
-		return unit_t<inverse<typename units::traits::unit_t_traits<UnitTypeRhs>::unit_type>>
+		return unit_t<inverse<typename wpi::units::traits::unit_t_traits<UnitTypeRhs>::unit_type>>
 			(static_cast<UNIT_LIB_DEFAULT_TYPE>(lhs) / rhs());
 	}
 
@@ -2692,9 +2692,9 @@ namespace units
 	/// Division of a scalar  by a unit_t type with a linear scale
 	template<class UnitTypeRhs, typename T,
 		std::enable_if_t<std::is_arithmetic<T>::value && traits::has_linear_scale<UnitTypeRhs>::value, int> = 0>
-		constexpr auto operator/(T lhs, const UnitTypeRhs& rhs) noexcept -> unit_t<inverse<typename units::traits::unit_t_traits<UnitTypeRhs>::unit_type>>
+		constexpr auto operator/(T lhs, const UnitTypeRhs& rhs) noexcept -> unit_t<inverse<typename wpi::units::traits::unit_t_traits<UnitTypeRhs>::unit_type>>
 	{
-		using UnitsRhs = typename units::traits::unit_t_traits<UnitTypeRhs>::unit_type;
+		using UnitsRhs = typename wpi::units::traits::unit_t_traits<UnitTypeRhs>::unit_type;
 		return unit_t<inverse<UnitsRhs>>
 			(lhs / rhs());
 	}
@@ -2703,75 +2703,75 @@ namespace units
 	//	SCALAR COMPARISONS
 	//----------------------------------
 
-	template<typename Units, class = std::enable_if_t<units::traits::is_dimensionless_unit<Units>::value>>
+	template<typename Units, class = std::enable_if_t<wpi::units::traits::is_dimensionless_unit<Units>::value>>
 	constexpr bool operator==(const UNIT_LIB_DEFAULT_TYPE lhs, const Units& rhs) noexcept
 	{
 		return detail::abs(lhs - static_cast<UNIT_LIB_DEFAULT_TYPE>(rhs)) < std::numeric_limits<UNIT_LIB_DEFAULT_TYPE>::epsilon() * detail::abs(lhs + static_cast<UNIT_LIB_DEFAULT_TYPE>(rhs)) ||
 			detail::abs(lhs - static_cast<UNIT_LIB_DEFAULT_TYPE>(rhs)) < (std::numeric_limits<UNIT_LIB_DEFAULT_TYPE>::min)();
 	}
 
-	template<typename Units, class = std::enable_if_t<units::traits::is_dimensionless_unit<Units>::value>>
+	template<typename Units, class = std::enable_if_t<wpi::units::traits::is_dimensionless_unit<Units>::value>>
 	constexpr bool operator==(const Units& lhs, const UNIT_LIB_DEFAULT_TYPE rhs) noexcept
 	{
 		return detail::abs(static_cast<UNIT_LIB_DEFAULT_TYPE>(lhs) - rhs) < std::numeric_limits<UNIT_LIB_DEFAULT_TYPE>::epsilon() * detail::abs(static_cast<UNIT_LIB_DEFAULT_TYPE>(lhs) + rhs) ||
 			detail::abs(static_cast<UNIT_LIB_DEFAULT_TYPE>(lhs) - rhs) < (std::numeric_limits<UNIT_LIB_DEFAULT_TYPE>::min)();
 	}
 
-	template<typename Units, class = std::enable_if_t<units::traits::is_dimensionless_unit<Units>::value>>
+	template<typename Units, class = std::enable_if_t<wpi::units::traits::is_dimensionless_unit<Units>::value>>
 	constexpr bool operator!=(const UNIT_LIB_DEFAULT_TYPE lhs, const Units& rhs) noexcept
 	{
 		return!(lhs == static_cast<UNIT_LIB_DEFAULT_TYPE>(rhs));
 	}
 
-	template<typename Units, class = std::enable_if_t<units::traits::is_dimensionless_unit<Units>::value>>
+	template<typename Units, class = std::enable_if_t<wpi::units::traits::is_dimensionless_unit<Units>::value>>
 	constexpr bool operator!=(const Units& lhs, const UNIT_LIB_DEFAULT_TYPE rhs) noexcept
 	{
 		return !(static_cast<UNIT_LIB_DEFAULT_TYPE>(lhs) == rhs);
 	}
 
-	template<typename Units, class = std::enable_if_t<units::traits::is_dimensionless_unit<Units>::value>>
+	template<typename Units, class = std::enable_if_t<wpi::units::traits::is_dimensionless_unit<Units>::value>>
 	constexpr bool operator>=(const UNIT_LIB_DEFAULT_TYPE lhs, const Units& rhs) noexcept
 	{
 		return std::isgreaterequal(lhs, static_cast<UNIT_LIB_DEFAULT_TYPE>(rhs));
 	}
 
-	template<typename Units, class = std::enable_if_t<units::traits::is_dimensionless_unit<Units>::value>>
+	template<typename Units, class = std::enable_if_t<wpi::units::traits::is_dimensionless_unit<Units>::value>>
 	constexpr bool operator>=(const Units& lhs, const UNIT_LIB_DEFAULT_TYPE rhs) noexcept
 	{
 		return std::isgreaterequal(static_cast<UNIT_LIB_DEFAULT_TYPE>(lhs), rhs);
 	}
 
-	template<typename Units, class = std::enable_if_t<units::traits::is_dimensionless_unit<Units>::value>>
+	template<typename Units, class = std::enable_if_t<wpi::units::traits::is_dimensionless_unit<Units>::value>>
 	constexpr bool operator>(const UNIT_LIB_DEFAULT_TYPE lhs, const Units& rhs) noexcept
 	{
 		return lhs > static_cast<UNIT_LIB_DEFAULT_TYPE>(rhs);
 	}
 
-	template<typename Units, class = std::enable_if_t<units::traits::is_dimensionless_unit<Units>::value>>
+	template<typename Units, class = std::enable_if_t<wpi::units::traits::is_dimensionless_unit<Units>::value>>
 	constexpr bool operator>(const Units& lhs, const UNIT_LIB_DEFAULT_TYPE rhs) noexcept
 	{
 		return static_cast<UNIT_LIB_DEFAULT_TYPE>(lhs) > rhs;
 	}
 
-	template<typename Units, class = std::enable_if_t<units::traits::is_dimensionless_unit<Units>::value>>
+	template<typename Units, class = std::enable_if_t<wpi::units::traits::is_dimensionless_unit<Units>::value>>
 	constexpr bool operator<=(const UNIT_LIB_DEFAULT_TYPE lhs, const Units& rhs) noexcept
 	{
 		return std::islessequal(lhs, static_cast<UNIT_LIB_DEFAULT_TYPE>(rhs));
 	}
 
-	template<typename Units, class = std::enable_if_t<units::traits::is_dimensionless_unit<Units>::value>>
+	template<typename Units, class = std::enable_if_t<wpi::units::traits::is_dimensionless_unit<Units>::value>>
 	constexpr bool operator<=(const Units& lhs, const UNIT_LIB_DEFAULT_TYPE rhs) noexcept
 	{
 		return std::islessequal(static_cast<UNIT_LIB_DEFAULT_TYPE>(lhs), rhs);
 	}
 
-	template<typename Units, class = std::enable_if_t<units::traits::is_dimensionless_unit<Units>::value>>
+	template<typename Units, class = std::enable_if_t<wpi::units::traits::is_dimensionless_unit<Units>::value>>
 	constexpr bool operator<(const UNIT_LIB_DEFAULT_TYPE lhs, const Units& rhs) noexcept
 	{
 		return lhs < static_cast<UNIT_LIB_DEFAULT_TYPE>(rhs);
 	}
 
-	template<typename Units, class = std::enable_if_t<units::traits::is_dimensionless_unit<Units>::value>>
+	template<typename Units, class = std::enable_if_t<wpi::units::traits::is_dimensionless_unit<Units>::value>>
 	constexpr bool operator<(const Units& lhs, const UNIT_LIB_DEFAULT_TYPE rhs) noexcept
 	{
 		return static_cast<UNIT_LIB_DEFAULT_TYPE>(lhs) < rhs;
@@ -2787,7 +2787,7 @@ namespace units
 		/// recursive exponential implementation
 		template <int N, class U> struct power_of_unit
 		{
-			typedef typename units::detail::unit_multiply<U, typename power_of_unit<N - 1, U>::type> type;
+			typedef typename wpi::units::detail::unit_multiply<U, typename power_of_unit<N - 1, U>::type> type;
 		};
 
 		/// End recursion
@@ -2808,9 +2808,9 @@ namespace units
 		 * @returns		new unit_t, raised to the given exponent
 		 */
 		template<int power, class UnitType, class = typename std::enable_if<traits::has_linear_scale<UnitType>::value, int>>
-		constexpr auto pow(const UnitType& value) noexcept -> unit_t<typename units::detail::power_of_unit<power, typename units::traits::unit_t_traits<UnitType>::unit_type>::type, typename units::traits::unit_t_traits<UnitType>::underlying_type, linear_scale>
+		constexpr auto pow(const UnitType& value) noexcept -> unit_t<typename wpi::units::detail::power_of_unit<power, typename wpi::units::traits::unit_t_traits<UnitType>::unit_type>::type, typename wpi::units::traits::unit_t_traits<UnitType>::underlying_type, linear_scale>
 		{
-			return unit_t<typename units::detail::power_of_unit<power, typename units::traits::unit_t_traits<UnitType>::unit_type>::type, typename units::traits::unit_t_traits<UnitType>::underlying_type, linear_scale>
+			return unit_t<typename wpi::units::detail::power_of_unit<power, typename wpi::units::traits::unit_t_traits<UnitType>::unit_type>::type, typename wpi::units::traits::unit_t_traits<UnitType>::underlying_type, linear_scale>
 				(gcem::pow(value(), power));
 		}
 
@@ -2823,10 +2823,10 @@ namespace units
 		 * @returns		new unit_t, raised to the given exponent
 		 */
 		template<int power, class UnitType, class = typename std::enable_if<traits::has_linear_scale<UnitType>::value, int>>
-		constexpr auto cpow(const UnitType& value) noexcept -> unit_t<typename units::detail::power_of_unit<power, typename units::traits::unit_t_traits<UnitType>::unit_type>::type, typename units::traits::unit_t_traits<UnitType>::underlying_type, linear_scale>
+		constexpr auto cpow(const UnitType& value) noexcept -> unit_t<typename wpi::units::detail::power_of_unit<power, typename wpi::units::traits::unit_t_traits<UnitType>::unit_type>::type, typename wpi::units::traits::unit_t_traits<UnitType>::underlying_type, linear_scale>
 		{
-			static_assert(power >= 0, "cpow cannot accept negative numbers. Try units::math::pow instead.");
-			return unit_t<typename units::detail::power_of_unit<power, typename units::traits::unit_t_traits<UnitType>::unit_type>::type, typename units::traits::unit_t_traits<UnitType>::underlying_type, linear_scale>
+			static_assert(power >= 0, "cpow cannot accept negative numbers. Try wpi::units::math::pow instead.");
+			return unit_t<typename wpi::units::detail::power_of_unit<power, typename wpi::units::traits::unit_t_traits<UnitType>::unit_type>::type, typename wpi::units::traits::unit_t_traits<UnitType>::underlying_type, linear_scale>
 				(detail::pow(value(), power));
 		}
 	}
@@ -2882,11 +2882,11 @@ namespace units
 }
 #if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
 template <>
-struct fmt::formatter<units::dimensionless::dB_t> : fmt::formatter<double>
+struct fmt::formatter<wpi::units::dimensionless::dB_t> : fmt::formatter<double>
 {
 	template <typename FmtContext>
 	auto format(
-			const units::dimensionless::dB_t& obj,
+			const wpi::units::dimensionless::dB_t& obj,
 			FmtContext& ctx) const
 	{
 		auto out = ctx.out();
@@ -2896,7 +2896,7 @@ struct fmt::formatter<units::dimensionless::dB_t> : fmt::formatter<double>
 };
 #endif
 
-namespace units {
+namespace wpi::units {
 	//------------------------------
 	//	DECIBEL ARITHMETIC
 	//------------------------------
@@ -2904,11 +2904,11 @@ namespace units {
 	/// Addition for convertible unit_t types with a decibel_scale
 	template<class UnitTypeLhs, class UnitTypeRhs,
 		std::enable_if_t<traits::has_decibel_scale<UnitTypeLhs, UnitTypeRhs>::value, int> = 0>
-	constexpr inline auto operator+(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs) noexcept -> unit_t<compound_unit<squared<typename units::traits::unit_t_traits<UnitTypeLhs>::unit_type>>, typename units::traits::unit_t_traits<UnitTypeLhs>::underlying_type, decibel_scale>
+	constexpr inline auto operator+(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs) noexcept -> unit_t<compound_unit<squared<typename wpi::units::traits::unit_t_traits<UnitTypeLhs>::unit_type>>, typename wpi::units::traits::unit_t_traits<UnitTypeLhs>::underlying_type, decibel_scale>
 	{
-		using LhsUnits = typename units::traits::unit_t_traits<UnitTypeLhs>::unit_type;
-		using RhsUnits = typename units::traits::unit_t_traits<UnitTypeRhs>::unit_type;
-		using underlying_type = typename units::traits::unit_t_traits<UnitTypeLhs>::underlying_type;
+		using LhsUnits = typename wpi::units::traits::unit_t_traits<UnitTypeLhs>::unit_type;
+		using RhsUnits = typename wpi::units::traits::unit_t_traits<UnitTypeRhs>::unit_type;
+		using underlying_type = typename wpi::units::traits::unit_t_traits<UnitTypeLhs>::underlying_type;
 
 		return unit_t<compound_unit<squared<LhsUnits>>, underlying_type, decibel_scale>
 			(lhs.template toLinearized<underlying_type>() * convert<RhsUnits, LhsUnits>(rhs.template toLinearized<underlying_type>()), std::true_type());
@@ -2918,7 +2918,7 @@ namespace units {
 	template<class UnitTypeLhs, std::enable_if_t<traits::has_decibel_scale<UnitTypeLhs>::value && !traits::is_dimensionless_unit<UnitTypeLhs>::value, int> = 0>
 	constexpr inline UnitTypeLhs operator+(const UnitTypeLhs& lhs, const dimensionless::dB_t& rhs) noexcept
 	{
-		using underlying_type = typename units::traits::unit_t_traits<UnitTypeLhs>::underlying_type;
+		using underlying_type = typename wpi::units::traits::unit_t_traits<UnitTypeLhs>::underlying_type;
 		return UnitTypeLhs(lhs.template toLinearized<underlying_type>() * rhs.template toLinearized<underlying_type>(), std::true_type());
 	}
 
@@ -2926,17 +2926,17 @@ namespace units {
 	template<class UnitTypeRhs, std::enable_if_t<traits::has_decibel_scale<UnitTypeRhs>::value && !traits::is_dimensionless_unit<UnitTypeRhs>::value, int> = 0>
 	constexpr inline UnitTypeRhs operator+(const dimensionless::dB_t& lhs, const UnitTypeRhs& rhs) noexcept
 	{
-		using underlying_type = typename units::traits::unit_t_traits<UnitTypeRhs>::underlying_type;
+		using underlying_type = typename wpi::units::traits::unit_t_traits<UnitTypeRhs>::underlying_type;
 		return UnitTypeRhs(lhs.template toLinearized<underlying_type>() * rhs.template toLinearized<underlying_type>(), std::true_type());
 	}
 
 	/// Subtraction for convertible unit_t types with a decibel_scale
 	template<class UnitTypeLhs, class UnitTypeRhs, std::enable_if_t<traits::has_decibel_scale<UnitTypeLhs, UnitTypeRhs>::value, int> = 0>
-	constexpr inline auto operator-(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs) noexcept -> unit_t<compound_unit<typename units::traits::unit_t_traits<UnitTypeLhs>::unit_type, inverse<typename units::traits::unit_t_traits<UnitTypeRhs>::unit_type>>, typename units::traits::unit_t_traits<UnitTypeLhs>::underlying_type, decibel_scale>
+	constexpr inline auto operator-(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs) noexcept -> unit_t<compound_unit<typename wpi::units::traits::unit_t_traits<UnitTypeLhs>::unit_type, inverse<typename wpi::units::traits::unit_t_traits<UnitTypeRhs>::unit_type>>, typename wpi::units::traits::unit_t_traits<UnitTypeLhs>::underlying_type, decibel_scale>
 	{
-		using LhsUnits = typename units::traits::unit_t_traits<UnitTypeLhs>::unit_type;
-		using RhsUnits = typename units::traits::unit_t_traits<UnitTypeRhs>::unit_type;
-		using underlying_type = typename units::traits::unit_t_traits<UnitTypeLhs>::underlying_type;
+		using LhsUnits = typename wpi::units::traits::unit_t_traits<UnitTypeLhs>::unit_type;
+		using RhsUnits = typename wpi::units::traits::unit_t_traits<UnitTypeRhs>::unit_type;
+		using underlying_type = typename wpi::units::traits::unit_t_traits<UnitTypeLhs>::underlying_type;
 
 		return unit_t<compound_unit<LhsUnits, inverse<RhsUnits>>, underlying_type, decibel_scale>
 			(lhs.template toLinearized<underlying_type>() / convert<RhsUnits, LhsUnits>(rhs.template toLinearized<underlying_type>()), std::true_type());
@@ -2946,16 +2946,16 @@ namespace units {
 	template<class UnitTypeLhs, std::enable_if_t<traits::has_decibel_scale<UnitTypeLhs>::value && !traits::is_dimensionless_unit<UnitTypeLhs>::value, int> = 0>
 	constexpr inline UnitTypeLhs operator-(const UnitTypeLhs& lhs, const dimensionless::dB_t& rhs) noexcept
 	{
-		using underlying_type = typename units::traits::unit_t_traits<UnitTypeLhs>::underlying_type;
+		using underlying_type = typename wpi::units::traits::unit_t_traits<UnitTypeLhs>::underlying_type;
 		return UnitTypeLhs(lhs.template toLinearized<underlying_type>() / rhs.template toLinearized<underlying_type>(), std::true_type());
 	}
 
 	/// Subtraction between unit_t types with a decibel_scale and dimensionless dB units
 	template<class UnitTypeRhs, std::enable_if_t<traits::has_decibel_scale<UnitTypeRhs>::value && !traits::is_dimensionless_unit<UnitTypeRhs>::value, int> = 0>
-	constexpr inline auto operator-(const dimensionless::dB_t& lhs, const UnitTypeRhs& rhs) noexcept -> unit_t<inverse<typename units::traits::unit_t_traits<UnitTypeRhs>::unit_type>, typename units::traits::unit_t_traits<UnitTypeRhs>::underlying_type, decibel_scale>
+	constexpr inline auto operator-(const dimensionless::dB_t& lhs, const UnitTypeRhs& rhs) noexcept -> unit_t<inverse<typename wpi::units::traits::unit_t_traits<UnitTypeRhs>::unit_type>, typename wpi::units::traits::unit_t_traits<UnitTypeRhs>::underlying_type, decibel_scale>
 	{
-		using RhsUnits = typename units::traits::unit_t_traits<UnitTypeRhs>::unit_type;
-		using underlying_type = typename units::traits::unit_t_traits<RhsUnits>::underlying_type;
+		using RhsUnits = typename wpi::units::traits::unit_t_traits<UnitTypeRhs>::unit_type;
+		using underlying_type = typename wpi::units::traits::unit_t_traits<RhsUnits>::underlying_type;
 
 		return unit_t<inverse<RhsUnits>, underlying_type, decibel_scale>
 			(lhs.template toLinearized<underlying_type>() / rhs.template toLinearized<underlying_type>(), std::true_type());
@@ -2978,7 +2978,7 @@ namespace units {
 #ifdef FOR_DOXYGEN_PURPOSES_ONLY
 		/**
 		* @ingroup		TypeTraits
-		* @brief		Trait for accessing the publicly defined types of `units::unit_value_t_traits`
+		* @brief		Trait for accessing the publicly defined types of `wpi::units::unit_value_t_traits`
 		* @details		The units library determines certain properties of the `unit_value_t` types passed to
 		*				them and what they represent by using the members of the corresponding `unit_value_t_traits`
 		*				instantiation.
@@ -3005,7 +3005,7 @@ namespace units {
 
 		/**
 		 * @ingroup		TypeTraits
-		 * @brief		Trait for accessing the publicly defined types of `units::unit_value_t_traits`
+		 * @brief		Trait for accessing the publicly defined types of `wpi::units::unit_value_t_traits`
 		 * @details
 		 */
 		template<typename T>
@@ -3037,7 +3037,7 @@ namespace units {
 	 *
 	 */
 	template<typename Units, std::uintmax_t Num, std::uintmax_t Denom = 1>
-	struct unit_value_t : units::detail::_unit_value_t<Units>
+	struct unit_value_t : wpi::units::detail::_unit_value_t<Units>
 	{
 		typedef Units unit_type;
 		typedef std::ratio<Num, Denom> ratio;
@@ -3058,7 +3058,7 @@ namespace units {
 		 */
 		template<typename T, typename Units = typename traits::unit_value_t_traits<T>::unit_type>
 		struct is_unit_value_t : std::integral_constant<bool,
-			std::is_base_of<units::detail::_unit_value_t<Units>, T>::value>
+			std::is_base_of<wpi::units::detail::_unit_value_t<Units>, T>::value>
 		{};
 		template<typename T, typename Units = typename traits::unit_value_t_traits<T>::unit_type>
 		constexpr bool is_unit_value_t_v = is_unit_value_t<T, Units>::value;
@@ -3066,11 +3066,11 @@ namespace units {
 		/**
 		 * @ingroup		TypeTraits
 		 * @brief		Trait which tests whether type T is a unit_value_t with a unit type in the given category.
-		 * @details		e.g. `is_unit_value_t_category<units::category::length, unit_value_t<feet>>::value` would be true
+		 * @details		e.g. `is_unit_value_t_category<wpi::units::category::length, unit_value_t<feet>>::value` would be true
 		 */
 		template<typename Category, typename T>
 		struct is_unit_value_t_category : std::integral_constant<bool,
-			std::is_same<units::traits::base_unit_of<typename traits::unit_value_t_traits<T>::unit_type>, Category>::value>
+			std::is_same<wpi::units::traits::base_unit_of<typename traits::unit_value_t_traits<T>::unit_type>, Category>::value>
 		{
 			static_assert(is_base_unit<Category>::value, "Template parameter `Category` must be a `base_unit` type.");
 		};
@@ -3090,12 +3090,12 @@ namespace units {
 
 			using _UNIT1 = typename traits::unit_value_t_traits<U1>::unit_type;
 			using _UNIT2 = typename traits::unit_value_t_traits<U2>::unit_type;
-			using _CONV1 = typename units::traits::unit_traits<_UNIT1>::conversion_ratio;
-			using _CONV2 = typename units::traits::unit_traits<_UNIT2>::conversion_ratio;
+			using _CONV1 = typename wpi::units::traits::unit_traits<_UNIT1>::conversion_ratio;
+			using _CONV2 = typename wpi::units::traits::unit_traits<_UNIT2>::conversion_ratio;
 			using _RATIO1 = typename traits::unit_value_t_traits<U1>::ratio;
 			using _RATIO2 = typename traits::unit_value_t_traits<U2>::ratio;
 			using _RATIO2CONV = typename std::ratio_divide<std::ratio_multiply<_RATIO2, _CONV2>, _CONV1>;
-			using _PI_EXP = std::ratio_subtract<typename units::traits::unit_traits<_UNIT2>::pi_exponent_ratio, typename units::traits::unit_traits<_UNIT1>::pi_exponent_ratio>;
+			using _PI_EXP = std::ratio_subtract<typename wpi::units::traits::unit_traits<_UNIT2>::pi_exponent_ratio, typename wpi::units::traits::unit_traits<_UNIT1>::pi_exponent_ratio>;
 		};
 	}
 	/** @endcond */	// END DOXYGEN IGNORE
@@ -3111,10 +3111,10 @@ namespace units {
 	 * @note		very similar in concept to `std::ratio_add`
 	 */
 	template<class U1, class U2>
-	struct unit_value_add : units::detail::unit_value_arithmetic<U1, U2>, units::detail::_unit_value_t<typename traits::unit_value_t_traits<U1>::unit_type>
+	struct unit_value_add : wpi::units::detail::unit_value_arithmetic<U1, U2>, wpi::units::detail::_unit_value_t<typename traits::unit_value_t_traits<U1>::unit_type>
 	{
 		/** @cond */	// DOXYGEN IGNORE
-		using Base = units::detail::unit_value_arithmetic<U1, U2>;
+		using Base = wpi::units::detail::unit_value_arithmetic<U1, U2>;
 		typedef typename Base::_UNIT1 unit_type;
 		using ratio = std::ratio_add<typename Base::_RATIO1, typename Base::_RATIO2CONV>;
 
@@ -3144,7 +3144,7 @@ namespace units {
 		static constexpr const unit_t<unit_type> value(std::true_type) noexcept
 		{
 			return unit_t<unit_type>(((UNIT_LIB_DEFAULT_TYPE)Base::_RATIO1::num / Base::_RATIO1::den) +
-			((UNIT_LIB_DEFAULT_TYPE)Base::_RATIO2CONV::num / Base::_RATIO2CONV::den) * std::pow(units::constants::detail::PI_VAL, ((UNIT_LIB_DEFAULT_TYPE)Base::_PI_EXP::num / Base::_PI_EXP::den)));
+			((UNIT_LIB_DEFAULT_TYPE)Base::_RATIO2CONV::num / Base::_RATIO2CONV::den) * std::pow(wpi::units::constants::detail::PI_VAL, ((UNIT_LIB_DEFAULT_TYPE)Base::_PI_EXP::num / Base::_PI_EXP::den)));
 		}
 		/** @endcond */	// END DOXYGEN IGNORE
 	};
@@ -3160,10 +3160,10 @@ namespace units {
 	 * @note		very similar in concept to `std::ratio_subtract`
 	 */
 	template<class U1, class U2>
-	struct unit_value_subtract : units::detail::unit_value_arithmetic<U1, U2>, units::detail::_unit_value_t<typename traits::unit_value_t_traits<U1>::unit_type>
+	struct unit_value_subtract : wpi::units::detail::unit_value_arithmetic<U1, U2>, wpi::units::detail::_unit_value_t<typename traits::unit_value_t_traits<U1>::unit_type>
 	{
 		/** @cond */	// DOXYGEN IGNORE
-		using Base = units::detail::unit_value_arithmetic<U1, U2>;
+		using Base = wpi::units::detail::unit_value_arithmetic<U1, U2>;
 
 		typedef typename Base::_UNIT1 unit_type;
 		using ratio = std::ratio_subtract<typename Base::_RATIO1, typename Base::_RATIO2CONV>;
@@ -3194,7 +3194,7 @@ namespace units {
 		static constexpr const unit_t<unit_type> value(std::true_type) noexcept
 		{
 			return unit_t<unit_type>(((UNIT_LIB_DEFAULT_TYPE)Base::_RATIO1::num / Base::_RATIO1::den) - ((UNIT_LIB_DEFAULT_TYPE)Base::_RATIO2CONV::num / Base::_RATIO2CONV::den)
-				* std::pow(units::constants::detail::PI_VAL, ((UNIT_LIB_DEFAULT_TYPE)Base::_PI_EXP::num / Base::_PI_EXP::den)));
+				* std::pow(wpi::units::constants::detail::PI_VAL, ((UNIT_LIB_DEFAULT_TYPE)Base::_PI_EXP::num / Base::_PI_EXP::den)));
 		}
 		/** @endcond */	// END DOXYGEN IGNORE	};
 	};
@@ -3210,13 +3210,13 @@ namespace units {
 	 * @note		very similar in concept to `std::ratio_multiply`
 	 */
 	template<class U1, class U2>
-	struct unit_value_multiply : units::detail::unit_value_arithmetic<U1, U2>,
-		units::detail::_unit_value_t<typename std::conditional<traits::is_convertible_unit<typename traits::unit_value_t_traits<U1>::unit_type,
+	struct unit_value_multiply : wpi::units::detail::unit_value_arithmetic<U1, U2>,
+		wpi::units::detail::_unit_value_t<typename std::conditional<traits::is_convertible_unit<typename traits::unit_value_t_traits<U1>::unit_type,
 			typename traits::unit_value_t_traits<U2>::unit_type>::value, compound_unit<squared<typename traits::unit_value_t_traits<U1>::unit_type>>,
 			compound_unit<typename traits::unit_value_t_traits<U1>::unit_type, typename traits::unit_value_t_traits<U2>::unit_type>>::type>
 	{
 		/** @cond */	// DOXYGEN IGNORE
-		using Base = units::detail::unit_value_arithmetic<U1, U2>;
+		using Base = wpi::units::detail::unit_value_arithmetic<U1, U2>;
 
 		using unit_type = std::conditional_t<traits::is_convertible_unit<typename Base::_UNIT1, typename Base::_UNIT2>::value, compound_unit<squared<typename Base::_UNIT1>>, compound_unit<typename Base::_UNIT1, typename Base::_UNIT2>>;
 		using ratio = std::conditional_t<traits::is_convertible_unit<typename Base::_UNIT1, typename Base::_UNIT2>::value, std::ratio_multiply<typename Base::_RATIO1, typename Base::_RATIO2CONV>, std::ratio_multiply<typename Base::_RATIO1, typename Base::_RATIO2>>;
@@ -3244,7 +3244,7 @@ namespace units {
 		// value if PI *is* involved
 		static constexpr const unit_t<unit_type> value(std::true_type) noexcept
 		{
-			return unit_t<unit_type>(((UNIT_LIB_DEFAULT_TYPE)ratio::num / ratio::den) * std::pow(units::constants::detail::PI_VAL, ((UNIT_LIB_DEFAULT_TYPE)Base::_PI_EXP::num / Base::_PI_EXP::den)));
+			return unit_t<unit_type>(((UNIT_LIB_DEFAULT_TYPE)ratio::num / ratio::den) * std::pow(wpi::units::constants::detail::PI_VAL, ((UNIT_LIB_DEFAULT_TYPE)Base::_PI_EXP::num / Base::_PI_EXP::den)));
 		}
 		/** @endcond */	// END DOXYGEN IGNORE
 	};
@@ -3260,13 +3260,13 @@ namespace units {
 	 * @note		very similar in concept to `std::ratio_divide`
 	 */
 	template<class U1, class U2>
-	struct unit_value_divide : units::detail::unit_value_arithmetic<U1, U2>,
-		units::detail::_unit_value_t<typename std::conditional<traits::is_convertible_unit<typename traits::unit_value_t_traits<U1>::unit_type,
+	struct unit_value_divide : wpi::units::detail::unit_value_arithmetic<U1, U2>,
+		wpi::units::detail::_unit_value_t<typename std::conditional<traits::is_convertible_unit<typename traits::unit_value_t_traits<U1>::unit_type,
 		typename traits::unit_value_t_traits<U2>::unit_type>::value, dimensionless::scalar, compound_unit<typename traits::unit_value_t_traits<U1>::unit_type,
 		inverse<typename traits::unit_value_t_traits<U2>::unit_type>>>::type>
 	{
 		/** @cond */	// DOXYGEN IGNORE
-		using Base = units::detail::unit_value_arithmetic<U1, U2>;
+		using Base = wpi::units::detail::unit_value_arithmetic<U1, U2>;
 
 		using unit_type = std::conditional_t<traits::is_convertible_unit<typename Base::_UNIT1, typename Base::_UNIT2>::value, dimensionless::scalar, compound_unit<typename Base::_UNIT1, inverse<typename Base::_UNIT2>>>;
 		using ratio = std::conditional_t<traits::is_convertible_unit<typename Base::_UNIT1, typename Base::_UNIT2>::value, std::ratio_divide<typename Base::_RATIO1, typename Base::_RATIO2CONV>, std::ratio_divide<typename Base::_RATIO1, typename Base::_RATIO2>>;
@@ -3294,7 +3294,7 @@ namespace units {
 		// value if PI *is* involved
 		static constexpr const unit_t<unit_type> value(std::true_type) noexcept
 		{
-			return unit_t<unit_type>(((UNIT_LIB_DEFAULT_TYPE)ratio::num / ratio::den) * std::pow(units::constants::detail::PI_VAL, ((UNIT_LIB_DEFAULT_TYPE)Base::_PI_EXP::num / Base::_PI_EXP::den)));
+			return unit_t<unit_type>(((UNIT_LIB_DEFAULT_TYPE)ratio::num / ratio::den) * std::pow(wpi::units::constants::detail::PI_VAL, ((UNIT_LIB_DEFAULT_TYPE)Base::_PI_EXP::num / Base::_PI_EXP::den)));
 		}
 		/** @endcond */	// END DOXYGEN IGNORE
 	};
@@ -3306,16 +3306,16 @@ namespace units {
 	 * @tparam		U1	`unit_value_t` to take the exponentiation of.
 	 * @sa			unit_value_t_traits to access information about the properties of the class,
 	 *				such as it's unit type and rational value.
-	 * @note		very similar in concept to `units::math::pow`
+	 * @note		very similar in concept to `wpi::units::math::pow`
 	 */
 	template<class U1, int power>
-	struct unit_value_power : units::detail::unit_value_arithmetic<U1, U1>, units::detail::_unit_value_t<typename units::detail::power_of_unit<power, typename traits::unit_value_t_traits<U1>::unit_type>::type>
+	struct unit_value_power : wpi::units::detail::unit_value_arithmetic<U1, U1>, wpi::units::detail::_unit_value_t<typename wpi::units::detail::power_of_unit<power, typename traits::unit_value_t_traits<U1>::unit_type>::type>
 	{
 		/** @cond */	// DOXYGEN IGNORE
-		using Base = units::detail::unit_value_arithmetic<U1, U1>;
+		using Base = wpi::units::detail::unit_value_arithmetic<U1, U1>;
 
-		using unit_type = typename units::detail::power_of_unit<power, typename Base::_UNIT1>::type;
-		using ratio = typename units::detail::power_of_ratio<power, typename Base::_RATIO1>::type;
+		using unit_type = typename wpi::units::detail::power_of_unit<power, typename Base::_UNIT1>::type;
+		using ratio = typename wpi::units::detail::power_of_ratio<power, typename Base::_RATIO1>::type;
 		using pi_exponent = std::ratio_multiply<std::ratio<power>, typename Base::_UNIT1::pi_exponent_ratio>;
 		/** @endcond */	// END DOXYGEN IGNORE
 
@@ -3341,7 +3341,7 @@ namespace units {
 		// value if PI *is* involved
 		static constexpr const unit_t<unit_type> value(std::true_type) noexcept
 		{
-			return unit_t<unit_type>(((UNIT_LIB_DEFAULT_TYPE)ratio::num / ratio::den) * std::pow(units::constants::detail::PI_VAL, ((UNIT_LIB_DEFAULT_TYPE)pi_exponent::num / pi_exponent::den)));
+			return unit_t<unit_type>(((UNIT_LIB_DEFAULT_TYPE)ratio::num / ratio::den) * std::pow(wpi::units::constants::detail::PI_VAL, ((UNIT_LIB_DEFAULT_TYPE)pi_exponent::num / pi_exponent::den)));
 		}
 		/** @endcond */	// END DOXYGEN IGNORE	};
 	};
@@ -3353,13 +3353,13 @@ namespace units {
 	 * @tparam		U1	`unit_value_t` to take the square root of.
 	 * @sa			unit_value_t_traits to access information about the properties of the class,
 	 *				such as it's unit type and rational value.
-	 * @note		very similar in concept to `units::ratio_sqrt`
+	 * @note		very similar in concept to `wpi::units::ratio_sqrt`
 	 */
 	template<class U1, std::intmax_t Eps = 10000000000>
-	struct unit_value_sqrt : units::detail::unit_value_arithmetic<U1, U1>, units::detail::_unit_value_t<square_root<typename traits::unit_value_t_traits<U1>::unit_type, Eps>>
+	struct unit_value_sqrt : wpi::units::detail::unit_value_arithmetic<U1, U1>, wpi::units::detail::_unit_value_t<square_root<typename traits::unit_value_t_traits<U1>::unit_type, Eps>>
 	{
 		/** @cond */	// DOXYGEN IGNORE
-		using Base = units::detail::unit_value_arithmetic<U1, U1>;
+		using Base = wpi::units::detail::unit_value_arithmetic<U1, U1>;
 
 		using unit_type = square_root<typename Base::_UNIT1, Eps>;
 		using ratio = ratio_sqrt<typename Base::_RATIO1, Eps>;
@@ -3388,7 +3388,7 @@ namespace units {
 		// value if PI *is* involved
 		static constexpr const unit_t<unit_type> value(std::true_type) noexcept
 		{
-			return unit_t<unit_type>(((UNIT_LIB_DEFAULT_TYPE)ratio::num / ratio::den) * std::pow(units::constants::detail::PI_VAL, ((UNIT_LIB_DEFAULT_TYPE)pi_exponent::num / pi_exponent::den)));
+			return unit_t<unit_type>(((UNIT_LIB_DEFAULT_TYPE)ratio::num / ratio::den) * std::pow(wpi::units::constants::detail::PI_VAL, ((UNIT_LIB_DEFAULT_TYPE)pi_exponent::num / pi_exponent::den)));
 		}
 		/** @endcond */	// END DOXYGEN IGNORE
 	};
@@ -3442,8 +3442,8 @@ namespace units {
 #endif // _MSC_VER
 
 #if defined(UNIT_HAS_LITERAL_SUPPORT)
-namespace units::literals {}
-using namespace units::literals;
+namespace wpi::units::literals {}
+using namespace wpi::units::literals;
 #endif  // UNIT_HAS_LITERAL_SUPPORT
 
 #if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)

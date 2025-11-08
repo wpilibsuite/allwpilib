@@ -24,10 +24,10 @@
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/print.hpp"
 
-using namespace nt;
+using namespace wpi::nt;
 
 Topic NetworkTableInstance::GetTopic(std::string_view name) const {
-  return Topic{::nt::GetTopic(m_handle, name)};
+  return Topic{::wpi::nt::GetTopic(m_handle, name)};
 }
 
 BooleanTopic NetworkTableInstance::GetBooleanTopic(
@@ -108,41 +108,41 @@ void NetworkTableInstance::SetServer(std::span<const std::string_view> servers,
 NT_Listener NetworkTableInstance::AddListener(Topic topic,
                                               unsigned int eventMask,
                                               ListenerCallback listener) {
-  if (::nt::GetInstanceFromHandle(topic.GetHandle()) != m_handle) {
-    wpi::print(stderr, "AddListener: topic is not from this instance\n");
+  if (::wpi::nt::GetInstanceFromHandle(topic.GetHandle()) != m_handle) {
+    wpi::util::print(stderr, "AddListener: topic is not from this instance\n");
     return 0;
   }
-  return ::nt::AddListener(topic.GetHandle(), eventMask, std::move(listener));
+  return ::wpi::nt::AddListener(topic.GetHandle(), eventMask, std::move(listener));
 }
 
 NT_Listener NetworkTableInstance::AddListener(Subscriber& subscriber,
                                               unsigned int eventMask,
                                               ListenerCallback listener) {
-  if (::nt::GetInstanceFromHandle(subscriber.GetHandle()) != m_handle) {
-    wpi::print(stderr, "AddListener: subscriber is not from this instance\n");
+  if (::wpi::nt::GetInstanceFromHandle(subscriber.GetHandle()) != m_handle) {
+    wpi::util::print(stderr, "AddListener: subscriber is not from this instance\n");
     return 0;
   }
-  return ::nt::AddListener(subscriber.GetHandle(), eventMask,
+  return ::wpi::nt::AddListener(subscriber.GetHandle(), eventMask,
                            std::move(listener));
 }
 
 NT_Listener NetworkTableInstance::AddListener(const NetworkTableEntry& entry,
                                               int eventMask,
                                               ListenerCallback listener) {
-  if (::nt::GetInstanceFromHandle(entry.GetHandle()) != m_handle) {
-    wpi::print(stderr, "AddListener: entry is not from this instance\n");
+  if (::wpi::nt::GetInstanceFromHandle(entry.GetHandle()) != m_handle) {
+    wpi::util::print(stderr, "AddListener: entry is not from this instance\n");
     return 0;
   }
-  return ::nt::AddListener(entry.GetHandle(), eventMask, std::move(listener));
+  return ::wpi::nt::AddListener(entry.GetHandle(), eventMask, std::move(listener));
 }
 
 NT_Listener NetworkTableInstance::AddListener(MultiSubscriber& subscriber,
                                               int eventMask,
                                               ListenerCallback listener) {
-  if (::nt::GetInstanceFromHandle(subscriber.GetHandle()) != m_handle) {
-    wpi::print(stderr, "AddListener: subscriber is not from this instance\n");
+  if (::wpi::nt::GetInstanceFromHandle(subscriber.GetHandle()) != m_handle) {
+    wpi::util::print(stderr, "AddListener: subscriber is not from this instance\n");
     return 0;
   }
-  return ::nt::AddListener(subscriber.GetHandle(), eventMask,
+  return ::wpi::nt::AddListener(subscriber.GetHandle(), eventMask,
                            std::move(listener));
 }

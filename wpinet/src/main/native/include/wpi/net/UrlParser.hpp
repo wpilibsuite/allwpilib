@@ -10,7 +10,7 @@
 #include "wpi/net/http_parser.hpp"
 #include "wpi/util/StringExtras.hpp"
 
-namespace wpi {
+namespace wpi::net {
 
 /**
  * Parses a URL into its constituent components.
@@ -53,34 +53,34 @@ class UrlParser {
   }
 
   std::string_view GetSchema() const {
-    return wpi::substr(m_data, m_url.field_data[UF_SCHEMA].off,
+    return wpi::util::substr(m_data, m_url.field_data[UF_SCHEMA].off,
                        m_url.field_data[UF_SCHEMA].len);
   }
 
   std::string_view GetHost() const {
-    return wpi::substr(m_data, m_url.field_data[UF_HOST].off,
+    return wpi::util::substr(m_data, m_url.field_data[UF_HOST].off,
                        m_url.field_data[UF_HOST].len);
   }
 
   unsigned int GetPort() const { return m_url.port; }
 
   std::string_view GetPath() const {
-    return wpi::substr(m_data, m_url.field_data[UF_PATH].off,
+    return wpi::util::substr(m_data, m_url.field_data[UF_PATH].off,
                        m_url.field_data[UF_PATH].len);
   }
 
   std::string_view GetQuery() const {
-    return wpi::substr(m_data, m_url.field_data[UF_QUERY].off,
+    return wpi::util::substr(m_data, m_url.field_data[UF_QUERY].off,
                        m_url.field_data[UF_QUERY].len);
   }
 
   std::string_view GetFragment() const {
-    return wpi::substr(m_data, m_url.field_data[UF_FRAGMENT].off,
+    return wpi::util::substr(m_data, m_url.field_data[UF_FRAGMENT].off,
                        m_url.field_data[UF_FRAGMENT].len);
   }
 
   std::string_view GetUserInfo() const {
-    return wpi::substr(m_data, m_url.field_data[UF_USERINFO].off,
+    return wpi::util::substr(m_data, m_url.field_data[UF_USERINFO].off,
                        m_url.field_data[UF_USERINFO].len);
   }
 
@@ -90,6 +90,6 @@ class UrlParser {
   http_parser_url m_url;
 };
 
-}  // namespace wpi
+}  // namespace wpi::net
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_URLPARSER_HPP_

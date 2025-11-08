@@ -8,12 +8,12 @@
 
 #include <fmt/format.h>
 
-using namespace glass;
+using namespace wpi::glass;
 
 NTSubsystemModel::NTSubsystemModel(std::string_view path)
-    : NTSubsystemModel(nt::NetworkTableInstance::GetDefault(), path) {}
+    : NTSubsystemModel(wpi::nt::NetworkTableInstance::GetDefault(), path) {}
 
-NTSubsystemModel::NTSubsystemModel(nt::NetworkTableInstance inst,
+NTSubsystemModel::NTSubsystemModel(wpi::nt::NetworkTableInstance inst,
                                    std::string_view path)
     : m_inst{inst},
       m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},

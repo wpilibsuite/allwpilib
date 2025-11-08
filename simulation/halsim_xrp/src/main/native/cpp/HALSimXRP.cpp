@@ -14,18 +14,18 @@
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/print.hpp"
 
-namespace uv = wpi::uv;
+namespace uv = wpi::net::uv;
 
 using namespace wpilibxrp;
 
-HALSimXRP::HALSimXRP(wpi::uv::Loop& loop,
+HALSimXRP::HALSimXRP(wpi::net::uv::Loop& loop,
                      wpilibws::ProviderContainer& providers,
                      wpilibws::HALSimWSProviderSimDevices& simDevicesProvider)
     : m_loop(loop),
       m_providers(providers),
       m_simDevicesProvider(simDevicesProvider) {
   m_loop.error.connect([](uv::Error err) {
-    wpi::print(stderr, "HALSim XRP Client libuv Error: {}\n", err.str());
+    wpi::util::print(stderr, "HALSim XRP Client libuv Error: {}\n", err.str());
   });
 
   m_udp_client = uv::Udp::Create(m_loop);
@@ -52,14 +52,14 @@ bool HALSimXRP::Initialize() {
     try {
       m_port = std::stoi(port);
     } catch (const std::invalid_argument& err) {
-      wpi::print(stderr, "Error decoding HALSIMXRP_PORT ({})\n", err.what());
+      wpi::util::print(stderr, "Error decoding HALSIMXRP_PORT ({})\n", err.what());
       return false;
     }
   } else {
     m_port = 3540;
   }
 
-  wpilibxrp::WPILibUpdateFunc func = [&](const wpi::json& data) {
+  wpilibxrp::WPILibUpdateFunc func = [&](const wpi::util::json& data) {
     OnNetValueChanged(data);
   };
 
@@ -80,7 +80,7 @@ void HALSimXRP::Start() {
         ParsePacket({reinterpret_cast<uint8_t*>(data.base), len});
       });
 
-  m_udp_client->closed.connect([]() { wpi::print("Socket Closed\n"); });
+  m_udp_client->closed.connect([]() { wpi::util::print("Socket Closed\n"); });
 
   // Fake the OnNetworkConnected call
   auto hws = shared_from_this();
@@ -104,12 +104,12 @@ void HALSimXRP::ParsePacket(std::span<const uint8_t> packet) {
   m_xrp.HandleXRPUpdate(packet);
 }
 
-void HALSimXRP::OnNetValueChanged(const wpi::json& msg) {
+void HALSimXRP::OnNetValueChanged(const wpi::util::json& msg) {
   try {
     auto& type = msg.at("type").get_ref<const std::string&>();
     auto& device = msg.at("device").get_ref<const std::string&>();
 
-    wpi::SmallString<64> key;
+    wpi::util::SmallString<64> key;
     key.append(type);
     if (!device.empty()) {
       key.append("/");
@@ -120,12 +120,12 @@ void HALSimXRP::OnNetValueChanged(const wpi::json& msg) {
     if (provider) {
       provider->OnNetValueChanged(msg.at("data"));
     }
-  } catch (wpi::json::exception& e) {
-    wpi::print(stderr, "Error with incoming message: {}\n", e.what());
+  } catch (wpi::util::json::exception& e) {
+    wpi::util::print(stderr, "Error with incoming message: {}\n", e.what());
   }
 }
 
-void HALSimXRP::OnSimValueChanged(const wpi::json& simData) {
+void HALSimXRP::OnSimValueChanged(const wpi::util::json& simData) {
   // We'll use a signal from robot code to send all the data
   if (simData["type"] == "HAL") {
     auto halData = simData["data"];
@@ -143,8 +143,8 @@ uv::SimpleBufferPool<4>& HALSimXRP::GetBufferPool() {
 }
 
 void HALSimXRP::SendStateToXRP() {
-  wpi::SmallVector<uv::Buffer, 4> sendBufs;
-  wpi::raw_uv_ostream stream{sendBufs, [&] {
+  wpi::util::SmallVector<uv::Buffer, 4> sendBufs;
+  wpi::net::raw_uv_ostream stream{sendBufs, [&] {
                                std::lock_guard lock(m_buffer_mutex);
                                return GetBufferPool().Allocate();
                              }};

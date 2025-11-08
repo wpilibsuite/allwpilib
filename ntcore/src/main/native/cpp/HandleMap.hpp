@@ -11,7 +11,7 @@
 #include "Handle.hpp"
 #include "wpi/util/UidVector.hpp"
 
-namespace nt {
+namespace wpi::nt {
 
 template <typename T>
 concept HandleType = requires {
@@ -20,7 +20,7 @@ concept HandleType = requires {
 
 // Utility wrapper class for our UidVectors
 template <HandleType T, size_t Size>
-class HandleMap : public wpi::UidVector<std::unique_ptr<T>, Size> {
+class HandleMap : public wpi::util::UidVector<std::unique_ptr<T>, Size> {
  public:
   template <typename... Args>
   T* Add(int inst, Args&&... args) {
@@ -56,4 +56,4 @@ class HandleMap : public wpi::UidVector<std::unique_ptr<T>, Size> {
   }
 };
 
-}  // namespace nt
+}  // namespace wpi::nt

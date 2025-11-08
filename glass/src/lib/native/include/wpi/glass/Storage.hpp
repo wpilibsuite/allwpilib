@@ -18,7 +18,7 @@
 #include "wpi/util/iterator_range.hpp"
 #include "wpi/util/json_fwd.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 namespace detail {
 template <typename IteratorType>
@@ -103,7 +103,7 @@ class Storage {
     void Reset(Type newType);
   };
 
-  using ValueMap = wpi::StringMap<std::unique_ptr<Value>>;
+  using ValueMap = wpi::util::StringMap<std::unique_ptr<Value>>;
   template <typename Iterator>
   using ChildIterator = detail::ChildIterator<Iterator>;
 
@@ -173,15 +173,15 @@ class Storage {
   ValueMap& GetValues() { return m_values; }
   const ValueMap& GetValues() const { return m_values; }
 
-  wpi::iterator_range<ChildIterator<ValueMap::iterator>> GetChildren();
+  wpi::util::iterator_range<ChildIterator<ValueMap::iterator>> GetChildren();
 
   /**
    * Erases all children (at top level).
    */
   void EraseChildren();
 
-  bool FromJson(const wpi::json& json, const char* filename);
-  wpi::json ToJson() const;
+  bool FromJson(const wpi::util::json& json, const char* filename);
+  wpi::util::json ToJson() const;
 
   /**
    * Clear settings (set to default).  Calls custom clear function (if set),
@@ -213,8 +213,8 @@ class Storage {
    * @param toJson replacement for ToJson()
    */
   void SetCustomJson(
-      std::function<bool(const wpi::json& json, const char* filename)> fromJson,
-      std::function<wpi::json()> toJson) {
+      std::function<bool(const wpi::util::json& json, const char* filename)> fromJson,
+      std::function<wpi::util::json()> toJson) {
     m_fromJson = std::move(fromJson);
     m_toJson = std::move(toJson);
   }
@@ -230,8 +230,8 @@ class Storage {
  private:
   mutable ValueMap m_values;
   std::shared_ptr<void> m_data;
-  std::function<bool(const wpi::json& json, const char* filename)> m_fromJson;
-  std::function<wpi::json()> m_toJson;
+  std::function<bool(const wpi::util::json& json, const char* filename)> m_fromJson;
+  std::function<wpi::util::json()> m_toJson;
   std::function<void()> m_clear;
   std::function<void()> m_apply;
 };
@@ -281,8 +281,8 @@ class ChildIterator {
 }  // namespace detail
 
 inline auto Storage::GetChildren()
-    -> wpi::iterator_range<ChildIterator<ValueMap::iterator>> {
+    -> wpi::util::iterator_range<ChildIterator<ValueMap::iterator>> {
   return {{m_values.begin(), m_values.end()}, {m_values.end(), m_values.end()}};
 }
 
-}  // namespace glass
+}  // namespace wpi::glass

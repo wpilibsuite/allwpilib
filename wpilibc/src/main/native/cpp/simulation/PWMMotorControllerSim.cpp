@@ -8,15 +8,15 @@
 #include "wpi/simulation/SimDeviceSim.hpp"
 #include "wpi/units/length.hpp"
 
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 PWMMotorControllerSim::PWMMotorControllerSim(
     const PWMMotorController& motorctrl)
     : PWMMotorControllerSim(motorctrl.GetChannel()) {}
 
 PWMMotorControllerSim::PWMMotorControllerSim(int channel) {
-  frc::sim::SimDeviceSim deviceSim{"PWMMotorController", channel};
+  wpi::sim::SimDeviceSim deviceSim{"PWMMotorController", channel};
   m_simSpeed = deviceSim.GetDouble("Speed");
 }
 

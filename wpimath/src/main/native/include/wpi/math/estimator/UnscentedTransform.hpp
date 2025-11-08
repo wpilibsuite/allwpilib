@@ -11,7 +11,7 @@
 
 #include "wpi/math/linalg/EigenCore.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * Computes unscented transform of a set of sigma points and weights. CovDim
@@ -103,4 +103,4 @@ SquareRootUnscentedTransform(
   return std::make_tuple(x, S);
 }
 
-}  // namespace frc
+}  // namespace wpi::math

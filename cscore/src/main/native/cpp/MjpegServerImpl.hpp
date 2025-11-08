@@ -22,16 +22,16 @@
 #include "wpi/util/raw_istream.hpp"
 #include "wpi/util/raw_ostream.hpp"
 
-namespace cs {
+namespace wpi::cs {
 
 class SourceImpl;
 
 class MjpegServerImpl : public SinkImpl {
  public:
-  MjpegServerImpl(std::string_view name, wpi::Logger& logger,
+  MjpegServerImpl(std::string_view name, wpi::util::Logger& logger,
                   Notifier& notifier, Telemetry& telemetry,
                   std::string_view listenAddress, int port,
-                  std::unique_ptr<wpi::NetworkAcceptor> acceptor);
+                  std::unique_ptr<wpi::net::NetworkAcceptor> acceptor);
   ~MjpegServerImpl() override;
 
   void Stop();
@@ -49,11 +49,11 @@ class MjpegServerImpl : public SinkImpl {
   std::string m_listenAddress;
   int m_port;
 
-  std::unique_ptr<wpi::NetworkAcceptor> m_acceptor;
+  std::unique_ptr<wpi::net::NetworkAcceptor> m_acceptor;
   std::atomic_bool m_active;  // set to false to terminate threads
   std::thread m_serverThread;
 
-  std::vector<wpi::SafeThreadOwner<ConnThread>> m_connThreads;
+  std::vector<wpi::util::SafeThreadOwner<ConnThread>> m_connThreads;
 
   // property indices
   int m_widthProp;
@@ -63,6 +63,6 @@ class MjpegServerImpl : public SinkImpl {
   int m_fpsProp;
 };
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_MJPEGSERVERIMPL_HPP_

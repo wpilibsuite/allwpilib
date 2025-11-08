@@ -11,12 +11,12 @@
 #include "wpi/commands2/CommandScheduler.hpp"
 #include "wpi/commands2/button/CommandGenericHID.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 /**
- * A version of {@link frc::XboxController} with {@link Trigger} factories for
+ * A version of {@link wpi::XboxController} with {@link Trigger} factories for
  * command-based.
  *
- * @see frc::XboxController
+ * @see wpi::XboxController
  */
 class CommandXboxController : public CommandGenericHID {
  public:
@@ -33,7 +33,7 @@ class CommandXboxController : public CommandGenericHID {
    *
    * @return the wrapped GenericHID object
    */
-  frc::XboxController& GetHID();
+  wpi::XboxController& GetHID();
 
   /**
    * Constructs a Trigger instance around the A button's
@@ -44,7 +44,7 @@ class CommandXboxController : public CommandGenericHID {
    * @return a Trigger instance representing the A button's
    * digital signal attached to the given loop.
    */
-  Trigger A(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger A(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 
   /**
@@ -56,7 +56,7 @@ class CommandXboxController : public CommandGenericHID {
    * @return a Trigger instance representing the B button's
    * digital signal attached to the given loop.
    */
-  Trigger B(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger B(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 
   /**
@@ -68,7 +68,7 @@ class CommandXboxController : public CommandGenericHID {
    * @return a Trigger instance representing the X button's
    * digital signal attached to the given loop.
    */
-  Trigger X(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger X(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 
   /**
@@ -80,7 +80,7 @@ class CommandXboxController : public CommandGenericHID {
    * @return a Trigger instance representing the Y button's
    * digital signal attached to the given loop.
    */
-  Trigger Y(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger Y(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 
   /**
@@ -92,7 +92,7 @@ class CommandXboxController : public CommandGenericHID {
    * @return a Trigger instance representing the left bumper button's
    * digital signal attached to the given loop.
    */
-  Trigger LeftBumper(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger LeftBumper(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 
   /**
@@ -104,7 +104,7 @@ class CommandXboxController : public CommandGenericHID {
    * @return a Trigger instance representing the right bumper button's
    * digital signal attached to the given loop.
    */
-  Trigger RightBumper(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger RightBumper(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 
   /**
@@ -116,7 +116,7 @@ class CommandXboxController : public CommandGenericHID {
    * @return a Trigger instance representing the back button's
    * digital signal attached to the given loop.
    */
-  Trigger Back(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger Back(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 
   /**
@@ -128,7 +128,7 @@ class CommandXboxController : public CommandGenericHID {
    * @return a Trigger instance representing the start button's
    * digital signal attached to the given loop.
    */
-  Trigger Start(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger Start(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 
   /**
@@ -140,7 +140,7 @@ class CommandXboxController : public CommandGenericHID {
    * @return a Trigger instance representing the left stick button's
    * digital signal attached to the given loop.
    */
-  Trigger LeftStick(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger LeftStick(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 
   /**
@@ -152,7 +152,7 @@ class CommandXboxController : public CommandGenericHID {
    * @return a Trigger instance representing the right stick button's
    * digital signal attached to the given loop.
    */
-  Trigger RightStick(frc::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger RightStick(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                 .GetDefaultButtonLoop()) const;
 
   /**
@@ -169,7 +169,7 @@ class CommandXboxController : public CommandGenericHID {
    * exceeds the provided threshold, attached to the given loop
    */
   Trigger LeftTrigger(double threshold = 0.5,
-                      frc::EventLoop* loop = CommandScheduler::GetInstance()
+                      wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                  .GetDefaultButtonLoop()) const;
 
   /**
@@ -186,7 +186,7 @@ class CommandXboxController : public CommandGenericHID {
    * exceeds the provided threshold, attached to the given loop
    */
   Trigger RightTrigger(double threshold = 0.5,
-                      frc::EventLoop* loop = CommandScheduler::GetInstance()
+                      wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                                  .GetDefaultButtonLoop()) const;
 
   /**
@@ -234,6 +234,6 @@ class CommandXboxController : public CommandGenericHID {
   double GetRightTriggerAxis() const;
 
  private:
-  frc::XboxController m_hid;
+  wpi::XboxController m_hid;
 };
-}  // namespace frc2
+}  // namespace wpi::cmd

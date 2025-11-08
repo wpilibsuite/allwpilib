@@ -19,11 +19,11 @@
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/StringExtras.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
-bool glass::DisplayPneumaticControlSolenoids(PneumaticControlModel* model,
+bool wpi::glass::DisplayPneumaticControlSolenoids(PneumaticControlModel* model,
                                              int index, bool outputsEnabled) {
-  wpi::SmallVector<int, 16> channels;
+  wpi::util::SmallVector<int, 16> channels;
   model->ForEachSolenoid([&](SolenoidModel& solenoid, int j) {
     if (auto data = solenoid.GetOutputData()) {
       if (j >= static_cast<int>(channels.size())) {
@@ -48,10 +48,10 @@ bool glass::DisplayPneumaticControlSolenoids(PneumaticControlModel* model,
   std::string& name = GetStorage().GetString("name");
   char label[128];
   if (!name.empty()) {
-    wpi::format_to_n_c_str(label, sizeof(label), "{} [{}]###header", name,
+    wpi::util::format_to_n_c_str(label, sizeof(label), "{} [{}]###header", name,
                            index);
   } else {
-    wpi::format_to_n_c_str(label, sizeof(label), "{}[{}]###header",
+    wpi::util::format_to_n_c_str(label, sizeof(label), "{}[{}]###header",
                            model->GetName(), index);
   }
 
@@ -87,7 +87,7 @@ bool glass::DisplayPneumaticControlSolenoids(PneumaticControlModel* model,
   return true;
 }
 
-void glass::DisplayPneumaticControlsSolenoids(PneumaticControlsModel* model,
+void wpi::glass::DisplayPneumaticControlsSolenoids(PneumaticControlsModel* model,
                                               bool outputsEnabled,
                                               std::string_view noneMsg) {
   bool hasAny = false;
@@ -105,13 +105,13 @@ void glass::DisplayPneumaticControlsSolenoids(PneumaticControlsModel* model,
   }
 }
 
-void glass::DisplayCompressorDevice(CompressorModel* model, int index,
+void wpi::glass::DisplayCompressorDevice(CompressorModel* model, int index,
                                     bool outputsEnabled) {
   if (!model || !model->Exists()) {
     return;
   }
   char name[32];
-  wpi::format_to_n_c_str(name, sizeof(name), "Compressor[{}]", index);
+  wpi::util::format_to_n_c_str(name, sizeof(name), "Compressor[{}]", index);
 
   if (BeginDevice(name)) {
     // output enabled
@@ -154,7 +154,7 @@ void glass::DisplayCompressorDevice(CompressorModel* model, int index,
   }
 }
 
-void glass::DisplayCompressorsDevice(PneumaticControlsModel* model,
+void wpi::glass::DisplayCompressorsDevice(PneumaticControlsModel* model,
                                      bool outputsEnabled) {
   model->ForEachPneumaticControl(
       [&](PneumaticControlModel& pneumaticControl, int i) {

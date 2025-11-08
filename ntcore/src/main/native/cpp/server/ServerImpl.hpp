@@ -17,29 +17,29 @@
 #include "server/ServerClient.hpp"
 #include "server/ServerStorage.hpp"
 
-namespace wpi {
+namespace wpi::util {
 class Logger;
 }  // namespace wpi
 
-namespace nt::net {
+namespace wpi::nt::net {
 class ClientMessageQueue;
 class LocalInterface;
 class ServerMessageHandler;
 class WireConnection;
-}  // namespace nt::net
+}  // namespace wpi::nt::net
 
-namespace nt::net3 {
+namespace wpi::nt::net3 {
 class WireConnection3;
-}  // namespace nt::net3
+}  // namespace wpi::nt::net3
 
-namespace nt::server {
+namespace wpi::nt::server {
 
 class ServerClientLocal;
 struct ServerTopic;
 
 class ServerImpl final {
  public:
-  explicit ServerImpl(wpi::Logger& logger);
+  explicit ServerImpl(wpi::util::Logger& logger);
 
   void SendAllOutgoing(uint64_t curTimeMs, bool flush);
   void SendOutgoing(int clientId, uint64_t curTimeMs);
@@ -78,7 +78,7 @@ class ServerImpl final {
   }
 
  private:
-  wpi::Logger& m_logger;
+  wpi::util::Logger& m_logger;
 
   ServerClientLocal* m_localClient;
   std::vector<std::unique_ptr<ServerClient>> m_clients;
@@ -94,4 +94,4 @@ class ServerImpl final {
   void UpdateMetaClients(const std::vector<ConnectionInfo>& conns);
 };
 
-}  // namespace nt::server
+}  // namespace wpi::nt::server

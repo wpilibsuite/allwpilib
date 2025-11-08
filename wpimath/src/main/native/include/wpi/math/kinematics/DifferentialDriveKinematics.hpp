@@ -16,7 +16,7 @@
 #include "wpi/units/length.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
-namespace frc {
+namespace wpi::math {
 /**
  * Helper class that converts a chassis velocity (dx and dtheta components) to
  * left and right wheel velocities for a differential drive.
@@ -37,7 +37,7 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
    * empirical value may be larger than the physical measured value due to
    * scrubbing effects.
    */
-  constexpr explicit DifferentialDriveKinematics(units::meter_t trackwidth)
+  constexpr explicit DifferentialDriveKinematics(wpi::units::meter_t trackwidth)
       : trackwidth(trackwidth) {
     if (!std::is_constant_evaluated()) {
       wpi::math::MathSharedStore::ReportUsage("DifferentialDriveKinematics",
@@ -80,8 +80,8 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
    * @param rightDistance The distance measured by the right encoder.
    * @return The resulting Twist2d.
    */
-  constexpr Twist2d ToTwist2d(const units::meter_t leftDistance,
-                              const units::meter_t rightDistance) const {
+  constexpr Twist2d ToTwist2d(const wpi::units::meter_t leftDistance,
+                              const wpi::units::meter_t rightDistance) const {
     return {(leftDistance + rightDistance) / 2, 0_m,
             (rightDistance - leftDistance) / trackwidth * 1_rad};
   }
@@ -99,9 +99,9 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
   }
 
   /// Differential drive trackwidth.
-  units::meter_t trackwidth;
+  wpi::units::meter_t trackwidth;
 };
-}  // namespace frc
+}  // namespace wpi::math
 
 #include "wpi/math/kinematics/proto/DifferentialDriveKinematicsProto.hpp"
 #include "wpi/math/kinematics/struct/DifferentialDriveKinematicsStruct.hpp"

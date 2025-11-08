@@ -22,7 +22,7 @@
 #include "wpi/commands2/WrapperCommand.hpp"
 #include "wpi/system/Errors.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 CommandPtr::CommandPtr(std::unique_ptr<Command>&& command)
     : m_ptr(std::move(command)) {
@@ -32,12 +32,12 @@ CommandPtr::CommandPtr(std::unique_ptr<Command>&& command)
 CommandPtr::CommandPtr(CommandPtr&& rhs) {
   m_ptr = std::move(rhs.m_ptr);
   AssertValid();
-  rhs.m_moveOutSite = wpi::GetStackTrace(1);
+  rhs.m_moveOutSite = wpi::util::GetStackTrace(1);
 }
 
 void CommandPtr::AssertValid() const {
   if (!m_ptr) {
-    throw FRC_MakeError(frc::err::CommandIllegalUse,
+    throw FRC_MakeError(wpi::err::CommandIllegalUse,
                         "Moved-from CommandPtr object used!\nMoved out at:\n{}",
                         m_moveOutSite);
   }
@@ -131,7 +131,7 @@ CommandPtr CommandPtr::BeforeStarting(CommandPtr&& before) && {
   return std::move(*this);
 }
 
-CommandPtr CommandPtr::WithTimeout(units::second_t duration) && {
+CommandPtr CommandPtr::WithTimeout(wpi::units::second_t duration) && {
   AssertValid();
   std::vector<std::unique_ptr<Command>> temp;
   temp.emplace_back(std::move(m_ptr));

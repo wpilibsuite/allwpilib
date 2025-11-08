@@ -14,17 +14,17 @@
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/timestamp.h"
 
-using namespace cs;
+using namespace wpi::cs;
 
-class Telemetry::Thread : public wpi::SafeThread {
+class Telemetry::Thread : public wpi::util::SafeThread {
  public:
   explicit Thread(Notifier& notifier) : m_notifier(notifier) {}
 
   void Main() override;
 
   Notifier& m_notifier;
-  wpi::DenseMap<std::pair<CS_Handle, int>, int64_t> m_user;
-  wpi::DenseMap<std::pair<CS_Handle, int>, int64_t> m_current;
+  wpi::util::DenseMap<std::pair<CS_Handle, int>, int64_t> m_user;
+  wpi::util::DenseMap<std::pair<CS_Handle, int>, int64_t> m_current;
   double m_period = 0.0;
   double m_elapsed = 0.0;
   bool m_updated = false;

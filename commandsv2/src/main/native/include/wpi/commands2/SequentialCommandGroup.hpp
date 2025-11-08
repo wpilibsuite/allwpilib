@@ -18,7 +18,7 @@
 #include "wpi/commands2/CommandHelper.hpp"
 #include "wpi/util/DecayedDerivedFrom.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 
 const size_t invalid_index = std::numeric_limits<size_t>::max();
 
@@ -52,7 +52,7 @@ class SequentialCommandGroup
    *
    * @param commands the commands to include in this composition.
    */
-  template <wpi::DecayedDerivedFrom<Command>... Commands>
+  template <wpi::util::DecayedDerivedFrom<Command>... Commands>
   explicit SequentialCommandGroup(Commands&&... commands) {
     AddCommands(std::forward<Commands>(commands)...);
   }
@@ -70,7 +70,7 @@ class SequentialCommandGroup
    *
    * @param commands Commands to add, in order of execution.
    */
-  template <wpi::DecayedDerivedFrom<Command>... Commands>
+  template <wpi::util::DecayedDerivedFrom<Command>... Commands>
   void AddCommands(Commands&&... commands) {
     std::vector<std::unique_ptr<Command>> foo;
     ((void)foo.emplace_back(std::make_unique<std::decay_t<Commands>>(
@@ -91,18 +91,18 @@ class SequentialCommandGroup
 
   Command::InterruptionBehavior GetInterruptionBehavior() const override;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
   void AddCommands(std::vector<std::unique_ptr<Command>>&& commands);
 
-  wpi::SmallVector<std::unique_ptr<Command>, 4> m_commands;
+  wpi::util::SmallVector<std::unique_ptr<Command>, 4> m_commands;
   size_t m_currentCommandIndex{invalid_index};
   bool m_runWhenDisabled{true};
   Command::InterruptionBehavior m_interruptBehavior{
       Command::InterruptionBehavior::kCancelIncoming};
 };
-}  // namespace frc2
+}  // namespace wpi::cmd
 
 #ifdef _WIN32
 #pragma warning(pop)

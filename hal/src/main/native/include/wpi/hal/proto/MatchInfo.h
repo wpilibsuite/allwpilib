@@ -11,10 +11,10 @@
 #include "wpi/util/protobuf/Protobuf.hpp"
 
 template <>
-struct wpi::Protobuf<mrc::MatchInfo> {
+struct wpi::util::Protobuf<mrc::MatchInfo> {
   using MessageStruct = mrc_proto_ProtobufMatchInfo;
-  using InputStream = wpi::ProtoInputStream<mrc::MatchInfo>;
-  using OutputStream = wpi::ProtoOutputStream<mrc::MatchInfo>;
+  using InputStream = wpi::util::ProtoInputStream<mrc::MatchInfo>;
+  using OutputStream = wpi::util::ProtoOutputStream<mrc::MatchInfo>;
   static std::optional<mrc::MatchInfo> Unpack(InputStream& Stream);
   static bool Pack(OutputStream& Stream, const mrc::MatchInfo& Value);
 };

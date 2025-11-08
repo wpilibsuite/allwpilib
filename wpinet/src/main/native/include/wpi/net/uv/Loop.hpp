@@ -18,7 +18,7 @@
 #include "wpi/util/Signal.h"
 #include "wpi/util/function_ref.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 class Handle;
 
@@ -186,7 +186,7 @@ class Loop final : public std::enable_shared_from_this<Loop> {
    *
    * @param callback A function to be invoked once for each active handle.
    */
-  void Walk(function_ref<void(Handle&)> callback);
+  void Walk(wpi::util::function_ref<void(Handle&)> callback);
 
   /**
    * Reinitialize any kernel state necessary in the child process after
@@ -247,7 +247,7 @@ class Loop final : public std::enable_shared_from_this<Loop> {
   /**
    * Error signal
    */
-  sig::Signal<Error> error;
+  wpi::util::sig::Signal<Error> error;
 
   /**
    * Reports error.
@@ -263,6 +263,6 @@ class Loop final : public std::enable_shared_from_this<Loop> {
   bool m_closing = false;
 };
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_LOOP_HPP_

@@ -12,24 +12,24 @@
 #include "server/ServerClient.hpp"
 #include "wpi/util/DenseMap.hpp"
 
-namespace nt::server {
+namespace wpi::nt::server {
 
 class ServerClient4Base : public ServerClient,
                           protected net::ClientMessageHandler {
  public:
   ServerClient4Base(std::string_view name, std::string_view connInfo,
                     bool local, SetPeriodicFunc setPeriodic,
-                    ServerStorage& storage, int id, wpi::Logger& logger)
+                    ServerStorage& storage, int id, wpi::util::Logger& logger)
       : ServerClient{name, connInfo, local, setPeriodic, storage, id, logger} {}
 
  protected:
   // ClientMessageHandler interface
   void ClientPublish(int pubuid, std::string_view name,
-                     std::string_view typeStr, const wpi::json& properties,
+                     std::string_view typeStr, const wpi::util::json& properties,
                      const PubSubOptionsImpl& options) final;
   void ClientUnpublish(int pubuid) final;
   void ClientSetProperties(std::string_view name,
-                           const wpi::json& update) final;
+                           const wpi::util::json& update) final;
   void ClientSubscribe(int subuid, std::span<const std::string> topicNames,
                        const PubSubOptionsImpl& options) final;
   void ClientUnsubscribe(int subuid) final;
@@ -38,10 +38,10 @@ class ServerClient4Base : public ServerClient,
 
   bool DoProcessIncomingMessages(net::ClientMessageQueue& queue, size_t max);
 
-  wpi::DenseMap<ServerTopic*, bool> m_announceSent;
+  wpi::util::DenseMap<ServerTopic*, bool> m_announceSent;
 
  private:
   std::array<net::ClientMessage, 16> m_msgsBuf;
 };
 
-}  // namespace nt::server
+}  // namespace wpi::nt::server

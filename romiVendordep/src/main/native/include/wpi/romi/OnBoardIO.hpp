@@ -10,7 +10,7 @@
 #include "wpi/hardware/discrete/DigitalOutput.hpp"
 #include "wpi/units/time.hpp"
 
-namespace frc {
+namespace wpi::romi {
 
 /**
  * @ingroup romi_api
@@ -34,7 +34,7 @@ class OnBoardIO {
   OnBoardIO(OnBoardIO::ChannelMode dio1, OnBoardIO::ChannelMode dio2);
 
   static constexpr auto kMessageInterval = 1_s;
-  units::second_t m_nextMessageTime = 0_s;
+  wpi::units::second_t m_nextMessageTime = 0_s;
 
   /**
    * Gets if the A button is pressed.
@@ -67,18 +67,18 @@ class OnBoardIO {
   void SetYellowLed(bool value);
 
  private:
-  frc::DigitalInput m_buttonA{0};
-  frc::DigitalOutput m_yellowLed{3};
+  wpi::DigitalInput m_buttonA{0};
+  wpi::DigitalOutput m_yellowLed{3};
 
   // DIO 1
-  std::unique_ptr<frc::DigitalInput> m_buttonB;
-  std::unique_ptr<frc::DigitalOutput> m_greenLed;
+  std::unique_ptr<wpi::DigitalInput> m_buttonB;
+  std::unique_ptr<wpi::DigitalOutput> m_greenLed;
 
   // DIO 2
-  std::unique_ptr<frc::DigitalInput> m_buttonC;
-  std::unique_ptr<frc::DigitalOutput> m_redLed;
+  std::unique_ptr<wpi::DigitalInput> m_buttonC;
+  std::unique_ptr<wpi::DigitalOutput> m_redLed;
 };
 
 /** @} */
 
-}  // namespace frc
+}  // namespace wpi::romi

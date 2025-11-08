@@ -8,7 +8,7 @@
 
 #include "wpi/hal/CANAPI.h"
 
-namespace frc {
+namespace wpi {
 
 /**
  * High level class for interfacing with CAN devices conforming to
@@ -154,6 +154,6 @@ class CAN {
       HAL_CAN_Dev_kMiscellaneous;
 
  private:
-  hal::Handle<HAL_CANHandle, HAL_CleanCAN> m_handle;
+  wpi::hal::Handle<HAL_CANHandle, HAL_CleanCAN> m_handle;
 };
-}  // namespace frc
+}  // namespace wpi

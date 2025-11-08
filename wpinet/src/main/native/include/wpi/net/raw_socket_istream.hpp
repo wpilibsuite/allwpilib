@@ -7,11 +7,11 @@
 
 #include "wpi/util/raw_istream.hpp"
 
-namespace wpi {
+namespace wpi::net {
 
 class NetworkStream;
 
-class raw_socket_istream : public raw_istream {
+class raw_socket_istream : public wpi::util::raw_istream {
  public:
   explicit raw_socket_istream(NetworkStream& stream, int timeout = 0)
       : m_stream(stream), m_timeout(timeout) {}
@@ -26,6 +26,6 @@ class raw_socket_istream : public raw_istream {
   int m_timeout;
 };
 
-}  // namespace wpi
+}  // namespace wpi::net
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_RAW_SOCKET_ISTREAM_HPP_

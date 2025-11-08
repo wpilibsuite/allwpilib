@@ -17,7 +17,7 @@
 #include "wpi/net/uv/Loop.hpp"
 #include "wpi/util/print.hpp"
 
-namespace uv = wpi::uv;
+namespace uv = wpi::net::uv;
 
 using namespace wpilibws;
 
@@ -51,13 +51,13 @@ TEST_F(WebServerIntegrationTest, DISABLED_DigitalOutput) {
 
   // Attach timer to loop for test function
   m_server.runner.ExecSync([&](auto& loop) {
-    auto timer = wpi::uv::Timer::Create(loop);
+    auto timer = wpi::net::uv::Timer::Create(loop);
     timer->timeout.connect([&] {
       if (done) {
         return;
       }
       if (IsConnectedClientWS()) {
-        wpi::print("***** Setting DIO value for pin {} to {}\n", PIN,
+        wpi::util::print("***** Setting DIO value for pin {} to {}\n", PIN,
                    (EXPECTED_VALUE ? "true" : "false"));
         HALSIM_SetDIOValue(PIN, EXPECTED_VALUE);
         done = true;
@@ -80,12 +80,12 @@ TEST_F(WebServerIntegrationTest, DISABLED_DigitalOutput) {
     test_type = msg.at("type").get_ref<const std::string&>();
     test_device = msg.at("device").get_ref<const std::string&>();
     auto& data = msg.at("data");
-    wpi::json::const_iterator it = data.find("<>value");
+    wpi::util::json::const_iterator it = data.find("<>value");
     if (it != data.end()) {
       test_value = it.value();
     }
-  } catch (wpi::json::exception& e) {
-    wpi::print(stderr, "Error with incoming message: {}\n", e.what());
+  } catch (wpi::util::json::exception& e) {
+    wpi::util::print(stderr, "Error with incoming message: {}\n", e.what());
   }
 
   // Compare results
@@ -102,16 +102,16 @@ TEST_F(WebServerIntegrationTest, DISABLED_DigitalInput) {
 
   // Attach timer to loop for test function
   m_server.runner.ExecSync([&](auto& loop) {
-    auto timer = wpi::uv::Timer::Create(loop);
+    auto timer = wpi::net::uv::Timer::Create(loop);
     timer->timeout.connect([&] {
       if (done) {
         return;
       }
       if (IsConnectedClientWS()) {
-        wpi::json msg = {{"type", "DIO"},
+        wpi::util::json msg = {{"type", "DIO"},
                          {"device", std::to_string(PIN)},
                          {"data", {{"<>value", EXPECTED_VALUE}}}};
-        wpi::print("***** Input JSON: {}\n", msg.dump());
+        wpi::util::print("***** Input JSON: {}\n", msg.dump());
         m_webserverClient->SendMessage(msg);
         done = true;
       }
@@ -136,17 +136,17 @@ TEST_F(WebServerIntegrationTest, DriverStation) {
 
   // Attach timer to loop for test function
   m_server.runner.ExecSync([&](auto& loop) {
-    auto timer = wpi::uv::Timer::Create(loop);
+    auto timer = wpi::net::uv::Timer::Create(loop);
     timer->timeout.connect([&] {
       if (done) {
         return;
       }
       if (IsConnectedClientWS()) {
-        wpi::json msg = {
+        wpi::util::json msg = {
             {"type", "DriverStation"},
             {"device", ""},
             {"data", {{">enabled", EXPECTED_VALUE}, {">new_data", true}}}};
-        wpi::print("***** Input JSON: {}\n", msg.dump());
+        wpi::util::print("***** Input JSON: {}\n", msg.dump());
         m_webserverClient->SendMessage(msg);
         done = true;
       }

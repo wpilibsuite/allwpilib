@@ -28,9 +28,9 @@
 
 #include "wpi/units/base.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::luminous_flux
+ * @namespace wpi::units::luminous_flux
  * @brief namespace for unit types and containers representing luminous_flux
  *        values
  * @details The SI unit for luminous_flux is `lumens`, and the corresponding
@@ -42,10 +42,10 @@ namespace units {
     defined(ENABLE_PREDEFINED_LUMINOUS_FLUX_UNITS)
 UNIT_ADD_WITH_METRIC_PREFIXES(
     luminous_flux, lumen, lumens, lm,
-    unit<std::ratio<1>, units::category::luminous_flux_unit>)
+    unit<std::ratio<1>, wpi::units::category::luminous_flux_unit>)
 
 UNIT_ADD_CATEGORY_TRAIT(luminous_flux)
 #endif
 
 using namespace luminous_flux;
-}  // namespace units
+}  // namespace wpi::units

@@ -10,13 +10,13 @@
 #include "wpimath/protobuf/kinematics.npb.h"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Protobuf<frc::DifferentialDriveWheelSpeeds> {
+struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::DifferentialDriveWheelSpeeds> {
   using MessageStruct = wpi_proto_ProtobufDifferentialDriveWheelSpeeds;
-  using InputStream = wpi::ProtoInputStream<frc::DifferentialDriveWheelSpeeds>;
+  using InputStream = wpi::util::ProtoInputStream<wpi::math::DifferentialDriveWheelSpeeds>;
   using OutputStream =
-      wpi::ProtoOutputStream<frc::DifferentialDriveWheelSpeeds>;
-  static std::optional<frc::DifferentialDriveWheelSpeeds> Unpack(
+      wpi::util::ProtoOutputStream<wpi::math::DifferentialDriveWheelSpeeds>;
+  static std::optional<wpi::math::DifferentialDriveWheelSpeeds> Unpack(
       InputStream& stream);
   static bool Pack(OutputStream& stream,
-                   const frc::DifferentialDriveWheelSpeeds& value);
+                   const wpi::math::DifferentialDriveWheelSpeeds& value);
 };

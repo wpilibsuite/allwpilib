@@ -31,9 +31,9 @@
 #include "wpi/units/force.hpp"
 #include "wpi/units/length.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::torque
+ * @namespace wpi::units::torque
  * @brief namespace for unit types and containers representing torque values
  * @details The SI unit for torque is `newton_meters`, and the corresponding
  *          `base_unit` category is `torque_units`.
@@ -43,7 +43,7 @@ namespace units {
 #if !defined(DISABLE_PREDEFINED_UNITS) || \
     defined(ENABLE_PREDEFINED_TORQUE_UNITS)
 UNIT_ADD(torque, newton_meter, newton_meters, Nm,
-         unit<std::ratio<1>, units::energy::joule>)
+         unit<std::ratio<1>, wpi::units::energy::joule>)
 UNIT_ADD(torque, foot_pound, foot_pounds, ftlb,
          compound_unit<length::foot, force::pounds>)
 UNIT_ADD(torque, foot_poundal, foot_poundals, ftpdl,
@@ -57,4 +57,4 @@ UNIT_ADD_CATEGORY_TRAIT(torque)
 #endif
 
 using namespace torque;
-}  // namespace units
+}  // namespace wpi::units

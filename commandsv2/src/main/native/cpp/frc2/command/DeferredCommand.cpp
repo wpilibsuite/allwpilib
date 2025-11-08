@@ -9,9 +9,9 @@
 #include "wpi/commands2/Commands.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 
-DeferredCommand::DeferredCommand(wpi::unique_function<CommandPtr()> supplier,
+DeferredCommand::DeferredCommand(wpi::util::unique_function<CommandPtr()> supplier,
                                  Requirements requirements)
     : m_supplier{std::move(supplier)} {
   AddRequirements(requirements);
@@ -40,7 +40,7 @@ bool DeferredCommand::IsFinished() {
   return m_command->IsFinished();
 }
 
-void DeferredCommand::InitSendable(wpi::SendableBuilder& builder) {
+void DeferredCommand::InitSendable(wpi::util::SendableBuilder& builder) {
   Command::InitSendable(builder);
   builder.AddStringProperty(
       "deferred", [this] { return m_command->GetName(); }, nullptr);

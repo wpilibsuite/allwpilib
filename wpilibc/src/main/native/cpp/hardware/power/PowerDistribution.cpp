@@ -17,18 +17,18 @@
 #include "wpi/util/sendable/SendableRegistry.hpp"
 
 static_assert(static_cast<HAL_PowerDistributionType>(
-                  frc::PowerDistribution::ModuleType::kCTRE) ==
+                  wpi::PowerDistribution::ModuleType::kCTRE) ==
               HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE);
 static_assert(static_cast<HAL_PowerDistributionType>(
-                  frc::PowerDistribution::ModuleType::kRev) ==
+                  wpi::PowerDistribution::ModuleType::kRev) ==
               HAL_PowerDistributionType::HAL_PowerDistributionType_kRev);
-static_assert(frc::PowerDistribution::kDefaultModule ==
+static_assert(wpi::PowerDistribution::kDefaultModule ==
               HAL_DEFAULT_POWER_DISTRIBUTION_MODULE);
 
-using namespace frc;
+using namespace wpi;
 
 PowerDistribution::PowerDistribution(int busId) {
-  auto stack = wpi::GetStackTrace(1);
+  auto stack = wpi::util::GetStackTrace(1);
 
   int32_t status = 0;
   m_handle = HAL_InitializePowerDistribution(
@@ -45,12 +45,12 @@ PowerDistribution::PowerDistribution(int busId) {
   } else {
     HAL_ReportUsage("PDH", m_module, "");
   }
-  wpi::SendableRegistry::Add(this, "PowerDistribution", m_module);
+  wpi::util::SendableRegistry::Add(this, "PowerDistribution", m_module);
 }
 
 PowerDistribution::PowerDistribution(int busId, int module,
                                      ModuleType moduleType) {
-  auto stack = wpi::GetStackTrace(1);
+  auto stack = wpi::util::GetStackTrace(1);
 
   int32_t status = 0;
   m_handle = HAL_InitializePowerDistribution(
@@ -65,7 +65,7 @@ PowerDistribution::PowerDistribution(int busId, int module,
   } else {
     HAL_ReportUsage("PDH_REV", m_module, "");
   }
-  wpi::SendableRegistry::Add(this, "PowerDistribution", m_module);
+  wpi::util::SendableRegistry::Add(this, "PowerDistribution", m_module);
 }
 
 int PowerDistribution::GetNumChannels() const {
@@ -320,7 +320,7 @@ PowerDistribution::StickyFaults PowerDistribution::GetStickyFaults() const {
   return stickyFaults;
 }
 
-void PowerDistribution::InitSendable(wpi::SendableBuilder& builder) {
+void PowerDistribution::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("PowerDistribution");
   int numChannels = GetNumChannels();
   // Use manual reads to avoid printing errors

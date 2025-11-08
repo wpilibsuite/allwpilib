@@ -4,6 +4,6 @@
 
 #pragma once
 
-namespace hal {
+namespace wpi::hal {
 bool InitializeCanBuses();
-}  // namespace hal
+}  // namespace wpi::hal

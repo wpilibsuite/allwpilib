@@ -9,7 +9,7 @@
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 class CommandScheduleTest : public CommandTestBase {};
 
 TEST_F(CommandScheduleTest, InstantSchedule) {
@@ -100,8 +100,8 @@ TEST_F(CommandScheduleTest, SchedulerCancel) {
 TEST_F(CommandScheduleTest, CommandKnowsWhenItEnded) {
   CommandScheduler scheduler = GetScheduler();
 
-  frc2::FunctionalCommand* commandPtr = nullptr;
-  auto command = frc2::FunctionalCommand(
+  wpi::cmd::FunctionalCommand* commandPtr = nullptr;
+  auto command = wpi::cmd::FunctionalCommand(
       [] {}, [] {},
       [&](auto isForced) {
         EXPECT_FALSE(scheduler.IsScheduled(commandPtr))
@@ -120,10 +120,10 @@ TEST_F(CommandScheduleTest, CommandKnowsWhenItEnded) {
 TEST_F(CommandScheduleTest, ScheduleCommandInCommand) {
   CommandScheduler scheduler = GetScheduler();
   int counter = 0;
-  frc2::InstantCommand commandToGetScheduled{[&counter] { counter++; }};
+  wpi::cmd::InstantCommand commandToGetScheduled{[&counter] { counter++; }};
 
   auto command =
-      frc2::RunCommand([&counter, &scheduler, &commandToGetScheduled] {
+      wpi::cmd::RunCommand([&counter, &scheduler, &commandToGetScheduled] {
         scheduler.Schedule(&commandToGetScheduled);
         EXPECT_EQ(counter, 1)
             << "Scheduled command's init was not run immediately "
@@ -151,21 +151,21 @@ TEST_F(CommandScheduleTest, NotScheduledCancel) {
 
 TEST_F(CommandScheduleTest, SmartDashboardCancel) {
   CommandScheduler scheduler = GetScheduler();
-  frc::SmartDashboard::PutData("Scheduler", &scheduler);
-  frc::SmartDashboard::UpdateValues();
+  wpi::SmartDashboard::PutData("Scheduler", &scheduler);
+  wpi::SmartDashboard::UpdateValues();
 
   MockCommand command;
   scheduler.Schedule(&command);
   scheduler.Run();
-  frc::SmartDashboard::UpdateValues();
+  wpi::SmartDashboard::UpdateValues();
   EXPECT_TRUE(scheduler.IsScheduled(&command));
 
   uintptr_t ptrTmp = reinterpret_cast<uintptr_t>(&command);
-  nt::NetworkTableInstance::GetDefault()
+  wpi::nt::NetworkTableInstance::GetDefault()
       .GetEntry("/SmartDashboard/Scheduler/Cancel")
       .SetIntegerArray(
           std::span<const int64_t>{{static_cast<int64_t>(ptrTmp)}});
-  frc::SmartDashboard::UpdateValues();
+  wpi::SmartDashboard::UpdateValues();
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(&command));
 }

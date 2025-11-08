@@ -16,38 +16,38 @@
 
 #include "Constants.hpp"
 
-class Shooter : public frc2::SubsystemBase {
+class Shooter : public wpi::cmd::SubsystemBase {
  public:
   Shooter();
 
-  frc2::CommandPtr RunShooterCommand(std::function<double()> shooterSpeed);
-  frc2::CommandPtr SysIdQuasistatic(frc2::sysid::Direction direction);
-  frc2::CommandPtr SysIdDynamic(frc2::sysid::Direction direction);
+  wpi::cmd::CommandPtr RunShooterCommand(std::function<double()> shooterSpeed);
+  wpi::cmd::CommandPtr SysIdQuasistatic(wpi::cmd::sysid::Direction direction);
+  wpi::cmd::CommandPtr SysIdDynamic(wpi::cmd::sysid::Direction direction);
 
  private:
-  frc::PWMSparkMax m_shooterMotor{constants::shooter::kShooterMotorPort};
-  frc::PWMSparkMax m_feederMotor{constants::shooter::kFeederMotorPort};
+  wpi::PWMSparkMax m_shooterMotor{constants::shooter::kShooterMotorPort};
+  wpi::PWMSparkMax m_feederMotor{constants::shooter::kFeederMotorPort};
 
-  frc::Encoder m_shooterEncoder{constants::shooter::kEncoderPorts[0],
+  wpi::Encoder m_shooterEncoder{constants::shooter::kEncoderPorts[0],
                                 constants::shooter::kEncoderPorts[1],
                                 constants::shooter::kEncoderReversed};
 
-  frc2::sysid::SysIdRoutine m_sysIdRoutine{
-      frc2::sysid::Config{std::nullopt, std::nullopt, std::nullopt, nullptr},
-      frc2::sysid::Mechanism{
-          [this](units::volt_t driveVoltage) {
+  wpi::cmd::sysid::SysIdRoutine m_sysIdRoutine{
+      wpi::cmd::sysid::Config{std::nullopt, std::nullopt, std::nullopt, nullptr},
+      wpi::cmd::sysid::Mechanism{
+          [this](wpi::units::volt_t driveVoltage) {
             m_shooterMotor.SetVoltage(driveVoltage);
           },
-          [this](frc::sysid::SysIdRoutineLog* log) {
+          [this](wpi::sysid::SysIdRoutineLog* log) {
             log->Motor("shooter-wheel")
                 .voltage(m_shooterMotor.Get() *
-                         frc::RobotController::GetBatteryVoltage())
-                .position(units::turn_t{m_shooterEncoder.GetDistance()})
+                         wpi::RobotController::GetBatteryVoltage())
+                .position(wpi::units::turn_t{m_shooterEncoder.GetDistance()})
                 .velocity(
-                    units::turns_per_second_t{m_shooterEncoder.GetRate()});
+                    wpi::units::turns_per_second_t{m_shooterEncoder.GetRate()});
           },
           this}};
-  frc::PIDController m_shooterFeedback{constants::shooter::kP, 0, 0};
-  frc::SimpleMotorFeedforward<units::radians> m_shooterFeedforward{
+  wpi::math::PIDController m_shooterFeedback{constants::shooter::kP, 0, 0};
+  wpi::math::SimpleMotorFeedforward<wpi::units::radians> m_shooterFeedforward{
       constants::shooter::kS, constants::shooter::kV, constants::shooter::kA};
 };

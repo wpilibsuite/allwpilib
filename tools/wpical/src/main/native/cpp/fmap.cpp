@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-wpi::json fmap::singleTag(int tag, const tag::Pose& tagpose) {
+wpi::util::json fmap::singleTag(int tag, const tag::Pose& tagpose) {
   std::vector<double> transform = {};
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
@@ -22,7 +22,7 @@ wpi::json fmap::singleTag(int tag, const tag::Pose& tagpose) {
           {"unique", true}};
 }
 
-wpi::json fmap::convertfmap(const wpi::json& json) {
+wpi::util::json fmap::convertfmap(const wpi::util::json& json) {
   std::string fmapstart = "{\"fiducials\":[";
 
   std::string fmapend = "],\"type\":\"frc\"}";
@@ -36,5 +36,5 @@ wpi::json fmap::convertfmap(const wpi::json& json) {
     }
   }
 
-  return wpi::json::parse(fmapstart.append(fmapend));
+  return wpi::util::json::parse(fmapstart.append(fmapend));
 }

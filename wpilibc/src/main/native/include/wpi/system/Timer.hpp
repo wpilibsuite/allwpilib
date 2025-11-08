@@ -6,7 +6,7 @@
 
 #include "wpi/units/time.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Pause the task for a specified time.
@@ -18,19 +18,19 @@ namespace frc {
  *
  * @param seconds Length of time to pause, in seconds.
  */
-void Wait(units::second_t seconds);
+void Wait(wpi::units::second_t seconds);
 
 /**
  * @brief  Gives real-time clock system time with nanosecond resolution
  * @return The time, just in case you want the robot to start autonomous at 8pm
  *         on Saturday.
  */
-units::second_t GetTime();
+wpi::units::second_t GetTime();
 
 /**
  * A timer class.
  *
- * Note that if the user calls frc::sim::RestartTiming(), they should also reset
+ * Note that if the user calls wpi::sim::RestartTiming(), they should also reset
  * the timer so Get() won't return a negative duration.
  */
 class Timer {
@@ -57,7 +57,7 @@ class Timer {
    *
    * @return Current time value for this timer in seconds
    */
-  units::second_t Get() const;
+  wpi::units::second_t Get() const;
 
   /**
    * Reset the timer by setting the time to 0.
@@ -99,7 +99,7 @@ class Timer {
    * @param period The period to check.
    * @return       True if the period has passed.
    */
-  bool HasElapsed(units::second_t period) const;
+  bool HasElapsed(wpi::units::second_t period) const;
 
   /**
    * Check if the period specified has passed and if it has, advance the start
@@ -109,7 +109,7 @@ class Timer {
    * @param period The period to check for.
    * @return       True if the period has passed.
    */
-  bool AdvanceIfElapsed(units::second_t period);
+  bool AdvanceIfElapsed(wpi::units::second_t period);
 
   /**
    * Whether the timer is currently running.
@@ -126,7 +126,7 @@ class Timer {
    *
    * @returns Robot running time in seconds.
    */
-  static units::second_t GetTimestamp();
+  static wpi::units::second_t GetTimestamp();
 
   /**
    * Return the FPGA system clock time in seconds.
@@ -136,7 +136,7 @@ class Timer {
    *
    * @returns Robot running time in seconds.
    */
-  static units::second_t GetFPGATimestamp();
+  static wpi::units::second_t GetFPGATimestamp();
 
   /**
    * Return the approximate match time.
@@ -153,12 +153,12 @@ class Timer {
    *
    * @return Time remaining in current match period (auto or teleop)
    */
-  static units::second_t GetMatchTime();
+  static wpi::units::second_t GetMatchTime();
 
  private:
-  units::second_t m_startTime = 0_s;
-  units::second_t m_accumulatedTime = 0_s;
+  wpi::units::second_t m_startTime = 0_s;
+  wpi::units::second_t m_accumulatedTime = 0_s;
   bool m_running = false;
 };
 
-}  // namespace frc
+}  // namespace wpi

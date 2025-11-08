@@ -17,7 +17,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace wpi {
+namespace wpi::util {
 
 
 /// Metafunction that determines whether the given type is either an
@@ -81,6 +81,6 @@ template<class Lambda, int=(Lambda{}(), 0)>
 constexpr bool is_constexpr(Lambda) { return true; }
 constexpr bool is_constexpr(...) { return false; }
 
-} // end namespace wpi
+} // end namespace wpi::util
 
 #endif // WPIUTIL_WPI_TYPE_TRAITS_H

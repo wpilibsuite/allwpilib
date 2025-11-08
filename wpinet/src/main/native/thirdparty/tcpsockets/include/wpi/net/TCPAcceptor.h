@@ -32,7 +32,7 @@
 #include "wpi/net/NetworkAcceptor.hpp"
 #include "wpi/net/TCPStream.h"
 
-namespace wpi {
+namespace wpi::net {
 
 class Logger;
 
@@ -42,10 +42,10 @@ class TCPAcceptor : public NetworkAcceptor {
   std::string m_address;
   bool m_listening;
   std::atomic_bool m_shutdown;
-  Logger& m_logger;
+  wpi::util::Logger& m_logger;
 
  public:
-  TCPAcceptor(int port, std::string_view address, Logger& logger);
+  TCPAcceptor(int port, std::string_view address, wpi::util::Logger& logger);
   ~TCPAcceptor() override;
 
   int start() override;
@@ -53,6 +53,6 @@ class TCPAcceptor : public NetworkAcceptor {
   std::unique_ptr<NetworkStream> accept() override;
 };
 
-}  // namespace wpi
+}  // namespace wpi::net
 
 #endif  // WPINET_TCPACCEPTOR_H_

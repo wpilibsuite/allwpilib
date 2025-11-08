@@ -16,7 +16,7 @@
 #include "wpi/commands2/Command.hpp"
 #include "wpi/commands2/CommandHelper.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 /**
  * A class used internally to wrap commands while overriding a specific method;
  * all other methods will call through to the wrapped command.
@@ -66,13 +66,13 @@ class WrapperCommand : public CommandHelper<Command, WrapperCommand> {
 
   InterruptionBehavior GetInterruptionBehavior() const override;
 
-  wpi::SmallSet<Subsystem*, 4> GetRequirements() const override;
+  wpi::util::SmallSet<Subsystem*, 4> GetRequirements() const override;
 
  protected:
   /// Command being wrapped.
   std::unique_ptr<Command> m_command;
 };
-}  // namespace frc2
+}  // namespace wpi::cmd
 
 #ifdef _WIN32
 #pragma warning(pop)

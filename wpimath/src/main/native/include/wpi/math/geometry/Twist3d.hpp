@@ -9,7 +9,7 @@
 #include "wpi/units/math.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 class Transform3d;
 
@@ -24,32 +24,32 @@ struct WPILIB_DLLEXPORT Twist3d {
   /**
    * Linear "dx" component
    */
-  units::meter_t dx = 0_m;
+  wpi::units::meter_t dx = 0_m;
 
   /**
    * Linear "dy" component
    */
-  units::meter_t dy = 0_m;
+  wpi::units::meter_t dy = 0_m;
 
   /**
    * Linear "dz" component
    */
-  units::meter_t dz = 0_m;
+  wpi::units::meter_t dz = 0_m;
 
   /**
    * Rotation vector x component.
    */
-  units::radian_t rx = 0_rad;
+  wpi::units::radian_t rx = 0_rad;
 
   /**
    * Rotation vector y component.
    */
-  units::radian_t ry = 0_rad;
+  wpi::units::radian_t ry = 0_rad;
 
   /**
    * Rotation vector z component.
    */
-  units::radian_t rz = 0_rad;
+  wpi::units::radian_t rz = 0_rad;
 
   /**
    * Obtain a new Transform3d from a (constant curvature) velocity.
@@ -76,12 +76,12 @@ struct WPILIB_DLLEXPORT Twist3d {
    * @return Whether the two objects are equal.
    */
   constexpr bool operator==(const Twist3d& other) const {
-    return units::math::abs(dx - other.dx) < 1E-9_m &&
-           units::math::abs(dy - other.dy) < 1E-9_m &&
-           units::math::abs(dz - other.dz) < 1E-9_m &&
-           units::math::abs(rx - other.rx) < 1E-9_rad &&
-           units::math::abs(ry - other.ry) < 1E-9_rad &&
-           units::math::abs(rz - other.rz) < 1E-9_rad;
+    return wpi::units::math::abs(dx - other.dx) < 1E-9_m &&
+           wpi::units::math::abs(dy - other.dy) < 1E-9_m &&
+           wpi::units::math::abs(dz - other.dz) < 1E-9_m &&
+           wpi::units::math::abs(rx - other.rx) < 1E-9_rad &&
+           wpi::units::math::abs(ry - other.ry) < 1E-9_rad &&
+           wpi::units::math::abs(rz - other.rz) < 1E-9_rad;
   }
 
   /**
@@ -96,12 +96,12 @@ struct WPILIB_DLLEXPORT Twist3d {
   }
 };
 
-}  // namespace frc
+}  // namespace wpi::math
 
 #include "wpi/math/geometry/Transform3d.hpp"
 #include "wpi/math/geometry/detail/RotationVectorToMatrix.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 constexpr Transform3d Twist3d::Exp() const {
   // Implementation from Section 3.2 of https://ethaneade.org/lie.pdf
@@ -147,9 +147,9 @@ constexpr Transform3d Twist3d::Exp() const {
     Vector3d translation_component = V * u;
 
     const Transform3d transform{
-        Translation3d{units::meter_t{translation_component(0)},
-                      units::meter_t{translation_component(1)},
-                      units::meter_t{translation_component(2)}},
+        Translation3d{wpi::units::meter_t{translation_component(0)},
+                      wpi::units::meter_t{translation_component(1)},
+                      wpi::units::meter_t{translation_component(2)}},
         Rotation3d{R}};
 
     return transform;
@@ -161,7 +161,7 @@ constexpr Transform3d Twist3d::Exp() const {
   return impl.template operator()<Eigen::Matrix3d, Eigen::Vector3d>();
 }
 
-}  // namespace frc
+}  // namespace wpi::math
 
 #include "wpi/math/geometry/proto/Twist3dProto.hpp"
 #include "wpi/math/geometry/struct/Twist3dStruct.hpp"

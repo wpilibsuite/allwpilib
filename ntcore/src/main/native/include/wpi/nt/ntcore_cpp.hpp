@@ -22,7 +22,7 @@
 #include "wpi/nt/ntcore_cpp_types.hpp"
 #include "wpi/util/json_fwd.hpp"
 
-namespace wpi {
+namespace wpi::util {
 template <typename T>
 class SmallVectorImpl;
 }  // namespace wpi
@@ -32,7 +32,7 @@ class DataLog;
 }  // namespace wpi::log
 
 /** NetworkTables (ntcore) namespace */
-namespace nt {
+namespace wpi::nt {
 
 /**
  * @defgroup ntcore_cpp_handle_api ntcore C++ API
@@ -103,7 +103,7 @@ struct TopicInfo {
   std::string properties;
 
   /** Get topic properties as a JSON object. */
-  wpi::json GetProperties() const;
+  wpi::util::json GetProperties() const;
 
   friend void swap(TopicInfo& first, TopicInfo& second) {
     using std::swap;
@@ -119,7 +119,7 @@ struct TopicInfo {
 struct ConnectionInfo {
   /**
    * The remote identifier (as set on the remote node by
-   * NetworkTableInstance::StartClient() or nt::StartClient()).
+   * NetworkTableInstance::StartClient() or wpi::nt::StartClient()).
    */
   std::string remote_id;
 
@@ -131,7 +131,7 @@ struct ConnectionInfo {
 
   /**
    * The last time any update was received from the remote node (same scale as
-   * returned by nt::Now()).
+   * returned by wpi::nt::Now()).
    */
   int64_t last_update{0};
 
@@ -733,7 +733,7 @@ bool GetTopicExists(NT_Handle handle);
  * @param name property name
  * @return JSON object; null object if the property does not exist.
  */
-wpi::json GetTopicProperty(NT_Topic topic, std::string_view name);
+wpi::util::json GetTopicProperty(NT_Topic topic, std::string_view name);
 
 /**
  * Sets a property value.
@@ -743,7 +743,7 @@ wpi::json GetTopicProperty(NT_Topic topic, std::string_view name);
  * @param value property value
  */
 void SetTopicProperty(NT_Topic topic, std::string_view name,
-                      const wpi::json& value);
+                      const wpi::util::json& value);
 
 /**
  * Deletes a property.  Has no effect if the property does not exist.
@@ -760,7 +760,7 @@ void DeleteTopicProperty(NT_Topic topic, std::string_view name);
  * @param topic topic handle
  * @return JSON object
  */
-wpi::json GetTopicProperties(NT_Topic topic);
+wpi::util::json GetTopicProperties(NT_Topic topic);
 
 /**
  * Updates multiple topic properties.  Each key in the passed-in object is
@@ -772,7 +772,7 @@ wpi::json GetTopicProperties(NT_Topic topic);
  * @param update JSON object with keys to add/update/delete
  * @return False if update is not a JSON object
  */
-bool SetTopicProperties(NT_Topic topic, const wpi::json& update);
+bool SetTopicProperties(NT_Topic topic, const wpi::util::json& update);
 
 /**
  * Creates a new subscriber to value changes on a topic.
@@ -816,7 +816,7 @@ NT_Publisher Publish(NT_Topic topic, NT_Type type, std::string_view typeStr,
  * @return Publisher handle
  */
 NT_Publisher PublishEx(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                       const wpi::json& properties,
+                       const wpi::util::json& properties,
                        const PubSubOptions& options = kDefaultPubSubOptions);
 
 /**
@@ -1207,7 +1207,7 @@ std::optional<int64_t> GetServerTimeOffset(NT_Inst inst);
 /**
  * Returns monotonic current time in 1 us increments.
  * This is the same time base used for value and connection timestamps.
- * This function by default simply wraps wpi::Now(), but if SetNow() is
+ * This function by default simply wraps wpi::util::Now(), but if SetNow() is
  * called, this function instead returns the value passed to SetNow();
  * this can be used to reduce overhead.
  *
@@ -1219,8 +1219,8 @@ int64_t Now();
  * Sets the current timestamp used for timestamping values that do not
  * provide a timestamp (e.g. a value of 0 is passed).  For consistency,
  * it also results in Now() returning the set value.  This should generally
- * be used only if the overhead of calling wpi::Now() is a concern.
- * If used, it should be called periodically with the value of wpi::Now().
+ * be used only if the overhead of calling wpi::util::Now() is a concern.
+ * If used, it should be called periodically with the value of wpi::util::Now().
  *
  * @param timestamp timestamp (1 us increments)
  */
@@ -1245,7 +1245,7 @@ std::string_view GetStringFromType(NT_Type type);
 /** @} */
 
 /**
- * @defgroup ntcore_data_logger_func Data Logger Functions
+ * @defgroup ntcore_data_logger_func Data wpi::util::Logger Functions
  * @{
  */
 
@@ -1294,7 +1294,7 @@ void StopConnectionDataLog(NT_ConnectionDataLogger logger);
 /** @} */
 
 /**
- * @defgroup ntcore_logger_func Logger Functions
+ * @defgroup ntcore_logger_func wpi::util::Logger Functions
  * @{
  */
 
@@ -1322,7 +1322,7 @@ NT_Listener AddLogger(NT_Inst inst, unsigned int min_level,
  * @param poller        poller handle
  * @param min_level     minimum log level
  * @param max_level     maximum log level
- * @return Logger handle
+ * @return wpi::util::Logger handle
  */
 NT_Listener AddPolledLogger(NT_ListenerPoller poller, unsigned int min_level,
                             unsigned int max_level);
@@ -1505,4 +1505,4 @@ std::optional<std::vector<Client>> DecodeClients(std::span<const uint8_t> data);
 /** @} */
 
 }  // namespace meta
-}  // namespace nt
+}  // namespace wpi::nt

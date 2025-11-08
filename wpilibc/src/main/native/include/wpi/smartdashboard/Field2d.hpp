@@ -18,7 +18,7 @@
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * 2D representation of game field for dashboards.
@@ -38,7 +38,7 @@ namespace frc {
  * also be shown by using the GetObject() function.  Other objects can
  * also have multiple poses (which will show the object at multiple locations).
  */
-class Field2d : public nt::NTSendable, public wpi::SendableHelper<Field2d> {
+class Field2d : public wpi::nt::NTSendable, public wpi::util::SendableHelper<Field2d> {
  public:
   using Entry = size_t;
 
@@ -52,7 +52,7 @@ class Field2d : public nt::NTSendable, public wpi::SendableHelper<Field2d> {
    *
    * @param pose 2D pose
    */
-  void SetRobotPose(const Pose2d& pose);
+  void SetRobotPose(const wpi::math::Pose2d& pose);
 
   /**
    * Set the robot pose from x, y, and rotation.
@@ -61,14 +61,14 @@ class Field2d : public nt::NTSendable, public wpi::SendableHelper<Field2d> {
    * @param y Y location
    * @param rotation rotation
    */
-  void SetRobotPose(units::meter_t x, units::meter_t y, Rotation2d rotation);
+  void SetRobotPose(wpi::units::meter_t x, wpi::units::meter_t y, wpi::math::Rotation2d rotation);
 
   /**
    * Get the robot pose.
    *
    * @return 2D pose
    */
-  Pose2d GetRobotPose() const;
+  wpi::math::Pose2d GetRobotPose() const;
 
   /**
    * Get or create a field object.
@@ -84,13 +84,13 @@ class Field2d : public nt::NTSendable, public wpi::SendableHelper<Field2d> {
    */
   FieldObject2d* GetRobotObject();
 
-  void InitSendable(nt::NTSendableBuilder& builder) override;
+  void InitSendable(wpi::nt::NTSendableBuilder& builder) override;
 
  private:
-  std::shared_ptr<nt::NetworkTable> m_table;
+  std::shared_ptr<wpi::nt::NetworkTable> m_table;
 
-  mutable wpi::mutex m_mutex;
+  mutable wpi::util::mutex m_mutex;
   std::vector<std::unique_ptr<FieldObject2d>> m_objects;
 };
 
-}  // namespace frc
+}  // namespace wpi

@@ -18,7 +18,7 @@
 #include "wpi/util/Synchronization.h"
 #include "wpi/util/json.hpp"
 
-namespace nt::local {
+namespace wpi::nt::local {
 
 struct LocalDataLogger;
 struct LocalEntry;
@@ -48,20 +48,20 @@ struct LocalTopic {
   unsigned int GetFlags() const { return m_flags; }
 
   // these return update json
-  wpi::json SetFlags(unsigned int flags);
-  wpi::json SetPersistent(bool value);
-  wpi::json SetRetained(bool value);
-  wpi::json SetCached(bool value);
-  wpi::json SetProperty(std::string_view name, const wpi::json& value);
-  wpi::json DeleteProperty(std::string_view name);
+  wpi::util::json SetFlags(unsigned int flags);
+  wpi::util::json SetPersistent(bool value);
+  wpi::util::json SetRetained(bool value);
+  wpi::util::json SetCached(bool value);
+  wpi::util::json SetProperty(std::string_view name, const wpi::util::json& value);
+  wpi::util::json DeleteProperty(std::string_view name);
 
   // returns false if not object
-  bool SetProperties(const wpi::json& update);
+  bool SetProperties(const wpi::util::json& update);
 
   void RefreshProperties(bool updateFlags);
 
   // returns update json
-  wpi::json CompareProperties(const wpi::json props);
+  wpi::util::json CompareProperties(const wpi::util::json props);
 
   TopicInfo GetTopicInfo() const {
     TopicInfo info;
@@ -76,7 +76,7 @@ struct LocalTopic {
   void ResetIfDoesNotExist();
 
   // invariants
-  wpi::SignalObject<NT_Topic> handle;
+  wpi::util::SignalObject<NT_Topic> handle;
   std::string name;
   bool special;
 
@@ -84,13 +84,13 @@ struct LocalTopic {
   Value lastValueNetwork;
   NT_Type type{NT_UNASSIGNED};
   std::string typeStr;
-  wpi::json properties = wpi::json::object();
+  wpi::util::json properties = wpi::util::json::object();
   LocalEntry* entry{nullptr};  // cached entry for GetEntry()
 
   bool onNetwork{false};  // true if there are any remote publishers
   bool lastValueFromNetwork{false};
 
-  wpi::SmallVector<LocalDataLoggerEntry, 1> datalogs;
+  wpi::util::SmallVector<LocalDataLoggerEntry, 1> datalogs;
   NT_Type datalogType{NT_UNASSIGNED};
 
   VectorSet<LocalPublisher*> localPublishers;
@@ -107,4 +107,4 @@ struct LocalTopic {
   std::string m_propertiesStr{"{}"};  // cached string for GetTopicInfo() et al
 };
 
-}  // namespace nt::local
+}  // namespace wpi::nt::local

@@ -7,7 +7,7 @@
 #include "wpi/hardware/range/SharpIR.hpp"
 #include "wpi/simulation/SharpIRSim.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 TEST(SharpIRTest, SimDevices) {
   SharpIR s = SharpIR::GP2Y0A02YK0F(1);

@@ -10,7 +10,7 @@
 #include "wpi/nt/DoubleTopic.hpp"
 #include "wpi/smartdashboard/MechanismObject2d.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Root Mechanism2d node.
@@ -43,11 +43,11 @@ class MechanismRoot2d : private MechanismObject2d {
   using MechanismObject2d::Append;
 
  private:
-  void UpdateEntries(std::shared_ptr<nt::NetworkTable> table) override;
+  void UpdateEntries(std::shared_ptr<wpi::nt::NetworkTable> table) override;
   inline void Flush();
   double m_x;
   double m_y;
-  nt::DoublePublisher m_xPub;
-  nt::DoublePublisher m_yPub;
+  wpi::nt::DoublePublisher m_xPub;
+  wpi::nt::DoublePublisher m_yPub;
 };
-}  // namespace frc
+}  // namespace wpi

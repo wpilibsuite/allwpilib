@@ -19,13 +19,13 @@
 #include "server/ServerSubscriber.hpp"
 #include "wpi/util/json_fwd.hpp"
 
-namespace wpi {
+namespace wpi::util {
 class Logger;
 template <typename T>
 class SmallVectorImpl;
 }  // namespace wpi
 
-namespace nt::server {
+namespace wpi::nt::server {
 
 struct ServerTopic;
 class ServerStorage;
@@ -35,7 +35,7 @@ class ServerClient {
  public:
   ServerClient(std::string_view name, std::string_view connInfo, bool local,
                SetPeriodicFunc setPeriodic, ServerStorage& storage, int id,
-               wpi::Logger& logger)
+               wpi::util::Logger& logger)
       : m_name{name},
         m_connInfo{connInfo},
         m_local{local},
@@ -55,7 +55,7 @@ class ServerClient {
                          net::ValueSendMode mode) = 0;
   virtual void SendAnnounce(ServerTopic* topic, std::optional<int> pubuid) = 0;
   virtual void SendUnannounce(ServerTopic* topic) = 0;
-  virtual void SendPropertiesUpdate(ServerTopic* topic, const wpi::json& update,
+  virtual void SendPropertiesUpdate(ServerTopic* topic, const wpi::util::json& update,
                                     bool ack) = 0;
   virtual void SendOutgoing(uint64_t curTimeMs, bool flush) = 0;
   virtual void Flush() = 0;
@@ -68,7 +68,7 @@ class ServerClient {
 
   std::span<ServerSubscriber*> GetSubscribers(
       std::string_view name, bool special,
-      wpi::SmallVectorImpl<ServerSubscriber*>& buf);
+      wpi::util::SmallVectorImpl<ServerSubscriber*>& buf);
 
   std::string_view GetName() const { return m_name; }
   int GetId() const { return m_id; }
@@ -86,10 +86,10 @@ class ServerClient {
   ServerStorage& m_storage;
   int m_id;
 
-  wpi::Logger& m_logger;
+  wpi::util::Logger& m_logger;
 
-  wpi::DenseMap<int, std::unique_ptr<ServerPublisher>> m_publishers;
-  wpi::DenseMap<int, std::unique_ptr<ServerSubscriber>> m_subscribers;
+  wpi::util::DenseMap<int, std::unique_ptr<ServerPublisher>> m_publishers;
+  wpi::util::DenseMap<int, std::unique_ptr<ServerSubscriber>> m_subscribers;
 
  public:
   // meta topics
@@ -97,4 +97,4 @@ class ServerClient {
   ServerTopic* m_metaSub = nullptr;
 };
 
-}  // namespace nt::server
+}  // namespace wpi::nt::server

@@ -18,7 +18,7 @@
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/spinlock.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 /**
  * A data source for numeric/boolean data.
@@ -62,7 +62,7 @@ class DataSource {
 
   static DataSource* Find(std::string_view id);
 
-  static wpi::sig::Signal<const char*, DataSource*> sourceCreated;
+  static wpi::util::sig::Signal<const char*, DataSource*> sourceCreated;
 
  private:
   std::string m_id;
@@ -78,7 +78,7 @@ class DataSource {
 
   virtual void DragDropTooltip() const;
 
-  mutable wpi::spinlock m_valueMutex;
+  mutable wpi::util::spinlock m_valueMutex;
   int64_t m_valueTime = 0;
 };
 
@@ -113,7 +113,7 @@ class ValueSource : public DataSource {
     return m_value;
   }
 
-  wpi::sig::SignalBase<wpi::spinlock, T, int64_t> valueChanged;
+  wpi::util::sig::SignalBase<wpi::util::spinlock, T, int64_t> valueChanged;
 
  private:
   T m_value = 0;
@@ -202,16 +202,16 @@ class StringSource : public DataSource {
     return m_value;
   }
 
-  std::string_view GetValue(wpi::SmallVectorImpl<char>& buf) const {
+  std::string_view GetValue(wpi::util::SmallVectorImpl<char>& buf) const {
     std::scoped_lock lock{m_valueMutex};
     buf.assign(m_value.begin(), m_value.end());
     return {buf.begin(), buf.end()};
   }
 
-  wpi::sig::SignalBase<wpi::spinlock, std::string_view, int64_t> valueChanged;
+  wpi::util::sig::SignalBase<wpi::util::spinlock, std::string_view, int64_t> valueChanged;
 
  private:
   std::string m_value;
 };
 
-}  // namespace glass
+}  // namespace wpi::glass

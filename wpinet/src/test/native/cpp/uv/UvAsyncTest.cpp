@@ -35,14 +35,14 @@
 #include "wpi/net/uv/Prepare.hpp"
 #include "wpi/util/mutex.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 TEST(UvAsyncTest, CallbackOnly) {
   std::atomic_int async_cb_called{0};
   int prepare_cb_called = 0;
   int close_cb_called = 0;
 
-  wpi::mutex mutex;
+  wpi::util::mutex mutex;
   mutex.lock();
 
   std::thread theThread;
@@ -183,4 +183,4 @@ TEST(UvAsyncTest, DataRef) {
   }
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

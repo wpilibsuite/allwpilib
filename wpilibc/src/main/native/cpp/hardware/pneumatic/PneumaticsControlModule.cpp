@@ -20,11 +20,11 @@
 #include "wpi/util/SensorUtil.hpp"
 #include "wpi/util/StackTrace.hpp"
 
-using namespace frc;
+using namespace wpi;
 
-wpi::mutex PneumaticsControlModule::m_handleLock;
+wpi::util::mutex PneumaticsControlModule::m_handleLock;
 std::unique_ptr<
-    wpi::DenseMap<int, std::weak_ptr<PneumaticsControlModule::DataStore>>[]>
+    wpi::util::DenseMap<int, std::weak_ptr<PneumaticsControlModule::DataStore>>[]>
     PneumaticsControlModule::m_handleMaps = nullptr;
 
 // Always called under lock, so we can avoid the double lock from the magic
@@ -35,7 +35,7 @@ PneumaticsControlModule::GetDataStore(int busId, int module) {
   FRC_AssertMessage(busId >= 0 && busId < numBuses,
                     "Bus {} out of range. Must be [0-{}).", busId, numBuses);
   if (!m_handleMaps) {
-    m_handleMaps = std::make_unique<wpi::DenseMap<
+    m_handleMaps = std::make_unique<wpi::util::DenseMap<
         int, std::weak_ptr<PneumaticsControlModule::DataStore>>[]>(numBuses);
   }
 
@@ -51,7 +51,7 @@ class PneumaticsControlModule::DataStore {
     FRC_CheckErrorStatus(status, "Module {}", module);
     m_moduleObject = PneumaticsControlModule{busId, handle, module};
     m_moduleObject.m_dataStore =
-        std::shared_ptr<DataStore>{this, wpi::NullDeleter<DataStore>()};
+        std::shared_ptr<DataStore>{this, wpi::util::NullDeleter<DataStore>()};
   }
 
   ~DataStore() noexcept { HAL_FreeCTREPCM(m_moduleObject.m_handle); }
@@ -63,7 +63,7 @@ class PneumaticsControlModule::DataStore {
   friend class PneumaticsControlModule;
   uint32_t m_reservedMask{0};
   bool m_compressorReserved{false};
-  wpi::mutex m_reservedLock;
+  wpi::util::mutex m_reservedLock;
   PneumaticsControlModule m_moduleObject{0, HAL_kInvalidHandle, 0};
 };
 
@@ -71,7 +71,7 @@ PneumaticsControlModule::PneumaticsControlModule(int busId)
     : PneumaticsControlModule{busId, SensorUtil::GetDefaultCTREPCMModule()} {}
 
 PneumaticsControlModule::PneumaticsControlModule(int busId, int module) {
-  std::string stackTrace = wpi::GetStackTrace(1);
+  std::string stackTrace = wpi::util::GetStackTrace(1);
   std::scoped_lock lock(m_handleLock);
   auto& res = GetDataStore(busId, module);
   m_dataStore = res.lock();
@@ -109,16 +109,16 @@ void PneumaticsControlModule::EnableCompressorDigital() {
 }
 
 void PneumaticsControlModule::EnableCompressorAnalog(
-    units::pounds_per_square_inch_t minPressure,
-    units::pounds_per_square_inch_t maxPressure) {
+    wpi::units::pounds_per_square_inch_t minPressure,
+    wpi::units::pounds_per_square_inch_t maxPressure) {
   int32_t status = 0;
   HAL_SetCTREPCMClosedLoopControl(m_handle, true, &status);
   FRC_ReportError(status, "Module {}", m_module);
 }
 
 void PneumaticsControlModule::EnableCompressorHybrid(
-    units::pounds_per_square_inch_t minPressure,
-    units::pounds_per_square_inch_t maxPressure) {
+    wpi::units::pounds_per_square_inch_t minPressure,
+    wpi::units::pounds_per_square_inch_t maxPressure) {
   int32_t status = 0;
   HAL_SetCTREPCMClosedLoopControl(m_handle, true, &status);
   FRC_ReportError(status, "Module {}", m_module);
@@ -139,11 +139,11 @@ bool PneumaticsControlModule::GetPressureSwitch() const {
   return result;
 }
 
-units::ampere_t PneumaticsControlModule::GetCompressorCurrent() const {
+wpi::units::ampere_t PneumaticsControlModule::GetCompressorCurrent() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMCompressorCurrent(m_handle, &status);
   FRC_ReportError(status, "Module {}", m_module);
-  return units::ampere_t{result};
+  return wpi::units::ampere_t{result};
 }
 
 bool PneumaticsControlModule::GetCompressorCurrentTooHighFault() const {
@@ -235,9 +235,9 @@ void PneumaticsControlModule::FireOneShot(int index) {
 }
 
 void PneumaticsControlModule::SetOneShotDuration(int index,
-                                                 units::second_t duration) {
+                                                 wpi::units::second_t duration) {
   int32_t status = 0;
-  units::millisecond_t millis = duration;
+  wpi::units::millisecond_t millis = duration;
   HAL_SetCTREPCMOneShotDuration(m_handle, index, millis.to<int32_t>(), &status);
   FRC_ReportError(status, "Module {}", m_module);
 }
@@ -275,11 +275,11 @@ void PneumaticsControlModule::UnreserveCompressor() {
   m_dataStore->m_compressorReserved = false;
 }
 
-units::volt_t PneumaticsControlModule::GetAnalogVoltage(int channel) const {
+wpi::units::volt_t PneumaticsControlModule::GetAnalogVoltage(int channel) const {
   return 0_V;
 }
 
-units::pounds_per_square_inch_t PneumaticsControlModule::GetPressure(
+wpi::units::pounds_per_square_inch_t PneumaticsControlModule::GetPressure(
     int channel) const {
   return 0_psi;
 }
@@ -305,7 +305,7 @@ void PneumaticsControlModule::ReportUsage(std::string_view device,
 
 std::shared_ptr<PneumaticsBase> PneumaticsControlModule::GetForModule(
     int busId, int module) {
-  std::string stackTrace = wpi::GetStackTrace(1);
+  std::string stackTrace = wpi::util::GetStackTrace(1);
   std::scoped_lock lock(m_handleLock);
   auto& res = GetDataStore(busId, module);
   std::shared_ptr<DataStore> dataStore = res.lock();

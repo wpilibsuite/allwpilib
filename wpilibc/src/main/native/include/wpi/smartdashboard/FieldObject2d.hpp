@@ -17,10 +17,10 @@
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/mutex.hpp"
 
-namespace frc {
+namespace wpi {
 
 class Field2d;
-class Trajectory;
+class wpi::math::Trajectory;
 
 /**
  * Game field object on a Field2d.
@@ -40,7 +40,7 @@ class FieldObject2d {
    *
    * @param pose 2D pose
    */
-  void SetPose(const Pose2d& pose);
+  void SetPose(const wpi::math::Pose2d& pose);
 
   /**
    * Set the pose from x, y, and rotation.
@@ -49,14 +49,14 @@ class FieldObject2d {
    * @param y Y location
    * @param rotation rotation
    */
-  void SetPose(units::meter_t x, units::meter_t y, Rotation2d rotation);
+  void SetPose(wpi::units::meter_t x, wpi::units::meter_t y, wpi::math::Rotation2d rotation);
 
   /**
    * Get the pose.
    *
    * @return 2D pose, or 0,0,0 if unknown / does not exist
    */
-  Pose2d GetPose() const;
+  wpi::math::Pose2d GetPose() const;
 
   /**
    * Set multiple poses from an array of Pose objects.
@@ -64,7 +64,7 @@ class FieldObject2d {
    *
    * @param poses array of 2D poses
    */
-  void SetPoses(std::span<const Pose2d> poses);
+  void SetPoses(std::span<const wpi::math::Pose2d> poses);
 
   /**
    * Set multiple poses from an array of Pose objects.
@@ -72,38 +72,38 @@ class FieldObject2d {
    *
    * @param poses array of 2D poses
    */
-  void SetPoses(std::initializer_list<Pose2d> poses);
+  void SetPoses(std::initializer_list<wpi::math::Pose2d> poses);
 
   /**
    * Sets poses from a trajectory.
    *
    * @param trajectory The trajectory from which poses should be added.
    */
-  void SetTrajectory(const Trajectory& trajectory);
+  void SetTrajectory(const wpi::math::Trajectory& trajectory);
 
   /**
    * Get multiple poses.
    *
    * @return vector of 2D poses
    */
-  std::vector<Pose2d> GetPoses() const;
+  std::vector<wpi::math::Pose2d> GetPoses() const;
 
   /**
    * Get multiple poses.
    *
-   * @param out output SmallVector to hold 2D poses
-   * @return span referring to output SmallVector
+   * @param out output wpi::util::SmallVector to hold 2D poses
+   * @return span referring to output wpi::util::SmallVector
    */
-  std::span<const Pose2d> GetPoses(wpi::SmallVectorImpl<Pose2d>& out) const;
+  std::span<const wpi::math::Pose2d> GetPoses(wpi::util::SmallVectorImpl<wpi::math::Pose2d>& out) const;
 
  private:
   void UpdateEntry(bool setDefault = false);
   void UpdateFromEntry() const;
 
-  mutable wpi::mutex m_mutex;
+  mutable wpi::util::mutex m_mutex;
   std::string m_name;
-  nt::DoubleArrayEntry m_entry;
-  mutable wpi::SmallVector<Pose2d, 1> m_poses;
+  wpi::nt::DoubleArrayEntry m_entry;
+  mutable wpi::util::SmallVector<wpi::math::Pose2d, 1> m_poses;
 };
 
-}  // namespace frc
+}  // namespace wpi

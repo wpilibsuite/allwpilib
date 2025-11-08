@@ -3,7 +3,7 @@ extra_includes:
 - wpi/datalog/DataLog.hpp
 
 classes:
-  frc::DriverStation:
+  wpi::DriverStation:
     attributes:
       kJoystickPorts:
     enums:

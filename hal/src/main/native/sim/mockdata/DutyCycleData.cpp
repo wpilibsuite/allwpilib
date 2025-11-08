@@ -5,16 +5,16 @@
 #include "../PortsInternal.h"
 #include "DutyCycleDataInternal.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeDutyCycleData() {
   static DutyCycleData sed[kNumDutyCycles];
-  ::hal::SimDutyCycleData = sed;
+  ::wpi::hal::SimDutyCycleData = sed;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-DutyCycleData* hal::SimDutyCycleData;
+DutyCycleData* wpi::hal::SimDutyCycleData;
 
 void DutyCycleData::ResetData() {
   initialized.Reset(false);

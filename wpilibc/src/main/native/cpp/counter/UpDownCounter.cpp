@@ -13,12 +13,12 @@
 #include "wpi/util/StackTrace.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 UpDownCounter::UpDownCounter(int channel, EdgeConfiguration configuration)
     : m_channel{channel} {
   int32_t status = 0;
-  std::string stackTrace = wpi::GetStackTrace(1);
+  std::string stackTrace = wpi::util::GetStackTrace(1);
   m_handle = HAL_InitializeCounter(
       channel, configuration == EdgeConfiguration::kRisingEdge,
       stackTrace.c_str(), &status);
@@ -27,7 +27,7 @@ UpDownCounter::UpDownCounter(int channel, EdgeConfiguration configuration)
   Reset();
 
   HAL_ReportUsage("IO", channel, "UpDownCounter");
-  wpi::SendableRegistry::Add(this, "UpDown Counter", channel);
+  wpi::util::SendableRegistry::Add(this, "UpDown Counter", channel);
 }
 
 int UpDownCounter::GetCount() const {
@@ -50,7 +50,7 @@ void UpDownCounter::SetEdgeConfiguration(EdgeConfiguration configuration) {
   FRC_CheckErrorStatus(status, "{}", m_channel);
 }
 
-void UpDownCounter::InitSendable(wpi::SendableBuilder& builder) {
+void UpDownCounter::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("UpDown Counter");
   builder.AddDoubleProperty("Count", [&] { return GetCount(); }, nullptr);
 }

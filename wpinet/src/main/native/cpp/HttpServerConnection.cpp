@@ -14,7 +14,7 @@
 #include "wpi/util/fmt/raw_ostream.hpp"
 #include "wpi/util/print.hpp"
 
-using namespace wpi;
+using namespace wpi::net;
 
 HttpServerConnection::HttpServerConnection(std::shared_ptr<uv::Stream> stream)
     : m_stream(*stream) {
@@ -29,8 +29,8 @@ HttpServerConnection::HttpServerConnection(std::shared_ptr<uv::Stream> stream)
   m_request.messageBegin.connect([this] { m_acceptGzip = false; });
   m_request.header.connect(
       [this](std::string_view name, std::string_view value) {
-        if (wpi::equals_lower(name, "accept-encoding") &&
-            wpi::contains(value, "gzip")) {
+        if (wpi::util::equals_lower(name, "accept-encoding") &&
+            wpi::util::contains(value, "gzip")) {
           m_acceptGzip = true;
         }
       });
@@ -53,7 +53,7 @@ HttpServerConnection::HttpServerConnection(std::shared_ptr<uv::Stream> stream)
   stream->StartRead();
 }
 
-void HttpServerConnection::BuildCommonHeaders(raw_ostream& os) {
+void HttpServerConnection::BuildCommonHeaders(wpi::util::raw_ostream& os) {
   os << "Server: WebServer/1.0\r\n"
         "Cache-Control: no-store, no-cache, must-revalidate, pre-check=0, "
         "post-check=0, max-age=0\r\n"
@@ -61,12 +61,12 @@ void HttpServerConnection::BuildCommonHeaders(raw_ostream& os) {
         "Expires: Mon, 3 Jan 2000 12:34:56 GMT\r\n";
 }
 
-void HttpServerConnection::BuildHeader(raw_ostream& os, int code,
+void HttpServerConnection::BuildHeader(wpi::util::raw_ostream& os, int code,
                                        std::string_view codeText,
                                        std::string_view contentType,
                                        uint64_t contentLength,
                                        std::string_view extra) {
-  wpi::print(os, "HTTP/{}.{} {} {}\r\n", m_request.GetMajor(),
+  wpi::util::print(os, "HTTP/{}.{} {} {}\r\n", m_request.GetMajor(),
              m_request.GetMinor(), code, codeText);
   if (contentLength == 0) {
     m_keepAlive = false;
@@ -77,7 +77,7 @@ void HttpServerConnection::BuildHeader(raw_ostream& os, int code,
   BuildCommonHeaders(os);
   os << "Content-Type: " << contentType << "\r\n";
   if (contentLength != 0) {
-    wpi::print(os, "Content-Length: {}\r\n", contentLength);
+    wpi::util::print(os, "Content-Length: {}\r\n", contentLength);
   }
   os << "Access-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: *\r\n";
   if (!extra.empty()) {
@@ -102,7 +102,7 @@ void HttpServerConnection::SendResponse(int code, std::string_view codeText,
                                         std::string_view contentType,
                                         std::string_view content,
                                         std::string_view extraHeader) {
-  SmallVector<uv::Buffer, 4> toSend;
+  wpi::util::SmallVector<uv::Buffer, 4> toSend;
   raw_uv_ostream os{toSend, 4096};
   BuildHeader(os, code, codeText, contentType, content.size(), extraHeader);
   os << content;
@@ -120,7 +120,7 @@ void HttpServerConnection::SendStaticResponse(
     contentEncodingHeader = "Content-Encoding: gzip\r\n";
   }
 
-  SmallVector<uv::Buffer, 4> bufs;
+  wpi::util::SmallVector<uv::Buffer, 4> bufs;
   raw_uv_ostream os{bufs, 4096};
   BuildHeader(os, code, codeText, contentType, content.size(),
               fmt::format("{}{}", extraHeader, contentEncodingHeader));
@@ -130,7 +130,7 @@ void HttpServerConnection::SendStaticResponse(
   m_stream.Write(bufs, [closeAfter = !m_keepAlive, stream = &m_stream](
                            auto bufs, uv::Error) {
     // don't deallocate the static content
-    for (auto&& buf : wpi::drop_back(bufs)) {
+    for (auto&& buf : wpi::util::drop_back(bufs)) {
       buf.Deallocate();
     }
     if (closeAfter) {
@@ -173,7 +173,7 @@ void HttpServerConnection::SendError(int code, std::string_view message) {
       baseMessage = "501: Not Implemented!";
       break;
   }
-  SmallString<256> content{baseMessage};
+  wpi::util::SmallString<256> content{baseMessage};
   content += "\r\n";
   content += message;
   SendResponse(code, codeText, "text/plain", content.str(), extra);

@@ -12,7 +12,7 @@
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
-namespace frc {
+namespace wpi {
 class AddressableLED;
 
 /**
@@ -23,7 +23,7 @@ class AddressableLED;
  * (off) to 4096. Changes are immediately sent to the FPGA, and the update
  * occurs at the next FPGA cycle (5.05ms). There is no delay.
  */
-class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
+class PWM : public wpi::util::Sendable, public wpi::util::SendableHelper<PWM> {
  public:
   friend class AddressableLED;
   /**
@@ -74,7 +74,7 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
    *
    * @param time Microsecond PWM value.
    */
-  void SetPulseTime(units::microsecond_t time);
+  void SetPulseTime(wpi::units::microsecond_t time);
 
   /**
    * Get the PWM pulse time directly from the hardware.
@@ -83,7 +83,7 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
    *
    * @return Microsecond PWM control value.
    */
-  units::microsecond_t GetPulseTime() const;
+  wpi::units::microsecond_t GetPulseTime() const;
 
   /**
    * Temporarily disables the PWM output. The next set call will re-enable
@@ -108,11 +108,11 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
   void SetSimDevice(HAL_SimDeviceHandle device);
 
  protected:
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
   int m_channel;
-  hal::Handle<HAL_DigitalHandle, HAL_FreePWMPort> m_handle;
+  wpi::hal::Handle<HAL_DigitalHandle, HAL_FreePWMPort> m_handle;
 };
 
-}  // namespace frc
+}  // namespace wpi

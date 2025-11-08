@@ -5,7 +5,7 @@
 #include "Robot.hpp"
 
 // Run robot periodic() functions for 5 ms, and run controllers every 10 ms
-Robot::Robot() : frc::TimesliceRobot{5_ms, 10_ms} {
+Robot::Robot() : wpi::TimesliceRobot{5_ms, 10_ms} {
   // Runs for 2 ms after robot periodic functions
   Schedule([=] {}, 2_ms);
 
@@ -33,6 +33,6 @@ void Robot::TestPeriodic() {}
 
 #ifndef RUNNING_FRC_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

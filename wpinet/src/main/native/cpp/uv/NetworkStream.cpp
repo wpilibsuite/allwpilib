@@ -7,7 +7,7 @@
 #include <functional>
 #include <utility>
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 ConnectReq::ConnectReq() {
   error = [this](Error err) { GetStream().error(err); };
@@ -33,4 +33,4 @@ void NetworkStream::Listen(std::function<void()> callback, int backlog) {
   Listen(backlog);
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

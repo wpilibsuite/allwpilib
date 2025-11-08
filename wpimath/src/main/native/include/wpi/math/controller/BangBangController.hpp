@@ -13,7 +13,7 @@
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * Implements a bang-bang controller, which outputs either 0 or 1 depending on
@@ -29,8 +29,8 @@ namespace frc {
  * control them with a bang-bang controller.
  */
 class WPILIB_DLLEXPORT BangBangController
-    : public wpi::Sendable,
-      public wpi::SendableHelper<BangBangController> {
+    : public wpi::util::Sendable,
+      public wpi::util::SendableHelper<BangBangController> {
  public:
   /**
    * Creates a new bang-bang controller.
@@ -128,7 +128,7 @@ class WPILIB_DLLEXPORT BangBangController
     return Calculate(measurement, m_setpoint);
   }
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
   double m_tolerance;
@@ -140,4 +140,4 @@ class WPILIB_DLLEXPORT BangBangController
   inline static int instances = 0;
 };
 
-}  // namespace frc
+}  // namespace wpi::math

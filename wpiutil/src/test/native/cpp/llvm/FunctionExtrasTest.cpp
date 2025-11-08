@@ -13,7 +13,7 @@
 #include <memory>
 #include <type_traits>
 
-using namespace wpi;
+using namespace wpi::util;
 
 namespace {
 

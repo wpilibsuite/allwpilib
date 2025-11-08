@@ -17,13 +17,13 @@
 #include "wpi/nt/StringArrayTopic.hpp"
 #include "wpi/nt/StringTopic.hpp"
 
-namespace glass {
+namespace wpi::glass {
 class NTCommandSchedulerModel : public CommandSchedulerModel {
  public:
   static constexpr const char* kType = "Scheduler";
 
   explicit NTCommandSchedulerModel(std::string_view path);
-  NTCommandSchedulerModel(nt::NetworkTableInstance inst, std::string_view path);
+  NTCommandSchedulerModel(wpi::nt::NetworkTableInstance inst, std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
   const std::vector<std::string>& GetCurrentCommands() override {
@@ -37,14 +37,14 @@ class NTCommandSchedulerModel : public CommandSchedulerModel {
   bool IsReadOnly() override { return false; }
 
  private:
-  nt::NetworkTableInstance m_inst;
-  nt::StringSubscriber m_name;
-  nt::StringArraySubscriber m_commands;
-  nt::IntegerArraySubscriber m_ids;
-  nt::IntegerArrayPublisher m_cancel;
+  wpi::nt::NetworkTableInstance m_inst;
+  wpi::nt::StringSubscriber m_name;
+  wpi::nt::StringArraySubscriber m_commands;
+  wpi::nt::IntegerArraySubscriber m_ids;
+  wpi::nt::IntegerArrayPublisher m_cancel;
 
   std::string m_nameValue;
   std::vector<std::string> m_commandsValue;
   std::vector<int64_t> m_idsValue;
 };
-}  // namespace glass
+}  // namespace wpi::glass
