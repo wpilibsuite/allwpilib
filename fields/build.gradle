@@ -30,7 +30,7 @@ apply from: "${rootDir}/shared/resources.gradle"
 apply from: "${rootDir}/shared/config.gradle"
 apply from: "${rootDir}/shared/java/javacommon.gradle"
 
-def generateTask = createGenerateResourcesTask('main', 'FIELDS', 'fields', project)
+def generateTask = createGenerateResourcesTask('main', 'FIELDS', 'wpi::fields', project)
 
 project(':').libraryBuild.dependsOn build
 tasks.withType(CppCompile) {
