@@ -103,6 +103,7 @@ class StringMap : public std::map<std::string, T, std::less<>, Allocator> {
    *             with
    * @param alloc allocator to use for all memory allocations of this container
    */
+  // NOLINTNEXTLINE (google-explicit-constructor)
   StringMap(std::initializer_list<value_type> init,
             const Allocator& alloc = Allocator())
       : map_type{init, alloc} {}
