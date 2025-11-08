@@ -6,7 +6,7 @@
 {% macro capitalize_first(string) -%}
 {{ string[0]|capitalize + string[1:] }}
 {%- endmacro %}
-#include "frc/{{ ConsoleName }}Controller.h"
+#include "wpi/driverstation/{{ ConsoleName }}Controller.hpp"
 
 #include "wpi/hal/UsageReporting.h"
 #include "wpi/util/sendable/SendableBuilder.hpp"
