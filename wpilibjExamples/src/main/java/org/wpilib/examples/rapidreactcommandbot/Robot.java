@@ -8,7 +8,7 @@ import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.epilogue.Epilogue;
 import org.wpilib.epilogue.Logged;
-import org.wpilib.opmode.TimedRobot;
+import org.wpilib.framework.TimedRobot;
 import org.wpilib.system.DataLogManager;
 
 /**

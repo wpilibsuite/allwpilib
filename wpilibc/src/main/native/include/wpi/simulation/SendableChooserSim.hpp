@@ -6,9 +6,9 @@
 
 #include <string_view>
 
+#include "wpi/framework/RobotBase.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/StringTopic.hpp"
-#include "wpi/opmode/RobotBase.hpp"
 
 namespace wpi::sim {
 

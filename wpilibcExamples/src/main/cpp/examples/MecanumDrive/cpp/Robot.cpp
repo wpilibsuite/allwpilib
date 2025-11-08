@@ -4,8 +4,8 @@
 
 #include <wpi/drive/MecanumDrive.hpp>
 #include <wpi/driverstation/Joystick.hpp>
+#include <wpi/framework/TimedRobot.hpp>
 #include <wpi/hardware/motor/PWMSparkMax.hpp>
-#include <wpi/opmode/TimedRobot.hpp>
 
 /**
  * This is a demo program showing how to use Mecanum control with the

@@ -4,8 +4,8 @@
 
 #include <wpi/drive/DifferentialDrive.hpp>
 #include <wpi/driverstation/XboxController.hpp>
+#include <wpi/framework/TimedRobot.hpp>
 #include <wpi/hardware/motor/PWMSparkMax.hpp>
-#include <wpi/opmode/TimedRobot.hpp>
 #include <wpi/system/Timer.hpp>
 
 class Robot : public wpi::TimedRobot {

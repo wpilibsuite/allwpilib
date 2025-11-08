@@ -6,8 +6,8 @@ package org.wpilib.examples.mecanumdrive;
 
 import org.wpilib.drive.MecanumDrive;
 import org.wpilib.driverstation.Joystick;
+import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.motor.PWMSparkMax;
-import org.wpilib.opmode.TimedRobot;
 import org.wpilib.util.sendable.SendableRegistry;
 
 /** This is a demo program showing how to use Mecanum control with the MecanumDrive class. */

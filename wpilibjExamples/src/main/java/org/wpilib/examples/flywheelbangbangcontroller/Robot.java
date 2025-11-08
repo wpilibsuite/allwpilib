@@ -5,6 +5,7 @@
 package org.wpilib.examples.flywheelbangbangcontroller;
 
 import org.wpilib.driverstation.Joystick;
+import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.BangBangController;
@@ -14,7 +15,6 @@ import org.wpilib.math.system.LinearSystem;
 import org.wpilib.math.system.plant.DCMotor;
 import org.wpilib.math.system.plant.LinearSystemId;
 import org.wpilib.math.util.Units;
-import org.wpilib.opmode.TimedRobot;
 import org.wpilib.simulation.EncoderSim;
 import org.wpilib.simulation.FlywheelSim;
 import org.wpilib.smartdashboard.SmartDashboard;

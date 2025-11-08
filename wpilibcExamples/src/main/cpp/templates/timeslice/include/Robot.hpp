@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include <wpi/opmode/TimesliceRobot.hpp>
+#include <wpi/framework/TimesliceRobot.hpp>
 #include <wpi/smartdashboard/SendableChooser.hpp>
 
 class Robot : public wpi::TimesliceRobot {

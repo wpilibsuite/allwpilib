@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include "wpi/opmode/RobotBase.hpp"
+#include "wpi/framework/RobotBase.hpp"
 #include "wpi/util/fs.hpp"
 
 std::string wpi::filesystem::GetLaunchDirectory() {

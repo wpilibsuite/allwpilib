@@ -5,8 +5,8 @@
 package org.wpilib.examples.swervedriveposeestimator;
 
 import org.wpilib.driverstation.XboxController;
+import org.wpilib.framework.TimedRobot;
 import org.wpilib.math.filter.SlewRateLimiter;
-import org.wpilib.opmode.TimedRobot;
 
 public class Robot extends TimedRobot {
   private final XboxController m_controller = new XboxController(0);

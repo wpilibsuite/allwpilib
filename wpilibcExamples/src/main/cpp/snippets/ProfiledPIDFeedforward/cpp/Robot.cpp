@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <wpi/framework/TimedRobot.hpp>
 #include <wpi/hardware/motor/PWMSparkMax.hpp>
 #include <wpi/hardware/rotation/Encoder.hpp>
 #include <wpi/math/controller/ProfiledPIDController.hpp>
 #include <wpi/math/controller/SimpleMotorFeedforward.hpp>
-#include <wpi/opmode/TimedRobot.hpp>
 #include <wpi/units/acceleration.hpp>
 #include <wpi/units/length.hpp>
 #include <wpi/units/velocity.hpp>

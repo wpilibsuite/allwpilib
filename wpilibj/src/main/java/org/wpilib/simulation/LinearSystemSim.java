@@ -14,7 +14,7 @@ import org.wpilib.math.util.StateSpaceUtil;
 
 /**
  * This class helps simulate linear systems. To use this class, do the following in the {@link
- * org.wpilib.opmode.IterativeRobotBase#simulationPeriodic} method.
+ * org.wpilib.framework.IterativeRobotBase#simulationPeriodic} method.
  *
  * <p>Call {@link #setInput(double...)} with the inputs to the system (usually voltage).
  *

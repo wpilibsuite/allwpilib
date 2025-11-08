@@ -7,10 +7,10 @@ package org.wpilib.examples.addressableled;
 import static org.wpilib.units.Units.Meters;
 import static org.wpilib.units.Units.MetersPerSecond;
 
+import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.led.AddressableLED;
 import org.wpilib.hardware.led.AddressableLEDBuffer;
 import org.wpilib.hardware.led.LEDPattern;
-import org.wpilib.opmode.TimedRobot;
 import org.wpilib.units.measure.Distance;
 
 public class Robot extends TimedRobot {

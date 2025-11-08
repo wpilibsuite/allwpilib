@@ -5,9 +5,9 @@
 package org.wpilib.templates.xrpeducational;
 
 import org.wpilib.driverstation.DriverStation;
+import org.wpilib.framework.RobotBase;
 import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.internal.DriverStationModeThread;
-import org.wpilib.opmode.RobotBase;
 import org.wpilib.util.WPIUtilJNI;
 
 /** Educational robot base class. */

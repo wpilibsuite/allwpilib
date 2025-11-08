@@ -16,10 +16,10 @@
 #include <wpi/apriltag/AprilTagDetector.hpp>
 #include <wpi/apriltag/AprilTagPoseEstimator.hpp>
 #include <wpi/cameraserver/CameraServer.hpp>
+#include <wpi/framework/TimedRobot.hpp>
 #include <wpi/math/geometry/Transform3d.hpp>
 #include <wpi/nt/IntegerArrayTopic.hpp>
 #include <wpi/nt/NetworkTableInstance.hpp>
-#include <wpi/opmode/TimedRobot.hpp>
 #include <wpi/units/angle.hpp>
 #include <wpi/units/length.hpp>
 

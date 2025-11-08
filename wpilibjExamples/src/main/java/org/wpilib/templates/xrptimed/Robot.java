@@ -4,7 +4,7 @@
 
 package org.wpilib.templates.xrptimed;
 
-import org.wpilib.opmode.TimedRobot;
+import org.wpilib.framework.TimedRobot;
 import org.wpilib.smartdashboard.SendableChooser;
 import org.wpilib.smartdashboard.SmartDashboard;
 

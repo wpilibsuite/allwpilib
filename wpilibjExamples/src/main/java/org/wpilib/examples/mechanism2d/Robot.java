@@ -5,10 +5,10 @@
 package org.wpilib.examples.mechanism2d;
 
 import org.wpilib.driverstation.Joystick;
+import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.AnalogPotentiometer;
 import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.opmode.TimedRobot;
 import org.wpilib.smartdashboard.Mechanism2d;
 import org.wpilib.smartdashboard.MechanismLigament2d;
 import org.wpilib.smartdashboard.MechanismRoot2d;

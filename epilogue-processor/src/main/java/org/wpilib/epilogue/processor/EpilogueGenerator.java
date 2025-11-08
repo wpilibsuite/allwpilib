@@ -19,8 +19,8 @@ import org.wpilib.epilogue.EpilogueConfiguration;
  * Generates the {@code Epilogue} file used as the main entry point to logging with Epilogue in a
  * robot program. {@code Epilogue} has instances of every generated logger class, a {@link
  * EpilogueConfiguration config} object, and (if the main robot class inherits from {@link
- * org.wpilib.opmode.TimedRobot TimedRobot}) a {@code bind()} method to automatically add a periodic
- * logging call to the robot.
+ * org.wpilib.framework.TimedRobot TimedRobot}) a {@code bind()} method to automatically add a
+ * periodic logging call to the robot.
  */
 public class EpilogueGenerator {
   private final ProcessingEnvironment m_processingEnv;

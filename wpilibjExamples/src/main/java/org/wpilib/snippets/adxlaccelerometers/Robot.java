@@ -4,9 +4,9 @@
 
 package org.wpilib.snippets.adxlaccelerometers;
 
+import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.accelerometer.ADXL345_I2C;
 import org.wpilib.hardware.bus.I2C;
-import org.wpilib.opmode.TimedRobot;
 
 /**
  * ADXL345, 362 Accelerometer snippets for frc-docs.
