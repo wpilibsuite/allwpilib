@@ -11,7 +11,7 @@ evaluationDependsOn(':epilogue-runtime')
 evaluationDependsOn(':hal')
 evaluationDependsOn(':ntcore')
 evaluationDependsOn(':wpiannotations')
-evaluationDependsOn(':wpilibNewCommands')
+evaluationDependsOn(':commandsv2')
 evaluationDependsOn(':wpilibc')
 evaluationDependsOn(':wpilibj')
 evaluationDependsOn(':wpimath')
@@ -39,7 +39,7 @@ cppProjectZips.add(project(':cameraserver').cppHeadersZip)
 cppProjectZips.add(project(':cscore').cppHeadersZip)
 cppProjectZips.add(project(':hal').cppHeadersZip)
 cppProjectZips.add(project(':ntcore').cppHeadersZip)
-cppProjectZips.add(project(':wpilibNewCommands').cppHeadersZip)
+cppProjectZips.add(project(':commandsv2').cppHeadersZip)
 cppProjectZips.add(project(':wpilibc').cppHeadersZip)
 cppProjectZips.add(project(':wpimath').cppHeadersZip)
 cppProjectZips.add(project(':wpinet').cppHeadersZip)
@@ -187,7 +187,7 @@ task generateJavaDocs(type: Javadoc) {
     source project(':hal').sourceSets.main.java
     source project(':ntcore').sourceSets.main.java
     source project(':wpiannotations').sourceSets.main.java
-    source project(':wpilibNewCommands').sourceSets.main.java
+    source project(':commandsv2').sourceSets.main.java
     source project(':wpilibj').sourceSets.main.java
     source project(':wpimath').sourceSets.main.java
     source project(':wpinet').sourceSets.main.java

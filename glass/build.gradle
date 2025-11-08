@@ -96,7 +96,7 @@ model {
 
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
-                lib project: ':fieldImages', library: 'fieldImages', linkage: 'shared'
+                lib project: ':fields', library: 'fields', linkage: 'shared'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             }
@@ -126,7 +126,7 @@ model {
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
-                lib project: ':fieldImages', library: 'fieldImages', linkage: 'shared'
+                lib project: ':fields', library: 'fields', linkage: 'shared'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             }
@@ -165,7 +165,7 @@ model {
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
-                lib project: ':fieldImages', library: 'fieldImages', linkage: 'static'
+                lib project: ':fields', library: 'fields', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'opencv_static')
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'

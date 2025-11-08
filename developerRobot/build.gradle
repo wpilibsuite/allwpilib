@@ -52,7 +52,7 @@ dependencies {
     implementation project(':ntcore')
     implementation project(':cscore')
     implementation project(':cameraserver')
-    implementation project(':wpilibNewCommands')
+    implementation project(':commandsv2')
     implementation project(':apriltag')
     implementation project(':wpiunits')
     implementation project(':epilogue-runtime')
@@ -198,7 +198,7 @@ model {
                     }
                 }
                 lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
-                lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
+                lib project: ':commandsv2', library: 'commandsv2', linkage: 'shared'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
@@ -243,7 +243,7 @@ model {
                     }
                 }
                 lib project: ':apriltag', library: 'apriltag', linkage: 'static'
-                lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'static'
+                lib project: ':commandsv2', library: 'commandsv2', linkage: 'static'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'
