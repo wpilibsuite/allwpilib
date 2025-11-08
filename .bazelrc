@@ -1,4 +1,3 @@
-try-import %workspace%/bazel_auth.rc
 try-import %workspace%/user.bazelrc
 
 common --noenable_bzlmod --enable_workspace
@@ -37,15 +36,19 @@ build:no_example --test_tag_filters=-wpi-example --build_tag_filters=-wpi-exampl
 test:no_example --test_tag_filters=-wpi-example --build_tag_filters=-wpi-example
 common:skip_robotpy --test_tag_filters=-robotpy --build_tag_filters=-robotpy
 
-# Build Buddy Cache Setup
-build:build_buddy --bes_results_url=https://app.buildbuddy.io/invocation/
-build:build_buddy --bes_backend=grpcs://remote.buildbuddy.io
-build:build_buddy --remote_cache=grpcs://remote.buildbuddy.io
-build:build_buddy --remote_timeout=3600
+# Build Buddy BES Setup
+build:build_buddy_bes --bes_results_url=https://app.buildbuddy.io/invocation/
+build:build_buddy_bes --bes_backend=grpcs://remote.buildbuddy.io
 
-# Additional suggestions from buildbuddy for speed
-build:build_buddy --experimental_remote_cache_compression
-build:build_buddy --experimental_remote_cache_compression_threshold=100
+# Common Cache Settings
+build:common_cache --remote_timeout=3600
+build:common_cache --experimental_remote_cache_compression
+build:common_cache --experimental_remote_cache_compression_threshold=100
+
+# Build Buddy Cache Setup
+build:build_buddy --config=common_cache
+build:build_buddy --config=build_buddy_bes
+build:build_buddy --remote_cache=grpcs://remote.buildbuddy.io
 build:build_buddy --noslim_profile
 build:build_buddy --experimental_profile_include_target_label
 build:build_buddy --experimental_profile_include_primary_output
@@ -53,12 +56,18 @@ build:build_buddy --nolegacy_important_outputs
 
 common:build_buddy_readonly --noremote_upload_local_results
 
+# Bazel-remote cache setup
+build:remote_cache --config=common_cache
+build:remote_cache --remote_cache=grpcs://gitlib-bazel.wpi.edu
+
+common:remote_cache_readonly --noremote_upload_local_results
+
 # This config should be used locally. It downloads more than the CI version
-build:remote_user --config=build_buddy
-build:remote_user --config=build_buddy_readonly
+build:remote_user --config=remote_cache
+build:remote_user --config=remote_cache_readonly
 build:remote_user --remote_download_toplevel
 
-build:ci --config=build_buddy
+build:ci --config=remote_cache
 build:ci --remote_download_minimal
 
 build --build_metadata=REPO_URL=https://github.com/wpilibsuite/allwpilib.git
@@ -73,3 +82,5 @@ common:ci --repo_env="WPI_PUBLISH_CLASSIFIER_FILTER=headers,sources,linuxsystemc
 # Instead, skip the cross transition for ARM on x86, and the reverse on x86.
 common:ci_windows_x86 --repo_env="WPI_PUBLISH_CLASSIFIER_FILTER=headers,sources,linuxsystemcore,linuxsystemcoredebug,linuxsystemcorestatic,linuxsystemcorestaticdebug,linuxx86-64,linuxx86-64debug,linuxx86-64static,linuxx86-64staticdebug,osxuniversal,osxuniversaldebug,osxuniversalstatic,osxuniversalstaticdebug,windowsx86-64,windowsx86-64debug,windowsx86-64static,windowsx86-64staticdebug"
 common:ci_windows_arm --repo_env="WPI_PUBLISH_CLASSIFIER_FILTER=headers,sources,linuxsystemcore,linuxsystemcoredebug,linuxsystemcorestatic,linuxsystemcorestaticdebug,linuxx86-64,linuxx86-64debug,linuxx86-64static,linuxx86-64staticdebug,osxuniversal,osxuniversaldebug,osxuniversalstatic,osxuniversalstaticdebug,windowsarm64,windowsarm64debug,windowsarm64static,windowsarm64staticdebug"
+
+try-import %workspace%/bazel_auth.rc
