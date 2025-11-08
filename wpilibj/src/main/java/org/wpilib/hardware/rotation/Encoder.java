@@ -6,6 +6,7 @@ package org.wpilib.hardware.rotation;
 
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
+import org.wpilib.hardware.discrete.CounterBase;
 import org.wpilib.hardware.hal.EncoderJNI;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.SimDevice;

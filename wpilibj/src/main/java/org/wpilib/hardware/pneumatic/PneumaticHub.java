@@ -4,6 +4,7 @@
 
 package org.wpilib.hardware.pneumatic;
 
+import org.wpilib.system.SensorUtil;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.PortsJNI;
 import org.wpilib.hardware.hal.REVPHFaults;

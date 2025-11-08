@@ -4,6 +4,8 @@
 
 package org.wpilib.math;
 
+import org.wpilib.math.util.MathUtil;
+
 public final class DevMain {
   /** Main entry point. */
   public static void main(String[] args) {

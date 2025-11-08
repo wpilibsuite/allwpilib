@@ -12,6 +12,7 @@ import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N2;
 import org.wpilib.math.numbers.N3;
 import org.wpilib.math.numbers.N4;
+import org.wpilib.math.util.Nat;
 import org.ejml.data.SingularMatrixException;
 import org.junit.jupiter.api.Test;
 

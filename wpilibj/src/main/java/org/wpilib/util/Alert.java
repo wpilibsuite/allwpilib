@@ -4,6 +4,7 @@
 
 package org.wpilib.util;
 
+import org.wpilib.system.RobotController;
 import org.wpilib.util.sendable.Sendable;
 import org.wpilib.util.sendable.SendableBuilder;
 import org.wpilib.smartdashboard.SmartDashboard;

@@ -7,6 +7,7 @@ package org.wpilib.util.concurrent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
+import org.wpilib.util.WPIUtilJNI;
 
 /** A thread-safe container for handling events. */
 public class EventVector {

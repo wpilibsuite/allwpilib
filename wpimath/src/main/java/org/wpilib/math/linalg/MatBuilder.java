@@ -6,6 +6,8 @@ package org.wpilib.math.linalg;
 
 import java.util.Objects;
 import org.ejml.simple.SimpleMatrix;
+import org.wpilib.math.util.Nat;
+import org.wpilib.math.util.Num;
 
 /** A class for constructing arbitrary RxC matrices. */
 public final class MatBuilder {

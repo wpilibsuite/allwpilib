@@ -6,6 +6,7 @@ package org.wpilib.system;
 
 import static org.wpilib.units.Units.Seconds;
 
+import org.wpilib.driverstation.DriverStation;
 import org.wpilib.hardware.hal.NotifierJNI;
 import org.wpilib.units.measure.Time;
 import java.io.Closeable;
