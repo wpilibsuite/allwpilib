@@ -255,8 +255,9 @@ bool UsbCameraImpl::CheckDeviceChange(WPARAM wParam, DEV_BROADCAST_HDR* pHdr,
 }
 
 void UsbCameraImpl::DeviceDisconnect() {
-  if (m_connectVerbose)
+  if (m_connectVerbose) {
     SINFO("Disconnected from {}", m_path);
+  }
   m_sourceReader.Reset();
   m_mediaSource.Reset();
   if (m_imageCallback) {
@@ -655,8 +656,9 @@ void UsbCameraImpl::DeviceCacheProperty(
     rawProp->valueStr = perProp->valueStr;  // copy
   } else {
     // Read current raw value and set percentage from it
-    if (!rawProp->DeviceGet(lock, pProcAmp))
+    if (!rawProp->DeviceGet(lock, pProcAmp)) {
       SWARNING("failed to get property {}", rawProp->name);
+    }
 
     if (perProp) {
       perProp->SetValue(RawToPercentage(*rawProp, rawProp->value));
@@ -666,8 +668,9 @@ void UsbCameraImpl::DeviceCacheProperty(
 
   // Set value on device if user-configured
   if (rawProp->valueSet) {
-    if (!rawProp->DeviceSet(lock, pProcAmp))
+    if (!rawProp->DeviceSet(lock, pProcAmp)) {
       SWARNING("failed to set property {}", rawProp->name);
+    }
   }
 
   // Update pointers since we released the lock
