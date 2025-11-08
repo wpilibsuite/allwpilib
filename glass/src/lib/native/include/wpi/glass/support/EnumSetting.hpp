@@ -8,7 +8,7 @@
 
 #include "wpi/util/SmallVector.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 class EnumSetting {
  public:
@@ -26,9 +26,9 @@ class EnumSetting {
   void UpdateValue() const;
 
   std::string& m_str;
-  wpi::SmallVector<const char*, 8> m_choices;
+  wpi::util::SmallVector<const char*, 8> m_choices;
   int m_defaultValue;
   mutable int m_value = -1;
 };
 
-}  // namespace glass
+}  // namespace wpi::glass

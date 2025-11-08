@@ -9,7 +9,7 @@
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/raw_istream.hpp"
 
-namespace cs {
+namespace wpi::cs {
 
 // DHT data for MJPEG images that don't have it.
 static const unsigned char dhtData[] = {
@@ -67,7 +67,7 @@ bool GetJpegSize(std::string_view data, int* width, int* height) {
     return false;
   }
 
-  data = wpi::substr(data, 2);  // Get to the first block
+  data = wpi::util::substr(data, 2);  // Get to the first block
   for (;;) {
     if (data.size() < 4) {
       return false;  // EOF
@@ -92,7 +92,7 @@ bool GetJpegSize(std::string_view data, int* width, int* height) {
       return true;
     }
     // Go to the next block
-    data = wpi::substr(data, bytes[2] * 256 + bytes[3] + 2);
+    data = wpi::util::substr(data, bytes[2] * 256 + bytes[3] + 2);
   }
 }
 
@@ -105,7 +105,7 @@ bool JpegNeedsDHT(const char* data, size_t* size, size_t* locSOF) {
   *locSOF = *size;
 
   // Search until SOS for DHT tag
-  sdata = wpi::substr(sdata, 2);  // Get to the first block
+  sdata = wpi::util::substr(sdata, 2);  // Get to the first block
   for (;;) {
     if (sdata.size() < 4) {
       return false;  // EOF
@@ -124,7 +124,7 @@ bool JpegNeedsDHT(const char* data, size_t* size, size_t* locSOF) {
       *locSOF = sdata.data() - data;  // SOF
     }
     // Go to the next block
-    sdata = wpi::substr(sdata, bytes[2] * 256 + bytes[3] + 2);
+    sdata = wpi::util::substr(sdata, bytes[2] * 256 + bytes[3] + 2);
   }
 
   // Only add DHT if we also found SOF (insertion point)
@@ -139,14 +139,14 @@ std::string_view JpegGetDHT() {
   return {reinterpret_cast<const char*>(dhtData), sizeof(dhtData)};
 }
 
-static inline void ReadInto(wpi::raw_istream& is, std::string& buf,
+static inline void ReadInto(wpi::util::raw_istream& is, std::string& buf,
                             size_t len) {
   size_t oldSize = buf.size();
   buf.resize(oldSize + len);
   is.read(&(*buf.begin()) + oldSize, len);
 }
 
-bool ReadJpeg(wpi::raw_istream& is, std::string& buf, int* width, int* height) {
+bool ReadJpeg(wpi::util::raw_istream& is, std::string& buf, int* width, int* height) {
   // in case we don't get a SOF
   *width = 0;
   *height = 0;
@@ -234,4 +234,4 @@ bool ReadJpeg(wpi::raw_istream& is, std::string& buf, int* width, int* height) {
   }
 }
 
-}  // namespace cs
+}  // namespace wpi::cs

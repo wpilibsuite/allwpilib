@@ -9,25 +9,25 @@
 #include "wpi/util/struct/Struct.hpp"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Struct<frc::SwerveModuleState> {
+struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::SwerveModuleState> {
   static constexpr std::string_view GetTypeName() {
     return "SwerveModuleState";
   }
   static constexpr size_t GetSize() {
-    return 8 + wpi::GetStructSize<frc::Rotation2d>();
+    return 8 + wpi::util::GetStructSize<wpi::math::Rotation2d>();
   }
   static constexpr std::string_view GetSchema() {
     return "double speed;Rotation2d angle";
   }
 
-  static frc::SwerveModuleState Unpack(std::span<const uint8_t> data);
+  static wpi::math::SwerveModuleState Unpack(std::span<const uint8_t> data);
   static void Pack(std::span<uint8_t> data,
-                   const frc::SwerveModuleState& value);
+                   const wpi::math::SwerveModuleState& value);
   static void ForEachNested(
       std::invocable<std::string_view, std::string_view> auto fn) {
-    wpi::ForEachStructSchema<frc::Rotation2d>(fn);
+    wpi::util::ForEachStructSchema<wpi::math::Rotation2d>(fn);
   }
 };
 
-static_assert(wpi::StructSerializable<frc::SwerveModuleState>);
-static_assert(wpi::HasNestedStruct<frc::SwerveModuleState>);
+static_assert(wpi::util::StructSerializable<wpi::math::SwerveModuleState>);
+static_assert(wpi::util::HasNestedStruct<wpi::math::SwerveModuleState>);

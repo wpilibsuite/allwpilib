@@ -9,7 +9,7 @@
 
 #include <imgui.h>
 
-namespace glass {
+namespace wpi::glass {
 
 class NameSetting {
  public:
@@ -40,4 +40,4 @@ class NameSetting {
   std::string& m_name;
 };
 
-}  // namespace glass
+}  // namespace wpi::glass

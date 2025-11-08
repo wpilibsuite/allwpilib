@@ -7,14 +7,14 @@
 #import <AVFoundation/AVFoundation.h>
 #include <memory>
 
-namespace cs {
+namespace wpi::cs {
 class UsbCameraImpl;
 }
 
 @interface UsbCameraDelegate
     : NSObject <AVCaptureVideoDataOutputSampleBufferDelegate>
 
-@property(nonatomic) std::weak_ptr<cs::UsbCameraImpl> cppImpl;
+@property(nonatomic) std::weak_ptr<wpi::cs::UsbCameraImpl> cppImpl;
 
 - (void)captureOutput:(AVCaptureOutput*)captureOutput
     didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer

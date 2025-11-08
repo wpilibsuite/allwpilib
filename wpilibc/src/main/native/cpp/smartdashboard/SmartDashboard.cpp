@@ -19,15 +19,15 @@
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 namespace {
 struct Instance {
   detail::ListenerExecutor listenerExecutor;
-  std::shared_ptr<nt::NetworkTable> table =
-      nt::NetworkTableInstance::GetDefault().GetTable("SmartDashboard");
-  wpi::StringMap<wpi::SendableRegistry::UID> tablesToData;
-  wpi::mutex tablesToDataMutex;
+  std::shared_ptr<wpi::nt::NetworkTable> table =
+      wpi::nt::NetworkTableInstance::GetDefault().GetTable("SmartDashboard");
+  wpi::util::StringMap<wpi::util::SendableRegistry::UID> tablesToData;
+  wpi::util::mutex tablesToDataMutex;
 };
 }  // namespace
 
@@ -41,11 +41,11 @@ static Instance& GetInstance() {
 }
 
 #ifndef __FRC_SYSTEMCORE__
-namespace frc::impl {
+namespace wpi::impl {
 void ResetSmartDashboardInstance() {
   std::make_unique<Instance>().swap(GetInstanceHolder());
 }
-}  // namespace frc::impl
+}  // namespace wpi::impl
 #endif
 
 static bool gReported = false;
@@ -74,7 +74,7 @@ bool SmartDashboard::IsPersistent(std::string_view key) {
   return GetEntry(key).IsPersistent();
 }
 
-nt::NetworkTableEntry SmartDashboard::GetEntry(std::string_view key) {
+wpi::nt::NetworkTableEntry SmartDashboard::GetEntry(std::string_view key) {
   if (!gReported) {
     HAL_ReportUsage("SmartDashboard", "");
     gReported = true;
@@ -82,7 +82,7 @@ nt::NetworkTableEntry SmartDashboard::GetEntry(std::string_view key) {
   return GetInstance().table->GetEntry(key);
 }
 
-void SmartDashboard::PutData(std::string_view key, wpi::Sendable* data) {
+void SmartDashboard::PutData(std::string_view key, wpi::util::Sendable* data) {
   if (!data) {
     throw FRC_MakeError(err::NullParameter, "value");
   }
@@ -93,37 +93,37 @@ void SmartDashboard::PutData(std::string_view key, wpi::Sendable* data) {
   auto& inst = GetInstance();
   std::scoped_lock lock(inst.tablesToDataMutex);
   auto& uid = inst.tablesToData[key];
-  wpi::Sendable* sddata = wpi::SendableRegistry::GetSendable(uid);
+  wpi::util::Sendable* sddata = wpi::util::SendableRegistry::GetSendable(uid);
   if (sddata != data) {
-    uid = wpi::SendableRegistry::GetUniqueId(data);
+    uid = wpi::util::SendableRegistry::GetUniqueId(data);
     auto dataTable = inst.table->GetSubTable(key);
     auto builder = std::make_unique<SendableBuilderImpl>();
     auto builderPtr = builder.get();
     builderPtr->SetTable(dataTable);
-    wpi::SendableRegistry::Publish(uid, std::move(builder));
+    wpi::util::SendableRegistry::Publish(uid, std::move(builder));
     builderPtr->StartListeners();
     dataTable->GetEntry(".name").SetString(key);
   }
 }
 
-void SmartDashboard::PutData(wpi::Sendable* value) {
+void SmartDashboard::PutData(wpi::util::Sendable* value) {
   if (!value) {
     throw FRC_MakeError(err::NullParameter, "value");
   }
-  auto name = wpi::SendableRegistry::GetName(value);
+  auto name = wpi::util::SendableRegistry::GetName(value);
   if (!name.empty()) {
     PutData(name, value);
   }
 }
 
-wpi::Sendable* SmartDashboard::GetData(std::string_view key) {
+wpi::util::Sendable* SmartDashboard::GetData(std::string_view key) {
   auto& inst = GetInstance();
   std::scoped_lock lock(inst.tablesToDataMutex);
   auto it = inst.tablesToData.find(key);
   if (it == inst.tablesToData.end()) {
     throw FRC_MakeError(err::SmartDashboardMissingKey, "{}", key);
   }
-  return wpi::SendableRegistry::GetSendable(it->second);
+  return wpi::util::SendableRegistry::GetSendable(it->second);
 }
 
 bool SmartDashboard::PutBoolean(std::string_view keyName, bool value) {
@@ -229,16 +229,16 @@ std::vector<uint8_t> SmartDashboard::GetRaw(
 }
 
 bool SmartDashboard::PutValue(std::string_view keyName,
-                              const nt::Value& value) {
+                              const wpi::nt::Value& value) {
   return GetInstance().table->GetEntry(keyName).SetValue(value);
 }
 
 bool SmartDashboard::SetDefaultValue(std::string_view key,
-                                     const nt::Value& defaultValue) {
+                                     const wpi::nt::Value& defaultValue) {
   return GetEntry(key).SetDefaultValue(defaultValue);
 }
 
-nt::Value SmartDashboard::GetValue(std::string_view keyName) {
+wpi::nt::Value SmartDashboard::GetValue(std::string_view keyName) {
   return GetInstance().table->GetEntry(keyName).GetValue();
 }
 
@@ -251,6 +251,6 @@ void SmartDashboard::UpdateValues() {
   inst.listenerExecutor.RunListenerTasks();
   std::scoped_lock lock(inst.tablesToDataMutex);
   for (auto& i : inst.tablesToData) {
-    wpi::SendableRegistry::Update(i.second);
+    wpi::util::SendableRegistry::Update(i.second);
   }
 }

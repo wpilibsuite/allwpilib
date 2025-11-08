@@ -9,7 +9,7 @@
 
 #include "wpi/glass/Model.hpp"
 
-namespace glass {
+namespace wpi::glass {
 class DataSource;
 class CommandSchedulerModel : public Model {
  public:
@@ -18,4 +18,4 @@ class CommandSchedulerModel : public Model {
   virtual void CancelCommand(size_t index) = 0;
 };
 void DisplayCommandScheduler(CommandSchedulerModel* m);
-}  // namespace glass
+}  // namespace wpi::glass

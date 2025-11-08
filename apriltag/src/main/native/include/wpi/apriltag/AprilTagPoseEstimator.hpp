@@ -11,7 +11,7 @@
 #include "wpi/units/length.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
-namespace frc {
+namespace wpi::apriltag {
 
 class AprilTagDetection;
 
@@ -23,7 +23,7 @@ class WPILIB_DLLEXPORT AprilTagPoseEstimator {
     bool operator==(const Config&) const = default;
 
     /** The tag size. */
-    units::meter_t tagSize;
+    wpi::units::meter_t tagSize;
 
     /** Camera horizontal focal length, in pixels. */
     double fx;
@@ -65,7 +65,7 @@ class WPILIB_DLLEXPORT AprilTagPoseEstimator {
    * @param detection Tag detection
    * @return Pose estimate
    */
-  Transform3d EstimateHomography(const AprilTagDetection& detection) const;
+  wpi::math::Transform3d EstimateHomography(const AprilTagDetection& detection) const;
 
   /**
    * Estimates the pose of the tag using the homography method described in [1].
@@ -73,7 +73,7 @@ class WPILIB_DLLEXPORT AprilTagPoseEstimator {
    * @param homography Homography 3x3 matrix data
    * @return Pose estimate
    */
-  Transform3d EstimateHomography(std::span<const double, 9> homography) const;
+  wpi::math::Transform3d EstimateHomography(std::span<const double, 9> homography) const;
 
   /**
    * Estimates the pose of the tag. This returns one or two possible poses for
@@ -123,7 +123,7 @@ class WPILIB_DLLEXPORT AprilTagPoseEstimator {
    * @param detection Tag detection
    * @return Pose estimate
    */
-  Transform3d Estimate(const AprilTagDetection& detection) const;
+  wpi::math::Transform3d Estimate(const AprilTagDetection& detection) const;
 
   /**
    * Estimates tag pose. This method is an easier to use interface to
@@ -134,11 +134,11 @@ class WPILIB_DLLEXPORT AprilTagPoseEstimator {
    * @param corners Corner point array (X and Y for each corner in order)
    * @return Pose estimate
    */
-  Transform3d Estimate(std::span<const double, 9> homography,
+  wpi::math::Transform3d Estimate(std::span<const double, 9> homography,
                        std::span<const double, 8> corners) const;
 
  private:
   Config m_config;
 };
 
-}  // namespace frc
+}  // namespace wpi::apriltag

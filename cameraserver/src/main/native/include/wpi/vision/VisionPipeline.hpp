@@ -8,7 +8,7 @@ namespace cv {
 class Mat;
 }  // namespace cv
 
-namespace frc {
+namespace wpi::vision {
 
 /**
  * A vision pipeline is responsible for running a group of OpenCV algorithms to
@@ -26,4 +26,4 @@ class VisionPipeline {
    */
   virtual void Process(cv::Mat& mat) = 0;
 };
-}  // namespace frc
+}  // namespace wpi::vision

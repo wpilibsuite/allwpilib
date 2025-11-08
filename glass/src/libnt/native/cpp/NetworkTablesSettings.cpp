@@ -17,7 +17,7 @@
 #include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/StringExtras.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 void NetworkTablesSettings::Thread::Main() {
   while (m_active) {
@@ -42,16 +42,16 @@ void NetworkTablesSettings::Thread::Main() {
       lock.unlock();
 
       // if just changing servers in client mode, no need to stop and restart
-      unsigned int curMode = nt::GetNetworkMode(m_inst);
+      unsigned int curMode = wpi::nt::GetNetworkMode(m_inst);
       if ((mode == 0 || mode == 2) ||
           (mode == 1 && (curMode & NT_NET_MODE_CLIENT) == 0)) {
-        nt::StopClient(m_inst);
-        nt::StopServer(m_inst);
-        nt::StopLocal(m_inst);
+        wpi::nt::StopClient(m_inst);
+        wpi::nt::StopServer(m_inst);
+        wpi::nt::StopLocal(m_inst);
       }
 
       if ((m_mode == 0 || m_mode == 2) || !dsClient) {
-        nt::StopDSClient(m_inst);
+        wpi::nt::StopDSClient(m_inst);
       }
 
       lock.lock();
@@ -61,25 +61,25 @@ void NetworkTablesSettings::Thread::Main() {
       std::string_view serverTeam{m_serverTeam};
       std::optional<unsigned int> team;
       if (m_mode == 1) {
-        nt::StartClient(m_inst, m_clientName);
+        wpi::nt::StartClient(m_inst, m_clientName);
       }
 
-      if (!wpi::contains(serverTeam, '.') &&
-          (team = wpi::parse_integer<unsigned int>(serverTeam, 10))) {
-        nt::SetServerTeam(m_inst, team.value(), m_port);
+      if (!wpi::util::contains(serverTeam, '.') &&
+          (team = wpi::util::parse_integer<unsigned int>(serverTeam, 10))) {
+        wpi::nt::SetServerTeam(m_inst, team.value(), m_port);
       } else {
         std::vector<std::pair<std::string_view, unsigned int>> servers;
-        wpi::split(serverTeam, ',', -1, false, [&](auto serverName) {
+        wpi::util::split(serverTeam, ',', -1, false, [&](auto serverName) {
           servers.emplace_back(serverName, m_port);
         });
-        nt::SetServer(m_inst, servers);
+        wpi::nt::SetServer(m_inst, servers);
       }
 
       if (m_dsClient) {
-        nt::StartDSClient(m_inst, m_port);
+        wpi::nt::StartDSClient(m_inst, m_port);
       }
     } else if (m_mode == 3) {
-      nt::StartServer(m_inst, m_iniName.c_str(), m_listenAddress.c_str(),
+      wpi::nt::StartServer(m_inst, m_iniName.c_str(), m_listenAddress.c_str(),
                       m_port);
     }
   }

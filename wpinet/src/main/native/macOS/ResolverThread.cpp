@@ -13,7 +13,7 @@
 
 #include "wpi/util/mutex.hpp"
 
-using namespace wpi;
+using namespace wpi::net;
 
 ResolverThread::ResolverThread(const private_init&) {}
 
@@ -62,7 +62,7 @@ bool ResolverThread::CleanupRefs() {
         std::find_if(serviceRefs.begin(), serviceRefs.end(),
                      [=](auto& a) { return a.first == r.first; }));
     DNSServiceRefDeallocate(r.first);
-    wpi::SetEvent(r.second);
+    wpi::util::SetEvent(r.second);
   }
   serviceRefsToRemove.clear();
   return serviceRefs.empty();
@@ -102,7 +102,7 @@ void ResolverThread::ThreadMain() {
   }
 }
 
-static wpi::mutex ThreadLoopLock;
+static wpi::util::mutex ThreadLoopLock;
 static std::weak_ptr<ResolverThread> ThreadLoop;
 
 std::shared_ptr<ResolverThread> ResolverThread::Get() {

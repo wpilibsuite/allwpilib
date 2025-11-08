@@ -23,7 +23,7 @@
 #include <set>
 #include <utility>
 
-namespace wpi {
+namespace wpi::util {
 
 /// SmallSetIterator - This class implements a const_iterator for SmallSet by
 /// delegating to the underlying SmallVector or Set iterators.
@@ -291,6 +291,6 @@ bool operator!=(const SmallSet<T, LN, C> &LHS, const SmallSet<T, RN, C> &RHS) {
   return !(LHS == RHS);
 }
 
-} // end namespace wpi
+} // end namespace wpi::util
 
 #endif // WPIUTIL_WPI_SMALLSET_H

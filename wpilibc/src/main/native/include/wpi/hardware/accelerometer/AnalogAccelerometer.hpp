@@ -10,7 +10,7 @@
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Handle operation of an analog accelerometer.
@@ -19,8 +19,8 @@ namespace frc {
  * sensors have multiple axis and can be treated as multiple devices. Each is
  * calibrated by finding the center value over a period of time.
  */
-class AnalogAccelerometer : public wpi::Sendable,
-                            public wpi::SendableHelper<AnalogAccelerometer> {
+class AnalogAccelerometer : public wpi::util::Sendable,
+                            public wpi::util::SendableHelper<AnalogAccelerometer> {
  public:
   /**
    * Create a new instance of an accelerometer.
@@ -89,7 +89,7 @@ class AnalogAccelerometer : public wpi::Sendable,
    */
   void SetZero(double zero);
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
   /**
@@ -102,4 +102,4 @@ class AnalogAccelerometer : public wpi::Sendable,
   double m_zeroGVoltage = 2.5;
 };
 
-}  // namespace frc
+}  // namespace wpi

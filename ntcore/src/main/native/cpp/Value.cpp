@@ -18,7 +18,7 @@
 #include "wpi/util/MemAlloc.hpp"
 #include "wpi/util/timestamp.h"
 
-using namespace nt;
+using namespace wpi::nt;
 
 namespace {
 struct StringArrayStorage {
@@ -176,7 +176,7 @@ Value Value::MakeStringArray(std::vector<std::string>&& value, int64_t time) {
   return val;
 }
 
-void nt::ConvertToC(const Value& in, NT_Value* out) {
+void wpi::nt::ConvertToC(const Value& in, NT_Value* out) {
   *out = in.value();
   switch (in.type()) {
     case NT_STRING:
@@ -184,7 +184,7 @@ void nt::ConvertToC(const Value& in, NT_Value* out) {
       break;
     case NT_RAW: {
       auto v = in.GetRaw();
-      out->data.v_raw.data = static_cast<uint8_t*>(wpi::safe_malloc(v.size()));
+      out->data.v_raw.data = static_cast<uint8_t*>(wpi::util::safe_malloc(v.size()));
       out->data.v_raw.size = v.size();
       std::memcpy(out->data.v_raw.data, v.data(), v.size());
       break;
@@ -192,7 +192,7 @@ void nt::ConvertToC(const Value& in, NT_Value* out) {
     case NT_BOOLEAN_ARRAY: {
       auto v = in.GetBooleanArray();
       out->data.arr_boolean.arr =
-          static_cast<int*>(wpi::safe_malloc(v.size() * sizeof(int)));
+          static_cast<int*>(wpi::util::safe_malloc(v.size() * sizeof(int)));
       out->data.arr_boolean.size = v.size();
       std::copy(v.begin(), v.end(), out->data.arr_boolean.arr);
       break;
@@ -200,7 +200,7 @@ void nt::ConvertToC(const Value& in, NT_Value* out) {
     case NT_INTEGER_ARRAY: {
       auto v = in.GetIntegerArray();
       out->data.arr_int.arr =
-          static_cast<int64_t*>(wpi::safe_malloc(v.size() * sizeof(int64_t)));
+          static_cast<int64_t*>(wpi::util::safe_malloc(v.size() * sizeof(int64_t)));
       out->data.arr_int.size = v.size();
       std::copy(v.begin(), v.end(), out->data.arr_int.arr);
       break;
@@ -208,7 +208,7 @@ void nt::ConvertToC(const Value& in, NT_Value* out) {
     case NT_FLOAT_ARRAY: {
       auto v = in.GetFloatArray();
       out->data.arr_float.arr =
-          static_cast<float*>(wpi::safe_malloc(v.size() * sizeof(float)));
+          static_cast<float*>(wpi::util::safe_malloc(v.size() * sizeof(float)));
       out->data.arr_float.size = v.size();
       std::copy(v.begin(), v.end(), out->data.arr_float.arr);
       break;
@@ -216,7 +216,7 @@ void nt::ConvertToC(const Value& in, NT_Value* out) {
     case NT_DOUBLE_ARRAY: {
       auto v = in.GetDoubleArray();
       out->data.arr_double.arr =
-          static_cast<double*>(wpi::safe_malloc(v.size() * sizeof(double)));
+          static_cast<double*>(wpi::util::safe_malloc(v.size() * sizeof(double)));
       out->data.arr_double.size = v.size();
       std::copy(v.begin(), v.end(), out->data.arr_double.arr);
       break;
@@ -235,7 +235,7 @@ void nt::ConvertToC(const Value& in, NT_Value* out) {
   }
 }
 
-void nt::ConvertToC(std::string_view in, WPI_String* out) {
+void wpi::nt::ConvertToC(std::string_view in, WPI_String* out) {
   if (in.empty()) {
     out->len = 0;
     out->str = nullptr;
@@ -245,7 +245,7 @@ void nt::ConvertToC(std::string_view in, WPI_String* out) {
   std::memcpy(write, in.data(), in.size());
 }
 
-Value nt::ConvertFromC(const NT_Value& value) {
+Value wpi::nt::ConvertFromC(const NT_Value& value) {
   switch (value.type) {
     case NT_BOOLEAN:
       return Value::MakeBoolean(value.data.v_boolean != 0, value.last_change);
@@ -290,7 +290,7 @@ Value nt::ConvertFromC(const NT_Value& value) {
   }
 }
 
-bool nt::operator==(const Value& lhs, const Value& rhs) {
+bool wpi::nt::operator==(const Value& lhs, const Value& rhs) {
   if (lhs.type() != rhs.type()) {
     return false;
   }

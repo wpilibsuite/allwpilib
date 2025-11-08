@@ -11,9 +11,9 @@
 #include "wpi/hal/AddressableLEDTypes.h"
 #include "wpi/hal/Errors.h"
 
-namespace hal {
+namespace wpi::hal {
 
-wpi::mutex smartIoMutex;
+wpi::util::mutex smartIoMutex;
 DigitalHandleResource<HAL_DigitalHandle, SmartIo, kNumSmartIo>* smartIoHandles;
 
 namespace init {
@@ -24,9 +24,9 @@ void InitializeSmartIo() {
 }  // namespace init
 
 int32_t SmartIo::InitializeMode(SmartIoMode mode) {
-  auto inst = hal::GetSystemServer();
+  auto inst = wpi::hal::GetSystemServer();
 
-  nt::PubSubOptions options;
+  wpi::nt::PubSubOptions options;
   options.sendAll = true;
   options.keepDuplicates = true;
   options.periodic = 0.005;
@@ -221,4 +221,4 @@ int32_t SmartIo::SetLedLength(int32_t length) {
   return 0;
 }
 
-}  // namespace hal
+}  // namespace wpi::hal

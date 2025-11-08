@@ -13,7 +13,7 @@ static constexpr int kPositionMode = 2;
 static constexpr int kVelocityMode = 3;
 static constexpr int kFollowerMode = 4;
 
-using namespace frc;
+using namespace wpi;
 
 ExpansionHubMotor::ExpansionHubMotor(int usbId, int channel)
     : m_hub{usbId},
@@ -31,7 +31,7 @@ ExpansionHubMotor::ExpansionHubMotor(int usbId, int channel)
 
   auto systemServer = SystemServer::GetSystemServer();
 
-  nt::PubSubOptions options;
+  wpi::nt::PubSubOptions options;
   options.sendAll = true;
   options.keepDuplicates = true;
   options.periodic = 0.005;
@@ -96,7 +96,7 @@ void ExpansionHubMotor::SetPercentagePower(double power) {
   m_setpointPublisher.Set(power);
 }
 
-void ExpansionHubMotor::SetVoltage(units::volt_t voltage) {
+void ExpansionHubMotor::SetVoltage(wpi::units::volt_t voltage) {
   m_modePublisher.Set(kVoltageMode);
   m_setpointPublisher.Set(voltage.to<double>());
 }
@@ -119,8 +119,8 @@ void ExpansionHubMotor::SetFloatOn0(bool floatOn0) {
   m_floatOn0Publisher.Set(floatOn0);
 }
 
-units::ampere_t ExpansionHubMotor::GetCurrent() const {
-  return units::ampere_t{m_currentSubscriber.Get(0)};
+wpi::units::ampere_t ExpansionHubMotor::GetCurrent() const {
+  return wpi::units::ampere_t{m_currentSubscriber.Get(0)};
 }
 
 void ExpansionHubMotor::SetDistancePerCount(double perCount) {

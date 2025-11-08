@@ -7,7 +7,7 @@
 #include <gtest/gtest.h>
 
 TEST(InterpolatingMapTest, Insert) {
-  wpi::interpolating_map<double, double> table;
+  wpi::util::interpolating_map<double, double> table;
 
   table.insert(125, 450);
   table.insert(200, 510);
@@ -35,7 +35,7 @@ TEST(InterpolatingMapTest, Insert) {
 }
 
 TEST(InterpolatingMapTest, Clear) {
-  wpi::interpolating_map<double, double> table;
+  wpi::util::interpolating_map<double, double> table;
 
   table.insert(125, 450);
   table.insert(200, 510);

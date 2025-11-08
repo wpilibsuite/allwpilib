@@ -10,10 +10,10 @@
 #include "wpimath/protobuf/kinematics.npb.h"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Protobuf<frc::ChassisSpeeds> {
+struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::ChassisSpeeds> {
   using MessageStruct = wpi_proto_ProtobufChassisSpeeds;
-  using InputStream = wpi::ProtoInputStream<frc::ChassisSpeeds>;
-  using OutputStream = wpi::ProtoOutputStream<frc::ChassisSpeeds>;
-  static std::optional<frc::ChassisSpeeds> Unpack(InputStream& stream);
-  static bool Pack(OutputStream& stream, const frc::ChassisSpeeds& value);
+  using InputStream = wpi::util::ProtoInputStream<wpi::math::ChassisSpeeds>;
+  using OutputStream = wpi::util::ProtoOutputStream<wpi::math::ChassisSpeeds>;
+  static std::optional<wpi::math::ChassisSpeeds> Unpack(InputStream& stream);
+  static bool Pack(OutputStream& stream, const wpi::math::ChassisSpeeds& value);
 };

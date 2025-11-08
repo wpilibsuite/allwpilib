@@ -50,8 +50,8 @@ void HALSimWSProviderDIO::DoCancelCallbacks() {
   m_inputCbKey = 0;
 }
 
-void HALSimWSProviderDIO::OnNetValueChanged(const wpi::json& json) {
-  wpi::json::const_iterator it;
+void HALSimWSProviderDIO::OnNetValueChanged(const wpi::util::json& json) {
+  wpi::util::json::const_iterator it;
   if ((it = json.find("<>value")) != json.end()) {
     HALSIM_SetDIOValue(m_channel, static_cast<bool>(it.value()));
   }

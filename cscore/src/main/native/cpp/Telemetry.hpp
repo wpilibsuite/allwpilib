@@ -8,7 +8,7 @@
 #include "wpi/cs/cscore_cpp.hpp"
 #include "wpi/util/SafeThread.hpp"
 
-namespace cs {
+namespace wpi::cs {
 
 class Notifier;
 class SourceImpl;
@@ -38,9 +38,9 @@ class Telemetry {
   Notifier& m_notifier;
 
   class Thread;
-  wpi::SafeThreadOwner<Thread> m_owner;
+  wpi::util::SafeThreadOwner<Thread> m_owner;
 };
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_TELEMETRY_HPP_

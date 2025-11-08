@@ -8,7 +8,7 @@
 #include <memory>
 #include <utility>
 
-using namespace wpi;
+using namespace wpi::util;
 
 // thread start/stop notifications for bindings that need to set up
 // per-thread state
@@ -24,7 +24,7 @@ static std::atomic<int> gSafeThreadRefcount;
 static std::atomic<OnThreadStartFn> gOnSafeThreadStart{DefaultOnThreadStart};
 static std::atomic<OnThreadEndFn> gOnSafeThreadEnd{DefaultOnThreadEnd};
 
-namespace wpi::impl {
+namespace wpi::util::impl {
 void SetSafeThreadNotifiers(OnThreadStartFn OnStart, OnThreadEndFn OnEnd) {
   if (gSafeThreadRefcount != 0) {
     throw std::runtime_error(
@@ -36,7 +36,7 @@ void SetSafeThreadNotifiers(OnThreadStartFn OnStart, OnThreadEndFn OnEnd) {
   gOnSafeThreadStart = OnStart ? OnStart : DefaultOnThreadStart;
   gOnSafeThreadEnd = OnEnd ? OnEnd : DefaultOnThreadEnd;
 }
-}  // namespace wpi::impl
+}  // namespace wpi::util::impl
 
 void SafeThread::Stop() {
   m_active = false;
@@ -54,7 +54,7 @@ detail::SafeThreadProxyBase::SafeThreadProxyBase(
   if (!m_thread) {
     return;
   }
-  m_lock = std::unique_lock<wpi::mutex>(m_thread->m_mutex);
+  m_lock = std::unique_lock<wpi::util::mutex>(m_thread->m_mutex);
   if (!m_thread->m_active) {
     m_lock.unlock();
     m_thread = nullptr;

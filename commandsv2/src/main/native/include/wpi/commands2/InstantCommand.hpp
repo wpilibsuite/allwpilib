@@ -10,7 +10,7 @@
 #include "wpi/commands2/FunctionalCommand.hpp"
 #include "wpi/commands2/Requirements.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 /**
  * A Command that runs instantly; it will initialize, execute once, and end on
  * the same iteration of the scheduler.  Users can either pass in a Runnable and
@@ -40,4 +40,4 @@ class InstantCommand : public CommandHelper<FunctionalCommand, InstantCommand> {
    */
   InstantCommand();
 };
-}  // namespace frc2
+}  // namespace wpi::cmd

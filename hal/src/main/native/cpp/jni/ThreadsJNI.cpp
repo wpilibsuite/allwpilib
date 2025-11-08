@@ -10,7 +10,7 @@
 #include "org_wpilib_hardware_hal_ThreadsJNI.h"
 #include "wpi/hal/Threads.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
 /*

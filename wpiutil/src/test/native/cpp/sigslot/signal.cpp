@@ -40,7 +40,7 @@ SOFTWARE.
 
 #include <gtest/gtest.h>
 
-using namespace wpi::sig;
+using namespace wpi::util::sig;
 
 namespace {
 
@@ -99,7 +99,7 @@ struct o8 {
 
 }  // namespace
 
-namespace wpi {
+namespace wpi::util {
 
 TEST(SignalTest, FreeConnection) {
   sum = 0;
@@ -539,4 +539,4 @@ TEST(SignalTest, Loop) {
   ASSERT_EQ(i2.val(), 1);
 }
 
-}  // namespace wpi
+}  // namespace wpi::util

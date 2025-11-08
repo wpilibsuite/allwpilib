@@ -14,7 +14,7 @@
 #include "Instance.hpp"
 #include "SourceImpl.hpp"
 
-using namespace cs;
+using namespace wpi::cs;
 
 Frame::Frame(SourceImpl& source, std::string_view error, Time time,
              WPI_TimestampSource timeSrc)
@@ -802,8 +802,8 @@ void Frame::ReleaseFrame() {
   m_impl = nullptr;
 }
 
-namespace cs {
-std::unique_ptr<Image> CreateImageFromBGRA(cs::SourceImpl* source, size_t width,
+namespace wpi::cs {
+std::unique_ptr<Image> CreateImageFromBGRA(wpi::cs::SourceImpl* source, size_t width,
                                            size_t height, size_t stride,
                                            const uint8_t* data) {
   cv::Mat finalImage{static_cast<int>(height), static_cast<int>(width), CV_8UC4,
@@ -813,4 +813,4 @@ std::unique_ptr<Image> CreateImageFromBGRA(cs::SourceImpl* source, size_t width,
   cv::cvtColor(finalImage, dest->AsMat(), cv::COLOR_BGRA2BGR);
   return dest;
 }
-}  // namespace cs
+}  // namespace wpi::cs

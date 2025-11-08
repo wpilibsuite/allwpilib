@@ -12,26 +12,26 @@
 #include "wpi/util/fs.hpp"
 #include "wpi/util/print.hpp"
 
-using namespace nt;
+using namespace wpi::nt;
 
 static void DefaultLogger(unsigned int level, const char* file,
                           unsigned int line, const char* msg) {
-  if (level == wpi::WPI_LOG_INFO) {
-    wpi::print(stderr, "NT: {}\n", msg);
+  if (level == wpi::util::WPI_LOG_INFO) {
+    wpi::util::print(stderr, "NT: {}\n", msg);
     return;
   }
 
   std::string_view levelmsg;
-  if (level >= wpi::WPI_LOG_CRITICAL) {
+  if (level >= wpi::util::WPI_LOG_CRITICAL) {
     levelmsg = "CRITICAL";
-  } else if (level >= wpi::WPI_LOG_ERROR) {
+  } else if (level >= wpi::util::WPI_LOG_ERROR) {
     levelmsg = "ERROR";
-  } else if (level >= wpi::WPI_LOG_WARNING) {
+  } else if (level >= wpi::util::WPI_LOG_WARNING) {
     levelmsg = "WARNING";
   } else {
     return;
   }
-  wpi::print(stderr, "NT: {}: {} ({}:{})\n", levelmsg, msg, file, line);
+  wpi::util::print(stderr, "NT: {}: {} ({}:{})\n", levelmsg, msg, file, line);
 }
 
 static constexpr unsigned int kFlagCritical = 1u << 16;
@@ -45,23 +45,23 @@ static constexpr unsigned int kFlagDebug3 = 1u << 23;
 static constexpr unsigned int kFlagDebug4 = 1u << 24;
 
 static unsigned int LevelToFlag(unsigned int level) {
-  if (level >= wpi::WPI_LOG_CRITICAL) {
+  if (level >= wpi::util::WPI_LOG_CRITICAL) {
     return EventFlags::kLogMessage | kFlagCritical;
-  } else if (level >= wpi::WPI_LOG_ERROR) {
+  } else if (level >= wpi::util::WPI_LOG_ERROR) {
     return EventFlags::kLogMessage | kFlagError;
-  } else if (level >= wpi::WPI_LOG_WARNING) {
+  } else if (level >= wpi::util::WPI_LOG_WARNING) {
     return EventFlags::kLogMessage | kFlagWarning;
-  } else if (level >= wpi::WPI_LOG_INFO) {
+  } else if (level >= wpi::util::WPI_LOG_INFO) {
     return EventFlags::kLogMessage | kFlagInfo;
-  } else if (level >= wpi::WPI_LOG_DEBUG) {
+  } else if (level >= wpi::util::WPI_LOG_DEBUG) {
     return EventFlags::kLogMessage | kFlagDebug;
-  } else if (level >= wpi::WPI_LOG_DEBUG1) {
+  } else if (level >= wpi::util::WPI_LOG_DEBUG1) {
     return EventFlags::kLogMessage | kFlagDebug1;
-  } else if (level >= wpi::WPI_LOG_DEBUG2) {
+  } else if (level >= wpi::util::WPI_LOG_DEBUG2) {
     return EventFlags::kLogMessage | kFlagDebug2;
-  } else if (level >= wpi::WPI_LOG_DEBUG3) {
+  } else if (level >= wpi::util::WPI_LOG_DEBUG3) {
     return EventFlags::kLogMessage | kFlagDebug3;
-  } else if (level >= wpi::WPI_LOG_DEBUG4) {
+  } else if (level >= wpi::util::WPI_LOG_DEBUG4) {
     return EventFlags::kLogMessage | kFlagDebug4;
   } else {
     return EventFlags::kLogMessage;
@@ -71,31 +71,31 @@ static unsigned int LevelToFlag(unsigned int level) {
 static unsigned int LevelsToEventMask(unsigned int minLevel,
                                       unsigned int maxLevel) {
   unsigned int mask = 0;
-  if (minLevel <= wpi::WPI_LOG_CRITICAL && maxLevel >= wpi::WPI_LOG_CRITICAL) {
+  if (minLevel <= wpi::util::WPI_LOG_CRITICAL && maxLevel >= wpi::util::WPI_LOG_CRITICAL) {
     mask |= kFlagCritical;
   }
-  if (minLevel <= wpi::WPI_LOG_ERROR && maxLevel >= wpi::WPI_LOG_ERROR) {
+  if (minLevel <= wpi::util::WPI_LOG_ERROR && maxLevel >= wpi::util::WPI_LOG_ERROR) {
     mask |= kFlagError;
   }
-  if (minLevel <= wpi::WPI_LOG_WARNING && maxLevel >= wpi::WPI_LOG_WARNING) {
+  if (minLevel <= wpi::util::WPI_LOG_WARNING && maxLevel >= wpi::util::WPI_LOG_WARNING) {
     mask |= kFlagWarning;
   }
-  if (minLevel <= wpi::WPI_LOG_INFO && maxLevel >= wpi::WPI_LOG_INFO) {
+  if (minLevel <= wpi::util::WPI_LOG_INFO && maxLevel >= wpi::util::WPI_LOG_INFO) {
     mask |= kFlagInfo;
   }
-  if (minLevel <= wpi::WPI_LOG_DEBUG && maxLevel >= wpi::WPI_LOG_DEBUG) {
+  if (minLevel <= wpi::util::WPI_LOG_DEBUG && maxLevel >= wpi::util::WPI_LOG_DEBUG) {
     mask |= kFlagDebug;
   }
-  if (minLevel <= wpi::WPI_LOG_DEBUG1 && maxLevel >= wpi::WPI_LOG_DEBUG1) {
+  if (minLevel <= wpi::util::WPI_LOG_DEBUG1 && maxLevel >= wpi::util::WPI_LOG_DEBUG1) {
     mask |= kFlagDebug1;
   }
-  if (minLevel <= wpi::WPI_LOG_DEBUG2 && maxLevel >= wpi::WPI_LOG_DEBUG2) {
+  if (minLevel <= wpi::util::WPI_LOG_DEBUG2 && maxLevel >= wpi::util::WPI_LOG_DEBUG2) {
     mask |= kFlagDebug2;
   }
-  if (minLevel <= wpi::WPI_LOG_DEBUG3 && maxLevel >= wpi::WPI_LOG_DEBUG3) {
+  if (minLevel <= wpi::util::WPI_LOG_DEBUG3 && maxLevel >= wpi::util::WPI_LOG_DEBUG3) {
     mask |= kFlagDebug3;
   }
-  if (minLevel <= wpi::WPI_LOG_DEBUG4 && maxLevel >= wpi::WPI_LOG_DEBUG4) {
+  if (minLevel <= wpi::util::WPI_LOG_DEBUG4 && maxLevel >= wpi::util::WPI_LOG_DEBUG4) {
     mask |= kFlagDebug4;
   }
   if (mask == 0) {

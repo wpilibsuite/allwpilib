@@ -30,9 +30,9 @@
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::acceleration
+ * @namespace wpi::units::acceleration
  * @brief namespace for unit types and containers representing acceleration
  *        values
  * @details The SI unit for acceleration is `meters_per_second_squared`, and the
@@ -43,7 +43,7 @@ namespace units {
 #if !defined(DISABLE_PREDEFINED_UNITS) || \
     defined(ENABLE_PREDEFINED_ACCELERATION_UNITS)
 UNIT_ADD(acceleration, meters_per_second_squared, meters_per_second_squared,
-         mps_sq, unit<std::ratio<1>, units::category::acceleration_unit>)
+         mps_sq, unit<std::ratio<1>, wpi::units::category::acceleration_unit>)
 UNIT_ADD(acceleration, feet_per_second_squared, feet_per_second_squared, fps_sq,
          compound_unit<length::feet, inverse<squared<time::seconds>>>)
 UNIT_ADD(acceleration, standard_gravity, standard_gravity, SG,
@@ -53,4 +53,4 @@ UNIT_ADD_CATEGORY_TRAIT(acceleration)
 #endif
 
 using namespace acceleration;
-}  // namespace units
+}  // namespace wpi::units

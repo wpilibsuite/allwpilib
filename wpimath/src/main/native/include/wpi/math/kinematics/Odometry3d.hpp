@@ -13,7 +13,7 @@
 #include "wpi/math/kinematics/Kinematics.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * Class for odometry. Robot code should not use this directly- Instead, use the
@@ -126,9 +126,9 @@ class WPILIB_DLLEXPORT Odometry3d {
     Twist3d twist{twist2d.dx,
                   twist2d.dy,
                   0_m,
-                  units::radian_t{angle_difference(0)},
-                  units::radian_t{angle_difference(1)},
-                  units::radian_t{angle_difference(2)}};
+                  wpi::units::radian_t{angle_difference(0)},
+                  wpi::units::radian_t{angle_difference(1)},
+                  wpi::units::radian_t{angle_difference(2)}};
 
     auto newPose = m_pose + twist.Exp();
 
@@ -148,4 +148,4 @@ class WPILIB_DLLEXPORT Odometry3d {
   Rotation3d m_gyroOffset;
 };
 
-}  // namespace frc
+}  // namespace wpi::math

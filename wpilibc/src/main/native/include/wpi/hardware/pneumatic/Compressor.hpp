@@ -14,7 +14,7 @@
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Class for operating a compressor connected to a pneumatics module.
@@ -30,8 +30,8 @@ namespace frc {
  * loop control. You can only turn off closed loop control, thereby stopping
  * the compressor from operating.
  */
-class Compressor : public wpi::Sendable,
-                   public wpi::SendableHelper<Compressor> {
+class Compressor : public wpi::util::Sendable,
+                   public wpi::util::SendableHelper<Compressor> {
  public:
   /**
    * Constructs a compressor for a specified module and type.
@@ -78,7 +78,7 @@ class Compressor : public wpi::Sendable,
    *
    * @return Current drawn by the compressor.
    */
-  units::ampere_t GetCurrent() const;
+  wpi::units::ampere_t GetCurrent() const;
 
   /**
    * If supported by the device, returns the analog input voltage (on channel
@@ -89,7 +89,7 @@ class Compressor : public wpi::Sendable,
    *
    * @return The analog input voltage, in volts.
    */
-  units::volt_t GetAnalogVoltage() const;
+  wpi::units::volt_t GetAnalogVoltage() const;
 
   /**
    * If supported by the device, returns the pressure read by the analog
@@ -100,7 +100,7 @@ class Compressor : public wpi::Sendable,
    *
    * @return The pressure read by the analog pressure sensor.
    */
-  units::pounds_per_square_inch_t GetPressure() const;
+  wpi::units::pounds_per_square_inch_t GetPressure() const;
 
   /**
    * Disable the compressor.
@@ -130,8 +130,8 @@ class Compressor : public wpi::Sendable,
    * @param maxPressure The maximum pressure. The compressor will turn off when
    * the pressure reaches this value.
    */
-  void EnableAnalog(units::pounds_per_square_inch_t minPressure,
-                    units::pounds_per_square_inch_t maxPressure);
+  void EnableAnalog(wpi::units::pounds_per_square_inch_t minPressure,
+                    wpi::units::pounds_per_square_inch_t maxPressure);
 
   /**
    * If supported by the device, enables the compressor in hybrid mode. This
@@ -162,8 +162,8 @@ class Compressor : public wpi::Sendable,
    * off when the pressure reaches this value or the pressure switch is
    * disconnected or indicates that the system is full.
    */
-  void EnableHybrid(units::pounds_per_square_inch_t minPressure,
-                    units::pounds_per_square_inch_t maxPressure);
+  void EnableHybrid(wpi::units::pounds_per_square_inch_t minPressure,
+                    wpi::units::pounds_per_square_inch_t maxPressure);
 
   /**
    * Returns the active compressor configuration.
@@ -172,11 +172,11 @@ class Compressor : public wpi::Sendable,
    */
   CompressorConfigType GetConfigType() const;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
   std::shared_ptr<PneumaticsBase> m_module;
   PneumaticsModuleType m_moduleType;
 };
 
-}  // namespace frc
+}  // namespace wpi

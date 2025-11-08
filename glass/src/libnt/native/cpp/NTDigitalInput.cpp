@@ -10,19 +10,19 @@
 
 #include "wpi/util/StringExtras.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 NTDigitalInputModel::NTDigitalInputModel(std::string_view path)
-    : NTDigitalInputModel{nt::NetworkTableInstance::GetDefault(), path} {}
+    : NTDigitalInputModel{wpi::nt::NetworkTableInstance::GetDefault(), path} {}
 
-NTDigitalInputModel::NTDigitalInputModel(nt::NetworkTableInstance inst,
+NTDigitalInputModel::NTDigitalInputModel(wpi::nt::NetworkTableInstance inst,
                                          std::string_view path)
     : m_inst{inst},
       m_value{
           inst.GetBooleanTopic(fmt::format("{}/Value", path)).Subscribe(false)},
       m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
       m_valueData{fmt::format("NT_DIn:{}", path)},
-      m_nameValue{wpi::rsplit(path, '/').second} {}
+      m_nameValue{wpi::util::rsplit(path, '/').second} {}
 
 void NTDigitalInputModel::Update() {
   for (auto&& v : m_value.ReadQueue()) {

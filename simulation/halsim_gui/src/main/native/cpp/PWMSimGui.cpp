@@ -19,7 +19,7 @@ using namespace halsimgui;
 namespace {
 HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(PWMPulseMicrosecond, "PWM");
 
-class PWMSimModel : public glass::PWMModel {
+class PWMSimModel : public wpi::glass::PWMModel {
  public:
   explicit PWMSimModel(int32_t index) : m_index{index}, m_speed{m_index} {}
 
@@ -27,7 +27,7 @@ class PWMSimModel : public glass::PWMModel {
 
   bool Exists() override { return HALSIM_GetPWMInitialized(m_index); }
 
-  glass::DoubleSource* GetSpeedData() override { return &m_speed; }
+  wpi::glass::DoubleSource* GetSpeedData() override { return &m_speed; }
 
   void SetSpeed(double val) override {
     HALSIM_SetPWMPulseMicrosecond(m_index, val);
@@ -38,7 +38,7 @@ class PWMSimModel : public glass::PWMModel {
   PWMPulseMicrosecondSource m_speed;
 };
 
-class PWMsSimModel : public glass::PWMsModel {
+class PWMsSimModel : public wpi::glass::PWMsModel {
  public:
   PWMsSimModel() : m_sources(HAL_GetNumPWMChannels()) {}
 
@@ -47,7 +47,7 @@ class PWMsSimModel : public glass::PWMsModel {
   bool Exists() override { return true; }
 
   void ForEachPWM(
-      wpi::function_ref<void(glass::PWMModel& model, int index)> func) override;
+      wpi::util::function_ref<void(wpi::glass::PWMModel& model, int index)> func) override;
 
  private:
   // indexed by channel
@@ -70,7 +70,7 @@ void PWMsSimModel::Update() {
 }
 
 void PWMsSimModel::ForEachPWM(
-    wpi::function_ref<void(glass::PWMModel& model, int index)> func) {
+    wpi::util::function_ref<void(wpi::glass::PWMModel& model, int index)> func) {
   const int32_t numPWM = m_sources.size();
   for (int32_t i = 0; i < numPWM; ++i) {
     if (auto model = m_sources[i].get()) {
@@ -93,11 +93,11 @@ void PWMSimGui::Initialize() {
   HALSimGui::halProvider->Register(
       "PWM Outputs", PWMsAnyInitialized,
       [] { return std::make_unique<PWMsSimModel>(); },
-      [](glass::Window* win, glass::Model* model) {
+      [](wpi::glass::Window* win, wpi::glass::Model* model) {
         win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
         win->SetDefaultPos(910, 20);
-        return glass::MakeFunctionView([=] {
-          glass::DisplayPWMs(static_cast<PWMsSimModel*>(model),
+        return wpi::glass::MakeFunctionView([=] {
+          wpi::glass::DisplayPWMs(static_cast<PWMsSimModel*>(model),
                              HALSimGui::halProvider->AreOutputsEnabled());
         });
       });

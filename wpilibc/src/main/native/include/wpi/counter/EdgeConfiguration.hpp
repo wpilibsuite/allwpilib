@@ -4,7 +4,7 @@
 
 #pragma once
 
-namespace frc {
+namespace wpi {
 /**
  * Edge configuration.
  */
@@ -14,4 +14,4 @@ enum class EdgeConfiguration {
   /// Falling edge configuration.
   kFallingEdge = 1,
 };
-}  // namespace frc
+}  // namespace wpi

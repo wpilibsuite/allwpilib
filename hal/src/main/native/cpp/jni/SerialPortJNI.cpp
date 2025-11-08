@@ -11,8 +11,8 @@
 #include "wpi/hal/SerialPort.h"
 #include "wpi/util/jni_util.hpp"
 
-using namespace hal;
-using namespace wpi::java;
+using namespace wpi::hal;
+using namespace wpi::util::java;
 
 extern "C" {
 
@@ -239,7 +239,7 @@ JNIEXPORT jint JNICALL
 Java_org_wpilib_hardware_hal_SerialPortJNI_serialRead
   (JNIEnv* env, jclass, jint handle, jbyteArray dataReceived, jint size)
 {
-  wpi::SmallVector<char, 128> recvBuf;
+  wpi::util::SmallVector<char, 128> recvBuf;
   recvBuf.resize(size);
   int32_t status = 0;
   jint retVal = HAL_ReadSerial(static_cast<HAL_SerialPortHandle>(handle),

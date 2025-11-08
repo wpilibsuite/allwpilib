@@ -7,23 +7,23 @@
 #include <memory>
 #include <utility>
 
-using namespace frc2;
+using namespace wpi::cmd;
 
-NetworkButton::NetworkButton(nt::BooleanTopic topic)
+NetworkButton::NetworkButton(wpi::nt::BooleanTopic topic)
     : NetworkButton(topic.Subscribe(false)) {}
 
-NetworkButton::NetworkButton(nt::BooleanSubscriber sub)
-    : Trigger([sub = std::make_shared<nt::BooleanSubscriber>(std::move(sub))] {
+NetworkButton::NetworkButton(wpi::nt::BooleanSubscriber sub)
+    : Trigger([sub = std::make_shared<wpi::nt::BooleanSubscriber>(std::move(sub))] {
         return sub->GetTopic().GetInstance().IsConnected() && sub->Get();
       }) {}
 
-NetworkButton::NetworkButton(std::shared_ptr<nt::NetworkTable> table,
+NetworkButton::NetworkButton(std::shared_ptr<wpi::nt::NetworkTable> table,
                              std::string_view field)
     : NetworkButton(table->GetBooleanTopic(field)) {}
 
 NetworkButton::NetworkButton(std::string_view table, std::string_view field)
-    : NetworkButton(nt::NetworkTableInstance::GetDefault(), table, field) {}
+    : NetworkButton(wpi::nt::NetworkTableInstance::GetDefault(), table, field) {}
 
-NetworkButton::NetworkButton(nt::NetworkTableInstance inst,
+NetworkButton::NetworkButton(wpi::nt::NetworkTableInstance inst,
                              std::string_view table, std::string_view field)
     : NetworkButton(inst.GetTable(table), field) {}

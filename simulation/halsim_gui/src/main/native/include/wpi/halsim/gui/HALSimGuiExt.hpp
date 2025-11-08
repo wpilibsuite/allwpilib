@@ -8,7 +8,7 @@
 
 struct ImGuiContext;
 
-namespace glass {
+namespace wpi::glass {
 class Context;
 }  // namespace glass
 
@@ -40,6 +40,6 @@ using GetImguiContextFn = ImGuiContext* (*)();
 using GetGuiContextFn = wpi::gui::Context* (*)();
 
 #define HALSIMGUI_EXT_GETGLASSCONTEXT "halsimgui::GetGlassContext"
-using GetGlassContextFn = glass::Context* (*)();
+using GetGlassContextFn = wpi::glass::Context* (*)();
 
 }  // namespace halsimgui

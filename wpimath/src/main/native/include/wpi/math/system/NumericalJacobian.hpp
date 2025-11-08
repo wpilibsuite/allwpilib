@@ -6,7 +6,7 @@
 
 #include "wpi/math/linalg/EigenCore.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * Returns numerical Jacobian with respect to x for f(x).
@@ -138,4 +138,4 @@ auto NumericalJacobianU(F&& f, const Eigen::VectorXd& x,
       [&](const Eigen::VectorXd& u) { return f(x, u, args...); }, u);
 }
 
-}  // namespace frc
+}  // namespace wpi::math

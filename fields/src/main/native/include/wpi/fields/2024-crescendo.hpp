@@ -6,7 +6,7 @@
 
 #include <string_view>
 
-namespace fields {
+namespace wpi::fields {
 std::string_view GetResource_2024_crescendo_json();
 std::string_view GetResource_2024_field_png();
-}  // namespace fields
+}  // namespace wpi::fields

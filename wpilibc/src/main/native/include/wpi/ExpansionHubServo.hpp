@@ -12,7 +12,7 @@
 #include "wpi/units/angle.hpp"
 #include "wpi/units/time.hpp"
 
-namespace frc {
+namespace wpi {
 
 /** This class controls a specific servo hooked up to an ExpansionHub. */
 class ExpansionHubServo {
@@ -45,14 +45,14 @@ class ExpansionHubServo {
    * @param angle Position in angle units. Will be scaled between 0 and 180
    * degrees
    */
-  void SetAngle(units::degree_t angle);
+  void SetAngle(wpi::units::degree_t angle);
 
   /**
    * Sets the raw pulse width output on the servo.
    *
    * @param pulseWidth Pulse width
    */
-  void SetPulseWidth(units::microsecond_t pulseWidth);
+  void SetPulseWidth(wpi::units::microsecond_t pulseWidth);
 
   /**
    * Sets if the servo output is enabled or not. Defaults to false.
@@ -66,7 +66,7 @@ class ExpansionHubServo {
    *
    * @param framePeriod The frame period
    */
-  void SetFramePeriod(units::microsecond_t framePeriod);
+  void SetFramePeriod(wpi::units::microsecond_t framePeriod);
 
   /**
    * Gets if the underlying ExpansionHub is connected.
@@ -84,7 +84,7 @@ class ExpansionHubServo {
    * @param minAngle Minimum angle
    * @param maxAngle Maximum angle
    */
-  void SetAngleRange(units::degree_t minAngle, units::degree_t maxAngle);
+  void SetAngleRange(wpi::units::degree_t minAngle, wpi::units::degree_t maxAngle);
 
   /**
    * Sets the PWM range for the servo.
@@ -95,7 +95,7 @@ class ExpansionHubServo {
    * @param minPwm Minimum PWM
    * @param maxPwm Maximum PWM
    */
-  void SetPWMRange(units::microsecond_t minPwm, units::microsecond_t maxPwm);
+  void SetPWMRange(wpi::units::microsecond_t minPwm, wpi::units::microsecond_t maxPwm);
 
   /**
    * Sets whether the servo is reversed.
@@ -117,23 +117,23 @@ class ExpansionHubServo {
   void SetContinousRotationMode(bool enable);
 
  private:
-  units::microsecond_t GetFullRangeScaleFactor();
-  units::degree_t GetServoAngleRange();
+  wpi::units::microsecond_t GetFullRangeScaleFactor();
+  wpi::units::degree_t GetServoAngleRange();
 
   ExpansionHub m_hub;
   int m_channel;
 
-  units::degree_t m_maxServoAngle = 180.0_deg;
-  units::degree_t m_minServoAngle = 0.0_deg;
+  wpi::units::degree_t m_maxServoAngle = 180.0_deg;
+  wpi::units::degree_t m_minServoAngle = 0.0_deg;
 
-  units::microsecond_t m_minPwm = 600_us;
-  units::microsecond_t m_maxPwm = 2400_us;
+  wpi::units::microsecond_t m_minPwm = 600_us;
+  wpi::units::microsecond_t m_maxPwm = 2400_us;
 
   bool m_reversed = false;
   bool m_continousMode = false;
 
-  nt::IntegerPublisher m_pulseWidthPublisher;
-  nt::IntegerPublisher m_framePeriodPublisher;
-  nt::BooleanPublisher m_enabledPublisher;
+  wpi::nt::IntegerPublisher m_pulseWidthPublisher;
+  wpi::nt::IntegerPublisher m_framePeriodPublisher;
+  wpi::nt::BooleanPublisher m_enabledPublisher;
 };
-}  // namespace frc
+}  // namespace wpi

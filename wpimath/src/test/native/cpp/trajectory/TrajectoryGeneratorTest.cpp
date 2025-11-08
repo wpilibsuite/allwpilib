@@ -13,22 +13,22 @@
 #include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
 #include "wpi/units/math.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 TEST(TrajectoryGenerationTest, ObeysConstraints) {
   TrajectoryConfig config{12_fps, 12_fps_sq};
   auto trajectory = TestTrajectory::GetTrajectory(config);
 
-  units::second_t time = 0_s;
-  units::second_t dt = 20_ms;
-  units::second_t duration = trajectory.TotalTime();
+  wpi::units::second_t time = 0_s;
+  wpi::units::second_t dt = 20_ms;
+  wpi::units::second_t duration = trajectory.TotalTime();
 
   while (time < duration) {
     const Trajectory::State point = trajectory.Sample(time);
     time += dt;
 
-    EXPECT_TRUE(units::math::abs(point.velocity) <= 12_fps + 0.01_fps);
-    EXPECT_TRUE(units::math::abs(point.acceleration) <=
+    EXPECT_TRUE(wpi::units::math::abs(point.velocity) <= 12_fps + 0.01_fps);
+    EXPECT_TRUE(wpi::units::math::abs(point.acceleration) <=
                 12_fps_sq + 0.01_fps_sq);
   }
 }

@@ -11,19 +11,19 @@
 #include "wpi/util/protobuf/Protobuf.hpp"
 
 template <>
-struct wpi::Protobuf<mrc::ControlData> {
+struct wpi::util::Protobuf<mrc::ControlData> {
   using MessageStruct = mrc_proto_ProtobufControlData;
-  using InputStream = wpi::ProtoInputStream<mrc::ControlData>;
-  using OutputStream = wpi::ProtoOutputStream<mrc::ControlData>;
+  using InputStream = wpi::util::ProtoInputStream<mrc::ControlData>;
+  using OutputStream = wpi::util::ProtoOutputStream<mrc::ControlData>;
   static std::optional<mrc::ControlData> Unpack(InputStream& Stream);
   static bool Pack(OutputStream& Stream, const mrc::ControlData& Value);
 };
 
 template <>
-struct wpi::Protobuf<mrc::Joystick> {
+struct wpi::util::Protobuf<mrc::Joystick> {
   using MessageStruct = mrc_proto_ProtobufJoystickData;
-  using InputStream = wpi::ProtoInputStream<mrc::Joystick>;
-  using OutputStream = wpi::ProtoOutputStream<mrc::Joystick>;
+  using InputStream = wpi::util::ProtoInputStream<mrc::Joystick>;
+  using OutputStream = wpi::util::ProtoOutputStream<mrc::Joystick>;
   static std::optional<mrc::Joystick> Unpack(InputStream& Stream);
   static bool Pack(OutputStream& Stream, const mrc::Joystick& Value);
 };

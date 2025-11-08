@@ -22,7 +22,7 @@
 #include "wpi/util/Synchronization.h"
 #include "wpi/util/mutex.hpp"
 
-namespace nt {
+namespace wpi::nt {
 
 class ListenerStorage final : public IListenerStorage {
  public:
@@ -72,14 +72,14 @@ class ListenerStorage final : public IListenerStorage {
       std::span<const NT_Listener> handles);
 
   int m_inst;
-  mutable wpi::mutex m_mutex;
+  mutable wpi::util::mutex m_mutex;
 
   struct PollerData {
     static constexpr auto kType = Handle::kListenerPoller;
 
     explicit PollerData(NT_ListenerPoller handle) : handle{handle} {}
 
-    wpi::SignalObject<NT_ListenerPoller> handle;
+    wpi::util::SignalObject<NT_ListenerPoller> handle;
     std::vector<Event> queue;
   };
   HandleMap<PollerData, 8> m_pollers;
@@ -90,9 +90,9 @@ class ListenerStorage final : public IListenerStorage {
     ListenerData(NT_Listener handle, PollerData* poller)
         : handle{handle}, poller{poller} {}
 
-    wpi::SignalObject<NT_Listener> handle;
+    wpi::util::SignalObject<NT_Listener> handle;
     PollerData* poller;
-    wpi::SmallVector<std::pair<FinishEventFunc, unsigned int>, 2> sources;
+    wpi::util::SmallVector<std::pair<FinishEventFunc, unsigned int>, 2> sources;
     unsigned int eventMask{0};
   };
   HandleMap<ListenerData, 8> m_listeners;
@@ -103,18 +103,18 @@ class ListenerStorage final : public IListenerStorage {
   VectorSet<ListenerData*> m_logListeners;
   VectorSet<ListenerData*> m_timeSyncListeners;
 
-  class Thread final : public wpi::SafeThreadEvent {
+  class Thread final : public wpi::util::SafeThreadEvent {
    public:
     explicit Thread(NT_ListenerPoller poller) : m_poller{poller} {}
 
     void Main() final;
 
     NT_ListenerPoller m_poller;
-    wpi::DenseMap<NT_Listener, ListenerCallback> m_callbacks;
-    wpi::Event m_waitQueueWakeup;
-    wpi::Event m_waitQueueWaiter;
+    wpi::util::DenseMap<NT_Listener, ListenerCallback> m_callbacks;
+    wpi::util::Event m_waitQueueWakeup;
+    wpi::util::Event m_waitQueueWaiter;
   };
-  wpi::SafeThreadOwner<Thread> m_thread;
+  wpi::util::SafeThreadOwner<Thread> m_thread;
 };
 
-}  // namespace nt
+}  // namespace wpi::nt

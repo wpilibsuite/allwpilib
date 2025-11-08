@@ -42,7 +42,7 @@ SOFTWARE.
 
 #include "wpi/util/mutex.hpp"
 
-namespace wpi {
+namespace wpi::util {
 
 namespace sig {
 
@@ -482,8 +482,8 @@ struct NullMutex {
  * of an emitting object and slots that are connected to the signal and called
  * with supplied arguments when a signal is emitted.
  *
- * wpi::SignalBase is the general implementation, whose locking policy must be
- * set in order to decide thread safety guarantees. wpi::Signal and wpi::Signal_st
+ * wpi::util::SignalBase is the general implementation, whose locking policy must be
+ * set in order to decide thread safety guarantees. wpi::util::Signal and wpi::util::Signal_st
  * are partial specializations for multi-threaded and single-threaded use.
  *
  * It does not allow slots to return a value.
@@ -560,7 +560,7 @@ public:
      *
      * Effect: All non blocked and connected slot functions will be called
      *         with supplied arguments.
-     * Safety: With proper locking (see wpi::Signal), emission can happen from
+     * Safety: With proper locking (see wpi::util::Signal), emission can happen from
      *         multiple threads simultaneously. The guarantees only apply to the
      *         signal object, it does not cover thread safety of potentially
      *         shared state used in slot functions.
@@ -829,4 +829,4 @@ template <typename... T>
 using Signal_r = SignalBase<recursive_mutex, T...>;
 
 }  // namespace sig
-}  // namespace wpi
+}  // namespace wpi::util

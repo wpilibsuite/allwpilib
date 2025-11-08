@@ -33,7 +33,7 @@ class HALSimWSHalProvider : public HALSimWSBaseProvider {
       std::shared_ptr<HALSimBaseWebSocketConnection> ws) override;
   void OnNetworkDisconnected() override;
 
-  void ProcessHalCallback(const wpi::json& payload);
+  void ProcessHalCallback(const wpi::util::json& payload);
 
  protected:
   virtual void RegisterCallbacks() = 0;

@@ -9,7 +9,7 @@
 #include "wpi/nt/NTSendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * ADXL345 Accelerometer on I2C.
@@ -18,8 +18,8 @@ namespace frc {
  * an I2C bus. This class assumes the default (not alternate) sensor address of
  * 0x1D (7-bit address).
  */
-class ADXL345_I2C : public nt::NTSendable,
-                    public wpi::SendableHelper<ADXL345_I2C> {
+class ADXL345_I2C : public wpi::nt::NTSendable,
+                    public wpi::util::SendableHelper<ADXL345_I2C> {
  public:
   /**
    * Accelerometer range.
@@ -124,16 +124,16 @@ class ADXL345_I2C : public nt::NTSendable,
    */
   virtual AllAxes GetAccelerations();
 
-  void InitSendable(nt::NTSendableBuilder& builder) override;
+  void InitSendable(wpi::nt::NTSendableBuilder& builder) override;
 
  private:
   I2C m_i2c;
 
-  hal::SimDevice m_simDevice;
-  hal::SimEnum m_simRange;
-  hal::SimDouble m_simX;
-  hal::SimDouble m_simY;
-  hal::SimDouble m_simZ;
+  wpi::hal::SimDevice m_simDevice;
+  wpi::hal::SimEnum m_simRange;
+  wpi::hal::SimDouble m_simX;
+  wpi::hal::SimDouble m_simY;
+  wpi::hal::SimDouble m_simZ;
 
   static constexpr int kPowerCtlRegister = 0x2D;
   static constexpr int kDataFormatRegister = 0x31;
@@ -156,4 +156,4 @@ class ADXL345_I2C : public nt::NTSendable,
   };
 };
 
-}  // namespace frc
+}  // namespace wpi

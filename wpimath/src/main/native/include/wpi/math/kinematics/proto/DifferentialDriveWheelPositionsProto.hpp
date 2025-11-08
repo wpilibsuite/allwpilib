@@ -10,14 +10,14 @@
 #include "wpimath/protobuf/kinematics.npb.h"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Protobuf<frc::DifferentialDriveWheelPositions> {
+struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::DifferentialDriveWheelPositions> {
   using MessageStruct = wpi_proto_ProtobufDifferentialDriveWheelPositions;
   using InputStream =
-      wpi::ProtoInputStream<frc::DifferentialDriveWheelPositions>;
+      wpi::util::ProtoInputStream<wpi::math::DifferentialDriveWheelPositions>;
   using OutputStream =
-      wpi::ProtoOutputStream<frc::DifferentialDriveWheelPositions>;
-  static std::optional<frc::DifferentialDriveWheelPositions> Unpack(
+      wpi::util::ProtoOutputStream<wpi::math::DifferentialDriveWheelPositions>;
+  static std::optional<wpi::math::DifferentialDriveWheelPositions> Unpack(
       InputStream& stream);
   static bool Pack(OutputStream& stream,
-                   const frc::DifferentialDriveWheelPositions& value);
+                   const wpi::math::DifferentialDriveWheelPositions& value);
 };

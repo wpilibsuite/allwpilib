@@ -9,18 +9,18 @@
 #include "wpi/nt/NTSendableBuilder.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 ADXL345_I2C::ADXL345_I2C(I2C::Port port, Range range, int deviceAddress)
     : m_i2c(port, deviceAddress),
       m_simDevice("Accel:ADXL345_I2C", port, deviceAddress) {
   if (m_simDevice) {
-    m_simRange = m_simDevice.CreateEnumDouble("range", hal::SimDevice::kOutput,
+    m_simRange = m_simDevice.CreateEnumDouble("range", wpi::hal::SimDevice::kOutput,
                                               {"2G", "4G", "8G", "16G"},
                                               {2.0, 4.0, 8.0, 16.0}, 0);
-    m_simX = m_simDevice.CreateDouble("x", hal::SimDevice::kInput, 0.0);
-    m_simY = m_simDevice.CreateDouble("y", hal::SimDevice::kInput, 0.0);
-    m_simZ = m_simDevice.CreateDouble("z", hal::SimDevice::kInput, 0.0);
+    m_simX = m_simDevice.CreateDouble("x", wpi::hal::SimDevice::kInput, 0.0);
+    m_simY = m_simDevice.CreateDouble("y", wpi::hal::SimDevice::kInput, 0.0);
+    m_simZ = m_simDevice.CreateDouble("z", wpi::hal::SimDevice::kInput, 0.0);
   }
   // Turn on the measurements
   m_i2c.Write(kPowerCtlRegister, kPowerCtl_Measure);
@@ -31,7 +31,7 @@ ADXL345_I2C::ADXL345_I2C(I2C::Port port, Range range, int deviceAddress)
       fmt::format("I2C[{}][{}]", static_cast<int>(port), deviceAddress),
       "ADXL345");
 
-  wpi::SendableRegistry::Add(this, "ADXL345_I2C", port);
+  wpi::util::SendableRegistry::Add(this, "ADXL345_I2C", port);
 }
 
 I2C::Port ADXL345_I2C::GetI2CPort() const {
@@ -93,12 +93,12 @@ ADXL345_I2C::AllAxes ADXL345_I2C::GetAccelerations() {
   return data;
 }
 
-void ADXL345_I2C::InitSendable(nt::NTSendableBuilder& builder) {
+void ADXL345_I2C::InitSendable(wpi::nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("3AxisAccelerometer");
   builder.SetUpdateTable(
-      [this, x = nt::DoubleTopic{builder.GetTopic("X")}.Publish(),
-       y = nt::DoubleTopic{builder.GetTopic("Y")}.Publish(),
-       z = nt::DoubleTopic{builder.GetTopic("Z")}.Publish()]() mutable {
+      [this, x = wpi::nt::DoubleTopic{builder.GetTopic("X")}.Publish(),
+       y = wpi::nt::DoubleTopic{builder.GetTopic("Y")}.Publish(),
+       z = wpi::nt::DoubleTopic{builder.GetTopic("Z")}.Publish()]() mutable {
         auto data = GetAccelerations();
         x.Set(data.XAxis);
         y.Set(data.YAxis);

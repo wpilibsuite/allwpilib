@@ -8,9 +8,9 @@
 
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 
-WaitCommand::WaitCommand(units::second_t duration) : m_duration{duration} {
+WaitCommand::WaitCommand(wpi::units::second_t duration) : m_duration{duration} {
   SetName(fmt::format("{}: {}", GetName(), duration));
 }
 
@@ -30,7 +30,7 @@ bool WaitCommand::RunsWhenDisabled() const {
   return true;
 }
 
-void WaitCommand::InitSendable(wpi::SendableBuilder& builder) {
+void WaitCommand::InitSendable(wpi::util::SendableBuilder& builder) {
   Command::InitSendable(builder);
   builder.AddDoubleProperty(
       "duration", [this] { return m_duration.value(); }, nullptr);

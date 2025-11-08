@@ -14,7 +14,7 @@
 #include "wpi/hal/handles/HandlesInternal.h"
 #include "wpi/util/mutex.hpp"
 
-namespace hal {
+namespace wpi::hal {
 
 /**
  * The IndexedHandleResource class is a way to track handles. This version
@@ -49,7 +49,7 @@ class IndexedHandleResource : public HandleBase {
 
  private:
   std::array<std::shared_ptr<TStruct>, size> m_structures;
-  std::array<wpi::mutex, size> m_handleMutexes;
+  std::array<wpi::util::mutex, size> m_handleMutexes;
 };
 
 template <typename THandle, typename TStruct, int16_t size,
@@ -72,7 +72,7 @@ IndexedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
   }
   m_structures[index] = std::make_shared<TStruct>();
   *handle =
-      static_cast<THandle>(hal::createHandle(index, enumValue, m_version));
+      static_cast<THandle>(wpi::hal::createHandle(index, enumValue, m_version));
   *status = HAL_SUCCESS;
   return m_structures[index];
 }
@@ -115,4 +115,4 @@ void IndexedHandleResource<THandle, TStruct, size, enumValue>::ResetHandles() {
   }
   HandleBase::ResetHandles();
 }
-}  // namespace hal
+}  // namespace wpi::hal

@@ -49,13 +49,13 @@
 // Must be included after windows.h
 #include <wincrypt.h>
 
-namespace wpi {
+namespace wpi::util {
 
 /// Returns the Windows version as Major.Minor.0.BuildNumber. Uses
 /// RtlGetVersion or GetVersionEx under the hood depending on what is available.
 /// GetVersionEx is deprecated, but this API exposes the build number which can
 /// be useful for working around certain kernel bugs.
-inline wpi::VersionTuple GetWindowsOSVersion() {
+inline wpi::util::VersionTuple GetWindowsOSVersion() {
   typedef NTSTATUS(WINAPI* RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
   HMODULE hMod = ::GetModuleHandleW(L"ntdll.dll");
   if (hMod) {
@@ -64,12 +64,12 @@ inline wpi::VersionTuple GetWindowsOSVersion() {
       RTL_OSVERSIONINFOEXW info{};
       info.dwOSVersionInfoSize = sizeof(info);
       if (getVer((PRTL_OSVERSIONINFOW)&info) == ((NTSTATUS)0x00000000L)) {
-        return wpi::VersionTuple(info.dwMajorVersion, info.dwMinorVersion, 0,
+        return wpi::util::VersionTuple(info.dwMajorVersion, info.dwMinorVersion, 0,
                                   info.dwBuildNumber);
       }
     }
   }
-  return wpi::VersionTuple(0, 0, 0, 0);
+  return wpi::util::VersionTuple(0, 0, 0, 0);
 }
 
 /// Determines if the program is running on Windows 8 or newer. This
@@ -78,7 +78,7 @@ inline wpi::VersionTuple GetWindowsOSVersion() {
 /// yet have VersionHelpers.h, so we have our own helper.
 inline bool RunningWindows8OrGreater() {
   // Windows 8 is version 6.2, service pack 0.
-  return GetWindowsOSVersion() >= wpi::VersionTuple(6, 2, 0, 0);
+  return GetWindowsOSVersion() >= wpi::util::VersionTuple(6, 2, 0, 0);
 }
 
 /// Determines if the program is running on Windows 11 or Windows Server 2022.
@@ -88,7 +88,7 @@ bool RunningWindows11OrGreater();
 /// RtlGetVersion or GetVersionEx under the hood depending on what is available.
 /// GetVersionEx is deprecated, but this API exposes the build number which can
 /// be useful for working around certain kernel bugs.
-wpi::VersionTuple GetWindowsOSVersion();
+wpi::util::VersionTuple GetWindowsOSVersion();
 
 bool MakeErrMsg(std::string *ErrMsg, const std::string &prefix);
 
@@ -96,7 +96,7 @@ bool MakeErrMsg(std::string *ErrMsg, const std::string &prefix);
 [[noreturn]] inline void ReportLastErrorFatal(const char *Msg) {
   std::string ErrMsg;
   MakeErrMsg(&ErrMsg, Msg);
-  wpi::report_fatal_error(ErrMsg);
+  wpi::util::report_fatal_error(ErrMsg);
 }
 
 template <typename HandleTraits>
@@ -256,6 +256,6 @@ inline FILETIME toFILETIME(TimePoint<> TP) {
 }
 
 } // end namespace sys
-} // end namespace wpi.
+} // end namespace wpi::util.
 
 #endif

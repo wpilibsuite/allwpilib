@@ -8,7 +8,7 @@
 
 #include "wpi/util/sendable/SendableRegistry.hpp"
 
-namespace wpi {
+namespace wpi::util {
 
 /**
  * A helper class for use with objects that add themselves to SendableRegistry.
@@ -59,4 +59,4 @@ class SendableHelper {
   }
 };
 
-}  // namespace wpi
+}  // namespace wpi::util

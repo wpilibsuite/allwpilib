@@ -11,7 +11,7 @@
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/encoders-software.html
  */
 WPI_IGNORE_DEPRECATED
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   Robot() {
     // Configures the encoder to return a distance of 4 for every 256 pulses
@@ -52,15 +52,15 @@ class Robot : public frc::TimedRobot {
  private:
   // Initializes an encoder on DIO pins 0 and 1
   // Defaults to 4X decoding and non-inverted
-  frc::Encoder m_encoder{0, 1};
+  wpi::Encoder m_encoder{0, 1};
 
   // Initializes an encoder on DIO pins 0 and 1
   // 2X encoding and non-inverted
-  frc::Encoder m_encoder2x{0, 1, false, frc::Encoder::EncodingType::k2X};
+  wpi::Encoder m_encoder2x{0, 1, false, wpi::Encoder::EncodingType::k2X};
 };
 
 #ifndef RUNNING_FRC_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

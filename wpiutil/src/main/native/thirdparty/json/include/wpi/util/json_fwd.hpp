@@ -68,7 +68,7 @@ struct ordered_map;
 
 /// @brief specialization that maintains the insertion order of object keys
 /// @sa https://json.nlohmann.me/api/ordered_json/
-using ordered_json = basic_json<wpi::ordered_map>;
+using ordered_json = basic_json<wpi::util::ordered_map>;
 
 WPI_JSON_NAMESPACE_END
 

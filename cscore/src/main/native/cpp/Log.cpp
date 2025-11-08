@@ -4,7 +4,7 @@
 
 #include "Log.hpp"
 
-void cs::NamedLogV(wpi::Logger& logger, unsigned int level, const char* file,
+void wpi::cs::NamedLogV(wpi::util::Logger& logger, unsigned int level, const char* file,
                    unsigned int line, std::string_view name,
                    fmt::string_view format, fmt::format_args args) {
   fmt::memory_buffer out;

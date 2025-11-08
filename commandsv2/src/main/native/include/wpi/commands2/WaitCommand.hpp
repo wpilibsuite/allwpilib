@@ -9,7 +9,7 @@
 #include "wpi/system/Timer.hpp"
 #include "wpi/units/time.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 /**
  * A command that does nothing but takes a specified amount of time to finish.
  *
@@ -23,7 +23,7 @@ class WaitCommand : public CommandHelper<Command, WaitCommand> {
    *
    * @param duration the time to wait
    */
-  explicit WaitCommand(units::second_t duration);
+  explicit WaitCommand(wpi::units::second_t duration);
 
   WaitCommand(WaitCommand&& other) = default;
 
@@ -37,13 +37,13 @@ class WaitCommand : public CommandHelper<Command, WaitCommand> {
 
   bool RunsWhenDisabled() const override;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  protected:
   /// The timer used for waiting.
-  frc::Timer m_timer;
+  wpi::Timer m_timer;
 
  private:
-  units::second_t m_duration;
+  wpi::units::second_t m_duration;
 };
-}  // namespace frc2
+}  // namespace wpi::cmd

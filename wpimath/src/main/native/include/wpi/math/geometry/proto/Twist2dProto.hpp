@@ -10,10 +10,10 @@
 #include "wpimath/protobuf/geometry2d.npb.h"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Protobuf<frc::Twist2d> {
+struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::Twist2d> {
   using MessageStruct = wpi_proto_ProtobufTwist2d;
-  using InputStream = wpi::ProtoInputStream<frc::Twist2d>;
-  using OutputStream = wpi::ProtoOutputStream<frc::Twist2d>;
-  static std::optional<frc::Twist2d> Unpack(InputStream& stream);
-  static bool Pack(OutputStream& stream, const frc::Twist2d& value);
+  using InputStream = wpi::util::ProtoInputStream<wpi::math::Twist2d>;
+  using OutputStream = wpi::util::ProtoOutputStream<wpi::math::Twist2d>;
+  static std::optional<wpi::math::Twist2d> Unpack(InputStream& stream);
+  static bool Pack(OutputStream& stream, const wpi::math::Twist2d& value);
 };

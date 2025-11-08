@@ -15,11 +15,11 @@
 
 #include "SourceImpl.hpp"
 
-namespace cs {
+namespace wpi::cs {
 
 class ConfigurableSourceImpl : public SourceImpl {
  protected:
-  ConfigurableSourceImpl(std::string_view name, wpi::Logger& logger,
+  ConfigurableSourceImpl(std::string_view name, wpi::util::Logger& logger,
                          Notifier& notifier, Telemetry& telemetry,
                          const VideoMode& mode);
 
@@ -48,6 +48,6 @@ class ConfigurableSourceImpl : public SourceImpl {
   std::atomic_bool m_connected{true};
 };
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 #endif  // CSCORE_CONFIGURABLESOURCEIMPL_HPP_

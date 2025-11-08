@@ -33,7 +33,7 @@ class HALSimWSBaseProvider {
   virtual void OnNetworkDisconnected() = 0;
 
   // network -> sim
-  virtual void OnNetValueChanged(const wpi::json& json);
+  virtual void OnNetValueChanged(const wpi::util::json& json);
 
   const std::string& GetDeviceType() { return m_type; }
   const std::string& GetDeviceId() { return m_deviceId; }

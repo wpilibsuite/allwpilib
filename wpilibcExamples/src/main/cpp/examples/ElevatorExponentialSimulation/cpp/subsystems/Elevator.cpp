@@ -14,14 +14,14 @@ Elevator::Elevator() {
   // Put Mechanism 2d to SmartDashboard
   // To view the Elevator visualization, select Network Tables -> SmartDashboard
   // -> Elevator Sim
-  frc::SmartDashboard::PutData("Elevator Sim", &m_mech2d);
+  wpi::SmartDashboard::PutData("Elevator Sim", &m_mech2d);
 }
 
 void Elevator::SimulationPeriodic() {
   // In this method, we update our simulation of what our elevator is doing
   // First, we set our "inputs" (voltages)
-  m_elevatorSim.SetInput(frc::Vectord<1>{
-      m_motorSim.GetSpeed() * frc::RobotController::GetInputVoltage()});
+  m_elevatorSim.SetInput(wpi::math::Vectord<1>{
+      m_motorSim.GetSpeed() * wpi::RobotController::GetInputVoltage()});
 
   // Next, we update it. The standard loop time is 20ms.
   m_elevatorSim.Update(20_ms);
@@ -30,8 +30,8 @@ void Elevator::SimulationPeriodic() {
   // voltage
   m_encoderSim.SetDistance(m_elevatorSim.GetPosition().value());
   // SimBattery estimates loaded battery voltages
-  frc::sim::RoboRioSim::SetVInVoltage(
-      frc::sim::BatterySim::Calculate({m_elevatorSim.GetCurrentDraw()}));
+  wpi::sim::RoboRioSim::SetVInVoltage(
+      wpi::sim::BatterySim::Calculate({m_elevatorSim.GetCurrentDraw()}));
 }
 
 void Elevator::UpdateTelemetry() {
@@ -39,8 +39,8 @@ void Elevator::UpdateTelemetry() {
   m_elevatorMech2d->SetLength(m_encoder.GetDistance());
 }
 
-void Elevator::ReachGoal(units::meter_t goal) {
-  frc::ExponentialProfile<units::meters, units::volts>::State goalState{goal,
+void Elevator::ReachGoal(wpi::units::meter_t goal) {
+  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>::State goalState{goal,
                                                                         0_mps};
 
   auto next = m_profile.Calculate(20_ms, m_setpoint, goalState);
@@ -50,7 +50,7 @@ void Elevator::ReachGoal(units::meter_t goal) {
   auto feedforwardOutput =
       m_feedforward.Calculate(m_setpoint.velocity, next.velocity);
 
-  m_motor.SetVoltage(units::volt_t{pidOutput} + feedforwardOutput);
+  m_motor.SetVoltage(wpi::units::volt_t{pidOutput} + feedforwardOutput);
 
   m_setpoint = next;
 }

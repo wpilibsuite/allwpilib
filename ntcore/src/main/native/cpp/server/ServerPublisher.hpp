@@ -11,7 +11,7 @@
 #include <string_view>
 #include <vector>
 
-namespace nt::server {
+namespace wpi::nt::server {
 
 class ServerClient;
 struct ServerTopic;
@@ -40,4 +40,4 @@ class ServerPublisher {
   std::vector<uint8_t> m_metaTopic;
 };
 
-}  // namespace nt::server
+}  // namespace wpi::nt::server

@@ -16,8 +16,8 @@
 class SendableChooserTest : public ::testing::TestWithParam<int> {};
 
 TEST_P(SendableChooserTest, ReturnsSelected) {
-  frc::SendableChooser<int> chooser;
-  frc::sim::SendableChooserSim chooserSim{
+  wpi::SendableChooser<int> chooser;
+  wpi::sim::SendableChooserSim chooserSim{
       fmt::format("/SmartDashboard/ReturnsSelectedChooser{}/", GetParam())};
 
   for (int i = 1; i <= 3; i++) {
@@ -25,16 +25,16 @@ TEST_P(SendableChooserTest, ReturnsSelected) {
   }
   chooser.SetDefaultOption("0", 0);
 
-  frc::SmartDashboard::PutData(
+  wpi::SmartDashboard::PutData(
       fmt::format("ReturnsSelectedChooser{}", GetParam()), &chooser);
-  frc::SmartDashboard::UpdateValues();
+  wpi::SmartDashboard::UpdateValues();
   chooserSim.SetSelected(std::to_string(GetParam()));
-  frc::SmartDashboard::UpdateValues();
+  wpi::SmartDashboard::UpdateValues();
   EXPECT_EQ(GetParam(), chooser.GetSelected());
 }
 
 TEST(SendableChooserTest, DefaultIsReturnedOnNoSelect) {
-  frc::SendableChooser<int> chooser;
+  wpi::SendableChooser<int> chooser;
 
   for (int i = 1; i <= 3; i++) {
     chooser.AddOption(std::to_string(i), i);
@@ -48,7 +48,7 @@ TEST(SendableChooserTest, DefaultIsReturnedOnNoSelect) {
 
 TEST(SendableChooserTest,
      DefaultConstructableIsReturnedOnNoSelectAndNoDefault) {
-  frc::SendableChooser<int> chooser;
+  wpi::SendableChooser<int> chooser;
 
   for (int i = 1; i <= 3; i++) {
     chooser.AddOption(std::to_string(i), i);
@@ -58,8 +58,8 @@ TEST(SendableChooserTest,
 }
 
 TEST(SendableChooserTest, ChangeListener) {
-  frc::SendableChooser<int> chooser;
-  frc::sim::SendableChooserSim chooserSim{
+  wpi::SendableChooser<int> chooser;
+  wpi::sim::SendableChooserSim chooserSim{
       "/SmartDashboard/ChangeListenerChooser/"};
 
   for (int i = 1; i <= 3; i++) {
@@ -68,10 +68,10 @@ TEST(SendableChooserTest, ChangeListener) {
   int currentVal = 0;
   chooser.OnChange([&](int val) { currentVal = val; });
 
-  frc::SmartDashboard::PutData("ChangeListenerChooser", &chooser);
-  frc::SmartDashboard::UpdateValues();
+  wpi::SmartDashboard::PutData("ChangeListenerChooser", &chooser);
+  wpi::SmartDashboard::UpdateValues();
   chooserSim.SetSelected("3");
-  frc::SmartDashboard::UpdateValues();
+  wpi::SmartDashboard::UpdateValues();
 
   EXPECT_EQ(3, currentVal);
 }

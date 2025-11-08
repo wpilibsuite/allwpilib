@@ -6,7 +6,7 @@
 
 #include "wpi/driverstation/DriverStation.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 bool RobotState::IsDisabled() {
   return DriverStation::IsDisabled();

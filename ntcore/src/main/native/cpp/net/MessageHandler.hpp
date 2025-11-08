@@ -11,12 +11,12 @@
 
 #include "wpi/util/json_fwd.hpp"
 
-namespace nt {
+namespace wpi::nt {
 class PubSubOptionsImpl;
 class Value;
-}  // namespace nt
+}  // namespace wpi::nt
 
-namespace nt::net {
+namespace wpi::nt::net {
 
 class ClientMessageHandler {
  public:
@@ -24,11 +24,11 @@ class ClientMessageHandler {
 
   virtual void ClientPublish(int pubuid, std::string_view name,
                              std::string_view typeStr,
-                             const wpi::json& properties,
+                             const wpi::util::json& properties,
                              const PubSubOptionsImpl& options) = 0;
   virtual void ClientUnpublish(int pubuid) = 0;
   virtual void ClientSetProperties(std::string_view name,
-                                   const wpi::json& update) = 0;
+                                   const wpi::util::json& update) = 0;
   virtual void ClientSubscribe(int subuid,
                                std::span<const std::string> topicNames,
                                const PubSubOptionsImpl& options) = 0;
@@ -41,12 +41,12 @@ class ServerMessageHandler {
   virtual ~ServerMessageHandler() = default;
   virtual int ServerAnnounce(std::string_view name, int id,
                              std::string_view typeStr,
-                             const wpi::json& properties,
+                             const wpi::util::json& properties,
                              std::optional<int> pubuid) = 0;
   virtual void ServerUnannounce(std::string_view name, int id) = 0;
   virtual void ServerPropertiesUpdate(std::string_view name,
-                                      const wpi::json& update, bool ack) = 0;
+                                      const wpi::util::json& update, bool ack) = 0;
   virtual void ServerSetValue(int topicuid, const Value& value) = 0;
 };
 
-}  // namespace nt::net
+}  // namespace wpi::nt::net

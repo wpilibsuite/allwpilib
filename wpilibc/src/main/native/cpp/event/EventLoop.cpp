@@ -8,7 +8,7 @@
 
 #include "wpi/system/Errors.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 namespace {
 struct RunningSetter {
@@ -22,7 +22,7 @@ struct RunningSetter {
 
 EventLoop::EventLoop() {}
 
-void EventLoop::Bind(wpi::unique_function<void()> action) {
+void EventLoop::Bind(wpi::util::unique_function<void()> action) {
   if (m_running) {
     throw FRC_MakeError(err::Error,
                         "Cannot bind EventLoop while it is running");
@@ -32,7 +32,7 @@ void EventLoop::Bind(wpi::unique_function<void()> action) {
 
 void EventLoop::Poll() {
   RunningSetter runSetter{m_running};
-  for (wpi::unique_function<void()>& action : m_bindings) {
+  for (wpi::util::unique_function<void()>& action : m_bindings) {
     action();
   }
 }

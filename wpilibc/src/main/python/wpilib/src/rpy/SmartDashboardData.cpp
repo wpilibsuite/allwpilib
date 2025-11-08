@@ -15,7 +15,7 @@ static py::dict &getSmartDashboardData() {
   return data;
 }
 
-void addSmartDashboardData(py::str &key, std::shared_ptr<wpi::Sendable> data) {
+void addSmartDashboardData(py::str &key, std::shared_ptr<wpi::util::Sendable> data) {
   auto &sdData = getSmartDashboardData();
   sdData[key] = py::cast(data);
 }

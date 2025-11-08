@@ -23,24 +23,24 @@
 #include "wpi/util/SensorUtil.hpp"
 #include "wpi/util/StackTrace.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 /** Converts volts to PSI per the REV Analog Pressure Sensor datasheet. */
-units::pounds_per_square_inch_t VoltsToPSI(units::volt_t sensorVoltage,
-                                           units::volt_t supplyVoltage) {
-  return units::pounds_per_square_inch_t{
+wpi::units::pounds_per_square_inch_t VoltsToPSI(wpi::units::volt_t sensorVoltage,
+                                           wpi::units::volt_t supplyVoltage) {
+  return wpi::units::pounds_per_square_inch_t{
       250 * (sensorVoltage.value() / supplyVoltage.value()) - 25};
 }
 
 /** Converts PSI to volts per the REV Analog Pressure Sensor datasheet. */
-units::volt_t PSIToVolts(units::pounds_per_square_inch_t pressure,
-                         units::volt_t supplyVoltage) {
-  return units::volt_t{supplyVoltage.value() *
+wpi::units::volt_t PSIToVolts(wpi::units::pounds_per_square_inch_t pressure,
+                         wpi::units::volt_t supplyVoltage) {
+  return wpi::units::volt_t{supplyVoltage.value() *
                        (0.004 * pressure.value() + 0.1)};
 }
 
-wpi::mutex PneumaticHub::m_handleLock;
-std::unique_ptr<wpi::DenseMap<int, std::weak_ptr<PneumaticHub::DataStore>>[]>
+wpi::util::mutex PneumaticHub::m_handleLock;
+std::unique_ptr<wpi::util::DenseMap<int, std::weak_ptr<PneumaticHub::DataStore>>[]>
     PneumaticHub::m_handleMaps = nullptr;
 
 // Always called under lock, so we can avoid the double lock from the magic
@@ -52,7 +52,7 @@ std::weak_ptr<PneumaticHub::DataStore>& PneumaticHub::GetDataStore(int busId,
                     "Bus {} out of range. Must be [0-{}).", busId, numBuses);
   if (!m_handleMaps) {
     m_handleMaps = std::make_unique<
-        wpi::DenseMap<int, std::weak_ptr<PneumaticHub::DataStore>>[]>(numBuses);
+        wpi::util::DenseMap<int, std::weak_ptr<PneumaticHub::DataStore>>[]>(numBuses);
   }
   return m_handleMaps[busId][module];
 }
@@ -66,7 +66,7 @@ class PneumaticHub::DataStore {
     FRC_CheckErrorStatus(status, "Module {}", module);
     m_moduleObject = PneumaticHub{busId, handle, module};
     m_moduleObject.m_dataStore =
-        std::shared_ptr<DataStore>{this, wpi::NullDeleter<DataStore>()};
+        std::shared_ptr<DataStore>{this, wpi::util::NullDeleter<DataStore>()};
 
     auto version = m_moduleObject.GetVersion();
 
@@ -89,16 +89,16 @@ class PneumaticHub::DataStore {
   friend class PneumaticHub;
   uint32_t m_reservedMask{0};
   bool m_compressorReserved{false};
-  wpi::mutex m_reservedLock;
+  wpi::util::mutex m_reservedLock;
   PneumaticHub m_moduleObject{0, HAL_kInvalidHandle, 0};
-  std::array<units::millisecond_t, 16> m_oneShotDurMs{0_ms};
+  std::array<wpi::units::millisecond_t, 16> m_oneShotDurMs{0_ms};
 };
 
 PneumaticHub::PneumaticHub(int busId)
     : PneumaticHub{busId, SensorUtil::GetDefaultREVPHModule()} {}
 
 PneumaticHub::PneumaticHub(int busId, int module) {
-  std::string stackTrace = wpi::GetStackTrace(1);
+  std::string stackTrace = wpi::util::GetStackTrace(1);
   std::scoped_lock lock(m_handleLock);
   auto& res = GetDataStore(busId, module);
   m_dataStore = res.lock();
@@ -134,8 +134,8 @@ void PneumaticHub::EnableCompressorDigital() {
 }
 
 void PneumaticHub::EnableCompressorAnalog(
-    units::pounds_per_square_inch_t minPressure,
-    units::pounds_per_square_inch_t maxPressure) {
+    wpi::units::pounds_per_square_inch_t minPressure,
+    wpi::units::pounds_per_square_inch_t maxPressure) {
   if (minPressure >= maxPressure) {
     throw FRC_MakeError(err::InvalidParameter,
                         "maxPressure must be greater than minPressure");
@@ -154,8 +154,8 @@ void PneumaticHub::EnableCompressorAnalog(
   // Send the voltage as it would be if the 5V rail was at exactly 5V.
   // The firmware will compensate for the real 5V rail voltage, which
   // can fluctuate somewhat over time.
-  units::volt_t minAnalogVoltage = PSIToVolts(minPressure, 5_V);
-  units::volt_t maxAnalogVoltage = PSIToVolts(maxPressure, 5_V);
+  wpi::units::volt_t minAnalogVoltage = PSIToVolts(minPressure, 5_V);
+  wpi::units::volt_t maxAnalogVoltage = PSIToVolts(maxPressure, 5_V);
 
   int32_t status = 0;
   HAL_SetREVPHClosedLoopControlAnalog(m_handle, minAnalogVoltage.value(),
@@ -164,8 +164,8 @@ void PneumaticHub::EnableCompressorAnalog(
 }
 
 void PneumaticHub::EnableCompressorHybrid(
-    units::pounds_per_square_inch_t minPressure,
-    units::pounds_per_square_inch_t maxPressure) {
+    wpi::units::pounds_per_square_inch_t minPressure,
+    wpi::units::pounds_per_square_inch_t maxPressure) {
   if (minPressure >= maxPressure) {
     throw FRC_MakeError(err::InvalidParameter,
                         "maxPressure must be greater than minPressure");
@@ -184,8 +184,8 @@ void PneumaticHub::EnableCompressorHybrid(
   // Send the voltage as it would be if the 5V rail was at exactly 5V.
   // The firmware will compensate for the real 5V rail voltage, which
   // can fluctuate somewhat over time.
-  units::volt_t minAnalogVoltage = PSIToVolts(minPressure, 5_V);
-  units::volt_t maxAnalogVoltage = PSIToVolts(maxPressure, 5_V);
+  wpi::units::volt_t minAnalogVoltage = PSIToVolts(minPressure, 5_V);
+  wpi::units::volt_t maxAnalogVoltage = PSIToVolts(maxPressure, 5_V);
 
   int32_t status = 0;
   HAL_SetREVPHClosedLoopControlHybrid(m_handle, minAnalogVoltage.value(),
@@ -207,11 +207,11 @@ bool PneumaticHub::GetPressureSwitch() const {
   return result;
 }
 
-units::ampere_t PneumaticHub::GetCompressorCurrent() const {
+wpi::units::ampere_t PneumaticHub::GetCompressorCurrent() const {
   int32_t status = 0;
   auto result = HAL_GetREVPHCompressorCurrent(m_handle, &status);
   FRC_ReportError(status, "Module {}", m_module);
-  return units::ampere_t{result};
+  return wpi::units::ampere_t{result};
 }
 
 void PneumaticHub::SetSolenoids(int mask, int values) {
@@ -245,7 +245,7 @@ void PneumaticHub::FireOneShot(int index) {
   FRC_ReportError(status, "Module {}", m_module);
 }
 
-void PneumaticHub::SetOneShotDuration(int index, units::second_t duration) {
+void PneumaticHub::SetOneShotDuration(int index, wpi::units::second_t duration) {
   m_dataStore->m_oneShotDurMs[index] = duration;
 }
 
@@ -370,48 +370,48 @@ void PneumaticHub::ClearStickyFaults() {
   FRC_ReportError(status, "Module {}", m_module);
 }
 
-units::volt_t PneumaticHub::GetInputVoltage() const {
+wpi::units::volt_t PneumaticHub::GetInputVoltage() const {
   int32_t status = 0;
   auto voltage = HAL_GetREVPHVoltage(m_handle, &status);
   FRC_ReportError(status, "Module {}", m_module);
-  return units::volt_t{voltage};
+  return wpi::units::volt_t{voltage};
 }
 
-units::volt_t PneumaticHub::Get5VRegulatedVoltage() const {
+wpi::units::volt_t PneumaticHub::Get5VRegulatedVoltage() const {
   int32_t status = 0;
   auto voltage = HAL_GetREVPH5VVoltage(m_handle, &status);
   FRC_ReportError(status, "Module {}", m_module);
-  return units::volt_t{voltage};
+  return wpi::units::volt_t{voltage};
 }
 
-units::ampere_t PneumaticHub::GetSolenoidsTotalCurrent() const {
+wpi::units::ampere_t PneumaticHub::GetSolenoidsTotalCurrent() const {
   int32_t status = 0;
   auto current = HAL_GetREVPHSolenoidCurrent(m_handle, &status);
   FRC_ReportError(status, "Module {}", m_module);
-  return units::ampere_t{current};
+  return wpi::units::ampere_t{current};
 }
 
-units::volt_t PneumaticHub::GetSolenoidsVoltage() const {
+wpi::units::volt_t PneumaticHub::GetSolenoidsVoltage() const {
   int32_t status = 0;
   auto voltage = HAL_GetREVPHSolenoidVoltage(m_handle, &status);
   FRC_ReportError(status, "Module {}", m_module);
-  return units::volt_t{voltage};
+  return wpi::units::volt_t{voltage};
 }
 
-units::volt_t PneumaticHub::GetAnalogVoltage(int channel) const {
+wpi::units::volt_t PneumaticHub::GetAnalogVoltage(int channel) const {
   int32_t status = 0;
   auto voltage = HAL_GetREVPHAnalogVoltage(m_handle, channel, &status);
   FRC_ReportError(status, "Module {}", m_module);
-  return units::volt_t{voltage};
+  return wpi::units::volt_t{voltage};
 }
 
-units::pounds_per_square_inch_t PneumaticHub::GetPressure(int channel) const {
+wpi::units::pounds_per_square_inch_t PneumaticHub::GetPressure(int channel) const {
   int32_t status = 0;
   auto sensorVoltage = HAL_GetREVPHAnalogVoltage(m_handle, channel, &status);
   FRC_ReportError(status, "Module {}", m_module);
   auto supplyVoltage = HAL_GetREVPH5VVoltage(m_handle, &status);
   FRC_ReportError(status, "Module {}", m_module);
-  return VoltsToPSI(units::volt_t{sensorVoltage}, units::volt_t{supplyVoltage});
+  return VoltsToPSI(wpi::units::volt_t{sensorVoltage}, wpi::units::volt_t{supplyVoltage});
 }
 
 Solenoid PneumaticHub::MakeSolenoid(int channel) {
@@ -434,7 +434,7 @@ void PneumaticHub::ReportUsage(std::string_view device, std::string_view data) {
 
 std::shared_ptr<PneumaticsBase> PneumaticHub::GetForModule(int busId,
                                                            int module) {
-  std::string stackTrace = wpi::GetStackTrace(1);
+  std::string stackTrace = wpi::util::GetStackTrace(1);
   std::scoped_lock lock(m_handleLock);
   auto& res = GetDataStore(busId, module);
   std::shared_ptr<DataStore> dataStore = res.lock();

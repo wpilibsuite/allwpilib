@@ -8,7 +8,7 @@
 #include <string>
 #include <string_view>
 
-namespace wpi {
+namespace wpi::util {
 
 class Sendable;
 class SendableBuilder;
@@ -237,4 +237,4 @@ class SendableRegistry final {
   static void Update(UID sendableUid);
 };
 
-}  // namespace wpi
+}  // namespace wpi::util

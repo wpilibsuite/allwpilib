@@ -13,7 +13,7 @@
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 
-namespace frc {
+namespace wpi::math {
 /**
  * This class wraps Differential Drive Odometry to fuse latency-compensated
  * vision measurements with differential drive encoder measurements. It will
@@ -56,8 +56,8 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator3d
    */
   DifferentialDrivePoseEstimator3d(DifferentialDriveKinematics& kinematics,
                                    const Rotation3d& gyroAngle,
-                                   units::meter_t leftDistance,
-                                   units::meter_t rightDistance,
+                                   wpi::units::meter_t leftDistance,
+                                   wpi::units::meter_t rightDistance,
                                    const Pose3d& initialPose);
 
   /**
@@ -79,9 +79,9 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator3d
    */
   DifferentialDrivePoseEstimator3d(
       DifferentialDriveKinematics& kinematics, const Rotation3d& gyroAngle,
-      units::meter_t leftDistance, units::meter_t rightDistance,
-      const Pose3d& initialPose, const wpi::array<double, 4>& stateStdDevs,
-      const wpi::array<double, 4>& visionMeasurementStdDevs);
+      wpi::units::meter_t leftDistance, wpi::units::meter_t rightDistance,
+      const Pose3d& initialPose, const wpi::util::array<double, 4>& stateStdDevs,
+      const wpi::util::array<double, 4>& visionMeasurementStdDevs);
 
   /**
    * Resets the robot's position on the field.
@@ -91,8 +91,8 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator3d
    * @param rightDistance The distance traveled by the right encoder.
    * @param pose The estimated pose of the robot on the field.
    */
-  void ResetPosition(const Rotation3d& gyroAngle, units::meter_t leftDistance,
-                     units::meter_t rightDistance, const Pose3d& pose) {
+  void ResetPosition(const Rotation3d& gyroAngle, wpi::units::meter_t leftDistance,
+                     wpi::units::meter_t rightDistance, const Pose3d& pose) {
     PoseEstimator3d::ResetPosition(gyroAngle, {leftDistance, rightDistance},
                                    pose);
   }
@@ -107,8 +107,8 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator3d
    *
    * @return The estimated pose of the robot.
    */
-  Pose3d Update(const Rotation3d& gyroAngle, units::meter_t leftDistance,
-                units::meter_t rightDistance) {
+  Pose3d Update(const Rotation3d& gyroAngle, wpi::units::meter_t leftDistance,
+                wpi::units::meter_t rightDistance) {
     return PoseEstimator3d::Update(gyroAngle, {leftDistance, rightDistance});
   }
 
@@ -123,10 +123,10 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator3d
    *
    * @return The estimated pose of the robot.
    */
-  Pose3d UpdateWithTime(units::second_t currentTime,
+  Pose3d UpdateWithTime(wpi::units::second_t currentTime,
                         const Rotation3d& gyroAngle,
-                        units::meter_t leftDistance,
-                        units::meter_t rightDistance) {
+                        wpi::units::meter_t leftDistance,
+                        wpi::units::meter_t rightDistance) {
     return PoseEstimator3d::UpdateWithTime(currentTime, gyroAngle,
                                            {leftDistance, rightDistance});
   }
@@ -135,4 +135,4 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator3d
   DifferentialDriveOdometry3d m_odometryImpl;
 };
 
-}  // namespace frc
+}  // namespace wpi::math

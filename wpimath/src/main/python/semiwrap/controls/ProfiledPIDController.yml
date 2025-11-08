@@ -5,16 +5,16 @@ functions:
   IncrementAndGetProfiledPIDControllerInstances:
     ignore: true
 classes:
-  frc::ProfiledPIDController:
+  wpi::math::ProfiledPIDController:
     force_type_casters:
-    - units::radians_per_second
+    - wpi::units::radians_per_second
     template_params:
     - Distance
     ignored_bases:
-    - wpi::SendableHelper<ProfiledPIDController<Distance>>
+    - wpi::util::SendableHelper<ProfiledPIDController<Distance>>
     typealias:
-    - typename frc::ProfiledPIDController<Distance>::Velocity
-    - typename frc::ProfiledPIDController<Distance>::Velocity_t
+    - typename wpi::math::ProfiledPIDController<Distance>::Velocity
+    - typename wpi::math::ProfiledPIDController<Distance>::Velocity_t
     methods:
       ProfiledPIDController:
         param_override:
@@ -56,7 +56,7 @@ classes:
           Distance_t:
           Distance_t, State:
           Distance_t, Distance_t:
-          Distance_t, Distance_t, typename frc::TrapezoidProfile<Distance>::Constraints:
+          Distance_t, Distance_t, typename wpi::math::TrapezoidProfile<Distance>::Constraints:
             param_override:
               constraints:
                 x_type: typename TrapezoidProfile<Distance>::Constraints
@@ -69,12 +69,12 @@ classes:
 
 templates:
   ProfiledPIDController:
-    qualname: frc::ProfiledPIDController
+    qualname: wpi::math::ProfiledPIDController
     params:
-    - units::dimensionless::scalar
+    - wpi::units::dimensionless::scalar
 
   # needed for HolonomicDriveController
   ProfiledPIDControllerRadians:
-    qualname: frc::ProfiledPIDController
+    qualname: wpi::math::ProfiledPIDController
     params:
-    - units::radian
+    - wpi::units::radian

@@ -12,7 +12,7 @@
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/mutex.hpp"
 
-namespace wpi {
+namespace wpi::net {
 
 class Logger;
 
@@ -20,11 +20,11 @@ class UDPClient {
   int m_lsd;
   int m_port;
   std::string m_address;
-  Logger& m_logger;
+  wpi::util::Logger& m_logger;
 
  public:
-  explicit UDPClient(Logger& logger);
-  UDPClient(std::string_view address, Logger& logger);
+  explicit UDPClient(wpi::util::Logger& logger);
+  UDPClient(std::string_view address, wpi::util::Logger& logger);
   UDPClient(const UDPClient& other) = delete;
   UDPClient(UDPClient&& other);
   ~UDPClient();
@@ -40,10 +40,10 @@ class UDPClient {
   int send(std::string_view data, std::string_view server, int port);
   int receive(uint8_t* data_received, int receive_len);
   int receive(uint8_t* data_received, int receive_len,
-              SmallVectorImpl<char>* addr_received, int* port_received);
+              wpi::util::SmallVectorImpl<char>* addr_received, int* port_received);
   int set_timeout(double timeout);
 };
 
-}  // namespace wpi
+}  // namespace wpi::net
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UDPCLIENT_HPP_

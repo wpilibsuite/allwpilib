@@ -15,7 +15,7 @@
 #include "wpi/units/math.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * Represents a 2d rectangular space containing translational, rotational, and
@@ -33,8 +33,8 @@ class WPILIB_DLLEXPORT Rectangle2d {
    * @param yWidth The y size component of the rectangle, in unrotated
    * coordinate frame.
    */
-  constexpr Rectangle2d(const Pose2d& center, units::meter_t xWidth,
-                        units::meter_t yWidth)
+  constexpr Rectangle2d(const Pose2d& center, wpi::units::meter_t xWidth,
+                        wpi::units::meter_t yWidth)
       : m_center{center}, m_xWidth{xWidth}, m_yWidth{yWidth} {
     if (xWidth < 0_m || yWidth < 0_m) {
       throw std::invalid_argument(
@@ -52,8 +52,8 @@ class WPILIB_DLLEXPORT Rectangle2d {
   constexpr Rectangle2d(const Translation2d& cornerA,
                         const Translation2d& cornerB)
       : m_center{(cornerA + cornerB) / 2.0, Rotation2d{}},
-        m_xWidth{units::math::abs(cornerA.X() - cornerB.X())},
-        m_yWidth{units::math::abs(cornerA.Y() - cornerB.Y())} {}
+        m_xWidth{wpi::units::math::abs(cornerA.X() - cornerB.X())},
+        m_yWidth{wpi::units::math::abs(cornerA.Y() - cornerB.Y())} {}
 
   /**
    * Returns the center of the rectangle.
@@ -74,14 +74,14 @@ class WPILIB_DLLEXPORT Rectangle2d {
    *
    * @return The x size component of the rectangle.
    */
-  constexpr units::meter_t XWidth() const { return m_xWidth; }
+  constexpr wpi::units::meter_t XWidth() const { return m_xWidth; }
 
   /**
    * Returns the y size component of the rectangle.
    *
    * @return The y size component of the rectangle.
    */
-  constexpr units::meter_t YWidth() const { return m_yWidth; }
+  constexpr wpi::units::meter_t YWidth() const { return m_yWidth; }
 
   /**
    * Transforms the center of the rectangle and returns the new rectangle.
@@ -114,14 +114,14 @@ class WPILIB_DLLEXPORT Rectangle2d {
     auto pointInRect = point - m_center.Translation();
     pointInRect = pointInRect.RotateBy(-m_center.Rotation());
 
-    if (units::math::abs(units::math::abs(pointInRect.X()) - m_xWidth / 2.0) <=
+    if (wpi::units::math::abs(wpi::units::math::abs(pointInRect.X()) - m_xWidth / 2.0) <=
         1E-9_m) {
       // Point rests on left/right perimeter
-      return units::math::abs(pointInRect.Y()) <= m_yWidth / 2.0;
-    } else if (units::math::abs(units::math::abs(pointInRect.Y()) -
+      return wpi::units::math::abs(pointInRect.Y()) <= m_yWidth / 2.0;
+    } else if (wpi::units::math::abs(wpi::units::math::abs(pointInRect.Y()) -
                                 m_yWidth / 2.0) <= 1E-9_m) {
       // Point rests on top/bottom perimeter
-      return units::math::abs(pointInRect.X()) <= m_xWidth / 2.0;
+      return wpi::units::math::abs(pointInRect.X()) <= m_xWidth / 2.0;
     }
 
     return false;
@@ -153,7 +153,7 @@ class WPILIB_DLLEXPORT Rectangle2d {
    * @param point The point to check.
    * @return The distance (0, if the point is contained by the rectangle)
    */
-  constexpr units::meter_t Distance(const Translation2d& point) const {
+  constexpr wpi::units::meter_t Distance(const Translation2d& point) const {
     return Nearest(point).Distance(point);
   }
 
@@ -193,17 +193,17 @@ class WPILIB_DLLEXPORT Rectangle2d {
    */
   constexpr bool operator==(const Rectangle2d& other) const {
     return m_center == other.m_center &&
-           units::math::abs(m_xWidth - other.m_xWidth) < 1E-9_m &&
-           units::math::abs(m_yWidth - other.m_yWidth) < 1E-9_m;
+           wpi::units::math::abs(m_xWidth - other.m_xWidth) < 1E-9_m &&
+           wpi::units::math::abs(m_yWidth - other.m_yWidth) < 1E-9_m;
   }
 
  private:
   Pose2d m_center;
-  units::meter_t m_xWidth;
-  units::meter_t m_yWidth;
+  wpi::units::meter_t m_xWidth;
+  wpi::units::meter_t m_yWidth;
 };
 
-}  // namespace frc
+}  // namespace wpi::math
 
 #include "wpi/math/geometry/proto/Rectangle2dProto.hpp"
 #include "wpi/math/geometry/struct/Rectangle2dStruct.hpp"

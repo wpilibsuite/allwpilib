@@ -15,7 +15,7 @@
 #include "wpi/units/length.hpp"
 #include "wpi/util/array.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * Represents a two-dimensional parametric spline that interpolates between two
@@ -26,7 +26,7 @@ namespace frc {
 template <int Degree>
 class Spline {
  public:
-  using PoseWithCurvature = std::pair<Pose2d, units::curvature_t>;
+  using PoseWithCurvature = std::pair<Pose2d, wpi::units::curvature_t>;
 
   constexpr Spline() = default;
 
@@ -47,10 +47,10 @@ class Spline {
    */
   struct ControlVector {
     /// The x components of the control vector.
-    wpi::array<double, (Degree + 1) / 2> x;
+    wpi::util::array<double, (Degree + 1) / 2> x;
 
     /// The y components of the control vector.
-    wpi::array<double, (Degree + 1) / 2> y;
+    wpi::util::array<double, (Degree + 1) / 2> y;
   };
 
   /**
@@ -100,7 +100,7 @@ class Spline {
 
     return PoseWithCurvature{
         {FromVector(combined.template block<2, 1>(0, 0)), Rotation2d{dx, dy}},
-        units::curvature_t{curvature}};
+        wpi::units::curvature_t{curvature}};
   }
 
   /**
@@ -143,8 +143,8 @@ class Spline {
    * @return The Translation2d.
    */
   static constexpr Translation2d FromVector(const Eigen::Vector2d& vector) {
-    return Translation2d{units::meter_t{vector(0)}, units::meter_t{vector(1)}};
+    return Translation2d{wpi::units::meter_t{vector(0)}, wpi::units::meter_t{vector(1)}};
   }
 };
 
-}  // namespace frc
+}  // namespace wpi::math

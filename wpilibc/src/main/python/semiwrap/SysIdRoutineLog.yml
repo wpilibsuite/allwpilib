@@ -7,29 +7,29 @@ enums:
       .def("__str__", &SysIdRoutineLog::StateEnumToString)
 
 classes:
-  frc::sysid::SysIdRoutineLog:
+  wpi::sysid::SysIdRoutineLog:
     methods:
       SysIdRoutineLog:
       RecordState:
       Motor:
       StateEnumToString:
-  frc::sysid::SysIdRoutineLog::MotorLog:
+  wpi::sysid::SysIdRoutineLog::MotorLog:
     methods:
       value:
       voltage:
       position:
         overloads:
-          units::meter_t:
-          units::turn_t:
+          wpi::units::meter_t:
+          wpi::units::turn_t:
             rename: angularPosition
       velocity:
         overloads:
-          units::meters_per_second_t:
-          units::turns_per_second_t:
+          wpi::units::meters_per_second_t:
+          wpi::units::turns_per_second_t:
             rename: angularVelocity
       acceleration:
         overloads:
-          units::meters_per_second_squared_t:
-          units::turns_per_second_squared_t:
+          wpi::units::meters_per_second_squared_t:
+          wpi::units::turns_per_second_squared_t:
             rename: angularAcceleration
       current:

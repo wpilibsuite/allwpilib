@@ -9,7 +9,7 @@
 #include "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
 #include "wpi/simulation/PneumaticsBaseSim.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 
 class SolenoidSim {
  public:
@@ -41,4 +41,4 @@ class SolenoidSim {
   int m_channel;
 };
 
-}  // namespace frc::sim
+}  // namespace wpi::sim

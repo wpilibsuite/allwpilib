@@ -9,7 +9,7 @@
 #include "wpi/util/array.hpp"
 #include "wpi/util/jni_util.hpp"
 
-using namespace wpi::java;
+using namespace wpi::util::java;
 
 extern "C" {
 
@@ -25,13 +25,13 @@ Java_org_wpilib_math_jni_Ellipse2dJNI_nearest
    jdoubleArray nearestPoint)
 {
   auto point =
-      frc::Ellipse2d{
-          frc::Pose2d{units::meter_t{centerX}, units::meter_t{centerY},
-                      units::radian_t{centerHeading}},
-          units::meter_t{xSemiAxis}, units::meter_t{ySemiAxis}}
-          .Nearest({units::meter_t{pointX}, units::meter_t{pointY}});
+      wpi::math::Ellipse2d{
+          wpi::math::Pose2d{wpi::units::meter_t{centerX}, wpi::units::meter_t{centerY},
+                      wpi::units::radian_t{centerHeading}},
+          wpi::units::meter_t{xSemiAxis}, wpi::units::meter_t{ySemiAxis}}
+          .Nearest({wpi::units::meter_t{pointX}, wpi::units::meter_t{pointY}});
 
-  wpi::array buf{point.X().value(), point.Y().value()};
+  wpi::util::array buf{point.X().value(), point.Y().value()};
   env->SetDoubleArrayRegion(nearestPoint, 0, 2, buf.data());
 }
 

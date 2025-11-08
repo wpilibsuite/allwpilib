@@ -28,9 +28,9 @@
 
 #include "wpi/units/base.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::impedance
+ * @namespace wpi::units::impedance
  * @brief namespace for unit types and containers representing impedance values
  * @details The SI unit for impedance is `ohms`, and the corresponding
  *          `base_unit` category is `impedance_unit`.
@@ -41,10 +41,10 @@ namespace units {
     defined(ENABLE_PREDEFINED_IMPEDANCE_UNITS)
 UNIT_ADD_WITH_METRIC_PREFIXES(
     impedance, ohm, ohms, Ohm,
-    unit<std::ratio<1>, units::category::impedance_unit>)
+    unit<std::ratio<1>, wpi::units::category::impedance_unit>)
 
 UNIT_ADD_CATEGORY_TRAIT(impedance)
 #endif
 
 using namespace impedance;
-}  // namespace units
+}  // namespace wpi::units

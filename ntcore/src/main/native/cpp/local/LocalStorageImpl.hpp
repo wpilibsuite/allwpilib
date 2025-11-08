@@ -24,35 +24,35 @@
 #include "wpi/util/Synchronization.h"
 #include "wpi/util/json.hpp"
 
-namespace wpi {
+namespace wpi::util {
 class Logger;
 }  // namespace wpi
 
-namespace nt {
+namespace wpi::nt {
 class IListenerStorage;
-}  // namespace nt
+}  // namespace wpi::nt
 
-namespace nt::net {
+namespace wpi::nt::net {
 class ClientMessageHandler;
-}  // namespace nt::net
+}  // namespace wpi::nt::net
 
-namespace nt::local {
+namespace wpi::nt::local {
 
 // inner struct to protect against accidentally deadlocking on the mutex
 class StorageImpl {
  public:
-  StorageImpl(int inst, IListenerStorage& listenerStorage, wpi::Logger& logger);
+  StorageImpl(int inst, IListenerStorage& listenerStorage, wpi::util::Logger& logger);
 
-  wpi::Logger& GetLogger() { return m_logger; }
+  wpi::util::Logger& GetLogger() { return m_logger; }
 
   //
   // Network interface functions
   //
 
   void NetworkAnnounce(LocalTopic* topic, std::string_view typeStr,
-                       const wpi::json& properties, std::optional<int> pubuid);
+                       const wpi::util::json& properties, std::optional<int> pubuid);
   void RemoveNetworkPublisher(LocalTopic* topic);
-  void NetworkPropertiesUpdate(LocalTopic* topic, const wpi::json& update,
+  void NetworkPropertiesUpdate(LocalTopic* topic, const wpi::util::json& update,
                                bool ack);
 
   void ServerSetValue(LocalTopic* topic, const Value& value) {
@@ -80,7 +80,7 @@ class StorageImpl {
       if (!topic->Exists()) {
         continue;
       }
-      if (!wpi::starts_with(topic->name, prefix)) {
+      if (!wpi::util::starts_with(topic->name, prefix)) {
         continue;
       }
       if (types != 0 && (types & topic->type) == 0) {
@@ -97,7 +97,7 @@ class StorageImpl {
       if (!topic->Exists()) {
         continue;
       }
-      if (!wpi::starts_with(topic->name, prefix)) {
+      if (!wpi::util::starts_with(topic->name, prefix)) {
         continue;
       }
       if (!types.empty()) {
@@ -126,8 +126,8 @@ class StorageImpl {
   void SetCached(LocalTopic* topic, bool value);
 
   void SetProperty(LocalTopic* topic, std::string_view name,
-                   const wpi::json& value);
-  bool SetProperties(LocalTopic* topic, const wpi::json& update,
+                   const wpi::util::json& value);
+  bool SetProperties(LocalTopic* topic, const wpi::util::json& update,
                      bool sendNetwork);
 
   void DeleteProperty(LocalTopic* topic, std::string_view name);
@@ -156,7 +156,7 @@ class StorageImpl {
                              const PubSubOptions& options);
 
   LocalPublisher* Publish(LocalTopic* topic, NT_Type type,
-                          std::string_view typeStr, const wpi::json& properties,
+                          std::string_view typeStr, const wpi::util::json& properties,
                           const PubSubOptions& options);
 
   LocalEntry* GetEntry(LocalTopic* topicHandle, NT_Type type,
@@ -252,14 +252,14 @@ class StorageImpl {
                    unsigned int eventFlags, bool isDuplicate,
                    const LocalPublisher* publisher);
 
-  void PropertiesUpdated(LocalTopic* topic, const wpi::json& update,
+  void PropertiesUpdated(LocalTopic* topic, const wpi::util::json& update,
                          unsigned int eventFlags, bool sendNetwork,
                          bool updateFlags = true);
 
   void RefreshPubSubActive(LocalTopic* topic, bool warnOnSubMismatch);
 
   LocalPublisher* AddLocalPublisher(LocalTopic* topic,
-                                    const wpi::json& properties,
+                                    const wpi::util::json& properties,
                                     const PubSubConfig& options);
 
   std::unique_ptr<LocalPublisher> RemoveLocalPublisher(NT_Publisher pubHandle);
@@ -292,7 +292,7 @@ class StorageImpl {
  private:
   int m_inst;
   IListenerStorage& m_listenerStorage;
-  wpi::Logger& m_logger;
+  wpi::util::Logger& m_logger;
   net::ClientMessageHandler* m_network{nullptr};
 
   // handle mappings
@@ -304,16 +304,16 @@ class StorageImpl {
   HandleMap<LocalDataLogger, 16> m_dataloggers;
 
   // name mappings
-  wpi::StringMap<LocalTopic*> m_nameTopics;
+  wpi::util::StringMap<LocalTopic*> m_nameTopics;
 
   // listeners
-  wpi::DenseMap<NT_Listener, std::unique_ptr<LocalListener>> m_listeners;
+  wpi::util::DenseMap<NT_Listener, std::unique_ptr<LocalListener>> m_listeners;
 
   // string-based listeners
   VectorSet<LocalListener*> m_topicPrefixListeners;
 
   // schema publishers
-  wpi::StringMap<NT_Publisher> m_schemas;
+  wpi::util::StringMap<NT_Publisher> m_schemas;
 };
 
-}  // namespace nt::local
+}  // namespace wpi::nt::local

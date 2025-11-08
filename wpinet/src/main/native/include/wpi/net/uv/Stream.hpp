@@ -19,7 +19,7 @@
 #include "wpi/net/uv/Request.hpp"
 #include "wpi/util/Signal.h"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 class Stream;
 
@@ -37,7 +37,7 @@ class ShutdownReq : public RequestImpl<ShutdownReq, uv_shutdown_t> {
   /**
    * Shutdown completed signal.
    */
-  sig::Signal<> complete;
+  wpi::util::sig::Signal<> complete;
 };
 
 /**
@@ -55,7 +55,7 @@ class WriteReq : public RequestImpl<WriteReq, uv_write_t> {
    * Write completed signal.  This is called even if an error occurred.
    * @param err error value
    */
-  sig::Signal<Error> finish;
+  wpi::util::sig::Signal<Error> finish;
 };
 
 /**
@@ -293,12 +293,12 @@ class Stream : public Handle {
   /**
    * Signal generated when data was read on a stream.
    */
-  sig::Signal<Buffer&, size_t> data;
+  wpi::util::sig::Signal<Buffer&, size_t> data;
 
   /**
    * Signal generated when no more read data is available.
    */
-  sig::Signal<> end;
+  wpi::util::sig::Signal<> end;
 
  protected:
   explicit Stream(uv_stream_t* uv_stream)
@@ -329,6 +329,6 @@ class StreamImpl : public Stream {
   StreamImpl() : Stream{static_cast<uv_stream_t*>(std::malloc(sizeof(U)))} {}
 };
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_STREAM_HPP_

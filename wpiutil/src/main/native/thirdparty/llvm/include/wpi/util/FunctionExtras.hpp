@@ -42,7 +42,7 @@
 #include <memory>
 #include <type_traits>
 
-namespace wpi {
+namespace wpi::util {
 
 /// unique_function is a type-erasing functor similar to std::function.
 ///
@@ -425,6 +425,6 @@ public:
 #pragma GCC diagnostic pop
 #endif
 
-} // end namespace wpi
+} // end namespace wpi::util
 
 #endif // WPIUTIL_WPI_FUNCTIONEXTRAS_H

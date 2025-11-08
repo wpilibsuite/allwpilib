@@ -1,5 +1,5 @@
 classes:
-  frc::ExpansionHubPidConstants:
+  wpi::ExpansionHubPidConstants:
     methods:
       SetPID:
       SetFF:

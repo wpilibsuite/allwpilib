@@ -2,7 +2,7 @@ extra_includes:
 - pybind11/stl.h
 
 classes:
-  frc::sim::SimDeviceSim:
+  wpi::sim::SimDeviceSim:
     doc: |
       Interact with a generic simulated device
 
@@ -65,7 +65,7 @@ classes:
 
 inline_code: |
   cls_SimDeviceSim
-    .def("enumerateValues", [](frc::sim::SimDeviceSim * that) {
+    .def("enumerateValues", [](wpi::sim::SimDeviceSim * that) {
       std::vector<std::pair<std::string, bool>> values;
       that->EnumerateValues([&values](const char * name, HAL_SimValueHandle handle,
                                HAL_Bool readonly, const struct HAL_Value * value){
@@ -76,7 +76,7 @@ inline_code: |
     "Returns a list of (name, readonly) tuples of available values for this device")
     .def_static("enumerateDevices", [](const char * prefix) {
       std::vector<std::string> devices;
-      frc::sim::SimDeviceSim::EnumerateDevices(prefix, [&devices](const char * name, HAL_SimDeviceHandle handle) {
+      wpi::sim::SimDeviceSim::EnumerateDevices(prefix, [&devices](const char * name, HAL_SimDeviceHandle handle) {
         devices.push_back(std::string(name));
       });
       return devices;

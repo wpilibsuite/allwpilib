@@ -4,7 +4,7 @@
 
 #pragma once
 
-namespace frc {
+namespace wpi {
 /**
  * Runtime type.
  */
@@ -17,4 +17,4 @@ enum RuntimeType {
   kSimulation,
   kSystemCore
 };
-}  // namespace frc
+}  // namespace wpi

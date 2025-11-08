@@ -1,5 +1,5 @@
 classes:
-  frc::DifferentialDriveOdometry:
+  wpi::math::DifferentialDriveOdometry:
     force_no_trampoline: true
     methods:
       DifferentialDriveOdometry:

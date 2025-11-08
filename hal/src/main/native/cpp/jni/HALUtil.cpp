@@ -21,7 +21,7 @@
 #include "wpi/hal/HAL.h"
 #include "wpi/util/jni_util.hpp"
 
-using namespace wpi::java;
+using namespace wpi::util::java;
 
 #define kRioStatusOffset -63000
 #define kRioStatusSuccess 0
@@ -78,7 +78,7 @@ static const JExceptionInit exceptions[] = {
      &uncleanStatusExCls},
     {"java/lang/NullPointerException", &nullPointerEx}};
 
-namespace hal {
+namespace wpi::hal {
 
 void ThrowUncleanStatusException(JNIEnv* env, std::string_view msg,
                                  int32_t status) {
@@ -312,9 +312,9 @@ jint SimOnLoad(JavaVM* vm, void* reserved);
 void SimOnUnload(JavaVM* vm, void* reserved);
 }  // namespace sim
 
-}  // namespace hal
+}  // namespace wpi::hal
 
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
 
@@ -375,7 +375,7 @@ Java_org_wpilib_hardware_hal_HALUtil_getSerialNumber
 {
   WPI_String serialNum;
   HAL_GetSerialNumber(&serialNum);
-  jstring ret = MakeJString(env, wpi::to_string_view(&serialNum));
+  jstring ret = MakeJString(env, wpi::util::to_string_view(&serialNum));
   WPI_FreeString(&serialNum);
   return ret;
 }
@@ -391,7 +391,7 @@ Java_org_wpilib_hardware_hal_HALUtil_getComments
 {
   WPI_String comments;
   HAL_GetComments(&comments);
-  jstring ret = MakeJString(env, wpi::to_string_view(&comments));
+  jstring ret = MakeJString(env, wpi::util::to_string_view(&comments));
   WPI_FreeString(&comments);
   return ret;
 }

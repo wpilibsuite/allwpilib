@@ -28,7 +28,7 @@ constexpr const char* kYawLandscapeKey = IMU_PREFIX "yaw_landscape";
 constexpr const char* kYawPortraitKey = IMU_PREFIX "yaw_portrait";
 
 struct IMU {
-  explicit IMU(nt::NetworkTableInstance inst)
+  explicit IMU(wpi::nt::NetworkTableInstance inst)
       : rawAccelSub{inst.GetDoubleArrayTopic(kRawAccelKey).Subscribe({})},
         rawGyroSub{inst.GetDoubleArrayTopic(kRawGyroKey).Subscribe({})},
         quatSub{inst.GetDoubleArrayTopic(kQuaternionKey).Subscribe({})},
@@ -42,15 +42,15 @@ struct IMU {
         yawLandscapeSub{inst.GetDoubleTopic(kYawLandscapeKey).Subscribe(0)},
         yawPortraitSub{inst.GetDoubleTopic(kYawPortraitKey).Subscribe(0)} {}
 
-  nt::DoubleArraySubscriber rawAccelSub;
-  nt::DoubleArraySubscriber rawGyroSub;
-  nt::DoubleArraySubscriber quatSub;
-  nt::DoubleArraySubscriber eulerFlatSub;
-  nt::DoubleArraySubscriber eulerLandscapeSub;
-  nt::DoubleArraySubscriber eulerPortraitSub;
-  nt::DoubleSubscriber yawFlatSub;
-  nt::DoubleSubscriber yawLandscapeSub;
-  nt::DoubleSubscriber yawPortraitSub;
+  wpi::nt::DoubleArraySubscriber rawAccelSub;
+  wpi::nt::DoubleArraySubscriber rawGyroSub;
+  wpi::nt::DoubleArraySubscriber quatSub;
+  wpi::nt::DoubleArraySubscriber eulerFlatSub;
+  wpi::nt::DoubleArraySubscriber eulerLandscapeSub;
+  wpi::nt::DoubleArraySubscriber eulerPortraitSub;
+  wpi::nt::DoubleSubscriber yawFlatSub;
+  wpi::nt::DoubleSubscriber yawLandscapeSub;
+  wpi::nt::DoubleSubscriber yawPortraitSub;
 };
 
 static IMU* imu;
@@ -59,12 +59,12 @@ constexpr double kDegreesToRadians = std::numbers::pi / 180.0;
 constexpr double kGToMetersPerSecondSquared = 9.80665;
 }  // namespace
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeIMU() {
-  static IMU imu_static{hal::GetSystemServer()};
+  static IMU imu_static{wpi::hal::GetSystemServer()};
   imu = &imu_static;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 void HAL_GetIMUAcceleration(HAL_Acceleration3d* accel, int32_t* status) {

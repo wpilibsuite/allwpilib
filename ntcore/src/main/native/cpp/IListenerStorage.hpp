@@ -11,7 +11,7 @@
 
 #include "wpi/nt/ntcore_cpp.hpp"
 
-namespace nt {
+namespace wpi::nt {
 
 class IListenerStorage {
  public:
@@ -49,4 +49,4 @@ class IListenerStorage {
   }
 };
 
-}  // namespace nt
+}  // namespace wpi::nt

@@ -2,7 +2,7 @@ defaults:
   subpackage: path
 
 classes:
-  frc::TravelingSalesman:
+  wpi::math::TravelingSalesman:
     methods:
       TravelingSalesman:
         overloads:
@@ -10,6 +10,6 @@ classes:
           std::function<double (Pose2d, Pose2d)>:
       Solve:
         overloads:
-          const wpi::array<Pose2d, Poses>&, int:
+          const wpi::util::array<Pose2d, Poses>&, int:
             ignore: true
           std::span<const Pose2d>, int:

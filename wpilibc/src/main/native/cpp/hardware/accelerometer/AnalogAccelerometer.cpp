@@ -10,15 +10,15 @@
 #include "wpi/util/sendable/SendableBuilder.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 AnalogAccelerometer::AnalogAccelerometer(int channel)
     : AnalogAccelerometer(std::make_shared<AnalogInput>(channel)) {
-  wpi::SendableRegistry::AddChild(this, m_analogInput.get());
+  wpi::util::SendableRegistry::AddChild(this, m_analogInput.get());
 }
 
 AnalogAccelerometer::AnalogAccelerometer(AnalogInput* channel)
-    : m_analogInput(channel, wpi::NullDeleter<AnalogInput>()) {
+    : m_analogInput(channel, wpi::util::NullDeleter<AnalogInput>()) {
   if (!channel) {
     throw FRC_MakeError(err::NullParameter, "channel");
   }
@@ -45,7 +45,7 @@ void AnalogAccelerometer::SetZero(double zero) {
   m_zeroGVoltage = zero;
 }
 
-void AnalogAccelerometer::InitSendable(wpi::SendableBuilder& builder) {
+void AnalogAccelerometer::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Accelerometer");
   builder.AddDoubleProperty(
       "Value", [=, this] { return GetAcceleration(); }, nullptr);
@@ -54,6 +54,6 @@ void AnalogAccelerometer::InitSendable(wpi::SendableBuilder& builder) {
 void AnalogAccelerometer::InitAccelerometer() {
   HAL_ReportUsage("IO", m_analogInput->GetChannel(), "Accelerometer");
 
-  wpi::SendableRegistry::Add(this, "Accelerometer",
+  wpi::util::SendableRegistry::Add(this, "Accelerometer",
                              m_analogInput->GetChannel());
 }

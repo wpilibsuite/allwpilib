@@ -399,15 +399,15 @@
 @since version 3.9.0
 */
 #define WPI_DEFINE_TYPE_INTRUSIVE(Type, ...)  \
-    friend void to_json(wpi::json& nlohmann_json_j, const Type& nlohmann_json_t) { WPI_JSON_EXPAND(WPI_JSON_PASTE(WPI_JSON_TO, __VA_ARGS__)) } \
-    friend void from_json(const wpi::json& nlohmann_json_j, Type& nlohmann_json_t) { WPI_JSON_EXPAND(WPI_JSON_PASTE(WPI_JSON_FROM, __VA_ARGS__)) }
+    friend void to_json(wpi::util::json& nlohmann_json_j, const Type& nlohmann_json_t) { WPI_JSON_EXPAND(WPI_JSON_PASTE(WPI_JSON_TO, __VA_ARGS__)) } \
+    friend void from_json(const wpi::util::json& nlohmann_json_j, Type& nlohmann_json_t) { WPI_JSON_EXPAND(WPI_JSON_PASTE(WPI_JSON_FROM, __VA_ARGS__)) }
 
 #define WPI_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(Type, ...)  \
-    friend void to_json(wpi::json& nlohmann_json_j, const Type& nlohmann_json_t) { WPI_JSON_EXPAND(WPI_JSON_PASTE(WPI_JSON_TO, __VA_ARGS__)) } \
-    friend void from_json(const wpi::json& nlohmann_json_j, Type& nlohmann_json_t) { const Type nlohmann_json_default_obj{}; WPI_JSON_EXPAND(WPI_JSON_PASTE(WPI_JSON_FROM_WITH_DEFAULT, __VA_ARGS__)) }
+    friend void to_json(wpi::util::json& nlohmann_json_j, const Type& nlohmann_json_t) { WPI_JSON_EXPAND(WPI_JSON_PASTE(WPI_JSON_TO, __VA_ARGS__)) } \
+    friend void from_json(const wpi::util::json& nlohmann_json_j, Type& nlohmann_json_t) { const Type nlohmann_json_default_obj{}; WPI_JSON_EXPAND(WPI_JSON_PASTE(WPI_JSON_FROM_WITH_DEFAULT, __VA_ARGS__)) }
 
 #define WPI_DEFINE_TYPE_INTRUSIVE_ONLY_SERIALIZE(Type, ...)  \
-    friend void to_json(wpi::json& nlohmann_json_j, const Type& nlohmann_json_t) { WPI_JSON_EXPAND(WPI_JSON_PASTE(WPI_JSON_TO, __VA_ARGS__)) }
+    friend void to_json(wpi::util::json& nlohmann_json_j, const Type& nlohmann_json_t) { WPI_JSON_EXPAND(WPI_JSON_PASTE(WPI_JSON_TO, __VA_ARGS__)) }
 
 /*!
 @brief macro
@@ -415,15 +415,15 @@
 @since version 3.9.0
 */
 #define WPI_DEFINE_TYPE_NON_INTRUSIVE(Type, ...)  \
-    inline void to_json(wpi::json& nlohmann_json_j, const Type& nlohmann_json_t) { WPI_JSON_EXPAND(WPI_JSON_PASTE(WPI_JSON_TO, __VA_ARGS__)) } \
-    inline void from_json(const wpi::json& nlohmann_json_j, Type& nlohmann_json_t) { WPI_JSON_EXPAND(WPI_JSON_PASTE(WPI_JSON_FROM, __VA_ARGS__)) }
+    inline void to_json(wpi::util::json& nlohmann_json_j, const Type& nlohmann_json_t) { WPI_JSON_EXPAND(WPI_JSON_PASTE(WPI_JSON_TO, __VA_ARGS__)) } \
+    inline void from_json(const wpi::util::json& nlohmann_json_j, Type& nlohmann_json_t) { WPI_JSON_EXPAND(WPI_JSON_PASTE(WPI_JSON_FROM, __VA_ARGS__)) }
 
 #define WPI_DEFINE_TYPE_NON_INTRUSIVE_ONLY_SERIALIZE(Type, ...)  \
-    inline void to_json(wpi::json& nlohmann_json_j, const Type& nlohmann_json_t) { WPI_JSON_EXPAND(WPI_JSON_PASTE(WPI_JSON_TO, __VA_ARGS__)) }
+    inline void to_json(wpi::util::json& nlohmann_json_j, const Type& nlohmann_json_t) { WPI_JSON_EXPAND(WPI_JSON_PASTE(WPI_JSON_TO, __VA_ARGS__)) }
 
 #define WPI_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(Type, ...)  \
-    inline void to_json(wpi::json& nlohmann_json_j, const Type& nlohmann_json_t) { WPI_JSON_EXPAND(WPI_JSON_PASTE(WPI_JSON_TO, __VA_ARGS__)) } \
-    inline void from_json(const wpi::json& nlohmann_json_j, Type& nlohmann_json_t) { const Type nlohmann_json_default_obj{}; WPI_JSON_EXPAND(WPI_JSON_PASTE(WPI_JSON_FROM_WITH_DEFAULT, __VA_ARGS__)) }
+    inline void to_json(wpi::util::json& nlohmann_json_j, const Type& nlohmann_json_t) { WPI_JSON_EXPAND(WPI_JSON_PASTE(WPI_JSON_TO, __VA_ARGS__)) } \
+    inline void from_json(const wpi::util::json& nlohmann_json_j, Type& nlohmann_json_t) { const Type nlohmann_json_default_obj{}; WPI_JSON_EXPAND(WPI_JSON_PASTE(WPI_JSON_FROM_WITH_DEFAULT, __VA_ARGS__)) }
 
 // inspired from https://stackoverflow.com/a/26745591
 // allows to call any std function as if (e.g. with begin):
@@ -453,7 +453,7 @@
     template<typename... T>                                                       \
     struct would_call_std_##std_name                                              \
     {                                                                             \
-        static constexpr auto const value = ::wpi::detail::                  \
+        static constexpr auto const value = ::wpi::util::detail::                  \
                                             is_detected_exact<std_name##_tag, result_of_##std_name, T...>::value; \
     };                                                                            \
     } /* namespace detail2 */ \

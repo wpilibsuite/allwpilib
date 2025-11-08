@@ -12,7 +12,7 @@
 #include "wpi/nt/ntcore_cpp_types.hpp"
 #include "wpi/util/circular_buffer.hpp"
 
-namespace nt {
+namespace wpi::nt {
 
 class ValueCircularBuffer {
  public:
@@ -28,7 +28,7 @@ class ValueCircularBuffer {
   std::vector<Timestamped<typename TypeInfo<T>::Value>> Read();
 
  private:
-  wpi::circular_buffer<Value> m_storage;
+  wpi::util::circular_buffer<Value> m_storage;
 };
 
 template <ValidType T>
@@ -45,4 +45,4 @@ ValueCircularBuffer::Read() {
   return rv;
 }
 
-}  // namespace nt
+}  // namespace wpi::nt

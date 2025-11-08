@@ -20,16 +20,16 @@ ElevatorSim::ElevatorSim(double Ks, double Kv, double Ka, double Kg,
   Reset(initialPosition, initialVelocity);
 }
 
-void ElevatorSim::Update(units::volt_t voltage, units::second_t dt) {
+void ElevatorSim::Update(wpi::units::volt_t voltage, wpi::units::second_t dt) {
   Eigen::Vector<double, 1> u{voltage.value()};
 
   // Given dx/dt = Ax + Bu + c sgn(x) + d,
   // x_k+1 = e^(AT) x_k + A^-1 (e^(AT) - 1) (Bu + c sgn(x) + d)
   Eigen::Matrix<double, 2, 2> Ad;
   Eigen::Matrix<double, 2, 1> Bd;
-  frc::DiscretizeAB<2, 1>(m_A, m_B, dt, &Ad, &Bd);
+  wpi::math::DiscretizeAB<2, 1>(m_A, m_B, dt, &Ad, &Bd);
   m_x = Ad * m_x + Bd * u +
-        Bd * m_B.householderQr().solve(m_c * wpi::sgn(GetVelocity()) + m_d);
+        Bd * m_B.householderQr().solve(m_c * wpi::util::sgn(GetVelocity()) + m_d);
 }
 
 double ElevatorSim::GetPosition() const {
@@ -40,9 +40,9 @@ double ElevatorSim::GetVelocity() const {
   return m_x(1);
 }
 
-double ElevatorSim::GetAcceleration(units::volt_t voltage) const {
+double ElevatorSim::GetAcceleration(wpi::units::volt_t voltage) const {
   Eigen::Vector<double, 1> u{voltage.value()};
-  return (m_A * m_x + m_B * u + m_c * wpi::sgn(GetVelocity()) + m_d)(1);
+  return (m_A * m_x + m_B * u + m_c * wpi::util::sgn(GetVelocity()) + m_d)(1);
 }
 
 void ElevatorSim::Reset(double position, double velocity) {

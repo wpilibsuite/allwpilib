@@ -96,11 +96,11 @@ inline cameracalibration::CameraModel load_camera_model(std::string path) {
 
   std::ifstream file(path);
 
-  wpi::json json_data;
+  wpi::util::json json_data;
 
   try {
-    json_data = wpi::json::parse(file);
-  } catch (const wpi::json::parse_error& e) {
+    json_data = wpi::util::json::parse(file);
+  } catch (const wpi::util::json::parse_error& e) {
     std::cout << e.what() << std::endl;
   }
 
@@ -150,7 +150,7 @@ inline cameracalibration::CameraModel load_camera_model(std::string path) {
   return camera_model;
 }
 
-inline cameracalibration::CameraModel load_camera_model(wpi::json json_data) {
+inline cameracalibration::CameraModel load_camera_model(wpi::util::json json_data) {
   // Camera matrix
   Eigen::Matrix<double, 3, 3> camera_matrix;
 
@@ -176,10 +176,10 @@ inline cameracalibration::CameraModel load_camera_model(wpi::json json_data) {
   return camera_model;
 }
 
-inline std::map<int, wpi::json> load_ideal_map(std::string path) {
+inline std::map<int, wpi::util::json> load_ideal_map(std::string path) {
   std::ifstream file(path);
-  wpi::json json_data = wpi::json::parse(file);
-  std::map<int, wpi::json> ideal_map;
+  wpi::util::json json_data = wpi::util::json::parse(file);
+  std::map<int, wpi::util::json> ideal_map;
 
   for (const auto& element : json_data["tags"]) {
     ideal_map[element["ID"]] = element;
@@ -189,7 +189,7 @@ inline std::map<int, wpi::json> load_ideal_map(std::string path) {
 }
 
 Eigen::Matrix<double, 4, 4> get_tag_transform(
-    std::map<int, wpi::json>& ideal_map, int tag_id) {
+    std::map<int, wpi::util::json>& ideal_map, int tag_id) {
   Eigen::Matrix<double, 4, 4> transform =
       Eigen::Matrix<double, 4, 4>::Identity();
 
@@ -432,7 +432,7 @@ inline bool process_video_file(
 }
 
 int fieldcalibration::calibrate(std::string input_dir_path,
-                                wpi::json& output_json,
+                                wpi::util::json& output_json,
                                 std::string camera_model_path,
                                 std::string ideal_map_path, int pinned_tag_id,
                                 bool show_debug_window) {
@@ -452,13 +452,13 @@ int fieldcalibration::calibrate(std::string input_dir_path,
     return 1;
   }
 
-  wpi::json json = wpi::json::parse(std::ifstream(ideal_map_path));
+  wpi::util::json json = wpi::util::json::parse(std::ifstream(ideal_map_path));
   if (!json.contains("tags")) {
     return 1;
   }
 
   // Load ideal field map
-  std::map<int, wpi::json> ideal_map;
+  std::map<int, wpi::util::json> ideal_map;
   try {
     ideal_map = load_ideal_map(ideal_map_path);
   } catch (...) {
@@ -552,7 +552,7 @@ int fieldcalibration::calibrate(std::string input_dir_path,
   std::cout << summary.BriefReport() << std::endl;
 
   // Output
-  std::map<int, wpi::json> observed_map = ideal_map;
+  std::map<int, wpi::util::json> observed_map = ideal_map;
 
   Eigen::Matrix<double, 4, 4> correction_a;
   correction_a << 0, 0, -1, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 1;
@@ -594,7 +594,7 @@ int fieldcalibration::calibrate(std::string input_dir_path,
         corrected_transform_q.w();
   }
 
-  wpi::json observed_map_json;
+  wpi::util::json observed_map_json;
 
   for (const auto& [tag_id, tag_json] : observed_map) {
     observed_map_json["tags"].push_back(tag_json);

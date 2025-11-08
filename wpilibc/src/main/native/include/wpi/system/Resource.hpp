@@ -12,7 +12,7 @@
 
 #include "wpi/util/mutex.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * The Resource class is a convenient way to track allocated resources.
@@ -80,9 +80,9 @@ class [[deprecated("Use the HandleResource classes instead")]] Resource {
 
  private:
   std::vector<bool> m_isAllocated;
-  wpi::mutex m_allocateMutex;
+  wpi::util::mutex m_allocateMutex;
 
-  static wpi::mutex m_createMutex;
+  static wpi::util::mutex m_createMutex;
 };
 
-}  // namespace frc
+}  // namespace wpi

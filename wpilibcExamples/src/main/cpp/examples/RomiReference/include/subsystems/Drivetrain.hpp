@@ -13,10 +13,10 @@
 #include <wpi/units/angle.hpp>
 #include <wpi/units/length.hpp>
 
-class Drivetrain : public frc2::SubsystemBase {
+class Drivetrain : public wpi::cmd::SubsystemBase {
  public:
   static constexpr double kCountsPerRevolution = 1440.0;
-  static constexpr units::meter_t kWheelDiameter = 70_mm;
+  static constexpr wpi::units::meter_t kWheelDiameter = 70_mm;
 
   Drivetrain();
 
@@ -57,42 +57,42 @@ class Drivetrain : public frc2::SubsystemBase {
    *
    * @return the left-side distance driven
    */
-  units::meter_t GetLeftDistance();
+  wpi::units::meter_t GetLeftDistance();
 
   /**
    * Gets the right distance driven.
    *
    * @return the right-side distance driven
    */
-  units::meter_t GetRightDistance();
+  wpi::units::meter_t GetRightDistance();
 
   /**
    * Returns the average distance traveled by the left and right encoders.
    *
    * @return The average distance traveled by the left and right encoders.
    */
-  units::meter_t GetAverageDistance();
+  wpi::units::meter_t GetAverageDistance();
 
   /**
    * Current angle of the Romi around the X-axis.
    *
    * @return The current angle of the Romi.
    */
-  units::radian_t GetGyroAngleX();
+  wpi::units::radian_t GetGyroAngleX();
 
   /**
    * Current angle of the Romi around the Y-axis.
    *
    * @return The current angle of the Romi.
    */
-  units::radian_t GetGyroAngleY();
+  wpi::units::radian_t GetGyroAngleY();
 
   /**
    * Current angle of the Romi around the Z-axis.
    *
    * @return The current angle of the Romi.
    */
-  units::radian_t GetGyroAngleZ();
+  wpi::units::radian_t GetGyroAngleZ();
 
   /**
    * Reset the gyro.
@@ -100,15 +100,15 @@ class Drivetrain : public frc2::SubsystemBase {
   void ResetGyro();
 
  private:
-  frc::Spark m_leftMotor{0};
-  frc::Spark m_rightMotor{1};
+  wpi::Spark m_leftMotor{0};
+  wpi::Spark m_rightMotor{1};
 
-  frc::Encoder m_leftEncoder{4, 5};
-  frc::Encoder m_rightEncoder{6, 7};
+  wpi::Encoder m_leftEncoder{4, 5};
+  wpi::Encoder m_rightEncoder{6, 7};
 
-  frc::DifferentialDrive m_drive{
+  wpi::DifferentialDrive m_drive{
       [&](double output) { m_leftMotor.Set(output); },
       [&](double output) { m_rightMotor.Set(output); }};
 
-  frc::RomiGyro m_gyro;
+  wpi::romi::RomiGyro m_gyro;
 };

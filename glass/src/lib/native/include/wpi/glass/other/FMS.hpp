@@ -8,12 +8,12 @@
 
 #include "wpi/glass/Model.hpp"
 
-namespace wpi {
+namespace wpi::util {
 template <typename T>
 class SmallVectorImpl;
 }  // namespace wpi
 
-namespace glass {
+namespace wpi::glass {
 
 class BooleanSource;
 class DoubleSource;
@@ -53,4 +53,4 @@ class FMSModel : public Model {
 void DisplayFMS(FMSModel* model, bool editableDsAttached);
 void DisplayFMSReadOnly(FMSModel* model);
 
-}  // namespace glass
+}  // namespace wpi::glass

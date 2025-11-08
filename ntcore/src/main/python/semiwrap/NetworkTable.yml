@@ -19,7 +19,7 @@ extra_includes:
 - wpystruct.h
 
 classes:
-  nt::NetworkTable:
+  wpi::nt::NetworkTable:
     attributes:
       PATH_SEPARATOR_CHAR:
     methods:
@@ -27,7 +27,7 @@ classes:
       NormalizeKey:
         overloads:
           std::string_view, bool:
-          std::string_view, wpi::SmallVectorImpl<char>&, bool:
+          std::string_view, wpi::util::SmallVectorImpl<char>&, bool:
             ignore: true
       GetHierarchy:
       NetworkTable:
@@ -81,7 +81,7 @@ classes:
       GetNumber:
         cpp_code: |
           [](NetworkTable * table, std::string_view key, py::object defaultValue) -> py::object {
-            nt::NetworkTableEntry entry;
+            wpi::nt::NetworkTableEntry entry;
             {
               py::gil_scoped_release release;
               entry = table->GetEntry(key);
@@ -93,7 +93,7 @@ classes:
       GetString:
         cpp_code: |
           [](NetworkTable * table, std::string_view key, py::object defaultValue) -> py::object {
-            nt::NetworkTableEntry entry;
+            wpi::nt::NetworkTableEntry entry;
             {
               py::gil_scoped_release release;
               entry = table->GetEntry(key);
@@ -105,7 +105,7 @@ classes:
       GetBoolean:
         cpp_code: |
           [](NetworkTable * table, std::string_view key, py::object defaultValue) -> py::object {
-            nt::NetworkTableEntry entry;
+            wpi::nt::NetworkTableEntry entry;
             {
               py::gil_scoped_release release;
               entry = table->GetEntry(key);
@@ -117,7 +117,7 @@ classes:
       GetBooleanArray:
         cpp_code: |
           [](NetworkTable * table, std::string_view key, py::object defaultValue) -> py::object {
-            nt::NetworkTableEntry entry;
+            wpi::nt::NetworkTableEntry entry;
             {
               py::gil_scoped_release release;
               entry = table->GetEntry(key);
@@ -129,7 +129,7 @@ classes:
       GetNumberArray:
         cpp_code: |
           [](NetworkTable * table, std::string_view key, py::object defaultValue) -> py::object {
-            nt::NetworkTableEntry entry;
+            wpi::nt::NetworkTableEntry entry;
             {
               py::gil_scoped_release release;
               entry = table->GetEntry(key);
@@ -141,7 +141,7 @@ classes:
       GetStringArray:
         cpp_code: |
           [](NetworkTable * table, std::string_view key, py::object defaultValue) -> py::object {
-            nt::NetworkTableEntry entry;
+            wpi::nt::NetworkTableEntry entry;
             {
               py::gil_scoped_release release;
               entry = table->GetEntry(key);
@@ -153,7 +153,7 @@ classes:
       GetRaw:
         cpp_code: |
           [](NetworkTable * table, std::string_view key, py::object defaultValue) -> py::object {
-            nt::NetworkTableEntry entry;
+            wpi::nt::NetworkTableEntry entry;
             {
               py::gil_scoped_release release;
               entry = table->GetEntry(key);

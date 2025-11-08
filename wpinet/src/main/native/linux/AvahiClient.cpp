@@ -10,7 +10,7 @@
 
 #include "dlfcn.h"
 
-using namespace wpi;
+using namespace wpi::net;
 
 #define AvahiFunctionLoad(snake_name)                                          \
   do {                                                                         \
@@ -73,7 +73,7 @@ AvahiFunctionTable& AvahiFunctionTable::Get() {
   return table;
 }
 
-static wpi::mutex ThreadLoopLock;
+static wpi::util::mutex ThreadLoopLock;
 static std::weak_ptr<AvahiThread> ThreadLoop;
 
 std::shared_ptr<AvahiThread> AvahiThread::Get() {

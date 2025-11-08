@@ -19,7 +19,7 @@
 #include "wpi/util/raw_istream.hpp"
 #include "wpi/util/raw_ostream.hpp"
 
-namespace cs {
+namespace wpi::cs {
 
 static std::string GetUsbNameFromFile(int vendor, int product) {
   int fd = open("/var/lib/usbutils/usb.ids", O_RDONLY);
@@ -27,15 +27,15 @@ static std::string GetUsbNameFromFile(int vendor, int product) {
     return {};
   }
 
-  wpi::SmallString<128> buf;
-  wpi::raw_fd_istream is{fd, true};
+  wpi::util::SmallString<128> buf;
+  wpi::util::raw_fd_istream is{fd, true};
 
   // build vendor and product 4-char hex strings
   auto vendorStr = fmt::format("{:04x}", vendor);
   auto productStr = fmt::format("{:04x}", product);
 
   // scan file
-  wpi::SmallString<128> lineBuf;
+  wpi::util::SmallString<128> lineBuf;
   bool foundVendor = false;
   for (;;) {
     auto line = is.getline(lineBuf, 4096);
@@ -48,9 +48,9 @@ static std::string GetUsbNameFromFile(int vendor, int product) {
     }
 
     // look for vendor at start of line
-    if (wpi::starts_with(line, vendorStr)) {
+    if (wpi::util::starts_with(line, vendorStr)) {
       foundVendor = true;
-      buf += wpi::trim(wpi::substr(line, 5));
+      buf += wpi::util::trim(wpi::util::substr(line, 5));
       buf += ' ';
       continue;
     }
@@ -63,8 +63,8 @@ static std::string GetUsbNameFromFile(int vendor, int product) {
       }
 
       // look for product
-      if (wpi::starts_with(wpi::substr(line, 1), productStr)) {
-        buf += wpi::trim(wpi::substr(line, 6));
+      if (wpi::util::starts_with(wpi::util::substr(line, 1), productStr)) {
+        buf += wpi::util::trim(wpi::util::substr(line, 6));
         return std::string{buf};
       }
     }
@@ -161,4 +161,4 @@ int CheckedIoctl(int fd, unsigned long req, void* data,  // NOLINT(runtime/int)
   return retval;
 }
 
-}  // namespace cs
+}  // namespace wpi::cs

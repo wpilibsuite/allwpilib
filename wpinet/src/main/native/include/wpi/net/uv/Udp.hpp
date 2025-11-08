@@ -17,7 +17,7 @@
 #include "wpi/net/uv/Request.hpp"
 #include "wpi/util/Signal.h"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 class Loop;
 class Udp;
@@ -35,7 +35,7 @@ class UdpSendReq : public RequestImpl<UdpSendReq, uv_udp_send_t> {
    * Send completed signal.  This is called even if an error occurred.
    * @param err error value
    */
-  sig::Signal<Error> complete;
+  wpi::util::sig::Signal<Error> complete;
 };
 
 /**
@@ -390,9 +390,9 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
    * Signal generated for each incoming datagram.  Parameters are the buffer,
    * the number of bytes received, the address of the sender, and flags.
    */
-  sig::Signal<Buffer&, size_t, const sockaddr&, unsigned> received;
+  wpi::util::sig::Signal<Buffer&, size_t, const sockaddr&, unsigned> received;
 };
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_UDP_HPP_

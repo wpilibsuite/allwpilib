@@ -2,7 +2,7 @@ defaults:
   subpackage: estimator
 
 classes:
-  frc::DifferentialDrivePoseEstimator:
+  wpi::math::DifferentialDrivePoseEstimator:
     force_no_trampoline: true
     doc: |
       This class wraps an Unscented Kalman Filter to fuse latency-compensated
@@ -40,8 +40,8 @@ classes:
     methods:
       DifferentialDrivePoseEstimator:
         overloads:
-          DifferentialDriveKinematics&, const Rotation2d&, units::meter_t, units::meter_t, const Pose2d&:
-          ? DifferentialDriveKinematics&, const Rotation2d&, units::meter_t, units::meter_t, const Pose2d&, const wpi::array<double, 3>&, const wpi::array<double, 3>&
+          DifferentialDriveKinematics&, const Rotation2d&, wpi::units::meter_t, wpi::units::meter_t, const Pose2d&:
+          ? DifferentialDriveKinematics&, const Rotation2d&, wpi::units::meter_t, wpi::units::meter_t, const Pose2d&, const wpi::util::array<double, 3>&, const wpi::util::array<double, 3>&
           :
       ResetPosition:
       Update:

@@ -41,7 +41,7 @@ using MockSetPeriodicFunc = ::testing::MockFunction<void(uint32_t repeatMs)>;
 using MockConnected3Func =
     ::testing::MockFunction<void(std::string_view name, uint16_t proto)>;
 
-namespace nt {
+namespace wpi::nt {
 
 class ServerImplTest : public ::testing::Test {
  public:
@@ -85,7 +85,7 @@ TEST_F(ServerImplTest, AddClient3) {}
 template <typename T>
 static std::string EncodeText1(const T& msg) {
   std::string data;
-  wpi::raw_string_ostream os{data};
+  wpi::util::raw_string_ostream os{data};
   net::WireEncodeText(os, msg);
   return data;
 }
@@ -93,7 +93,7 @@ static std::string EncodeText1(const T& msg) {
 template <typename T>
 static std::string EncodeText(const T& msgs) {
   std::string data;
-  wpi::raw_string_ostream os{data};
+  wpi::util::raw_string_ostream os{data};
   bool first = true;
   for (auto&& msg : msgs) {
     if (first) {
@@ -111,7 +111,7 @@ static std::string EncodeText(const T& msgs) {
 template <typename T>
 static std::vector<uint8_t> EncodeServerBinary1(const T& msg) {
   std::vector<uint8_t> data;
-  wpi::raw_uvector_ostream os{data};
+  wpi::util::raw_uvector_ostream os{data};
   if constexpr (std::same_as<T, net::ServerMessage>) {
     if (auto m = std::get_if<net::ServerValueMsg>(&msg.contents)) {
       net::WireEncodeBinary(os, m->topic, m->value.time(), m->value);
@@ -128,7 +128,7 @@ static std::vector<uint8_t> EncodeServerBinary1(const T& msg) {
 template <typename T>
 static std::vector<uint8_t> EncodeServerBinary(const T& msgs) {
   std::vector<uint8_t> data;
-  wpi::raw_uvector_ostream os{data};
+  wpi::util::raw_uvector_ostream os{data};
   for (auto&& msg : msgs) {
     if constexpr (std::same_as<typename T::value_type, net::ServerMessage>) {
       if (auto m = std::get_if<net::ServerValueMsg>(&msg.contents)) {
@@ -155,20 +155,20 @@ TEST_F(ServerImplTest, PublishLocal) {
     EXPECT_CALL(
         local,
         ServerAnnounce(std::string_view{"test"}, 0, std::string_view{"double"},
-                       wpi::json::object(), std::optional<int>{pubuid}));
+                       wpi::util::json::object(), std::optional<int>{pubuid}));
     EXPECT_CALL(
         local,
         ServerAnnounce(std::string_view{"test2"}, 0, std::string_view{"double"},
-                       wpi::json::object(), std::optional<int>{pubuid2}));
+                       wpi::util::json::object(), std::optional<int>{pubuid2}));
     EXPECT_CALL(
         local,
         ServerAnnounce(std::string_view{"test3"}, 0, std::string_view{"double"},
-                       wpi::json::object(), std::optional<int>{pubuid3}));
+                       wpi::util::json::object(), std::optional<int>{pubuid3}));
   }
 
   {
     queue.msgs.emplace_back(net::ClientMessage{
-        net::PublishMsg{pubuid, "test", "double", wpi::json::object(), {}}});
+        net::PublishMsg{pubuid, "test", "double", wpi::util::json::object(), {}}});
     EXPECT_FALSE(server.ProcessLocalMessages(UINT_MAX));
   }
 
@@ -187,17 +187,17 @@ TEST_F(ServerImplTest, PublishLocal) {
     EXPECT_CALL(wire, Ready()).WillOnce(Return(true));  // SendControl()
     EXPECT_CALL(
         wire, DoWriteText(StrEq(EncodeText1(net::ServerMessage{net::AnnounceMsg{
-                  "test", 3, "double", std::nullopt, wpi::json::object()}}))))
+                  "test", 3, "double", std::nullopt, wpi::util::json::object()}}))))
         .WillOnce(Return(0));
     EXPECT_CALL(
         wire, DoWriteText(StrEq(EncodeText1(net::ServerMessage{net::AnnounceMsg{
-                  "test2", 8, "double", std::nullopt, wpi::json::object()}}))))
+                  "test2", 8, "double", std::nullopt, wpi::util::json::object()}}))))
         .WillOnce(Return(0));
     EXPECT_CALL(wire, Flush()).WillOnce(Return(0));     // SendControl()
     EXPECT_CALL(wire, Ready()).WillOnce(Return(true));  // SendControl()
     EXPECT_CALL(
         wire, DoWriteText(StrEq(EncodeText1(net::ServerMessage{net::AnnounceMsg{
-                  "test3", 11, "double", std::nullopt, wpi::json::object()}}))))
+                  "test3", 11, "double", std::nullopt, wpi::util::json::object()}}))))
         .WillOnce(Return(0));
     EXPECT_CALL(wire, Flush()).WillOnce(Return(0));  // SendControl()
   }
@@ -215,7 +215,7 @@ TEST_F(ServerImplTest, PublishLocal) {
   // publish before send control
   {
     queue.msgs.emplace_back(net::ClientMessage{
-        net::PublishMsg{pubuid2, "test2", "double", wpi::json::object(), {}}});
+        net::PublishMsg{pubuid2, "test2", "double", wpi::util::json::object(), {}}});
     EXPECT_FALSE(server.ProcessLocalMessages(UINT_MAX));
   }
 
@@ -224,7 +224,7 @@ TEST_F(ServerImplTest, PublishLocal) {
   // publish after send control
   {
     queue.msgs.emplace_back(net::ClientMessage{
-        net::PublishMsg{pubuid3, "test3", "double", wpi::json::object(), {}}});
+        net::PublishMsg{pubuid3, "test3", "double", wpi::util::json::object(), {}}});
     EXPECT_FALSE(server.ProcessLocalMessages(UINT_MAX));
   }
 
@@ -238,11 +238,11 @@ TEST_F(ServerImplTest, ClientSubTopicOnlyThenValue) {
   EXPECT_CALL(
       local,
       ServerAnnounce(std::string_view{"test"}, 0, std::string_view{"double"},
-                     wpi::json::object(), std::optional<int>{pubuid}));
+                     wpi::util::json::object(), std::optional<int>{pubuid}));
 
   {
     queue.msgs.emplace_back(net::ClientMessage{
-        net::PublishMsg{pubuid, "test", "double", wpi::json::object(), {}}});
+        net::PublishMsg{pubuid, "test", "double", wpi::util::json::object(), {}}});
     queue.msgs.emplace_back(net::ClientMessage{
         net::ClientValueMsg{pubuid, Value::MakeDouble(1.0, 10)}});
     EXPECT_FALSE(server.ProcessLocalMessages(UINT_MAX));
@@ -261,14 +261,14 @@ TEST_F(ServerImplTest, ClientSubTopicOnlyThenValue) {
     EXPECT_CALL(wire, Ready()).WillOnce(Return(true));  // SendValues()
     EXPECT_CALL(
         wire, DoWriteText(StrEq(EncodeText1(net::ServerMessage{net::AnnounceMsg{
-                  "test", 3, "double", std::nullopt, wpi::json::object()}}))))
+                  "test", 3, "double", std::nullopt, wpi::util::json::object()}}))))
         .WillOnce(Return(0));
     EXPECT_CALL(wire, Flush()).WillOnce(Return(0));  // SendValues()
     EXPECT_CALL(setPeriodic, Call(100));             // ClientSubscribe()
     // EXPECT_CALL(wire, Flush()).WillOnce(Return(0));     // ClientSubscribe()
     EXPECT_CALL(wire, Ready()).WillOnce(Return(true));  // SendValues()
     EXPECT_CALL(
-        wire, DoWriteBinary(wpi::SpanEq(EncodeServerBinary1(net::ServerMessage{
+        wire, DoWriteBinary(wpi::util::SpanEq(EncodeServerBinary1(net::ServerMessage{
                   net::ServerValueMsg{3, Value::MakeDouble(1.0, 10)}}))))
         .WillOnce(Return(0));
     EXPECT_CALL(wire, Flush());  // SendValues()
@@ -312,17 +312,17 @@ TEST_F(ServerImplTest, ClientDisconnectUnpublish) {
     EXPECT_CALL(
         local,
         ServerAnnounce(std::string_view{"test2"}, 0, std::string_view{"double"},
-                       wpi::json::object(), std::optional<int>{pubuidLocal}));
+                       wpi::util::json::object(), std::optional<int>{pubuidLocal}));
     EXPECT_CALL(
         local,
         ServerAnnounce(std::string_view{"test"}, 0, std::string_view{"double"},
-                       wpi::json::object(), std::optional<int>{}));
+                       wpi::util::json::object(), std::optional<int>{}));
     EXPECT_CALL(local, ServerUnannounce(std::string_view{"test"}, 0));
   }
 
   {
     queue.msgs.emplace_back(net::ClientMessage{net::PublishMsg{
-        pubuidLocal, "test2", "double", wpi::json::object(), {}}});
+        pubuidLocal, "test2", "double", wpi::util::json::object(), {}}});
     queue.msgs.emplace_back(net::ClientMessage{
         net::ClientValueMsg{pubuidLocal, Value::MakeDouble(1.0, 10)}});
     EXPECT_FALSE(server.ProcessLocalMessages(UINT_MAX));
@@ -344,7 +344,7 @@ TEST_F(ServerImplTest, ClientDisconnectUnpublish) {
     EXPECT_CALL(wire, Ready()).WillOnce(Return(true));  // SendValues()
     EXPECT_CALL(
         wire, DoWriteText(StrEq(EncodeText1(net::ServerMessage{net::AnnounceMsg{
-                  "test", 8, "double", 1, wpi::json::object()}}))))
+                  "test", 8, "double", 1, wpi::util::json::object()}}))))
         .WillOnce(Return(0));
     EXPECT_CALL(wire, Flush());  // SendValues()
   }
@@ -358,7 +358,7 @@ TEST_F(ServerImplTest, ClientDisconnectUnpublish) {
     constexpr int pubuid = 1;
     std::vector<net::ClientMessage> msgs;
     msgs.emplace_back(net::ClientMessage{
-        net::PublishMsg{pubuid, "test", "double", wpi::json::object(), {}}});
+        net::PublishMsg{pubuid, "test", "double", wpi::util::json::object(), {}}});
     server.ProcessIncomingText(id, EncodeText(msgs));
   }
 
@@ -372,7 +372,7 @@ TEST_F(ServerImplTest, ZeroTimestampNegativeTime) {
   // publish before client connect
   server.SetLocal(&local, &queue);
   constexpr int pubuid = 1;
-  NT_Topic topicHandle = nt::Handle{0, 1, nt::Handle::kTopic};
+  NT_Topic topicHandle = wpi::nt::Handle{0, 1, wpi::nt::Handle::kTopic};
   constexpr int subuid = 1;
   Value defaultValue = Value::MakeDouble(1.0, 10);
   defaultValue.SetTime(0);
@@ -383,7 +383,7 @@ TEST_F(ServerImplTest, ZeroTimestampNegativeTime) {
     EXPECT_CALL(
         local,
         ServerAnnounce(std::string_view{"test"}, 0, std::string_view{"double"},
-                       wpi::json::object(), std::optional<int>{pubuid}))
+                       wpi::util::json::object(), std::optional<int>{pubuid}))
         .WillOnce(Return(topicHandle));
     EXPECT_CALL(local, ServerSetValue(topicHandle, defaultValue));
     EXPECT_CALL(local, ServerSetValue(topicHandle, value));
@@ -391,7 +391,7 @@ TEST_F(ServerImplTest, ZeroTimestampNegativeTime) {
 
   {
     queue.msgs.emplace_back(net::ClientMessage{
-        net::PublishMsg{pubuid, "test", "double", wpi::json::object(), {}}});
+        net::PublishMsg{pubuid, "test", "double", wpi::util::json::object(), {}}});
     queue.msgs.emplace_back(
         net::ClientMessage{net::ClientValueMsg{pubuid, defaultValue}});
     queue.msgs.emplace_back(
@@ -415,7 +415,7 @@ TEST_F(ServerImplTest, ZeroTimestampNegativeTime) {
     constexpr int pubuid2 = 2;
     std::vector<net::ClientMessage> msgs;
     msgs.emplace_back(net::ClientMessage{
-        net::PublishMsg{pubuid2, "test", "double", wpi::json::object(), {}}});
+        net::PublishMsg{pubuid2, "test", "double", wpi::util::json::object(), {}}});
     server.ProcessIncomingText(id, EncodeText(msgs));
     msgs.clear();
     msgs.emplace_back(net::ClientMessage{net::ClientValueMsg{pubuid2, value}});
@@ -439,4 +439,4 @@ TEST_F(ServerImplTest, InvalidPubUid) {
       "\"myvalue\",\"pubuid\":2147483647,\"properties\":{}}}]");
 }
 
-}  // namespace nt
+}  // namespace wpi::nt

@@ -2,11 +2,11 @@ extra_includes:
 - pybind11/stl.h
 
 classes:
-  frc::Spline:
+  wpi::math::Spline:
     is_polymorphic: true
     force_type_casters:
-    - units::curvature_t
-    - wpi::array
+    - wpi::units::curvature_t
+    - wpi::util::array
     template_params:
     - int Degree
     methods:
@@ -26,12 +26,12 @@ classes:
       cls_ControlVector
         .def(
           py::init<
-            wpi::array<double, (Degree + 1) / 2>,
-            wpi::array<double, (Degree + 1) / 2>>(),
+            wpi::util::array<double, (Degree + 1) / 2>,
+            wpi::util::array<double, (Degree + 1) / 2>>(),
           py::arg("x"),
           py::arg("y")
         );
-  frc::Spline::ControlVector:
+  wpi::math::Spline::ControlVector:
     force_no_default_constructor: true
     attributes:
       x:
@@ -39,11 +39,11 @@ classes:
 
 templates:
   Spline3:
-    qualname: frc::Spline
+    qualname: wpi::math::Spline
     params:
     - 3
 
   Spline5:
-    qualname: frc::Spline
+    qualname: wpi::math::Spline
     params:
     - 5

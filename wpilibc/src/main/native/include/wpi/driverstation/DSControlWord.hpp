@@ -6,7 +6,7 @@
 
 #include "wpi/hal/DriverStationTypes.h"
 
-namespace frc {
+namespace wpi {
 
 /**
  * A wrapper around Driver Station control word.
@@ -99,4 +99,4 @@ class DSControlWord {
   HAL_ControlWord m_controlWord;
 };
 
-}  // namespace frc
+}  // namespace wpi

@@ -20,7 +20,7 @@
 #include "wpi/units/time.hpp"
 #include "wpi/util/array.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * A Kalman filter combines predictions from a model and measurements to give an
@@ -49,8 +49,8 @@ class KalmanFilter {
   using InputVector = Vectord<Inputs>;
   using OutputVector = Vectord<Outputs>;
 
-  using StateArray = wpi::array<double, States>;
-  using OutputArray = wpi::array<double, Outputs>;
+  using StateArray = wpi::util::array<double, States>;
+  using OutputArray = wpi::util::array<double, Outputs>;
 
   using StateMatrix = Matrixd<States, States>;
 
@@ -69,7 +69,7 @@ class KalmanFilter {
    */
   KalmanFilter(LinearSystem<States, Inputs, Outputs>& plant,
                const StateArray& stateStdDevs,
-               const OutputArray& measurementStdDevs, units::second_t dt) {
+               const OutputArray& measurementStdDevs, wpi::units::second_t dt) {
     m_plant = &plant;
 
     m_contQ = MakeCovMatrix(stateStdDevs);
@@ -181,7 +181,7 @@ class KalmanFilter {
    * @param u  New control input from controller.
    * @param dt Timestep for prediction.
    */
-  void Predict(const InputVector& u, units::second_t dt) {
+  void Predict(const InputVector& u, wpi::units::second_t dt) {
     // Find discrete A and Q
     StateMatrix discA;
     StateMatrix discQ;
@@ -257,7 +257,7 @@ class KalmanFilter {
   StateMatrix m_P;
   StateMatrix m_contQ;
   Matrixd<Outputs, Outputs> m_contR;
-  units::second_t m_dt;
+  wpi::units::second_t m_dt;
 
   StateMatrix m_initP;
 };
@@ -267,4 +267,4 @@ extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
     KalmanFilter<2, 1, 1>;
 
-}  // namespace frc
+}  // namespace wpi::math

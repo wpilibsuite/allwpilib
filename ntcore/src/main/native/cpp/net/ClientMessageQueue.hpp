@@ -13,11 +13,11 @@
 #include "wpi/util/Logger.hpp"
 #include "wpi/util/mutex.hpp"
 
-namespace wpi {
+namespace wpi::util {
 class Logger;
 }  // namespace wpi
 
-namespace nt::net {
+namespace wpi::nt::net {
 
 class ClientMessageQueue {
  public:
@@ -35,7 +35,7 @@ class ClientMessageQueueImpl final : public ClientMessageHandler,
  public:
   static constexpr size_t kBlockSize = 64;
 
-  explicit ClientMessageQueueImpl(wpi::Logger& logger) : m_logger{logger} {}
+  explicit ClientMessageQueueImpl(wpi::util::Logger& logger) : m_logger{logger} {}
 
   bool empty() const { return m_queue.empty(); }
 
@@ -71,7 +71,7 @@ class ClientMessageQueueImpl final : public ClientMessageHandler,
 
   // ClientMessageHandler - calls to these append to the queue
   void ClientPublish(int pubuid, std::string_view name,
-                     std::string_view typeStr, const wpi::json& properties,
+                     std::string_view typeStr, const wpi::util::json& properties,
                      const PubSubOptionsImpl& options) final {
     std::scoped_lock lock{m_mutex};
     m_queue.enqueue(ClientMessage{PublishMsg{
@@ -84,7 +84,7 @@ class ClientMessageQueueImpl final : public ClientMessageHandler,
   }
 
   void ClientSetProperties(std::string_view name,
-                           const wpi::json& update) final {
+                           const wpi::util::json& update) final {
     std::scoped_lock lock{m_mutex};
     m_queue.enqueue(ClientMessage{SetPropertiesMsg{std::string{name}, update}});
   }
@@ -117,8 +117,8 @@ class ClientMessageQueueImpl final : public ClientMessageHandler,
   }
 
  private:
-  wpi::FastQueue<ClientMessage, kBlockSize> m_queue{kBlockSize - 1};
-  wpi::Logger& m_logger;
+  wpi::util::FastQueue<ClientMessage, kBlockSize> m_queue{kBlockSize - 1};
+  wpi::util::Logger& m_logger;
 
   class NoMutex {
    public:
@@ -126,7 +126,7 @@ class ClientMessageQueueImpl final : public ClientMessageHandler,
     void unlock() {}
   };
   [[no_unique_address]]
-  std::conditional_t<IsMutexed, wpi::mutex, NoMutex> m_mutex;
+  std::conditional_t<IsMutexed, wpi::util::mutex, NoMutex> m_mutex;
 
   struct ValueSize {
     size_t size{0};
@@ -143,4 +143,4 @@ using LocalClientMessageQueue =
     detail::ClientMessageQueueImpl<2 * 1024 * 1024, true>;
 using NetworkIncomingClientQueue = detail::ClientMessageQueueImpl<0, false>;
 
-}  // namespace nt::net
+}  // namespace wpi::nt::net

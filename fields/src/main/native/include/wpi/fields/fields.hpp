@@ -7,7 +7,7 @@
 #include <span>
 #include <string_view>
 
-namespace fields {
+namespace wpi::fields {
 
 struct Field {
   const char* name;
@@ -17,4 +17,4 @@ struct Field {
 
 std::span<const Field> GetFields();
 
-}  // namespace fields
+}  // namespace wpi::fields

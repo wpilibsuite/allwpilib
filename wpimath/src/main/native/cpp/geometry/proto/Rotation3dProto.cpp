@@ -7,9 +7,9 @@
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 #include "wpimath/protobuf/geometry3d.npb.h"
 
-std::optional<frc::Rotation3d> wpi::Protobuf<frc::Rotation3d>::Unpack(
+std::optional<wpi::math::Rotation3d> wpi::util::Protobuf<wpi::math::Rotation3d>::Unpack(
     InputStream& stream) {
-  wpi::UnpackCallback<frc::Quaternion> quat;
+  wpi::util::UnpackCallback<wpi::math::Quaternion> quat;
   wpi_proto_ProtobufRotation3d msg{
       .q = quat.Callback(),
   };
@@ -23,14 +23,14 @@ std::optional<frc::Rotation3d> wpi::Protobuf<frc::Rotation3d>::Unpack(
     return {};
   }
 
-  return frc::Rotation3d{
+  return wpi::math::Rotation3d{
       iquat[0],
   };
 }
 
-bool wpi::Protobuf<frc::Rotation3d>::Pack(OutputStream& stream,
-                                          const frc::Rotation3d& value) {
-  wpi::PackCallback quat{&value.GetQuaternion()};
+bool wpi::util::Protobuf<wpi::math::Rotation3d>::Pack(OutputStream& stream,
+                                          const wpi::math::Rotation3d& value) {
+  wpi::util::PackCallback quat{&value.GetQuaternion()};
   wpi_proto_ProtobufRotation3d msg{
       .q = quat.Callback(),
   };

@@ -11,18 +11,18 @@
 #include "wpi/commands2/button/NetworkButton.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 class NetworkButtonTest : public CommandTestBase {
  public:
   NetworkButtonTest() {
-    inst = nt::NetworkTableInstance::Create();
+    inst = wpi::nt::NetworkTableInstance::Create();
     inst.StartLocal();
   }
 
-  ~NetworkButtonTest() override { nt::NetworkTableInstance::Destroy(inst); }
+  ~NetworkButtonTest() override { wpi::nt::NetworkTableInstance::Destroy(inst); }
 
-  nt::NetworkTableInstance inst;
+  wpi::nt::NetworkTableInstance inst;
 };
 
 TEST_F(NetworkButtonTest, SetNetworkButton) {

@@ -4,7 +4,7 @@
 
 #include "CommandTestBase.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 CommandTestBase::CommandTestBase() {
   auto& scheduler = CommandScheduler::GetInstance();
@@ -26,7 +26,7 @@ CommandScheduler CommandTestBase::GetScheduler() {
 }
 
 void CommandTestBase::SetDSEnabled(bool enabled) {
-  frc::sim::DriverStationSim::SetDsAttached(true);
-  frc::sim::DriverStationSim::SetEnabled(enabled);
-  frc::sim::DriverStationSim::NotifyNewData();
+  wpi::sim::DriverStationSim::SetDsAttached(true);
+  wpi::sim::DriverStationSim::SetEnabled(enabled);
+  wpi::sim::DriverStationSim::NotifyNewData();
 }

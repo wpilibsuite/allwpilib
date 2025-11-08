@@ -8,7 +8,7 @@
 #include "wpi/hal/DriverStation.h"
 #include "wpi/util/Synchronization.h"
 
-using namespace frc::internal;
+using namespace wpi::internal;
 
 DriverStationModeThread::DriverStationModeThread() {
   m_keepAlive = true;
@@ -39,13 +39,13 @@ void DriverStationModeThread::InTest(bool entering) {
 }
 
 void DriverStationModeThread::Run() {
-  wpi::Event event{false, false};
+  wpi::util::Event event{false, false};
   HAL_ProvideNewDataEventHandle(event.GetHandle());
 
   while (m_keepAlive.load()) {
     bool timedOut = false;
-    wpi::WaitForObject(event.GetHandle(), 0.1, &timedOut);
-    frc::DriverStation::RefreshData();
+    wpi::util::WaitForObject(event.GetHandle(), 0.1, &timedOut);
+    wpi::DriverStation::RefreshData();
     if (m_userInDisabled) {
       HAL_ObserveUserProgramDisabled();
     }

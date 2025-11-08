@@ -6,7 +6,7 @@
 
 #include "wpi/glass/Model.hpp"
 
-namespace glass {
+namespace wpi::glass {
 class DoubleSource;
 class ProfiledPIDControllerModel : public Model {
  public:
@@ -29,4 +29,4 @@ class ProfiledPIDControllerModel : public Model {
   virtual void SetGoal(double value) = 0;
 };
 void DisplayProfiledPIDController(ProfiledPIDControllerModel* m);
-}  // namespace glass
+}  // namespace wpi::glass

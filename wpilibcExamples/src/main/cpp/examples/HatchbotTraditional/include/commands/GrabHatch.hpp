@@ -16,7 +16,7 @@
  *
  * @see InstantCommand
  */
-class GrabHatch : public frc2::CommandHelper<frc2::Command, GrabHatch> {
+class GrabHatch : public wpi::cmd::CommandHelper<wpi::cmd::Command, GrabHatch> {
  public:
   explicit GrabHatch(HatchSubsystem* subsystem);
 

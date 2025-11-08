@@ -6,11 +6,11 @@
 
 #include "wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 namespace {
 
-using StructType = wpi::Struct<frc::MecanumDriveWheelSpeeds>;
+using StructType = wpi::util::Struct<wpi::math::MecanumDriveWheelSpeeds>;
 const MecanumDriveWheelSpeeds kExpectedData{
     MecanumDriveWheelSpeeds{2.29_mps, 17.4_mps, 4.4_mps, 0.229_mps}};
 }  // namespace

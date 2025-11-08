@@ -9,7 +9,7 @@
 #include "wpi/util/struct/Struct.hpp"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Struct<frc::MecanumDriveWheelPositions> {
+struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::MecanumDriveWheelPositions> {
   static constexpr std::string_view GetTypeName() {
     return "MecanumDriveWheelPositions";
   }
@@ -19,9 +19,9 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::MecanumDriveWheelPositions> {
            "rear_right";
   }
 
-  static frc::MecanumDriveWheelPositions Unpack(std::span<const uint8_t> data);
+  static wpi::math::MecanumDriveWheelPositions Unpack(std::span<const uint8_t> data);
   static void Pack(std::span<uint8_t> data,
-                   const frc::MecanumDriveWheelPositions& value);
+                   const wpi::math::MecanumDriveWheelPositions& value);
 };
 
-static_assert(wpi::StructSerializable<frc::MecanumDriveWheelPositions>);
+static_assert(wpi::util::StructSerializable<wpi::math::MecanumDriveWheelPositions>);

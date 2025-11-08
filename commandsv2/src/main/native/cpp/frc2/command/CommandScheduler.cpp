@@ -24,39 +24,39 @@
 #include "wpi/util/sendable/SendableBuilder.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 class CommandScheduler::Impl {
  public:
   // A set of the currently-running commands.
-  wpi::SmallSet<Command*, 12> scheduledCommands;
+  wpi::util::SmallSet<Command*, 12> scheduledCommands;
 
   // A map from required subsystems to their requiring commands.  Also used as a
   // set of the currently-required subsystems.
-  wpi::DenseMap<Subsystem*, Command*> requirements;
+  wpi::util::DenseMap<Subsystem*, Command*> requirements;
 
   // A map from subsystems registered with the scheduler to their default
   // commands.  Also used as a list of currently-registered subsystems.
-  wpi::DenseMap<Subsystem*, std::unique_ptr<Command>> subsystems;
+  wpi::util::DenseMap<Subsystem*, std::unique_ptr<Command>> subsystems;
 
-  frc::EventLoop defaultButtonLoop;
+  wpi::EventLoop defaultButtonLoop;
   // The set of currently-registered buttons that will be polled every
   // iteration.
-  frc::EventLoop* activeButtonLoop{&defaultButtonLoop};
+  wpi::EventLoop* activeButtonLoop{&defaultButtonLoop};
 
   bool disabled{false};
 
   // Lists of user-supplied actions to be executed on scheduling events for
   // every command.
-  wpi::SmallVector<Action, 4> initActions;
-  wpi::SmallVector<Action, 4> executeActions;
-  wpi::SmallVector<InterruptAction, 4> interruptActions;
-  wpi::SmallVector<Action, 4> finishActions;
+  wpi::util::SmallVector<Action, 4> initActions;
+  wpi::util::SmallVector<Action, 4> executeActions;
+  wpi::util::SmallVector<InterruptAction, 4> interruptActions;
+  wpi::util::SmallVector<Action, 4> finishActions;
 
   // Map of Command* -> CommandPtr for CommandPtrs transferred to the scheduler
   // via Schedule(CommandPtr&&). These are erased (destroyed) at the very end of
   // the loop cycle when the command lifecycle is complete.
-  wpi::DenseMap<Command*, CommandPtr> ownedCommands;
+  wpi::util::DenseMap<Command*, CommandPtr> ownedCommands;
 };
 
 template <typename TMap, typename TKey>
@@ -65,15 +65,15 @@ static bool ContainsKey(const TMap& map, TKey keyToCheck) {
 }
 
 CommandScheduler::CommandScheduler()
-    : m_impl(new Impl), m_watchdog(frc::TimedRobot::kDefaultPeriod, [] {
+    : m_impl(new Impl), m_watchdog(wpi::TimedRobot::kDefaultPeriod, [] {
         std::puts("CommandScheduler loop time overrun.");
       }) {
   HAL_ReportUsage("CommandScheduler", "");
-  wpi::SendableRegistry::Add(this, "Scheduler");
+  wpi::util::SendableRegistry::Add(this, "Scheduler");
 }
 
 CommandScheduler::~CommandScheduler() {
-  wpi::SendableRegistry::Remove(this);
+  wpi::util::SendableRegistry::Remove(this);
   std::unique_ptr<Impl>().swap(m_impl);
 }
 
@@ -82,19 +82,19 @@ CommandScheduler& CommandScheduler::GetInstance() {
   return scheduler;
 }
 
-void CommandScheduler::SetPeriod(units::second_t period) {
+void CommandScheduler::SetPeriod(wpi::units::second_t period) {
   m_watchdog.SetTimeout(period);
 }
 
-frc::EventLoop* CommandScheduler::GetActiveButtonLoop() const {
+wpi::EventLoop* CommandScheduler::GetActiveButtonLoop() const {
   return m_impl->activeButtonLoop;
 }
 
-void CommandScheduler::SetActiveButtonLoop(frc::EventLoop* loop) {
+void CommandScheduler::SetActiveButtonLoop(wpi::EventLoop* loop) {
   m_impl->activeButtonLoop = loop;
 }
 
-frc::EventLoop* CommandScheduler::GetDefaultButtonLoop() const {
+wpi::EventLoop* CommandScheduler::GetDefaultButtonLoop() const {
   return &(m_impl->defaultButtonLoop);
 }
 
@@ -102,13 +102,13 @@ void CommandScheduler::Schedule(Command* command) {
   RequireUngrouped(command);
 
   if (m_impl->disabled || m_impl->scheduledCommands.contains(command) ||
-      (frc::RobotState::IsDisabled() && !command->RunsWhenDisabled())) {
+      (wpi::RobotState::IsDisabled() && !command->RunsWhenDisabled())) {
     return;
   }
 
   const auto& requirements = command->GetRequirements();
 
-  wpi::SmallVector<Command*, 8> intersection;
+  wpi::util::SmallVector<Command*, 8> intersection;
 
   bool isDisjoint = true;
   bool allInterruptible = true;
@@ -171,7 +171,7 @@ void CommandScheduler::Run() {
   // Run the periodic method of all registered subsystems.
   for (auto&& subsystem : m_impl->subsystems) {
     subsystem.getFirst()->Periodic();
-    if constexpr (frc::RobotBase::IsSimulation()) {
+    if constexpr (wpi::RobotBase::IsSimulation()) {
       subsystem.getFirst()->SimulationPeriodic();
     }
     m_watchdog.AddEpoch(subsystem.getFirst()->GetName() + ".Periodic()");
@@ -179,14 +179,14 @@ void CommandScheduler::Run() {
 
   // Cache the active instance to avoid concurrency problems if SetActiveLoop()
   // is called from inside the button bindings.
-  frc::EventLoop* loopCache = m_impl->activeButtonLoop;
+  wpi::EventLoop* loopCache = m_impl->activeButtonLoop;
   // Poll buttons for new commands to add.
   loopCache->Poll();
   m_watchdog.AddEpoch("buttons.Run()");
 
-  bool isDisabled = frc::RobotState::IsDisabled();
+  bool isDisabled = wpi::RobotState::IsDisabled();
   // create a new set to avoid iterator invalidation.
-  for (Command* command : wpi::SmallSet(m_impl->scheduledCommands)) {
+  for (Command* command : wpi::util::SmallSet(m_impl->scheduledCommands)) {
     if (!IsScheduled(command)) {
       continue;  // skip as the normal scheduledCommands was modified
     }
@@ -284,7 +284,7 @@ void CommandScheduler::UnregisterAllSubsystems() {
 void CommandScheduler::SetDefaultCommand(Subsystem* subsystem,
                                          CommandPtr&& defaultCommand) {
   if (!defaultCommand.get()->HasRequirement(subsystem)) {
-    throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
+    throw FRC_MakeError(wpi::err::CommandIllegalUse, "{}",
                         "Default commands must require their subsystem!");
   }
   RequireUngrouped(defaultCommand.get());
@@ -347,7 +347,7 @@ void CommandScheduler::Cancel(std::initializer_list<Command*> commands) {
 }
 
 void CommandScheduler::CancelAll() {
-  wpi::SmallVector<Command*, 16> commands;
+  wpi::util::SmallVector<Command*, 16> commands;
   for (auto&& command : m_impl->scheduledCommands) {
     commands.emplace_back(command);
   }
@@ -430,7 +430,7 @@ void CommandScheduler::OnCommandFinish(Action action) {
 void CommandScheduler::RequireUngrouped(const Command* command) {
   auto stacktrace = command->GetPreviousCompositionSite();
   if (stacktrace.has_value()) {
-    throw FRC_MakeError(frc::err::CommandIllegalUse,
+    throw FRC_MakeError(wpi::err::CommandIllegalUse,
                         "Commands that have been composed may not be added to "
                         "another composition or scheduled individually!"
                         "\nOriginally composed at:\n{}",
@@ -454,7 +454,7 @@ void CommandScheduler::RequireUngrouped(
 
 void CommandScheduler::RequireUngroupedAndUnscheduled(const Command* command) {
   if (IsScheduled(command)) {
-    throw FRC_MakeError(frc::err::CommandIllegalUse,
+    throw FRC_MakeError(wpi::err::CommandIllegalUse,
                         "Commands that have been scheduled individually may "
                         "not be added to another composition!");
   }
@@ -475,7 +475,7 @@ void CommandScheduler::RequireUngroupedAndUnscheduled(
   }
 }
 
-void CommandScheduler::InitSendable(wpi::SendableBuilder& builder) {
+void CommandScheduler::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Scheduler");
   builder.AddStringArrayProperty(
       "Names",

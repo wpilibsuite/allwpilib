@@ -20,10 +20,10 @@
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/StringExtras.hpp"
 
-using namespace wpi;
+using namespace wpi::net;
 
 struct ImplBase {
-  wpi::DynamicDns& dynamicDns = wpi::DynamicDns::GetDynamicDns();
+  wpi::net::DynamicDns& dynamicDns = wpi::net::DynamicDns::GetDynamicDns();
   PDNS_SERVICE_INSTANCE serviceInstance = nullptr;
   HANDLE event = nullptr;
 };
@@ -53,16 +53,16 @@ MulticastServiceAnnouncer::Impl::Impl(std::string_view serviceName,
 
   this->port = port;
 
-  wpi::SmallVector<wchar_t, 128> wideStorage;
-  std::string hostName = wpi::GetHostname() + ".local";
+  wpi::util::SmallVector<wchar_t, 128> wideStorage;
+  std::string hostName = wpi::net::GetHostname() + ".local";
 
   for (auto&& i : txt) {
     wideStorage.clear();
-    wpi::sys::windows::UTF8ToUTF16(i.first, wideStorage);
+    wpi::util::sys::windows::UTF8ToUTF16(i.first, wideStorage);
     this->keys.emplace_back(
         std::wstring{wideStorage.data(), wideStorage.size()});
     wideStorage.clear();
-    wpi::sys::windows::UTF8ToUTF16(i.second, wideStorage);
+    wpi::util::sys::windows::UTF8ToUTF16(i.second, wideStorage);
     this->values.emplace_back(
         std::wstring{wideStorage.data(), wideStorage.size()});
   }
@@ -72,21 +72,21 @@ MulticastServiceAnnouncer::Impl::Impl(std::string_view serviceName,
     this->valuePtrs.emplace_back(this->values[i].c_str());
   }
 
-  wpi::SmallString<128> storage;
+  wpi::util::SmallString<128> storage;
 
   wideStorage.clear();
-  wpi::sys::windows::UTF8ToUTF16(hostName, wideStorage);
+  wpi::util::sys::windows::UTF8ToUTF16(hostName, wideStorage);
 
   this->hostName = std::wstring{wideStorage.data(), wideStorage.size()};
 
   wideStorage.clear();
-  if (wpi::ends_with_lower(serviceType, ".local")) {
-    wpi::sys::windows::UTF8ToUTF16(serviceType, wideStorage);
+  if (wpi::util::ends_with_lower(serviceType, ".local")) {
+    wpi::util::sys::windows::UTF8ToUTF16(serviceType, wideStorage);
   } else {
     storage.clear();
     storage.append(serviceType);
     storage.append(".local");
-    wpi::sys::windows::UTF8ToUTF16(storage.str(), wideStorage);
+    wpi::util::sys::windows::UTF8ToUTF16(storage.str(), wideStorage);
   }
   this->serviceType = std::wstring{wideStorage.data(), wideStorage.size()};
 
@@ -95,11 +95,11 @@ MulticastServiceAnnouncer::Impl::Impl(std::string_view serviceName,
   storage.append(serviceName);
   storage.append(".");
   storage.append(serviceType);
-  if (!wpi::ends_with_lower(serviceType, ".local")) {
+  if (!wpi::util::ends_with_lower(serviceType, ".local")) {
     storage.append(".local");
   }
 
-  wpi::sys::windows::UTF8ToUTF16(storage.str(), wideStorage);
+  wpi::util::sys::windows::UTF8ToUTF16(storage.str(), wideStorage);
   this->serviceInstanceName =
       std::wstring{wideStorage.data(), wideStorage.size()};
 }

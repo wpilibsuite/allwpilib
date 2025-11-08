@@ -9,11 +9,11 @@
 
 #include "server/ServerClient4Base.hpp"
 
-namespace nt::server {
+namespace wpi::nt::server {
 
 class ServerClientLocal final : public ServerClient4Base {
  public:
-  ServerClientLocal(ServerStorage& storage, int id, wpi::Logger& logger);
+  ServerClientLocal(ServerStorage& storage, int id, wpi::util::Logger& logger);
 
   bool ProcessIncomingText(std::string_view data) final { return false; }
   bool ProcessIncomingBinary(std::span<const uint8_t> data) final {
@@ -31,7 +31,7 @@ class ServerClientLocal final : public ServerClient4Base {
                  net::ValueSendMode mode) final;
   void SendAnnounce(ServerTopic* topic, std::optional<int> pubuid) final;
   void SendUnannounce(ServerTopic* topic) final;
-  void SendPropertiesUpdate(ServerTopic* topic, const wpi::json& update,
+  void SendPropertiesUpdate(ServerTopic* topic, const wpi::util::json& update,
                             bool ack) final;
   void SendOutgoing(uint64_t curTimeMs, bool flush) final {}
   void Flush() final {}
@@ -47,4 +47,4 @@ class ServerClientLocal final : public ServerClient4Base {
   net::ClientMessageQueue* m_queue = nullptr;
 };
 
-}  // namespace nt::server
+}  // namespace wpi::nt::server

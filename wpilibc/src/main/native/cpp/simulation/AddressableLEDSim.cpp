@@ -10,8 +10,8 @@
 #include "wpi/hal/simulation/AddressableLEDData.h"
 #include "wpi/hardware/led/AddressableLED.hpp"
 
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 AddressableLEDSim::AddressableLEDSim(int channel) : m_channel{channel} {}
 

@@ -6,9 +6,9 @@
 
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
-void BangBangController::InitSendable(wpi::SendableBuilder& builder) {
+void BangBangController::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("BangBangController");
   builder.AddDoubleProperty(
       "tolerance", [this] { return GetTolerance(); },

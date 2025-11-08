@@ -8,7 +8,7 @@
 
 #include "wpi/util/SmallString.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 int NameToAddr(std::string_view ip, unsigned int port, sockaddr_in* addr) {
   if (ip.empty()) {
@@ -18,7 +18,7 @@ int NameToAddr(std::string_view ip, unsigned int port, sockaddr_in* addr) {
     addr->sin_port = htons(port);
     return 0;
   } else {
-    SmallString<128> ipBuf{ip};
+    wpi::util::SmallString<128> ipBuf{ip};
     return uv_ip4_addr(ipBuf.c_str(), port, addr);
   }
 }
@@ -31,7 +31,7 @@ int NameToAddr(std::string_view ip, unsigned int port, sockaddr_in6* addr) {
     addr->sin6_port = htons(port);
     return 0;
   } else {
-    SmallString<128> ipBuf{ip};
+    wpi::util::SmallString<128> ipBuf{ip};
     return uv_ip6_addr(ipBuf.c_str(), port, addr);
   }
 }
@@ -41,7 +41,7 @@ int NameToAddr(std::string_view ip, in_addr* addr) {
     addr->s_addr = INADDR_ANY;
     return 0;
   } else {
-    SmallString<128> ipBuf{ip};
+    wpi::util::SmallString<128> ipBuf{ip};
     return uv_inet_pton(AF_INET, ipBuf.c_str(), addr);
   }
 }
@@ -51,9 +51,9 @@ int NameToAddr(std::string_view ip, in6_addr* addr) {
     *addr = in6addr_any;
     return 0;
   } else {
-    SmallString<128> ipBuf{ip};
+    wpi::util::SmallString<128> ipBuf{ip};
     return uv_inet_pton(AF_INET6, ipBuf.c_str(), addr);
   }
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

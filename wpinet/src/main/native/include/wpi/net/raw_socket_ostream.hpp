@@ -7,11 +7,11 @@
 
 #include "wpi/util/raw_ostream.hpp"
 
-namespace wpi {
+namespace wpi::net {
 
 class NetworkStream;
 
-class raw_socket_ostream : public raw_ostream {
+class raw_socket_ostream : public wpi::util::raw_ostream {
  public:
   raw_socket_ostream(NetworkStream& stream, bool shouldClose)
       : m_stream(stream), m_shouldClose(shouldClose) {}
@@ -34,6 +34,6 @@ class raw_socket_ostream : public raw_ostream {
   bool m_shouldClose;
 };
 
-}  // namespace wpi
+}  // namespace wpi::net
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_RAW_SOCKET_OSTREAM_HPP_

@@ -10,7 +10,7 @@
 #include "wpi/math/linalg/EigenCore.hpp"
 
 TEST(AngleStatisticsTest, Mean) {
-  frc::Matrixd<3, 3> sigmas{
+  wpi::math::Matrixd<3, 3> sigmas{
       {1, 1.2, 0},
       {359 * std::numbers::pi / 180, 3 * std::numbers::pi / 180, 0},
       {1, 2, 0}};
@@ -19,7 +19,7 @@ TEST(AngleStatisticsTest, Mean) {
   weights.fill(1.0 / sigmas.cols());
 
   EXPECT_TRUE(Eigen::Vector3d(0.7333333, 0.01163323, 1)
-                  .isApprox(frc::AngleMean<3, 3>(sigmas, weights, 1), 1e-3));
+                  .isApprox(wpi::math::AngleMean<3, 3>(sigmas, weights, 1), 1e-3));
 }
 
 TEST(AngleStatisticsTest, Mean_DynamicSize) {
@@ -32,7 +32,7 @@ TEST(AngleStatisticsTest, Mean_DynamicSize) {
   weights.fill(1.0 / sigmas.cols());
 
   EXPECT_TRUE(Eigen::Vector3d(0.7333333, 0.01163323, 1)
-                  .isApprox(frc::AngleMean<Eigen::Dynamic, Eigen::Dynamic>(
+                  .isApprox(wpi::math::AngleMean<Eigen::Dynamic, Eigen::Dynamic>(
                                 sigmas, weights, 1),
                             1e-3));
 }
@@ -41,7 +41,7 @@ TEST(AngleStatisticsTest, Residual) {
   Eigen::Vector3d a{1, 1 * std::numbers::pi / 180, 2};
   Eigen::Vector3d b{1, 359 * std::numbers::pi / 180, 1};
 
-  EXPECT_TRUE(frc::AngleResidual<3>(a, b, 1).isApprox(
+  EXPECT_TRUE(wpi::math::AngleResidual<3>(a, b, 1).isApprox(
       Eigen::Vector3d{0, 2 * std::numbers::pi / 180, 1}));
 }
 
@@ -49,7 +49,7 @@ TEST(AngleStatisticsTest, Residual_DynamicSize) {
   Eigen::VectorXd a{{1, 1 * std::numbers::pi / 180, 2}};
   Eigen::VectorXd b{{1, 359 * std::numbers::pi / 180, 1}};
 
-  EXPECT_TRUE(frc::AngleResidual<Eigen::Dynamic>(a, b, 1).isApprox(
+  EXPECT_TRUE(wpi::math::AngleResidual<Eigen::Dynamic>(a, b, 1).isApprox(
       Eigen::VectorXd{{0, 2 * std::numbers::pi / 180, 1}}));
 }
 
@@ -57,13 +57,13 @@ TEST(AngleStatisticsTest, Add) {
   Eigen::Vector3d a{1, 1 * std::numbers::pi / 180, 2};
   Eigen::Vector3d b{1, 359 * std::numbers::pi / 180, 1};
 
-  EXPECT_TRUE(frc::AngleAdd<3>(a, b, 1).isApprox(Eigen::Vector3d{2, 0, 3}));
+  EXPECT_TRUE(wpi::math::AngleAdd<3>(a, b, 1).isApprox(Eigen::Vector3d{2, 0, 3}));
 }
 
 TEST(AngleStatisticsTest, Add_DynamicSize) {
   Eigen::VectorXd a{{1, 1 * std::numbers::pi / 180, 2}};
   Eigen::VectorXd b{{1, 359 * std::numbers::pi / 180, 1}};
 
-  EXPECT_TRUE(frc::AngleAdd<Eigen::Dynamic>(a, b, 1).isApprox(
+  EXPECT_TRUE(wpi::math::AngleAdd<Eigen::Dynamic>(a, b, 1).isApprox(
       Eigen::VectorXd{{2, 0, 3}}));
 }

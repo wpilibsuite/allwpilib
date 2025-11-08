@@ -13,7 +13,7 @@
 #include "wpi/hal/simulation/NotifyListener.h"
 #include "wpi/util/jni_util.hpp"
 
-namespace hal::sim {
+namespace wpi::hal::sim {
 class ConstBufferCallbackStore {
  public:
   void create(JNIEnv* env, jobject obj);
@@ -24,7 +24,7 @@ class ConstBufferCallbackStore {
   int32_t getCallbackId() { return callbackId; }
 
  private:
-  wpi::java::JGlobal<jobject> m_call;
+  wpi::util::java::JGlobal<jobject> m_call;
   int32_t callbackId;
 };
 
@@ -39,4 +39,4 @@ SIM_JniHandle AllocateConstBufferCallback(
     RegisterConstBufferCallbackFunc createCallback);
 void FreeConstBufferCallback(JNIEnv* env, SIM_JniHandle handle, jint index,
                              FreeConstBufferCallbackFunc freeCallback);
-}  // namespace hal::sim
+}  // namespace wpi::hal::sim

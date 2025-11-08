@@ -6,7 +6,7 @@
 
 #include "wpi/units/time.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Interface for counting the number of ticks on a digital input channel.
@@ -29,10 +29,10 @@ class CounterBase {
 
   virtual int Get() const = 0;
   virtual void Reset() = 0;
-  virtual units::second_t GetPeriod() const = 0;
-  virtual void SetMaxPeriod(units::second_t maxPeriod) = 0;
+  virtual wpi::units::second_t GetPeriod() const = 0;
+  virtual void SetMaxPeriod(wpi::units::second_t maxPeriod) = 0;
   virtual bool GetStopped() const = 0;
   virtual bool GetDirection() const = 0;
 };
 
-}  // namespace frc
+}  // namespace wpi

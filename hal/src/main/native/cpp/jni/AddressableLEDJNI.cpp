@@ -9,8 +9,8 @@
 #include "wpi/hal/AddressableLED.h"
 #include "wpi/util/jni_util.hpp"
 
-using namespace hal;
-using namespace wpi::java;
+using namespace wpi::hal;
+using namespace wpi::util::java;
 
 static_assert(sizeof(jbyte) * 3 == sizeof(HAL_AddressableLEDData));
 
@@ -38,7 +38,7 @@ Java_org_wpilib_hardware_hal_AddressableLEDJNI_initialize
   (JNIEnv* env, jclass, jint channel)
 {
   int32_t status = 0;
-  auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
+  auto stack = wpi::util::java::GetJavaStackTrace(env, "edu.wpi.first");
   auto ret = HAL_InitializeAddressableLED(channel, stack.c_str(), &status);
   CheckStatusForceThrow(env, status);
   return ret;

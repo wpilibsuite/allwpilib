@@ -11,7 +11,7 @@
 
 #include "wpi/event/BooleanEvent.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 PS5Controller::PS5Controller(int port) : GenericHID(port) {
   HAL_ReportUsage("HID", port, "PS5Controller");
@@ -277,7 +277,7 @@ bool PS5Controller::GetTouchpadReleased() {
   return GetRawButtonReleased(Button::kTouchpad);
 }
 
-void PS5Controller::InitSendable(wpi::SendableBuilder& builder) {
+void PS5Controller::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("HID");
   builder.PublishConstString("ControllerType", "PS5");
   builder.AddDoubleProperty("L2 Axis", [this] { return GetL2Axis(); }, nullptr);

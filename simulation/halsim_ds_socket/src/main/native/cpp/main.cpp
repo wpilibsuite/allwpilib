@@ -34,14 +34,14 @@
 #pragma comment(lib, "Ws2_32.lib")
 #endif
 
-using namespace wpi::uv;
+using namespace wpi::net::uv;
 
 static std::unique_ptr<Buffer> singleByte;
 static std::atomic<bool> gDSConnected = false;
 
 namespace {
 struct DataStore {
-  wpi::SmallVector<uint8_t, 128> m_frame;
+  wpi::util::SmallVector<uint8_t, 128> m_frame;
   size_t m_frameSize = (std::numeric_limits<size_t>::max)();
   halsim::DSCommPacket* dsPacket;
 };
@@ -83,7 +83,7 @@ static void HandleTcpDataStream(Buffer& buf, size_t size, DataStore& store) {
   }
 }
 
-static void SetupTcp(wpi::uv::Loop& loop) {
+static void SetupTcp(wpi::net::uv::Loop& loop) {
   auto tcp = Tcp::Create(loop);
   auto tcpWaitTimer = Timer::Create(loop);
 
@@ -109,8 +109,8 @@ static void SetupTcp(wpi::uv::Loop& loop) {
   });
 }
 
-static void SetupUdp(wpi::uv::Loop& loop) {
-  auto udp = wpi::uv::Udp::Create(loop);
+static void SetupUdp(wpi::net::uv::Loop& loop) {
+  auto udp = wpi::net::uv::Udp::Create(loop);
   udp->Bind("0.0.0.0", 1110);
 
   // Simulation mode packet
@@ -120,7 +120,7 @@ static void SetupUdp(wpi::uv::Loop& loop) {
   simLoopTimer->timeout.connect([udpLocal = udp.get(), simAddr] {
     udpLocal->Send(simAddr, {singleByte.get(), 1}, [](auto buf, Error err) {
       if (err) {
-        wpi::print(stderr, "{}\n", err.str());
+        wpi::util::print(stderr, "{}\n", err.str());
         std::fflush(stderr);
       }
     });
@@ -132,7 +132,7 @@ static void SetupUdp(wpi::uv::Loop& loop) {
     try {
       timeoutMs = std::stoi(envTimeout);
     } catch (const std::exception& e) {
-      wpi::print(stderr, "Error parsing DS_TIMEOUT_MS: {}\n", e.what());
+      wpi::util::print(stderr, "Error parsing DS_TIMEOUT_MS: {}\n", e.what());
     }
   }
   auto autoDisableTimer = Timer::Create(loop);
@@ -151,15 +151,15 @@ static void SetupUdp(wpi::uv::Loop& loop) {
         outAddr.sin_family = PF_INET;
         outAddr.sin_port = htons(1150);
 
-        wpi::SmallVector<wpi::uv::Buffer, 4> sendBufs;
-        wpi::raw_uv_ostream stream{sendBufs,
+        wpi::util::SmallVector<wpi::net::uv::Buffer, 4> sendBufs;
+        wpi::net::raw_uv_ostream stream{sendBufs,
                                    [] { return GetBufferPool().Allocate(); }};
         ds->SetupSendBuffer(stream);
 
         udpLocal->Send(outAddr, sendBufs, [](auto bufs, Error err) {
           GetBufferPool().Release(bufs);
           if (err) {
-            wpi::print(stderr, "{}\n", err.str());
+            wpi::util::print(stderr, "{}\n", err.str());
             std::fflush(stderr);
           }
         });
@@ -169,14 +169,14 @@ static void SetupUdp(wpi::uv::Loop& loop) {
   udp->StartRecv();
 }
 
-static void SetupEventLoop(wpi::uv::Loop& loop) {
+static void SetupEventLoop(wpi::net::uv::Loop& loop) {
   auto loopData = std::make_shared<halsim::DSCommPacket>();
   loop.SetData(loopData);
   SetupUdp(loop);
   SetupTcp(loop);
 }
 
-static std::unique_ptr<wpi::EventLoopRunner> eventLoopRunner;
+static std::unique_ptr<wpi::net::EventLoopRunner> eventLoopRunner;
 
 /*----------------------------------------------------------------------------
 ** Main entry point.  We will start listen threads going, processing
@@ -201,7 +201,7 @@ int HALSIM_InitExtension(void) {
 
   singleByte = std::make_unique<Buffer>("0");
 
-  eventLoopRunner = std::make_unique<wpi::EventLoopRunner>();
+  eventLoopRunner = std::make_unique<wpi::net::EventLoopRunner>();
 
   eventLoopRunner->ExecAsync(SetupEventLoop);
 

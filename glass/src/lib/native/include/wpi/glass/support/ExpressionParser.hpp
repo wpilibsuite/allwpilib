@@ -10,13 +10,13 @@
 
 #include "wpi/util/expected"
 
-namespace glass::expression {
+namespace wpi::glass::expression {
 
 template <typename V>
-wpi::expected<V, std::string> TryParseExpr(const char* expr);
+wpi::util::expected<V, std::string> TryParseExpr(const char* expr);
 
-extern template wpi::expected<double, std::string> TryParseExpr(const char*);
-extern template wpi::expected<float, std::string> TryParseExpr(const char*);
-extern template wpi::expected<int64_t, std::string> TryParseExpr(const char*);
+extern template wpi::util::expected<double, std::string> TryParseExpr(const char*);
+extern template wpi::util::expected<float, std::string> TryParseExpr(const char*);
+extern template wpi::util::expected<int64_t, std::string> TryParseExpr(const char*);
 
-}  // namespace glass::expression
+}  // namespace wpi::glass::expression

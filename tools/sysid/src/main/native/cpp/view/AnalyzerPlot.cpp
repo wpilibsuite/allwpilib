@@ -30,7 +30,7 @@ static ImPlotPoint Getter(int idx, void* data) {
 template <typename Model>
 static std::vector<std::vector<ImPlotPoint>> PopulateTimeDomainSim(
     const std::vector<PreparedData>& data,
-    const std::array<units::second_t, 4>& startTimes, size_t step, Model model,
+    const std::array<wpi::units::second_t, 4>& startTimes, size_t step, Model model,
     double* simSquaredErrorSum, double* squaredVariationSum,
     int* timeSeriesPoints) {
   // Create the vector of ImPlotPoints that will contain our simulated data.
@@ -42,7 +42,7 @@ static std::vector<std::vector<ImPlotPoint>> PopulateTimeDomainSim(
   tmp.emplace_back(startTime.value(), data[0].velocity);
 
   model.Reset(data[0].position, data[0].velocity);
-  units::second_t t = 0_s;
+  wpi::units::second_t t = 0_s;
 
   for (size_t i = 1; i < data.size(); ++i) {
     const auto& now = data[i];
@@ -60,7 +60,7 @@ static std::vector<std::vector<ImPlotPoint>> PopulateTimeDomainSim(
       continue;
     }
 
-    model.Update(units::volt_t{pre.voltage}, now.timestamp - pre.timestamp);
+    model.Update(wpi::units::volt_t{pre.voltage}, now.timestamp - pre.timestamp);
     tmp.emplace_back((startTime + t).value(), model.GetVelocity());
     *simSquaredErrorSum += std::pow(now.velocity - model.GetVelocity(), 2);
     *squaredVariationSum += std::pow(now.velocity, 2);
@@ -71,7 +71,7 @@ static std::vector<std::vector<ImPlotPoint>> PopulateTimeDomainSim(
   return pts;
 }
 
-AnalyzerPlot::AnalyzerPlot(wpi::Logger& logger) : m_logger(logger) {}
+AnalyzerPlot::AnalyzerPlot(wpi::util::Logger& logger) : m_logger(logger) {}
 
 void AnalyzerPlot::SetRawTimeData(const std::vector<PreparedData>& rawSlow,
                                   const std::vector<PreparedData>& rawFast,
@@ -131,7 +131,7 @@ void AnalyzerPlot::SetRawData(const Storage& data, std::string_view unit,
 void AnalyzerPlot::SetData(const Storage& rawData, const Storage& filteredData,
                            std::string_view unit,
                            const AnalysisManager::FeedforwardGains& ffGains,
-                           const std::array<units::second_t, 4>& startTimes,
+                           const std::array<wpi::units::second_t, 4>& startTimes,
                            AnalysisType type, std::atomic<bool>& abort) {
   double simSquaredErrorSum = 0;
   double squaredVariationSum = 0;
@@ -163,7 +163,7 @@ void AnalyzerPlot::SetData(const Storage& rawData, const Storage& filteredData,
   auto slowStep = std::ceil(slow.size() * 1.0 / kMaxSize * 4);
   auto fastStep = std::ceil(fast.size() * 1.0 / kMaxSize * 4);
 
-  units::second_t dtMean = GetMeanTimeDelta(filteredData);
+  wpi::units::second_t dtMean = GetMeanTimeDelta(filteredData);
 
   // Velocity-vs-time plots
   {
@@ -192,7 +192,7 @@ void AnalyzerPlot::SetData(const Storage& rawData, const Storage& filteredData,
                       slow[i].timestamp) == startTimes.end()) {
           m_timestepData.data.emplace_back(
               (slow[i].timestamp).value(),
-              units::millisecond_t{slow[i].dt}.value());
+              wpi::units::millisecond_t{slow[i].dt}.value());
         }
       }
     }
@@ -217,7 +217,7 @@ void AnalyzerPlot::SetData(const Storage& rawData, const Storage& filteredData,
                       fast[i].timestamp) == startTimes.end()) {
           m_timestepData.data.emplace_back(
               (fast[i].timestamp).value(),
-              units::millisecond_t{fast[i].dt}.value());
+              wpi::units::millisecond_t{fast[i].dt}.value());
         }
       }
     }
@@ -334,7 +334,7 @@ void AnalyzerPlot::SetData(const Storage& rawData, const Storage& filteredData,
               startTimes.end()) {
         m_timestepData.data.emplace_back(
             (slow[i].timestamp).value(),
-            units::millisecond_t{slow[i].dt}.value());
+            wpi::units::millisecond_t{slow[i].dt}.value());
       }
     }
   }
@@ -351,19 +351,19 @@ void AnalyzerPlot::SetData(const Storage& rawData, const Storage& filteredData,
               startTimes.end()) {
         m_timestepData.data.emplace_back(
             (fast[i].timestamp).value(),
-            units::millisecond_t{fast[i].dt}.value());
+            wpi::units::millisecond_t{fast[i].dt}.value());
       }
     }
   }
 
   auto minTime =
-      units::math::min(slow.front().timestamp, fast.front().timestamp);
+      wpi::units::math::min(slow.front().timestamp, fast.front().timestamp);
   m_timestepData.fitLine[0] =
-      ImPlotPoint{minTime.value(), units::millisecond_t{dtMean}.value()};
+      ImPlotPoint{minTime.value(), wpi::units::millisecond_t{dtMean}.value()};
 
-  auto maxTime = units::math::max(slow.back().timestamp, fast.back().timestamp);
+  auto maxTime = wpi::units::math::max(slow.back().timestamp, fast.back().timestamp);
   m_timestepData.fitLine[1] =
-      ImPlotPoint{maxTime.value(), units::millisecond_t{dtMean}.value()};
+      ImPlotPoint{maxTime.value(), wpi::units::millisecond_t{dtMean}.value()};
 
   // RMSE = std::sqrt(sum((x_i - x^_i)^2) / N) where sum represents the sum of
   // all time series points, x_i represents the velocity at a timestep, x^_i

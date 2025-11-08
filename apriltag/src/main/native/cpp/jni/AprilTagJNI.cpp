@@ -16,8 +16,8 @@
 #include "wpi/apriltag/AprilTagDetector.hpp"
 #include "wpi/apriltag/AprilTagPoseEstimator.hpp"
 
-using namespace frc;
-using namespace wpi::java;
+using namespace wpi::apriltag;
+using namespace wpi::util::java;
 
 static JavaVM* jvm = nullptr;
 
@@ -162,7 +162,7 @@ static AprilTagDetector::QuadThresholdParameters FromJavaDetectorQTP(
   return {
       FIELD(int, Int, minClusterPixels),
       FIELD(int, Int, maxNumMaxima),
-      .criticalAngle = units::radian_t{static_cast<double>(
+      .criticalAngle = wpi::units::radian_t{static_cast<double>(
           env->GetDoubleField(jparams, criticalAngleField))},
       FIELD(float, Float, maxLineFitMSE),
       FIELD(int, Int, minWhiteBlackDiff),
@@ -256,7 +256,7 @@ static jobject MakeJObject(
                         static_cast<jboolean>(params.deglitch));
 }
 
-static jobject MakeJObject(JNIEnv* env, const Translation3d& xlate) {
+static jobject MakeJObject(JNIEnv* env, const wpi::math::Translation3d& xlate) {
   static jmethodID constructor =
       env->GetMethodID(translation3dCls, "<init>", "(DDD)V");
   if (!constructor) {
@@ -268,7 +268,7 @@ static jobject MakeJObject(JNIEnv* env, const Translation3d& xlate) {
       static_cast<jdouble>(xlate.Y()), static_cast<jdouble>(xlate.Z()));
 }
 
-static jobject MakeJObject(JNIEnv* env, const Quaternion& q) {
+static jobject MakeJObject(JNIEnv* env, const wpi::math::Quaternion& q) {
   static jmethodID constructor =
       env->GetMethodID(quaternionCls, "<init>", "(DDDD)V");
   if (!constructor) {
@@ -281,7 +281,7 @@ static jobject MakeJObject(JNIEnv* env, const Quaternion& q) {
                         static_cast<jdouble>(q.Z()));
 }
 
-static jobject MakeJObject(JNIEnv* env, const Rotation3d& rot) {
+static jobject MakeJObject(JNIEnv* env, const wpi::math::Rotation3d& rot) {
   static jmethodID constructor = env->GetMethodID(
       rotation3dCls, "<init>", "(Lorg/wpilib/math/geometry/Quaternion;)V");
   if (!constructor) {
@@ -292,7 +292,7 @@ static jobject MakeJObject(JNIEnv* env, const Rotation3d& rot) {
   return env->NewObject(rotation3dCls, constructor, q.obj());
 }
 
-static jobject MakeJObject(JNIEnv* env, const Transform3d& xform) {
+static jobject MakeJObject(JNIEnv* env, const wpi::math::Transform3d& xform) {
   static jmethodID constructor =
       env->GetMethodID(transform3dCls, "<init>",
                        "(Lorg/wpilib/math/geometry/Translation3d;"
@@ -517,7 +517,7 @@ Java_org_wpilib_vision_apriltag_jni_AprilTagJNI_estimatePoseHomography
     return nullptr;
   }
 
-  AprilTagPoseEstimator estimator({units::meter_t{tagSize}, fx, fy, cx, cy});
+  AprilTagPoseEstimator estimator({wpi::units::meter_t{tagSize}, fx, fy, cx, cy});
   return MakeJObject(env, estimator.EstimateHomography(harr));
 }
 
@@ -553,7 +553,7 @@ Java_org_wpilib_vision_apriltag_jni_AprilTagJNI_estimatePoseOrthogonalIteration
     return nullptr;
   }
 
-  AprilTagPoseEstimator estimator({units::meter_t{tagSize}, fx, fy, cx, cy});
+  AprilTagPoseEstimator estimator({wpi::units::meter_t{tagSize}, fx, fy, cx, cy});
   return MakeJObject(env,
                      estimator.EstimateOrthogonalIteration(harr, carr, nIters));
 }
@@ -590,7 +590,7 @@ Java_org_wpilib_vision_apriltag_jni_AprilTagJNI_estimatePose
     return nullptr;
   }
 
-  AprilTagPoseEstimator estimator({units::meter_t{tagSize}, fx, fy, cx, cy});
+  AprilTagPoseEstimator estimator({wpi::units::meter_t{tagSize}, fx, fy, cx, cy});
   return MakeJObject(env, estimator.Estimate(harr, carr));
 }
 
@@ -603,13 +603,13 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_vision_apriltag_jni_AprilTagJNI_generate16h5AprilTagImage
   (JNIEnv* env, jclass, jobject frameObj, jlong framePtr, jint id)
 {
-  auto* frame = reinterpret_cast<wpi::RawFrame*>(framePtr);
+  auto* frame = reinterpret_cast<wpi::util::RawFrame*>(framePtr);
   if (!frame) {
     nullPointerEx.Throw(env, "frame is null");
     return;
   }
   bool newData = AprilTag::Generate16h5AprilTagImage(frame, id);
-  wpi::SetFrameData(env, rawFrameCls, frameObj, *frame, newData);
+  wpi::util::SetFrameData(env, rawFrameCls, frameObj, *frame, newData);
 }
 
 /*
@@ -621,14 +621,14 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_vision_apriltag_jni_AprilTagJNI_generate36h11AprilTagImage
   (JNIEnv* env, jclass, jobject frameObj, jlong framePtr, jint id)
 {
-  auto* frame = reinterpret_cast<wpi::RawFrame*>(framePtr);
+  auto* frame = reinterpret_cast<wpi::util::RawFrame*>(framePtr);
   if (!frame) {
     nullPointerEx.Throw(env, "frame is null");
     return;
   }
   // function might reallocate
   bool newData = AprilTag::Generate36h11AprilTagImage(frame, id);
-  wpi::SetFrameData(env, rawFrameCls, frameObj, *frame, newData);
+  wpi::util::SetFrameData(env, rawFrameCls, frameObj, *frame, newData);
 }
 
 }  // extern "C"

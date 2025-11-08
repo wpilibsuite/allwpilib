@@ -10,17 +10,17 @@
 #include "wpi/units/length.hpp"
 #include "wpi/util/array.hpp"
 
-static constexpr wpi::array<frc::Pose2d, 6> poses{
-    frc::Pose2d{-1_m, 1_m, -90_deg}, frc::Pose2d{-1_m, 2_m, 90_deg},
-    frc::Pose2d{0_m, 0_m, 0_deg},    frc::Pose2d{0_m, 3_m, -90_deg},
-    frc::Pose2d{1_m, 1_m, 90_deg},   frc::Pose2d{1_m, 2_m, 90_deg},
+static constexpr wpi::util::array<wpi::math::Pose2d, 6> poses{
+    wpi::math::Pose2d{-1_m, 1_m, -90_deg}, wpi::math::Pose2d{-1_m, 2_m, 90_deg},
+    wpi::math::Pose2d{0_m, 0_m, 0_deg},    wpi::math::Pose2d{0_m, 3_m, -90_deg},
+    wpi::math::Pose2d{1_m, 1_m, 90_deg},   wpi::math::Pose2d{1_m, 2_m, 90_deg},
 };
 static constexpr int iterations = 100;
 
 void BM_Transform(benchmark::State& state) {
-  frc::TravelingSalesman traveler{[](auto pose1, auto pose2) {
+  wpi::math::TravelingSalesman traveler{[](auto pose1, auto pose2) {
     auto transform = pose2 - pose1;
-    return units::math::hypot(transform.X(), transform.Y()).value();
+    return wpi::units::math::hypot(transform.X(), transform.Y()).value();
   }};
   // NOLINTNEXTLINE(clang-analyzer-deadcode.DeadStores)
   for (auto _ : state) {
@@ -30,9 +30,9 @@ void BM_Transform(benchmark::State& state) {
 BENCHMARK(BM_Transform);
 
 void BM_Twist(benchmark::State& state) {
-  frc::TravelingSalesman traveler{[](auto pose1, auto pose2) {
+  wpi::math::TravelingSalesman traveler{[](auto pose1, auto pose2) {
     auto twist = (pose2 - pose1).Log();
-    return units::math::hypot(twist.dx, twist.dy).value();
+    return wpi::units::math::hypot(twist.dx, twist.dy).value();
   }};
   // NOLINTNEXTLINE(clang-analyzer-deadcode.DeadStores)
   for (auto _ : state) {

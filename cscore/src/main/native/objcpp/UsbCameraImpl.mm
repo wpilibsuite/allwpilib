@@ -20,9 +20,9 @@
 #include "wpi/cs/cscore_cpp.hpp"
 #include "UsbCameraImpl.hpp"
 
-namespace cs {
+namespace wpi::cs {
 
-UsbCameraImpl::UsbCameraImpl(std::string_view name, wpi::Logger& logger,
+UsbCameraImpl::UsbCameraImpl(std::string_view name, wpi::util::Logger& logger,
                              Notifier& notifier, Telemetry& telemetry,
                              std::string_view path)
     : SourceImpl{name, logger, notifier, telemetry} {
@@ -32,7 +32,7 @@ UsbCameraImpl::UsbCameraImpl(std::string_view name, wpi::Logger& logger,
                                      encoding:NSUTF8StringEncoding];
   m_objc = objc;
 }
-UsbCameraImpl::UsbCameraImpl(std::string_view name, wpi::Logger& logger,
+UsbCameraImpl::UsbCameraImpl(std::string_view name, wpi::util::Logger& logger,
                              Notifier& notifier, Telemetry& telemetry,
                              int deviceId)
     : SourceImpl{name, logger, notifier, telemetry} {
@@ -108,7 +108,7 @@ void UsbCameraImpl::NumSinksEnabledChanged() {
 
 CS_Source CreateUsbCameraDev(std::string_view name, int dev,
                              CS_Status* status) {
-  std::vector<UsbCameraInfo> devices = cs::EnumerateUsbCameras(status);
+  std::vector<UsbCameraInfo> devices = wpi::cs::EnumerateUsbCameras(status);
   if (static_cast<int>(devices.size()) > dev) {
     return CreateUsbCameraPath(name, devices[dev].path, status);
   }
@@ -203,4 +203,4 @@ UsbCameraInfo GetUsbCameraInfo(CS_Source source, CS_Status* status) {
   return info;
 }
 
-}  // namespace cs
+}  // namespace wpi::cs

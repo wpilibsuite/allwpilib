@@ -12,7 +12,7 @@
 #include "MockDispatcher.h"
 #include "Storage.h"
 
-namespace nt {
+namespace wpi::nt {
 
 class StorageTest {
  public:
@@ -28,10 +28,10 @@ class StorageTest {
 
   void HookOutgoing(bool server) { storage.SetDispatcher(&dispatcher, server); }
 
-  wpi::Logger logger;
+  wpi::util::Logger logger;
   ::testing::StrictMock<MockDispatcher> dispatcher;
   Storage storage;
   Storage::Entry tmp_entry;
 };
 
-}  // namespace nt
+}  // namespace wpi::nt

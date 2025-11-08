@@ -4,9 +4,9 @@
 
 #include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT)
     SwerveDriveKinematics<4>;
 
-}  // namespace frc
+}  // namespace wpi::math

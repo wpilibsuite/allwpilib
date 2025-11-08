@@ -12,7 +12,7 @@
 #include <string>
 #include <string_view>
 #include <utility>
-namespace wpi {
+namespace wpi::net {
 class MulticastServiceAnnouncer {
  public:
   /**
@@ -66,7 +66,7 @@ class MulticastServiceAnnouncer {
  private:
   std::unique_ptr<Impl> pImpl;
 };
-}  // namespace wpi
+}  // namespace wpi::net
 extern "C" {
 #endif
 

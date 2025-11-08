@@ -8,10 +8,10 @@
 
 #include "wpi/util/print.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 PrintCommand::PrintCommand(std::string_view message)
-    : CommandHelper{[str = std::string(message)] { wpi::print("{}\n", str); },
+    : CommandHelper{[str = std::string(message)] { wpi::util::print("{}\n", str); },
                     {}} {}
 
 bool PrintCommand::RunsWhenDisabled() const {

@@ -28,9 +28,9 @@
 
 #include "wpi/units/base.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::time
+ * @namespace wpi::units::time
  * @brief namespace for unit types and containers representing time values
  * @details The SI unit for time is `seconds`, and the corresponding `base_unit`
  *          category is `time_unit`.
@@ -39,7 +39,7 @@ namespace units {
  */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_TIME_UNITS)
 UNIT_ADD_WITH_METRIC_PREFIXES(time, second, seconds, s,
-                              unit<std::ratio<1>, units::category::time_unit>)
+                              unit<std::ratio<1>, wpi::units::category::time_unit>)
 UNIT_ADD(time, minute, minutes, min, unit<std::ratio<60>, seconds>)
 UNIT_ADD(time, hour, hours, hr, unit<std::ratio<60>, minutes>)
 UNIT_ADD(time, day, days, d, unit<std::ratio<24>, hours>)
@@ -54,4 +54,4 @@ UNIT_ADD_CATEGORY_TRAIT(time)
 #endif
 
 using namespace time;
-}  // namespace units
+}  // namespace wpi::units

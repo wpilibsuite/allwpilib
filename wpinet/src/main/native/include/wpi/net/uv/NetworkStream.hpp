@@ -14,7 +14,7 @@
 #include "wpi/net/uv/Stream.hpp"
 #include "wpi/util/Signal.h"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 class NetworkStream;
 
@@ -32,7 +32,7 @@ class ConnectReq : public RequestImpl<ConnectReq, uv_connect_t> {
   /**
    * Connection completed signal.
    */
-  sig::Signal<> connected;
+  wpi::util::sig::Signal<> connected;
 };
 
 /**
@@ -115,7 +115,7 @@ class NetworkStream : public Stream {
   /**
    * Signal generated when an incoming connection is received.
    */
-  sig::Signal<> connection;
+  wpi::util::sig::Signal<> connection;
 
  protected:
   explicit NetworkStream(uv_stream_t* uv_stream) : Stream{uv_stream} {}
@@ -148,6 +148,6 @@ class NetworkStreamImpl : public NetworkStream {
       : NetworkStream{static_cast<uv_stream_t*>(std::malloc(sizeof(U)))} {}
 };
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_NETWORKSTREAM_HPP_

@@ -8,7 +8,7 @@
 #include "wpi/hal/simulation/REVPHData.h"
 #include "wpi/hal/simulation/SimDataValue.h"
 
-namespace hal {
+namespace wpi::hal {
 class REVPHData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(SolenoidOutput)
@@ -47,4 +47,4 @@ class REVPHData {
   virtual void ResetData();
 };
 extern REVPHData* SimREVPHData;
-}  // namespace hal
+}  // namespace wpi::hal

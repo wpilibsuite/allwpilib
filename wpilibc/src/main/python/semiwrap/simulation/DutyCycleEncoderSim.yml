@@ -2,7 +2,7 @@ extra_includes:
 - wpi/hardware/rotation/DutyCycleEncoder.hpp
 
 classes:
-  frc::sim::DutyCycleEncoderSim:
+  wpi::sim::DutyCycleEncoderSim:
     methods:
       DutyCycleEncoderSim:
         overloads:

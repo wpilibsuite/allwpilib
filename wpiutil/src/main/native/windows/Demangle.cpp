@@ -15,10 +15,10 @@
 
 #pragma comment(lib, "Dbghelp.lib")
 
-namespace wpi {
+namespace wpi::util {
 
 std::string Demangle(std::string_view mangledSymbol) {
-  static wpi::mutex m;
+  static wpi::util::mutex m;
   std::scoped_lock lock(m);
   SmallString<128> buf{mangledSymbol};
   char buffer[256];
@@ -30,4 +30,4 @@ std::string Demangle(std::string_view mangledSymbol) {
   return std::string(buffer, sz);
 }
 
-}  // namespace wpi
+}  // namespace wpi::util

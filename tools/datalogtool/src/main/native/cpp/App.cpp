@@ -64,7 +64,7 @@ static void DisplayDownload() {
   if (ImGui::Begin("Download", gDownloadVisible)) {
     if (!gDownloader) {
       gDownloader = std::make_unique<Downloader>(
-          glass::GetStorageRoot().GetChild("download"));
+          wpi::glass::GetStorageRoot().GetChild("download"));
     }
     gDownloader->Display();
   }
@@ -74,7 +74,7 @@ static void DisplayDownload() {
 static void DisplayMainMenu() {
   ImGui::BeginMainMenuBar();
 
-  static glass::MainMenuBar mainMenu;
+  static wpi::glass::MainMenuBar mainMenu;
   mainMenu.WorkspaceMenu();
   gui::EmitViewMenu();
 
@@ -110,7 +110,7 @@ static void DisplayMainMenu() {
     ImGui::Separator();
     ImGui::Text("v%s", GetWPILibVersion());
     ImGui::Separator();
-    ImGui::Text("Save location: %s", glass::GetStorageDir().c_str());
+    ImGui::Text("Save location: %s", wpi::glass::GetStorageDir().c_str());
     ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
                 ImGui::GetIO().Framerate);
     if (ImGui::Button("Close")) {
@@ -124,7 +124,7 @@ static void DisplayGui() {
   DisplayMainMenu();
   DisplayInputFiles();
   DisplayEntries();
-  DisplayOutput(glass::GetStorageRoot().GetChild("output"));
+  DisplayOutput(wpi::glass::GetStorageRoot().GetChild("output"));
   DisplayDownload();
 }
 
@@ -132,7 +132,7 @@ void Application(std::string_view saveDir) {
   ssh_init();
 
   gui::CreateContext();
-  glass::CreateContext();
+  wpi::glass::CreateContext();
 
   // Add icons
   gui::AddIcon(dlt::GetResource_dlt_16_png());
@@ -143,8 +143,8 @@ void Application(std::string_view saveDir) {
   gui::AddIcon(dlt::GetResource_dlt_256_png());
   gui::AddIcon(dlt::GetResource_dlt_512_png());
 
-  glass::SetStorageName("datalogtool");
-  glass::SetStorageDir(saveDir.empty() ? gui::GetPlatformSaveFileDir()
+  wpi::glass::SetStorageName("datalogtool");
+  wpi::glass::SetStorageDir(saveDir.empty() ? gui::GetPlatformSaveFileDir()
                                        : saveDir);
 
   gui::AddWindowScaler([](float scale) { gDefaultScale = scale; });
@@ -152,12 +152,12 @@ void Application(std::string_view saveDir) {
   gui::Initialize("Datalog Tool", 925, 510);
 
   gDownloadVisible =
-      &glass::GetStorageRoot().GetChild("download").GetBool("visible", true);
+      &wpi::glass::GetStorageRoot().GetChild("download").GetBool("visible", true);
 
   gui::Main();
 
   gShutdown = true;
-  glass::DestroyContext();
+  wpi::glass::DestroyContext();
   gui::DestroyContext();
 
   gDownloader.reset();

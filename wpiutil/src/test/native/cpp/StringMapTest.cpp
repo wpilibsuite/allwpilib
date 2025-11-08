@@ -18,7 +18,7 @@
 
 #include <gtest/gtest.h>
 
-using namespace wpi;
+using namespace wpi::util;
 
 namespace {
 
@@ -163,7 +163,7 @@ TEST_F(StringMapTest, InsertAndErase) {
 }
 
 TEST_F(StringMapTest, SmallFullMap) {
-  wpi::StringMap<int> Map;
+  wpi::util::StringMap<int> Map;
 
   Map["eins"] = 1;
   Map["zwei"] = 2;
@@ -182,7 +182,7 @@ TEST_F(StringMapTest, SmallFullMap) {
 }
 
 TEST_F(StringMapTest, CopyCtor) {
-  wpi::StringMap<int> Map;
+  wpi::util::StringMap<int> Map;
 
   Map["eins"] = 1;
   Map["zwei"] = 2;
@@ -199,7 +199,7 @@ TEST_F(StringMapTest, CopyCtor) {
   EXPECT_EQ(4, Map["veir"]);
   EXPECT_EQ(5, Map["funf"]);
 
-  wpi::StringMap<int> Map2(Map);
+  wpi::util::StringMap<int> Map2(Map);
   EXPECT_EQ(3u, Map2.size());
   EXPECT_FALSE(Map2.contains("eins"));
   EXPECT_EQ(2, Map2["zwei"]);
@@ -209,7 +209,7 @@ TEST_F(StringMapTest, CopyCtor) {
 }
 
 TEST_F(StringMapTest, At) {
-  wpi::StringMap<int> Map;
+  wpi::util::StringMap<int> Map;
 
   // keys both found and not found on non-empty map
   Map["a"] = 1;

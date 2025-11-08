@@ -13,13 +13,13 @@
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/StringTopic.hpp"
 
-namespace glass {
+namespace wpi::glass {
 class NTGyroModel : public GyroModel {
  public:
   static constexpr const char* kType = "Gyro";
 
   explicit NTGyroModel(std::string_view path);
-  NTGyroModel(nt::NetworkTableInstance inst, std::string_view path);
+  NTGyroModel(wpi::nt::NetworkTableInstance inst, std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
   const char* GetSimDevice() const override { return nullptr; }
@@ -32,11 +32,11 @@ class NTGyroModel : public GyroModel {
   bool IsReadOnly() override { return true; }
 
  private:
-  nt::NetworkTableInstance m_inst;
-  nt::DoubleSubscriber m_angle;
-  nt::StringSubscriber m_name;
+  wpi::nt::NetworkTableInstance m_inst;
+  wpi::nt::DoubleSubscriber m_angle;
+  wpi::nt::StringSubscriber m_name;
 
   DoubleSource m_angleData;
   std::string m_nameValue;
 };
-}  // namespace glass
+}  // namespace wpi::glass

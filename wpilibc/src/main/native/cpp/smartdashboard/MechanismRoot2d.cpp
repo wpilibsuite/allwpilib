@@ -6,7 +6,7 @@
 
 #include "wpi/util/Color8Bit.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 MechanismRoot2d::MechanismRoot2d(std::string_view name, double x, double y,
                                  const private_init&)
@@ -19,7 +19,7 @@ void MechanismRoot2d::SetPosition(double x, double y) {
   Flush();
 }
 
-void MechanismRoot2d::UpdateEntries(std::shared_ptr<nt::NetworkTable> table) {
+void MechanismRoot2d::UpdateEntries(std::shared_ptr<wpi::nt::NetworkTable> table) {
   m_xPub = table->GetDoubleTopic("x").Publish();
   m_yPub = table->GetDoubleTopic("y").Publish();
   Flush();

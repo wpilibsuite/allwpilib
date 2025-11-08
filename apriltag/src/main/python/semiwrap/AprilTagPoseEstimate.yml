@@ -1,5 +1,5 @@
 classes:
-  frc::AprilTagPoseEstimate:
+  wpi::apriltag::AprilTagPoseEstimate:
     attributes:
       pose1:
       pose2:

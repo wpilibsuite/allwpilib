@@ -1,5 +1,5 @@
 classes:
-  frc::TimedRobot:
+  wpi::TimedRobot:
     attributes:
       kDefaultPeriod:
     methods:
@@ -12,5 +12,5 @@ classes:
             default: 0_s
       TimedRobot:
         overloads:
-          units::second_t:
-          units::hertz_t:
+          wpi::units::second_t:
+          wpi::units::hertz_t:

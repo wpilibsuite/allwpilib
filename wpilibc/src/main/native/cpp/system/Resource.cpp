@@ -13,9 +13,9 @@
 #include "wpi/util/deprecated.hpp"
 
 WPI_IGNORE_DEPRECATED
-using namespace frc;
+using namespace wpi;
 
-wpi::mutex Resource::m_createMutex;
+wpi::util::mutex Resource::m_createMutex;
 
 void Resource::CreateResourceObject(std::unique_ptr<Resource>& r,
                                     uint32_t elements) {

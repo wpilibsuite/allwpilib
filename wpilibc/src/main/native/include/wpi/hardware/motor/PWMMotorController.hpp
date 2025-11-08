@@ -21,7 +21,7 @@
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
-namespace frc {
+namespace wpi {
 
 WPI_IGNORE_DEPRECATED
 
@@ -30,8 +30,8 @@ WPI_IGNORE_DEPRECATED
  */
 class PWMMotorController : public MotorController,
                            public MotorSafety,
-                           public wpi::Sendable,
-                           public wpi::SendableHelper<PWMMotorController> {
+                           public wpi::util::Sendable,
+                           public wpi::util::SendableHelper<PWMMotorController> {
  public:
   PWMMotorController(PWMMotorController&&) = default;
   PWMMotorController& operator=(PWMMotorController&&) = default;
@@ -58,7 +58,7 @@ class PWMMotorController : public MotorController,
    *
    * @param output The voltage to output.
    */
-  void SetVoltage(units::volt_t output) override;
+  void SetVoltage(wpi::units::volt_t output) override;
 
   /**
    * Get the recently set value of the PWM. This value is affected by the
@@ -76,7 +76,7 @@ class PWMMotorController : public MotorController,
    * @return The voltage of the motor controller, nominally between -12 V and 12
    *   V.
    */
-  virtual units::volt_t GetVoltage() const;
+  virtual wpi::units::volt_t GetVoltage() const;
 
   void SetInverted(bool isInverted) override;
 
@@ -128,7 +128,7 @@ class PWMMotorController : public MotorController,
    */
   PWMMotorController(std::string_view name, int channel);
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
   /// PWM instances for motor controller.
   PWM m_pwm;
@@ -136,35 +136,35 @@ class PWMMotorController : public MotorController,
   void SetSpeed(double speed);
   double GetSpeed() const;
 
-  void SetBounds(units::microsecond_t maxPwm,
-                 units::microsecond_t deadbandMaxPwm,
-                 units::microsecond_t centerPwm,
-                 units::microsecond_t deadbandMinPwm,
-                 units::microsecond_t minPwm);
+  void SetBounds(wpi::units::microsecond_t maxPwm,
+                 wpi::units::microsecond_t deadbandMaxPwm,
+                 wpi::units::microsecond_t centerPwm,
+                 wpi::units::microsecond_t deadbandMinPwm,
+                 wpi::units::microsecond_t minPwm);
 
  private:
   bool m_isInverted = false;
   std::vector<PWMMotorController*> m_nonowningFollowers;
   std::vector<std::unique_ptr<PWMMotorController>> m_owningFollowers;
 
-  hal::SimDevice m_simDevice;
-  hal::SimDouble m_simSpeed;
+  wpi::hal::SimDevice m_simDevice;
+  wpi::hal::SimDouble m_simSpeed;
 
   bool m_eliminateDeadband{0};
-  units::microsecond_t m_minPwm{0};
-  units::microsecond_t m_deadbandMinPwm{0};
-  units::microsecond_t m_centerPwm{0};
-  units::microsecond_t m_deadbandMaxPwm{0};
-  units::microsecond_t m_maxPwm{0};
+  wpi::units::microsecond_t m_minPwm{0};
+  wpi::units::microsecond_t m_deadbandMinPwm{0};
+  wpi::units::microsecond_t m_centerPwm{0};
+  wpi::units::microsecond_t m_deadbandMaxPwm{0};
+  wpi::units::microsecond_t m_maxPwm{0};
 
-  units::microsecond_t GetMinPositivePwm() const;
-  units::microsecond_t GetMaxNegativePwm() const;
-  units::microsecond_t GetPositiveScaleFactor() const;
-  units::microsecond_t GetNegativeScaleFactor() const;
+  wpi::units::microsecond_t GetMinPositivePwm() const;
+  wpi::units::microsecond_t GetMaxNegativePwm() const;
+  wpi::units::microsecond_t GetPositiveScaleFactor() const;
+  wpi::units::microsecond_t GetNegativeScaleFactor() const;
 
   PWM* GetPwm() { return &m_pwm; }
 };
 
 WPI_UNIGNORE_DEPRECATED
 
-}  // namespace frc
+}  // namespace wpi

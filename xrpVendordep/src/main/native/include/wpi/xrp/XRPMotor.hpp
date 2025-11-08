@@ -13,7 +13,7 @@
 #include "wpi/hardware/motor/MotorSafety.hpp"
 #include "wpi/util/deprecated.hpp"
 
-namespace frc {
+namespace wpi::xrp {
 
 WPI_IGNORE_DEPRECATED
 
@@ -27,7 +27,7 @@ WPI_IGNORE_DEPRECATED
  *
  * <p>A SimDevice based motor controller representing the motors on an XRP robot
  */
-class XRPMotor : public frc::MotorController, public frc::MotorSafety {
+class XRPMotor : public wpi::MotorController, public wpi::MotorSafety {
  public:
   /**
    * Constructs an XRPMotor.
@@ -64,4 +64,4 @@ class XRPMotor : public frc::MotorController, public frc::MotorSafety {
 
 WPI_UNIGNORE_DEPRECATED
 
-}  // namespace frc
+}  // namespace wpi::xrp

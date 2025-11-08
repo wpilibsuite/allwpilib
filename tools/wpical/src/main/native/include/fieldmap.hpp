@@ -13,7 +13,7 @@
 class Fieldmap {
  public:
   Fieldmap() = default;
-  explicit Fieldmap(const wpi::json& json) {
+  explicit Fieldmap(const wpi::util::json& json) {
     double field_length_meters =
         static_cast<double>(json.at("field").at("length"));
     double field_width_meters =
@@ -50,8 +50,8 @@ class Fieldmap {
 
   bool hasTag(int tag) { return tagMap.find(tag) != tagMap.end(); }
 
-  wpi::json toJson() {
-    wpi::json json;
+  wpi::util::json toJson() {
+    wpi::util::json json;
     for (auto& [key, val] : tagMap) {
       json["tags"].push_back(val.toJson());
     }

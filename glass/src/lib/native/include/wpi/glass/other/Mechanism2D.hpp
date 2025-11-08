@@ -12,7 +12,7 @@
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/util/function_ref.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 class MechanismObjectModel;
 
@@ -20,7 +20,7 @@ class MechanismObjectGroup {
  public:
   virtual const char* GetName() const = 0;
   virtual void ForEachObject(
-      wpi::function_ref<void(MechanismObjectModel& model)> func) = 0;
+      wpi::util::function_ref<void(MechanismObjectModel& model)> func) = 0;
 };
 
 class MechanismObjectModel : public MechanismObjectGroup {
@@ -30,21 +30,21 @@ class MechanismObjectModel : public MechanismObjectGroup {
 
   // line accessors
   virtual double GetWeight() const = 0;
-  virtual frc::Rotation2d GetAngle() const = 0;
-  virtual units::meter_t GetLength() const = 0;
+  virtual wpi::math::Rotation2d GetAngle() const = 0;
+  virtual wpi::units::meter_t GetLength() const = 0;
 };
 
 class MechanismRootModel : public MechanismObjectGroup {
  public:
-  virtual frc::Translation2d GetPosition() const = 0;
+  virtual wpi::math::Translation2d GetPosition() const = 0;
 };
 
 class Mechanism2DModel : public Model {
  public:
-  virtual frc::Translation2d GetDimensions() const = 0;
+  virtual wpi::math::Translation2d GetDimensions() const = 0;
   virtual ImU32 GetBackgroundColor() const = 0;
   virtual void ForEachRoot(
-      wpi::function_ref<void(MechanismRootModel& model)> func) = 0;
+      wpi::util::function_ref<void(MechanismRootModel& model)> func) = 0;
 };
 
 void DisplayMechanism2D(Mechanism2DModel* model, const ImVec2& contentSize);
@@ -62,4 +62,4 @@ class Mechanism2DView : public View {
   Mechanism2DModel* m_model;
 };
 
-}  // namespace glass
+}  // namespace wpi::glass

@@ -4,7 +4,7 @@
 
 #pragma once
 
-namespace frc {
+namespace wpi {
 /**
  * Compressor config type.
  */
@@ -19,4 +19,4 @@ enum class CompressorConfigType {
   Hybrid = 3
 };
 
-}  // namespace frc
+}  // namespace wpi

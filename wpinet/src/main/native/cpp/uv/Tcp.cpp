@@ -11,7 +11,7 @@
 
 #include "wpi/net/uv/util.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 std::shared_ptr<Tcp> Tcp::Create(Loop& loop, unsigned int flags) {
   if (loop.IsClosing()) {
@@ -190,4 +190,4 @@ void Tcp::CloseReset() {
   }
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

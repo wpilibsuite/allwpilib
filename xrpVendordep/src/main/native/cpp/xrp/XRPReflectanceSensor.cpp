@@ -4,7 +4,7 @@
 
 #include "wpi/xrp/XRPReflectanceSensor.hpp"
 
-using namespace frc;
+using namespace wpi::xrp;
 
 double XRPReflectanceSensor::GetLeftReflectanceValue() const {
   return m_leftSensor.GetVoltage() / 5.0;

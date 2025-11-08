@@ -16,7 +16,7 @@
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
-namespace frc {
+namespace wpi::apriltag {
 
 /**
  * An AprilTag detector engine. This is expensive to set up and tear down, so
@@ -98,7 +98,7 @@ class WPILIB_DLLEXPORT AprilTagDetector {
      * angles that are close to straight or close to 180 degrees. Zero means
      * that no quads are rejected. Default is 45 degrees.
      */
-    units::radian_t criticalAngle = 45_deg;
+    wpi::units::radian_t criticalAngle = 45_deg;
 
     /**
      * When fitting lines to the contours, the maximum mean squared error
@@ -254,8 +254,8 @@ class WPILIB_DLLEXPORT AprilTagDetector {
   void DestroyFamily(std::string_view name, void* data);
 
   void* m_impl;
-  wpi::StringMap<void*> m_families;
-  units::radian_t m_qtpCriticalAngle = 10_deg;
+  wpi::util::StringMap<void*> m_families;
+  wpi::units::radian_t m_qtpCriticalAngle = 10_deg;
 };
 
-}  // namespace frc
+}  // namespace wpi::apriltag

@@ -9,7 +9,7 @@
 #include <set>
 #include <string>
 
-namespace frc {
+namespace wpi {
 
 /**
  * Persistent alert to be sent via NetworkTables. Alerts are tagged with a type
@@ -27,7 +27,7 @@ namespace frc {
  *
  * <pre>
  * class Robot {
- *   frc::Alert alert{"Something went wrong", frc::Alert::AlertType::kWarning};
+ *   wpi::Alert alert{"Something went wrong", wpi::Alert::AlertType::kWarning};
  * }
  *
  * Robot::periodic() {
@@ -138,4 +138,4 @@ class Alert {
 
 std::string format_as(Alert::AlertType type);
 
-}  // namespace frc
+}  // namespace wpi

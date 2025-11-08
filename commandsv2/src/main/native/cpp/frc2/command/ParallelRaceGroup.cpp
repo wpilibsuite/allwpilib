@@ -7,7 +7,7 @@
 #include <utility>
 #include <vector>
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 ParallelRaceGroup::ParallelRaceGroup(
     std::vector<std::unique_ptr<Command>>&& commands) {
@@ -56,7 +56,7 @@ void ParallelRaceGroup::AddCommands(
   CommandScheduler::GetInstance().RequireUngroupedAndUnscheduled(commands);
 
   if (isRunning) {
-    throw FRC_MakeError(frc::err::CommandIllegalUse,
+    throw FRC_MakeError(wpi::err::CommandIllegalUse,
                         "Commands cannot be added to a CommandGroup "
                         "while the group is running");
   }
@@ -72,7 +72,7 @@ void ParallelRaceGroup::AddCommands(
       }
       m_commands.emplace_back(std::move(command));
     } else {
-      throw FRC_MakeError(frc::err::CommandIllegalUse,
+      throw FRC_MakeError(wpi::err::CommandIllegalUse,
                           "Multiple commands in a parallel group cannot "
                           "require the same subsystems");
     }

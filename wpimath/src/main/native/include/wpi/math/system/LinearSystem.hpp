@@ -17,7 +17,7 @@
 #include "wpi/util/Algorithm.hpp"
 #include "wpi/util/SmallVector.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * A plant defined using state-space notation.
@@ -161,7 +161,7 @@ class LinearSystem {
    * @param dt       Timestep for model update.
    */
   StateVector CalculateX(const StateVector& x, const InputVector& clampedU,
-                         units::second_t dt) const {
+                         wpi::units::second_t dt) const {
     Matrixd<States, States> discA;
     Matrixd<States, Inputs> discB;
     DiscretizeAB<States, Inputs>(m_A, m_B, dt, &discA, &discB);
@@ -205,7 +205,7 @@ class LinearSystem {
                   "More outputs requested than available. This is usually due "
                   "to model implementation errors.");
 
-    wpi::for_each(
+    wpi::util::for_each(
         [](size_t i, const auto& elem) {
           if (elem < 0 || elem >= Outputs) {
             throw std::domain_error(
@@ -216,7 +216,7 @@ class LinearSystem {
         outputIndices...);
 
     // Sort and deduplicate output indices
-    wpi::SmallVector<int> outputIndicesArray{outputIndices...};
+    wpi::util::SmallVector<int> outputIndicesArray{outputIndices...};
     std::sort(outputIndicesArray.begin(), outputIndicesArray.end());
     auto last =
         std::unique(outputIndicesArray.begin(), outputIndicesArray.end());
@@ -255,4 +255,4 @@ class LinearSystem {
   Matrixd<Outputs, Inputs> m_D;
 };
 
-}  // namespace frc
+}  // namespace wpi::math

@@ -88,11 +88,11 @@ includedir = [
 
 [[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
 header = "wpi_array_type_caster.h"
-types = ["wpi::array"]
+types = ["wpi::util::array"]
 
 [[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
 header = "wpi_json_type_caster.h"
-types = ["wpi::json"]
+types = ["wpi::util::json"]
 
 [[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
 header = "wpi_span_type_caster.h"
@@ -100,23 +100,23 @@ types = ["std::span"]
 
 [[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
 header = "wpi_smallset_type_caster.h"
-types = ["wpi::SmallSet"]
+types = ["wpi::util::SmallSet"]
 
 [[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
 header = "wpi_smallvector_type_caster.h"
-types = ["wpi::SmallVector"]
+types = ["wpi::util::SmallVector"]
 
 [[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
 header = "wpi_smallvectorimpl_type_caster.h"
-types = ["wpi::SmallVectorImpl"]
+types = ["wpi::util::SmallVectorImpl"]
 
 [[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
 header = "wpi_string_map_caster.h"
-types = ["wpi::StringMap"]
+types = ["wpi::util::StringMap"]
 
 [[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
 header = "wpi_ct_string_type_caster.h"
-types = ["wpi::ct_string"]
+types = ["wpi::util::ct_string"]
 
 [[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
 header = "wpystruct.h"

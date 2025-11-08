@@ -8,8 +8,8 @@
 
 #include "wpi/driverstation/PS5Controller.hpp"
 
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 PS5ControllerSim::PS5ControllerSim(const PS5Controller& joystick)
     : GenericHIDSim{joystick} {

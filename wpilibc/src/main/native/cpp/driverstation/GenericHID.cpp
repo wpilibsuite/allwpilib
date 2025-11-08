@@ -11,7 +11,7 @@
 #include "wpi/hal/DriverStation.h"
 #include "wpi/system/Errors.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 GenericHID::GenericHID(int port) {
   if (port < 0 || port >= DriverStation::kJoystickPorts) {

@@ -18,7 +18,7 @@
 #include <utility>
 #include <variant>
 
-namespace wpi {
+namespace wpi::util {
 
 // Provide DenseMapInfo for variants whose all alternatives have DenseMapInfo.
 template <typename... Ts> struct DenseMapInfo<std::variant<Ts...>> {
@@ -66,6 +66,6 @@ template <typename... Ts> struct DenseMapInfo<std::variant<Ts...>> {
   }
 };
 
-} // end namespace wpi
+} // end namespace wpi::util
 
 #endif // WPIUTIL_WPI_DENSEMAPINFOVARIANT_H

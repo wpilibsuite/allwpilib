@@ -19,15 +19,15 @@
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
 
-namespace nt {
+namespace wpi::nt {
 
-template <wpi::ProtobufSerializable T>
+template <wpi::util::ProtobufSerializable T>
 class ProtobufTopic;
 
 /**
  * NetworkTables protobuf-encoded value subscriber.
  */
-template <wpi::ProtobufSerializable T>
+template <wpi::util::ProtobufSerializable T>
 class ProtobufSubscriber : public Subscriber {
  public:
   using TopicType = ProtobufTopic<T>;
@@ -45,7 +45,7 @@ class ProtobufSubscriber : public Subscriber {
    * @param msg Protobuf message
    * @param defaultValue Default value
    */
-  ProtobufSubscriber(NT_Subscriber handle, wpi::ProtobufMessage<T> msg,
+  ProtobufSubscriber(NT_Subscriber handle, wpi::util::ProtobufMessage<T> msg,
                      T defaultValue)
       : Subscriber{handle},
         m_msg{std::move(msg)},
@@ -96,8 +96,8 @@ class ProtobufSubscriber : public Subscriber {
    * @return true if successful
    */
   bool GetInto(T* out) {
-    wpi::SmallVector<uint8_t, 128> buf;
-    TimestampedRawView view = ::nt::GetAtomicRaw(m_subHandle, buf, {});
+    wpi::util::SmallVector<uint8_t, 128> buf;
+    TimestampedRawView view = ::wpi::nt::GetAtomicRaw(m_subHandle, buf, {});
     if (view.value.empty()) {
       return false;
     } else {
@@ -124,8 +124,8 @@ class ProtobufSubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueType GetAtomic(const T& defaultValue) const {
-    wpi::SmallVector<uint8_t, 128> buf;
-    TimestampedRawView view = ::nt::GetAtomicRaw(m_subHandle, buf, {});
+    wpi::util::SmallVector<uint8_t, 128> buf;
+    TimestampedRawView view = ::wpi::nt::GetAtomicRaw(m_subHandle, buf, {});
     if (!view.value.empty()) {
       std::scoped_lock lock{m_mutex};
       if (auto optval = m_msg.Unpack(view.value)) {
@@ -147,7 +147,7 @@ class ProtobufSubscriber : public Subscriber {
    *     have been published since the previous call.
    */
   std::vector<TimestampedValueType> ReadQueue() {
-    auto raw = ::nt::ReadQueueRaw(m_subHandle);
+    auto raw = ::wpi::nt::ReadQueueRaw(m_subHandle);
     std::vector<TimestampedValueType> rv;
     rv.reserve(raw.size());
     std::scoped_lock lock{m_mutex};
@@ -165,19 +165,19 @@ class ProtobufSubscriber : public Subscriber {
    * @return Topic
    */
   TopicType GetTopic() const {
-    return ProtobufTopic<T>{::nt::GetTopicFromHandle(m_subHandle)};
+    return ProtobufTopic<T>{::wpi::nt::GetTopicFromHandle(m_subHandle)};
   }
 
  private:
-  mutable wpi::mutex m_mutex;
-  mutable wpi::ProtobufMessage<T> m_msg;
+  mutable wpi::util::mutex m_mutex;
+  mutable wpi::util::ProtobufMessage<T> m_msg;
   ValueType m_defaultValue;
 };
 
 /**
  * NetworkTables protobuf-encoded value publisher.
  */
-template <wpi::ProtobufSerializable T>
+template <wpi::util::ProtobufSerializable T>
 class ProtobufPublisher : public Publisher {
  public:
   using TopicType = ProtobufTopic<T>;
@@ -195,7 +195,7 @@ class ProtobufPublisher : public Publisher {
    * @param handle Native handle
    * @param msg Protobuf message
    */
-  explicit ProtobufPublisher(NT_Publisher handle, wpi::ProtobufMessage<T> msg)
+  explicit ProtobufPublisher(NT_Publisher handle, wpi::util::ProtobufMessage<T> msg)
       : Publisher{handle}, m_msg{std::move(msg)} {}
 
   ProtobufPublisher(const ProtobufPublisher&) = delete;
@@ -222,7 +222,7 @@ class ProtobufPublisher : public Publisher {
    * @param time timestamp; 0 indicates current NT time should be used
    */
   void Set(const T& value, int64_t time = 0) {
-    wpi::SmallVector<uint8_t, 128> buf;
+    wpi::util::SmallVector<uint8_t, 128> buf;
     {
       std::scoped_lock lock{m_mutex};
       if (!m_schemaPublished.exchange(true, std::memory_order_relaxed)) {
@@ -230,7 +230,7 @@ class ProtobufPublisher : public Publisher {
       }
       m_msg.Pack(buf, value);
     }
-    ::nt::SetRaw(m_pubHandle, buf, time);
+    ::wpi::nt::SetRaw(m_pubHandle, buf, time);
   }
 
   /**
@@ -241,7 +241,7 @@ class ProtobufPublisher : public Publisher {
    * @param value value
    */
   void SetDefault(const T& value) {
-    wpi::SmallVector<uint8_t, 128> buf;
+    wpi::util::SmallVector<uint8_t, 128> buf;
     {
       std::scoped_lock lock{m_mutex};
       if (!m_schemaPublished.exchange(true, std::memory_order_relaxed)) {
@@ -249,7 +249,7 @@ class ProtobufPublisher : public Publisher {
       }
       m_msg.Pack(buf, value);
     }
-    ::nt::SetDefaultRaw(m_pubHandle, buf);
+    ::wpi::nt::SetDefaultRaw(m_pubHandle, buf);
   }
 
   /**
@@ -258,12 +258,12 @@ class ProtobufPublisher : public Publisher {
    * @return Topic
    */
   TopicType GetTopic() const {
-    return ProtobufTopic<T>{::nt::GetTopicFromHandle(m_pubHandle)};
+    return ProtobufTopic<T>{::wpi::nt::GetTopicFromHandle(m_pubHandle)};
   }
 
  private:
-  wpi::mutex m_mutex;
-  wpi::ProtobufMessage<T> m_msg;
+  wpi::util::mutex m_mutex;
+  wpi::util::ProtobufMessage<T> m_msg;
   std::atomic_bool m_schemaPublished{false};
 };
 
@@ -272,7 +272,7 @@ class ProtobufPublisher : public Publisher {
  *
  * @note Unlike NetworkTableEntry, the entry goes away when this is destroyed.
  */
-template <wpi::ProtobufSerializable T>
+template <wpi::util::ProtobufSerializable T>
 class ProtobufEntry final : public ProtobufSubscriber<T>,
                             public ProtobufPublisher<T> {
  public:
@@ -294,9 +294,9 @@ class ProtobufEntry final : public ProtobufSubscriber<T>,
    * @param msg Protobuf message
    * @param defaultValue Default value
    */
-  ProtobufEntry(NT_Entry handle, wpi::ProtobufMessage<T> msg, T defaultValue)
+  ProtobufEntry(NT_Entry handle, wpi::util::ProtobufMessage<T> msg, T defaultValue)
       : ProtobufSubscriber<T>{handle, std::move(msg), std::move(defaultValue)},
-        ProtobufPublisher<T>{handle, wpi::ProtobufMessage<T>{}} {}
+        ProtobufPublisher<T>{handle, wpi::util::ProtobufMessage<T>{}} {}
 
   /**
    * Determines if the native handle is valid.
@@ -318,19 +318,19 @@ class ProtobufEntry final : public ProtobufSubscriber<T>,
    * @return Topic
    */
   TopicType GetTopic() const {
-    return ProtobufTopic<T>{::nt::GetTopicFromHandle(this->m_subHandle)};
+    return ProtobufTopic<T>{::wpi::nt::GetTopicFromHandle(this->m_subHandle)};
   }
 
   /**
    * Stops publishing the entry if it's published.
    */
-  void Unpublish() { ::nt::Unpublish(this->m_pubHandle); }
+  void Unpublish() { ::wpi::nt::Unpublish(this->m_pubHandle); }
 };
 
 /**
  * NetworkTables protobuf-encoded value topic.
  */
-template <wpi::ProtobufSerializable T>
+template <wpi::util::ProtobufSerializable T>
 class ProtobufTopic final : public Topic {
  public:
   using SubscriberType = ProtobufSubscriber<T>;
@@ -375,10 +375,10 @@ class ProtobufTopic final : public Topic {
   [[nodiscard]]
   SubscriberType Subscribe(
       T defaultValue, const PubSubOptions& options = kDefaultPubSubOptions) {
-    wpi::ProtobufMessage<T> msg;
+    wpi::util::ProtobufMessage<T> msg;
     auto typeString = msg.GetTypeString();
     return ProtobufSubscriber<T>{
-        ::nt::Subscribe(m_handle, NT_RAW, typeString, options), std::move(msg),
+        ::wpi::nt::Subscribe(m_handle, NT_RAW, typeString, options), std::move(msg),
         std::move(defaultValue)};
   }
 
@@ -399,10 +399,10 @@ class ProtobufTopic final : public Topic {
    */
   [[nodiscard]]
   PublisherType Publish(const PubSubOptions& options = kDefaultPubSubOptions) {
-    wpi::ProtobufMessage<T> msg;
+    wpi::util::ProtobufMessage<T> msg;
     auto typeString = msg.GetTypeString();
     return ProtobufPublisher<T>{
-        ::nt::Publish(m_handle, NT_RAW, typeString, options), std::move(msg)};
+        ::wpi::nt::Publish(m_handle, NT_RAW, typeString, options), std::move(msg)};
   }
 
   /**
@@ -424,12 +424,12 @@ class ProtobufTopic final : public Topic {
    */
   [[nodiscard]]
   PublisherType PublishEx(
-      const wpi::json& properties,
+      const wpi::util::json& properties,
       const PubSubOptions& options = kDefaultPubSubOptions) {
-    wpi::ProtobufMessage<T> msg;
+    wpi::util::ProtobufMessage<T> msg;
     auto typeString = msg.GetTypeString();
     return ProtobufPublisher<T>{
-        ::nt::PublishEx(m_handle, NT_RAW, typeString, properties, options),
+        ::wpi::nt::PublishEx(m_handle, NT_RAW, typeString, properties, options),
         std::move(msg)};
   }
 
@@ -456,12 +456,12 @@ class ProtobufTopic final : public Topic {
   [[nodiscard]]
   EntryType GetEntry(T defaultValue,
                      const PubSubOptions& options = kDefaultPubSubOptions) {
-    wpi::ProtobufMessage<T> msg;
+    wpi::util::ProtobufMessage<T> msg;
     auto typeString = msg.GetTypeString();
     return ProtobufEntry<T>{
-        ::nt::GetEntry(m_handle, NT_RAW, typeString, options), std::move(msg),
+        ::wpi::nt::GetEntry(m_handle, NT_RAW, typeString, options), std::move(msg),
         std::move(defaultValue)};
   }
 };
 
-}  // namespace nt
+}  // namespace wpi::nt

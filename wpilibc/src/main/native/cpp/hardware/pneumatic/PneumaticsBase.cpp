@@ -12,7 +12,7 @@
 #include "wpi/system/Errors.hpp"
 #include "wpi/util/SensorUtil.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 static_assert(
     static_cast<int>(CompressorConfigType::Disabled) ==

@@ -2,9 +2,9 @@ extra_includes:
 - wpi/util/sendable/SendableBuilder.hpp
 
 classes:
-  frc::StadiaController:
+  wpi::StadiaController:
     ignored_bases:
-    - wpi::SendableHelper<StadiaController>
+    - wpi::util::SendableHelper<StadiaController>
     methods:
       StadiaController:
       GetLeftX:
@@ -78,7 +78,7 @@ classes:
       GetRightBumperButtonPressed:
       GetRightBumperButtonReleased:
       InitSendable:
-  frc::StadiaController::Button:
+  wpi::StadiaController::Button:
     attributes:
       kA:
       kB:
@@ -95,7 +95,7 @@ classes:
       kLeftTrigger:
       kGoogle:
       kFrame:
-  frc::StadiaController::Axis:
+  wpi::StadiaController::Axis:
     attributes:
       kLeftX:
       kRightX:

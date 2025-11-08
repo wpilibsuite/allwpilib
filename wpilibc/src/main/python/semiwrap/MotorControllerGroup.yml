@@ -3,10 +3,10 @@ extra_includes:
 - pybind11/stl.h
 
 classes:
-  frc::PyMotorControllerGroup:
+  wpi::PyMotorControllerGroup:
     rename: MotorControllerGroup
     ignored_bases:
-    - wpi::SendableHelper<PyMotorControllerGroup>
+    - wpi::util::SendableHelper<PyMotorControllerGroup>
     methods:
       PyMotorControllerGroup:
         cpp_code: |

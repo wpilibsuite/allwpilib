@@ -13,7 +13,7 @@
 #include "wpi/units/moment_of_inertia.hpp"
 #include "wpi/units/torque.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 /**
  * Represents a simulated DC motor mechanism.
  */
@@ -23,14 +23,14 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
    * Creates a simulated DC motor mechanism.
    *
    * @param plant              The linear system representing the DC motor. This
-   * system can be created with LinearSystemId::DCMotorSystem(). If
-   * LinearSystemId::DCMotorSystem(kV, kA) is used, the distance unit must be
+   * system can be created with wpi::math::LinearSystemId::DCMotorSystem(). If
+   * wpi::math::LinearSystemId::DCMotorSystem(kV, kA) is used, the distance unit must be
    * radians.
    * @param gearbox            The type of and number of motors in the DC motor
    * gearbox.
    * @param measurementStdDevs The standard deviation of the measurement noise.
    */
-  DCMotorSim(const LinearSystem<2, 1, 2>& plant, const DCMotor& gearbox,
+  DCMotorSim(const wpi::math::LinearSystem<2, 1, 2>& plant, const wpi::math::DCMotor& gearbox,
              const std::array<double, 2>& measurementStdDevs = {0.0, 0.0});
 
   using LinearSystemSim::SetState;
@@ -41,76 +41,76 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
    * @param angularPosition The new position
    * @param angularVelocity The new velocity
    */
-  void SetState(units::radian_t angularPosition,
-                units::radians_per_second_t angularVelocity);
+  void SetState(wpi::units::radian_t angularPosition,
+                wpi::units::radians_per_second_t angularVelocity);
 
   /**
    * Sets the DC motor's angular position.
    *
    * @param angularPosition The new position in radians.
    */
-  void SetAngle(units::radian_t angularPosition);
+  void SetAngle(wpi::units::radian_t angularPosition);
 
   /**
    * Sets the DC motor's angular velocity.
    *
    * @param angularVelocity The new velocity in radians per second.
    */
-  void SetAngularVelocity(units::radians_per_second_t angularVelocity);
+  void SetAngularVelocity(wpi::units::radians_per_second_t angularVelocity);
 
   /**
    * Returns the DC motor position.
    *
    * @return The DC motor position.
    */
-  units::radian_t GetAngularPosition() const;
+  wpi::units::radian_t GetAngularPosition() const;
 
   /**
    * Returns the DC motor velocity.
    *
    * @return The DC motor velocity.
    */
-  units::radians_per_second_t GetAngularVelocity() const;
+  wpi::units::radians_per_second_t GetAngularVelocity() const;
 
   /**
    * Returns the DC motor acceleration.
    *
    * @return The DC motor acceleration
    */
-  units::radians_per_second_squared_t GetAngularAcceleration() const;
+  wpi::units::radians_per_second_squared_t GetAngularAcceleration() const;
 
   /**
    * Returns the DC motor torque.
    *
    * @return The DC motor torque
    */
-  units::newton_meter_t GetTorque() const;
+  wpi::units::newton_meter_t GetTorque() const;
 
   /**
    * Returns the DC motor current draw.
    *
    * @return The DC motor current draw.
    */
-  units::ampere_t GetCurrentDraw() const;
+  wpi::units::ampere_t GetCurrentDraw() const;
 
   /**
    * Gets the input voltage for the DC motor.
    *
    * @return The DC motor input voltage.
    */
-  units::volt_t GetInputVoltage() const;
+  wpi::units::volt_t GetInputVoltage() const;
 
   /**
    * Sets the input voltage for the DC motor.
    *
    * @param voltage The input voltage.
    */
-  void SetInputVoltage(units::volt_t voltage);
+  void SetInputVoltage(wpi::units::volt_t voltage);
 
   /**
    * Returns the gearbox.
    */
-  const DCMotor& GetGearbox() const;
+  const wpi::math::DCMotor& GetGearbox() const;
 
   /**
    * Returns the gearing;
@@ -120,11 +120,11 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
   /**
    * Returns the moment of inertia
    */
-  units::kilogram_square_meter_t GetJ() const;
+  wpi::units::kilogram_square_meter_t GetJ() const;
 
  private:
-  DCMotor m_gearbox;
+  wpi::math::DCMotor m_gearbox;
   double m_gearing;
-  units::kilogram_square_meter_t m_j;
+  wpi::units::kilogram_square_meter_t m_j;
 };
-}  // namespace frc::sim
+}  // namespace wpi::sim

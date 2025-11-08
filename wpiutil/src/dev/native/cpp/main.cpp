@@ -6,6 +6,6 @@
 #include "wpi/util/print.hpp"
 
 int main() {
-  wpi::SmallString<128> v1("Hello");
-  wpi::print("{}\n", v1.str());
+  wpi::util::SmallString<128> v1("Hello");
+  wpi::util::print("{}\n", v1.str());
 }

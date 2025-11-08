@@ -27,107 +27,107 @@ static std::vector<int> vec_values{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
 TEST(CircularSpanTest, Constexpr) {
   {
-    constexpr wpi::rotated_span<const int, 10> sp{cesarr_values};
+    constexpr wpi::util::rotated_span<const int, 10> sp{cesarr_values};
     static_assert(sp[5] == cesarr_values[5]);
   }
   {
-    constexpr wpi::rotated_span<const int, 10> sp{cearr_values};
+    constexpr wpi::util::rotated_span<const int, 10> sp{cearr_values};
     static_assert(sp[5] == cearr_values[5]);
   }
 }
 
 TEST(CircularSpanTest, ConstructConst) {
   {
-    wpi::rotated_span<const int, 10> sp{csarr_values};
+    wpi::util::rotated_span<const int, 10> sp{csarr_values};
     EXPECT_EQ(sp[5], sarr_values[5]);
   }
   {
-    wpi::rotated_span<const int> sp{csarr_values};
+    wpi::util::rotated_span<const int> sp{csarr_values};
     EXPECT_EQ(sp[5], sarr_values[5]);
   }
   {
-    wpi::rotated_span<const int, 10> sp{carr_values};
+    wpi::util::rotated_span<const int, 10> sp{carr_values};
     EXPECT_EQ(sp[5], arr_values[5]);
   }
   {
-    wpi::rotated_span<const int> sp{carr_values};
+    wpi::util::rotated_span<const int> sp{carr_values};
     EXPECT_EQ(sp[5], arr_values[5]);
   }
   {
-    wpi::rotated_span<const int> sp{cvec_values.begin(), cvec_values.end()};
+    wpi::util::rotated_span<const int> sp{cvec_values.begin(), cvec_values.end()};
     EXPECT_EQ(sp[5], vec_values[5]);
   }
   {
-    wpi::rotated_span<const int> sp{cvec_values.data(), cvec_values.size()};
+    wpi::util::rotated_span<const int> sp{cvec_values.data(), cvec_values.size()};
     EXPECT_EQ(sp[5], vec_values[5]);
   }
 }
 
 TEST(CircularSpanTest, ConstructNonConst) {
   {
-    wpi::rotated_span<int, 10> sp{sarr_values};
+    wpi::util::rotated_span<int, 10> sp{sarr_values};
     EXPECT_EQ(sp[5], sarr_values[5]);
   }
   {
-    wpi::rotated_span<int> sp{sarr_values};
+    wpi::util::rotated_span<int> sp{sarr_values};
     EXPECT_EQ(sp[5], sarr_values[5]);
   }
   {
-    wpi::rotated_span<int, 10> sp{arr_values};
+    wpi::util::rotated_span<int, 10> sp{arr_values};
     EXPECT_EQ(sp[5], arr_values[5]);
   }
   {
-    wpi::rotated_span<int> sp{arr_values};
+    wpi::util::rotated_span<int> sp{arr_values};
     EXPECT_EQ(sp[5], arr_values[5]);
   }
   {
-    wpi::rotated_span<int> sp{vec_values.begin(), vec_values.end()};
+    wpi::util::rotated_span<int> sp{vec_values.begin(), vec_values.end()};
     EXPECT_EQ(sp[5], vec_values[5]);
   }
   {
-    wpi::rotated_span<int> sp{vec_values.data(), vec_values.size()};
+    wpi::util::rotated_span<int> sp{vec_values.data(), vec_values.size()};
     EXPECT_EQ(sp[5], vec_values[5]);
   }
 }
 
 TEST(CircularSpanTest, ConstructRotated) {
   {
-    constexpr wpi::rotated_span<const int, 10> sp{cesarr_values, 1};
+    constexpr wpi::util::rotated_span<const int, 10> sp{cesarr_values, 1};
     static_assert(sp[5] == cesarr_values[6]);
   }
   {
-    constexpr wpi::rotated_span<const int, 10> sp{cesarr_values, 9};
+    constexpr wpi::util::rotated_span<const int, 10> sp{cesarr_values, 9};
     static_assert(sp[5] == cesarr_values[4]);
   }
   {
-    constexpr wpi::rotated_span<const int, 10> sp{cesarr_values, 10};
+    constexpr wpi::util::rotated_span<const int, 10> sp{cesarr_values, 10};
     static_assert(sp[5] == cesarr_values[5]);
   }
   {
-    constexpr wpi::rotated_span<const int, 10> sp{cesarr_values, 11};
+    constexpr wpi::util::rotated_span<const int, 10> sp{cesarr_values, 11};
     static_assert(sp[5] == cesarr_values[6]);
   }
 
   {
-    constexpr wpi::rotated_span<const int, 10> sp{cearr_values, -1};
+    constexpr wpi::util::rotated_span<const int, 10> sp{cearr_values, -1};
     static_assert(sp[5] == cearr_values[4]);
   }
   {
-    constexpr wpi::rotated_span<const int, 10> sp{cearr_values, -9};
+    constexpr wpi::util::rotated_span<const int, 10> sp{cearr_values, -9};
     static_assert(sp[5] == cearr_values[6]);
   }
   {
-    constexpr wpi::rotated_span<const int, 10> sp{cearr_values, -10};
+    constexpr wpi::util::rotated_span<const int, 10> sp{cearr_values, -10};
     static_assert(sp[5] == cearr_values[5]);
   }
   {
-    constexpr wpi::rotated_span<const int, 10> sp{cearr_values, -11};
+    constexpr wpi::util::rotated_span<const int, 10> sp{cearr_values, -11};
     static_assert(sp[5] == cearr_values[4]);
   }
 }
 
 TEST(CircularSpanTest, Rotate) {
-  constexpr wpi::rotated_span<const int, 10> sp{cesarr_values, 1};
+  constexpr wpi::util::rotated_span<const int, 10> sp{cesarr_values, 1};
   static_assert(sp[5] == cesarr_values[6]);
   static_assert(sp.rotate(2)[5] == cesarr_values[8]);
   static_assert(sp.rotate(9)[5] == cesarr_values[5]);
@@ -140,10 +140,10 @@ TEST(CircularSpanTest, Rotate) {
   static_assert(sp.rotate(-11)[5] == cesarr_values[5]);
 }
 
-void unsized_func(wpi::rotated_span<int>) {}
-void const_unsized_func(wpi::rotated_span<const int>) {}
-void sized_func(wpi::rotated_span<int, 10>) {}
-void const_sized_func(wpi::rotated_span<const int, 10>) {}
+void unsized_func(wpi::util::rotated_span<int>) {}
+void const_unsized_func(wpi::util::rotated_span<const int>) {}
+void sized_func(wpi::util::rotated_span<int, 10>) {}
+void const_sized_func(wpi::util::rotated_span<const int, 10>) {}
 
 TEST(CircularSpanTest, Implicit) {
   // unsized_func(csarr_values);  // error
@@ -168,7 +168,7 @@ TEST(CircularSpanTest, Implicit) {
 }
 
 TEST(CircularSpanTest, IteratorConst) {
-  wpi::rotated_span<const int> sp_sarr{csarr_values};
+  wpi::util::rotated_span<const int> sp_sarr{csarr_values};
 
   // iterator
   int i = 0;
@@ -186,7 +186,7 @@ TEST(CircularSpanTest, IteratorConst) {
 }
 
 TEST(CircularSpanTest, IteratorNonConst) {
-  wpi::rotated_span<int> sp_sarr{sarr_values};
+  wpi::util::rotated_span<int> sp_sarr{sarr_values};
 
   // iterator
   int i = 0;

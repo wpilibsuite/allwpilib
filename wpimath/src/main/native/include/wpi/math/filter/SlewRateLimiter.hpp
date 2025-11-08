@@ -10,7 +10,7 @@
 #include "wpi/units/time.hpp"
 #include "wpi/util/timestamp.h"
 
-namespace frc {
+namespace wpi::math {
 /**
  * A class that limits the rate of change of an input value.  Useful for
  * implementing voltage, setpoint, and/or output ramps.  A slew-rate limit
@@ -23,9 +23,9 @@ namespace frc {
 template <class Unit>
 class SlewRateLimiter {
  public:
-  using Unit_t = units::unit_t<Unit>;
-  using Rate = units::compound_unit<Unit, units::inverse<units::seconds>>;
-  using Rate_t = units::unit_t<Rate>;
+  using Unit_t = wpi::units::unit_t<Unit>;
+  using Rate = wpi::units::compound_unit<Unit, wpi::units::inverse<wpi::units::seconds>>;
+  using Rate_t = wpi::units::unit_t<Rate>;
 
   /**
    * Creates a new SlewRateLimiter with the given positive and negative rate
@@ -45,7 +45,7 @@ class SlewRateLimiter {
         m_negativeRateLimit{negativeRateLimit},
         m_prevVal{initialValue},
         m_prevTime{
-            units::microsecond_t{wpi::math::MathSharedStore::GetTimestamp()}} {}
+            wpi::units::microsecond_t{wpi::math::MathSharedStore::GetTimestamp()}} {}
 
   /**
    * Creates a new SlewRateLimiter with the given positive rate limit and
@@ -64,8 +64,8 @@ class SlewRateLimiter {
    * rate.
    */
   Unit_t Calculate(Unit_t input) {
-    units::second_t currentTime = wpi::math::MathSharedStore::GetTimestamp();
-    units::second_t elapsedTime = currentTime - m_prevTime;
+    wpi::units::second_t currentTime = wpi::math::MathSharedStore::GetTimestamp();
+    wpi::units::second_t elapsedTime = currentTime - m_prevTime;
     m_prevVal +=
         std::clamp(input - m_prevVal, m_negativeRateLimit * elapsedTime,
                    m_positiveRateLimit * elapsedTime);
@@ -95,6 +95,6 @@ class SlewRateLimiter {
   Rate_t m_positiveRateLimit;
   Rate_t m_negativeRateLimit;
   Unit_t m_prevVal;
-  units::second_t m_prevTime;
+  wpi::units::second_t m_prevTime;
 };
-}  // namespace frc
+}  // namespace wpi::math

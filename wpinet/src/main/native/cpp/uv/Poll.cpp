@@ -10,7 +10,7 @@
 
 #include "wpi/net/uv/Loop.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 std::shared_ptr<Poll> Poll::Create(Loop& loop, int fd) {
   if (loop.IsClosing()) {
@@ -105,4 +105,4 @@ void Poll::Start(int events) {
          });
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

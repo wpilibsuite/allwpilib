@@ -7,15 +7,15 @@
 #include "wpi/math/geometry/Transform3d.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
-namespace frc {
+namespace wpi::apriltag {
 
 /** A pair of AprilTag pose estimates. */
 struct WPILIB_DLLEXPORT AprilTagPoseEstimate {
   /** Pose 1. */
-  Transform3d pose1;
+  wpi::math::Transform3d pose1;
 
   /** Pose 2. */
-  Transform3d pose2;
+  wpi::math::Transform3d pose2;
 
   /** Object-space error of pose 1. */
   double error1;
@@ -32,4 +32,4 @@ struct WPILIB_DLLEXPORT AprilTagPoseEstimate {
   double GetAmbiguity() const;
 };
 
-}  // namespace frc
+}  // namespace wpi::apriltag

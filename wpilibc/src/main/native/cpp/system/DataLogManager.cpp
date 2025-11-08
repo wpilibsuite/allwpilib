@@ -28,11 +28,11 @@
 #include "wpi/util/print.hpp"
 #include "wpi/util/timestamp.h"
 
-using namespace frc;
+using namespace wpi;
 
 namespace {
 
-struct Thread final : public wpi::SafeThread {
+struct Thread final : public wpi::util::SafeThread {
   Thread(std::string_view dir, std::string_view filename, double period);
   ~Thread() override;
 
@@ -56,7 +56,7 @@ struct Thread final : public wpi::SafeThread {
 
 struct Instance {
   Instance(std::string_view dir, std::string_view filename, double period);
-  wpi::SafeThreadOwner<Thread> owner;
+  wpi::util::SafeThreadOwner<Thread> owner;
 };
 
 }  // namespace
@@ -138,9 +138,9 @@ void Thread::Main() {
       std::vector<fs::directory_entry> entries;
       for (auto&& entry : fs::directory_iterator{m_logDir, ec}) {
         auto stem = entry.path().stem().string();
-        if (wpi::starts_with(stem, "FRC_") &&
+        if (wpi::util::starts_with(stem, "FRC_") &&
             entry.path().extension() == ".wpilog" &&
-            !wpi::starts_with(stem, "FRC_TBD_")) {
+            !wpi::util::starts_with(stem, "FRC_TBD_")) {
           entries.emplace_back(entry);
         }
       }
@@ -164,7 +164,7 @@ void Thread::Main() {
             break;
           }
         } else {
-          wpi::print(stderr, "DataLogManager: could not delete {}\n",
+          wpi::util::print(stderr, "DataLogManager: could not delete {}\n",
                      entry.path().string());
         }
       }
@@ -189,13 +189,13 @@ void Thread::Main() {
       m_log, "systemTime",
       "{\"source\":\"DataLogManager\",\"format\":\"time_t_us\"}"};
 
-  wpi::Event newDataEvent;
+  wpi::util::Event newDataEvent;
   DriverStation::ProvideRefreshedDataEventHandle(newDataEvent.GetHandle());
 
   for (;;) {
     bool timedOut = false;
     bool newData =
-        wpi::WaitForObject(newDataEvent.GetHandle(), 0.25, &timedOut);
+        wpi::util::WaitForObject(newDataEvent.GetHandle(), 0.25, &timedOut);
     if (!m_active) {
       break;
     }
@@ -279,7 +279,7 @@ void Thread::Main() {
     if (sysTimeCount >= 250) {
       sysTimeCount = 0;
       if (RobotController::IsSystemTimeValid()) {
-        sysTimeEntry.Append(wpi::GetSystemTime(), wpi::Now());
+        sysTimeEntry.Append(wpi::util::GetSystemTime(), wpi::util::Now());
       }
     }
   }
@@ -289,7 +289,7 @@ void Thread::Main() {
 void Thread::StartNTLog() {
   if (!m_ntLoggerEnabled) {
     m_ntLoggerEnabled = true;
-    auto inst = nt::NetworkTableInstance::GetDefault();
+    auto inst = wpi::nt::NetworkTableInstance::GetDefault();
     m_ntEntryLogger = inst.StartEntryDataLog(m_log, "", "NT:");
     m_ntConnLogger = inst.StartConnectionDataLog(m_log, "NTConnection");
   }
@@ -298,8 +298,8 @@ void Thread::StartNTLog() {
 void Thread::StopNTLog() {
   if (m_ntLoggerEnabled) {
     m_ntLoggerEnabled = false;
-    nt::NetworkTableInstance::StopEntryDataLog(m_ntEntryLogger);
-    nt::NetworkTableInstance::StopConnectionDataLog(m_ntConnLogger);
+    wpi::nt::NetworkTableInstance::StopEntryDataLog(m_ntEntryLogger);
+    wpi::nt::NetworkTableInstance::StopConnectionDataLog(m_ntConnLogger);
   }
 }
 
@@ -326,10 +326,10 @@ Instance::Instance(std::string_view dir, std::string_view filename,
   auto logDir = MakeLogDir(dir);
   std::error_code ec;
   for (auto&& entry : fs::directory_iterator{logDir, ec}) {
-    if (wpi::starts_with(entry.path().stem().string(), "FRC_TBD_") &&
+    if (wpi::util::starts_with(entry.path().stem().string(), "FRC_TBD_") &&
         entry.path().extension() == ".wpilog") {
       if (!fs::remove(entry, ec)) {
-        wpi::print(stderr, "DataLogManager: could not delete {}\n",
+        wpi::util::print(stderr, "DataLogManager: could not delete {}\n",
                    entry.path().string());
       }
     }
@@ -361,7 +361,7 @@ void DataLogManager::Stop() {
 
 void DataLogManager::Log(std::string_view message) {
   GetInstance().owner.GetThread()->m_messageLog.Append(message);
-  wpi::print("{}\n", message);
+  wpi::util::print("{}\n", message);
 }
 
 wpi::log::DataLog& DataLogManager::GetLog() {

@@ -13,7 +13,7 @@
 #include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/json.hpp"
 
-namespace nt {
+namespace wpi::nt {
 
 template <typename T>
 class UnitTopic;
@@ -21,7 +21,7 @@ class UnitTopic;
 /**
  * Timestamped unit.
  *
- * @tparam T unit type, e.g. units::meter_t
+ * @tparam T unit type, e.g. wpi::units::meter_t
  */
 template <typename T>
 struct TimestampedUnit {
@@ -48,7 +48,7 @@ struct TimestampedUnit {
 /**
  * NetworkTables unit-typed subscriber.
  *
- * @tparam T unit type, e.g. units::meter_t
+ * @tparam T unit type, e.g. wpi::units::meter_t
  */
 template <typename T>
 class UnitSubscriber : public Subscriber {
@@ -86,7 +86,7 @@ class UnitSubscriber : public Subscriber {
    * @return value
    */
   ValueType Get(ParamType defaultValue) const {
-    return T{::nt::GetDouble(m_subHandle, defaultValue.value())};
+    return T{::wpi::nt::GetDouble(m_subHandle, defaultValue.value())};
   }
 
   /**
@@ -107,7 +107,7 @@ class UnitSubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueType GetAtomic(ParamType defaultValue) const {
-    auto doubleVal = ::nt::GetAtomicDouble(m_subHandle, defaultValue.value());
+    auto doubleVal = ::wpi::nt::GetAtomicDouble(m_subHandle, defaultValue.value());
     return {doubleVal.time, doubleVal.serverTime, doubleVal.value};
   }
 
@@ -123,7 +123,7 @@ class UnitSubscriber : public Subscriber {
    */
   std::vector<TimestampedValueType> ReadQueue() {
     std::vector<TimestampedUnit<T>> vals;
-    auto doubleVals = ::nt::ReadQueueDouble(m_subHandle);
+    auto doubleVals = ::wpi::nt::ReadQueueDouble(m_subHandle);
     vals.reserve(doubleVals.size());
     for (auto&& val : doubleVals) {
       vals.emplace_back(val.time, val.serverTime, val.value);
@@ -136,7 +136,7 @@ class UnitSubscriber : public Subscriber {
    * @return Topic
    */
   TopicType GetTopic() const {
-    return UnitTopic<T>{::nt::GetTopicFromHandle(m_subHandle)};
+    return UnitTopic<T>{::wpi::nt::GetTopicFromHandle(m_subHandle)};
   }
 
  private:
@@ -146,7 +146,7 @@ class UnitSubscriber : public Subscriber {
 /**
  * NetworkTables unit-typed publisher.
  *
- * @tparam T unit type, e.g. units::meter_t
+ * @tparam T unit type, e.g. wpi::units::meter_t
  */
 template <typename T>
 class UnitPublisher : public Publisher {
@@ -174,7 +174,7 @@ class UnitPublisher : public Publisher {
    * @param time timestamp; 0 indicates current NT time should be used
    */
   void Set(ParamType value, int64_t time = 0) {
-    ::nt::SetDouble(m_pubHandle, value.value(), time);
+    ::wpi::nt::SetDouble(m_pubHandle, value.value(), time);
   }
 
   /**
@@ -185,7 +185,7 @@ class UnitPublisher : public Publisher {
    * @param value value
    */
   void SetDefault(ParamType value) {
-    ::nt::SetDefaultDouble(m_pubHandle, value.value());
+    ::wpi::nt::SetDefaultDouble(m_pubHandle, value.value());
   }
 
   /**
@@ -194,7 +194,7 @@ class UnitPublisher : public Publisher {
    * @return Topic
    */
   TopicType GetTopic() const {
-    return UnitTopic<T>{::nt::GetTopicFromHandle(m_pubHandle)};
+    return UnitTopic<T>{::wpi::nt::GetTopicFromHandle(m_pubHandle)};
   }
 };
 
@@ -203,7 +203,7 @@ class UnitPublisher : public Publisher {
  *
  * @note Unlike NetworkTableEntry, the entry goes away when this is destroyed.
  *
- * @tparam T unit type, e.g. units::meter_t
+ * @tparam T unit type, e.g. wpi::units::meter_t
  */
 template <typename T>
 class UnitEntry final : public UnitSubscriber<T>, public UnitPublisher<T> {
@@ -248,13 +248,13 @@ class UnitEntry final : public UnitSubscriber<T>, public UnitPublisher<T> {
    * @return Topic
    */
   TopicType GetTopic() const {
-    return UnitTopic<T>{::nt::GetTopicFromHandle(this->m_subHandle)};
+    return UnitTopic<T>{::wpi::nt::GetTopicFromHandle(this->m_subHandle)};
   }
 
   /**
    * Stops publishing the entry if it's published.
    */
-  void Unpublish() { ::nt::Unpublish(this->m_pubHandle); }
+  void Unpublish() { ::wpi::nt::Unpublish(this->m_pubHandle); }
 };
 
 /**
@@ -263,7 +263,7 @@ class UnitEntry final : public UnitSubscriber<T>, public UnitPublisher<T> {
  * correct behavior the publisher and subscriber must use the same unit type,
  * but this can be checked at runtime using IsMatchingUnit().
  *
- * @tparam T unit type, e.g. units::meter_t
+ * @tparam T unit type, e.g. wpi::units::meter_t
  */
 template <typename T>
 class UnitTopic final : public Topic {
@@ -320,7 +320,7 @@ class UnitTopic final : public Topic {
       ParamType defaultValue,
       const PubSubOptions& options = kDefaultPubSubOptions) {
     return UnitSubscriber<T>{
-        ::nt::Subscribe(m_handle, NT_DOUBLE, "double", options), defaultValue};
+        ::wpi::nt::Subscribe(m_handle, NT_DOUBLE, "double", options), defaultValue};
   }
 
   /**
@@ -344,7 +344,7 @@ class UnitTopic final : public Topic {
       std::string_view typeString, ParamType defaultValue,
       const PubSubOptions& options = kDefaultPubSubOptions) {
     return UnitSubscriber<T>{
-        ::nt::Subscribe(m_handle, NT_DOUBLE, typeString, options),
+        ::wpi::nt::Subscribe(m_handle, NT_DOUBLE, typeString, options),
         defaultValue};
   }
 
@@ -365,7 +365,7 @@ class UnitTopic final : public Topic {
    */
   [[nodiscard]]
   PublisherType Publish(const PubSubOptions& options = kDefaultPubSubOptions) {
-    return UnitPublisher<T>{::nt::PublishEx(m_handle, NT_DOUBLE, "double",
+    return UnitPublisher<T>{::wpi::nt::PublishEx(m_handle, NT_DOUBLE, "double",
                                             {{"unit", T{}.name()}}, options)};
   }
 
@@ -389,12 +389,12 @@ class UnitTopic final : public Topic {
    */
   [[nodiscard]]
   PublisherType PublishEx(
-      std::string_view typeString, const wpi::json& properties,
+      std::string_view typeString, const wpi::util::json& properties,
       const PubSubOptions& options = kDefaultPubSubOptions) {
-    wpi::json props = properties;
+    wpi::util::json props = properties;
     props["unit"] = T{}.name();
     return UnitPublisher<T>{
-        ::nt::PublishEx(m_handle, NT_DOUBLE, typeString, props, options)};
+        ::wpi::nt::PublishEx(m_handle, NT_DOUBLE, typeString, props, options)};
   }
 
   /**
@@ -420,7 +420,7 @@ class UnitTopic final : public Topic {
   [[nodiscard]]
   EntryType GetEntry(ParamType defaultValue,
                      const PubSubOptions& options = kDefaultPubSubOptions) {
-    return UnitEntry<T>{::nt::GetEntry(m_handle, NT_DOUBLE, "double", options),
+    return UnitEntry<T>{::wpi::nt::GetEntry(m_handle, NT_DOUBLE, "double", options),
                         defaultValue};
   }
 
@@ -449,8 +449,8 @@ class UnitTopic final : public Topic {
   EntryType GetEntryEx(std::string_view typeString, ParamType defaultValue,
                        const PubSubOptions& options = kDefaultPubSubOptions) {
     return UnitEntry<T>{
-        ::nt::GetEntry(m_handle, NT_DOUBLE, typeString, options), defaultValue};
+        ::wpi::nt::GetEntry(m_handle, NT_DOUBLE, typeString, options), defaultValue};
   }
 };
 
-}  // namespace nt
+}  // namespace wpi::nt

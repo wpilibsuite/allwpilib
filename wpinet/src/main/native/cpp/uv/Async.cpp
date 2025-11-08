@@ -8,7 +8,7 @@
 
 #include "wpi/net/uv/Loop.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 Async<>::~Async() noexcept {
   if (auto loop = m_loop.lock()) {
@@ -35,4 +35,4 @@ std::shared_ptr<Async<>> Async<>::Create(const std::shared_ptr<Loop>& loop) {
   return h;
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

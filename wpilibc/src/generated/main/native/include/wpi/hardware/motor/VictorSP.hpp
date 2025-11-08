@@ -8,7 +8,7 @@
 
 #include "wpi/hardware/motor/PWMMotorController.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Vex Robotics Victor SP Motor Controller with PWM control.
@@ -40,4 +40,4 @@ class VictorSP : public PWMMotorController {
   VictorSP& operator=(VictorSP&&) = default;
 };
 
-}  // namespace frc
+}  // namespace wpi

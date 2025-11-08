@@ -8,7 +8,7 @@
 
 #include "wpi/hal/UsageReporting.h"
 
-using namespace frc;
+using namespace wpi;
 
 PWMTalonSRX::PWMTalonSRX(int channel) : PWMMotorController("PWMTalonSRX", channel) {
   SetBounds(2.004_ms, 1.52_ms, 1.5_ms, 1.48_ms, 0.997_ms);

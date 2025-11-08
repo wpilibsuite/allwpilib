@@ -13,11 +13,11 @@
 #include "wpi/util/condition_variable.hpp"
 #include "wpi/util/mutex.hpp"
 
-namespace wpi {
+namespace wpi::net {
 
 TEST(WorkerThreadTest, Future) {
   WorkerThread<int(bool)> worker;
-  future<int> f =
+  wpi::util::future<int> f =
       worker.QueueWork([](bool v) -> int { return v ? 1 : 2; }, true);
   ASSERT_EQ(f.get(), 1);
 }
@@ -25,7 +25,7 @@ TEST(WorkerThreadTest, Future) {
 TEST(WorkerThreadTest, FutureVoid) {
   int callbacks = 0;
   WorkerThread<void(int)> worker;
-  future<void> f = worker.QueueWork(
+  wpi::util::future<void> f = worker.QueueWork(
       [&](int v) {
         ++callbacks;
         ASSERT_EQ(v, 3);
@@ -82,4 +82,4 @@ TEST(WorkerThreadTest, LoopVoid) {
   ASSERT_EQ(callbacks, 1);
 }
 
-}  // namespace wpi
+}  // namespace wpi::net

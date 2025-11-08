@@ -17,7 +17,7 @@
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/json_fwd.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * A rotation in a 2D coordinate frame represented by a point on the unit circle
@@ -35,9 +35,9 @@ class WPILIB_DLLEXPORT Rotation2d {
    *
    * @param value The value of the angle.
    */
-  constexpr Rotation2d(units::angle_unit auto value)  // NOLINT
-      : m_cos{gcem::cos(value.template convert<units::radian>().value())},
-        m_sin{gcem::sin(value.template convert<units::radian>().value())} {}
+  constexpr Rotation2d(wpi::units::angle_unit auto value)  // NOLINT
+      : m_cos{gcem::cos(value.template convert<wpi::units::radian>().value())},
+        m_sin{gcem::sin(value.template convert<wpi::units::radian>().value())} {}
 
   /**
    * Constructs a Rotation2d with the given x and y (cosine and sine)
@@ -57,7 +57,7 @@ class WPILIB_DLLEXPORT Rotation2d {
       if (!std::is_constant_evaluated()) {
         wpi::math::MathSharedStore::ReportError(
             "x and y components of Rotation2d are zero\n{}",
-            wpi::GetStackTrace(1));
+            wpi::util::GetStackTrace(1));
       }
     }
   }
@@ -106,7 +106,7 @@ class WPILIB_DLLEXPORT Rotation2d {
    * π.
    *
    * For example, <code>Rotation2d{30_deg} + Rotation2d{60_deg}</code> equals
-   * <code>Rotation2d{units::radian_t{std::numbers::pi/2.0}}</code>
+   * <code>Rotation2d{wpi::units::radian_t{std::numbers::pi/2.0}}</code>
    *
    * @param other The rotation to add.
    *
@@ -121,7 +121,7 @@ class WPILIB_DLLEXPORT Rotation2d {
    * rotation.
    *
    * For example, <code>Rotation2d{10_deg} - Rotation2d{100_deg}</code> equals
-   * <code>Rotation2d{units::radian_t{-std::numbers::pi/2.0}}</code>
+   * <code>Rotation2d{wpi::units::radian_t{-std::numbers::pi/2.0}}</code>
    *
    * @param other The rotation to subtract.
    *
@@ -203,8 +203,8 @@ class WPILIB_DLLEXPORT Rotation2d {
    *
    * @return The radian value of the rotation constrained within [-π, π].
    */
-  constexpr units::radian_t Radians() const {
-    return units::radian_t{gcem::atan2(m_sin, m_cos)};
+  constexpr wpi::units::radian_t Radians() const {
+    return wpi::units::radian_t{gcem::atan2(m_sin, m_cos)};
   }
 
   /**
@@ -212,7 +212,7 @@ class WPILIB_DLLEXPORT Rotation2d {
    *
    * @return The degree value of the rotation constrained within [-180, 180].
    */
-  constexpr units::degree_t Degrees() const { return Radians(); }
+  constexpr wpi::units::degree_t Degrees() const { return Radians(); }
 
   /**
    * Returns the cosine of the rotation.
@@ -241,12 +241,12 @@ class WPILIB_DLLEXPORT Rotation2d {
 };
 
 WPILIB_DLLEXPORT
-void to_json(wpi::json& json, const Rotation2d& rotation);
+void to_json(wpi::util::json& json, const Rotation2d& rotation);
 
 WPILIB_DLLEXPORT
-void from_json(const wpi::json& json, Rotation2d& rotation);
+void from_json(const wpi::util::json& json, Rotation2d& rotation);
 
-}  // namespace frc
+}  // namespace wpi::math
 
 #include "wpi/math/geometry/proto/Rotation2dProto.hpp"
 #include "wpi/math/geometry/struct/Rotation2dStruct.hpp"

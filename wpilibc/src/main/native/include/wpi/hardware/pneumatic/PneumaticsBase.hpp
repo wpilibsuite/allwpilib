@@ -14,7 +14,7 @@
 #include "wpi/units/time.hpp"
 #include "wpi/units/voltage.hpp"
 
-namespace frc {
+namespace wpi {
 class Solenoid;
 class DoubleSolenoid;
 class Compressor;
@@ -46,7 +46,7 @@ class PneumaticsBase {
    *
    * @return The current drawn by the compressor.
    */
-  virtual units::ampere_t GetCompressorCurrent() const = 0;
+  virtual wpi::units::ampere_t GetCompressorCurrent() const = 0;
 
   /** Disables the compressor. */
   virtual void DisableCompressor() = 0;
@@ -75,8 +75,8 @@ class PneumaticsBase {
    * off when the pressure reaches this value.
    */
   virtual void EnableCompressorAnalog(
-      units::pounds_per_square_inch_t minPressure,
-      units::pounds_per_square_inch_t maxPressure) = 0;
+      wpi::units::pounds_per_square_inch_t minPressure,
+      wpi::units::pounds_per_square_inch_t maxPressure) = 0;
 
   /**
    * If supported by the device, enables the compressor in hybrid mode. This
@@ -108,8 +108,8 @@ class PneumaticsBase {
    * disconnected or indicates that the system is full.
    */
   virtual void EnableCompressorHybrid(
-      units::pounds_per_square_inch_t minPressure,
-      units::pounds_per_square_inch_t maxPressure) = 0;
+      wpi::units::pounds_per_square_inch_t minPressure,
+      wpi::units::pounds_per_square_inch_t maxPressure) = 0;
 
   /**
    * Returns the active compressor configuration.
@@ -164,7 +164,7 @@ class PneumaticsBase {
    * @param index solenoid index
    * @param duration shot duration
    */
-  virtual void SetOneShotDuration(int index, units::second_t duration) = 0;
+  virtual void SetOneShotDuration(int index, wpi::units::second_t duration) = 0;
 
   /**
    * Check if a solenoid channel is valid.
@@ -215,7 +215,7 @@ class PneumaticsBase {
    * @param channel The analog input channel to read voltage from.
    * @return The voltage of the specified analog input channel.
    */
-  virtual units::volt_t GetAnalogVoltage(int channel) const = 0;
+  virtual wpi::units::volt_t GetAnalogVoltage(int channel) const = 0;
 
   /**
    * If supported by the device, returns the pressure read by an analog
@@ -228,7 +228,7 @@ class PneumaticsBase {
    * @return The pressure read by an analog pressure sensor on the
    * specified analog input channel.
    */
-  virtual units::pounds_per_square_inch_t GetPressure(int channel) const = 0;
+  virtual wpi::units::pounds_per_square_inch_t GetPressure(int channel) const = 0;
 
   /**
    * Create a solenoid object for the specified channel.
@@ -282,4 +282,4 @@ class PneumaticsBase {
    */
   static int GetDefaultForType(PneumaticsModuleType moduleType);
 };
-}  // namespace frc
+}  // namespace wpi

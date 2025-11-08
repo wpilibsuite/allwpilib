@@ -9,8 +9,8 @@
 #include "wpi/hal/simulation/AnalogInData.h"
 #include "wpi/hardware/discrete/AnalogInput.hpp"
 
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 AnalogInputSim::AnalogInputSim(const AnalogInput& analogInput)
     : m_index{analogInput.GetChannel()} {}

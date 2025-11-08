@@ -2,15 +2,15 @@ extra_includes:
 - wpi/nt/NTSendableBuilder.hpp
 
 classes:
-  frc::Field2d:
+  wpi::Field2d:
     ignored_bases:
-    - wpi::SendableHelper<Field2d>
+    - wpi::util::SendableHelper<Field2d>
     methods:
       Field2d:
       SetRobotPose:
         overloads:
-          const Pose2d&:
-          units::meter_t, units::meter_t, Rotation2d:
+          const wpi::math::Pose2d&:
+          wpi::units::meter_t, wpi::units::meter_t, wpi::math::Rotation2d:
       GetRobotPose:
       GetObject:
         return_value_policy: reference_internal

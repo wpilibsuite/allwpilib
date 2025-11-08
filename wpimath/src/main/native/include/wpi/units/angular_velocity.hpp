@@ -30,9 +30,9 @@
 #include "wpi/units/base.hpp"
 #include "wpi/units/time.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::angular_velocity
+ * @namespace wpi::units::angular_velocity
  * @brief namespace for unit types and containers representing angular velocity
  *        values
  * @details The SI unit for angular velocity is `radians_per_second`, and the
@@ -43,7 +43,7 @@ namespace units {
 #if !defined(DISABLE_PREDEFINED_UNITS) || \
     defined(ENABLE_PREDEFINED_ANGULAR_VELOCITY_UNITS)
 UNIT_ADD(angular_velocity, radians_per_second, radians_per_second, rad_per_s,
-         unit<std::ratio<1>, units::category::angular_velocity_unit>)
+         unit<std::ratio<1>, wpi::units::category::angular_velocity_unit>)
 UNIT_ADD(angular_velocity, degrees_per_second, degrees_per_second, deg_per_s,
          compound_unit<angle::degrees, inverse<time::seconds>>)
 UNIT_ADD(angular_velocity, turns_per_second, turns_per_second, tps,
@@ -57,4 +57,4 @@ UNIT_ADD_CATEGORY_TRAIT(angular_velocity)
 #endif
 
 using namespace angular_velocity;
-}  // namespace units
+}  // namespace wpi::units

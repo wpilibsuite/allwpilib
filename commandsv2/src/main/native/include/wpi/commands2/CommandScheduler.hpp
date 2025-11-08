@@ -20,7 +20,7 @@
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 class Command;
 class CommandPtr;
 class Subsystem;
@@ -34,8 +34,8 @@ class Subsystem;
  *
  * This class is provided by the NewCommands VendorDep
  */
-class CommandScheduler final : public wpi::Sendable,
-                               public wpi::SendableHelper<CommandScheduler> {
+class CommandScheduler final : public wpi::util::Sendable,
+                               public wpi::util::SendableHelper<CommandScheduler> {
  public:
   /**
    * Returns the Scheduler instance.
@@ -56,30 +56,30 @@ class CommandScheduler final : public wpi::Sendable,
    * Changes the period of the loop overrun watchdog. This should be kept in
    * sync with the TimedRobot period.
    */
-  void SetPeriod(units::second_t period);
+  void SetPeriod(wpi::units::second_t period);
 
   /**
    * Get the active button poll.
    *
-   * @return a reference to the current {@link frc::EventLoop} object polling
+   * @return a reference to the current {@link wpi::EventLoop} object polling
    * buttons.
    */
-  frc::EventLoop* GetActiveButtonLoop() const;
+  wpi::EventLoop* GetActiveButtonLoop() const;
 
   /**
    * Replace the button poll with another one.
    *
    * @param loop the new button polling loop object.
    */
-  void SetActiveButtonLoop(frc::EventLoop* loop);
+  void SetActiveButtonLoop(wpi::EventLoop* loop);
 
   /**
    * Get the default button poll.
    *
-   * @return a reference to the default {@link frc::EventLoop} object polling
+   * @return a reference to the default {@link wpi::EventLoop} object polling
    * buttons.
    */
-  frc::EventLoop* GetDefaultButtonLoop() const;
+  wpi::EventLoop* GetDefaultButtonLoop() const;
 
   /**
    * Schedules a command for execution. Does nothing if the command is already
@@ -212,7 +212,7 @@ class CommandScheduler final : public wpi::Sendable,
   template <std::derived_from<Command> T>
   void SetDefaultCommand(Subsystem* subsystem, T&& defaultCommand) {
     if (!defaultCommand.HasRequirement(subsystem)) {
-      throw FRC_MakeError(frc::err::CommandIllegalUse,
+      throw FRC_MakeError(wpi::err::CommandIllegalUse,
                           "Default commands must require their subsystem!");
     }
     SetDefaultCommandImpl(subsystem, std::make_unique<std::decay_t<T>>(
@@ -467,7 +467,7 @@ class CommandScheduler final : public wpi::Sendable,
   void RequireUngroupedAndUnscheduled(
       std::initializer_list<const Command*> commands);
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
   // Constructor; private as this is a singleton
@@ -481,11 +481,11 @@ class CommandScheduler final : public wpi::Sendable,
   class Impl;
   std::unique_ptr<Impl> m_impl;
 
-  frc::Watchdog m_watchdog;
+  wpi::Watchdog m_watchdog;
 
   friend class CommandTestBase;
 
   template <typename T>
   friend class CommandTestBaseWithParam;
 };
-}  // namespace frc2
+}  // namespace wpi::cmd

@@ -13,7 +13,7 @@
 #include "make_vector.hpp"
 #include "wpi/commands2/Commands.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 
 inline namespace single {
 template <typename T>
@@ -182,4 +182,4 @@ REGISTER_TYPED_TEST_SUITE_P(MultiCompositionInterruptibilityTest, AllCancelSelf,
   INSTANTIATE_TYPED_TEST_SUITE_P(Suite, MultiCompositionRunsWhenDisabledTest, \
                                  CompositionType)
 }  // namespace multi
-}  // namespace frc2
+}  // namespace wpi::cmd

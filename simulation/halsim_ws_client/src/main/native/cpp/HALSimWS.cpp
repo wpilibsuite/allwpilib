@@ -16,17 +16,17 @@
 
 static constexpr int kTcpConnectAttemptTimeout = 1000;
 
-namespace uv = wpi::uv;
+namespace uv = wpi::net::uv;
 
 using namespace wpilibws;
 
-HALSimWS::HALSimWS(wpi::uv::Loop& loop, ProviderContainer& providers,
+HALSimWS::HALSimWS(wpi::net::uv::Loop& loop, ProviderContainer& providers,
                    HALSimWSProviderSimDevices& simDevicesProvider)
     : m_loop(loop),
       m_providers(providers),
       m_simDevicesProvider(simDevicesProvider) {
   m_loop.error.connect([](uv::Error err) {
-    wpi::print(stderr, "HALSim WS Client libuv Error: {}\n", err.str());
+    wpi::util::print(stderr, "HALSim WS Client libuv Error: {}\n", err.str());
   });
 
   m_tcp_client = uv::Tcp::Create(m_loop);
@@ -54,7 +54,7 @@ bool HALSimWS::Initialize() {
     try {
       m_port = std::stoi(port);
     } catch (const std::invalid_argument& err) {
-      wpi::print(stderr, "Error decoding HALSIMWS_PORT ({})\n", err.what());
+      wpi::util::print(stderr, "Error decoding HALSIMWS_PORT ({})\n", err.what());
       return false;
     }
   } else {
@@ -71,8 +71,8 @@ bool HALSimWS::Initialize() {
   const char* msgFilters = std::getenv("HALSIMWS_FILTERS");
   if (msgFilters != nullptr) {
     m_useMsgFiltering = true;
-    wpi::split(wpi::trim(msgFilters), ',', -1, false,
-               [&](auto val) { m_msgFilters[wpi::trim(val)] = true; });
+    wpi::util::split(wpi::util::trim(msgFilters), ',', -1, false,
+               [&](auto val) { m_msgFilters[wpi::util::trim(val)] = true; });
   } else {
     m_useMsgFiltering = false;
   }
@@ -85,7 +85,7 @@ void HALSimWS::Start() {
 
   // Hook up TCP client events
   m_tcp_client->error.connect(
-      [this, socket = m_tcp_client.get()](wpi::uv::Error err) {
+      [this, socket = m_tcp_client.get()](wpi::net::uv::Error err) {
         if (m_tcp_connected) {
           m_tcp_connected = false;
           m_connect_attempts = 0;
@@ -102,16 +102,16 @@ void HALSimWS::Start() {
 
   // Print any filters we are using
   if (m_useMsgFiltering) {
-    wpi::print("WS Message Filters:");
+    wpi::util::print("WS Message Filters:");
     for (auto&& filter : m_msgFilters) {
-      wpi::print("* \"{}\"\n", filter.first);
+      wpi::util::print("* \"{}\"\n", filter.first);
     }
   } else {
-    wpi::print("No WS Message Filters specified");
+    wpi::util::print("No WS Message Filters specified");
   }
 
   // Set up the connection timer
-  wpi::print("Will attempt to connect to ws://{}:{}{}\n", m_host, m_port,
+  wpi::util::print("Will attempt to connect to ws://{}:{}{}\n", m_host, m_port,
              m_uri);
 
   // Set up the timer to attempt connection
@@ -125,7 +125,7 @@ void HALSimWS::Start() {
 void HALSimWS::AttemptConnect() {
   m_connect_attempts++;
 
-  wpi::print("Connection Attempt {}\n", m_connect_attempts);
+  wpi::util::print("Connection Attempt {}\n", m_connect_attempts);
 
   struct sockaddr_in dest;
   uv::NameToAddr(m_host, m_port, &dest);
@@ -170,7 +170,7 @@ void HALSimWS::CloseWebsocket(
   }
 }
 
-void HALSimWS::OnNetValueChanged(const wpi::json& msg) {
+void HALSimWS::OnNetValueChanged(const wpi::util::json& msg) {
   // Look for "type" and "device" fields so that we can
   // generate the key
 
@@ -178,7 +178,7 @@ void HALSimWS::OnNetValueChanged(const wpi::json& msg) {
     auto& type = msg.at("type").get_ref<const std::string&>();
     auto& device = msg.at("device").get_ref<const std::string&>();
 
-    wpi::SmallString<64> key;
+    wpi::util::SmallString<64> key;
     key.append(type);
     if (!device.empty()) {
       key.append("/");
@@ -189,8 +189,8 @@ void HALSimWS::OnNetValueChanged(const wpi::json& msg) {
     if (provider) {
       provider->OnNetValueChanged(msg.at("data"));
     }
-  } catch (wpi::json::exception& e) {
-    wpi::print(stderr, "Error with incoming message: {}\n", e.what());
+  } catch (wpi::util::json::exception& e) {
+    wpi::util::print(stderr, "Error with incoming message: {}\n", e.what());
   }
 }
 

@@ -22,14 +22,14 @@
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/print.hpp"
 
-using namespace hal;
+using namespace wpi::hal;
 
 namespace {
 constexpr const char* physicalPorts[kNumI2cBuses] = {"/dev/i2c-10",
                                                      "/dev/i2c-1"};
 
 struct I2C {
-  wpi::mutex initMutex;
+  wpi::util::mutex initMutex;
   int objCount = 0;
   int fd = -1;
 };
@@ -37,17 +37,17 @@ struct I2C {
 static I2C i2cObjs[kNumI2cBuses];
 }  // namespace
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeI2C() {}
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
 
   if (port < 0 || port > 2) {
     *status = RESOURCE_OUT_OF_RANGE;
-    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for I2C", 0, 1,
+    wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for I2C", 0, 1,
                                      port);
     return;
   }
@@ -61,9 +61,9 @@ void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
   if (handle < 0) {
     int err = errno;
     *status = NO_AVAILABLE_RESOURCES;
-    hal::SetLastError(status, fmt::format("Failed to open onboard i2c bus: {}",
+    wpi::hal::SetLastError(status, fmt::format("Failed to open onboard i2c bus: {}",
                                           std::strerror(err)));
-    wpi::print("Failed to open onboard i2c bus: {}\n", std::strerror(err));
+    wpi::util::print("Failed to open onboard i2c bus: {}\n", std::strerror(err));
     handle = -1;
     i2cObjs[port].objCount--;
     return;
@@ -76,7 +76,7 @@ int32_t HAL_TransactionI2C(HAL_I2CPort port, int32_t deviceAddress,
                            uint8_t* dataReceived, int32_t receiveSize) {
   if (port < 0 || port > 2) {
     int32_t status = 0;
-    hal::SetLastErrorIndexOutOfRange(&status, "Invalid Index for I2C", 0, 1,
+    wpi::hal::SetLastErrorIndexOutOfRange(&status, "Invalid Index for I2C", 0, 1,
                                      port);
     return -1;
   }
@@ -103,7 +103,7 @@ int32_t HAL_WriteI2C(HAL_I2CPort port, int32_t deviceAddress,
                      const uint8_t* dataToSend, int32_t sendSize) {
   if (port < 0 || port > 2) {
     int32_t status = 0;
-    hal::SetLastErrorIndexOutOfRange(&status, "Invalid Index for I2C", 0, 2,
+    wpi::hal::SetLastErrorIndexOutOfRange(&status, "Invalid Index for I2C", 0, 2,
                                      port);
     return -1;
   }
@@ -126,7 +126,7 @@ int32_t HAL_ReadI2C(HAL_I2CPort port, int32_t deviceAddress, uint8_t* buffer,
                     int32_t count) {
   if (port < 0 || port > 2) {
     int32_t status = 0;
-    hal::SetLastErrorIndexOutOfRange(&status, "Invalid Index for I2C", 0, 1,
+    wpi::hal::SetLastErrorIndexOutOfRange(&status, "Invalid Index for I2C", 0, 1,
                                      port);
     return -1;
   }
@@ -148,7 +148,7 @@ int32_t HAL_ReadI2C(HAL_I2CPort port, int32_t deviceAddress, uint8_t* buffer,
 void HAL_CloseI2C(HAL_I2CPort port) {
   if (port < 0 || port > 2) {
     int32_t status = 0;
-    hal::SetLastErrorIndexOutOfRange(&status, "Invalid Index for I2C", 0, 1,
+    wpi::hal::SetLastErrorIndexOutOfRange(&status, "Invalid Index for I2C", 0, 1,
                                      port);
     return;
   }

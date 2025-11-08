@@ -17,17 +17,17 @@
 #include "wpi/util/fs.hpp"
 #include "wpi/util/print.hpp"
 
-namespace uv = wpi::uv;
+namespace uv = wpi::net::uv;
 
 using namespace wpilibws;
 
-HALSimWeb::HALSimWeb(wpi::uv::Loop& loop, ProviderContainer& providers,
+HALSimWeb::HALSimWeb(wpi::net::uv::Loop& loop, ProviderContainer& providers,
                      HALSimWSProviderSimDevices& simDevicesProvider)
     : m_loop(loop),
       m_providers(providers),
       m_simDevicesProvider(simDevicesProvider) {
   m_loop.error.connect([](uv::Error err) {
-    wpi::print(stderr, "HALSim WS Server libuv ERROR: {}\n", err.str());
+    wpi::util::print(stderr, "HALSim WS Server libuv ERROR: {}\n", err.str());
   });
 
   m_server = uv::Tcp::Create(m_loop);
@@ -72,7 +72,7 @@ bool HALSimWeb::Initialize() {
     try {
       m_port = std::stoi(port);
     } catch (const std::invalid_argument& err) {
-      wpi::print(stderr, "Error decoding HALSIMWS_PORT ({})\n", err.what());
+      wpi::util::print(stderr, "Error decoding HALSIMWS_PORT ({})\n", err.what());
       return false;
     }
   } else {
@@ -82,8 +82,8 @@ bool HALSimWeb::Initialize() {
   const char* msgFilters = std::getenv("HALSIMWS_FILTERS");
   if (msgFilters != nullptr) {
     m_useMsgFiltering = true;
-    wpi::split(wpi::trim(msgFilters), ',', -1, false,
-               [&](auto val) { m_msgFilters[wpi::trim(val)] = true; });
+    wpi::util::split(wpi::util::trim(msgFilters), ',', -1, false,
+               [&](auto val) { m_msgFilters[wpi::util::trim(val)] = true; });
   } else {
     m_useMsgFiltering = false;
   }
@@ -109,17 +109,17 @@ void HALSimWeb::Start() {
 
   // start listening for incoming connections
   m_server->Listen();
-  wpi::print("Listening at http://localhost:{}\n", m_port);
-  wpi::print("WebSocket URI: {}\n", m_uri);
+  wpi::util::print("Listening at http://localhost:{}\n", m_port);
+  wpi::util::print("WebSocket URI: {}\n", m_uri);
 
   // Print any filters we are using
   if (m_useMsgFiltering) {
-    wpi::print("WS Message Filters:");
+    wpi::util::print("WS Message Filters:");
     for (auto&& filter : m_msgFilters) {
-      wpi::print("* \"{}\"\n", filter.first);
+      wpi::util::print("* \"{}\"\n", filter.first);
     }
   } else {
-    wpi::print("No WS Message Filters specified");
+    wpi::util::print("No WS Message Filters specified");
   }
 }
 
@@ -155,7 +155,7 @@ void HALSimWeb::CloseWebsocket(
   }
 }
 
-void HALSimWeb::OnNetValueChanged(const wpi::json& msg) {
+void HALSimWeb::OnNetValueChanged(const wpi::util::json& msg) {
   // Look for "type" and "device" fields so that we can
   // generate the key
 
@@ -163,7 +163,7 @@ void HALSimWeb::OnNetValueChanged(const wpi::json& msg) {
     auto& type = msg.at("type").get_ref<const std::string&>();
     auto& device = msg.at("device").get_ref<const std::string&>();
 
-    wpi::SmallString<64> key;
+    wpi::util::SmallString<64> key;
     key.append(type);
     if (!device.empty()) {
       key.append("/");
@@ -174,8 +174,8 @@ void HALSimWeb::OnNetValueChanged(const wpi::json& msg) {
     if (provider) {
       provider->OnNetValueChanged(msg.at("data"));
     }
-  } catch (wpi::json::exception& e) {
-    wpi::print(stderr, "Error with incoming message: {}\n", e.what());
+  } catch (wpi::util::json::exception& e) {
+    wpi::util::print(stderr, "Error with incoming message: {}\n", e.what());
   }
 }
 

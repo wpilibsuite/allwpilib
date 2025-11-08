@@ -2,10 +2,10 @@ extra_includes:
 - wpi/driverstation/XboxController.hpp
 
 classes:
-  frc::sim::XboxControllerSim:
+  wpi::sim::XboxControllerSim:
     force_no_trampoline: true
     typealias:
-    - frc::XboxController
+    - wpi::XboxController
     methods:
       XboxControllerSim:
         overloads:

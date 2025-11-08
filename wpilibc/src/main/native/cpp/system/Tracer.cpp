@@ -10,14 +10,14 @@
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/raw_ostream.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 Tracer::Tracer() {
   ResetTimer();
 }
 
 void Tracer::ResetTimer() {
-  m_startTime = hal::fpga_clock::now();
+  m_startTime = wpi::hal::fpga_clock::now();
 }
 
 void Tracer::ClearEpochs() {
@@ -26,25 +26,25 @@ void Tracer::ClearEpochs() {
 }
 
 void Tracer::AddEpoch(std::string_view epochName) {
-  auto currentTime = hal::fpga_clock::now();
+  auto currentTime = wpi::hal::fpga_clock::now();
   m_epochs[epochName] = currentTime - m_startTime;
   m_startTime = currentTime;
 }
 
 void Tracer::PrintEpochs() {
-  wpi::SmallString<128> buf;
-  wpi::raw_svector_ostream os(buf);
+  wpi::util::SmallString<128> buf;
+  wpi::util::raw_svector_ostream os(buf);
   PrintEpochs(os);
   if (!buf.empty()) {
     FRC_ReportWarning("{}", buf.c_str());
   }
 }
 
-void Tracer::PrintEpochs(wpi::raw_ostream& os) {
+void Tracer::PrintEpochs(wpi::util::raw_ostream& os) {
   using std::chrono::duration_cast;
   using std::chrono::microseconds;
 
-  auto now = hal::fpga_clock::now();
+  auto now = wpi::hal::fpga_clock::now();
   if (now - m_lastEpochsPrintTime > kMinPrintPeriod) {
     m_lastEpochsPrintTime = now;
     for (const auto& epoch : m_epochs) {

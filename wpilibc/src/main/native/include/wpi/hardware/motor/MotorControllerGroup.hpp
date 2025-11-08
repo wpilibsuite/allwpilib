@@ -14,7 +14,7 @@
 
 WPI_IGNORE_DEPRECATED
 
-namespace frc {
+namespace wpi {
 
 /**
  * Allows multiple MotorController objects to be linked together.
@@ -22,9 +22,9 @@ namespace frc {
 class [[deprecated(
     "Use PWMMotorController::AddFollower() or if using CAN motor controllers,"
     "use their method of following.")]] MotorControllerGroup
-    : public wpi::Sendable,
+    : public wpi::util::Sendable,
       public MotorController,
-      public wpi::SendableHelper<MotorControllerGroup> {
+      public wpi::util::SendableHelper<MotorControllerGroup> {
  public:
   /**
    * Create a new MotorControllerGroup with the provided MotorControllers.
@@ -53,14 +53,14 @@ class [[deprecated(
   MotorControllerGroup& operator=(MotorControllerGroup&&) = default;
 
   void Set(double speed) override;
-  void SetVoltage(units::volt_t output) override;
+  void SetVoltage(wpi::units::volt_t output) override;
   double Get() const override;
   void SetInverted(bool isInverted) override;
   bool GetInverted() const override;
   void Disable() override;
   void StopMotor() override;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
   bool m_isInverted = false;
@@ -69,6 +69,6 @@ class [[deprecated(
   void Initialize();
 };
 
-}  // namespace frc
+}  // namespace wpi
 
 WPI_UNIGNORE_DEPRECATED

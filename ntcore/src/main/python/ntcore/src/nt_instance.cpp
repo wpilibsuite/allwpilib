@@ -9,24 +9,24 @@ static std::set<NT_Inst> g_known_instances;
 
 namespace pyntcore {
 
-void onInstanceStart(nt::NetworkTableInstance *instance) {
+void onInstanceStart(wpi::nt::NetworkTableInstance *instance) {
     g_known_instances.emplace(instance->GetHandle());
 
     py::module::import("ntcore._logutil")
         .attr("NtLogForwarder").attr("onInstanceStart")(instance);
 }
 
-void onInstancePreReset(nt::NetworkTableInstance *instance) {
+void onInstancePreReset(wpi::nt::NetworkTableInstance *instance) {
     py::module::import("ntcore._logutil")
         .attr("NtLogForwarder").attr("onInstanceDestroy")(instance);
 }
 
-void onInstancePostReset(nt::NetworkTableInstance *instance) {
+void onInstancePostReset(wpi::nt::NetworkTableInstance *instance) {
     py::module::import("ntcore.util")
         .attr("_NtProperty").attr("onInstancePostReset")(instance);
 }
 
-void onInstanceDestroy(nt::NetworkTableInstance *instance) {
+void onInstanceDestroy(wpi::nt::NetworkTableInstance *instance) {
     py::module::import("ntcore._logutil")
         .attr("NtLogForwarder").attr("onInstanceDestroy")(instance);
     py::module::import("ntcore.util")
@@ -43,12 +43,12 @@ void resetAllInstances()
     known_instances.swap(g_known_instances);
 
     // always reset the default instance
-    known_instances.emplace(nt::GetDefaultInstance());
+    known_instances.emplace(wpi::nt::GetDefaultInstance());
 
     py::gil_scoped_release unlock;
 
     for (auto &inst: known_instances) {
-        nt::ResetInstance(inst);
+        wpi::nt::ResetInstance(inst);
     }
 }
 

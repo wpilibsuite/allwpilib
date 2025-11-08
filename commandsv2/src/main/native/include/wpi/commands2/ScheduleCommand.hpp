@@ -10,7 +10,7 @@
 #include "wpi/commands2/CommandHelper.hpp"
 #include "wpi/util/SmallSet.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 /**
  * Schedules the given commands when this command is initialized. Useful for
  * forking off from CommandGroups. Note that if run from a composition, the
@@ -42,6 +42,6 @@ class ScheduleCommand : public CommandHelper<Command, ScheduleCommand> {
   bool RunsWhenDisabled() const override;
 
  private:
-  wpi::SmallSet<Command*, 4> m_toSchedule;
+  wpi::util::SmallSet<Command*, 4> m_toSchedule;
 };
-}  // namespace frc2
+}  // namespace wpi::cmd

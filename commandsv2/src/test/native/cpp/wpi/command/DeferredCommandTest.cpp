@@ -7,7 +7,7 @@
 #include "wpi/commands2/DeferredCommand.hpp"
 #include "wpi/commands2/FunctionalCommand.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 
 class DeferredFunctionsTest : public CommandTestBaseWithParam<bool> {};
 

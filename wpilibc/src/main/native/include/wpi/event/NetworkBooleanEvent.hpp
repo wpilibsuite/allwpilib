@@ -16,7 +16,7 @@ class NetworkTable;
 class NetworkTableInstance;
 }  // namespace nt
 
-namespace frc {
+namespace wpi {
 /**
  * A Button that uses a NetworkTable boolean field.
  *
@@ -31,7 +31,7 @@ class NetworkBooleanEvent : public BooleanEvent {
    * @param loop the loop that polls this event
    * @param topic The boolean topic that contains the value
    */
-  NetworkBooleanEvent(EventLoop* loop, nt::BooleanTopic topic);
+  NetworkBooleanEvent(EventLoop* loop, wpi::nt::BooleanTopic topic);
 
   /**
    * Creates a new event with the given boolean subscriber determining whether
@@ -40,7 +40,7 @@ class NetworkBooleanEvent : public BooleanEvent {
    * @param loop the loop that polls this event
    * @param sub The boolean subscriber that provides the value
    */
-  NetworkBooleanEvent(EventLoop* loop, nt::BooleanSubscriber sub);
+  NetworkBooleanEvent(EventLoop* loop, wpi::nt::BooleanSubscriber sub);
 
   /**
    * Creates a new event with the given boolean topic determining whether it is
@@ -50,7 +50,7 @@ class NetworkBooleanEvent : public BooleanEvent {
    * @param table The NetworkTable that contains the topic
    * @param topicName The topic name within the table that contains the value
    */
-  NetworkBooleanEvent(EventLoop* loop, std::shared_ptr<nt::NetworkTable> table,
+  NetworkBooleanEvent(EventLoop* loop, std::shared_ptr<wpi::nt::NetworkTable> table,
                       std::string_view topicName);
 
   /**
@@ -73,7 +73,7 @@ class NetworkBooleanEvent : public BooleanEvent {
    * @param tableName The NetworkTable that contains the topic
    * @param topicName The topic name within the table that contains the value
    */
-  NetworkBooleanEvent(EventLoop* loop, nt::NetworkTableInstance inst,
+  NetworkBooleanEvent(EventLoop* loop, wpi::nt::NetworkTableInstance inst,
                       std::string_view tableName, std::string_view topicName);
 };
-}  // namespace frc
+}  // namespace wpi

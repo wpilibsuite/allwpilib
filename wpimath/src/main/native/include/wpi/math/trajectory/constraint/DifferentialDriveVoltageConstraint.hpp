@@ -17,7 +17,7 @@
 #include "wpi/util/MathExtras.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
-namespace frc {
+namespace wpi::math {
 /**
  * A class that enforces constraints on differential drive voltage expenditure
  * based on the motor dynamics and the drive kinematics.  Ensures that the
@@ -38,21 +38,21 @@ class WPILIB_DLLEXPORT DifferentialDriveVoltageConstraint
    * voltage (12V) to account for "voltage sag" due to current draw.
    */
   constexpr DifferentialDriveVoltageConstraint(
-      const SimpleMotorFeedforward<units::meter>& feedforward,
-      DifferentialDriveKinematics kinematics, units::volt_t maxVoltage)
+      const SimpleMotorFeedforward<wpi::units::meter>& feedforward,
+      DifferentialDriveKinematics kinematics, wpi::units::volt_t maxVoltage)
       : m_feedforward(feedforward),
         m_kinematics(std::move(kinematics)),
         m_maxVoltage(maxVoltage) {}
 
-  constexpr units::meters_per_second_t MaxVelocity(
-      const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t velocity) const override {
-    return units::meters_per_second_t{std::numeric_limits<double>::max()};
+  constexpr wpi::units::meters_per_second_t MaxVelocity(
+      const Pose2d& pose, wpi::units::curvature_t curvature,
+      wpi::units::meters_per_second_t velocity) const override {
+    return wpi::units::meters_per_second_t{std::numeric_limits<double>::max()};
   }
 
   constexpr MinMax MinMaxAcceleration(
-      const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t speed) const override {
+      const Pose2d& pose, wpi::units::curvature_t curvature,
+      wpi::units::meters_per_second_t speed) const override {
     auto wheelSpeeds =
         m_kinematics.ToWheelSpeeds({speed, 0_mps, speed * curvature});
 
@@ -83,25 +83,25 @@ class WPILIB_DLLEXPORT DifferentialDriveVoltageConstraint
     // case, as it breaks the signum function.  Both max and min acceleration
     // are *reduced in magnitude* in this case.
 
-    units::meters_per_second_squared_t maxChassisAcceleration;
-    units::meters_per_second_squared_t minChassisAcceleration;
+    wpi::units::meters_per_second_squared_t maxChassisAcceleration;
+    wpi::units::meters_per_second_squared_t minChassisAcceleration;
 
     if (speed == 0_mps) {
       maxChassisAcceleration =
           maxWheelAcceleration /
-          (1 + m_kinematics.trackwidth * units::math::abs(curvature) / (2_rad));
+          (1 + m_kinematics.trackwidth * wpi::units::math::abs(curvature) / (2_rad));
       minChassisAcceleration =
           minWheelAcceleration /
-          (1 + m_kinematics.trackwidth * units::math::abs(curvature) / (2_rad));
+          (1 + m_kinematics.trackwidth * wpi::units::math::abs(curvature) / (2_rad));
     } else {
       maxChassisAcceleration =
           maxWheelAcceleration /
-          (1 + m_kinematics.trackwidth * units::math::abs(curvature) *
-                   wpi::sgn(speed) / (2_rad));
+          (1 + m_kinematics.trackwidth * wpi::units::math::abs(curvature) *
+                   wpi::util::sgn(speed) / (2_rad));
       minChassisAcceleration =
           minWheelAcceleration /
-          (1 - m_kinematics.trackwidth * units::math::abs(curvature) *
-                   wpi::sgn(speed) / (2_rad));
+          (1 - m_kinematics.trackwidth * wpi::units::math::abs(curvature) *
+                   wpi::util::sgn(speed) / (2_rad));
     }
 
     // When turning about a point inside of the wheelbase (i.e. radius less than
@@ -110,7 +110,7 @@ class WPILIB_DLLEXPORT DifferentialDriveVoltageConstraint
     // wheel when this happens. We can accurately account for this by simply
     // negating the inner wheel.
 
-    if ((m_kinematics.trackwidth / 2) > 1_rad / units::math::abs(curvature)) {
+    if ((m_kinematics.trackwidth / 2) > 1_rad / wpi::units::math::abs(curvature)) {
       if (speed > 0_mps) {
         minChassisAcceleration = -minChassisAcceleration;
       } else if (speed < 0_mps) {
@@ -122,8 +122,8 @@ class WPILIB_DLLEXPORT DifferentialDriveVoltageConstraint
   }
 
  private:
-  SimpleMotorFeedforward<units::meter> m_feedforward;
+  SimpleMotorFeedforward<wpi::units::meter> m_feedforward;
   DifferentialDriveKinematics m_kinematics;
-  units::volt_t m_maxVoltage;
+  wpi::units::volt_t m_maxVoltage;
 };
-}  // namespace frc
+}  // namespace wpi::math

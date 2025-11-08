@@ -18,16 +18,16 @@
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/StringMap.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 class Window;
 
 namespace detail {
 struct NTProviderFunctions {
   using Exists =
-      std::function<bool(nt::NetworkTableInstance inst, const char* path)>;
+      std::function<bool(wpi::nt::NetworkTableInstance inst, const char* path)>;
   using CreateModel = std::function<std::unique_ptr<Model>(
-      nt::NetworkTableInstance inst, const char* path)>;
+      wpi::nt::NetworkTableInstance inst, const char* path)>;
   using ViewExists = std::function<bool(Model*, const char* path)>;
   using CreateView =
       std::function<std::unique_ptr<View>(Window*, Model*, const char* path)>;
@@ -43,14 +43,14 @@ class NetworkTablesProvider : private Provider<detail::NTProviderFunctions> {
   using Provider::CreateViewFunc;
 
   explicit NetworkTablesProvider(Storage& storage);
-  NetworkTablesProvider(Storage& storage, nt::NetworkTableInstance inst);
+  NetworkTablesProvider(Storage& storage, wpi::nt::NetworkTableInstance inst);
 
   /**
    * Get the NetworkTables instance being used for this provider.
    *
    * @return NetworkTables instance
    */
-  nt::NetworkTableInstance GetInstance() const { return m_inst; }
+  wpi::nt::NetworkTableInstance GetInstance() const { return m_inst; }
 
   /**
    * Perform global initialization.  This should be called prior to
@@ -76,8 +76,8 @@ class NetworkTablesProvider : private Provider<detail::NTProviderFunctions> {
  private:
   void Update() override;
 
-  nt::NetworkTableInstance m_inst;
-  nt::NetworkTableListenerPoller m_poller;
+  wpi::nt::NetworkTableInstance m_inst;
+  wpi::nt::NetworkTableListenerPoller m_poller;
   NT_Listener m_listener{0};
 
   // cached mapping from table name to type string
@@ -89,27 +89,27 @@ class NetworkTablesProvider : private Provider<detail::NTProviderFunctions> {
   };
 
   // mapping from .type string to model/view creators
-  wpi::StringMap<Builder> m_typeMap;
+  wpi::util::StringMap<Builder> m_typeMap;
 
   struct SubListener {
-    nt::StringSubscriber subscriber;
+    wpi::nt::StringSubscriber subscriber;
     NT_Listener listener;
   };
 
   // mapping from .type topic to subscriber/listener
-  wpi::DenseMap<NT_Topic, SubListener> m_topicMap;
+  wpi::util::DenseMap<NT_Topic, SubListener> m_topicMap;
 
   struct Entry : public ModelEntry {
-    Entry(nt::Topic typeTopic, std::string_view name, const Builder& builder)
+    Entry(wpi::nt::Topic typeTopic, std::string_view name, const Builder& builder)
         : ModelEntry{name, [](auto, const char*) { return true; },
                      builder.createModel},
           typeTopic{typeTopic} {}
-    nt::Topic typeTopic;
+    wpi::nt::Topic typeTopic;
   };
 
   void Show(ViewEntry* entry, Window* window) override;
 
-  ViewEntry* GetOrCreateView(const Builder& builder, nt::Topic typeTopic,
+  ViewEntry* GetOrCreateView(const Builder& builder, wpi::nt::Topic typeTopic,
                              std::string_view name);
 };
 
@@ -120,4 +120,4 @@ class NetworkTablesProvider : private Provider<detail::NTProviderFunctions> {
  */
 void AddStandardNetworkTablesViews(NetworkTablesProvider& provider);
 
-}  // namespace glass
+}  // namespace wpi::glass

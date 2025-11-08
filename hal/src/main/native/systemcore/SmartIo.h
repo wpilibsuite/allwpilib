@@ -11,7 +11,7 @@
 #include "wpi/hal/handles/HandlesInternal.h"
 #include "wpi/nt/IntegerTopic.hpp"
 
-namespace hal {
+namespace wpi::hal {
 
 constexpr int32_t kPwmDisabled = 0;
 constexpr int32_t kPwmAlwaysHigh = 0xFFFF;
@@ -38,16 +38,16 @@ struct SmartIo {
   uint8_t channel;
   std::string previousAllocation;
   SmartIoMode currentMode{SmartIoMode::DigitalInput};
-  nt::IntegerPublisher modePublisher;
+  wpi::nt::IntegerPublisher modePublisher;
 
-  nt::IntegerPublisher setPublisher;
-  nt::IntegerSubscriber getSubscriber;
+  wpi::nt::IntegerPublisher setPublisher;
+  wpi::nt::IntegerSubscriber getSubscriber;
 
-  nt::IntegerPublisher periodSetPublisher;
-  nt::IntegerSubscriber periodGetSubscriber;
+  wpi::nt::IntegerPublisher periodSetPublisher;
+  wpi::nt::IntegerSubscriber periodGetSubscriber;
 
-  nt::IntegerPublisher ledcountPublisher;
-  nt::IntegerPublisher ledoffsetPublisher;
+  wpi::nt::IntegerPublisher ledcountPublisher;
+  wpi::nt::IntegerPublisher ledoffsetPublisher;
 
   int32_t InitializeMode(SmartIoMode mode);
   int32_t SwitchDioDirection(bool input);
@@ -74,6 +74,6 @@ struct SmartIo {
 extern DigitalHandleResource<HAL_DigitalHandle, SmartIo, kNumSmartIo>*
     smartIoHandles;
 
-extern wpi::mutex smartIoMutex;
+extern wpi::util::mutex smartIoMutex;
 
-}  // namespace hal
+}  // namespace wpi::hal

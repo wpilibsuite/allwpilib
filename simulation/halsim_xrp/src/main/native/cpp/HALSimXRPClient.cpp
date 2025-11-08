@@ -20,7 +20,7 @@ using namespace wpilibws;
 
 bool HALSimXRPClient::Initialize() {
   bool result = true;
-  runner.ExecSync([&](wpi::uv::Loop& loop) {
+  runner.ExecSync([&](wpi::net::uv::Loop& loop) {
     simxrp = std::make_shared<HALSimXRP>(loop, providers, simDevices);
 
     if (!simxrp->Initialize()) {

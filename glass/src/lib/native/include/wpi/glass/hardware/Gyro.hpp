@@ -6,7 +6,7 @@
 
 #include "wpi/glass/Model.hpp"
 
-namespace glass {
+namespace wpi::glass {
 class DoubleSource;
 class GyroModel : public Model {
  public:
@@ -17,4 +17,4 @@ class GyroModel : public Model {
   virtual void SetAngle(double angle) = 0;
 };
 void DisplayGyro(GyroModel* m);
-}  // namespace glass
+}  // namespace wpi::glass

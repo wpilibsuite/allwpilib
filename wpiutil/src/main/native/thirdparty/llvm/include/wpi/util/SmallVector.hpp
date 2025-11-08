@@ -39,7 +39,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace wpi {
+namespace wpi::util {
 
 template <typename IteratorT> class iterator_range;
 
@@ -1323,21 +1323,21 @@ typename SmallVectorImpl<T>::size_type erase_if(
   return original_size - c.size();
 }
 
-} // end namespace wpi
+} // end namespace wpi::util
 
 namespace std {
 
   /// Implement std::swap in terms of SmallVector swap.
   template<typename T>
   inline void
-  swap(wpi::SmallVectorImpl<T> &LHS, wpi::SmallVectorImpl<T> &RHS) {
+  swap(wpi::util::SmallVectorImpl<T> &LHS, wpi::util::SmallVectorImpl<T> &RHS) {
     LHS.swap(RHS);
   }
 
   /// Implement std::swap in terms of SmallVector swap.
   template<typename T, unsigned N>
   inline void
-  swap(wpi::SmallVector<T, N> &LHS, wpi::SmallVector<T, N> &RHS) {
+  swap(wpi::util::SmallVector<T, N> &LHS, wpi::util::SmallVector<T, N> &RHS) {
     LHS.swap(RHS);
   }
 

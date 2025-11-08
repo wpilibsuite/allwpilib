@@ -20,11 +20,11 @@ inline void NamedLog(UsbCameraImplObjc* objc, unsigned int level,
     return;
   }
 
-  wpi::Logger& logger = sharedThis->objcGetLogger();
+  wpi::util::Logger& logger = sharedThis->objcGetLogger();
   std::string_view name = sharedThis->GetName();
 
   if (logger.HasLogger() && level >= logger.min_level()) {
-    cs::NamedLogV(logger, level, file, line, name, format,
+    wpi::cs::NamedLogV(logger, level, file, line, name, format,
                   fmt::make_format_args(args...));
   }
 }
@@ -34,11 +34,11 @@ inline void NamedLog(UsbCameraImplObjc* objc, unsigned int level,
            format __VA_OPT__(, ) __VA_ARGS__)
 
 #define OBJCERROR(format, ...) \
-  OBJCLOG(::wpi::WPI_LOG_ERROR, format __VA_OPT__(, ) __VA_ARGS__)
+  OBJCLOG(::wpi::util::WPI_LOG_ERROR, format __VA_OPT__(, ) __VA_ARGS__)
 #define OBJCWARNING(format, ...) \
-  OBJCLOG(::wpi::WPI_LOG_WARNING, format __VA_OPT__(, ) __VA_ARGS__)
+  OBJCLOG(::wpi::util::WPI_LOG_WARNING, format __VA_OPT__(, ) __VA_ARGS__)
 #define OBJCINFO(format, ...) \
-  OBJCLOG(::wpi::WPI_LOG_INFO, format __VA_OPT__(, ) __VA_ARGS__)
+  OBJCLOG(::wpi::util::WPI_LOG_INFO, format __VA_OPT__(, ) __VA_ARGS__)
 
 #ifdef NDEBUG
 #define OBJCDEBUG(format, ...) \
@@ -58,18 +58,18 @@ inline void NamedLog(UsbCameraImplObjc* objc, unsigned int level,
   } while (0)
 #else
 #define OBJCDEBUG(format, ...) \
-  OBJCLOG(::wpi::WPI_LOG_DEBUG, format __VA_OPT__(, ) __VA_ARGS__)
+  OBJCLOG(::wpi::util::WPI_LOG_DEBUG, format __VA_OPT__(, ) __VA_ARGS__)
 #define OBJCDEBUG1(format, ...) \
-  OBJCLOG(::wpi::WPI_LOG_DEBUG1, format __VA_OPT__(, ) __VA_ARGS__)
+  OBJCLOG(::wpi::util::WPI_LOG_DEBUG1, format __VA_OPT__(, ) __VA_ARGS__)
 #define OBJCDEBUG2(format, ...) \
-  OBJCLOG(::wpi::WPI_LOG_DEBUG2, format __VA_OPT__(, ) __VA_ARGS__)
+  OBJCLOG(::wpi::util::WPI_LOG_DEBUG2, format __VA_OPT__(, ) __VA_ARGS__)
 #define OBJCDEBUG3(format, ...) \
-  OBJCLOG(::wpi::WPI_LOG_DEBUG3, format __VA_OPT__(, ) __VA_ARGS__)
+  OBJCLOG(::wpi::util::WPI_LOG_DEBUG3, format __VA_OPT__(, ) __VA_ARGS__)
 #define OBJCDEBUG4(format, ...) \
-  OBJCLOG(::wpi::WPI_LOG_DEBUG4, format __VA_OPT__(, ) __VA_ARGS__)
+  OBJCLOG(::wpi::util::WPI_LOG_DEBUG4, format __VA_OPT__(, ) __VA_ARGS__)
 #endif
 
-using namespace cs;
+using namespace wpi::cs;
 
 @implementation UsbCameraImplObjc
 
@@ -169,7 +169,7 @@ using namespace cs;
     }
     
     // Get the property name from the property index
-    wpi::SmallString<128> nameBuf;
+    wpi::util::SmallString<128> nameBuf;
     std::string_view propName = sharedThis->GetPropertyName(property, nameBuf, status);
     if (*status != 0) {
         OBJCERROR("Failed to get property name for index {}", property);
@@ -402,7 +402,7 @@ using namespace cs;
   sharedThis->SetProperty(prop, value, status);
 }
 
-- (bool)setVideoMode:(const cs::VideoMode&)mode status:(CS_Status*)status {
+- (bool)setVideoMode:(const wpi::cs::VideoMode&)mode status:(CS_Status*)status {
   dispatch_async_and_wait(self.sessionQueue, ^{
     auto sharedThis = self.cppImpl.lock();
     if (!sharedThis) {
@@ -414,7 +414,7 @@ using namespace cs;
   });
   return true;
 }
-- (bool)setPixelFormat:(cs::VideoMode::PixelFormat)pixelFormat
+- (bool)setPixelFormat:(wpi::cs::VideoMode::PixelFormat)pixelFormat
                 status:(CS_Status*)status {
   dispatch_async_and_wait(self.sessionQueue, ^{
     auto sharedThis = self.cppImpl.lock();
@@ -449,7 +449,7 @@ using namespace cs;
   return true;
 }
 
-- (void)internalSetMode:(const cs::VideoMode&)newMode
+- (void)internalSetMode:(const wpi::cs::VideoMode&)newMode
                  status:(CS_Status*)status {
   auto sharedThis = self.cppImpl.lock();
   if (!sharedThis) {
@@ -693,13 +693,13 @@ using namespace cs;
     propertyAutoCache[nameStr] = propID;
 }
 
-static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
+static wpi::cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
   switch (fourcc) {
     case kCVPixelFormatType_422YpCbCr8_yuvs:
     case kCVPixelFormatType_422YpCbCr8FullRange:
-      return cs::VideoMode::PixelFormat::kYUYV;
+      return wpi::cs::VideoMode::PixelFormat::kYUYV;
     default:
-      return cs::VideoMode::PixelFormat::kBGR;
+      return wpi::cs::VideoMode::PixelFormat::kBGR;
   }
 }
 
@@ -761,7 +761,7 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
                                              CS_SOURCE_VIDEOMODES_UPDATED);
 }
 
-- (AVCaptureDeviceFormat*)deviceCheckModeValid:(const cs::VideoMode*)toCheck
+- (AVCaptureDeviceFormat*)deviceCheckModeValid:(const wpi::cs::VideoMode*)toCheck
                                        withFps:(int*)fps {
   auto sharedThis = self.cppImpl.lock();
   if (!sharedThis) {
@@ -995,7 +995,7 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
     OBJCINFO("Starting for device id {}", self.deviceId);
     // Enumerate Devices
     CS_Status status = 0;
-    auto cameras = cs::EnumerateUsbCameras(&status);
+    auto cameras = wpi::cs::EnumerateUsbCameras(&status);
     if (static_cast<int>(cameras.size()) <= self.deviceId) {
       return false;
     }

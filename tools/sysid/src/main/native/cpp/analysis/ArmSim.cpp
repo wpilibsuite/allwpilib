@@ -27,13 +27,13 @@ ArmSim::ArmSim(double Ks, double Kv, double Ka, double Kg, double offset,
   Reset(initialPosition, initialVelocity);
 }
 
-void ArmSim::Update(units::volt_t voltage, units::second_t dt) {
+void ArmSim::Update(wpi::units::volt_t voltage, wpi::units::second_t dt) {
   // Returns arm acceleration under gravity
   auto f = [=, this](
                const Eigen::Vector<double, 2>& x,
                const Eigen::Vector<double, 1>& u) -> Eigen::Vector<double, 2> {
     return Eigen::Vector<double, 2>{
-        x(1), (m_A * x.block<1, 1>(1, 0) + m_B * u + m_c * wpi::sgn(x(1)) +
+        x(1), (m_A * x.block<1, 1>(1, 0) + m_B * u + m_c * wpi::util::sgn(x(1)) +
                m_d * std::cos(x(0) + m_offset))(0)};
   };
 
@@ -42,7 +42,7 @@ void ArmSim::Update(units::volt_t voltage, units::second_t dt) {
   // small for ill-conditioned data (e.g., high velocities with sharp spikes in
   // acceleration).
   Eigen::Vector<double, 1> u{voltage.value()};
-  m_x = frc::RKDP(f, m_x, u, dt, 0.25);
+  m_x = wpi::math::RKDP(f, m_x, u, dt, 0.25);
 }
 
 double ArmSim::GetPosition() const {
@@ -53,10 +53,10 @@ double ArmSim::GetVelocity() const {
   return m_x(1);
 }
 
-double ArmSim::GetAcceleration(units::volt_t voltage) const {
+double ArmSim::GetAcceleration(wpi::units::volt_t voltage) const {
   Eigen::Vector<double, 1> u{voltage.value()};
   return (m_A * m_x.block<1, 1>(1, 0) + m_B * u +
-          m_c * wpi::sgn(GetVelocity()) + m_d * std::cos(m_x(0) + m_offset))(0);
+          m_c * wpi::util::sgn(GetVelocity()) + m_d * std::cos(m_x(0) + m_offset))(0);
 }
 
 void ArmSim::Reset(double position, double velocity) {

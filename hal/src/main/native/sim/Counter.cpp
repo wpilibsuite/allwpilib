@@ -10,26 +10,26 @@
 #include "wpi/hal/handles/HandlesInternal.h"
 #include "wpi/hal/handles/LimitedHandleResource.h"
 
-namespace hal {
+namespace wpi::hal {
 
 LimitedHandleResource<HAL_CounterHandle, Counter, kNumCounters,
                       HAL_HandleEnum::Counter>* counterHandles;
-}  // namespace hal
+}  // namespace wpi::hal
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeCounter() {
   static LimitedHandleResource<HAL_CounterHandle, Counter, kNumCounters,
                                HAL_HandleEnum::Counter>
       cH;
   counterHandles = &cH;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 HAL_CounterHandle HAL_InitializeCounter(int channel, HAL_Bool risingEdge,
                                         const char* allocationLocation,
                                         int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
   return 0;
 }
 void HAL_FreeCounter(HAL_CounterHandle counterHandle) {}

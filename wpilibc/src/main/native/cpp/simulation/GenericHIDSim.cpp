@@ -8,8 +8,8 @@
 #include "wpi/driverstation/GenericHID.hpp"
 #include "wpi/simulation/DriverStationSim.hpp"
 
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 GenericHIDSim::GenericHIDSim(const GenericHID& joystick)
     : m_port{joystick.GetPort()} {}

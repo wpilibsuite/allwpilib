@@ -30,9 +30,9 @@
 #include "wpi/units/length.hpp"
 #include "wpi/units/magnetic_flux.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::magnetic_field_strength
+ * @namespace wpi::units::magnetic_field_strength
  * @brief namespace for unit types and containers representing
  *        magnetic_field_strength values
  * @details The SI unit for magnetic_field_strength is `teslas`, and the
@@ -47,7 +47,7 @@ namespace units {
     defined(ENABLE_PREDEFINED_MAGNETIC_FIELD_STRENGTH_UNITS)
 UNIT_ADD_WITH_METRIC_PREFIXES(
     magnetic_field_strength, tesla, teslas, Te,
-    unit<std::ratio<1>, units::category::magnetic_field_strength_unit>)
+    unit<std::ratio<1>, wpi::units::category::magnetic_field_strength_unit>)
 UNIT_ADD(
     magnetic_field_strength, gauss, gauss, G,
     compound_unit<magnetic_flux::maxwell, inverse<squared<length::centimeter>>>)
@@ -56,4 +56,4 @@ UNIT_ADD_CATEGORY_TRAIT(magnetic_field_strength)
 #endif
 
 using namespace magnetic_field_strength;
-}  // namespace units
+}  // namespace wpi::units

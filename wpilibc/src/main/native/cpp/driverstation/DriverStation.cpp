@@ -33,7 +33,7 @@
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/timestamp.h"
 
-using namespace frc;
+using namespace wpi;
 
 static constexpr int availableToCount(uint64_t available) {
   return 64 - std::countl_zero(available);
@@ -45,10 +45,10 @@ namespace {
 template <typename Topic>
 class MatchDataSenderEntry {
  public:
-  MatchDataSenderEntry(const std::shared_ptr<nt::NetworkTable>& table,
+  MatchDataSenderEntry(const std::shared_ptr<wpi::nt::NetworkTable>& table,
                        std::string_view key,
                        typename Topic::ParamType initialVal,
-                       wpi::json topicProperties = wpi::json::object())
+                       wpi::util::json topicProperties = wpi::util::json::object())
       : publisher{Topic{table->GetTopic(key)}.PublishEx(Topic::kTypeString,
                                                         topicProperties)},
         prevVal{initialVal} {
@@ -70,22 +70,22 @@ class MatchDataSenderEntry {
 static constexpr std::string_view kSmartDashboardType = "FMSInfo";
 
 struct MatchDataSender {
-  std::shared_ptr<nt::NetworkTable> table =
-      nt::NetworkTableInstance::GetDefault().GetTable("FMSInfo");
-  MatchDataSenderEntry<nt::StringTopic> typeMetaData{
+  std::shared_ptr<wpi::nt::NetworkTable> table =
+      wpi::nt::NetworkTableInstance::GetDefault().GetTable("FMSInfo");
+  MatchDataSenderEntry<wpi::nt::StringTopic> typeMetaData{
       table,
       ".type",
       kSmartDashboardType,
       {{"SmartDashboard", kSmartDashboardType}}};
-  MatchDataSenderEntry<nt::StringTopic> gameSpecificMessage{
+  MatchDataSenderEntry<wpi::nt::StringTopic> gameSpecificMessage{
       table, "GameSpecificMessage", ""};
-  MatchDataSenderEntry<nt::StringTopic> eventName{table, "EventName", ""};
-  MatchDataSenderEntry<nt::IntegerTopic> matchNumber{table, "MatchNumber", 0};
-  MatchDataSenderEntry<nt::IntegerTopic> replayNumber{table, "ReplayNumber", 0};
-  MatchDataSenderEntry<nt::IntegerTopic> matchType{table, "MatchType", 0};
-  MatchDataSenderEntry<nt::BooleanTopic> alliance{table, "IsRedAlliance", true};
-  MatchDataSenderEntry<nt::IntegerTopic> station{table, "StationNumber", 1};
-  MatchDataSenderEntry<nt::IntegerTopic> controlWord{table, "FMSControlData",
+  MatchDataSenderEntry<wpi::nt::StringTopic> eventName{table, "EventName", ""};
+  MatchDataSenderEntry<wpi::nt::IntegerTopic> matchNumber{table, "MatchNumber", 0};
+  MatchDataSenderEntry<wpi::nt::IntegerTopic> replayNumber{table, "ReplayNumber", 0};
+  MatchDataSenderEntry<wpi::nt::IntegerTopic> matchType{table, "MatchType", 0};
+  MatchDataSenderEntry<wpi::nt::BooleanTopic> alliance{table, "IsRedAlliance", true};
+  MatchDataSenderEntry<wpi::nt::IntegerTopic> station{table, "StationNumber", 1};
+  MatchDataSenderEntry<wpi::nt::IntegerTopic> controlWord{table, "FMSControlData",
                                                      0};
 };
 
@@ -129,12 +129,12 @@ struct Instance {
   Instance();
   ~Instance();
 
-  wpi::EventVector refreshEvents;
+  wpi::util::EventVector refreshEvents;
   MatchDataSender matchDataSender;
   std::atomic<DataLogSender*> dataLogSender{nullptr};
 
   // Joystick button rising/falling edge flags
-  wpi::mutex buttonEdgeMutex;
+  wpi::util::mutex buttonEdgeMutex;
   std::array<HAL_JoystickButtons, DriverStation::kJoystickPorts>
       previousButtonStates;
   std::array<uint32_t, DriverStation::kJoystickPorts> joystickButtonsPressed;
@@ -148,7 +148,7 @@ struct Instance {
   bool userInTeleop = false;
   bool userInTest = false;
 
-  units::second_t nextMessageTime = 0_s;
+  wpi::units::second_t nextMessageTime = 0_s;
 };
 }  // namespace
 
@@ -624,9 +624,9 @@ std::optional<int> DriverStation::GetLocation() {
   }
 }
 
-units::second_t DriverStation::GetMatchTime() {
+wpi::units::second_t DriverStation::GetMatchTime() {
   int32_t status = 0;
-  return units::second_t{HAL_GetMatchTime(&status)};
+  return wpi::units::second_t{HAL_GetMatchTime(&status)};
 }
 
 double DriverStation::GetBatteryVoltage() {
@@ -670,7 +670,7 @@ void DriverStation::RefreshData() {
 
   SendMatchData();
   if (auto sender = inst.dataLogSender.load()) {
-    sender->Send(wpi::Now());
+    sender->Send(wpi::util::Now());
   }
 }
 
@@ -706,7 +706,7 @@ void DriverStation::StartDataLog(wpi::log::DataLog& log, bool logJoysticks) {
   if (oldSender) {
     delete newSender;  // already had a sender
   } else {
-    newSender->Init(log, logJoysticks, wpi::Now());
+    newSender->Init(log, logJoysticks, wpi::util::Now());
   }
 }
 

@@ -4,7 +4,7 @@
 
 #pragma once
 
-namespace cs {
+namespace wpi::cs {
 
 void RunMainRunLoop();
 
@@ -17,4 +17,4 @@ int RunMainRunLoopTimeout(double timeout);
 
 void StopMainRunLoop();
 
-}  // namespace cs
+}  // namespace wpi::cs

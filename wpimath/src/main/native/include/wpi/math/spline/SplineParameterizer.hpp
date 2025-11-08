@@ -40,14 +40,14 @@
 #include "wpi/units/math.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * Class used to parameterize a spline by its arc length.
  */
 class WPILIB_DLLEXPORT SplineParameterizer {
  public:
-  using PoseWithCurvature = std::pair<Pose2d, units::curvature_t>;
+  using PoseWithCurvature = std::pair<Pose2d, wpi::units::curvature_t>;
 
   struct MalformedSplineException : public std::runtime_error {
     explicit MalformedSplineException(const char* what_arg)
@@ -107,9 +107,9 @@ class WPILIB_DLLEXPORT SplineParameterizer {
 
       const auto twist = (end.value().first - start.value().first).Log();
 
-      if (units::math::abs(twist.dy) > kMaxDy ||
-          units::math::abs(twist.dx) > kMaxDx ||
-          units::math::abs(twist.dtheta) > kMaxDtheta) {
+      if (wpi::units::math::abs(twist.dy) > kMaxDy ||
+          wpi::units::math::abs(twist.dx) > kMaxDx ||
+          wpi::units::math::abs(twist.dtheta) > kMaxDtheta) {
         stack.emplace(StackContents{(current.t0 + current.t1) / 2, current.t1});
         stack.emplace(StackContents{current.t0, (current.t0 + current.t1) / 2});
       } else {
@@ -126,9 +126,9 @@ class WPILIB_DLLEXPORT SplineParameterizer {
 
  private:
   // Constraints for spline parameterization.
-  static inline constexpr units::meter_t kMaxDx = 5_in;
-  static inline constexpr units::meter_t kMaxDy = 0.05_in;
-  static inline constexpr units::radian_t kMaxDtheta = 0.0872_rad;
+  static inline constexpr wpi::units::meter_t kMaxDx = 5_in;
+  static inline constexpr wpi::units::meter_t kMaxDy = 0.05_in;
+  static inline constexpr wpi::units::radian_t kMaxDtheta = 0.0872_rad;
 
   struct StackContents {
     double t0;
@@ -147,4 +147,4 @@ class WPILIB_DLLEXPORT SplineParameterizer {
   friend class CubicHermiteSplineTest;
   friend class QuinticHermiteSplineTest;
 };
-}  // namespace frc
+}  // namespace wpi::math

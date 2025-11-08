@@ -8,7 +8,7 @@
 #include "wpi/nt/DoubleTopic.hpp"
 #include "wpi/nt/IntegerTopic.hpp"
 
-namespace frc {
+namespace wpi {
 class ExpansionHubMotor;
 
 /** This class contains PID constants for an ExpansionHub motor. */
@@ -67,15 +67,15 @@ class ExpansionHubPidConstants {
  private:
   ExpansionHubPidConstants(int usbId, int channel, bool isVelocityPid);
 
-  nt::DoublePublisher m_pPublisher;
-  nt::DoublePublisher m_iPublisher;
-  nt::DoublePublisher m_dPublisher;
-  nt::DoublePublisher m_sPublisher;
-  nt::DoublePublisher m_vPublisher;
-  nt::DoublePublisher m_aPublisher;
+  wpi::nt::DoublePublisher m_pPublisher;
+  wpi::nt::DoublePublisher m_iPublisher;
+  wpi::nt::DoublePublisher m_dPublisher;
+  wpi::nt::DoublePublisher m_sPublisher;
+  wpi::nt::DoublePublisher m_vPublisher;
+  wpi::nt::DoublePublisher m_aPublisher;
 
-  nt::BooleanPublisher m_continuousPublisher;
-  nt::DoublePublisher m_continuousMinimumPublisher;
-  nt::DoublePublisher m_continuousMaximumPublisher;
+  wpi::nt::BooleanPublisher m_continuousPublisher;
+  wpi::nt::DoublePublisher m_continuousMinimumPublisher;
+  wpi::nt::DoublePublisher m_continuousMaximumPublisher;
 };
-}  // namespace frc
+}  // namespace wpi

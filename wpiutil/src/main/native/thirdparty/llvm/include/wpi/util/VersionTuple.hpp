@@ -19,7 +19,7 @@
 #include <string>
 #include <tuple>
 
-namespace wpi {
+namespace wpi::util {
 class raw_ostream;
 
 /// Represents a version number in the form major[.minor[.subminor[.build]]].
@@ -166,5 +166,5 @@ public:
   }
 };
 
-} // end namespace wpi
+} // end namespace wpi::util
 #endif // WPIUTIL_WPI_VERSIONTUPLE_H

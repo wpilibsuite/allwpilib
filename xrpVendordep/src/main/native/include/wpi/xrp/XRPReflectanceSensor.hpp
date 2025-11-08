@@ -6,7 +6,7 @@
 
 #include "wpi/hardware/discrete/AnalogInput.hpp"
 
-namespace frc {
+namespace wpi::xrp {
 
 /**
  * @ingroup xrp_api
@@ -31,10 +31,10 @@ class XRPReflectanceSensor {
   double GetRightReflectanceValue() const;
 
  private:
-  frc::AnalogInput m_leftSensor{0};
-  frc::AnalogInput m_rightSensor{1};
+  wpi::AnalogInput m_leftSensor{0};
+  wpi::AnalogInput m_rightSensor{1};
 };
 
 /** @} */
 
-}  // namespace frc
+}  // namespace wpi::xrp

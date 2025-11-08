@@ -8,24 +8,24 @@
 
 #include "wpimath/protobuf/plant.npb.h"
 
-std::optional<frc::DCMotor> wpi::Protobuf<frc::DCMotor>::Unpack(
+std::optional<wpi::math::DCMotor> wpi::util::Protobuf<wpi::math::DCMotor>::Unpack(
     InputStream& stream) {
   wpi_proto_ProtobufDCMotor msg;
   if (!stream.Decode(msg)) {
     return {};
   }
 
-  return frc::DCMotor{
-      units::volt_t{msg.nominal_voltage},
-      units::newton_meter_t{msg.stall_torque},
-      units::ampere_t{msg.stall_current},
-      units::ampere_t{msg.free_current},
-      units::radians_per_second_t{msg.free_speed},
+  return wpi::math::DCMotor{
+      wpi::units::volt_t{msg.nominal_voltage},
+      wpi::units::newton_meter_t{msg.stall_torque},
+      wpi::units::ampere_t{msg.stall_current},
+      wpi::units::ampere_t{msg.free_current},
+      wpi::units::radians_per_second_t{msg.free_speed},
   };
 }
 
-bool wpi::Protobuf<frc::DCMotor>::Pack(OutputStream& stream,
-                                       const frc::DCMotor& value) {
+bool wpi::util::Protobuf<wpi::math::DCMotor>::Pack(OutputStream& stream,
+                                       const wpi::math::DCMotor& value) {
   wpi_proto_ProtobufDCMotor msg{
       .nominal_voltage = value.nominalVoltage.value(),
       .stall_torque = value.stallTorque.value(),

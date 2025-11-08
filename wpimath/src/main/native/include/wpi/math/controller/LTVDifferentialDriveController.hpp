@@ -19,7 +19,7 @@
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * The linear time-varying differential drive controller has a similar form to
@@ -54,16 +54,16 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
    * @param Relems     The maximum desired control effort for each input.
    * @param dt         Discretization timestep.
    */
-  LTVDifferentialDriveController(const frc::LinearSystem<2, 2, 2>& plant,
-                                 units::meter_t trackwidth,
-                                 const wpi::array<double, 5>& Qelems,
-                                 const wpi::array<double, 2>& Relems,
-                                 units::second_t dt)
+  LTVDifferentialDriveController(const wpi::math::LinearSystem<2, 2, 2>& plant,
+                                 wpi::units::meter_t trackwidth,
+                                 const wpi::util::array<double, 5>& Qelems,
+                                 const wpi::util::array<double, 2>& Relems,
+                                 wpi::units::second_t dt)
       : m_trackwidth{trackwidth},
         m_A{plant.A()},
         m_B{plant.B()},
-        m_Q{frc::MakeCostMatrix(Qelems)},
-        m_R{frc::MakeCostMatrix(Relems)},
+        m_Q{wpi::math::MakeCostMatrix(Qelems)},
+        m_R{wpi::math::MakeCostMatrix(Relems)},
         m_dt{dt} {}
 
   /**
@@ -97,8 +97,8 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
    * @param rightVelocityTolerance Right velocity error which is tolerable.
    */
   void SetTolerance(const Pose2d& poseTolerance,
-                    units::meters_per_second_t leftVelocityTolerance,
-                    units::meters_per_second_t rightVelocityTolerance) {
+                    wpi::units::meters_per_second_t leftVelocityTolerance,
+                    wpi::units::meters_per_second_t rightVelocityTolerance) {
     m_tolerance = Eigen::Vector<double, 5>{
         poseTolerance.X().value(), poseTolerance.Y().value(),
         poseTolerance.Rotation().Radians().value(),
@@ -119,10 +119,10 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
    * @param rightVelocityRef The desired right velocity.
    */
   DifferentialDriveWheelVoltages Calculate(
-      const Pose2d& currentPose, units::meters_per_second_t leftVelocity,
-      units::meters_per_second_t rightVelocity, const Pose2d& poseRef,
-      units::meters_per_second_t leftVelocityRef,
-      units::meters_per_second_t rightVelocityRef);
+      const Pose2d& currentPose, wpi::units::meters_per_second_t leftVelocity,
+      wpi::units::meters_per_second_t rightVelocity, const Pose2d& poseRef,
+      wpi::units::meters_per_second_t leftVelocityRef,
+      wpi::units::meters_per_second_t rightVelocityRef);
 
   /**
    * Returns the left and right output voltages of the LTV controller.
@@ -137,8 +137,8 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
    *                     from a trajectory.
    */
   DifferentialDriveWheelVoltages Calculate(
-      const Pose2d& currentPose, units::meters_per_second_t leftVelocity,
-      units::meters_per_second_t rightVelocity,
+      const Pose2d& currentPose, wpi::units::meters_per_second_t leftVelocity,
+      wpi::units::meters_per_second_t rightVelocity,
       const Trajectory::State& desiredState) {
     // v = (v_r + v_l) / 2     (1)
     // w = (v_r - v_l) / (2r)  (2)
@@ -160,7 +160,7 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
   }
 
  private:
-  units::meter_t m_trackwidth;
+  wpi::units::meter_t m_trackwidth;
 
   // Continuous velocity dynamics
   Eigen::Matrix<double, 2, 2> m_A;
@@ -170,10 +170,10 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
   Eigen::Matrix<double, 5, 5> m_Q;
   Eigen::Matrix<double, 2, 2> m_R;
 
-  units::second_t m_dt;
+  wpi::units::second_t m_dt;
 
   Eigen::Vector<double, 5> m_error;
   Eigen::Vector<double, 5> m_tolerance;
 };
 
-}  // namespace frc
+}  // namespace wpi::math

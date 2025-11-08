@@ -12,7 +12,7 @@
 
 #pragma comment(lib, "Ws2_32.lib")
 
-namespace cs {
+namespace wpi::cs {
 
 std::vector<std::string> GetNetworkInterfaces() {
   uv_interface_address_t* adrs;
@@ -42,4 +42,4 @@ std::vector<std::string> GetNetworkInterfaces() {
   return addresses;
 }
 
-}  // namespace cs
+}  // namespace wpi::cs

@@ -8,7 +8,7 @@
 
 #include <imgui.h>
 
-using namespace glass;
+using namespace wpi::glass;
 
 LogData::LogData(size_t maxLines) : m_maxLines{maxLines} {}
 
@@ -36,7 +36,7 @@ const std::string& LogData::GetBuffer() {
   return m_buf;
 }
 
-void glass::DisplayLog(LogData* data, bool autoScroll) {
+void wpi::glass::DisplayLog(LogData* data, bool autoScroll) {
   if (data->m_buf.empty()) {
     return;
   }

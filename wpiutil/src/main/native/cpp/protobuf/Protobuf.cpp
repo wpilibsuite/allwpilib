@@ -11,7 +11,7 @@
 
 #include "wpi/util/SmallVector.hpp"
 
-using namespace wpi;
+using namespace wpi::util;
 
 std::string detail::GetTypeString(const pb_msgdesc_t* msg) {
   return fmt::format("proto:{}", msg->proto_name);
@@ -52,7 +52,7 @@ bool detail::WriteFromStdVector(pb_ostream_t* stream, const pb_byte_t* buf,
 bool detail::WriteSubmessage(pb_ostream_t* stream, const pb_msgdesc_t* desc,
                              const void* msg) {
   // Write the submessage to a separate buffer
-  wpi::SmallVector<uint8_t, 64> buf;
+  wpi::util::SmallVector<uint8_t, 64> buf;
   pb_ostream_t subStream{
       .callback = WriteFromSmallVector,
       .state = &buf,

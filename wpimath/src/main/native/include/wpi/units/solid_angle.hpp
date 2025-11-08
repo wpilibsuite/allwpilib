@@ -29,9 +29,9 @@
 #include "wpi/units/angle.hpp"
 #include "wpi/units/base.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::solid_angle
+ * @namespace wpi::units::solid_angle
  * @brief namespace for unit types and containers representing solid_angle
  *        values
  * @details The SI unit for solid_angle is `steradians`, and the corresponding
@@ -43,7 +43,7 @@ namespace units {
     defined(ENABLE_PREDEFINED_SOLID_ANGLE_UNITS)
 UNIT_ADD_WITH_METRIC_PREFIXES(
     solid_angle, steradian, steradians, sr,
-    unit<std::ratio<1>, units::category::solid_angle_unit>)
+    unit<std::ratio<1>, wpi::units::category::solid_angle_unit>)
 UNIT_ADD(solid_angle, degree_squared, degrees_squared, sq_deg,
          squared<angle::degrees>)
 UNIT_ADD(solid_angle, spat, spats, sp,
@@ -53,4 +53,4 @@ UNIT_ADD_CATEGORY_TRAIT(solid_angle)
 #endif
 
 using namespace solid_angle;
-}  // namespace units
+}  // namespace wpi::units

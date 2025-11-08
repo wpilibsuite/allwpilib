@@ -10,7 +10,7 @@
 
 #include "wpi/system/Errors.hpp"
 
-using namespace frc;
+using namespace wpi::xrp;
 
 std::map<int, std::string> XRPMotor::s_simDeviceMap = {
     {0, "motorL"}, {1, "motorR"}, {2, "motor3"}, {3, "motor4"}};
@@ -19,12 +19,12 @@ std::set<int> XRPMotor::s_registeredDevices = {};
 
 void XRPMotor::CheckDeviceAllocation(int deviceNum) {
   if (s_simDeviceMap.count(deviceNum) == 0) {
-    throw FRC_MakeError(frc::err::ChannelIndexOutOfRange, "Channel {}",
+    throw FRC_MakeError(wpi::err::ChannelIndexOutOfRange, "Channel {}",
                         deviceNum);
   }
 
   if (s_registeredDevices.count(deviceNum) > 0) {
-    throw FRC_MakeError(frc::err::ResourceAlreadyAllocated, "Channel {}",
+    throw FRC_MakeError(wpi::err::ResourceAlreadyAllocated, "Channel {}",
                         deviceNum);
   }
 

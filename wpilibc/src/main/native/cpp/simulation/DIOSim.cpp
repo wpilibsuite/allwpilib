@@ -10,8 +10,8 @@
 #include "wpi/hardware/discrete/DigitalInput.hpp"
 #include "wpi/hardware/discrete/DigitalOutput.hpp"
 
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 DIOSim::DIOSim(const DigitalInput& input) : m_index{input.GetChannel()} {}
 

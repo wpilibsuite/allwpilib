@@ -9,7 +9,7 @@
 #ifndef LLVM_UNITTESTS_ADT_COUNTCOPYANDMOVE_H
 #define LLVM_UNITTESTS_ADT_COUNTCOPYANDMOVE_H
 
-namespace wpi {
+namespace wpi::util {
 
 struct CountCopyAndMove {
   static int DefaultConstructions;
@@ -61,6 +61,6 @@ struct CountCopyAndMove {
   static int TotalMoves() { return MoveConstructions + MoveAssignments; }
 };
 
-} // end namespace wpi
+} // end namespace wpi::util
 
 #endif // LLVM_UNITTESTS_ADT_COUNTCOPYANDMOVE_H

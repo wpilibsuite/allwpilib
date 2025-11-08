@@ -15,7 +15,7 @@
 #include <vector>
 
 #include "wpi/util/mutex.hpp"
-namespace wpi {
+namespace wpi::net {
 class MulticastServiceResolver {
  public:
   explicit MulticastServiceResolver(std::string_view serviceType);
@@ -95,14 +95,14 @@ class MulticastServiceResolver {
       event.Set();
     }
   }
-  wpi::Event event{true};
+  wpi::util::Event event{true};
   std::vector<ServiceData> queue;
-  wpi::mutex mutex;
+  wpi::util::mutex mutex;
   std::function<bool(const ServiceData&)> copyCallback;
   std::function<void(ServiceData&&)> moveCallback;
   std::unique_ptr<Impl> pImpl;
 };
-}  // namespace wpi
+}  // namespace wpi::net
 #endif
 
 #ifdef __cplusplus

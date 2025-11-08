@@ -12,7 +12,7 @@
 #include "wpi/hal/HAL.h"
 #include "wpi/hardware/led/AddressableLED.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 
 TEST(AddressableLEDSimTest, InitializationCallback) {
   HAL_Initialize(500, 0);
@@ -120,4 +120,4 @@ TEST(AddressableLEDSimTest, SetData) {
   EXPECT_EQ(0xFF, simData[2].b);
 }
 
-}  // namespace frc::sim
+}  // namespace wpi::sim

@@ -2,7 +2,7 @@ extra_includes:
 - wpi/hardware/discrete/DigitalOutput.hpp
 
 classes:
-  frc::sim::DigitalPWMSim:
+  wpi::sim::DigitalPWMSim:
     force_type_casters:
     - std::function
     methods:

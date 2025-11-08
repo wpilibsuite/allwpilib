@@ -13,7 +13,7 @@
 #include "wpi/hal/simulation/NotifyListener.h"
 #include "wpi/util/jni_util.hpp"
 
-namespace hal::sim {
+namespace wpi::hal::sim {
 class CallbackStore {
  public:
   void create(JNIEnv* env, jobject obj);
@@ -23,7 +23,7 @@ class CallbackStore {
   int32_t getCallbackId() { return callbackId; }
 
  private:
-  wpi::java::JGlobal<jobject> m_call;
+  wpi::util::java::JGlobal<jobject> m_call;
   int32_t callbackId;
 };
 
@@ -59,4 +59,4 @@ void FreeChannelCallback(JNIEnv* env, SIM_JniHandle handle, jint index,
                          jint channel, FreeChannelCallbackFunc freeCallback);
 void FreeCallbackNoIndex(JNIEnv* env, SIM_JniHandle handle,
                          FreeCallbackNoIndexFunc freeCallback);
-}  // namespace hal::sim
+}  // namespace wpi::hal::sim

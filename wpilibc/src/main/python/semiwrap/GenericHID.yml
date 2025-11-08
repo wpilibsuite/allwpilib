@@ -6,7 +6,7 @@ extra_includes:
 - wpi/event/BooleanEvent.hpp
 
 classes:
-  frc::GenericHID:
+  wpi::GenericHID:
     enums:
       RumbleType:
       HIDType:

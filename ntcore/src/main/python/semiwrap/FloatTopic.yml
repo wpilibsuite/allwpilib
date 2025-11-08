@@ -1,5 +1,5 @@
 classes:
-  nt::FloatSubscriber:
+  wpi::nt::FloatSubscriber:
     methods:
       FloatSubscriber:
         overloads:
@@ -29,7 +29,7 @@ classes:
         py::gil_scoped_release release;
         *self = FloatSubscriber();
       })
-  nt::FloatPublisher:
+  wpi::nt::FloatPublisher:
     methods:
       FloatPublisher:
         overloads:
@@ -52,7 +52,7 @@ classes:
         py::gil_scoped_release release;
         *self = FloatPublisher();
       })
-  nt::FloatEntry:
+  wpi::nt::FloatEntry:
     methods:
       FloatEntry:
         overloads:
@@ -76,7 +76,7 @@ classes:
         py::gil_scoped_release release;
         *self = FloatEntry();
       })
-  nt::FloatTopic:
+  wpi::nt::FloatTopic:
     attributes:
       kTypeString:
     methods:

@@ -4,11 +4,11 @@
 
 namespace pybind11 {
 namespace detail {
-template <> struct handle_type_name<units::mole_t> {
+template <> struct handle_type_name<wpi::units::mole_t> {
   static constexpr auto name = _("wpimath.units.moles");
 };
 
-template <> struct handle_type_name<units::moles> {
+template <> struct handle_type_name<wpi::units::moles> {
   static constexpr auto name = _("wpimath.units.moles");
 };
 

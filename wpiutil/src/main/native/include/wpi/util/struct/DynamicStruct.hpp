@@ -16,7 +16,7 @@
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/bit.hpp"
 
-namespace wpi {
+namespace wpi::util {
 
 template <typename T>
 class SmallVectorImpl;
@@ -316,9 +316,9 @@ class StructDescriptor {
 
  private:
   bool CheckCircular(
-      wpi::SmallVectorImpl<const StructDescriptor*>& stack) const;
+      wpi::util::SmallVectorImpl<const StructDescriptor*>& stack) const;
   std::string CalculateOffsets(
-      wpi::SmallVectorImpl<const StructDescriptor*>& stack);
+      wpi::util::SmallVectorImpl<const StructDescriptor*>& stack);
 
   std::string m_name;
   std::string m_schema;
@@ -696,4 +696,4 @@ class DynamicStructObject : private impl::DSOData, public MutableDynamicStruct {
   DynamicStructObject& operator=(DynamicStructObject&&) = delete;
 };
 
-}  // namespace wpi
+}  // namespace wpi::util

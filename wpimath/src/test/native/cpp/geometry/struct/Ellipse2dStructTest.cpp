@@ -6,11 +6,11 @@
 
 #include "wpi/math/geometry/Ellipse2d.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 namespace {
 
-using StructType = wpi::Struct<frc::Ellipse2d>;
+using StructType = wpi::util::Struct<wpi::math::Ellipse2d>;
 const Ellipse2d kExpectedData{
     Pose2d{Translation2d{0.191_m, 2.2_m}, Rotation2d{22.9_rad}}, 1.2_m, 2.3_m};
 }  // namespace

@@ -30,9 +30,9 @@
 #include "wpi/units/length.hpp"
 #include "wpi/units/luminous_flux.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::illuminance
+ * @namespace wpi::units::illuminance
  * @brief namespace for unit types and containers representing illuminance
  *        values
  * @details The SI unit for illuminance is `luxes`, and the corresponding
@@ -44,7 +44,7 @@ namespace units {
     defined(ENABLE_PREDEFINED_ILLUMINANCE_UNITS)
 UNIT_ADD_WITH_METRIC_PREFIXES(
     illuminance, lux, luxes, lx,
-    unit<std::ratio<1>, units::category::illuminance_unit>)
+    unit<std::ratio<1>, wpi::units::category::illuminance_unit>)
 UNIT_ADD(illuminance, footcandle, footcandles, fc,
          compound_unit<luminous_flux::lumen, inverse<squared<length::foot>>>)
 UNIT_ADD(illuminance, lumens_per_square_inch, lumens_per_square_inch,
@@ -58,4 +58,4 @@ UNIT_ADD_CATEGORY_TRAIT(illuminance)
 #endif
 
 using namespace illuminance;
-}  // namespace units
+}  // namespace wpi::units

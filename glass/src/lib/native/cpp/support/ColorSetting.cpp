@@ -4,7 +4,7 @@
 
 #include "wpi/glass/support/ColorSetting.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 ColorSetting::ColorSetting(std::vector<float>& color) : m_color{color} {
   m_color.resize(4);

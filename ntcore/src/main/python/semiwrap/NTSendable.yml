@@ -2,7 +2,7 @@ extra_includes:
 - wpi/nt/NTSendableBuilder.hpp
 
 classes:
-  nt::NTSendable:
+  wpi::nt::NTSendable:
     methods:
       InitSendable:
         overloads:
@@ -12,7 +12,7 @@ classes:
                 auto builderHandle = py::cast(builder, py::return_value_policy::reference);
                 fn(builderHandle);
               }
-          wpi::SendableBuilder&:
+          wpi::util::SendableBuilder&:
             virtual_xform: |
               [&](py::function fn) {
                 auto builderHandle = py::cast(builder, py::return_value_policy::reference);

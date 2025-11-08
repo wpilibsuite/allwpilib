@@ -4,8 +4,8 @@
 
 #include "wpi/math/kinematics/SwerveDriveOdometry.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT) SwerveDriveOdometry<4>;
 
-}  // namespace frc
+}  // namespace wpi::math

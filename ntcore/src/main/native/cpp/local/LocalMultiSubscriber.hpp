@@ -16,11 +16,11 @@
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/Synchronization.h"
 
-namespace nt::local {
+namespace wpi::nt::local {
 
 constexpr bool PrefixMatch(std::string_view name, std::string_view prefix,
                            bool special) {
-  return (!special || !prefix.empty()) && wpi::starts_with(name, prefix);
+  return (!special || !prefix.empty()) && wpi::util::starts_with(name, prefix);
 }
 
 struct LocalMultiSubscriber {
@@ -47,7 +47,7 @@ struct LocalMultiSubscriber {
   }
 
   // invariants
-  wpi::SignalObject<NT_MultiSubscriber> handle;
+  wpi::util::SignalObject<NT_MultiSubscriber> handle;
   std::vector<std::string> prefixes;
   PubSubOptionsImpl options;
 
@@ -55,4 +55,4 @@ struct LocalMultiSubscriber {
   VectorSet<NT_Listener> valueListeners;
 };
 
-}  // namespace nt::local
+}  // namespace wpi::nt::local

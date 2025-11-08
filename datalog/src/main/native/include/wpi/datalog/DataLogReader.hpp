@@ -303,7 +303,7 @@ class DataLogReader {
   using iterator = DataLogIterator;
 
   /** Constructs from a memory buffer. */
-  explicit DataLogReader(std::unique_ptr<MemoryBuffer> buffer);
+  explicit DataLogReader(std::unique_ptr<wpi::util::MemoryBuffer> buffer);
 
   /** Returns true if the data log is valid (e.g. has a valid header). */
   explicit operator bool() const { return IsValid(); }
@@ -342,7 +342,7 @@ class DataLogReader {
   iterator end() const { return DataLogIterator{this, SIZE_MAX}; }
 
  private:
-  std::unique_ptr<MemoryBuffer> m_buf;
+  std::unique_ptr<wpi::util::MemoryBuffer> m_buf;
 
   bool GetRecord(size_t* pos, DataLogRecord* out) const;
   bool GetNextRecord(size_t* pos) const;

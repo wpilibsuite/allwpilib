@@ -14,7 +14,7 @@
 #include "wpi/gui/wpigui.hpp"
 #include "wpi/util/StringExtras.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 void MainMenuBar::AddMainMenu(std::function<void()> menu) {
   if (menu) {
@@ -54,7 +54,7 @@ void MainMenuBar::Display() {
 
 #if 0
   char str[64];
-  wpi::format_to_n_c_str(str, sizeof(str), "{:.3f} ms/frame ({:.1f} FPS)",
+  wpi::util::format_to_n_c_str(str, sizeof(str), "{:.3f} ms/frame ({:.1f} FPS)",
                          1000.0f / ImGui::GetIO().Framerate,
                          ImGui::GetIO().Framerate);
 

@@ -6,11 +6,11 @@
 
 #include "wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 namespace {
 
-using StructType = wpi::Struct<frc::DifferentialDriveWheelSpeeds>;
+using StructType = wpi::util::Struct<wpi::math::DifferentialDriveWheelSpeeds>;
 const DifferentialDriveWheelSpeeds kExpectedData{
     DifferentialDriveWheelSpeeds{1.74_mps, 35.04_mps}};
 }  // namespace

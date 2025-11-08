@@ -21,7 +21,7 @@
   (void)sampleBuffer;
   (void)connection;
 
-  auto currentTime = wpi::Now();
+  auto currentTime = wpi::util::Now();
 
   auto sharedThis = self.cppImpl.lock();
   if (!sharedThis) {
@@ -51,7 +51,7 @@
     return;
   }
 
-  std::unique_ptr<cs::Image> image = cs::CreateImageFromBGRA(
+  std::unique_ptr<wpi::cs::Image> image = wpi::cs::CreateImageFromBGRA(
       sharedThis.get(), width, height, rowBytes, reinterpret_cast<uint8_t*>(baseaddress));
 
   CVPixelBufferUnlockBaseAddress(imageBuffer, 0);

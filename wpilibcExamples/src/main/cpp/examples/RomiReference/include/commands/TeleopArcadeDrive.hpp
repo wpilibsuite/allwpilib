@@ -12,7 +12,7 @@
 #include "subsystems/Drivetrain.hpp"
 
 class TeleopArcadeDrive
-    : public frc2::CommandHelper<frc2::Command, TeleopArcadeDrive> {
+    : public wpi::cmd::CommandHelper<wpi::cmd::Command, TeleopArcadeDrive> {
  public:
   /**
    * Creates a new ArcadeDrive. This command will drive your robot according to

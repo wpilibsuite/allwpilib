@@ -15,7 +15,7 @@
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/handles/IndexedHandleResource.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
 static constexpr HAL_CANManufacturer manufacturer =
     HAL_CANManufacturer::HAL_CAN_Man_kCTRE;
@@ -126,7 +126,7 @@ union PcmDebug {
 namespace {
 struct PCM {
   HAL_CANHandle canHandle;
-  wpi::mutex lock;
+  wpi::util::mutex lock;
   std::string previousAllocation;
   PcmControl control;
   PcmControlSetOneShotDur oneShot;
@@ -136,14 +136,14 @@ struct PCM {
 static IndexedHandleResource<HAL_CTREPCMHandle, PCM, kNumCTREPCMModules,
                              HAL_HandleEnum::CTREPCM>* pcmHandles;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeCTREPCM() {
   static IndexedHandleResource<HAL_CTREPCMHandle, PCM, kNumCTREPCMModules,
                                HAL_HandleEnum::CTREPCM>
       pH;
   pcmHandles = &pH;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 #define READ_PACKET(type, frame, failureValue)                         \
   auto pcm = pcmHandles->Get(handle);                                  \
@@ -178,17 +178,17 @@ extern "C" {
 HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t busId, int32_t module,
                                         const char* allocationLocation,
                                         int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
 
   HAL_CTREPCMHandle handle;
   auto pcm = pcmHandles->Allocate(module, &handle, status);
 
   if (*status != 0) {
     if (pcm) {
-      hal::SetLastErrorPreviouslyAllocated(status, "CTRE PCM", module,
+      wpi::hal::SetLastErrorPreviouslyAllocated(status, "CTRE PCM", module,
                                            pcm->previousAllocation);
     } else {
-      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for CTRE PCM", 0,
+      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for CTRE PCM", 0,
                                        kNumCTREPCMModules - 1, module);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
@@ -360,7 +360,7 @@ void HAL_FireCTREPCMOneShot(HAL_CTREPCMHandle handle, int32_t index,
                             int32_t* status) {
   if (index > 7 || index < 0) {
     *status = PARAMETER_OUT_OF_RANGE;
-    hal::SetLastError(
+    wpi::hal::SetLastError(
         status,
         fmt::format("Only [0-7] are valid index values. Requested {}", index));
     return;
@@ -392,7 +392,7 @@ void HAL_SetCTREPCMOneShotDuration(HAL_CTREPCMHandle handle, int32_t index,
                                    int32_t durMs, int32_t* status) {
   if (index > 7 || index < 0) {
     *status = PARAMETER_OUT_OF_RANGE;
-    hal::SetLastError(
+    wpi::hal::SetLastError(
         status,
         fmt::format("Only [0-7] are valid index values. Requested {}", index));
     return;

@@ -10,7 +10,7 @@
 #include "server/ServerTopic.hpp"
 #include "wpi/util/MessagePack.hpp"
 
-using namespace nt::server;
+using namespace wpi::nt::server;
 using namespace mpack;
 
 void ServerPublisher::UpdateMeta() {

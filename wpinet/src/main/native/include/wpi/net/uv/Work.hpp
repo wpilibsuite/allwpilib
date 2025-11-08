@@ -14,7 +14,7 @@
 #include "wpi/net/uv/Request.hpp"
 #include "wpi/util/Signal.h"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 class Loop;
 
@@ -31,13 +31,13 @@ class WorkReq : public RequestImpl<WorkReq, uv_work_t> {
   /**
    * Function(s) that will be run on the thread pool.
    */
-  sig::Signal<> work;
+  wpi::util::sig::Signal<> work;
 
   /**
    * Function(s) that will be run on the loop thread after the work on the
    * thread pool has been completed by the work callback.
    */
-  sig::Signal<> afterWork;
+  wpi::util::sig::Signal<> afterWork;
 };
 
 /**
@@ -88,6 +88,6 @@ inline void QueueWork(const std::shared_ptr<Loop>& loop,
   QueueWork(*loop, std::move(work), std::move(afterWork));
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_WORK_HPP_

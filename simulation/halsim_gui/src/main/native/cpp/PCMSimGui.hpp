@@ -13,8 +13,8 @@ class PCMSimGui {
  public:
   static void Initialize();
   static bool PCMsAnyInitialized();
-  static bool PCMsAnySolenoids(glass::PneumaticControlsModel* model);
-  static std::unique_ptr<glass::PneumaticControlsModel> GetPCMsModel();
+  static bool PCMsAnySolenoids(wpi::glass::PneumaticControlsModel* model);
+  static std::unique_ptr<wpi::glass::PneumaticControlsModel> GetPCMsModel();
 };
 
 }  // namespace halsimgui

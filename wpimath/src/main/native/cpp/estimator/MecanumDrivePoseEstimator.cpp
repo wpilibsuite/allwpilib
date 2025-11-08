@@ -9,20 +9,20 @@
 #include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/util/timestamp.h"
 
-using namespace frc;
+using namespace wpi::math;
 
-frc::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
+wpi::math::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
     MecanumDriveKinematics& kinematics, const Rotation2d& gyroAngle,
     const MecanumDriveWheelPositions& wheelPositions, const Pose2d& initialPose)
     : MecanumDrivePoseEstimator{kinematics,      gyroAngle,
                                 wheelPositions,  initialPose,
                                 {0.1, 0.1, 0.1}, {0.45, 0.45, 0.45}} {}
 
-frc::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
+wpi::math::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
     MecanumDriveKinematics& kinematics, const Rotation2d& gyroAngle,
     const MecanumDriveWheelPositions& wheelPositions, const Pose2d& initialPose,
-    const wpi::array<double, 3>& stateStdDevs,
-    const wpi::array<double, 3>& visionMeasurementStdDevs)
+    const wpi::util::array<double, 3>& stateStdDevs,
+    const wpi::util::array<double, 3>& visionMeasurementStdDevs)
     : PoseEstimator(kinematics, m_odometryImpl, stateStdDevs,
                     visionMeasurementStdDevs),
       m_odometryImpl(kinematics, gyroAngle, wheelPositions, initialPose) {

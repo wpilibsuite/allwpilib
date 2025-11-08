@@ -13,7 +13,7 @@
 #include "wpi/units/mass.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 /**
  * Represents a simulated arm mechanism.
  */
@@ -24,7 +24,7 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
    *
    * @param system             The system representing this arm. This system can
    *                           be created with
-   *                           LinearSystemId::SingleJointedArmSystem().
+   *                           wpi::math::LinearSystemId::SingleJointedArmSystem().
    * @param gearbox            The type and number of motors on the arm gearbox.
    * @param gearing            The gear ratio of the arm (numbers greater than 1
    *                           represent reductions).
@@ -35,11 +35,11 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
    * @param startingAngle      The initial position of the arm.
    * @param measurementStdDevs The standard deviations of the measurements.
    */
-  SingleJointedArmSim(const LinearSystem<2, 1, 2>& system,
-                      const DCMotor& gearbox, double gearing,
-                      units::meter_t armLength, units::radian_t minAngle,
-                      units::radian_t maxAngle, bool simulateGravity,
-                      units::radian_t startingAngle,
+  SingleJointedArmSim(const wpi::math::LinearSystem<2, 1, 2>& system,
+                      const wpi::math::DCMotor& gearbox, double gearing,
+                      wpi::units::meter_t armLength, wpi::units::radian_t minAngle,
+                      wpi::units::radian_t maxAngle, bool simulateGravity,
+                      wpi::units::radian_t startingAngle,
                       const std::array<double, 2>& measurementStdDevs = {0.0,
                                                                          0.0});
   /**
@@ -57,11 +57,11 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
    * @param startingAngle      The initial position of the arm.
    * @param measurementStdDevs The standard deviation of the measurement noise.
    */
-  SingleJointedArmSim(const DCMotor& gearbox, double gearing,
-                      units::kilogram_square_meter_t moi,
-                      units::meter_t armLength, units::radian_t minAngle,
-                      units::radian_t maxAngle, bool simulateGravity,
-                      units::radian_t startingAngle,
+  SingleJointedArmSim(const wpi::math::DCMotor& gearbox, double gearing,
+                      wpi::units::kilogram_square_meter_t moi,
+                      wpi::units::meter_t armLength, wpi::units::radian_t minAngle,
+                      wpi::units::radian_t maxAngle, bool simulateGravity,
+                      wpi::units::radian_t startingAngle,
                       const std::array<double, 2>& measurementStdDevs = {0.0,
                                                                          0.0});
 
@@ -74,7 +74,7 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
    * @param angle The new angle.
    * @param velocity The new angular velocity.
    */
-  void SetState(units::radian_t angle, units::radians_per_second_t velocity);
+  void SetState(wpi::units::radian_t angle, wpi::units::radians_per_second_t velocity);
 
   /**
    * Returns whether the arm would hit the lower limit.
@@ -82,7 +82,7 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
    * @param armAngle The arm height.
    * @return Whether the arm would hit the lower limit.
    */
-  bool WouldHitLowerLimit(units::radian_t armAngle) const;
+  bool WouldHitLowerLimit(wpi::units::radian_t armAngle) const;
 
   /**
    * Returns whether the arm would hit the upper limit.
@@ -90,7 +90,7 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
    * @param armAngle The arm height.
    * @return Whether the arm would hit the upper limit.
    */
-  bool WouldHitUpperLimit(units::radian_t armAngle) const;
+  bool WouldHitUpperLimit(wpi::units::radian_t armAngle) const;
 
   /**
    * Returns whether the arm has hit the lower limit.
@@ -111,28 +111,28 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
    *
    * @return The current arm angle.
    */
-  units::radian_t GetAngle() const;
+  wpi::units::radian_t GetAngle() const;
 
   /**
    * Returns the current arm velocity.
    *
    * @return The current arm velocity.
    */
-  units::radians_per_second_t GetVelocity() const;
+  wpi::units::radians_per_second_t GetVelocity() const;
 
   /**
    * Returns the arm current draw.
    *
    * @return The arm current draw.
    */
-  units::ampere_t GetCurrentDraw() const;
+  wpi::units::ampere_t GetCurrentDraw() const;
 
   /**
    * Sets the input voltage for the arm.
    *
    * @param voltage The input voltage.
    */
-  void SetInputVoltage(units::volt_t voltage);
+  void SetInputVoltage(wpi::units::volt_t voltage);
 
   /**
    * Calculates a rough estimate of the moment of inertia of an arm given its
@@ -143,8 +143,8 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
    *
    * @return The calculated moment of inertia.
    */
-  static constexpr units::kilogram_square_meter_t EstimateMOI(
-      units::meter_t length, units::kilogram_t mass) {
+  static constexpr wpi::units::kilogram_square_meter_t EstimateMOI(
+      wpi::units::meter_t length, wpi::units::kilogram_t mass) {
     return 1.0 / 3.0 * mass * length * length;
   }
 
@@ -156,15 +156,15 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
    * @param u           The system inputs (voltage).
    * @param dt          The time difference between controller updates.
    */
-  Vectord<2> UpdateX(const Vectord<2>& currentXhat, const Vectord<1>& u,
-                     units::second_t dt) override;
+  wpi::math::Vectord<2> UpdateX(const wpi::math::Vectord<2>& currentXhat, const wpi::math::Vectord<1>& u,
+                     wpi::units::second_t dt) override;
 
  private:
-  units::meter_t m_armLen;
-  units::radian_t m_minAngle;
-  units::radian_t m_maxAngle;
-  const DCMotor m_gearbox;
+  wpi::units::meter_t m_armLen;
+  wpi::units::radian_t m_minAngle;
+  wpi::units::radian_t m_maxAngle;
+  const wpi::math::DCMotor m_gearbox;
   double m_gearing;
   bool m_simulateGravity;
 };
-}  // namespace frc::sim
+}  // namespace wpi::sim

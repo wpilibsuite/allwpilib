@@ -14,7 +14,7 @@
 #include "wpi/glass/DataSource.hpp"
 #include "wpi/util/StringExtras.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 void DeviceTreeModel::Update() {
   for (auto&& display : m_displays) {
@@ -41,11 +41,11 @@ void DeviceTreeModel::Display() {
   }
 }
 
-void glass::HideDevice(const char* id) {
+void wpi::glass::HideDevice(const char* id) {
   gContext->deviceHidden[id] = true;
 }
 
-bool glass::BeginDevice(const char* id, ImGuiTreeNodeFlags flags) {
+bool wpi::glass::BeginDevice(const char* id, ImGuiTreeNodeFlags flags) {
   if (gContext->deviceHidden[id]) {
     return false;
   }
@@ -56,9 +56,9 @@ bool glass::BeginDevice(const char* id, ImGuiTreeNodeFlags flags) {
   std::string& name = GetStorage().GetString("name");
   char label[128];
   if (name.empty()) {
-    wpi::format_to_n_c_str(label, sizeof(label), "{}###header", id);
+    wpi::util::format_to_n_c_str(label, sizeof(label), "{}###header", id);
   } else {
-    wpi::format_to_n_c_str(label, sizeof(label), "{}###header", name);
+    wpi::util::format_to_n_c_str(label, sizeof(label), "{}###header", name);
   }
 
   bool open = CollapsingHeader(label, flags);
@@ -70,7 +70,7 @@ bool glass::BeginDevice(const char* id, ImGuiTreeNodeFlags flags) {
   return open;
 }
 
-void glass::EndDevice() {
+void wpi::glass::EndDevice() {
   PopID();
 }
 
@@ -150,29 +150,29 @@ static inline bool DeviceValueImpl(const char* name, bool readonly,
   }
 }
 
-bool glass::DeviceBoolean(const char* name, bool readonly, bool* value,
+bool wpi::glass::DeviceBoolean(const char* name, bool readonly, bool* value,
                           const DataSource* source) {
   return DeviceValueImpl(name, readonly, source, DeviceBooleanImpl, value);
 }
 
-bool glass::DeviceDouble(const char* name, bool readonly, double* value,
+bool wpi::glass::DeviceDouble(const char* name, bool readonly, double* value,
                          const DataSource* source) {
   return DeviceValueImpl(name, readonly, source, DeviceDoubleImpl, value);
 }
 
-bool glass::DeviceEnum(const char* name, bool readonly, int* value,
+bool wpi::glass::DeviceEnum(const char* name, bool readonly, int* value,
                        const char** options, int32_t numOptions,
                        const DataSource* source) {
   return DeviceValueImpl(name, readonly, source, DeviceEnumImpl, value, options,
                          numOptions);
 }
 
-bool glass::DeviceInt(const char* name, bool readonly, int32_t* value,
+bool wpi::glass::DeviceInt(const char* name, bool readonly, int32_t* value,
                       const DataSource* source) {
   return DeviceValueImpl(name, readonly, source, DeviceIntImpl, value);
 }
 
-bool glass::DeviceLong(const char* name, bool readonly, int64_t* value,
+bool wpi::glass::DeviceLong(const char* name, bool readonly, int64_t* value,
                        const DataSource* source) {
   return DeviceValueImpl(name, readonly, source, DeviceLongImpl, value);
 }

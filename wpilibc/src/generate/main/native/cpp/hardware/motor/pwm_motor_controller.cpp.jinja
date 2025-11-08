@@ -8,7 +8,7 @@
 
 #include "wpi/hal/UsageReporting.h"
 
-using namespace frc;
+using namespace wpi;
 
 {{ name }}::{{ name }}(int channel) : PWMMotorController("{{ name }}", channel) {
   SetBounds({{ pulse_width_ms.max }}_ms, {{ pulse_width_ms.deadbandMax }}_ms, {{ pulse_width_ms.center }}_ms, {{ pulse_width_ms.deadbandMin }}_ms, {{ pulse_width_ms.min }}_ms);

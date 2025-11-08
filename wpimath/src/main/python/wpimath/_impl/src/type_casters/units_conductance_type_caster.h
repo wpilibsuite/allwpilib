@@ -4,43 +4,43 @@
 
 namespace pybind11 {
 namespace detail {
-template <> struct handle_type_name<units::siemens_t> {
+template <> struct handle_type_name<wpi::units::siemens_t> {
   static constexpr auto name = _("wpimath.units.siemens");
 };
 
-template <> struct handle_type_name<units::siemens> {
+template <> struct handle_type_name<wpi::units::siemens> {
   static constexpr auto name = _("wpimath.units.siemens");
 };
 
-template <> struct handle_type_name<units::nanosiemens_t> {
+template <> struct handle_type_name<wpi::units::nanosiemens_t> {
   static constexpr auto name = _("wpimath.units.nanosiemens");
 };
 
-template <> struct handle_type_name<units::nanosiemens> {
+template <> struct handle_type_name<wpi::units::nanosiemens> {
   static constexpr auto name = _("wpimath.units.nanosiemens");
 };
 
-template <> struct handle_type_name<units::microsiemens_t> {
+template <> struct handle_type_name<wpi::units::microsiemens_t> {
   static constexpr auto name = _("wpimath.units.microsiemens");
 };
 
-template <> struct handle_type_name<units::microsiemens> {
+template <> struct handle_type_name<wpi::units::microsiemens> {
   static constexpr auto name = _("wpimath.units.microsiemens");
 };
 
-template <> struct handle_type_name<units::millisiemens_t> {
+template <> struct handle_type_name<wpi::units::millisiemens_t> {
   static constexpr auto name = _("wpimath.units.millisiemens");
 };
 
-template <> struct handle_type_name<units::millisiemens> {
+template <> struct handle_type_name<wpi::units::millisiemens> {
   static constexpr auto name = _("wpimath.units.millisiemens");
 };
 
-template <> struct handle_type_name<units::kilosiemens_t> {
+template <> struct handle_type_name<wpi::units::kilosiemens_t> {
   static constexpr auto name = _("wpimath.units.kilosiemens");
 };
 
-template <> struct handle_type_name<units::kilosiemens> {
+template <> struct handle_type_name<wpi::units::kilosiemens> {
   static constexpr auto name = _("wpimath.units.kilosiemens");
 };
 

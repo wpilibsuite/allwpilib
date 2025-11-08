@@ -6,7 +6,7 @@
 #include "wpi/commands2/NotifierCommand.hpp"
 #include "wpi/simulation/SimHooks.hpp"
 
-using namespace frc2;
+using namespace wpi::cmd;
 using namespace std::chrono_literals;
 
 class NotifierCommandTest : public CommandTestBase {};
@@ -14,18 +14,18 @@ class NotifierCommandTest : public CommandTestBase {};
 TEST_F(NotifierCommandTest, NotifierCommandSchedule) {
   CommandScheduler scheduler = GetScheduler();
 
-  frc::sim::PauseTiming();
+  wpi::sim::PauseTiming();
 
   int counter = 0;
   NotifierCommand command([&] { counter++; }, 10_ms, {});
 
   scheduler.Schedule(&command);
   for (int i = 0; i < 5; ++i) {
-    frc::sim::StepTiming(5_ms);
+    wpi::sim::StepTiming(5_ms);
   }
   scheduler.Cancel(&command);
 
-  frc::sim::ResumeTiming();
+  wpi::sim::ResumeTiming();
 
   EXPECT_EQ(counter, 2);
 }

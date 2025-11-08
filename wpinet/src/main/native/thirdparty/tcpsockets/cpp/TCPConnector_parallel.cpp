@@ -13,10 +13,10 @@
 #include "wpi/util/condition_variable.hpp"
 #include "wpi/util/mutex.hpp"
 
-using namespace wpi;
+using namespace wpi::net;
 
 std::unique_ptr<NetworkStream> TCPConnector::connect_parallel(
-    std::span<const std::pair<const char*, int>> servers, Logger& logger,
+    std::span<const std::pair<const char*, int>> servers, wpi::util::Logger& logger,
     int timeout) {
   if (servers.empty()) {
     return nullptr;
@@ -24,8 +24,8 @@ std::unique_ptr<NetworkStream> TCPConnector::connect_parallel(
 
   // structure to make sure we don't start duplicate workers
   struct GlobalState {
-    wpi::mutex mtx;
-    SmallSet<std::tuple<std::thread::id, std::string, int>, 16> active;
+    wpi::util::mutex mtx;
+    wpi::util::SmallSet<std::tuple<std::thread::id, std::string, int>, 16> active;
   };
   static auto global = std::make_shared<GlobalState>();
   auto this_id = std::this_thread::get_id();
@@ -33,8 +33,8 @@ std::unique_ptr<NetworkStream> TCPConnector::connect_parallel(
 
   // structure shared between threads and this function
   struct Result {
-    wpi::mutex mtx;
-    wpi::condition_variable cv;
+    wpi::util::mutex mtx;
+    wpi::util::condition_variable cv;
     std::unique_ptr<NetworkStream> stream;
     std::atomic<unsigned int> count{0};
     std::atomic<bool> done{false};
@@ -42,7 +42,7 @@ std::unique_ptr<NetworkStream> TCPConnector::connect_parallel(
   auto result = std::make_shared<Result>();
 
   // start worker threads; this is I/O bound so we don't limit to # of procs
-  Logger* plogger = &logger;
+  wpi::util::Logger* plogger = &logger;
   unsigned int num_workers = 0;
   for (const auto& server : servers) {
     std::pair<std::string, int> server_copy{std::string{server.first},

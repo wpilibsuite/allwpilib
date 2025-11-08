@@ -13,9 +13,9 @@
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/json.hpp"
 
-using namespace cs;
+using namespace wpi::cs;
 
-SinkImpl::SinkImpl(std::string_view name, wpi::Logger& logger,
+SinkImpl::SinkImpl(std::string_view name, wpi::util::Logger& logger,
                    Notifier& notifier, Telemetry& telemetry)
     : m_logger(logger),
       m_notifier(notifier),
@@ -37,7 +37,7 @@ void SinkImpl::SetDescription(std::string_view description) {
 }
 
 std::string_view SinkImpl::GetDescription(
-    wpi::SmallVectorImpl<char>& buf) const {
+    wpi::util::SmallVectorImpl<char>& buf) const {
   std::scoped_lock lock(m_mutex);
   buf.append(m_description.begin(), m_description.end());
   return {buf.data(), buf.size()};
@@ -113,7 +113,7 @@ std::string SinkImpl::GetError() const {
   return std::string{m_source->GetCurFrame().GetError()};
 }
 
-std::string_view SinkImpl::GetError(wpi::SmallVectorImpl<char>& buf) const {
+std::string_view SinkImpl::GetError(wpi::util::SmallVectorImpl<char>& buf) const {
   std::scoped_lock lock(m_mutex);
   if (!m_source) {
     return "no source connected";
@@ -126,10 +126,10 @@ std::string_view SinkImpl::GetError(wpi::SmallVectorImpl<char>& buf) const {
 }
 
 bool SinkImpl::SetConfigJson(std::string_view config, CS_Status* status) {
-  wpi::json j;
+  wpi::util::json j;
   try {
-    j = wpi::json::parse(config);
-  } catch (const wpi::json::parse_error& e) {
+    j = wpi::util::json::parse(config);
+  } catch (const wpi::util::json::parse_error& e) {
     SWARNING("SetConfigJson: parse error at byte {}: {}", e.byte, e.what());
     *status = CS_PROPERTY_WRITE_FAILED;
     return false;
@@ -137,7 +137,7 @@ bool SinkImpl::SetConfigJson(std::string_view config, CS_Status* status) {
   return SetConfigJson(j, status);
 }
 
-bool SinkImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
+bool SinkImpl::SetConfigJson(const wpi::util::json& config, CS_Status* status) {
   if (config.count("properties") != 0) {
     SetPropertiesJson(config.at("properties"), m_logger, GetName(), status);
   }
@@ -147,16 +147,16 @@ bool SinkImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
 
 std::string SinkImpl::GetConfigJson(CS_Status* status) {
   std::string rv;
-  wpi::raw_string_ostream os(rv);
+  wpi::util::raw_string_ostream os(rv);
   GetConfigJsonObject(status).dump(os, 4);
   os.flush();
   return rv;
 }
 
-wpi::json SinkImpl::GetConfigJsonObject(CS_Status* status) {
-  wpi::json j;
+wpi::util::json SinkImpl::GetConfigJsonObject(CS_Status* status) {
+  wpi::util::json j;
 
-  wpi::json props = GetPropertiesJsonObject(status);
+  wpi::util::json props = GetPropertiesJsonObject(status);
   if (props.is_array()) {
     j.emplace("properties", props);
   }
@@ -199,7 +199,7 @@ void SinkImpl::UpdatePropertyValue(int property, bool setString, int value,
 
 void SinkImpl::SetSourceImpl(std::shared_ptr<SourceImpl> source) {}
 
-namespace cs {
+namespace wpi::cs {
 static constexpr unsigned SinkMask = CS_SINK_CV | CS_SINK_RAW;
 
 void SetSinkDescription(CS_Sink sink, std::string_view description,
@@ -221,7 +221,7 @@ std::string GetSinkError(CS_Sink sink, CS_Status* status) {
   return data->sink->GetError();
 }
 
-std::string_view GetSinkError(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
+std::string_view GetSinkError(CS_Sink sink, wpi::util::SmallVectorImpl<char>& buf,
                               CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data || (data->kind & SinkMask) == 0) {
@@ -240,22 +240,22 @@ void SetSinkEnabled(CS_Sink sink, bool enabled, CS_Status* status) {
   data->sink->SetEnabled(enabled);
 }
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 extern "C" {
 void CS_SetSinkDescription(CS_Sink sink, const struct WPI_String* description,
                            CS_Status* status) {
-  return cs::SetSinkDescription(sink, wpi::to_string_view(description), status);
+  return wpi::cs::SetSinkDescription(sink, wpi::util::to_string_view(description), status);
 }
 
 void CS_GetSinkError(CS_Sink sink, struct WPI_String* error,
                      CS_Status* status) {
-  wpi::SmallString<128> buf;
-  cs::ConvertToC(error, cs::GetSinkError(sink, buf, status));
+  wpi::util::SmallString<128> buf;
+  wpi::cs::ConvertToC(error, wpi::cs::GetSinkError(sink, buf, status));
 }
 
 void CS_SetSinkEnabled(CS_Sink sink, CS_Bool enabled, CS_Status* status) {
-  return cs::SetSinkEnabled(sink, enabled, status);
+  return wpi::cs::SetSinkEnabled(sink, enabled, status);
 }
 
 }  // extern "C"

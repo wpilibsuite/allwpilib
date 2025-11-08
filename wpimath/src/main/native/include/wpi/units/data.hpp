@@ -28,9 +28,9 @@
 
 #include "wpi/units/base.hpp"
 
-namespace units {
+namespace wpi::units {
 /**
- * @namespace units::data
+ * @namespace wpi::units::data
  * @brief namespace for unit types and containers representing data values
  * @details The base unit for data is `bytes`, and the corresponding `base_unit`
  *          category is `data_unit`.
@@ -39,7 +39,7 @@ namespace units {
  */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_DATA_UNITS)
 UNIT_ADD_WITH_METRIC_AND_BINARY_PREFIXES(
-    data, byte, bytes, B, unit<std::ratio<1>, units::category::data_unit>)
+    data, byte, bytes, B, unit<std::ratio<1>, wpi::units::category::data_unit>)
 UNIT_ADD(data, exabyte, exabytes, EB, unit<std::ratio<1000>, petabytes>)
 UNIT_ADD_WITH_METRIC_AND_BINARY_PREFIXES(data, bit, bits, b,
                                          unit<std::ratio<1, 8>, byte>)
@@ -49,4 +49,4 @@ UNIT_ADD_CATEGORY_TRAIT(data)
 #endif
 
 using namespace data;
-}  // namespace units
+}  // namespace wpi::units

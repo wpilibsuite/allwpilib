@@ -14,12 +14,12 @@
 #include "wpi/util/json.hpp"
 #include "wpi/util/raw_ostream.hpp"
 
-using namespace nt;
+using namespace wpi::nt;
 
 static std::string ConnInfoToJson(bool connected, const ConnectionInfo& info) {
   std::string str;
-  wpi::raw_string_ostream os{str};
-  wpi::json::serializer s{os, ' ', 0};
+  wpi::util::raw_string_ostream os{str};
+  wpi::util::json::serializer s{os, ' ', 0};
   os << "{\"connected\":" << (connected ? "true" : "false");
   os << ",\"remote_id\":\"";
   s.dump_escaped(info.remote_id, false);
@@ -99,7 +99,7 @@ void ConnectionList::AddListener(NT_Listener listener, unsigned int eventMask) {
   if ((eventMask & (NT_EVENT_CONNECTED | NT_EVENT_IMMEDIATE)) ==
           (NT_EVENT_CONNECTED | NT_EVENT_IMMEDIATE) &&
       !m_connections.empty()) {
-    wpi::SmallVector<const ConnectionInfo*, 16> infos;
+    wpi::util::SmallVector<const ConnectionInfo*, 16> infos;
     infos.reserve(m_connections.size());
     for (auto&& conn : m_connections) {
       infos.emplace_back(&(*conn));

@@ -16,7 +16,7 @@
 #include "wpi/commands2/SubsystemBase.hpp"
 #include "wpi/simulation/DriverStationSim.hpp"
 
-namespace frc2 {
+namespace wpi::cmd {
 
 class TestSubsystem : public SubsystemBase {
  public:
@@ -33,7 +33,7 @@ class TestSubsystem : public SubsystemBase {
  */
 class MockCommand : public CommandHelper<Command, MockCommand> {
  public:
-  MOCK_CONST_METHOD0(GetRequirements, wpi::SmallSet<Subsystem*, 4>());
+  MOCK_CONST_METHOD0(GetRequirements, wpi::util::SmallSet<Subsystem*, 4>());
   MOCK_METHOD0(IsFinished, bool());
   MOCK_CONST_METHOD0(RunsWhenDisabled, bool());
   MOCK_METHOD0(Initialize, void());
@@ -83,7 +83,7 @@ class MockCommand : public CommandHelper<Command, MockCommand> {
   }
 
  private:
-  wpi::SmallSet<Subsystem*, 4> m_requirements;
+  wpi::util::SmallSet<Subsystem*, 4> m_requirements;
 };
 
 class CommandTestBase : public ::testing::Test {
@@ -120,10 +120,10 @@ class CommandTestBaseWithParam : public ::testing::TestWithParam<T> {
   CommandScheduler GetScheduler() { return CommandScheduler(); }
 
   void SetDSEnabled(bool enabled) {
-    frc::sim::DriverStationSim::SetDsAttached(true);
-    frc::sim::DriverStationSim::SetEnabled(enabled);
-    frc::sim::DriverStationSim::NotifyNewData();
+    wpi::sim::DriverStationSim::SetDsAttached(true);
+    wpi::sim::DriverStationSim::SetEnabled(enabled);
+    wpi::sim::DriverStationSim::NotifyNewData();
   }
 };
 
-}  // namespace frc2
+}  // namespace wpi::cmd

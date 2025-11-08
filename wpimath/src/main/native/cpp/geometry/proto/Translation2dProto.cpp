@@ -6,21 +6,21 @@
 
 #include "wpimath/protobuf/geometry2d.npb.h"
 
-std::optional<frc::Translation2d> wpi::Protobuf<frc::Translation2d>::Unpack(
+std::optional<wpi::math::Translation2d> wpi::util::Protobuf<wpi::math::Translation2d>::Unpack(
     InputStream& stream) {
   wpi_proto_ProtobufTranslation2d msg;
   if (!stream.Decode(msg)) {
     return {};
   }
 
-  return frc::Translation2d{
-      units::meter_t{msg.x},
-      units::meter_t{msg.y},
+  return wpi::math::Translation2d{
+      wpi::units::meter_t{msg.x},
+      wpi::units::meter_t{msg.y},
   };
 }
 
-bool wpi::Protobuf<frc::Translation2d>::Pack(OutputStream& stream,
-                                             const frc::Translation2d& value) {
+bool wpi::util::Protobuf<wpi::math::Translation2d>::Pack(OutputStream& stream,
+                                             const wpi::math::Translation2d& value) {
   wpi_proto_ProtobufTranslation2d msg{
       .x = value.X().value(),
       .y = value.Y().value(),

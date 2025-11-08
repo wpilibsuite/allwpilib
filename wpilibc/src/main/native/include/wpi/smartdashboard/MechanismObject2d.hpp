@@ -15,7 +15,7 @@
 #include "wpi/system/Errors.hpp"
 #include "wpi/util/StringMap.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * Common base class for all Mechanism2d node types.
@@ -38,9 +38,9 @@ class MechanismObject2d {
    *
    * @param table the new table.
    */
-  virtual void UpdateEntries(std::shared_ptr<nt::NetworkTable> table) = 0;
+  virtual void UpdateEntries(std::shared_ptr<wpi::nt::NetworkTable> table) = 0;
 
-  mutable wpi::mutex m_mutex;
+  mutable wpi::util::mutex m_mutex;
 
  public:
   virtual ~MechanismObject2d() = default;
@@ -82,8 +82,8 @@ class MechanismObject2d {
 
  private:
   std::string m_name;
-  wpi::StringMap<std::unique_ptr<MechanismObject2d>> m_objects;
-  std::shared_ptr<nt::NetworkTable> m_table;
-  void Update(std::shared_ptr<nt::NetworkTable> table);
+  wpi::util::StringMap<std::unique_ptr<MechanismObject2d>> m_objects;
+  std::shared_ptr<wpi::nt::NetworkTable> m_table;
+  void Update(std::shared_ptr<wpi::nt::NetworkTable> table);
 };
-}  // namespace frc
+}  // namespace wpi

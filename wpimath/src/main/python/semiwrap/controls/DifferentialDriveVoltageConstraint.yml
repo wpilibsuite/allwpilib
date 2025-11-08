@@ -2,9 +2,9 @@ defaults:
   subpackage: constraint
 
 classes:
-  frc::DifferentialDriveVoltageConstraint:
+  wpi::math::DifferentialDriveVoltageConstraint:
     typealias:
-    - frc::TrajectoryConstraint::MinMax
+    - wpi::math::TrajectoryConstraint::MinMax
     methods:
       DifferentialDriveVoltageConstraint:
       MaxVelocity:

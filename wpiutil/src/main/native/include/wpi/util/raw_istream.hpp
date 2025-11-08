@@ -17,7 +17,7 @@
 
 #include "wpi/util/SmallVector.hpp"
 
-namespace wpi {
+namespace wpi::util {
 
 class raw_istream {
  public:
@@ -171,6 +171,6 @@ class raw_fd_istream : public raw_istream {
   bool m_shouldClose;
 };
 
-}  // namespace wpi
+}  // namespace wpi::util
 
 #endif  // WPIUTIL_WPI_UTIL_RAW_ISTREAM_HPP_

@@ -8,7 +8,7 @@
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/linalg/proto/MatrixProto.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 struct MatrixProtoTestData {
   using Type = Matrixd<2, 3>;

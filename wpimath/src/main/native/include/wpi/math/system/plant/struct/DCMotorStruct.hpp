@@ -9,7 +9,7 @@
 #include "wpi/util/struct/Struct.hpp"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Struct<frc::DCMotor> {
+struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::DCMotor> {
   static constexpr std::string_view GetTypeName() { return "DCMotor"; }
   static constexpr size_t GetSize() { return 40; }
   static constexpr std::string_view GetSchema() {
@@ -18,8 +18,8 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::DCMotor> {
            "free_current;double free_speed";
   }
 
-  static frc::DCMotor Unpack(std::span<const uint8_t> data);
-  static void Pack(std::span<uint8_t> data, const frc::DCMotor& value);
+  static wpi::math::DCMotor Unpack(std::span<const uint8_t> data);
+  static void Pack(std::span<uint8_t> data, const wpi::math::DCMotor& value);
 };
 
-static_assert(wpi::StructSerializable<frc::DCMotor>);
+static_assert(wpi::util::StructSerializable<wpi::math::DCMotor>);

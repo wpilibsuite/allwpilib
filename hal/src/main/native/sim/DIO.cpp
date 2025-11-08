@@ -13,13 +13,13 @@
 #include "wpi/hal/handles/HandlesInternal.h"
 #include "wpi/hal/handles/LimitedHandleResource.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
 static LimitedHandleResource<HAL_DigitalPWMHandle, uint8_t,
                              kNumDigitalPWMOutputs, HAL_HandleEnum::DigitalPWM>*
     digitalPWMHandles;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeDIO() {
   static LimitedHandleResource<HAL_DigitalPWMHandle, uint8_t,
                                kNumDigitalPWMOutputs,
@@ -27,18 +27,18 @@ void InitializeDIO() {
       dpH;
   digitalPWMHandles = &dpH;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 
 HAL_DigitalHandle HAL_InitializeDIOPort(int32_t channel, HAL_Bool input,
                                         const char* allocationLocation,
                                         int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
 
   if (channel < 0 || channel >= kNumDigitalChannels) {
     *status = RESOURCE_OUT_OF_RANGE;
-    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
+    wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
                                      kNumDigitalChannels, channel);
     return HAL_kInvalidHandle;
   }
@@ -50,10 +50,10 @@ HAL_DigitalHandle HAL_InitializeDIOPort(int32_t channel, HAL_Bool input,
 
   if (*status != 0) {
     if (port) {
-      hal::SetLastErrorPreviouslyAllocated(status, "PWM or DIO", channel,
+      wpi::hal::SetLastErrorPreviouslyAllocated(status, "PWM or DIO", channel,
                                            port->previousAllocation);
     } else {
-      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
+      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
                                        kNumDigitalChannels, channel);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
@@ -190,7 +190,7 @@ void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
   }
   if (SimDIOData[port->channel].isInput) {
     *status = PARAMETER_OUT_OF_RANGE;
-    hal::SetLastError(status, "Cannot set output of an input channel");
+    wpi::hal::SetLastError(status, "Cannot set output of an input channel");
     return;
   }
   SimDIOData[port->channel].value = value;

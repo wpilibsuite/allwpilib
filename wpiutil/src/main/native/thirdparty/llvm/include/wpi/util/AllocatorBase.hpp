@@ -29,7 +29,7 @@
 #include "wpi/util/MemAlloc.hpp"
 #include <type_traits>
 
-namespace wpi {
+namespace wpi::util {
 
 /// CRTP base class providing obvious overloads for the core \c
 /// Allocate() methods of LLVM-style allocators.
@@ -127,6 +127,6 @@ public:
 
 } // namespace detail
 
-} // namespace wpi
+} // namespace wpi::util
 
 #endif // WPIUTIL_WPI_ALLOCATORBASE_H

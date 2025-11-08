@@ -29,7 +29,7 @@
 #include <limits>
 #include <utility>
 
-namespace wpi {
+namespace wpi::util {
 
 /// SmallPtrSetImplBase - This is the common code shared among all the
 /// SmallPtrSet<>'s, which is almost everything.  SmallPtrSet has two modes, one
@@ -524,7 +524,7 @@ class SmallPtrSet : public SmallPtrSetImpl<PtrType> {
 
   using BaseT = SmallPtrSetImpl<PtrType>;
 
-  // A constexpr version of wpi::bit_ceil.
+  // A constexpr version of wpi::util::bit_ceil.
   // TODO: Replace this with std::bit_ceil once C++20 is available.
   static constexpr size_t RoundUpToPowerOfTwo(size_t X) {
     size_t C = 1;
@@ -584,13 +584,13 @@ public:
   }
 };
 
-} // end namespace wpi
+} // end namespace wpi::util
 
 namespace std {
 
   /// Implement std::swap in terms of SmallPtrSet swap.
   template<class T, unsigned N>
-  inline void swap(wpi::SmallPtrSet<T, N> &LHS, wpi::SmallPtrSet<T, N> &RHS) {
+  inline void swap(wpi::util::SmallPtrSet<T, N> &LHS, wpi::util::SmallPtrSet<T, N> &RHS) {
     LHS.swap(RHS);
   }
 

@@ -13,22 +13,22 @@
 
 #include "Constants.hpp"
 
-class Intake : public frc2::SubsystemBase {
+class Intake : public wpi::cmd::SubsystemBase {
  public:
   Intake() = default;
 
   /** Returns a command that deploys the intake, and then runs the intake motor
    * indefinitely. */
-  frc2::CommandPtr IntakeCommand();
+  wpi::cmd::CommandPtr IntakeCommand();
 
   /** Returns a command that turns off and retracts the intake. */
-  frc2::CommandPtr RetractCommand();
+  wpi::cmd::CommandPtr RetractCommand();
 
  private:
-  frc::PWMSparkMax m_motor{IntakeConstants::kMotorPort};
+  wpi::PWMSparkMax m_motor{IntakeConstants::kMotorPort};
 
   // Double solenoid connected to two channels of a PCM with the default CAN ID
-  frc::DoubleSolenoid m_piston{0, frc::PneumaticsModuleType::CTREPCM,
+  wpi::DoubleSolenoid m_piston{0, wpi::PneumaticsModuleType::CTREPCM,
                                IntakeConstants::kSolenoidPorts[0],
                                IntakeConstants::kSolenoidPorts[1]};
 };

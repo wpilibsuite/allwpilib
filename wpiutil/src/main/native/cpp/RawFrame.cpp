@@ -14,7 +14,7 @@ int WPI_AllocateRawFrameData(WPI_RawFrame* frame, size_t requestedSize) {
     return 0;
   }
   WPI_FreeRawFrameData(frame);
-  frame->data = static_cast<uint8_t*>(wpi::safe_malloc(requestedSize));
+  frame->data = static_cast<uint8_t*>(wpi::util::safe_malloc(requestedSize));
   frame->capacity = requestedSize;
   frame->size = 0;
   return 1;

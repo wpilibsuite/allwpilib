@@ -13,14 +13,14 @@
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/raw_ostream.hpp"
 
-namespace wpi {
+namespace wpi::net {
 
 /**
- * raw_ostream style output to a SmallVector of uv::Buffer buffers.  Fixed-size
+ * wpi::util::raw_ostream style output to a wpi::util::SmallVector of uv::Buffer buffers.  Fixed-size
  * buffers are allocated and appended as necessary to fit the data being output.
- * The SmallVector need not be empty at start.
+ * The wpi::util::SmallVector need not be empty at start.
  */
-class raw_uv_ostream : public raw_ostream {
+class raw_uv_ostream : public wpi::util::raw_ostream {
  public:
   /**
    * Construct a new raw_uv_ostream.
@@ -28,7 +28,7 @@ class raw_uv_ostream : public raw_ostream {
    * @param allocSize Size to allocate for each buffer; allocation will be
    *                  performed using Buffer::Allocate().
    */
-  raw_uv_ostream(SmallVectorImpl<uv::Buffer>& bufs, size_t allocSize)
+  raw_uv_ostream(wpi::util::SmallVectorImpl<uv::Buffer>& bufs, size_t allocSize)
       : m_bufs(bufs), m_alloc([=] { return uv::Buffer::Allocate(allocSize); }) {
     SetUnbuffered();
   }
@@ -38,7 +38,7 @@ class raw_uv_ostream : public raw_ostream {
    * @param bufs Buffers vector.  NOT cleared on construction.
    * @param alloc Allocator.
    */
-  raw_uv_ostream(SmallVectorImpl<uv::Buffer>& bufs,
+  raw_uv_ostream(wpi::util::SmallVectorImpl<uv::Buffer>& bufs,
                  std::function<uv::Buffer()> alloc)
       : m_bufs(bufs), m_alloc(std::move(alloc)) {
     SetUnbuffered();
@@ -62,13 +62,13 @@ class raw_uv_ostream : public raw_ostream {
   void write_impl(const char* data, size_t len) override;
   uint64_t current_pos() const override;
 
-  SmallVectorImpl<uv::Buffer>& m_bufs;
+  wpi::util::SmallVectorImpl<uv::Buffer>& m_bufs;
   std::function<uv::Buffer()> m_alloc;
 
   // How much allocated space is left in the current buffer.
   size_t m_left = 0;
 };
 
-}  // namespace wpi
+}  // namespace wpi::net
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_RAW_UV_OSTREAM_HPP_

@@ -8,7 +8,7 @@
 
 #include "wpi/hal/UsageReporting.h"
 
-using namespace frc;
+using namespace wpi;
 
 PWMSparkFlex::PWMSparkFlex(int channel) : PWMMotorController("PWMSparkFlex", channel) {
   SetBounds(2.003_ms, 1.55_ms, 1.5_ms, 1.46_ms, 0.999_ms);

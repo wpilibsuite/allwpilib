@@ -9,8 +9,8 @@
 
 #include "wpi/hardware/pneumatic/PneumaticsBase.hpp"
 
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 DoubleSolenoidSim::DoubleSolenoidSim(
     std::shared_ptr<PneumaticsBaseSim> moduleSim, int fwd, int rev)

@@ -11,7 +11,7 @@
 #include "wpi/hal/SimDevice.h"
 #include "wpi/hal/simulation/SimDeviceData.h"
 
-namespace frc::sim {
+namespace wpi::sim {
 
 /**
  * Class to control the simulation side of a SimDevice.
@@ -62,7 +62,7 @@ class SimDeviceSim {
    * @param name the property name
    * @return the property object
    */
-  hal::SimValue GetValue(const char* name) const;
+  wpi::hal::SimValue GetValue(const char* name) const;
 
   /**
    * Get the property object with the given name.
@@ -70,7 +70,7 @@ class SimDeviceSim {
    * @param name the property name
    * @return the property object
    */
-  hal::SimInt GetInt(const char* name) const;
+  wpi::hal::SimInt GetInt(const char* name) const;
 
   /**
    * Get the property object with the given name.
@@ -78,7 +78,7 @@ class SimDeviceSim {
    * @param name the property name
    * @return the property object
    */
-  hal::SimLong GetLong(const char* name) const;
+  wpi::hal::SimLong GetLong(const char* name) const;
 
   /**
    * Get the property object with the given name.
@@ -86,7 +86,7 @@ class SimDeviceSim {
    * @param name the property name
    * @return the property object
    */
-  hal::SimDouble GetDouble(const char* name) const;
+  wpi::hal::SimDouble GetDouble(const char* name) const;
 
   /**
    * Get the property object with the given name.
@@ -94,7 +94,7 @@ class SimDeviceSim {
    * @param name the property name
    * @return the property object
    */
-  hal::SimEnum GetEnum(const char* name) const;
+  wpi::hal::SimEnum GetEnum(const char* name) const;
 
   /**
    * Get the property object with the given name.
@@ -102,7 +102,7 @@ class SimDeviceSim {
    * @param name the property name
    * @return the property object
    */
-  hal::SimBoolean GetBoolean(const char* name) const;
+  wpi::hal::SimBoolean GetBoolean(const char* name) const;
 
   /**
    * Get all options for the given enum.
@@ -159,4 +159,4 @@ class SimDeviceSim {
  private:
   HAL_SimDeviceHandle m_handle;
 };
-}  // namespace frc::sim
+}  // namespace wpi::sim

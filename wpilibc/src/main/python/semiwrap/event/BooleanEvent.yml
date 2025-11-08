@@ -1,5 +1,5 @@
 classes:
-  frc::BooleanEvent:
+  wpi::BooleanEvent:
     methods:
       BooleanEvent:
       GetAsBoolean:

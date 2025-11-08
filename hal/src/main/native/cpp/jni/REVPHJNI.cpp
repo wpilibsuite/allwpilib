@@ -24,7 +24,7 @@ static_assert(
     org_wpilib_hardware_hal_REVPHJNI_COMPRESSOR_CONFIG_TYPE_HYBRID ==
     HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kHybrid);
 
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
 
@@ -38,7 +38,7 @@ Java_org_wpilib_hardware_hal_REVPHJNI_initialize
   (JNIEnv* env, jclass, jint busId, jint module)
 {
   int32_t status = 0;
-  auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
+  auto stack = wpi::util::java::GetJavaStackTrace(env, "edu.wpi.first");
   auto handle = HAL_InitializeREVPH(busId, module, stack.c_str(), &status);
   CheckStatusForceThrow(env, status);
   return handle;

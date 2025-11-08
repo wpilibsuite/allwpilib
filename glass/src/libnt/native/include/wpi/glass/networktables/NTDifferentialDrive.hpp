@@ -15,13 +15,13 @@
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/StringTopic.hpp"
 
-namespace glass {
+namespace wpi::glass {
 class NTDifferentialDriveModel : public DriveModel {
  public:
   static constexpr const char* kType = "DifferentialDrive";
 
   explicit NTDifferentialDriveModel(std::string_view path);
-  NTDifferentialDriveModel(nt::NetworkTableInstance instance,
+  NTDifferentialDriveModel(wpi::nt::NetworkTableInstance instance,
                            std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
@@ -37,11 +37,11 @@ class NTDifferentialDriveModel : public DriveModel {
   bool IsReadOnly() override { return !m_controllableValue; }
 
  private:
-  nt::NetworkTableInstance m_inst;
-  nt::StringSubscriber m_name;
-  nt::BooleanSubscriber m_controllable;
-  nt::DoubleEntry m_lPercent;
-  nt::DoubleEntry m_rPercent;
+  wpi::nt::NetworkTableInstance m_inst;
+  wpi::nt::StringSubscriber m_name;
+  wpi::nt::BooleanSubscriber m_controllable;
+  wpi::nt::DoubleEntry m_lPercent;
+  wpi::nt::DoubleEntry m_rPercent;
 
   std::string m_nameValue;
   bool m_controllableValue = false;
@@ -52,4 +52,4 @@ class NTDifferentialDriveModel : public DriveModel {
   ImVec2 m_speedVector;
   double m_rotation;
 };
-}  // namespace glass
+}  // namespace wpi::glass

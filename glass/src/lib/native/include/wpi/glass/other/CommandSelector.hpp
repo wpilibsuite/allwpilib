@@ -6,7 +6,7 @@
 
 #include "wpi/glass/Model.hpp"
 
-namespace glass {
+namespace wpi::glass {
 class BooleanSource;
 class CommandSelectorModel : public Model {
  public:
@@ -15,4 +15,4 @@ class CommandSelectorModel : public Model {
   virtual void SetRunning(bool run) = 0;
 };
 void DisplayCommandSelector(CommandSelectorModel* m);
-}  // namespace glass
+}  // namespace wpi::glass

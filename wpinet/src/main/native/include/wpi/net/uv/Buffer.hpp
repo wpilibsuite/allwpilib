@@ -15,7 +15,7 @@
 
 #include "wpi/util/SmallVector.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 /**
  * Data buffer.  Convenience wrapper around uv_buf_t.
@@ -167,10 +167,10 @@ class SimpleBufferPool {
   size_t Remaining() const { return m_pool.size(); }
 
  private:
-  SmallVector<Buffer, DEPTH> m_pool;
+  wpi::util::SmallVector<Buffer, DEPTH> m_pool;
   size_t m_size;  // NOLINT
 };
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv
 
 #endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_BUFFER_HPP_

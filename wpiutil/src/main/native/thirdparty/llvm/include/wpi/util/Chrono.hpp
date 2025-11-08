@@ -15,7 +15,7 @@
 #include <ctime>
 #include <ratio>
 
-namespace wpi {
+namespace wpi::util {
 
 class raw_ostream;
 
@@ -79,6 +79,6 @@ toTimePoint(std::time_t T, uint32_t nsec) {
 raw_ostream &operator<<(raw_ostream &OS, sys::TimePoint<> TP);
 raw_ostream &operator<<(raw_ostream &OS, sys::UtcTime<> TP);
 
-} // namespace wpi
+} // namespace wpi::util
 
 #endif // WPIUTIL_WPI_CHRONO_H

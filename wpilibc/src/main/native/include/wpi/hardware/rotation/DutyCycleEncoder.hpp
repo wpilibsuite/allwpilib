@@ -13,7 +13,7 @@
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
-namespace frc {
+namespace wpi {
 class DutyCycle;
 
 /**
@@ -21,8 +21,8 @@ class DutyCycle;
  * PWM Output, the CTRE Mag Encoder, the Rev Hex Encoder, and the AM Mag
  * Encoder.
  */
-class DutyCycleEncoder : public wpi::Sendable,
-                         public wpi::SendableHelper<DutyCycleEncoder> {
+class DutyCycleEncoder : public wpi::util::Sendable,
+                         public wpi::util::SendableHelper<DutyCycleEncoder> {
  public:
   /**
    * Construct a new DutyCycleEncoder on a specific channel.
@@ -107,7 +107,7 @@ class DutyCycleEncoder : public wpi::Sendable,
    *
    * @return duty cycle frequency
    */
-  units::hertz_t GetFrequency() const;
+  wpi::units::hertz_t GetFrequency() const;
 
   /**
    * Get if the sensor is connected
@@ -126,7 +126,7 @@ class DutyCycleEncoder : public wpi::Sendable,
    *
    * @param frequency the minimum frequency.
    */
-  void SetConnectedFrequencyThreshold(units::hertz_t frequency);
+  void SetConnectedFrequencyThreshold(wpi::units::hertz_t frequency);
 
   /**
    * Get the encoder value.
@@ -161,7 +161,7 @@ class DutyCycleEncoder : public wpi::Sendable,
    *
    * @param frequency the assumed frequency of the sensor
    */
-  void SetAssumedFrequency(units::hertz_t frequency);
+  void SetAssumedFrequency(wpi::units::hertz_t frequency);
 
   /**
    * Set if this encoder is inverted.
@@ -177,23 +177,23 @@ class DutyCycleEncoder : public wpi::Sendable,
    */
   int GetSourceChannel() const;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
   void Init(double fullRange, double expectedZero);
   double MapSensorRange(double pos) const;
 
   std::shared_ptr<DutyCycle> m_dutyCycle;
-  units::hertz_t m_frequencyThreshold = {100_Hz};
+  wpi::units::hertz_t m_frequencyThreshold = {100_Hz};
   double m_fullRange;
   double m_expectedZero;
-  units::second_t m_period{0_s};
+  wpi::units::second_t m_period{0_s};
   double m_sensorMin{0.0};
   double m_sensorMax{1.0};
   bool m_isInverted{false};
 
-  hal::SimDevice m_simDevice;
-  hal::SimDouble m_simPosition;
-  hal::SimBoolean m_simIsConnected;
+  wpi::hal::SimDevice m_simDevice;
+  wpi::hal::SimDouble m_simPosition;
+  wpi::hal::SimBoolean m_simIsConnected;
 };
-}  // namespace frc
+}  // namespace wpi

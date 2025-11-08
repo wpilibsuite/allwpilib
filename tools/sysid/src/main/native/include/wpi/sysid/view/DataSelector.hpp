@@ -17,7 +17,7 @@
 #include "wpi/sysid/analysis/Storage.hpp"
 #include "wpi/util/StringMap.hpp"
 
-namespace glass {
+namespace wpi::glass {
 class Storage;
 }  // namespace glass
 
@@ -25,21 +25,21 @@ namespace wpi {
 namespace log {
 class DataLogReaderEntry;
 }  // namespace log
-class Logger;
+class wpi::util::Logger;
 }  // namespace wpi
 
 namespace sysid {
 /**
  * Helps with loading datalog files.
  */
-class DataSelector : public glass::View {
+class DataSelector : public wpi::glass::View {
  public:
   /**
    * Creates a data selector widget
    *
    * @param logger The program logger
    */
-  explicit DataSelector(glass::Storage& storage, wpi::Logger& logger)
+  explicit DataSelector(wpi::glass::Storage& storage, wpi::util::Logger& logger)
       : m_logger{logger} {}
 
   /**
@@ -60,7 +60,7 @@ class DataSelector : public glass::View {
   std::vector<std::string> m_missingTests;
 
  private:
-  wpi::Logger& m_logger;
+  wpi::util::Logger& m_logger;
   using Runs = std::vector<std::pair<int64_t, int64_t>>;
   using State = std::map<std::string, Runs, std::less<>>;   // full name
   using Tests = std::map<std::string, State, std::less<>>;  // e.g. "dynamic"

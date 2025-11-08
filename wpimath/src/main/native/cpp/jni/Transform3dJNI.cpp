@@ -13,7 +13,7 @@
 #include "wpi/units/length.hpp"
 #include "wpi/util/jni_util.hpp"
 
-using namespace wpi::java;
+using namespace wpi::util::java;
 
 extern "C" {
 
@@ -27,11 +27,11 @@ Java_org_wpilib_math_jni_Transform3dJNI_log
   (JNIEnv* env, jclass, jdouble relX, jdouble relY, jdouble relZ, jdouble relQw,
    jdouble relQx, jdouble relQy, jdouble relQz)
 {
-  frc::Transform3d transform3d{
-      units::meter_t{relX}, units::meter_t{relY}, units::meter_t{relZ},
-      frc::Rotation3d{frc::Quaternion{relQw, relQx, relQy, relQz}}};
+  wpi::math::Transform3d transform3d{
+      wpi::units::meter_t{relX}, wpi::units::meter_t{relY}, wpi::units::meter_t{relZ},
+      wpi::math::Rotation3d{wpi::math::Quaternion{relQw, relQx, relQy, relQz}}};
 
-  frc::Twist3d result = transform3d.Log();
+  wpi::math::Twist3d result = transform3d.Log();
 
   return MakeJDoubleArray(
       env, {{result.dx.value(), result.dy.value(), result.dz.value(),

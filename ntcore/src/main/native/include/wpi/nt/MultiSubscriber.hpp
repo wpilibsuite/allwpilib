@@ -10,7 +10,7 @@
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
 
-namespace nt {
+namespace wpi::nt {
 
 /**
  * Subscribe to multiple topics based on one or more topic name prefixes. Can be
@@ -31,7 +31,7 @@ class MultiSubscriber final {
   MultiSubscriber(NetworkTableInstance inst,
                   std::span<const std::string_view> prefixes,
                   const PubSubOptions& options = kDefaultPubSubOptions)
-      : m_handle{::nt::SubscribeMultiple(inst.GetHandle(), prefixes, options)} {
+      : m_handle{::wpi::nt::SubscribeMultiple(inst.GetHandle(), prefixes, options)} {
   }
 
   MultiSubscriber(const MultiSubscriber&) = delete;
@@ -43,7 +43,7 @@ class MultiSubscriber final {
 
   MultiSubscriber& operator=(MultiSubscriber&& rhs) {
     if (m_handle != 0) {
-      ::nt::UnsubscribeMultiple(m_handle);
+      ::wpi::nt::UnsubscribeMultiple(m_handle);
     }
     m_handle = rhs.m_handle;
     rhs.m_handle = 0;
@@ -52,7 +52,7 @@ class MultiSubscriber final {
 
   ~MultiSubscriber() {
     if (m_handle != 0) {
-      ::nt::UnsubscribeMultiple(m_handle);
+      ::wpi::nt::UnsubscribeMultiple(m_handle);
     }
   }
 
@@ -74,4 +74,4 @@ class MultiSubscriber final {
   NT_MultiSubscriber m_handle{0};
 };
 
-}  // namespace nt
+}  // namespace wpi::nt

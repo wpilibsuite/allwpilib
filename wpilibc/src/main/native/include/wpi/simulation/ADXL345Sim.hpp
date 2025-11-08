@@ -6,7 +6,7 @@
 
 #include "wpi/hal/SimDevice.h"
 
-namespace frc {
+namespace wpi {
 
 class ADXL345_I2C;
 
@@ -46,10 +46,10 @@ class ADXL345Sim {
   void SetZ(double accel);
 
  private:
-  hal::SimDouble m_simX;
-  hal::SimDouble m_simY;
-  hal::SimDouble m_simZ;
+  wpi::hal::SimDouble m_simX;
+  wpi::hal::SimDouble m_simY;
+  wpi::hal::SimDouble m_simZ;
 };
 
 }  // namespace sim
-}  // namespace frc
+}  // namespace wpi

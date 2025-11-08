@@ -2,14 +2,14 @@ extra_includes:
 - "wpi/math/geometry/Pose3d.hpp"
 
 classes:
-  frc::TimeInterpolatableBuffer:
+  wpi::math::TimeInterpolatableBuffer:
     template_params:
     - T
     methods:
       TimeInterpolatableBuffer:
         overloads:
-          units::second_t, std::function<T (const T&, const T&, double)>:
-          units::second_t:
+          wpi::units::second_t, std::function<T (const T&, const T&, double)>:
+          wpi::units::second_t:
       AddSample:
       Clear:
       Sample:
@@ -21,30 +21,30 @@ classes:
 
 templates:
   TimeInterpolatablePose2dBuffer:
-    qualname: frc::TimeInterpolatableBuffer
+    qualname: wpi::math::TimeInterpolatableBuffer
     params:
-    - frc::Pose2d
+    - wpi::math::Pose2d
   TimeInterpolatablePose3dBuffer:
-    qualname: frc::TimeInterpolatableBuffer
+    qualname: wpi::math::TimeInterpolatableBuffer
     params:
-    - frc::Pose3d
+    - wpi::math::Pose3d
   TimeInterpolatableRotation2dBuffer:
-    qualname: frc::TimeInterpolatableBuffer
+    qualname: wpi::math::TimeInterpolatableBuffer
     params:
-    - frc::Rotation2d
+    - wpi::math::Rotation2d
   TimeInterpolatableRotation3dBuffer:
-    qualname: frc::TimeInterpolatableBuffer
+    qualname: wpi::math::TimeInterpolatableBuffer
     params:
-    - frc::Rotation3d
+    - wpi::math::Rotation3d
   TimeInterpolatableTranslation2dBuffer:
-    qualname: frc::TimeInterpolatableBuffer
+    qualname: wpi::math::TimeInterpolatableBuffer
     params:
-    - frc::Translation2d
+    - wpi::math::Translation2d
   TimeInterpolatableTranslation3dBuffer:
-    qualname: frc::TimeInterpolatableBuffer
+    qualname: wpi::math::TimeInterpolatableBuffer
     params:
-    - frc::Translation3d
+    - wpi::math::Translation3d
   TimeInterpolatableFloatBuffer:
-    qualname: frc::TimeInterpolatableBuffer
+    qualname: wpi::math::TimeInterpolatableBuffer
     params:
     - double

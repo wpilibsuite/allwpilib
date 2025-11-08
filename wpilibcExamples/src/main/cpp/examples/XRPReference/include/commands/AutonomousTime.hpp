@@ -12,7 +12,7 @@
 #include "subsystems/Drivetrain.hpp"
 
 class AutonomousTime
-    : public frc2::CommandHelper<frc2::SequentialCommandGroup, AutonomousTime> {
+    : public wpi::cmd::CommandHelper<wpi::cmd::SequentialCommandGroup, AutonomousTime> {
  public:
   /**
    * Creates a new Autonomous Drive based on time. This will drive out for a

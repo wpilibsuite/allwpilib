@@ -6,21 +6,21 @@
 
 #include "wpimath/protobuf/kinematics.npb.h"
 
-std::optional<frc::DifferentialDriveWheelPositions> wpi::Protobuf<
-    frc::DifferentialDriveWheelPositions>::Unpack(InputStream& stream) {
+std::optional<wpi::math::DifferentialDriveWheelPositions> wpi::util::Protobuf<
+    wpi::math::DifferentialDriveWheelPositions>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufDifferentialDriveWheelPositions msg;
   if (!stream.Decode(msg)) {
     return {};
   }
 
-  return frc::DifferentialDriveWheelPositions{
-      units::meter_t{msg.left},
-      units::meter_t{msg.right},
+  return wpi::math::DifferentialDriveWheelPositions{
+      wpi::units::meter_t{msg.left},
+      wpi::units::meter_t{msg.right},
   };
 }
 
-bool wpi::Protobuf<frc::DifferentialDriveWheelPositions>::Pack(
-    OutputStream& stream, const frc::DifferentialDriveWheelPositions& value) {
+bool wpi::util::Protobuf<wpi::math::DifferentialDriveWheelPositions>::Pack(
+    OutputStream& stream, const wpi::math::DifferentialDriveWheelPositions& value) {
   wpi_proto_ProtobufDifferentialDriveWheelPositions msg{
       .left = value.left.value(),
       .right = value.right.value(),

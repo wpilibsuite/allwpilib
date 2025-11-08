@@ -15,7 +15,7 @@
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
-namespace frc {
+namespace wpi {
 /**
  * Tachometer for getting rotational speed from a device.
  *
@@ -25,8 +25,8 @@ namespace frc {
  * sensor, or optical sensor detecting tape on a shooter wheel. Unlike
  * encoders, this class only needs a single digital input.
  */
-class Tachometer : public wpi::Sendable,
-                   public wpi::SendableHelper<Tachometer> {
+class Tachometer : public wpi::util::Sendable,
+                   public wpi::util::SendableHelper<Tachometer> {
  public:
   /**
    * Constructs a new tachometer.
@@ -53,14 +53,14 @@ class Tachometer : public wpi::Sendable,
    *
    * @return Current frequency.
    */
-  units::hertz_t GetFrequency() const;
+  wpi::units::hertz_t GetFrequency() const;
 
   /**
    * Gets the tachometer period.
    *
    * @return Current period.
    */
-  units::second_t GetPeriod() const;
+  wpi::units::second_t GetPeriod() const;
 
   /**
    * Gets the number of edges per revolution.
@@ -83,7 +83,7 @@ class Tachometer : public wpi::Sendable,
    *
    * @return Current RPS.
    */
-  units::turns_per_second_t GetRevolutionsPerSecond() const;
+  wpi::units::turns_per_second_t GetRevolutionsPerSecond() const;
 
   /**
    * Gets the current tachometer revolutions per minute.
@@ -92,7 +92,7 @@ class Tachometer : public wpi::Sendable,
    *
    * @return Current RPM.
    */
-  units::revolutions_per_minute_t GetRevolutionsPerMinute() const;
+  wpi::units::revolutions_per_minute_t GetRevolutionsPerMinute() const;
 
   /**
    * Gets if the tachometer is stopped.
@@ -106,14 +106,14 @@ class Tachometer : public wpi::Sendable,
    *
    * @param maxPeriod The max period.
    */
-  void SetMaxPeriod(units::second_t maxPeriod);
+  void SetMaxPeriod(wpi::units::second_t maxPeriod);
 
  protected:
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
-  hal::Handle<HAL_CounterHandle, HAL_FreeCounter> m_handle;
+  wpi::hal::Handle<HAL_CounterHandle, HAL_FreeCounter> m_handle;
   int m_edgesPerRevolution;
   int32_t m_channel;
 };
-}  // namespace frc
+}  // namespace wpi

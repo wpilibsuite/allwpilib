@@ -14,7 +14,7 @@
 #include "wpi/util/Color.hpp"
 #include "wpi/util/Color8Bit.hpp"
 
-namespace frc {
+namespace wpi {
 
 /**
  * A class for driving addressable LEDs, such as WS2812B, WS2815, and NeoPixels.
@@ -171,7 +171,7 @@ class AddressableLED {
                             std::span<const LEDData> ledData);
 
  private:
-  hal::Handle<HAL_AddressableLEDHandle, HAL_FreeAddressableLED> m_handle;
+  wpi::hal::Handle<HAL_AddressableLEDHandle, HAL_FreeAddressableLED> m_handle;
   int m_channel;
   int m_start{0};
   int m_length{0};
@@ -182,4 +182,4 @@ constexpr auto format_as(AddressableLED::ColorOrder order) {
   return static_cast<int32_t>(order);
 }
 
-}  // namespace frc
+}  // namespace wpi
