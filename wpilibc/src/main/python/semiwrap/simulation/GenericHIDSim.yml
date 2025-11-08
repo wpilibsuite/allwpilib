@@ -12,12 +12,14 @@ classes:
         overloads:
           int, DriverStation::POVDirection:
           DriverStation::POVDirection:
-      SetAxisCount:
-      SetPOVCount:
-      SetButtonCount:
       SetType:
       SetName:
-      SetAxisType:
       GetOutput:
       GetOutputs:
       GetRumble:
+      SetAxesMaximumIndex:
+      SetAxesAvailable:
+      SetPOVsMaximumIndex:
+      SetPOVsAvailable:
+      SetButtonsMaximumIndex:
+      SetButtonsAvailable:

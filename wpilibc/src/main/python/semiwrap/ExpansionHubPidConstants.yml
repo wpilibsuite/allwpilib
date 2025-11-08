@@ -1,0 +1,7 @@
+classes:
+  frc::ExpansionHubPidConstants:
+    methods:
+      SetPID:
+      SetFF:
+      EnableContinousInput:
+      DisableContinousInput:

@@ -12,6 +12,5 @@ classes:
             default: 0_s
       TimedRobot:
         overloads:
-          double:
-            ignore: true
           units::second_t:
+          units::hertz_t:

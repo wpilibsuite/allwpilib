@@ -41,6 +41,9 @@ classes:
       KrakenX60:
       KrakenX60FOC:
       NeoVortex:
+      KrakenX44:
+      KrakenX44FOC:
+      Minion:
 
 inline_code: |
   SetupWPyStruct<frc::DCMotor>(cls_DCMotor);

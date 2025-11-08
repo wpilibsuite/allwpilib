@@ -33,17 +33,19 @@ classes:
       POVCenter:
       AxisLessThan:
       AxisGreaterThan:
-      GetAxisCount:
-      GetPOVCount:
-      GetButtonCount:
       IsConnected:
       GetType:
       GetName:
-      GetAxisType:
       GetPort:
       SetOutput:
       SetOutputs:
       SetRumble:
+      GetAxesMaximumIndex:
+      GetAxesAvailable:
+      GetPOVsMaximumIndex:
+      GetPOVsAvailable:
+      GetButtonsMaximumIndex:
+      GetButtonsAvailable:
 
 inline_code: |
   cls_GenericHID
