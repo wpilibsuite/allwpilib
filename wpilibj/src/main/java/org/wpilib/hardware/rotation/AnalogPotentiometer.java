@@ -4,6 +4,8 @@
 
 package org.wpilib.hardware.rotation;
 
+import org.wpilib.hardware.discrete.AnalogInput;
+import org.wpilib.system.RobotController;
 import org.wpilib.util.sendable.Sendable;
 import org.wpilib.util.sendable.SendableBuilder;
 import org.wpilib.util.sendable.SendableRegistry;

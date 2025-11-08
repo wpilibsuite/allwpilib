@@ -7,6 +7,7 @@ package org.wpilib;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.networktables.BooleanSubscriber;
 import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.system.SystemServer;
 
 /** This class controls a REV ExpansionHub plugged in over USB to Systemcore. */
 public class ExpansionHub implements AutoCloseable {

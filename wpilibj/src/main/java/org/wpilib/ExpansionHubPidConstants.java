@@ -8,6 +8,7 @@ import org.wpilib.networktables.BooleanPublisher;
 import org.wpilib.networktables.DoublePublisher;
 import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.networktables.PubSubOption;
+import org.wpilib.system.SystemServer;
 
 /** This class contains PID constants for an ExpansionHub motor. */
 public class ExpansionHubPidConstants {

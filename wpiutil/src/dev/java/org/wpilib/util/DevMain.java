@@ -4,6 +4,8 @@
 
 package org.wpilib.util;
 
+import org.wpilib.util.runtime.CombinedRuntimeLoader;
+
 public final class DevMain {
   /** Main entry point. */
   public static void main(String[] args) {

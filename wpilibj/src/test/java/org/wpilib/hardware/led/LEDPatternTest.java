@@ -27,6 +27,7 @@ import static org.wpilib.util.Color.kYellow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import org.wpilib.system.RobotController;
 import org.wpilib.util.Color;
 import org.wpilib.util.Color8Bit;
 import java.util.Map;

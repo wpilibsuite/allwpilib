@@ -7,6 +7,7 @@ package org.wpilib.system;
 import static org.wpilib.units.Units.Seconds;
 
 import org.wpilib.units.measure.Time;
+import org.wpilib.driverstation.DriverStation;
 
 /**
  * A timer class.
