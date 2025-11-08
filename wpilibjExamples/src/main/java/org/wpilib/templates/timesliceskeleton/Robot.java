@@ -4,7 +4,7 @@
 
 package org.wpilib.templates.timesliceskeleton;
 
-import org.wpilib.opmode.TimesliceRobot;
+import org.wpilib.framework.TimesliceRobot;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in

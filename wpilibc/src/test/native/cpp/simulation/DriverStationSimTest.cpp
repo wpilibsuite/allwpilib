@@ -10,7 +10,7 @@
 #include "callback_helpers/TestCallbackHelpers.hpp"
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/driverstation/Joystick.hpp"
-#include "wpi/opmode/RobotState.hpp"
+#include "wpi/framework/RobotState.hpp"
 #include "wpi/simulation/DriverStationSim.hpp"
 #include "wpi/simulation/SimHooks.hpp"
 

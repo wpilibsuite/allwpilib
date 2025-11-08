@@ -6,7 +6,7 @@
 #include <opencv2/core/types.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <wpi/cameraserver/CameraServer.hpp>
-#include <wpi/opmode/TimedRobot.hpp>
+#include <wpi/framework/TimedRobot.hpp>
 
 /**
  * This is a demo program showing the use of OpenCV to do vision processing. The

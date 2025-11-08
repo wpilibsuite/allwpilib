@@ -4,9 +4,9 @@
 
 package org.wpilib.simulation;
 
+import org.wpilib.framework.RobotBase;
 import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.networktables.StringPublisher;
-import org.wpilib.opmode.RobotBase;
 
 /** Class that facilitates control of a SendableChooser's selected option in simulation. */
 public class SendableChooserSim implements AutoCloseable {

@@ -3,9 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <wpi/drive/DifferentialDrive.hpp>
+#include <wpi/framework/TimedRobot.hpp>
 #include <wpi/hardware/motor/Spark.hpp>
 #include <wpi/hardware/rotation/Encoder.hpp>
-#include <wpi/opmode/TimedRobot.hpp>
 
 /**
  * Encoder drive to distance snippets for frc-docs.

@@ -4,9 +4,9 @@
 
 #include <wpi/drive/MecanumDrive.hpp>
 #include <wpi/driverstation/Joystick.hpp>
+#include <wpi/framework/TimedRobot.hpp>
 #include <wpi/hardware/imu/OnboardIMU.hpp>
 #include <wpi/hardware/motor/PWMSparkMax.hpp>
-#include <wpi/opmode/TimedRobot.hpp>
 
 /**
  * This is a sample program that uses mecanum drive with a gyro sensor to

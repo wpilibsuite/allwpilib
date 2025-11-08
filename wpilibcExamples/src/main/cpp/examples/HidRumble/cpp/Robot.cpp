@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <wpi/driverstation/XboxController.hpp>
-#include <wpi/opmode/TimedRobot.hpp>
+#include <wpi/framework/TimedRobot.hpp>
 
 /**
  * This is a demo program showing the use of GenericHID's rumble feature.

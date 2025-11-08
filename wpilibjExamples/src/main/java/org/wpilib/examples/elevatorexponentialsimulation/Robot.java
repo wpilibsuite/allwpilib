@@ -6,7 +6,7 @@ package org.wpilib.examples.elevatorexponentialsimulation;
 
 import org.wpilib.driverstation.Joystick;
 import org.wpilib.examples.elevatorexponentialsimulation.subsystems.Elevator;
-import org.wpilib.opmode.TimedRobot;
+import org.wpilib.framework.TimedRobot;
 
 /** This is a sample program to demonstrate the use of elevator simulation. */
 public class Robot extends TimedRobot {

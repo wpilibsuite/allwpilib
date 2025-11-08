@@ -4,12 +4,12 @@
 
 package org.wpilib.snippets.profiledpidfeedforward;
 
+import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.ProfiledPIDController;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
 import org.wpilib.math.trajectory.TrapezoidProfile;
-import org.wpilib.opmode.TimedRobot;
 
 /**
  * ProfiledPIDController with feedforward snippets for frc-docs.

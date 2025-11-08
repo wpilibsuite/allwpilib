@@ -4,9 +4,9 @@
 
 package org.wpilib.snippets.analogpotentiometer;
 
+import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.discrete.AnalogInput;
 import org.wpilib.hardware.rotation.AnalogPotentiometer;
-import org.wpilib.opmode.TimedRobot;
 
 /**
  * AnalogPotentiometer snippets for frc-docs.

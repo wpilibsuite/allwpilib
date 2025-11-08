@@ -7,7 +7,7 @@
 #include <optional>
 
 #include <wpi/commands2/CommandPtr.hpp>
-#include <wpi/opmode/TimedRobot.hpp>
+#include <wpi/framework/TimedRobot.hpp>
 
 #include "RapidReactCommandBot.hpp"
 

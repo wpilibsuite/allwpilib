@@ -5,6 +5,7 @@
 package org.wpilib.examples.statespaceflywheel;
 
 import org.wpilib.driverstation.Joystick;
+import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.LinearQuadraticRegulator;
@@ -17,7 +18,6 @@ import org.wpilib.math.system.plant.DCMotor;
 import org.wpilib.math.system.plant.LinearSystemId;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Units;
-import org.wpilib.opmode.TimedRobot;
 
 /**
  * This is a sample program to demonstrate how to use a state-space controller to control a

@@ -6,9 +6,9 @@ package org.wpilib.examples.gyromecanum;
 
 import org.wpilib.drive.MecanumDrive;
 import org.wpilib.driverstation.Joystick;
+import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.imu.OnboardIMU;
 import org.wpilib.hardware.motor.PWMSparkMax;
-import org.wpilib.opmode.TimedRobot;
 import org.wpilib.util.sendable.SendableRegistry;
 
 /**

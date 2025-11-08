@@ -11,13 +11,13 @@
 
 #include <fmt/format.h>
 
+#include "wpi/framework/RobotBase.hpp"
 #include "wpi/hal/Ports.h"
 #include "wpi/hal/REVPH.h"
 #include "wpi/hal/UsageReporting.h"
 #include "wpi/hardware/pneumatic/Compressor.hpp"
 #include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
 #include "wpi/hardware/pneumatic/Solenoid.hpp"
-#include "wpi/opmode/RobotBase.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/util/NullDeleter.hpp"
 #include "wpi/util/SensorUtil.hpp"

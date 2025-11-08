@@ -5,9 +5,9 @@
 package org.wpilib.examples.elevatorexponentialprofile;
 
 import org.wpilib.driverstation.Joystick;
+import org.wpilib.framework.TimedRobot;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
 import org.wpilib.math.trajectory.ExponentialProfile;
-import org.wpilib.opmode.TimedRobot;
 
 public class Robot extends TimedRobot {
   private static double kDt = 0.02;

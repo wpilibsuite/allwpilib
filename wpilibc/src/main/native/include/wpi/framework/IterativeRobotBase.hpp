@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "wpi/opmode/RobotBase.hpp"
+#include "wpi/framework/RobotBase.hpp"
 #include "wpi/system/Watchdog.hpp"
 #include "wpi/units/time.hpp"
 

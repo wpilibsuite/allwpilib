@@ -3,9 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <wpi/driverstation/XboxController.hpp>
+#include <wpi/framework/TimedRobot.hpp>
 #include <wpi/math/filter/SlewRateLimiter.hpp>
 #include <wpi/math/util/MathUtil.hpp>
-#include <wpi/opmode/TimedRobot.hpp>
 
 #include "Drivetrain.hpp"
 

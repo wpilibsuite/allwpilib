@@ -74,7 +74,7 @@ class EpilogueGeneratorTest {
           package org.wpilib.epilogue;
 
           @Logged
-          class Example extends org.wpilib.opmode.RobotBase {
+          class Example extends org.wpilib.framework.RobotBase {
             @Override
             public void startCompetition() {}
             @Override
@@ -128,7 +128,7 @@ class EpilogueGeneratorTest {
           package org.wpilib.epilogue;
 
           @Logged
-          class Example extends org.wpilib.opmode.TimedRobot {
+          class Example extends org.wpilib.framework.TimedRobot {
           }
           """;
 
@@ -210,10 +210,10 @@ class EpilogueGeneratorTest {
           package org.wpilib.epilogue;
 
           @Logged
-          class AlphaBot extends org.wpilib.opmode.TimedRobot { }
+          class AlphaBot extends org.wpilib.framework.TimedRobot { }
 
           @Logged
-          class BetaBot extends org.wpilib.opmode.TimedRobot { }
+          class BetaBot extends org.wpilib.framework.TimedRobot { }
           """;
 
     String expected =
