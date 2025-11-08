@@ -60,7 +60,7 @@ inline void ReportError(int32_t status, const char* fileName, int lineNumber,
 #define WPILIB_ReportError(status, format, ...)                       \
   do {                                                             \
     if ((status) != 0) {                                           \
-      ::wpi::ReportError(status, __FILE__, __LINE__, __FUNCTION__, \
+      wpi::ReportError(status, __FILE__, __LINE__, __FUNCTION__, \
                          format __VA_OPT__(, ) __VA_ARGS__);       \
     }                                                              \
   } while (0)
@@ -185,7 +185,7 @@ inline void RemoveRefreshedDataEventHandle(WPI_EventHandle event) {}
 // }  // namespace RobotBase
 // #endif
 
-struct Thread final : public wpi::util::SafeThread {
+struct Thread final : public ::wpi::util::SafeThread {
   Thread(std::string_view dir, std::string_view filename, double period);
   ~Thread() override;
 
@@ -198,18 +198,18 @@ struct Thread final : public wpi::util::SafeThread {
 
   std::string m_logDir;
   bool m_filenameOverride;
-  wpi::log::DataLogBackgroundWriter m_log;
+  ::wpi::log::DataLogBackgroundWriter m_log;
   bool m_ntLoggerEnabled = false;
   NT_DataLogger m_ntEntryLogger = 0;
   NT_ConnectionDataLogger m_ntConnLogger = 0;
   bool m_consoleLoggerEnabled = false;
-  wpi::log::FileLogger m_consoleLogger;
-  wpi::log::StringLogEntry m_messageLog;
+  ::wpi::log::FileLogger m_consoleLogger;
+  ::wpi::log::StringLogEntry m_messageLog;
 };
 
 struct Instance {
   Instance(std::string_view dir, std::string_view filename, double period);
-  wpi::util::SafeThreadOwner<Thread> owner;
+  ::wpi::util::SafeThreadOwner<Thread> owner;
 };
 
 }  // namespace
@@ -287,9 +287,9 @@ void Thread::Main() {
       std::vector<fs::directory_entry> entries;
       for (auto&& entry : fs::directory_iterator{m_logDir, ec}) {
         auto stem = entry.path().stem().string();
-        if (wpi::util::starts_with(stem, "WPILIB_") &&
+        if (::wpi::util::starts_with(stem, "WPILIB_") &&
             entry.path().extension() == ".wpilog" &&
-            !wpi::util::starts_with(stem, "WPILIB_TBD_")) {
+            !::wpi::util::starts_with(stem, "WPILIB_TBD_")) {
           entries.emplace_back(entry);
         }
       }
@@ -313,7 +313,7 @@ void Thread::Main() {
             break;
           }
         } else {
-          wpi::util::print(stderr, "DataLogManager: could not delete {}\n",
+          ::wpi::util::print(stderr, "DataLogManager: could not delete {}\n",
                      entry.path().string());
         }
       }
@@ -334,17 +334,17 @@ void Thread::Main() {
   bool dsRenamed = m_filenameOverride;
   bool fmsRenamed = m_filenameOverride;
   int sysTimeCount = 0;
-  wpi::log::IntegerLogEntry sysTimeEntry{
+  ::wpi::log::IntegerLogEntry sysTimeEntry{
       m_log, "systemTime",
       "{\"source\":\"DataLogManager\",\"format\":\"time_t_us\"}"};
 
-  wpi::util::Event newDataEvent;
+  ::wpi::util::Event newDataEvent;
   DriverStation::ProvideRefreshedDataEventHandle(newDataEvent.GetHandle());
 
   for (;;) {
     bool timedOut = false;
     bool newData =
-        wpi::util::WaitForObject(newDataEvent.GetHandle(), 0.25, &timedOut);
+        ::wpi::util::WaitForObject(newDataEvent.GetHandle(), 0.25, &timedOut);
     if (!m_active) {
       break;
     }
@@ -429,7 +429,7 @@ void Thread::Main() {
     if (sysTimeCount >= 250) {
       sysTimeCount = 0;
       if (RobotController::IsSystemTimeValid()) {
-        sysTimeEntry.Append(wpi::util::GetSystemTime(), wpi::util::Now());
+        sysTimeEntry.Append(::wpi::util::GetSystemTime(), ::wpi::util::Now());
       }
     }
   }
@@ -475,10 +475,10 @@ Instance::Instance(std::string_view dir, std::string_view filename,
   auto logDir = MakeLogDir(dir);
   std::error_code ec;
   for (auto&& entry : fs::directory_iterator{logDir, ec}) {
-    if (wpi::util::starts_with(entry.path().stem().string(), "WPILIB_TBD_") &&
+    if (::wpi::util::starts_with(entry.path().stem().string(), "WPILIB_TBD_") &&
         entry.path().extension() == ".wpilog") {
       if (!fs::remove(entry, ec)) {
-        wpi::util::print(stderr, "DataLogManager: could not delete {}\n",
+        ::wpi::util::print(stderr, "DataLogManager: could not delete {}\n",
                    entry.path().string());
       }
     }
@@ -510,10 +510,10 @@ void DataLogManager::Stop() {
 
 void DataLogManager::Log(std::string_view message) {
   GetInstance().owner.GetThread()->m_messageLog.Append(message);
-  wpi::util::print("{}\n", message);
+  ::wpi::util::print("{}\n", message);
 }
 
-wpi::log::DataLog& DataLogManager::GetLog() {
+::wpi::log::DataLog& DataLogManager::GetLog() {
   return GetInstance().owner.GetThread()->m_log;
 }
 
@@ -542,14 +542,14 @@ void DataLogManager::LogConsoleOutput(bool enabled) {
 }
 
 void DataLogManager::SignalNewDSDataOccur() {
-  wpi::util::SetSignalObject(DriverStation::gNewDataEvent);
+  ::wpi::util::SetSignalObject(DriverStation::gNewDataEvent);
 }
 
 extern "C" {
 
 void DLM_Start(const struct WPI_String* dir, const struct WPI_String* filename,
                double period) {
-  DataLogManager::Start(wpi::util::to_string_view(dir), wpi::util::to_string_view(filename),
+  DataLogManager::Start(::wpi::util::to_string_view(dir), ::wpi::util::to_string_view(filename),
                         period);
 }
 
@@ -558,7 +558,7 @@ void DLM_Stop(void) {
 }
 
 void DLM_Log(const struct WPI_String* message) {
-  DataLogManager::Log(wpi::util::to_string_view(message));
+  DataLogManager::Log(::wpi::util::to_string_view(message));
 }
 
 WPI_DataLog* DLM_GetLog(void) {
