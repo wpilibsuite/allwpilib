@@ -69,7 +69,7 @@ build:remote_user --remote_download_toplevel
 
 build:ci --config=remote_cache
 build:ci --remote_download_minimal
-build:ci --progress_report_interval=60
+build:ci --progress_report_interval=60 --show_progress_rate_limit=60
 
 build --build_metadata=REPO_URL=https://github.com/wpilibsuite/allwpilib.git
 
