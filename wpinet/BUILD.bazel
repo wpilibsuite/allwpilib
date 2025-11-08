@@ -118,7 +118,7 @@ filegroup(
 cc_library(
     name = "private_includes",
     hdrs = glob([
-        "src/main/native/cpp/*.h",
+        "src/main/native/cpp/*.hpp",
     ]),
     strip_include_prefix = "src/main/native/cpp",
 )
@@ -183,7 +183,7 @@ wpilib_jni_cc_library(
     name = "wpinetjni",
     srcs = glob([
         "src/main/native/cpp/jni/**",
-        "src/main/native/cpp/**/*.h",
+        "src/main/native/cpp/**/*.hpp",
     ]),
     java_dep = ":wpinet-java",
     visibility = ["//visibility:public"],
@@ -221,7 +221,7 @@ cc_test(
     size = "small",
     srcs = glob([
         "src/test/native/**/*.cpp",
-        "src/test/native/**/*.h",
+        "src/test/native/**/*.hpp",
     ]),
     tags = ["no-asan"],
     deps = [
@@ -249,8 +249,8 @@ cc_binary(
 
 java_binary(
     name = "DevMain-java",
-    srcs = ["src/dev/java/edu/wpi/first/net/DevMain.java"],
-    main_class = "edu.wpi.first.net.DevMain",
+    srcs = ["src/dev/java/org/wpilib/net/DevMain.java"],
+    main_class = "org.wpilib.net.DevMain",
     deps = [
         ":wpinet-java",
         "//wpiutil:wpiutil-java",
