@@ -8,10 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Test;
+import org.wpilib.UtilityClassTest;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Translation3d;
-import org.wpilib.UtilityClassTest;
-import org.junit.jupiter.api.Test;
 import org.wpilib.math.linalg.VecBuilder;
 
 class MathUtilTest extends UtilityClassTest<MathUtil> {

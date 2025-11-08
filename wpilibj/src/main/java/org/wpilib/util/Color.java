@@ -4,8 +4,8 @@
 
 package org.wpilib.util;
 
-import org.wpilib.math.util.MathUtil;
 import java.util.Objects;
+import org.wpilib.math.util.MathUtil;
 
 /**
  * Represents colors.

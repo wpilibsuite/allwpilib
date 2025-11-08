@@ -4,10 +4,10 @@
 
 package org.wpilib.hal;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.HALUtil;
 import org.wpilib.networktables.NetworkTablesJNI;
-import org.junit.jupiter.api.Test;
 
 class JNITest {
   @Test

@@ -4,11 +4,11 @@
 
 package org.wpilib.math.geometry.struct;
 
+import java.nio.ByteBuffer;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.util.struct.Struct;
-import java.nio.ByteBuffer;
 
 public class Transform2dStruct implements Struct<Transform2d> {
   @Override

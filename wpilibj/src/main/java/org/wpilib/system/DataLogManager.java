@@ -4,17 +4,6 @@
 
 package org.wpilib.system;
 
-import org.wpilib.datalog.DataLog;
-import org.wpilib.datalog.DataLogBackgroundWriter;
-import org.wpilib.datalog.FileLogger;
-import org.wpilib.datalog.IntegerLogEntry;
-import org.wpilib.datalog.StringLogEntry;
-import org.wpilib.driverstation.DriverStation;
-import org.wpilib.hardware.hal.HAL;
-import org.wpilib.networktables.NetworkTableInstance;
-import org.wpilib.opmode.RobotBase;
-import org.wpilib.util.WPIUtilJNI;
-import org.wpilib.util.concurrent.Event;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,6 +15,17 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Random;
+import org.wpilib.datalog.DataLog;
+import org.wpilib.datalog.DataLogBackgroundWriter;
+import org.wpilib.datalog.FileLogger;
+import org.wpilib.datalog.IntegerLogEntry;
+import org.wpilib.datalog.StringLogEntry;
+import org.wpilib.driverstation.DriverStation;
+import org.wpilib.hardware.hal.HAL;
+import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.opmode.RobotBase;
+import org.wpilib.util.WPIUtilJNI;
+import org.wpilib.util.concurrent.Event;
 
 /**
  * Centralized data log that provides automatic data log file management. It automatically cleans up

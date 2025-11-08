@@ -4,10 +4,10 @@
 
 package org.wpilib.math.geometry.struct;
 
+import java.nio.ByteBuffer;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rectangle2d;
 import org.wpilib.util.struct.Struct;
-import java.nio.ByteBuffer;
 
 public class Rectangle2dStruct implements Struct<Rectangle2d> {
   @Override

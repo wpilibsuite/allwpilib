@@ -4,16 +4,15 @@
 
 package org.wpilib.hardware.motor;
 
+import java.util.ArrayList;
+import org.wpilib.hardware.discrete.PWM;
 import org.wpilib.hardware.hal.SimDevice;
 import org.wpilib.hardware.hal.SimDevice.Direction;
 import org.wpilib.hardware.hal.SimDouble;
+import org.wpilib.system.RobotController;
 import org.wpilib.util.sendable.Sendable;
 import org.wpilib.util.sendable.SendableBuilder;
 import org.wpilib.util.sendable.SendableRegistry;
-import org.wpilib.hardware.motor.MotorSafety;
-import org.wpilib.hardware.discrete.PWM;
-import org.wpilib.system.RobotController;
-import java.util.ArrayList;
 
 /** Common base class for all PWM Motor Controllers. */
 @SuppressWarnings("removal")

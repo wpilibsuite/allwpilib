@@ -6,10 +6,10 @@ package org.wpilib.command2;
 
 import static org.wpilib.units.Units.Seconds;
 
+import org.wpilib.system.Timer;
 import org.wpilib.units.measure.Time;
 import org.wpilib.util.sendable.SendableBuilder;
 import org.wpilib.util.sendable.SendableRegistry;
-import org.wpilib.system.Timer;
 
 /**
  * A command that does nothing but takes a specified amount of time to finish.

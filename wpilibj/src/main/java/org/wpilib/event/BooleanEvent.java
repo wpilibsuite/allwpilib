@@ -7,11 +7,11 @@ package org.wpilib.event;
 import static org.wpilib.units.Units.Seconds;
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import org.wpilib.math.filter.Debouncer;
-import org.wpilib.units.measure.Time;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 import java.util.function.BooleanSupplier;
+import org.wpilib.math.filter.Debouncer;
+import org.wpilib.units.measure.Time;
 
 /**
  * This class provides an easy way to link actions to active high logic signals. Each object

@@ -4,15 +4,15 @@
 
 package org.wpilib.examples.httpcamera;
 
-import org.wpilib.vision.stream.CameraServer;
-import org.wpilib.vision.camera.CvSink;
-import org.wpilib.vision.camera.CvSource;
-import org.wpilib.vision.camera.HttpCamera;
-import org.wpilib.opmode.TimedRobot;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
+import org.wpilib.opmode.TimedRobot;
+import org.wpilib.vision.camera.CvSink;
+import org.wpilib.vision.camera.CvSource;
+import org.wpilib.vision.camera.HttpCamera;
+import org.wpilib.vision.stream.CameraServer;
 
 /**
  * This is a demo program showing the use of OpenCV to do vision processing. The image is acquired

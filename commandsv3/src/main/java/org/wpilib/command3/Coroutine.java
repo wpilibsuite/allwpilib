@@ -7,13 +7,13 @@ package org.wpilib.command3;
 import static org.wpilib.units.Units.Seconds;
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import org.wpilib.units.measure.Time;
-import org.wpilib.system.Timer;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
+import org.wpilib.system.Timer;
+import org.wpilib.units.measure.Time;
 
 /**
  * A coroutine object is injected into command's {@link Command#run(Coroutine)} method to allow

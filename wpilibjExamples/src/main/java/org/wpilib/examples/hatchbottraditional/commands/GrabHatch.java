@@ -4,8 +4,8 @@
 
 package org.wpilib.examples.hatchbottraditional.commands;
 
-import org.wpilib.examples.hatchbottraditional.subsystems.HatchSubsystem;
 import org.wpilib.command2.Command;
+import org.wpilib.examples.hatchbottraditional.subsystems.HatchSubsystem;
 
 /**
  * A simple command that grabs a hatch with the {@link HatchSubsystem}. Written explicitly for

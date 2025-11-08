@@ -6,10 +6,10 @@ package org.wpilib.math.kinematics.proto;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
+import org.wpilib.ProtoTestBase;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.kinematics.SwerveDriveKinematics;
 import org.wpilib.math.proto.Kinematics.ProtobufSwerveDriveKinematics;
-import org.wpilib.ProtoTestBase;
 
 @SuppressWarnings("PMD.TestClassWithoutTestCases")
 class SwerveDriveKinematicsProtoTest

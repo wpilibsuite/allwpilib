@@ -4,14 +4,14 @@
 
 package org.wpilib.datalog;
 
-import org.wpilib.util.WPIUtilJNI;
-import org.wpilib.util.protobuf.Protobuf;
-import org.wpilib.util.struct.Struct;
 import java.nio.ByteBuffer;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import org.wpilib.util.WPIUtilJNI;
+import org.wpilib.util.protobuf.Protobuf;
+import org.wpilib.util.struct.Struct;
 
 /**
  * A data log for high-speed writing of data values.

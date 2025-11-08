@@ -4,8 +4,8 @@
 
 package org.wpilib.units;
 
-import org.wpilib.units.measure.Mult;
 import java.util.Objects;
+import org.wpilib.units.measure.Mult;
 
 /**
  * A combinatory unit type that is equivalent to the product of two other others. Note that

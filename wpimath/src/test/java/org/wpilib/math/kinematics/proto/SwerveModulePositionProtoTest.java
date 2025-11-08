@@ -6,10 +6,10 @@ package org.wpilib.math.kinematics.proto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.kinematics.SwerveModulePosition;
 import org.wpilib.math.proto.Kinematics.ProtobufSwerveModulePosition;
-import org.junit.jupiter.api.Test;
 
 class SwerveModulePositionProtoTest {
   private static final SwerveModulePosition DATA =

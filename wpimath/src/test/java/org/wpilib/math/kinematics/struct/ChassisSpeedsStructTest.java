@@ -6,10 +6,10 @@ package org.wpilib.math.kinematics.struct;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.math.kinematics.ChassisSpeeds;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.kinematics.ChassisSpeeds;
 
 class ChassisSpeedsStructTest {
   private static final ChassisSpeeds DATA = new ChassisSpeeds(2.29, 2.2, 0.3504);

@@ -4,15 +4,15 @@
 
 package org.wpilib.smartdashboard;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.networktables.NetworkTable;
 import org.wpilib.networktables.NetworkTableEntry;
 import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.util.sendable.Sendable;
 import org.wpilib.util.sendable.SendableRegistry;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * The {@link SmartDashboard} class is the bridge between robot programs and the SmartDashboard on

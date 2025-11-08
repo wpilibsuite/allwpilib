@@ -4,6 +4,8 @@
 
 package org.wpilib.math.linalg;
 
+import java.util.Objects;
+import org.ejml.simple.SimpleMatrix;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N10;
 import org.wpilib.math.numbers.N2;
@@ -16,8 +18,6 @@ import org.wpilib.math.numbers.N8;
 import org.wpilib.math.numbers.N9;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Num;
-import java.util.Objects;
-import org.ejml.simple.SimpleMatrix;
 
 /** A class for constructing vectors (Nx1 matrices). */
 public final class VecBuilder {

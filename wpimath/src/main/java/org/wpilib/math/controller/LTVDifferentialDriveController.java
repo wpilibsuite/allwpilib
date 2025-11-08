@@ -4,21 +4,21 @@
 
 package org.wpilib.math.controller;
 
+import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.linalg.DARE;
 import org.wpilib.math.linalg.MatBuilder;
-import org.wpilib.math.util.MathUtil;
 import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Nat;
-import org.wpilib.math.util.StateSpaceUtil;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.linalg.Vector;
-import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N2;
 import org.wpilib.math.numbers.N5;
 import org.wpilib.math.system.Discretization;
 import org.wpilib.math.system.LinearSystem;
 import org.wpilib.math.trajectory.Trajectory;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.math.util.Nat;
+import org.wpilib.math.util.StateSpaceUtil;
 
 /**
  * The linear time-varying differential drive controller has a similar form to the LQR, but the

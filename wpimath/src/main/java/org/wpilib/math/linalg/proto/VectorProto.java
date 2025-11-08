@@ -4,12 +4,12 @@
 
 package org.wpilib.math.linalg.proto;
 
-import org.wpilib.math.util.Nat;
-import org.wpilib.math.util.Num;
+import org.ejml.simple.SimpleMatrix;
 import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.proto.Wpimath.ProtobufVector;
+import org.wpilib.math.util.Nat;
+import org.wpilib.math.util.Num;
 import org.wpilib.util.protobuf.Protobuf;
-import org.ejml.simple.SimpleMatrix;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
 public final class VectorProto<R extends Num> implements Protobuf<Vector<R>, ProtobufVector> {

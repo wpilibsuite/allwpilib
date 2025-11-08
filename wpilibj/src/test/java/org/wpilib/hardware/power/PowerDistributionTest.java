@@ -6,10 +6,10 @@ package org.wpilib.hardware.power;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.power.PowerDistribution.ModuleType;
 import org.wpilib.simulation.PDPSim;
-import org.junit.jupiter.api.Test;
 
 class PowerDistributionTest {
   @Test

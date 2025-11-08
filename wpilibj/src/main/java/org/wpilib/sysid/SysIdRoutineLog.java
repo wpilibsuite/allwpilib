@@ -12,8 +12,11 @@ import static org.wpilib.units.Units.RotationsPerSecond;
 import static org.wpilib.units.Units.Second;
 import static org.wpilib.units.Units.Volts;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.wpilib.datalog.DoubleLogEntry;
 import org.wpilib.datalog.StringLogEntry;
+import org.wpilib.system.DataLogManager;
 import org.wpilib.units.measure.Angle;
 import org.wpilib.units.measure.AngularAcceleration;
 import org.wpilib.units.measure.AngularVelocity;
@@ -22,9 +25,6 @@ import org.wpilib.units.measure.Distance;
 import org.wpilib.units.measure.LinearAcceleration;
 import org.wpilib.units.measure.LinearVelocity;
 import org.wpilib.units.measure.Voltage;
-import org.wpilib.system.DataLogManager;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Utility for logging data from a SysId test routine. Each complete routine (quasistatic and

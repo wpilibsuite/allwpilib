@@ -4,11 +4,11 @@
 
 package org.wpilib.math.geometry.struct;
 
+import java.nio.ByteBuffer;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Translation3d;
 import org.wpilib.util.struct.Struct;
-import java.nio.ByteBuffer;
 
 public class Pose3dStruct implements Struct<Pose3d> {
   @Override

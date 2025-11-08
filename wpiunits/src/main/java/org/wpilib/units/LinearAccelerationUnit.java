@@ -6,9 +6,7 @@ package org.wpilib.units;
 
 import org.wpilib.units.measure.LinearAcceleration;
 
-/**
- * A unit of linear acceleration like {@link org.wpilib.units.Units#MetersPerSecondPerSecond}.
- */
+/** A unit of linear acceleration like {@link org.wpilib.units.Units#MetersPerSecondPerSecond}. */
 public final class LinearAccelerationUnit extends PerUnit<LinearVelocityUnit, TimeUnit> {
   private static final CombinatoryUnitCache<LinearVelocityUnit, TimeUnit, LinearAccelerationUnit>
       cache = new CombinatoryUnitCache<>(LinearAccelerationUnit::new);

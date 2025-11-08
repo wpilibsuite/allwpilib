@@ -7,11 +7,11 @@ package org.wpilib.smartdashboard;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.networktables.NetworkTableInstance;
-import org.wpilib.util.Color8Bit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.util.Color8Bit;
 
 class Mechanism2dTest {
   private NetworkTableInstance m_inst;

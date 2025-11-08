@@ -6,13 +6,13 @@ package org.wpilib.math.trajectory.proto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.List;
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.proto.Trajectory.ProtobufTrajectory;
 import org.wpilib.math.trajectory.Trajectory;
-import java.util.List;
-import org.junit.jupiter.api.Test;
 
 class TrajectoryProtoTest {
   private static final Trajectory DATA =

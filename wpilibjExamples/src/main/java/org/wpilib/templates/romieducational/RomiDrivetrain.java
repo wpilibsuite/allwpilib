@@ -4,9 +4,9 @@
 
 package org.wpilib.templates.romieducational;
 
-import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.drive.DifferentialDrive;
 import org.wpilib.hardware.motor.Spark;
+import org.wpilib.hardware.rotation.Encoder;
 
 public class RomiDrivetrain {
   private static final double kCountsPerRevolution = 1440.0;

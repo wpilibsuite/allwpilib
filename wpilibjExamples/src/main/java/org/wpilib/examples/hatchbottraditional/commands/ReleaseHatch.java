@@ -4,8 +4,8 @@
 
 package org.wpilib.examples.hatchbottraditional.commands;
 
-import org.wpilib.examples.hatchbottraditional.subsystems.HatchSubsystem;
 import org.wpilib.command2.InstantCommand;
+import org.wpilib.examples.hatchbottraditional.subsystems.HatchSubsystem;
 
 /** A command that releases the hatch. */
 public class ReleaseHatch extends InstantCommand {

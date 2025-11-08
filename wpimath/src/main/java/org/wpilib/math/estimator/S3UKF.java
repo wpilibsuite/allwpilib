@@ -4,11 +4,11 @@
 
 package org.wpilib.math.estimator;
 
+import java.util.function.BiFunction;
 import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.numbers.N1;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Num;
-import org.wpilib.math.numbers.N1;
-import java.util.function.BiFunction;
 
 /**
  * An Unscented Kalman Filter using sigma points and weights from Papakonstantinou's paper. This is

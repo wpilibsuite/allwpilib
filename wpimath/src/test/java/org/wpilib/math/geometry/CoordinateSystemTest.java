@@ -6,8 +6,8 @@ package org.wpilib.math.geometry;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.math.util.Units;
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.util.Units;
 
 class CoordinateSystemTest {
   private void checkPose3dConvert(

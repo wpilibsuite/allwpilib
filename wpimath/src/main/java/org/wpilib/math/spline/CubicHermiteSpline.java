@@ -4,11 +4,11 @@
 
 package org.wpilib.math.spline;
 
+import org.ejml.simple.SimpleMatrix;
 import org.wpilib.math.spline.proto.CubicHermiteSplineProto;
 import org.wpilib.math.spline.struct.CubicHermiteSplineStruct;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
-import org.ejml.simple.SimpleMatrix;
 
 /** Represents a hermite spline of degree 3. */
 public class CubicHermiteSpline extends Spline implements ProtobufSerializable, StructSerializable {

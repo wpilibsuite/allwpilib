@@ -4,9 +4,9 @@
 
 package org.wpilib.epilogue.logging;
 
+import java.nio.ByteBuffer;
 import org.wpilib.util.struct.Struct;
 import org.wpilib.util.struct.StructSerializable;
-import java.nio.ByteBuffer;
 
 public record CustomStruct(int x) implements StructSerializable {
   public static final Serializer struct = new Serializer();

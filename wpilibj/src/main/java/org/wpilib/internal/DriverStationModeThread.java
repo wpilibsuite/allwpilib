@@ -4,10 +4,10 @@
 
 package org.wpilib.internal;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+import org.wpilib.driverstation.DriverStation;
 import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.util.WPIUtilJNI;
-import org.wpilib.driverstation.DriverStation;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /** For internal use only. */
 public class DriverStationModeThread implements AutoCloseable {

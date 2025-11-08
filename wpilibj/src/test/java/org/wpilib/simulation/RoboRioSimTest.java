@@ -8,11 +8,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.wpilib.system.RobotController;
+import org.junit.jupiter.api.Test;
 import org.wpilib.simulation.testutils.BooleanCallback;
 import org.wpilib.simulation.testutils.DoubleCallback;
 import org.wpilib.simulation.testutils.IntCallback;
-import org.junit.jupiter.api.Test;
+import org.wpilib.system.RobotController;
 
 class RoboRioSimTest {
   @Test

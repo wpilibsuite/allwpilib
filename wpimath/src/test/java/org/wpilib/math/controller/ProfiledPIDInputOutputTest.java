@@ -7,8 +7,8 @@ package org.wpilib.math.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.wpilib.math.trajectory.TrapezoidProfile;
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.trajectory.TrapezoidProfile;
 
 class ProfiledPIDInputOutputTest {
   @Test

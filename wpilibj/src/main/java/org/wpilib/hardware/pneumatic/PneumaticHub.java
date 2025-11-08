@@ -4,15 +4,15 @@
 
 package org.wpilib.hardware.pneumatic;
 
-import org.wpilib.system.SensorUtil;
+import java.util.HashMap;
+import java.util.Map;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.PortsJNI;
 import org.wpilib.hardware.hal.REVPHFaults;
 import org.wpilib.hardware.hal.REVPHJNI;
 import org.wpilib.hardware.hal.REVPHStickyFaults;
 import org.wpilib.hardware.hal.REVPHVersion;
-import java.util.HashMap;
-import java.util.Map;
+import org.wpilib.system.SensorUtil;
 
 /** Module class for controlling a REV Robotics Pneumatic Hub. */
 public class PneumaticHub implements PneumaticsBase {

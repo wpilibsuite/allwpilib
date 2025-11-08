@@ -4,10 +4,10 @@
 
 package org.wpilib.simulation;
 
+import java.util.NoSuchElementException;
+import org.wpilib.hardware.discrete.DigitalOutput;
 import org.wpilib.hardware.hal.simulation.DigitalPWMDataJNI;
 import org.wpilib.hardware.hal.simulation.NotifyCallback;
-import org.wpilib.hardware.discrete.DigitalOutput;
-import java.util.NoSuchElementException;
 
 /**
  * Class to control a simulated digital PWM output.

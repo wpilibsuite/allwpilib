@@ -4,21 +4,21 @@
 
 package org.wpilib.command2.sysid;
 
+import static java.util.Map.entry;
 import static org.wpilib.units.Units.Second;
 import static org.wpilib.units.Units.Seconds;
 import static org.wpilib.units.Units.Volts;
-import static java.util.Map.entry;
 
+import java.util.Map;
+import java.util.function.Consumer;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.Subsystem;
+import org.wpilib.sysid.SysIdRoutineLog;
+import org.wpilib.system.Timer;
 import org.wpilib.units.VoltageUnit;
 import org.wpilib.units.measure.Time;
 import org.wpilib.units.measure.Velocity;
 import org.wpilib.units.measure.Voltage;
-import org.wpilib.system.Timer;
-import org.wpilib.sysid.SysIdRoutineLog;
-import org.wpilib.command2.Command;
-import org.wpilib.command2.Subsystem;
-import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * A SysId characterization routine for a single mechanism. Mechanisms may have multiple motors.

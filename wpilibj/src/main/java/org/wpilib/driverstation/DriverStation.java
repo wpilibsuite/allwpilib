@@ -4,6 +4,11 @@
 
 package org.wpilib.driverstation;
 
+import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.concurrent.locks.ReentrantLock;
 import org.wpilib.datalog.BooleanArrayLogEntry;
 import org.wpilib.datalog.BooleanLogEntry;
 import org.wpilib.datalog.DataLog;
@@ -20,14 +25,9 @@ import org.wpilib.networktables.IntegerPublisher;
 import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.networktables.StringPublisher;
 import org.wpilib.networktables.StringTopic;
-import org.wpilib.util.concurrent.EventVector;
 import org.wpilib.system.Timer;
 import org.wpilib.util.WPIUtilJNI;
-import java.util.Map;
-import java.util.Optional;
-import java.util.OptionalDouble;
-import java.util.OptionalInt;
-import java.util.concurrent.locks.ReentrantLock;
+import org.wpilib.util.concurrent.EventVector;
 
 /** Provide access to the network communication data to / from the Driver Station. */
 public final class DriverStation {

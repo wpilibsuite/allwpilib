@@ -4,12 +4,12 @@
 
 package org.wpilib.datalog;
 
-import org.wpilib.util.struct.Struct;
-import org.wpilib.util.struct.StructBuffer;
 import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Collection;
+import org.wpilib.util.struct.Struct;
+import org.wpilib.util.struct.StructBuffer;
 
 /**
  * Log struct-encoded array values.

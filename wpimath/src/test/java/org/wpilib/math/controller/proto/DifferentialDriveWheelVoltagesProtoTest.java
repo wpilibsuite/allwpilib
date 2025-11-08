@@ -6,9 +6,9 @@ package org.wpilib.math.controller.proto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.controller.DifferentialDriveWheelVoltages;
 import org.wpilib.math.proto.Controller.ProtobufDifferentialDriveWheelVoltages;
-import org.junit.jupiter.api.Test;
 
 class DifferentialDriveWheelVoltagesProtoTest {
   private static final DifferentialDriveWheelVoltages DATA =

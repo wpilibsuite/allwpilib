@@ -6,13 +6,13 @@ package org.wpilib.system;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.hardware.hal.HAL;
-import org.wpilib.simulation.SimHooks;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
+import org.wpilib.hardware.hal.HAL;
+import org.wpilib.simulation.SimHooks;
 
 /** Tests to see if the Notifier is working properly. */
 class NotifierTest {

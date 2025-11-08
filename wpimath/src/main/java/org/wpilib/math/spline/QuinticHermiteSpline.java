@@ -4,11 +4,11 @@
 
 package org.wpilib.math.spline;
 
+import org.ejml.simple.SimpleMatrix;
 import org.wpilib.math.spline.proto.QuinticHermiteSplineProto;
 import org.wpilib.math.spline.struct.QuinticHermiteSplineStruct;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
-import org.ejml.simple.SimpleMatrix;
 
 /** Represents a hermite spline of degree 5. */
 public class QuinticHermiteSpline extends Spline

@@ -4,10 +4,6 @@
 
 package org.wpilib.epilogue.logging;
 
-import org.wpilib.util.function.BooleanConsumer;
-import org.wpilib.util.function.FloatConsumer;
-import org.wpilib.util.function.FloatSupplier;
-import org.wpilib.util.sendable.SendableBuilder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.BooleanSupplier;
@@ -17,6 +13,10 @@ import java.util.function.DoubleSupplier;
 import java.util.function.LongConsumer;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
+import org.wpilib.util.function.BooleanConsumer;
+import org.wpilib.util.function.FloatConsumer;
+import org.wpilib.util.function.FloatSupplier;
+import org.wpilib.util.sendable.SendableBuilder;
 
 /** A sendable builder implementation that sends data to a {@link EpilogueBackend}. */
 public class LogBackedSendableBuilder implements SendableBuilder {

@@ -8,15 +8,15 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.kinematics.ChassisSpeeds;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import org.wpilib.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
-import java.util.ArrayList;
-import java.util.Collections;
-import org.junit.jupiter.api.Test;
 
 class DifferentialDriveVoltageConstraintTest {
   @Test

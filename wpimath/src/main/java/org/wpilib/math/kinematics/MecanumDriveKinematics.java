@@ -4,14 +4,14 @@
 
 package org.wpilib.math.kinematics;
 
-import org.wpilib.math.util.MathSharedStore;
+import org.ejml.simple.SimpleMatrix;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Twist2d;
 import org.wpilib.math.kinematics.proto.MecanumDriveKinematicsProto;
 import org.wpilib.math.kinematics.struct.MecanumDriveKinematicsStruct;
+import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
-import org.ejml.simple.SimpleMatrix;
 
 /**
  * Helper class that converts a chassis velocity (dx, dy, and dtheta components) into individual

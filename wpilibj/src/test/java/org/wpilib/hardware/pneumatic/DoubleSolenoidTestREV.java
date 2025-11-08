@@ -7,8 +7,8 @@ package org.wpilib.hardware.pneumatic;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.wpilib.hardware.hal.util.AllocationException;
 import org.junit.jupiter.api.Test;
+import org.wpilib.hardware.hal.util.AllocationException;
 
 class DoubleSolenoidTestREV {
   @Test

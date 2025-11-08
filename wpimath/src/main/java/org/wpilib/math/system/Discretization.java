@@ -4,10 +4,10 @@
 
 package org.wpilib.math.system;
 
+import org.ejml.simple.SimpleMatrix;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.util.Num;
 import org.wpilib.math.util.Pair;
-import org.ejml.simple.SimpleMatrix;
 
 /** Discretization helper functions. */
 public final class Discretization {

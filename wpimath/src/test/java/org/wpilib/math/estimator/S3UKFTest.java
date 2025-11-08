@@ -8,13 +8,15 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.wpilib.math.linalg.MatBuilder;
-import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Nat;
-import org.wpilib.math.util.StateSpaceUtil;
-import org.wpilib.math.linalg.VecBuilder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.linalg.MatBuilder;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N2;
 import org.wpilib.math.numbers.N3;
@@ -27,10 +29,8 @@ import org.wpilib.math.system.plant.DCMotor;
 import org.wpilib.math.system.plant.LinearSystemId;
 import org.wpilib.math.trajectory.TrajectoryConfig;
 import org.wpilib.math.trajectory.TrajectoryGenerator;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import org.junit.jupiter.api.Test;
+import org.wpilib.math.util.Nat;
+import org.wpilib.math.util.StateSpaceUtil;
 
 class S3UKFTest {
   private static Matrix<N5, N1> driveDynamics(Matrix<N5, N1> x, Matrix<N2, N1> u) {

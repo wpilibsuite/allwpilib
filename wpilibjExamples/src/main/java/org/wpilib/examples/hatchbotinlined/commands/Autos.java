@@ -4,12 +4,12 @@
 
 package org.wpilib.examples.hatchbotinlined.commands;
 
-import org.wpilib.examples.hatchbotinlined.Constants.AutoConstants;
-import org.wpilib.examples.hatchbotinlined.subsystems.DriveSubsystem;
-import org.wpilib.examples.hatchbotinlined.subsystems.HatchSubsystem;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.Commands;
 import org.wpilib.command2.FunctionalCommand;
+import org.wpilib.examples.hatchbotinlined.Constants.AutoConstants;
+import org.wpilib.examples.hatchbotinlined.subsystems.DriveSubsystem;
+import org.wpilib.examples.hatchbotinlined.subsystems.HatchSubsystem;
 
 /** Container for auto command factories. */
 public final class Autos {

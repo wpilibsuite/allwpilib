@@ -6,11 +6,11 @@ package org.wpilib.command2;
 
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import org.wpilib.units.measure.Time;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
+import org.wpilib.units.measure.Time;
 
 /**
  * Namespace for command factory methods.

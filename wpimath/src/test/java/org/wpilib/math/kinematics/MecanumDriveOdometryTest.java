@@ -7,14 +7,14 @@ package org.wpilib.math.kinematics;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.List;
+import java.util.Random;
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.trajectory.TrajectoryConfig;
 import org.wpilib.math.trajectory.TrajectoryGenerator;
-import java.util.List;
-import java.util.Random;
-import org.junit.jupiter.api.Test;
 
 class MecanumDriveOdometryTest {
   private final Translation2d m_fl = new Translation2d(12, 12);

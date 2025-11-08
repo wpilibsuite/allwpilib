@@ -4,12 +4,12 @@
 
 package org.wpilib.examples.drivedistanceoffboard;
 
-import org.wpilib.driverstation.XboxController;
-import org.wpilib.examples.drivedistanceoffboard.Constants.OIConstants;
-import org.wpilib.examples.drivedistanceoffboard.subsystems.DriveSubsystem;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.Commands;
 import org.wpilib.command2.button.CommandXboxController;
+import org.wpilib.driverstation.XboxController;
+import org.wpilib.examples.drivedistanceoffboard.Constants.OIConstants;
+import org.wpilib.examples.drivedistanceoffboard.subsystems.DriveSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a

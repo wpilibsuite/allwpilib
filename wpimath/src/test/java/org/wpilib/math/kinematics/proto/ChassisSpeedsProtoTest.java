@@ -6,9 +6,9 @@ package org.wpilib.math.kinematics.proto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.kinematics.ChassisSpeeds;
 import org.wpilib.math.proto.Kinematics.ProtobufChassisSpeeds;
-import org.junit.jupiter.api.Test;
 
 class ChassisSpeedsProtoTest {
   private static final ChassisSpeeds DATA = new ChassisSpeeds(2.29, 2.2, 0.3504);

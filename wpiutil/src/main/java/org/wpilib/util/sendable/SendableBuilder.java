@@ -4,9 +4,6 @@
 
 package org.wpilib.util.sendable;
 
-import org.wpilib.util.function.BooleanConsumer;
-import org.wpilib.util.function.FloatConsumer;
-import org.wpilib.util.function.FloatSupplier;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
@@ -14,6 +11,9 @@ import java.util.function.DoubleSupplier;
 import java.util.function.LongConsumer;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
+import org.wpilib.util.function.BooleanConsumer;
+import org.wpilib.util.function.FloatConsumer;
+import org.wpilib.util.function.FloatSupplier;
 
 /** Helper class for building Sendable dashboard representations. */
 public interface SendableBuilder extends AutoCloseable {

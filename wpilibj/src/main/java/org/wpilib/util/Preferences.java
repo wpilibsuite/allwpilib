@@ -6,6 +6,8 @@ package org.wpilib.util;
 
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
+import java.util.Collection;
+import java.util.EnumSet;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.networktables.MultiSubscriber;
 import org.wpilib.networktables.NetworkTable;
@@ -16,8 +18,6 @@ import org.wpilib.networktables.NetworkTableListener;
 import org.wpilib.networktables.StringPublisher;
 import org.wpilib.networktables.StringTopic;
 import org.wpilib.networktables.Topic;
-import java.util.Collection;
-import java.util.EnumSet;
 
 /**
  * The preferences class provides a relatively simple way to save important values to the roboRIO to

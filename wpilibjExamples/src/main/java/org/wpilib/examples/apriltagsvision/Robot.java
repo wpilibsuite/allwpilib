@@ -4,24 +4,24 @@
 
 package org.wpilib.examples.apriltagsvision;
 
-import org.wpilib.vision.apriltag.AprilTagDetection;
-import org.wpilib.vision.apriltag.AprilTagDetector;
-import org.wpilib.vision.apriltag.AprilTagPoseEstimator;
-import org.wpilib.vision.stream.CameraServer;
-import org.wpilib.vision.camera.CvSink;
-import org.wpilib.vision.camera.CvSource;
-import org.wpilib.vision.camera.UsbCamera;
+import java.util.ArrayList;
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Transform3d;
 import org.wpilib.networktables.IntegerArrayPublisher;
 import org.wpilib.networktables.NetworkTable;
 import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.opmode.TimedRobot;
-import java.util.ArrayList;
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Scalar;
-import org.opencv.imgproc.Imgproc;
+import org.wpilib.vision.apriltag.AprilTagDetection;
+import org.wpilib.vision.apriltag.AprilTagDetector;
+import org.wpilib.vision.apriltag.AprilTagPoseEstimator;
+import org.wpilib.vision.camera.CvSink;
+import org.wpilib.vision.camera.CvSource;
+import org.wpilib.vision.camera.UsbCamera;
+import org.wpilib.vision.stream.CameraServer;
 
 /**
  * This is a demo program showing the detection of AprilTags. The image is acquired from the USB

@@ -4,9 +4,9 @@
 
 package org.wpilib.command3.proto;
 
-import org.wpilib.util.protobuf.Protobuf;
 import org.wpilib.command3.Mechanism;
 import org.wpilib.command3.proto.ProtobufCommands.ProtobufMechanism;
+import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors;
 
 public class MechanismProto implements Protobuf<Mechanism, ProtobufMechanism> {

@@ -4,9 +4,9 @@
 
 package org.wpilib.command2.button;
 
+import org.wpilib.command2.CommandScheduler;
 import org.wpilib.driverstation.Gamepad;
 import org.wpilib.event.EventLoop;
-import org.wpilib.command2.CommandScheduler;
 
 /**
  * A version of {@link Gamepad} with {@link Trigger} factories for command-based.

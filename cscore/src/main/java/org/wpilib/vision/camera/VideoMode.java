@@ -4,8 +4,8 @@
 
 package org.wpilib.vision.camera;
 
-import org.wpilib.util.PixelFormat;
 import java.util.Objects;
+import org.wpilib.util.PixelFormat;
 
 /** Video mode. */
 @SuppressWarnings("MemberName")

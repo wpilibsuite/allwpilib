@@ -6,10 +6,10 @@ package org.wpilib.math.geometry.struct;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.math.geometry.Quaternion;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.geometry.Quaternion;
 
 class QuaternionStructTest {
   private static final Quaternion DATA = new Quaternion(1.1, 0.191, 35.04, 19.1);

@@ -8,16 +8,16 @@ import static org.wpilib.units.Units.Rotations;
 import static org.wpilib.units.Units.RotationsPerSecond;
 import static org.wpilib.units.Units.Volts;
 
-import org.wpilib.math.controller.PIDController;
-import org.wpilib.math.controller.SimpleMotorFeedforward;
-import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.system.RobotController;
-import org.wpilib.examples.sysidroutine.Constants.ShooterConstants;
-import org.wpilib.hardware.motor.PWMSparkMax;
+import java.util.function.DoubleSupplier;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.command2.sysid.SysIdRoutine;
-import java.util.function.DoubleSupplier;
+import org.wpilib.examples.sysidroutine.Constants.ShooterConstants;
+import org.wpilib.hardware.motor.PWMSparkMax;
+import org.wpilib.hardware.rotation.Encoder;
+import org.wpilib.math.controller.PIDController;
+import org.wpilib.math.controller.SimpleMotorFeedforward;
+import org.wpilib.system.RobotController;
 
 public class Shooter extends SubsystemBase {
   // The motor on the shooter wheel .

@@ -8,14 +8,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Arrays;
+import org.junit.jupiter.api.Test;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.led.AddressableLED;
 import org.wpilib.hardware.led.AddressableLEDBuffer;
 import org.wpilib.simulation.testutils.BooleanCallback;
 import org.wpilib.simulation.testutils.BufferCallback;
 import org.wpilib.simulation.testutils.IntCallback;
-import java.util.Arrays;
-import org.junit.jupiter.api.Test;
 
 class AddressableLEDSimTest {
   @Test

@@ -6,14 +6,14 @@ package org.wpilib.math.kinematics;
 
 import static org.wpilib.units.Units.Meters;
 
-import org.wpilib.math.util.MathUtil;
+import java.util.Objects;
 import org.wpilib.math.interpolation.Interpolatable;
 import org.wpilib.math.kinematics.proto.DifferentialDriveWheelPositionsProto;
 import org.wpilib.math.kinematics.struct.DifferentialDriveWheelPositionsStruct;
+import org.wpilib.math.util.MathUtil;
 import org.wpilib.units.measure.Distance;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
-import java.util.Objects;
 
 /** Represents the wheel positions for a differential drive drivetrain. */
 public class DifferentialDriveWheelPositions

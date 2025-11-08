@@ -4,7 +4,6 @@
 
 package org.wpilib.epilogue.processor;
 
-import org.wpilib.epilogue.Logged;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
@@ -13,6 +12,7 @@ import java.util.stream.Collectors;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
+import org.wpilib.epilogue.Logged;
 
 public final class StringUtils {
   private StringUtils() {

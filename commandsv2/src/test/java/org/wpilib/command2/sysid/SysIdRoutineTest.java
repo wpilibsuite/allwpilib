@@ -4,7 +4,6 @@
 
 package org.wpilib.command2.sysid;
 
-import static org.wpilib.units.Units.Volts;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.clearInvocations;
@@ -12,16 +11,17 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.wpilib.units.Units.Volts;
 
-import org.wpilib.hardware.hal.HAL;
-import org.wpilib.units.measure.Voltage;
-import org.wpilib.simulation.SimHooks;
-import org.wpilib.sysid.SysIdRoutineLog;
-import org.wpilib.command2.Command;
-import org.wpilib.command2.Subsystem;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.Subsystem;
+import org.wpilib.hardware.hal.HAL;
+import org.wpilib.simulation.SimHooks;
+import org.wpilib.sysid.SysIdRoutineLog;
+import org.wpilib.units.measure.Voltage;
 
 class SysIdRoutineTest {
   interface Mechanism extends Subsystem {

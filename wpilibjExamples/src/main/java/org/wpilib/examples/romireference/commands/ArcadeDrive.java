@@ -4,9 +4,9 @@
 
 package org.wpilib.examples.romireference.commands;
 
-import org.wpilib.examples.romireference.subsystems.Drivetrain;
-import org.wpilib.command2.Command;
 import java.util.function.Supplier;
+import org.wpilib.command2.Command;
+import org.wpilib.examples.romireference.subsystems.Drivetrain;
 
 public class ArcadeDrive extends Command {
   private final Drivetrain m_drivetrain;

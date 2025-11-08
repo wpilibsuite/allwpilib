@@ -7,12 +7,12 @@ package org.wpilib.math.estimator;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.util.Nat;
-import org.wpilib.math.util.StateSpaceUtil;
-import org.wpilib.math.linalg.VecBuilder;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N2;
 import org.wpilib.math.numbers.N3;
@@ -22,8 +22,8 @@ import org.wpilib.math.system.NumericalJacobian;
 import org.wpilib.math.system.plant.DCMotor;
 import org.wpilib.math.trajectory.TrajectoryConfig;
 import org.wpilib.math.trajectory.TrajectoryGenerator;
-import java.util.List;
-import org.junit.jupiter.api.Test;
+import org.wpilib.math.util.Nat;
+import org.wpilib.math.util.StateSpaceUtil;
 
 class ExtendedKalmanFilterTest {
   private static Matrix<N5, N1> getDynamics(final Matrix<N5, N1> x, final Matrix<N2, N1> u) {

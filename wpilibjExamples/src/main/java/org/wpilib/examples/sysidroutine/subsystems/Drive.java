@@ -8,15 +8,15 @@ import static org.wpilib.units.Units.Meters;
 import static org.wpilib.units.Units.MetersPerSecond;
 import static org.wpilib.units.Units.Volts;
 
-import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.system.RobotController;
-import org.wpilib.drive.DifferentialDrive;
-import org.wpilib.examples.sysidroutine.Constants.DriveConstants;
-import org.wpilib.hardware.motor.PWMSparkMax;
+import java.util.function.DoubleSupplier;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.command2.sysid.SysIdRoutine;
-import java.util.function.DoubleSupplier;
+import org.wpilib.drive.DifferentialDrive;
+import org.wpilib.examples.sysidroutine.Constants.DriveConstants;
+import org.wpilib.hardware.motor.PWMSparkMax;
+import org.wpilib.hardware.rotation.Encoder;
+import org.wpilib.system.RobotController;
 
 public class Drive extends SubsystemBase {
   // The motors on the left side of the drive.
