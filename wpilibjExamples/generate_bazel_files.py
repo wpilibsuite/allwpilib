@@ -29,19 +29,19 @@ def load_tests(filename):
 
 def main():
     examples = load_foldernames(
-        "wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/examples/examples.json"
+        "wpilibjExamples/src/main/java/org/wpilib/examples/examples.json"
     )
     commands = load_foldernames(
-        "wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/commands/commands.json"
+        "wpilibjExamples/src/main/java/org/wpilib/commands/commands.json"
     )
     templates = load_foldernames(
-        "wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/templates/templates.json"
+        "wpilibjExamples/src/main/java/org/wpilib/templates/templates.json"
     )
     snippets = load_foldernames(
-        "wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/snippets/snippets.json"
+        "wpilibjExamples/src/main/java/org/wpilib/snippets/snippets.json"
     )
     tests = load_tests(
-        "wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/examples/examples.json"
+        "wpilibjExamples/src/main/java/org/wpilib/examples/examples.json"
     )
 
     output_file = "wpilibjExamples/example_projects.bzl"

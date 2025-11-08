@@ -24,7 +24,7 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
         controllers = json.load(f)
 
     # Java files
-    java_subdirectory = "main/java/org/wpilib/commands3/button"
+    java_subdirectory = "main/java/org/wpilib/command3/button"
     env = Environment(
         loader=FileSystemLoader(template_directory / "main/java"),
         autoescape=False,
@@ -54,7 +54,7 @@ def generate_quickbuf(
             absolute_filename,
         ]
         subprocess.check_call(args)
-    java_files = (output_directory / "org/wpilib/commands3/proto").glob("*.java")
+    java_files = (output_directory / "org/wpilib/command3/proto").glob("*.java")
     for java_file in java_files:
         with (java_file).open(encoding="utf-8") as f:
             content = f.read()
