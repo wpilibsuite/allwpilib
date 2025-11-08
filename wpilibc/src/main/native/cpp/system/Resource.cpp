@@ -38,16 +38,16 @@ uint32_t Resource::Allocate(const std::string& resourceDesc) {
       return i;
     }
   }
-  throw FRC_MakeError(err::NoAvailableResources, "{}", resourceDesc);
+  throw WPILIB_MakeError(err::NoAvailableResources, "{}", resourceDesc);
 }
 
 uint32_t Resource::Allocate(uint32_t index, const std::string& resourceDesc) {
   std::scoped_lock lock(m_allocateMutex);
   if (index >= m_isAllocated.size()) {
-    throw FRC_MakeError(err::ChannelIndexOutOfRange, "{}", resourceDesc);
+    throw WPILIB_MakeError(err::ChannelIndexOutOfRange, "{}", resourceDesc);
   }
   if (m_isAllocated[index]) {
-    throw FRC_MakeError(err::ResourceAlreadyAllocated, "{}", resourceDesc);
+    throw WPILIB_MakeError(err::ResourceAlreadyAllocated, "{}", resourceDesc);
   }
   m_isAllocated[index] = true;
   return index;
@@ -59,10 +59,10 @@ void Resource::Free(uint32_t index) {
     return;
   }
   if (index >= m_isAllocated.size()) {
-    throw FRC_MakeError(err::NotAllocated, "index {}", index);
+    throw WPILIB_MakeError(err::NotAllocated, "index {}", index);
   }
   if (!m_isAllocated[index]) {
-    throw FRC_MakeError(err::NotAllocated, "index {}", index);
+    throw WPILIB_MakeError(err::NotAllocated, "index {}", index);
   }
   m_isAllocated[index] = false;
 }

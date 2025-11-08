@@ -193,7 +193,7 @@ void IterativeRobotBase::LoopFunc() {
 }
 
 void IterativeRobotBase::PrintLoopOverrunMessage() {
-  FRC_ReportError(err::Error, "Loop time of {:.6f}s overrun", m_period.value());
+  WPILIB_ReportError(err::Error, "Loop time of {:.6f}s overrun", m_period.value());
 }
 
 void IterativeRobotBase::PrintWatchdogEpochs() {

@@ -50,7 +50,7 @@ int wpi::RunHALInitialization() {
   HAL_ReportUsage("WPILibVersion", GetWPILibVersion());
 
   if (!wpi::Notifier::SetHALThreadPriority(true, 40)) {
-    FRC_ReportWarning("Setting HAL Notifier RT priority to 40 failed\n");
+    WPILIB_ReportWarning("Setting HAL Notifier RT priority to 40 failed\n");
   }
 
   std::puts("\n********** Robot program starting **********");

@@ -22,7 +22,7 @@ UpDownCounter::UpDownCounter(int channel, EdgeConfiguration configuration)
   m_handle = HAL_InitializeCounter(
       channel, configuration == EdgeConfiguration::kRisingEdge,
       stackTrace.c_str(), &status);
-  FRC_CheckErrorStatus(status, "{}", channel);
+  WPILIB_CheckErrorStatus(status, "{}", channel);
 
   Reset();
 
@@ -33,21 +33,21 @@ UpDownCounter::UpDownCounter(int channel, EdgeConfiguration configuration)
 int UpDownCounter::GetCount() const {
   int32_t status = 0;
   int val = HAL_GetCounter(m_handle, &status);
-  FRC_CheckErrorStatus(status, "{}", m_channel);
+  WPILIB_CheckErrorStatus(status, "{}", m_channel);
   return val;
 }
 
 void UpDownCounter::Reset() {
   int32_t status = 0;
   HAL_ResetCounter(m_handle, &status);
-  FRC_CheckErrorStatus(status, "{}", m_channel);
+  WPILIB_CheckErrorStatus(status, "{}", m_channel);
 }
 
 void UpDownCounter::SetEdgeConfiguration(EdgeConfiguration configuration) {
   int32_t status = 0;
   bool rising = configuration == EdgeConfiguration::kRisingEdge;
   HAL_SetCounterEdgeConfiguration(m_handle, rising, &status);
-  FRC_CheckErrorStatus(status, "{}", m_channel);
+  WPILIB_CheckErrorStatus(status, "{}", m_channel);
 }
 
 void UpDownCounter::InitSendable(wpi::util::SendableBuilder& builder) {

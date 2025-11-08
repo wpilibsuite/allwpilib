@@ -51,7 +51,7 @@ void Robot::TestInit() {
 
 void Robot::TestPeriodic() {}
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
   return wpi::StartRobot<Robot>();
 }

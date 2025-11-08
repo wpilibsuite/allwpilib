@@ -38,7 +38,7 @@ class Robot : public wpi::TimedRobot {
   wpi::AnalogPotentiometer m_pot1{&m_input, 180, 30};
 };
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
   return wpi::StartRobot<Robot>();
 }

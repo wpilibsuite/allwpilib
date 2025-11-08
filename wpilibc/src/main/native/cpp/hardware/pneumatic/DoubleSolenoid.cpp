@@ -22,11 +22,11 @@ DoubleSolenoid::DoubleSolenoid(int busId, int module,
       m_forwardChannel{forwardChannel},
       m_reverseChannel{reverseChannel} {
   if (!m_module->CheckSolenoidChannel(m_forwardChannel)) {
-    throw FRC_MakeError(err::ChannelIndexOutOfRange, "Channel {}",
+    throw WPILIB_MakeError(err::ChannelIndexOutOfRange, "Channel {}",
                         m_forwardChannel);
   }
   if (!m_module->CheckSolenoidChannel(m_reverseChannel)) {
-    throw FRC_MakeError(err::ChannelIndexOutOfRange, "Channel {}",
+    throw WPILIB_MakeError(err::ChannelIndexOutOfRange, "Channel {}",
                         m_reverseChannel);
   }
 
@@ -37,13 +37,13 @@ DoubleSolenoid::DoubleSolenoid(int busId, int module,
   int allocMask = m_module->CheckAndReserveSolenoids(m_mask);
   if (allocMask != 0) {
     if (allocMask == m_mask) {
-      throw FRC_MakeError(err::ResourceAlreadyAllocated, "Channels {} and {}",
+      throw WPILIB_MakeError(err::ResourceAlreadyAllocated, "Channels {} and {}",
                           m_forwardChannel, m_reverseChannel);
     } else if (allocMask == m_forwardMask) {
-      throw FRC_MakeError(err::ResourceAlreadyAllocated, "Channel {}",
+      throw WPILIB_MakeError(err::ResourceAlreadyAllocated, "Channel {}",
                           m_forwardChannel);
     } else {
-      throw FRC_MakeError(err::ResourceAlreadyAllocated, "Channel {}",
+      throw WPILIB_MakeError(err::ResourceAlreadyAllocated, "Channel {}",
                           m_reverseChannel);
     }
   }

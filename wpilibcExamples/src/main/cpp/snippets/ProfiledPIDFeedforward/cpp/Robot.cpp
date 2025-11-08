@@ -47,7 +47,7 @@ class Robot : public wpi::TimedRobot {
   wpi::units::meters_per_second_t m_lastSpeed = 0_mps;
 };
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
   return wpi::StartRobot<Robot>();
 }
