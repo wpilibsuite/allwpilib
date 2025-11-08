@@ -48,7 +48,7 @@ index 990d3e4cfe53e025df6ce797f46f9de5af8ca6dc..264b8192a0473b94363765995517851c
    //===--------------------------------------------------------------------===//
    // Subclass Interface
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index b66f4a0d71f4897821084dc05a278d7c5194a847..6c2b1c433285d2ec5d124f96919ff27f3328d74c 100644
+index 2f160c45b47cf57bb28f6393dd56cde06089639b..9ef6f7da66c66a35b1ce63e603e8590c214f9843 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -182,22 +182,6 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
@@ -75,7 +75,7 @@ index b66f4a0d71f4897821084dc05a278d7c5194a847..6c2b1c433285d2ec5d124f96919ff27f
  
  #define WIN32_NO_STATUS
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 193ef061867c659e732bb1507b4ff0808f3b5f5c..3bfebbb41f324d9525290d9105c11fe01502dd87 100644
+index 585f45d9eedc2d900886988010738dc390acbf90..841a30962da17fc3d7bd18e14b44993900b3f984 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -168,16 +168,6 @@ raw_ostream &raw_ostream::write_escaped(std::string_view Str,
