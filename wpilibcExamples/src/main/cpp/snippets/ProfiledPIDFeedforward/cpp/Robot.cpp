@@ -20,8 +20,8 @@ class Robot : public wpi::TimedRobot {
  public:
   Robot() { m_encoder.SetDistancePerPulse(1.0 / 256.0); }
 
-  // Controls a simple motor's position using a wpi::math::SimpleMotorFeedforward
-  // and a wpi::math::ProfiledPIDController
+  // Controls a simple motor's position using a
+  // wpi::math::SimpleMotorFeedforward and a wpi::math::ProfiledPIDController
   void GoToPosition(wpi::units::meter_t goalPosition) {
     auto pidVal = m_controller.Calculate(
         wpi::units::meter_t{m_encoder.GetDistance()}, goalPosition);
@@ -39,8 +39,8 @@ class Robot : public wpi::TimedRobot {
  private:
   wpi::math::ProfiledPIDController<wpi::units::meters> m_controller{
       1.0, 0.0, 0.0, {5_mps, 10_mps_sq}};
-  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_feedforward{0.5_V, 1.5_V / 1_mps,
-                                                           0.3_V / 1_mps_sq};
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_feedforward{
+      0.5_V, 1.5_V / 1_mps, 0.3_V / 1_mps_sq};
   wpi::Encoder m_encoder{0, 1};
   wpi::PWMSparkMax m_motor{0};
 

@@ -55,7 +55,8 @@ extern "C" {
 CS_Source CS_CreateRawSource(const struct WPI_String* name, CS_Bool isCv,
                              const CS_VideoMode* mode, CS_Status* status) {
   return wpi::cs::CreateRawSource(wpi::util::to_string_view(name), isCv,
-                             static_cast<const wpi::cs::VideoMode&>(*mode), status);
+                                  static_cast<const wpi::cs::VideoMode&>(*mode),
+                                  status);
 }
 
 void CS_PutRawSourceFrame(CS_Source source, const struct WPI_RawFrame* image,

@@ -50,7 +50,8 @@ TEST(EventTest, WaitMultiple) {
   ASSERT_EQ(result1.size(), 1u);
   ASSERT_EQ(result1[0], event2);
   bool timedOut;
-  auto result2 = wpi::util::WaitForObjects({event1, event2}, signaled, 0, &timedOut);
+  auto result2 =
+      wpi::util::WaitForObjects({event1, event2}, signaled, 0, &timedOut);
   ASSERT_EQ(timedOut, true);
   ASSERT_EQ(result2.size(), 0u);
 }

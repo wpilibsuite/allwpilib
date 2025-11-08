@@ -52,13 +52,14 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelSpeeds {
    */
   constexpr MecanumDriveWheelSpeeds Desaturate(
       wpi::units::meters_per_second_t attainableMaxSpeed) const {
-    std::array<wpi::units::meters_per_second_t, 4> wheelSpeeds{frontLeft, frontRight,
-                                                          rearLeft, rearRight};
-    wpi::units::meters_per_second_t realMaxSpeed = wpi::units::math::abs(
-        *std::max_element(wheelSpeeds.begin(), wheelSpeeds.end(),
-                          [](const auto& a, const auto& b) {
-                            return wpi::units::math::abs(a) < wpi::units::math::abs(b);
-                          }));
+    std::array<wpi::units::meters_per_second_t, 4> wheelSpeeds{
+        frontLeft, frontRight, rearLeft, rearRight};
+    wpi::units::meters_per_second_t realMaxSpeed =
+        wpi::units::math::abs(*std::max_element(
+            wheelSpeeds.begin(), wheelSpeeds.end(),
+            [](const auto& a, const auto& b) {
+              return wpi::units::math::abs(a) < wpi::units::math::abs(b);
+            }));
 
     if (realMaxSpeed > attainableMaxSpeed) {
       for (int i = 0; i < 4; ++i) {

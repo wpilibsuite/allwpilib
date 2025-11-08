@@ -19,7 +19,8 @@ struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::Rectangle2d> {
   }
 
   static wpi::math::Rectangle2d Unpack(std::span<const uint8_t> data);
-  static void Pack(std::span<uint8_t> data, const wpi::math::Rectangle2d& value);
+  static void Pack(std::span<uint8_t> data,
+                   const wpi::math::Rectangle2d& value);
   static void ForEachNested(
       std::invocable<std::string_view, std::string_view> auto fn) {
     wpi::util::ForEachStructSchema<wpi::math::Pose2d>(fn);

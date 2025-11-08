@@ -220,7 +220,7 @@ std::optional<double> ValueFromString(std::string_view str) {
 
 template <typename V>
 wpi::util::expected<V, std::string> EvalAll(std::stack<Operator>& operStack,
-                                      std::stack<V>& valStack) {
+                                            std::stack<V>& valStack) {
   while (!operStack.empty()) {
     if (valStack.size() < 2) {
       return wpi::util::unexpected("Missing operand");
@@ -307,7 +307,8 @@ wpi::util::expected<V, std::string> ParseExpr(Lexer& lexer, bool insideParen) {
         // Acts as if there was open paren at start of expression. EvalAll will
         // clear both stacks, and leave the result value on top of valStack.
         // This makes sure everything inside the parentheses is evaluated first
-        wpi::util::expected<V, std::string> result = EvalAll<V>(operStack, valStack);
+        wpi::util::expected<V, std::string> result =
+            EvalAll<V>(operStack, valStack);
         if (!result) {
           return result;
         }
@@ -316,7 +317,7 @@ wpi::util::expected<V, std::string> ParseExpr(Lexer& lexer, bool insideParen) {
 
       case TokenType::Error:
         return wpi::util::unexpected(std::string("Unexpected character: ")
-                                   .append(token.str, token.strLen));
+                                         .append(token.str, token.strLen));
 
       default:
         Operator op = GetOperator(token.type);

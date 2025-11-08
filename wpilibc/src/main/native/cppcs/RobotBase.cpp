@@ -202,7 +202,8 @@ RobotBase::RobotBase() {
     std::this_thread::sleep_for(10ms);
     ++count;
     if (count > 100) {
-      wpi::util::print(stderr, "timed out while waiting for NT server to start\n");
+      wpi::util::print(stderr,
+                       "timed out while waiting for NT server to start\n");
       break;
     }
   }

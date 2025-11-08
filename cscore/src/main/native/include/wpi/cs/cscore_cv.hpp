@@ -107,8 +107,8 @@ class CvSink : public ImageSink {
    * with.
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
-   *         message); the frame time is in the same time base as wpi::util::Now(),
-   *         and is in 1 us increments.
+   *         message); the frame time is in the same time base as
+   * wpi::util::Now(), and is in 1 us increments.
    */
   [[nodiscard]]
   uint64_t GrabFrame(cv::Mat& image, double timeout = 0.225);
@@ -119,8 +119,8 @@ class CvSink : public ImageSink {
    * with.
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
-   *         message); the frame time is in the same time base as wpi::util::Now(),
-   *         and is in 1 us increments.
+   *         message); the frame time is in the same time base as
+   * wpi::util::Now(), and is in 1 us increments.
    */
   [[nodiscard]]
   uint64_t GrabFrameNoTimeout(cv::Mat& image);
@@ -133,8 +133,8 @@ class CvSink : public ImageSink {
    * any grabFrame*() call on the sink.
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
-   *         message); the frame time is in the same time base as wpi::util::Now(),
-   *         and is in 1 us increments.
+   *         message); the frame time is in the same time base as
+   * wpi::util::Now(), and is in 1 us increments.
    */
   [[nodiscard]]
   uint64_t GrabFrameDirect(cv::Mat& image, double timeout = 0.225);
@@ -146,8 +146,8 @@ class CvSink : public ImageSink {
    * any grabFrame*() call on the sink.
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
-   *         message); the frame time is in the same time base as wpi::util::Now(),
-   *         and is in 1 us increments.
+   *         message); the frame time is in the same time base as
+   * wpi::util::Now(), and is in 1 us increments.
    */
   [[nodiscard]]
   uint64_t GrabFrameNoTimeoutDirect(cv::Mat& image);
@@ -166,8 +166,8 @@ class CvSink : public ImageSink {
    * a new frame.
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
-   *         message); the frame time is in the same time base as wpi::util::Now(),
-   *         and is in 1 us increments.
+   *         message); the frame time is in the same time base as
+   * wpi::util::Now(), and is in 1 us increments.
    */
   [[nodiscard]]
   uint64_t GrabFrameDirectLastTime(cv::Mat& image, uint64_t lastFrameTime,

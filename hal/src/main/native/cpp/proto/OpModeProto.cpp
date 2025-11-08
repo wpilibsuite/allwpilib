@@ -35,7 +35,7 @@ std::optional<mrc::OpMode> wpi::util::Protobuf<mrc::OpMode>::Unpack(
 }
 
 bool wpi::util::Protobuf<mrc::OpMode>::Pack(OutputStream& Stream,
-                                      const mrc::OpMode& Value) {
+                                            const mrc::OpMode& Value) {
   std::string_view EventNameStr = Value.GetName();
   wpi::util::PackCallback EventName{&EventNameStr};
 

@@ -9,6 +9,6 @@
 #include "wpi/units/length.hpp"
 
 namespace wpi::units {
-using curvature_t = wpi::units::unit_t<
-    wpi::units::compound_unit<wpi::units::radians, wpi::units::inverse<wpi::units::meters>>>;
+using curvature_t = wpi::units::unit_t<wpi::units::compound_unit<
+    wpi::units::radians, wpi::units::inverse<wpi::units::meters>>>;
 }  // namespace wpi::units

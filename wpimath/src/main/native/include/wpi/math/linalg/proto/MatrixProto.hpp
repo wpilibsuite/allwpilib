@@ -15,19 +15,21 @@
 
 template <int Rows, int Cols, int Options, int MaxRows, int MaxCols>
   requires(Cols != 1)
-struct wpi::util::Protobuf<wpi::math::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>> {
+struct wpi::util::Protobuf<
+    wpi::math::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>> {
   using MessageStruct = wpi_proto_ProtobufMatrix;
   using InputStream = wpi::util::ProtoInputStream<
       wpi::math::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>>;
   using OutputStream = wpi::util::ProtoOutputStream<
       wpi::math::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>>;
 
-  static std::optional<wpi::math::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>>
+  static std::optional<
+      wpi::math::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>>
   Unpack(InputStream& stream) {
     constexpr bool isSmall = Rows * Cols * sizeof(double) < 256;
-    using UnpackType =
-        std::conditional_t<isSmall, wpi::util::UnpackCallback<double, Rows * Cols>,
-                           wpi::util::StdVectorUnpackCallback<double, Rows * Cols>>;
+    using UnpackType = std::conditional_t<
+        isSmall, wpi::util::UnpackCallback<double, Rows * Cols>,
+        wpi::util::StdVectorUnpackCallback<double, Rows * Cols>>;
     UnpackType data;
     data.Vec().reserve(Rows * Cols);
     data.SetLimits(wpi::util::DecodeLimits::Fail);

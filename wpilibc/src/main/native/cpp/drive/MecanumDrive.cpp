@@ -49,7 +49,8 @@ MecanumDrive::MecanumDrive(std::function<void(double)> frontLeftMotor,
 }
 
 void MecanumDrive::DriveCartesian(double xSpeed, double ySpeed,
-                                  double zRotation, wpi::math::Rotation2d gyroAngle) {
+                                  double zRotation,
+                                  wpi::math::Rotation2d gyroAngle) {
   if (!reported) {
     HAL_ReportUsage("RobotDrive", "MecanumCartesian");
     reported = true;
@@ -99,17 +100,17 @@ void MecanumDrive::StopMotor() {
   Feed();
 }
 
-MecanumDrive::WheelSpeeds MecanumDrive::DriveCartesianIK(double xSpeed,
-                                                         double ySpeed,
-                                                         double zRotation,
-                                                         wpi::math::Rotation2d gyroAngle) {
+MecanumDrive::WheelSpeeds MecanumDrive::DriveCartesianIK(
+    double xSpeed, double ySpeed, double zRotation,
+    wpi::math::Rotation2d gyroAngle) {
   xSpeed = std::clamp(xSpeed, -1.0, 1.0);
   ySpeed = std::clamp(ySpeed, -1.0, 1.0);
 
   // Compensate for gyro angle.
-  auto input =
-      wpi::math::Translation2d{wpi::units::meter_t{xSpeed}, wpi::units::meter_t{ySpeed}}.RotateBy(
-          -gyroAngle);
+  auto input = wpi::math::Translation2d{
+      wpi::units::meter_t{xSpeed},
+      wpi::units::meter_t{
+          ySpeed}}.RotateBy(-gyroAngle);
 
   double wheelSpeeds[4];
   wheelSpeeds[kFrontLeft] = input.X().value() + input.Y().value() + zRotation;

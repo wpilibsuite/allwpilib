@@ -44,7 +44,8 @@ class TimeInterpolatableBuffer {
 
   /**
    * Create a new TimeInterpolatableBuffer. By default, the interpolation
-   * function is wpi::util::Lerp except for Pose2d, which uses the pose exponential.
+   * function is wpi::util::Lerp except for Pose2d, which uses the pose
+   * exponential.
    *
    * @param historySize  The history size of the buffer.
    */
@@ -144,7 +145,8 @@ class TimeInterpolatableBuffer {
   /**
    * Grant access to the internal sample buffer.
    */
-  const std::vector<std::pair<wpi::units::second_t, T>>& GetInternalBuffer() const {
+  const std::vector<std::pair<wpi::units::second_t, T>>& GetInternalBuffer()
+      const {
     return m_pastSnapshots;
   }
 

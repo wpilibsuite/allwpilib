@@ -31,9 +31,9 @@ class BatterySim {
    * @param currents       The currents drawn from the battery.
    * @return The battery's voltage under load.
    */
-  static wpi::units::volt_t Calculate(wpi::units::volt_t nominalVoltage,
-                                 wpi::units::ohm_t resistance,
-                                 std::span<const wpi::units::ampere_t> currents) {
+  static wpi::units::volt_t Calculate(
+      wpi::units::volt_t nominalVoltage, wpi::units::ohm_t resistance,
+      std::span<const wpi::units::ampere_t> currents) {
     return std::max(0_V, nominalVoltage - std::accumulate(currents.begin(),
                                                           currents.end(), 0_A) *
                                               resistance);
@@ -69,7 +69,8 @@ class BatterySim {
    * @param currents The currents drawn from the battery.
    * @return The battery's voltage under load.
    */
-  static wpi::units::volt_t Calculate(std::span<const wpi::units::ampere_t> currents) {
+  static wpi::units::volt_t Calculate(
+      std::span<const wpi::units::ampere_t> currents) {
     return Calculate(12_V, 0.02_Ohm, currents);
   }
 

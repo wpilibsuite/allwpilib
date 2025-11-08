@@ -11,8 +11,8 @@ constexpr size_t kYInitialOff = kXFinalOff + 3 * 8;
 constexpr size_t kYFinalOff = kYInitialOff + 3 * 8;
 }  // namespace
 
-wpi::math::QuinticHermiteSpline wpi::util::Struct<wpi::math::QuinticHermiteSpline>::Unpack(
-    std::span<const uint8_t> data) {
+wpi::math::QuinticHermiteSpline wpi::util::Struct<
+    wpi::math::QuinticHermiteSpline>::Unpack(std::span<const uint8_t> data) {
   return wpi::math::QuinticHermiteSpline{
       wpi::util::UnpackStructArray<double, kXInitialOff, 3>(data),
       wpi::util::UnpackStructArray<double, kXFinalOff, 3>(data),
@@ -22,10 +22,12 @@ wpi::math::QuinticHermiteSpline wpi::util::Struct<wpi::math::QuinticHermiteSplin
 
 void wpi::util::Struct<wpi::math::QuinticHermiteSpline>::Pack(
     std::span<uint8_t> data, const wpi::math::QuinticHermiteSpline& value) {
-  wpi::util::PackStructArray<kXInitialOff, 3>(data,
-                                        value.GetInitialControlVector().x);
-  wpi::util::PackStructArray<kXFinalOff, 3>(data, value.GetFinalControlVector().x);
-  wpi::util::PackStructArray<kYInitialOff, 3>(data,
-                                        value.GetInitialControlVector().y);
-  wpi::util::PackStructArray<kYFinalOff, 3>(data, value.GetFinalControlVector().y);
+  wpi::util::PackStructArray<kXInitialOff, 3>(
+      data, value.GetInitialControlVector().x);
+  wpi::util::PackStructArray<kXFinalOff, 3>(data,
+                                            value.GetFinalControlVector().x);
+  wpi::util::PackStructArray<kYInitialOff, 3>(
+      data, value.GetInitialControlVector().y);
+  wpi::util::PackStructArray<kYFinalOff, 3>(data,
+                                            value.GetFinalControlVector().y);
 }

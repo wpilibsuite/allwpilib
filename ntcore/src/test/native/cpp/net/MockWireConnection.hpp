@@ -25,28 +25,30 @@ class MockWireConnection : public WireConnection {
 
   MOCK_METHOD(bool, Ready, (), (const, override));
 
-  int WriteText(wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) override {
+  int WriteText(wpi::util::function_ref<void(wpi::util::raw_ostream& os)>
+                    writer) override {
     std::string text;
     wpi::util::raw_string_ostream os{text};
     writer(os);
     return DoWriteText(text);
   }
-  int WriteBinary(
-      wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) override {
+  int WriteBinary(wpi::util::function_ref<void(wpi::util::raw_ostream& os)>
+                      writer) override {
     std::vector<uint8_t> binary;
     wpi::util::raw_uvector_ostream os{binary};
     writer(os);
     return DoWriteBinary(binary);
   }
 
-  void SendText(wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) override {
+  void SendText(wpi::util::function_ref<void(wpi::util::raw_ostream& os)>
+                    writer) override {
     std::string text;
     wpi::util::raw_string_ostream os{text};
     writer(os);
     DoSendText(text);
   }
-  void SendBinary(
-      wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) override {
+  void SendBinary(wpi::util::function_ref<void(wpi::util::raw_ostream& os)>
+                      writer) override {
     std::vector<uint8_t> binary;
     wpi::util::raw_uvector_ostream os{binary};
     writer(os);

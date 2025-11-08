@@ -19,8 +19,9 @@ namespace wpi {
  * It contains static, non-templated variables to avoid their duplication in the
  * template class.
  */
-class SendableChooserBase : public wpi::util::Sendable,
-                            public wpi::util::SendableHelper<SendableChooserBase> {
+class SendableChooserBase
+    : public wpi::util::Sendable,
+      public wpi::util::SendableHelper<SendableChooserBase> {
  public:
   SendableChooserBase();
   ~SendableChooserBase() override = default;

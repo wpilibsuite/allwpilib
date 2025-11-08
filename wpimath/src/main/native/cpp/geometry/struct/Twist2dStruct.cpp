@@ -20,7 +20,8 @@ wpi::math::Twist2d StructType::Unpack(std::span<const uint8_t> data) {
   };
 }
 
-void StructType::Pack(std::span<uint8_t> data, const wpi::math::Twist2d& value) {
+void StructType::Pack(std::span<uint8_t> data,
+                      const wpi::math::Twist2d& value) {
   wpi::util::PackStruct<kDxOff>(data, value.dx.value());
   wpi::util::PackStruct<kDyOff>(data, value.dy.value());
   wpi::util::PackStruct<kDthetaOff>(data, value.dtheta.value());

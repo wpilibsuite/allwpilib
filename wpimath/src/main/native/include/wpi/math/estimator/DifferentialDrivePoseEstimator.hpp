@@ -75,7 +75,8 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator
   DifferentialDrivePoseEstimator(
       DifferentialDriveKinematics& kinematics, const Rotation2d& gyroAngle,
       wpi::units::meter_t leftDistance, wpi::units::meter_t rightDistance,
-      const Pose2d& initialPose, const wpi::util::array<double, 3>& stateStdDevs,
+      const Pose2d& initialPose,
+      const wpi::util::array<double, 3>& stateStdDevs,
       const wpi::util::array<double, 3>& visionMeasurementStdDevs);
 
   /**
@@ -86,7 +87,8 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator
    * @param rightDistance The distance traveled by the right encoder.
    * @param pose The estimated pose of the robot on the field.
    */
-  void ResetPosition(const Rotation2d& gyroAngle, wpi::units::meter_t leftDistance,
+  void ResetPosition(const Rotation2d& gyroAngle,
+                     wpi::units::meter_t leftDistance,
                      wpi::units::meter_t rightDistance, const Pose2d& pose) {
     PoseEstimator::ResetPosition(gyroAngle, {leftDistance, rightDistance},
                                  pose);

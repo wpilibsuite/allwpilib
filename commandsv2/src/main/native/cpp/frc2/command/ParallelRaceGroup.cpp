@@ -57,8 +57,8 @@ void ParallelRaceGroup::AddCommands(
 
   if (isRunning) {
     throw WPILIB_MakeError(wpi::err::CommandIllegalUse,
-                        "Commands cannot be added to a CommandGroup "
-                        "while the group is running");
+                           "Commands cannot be added to a CommandGroup "
+                           "while the group is running");
   }
 
   for (auto&& command : commands) {
@@ -73,8 +73,8 @@ void ParallelRaceGroup::AddCommands(
       m_commands.emplace_back(std::move(command));
     } else {
       throw WPILIB_MakeError(wpi::err::CommandIllegalUse,
-                          "Multiple commands in a parallel group cannot "
-                          "require the same subsystems");
+                             "Multiple commands in a parallel group cannot "
+                             "require the same subsystems");
     }
   }
 }

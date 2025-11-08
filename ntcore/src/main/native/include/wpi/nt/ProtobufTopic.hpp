@@ -195,7 +195,8 @@ class ProtobufPublisher : public Publisher {
    * @param handle Native handle
    * @param msg Protobuf message
    */
-  explicit ProtobufPublisher(NT_Publisher handle, wpi::util::ProtobufMessage<T> msg)
+  explicit ProtobufPublisher(NT_Publisher handle,
+                             wpi::util::ProtobufMessage<T> msg)
       : Publisher{handle}, m_msg{std::move(msg)} {}
 
   ProtobufPublisher(const ProtobufPublisher&) = delete;
@@ -294,7 +295,8 @@ class ProtobufEntry final : public ProtobufSubscriber<T>,
    * @param msg Protobuf message
    * @param defaultValue Default value
    */
-  ProtobufEntry(NT_Entry handle, wpi::util::ProtobufMessage<T> msg, T defaultValue)
+  ProtobufEntry(NT_Entry handle, wpi::util::ProtobufMessage<T> msg,
+                T defaultValue)
       : ProtobufSubscriber<T>{handle, std::move(msg), std::move(defaultValue)},
         ProtobufPublisher<T>{handle, wpi::util::ProtobufMessage<T>{}} {}
 
@@ -378,8 +380,8 @@ class ProtobufTopic final : public Topic {
     wpi::util::ProtobufMessage<T> msg;
     auto typeString = msg.GetTypeString();
     return ProtobufSubscriber<T>{
-        ::wpi::nt::Subscribe(m_handle, NT_RAW, typeString, options), std::move(msg),
-        std::move(defaultValue)};
+        ::wpi::nt::Subscribe(m_handle, NT_RAW, typeString, options),
+        std::move(msg), std::move(defaultValue)};
   }
 
   /**
@@ -402,7 +404,8 @@ class ProtobufTopic final : public Topic {
     wpi::util::ProtobufMessage<T> msg;
     auto typeString = msg.GetTypeString();
     return ProtobufPublisher<T>{
-        ::wpi::nt::Publish(m_handle, NT_RAW, typeString, options), std::move(msg)};
+        ::wpi::nt::Publish(m_handle, NT_RAW, typeString, options),
+        std::move(msg)};
   }
 
   /**
@@ -459,8 +462,8 @@ class ProtobufTopic final : public Topic {
     wpi::util::ProtobufMessage<T> msg;
     auto typeString = msg.GetTypeString();
     return ProtobufEntry<T>{
-        ::wpi::nt::GetEntry(m_handle, NT_RAW, typeString, options), std::move(msg),
-        std::move(defaultValue)};
+        ::wpi::nt::GetEntry(m_handle, NT_RAW, typeString, options),
+        std::move(msg), std::move(defaultValue)};
   }
 };
 

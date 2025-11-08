@@ -20,7 +20,8 @@ class NTMotorControllerModel : public MotorControllerModel {
   static constexpr const char* kType = "Motor Controller";
 
   explicit NTMotorControllerModel(std::string_view path);
-  NTMotorControllerModel(wpi::nt::NetworkTableInstance inst, std::string_view path);
+  NTMotorControllerModel(wpi::nt::NetworkTableInstance inst,
+                         std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
   const char* GetSimDevice() const override { return nullptr; }

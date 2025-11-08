@@ -100,7 +100,8 @@ class NetworkTablesProvider : private Provider<detail::NTProviderFunctions> {
   wpi::util::DenseMap<NT_Topic, SubListener> m_topicMap;
 
   struct Entry : public ModelEntry {
-    Entry(wpi::nt::Topic typeTopic, std::string_view name, const Builder& builder)
+    Entry(wpi::nt::Topic typeTopic, std::string_view name,
+          const Builder& builder)
         : ModelEntry{name, [](auto, const char*) { return true; },
                      builder.createModel},
           typeTopic{typeTopic} {}

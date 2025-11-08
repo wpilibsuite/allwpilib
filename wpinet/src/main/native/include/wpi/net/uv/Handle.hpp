@@ -20,7 +20,7 @@
 
 namespace wpi::util {
 class Logger;
-}  // namespace wpi::net
+}  // namespace wpi::util
 
 namespace wpi::net::uv {
 

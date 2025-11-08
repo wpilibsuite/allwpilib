@@ -44,7 +44,7 @@ class HttpWebSocketServerConnection
     m_helper.upgrade.connect([this] {
       // Negotiate sub-protocol
       wpi::util::SmallVector<std::string_view, 2> protocols{m_protocols.begin(),
-                                                 m_protocols.end()};
+                                                            m_protocols.end()};
       std::string_view protocol = m_helper.MatchProtocol(protocols).second;
 
       // Check that the upgrade is valid

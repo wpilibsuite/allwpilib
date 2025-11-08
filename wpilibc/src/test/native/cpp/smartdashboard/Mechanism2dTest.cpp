@@ -58,7 +58,8 @@ TEST(Mechanism2dTest, Ligament) {
       "/SmartDashboard/mechanism/root/ligament/weight");
   wpi::MechanismRoot2d* root = mechanism.GetRoot("root", 1, 2);
   wpi::MechanismLigament2d* ligament = root->Append<wpi::MechanismLigament2d>(
-      "ligament", 3, wpi::units::degree_t{90}, 1, wpi::Color8Bit{255, 255, 255});
+      "ligament", 3, wpi::units::degree_t{90}, 1,
+      wpi::Color8Bit{255, 255, 255});
   wpi::SmartDashboard::PutData("mechanism", &mechanism);
   EXPECT_EQ(ligament->GetAngle(), angleEntry.GetDouble(0.0));
   EXPECT_EQ(ligament->GetColor().HexString(), colorEntry.GetString(""));

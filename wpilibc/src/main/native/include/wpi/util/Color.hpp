@@ -782,9 +782,12 @@ class Color {
    */
   explicit constexpr Color(std::string_view hexString) {
     if (hexString.length() != 7 || !hexString.starts_with("#") ||
-        !wpi::util::isHexDigit(hexString[1]) || !wpi::util::isHexDigit(hexString[2]) ||
-        !wpi::util::isHexDigit(hexString[3]) || !wpi::util::isHexDigit(hexString[4]) ||
-        !wpi::util::isHexDigit(hexString[5]) || !wpi::util::isHexDigit(hexString[6])) {
+        !wpi::util::isHexDigit(hexString[1]) ||
+        !wpi::util::isHexDigit(hexString[2]) ||
+        !wpi::util::isHexDigit(hexString[3]) ||
+        !wpi::util::isHexDigit(hexString[4]) ||
+        !wpi::util::isHexDigit(hexString[5]) ||
+        !wpi::util::isHexDigit(hexString[6])) {
       throw std::invalid_argument(
           fmt::format("Invalid hex string for Color \"{}\"", hexString));
     }
@@ -861,8 +864,8 @@ class Color {
 
     return wpi::util::ct_string<char, std::char_traits<char>, 7>{
         {'#', wpi::util::hexdigit(r / 16), wpi::util::hexdigit(r % 16),
-         wpi::util::hexdigit(g / 16), wpi::util::hexdigit(g % 16), wpi::util::hexdigit(b / 16),
-         wpi::util::hexdigit(b % 16)}};
+         wpi::util::hexdigit(g / 16), wpi::util::hexdigit(g % 16),
+         wpi::util::hexdigit(b / 16), wpi::util::hexdigit(b % 16)}};
   }
 
   /// Red component (0-1).

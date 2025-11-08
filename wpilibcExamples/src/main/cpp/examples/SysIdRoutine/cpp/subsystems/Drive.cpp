@@ -22,13 +22,14 @@ Drive::Drive() {
 }
 
 wpi::cmd::CommandPtr Drive::ArcadeDriveCommand(std::function<double()> fwd,
-                                           std::function<double()> rot) {
-  return wpi::cmd::cmd::Run([this, fwd, rot] { m_drive.ArcadeDrive(fwd(), rot()); },
-                        {this})
+                                               std::function<double()> rot) {
+  return wpi::cmd::cmd::Run(
+             [this, fwd, rot] { m_drive.ArcadeDrive(fwd(), rot()); }, {this})
       .WithName("Arcade Drive");
 }
 
-wpi::cmd::CommandPtr Drive::SysIdQuasistatic(wpi::cmd::sysid::Direction direction) {
+wpi::cmd::CommandPtr Drive::SysIdQuasistatic(
+    wpi::cmd::sysid::Direction direction) {
   return m_sysIdRoutine.Quasistatic(direction);
 }
 

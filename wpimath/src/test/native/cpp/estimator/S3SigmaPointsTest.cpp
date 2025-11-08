@@ -29,11 +29,13 @@ TEST(S3SigmaPointsTest, Simplex) {
 TEST(S3SigmaPointsTest, ZeroMean) {
   wpi::math::S3SigmaPoints<2> sigmaPoints;
   auto points = sigmaPoints.SquareRootSigmaPoints(
-      wpi::math::Vectord<2>{0.0, 0.0}, wpi::math::Matrixd<2, 2>{{1.0, 0.0}, {0.0, 1.0}});
+      wpi::math::Vectord<2>{0.0, 0.0},
+      wpi::math::Matrixd<2, 2>{{1.0, 0.0}, {0.0, 1.0}});
 
   EXPECT_TRUE(
-      (points - wpi::math::Matrixd<2, 4>{{0.0, -0.00122474, 0.00122474, 0.0},
-                                   {0.0, -0.00070711, -0.00070711, 0.00141421}})
+      (points -
+       wpi::math::Matrixd<2, 4>{{0.0, -0.00122474, 0.00122474, 0.0},
+                                {0.0, -0.00070711, -0.00070711, 0.00141421}})
           .norm() < 1e-7);
 }
 
@@ -44,7 +46,8 @@ TEST(S3SigmaPointsTest, NonzeroMean) {
       wpi::math::Matrixd<2, 2>{{1.0, 0.0}, {0.0, std::sqrt(10.0)}});
 
   EXPECT_TRUE(
-      (points - wpi::math::Matrixd<2, 4>{{1.0, 0.99877526, 1.00122474, 1.0},
-                                   {2.0, 1.99776393, 1.99776393, 2.00447214}})
+      (points -
+       wpi::math::Matrixd<2, 4>{{1.0, 0.99877526, 1.00122474, 1.0},
+                                {2.0, 1.99776393, 1.99776393, 2.00447214}})
           .norm() < 1e-7);
 }

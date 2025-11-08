@@ -15,9 +15,11 @@ namespace wpi::net {
 struct MulticastHandleManager {
   wpi::util::mutex mutex;
   wpi::util::UidVector<int, 8> handleIds;
-  wpi::util::DenseMap<size_t, std::unique_ptr<wpi::net::MulticastServiceResolver>>
+  wpi::util::DenseMap<size_t,
+                      std::unique_ptr<wpi::net::MulticastServiceResolver>>
       resolvers;
-  wpi::util::DenseMap<size_t, std::unique_ptr<wpi::net::MulticastServiceAnnouncer>>
+  wpi::util::DenseMap<size_t,
+                      std::unique_ptr<wpi::net::MulticastServiceAnnouncer>>
       announcers;
 #ifdef _WIN32
   ~MulticastHandleManager();

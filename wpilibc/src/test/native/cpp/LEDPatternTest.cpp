@@ -1037,7 +1037,8 @@ void AssertIndexColor(std::span<AddressableLED::LEDData> data, int index,
 }
 
 Color LerpColors(Color a, Color b, double t) {
-  return Color{wpi::util::Lerp(a.red, b.red, t), wpi::util::Lerp(a.green, b.green, t),
+  return Color{wpi::util::Lerp(a.red, b.red, t),
+               wpi::util::Lerp(a.green, b.green, t),
                wpi::util::Lerp(a.blue, b.blue, t)};
 }
 }  // namespace wpi

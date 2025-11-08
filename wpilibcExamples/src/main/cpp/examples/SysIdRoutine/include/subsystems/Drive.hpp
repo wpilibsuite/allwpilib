@@ -20,7 +20,7 @@ class Drive : public wpi::cmd::SubsystemBase {
   Drive();
 
   wpi::cmd::CommandPtr ArcadeDriveCommand(std::function<double()> fwd,
-                                      std::function<double()> rot);
+                                          std::function<double()> rot);
   wpi::cmd::CommandPtr SysIdQuasistatic(wpi::cmd::sysid::Direction direction);
   wpi::cmd::CommandPtr SysIdDynamic(wpi::cmd::sysid::Direction direction);
 
@@ -39,7 +39,8 @@ class Drive : public wpi::cmd::SubsystemBase {
                               constants::drive::kRightEncoderReversed};
 
   wpi::cmd::sysid::SysIdRoutine m_sysIdRoutine{
-      wpi::cmd::sysid::Config{std::nullopt, std::nullopt, std::nullopt, nullptr},
+      wpi::cmd::sysid::Config{std::nullopt, std::nullopt, std::nullopt,
+                              nullptr},
       wpi::cmd::sysid::Mechanism{
           [this](wpi::units::volt_t driveVoltage) {
             m_leftMotor.SetVoltage(driveVoltage);
@@ -50,12 +51,14 @@ class Drive : public wpi::cmd::SubsystemBase {
                 .voltage(m_leftMotor.Get() *
                          wpi::RobotController::GetBatteryVoltage())
                 .position(wpi::units::meter_t{m_leftEncoder.GetDistance()})
-                .velocity(wpi::units::meters_per_second_t{m_leftEncoder.GetRate()});
+                .velocity(
+                    wpi::units::meters_per_second_t{m_leftEncoder.GetRate()});
             log->Motor("drive-right")
                 .voltage(m_rightMotor.Get() *
                          wpi::RobotController::GetBatteryVoltage())
                 .position(wpi::units::meter_t{m_rightEncoder.GetDistance()})
-                .velocity(wpi::units::meters_per_second_t{m_rightEncoder.GetRate()});
+                .velocity(
+                    wpi::units::meters_per_second_t{m_rightEncoder.GetRate()});
           },
           this}};
 };

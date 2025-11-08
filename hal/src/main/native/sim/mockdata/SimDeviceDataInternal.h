@@ -29,7 +29,8 @@ class SimUnnamedCallbackRegistry {
   using RawFunctor = void (*)();
 
  protected:
-  using CallbackVector = wpi::util::UidVector<HalCallbackListener<RawFunctor>, 4>;
+  using CallbackVector =
+      wpi::util::UidVector<HalCallbackListener<RawFunctor>, 4>;
 
  public:
   void Cancel(int32_t uid) {

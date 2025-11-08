@@ -24,8 +24,8 @@ Arm::Arm() {
 void Arm::SimulationPeriodic() {
   // In this method, we update our simulation of what our arm is doing
   // First, we set our "inputs" (voltages)
-  m_armSim.SetInput(
-      wpi::math::Vectord<1>{m_motor.Get() * wpi::RobotController::GetInputVoltage()});
+  m_armSim.SetInput(wpi::math::Vectord<1>{
+      m_motor.Get() * wpi::RobotController::GetInputVoltage()});
 
   // Next, we update it. The standard loop time is 20ms.
   m_armSim.Update(20_ms);

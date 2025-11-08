@@ -55,8 +55,8 @@ class TravelingSalesman {
    * @return The optimized path as an array of Pose2ds.
    */
   template <size_t Poses>
-  wpi::util::array<Pose2d, Poses> Solve(const wpi::util::array<Pose2d, Poses>& poses,
-                                  int iterations) {
+  wpi::util::array<Pose2d, Poses> Solve(
+      const wpi::util::array<Pose2d, Poses>& poses, int iterations) {
     SimulatedAnnealing<Vectord<Poses>> solver{
         1, &Neighbor<Poses>, [&](const Vectord<Poses>& state) {
           // Total cost is sum of all costs between adjacent pairs in path

@@ -68,7 +68,8 @@ class AlertsTest : public ::testing::Test {
     }
   }
 
-  const wpi::nt::StringArraySubscriber GetSubscriberForType(Alert::AlertType type) {
+  const wpi::nt::StringArraySubscriber GetSubscriberForType(
+      Alert::AlertType type) {
     return wpi::nt::NetworkTableInstance::GetDefault()
         .GetStringArrayTopic(fmt::format("/SmartDashboard/{}/{}",
                                          GetGroupName(), GetSubtableName(type)))

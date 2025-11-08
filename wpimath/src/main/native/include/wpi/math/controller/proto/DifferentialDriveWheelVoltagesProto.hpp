@@ -11,7 +11,8 @@
 #include "wpimath/protobuf/controller.npb.h"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::DifferentialDriveWheelVoltages> {
+struct WPILIB_DLLEXPORT
+    wpi::util::Protobuf<wpi::math::DifferentialDriveWheelVoltages> {
   using MessageStruct = wpi_proto_ProtobufDifferentialDriveWheelVoltages;
   using InputStream =
       wpi::util::ProtoInputStream<wpi::math::DifferentialDriveWheelVoltages>;

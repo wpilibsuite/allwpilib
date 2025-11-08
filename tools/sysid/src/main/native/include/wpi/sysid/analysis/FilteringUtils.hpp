@@ -148,7 +148,8 @@ void ApplyMedianFilter(std::vector<PreparedData>* data, int window);
 std::tuple<wpi::units::second_t, wpi::units::second_t, wpi::units::second_t>
 TrimStepVoltageData(std::vector<PreparedData>* data,
                     AnalysisManager::Settings* settings,
-                    wpi::units::second_t minStepTime, wpi::units::second_t maxStepTime);
+                    wpi::units::second_t minStepTime,
+                    wpi::units::second_t maxStepTime);
 
 /**
  * Compute the mean time delta of the given data.
@@ -187,7 +188,8 @@ wpi::units::second_t GetMeanTimeDelta(const Storage& data);
  * @param period      The period in seconds between samples taken by the user.
  */
 template <int Derivative, int Samples>
-wpi::math::LinearFilter<double> CentralFiniteDifference(wpi::units::second_t period) {
+wpi::math::LinearFilter<double> CentralFiniteDifference(
+    wpi::units::second_t period) {
   static_assert(Samples % 2 != 0, "Number of samples must be odd.");
 
   // Generate stencil points from -(samples - 1)/2 to (samples - 1)/2

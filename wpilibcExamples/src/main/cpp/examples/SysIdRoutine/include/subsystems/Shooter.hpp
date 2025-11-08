@@ -33,7 +33,8 @@ class Shooter : public wpi::cmd::SubsystemBase {
                                 constants::shooter::kEncoderReversed};
 
   wpi::cmd::sysid::SysIdRoutine m_sysIdRoutine{
-      wpi::cmd::sysid::Config{std::nullopt, std::nullopt, std::nullopt, nullptr},
+      wpi::cmd::sysid::Config{std::nullopt, std::nullopt, std::nullopt,
+                              nullptr},
       wpi::cmd::sysid::Mechanism{
           [this](wpi::units::volt_t driveVoltage) {
             m_shooterMotor.SetVoltage(driveVoltage);

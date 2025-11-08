@@ -214,8 +214,12 @@ class FMSSimModel : public wpi::glass::FMSModel {
  public:
   FMSSimModel();
 
-  wpi::glass::BooleanSource* GetFmsAttachedData() override { return &m_fmsAttached; }
-  wpi::glass::BooleanSource* GetDsAttachedData() override { return &m_dsAttached; }
+  wpi::glass::BooleanSource* GetFmsAttachedData() override {
+    return &m_fmsAttached;
+  }
+  wpi::glass::BooleanSource* GetDsAttachedData() override {
+    return &m_dsAttached;
+  }
   wpi::glass::IntegerSource* GetAllianceStationIdData() override {
     return &m_allianceStationId;
   }
@@ -223,7 +227,9 @@ class FMSSimModel : public wpi::glass::FMSModel {
   wpi::glass::BooleanSource* GetEStopData() override { return &m_estop; }
   wpi::glass::BooleanSource* GetEnabledData() override { return &m_enabled; }
   wpi::glass::BooleanSource* GetTestData() override { return &m_test; }
-  wpi::glass::BooleanSource* GetAutonomousData() override { return &m_autonomous; }
+  wpi::glass::BooleanSource* GetAutonomousData() override {
+    return &m_autonomous;
+  }
   wpi::glass::StringSource* GetGameSpecificMessageData() override {
     return &m_gameMessage;
   }
@@ -562,10 +568,11 @@ void KeyboardJoystick::EditKey(const char* label, int* key) {
 
   char editLabel[32];
   if (s_keyEdit == key) {
-    wpi::util::format_to_n_c_str(editLabel, sizeof(editLabel), "(press key)###edit");
+    wpi::util::format_to_n_c_str(editLabel, sizeof(editLabel),
+                                 "(press key)###edit");
   } else {
     wpi::util::format_to_n_c_str(editLabel, sizeof(editLabel), "{}###edit",
-                           GetKeyName(*key));
+                                 GetKeyName(*key));
   }
 
   if (ImGui::SmallButton(editLabel)) {
@@ -842,7 +849,8 @@ void KeyboardJoystick::ClearKey(int key) {
   }
 }
 
-GlfwKeyboardJoystick::GlfwKeyboardJoystick(wpi::glass::Storage& storage, int index)
+GlfwKeyboardJoystick::GlfwKeyboardJoystick(wpi::glass::Storage& storage,
+                                           int index)
     : KeyboardJoystick{storage, index} {
   // set up a default keyboard config for 0, 1, and 2
   if (index == 0) {
@@ -1216,7 +1224,8 @@ bool FMSSimModel::IsReadOnly() {
 
 static void DisplaySystemJoystick(SystemJoystick& joy, int i) {
   char label[64];
-  wpi::util::format_to_n_c_str(label, sizeof(label), "{}: {}", i, joy.GetName());
+  wpi::util::format_to_n_c_str(label, sizeof(label), "{}: {}", i,
+                               joy.GetName());
 
   // highlight if any buttons pressed
   bool anyButtonPressed = joy.IsAnyButtonPressed();
@@ -1250,7 +1259,8 @@ static void DisplaySystemJoysticks() {
     DisplaySystemJoystick(*joy, i + GLFW_JOYSTICK_LAST + 1);
     if (ImGui::BeginPopupContextItem()) {
       char buf[64];
-      wpi::util::format_to_n_c_str(buf, sizeof(buf), "{} Settings", joy->GetName());
+      wpi::util::format_to_n_c_str(buf, sizeof(buf), "{} Settings",
+                                   joy->GetName());
 
       if (ImGui::MenuItem(buf)) {
         if (auto win = DriverStationGui::dsManager->GetWindow(buf)) {
@@ -1300,8 +1310,8 @@ static void DisplayJoysticks() {
         joy.sys = payload_sys;
         joy.guid = payload_sys->GetGUID();
         std::string_view name{payload_sys->GetName()};
-        joy.useGamepad =
-            wpi::util::starts_with(name, "Xbox") || wpi::util::contains(name, "pad");
+        joy.useGamepad = wpi::util::starts_with(name, "Xbox") ||
+                         wpi::util::contains(name, "pad");
       }
       ImGui::EndDragDropTarget();
     }
@@ -1460,7 +1470,7 @@ void DriverStationGui::GlobalInit() {
     for (auto&& joy : gKeyboardJoysticks) {
       char label[64];
       wpi::util::format_to_n_c_str(label, sizeof(label), "{} Settings",
-                             joy->GetName());
+                                   joy->GetName());
 
       if (auto win = dsManager->AddWindow(
               label, [j = joy.get()] { j->SettingsDisplay(); },

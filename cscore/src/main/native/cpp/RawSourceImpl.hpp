@@ -20,8 +20,9 @@ namespace wpi::cs {
 
 class RawSourceImpl : public ConfigurableSourceImpl {
  public:
-  RawSourceImpl(std::string_view name, wpi::util::Logger& logger, Notifier& notifier,
-                Telemetry& telemetry, const VideoMode& mode);
+  RawSourceImpl(std::string_view name, wpi::util::Logger& logger,
+                Notifier& notifier, Telemetry& telemetry,
+                const VideoMode& mode);
   ~RawSourceImpl() override;
 
   // Raw-specific functions

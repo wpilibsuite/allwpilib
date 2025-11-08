@@ -13,10 +13,11 @@
 using namespace wpi::glass;
 
 NTMotorControllerModel::NTMotorControllerModel(std::string_view path)
-    : NTMotorControllerModel(wpi::nt::NetworkTableInstance::GetDefault(), path) {}
+    : NTMotorControllerModel(wpi::nt::NetworkTableInstance::GetDefault(),
+                             path) {}
 
-NTMotorControllerModel::NTMotorControllerModel(wpi::nt::NetworkTableInstance inst,
-                                               std::string_view path)
+NTMotorControllerModel::NTMotorControllerModel(
+    wpi::nt::NetworkTableInstance inst, std::string_view path)
     : m_inst{inst},
       m_value{inst.GetDoubleTopic(fmt::format("{}/Value", path)).GetEntry(0)},
       m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},

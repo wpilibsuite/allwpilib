@@ -291,7 +291,8 @@ class LinearQuadraticRegulator {
    */
   template <int Outputs>
   void LatencyCompensate(const LinearSystem<States, Inputs, Outputs>& plant,
-                         wpi::units::second_t dt, wpi::units::second_t inputDelay) {
+                         wpi::units::second_t dt,
+                         wpi::units::second_t inputDelay) {
     Matrixd<States, States> discA;
     Matrixd<States, Inputs> discB;
     DiscretizeAB<States, Inputs>(plant.A(), plant.B(), dt, &discA, &discB);

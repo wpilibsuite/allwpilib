@@ -14,7 +14,7 @@
 
 namespace wpi::glass {
 class Storage;
-}  // namespace glass
+}  // namespace wpi::glass
 
 namespace pfd {
 class select_folder;

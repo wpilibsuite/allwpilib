@@ -6,8 +6,8 @@
 
 #include "wpimath/protobuf/geometry2d.npb.h"
 
-std::optional<wpi::math::Translation2d> wpi::util::Protobuf<wpi::math::Translation2d>::Unpack(
-    InputStream& stream) {
+std::optional<wpi::math::Translation2d>
+wpi::util::Protobuf<wpi::math::Translation2d>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufTranslation2d msg;
   if (!stream.Decode(msg)) {
     return {};
@@ -19,8 +19,8 @@ std::optional<wpi::math::Translation2d> wpi::util::Protobuf<wpi::math::Translati
   };
 }
 
-bool wpi::util::Protobuf<wpi::math::Translation2d>::Pack(OutputStream& stream,
-                                             const wpi::math::Translation2d& value) {
+bool wpi::util::Protobuf<wpi::math::Translation2d>::Pack(
+    OutputStream& stream, const wpi::math::Translation2d& value) {
   wpi_proto_ProtobufTranslation2d msg{
       .x = value.X().value(),
       .y = value.Y().value(),

@@ -16,7 +16,8 @@
 
 namespace wpi::net {
 
-std::string_view UnescapeURI(std::string_view str, wpi::util::SmallVectorImpl<char>& buf,
+std::string_view UnescapeURI(std::string_view str,
+                             wpi::util::SmallVectorImpl<char>& buf,
                              bool* error) {
   buf.clear();
   for (auto i = str.begin(), end = str.end(); i != end; ++i) {
@@ -55,7 +56,8 @@ std::string_view UnescapeURI(std::string_view str, wpi::util::SmallVectorImpl<ch
   return {buf.data(), buf.size()};
 }
 
-std::string_view EscapeURI(std::string_view str, wpi::util::SmallVectorImpl<char>& buf,
+std::string_view EscapeURI(std::string_view str,
+                           wpi::util::SmallVectorImpl<char>& buf,
                            bool spacePlus) {
   static const char* const hexLut = "0123456789ABCDEF";
 
@@ -82,7 +84,8 @@ std::string_view EscapeURI(std::string_view str, wpi::util::SmallVectorImpl<char
   return {buf.data(), buf.size()};
 }
 
-std::string_view EscapeHTML(std::string_view str, wpi::util::SmallVectorImpl<char>& buf) {
+std::string_view EscapeHTML(std::string_view str,
+                            wpi::util::SmallVectorImpl<char>& buf) {
   buf.clear();
   for (auto i = str.begin(), end = str.end(); i != end; ++i) {
     if (*i == '&') {
@@ -166,7 +169,8 @@ std::string_view HttpPath::operator[](size_t n) const {
   return slice(m_pathBuf, n == 0 ? 0 : m_pathEnds[n - 1], m_pathEnds[n]);
 }
 
-bool ParseHttpHeaders(wpi::util::raw_istream& is, wpi::util::SmallVectorImpl<char>* contentType,
+bool ParseHttpHeaders(wpi::util::raw_istream& is,
+                      wpi::util::SmallVectorImpl<char>* contentType,
                       wpi::util::SmallVectorImpl<char>* contentLength) {
   if (contentType) {
     contentType->clear();
@@ -215,8 +219,8 @@ bool ParseHttpHeaders(wpi::util::raw_istream& is, wpi::util::SmallVectorImpl<cha
   }
 }
 
-bool FindMultipartBoundary(wpi::util::raw_istream& is, std::string_view boundary,
-                           std::string* saveBuf) {
+bool FindMultipartBoundary(wpi::util::raw_istream& is,
+                           std::string_view boundary, std::string* saveBuf) {
   wpi::util::SmallString<64> searchBuf;
   searchBuf.resize(boundary.size() + 2);
   size_t searchPos = 0;

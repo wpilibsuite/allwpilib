@@ -34,13 +34,14 @@ struct fmt::formatter<Unit, CharT,
   template <typename FmtContext>
   auto format(const Unit& obj, FmtContext& ctx) const {
     using Units = typename Unit::unit_type;
-    using BaseUnits =
-        wpi::units::unit<std::ratio<1>,
-                    typename wpi::units::traits::unit_traits<Units>::base_unit_type>;
+    using BaseUnits = wpi::units::unit<
+        std::ratio<1>,
+        typename wpi::units::traits::unit_traits<Units>::base_unit_type>;
 
     auto out = ctx.out();
 
-    out = m_underlying.format(wpi::units::convert<Units, BaseUnits>(obj()), ctx);
+    out =
+        m_underlying.format(wpi::units::convert<Units, BaseUnits>(obj()), ctx);
 
     if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::meter_ratio::num != 0) {
@@ -50,15 +51,15 @@ struct fmt::formatter<Unit, CharT,
                       Units>::base_unit_type::meter_ratio::num != 0 &&
                   wpi::units::traits::unit_traits<
                       Units>::base_unit_type::meter_ratio::num != 1) {
-      out = fmt::format_to(
-          out, "^{}",
-          wpi::units::traits::unit_traits<Units>::base_unit_type::meter_ratio::num);
+      out = fmt::format_to(out, "^{}",
+                           wpi::units::traits::unit_traits<
+                               Units>::base_unit_type::meter_ratio::num);
     }
     if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::meter_ratio::den != 1) {
-      out = fmt::format_to(
-          out, "/{}",
-          wpi::units::traits::unit_traits<Units>::base_unit_type::meter_ratio::den);
+      out = fmt::format_to(out, "/{}",
+                           wpi::units::traits::unit_traits<
+                               Units>::base_unit_type::meter_ratio::den);
     }
 
     if constexpr (wpi::units::traits::unit_traits<
@@ -88,15 +89,15 @@ struct fmt::formatter<Unit, CharT,
                       Units>::base_unit_type::second_ratio::num != 0 &&
                   wpi::units::traits::unit_traits<
                       Units>::base_unit_type::second_ratio::num != 1) {
-      out = fmt::format_to(
-          out, "^{}",
-          wpi::units::traits::unit_traits<Units>::base_unit_type::second_ratio::num);
+      out = fmt::format_to(out, "^{}",
+                           wpi::units::traits::unit_traits<
+                               Units>::base_unit_type::second_ratio::num);
     }
     if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::second_ratio::den != 1) {
-      out = fmt::format_to(
-          out, "/{}",
-          wpi::units::traits::unit_traits<Units>::base_unit_type::second_ratio::den);
+      out = fmt::format_to(out, "/{}",
+                           wpi::units::traits::unit_traits<
+                               Units>::base_unit_type::second_ratio::den);
     }
 
     if constexpr (wpi::units::traits::unit_traits<
@@ -107,15 +108,15 @@ struct fmt::formatter<Unit, CharT,
                       Units>::base_unit_type::ampere_ratio::num != 0 &&
                   wpi::units::traits::unit_traits<
                       Units>::base_unit_type::ampere_ratio::num != 1) {
-      out = fmt::format_to(
-          out, "^{}",
-          wpi::units::traits::unit_traits<Units>::base_unit_type::ampere_ratio::num);
+      out = fmt::format_to(out, "^{}",
+                           wpi::units::traits::unit_traits<
+                               Units>::base_unit_type::ampere_ratio::num);
     }
     if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::ampere_ratio::den != 1) {
-      out = fmt::format_to(
-          out, "/{}",
-          wpi::units::traits::unit_traits<Units>::base_unit_type::ampere_ratio::den);
+      out = fmt::format_to(out, "/{}",
+                           wpi::units::traits::unit_traits<
+                               Units>::base_unit_type::ampere_ratio::den);
     }
 
     if constexpr (wpi::units::traits::unit_traits<
@@ -126,15 +127,15 @@ struct fmt::formatter<Unit, CharT,
                       Units>::base_unit_type::kelvin_ratio::num != 0 &&
                   wpi::units::traits::unit_traits<
                       Units>::base_unit_type::kelvin_ratio::num != 1) {
-      out = fmt::format_to(
-          out, "^{}",
-          wpi::units::traits::unit_traits<Units>::base_unit_type::kelvin_ratio::num);
+      out = fmt::format_to(out, "^{}",
+                           wpi::units::traits::unit_traits<
+                               Units>::base_unit_type::kelvin_ratio::num);
     }
     if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::kelvin_ratio::den != 1) {
-      out = fmt::format_to(
-          out, "/{}",
-          wpi::units::traits::unit_traits<Units>::base_unit_type::kelvin_ratio::den);
+      out = fmt::format_to(out, "/{}",
+                           wpi::units::traits::unit_traits<
+                               Units>::base_unit_type::kelvin_ratio::den);
     }
 
     if constexpr (wpi::units::traits::unit_traits<
@@ -145,15 +146,15 @@ struct fmt::formatter<Unit, CharT,
                       Units>::base_unit_type::mole_ratio::num != 0 &&
                   wpi::units::traits::unit_traits<
                       Units>::base_unit_type::mole_ratio::num != 1) {
-      out = fmt::format_to(
-          out, "^{}",
-          wpi::units::traits::unit_traits<Units>::base_unit_type::mole_ratio::num);
+      out = fmt::format_to(out, "^{}",
+                           wpi::units::traits::unit_traits<
+                               Units>::base_unit_type::mole_ratio::num);
     }
     if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::mole_ratio::den != 1) {
-      out = fmt::format_to(
-          out, "/{}",
-          wpi::units::traits::unit_traits<Units>::base_unit_type::mole_ratio::den);
+      out = fmt::format_to(out, "/{}",
+                           wpi::units::traits::unit_traits<
+                               Units>::base_unit_type::mole_ratio::den);
     }
 
     if constexpr (wpi::units::traits::unit_traits<
@@ -183,15 +184,15 @@ struct fmt::formatter<Unit, CharT,
                       Units>::base_unit_type::radian_ratio::num != 0 &&
                   wpi::units::traits::unit_traits<
                       Units>::base_unit_type::radian_ratio::num != 1) {
-      out = fmt::format_to(
-          out, "^{}",
-          wpi::units::traits::unit_traits<Units>::base_unit_type::radian_ratio::num);
+      out = fmt::format_to(out, "^{}",
+                           wpi::units::traits::unit_traits<
+                               Units>::base_unit_type::radian_ratio::num);
     }
     if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::radian_ratio::den != 1) {
-      out = fmt::format_to(
-          out, "/{}",
-          wpi::units::traits::unit_traits<Units>::base_unit_type::radian_ratio::den);
+      out = fmt::format_to(out, "/{}",
+                           wpi::units::traits::unit_traits<
+                               Units>::base_unit_type::radian_ratio::den);
     }
 
     if constexpr (wpi::units::traits::unit_traits<
@@ -202,15 +203,15 @@ struct fmt::formatter<Unit, CharT,
                       Units>::base_unit_type::byte_ratio::num != 0 &&
                   wpi::units::traits::unit_traits<
                       Units>::base_unit_type::byte_ratio::num != 1) {
-      out = fmt::format_to(
-          out, "^{}",
-          wpi::units::traits::unit_traits<Units>::base_unit_type::byte_ratio::num);
+      out = fmt::format_to(out, "^{}",
+                           wpi::units::traits::unit_traits<
+                               Units>::base_unit_type::byte_ratio::num);
     }
     if constexpr (wpi::units::traits::unit_traits<
                       Units>::base_unit_type::byte_ratio::den != 1) {
-      out = fmt::format_to(
-          out, "/{}",
-          wpi::units::traits::unit_traits<Units>::base_unit_type::byte_ratio::den);
+      out = fmt::format_to(out, "/{}",
+                           wpi::units::traits::unit_traits<
+                               Units>::base_unit_type::byte_ratio::den);
     }
 
     return out;

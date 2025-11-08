@@ -59,7 +59,8 @@ CS_PropertyKind PropertyContainer::GetPropertyKind(int property) const {
 }
 
 std::string_view PropertyContainer::GetPropertyName(
-    int property, wpi::util::SmallVectorImpl<char>& buf, CS_Status* status) const {
+    int property, wpi::util::SmallVectorImpl<char>& buf,
+    CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status)) {
     return {};
   }
@@ -168,7 +169,8 @@ int PropertyContainer::GetPropertyDefault(int property,
 }
 
 std::string_view PropertyContainer::GetStringProperty(
-    int property, wpi::util::SmallVectorImpl<char>& buf, CS_Status* status) const {
+    int property, wpi::util::SmallVectorImpl<char>& buf,
+    CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status)) {
     return {};
   }

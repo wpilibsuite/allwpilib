@@ -10,10 +10,13 @@
 #include "wpimath/protobuf/kinematics.npb.h"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::MecanumDriveWheelPositions> {
+struct WPILIB_DLLEXPORT
+    wpi::util::Protobuf<wpi::math::MecanumDriveWheelPositions> {
   using MessageStruct = wpi_proto_ProtobufMecanumDriveWheelPositions;
-  using InputStream = wpi::util::ProtoInputStream<wpi::math::MecanumDriveWheelPositions>;
-  using OutputStream = wpi::util::ProtoOutputStream<wpi::math::MecanumDriveWheelPositions>;
+  using InputStream =
+      wpi::util::ProtoInputStream<wpi::math::MecanumDriveWheelPositions>;
+  using OutputStream =
+      wpi::util::ProtoOutputStream<wpi::math::MecanumDriveWheelPositions>;
   static std::optional<wpi::math::MecanumDriveWheelPositions> Unpack(
       InputStream& stream);
   static bool Pack(OutputStream& stream,

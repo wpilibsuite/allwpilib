@@ -69,8 +69,8 @@ void SequentialCommandGroup::AddCommands(
 
   if (m_currentCommandIndex != invalid_index) {
     throw WPILIB_MakeError(wpi::err::CommandIllegalUse,
-                        "Commands cannot be added to a CommandGroup "
-                        "while the group is running");
+                           "Commands cannot be added to a CommandGroup "
+                           "while the group is running");
   }
 
   for (auto&& command : commands) {

@@ -145,14 +145,15 @@ void Application(std::string_view saveDir) {
 
   wpi::glass::SetStorageName("datalogtool");
   wpi::glass::SetStorageDir(saveDir.empty() ? gui::GetPlatformSaveFileDir()
-                                       : saveDir);
+                                            : saveDir);
 
   gui::AddWindowScaler([](float scale) { gDefaultScale = scale; });
   gui::AddLateExecute(DisplayGui);
   gui::Initialize("Datalog Tool", 925, 510);
 
-  gDownloadVisible =
-      &wpi::glass::GetStorageRoot().GetChild("download").GetBool("visible", true);
+  gDownloadVisible = &wpi::glass::GetStorageRoot()
+                          .GetChild("download")
+                          .GetBool("visible", true);
 
   gui::Main();
 

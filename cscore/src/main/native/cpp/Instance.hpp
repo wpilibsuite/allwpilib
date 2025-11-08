@@ -91,12 +91,13 @@ class Instance {
     return m_sources.GetAll(vec);
   }
 
-  std::span<CS_Sink> EnumerateSinkHandles(wpi::util::SmallVectorImpl<CS_Sink>& vec) {
+  std::span<CS_Sink> EnumerateSinkHandles(
+      wpi::util::SmallVectorImpl<CS_Sink>& vec) {
     return m_sinks.GetAll(vec);
   }
 
-  std::span<CS_Sink> EnumerateSourceSinks(CS_Source source,
-                                          wpi::util::SmallVectorImpl<CS_Sink>& vec) {
+  std::span<CS_Sink> EnumerateSourceSinks(
+      CS_Source source, wpi::util::SmallVectorImpl<CS_Sink>& vec) {
     vec.clear();
     m_sinks.ForEach([&](CS_Sink sinkHandle, const SinkData& data) {
       if (source == data.sourceHandle.load()) {

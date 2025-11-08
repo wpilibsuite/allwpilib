@@ -155,8 +155,8 @@ class RawSink : public ImageSink {
    * The provided image will have three 8-bit channels stored in BGR order.
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
-   *         message); the frame time is in the same time base as wpi::util::Now(),
-   *         and is in 1 us increments.
+   *         message); the frame time is in the same time base as
+   * wpi::util::Now(), and is in 1 us increments.
    */
   [[nodiscard]]
   uint64_t GrabFrame(wpi::util::RawFrame& image, double timeout = 0.225) const;
@@ -166,8 +166,8 @@ class RawSink : public ImageSink {
    * The provided image will have three 8-bit channels stored in BGR order.
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
-   *         message); the frame time is in the same time base as wpi::util::Now(),
-   *         and is in 1 us increments.
+   *         message); the frame time is in the same time base as
+   * wpi::util::Now(), and is in 1 us increments.
    */
   [[nodiscard]]
   uint64_t GrabFrameNoTimeout(wpi::util::RawFrame& image) const;
@@ -183,8 +183,8 @@ class RawSink : public ImageSink {
    * a new frame.
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
-   *         message); the frame time is in the same time base as wpi::util::Now(),
-   *         and is in 1 us increments.
+   *         message); the frame time is in the same time base as
+   * wpi::util::Now(), and is in 1 us increments.
    */
   [[nodiscard]]
   uint64_t GrabFrameLastTime(wpi::util::RawFrame& image, uint64_t lastFrameTime,
@@ -216,7 +216,8 @@ inline RawSink::RawSink(std::string_view name,
   m_handle = CreateRawSinkCallback(name, false, processFrame, &m_status);
 }
 
-inline uint64_t RawSink::GrabFrame(wpi::util::RawFrame& image, double timeout) const {
+inline uint64_t RawSink::GrabFrame(wpi::util::RawFrame& image,
+                                   double timeout) const {
   m_status = 0;
   return GrabSinkFrameTimeout(m_handle, image, timeout, &m_status);
 }

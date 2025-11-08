@@ -51,7 +51,8 @@ wpi::units::radians_per_second_squared_t FlywheelSim::GetAngularAcceleration()
 }
 
 wpi::units::newton_meter_t FlywheelSim::GetTorque() const {
-  return wpi::units::newton_meter_t{GetAngularAcceleration().value() * m_j.value()};
+  return wpi::units::newton_meter_t{GetAngularAcceleration().value() *
+                                    m_j.value()};
 }
 
 wpi::units::ampere_t FlywheelSim::GetCurrentDraw() const {

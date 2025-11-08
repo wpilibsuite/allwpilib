@@ -54,11 +54,13 @@ TEST(CircularSpanTest, ConstructConst) {
     EXPECT_EQ(sp[5], arr_values[5]);
   }
   {
-    wpi::util::rotated_span<const int> sp{cvec_values.begin(), cvec_values.end()};
+    wpi::util::rotated_span<const int> sp{cvec_values.begin(),
+                                          cvec_values.end()};
     EXPECT_EQ(sp[5], vec_values[5]);
   }
   {
-    wpi::util::rotated_span<const int> sp{cvec_values.data(), cvec_values.size()};
+    wpi::util::rotated_span<const int> sp{cvec_values.data(),
+                                          cvec_values.size()};
     EXPECT_EQ(sp[5], vec_values[5]);
   }
 }

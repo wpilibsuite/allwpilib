@@ -17,11 +17,13 @@ class MockClientMessageHandler : public net::ClientMessageHandler {
  public:
   MOCK_METHOD(void, ClientPublish,
               (int pubuid, std::string_view name, std::string_view typeStr,
-               const wpi::util::json& properties, const PubSubOptionsImpl& options),
+               const wpi::util::json& properties,
+               const PubSubOptionsImpl& options),
               (override));
   MOCK_METHOD(void, ClientUnpublish, (int pubuid), (override));
   MOCK_METHOD(void, ClientSetProperties,
-              (std::string_view name, const wpi::util::json& update), (override));
+              (std::string_view name, const wpi::util::json& update),
+              (override));
   MOCK_METHOD(void, ClientSubscribe,
               (int subuid, std::span<const std::string> prefixes,
                const PubSubOptionsImpl& options),

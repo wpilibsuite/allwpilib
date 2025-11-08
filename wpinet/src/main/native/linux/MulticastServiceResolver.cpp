@@ -89,8 +89,8 @@ static void ResolveCallback(AvahiServiceResolver* r, AvahiIfIndex interface,
           continue;
         }
         std::string_view key = wpi::util::substr(value, 0, splitIndex);
-        value =
-            wpi::util::substr(value, splitIndex + 1, value.size() - splitIndex - 1);
+        value = wpi::util::substr(value, splitIndex + 1,
+                                  value.size() - splitIndex - 1);
         data.txt.emplace_back(std::pair<std::string, std::string>{key, value});
       }
       wpi::util::SmallString<256> outputHostName;

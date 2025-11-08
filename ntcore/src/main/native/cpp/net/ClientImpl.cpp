@@ -28,7 +28,8 @@ using namespace wpi::nt;
 using namespace wpi::nt::net;
 
 ClientImpl::ClientImpl(
-    uint64_t curTimeMs, WireConnection& wire, bool local, wpi::util::Logger& logger,
+    uint64_t curTimeMs, WireConnection& wire, bool local,
+    wpi::util::Logger& logger,
     std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
         timeSyncUpdated,
     std::function<void(uint32_t repeatMs)> setPeriodic)
@@ -165,7 +166,8 @@ void ClientImpl::UpdatePeriodic() {
 }
 
 void ClientImpl::Publish(int32_t pubuid, std::string_view name,
-                         std::string_view typeStr, const wpi::util::json& properties,
+                         std::string_view typeStr,
+                         const wpi::util::json& properties,
                          const PubSubOptionsImpl& options) {
   if (static_cast<uint32_t>(pubuid) >= m_publishers.size()) {
     m_publishers.resize(pubuid + 1);
@@ -239,7 +241,8 @@ void ClientImpl::ServerUnannounce(std::string_view name, int id) {
 }
 
 void ClientImpl::ServerPropertiesUpdate(std::string_view name,
-                                        const wpi::util::json& update, bool ack) {
+                                        const wpi::util::json& update,
+                                        bool ack) {
   DEBUG4("ServerProperties({}, {}, {})", name, update.dump(), ack);
   assert(m_local);
   m_local->ServerPropertiesUpdate(name, update, ack);

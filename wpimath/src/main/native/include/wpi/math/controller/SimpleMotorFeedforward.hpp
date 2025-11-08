@@ -24,12 +24,15 @@ template <class Distance>
 class SimpleMotorFeedforward {
  public:
   using Velocity =
-      wpi::units::compound_unit<Distance, wpi::units::inverse<wpi::units::seconds>>;
+      wpi::units::compound_unit<Distance,
+                                wpi::units::inverse<wpi::units::seconds>>;
   using Acceleration =
-      wpi::units::compound_unit<Velocity, wpi::units::inverse<wpi::units::seconds>>;
-  using kv_unit = wpi::units::compound_unit<wpi::units::volts, wpi::units::inverse<Velocity>>;
-  using ka_unit =
-      wpi::units::compound_unit<wpi::units::volts, wpi::units::inverse<Acceleration>>;
+      wpi::units::compound_unit<Velocity,
+                                wpi::units::inverse<wpi::units::seconds>>;
+  using kv_unit = wpi::units::compound_unit<wpi::units::volts,
+                                            wpi::units::inverse<Velocity>>;
+  using ka_unit = wpi::units::compound_unit<wpi::units::volts,
+                                            wpi::units::inverse<Acceleration>>;
 
   /**
    * Creates a new SimpleMotorFeedforward with the specified gains.
@@ -75,7 +78,8 @@ class SimpleMotorFeedforward {
    * @param velocity The velocity setpoint.
    * @return The computed feedforward, in volts.
    */
-  constexpr wpi::units::volt_t Calculate(wpi::units::unit_t<Velocity> velocity) const {
+  constexpr wpi::units::volt_t Calculate(
+      wpi::units::unit_t<Velocity> velocity) const {
     return Calculate(velocity, velocity);
   }
 
@@ -158,7 +162,8 @@ class SimpleMotorFeedforward {
    * @return The maximum possible acceleration at the given velocity.
    */
   constexpr wpi::units::unit_t<Acceleration> MaxAchievableAcceleration(
-      wpi::units::volt_t maxVoltage, wpi::units::unit_t<Velocity> velocity) const {
+      wpi::units::volt_t maxVoltage,
+      wpi::units::unit_t<Velocity> velocity) const {
     return (maxVoltage - kS * wpi::util::sgn(velocity) - kV * velocity) / kA;
   }
 
@@ -174,7 +179,8 @@ class SimpleMotorFeedforward {
    * @return The minimum possible acceleration at the given velocity.
    */
   constexpr wpi::units::unit_t<Acceleration> MinAchievableAcceleration(
-      wpi::units::volt_t maxVoltage, wpi::units::unit_t<Velocity> velocity) const {
+      wpi::units::volt_t maxVoltage,
+      wpi::units::unit_t<Velocity> velocity) const {
     return MaxAchievableAcceleration(-maxVoltage, velocity);
   }
 

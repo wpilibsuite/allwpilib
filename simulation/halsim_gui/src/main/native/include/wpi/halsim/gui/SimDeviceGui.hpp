@@ -9,7 +9,7 @@
 namespace wpi::glass {
 class DataSource;
 class DeviceTreeModel;
-}  // namespace glass
+}  // namespace wpi::glass
 
 namespace halsimgui {
 

@@ -11,7 +11,8 @@
 
 #include "subsystems/Drivetrain.hpp"
 
-class TurnDegrees : public wpi::cmd::CommandHelper<wpi::cmd::Command, TurnDegrees> {
+class TurnDegrees
+    : public wpi::cmd::CommandHelper<wpi::cmd::Command, TurnDegrees> {
  public:
   /**
    * Creates a new TurnDegrees. This command will turn your robot for a desired

@@ -18,7 +18,8 @@
 
 namespace {
 
-wpi::math::Vectord<5> Dynamics(const wpi::math::Vectord<5>& x, const wpi::math::Vectord<2>& u) {
+wpi::math::Vectord<5> Dynamics(const wpi::math::Vectord<5>& x,
+                               const wpi::math::Vectord<2>& u) {
   auto motors = wpi::math::DCMotor::CIM(2);
 
   // constexpr double Glow = 15.32;       // Low gear ratio
@@ -50,12 +51,14 @@ wpi::math::Vectord<5> Dynamics(const wpi::math::Vectord<5>& x, const wpi::math::
 }
 
 wpi::math::Vectord<3> LocalMeasurementModel(
-    const wpi::math::Vectord<5>& x, [[maybe_unused]] const wpi::math::Vectord<2>& u) {
+    const wpi::math::Vectord<5>& x,
+    [[maybe_unused]] const wpi::math::Vectord<2>& u) {
   return wpi::math::Vectord<3>{x(2), x(3), x(4)};
 }
 
 wpi::math::Vectord<5> GlobalMeasurementModel(
-    const wpi::math::Vectord<5>& x, [[maybe_unused]] const wpi::math::Vectord<2>& u) {
+    const wpi::math::Vectord<5>& x,
+    [[maybe_unused]] const wpi::math::Vectord<2>& u) {
   return wpi::math::Vectord<5>{x(0), x(1), x(2), x(3), x(4)};
 }
 }  // namespace
@@ -64,10 +67,10 @@ TEST(ExtendedKalmanFilterTest, Init) {
   constexpr wpi::units::second_t dt = 5_ms;
 
   wpi::math::ExtendedKalmanFilter<5, 2, 3> observer{Dynamics,
-                                              LocalMeasurementModel,
-                                              {0.5, 0.5, 10.0, 1.0, 1.0},
-                                              {0.0001, 0.01, 0.01},
-                                              dt};
+                                                    LocalMeasurementModel,
+                                                    {0.5, 0.5, 10.0, 1.0, 1.0},
+                                                    {0.0001, 0.01, 0.01},
+                                                    dt};
   wpi::math::Vectord<2> u{12.0, 12.0};
   observer.Predict(u, dt);
 
@@ -84,22 +87,22 @@ TEST(ExtendedKalmanFilterTest, Convergence) {
   constexpr auto rb = 0.8382_m / 2.0;  // Robot radius
 
   wpi::math::ExtendedKalmanFilter<5, 2, 3> observer{Dynamics,
-                                              LocalMeasurementModel,
-                                              {0.5, 0.5, 10.0, 1.0, 1.0},
-                                              {0.0001, 0.5, 0.5},
-                                              dt};
+                                                    LocalMeasurementModel,
+                                                    {0.5, 0.5, 10.0, 1.0, 1.0},
+                                                    {0.0001, 0.5, 0.5},
+                                                    dt};
 
-  auto waypoints =
-      std::vector<wpi::math::Pose2d>{wpi::math::Pose2d{2.75_m, 22.521_m, 0_rad},
-                               wpi::math::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
+  auto waypoints = std::vector<wpi::math::Pose2d>{
+      wpi::math::Pose2d{2.75_m, 22.521_m, 0_rad},
+      wpi::math::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
   auto trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
       waypoints, {8.8_mps, 0.1_mps_sq});
 
   wpi::math::Vectord<5> r = wpi::math::Vectord<5>::Zero();
   wpi::math::Vectord<2> u = wpi::math::Vectord<2>::Zero();
 
-  auto B = wpi::math::NumericalJacobianU<5, 5, 2>(Dynamics, wpi::math::Vectord<5>::Zero(),
-                                            wpi::math::Vectord<2>::Zero());
+  auto B = wpi::math::NumericalJacobianU<5, 5, 2>(
+      Dynamics, wpi::math::Vectord<5>::Zero(), wpi::math::Vectord<2>::Zero());
 
   observer.SetXhat(wpi::math::Vectord<5>{
       trajectory.InitialPose().Translation().X().value(),
@@ -119,10 +122,12 @@ TEST(ExtendedKalmanFilterTest, Convergence) {
         ref.pose.Rotation().Radians().value(), vl.value(), vr.value()};
 
     auto localY = LocalMeasurementModel(nextR, wpi::math::Vectord<2>::Zero());
-    observer.Correct(u, localY + wpi::math::MakeWhiteNoiseVector(0.0001, 0.5, 0.5));
+    observer.Correct(
+        u, localY + wpi::math::MakeWhiteNoiseVector(0.0001, 0.5, 0.5));
 
     wpi::math::Vectord<5> rdot = (nextR - r) / dt.value();
-    u = B.householderQr().solve(rdot - Dynamics(r, wpi::math::Vectord<2>::Zero()));
+    u = B.householderQr().solve(rdot -
+                                Dynamics(r, wpi::math::Vectord<2>::Zero()));
 
     observer.Predict(u, dt);
 

@@ -346,7 +346,8 @@ class PowerDistribution : public wpi::util::Sendable,
   void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
-  wpi::hal::Handle<HAL_PowerDistributionHandle, HAL_CleanPowerDistribution> m_handle;
+  wpi::hal::Handle<HAL_PowerDistributionHandle, HAL_CleanPowerDistribution>
+      m_handle;
   int m_module;
 };
 

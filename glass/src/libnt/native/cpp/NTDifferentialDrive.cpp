@@ -15,7 +15,8 @@
 using namespace wpi::glass;
 
 NTDifferentialDriveModel::NTDifferentialDriveModel(std::string_view path)
-    : NTDifferentialDriveModel(wpi::nt::NetworkTableInstance::GetDefault(), path) {}
+    : NTDifferentialDriveModel(wpi::nt::NetworkTableInstance::GetDefault(),
+                               path) {}
 
 NTDifferentialDriveModel::NTDifferentialDriveModel(
     wpi::nt::NetworkTableInstance inst, std::string_view path)

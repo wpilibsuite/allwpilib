@@ -14,7 +14,8 @@ DifferentialDriveWheelVoltages DifferentialDriveFeedforward::Calculate(
     wpi::units::meters_per_second_t currentLeftVelocity,
     wpi::units::meters_per_second_t nextLeftVelocity,
     wpi::units::meters_per_second_t currentRightVelocity,
-    wpi::units::meters_per_second_t nextRightVelocity, wpi::units::second_t dt) {
+    wpi::units::meters_per_second_t nextRightVelocity,
+    wpi::units::second_t dt) {
   wpi::math::LinearPlantInversionFeedforward<2, 2> feedforward{m_plant, dt};
 
   Eigen::Vector2d r{currentLeftVelocity, currentRightVelocity};

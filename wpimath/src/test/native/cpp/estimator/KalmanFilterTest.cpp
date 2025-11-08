@@ -16,6 +16,7 @@
 
 TEST(KalmanFilterTest, Flywheel) {
   auto motor = wpi::math::DCMotor::NEO();
-  auto flywheel = wpi::math::LinearSystemId::FlywheelSystem(motor, 1_kg_sq_m, 1.0);
+  auto flywheel =
+      wpi::math::LinearSystemId::FlywheelSystem(motor, 1_kg_sq_m, 1.0);
   wpi::math::KalmanFilter<1, 1, 1> kf{flywheel, {1}, {1}, 5_ms};
 }

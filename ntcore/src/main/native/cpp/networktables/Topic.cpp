@@ -45,9 +45,9 @@ GenericPublisher Topic::GenericPublish(std::string_view typeString,
 GenericPublisher Topic::GenericPublishEx(std::string_view typeString,
                                          const wpi::util::json& properties,
                                          const PubSubOptions& options) {
-  return GenericPublisher{::wpi::nt::PublishEx(m_handle,
-                                          ::wpi::nt::GetTypeFromString(typeString),
-                                          typeString, properties, options)};
+  return GenericPublisher{
+      ::wpi::nt::PublishEx(m_handle, ::wpi::nt::GetTypeFromString(typeString),
+                           typeString, properties, options)};
 }
 
 GenericEntry Topic::GetGenericEntry(const PubSubOptions& options) {

@@ -12,7 +12,7 @@
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 class ReplaceMeParallelDeadlineGroup
     : public wpi::cmd::CommandHelper<wpi::cmd::ParallelDeadlineGroup,
-                                 ReplaceMeParallelDeadlineGroup> {
+                                     ReplaceMeParallelDeadlineGroup> {
  public:
   ReplaceMeParallelDeadlineGroup();
 };

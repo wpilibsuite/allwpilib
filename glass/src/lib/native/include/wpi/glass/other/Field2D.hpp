@@ -34,7 +34,8 @@ class Field2DModel : public Model {
   virtual FieldObjectModel* AddFieldObject(std::string_view name) = 0;
   virtual void RemoveFieldObject(std::string_view name) = 0;
   virtual void ForEachFieldObject(
-      wpi::util::function_ref<void(FieldObjectModel& model, std::string_view name)>
+      wpi::util::function_ref<void(FieldObjectModel& model,
+                                   std::string_view name)>
           func) = 0;
 };
 

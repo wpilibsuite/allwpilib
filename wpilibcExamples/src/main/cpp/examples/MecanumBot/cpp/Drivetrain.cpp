@@ -13,14 +13,16 @@ wpi::math::MecanumDriveWheelSpeeds Drivetrain::GetCurrentState() const {
           wpi::units::meters_per_second_t{m_backRightEncoder.GetRate()}};
 }
 
-wpi::math::MecanumDriveWheelPositions Drivetrain::GetCurrentWheelDistances() const {
+wpi::math::MecanumDriveWheelPositions Drivetrain::GetCurrentWheelDistances()
+    const {
   return {wpi::units::meter_t{m_frontLeftEncoder.GetDistance()},
           wpi::units::meter_t{m_frontRightEncoder.GetDistance()},
           wpi::units::meter_t{m_backLeftEncoder.GetDistance()},
           wpi::units::meter_t{m_backRightEncoder.GetDistance()}};
 }
 
-void Drivetrain::SetSpeeds(const wpi::math::MecanumDriveWheelSpeeds& wheelSpeeds) {
+void Drivetrain::SetSpeeds(
+    const wpi::math::MecanumDriveWheelSpeeds& wheelSpeeds) {
   const auto frontLeftFeedforward =
       m_feedforward.Calculate(wheelSpeeds.frontLeft);
   const auto frontRightFeedforward =

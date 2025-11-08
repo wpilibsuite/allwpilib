@@ -27,12 +27,12 @@ int main() {
       switch (prop.GetKind()) {
         case wpi::cs::VideoProperty::kBoolean:
           wpi::util::print(" (bool): value={} default={}", prop.Get(),
-                     prop.GetDefault());
+                           prop.GetDefault());
           break;
         case wpi::cs::VideoProperty::kInteger:
           wpi::util::print(" (int): value={} min={} max={} step={} default={}",
-                     prop.Get(), prop.GetMin(), prop.GetMax(), prop.GetStep(),
-                     prop.GetDefault());
+                           prop.Get(), prop.GetMin(), prop.GetMax(),
+                           prop.GetStep(), prop.GetDefault());
           break;
         case wpi::cs::VideoProperty::kString:
           wpi::util::print(" (string): {}", prop.GetString());
@@ -70,8 +70,8 @@ int main() {
           pixelFormat = "Unknown";
           break;
       }
-      wpi::util::print("  PixelFormat:{} Width:{} Height:{} FPS:{}\n", pixelFormat,
-                 mode.width, mode.height, mode.fps);
+      wpi::util::print("  PixelFormat:{} Width:{} Height:{} FPS:{}\n",
+                       pixelFormat, mode.width, mode.height, mode.fps);
     }
   }
 }

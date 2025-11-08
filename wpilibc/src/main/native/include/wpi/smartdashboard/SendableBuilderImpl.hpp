@@ -155,7 +155,8 @@ class SendableBuilderImpl : public wpi::nt::NTSendableBuilder {
 
   void AddSmallStringProperty(
       std::string_view key,
-      std::function<std::string_view(wpi::util::SmallVectorImpl<char>& buf)> getter,
+      std::function<std::string_view(wpi::util::SmallVectorImpl<char>& buf)>
+          getter,
       std::function<void(std::string_view)> setter) override;
 
   void AddSmallBooleanArrayProperty(
@@ -173,26 +174,29 @@ class SendableBuilderImpl : public wpi::nt::NTSendableBuilder {
 
   void AddSmallFloatArrayProperty(
       std::string_view key,
-      std::function<std::span<const float>(wpi::util::SmallVectorImpl<float>& buf)>
+      std::function<
+          std::span<const float>(wpi::util::SmallVectorImpl<float>& buf)>
           getter,
       std::function<void(std::span<const float>)> setter) override;
 
   void AddSmallDoubleArrayProperty(
       std::string_view key,
-      std::function<std::span<const double>(wpi::util::SmallVectorImpl<double>& buf)>
+      std::function<
+          std::span<const double>(wpi::util::SmallVectorImpl<double>& buf)>
           getter,
       std::function<void(std::span<const double>)> setter) override;
 
   void AddSmallStringArrayProperty(
       std::string_view key,
-      std::function<
-          std::span<const std::string>(wpi::util::SmallVectorImpl<std::string>& buf)>
+      std::function<std::span<const std::string>(
+          wpi::util::SmallVectorImpl<std::string>& buf)>
           getter,
       std::function<void(std::span<const std::string>)> setter) override;
 
   void AddSmallRawProperty(
       std::string_view key, std::string_view typeString,
-      std::function<std::span<uint8_t>(wpi::util::SmallVectorImpl<uint8_t>& buf)>
+      std::function<
+          std::span<uint8_t>(wpi::util::SmallVectorImpl<uint8_t>& buf)>
           getter,
       std::function<void(std::span<const uint8_t>)> setter) override;
 

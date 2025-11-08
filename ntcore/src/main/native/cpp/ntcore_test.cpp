@@ -22,8 +22,8 @@ struct NT_TopicInfo* NT_GetTopicInfoForTesting(const char* name,
                                                enum NT_Type type,
                                                const char* type_str,
                                                int* struct_size) {
-  struct NT_TopicInfo* topic_info =
-      static_cast<NT_TopicInfo*>(wpi::util::safe_calloc(1, sizeof(NT_TopicInfo)));
+  struct NT_TopicInfo* topic_info = static_cast<NT_TopicInfo*>(
+      wpi::util::safe_calloc(1, sizeof(NT_TopicInfo)));
   wpi::nt::ConvertToC(name, &topic_info->name);
   topic_info->type = type;
   wpi::nt::ConvertToC(type_str, &topic_info->type_str);

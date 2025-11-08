@@ -25,13 +25,15 @@ namespace wpi::math {
  *   pose. This can either be a constant for a rigidly mounted camera, or
  *   variable if the camera is mounted to a turret. If the camera was mounted 3
  *   inches in front of the "origin" (usually physical center) of the robot,
- *   this would be wpi::math::Transform3d{3_in, 0_in, 0_in, wpi::math::Rotation3d{}}.
+ *   this would be wpi::math::Transform3d{3_in, 0_in, 0_in,
+ * wpi::math::Rotation3d{}}.
  * @return The robot's field-relative pose.
  */
 WPILIB_DLLEXPORT
-constexpr wpi::math::Pose3d ObjectToRobotPose(const wpi::math::Pose3d& objectInField,
-                                        const wpi::math::Transform3d& cameraToObject,
-                                        const wpi::math::Transform3d& robotToCamera) {
+constexpr wpi::math::Pose3d ObjectToRobotPose(
+    const wpi::math::Pose3d& objectInField,
+    const wpi::math::Transform3d& cameraToObject,
+    const wpi::math::Transform3d& robotToCamera) {
   const auto objectToCamera = cameraToObject.Inverse();
   const auto cameraToRobot = robotToCamera.Inverse();
   return objectInField + objectToCamera + cameraToRobot;

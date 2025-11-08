@@ -57,7 +57,7 @@ extern "C" {
 int HAL_LoadOneExtension(const char* library) {
   int rc = 1;  // It is expected and reasonable not to find an extra simulation
   wpi::util::print("HAL Extensions: Attempting to load: {}\n",
-             fs::path{library}.stem().string());
+                   fs::path{library}.stem().string());
   std::fflush(stdout);
   HTYPE handle = DLOPEN(library);
 #if !defined(WIN32) && !defined(_WIN32)
@@ -67,8 +67,9 @@ int HAL_LoadOneExtension(const char* library) {
 #else
     auto libraryName = fmt::format("lib{}.so", library);
 #endif
-    wpi::util::print("HAL Extensions: Load failed: {}\nTrying modified name: {}\n",
-               DLERROR, fs::path{libraryName}.stem().string());
+    wpi::util::print(
+        "HAL Extensions: Load failed: {}\nTrying modified name: {}\n", DLERROR,
+        fs::path{libraryName}.stem().string());
     std::fflush(stdout);
     handle = DLOPEN(libraryName.c_str());
   }

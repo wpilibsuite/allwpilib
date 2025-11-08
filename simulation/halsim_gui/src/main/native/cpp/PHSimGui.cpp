@@ -98,8 +98,8 @@ class PHSimModel : public wpi::glass::PneumaticControlModel {
   CompressorSimModel* GetCompressor() override { return &m_compressor; }
 
   void ForEachSolenoid(
-      wpi::util::function_ref<void(wpi::glass::SolenoidModel& model, int index)> func)
-      override;
+      wpi::util::function_ref<void(wpi::glass::SolenoidModel& model, int index)>
+          func) override;
 
   std::string_view GetName() override { return "PH"; }
 
@@ -121,7 +121,8 @@ class PHsSimModel : public wpi::glass::PneumaticControlsModel {
   bool Exists() override { return true; }
 
   void ForEachPneumaticControl(
-      wpi::util::function_ref<void(wpi::glass::PneumaticControlModel& model, int index)>
+      wpi::util::function_ref<void(wpi::glass::PneumaticControlModel& model,
+                                   int index)>
           func) override;
 
  private:
@@ -146,7 +147,8 @@ void PHSimModel::Update() {
 }
 
 void PHSimModel::ForEachSolenoid(
-    wpi::util::function_ref<void(wpi::glass::SolenoidModel& model, int index)> func) {
+    wpi::util::function_ref<void(wpi::glass::SolenoidModel& model, int index)>
+        func) {
   if (m_solenoidInitCount == 0) {
     return;
   }
@@ -174,7 +176,8 @@ void PHsSimModel::Update() {
 }
 
 void PHsSimModel::ForEachPneumaticControl(
-    wpi::util::function_ref<void(wpi::glass::PneumaticControlModel& model, int index)>
+    wpi::util::function_ref<void(wpi::glass::PneumaticControlModel& model,
+                                 int index)>
         func) {
   int32_t numREVPHs = m_models.size();
   for (int32_t i = 0; i < numREVPHs; ++i) {

@@ -58,7 +58,8 @@ class UsbCameraListener::Impl {
   std::unique_ptr<wpi::cs::WindowsMessagePump> m_messagePump;
 };
 
-UsbCameraListener::UsbCameraListener(wpi::util::Logger& logger, Notifier& notifier)
+UsbCameraListener::UsbCameraListener(wpi::util::Logger& logger,
+                                     Notifier& notifier)
     : m_impl{std::make_unique<Impl>(notifier)} {}
 
 UsbCameraListener::~UsbCameraListener() {

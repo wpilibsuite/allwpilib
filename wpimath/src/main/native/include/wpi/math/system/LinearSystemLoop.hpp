@@ -61,7 +61,8 @@ class LinearSystemLoop {
       : LinearSystemLoop(
             plant, controller, observer,
             [=](const InputVector& u) {
-              return wpi::math::DesaturateInputVector<Inputs>(u, maxVoltage.value());
+              return wpi::math::DesaturateInputVector<Inputs>(
+                  u, maxVoltage.value());
             },
             dt) {}
 
@@ -101,11 +102,13 @@ class LinearSystemLoop {
   LinearSystemLoop(
       LinearQuadraticRegulator<States, Inputs>& controller,
       const LinearPlantInversionFeedforward<States, Inputs>& feedforward,
-      KalmanFilter<States, Inputs, Outputs>& observer, wpi::units::volt_t maxVoltage)
-      : LinearSystemLoop(
-            controller, feedforward, observer, [=](const InputVector& u) {
-              return wpi::math::DesaturateInputVector<Inputs>(u, maxVoltage.value());
-            }) {}
+      KalmanFilter<States, Inputs, Outputs>& observer,
+      wpi::units::volt_t maxVoltage)
+      : LinearSystemLoop(controller, feedforward, observer,
+                         [=](const InputVector& u) {
+                           return wpi::math::DesaturateInputVector<Inputs>(
+                               u, maxVoltage.value());
+                         }) {}
 
   /**
    * Constructs a state-space loop with the given controller, feedforward,

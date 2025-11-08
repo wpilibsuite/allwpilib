@@ -19,9 +19,11 @@ struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::MecanumDriveWheelSpeeds> {
            "double rear_right";
   }
 
-  static wpi::math::MecanumDriveWheelSpeeds Unpack(std::span<const uint8_t> data);
+  static wpi::math::MecanumDriveWheelSpeeds Unpack(
+      std::span<const uint8_t> data);
   static void Pack(std::span<uint8_t> data,
                    const wpi::math::MecanumDriveWheelSpeeds& value);
 };
 
-static_assert(wpi::util::StructSerializable<wpi::math::MecanumDriveWheelSpeeds>);
+static_assert(
+    wpi::util::StructSerializable<wpi::math::MecanumDriveWheelSpeeds>);

@@ -51,7 +51,8 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
         feedforward.Calculate(wpi::math::Vectord<2>{l.value(), r.value()});
 
     // Sim periodic code.
-    sim.SetInputs(wpi::units::volt_t{voltages(0, 0)}, wpi::units::volt_t{voltages(1, 0)});
+    sim.SetInputs(wpi::units::volt_t{voltages(0, 0)},
+                  wpi::units::volt_t{voltages(1, 0)});
     sim.Update(20_ms);
 
     // Update ground truth.

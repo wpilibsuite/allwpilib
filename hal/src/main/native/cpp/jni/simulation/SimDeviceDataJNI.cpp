@@ -193,9 +193,9 @@ void ValueCallbackStore::performCallback(const char* name,
   }
 }
 
-static wpi::hal::UnlimitedHandleResource<SIM_JniHandle, DeviceCallbackStore,
-                                    wpi::hal::HAL_HandleEnum::SimulationJni>*
-    deviceCallbackHandles;
+static wpi::hal::UnlimitedHandleResource<
+    SIM_JniHandle, DeviceCallbackStore,
+    wpi::hal::HAL_HandleEnum::SimulationJni>* deviceCallbackHandles;
 
 namespace {
 using RegisterDeviceCallbackFunc =
@@ -250,8 +250,8 @@ static void FreeDeviceCallback(JNIEnv* env, SIM_JniHandle handle,
   callback->free(env);
 }
 
-static wpi::hal::UnlimitedHandleResource<SIM_JniHandle, ValueCallbackStore,
-                                    wpi::hal::HAL_HandleEnum::SimulationJni>*
+static wpi::hal::UnlimitedHandleResource<
+    SIM_JniHandle, ValueCallbackStore, wpi::hal::HAL_HandleEnum::SimulationJni>*
     valueCallbackHandles;
 
 namespace {
@@ -346,13 +346,15 @@ bool InitializeSimDeviceDataJNI(JNIEnv* env) {
     return false;
   }
 
-  static wpi::hal::UnlimitedHandleResource<SIM_JniHandle, DeviceCallbackStore,
-                                      wpi::hal::HAL_HandleEnum::SimulationJni>
+  static wpi::hal::UnlimitedHandleResource<
+      SIM_JniHandle, DeviceCallbackStore,
+      wpi::hal::HAL_HandleEnum::SimulationJni>
       cbDevice;
   deviceCallbackHandles = &cbDevice;
 
-  static wpi::hal::UnlimitedHandleResource<SIM_JniHandle, ValueCallbackStore,
-                                      wpi::hal::HAL_HandleEnum::SimulationJni>
+  static wpi::hal::UnlimitedHandleResource<
+      SIM_JniHandle, ValueCallbackStore,
+      wpi::hal::HAL_HandleEnum::SimulationJni>
       cbValue;
   valueCallbackHandles = &cbValue;
 

@@ -69,7 +69,8 @@ wpi::units::turns_per_second_t Tachometer::GetRevolutionsPerSecond() const {
   return wpi::units::turns_per_second_t{rotationHz.value()};
 }
 
-wpi::units::revolutions_per_minute_t Tachometer::GetRevolutionsPerMinute() const {
+wpi::units::revolutions_per_minute_t Tachometer::GetRevolutionsPerMinute()
+    const {
   return wpi::units::revolutions_per_minute_t{GetRevolutionsPerSecond()};
 }
 

@@ -9,7 +9,8 @@
 #include "wpi/util/struct/Struct.hpp"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::DifferentialDriveFeedforward> {
+struct WPILIB_DLLEXPORT
+    wpi::util::Struct<wpi::math::DifferentialDriveFeedforward> {
   static constexpr std::string_view GetTypeName() {
     return "DifferentialDriveFeedforward";
   }
@@ -25,4 +26,5 @@ struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::DifferentialDriveFeedforwar
                    const wpi::math::DifferentialDriveFeedforward& value);
 };
 
-static_assert(wpi::util::StructSerializable<wpi::math::DifferentialDriveFeedforward>);
+static_assert(
+    wpi::util::StructSerializable<wpi::math::DifferentialDriveFeedforward>);

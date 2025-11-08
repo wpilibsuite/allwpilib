@@ -84,8 +84,8 @@ class WPILIB_DLLEXPORT DifferentialDriveAccelerationLimiter {
    */
   DifferentialDriveWheelVoltages Calculate(
       wpi::units::meters_per_second_t leftVelocity,
-      wpi::units::meters_per_second_t rightVelocity, wpi::units::volt_t leftVoltage,
-      wpi::units::volt_t rightVoltage);
+      wpi::units::meters_per_second_t rightVelocity,
+      wpi::units::volt_t leftVoltage, wpi::units::volt_t rightVoltage);
 
  private:
   LinearSystem<2, 2, 2> m_system;

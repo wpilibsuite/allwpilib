@@ -19,8 +19,9 @@ namespace wpi {
  * sensors have multiple axis and can be treated as multiple devices. Each is
  * calibrated by finding the center value over a period of time.
  */
-class AnalogAccelerometer : public wpi::util::Sendable,
-                            public wpi::util::SendableHelper<AnalogAccelerometer> {
+class AnalogAccelerometer
+    : public wpi::util::Sendable,
+      public wpi::util::SendableHelper<AnalogAccelerometer> {
  public:
   /**
    * Create a new instance of an accelerometer.

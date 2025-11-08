@@ -12,9 +12,12 @@
 template <>
 struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::SwerveModulePosition> {
   using MessageStruct = wpi_proto_ProtobufSwerveModulePosition;
-  using InputStream = wpi::util::ProtoInputStream<wpi::math::SwerveModulePosition>;
-  using OutputStream = wpi::util::ProtoOutputStream<wpi::math::SwerveModulePosition>;
-  static std::optional<wpi::math::SwerveModulePosition> Unpack(InputStream& stream);
+  using InputStream =
+      wpi::util::ProtoInputStream<wpi::math::SwerveModulePosition>;
+  using OutputStream =
+      wpi::util::ProtoOutputStream<wpi::math::SwerveModulePosition>;
+  static std::optional<wpi::math::SwerveModulePosition> Unpack(
+      InputStream& stream);
   static bool Pack(OutputStream& stream,
                    const wpi::math::SwerveModulePosition& value);
 };

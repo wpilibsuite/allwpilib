@@ -34,10 +34,12 @@ class ProfiledPIDController
  public:
   using Distance_t = wpi::units::unit_t<Distance>;
   using Velocity =
-      wpi::units::compound_unit<Distance, wpi::units::inverse<wpi::units::seconds>>;
+      wpi::units::compound_unit<Distance,
+                                wpi::units::inverse<wpi::units::seconds>>;
   using Velocity_t = wpi::units::unit_t<Velocity>;
   using Acceleration =
-      wpi::units::compound_unit<Velocity, wpi::units::inverse<wpi::units::seconds>>;
+      wpi::units::compound_unit<Velocity,
+                                wpi::units::inverse<wpi::units::seconds>>;
   using Acceleration_t = wpi::units::unit_t<Acceleration>;
   using State = typename TrapezoidProfile<Distance>::State;
   using Constraints = typename TrapezoidProfile<Distance>::Constraints;
@@ -64,7 +66,8 @@ class ProfiledPIDController
       int instances = detail::IncrementAndGetProfiledPIDControllerInstances();
       wpi::math::MathSharedStore::ReportUsage("ProfiledPIDController",
                                               std::to_string(instances));
-      wpi::util::SendableRegistry::Add(this, "ProfiledPIDController", instances);
+      wpi::util::SendableRegistry::Add(this, "ProfiledPIDController",
+                                       instances);
     }
   }
 

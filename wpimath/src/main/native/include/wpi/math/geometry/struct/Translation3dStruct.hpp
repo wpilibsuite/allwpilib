@@ -17,7 +17,8 @@ struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::Translation3d> {
   }
 
   static wpi::math::Translation3d Unpack(std::span<const uint8_t> data);
-  static void Pack(std::span<uint8_t> data, const wpi::math::Translation3d& value);
+  static void Pack(std::span<uint8_t> data,
+                   const wpi::math::Translation3d& value);
 };
 
 static_assert(wpi::util::StructSerializable<wpi::math::Translation3d>);

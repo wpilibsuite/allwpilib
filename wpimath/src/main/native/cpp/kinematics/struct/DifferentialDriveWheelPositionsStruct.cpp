@@ -9,7 +9,8 @@ constexpr size_t kLeftOff = 0;
 constexpr size_t kRightOff = kLeftOff + 8;
 }  // namespace
 
-using StructType = wpi::util::Struct<wpi::math::DifferentialDriveWheelPositions>;
+using StructType =
+    wpi::util::Struct<wpi::math::DifferentialDriveWheelPositions>;
 
 wpi::math::DifferentialDriveWheelPositions StructType::Unpack(
     std::span<const uint8_t> data) {

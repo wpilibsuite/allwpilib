@@ -45,7 +45,8 @@ class ServerMessageHandler {
                              std::optional<int> pubuid) = 0;
   virtual void ServerUnannounce(std::string_view name, int id) = 0;
   virtual void ServerPropertiesUpdate(std::string_view name,
-                                      const wpi::util::json& update, bool ack) = 0;
+                                      const wpi::util::json& update,
+                                      bool ack) = 0;
   virtual void ServerSetValue(int topicuid, const Value& value) = 0;
 };
 

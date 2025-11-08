@@ -147,7 +147,8 @@ void wpi::util::ResetEvent(WPI_EventHandle handle) {
   ResetSignalObject(handle);
 }
 
-WPI_SemaphoreHandle wpi::util::CreateSemaphore(int initialCount, int maximumCount) {
+WPI_SemaphoreHandle wpi::util::CreateSemaphore(int initialCount,
+                                               int maximumCount) {
   ManagerGuard guard;
   if (!guard) {
     return {};
@@ -183,7 +184,7 @@ void wpi::util::DestroySemaphore(WPI_SemaphoreHandle handle) {
 }
 
 bool wpi::util::ReleaseSemaphore(WPI_SemaphoreHandle handle, int releaseCount,
-                           int* prevCount) {
+                                 int* prevCount) {
   if ((handle >> 24) != kHandleTypeSemaphore) {
     return false;
   }
@@ -221,7 +222,8 @@ bool wpi::util::WaitForObject(WPI_Handle handle) {
   return WaitForObject(handle, -1, nullptr);
 }
 
-bool wpi::util::WaitForObject(WPI_Handle handle, double timeout, bool* timedOut) {
+bool wpi::util::WaitForObject(WPI_Handle handle, double timeout,
+                              bool* timedOut) {
   WPI_Handle signaledValue;
   auto signaled = WaitForObjects(
       std::span(&handle, 1), std::span(&signaledValue, 1), timeout, timedOut);
@@ -231,14 +233,14 @@ bool wpi::util::WaitForObject(WPI_Handle handle, double timeout, bool* timedOut)
   return (signaled[0] & 0x80000000ul) == 0;
 }
 
-std::span<WPI_Handle> wpi::util::WaitForObjects(std::span<const WPI_Handle> handles,
-                                          std::span<WPI_Handle> signaled) {
+std::span<WPI_Handle> wpi::util::WaitForObjects(
+    std::span<const WPI_Handle> handles, std::span<WPI_Handle> signaled) {
   return WaitForObjects(handles, signaled, -1, nullptr);
 }
 
-std::span<WPI_Handle> wpi::util::WaitForObjects(std::span<const WPI_Handle> handles,
-                                          std::span<WPI_Handle> signaled,
-                                          double timeout, bool* timedOut) {
+std::span<WPI_Handle> wpi::util::WaitForObjects(
+    std::span<const WPI_Handle> handles, std::span<WPI_Handle> signaled,
+    double timeout, bool* timedOut) {
   ManagerGuard guard;
   if (!guard) {
     if (timedOut) {
@@ -337,7 +339,7 @@ std::span<WPI_Handle> wpi::util::WaitForObjects(std::span<const WPI_Handle> hand
 }
 
 void wpi::util::CreateSignalObject(WPI_Handle handle, bool manualReset,
-                             bool initialState) {
+                                   bool initialState) {
   ManagerGuard guard;
   if (!guard) {
     return;
@@ -448,7 +450,7 @@ int WPI_WaitForObjectTimeout(WPI_Handle handle, double timeout,
 int WPI_WaitForObjects(const WPI_Handle* handles, int handles_count,
                        WPI_Handle* signaled) {
   return wpi::util::WaitForObjects(std::span(handles, handles_count),
-                             std::span(signaled, handles_count))
+                                   std::span(signaled, handles_count))
       .size();
 }
 
@@ -456,9 +458,9 @@ int WPI_WaitForObjectsTimeout(const WPI_Handle* handles, int handles_count,
                               WPI_Handle* signaled, double timeout,
                               int* timed_out) {
   bool timedOutBool;
-  auto signaledResult = wpi::util::WaitForObjects(std::span(handles, handles_count),
-                                            std::span(signaled, handles_count),
-                                            timeout, &timedOutBool);
+  auto signaledResult = wpi::util::WaitForObjects(
+      std::span(handles, handles_count), std::span(signaled, handles_count),
+      timeout, &timedOutBool);
   *timed_out = timedOutBool ? 1 : 0;
   return signaledResult.size();
 }

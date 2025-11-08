@@ -13,7 +13,8 @@ using namespace wpi;
 using namespace wpi::sim;
 
 ElevatorSim::ElevatorSim(const wpi::math::LinearSystem<2, 1, 2>& plant,
-                         const wpi::math::DCMotor& gearbox, wpi::units::meter_t minHeight,
+                         const wpi::math::DCMotor& gearbox,
+                         wpi::units::meter_t minHeight,
                          wpi::units::meter_t maxHeight, bool simulateGravity,
                          wpi::units::meter_t startingHeight,
                          const std::array<double, 2>& measurementStdDevs)
@@ -27,12 +28,13 @@ ElevatorSim::ElevatorSim(const wpi::math::LinearSystem<2, 1, 2>& plant,
 
 ElevatorSim::ElevatorSim(const wpi::math::DCMotor& gearbox, double gearing,
                          wpi::units::kilogram_t carriageMass,
-                         wpi::units::meter_t drumRadius, wpi::units::meter_t minHeight,
+                         wpi::units::meter_t drumRadius,
+                         wpi::units::meter_t minHeight,
                          wpi::units::meter_t maxHeight, bool simulateGravity,
                          wpi::units::meter_t startingHeight,
                          const std::array<double, 2>& measurementStdDevs)
-    : ElevatorSim(wpi::math::LinearSystemId::ElevatorSystem(gearbox, carriageMass,
-                                                 drumRadius, gearing),
+    : ElevatorSim(wpi::math::LinearSystemId::ElevatorSystem(
+                      gearbox, carriageMass, drumRadius, gearing),
                   gearbox, minHeight, maxHeight, simulateGravity,
                   startingHeight, measurementStdDevs) {}
 
@@ -41,18 +43,19 @@ template <typename Distance>
            std::same_as<wpi::units::radian, Distance>
 ElevatorSim::ElevatorSim(decltype(1_V / Velocity_t<Distance>(1)) kV,
                          decltype(1_V / Acceleration_t<Distance>(1)) kA,
-                         const wpi::math::DCMotor& gearbox, wpi::units::meter_t minHeight,
+                         const wpi::math::DCMotor& gearbox,
+                         wpi::units::meter_t minHeight,
                          wpi::units::meter_t maxHeight, bool simulateGravity,
                          wpi::units::meter_t startingHeight,
                          const std::array<double, 2>& measurementStdDevs)
-    : ElevatorSim(wpi::math::LinearSystemId::IdentifyPositionSystem(kV, kA), gearbox,
-                  minHeight, maxHeight, simulateGravity, startingHeight,
-                  measurementStdDevs) {}
+    : ElevatorSim(wpi::math::LinearSystemId::IdentifyPositionSystem(kV, kA),
+                  gearbox, minHeight, maxHeight, simulateGravity,
+                  startingHeight, measurementStdDevs) {}
 
 void ElevatorSim::SetState(wpi::units::meter_t position,
                            wpi::units::meters_per_second_t velocity) {
-  SetState(
-      wpi::math::Vectord<2>{std::clamp(position, m_minHeight, m_maxHeight), velocity});
+  SetState(wpi::math::Vectord<2>{std::clamp(position, m_minHeight, m_maxHeight),
+                                 velocity});
 }
 
 bool ElevatorSim::WouldHitLowerLimit(wpi::units::meter_t elevatorHeight) const {
@@ -101,10 +104,12 @@ void ElevatorSim::SetInputVoltage(wpi::units::volt_t voltage) {
   ClampInput(wpi::RobotController::GetBatteryVoltage().value());
 }
 
-wpi::math::Vectord<2> ElevatorSim::UpdateX(const wpi::math::Vectord<2>& currentXhat,
-                                const wpi::math::Vectord<1>& u, wpi::units::second_t dt) {
+wpi::math::Vectord<2> ElevatorSim::UpdateX(
+    const wpi::math::Vectord<2>& currentXhat, const wpi::math::Vectord<1>& u,
+    wpi::units::second_t dt) {
   auto updatedXhat = wpi::math::RKDP(
-      [&](const wpi::math::Vectord<2>& x, const wpi::math::Vectord<1>& u_) -> wpi::math::Vectord<2> {
+      [&](const wpi::math::Vectord<2>& x,
+          const wpi::math::Vectord<1>& u_) -> wpi::math::Vectord<2> {
         wpi::math::Vectord<2> xdot = m_plant.A() * x + m_plant.B() * u;
 
         if (m_simulateGravity) {

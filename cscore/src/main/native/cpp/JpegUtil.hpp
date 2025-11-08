@@ -10,7 +10,7 @@
 
 namespace wpi::util {
 class raw_istream;
-}  // namespace wpi
+}  // namespace wpi::util
 
 namespace wpi::cs {
 
@@ -22,7 +22,8 @@ bool JpegNeedsDHT(const char* data, size_t* size, size_t* locSOF);
 
 std::string_view JpegGetDHT();
 
-bool ReadJpeg(wpi::util::raw_istream& is, std::string& buf, int* width, int* height);
+bool ReadJpeg(wpi::util::raw_istream& is, std::string& buf, int* width,
+              int* height);
 
 }  // namespace wpi::cs
 

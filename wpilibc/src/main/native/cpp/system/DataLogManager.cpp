@@ -133,8 +133,8 @@ void Thread::Main() {
       freeSpace = UINTMAX_MAX;
     }
     if (freeSpace < kFreeSpaceThreshold) {
-      // Delete oldest WPILIB_*.wpilog files (ignore WPILIB_TBD_*.wpilog as we just
-      // created one)
+      // Delete oldest WPILIB_*.wpilog files (ignore WPILIB_TBD_*.wpilog as we
+      // just created one)
       std::vector<fs::directory_entry> entries;
       for (auto&& entry : fs::directory_iterator{m_logDir, ec}) {
         auto stem = entry.path().stem().string();
@@ -158,14 +158,14 @@ void Thread::Main() {
         auto size = entry.file_size();
         if (fs::remove(entry.path(), ec)) {
           WPILIB_ReportWarning("DataLogManager: Deleted {}",
-                            entry.path().string());
+                               entry.path().string());
           freeSpace += size;
           if (freeSpace >= kFreeSpaceThreshold) {
             break;
           }
         } else {
           wpi::util::print(stderr, "DataLogManager: could not delete {}\n",
-                     entry.path().string());
+                           entry.path().string());
         }
       }
     } else if (freeSpace < 2 * kFreeSpaceThreshold) {
@@ -330,7 +330,7 @@ Instance::Instance(std::string_view dir, std::string_view filename,
         entry.path().extension() == ".wpilog") {
       if (!fs::remove(entry, ec)) {
         wpi::util::print(stderr, "DataLogManager: could not delete {}\n",
-                   entry.path().string());
+                         entry.path().string());
       }
     }
   }

@@ -35,9 +35,10 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelSpeeds {
    *
    * @param attainableMaxSpeed The absolute max speed that a wheel can reach.
    */
-  constexpr void Desaturate(wpi::units::meters_per_second_t attainableMaxSpeed) {
-    auto realMaxSpeed =
-        wpi::units::math::max(wpi::units::math::abs(left), wpi::units::math::abs(right));
+  constexpr void Desaturate(
+      wpi::units::meters_per_second_t attainableMaxSpeed) {
+    auto realMaxSpeed = wpi::units::math::max(wpi::units::math::abs(left),
+                                              wpi::units::math::abs(right));
 
     if (realMaxSpeed > attainableMaxSpeed) {
       left = left / realMaxSpeed * attainableMaxSpeed;

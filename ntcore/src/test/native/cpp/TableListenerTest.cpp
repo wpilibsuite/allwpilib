@@ -15,16 +15,19 @@
 using ::testing::_;
 
 using MockTableEventListener = testing::MockFunction<void(
-    wpi::nt::NetworkTable* table, std::string_view key, const wpi::nt::Event& event)>;
-using MockSubTableListener =
-    testing::MockFunction<void(wpi::nt::NetworkTable* parent, std::string_view name,
-                               std::shared_ptr<wpi::nt::NetworkTable> table)>;
+    wpi::nt::NetworkTable* table, std::string_view key,
+    const wpi::nt::Event& event)>;
+using MockSubTableListener = testing::MockFunction<void(
+    wpi::nt::NetworkTable* parent, std::string_view name,
+    std::shared_ptr<wpi::nt::NetworkTable> table)>;
 
 class TableListenerTest : public ::testing::Test {
  public:
   TableListenerTest() : m_inst(wpi::nt::NetworkTableInstance::Create()) {}
 
-  ~TableListenerTest() override { wpi::nt::NetworkTableInstance::Destroy(m_inst); }
+  ~TableListenerTest() override {
+    wpi::nt::NetworkTableInstance::Destroy(m_inst);
+  }
 
   void PublishTopics();
 

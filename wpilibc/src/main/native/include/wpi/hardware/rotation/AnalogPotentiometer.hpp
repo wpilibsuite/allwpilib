@@ -18,8 +18,9 @@ namespace wpi {
  * units you choose, by way of the scaling and offset constants passed to the
  * constructor.
  */
-class AnalogPotentiometer : public wpi::util::Sendable,
-                            public wpi::util::SendableHelper<AnalogPotentiometer> {
+class AnalogPotentiometer
+    : public wpi::util::Sendable,
+      public wpi::util::SendableHelper<AnalogPotentiometer> {
  public:
   /**
    * Construct an Analog Potentiometer object from a channel number.

@@ -13,10 +13,10 @@
 
 template <int States, int Inputs, int Outputs>
 struct wpi::util::Struct<wpi::math::LinearSystem<States, Inputs, Outputs>> {
-  static constexpr ct_string kTypeName =
-      wpi::util::Concat("LinearSystem__"_ct_string, wpi::util::NumToCtString<States>(),
-                  "_"_ct_string, wpi::util::NumToCtString<Inputs>(), "_"_ct_string,
-                  wpi::util::NumToCtString<Outputs>());
+  static constexpr ct_string kTypeName = wpi::util::Concat(
+      "LinearSystem__"_ct_string, wpi::util::NumToCtString<States>(),
+      "_"_ct_string, wpi::util::NumToCtString<Inputs>(), "_"_ct_string,
+      wpi::util::NumToCtString<Outputs>());
   static constexpr std::string_view GetTypeName() { return kTypeName; }
   static constexpr size_t GetSize() {
     return wpi::util::Struct<wpi::math::Matrixd<States, States>>::GetSize() +
@@ -25,10 +25,14 @@ struct wpi::util::Struct<wpi::math::LinearSystem<States, Inputs, Outputs>> {
            wpi::util::Struct<wpi::math::Matrixd<Outputs, Inputs>>::GetSize();
   }
   static constexpr ct_string kSchema = wpi::util::Concat(
-      wpi::util::Struct<wpi::math::Matrixd<States, States>>::kTypeName, " a;"_ct_string,
-      wpi::util::Struct<wpi::math::Matrixd<States, Inputs>>::kTypeName, " b;"_ct_string,
-      wpi::util::Struct<wpi::math::Matrixd<Outputs, States>>::kTypeName, " c;"_ct_string,
-      wpi::util::Struct<wpi::math::Matrixd<Outputs, Inputs>>::kTypeName, " d"_ct_string);
+      wpi::util::Struct<wpi::math::Matrixd<States, States>>::kTypeName,
+      " a;"_ct_string,
+      wpi::util::Struct<wpi::math::Matrixd<States, Inputs>>::kTypeName,
+      " b;"_ct_string,
+      wpi::util::Struct<wpi::math::Matrixd<Outputs, States>>::kTypeName,
+      " c;"_ct_string,
+      wpi::util::Struct<wpi::math::Matrixd<Outputs, Inputs>>::kTypeName,
+      " d"_ct_string);
   static constexpr std::string_view GetSchema() { return kSchema; }
 
   static wpi::math::LinearSystem<States, Inputs, Outputs> Unpack(
@@ -41,14 +45,19 @@ struct wpi::util::Struct<wpi::math::LinearSystem<States, Inputs, Outputs>> {
     constexpr size_t kDOff =
         kCOff + wpi::util::GetStructSize<wpi::math::Matrixd<Outputs, States>>();
     return wpi::math::LinearSystem<States, Inputs, Outputs>{
-        wpi::util::UnpackStruct<wpi::math::Matrixd<States, States>, kAOff>(data),
-        wpi::util::UnpackStruct<wpi::math::Matrixd<States, Inputs>, kBOff>(data),
-        wpi::util::UnpackStruct<wpi::math::Matrixd<Outputs, States>, kCOff>(data),
-        wpi::util::UnpackStruct<wpi::math::Matrixd<Outputs, Inputs>, kDOff>(data)};
+        wpi::util::UnpackStruct<wpi::math::Matrixd<States, States>, kAOff>(
+            data),
+        wpi::util::UnpackStruct<wpi::math::Matrixd<States, Inputs>, kBOff>(
+            data),
+        wpi::util::UnpackStruct<wpi::math::Matrixd<Outputs, States>, kCOff>(
+            data),
+        wpi::util::UnpackStruct<wpi::math::Matrixd<Outputs, Inputs>, kDOff>(
+            data)};
   }
 
-  static void Pack(std::span<uint8_t> data,
-                   const wpi::math::LinearSystem<States, Inputs, Outputs>& value) {
+  static void Pack(
+      std::span<uint8_t> data,
+      const wpi::math::LinearSystem<States, Inputs, Outputs>& value) {
     constexpr size_t kAOff = 0;
     constexpr size_t kBOff =
         kAOff + wpi::util::GetStructSize<wpi::math::Matrixd<States, States>>();

@@ -22,10 +22,10 @@ class SourceImpl;
 
 class RawSinkImpl : public SinkImpl {
  public:
-  RawSinkImpl(std::string_view name, wpi::util::Logger& logger, Notifier& notifier,
-              Telemetry& telemetry);
-  RawSinkImpl(std::string_view name, wpi::util::Logger& logger, Notifier& notifier,
-              Telemetry& telemetry,
+  RawSinkImpl(std::string_view name, wpi::util::Logger& logger,
+              Notifier& notifier, Telemetry& telemetry);
+  RawSinkImpl(std::string_view name, wpi::util::Logger& logger,
+              Notifier& notifier, Telemetry& telemetry,
               std::function<void(uint64_t time)> processFrame);
   ~RawSinkImpl() override;
 

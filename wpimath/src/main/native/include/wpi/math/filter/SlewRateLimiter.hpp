@@ -24,7 +24,8 @@ template <class Unit>
 class SlewRateLimiter {
  public:
   using Unit_t = wpi::units::unit_t<Unit>;
-  using Rate = wpi::units::compound_unit<Unit, wpi::units::inverse<wpi::units::seconds>>;
+  using Rate =
+      wpi::units::compound_unit<Unit, wpi::units::inverse<wpi::units::seconds>>;
   using Rate_t = wpi::units::unit_t<Rate>;
 
   /**
@@ -44,8 +45,8 @@ class SlewRateLimiter {
       : m_positiveRateLimit{positiveRateLimit},
         m_negativeRateLimit{negativeRateLimit},
         m_prevVal{initialValue},
-        m_prevTime{
-            wpi::units::microsecond_t{wpi::math::MathSharedStore::GetTimestamp()}} {}
+        m_prevTime{wpi::units::microsecond_t{
+            wpi::math::MathSharedStore::GetTimestamp()}} {}
 
   /**
    * Creates a new SlewRateLimiter with the given positive rate limit and
@@ -64,7 +65,8 @@ class SlewRateLimiter {
    * rate.
    */
   Unit_t Calculate(Unit_t input) {
-    wpi::units::second_t currentTime = wpi::math::MathSharedStore::GetTimestamp();
+    wpi::units::second_t currentTime =
+        wpi::math::MathSharedStore::GetTimestamp();
     wpi::units::second_t elapsedTime = currentTime - m_prevTime;
     m_prevVal +=
         std::clamp(input - m_prevVal, m_negativeRateLimit * elapsedTime,

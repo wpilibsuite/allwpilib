@@ -22,7 +22,8 @@ wpi::math::Quaternion StructType::Unpack(std::span<const uint8_t> data) {
   };
 }
 
-void StructType::Pack(std::span<uint8_t> data, const wpi::math::Quaternion& value) {
+void StructType::Pack(std::span<uint8_t> data,
+                      const wpi::math::Quaternion& value) {
   wpi::util::PackStruct<kWOff>(data, value.W());
   wpi::util::PackStruct<kXOff>(data, value.X());
   wpi::util::PackStruct<kYOff>(data, value.Y());

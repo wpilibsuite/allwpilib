@@ -38,7 +38,8 @@ namespace wpi {
  * also be shown by using the GetObject() function.  Other objects can
  * also have multiple poses (which will show the object at multiple locations).
  */
-class Field2d : public wpi::nt::NTSendable, public wpi::util::SendableHelper<Field2d> {
+class Field2d : public wpi::nt::NTSendable,
+                public wpi::util::SendableHelper<Field2d> {
  public:
   using Entry = size_t;
 
@@ -61,7 +62,8 @@ class Field2d : public wpi::nt::NTSendable, public wpi::util::SendableHelper<Fie
    * @param y Y location
    * @param rotation rotation
    */
-  void SetRobotPose(wpi::units::meter_t x, wpi::units::meter_t y, wpi::math::Rotation2d rotation);
+  void SetRobotPose(wpi::units::meter_t x, wpi::units::meter_t y,
+                    wpi::math::Rotation2d rotation);
 
   /**
    * Get the robot pose.

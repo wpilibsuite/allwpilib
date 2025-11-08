@@ -26,21 +26,22 @@
 using namespace wpi;
 
 /** Converts volts to PSI per the REV Analog Pressure Sensor datasheet. */
-wpi::units::pounds_per_square_inch_t VoltsToPSI(wpi::units::volt_t sensorVoltage,
-                                           wpi::units::volt_t supplyVoltage) {
+wpi::units::pounds_per_square_inch_t VoltsToPSI(
+    wpi::units::volt_t sensorVoltage, wpi::units::volt_t supplyVoltage) {
   return wpi::units::pounds_per_square_inch_t{
       250 * (sensorVoltage.value() / supplyVoltage.value()) - 25};
 }
 
 /** Converts PSI to volts per the REV Analog Pressure Sensor datasheet. */
 wpi::units::volt_t PSIToVolts(wpi::units::pounds_per_square_inch_t pressure,
-                         wpi::units::volt_t supplyVoltage) {
+                              wpi::units::volt_t supplyVoltage) {
   return wpi::units::volt_t{supplyVoltage.value() *
-                       (0.004 * pressure.value() + 0.1)};
+                            (0.004 * pressure.value() + 0.1)};
 }
 
 wpi::util::mutex PneumaticHub::m_handleLock;
-std::unique_ptr<wpi::util::DenseMap<int, std::weak_ptr<PneumaticHub::DataStore>>[]>
+std::unique_ptr<
+    wpi::util::DenseMap<int, std::weak_ptr<PneumaticHub::DataStore>>[]>
     PneumaticHub::m_handleMaps = nullptr;
 
 // Always called under lock, so we can avoid the double lock from the magic
@@ -49,10 +50,11 @@ std::weak_ptr<PneumaticHub::DataStore>& PneumaticHub::GetDataStore(int busId,
                                                                    int module) {
   int32_t numBuses = HAL_GetNumCanBuses();
   WPILIB_AssertMessage(busId >= 0 && busId < numBuses,
-                    "Bus {} out of range. Must be [0-{}).", busId, numBuses);
+                       "Bus {} out of range. Must be [0-{}).", busId, numBuses);
   if (!m_handleMaps) {
     m_handleMaps = std::make_unique<
-        wpi::util::DenseMap<int, std::weak_ptr<PneumaticHub::DataStore>>[]>(numBuses);
+        wpi::util::DenseMap<int, std::weak_ptr<PneumaticHub::DataStore>>[]>(
+        numBuses);
   }
   return m_handleMaps[busId][module];
 }
@@ -138,17 +140,17 @@ void PneumaticHub::EnableCompressorAnalog(
     wpi::units::pounds_per_square_inch_t maxPressure) {
   if (minPressure >= maxPressure) {
     throw WPILIB_MakeError(err::InvalidParameter,
-                        "maxPressure must be greater than minPressure");
+                           "maxPressure must be greater than minPressure");
   }
   if (minPressure < 0_psi || minPressure > 120_psi) {
     throw WPILIB_MakeError(err::ParameterOutOfRange,
-                        "minPressure must be between 0 and 120 PSI, got {}",
-                        minPressure);
+                           "minPressure must be between 0 and 120 PSI, got {}",
+                           minPressure);
   }
   if (maxPressure < 0_psi || maxPressure > 120_psi) {
     throw WPILIB_MakeError(err::ParameterOutOfRange,
-                        "maxPressure must be between 0 and 120 PSI, got {}",
-                        maxPressure);
+                           "maxPressure must be between 0 and 120 PSI, got {}",
+                           maxPressure);
   }
 
   // Send the voltage as it would be if the 5V rail was at exactly 5V.
@@ -168,17 +170,17 @@ void PneumaticHub::EnableCompressorHybrid(
     wpi::units::pounds_per_square_inch_t maxPressure) {
   if (minPressure >= maxPressure) {
     throw WPILIB_MakeError(err::InvalidParameter,
-                        "maxPressure must be greater than minPressure");
+                           "maxPressure must be greater than minPressure");
   }
   if (minPressure < 0_psi || minPressure > 120_psi) {
     throw WPILIB_MakeError(err::ParameterOutOfRange,
-                        "minPressure must be between 0 and 120 PSI, got {}",
-                        minPressure);
+                           "minPressure must be between 0 and 120 PSI, got {}",
+                           minPressure);
   }
   if (maxPressure < 0_psi || maxPressure > 120_psi) {
     throw WPILIB_MakeError(err::ParameterOutOfRange,
-                        "maxPressure must be between 0 and 120 PSI, got {}",
-                        maxPressure);
+                           "maxPressure must be between 0 and 120 PSI, got {}",
+                           maxPressure);
   }
 
   // Send the voltage as it would be if the 5V rail was at exactly 5V.
@@ -245,7 +247,8 @@ void PneumaticHub::FireOneShot(int index) {
   WPILIB_ReportError(status, "Module {}", m_module);
 }
 
-void PneumaticHub::SetOneShotDuration(int index, wpi::units::second_t duration) {
+void PneumaticHub::SetOneShotDuration(int index,
+                                      wpi::units::second_t duration) {
   m_dataStore->m_oneShotDurMs[index] = duration;
 }
 
@@ -360,7 +363,7 @@ bool PneumaticHub::Faults::GetChannelFault(int channel) const {
       return Channel15Fault != 0;
     default:
       throw WPILIB_MakeError(err::ChannelIndexOutOfRange,
-                          "Pneumatics fault channel out of bounds!");
+                             "Pneumatics fault channel out of bounds!");
   }
 }
 
@@ -405,13 +408,15 @@ wpi::units::volt_t PneumaticHub::GetAnalogVoltage(int channel) const {
   return wpi::units::volt_t{voltage};
 }
 
-wpi::units::pounds_per_square_inch_t PneumaticHub::GetPressure(int channel) const {
+wpi::units::pounds_per_square_inch_t PneumaticHub::GetPressure(
+    int channel) const {
   int32_t status = 0;
   auto sensorVoltage = HAL_GetREVPHAnalogVoltage(m_handle, channel, &status);
   WPILIB_ReportError(status, "Module {}", m_module);
   auto supplyVoltage = HAL_GetREVPH5VVoltage(m_handle, &status);
   WPILIB_ReportError(status, "Module {}", m_module);
-  return VoltsToPSI(wpi::units::volt_t{sensorVoltage}, wpi::units::volt_t{supplyVoltage});
+  return VoltsToPSI(wpi::units::volt_t{sensorVoltage},
+                    wpi::units::volt_t{supplyVoltage});
 }
 
 Solenoid PneumaticHub::MakeSolenoid(int channel) {

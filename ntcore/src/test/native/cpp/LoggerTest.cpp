@@ -30,12 +30,13 @@ void LoggerTest::Generate() {
   wpi::nt::StartClient(m_inst, "");
 
   // generate error message
-  wpi::nt::Publish(wpi::nt::Handle(wpi::nt::Handle{m_inst}.GetInst(), 5, wpi::nt::Handle::kTopic),
-              NT_DOUBLE, "");
+  wpi::nt::Publish(wpi::nt::Handle(wpi::nt::Handle{m_inst}.GetInst(), 5,
+                                   wpi::nt::Handle::kTopic),
+                   NT_DOUBLE, "");
 }
 
-void LoggerTest::Check(const std::vector<wpi::nt::Event>& events, NT_Listener handle,
-                       bool infoMsg, bool errMsg) {
+void LoggerTest::Check(const std::vector<wpi::nt::Event>& events,
+                       NT_Listener handle, bool infoMsg, bool errMsg) {
   size_t count = (infoMsg ? 1u : 0u) + (errMsg ? 1u : 0u);
   ASSERT_EQ(events.size(), count);
   for (size_t i = 0; i < count; ++i) {
@@ -59,8 +60,8 @@ void LoggerTest::Check(const std::vector<wpi::nt::Event>& events, NT_Listener ha
 
 TEST_F(LoggerTest, DefaultLogRange) {
   auto poller = wpi::nt::CreateListenerPoller(m_inst);
-  auto handle =
-      wpi::nt::AddPolledListener(poller, m_inst, wpi::nt::EventFlags::kLogMessage);
+  auto handle = wpi::nt::AddPolledListener(poller, m_inst,
+                                           wpi::nt::EventFlags::kLogMessage);
 
   Generate();
 

@@ -25,7 +25,7 @@ EventLoop::EventLoop() {}
 void EventLoop::Bind(wpi::util::unique_function<void()> action) {
   if (m_running) {
     throw WPILIB_MakeError(err::Error,
-                        "Cannot bind EventLoop while it is running");
+                           "Cannot bind EventLoop while it is running");
   }
   m_bindings.emplace_back(std::move(action));
 }
@@ -40,7 +40,7 @@ void EventLoop::Poll() {
 void EventLoop::Clear() {
   if (m_running) {
     throw WPILIB_MakeError(err::Error,
-                        "Cannot clear EventLoop while it is running");
+                           "Cannot clear EventLoop while it is running");
   }
   m_bindings.clear();
 }

@@ -11,9 +11,11 @@
 #include "wpimath/protobuf/controller.npb.h"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::DifferentialDriveFeedforward> {
+struct WPILIB_DLLEXPORT
+    wpi::util::Protobuf<wpi::math::DifferentialDriveFeedforward> {
   using MessageStruct = wpi_proto_ProtobufDifferentialDriveFeedforward;
-  using InputStream = wpi::util::ProtoInputStream<wpi::math::DifferentialDriveFeedforward>;
+  using InputStream =
+      wpi::util::ProtoInputStream<wpi::math::DifferentialDriveFeedforward>;
   using OutputStream =
       wpi::util::ProtoOutputStream<wpi::math::DifferentialDriveFeedforward>;
   static std::optional<wpi::math::DifferentialDriveFeedforward> Unpack(

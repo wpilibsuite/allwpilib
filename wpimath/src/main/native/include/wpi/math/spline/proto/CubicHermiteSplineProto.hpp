@@ -12,8 +12,12 @@
 template <>
 struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::CubicHermiteSpline> {
   using MessageStruct = wpi_proto_ProtobufCubicHermiteSpline;
-  using InputStream = wpi::util::ProtoInputStream<wpi::math::CubicHermiteSpline>;
-  using OutputStream = wpi::util::ProtoOutputStream<wpi::math::CubicHermiteSpline>;
-  static std::optional<wpi::math::CubicHermiteSpline> Unpack(InputStream& stream);
-  static bool Pack(OutputStream& stream, const wpi::math::CubicHermiteSpline& value);
+  using InputStream =
+      wpi::util::ProtoInputStream<wpi::math::CubicHermiteSpline>;
+  using OutputStream =
+      wpi::util::ProtoOutputStream<wpi::math::CubicHermiteSpline>;
+  static std::optional<wpi::math::CubicHermiteSpline> Unpack(
+      InputStream& stream);
+  static bool Pack(OutputStream& stream,
+                   const wpi::math::CubicHermiteSpline& value);
 };

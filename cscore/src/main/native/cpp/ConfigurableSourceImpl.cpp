@@ -200,7 +200,8 @@ void SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
 extern "C" {
 void CS_NotifySourceError(CS_Source source, const struct WPI_String* msg,
                           CS_Status* status) {
-  return wpi::cs::NotifySourceError(source, wpi::util::to_string_view(msg), status);
+  return wpi::cs::NotifySourceError(source, wpi::util::to_string_view(msg),
+                                    status);
 }
 
 void CS_SetSourceConnected(CS_Source source, CS_Bool connected,
@@ -211,8 +212,8 @@ void CS_SetSourceConnected(CS_Source source, CS_Bool connected,
 void CS_SetSourceDescription(CS_Source source,
                              const struct WPI_String* description,
                              CS_Status* status) {
-  return wpi::cs::SetSourceDescription(source, wpi::util::to_string_view(description),
-                                  status);
+  return wpi::cs::SetSourceDescription(
+      source, wpi::util::to_string_view(description), status);
 }
 
 CS_Property CS_CreateSourceProperty(CS_Source source,
@@ -220,9 +221,9 @@ CS_Property CS_CreateSourceProperty(CS_Source source,
                                     enum CS_PropertyKind kind, int minimum,
                                     int maximum, int step, int defaultValue,
                                     int value, CS_Status* status) {
-  return wpi::cs::CreateSourceProperty(source, wpi::util::to_string_view(name), kind,
-                                  minimum, maximum, step, defaultValue, value,
-                                  status);
+  return wpi::cs::CreateSourceProperty(source, wpi::util::to_string_view(name),
+                                       kind, minimum, maximum, step,
+                                       defaultValue, value, status);
 }
 
 CS_Property CS_CreateSourcePropertyCallback(

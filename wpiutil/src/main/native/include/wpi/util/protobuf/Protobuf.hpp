@@ -232,9 +232,9 @@ class ProtoOutputStream {
  * values into a nanopb Stream and deserialization consists of
  * reading values from nanopb Stream.
  *
- * Implementations must define a template specialization for wpi::util::Protobuf with
- * T being the type that is being serialized/deserialized, with the following
- * static members (as enforced by this concept):
+ * Implementations must define a template specialization for wpi::util::Protobuf
+ * with T being the type that is being serialized/deserialized, with the
+ * following static members (as enforced by this concept):
  * - using MessageStruct = nanopb_message_struct_here: typedef to the wpilib
  *   modified nanopb message struct
  * - std::optional<T> Unpack(wpi::util::ProtoInputStream<T>&): function
@@ -250,7 +250,8 @@ class ProtoOutputStream {
 template <typename T>
 concept ProtobufSerializable = requires(
     wpi::util::ProtoOutputStream<std::remove_cvref_t<T>>& ostream,
-    wpi::util::ProtoInputStream<std::remove_cvref_t<T>>& istream, const T& value) {
+    wpi::util::ProtoInputStream<std::remove_cvref_t<T>>& istream,
+    const T& value) {
   typename Protobuf<typename std::remove_cvref_t<T>>;
   {
     Protobuf<typename std::remove_cvref_t<T>>::Unpack(istream)
@@ -275,8 +276,8 @@ concept ProtobufSerializable = requires(
  *
  * In addition to meeting ProtobufSerializable, implementations must define a
  * wpi::util::Protobuf<T> static member -
- * `bool UnpackInto(T*, wpi::util::ProtoInputStream<T>&)` to update the pointed-to T
- * with the contents of the message.
+ * `bool UnpackInto(T*, wpi::util::ProtoInputStream<T>&)` to update the
+ * pointed-to T with the contents of the message.
  */
 template <typename T>
 concept MutableProtobufSerializable =

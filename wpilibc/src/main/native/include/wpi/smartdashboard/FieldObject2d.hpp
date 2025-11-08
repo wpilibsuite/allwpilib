@@ -52,7 +52,8 @@ class FieldObject2d {
    * @param y Y location
    * @param rotation rotation
    */
-  void SetPose(wpi::units::meter_t x, wpi::units::meter_t y, wpi::math::Rotation2d rotation);
+  void SetPose(wpi::units::meter_t x, wpi::units::meter_t y,
+               wpi::math::Rotation2d rotation);
 
   /**
    * Get the pose.
@@ -97,7 +98,8 @@ class FieldObject2d {
    * @param out output wpi::util::SmallVector to hold 2D poses
    * @return span referring to output wpi::util::SmallVector
    */
-  std::span<const wpi::math::Pose2d> GetPoses(wpi::util::SmallVectorImpl<wpi::math::Pose2d>& out) const;
+  std::span<const wpi::math::Pose2d> GetPoses(
+      wpi::util::SmallVectorImpl<wpi::math::Pose2d>& out) const;
 
  private:
   void UpdateEntry(bool setDefault = false);

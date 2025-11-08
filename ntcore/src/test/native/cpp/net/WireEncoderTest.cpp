@@ -128,7 +128,8 @@ TEST_F(WireEncoderTextTest, AnnounceProperties) {
 }
 
 TEST_F(WireEncoderTextTest, AnnouncePubuid) {
-  net::WireEncodeAnnounce(os, "test", 5, "double", wpi::util::json::object(), 6);
+  net::WireEncodeAnnounce(os, "test", 5, "double", wpi::util::json::object(),
+                          6);
   ASSERT_EQ(os.str(),
             "{\"method\":\"announce\",\"params\":{\"id\":5,\"name\":\"test\","
             "\"properties\":{},\"pubuid\":6,\"type\":\"double\"}}");
@@ -179,8 +180,8 @@ TEST_F(WireEncoderTextTest, MessageUnsubscribe) {
 }
 
 TEST_F(WireEncoderTextTest, MessageAnnounce) {
-  net::ServerMessage msg{
-      net::AnnounceMsg{"test", 5, "double", std::nullopt, wpi::util::json::object()}};
+  net::ServerMessage msg{net::AnnounceMsg{"test", 5, "double", std::nullopt,
+                                          wpi::util::json::object()}};
   ASSERT_TRUE(net::WireEncodeText(os, msg));
   ASSERT_EQ(os.str(),
             "{\"method\":\"announce\",\"params\":{\"id\":5,\"name\":\"test\","
@@ -234,14 +235,15 @@ TEST_F(WireEncoderBinaryTest, Integer) {
 
 TEST_F(WireEncoderBinaryTest, Float) {
   net::WireEncodeBinary(os, 5, 6, Value::MakeFloat(2.5));
-  ASSERT_THAT(out, wpi::util::SpanEq("\x94\x05\x06\x03\xca\x40\x20\x00\x00"_us));
+  ASSERT_THAT(out,
+              wpi::util::SpanEq("\x94\x05\x06\x03\xca\x40\x20\x00\x00"_us));
 }
 
 TEST_F(WireEncoderBinaryTest, Double) {
   net::WireEncodeBinary(os, 5, 6, Value::MakeDouble(2.5));
-  ASSERT_THAT(
-      out,
-      wpi::util::SpanEq("\x94\x05\x06\x01\xcb\x40\x04\x00\x00\x00\x00\x00\x00"_us));
+  ASSERT_THAT(out,
+              wpi::util::SpanEq(
+                  "\x94\x05\x06\x01\xcb\x40\x04\x00\x00\x00\x00\x00\x00"_us));
 }
 
 TEST_F(WireEncoderBinaryTest, String) {
@@ -267,23 +269,24 @@ TEST_F(WireEncoderBinaryTest, IntegerArray) {
 TEST_F(WireEncoderBinaryTest, FloatArray) {
   net::WireEncodeBinary(os, 5, 6, Value::MakeFloatArray({1, 2, 3}));
   ASSERT_THAT(out, wpi::util::SpanEq("\x94\x05\x06\x13\x93"
-                               "\xca\x3f\x80\x00\x00"
-                               "\xca\x40\x00\x00\x00"
-                               "\xca\x40\x40\x00\x00"_us));
+                                     "\xca\x3f\x80\x00\x00"
+                                     "\xca\x40\x00\x00\x00"
+                                     "\xca\x40\x40\x00\x00"_us));
 }
 
 TEST_F(WireEncoderBinaryTest, DoubleArray) {
   net::WireEncodeBinary(os, 5, 6, Value::MakeDoubleArray({1, 2, 3}));
-  ASSERT_THAT(out, wpi::util::SpanEq("\x94\x05\x06\x11\x93"
-                               "\xcb\x3f\xf0\x00\x00\x00\x00\x00\x00"
-                               "\xcb\x40\x00\x00\x00\x00\x00\x00\x00"
-                               "\xcb\x40\x08\x00\x00\x00\x00\x00\x00"_us));
+  ASSERT_THAT(out,
+              wpi::util::SpanEq("\x94\x05\x06\x11\x93"
+                                "\xcb\x3f\xf0\x00\x00\x00\x00\x00\x00"
+                                "\xcb\x40\x00\x00\x00\x00\x00\x00\x00"
+                                "\xcb\x40\x08\x00\x00\x00\x00\x00\x00"_us));
 }
 
 TEST_F(WireEncoderBinaryTest, StringArray) {
   net::WireEncodeBinary(os, 5, 6, Value::MakeStringArray({"hello", "bye"}));
   ASSERT_THAT(out, wpi::util::SpanEq("\x94\x05\x06\x14\x92\xa5hello\xa3"
-                               "bye"_us));
+                                     "bye"_us));
 }
 
 }  // namespace wpi::nt

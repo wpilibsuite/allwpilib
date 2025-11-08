@@ -31,8 +31,9 @@ class Telemetry;
 
 class UsbCameraImpl : public SourceImpl {
  public:
-  UsbCameraImpl(std::string_view name, wpi::util::Logger& logger, Notifier& notifier,
-                Telemetry& telemetry, std::string_view path);
+  UsbCameraImpl(std::string_view name, wpi::util::Logger& logger,
+                Notifier& notifier, Telemetry& telemetry,
+                std::string_view path);
   ~UsbCameraImpl() override;
 
   void Start() override;

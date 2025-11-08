@@ -17,7 +17,7 @@
 namespace wpi::util {
 class Logger;
 class raw_ostream;
-}  // namespace wpi
+}  // namespace wpi::util
 
 namespace wpi::nt::server {
 
@@ -34,7 +34,8 @@ class ServerStorage final {
 
   ServerTopic* CreateTopic(ServerClient* client, std::string_view name,
                            std::string_view typeStr,
-                           const wpi::util::json& properties, bool special = false);
+                           const wpi::util::json& properties,
+                           bool special = false);
   ServerTopic* CreateMetaTopic(std::string_view name);
   void DeleteTopic(ServerTopic* topic);
   void SetProperties(ServerClient* client, ServerTopic* topic,

@@ -17,9 +17,9 @@ void TimesliceRobot::Schedule(std::function<void()> func,
                               wpi::units::second_t allocation) {
   if (m_nextOffset + allocation > m_controllerPeriod) {
     throw WPILIB_MakeError(err::Error,
-                        "Function scheduled at offset {} with allocation {} "
-                        "exceeded controller period of {}\n",
-                        m_nextOffset, allocation, m_controllerPeriod);
+                           "Function scheduled at offset {} with allocation {} "
+                           "exceeded controller period of {}\n",
+                           m_nextOffset, allocation, m_controllerPeriod);
   }
 
   AddPeriodic(func, m_controllerPeriod, m_nextOffset);

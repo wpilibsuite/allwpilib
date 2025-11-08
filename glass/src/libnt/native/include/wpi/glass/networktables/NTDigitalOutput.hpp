@@ -21,7 +21,8 @@ class NTDigitalOutputModel : public DIOModel {
 
   // path is to the table containing ".type", excluding the trailing /
   explicit NTDigitalOutputModel(std::string_view path);
-  NTDigitalOutputModel(wpi::nt::NetworkTableInstance inst, std::string_view path);
+  NTDigitalOutputModel(wpi::nt::NetworkTableInstance inst,
+                       std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
 

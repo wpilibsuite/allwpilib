@@ -228,7 +228,8 @@ class PneumaticsBase {
    * @return The pressure read by an analog pressure sensor on the
    * specified analog input channel.
    */
-  virtual wpi::units::pounds_per_square_inch_t GetPressure(int channel) const = 0;
+  virtual wpi::units::pounds_per_square_inch_t GetPressure(
+      int channel) const = 0;
 
   /**
    * Create a solenoid object for the specified channel.

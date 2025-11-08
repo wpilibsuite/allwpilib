@@ -18,14 +18,15 @@ using namespace wpi::hal;
 using namespace wpi::hal::sim;
 using namespace wpi::util::java;
 
-static wpi::hal::UnlimitedHandleResource<SIM_JniHandle, BufferCallbackStore,
-                                    wpi::hal::HAL_HandleEnum::SimulationJni>*
-    callbackHandles;
+static wpi::hal::UnlimitedHandleResource<
+    SIM_JniHandle, BufferCallbackStore,
+    wpi::hal::HAL_HandleEnum::SimulationJni>* callbackHandles;
 
 namespace wpi::hal::sim {
 void InitializeBufferStore() {
-  static wpi::hal::UnlimitedHandleResource<SIM_JniHandle, BufferCallbackStore,
-                                      wpi::hal::HAL_HandleEnum::SimulationJni>
+  static wpi::hal::UnlimitedHandleResource<
+      SIM_JniHandle, BufferCallbackStore,
+      wpi::hal::HAL_HandleEnum::SimulationJni>
       cb;
   callbackHandles = &cb;
 }

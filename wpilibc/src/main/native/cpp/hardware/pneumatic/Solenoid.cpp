@@ -19,17 +19,19 @@ Solenoid::Solenoid(int busId, int module, PneumaticsModuleType moduleType,
     : m_module{PneumaticsBase::GetForType(busId, module, moduleType)},
       m_channel{channel} {
   if (!m_module->CheckSolenoidChannel(m_channel)) {
-    throw WPILIB_MakeError(err::ChannelIndexOutOfRange, "Channel {}", m_channel);
+    throw WPILIB_MakeError(err::ChannelIndexOutOfRange, "Channel {}",
+                           m_channel);
   }
   m_mask = 1 << channel;
 
   if (m_module->CheckAndReserveSolenoids(m_mask) != 0) {
-    throw WPILIB_MakeError(err::ResourceAlreadyAllocated, "Channel {}", m_channel);
+    throw WPILIB_MakeError(err::ResourceAlreadyAllocated, "Channel {}",
+                           m_channel);
   }
 
   m_module->ReportUsage(fmt::format("Solenoid[{}]", m_channel), "Solenoid");
-  wpi::util::SendableRegistry::Add(this, "Solenoid", m_module->GetModuleNumber(),
-                             m_channel);
+  wpi::util::SendableRegistry::Add(this, "Solenoid",
+                                   m_module->GetModuleNumber(), m_channel);
 }
 
 Solenoid::Solenoid(int busId, PneumaticsModuleType moduleType, int channel)

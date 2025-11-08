@@ -93,9 +93,9 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
    */
   constexpr ChassisSpeeds ToRobotRelative(const Rotation2d& robotAngle) const {
     // CW rotation into chassis frame
-    auto rotated =
-        Translation2d{wpi::units::meter_t{vx.value()}, wpi::units::meter_t{vy.value()}}
-            .RotateBy(-robotAngle);
+    auto rotated = Translation2d{wpi::units::meter_t{vx.value()},
+                                 wpi::units::meter_t{vy.value()}}
+                       .RotateBy(-robotAngle);
     return {wpi::units::meters_per_second_t{rotated.X().value()},
             wpi::units::meters_per_second_t{rotated.Y().value()}, omega};
   }
@@ -113,9 +113,9 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
    */
   constexpr ChassisSpeeds ToFieldRelative(const Rotation2d& robotAngle) const {
     // CCW rotation out of chassis frame
-    auto rotated =
-        Translation2d{wpi::units::meter_t{vx.value()}, wpi::units::meter_t{vy.value()}}
-            .RotateBy(robotAngle);
+    auto rotated = Translation2d{wpi::units::meter_t{vx.value()},
+                                 wpi::units::meter_t{vy.value()}}
+                       .RotateBy(robotAngle);
     return {wpi::units::meters_per_second_t{rotated.X().value()},
             wpi::units::meters_per_second_t{rotated.Y().value()}, omega};
   }

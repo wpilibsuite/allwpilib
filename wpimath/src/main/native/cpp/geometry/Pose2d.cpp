@@ -8,7 +8,7 @@
 
 void wpi::math::to_json(wpi::util::json& json, const Pose2d& pose) {
   json = wpi::util::json{{"translation", pose.Translation()},
-                   {"rotation", pose.Rotation()}};
+                         {"rotation", pose.Rotation()}};
 }
 
 void wpi::math::from_json(const wpi::util::json& json, Pose2d& pose) {
