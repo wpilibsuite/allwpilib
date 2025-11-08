@@ -145,7 +145,8 @@ class WPILIB_DLLEXPORT QuinticHermiteSpline : public Spline<5> {
    * @return The control vector matrix for a dimension.
    */
   static constexpr Vectord<6> ControlVectorFromArrays(
-      wpi::util::array<double, 3> initialVector, wpi::util::array<double, 3> finalVector) {
+      wpi::util::array<double, 3> initialVector,
+      wpi::util::array<double, 3> finalVector) {
     return Vectord<6>{{initialVector[0]}, {initialVector[1]},
                       {initialVector[2]}, {finalVector[0]},
                       {finalVector[1]},   {finalVector[2]}};

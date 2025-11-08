@@ -23,9 +23,9 @@ AnalogPotentiometer::AnalogPotentiometer(int channel, double fullRange,
 
 AnalogPotentiometer::AnalogPotentiometer(AnalogInput* input, double fullRange,
                                          double offset)
-    : AnalogPotentiometer(
-          std::shared_ptr<AnalogInput>(input, wpi::util::NullDeleter<AnalogInput>()),
-          fullRange, offset) {}
+    : AnalogPotentiometer(std::shared_ptr<AnalogInput>(
+                              input, wpi::util::NullDeleter<AnalogInput>()),
+                          fullRange, offset) {}
 
 AnalogPotentiometer::AnalogPotentiometer(std::shared_ptr<AnalogInput> input,
                                          double fullRange, double offset)
@@ -33,7 +33,7 @@ AnalogPotentiometer::AnalogPotentiometer(std::shared_ptr<AnalogInput> input,
       m_fullRange(fullRange),
       m_offset(offset) {
   wpi::util::SendableRegistry::Add(this, "AnalogPotentiometer",
-                             m_analog_input->GetChannel());
+                                   m_analog_input->GetChannel());
 }
 
 double AnalogPotentiometer::Get() const {

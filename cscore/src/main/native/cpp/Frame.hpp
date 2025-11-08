@@ -21,9 +21,9 @@ namespace wpi::cs {
 
 class SourceImpl;
 
-std::unique_ptr<Image> CreateImageFromBGRA(wpi::cs::SourceImpl* source, size_t width,
-                                           size_t height, size_t stride,
-                                           const uint8_t* data);
+std::unique_ptr<Image> CreateImageFromBGRA(wpi::cs::SourceImpl* source,
+                                           size_t width, size_t height,
+                                           size_t stride, const uint8_t* data);
 
 class Frame {
   friend class SourceImpl;

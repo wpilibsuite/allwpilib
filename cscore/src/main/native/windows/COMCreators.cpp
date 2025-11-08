@@ -94,7 +94,8 @@ STDMETHODIMP SourceReaderCB::OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex,
 
 // Create a Source Reader COM Smart Object
 ComPtr<SourceReaderCB> CreateSourceReaderCB(
-    std::weak_ptr<wpi::cs::UsbCameraImpl> source, const wpi::cs::VideoMode& mode) {
+    std::weak_ptr<wpi::cs::UsbCameraImpl> source,
+    const wpi::cs::VideoMode& mode) {
   SourceReaderCB* ptr = new SourceReaderCB(source, mode);
   ComPtr<SourceReaderCB> sourceReaderCB;
   sourceReaderCB.Attach(ptr);

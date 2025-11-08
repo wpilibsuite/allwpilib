@@ -122,7 +122,8 @@ void HALSimWSProviderDriverStation::DoCancelCallbacks() {
   m_matchTimeCbKey = 0;
 }
 
-void HALSimWSProviderDriverStation::OnNetValueChanged(const wpi::util::json& json) {
+void HALSimWSProviderDriverStation::OnNetValueChanged(
+    const wpi::util::json& json) {
   // ignore if DS connected
   if (gDSSocketConnected && *gDSSocketConnected) {
     return;

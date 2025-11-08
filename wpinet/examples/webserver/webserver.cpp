@@ -26,7 +26,7 @@ class MyHttpServerConnection : public wpi::net::HttpServerConnection {
 void MyHttpServerConnection::ProcessRequest() {
   wpi::util::print(stderr, "HTTP request: '{}'\n", m_request.GetUrl());
   wpi::net::UrlParser url{m_request.GetUrl(),
-                     m_request.GetMethod() == wpi::net::HTTP_CONNECT};
+                          m_request.GetMethod() == wpi::net::HTTP_CONNECT};
   if (!url.IsValid()) {
     // failed to parse URL
     SendError(400);

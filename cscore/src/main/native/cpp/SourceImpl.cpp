@@ -190,7 +190,8 @@ bool SourceImpl::SetConfigJson(std::string_view config, CS_Status* status) {
   return SetConfigJson(j, status);
 }
 
-bool SourceImpl::SetConfigJson(const wpi::util::json& config, CS_Status* status) {
+bool SourceImpl::SetConfigJson(const wpi::util::json& config,
+                               CS_Status* status) {
   VideoMode mode;
 
   // pixel format
@@ -260,8 +261,9 @@ bool SourceImpl::SetConfigJson(const wpi::util::json& config, CS_Status* status)
   } else {
     if (mode.pixelFormat != wpi::cs::VideoMode::kUnknown) {
       SINFO("SetConfigJson: setting pixelFormat {}", mode.pixelFormat);
-      SetPixelFormat(static_cast<wpi::cs::VideoMode::PixelFormat>(mode.pixelFormat),
-                     status);
+      SetPixelFormat(
+          static_cast<wpi::cs::VideoMode::PixelFormat>(mode.pixelFormat),
+          status);
     }
     if (mode.width != 0 && mode.height != 0) {
       SINFO("SetConfigJson: setting width {}, height {}", mode.width,

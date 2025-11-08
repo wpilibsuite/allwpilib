@@ -12,7 +12,7 @@
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 class ReplaceMeInstantCommand2
     : public wpi::cmd::CommandHelper<wpi::cmd::InstantCommand,
-                                 ReplaceMeInstantCommand2> {
+                                     ReplaceMeInstantCommand2> {
  public:
   ReplaceMeInstantCommand2();
 

@@ -93,7 +93,9 @@ class EncoderSimModel : public wpi::glass::EncoderModel {
   }
   wpi::glass::IntegerSource* GetCountData() override { return &m_count; }
   wpi::glass::DoubleSource* GetPeriodData() override { return &m_period; }
-  wpi::glass::BooleanSource* GetDirectionData() override { return &m_direction; }
+  wpi::glass::BooleanSource* GetDirectionData() override {
+    return &m_direction;
+  }
   wpi::glass::DoubleSource* GetDistanceData() override { return &m_distance; }
   wpi::glass::DoubleSource* GetRateData() override { return &m_rate; }
 
@@ -201,8 +203,8 @@ class EncodersSimModel : public wpi::glass::EncodersModel {
   bool Exists() override { return true; }
 
   void ForEachEncoder(
-      wpi::util::function_ref<void(wpi::glass::EncoderModel& model, int index)> func)
-      override;
+      wpi::util::function_ref<void(wpi::glass::EncoderModel& model, int index)>
+          func) override;
 
  private:
   std::vector<std::unique_ptr<EncoderSimModel>> m_models;
@@ -224,7 +226,8 @@ void EncodersSimModel::Update() {
 }
 
 void EncodersSimModel::ForEachEncoder(
-    wpi::util::function_ref<void(wpi::glass::EncoderModel& model, int index)> func) {
+    wpi::util::function_ref<void(wpi::glass::EncoderModel& model, int index)>
+        func) {
   for (int32_t i = 0, iend = static_cast<int32_t>(m_models.size()); i < iend;
        ++i) {
     if (auto model = m_models[i].get()) {

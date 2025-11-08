@@ -16,9 +16,9 @@
 namespace wpi::net {
 
 /**
- * wpi::util::raw_ostream style output to a wpi::util::SmallVector of uv::Buffer buffers.  Fixed-size
- * buffers are allocated and appended as necessary to fit the data being output.
- * The wpi::util::SmallVector need not be empty at start.
+ * wpi::util::raw_ostream style output to a wpi::util::SmallVector of uv::Buffer
+ * buffers.  Fixed-size buffers are allocated and appended as necessary to fit
+ * the data being output. The wpi::util::SmallVector need not be empty at start.
  */
 class raw_uv_ostream : public wpi::util::raw_ostream {
  public:

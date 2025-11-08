@@ -15,7 +15,7 @@
 
 namespace wpi::util {
 class Logger;
-}  // namespace wpi
+}  // namespace wpi::util
 
 namespace wpi::nt::net {
 
@@ -35,7 +35,8 @@ class ClientMessageQueueImpl final : public ClientMessageHandler,
  public:
   static constexpr size_t kBlockSize = 64;
 
-  explicit ClientMessageQueueImpl(wpi::util::Logger& logger) : m_logger{logger} {}
+  explicit ClientMessageQueueImpl(wpi::util::Logger& logger)
+      : m_logger{logger} {}
 
   bool empty() const { return m_queue.empty(); }
 
@@ -71,7 +72,8 @@ class ClientMessageQueueImpl final : public ClientMessageHandler,
 
   // ClientMessageHandler - calls to these append to the queue
   void ClientPublish(int pubuid, std::string_view name,
-                     std::string_view typeStr, const wpi::util::json& properties,
+                     std::string_view typeStr,
+                     const wpi::util::json& properties,
                      const PubSubOptionsImpl& options) final {
     std::scoped_lock lock{m_mutex};
     m_queue.enqueue(ClientMessage{PublishMsg{

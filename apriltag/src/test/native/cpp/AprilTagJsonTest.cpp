@@ -15,9 +15,10 @@ using namespace wpi::apriltag;
 
 TEST(AprilTagJsonTest, DeserializeMatches) {
   auto layout = AprilTagFieldLayout{
-      std::vector{
-          AprilTag{1, wpi::math::Pose3d{}},
-          AprilTag{3, wpi::math::Pose3d{0_m, 1_m, 0_m, wpi::math::Rotation3d{0_deg, 0_deg, 0_deg}}}},
+      std::vector{AprilTag{1, wpi::math::Pose3d{}},
+                  AprilTag{3, wpi::math::Pose3d{0_m, 1_m, 0_m,
+                                                wpi::math::Rotation3d{
+                                                    0_deg, 0_deg, 0_deg}}}},
       54_ft, 27_ft};
 
   AprilTagFieldLayout deserialized;

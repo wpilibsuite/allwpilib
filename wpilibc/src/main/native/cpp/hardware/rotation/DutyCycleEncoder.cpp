@@ -61,19 +61,19 @@ DutyCycleEncoder::DutyCycleEncoder(std::shared_ptr<DutyCycle> dutyCycle,
 
 void DutyCycleEncoder::Init(double fullRange, double expectedZero) {
   m_simDevice = wpi::hal::SimDevice{"DutyCycle:DutyCycleEncoder",
-                               m_dutyCycle->GetSourceChannel()};
+                                    m_dutyCycle->GetSourceChannel()};
 
   if (m_simDevice) {
     m_simPosition = m_simDevice.CreateDouble("Position", false, 0.0);
-    m_simIsConnected =
-        m_simDevice.CreateBoolean("Connected", wpi::hal::SimDevice::kInput, true);
+    m_simIsConnected = m_simDevice.CreateBoolean(
+        "Connected", wpi::hal::SimDevice::kInput, true);
   }
 
   m_fullRange = fullRange;
   m_expectedZero = expectedZero;
 
   wpi::util::SendableRegistry::Add(this, "DutyCycle Encoder",
-                             m_dutyCycle->GetSourceChannel());
+                                   m_dutyCycle->GetSourceChannel());
 }
 
 double DutyCycleEncoder::Get() const {

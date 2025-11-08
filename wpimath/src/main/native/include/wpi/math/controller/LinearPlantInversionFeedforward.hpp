@@ -44,7 +44,8 @@ class LinearPlantInversionFeedforward {
    */
   template <int Outputs>
   LinearPlantInversionFeedforward(
-      const LinearSystem<States, Inputs, Outputs>& plant, wpi::units::second_t dt)
+      const LinearSystem<States, Inputs, Outputs>& plant,
+      wpi::units::second_t dt)
       : LinearPlantInversionFeedforward(plant.A(), plant.B(), dt) {}
 
   /**

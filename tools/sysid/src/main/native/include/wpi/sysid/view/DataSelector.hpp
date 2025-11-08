@@ -19,7 +19,7 @@
 
 namespace wpi::glass {
 class Storage;
-}  // namespace glass
+}  // namespace wpi::glass
 
 namespace wpi {
 namespace log {
@@ -27,7 +27,7 @@ class DataLogReaderEntry;
 }  // namespace log
 namespace util {
 class Logger;
-}
+}  // namespace util
 }  // namespace wpi
 
 namespace sysid {

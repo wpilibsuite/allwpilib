@@ -19,7 +19,8 @@ WPI_MulticastServiceResolverHandle WPI_CreateMulticastServiceResolver(
   auto& manager = wpi::net::GetMulticastManager();
   std::scoped_lock lock{manager.mutex};
 
-  auto resolver = std::make_unique<wpi::net::MulticastServiceResolver>(serviceType);
+  auto resolver =
+      std::make_unique<wpi::net::MulticastServiceResolver>(serviceType);
 
   size_t index = manager.handleIds.emplace_back(2);
   manager.resolvers[index] = std::move(resolver);
@@ -99,7 +100,8 @@ WPI_ServiceData* WPI_GetMulticastServiceResolverData(
     allocSize += valuesTotalLength;
   }
 
-  uint8_t* cDataRaw = reinterpret_cast<uint8_t*>(wpi::util::safe_malloc(allocSize));
+  uint8_t* cDataRaw =
+      reinterpret_cast<uint8_t*>(wpi::util::safe_malloc(allocSize));
   if (!cDataRaw) {
     return nullptr;
   }

@@ -47,8 +47,8 @@ class NetworkTableListener final {
   static NetworkTableListener CreateListener(
       NetworkTableInstance inst, std::span<const std::string_view> prefixes,
       unsigned int mask, ListenerCallback listener) {
-    return NetworkTableListener{::wpi::nt::AddListener(inst.GetHandle(), prefixes,
-                                                  mask, std::move(listener))};
+    return NetworkTableListener{::wpi::nt::AddListener(
+        inst.GetHandle(), prefixes, mask, std::move(listener))};
   }
 
   /**
@@ -78,8 +78,8 @@ class NetworkTableListener final {
   static NetworkTableListener CreateListener(Subscriber& subscriber,
                                              unsigned int mask,
                                              ListenerCallback listener) {
-    return NetworkTableListener{
-        ::wpi::nt::AddListener(subscriber.GetHandle(), mask, std::move(listener))};
+    return NetworkTableListener{::wpi::nt::AddListener(
+        subscriber.GetHandle(), mask, std::move(listener))};
   }
 
   /**
@@ -94,8 +94,8 @@ class NetworkTableListener final {
   static NetworkTableListener CreateListener(MultiSubscriber& subscriber,
                                              unsigned int mask,
                                              ListenerCallback listener) {
-    return NetworkTableListener{
-        ::wpi::nt::AddListener(subscriber.GetHandle(), mask, std::move(listener))};
+    return NetworkTableListener{::wpi::nt::AddListener(
+        subscriber.GetHandle(), mask, std::move(listener))};
   }
 
   /**
@@ -166,8 +166,8 @@ class NetworkTableListener final {
                                            unsigned int minLevel,
                                            unsigned int maxLevel,
                                            ListenerCallback listener) {
-    return NetworkTableListener{::wpi::nt::AddLogger(inst.GetHandle(), minLevel,
-                                                maxLevel, std::move(listener))};
+    return NetworkTableListener{::wpi::nt::AddLogger(
+        inst.GetHandle(), minLevel, maxLevel, std::move(listener))};
   }
 
   NetworkTableListener(const NetworkTableListener&) = delete;
@@ -386,14 +386,18 @@ class NetworkTableListenerPoller final {
    *
    * @param listener Listener handle
    */
-  void RemoveListener(NT_Listener listener) { ::wpi::nt::RemoveListener(listener); }
+  void RemoveListener(NT_Listener listener) {
+    ::wpi::nt::RemoveListener(listener);
+  }
 
   /**
    * Read events.
    *
    * @return Events since the previous call to ReadQueue()
    */
-  std::vector<Event> ReadQueue() { return ::wpi::nt::ReadListenerQueue(m_handle); }
+  std::vector<Event> ReadQueue() {
+    return ::wpi::nt::ReadListenerQueue(m_handle);
+  }
 
  private:
   NT_ListenerPoller m_handle{0};

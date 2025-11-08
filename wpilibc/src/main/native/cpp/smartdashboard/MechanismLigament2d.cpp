@@ -28,7 +28,8 @@ MechanismLigament2d::MechanismLigament2d(std::string_view name, double length,
 void MechanismLigament2d::UpdateEntries(
     std::shared_ptr<wpi::nt::NetworkTable> table) {
   m_typePub = table->GetStringTopic(".type").PublishEx(
-      wpi::nt::StringTopic::kTypeString, {{"SmartDashboard", kSmartDashboardType}});
+      wpi::nt::StringTopic::kTypeString,
+      {{"SmartDashboard", kSmartDashboardType}});
   m_typePub.Set(kSmartDashboardType);
 
   m_colorEntry = table->GetStringTopic("color").GetEntry("");
@@ -45,7 +46,7 @@ void MechanismLigament2d::SetColor(const Color8Bit& color) {
   std::scoped_lock lock(m_mutex);
 
   wpi::util::format_to_n_c_str(m_color, sizeof(m_color), "#{:02X}{:02X}{:02X}",
-                         color.red, color.green, color.blue);
+                               color.red, color.green, color.blue);
 
   if (m_colorEntry) {
     m_colorEntry.Set(m_color);

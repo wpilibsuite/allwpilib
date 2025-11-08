@@ -126,7 +126,7 @@ void NetworkServer::ServerConnection::ConnectionClosed() {
 void NetworkServer::ServerConnection4::ProcessRequest() {
   DEBUG1("HTTP request: '{}'", m_request.GetUrl());
   wpi::net::UrlParser url{m_request.GetUrl(),
-                     m_request.GetMethod() == wpi::net::HTTP_CONNECT};
+                          m_request.GetMethod() == wpi::net::HTTP_CONNECT};
   if (!url.IsValid()) {
     // failed to parse URL
     SendError(400);
@@ -255,7 +255,8 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
 NetworkServer::NetworkServer(std::string_view persistentFilename,
                              std::string_view listenAddress, unsigned int port,
                              net::ILocalStorage& localStorage,
-                             IConnectionList& connList, wpi::util::Logger& logger,
+                             IConnectionList& connList,
+                             wpi::util::Logger& logger,
                              std::function<void()> initDone)
     : m_localStorage{localStorage},
       m_connList{connList},

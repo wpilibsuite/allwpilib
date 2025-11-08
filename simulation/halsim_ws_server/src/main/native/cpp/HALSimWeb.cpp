@@ -72,7 +72,8 @@ bool HALSimWeb::Initialize() {
     try {
       m_port = std::stoi(port);
     } catch (const std::invalid_argument& err) {
-      wpi::util::print(stderr, "Error decoding HALSIMWS_PORT ({})\n", err.what());
+      wpi::util::print(stderr, "Error decoding HALSIMWS_PORT ({})\n",
+                       err.what());
       return false;
     }
   } else {
@@ -82,8 +83,9 @@ bool HALSimWeb::Initialize() {
   const char* msgFilters = std::getenv("HALSIMWS_FILTERS");
   if (msgFilters != nullptr) {
     m_useMsgFiltering = true;
-    wpi::util::split(wpi::util::trim(msgFilters), ',', -1, false,
-               [&](auto val) { m_msgFilters[wpi::util::trim(val)] = true; });
+    wpi::util::split(
+        wpi::util::trim(msgFilters), ',', -1, false,
+        [&](auto val) { m_msgFilters[wpi::util::trim(val)] = true; });
   } else {
     m_useMsgFiltering = false;
   }

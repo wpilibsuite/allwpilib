@@ -16,8 +16,9 @@ using namespace wpi;
 using namespace wpi::sim;
 
 DifferentialDrivetrainSim::DifferentialDrivetrainSim(
-    wpi::math::LinearSystem<2, 2, 2> plant, wpi::units::meter_t trackwidth, wpi::math::DCMotor driveMotor,
-    double gearRatio, wpi::units::meter_t wheelRadius,
+    wpi::math::LinearSystem<2, 2, 2> plant, wpi::units::meter_t trackwidth,
+    wpi::math::DCMotor driveMotor, double gearRatio,
+    wpi::units::meter_t wheelRadius,
     const std::array<double, 7>& measurementStdDevs)
     : m_plant(std::move(plant)),
       m_rb(trackwidth / 2.0),
@@ -32,9 +33,10 @@ DifferentialDrivetrainSim::DifferentialDrivetrainSim(
 }
 
 DifferentialDrivetrainSim::DifferentialDrivetrainSim(
-    wpi::math::DCMotor driveMotor, double gearing, wpi::units::kilogram_square_meter_t J,
-    wpi::units::kilogram_t mass, wpi::units::meter_t wheelRadius,
-    wpi::units::meter_t trackwidth, const std::array<double, 7>& measurementStdDevs)
+    wpi::math::DCMotor driveMotor, double gearing,
+    wpi::units::kilogram_square_meter_t J, wpi::units::kilogram_t mass,
+    wpi::units::meter_t wheelRadius, wpi::units::meter_t trackwidth,
+    const std::array<double, 7>& measurementStdDevs)
     : DifferentialDrivetrainSim(
           wpi::math::LinearSystemId::DrivetrainVelocitySystem(
               driveMotor, mass, wheelRadius, trackwidth / 2.0, J, gearing),
@@ -42,8 +44,8 @@ DifferentialDrivetrainSim::DifferentialDrivetrainSim(
 
 Eigen::Vector2d DifferentialDrivetrainSim::ClampInput(
     const Eigen::Vector2d& u) {
-  return wpi::math::DesaturateInputVector<2>(u,
-                                       wpi::RobotController::GetInputVoltage());
+  return wpi::math::DesaturateInputVector<2>(
+      u, wpi::RobotController::GetInputVoltage());
 }
 
 void DifferentialDrivetrainSim::SetInputs(wpi::units::volt_t leftVoltage,
@@ -57,7 +59,8 @@ void DifferentialDrivetrainSim::SetGearing(double newGearing) {
 }
 
 void DifferentialDrivetrainSim::Update(wpi::units::second_t dt) {
-  m_x = wpi::math::RKDP([this](auto& x, auto& u) { return Dynamics(x, u); }, m_x, m_u, dt);
+  m_x = wpi::math::RKDP([this](auto& x, auto& u) { return Dynamics(x, u); },
+                        m_x, m_u, dt);
   m_y = m_x + wpi::math::MakeWhiteNoiseVector<7>(m_measurementStdDevs);
 }
 
@@ -87,22 +90,24 @@ wpi::math::Rotation2d DifferentialDrivetrainSim::GetHeading() const {
 
 wpi::math::Pose2d DifferentialDrivetrainSim::GetPose() const {
   return wpi::math::Pose2d{wpi::units::meter_t{GetOutput(State::kX)},
-                wpi::units::meter_t{GetOutput(State::kY)}, GetHeading()};
+                           wpi::units::meter_t{GetOutput(State::kY)},
+                           GetHeading()};
 }
 
 wpi::units::ampere_t DifferentialDrivetrainSim::GetLeftCurrentDraw() const {
-  return m_motor.Current(wpi::units::radians_per_second_t{m_x(State::kLeftVelocity) *
-                                                     m_currentGearing /
-                                                     m_wheelRadius.value()},
-                         wpi::units::volt_t{m_u(0)}) *
+  return m_motor.Current(
+             wpi::units::radians_per_second_t{m_x(State::kLeftVelocity) *
+                                              m_currentGearing /
+                                              m_wheelRadius.value()},
+             wpi::units::volt_t{m_u(0)}) *
          wpi::util::sgn(m_u(0));
 }
 
 wpi::units::ampere_t DifferentialDrivetrainSim::GetRightCurrentDraw() const {
   return m_motor.Current(
              wpi::units::radians_per_second_t{m_x(State::kRightVelocity) *
-                                         m_currentGearing /
-                                         m_wheelRadius.value()},
+                                              m_currentGearing /
+                                              m_wheelRadius.value()},
              wpi::units::volt_t{m_u(1)}) *
          wpi::util::sgn(m_u(1));
 }
@@ -123,8 +128,8 @@ void DifferentialDrivetrainSim::SetPose(const wpi::math::Pose2d& pose) {
   m_x(State::kRightPosition) = 0;
 }
 
-wpi::math::Vectord<7> DifferentialDrivetrainSim::Dynamics(const wpi::math::Vectord<7>& x,
-                                               const Eigen::Vector2d& u) {
+wpi::math::Vectord<7> DifferentialDrivetrainSim::Dynamics(
+    const wpi::math::Vectord<7>& x, const Eigen::Vector2d& u) {
   // Because G² can be factored out of A, we can divide by the old ratio
   // squared and multiply by the new ratio squared to get a new drivetrain
   // model.

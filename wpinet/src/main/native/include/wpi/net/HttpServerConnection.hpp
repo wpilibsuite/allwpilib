@@ -65,7 +65,8 @@ class HttpServerConnection {
    *                      be set to false.
    * @param extra Extra HTTP headers to send, including final "\r\n"
    */
-  virtual void BuildHeader(wpi::util::raw_ostream& os, int code, std::string_view codeText,
+  virtual void BuildHeader(wpi::util::raw_ostream& os, int code,
+                           std::string_view codeText,
                            std::string_view contentType, uint64_t contentLength,
                            std::string_view extra = {});
 

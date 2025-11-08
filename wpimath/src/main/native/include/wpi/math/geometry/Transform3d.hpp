@@ -47,8 +47,8 @@ class WPILIB_DLLEXPORT Transform3d {
    * @param z The z component of the translational component of the transform.
    * @param rotation The rotational component of the transform.
    */
-  constexpr Transform3d(wpi::units::meter_t x, wpi::units::meter_t y, wpi::units::meter_t z,
-                        Rotation3d rotation)
+  constexpr Transform3d(wpi::units::meter_t x, wpi::units::meter_t y,
+                        wpi::units::meter_t z, Rotation3d rotation)
       : m_translation{x, y, z}, m_rotation{std::move(rotation)} {}
 
   /**

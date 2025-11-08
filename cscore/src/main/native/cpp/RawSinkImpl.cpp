@@ -233,8 +233,8 @@ uint64_t CS_GrabRawSinkFrameTimeoutWithFrameTime(CS_Sink sink,
                                                  double timeout,
                                                  uint64_t lastFrameTime,
                                                  CS_Status* status) {
-  return wpi::cs::GrabSinkFrameTimeoutLastTime(sink, *image, timeout, lastFrameTime,
-                                          status);
+  return wpi::cs::GrabSinkFrameTimeoutLastTime(sink, *image, timeout,
+                                               lastFrameTime, status);
 }
 
 }  // extern "C"

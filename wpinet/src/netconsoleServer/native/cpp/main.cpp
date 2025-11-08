@@ -34,8 +34,8 @@ namespace uv = wpi::net::uv;
 static uint64_t startTime = wpi::util::Now();
 
 static bool NewlineBuffer(std::string& rem, uv::Buffer& buf, size_t len,
-                          wpi::util::SmallVectorImpl<uv::Buffer>& bufs, bool tcp,
-                          uint16_t tcpSeq) {
+                          wpi::util::SmallVectorImpl<uv::Buffer>& bufs,
+                          bool tcp, uint16_t tcpSeq) {
   // scan for last newline
   std::string_view str(buf.base, len);
   size_t idx = str.rfind('\n');
@@ -156,7 +156,7 @@ int main(int argc, char* argv[]) {
       broadcastUdp = true;
     } else {
       wpi::util::print(stderr, "unrecognized command line option {}\n",
-                 argv[programArgc]);
+                       argv[programArgc]);
       err = true;
     }
     ++programArgc;
@@ -175,8 +175,9 @@ int main(int argc, char* argv[]) {
   uv::Process::DisableStdioInheritance();
 
   auto loop = uv::Loop::Create();
-  loop->error.connect(
-      [](uv::Error err) { wpi::util::print(stderr, "uv ERROR: {}\n", err.str()); });
+  loop->error.connect([](uv::Error err) {
+    wpi::util::print(stderr, "uv ERROR: {}\n", err.str());
+  });
 
   // create pipes to communicate with child
   auto stdinPipe = uv::Pipe::Create(loop);
@@ -223,7 +224,8 @@ int main(int argc, char* argv[]) {
       }
 
       // close on error
-      tcp->error.connect([s = tcp.get()](wpi::net::uv::Error err) { s->Close(); });
+      tcp->error.connect(
+          [s = tcp.get()](wpi::net::uv::Error err) { s->Close(); });
 
       // tee stdout and stderr
       CopyTcp(*stdoutPipe, tcp);

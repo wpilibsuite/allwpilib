@@ -57,8 +57,8 @@ class NTMechanism2DModel : public Mechanism2DModel {
   class NTMechanismObjectModel;
   class NTMechanismGroupImpl final {
    public:
-    NTMechanismGroupImpl(wpi::nt::NetworkTableInstance inst, std::string_view path,
-                         std::string_view name)
+    NTMechanismGroupImpl(wpi::nt::NetworkTableInstance inst,
+                         std::string_view path, std::string_view name)
         : m_inst{inst}, m_path{path}, m_name{name} {}
 
     const char* GetName() const { return m_name.c_str(); }
@@ -76,8 +76,8 @@ class NTMechanism2DModel : public Mechanism2DModel {
 
   class NTMechanismObjectModel final : public MechanismObjectModel {
    public:
-    NTMechanismObjectModel(wpi::nt::NetworkTableInstance inst, std::string_view path,
-                           std::string_view name)
+    NTMechanismObjectModel(wpi::nt::NetworkTableInstance inst,
+                           std::string_view path, std::string_view name)
         : m_group{inst, path, name},
           m_typeTopic{inst.GetTopic(fmt::format("{}/.type", path))},
           m_colorTopic{inst.GetTopic(fmt::format("{}/color", path))},

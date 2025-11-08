@@ -21,7 +21,7 @@ Vectord<2> StateDynamics(const Vectord<2>& x) {
 
 TEST(ControlAffinePlantInversionFeedforwardTest, Calculate) {
   wpi::math::ControlAffinePlantInversionFeedforward<2, 1> feedforward{&Dynamics,
-                                                                20_ms};
+                                                                      20_ms};
 
   Vectord<2> r{2, 2};
   Vectord<2> nextR{3, 3};

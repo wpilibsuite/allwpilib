@@ -21,7 +21,8 @@ struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::MecanumDriveKinematics> {
            "rear_left;Translation2d rear_right";
   }
 
-  static wpi::math::MecanumDriveKinematics Unpack(std::span<const uint8_t> data);
+  static wpi::math::MecanumDriveKinematics Unpack(
+      std::span<const uint8_t> data);
   static void Pack(std::span<uint8_t> data,
                    const wpi::math::MecanumDriveKinematics& value);
   static void ForEachNested(

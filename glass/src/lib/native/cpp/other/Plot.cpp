@@ -350,8 +350,9 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
   CheckSource();
 
   char label[128];
-  wpi::util::format_to_n_c_str(label, sizeof(label), "{}###name{}_{}", GetName(),
-                         static_cast<int>(i), static_cast<int>(plotIndex));
+  wpi::util::format_to_n_c_str(label, sizeof(label), "{}###name{}_{}",
+                               GetName(), static_cast<int>(i),
+                               static_cast<int>(plotIndex));
 
   int size = m_size;
   int offset = m_offset;
@@ -619,7 +620,7 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
 
   char label[128];
   wpi::util::format_to_n_c_str(label, sizeof(label), "{}###plot{}", m_name,
-                         static_cast<int>(i));
+                               static_cast<int>(i));
 
   ImPlotFlags plotFlags = (m_legend ? 0 : ImPlotFlags_NoLegend) |
                           (m_crosshairs ? ImPlotFlags_Crosshairs : 0) |
@@ -976,15 +977,16 @@ void PlotView::Settings() {
 
     char name[64];
     if (!plot->GetName().empty()) {
-      wpi::util::format_to_n_c_str(name, sizeof(name), "{}", plot->GetName().c_str());
+      wpi::util::format_to_n_c_str(name, sizeof(name), "{}",
+                                   plot->GetName().c_str());
     } else {
       wpi::util::format_to_n_c_str(name, sizeof(name), "Plot {}",
-                             static_cast<int>(i));
+                                   static_cast<int>(i));
     }
 
     char label[90];
     wpi::util::format_to_n_c_str(label, sizeof(label), "{}###header{}", name,
-                           static_cast<int>(i));
+                                 static_cast<int>(i));
 
     bool open = ImGui::CollapsingHeader(label);
 
@@ -1053,7 +1055,8 @@ void PlotProvider::DisplayMenu() {
     char id[32];
     size_t numWindows = m_windows.size();
     for (size_t i = 0; i <= numWindows; ++i) {
-      wpi::util::format_to_n_c_str(id, sizeof(id), "Plot <{}>", static_cast<int>(i));
+      wpi::util::format_to_n_c_str(id, sizeof(id), "Plot <{}>",
+                                   static_cast<int>(i));
 
       bool match = false;
       for (size_t j = 0; j < numWindows; ++j) {

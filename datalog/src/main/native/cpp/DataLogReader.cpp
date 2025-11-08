@@ -97,7 +97,8 @@ bool DataLogRecord::GetFloat(float* value) const {
   if (m_data.size() != 4) {
     return false;
   }
-  *value = std::bit_cast<float>(wpi::util::support::endian::read32le(m_data.data()));
+  *value =
+      std::bit_cast<float>(wpi::util::support::endian::read32le(m_data.data()));
   return true;
 }
 
@@ -105,7 +106,8 @@ bool DataLogRecord::GetDouble(double* value) const {
   if (m_data.size() != 8) {
     return false;
   }
-  *value = std::bit_cast<double>(wpi::util::support::endian::read64le(m_data.data()));
+  *value = std::bit_cast<double>(
+      wpi::util::support::endian::read64le(m_data.data()));
   return true;
 }
 
@@ -142,8 +144,8 @@ bool DataLogRecord::GetFloatArray(std::vector<float>* arr) const {
   }
   arr->reserve(m_data.size() / 4);
   for (size_t pos = 0; pos < m_data.size(); pos += 4) {
-    arr->push_back(
-        std::bit_cast<float>(wpi::util::support::endian::read32le(&m_data[pos])));
+    arr->push_back(std::bit_cast<float>(
+        wpi::util::support::endian::read32le(&m_data[pos])));
   }
   return true;
 }
@@ -155,8 +157,8 @@ bool DataLogRecord::GetDoubleArray(std::vector<double>* arr) const {
   }
   arr->reserve(m_data.size() / 8);
   for (size_t pos = 0; pos < m_data.size(); pos += 8) {
-    arr->push_back(
-        std::bit_cast<double>(wpi::util::support::endian::read64le(&m_data[pos])));
+    arr->push_back(std::bit_cast<double>(
+        wpi::util::support::endian::read64le(&m_data[pos])));
   }
   return true;
 }

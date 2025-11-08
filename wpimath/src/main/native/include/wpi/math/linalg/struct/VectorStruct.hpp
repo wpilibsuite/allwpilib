@@ -11,13 +11,15 @@
 #include "wpi/util/struct/Struct.hpp"
 
 template <int Size, int Options, int MaxRows, int MaxCols>
-struct wpi::util::Struct<wpi::math::Matrixd<Size, 1, Options, MaxRows, MaxCols>> {
+struct wpi::util::Struct<
+    wpi::math::Matrixd<Size, 1, Options, MaxRows, MaxCols>> {
   static constexpr ct_string kTypeName =
       wpi::util::Concat("Vector__"_ct_string, wpi::util::NumToCtString<Size>());
   static constexpr std::string_view GetTypeName() { return kTypeName; }
   static constexpr size_t GetSize() { return Size * 8; }
-  static constexpr ct_string kSchema = wpi::util::Concat(
-      "double data["_ct_string, wpi::util::NumToCtString<Size>(), "]"_ct_string);
+  static constexpr ct_string kSchema =
+      wpi::util::Concat("double data["_ct_string,
+                        wpi::util::NumToCtString<Size>(), "]"_ct_string);
   static constexpr std::string_view GetSchema() { return kSchema; }
 
   static wpi::math::Matrixd<Size, 1, Options, MaxRows, MaxCols> Unpack(

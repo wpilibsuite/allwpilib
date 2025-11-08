@@ -6,7 +6,7 @@
 
 namespace wpi::glass {
 class EncodersModel;
-}  // namespace glass
+}  // namespace wpi::glass
 
 namespace halsimgui {
 

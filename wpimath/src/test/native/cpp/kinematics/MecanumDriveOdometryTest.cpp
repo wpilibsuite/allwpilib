@@ -80,19 +80,22 @@ TEST_F(MecanumDriveOdometryTest, GyroAngleReset) {
 TEST_F(MecanumDriveOdometryTest, AccuracyFacingTrajectory) {
   wpi::math::MecanumDriveKinematics kinematics{
       wpi::math::Translation2d{1_m, 1_m}, wpi::math::Translation2d{1_m, -1_m},
-      wpi::math::Translation2d{-1_m, -1_m}, wpi::math::Translation2d{-1_m, 1_m}};
+      wpi::math::Translation2d{-1_m, -1_m},
+      wpi::math::Translation2d{-1_m, 1_m}};
 
   wpi::math::MecanumDriveWheelPositions wheelPositions;
 
   wpi::math::MecanumDriveOdometry odometry{kinematics, wpi::math::Rotation2d{},
-                                     wheelPositions};
+                                           wheelPositions};
 
-  wpi::math::Trajectory trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
-      std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg}, wpi::math::Pose2d{3_m, 0_m, -90_deg},
-                  wpi::math::Pose2d{0_m, 0_m, 135_deg},
-                  wpi::math::Pose2d{-3_m, 0_m, -90_deg},
-                  wpi::math::Pose2d{0_m, 0_m, 45_deg}},
-      wpi::math::TrajectoryConfig(5.0_mps, 2.0_mps_sq));
+  wpi::math::Trajectory trajectory =
+      wpi::math::TrajectoryGenerator::GenerateTrajectory(
+          std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
+                      wpi::math::Pose2d{3_m, 0_m, -90_deg},
+                      wpi::math::Pose2d{0_m, 0_m, 135_deg},
+                      wpi::math::Pose2d{-3_m, 0_m, -90_deg},
+                      wpi::math::Pose2d{0_m, 0_m, 45_deg}},
+          wpi::math::TrajectoryConfig(5.0_mps, 2.0_mps_sq));
 
   std::default_random_engine generator;
   std::normal_distribution<double> distribution(0.0, 1.0);
@@ -120,10 +123,10 @@ TEST_F(MecanumDriveOdometryTest, AccuracyFacingTrajectory) {
     wheelPositions.rearLeft += wheelSpeeds.rearLeft * dt;
     wheelPositions.rearRight += wheelSpeeds.rearRight * dt;
 
-    auto xhat =
-        odometry.Update(groundTruthState.pose.Rotation() +
-                            wpi::math::Rotation2d{distribution(generator) * 0.05_rad},
-                        wheelPositions);
+    auto xhat = odometry.Update(
+        groundTruthState.pose.Rotation() +
+            wpi::math::Rotation2d{distribution(generator) * 0.05_rad},
+        wheelPositions);
     double error = groundTruthState.pose.Translation()
                        .Distance(xhat.Translation())
                        .value();
@@ -143,19 +146,22 @@ TEST_F(MecanumDriveOdometryTest, AccuracyFacingTrajectory) {
 TEST_F(MecanumDriveOdometryTest, AccuracyFacingXAxis) {
   wpi::math::MecanumDriveKinematics kinematics{
       wpi::math::Translation2d{1_m, 1_m}, wpi::math::Translation2d{1_m, -1_m},
-      wpi::math::Translation2d{-1_m, -1_m}, wpi::math::Translation2d{-1_m, 1_m}};
+      wpi::math::Translation2d{-1_m, -1_m},
+      wpi::math::Translation2d{-1_m, 1_m}};
 
   wpi::math::MecanumDriveWheelPositions wheelPositions;
 
   wpi::math::MecanumDriveOdometry odometry{kinematics, wpi::math::Rotation2d{},
-                                     wheelPositions};
+                                           wheelPositions};
 
-  wpi::math::Trajectory trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
-      std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg}, wpi::math::Pose2d{3_m, 0_m, -90_deg},
-                  wpi::math::Pose2d{0_m, 0_m, 135_deg},
-                  wpi::math::Pose2d{-3_m, 0_m, -90_deg},
-                  wpi::math::Pose2d{0_m, 0_m, 45_deg}},
-      wpi::math::TrajectoryConfig(5.0_mps, 2.0_mps_sq));
+  wpi::math::Trajectory trajectory =
+      wpi::math::TrajectoryGenerator::GenerateTrajectory(
+          std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
+                      wpi::math::Pose2d{3_m, 0_m, -90_deg},
+                      wpi::math::Pose2d{0_m, 0_m, 135_deg},
+                      wpi::math::Pose2d{-3_m, 0_m, -90_deg},
+                      wpi::math::Pose2d{0_m, 0_m, 45_deg}},
+          wpi::math::TrajectoryConfig(5.0_mps, 2.0_mps_sq));
 
   std::default_random_engine generator;
   std::normal_distribution<double> distribution(0.0, 1.0);
@@ -185,7 +191,8 @@ TEST_F(MecanumDriveOdometryTest, AccuracyFacingXAxis) {
     wheelPositions.rearRight += wheelSpeeds.rearRight * dt;
 
     auto xhat = odometry.Update(
-        wpi::math::Rotation2d{distribution(generator) * 0.05_rad}, wheelPositions);
+        wpi::math::Rotation2d{distribution(generator) * 0.05_rad},
+        wheelPositions);
     double error = groundTruthState.pose.Translation()
                        .Distance(xhat.Translation())
                        .value();

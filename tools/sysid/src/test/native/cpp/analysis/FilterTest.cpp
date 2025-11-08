@@ -136,8 +136,8 @@ TEST(FilterTest, StepTrim) {
 }
 
 template <int Derivative, int Samples, typename F, typename DfDx>
-void AssertCentralResults(F&& f, DfDx&& dfdx, wpi::units::second_t h, double min,
-                          double max) {
+void AssertCentralResults(F&& f, DfDx&& dfdx, wpi::units::second_t h,
+                          double min, double max) {
   static_assert(Samples % 2 != 0, "Number of samples must be odd.");
 
   auto filter = sysid::CentralFiniteDifference<Derivative, Samples>(h);

@@ -123,7 +123,8 @@ class TimedRobot : public IterativeRobotBase {
   std::chrono::microseconds m_startTime;
   uint64_t m_loopStartTimeUs = 0;
 
-  wpi::util::priority_queue<Callback, std::vector<Callback>, std::greater<Callback>>
+  wpi::util::priority_queue<Callback, std::vector<Callback>,
+                            std::greater<Callback>>
       m_callbacks;
 };
 

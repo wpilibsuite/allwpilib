@@ -49,7 +49,8 @@ static void CheckSize(const std::vector<PreparedData>& data, size_t window,
  * @return True, if the key corresponds to a raw dataset.
  */
 static bool IsRaw(std::string_view key) {
-  return wpi::util::contains(key, "raw") && !wpi::util::contains(key, "original");
+  return wpi::util::contains(key, "raw") &&
+         !wpi::util::contains(key, "original");
 }
 
 /**
@@ -60,7 +61,8 @@ static bool IsRaw(std::string_view key) {
  * @return True, if the key corresponds to a filtered dataset.
  */
 static bool IsFiltered(std::string_view key) {
-  return !wpi::util::contains(key, "raw") && !wpi::util::contains(key, "original");
+  return !wpi::util::contains(key, "raw") &&
+         !wpi::util::contains(key, "original");
 }
 
 /**
@@ -156,7 +158,8 @@ sysid::TrimStepVoltageData(std::vector<PreparedData>* data,
   auto accelBegins = std::find_if(
       data->begin(), data->end(), [&maxAccel](const auto& measurement) {
         return wpi::util::sgn(measurement.velocity) * measurement.acceleration >
-               0.8 * wpi::util::sgn(maxAccel->velocity) * maxAccel->acceleration;
+               0.8 * wpi::util::sgn(maxAccel->velocity) *
+                   maxAccel->acceleration;
       });
 
   wpi::units::second_t velocityDelay;
@@ -229,7 +232,8 @@ double sysid::GetMaxSpeed(
   return max;
 }
 
-wpi::units::second_t sysid::GetMeanTimeDelta(const std::vector<PreparedData>& data) {
+wpi::units::second_t sysid::GetMeanTimeDelta(
+    const std::vector<PreparedData>& data) {
   std::vector<wpi::units::second_t> dts;
 
   for (const auto& pt : data) {
@@ -342,8 +346,9 @@ void sysid::InitialTrimAndFilter(
     wpi::util::StringMap<std::vector<PreparedData>>* data,
     AnalysisManager::Settings* settings,
     std::vector<wpi::units::second_t>& positionDelays,
-    std::vector<wpi::units::second_t>& velocityDelays, wpi::units::second_t& minStepTime,
-    wpi::units::second_t& maxStepTime, std::string_view unit) {
+    std::vector<wpi::units::second_t>& velocityDelays,
+    wpi::units::second_t& minStepTime, wpi::units::second_t& maxStepTime,
+    std::string_view unit) {
   auto& preparedData = *data;
 
   // Find the maximum Step Test Duration of the dynamic tests

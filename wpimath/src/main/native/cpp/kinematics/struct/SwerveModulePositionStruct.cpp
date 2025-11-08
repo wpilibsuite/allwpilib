@@ -11,7 +11,8 @@ constexpr size_t kAngleOff = kDistanceOff + 8;
 
 using StructType = wpi::util::Struct<wpi::math::SwerveModulePosition>;
 
-wpi::math::SwerveModulePosition StructType::Unpack(std::span<const uint8_t> data) {
+wpi::math::SwerveModulePosition StructType::Unpack(
+    std::span<const uint8_t> data) {
   return wpi::math::SwerveModulePosition{
       wpi::units::meter_t{wpi::util::UnpackStruct<double, kDistanceOff>(data)},
       wpi::util::UnpackStruct<wpi::math::Rotation2d, kAngleOff>(data),

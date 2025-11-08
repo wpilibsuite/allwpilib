@@ -7,8 +7,8 @@
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 #include "wpimath/protobuf/geometry2d.npb.h"
 
-std::optional<wpi::math::Transform2d> wpi::util::Protobuf<wpi::math::Transform2d>::Unpack(
-    InputStream& stream) {
+std::optional<wpi::math::Transform2d>
+wpi::util::Protobuf<wpi::math::Transform2d>::Unpack(InputStream& stream) {
   wpi::util::UnpackCallback<wpi::math::Translation2d> tsln;
   wpi::util::UnpackCallback<wpi::math::Rotation2d> rot;
   wpi_proto_ProtobufTransform2d msg{
@@ -32,8 +32,8 @@ std::optional<wpi::math::Transform2d> wpi::util::Protobuf<wpi::math::Transform2d
   };
 }
 
-bool wpi::util::Protobuf<wpi::math::Transform2d>::Pack(OutputStream& stream,
-                                           const wpi::math::Transform2d& value) {
+bool wpi::util::Protobuf<wpi::math::Transform2d>::Pack(
+    OutputStream& stream, const wpi::math::Transform2d& value) {
   wpi::util::PackCallback tsln{&value.Translation()};
   wpi::util::PackCallback rot{&value.Rotation()};
   wpi_proto_ProtobufTransform2d msg{

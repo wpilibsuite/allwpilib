@@ -35,7 +35,8 @@ TEST_F(SwerveDriveOdometry3dTest, Initialize) {
       m_kinematics,
       wpi::math::Rotation3d{},
       {zero, zero, zero, zero},
-      wpi::math::Pose3d{1_m, 2_m, 0_m, wpi::math::Rotation3d{0_deg, 0_deg, 45_deg}}};
+      wpi::math::Pose3d{1_m, 2_m, 0_m,
+                        wpi::math::Rotation3d{0_deg, 0_deg, 45_deg}}};
 
   const wpi::math::Pose3d& pose = odometry.GetPose();
 
@@ -140,8 +141,9 @@ TEST_F(SwerveDriveOdometry3dTest, AccuracyFacingTrajectory) {
     br.angle = moduleStates[3].angle;
 
     auto xhat = odometry.Update(
-        wpi::math::Rotation3d{groundTruthState.pose.Rotation() +
-                        wpi::math::Rotation2d{distribution(generator) * 0.05_rad}},
+        wpi::math::Rotation3d{
+            groundTruthState.pose.Rotation() +
+            wpi::math::Rotation2d{distribution(generator) * 0.05_rad}},
         {fl, fr, bl, br});
     double error = groundTruthState.pose.Translation()
                        .Distance(xhat.Translation().ToTranslation2d())

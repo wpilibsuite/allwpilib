@@ -74,8 +74,8 @@ class WPILIB_DLLEXPORT Trajectory {
 
       // Check whether the robot is reversing at this stage.
       const auto reversing =
-          velocity < 0_mps ||
-          (wpi::units::math::abs(velocity) < 1E-9_mps && acceleration < 0_mps_sq);
+          velocity < 0_mps || (wpi::units::math::abs(velocity) < 1E-9_mps &&
+                               acceleration < 0_mps_sq);
 
       // Calculate the new velocity.
       // v = v_0 + at
@@ -95,9 +95,10 @@ class WPILIB_DLLEXPORT Trajectory {
       const double interpolationFrac =
           newS / endValue.pose.Translation().Distance(pose.Translation());
 
-      return {newT, newV, acceleration,
-              wpi::util::Lerp(pose, endValue.pose, interpolationFrac),
-              wpi::util::Lerp(curvature, endValue.curvature, interpolationFrac)};
+      return {
+          newT, newV, acceleration,
+          wpi::util::Lerp(pose, endValue.pose, interpolationFrac),
+          wpi::util::Lerp(curvature, endValue.curvature, interpolationFrac)};
     }
   };
 

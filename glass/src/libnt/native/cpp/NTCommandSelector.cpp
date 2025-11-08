@@ -13,10 +13,11 @@
 using namespace wpi::glass;
 
 NTCommandSelectorModel::NTCommandSelectorModel(std::string_view path)
-    : NTCommandSelectorModel(wpi::nt::NetworkTableInstance::GetDefault(), path) {}
+    : NTCommandSelectorModel(wpi::nt::NetworkTableInstance::GetDefault(),
+                             path) {}
 
-NTCommandSelectorModel::NTCommandSelectorModel(wpi::nt::NetworkTableInstance inst,
-                                               std::string_view path)
+NTCommandSelectorModel::NTCommandSelectorModel(
+    wpi::nt::NetworkTableInstance inst, std::string_view path)
     : m_inst{inst},
       m_running{inst.GetBooleanTopic(fmt::format("{}/running", path))
                     .GetEntry(false)},

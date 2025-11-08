@@ -48,9 +48,9 @@ class AddressableLEDsModel : public wpi::glass::LEDDisplaysModel {
 
   size_t GetNumLEDDisplays() override { return m_models.size(); }
 
-  void ForEachLEDDisplay(
-      wpi::util::function_ref<void(wpi::glass::LEDDisplayModel& model, int channel)> func)
-      override;
+  void ForEachLEDDisplay(wpi::util::function_ref<
+                         void(wpi::glass::LEDDisplayModel& model, int channel)>
+                             func) override;
 
  private:
   std::vector<std::unique_ptr<AddressableLEDModel>> m_models;
@@ -83,7 +83,9 @@ bool AddressableLEDsModel::Exists() {
 }
 
 void AddressableLEDsModel::ForEachLEDDisplay(
-    wpi::util::function_ref<void(wpi::glass::LEDDisplayModel& model, int channel)> func) {
+    wpi::util::function_ref<void(wpi::glass::LEDDisplayModel& model,
+                                 int channel)>
+        func) {
   for (int i = 0; i < static_cast<int>(m_models.size()); ++i) {
     if (m_models[i]) {
       func(*m_models[i], i);
@@ -109,7 +111,8 @@ void AddressableLEDGui::Initialize() {
         win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
         win->SetDefaultPos(290, 100);
         return wpi::glass::MakeFunctionView([=] {
-          wpi::glass::DisplayLEDDisplays(static_cast<AddressableLEDsModel*>(model));
+          wpi::glass::DisplayLEDDisplays(
+              static_cast<AddressableLEDsModel*>(model));
         });
       });
 }

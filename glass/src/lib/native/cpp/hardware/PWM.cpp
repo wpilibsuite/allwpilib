@@ -25,7 +25,8 @@ void wpi::glass::DisplayPWM(PWMModel* model, int index, bool outputsEnabled) {
   std::string& name = GetStorage().GetString("name");
   char label[128];
   if (!name.empty()) {
-    wpi::util::format_to_n_c_str(label, sizeof(label), "{} [{}]###name", name, index);
+    wpi::util::format_to_n_c_str(label, sizeof(label), "{} [{}]###name", name,
+                                 index);
   } else {
     wpi::util::format_to_n_c_str(label, sizeof(label), "PWM[{}]###name", index);
   }
@@ -39,7 +40,7 @@ void wpi::glass::DisplayPWM(PWMModel* model, int index, bool outputsEnabled) {
 }
 
 void wpi::glass::DisplayPWMs(PWMsModel* model, bool outputsEnabled,
-                        std::string_view noneMsg) {
+                             std::string_view noneMsg) {
   bool hasAny = false;
   bool first = true;
   model->ForEachPWM([&](PWMModel& pwm, int i) {

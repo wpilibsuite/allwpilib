@@ -12,7 +12,7 @@
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 class ReplaceMeParallelCommandGroup
     : public wpi::cmd::CommandHelper<wpi::cmd::ParallelCommandGroup,
-                                 ReplaceMeParallelCommandGroup> {
+                                     ReplaceMeParallelCommandGroup> {
  public:
   ReplaceMeParallelCommandGroup();
 };

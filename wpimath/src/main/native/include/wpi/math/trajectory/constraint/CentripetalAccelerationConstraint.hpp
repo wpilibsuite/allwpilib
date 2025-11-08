@@ -43,7 +43,7 @@ class WPILIB_DLLEXPORT CentripetalAccelerationConstraint
     // The units library defines a unit for radians although it is technically
     // unitless.
     return wpi::units::math::sqrt(m_maxCentripetalAcceleration /
-                             wpi::units::math::abs(curvature) * 1_rad);
+                                  wpi::units::math::abs(curvature) * 1_rad);
   }
 
   constexpr MinMax MinMaxAcceleration(

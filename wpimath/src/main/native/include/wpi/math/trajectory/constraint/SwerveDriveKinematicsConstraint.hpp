@@ -40,8 +40,9 @@ class SwerveDriveKinematicsConstraint : public TrajectoryConstraint {
     return wpi::units::math::hypot(normSpeeds.vx, normSpeeds.vy);
   }
 
-  MinMax MinMaxAcceleration(const Pose2d& pose, wpi::units::curvature_t curvature,
-                            wpi::units::meters_per_second_t speed) const override {
+  MinMax MinMaxAcceleration(
+      const Pose2d& pose, wpi::units::curvature_t curvature,
+      wpi::units::meters_per_second_t speed) const override {
     return {};
   }
 

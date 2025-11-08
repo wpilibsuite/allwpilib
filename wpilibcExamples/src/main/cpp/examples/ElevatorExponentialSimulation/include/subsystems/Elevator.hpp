@@ -35,11 +35,13 @@ class Elevator {
   wpi::math::DCMotor m_elevatorGearbox = wpi::math::DCMotor::NEO(2);
 
   // Standard classes for controlling our elevator
-  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>::Constraints
-      m_constraints{Constants::kElevatorMaxV, Constants::kElevatorkV,
-                    Constants::kElevatorkA};
-  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts> m_profile{m_constraints};
-  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>::State m_setpoint;
+  wpi::math::ExponentialProfile<wpi::units::meters,
+                                wpi::units::volts>::Constraints m_constraints{
+      Constants::kElevatorMaxV, Constants::kElevatorkV, Constants::kElevatorkA};
+  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>
+      m_profile{m_constraints};
+  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>::State
+      m_setpoint;
 
   wpi::math::PIDController m_controller{
       Constants::kElevatorKp, Constants::kElevatorKi, Constants::kElevatorKd};

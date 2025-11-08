@@ -29,10 +29,13 @@ struct Instance {
 
   std::shared_ptr<wpi::nt::NetworkTable> table{
       wpi::nt::NetworkTableInstance::GetDefault().GetTable(kTableName)};
-  wpi::nt::StringPublisher typePublisher{table->GetStringTopic(".type").PublishEx(
-      wpi::nt::StringTopic::kTypeString, {{"SmartDashboard", kSmartDashboardType}})};
-  wpi::nt::MultiSubscriber tableSubscriber{wpi::nt::NetworkTableInstance::GetDefault(),
-                                      {{fmt::format("{}/", table->GetPath())}}};
+  wpi::nt::StringPublisher typePublisher{
+      table->GetStringTopic(".type").PublishEx(
+          wpi::nt::StringTopic::kTypeString,
+          {{"SmartDashboard", kSmartDashboardType}})};
+  wpi::nt::MultiSubscriber tableSubscriber{
+      wpi::nt::NetworkTableInstance::GetDefault(),
+      {{fmt::format("{}/", table->GetPath())}}};
   wpi::nt::NetworkTableListener listener;
 };
 }  // namespace

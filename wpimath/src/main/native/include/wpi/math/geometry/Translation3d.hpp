@@ -43,7 +43,8 @@ class WPILIB_DLLEXPORT Translation3d {
    * @param y The y component of the translation.
    * @param z The z component of the translation.
    */
-  constexpr Translation3d(wpi::units::meter_t x, wpi::units::meter_t y, wpi::units::meter_t z)
+  constexpr Translation3d(wpi::units::meter_t x, wpi::units::meter_t y,
+                          wpi::units::meter_t z)
       : m_x{x}, m_y{y}, m_z{z} {}
 
   /**
@@ -53,7 +54,8 @@ class WPILIB_DLLEXPORT Translation3d {
    * @param distance The distance from the origin to the end of the translation.
    * @param angle The angle between the x-axis and the translation vector.
    */
-  constexpr Translation3d(wpi::units::meter_t distance, const Rotation3d& angle) {
+  constexpr Translation3d(wpi::units::meter_t distance,
+                          const Rotation3d& angle) {
     auto rectangular = Translation3d{distance, 0_m, 0_m}.RotateBy(angle);
     m_x = rectangular.X();
     m_y = rectangular.Y();
@@ -93,8 +95,8 @@ class WPILIB_DLLEXPORT Translation3d {
    */
   constexpr wpi::units::meter_t Distance(const Translation3d& other) const {
     return wpi::units::math::sqrt(wpi::units::math::pow<2>(other.m_x - m_x) +
-                             wpi::units::math::pow<2>(other.m_y - m_y) +
-                             wpi::units::math::pow<2>(other.m_z - m_z));
+                                  wpi::units::math::pow<2>(other.m_y - m_y) +
+                                  wpi::units::math::pow<2>(other.m_z - m_z));
   }
 
   /**
@@ -178,7 +180,8 @@ class WPILIB_DLLEXPORT Translation3d {
   constexpr Translation3d RotateBy(const Rotation3d& other) const {
     Quaternion p{0.0, m_x.value(), m_y.value(), m_z.value()};
     auto qprime = other.GetQuaternion() * p * other.GetQuaternion().Inverse();
-    return Translation3d{wpi::units::meter_t{qprime.X()}, wpi::units::meter_t{qprime.Y()},
+    return Translation3d{wpi::units::meter_t{qprime.X()},
+                         wpi::units::meter_t{qprime.Y()},
                          wpi::units::meter_t{qprime.Z()}};
   }
 

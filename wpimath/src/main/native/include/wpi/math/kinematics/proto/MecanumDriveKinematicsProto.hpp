@@ -12,9 +12,12 @@
 template <>
 struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::MecanumDriveKinematics> {
   using MessageStruct = wpi_proto_ProtobufMecanumDriveKinematics;
-  using InputStream = wpi::util::ProtoInputStream<wpi::math::MecanumDriveKinematics>;
-  using OutputStream = wpi::util::ProtoOutputStream<wpi::math::MecanumDriveKinematics>;
-  static std::optional<wpi::math::MecanumDriveKinematics> Unpack(InputStream& stream);
+  using InputStream =
+      wpi::util::ProtoInputStream<wpi::math::MecanumDriveKinematics>;
+  using OutputStream =
+      wpi::util::ProtoOutputStream<wpi::math::MecanumDriveKinematics>;
+  static std::optional<wpi::math::MecanumDriveKinematics> Unpack(
+      InputStream& stream);
   static bool Pack(OutputStream& stream,
                    const wpi::math::MecanumDriveKinematics& value);
 };

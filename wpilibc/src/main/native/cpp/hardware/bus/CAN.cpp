@@ -23,7 +23,7 @@ CAN::CAN(int busId, int deviceId, int deviceManufacturer, int deviceType) {
       busId, static_cast<HAL_CANManufacturer>(deviceManufacturer), deviceId,
       static_cast<HAL_CANDeviceType>(deviceType), &status);
   WPILIB_CheckErrorStatus(status, "device id {} mfg {} type {}", deviceId,
-                       deviceManufacturer, deviceType);
+                          deviceManufacturer, deviceType);
 
   HAL_ReportUsage(
       fmt::format("CAN[{}][{}][{}]", deviceType, deviceManufacturer, deviceId),

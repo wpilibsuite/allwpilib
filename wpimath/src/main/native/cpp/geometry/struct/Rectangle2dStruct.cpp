@@ -6,7 +6,8 @@
 
 namespace {
 constexpr size_t kCenterOff = 0;
-constexpr size_t kXWidthOff = kCenterOff + wpi::util::GetStructSize<wpi::math::Pose2d>();
+constexpr size_t kXWidthOff =
+    kCenterOff + wpi::util::GetStructSize<wpi::math::Pose2d>();
 constexpr size_t kYWidthOff = kXWidthOff + 8;
 }  // namespace
 
@@ -20,7 +21,8 @@ wpi::math::Rectangle2d StructType::Unpack(std::span<const uint8_t> data) {
   };
 }
 
-void StructType::Pack(std::span<uint8_t> data, const wpi::math::Rectangle2d& value) {
+void StructType::Pack(std::span<uint8_t> data,
+                      const wpi::math::Rectangle2d& value) {
   wpi::util::PackStruct<kCenterOff>(data, value.Center());
   wpi::util::PackStruct<kXWidthOff>(data, value.XWidth().value());
   wpi::util::PackStruct<kYWidthOff>(data, value.YWidth().value());

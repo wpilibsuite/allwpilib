@@ -7,7 +7,7 @@
 #include "wpi/glass/DataSource.hpp"
 
 #define HALSIMGUI_DATASOURCE(cbname, id, TYPE, Type, vtype)                   \
-  class cbname##Source : public ::wpi::glass::Type##Source {                       \
+  class cbname##Source : public ::wpi::glass::Type##Source {                  \
    public:                                                                    \
     cbname##Source()                                                          \
         : Type##Source{id},                                                   \
@@ -39,11 +39,11 @@
   HALSIMGUI_DATASOURCE(cbname, id, INT, Integer, int)
 
 #define HALSIMGUI_DATASOURCE_INDEXED(cbname, id, TYPE, Type, vtype)           \
-  class cbname##Source : public ::wpi::glass::Type##Source {                       \
+  class cbname##Source : public ::wpi::glass::Type##Source {                  \
    public:                                                                    \
     explicit cbname##Source(int32_t index, int channel = -1)                  \
-        : Type##Source{::wpi::glass::MakeSourceId(id,                              \
-                                             channel < 0 ? index : channel)}, \
+        : Type##Source{::wpi::glass::MakeSourceId(                            \
+              id, channel < 0 ? index : channel)},                            \
           m_index{index},                                                     \
           m_channel{channel < 0 ? index : channel},                           \
           m_callback{HALSIM_Register##cbname##Callback(index, CallbackFunc,   \
@@ -77,10 +77,10 @@
   HALSIMGUI_DATASOURCE_INDEXED(cbname, id, DOUBLE, Double, double)
 
 #define HALSIMGUI_DATASOURCE_INDEXED2(cbname, id, TYPE, Type, vtype)          \
-  class cbname##Source : public ::wpi::glass::Type##Source {                       \
+  class cbname##Source : public ::wpi::glass::Type##Source {                  \
    public:                                                                    \
     explicit cbname##Source(int32_t index, int32_t channel)                   \
-        : Type##Source{::wpi::glass::MakeSourceId(id, index, channel)},            \
+        : Type##Source{::wpi::glass::MakeSourceId(id, index, channel)},       \
           m_index{index},                                                     \
           m_channel{channel},                                                 \
           m_callback{HALSIM_Register##cbname##Callback(                       \

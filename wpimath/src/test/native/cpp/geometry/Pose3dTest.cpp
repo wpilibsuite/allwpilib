@@ -92,8 +92,8 @@ TEST(Pose3dTest, RotateAround) {
 
   EXPECT_NEAR(-5.0, rotated.X().value(), 1e-9);
   EXPECT_NEAR(0.0, rotated.Y().value(), 1e-9);
-  EXPECT_NEAR(wpi::units::radian_t{180_deg}.value(), rotated.Rotation().Z().value(),
-              1e-9);
+  EXPECT_NEAR(wpi::units::radian_t{180_deg}.value(),
+              rotated.Rotation().Z().value(), 1e-9);
 }
 
 TEST(Pose3dTest, Equality) {

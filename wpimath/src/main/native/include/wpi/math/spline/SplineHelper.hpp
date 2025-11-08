@@ -106,8 +106,8 @@ class WPILIB_DLLEXPORT SplineHelper {
       waypoints.emplace(waypoints.begin(),
                         Translation2d{wpi::units::meter_t{xInitial[0]},
                                       wpi::units::meter_t{yInitial[0]}});
-      waypoints.emplace_back(
-          Translation2d{wpi::units::meter_t{xFinal[0]}, wpi::units::meter_t{yFinal[0]}});
+      waypoints.emplace_back(Translation2d{wpi::units::meter_t{xFinal[0]},
+                                           wpi::units::meter_t{yFinal[0]}});
 
       // Populate tridiagonal system for clamped cubic
       /* See:
@@ -186,8 +186,10 @@ class WPILIB_DLLEXPORT SplineHelper {
       const double yDeriv =
           (3 * (yFinal[0] - yInitial[0]) - yFinal[1] - yInitial[1]) / 4.0;
 
-      wpi::util::array<double, 2> midXControlVector{waypoints[0].X().value(), xDeriv};
-      wpi::util::array<double, 2> midYControlVector{waypoints[0].Y().value(), yDeriv};
+      wpi::util::array<double, 2> midXControlVector{waypoints[0].X().value(),
+                                                    xDeriv};
+      wpi::util::array<double, 2> midYControlVector{waypoints[0].Y().value(),
+                                                    yDeriv};
 
       splines.emplace_back(xInitial, midXControlVector, yInitial,
                            midYControlVector);

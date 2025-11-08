@@ -26,7 +26,8 @@ DifferentialDriveWheelVoltages LTVDifferentialDriveController::Calculate(
   //     [vₗ]
   //     [vᵣ]
 
-  wpi::units::meters_per_second_t velocity{(leftVelocity + rightVelocity) / 2.0};
+  wpi::units::meters_per_second_t velocity{(leftVelocity + rightVelocity) /
+                                           2.0};
 
   // The DARE is ill-conditioned if the velocity is close to zero, so don't
   // let the system stop.
@@ -42,7 +43,8 @@ DifferentialDriveWheelVoltages LTVDifferentialDriveController::Calculate(
                              leftVelocity.value(), rightVelocity.value()};
 
   m_error = r - x;
-  m_error(2) = wpi::math::AngleModulus(wpi::units::radian_t{m_error(2)}).value();
+  m_error(2) =
+      wpi::math::AngleModulus(wpi::units::radian_t{m_error(2)}).value();
 
   Eigen::Matrix<double, 5, 5> A{
       {0.0, 0.0, 0.0, 0.5, 0.5},

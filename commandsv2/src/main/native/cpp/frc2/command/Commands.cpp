@@ -83,7 +83,8 @@ CommandPtr cmd::DeferredProxy(wpi::util::unique_function<Command*()> supplier) {
       {});
 }
 
-CommandPtr cmd::DeferredProxy(wpi::util::unique_function<CommandPtr()> supplier) {
+CommandPtr cmd::DeferredProxy(
+    wpi::util::unique_function<CommandPtr()> supplier) {
   return Defer([supplier = std::move(
                     supplier)]() mutable { return supplier().AsProxy(); },
                {});

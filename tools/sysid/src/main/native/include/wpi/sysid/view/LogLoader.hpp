@@ -14,7 +14,7 @@
 
 namespace wpi::glass {
 class Storage;
-}  // namespace glass
+}  // namespace wpi::glass
 
 namespace pfd {
 class open_file;
@@ -27,7 +27,7 @@ class DataLogReaderThread;
 }  // namespace log
 namespace util {
 class Logger;
-}
+}  // namespace util
 }  // namespace wpi
 
 namespace sysid {

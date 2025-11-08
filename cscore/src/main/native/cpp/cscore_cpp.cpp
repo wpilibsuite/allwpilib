@@ -401,9 +401,9 @@ std::vector<VideoMode> EnumerateSourceVideoModes(CS_Source source,
   return data->source->EnumerateVideoModes(status);
 }
 
-std::span<CS_Sink> EnumerateSourceSinks(CS_Source source,
-                                        wpi::util::SmallVectorImpl<CS_Sink>& vec,
-                                        CS_Status* status) {
+std::span<CS_Sink> EnumerateSourceSinks(
+    CS_Source source, wpi::util::SmallVectorImpl<CS_Sink>& vec,
+    CS_Status* status) {
   auto& inst = Instance::GetInstance();
   auto data = inst.GetSource(source);
   if (!data) {
@@ -540,7 +540,8 @@ std::string GetSinkName(CS_Sink sink, CS_Status* status) {
   return std::string{data->sink->GetName()};
 }
 
-std::string_view GetSinkName(CS_Sink sink, wpi::util::SmallVectorImpl<char>& buf,
+std::string_view GetSinkName(CS_Sink sink,
+                             wpi::util::SmallVectorImpl<char>& buf,
                              CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data) {
@@ -587,7 +588,8 @@ CS_Property GetSinkProperty(CS_Sink sink, std::string_view name,
 }
 
 std::span<CS_Property> EnumerateSinkProperties(
-    CS_Sink sink, wpi::util::SmallVectorImpl<CS_Property>& vec, CS_Status* status) {
+    CS_Sink sink, wpi::util::SmallVectorImpl<CS_Property>& vec,
+    CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data) {
     *status = CS_INVALID_HANDLE;
@@ -873,8 +875,8 @@ std::span<CS_Source> EnumerateSourceHandles(
   return Instance::GetInstance().EnumerateSourceHandles(vec);
 }
 
-std::span<CS_Sink> EnumerateSinkHandles(wpi::util::SmallVectorImpl<CS_Sink>& vec,
-                                        CS_Status* status) {
+std::span<CS_Sink> EnumerateSinkHandles(
+    wpi::util::SmallVectorImpl<CS_Sink>& vec, CS_Status* status) {
   return Instance::GetInstance().EnumerateSinkHandles(vec);
 }
 

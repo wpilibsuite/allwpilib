@@ -22,7 +22,8 @@ std::optional<wpi::math::DifferentialDriveWheelVoltages> wpi::util::Protobuf<
 }
 
 bool wpi::util::Protobuf<wpi::math::DifferentialDriveWheelVoltages>::Pack(
-    OutputStream& stream, const wpi::math::DifferentialDriveWheelVoltages& value) {
+    OutputStream& stream,
+    const wpi::math::DifferentialDriveWheelVoltages& value) {
   wpi_proto_ProtobufDifferentialDriveWheelVoltages msg{
       .left = value.left.value(),
       .right = value.right.value(),

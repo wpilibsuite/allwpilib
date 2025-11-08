@@ -319,8 +319,8 @@ int32_t HALSIM_GetNotifierInfo(struct HALSIM_NotifierInfo* arr, int32_t size) {
       arr[num].handle = handle;
       if (notifier->name.empty()) {
         wpi::util::format_to_n_c_str(arr[num].name, sizeof(arr[num].name),
-                               "Notifier{}",
-                               static_cast<int>(getHandleIndex(handle)));
+                                     "Notifier{}",
+                                     static_cast<int>(getHandleIndex(handle)));
       } else {
         std::strncpy(arr[num].name, notifier->name.c_str(),
                      sizeof(arr[num].name) - 1);

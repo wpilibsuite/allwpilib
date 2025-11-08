@@ -12,7 +12,8 @@
 
 namespace wpi {
 
-class SharpIR : public wpi::util::Sendable, public wpi::util::SendableHelper<SharpIR> {
+class SharpIR : public wpi::util::Sendable,
+                public wpi::util::SendableHelper<SharpIR> {
  public:
   /**
    * Sharp GP2Y0A02YK0F is an analog IR sensor capable of measuring

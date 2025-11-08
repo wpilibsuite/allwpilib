@@ -118,14 +118,17 @@ class Robot : public wpi::TimedRobot {
         // draw lines around the tag
         for (int i = 0; i <= 3; i++) {
           int j = (i + 1) % 4;
-          const wpi::apriltag::AprilTagDetection::Point pti = detection->GetCorner(i);
-          const wpi::apriltag::AprilTagDetection::Point ptj = detection->GetCorner(j);
+          const wpi::apriltag::AprilTagDetection::Point pti =
+              detection->GetCorner(i);
+          const wpi::apriltag::AprilTagDetection::Point ptj =
+              detection->GetCorner(j);
           line(mat, cv::Point(pti.x, pti.y), cv::Point(ptj.x, ptj.y),
                outlineColor, 2);
         }
 
         // mark the center of the tag
-        const wpi::apriltag::AprilTagDetection::Point c = detection->GetCenter();
+        const wpi::apriltag::AprilTagDetection::Point c =
+            detection->GetCenter();
         int ll = 10;
         line(mat, cv::Point(c.x - ll, c.y), cv::Point(c.x + ll, c.y),
              crossColor, 2);

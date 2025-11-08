@@ -89,7 +89,8 @@ class WPILIB_DLLEXPORT DifferentialDriveFeedforward {
       wpi::units::meters_per_second_t currentLeftVelocity,
       wpi::units::meters_per_second_t nextLeftVelocity,
       wpi::units::meters_per_second_t currentRightVelocity,
-      wpi::units::meters_per_second_t nextRightVelocity, wpi::units::second_t dt);
+      wpi::units::meters_per_second_t nextRightVelocity,
+      wpi::units::second_t dt);
 
   decltype(1_V / 1_mps) m_kVLinear;
   decltype(1_V / 1_mps_sq) m_kALinear;

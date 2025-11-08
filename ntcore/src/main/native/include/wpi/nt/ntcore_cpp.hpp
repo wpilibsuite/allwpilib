@@ -25,7 +25,7 @@
 namespace wpi::util {
 template <typename T>
 class SmallVectorImpl;
-}  // namespace wpi
+}  // namespace wpi::util
 
 namespace wpi::log {
 class DataLog;

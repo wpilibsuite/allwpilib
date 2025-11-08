@@ -20,7 +20,8 @@ class NTStringChooserModel : public StringChooserModel {
 
   // path is to the table containing ".type", excluding the trailing /
   explicit NTStringChooserModel(std::string_view path);
-  NTStringChooserModel(wpi::nt::NetworkTableInstance inst, std::string_view path);
+  NTStringChooserModel(wpi::nt::NetworkTableInstance inst,
+                       std::string_view path);
 
   const std::string& GetDefault() override { return m_defaultValue; }
   const std::string& GetSelected() override { return m_selectedValue; }

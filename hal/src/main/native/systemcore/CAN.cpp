@@ -88,18 +88,21 @@ struct SocketCanState {
   wpi::util::mutex writeMutex[wpi::hal::kNumCanBuses];
   int socketHandle[wpi::hal::kNumCanBuses];
   // ms to count/timer map
-  wpi::util::DenseMap<uint16_t, std::pair<size_t, std::weak_ptr<wpi::net::uv::Timer>>>
+  wpi::util::DenseMap<uint16_t,
+                      std::pair<size_t, std::weak_ptr<wpi::net::uv::Timer>>>
       timers;
   // ms to bus mask/packet
-  wpi::util::DenseMap<uint16_t,
-                std::array<std::optional<canfd_frame>, wpi::hal::kNumCanBuses>>
+  wpi::util::DenseMap<
+      uint16_t, std::array<std::optional<canfd_frame>, wpi::hal::kNumCanBuses>>
       timedFrames;
   // packet to time
-  wpi::util::DenseMap<uint32_t, std::array<uint16_t, wpi::hal::kNumCanBuses>> packetToTime;
+  wpi::util::DenseMap<uint32_t, std::array<uint16_t, wpi::hal::kNumCanBuses>>
+      packetToTime;
 
   wpi::util::mutex readMutex[wpi::hal::kNumCanBuses];
   // TODO(thadhouse) we need a MUCH better way of doing this masking
-  wpi::util::DenseMap<uint32_t, HAL_CANStreamMessage> readFrames[wpi::hal::kNumCanBuses];
+  wpi::util::DenseMap<uint32_t, HAL_CANStreamMessage>
+      readFrames[wpi::hal::kNumCanBuses];
   std::vector<CANStreamStorage*> canStreams[wpi::hal::kNumCanBuses];
 
   bool InitializeBuses();
@@ -157,7 +160,7 @@ bool SocketCanState::InitializeBuses() {
       socketHandle[i] = socket(PF_CAN, SOCK_RAW, CAN_RAW);
       if (socketHandle[i] == -1) {
         wpi::util::print("socket() for CAN {} failed with {}\n", i,
-                   std::strerror(errno));
+                         std::strerror(errno));
         success = false;
         return;
       }
@@ -167,7 +170,7 @@ bool SocketCanState::InitializeBuses() {
 
       if (ioctl(socketHandle[i], SIOCGIFINDEX, &ifr) == -1) {
         wpi::util::print("ioctl(SIOCGIFINDEX) for CAN {} failed with {}\n",
-                   ifr.ifr_name, std::strerror(errno));
+                         ifr.ifr_name, std::strerror(errno));
         success = false;
         return;
       }
@@ -180,14 +183,14 @@ bool SocketCanState::InitializeBuses() {
       if (bind(socketHandle[i], reinterpret_cast<const sockaddr*>(&addr),
                sizeof(addr)) == -1) {
         wpi::util::print("bind() for CAN {} failed with {}\n", ifr.ifr_name,
-                   std::strerror(errno));
+                         std::strerror(errno));
         success = false;
         return;
       }
 
       if (ioctl(socketHandle[i], SIOCGIFMTU, &ifr) == -1) {
         wpi::util::print("ioctl(SIOCGIFMTU) for CAN {} failed with {}\n",
-                   ifr.ifr_name, std::strerror(errno));
+                         ifr.ifr_name, std::strerror(errno));
         success = false;
         return;
       }
@@ -206,7 +209,8 @@ bool SocketCanState::InitializeBuses() {
 
       auto poll = wpi::net::uv::Poll::Create(loop, socketHandle[i]);
       if (!poll) {
-        wpi::util::print("wpi::net::uv::Poll::Create for CAN {} failed\n", ifr.ifr_name);
+        wpi::util::print("wpi::net::uv::Poll::Create for CAN {} failed\n",
+                         ifr.ifr_name);
         success = false;
         return;
       }
@@ -309,7 +313,8 @@ void SocketCanState::AddPeriodic(wpi::net::uv::Loop& loop, uint8_t busId,
   if (timer.first == 1) {
     auto newTimer = wpi::net::uv::Timer::Create(loop);
     newTimer->timeout.connect([this, time] { TimerCallback(time); });
-    newTimer->Start(wpi::net::uv::Timer::Time{time}, wpi::net::uv::Timer::Time{time});
+    newTimer->Start(wpi::net::uv::Timer::Time{time},
+                    wpi::net::uv::Timer::Time{time});
   }
 }
 

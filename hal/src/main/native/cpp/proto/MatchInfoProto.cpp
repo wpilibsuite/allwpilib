@@ -36,7 +36,7 @@ std::optional<mrc::MatchInfo> wpi::util::Protobuf<mrc::MatchInfo>::Unpack(
 }
 
 bool wpi::util::Protobuf<mrc::MatchInfo>::Pack(OutputStream& Stream,
-                                         const mrc::MatchInfo& Value) {
+                                               const mrc::MatchInfo& Value) {
   std::string_view EventNameStr = Value.GetEventName();
   wpi::util::PackCallback EventName{&EventNameStr};
 

@@ -122,7 +122,8 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
 // Conversions from Java objects to C++
 //
 
-static wpi::nt::PubSubOptions FromJavaPubSubOptions(JNIEnv* env, jobject joptions) {
+static wpi::nt::PubSubOptions FromJavaPubSubOptions(JNIEnv* env,
+                                                    jobject joptions) {
   if (!joptions) {
     return {};
   }
@@ -299,7 +300,8 @@ static jobject MakeJObject(JNIEnv* env, jobject inst,
                         static_cast<jint>(data.subentry), value.obj());
 }
 
-static jobject MakeJObject(JNIEnv* env, const wpi::nt::TimeSyncEventData& data) {
+static jobject MakeJObject(JNIEnv* env,
+                           const wpi::nt::TimeSyncEventData& data) {
   static jmethodID constructor =
       env->GetMethodID(timeSyncEventDataCls, "<init>", "(JJZ)V");
   return env->NewObject(timeSyncEventDataCls, constructor,
@@ -308,7 +310,8 @@ static jobject MakeJObject(JNIEnv* env, const wpi::nt::TimeSyncEventData& data) 
                         static_cast<jboolean>(data.valid));
 }
 
-static jobject MakeJObject(JNIEnv* env, jobject inst, const wpi::nt::Event& event) {
+static jobject MakeJObject(JNIEnv* env, jobject inst,
+                           const wpi::nt::Event& event) {
   static jmethodID constructor =
       env->GetMethodID(eventCls, "<init>",
                        "(Lorg/wpilib/networktables/NetworkTableInstance;II"
@@ -339,7 +342,8 @@ static jobject MakeJObject(JNIEnv* env, jobject inst, const wpi::nt::Event& even
       valueData.obj(), logMessage.obj(), timeSyncData.obj());
 }
 
-static jobjectArray MakeJObject(JNIEnv* env, std::span<const wpi::nt::Value> arr) {
+static jobjectArray MakeJObject(JNIEnv* env,
+                                std::span<const wpi::nt::Value> arr) {
   jobjectArray jarr = env->NewObjectArray(arr.size(), valueCls, nullptr);
   if (!jarr) {
     return nullptr;
@@ -580,7 +584,8 @@ Java_org_wpilib_networktables_NetworkTablesJNI_getTopicInfosStr
     typeStrs.emplace_back(typeStrData.back());
   }
 
-  auto arr = wpi::nt::GetTopicInfo(inst, JStringRef{env, prefix}.str(), typeStrs);
+  auto arr =
+      wpi::nt::GetTopicInfo(inst, JStringRef{env, prefix}.str(), typeStrs);
   jobjectArray jarr = env->NewObjectArray(arr.size(), topicInfoCls, nullptr);
   if (!jarr) {
     return nullptr;
@@ -733,8 +738,8 @@ JNIEXPORT jstring JNICALL
 Java_org_wpilib_networktables_NetworkTablesJNI_getTopicProperty
   (JNIEnv* env, jclass, jint topic, jstring name)
 {
-  return MakeJString(env,
-                     wpi::nt::GetTopicProperty(topic, JStringRef{env, name}).dump());
+  return MakeJString(
+      env, wpi::nt::GetTopicProperty(topic, JStringRef{env, name}).dump());
 }
 
 /*
@@ -815,8 +820,8 @@ Java_org_wpilib_networktables_NetworkTablesJNI_subscribe
   (JNIEnv* env, jclass, jint topic, jint type, jstring typeStr, jobject options)
 {
   return wpi::nt::Subscribe(topic, static_cast<NT_Type>(type),
-                       JStringRef{env, typeStr},
-                       FromJavaPubSubOptions(env, options));
+                            JStringRef{env, typeStr},
+                            FromJavaPubSubOptions(env, options));
 }
 
 /*
@@ -841,8 +846,8 @@ Java_org_wpilib_networktables_NetworkTablesJNI_publish
   (JNIEnv* env, jclass, jint topic, jint type, jstring typeStr, jobject options)
 {
   return wpi::nt::Publish(topic, static_cast<NT_Type>(type),
-                     JStringRef{env, typeStr},
-                     FromJavaPubSubOptions(env, options));
+                          JStringRef{env, typeStr},
+                          FromJavaPubSubOptions(env, options));
 }
 
 /*
@@ -868,8 +873,8 @@ Java_org_wpilib_networktables_NetworkTablesJNI_publishEx
     return 0;
   }
   return wpi::nt::PublishEx(topic, static_cast<NT_Type>(type),
-                       JStringRef{env, typeStr}, j,
-                       FromJavaPubSubOptions(env, options));
+                            JStringRef{env, typeStr}, j,
+                            FromJavaPubSubOptions(env, options));
 }
 
 /*
@@ -894,8 +899,8 @@ Java_org_wpilib_networktables_NetworkTablesJNI_getEntryImpl
   (JNIEnv* env, jclass, jint topic, jint type, jstring typeStr, jobject options)
 {
   return wpi::nt::GetEntry(topic, static_cast<NT_Type>(type),
-                      JStringRef{env, typeStr},
-                      FromJavaPubSubOptions(env, options));
+                           JStringRef{env, typeStr},
+                           FromJavaPubSubOptions(env, options));
 }
 
 /*
@@ -965,7 +970,7 @@ Java_org_wpilib_networktables_NetworkTablesJNI_subscribeMultiple
   }
 
   return wpi::nt::SubscribeMultiple(inst, prefixStringViews,
-                               FromJavaPubSubOptions(env, options));
+                                    FromJavaPubSubOptions(env, options));
 }
 
 /*
@@ -1189,7 +1194,7 @@ Java_org_wpilib_networktables_NetworkTablesJNI_startServer
     return;
   }
   wpi::nt::StartServer(inst, JStringRef{env, persistFilename}.str(),
-                  JStringRef{env, listenAddress}.c_str(), port);
+                       JStringRef{env, listenAddress}.c_str(), port);
 }
 
 /*
@@ -1433,9 +1438,9 @@ JNIEXPORT jint JNICALL
 Java_org_wpilib_networktables_NetworkTablesJNI_startEntryDataLog
   (JNIEnv* env, jclass, jint inst, jlong log, jstring prefix, jstring logPrefix)
 {
-  return wpi::nt::StartEntryDataLog(inst, *reinterpret_cast<wpi::log::DataLog*>(log),
-                               JStringRef{env, prefix},
-                               JStringRef{env, logPrefix});
+  return wpi::nt::StartEntryDataLog(
+      inst, *reinterpret_cast<wpi::log::DataLog*>(log), JStringRef{env, prefix},
+      JStringRef{env, logPrefix});
 }
 
 /*

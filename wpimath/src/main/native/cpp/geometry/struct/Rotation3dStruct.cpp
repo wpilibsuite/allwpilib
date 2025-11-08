@@ -16,6 +16,7 @@ wpi::math::Rotation3d StructType::Unpack(std::span<const uint8_t> data) {
   };
 }
 
-void StructType::Pack(std::span<uint8_t> data, const wpi::math::Rotation3d& value) {
+void StructType::Pack(std::span<uint8_t> data,
+                      const wpi::math::Rotation3d& value) {
   wpi::util::PackStruct<kQOff>(data, value.GetQuaternion());
 }

@@ -17,7 +17,8 @@
 TEST(DCMotorSimTest, VoltageSteadyState) {
   wpi::math::DCMotor gearbox = wpi::math::DCMotor::NEO(1);
   auto plant = wpi::math::LinearSystemId::DCMotorSystem(
-      wpi::math::DCMotor::NEO(1), wpi::units::kilogram_square_meter_t{0.0005}, 1.0);
+      wpi::math::DCMotor::NEO(1), wpi::units::kilogram_square_meter_t{0.0005},
+      1.0);
   wpi::sim::DCMotorSim sim{plant, gearbox};
 
   wpi::Encoder encoder{0, 1};
@@ -63,7 +64,8 @@ TEST(DCMotorSimTest, VoltageSteadyState) {
 TEST(DCMotorSimTest, PositionFeedbackControl) {
   wpi::math::DCMotor gearbox = wpi::math::DCMotor::NEO(1);
   auto plant = wpi::math::LinearSystemId::DCMotorSystem(
-      wpi::math::DCMotor::NEO(1), wpi::units::kilogram_square_meter_t{0.0005}, 1.0);
+      wpi::math::DCMotor::NEO(1), wpi::units::kilogram_square_meter_t{0.0005},
+      1.0);
   wpi::sim::DCMotorSim sim{plant, gearbox};
 
   wpi::math::PIDController controller{0.04, 0.0, 0.001};

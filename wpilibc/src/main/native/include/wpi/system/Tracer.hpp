@@ -12,7 +12,7 @@
 
 namespace wpi::util {
 class raw_ostream;
-}  // namespace wpi
+}  // namespace wpi::util
 
 namespace wpi {
 /**
@@ -66,7 +66,8 @@ class Tracer {
   static constexpr std::chrono::milliseconds kMinPrintPeriod{1000};
 
   wpi::hal::fpga_clock::time_point m_startTime;
-  wpi::hal::fpga_clock::time_point m_lastEpochsPrintTime = wpi::hal::fpga_clock::epoch();
+  wpi::hal::fpga_clock::time_point m_lastEpochsPrintTime =
+      wpi::hal::fpga_clock::epoch();
 
   wpi::util::StringMap<std::chrono::nanoseconds> m_epochs;
 };

@@ -21,7 +21,8 @@ class NTDigitalInputModel : public DIOModel {
 
   // path is to the table containing ".type", excluding the trailing /
   explicit NTDigitalInputModel(std::string_view path);
-  NTDigitalInputModel(wpi::nt::NetworkTableInstance inst, std::string_view path);
+  NTDigitalInputModel(wpi::nt::NetworkTableInstance inst,
+                      std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
 

@@ -25,8 +25,8 @@ namespace wpilibws {
 void WebServerClientTest::InitializeWebSocket(const std::string& host, int port,
                                               const std::string& uri) {
   wpi::util::print("Will attempt to connect to: {}:{}{}\n", host, port, uri);
-  m_websocket = wpi::net::WebSocket::CreateClient(*m_tcp_client.get(), uri,
-                                             fmt::format("{}:{}", host, port));
+  m_websocket = wpi::net::WebSocket::CreateClient(
+      *m_tcp_client.get(), uri, fmt::format("{}:{}", host, port));
 
   // Hook up events
   m_websocket->open.connect_extended([this](auto conn, auto) {
@@ -68,8 +68,9 @@ void WebServerClientTest::InitializeWebSocket(const std::string& host, int port,
 
 // Create tcp client, specify callbacks, and create timers for loop
 bool WebServerClientTest::Initialize() {
-  m_loop.error.connect(
-      [](uv::Error err) { wpi::util::print(stderr, "uv Error: {}\n", err.str()); });
+  m_loop.error.connect([](uv::Error err) {
+    wpi::util::print(stderr, "uv Error: {}\n", err.str());
+  });
 
   m_tcp_client = uv::Tcp::Create(m_loop);
   if (!m_tcp_client) {
@@ -135,9 +136,9 @@ void WebServerClientTest::SendMessage(const wpi::util::json& msg) {
   wpi::util::SmallVector<uv::Buffer, 4> sendBufs;
 
   wpi::net::raw_uv_ostream os{sendBufs, [this]() -> uv::Buffer {
-                           std::lock_guard lock(m_buffers_mutex);
-                           return m_buffers->Allocate();
-                         }};
+                                std::lock_guard lock(m_buffers_mutex);
+                                return m_buffers->Allocate();
+                              }};
   os << msg;
 
   // Call the websocket send function on the uv loop

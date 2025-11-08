@@ -82,7 +82,7 @@ void PWM::SetOutputPeriod(OutputPeriod mult) {
       break;
     default:
       throw WPILIB_MakeError(err::InvalidParameter, "OutputPeriod value {}",
-                          static_cast<int>(mult));
+                             static_cast<int>(mult));
   }
 
   WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
@@ -101,5 +101,7 @@ void PWM::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetActuator(true);
   builder.AddDoubleProperty(
       "Value", [=, this] { return GetPulseTime().value(); },
-      [=, this](double value) { SetPulseTime(wpi::units::millisecond_t{value}); });
+      [=, this](double value) {
+        SetPulseTime(wpi::units::millisecond_t{value});
+      });
 }

@@ -10,5 +10,5 @@
 
 wpi::cmd::CommandPtr autos::ExampleAuto(ExampleSubsystem* subsystem) {
   return wpi::cmd::cmd::Sequence(subsystem->ExampleMethodCommand(),
-                             ExampleCommand(subsystem).ToPtr());
+                                 ExampleCommand(subsystem).ToPtr());
 }

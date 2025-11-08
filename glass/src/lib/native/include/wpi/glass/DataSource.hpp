@@ -208,7 +208,8 @@ class StringSource : public DataSource {
     return {buf.begin(), buf.end()};
   }
 
-  wpi::util::sig::SignalBase<wpi::util::spinlock, std::string_view, int64_t> valueChanged;
+  wpi::util::sig::SignalBase<wpi::util::spinlock, std::string_view, int64_t>
+      valueChanged;
 
  private:
   std::string m_value;

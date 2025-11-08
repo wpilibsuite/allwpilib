@@ -50,8 +50,8 @@ TEST(LinearQuadraticRegulatorTest, ArmGains) {
     // Gear ratio
     constexpr double G = 100.0;
 
-    return wpi::math::LinearSystemId::SingleJointedArmSystem(motors,
-                                                       1.0 / 3.0 * m * r * r, G)
+    return wpi::math::LinearSystemId::SingleJointedArmSystem(
+               motors, 1.0 / 3.0 * m * r * r, G)
         .Slice(0);
   }();
 

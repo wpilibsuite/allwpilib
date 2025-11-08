@@ -35,7 +35,9 @@ class SourceReaderCB : public IMFSourceReaderCallback {
                             IMFSample* pSample  // Can be NULL
   );
 
-  void InvalidateCapture() { m_source = std::weak_ptr<wpi::cs::UsbCameraImpl>(); }
+  void InvalidateCapture() {
+    m_source = std::weak_ptr<wpi::cs::UsbCameraImpl>();
+  }
 
  private:
   // Destructor is private. Caller should call Release.
@@ -48,7 +50,8 @@ class SourceReaderCB : public IMFSourceReaderCallback {
 };
 
 ComPtr<SourceReaderCB> CreateSourceReaderCB(
-    std::weak_ptr<wpi::cs::UsbCameraImpl> source, const wpi::cs::VideoMode& mode);
+    std::weak_ptr<wpi::cs::UsbCameraImpl> source,
+    const wpi::cs::VideoMode& mode);
 ComPtr<IMFSourceReader> CreateSourceReader(IMFMediaSource* mediaSource,
                                            IMFSourceReaderCallback* callback);
 ComPtr<IMFMediaSource> CreateVideoCaptureDevice(LPCWSTR pszSymbolicLink);

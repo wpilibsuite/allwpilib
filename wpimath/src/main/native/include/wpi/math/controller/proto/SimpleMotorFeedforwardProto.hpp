@@ -26,7 +26,8 @@ struct wpi::util::Protobuf<wpi::math::SimpleMotorFeedforward<Distance>> {
   static std::optional<wpi::math::SimpleMotorFeedforward<Distance>> Unpack(
       InputStream& stream) {
     using BaseUnit =
-        wpi::units::unit<std::ratio<1>, wpi::units::traits::base_unit_of<Distance>>;
+        wpi::units::unit<std::ratio<1>,
+                         wpi::units::traits::base_unit_of<Distance>>;
     using BaseFeedforward = wpi::math::SimpleMotorFeedforward<BaseUnit>;
     wpi_proto_ProtobufSimpleMotorFeedforward msg;
     if (!stream.Decode(msg)) {
@@ -44,14 +45,17 @@ struct wpi::util::Protobuf<wpi::math::SimpleMotorFeedforward<Distance>> {
   static bool Pack(OutputStream& stream,
                    const wpi::math::SimpleMotorFeedforward<Distance>& value) {
     using BaseUnit =
-        wpi::units::unit<std::ratio<1>, wpi::units::traits::base_unit_of<Distance>>;
+        wpi::units::unit<std::ratio<1>,
+                         wpi::units::traits::base_unit_of<Distance>>;
     using BaseFeedforward = wpi::math::SimpleMotorFeedforward<BaseUnit>;
     wpi_proto_ProtobufSimpleMotorFeedforward msg{
         .ks = value.GetKs().value(),
-        .kv = wpi::units::unit_t<typename BaseFeedforward::kv_unit>{value.GetKv()}
-                  .value(),
-        .ka = wpi::units::unit_t<typename BaseFeedforward::ka_unit>{value.GetKa()}
-                  .value(),
+        .kv =
+            wpi::units::unit_t<typename BaseFeedforward::kv_unit>{value.GetKv()}
+                .value(),
+        .ka =
+            wpi::units::unit_t<typename BaseFeedforward::ka_unit>{value.GetKa()}
+                .value(),
         .dt = wpi::units::second_t{value.GetDt()}.value(),
     };
     return stream.Encode(msg);

@@ -34,8 +34,9 @@ namespace wpi::math {
  */
 template <size_t NumModules>
 class SwerveDrivePoseEstimator3d
-    : public PoseEstimator3d<wpi::util::array<SwerveModuleState, NumModules>,
-                             wpi::util::array<SwerveModulePosition, NumModules>> {
+    : public PoseEstimator3d<
+          wpi::util::array<SwerveModuleState, NumModules>,
+          wpi::util::array<SwerveModulePosition, NumModules>> {
  public:
   /**
    * Constructs a SwerveDrivePoseEstimator3d with default standard deviations
@@ -85,7 +86,8 @@ class SwerveDrivePoseEstimator3d
       SwerveDriveKinematics<NumModules>& kinematics,
       const Rotation3d& gyroAngle,
       const wpi::util::array<SwerveModulePosition, NumModules>& modulePositions,
-      const Pose3d& initialPose, const wpi::util::array<double, 4>& stateStdDevs,
+      const Pose3d& initialPose,
+      const wpi::util::array<double, 4>& stateStdDevs,
       const wpi::util::array<double, 4>& visionMeasurementStdDevs)
       : SwerveDrivePoseEstimator3d::PoseEstimator3d(
             kinematics, m_odometryImpl, stateStdDevs, visionMeasurementStdDevs),

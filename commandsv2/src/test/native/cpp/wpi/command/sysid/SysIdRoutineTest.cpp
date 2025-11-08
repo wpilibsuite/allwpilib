@@ -75,9 +75,10 @@ class SysIdRoutineTest : public ::testing::Test {
       m_sysidRoutine.Dynamic(wpi::cmd::sysid::Direction::kReverse)};
 
   wpi::cmd::sysid::SysIdRoutine m_emptySysidRoutine{
-      wpi::cmd::sysid::Config{std::nullopt, std::nullopt, std::nullopt, nullptr},
-      wpi::cmd::sysid::Mechanism{[](wpi::units::volt_t driveVoltage) {}, nullptr,
-                             &m_subsystem}};
+      wpi::cmd::sysid::Config{std::nullopt, std::nullopt, std::nullopt,
+                              nullptr},
+      wpi::cmd::sysid::Mechanism{[](wpi::units::volt_t driveVoltage) {},
+                                 nullptr, &m_subsystem}};
 
   wpi::cmd::CommandPtr m_emptyRoutineForward{
       m_emptySysidRoutine.Quasistatic(wpi::cmd::sysid::Direction::kForward)};

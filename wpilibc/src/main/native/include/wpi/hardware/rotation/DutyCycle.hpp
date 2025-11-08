@@ -21,7 +21,8 @@ namespace wpi {
  * low in that frequency. These can be attached to any SmartIO.
  *
  */
-class DutyCycle : public wpi::util::Sendable, public wpi::util::SendableHelper<DutyCycle> {
+class DutyCycle : public wpi::util::Sendable,
+                  public wpi::util::SendableHelper<DutyCycle> {
  public:
   /**
    * Constructs a DutyCycle input from a smartio channel.

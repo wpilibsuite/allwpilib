@@ -246,7 +246,7 @@ bool PowerDistribution::Faults::GetBreakerFault(int channel) const {
       return Channel23BreakerFault != 0;
     default:
       throw WPILIB_MakeError(err::ChannelIndexOutOfRange,
-                          "Power distribution fault channel out of bounds!");
+                             "Power distribution fault channel out of bounds!");
   }
 }
 
@@ -302,7 +302,7 @@ bool PowerDistribution::StickyFaults::GetBreakerFault(int channel) const {
       return Channel23BreakerFault != 0;
     default:
       throw WPILIB_MakeError(err::ChannelIndexOutOfRange,
-                          "Power distribution fault channel out of bounds!");
+                             "Power distribution fault channel out of bounds!");
   }
 }
 

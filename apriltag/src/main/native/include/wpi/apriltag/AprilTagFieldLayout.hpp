@@ -23,10 +23,10 @@ namespace wpi::apriltag {
  *
  * The JSON format contains two top-level objects, "tags" and "field".
  * The "tags" object is a list of all AprilTags contained within a layout. Each
- * AprilTag serializes to a JSON object containing an ID and a wpi::math::Pose3d. The
- * "field" object is a descriptor of the size of the field in meters with
- * "width" and "length" values.  This is to account for arbitrary field sizes
- * when transforming the poses.
+ * AprilTag serializes to a JSON object containing an ID and a
+ * wpi::math::Pose3d. The "field" object is a descriptor of the size of the
+ * field in meters with "width" and "length" values.  This is to account for
+ * arbitrary field sizes when transforming the poses.
  *
  * Pose3ds in the JSON are measured using the normal FRC coordinate system, NWU
  * with the origin at the bottom-right corner of the blue alliance wall.
@@ -73,7 +73,8 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
    * @param fieldWidth Width of field the layout is representing.
    */
   AprilTagFieldLayout(std::vector<AprilTag> apriltags,
-                      wpi::units::meter_t fieldLength, wpi::units::meter_t fieldWidth);
+                      wpi::units::meter_t fieldLength,
+                      wpi::units::meter_t fieldWidth);
 
   /**
    * Returns the length of the field the layout is representing.

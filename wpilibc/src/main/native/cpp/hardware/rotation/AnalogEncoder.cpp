@@ -58,7 +58,8 @@ AnalogEncoder::AnalogEncoder(std::shared_ptr<AnalogInput> analogInput,
 }
 
 void AnalogEncoder::Init(double fullRange, double expectedZero) {
-  m_simDevice = wpi::hal::SimDevice{"AnalogEncoder", m_analogInput->GetChannel()};
+  m_simDevice =
+      wpi::hal::SimDevice{"AnalogEncoder", m_analogInput->GetChannel()};
 
   if (m_simDevice) {
     m_simPosition = m_simDevice.CreateDouble("Position", false, 0.0);
@@ -70,7 +71,7 @@ void AnalogEncoder::Init(double fullRange, double expectedZero) {
   HAL_ReportUsage("IO", m_analogInput->GetChannel(), "AnalogEncoder");
 
   wpi::util::SendableRegistry::Add(this, "Analog Encoder",
-                             m_analogInput->GetChannel());
+                                   m_analogInput->GetChannel());
 }
 
 double AnalogEncoder::Get() const {

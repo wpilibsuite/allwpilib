@@ -146,7 +146,8 @@ static inline void ReadInto(wpi::util::raw_istream& is, std::string& buf,
   is.read(&(*buf.begin()) + oldSize, len);
 }
 
-bool ReadJpeg(wpi::util::raw_istream& is, std::string& buf, int* width, int* height) {
+bool ReadJpeg(wpi::util::raw_istream& is, std::string& buf, int* width,
+              int* height) {
   // in case we don't get a SOF
   *width = 0;
   *height = 0;

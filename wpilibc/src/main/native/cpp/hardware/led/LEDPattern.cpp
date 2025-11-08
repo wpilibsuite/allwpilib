@@ -55,7 +55,7 @@ LEDPattern LEDPattern::Reversed() {
 LEDPattern LEDPattern::OffsetBy(int offset) {
   return MapIndex([offset](size_t bufLen, size_t i) {
     return wpi::math::FloorMod(static_cast<int>(i) + offset,
-                         static_cast<int>(bufLen));
+                               static_cast<int>(bufLen));
   });
 }
 
@@ -74,7 +74,7 @@ LEDPattern LEDPattern::ScrollAtRelativeSpeed(wpi::units::hertz_t velocity) {
     int offset = static_cast<int>(std::floor(t * bufLen));
 
     return wpi::math::FloorMod(static_cast<int>(i) + offset,
-                         static_cast<int>(bufLen));
+                               static_cast<int>(bufLen));
   });
 }
 
@@ -95,11 +95,12 @@ LEDPattern LEDPattern::ScrollAtAbsoluteSpeed(
     auto offset = static_cast<int64_t>(now) / microsPerLed;
 
     return wpi::math::FloorMod(static_cast<int>(i) + offset,
-                         static_cast<int>(bufLen));
+                               static_cast<int>(bufLen));
   });
 }
 
-LEDPattern LEDPattern::Blink(wpi::units::second_t onTime, wpi::units::second_t offTime) {
+LEDPattern LEDPattern::Blink(wpi::units::second_t onTime,
+                             wpi::units::second_t offTime) {
   auto totalMicros = wpi::units::microsecond_t{onTime + offTime}.to<uint64_t>();
   auto onMicros = wpi::units::microsecond_t{onTime}.to<uint64_t>();
 

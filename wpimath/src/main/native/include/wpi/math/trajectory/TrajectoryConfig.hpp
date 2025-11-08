@@ -115,7 +115,9 @@ class WPILIB_DLLEXPORT TrajectoryConfig {
    * Returns the starting velocity of the trajectory.
    * @return The starting velocity of the trajectory.
    */
-  wpi::units::meters_per_second_t StartVelocity() const { return m_startVelocity; }
+  wpi::units::meters_per_second_t StartVelocity() const {
+    return m_startVelocity;
+  }
 
   /**
    * Returns the ending velocity of the trajectory.

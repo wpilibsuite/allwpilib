@@ -96,7 +96,8 @@ class Drivetrain {
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
-  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_feedforward{1_V, 3_V / 1_mps};
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_feedforward{
+      1_V, 3_V / 1_mps};
 
   // Simulation classes help us simulate our robot
   wpi::sim::EncoderSim m_leftEncoderSim{m_leftEncoder};

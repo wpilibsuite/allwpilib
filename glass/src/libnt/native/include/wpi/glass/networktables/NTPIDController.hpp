@@ -20,7 +20,8 @@ class NTPIDControllerModel : public PIDControllerModel {
   static constexpr const char* kType = "PIDController";
 
   explicit NTPIDControllerModel(std::string_view path);
-  NTPIDControllerModel(wpi::nt::NetworkTableInstance inst, std::string_view path);
+  NTPIDControllerModel(wpi::nt::NetworkTableInstance inst,
+                       std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
 

@@ -26,7 +26,7 @@
 
 namespace wpi::util {
 class Logger;
-}  // namespace wpi
+}  // namespace wpi::util
 
 namespace wpi::nt {
 class IListenerStorage;
@@ -41,7 +41,8 @@ namespace wpi::nt::local {
 // inner struct to protect against accidentally deadlocking on the mutex
 class StorageImpl {
  public:
-  StorageImpl(int inst, IListenerStorage& listenerStorage, wpi::util::Logger& logger);
+  StorageImpl(int inst, IListenerStorage& listenerStorage,
+              wpi::util::Logger& logger);
 
   wpi::util::Logger& GetLogger() { return m_logger; }
 
@@ -50,7 +51,8 @@ class StorageImpl {
   //
 
   void NetworkAnnounce(LocalTopic* topic, std::string_view typeStr,
-                       const wpi::util::json& properties, std::optional<int> pubuid);
+                       const wpi::util::json& properties,
+                       std::optional<int> pubuid);
   void RemoveNetworkPublisher(LocalTopic* topic);
   void NetworkPropertiesUpdate(LocalTopic* topic, const wpi::util::json& update,
                                bool ack);
@@ -156,7 +158,8 @@ class StorageImpl {
                              const PubSubOptions& options);
 
   LocalPublisher* Publish(LocalTopic* topic, NT_Type type,
-                          std::string_view typeStr, const wpi::util::json& properties,
+                          std::string_view typeStr,
+                          const wpi::util::json& properties,
                           const PubSubOptions& options);
 
   LocalEntry* GetEntry(LocalTopic* topicHandle, NT_Type type,

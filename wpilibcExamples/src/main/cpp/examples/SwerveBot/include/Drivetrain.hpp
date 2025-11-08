@@ -21,8 +21,9 @@ class Drivetrain {
   Drivetrain() { m_imu.ResetYaw(); }
 
   void Drive(wpi::units::meters_per_second_t xSpeed,
-             wpi::units::meters_per_second_t ySpeed, wpi::units::radians_per_second_t rot,
-             bool fieldRelative, wpi::units::second_t period);
+             wpi::units::meters_per_second_t ySpeed,
+             wpi::units::radians_per_second_t rot, bool fieldRelative,
+             wpi::units::second_t period);
   void UpdateOdometry();
 
   static constexpr wpi::units::meters_per_second_t kMaxSpeed =

@@ -39,8 +39,9 @@ namespace wpi::units {
  */
 #if !defined(DISABLE_PREDEFINED_UNITS) || \
     defined(ENABLE_PREDEFINED_ENERGY_UNITS)
-UNIT_ADD_WITH_METRIC_PREFIXES(energy, joule, joules, J,
-                              unit<std::ratio<1>, wpi::units::category::energy_unit>)
+UNIT_ADD_WITH_METRIC_PREFIXES(
+    energy, joule, joules, J,
+    unit<std::ratio<1>, wpi::units::category::energy_unit>)
 UNIT_ADD_WITH_METRIC_PREFIXES(energy, calorie, calories, cal,
                               unit<std::ratio<4184, 1000>, joules>)
 UNIT_ADD(energy, kilowatt_hour, kilowatt_hours, kWh,

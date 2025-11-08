@@ -25,7 +25,7 @@ std::shared_ptr<PneumaticsBaseSim> PneumaticsBaseSim::GetForType(
 
     default:
       throw WPILIB_MakeError(err::InvalidParameter, "{}",
-                          static_cast<int>(module));
+                             static_cast<int>(module));
   }
 }
 

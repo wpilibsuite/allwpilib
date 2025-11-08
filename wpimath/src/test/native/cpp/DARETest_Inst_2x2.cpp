@@ -6,12 +6,14 @@
 
 template wpi::util::expected<Eigen::Matrix<double, 2, 2>, wpi::math::DAREError>
 wpi::math::DARE<2, 2>(const Eigen::Matrix<double, 2, 2>& A,
-                const Eigen::Matrix<double, 2, 2>& B,
-                const Eigen::Matrix<double, 2, 2>& Q,
-                const Eigen::Matrix<double, 2, 2>& R, bool checkPreconditions);
+                      const Eigen::Matrix<double, 2, 2>& B,
+                      const Eigen::Matrix<double, 2, 2>& Q,
+                      const Eigen::Matrix<double, 2, 2>& R,
+                      bool checkPreconditions);
 template wpi::util::expected<Eigen::Matrix<double, 2, 2>, wpi::math::DAREError>
 wpi::math::DARE<2, 2>(const Eigen::Matrix<double, 2, 2>& A,
-                const Eigen::Matrix<double, 2, 2>& B,
-                const Eigen::Matrix<double, 2, 2>& Q,
-                const Eigen::Matrix<double, 2, 2>& R,
-                const Eigen::Matrix<double, 2, 2>& N, bool checkPreconditions);
+                      const Eigen::Matrix<double, 2, 2>& B,
+                      const Eigen::Matrix<double, 2, 2>& Q,
+                      const Eigen::Matrix<double, 2, 2>& R,
+                      const Eigen::Matrix<double, 2, 2>& N,
+                      bool checkPreconditions);

@@ -47,7 +47,8 @@ class WebSocketClientTest : public WebSocketTest {
       wpi::util::SmallString<64> hashBuf;
       wpi::util::SmallString<64> acceptBuf;
       os << "Sec-WebSocket-Accept: "
-         << wpi::util::Base64Encode(hash.RawFinal(hashBuf), acceptBuf) << "\r\n";
+         << wpi::util::Base64Encode(hash.RawFinal(hashBuf), acceptBuf)
+         << "\r\n";
 
       if (!mockProtocol.empty()) {
         os << "Sec-WebSocket-Protocol: " << mockProtocol << "\r\n";

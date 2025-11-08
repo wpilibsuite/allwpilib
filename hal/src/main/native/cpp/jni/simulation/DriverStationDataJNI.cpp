@@ -537,8 +537,9 @@ Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setMatchInfo
   JStringRef gameSpecificMessageRef{env, gameSpecificMessage};
 
   HAL_MatchInfo halMatchInfo;
-  wpi::util::format_to_n_c_str(halMatchInfo.eventName, sizeof(halMatchInfo.eventName),
-                         "{}", eventNameRef.str());
+  wpi::util::format_to_n_c_str(halMatchInfo.eventName,
+                               sizeof(halMatchInfo.eventName), "{}",
+                               eventNameRef.str());
   wpi::util::format_to_n_c_str(
       reinterpret_cast<char*>(halMatchInfo.gameSpecificMessage),
       sizeof(halMatchInfo.gameSpecificMessage), "{}",

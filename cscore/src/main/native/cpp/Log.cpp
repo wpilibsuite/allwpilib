@@ -4,9 +4,10 @@
 
 #include "Log.hpp"
 
-void wpi::cs::NamedLogV(wpi::util::Logger& logger, unsigned int level, const char* file,
-                   unsigned int line, std::string_view name,
-                   fmt::string_view format, fmt::format_args args) {
+void wpi::cs::NamedLogV(wpi::util::Logger& logger, unsigned int level,
+                        const char* file, unsigned int line,
+                        std::string_view name, fmt::string_view format,
+                        fmt::format_args args) {
   fmt::memory_buffer out;
   fmt::format_to(fmt::appender{out}, "{}: ", name);
   fmt::vformat_to(fmt::appender{out}, format, args);

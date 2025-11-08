@@ -23,7 +23,7 @@
 
 namespace wpi::util {
 class Logger;
-}  // namespace wpi
+}  // namespace wpi::util
 
 namespace wpi::nt {
 
@@ -31,7 +31,8 @@ class IListenerStorage;
 
 class LocalStorage final : public net::ILocalStorage {
  public:
-  LocalStorage(int inst, IListenerStorage& listenerStorage, wpi::util::Logger& logger)
+  LocalStorage(int inst, IListenerStorage& listenerStorage,
+               wpi::util::Logger& logger)
       : m_impl{inst, listenerStorage, logger} {}
   LocalStorage(const LocalStorage&) = delete;
   LocalStorage& operator=(const LocalStorage&) = delete;
@@ -51,8 +52,8 @@ class LocalStorage final : public net::ILocalStorage {
     m_impl.RemoveNetworkPublisher(m_impl.GetOrCreateTopic(name));
   }
 
-  void ServerPropertiesUpdate(std::string_view name, const wpi::util::json& update,
-                              bool ack) final {
+  void ServerPropertiesUpdate(std::string_view name,
+                              const wpi::util::json& update, bool ack) final {
     std::scoped_lock lock{m_mutex};
     if (auto topic = m_impl.GetTopicByName(name)) {
       m_impl.NetworkPropertiesUpdate(topic, update, ack);
@@ -177,7 +178,8 @@ class LocalStorage final : public net::ILocalStorage {
     return topic && topic->Exists();
   }
 
-  wpi::util::json GetTopicProperty(NT_Topic topicHandle, std::string_view name) {
+  wpi::util::json GetTopicProperty(NT_Topic topicHandle,
+                                   std::string_view name) {
     std::scoped_lock lock{m_mutex};
     if (auto topic = m_impl.GetTopicByHandle(topicHandle)) {
       return topic->properties.value(name, wpi::util::json{});
@@ -262,7 +264,8 @@ class LocalStorage final : public net::ILocalStorage {
   }
 
   NT_Publisher Publish(NT_Topic topicHandle, NT_Type type,
-                       std::string_view typeStr, const wpi::util::json& properties,
+                       std::string_view typeStr,
+                       const wpi::util::json& properties,
                        const PubSubOptions& options) {
     std::scoped_lock lock{m_mutex};
     if (auto topic = m_impl.GetTopicByHandle(topicHandle)) {

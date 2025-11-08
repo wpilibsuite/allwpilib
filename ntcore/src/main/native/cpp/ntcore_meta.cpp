@@ -39,8 +39,8 @@ static SubscriberOptions DecodeSubscriberOptions(mpack_reader_t& r) {
   return options;
 }
 
-std::optional<std::vector<ClientPublisher>> wpi::nt::meta::DecodeClientPublishers(
-    std::span<const uint8_t> data) {
+std::optional<std::vector<ClientPublisher>>
+wpi::nt::meta::DecodeClientPublishers(std::span<const uint8_t> data) {
   mpack_reader_t r;
   mpack_reader_init_data(&r, data);
   uint32_t numPub = mpack_expect_array_max(&r, 10000);
@@ -71,8 +71,8 @@ std::optional<std::vector<ClientPublisher>> wpi::nt::meta::DecodeClientPublisher
   }
 }
 
-std::optional<std::vector<ClientSubscriber>> wpi::nt::meta::DecodeClientSubscribers(
-    std::span<const uint8_t> data) {
+std::optional<std::vector<ClientSubscriber>>
+wpi::nt::meta::DecodeClientSubscribers(std::span<const uint8_t> data) {
   mpack_reader_t r;
   mpack_reader_init_data(&r, data);
   uint32_t numSub = mpack_expect_array_max(&r, 10000);
@@ -145,8 +145,8 @@ std::optional<std::vector<TopicPublisher>> wpi::nt::meta::DecodeTopicPublishers(
   }
 }
 
-std::optional<std::vector<TopicSubscriber>> wpi::nt::meta::DecodeTopicSubscribers(
-    std::span<const uint8_t> data) {
+std::optional<std::vector<TopicSubscriber>>
+wpi::nt::meta::DecodeTopicSubscribers(std::span<const uint8_t> data) {
   mpack_reader_t r;
   mpack_reader_init_data(&r, data);
   uint32_t numSub = mpack_expect_array_max(&r, 1000);

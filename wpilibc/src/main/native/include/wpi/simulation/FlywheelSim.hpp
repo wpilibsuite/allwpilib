@@ -29,7 +29,8 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
    *                           gearbox.
    * @param measurementStdDevs The standard deviation of the measurement noise.
    */
-  FlywheelSim(const wpi::math::LinearSystem<1, 1, 1>& plant, const wpi::math::DCMotor& gearbox,
+  FlywheelSim(const wpi::math::LinearSystem<1, 1, 1>& plant,
+              const wpi::math::DCMotor& gearbox,
               const std::array<double, 1>& measurementStdDevs = {0.0});
 
   using LinearSystemSim::SetState;

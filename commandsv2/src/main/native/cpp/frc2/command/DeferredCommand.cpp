@@ -11,8 +11,9 @@
 
 using namespace wpi::cmd;
 
-DeferredCommand::DeferredCommand(wpi::util::unique_function<CommandPtr()> supplier,
-                                 Requirements requirements)
+DeferredCommand::DeferredCommand(
+    wpi::util::unique_function<CommandPtr()> supplier,
+    Requirements requirements)
     : m_supplier{std::move(supplier)} {
   AddRequirements(requirements);
 }

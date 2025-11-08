@@ -29,7 +29,7 @@ class Drive : public wpi::cmd::SubsystemBase {
    * @param rot the commanded rotation
    */
   wpi::cmd::CommandPtr ArcadeDriveCommand(std::function<double()> fwd,
-                                      std::function<double()> rot);
+                                          std::function<double()> rot);
 
   /**
    * Returns a command that drives the robot forward a specified distance at a
@@ -38,7 +38,8 @@ class Drive : public wpi::cmd::SubsystemBase {
    * @param distance The distance to drive forward in meters
    * @param speed The fraction of max speed at which to drive
    */
-  wpi::cmd::CommandPtr DriveDistanceCommand(wpi::units::meter_t distance, double speed);
+  wpi::cmd::CommandPtr DriveDistanceCommand(wpi::units::meter_t distance,
+                                            double speed);
 
   /**
    * Returns a command that turns to robot to the specified angle using a motion

@@ -10,7 +10,8 @@
 #include "wpimath/protobuf/kinematics.npb.h"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::DifferentialDriveWheelPositions> {
+struct WPILIB_DLLEXPORT
+    wpi::util::Protobuf<wpi::math::DifferentialDriveWheelPositions> {
   using MessageStruct = wpi_proto_ProtobufDifferentialDriveWheelPositions;
   using InputStream =
       wpi::util::ProtoInputStream<wpi::math::DifferentialDriveWheelPositions>;

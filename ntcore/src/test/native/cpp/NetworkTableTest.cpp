@@ -15,14 +15,16 @@ class NetworkTableTest : public ::testing::Test {};
 
 TEST_F(NetworkTableTest, BasenameKey) {
   EXPECT_EQ("simple", wpi::nt::NetworkTable::BasenameKey("simple"));
-  EXPECT_EQ("simple", wpi::nt::NetworkTable::BasenameKey("one/two/many/simple"));
   EXPECT_EQ("simple",
-            wpi::nt::NetworkTable::BasenameKey("//////an/////awful/key////simple"));
+            wpi::nt::NetworkTable::BasenameKey("one/two/many/simple"));
+  EXPECT_EQ("simple", wpi::nt::NetworkTable::BasenameKey(
+                          "//////an/////awful/key////simple"));
 }
 
 TEST_F(NetworkTableTest, NormalizeKeySlash) {
   EXPECT_EQ("/", wpi::nt::NetworkTable::NormalizeKey("///"));
-  EXPECT_EQ("/no/normal/req", wpi::nt::NetworkTable::NormalizeKey("/no/normal/req"));
+  EXPECT_EQ("/no/normal/req",
+            wpi::nt::NetworkTable::NormalizeKey("/no/normal/req"));
   EXPECT_EQ("/no/leading/slash",
             wpi::nt::NetworkTable::NormalizeKey("no/leading/slash"));
   EXPECT_EQ("/what/an/awful/key/", wpi::nt::NetworkTable::NormalizeKey(
@@ -37,8 +39,8 @@ TEST_F(NetworkTableTest, NormalizeKeyNoSlash) {
   EXPECT_EQ("no/leading/slash",
             wpi::nt::NetworkTable::NormalizeKey("no/leading/slash", false));
   EXPECT_EQ("what/an/awful/key/",
-            wpi::nt::NetworkTable::NormalizeKey("//////what////an/awful/////key///",
-                                           false));
+            wpi::nt::NetworkTable::NormalizeKey(
+                "//////what////an/awful/////key///", false));
 }
 
 TEST_F(NetworkTableTest, GetHierarchyEmpty) {

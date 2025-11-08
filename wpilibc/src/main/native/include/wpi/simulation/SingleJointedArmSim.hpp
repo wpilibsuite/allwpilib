@@ -37,7 +37,8 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
    */
   SingleJointedArmSim(const wpi::math::LinearSystem<2, 1, 2>& system,
                       const wpi::math::DCMotor& gearbox, double gearing,
-                      wpi::units::meter_t armLength, wpi::units::radian_t minAngle,
+                      wpi::units::meter_t armLength,
+                      wpi::units::radian_t minAngle,
                       wpi::units::radian_t maxAngle, bool simulateGravity,
                       wpi::units::radian_t startingAngle,
                       const std::array<double, 2>& measurementStdDevs = {0.0,
@@ -57,13 +58,12 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
    * @param startingAngle      The initial position of the arm.
    * @param measurementStdDevs The standard deviation of the measurement noise.
    */
-  SingleJointedArmSim(const wpi::math::DCMotor& gearbox, double gearing,
-                      wpi::units::kilogram_square_meter_t moi,
-                      wpi::units::meter_t armLength, wpi::units::radian_t minAngle,
-                      wpi::units::radian_t maxAngle, bool simulateGravity,
-                      wpi::units::radian_t startingAngle,
-                      const std::array<double, 2>& measurementStdDevs = {0.0,
-                                                                         0.0});
+  SingleJointedArmSim(
+      const wpi::math::DCMotor& gearbox, double gearing,
+      wpi::units::kilogram_square_meter_t moi, wpi::units::meter_t armLength,
+      wpi::units::radian_t minAngle, wpi::units::radian_t maxAngle,
+      bool simulateGravity, wpi::units::radian_t startingAngle,
+      const std::array<double, 2>& measurementStdDevs = {0.0, 0.0});
 
   using LinearSystemSim::SetState;
 
@@ -74,7 +74,8 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
    * @param angle The new angle.
    * @param velocity The new angular velocity.
    */
-  void SetState(wpi::units::radian_t angle, wpi::units::radians_per_second_t velocity);
+  void SetState(wpi::units::radian_t angle,
+                wpi::units::radians_per_second_t velocity);
 
   /**
    * Returns whether the arm would hit the lower limit.
@@ -156,8 +157,9 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
    * @param u           The system inputs (voltage).
    * @param dt          The time difference between controller updates.
    */
-  wpi::math::Vectord<2> UpdateX(const wpi::math::Vectord<2>& currentXhat, const wpi::math::Vectord<1>& u,
-                     wpi::units::second_t dt) override;
+  wpi::math::Vectord<2> UpdateX(const wpi::math::Vectord<2>& currentXhat,
+                                const wpi::math::Vectord<1>& u,
+                                wpi::units::second_t dt) override;
 
  private:
   wpi::units::meter_t m_armLen;

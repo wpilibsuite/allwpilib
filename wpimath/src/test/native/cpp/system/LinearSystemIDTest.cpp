@@ -20,18 +20,19 @@ TEST(LinearSystemIDTest, IdentifyDrivetrainVelocitySystem) {
 #endif
 
   ASSERT_TRUE(model.A().isApprox(
-      wpi::math::Matrixd<2, 2>{{-10.14132, 3.06598}, {3.06598, -10.14132}}, 0.001));
+      wpi::math::Matrixd<2, 2>{{-10.14132, 3.06598}, {3.06598, -10.14132}},
+      0.001));
   ASSERT_TRUE(model.B().isApprox(
       wpi::math::Matrixd<2, 2>{{4.2590, -1.28762}, {-1.2876, 4.2590}}, 0.001));
-  ASSERT_TRUE(
-      model.C().isApprox(wpi::math::Matrixd<2, 2>{{1.0, 0.0}, {0.0, 1.0}}, 0.001));
-  ASSERT_TRUE(
-      model.D().isApprox(wpi::math::Matrixd<2, 2>{{0.0, 0.0}, {0.0, 0.0}}, 0.001));
+  ASSERT_TRUE(model.C().isApprox(
+      wpi::math::Matrixd<2, 2>{{1.0, 0.0}, {0.0, 1.0}}, 0.001));
+  ASSERT_TRUE(model.D().isApprox(
+      wpi::math::Matrixd<2, 2>{{0.0, 0.0}, {0.0, 0.0}}, 0.001));
 }
 
 TEST(LinearSystemIDTest, ElevatorSystem) {
-  auto model = wpi::math::LinearSystemId::ElevatorSystem(wpi::math::DCMotor::NEO(2), 5_kg,
-                                                   0.05_m, 12)
+  auto model = wpi::math::LinearSystemId::ElevatorSystem(
+                   wpi::math::DCMotor::NEO(2), 5_kg, 0.05_m, 12)
                    .Slice(0);
   ASSERT_TRUE(model.A().isApprox(
       wpi::math::Matrixd<2, 2>{{0.0, 1.0}, {0.0, -99.05473}}, 0.001));
@@ -42,8 +43,8 @@ TEST(LinearSystemIDTest, ElevatorSystem) {
 
 TEST(LinearSystemIDTest, FlywheelSystem) {
 #if __GNUC__ <= 11
-  auto model = wpi::math::LinearSystemId::FlywheelSystem(wpi::math::DCMotor::NEO(2),
-                                                   0.00032_kg_sq_m, 1.0);
+  auto model = wpi::math::LinearSystemId::FlywheelSystem(
+      wpi::math::DCMotor::NEO(2), 0.00032_kg_sq_m, 1.0);
 #else
   constexpr auto model = wpi::math::LinearSystemId::FlywheelSystem(
       wpi::math::DCMotor::NEO(2), 0.00032_kg_sq_m, 1.0);
@@ -57,18 +58,19 @@ TEST(LinearSystemIDTest, FlywheelSystem) {
 
 TEST(LinearSystemIDTest, DCMotorSystem) {
 #if __GNUC__ <= 11
-  auto model = wpi::math::LinearSystemId::DCMotorSystem(wpi::math::DCMotor::NEO(2),
-                                                  0.00032_kg_sq_m, 1.0);
+  auto model = wpi::math::LinearSystemId::DCMotorSystem(
+      wpi::math::DCMotor::NEO(2), 0.00032_kg_sq_m, 1.0);
 #else
   constexpr auto model = wpi::math::LinearSystemId::DCMotorSystem(
       wpi::math::DCMotor::NEO(2), 0.00032_kg_sq_m, 1.0);
 #endif
 
+  ASSERT_TRUE(model.A().isApprox(
+      wpi::math::Matrixd<2, 2>{{0, 1}, {0, -26.87032}}, 0.001));
   ASSERT_TRUE(
-      model.A().isApprox(wpi::math::Matrixd<2, 2>{{0, 1}, {0, -26.87032}}, 0.001));
-  ASSERT_TRUE(model.B().isApprox(wpi::math::Matrixd<2, 1>{0, 1354.166667}, 0.001));
-  ASSERT_TRUE(
-      model.C().isApprox(wpi::math::Matrixd<2, 2>{{1.0, 0.0}, {0.0, 1.0}}, 0.001));
+      model.B().isApprox(wpi::math::Matrixd<2, 1>{0, 1354.166667}, 0.001));
+  ASSERT_TRUE(model.C().isApprox(
+      wpi::math::Matrixd<2, 2>{{1.0, 0.0}, {0.0, 1.0}}, 0.001));
   ASSERT_TRUE(model.D().isApprox(wpi::math::Matrixd<2, 1>{0.0, 0.0}, 0.001));
 }
 
@@ -79,8 +81,9 @@ TEST(LinearSystemIDTest, IdentifyPositionSystem) {
   constexpr double ka = 0.5;
 
 #if __GNUC__ <= 11
-  auto model = wpi::math::LinearSystemId::IdentifyPositionSystem<wpi::units::meter>(
-      kv * 1_V / 1_mps, ka * 1_V / 1_mps_sq);
+  auto model =
+      wpi::math::LinearSystemId::IdentifyPositionSystem<wpi::units::meter>(
+          kv * 1_V / 1_mps, ka * 1_V / 1_mps_sq);
 #else
   constexpr auto model =
       wpi::math::LinearSystemId::IdentifyPositionSystem<wpi::units::meter>(
@@ -89,7 +92,8 @@ TEST(LinearSystemIDTest, IdentifyPositionSystem) {
 
   ASSERT_TRUE(model.A().isApprox(
       wpi::math::Matrixd<2, 2>{{0.0, 1.0}, {0.0, -kv / ka}}, 0.001));
-  ASSERT_TRUE(model.B().isApprox(wpi::math::Matrixd<2, 1>{0.0, 1.0 / ka}, 0.001));
+  ASSERT_TRUE(
+      model.B().isApprox(wpi::math::Matrixd<2, 1>{0.0, 1.0 / ka}, 0.001));
 }
 
 TEST(LinearSystemIDTest, IdentifyVelocitySystem) {
@@ -100,8 +104,9 @@ TEST(LinearSystemIDTest, IdentifyVelocitySystem) {
   constexpr double ka = 0.5;
 
 #if __GNUC__ <= 11
-  auto model = wpi::math::LinearSystemId::IdentifyVelocitySystem<wpi::units::meter>(
-      kv * 1_V / 1_mps, ka * 1_V / 1_mps_sq);
+  auto model =
+      wpi::math::LinearSystemId::IdentifyVelocitySystem<wpi::units::meter>(
+          kv * 1_V / 1_mps, ka * 1_V / 1_mps_sq);
 #else
   constexpr auto model =
       wpi::math::LinearSystemId::IdentifyVelocitySystem<wpi::units::meter>(

@@ -17,7 +17,8 @@ struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::ArmFeedforward> {
   }
 
   static wpi::math::ArmFeedforward Unpack(std::span<const uint8_t> data);
-  static void Pack(std::span<uint8_t> data, const wpi::math::ArmFeedforward& value);
+  static void Pack(std::span<uint8_t> data,
+                   const wpi::math::ArmFeedforward& value);
 };
 
 static_assert(wpi::util::StructSerializable<wpi::math::ArmFeedforward>);

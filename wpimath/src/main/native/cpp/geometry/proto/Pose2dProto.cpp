@@ -32,8 +32,8 @@ std::optional<wpi::math::Pose2d> wpi::util::Protobuf<wpi::math::Pose2d>::Unpack(
   };
 }
 
-bool wpi::util::Protobuf<wpi::math::Pose2d>::Pack(OutputStream& stream,
-                                      const wpi::math::Pose2d& value) {
+bool wpi::util::Protobuf<wpi::math::Pose2d>::Pack(
+    OutputStream& stream, const wpi::math::Pose2d& value) {
   wpi::util::PackCallback tsln{&value.Translation()};
   wpi::util::PackCallback rot{&value.Rotation()};
   wpi_proto_ProtobufPose2d msg{

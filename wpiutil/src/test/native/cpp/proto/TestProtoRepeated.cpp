@@ -68,12 +68,12 @@ std::optional<RepeatedTestProto> wpi::util::Protobuf<RepeatedTestProto>::Unpack(
       toRet.sfixed32_msg};
   wpi::util::DirectUnpackCallback<int64_t, std::vector<int64_t>> sfixed64_msg{
       toRet.sfixed64_msg};
-  wpi::util::DirectUnpackCallback<bool, wpi::util::SmallVector<bool, 128>> bool_msg{
-      toRet.bool_msg};
-  wpi::util::DirectUnpackCallback<std::string, std::vector<std::string>> string_msg{
-      toRet.string_msg};
+  wpi::util::DirectUnpackCallback<bool, wpi::util::SmallVector<bool, 128>>
+      bool_msg{toRet.bool_msg};
+  wpi::util::DirectUnpackCallback<std::string, std::vector<std::string>>
+      string_msg{toRet.string_msg};
   wpi::util::DirectUnpackCallback<std::vector<uint8_t>,
-                            std::vector<std::vector<uint8_t>>>
+                                  std::vector<std::vector<uint8_t>>>
       bytes_msg{toRet.bytes_msg};
   wpi::util::DirectUnpackCallback<TestProtoInner, std::vector<TestProtoInner>>
       TestProtoInner_msg{toRet.TestProtoInner_msg};
@@ -104,8 +104,8 @@ std::optional<RepeatedTestProto> wpi::util::Protobuf<RepeatedTestProto>::Unpack(
   return toRet;
 }
 
-bool wpi::util::Protobuf<RepeatedTestProto>::Pack(OutputStream& stream,
-                                            const RepeatedTestProto& value) {
+bool wpi::util::Protobuf<RepeatedTestProto>::Pack(
+    OutputStream& stream, const RepeatedTestProto& value) {
   wpi::util::PackCallback<double> double_msg{value.double_msg};
   wpi::util::PackCallback<float> float_msg{value.float_msg};
   wpi::util::PackCallback<int32_t> int32_msg{value.int32_msg};

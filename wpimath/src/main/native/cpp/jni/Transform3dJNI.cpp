@@ -28,7 +28,8 @@ Java_org_wpilib_math_jni_Transform3dJNI_log
    jdouble relQx, jdouble relQy, jdouble relQz)
 {
   wpi::math::Transform3d transform3d{
-      wpi::units::meter_t{relX}, wpi::units::meter_t{relY}, wpi::units::meter_t{relZ},
+      wpi::units::meter_t{relX}, wpi::units::meter_t{relY},
+      wpi::units::meter_t{relZ},
       wpi::math::Rotation3d{wpi::math::Quaternion{relQw, relQx, relQy, relQz}}};
 
   wpi::math::Twist3d result = transform3d.Log();

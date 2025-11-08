@@ -137,7 +137,8 @@ class WPILIB_DLLEXPORT CubicHermiteSpline : public Spline<3> {
    * @return The control vector matrix for a dimension.
    */
   static constexpr Eigen::Vector4d ControlVectorFromArrays(
-      wpi::util::array<double, 2> initialVector, wpi::util::array<double, 2> finalVector) {
+      wpi::util::array<double, 2> initialVector,
+      wpi::util::array<double, 2> finalVector) {
     return Eigen::Vector4d{{initialVector[0]},
                            {initialVector[1]},
                            {finalVector[0]},

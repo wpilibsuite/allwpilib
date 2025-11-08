@@ -23,9 +23,10 @@ void NetworkTablesSimGui::Initialize() {
   wpi::gui::AddEarlyExecute([] { gNetworkTablesModel->Update(); });
 
   gNetworkTablesWindow = std::make_unique<wpi::glass::Window>(
-      wpi::glass::GetStorageRoot().GetChild("NetworkTables View"), "NetworkTables");
-  gNetworkTablesWindow->SetView(
-      std::make_unique<wpi::glass::NetworkTablesView>(gNetworkTablesModel.get()));
+      wpi::glass::GetStorageRoot().GetChild("NetworkTables View"),
+      "NetworkTables");
+  gNetworkTablesWindow->SetView(std::make_unique<wpi::glass::NetworkTablesView>(
+      gNetworkTablesModel.get()));
   gNetworkTablesWindow->SetDefaultPos(250, 277);
   gNetworkTablesWindow->SetDefaultSize(750, 185);
   gNetworkTablesWindow->DisableRenamePopup();
@@ -35,8 +36,9 @@ void NetworkTablesSimGui::Initialize() {
   gNetworkTablesInfoWindow = std::make_unique<wpi::glass::Window>(
       wpi::glass::GetStorageRoot().GetChild("NetworkTables Info"),
       "NetworkTables Info");
-  gNetworkTablesInfoWindow->SetView(wpi::glass::MakeFunctionView(
-      [&] { wpi::glass::DisplayNetworkTablesInfo(gNetworkTablesModel.get()); }));
+  gNetworkTablesInfoWindow->SetView(wpi::glass::MakeFunctionView([&] {
+    wpi::glass::DisplayNetworkTablesInfo(gNetworkTablesModel.get());
+  }));
   gNetworkTablesInfoWindow->SetDefaultPos(250, 130);
   gNetworkTablesInfoWindow->SetDefaultSize(750, 145);
   gNetworkTablesInfoWindow->SetDefaultVisibility(wpi::glass::Window::kHide);

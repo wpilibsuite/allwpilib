@@ -8,8 +8,9 @@
 #include "wpi/hal/handles/IndexedHandleResource.h"
 
 namespace wpi::hal {
-IndexedHandleResource<HAL_AnalogInputHandle, wpi::hal::AnalogPort, kNumAnalogInputs,
-                      HAL_HandleEnum::AnalogInput>* analogInputHandles;
+IndexedHandleResource<HAL_AnalogInputHandle, wpi::hal::AnalogPort,
+                      kNumAnalogInputs, HAL_HandleEnum::AnalogInput>*
+    analogInputHandles;
 }  // namespace wpi::hal
 
 namespace wpi::hal::init {

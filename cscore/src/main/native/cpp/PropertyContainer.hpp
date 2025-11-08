@@ -23,7 +23,7 @@ namespace wpi::util {
 class Logger;
 template <typename T>
 class SmallVectorImpl;
-}  // namespace wpi
+}  // namespace wpi::util
 
 namespace wpi::cs {
 
@@ -52,8 +52,9 @@ class PropertyContainer {
   std::vector<std::string> GetEnumPropertyChoices(int property,
                                                   CS_Status* status) const;
 
-  bool SetPropertiesJson(const wpi::util::json& config, wpi::util::Logger& logger,
-                         std::string_view logName, CS_Status* status);
+  bool SetPropertiesJson(const wpi::util::json& config,
+                         wpi::util::Logger& logger, std::string_view logName,
+                         CS_Status* status);
   wpi::util::json GetPropertiesJsonObject(CS_Status* status);
 
  protected:

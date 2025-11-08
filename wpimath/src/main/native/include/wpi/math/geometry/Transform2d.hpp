@@ -46,7 +46,8 @@ class WPILIB_DLLEXPORT Transform2d {
    * @param y The y component of the translational component of the transform.
    * @param rotation The rotational component of the transform.
    */
-  constexpr Transform2d(wpi::units::meter_t x, wpi::units::meter_t y, Rotation2d rotation)
+  constexpr Transform2d(wpi::units::meter_t x, wpi::units::meter_t y,
+                        Rotation2d rotation)
       : m_translation{x, y}, m_rotation{std::move(rotation)} {}
 
   /**
@@ -207,7 +208,8 @@ constexpr Twist2d Transform2d::Log() const {
       m_translation.RotateBy({halfThetaByTanOfHalfDtheta, -halfDtheta}) *
       gcem::hypot(halfThetaByTanOfHalfDtheta, halfDtheta);
 
-  return {translationPart.X(), translationPart.Y(), wpi::units::radian_t{dtheta}};
+  return {translationPart.X(), translationPart.Y(),
+          wpi::units::radian_t{dtheta}};
 }
 
 }  // namespace wpi::math

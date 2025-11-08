@@ -8,9 +8,9 @@
 
 void wpi::math::to_json(wpi::util::json& json, const Quaternion& quaternion) {
   json = wpi::util::json{{"W", quaternion.W()},
-                   {"X", quaternion.X()},
-                   {"Y", quaternion.Y()},
-                   {"Z", quaternion.Z()}};
+                         {"X", quaternion.X()},
+                         {"Y", quaternion.Y()},
+                         {"Z", quaternion.Z()}};
 }
 
 void wpi::math::from_json(const wpi::util::json& json, Quaternion& quaternion) {

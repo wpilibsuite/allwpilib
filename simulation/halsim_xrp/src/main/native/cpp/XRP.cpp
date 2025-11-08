@@ -15,7 +15,8 @@
 using namespace wpilibxrp;
 
 XRP::XRP()
-    : m_gyro_name{"XRPGyro"}, m_wpilib_update_func([](const wpi::util::json&) {}) {
+    : m_gyro_name{"XRPGyro"},
+      m_wpilib_update_func([](const wpi::util::json&) {}) {
   // Set up the inputs and outputs
   m_motor_outputs.emplace(0, 0.0f);
   m_motor_outputs.emplace(1, 0.0f);
@@ -246,8 +247,8 @@ void XRP::SetupMotorTag(wpi::net::raw_uv_ostream& buf) {
         << static_cast<uint8_t>(motor.first);   // Channel
 
     // Convert the value
-    wpi::util::support::endian::write32be(value,
-                                    std::bit_cast<uint32_t>(motor.second));
+    wpi::util::support::endian::write32be(
+        value, std::bit_cast<uint32_t>(motor.second));
     buf << value[0] << value[1] << value[2] << value[3];
   }
 }
@@ -262,8 +263,8 @@ void XRP::SetupServoTag(wpi::net::raw_uv_ostream& buf) {
         << static_cast<uint8_t>(servo.first);   // Channel
 
     // Convert the value
-    wpi::util::support::endian::write32be(value,
-                                    std::bit_cast<uint32_t>(servo.second));
+    wpi::util::support::endian::write32be(
+        value, std::bit_cast<uint32_t>(servo.second));
     buf << value[0] << value[1] << value[2] << value[3];
   }
 }
@@ -374,7 +375,8 @@ void XRP::ReadEncoderTag(std::span<const uint8_t> packet) {
       period = -period;
     }
 
-    encJson["data"].push_back({wpi::util::json(">period"), wpi::util::json(period)});
+    encJson["data"].push_back(
+        {wpi::util::json(">period"), wpi::util::json(period)});
   }
 
   m_wpilib_update_func(encJson);

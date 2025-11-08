@@ -89,10 +89,12 @@ class WPILIB_DLLEXPORT DifferentialDriveVoltageConstraint
     if (speed == 0_mps) {
       maxChassisAcceleration =
           maxWheelAcceleration /
-          (1 + m_kinematics.trackwidth * wpi::units::math::abs(curvature) / (2_rad));
+          (1 + m_kinematics.trackwidth * wpi::units::math::abs(curvature) /
+                   (2_rad));
       minChassisAcceleration =
           minWheelAcceleration /
-          (1 + m_kinematics.trackwidth * wpi::units::math::abs(curvature) / (2_rad));
+          (1 + m_kinematics.trackwidth * wpi::units::math::abs(curvature) /
+                   (2_rad));
     } else {
       maxChassisAcceleration =
           maxWheelAcceleration /
@@ -110,7 +112,8 @@ class WPILIB_DLLEXPORT DifferentialDriveVoltageConstraint
     // wheel when this happens. We can accurately account for this by simply
     // negating the inner wheel.
 
-    if ((m_kinematics.trackwidth / 2) > 1_rad / wpi::units::math::abs(curvature)) {
+    if ((m_kinematics.trackwidth / 2) >
+        1_rad / wpi::units::math::abs(curvature)) {
       if (speed > 0_mps) {
         minChassisAcceleration = -minChassisAcceleration;
       } else if (speed < 0_mps) {

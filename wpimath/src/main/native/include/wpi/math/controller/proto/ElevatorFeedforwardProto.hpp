@@ -13,8 +13,12 @@
 template <>
 struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::ElevatorFeedforward> {
   using MessageStruct = wpi_proto_ProtobufElevatorFeedforward;
-  using InputStream = wpi::util::ProtoInputStream<wpi::math::ElevatorFeedforward>;
-  using OutputStream = wpi::util::ProtoOutputStream<wpi::math::ElevatorFeedforward>;
-  static std::optional<wpi::math::ElevatorFeedforward> Unpack(InputStream& stream);
-  static bool Pack(OutputStream& stream, const wpi::math::ElevatorFeedforward& value);
+  using InputStream =
+      wpi::util::ProtoInputStream<wpi::math::ElevatorFeedforward>;
+  using OutputStream =
+      wpi::util::ProtoOutputStream<wpi::math::ElevatorFeedforward>;
+  static std::optional<wpi::math::ElevatorFeedforward> Unpack(
+      InputStream& stream);
+  static bool Pack(OutputStream& stream,
+                   const wpi::math::ElevatorFeedforward& value);
 };

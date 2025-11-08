@@ -27,20 +27,23 @@ TEST(AprilTagFieldsTest, TestLoad2022RapidReact) {
 
   // Blue Hangar Truss - Hub
   auto expectedPose =
-      wpi::math::Pose3d{127.272_in, 216.01_in, 67.932_in, wpi::math::Rotation3d{0_deg, 0_deg, 0_deg}};
+      wpi::math::Pose3d{127.272_in, 216.01_in, 67.932_in,
+                        wpi::math::Rotation3d{0_deg, 0_deg, 0_deg}};
   auto maybePose = layout.GetTagPose(1);
   EXPECT_TRUE(maybePose);
   EXPECT_EQ(expectedPose, *maybePose);
 
   // Blue Terminal Near Station
-  expectedPose = wpi::math::Pose3d{4.768_in, 67.631_in, 35.063_in,
+  expectedPose =
+      wpi::math::Pose3d{4.768_in, 67.631_in, 35.063_in,
                         wpi::math::Rotation3d{0_deg, 0_deg, 46.25_deg}};
   maybePose = layout.GetTagPose(5);
   EXPECT_TRUE(maybePose);
   EXPECT_EQ(expectedPose, *maybePose);
 
   // Upper Hub Blue-Near
-  expectedPose = wpi::math::Pose3d{332.321_in, 183.676_in, 95.186_in,
+  expectedPose =
+      wpi::math::Pose3d{332.321_in, 183.676_in, 95.186_in,
                         wpi::math::Rotation3d{0_deg, 26.75_deg, 69_deg}};
   maybePose = layout.GetTagPose(53);
   EXPECT_TRUE(maybePose);

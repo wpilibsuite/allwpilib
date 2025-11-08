@@ -9,7 +9,8 @@
 
 #include "subsystems/DriveSubsystem.hpp"
 
-class DriveDistance : public wpi::cmd::CommandHelper<wpi::cmd::Command, DriveDistance> {
+class DriveDistance
+    : public wpi::cmd::CommandHelper<wpi::cmd::Command, DriveDistance> {
  public:
   /**
    * Creates a new DriveDistance.

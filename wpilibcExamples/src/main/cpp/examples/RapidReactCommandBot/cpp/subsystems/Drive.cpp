@@ -35,7 +35,7 @@ Drive::Drive() {
 }
 
 wpi::cmd::CommandPtr Drive::ArcadeDriveCommand(std::function<double()> fwd,
-                                           std::function<double()> rot) {
+                                               std::function<double()> rot) {
   return Run([this, fwd = std::move(fwd), rot = std::move(rot)] {
            m_drive.ArcadeDrive(fwd(), rot());
          })
@@ -43,7 +43,7 @@ wpi::cmd::CommandPtr Drive::ArcadeDriveCommand(std::function<double()> fwd,
 }
 
 wpi::cmd::CommandPtr Drive::DriveDistanceCommand(wpi::units::meter_t distance,
-                                             double speed) {
+                                                 double speed) {
   return RunOnce([this] {
            // Reset encoders at the start of the command
            m_leftEncoder.Reset();
@@ -52,8 +52,9 @@ wpi::cmd::CommandPtr Drive::DriveDistanceCommand(wpi::units::meter_t distance,
       // Drive forward at specified speed
       .AndThen(Run([this, speed] { m_drive.ArcadeDrive(speed, 0.0); }))
       .Until([this, distance] {
-        return wpi::units::math::max(wpi::units::meter_t(m_leftEncoder.GetDistance()),
-                                wpi::units::meter_t(m_rightEncoder.GetDistance())) >=
+        return wpi::units::math::max(
+                   wpi::units::meter_t(m_leftEncoder.GetDistance()),
+                   wpi::units::meter_t(m_rightEncoder.GetDistance())) >=
                distance;
       })
       // Stop the drive when the command ends

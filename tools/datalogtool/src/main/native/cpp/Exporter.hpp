@@ -6,7 +6,7 @@
 
 namespace wpi::glass {
 class Storage;
-}  // namespace glass
+}  // namespace wpi::glass
 
 void DisplayInputFiles();
 void DisplayEntries();
