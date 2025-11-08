@@ -18,19 +18,10 @@ repoRootNameOverride {
 }
 
 includeOtherLibs {
-  ^cameraserver/
-  ^cscore
   ^fmt/
-  ^frc/
   ^gtest/
-  ^hal/
   ^imgui
   ^mockdata/
-  ^networktables/
-  ^ntcore
   ^opencv2/
   ^support/
-  ^units/
-  ^vision/
-  ^wpi/
 }

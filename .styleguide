@@ -43,20 +43,13 @@ includeOtherLibs {
   ^fmt/
   ^glass/
   ^gtest/
-  ^hal/
   ^imgui
   ^implot
   ^mockdata/
-  ^networktables/
-  ^ntcore
   ^opencv2/
   ^support/
   ^units/
   ^unsupported/
   ^upb/
   ^vision/
-  ^wpi/
-  ^wpigui
-  ^wpimath/
-  ^wpinet/
 }
