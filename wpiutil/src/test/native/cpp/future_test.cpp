@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/future.h"  // NOLINT(build/include_order)
+#include "wpi/util/future.hpp"  // NOLINT(build/include_order)
 
 #include <utility>
 
 #include <gtest/gtest.h>
 
-namespace wpi {
+namespace wpi::util {
 
 TEST(FutureTest, Then) {
   promise<bool> inPromise;
@@ -78,4 +78,4 @@ TEST(FutureTest, MoveVoid) {
   ASSERT_TRUE(outFuture.is_ready());
 }
 
-}  // namespace wpi
+}  // namespace wpi::util

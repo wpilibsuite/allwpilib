@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/datalog/DataLog.h"
+#include "wpi/datalog/DataLog.hpp"
 
 #include <algorithm>
 #include <bit>
@@ -13,11 +13,11 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/Endian.h>
-#include <wpi/Logger.h>
-#include <wpi/SmallString.h>
-#include <wpi/print.h>
-#include <wpi/timestamp.h>
+#include "wpi/util/Endian.hpp"
+#include "wpi/util/Logger.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/print.hpp"
+#include "wpi/util/timestamp.h"
 
 using namespace wpi::log;
 
@@ -25,14 +25,14 @@ static constexpr size_t kRecordMaxHeaderSize = 17;
 
 static void DefaultLog(unsigned int level, const char* file, unsigned int line,
                        const char* msg) {
-  if (level > wpi::WPI_LOG_INFO) {
-    wpi::print(stderr, "DataLog: {}\n", msg);
-  } else if (level == wpi::WPI_LOG_INFO) {
-    wpi::print("DataLog: {}\n", msg);
+  if (level > wpi::util::WPI_LOG_INFO) {
+    wpi::util::print(stderr, "DataLog: {}\n", msg);
+  } else if (level == wpi::util::WPI_LOG_INFO) {
+    wpi::util::print("DataLog: {}\n", msg);
   }
 }
 
-wpi::Logger DataLog::s_defaultMessageLog{DefaultLog};
+wpi::util::Logger DataLog::s_defaultMessageLog{DefaultLog};
 
 template <typename T>
 static unsigned int WriteVarInt(uint8_t* buf, T val) {
@@ -56,7 +56,7 @@ static unsigned int WriteRecordHeader(uint8_t* buf, uint32_t entry,
   unsigned int payloadLen = WriteVarInt(buf, payloadSize);
   buf += payloadLen;
   unsigned int timestampLen =
-      WriteVarInt(buf, timestamp == 0 ? wpi::Now() : timestamp);
+      WriteVarInt(buf, timestamp == 0 ? wpi::util::Now() : timestamp);
   buf += timestampLen;
   *origbuf =
       ((timestampLen - 1) << 4) | ((payloadLen - 1) << 2) | (entryLen - 1);
@@ -78,7 +78,7 @@ void DataLog::StartFile() {
   uint8_t* buf = Reserve(m_extraHeader.size() + 12);
   static const uint8_t header[] = {'W', 'P', 'I', 'L', 'O', 'G', 0, 1};
   std::memcpy(buf, header, 8);
-  support::endian::write32le(buf + 8, m_extraHeader.size());
+  wpi::util::support::endian::write32le(buf + 8, m_extraHeader.size());
   std::memcpy(buf + 12, m_extraHeader.data(), m_extraHeader.size());
 
   // Existing start and schema data records
@@ -145,7 +145,7 @@ void DataLog::AddSchema(std::string_view name, std::string_view type,
     return;  // don't add duplicates
   }
   schemaInfo.data.assign(schema.begin(), schema.end());
-  wpi::SmallString<128> fullName{"/.schema/"};
+  wpi::util::SmallString<128> fullName{"/.schema/"};
   fullName += name;
   int entry = StartImpl(fullName, type, {}, timestamp);
 
@@ -206,7 +206,7 @@ void DataLog::AppendStartRecord(int id, std::string_view name,
   size_t strsize = name.size() + type.size() + metadata.size();
   uint8_t* buf = StartRecord(0, timestamp, 5 + 12 + strsize, 5);
   *buf++ = impl::kControlStart;
-  wpi::support::endian::write32le(buf, id);
+  wpi::util::support::endian::write32le(buf, id);
   AppendStringImpl(name);
   AppendStringImpl(type);
   AppendStringImpl(metadata);
@@ -241,7 +241,7 @@ void DataLog::Finish(int entry, int64_t timestamp) {
   }
   uint8_t* buf = StartRecord(0, timestamp, 5, 5);
   *buf++ = impl::kControlFinish;
-  wpi::support::endian::write32le(buf, entry);
+  wpi::util::support::endian::write32le(buf, entry);
 }
 
 void DataLog::SetMetadata(int entry, std::string_view metadata,
@@ -256,7 +256,7 @@ void DataLog::SetMetadata(int entry, std::string_view metadata,
   }
   uint8_t* buf = StartRecord(0, timestamp, 5 + 4 + metadata.size(), 5);
   *buf++ = impl::kControlSetMetadata;
-  wpi::support::endian::write32le(buf, entry);
+  wpi::util::support::endian::write32le(buf, entry);
   AppendStringImpl(metadata);
 }
 
@@ -305,7 +305,7 @@ void DataLog::AppendImpl(std::span<const uint8_t> data) {
 
 void DataLog::AppendStringImpl(std::string_view str) {
   uint8_t* buf = Reserve(4);
-  wpi::support::endian::write32le(buf, str.size());
+  wpi::util::support::endian::write32le(buf, str.size());
   AppendImpl({reinterpret_cast<const uint8_t*>(str.data()), str.size()});
 }
 
@@ -363,7 +363,7 @@ void DataLog::AppendInteger(int entry, int64_t value, int64_t timestamp) {
     [[unlikely]] return;
   }
   uint8_t* buf = StartRecord(entry, timestamp, 8, 8);
-  wpi::support::endian::write64le(buf, value);
+  wpi::util::support::endian::write64le(buf, value);
 }
 
 void DataLog::AppendFloat(int entry, float value, int64_t timestamp) {
@@ -378,7 +378,7 @@ void DataLog::AppendFloat(int entry, float value, int64_t timestamp) {
   if constexpr (std::endian::native == std::endian::little) {
     std::memcpy(buf, &value, 4);
   } else {
-    wpi::support::endian::write32le(buf, std::bit_cast<uint32_t>(value));
+    wpi::util::support::endian::write32le(buf, std::bit_cast<uint32_t>(value));
   }
 }
 
@@ -394,7 +394,7 @@ void DataLog::AppendDouble(int entry, double value, int64_t timestamp) {
   if constexpr (std::endian::native == std::endian::little) {
     std::memcpy(buf, &value, 8);
   } else {
-    wpi::support::endian::write64le(buf, std::bit_cast<uint64_t>(value));
+    wpi::util::support::endian::write64le(buf, std::bit_cast<uint64_t>(value));
   }
 }
 
@@ -477,14 +477,14 @@ void DataLog::AppendIntegerArray(int entry, std::span<const int64_t> arr,
     while ((arr.size() * 8) > kBlockSize) {
       buf = Reserve(kBlockSize);
       for (auto val : arr.subspan(0, kBlockSize / 8)) {
-        wpi::support::endian::write64le(buf, val);
+        wpi::util::support::endian::write64le(buf, val);
         buf += 8;
       }
       arr = arr.subspan(kBlockSize / 8);
     }
     buf = Reserve(arr.size() * 8);
     for (auto val : arr) {
-      wpi::support::endian::write64le(buf, val);
+      wpi::util::support::endian::write64le(buf, val);
       buf += 8;
     }
   }
@@ -509,14 +509,15 @@ void DataLog::AppendFloatArray(int entry, std::span<const float> arr,
     while ((arr.size() * 4) > kBlockSize) {
       buf = Reserve(kBlockSize);
       for (auto val : arr.subspan(0, kBlockSize / 4)) {
-        wpi::support::endian::write32le(buf, std::bit_cast<uint32_t>(val));
+        wpi::util::support::endian::write32le(buf,
+                                              std::bit_cast<uint32_t>(val));
         buf += 4;
       }
       arr = arr.subspan(kBlockSize / 4);
     }
     buf = Reserve(arr.size() * 4);
     for (auto val : arr) {
-      wpi::support::endian::write32le(buf, std::bit_cast<uint32_t>(val));
+      wpi::util::support::endian::write32le(buf, std::bit_cast<uint32_t>(val));
       buf += 4;
     }
   }
@@ -541,14 +542,15 @@ void DataLog::AppendDoubleArray(int entry, std::span<const double> arr,
     while ((arr.size() * 8) > kBlockSize) {
       buf = Reserve(kBlockSize);
       for (auto val : arr.subspan(0, kBlockSize / 8)) {
-        wpi::support::endian::write64le(buf, std::bit_cast<uint64_t>(val));
+        wpi::util::support::endian::write64le(buf,
+                                              std::bit_cast<uint64_t>(val));
         buf += 8;
       }
       arr = arr.subspan(kBlockSize / 8);
     }
     buf = Reserve(arr.size() * 8);
     for (auto val : arr) {
-      wpi::support::endian::write64le(buf, std::bit_cast<uint64_t>(val));
+      wpi::util::support::endian::write64le(buf, std::bit_cast<uint64_t>(val));
       buf += 8;
     }
   }
@@ -570,7 +572,7 @@ void DataLog::AppendStringArray(int entry, std::span<const std::string> arr,
     [[unlikely]] return;
   }
   uint8_t* buf = StartRecord(entry, timestamp, size, 4);
-  wpi::support::endian::write32le(buf, arr.size());
+  wpi::util::support::endian::write32le(buf, arr.size());
   for (auto&& str : arr) {
     AppendStringImpl(str);
   }
@@ -593,7 +595,7 @@ void DataLog::AppendStringArray(int entry,
     [[unlikely]] return;
   }
   uint8_t* buf = StartRecord(entry, timestamp, size, 4);
-  wpi::support::endian::write32le(buf, arr.size());
+  wpi::util::support::endian::write32le(buf, arr.size());
   for (auto&& sv : arr) {
     AppendStringImpl(sv);
   }
@@ -616,7 +618,7 @@ void DataLog::AppendStringArray(int entry,
     [[unlikely]] return;
   }
   uint8_t* buf = StartRecord(entry, timestamp, size, 4);
-  wpi::support::endian::write32le(buf, arr.size());
+  wpi::util::support::endian::write32le(buf, arr.size());
   for (auto&& sv : arr) {
     AppendStringImpl(sv.str);
   }
@@ -750,8 +752,8 @@ int WPI_DataLog_Start(struct WPI_DataLog* datalog,
                       const struct WPI_String* type,
                       const struct WPI_String* metadata, int64_t timestamp) {
   return reinterpret_cast<DataLog*>(datalog)->Start(
-      wpi::to_string_view(name), wpi::to_string_view(type),
-      wpi::to_string_view(metadata), timestamp);
+      wpi::util::to_string_view(name), wpi::util::to_string_view(type),
+      wpi::util::to_string_view(metadata), timestamp);
 }
 
 void WPI_DataLog_Finish(struct WPI_DataLog* datalog, int entry,
@@ -763,7 +765,7 @@ void WPI_DataLog_SetMetadata(struct WPI_DataLog* datalog, int entry,
                              const struct WPI_String* metadata,
                              int64_t timestamp) {
   reinterpret_cast<DataLog*>(datalog)->SetMetadata(
-      entry, wpi::to_string_view(metadata), timestamp);
+      entry, wpi::util::to_string_view(metadata), timestamp);
 }
 
 void WPI_DataLog_AppendRaw(struct WPI_DataLog* datalog, int entry,
@@ -846,8 +848,8 @@ void WPI_DataLog_AddSchemaString(struct WPI_DataLog* datalog,
                                  const struct WPI_String* schema,
                                  int64_t timestamp) {
   reinterpret_cast<DataLog*>(datalog)->AddSchema(
-      wpi::to_string_view(name), wpi::to_string_view(type),
-      wpi::to_string_view(schema), timestamp);
+      wpi::util::to_string_view(name), wpi::util::to_string_view(type),
+      wpi::util::to_string_view(schema), timestamp);
 }
 
 void WPI_DataLog_AddSchema(struct WPI_DataLog* datalog,
@@ -855,7 +857,7 @@ void WPI_DataLog_AddSchema(struct WPI_DataLog* datalog,
                            const struct WPI_String* type, const uint8_t* schema,
                            size_t schema_len, int64_t timestamp) {
   reinterpret_cast<DataLog*>(datalog)->AddSchema(
-      wpi::to_string_view(name), wpi::to_string_view(type),
+      wpi::util::to_string_view(name), wpi::util::to_string_view(type),
       std::span<const uint8_t>{schema, schema_len}, timestamp);
 }
 

@@ -51,9 +51,9 @@ http_archive(
 # Rules Python
 http_archive(
     name = "rules_python",
-    sha256 = "0a1cefefb4a7b550fb0b43f54df67d6da95b7ba352637669e46c987f69986f6a",
-    strip_prefix = "rules_python-1.5.3",
-    url = "https://github.com/bazel-contrib/rules_python/releases/download/1.5.3/rules_python-1.5.3.tar.gz",
+    sha256 = "2f5c284fbb4e86045c2632d3573fc006facbca5d1fa02976e89dc0cd5488b590",
+    strip_prefix = "rules_python-1.6.3",
+    url = "https://github.com/bazel-contrib/rules_python/releases/download/1.6.3/rules_python-1.6.3.tar.gz",
 )
 
 # Download Extra java rules
@@ -80,6 +80,27 @@ http_archive(
 )
 
 http_archive(
+    name = "pybind11_bazel",
+    integrity = "sha256-iwRj1wuX2pDS6t6DqiCfhIXisv4y+7CvxSJtZoSAzGw=",
+    strip_prefix = "pybind11_bazel-2b6082a4d9d163a52299718113fa41e4b7978db5",
+    urls = ["https://github.com/pybind/pybind11_bazel/archive/2b6082a4d9d163a52299718113fa41e4b7978db5.tar.gz"],
+)
+
+http_archive(
+    name = "pybind11",
+    build_file = "@pybind11_bazel//:pybind11-BUILD.bazel",
+    strip_prefix = "pybind11-dfe7e65b4527eeb11036402aac3a394130960bb2",
+    urls = ["https://github.com/pybind/pybind11/archive/dfe7e65b4527eeb11036402aac3a394130960bb2.zip"],
+)
+
+http_archive(
+    name = "rules_python_pytest",
+    sha256 = "e2556404ef56ea3ec938597616afc51d78e1832cfe511b196e9f2b8fd7f8f149",
+    strip_prefix = "rules_python_pytest-1.1.1",
+    url = "https://github.com/caseyduquettesc/rules_python_pytest/releases/download/v1.1.1/rules_python_pytest-v1.1.1.tar.gz",
+)
+
+http_archive(
     name = "bazel_skylib",
     sha256 = "51b5105a760b353773f904d2bbc5e664d0987fbaf22265164de65d43e910d8ac",
     urls = [
@@ -90,9 +111,17 @@ http_archive(
 
 http_archive(
     name = "rules_doxygen",
-    sha256 = "5d154d3d011208510392b5aee8ea23ec61ab858cc1f3382b6eb8c729d3b4b336",
-    strip_prefix = "rules_doxygen-2.4.2",
-    url = "https://github.com/TendTo/rules_doxygen/releases/download/2.4.2/rules_doxygen-2.4.2.tar.gz",
+    sha256 = "ab17caade4e4427578b545fa2890c55ee3898f8a7a5597416230227bbec8e61a",
+    strip_prefix = "rules_doxygen-2.5.0",
+    url = "https://github.com/TendTo/rules_doxygen/releases/download/2.5.0/rules_doxygen-2.5.0.tar.gz",
+)
+
+# This gives us a repository layout which matches what normal BCR modules expect.
+# The goal here is to make it easier to depend on external projects which already
+# include @eigen without introducing multiple eigen versions.
+local_repository(
+    name = "eigen",
+    path = "wpimath/src/main/native/thirdparty/eigen/include/",
 )
 
 load("@bazel_features//:deps.bzl", "bazel_features_deps")
@@ -138,6 +167,7 @@ pip_parse(
     name = "allwpilib_pip_deps",
     python_interpreter_target = "@python_3_10_host//:python",
     requirements_lock = "//:requirements_lock.txt",
+    requirements_windows = "//:requirements_windows_lock.txt",
 )
 
 load("@allwpilib_pip_deps//:requirements.bzl", "install_deps")
@@ -156,12 +186,12 @@ load("@rules_jvm_external//:defs.bzl", "maven_install")
 load("@rules_jvm_external//:specs.bzl", "maven")
 
 maven_artifacts = [
-    "org.ejml:ejml-simple:0.43.1",
-    "com.fasterxml.jackson.core:jackson-annotations:2.15.2",
-    "com.fasterxml.jackson.core:jackson-core:2.15.2",
-    "com.fasterxml.jackson.core:jackson-databind:2.15.2",
-    "us.hebi.quickbuf:quickbuf-runtime:1.3.3",
-    "com.google.code.gson:gson:2.10.1",
+    "org.ejml:ejml-simple:0.44.0",
+    "com.fasterxml.jackson.core:jackson-annotations:2.19.2",
+    "com.fasterxml.jackson.core:jackson-core:2.19.2",
+    "com.fasterxml.jackson.core:jackson-databind:2.19.2",
+    "us.hebi.quickbuf:quickbuf-runtime:1.4",
+    "com.google.code.gson:gson:2.13.1",
     "edu.wpi.first.thirdparty.frc2025.opencv:opencv-java:4.10.0-3",
     maven.artifact(
         "org.junit.jupiter",
@@ -371,6 +401,10 @@ load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
 
 rules_pkg_dependencies()
 
+load("@rules_python_pytest//python_pytest:repositories.bzl", "rules_python_pytest_dependencies")
+
+rules_python_pytest_dependencies()
+
 # Capture the repository environmental variables which specify the filter list for what architectures to build in CI.
 load("//shared/bazel/rules:publishing_rule.bzl", "publishing_repo")
 
@@ -384,7 +418,7 @@ bazel_skylib_workspace()
 
 load("@rules_doxygen//:extensions.bzl", "doxygen_repository")
 
-# Download the os specific version 1.12.0 of doxygen supporting all the indicated platforms
+# Download the os specific version 1.15.0 of doxygen supporting all the indicated platforms
 doxygen_repository(
     name = "doxygen",
     executables = [
@@ -398,13 +432,13 @@ doxygen_repository(
         "linux",
     ],
     sha256s = [
-        "07f1c92cbbb32816689c725539c0951f92c6371d3d7f66dfa3192cbe88dd3138",
-        "6ace7dde967d41f4e293d034a67eb2c7edd61318491ee3131112173a77344001",
-        "3c42c3f3fb206732b503862d9c9c11978920a8214f223a3950bbf2520be5f647",
+        "44658b9cc5c91749e6e3cc426ba63e2550b4a4a7619065acd77029aa234719c6",
+        "b7630eaa0d97bb50b0333929ef5dc1c18f9e38faf1e22dca3166189a9718faf0",
+        "0ec2e5b2c3cd82b7106d19cb42d8466450730b8cb7a9e85af712be38bf4523a1",
     ],
     versions = [
-        "1.12.0",
-        "1.12.0",
-        "1.12.0",
+        "1.15.0",
+        "1.15.0",
+        "1.15.0",
     ],
 )

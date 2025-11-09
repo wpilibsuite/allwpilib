@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Johnson <johnson.peter@gmail.com>
 Date: Fri, 20 Jan 2023 23:41:56 -0800
-Subject: [PATCH 2/2] Intellisense fix
+Subject: [PATCH 2/3] Intellisense fix
 
 ---
  Eigen/src/Core/util/ConfigureVectorization.h | 7 +++++++
  1 file changed, 7 insertions(+)
 
 diff --git a/Eigen/src/Core/util/ConfigureVectorization.h b/Eigen/src/Core/util/ConfigureVectorization.h
-index 49f307c734e937f013e659e931286a17ef6756f9..a9430716a320327aed81ea0cdffabc051aeb0ce2 100644
+index c2546a083898154a1d4bd741722a5544cbdb1d92..8b5cc16b2092a73804af87ed7f59722ae3fdab0c 100644
 --- a/Eigen/src/Core/util/ConfigureVectorization.h
 +++ b/Eigen/src/Core/util/ConfigureVectorization.h
 @@ -178,6 +178,13 @@

@@ -1,0 +1,80 @@
+defaults:
+  subpackage: controller
+
+functions:
+  IncrementAndGetProfiledPIDControllerInstances:
+    ignore: true
+classes:
+  wpi::math::ProfiledPIDController:
+    force_type_casters:
+    - wpi::units::radians_per_second
+    template_params:
+    - Distance
+    ignored_bases:
+    - wpi::util::SendableHelper<ProfiledPIDController<Distance>>
+    typealias:
+    - typename wpi::math::ProfiledPIDController<Distance>::Velocity
+    - typename wpi::math::ProfiledPIDController<Distance>::Velocity_t
+    methods:
+      ProfiledPIDController:
+        param_override:
+          constraints:
+            x_type: typename TrapezoidProfile<Distance>::Constraints
+          period:
+            default: 0.020_s
+      SetPID:
+      SetP:
+      SetI:
+      SetD:
+      SetIZone:
+      GetP:
+      GetI:
+      GetD:
+      GetIZone:
+      GetPeriod:
+      GetPositionTolerance:
+      GetVelocityTolerance:
+      GetAccumulatedError:
+      SetGoal:
+        overloads:
+          State:
+          Distance_t:
+      GetGoal:
+      AtGoal:
+      SetConstraints:
+      GetConstraints:
+      GetSetpoint:
+      AtSetpoint:
+      EnableContinuousInput:
+      DisableContinuousInput:
+      SetIntegratorRange:
+      SetTolerance:
+      GetPositionError:
+      GetVelocityError:
+      Calculate:
+        overloads:
+          Distance_t:
+          Distance_t, State:
+          Distance_t, Distance_t:
+          Distance_t, Distance_t, typename wpi::math::TrapezoidProfile<Distance>::Constraints:
+            param_override:
+              constraints:
+                x_type: typename TrapezoidProfile<Distance>::Constraints
+      Reset:
+        overloads:
+          const State&:
+          Distance_t, Velocity_t:
+          Distance_t:
+      InitSendable:
+
+templates:
+  ProfiledPIDController:
+    qualname: wpi::math::ProfiledPIDController
+    params:
+    - wpi::units::dimensionless::scalar
+
+  # needed for HolonomicDriveController
+  ProfiledPIDControllerRadians:
+    qualname: wpi::math::ProfiledPIDController
+    params:
+    - wpi::units::radian

@@ -14,15 +14,15 @@ modifiableFileExclude {
 }
 
 generatedFileExclude {
-  src/main/native/include/units/base\.h$
-  src/main/native/include/units/units\.h$
-  src/main/native/include/unsupported/
+  src/main/native/include/wpi/units/base\.hpp$
+  src/main/native/include/wpi/units/units\.hpp$
   src/main/native/thirdparty/
   src/test/native/cpp/UnitsTest\.cpp$
-  src/test/native/cpp/drake/
-  src/test/native/include/drake/
-  src/generated/main/java/edu/wpi/first/math/proto
+  src/generated/main/java/org/wpilib/math/proto
   src/generated/main/native/cpp
+
+  src/main/python/
+  src/test/python/
 }
 
 repoRootNameOverride {
@@ -39,12 +39,11 @@ includeOtherLibs {
   ^Eigen/
   ^fmt/
   ^gcem/
-  ^google/
   ^gtest/
+  ^sleipnir/
   ^unsupported/
-  ^wpi/
 }
 
 includeProject {
-  ^units/
+  wpi/util/expected
 }

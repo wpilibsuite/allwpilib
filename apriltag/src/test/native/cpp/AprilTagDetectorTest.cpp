@@ -4,9 +4,9 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/apriltag/AprilTagDetector.h"
+#include "wpi/apriltag/AprilTagDetector.hpp"
 
-using namespace frc;
+using namespace wpi::apriltag;
 
 TEST(AprilTagDetectorTest, ConfigDefaults) {
   AprilTagDetector detector;

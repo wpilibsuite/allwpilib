@@ -2,25 +2,27 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "Drivetrain.h"
+#include "Drivetrain.hpp"
 
-#include <frc/kinematics/ChassisSpeeds.h>
+#include "wpi/math/kinematics/ChassisSpeeds.hpp"
 
-frc::MecanumDriveWheelSpeeds Drivetrain::GetCurrentState() const {
-  return {units::meters_per_second_t{m_frontLeftEncoder.GetRate()},
-          units::meters_per_second_t{m_frontRightEncoder.GetRate()},
-          units::meters_per_second_t{m_backLeftEncoder.GetRate()},
-          units::meters_per_second_t{m_backRightEncoder.GetRate()}};
+wpi::math::MecanumDriveWheelSpeeds Drivetrain::GetCurrentState() const {
+  return {wpi::units::meters_per_second_t{m_frontLeftEncoder.GetRate()},
+          wpi::units::meters_per_second_t{m_frontRightEncoder.GetRate()},
+          wpi::units::meters_per_second_t{m_backLeftEncoder.GetRate()},
+          wpi::units::meters_per_second_t{m_backRightEncoder.GetRate()}};
 }
 
-frc::MecanumDriveWheelPositions Drivetrain::GetCurrentWheelDistances() const {
-  return {units::meter_t{m_frontLeftEncoder.GetDistance()},
-          units::meter_t{m_frontRightEncoder.GetDistance()},
-          units::meter_t{m_backLeftEncoder.GetDistance()},
-          units::meter_t{m_backRightEncoder.GetDistance()}};
+wpi::math::MecanumDriveWheelPositions Drivetrain::GetCurrentWheelDistances()
+    const {
+  return {wpi::units::meter_t{m_frontLeftEncoder.GetDistance()},
+          wpi::units::meter_t{m_frontRightEncoder.GetDistance()},
+          wpi::units::meter_t{m_backLeftEncoder.GetDistance()},
+          wpi::units::meter_t{m_backRightEncoder.GetDistance()}};
 }
 
-void Drivetrain::SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds) {
+void Drivetrain::SetSpeeds(
+    const wpi::math::MecanumDriveWheelSpeeds& wheelSpeeds) {
   const auto frontLeftFeedforward =
       m_feedforward.Calculate(wheelSpeeds.frontLeft);
   const auto frontRightFeedforward =
@@ -39,28 +41,28 @@ void Drivetrain::SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds) {
   const double backRightOutput = m_backRightPIDController.Calculate(
       m_backRightEncoder.GetRate(), wheelSpeeds.rearRight.value());
 
-  m_frontLeftMotor.SetVoltage(units::volt_t{frontLeftOutput} +
+  m_frontLeftMotor.SetVoltage(wpi::units::volt_t{frontLeftOutput} +
                               frontLeftFeedforward);
-  m_frontRightMotor.SetVoltage(units::volt_t{frontRightOutput} +
+  m_frontRightMotor.SetVoltage(wpi::units::volt_t{frontRightOutput} +
                                frontRightFeedforward);
-  m_backLeftMotor.SetVoltage(units::volt_t{backLeftOutput} +
+  m_backLeftMotor.SetVoltage(wpi::units::volt_t{backLeftOutput} +
                              backLeftFeedforward);
-  m_backRightMotor.SetVoltage(units::volt_t{backRightOutput} +
+  m_backRightMotor.SetVoltage(wpi::units::volt_t{backRightOutput} +
                               backRightFeedforward);
 }
 
-void Drivetrain::Drive(units::meters_per_second_t xSpeed,
-                       units::meters_per_second_t ySpeed,
-                       units::radians_per_second_t rot, bool fieldRelative,
-                       units::second_t period) {
-  frc::ChassisSpeeds chassisSpeeds{xSpeed, ySpeed, rot};
+void Drivetrain::Drive(wpi::units::meters_per_second_t xSpeed,
+                       wpi::units::meters_per_second_t ySpeed,
+                       wpi::units::radians_per_second_t rot, bool fieldRelative,
+                       wpi::units::second_t period) {
+  wpi::math::ChassisSpeeds chassisSpeeds{xSpeed, ySpeed, rot};
   if (fieldRelative) {
-    chassisSpeeds = chassisSpeeds.ToRobotRelative(m_gyro.GetRotation2d());
+    chassisSpeeds = chassisSpeeds.ToRobotRelative(m_imu.GetRotation2d());
   }
   SetSpeeds(m_kinematics.ToWheelSpeeds(chassisSpeeds.Discretize(period))
                 .Desaturate(kMaxSpeed));
 }
 
 void Drivetrain::UpdateOdometry() {
-  m_odometry.Update(m_gyro.GetRotation2d(), GetCurrentWheelDistances());
+  m_odometry.Update(m_imu.GetRotation2d(), GetCurrentWheelDistances());
 }

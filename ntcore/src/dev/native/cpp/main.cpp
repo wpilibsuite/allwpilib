@@ -16,15 +16,15 @@
 
 #include <fmt/format.h>
 #include <fmt/ranges.h>
-#include <wpi/Synchronization.h>
-#include <wpi/print.h>
-#include <wpi/timestamp.h>
 
-#include "networktables/DoubleArrayTopic.h"
-#include "networktables/NetworkTableInstance.h"
-#include "ntcore.h"
-#include "ntcore_c.h"
-#include "ntcore_cpp.h"
+#include "wpi/nt/DoubleArrayTopic.hpp"
+#include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/nt/ntcore.h"
+#include "wpi/nt/ntcore_c.h"
+#include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/Synchronization.h"
+#include "wpi/util/print.hpp"
+#include "wpi/util/timestamp.h"
 
 void bench();
 void bench2();
@@ -54,11 +54,11 @@ int main(int argc, char* argv[]) {
     return EXIT_SUCCESS;
   }
 
-  auto myValue = nt::GetEntry(nt::GetDefaultInstance(), "MyValue");
+  auto myValue = wpi::nt::GetEntry(wpi::nt::GetDefaultInstance(), "MyValue");
 
-  nt::SetEntryValue(myValue, nt::Value::MakeString("Hello World"));
+  wpi::nt::SetEntryValue(myValue, wpi::nt::Value::MakeString("Hello World"));
 
-  wpi::print("{}\n", nt::GetEntryValue(myValue).GetString());
+  wpi::util::print("{}\n", wpi::nt::GetEntryValue(myValue).GetString());
 }
 
 void PrintTimes(std::vector<int64_t>& times) {
@@ -72,36 +72,40 @@ void PrintTimes(std::vector<int64_t>& times) {
       std::inner_product(times.begin(), times.end(), times.begin(), 0);
   double stdev = std::sqrt(sq_sum / times.size() - mean * mean);
 
-  wpi::print("min: {} max: {}, mean: {}, stdev: {}\n", min, max, mean, stdev);
-  wpi::print("min 10: {}\n", fmt::join(times.begin(), times.begin() + 10, ","));
-  wpi::print("max 10: {}\n", fmt::join(times.end() - 10, times.end(), ","));
+  wpi::util::print("min: {} max: {}, mean: {}, stdev: {}\n", min, max, mean,
+                   stdev);
+  wpi::util::print("min 10: {}\n",
+                   fmt::join(times.begin(), times.begin() + 10, ","));
+  wpi::util::print("max 10: {}\n",
+                   fmt::join(times.end() - 10, times.end(), ","));
 }
 
 // benchmark
 void bench() {
   // set up instances
-  auto client = nt::CreateInstance();
-  auto server = nt::CreateInstance();
+  auto client = wpi::nt::CreateInstance();
+  auto server = wpi::nt::CreateInstance();
 
   // connect client and server
-  nt::StartServer(server, "bench.json", "127.0.0.1", 10000);
-  nt::StartClient(client, "client");
-  nt::SetServer(client, "127.0.0.1", 10000);
+  wpi::nt::StartServer(server, "bench.json", "127.0.0.1", 10000);
+  wpi::nt::StartClient(client, "client");
+  wpi::nt::SetServer(client, "127.0.0.1", 10000);
 
   using namespace std::chrono_literals;
   std::this_thread::sleep_for(1s);
 
   // add "typical" set of subscribers on client and server
-  nt::SubscribeMultiple(client, {{std::string_view{}}});
-  nt::Subscribe(nt::GetTopic(client, "highrate"), NT_DOUBLE, "double",
-                {.sendAll = true, .keepDuplicates = true});
-  nt::SubscribeMultiple(server, {{std::string_view{}}});
-  auto pub = nt::Publish(nt::GetTopic(server, "highrate"), NT_DOUBLE, "double");
-  nt::SetDouble(pub, 0);
+  wpi::nt::SubscribeMultiple(client, {{std::string_view{}}});
+  wpi::nt::Subscribe(wpi::nt::GetTopic(client, "highrate"), NT_DOUBLE, "double",
+                     {.sendAll = true, .keepDuplicates = true});
+  wpi::nt::SubscribeMultiple(server, {{std::string_view{}}});
+  auto pub = wpi::nt::Publish(wpi::nt::GetTopic(server, "highrate"), NT_DOUBLE,
+                              "double");
+  wpi::nt::SetDouble(pub, 0);
 
   // warm up
   for (int i = 1; i <= 10000; ++i) {
-    nt::SetDouble(pub, i * 0.01);
+    wpi::nt::SetDouble(pub, i * 0.01);
     if (i % 2000 == 0) {
       std::this_thread::sleep_for(0.02s);
     }
@@ -115,56 +119,57 @@ void bench() {
 
   // benchmark
   auto start = std::chrono::high_resolution_clock::now();
-  int64_t now = nt::Now();
+  int64_t now = wpi::nt::Now();
   for (int i = 1; i <= 100000; ++i) {
-    nt::SetDouble(pub, i * 0.01, now);
+    wpi::nt::SetDouble(pub, i * 0.01, now);
     int64_t prev = now;
-    now = nt::Now();
+    now = wpi::nt::Now();
     times.emplace_back(now - prev);
     if (i % 2000 == 0) {
-      nt::Flush(server);
-      flushTimes.emplace_back(nt::Now() - now);
+      wpi::nt::Flush(server);
+      flushTimes.emplace_back(wpi::nt::Now() - now);
       std::this_thread::sleep_for(0.02s);
-      now = nt::Now();
+      now = wpi::nt::Now();
     }
   }
   auto stop = std::chrono::high_resolution_clock::now();
 
-  wpi::print("total time: {}us\n",
-             std::chrono::duration_cast<std::chrono::microseconds>(stop - start)
-                 .count());
+  wpi::util::print(
+      "total time: {}us\n",
+      std::chrono::duration_cast<std::chrono::microseconds>(stop - start)
+          .count());
   PrintTimes(times);
-  wpi::print("-- Flush --\n");
+  wpi::util::print("-- Flush --\n");
   PrintTimes(flushTimes);
 }
 
 void bench2() {
   // set up instances
-  auto client1 = nt::CreateInstance();
-  auto client2 = nt::CreateInstance();
-  auto server = nt::CreateInstance();
+  auto client1 = wpi::nt::CreateInstance();
+  auto client2 = wpi::nt::CreateInstance();
+  auto server = wpi::nt::CreateInstance();
 
   // connect client and server
-  nt::StartServer(server, "bench2.json", "127.0.0.1", 10000);
-  nt::StartClient(client1, "client1");
-  nt::StartClient(client2, "client2");
-  nt::SetServer(client1, "127.0.0.1", 10000);
-  nt::SetServer(client2, "127.0.0.1", 10000);
+  wpi::nt::StartServer(server, "bench2.json", "127.0.0.1", 10000);
+  wpi::nt::StartClient(client1, "client1");
+  wpi::nt::StartClient(client2, "client2");
+  wpi::nt::SetServer(client1, "127.0.0.1", 10000);
+  wpi::nt::SetServer(client2, "127.0.0.1", 10000);
 
   using namespace std::chrono_literals;
   std::this_thread::sleep_for(1s);
 
   // add "typical" set of subscribers on client and server
-  nt::SubscribeMultiple(client1, {{std::string_view{}}});
-  nt::SubscribeMultiple(client2, {{std::string_view{}}});
-  nt::SubscribeMultiple(server, {{std::string_view{}}});
+  wpi::nt::SubscribeMultiple(client1, {{std::string_view{}}});
+  wpi::nt::SubscribeMultiple(client2, {{std::string_view{}}});
+  wpi::nt::SubscribeMultiple(server, {{std::string_view{}}});
 
   // create 1000 entries
   std::array<NT_Entry, 1000> pubs;
   for (int i = 0; i < 1000; ++i) {
-    pubs[i] = nt::GetEntry(
-        nt::GetTopic(server,
-                     fmt::format("/some/long/name/with/lots/of/slashes/{}", i)),
+    pubs[i] = wpi::nt::GetEntry(
+        wpi::nt::GetTopic(
+            server, fmt::format("/some/long/name/with/lots/of/slashes/{}", i)),
         NT_DOUBLE_ARRAY, "double[]");
   }
 
@@ -172,9 +177,9 @@ void bench2() {
   for (int i = 1; i <= 100; ++i) {
     for (auto pub : pubs) {
       double vals[3] = {i * 0.01, i * 0.02, i * 0.03};
-      nt::SetDoubleArray(pub, vals);
+      wpi::nt::SetDoubleArray(pub, vals);
     }
-    nt::FlushLocal(server);
+    wpi::nt::FlushLocal(server);
     std::this_thread::sleep_for(0.02s);
   }
 
@@ -186,28 +191,29 @@ void bench2() {
 
   // benchmark
   auto start = std::chrono::high_resolution_clock::now();
-  int64_t now = nt::Now();
+  int64_t now = wpi::nt::Now();
   for (int i = 1; i <= 1000; ++i) {
     for (auto pub : pubs) {
       double vals[3] = {i * 0.01, i * 0.02, i * 0.03};
-      nt::SetDoubleArray(pub, vals);
+      wpi::nt::SetDoubleArray(pub, vals);
     }
     int64_t prev = now;
-    now = nt::Now();
+    now = wpi::nt::Now();
     times.emplace_back(now - prev);
-    nt::FlushLocal(server);
-    nt::Flush(server);
-    flushTimes.emplace_back(nt::Now() - now);
+    wpi::nt::FlushLocal(server);
+    wpi::nt::Flush(server);
+    flushTimes.emplace_back(wpi::nt::Now() - now);
     std::this_thread::sleep_for(0.02s);
-    now = nt::Now();
+    now = wpi::nt::Now();
   }
   auto stop = std::chrono::high_resolution_clock::now();
 
-  wpi::print("total time: {}us\n",
-             std::chrono::duration_cast<std::chrono::microseconds>(stop - start)
-                 .count());
+  wpi::util::print(
+      "total time: {}us\n",
+      std::chrono::duration_cast<std::chrono::microseconds>(stop - start)
+          .count());
   PrintTimes(times);
-  wpi::print("-- Flush --\n");
+  wpi::util::print("-- Flush --\n");
   PrintTimes(flushTimes);
 }
 
@@ -216,31 +222,31 @@ static std::mt19937 gen(r());
 static std::uniform_real_distribution<double> dist;
 
 void stress() {
-  auto server = nt::CreateInstance();
-  nt::StartServer(server, "stress.json", "127.0.0.1", 10000);
-  nt::SubscribeMultiple(server, {{std::string_view{}}});
+  auto server = wpi::nt::CreateInstance();
+  wpi::nt::StartServer(server, "stress.json", "127.0.0.1", 10000);
+  wpi::nt::SubscribeMultiple(server, {{std::string_view{}}});
 
   using namespace std::chrono_literals;
 
   for (int count = 0; count < 10; ++count) {
     std::thread{[] {
-      auto client = nt::CreateInstance();
-      nt::SubscribeMultiple(client, {{std::string_view{}}});
+      auto client = wpi::nt::CreateInstance();
+      wpi::nt::SubscribeMultiple(client, {{std::string_view{}}});
       for (int i = 0; i < 300; ++i) {
         // sleep a random amount of time
         std::this_thread::sleep_for(0.1s * dist(gen));
 
         // connect
-        nt::StartClient(client, "client");
-        nt::SetServer(client, "127.0.0.1", 10000);
+        wpi::nt::StartClient(client, "client");
+        wpi::nt::SetServer(client, "127.0.0.1", 10000);
 
         // sleep a random amount of time
         std::this_thread::sleep_for(0.1s * dist(gen));
 
         // disconnect
-        nt::StopClient(client);
+        wpi::nt::StopClient(client);
       }
-      nt::DestroyInstance(client);
+      wpi::nt::DestroyInstance(client);
     }}.detach();
 
     std::thread{[server, count] {
@@ -251,9 +257,9 @@ void stress() {
         // create publishers
         NT_Publisher pub[30];
         for (int i = 0; i < 30; ++i) {
-          pub[i] =
-              nt::Publish(nt::GetTopic(server, fmt::format("{}_{}", count, i)),
-                          NT_DOUBLE, "double", {});
+          pub[i] = wpi::nt::Publish(
+              wpi::nt::GetTopic(server, fmt::format("{}_{}", count, i)),
+              NT_DOUBLE, "double", {});
         }
 
         // publish values
@@ -261,9 +267,9 @@ void stress() {
           // sleep a random amount of time between each value set
           std::this_thread::sleep_for(0.001s * dist(gen));
           for (int i = 0; i < 30; ++i) {
-            nt::SetDouble(pub[i], dist(gen));
+            wpi::nt::SetDouble(pub[i], dist(gen));
           }
-          nt::FlushLocal(server);
+          wpi::nt::FlushLocal(server);
         }
 
         // sleep a random amount of time
@@ -271,7 +277,7 @@ void stress() {
 
         // remove publishers
         for (int i = 0; i < 30; ++i) {
-          nt::Unpublish(pub[i]);
+          wpi::nt::Unpublish(pub[i]);
         }
       }
     }}.detach();
@@ -286,11 +292,11 @@ void stress2() {
   auto testTopicName = "testTopic";
   auto count = 1000;
   std::atomic_bool isDone{false};
-  nt::PubSubOptions pubSubOptions{
+  wpi::nt::PubSubOptions pubSubOptions{
       .periodic = std::numeric_limits<double>::min(),
       .sendAll = true,
       .keepDuplicates = true};
-  auto server = nt::NetworkTableInstance::Create();
+  auto server = wpi::nt::NetworkTableInstance::Create();
   server.StartServer();
   auto serverTopic = server.GetDoubleArrayTopic(testTopicName);
   auto subscriber = serverTopic.Subscribe({}, pubSubOptions);
@@ -308,7 +314,7 @@ void stress2() {
     // event.valueData.value.getDoubleArray())));
   });
 
-  auto client = nt::NetworkTableInstance::Create();
+  auto client = wpi::nt::NetworkTableInstance::Create();
   client.SetServer("localhost");
   auto clientName = "test client";
   client.StartClient(clientName);
@@ -333,36 +339,36 @@ void stress2() {
 
 void latency() {
   // set up instances
-  auto client1 = nt::CreateInstance();
-  auto client2 = nt::CreateInstance();
-  auto server = nt::CreateInstance();
+  auto client1 = wpi::nt::CreateInstance();
+  auto client2 = wpi::nt::CreateInstance();
+  auto server = wpi::nt::CreateInstance();
 
   // connect client and server
-  nt::StartServer(server, "latency.json", "127.0.0.1", 10000);
-  nt::StartClient(client1, "client1");
-  nt::SetServer(client1, "127.0.0.1", 10000);
-  nt::StartClient(client2, "client2");
-  nt::SetServer(client2, "127.0.0.1", 10000);
+  wpi::nt::StartServer(server, "latency.json", "127.0.0.1", 10000);
+  wpi::nt::StartClient(client1, "client1");
+  wpi::nt::SetServer(client1, "127.0.0.1", 10000);
+  wpi::nt::StartClient(client2, "client2");
+  wpi::nt::SetServer(client2, "127.0.0.1", 10000);
 
   using namespace std::chrono_literals;
   std::this_thread::sleep_for(1s);
 
   // create publishers and subscribers
-  auto pub =
-      nt::Publish(nt::GetTopic(client1, "highrate"), NT_DOUBLE, "double");
-  nt::SubscribeMultiple(server, {{std::string_view{}}});
-  auto sub =
-      nt::Subscribe(nt::GetTopic(server, "highrate"), NT_DOUBLE, "double");
-  auto sub2 =
-      nt::Subscribe(nt::GetTopic(client2, "highrate"), NT_DOUBLE, "double");
+  auto pub = wpi::nt::Publish(wpi::nt::GetTopic(client1, "highrate"), NT_DOUBLE,
+                              "double");
+  wpi::nt::SubscribeMultiple(server, {{std::string_view{}}});
+  auto sub = wpi::nt::Subscribe(wpi::nt::GetTopic(server, "highrate"),
+                                NT_DOUBLE, "double");
+  auto sub2 = wpi::nt::Subscribe(wpi::nt::GetTopic(client2, "highrate"),
+                                 NT_DOUBLE, "double");
 
   std::this_thread::sleep_for(1s);
 
-  nt::SetDouble(pub, 0);
+  wpi::nt::SetDouble(pub, 0);
 #if 0
   // warm up
   for (int i = 1; i <= 10000; ++i) {
-    nt::SetDouble(pub, i * 0.01);
+    wpi::nt::SetDouble(pub, i * 0.01);
     if (i % 2000 == 0) {
       std::this_thread::sleep_for(0.02s);
     }
@@ -374,26 +380,26 @@ void latency() {
 
   // benchmark client to server
   for (int i = 1; i <= 1000; ++i) {
-    int64_t sendTime = nt::Now();
-    nt::SetDouble(pub, i, sendTime);
-    nt::Flush(client1);
-    while (nt::GetDouble(sub, 0) != i) {
-      wpi::WaitForObject(sub);
+    int64_t sendTime = wpi::nt::Now();
+    wpi::nt::SetDouble(pub, i, sendTime);
+    wpi::nt::Flush(client1);
+    while (wpi::nt::GetDouble(sub, 0) != i) {
+      wpi::util::WaitForObject(sub);
     }
-    times.emplace_back(nt::Now() - sendTime);
+    times.emplace_back(wpi::nt::Now() - sendTime);
   }
   PrintTimes(times);
 
   // benchmark client to client
   times.resize(0);
   for (int i = 2001; i <= 3000; ++i) {
-    int64_t sendTime = nt::Now();
-    nt::SetDouble(pub, i, sendTime);
-    nt::Flush(client1);
-    while (nt::GetDouble(sub2, 0) != i) {
-      wpi::WaitForObject(sub2);
+    int64_t sendTime = wpi::nt::Now();
+    wpi::nt::SetDouble(pub, i, sendTime);
+    wpi::nt::Flush(client1);
+    while (wpi::nt::GetDouble(sub2, 0) != i) {
+      wpi::util::WaitForObject(sub2);
     }
-    times.emplace_back(nt::Now() - sendTime);
+    times.emplace_back(wpi::nt::Now() - sendTime);
   }
 
   PrintTimes(times);

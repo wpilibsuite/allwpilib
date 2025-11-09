@@ -1,0 +1,55 @@
+extra_includes:
+- rpy/geometryToString.h
+- wpystruct.h
+
+functions:
+  to_json:
+    ignore: true
+  from_json:
+    ignore: true
+classes:
+  wpi::math::Rotation2d:
+    methods:
+      Rotation2d:
+        overloads:
+          '':
+          auto:
+            doc: |
+              Constructs a Rotation2d with the given radian value.
+              :param value: The value of the angle in radians.
+            param_override:
+              value:
+                x_type: wpi::units::radian_t
+            template_impls:
+            - [wpi::units::radian_t]
+          double, double:
+          const Eigen::Matrix2d&:
+            rename: fromMatrix
+            keepalive: []
+      RotateBy:
+      ToMatrix:
+      Radians:
+      Degrees:
+      Cos:
+      Sin:
+      Tan:
+      operator+:
+      operator-:
+        overloads:
+          const Rotation2d& [const]:
+          '[const]':
+      operator*:
+      operator/:
+      operator==:
+
+inline_code: |
+  cls_Rotation2d
+    .def_static("fromDegrees", [](wpi::units::degree_t value) {
+      return std::make_unique<Rotation2d>(value);
+    }, py::arg("value"))
+    .def_static("fromRotations", [](wpi::units::turn_t value) {
+      return std::make_unique<Rotation2d>(value);
+    })
+    .def("__repr__", py::overload_cast<const Rotation2d&>(&rpy::toString));
+
+  SetupWPyStruct<wpi::math::Rotation2d>(cls_Rotation2d);

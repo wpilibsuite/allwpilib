@@ -1,0 +1,63 @@
+classes:
+  wpi::nt::NetworkTableListener:
+    force_type_casters:
+    - std::function
+    methods:
+      NetworkTableListener:
+        overloads:
+          '':
+      CreateListener:
+        overloads:
+          NetworkTableInstance, std::span<const std::string_view>, unsigned int, ListenerCallback:
+          Topic, unsigned int, ListenerCallback:
+          Subscriber&, unsigned int, ListenerCallback:
+          MultiSubscriber&, unsigned int, ListenerCallback:
+          NetworkTableEntry&, unsigned int, ListenerCallback:
+      CreateConnectionListener:
+      CreateTimeSyncListener:
+      CreateLogger:
+      GetHandle:
+      WaitForQueue:
+    inline_code: |
+      .def("close", [](NetworkTableListener *self) {
+        py::gil_scoped_release release;
+        *self = NetworkTableListener();
+      }, py::doc("Destroys the listener"))
+      .def("__enter__", [](NetworkTableListener *self) {
+        return self;
+      })
+      .def("__exit__", [](NetworkTableListener *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = NetworkTableListener();
+      })
+  wpi::nt::NetworkTableListenerPoller:
+    methods:
+      NetworkTableListenerPoller:
+        overloads:
+          '':
+          NetworkTableInstance:
+      GetHandle:
+      AddListener:
+        overloads:
+          std::span<const std::string_view>, unsigned int:
+          Topic, unsigned int:
+          Subscriber&, unsigned int:
+          MultiSubscriber&, unsigned int:
+          NetworkTableEntry&, unsigned int:
+      AddConnectionListener:
+      AddTimeSyncListener:
+      AddLogger:
+      RemoveListener:
+      ReadQueue:
+    inline_code: |
+      .def("close", [](NetworkTableListenerPoller *self) {
+        py::gil_scoped_release release;
+        *self = NetworkTableListenerPoller();
+      }, py::doc("Destroys the poller"))
+      .def("__enter__", [](NetworkTableListenerPoller *self) {
+        return self;
+      })
+      .def("__exit__", [](NetworkTableListenerPoller *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = NetworkTableListenerPoller();
+      })

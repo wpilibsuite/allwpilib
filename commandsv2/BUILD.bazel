@@ -1,0 +1,185 @@
+load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
+load("@rules_java//java:defs.bzl", "java_binary")
+load("@rules_python//python:defs.bzl", "py_binary")
+load("//commandsv2:generate.bzl", "generate_wpilib_new_commands")
+load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test", "wpilib_java_library")
+load("//shared/bazel/rules:packaging.bzl", "package_minimal_cc_project")
+
+filegroup(
+    name = "doxygen-files",
+    srcs = glob([
+        "src/generated/main/native/include/**/*",
+        "src/main/native/include/**/*",
+    ]),
+    visibility = ["//visibility:public"],
+)
+
+py_binary(
+    name = "generate_hids",
+    srcs = ["generate_hids.py"],
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    deps = [requirement("jinja2")],
+)
+
+filegroup(
+    name = "templates",
+    srcs = glob(["src/generate/main/**"]) + [
+        "//wpilibj:hid_schema",
+    ],
+)
+
+generate_wpilib_new_commands(
+    name = "generate_wpilib_new_commands",
+)
+
+write_source_files(
+    name = "write_wpilib_new_commands",
+    files = {
+        "src/generated": ":generate_wpilib_new_commands",
+    },
+    suggested_update_target = "//:write_all",
+    tags = ["pregeneration"],
+    visibility = ["//visibility:public"],
+)
+
+third_party_cc_lib_helper(
+    name = "generated_cc",
+    include_root = "src/generated/main/native/include",
+    src_root = "src/generated/main/native/cpp",
+)
+
+filegroup(
+    name = "generated_java",
+    srcs = glob(["src/generated/main/java/**/*.java"]),
+)
+
+wpilib_cc_library(
+    name = "commandsv2",
+    srcs = glob(["src/main/native/cpp/**"]),
+    hdrs = glob(["src/main/native/include/**"]),
+    includes = ["src/main/native/include"],
+    strip_include_prefix = "src/main/native/include",
+    third_party_libraries = [
+        ":generated_cc",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//ntcore",
+        "//wpilibc",
+        "//wpinet",
+    ],
+)
+
+wpilib_cc_shared_library(
+    name = "shared/commandsv2",
+    dynamic_deps = [
+        "//hal:shared/wpiHal",
+        "//ntcore:shared/ntcore",
+        "//wpilibc:shared/wpilibc",
+        "//wpimath:shared/wpimath",
+        "//wpinet:shared/wpinet",
+        "//wpiutil:shared/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [":commandsv2"],
+)
+
+wpilib_cc_static_library(
+    name = "static/commandsv2",
+    static_deps = [
+        "//ntcore:static/ntcore",
+        "//wpilibc:static/wpilibc",
+        "//wpinet:static/wpinet",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [":commandsv2"],
+)
+
+wpilib_java_library(
+    name = "commandsv2-java",
+    srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
+    exported_plugins = ["//javacPlugin:plugin"],
+    maven_artifact_name = "commandsv2-java",
+    maven_group_id = "org.wpilib.commandsv2",
+    plugins = ["//javacPlugin:plugin"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cscore:cscore-java",
+        "//hal:hal-java",
+        "//ntcore:ntcore-java",
+        "//wpiannotations",
+        "//wpilibj:wpilibj-java",
+        "//wpimath:wpimath-java",
+        "//wpinet:wpinet-java",
+        "//wpiunits:wpiunits-java",
+        "//wpiutil:wpiutil-java",
+    ],
+)
+
+cc_test(
+    name = "commandsv2-cpp-test",
+    size = "small",
+    srcs = glob([
+        "src/test/native/**/*.cpp",
+        "src/test/native/**/*.hpp",
+    ]),
+    tags = [
+        "no-tsan",
+        "no-ubsan",
+    ],
+    deps = [
+        ":commandsv2",
+        "//thirdparty/googletest",
+    ],
+)
+
+wpilib_java_junit5_test(
+    name = "commandsv2-java-test",
+    srcs = glob(["src/main/java/**/*.java"]),
+    resource_strip_prefix = "commandsv2/src/test/resources",
+    resources = glob(["src/test/resources/**"]),
+    deps = [
+        ":commandsv2-java",
+        "//hal:hal-java",
+        "//ntcore:ntcore-java",
+        "//wpiannotations",
+        "//wpilibj:wpilibj-java",
+        "//wpimath:wpimath-java",
+        "//wpiunits:wpiunits-java",
+        "//wpiutil:wpiutil-java",
+        "@maven//:org_mockito_mockito_core",
+    ],
+)
+
+cc_binary(
+    name = "DevMain-Cpp",
+    srcs = ["src/dev/native/cpp/main.cpp"],
+    deps = [
+    ],
+)
+
+java_binary(
+    name = "DevMain-Java",
+    srcs = ["src/dev/java/org/wpilib/commands2/DevMain.java"],
+    main_class = "org.wpilib.commands2.DevMain",
+    deps = [
+        ":commandsv2-java",
+        "//hal:hal-java",
+        "//ntcore:ntcore-java",
+        "//wpiannotations",
+        "//wpimath:wpimath-java",
+        "//wpiutil:wpiutil-java",
+    ],
+)
+
+package_minimal_cc_project(
+    name = "commandsv2",
+    maven_artifact_name = "commandsv2-cpp",
+    maven_group_id = "org.wpilib.commandsv2",
+)

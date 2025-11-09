@@ -1,0 +1,283 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [
+    "semiwrap~=0.2.1",
+    "hatch-meson~=0.1.0",
+    "hatch-robotpy~=0.2.1",
+    "hatchling",
+    "robotpy-native-wpilib==0.0.0",
+    "robotpy-wpiutil==0.0.0",
+    "robotpy-wpimath==0.0.0",
+    "robotpy-hal==0.0.0",
+    "pyntcore==0.0.0",
+]
+
+[project]
+name = "wpilib"
+version = "0.0.0"
+description = "Binary wrapper for FRC WPILib"
+authors = [
+    {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
+]
+license = "BSD-3-Clause"
+dependencies = [
+    "robotpy-native-wpilib==0.0.0",
+    "robotpy-wpiutil==0.0.0",
+    "robotpy-wpimath==0.0.0",
+    "robotpy-hal==0.0.0",
+    "pyntcore==0.0.0",
+    "robotpy-cli~=2027.0.0a1"
+]
+
+[project.urls]
+"Source code" = "https://github.com/robotpy/mostrobotpy"
+
+[project.entry-points."robotpy_cli.2027"]
+run = "wpilib._impl.start:Main"
+
+
+[tool.hatch.build.hooks.robotpy]
+version_file = "wpilib/version.py"
+
+[tool.hatch.build.hooks.semiwrap]
+
+[tool.hatch.build.hooks.meson]
+
+[tool.hatch.build.targets.wheel]
+packages = ["wpilib"]
+
+
+[tool.semiwrap]
+update_init = [
+    "wpilib",
+    "wpilib.counter",
+    "wpilib.drive",
+    "wpilib.event",
+    "wpilib.interfaces wpilib._wpilib.interfaces",
+    "wpilib.simulation",
+    "wpilib.sysid wpilib._wpilib.sysid",
+]
+scan_headers_ignore = [
+    "wpi/system/WPILibVersion.hpp",
+
+    # needs a python wrapper
+    "frc/AsynchronousInterrupt.h",
+
+    "wpi/system/Filesystem.hpp",
+    "wpi/system/Notifier.hpp", # wrapped separately
+    "wpi/system/Resource.hpp",
+    "wpi/system/ScopedTracer.hpp", # not useful for python
+
+    "wpi/hardware/motor/MotorControllerGroup.hpp", # wrapped separately
+
+    "wpi/smartdashboard/ListenerExecutor.hpp",    # internal detail
+
+    # Internals
+    "rpy/ControlWord.h",
+    "rpy/SmartDashboardData.h",
+]
+
+[tool.semiwrap.extension_modules."wpilib._wpilib"]
+name = "wpilib"
+wraps = ["robotpy-native-wpilib"]
+depends = [
+    "wpihal", "wpiutil", "ntcore",
+    "wpimath", "wpimath_geometry", "wpimath_controls",
+    "wpilib_event"
+]
+includes = ["wpilib/src"]
+
+[tool.semiwrap.extension_modules."wpilib._wpilib".defines]
+DYNAMIC_CAMERA_SERVER = 1
+
+[tool.semiwrap.extension_modules."wpilib._wpilib".headers]
+# frc
+ADXL345_I2C = "wpi/hardware/accelerometer/ADXL345_I2C.hpp"
+AddressableLED = "wpi/hardware/led/AddressableLED.hpp"
+Alert = "wpi/util/Alert.hpp"
+AnalogAccelerometer = "wpi/hardware/accelerometer/AnalogAccelerometer.hpp"
+AnalogEncoder = "wpi/hardware/rotation/AnalogEncoder.hpp"
+AnalogInput = "wpi/hardware/discrete/AnalogInput.hpp"
+AnalogPotentiometer = "wpi/hardware/rotation/AnalogPotentiometer.hpp"
+CAN = "wpi/hardware/bus/CAN.hpp"
+Compressor = "wpi/hardware/pneumatic/Compressor.hpp"
+CompressorConfigType = "wpi/hardware/pneumatic/CompressorConfigType.hpp"
+DataLogManager = "wpi/system/DataLogManager.hpp"
+DSControlWord = "wpi/driverstation/DSControlWord.hpp"
+DigitalInput = "wpi/hardware/discrete/DigitalInput.hpp"
+DigitalOutput = "wpi/hardware/discrete/DigitalOutput.hpp"
+DoubleSolenoid = "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
+DriverStation = "wpi/driverstation/DriverStation.hpp"
+DutyCycle = "wpi/hardware/rotation/DutyCycle.hpp"
+DutyCycleEncoder = "wpi/hardware/rotation/DutyCycleEncoder.hpp"
+Encoder = "wpi/hardware/rotation/Encoder.hpp"
+Errors = "wpi/system/Errors.hpp"
+ExpansionHub = "wpi/ExpansionHub.hpp"
+ExpansionHubMotor = "wpi/ExpansionHubMotor.hpp"
+ExpansionHubPidConstants = "wpi/ExpansionHubPidConstants.hpp"
+ExpansionHubServo = "wpi/ExpansionHubServo.hpp"
+Filesystem = "rpy/Filesystem.h"
+Gamepad = "wpi/driverstation/Gamepad.hpp"
+I2C = "wpi/hardware/bus/I2C.hpp"
+IterativeRobotBase = "wpi/framework/IterativeRobotBase.hpp"
+Joystick = "wpi/driverstation/Joystick.hpp"
+LEDPattern = "wpi/hardware/led/LEDPattern.hpp"
+MotorSafety = "wpi/hardware/motor/MotorSafety.hpp"
+Notifier = "rpy/Notifier.h"
+OnboardIMU = "wpi/hardware/imu/OnboardIMU.hpp"
+PS4Controller = "wpi/driverstation/PS4Controller.hpp"
+PS5Controller = "wpi/driverstation/PS5Controller.hpp"
+PWM = "wpi/hardware/discrete/PWM.hpp"
+PneumaticHub = "wpi/hardware/pneumatic/PneumaticHub.hpp"
+PneumaticsBase = "wpi/hardware/pneumatic/PneumaticsBase.hpp"
+PneumaticsControlModule = "wpi/hardware/pneumatic/PneumaticsControlModule.hpp"
+PneumaticsModuleType = "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
+PowerDistribution = "wpi/hardware/power/PowerDistribution.hpp"
+Preferences = "wpi/util/Preferences.hpp"
+RobotBase = "wpi/framework/RobotBase.hpp"
+RobotController = "wpi/system/RobotController.hpp"
+RobotState = "wpi/framework/RobotState.hpp"
+RuntimeType = "wpi/system/RuntimeType.hpp"
+SensorUtil = "wpi/util/SensorUtil.hpp"
+SerialPort = "wpi/hardware/bus/SerialPort.hpp"
+SharpIR = "wpi/hardware/range/SharpIR.hpp"
+Solenoid = "wpi/hardware/pneumatic/Solenoid.hpp"
+StadiaController = "wpi/driverstation/StadiaController.hpp"
+SystemServer = "wpi/system/SystemServer.hpp"
+Threads = "wpi/system/Threads.hpp"
+TimedRobot = "wpi/framework/TimedRobot.hpp"
+Timer = "wpi/system/Timer.hpp"
+TimesliceRobot = "wpi/framework/TimesliceRobot.hpp"
+Tracer = "wpi/system/Tracer.hpp"
+Watchdog = "wpi/system/Watchdog.hpp"
+XboxController = "wpi/driverstation/XboxController.hpp"
+
+# frc (interfaces)
+CounterBase = "wpi/hardware/discrete/CounterBase.hpp"
+GenericHID = "wpi/driverstation/GenericHID.hpp"
+MotorController = "wpi/hardware/motor/MotorController.hpp"
+
+# frc/internal
+DriverStationModeThread = "wpi/internal/DriverStationModeThread.hpp"
+
+# frc/motorcontrol
+Koors40 = "wpi/hardware/motor/Koors40.hpp"
+MotorControllerGroup = "rpy/MotorControllerGroup.h"
+PWMMotorController = "wpi/hardware/motor/PWMMotorController.hpp"
+PWMSparkFlex = "wpi/hardware/motor/PWMSparkFlex.hpp"
+PWMSparkMax = "wpi/hardware/motor/PWMSparkMax.hpp"
+PWMTalonFX = "wpi/hardware/motor/PWMTalonFX.hpp"
+PWMTalonSRX = "wpi/hardware/motor/PWMTalonSRX.hpp"
+PWMVenom = "wpi/hardware/motor/PWMVenom.hpp"
+PWMVictorSPX = "wpi/hardware/motor/PWMVictorSPX.hpp"
+Spark = "wpi/hardware/motor/Spark.hpp"
+SparkMini = "wpi/hardware/motor/SparkMini.hpp"
+Talon = "wpi/hardware/motor/Talon.hpp"
+VictorSP = "wpi/hardware/motor/VictorSP.hpp"
+
+# frc/smartdashboard
+Field2d = "wpi/smartdashboard/Field2d.hpp"
+FieldObject2d = "wpi/smartdashboard/FieldObject2d.hpp"
+Mechanism2d = "wpi/smartdashboard/Mechanism2d.hpp"
+MechanismLigament2d = "wpi/smartdashboard/MechanismLigament2d.hpp"
+MechanismObject2d = "wpi/smartdashboard/MechanismObject2d.hpp"
+MechanismRoot2d = "wpi/smartdashboard/MechanismRoot2d.hpp"
+SendableBuilderImpl = "wpi/smartdashboard/SendableBuilderImpl.hpp"
+SendableChooser = "wpi/smartdashboard/SendableChooser.hpp"
+SendableChooserBase = "wpi/smartdashboard/SendableChooserBase.hpp"
+SmartDashboard = "wpi/smartdashboard/SmartDashboard.hpp"
+
+# frc/sysid
+SysIdRoutineLog = "wpi/sysid/SysIdRoutineLog.hpp"
+
+# frc/util
+Color = "wpi/util/Color.hpp"
+Color8Bit = "wpi/util/Color8Bit.hpp"
+
+
+[tool.semiwrap.extension_modules."wpilib.counter._counter"]
+name = "wpilib_counter"
+wraps = ["robotpy-native-wpilib"]
+depends = ["wpilib"]
+yaml_path = "semiwrap/counter"
+
+[tool.semiwrap.extension_modules."wpilib.counter._counter".headers]
+# frc/counter
+EdgeConfiguration = "wpi/counter/EdgeConfiguration.hpp"
+Tachometer = "wpi/counter/Tachometer.hpp"
+UpDownCounter = "wpi/counter/UpDownCounter.hpp"
+
+
+[tool.semiwrap.extension_modules."wpilib.drive._drive"]
+name = "wpilib_drive"
+wraps = ["robotpy-native-wpilib"]
+depends = ["wpilib"]
+yaml_path = "semiwrap/drive"
+
+[tool.semiwrap.extension_modules."wpilib.drive._drive".headers]
+# frc/drive
+DifferentialDrive = "wpi/drive/DifferentialDrive.hpp"
+MecanumDrive = "wpi/drive/MecanumDrive.hpp"
+RobotDriveBase = "wpi/drive/RobotDriveBase.hpp"
+
+
+[tool.semiwrap.extension_modules."wpilib.event._event"]
+name = "wpilib_event"
+wraps = ["robotpy-native-wpilib"]
+# depends = ["wpilib", "wpimath_filter"]
+depends = ["wpimath_filter"]
+yaml_path = "semiwrap/event"
+
+[tool.semiwrap.extension_modules."wpilib.event._event".headers]
+# frc/event
+BooleanEvent = "wpi/event/BooleanEvent.hpp"
+EventLoop = "wpi/event/EventLoop.hpp"
+NetworkBooleanEvent = "wpi/event/NetworkBooleanEvent.hpp"
+
+
+[tool.semiwrap.extension_modules."wpilib.simulation._simulation"]
+name = "wpilib_simulation"
+wraps = ["robotpy-native-wpilib"]
+depends = ["wpilib", "wpimath_controls", "wpimath_geometry", "wpimath_kinematics"]
+yaml_path = "semiwrap/simulation"
+
+[tool.semiwrap.extension_modules."wpilib.simulation._simulation".headers]
+# frc/simulation
+ADXL345Sim = "wpi/simulation/ADXL345Sim.hpp"
+AddressableLEDSim = "wpi/simulation/AddressableLEDSim.hpp"
+AnalogEncoderSim = "wpi/simulation/AnalogEncoderSim.hpp"
+AnalogInputSim = "wpi/simulation/AnalogInputSim.hpp"
+BatterySim = "wpi/simulation/BatterySim.hpp"
+CTREPCMSim = "wpi/simulation/CTREPCMSim.hpp"
+CallbackStore = "wpi/simulation/CallbackStore.hpp"
+DCMotorSim = "wpi/simulation/DCMotorSim.hpp"
+DIOSim = "wpi/simulation/DIOSim.hpp"
+DifferentialDrivetrainSim = "wpi/simulation/DifferentialDrivetrainSim.hpp"
+DigitalPWMSim = "wpi/simulation/DigitalPWMSim.hpp"
+DoubleSolenoidSim = "wpi/simulation/DoubleSolenoidSim.hpp"
+DriverStationSim = "wpi/simulation/DriverStationSim.hpp"
+DutyCycleEncoderSim = "wpi/simulation/DutyCycleEncoderSim.hpp"
+DutyCycleSim = "wpi/simulation/DutyCycleSim.hpp"
+ElevatorSim = "wpi/simulation/ElevatorSim.hpp"
+EncoderSim = "wpi/simulation/EncoderSim.hpp"
+FlywheelSim = "wpi/simulation/FlywheelSim.hpp"
+GamepadSim = "wpi/simulation/GamepadSim.hpp"
+GenericHIDSim = "wpi/simulation/GenericHIDSim.hpp"
+JoystickSim = "wpi/simulation/JoystickSim.hpp"
+LinearSystemSim = "wpi/simulation/LinearSystemSim.hpp"
+PS4ControllerSim = "wpi/simulation/PS4ControllerSim.hpp"
+PS5ControllerSim = "wpi/simulation/PS5ControllerSim.hpp"
+PWMSim = "wpi/simulation/PWMSim.hpp"
+PneumaticsBaseSim = "wpi/simulation/PneumaticsBaseSim.hpp"
+PowerDistributionSim = "wpi/simulation/PowerDistributionSim.hpp"
+PWMMotorControllerSim = "wpi/simulation/PWMMotorControllerSim.hpp"
+REVPHSim = "wpi/simulation/REVPHSim.hpp"
+RoboRioSim = "wpi/simulation/RoboRioSim.hpp"
+SendableChooserSim = "wpi/simulation/SendableChooserSim.hpp"
+SharpIRSim = "wpi/simulation/SharpIRSim.hpp"
+SimDeviceSim = "wpi/simulation/SimDeviceSim.hpp"
+SimHooks = "wpi/simulation/SimHooks.hpp"
+SingleJointedArmSim = "wpi/simulation/SingleJointedArmSim.hpp"
+SolenoidSim = "wpi/simulation/SolenoidSim.hpp"
+StadiaControllerSim = "wpi/simulation/StadiaControllerSim.hpp"
+XboxControllerSim = "wpi/simulation/XboxControllerSim.hpp"

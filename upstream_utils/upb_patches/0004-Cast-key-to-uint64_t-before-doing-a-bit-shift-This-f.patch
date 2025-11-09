@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Gold856 <117957790+Gold856@users.noreply.github.com>
+Date: Mon, 26 May 2025 01:34:57 -0400
+Subject: [PATCH 4/5] Cast key to uint64_t before doing a bit shift This fixes
+ compilation on Win32
+
+---
+ upb/hash/common.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/upb/hash/common.c b/upb/hash/common.c
+index ca0e488689e9cc54d143f505484497654d0f8c03..26c731764ce08f4e3f12900821fd1ebd1798da27 100644
+--- a/upb/hash/common.c
++++ b/upb/hash/common.c
+@@ -95,7 +95,7 @@ typedef bool eqlfunc_t(upb_key k1, lookupkey_t k2);
+ 
+ static uint32_t upb_inthash(uintptr_t key) {
+   if (sizeof(uintptr_t) == 8) {
+-    return (uint32_t)key ^ (uint32_t)(key >> 32);
++    return (uint32_t)key ^ (uint32_t)((uint64_t)(key) >> 32);
+   } else {
+     UPB_ASSERT(sizeof(uintptr_t) == 4);
+     return (uint32_t)key;

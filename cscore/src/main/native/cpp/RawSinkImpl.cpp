@@ -2,24 +2,24 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "RawSinkImpl.h"
+#include "RawSinkImpl.hpp"
 
 #include <algorithm>
 #include <memory>
 
-#include "Instance.h"
-#include "cscore_raw.h"
+#include "Instance.hpp"
+#include "wpi/cs/cscore_raw.h"
 
-using namespace cs;
+using namespace wpi::cs;
 
-RawSinkImpl::RawSinkImpl(std::string_view name, wpi::Logger& logger,
+RawSinkImpl::RawSinkImpl(std::string_view name, wpi::util::Logger& logger,
                          Notifier& notifier, Telemetry& telemetry)
     : SinkImpl{name, logger, notifier, telemetry} {
   m_active = true;
   // m_thread = std::thread(&RawSinkImpl::ThreadMain, this);
 }
 
-RawSinkImpl::RawSinkImpl(std::string_view name, wpi::Logger& logger,
+RawSinkImpl::RawSinkImpl(std::string_view name, wpi::util::Logger& logger,
                          Notifier& notifier, Telemetry& telemetry,
                          std::function<void(uint64_t time)> processFrame)
     : SinkImpl{name, logger, notifier, telemetry} {}
@@ -151,7 +151,7 @@ void RawSinkImpl::ThreadMain() {
   Disable();
 }
 
-namespace cs {
+namespace wpi::cs {
 static constexpr unsigned SinkMask = CS_SINK_CV | CS_SINK_RAW;
 
 CS_Sink CreateRawSink(std::string_view name, bool isCv, CS_Status* status) {
@@ -202,30 +202,30 @@ uint64_t GrabSinkFrameTimeoutLastTime(CS_Sink sink, WPI_RawFrame& image,
       .GrabFrame(image, timeout, lastFrameTime);
 }
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 extern "C" {
 CS_Sink CS_CreateRawSink(const struct WPI_String* name, CS_Bool isCv,
                          CS_Status* status) {
-  return cs::CreateRawSink(wpi::to_string_view(name), isCv, status);
+  return wpi::cs::CreateRawSink(wpi::util::to_string_view(name), isCv, status);
 }
 
 CS_Sink CS_CreateRawSinkCallback(
     const struct WPI_String* name, CS_Bool isCv, void* data,
     void (*processFrame)(void* data, uint64_t time), CS_Status* status) {
-  return cs::CreateRawSinkCallback(
-      wpi::to_string_view(name), isCv,
+  return wpi::cs::CreateRawSinkCallback(
+      wpi::util::to_string_view(name), isCv,
       [=](uint64_t time) { processFrame(data, time); }, status);
 }
 
 uint64_t CS_GrabRawSinkFrame(CS_Sink sink, struct WPI_RawFrame* image,
                              CS_Status* status) {
-  return cs::GrabSinkFrame(sink, *image, status);
+  return wpi::cs::GrabSinkFrame(sink, *image, status);
 }
 
 uint64_t CS_GrabRawSinkFrameTimeout(CS_Sink sink, struct WPI_RawFrame* image,
                                     double timeout, CS_Status* status) {
-  return cs::GrabSinkFrameTimeout(sink, *image, timeout, status);
+  return wpi::cs::GrabSinkFrameTimeout(sink, *image, timeout, status);
 }
 
 uint64_t CS_GrabRawSinkFrameTimeoutWithFrameTime(CS_Sink sink,
@@ -233,8 +233,8 @@ uint64_t CS_GrabRawSinkFrameTimeoutWithFrameTime(CS_Sink sink,
                                                  double timeout,
                                                  uint64_t lastFrameTime,
                                                  CS_Status* status) {
-  return cs::GrabSinkFrameTimeoutLastTime(sink, *image, timeout, lastFrameTime,
-                                          status);
+  return wpi::cs::GrabSinkFrameTimeoutLastTime(sink, *image, timeout,
+                                               lastFrameTime, status);
 }
 
 }  // extern "C"

@@ -19,7 +19,7 @@ if(WITH_JAVA)
 
     configure_file(
         src/generate/WPILibVersion.java.in
-        generated/main/java/edu/wpi/first/wpilibj/WPILibVersion.java
+        generated/main/java/org/wpilib/system/WPILibVersion.java
     )
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java src/generated/main/java/*.java)
@@ -29,7 +29,7 @@ if(WITH_JAVA)
     add_jar(
         wpilibj_jar
         ${JAVA_SOURCES}
-        ${CMAKE_CURRENT_BINARY_DIR}/generated/main/java/edu/wpi/first/wpilibj/WPILibVersion.java
+        ${CMAKE_CURRENT_BINARY_DIR}/generated/main/java/org/wpilib/system/WPILibVersion.java
         INCLUDE_JARS
             hal_jar
             ntcore_jar
@@ -60,7 +60,7 @@ if(WITH_JAVA_SOURCE)
     if(NOT WITH_JAVA)
         configure_file(
             src/generate/WPILibVersion.java.in
-            generated/main/java/edu/wpi/first/wpilibj/WPILibVersion.java
+            generated/main/java/org/wpilib/system/WPILibVersion.java
         )
     endif()
     add_source_jar(

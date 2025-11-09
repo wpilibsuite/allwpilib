@@ -2,13 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <wpi/protobuf/ProtobufCallbacks.h>
-
-#include "hal/proto/JoystickRumbleData.h"
+#include "wpi/hal/proto/JoystickRumbleData.h"
+#include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 
 std::optional<mrc::JoystickRumbleData>
-wpi::Protobuf<mrc::JoystickRumbleData>::Unpack(InputStream& Stream) {
-  wpi::UnpackCallback<uint16_t, MRC_MAX_NUM_RUMBLE> RumbleCb;
+wpi::util::Protobuf<mrc::JoystickRumbleData>::Unpack(InputStream& Stream) {
+  wpi::util::UnpackCallback<uint16_t, MRC_MAX_NUM_RUMBLE> RumbleCb;
 
   mrc_proto_ProtobufJoystickRumbleData Msg{
       .Value = RumbleCb.Callback(),
@@ -30,9 +29,9 @@ wpi::Protobuf<mrc::JoystickRumbleData>::Unpack(InputStream& Stream) {
   return Rumble;
 }
 
-bool wpi::Protobuf<mrc::JoystickRumbleData>::Pack(
+bool wpi::util::Protobuf<mrc::JoystickRumbleData>::Pack(
     OutputStream& Stream, const mrc::JoystickRumbleData& Value) {
-  wpi::PackCallback RumbleCb{Value.Rumbles()};
+  wpi::util::PackCallback RumbleCb{Value.Rumbles()};
 
   mrc_proto_ProtobufJoystickRumbleData Msg{
       .Value = RumbleCb.Callback(),

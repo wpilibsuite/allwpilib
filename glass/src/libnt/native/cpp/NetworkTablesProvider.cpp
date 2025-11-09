@@ -2,34 +2,35 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/networktables/NetworkTablesProvider.h"
+#include "wpi/glass/networktables/NetworkTablesProvider.hpp"
 
 #include <algorithm>
 #include <memory>
 #include <utility>
 
 #include <fmt/format.h>
-#include <ntcore_cpp.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringExtras.h>
-#include <wpigui.h>
 
-#include "glass/Storage.h"
+#include "wpi/glass/Storage.hpp"
+#include "wpi/gui/wpigui.hpp"
+#include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/StringExtras.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 NetworkTablesProvider::NetworkTablesProvider(Storage& storage)
-    : NetworkTablesProvider{storage, nt::NetworkTableInstance::GetDefault()} {}
+    : NetworkTablesProvider{storage,
+                            wpi::nt::NetworkTableInstance::GetDefault()} {}
 
 NetworkTablesProvider::NetworkTablesProvider(Storage& storage,
-                                             nt::NetworkTableInstance inst)
+                                             wpi::nt::NetworkTableInstance inst)
     : Provider{storage.GetChild("windows")},
       m_inst{inst},
       m_poller{inst},
       m_typeCache{storage.GetChild("types")} {
   storage.SetCustomApply([this] {
     m_listener = m_poller.AddListener(
-        {{""}}, nt::EventFlags::kImmediate | nt::EventFlags::kTopic);
+        {{""}}, wpi::nt::EventFlags::kImmediate | wpi::nt::EventFlags::kTopic);
     for (auto&& childIt : m_storage.GetChildren()) {
       auto id = childIt.key();
       auto typePtr = m_typeCache.FindValue(id);
@@ -64,12 +65,12 @@ NetworkTablesProvider::NetworkTablesProvider(Storage& storage,
 }
 
 void NetworkTablesProvider::DisplayMenu() {
-  wpi::SmallVector<std::string_view, 6> path;
-  wpi::SmallString<64> name;
+  wpi::util::SmallVector<std::string_view, 6> path;
+  wpi::util::SmallString<64> name;
   for (auto&& entry : m_viewEntries) {
     path.clear();
-    wpi::split(entry->name, '/', -1, false,
-               [&](auto name) { path.emplace_back(name); });
+    wpi::util::split(entry->name, '/', -1, false,
+                     [&](auto name) { path.emplace_back(name); });
 
     bool fullDepth = true;
     int depth = 0;
@@ -88,7 +89,7 @@ void NetworkTablesProvider::DisplayMenu() {
       // data is the last item, so is guaranteed to be null-terminated
       ImGui::MenuItem(path.back().data(), nullptr, &visible, true);
       // Add type label to smartdashboard sendables
-      if (wpi::starts_with(entry->name, "/SmartDashboard/")) {
+      if (wpi::util::starts_with(entry->name, "/SmartDashboard/")) {
         auto typeEntry = m_typeCache.FindValue(entry->name);
         if (typeEntry) {
           ImGui::SameLine();
@@ -119,12 +120,12 @@ void NetworkTablesProvider::Update() {
     if (auto info = event.GetTopicInfo()) {
       // add/remove entries from NT changes
       // look for .type fields
-      if (!wpi::ends_with(info->name, "/.type") || info->type != NT_STRING ||
-          info->type_str != "string") {
+      if (!wpi::util::ends_with(info->name, "/.type") ||
+          info->type != NT_STRING || info->type_str != "string") {
         continue;
       }
 
-      if (event.flags & nt::EventFlags::kUnpublish) {
+      if (event.flags & wpi::nt::EventFlags::kUnpublish) {
         auto it = m_topicMap.find(info->topic);
         if (it != m_topicMap.end()) {
           m_poller.RemoveListener(it->second.listener);
@@ -139,13 +140,14 @@ void NetworkTablesProvider::Update() {
         if (it2 != m_viewEntries.end()) {
           m_viewEntries.erase(it2);
         }
-      } else if (event.flags & nt::EventFlags::kPublish) {
+      } else if (event.flags & wpi::nt::EventFlags::kPublish) {
         // subscribe to it; use a subscriber so we only get string values
         SubListener sublistener;
-        sublistener.subscriber = nt::StringTopic{info->topic}.Subscribe("");
+        sublistener.subscriber =
+            wpi::nt::StringTopic{info->topic}.Subscribe("");
         sublistener.listener = m_poller.AddListener(
             sublistener.subscriber,
-            nt::EventFlags::kValueAll | nt::EventFlags::kImmediate);
+            wpi::nt::EventFlags::kValueAll | wpi::nt::EventFlags::kImmediate);
         m_topicMap.try_emplace(info->topic, std::move(sublistener));
       }
     } else if (auto valueData = event.GetValueEventData()) {
@@ -160,11 +162,11 @@ void NetworkTablesProvider::Update() {
         continue;
       }
 
-      auto topicName = nt::GetTopicName(valueData->topic);
+      auto topicName = wpi::nt::GetTopicName(valueData->topic);
       auto tableName =
-          wpi::remove_suffix(topicName, "/.type").value_or(topicName);
+          wpi::util::remove_suffix(topicName, "/.type").value_or(topicName);
 
-      GetOrCreateView(builderIt->second, nt::Topic{valueData->topic},
+      GetOrCreateView(builderIt->second, wpi::nt::Topic{valueData->topic},
                       tableName);
       // cache the type
       m_typeCache.SetString(tableName, valueData->value.GetString());
@@ -201,7 +203,7 @@ void NetworkTablesProvider::Show(ViewEntry* entry, Window* window) {
   if (!window) {
     return;
   }
-  if (auto name = wpi::remove_prefix(entry->name, "/SmartDashboard/")) {
+  if (auto name = wpi::util::remove_prefix(entry->name, "/SmartDashboard/")) {
     window->SetDefaultName(fmt::format("{} (SmartDashboard)", *name));
   }
   entry->window = window;
@@ -218,7 +220,7 @@ void NetworkTablesProvider::Show(ViewEntry* entry, Window* window) {
 }
 
 NetworkTablesProvider::ViewEntry* NetworkTablesProvider::GetOrCreateView(
-    const Builder& builder, nt::Topic typeTopic, std::string_view name) {
+    const Builder& builder, wpi::nt::Topic typeTopic, std::string_view name) {
   // get view entry if it already exists
   auto viewIt = FindViewEntry(name);
   if (viewIt != m_viewEntries.end() && (*viewIt)->name == name) {

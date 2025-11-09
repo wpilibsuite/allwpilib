@@ -23,13 +23,13 @@
  * IN THE SOFTWARE.
  */
 
-#include "wpinet/uv/Loop.h"  // NOLINT(build/include_order)
+#include "wpi/net/uv/Loop.hpp"  // NOLINT(build/include_order)
 
 #include <gtest/gtest.h>
 
-#include "wpinet/uv/Timer.h"
+#include "wpi/net/uv/Timer.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 TEST(UvLoopTest, Walk) {
   int seen_timer_handle = 0;
@@ -66,4 +66,4 @@ TEST(UvLoopTest, Walk) {
   ASSERT_EQ(seen_timer_handle, 0);
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

@@ -1,0 +1,107 @@
+classes:
+  wpi::nt::IntegerSubscriber:
+    methods:
+      IntegerSubscriber:
+        overloads:
+          '':
+            ignore: true
+          NT_Subscriber, ParamType:
+            ignore: true
+      Get:
+        overloads:
+          '[const]':
+          ParamType [const]:
+      GetAtomic:
+        overloads:
+          '[const]':
+          ParamType [const]:
+      ReadQueue:
+      GetTopic:
+    inline_code: |
+      .def("close", [](IntegerSubscriber *self) {
+        py::gil_scoped_release release;
+        *self = IntegerSubscriber();
+      }, py::doc("Destroys the subscriber"))
+      .def("__enter__", [](IntegerSubscriber *self) {
+        return self;
+      })
+      .def("__exit__", [](IntegerSubscriber *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = IntegerSubscriber();
+      })
+  wpi::nt::IntegerPublisher:
+    methods:
+      IntegerPublisher:
+        overloads:
+          '':
+            ignore: true
+          NT_Publisher:
+            ignore: true
+      Set:
+      SetDefault:
+      GetTopic:
+    inline_code: |
+      .def("close", [](IntegerPublisher *self) {
+        py::gil_scoped_release release;
+        *self = IntegerPublisher();
+      }, py::doc("Destroys the publisher"))
+      .def("__enter__", [](IntegerPublisher *self) {
+        return self;
+      })
+      .def("__exit__", [](IntegerPublisher *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = IntegerPublisher();
+      })
+  wpi::nt::IntegerEntry:
+    methods:
+      IntegerEntry:
+        overloads:
+          '':
+            ignore: true
+          NT_Entry, ParamType:
+            ignore: true
+      GetHandle:
+        ignore: true
+      GetTopic:
+      Unpublish:
+    inline_code: |
+      .def("close", [](IntegerEntry *self) {
+        py::gil_scoped_release release;
+        *self = IntegerEntry();
+      }, py::doc("Destroys the entry"))
+      .def("__enter__", [](IntegerEntry *self) {
+        return self;
+      })
+      .def("__exit__", [](IntegerEntry *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = IntegerEntry();
+      })
+  wpi::nt::IntegerTopic:
+    attributes:
+      kTypeString:
+    methods:
+      IntegerTopic:
+        overloads:
+          '':
+            ignore: true
+          NT_Topic:
+            ignore: true
+          Topic:
+      Subscribe:
+      SubscribeEx:
+      Publish:
+      PublishEx:
+      GetEntry:
+      GetEntryEx:
+    inline_code: |
+      .def("close", [](IntegerTopic *self) {
+        py::gil_scoped_release release;
+        *self = IntegerTopic();
+      }, py::doc("Destroys the topic"))
+      .def("__enter__", [](IntegerTopic *self) {
+        return self;
+      })
+      .def("__exit__", [](IntegerTopic *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = IntegerTopic();
+      })

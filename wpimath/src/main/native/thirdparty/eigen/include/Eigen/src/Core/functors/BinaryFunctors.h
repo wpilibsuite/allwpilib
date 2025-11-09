@@ -208,19 +208,8 @@ struct functor_traits<scalar_cmp_op<LhsScalar, RhsScalar, cmp, UseTypedComparato
 };
 
 template <typename LhsScalar, typename RhsScalar, bool UseTypedComparators>
-struct typed_cmp_helper {
-  static constexpr bool SameType = is_same<LhsScalar, RhsScalar>::value;
-  static constexpr bool IsNumeric = is_arithmetic<typename NumTraits<LhsScalar>::Real>::value;
-  static constexpr bool UseTyped = UseTypedComparators && SameType && IsNumeric;
-  using type = typename conditional<UseTyped, LhsScalar, bool>::type;
-};
-
-template <typename LhsScalar, typename RhsScalar, bool UseTypedComparators>
-using cmp_return_t = typename typed_cmp_helper<LhsScalar, RhsScalar, UseTypedComparators>::type;
-
-template <typename LhsScalar, typename RhsScalar, bool UseTypedComparators>
 struct scalar_cmp_op<LhsScalar, RhsScalar, cmp_EQ, UseTypedComparators> : binary_op_base<LhsScalar, RhsScalar> {
-  using result_type = cmp_return_t<LhsScalar, RhsScalar, UseTypedComparators>;
+  using result_type = std::conditional_t<UseTypedComparators, LhsScalar, bool>;
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE result_type operator()(const LhsScalar& a, const RhsScalar& b) const {
     return a == b ? result_type(1) : result_type(0);
   }
@@ -233,7 +222,7 @@ struct scalar_cmp_op<LhsScalar, RhsScalar, cmp_EQ, UseTypedComparators> : binary
 
 template <typename LhsScalar, typename RhsScalar, bool UseTypedComparators>
 struct scalar_cmp_op<LhsScalar, RhsScalar, cmp_LT, UseTypedComparators> : binary_op_base<LhsScalar, RhsScalar> {
-  using result_type = cmp_return_t<LhsScalar, RhsScalar, UseTypedComparators>;
+  using result_type = std::conditional_t<UseTypedComparators, LhsScalar, bool>;
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE result_type operator()(const LhsScalar& a, const RhsScalar& b) const {
     return a < b ? result_type(1) : result_type(0);
   }
@@ -246,7 +235,7 @@ struct scalar_cmp_op<LhsScalar, RhsScalar, cmp_LT, UseTypedComparators> : binary
 
 template <typename LhsScalar, typename RhsScalar, bool UseTypedComparators>
 struct scalar_cmp_op<LhsScalar, RhsScalar, cmp_LE, UseTypedComparators> : binary_op_base<LhsScalar, RhsScalar> {
-  using result_type = cmp_return_t<LhsScalar, RhsScalar, UseTypedComparators>;
+  using result_type = std::conditional_t<UseTypedComparators, LhsScalar, bool>;
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE result_type operator()(const LhsScalar& a, const RhsScalar& b) const {
     return a <= b ? result_type(1) : result_type(0);
   }
@@ -259,7 +248,7 @@ struct scalar_cmp_op<LhsScalar, RhsScalar, cmp_LE, UseTypedComparators> : binary
 
 template <typename LhsScalar, typename RhsScalar, bool UseTypedComparators>
 struct scalar_cmp_op<LhsScalar, RhsScalar, cmp_GT, UseTypedComparators> : binary_op_base<LhsScalar, RhsScalar> {
-  using result_type = cmp_return_t<LhsScalar, RhsScalar, UseTypedComparators>;
+  using result_type = std::conditional_t<UseTypedComparators, LhsScalar, bool>;
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE result_type operator()(const LhsScalar& a, const RhsScalar& b) const {
     return a > b ? result_type(1) : result_type(0);
   }
@@ -272,7 +261,7 @@ struct scalar_cmp_op<LhsScalar, RhsScalar, cmp_GT, UseTypedComparators> : binary
 
 template <typename LhsScalar, typename RhsScalar, bool UseTypedComparators>
 struct scalar_cmp_op<LhsScalar, RhsScalar, cmp_GE, UseTypedComparators> : binary_op_base<LhsScalar, RhsScalar> {
-  using result_type = cmp_return_t<LhsScalar, RhsScalar, UseTypedComparators>;
+  using result_type = std::conditional_t<UseTypedComparators, LhsScalar, bool>;
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE result_type operator()(const LhsScalar& a, const RhsScalar& b) const {
     return a >= b ? result_type(1) : result_type(0);
   }
@@ -285,7 +274,7 @@ struct scalar_cmp_op<LhsScalar, RhsScalar, cmp_GE, UseTypedComparators> : binary
 
 template <typename LhsScalar, typename RhsScalar, bool UseTypedComparators>
 struct scalar_cmp_op<LhsScalar, RhsScalar, cmp_UNORD, UseTypedComparators> : binary_op_base<LhsScalar, RhsScalar> {
-  using result_type = cmp_return_t<LhsScalar, RhsScalar, UseTypedComparators>;
+  using result_type = std::conditional_t<UseTypedComparators, LhsScalar, bool>;
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE result_type operator()(const LhsScalar& a, const RhsScalar& b) const {
     return !(a <= b || b <= a) ? result_type(1) : result_type(0);
   }
@@ -298,7 +287,7 @@ struct scalar_cmp_op<LhsScalar, RhsScalar, cmp_UNORD, UseTypedComparators> : bin
 
 template <typename LhsScalar, typename RhsScalar, bool UseTypedComparators>
 struct scalar_cmp_op<LhsScalar, RhsScalar, cmp_NEQ, UseTypedComparators> : binary_op_base<LhsScalar, RhsScalar> {
-  using result_type = cmp_return_t<LhsScalar, RhsScalar, UseTypedComparators>;
+  using result_type = std::conditional_t<UseTypedComparators, LhsScalar, bool>;
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE result_type operator()(const LhsScalar& a, const RhsScalar& b) const {
     return a != b ? result_type(1) : result_type(0);
   }
@@ -362,11 +351,7 @@ template <typename Scalar, typename Exponent>
 struct functor_traits<scalar_pow_op<Scalar, Exponent>> {
   enum {
     Cost = 5 * NumTraits<Scalar>::MulCost,
-    PacketAccess = (!NumTraits<Scalar>::IsComplex && !NumTraits<Scalar>::IsInteger && packet_traits<Scalar>::HasExp &&
-                    packet_traits<Scalar>::HasLog && packet_traits<Scalar>::HasRound && packet_traits<Scalar>::HasCmp &&
-                    // Temporarily disable packet access for half/bfloat16 until
-                    // accuracy is improved.
-                    !is_same<Scalar, half>::value && !is_same<Scalar, bfloat16>::value)
+    PacketAccess = (!NumTraits<Scalar>::IsComplex && !NumTraits<Scalar>::IsInteger && packet_traits<Scalar>::HasPow)
   };
 };
 

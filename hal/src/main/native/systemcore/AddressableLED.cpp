@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/AddressableLED.h"
+#include "wpi/hal/AddressableLED.h"
 
 #include <stdint.h>
 
@@ -12,19 +12,20 @@
 #include <thread>
 
 #include <fmt/format.h>
-#include <networktables/NetworkTableInstance.h>
-#include <networktables/RawTopic.h>
 
+#include "AddressableLEDSimd.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
 #include "SmartIo.h"
 #include "SystemServerInternal.h"
-#include "hal/AddressableLEDTypes.h"
-#include "hal/Errors.h"
-#include "hal/cpp/fpga_clock.h"
+#include "wpi/hal/AddressableLEDTypes.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/cpp/fpga_clock.h"
+#include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/nt/RawTopic.hpp"
 
-using namespace hal;
+using namespace wpi::hal;
 
 #define IO_PREFIX "/io/"
 
@@ -33,35 +34,64 @@ namespace {
 constexpr const char* kLedsKey = IO_PREFIX "leds";
 
 struct AddressableLEDs {
-  explicit AddressableLEDs(nt::NetworkTableInstance inst)
+  explicit AddressableLEDs(wpi::nt::NetworkTableInstance inst)
       : rawPub{inst.GetRawTopic(kLedsKey).Publish(
             "raw", {.periodic = 0.005, .sendAll = true})} {}
 
-  nt::RawPublisher rawPub;
+  wpi::nt::RawPublisher rawPub;
   uint8_t s_buffer[HAL_kAddressableLEDMaxLength * 3];
 };
 
 static AddressableLEDs* leds;
 
+void ConvertAndCopyLEDData(void* dst, const struct HAL_AddressableLEDData* src,
+                           int32_t len, HAL_AddressableLEDColorOrder order) {
+  using namespace wpi::hal::detail;
+  switch (order) {
+    case HAL_ALED_RGB:
+      std::memcpy(dst, src, len * sizeof(HAL_AddressableLEDData));
+      break;
+    case HAL_ALED_RBG:
+      ConvertPixels<HAL_ALED_RBG>(reinterpret_cast<const uint8_t*>(src),
+                                  reinterpret_cast<uint8_t*>(dst), len);
+      break;
+    case HAL_ALED_BGR:
+      ConvertPixels<HAL_ALED_BGR>(reinterpret_cast<const uint8_t*>(src),
+                                  reinterpret_cast<uint8_t*>(dst), len);
+      break;
+    case HAL_ALED_BRG:
+      ConvertPixels<HAL_ALED_BRG>(reinterpret_cast<const uint8_t*>(src),
+                                  reinterpret_cast<uint8_t*>(dst), len);
+      break;
+    case HAL_ALED_GBR:
+      ConvertPixels<HAL_ALED_GBR>(reinterpret_cast<const uint8_t*>(src),
+                                  reinterpret_cast<uint8_t*>(dst), len);
+      break;
+    case HAL_ALED_GRB:
+      ConvertPixels<HAL_ALED_GRB>(reinterpret_cast<const uint8_t*>(src),
+                                  reinterpret_cast<uint8_t*>(dst), len);
+      break;
+  }
+}
 }  // namespace
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeAddressableLED() {
-  static AddressableLEDs leds_static{hal::GetSystemServer()};
+  static AddressableLEDs leds_static{wpi::hal::GetSystemServer()};
   leds = &leds_static;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 
 HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
     int32_t channel, const char* allocationLocation, int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
 
   if (channel < 0 || channel >= kNumSmartIo) {
     *status = RESOURCE_OUT_OF_RANGE;
-    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for AddressableLED",
-                                     0, kNumSmartIo, channel);
+    wpi::hal::SetLastErrorIndexOutOfRange(
+        status, "Invalid Index for AddressableLED", 0, kNumSmartIo, channel);
     return HAL_kInvalidHandle;
   }
 
@@ -72,10 +102,10 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
 
   if (*status != 0) {
     if (port) {
-      hal::SetLastErrorPreviouslyAllocated(status, "SmartIo", channel,
-                                           port->previousAllocation);
+      wpi::hal::SetLastErrorPreviouslyAllocated(status, "SmartIo", channel,
+                                                port->previousAllocation);
     } else {
-      hal::SetLastErrorIndexOutOfRange(
+      wpi::hal::SetLastErrorIndexOutOfRange(
           status, "Invalid Index for AddressableLED", 0, kNumSmartIo, channel);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
@@ -103,9 +133,9 @@ void HAL_FreeAddressableLED(HAL_AddressableLEDHandle handle) {
   smartIoHandles->Free(handle, HAL_HandleEnum::AddressableLED);
 
   // Wait for no other object to hold this handle.
-  auto start = hal::fpga_clock::now();
+  auto start = wpi::hal::fpga_clock::now();
   while (port.use_count() != 1) {
-    auto current = hal::fpga_clock::now();
+    auto current = wpi::hal::fpga_clock::now();
     if (start + std::chrono::seconds(1) < current) {
       std::puts("AddressableLED handle free timeout");
       std::fflush(stdout);
@@ -148,8 +178,7 @@ void HAL_SetAddressableLEDData(int32_t start, int32_t length,
     *status = PARAMETER_OUT_OF_RANGE;
     return;
   }
-  // TODO: handle color order
-  std::memcpy(&leds->s_buffer[start * 3], data, length * 3);
+  ConvertAndCopyLEDData(&leds->s_buffer[start * 3], data, length, colorOrder);
   leds->rawPub.Set(leds->s_buffer);
 }
 }  // extern "C"

@@ -1,0 +1,38 @@
+defaults:
+  subpackage: estimator
+
+classes:
+  wpi::math::MecanumDrivePoseEstimator:
+    force_no_trampoline: true
+    doc: |
+      This class wraps an Unscented Kalman Filter to fuse latency-compensated
+      vision measurements with mecanum drive encoder velocity measurements. It will
+      correct for noisy measurements and encoder drift. It is intended to be an
+      easy but more accurate drop-in for :class:`MecanumDriveOdometry`.
+
+      :meth:`update` should be called every robot loop. If your loops are faster or
+      slower than the default of 0.02s, then you should change the nominal delta
+      time by specifying it in the constructor.
+
+      :meth:`addVisionMeasurement` can be called as infrequently as you want; if you
+      never call it, then this class will behave mostly like regular encoder
+      odometry.
+
+      The state-space system used internally has the following states (x), inputs
+      (u), and outputs (y):
+
+      :math:`x = [x, y, \theta]^T` in the field-coordinate system
+      containing x position, y position, and heading.
+
+      :math:`u = [v_x, v_y, \omega]^T` containing x velocity, y velocity,
+      and angular velocity in the field-coordinate system.
+
+      :math:`y = [x, y, \theta]^T` from vision containing x position, y
+      position, and heading; or :math:`y = [theta]^T` containing gyro
+      heading.
+    methods:
+      MecanumDrivePoseEstimator:
+        overloads:
+          MecanumDriveKinematics&, const Rotation2d&, const MecanumDriveWheelPositions&, const Pose2d&:
+          ? MecanumDriveKinematics&, const Rotation2d&, const MecanumDriveWheelPositions&, const Pose2d&, const wpi::util::array<double, 3>&, const wpi::util::array<double, 3>&
+          :

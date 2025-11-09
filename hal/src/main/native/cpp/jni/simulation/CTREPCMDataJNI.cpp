@@ -5,20 +5,20 @@
 #include <jni.h>
 
 #include "CallbackStore.h"
-#include "edu_wpi_first_hal_simulation_CTREPCMDataJNI.h"
-#include "hal/simulation/CTREPCMData.h"
+#include "org_wpilib_hardware_hal_simulation_CTREPCMDataJNI.h"
+#include "wpi/hal/simulation/CTREPCMData.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_CTREPCMDataJNI
  * Method:    registerInitializedCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_registerInitializedCallback
+Java_org_wpilib_hardware_hal_simulation_CTREPCMDataJNI_registerInitializedCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(env, index, callback, initialNotify,
@@ -26,12 +26,12 @@ Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_registerInitializedCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_CTREPCMDataJNI
  * Method:    cancelInitializedCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_cancelInitializedCallback
+Java_org_wpilib_hardware_hal_simulation_CTREPCMDataJNI_cancelInitializedCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
@@ -39,36 +39,36 @@ Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_cancelInitializedCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_CTREPCMDataJNI
  * Method:    getInitialized
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_getInitialized
+Java_org_wpilib_hardware_hal_simulation_CTREPCMDataJNI_getInitialized
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetCTREPCMInitialized(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_CTREPCMDataJNI
  * Method:    setInitialized
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_setInitialized
+Java_org_wpilib_hardware_hal_simulation_CTREPCMDataJNI_setInitialized
   (JNIEnv*, jclass, jint index, jboolean value)
 {
   HALSIM_SetCTREPCMInitialized(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_CTREPCMDataJNI
  * Method:    registerSolenoidOutputCallback
  * Signature: (IILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_registerSolenoidOutputCallback
+Java_org_wpilib_hardware_hal_simulation_CTREPCMDataJNI_registerSolenoidOutputCallback
   (JNIEnv* env, jclass, jint index, jint channel, jobject callback,
    jboolean initialNotify)
 {
@@ -78,12 +78,12 @@ Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_registerSolenoidOutputCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_CTREPCMDataJNI
  * Method:    cancelSolenoidOutputCallback
  * Signature: (III)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_cancelSolenoidOutputCallback
+Java_org_wpilib_hardware_hal_simulation_CTREPCMDataJNI_cancelSolenoidOutputCallback
   (JNIEnv* env, jclass, jint index, jint channel, jint handle)
 {
   return sim::FreeChannelCallback(env, handle, index, channel,
@@ -91,36 +91,36 @@ Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_cancelSolenoidOutputCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_CTREPCMDataJNI
  * Method:    getSolenoidOutput
  * Signature: (II)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_getSolenoidOutput
+Java_org_wpilib_hardware_hal_simulation_CTREPCMDataJNI_getSolenoidOutput
   (JNIEnv*, jclass, jint index, jint channel)
 {
   return HALSIM_GetCTREPCMSolenoidOutput(index, channel);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_CTREPCMDataJNI
  * Method:    setSolenoidOutput
  * Signature: (IIZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_setSolenoidOutput
+Java_org_wpilib_hardware_hal_simulation_CTREPCMDataJNI_setSolenoidOutput
   (JNIEnv*, jclass, jint index, jint channel, jboolean value)
 {
   HALSIM_SetCTREPCMSolenoidOutput(index, channel, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_CTREPCMDataJNI
  * Method:    registerCompressorOnCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_registerCompressorOnCallback
+Java_org_wpilib_hardware_hal_simulation_CTREPCMDataJNI_registerCompressorOnCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(env, index, callback, initialNotify,
@@ -128,12 +128,12 @@ Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_registerCompressorOnCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_CTREPCMDataJNI
  * Method:    cancelCompressorOnCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_cancelCompressorOnCallback
+Java_org_wpilib_hardware_hal_simulation_CTREPCMDataJNI_cancelCompressorOnCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
@@ -141,36 +141,36 @@ Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_cancelCompressorOnCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_CTREPCMDataJNI
  * Method:    getCompressorOn
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_getCompressorOn
+Java_org_wpilib_hardware_hal_simulation_CTREPCMDataJNI_getCompressorOn
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetCTREPCMCompressorOn(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_CTREPCMDataJNI
  * Method:    setCompressorOn
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_setCompressorOn
+Java_org_wpilib_hardware_hal_simulation_CTREPCMDataJNI_setCompressorOn
   (JNIEnv*, jclass, jint index, jboolean value)
 {
   HALSIM_SetCTREPCMCompressorOn(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_CTREPCMDataJNI
  * Method:    registerClosedLoopEnabledCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_registerClosedLoopEnabledCallback
+Java_org_wpilib_hardware_hal_simulation_CTREPCMDataJNI_registerClosedLoopEnabledCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(
@@ -179,12 +179,12 @@ Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_registerClosedLoopEnabledCallba
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_CTREPCMDataJNI
  * Method:    cancelClosedLoopEnabledCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_cancelClosedLoopEnabledCallback
+Java_org_wpilib_hardware_hal_simulation_CTREPCMDataJNI_cancelClosedLoopEnabledCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
@@ -192,36 +192,36 @@ Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_cancelClosedLoopEnabledCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_CTREPCMDataJNI
  * Method:    getClosedLoopEnabled
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_getClosedLoopEnabled
+Java_org_wpilib_hardware_hal_simulation_CTREPCMDataJNI_getClosedLoopEnabled
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetCTREPCMClosedLoopEnabled(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_CTREPCMDataJNI
  * Method:    setClosedLoopEnabled
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_setClosedLoopEnabled
+Java_org_wpilib_hardware_hal_simulation_CTREPCMDataJNI_setClosedLoopEnabled
   (JNIEnv*, jclass, jint index, jboolean value)
 {
   HALSIM_SetCTREPCMClosedLoopEnabled(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_CTREPCMDataJNI
  * Method:    registerPressureSwitchCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_registerPressureSwitchCallback
+Java_org_wpilib_hardware_hal_simulation_CTREPCMDataJNI_registerPressureSwitchCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(env, index, callback, initialNotify,
@@ -229,12 +229,12 @@ Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_registerPressureSwitchCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_CTREPCMDataJNI
  * Method:    cancelPressureSwitchCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_cancelPressureSwitchCallback
+Java_org_wpilib_hardware_hal_simulation_CTREPCMDataJNI_cancelPressureSwitchCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
@@ -242,36 +242,36 @@ Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_cancelPressureSwitchCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_CTREPCMDataJNI
  * Method:    getPressureSwitch
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_getPressureSwitch
+Java_org_wpilib_hardware_hal_simulation_CTREPCMDataJNI_getPressureSwitch
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetCTREPCMPressureSwitch(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_CTREPCMDataJNI
  * Method:    setPressureSwitch
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_setPressureSwitch
+Java_org_wpilib_hardware_hal_simulation_CTREPCMDataJNI_setPressureSwitch
   (JNIEnv*, jclass, jint index, jboolean value)
 {
   HALSIM_SetCTREPCMPressureSwitch(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_CTREPCMDataJNI
  * Method:    registerCompressorCurrentCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_registerCompressorCurrentCallback
+Java_org_wpilib_hardware_hal_simulation_CTREPCMDataJNI_registerCompressorCurrentCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(
@@ -280,12 +280,12 @@ Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_registerCompressorCurrentCallba
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_CTREPCMDataJNI
  * Method:    cancelCompressorCurrentCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_cancelCompressorCurrentCallback
+Java_org_wpilib_hardware_hal_simulation_CTREPCMDataJNI_cancelCompressorCurrentCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
@@ -293,36 +293,36 @@ Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_cancelCompressorCurrentCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_CTREPCMDataJNI
  * Method:    getCompressorCurrent
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_getCompressorCurrent
+Java_org_wpilib_hardware_hal_simulation_CTREPCMDataJNI_getCompressorCurrent
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetCTREPCMCompressorCurrent(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_CTREPCMDataJNI
  * Method:    setCompressorCurrent
  * Signature: (ID)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_setCompressorCurrent
+Java_org_wpilib_hardware_hal_simulation_CTREPCMDataJNI_setCompressorCurrent
   (JNIEnv*, jclass, jint index, jdouble value)
 {
   HALSIM_SetCTREPCMCompressorCurrent(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_CTREPCMDataJNI
  * Method:    registerAllNonSolenoidCallbacks
  * Signature: (ILjava/lang/Object;Z)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_registerAllNonSolenoidCallbacks
+Java_org_wpilib_hardware_hal_simulation_CTREPCMDataJNI_registerAllNonSolenoidCallbacks
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   sim::AllocateCallback(
@@ -334,12 +334,12 @@ Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_registerAllNonSolenoidCallbacks
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_CTREPCMDataJNI
  * Method:    registerAllSolenoidCallbacks
  * Signature: (IILjava/lang/Object;Z)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_registerAllSolenoidCallbacks
+Java_org_wpilib_hardware_hal_simulation_CTREPCMDataJNI_registerAllSolenoidCallbacks
   (JNIEnv* env, jclass, jint index, jint channel, jobject callback,
    jboolean initialNotify)
 {
@@ -354,12 +354,12 @@ Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_registerAllSolenoidCallbacks
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_CTREPCMDataJNI
  * Method:    resetData
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_resetData
+Java_org_wpilib_hardware_hal_simulation_CTREPCMDataJNI_resetData
   (JNIEnv*, jclass, jint index)
 {
   HALSIM_ResetCTREPCMData(index);

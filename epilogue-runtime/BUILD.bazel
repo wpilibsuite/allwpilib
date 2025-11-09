@@ -4,13 +4,14 @@ wpilib_java_library(
     name = "epilogue-java",
     srcs = glob(["src/main/java/**/*.java"]),
     maven_artifact_name = "epilogue-runtime-java",
-    maven_group_id = "edu.wpi.first.epilogue",
+    maven_group_id = "org.wpilib.epilogue",
     visibility = ["//visibility:public"],
     deps = [
         "//datalog:datalog-java",
         "//ntcore:ntcore-java",
         "//wpiunits:wpiunits-java",
         "//wpiutil:wpiutil-java",
+        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
 )
 
@@ -19,6 +20,8 @@ wpilib_java_junit5_test(
     srcs = glob(["src/test/java/**/*.java"]),
     deps = [
         ":epilogue-java",
+        "//wpimath:wpimath-java",
         "//wpiutil:wpiutil-java",
+        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
 )

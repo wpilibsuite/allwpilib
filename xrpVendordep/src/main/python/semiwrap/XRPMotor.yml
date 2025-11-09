@@ -1,0 +1,11 @@
+classes:
+  wpi::xrp::XRPMotor:
+    methods:
+      XRPMotor:
+      Set:
+      Get:
+      SetInverted:
+      GetInverted:
+      Disable:
+      StopMotor:
+      GetDescription:

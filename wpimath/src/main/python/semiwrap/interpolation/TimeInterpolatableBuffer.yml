@@ -1,0 +1,50 @@
+extra_includes:
+- "wpi/math/geometry/Pose3d.hpp"
+
+classes:
+  wpi::math::TimeInterpolatableBuffer:
+    template_params:
+    - T
+    methods:
+      TimeInterpolatableBuffer:
+        overloads:
+          wpi::units::second_t, std::function<T (const T&, const T&, double)>:
+          wpi::units::second_t:
+      AddSample:
+      Clear:
+      Sample:
+      GetInternalBuffer:
+        overloads:
+          "":
+          '[const]':
+            ignore: true
+
+templates:
+  TimeInterpolatablePose2dBuffer:
+    qualname: wpi::math::TimeInterpolatableBuffer
+    params:
+    - wpi::math::Pose2d
+  TimeInterpolatablePose3dBuffer:
+    qualname: wpi::math::TimeInterpolatableBuffer
+    params:
+    - wpi::math::Pose3d
+  TimeInterpolatableRotation2dBuffer:
+    qualname: wpi::math::TimeInterpolatableBuffer
+    params:
+    - wpi::math::Rotation2d
+  TimeInterpolatableRotation3dBuffer:
+    qualname: wpi::math::TimeInterpolatableBuffer
+    params:
+    - wpi::math::Rotation3d
+  TimeInterpolatableTranslation2dBuffer:
+    qualname: wpi::math::TimeInterpolatableBuffer
+    params:
+    - wpi::math::Translation2d
+  TimeInterpolatableTranslation3dBuffer:
+    qualname: wpi::math::TimeInterpolatableBuffer
+    params:
+    - wpi::math::Translation3d
+  TimeInterpolatableFloatBuffer:
+    qualname: wpi::math::TimeInterpolatableBuffer
+    params:
+    - double

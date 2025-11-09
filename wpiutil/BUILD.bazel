@@ -2,13 +2,18 @@ load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
-load("@rules_python//python:defs.bzl", "py_binary")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project")
 load("//shared/bazel/rules/gen:gen-resources.bzl", "generate_resources")
+load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info", "generate_robotpy_pybind_build_info")
+load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "create_pybind_library")
+load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
 load("//wpiutil:generate.bzl", "generate_wpiutil")
+load("//wpiutil:robotpy_native_build_info.bzl", "define_native_wrapper")
+load("//wpiutil:robotpy_pybind_build_info.bzl", "define_pybind_library", "publish_library_casters", "wpiutil_extension")
 
 filegroup(
     name = "doxygen-files",
@@ -80,57 +85,66 @@ third_party_cc_lib_helper(
     name = "argparse",
     include_root = "src/main/native/thirdparty/argparse/include",
     src_root = None,
+    visibility = ["//visibility:public"],
 )
 
 third_party_cc_lib_helper(
     name = "debugging",
     include_root = "src/main/native/thirdparty/debugging/include",
     src_root = "src/main/native/thirdparty/debugging/src",
+    visibility = ["//visibility:public"],
 )
 
 third_party_cc_lib_helper(
     name = "expected",
     include_root = "src/main/native/thirdparty/expected/include",
+    visibility = ["//visibility:public"],
 )
 
 third_party_cc_lib_helper(
     name = "fmtlib",
     include_root = "src/main/native/thirdparty/fmtlib/include",
     src_root = "src/main/native/thirdparty/fmtlib/src",
+    visibility = ["//visibility:public"],
 )
 
 third_party_cc_lib_helper(
     name = "json",
     include_root = "src/main/native/thirdparty/json/include",
+    visibility = ["//visibility:public"],
 )
 
 third_party_cc_lib_helper(
     name = "llvm",
     include_root = "src/main/native/thirdparty/llvm/include",
     src_root = "src/main/native/thirdparty/llvm/cpp",
+    visibility = ["//visibility:public"],
 )
 
 third_party_cc_lib_helper(
     name = "mpack",
     include_root = "src/main/native/thirdparty/mpack/include",
     src_root = "src/main/native/thirdparty/mpack/src",
-)
-
-third_party_cc_lib_helper(
-    name = "protobuf",
-    include_root = "src/main/native/thirdparty/protobuf/include",
-    src_root = "src/main/native/thirdparty/protobuf/src",
+    visibility = ["//visibility:public"],
 )
 
 third_party_cc_lib_helper(
     name = "nanopb",
     include_root = "src/main/native/thirdparty/nanopb/include",
     src_root = "src/main/native/thirdparty/nanopb/src",
+    visibility = ["//visibility:public"],
 )
 
 third_party_cc_lib_helper(
     name = "sigslot",
     include_root = "src/main/native/thirdparty/sigslot/include",
+    visibility = ["//visibility:public"],
+)
+
+third_party_cc_lib_helper(
+    name = "upb",
+    include_root = "src/main/native/thirdparty/upb/include",
+    src_root = "src/main/native/thirdparty/upb/src",
 )
 
 generate_resources(
@@ -173,7 +187,7 @@ wpilib_cc_library(
         ":llvm",
         ":mpack",
         ":nanopb",
-        ":protobuf",
+        ":upb",
     ],
     visibility = ["//visibility:public"],
     deps = select({
@@ -248,7 +262,7 @@ wpilib_jni_java_library(
     name = "wpiutil-java",
     srcs = glob(["src/main/java/**/*.java"]),
     maven_artifact_name = "wpiutil-java",
-    maven_group_id = "edu.wpi.first.wpiutil",
+    maven_group_id = "org.wpilib.wpiutil",
     native_libs = [":wpiutiljni"],
     visibility = ["//visibility:public"],
     deps = [
@@ -273,20 +287,41 @@ cc_library(
     strip_include_prefix = "src/generated/test/native/cpp",
 )
 
+CATCH2_SRCS = [
+    "src/test/native/cpp/TestCatch2.cpp",
+    "src/test/native/cpp/catch2main.cpp",
+]
+
 cc_test(
-    name = "wpiutil-cpp-test",
+    name = "wpiutil-gtest-cpp-test",
     size = "small",
-    srcs = glob([
-        "src/test/native/cpp/**",
-        "src/generated/test/native/cpp/*",
-    ]),
+    srcs = glob(
+        [
+            "src/test/native/cpp/**",
+            "src/generated/test/native/cpp/*",
+        ],
+        exclude = CATCH2_SRCS,
+    ),
     linkstatic = True,
     tags = ["no-tsan"],  # TODO(pj.reiniger) Find problem
     deps = [
         ":nanopb-test-headers",
         ":wpiutil",
         ":wpiutil-testlib",
+        "//thirdparty/catch2:catch2.static",
         "//thirdparty/googletest",
+    ],
+)
+
+cc_test(
+    name = "wpiutil-catch2-cpp-test",
+    size = "small",
+    srcs = CATCH2_SRCS,
+    linkstatic = True,
+    deps = [
+        ":wpiutil",
+        ":wpiutil-testlib",
+        "//thirdparty/catch2:catch2.static",
     ],
 )
 
@@ -308,15 +343,104 @@ cc_binary(
 
 java_binary(
     name = "DevMain-Java",
-    srcs = ["src/dev/java/edu/wpi/first/util/DevMain.java"],
-    main_class = "edu.wpi.first.util.DevMain",
+    srcs = ["src/dev/java/org/wpilib/util/DevMain.java"],
+    main_class = "org.wpilib.util.DevMain",
     deps = [
         ":wpiutil-java",
+    ],
+)
+
+generate_robotpy_native_wrapper_build_info(
+    name = "robotpy-native-wpiutil-generator",
+    pyproject_toml = "src/main/python/native-pyproject.toml",
+    third_party_dirs = [
+        "argparse",
+        "debugging",
+        "expected",
+        "fmtlib",
+        "json",
+        "llvm",
+        "mpack",
+        "nanopb",
+        "sigslot",
+        "upb",
+    ],
+)
+
+define_native_wrapper(
+    name = "robotpy-native-wpiutil",
+)
+
+PYBIND_PKGCFG_DEPS = ["//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc"]
+
+generate_robotpy_pybind_build_info(
+    name = "robotpy-wpiutil-generator",
+    additional_srcs = ["src/main/python/wpiutil/src/wpistruct/wpystruct_fns.h"] + [":robotpy-native-wpiutil.copy_headers"],
+    package_root_file = "src/main/python/wpiutil/__init__.py",
+    pkgcfgs = PYBIND_PKGCFG_DEPS,
+    pyproject_toml = "src/main/python/pyproject.toml",
+    yaml_files = glob(["src/main/python/semiwrap/*.yml"]),
+)
+
+publish_library_casters()
+
+wpiutil_extension(
+    srcs = glob(["src/main/python/wpiutil/src/**/*.cpp"]),
+    extra_hdrs = glob([
+        "src/main/python/wpiutil/src/type_casters/*.h",
+        "src/main/python/wpiutil/src/wpistruct/*.h",
+    ]),
+    header_to_dat_deps = ["src/main/python/wpiutil/src/wpistruct/wpystruct_fns.h"],
+    includes = [
+        "src/main/python/wpiutil/",
+        "src/main/python/wpiutil/src/type_casters",
+        "src/main/python/wpiutil/src/wpistruct",
+    ],
+)
+
+define_pybind_library(
+    name = "robotpy-wpiutil",
+    pkgcfgs = PYBIND_PKGCFG_DEPS,
+)
+
+create_pybind_library(
+    name = "module",
+    dynamic_deps = [
+        ":shared/wpiutil",
+    ],
+    extension_name = "module",
+    extra_srcs = glob(["src/test/python/cpp/wpiutil_test/*.cpp"]),
+    install_path = "src/test/python/cpp/wpiutil_test/",
+    deps = [
+        ":wpiutil_pybind_library",
+    ],
+)
+
+py_library(
+    name = "wpiutil_test",
+    srcs = glob(["src/test/python/cpp/wpiutil_test/*.py"]),
+    data = [
+        ":src/test/python/cpp/wpiutil_test/module",
+    ],
+    imports = ["src/test/python/cpp"],
+    visibility = ["//visibility:public"],
+)
+
+robotpy_py_test(
+    "wpiutil_tests",
+    srcs = glob(
+        ["src/test/python/**/*.py"],
+        exclude = ["src/test/python/cpp/**"],
+    ),
+    deps = [
+        ":robotpy-wpiutil",
+        ":wpiutil_test",
+        requirement("pytest"),
     ],
 )
 
 package_default_jni_project(
     name = "wpiutil",
     maven_artifact_name = "wpiutil-cpp",
-    maven_group_id = "edu.wpi.first.wpiutil",
+    maven_group_id = "org.wpilib.wpiutil",
 )

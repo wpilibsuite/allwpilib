@@ -13,15 +13,15 @@
 #include <string>
 
 #include <fmt/format.h>
-#include <wpi/jni_util.h>
 
-#include "edu_wpi_first_hal_HALUtil.h"
-#include "hal/CAN.h"
-#include "hal/DriverStation.h"
-#include "hal/Errors.h"
-#include "hal/HAL.h"
+#include "org_wpilib_hardware_hal_HALUtil.h"
+#include "wpi/hal/CAN.h"
+#include "wpi/hal/DriverStation.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/HAL.h"
+#include "wpi/util/jni_util.hpp"
 
-using namespace wpi::java;
+using namespace wpi::util::java;
 
 #define kRioStatusOffset -63000
 #define kRioStatusSuccess 0
@@ -30,12 +30,13 @@ using namespace wpi::java;
 #define kRIOStatusFeatureNotSupported (kRioStatusOffset - 193)
 #define kRIOStatusResourceNotInitialized -52010
 
-static_assert(edu_wpi_first_hal_HALUtil_RUNTIME_ROBORIO == HAL_Runtime_RoboRIO);
-static_assert(edu_wpi_first_hal_HALUtil_RUNTIME_ROBORIO2 ==
+static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_ROBORIO ==
+              HAL_Runtime_RoboRIO);
+static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_ROBORIO2 ==
               HAL_Runtime_RoboRIO2);
-static_assert(edu_wpi_first_hal_HALUtil_RUNTIME_SIMULATION ==
+static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_SIMULATION ==
               HAL_Runtime_Simulation);
-static_assert(edu_wpi_first_hal_HALUtil_RUNTIME_SYSTEMCORE ==
+static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_SYSTEMCORE ==
               HAL_Runtime_SystemCore);
 
 static JavaVM* jvm = nullptr;
@@ -56,27 +57,28 @@ static JClass revPHVersionCls;
 static JClass canStreamOverflowExCls;
 
 static const JClassInit classes[] = {
-    {"edu/wpi/first/hal/PowerDistributionVersion",
+    {"org/wpilib/hardware/hal/PowerDistributionVersion",
      &powerDistributionVersionCls},
-    {"edu/wpi/first/hal/can/CANStatus", &canStatusCls},
-    {"edu/wpi/first/hal/MatchInfoData", &matchInfoDataCls},
-    {"edu/wpi/first/hal/can/CANReceiveMessage", &canReceiveMessageCls},
-    {"edu/wpi/first/hal/can/CANStreamMessage", &canStreamMessageCls},
-    {"edu/wpi/first/hal/HALValue", &halValueCls},
-    {"edu/wpi/first/hal/REVPHVersion", &revPHVersionCls},
-    {"edu/wpi/first/hal/can/CANStreamOverflowException",
+    {"org/wpilib/hardware/hal/can/CANStatus", &canStatusCls},
+    {"org/wpilib/hardware/hal/MatchInfoData", &matchInfoDataCls},
+    {"org/wpilib/hardware/hal/can/CANReceiveMessage", &canReceiveMessageCls},
+    {"org/wpilib/hardware/hal/can/CANStreamMessage", &canStreamMessageCls},
+    {"org/wpilib/hardware/hal/HALValue", &halValueCls},
+    {"org/wpilib/hardware/hal/REVPHVersion", &revPHVersionCls},
+    {"org/wpilib/hardware/hal/can/CANStreamOverflowException",
      &canStreamOverflowExCls}};
 
 static const JExceptionInit exceptions[] = {
     {"java/lang/IllegalArgumentException", &illegalArgExCls},
     {"java/lang/IndexOutOfBoundsException", &indexOobExCls},
-    {"edu/wpi/first/hal/util/BoundaryException", &boundaryExCls},
-    {"edu/wpi/first/hal/util/AllocationException", &allocationExCls},
-    {"edu/wpi/first/hal/util/HalHandleException", &halHandleExCls},
-    {"edu/wpi/first/hal/util/UncleanStatusException", &uncleanStatusExCls},
+    {"org/wpilib/hardware/hal/util/BoundaryException", &boundaryExCls},
+    {"org/wpilib/hardware/hal/util/AllocationException", &allocationExCls},
+    {"org/wpilib/hardware/hal/util/HalHandleException", &halHandleExCls},
+    {"org/wpilib/hardware/hal/util/UncleanStatusException",
+     &uncleanStatusExCls},
     {"java/lang/NullPointerException", &nullPointerEx}};
 
-namespace hal {
+namespace wpi::hal {
 
 void ThrowUncleanStatusException(JNIEnv* env, std::string_view msg,
                                  int32_t status) {
@@ -115,7 +117,7 @@ void ReportError(JNIEnv* env, int32_t status, bool doThrow) {
         env, fmt::format(" Code: {}. {}", status, message).c_str(), status);
   } else {
     std::string func;
-    auto stack = GetJavaStackTrace(env, &func, "edu.wpi.first");
+    auto stack = GetJavaStackTrace(env, &func, "org.wpilib");
     // Make a copy of message for safety, calling back into the HAL might
     // invalidate the string.
     std::string lastMessage{message};
@@ -151,7 +153,7 @@ void ThrowCANStreamOverflowException(JNIEnv* env, jobjectArray messages,
                                      jint length) {
   static jmethodID constructor =
       env->GetMethodID(canStreamOverflowExCls, "<init>",
-                       "([Ledu/wpi/first/hal/CANStreamMessage;I)V");
+                       "([Lorg/wpilib/hardware/hal/CANStreamMessage;I)V");
   jobject exception =
       env->NewObject(canStreamOverflowExCls, constructor, messages, length);
   env->Throw(static_cast<jthrowable>(exception));
@@ -254,7 +256,7 @@ jbyteArray SetCANStreamObject(JNIEnv* env, jobject canStreamData,
 
 jobject CreateHALValue(JNIEnv* env, const HAL_Value& value) {
   static jmethodID fromNative = env->GetStaticMethodID(
-      halValueCls, "fromNative", "(IJD)Ledu/wpi/first/hal/HALValue;");
+      halValueCls, "fromNative", "(IJD)Lorg/wpilib/hardware/hal/HALValue;");
   jlong value1 = 0;
   jdouble value2 = 0.0;
   switch (value.type) {
@@ -310,9 +312,9 @@ jint SimOnLoad(JavaVM* vm, void* reserved);
 void SimOnUnload(JavaVM* vm, void* reserved);
 }  // namespace sim
 
-}  // namespace hal
+}  // namespace wpi::hal
 
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
 
@@ -363,86 +365,56 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
 }
 
 /*
- * Class:     edu_wpi_first_hal_HALUtil
- * Method:    getFPGAVersion
- * Signature: ()S
- */
-JNIEXPORT jshort JNICALL
-Java_edu_wpi_first_hal_HALUtil_getFPGAVersion
-  (JNIEnv* env, jclass)
-{
-  int32_t status = 0;
-  jshort returnValue = HAL_GetFPGAVersion(&status);
-  CheckStatus(env, status);
-  return returnValue;
-}
-
-/*
- * Class:     edu_wpi_first_hal_HALUtil
- * Method:    getFPGARevision
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_HALUtil_getFPGARevision
-  (JNIEnv* env, jclass)
-{
-  int32_t status = 0;
-  jint returnValue = HAL_GetFPGARevision(&status);
-  CheckStatus(env, status);
-  return returnValue;
-}
-
-/*
- * Class:     edu_wpi_first_hal_HALUtil
+ * Class:     org_wpilib_hardware_hal_HALUtil
  * Method:    getSerialNumber
  * Signature: ()Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_first_hal_HALUtil_getSerialNumber
+Java_org_wpilib_hardware_hal_HALUtil_getSerialNumber
   (JNIEnv* env, jclass)
 {
   WPI_String serialNum;
   HAL_GetSerialNumber(&serialNum);
-  jstring ret = MakeJString(env, wpi::to_string_view(&serialNum));
+  jstring ret = MakeJString(env, wpi::util::to_string_view(&serialNum));
   WPI_FreeString(&serialNum);
   return ret;
 }
 
 /*
- * Class:     edu_wpi_first_hal_HALUtil
+ * Class:     org_wpilib_hardware_hal_HALUtil
  * Method:    getComments
  * Signature: ()Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_first_hal_HALUtil_getComments
+Java_org_wpilib_hardware_hal_HALUtil_getComments
   (JNIEnv* env, jclass)
 {
   WPI_String comments;
   HAL_GetComments(&comments);
-  jstring ret = MakeJString(env, wpi::to_string_view(&comments));
+  jstring ret = MakeJString(env, wpi::util::to_string_view(&comments));
   WPI_FreeString(&comments);
   return ret;
 }
 
 /*
- * Class:     edu_wpi_first_hal_HALUtil
+ * Class:     org_wpilib_hardware_hal_HALUtil
  * Method:    getTeamNumber
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_HALUtil_getTeamNumber
+Java_org_wpilib_hardware_hal_HALUtil_getTeamNumber
   (JNIEnv* env, jclass)
 {
   return HAL_GetTeamNumber();
 }
 
 /*
- * Class:     edu_wpi_first_hal_HALUtil
+ * Class:     org_wpilib_hardware_hal_HALUtil
  * Method:    getFPGATime
  * Signature: ()J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_hal_HALUtil_getFPGATime
+Java_org_wpilib_hardware_hal_HALUtil_getFPGATime
   (JNIEnv* env, jclass)
 {
   int32_t status = 0;
@@ -452,12 +424,12 @@ Java_edu_wpi_first_hal_HALUtil_getFPGATime
 }
 
 /*
- * Class:     edu_wpi_first_hal_HALUtil
+ * Class:     org_wpilib_hardware_hal_HALUtil
  * Method:    getHALRuntimeType
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_HALUtil_getHALRuntimeType
+Java_org_wpilib_hardware_hal_HALUtil_getHALRuntimeType
   (JNIEnv* env, jclass)
 {
   jint returnValue = HAL_GetRuntimeType();
@@ -465,12 +437,12 @@ Java_edu_wpi_first_hal_HALUtil_getHALRuntimeType
 }
 
 /*
- * Class:     edu_wpi_first_hal_HALUtil
+ * Class:     org_wpilib_hardware_hal_HALUtil
  * Method:    getHALErrorMessage
  * Signature: (I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_first_hal_HALUtil_getHALErrorMessage
+Java_org_wpilib_hardware_hal_HALUtil_getHALErrorMessage
   (JNIEnv* paramEnv, jclass, jint paramId)
 {
   const char* msg = HAL_GetErrorMessage(paramId);
@@ -478,24 +450,24 @@ Java_edu_wpi_first_hal_HALUtil_getHALErrorMessage
 }
 
 /*
- * Class:     edu_wpi_first_hal_HALUtil
+ * Class:     org_wpilib_hardware_hal_HALUtil
  * Method:    getHALErrno
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_HALUtil_getHALErrno
+Java_org_wpilib_hardware_hal_HALUtil_getHALErrno
   (JNIEnv*, jclass)
 {
   return errno;
 }
 
 /*
- * Class:     edu_wpi_first_hal_HALUtil
+ * Class:     org_wpilib_hardware_hal_HALUtil
  * Method:    getHALstrerror
  * Signature: (I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_first_hal_HALUtil_getHALstrerror
+Java_org_wpilib_hardware_hal_HALUtil_getHALstrerror
   (JNIEnv* env, jclass, jint errorCode)
 {
   const char* msg = std::strerror(errno);

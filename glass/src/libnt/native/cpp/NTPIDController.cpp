@@ -2,19 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/networktables/NTPIDController.h"
+#include "wpi/glass/networktables/NTPIDController.hpp"
 
 #include <utility>
 
 #include <fmt/format.h>
-#include <wpi/StringExtras.h>
 
-using namespace glass;
+#include "wpi/util/StringExtras.hpp"
+
+using namespace wpi::glass;
 
 NTPIDControllerModel::NTPIDControllerModel(std::string_view path)
-    : NTPIDControllerModel(nt::NetworkTableInstance::GetDefault(), path) {}
+    : NTPIDControllerModel(wpi::nt::NetworkTableInstance::GetDefault(), path) {}
 
-NTPIDControllerModel::NTPIDControllerModel(nt::NetworkTableInstance inst,
+NTPIDControllerModel::NTPIDControllerModel(wpi::nt::NetworkTableInstance inst,
                                            std::string_view path)
     : m_inst{inst},
       m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
@@ -31,7 +32,7 @@ NTPIDControllerModel::NTPIDControllerModel(nt::NetworkTableInstance inst,
       m_dData{fmt::format("NTPIDCtrlD:{}", path)},
       m_setpointData{fmt::format("NTPIDCtrlStpt:{}", path)},
       m_iZoneData{fmt::format("NTPIDCtrlIZone:{}", path)},
-      m_nameValue{wpi::rsplit(path, '/').second} {}
+      m_nameValue{wpi::util::rsplit(path, '/').second} {}
 
 void NTPIDControllerModel::SetP(double value) {
   m_p.Set(value);

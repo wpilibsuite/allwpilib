@@ -1,0 +1,112 @@
+strip_prefixes:
+- HALSIM_
+
+functions:
+  HALSIM_ResetDriverStationData:
+  HALSIM_RegisterDriverStationEnabledCallback:
+    ignore: true
+  HALSIM_CancelDriverStationEnabledCallback:
+  HALSIM_GetDriverStationEnabled:
+  HALSIM_SetDriverStationEnabled:
+  HALSIM_RegisterDriverStationAutonomousCallback:
+    ignore: true
+  HALSIM_CancelDriverStationAutonomousCallback:
+  HALSIM_GetDriverStationAutonomous:
+  HALSIM_SetDriverStationAutonomous:
+  HALSIM_RegisterDriverStationTestCallback:
+    ignore: true
+  HALSIM_CancelDriverStationTestCallback:
+  HALSIM_GetDriverStationTest:
+  HALSIM_SetDriverStationTest:
+  HALSIM_RegisterDriverStationEStopCallback:
+    ignore: true
+  HALSIM_CancelDriverStationEStopCallback:
+  HALSIM_GetDriverStationEStop:
+  HALSIM_SetDriverStationEStop:
+  HALSIM_RegisterDriverStationFmsAttachedCallback:
+    ignore: true
+  HALSIM_CancelDriverStationFmsAttachedCallback:
+  HALSIM_GetDriverStationFmsAttached:
+  HALSIM_SetDriverStationFmsAttached:
+  HALSIM_RegisterDriverStationDsAttachedCallback:
+    ignore: true
+  HALSIM_CancelDriverStationDsAttachedCallback:
+  HALSIM_GetDriverStationDsAttached:
+  HALSIM_SetDriverStationDsAttached:
+  HALSIM_RegisterDriverStationAllianceStationIdCallback:
+    ignore: true
+  HALSIM_CancelDriverStationAllianceStationIdCallback:
+  HALSIM_GetDriverStationAllianceStationId:
+  HALSIM_SetDriverStationAllianceStationId:
+  HALSIM_RegisterDriverStationMatchTimeCallback:
+    ignore: true
+  HALSIM_CancelDriverStationMatchTimeCallback:
+  HALSIM_GetDriverStationMatchTime:
+  HALSIM_SetDriverStationMatchTime:
+  HALSIM_RegisterJoystickAxesCallback:
+    ignore: true
+  HALSIM_CancelJoystickAxesCallback:
+  HALSIM_GetJoystickAxes:
+  HALSIM_SetJoystickAxes:
+  HALSIM_RegisterJoystickPOVsCallback:
+    ignore: true
+  HALSIM_CancelJoystickPOVsCallback:
+  HALSIM_GetJoystickPOVs:
+  HALSIM_SetJoystickPOVs:
+  HALSIM_RegisterJoystickButtonsCallback:
+    ignore: true
+  HALSIM_CancelJoystickButtonsCallback:
+  HALSIM_GetJoystickButtons:
+  HALSIM_SetJoystickButtons:
+  HALSIM_RegisterJoystickDescriptorCallback:
+    ignore: true
+  HALSIM_CancelJoystickDescriptorCallback:
+  HALSIM_GetJoystickDescriptor:
+  HALSIM_SetJoystickDescriptor:
+  HALSIM_RegisterJoystickOutputsCallback:
+    ignore: true
+  HALSIM_CancelJoystickOutputsCallback:
+  HALSIM_GetJoystickOutputs:
+  HALSIM_SetJoystickOutputs:
+  HALSIM_RegisterMatchInfoCallback:
+    ignore: true
+  HALSIM_CancelMatchInfoCallback:
+  HALSIM_GetMatchInfo:
+  HALSIM_SetMatchInfo:
+  HALSIM_SetJoystickButton:
+  HALSIM_SetJoystickAxis:
+  HALSIM_SetJoystickPOV:
+  HALSIM_SetJoystickButtonsValue:
+  HALSIM_SetJoystickType:
+  HALSIM_SetJoystickName:
+    cpp_code: |
+      [](int32_t stick, std::string_view sv) {
+        auto s = wpi::util::make_string(sv);
+        HALSIM_SetJoystickName(stick, &s);
+      }
+  HALSIM_SetGameSpecificMessage:
+    cpp_code: |
+      [](std::string_view sv) {
+        auto s = wpi::util::make_string(sv);
+        HALSIM_SetGameSpecificMessage(&s);
+      }
+  HALSIM_SetEventName:
+    cpp_code: |
+      [](std::string_view sv) {
+        auto s = wpi::util::make_string(sv);
+        HALSIM_SetEventName(&s);
+      }
+  HALSIM_SetMatchType:
+  HALSIM_SetMatchNumber:
+  HALSIM_SetReplayNumber:
+  HALSIM_RegisterDriverStationAllCallbacks:
+    ignore: true
+  HALSIM_RegisterDriverStationNewDataCallback:
+    ignore: true
+  HALSIM_CancelDriverStationNewDataCallback:
+  HALSIM_NotifyDriverStationNewData:
+  HALSIM_SetJoystickIsGamepad:
+  HALSIM_SetJoystickAxesAvailable:
+  HALSIM_SetJoystickPOVsAvailable:
+  HALSIM_SetJoystickButtonsAvailable:
+  HALSIM_GetJoystickAvailables:

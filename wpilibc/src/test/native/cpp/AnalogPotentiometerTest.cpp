@@ -3,14 +3,14 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <hal/HAL.h>
 
-#include "frc/AnalogPotentiometer.h"
-#include "frc/simulation/AnalogInputSim.h"
-#include "frc/simulation/RoboRioSim.h"
+#include "wpi/hal/HAL.h"
+#include "wpi/hardware/rotation/AnalogPotentiometer.hpp"
+#include "wpi/simulation/AnalogInputSim.hpp"
+#include "wpi/simulation/RoboRioSim.hpp"
 
-namespace frc {
-using namespace frc::sim;
+namespace wpi {
+using namespace wpi::sim;
 TEST(AnalogPotentiometerTest, InitializeWithAnalogInput) {
   HAL_Initialize(500, 0);
 
@@ -78,7 +78,7 @@ TEST(AnalogPotentiometerTest, WithModifiedBatteryVoltage) {
   EXPECT_EQ(90, pot.Get());
 
   // Simulate a lower battery voltage
-  RoboRioSim::SetUserVoltage3V3(units::volt_t{2.5});
+  RoboRioSim::SetUserVoltage3V3(wpi::units::volt_t{2.5});
 
   sim.SetVoltage(2.5);
   EXPECT_EQ(270.0, pot.Get());
@@ -89,4 +89,4 @@ TEST(AnalogPotentiometerTest, WithModifiedBatteryVoltage) {
   sim.SetVoltage(0.0);
   EXPECT_EQ(90.0, pot.Get());
 }
-}  // namespace frc
+}  // namespace wpi

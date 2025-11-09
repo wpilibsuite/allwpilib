@@ -7,20 +7,20 @@
 #include "BufferCallbackStore.h"
 #include "CallbackStore.h"
 #include "ConstBufferCallbackStore.h"
-#include "edu_wpi_first_hal_simulation_I2CDataJNI.h"
-#include "hal/simulation/I2CData.h"
+#include "org_wpilib_hardware_hal_simulation_I2CDataJNI.h"
+#include "wpi/hal/simulation/I2CData.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_hal_simulation_I2CDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_I2CDataJNI
  * Method:    registerInitializedCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_I2CDataJNI_registerInitializedCallback
+Java_org_wpilib_hardware_hal_simulation_I2CDataJNI_registerInitializedCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(env, index, callback, initialNotify,
@@ -28,12 +28,12 @@ Java_edu_wpi_first_hal_simulation_I2CDataJNI_registerInitializedCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_I2CDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_I2CDataJNI
  * Method:    cancelInitializedCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_I2CDataJNI_cancelInitializedCallback
+Java_org_wpilib_hardware_hal_simulation_I2CDataJNI_cancelInitializedCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
@@ -41,36 +41,36 @@ Java_edu_wpi_first_hal_simulation_I2CDataJNI_cancelInitializedCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_I2CDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_I2CDataJNI
  * Method:    getInitialized
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_simulation_I2CDataJNI_getInitialized
+Java_org_wpilib_hardware_hal_simulation_I2CDataJNI_getInitialized
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetI2CInitialized(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_I2CDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_I2CDataJNI
  * Method:    setInitialized
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_I2CDataJNI_setInitialized
+Java_org_wpilib_hardware_hal_simulation_I2CDataJNI_setInitialized
   (JNIEnv*, jclass, jint index, jboolean value)
 {
   HALSIM_SetI2CInitialized(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_I2CDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_I2CDataJNI
  * Method:    registerReadCallback
  * Signature: (ILjava/lang/Object;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_I2CDataJNI_registerReadCallback
+Java_org_wpilib_hardware_hal_simulation_I2CDataJNI_registerReadCallback
   (JNIEnv* env, jclass, jint index, jobject callback)
 {
   return sim::AllocateBufferCallback(env, index, callback,
@@ -78,24 +78,24 @@ Java_edu_wpi_first_hal_simulation_I2CDataJNI_registerReadCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_I2CDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_I2CDataJNI
  * Method:    cancelReadCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_I2CDataJNI_cancelReadCallback
+Java_org_wpilib_hardware_hal_simulation_I2CDataJNI_cancelReadCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   sim::FreeBufferCallback(env, handle, index, &HALSIM_CancelI2CReadCallback);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_I2CDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_I2CDataJNI
  * Method:    registerWriteCallback
  * Signature: (ILjava/lang/Object;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_I2CDataJNI_registerWriteCallback
+Java_org_wpilib_hardware_hal_simulation_I2CDataJNI_registerWriteCallback
   (JNIEnv* env, jclass, jint index, jobject callback)
 {
   return sim::AllocateConstBufferCallback(env, index, callback,
@@ -103,12 +103,12 @@ Java_edu_wpi_first_hal_simulation_I2CDataJNI_registerWriteCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_I2CDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_I2CDataJNI
  * Method:    cancelWriteCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_I2CDataJNI_cancelWriteCallback
+Java_org_wpilib_hardware_hal_simulation_I2CDataJNI_cancelWriteCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   sim::FreeConstBufferCallback(env, handle, index,
@@ -116,12 +116,12 @@ Java_edu_wpi_first_hal_simulation_I2CDataJNI_cancelWriteCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_I2CDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_I2CDataJNI
  * Method:    resetData
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_I2CDataJNI_resetData
+Java_org_wpilib_hardware_hal_simulation_I2CDataJNI_resetData
   (JNIEnv*, jclass, jint index)
 {
   HALSIM_ResetI2CData(index);

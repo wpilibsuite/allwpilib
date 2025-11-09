@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Thu, 7 Sep 2023 22:02:27 -0700
-Subject: [PATCH 2/4] Make serializer public
+Subject: [PATCH 2/5] Make serializer public
 
 ---
  include/nlohmann/detail/output/serializer.hpp | 4 +++-

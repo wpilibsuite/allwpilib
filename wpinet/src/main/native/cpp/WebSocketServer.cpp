@@ -2,38 +2,37 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/WebSocketServer.h"
+#include "wpi/net/WebSocketServer.hpp"
 
 #include <memory>
 #include <string>
 #include <utility>
 
-#include <wpi/StringExtras.h>
-#include <wpi/fmt/raw_ostream.h>
-#include <wpi/print.h>
+#include "wpi/net/raw_uv_ostream.hpp"
+#include "wpi/net/uv/Buffer.hpp"
+#include "wpi/net/uv/Stream.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/fmt/raw_ostream.hpp"
+#include "wpi/util/print.hpp"
 
-#include "wpinet/raw_uv_ostream.h"
-#include "wpinet/uv/Buffer.h"
-#include "wpinet/uv/Stream.h"
-
-using namespace wpi;
+using namespace wpi::net;
 
 WebSocketServerHelper::WebSocketServerHelper(HttpParser& req) {
   req.header.connect([this](std::string_view name, std::string_view value) {
-    if (equals_lower(name, "host")) {
+    if (wpi::util::equals_lower(name, "host")) {
       m_gotHost = true;
-    } else if (equals_lower(name, "upgrade")) {
-      if (equals_lower(value, "websocket")) {
+    } else if (wpi::util::equals_lower(name, "upgrade")) {
+      if (wpi::util::equals_lower(value, "websocket")) {
         m_websocket = true;
       }
-    } else if (equals_lower(name, "sec-websocket-key")) {
+    } else if (wpi::util::equals_lower(name, "sec-websocket-key")) {
       m_key = value;
-    } else if (equals_lower(name, "sec-websocket-version")) {
+    } else if (wpi::util::equals_lower(name, "sec-websocket-version")) {
       m_version = value;
-    } else if (equals_lower(name, "sec-websocket-protocol")) {
+    } else if (wpi::util::equals_lower(name, "sec-websocket-protocol")) {
       // Protocols are comma delimited, repeated headers add to list
-      split(value, ',', -1, false, [&](auto protocol) {
-        protocol = trim(protocol);
+      wpi::util::split(value, ',', -1, false, [&](auto protocol) {
+        protocol = wpi::util::trim(protocol);
         if (!protocol.empty()) {
           m_protocols.emplace_back(protocol);
         }
@@ -86,7 +85,7 @@ WebSocketServer::WebSocketServer(uv::Stream& stream,
       m_options{std::move(options)} {
   // Header handling
   m_req.header.connect([this](std::string_view name, std::string_view value) {
-    if (equals_lower(name, "host")) {
+    if (wpi::util::equals_lower(name, "host")) {
       if (m_options.checkHost) {
         if (!m_options.checkHost(value)) {
           Abort(401, "Unrecognized Host");
@@ -168,11 +167,11 @@ void WebSocketServer::Abort(uint16_t code, std::string_view reason) {
   m_aborted = true;
 
   // Build response
-  SmallVector<uv::Buffer, 4> bufs;
+  wpi::util::SmallVector<uv::Buffer, 4> bufs;
   raw_uv_ostream os{bufs, 1024};
 
   // Handle unsupported version
-  wpi::print(os, "HTTP/1.1 {} {}\r\n", code, reason);
+  wpi::util::print(os, "HTTP/1.1 {} {}\r\n", code, reason);
   if (code == 426) {
     os << "Upgrade: WebSocket\r\n";
   }

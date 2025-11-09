@@ -1,0 +1,92 @@
+load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@rules_java//java:defs.bzl", "java_binary")
+load("@rules_python//python:defs.bzl", "py_binary")
+load("//commandsv3:generate.bzl", "generate_commandsv3")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test", "wpilib_java_library")
+
+py_binary(
+    name = "generate_files",
+    srcs = ["generate_files.py"],
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    deps = [requirement("jinja2")],
+)
+
+filegroup(
+    name = "templates",
+    srcs = glob(["src/generate/main/**"]) + [
+        "//wpilibj:hid_schema",
+    ],
+)
+
+generate_commandsv3(
+    name = "generate_commandsv3",
+)
+
+write_source_files(
+    name = "write_commandsv3",
+    files = {
+        "src/generated": ":generate_commandsv3",
+    },
+    suggested_update_target = "//:write_all",
+    tags = ["pregeneration"],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "generated_java",
+    srcs = glob(["src/generated/main/java/**/*.java"]),
+)
+
+wpilib_java_library(
+    name = "commandsv3-java",
+    srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
+    exported_plugins = ["//javacPlugin:plugin"],
+    maven_artifact_name = "commands3-java",
+    maven_group_id = "org.wpilib.commands3",
+    plugins = ["//javacPlugin:plugin"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cscore:cscore-java",
+        "//hal:hal-java",
+        "//ntcore:ntcore-java",
+        "//wpiannotations",
+        "//wpilibj:wpilibj-java",
+        "//wpimath:wpimath-java",
+        "//wpinet:wpinet-java",
+        "//wpiunits:wpiunits-java",
+        "//wpiutil:wpiutil-java",
+        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
+    ],
+)
+
+wpilib_java_junit5_test(
+    name = "commandsv3-java-test",
+    srcs = glob(["src/test/java/**/*.java"]),
+    deps = [
+        ":commandsv3-java",
+        "//hal:hal-java",
+        "//ntcore:ntcore-java",
+        "//wpiannotations",
+        "//wpilibj:wpilibj-java",
+        "//wpimath:wpimath-java",
+        "//wpiunits:wpiunits-java",
+        "//wpiutil:wpiutil-java",
+        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
+    ],
+)
+
+java_binary(
+    name = "DevMain-Java",
+    srcs = ["src/dev/java/org/wpilib/command3/DevMain.java"],
+    main_class = "org.wpilib.command3.DevMain",
+    deps = [
+        "//hal:hal-java",
+        "//ntcore:ntcore-java",
+        "//wpimath:wpimath-java",
+        "//wpiutil:wpiutil-java",
+    ],
+)

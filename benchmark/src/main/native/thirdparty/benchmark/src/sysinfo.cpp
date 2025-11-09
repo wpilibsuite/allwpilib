@@ -441,7 +441,7 @@ std::vector<CPUInfo::CacheInfo> GetCacheSizes() {
   return GetCacheSizesQNX();
 #elif defined(BENCHMARK_OS_QURT) || defined(__EMSCRIPTEN__)
   return std::vector<CPUInfo::CacheInfo>();
-#elif defined(__FRC_ROBORIO__)
+#elif defined(__WPILIB_ROBORIO__)
   return std::vector<CPUInfo::CacheInfo>();
 #else
   return GetCacheSizesFromKVFS();

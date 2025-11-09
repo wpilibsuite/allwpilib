@@ -1,0 +1,14 @@
+extra_includes:
+- wpi/hardware/rotation/DutyCycleEncoder.hpp
+
+classes:
+  wpi::sim::DutyCycleEncoderSim:
+    methods:
+      DutyCycleEncoderSim:
+        overloads:
+          const DutyCycleEncoder&:
+          int:
+      Get:
+      Set:
+      IsConnected:
+      SetConnected:

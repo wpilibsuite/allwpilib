@@ -1,0 +1,45 @@
+defaults:
+  subpackage: controller
+
+classes:
+  wpi::math::PIDController:
+    ignored_bases:
+    - wpi::util::SendableHelper<PIDController>
+    methods:
+      PIDController:
+        param_override:
+          period:
+            default: 0.020_s
+      SetPID:
+      SetP:
+      SetI:
+      SetD:
+      SetIZone:
+      GetP:
+      GetI:
+      GetD:
+      GetIZone:
+      GetPeriod:
+      GetErrorTolerance:
+      GetErrorDerivativeTolerance:
+      GetPositionTolerance:
+      GetVelocityTolerance:
+      GetAccumulatedError:
+      SetSetpoint:
+      GetSetpoint:
+      AtSetpoint:
+      EnableContinuousInput:
+      DisableContinuousInput:
+      IsContinuousInputEnabled:
+      SetIntegratorRange:
+      SetTolerance:
+      GetError:
+      GetErrorDerivative:
+      GetPositionError:
+      GetVelocityError:
+      Calculate:
+        overloads:
+          double:
+          double, double:
+      Reset:
+      InitSendable:

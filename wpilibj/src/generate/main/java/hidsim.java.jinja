@@ -6,9 +6,9 @@
 {% macro capitalize_first(string) -%}
 {{ string[0]|capitalize + string[1:] }}
 {%- endmacro %}
-package edu.wpi.first.wpilibj.simulation;
+package org.wpilib.simulation;
 
-import edu.wpi.first.wpilibj.{{ ConsoleName }}Controller;
+import org.wpilib.driverstation.{{ ConsoleName }}Controller;
 
 /** Class to control a simulated {{ ConsoleName }} controller. */
 public class {{ ConsoleName }}ControllerSim extends GenericHIDSim {
@@ -20,9 +20,9 @@ public class {{ ConsoleName }}ControllerSim extends GenericHIDSim {
   @SuppressWarnings("this-escape")
   public {{ ConsoleName }}ControllerSim({{ ConsoleName }}Controller joystick) {
     super(joystick);
-    setAxisCount({{ sticks|length + triggers|length }});
-    setButtonCount({{ buttons|length }});
-    setPOVCount(1);
+    setAxesMaximumIndex({{ sticks|length + triggers|length }});
+    setButtonsMaximumIndex({{ buttons|length }});
+    setPOVsMaximumIndex(1);
   }
 
   /**
@@ -33,9 +33,9 @@ public class {{ ConsoleName }}ControllerSim extends GenericHIDSim {
   @SuppressWarnings("this-escape")
   public {{ ConsoleName }}ControllerSim(int port) {
     super(port);
-    setAxisCount({{ sticks|length + triggers|length }});
-    setButtonCount({{ buttons|length }});
-    setPOVCount(1);
+    setAxesMaximumIndex({{ sticks|length + triggers|length }});
+    setButtonsMaximumIndex({{ buttons|length }});
+    setPOVsMaximumIndex(1);
   }
 {% for stick in sticks %}
   /**

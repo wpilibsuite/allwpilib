@@ -69,7 +69,7 @@ wpilib_jni_java_library(
     name = "datalog-java",
     srcs = glob(["src/main/java/**/*.java"]),
     maven_artifact_name = "datalog-java",
-    maven_group_id = "edu.wpi.first.datalog",
+    maven_group_id = "org.wpilib.datalog",
     native_libs = [":datalogjni"],
     visibility = ["//visibility:public"],
     deps = [
@@ -144,5 +144,5 @@ wpilib_java_junit5_test(
 package_minimal_jni_project(
     name = "datalog",
     maven_artifact_name = "datalog-cpp",
-    maven_group_id = "edu.wpi.first.datalog",
+    maven_group_id = "org.wpilib.datalog",
 )

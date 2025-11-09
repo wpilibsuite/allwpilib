@@ -10,9 +10,9 @@
 
 #include <gtest/gtest.h>
 
-#include "TestPrinters.h"
-#include "Value_internal.h"
-#include "networktables/NetworkTableValue.h"
+#include "TestPrinters.hpp"
+#include "Value_internal.hpp"
+#include "wpi/nt/NetworkTableValue.hpp"
 
 using namespace std::string_view_literals;
 
@@ -26,7 +26,7 @@ inline bool operator==(std::span<T> lhs, std::span<U> rhs) {
 }
 }  // namespace std
 
-namespace nt {
+namespace wpi::nt {
 
 class ValueTest : public ::testing::Test {};
 
@@ -87,7 +87,7 @@ TEST_F(ValueTest, String) {
   NT_InitValue(&cv);
   ConvertToC(v, &cv);
   ASSERT_EQ(NT_STRING, cv.type);
-  ASSERT_EQ("hello"sv, wpi::to_string_view(&cv.data.v_string));
+  ASSERT_EQ("hello"sv, wpi::util::to_string_view(&cv.data.v_string));
   ASSERT_EQ(5u, cv.data.v_string.len);
 
   v = Value::MakeString("goodbye");
@@ -96,7 +96,7 @@ TEST_F(ValueTest, String) {
   NT_DisposeValue(&cv);
   ConvertToC(v, &cv);
   ASSERT_EQ(NT_STRING, cv.type);
-  ASSERT_EQ("goodbye"sv, wpi::to_string_view(&cv.data.v_string));
+  ASSERT_EQ("goodbye"sv, wpi::util::to_string_view(&cv.data.v_string));
   ASSERT_EQ(7u, cv.data.v_string.len);
 
   NT_DisposeValue(&cv);
@@ -229,9 +229,9 @@ TEST_F(ValueTest, StringArray) {
   ConvertToC(v, &cv);
   ASSERT_EQ(NT_STRING_ARRAY, cv.type);
   ASSERT_EQ(3u, cv.data.arr_string.size);
-  ASSERT_EQ("hello"sv, wpi::to_string_view(&cv.data.arr_string.arr[0]));
-  ASSERT_EQ("goodbye"sv, wpi::to_string_view(&cv.data.arr_string.arr[1]));
-  ASSERT_EQ("string"sv, wpi::to_string_view(&cv.data.arr_string.arr[2]));
+  ASSERT_EQ("hello"sv, wpi::util::to_string_view(&cv.data.arr_string.arr[0]));
+  ASSERT_EQ("goodbye"sv, wpi::util::to_string_view(&cv.data.arr_string.arr[1]));
+  ASSERT_EQ("string"sv, wpi::util::to_string_view(&cv.data.arr_string.arr[2]));
 
   // assign with same size
   vec.clear();
@@ -248,9 +248,9 @@ TEST_F(ValueTest, StringArray) {
   ConvertToC(v, &cv);
   ASSERT_EQ(NT_STRING_ARRAY, cv.type);
   ASSERT_EQ(3u, cv.data.arr_string.size);
-  ASSERT_EQ("s1"sv, wpi::to_string_view(&cv.data.arr_string.arr[0]));
-  ASSERT_EQ("str2"sv, wpi::to_string_view(&cv.data.arr_string.arr[1]));
-  ASSERT_EQ("string3"sv, wpi::to_string_view(&cv.data.arr_string.arr[2]));
+  ASSERT_EQ("s1"sv, wpi::util::to_string_view(&cv.data.arr_string.arr[0]));
+  ASSERT_EQ("str2"sv, wpi::util::to_string_view(&cv.data.arr_string.arr[1]));
+  ASSERT_EQ("string3"sv, wpi::util::to_string_view(&cv.data.arr_string.arr[2]));
 
   // assign with different size
   vec.clear();
@@ -265,8 +265,8 @@ TEST_F(ValueTest, StringArray) {
   ConvertToC(v, &cv);
   ASSERT_EQ(NT_STRING_ARRAY, cv.type);
   ASSERT_EQ(2u, cv.data.arr_string.size);
-  ASSERT_EQ("short"sv, wpi::to_string_view(&cv.data.arr_string.arr[0]));
-  ASSERT_EQ("er"sv, wpi::to_string_view(&cv.data.arr_string.arr[1]));
+  ASSERT_EQ("short"sv, wpi::util::to_string_view(&cv.data.arr_string.arr[0]));
+  ASSERT_EQ("er"sv, wpi::util::to_string_view(&cv.data.arr_string.arr[1]));
 
   NT_DisposeValue(&cv);
 }
@@ -276,7 +276,7 @@ TEST_F(ValueTest, StringArray) {
 #ifdef NDEBUG
 TEST_F(ValueDeathTest, DISABLED_GetAssertions) {
 #else
-TEST_F(ValueDeathTest, GetAssertions) {
+TEST_F(ValueDeathTest, DISABLED_GetAssertions) {
 #endif
   Value v;
   ASSERT_DEATH((void)v.GetBoolean(), "type == NT_BOOLEAN");
@@ -463,4 +463,4 @@ TEST_F(ValueTest, StringArrayComparison) {
   ASSERT_EQ(v1, v2);
 }
 
-}  // namespace nt
+}  // namespace wpi::nt

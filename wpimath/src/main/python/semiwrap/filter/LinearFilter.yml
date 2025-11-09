@@ -1,0 +1,29 @@
+classes:
+  wpi::math::LinearFilter:
+    template_params:
+    - T
+    methods:
+      LinearFilter:
+        overloads:
+          std::span<const double>, std::span<const double>:
+          std::initializer_list<double>, std::initializer_list<double>:
+            ignore: true
+      SinglePoleIIR:
+      HighPass:
+      MovingAverage:
+      Reset:
+        overloads:
+          '':
+          std::span<const T>, std::span<const T>:
+      Calculate:
+      LastValue:
+      BackwardFiniteDifference:
+        ignore: true  # TODO: template_impls
+      FiniteDifference:
+        ignore: true  # TODO: template_impls
+
+templates:
+  LinearFilter:
+    qualname: wpi::math::LinearFilter
+    params:
+    - double

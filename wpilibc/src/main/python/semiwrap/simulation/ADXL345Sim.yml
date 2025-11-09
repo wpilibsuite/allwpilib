@@ -1,0 +1,12 @@
+extra_includes:
+- wpi/hardware/accelerometer/ADXL345_I2C.hpp
+
+classes:
+  wpi::sim::ADXL345Sim:
+    methods:
+      ADXL345Sim:
+        overloads:
+          const ADXL345_I2C&:
+      SetX:
+      SetY:
+      SetZ:

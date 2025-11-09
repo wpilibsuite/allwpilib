@@ -61,15 +61,15 @@
 
 ------------------------------------------------------------------------ */
 
-#include "wpi/ConvertUTF.h"
+#include "wpi/util/ConvertUTF.hpp"
 #ifdef CVTUTF_DEBUG
 #include <stdio.h>
 #endif
 #include <assert.h>
 
 #ifdef _WIN32
-#include "wpi/WindowsError.h"
-#include "Windows/WindowsSupport.h"
+#include "wpi/util/WindowsError.hpp"
+#include "Windows/WindowsSupport.hpp"
 #endif
 
 /*
@@ -100,7 +100,7 @@
 
 ConvertUTF_DISABLE_WARNINGS
 
-namespace wpi {
+namespace wpi::util {
 
 static const int halfShift  = 10; /* used for shifting by 10 bits */
 
@@ -770,7 +770,7 @@ namespace sys {
 namespace windows {
 std::error_code CodePageToUTF16(unsigned codepage,
                                 std::string_view original,
-                                wpi::SmallVectorImpl<wchar_t> &utf16) {
+                                wpi::util::SmallVectorImpl<wchar_t> &utf16) {
   if (!original.empty()) {
     int len = ::MultiByteToWideChar(codepage, MB_ERR_INVALID_CHARS, original.data(),
                                     original.size(), utf16.begin(), 0);
@@ -798,19 +798,19 @@ std::error_code CodePageToUTF16(unsigned codepage,
 }
 
 std::error_code UTF8ToUTF16(std::string_view utf8,
-                            wpi::SmallVectorImpl<wchar_t> &utf16) {
+                            wpi::util::SmallVectorImpl<wchar_t> &utf16) {
   return CodePageToUTF16(CP_UTF8, utf8, utf16);
 }
 
 std::error_code CurCPToUTF16(std::string_view curcp,
-                            wpi::SmallVectorImpl<wchar_t> &utf16) {
+                            wpi::util::SmallVectorImpl<wchar_t> &utf16) {
   return CodePageToUTF16(CP_ACP, curcp, utf16);
 }
 
 static
 std::error_code UTF16ToCodePage(unsigned codepage, const wchar_t *utf16,
                                 size_t utf16_len,
-                                wpi::SmallVectorImpl<char> &converted) {
+                                wpi::util::SmallVectorImpl<char> &converted) {
   if (utf16_len) {
     // Get length.
     int len = ::WideCharToMultiByte(codepage, 0, utf16, utf16_len, converted.begin(),
@@ -840,12 +840,12 @@ std::error_code UTF16ToCodePage(unsigned codepage, const wchar_t *utf16,
 }
 
 std::error_code UTF16ToUTF8(const wchar_t *utf16, size_t utf16_len,
-                            wpi::SmallVectorImpl<char> &utf8) {
+                            wpi::util::SmallVectorImpl<char> &utf8) {
   return UTF16ToCodePage(CP_UTF8, utf16, utf16_len, utf8);
 }
 
 std::error_code UTF16ToCurCP(const wchar_t *utf16, size_t utf16_len,
-                             wpi::SmallVectorImpl<char> &curcp) {
+                             wpi::util::SmallVectorImpl<char> &curcp) {
   return UTF16ToCodePage(CP_ACP, utf16, utf16_len, curcp);
 }
 
@@ -854,6 +854,6 @@ std::error_code UTF16ToCurCP(const wchar_t *utf16, size_t utf16_len,
 
 #endif  // _WIN32
 
-} // namespace wpi
+} // namespace wpi::util
 
 ConvertUTF_RESTORE_WARNINGS

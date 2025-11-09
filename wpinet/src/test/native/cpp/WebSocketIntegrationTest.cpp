@@ -2,15 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/WebSocketServer.h"  // NOLINT(build/include_order)
+#include "wpi/net/WebSocketServer.hpp"  // NOLINT(build/include_order)
 
 #include <vector>
 
-#include <wpi/SmallString.h>
+#include "WebSocketTest.hpp"
+#include "wpi/util/SmallString.hpp"
 
-#include "WebSocketTest.h"
-
-namespace wpi {
+namespace wpi::net {
 
 class WebSocketIntegrationTest : public WebSocketTest {};
 
@@ -200,4 +199,4 @@ TEST_F(WebSocketIntegrationTest, ServerSendPing) {
   ASSERT_EQ(gotData, 2);
 }
 
-}  // namespace wpi
+}  // namespace wpi::net

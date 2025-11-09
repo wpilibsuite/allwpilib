@@ -1,0 +1,9 @@
+classes:
+  wpi::internal::DriverStationModeThread:
+    rename: _DriverStationModeThread
+    methods:
+      DriverStationModeThread:
+      InAutonomous:
+      InDisabled:
+      InTeleop:
+      InTest:

@@ -2,7 +2,7 @@ import org.gradle.internal.os.OperatingSystem
 
 ext {
     nativeName = 'cscore'
-    devMain = 'edu.wpi.first.cscore.DevMain'
+    devMain = 'org.wpilib.cscore.DevMain'
 }
 
 // Removed because having the objective-cpp plugin added breaks

@@ -26,14 +26,14 @@ def generate_numbers(output_directory: Path, template_root: Path):
     )
 
     template = env.get_template("GenericNumber.java.jinja")
-    rootPath = output_directory / "main/java/edu/wpi/first/math/numbers"
+    rootPath = output_directory / "main/java/org/wpilib/math/numbers"
 
     for i in range(MAX_NUM + 1):
         contents = template.render(num=i)
         output(rootPath, f"N{i}.java", contents)
 
     template = env.get_template("Nat.java.jinja")
-    rootPath = output_directory / "main/java/edu/wpi/first/math"
+    rootPath = output_directory / "main/java/org/wpilib/math/util"
     contents = template.render(nums=range(MAX_NUM + 1))
     output(rootPath, "Nat.java", contents)
 

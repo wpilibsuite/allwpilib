@@ -7,7 +7,7 @@ load("@rules_python//python:defs.bzl", "py_binary")
 load("//shared/bazel/rules:cc_rules.bzl", "generate_def_windows", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
-load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project")
+load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project", "pkg_files_headers")
 load("//wpimath:generate.bzl", "generate_wpimath")
 
 filegroup(
@@ -99,10 +99,15 @@ filegroup(
     srcs = glob(["src/generated/main/java/**/*.java"]),
 )
 
-third_party_cc_lib_helper(
-    name = "eigen",
-    include_root = "src/main/native/thirdparty/eigen/include",
+alias(
+    name = "eigen-headers",
+    actual = "@eigen",
     visibility = ["//visibility:public"],
+)
+
+pkg_files_headers(
+    name = "eigen-hdrs-pkg",
+    dep = "@eigen",
 )
 
 third_party_cc_lib_helper(
@@ -227,7 +232,7 @@ wpilib_jni_java_library(
     name = "wpimath-java",
     srcs = [":generated_java"] + glob(["src/main/java/**/*.java"]),
     maven_artifact_name = "wpimath-java",
-    maven_group_id = "edu.wpi.first.wpimath",
+    maven_group_id = "org.wpilib.wpimath",
     native_libs = [":wpimathjni"],
     resource_strip_prefix = "wpimath/src/main/proto",
     resources = glob(["src/main/proto/**"]),
@@ -258,7 +263,7 @@ cc_test(
     size = "small",
     srcs = glob([
         "src/test/native/cpp/**/*.cpp",
-        "src/test/native/cpp/**/*.h",
+        "src/test/native/cpp/**/*.hpp",
     ]),
     tags = [
         "no-raspi",
@@ -293,8 +298,8 @@ cc_binary(
 
 java_binary(
     name = "DevMain-Java",
-    srcs = ["src/dev/java/edu/wpi/first/math/DevMain.java"],
-    main_class = "edu.wpi.first.math.DevMain",
+    srcs = ["src/dev/java/org/wpilib/math/DevMain.java"],
+    main_class = "org.wpilib.math.DevMain",
     deps = [
         ":wpimath-java",
     ],
@@ -312,5 +317,5 @@ py_binary(
 package_default_jni_project(
     name = "wpimath",
     maven_artifact_name = "wpimath-cpp",
-    maven_group_id = "edu.wpi.first.wpimath",
+    maven_group_id = "org.wpilib.wpimath",
 )

@@ -6,29 +6,28 @@
 
 #include <cassert>
 
-#include <wpi/jni_util.h>
-#include <wpi/string.h>
+#include "org_wpilib_hardware_hal_UsageReportingJNI.h"
+#include "wpi/hal/UsageReporting.h"
+#include "wpi/util/jni_util.hpp"
+#include "wpi/util/string.h"
 
-#include "edu_wpi_first_hal_UsageReportingJNI.h"
-#include "hal/UsageReporting.h"
-
-using namespace wpi::java;
+using namespace wpi::util::java;
 
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_hal_UsageReportingJNI
+ * Class:     org_wpilib_hardware_hal_UsageReportingJNI
  * Method:    report
  * Signature: (Ljava/lang/String;Ljava/lang/String;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_UsageReportingJNI_report
+Java_org_wpilib_hardware_hal_UsageReportingJNI_report
   (JNIEnv* env, jclass, jstring resource, jstring data)
 {
   JStringRef resourceStr{env, resource};
   JStringRef dataStr{env, data};
-  WPI_String resourceWpiStr = wpi::make_string(resourceStr);
-  WPI_String dataWpiStr = wpi::make_string(dataStr);
+  WPI_String resourceWpiStr = wpi::util::make_string(resourceStr);
+  WPI_String dataWpiStr = wpi::util::make_string(dataStr);
   return HAL_ReportUsage(&resourceWpiStr, &dataWpiStr);
 }
 

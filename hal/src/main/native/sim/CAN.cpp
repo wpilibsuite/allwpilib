@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/CAN.h"
+#include "wpi/hal/CAN.h"
 
 #include "mockdata/CanDataInternal.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeCAN() {}
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/AddressableLED.h"
+#include "wpi/hal/AddressableLED.h"
 
 #include <fmt/format.h>
 
@@ -10,26 +10,27 @@
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
-#include "hal/Errors.h"
-#include "hal/handles/HandlesInternal.h"
-#include "hal/handles/IndexedHandleResource.h"
 #include "mockdata/AddressableLEDDataInternal.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/hal/handles/IndexedHandleResource.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeAddressableLED() {}
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
     int32_t channel, const char* allocationLocation, int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
 
   if (channel < 0 || channel >= kNumAddressableLEDs) {
     *status = RESOURCE_OUT_OF_RANGE;
-    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for AddressableLED",
-                                     0, kNumAddressableLEDs, channel);
+    wpi::hal::SetLastErrorIndexOutOfRange(status,
+                                          "Invalid Index for AddressableLED", 0,
+                                          kNumAddressableLEDs, channel);
     return HAL_kInvalidHandle;
   }
 
@@ -40,12 +41,12 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
 
   if (*status != 0) {
     if (port) {
-      hal::SetLastErrorPreviouslyAllocated(status, "PWM or DIO", channel,
-                                           port->previousAllocation);
+      wpi::hal::SetLastErrorPreviouslyAllocated(status, "PWM or DIO", channel,
+                                                port->previousAllocation);
     } else {
-      hal::SetLastErrorIndexOutOfRange(status,
-                                       "Invalid Index for AddressableLED", 0,
-                                       kNumAddressableLEDs, channel);
+      wpi::hal::SetLastErrorIndexOutOfRange(status,
+                                            "Invalid Index for AddressableLED",
+                                            0, kNumAddressableLEDs, channel);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
   }
@@ -81,7 +82,7 @@ void HAL_SetAddressableLEDStart(HAL_AddressableLEDHandle handle, int32_t start,
   }
   if (start > HAL_kAddressableLEDMaxLength || start < 0) {
     *status = PARAMETER_OUT_OF_RANGE;
-    hal::SetLastError(
+    wpi::hal::SetLastError(
         status,
         fmt::format(
             "LED start must be less than or equal to {}. {} was requested",
@@ -101,7 +102,7 @@ void HAL_SetAddressableLEDLength(HAL_AddressableLEDHandle handle,
   }
   if (length > HAL_kAddressableLEDMaxLength || length < 0) {
     *status = PARAMETER_OUT_OF_RANGE;
-    hal::SetLastError(
+    wpi::hal::SetLastError(
         status,
         fmt::format(
             "LED length must be less than or equal to {}. {} was requested",

@@ -6,24 +6,23 @@
 
 #include <cassert>
 
-#include <wpi/jni_util.h>
-
 #include "HALUtil.h"
-#include "edu_wpi_first_hal_I2CJNI.h"
-#include "hal/I2C.h"
+#include "org_wpilib_hardware_hal_I2CJNI.h"
+#include "wpi/hal/I2C.h"
+#include "wpi/util/jni_util.hpp"
 
-using namespace hal;
-using namespace wpi::java;
+using namespace wpi::hal;
+using namespace wpi::util::java;
 
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_hal_I2CJNI
+ * Class:     org_wpilib_hardware_hal_I2CJNI
  * Method:    i2CInitialize
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_I2CJNI_i2CInitialize
+Java_org_wpilib_hardware_hal_I2CJNI_i2CInitialize
   (JNIEnv* env, jclass, jint port)
 {
   int32_t status = 0;
@@ -32,12 +31,12 @@ Java_edu_wpi_first_hal_I2CJNI_i2CInitialize
 }
 
 /*
- * Class:     edu_wpi_first_hal_I2CJNI
+ * Class:     org_wpilib_hardware_hal_I2CJNI
  * Method:    i2CTransaction
  * Signature: (IBLjava/lang/Object;BLjava/lang/Object;B)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_I2CJNI_i2CTransaction
+Java_org_wpilib_hardware_hal_I2CJNI_i2CTransaction
   (JNIEnv* env, jclass, jint port, jbyte address, jobject dataToSend,
    jbyte sendSize, jobject dataReceived, jbyte receiveSize)
 {
@@ -55,12 +54,12 @@ Java_edu_wpi_first_hal_I2CJNI_i2CTransaction
 }
 
 /*
- * Class:     edu_wpi_first_hal_I2CJNI
+ * Class:     org_wpilib_hardware_hal_I2CJNI
  * Method:    i2CTransactionB
  * Signature: (IB[BB[BB)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_I2CJNI_i2CTransactionB
+Java_org_wpilib_hardware_hal_I2CJNI_i2CTransactionB
   (JNIEnv* env, jclass, jint port, jbyte address, jbyteArray dataToSend,
    jbyte sendSize, jbyteArray dataReceived, jbyte receiveSize)
 {
@@ -74,7 +73,7 @@ Java_edu_wpi_first_hal_I2CJNI_i2CTransactionB
     return 0;
   }
 
-  wpi::SmallVector<uint8_t, 128> recvBuf;
+  wpi::util::SmallVector<uint8_t, 128> recvBuf;
   recvBuf.resize(receiveSize);
   jint returnValue =
       HAL_TransactionI2C(static_cast<HAL_I2CPort>(port), address,
@@ -87,12 +86,12 @@ Java_edu_wpi_first_hal_I2CJNI_i2CTransactionB
 }
 
 /*
- * Class:     edu_wpi_first_hal_I2CJNI
+ * Class:     org_wpilib_hardware_hal_I2CJNI
  * Method:    i2CWrite
  * Signature: (IBLjava/lang/Object;B)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_I2CJNI_i2CWrite
+Java_org_wpilib_hardware_hal_I2CJNI_i2CWrite
   (JNIEnv* env, jclass, jint port, jbyte address, jobject dataToSend,
    jbyte sendSize)
 {
@@ -108,12 +107,12 @@ Java_edu_wpi_first_hal_I2CJNI_i2CWrite
 }
 
 /*
- * Class:     edu_wpi_first_hal_I2CJNI
+ * Class:     org_wpilib_hardware_hal_I2CJNI
  * Method:    i2CWriteB
  * Signature: (IB[BB)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_I2CJNI_i2CWriteB
+Java_org_wpilib_hardware_hal_I2CJNI_i2CWriteB
   (JNIEnv* env, jclass, jint port, jbyte address, jbyteArray dataToSend,
    jbyte sendSize)
 {
@@ -126,12 +125,12 @@ Java_edu_wpi_first_hal_I2CJNI_i2CWriteB
 }
 
 /*
- * Class:     edu_wpi_first_hal_I2CJNI
+ * Class:     org_wpilib_hardware_hal_I2CJNI
  * Method:    i2CRead
  * Signature: (IBLjava/lang/Object;B)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_I2CJNI_i2CRead
+Java_org_wpilib_hardware_hal_I2CJNI_i2CRead
   (JNIEnv* env, jclass, jint port, jbyte address, jobject dataReceived,
    jbyte receiveSize)
 {
@@ -143,12 +142,12 @@ Java_edu_wpi_first_hal_I2CJNI_i2CRead
 }
 
 /*
- * Class:     edu_wpi_first_hal_I2CJNI
+ * Class:     org_wpilib_hardware_hal_I2CJNI
  * Method:    i2CReadB
  * Signature: (IB[BB)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_I2CJNI_i2CReadB
+Java_org_wpilib_hardware_hal_I2CJNI_i2CReadB
   (JNIEnv* env, jclass, jint port, jbyte address, jbyteArray dataReceived,
    jbyte receiveSize)
 {
@@ -157,7 +156,7 @@ Java_edu_wpi_first_hal_I2CJNI_i2CReadB
     return 0;
   }
 
-  wpi::SmallVector<uint8_t, 128> recvBuf;
+  wpi::util::SmallVector<uint8_t, 128> recvBuf;
   recvBuf.resize(receiveSize);
   jint returnValue = HAL_ReadI2C(static_cast<HAL_I2CPort>(port), address,
                                  recvBuf.data(), receiveSize);
@@ -167,12 +166,12 @@ Java_edu_wpi_first_hal_I2CJNI_i2CReadB
 }
 
 /*
- * Class:     edu_wpi_first_hal_I2CJNI
+ * Class:     org_wpilib_hardware_hal_I2CJNI
  * Method:    i2CClose
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_I2CJNI_i2CClose
+Java_org_wpilib_hardware_hal_I2CJNI_i2CClose
   (JNIEnv*, jclass, jint port)
 {
   HAL_CloseI2C(static_cast<HAL_I2CPort>(port));

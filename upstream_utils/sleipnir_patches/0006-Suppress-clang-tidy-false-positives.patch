@@ -8,10 +8,10 @@ Subject: [PATCH 6/8] Suppress clang-tidy false positives
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/include/sleipnir/autodiff/variable.hpp b/include/sleipnir/autodiff/variable.hpp
-index 9f79a82763213dc712cce4c2a322289d57645032..17e7eb7cc2c7c7599eaba97d8ec80972524c1599 100644
+index 264f0950f293c67d6e6c7e729887090c050e40e2..62135a5539308ae69f6b45a64d9337c4c3e96d7b 100644
 --- a/include/sleipnir/autodiff/variable.hpp
 +++ b/include/sleipnir/autodiff/variable.hpp
-@@ -626,7 +626,7 @@ struct SLEIPNIR_DLLEXPORT InequalityConstraints {
+@@ -633,7 +633,7 @@ struct SLEIPNIR_DLLEXPORT InequalityConstraints {
     * @param inequality_constraints The list of InequalityConstraints to
     * concatenate.
     */

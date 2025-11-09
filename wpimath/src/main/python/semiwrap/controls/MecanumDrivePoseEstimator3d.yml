@@ -1,0 +1,12 @@
+defaults:
+  subpackage: estimator
+
+classes:
+  wpi::math::MecanumDrivePoseEstimator3d:
+    force_no_trampoline: true
+    methods:
+      MecanumDrivePoseEstimator3d:
+        overloads:
+          MecanumDriveKinematics&, const Rotation3d&, const MecanumDriveWheelPositions&, const Pose3d&:
+          ? MecanumDriveKinematics&, const Rotation3d&, const MecanumDriveWheelPositions&, const Pose3d&, const wpi::util::array<double, 4>&, const wpi::util::array<double, 4>&
+          :

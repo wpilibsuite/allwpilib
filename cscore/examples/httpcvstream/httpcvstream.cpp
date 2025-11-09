@@ -5,18 +5,19 @@
 #include <cstdio>
 
 #include <opencv2/core/core.hpp>
-#include <wpi/print.h>
 
-#include "cscore.h"
-#include "cscore_cv.h"
+#include "wpi/cs/cscore.h"
+#include "wpi/cs/cscore_cv.hpp"
+#include "wpi/util/print.hpp"
 
 int main() {
-  cs::HttpCamera camera{"httpcam", "http://localhost:8081/?action=stream"};
-  camera.SetVideoMode(cs::VideoMode::kMJPEG, 320, 240, 30);
-  cs::CvSink cvsink{"cvsink"};
+  wpi::cs::HttpCamera camera{"httpcam", "http://localhost:8081/?action=stream"};
+  camera.SetVideoMode(wpi::cs::VideoMode::kMJPEG, 320, 240, 30);
+  wpi::cs::CvSink cvsink{"cvsink"};
   cvsink.SetSource(camera);
-  cs::CvSource cvsource{"cvsource", cs::VideoMode::kMJPEG, 320, 240, 30};
-  cs::MjpegServer cvMjpegServer{"cvhttpserver", 8083};
+  wpi::cs::CvSource cvsource{"cvsource", wpi::cs::VideoMode::kMJPEG, 320, 240,
+                             30};
+  wpi::cs::MjpegServer cvMjpegServer{"cvhttpserver", 8083};
   cvMjpegServer.SetSource(cvsource);
 
   cv::Mat test;
@@ -24,11 +25,11 @@ int main() {
   for (;;) {
     uint64_t time = cvsink.GrabFrame(test);
     if (time == 0) {
-      wpi::print("error: {}\n", cvsink.GetError());
+      wpi::util::print("error: {}\n", cvsink.GetError());
       continue;
     }
-    wpi::print("got frame at time {} size ({}, {})\n", time, test.size().width,
-               test.size().height);
+    wpi::util::print("got frame at time {} size ({}, {})\n", time,
+                     test.size().width, test.size().height);
     cv::flip(test, flip, 0);
     cvsource.PutFrame(flip);
   }

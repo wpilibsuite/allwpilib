@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/static_circular_buffer.h"  // NOLINT(build/include_order)
+#include "wpi/util/static_circular_buffer.hpp"  // NOLINT(build/include_order)
 
 #include <array>
 
@@ -19,7 +19,7 @@ static const std::array<double, 8> pushBackOut = {
     {342.657, 234.252, 716.126, 132.344, 445.697, 22.727, 421.125, 799.913}};
 
 TEST(StaticCircularBufferTest, PushFront) {
-  wpi::static_circular_buffer<double, 8> queue;
+  wpi::util::static_circular_buffer<double, 8> queue;
 
   for (auto& value : values) {
     queue.push_front(value);
@@ -31,7 +31,7 @@ TEST(StaticCircularBufferTest, PushFront) {
 }
 
 TEST(StaticCircularBufferTest, PushBack) {
-  wpi::static_circular_buffer<double, 8> queue;
+  wpi::util::static_circular_buffer<double, 8> queue;
 
   for (auto& value : values) {
     queue.push_back(value);
@@ -43,7 +43,7 @@ TEST(StaticCircularBufferTest, PushBack) {
 }
 
 TEST(StaticCircularBufferTest, EmplaceFront) {
-  wpi::static_circular_buffer<double, 8> queue;
+  wpi::util::static_circular_buffer<double, 8> queue;
 
   for (auto& value : values) {
     queue.emplace_front(value);
@@ -55,7 +55,7 @@ TEST(StaticCircularBufferTest, EmplaceFront) {
 }
 
 TEST(StaticCircularBufferTest, EmplaceBack) {
-  wpi::static_circular_buffer<double, 8> queue;
+  wpi::util::static_circular_buffer<double, 8> queue;
 
   for (auto& value : values) {
     queue.emplace_back(value);
@@ -67,7 +67,7 @@ TEST(StaticCircularBufferTest, EmplaceBack) {
 }
 
 TEST(StaticCircularBufferTest, PushPop) {
-  wpi::static_circular_buffer<double, 3> queue;
+  wpi::util::static_circular_buffer<double, 3> queue;
 
   // Insert three elements into the buffer
   queue.push_back(1.0);
@@ -110,7 +110,7 @@ TEST(StaticCircularBufferTest, PushPop) {
 }
 
 TEST(StaticCircularBufferTest, Reset) {
-  wpi::static_circular_buffer<double, 5> queue;
+  wpi::util::static_circular_buffer<double, 5> queue;
 
   for (size_t i = 1; i < 6; ++i) {
     queue.push_back(i);
@@ -122,7 +122,7 @@ TEST(StaticCircularBufferTest, Reset) {
 }
 
 TEST(StaticCircularBufferTest, Iterator) {
-  wpi::static_circular_buffer<double, 3> queue;
+  wpi::util::static_circular_buffer<double, 3> queue;
 
   queue.push_back(1.0);
   queue.push_back(2.0);
@@ -144,5 +144,19 @@ TEST(StaticCircularBufferTest, Iterator) {
   for (const auto& elem : queue) {
     EXPECT_EQ(values[i], elem);
     ++i;
+  }
+
+  // reverse_iterator
+  i = 2;
+  for (auto it = queue.rbegin(); it != queue.rend(); ++it) {
+    EXPECT_EQ(values[i], *it);
+    --i;
+  }
+
+  // const_reverse_iterator
+  i = 2;
+  for (auto it = queue.crbegin(); it != queue.crend(); ++it) {
+    EXPECT_EQ(values[i], *it);
+    --i;
   }
 }

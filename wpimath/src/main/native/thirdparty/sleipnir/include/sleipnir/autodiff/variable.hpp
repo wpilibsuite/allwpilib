@@ -87,6 +87,7 @@ class SLEIPNIR_DLLEXPORT Variable {
    */
   Variable& operator=(double value) {
     expr = detail::make_expression_ptr<detail::ConstExpression>(value);
+    m_graph_initialized = false;
 
     return *this;
   }
@@ -97,22 +98,18 @@ class SLEIPNIR_DLLEXPORT Variable {
    * @param value The value of the Variable.
    */
   void set_value(double value) {
-    if (expr->is_constant(0.0)) {
-      expr = detail::make_expression_ptr<detail::ConstExpression>(value);
-    } else {
 #ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
-      // We only need to check the first argument since unary and binary
-      // operators both use it
-      if (expr->args[0] != nullptr) {
-        auto location = std::source_location::current();
-        slp::println(
-            stderr,
-            "WARNING: {}:{}: {}: Modified the value of a dependent variable",
-            location.file_name(), location.line(), location.function_name());
-      }
-#endif
-      expr->val = value;
+    // We only need to check the first argument since unary and binary operators
+    // both use it
+    if (expr->args[0] != nullptr) {
+      auto location = std::source_location::current();
+      slp::println(
+          stderr,
+          "WARNING: {}:{}: {}: Modified the value of a dependent variable",
+          location.file_name(), location.line(), location.function_name());
     }
+#endif
+    expr->val = value;
   }
 
   /**
@@ -266,6 +263,7 @@ class SLEIPNIR_DLLEXPORT Variable {
   friend SLEIPNIR_DLLEXPORT Variable atan(const Variable& x);
   friend SLEIPNIR_DLLEXPORT Variable atan2(const Variable& y,
                                            const Variable& x);
+  friend SLEIPNIR_DLLEXPORT Variable cbrt(const Variable& x);
   friend SLEIPNIR_DLLEXPORT Variable cos(const Variable& x);
   friend SLEIPNIR_DLLEXPORT Variable cosh(const Variable& x);
   friend SLEIPNIR_DLLEXPORT Variable erf(const Variable& x);
@@ -336,6 +334,15 @@ SLEIPNIR_DLLEXPORT inline Variable atan(const Variable& x) {
  */
 SLEIPNIR_DLLEXPORT inline Variable atan2(const Variable& y, const Variable& x) {
   return Variable{detail::atan2(y.expr, x.expr)};
+}
+
+/**
+ * std::cbrt() for Variables.
+ *
+ * @param x The argument.
+ */
+SLEIPNIR_DLLEXPORT inline Variable cbrt(const Variable& x) {
+  return Variable{detail::cbrt(x.expr)};
 }
 
 /**

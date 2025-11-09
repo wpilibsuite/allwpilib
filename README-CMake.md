@@ -5,15 +5,16 @@ WPILib is normally built with Gradle, however for some systems, such as Linux ba
 ## Libraries that get built
 * apriltag
 * cameraserver
+* commandsv3
 * cscore
-* fieldImages
+* fields
 * hal (simulation HAL only)
 * ntcore
 * romiVendordep
 * simulation extensions
 * wpigui
 * wpilib (wpilibc, wpilibj, and myRobot)
-* wpilibNewCommands
+* commandsv2
 * wpimath
 * wpinet
 * wpiunits
@@ -30,8 +31,6 @@ WPILib is normally built with Gradle, however for some systems, such as Linux ba
 By default, all libraries get built with a default CMake setup. The libraries are built as shared libraries, and include the JNI libraries as well as building the Java JARs. Data Log Tool and the roboRIO Team Number Setter are only built if libssh is available.
 
 ## Prerequisites
-
-The protobuf library and compiler are needed for protobuf generation.
 
 OpenCV needs to be findable by CMake. On systems like the Jetson, this is installed by default. Otherwise, you will need to build OpenCV from source and install it.
 
@@ -65,8 +64,6 @@ The following build options are available:
   * This option will build the HAL and wpilibc/j during the build. The HAL is the simulation HAL, unless the external HAL options are used. The CMake build has no capability to build for the roboRIO.
 * `WITH_WPIMATH` (ON Default)
   * This option will build the wpimath library. This option must be on to build wpilib.
-* `WITH_PROTOBUF` (ON Default)
-  * This option will build with the protobuf library.
 * `WITH_WPIUNITS` (`WITH_JAVA` Default)
   * This option will build the wpiunits library. This option must be on to build the Java wpimath library and requires `WITH_JAVA` to also be on.
 * `OPENCV_JAVA_INSTALL_DIR`
@@ -89,8 +86,6 @@ cmake --preset default
 If you want to change any of the options, add `-DOPTIONHERE=VALUE` to the `cmake` command. This will check for any dependencies. If everything works properly this will succeed. If not, please check out the troubleshooting section for help.
 
 If you want, you can also use `ccmake` in order to visually set these properties as well. [Here](https://cmake.org/cmake/help/v3.0/manual/ccmake.1.html) is the link to the documentation for that program. On Windows, you can use `cmake-gui` instead.
-
-Note that if you are cross-compiling, you will need to override the protobuf options manually to point to the libraries for the target platform. Leave the protoc binary location as the path to the binary for the host platform, since protoc needs to execute on the host platform.
 
 ## Presets
 
@@ -118,7 +113,7 @@ sudo cmake --build . --target install
 
 ## Preparing to use the installed libraries
 
-On Windows, make sure the directories for the libraries you built are on PATH. For wpilib, the default install location is `C:\Program Files (x86)\allwpilib`. If you built other libraries like OpenCV and protobuf from source, install them, and add the install directories to PATH. This ensures CMake can locate the libraries.
+On Windows, make sure the directories for the libraries you built are on PATH. For wpilib, the default install location is `C:\Program Files (x86)\allwpilib`. If you built other libraries like OpenCV from source, install them, and add the install directories to PATH. This ensures CMake can locate the libraries.
 
 You will also want to add the directories where the DLLs are located (usually the `bin` subdirectory of the install directory) to PATH so they can be loaded by your program. If you are using OpenCV and Java, the `opencv_java` DLL is located in either the `lib` subdirectory if you built but didn't install OpenCV, or the `java` subdirectory if you did install OpenCV.
 
@@ -167,7 +162,7 @@ file(GLOB_RECURSE JAVA_SOURCES *.java)
 # If you want Gradle compatibility or you are using one of the templates/examples, comment out the above line and uncomment this line instead:
 # file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
 add_jar(robot ${JAVA_SOURCES}
-    INCLUDE_JARS apriltag_jar cscore_jar hal_jar ntcore_jar wpilibNewCommands_jar wpimath_jar wpinet_jar wpiutil_jar wpiunits_jar wpilibj_jar ${opencvJar})
+    INCLUDE_JARS apriltag_jar cscore_jar hal_jar ntcore_jar commandsv2_jar wpimath_jar wpinet_jar wpiutil_jar wpiunits_jar wpilibj_jar ${opencvJar})
 export_jars(TARGETS robot FILE robot.jar)
 ```
 This includes all the built JARs except for the vendordeps. If you are not using a JAR/library, you may remove it.
@@ -181,7 +176,7 @@ After that, run `cmake --build .` to create your JAR file. To execute the JAR fi
 
 ## Using vendordeps
 
-Vendordeps are not included as part of the `wpilib` CMake package. However, if you want to use a vendordep, you need to use `find_package(VENDORDEP)`, where `VENDORDEP` is the name of the vendordep (case-sensitive), like `xrpVendordep` or `romiVendordep`. Note that wpilibNewCommands, while a vendordep in normal robot projects, is not built as a vendordep in CMake, and is instead included as part of the `wpilib` CMake package. After you used `find_package`, you can reference the vendordep library like normal, either by using `target_link_libraries` for C++ or `add_jar` for Java.
+Vendordeps are not included as part of the `wpilib` CMake package. However, if you want to use a vendordep, you need to use `find_package(VENDORDEP)`, where `VENDORDEP` is the name of the vendordep (case-sensitive), like `xrpVendordep` or `romiVendordep`. Note that commandsv2, while a vendordep in normal robot projects, is not built as a vendordep in CMake, and is instead included as part of the `wpilib` CMake package. After you used `find_package`, you can reference the vendordep library like normal, either by using `target_link_libraries` for C++ or `add_jar` for Java.
 
 ## Troubleshooting
 Below are some common issues that are run into when building.
@@ -234,6 +229,6 @@ Last Load Error:
 C:\Program Files (x86)\allwpilib\bin\wpiHaljni.dll: Can't find dependent libraries
 ```
 
-If you get this error, that's usually an indication that not all your libraries are in your PATH. The two libraries that should be in your PATH are OpenCV and protobuf. If the error is coming from cscore, it's likely you're missing OpenCV. Otherwise, it's likely you're missing protobuf.
+If you get this error, that's usually an indication that not all your libraries are in your PATH. If the error is coming from cscore specifically, it's likely you're missing OpenCV. Otherwise, it's likely the wpilib libraries are not in a directory on PATH.
 
 Note that Linux will not have this specific type of error, as it will usually tell you the dependent library you are missing. In that case, you most likely need to add the library to `LD_LIBRARY_PATH`.

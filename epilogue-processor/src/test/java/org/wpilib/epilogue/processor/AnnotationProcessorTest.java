@@ -1,0 +1,2355 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package org.wpilib.epilogue.processor;
+
+import static com.google.testing.compile.CompilationSubject.assertThat;
+import static com.google.testing.compile.Compiler.javac;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.wpilib.epilogue.processor.CompileTestOptions.kJavaVersionOptions;
+
+import com.google.testing.compile.Compilation;
+import com.google.testing.compile.JavaFileObjects;
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+import java.util.regex.Pattern;
+import javax.tools.Diagnostic;
+import javax.tools.JavaFileObject;
+import org.junit.jupiter.api.Test;
+
+@SuppressWarnings("checkstyle:LineLength") // Source code templates exceed the line length limit
+class AnnotationProcessorTest {
+  @Test
+  void simple() {
+    String source =
+        """
+      package org.wpilib.epilogue;
+
+      @Logged
+      class Example {
+        double x;
+      }
+    """;
+
+    String expectedGeneratedSource =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("x", object.x);
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void optInFields() {
+    String source =
+        """
+      package org.wpilib.epilogue;
+
+      class Example {
+        @Logged double x;
+        @Logged int y;
+      }
+    """;
+
+    String expectedGeneratedSource =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("x", object.x);
+            backend.log("y", object.y);
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void optInMethods() {
+    String source =
+        """
+      package org.wpilib.epilogue;
+
+      class Example {
+        @Logged public double getValue() { return 2.0; }
+        @Logged public String getName() { return "Example"; }
+      }
+    """;
+
+    String expectedGeneratedSource =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("getValue", object.getValue());
+            backend.log("getName", object.getName());
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void shouldNotLog() {
+    String source =
+        """
+      class Example {
+        public double getValue() { return 2.0; }
+        public String getName() { return "Example"; }
+      }
+    """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(kJavaVersionOptions)
+            .withProcessors(new AnnotationProcessor())
+            .compile(JavaFileObjects.forSourceString("org.wpilib.epilogue.Example", source));
+
+    assertThat(compilation).succeeded();
+    // nothing is annotated with @Logged; so, no logger file should be generated
+    assertTrue(
+        compilation.generatedSourceFiles().stream()
+            .noneMatch(jfo -> jfo.getName().contains("Example")));
+  }
+
+  @Test
+  void multiple() {
+    String source =
+        """
+      package org.wpilib.epilogue;
+
+      @Logged
+      class Example {
+        double x;
+        double y;
+      }
+    """;
+
+    String expectedGeneratedSource =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("x", object.x);
+            backend.log("y", object.y);
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void privateFields() {
+    String source =
+        """
+      package org.wpilib.epilogue;
+
+      @Logged
+      class Example {
+        private double x;
+      }
+    """;
+
+    String expectedGeneratedSource =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import java.lang.invoke.MethodHandles;
+      import java.lang.invoke.VarHandle;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        // Accesses private or superclass field org.wpilib.epilogue.Example.x
+        private static final VarHandle $org_wpilib_epilogue_Example_x;
+
+        static {
+          try {
+            var rootLookup = MethodHandles.lookup();
+            var lookup$$org_wpilib_epilogue_Example = MethodHandles.privateLookupIn(org.wpilib.epilogue.Example.class, rootLookup);
+            $org_wpilib_epilogue_Example_x = lookup$$org_wpilib_epilogue_Example.findVarHandle(org.wpilib.epilogue.Example.class, "x", double.class);
+          } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
+          }
+        }
+
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("x", ((double) $org_wpilib_epilogue_Example_x.get(object)));
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void privateSuppliers() {
+    String source =
+        """
+      package org.wpilib.epilogue;
+
+      import java.util.function.DoubleSupplier;
+
+      @Logged
+      class Example {
+        private DoubleSupplier x;
+      }
+    """;
+
+    String expectedGeneratedSource =
+        """
+    package org.wpilib.epilogue;
+
+    import org.wpilib.epilogue.Logged;
+    import org.wpilib.epilogue.Epilogue;
+    import org.wpilib.epilogue.logging.ClassSpecificLogger;
+    import org.wpilib.epilogue.logging.EpilogueBackend;
+    import java.lang.invoke.MethodHandles;
+    import java.lang.invoke.VarHandle;
+
+    public class ExampleLogger extends ClassSpecificLogger<Example> {
+      // Accesses private or superclass field org.wpilib.epilogue.Example.x
+      private static final VarHandle $org_wpilib_epilogue_Example_x;
+
+      static {
+        try {
+          var rootLookup = MethodHandles.lookup();
+          var lookup$$org_wpilib_epilogue_Example = MethodHandles.privateLookupIn(org.wpilib.epilogue.Example.class, rootLookup);
+          $org_wpilib_epilogue_Example_x = lookup$$org_wpilib_epilogue_Example.findVarHandle(org.wpilib.epilogue.Example.class, "x", java.util.function.DoubleSupplier.class);
+        } catch (ReflectiveOperationException e) {
+          throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
+        }
+      }
+
+      public ExampleLogger() {
+        super(Example.class);
+      }
+
+      @Override
+      public void update(EpilogueBackend backend, Example object) {
+        if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+          backend.log("x", ((java.util.function.DoubleSupplier) $org_wpilib_epilogue_Example_x.get(object)).getAsDouble());
+        }
+      }
+    }
+    """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void privateWithGenerics() {
+    String source =
+        """
+      package org.wpilib.epilogue;
+
+      @Logged
+      class Example {
+        private org.wpilib.smartdashboard.SendableChooser<String> chooser;
+      }
+      """;
+
+    String expectedGeneratedSource =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import java.lang.invoke.MethodHandles;
+      import java.lang.invoke.VarHandle;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        // Accesses private or superclass field org.wpilib.epilogue.Example.chooser
+        private static final VarHandle $org_wpilib_epilogue_Example_chooser;
+
+        static {
+          try {
+            var rootLookup = MethodHandles.lookup();
+            var lookup$$org_wpilib_epilogue_Example = MethodHandles.privateLookupIn(org.wpilib.epilogue.Example.class, rootLookup);
+            $org_wpilib_epilogue_Example_chooser = lookup$$org_wpilib_epilogue_Example.findVarHandle(org.wpilib.epilogue.Example.class, "chooser", org.wpilib.smartdashboard.SendableChooser.class);
+          } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
+          }
+        }
+
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            logSendable(backend.getNested("chooser"), ((org.wpilib.smartdashboard.SendableChooser<java.lang.String>) $org_wpilib_epilogue_Example_chooser.get(object)));
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void importanceLevels() {
+    String source =
+        """
+      package org.wpilib.epilogue;
+
+      @Logged(importance = Logged.Importance.INFO)
+      class Example {
+        @Logged(importance = Logged.Importance.DEBUG)    double low;
+        @Logged(importance = Logged.Importance.INFO)     int    medium;
+        @Logged(importance = Logged.Importance.CRITICAL) long   high;
+      }
+      """;
+
+    String expectedGeneratedSource =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("low", object.low);
+          }
+          if (Epilogue.shouldLog(Logged.Importance.INFO)) {
+            backend.log("medium", object.medium);
+          }
+          if (Epilogue.shouldLog(Logged.Importance.CRITICAL)) {
+            backend.log("high", object.high);
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void logEnum() {
+    String source =
+        """
+      package org.wpilib.epilogue;
+
+      @Logged
+      class Example {
+        enum E {
+          a, b, c;
+        }
+        E enumValue;   // Should be logged
+        E[] enumArray; // Should not be logged
+      }
+      """;
+
+    String expectedGeneratedSource =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("enumValue", object.enumValue);
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void superclassStillOptIn() {
+    String source =
+        """
+      package org.wpilib.epilogue;
+
+      // nothing should be logged from BaseExample
+      class BaseExample {
+        public double x;
+        public double getValue() { return 2.0; }
+      }
+
+      @Logged
+      class Example extends BaseExample {
+        double y;
+      }
+    """;
+
+    String expectedGeneratedSource =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("y", object.y);
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void simpleSuperclass() {
+    String source =
+        """
+      package org.wpilib.epilogue;
+
+      @Logged
+      class BaseExample {
+        public double a;
+        protected double b;
+        private double c;
+        double d;
+      }
+
+      @Logged
+      class Example extends BaseExample {
+        double e;
+      }
+    """;
+
+    String expectedGeneratedSource =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import java.lang.invoke.MethodHandles;
+      import java.lang.invoke.VarHandle;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        // Accesses private or superclass field org.wpilib.epilogue.BaseExample.b
+        private static final VarHandle $org_wpilib_epilogue_BaseExample_b;
+        // Accesses private or superclass field org.wpilib.epilogue.BaseExample.c
+        private static final VarHandle $org_wpilib_epilogue_BaseExample_c;
+        // Accesses private or superclass field org.wpilib.epilogue.BaseExample.d
+        private static final VarHandle $org_wpilib_epilogue_BaseExample_d;
+
+        static {
+          try {
+            var rootLookup = MethodHandles.lookup();
+            var lookup$$org_wpilib_epilogue_BaseExample = MethodHandles.privateLookupIn(org.wpilib.epilogue.BaseExample.class, rootLookup);
+            $org_wpilib_epilogue_BaseExample_b = lookup$$org_wpilib_epilogue_BaseExample.findVarHandle(org.wpilib.epilogue.BaseExample.class, "b", double.class);
+            $org_wpilib_epilogue_BaseExample_c = lookup$$org_wpilib_epilogue_BaseExample.findVarHandle(org.wpilib.epilogue.BaseExample.class, "c", double.class);
+            $org_wpilib_epilogue_BaseExample_d = lookup$$org_wpilib_epilogue_BaseExample.findVarHandle(org.wpilib.epilogue.BaseExample.class, "d", double.class);
+          } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
+          }
+        }
+
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("e", object.e);
+            backend.log("a", object.a);
+            backend.log("b", ((double) $org_wpilib_epilogue_BaseExample_b.get(object)));
+            backend.log("c", ((double) $org_wpilib_epilogue_BaseExample_c.get(object)));
+            backend.log("d", ((double) $org_wpilib_epilogue_BaseExample_d.get(object)));
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void complexSuperclass() {
+    String source =
+        """
+      package org.wpilib.epilogue;
+
+      class Grandparent {
+        @Logged
+        public double a;
+        @Logged public double getB() { return 0; }
+        public double getC() { return 1; }             // not annotated, not logged
+      }
+
+      @Logged
+      class BaseExample extends Grandparent {
+        protected double d;
+        public double e;
+        private double f;
+        double g;
+        public double getValue() { return 2.0; }
+        private double getOtherValue() { return 3.0; }  // private, not logged
+      }
+
+      @Logged
+      class Example extends BaseExample {
+        double h;
+        private double i;
+      }
+    """;
+
+    String expectedGeneratedSource =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import java.lang.invoke.MethodHandles;
+      import java.lang.invoke.VarHandle;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        // Accesses private or superclass field org.wpilib.epilogue.Example.i
+        private static final VarHandle $org_wpilib_epilogue_Example_i;
+        // Accesses private or superclass field org.wpilib.epilogue.BaseExample.d
+        private static final VarHandle $org_wpilib_epilogue_BaseExample_d;
+        // Accesses private or superclass field org.wpilib.epilogue.BaseExample.f
+        private static final VarHandle $org_wpilib_epilogue_BaseExample_f;
+        // Accesses private or superclass field org.wpilib.epilogue.BaseExample.g
+        private static final VarHandle $org_wpilib_epilogue_BaseExample_g;
+
+        static {
+          try {
+            var rootLookup = MethodHandles.lookup();
+            var lookup$$org_wpilib_epilogue_BaseExample = MethodHandles.privateLookupIn(org.wpilib.epilogue.BaseExample.class, rootLookup);
+            $org_wpilib_epilogue_BaseExample_d = lookup$$org_wpilib_epilogue_BaseExample.findVarHandle(org.wpilib.epilogue.BaseExample.class, "d", double.class);
+            $org_wpilib_epilogue_BaseExample_f = lookup$$org_wpilib_epilogue_BaseExample.findVarHandle(org.wpilib.epilogue.BaseExample.class, "f", double.class);
+            $org_wpilib_epilogue_BaseExample_g = lookup$$org_wpilib_epilogue_BaseExample.findVarHandle(org.wpilib.epilogue.BaseExample.class, "g", double.class);
+            var lookup$$org_wpilib_epilogue_Example = MethodHandles.privateLookupIn(org.wpilib.epilogue.Example.class, rootLookup);
+            $org_wpilib_epilogue_Example_i = lookup$$org_wpilib_epilogue_Example.findVarHandle(org.wpilib.epilogue.Example.class, "i", double.class);
+          } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
+          }
+        }
+
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("h", object.h);
+            backend.log("i", ((double) $org_wpilib_epilogue_Example_i.get(object)));
+            backend.log("d", ((double) $org_wpilib_epilogue_BaseExample_d.get(object)));
+            backend.log("e", object.e);
+            backend.log("f", ((double) $org_wpilib_epilogue_BaseExample_f.get(object)));
+            backend.log("g", ((double) $org_wpilib_epilogue_BaseExample_g.get(object)));
+            backend.log("a", object.a);
+            backend.log("getValue", object.getValue());
+            backend.log("getB", object.getB());
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void bytes() {
+    String source =
+        """
+      package org.wpilib.epilogue;
+
+      @Logged
+      class Example {
+        byte x;        // Should be logged
+        byte[] arr1;   // Should be logged
+        byte[][] arr2; // Should not be logged
+
+        public byte getX() { return 0; }
+        public byte[] getArr1() { return null; }
+        public byte[][] getArr2() { return null; }
+      }
+      """;
+
+    String expectedGeneratedSource =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("x", object.x);
+            backend.log("arr1", object.arr1);
+            backend.log("getX", object.getX());
+            backend.log("getArr1", object.getArr1());
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void chars() {
+    String source =
+        """
+      package org.wpilib.epilogue;
+
+      @Logged
+      class Example {
+        char x;        // Should be logged
+        char[] arr1;   // Should not be logged
+        char[][] arr2; // Should not be logged
+
+        public char getX() { return 'x'; }
+        public char[] getArr1() { return null; }
+        public char[][] getArr2() { return null; }
+      }
+      """;
+
+    String expectedGeneratedSource =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("x", object.x);
+            backend.log("getX", object.getX());
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void shorts() {
+    String source =
+        """
+      package org.wpilib.epilogue;
+
+      @Logged
+      class Example {
+        short x;        // Should be logged
+        short[] arr1;   // Should not be logged
+        short[][] arr2; // Should not be logged
+
+        public short getX() { return 0; }
+        public short[] getArr1() { return null; }
+        public short[][] getArr2() { return null; }
+      }
+      """;
+
+    String expectedGeneratedSource =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("x", object.x);
+            backend.log("getX", object.getX());
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void ints() {
+    String source =
+        """
+      package org.wpilib.epilogue;
+
+      @Logged
+      class Example {
+        int x;           // Should be logged
+        int[] arr1;   // Should be logged
+        int[][] arr2; // Should not be logged
+
+        public int getX() { return 0; }
+        public int[] getArr1() { return null; }
+        public int[][] getArr2() { return null; }
+      }
+      """;
+
+    String expectedGeneratedSource =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("x", object.x);
+            backend.log("arr1", object.arr1);
+            backend.log("getX", object.getX());
+            backend.log("getArr1", object.getArr1());
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void longs() {
+    String source =
+        """
+      package org.wpilib.epilogue;
+
+      @Logged
+      class Example {
+        long x;        // Should be logged
+        long[] arr1;   // Should be logged
+        long[][] arr2; // Should not be logged
+
+        public long getX() { return 0; }
+        public long[] getArr1() { return null; }
+        public long[][] getArr2() { return null; }
+      }
+      """;
+
+    String expectedGeneratedSource =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("x", object.x);
+            backend.log("arr1", object.arr1);
+            backend.log("getX", object.getX());
+            backend.log("getArr1", object.getArr1());
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void floats() {
+    String source =
+        """
+      package org.wpilib.epilogue;
+
+      @Logged
+      class Example {
+        float x;        // Should be logged
+        float[] arr1;   // Should be logged
+        float[][] arr2; // Should not be logged
+
+        public float getX() { return 0; }
+        public float[] getArr1() { return null; }
+        public float[][] getArr2() { return null; }
+      }
+      """;
+
+    String expectedGeneratedSource =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("x", object.x);
+            backend.log("arr1", object.arr1);
+            backend.log("getX", object.getX());
+            backend.log("getArr1", object.getArr1());
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void doubles() {
+    String source =
+        """
+      package org.wpilib.epilogue;
+
+      import java.util.List;
+
+      @Logged
+      class Example {
+        double x;        // Should be logged
+        double[] arr1;   // Should be logged
+        double[][] arr2; // Should not be logged
+        List<Double> list; // Should not be logged
+
+        public double getX() { return 0; }
+        public double[] getArr1() { return null; }
+        public double[][] getArr2() { return null; }
+      }
+      """;
+
+    String expectedGeneratedSource =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("x", object.x);
+            backend.log("arr1", object.arr1);
+            backend.log("getX", object.getX());
+            backend.log("getArr1", object.getArr1());
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void booleans() {
+    String source =
+        """
+      package org.wpilib.epilogue;
+      import java.util.List;
+
+      @Logged
+      class Example {
+        boolean x;        // Should be logged
+        boolean[] arr1;   // Should be logged
+        boolean[][] arr2; // Should not be logged
+        List<Boolean> list; // Should not be logged
+
+        public boolean getX() { return false; }
+        public boolean[] getArr1() { return null; }
+        public boolean[][] getArr2() { return null; }
+      }
+      """;
+
+    String expectedGeneratedSource =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("x", object.x);
+            backend.log("arr1", object.arr1);
+            backend.log("getX", object.getX());
+            backend.log("getArr1", object.getArr1());
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void strings() {
+    String source =
+        """
+      package org.wpilib.epilogue;
+
+      import java.util.List;
+
+      @Logged
+      class Example {
+        String x;         // Should be logged
+        String[] arr1;   // Should be logged
+        String[][] arr2; // Should not be logged
+        List<String> list;  // Should be logged
+
+        public String getX() { return null; }
+        public String[] getArr1() { return null; }
+        public String[][] getArr2() { return null; }
+      }
+      """;
+
+    String expectedGeneratedSource =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("x", object.x);
+            backend.log("arr1", object.arr1);
+            backend.log("list", object.list);
+            backend.log("getX", object.getX());
+            backend.log("getArr1", object.getArr1());
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void structs() {
+    String source =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.util.struct.Struct;
+      import org.wpilib.util.struct.StructSerializable;
+      import java.util.List;
+
+      @Logged
+      class Example {
+        static class Structable implements StructSerializable {
+          int x, y;
+
+          public static final Struct<Structable> struct = null; // value doesn't matter
+        }
+
+        Structable x;        // Should be logged
+        Structable[] arr1;   // Should be logged
+        Structable[][] arr2; // Should not be logged
+        List<Structable> list; // Should be logged
+
+        public Structable getX() { return null; }
+        public Structable[] getArr1() { return null; }
+        public Structable[][] getArr2() { return null; }
+      }
+      """;
+
+    String expectedGeneratedSource =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("x", object.x, org.wpilib.epilogue.Example.Structable.struct);
+            backend.log("arr1", object.arr1, org.wpilib.epilogue.Example.Structable.struct);
+            backend.log("list", object.list, org.wpilib.epilogue.Example.Structable.struct);
+            backend.log("getX", object.getX(), org.wpilib.epilogue.Example.Structable.struct);
+            backend.log("getArr1", object.getArr1(), org.wpilib.epilogue.Example.Structable.struct);
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void protobuf() {
+    String source =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.util.protobuf.Protobuf;
+      import org.wpilib.util.protobuf.ProtobufSerializable;
+      import java.util.List;
+      import us.hebi.quickbuf.*;
+
+      class ProtobufType implements ProtobufSerializable {
+        // Message type is necessary - Epilogue can't log with a wildcard message type in the proto
+        public static final Protobuf<ProtobufType, Message> proto = null; // value doesn't matter
+
+        static class Message extends ProtoMessage<Message> {
+          // Implement stubs for the abstract base class.
+          // This code never runs so actual implementations are unnecessary.
+          @Override
+          public Message copyFrom(Message other) { return null; }
+          @Override
+          public Message clear() { return null; }
+          @Override
+          public int computeSerializedSize() { return 0; }
+          @Override
+          public void writeTo(ProtoSink output) {}
+          @Override
+          public Message mergeFrom(ProtoSource input) { return null; }
+          @Override
+          public boolean equals(Object obj) { return false; }
+          @Override
+          public Message clone() { return null; }
+        }
+      }
+
+      @Logged
+      class Example {
+        ProtobufType x;          // Should be logged
+        ProtobufType[] arr1;     // Should not be logged
+        ProtobufType[][] arr2;   // Should not be logged
+        List<ProtobufType> list; // Should not be logged
+      }
+      """;
+
+    String expectedGeneratedSource =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("x", object.x, org.wpilib.epilogue.ProtobufType.proto);
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void lists() {
+    String source =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.util.struct.Struct;
+      import org.wpilib.util.struct.StructSerializable;
+      import java.util.*;
+
+      @Logged
+      class Example {
+        /* Logged */     List<String> list;
+        /* Not Logged */ List<List<String>> nestedList;
+        /* Not logged */ List rawList;
+        /* Logged */     Set<String> set;
+        /* Logged */     Queue<String> queue;
+        /* Logged */     Stack<String> stack;
+      }
+      """;
+
+    String expectedGeneratedSource =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("list", object.list);
+            backend.log("set", object.set);
+            backend.log("queue", object.queue);
+            backend.log("stack", object.stack);
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void boxedPrimitiveLists() {
+    // Boxed primitives are not directly supported, nor are arrays of boxed primitives
+    // int[] is fine, but Integer[] is not
+
+    String source =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.util.struct.Struct;
+      import org.wpilib.util.struct.StructSerializable;
+      import java.util.List;
+
+      @Logged
+      class Example {
+        /* Not logged */ List<Integer> ints;
+        /* Not logged */ List<Double> doubles;
+        /* Not logged */ List<Long> longs;
+      }
+      """;
+
+    String expectedGeneratedSource =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void badLogSetup() {
+    String source =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.util.struct.Struct;
+      import org.wpilib.util.struct.StructSerializable;
+      import java.util.*;
+
+      @Logged
+      class Example {
+        @Logged Map<String, String> notLoggableType;
+        @Logged List rawType;
+        @NotLogged List skippedUnloggable;
+
+        @Logged
+        private String privateMethod() { return ""; }
+
+        @Logged
+        String packagePrivateMethod() { return ""; }
+
+        @Logged
+        protected String protectedMethod() { return ""; }
+
+        @Logged
+        public static String publicStaticMethod() { return ""; }
+
+        @Logged
+        private static String privateStaticMethod() { return ""; }
+
+        @Logged
+        public void publicVoidMethod() {}
+
+        @Logged
+        public Map<String, String> publicNonLoggableMethod() { return notLoggableType; }
+      }
+      """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(kJavaVersionOptions)
+            .withProcessors(new AnnotationProcessor())
+            .compile(JavaFileObjects.forSourceString("org.wpilib.epilogue.Example", source));
+
+    assertThat(compilation).failed();
+    assertThat(compilation).hadErrorCount(10);
+
+    List<Diagnostic<? extends JavaFileObject>> errors = compilation.errors();
+    assertAll(
+        () ->
+            assertCompilationError(
+                "[EPILOGUE] You have opted in to logging on this field, but it is not a loggable data type!",
+                9,
+                31,
+                errors.get(0)),
+        () ->
+            assertCompilationError(
+                "[EPILOGUE] You have opted in to logging on this field, but it is not a loggable data type!",
+                10,
+                16,
+                errors.get(1)),
+        () ->
+            assertCompilationError(
+                "[EPILOGUE] Logged methods must be public", 14, 18, errors.get(2)),
+        () ->
+            assertCompilationError(
+                "[EPILOGUE] Logged methods must be public", 17, 10, errors.get(3)),
+        () ->
+            assertCompilationError(
+                "[EPILOGUE] Logged methods must be public", 20, 20, errors.get(4)),
+        () ->
+            assertCompilationError(
+                "[EPILOGUE] Logged methods cannot be static", 23, 24, errors.get(5)),
+        () ->
+            assertCompilationError(
+                "[EPILOGUE] Logged methods must be public", 26, 25, errors.get(6)),
+        () ->
+            assertCompilationError(
+                "[EPILOGUE] Logged methods cannot be static", 26, 25, errors.get(7)),
+        () ->
+            assertCompilationError(
+                "[EPILOGUE] You have opted in to logging on this method, but it does not return a loggable data type!",
+                29,
+                15,
+                errors.get(8)),
+        () ->
+            assertCompilationError(
+                "[EPILOGUE] You have opted in to logging on this method, but it does not return a loggable data type!",
+                32,
+                30,
+                errors.get(9)));
+  }
+
+  @Test
+  void onGenericType() {
+    String source =
+        """
+      package org.wpilib.epilogue;
+
+      @Logged
+      class Example<T extends String> {
+        T valueA;
+        private T valueB;
+
+        public <S extends T> S upcast() { return (S) valueA; }
+      }
+      """;
+
+    String expectedGeneratedSource =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import java.lang.invoke.MethodHandles;
+      import java.lang.invoke.VarHandle;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        // Accesses private or superclass field org.wpilib.epilogue.Example.valueB
+        private static final VarHandle $org_wpilib_epilogue_Example_valueB;
+
+        static {
+          try {
+            var rootLookup = MethodHandles.lookup();
+            var lookup$$org_wpilib_epilogue_Example = MethodHandles.privateLookupIn(org.wpilib.epilogue.Example.class, rootLookup);
+            $org_wpilib_epilogue_Example_valueB = lookup$$org_wpilib_epilogue_Example.findVarHandle(org.wpilib.epilogue.Example.class, "valueB", java.lang.String.class);
+          } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
+          }
+        }
+
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("valueA", object.valueA);
+            backend.log("valueB", ((java.lang.String) $org_wpilib_epilogue_Example_valueB.get(object)));
+            backend.log("upcast", object.upcast());
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void annotationInheritance() {
+    String source =
+        """
+      package org.wpilib.epilogue;
+
+      @Logged
+      class Child {}
+
+      class GoldenChild extends Child {} // inherits the @Logged annotation from the parent
+
+      @Logged
+      interface IO {}
+
+      class IOImpl implements IO {}
+
+      @Logged
+      public class Example {
+        /* Logged */     Child child;
+        /* Not Logged */ GoldenChild goldenChild;
+        /* Logged */     IO io;
+        /* Not logged */ IOImpl ioImpl;
+      }
+      """;
+
+    String expectedRootLogger =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            Epilogue.childLogger.tryUpdate(backend.getNested("child"), object.child, Epilogue.getConfig().errorHandler);
+            Epilogue.ioLogger.tryUpdate(backend.getNested("io"), object.io, Epilogue.getConfig().errorHandler);
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedRootLogger);
+  }
+
+  @Test
+  void inheritanceOfLoggedTypes() {
+    String source =
+        """
+        package org.wpilib.epilogue;
+
+        @Logged
+        interface IFace {}
+
+        @Logged
+        class Impl1 implements IFace {}
+
+        @Logged
+        class Impl2 implements IFace {}
+
+        @Logged
+        interface I {
+          int a();
+        }
+
+        @Logged
+        interface I2 extends I {
+          int x();
+        }
+
+        @Logged
+        interface I3 extends I {
+          int y();
+        }
+
+        @Logged
+        interface I4 extends I2, I3 {
+          int z();
+        }
+
+        @Logged
+        class ConcreteLogged implements I4 {
+          public int a() { return 0; }
+          public int x() { return 0; }
+          public int y() { return 0; }
+          public int z() { return 0; }
+        }
+
+        class ConcreteNotLogged implements I4 {
+          public int a() { return 0; }
+          public int x() { return 0; }
+          public int y() { return 0; }
+          public int z() { return 0; }
+        }
+
+        @Logged
+        public class Example {
+          IFace asInterface;
+          Impl1 firstImpl;
+          Impl2 secondImpl;
+
+          I complex;
+        }
+        """;
+
+    String expectedRootLogger =
+        """
+        package org.wpilib.epilogue;
+
+        import org.wpilib.epilogue.Logged;
+        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.logging.ClassSpecificLogger;
+        import org.wpilib.epilogue.logging.EpilogueBackend;
+
+        public class ExampleLogger extends ClassSpecificLogger<Example> {
+          public ExampleLogger() {
+            super(Example.class);
+          }
+
+          @Override
+          public void update(EpilogueBackend backend, Example object) {
+            if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              var $$asInterface = object.asInterface;
+              if ($$asInterface instanceof org.wpilib.epilogue.Impl1 org_wpilib_epilogue_Impl1) {
+                Epilogue.impl1Logger.tryUpdate(backend.getNested("asInterface"), org_wpilib_epilogue_Impl1, Epilogue.getConfig().errorHandler);
+              } else if ($$asInterface instanceof org.wpilib.epilogue.Impl2 org_wpilib_epilogue_Impl2) {
+                Epilogue.impl2Logger.tryUpdate(backend.getNested("asInterface"), org_wpilib_epilogue_Impl2, Epilogue.getConfig().errorHandler);
+              } else {
+                // Base type org.wpilib.epilogue.IFace
+                Epilogue.iFaceLogger.tryUpdate(backend.getNested("asInterface"), $$asInterface, Epilogue.getConfig().errorHandler);
+              };
+              Epilogue.impl1Logger.tryUpdate(backend.getNested("firstImpl"), object.firstImpl, Epilogue.getConfig().errorHandler);
+              Epilogue.impl2Logger.tryUpdate(backend.getNested("secondImpl"), object.secondImpl, Epilogue.getConfig().errorHandler);
+              var $$complex = object.complex;
+              if ($$complex instanceof org.wpilib.epilogue.ConcreteLogged org_wpilib_epilogue_ConcreteLogged) {
+                Epilogue.concreteLoggedLogger.tryUpdate(backend.getNested("complex"), org_wpilib_epilogue_ConcreteLogged, Epilogue.getConfig().errorHandler);
+              } else if ($$complex instanceof org.wpilib.epilogue.I4 org_wpilib_epilogue_I4) {
+                Epilogue.i4Logger.tryUpdate(backend.getNested("complex"), org_wpilib_epilogue_I4, Epilogue.getConfig().errorHandler);
+              } else if ($$complex instanceof org.wpilib.epilogue.I2 org_wpilib_epilogue_I2) {
+                Epilogue.i2Logger.tryUpdate(backend.getNested("complex"), org_wpilib_epilogue_I2, Epilogue.getConfig().errorHandler);
+              } else if ($$complex instanceof org.wpilib.epilogue.I3 org_wpilib_epilogue_I3) {
+                Epilogue.i3Logger.tryUpdate(backend.getNested("complex"), org_wpilib_epilogue_I3, Epilogue.getConfig().errorHandler);
+              } else {
+                // Base type org.wpilib.epilogue.I
+                Epilogue.iLogger.tryUpdate(backend.getNested("complex"), $$complex, Epilogue.getConfig().errorHandler);
+              };
+            }
+          }
+        }
+        """;
+
+    assertLoggerGenerates(source, expectedRootLogger);
+  }
+
+  @Test
+  void innerClasses() {
+    String source =
+        """
+        package org.wpilib.epilogue;
+
+        class Outer {
+          @Logged
+          class Example { // Deliberately nonstatic
+            double x;
+          }
+        }
+        """;
+
+    String expectedRootLogger =
+        """
+        package org.wpilib.epilogue;
+
+        import org.wpilib.epilogue.Logged;
+        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.logging.ClassSpecificLogger;
+        import org.wpilib.epilogue.logging.EpilogueBackend;
+
+        public class Outer$ExampleLogger extends ClassSpecificLogger<Outer.Example> {
+          public Outer$ExampleLogger() {
+            super(Outer.Example.class);
+          }
+
+          @Override
+          public void update(EpilogueBackend backend, Outer.Example object) {
+            if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              backend.log("x", object.x);
+            }
+          }
+        }
+        """;
+
+    assertLoggerGenerates(source, expectedRootLogger);
+  }
+
+  @Test
+  void highlyNestedInnerClasses() {
+    String source =
+        """
+        package org.wpilib.epilogue;
+
+        class A {
+          class B {
+            class C {
+              class D {
+                @Logged
+                class Example {
+                  double x;
+                }
+              }
+            }
+          }
+        }
+        """;
+
+    String expectedRootLogger =
+        """
+        package org.wpilib.epilogue;
+
+        import org.wpilib.epilogue.Logged;
+        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.logging.ClassSpecificLogger;
+        import org.wpilib.epilogue.logging.EpilogueBackend;
+
+        public class A$B$C$D$ExampleLogger extends ClassSpecificLogger<A.B.C.D.Example> {
+          public A$B$C$D$ExampleLogger() {
+            super(A.B.C.D.Example.class);
+          }
+
+          @Override
+          public void update(EpilogueBackend backend, A.B.C.D.Example object) {
+            if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              backend.log("x", object.x);
+            }
+          }
+        }
+        """;
+
+    assertLoggerGenerates(source, expectedRootLogger);
+  }
+
+  @Test
+  void renamedInnerClass() {
+    String source =
+        """
+        package org.wpilib.epilogue;
+
+        class Outer {
+          @Logged(name = "Custom Example") // For the sake of testing, needs "Example" somewhere in the name
+          class Example {
+            double x;
+          }
+        }
+        """;
+
+    String expectedRootLogger =
+        """
+        package org.wpilib.epilogue;
+
+        import org.wpilib.epilogue.Logged;
+        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.logging.ClassSpecificLogger;
+        import org.wpilib.epilogue.logging.EpilogueBackend;
+
+        public class CustomExampleLogger extends ClassSpecificLogger<Outer.Example> {
+          public CustomExampleLogger() {
+            super(Outer.Example.class);
+          }
+
+          @Override
+          public void update(EpilogueBackend backend, Outer.Example object) {
+            if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              backend.log("x", object.x);
+            }
+          }
+        }
+        """;
+
+    assertLoggerGenerates(source, expectedRootLogger);
+  }
+
+  @Test
+  void diamondInheritance() {
+    String source =
+        """
+        package org.wpilib.epilogue;
+
+        @Logged
+        interface I {}
+
+        @Logged
+        interface ExtendingInterface extends I {}
+
+        @Logged
+        class Base implements I {}
+
+        /* Not @Logged */
+        // Diamond inheritance from I (I -> ExtendingInterface -> Inheritor, I -> Base -> Inheritor)
+        class Inheritor extends Base implements ExtendingInterface {}
+
+        @Logged
+        class Example {
+          // If this is set to an `Inheritor` instance, it will be logged as a `Base` object rather
+          // than `ExtendingInterface` or `I`
+          I theField;
+        }
+        """;
+
+    String expectedRootLogger =
+        """
+        package org.wpilib.epilogue;
+
+        import org.wpilib.epilogue.Logged;
+        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.logging.ClassSpecificLogger;
+        import org.wpilib.epilogue.logging.EpilogueBackend;
+
+        public class ExampleLogger extends ClassSpecificLogger<Example> {
+          public ExampleLogger() {
+            super(Example.class);
+          }
+
+          @Override
+          public void update(EpilogueBackend backend, Example object) {
+            if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              var $$theField = object.theField;
+              if ($$theField instanceof org.wpilib.epilogue.Base org_wpilib_epilogue_Base) {
+                Epilogue.baseLogger.tryUpdate(backend.getNested("theField"), org_wpilib_epilogue_Base, Epilogue.getConfig().errorHandler);
+              } else if ($$theField instanceof org.wpilib.epilogue.ExtendingInterface org_wpilib_epilogue_ExtendingInterface) {
+                Epilogue.extendingInterfaceLogger.tryUpdate(backend.getNested("theField"), org_wpilib_epilogue_ExtendingInterface, Epilogue.getConfig().errorHandler);
+              } else {
+                // Base type org.wpilib.epilogue.I
+                Epilogue.iLogger.tryUpdate(backend.getNested("theField"), $$theField, Epilogue.getConfig().errorHandler);
+              };
+            }
+          }
+        }
+        """;
+
+    assertLoggerGenerates(source, expectedRootLogger);
+  }
+
+  @Test
+  void instanceofChainWithField() {
+    String source =
+        """
+        package org.wpilib.epilogue;
+
+        @Logged
+        interface I {}
+
+        @Logged
+        class Base implements I {}
+
+        @Logged
+        class Example {
+          private I theField;
+        }
+        """;
+
+    String expectedRootLogger =
+        """
+        package org.wpilib.epilogue;
+
+        import org.wpilib.epilogue.Logged;
+        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.logging.ClassSpecificLogger;
+        import org.wpilib.epilogue.logging.EpilogueBackend;
+        import java.lang.invoke.MethodHandles;
+        import java.lang.invoke.VarHandle;
+
+        public class ExampleLogger extends ClassSpecificLogger<Example> {
+          // Accesses private or superclass field org.wpilib.epilogue.Example.theField
+          private static final VarHandle $org_wpilib_epilogue_Example_theField;
+
+          static {
+            try {
+              var rootLookup = MethodHandles.lookup();
+              var lookup$$org_wpilib_epilogue_Example = MethodHandles.privateLookupIn(org.wpilib.epilogue.Example.class, rootLookup);
+              $org_wpilib_epilogue_Example_theField = lookup$$org_wpilib_epilogue_Example.findVarHandle(org.wpilib.epilogue.Example.class, "theField", org.wpilib.epilogue.I.class);
+            } catch (ReflectiveOperationException e) {
+              throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
+            }
+          }
+
+          public ExampleLogger() {
+            super(Example.class);
+          }
+
+          @Override
+          public void update(EpilogueBackend backend, Example object) {
+            if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              var $$theField = ((org.wpilib.epilogue.I) $org_wpilib_epilogue_Example_theField.get(object));
+              if ($$theField instanceof org.wpilib.epilogue.Base org_wpilib_epilogue_Base) {
+                Epilogue.baseLogger.tryUpdate(backend.getNested("theField"), org_wpilib_epilogue_Base, Epilogue.getConfig().errorHandler);
+              } else {
+                // Base type org.wpilib.epilogue.I
+                Epilogue.iLogger.tryUpdate(backend.getNested("theField"), $$theField, Epilogue.getConfig().errorHandler);
+              };
+            }
+          }
+        }
+        """;
+
+    assertLoggerGenerates(source, expectedRootLogger);
+  }
+
+  @Test
+  void nestedOptIn() {
+    String source =
+        """
+        package org.wpilib.epilogue;
+
+        class Implicit {
+          @Logged double x;
+        }
+
+        class Example {
+          @Logged Implicit i;
+        }
+        """;
+
+    String expectedRootLogger =
+        """
+        package org.wpilib.epilogue;
+
+        import org.wpilib.epilogue.Logged;
+        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.logging.ClassSpecificLogger;
+        import org.wpilib.epilogue.logging.EpilogueBackend;
+
+        public class ExampleLogger extends ClassSpecificLogger<Example> {
+          public ExampleLogger() {
+            super(Example.class);
+          }
+
+          @Override
+          public void update(EpilogueBackend backend, Example object) {
+            if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              Epilogue.implicitLogger.tryUpdate(backend.getNested("i"), object.i, Epilogue.getConfig().errorHandler);
+            }
+          }
+        }
+        """;
+
+    assertLoggerGenerates(source, expectedRootLogger);
+  }
+
+  @Test
+  void customLogger() {
+    String source =
+        """
+        package org.wpilib.epilogue;
+
+        import org.wpilib.epilogue.logging.*;
+
+        record Point(int x, int y) {}
+
+        @CustomLoggerFor(Point.class)
+        class CustomPointLogger extends ClassSpecificLogger<Point> {
+          public CustomPointLogger() {
+            super(Point.class);
+          }
+
+          @Override
+          public void update(EpilogueBackend backend, Point point) {
+            // Implementation is irrelevant
+          }
+        }
+
+        @Logged
+        class Example {
+          Point point;
+        }
+        """;
+
+    String expectedGeneratedSource =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            Epilogue.customPointLogger.tryUpdate(backend.getNested("point"), object.point, Epilogue.getConfig().errorHandler);
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void customGenericLogger() {
+    String source =
+        """
+        package org.wpilib.epilogue;
+
+        import org.wpilib.epilogue.logging.*;
+        import org.wpilib.math.numbers.*;
+        import org.wpilib.math.util.Num;
+        import org.wpilib.math.linalg.Vector;
+
+        @CustomLoggerFor(Vector.class)
+        class VectorLogger extends ClassSpecificLogger<Vector<?>> {
+          public VectorLogger() {
+            super((Class) Vector.class);
+          }
+
+          @Override
+          public void update(EpilogueBackend backend, Vector<?> object) {
+            // Implementation is irrelevant
+          }
+        }
+
+        @Logged
+        class Example {
+          Vector<N3> vec;
+        }
+        """;
+
+    String expectedGeneratedSource =
+        """
+        package org.wpilib.epilogue;
+
+        import org.wpilib.epilogue.Logged;
+        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.logging.ClassSpecificLogger;
+        import org.wpilib.epilogue.logging.EpilogueBackend;
+
+        public class ExampleLogger extends ClassSpecificLogger<Example> {
+          public ExampleLogger() {
+            super(Example.class);
+          }
+
+          @Override
+          public void update(EpilogueBackend backend, Example object) {
+            if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              Epilogue.vectorLogger.tryUpdate(backend.getNested("vec"), object.vec, Epilogue.getConfig().errorHandler);
+            }
+          }
+        }
+        """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void genericLoggerForGenericType() {
+    String source =
+        """
+        package org.wpilib.epilogue;
+
+        import org.wpilib.epilogue.logging.*;
+
+        class Generic<T> { }
+
+        @CustomLoggerFor(Generic.class)
+        // Invalid: loggers cannot take type arguments
+        class GenericLogger<T> extends ClassSpecificLogger<Generic<T>> {
+          public GenericLogger() {
+            super((Class) Generic.class);
+          }
+
+          @Override
+          public void update(EpilogueBackend backend, Generic<T> object) {
+            // Implementation is irrelevant
+          }
+        }
+
+        @Logged
+        class Example {
+          Generic<String> genericField;
+        }
+        """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(kJavaVersionOptions)
+            .withProcessors(new AnnotationProcessor())
+            .compile(JavaFileObjects.forSourceString("org.wpilib.epilogue.Example", source));
+
+    assertThat(compilation).failed();
+    assertThat(compilation).hadErrorCount(1);
+
+    assertCompilationError(
+        "[EPILOGUE] Custom logger classes cannot take generic type arguments",
+        9,
+        1,
+        compilation.errors().get(0));
+  }
+
+  @Test
+  void warnsAboutNonLoggableFields() {
+    String source =
+        """
+        package org.wpilib.epilogue;
+
+        @Logged(warnForNonLoggableTypes = true)
+        class Example {
+          Throwable t;
+        }
+        """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(kJavaVersionOptions)
+            .withProcessors(new AnnotationProcessor())
+            .compile(JavaFileObjects.forSourceString("org.wpilib.epilogue.Example", source));
+
+    assertThat(compilation).succeeded();
+    assertEquals(1, compilation.notes().size());
+    var warning = compilation.notes().get(0);
+    var message = warning.getMessage(Locale.getDefault());
+    assertEquals(
+        "[EPILOGUE] Excluded from logs because java.lang.Throwable is not a loggable data type",
+        message);
+  }
+
+  @Test
+  void loggingRecords() {
+    String source =
+        """
+        package org.wpilib.epilogue;
+
+        @Logged
+        record Example(double x, double y) { }
+        """;
+
+    String expectedRootLogger =
+        """
+        package org.wpilib.epilogue;
+
+        import org.wpilib.epilogue.Logged;
+        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.logging.ClassSpecificLogger;
+        import org.wpilib.epilogue.logging.EpilogueBackend;
+
+        public class ExampleLogger extends ClassSpecificLogger<Example> {
+          public ExampleLogger() {
+            super(Example.class);
+          }
+
+          @Override
+          public void update(EpilogueBackend backend, Example object) {
+            if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              backend.log("x", object.x());
+              backend.log("y", object.y());
+            }
+          }
+        }
+        """;
+
+    assertLoggerGenerates(source, expectedRootLogger);
+  }
+
+  @Test
+  void errorsOnFieldNameConflicts() {
+    String source =
+        """
+        package org.wpilib.epilogue;
+
+        @Logged
+        class Example {
+          @Logged(name = "Custom Name") double x;
+          @Logged(name = "Custom Name") double y;
+          @Logged(name = "Custom Name") double z;
+        }
+        """;
+
+    Compilation compilation =
+        javac()
+            .withProcessors(new AnnotationProcessor())
+            .compile(JavaFileObjects.forSourceString("org.wpilib.epilogue.Example", source));
+
+    assertThat(compilation).failed();
+    assertThat(compilation).hadErrorCount(3);
+
+    List<Diagnostic<? extends JavaFileObject>> errors = compilation.errors();
+    assertAll(
+        () ->
+            assertCompilationError(
+                "[EPILOGUE] Conflicting name detected: \"Custom Name\" is also used by Example.y, Example.z",
+                5,
+                40,
+                errors.get(0)),
+        () ->
+            assertCompilationError(
+                "[EPILOGUE] Conflicting name detected: \"Custom Name\" is also used by Example.x, Example.z",
+                6,
+                40,
+                errors.get(1)),
+        () ->
+            assertCompilationError(
+                "[EPILOGUE] Conflicting name detected: \"Custom Name\" is also used by Example.x, Example.y",
+                7,
+                40,
+                errors.get(2)));
+  }
+
+  @Test
+  void doesNotErrorOnGetterMethod() {
+    String source =
+        """
+        package org.wpilib.epilogue;
+
+        @Logged
+        class Example {
+          double x;
+          public double x() { return x; }
+          public double getX() { return x; }
+          public double aTotallyArbitraryNameForAnAccessorMethod() { return x; }
+          public double withANoOpTransform() { return x + 0; }
+          public double withTemp() { var temp = x; return temp; }
+        }
+        """;
+
+    String expectedRootLogger =
+        """
+        package org.wpilib.epilogue;
+
+        import org.wpilib.epilogue.Logged;
+        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.logging.ClassSpecificLogger;
+        import org.wpilib.epilogue.logging.EpilogueBackend;
+
+        public class ExampleLogger extends ClassSpecificLogger<Example> {
+          public ExampleLogger() {
+            super(Example.class);
+          }
+
+          @Override
+          public void update(EpilogueBackend backend, Example object) {
+            if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              backend.log("x", object.x);
+              backend.log("withANoOpTransform", object.withANoOpTransform());
+              backend.log("withTemp", object.withTemp());
+            }
+          }
+        }
+        """;
+
+    assertLoggerGenerates(source, expectedRootLogger);
+  }
+
+  @Test
+  void configuredDefaultNaming() {
+    String source =
+        """
+        package org.wpilib.epilogue;
+
+        @Logged(defaultNaming = Logged.Naming.USE_HUMAN_NAME)
+        class Example {
+          double m_memberPrefix;
+          double kConstantPrefix;
+          double k_otherConstantPrefix;
+          double s_otherPrefix;
+
+          public double getTheGetterMethod() {
+            return 0;
+          }
+
+          @Logged(defaultNaming = Logged.Naming.USE_CODE_NAME)
+          public double optedOut() {
+            return 0;
+          }
+        }
+        """;
+
+    String expectedRootLogger =
+        """
+        package org.wpilib.epilogue;
+
+        import org.wpilib.epilogue.Logged;
+        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.logging.ClassSpecificLogger;
+        import org.wpilib.epilogue.logging.EpilogueBackend;
+
+        public class ExampleLogger extends ClassSpecificLogger<Example> {
+          public ExampleLogger() {
+            super(Example.class);
+          }
+
+          @Override
+          public void update(EpilogueBackend backend, Example object) {
+            if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+              backend.log("Member Prefix", object.m_memberPrefix);
+              backend.log("Constant Prefix", object.kConstantPrefix);
+              backend.log("Other Constant Prefix", object.k_otherConstantPrefix);
+              backend.log("Other Prefix", object.s_otherPrefix);
+              backend.log("The Getter Method", object.getTheGetterMethod());
+              backend.log("optedOut", object.optedOut());
+            }
+          }
+        }
+        """;
+
+    assertLoggerGenerates(source, expectedRootLogger);
+  }
+
+  @Test
+  void doesNotBreakWithPackageInfo() {
+    String source =
+        """
+        package example;
+
+        import org.wpilib.epilogue.*;
+
+        @Logged
+        class Example {}
+        """;
+
+    String packageInfo =
+        """
+        package example;
+        """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(kJavaVersionOptions)
+            .withProcessors(new AnnotationProcessor())
+            .compile(
+                JavaFileObjects.forSourceString("example.Example", source),
+                JavaFileObjects.forSourceString("example.package-info", packageInfo));
+
+    assertThat(compilation).succeeded();
+    compilation.generatedSourceFiles().stream()
+        .filter(jfo -> jfo.getName().contains("Example"))
+        .findFirst()
+        .orElseThrow(() -> new IllegalStateException("Logger file was not generated!"));
+  }
+
+  private void assertCompilationError(
+      String message, long lineNumber, long col, Diagnostic<? extends JavaFileObject> diagnostic) {
+    assertAll(
+        () -> assertEquals(Diagnostic.Kind.ERROR, diagnostic.getKind(), "not an error"),
+        () ->
+            assertEquals(
+                message, diagnostic.getMessage(Locale.getDefault()), "error message mismatch"),
+        () -> assertEquals(lineNumber, diagnostic.getLineNumber(), "line number mismatch"),
+        () -> assertEquals(col, diagnostic.getColumnNumber(), "column number mismatch"));
+  }
+
+  private void assertLoggerGenerates(String loggedClassContent, String loggerClassContent) {
+    // Extract the expected logger file name from the class declaration so we can find the correct
+    // generated file.
+    var pattern =
+        Pattern.compile(".*public class (.*) extends ClassSpecificLogger.*", Pattern.DOTALL);
+    var matcher = pattern.matcher(loggerClassContent);
+    var className = "ExampleLogger";
+    if (matcher.matches()) {
+      var result = matcher.toMatchResult();
+      className = result.group(1);
+    }
+    var loggerFileName = "/" + className + ".java";
+
+    Compilation compilation =
+        javac()
+            .withOptions(kJavaVersionOptions)
+            .withProcessors(new AnnotationProcessor())
+            .compile(
+                JavaFileObjects.forSourceString("org.wpilib.epilogue.Example", loggedClassContent));
+
+    assertThat(compilation).succeeded();
+    var generatedFiles = compilation.generatedSourceFiles();
+    var generatedFile =
+        generatedFiles.stream()
+            .filter(jfo -> jfo.toUri().getPath().endsWith(loggerFileName))
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("Logger file was not generated!"));
+    try {
+      var content = generatedFile.getCharContent(false);
+      assertEquals(
+          loggerClassContent.replace("\r\n", "\n"), content.toString().replace("\r\n", "\n"));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+}

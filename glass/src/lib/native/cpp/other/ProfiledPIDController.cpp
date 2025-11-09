@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/other/ProfiledPIDController.h"
+#include "wpi/glass/other/ProfiledPIDController.hpp"
 
 #include <imgui.h>
 
-#include "glass/DataSource.h"
+#include "wpi/glass/DataSource.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
-void glass::DisplayProfiledPIDController(ProfiledPIDControllerModel* m) {
+void wpi::glass::DisplayProfiledPIDController(ProfiledPIDControllerModel* m) {
   if (auto name = m->GetName()) {
     ImGui::Text("%s", name);
     ImGui::Separator();
@@ -31,8 +31,8 @@ void glass::DisplayProfiledPIDController(ProfiledPIDControllerModel* m) {
         [flag](const char* name, double* v,
                std::function<void(double)> callback) {
           ImGui::SetNextItemWidth(ImGui::GetFontSize() * 4);
-          if (ImGui::InputScalar(name, ImGuiDataType_Double, v, NULL, NULL,
-                                 "%.3f", flag)) {
+          if (ImGui::InputScalar(name, ImGuiDataType_Double, v, nullptr,
+                                 nullptr, "%.3f", flag)) {
             callback(*v);
           }
         };

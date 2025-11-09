@@ -1,0 +1,14 @@
+classes:
+  wpi::math::Debouncer:
+    enums:
+      DebounceType:
+    methods:
+      Debouncer:
+        param_override:
+          type:
+            default: wpi::math::Debouncer::DebounceType::kRising
+      Calculate:
+      SetDebounceTime:
+      GetDebounceTime:
+      SetDebounceType:
+      GetDebounceType:

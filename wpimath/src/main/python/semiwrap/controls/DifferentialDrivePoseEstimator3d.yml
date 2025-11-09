@@ -1,0 +1,15 @@
+defaults:
+  subpackage: estimator
+
+classes:
+  wpi::math::DifferentialDrivePoseEstimator3d:
+    force_no_trampoline: true
+    methods:
+      DifferentialDrivePoseEstimator3d:
+        overloads:
+          DifferentialDriveKinematics&, const Rotation3d&, wpi::units::meter_t, wpi::units::meter_t, const Pose3d&:
+          ? DifferentialDriveKinematics&, const Rotation3d&, wpi::units::meter_t, wpi::units::meter_t, const Pose3d&, const wpi::util::array<double, 4>&, const wpi::util::array<double, 4>&
+          :
+      ResetPosition:
+      Update:
+      UpdateWithTime:

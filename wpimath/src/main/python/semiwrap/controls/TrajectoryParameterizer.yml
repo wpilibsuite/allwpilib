@@ -1,0 +1,10 @@
+defaults:
+  subpackage: trajectory
+
+classes:
+  wpi::math::TrajectoryParameterizer:
+    force_type_casters:
+    - wpi::units::unit_t
+    - wpi::units::curvature_t
+    methods:
+      TimeParameterizeTrajectory:

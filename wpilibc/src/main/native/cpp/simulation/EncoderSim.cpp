@@ -2,17 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/EncoderSim.h"
+#include "wpi/simulation/EncoderSim.hpp"
 
 #include <memory>
 #include <stdexcept>
 
-#include <hal/simulation/EncoderData.h>
+#include "wpi/hal/simulation/EncoderData.h"
+#include "wpi/hardware/rotation/Encoder.hpp"
 
-#include "frc/Encoder.h"
-
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 EncoderSim::EncoderSim(const Encoder& encoder)
     : m_index{encoder.GetFPGAIndex()} {}

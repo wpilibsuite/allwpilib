@@ -1,0 +1,185 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#include "wpi/hardware/motor/MotorSafety.hpp"
+
+#include <algorithm>
+#include <utility>
+
+#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/hal/DriverStation.h"
+#include "wpi/system/Errors.hpp"
+#include "wpi/util/SafeThread.hpp"
+#include "wpi/util/SmallPtrSet.hpp"
+
+using namespace wpi;
+
+namespace {
+class Thread : public wpi::util::SafeThread {
+ public:
+  Thread() {}
+  void Main() override;
+};
+
+void Thread::Main() {
+  wpi::util::Event event{false, false};
+  HAL_ProvideNewDataEventHandle(event.GetHandle());
+
+  int safetyCounter = 0;
+  while (m_active) {
+    bool timedOut = false;
+    bool signaled = wpi::util::WaitForObject(event.GetHandle(), 0.1, &timedOut);
+    if (signaled) {
+      HAL_ControlWord controlWord;
+      std::memset(&controlWord, 0, sizeof(controlWord));
+      HAL_GetControlWord(&controlWord);
+      if (!(controlWord.enabled && controlWord.dsAttached)) {
+        safetyCounter = 0;
+      }
+      if (++safetyCounter >= 4) {
+        MotorSafety::CheckMotors();
+        safetyCounter = 0;
+      }
+    } else {
+      safetyCounter = 0;
+    }
+  }
+
+  HAL_RemoveNewDataEventHandle(event.GetHandle());
+}
+}  // namespace
+
+static std::atomic_bool gShutdown{false};
+
+namespace {
+struct MotorSafetyManager {
+  ~MotorSafetyManager() { gShutdown = true; }
+
+  wpi::util::SafeThreadOwner<Thread> thread;
+  wpi::util::SmallPtrSet<MotorSafety*, 32> instanceList;
+  wpi::util::mutex listMutex;
+  bool threadStarted = false;
+};
+}  // namespace
+
+static MotorSafetyManager& GetManager() {
+  static MotorSafetyManager manager;
+  return manager;
+}
+
+#ifndef __FRC_SYSTEMCORE__
+namespace wpi::impl {
+void ResetMotorSafety() {
+  auto& manager = GetManager();
+  std::scoped_lock lock(manager.listMutex);
+  manager.instanceList.clear();
+  manager.thread.Stop();
+  manager.thread.Join();
+  manager.thread = wpi::util::SafeThreadOwner<Thread>{};
+  manager.threadStarted = false;
+}
+}  // namespace wpi::impl
+#endif
+
+MotorSafety::MotorSafety() {
+  auto& manager = GetManager();
+  std::scoped_lock lock(manager.listMutex);
+  manager.instanceList.insert(this);
+  if (!manager.threadStarted) {
+    manager.threadStarted = true;
+    manager.thread.Start();
+  }
+}
+
+MotorSafety::~MotorSafety() {
+  auto& manager = GetManager();
+  std::scoped_lock lock(manager.listMutex);
+  manager.instanceList.erase(this);
+}
+
+MotorSafety::MotorSafety(MotorSafety&& rhs)
+    : m_expiration(std::move(rhs.m_expiration)),
+      m_enabled(std::move(rhs.m_enabled)),
+      m_stopTime(std::move(rhs.m_stopTime)) {}
+
+MotorSafety& MotorSafety::operator=(MotorSafety&& rhs) {
+  std::scoped_lock lock(m_thisMutex, rhs.m_thisMutex);
+
+  m_expiration = std::move(rhs.m_expiration);
+  m_enabled = std::move(rhs.m_enabled);
+  m_stopTime = std::move(rhs.m_stopTime);
+
+  return *this;
+}
+
+void MotorSafety::Feed() {
+  std::scoped_lock lock(m_thisMutex);
+  m_stopTime = Timer::GetFPGATimestamp() + m_expiration;
+}
+
+void MotorSafety::SetExpiration(wpi::units::second_t expirationTime) {
+  std::scoped_lock lock(m_thisMutex);
+  m_expiration = expirationTime;
+}
+
+wpi::units::second_t MotorSafety::GetExpiration() const {
+  std::scoped_lock lock(m_thisMutex);
+  return m_expiration;
+}
+
+bool MotorSafety::IsAlive() const {
+  std::scoped_lock lock(m_thisMutex);
+  return !m_enabled || m_stopTime > Timer::GetFPGATimestamp();
+}
+
+void MotorSafety::SetSafetyEnabled(bool enabled) {
+  std::scoped_lock lock(m_thisMutex);
+  m_enabled = enabled;
+}
+
+bool MotorSafety::IsSafetyEnabled() const {
+  std::scoped_lock lock(m_thisMutex);
+  return m_enabled;
+}
+
+void MotorSafety::Check() {
+  bool enabled;
+  wpi::units::second_t stopTime;
+
+  {
+    std::scoped_lock lock(m_thisMutex);
+    enabled = m_enabled;
+    stopTime = m_stopTime;
+  }
+
+  if (!enabled || DriverStation::IsDisabled() || DriverStation::IsTest()) {
+    return;
+  }
+
+  if (stopTime < Timer::GetFPGATimestamp()) {
+    WPILIB_ReportError(
+        err::Timeout,
+        "{}... Output not updated often enough. See "
+        "https://docs.wpilib.org/motorsafety for more information.",
+        GetDescription());
+
+    try {
+      StopMotor();
+    } catch (wpi::RuntimeError& e) {
+      e.Report();
+    } catch (std::exception& e) {
+      WPILIB_ReportError(err::Error,
+                         "{} StopMotor threw unexpected exception: {}",
+                         GetDescription(), e.what());
+    }
+  }
+}
+
+void MotorSafety::CheckMotors() {
+  auto& manager = GetManager();
+  std::scoped_lock lock(manager.listMutex);
+  for (auto elem : manager.instanceList) {
+    elem->Check();
+  }
+}

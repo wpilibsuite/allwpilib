@@ -19,7 +19,7 @@ ext {
 apply from: "${rootDir}/shared/opencv.gradle"
 
 application {
-    mainClass = 'edu.wpi.Main'
+    mainClass = 'org.wpilib.Main'
 }
 
 apply plugin: 'com.gradleup.shadow'

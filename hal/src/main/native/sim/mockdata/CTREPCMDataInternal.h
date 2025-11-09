@@ -5,10 +5,10 @@
 #pragma once
 
 #include "../PortsInternal.h"
-#include "hal/simulation/CTREPCMData.h"
-#include "hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/CTREPCMData.h"
+#include "wpi/hal/simulation/SimDataValue.h"
 
-namespace hal {
+namespace wpi::hal {
 class CTREPCMData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(SolenoidOutput)
@@ -40,4 +40,4 @@ class CTREPCMData {
   virtual void ResetData();
 };
 extern CTREPCMData* SimCTREPCMData;
-}  // namespace hal
+}  // namespace wpi::hal

@@ -1,0 +1,56 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [
+    "semiwrap~=0.2.1",
+    "hatch-meson~=0.1.0",
+    "semiwrap~=0.2.1",
+    "hatch-meson~=0.1.0",
+    "hatchling",
+    "robotpy-native-wpinet==0.0.0",
+    "robotpy-wpiutil==0.0.0"
+]
+
+[project]
+name = "robotpy-wpinet"
+version = "0.0.0"
+description = "Binary wrapper for FRC wpinet library"
+authors = [
+    {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
+]
+license = "BSD-3-Clause"
+dependencies = [
+    "robotpy-native-wpinet==0.0.0",
+    "robotpy-wpiutil==0.0.0"
+]
+
+[project.urls]
+"Source code" = "https://github.com/robotpy/mostrobotpy"
+
+
+[tool.hatch.build.hooks.robotpy]
+version_file = "wpinet/version.py"
+
+[tool.hatch.build.hooks.semiwrap]
+
+[tool.hatch.build.hooks.meson]
+
+[tool.hatch.build.targets.wheel]
+packages = ["wpinet"]
+
+
+[tool.semiwrap]
+update_init = [
+    "wpinet"
+]
+# we don't wrap anything here
+scan_headers_ignore = ["*"]
+
+[tool.semiwrap.extension_modules."wpinet._wpinet"]
+name = "wpinet"
+wraps = ["robotpy-native-wpinet"]
+depends = ["wpiutil"]
+
+[tool.semiwrap.extension_modules."wpinet._wpinet".headers]
+# wpinet
+PortForwarder = "wpi/net/PortForwarder.hpp"
+WebServer = "wpi/net/WebServer.hpp"

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "ServerStorage.h"
+#include "ServerStorage.hpp"
 
 #include <memory>
 #include <string>
@@ -10,22 +10,22 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/Base64.h>
-#include <wpi/MessagePack.h>
-#include <wpi/json.h>
 
-#include "Log.h"
-#include "server/MessagePackWriter.h"
-#include "server/ServerClient.h"
+#include "Log.hpp"
+#include "server/MessagePackWriter.hpp"
+#include "server/ServerClient.hpp"
+#include "wpi/util/Base64.hpp"
+#include "wpi/util/MessagePack.hpp"
+#include "wpi/util/json.hpp"
 
-using namespace nt;
-using namespace nt::server;
+using namespace wpi::nt;
+using namespace wpi::nt::server;
 using namespace mpack;
 
 ServerTopic* ServerStorage::CreateTopic(ServerClient* client,
                                         std::string_view name,
                                         std::string_view typeStr,
-                                        const wpi::json& properties,
+                                        const wpi::util::json& properties,
                                         bool special) {
   auto& topic = m_nameTopics[name];
   if (topic) {
@@ -88,7 +88,7 @@ void ServerStorage::DeleteTopic(ServerTopic* topic) {
 }
 
 void ServerStorage::SetProperties(ServerClient* client, ServerTopic* topic,
-                                  const wpi::json& update) {
+                                  const wpi::util::json& update) {
   DEBUG4("SetProperties({}, {}, {})", client ? client->GetId() : -1,
          topic->name, update.dump());
   bool wasPersistent = topic->persistent;
@@ -108,11 +108,11 @@ void ServerStorage::SetFlags(ServerClient* client, ServerTopic* topic,
     // update persistentChanged flag
     if (topic->persistent != wasPersistent) {
       m_persistentChanged = true;
-      wpi::json update;
+      wpi::util::json update;
       if (topic->persistent) {
         update = {{"persistent", true}};
       } else {
-        update = {{"persistent", wpi::json::object()}};
+        update = {{"persistent", wpi::util::json::object()}};
       }
       PropertiesChanged(client, topic, update);
     }
@@ -146,7 +146,7 @@ void ServerStorage::SetValue(ServerClient* client, ServerTopic* topic,
 
 void ServerStorage::RemoveClient(ServerClient* client) {
   // remove all publishers and subscribers for this client
-  wpi::SmallVector<ServerTopic*, 16> toDelete;
+  wpi::util::SmallVector<ServerTopic*, 16> toDelete;
   for (auto&& topic : m_topics) {
     bool pubChanged = false;
     bool subChanged = false;
@@ -222,7 +222,7 @@ void ServerStorage::UpdateMetaTopicSub(ServerTopic* topic) {
 }
 
 void ServerStorage::PropertiesChanged(ServerClient* client, ServerTopic* topic,
-                                      const wpi::json& update) {
+                                      const wpi::util::json& update) {
   // removing some properties can result in the topic being unpublished
   if (!topic->IsPublished()) {
     DeleteTopic(topic);
@@ -234,8 +234,8 @@ void ServerStorage::PropertiesChanged(ServerClient* client, ServerTopic* topic,
   }
 }
 
-static void DumpValue(wpi::raw_ostream& os, const Value& value,
-                      wpi::json::serializer& s) {
+static void DumpValue(wpi::util::raw_ostream& os, const Value& value,
+                      wpi::util::json::serializer& s) {
   switch (value.type()) {
     case NT_BOOLEAN:
       if (value.GetBoolean()) {
@@ -261,7 +261,7 @@ static void DumpValue(wpi::raw_ostream& os, const Value& value,
     case NT_RAW:
     case NT_RPC:
       os << '"';
-      wpi::Base64Encode(os, value.GetRaw());
+      wpi::util::Base64Encode(os, value.GetRaw());
       os << '"';
       break;
     case NT_BOOLEAN_ARRAY: {
@@ -346,8 +346,8 @@ static void DumpValue(wpi::raw_ostream& os, const Value& value,
   }
 }
 
-void ServerStorage::DumpPersistent(wpi::raw_ostream& os) {
-  wpi::json::serializer s{os, ' ', 16};
+void ServerStorage::DumpPersistent(wpi::util::raw_ostream& os) {
+  wpi::util::json::serializer s{os, ' ', 16};
   os << "[\n";
   bool first = true;
   for (const auto& topic : m_topics) {
@@ -372,8 +372,8 @@ void ServerStorage::DumpPersistent(wpi::raw_ostream& os) {
   os << "\n]\n";
 }
 
-static std::string* ObjGetString(wpi::json::object_t& obj, std::string_view key,
-                                 std::string* error) {
+static std::string* ObjGetString(wpi::util::json::object_t& obj,
+                                 std::string_view key, std::string* error) {
   auto it = obj.find(key);
   if (it == obj.end()) {
     *error = fmt::format("no {} key", key);
@@ -391,10 +391,10 @@ std::string ServerStorage::LoadPersistent(std::string_view in) {
     return {};
   }
 
-  wpi::json j;
+  wpi::util::json j;
   try {
-    j = wpi::json::parse(in);
-  } catch (wpi::json::parse_error& err) {
+    j = wpi::util::json::parse(in);
+  } catch (wpi::util::json::parse_error& err) {
     return fmt::format("could not decode JSON: {}", err.what());
   }
 
@@ -406,12 +406,12 @@ std::string ServerStorage::LoadPersistent(std::string_view in) {
 
   std::string allerrors;
   int i = -1;
-  auto time = nt::Now();
+  auto time = wpi::nt::Now();
   for (auto&& jitem : j) {
     ++i;
     std::string error;
     {
-      auto obj = jitem.get_ptr<wpi::json::object_t*>();
+      auto obj = jitem.get_ptr<wpi::util::json::object_t*>();
       if (!obj) {
         error = "expected item to be an object";
         goto err;
@@ -502,7 +502,7 @@ std::string ServerStorage::LoadPersistent(std::string_view in) {
           goto err;
         }
       } else if (*typeStr == "boolean[]") {
-        auto arr = valueIt->second.get_ptr<wpi::json::array_t*>();
+        auto arr = valueIt->second.get_ptr<wpi::util::json::array_t*>();
         if (!arr) {
           error = "value type mismatch, expected array";
           goto err;
@@ -517,7 +517,7 @@ std::string ServerStorage::LoadPersistent(std::string_view in) {
         }
         value = Value::MakeBooleanArray(elems, time);
       } else if (*typeStr == "int[]") {
-        auto arr = valueIt->second.get_ptr<wpi::json::array_t*>();
+        auto arr = valueIt->second.get_ptr<wpi::util::json::array_t*>();
         if (!arr) {
           error = "value type mismatch, expected array";
           goto err;
@@ -534,7 +534,7 @@ std::string ServerStorage::LoadPersistent(std::string_view in) {
         }
         value = Value::MakeIntegerArray(elems, time);
       } else if (*typeStr == "double[]") {
-        auto arr = valueIt->second.get_ptr<wpi::json::array_t*>();
+        auto arr = valueIt->second.get_ptr<wpi::util::json::array_t*>();
         if (!arr) {
           error = "value type mismatch, expected array";
           goto err;
@@ -549,7 +549,7 @@ std::string ServerStorage::LoadPersistent(std::string_view in) {
         }
         value = Value::MakeDoubleArray(elems, time);
       } else if (*typeStr == "float[]") {
-        auto arr = valueIt->second.get_ptr<wpi::json::array_t*>();
+        auto arr = valueIt->second.get_ptr<wpi::util::json::array_t*>();
         if (!arr) {
           error = "value type mismatch, expected array";
           goto err;
@@ -564,7 +564,7 @@ std::string ServerStorage::LoadPersistent(std::string_view in) {
         }
         value = Value::MakeFloatArray(elems, time);
       } else if (*typeStr == "string[]") {
-        auto arr = valueIt->second.get_ptr<wpi::json::array_t*>();
+        auto arr = valueIt->second.get_ptr<wpi::util::json::array_t*>();
         if (!arr) {
           error = "value type mismatch, expected array";
           goto err;
@@ -582,7 +582,7 @@ std::string ServerStorage::LoadPersistent(std::string_view in) {
         // raw
         if (auto v = valueIt->second.get_ptr<std::string*>()) {
           std::vector<uint8_t> data;
-          wpi::Base64Decode(*v, &data);
+          wpi::util::Base64Decode(*v, &data);
           value = Value::MakeRaw(std::move(data), time);
         } else {
           error = "value type mismatch, expected string";

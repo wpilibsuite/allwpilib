@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/hardware/MotorController.h"
+#include "wpi/glass/hardware/MotorController.hpp"
 
 #include <imgui.h>
 #include <imgui_internal.h>
 
-#include "glass/DataSource.h"
+#include "wpi/glass/DataSource.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
-void glass::DisplayMotorController(MotorControllerModel* m) {
+void wpi::glass::DisplayMotorController(MotorControllerModel* m) {
   // Get duty cycle data from the model and do not display anything if the data
   // is null.
   auto dc = m->GetPercentData();

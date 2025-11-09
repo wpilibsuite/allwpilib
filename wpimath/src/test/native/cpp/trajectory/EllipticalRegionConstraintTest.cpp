@@ -4,19 +4,19 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/trajectory/constraint/EllipticalRegionConstraint.h"
-#include "frc/trajectory/constraint/MaxVelocityConstraint.h"
-#include "trajectory/TestTrajectory.h"
-#include "units/acceleration.h"
-#include "units/angle.h"
-#include "units/length.h"
-#include "units/velocity.h"
+#include "wpi/math/trajectory/TestTrajectory.hpp"
+#include "wpi/math/trajectory/constraint/EllipticalRegionConstraint.hpp"
+#include "wpi/math/trajectory/constraint/MaxVelocityConstraint.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/velocity.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 TEST(EllipticalRegionConstraintTest, Constraint) {
   constexpr auto maxVelocity = 2_fps;
-  constexpr frc::Ellipse2d ellipse{{5_ft, 2.5_ft, 180_deg}, 5_ft, 2.5_ft};
+  constexpr wpi::math::Ellipse2d ellipse{{5_ft, 2.5_ft, 180_deg}, 5_ft, 2.5_ft};
 
   auto config = TrajectoryConfig(13_fps, 13_fps_sq);
   config.AddConstraint(
@@ -26,8 +26,10 @@ TEST(EllipticalRegionConstraintTest, Constraint) {
   bool exceededConstraintOutsideRegion = false;
   for (auto& point : trajectory.States()) {
     if (ellipse.Contains(point.pose.Translation())) {
-      EXPECT_TRUE(units::math::abs(point.velocity) < maxVelocity + 0.05_mps);
-    } else if (units::math::abs(point.velocity) >= maxVelocity + 0.05_mps) {
+      EXPECT_TRUE(wpi::units::math::abs(point.velocity) <
+                  maxVelocity + 0.05_mps);
+    } else if (wpi::units::math::abs(point.velocity) >=
+               maxVelocity + 0.05_mps) {
       exceededConstraintOutsideRegion = true;
     }
   }

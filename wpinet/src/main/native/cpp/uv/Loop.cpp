@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/uv/Loop.h"
+#include "wpi/net/uv/Loop.hpp"
 
 #include <memory>
 
-using namespace wpi::uv;
+using namespace wpi::net::uv;
 
 Loop::Loop(const private_init&) noexcept {
 #ifndef _WIN32
@@ -53,12 +53,12 @@ void Loop::Close() {
   }
 }
 
-void Loop::Walk(function_ref<void(Handle&)> callback) {
+void Loop::Walk(wpi::util::function_ref<void(Handle&)> callback) {
   uv_walk(
       m_loop,
       [](uv_handle_t* handle, void* func) {
         auto& h = *static_cast<Handle*>(handle->data);
-        auto& f = *static_cast<function_ref<void(Handle&)>*>(func);
+        auto& f = *static_cast<wpi::util::function_ref<void(Handle&)>*>(func);
         f(h);
       },
       &callback);

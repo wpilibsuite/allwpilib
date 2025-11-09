@@ -33,6 +33,20 @@ wpilib_cc_library(
         "src/main/native/cpp/**",
     ]),
     hdrs = glob(["src/main/native/include/**"]),
+    extra_hdr_pkg_files = [
+        "//wpiutil:fmtlib-hdrs-pkg",
+        "//wpiutil:llvm-hdrs-pkg",
+        "//wpiutil:wpiutil-hdrs-pkg",
+        "//wpiutil:json-hdrs-pkg",
+        "//wpiutil:mpack-hdrs-pkg",
+        "//wpiutil:expected-hdrs-pkg",
+        "//wpiutil:debugging-hdrs-pkg",
+        "//wpiutil:sigslot-hdrs-pkg",
+        "//wpiutil:nanopb-hdrs-pkg",
+        "//wpiutil:argparse-hdrs-pkg",
+        "//ntcore:ntcore-hdrs-pkg",
+        "//ntcore:generated_cc-hdrs-pkg",
+    ],
     include_license_files = True,
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
@@ -55,5 +69,5 @@ wpilib_cc_shared_library(
 package_shared_cc_project(
     name = "ntcoreffi",
     maven_artifact_name = "ntcoreffi-cpp",
-    maven_group_id = "edu.wpi.first.ntcoreffi",
+    maven_group_id = "org.wpilib.ntcoreffi",
 )

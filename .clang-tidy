@@ -45,6 +45,8 @@ Checks:
   -clang-diagnostic-#warnings,
   -clang-diagnostic-pedantic,
   clang-analyzer-*,
+  -clang-analyzer-optin.cplusplus.UninitializedObject,
+  -clang-analyzer-security.FloatLoopCounter,
   cppcoreguidelines-slicing,
   google-build-namespaces,
   google-explicit-constructor,

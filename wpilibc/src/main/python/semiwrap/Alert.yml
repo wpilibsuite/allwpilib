@@ -1,0 +1,30 @@
+functions:
+  format_as:
+    ignore: true
+
+classes:
+  wpi::Alert:
+    enums:
+      AlertType:
+    methods:
+      Alert:
+        overloads:
+          std::string_view, AlertType:
+          std::string_view, std::string_view, AlertType:
+      Set:
+      Get:
+      SetText:
+      GetText:
+      GetType:
+    inline_code: |
+      .def("close", [](wpi::Alert &self) {
+        py::gil_scoped_release release;
+        self.Set(false);
+      }, py::doc("Disables the alert"))
+      .def("__enter__", [](wpi::Alert &self) -> wpi::Alert& {
+        return self;
+      })
+      .def("__exit__", [](wpi::Alert &self, py::args args) {
+        py::gil_scoped_release release;
+        self.Set(false);
+      })

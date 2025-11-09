@@ -17,12 +17,12 @@ filegroup(
 
 WIN_SRCS = glob([
     "src/main/native/windows/**/*.cpp",
-    "src/main/native/windows/**/*.h",
+    "src/main/native/windows/**/*.hpp",
 ])
 
 LINUX_SRCS = glob([
     "src/main/native/linux/**/*.cpp",
-    "src/main/native/linux/**/*.h",
+    "src/main/native/linux/**/*.hpp",
 ])
 
 MAC_SRCS = glob(["src/main/native/osx/**/*.cpp"])
@@ -40,11 +40,11 @@ wpilib_objc_library(
     name = "cscore-mac",
     srcs = glob([
         "src/main/native/objcpp/**/*.mm",
-        "src/main/native/cpp/*.h",
+        "src/main/native/cpp/*.hpp",
     ]),
     hdrs = glob([
         "src/main/native/include/**/*",
-        "src/main/native/objcpp/**/*.h",
+        "src/main/native/objcpp/**/*.hpp",
     ]),
     include_arc = False,
     includes = [
@@ -210,7 +210,7 @@ wpilib_jni_java_library(
     name = "cscore-java",
     srcs = glob(["src/main/java/**/*.java"]),
     maven_artifact_name = "cscore-java",
-    maven_group_id = "edu.wpi.first.cscore",
+    maven_group_id = "org.wpilib.cscore",
     native_libs = [":cscorejni"],
     visibility = ["//visibility:public"],
     deps = [
@@ -248,8 +248,8 @@ cc_binary(
 
 java_binary(
     name = "DevMain-Java",
-    srcs = ["src/dev/java/edu/wpi/first/cscore/DevMain.java"],
-    main_class = "edu.wpi.first.cscore.DevMain",
+    srcs = ["src/dev/java/org/wpilib/vision/camera/DevMain.java"],
+    main_class = "org.wpilib.vision.camera.DevMain",
     deps = [
         ":cscore-java",
         "//wpiutil:wpiutil-java",
@@ -281,7 +281,7 @@ java_binary(
 package_minimal_jni_project(
     name = "cscore",
     maven_artifact_name = "cscore-cpp",
-    maven_group_id = "edu.wpi.first.cscore",
+    maven_group_id = "org.wpilib.cscore",
 )
 
 alias(

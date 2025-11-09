@@ -1,0 +1,171 @@
+extra_includes:
+- src/rpy/SmartDashboardData.h
+- wpi/system/Errors.hpp
+- wpi/util/sendable/SendableRegistry.hpp
+
+classes:
+  wpi::SmartDashboard:
+    methods:
+      init:
+      ContainsKey:
+      GetKeys:
+      SetPersistent:
+      ClearPersistent:
+      IsPersistent:
+      GetEntry:
+      PutData:
+        # overrides ensure data doesn't die if this is the only reference
+        overloads:
+          std::string_view, wpi::util::Sendable*:
+            cpp_code: |
+              [](py::str &key, std::shared_ptr<wpi::util::Sendable> data) {
+                if (!data) {
+                  throw WPILIB_MakeError(err::NullParameter, "{}", "value");
+                }
+
+                // convert key to a raw string so that we can create a StringRef
+                Py_ssize_t raw_size;
+                const char *raw_str = PyUnicode_AsUTF8AndSize(key.ptr(), &raw_size);
+                if (raw_str == NULL) {
+                  throw py::error_already_set();
+                }
+
+                std::string_view keyRef(raw_str, raw_size);
+                wpi::SmartDashboard::PutData(keyRef, data.get());
+
+                // this comes after the PutData to ensure that the original object doesn't die
+                // while PutData is called
+                rpy::addSmartDashboardData(key, data);
+              }
+          wpi::util::Sendable*:
+            cpp_code: |
+              [](std::shared_ptr<wpi::util::Sendable> value) {
+                wpi::SmartDashboard::PutData(value.get());
+                // this comes after the PutData to ensure that the original object doesn't die
+                // while PutData is called
+                auto name = wpi::util::SendableRegistry::GetName(value.get());
+                if (!name.empty()) {
+                  py::str key(name);
+                  rpy::addSmartDashboardData(key, value);
+                }
+              }
+      GetData:
+      PutBoolean:
+      SetDefaultBoolean:
+      GetBoolean:
+        cpp_code: |
+          [](std::string_view key, py::object defaultValue) -> py::object {
+              wpi::nt::Value value;
+              {
+                py::gil_scoped_release release;
+                auto entry = wpi::SmartDashboard::GetEntry(key);
+                value = wpi::nt::GetEntryValue(entry.GetHandle());
+              }
+              if (!value || value.type() != NT_BOOLEAN) return defaultValue;
+              return py::cast(value.GetBoolean());
+          }
+      PutNumber:
+      SetDefaultNumber:
+      GetNumber:
+        cpp_code: |
+          [](std::string_view key, py::object defaultValue) -> py::object {
+              wpi::nt::Value value;
+              {
+                py::gil_scoped_release release;
+                auto entry = wpi::SmartDashboard::GetEntry(key);
+                value = wpi::nt::GetEntryValue(entry.GetHandle());
+              }
+              if (!value || value.type() != NT_DOUBLE) return defaultValue;
+              return py::cast(value.GetDouble());
+          }
+      PutString:
+      SetDefaultString:
+      GetString:
+        cpp_code: |
+          [](std::string_view key, py::object defaultValue) -> py::object {
+              wpi::nt::Value value;
+              {
+                py::gil_scoped_release release;
+                auto entry = wpi::SmartDashboard::GetEntry(key);
+                value = wpi::nt::GetEntryValue(entry.GetHandle());
+              }
+              if (!value || value.type() != NT_STRING) return defaultValue;
+              return py::cast(value.GetString());
+          }
+      PutBooleanArray:
+      SetDefaultBooleanArray:
+      GetBooleanArray:
+        cpp_code: |
+          [](std::string_view key, py::object defaultValue) -> py::object {
+            wpi::nt::Value value;
+            {
+              py::gil_scoped_release release;
+              auto entry = wpi::SmartDashboard::GetEntry(key);
+              value = wpi::nt::GetEntryValue(entry.GetHandle());
+            }
+            if (!value || value.type() != NT_BOOLEAN_ARRAY) return defaultValue;
+            // ntcore will return bit vector by default. Convert to List[bool]
+            auto v = value.value();
+            py::list l(v.data.arr_boolean.size);
+            for (size_t i = 0; i < v.data.arr_boolean.size; i++) {
+              auto b = py::bool_(v.data.arr_boolean.arr[i]);
+                PyList_SET_ITEM(l.ptr(), i, b.release().ptr());
+            }
+            return l;
+          }
+      PutNumberArray:
+      SetDefaultNumberArray:
+      GetNumberArray:
+        cpp_code: |
+          [](std::string_view key, py::object defaultValue) -> py::object {
+              wpi::nt::Value value;
+              {
+                py::gil_scoped_release release;
+                auto entry = wpi::SmartDashboard::GetEntry(key);
+                value = wpi::nt::GetEntryValue(entry.GetHandle());
+              }
+              if (!value || value.type() != NT_DOUBLE_ARRAY) return defaultValue;
+              return py::cast(value.GetDoubleArray());
+          }
+      PutStringArray:
+      SetDefaultStringArray:
+      GetStringArray:
+        cpp_code: |
+          [](std::string_view key, py::object defaultValue) -> py::object {
+              wpi::nt::Value value;
+              {
+                py::gil_scoped_release release;
+                auto entry = wpi::SmartDashboard::GetEntry(key);
+                value = wpi::nt::GetEntryValue(entry.GetHandle());
+              }
+              if (!value || value.type() != NT_STRING_ARRAY) return defaultValue;
+              return py::cast(value.GetStringArray());
+          }
+      PutRaw:
+      SetDefaultRaw:
+      GetRaw:
+        cpp_code: |
+          [](std::string_view key, py::object defaultValue) -> py::object {
+              wpi::nt::Value value;
+              {
+                py::gil_scoped_release release;
+                auto entry = wpi::SmartDashboard::GetEntry(key);
+                value = wpi::nt::GetEntryValue(entry.GetHandle());
+              }
+              if (!value || value.type() != NT_STRING) return defaultValue;
+              return py::cast(value.GetString());
+          }
+      PutValue:
+      SetDefaultValue:
+      GetValue:
+      PostListenerTask:
+      UpdateValues:
+
+inline_code: |-
+  // ensure that the smart dashboard data is released when python shuts down
+  static int unused; // the capsule needs something to reference
+  py::capsule cleanup(&unused, [](void *) {
+      rpy::destroySmartDashboardData();
+  });
+  m.add_object("_sd_cleanup", cleanup);
+  m.def("_clearSmartDashboardData", &rpy::clearSmartDashboardData);

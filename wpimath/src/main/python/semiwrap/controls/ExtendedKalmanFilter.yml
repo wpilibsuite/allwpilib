@@ -1,0 +1,66 @@
+defaults:
+  subpackage: estimator
+
+classes:
+  wpi::math::ExtendedKalmanFilter:
+    template_params:
+    - int States
+    - int Inputs
+    - int Outputs
+    methods:
+      ExtendedKalmanFilter:
+        overloads:
+          ? std::function<StateVector (const StateVector&, const InputVector&)>, std::function<OutputVector (const StateVector&, const InputVector&)>, const StateArray&, const OutputArray&, wpi::units::second_t
+          :
+          ? std::function<StateVector (const StateVector&, const InputVector&)>, std::function<OutputVector (const StateVector&, const InputVector&)>, const StateArray&, const OutputArray&, std::function<OutputVector (const OutputVector&, const OutputVector&)>, std::function<StateVector (const StateVector&, const StateVector&)>, wpi::units::second_t
+          :
+      P:
+        overloads:
+          '[const]':
+          int, int [const]:
+      SetP:
+      Xhat:
+        overloads:
+          '[const]':
+          int [const]:
+      SetXhat:
+        overloads:
+          const StateVector&:
+          int, double:
+      Reset:
+      Predict:
+      Correct:
+        overloads:
+          const InputVector&, const OutputVector&:
+          const InputVector&, const OutputVector&, const Matrixd<Outputs, Outputs>&:
+          ? const InputVector&, const Vectord<Rows>&, std::function<Vectord<Rows> (const StateVector&, const InputVector&)>, const Matrixd<Rows, Rows>&
+          : ignore: true
+          ? const InputVector&, const Vectord<Rows>&, std::function<Vectord<Rows> (const StateVector&, const InputVector&)>, const Matrixd<Rows, Rows>&, std::function<Vectord<Rows> (const Vectord<Rows>&, const Vectord<Rows>&)>, std::function<StateVector (const StateVector&, const StateVector&)>
+          : ignore: true
+
+
+templates:
+  ExtendedKalmanFilter_1_1_1:
+    qualname: wpi::math::ExtendedKalmanFilter
+    params:
+    - 1
+    - 1
+    - 1
+  ExtendedKalmanFilter_2_1_1:
+    qualname: wpi::math::ExtendedKalmanFilter
+    params:
+    - 2
+    - 1
+    - 1
+  ExtendedKalmanFilter_2_1_2:
+    qualname: wpi::math::ExtendedKalmanFilter
+    params:
+    - 2
+    - 1
+    - 2
+  ExtendedKalmanFilter_2_2_2:
+    qualname: wpi::math::ExtendedKalmanFilter
+    params:
+    - 2
+    - 2
+    - 2

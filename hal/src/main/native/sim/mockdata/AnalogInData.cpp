@@ -5,16 +5,16 @@
 #include "../PortsInternal.h"
 #include "AnalogInDataInternal.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeAnalogInData() {
   static AnalogInData sind[kNumAnalogInputs];
-  ::hal::SimAnalogInData = sind;
+  ::wpi::hal::SimAnalogInData = sind;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-AnalogInData* hal::SimAnalogInData;
+AnalogInData* wpi::hal::SimAnalogInData;
 void AnalogInData::ResetData() {
   initialized.Reset(false);
   simDevice = 0;

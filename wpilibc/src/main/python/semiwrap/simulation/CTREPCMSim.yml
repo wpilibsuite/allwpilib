@@ -1,0 +1,36 @@
+extra_includes:
+- wpi/hardware/pneumatic/Compressor.hpp
+
+classes:
+  wpi::sim::CTREPCMSim:
+    typealias:
+    - wpi::PneumaticsBase
+    force_type_casters:
+    - std::function
+    methods:
+      CTREPCMSim:
+        overloads:
+          '':
+          int:
+          const PneumaticsBase&:
+      RegisterInitializedCallback:
+      GetInitialized:
+      SetInitialized:
+      RegisterSolenoidOutputCallback:
+      GetSolenoidOutput:
+      SetSolenoidOutput:
+      RegisterCompressorOnCallback:
+      GetCompressorOn:
+      SetCompressorOn:
+      RegisterClosedLoopEnabledCallback:
+      GetClosedLoopEnabled:
+      SetClosedLoopEnabled:
+      RegisterPressureSwitchCallback:
+      GetPressureSwitch:
+      SetPressureSwitch:
+      RegisterCompressorCurrentCallback:
+      GetCompressorCurrent:
+      SetCompressorCurrent:
+      GetAllSolenoidOutputs:
+      SetAllSolenoidOutputs:
+      ResetData:

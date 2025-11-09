@@ -5,11 +5,12 @@
 #include <cstdio>
 #include <thread>
 
-#include <cameraserver/CameraServer.h>
-#include <frc/TimedRobot.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/types.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+
+#include "wpi/cameraserver/CameraServer.hpp"
+#include "wpi/framework/TimedRobot.hpp"
 
 /**
  * This is a demo program showing the use of OpenCV to do vision processing. The
@@ -17,7 +18,7 @@
  * and sent to the dashboard. OpenCV has many methods for different types of
  * processing.
  */
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   Robot() {
     // We need to run our vision program in a separate thread. If not, our robot
@@ -36,15 +37,15 @@ class Robot : public frc::TimedRobot {
  private:
   static void VisionThread() {
     // Get the USB camera from CameraServer
-    cs::UsbCamera camera = frc::CameraServer::StartAutomaticCapture();
+    wpi::cs::UsbCamera camera = wpi::CameraServer::StartAutomaticCapture();
     // Set the resolution
     camera.SetResolution(640, 480);
 
     // Get a CvSink. This will capture Mats from the Camera
-    cs::CvSink cvSink = frc::CameraServer::GetVideo();
+    wpi::cs::CvSink cvSink = wpi::CameraServer::GetVideo();
     // Setup a CvSource. This will send images back to the Dashboard
-    cs::CvSource outputStream =
-        frc::CameraServer::PutVideo("Rectangle", 640, 480);
+    wpi::cs::CvSource outputStream =
+        wpi::CameraServer::PutVideo("Rectangle", 640, 480);
 
     // Mats are very memory expensive. Lets reuse this Mat.
     cv::Mat mat;
@@ -70,8 +71,8 @@ class Robot : public frc::TimedRobot {
 #endif
 };
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

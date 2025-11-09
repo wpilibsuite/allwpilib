@@ -14,33 +14,33 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <networktables/BooleanTopic.h>
-#include <networktables/IntegerTopic.h>
-#include <networktables/NetworkTableInstance.h>
-#include <networktables/ProtobufTopic.h>
-#include <networktables/StringArrayTopic.h>
-#include <networktables/StringTopic.h>
-#include <wpi/EventVector.h>
-#include <wpi/SafeThread.h>
-#include <wpi/SmallVector.h>
-#include <wpi/condition_variable.h>
-#include <wpi/mutex.h>
-#include <wpi/timestamp.h>
 
 #include "HALInitializer.h"
 #include "SystemServerInternal.h"
-#include "hal/DriverStation.h"
-#include "hal/Errors.h"
-#include "hal/proto/ControlData.h"
-#include "hal/proto/ErrorInfo.h"
-#include "hal/proto/JoystickDescriptor.h"
-#include "hal/proto/JoystickRumbleData.h"
-#include "hal/proto/MatchInfo.h"
-#include "hal/proto/OpMode.h"
 #include "mrc/NtNetComm.h"
+#include "wpi/hal/DriverStation.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/proto/ControlData.h"
+#include "wpi/hal/proto/ErrorInfo.h"
+#include "wpi/hal/proto/JoystickDescriptor.h"
+#include "wpi/hal/proto/JoystickRumbleData.h"
+#include "wpi/hal/proto/MatchInfo.h"
+#include "wpi/hal/proto/OpMode.h"
+#include "wpi/nt/BooleanTopic.hpp"
+#include "wpi/nt/IntegerTopic.hpp"
+#include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/nt/ProtobufTopic.hpp"
+#include "wpi/nt/StringArrayTopic.hpp"
+#include "wpi/nt/StringTopic.hpp"
+#include "wpi/util/EventVector.hpp"
+#include "wpi/util/SafeThread.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/condition_variable.hpp"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/timestamp.h"
 
 static_assert(sizeof(int32_t) >= sizeof(int),
-              "FRC_NetworkComm status variable is larger than 32 bits");
+              "WPILIB_NetworkComm status variable is larger than 32 bits");
 
 static_assert(MRC_MAX_NUM_AXES == HAL_kMaxJoystickAxes);
 static_assert(MRC_MAX_NUM_POVS == HAL_kMaxJoystickPOVs);
@@ -62,43 +62,43 @@ static_assert(std::is_standard_layout_v<JoystickDataCache>);
 // static_assert(std::is_trivial_v<JoystickDataCache>);
 
 struct SystemServerDriverStation {
-  nt::NetworkTableInstance ntInst;
-  nt::BooleanPublisher hasUserCodePublisher;
-  nt::BooleanPublisher hasUserCodeReadyPublisher;
+  wpi::nt::NetworkTableInstance ntInst;
+  wpi::nt::BooleanPublisher hasUserCodePublisher;
+  wpi::nt::BooleanPublisher hasUserCodeReadyPublisher;
 
-  nt::BooleanSubscriber hasSetWallClockSubscriber;
+  wpi::nt::BooleanSubscriber hasSetWallClockSubscriber;
 
-  nt::ProtobufSubscriber<mrc::ControlData> controlDataSubscriber;
-  nt::ProtobufSubscriber<mrc::MatchInfo> matchInfoSubscriber;
-  nt::StringSubscriber gameSpecificMessageSubscriber;
+  wpi::nt::ProtobufSubscriber<mrc::ControlData> controlDataSubscriber;
+  wpi::nt::ProtobufSubscriber<mrc::MatchInfo> matchInfoSubscriber;
+  wpi::nt::StringSubscriber gameSpecificMessageSubscriber;
 
-  std::array<nt::ProtobufSubscriber<mrc::JoystickDescriptor>,
+  std::array<wpi::nt::ProtobufSubscriber<mrc::JoystickDescriptor>,
              MRC_MAX_NUM_JOYSTICKS>
       joystickDescriptorTopics;
 
-  nt::StringPublisher versionPublisher;
-  nt::StringPublisher consoleLinePublisher;
-  nt::ProtobufPublisher<mrc::ErrorInfo> errorInfoPublisher;
+  wpi::nt::StringPublisher versionPublisher;
+  wpi::nt::StringPublisher consoleLinePublisher;
+  wpi::nt::ProtobufPublisher<mrc::ErrorInfo> errorInfoPublisher;
 
-  std::array<nt::ProtobufPublisher<mrc::JoystickRumbleData>,
+  std::array<wpi::nt::ProtobufPublisher<mrc::JoystickRumbleData>,
              MRC_MAX_NUM_JOYSTICKS>
       joystickRumbleTopics;
 
-  nt::ProtobufPublisher<std::vector<mrc::OpMode>> teleopOpModes;
-  nt::ProtobufPublisher<std::vector<mrc::OpMode>> autoOpModes;
-  nt::ProtobufPublisher<std::vector<mrc::OpMode>> testOpModes;
-  nt::IntegerPublisher traceOpModePublisher;
+  wpi::nt::ProtobufPublisher<std::vector<mrc::OpMode>> teleopOpModes;
+  wpi::nt::ProtobufPublisher<std::vector<mrc::OpMode>> autoOpModes;
+  wpi::nt::ProtobufPublisher<std::vector<mrc::OpMode>> testOpModes;
+  wpi::nt::IntegerPublisher traceOpModePublisher;
 
   NT_Listener controlDataListener;
 
-  wpi::mutex controlDataMutex;
-  wpi::ProtobufMessage<mrc::ControlData> controlDataMsg;
-  nt::Value lastValue;
+  wpi::util::mutex controlDataMutex;
+  wpi::util::ProtobufMessage<mrc::ControlData> controlDataMsg;
+  wpi::nt::Value lastValue;
 
-  explicit SystemServerDriverStation(nt::NetworkTableInstance inst) {
+  explicit SystemServerDriverStation(wpi::nt::NetworkTableInstance inst) {
     ntInst = inst;
 
-    nt::PubSubOptions options;
+    wpi::nt::PubSubOptions options;
     options.sendAll = true;
     options.keepDuplicates = true;
     options.periodic = 0.005;
@@ -179,7 +179,7 @@ struct SystemServerDriverStation {
 
     ntInst.AddListener(
         controlDataSubscriber, NT_EVENT_VALUE_REMOTE | NT_EVENT_UNPUBLISH,
-        [this](const nt::Event& event) { HandleListener(event); });
+        [this](const wpi::nt::Event& event) { HandleListener(event); });
 
     traceOpModePublisher =
         ntInst.GetIntegerTopic(ROBOT_CURRENT_OPMODE_TRACE_PATH)
@@ -187,7 +187,7 @@ struct SystemServerDriverStation {
     traceOpModePublisher.GetTopic().SetCached(false);
   }
 
-  void HandleListener(const nt::Event& event);
+  void HandleListener(const wpi::nt::Event& event);
 
   bool GetLastControlData(mrc::ControlData* data, int64_t* time) {
     std::scoped_lock lock{controlDataMutex};
@@ -205,14 +205,14 @@ struct SystemServerDriverStation {
 };
 
 struct FRCDriverStation {
-  wpi::EventVector newDataEvents;
+  wpi::util::EventVector newDataEvents;
 };
 }  // namespace
 
 static ::SystemServerDriverStation* systemServerDs;
 static ::FRCDriverStation* driverStation;
 
-void SystemServerDriverStation::HandleListener(const nt::Event& event) {
+void SystemServerDriverStation::HandleListener(const wpi::nt::Event& event) {
   auto valueEvent = event.GetValueEventData();
 
   bool isValid = valueEvent && valueEvent->value.IsRaw();
@@ -224,7 +224,7 @@ void SystemServerDriverStation::HandleListener(const nt::Event& event) {
     } else {
       // We've either been unpublished, or type changed.
       // Treat either as a disconnect.
-      lastValue = nt::Value{};
+      lastValue = wpi::nt::Value{};
     }
   }
   if (isValid) {
@@ -233,7 +233,7 @@ void SystemServerDriverStation::HandleListener(const nt::Event& event) {
 }
 
 // Message and Data variables
-static wpi::mutex msgMutex;
+static wpi::util::mutex msgMutex;
 
 void JoystickDataCache::Update(const mrc::ControlData& data) {
   matchTime = data.MatchTime;
@@ -256,7 +256,8 @@ void JoystickDataCache::Update(const mrc::ControlData& data) {
     auto newAxes = newStick.Axes.Axes();
     auto newPovs = newStick.Povs.Povs();
 
-    axes[count].count = newAxes.size();
+    axes[count].available = newStick.Axes.GetAvailable();
+
     for (size_t i = 0; i < newAxes.size(); i++) {
       axes[count].raw[i] = newAxes[i];
       int16_t axisValue = newAxes[i];
@@ -267,12 +268,13 @@ void JoystickDataCache::Update(const mrc::ControlData& data) {
       }
     }
 
-    povs[count].count = newPovs.size();
+    // When mrccomm switches this to available, move to available
+    povs[count].available = (1lu << newPovs.size()) - 1;
     for (size_t i = 0; i < newPovs.size(); i++) {
       povs[count].povs[i] = static_cast<HAL_JoystickPOV>(newPovs[i]);
     }
 
-    buttons[count].count = newStick.Buttons.GetMaxAvailableCount();
+    buttons[count].available = newStick.Buttons.GetAvailable();
     buttons[count].buttons = newStick.Buttons.Buttons;
   }
 }
@@ -286,7 +288,7 @@ static JoystickDataCache caches[2];
 static JoystickDataCache* currentRead = &caches[0];
 static JoystickDataCache* cacheToUpdate = &caches[1];
 
-static wpi::mutex cacheMutex;
+static wpi::util::mutex cacheMutex;
 
 namespace {
 struct TcpCache {
@@ -304,7 +306,7 @@ static TcpCache tcpCaches[2];
 static TcpCache* tcpCurrentRead = &tcpCaches[0];
 static TcpCache* tcpCacheToUpdate = &tcpCaches[1];
 
-static wpi::mutex tcpCacheMutex;
+static wpi::util::mutex tcpCacheMutex;
 
 void TcpCache::Update() {
   auto newMatchInfo = systemServerDs->matchInfoSubscriber.Get();
@@ -339,8 +341,6 @@ void TcpCache::Update() {
 
     desc.isGamepad = newDesc.IsGamepad;
     desc.type = newDesc.Type;
-    desc.buttonCount = newDesc.GetButtonsCount();
-    desc.povCount = newDesc.GetPovsCount();
 
     auto joystickName = newDesc.GetName();
     auto joystickNameLen =
@@ -350,33 +350,25 @@ void TcpCache::Update() {
       std::memcpy(desc.name, joystickName.data(), joystickNameLen);
     }
     desc.name[joystickNameLen] = '\0';
-
-    auto sticks = newDesc.AxesTypes();
-
-    desc.axisCount = sticks.size();
-
-    for (size_t i = 0; i < sticks.size(); i++) {
-      desc.axisTypes[i] = sticks[i];
-    }
   }
 }
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeFRCDriverStation() {
   std::memset(&newestControlWord, 0, sizeof(newestControlWord));
   static FRCDriverStation ds;
   driverStation = &ds;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-namespace hal {
+namespace wpi::hal {
 static void DefaultPrintErrorImpl(const char* line, size_t size) {
   std::fwrite(line, size, 1, stderr);
 }
-}  // namespace hal
+}  // namespace wpi::hal
 
 static std::atomic<void (*)(const char* line, size_t size)> gPrintErrorImpl{
-    hal::DefaultPrintErrorImpl};
+    wpi::hal::DefaultPrintErrorImpl};
 
 extern "C" {
 
@@ -454,7 +446,7 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
 }
 
 void HAL_SetPrintErrorImpl(void (*func)(const char* line, size_t size)) {
-  gPrintErrorImpl.store(func ? func : hal::DefaultPrintErrorImpl);
+  gPrintErrorImpl.store(func ? func : wpi::hal::DefaultPrintErrorImpl);
 }
 
 int32_t HAL_SendConsoleLine(const char* line) {
@@ -490,12 +482,13 @@ int32_t HAL_GetJoystickButtons(int32_t joystickNum,
   return 0;
 }
 
-void HAL_GetAllJoystickData(HAL_JoystickAxes* axes, HAL_JoystickPOVs* povs,
+void HAL_GetAllJoystickData(int32_t joystickNum, HAL_JoystickAxes* axes,
+                            HAL_JoystickPOVs* povs,
                             HAL_JoystickButtons* buttons) {
   std::scoped_lock lock{cacheMutex};
-  std::memcpy(axes, currentRead->axes, sizeof(currentRead->axes));
-  std::memcpy(povs, currentRead->povs, sizeof(currentRead->povs));
-  std::memcpy(buttons, currentRead->buttons, sizeof(currentRead->buttons));
+  *axes = currentRead->axes[joystickNum];
+  *povs = currentRead->povs[joystickNum];
+  *buttons = currentRead->buttons[joystickNum];
 }
 
 int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
@@ -544,15 +537,6 @@ void HAL_GetJoystickName(struct WPI_String* name, int32_t joystickNum) {
   auto len = std::strlen(cName);
   auto write = WPI_AllocateString(name, len);
   std::memcpy(write, cName, len);
-}
-
-int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis) {
-  HAL_JoystickDescriptor joystickDesc;
-  if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {
-    return -1;
-  } else {
-    return joystickDesc.axisTypes[axis];
-  }
 }
 
 int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
@@ -608,7 +592,7 @@ HAL_Bool HAL_RefreshDSData(void) {
   int64_t dataTime{0};
   bool dataValid = systemServerDs->GetLastControlData(&newestData, &dataTime);
 
-  // auto now = wpi::Now();
+  // auto now = wpi::util::Now();
   // auto delta = now - dataTime;
 
   bool updatedData = false;
@@ -638,7 +622,7 @@ HAL_Bool HAL_RefreshDSData(void) {
 }
 
 void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
   driverStation->newDataEvents.Add(handle);
 }
 
@@ -656,17 +640,17 @@ HAL_Bool HAL_GetSystemTimeValid(int32_t* status) {
 
 }  // extern "C"
 
-namespace hal {
+namespace wpi::hal {
 void InitializeDriverStation() {
-  systemServerDs = new ::SystemServerDriverStation{hal::GetSystemServer()};
+  systemServerDs = new ::SystemServerDriverStation{wpi::hal::GetSystemServer()};
 }
 
 void WaitForInitialPacket() {
-  wpi::Event waitForInitEvent;
+  wpi::util::Event waitForInitEvent;
   driverStation->newDataEvents.Add(waitForInitEvent.GetHandle());
   bool timed_out = false;
-  wpi::WaitForObject(waitForInitEvent.GetHandle(), 0.1, &timed_out);
+  wpi::util::WaitForObject(waitForInitEvent.GetHandle(), 0.1, &timed_out);
   // Don't care what the result is, just want to give it a chance.
   driverStation->newDataEvents.Remove(waitForInitEvent.GetHandle());
 }
-}  // namespace hal
+}  // namespace wpi::hal

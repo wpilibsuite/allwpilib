@@ -1,0 +1,26 @@
+extra_includes:
+- wpi/hardware/led/AddressableLED.hpp
+
+classes:
+  wpi::sim::AddressableLEDSim:
+    force_type_casters:
+    - std::function
+    methods:
+      AddressableLEDSim:
+        overloads:
+          const AddressableLED&:
+          int:
+      RegisterInitializedCallback:
+      GetInitialized:
+      SetInitialized:
+      RegisterLengthCallback:
+      GetLength:
+      SetLength:
+      RegisterDataCallback:
+      GetData:
+      SetData:
+      RegisterStartCallback:
+      GetStart:
+      SetStart:
+      GetGlobalData:
+      SetGlobalData:

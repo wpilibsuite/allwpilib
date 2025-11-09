@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/uv/AsyncFunction.h"  // NOLINT(build/include_order)
+#include "wpi/net/uv/AsyncFunction.hpp"  // NOLINT(build/include_order)
 
 #include <memory>
 #include <thread>
@@ -10,10 +10,10 @@
 
 #include <gtest/gtest.h>
 
-#include "wpinet/uv/Loop.h"
-#include "wpinet/uv/Prepare.h"
+#include "wpi/net/uv/Loop.hpp"
+#include "wpi/net/uv/Prepare.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 TEST(UvAsyncFunctionTest, Basic) {
   int prepare_cb_called = 0;
@@ -44,7 +44,7 @@ TEST(UvAsyncFunctionTest, Basic) {
 
   async->error.connect([](Error) { FAIL(); });
   async->closed.connect([&] { close_cb_called++; });
-  async->wakeup = [&](promise<int> out, int v) {
+  async->wakeup = [&](wpi::util::promise<int> out, int v) {
     ++async_cb_called[v];
     if (v == 1) {
       async->Close();
@@ -82,7 +82,7 @@ TEST(UvAsyncFunctionTest, Ref) {
   });
   prepare->Start();
 
-  async->wakeup = [&](promise<int> out, int v, int& r) {
+  async->wakeup = [&](wpi::util::promise<int> out, int v, int& r) {
     r = v;
     async->Close();
     prepare->Close();
@@ -121,7 +121,7 @@ TEST(UvAsyncFunctionTest, Movable) {
   });
   prepare->Start();
 
-  async->wakeup = [&](promise<std::unique_ptr<int>> out,
+  async->wakeup = [&](wpi::util::promise<std::unique_ptr<int>> out,
                       std::unique_ptr<int> v) {
     async->Close();
     prepare->Close();
@@ -153,7 +153,7 @@ TEST(UvAsyncFunctionTest, CallIgnoreResult) {
   });
   prepare->Start();
 
-  async->wakeup = [&](promise<std::unique_ptr<int>> out,
+  async->wakeup = [&](wpi::util::promise<std::unique_ptr<int>> out,
                       std::unique_ptr<int> v) {
     async->Close();
     prepare->Close();
@@ -184,7 +184,7 @@ TEST(UvAsyncFunctionTest, VoidCall) {
   });
   prepare->Start();
 
-  async->wakeup = [&](promise<void> out) {
+  async->wakeup = [&](wpi::util::promise<void> out) {
     async->Close();
     prepare->Close();
     out.set_value();
@@ -216,7 +216,7 @@ TEST(UvAsyncFunctionTest, WaitFor) {
   });
   prepare->Start();
 
-  async->wakeup = [&](promise<int> out) {
+  async->wakeup = [&](wpi::util::promise<int> out) {
     async->Close();
     prepare->Close();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -249,7 +249,7 @@ TEST(UvAsyncFunctionTest, VoidWaitFor) {
   });
   prepare->Start();
 
-  async->wakeup = [&](promise<void> out) {
+  async->wakeup = [&](wpi::util::promise<void> out) {
     async->Close();
     prepare->Close();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -263,4 +263,4 @@ TEST(UvAsyncFunctionTest, VoidWaitFor) {
   }
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

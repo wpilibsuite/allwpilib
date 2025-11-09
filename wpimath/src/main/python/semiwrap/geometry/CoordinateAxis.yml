@@ -1,0 +1,10 @@
+classes:
+  wpi::math::CoordinateAxis:
+    methods:
+      CoordinateAxis:
+      N:
+      S:
+      E:
+      W:
+      U:
+      D:

@@ -1,0 +1,29 @@
+apply plugin: 'cpp'
+apply plugin: 'visual-studio'
+apply plugin: 'edu.wpi.first.NativeUtils'
+
+ext {
+    nativeName = 'catch2'
+}
+
+apply from: "${rootDir}/shared/config.gradle"
+
+model {
+    components {
+        "${nativeName}"(NativeLibrarySpec) {
+            sources.cpp {
+                source {
+                    srcDirs "src/main/native/cpp"
+                    include '**/*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/include'
+                }
+            }
+        }
+    }
+}
+
+project(':').libraryBuild.dependsOn build
+
+apply from: 'publish.gradle'

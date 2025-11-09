@@ -5,11 +5,11 @@
 #include "DigitalInternal.h"
 
 #include "PortsInternal.h"
-#include "hal/Errors.h"
-#include "hal/handles/DigitalHandleResource.h"
-#include "hal/handles/HandlesInternal.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/handles/DigitalHandleResource.h"
+#include "wpi/hal/handles/HandlesInternal.h"
 
-namespace hal {
+namespace wpi::hal {
 
 DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
                       kNumDigitalChannels + kNumPWMHeaders>*
@@ -45,4 +45,4 @@ int32_t GetDigitalInputChannel(HAL_DigitalHandle handle, int32_t* status) {
 
   return digital->channel;
 }
-}  // namespace hal
+}  // namespace wpi::hal

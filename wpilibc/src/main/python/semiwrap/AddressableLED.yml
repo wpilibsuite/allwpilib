@@ -1,0 +1,44 @@
+functions:
+  format_as:
+    ignore: true
+
+classes:
+  wpi::AddressableLED:
+    methods:
+      AddressableLED:
+      SetLength:
+      SetData:
+        overloads:
+          std::span<const LEDData>:
+          std::initializer_list<LEDData>:
+            ignore: true
+      SetColorOrder:
+      GetChannel:
+      SetStart:
+      GetStart:
+      SetGlobalData:
+    enums:
+      ColorOrder:
+  wpi::AddressableLED::LEDData:
+    force_no_trampoline: true
+    base_qualnames:
+      HAL_AddressableLEDData: ::HAL_AddressableLEDData
+    methods:
+      LEDData:
+        overloads:
+          '':
+          int, int, int:
+            param_override:
+              _r:
+                name: r
+              _g:
+                name: g
+              _b:
+                name: b
+      SetRGB:
+      SetHSV:
+      SetLED:
+        overloads:
+          const Color&:
+          const Color8Bit&:
+

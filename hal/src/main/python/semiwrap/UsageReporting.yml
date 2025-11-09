@@ -1,0 +1,10 @@
+strip_prefixes:
+- HAL_
+
+functions:
+  HAL_ReportUsage:
+    overloads:
+      const struct WPI_String*, const struct WPI_String*:
+        ignore: true
+      std::string_view, std::string_view:
+      std::string_view, int, std::string_view:

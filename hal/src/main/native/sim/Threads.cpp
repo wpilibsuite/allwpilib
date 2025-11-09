@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/Threads.h"
+#include "wpi/hal/Threads.h"
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeThreads() {}
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 int32_t HAL_GetThreadPriority(NativeThreadHandle handle, HAL_Bool* isRealTime,
                               int32_t* status) {

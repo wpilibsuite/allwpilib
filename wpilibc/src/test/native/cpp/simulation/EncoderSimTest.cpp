@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/EncoderSim.h"  // NOLINT(build/include_order)
+#include "wpi/simulation/EncoderSim.hpp"  // NOLINT(build/include_order)
 
 #include <gtest/gtest.h>
-#include <hal/HAL.h>
-#include <wpi/deprecated.h>
 
-#include "callback_helpers/TestCallbackHelpers.h"
-#include "frc/Encoder.h"
+#include "callback_helpers/TestCallbackHelpers.hpp"
+#include "wpi/hal/HAL.h"
+#include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/util/deprecated.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 
 namespace {
 constexpr double kDefaultDistancePerPulse = .0005;
@@ -232,4 +232,4 @@ TEST(EncoderSimTest, Reset) {
   EXPECT_EQ(0, encoder.GetDistance());
 }
 
-}  // namespace frc::sim
+}  // namespace wpi::sim

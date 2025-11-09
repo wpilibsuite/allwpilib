@@ -3,26 +3,26 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <networktables/BooleanTopic.h>
-#include <networktables/NetworkTableInstance.h>
 
-#include "frc/event/EventLoop.h"
-#include "frc/event/NetworkBooleanEvent.h"
+#include "wpi/event/EventLoop.hpp"
+#include "wpi/event/NetworkBooleanEvent.hpp"
+#include "wpi/nt/BooleanTopic.hpp"
+#include "wpi/nt/NetworkTableInstance.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 class NetworkBooleanEventTest : public ::testing::Test {
  public:
   NetworkBooleanEventTest() {
-    m_inst = nt::NetworkTableInstance::Create();
+    m_inst = wpi::nt::NetworkTableInstance::Create();
     m_inst.StartLocal();
   }
 
   ~NetworkBooleanEventTest() override {
-    nt::NetworkTableInstance::Destroy(m_inst);
+    wpi::nt::NetworkTableInstance::Destroy(m_inst);
   }
 
-  nt::NetworkTableInstance m_inst;
+  wpi::nt::NetworkTableInstance m_inst;
 };
 
 TEST_F(NetworkBooleanEventTest, Set) {

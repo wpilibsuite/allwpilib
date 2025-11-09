@@ -9,7 +9,7 @@ apply from: "${rootDir}/shared/config.gradle"
 
 ext {
     baseId = nativeName
-    groupId = "edu.wpi.first.${nativeName}"
+    groupId = "org.wpilib.${nativeName}"
 }
 
 apply from: "${rootDir}/shared/java/javacommon.gradle"
@@ -23,6 +23,7 @@ ext {
 staticGtestConfigs["${nativeName}Test"] = []
 
 apply from: "${rootDir}/shared/googletest.gradle"
+apply from: "${rootDir}/shared/catch2.gradle"
 
 model {
     components {
@@ -168,10 +169,4 @@ model {
 }
 
 apply from: "${rootDir}/shared/cppJavaDesktopTestTask.gradle"
-
-tasks.withType(RunTestExecutable) {
-    args "--gtest_output=xml:test_detail.xml"
-    outputs.dir outputDir
-}
-
 apply from: "${rootDir}/shared/javacpp/publish.gradle"

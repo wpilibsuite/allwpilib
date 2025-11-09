@@ -5,9 +5,8 @@
 #include <cstdio>
 #include <memory>
 
-#include <hal/Extensions.h>
-
-#include "HALSimWSServer.h"
+#include "wpi/hal/Extensions.h"
+#include "wpi/halsim/ws_server/HALSimWSServer.hpp"
 
 using namespace std::placeholders;
 using namespace wpilibws;
@@ -18,7 +17,7 @@ extern "C" {
 #if defined(WIN32) || defined(_WIN32)
 __declspec(dllexport)
 #endif
-    int HALSIM_InitExtension(void) {
+int HALSIM_InitExtension(void) {
   std::puts("Websocket WS Server Initializing.");
 
   HAL_OnShutdown(nullptr, [](void*) { gServer.reset(); });

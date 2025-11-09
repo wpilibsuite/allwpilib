@@ -4,32 +4,32 @@
 
 #include <numbers>
 
-#include <frc/DriverStation.h>
-#include <frc/Encoder.h>
-#include <frc/TimedRobot.h>
-#include <frc/XboxController.h>
-#include <frc/controller/LinearQuadraticRegulator.h>
-#include <frc/drive/DifferentialDrive.h>
-#include <frc/estimator/KalmanFilter.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc/system/LinearSystemLoop.h>
-#include <frc/system/plant/DCMotor.h>
-#include <frc/system/plant/LinearSystemId.h>
-#include <units/angular_velocity.h>
+#include "wpi/drive/DifferentialDrive.hpp"
+#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/XboxController.hpp"
+#include "wpi/framework/TimedRobot.hpp"
+#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/math/controller/LinearQuadraticRegulator.hpp"
+#include "wpi/math/estimator/KalmanFilter.hpp"
+#include "wpi/math/system/LinearSystemLoop.hpp"
+#include "wpi/math/system/plant/DCMotor.hpp"
+#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/units/angular_velocity.hpp"
 
 /**
  * This is a sample program to demonstrate how to use a state-space controller
  * to control a flywheel.
  */
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
   static constexpr int kMotorPort = 0;
   static constexpr int kEncoderAChannel = 0;
   static constexpr int kEncoderBChannel = 1;
   static constexpr int kJoystickPort = 0;
-  static constexpr units::radians_per_second_t kSpinup = 500_rpm;
+  static constexpr wpi::units::radians_per_second_t kSpinup = 500_rpm;
 
-  static constexpr units::kilogram_square_meter_t kFlywheelMomentOfInertia =
-      0.00032_kg_sq_m;
+  static constexpr wpi::units::kilogram_square_meter_t
+      kFlywheelMomentOfInertia = 0.00032_kg_sq_m;
 
   // Reduction between motors and encoder, as output over input. If the flywheel
   // spins slower than the motors, this number should be greater than one.
@@ -41,19 +41,20 @@ class Robot : public frc::TimedRobot {
   // States: [velocity], in radians per second.
   // Inputs (what we can "put in"): [voltage], in volts.
   // Outputs (what we can measure): [velocity], in radians per second.
-  frc::LinearSystem<1, 1, 1> m_flywheelPlant =
-      frc::LinearSystemId::FlywheelSystem(
-          frc::DCMotor::NEO(2), kFlywheelMomentOfInertia, kFlywheelGearing);
+  wpi::math::LinearSystem<1, 1, 1> m_flywheelPlant =
+      wpi::math::LinearSystemId::FlywheelSystem(wpi::math::DCMotor::NEO(2),
+                                                kFlywheelMomentOfInertia,
+                                                kFlywheelGearing);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
-  frc::KalmanFilter<1, 1, 1> m_observer{
+  wpi::math::KalmanFilter<1, 1, 1> m_observer{
       m_flywheelPlant,
       {3.0},   // How accurate we think our model is
       {0.01},  // How accurate we think our encoder data is
       20_ms};
 
   // A LQR uses feedback to create voltage commands.
-  frc::LinearQuadraticRegulator<1, 1> m_controller{
+  wpi::math::LinearQuadraticRegulator<1, 1> m_controller{
       m_flywheelPlant,
       // qelms. Velocity error tolerance, in radians per second. Decrease this
       // to more heavily penalize state excursion, or make the controller behave
@@ -70,14 +71,14 @@ class Robot : public frc::TimedRobot {
 
   // The state-space loop combines a controller, observer, feedforward and plant
   // for easy control.
-  frc::LinearSystemLoop<1, 1, 1> m_loop{m_flywheelPlant, m_controller,
-                                        m_observer, 12_V, 20_ms};
+  wpi::math::LinearSystemLoop<1, 1, 1> m_loop{m_flywheelPlant, m_controller,
+                                              m_observer, 12_V, 20_ms};
 
   // An encoder set up to measure flywheel velocity in radians per second.
-  frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
+  wpi::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
 
-  frc::PWMSparkMax m_motor{kMotorPort};
-  frc::XboxController m_joystick{kJoystickPort};
+  wpi::PWMSparkMax m_motor{kMotorPort};
+  wpi::XboxController m_joystick{kJoystickPort};
 
  public:
   Robot() {
@@ -86,7 +87,7 @@ class Robot : public frc::TimedRobot {
   }
 
   void TeleopInit() override {
-    m_loop.Reset(frc::Vectord<1>{m_encoder.GetRate()});
+    m_loop.Reset(wpi::math::Vectord<1>{m_encoder.GetRate()});
   }
 
   void TeleopPeriodic() override {
@@ -94,14 +95,14 @@ class Robot : public frc::TimedRobot {
     // setpoint of a PID controller.
     if (m_joystick.GetRightBumperButton()) {
       // We pressed the bumper, so let's set our next reference
-      m_loop.SetNextR(frc::Vectord<1>{kSpinup.value()});
+      m_loop.SetNextR(wpi::math::Vectord<1>{kSpinup.value()});
     } else {
       // We released the bumper, so let's spin down
-      m_loop.SetNextR(frc::Vectord<1>{0.0});
+      m_loop.SetNextR(wpi::math::Vectord<1>{0.0});
     }
 
     // Correct our Kalman filter's state vector estimate with encoder data.
-    m_loop.Correct(frc::Vectord<1>{m_encoder.GetRate()});
+    m_loop.Correct(wpi::math::Vectord<1>{m_encoder.GetRate()});
 
     // Update our LQR to generate new voltage commands and use the voltages to
     // predict the next state with out Kalman filter.
@@ -110,12 +111,12 @@ class Robot : public frc::TimedRobot {
     // Send the new calculated voltage to the motors.
     // voltage = duty cycle * battery voltage, so
     // duty cycle = voltage / battery voltage
-    m_motor.SetVoltage(units::volt_t{m_loop.U(0)});
+    m_motor.SetVoltage(wpi::units::volt_t{m_loop.U(0)});
   }
 };
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

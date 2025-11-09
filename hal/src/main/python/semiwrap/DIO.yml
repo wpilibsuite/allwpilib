@@ -1,0 +1,22 @@
+strip_prefixes:
+- HAL_
+
+functions:
+  HAL_InitializeDIOPort:
+  HAL_CheckDIOChannel:
+  HAL_FreeDIOPort:
+  HAL_SetDIOSimDevice:
+  HAL_AllocateDigitalPWM:
+  HAL_FreeDigitalPWM:
+  HAL_SetDigitalPWMRate:
+  HAL_SetDigitalPWMDutyCycle:
+  HAL_SetDigitalPWMPPS:
+  HAL_SetDigitalPWMOutputChannel:
+  HAL_SetDIO:
+  HAL_SetDIODirection:
+  HAL_GetDIO:
+  HAL_GetDIODirection:
+  HAL_Pulse:
+  HAL_PulseMultiple:
+  HAL_IsPulsing:
+  HAL_IsAnyPulsing:

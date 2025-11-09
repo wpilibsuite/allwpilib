@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "UsbCameraListener.h"
+#include "UsbCameraListener.hpp"
 
-#include "Notifier.h"
-#include "WindowsMessagePump.h"
+#include "Notifier.hpp"
+#include "WindowsMessagePump.hpp"
 
 #include <dbt.h>  // NOLINT(build/include_order)
 
@@ -13,7 +13,7 @@
 
 #define IDT_TIMER1 1001
 
-using namespace cs;
+using namespace wpi::cs;
 
 class UsbCameraListener::Impl {
  public:
@@ -55,10 +55,11 @@ class UsbCameraListener::Impl {
   }
 
   Notifier& m_notifier;
-  std::unique_ptr<cs::WindowsMessagePump> m_messagePump;
+  std::unique_ptr<wpi::cs::WindowsMessagePump> m_messagePump;
 };
 
-UsbCameraListener::UsbCameraListener(wpi::Logger& logger, Notifier& notifier)
+UsbCameraListener::UsbCameraListener(wpi::util::Logger& logger,
+                                     Notifier& notifier)
     : m_impl{std::make_unique<Impl>(notifier)} {}
 
 UsbCameraListener::~UsbCameraListener() {

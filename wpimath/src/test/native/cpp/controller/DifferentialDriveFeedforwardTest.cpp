@@ -7,12 +7,12 @@
 #include <Eigen/Core>
 #include <gtest/gtest.h>
 
-#include "frc/controller/DifferentialDriveFeedforward.h"
-#include "frc/controller/LinearPlantInversionFeedforward.h"
-#include "frc/system/plant/LinearSystemId.h"
-#include "units/acceleration.h"
-#include "units/length.h"
-#include "units/time.h"
+#include "wpi/math/controller/DifferentialDriveFeedforward.hpp"
+#include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
+#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/time.hpp"
 
 TEST(DifferentialDriveFeedforwardTest, CalculateWithTrackwidth) {
   constexpr auto kVLinear = 1_V / 1_mps;
@@ -20,12 +20,12 @@ TEST(DifferentialDriveFeedforwardTest, CalculateWithTrackwidth) {
   constexpr auto kVAngular = 1_V / 1_rad_per_s;
   constexpr auto kAAngular = 1_V / 1_rad_per_s_sq;
   constexpr auto trackwidth = 1_m;
-  constexpr auto dt = 20_ms;
+  constexpr wpi::units::second_t dt = 20_ms;
 
-  frc::DifferentialDriveFeedforward differentialDriveFeedforward{
+  wpi::math::DifferentialDriveFeedforward differentialDriveFeedforward{
       kVLinear, kALinear, kVAngular, kAAngular, trackwidth};
-  frc::LinearSystem<2, 2, 2> plant =
-      frc::LinearSystemId::IdentifyDrivetrainSystem(
+  wpi::math::LinearSystem<2, 2, 2> plant =
+      wpi::math::LinearSystemId::IdentifyDrivetrainSystem(
           kVLinear, kALinear, kVAngular, kAAngular, trackwidth);
   for (auto currentLeftVelocity = -4_mps; currentLeftVelocity <= 4_mps;
        currentLeftVelocity += 2_mps) {
@@ -54,13 +54,13 @@ TEST(DifferentialDriveFeedforwardTest, CalculateWithoutTrackwidth) {
   constexpr auto kALinear = 1_V / 1_mps_sq;
   constexpr auto kVAngular = 1_V / 1_mps;
   constexpr auto kAAngular = 1_V / 1_mps_sq;
-  constexpr auto dt = 20_ms;
+  constexpr wpi::units::second_t dt = 20_ms;
 
-  frc::DifferentialDriveFeedforward differentialDriveFeedforward{
+  wpi::math::DifferentialDriveFeedforward differentialDriveFeedforward{
       kVLinear, kALinear, kVAngular, kAAngular};
-  frc::LinearSystem<2, 2, 2> plant =
-      frc::LinearSystemId::IdentifyDrivetrainSystem(kVLinear, kALinear,
-                                                    kVAngular, kAAngular);
+  wpi::math::LinearSystem<2, 2, 2> plant =
+      wpi::math::LinearSystemId::IdentifyDrivetrainSystem(kVLinear, kALinear,
+                                                          kVAngular, kAAngular);
   for (auto currentLeftVelocity = -4_mps; currentLeftVelocity <= 4_mps;
        currentLeftVelocity += 2_mps) {
     for (auto currentRightVelocity = -4_mps; currentRightVelocity <= 4_mps;
