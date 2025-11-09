@@ -18,11 +18,3 @@ generatedFileExclude {
 repoRootNameOverride {
   outlineviewer
 }
-
-includeOtherLibs {
-  ^GLFW
-  ^fmt/
-  ^gtest/
-  ^imgui
-  ^implot\.h$
-}

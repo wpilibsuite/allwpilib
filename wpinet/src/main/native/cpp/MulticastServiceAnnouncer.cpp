@@ -11,6 +11,7 @@
 #include "wpi/util/SmallVector.hpp"
 
 extern "C" {
+
 WPI_MulticastServiceAnnouncerHandle WPI_CreateMulticastServiceAnnouncer(
     const char* serviceName, const char* serviceType, int32_t port,
     int32_t txtCount, const char** keys, const char** values)
@@ -66,4 +67,5 @@ int32_t WPI_GetMulticastServiceAnnouncerHasImplementation(
   auto& announcer = manager.announcers[handle];
   return announcer->HasImplementation();
 }
+
 }  // extern "C"

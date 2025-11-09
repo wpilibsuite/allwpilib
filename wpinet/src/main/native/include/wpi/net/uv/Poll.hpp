@@ -5,10 +5,10 @@
 #ifndef WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_POLL_HPP_
 #define WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_POLL_HPP_
 
-#include <uv.h>
-
 #include <functional>
 #include <memory>
+
+#include <uv.h>
 
 #include "wpi/net/uv/Handle.hpp"
 #include "wpi/util/Signal.h"

@@ -2,10 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/commands2/RepeatCommand.hpp"
+
 #include "CommandTestBase.hpp"
 #include "CompositionTestBase.hpp"
 #include "wpi/commands2/FunctionalCommand.hpp"
-#include "wpi/commands2/RepeatCommand.hpp"
 
 using namespace wpi::cmd;
 class RepeatCommandTest : public CommandTestBase {};

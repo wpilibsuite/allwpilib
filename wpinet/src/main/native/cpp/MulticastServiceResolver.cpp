@@ -12,6 +12,7 @@
 #include "wpi/util/MemAlloc.hpp"
 
 extern "C" {
+
 WPI_MulticastServiceResolverHandle WPI_CreateMulticastServiceResolver(
     const char* serviceType)
 
@@ -151,4 +152,5 @@ WPI_ServiceData* WPI_GetMulticastServiceResolverData(
 void WPI_FreeServiceData(WPI_ServiceData* serviceData, int32_t length) {
   std::free(serviceData);
 }
+
 }  // extern "C"

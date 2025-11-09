@@ -2,10 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/net/uv/util.hpp"  // NOLINT(build/include_order)
-
 #include <cstring>
 
+#include "wpi/net/uv/util.hpp"
 #include "wpi/util/SmallString.hpp"
 
 namespace wpi::net::uv {

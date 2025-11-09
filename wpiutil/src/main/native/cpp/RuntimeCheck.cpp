@@ -8,7 +8,7 @@
 #include <cstdio>
 #include <memory>
 #pragma comment(lib, "version.lib")  // for VerQueryValueW
-#include "Windows.h"
+#include <windows.h>
 extern "C" int32_t WPI_IsRuntimeValid(uint32_t* foundMajor,
                                       uint32_t* foundMinor,
                                       uint32_t* expectedMajor,

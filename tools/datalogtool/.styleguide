@@ -18,10 +18,3 @@ generatedFileExclude {
 repoRootNameOverride {
   datalogtool
 }
-
-includeOtherLibs {
-  ^GLFW
-  ^fmt/
-  ^imgui
-  ^libssh/
-}

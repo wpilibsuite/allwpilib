@@ -6,7 +6,6 @@
 #define WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_ASYNCFUNCTION_HPP_
 
 #include <stdint.h>
-#include <uv.h>
 
 #include <concepts>
 #include <functional>
@@ -15,6 +14,8 @@
 #include <tuple>
 #include <utility>
 #include <vector>
+
+#include <uv.h>
 
 #include "wpi/net/uv/Handle.hpp"
 #include "wpi/net/uv/Loop.hpp"

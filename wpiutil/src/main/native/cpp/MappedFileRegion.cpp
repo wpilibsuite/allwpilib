@@ -10,17 +10,12 @@
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
-
-#include <windows.h>  // NOLINT(build/include_order)
-
+#include <windows.h>
 #include <memoryapi.h>
 #include <sysinfoapi.h>
-
 #else  // _WIN32
-
 #include <sys/mman.h>
 #include <unistd.h>
-
 #endif  // _WIN32
 
 #ifdef _MSC_VER

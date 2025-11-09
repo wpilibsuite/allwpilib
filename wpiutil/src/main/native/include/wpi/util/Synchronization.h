@@ -5,8 +5,7 @@
 #pragma once
 
 #ifdef __cplusplus
-#include <climits>  // NOLINT
-
+#include <climits>
 #include <initializer_list>
 #include <span>
 #endif

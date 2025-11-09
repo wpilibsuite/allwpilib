@@ -5,14 +5,14 @@
 #ifndef WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_STREAM_HPP_
 #define WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_STREAM_HPP_
 
-#include <uv.h>
-
 #include <cstdlib>
 #include <functional>
 #include <initializer_list>
 #include <memory>
 #include <span>
 #include <utility>
+
+#include <uv.h>
 
 #include "wpi/net/uv/Buffer.hpp"
 #include "wpi/net/uv/Handle.hpp"

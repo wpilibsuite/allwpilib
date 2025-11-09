@@ -5,6 +5,9 @@
 #define _WINSOCKAPI_
 #include "UsbCameraImpl.hpp"
 
+#include <windows.h>
+#include <dbt.h>
+#include <dshow.h>
 #include <ks.h>
 #include <ksmedia.h>
 #include <mfapi.h>
@@ -18,10 +21,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <Dbt.h>
-#include <Dshow.h>
-#include <Windows.h>
 
 #include "COMCreators.hpp"
 #include "ComPtr.hpp"

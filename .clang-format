@@ -104,25 +104,52 @@ ForEachMacros:
   - BOOST_FOREACH
 IfMacros:
   - KJ_IF_MAYBE
-IncludeBlocks:   Regroup
+IncludeBlocks: Regroup
 IncludeCategories:
-  - Regex:           '^<ext/.*\.h>'
-    Priority:        2
-    SortPriority:    0
-    CaseSensitive:   false
-  - Regex:           '^<.*\.h>'
-    Priority:        1
-    SortPriority:    0
-    CaseSensitive:   false
-  - Regex:           '^<.*'
-    Priority:        2
-    SortPriority:    0
-    CaseSensitive:   false
-  - Regex:           '.*'
-    Priority:        3
-    SortPriority:    0
-    CaseSensitive:   false
-IncludeIsMainRegex: '([-_](test|unittest))?$'
+  # C standard library headers
+  #
+  # https://en.cppreference.com/w/cpp/header:
+  #  * C compatibility headers
+  #  * Special C compatibility headers
+  #  * Empty C headers
+  #  * Meaningless C headers
+  #  * Unsupported C headers
+  - Regex:        '^<(assert\.h|ctype\.h|errno\.h|fenv\.h|float\.h|inttypes\.h|limits\.h|locale\.h|math\.h|setjmp\.h|signal\.h|stdarg\.h|stddef\.h|stdint\.h|stdio\.h|stdlib\.h|string\.h|time\.h|uchar\.h|wchar\.h|wctype\.h|stdatomic\.h|ccomplex|complex\.h|ctgmath|tgmath\.h|ciso646|cstdalign|cstdbool|iso646\.h|stdalign\.h|stdbool\.h|stdatomic\.h|stdnoreturn\.h|threads\.h)>'
+    Priority:     1
+    SortPriority: 0
+  # Linux system headers
+  - Regex:        '^<((arpa\/|linux\/|net/|netinet\/|sys\/).*|arm_neon\.h|dirent\.h|dlfcn\.h|fcntl\.h|ifaddrs\.h|jni\.h|libgen\.h|poll\.h|spawn\.h|termios\.h|unistd\.h)>'
+    Priority:     1
+    SortPriority: 1
+  # winsock2.h
+  - Regex:        '^<winsock2\.h>'
+    Priority:     1
+    SortPriority: 2
+  # windows.h
+  - Regex:        '^<windows.\h>'
+    Priority:     1
+    SortPriority: 3
+  # Windows def.h headers
+  - Regex:        '^<(comdef\.h|ws2def\.h|ws2ipdef\.h)>'
+    Priority:     1
+    SortPriority: 4
+  # Windows system headers
+  - Regex:        '^<(dbghelp\.h|dbt\.h|delayimp\.h|dshow\.h|io\.h|iphlpapi\.h|ks\.h|ksmedia\.h|memoryapi\.h|mfapi\.h|mferror\.h|mfidl\.h|mfreadwrite\.h|netioapi\.h|shellapi\.h|shlwapi\.h|sysinfoapi\.h|windns\.h|windowsx\.h|ws2tcpip\.h)>'
+    Priority:     1
+    SortPriority: 5
+  # C++ standard library headers (lowercase and underscores with no .h suffix)
+  - Regex:        '^<([a-z_]+|cxxabi\.h)>'
+    Priority:     2
+    SortPriority: 6
+  # Other library headers (angle brackets)
+  - Regex:        '^<.*'
+    Priority:     3
+    SortPriority: 7
+  # Project headers (double quotes)
+  - Regex:        '^".*'
+    Priority:     4
+    SortPriority: 8
+IncludeIsMainRegex: '(Test|_bench|_test)?$'
 IncludeIsMainSourceRegex: ''
 IndentAccessModifiers: false
 IndentCaseBlocks: false
@@ -213,7 +240,7 @@ RequiresClausePosition: OwnLine
 RequiresExpressionIndentation: OuterScope
 SeparateDefinitionBlocks: Leave
 ShortNamespaceLines: 1
-SortIncludes:    false
+SortIncludes: true
 SortJavaStaticImport: Before
 SortUsingDeclarations: LexicographicNumeric
 SpaceAfterCStyleCast: false

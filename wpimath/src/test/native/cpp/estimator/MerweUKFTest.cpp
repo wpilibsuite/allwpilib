@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/estimator/MerweUKF.hpp"
+
 #include <algorithm>
 #include <cmath>
 #include <numbers>
@@ -11,7 +13,6 @@
 #include <gtest/gtest.h>
 
 #include "wpi/math/estimator/AngleStatistics.hpp"
-#include "wpi/math/estimator/MerweUKF.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/Discretization.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"

@@ -2,13 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/interpolation/TimeInterpolatableBuffer.hpp"
+
 #include <cmath>
 
 #include <gtest/gtest.h>
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
-#include "wpi/math/interpolation/TimeInterpolatableBuffer.hpp"
 #include "wpi/units/time.hpp"
 
 TEST(TimeInterpolatableBufferTest, AddSample) {

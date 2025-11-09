@@ -5,13 +5,13 @@
 #ifndef WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_UDP_HPP_
 #define WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_UDP_HPP_
 
-#include <uv.h>
-
 #include <functional>
 #include <memory>
 #include <span>
 #include <string_view>
 #include <utility>
+
+#include <uv.h>
 
 #include "wpi/net/uv/Handle.hpp"
 #include "wpi/net/uv/Request.hpp"

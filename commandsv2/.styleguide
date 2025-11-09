@@ -15,14 +15,3 @@ repoRootNameOverride {
 generatedFileExclude {
   commandsv2/src/generated/
 }
-
-includeOtherLibs {
-  ^gtest/
-  ^imgui
-  ^mockdata/
-  ^networktables/
-  ^opencv2/
-  ^support/
-  ^units/
-  ^vision/
-}

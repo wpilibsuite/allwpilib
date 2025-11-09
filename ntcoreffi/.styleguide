@@ -15,12 +15,6 @@ repoRootNameOverride {
   ntcoreffi
 }
 
-includeOtherLibs {
-  ^fmt/
-  ^gmock/
-  ^gtest/
-}
-
 includeGuardRoots {
   ntcoreffi/src/main/native/include/
 }

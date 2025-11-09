@@ -273,10 +273,9 @@ void from_json(const wpi::util::json& json, Pose2d& pose);
 
 }  // namespace wpi::math
 
+#include "wpi/math/geometry/Transform2d.hpp"
 #include "wpi/math/geometry/proto/Pose2dProto.hpp"
 #include "wpi/math/geometry/struct/Pose2dStruct.hpp"
-
-#include "wpi/math/geometry/Transform2d.hpp"
 
 namespace wpi::math {
 

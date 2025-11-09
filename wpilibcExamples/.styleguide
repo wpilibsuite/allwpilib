@@ -7,9 +7,3 @@ cppHeaderFileInclude {
 cppSrcFileInclude {
   \.cpp$
 }
-
-includeOtherLibs {
-  ^fmt/
-  ^gtest/
-  ^opencv2/
-}

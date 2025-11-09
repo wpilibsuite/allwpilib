@@ -18,11 +18,3 @@ generatedFileExclude {
 repoRootNameOverride {
   sysid
 }
-
-includeOtherLibs {
-  ^GLFW
-  ^fmt/
-  ^gtest/
-  ^imgui
-  ^implot\.h$
-}

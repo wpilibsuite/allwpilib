@@ -5,10 +5,10 @@
 #ifndef WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_UTIL_HPP_
 #define WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_UTIL_HPP_
 
-#include <uv.h>
-
 #include <cstring>
 #include <string_view>
+
+#include <uv.h>
 
 #ifdef _WIN32
 #pragma comment(lib, "Ws2_32.lib")

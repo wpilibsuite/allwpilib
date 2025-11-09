@@ -5,14 +5,14 @@
 #ifndef WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_LOOP_HPP_
 #define WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_LOOP_HPP_
 
-#include <uv.h>
-
 #include <atomic>
 #include <chrono>
 #include <functional>
 #include <memory>
 #include <thread>
 #include <utility>
+
+#include <uv.h>
 
 #include "wpi/net/uv/Error.hpp"
 #include "wpi/util/Signal.h"

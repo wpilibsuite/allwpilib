@@ -16,12 +16,3 @@ generatedFileExclude {
 repoRootNameOverride {
   wpilib
 }
-
-includeOtherLibs {
-  ^fmt/
-  ^gtest/
-  ^imgui
-  ^mockdata/
-  ^opencv2/
-  ^support/
-}

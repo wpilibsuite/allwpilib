@@ -23,9 +23,3 @@ modifiableFileExclude {
 repoRootNameOverride {
   datalog
 }
-
-includeOtherLibs {
-  ^fmt/
-  ^gtest/
-  ^upb/
-}

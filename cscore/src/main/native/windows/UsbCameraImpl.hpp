@@ -5,13 +5,13 @@
 #ifndef CSCORE_USBCAMERAIMPL_HPP_
 #define CSCORE_USBCAMERAIMPL_HPP_
 
+#include <windows.h>
+#include <dbt.h>
+#include <ks.h>
+#include <ksmedia.h>
 #include <mfapi.h>
 #include <mfidl.h>
 #include <mfreadwrite.h>
-
-#include <ks.h>  // NOLINT(build/include_order)
-
-#include <ksmedia.h>  // NOLINT(build/include_order)
 
 #include <atomic>
 #include <memory>
@@ -20,8 +20,6 @@
 #include <thread>
 #include <utility>
 #include <vector>
-
-#include <Dbt.h>
 
 #include "COMCreators.hpp"
 #include "ComPtr.hpp"

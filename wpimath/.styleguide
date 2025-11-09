@@ -34,16 +34,3 @@ includeGuardRoots {
   wpimath/src/main/native/include/
   wpimath/src/test/native/cpp/
 }
-
-includeOtherLibs {
-  ^Eigen/
-  ^fmt/
-  ^gcem/
-  ^gtest/
-  ^sleipnir/
-  ^unsupported/
-}
-
-includeProject {
-  wpi/util/expected
-}

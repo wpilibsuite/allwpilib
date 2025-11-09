@@ -2,10 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/trajectory/constraint/EllipticalRegionConstraint.hpp"
+
 #include <gtest/gtest.h>
 
 #include "wpi/math/trajectory/TestTrajectory.hpp"
-#include "wpi/math/trajectory/constraint/EllipticalRegionConstraint.hpp"
 #include "wpi/math/trajectory/constraint/MaxVelocityConstraint.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"

@@ -4,12 +4,13 @@
 
 #include "UsbCameraListener.hpp"
 
-#include "Notifier.hpp"
-#include "WindowsMessagePump.hpp"
-
-#include <dbt.h>  // NOLINT(build/include_order)
+#include <windows.h>
+#include <dbt.h>
 
 #include <memory>
+
+#include "Notifier.hpp"
+#include "WindowsMessagePump.hpp"
 
 #define IDT_TIMER1 1001
 

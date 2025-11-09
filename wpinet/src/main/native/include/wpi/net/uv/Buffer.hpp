@@ -5,13 +5,13 @@
 #ifndef WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_BUFFER_HPP_
 #define WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_BUFFER_HPP_
 
-#include <uv.h>
-
 #include <cstring>
 #include <initializer_list>
 #include <span>
 #include <string_view>
 #include <utility>
+
+#include <uv.h>
 
 #include "wpi/util/SmallVector.hpp"
 

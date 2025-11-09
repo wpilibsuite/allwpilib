@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
-
 #include "wpi/math/util/ComputerVisionUtil.hpp"
+
+#include <gtest/gtest.h>
 
 TEST(ComputerVisionUtilTest, ObjectToRobotPose) {
   wpi::math::Pose3d robot{1_m, 2_m, 0_m,

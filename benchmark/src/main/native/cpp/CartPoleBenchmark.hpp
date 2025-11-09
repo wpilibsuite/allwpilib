@@ -4,10 +4,9 @@
 
 #pragma once
 
-#include <benchmark/benchmark.h>
-
 #include <chrono>
 
+#include <benchmark/benchmark.h>
 #include <sleipnir/optimization/problem.hpp>
 
 #include "wpi/math/system/NumericalIntegration.hpp"
