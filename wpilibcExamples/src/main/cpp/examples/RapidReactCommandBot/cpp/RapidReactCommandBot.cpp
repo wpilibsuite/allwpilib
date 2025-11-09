@@ -4,11 +4,10 @@
 
 #include "RapidReactCommandBot.hpp"
 
-#include <wpi/commands2/Command.hpp>
-#include <wpi/commands2/Commands.hpp>
-#include <wpi/commands2/button/Trigger.hpp>
-
 #include "Constants.hpp"
+#include "wpi/commands2/Command.hpp"
+#include "wpi/commands2/Commands.hpp"
+#include "wpi/commands2/button/Trigger.hpp"
 
 void RapidReactCommandBot::ConfigureBindings() {
   // Automatically run the storage motor whenever the ball storage is not full,

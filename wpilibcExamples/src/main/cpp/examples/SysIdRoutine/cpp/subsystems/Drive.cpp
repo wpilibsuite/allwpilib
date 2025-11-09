@@ -4,7 +4,7 @@
 
 #include "subsystems/Drive.hpp"
 
-#include <wpi/commands2/Commands.hpp>
+#include "wpi/commands2/Commands.hpp"
 
 Drive::Drive() {
   m_leftMotor.AddFollower(wpi::PWMSparkMax{constants::drive::kLeftMotor2Port});

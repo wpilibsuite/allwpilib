@@ -12,5 +12,4 @@ includeOtherLibs {
   ^fmt/
   ^gtest/
   ^opencv2/
-  ^wpi/
 }

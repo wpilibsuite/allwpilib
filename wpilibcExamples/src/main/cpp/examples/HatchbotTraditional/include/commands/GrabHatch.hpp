@@ -4,10 +4,9 @@
 
 #pragma once
 
-#include <wpi/commands2/Command.hpp>
-#include <wpi/commands2/CommandHelper.hpp>
-
 #include "subsystems/HatchSubsystem.hpp"
+#include "wpi/commands2/Command.hpp"
+#include "wpi/commands2/CommandHelper.hpp"
 
 /**
  * A simple command that grabs a hatch with the HatchSubsystem.  Written

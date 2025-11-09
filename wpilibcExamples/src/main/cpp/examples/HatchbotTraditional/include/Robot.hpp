@@ -4,10 +4,9 @@
 
 #pragma once
 
-#include <wpi/commands2/Command.hpp>
-#include <wpi/framework/TimedRobot.hpp>
-
 #include "RobotContainer.hpp"
+#include "wpi/commands2/Command.hpp"
+#include "wpi/framework/TimedRobot.hpp"
 
 class Robot : public wpi::TimedRobot {
  public:

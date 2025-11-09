@@ -4,17 +4,16 @@
 
 #pragma once
 
-#include <wpi/commands2/CommandPtr.hpp>
-#include <wpi/commands2/SubsystemBase.hpp>
-#include <wpi/drive/DifferentialDrive.hpp>
-#include <wpi/hardware/rotation/Encoder.hpp>
-#include <wpi/math/controller/SimpleMotorFeedforward.hpp>
-#include <wpi/math/trajectory/TrapezoidProfile.hpp>
-#include <wpi/system/Timer.hpp>
-#include <wpi/units/length.hpp>
-
 #include "Constants.hpp"
 #include "ExampleSmartMotorController.hpp"
+#include "wpi/commands2/CommandPtr.hpp"
+#include "wpi/commands2/SubsystemBase.hpp"
+#include "wpi/drive/DifferentialDrive.hpp"
+#include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/math/controller/SimpleMotorFeedforward.hpp"
+#include "wpi/math/trajectory/TrapezoidProfile.hpp"
+#include "wpi/system/Timer.hpp"
+#include "wpi/units/length.hpp"
 
 class DriveSubsystem : public wpi::cmd::SubsystemBase {
  public:

@@ -3,12 +3,12 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <wpi/hardware/pneumatic/DoubleSolenoid.hpp>
-#include <wpi/simulation/DoubleSolenoidSim.hpp>
-#include <wpi/simulation/PWMMotorControllerSim.hpp>
 
 #include "Constants.hpp"
 #include "subsystems/Intake.hpp"
+#include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
+#include "wpi/simulation/DoubleSolenoidSim.hpp"
+#include "wpi/simulation/PWMMotorControllerSim.hpp"
 
 class IntakeTest : public testing::Test {
  protected:

@@ -6,7 +6,7 @@
 
 #include <numbers>
 
-#include <wpi/math/geometry/Rotation2d.hpp>
+#include "wpi/math/geometry/Rotation2d.hpp"
 
 SwerveModule::SwerveModule(const int driveMotorChannel,
                            const int turningMotorChannel,

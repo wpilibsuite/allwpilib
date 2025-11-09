@@ -4,8 +4,8 @@
 
 #include "Robot.hpp"
 
-#include <wpi/smartdashboard/SmartDashboard.hpp>
-#include <wpi/util/print.hpp>
+#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/util/print.hpp"
 
 // Run robot periodic() functions for 5 ms, and run controllers every 10 ms
 Robot::Robot() : wpi::TimesliceRobot{5_ms, 10_ms} {

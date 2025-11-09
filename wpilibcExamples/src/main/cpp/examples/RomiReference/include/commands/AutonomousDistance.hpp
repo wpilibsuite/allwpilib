@@ -4,12 +4,11 @@
 
 #pragma once
 
-#include <wpi/commands2/CommandHelper.hpp>
-#include <wpi/commands2/SequentialCommandGroup.hpp>
-
 #include "commands/DriveDistance.hpp"
 #include "commands/TurnDegrees.hpp"
 #include "subsystems/Drivetrain.hpp"
+#include "wpi/commands2/CommandHelper.hpp"
+#include "wpi/commands2/SequentialCommandGroup.hpp"
 
 class AutonomousDistance
     : public wpi::cmd::CommandHelper<wpi::cmd::SequentialCommandGroup,

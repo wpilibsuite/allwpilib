@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <wpi/commands2/CommandHelper.hpp>
-#include <wpi/commands2/ParallelCommandGroup.hpp>
+#include "wpi/commands2/CommandHelper.hpp"
+#include "wpi/commands2/ParallelCommandGroup.hpp"
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.
 // For more information, see:

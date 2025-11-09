@@ -4,9 +4,8 @@
 
 #pragma once
 
-#include <wpi/commands2/CommandPtr.hpp>
-
 #include "subsystems/ExampleSubsystem.hpp"
+#include "wpi/commands2/CommandPtr.hpp"
 
 namespace autos {
 /**

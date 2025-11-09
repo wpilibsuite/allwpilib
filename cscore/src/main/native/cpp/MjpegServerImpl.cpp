@@ -9,11 +9,6 @@
 #include <string>
 #include <utility>
 
-#include <wpi/net/HttpUtil.hpp>
-#include <wpi/net/TCPAcceptor.h>
-#include <wpi/net/raw_socket_istream.hpp>
-#include <wpi/net/raw_socket_ostream.hpp>
-
 #include "Instance.hpp"
 #include "JpegUtil.hpp"
 #include "Log.hpp"
@@ -21,6 +16,10 @@
 #include "SourceImpl.hpp"
 #include "c_util.hpp"
 #include "wpi/cs/cscore_cpp.hpp"
+#include "wpi/net/HttpUtil.hpp"
+#include "wpi/net/TCPAcceptor.h"
+#include "wpi/net/raw_socket_istream.hpp"
+#include "wpi/net/raw_socket_ostream.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/fmt/raw_ostream.hpp"

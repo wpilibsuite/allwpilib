@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <wpi/math/geometry/Pose2d.hpp>
-#include <wpi/math/util/StateSpaceUtil.hpp>
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/util/StateSpaceUtil.hpp"
 
 /**
  * This dummy class represents a global measurement sensor, such as a computer

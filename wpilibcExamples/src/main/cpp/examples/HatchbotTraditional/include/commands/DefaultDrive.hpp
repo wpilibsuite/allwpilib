@@ -6,10 +6,9 @@
 
 #include <functional>
 
-#include <wpi/commands2/Command.hpp>
-#include <wpi/commands2/CommandHelper.hpp>
-
 #include "subsystems/DriveSubsystem.hpp"
+#include "wpi/commands2/Command.hpp"
+#include "wpi/commands2/CommandHelper.hpp"
 
 /**
  * A command to drive the robot with joystick input passed in through lambdas.

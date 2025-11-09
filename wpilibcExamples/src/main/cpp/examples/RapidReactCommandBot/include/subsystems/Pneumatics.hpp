@@ -4,14 +4,13 @@
 
 #pragma once
 
-#include <wpi/commands2/CommandPtr.hpp>
-#include <wpi/commands2/SubsystemBase.hpp>
-#include <wpi/hardware/pneumatic/Compressor.hpp>
-#include <wpi/hardware/pneumatic/PneumaticsControlModule.hpp>
-#include <wpi/hardware/rotation/AnalogPotentiometer.hpp>
-#include <wpi/units/pressure.hpp>
-
 #include "Constants.hpp"
+#include "wpi/commands2/CommandPtr.hpp"
+#include "wpi/commands2/SubsystemBase.hpp"
+#include "wpi/hardware/pneumatic/Compressor.hpp"
+#include "wpi/hardware/pneumatic/PneumaticsControlModule.hpp"
+#include "wpi/hardware/rotation/AnalogPotentiometer.hpp"
+#include "wpi/units/pressure.hpp"
 
 class Pneumatics : wpi::cmd::SubsystemBase {
  public:

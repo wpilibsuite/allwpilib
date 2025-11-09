@@ -4,10 +4,9 @@
 
 #include "commands/Autos.hpp"
 
-#include <wpi/commands2/Commands.hpp>
-#include <wpi/commands2/FunctionalCommand.hpp>
-
 #include "Constants.hpp"
+#include "wpi/commands2/Commands.hpp"
+#include "wpi/commands2/FunctionalCommand.hpp"
 
 using namespace AutoConstants;
 

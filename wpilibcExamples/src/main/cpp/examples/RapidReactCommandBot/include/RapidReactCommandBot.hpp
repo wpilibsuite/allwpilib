@@ -4,15 +4,14 @@
 
 #pragma once
 
-#include <wpi/commands2/CommandPtr.hpp>
-#include <wpi/commands2/button/CommandXboxController.hpp>
-
 #include "Constants.hpp"
 #include "subsystems/Drive.hpp"
 #include "subsystems/Intake.hpp"
 #include "subsystems/Pneumatics.hpp"
 #include "subsystems/Shooter.hpp"
 #include "subsystems/Storage.hpp"
+#include "wpi/commands2/CommandPtr.hpp"
+#include "wpi/commands2/button/CommandXboxController.hpp"
 
 /**
  * This class is where the bulk of the robot should be declared. Since

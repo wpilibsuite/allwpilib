@@ -4,11 +4,10 @@
 
 #pragma once
 
-#include <wpi/commands2/SubsystemBase.hpp>
-#include <wpi/hardware/pneumatic/DoubleSolenoid.hpp>
-#include <wpi/hardware/pneumatic/PneumaticsControlModule.hpp>
-
 #include "Constants.hpp"
+#include "wpi/commands2/SubsystemBase.hpp"
+#include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
+#include "wpi/hardware/pneumatic/PneumaticsControlModule.hpp"
 
 class HatchSubsystem : public wpi::cmd::SubsystemBase {
  public:

@@ -6,10 +6,9 @@
 
 #include <functional>
 
-#include <wpi/commands2/Command.hpp>
-#include <wpi/commands2/CommandHelper.hpp>
-
 #include "subsystems/Drivetrain.hpp"
+#include "wpi/commands2/Command.hpp"
+#include "wpi/commands2/CommandHelper.hpp"
 
 class TeleopArcadeDrive
     : public wpi::cmd::CommandHelper<wpi::cmd::Command, TeleopArcadeDrive> {

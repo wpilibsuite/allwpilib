@@ -6,20 +6,20 @@
 #include <thread>
 
 #include <gtest/gtest.h>
-#include <wpi/hal/simulation/MockHooks.h>
-#include <wpi/math/system/plant/DCMotor.hpp>
-#include <wpi/simulation/AnalogInputSim.hpp>
-#include <wpi/simulation/DriverStationSim.hpp>
-#include <wpi/simulation/ElevatorSim.hpp>
-#include <wpi/simulation/JoystickSim.hpp>
-#include <wpi/simulation/PWMMotorControllerSim.hpp>
-#include <wpi/simulation/SimHooks.hpp>
-#include <wpi/system/RobotController.hpp>
-#include <wpi/units/length.hpp>
-#include <wpi/units/mass.hpp>
-#include <wpi/units/time.hpp>
 
 #include "Robot.hpp"
+#include "wpi/hal/simulation/MockHooks.h"
+#include "wpi/math/system/plant/DCMotor.hpp"
+#include "wpi/simulation/AnalogInputSim.hpp"
+#include "wpi/simulation/DriverStationSim.hpp"
+#include "wpi/simulation/ElevatorSim.hpp"
+#include "wpi/simulation/JoystickSim.hpp"
+#include "wpi/simulation/PWMMotorControllerSim.hpp"
+#include "wpi/simulation/SimHooks.hpp"
+#include "wpi/system/RobotController.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/mass.hpp"
+#include "wpi/units/time.hpp"
 
 class PotentiometerPIDTest : public testing::Test {
   wpi::math::DCMotor m_elevatorGearbox = wpi::math::DCMotor::Vex775Pro(4);

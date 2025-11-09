@@ -4,12 +4,11 @@
 
 #pragma once
 
-#include <wpi/commands2/CommandHelper.hpp>
-#include <wpi/commands2/SequentialCommandGroup.hpp>
-
 #include "Constants.hpp"
 #include "commands/DriveDistance.hpp"
 #include "commands/ReleaseHatch.hpp"
+#include "wpi/commands2/CommandHelper.hpp"
+#include "wpi/commands2/SequentialCommandGroup.hpp"
 
 /**
  * A complex auto command that drives forward, releases a hatch, and then drives

@@ -6,16 +6,15 @@
 
 #include <functional>
 
-#include <wpi/commands2/CommandPtr.hpp>
-#include <wpi/commands2/SubsystemBase.hpp>
-#include <wpi/hardware/motor/PWMSparkMax.hpp>
-#include <wpi/hardware/rotation/Encoder.hpp>
-#include <wpi/math/controller/PIDController.hpp>
-#include <wpi/math/controller/SimpleMotorFeedforward.hpp>
-#include <wpi/units/angle.hpp>
-#include <wpi/units/angular_velocity.hpp>
-
 #include "Constants.hpp"
+#include "wpi/commands2/CommandPtr.hpp"
+#include "wpi/commands2/SubsystemBase.hpp"
+#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/math/controller/PIDController.hpp"
+#include "wpi/math/controller/SimpleMotorFeedforward.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/angular_velocity.hpp"
 
 class Shooter : public wpi::cmd::SubsystemBase {
  public:

@@ -4,9 +4,8 @@
 
 #include "Drivetrain.hpp"
 
-#include <wpi/system/Timer.hpp>
-
 #include "ExampleGlobalMeasurementSensor.hpp"
+#include "wpi/system/Timer.hpp"
 
 void Drivetrain::Drive(wpi::units::meters_per_second_t xSpeed,
                        wpi::units::meters_per_second_t ySpeed,

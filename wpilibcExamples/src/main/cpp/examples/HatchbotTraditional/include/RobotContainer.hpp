@@ -4,16 +4,15 @@
 
 #pragma once
 
-#include <wpi/commands2/Command.hpp>
-#include <wpi/driverstation/XboxController.hpp>
-#include <wpi/smartdashboard/SendableChooser.hpp>
-
 #include "Constants.hpp"
 #include "commands/ComplexAuto.hpp"
 #include "commands/DefaultDrive.hpp"
 #include "commands/DriveDistance.hpp"
 #include "subsystems/DriveSubsystem.hpp"
 #include "subsystems/HatchSubsystem.hpp"
+#include "wpi/commands2/Command.hpp"
+#include "wpi/driverstation/XboxController.hpp"
+#include "wpi/smartdashboard/SendableChooser.hpp"
 
 /**
  * This class is where the bulk of the robot should be declared.  Since

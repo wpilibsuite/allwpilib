@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/commands2/SubsystemBase.hpp>
+#include "wpi/commands2/SubsystemBase.hpp"
 
 class ReplaceMeSubsystem2 : public wpi::cmd::SubsystemBase {
  public:

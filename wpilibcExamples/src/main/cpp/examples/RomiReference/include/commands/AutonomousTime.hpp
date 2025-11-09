@@ -4,12 +4,11 @@
 
 #pragma once
 
-#include <wpi/commands2/CommandHelper.hpp>
-#include <wpi/commands2/SequentialCommandGroup.hpp>
-
 #include "commands/DriveTime.hpp"
 #include "commands/TurnTime.hpp"
 #include "subsystems/Drivetrain.hpp"
+#include "wpi/commands2/CommandHelper.hpp"
+#include "wpi/commands2/SequentialCommandGroup.hpp"
 
 class AutonomousTime
     : public wpi::cmd::CommandHelper<wpi::cmd::SequentialCommandGroup,
