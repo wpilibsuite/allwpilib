@@ -51,9 +51,9 @@ http_archive(
 # Rules Python
 http_archive(
     name = "rules_python",
-    sha256 = "2f5c284fbb4e86045c2632d3573fc006facbca5d1fa02976e89dc0cd5488b590",
-    strip_prefix = "rules_python-1.6.3",
-    url = "https://github.com/bazel-contrib/rules_python/releases/download/1.6.3/rules_python-1.6.3.tar.gz",
+    sha256 = "6b9185460d11d57a32139b103363fce39d81889206561ef582678273b74372ac",
+    strip_prefix = "rules_python-1.7.0-rc5",
+    url = "https://github.com/bazel-contrib/rules_python/releases/download/1.7.0-rc5/rules_python-1.7.0-rc5.tar.gz",
 )
 
 # Download Extra java rules
