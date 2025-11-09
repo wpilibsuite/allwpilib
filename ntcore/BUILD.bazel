@@ -4,10 +4,14 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//ntcore:generate_ntcore.bzl", "generate_ntcore")
+load("//ntcore:robotpy_native_build_info.bzl", "define_native_wrapper")
+load("//ntcore:robotpy_pybind_build_info.bzl", "define_pybind_library", "ntcore_extension")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project")
+load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info", "generate_robotpy_pybind_build_info")
+load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
 
 filegroup(
     name = "doxygen-files",
@@ -223,4 +227,57 @@ package_default_jni_project(
     name = "ntcore",
     maven_artifact_name = "ntcore-cpp",
     maven_group_id = "org.wpilib.ntcore",
+)
+
+generate_robotpy_native_wrapper_build_info(
+    name = "robotpy-native-ntcore-generator",
+    pyproject_toml = "src/main/python/native-pyproject.toml",
+)
+
+define_native_wrapper(
+    name = "robotpy-native-ntcore",
+    pyproject_toml = "src/main/python/native-pyproject.toml",
+)
+
+PYBIND_PKGCFG_DEPS = [
+    "//datalog:native/datalog/robotpy-native-datalog.pc",
+    "//datalog:robotpy-wpilog.generated_pkgcfg_files",
+    "//ntcore:native/ntcore/robotpy-native-ntcore.pc",
+    "//wpinet:native/wpinet/robotpy-native-wpinet.pc",
+    "//wpinet:robotpy-wpinet.generated_pkgcfg_files",
+    "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
+    "//wpiutil:robotpy-wpiutil.generated_pkgcfg_files",
+]
+
+generate_robotpy_pybind_build_info(
+    name = "pyntcore-generator",
+    additional_srcs = [":robotpy-native-ntcore.copy_headers"],
+    package_root_file = "src/main/python/ntcore/__init__.py",
+    pkgcfgs = PYBIND_PKGCFG_DEPS,
+    yaml_files = glob(["src/main/python/semiwrap/*.yml"]),
+)
+
+ntcore_extension(
+    srcs = glob(["src/main/python/ntcore/src/*.cpp"]),
+    extra_hdrs = glob([
+        "src/main/python/ntcore/src/*.h",
+        "src/main/python/ntcore/src/*.inl",
+    ]),
+    includes = [
+        "src/main/python/ntcore/",
+    ],
+)
+
+define_pybind_library(
+    name = "pyntcore",
+    pkgcfgs = PYBIND_PKGCFG_DEPS,
+)
+
+robotpy_py_test(
+    "python_tests",
+    srcs = glob(["src/test/python/**/*.py"]),
+    deps = [
+        ":pyntcore",
+        requirement("pytest"),
+    ],
 )

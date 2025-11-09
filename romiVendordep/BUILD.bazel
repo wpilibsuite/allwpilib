@@ -1,8 +1,13 @@
+load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
+load("//romiVendordep:robotpy_native_build_info.bzl", "define_native_wrapper")
+load("//romiVendordep:robotpy_pybind_build_info.bzl", "define_pybind_library", "romi_extension")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_library")
 load("//shared/bazel/rules:packaging.bzl", "package_minimal_cc_project")
+load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info", "generate_robotpy_pybind_build_info")
+load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
 
 filegroup(
     name = "doxygen-files",
@@ -100,4 +105,58 @@ package_minimal_cc_project(
     name = "romiVendordep",
     maven_artifact_name = "romiVendordep-cpp",
     maven_group_id = "org.wpilib.romiVendordep",
+)
+
+generate_robotpy_native_wrapper_build_info(
+    name = "robotpy-native-xrp-generator",
+    pyproject_toml = "src/main/python/native-pyproject.toml",
+)
+
+define_native_wrapper(
+    name = "robotpy-native-romi",
+    pyproject_toml = "src/main/python/native-pyproject.toml",
+)
+
+PKG_CONFIG_DEPS = [
+    "//datalog:native/datalog/robotpy-native-datalog.pc",
+    "//datalog:robotpy-wpilog.generated_pkgcfg_files",
+    "//hal:native/wpihal/robotpy-native-wpihal.pc",
+    "//hal:robotpy-hal.generated_pkgcfg_files",
+    "//ntcore:native/ntcore/robotpy-native-ntcore.pc",
+    "//ntcore:pyntcore.generated_pkgcfg_files",
+    "//wpilibc:native/wpilib/robotpy-native-wpilib.pc",
+    "//wpilibc:robotpy-wpilib.generated_pkgcfg_files",
+    "//wpimath:native/wpimath/robotpy-native-wpimath.pc",
+    "//wpimath:robotpy-wpimath.generated_pkgcfg_files",
+    "//wpinet:native/wpinet/robotpy-native-wpinet.pc",
+    "//wpinet:robotpy-wpinet.generated_pkgcfg_files",
+    "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
+    "//wpiutil:robotpy-wpiutil.generated_pkgcfg_files",
+    "//romiVendordep:native/romi/robotpy-native-romi.pc",
+]
+
+generate_robotpy_pybind_build_info(
+    name = "robotpy-romi-generator",
+    additional_srcs = [":robotpy-native-romi.copy_headers"],
+    package_root_file = "src/main/python/romi/__init__.py",
+    pkgcfgs = PKG_CONFIG_DEPS,
+    yaml_files = glob(["src/main/python/semiwrap/**/*.yml"]),
+)
+
+romi_extension(
+    srcs = ["src/main/python/romi/src/main.cpp"],
+)
+
+define_pybind_library(
+    name = "robotpy-romi",
+    pkgcfgs = PKG_CONFIG_DEPS,
+)
+
+robotpy_py_test(
+    "python_tests",
+    srcs = glob(["src/test/python/**/*.py"]),
+    deps = [
+        ":robotpy-romi",
+        requirement("pytest"),
+    ],
 )

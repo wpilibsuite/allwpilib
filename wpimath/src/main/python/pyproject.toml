@@ -83,10 +83,10 @@ scan_headers_ignore = [
 
     "wpi/math/proto/*",
     "wpi/math/*/proto/*",
-    
+
     "wpi/math/struct/*",
     "wpi/math/*/struct/*",
-    
+
     "[eE]igen/*",
 
     "gcem.hpp",
@@ -95,9 +95,7 @@ scan_headers_ignore = [
     "gch/*",
     "sleipnir/*",
     "type_casters/*",
-    "unsupported/*",
     "wpi/units/*",
-    "wpimath/protobuf/*",
 
     "wpi/math/util/MathShared.hpp",
 
@@ -1491,7 +1489,7 @@ includes = ["wpimath/geometry/include"]
 yaml_path = "semiwrap/geometry"
 
 [tool.semiwrap.extension_modules."wpimath.geometry._geometry".headers]
-# frc/geometry
+# wpi/math/geometry
 CoordinateAxis = "wpi/math/geometry/CoordinateAxis.hpp"
 CoordinateSystem = "wpi/math/geometry/CoordinateSystem.hpp"
 Ellipse2d = "wpi/math/geometry/Ellipse2d.hpp"
@@ -1515,7 +1513,7 @@ depends = ["wpimath_geometry"]
 yaml_path = "semiwrap/interpolation"
 
 [tool.semiwrap.extension_modules."wpimath.interpolation._interpolation".headers]
-# frc/interpolation
+# wpi/math/interpolation
 TimeInterpolatableBuffer = "wpi/math/interpolation/TimeInterpolatableBuffer.hpp"
 
 
@@ -1526,7 +1524,7 @@ depends = ["wpimath_geometry"]
 yaml_path = "semiwrap/kinematics"
 
 [tool.semiwrap.extension_modules."wpimath.kinematics._kinematics".headers]
-# frc/kinematics
+# wpi/math/kinematics
 ChassisSpeeds = "wpi/math/kinematics/ChassisSpeeds.hpp"
 DifferentialDriveKinematics = "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 DifferentialDriveOdometry3d = "wpi/math/kinematics/DifferentialDriveOdometry3d.hpp"
@@ -1555,7 +1553,7 @@ depends = ["wpimath_geometry"]
 yaml_path = "semiwrap/spline"
 
 [tool.semiwrap.extension_modules."wpimath.spline._spline".headers]
-# frc/spline
+# wpi/math/spline
 CubicHermiteSpline = "wpi/math/spline/CubicHermiteSpline.hpp"
 QuinticHermiteSpline = "wpi/math/spline/QuinticHermiteSpline.hpp"
 Spline = "wpi/math/spline/Spline.hpp"
@@ -1570,7 +1568,7 @@ depends = ["wpimath", "wpimath_geometry", "wpimath_kinematics", "wpimath_spline"
 yaml_path = "semiwrap/controls"
 
 [tool.semiwrap.extension_modules."wpimath._controls._controls".headers]
-# frc/controller
+# wpi/math/controller
 ArmFeedforward = "wpi/math/controller/ArmFeedforward.hpp"
 BangBangController = "wpi/math/controller/BangBangController.hpp"
 ControlAffinePlantInversionFeedforward = "wpi/math/controller/ControlAffinePlantInversionFeedforward.hpp"
@@ -1587,7 +1585,7 @@ PIDController = "wpi/math/controller/PIDController.hpp"
 ProfiledPIDController = "wpi/math/controller/ProfiledPIDController.hpp"
 SimpleMotorFeedforward = "wpi/math/controller/SimpleMotorFeedforward.hpp"
 
-# frc/estimator
+# wpi/math/estimator
 # AngleStatistics = "wpi/math/estimator/AngleStatistics.hpp"
 DifferentialDrivePoseEstimator = "wpi/math/estimator/DifferentialDrivePoseEstimator.hpp"
 DifferentialDrivePoseEstimator3d = "wpi/math/estimator/DifferentialDrivePoseEstimator3d.hpp"
@@ -1604,24 +1602,24 @@ SwerveDrivePoseEstimator3d = "wpi/math/estimator/SwerveDrivePoseEstimator3d.hpp"
 # UnscentedKalmanFilter = "wpi/math/estimator/UnscentedKalmanFilter.hpp"
 # UnscentedTransform = "wpi/math/estimator/UnscentedTransform.hpp"
 
-# frc/optimization
+# wpi/math/optimization
 SimulatedAnnealing = "wpi/math/optimization/SimulatedAnnealing.hpp"
 
-# frc/path
+# wpi/math/path
 TravelingSalesman = "wpi/math/path/TravelingSalesman.hpp"
 
-# frc/system
+# wpi/math/system
 # Discretization = "wpi/math/system/Discretization.hpp"
 LinearSystem = "wpi/math/system/LinearSystem.hpp"
 LinearSystemLoop = "wpi/math/system/LinearSystemLoop.hpp"
 # NumericalIntegration = "wpi/math/system/NumericalIntegration.hpp"
 # NumericalJacobian = "wpi/math/system/NumericalJacobian.hpp"
 
-# frc/system/plant
+# wpi/math/system/plant
 DCMotor = "wpi/math/system/plant/DCMotor.hpp"
 LinearSystemId = "wpi/math/system/plant/LinearSystemId.hpp"
 
-# frc/trajectory
+# wpi/math/trajectory
 ExponentialProfile = "wpi/math/trajectory/ExponentialProfile.hpp"
 Trajectory = "wpi/math/trajectory/Trajectory.hpp"
 TrajectoryConfig = "wpi/math/trajectory/TrajectoryConfig.hpp"
@@ -1629,7 +1627,7 @@ TrajectoryGenerator = "wpi/math/trajectory/TrajectoryGenerator.hpp"
 TrajectoryParameterizer = "wpi/math/trajectory/TrajectoryParameterizer.hpp"
 TrapezoidProfile = "wpi/math/trajectory/TrapezoidProfile.hpp"
 
-# frc/trajectory/constraint
+# wpi/math/trajectory/constraint
 CentripetalAccelerationConstraint = "wpi/math/trajectory/constraint/CentripetalAccelerationConstraint.hpp"
 DifferentialDriveKinematicsConstraint = "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
 DifferentialDriveVoltageConstraint = "wpi/math/trajectory/constraint/DifferentialDriveVoltageConstraint.hpp"

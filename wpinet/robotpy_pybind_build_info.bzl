@@ -1,5 +1,6 @@
 # THIS FILE IS AUTO GENERATED
 
+load("//shared/bazel/rules/gen:gen-version-file.bzl", "generate_version_file")
 load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "create_pybind_library", "robotpy_library")
 load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "resolve_casters", "run_header_gen")
 load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers", "update_yaml_files")
@@ -132,10 +133,17 @@ def define_pybind_library(name, pkgcfgs = []):
         tags = ["manual", "robotpy"],
     )
 
+    generate_version_file(
+        name = "{}.generate_version".format(name),
+        output_file = "src/main/python/wpinet/version.py",
+        template = "//shared/bazel/rules/robotpy:version_template.in",
+    )
+
     robotpy_library(
         name = name,
         srcs = native.glob(["src/main/python/wpinet/**/*.py"]) + [
             "src/main/python/wpinet/_init__wpinet.py",
+            "{}.generate_version".format(name),
         ],
         data = [
             "{}.generated_pkgcfg_files".format(name),
@@ -156,6 +164,7 @@ def define_pybind_library(name, pkgcfgs = []):
         yaml_output_directory = "src/main/python/semiwrap",
         extra_hdrs = native.glob(["src/main/python/**/*.h"], allow_empty = True) + [
             "//wpinet:robotpy-native-wpinet.copy_headers",
+            "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
         package_root_file = "src/main/python/wpinet/__init__.py",
         pkgcfgs = pkgcfgs,
