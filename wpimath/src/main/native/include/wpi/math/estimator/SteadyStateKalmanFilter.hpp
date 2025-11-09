@@ -237,6 +237,9 @@ class SteadyStateKalmanFilter {
   StateVector m_xHat;
 };
 
+template <int States, int Inputs, int Outputs>
+using SteadyStateKF = SteadyStateKalmanFilter<States, Inputs, Outputs>;
+
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
     SteadyStateKalmanFilter<1, 1, 1>;
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
