@@ -30,8 +30,7 @@ inline void NamedLog(wpi::util::Logger& logger, unsigned int level,
 #define LOG(level, format, ...) \
   WPI_LOG(m_logger, level, format __VA_OPT__(, ) __VA_ARGS__)
 
-#define ERR(format, ...) \
-  WPI_ERROR(m_logger, format __VA_OPT__(, ) __VA_ARGS__)
+#define ERR(format, ...) WPI_ERROR(m_logger, format __VA_OPT__(, ) __VA_ARGS__)
 #define WARN(format, ...) \
   WPI_WARNING(m_logger, format __VA_OPT__(, ) __VA_ARGS__)
 #define INFO(format, ...) WPI_INFO(m_logger, format __VA_OPT__(, ) __VA_ARGS__)

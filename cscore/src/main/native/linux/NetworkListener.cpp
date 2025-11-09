@@ -70,8 +70,7 @@ void NetworkListener::Impl::Thread::Main() {
   // Create event socket so we can be shut down
   m_command_fd = ::eventfd(0, 0);
   if (m_command_fd < 0) {
-    ERR("NetworkListener: could not create eventfd: {}",
-          std::strerror(errno));
+    ERR("NetworkListener: could not create eventfd: {}", std::strerror(errno));
     return;
   }
 
