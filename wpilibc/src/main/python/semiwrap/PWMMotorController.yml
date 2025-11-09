@@ -1,0 +1,33 @@
+extra_includes:
+- wpi/util/sendable/SendableBuilder.hpp
+
+classes:
+  wpi::PWMMotorController:
+    ignored_bases:
+    - wpi::util::SendableHelper<PWMMotorController>
+    attributes:
+      m_pwm:
+    methods:
+      Set:
+      SetVoltage:
+      Get:
+      GetVoltage:
+      SetInverted:
+      GetInverted:
+      Disable:
+      StopMotor:
+      GetDescription:
+      GetChannel:
+      EnableDeadbandElimination:
+      AddFollower:
+        overloads:
+          PWMMotorController&:
+            keepalive:
+            - [1, 2]
+          T&&:
+            ignore: true
+      PWMMotorController:
+      InitSendable:
+      SetSpeed:
+      GetSpeed:
+      SetBounds:

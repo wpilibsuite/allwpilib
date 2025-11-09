@@ -2,22 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/other/FMS.h"
+#include "wpi/glass/other/FMS.hpp"
 
 #include <string>
 
 #include <imgui.h>
 #include <imgui_stdlib.h>
-#include <wpi/SmallString.h>
 
-#include "glass/DataSource.h"
+#include "wpi/glass/DataSource.hpp"
+#include "wpi/util/SmallString.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 static const char* stations[] = {"Invalid", "Red 1",  "Red 2", "Red 3",
                                  "Blue 1",  "Blue 2", "Blue 3"};
 
-void glass::DisplayFMS(FMSModel* model, bool editableDsAttached) {
+void wpi::glass::DisplayFMS(FMSModel* model, bool editableDsAttached) {
   if (!model->Exists() || model->IsReadOnly()) {
     return DisplayFMSReadOnly(model);
   }
@@ -89,7 +89,7 @@ void glass::DisplayFMS(FMSModel* model, bool editableDsAttached) {
   }
 }
 
-void glass::DisplayFMSReadOnly(FMSModel* model) {
+void wpi::glass::DisplayFMSReadOnly(FMSModel* model) {
   bool exists = model->Exists();
   if (!exists) {
     ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
@@ -149,9 +149,14 @@ void glass::DisplayFMSReadOnly(FMSModel* model) {
     }
   }
   if (auto data = model->GetGameSpecificMessageData()) {
-    wpi::SmallString<64> gsmBuf;
-    ImGui::Text("Game Specific: %s",
-                exists ? data->GetValue(gsmBuf).data() : "?");
+    if (exists) {
+      wpi::util::SmallString<64> gsmBuf;
+      std::string_view gsm = data->GetValue(gsmBuf);
+      ImGui::Text("Game Specific: %.*s", static_cast<int>(gsm.size()),
+                  gsm.data());
+    } else {
+      ImGui::TextUnformatted("Game Specific: ?");
+    }
   }
 
   if (!exists) {

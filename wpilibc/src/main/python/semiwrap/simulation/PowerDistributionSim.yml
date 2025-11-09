@@ -1,0 +1,27 @@
+extra_includes:
+- wpi/hardware/power/PowerDistribution.hpp
+
+classes:
+  wpi::sim::PowerDistributionSim:
+    force_type_casters:
+    - std::function
+    methods:
+      PowerDistributionSim:
+        overloads:
+          int:
+          const PowerDistribution&:
+      RegisterInitializedCallback:
+      GetInitialized:
+      SetInitialized:
+      RegisterTemperatureCallback:
+      GetTemperature:
+      SetTemperature:
+      RegisterVoltageCallback:
+      GetVoltage:
+      SetVoltage:
+      RegisterCurrentCallback:
+      GetCurrent:
+      SetCurrent:
+      GetAllCurrents:
+      SetAllCurrents:
+      ResetData:

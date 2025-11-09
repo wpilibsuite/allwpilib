@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/motorcontrol/MotorControllerGroup.h"
+#include "wpi/hardware/motor/MotorControllerGroup.hpp"
 
 #include <utility>
 #include <vector>
 
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/util/sendable/SendableRegistry.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 // Can't use a delegated constructor here because of an MSVC bug.
 // https://developercommunity.visualstudio.com/content/problem/583/compiler-bug-with-delegating-a-constructor.html
@@ -25,11 +25,11 @@ MotorControllerGroup::MotorControllerGroup(
 
 void MotorControllerGroup::Initialize() {
   for (auto& motorController : m_motorControllers) {
-    wpi::SendableRegistry::AddChild(this, &motorController.get());
+    wpi::util::SendableRegistry::AddChild(this, &motorController.get());
   }
   static int instances = 0;
   ++instances;
-  wpi::SendableRegistry::Add(this, "MotorControllerGroup", instances);
+  wpi::util::SendableRegistry::Add(this, "MotorControllerGroup", instances);
 }
 
 void MotorControllerGroup::Set(double speed) {
@@ -38,7 +38,7 @@ void MotorControllerGroup::Set(double speed) {
   }
 }
 
-void MotorControllerGroup::SetVoltage(units::volt_t output) {
+void MotorControllerGroup::SetVoltage(wpi::units::volt_t output) {
   for (auto motorController : m_motorControllers) {
     motorController.get().SetVoltage(m_isInverted ? -output : output);
   }
@@ -71,7 +71,7 @@ void MotorControllerGroup::StopMotor() {
   }
 }
 
-void MotorControllerGroup::InitSendable(wpi::SendableBuilder& builder) {
+void MotorControllerGroup::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Motor Controller");
   builder.SetActuator(true);
   builder.AddDoubleProperty(

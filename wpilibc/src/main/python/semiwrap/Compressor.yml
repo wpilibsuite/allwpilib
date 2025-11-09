@@ -1,0 +1,26 @@
+extra_includes:
+- wpi/util/sendable/SendableBuilder.hpp
+- wpi/hardware/pneumatic/Compressor.hpp
+- wpi/hardware/pneumatic/Solenoid.hpp
+- wpi/hardware/pneumatic/DoubleSolenoid.hpp
+
+classes:
+  wpi::Compressor:
+    ignored_bases:
+    - wpi::util::SendableHelper<Compressor>
+    methods:
+      Compressor:
+        overloads:
+          int, PneumaticsModuleType:
+          int, int, PneumaticsModuleType:
+      IsEnabled:
+      GetPressureSwitchValue:
+      GetCurrent:
+      GetAnalogVoltage:
+      GetPressure:
+      Disable:
+      EnableDigital:
+      EnableAnalog:
+      EnableHybrid:
+      GetConfigType:
+      InitSendable:

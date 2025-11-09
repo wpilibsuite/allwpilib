@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/DigitalInput.h>
-#include <frc/Encoder.h>
-#include <frc/Joystick.h>
-#include <frc/TimedRobot.h>
-#include <frc/motorcontrol/PWMVictorSPX.h>
+#include "wpi/driverstation/Joystick.hpp"
+#include "wpi/framework/TimedRobot.hpp"
+#include "wpi/hardware/discrete/DigitalInput.hpp"
+#include "wpi/hardware/motor/PWMVictorSPX.hpp"
+#include "wpi/hardware/rotation/Encoder.hpp"
 
 /**
  * Limit Switch snippets for frc-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/limit-switch.html
  */
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   void TeleopPeriodic() override { SetMotorSpeed(m_joystick.GetRawAxis(2)); }
   void SetMotorSpeed(double speed) {
@@ -37,14 +37,14 @@ class Robot : public frc::TimedRobot {
   }
 
  private:
-  frc::DigitalInput m_toplimitSwitch{0};
-  frc::DigitalInput m_bottomlimitSwitch{1};
-  frc::PWMVictorSPX m_motor{0};
-  frc::Joystick m_joystick{0};
+  wpi::DigitalInput m_toplimitSwitch{0};
+  wpi::DigitalInput m_bottomlimitSwitch{1};
+  wpi::PWMVictorSPX m_motor{0};
+  wpi::Joystick m_joystick{0};
 };
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

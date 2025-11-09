@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/filter/Debouncer.h"
+#include "wpi/math/filter/Debouncer.hpp"
 
-#include "wpimath/MathShared.h"
+#include "wpi/math/util/MathShared.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
-Debouncer::Debouncer(units::second_t debounceTime, DebounceType type)
+Debouncer::Debouncer(wpi::units::second_t debounceTime, DebounceType type)
     : m_debounceTime(debounceTime), m_debounceType(type) {
   m_baseline = m_debounceType == DebounceType::kFalling;
   ResetTimer();

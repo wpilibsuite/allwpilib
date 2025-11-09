@@ -11,16 +11,15 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/StringExtras.h>
-#include <wpi/StringMap.h>
-#include <wpi/UidVector.h>
-#include <wpi/spinlock.h>
+#include "wpi/hal/Value.h"
+#include "wpi/hal/simulation/SimCallbackRegistry.h"
+#include "wpi/hal/simulation/SimDeviceData.h"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/StringMap.hpp"
+#include "wpi/util/UidVector.hpp"
+#include "wpi/util/spinlock.hpp"
 
-#include "hal/Value.h"
-#include "hal/simulation/SimCallbackRegistry.h"
-#include "hal/simulation/SimDeviceData.h"
-
-namespace hal {
+namespace wpi::hal {
 
 namespace impl {
 
@@ -30,7 +29,8 @@ class SimUnnamedCallbackRegistry {
   using RawFunctor = void (*)();
 
  protected:
-  using CallbackVector = wpi::UidVector<HalCallbackListener<RawFunctor>, 4>;
+  using CallbackVector =
+      wpi::util::UidVector<HalCallbackListener<RawFunctor>, 4>;
 
  public:
   void Cancel(int32_t uid) {
@@ -96,7 +96,7 @@ class SimPrefixCallbackRegistry {
 
     explicit operator bool() const { return callback != nullptr; }
   };
-  using CallbackVector = wpi::UidVector<CallbackData, 4>;
+  using CallbackVector = wpi::util::UidVector<CallbackData, 4>;
 
  public:
   void Cancel(int32_t uid) {
@@ -127,7 +127,7 @@ class SimPrefixCallbackRegistry {
     if (m_callbacks) {
       for (size_t i = 0; i < m_callbacks->size(); ++i) {
         auto& cb = (*m_callbacks)[i];
-        if (cb.callback && wpi::starts_with(name, cb.prefix)) {
+        if (cb.callback && wpi::util::starts_with(name, cb.prefix)) {
           auto callback = cb.callback;
           auto param = cb.param;
           lock.unlock();
@@ -171,16 +171,16 @@ class SimDeviceData {
 
     HAL_SimDeviceHandle handle{0};
     std::string name;
-    wpi::UidVector<std::unique_ptr<Value>, 16> values;
-    wpi::StringMap<Value*> valueMap;
+    wpi::util::UidVector<std::unique_ptr<Value>, 16> values;
+    wpi::util::StringMap<Value*> valueMap;
     impl::SimUnnamedCallbackRegistry<HALSIM_SimValueCallback> valueCreated;
   };
 
-  wpi::UidVector<std::shared_ptr<Device>, 4> m_devices;
-  wpi::StringMap<std::weak_ptr<Device>> m_deviceMap;
+  wpi::util::UidVector<std::shared_ptr<Device>, 4> m_devices;
+  wpi::util::StringMap<std::weak_ptr<Device>> m_deviceMap;
   std::vector<std::pair<std::string, bool>> m_prefixEnabled;
 
-  wpi::recursive_spinlock m_mutex;
+  wpi::util::recursive_spinlock m_mutex;
 
   impl::SimPrefixCallbackRegistry<HALSIM_SimDeviceCallback> m_deviceCreated;
   impl::SimPrefixCallbackRegistry<HALSIM_SimDeviceCallback> m_deviceFreed;
@@ -254,4 +254,4 @@ class SimDeviceData {
   void ResetData();
 };
 extern SimDeviceData* SimSimDeviceData;
-}  // namespace hal
+}  // namespace wpi::hal

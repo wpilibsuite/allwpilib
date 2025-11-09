@@ -8,89 +8,89 @@
 #include <type_traits>
 
 #include <gtest/gtest.h>
-#include <wpi/print.h>
+#include "wpi/util/print.hpp"
 
-#include "units/acceleration.h"
-#include "units/angle.h"
-#include "units/angular_acceleration.h"
-#include "units/angular_jerk.h"
-#include "units/angular_velocity.h"
-#include "units/area.h"
-#include "units/capacitance.h"
-#include "units/charge.h"
-#include "units/concentration.h"
-#include "units/conductance.h"
-#include "units/constants.h"
-#include "units/current.h"
-#include "units/data.h"
-#include "units/data_transfer_rate.h"
-#include "units/density.h"
-#include "units/dimensionless.h"
-#include "units/energy.h"
-#include "units/force.h"
-#include "units/frequency.h"
-#include "units/illuminance.h"
-#include "units/impedance.h"
-#include "units/inductance.h"
-#include "units/length.h"
-#include "units/luminous_flux.h"
-#include "units/luminous_intensity.h"
-#include "units/magnetic_field_strength.h"
-#include "units/magnetic_flux.h"
-#include "units/mass.h"
-#include "units/math.h"
-#include "units/power.h"
-#include "units/pressure.h"
-#include "units/radiation.h"
-#include "units/solid_angle.h"
-#include "units/substance.h"
-#include "units/temperature.h"
-#include "units/time.h"
-#include "units/torque.h"
-#include "units/velocity.h"
-#include "units/voltage.h"
-#include "units/volume.h"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/angular_acceleration.hpp"
+#include "wpi/units/angular_jerk.hpp"
+#include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/area.hpp"
+#include "wpi/units/capacitance.hpp"
+#include "wpi/units/charge.hpp"
+#include "wpi/units/concentration.hpp"
+#include "wpi/units/conductance.hpp"
+#include "wpi/units/constants.hpp"
+#include "wpi/units/current.hpp"
+#include "wpi/units/data.hpp"
+#include "wpi/units/data_transfer_rate.hpp"
+#include "wpi/units/density.hpp"
+#include "wpi/units/dimensionless.hpp"
+#include "wpi/units/energy.hpp"
+#include "wpi/units/force.hpp"
+#include "wpi/units/frequency.hpp"
+#include "wpi/units/illuminance.hpp"
+#include "wpi/units/impedance.hpp"
+#include "wpi/units/inductance.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/luminous_flux.hpp"
+#include "wpi/units/luminous_intensity.hpp"
+#include "wpi/units/magnetic_field_strength.hpp"
+#include "wpi/units/magnetic_flux.hpp"
+#include "wpi/units/mass.hpp"
+#include "wpi/units/math.hpp"
+#include "wpi/units/power.hpp"
+#include "wpi/units/pressure.hpp"
+#include "wpi/units/radiation.hpp"
+#include "wpi/units/solid_angle.hpp"
+#include "wpi/units/substance.hpp"
+#include "wpi/units/temperature.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/torque.hpp"
+#include "wpi/units/velocity.hpp"
+#include "wpi/units/voltage.hpp"
+#include "wpi/units/volume.hpp"
 
-using namespace units::acceleration;
-using namespace units::angle;
-using namespace units::angular_acceleration;
-using namespace units::angular_jerk;
-using namespace units::angular_velocity;
-using namespace units::area;
-using namespace units::capacitance;
-using namespace units::charge;
-using namespace units::concentration;
-using namespace units::conductance;
-using namespace units::data;
-using namespace units::data_transfer_rate;
-using namespace units::density;
-using namespace units::dimensionless;
-using namespace units::energy;
-using namespace units::frequency;
-using namespace units::illuminance;
-using namespace units::impedance;
-using namespace units::inductance;
-using namespace units::length;
-using namespace units::luminous_flux;
-using namespace units::luminous_intensity;
-using namespace units::magnetic_field_strength;
-using namespace units::magnetic_flux;
-using namespace units::mass;
-using namespace units::math;
-using namespace units::power;
-using namespace units::pressure;
-using namespace units::radiation;
-using namespace units::solid_angle;
-using namespace units::temperature;
-using namespace units::time;
-using namespace units::torque;
-using namespace units::velocity;
-using namespace units::voltage;
-using namespace units::volume;
-using namespace units;
+using namespace wpi::units::acceleration;
+using namespace wpi::units::angle;
+using namespace wpi::units::angular_acceleration;
+using namespace wpi::units::angular_jerk;
+using namespace wpi::units::angular_velocity;
+using namespace wpi::units::area;
+using namespace wpi::units::capacitance;
+using namespace wpi::units::charge;
+using namespace wpi::units::concentration;
+using namespace wpi::units::conductance;
+using namespace wpi::units::data;
+using namespace wpi::units::data_transfer_rate;
+using namespace wpi::units::density;
+using namespace wpi::units::dimensionless;
+using namespace wpi::units::energy;
+using namespace wpi::units::frequency;
+using namespace wpi::units::illuminance;
+using namespace wpi::units::impedance;
+using namespace wpi::units::inductance;
+using namespace wpi::units::length;
+using namespace wpi::units::luminous_flux;
+using namespace wpi::units::luminous_intensity;
+using namespace wpi::units::magnetic_field_strength;
+using namespace wpi::units::magnetic_flux;
+using namespace wpi::units::mass;
+using namespace wpi::units::math;
+using namespace wpi::units::power;
+using namespace wpi::units::pressure;
+using namespace wpi::units::radiation;
+using namespace wpi::units::solid_angle;
+using namespace wpi::units::temperature;
+using namespace wpi::units::time;
+using namespace wpi::units::torque;
+using namespace wpi::units::velocity;
+using namespace wpi::units::voltage;
+using namespace wpi::units::volume;
+using namespace wpi::units;
 
 #if !defined(_MSC_VER) || _MSC_VER > 1800
-using namespace units::literals;
+using namespace wpi::units::literals;
 #endif
 
 namespace {
@@ -452,7 +452,7 @@ TEST_F(TypeTraits, is_substance_unit) {
 TEST_F(TypeTraits, is_luminous_intensity_unit) {
   EXPECT_TRUE((traits::is_luminous_intensity_unit_v<candela>));
   EXPECT_FALSE(
-      (traits::is_luminous_intensity_unit_v<units::radiation::rad>));
+      (traits::is_luminous_intensity_unit_v<wpi::units::radiation::rad>));
   EXPECT_FALSE((traits::is_luminous_intensity_unit_v<double>));
 
   EXPECT_TRUE((traits::is_luminous_intensity_unit_v<candela_t>));
@@ -534,19 +534,19 @@ TEST_F(TypeTraits, is_acceleration_unit) {
 }
 
 TEST_F(TypeTraits, is_force_unit) {
-  EXPECT_TRUE((traits::is_force_unit_v<units::force::newton>));
-  EXPECT_TRUE((traits::is_force_unit_v<units::force::dynes>));
+  EXPECT_TRUE((traits::is_force_unit_v<wpi::units::force::newton>));
+  EXPECT_TRUE((traits::is_force_unit_v<wpi::units::force::dynes>));
   EXPECT_FALSE((traits::is_force_unit_v<meter>));
   EXPECT_FALSE((traits::is_force_unit_v<double>));
 
-  EXPECT_TRUE((traits::is_force_unit_v<units::force::newton_t>));
-  EXPECT_TRUE((traits::is_force_unit_v<const units::force::newton_t>));
-  EXPECT_TRUE((traits::is_force_unit_v<const units::force::newton_t&>));
-  EXPECT_TRUE((traits::is_force_unit_v<units::force::dyne_t>));
+  EXPECT_TRUE((traits::is_force_unit_v<wpi::units::force::newton_t>));
+  EXPECT_TRUE((traits::is_force_unit_v<const wpi::units::force::newton_t>));
+  EXPECT_TRUE((traits::is_force_unit_v<const wpi::units::force::newton_t&>));
+  EXPECT_TRUE((traits::is_force_unit_v<wpi::units::force::dyne_t>));
   EXPECT_FALSE((traits::is_force_unit_v<watt_t>));
-  EXPECT_TRUE((traits::is_force_unit_v<units::force::dyne_t,
-                                     units::force::newton_t>));
-  EXPECT_FALSE((traits::is_force_unit_v<watt_t, units::force::newton_t>));
+  EXPECT_TRUE((traits::is_force_unit_v<wpi::units::force::dyne_t,
+                                     wpi::units::force::newton_t>));
+  EXPECT_FALSE((traits::is_force_unit_v<watt_t, wpi::units::force::newton_t>));
 }
 
 TEST_F(TypeTraits, is_pressure_unit) {
@@ -677,7 +677,7 @@ TEST_F(TypeTraits, is_magnetic_flux_unit) {
 
 TEST_F(TypeTraits, is_magnetic_field_strength_unit) {
   EXPECT_TRUE((traits::is_magnetic_field_strength_unit_v<
-               units::magnetic_field_strength::tesla>));
+               wpi::units::magnetic_field_strength::tesla>));
   EXPECT_TRUE((traits::is_magnetic_field_strength_unit_v<gauss>));
   EXPECT_FALSE((traits::is_magnetic_field_strength_unit_v<volt>));
   EXPECT_FALSE((traits::is_magnetic_field_strength_unit_v<double>));
@@ -919,13 +919,13 @@ TEST_F(UnitManipulators, dimensionalAnalysis) {
   // REALLY handy if the unit types aren't know (i.e. they themselves are
   // template parameters), as you can get the resulting unit of the operation.
 
-  using velocity = units::detail::unit_divide<meters, second>;
+  using velocity = wpi::units::detail::unit_divide<meters, second>;
   bool shouldBeTrue = std::is_same_v<meters_per_second, velocity>;
   EXPECT_TRUE(shouldBeTrue);
 
   using acceleration1 = unit<std::ratio<1>, category::acceleration_unit>;
-  using acceleration2 = units::detail::unit_divide<
-      meters, units::detail::unit_multiply<seconds, seconds>>;
+  using acceleration2 = wpi::units::detail::unit_divide<
+      meters, wpi::units::detail::unit_multiply<seconds, seconds>>;
   shouldBeTrue = std::is_same_v<acceleration1, acceleration2>;
   EXPECT_TRUE(shouldBeTrue);
 }
@@ -964,7 +964,7 @@ TEST_F(UnitContainer, has_value_member) {
 }
 
 TEST_F(UnitContainer, make_unit) {
-  auto dist = units::make_unit<meter_t>(5);
+  auto dist = wpi::units::make_unit<meter_t>(5);
   EXPECT_EQ(meter_t(5), dist);
 }
 
@@ -1380,17 +1380,17 @@ TEST_F(UnitContainer, cout) {
 
   // undefined unit
   testing::internal::CaptureStdout();
-  std::cout << units::math::cpow<4>(meter_t(2));
+  std::cout << wpi::units::math::cpow<4>(meter_t(2));
   output = testing::internal::GetCapturedStdout();
   EXPECT_STREQ("16 m^4", output.c_str());
 
   testing::internal::CaptureStdout();
-  std::cout << units::math::cpow<3>(foot_t(2));
+  std::cout << wpi::units::math::cpow<3>(foot_t(2));
   output = testing::internal::GetCapturedStdout();
   EXPECT_STREQ("8 cu_ft", output.c_str());
 
   testing::internal::CaptureStdout();
-  std::cout << std::setprecision(9) << units::math::cpow<4>(foot_t(2));
+  std::cout << std::setprecision(9) << wpi::units::math::cpow<4>(foot_t(2));
   output = testing::internal::GetCapturedStdout();
   EXPECT_STREQ("0.138095597 m^4", output.c_str());
 
@@ -1427,59 +1427,59 @@ TEST_F(UnitContainer, cout) {
 #if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
 TEST_F(UnitContainer, fmtlib) {
   testing::internal::CaptureStdout();
-  wpi::print("{}", degree_t(349.87));
+  wpi::util::print("{}", degree_t(349.87));
   std::string output = testing::internal::GetCapturedStdout();
   EXPECT_STREQ("349.87 deg", output.c_str());
 
   testing::internal::CaptureStdout();
-  wpi::print("{}", meter_t(1.0));
+  wpi::util::print("{}", meter_t(1.0));
   output = testing::internal::GetCapturedStdout();
   EXPECT_STREQ("1 m", output.c_str());
 
   testing::internal::CaptureStdout();
-  wpi::print("{}", dB_t(31.0));
+  wpi::util::print("{}", dB_t(31.0));
   output = testing::internal::GetCapturedStdout();
   EXPECT_STREQ("31 dB", output.c_str());
 
   testing::internal::CaptureStdout();
-  wpi::print("{}", volt_t(21.79));
+  wpi::util::print("{}", volt_t(21.79));
   output = testing::internal::GetCapturedStdout();
   EXPECT_STREQ("21.79 V", output.c_str());
 
   testing::internal::CaptureStdout();
-  wpi::print("{}", dBW_t(12.0));
+  wpi::util::print("{}", dBW_t(12.0));
   output = testing::internal::GetCapturedStdout();
   EXPECT_STREQ("12 dBW", output.c_str());
 
   testing::internal::CaptureStdout();
-  wpi::print("{}", dBm_t(120.0));
+  wpi::util::print("{}", dBm_t(120.0));
   output = testing::internal::GetCapturedStdout();
   EXPECT_STREQ("120 dBm", output.c_str());
 
   testing::internal::CaptureStdout();
-  wpi::print("{}", miles_per_hour_t(72.1));
+  wpi::util::print("{}", miles_per_hour_t(72.1));
   output = testing::internal::GetCapturedStdout();
   EXPECT_STREQ("72.1 mph", output.c_str());
 
   // undefined unit
   testing::internal::CaptureStdout();
-  wpi::print("{}", units::math::cpow<4>(meter_t(2)));
+  wpi::util::print("{}", wpi::units::math::cpow<4>(meter_t(2)));
   output = testing::internal::GetCapturedStdout();
   EXPECT_STREQ("16 m^4", output.c_str());
 
   testing::internal::CaptureStdout();
-  wpi::print("{}", units::math::cpow<3>(foot_t(2)));
+  wpi::util::print("{}", wpi::units::math::cpow<3>(foot_t(2)));
   output = testing::internal::GetCapturedStdout();
   EXPECT_STREQ("8 cu_ft", output.c_str());
 
   testing::internal::CaptureStdout();
-  wpi::print("{:.9}", units::math::cpow<4>(foot_t(2)));
+  wpi::util::print("{:.9}", wpi::units::math::cpow<4>(foot_t(2)));
   output = testing::internal::GetCapturedStdout();
   EXPECT_STREQ("0.138095597 m^4", output.c_str());
 
   // constants
   testing::internal::CaptureStdout();
-  wpi::print("{:.8}", constants::k_B);
+  wpi::util::print("{:.8}", constants::k_B);
   output = testing::internal::GetCapturedStdout();
 #if defined(_MSC_VER) && (_MSC_VER <= 1800)
   EXPECT_STREQ("1.3806485e-023 m^2 kg s^-2 K^-1", output.c_str());
@@ -1488,7 +1488,7 @@ TEST_F(UnitContainer, fmtlib) {
 #endif
 
   testing::internal::CaptureStdout();
-  wpi::print("{:.9}", constants::mu_B);
+  wpi::util::print("{:.9}", constants::mu_B);
   output = testing::internal::GetCapturedStdout();
 #if defined(_MSC_VER) && (_MSC_VER <= 1800)
   EXPECT_STREQ("9.27400999e-024 m^2 A", output.c_str());
@@ -1497,7 +1497,7 @@ TEST_F(UnitContainer, fmtlib) {
 #endif
 
   testing::internal::CaptureStdout();
-  wpi::print("{:.7}", constants::sigma);
+  wpi::util::print("{:.7}", constants::sigma);
   output = testing::internal::GetCapturedStdout();
 #if defined(_MSC_VER) && (_MSC_VER <= 1800)
   EXPECT_STREQ("5.670367e-008 kg s^-3 K^-4", output.c_str());
@@ -1509,10 +1509,10 @@ TEST_F(UnitContainer, fmtlib) {
 
 TEST_F(UnitContainer, to_string) {
   foot_t a(3.5);
-  EXPECT_STREQ("3.5 ft", units::length::to_string(a).c_str());
+  EXPECT_STREQ("3.5 ft", wpi::units::length::to_string(a).c_str());
 
   meter_t b(8);
-  EXPECT_STREQ("8 m", units::length::to_string(b).c_str());
+  EXPECT_STREQ("8 m", wpi::units::length::to_string(b).c_str());
 }
 
 TEST_F(UnitContainer, DISABLED_to_string_locale) {
@@ -1530,10 +1530,10 @@ TEST_F(UnitContainer, DISABLED_to_string_locale) {
   EXPECT_EQ(point_de, ',');
 
   kilometer_t de = 2_km;
-  EXPECT_STREQ("2 km", units::length::to_string(de).c_str());
+  EXPECT_STREQ("2 km", wpi::units::length::to_string(de).c_str());
 
   de = 2.5_km;
-  EXPECT_STREQ("2,5 km", units::length::to_string(de).c_str());
+  EXPECT_STREQ("2,5 km", wpi::units::length::to_string(de).c_str());
 
   // US locale
 #if defined(_MSC_VER)
@@ -1547,20 +1547,20 @@ TEST_F(UnitContainer, DISABLED_to_string_locale) {
   EXPECT_EQ(point_us, '.');
 
   mile_t us = 2_mi;
-  EXPECT_STREQ("2 mi", units::length::to_string(us).c_str());
+  EXPECT_STREQ("2 mi", wpi::units::length::to_string(us).c_str());
 
   us = 2.5_mi;
-  EXPECT_STREQ("2.5 mi", units::length::to_string(us).c_str());
+  EXPECT_STREQ("2.5 mi", wpi::units::length::to_string(us).c_str());
 }
 
 TEST_F(UnitContainer, nameAndAbbreviation) {
   foot_t a(3.5);
-  EXPECT_STREQ("ft", units::abbreviation(a));
+  EXPECT_STREQ("ft", wpi::units::abbreviation(a));
   EXPECT_STREQ("ft", a.abbreviation());
   EXPECT_STREQ("foot", a.name());
 
   meter_t b(8);
-  EXPECT_STREQ("m", units::abbreviation(b));
+  EXPECT_STREQ("m", wpi::units::abbreviation(b));
   EXPECT_STREQ("m", b.abbreviation());
   EXPECT_STREQ("meter", b.name());
 }
@@ -2033,17 +2033,17 @@ TEST_F(UnitConversion, acceleration) {
 TEST_F(UnitConversion, force) {
   double test;
 
-  test = convert<units::force::newton, units::force::newton>(1.0);
+  test = convert<wpi::units::force::newton, wpi::units::force::newton>(1.0);
   EXPECT_NEAR(1.0, test, 5.0e-5);
-  test = convert<units::force::newton, units::force::pounds>(6.3);
+  test = convert<wpi::units::force::newton, wpi::units::force::pounds>(6.3);
   EXPECT_NEAR(1.4163, test, 5.0e-5);
-  test = convert<units::force::newton, units::force::dynes>(5.0);
+  test = convert<wpi::units::force::newton, wpi::units::force::dynes>(5.0);
   EXPECT_NEAR(500000.0, test, 5.0e-5);
-  test = convert<units::force::newtons, units::force::poundals>(2.1);
+  test = convert<wpi::units::force::newtons, wpi::units::force::poundals>(2.1);
   EXPECT_NEAR(15.1893, test, 5.0e-5);
-  test = convert<units::force::newtons, units::force::kiloponds>(173.0);
+  test = convert<wpi::units::force::newtons, wpi::units::force::kiloponds>(173.0);
   EXPECT_NEAR(17.6411, test, 5.0e-5);
-  test = convert<units::force::poundals, units::force::kiloponds>(21.879);
+  test = convert<wpi::units::force::poundals, wpi::units::force::kiloponds>(21.879);
   EXPECT_NEAR(0.308451933, test, 5.0e-10);
 }
 
@@ -2635,16 +2635,16 @@ TEST_F(UnitConversion, data_transfer_rate) {
 
 TEST_F(UnitConversion, pi) {
   EXPECT_TRUE(
-      units::traits::is_dimensionless_unit_v<decltype(constants::pi)>);
-  EXPECT_TRUE(units::traits::is_dimensionless_unit_v<constants::PI>);
+      wpi::units::traits::is_dimensionless_unit_v<decltype(constants::pi)>);
+  EXPECT_TRUE(wpi::units::traits::is_dimensionless_unit_v<constants::PI>);
 
   // implicit conversion/arithmetic
   EXPECT_NEAR(3.14159, constants::pi, 5.0e-6);
   EXPECT_NEAR(6.28318531, (2 * constants::pi), 5.0e-9);
   EXPECT_NEAR(6.28318531, (constants::pi + constants::pi), 5.0e-9);
   EXPECT_NEAR(0.0, (constants::pi - constants::pi), 5.0e-9);
-  EXPECT_NEAR(31.00627668, units::math::cpow<3>(constants::pi), 5.0e-10);
-  EXPECT_NEAR(0.0322515344, (1.0 / units::math::cpow<3>(constants::pi)),
+  EXPECT_NEAR(31.00627668, wpi::units::math::cpow<3>(constants::pi), 5.0e-10);
+  EXPECT_NEAR(0.0322515344, (1.0 / wpi::units::math::cpow<3>(constants::pi)),
               5.0e-11);
   EXPECT_TRUE(constants::detail::PI_VAL == constants::pi);
   EXPECT_TRUE(1.0 != constants::pi);
@@ -2748,10 +2748,10 @@ TEST_F(UnitConversion, std_chrono) {
 }
 
 TEST_F(UnitConversion, squaredTemperature) {
-  using squared_celsius = units::compound_unit<squared<celsius>>;
-  using squared_celsius_t = units::unit_t<squared_celsius>;
+  using squared_celsius = wpi::units::compound_unit<squared<celsius>>;
+  using squared_celsius_t = wpi::units::unit_t<squared_celsius>;
   const squared_celsius_t right(100);
-  const celsius_t rootRight = units::math::sqrt(right);
+  const celsius_t rootRight = wpi::units::math::sqrt(right);
   EXPECT_EQ(celsius_t(10), rootRight);
 }
 
@@ -3127,8 +3127,8 @@ TEST_F(Constexpr, arithmetic) {
   constexpr auto result5(meter_t(1) - meter_t(1));
   constexpr auto result6(meter_t(1) * meter_t(1));
   constexpr auto result7(meter_t(1) / meter_t(1));
-  constexpr auto result8(units::math::cpow<2>(meter_t(2)));
-  constexpr auto result9 = units::math::cpow<3>(2_m);
+  constexpr auto result8(wpi::units::math::cpow<2>(meter_t(2)));
+  constexpr auto result9 = wpi::units::math::cpow<3>(2_m);
   constexpr auto result10 = 2_m * 2_m;
 
   EXPECT_TRUE(noexcept(result0));
@@ -3329,7 +3329,7 @@ TEST_F(CompileTimeArithmetic, unit_value_multiply) {
   EXPECT_TRUE((
       traits::is_unit_value_t_category_v<category::area_unit, productF2>));
 
-  using nRatio = unit_value_t<units::force::newton, 5>;
+  using nRatio = unit_value_t<wpi::units::force::newton, 5>;
 
   using productN = unit_value_multiply<nRatio, ftRatio>;
   EXPECT_FALSE(
@@ -3512,4 +3512,19 @@ TEST_F(CaseStudies, pythagoreanTheorum) {
   EXPECT_TRUE(pow<2>(RightTriangle::a::value()) +
                   pow<2>(RightTriangle::b::value()) ==
               pow<2>(RightTriangle::c::value()));
+}
+
+TEST(Units, overloadResolution) {
+  // Slight hack to get nested functions
+  struct Scope {
+    static bool f(wpi::units::meter_t) {
+      return true;
+    };
+
+    static bool f(wpi::units::second_t) {
+      return false;
+    };
+  };
+  // Make sure this properly selects the meter overload
+  EXPECT_TRUE(Scope::f(1_mm));
 }

@@ -1,0 +1,123 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [
+    "semiwrap~=0.2.1",
+    "hatch-meson~=0.1.0",
+    "hatch-robotpy~=0.2.1",
+    "hatchling",
+    "robotpy-native-wpiutil==0.0.0",
+]
+
+[project]
+name = "robotpy-wpiutil"
+version = "0.0.0"
+description = "Binary wrapper for FRC WPIUtil library"
+authors = [
+    {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
+]
+license = "BSD-3-Clause"
+dependencies = [
+    "robotpy-native-wpiutil==0.0.0",
+]
+
+[project.urls]
+"Source code" = "https://github.com/robotpy/mostrobotpy"
+
+
+[tool.hatch.build.hooks.robotpy]
+version_file = "wpiutil/version.py"
+
+[tool.hatch.build.hooks.semiwrap]
+
+[tool.hatch.build.hooks.meson]
+
+[tool.hatch.build.targets.wheel]
+packages = ["wpiutil"]
+
+
+[tool.semiwrap]
+update_init = [
+    "wpiutil",
+    # "wpiutil.log wpiutil._wpiutil.log",
+    "wpiutil.sync wpiutil._wpiutil.sync",
+    "wpiutil.wpistruct wpiutil._wpiutil.wpistruct",
+]
+scan_headers_ignore = [
+    "debugging.hpp",
+    "debugging/*",
+    "fmt/*",
+    "google/*",
+    "wpi/*",
+    "wpystruct_fns.h",
+    "pb.h",
+    "pb_common.h",
+    "pb_decode.h",
+    "pb_encode.h",
+    "upb/*",
+    "utf8_range.h",
+]
+
+[tool.semiwrap.extension_modules."wpiutil._wpiutil"]
+name = "wpiutil"
+includes = [
+    "wpiutil/src/wpistruct",
+]
+wraps = ["robotpy-native-wpiutil"]
+depends = ["wpiutil-casters"]
+
+[tool.semiwrap.extension_modules."wpiutil._wpiutil".headers]
+# wpi
+StackTrace = "wpi/util/StackTrace.hpp"
+Synchronization = "wpi/util/Synchronization.h"
+RawFrame = "wpi/util/RawFrame.h"
+
+# wpi/sendable
+Sendable = "wpi/util/sendable/Sendable.hpp"
+SendableBuilder = "wpi/util/sendable/SendableBuilder.hpp"
+#SendableHelper = "wpi/util/sendable/SendableHelper.hpp"
+SendableRegistry = "wpi/util/sendable/SendableRegistry.hpp"
+
+WPyStruct = "src/wpistruct/wpystruct_fns.h"
+
+[tool.semiwrap.export_type_casters.wpiutil-casters]
+pypackage = "wpiutil"
+includedir = [
+    "wpiutil/src/type_casters",
+    "wpiutil/src/wpistruct",
+]
+
+[[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
+header = "wpi_array_type_caster.h"
+types = ["wpi::util::array"]
+
+[[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
+header = "wpi_json_type_caster.h"
+types = ["wpi::util::json"]
+
+[[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
+header = "wpi_span_type_caster.h"
+types = ["std::span"]
+
+[[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
+header = "wpi_smallset_type_caster.h"
+types = ["wpi::util::SmallSet"]
+
+[[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
+header = "wpi_smallvector_type_caster.h"
+types = ["wpi::util::SmallVector"]
+
+[[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
+header = "wpi_smallvectorimpl_type_caster.h"
+types = ["wpi::util::SmallVectorImpl"]
+
+[[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
+header = "wpi_string_map_caster.h"
+types = ["wpi::util::StringMap"]
+
+[[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
+header = "wpi_ct_string_type_caster.h"
+types = ["wpi::util::ct_string"]
+
+[[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
+header = "wpystruct.h"
+types = ["WPyStruct"]

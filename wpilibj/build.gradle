@@ -5,14 +5,14 @@ evaluationDependsOn(':cameraserver')
 
 ext {
     baseId = 'wpilibj'
-    groupId = 'edu.wpi.first.wpilibj'
-    devMain = 'edu.wpi.first.wpilibj.DevMain'
+    groupId = 'org.wpilib.wpilibj'
+    devMain = 'org.wpilib.wpilibj.DevMain'
 }
 
 apply from: "${rootDir}/shared/java/javacommon.gradle"
 
 def wpilibVersionFileInput = file("src/generate/WPILibVersion.java.in")
-def wpilibVersionFileOutput = file("$buildDir/generated/java/edu/wpi/first/wpilibj/util/WPILibVersion.java")
+def wpilibVersionFileOutput = file("$buildDir/generated/java/org/wpilib/system/WPILibVersion.java")
 
 task generateJavaVersion() {
     description = 'Generates the wpilib version class'
@@ -155,7 +155,7 @@ model {
     }
 }
 
-def oldWpilibVersionFile = file('src/main/java/edu/wpi/first/wpilibj/util/WPILibVersion.java')
+def oldWpilibVersionFile = file('src/main/java/org/wpilib/system/WPILibVersion.java')
 
 clean {
     delete oldWpilibVersionFile

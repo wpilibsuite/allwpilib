@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "subsystems/DriveSubsystem.h"
+#include "subsystems/DriveSubsystem.hpp"
 
-#include <frc/RobotController.h>
+#include "wpi/system/RobotController.hpp"
 
 using namespace DriveConstants;
 
@@ -14,8 +14,8 @@ DriveSubsystem::DriveSubsystem()
       m_rightLeader{kRightMotor1Port},
       m_rightFollower{kRightMotor2Port},
       m_feedforward{ks, kv, ka} {
-  wpi::SendableRegistry::AddChild(&m_drive, &m_leftLeader);
-  wpi::SendableRegistry::AddChild(&m_drive, &m_rightLeader);
+  wpi::util::SendableRegistry::AddChild(&m_drive, &m_leftLeader);
+  wpi::util::SendableRegistry::AddChild(&m_drive, &m_rightLeader);
 
   // We need to invert one side of the drivetrain so that positive voltages
   // result in both sides moving forward. Depending on how your robot's
@@ -34,21 +34,21 @@ void DriveSubsystem::Periodic() {
 }
 
 void DriveSubsystem::SetDriveStates(
-    frc::TrapezoidProfile<units::meters>::State currentLeft,
-    frc::TrapezoidProfile<units::meters>::State currentRight,
-    frc::TrapezoidProfile<units::meters>::State nextLeft,
-    frc::TrapezoidProfile<units::meters>::State nextRight) {
+    wpi::math::TrapezoidProfile<wpi::units::meters>::State currentLeft,
+    wpi::math::TrapezoidProfile<wpi::units::meters>::State currentRight,
+    wpi::math::TrapezoidProfile<wpi::units::meters>::State nextLeft,
+    wpi::math::TrapezoidProfile<wpi::units::meters>::State nextRight) {
   // Feedforward is divided by battery voltage to normalize it to [-1, 1]
   m_leftLeader.SetSetpoint(
       ExampleSmartMotorController::PIDMode::kPosition,
       currentLeft.position.value(),
       m_feedforward.Calculate(currentLeft.velocity, nextLeft.velocity) /
-          frc::RobotController::GetBatteryVoltage());
+          wpi::RobotController::GetBatteryVoltage());
   m_rightLeader.SetSetpoint(
       ExampleSmartMotorController::PIDMode::kPosition,
       currentRight.position.value(),
       m_feedforward.Calculate(currentRight.velocity, nextRight.velocity) /
-          frc::RobotController::GetBatteryVoltage());
+          wpi::RobotController::GetBatteryVoltage());
 }
 
 void DriveSubsystem::ArcadeDrive(double fwd, double rot) {
@@ -60,20 +60,20 @@ void DriveSubsystem::ResetEncoders() {
   m_rightLeader.ResetEncoder();
 }
 
-units::meter_t DriveSubsystem::GetLeftEncoderDistance() {
-  return units::meter_t{m_leftLeader.GetEncoderDistance()};
+wpi::units::meter_t DriveSubsystem::GetLeftEncoderDistance() {
+  return wpi::units::meter_t{m_leftLeader.GetEncoderDistance()};
 }
 
-units::meter_t DriveSubsystem::GetRightEncoderDistance() {
-  return units::meter_t{m_rightLeader.GetEncoderDistance()};
+wpi::units::meter_t DriveSubsystem::GetRightEncoderDistance() {
+  return wpi::units::meter_t{m_rightLeader.GetEncoderDistance()};
 }
 
 void DriveSubsystem::SetMaxOutput(double maxOutput) {
   m_drive.SetMaxOutput(maxOutput);
 }
 
-frc2::CommandPtr DriveSubsystem::ProfiledDriveDistance(
-    units::meter_t distance) {
+wpi::cmd::CommandPtr DriveSubsystem::ProfiledDriveDistance(
+    wpi::units::meter_t distance) {
   return StartRun(
              [&] {
                // Restart timer so profile setpoints start at the beginning
@@ -94,8 +94,8 @@ frc2::CommandPtr DriveSubsystem::ProfiledDriveDistance(
       .Until([&] { return m_profile.IsFinished(0_s); });
 }
 
-frc2::CommandPtr DriveSubsystem::DynamicProfiledDriveDistance(
-    units::meter_t distance) {
+wpi::cmd::CommandPtr DriveSubsystem::DynamicProfiledDriveDistance(
+    wpi::units::meter_t distance) {
   return StartRun(
              [&] {
                // Restart timer so profile setpoints start at the beginning

@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/RoboRioSim.h"  // NOLINT(build/include_order)
+#include "wpi/simulation/RoboRioSim.hpp"  // NOLINT(build/include_order)
 
 #include <string>
 
 #include <gtest/gtest.h>
-#include <hal/HAL.h>
-#include <hal/HALBase.h>
 
-#include "callback_helpers/TestCallbackHelpers.h"
-#include "frc/RobotController.h"
+#include "callback_helpers/TestCallbackHelpers.hpp"
+#include "wpi/hal/HAL.h"
+#include "wpi/hal/HALBase.h"
+#include "wpi/system/RobotController.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 
 TEST(RoboRioSimTest, SetVin) {
   RoboRioSim::ResetData();
@@ -23,7 +23,7 @@ TEST(RoboRioSimTest, SetVin) {
       voltageCallback.GetCallback(), false);
   constexpr double kTestVoltage = 1.91;
 
-  RoboRioSim::SetVInVoltage(units::volt_t{kTestVoltage});
+  RoboRioSim::SetVInVoltage(wpi::units::volt_t{kTestVoltage});
   EXPECT_TRUE(voltageCallback.WasTriggered());
   EXPECT_EQ(kTestVoltage, voltageCallback.GetLastValue());
   EXPECT_EQ(kTestVoltage, RoboRioSim::GetVInVoltage().value());
@@ -38,7 +38,7 @@ TEST(RoboRioSimTest, SetBrownout) {
       voltageCallback.GetCallback(), false);
   constexpr double kTestVoltage = 1.91;
 
-  RoboRioSim::SetBrownoutVoltage(units::volt_t{kTestVoltage});
+  RoboRioSim::SetBrownoutVoltage(wpi::units::volt_t{kTestVoltage});
   EXPECT_TRUE(voltageCallback.WasTriggered());
   EXPECT_EQ(kTestVoltage, voltageCallback.GetLastValue());
   EXPECT_EQ(kTestVoltage, RoboRioSim::GetBrownoutVoltage().value());
@@ -64,13 +64,13 @@ TEST(RoboRioSimTest, Set3V3) {
   constexpr double kTestCurrent = 174;
   constexpr int kTestFaults = 229;
 
-  RoboRioSim::SetUserVoltage3V3(units::volt_t{kTestVoltage});
+  RoboRioSim::SetUserVoltage3V3(wpi::units::volt_t{kTestVoltage});
   EXPECT_TRUE(voltageCallback.WasTriggered());
   EXPECT_EQ(kTestVoltage, voltageCallback.GetLastValue());
   EXPECT_EQ(kTestVoltage, RoboRioSim::GetUserVoltage3V3().value());
   EXPECT_EQ(kTestVoltage, RobotController::GetVoltage3V3());
 
-  RoboRioSim::SetUserCurrent3V3(units::ampere_t{kTestCurrent});
+  RoboRioSim::SetUserCurrent3V3(wpi::units::ampere_t{kTestCurrent});
   EXPECT_TRUE(currentCallback.WasTriggered());
   EXPECT_EQ(kTestCurrent, currentCallback.GetLastValue());
   EXPECT_EQ(kTestCurrent, RoboRioSim::GetUserCurrent3V3().value());
@@ -97,7 +97,7 @@ TEST(RoboRioSimTest, SetCPUTemp) {
       RoboRioSim::RegisterCPUTempCallback(callback.GetCallback(), false);
   constexpr double kCPUTemp = 100.0;
 
-  RoboRioSim::SetCPUTemp(units::celsius_t{kCPUTemp});
+  RoboRioSim::SetCPUTemp(wpi::units::celsius_t{kCPUTemp});
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(kCPUTemp, callback.GetLastValue());
   EXPECT_EQ(kCPUTemp, RoboRioSim::GetCPUTemp().value());
@@ -156,4 +156,4 @@ TEST(RoboRioSimTest, SetComments) {
   EXPECT_EQ(kCommentsTruncated, RobotController::GetComments());
 }
 
-}  // namespace frc::sim
+}  // namespace wpi::sim

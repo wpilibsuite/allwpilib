@@ -1,0 +1,21 @@
+classes:
+  wpi::math::SlewRateLimiter:
+    template_params:
+    - Unit
+    typealias:
+    - Unit_t = wpi::units::unit_t<Unit>
+    - Rate = wpi::units::compound_unit<Unit, wpi::units::inverse<wpi::units::seconds>>
+    methods:
+      SlewRateLimiter:
+        overloads:
+          Rate_t, Rate_t, Unit_t:
+          Rate_t:
+      Calculate:
+      LastValue:
+      Reset:
+
+templates:
+  SlewRateLimiter:
+    qualname: wpi::math::SlewRateLimiter
+    params:
+    - wpi::units::dimensionless::scalar

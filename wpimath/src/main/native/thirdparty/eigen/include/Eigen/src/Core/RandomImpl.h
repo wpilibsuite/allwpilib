@@ -131,8 +131,15 @@ struct random_longdouble_impl {
     uint64_t randomBits[2];
     long double result = 2.0L;
     memcpy(&randomBits, &result, Size);
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
     randomBits[0] |= getRandomBits<uint64_t>(numLowBits);
     randomBits[1] |= getRandomBits<uint64_t>(numHighBits);
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+    randomBits[0] |= getRandomBits<uint64_t>(numHighBits);
+    randomBits[1] |= getRandomBits<uint64_t>(numLowBits);
+#else
+#error Unexpected or undefined __BYTE_ORDER__
+#endif
     memcpy(&result, &randomBits, Size);
     result -= 3.0L;
     return result;

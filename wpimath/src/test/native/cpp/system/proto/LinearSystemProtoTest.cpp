@@ -4,11 +4,11 @@
 
 #include <gtest/gtest.h>
 
-#include "../../ProtoTestBase.h"
-#include "frc/system/LinearSystem.h"
-#include "frc/system/proto/LinearSystemProto.h"
+#include "../../ProtoTestBase.hpp"
+#include "wpi/math/system/LinearSystem.hpp"
+#include "wpi/math/system/proto/LinearSystemProto.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 struct LinearSystemProtoTestData {
   using Type = LinearSystem<2, 3, 4>;

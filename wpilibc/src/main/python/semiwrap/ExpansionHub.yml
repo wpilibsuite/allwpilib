@@ -1,0 +1,16 @@
+extra_includes:
+- wpi/ExpansionHubMotor.hpp
+- wpi/ExpansionHubServo.hpp
+
+classes:
+  wpi::ExpansionHub:
+    attributes:
+      NumUsbPorts:
+      NumServoPorts:
+      NumMotorPorts:
+    methods:
+      ExpansionHub:
+      MakeServo:
+      MakeMotor:
+      IsHubConnected:
+      GetUsbId:

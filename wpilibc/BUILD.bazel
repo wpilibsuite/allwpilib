@@ -197,5 +197,5 @@ cc_binary(
 package_default_cc_project(
     name = "wpilibc",
     maven_artifact_name = "wpilibc-cpp",
-    maven_group_id = "edu.wpi.first.wpilibc",
+    maven_group_id = "org.wpilib.wpilibc",
 )

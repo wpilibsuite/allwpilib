@@ -21,7 +21,7 @@
    limitations under the License.
 */
 
-#include "wpinet/TCPStream.h"
+#include "wpi/net/TCPStream.h"
 
 #include <fcntl.h>
 
@@ -36,9 +36,9 @@
 
 #include <cerrno>
 
-#include <wpi/StringExtras.h>
+#include "wpi/util/StringExtras.hpp"
 
-using namespace wpi;
+using namespace wpi::net;
 
 TCPStream::TCPStream(int sd, sockaddr_in* address)
     : m_sd(sd), m_blocking(true) {
@@ -87,7 +87,7 @@ size_t TCPStream::send(const char* buffer, size_t len, Error* err) {
   }
   if (!result) {
     char Buffer[128];
-    wpi::format_to_n_c_str(Buffer, sizeof(Buffer),
+    wpi::util::format_to_n_c_str(Buffer, sizeof(Buffer),
                            "Send() failed: WSA error={}\n", WSAGetLastError());
 
     OutputDebugStringA(Buffer);

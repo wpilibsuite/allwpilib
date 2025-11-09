@@ -4,21 +4,20 @@
 
 #include <numbers>
 
-#include <frc/Joystick.h>
-#include <frc/TimedRobot.h>
-#include <frc/controller/SimpleMotorFeedforward.h>
-#include <frc/trajectory/TrapezoidProfile.h>
-#include <units/acceleration.h>
-#include <units/length.h>
-#include <units/time.h>
-#include <units/velocity.h>
-#include <units/voltage.h>
+#include "ExampleSmartMotorController.hpp"
+#include "wpi/driverstation/Joystick.hpp"
+#include "wpi/framework/TimedRobot.hpp"
+#include "wpi/math/controller/SimpleMotorFeedforward.hpp"
+#include "wpi/math/trajectory/TrapezoidProfile.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
+#include "wpi/units/voltage.hpp"
 
-#include "ExampleSmartMotorController.h"
-
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
-  static constexpr units::second_t kDt = 20_ms;
+  static constexpr wpi::units::second_t kDt = 20_ms;
 
   Robot() {
     // Note: These gains are fake, and will have to be tuned for your robot.
@@ -43,21 +42,22 @@ class Robot : public frc::TimedRobot {
   }
 
  private:
-  frc::Joystick m_joystick{1};
+  wpi::Joystick m_joystick{1};
   ExampleSmartMotorController m_motor{1};
-  frc::SimpleMotorFeedforward<units::meters> m_feedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_feedforward{
       // Note: These gains are fake, and will have to be tuned for your robot.
       1_V, 1.5_V * 1_s / 1_m};
 
   // Create a motion profile with the given maximum velocity and maximum
   // acceleration constraints for the next setpoint.
-  frc::TrapezoidProfile<units::meters> m_profile{{1.75_mps, 0.75_mps_sq}};
-  frc::TrapezoidProfile<units::meters>::State m_goal;
-  frc::TrapezoidProfile<units::meters>::State m_setpoint;
+  wpi::math::TrapezoidProfile<wpi::units::meters> m_profile{
+      {1.75_mps, 0.75_mps_sq}};
+  wpi::math::TrapezoidProfile<wpi::units::meters>::State m_goal;
+  wpi::math::TrapezoidProfile<wpi::units::meters>::State m_setpoint;
 };
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

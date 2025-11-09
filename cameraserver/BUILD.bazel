@@ -54,7 +54,7 @@ wpilib_java_library(
     name = "cameraserver-java",
     srcs = glob(["src/main/java/**/*.java"]),
     maven_artifact_name = "cameraserver-java",
-    maven_group_id = "edu.wpi.first.cameraserver",
+    maven_group_id = "org.wpilib.cameraserver",
     visibility = ["//visibility:public"],
     deps = [
         "//cscore:cscore-java",
@@ -87,8 +87,8 @@ cc_binary(
 
 java_binary(
     name = "DevMain-Java",
-    srcs = ["src/dev/java/edu/wpi/first/cameraserver/DevMain.java"],
-    main_class = "edu.wpi.first.cameraserver.DevMain",
+    srcs = ["src/dev/java/org/wpilib/vision/stream/DevMain.java"],
+    main_class = "org.wpilib.vision.stream.DevMain",
     deps = [
     ],
 )
@@ -96,5 +96,5 @@ java_binary(
 package_default_cc_project(
     name = "cameraserver",
     maven_artifact_name = "cameraserver-cpp",
-    maven_group_id = "edu.wpi.first.cameraserver",
+    maven_group_id = "org.wpilib.cameraserver",
 )

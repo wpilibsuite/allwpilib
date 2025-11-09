@@ -2,26 +2,25 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/simulation/SimDeviceData.h"  // NOLINT(build/include_order)
+#include "wpi/hal/simulation/SimDeviceData.h"  // NOLINT(build/include_order)
 
 #include <algorithm>
 #include <memory>
 #include <utility>
 
-#include <wpi/StringExtras.h>
-
 #include "SimDeviceDataInternal.h"
+#include "wpi/util/StringExtras.hpp"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeSimDeviceData() {
   static SimDeviceData sdd;
-  ::hal::SimSimDeviceData = &sdd;
+  ::wpi::hal::SimSimDeviceData = &sdd;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-SimDeviceData* hal::SimSimDeviceData;
+SimDeviceData* wpi::hal::SimSimDeviceData;
 
 SimDeviceData::Device* SimDeviceData::LookupDevice(HAL_SimDeviceHandle handle) {
   if (handle <= 0) {
@@ -75,7 +74,7 @@ void SimDeviceData::SetDeviceEnabled(const char* prefix, bool enabled) {
 bool SimDeviceData::IsDeviceEnabled(const char* name) {
   std::scoped_lock lock(m_mutex);
   for (const auto& elem : m_prefixEnabled) {
-    if (wpi::starts_with(name, elem.first)) {
+    if (wpi::util::starts_with(name, elem.first)) {
       return elem.second;
     }
   }
@@ -87,7 +86,7 @@ HAL_SimDeviceHandle SimDeviceData::CreateDevice(const char* name) {
 
   // don't create if disabled
   for (const auto& elem : m_prefixEnabled) {
-    if (wpi::starts_with(name, elem.first)) {
+    if (wpi::util::starts_with(name, elem.first)) {
       if (elem.second) {
         break;  // enabled
       }
@@ -276,7 +275,7 @@ int32_t SimDeviceData::RegisterDeviceCreatedCallback(
   // initial notifications
   if (initialNotify) {
     for (auto&& device : m_devices) {
-      if (wpi::starts_with(device->name, prefix)) {
+      if (wpi::util::starts_with(device->name, prefix)) {
         auto name = device->name;
         auto handle = device->handle;
         lock.unlock();
@@ -340,7 +339,7 @@ void SimDeviceData::EnumerateDevices(const char* prefix, void* param,
                                      HALSIM_SimDeviceCallback callback) {
   std::scoped_lock lock(m_mutex);
   for (auto&& device : m_devices) {
-    if (wpi::starts_with(device->name, prefix)) {
+    if (wpi::util::starts_with(device->name, prefix)) {
       callback(device->name.c_str(), param, device->handle);
     }
   }

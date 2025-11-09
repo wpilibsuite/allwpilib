@@ -1,0 +1,25 @@
+classes:
+  wpi::sim::GenericHIDSim:
+    methods:
+      GenericHIDSim:
+        overloads:
+          const GenericHID&:
+          int:
+      NotifyNewData:
+      SetRawButton:
+      SetRawAxis:
+      SetPOV:
+        overloads:
+          int, DriverStation::POVDirection:
+          DriverStation::POVDirection:
+      SetType:
+      SetName:
+      GetOutput:
+      GetOutputs:
+      GetRumble:
+      SetAxesMaximumIndex:
+      SetAxesAvailable:
+      SetPOVsMaximumIndex:
+      SetPOVsAvailable:
+      SetButtonsMaximumIndex:
+      SetButtonsAvailable:

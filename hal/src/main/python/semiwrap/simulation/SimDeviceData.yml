@@ -1,0 +1,92 @@
+extra_includes:
+- sim_value_cb.h
+- pybind11/functional.h
+
+strip_prefixes:
+- HALSIM_
+
+functions:
+  HALSIM_SetSimDeviceEnabled:
+  HALSIM_IsSimDeviceEnabled:
+  HALSIM_RegisterSimDeviceCreatedCallback:
+    ignore: true
+  HALSIM_CancelSimDeviceCreatedCallback:
+    ignore: true
+  HALSIM_RegisterSimDeviceFreedCallback:
+    ignore: true
+  HALSIM_CancelSimDeviceFreedCallback:
+    ignore: true
+  HALSIM_GetSimDeviceHandle:
+  HALSIM_GetSimDeviceName:
+  HALSIM_GetSimValueDeviceHandle:
+  HALSIM_EnumerateSimDevices:
+    ignore: true
+  HALSIM_RegisterSimValueCreatedCallback:
+    param_override:
+      param:
+        ignore: true
+    cpp_code: |
+      [](wpi::hal::SimDevice &simdevice, std::function<void(const char *, HAL_SimValueHandle, HAL_SimValueDirection, HAL_Value)> fn, bool initialNotify) -> std::unique_ptr<SimValueCB> {
+        auto cb = std::make_unique<SimValueCB>(fn, HALSIM_CancelSimDeviceCreatedCallback);
+        auto uid = HALSIM_RegisterSimValueCreatedCallback(simdevice, cb.get(),
+          [](const char* name, void* param,
+             HAL_SimValueHandle handle,
+             int32_t direction,
+             const struct HAL_Value* value) {
+          ((SimValueCB*)param)->m_fn(name, handle, (HAL_SimValueDirection)direction, *value);
+        }, initialNotify);
+        cb->SetUID(uid);
+        return std::move(cb);
+      }
+  HALSIM_CancelSimValueCreatedCallback:
+    ignore: true
+  HALSIM_RegisterSimValueChangedCallback:
+    param_override:
+      handle:
+        name: value
+      param:
+        ignore: true
+    cpp_code: |
+      [](wpi::hal::SimValue &simvalue, std::function<void(const char *, HAL_SimValueHandle, HAL_SimValueDirection, HAL_Value)> fn, bool initialNotify) -> std::unique_ptr<SimValueCB> {
+        auto cb = std::make_unique<SimValueCB>(fn, HALSIM_CancelSimValueChangedCallback);
+        auto uid = HALSIM_RegisterSimValueChangedCallback(simvalue, cb.get(),
+          [](const char* name, void* param,
+             HAL_SimValueHandle handle,
+             int32_t direction,
+             const struct HAL_Value* value) {
+          ((SimValueCB*)param)->m_fn(name, handle, (HAL_SimValueDirection)direction, *value);
+        }, initialNotify);
+        cb->SetUID(uid);
+        return std::move(cb);
+      }
+  HALSIM_CancelSimValueChangedCallback:
+    ignore: true
+  HALSIM_RegisterSimValueResetCallback:
+    param_override:
+      handle:
+        name: value
+      param:
+        ignore: true
+    cpp_code: |
+      [](wpi::hal::SimValue &simvalue, std::function<void(const char *, HAL_SimValueHandle, HAL_SimValueDirection, HAL_Value)> fn, bool initialNotify) -> std::unique_ptr<SimValueCB> {
+        auto cb = std::make_unique<SimValueCB>(fn, HALSIM_CancelSimValueResetCallback);
+        auto uid = HALSIM_RegisterSimValueChangedCallback(simvalue, cb.get(),
+          [](const char* name, void* param,
+             HAL_SimValueHandle handle,
+             int32_t direction,
+             const struct HAL_Value* value) {
+          ((SimValueCB*)param)->m_fn(name, handle, (HAL_SimValueDirection)direction, *value);
+        }, initialNotify);
+        cb->SetUID(uid);
+        return std::move(cb);
+      }
+  HALSIM_CancelSimValueResetCallback:
+    ignore: true
+  HALSIM_GetSimValueHandle:
+  HALSIM_EnumerateSimValues:
+    ignore: true
+  HALSIM_GetSimValueEnumOptions:
+    ignore: true
+  HALSIM_GetSimValueEnumDoubleValues:
+    ignore: true
+  HALSIM_ResetSimDeviceData:

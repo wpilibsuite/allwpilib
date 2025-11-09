@@ -1,139 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FindBugsFilter>
   <Match>
+    <Bug pattern="AT_NONATOMIC_64BIT_PRIMITIVE" />
+    <Class name="org.wpilib.system.Watchdog" />
+  </Match>
+  <Match>
+    <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
+    <Or>
+      <Class name="org.wpilib.driverstation.DriverStation" />
+      <Class name="org.wpilib.driverstation.GenericHID" />
+      <Class name="org.wpilib.command2.CommandScheduler" />
+    </Or>
+  </Match>
+  <Match>
     <Bug pattern="CT_CONSTRUCTOR_THROW" />
   </Match>
   <Match>
-    <Bug pattern="DCN_NULLPOINTER_EXCEPTION" />
-    <Class name="edu.wpi.first.wpilibj.test.TestSuite" />
-  </Match>
-  <Match>
     <Bug pattern="DE_MIGHT_IGNORE" />
-    <Class name="edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl$Property" />
+    <Class name="org.wpilib.smartdashboard.SendableBuilderImpl$Property" />
   </Match>
   <Match>
     <Bug pattern="DM_DEFAULT_ENCODING" />
+    <Or>
+      <Class name="org.wpilib.epilogue.processor.EpilogueGenerator" />
+      <Class name="org.wpilib.examples.i2ccommunication.I2CCommunicationTest" />
+      <Class name="org.wpilib.command2.PrintCommandTest" />
+    </Or>
   </Match>
   <Match>
     <Bug pattern="DMI_HARDCODED_ABSOLUTE_FILENAME" />
+    <Or>
+      <Class name="org.wpilib.system.DataLogManager" />
+      <Class name="org.wpilib.system.Filesystem" />
+      <Class name="org.wpilib.util.runtime.CombinedRuntimeLoader" />
+      <Class name="org.wpilib.util.runtime.RuntimeDetector" />
+    </Or>
   </Match>
   <Match>
+    <!--
+    These are false positives where the Random instance is used multiple times in a loop. Futhermore, high randomness is not a
+    high priority because these are tests- In fact, the odometry tests seed the Random instance to guarantee repeatability.
+    -->
     <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE" />
-  </Match>
-  <Match>
-    <Bug pattern="EC_BAD_ARRAY_COMPARE" />
-    <Class name="edu.wpi.first.math.estimator.SwerveDrivePoseEstimator$InterpolationRecord" />
+    <Or>
+      <Class name="org.wpilib.math.kinematics.SwerveDriveOdometry3dTest" />
+      <Class name="org.wpilib.math.kinematics.SwerveDriveOdometryTest" />
+      <Class name="org.wpilib.math.filter.LinearFilterTest" />
+    </Or>
   </Match>
   <Match>
     <Bug pattern="EI_EXPOSE_REP" />
   </Match>
   <Match>
     <Bug pattern="EI_EXPOSE_REP2" />
-  </Match>
-  <Match>
-    <Bug pattern="FL_FLOATS_AS_LOOP_COUNTERS" />
-  </Match>
-  <Match>
-    <Bug pattern="IS2_INCONSISTENT_SYNC" />
-    <Source name="MechanismLigament2d.java" />
-  </Match>
-  <Match>
-    <Bug pattern="MS_EXPOSE_REP" />
-  </Match>
-  <Match>
-    <Bug pattern="MS_MUTABLE_ARRAY" />
-  </Match>
-  <Match>
-    <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
-    <Source name="ParallelCommandGroup.java" />
-  </Match>
-  <Match>
-    <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
-    <Source name="ParallelDeadlineGroup.java" />
-  </Match>
-  <Match>
-    <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
-    <Source name="ParallelRaceGroup.java" />
-  </Match>
-  <Match>
-    <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
-    <Source name="ProxyScheduleCommand.java" />
-  </Match>
-  <Match>
-    <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
-    <Source name="SequentialCommandGroup.java" />
-  </Match>
-  <Match>
-    <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
-    <Source name="SelectCommand.java" />
-  </Match>
-  <Match>
-    <Bug pattern="PA_PUBLIC_PRIMITIVE_ATTRIBUTE" />
-  </Match>
-  <Match>
-    <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
-    <Source name="AntJunitLauncher.java" />
-  </Match>
-  <Match>
-    <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
-    <Source name="CombinedRuntimeLoader.java" />
-  </Match>
-  <Match>
-    <Bug pattern="SF_SWITCH_FALLTHROUGH" />
-    <Source name="CameraServer.java" />
-  </Match>
-  <Match>
-    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD" />
-  </Match>
-  <Match>
-    <Bug pattern="THROWS_METHOD_THROWS_CLAUSE_BASIC_EXCEPTION" />
-  </Match>
-  <Match>
-    <Bug pattern="THROWS_METHOD_THROWS_CLAUSE_THROWABLE" />
-  </Match>
-  <Match>
-    <Bug pattern="THROWS_METHOD_THROWS_RUNTIMEEXCEPTION" />
-  </Match>
-  <Match>
-    <Bug pattern="UC_USELESS_VOID_METHOD" />
-    <Class name="edu.wpi.first.wpilibj.templates.romitimed.Robot" />
-  </Match>
-  <Match>
-    <Bug pattern="UC_USELESS_VOID_METHOD" />
-    <Class name="edu.wpi.first.wpilibj.templates.xrptimed.Robot" />
-  </Match>
-  <Match>
-    <Bug pattern="UC_USELESS_VOID_METHOD" />
-    <Class name="edu.wpi.first.wpilibj.templates.timed.Robot" />
-  </Match>
-  <Match>
-    <Bug pattern="UC_USELESS_VOID_METHOD" />
-    <Class name="edu.wpi.first.wpilibj.templates.timeslice.Robot" />
-  </Match>
-  <Match>
-    <Bug pattern="UC_USELESS_VOID_METHOD" />
-    <Class name="edu.wpi.first.wpilibj.templates.timesliceskeleton.Robot" />
-  </Match>
-  <Match>
-    <Bug pattern="URF_UNREAD_FIELD" />
-    <Class name="edu.wpi.first.wpilibj.ADIS16448_IMU" />
-  </Match>
-  <Match>
-    <Bug pattern="URF_UNREAD_FIELD" />
-    <Class name="edu.wpi.first.wpilibj.ADIS16470_IMU" />
-  </Match>
-  <Match>
-    <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />
-  </Match>
-  <Match>
-    <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE" />
-  </Match>
-  <Match>
-    <Bug pattern="SC_START_IN_CTOR" />
-  </Match>
-  <Match>
-    <Bug pattern="RV_RETURN_VALUE_OF_PUTIFABSENT_IGNORED" />
-    <Class name="edu.wpi.first.networktables.NetworkTableInstance" />
   </Match>
   <!--
   Strict reading of Object.equals() contract means that whenever equals() behaviour is defined, all implementations
@@ -145,15 +64,109 @@
     <Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS" />
   </Match>
   <Match>
+    <Bug pattern="FL_FLOATS_AS_LOOP_COUNTERS" />
+    <Or>
+      <Class name="org.wpilib.math.controller.DifferentialDriveAccelerationLimiterTest" />
+      <Class name="org.wpilib.math.controller.ImplicitModelFollowerTest" />
+      <Class name="org.wpilib.math.controller.LinearSystemLoopTest" />
+      <Class name="~org\.wpilib\.math\.estimator\.[^.]*PoseEstimator(3d)?Test" />
+      <Class name="org.wpilib.math.filter.LinearFilterTest" />
+      <Class name="org.wpilib.math.kinematics.ChassisSpeedsTest" />
+      <Class name="org.wpilib.hardware.led.LEDPatternTest" />
+      <Class name="org.wpilib.simulation.AnalogInputSimTest" />
+    </Or>
+  </Match>
+  <Match>
+    <Bug pattern="IS2_INCONSISTENT_SYNC" />
+    <Class name="org.wpilib.smartdashboard.MechanismLigament2d" />
+  </Match>
+  <Match>
+    <Bug pattern="MS_EXPOSE_REP" />
+  </Match>
+  <Match>
+    <Bug pattern="MS_MUTABLE_ARRAY" />
+  </Match>
+  <Match>
+    <!--
+    This seems to be a false positive from the &= used by these command compositions to determine runsWhenDisabled
+    -->
+    <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
+    <Or>
+      <Class name="org.wpilib.command2.ParallelCommandGroup" />
+      <Class name="org.wpilib.command2.ParallelDeadlineGroup" />
+      <Class name="org.wpilib.command2.ParallelRaceGroup" />
+      <Class name="org.wpilib.command2.SequentialCommandGroup" />
+      <Class name="org.wpilib.command2.SelectCommand" />
+    </Or>
+  </Match>
+  <Match>
+    <Bug pattern="PA_PUBLIC_PRIMITIVE_ATTRIBUTE" />
+  </Match>
+  <Match>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
+    <Class name="org.wpilib.util.runtime.CombinedRuntimeLoader" />
+  </Match>
+  <Match>
+    <Bug pattern="RV_RETURN_VALUE_OF_PUTIFABSENT_IGNORED" />
+    <Class name="org.wpilib.networktables.NetworkTableInstance" />
+  </Match>
+  <Match>
+    <Bug pattern="SC_START_IN_CTOR" />
+    <Class name="org.wpilib.hardware.motor.MotorSafety" />
+  </Match>
+  <Match>
+    <Bug pattern="SF_SWITCH_FALLTHROUGH" />
+    <Class name="org.wpilib.vision.stream.CameraServer$PropertyPublisher" />
+  </Match>
+  <Match>
+    <Bug pattern="SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR" />
+    <Or>
+      <Class name="org.wpilib.command2.CommandScheduler" />
+      <Class name="org.wpilib.math.geometry.CoordinateAxis" />
+      <Class name="org.wpilib.math.geometry.CoordinateSystem" />
+    </Or>
+  </Match>
+  <Match>
+    <!--
+    Many false positives from instance reporting.
+    -->
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD" />
+  </Match>
+  <Match>
+    <!--
+    False positives because the users are supposed to fill in the code.
+    -->
+    <Bug pattern="UC_USELESS_VOID_METHOD" />
+    <Or>
+      <Class name="org.wpilib.templates.romitimed.Robot" />
+      <Class name="org.wpilib.templates.xrptimed.Robot" />
+      <Class name="org.wpilib.templates.timed.Robot" />
+      <Class name="org.wpilib.templates.timeslice.Robot" />
+    </Or>
+  </Match>
+  <Match>
+    <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />
+  </Match>
+  <Match>
     <Bug pattern="UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD" />
-    <Class name="edu.wpi.first.epilogue.EpilogueConfiguration" />
+    <Class name="org.wpilib.epilogue.EpilogueConfiguration" />
   </Match>
   <Match>
-    <Bug pattern="SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR" />
-    <Class name="edu.wpi.first.wpilibj2.command.CommandScheduler" />
+    <!-- PMD will skip variables named `ignore`, but spotbugs isn't as smart -->
+    <Bug pattern="DLS_DEAD_LOCAL_STORE" />
+    <Class name="org.wpilib.command3.StagedCommandBuilderTest" />
   </Match>
   <Match>
-    <Bug pattern="SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR" />
-    <Class name="~edu.wpi.first.math.geometry.Coordinate\w+" />
+    <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE" />
+    <Or>
+      <Class name="org.wpilib.epilogue.processor.LoggableHandler" />
+      <Class name="org.wpilib.util.runtime.MsvcRuntimeException" />
+      <Class name="org.wpilib.util.runtime.RuntimeLoader" />
+      <Class name="org.wpilib.system.Tracer" />
+      <Class name="org.wpilib.system.Watchdog" />
+      <Class name="org.wpilib.math.system.LinearSystem" />
+      <Class name="org.wpilib.math.trajectory.Trajectory" />
+      <Class name="org.wpilib.command3.SchedulerTelemetryTests" />
+    </Or>
   </Match>
 </FindBugsFilter>

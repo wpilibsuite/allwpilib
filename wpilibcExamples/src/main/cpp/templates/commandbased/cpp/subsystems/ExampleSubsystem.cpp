@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "subsystems/ExampleSubsystem.h"
+#include "subsystems/ExampleSubsystem.hpp"
 
 ExampleSubsystem::ExampleSubsystem() {
   // Implementation of subsystem constructor goes here.
 }
 
-frc2::CommandPtr ExampleSubsystem::ExampleMethodCommand() {
+wpi::cmd::CommandPtr ExampleSubsystem::ExampleMethodCommand() {
   // Inline construction of command goes here.
   // Subsystem::RunOnce implicitly requires `this` subsystem.
   return RunOnce([/* this */] { /* one-time action goes here */ });

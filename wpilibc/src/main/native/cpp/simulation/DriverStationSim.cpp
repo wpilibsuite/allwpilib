@@ -2,18 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/DriverStationSim.h"
+#include "wpi/simulation/DriverStationSim.hpp"
 
 #include <memory>
 
-#include <hal/DriverStation.h>
-#include <hal/simulation/DriverStationData.h>
-#include <hal/simulation/MockHooks.h>
+#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/hal/DriverStation.h"
+#include "wpi/hal/simulation/DriverStationData.h"
+#include "wpi/hal/simulation/MockHooks.h"
 
-#include "frc/DriverStation.h"
-
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 std::unique_ptr<CallbackStore> DriverStationSim::RegisterEnabledCallback(
     NotifyCallback callback, bool initialNotify) {
@@ -154,12 +153,12 @@ void DriverStationSim::SetMatchTime(double matchTime) {
 }
 
 void DriverStationSim::NotifyNewData() {
-  wpi::Event waitEvent{true};
+  wpi::util::Event waitEvent{true};
   HAL_ProvideNewDataEventHandle(waitEvent.GetHandle());
   HALSIM_NotifyDriverStationNewData();
-  wpi::WaitForObject(waitEvent.GetHandle());
+  wpi::util::WaitForObject(waitEvent.GetHandle());
   HAL_RemoveNewDataEventHandle(waitEvent.GetHandle());
-  frc::DriverStation::RefreshData();
+  wpi::DriverStation::RefreshData();
 }
 
 void DriverStationSim::SetSendError(bool shouldSend) {
@@ -210,21 +209,53 @@ void DriverStationSim::SetJoystickPOV(int stick, int pov,
   HALSIM_SetJoystickPOV(stick, pov, static_cast<HAL_JoystickPOV>(value));
 }
 
-void DriverStationSim::SetJoystickButtons(int stick, uint32_t buttons) {
-  HALSIM_SetJoystickButtonsValue(stick, buttons);
+void DriverStationSim::SetJoystickAxesMaximumIndex(int stick,
+                                                   int maximumIndex) {
+  SetJoystickAxesAvailable(stick, (1 << maximumIndex) - 1);
 }
 
-void DriverStationSim::SetJoystickAxisCount(int stick, int count) {
-  HALSIM_SetJoystickAxisCount(stick, count);
+void DriverStationSim::SetJoystickAxesAvailable(int stick, int count) {
+  HALSIM_SetJoystickAxesAvailable(stick, count);
 }
 
-void DriverStationSim::SetJoystickPOVCount(int stick, int count) {
-  HALSIM_SetJoystickPOVCount(stick, count);
+void DriverStationSim::SetJoystickPOVsMaximumIndex(int stick,
+                                                   int maximumIndex) {
+  SetJoystickPOVsAvailable(stick, (1 << maximumIndex) - 1);
 }
 
-void DriverStationSim::SetJoystickButtonCount(int stick, int count) {
-  HALSIM_SetJoystickButtonCount(stick, count);
+void DriverStationSim::SetJoystickPOVsAvailable(int stick, int count) {
+  HALSIM_SetJoystickPOVsAvailable(stick, count);
 }
+
+void DriverStationSim::SetJoystickButtonsMaximumIndex(int stick,
+                                                      int maximumIndex) {
+  if (maximumIndex >= 64) {
+    SetJoystickButtonsAvailable(stick, 0xFFFFFFFFFFFFFFFFL);
+  } else {
+    SetJoystickButtonsAvailable(stick, (1L << maximumIndex) - 1);
+  }
+}
+
+void DriverStationSim::SetJoystickButtonsAvailable(int stick,
+                                                   uint64_t available) {
+  HALSIM_SetJoystickButtonsAvailable(stick, available);
+}
+
+// void DriverStationSim::SetJoystickButtons(int stick, uint32_t buttons) {
+//   HALSIM_SetJoystickButtonsValue(stick, buttons);
+// }
+
+// void DriverStationSim::SetJoystickAxisCount(int stick, int count) {
+//   HALSIM_SetJoystickAxisCount(stick, count);
+// }
+
+// void DriverStationSim::SetJoystickPOVCount(int stick, int count) {
+//   HALSIM_SetJoystickPOVCount(stick, count);
+// }
+
+// void DriverStationSim::SetJoystickButtonCount(int stick, int count) {
+//   HALSIM_SetJoystickButtonCount(stick, count);
+// }
 
 void DriverStationSim::SetJoystickIsGamepad(int stick, bool isGamepad) {
   HALSIM_SetJoystickIsGamepad(stick, isGamepad);
@@ -235,21 +266,17 @@ void DriverStationSim::SetJoystickType(int stick, int type) {
 }
 
 void DriverStationSim::SetJoystickName(int stick, std::string_view name) {
-  auto str = wpi::make_string(name);
+  auto str = wpi::util::make_string(name);
   HALSIM_SetJoystickName(stick, &str);
 }
 
-void DriverStationSim::SetJoystickAxisType(int stick, int axis, int type) {
-  HALSIM_SetJoystickAxisType(stick, axis, type);
-}
-
 void DriverStationSim::SetGameSpecificMessage(std::string_view message) {
-  auto str = wpi::make_string(message);
+  auto str = wpi::util::make_string(message);
   HALSIM_SetGameSpecificMessage(&str);
 }
 
 void DriverStationSim::SetEventName(std::string_view name) {
-  auto str = wpi::make_string(name);
+  auto str = wpi::util::make_string(name);
   HALSIM_SetEventName(&str);
 }
 

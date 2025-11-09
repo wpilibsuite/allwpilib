@@ -1,0 +1,26 @@
+functions:
+  CallbackStoreThunk:
+    ignore: true
+  ConstBufferCallbackStoreThunk:
+    ignore: true
+classes:
+  wpi::sim::CallbackStore:
+    force_type_casters:
+    - std::function
+    methods:
+      CallbackStore:
+        overloads:
+          # All are ignored because pybind11 can't use raw function pointers
+          int32_t, NotifyCallback, CancelCallbackNoIndexFunc:
+            ignore: true
+          int32_t, int32_t, NotifyCallback, CancelCallbackFunc:
+            ignore: true
+          int32_t, int32_t, int32_t, NotifyCallback, CancelCallbackChannelFunc:
+            ignore: true
+          int32_t, ConstBufferCallback, CancelCallbackNoIndexFunc:
+            ignore: true
+          int32_t, int32_t, ConstBufferCallback, CancelCallbackFunc:
+            ignore: true
+          int32_t, int32_t, int32_t, ConstBufferCallback, CancelCallbackChannelFunc:
+            ignore: true
+      SetUid:

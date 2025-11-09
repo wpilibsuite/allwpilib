@@ -1,0 +1,15 @@
+strip_prefixes:
+- HAL_
+
+enums:
+  HAL_HandleEnum:
+functions:
+  getHandleIndex:
+  getHandleType:
+  isHandleType:
+  isHandleCorrectVersion:
+  getHandleTypedIndex:
+  createHandle:
+classes:
+  wpi::hal::HandleBase:
+    ignore: true

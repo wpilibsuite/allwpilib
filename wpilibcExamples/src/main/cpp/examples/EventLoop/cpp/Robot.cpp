@@ -2,33 +2,33 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/Encoder.h>
-#include <frc/Joystick.h>
-#include <frc/TimedRobot.h>
-#include <frc/controller/PIDController.h>
-#include <frc/controller/SimpleMotorFeedforward.h>
-#include <frc/event/BooleanEvent.h>
-#include <frc/event/EventLoop.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
-#include <units/angular_velocity.h>
-#include <units/length.h>
-#include <units/time.h>
-#include <units/voltage.h>
+#include "wpi/driverstation/Joystick.hpp"
+#include "wpi/event/BooleanEvent.hpp"
+#include "wpi/event/EventLoop.hpp"
+#include "wpi/framework/TimedRobot.hpp"
+#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/math/controller/PIDController.hpp"
+#include "wpi/math/controller/SimpleMotorFeedforward.hpp"
+#include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/voltage.hpp"
 
 static const auto SHOT_VELOCITY = 200_rpm;
 static const auto TOLERANCE = 8_rpm;
 
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   Robot() {
     m_controller.SetTolerance(TOLERANCE.value());
 
-    frc::BooleanEvent isBallAtKicker{&m_loop, [] {
+    wpi::BooleanEvent isBallAtKicker{&m_loop, [] {
                                        return false;
                                        //    return kickerSensor.GetRange() <
                                        //           KICKER_THRESHOLD;
                                      }};
-    frc::BooleanEvent intakeButton{
+    wpi::BooleanEvent intakeButton{
         &m_loop, [&joystick = m_joystick] { return joystick.GetRawButton(2); }};
 
     // if the thumb button is held
@@ -45,7 +45,7 @@ class Robot : public frc::TimedRobot {
         // stop the intake
         .IfHigh([&intake = m_intake] { intake.Set(0.0); });
 
-    frc::BooleanEvent shootTrigger{
+    wpi::BooleanEvent shootTrigger{
         &m_loop, [&joystick = m_joystick] { return joystick.GetTrigger(); }};
 
     // if the trigger is held
@@ -54,15 +54,15 @@ class Robot : public frc::TimedRobot {
         .IfHigh([&shooter = m_shooter, &controller = m_controller, &ff = m_ff,
                  &encoder = m_shooterEncoder] {
           shooter.SetVoltage(
-              units::volt_t{controller.Calculate(encoder.GetRate(),
-                                                 SHOT_VELOCITY.value())} +
-              ff.Calculate(units::radians_per_second_t{SHOT_VELOCITY}));
+              wpi::units::volt_t{controller.Calculate(encoder.GetRate(),
+                                                      SHOT_VELOCITY.value())} +
+              ff.Calculate(wpi::units::radians_per_second_t{SHOT_VELOCITY}));
         });
     // if not, stop
     (!shootTrigger).IfHigh([&shooter = m_shooter] { shooter.Set(0.0); });
 
-    frc::BooleanEvent atTargetVelocity =
-        frc::BooleanEvent(
+    wpi::BooleanEvent atTargetVelocity =
+        wpi::BooleanEvent(
             &m_loop,
             [&controller = m_controller] { return controller.AtSetpoint(); })
             // debounce for more stability
@@ -81,21 +81,22 @@ class Robot : public frc::TimedRobot {
   void RobotPeriodic() override { m_loop.Poll(); }
 
  private:
-  frc::PWMSparkMax m_shooter{0};
-  frc::Encoder m_shooterEncoder{0, 1};
-  frc::PIDController m_controller{0.3, 0, 0};
-  frc::SimpleMotorFeedforward<units::radians> m_ff{0.1_V, 0.065_V / 1_rpm};
+  wpi::PWMSparkMax m_shooter{0};
+  wpi::Encoder m_shooterEncoder{0, 1};
+  wpi::math::PIDController m_controller{0.3, 0, 0};
+  wpi::math::SimpleMotorFeedforward<wpi::units::radians> m_ff{0.1_V,
+                                                              0.065_V / 1_rpm};
 
-  frc::PWMSparkMax m_kicker{1};
+  wpi::PWMSparkMax m_kicker{1};
 
-  frc::PWMSparkMax m_intake{3};
+  wpi::PWMSparkMax m_intake{3};
 
-  frc::EventLoop m_loop{};
-  frc::Joystick m_joystick{0};
+  wpi::EventLoop m_loop{};
+  wpi::Joystick m_joystick{0};
 };
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

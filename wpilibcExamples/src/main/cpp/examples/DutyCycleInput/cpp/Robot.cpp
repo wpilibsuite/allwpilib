@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/DigitalInput.h>
-#include <frc/DutyCycle.h>
-#include <frc/TimedRobot.h>
-#include <frc/smartdashboard/SmartDashboard.h>
+#include "wpi/framework/TimedRobot.hpp"
+#include "wpi/hardware/discrete/DigitalInput.hpp"
+#include "wpi/hardware/rotation/DutyCycle.hpp"
+#include "wpi/smartdashboard/SmartDashboard.hpp"
 
-class Robot : public frc::TimedRobot {
-  frc::DutyCycle m_dutyCycle{0};  // Duty cycle input
+class Robot : public wpi::TimedRobot {
+  wpi::DutyCycle m_dutyCycle{0};  // Duty cycle input
 
  public:
   Robot() {}
@@ -21,13 +21,13 @@ class Robot : public frc::TimedRobot {
     // 1 is fully on, 0 is fully off
     auto output = m_dutyCycle.GetOutput();
 
-    frc::SmartDashboard::PutNumber("Frequency", frequency.value());
-    frc::SmartDashboard::PutNumber("Duty Cycle", output);
+    wpi::SmartDashboard::PutNumber("Frequency", frequency.value());
+    wpi::SmartDashboard::PutNumber("Duty Cycle", output);
   }
 };
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

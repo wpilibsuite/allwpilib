@@ -1,0 +1,56 @@
+defaults:
+  subpackage: interfaces
+
+extra_includes:
+- wpi/driverstation/DriverStation.hpp
+- wpi/event/BooleanEvent.hpp
+
+classes:
+  wpi::GenericHID:
+    enums:
+      RumbleType:
+      HIDType:
+    methods:
+      GenericHID:
+      GetRawButton:
+      GetRawButtonPressed:
+      GetRawButtonReleased:
+      Button:
+      GetRawAxis:
+      GetPOV:
+      POV:
+        overloads:
+          DriverStation::POVDirection, EventLoop* [const]:
+          int, DriverStation::POVDirection, EventLoop* [const]:
+      POVUp:
+      POVUpRight:
+      POVRight:
+      POVDownRight:
+      POVDown:
+      POVDownLeft:
+      POVLeft:
+      POVUpLeft:
+      POVCenter:
+      AxisLessThan:
+      AxisGreaterThan:
+      IsConnected:
+      GetType:
+      GetName:
+      GetPort:
+      SetOutput:
+      SetOutputs:
+      SetRumble:
+      GetAxesMaximumIndex:
+      GetAxesAvailable:
+      GetPOVsMaximumIndex:
+      GetPOVsAvailable:
+      GetButtonsMaximumIndex:
+      GetButtonsAvailable:
+
+inline_code: |
+  cls_GenericHID
+    .def("__repr__", [](py::handle self) {
+      py::object type_name = self.get_type().attr("__qualname__");
+      int port = self.cast<GenericHID&>().GetPort();
+      return py::str("<{} {}>").format(type_name, port);
+    });

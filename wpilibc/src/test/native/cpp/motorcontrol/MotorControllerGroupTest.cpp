@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/motorcontrol/MotorControllerGroup.h"  // NOLINT(build/include_order)
+#include "wpi/hardware/motor/MotorControllerGroup.hpp"  // NOLINT(build/include_order)
 
 #include <memory>
 #include <vector>
 
 #include <gtest/gtest.h>
-#include <wpi/deprecated.h>
 
-#include "motorcontrol/MockMotorController.h"
+#include "motorcontrol/MockMotorController.hpp"
+#include "wpi/util/deprecated.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 enum MotorControllerGroupTestType { TEST_ONE, TEST_TWO, TEST_THREE };
 

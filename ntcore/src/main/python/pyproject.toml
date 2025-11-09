@@ -1,0 +1,96 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [
+    "semiwrap~=0.2.1",
+    "hatch-meson~=0.1.0",
+    "hatch-robotpy~=0.2.1",
+    "hatchling",
+    "robotpy-native-ntcore==0.0.0",
+    "robotpy-wpiutil==0.0.0",
+    "robotpy-wpinet==0.0.0",
+    "robotpy-wpilog==0.0.0",
+]
+
+
+[project]
+name = "pyntcore"
+version = "0.0.0"
+description = "Binary wrappers for the FRC ntcore library"
+authors = [
+    {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
+]
+license = "BSD-3-Clause"
+dependencies = [
+    "robotpy-native-ntcore==0.0.0",
+    "robotpy-wpiutil==0.0.0",
+    "robotpy-wpinet==0.0.0",
+    "robotpy-wpilog==0.0.0",
+]
+
+[project.urls]
+"Source code" = "https://github.com/robotpy/mostrobotpy"
+
+
+[tool.hatch.build.hooks.robotpy]
+version_file = "ntcore/version.py"
+
+[tool.hatch.build.hooks.semiwrap]
+
+[tool.hatch.build.hooks.meson]
+
+[tool.hatch.build.targets.wheel]
+packages = ["ntcore"]
+
+
+[tool.semiwrap]
+update_init = [
+    "ntcore",
+    "ntcore.meta ntcore._ntcore.meta"
+]
+scan_headers_ignore = [
+    "wpi/nt/ProtobufTopic.hpp",
+    "wpi/nt/UnitTopic.hpp",
+
+    "wpi/nt/ntcore.h",
+    "wpi/nt/ntcore_c.h",
+    "wpi/nt/ntcore_c_types.h",
+    "wpi/nt/ntcore_test.hpp",
+
+    "src/*",
+]
+
+[tool.semiwrap.extension_modules."ntcore._ntcore"]
+name = "ntcore"
+wraps = ["robotpy-native-ntcore"]
+depends = ["wpiutil", "wpinet", "wpilog"]
+
+
+[tool.semiwrap.extension_modules."ntcore._ntcore".headers]
+# networktables
+BooleanArrayTopic = "wpi/nt/BooleanArrayTopic.hpp"
+BooleanTopic = "wpi/nt/BooleanTopic.hpp"
+DoubleArrayTopic = "wpi/nt/DoubleArrayTopic.hpp"
+DoubleTopic = "wpi/nt/DoubleTopic.hpp"
+FloatArrayTopic = "wpi/nt/FloatArrayTopic.hpp"
+FloatTopic = "wpi/nt/FloatTopic.hpp"
+GenericEntry = "wpi/nt/GenericEntry.hpp"
+IntegerArrayTopic = "wpi/nt/IntegerArrayTopic.hpp"
+IntegerTopic = "wpi/nt/IntegerTopic.hpp"
+MultiSubscriber = "wpi/nt/MultiSubscriber.hpp"
+NTSendable = "wpi/nt/NTSendable.hpp"
+NTSendableBuilder = "wpi/nt/NTSendableBuilder.hpp"
+NetworkTable = "wpi/nt/NetworkTable.hpp"
+NetworkTableEntry = "wpi/nt/NetworkTableEntry.hpp"
+NetworkTableInstance = "wpi/nt/NetworkTableInstance.hpp"
+NetworkTableListener = "wpi/nt/NetworkTableListener.hpp"
+NetworkTableType = "wpi/nt/NetworkTableType.hpp"
+NetworkTableValue = "wpi/nt/NetworkTableValue.hpp"
+RawTopic = "wpi/nt/RawTopic.hpp"
+StructTopic = "wpi/nt/StructTopic.hpp"
+StructArrayTopic = "wpi/nt/StructArrayTopic.hpp"
+StringArrayTopic = "wpi/nt/StringArrayTopic.hpp"
+StringTopic = "wpi/nt/StringTopic.hpp"
+Topic = "wpi/nt/Topic.hpp"
+
+ntcore_cpp = "wpi/nt/ntcore_cpp.hpp"
+ntcore_cpp_types = "wpi/nt/ntcore_cpp_types.hpp"

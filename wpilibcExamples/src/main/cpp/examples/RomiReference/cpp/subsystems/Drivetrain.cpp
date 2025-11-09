@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "subsystems/Drivetrain.h"
+#include "subsystems/Drivetrain.hpp"
 
 #include <numbers>
 
-#include "Constants.h"
+#include "Constants.hpp"
 
 using namespace DriveConstants;
 
@@ -15,8 +15,8 @@ using namespace DriveConstants;
 // The Romi has onboard encoders that are hardcoded
 // to use DIO pins 4/5 and 6/7 for the left and right
 Drivetrain::Drivetrain() {
-  wpi::SendableRegistry::AddChild(&m_drive, &m_leftMotor);
-  wpi::SendableRegistry::AddChild(&m_drive, &m_rightMotor);
+  wpi::util::SendableRegistry::AddChild(&m_drive, &m_leftMotor);
+  wpi::util::SendableRegistry::AddChild(&m_drive, &m_rightMotor);
 
   // We need to invert one side of the drivetrain so that positive voltages
   // result in both sides moving forward. Depending on how your robot's
@@ -51,27 +51,27 @@ int Drivetrain::GetRightEncoderCount() {
   return m_rightEncoder.Get();
 }
 
-units::meter_t Drivetrain::GetLeftDistance() {
-  return units::meter_t{m_leftEncoder.GetDistance()};
+wpi::units::meter_t Drivetrain::GetLeftDistance() {
+  return wpi::units::meter_t{m_leftEncoder.GetDistance()};
 }
 
-units::meter_t Drivetrain::GetRightDistance() {
-  return units::meter_t{m_rightEncoder.GetDistance()};
+wpi::units::meter_t Drivetrain::GetRightDistance() {
+  return wpi::units::meter_t{m_rightEncoder.GetDistance()};
 }
 
-units::meter_t Drivetrain::GetAverageDistance() {
+wpi::units::meter_t Drivetrain::GetAverageDistance() {
   return (GetLeftDistance() + GetRightDistance()) / 2.0;
 }
 
-units::radian_t Drivetrain::GetGyroAngleX() {
+wpi::units::radian_t Drivetrain::GetGyroAngleX() {
   return m_gyro.GetAngleX();
 }
 
-units::radian_t Drivetrain::GetGyroAngleY() {
+wpi::units::radian_t Drivetrain::GetGyroAngleY() {
   return m_gyro.GetAngleY();
 }
 
-units::radian_t Drivetrain::GetGyroAngleZ() {
+wpi::units::radian_t Drivetrain::GetGyroAngleZ() {
   return m_gyro.GetAngleZ();
 }
 

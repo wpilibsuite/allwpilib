@@ -1,0 +1,10 @@
+classes:
+  wpi::RobotState:
+    nodelete: true
+    methods:
+      IsDisabled:
+      IsEnabled:
+      IsEStopped:
+      IsTeleop:
+      IsAutonomous:
+      IsTest:

@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "subsystems/DriveSubsystem.h"
+#include "subsystems/DriveSubsystem.hpp"
 
-#include <wpi/sendable/SendableBuilder.h>
+#include "wpi/util/sendable/SendableBuilder.hpp"
 
 using namespace DriveConstants;
 
@@ -15,8 +15,8 @@ DriveSubsystem::DriveSubsystem()
       m_right2{kRightMotor2Port},
       m_leftEncoder{kLeftEncoderPorts[0], kLeftEncoderPorts[1]},
       m_rightEncoder{kRightEncoderPorts[0], kRightEncoderPorts[1]} {
-  wpi::SendableRegistry::AddChild(&m_drive, &m_left1);
-  wpi::SendableRegistry::AddChild(&m_drive, &m_right1);
+  wpi::util::SendableRegistry::AddChild(&m_drive, &m_left1);
+  wpi::util::SendableRegistry::AddChild(&m_drive, &m_right1);
 
   m_left1.AddFollower(m_left2);
   m_right1.AddFollower(m_right2);
@@ -52,7 +52,7 @@ void DriveSubsystem::SetMaxOutput(double maxOutput) {
   m_drive.SetMaxOutput(maxOutput);
 }
 
-void DriveSubsystem::InitSendable(wpi::SendableBuilder& builder) {
+void DriveSubsystem::InitSendable(wpi::util::SendableBuilder& builder) {
   SubsystemBase::InitSendable(builder);
 
   // Publish encoder distances to telemetry.

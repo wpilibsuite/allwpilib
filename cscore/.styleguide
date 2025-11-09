@@ -18,7 +18,7 @@ modifiableFileExclude {
 }
 
 licenseUpdateExclude {
-  src/main/native/cpp/default_init_allocator\.h$
+  src/main/native/cpp/default_init_allocator\.hpp$
 }
 
 includeGuardRoots {
@@ -41,7 +41,4 @@ includeOtherLibs {
   ^imgui
   ^support/
   ^tcpsockets/
-  ^wpi/
-  ^wpigui
-  ^wpinet/
 }

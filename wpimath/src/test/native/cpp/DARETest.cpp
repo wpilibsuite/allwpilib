@@ -7,64 +7,80 @@
 #include <Eigen/Core>
 #include <Eigen/Eigenvalues>
 #include <gtest/gtest.h>
-#include <wpi/expected>
-#include <wpi/print.h>
 
-#include "frc/DARE.h"
-#include "frc/EigenCore.h"
-#include "frc/fmt/Eigen.h"
+#include "wpi/math/fmt/Eigen.hpp"
+#include "wpi/math/linalg/DARE.hpp"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/util/expected"
+#include "wpi/util/print.hpp"
 
 // 2x1
-extern template wpi::expected<Eigen::Matrix<double, 2, 2>, frc::DAREError>
-frc::DARE<2, 1>(const Eigen::Matrix<double, 2, 2>& A,
-                const Eigen::Matrix<double, 2, 1>& B,
-                const Eigen::Matrix<double, 2, 2>& Q,
-                const Eigen::Matrix<double, 1, 1>& R, bool checkPreconditions);
-extern template wpi::expected<Eigen::Matrix<double, 2, 2>, frc::DAREError>
-frc::DARE<2, 1>(const Eigen::Matrix<double, 2, 2>& A,
-                const Eigen::Matrix<double, 2, 1>& B,
-                const Eigen::Matrix<double, 2, 2>& Q,
-                const Eigen::Matrix<double, 1, 1>& R,
-                const Eigen::Matrix<double, 2, 1>& N, bool checkPreconditions);
+extern template wpi::util::expected<Eigen::Matrix<double, 2, 2>,
+                                    wpi::math::DAREError>
+wpi::math::DARE<2, 1>(const Eigen::Matrix<double, 2, 2>& A,
+                      const Eigen::Matrix<double, 2, 1>& B,
+                      const Eigen::Matrix<double, 2, 2>& Q,
+                      const Eigen::Matrix<double, 1, 1>& R,
+                      bool checkPreconditions);
+extern template wpi::util::expected<Eigen::Matrix<double, 2, 2>,
+                                    wpi::math::DAREError>
+wpi::math::DARE<2, 1>(const Eigen::Matrix<double, 2, 2>& A,
+                      const Eigen::Matrix<double, 2, 1>& B,
+                      const Eigen::Matrix<double, 2, 2>& Q,
+                      const Eigen::Matrix<double, 1, 1>& R,
+                      const Eigen::Matrix<double, 2, 1>& N,
+                      bool checkPreconditions);
 
 // 4x1
-extern template wpi::expected<Eigen::Matrix<double, 4, 4>, frc::DAREError>
-frc::DARE<4, 1>(const Eigen::Matrix<double, 4, 4>& A,
-                const Eigen::Matrix<double, 4, 1>& B,
-                const Eigen::Matrix<double, 4, 4>& Q,
-                const Eigen::Matrix<double, 1, 1>& R, bool checkPreconditions);
-extern template wpi::expected<Eigen::Matrix<double, 4, 4>, frc::DAREError>
-frc::DARE<4, 1>(const Eigen::Matrix<double, 4, 4>& A,
-                const Eigen::Matrix<double, 4, 1>& B,
-                const Eigen::Matrix<double, 4, 4>& Q,
-                const Eigen::Matrix<double, 1, 1>& R,
-                const Eigen::Matrix<double, 4, 1>& N, bool checkPreconditions);
+extern template wpi::util::expected<Eigen::Matrix<double, 4, 4>,
+                                    wpi::math::DAREError>
+wpi::math::DARE<4, 1>(const Eigen::Matrix<double, 4, 4>& A,
+                      const Eigen::Matrix<double, 4, 1>& B,
+                      const Eigen::Matrix<double, 4, 4>& Q,
+                      const Eigen::Matrix<double, 1, 1>& R,
+                      bool checkPreconditions);
+extern template wpi::util::expected<Eigen::Matrix<double, 4, 4>,
+                                    wpi::math::DAREError>
+wpi::math::DARE<4, 1>(const Eigen::Matrix<double, 4, 4>& A,
+                      const Eigen::Matrix<double, 4, 1>& B,
+                      const Eigen::Matrix<double, 4, 4>& Q,
+                      const Eigen::Matrix<double, 1, 1>& R,
+                      const Eigen::Matrix<double, 4, 1>& N,
+                      bool checkPreconditions);
 
 // 2x2
-extern template wpi::expected<Eigen::Matrix<double, 2, 2>, frc::DAREError>
-frc::DARE<2, 2>(const Eigen::Matrix<double, 2, 2>& A,
-                const Eigen::Matrix<double, 2, 2>& B,
-                const Eigen::Matrix<double, 2, 2>& Q,
-                const Eigen::Matrix<double, 2, 2>& R, bool checkPreconditions);
-extern template wpi::expected<Eigen::Matrix<double, 2, 2>, frc::DAREError>
-frc::DARE<2, 2>(const Eigen::Matrix<double, 2, 2>& A,
-                const Eigen::Matrix<double, 2, 2>& B,
-                const Eigen::Matrix<double, 2, 2>& Q,
-                const Eigen::Matrix<double, 2, 2>& R,
-                const Eigen::Matrix<double, 2, 2>& N, bool checkPreconditions);
+extern template wpi::util::expected<Eigen::Matrix<double, 2, 2>,
+                                    wpi::math::DAREError>
+wpi::math::DARE<2, 2>(const Eigen::Matrix<double, 2, 2>& A,
+                      const Eigen::Matrix<double, 2, 2>& B,
+                      const Eigen::Matrix<double, 2, 2>& Q,
+                      const Eigen::Matrix<double, 2, 2>& R,
+                      bool checkPreconditions);
+extern template wpi::util::expected<Eigen::Matrix<double, 2, 2>,
+                                    wpi::math::DAREError>
+wpi::math::DARE<2, 2>(const Eigen::Matrix<double, 2, 2>& A,
+                      const Eigen::Matrix<double, 2, 2>& B,
+                      const Eigen::Matrix<double, 2, 2>& Q,
+                      const Eigen::Matrix<double, 2, 2>& R,
+                      const Eigen::Matrix<double, 2, 2>& N,
+                      bool checkPreconditions);
 
 // 2x3
-extern template wpi::expected<Eigen::Matrix<double, 2, 2>, frc::DAREError>
-frc::DARE<2, 3>(const Eigen::Matrix<double, 2, 2>& A,
-                const Eigen::Matrix<double, 2, 3>& B,
-                const Eigen::Matrix<double, 2, 2>& Q,
-                const Eigen::Matrix<double, 3, 3>& R, bool checkPreconditions);
-extern template wpi::expected<Eigen::Matrix<double, 2, 2>, frc::DAREError>
-frc::DARE<2, 3>(const Eigen::Matrix<double, 2, 2>& A,
-                const Eigen::Matrix<double, 2, 3>& B,
-                const Eigen::Matrix<double, 2, 2>& Q,
-                const Eigen::Matrix<double, 3, 3>& R,
-                const Eigen::Matrix<double, 2, 3>& N, bool checkPreconditions);
+extern template wpi::util::expected<Eigen::Matrix<double, 2, 2>,
+                                    wpi::math::DAREError>
+wpi::math::DARE<2, 3>(const Eigen::Matrix<double, 2, 2>& A,
+                      const Eigen::Matrix<double, 2, 3>& B,
+                      const Eigen::Matrix<double, 2, 2>& Q,
+                      const Eigen::Matrix<double, 3, 3>& R,
+                      bool checkPreconditions);
+extern template wpi::util::expected<Eigen::Matrix<double, 2, 2>,
+                                    wpi::math::DAREError>
+wpi::math::DARE<2, 3>(const Eigen::Matrix<double, 2, 2>& A,
+                      const Eigen::Matrix<double, 2, 3>& B,
+                      const Eigen::Matrix<double, 2, 2>& Q,
+                      const Eigen::Matrix<double, 3, 3>& R,
+                      const Eigen::Matrix<double, 2, 3>& N,
+                      bool checkPreconditions);
 
 void ExpectMatrixEqual(const Eigen::MatrixXd& lhs, const Eigen::MatrixXd& rhs,
                        double tolerance) {
@@ -76,9 +92,9 @@ void ExpectMatrixEqual(const Eigen::MatrixXd& lhs, const Eigen::MatrixXd& rhs,
   }
 
   if (::testing::Test::HasFailure()) {
-    wpi::print("lhs =\n{}\n", lhs);
-    wpi::print("rhs =\n{}\n", rhs);
-    wpi::print("delta =\n{}\n", Eigen::MatrixXd{lhs - rhs});
+    wpi::util::print("lhs =\n{}\n", lhs);
+    wpi::util::print("rhs =\n{}\n", rhs);
+    wpi::util::print("delta =\n{}\n", Eigen::MatrixXd{lhs - rhs});
   }
 }
 
@@ -131,13 +147,14 @@ TEST(DARETest, NonInvertibleA_ABQR) {
   // Example 2 of "On the Numerical Solution of the Discrete-Time Algebraic
   // Riccati Equation"
 
-  frc::Matrixd<4, 4> A{
+  wpi::math::Matrixd<4, 4> A{
       {0.5, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}, {0, 0, 0, 0}};
-  frc::Matrixd<4, 1> B{{0}, {0}, {0}, {1}};
-  frc::Matrixd<4, 4> Q{{1, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
-  frc::Matrixd<1, 1> R{0.25};
+  wpi::math::Matrixd<4, 1> B{{0}, {0}, {0}, {1}};
+  wpi::math::Matrixd<4, 4> Q{
+      {1, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
+  wpi::math::Matrixd<1, 1> R{0.25};
 
-  auto ret = frc::DARE<4, 1>(A, B, Q, R);
+  auto ret = wpi::math::DARE<4, 1>(A, B, Q, R);
   EXPECT_TRUE(ret);
   auto X = ret.value();
 
@@ -150,19 +167,20 @@ TEST(DARETest, NonInvertibleA_ABQRN) {
   // Example 2 of "On the Numerical Solution of the Discrete-Time Algebraic
   // Riccati Equation"
 
-  frc::Matrixd<4, 4> A{
+  wpi::math::Matrixd<4, 4> A{
       {0.5, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}, {0, 0, 0, 0}};
-  frc::Matrixd<4, 1> B{{0}, {0}, {0}, {1}};
-  frc::Matrixd<4, 4> Q{{1, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
-  frc::Matrixd<1, 1> R{0.25};
+  wpi::math::Matrixd<4, 1> B{{0}, {0}, {0}, {1}};
+  wpi::math::Matrixd<4, 4> Q{
+      {1, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
+  wpi::math::Matrixd<1, 1> R{0.25};
 
-  frc::Matrixd<4, 4> Aref{
+  wpi::math::Matrixd<4, 4> Aref{
       {0.25, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}, {0, 0, 0, 0}};
   Q = (A - Aref).transpose() * Q * (A - Aref);
   R = B.transpose() * Q * B + R;
-  frc::Matrixd<4, 1> N = (A - Aref).transpose() * Q * B;
+  wpi::math::Matrixd<4, 1> N = (A - Aref).transpose() * Q * B;
 
-  auto ret = frc::DARE<4, 1>(A, B, Q, R, N);
+  auto ret = wpi::math::DARE<4, 1>(A, B, Q, R, N);
   EXPECT_TRUE(ret);
   auto X = ret.value();
 
@@ -172,12 +190,12 @@ TEST(DARETest, NonInvertibleA_ABQRN) {
 }
 
 TEST(DARETest, InvertibleA_ABQR) {
-  frc::Matrixd<2, 2> A{{1, 1}, {0, 1}};
-  frc::Matrixd<2, 1> B{{0}, {1}};
-  frc::Matrixd<2, 2> Q{{1, 0}, {0, 0}};
-  frc::Matrixd<1, 1> R{{0.3}};
+  wpi::math::Matrixd<2, 2> A{{1, 1}, {0, 1}};
+  wpi::math::Matrixd<2, 1> B{{0}, {1}};
+  wpi::math::Matrixd<2, 2> Q{{1, 0}, {0, 0}};
+  wpi::math::Matrixd<1, 1> R{{0.3}};
 
-  auto ret = frc::DARE<2, 1>(A, B, Q, R);
+  auto ret = wpi::math::DARE<2, 1>(A, B, Q, R);
   EXPECT_TRUE(ret);
   auto X = ret.value();
 
@@ -187,17 +205,17 @@ TEST(DARETest, InvertibleA_ABQR) {
 }
 
 TEST(DARETest, InvertibleA_ABQRN) {
-  frc::Matrixd<2, 2> A{{1, 1}, {0, 1}};
-  frc::Matrixd<2, 1> B{{0}, {1}};
-  frc::Matrixd<2, 2> Q{{1, 0}, {0, 0}};
-  frc::Matrixd<1, 1> R{0.3};
+  wpi::math::Matrixd<2, 2> A{{1, 1}, {0, 1}};
+  wpi::math::Matrixd<2, 1> B{{0}, {1}};
+  wpi::math::Matrixd<2, 2> Q{{1, 0}, {0, 0}};
+  wpi::math::Matrixd<1, 1> R{0.3};
 
-  frc::Matrixd<2, 2> Aref{{0.5, 1}, {0, 1}};
+  wpi::math::Matrixd<2, 2> Aref{{0.5, 1}, {0, 1}};
   Q = (A - Aref).transpose() * Q * (A - Aref);
   R = B.transpose() * Q * B + R;
-  frc::Matrixd<2, 1> N = (A - Aref).transpose() * Q * B;
+  wpi::math::Matrixd<2, 1> N = (A - Aref).transpose() * Q * B;
 
-  auto ret = frc::DARE<2, 1>(A, B, Q, R, N);
+  auto ret = wpi::math::DARE<2, 1>(A, B, Q, R, N);
   EXPECT_TRUE(ret);
   auto X = ret.value();
 
@@ -209,12 +227,12 @@ TEST(DARETest, InvertibleA_ABQRN) {
 TEST(DARETest, FirstGeneralizedEigenvalueOfSTIsStable_ABQR) {
   // The first generalized eigenvalue of (S, T) is stable
 
-  frc::Matrixd<2, 2> A{{0, 1}, {0, 0}};
-  frc::Matrixd<2, 1> B{{0}, {1}};
-  frc::Matrixd<2, 2> Q{{1, 0}, {0, 1}};
-  frc::Matrixd<1, 1> R{1};
+  wpi::math::Matrixd<2, 2> A{{0, 1}, {0, 0}};
+  wpi::math::Matrixd<2, 1> B{{0}, {1}};
+  wpi::math::Matrixd<2, 2> Q{{1, 0}, {0, 1}};
+  wpi::math::Matrixd<1, 1> R{1};
 
-  auto ret = frc::DARE<2, 1>(A, B, Q, R);
+  auto ret = wpi::math::DARE<2, 1>(A, B, Q, R);
   EXPECT_TRUE(ret);
   auto X = ret.value();
 
@@ -226,17 +244,17 @@ TEST(DARETest, FirstGeneralizedEigenvalueOfSTIsStable_ABQR) {
 TEST(DARETest, FirstGeneralizedEigenvalueOfSTIsStable_ABQRN) {
   // The first generalized eigenvalue of (S, T) is stable
 
-  frc::Matrixd<2, 2> A{{0, 1}, {0, 0}};
-  frc::Matrixd<2, 1> B{{0}, {1}};
-  frc::Matrixd<2, 2> Q{{1, 0}, {0, 1}};
-  frc::Matrixd<1, 1> R{1};
+  wpi::math::Matrixd<2, 2> A{{0, 1}, {0, 0}};
+  wpi::math::Matrixd<2, 1> B{{0}, {1}};
+  wpi::math::Matrixd<2, 2> Q{{1, 0}, {0, 1}};
+  wpi::math::Matrixd<1, 1> R{1};
 
-  frc::Matrixd<2, 2> Aref{{0, 0.5}, {0, 0}};
+  wpi::math::Matrixd<2, 2> Aref{{0, 0.5}, {0, 0}};
   Q = (A - Aref).transpose() * Q * (A - Aref);
   R = B.transpose() * Q * B + R;
-  frc::Matrixd<2, 1> N = (A - Aref).transpose() * Q * B;
+  wpi::math::Matrixd<2, 1> N = (A - Aref).transpose() * Q * B;
 
-  auto ret = frc::DARE<2, 1>(A, B, Q, R, N);
+  auto ret = wpi::math::DARE<2, 1>(A, B, Q, R, N);
   EXPECT_TRUE(ret);
   auto X = ret.value();
 
@@ -251,7 +269,7 @@ TEST(DARETest, IdentitySystem_ABQR) {
   const Eigen::Matrix2d Q{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d R{Eigen::Matrix2d::Identity()};
 
-  auto ret = frc::DARE<2, 2>(A, B, Q, R);
+  auto ret = wpi::math::DARE<2, 2>(A, B, Q, R);
   EXPECT_TRUE(ret);
   auto X = ret.value();
 
@@ -267,7 +285,7 @@ TEST(DARETest, IdentitySystem_ABQRN) {
   const Eigen::Matrix2d R{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d N{Eigen::Matrix2d::Identity()};
 
-  auto ret = frc::DARE<2, 2>(A, B, Q, R, N);
+  auto ret = wpi::math::DARE<2, 2>(A, B, Q, R, N);
   EXPECT_TRUE(ret);
   auto X = ret.value();
 
@@ -278,11 +296,11 @@ TEST(DARETest, IdentitySystem_ABQRN) {
 
 TEST(DARETest, MoreInputsThanStates_ABQR) {
   const Eigen::Matrix2d A{Eigen::Matrix2d::Identity()};
-  const frc::Matrixd<2, 3> B{{1.0, 0.0, 0.0}, {0.0, 0.5, 0.3}};
+  const wpi::math::Matrixd<2, 3> B{{1.0, 0.0, 0.0}, {0.0, 0.5, 0.3}};
   const Eigen::Matrix2d Q{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix3d R{Eigen::Matrix3d::Identity()};
 
-  auto ret = frc::DARE<2, 3>(A, B, Q, R);
+  auto ret = wpi::math::DARE<2, 3>(A, B, Q, R);
   EXPECT_TRUE(ret);
   auto X = ret.value();
 
@@ -293,12 +311,12 @@ TEST(DARETest, MoreInputsThanStates_ABQR) {
 
 TEST(DARETest, MoreInputsThanStates_ABQRN) {
   const Eigen::Matrix2d A{Eigen::Matrix2d::Identity()};
-  const frc::Matrixd<2, 3> B{{1.0, 0.0, 0.0}, {0.0, 0.5, 0.3}};
+  const wpi::math::Matrixd<2, 3> B{{1.0, 0.0, 0.0}, {0.0, 0.5, 0.3}};
   const Eigen::Matrix2d Q{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix3d R{Eigen::Matrix3d::Identity()};
-  const frc::Matrixd<2, 3> N{{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}};
+  const wpi::math::Matrixd<2, 3> N{{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}};
 
-  auto ret = frc::DARE<2, 3>(A, B, Q, R, N);
+  auto ret = wpi::math::DARE<2, 3>(A, B, Q, R, N);
   EXPECT_TRUE(ret);
   auto X = ret.value();
 
@@ -313,9 +331,9 @@ TEST(DARETest, QNotSymmetric_ABQR) {
   const Eigen::Matrix2d Q{{1.0, 1.0}, {0.0, 1.0}};
   const Eigen::Matrix2d R{Eigen::Matrix2d::Identity()};
 
-  auto ret = frc::DARE<2, 2>(A, B, Q, R);
+  auto ret = wpi::math::DARE<2, 2>(A, B, Q, R);
   EXPECT_FALSE(ret);
-  EXPECT_EQ(ret.error(), frc::DAREError::QNotSymmetric);
+  EXPECT_EQ(ret.error(), wpi::math::DAREError::QNotSymmetric);
 }
 
 TEST(DARETest, QNotPositiveSemidefinite_ABQR) {
@@ -324,9 +342,9 @@ TEST(DARETest, QNotPositiveSemidefinite_ABQR) {
   const Eigen::Matrix2d Q{-Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d R{Eigen::Matrix2d::Identity()};
 
-  auto ret = frc::DARE<2, 2>(A, B, Q, R);
+  auto ret = wpi::math::DARE<2, 2>(A, B, Q, R);
   EXPECT_FALSE(ret);
-  EXPECT_EQ(ret.error(), frc::DAREError::QNotPositiveSemidefinite);
+  EXPECT_EQ(ret.error(), wpi::math::DAREError::QNotPositiveSemidefinite);
 }
 
 TEST(DARETest, QNotSymmetric_ABQRN) {
@@ -336,9 +354,9 @@ TEST(DARETest, QNotSymmetric_ABQRN) {
   const Eigen::Matrix2d R{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d N{2.0 * Eigen::Matrix2d::Identity()};
 
-  auto ret = frc::DARE<2, 2>(A, B, Q, R, N);
+  auto ret = wpi::math::DARE<2, 2>(A, B, Q, R, N);
   EXPECT_FALSE(ret);
-  EXPECT_EQ(ret.error(), frc::DAREError::QNotSymmetric);
+  EXPECT_EQ(ret.error(), wpi::math::DAREError::QNotSymmetric);
 }
 
 TEST(DARETest, QNotPositiveSemidefinite_ABQRN) {
@@ -348,9 +366,9 @@ TEST(DARETest, QNotPositiveSemidefinite_ABQRN) {
   const Eigen::Matrix2d R{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d N{2.0 * Eigen::Matrix2d::Identity()};
 
-  auto ret = frc::DARE<2, 2>(A, B, Q, R, N);
+  auto ret = wpi::math::DARE<2, 2>(A, B, Q, R, N);
   EXPECT_FALSE(ret);
-  EXPECT_EQ(ret.error(), frc::DAREError::QNotPositiveSemidefinite);
+  EXPECT_EQ(ret.error(), wpi::math::DAREError::QNotPositiveSemidefinite);
 }
 
 TEST(DARETest, RNotSymmetric_ABQR) {
@@ -359,9 +377,9 @@ TEST(DARETest, RNotSymmetric_ABQR) {
   const Eigen::Matrix2d Q{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d R{{1.0, 1.0}, {0.0, 1.0}};
 
-  auto ret = frc::DARE<2, 2>(A, B, Q, R);
+  auto ret = wpi::math::DARE<2, 2>(A, B, Q, R);
   EXPECT_FALSE(ret);
-  EXPECT_EQ(ret.error(), frc::DAREError::RNotSymmetric);
+  EXPECT_EQ(ret.error(), wpi::math::DAREError::RNotSymmetric);
 }
 
 TEST(DARETest, RNotPositiveDefinite_ABQR) {
@@ -370,14 +388,14 @@ TEST(DARETest, RNotPositiveDefinite_ABQR) {
   const Eigen::Matrix2d Q{Eigen::Matrix2d::Identity()};
 
   const Eigen::Matrix2d R1{Eigen::Matrix2d::Zero()};
-  auto ret1 = frc::DARE<2, 2>(A, B, Q, R1);
+  auto ret1 = wpi::math::DARE<2, 2>(A, B, Q, R1);
   EXPECT_FALSE(ret1);
-  EXPECT_EQ(ret1.error(), frc::DAREError::RNotPositiveDefinite);
+  EXPECT_EQ(ret1.error(), wpi::math::DAREError::RNotPositiveDefinite);
 
   const Eigen::Matrix2d R2{-Eigen::Matrix2d::Identity()};
-  auto ret2 = frc::DARE<2, 2>(A, B, Q, R2);
+  auto ret2 = wpi::math::DARE<2, 2>(A, B, Q, R2);
   EXPECT_FALSE(ret2);
-  EXPECT_EQ(ret2.error(), frc::DAREError::RNotPositiveDefinite);
+  EXPECT_EQ(ret2.error(), wpi::math::DAREError::RNotPositiveDefinite);
 }
 
 TEST(DARETest, RNotSymmetric_ABQRN) {
@@ -387,9 +405,9 @@ TEST(DARETest, RNotSymmetric_ABQRN) {
   const Eigen::Matrix2d N{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d R{{1.0, 1.0}, {0.0, 1.0}};
 
-  auto ret = frc::DARE<2, 2>(A, B, Q, R, N);
+  auto ret = wpi::math::DARE<2, 2>(A, B, Q, R, N);
   EXPECT_FALSE(ret);
-  EXPECT_EQ(ret.error(), frc::DAREError::RNotSymmetric);
+  EXPECT_EQ(ret.error(), wpi::math::DAREError::RNotSymmetric);
 }
 
 TEST(DARETest, RNotPositiveDefinite_ABQRN) {
@@ -399,14 +417,14 @@ TEST(DARETest, RNotPositiveDefinite_ABQRN) {
   const Eigen::Matrix2d N{Eigen::Matrix2d::Identity()};
 
   const Eigen::Matrix2d R1{Eigen::Matrix2d::Zero()};
-  auto ret1 = frc::DARE<2, 2>(A, B, Q, R1, N);
+  auto ret1 = wpi::math::DARE<2, 2>(A, B, Q, R1, N);
   EXPECT_FALSE(ret1);
-  EXPECT_EQ(ret1.error(), frc::DAREError::RNotPositiveDefinite);
+  EXPECT_EQ(ret1.error(), wpi::math::DAREError::RNotPositiveDefinite);
 
   const Eigen::Matrix2d R2{-Eigen::Matrix2d::Identity()};
-  auto ret2 = frc::DARE<2, 2>(A, B, Q, R2, N);
+  auto ret2 = wpi::math::DARE<2, 2>(A, B, Q, R2, N);
   EXPECT_FALSE(ret2);
-  EXPECT_EQ(ret2.error(), frc::DAREError::RNotPositiveDefinite);
+  EXPECT_EQ(ret2.error(), wpi::math::DAREError::RNotPositiveDefinite);
 }
 
 TEST(DARETest, ABNotStabilizable_ABQR) {
@@ -415,9 +433,9 @@ TEST(DARETest, ABNotStabilizable_ABQR) {
   const Eigen::Matrix2d Q{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d R{Eigen::Matrix2d::Identity()};
 
-  auto ret = frc::DARE<2, 2>(A, B, Q, R);
+  auto ret = wpi::math::DARE<2, 2>(A, B, Q, R);
   EXPECT_FALSE(ret);
-  EXPECT_EQ(ret.error(), frc::DAREError::ABNotStabilizable);
+  EXPECT_EQ(ret.error(), wpi::math::DAREError::ABNotStabilizable);
 }
 
 TEST(DARETest, ABNotStabilizable_ABQRN) {
@@ -427,9 +445,9 @@ TEST(DARETest, ABNotStabilizable_ABQRN) {
   const Eigen::Matrix2d R{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d N{Eigen::Matrix2d::Identity()};
 
-  auto ret = frc::DARE<2, 2>(A, B, Q, R, N);
+  auto ret = wpi::math::DARE<2, 2>(A, B, Q, R, N);
   EXPECT_FALSE(ret);
-  EXPECT_EQ(ret.error(), frc::DAREError::ABNotStabilizable);
+  EXPECT_EQ(ret.error(), wpi::math::DAREError::ABNotStabilizable);
 }
 
 TEST(DARETest, ACNotDetectable_ABQR) {
@@ -438,9 +456,9 @@ TEST(DARETest, ACNotDetectable_ABQR) {
   const Eigen::Matrix2d Q{Eigen::Matrix2d::Zero()};
   const Eigen::Matrix2d R{Eigen::Matrix2d::Identity()};
 
-  auto ret = frc::DARE<2, 2>(A, B, Q, R);
+  auto ret = wpi::math::DARE<2, 2>(A, B, Q, R);
   EXPECT_FALSE(ret);
-  EXPECT_EQ(ret.error(), frc::DAREError::ACNotDetectable);
+  EXPECT_EQ(ret.error(), wpi::math::DAREError::ACNotDetectable);
 }
 
 TEST(DARETest, ACNotDetectable_ABQRN) {
@@ -450,9 +468,9 @@ TEST(DARETest, ACNotDetectable_ABQRN) {
   const Eigen::Matrix2d R{Eigen::Matrix2d::Identity()};
   const Eigen::Matrix2d N{Eigen::Matrix2d::Zero()};
 
-  auto ret = frc::DARE<2, 2>(A, B, Q, R, N);
+  auto ret = wpi::math::DARE<2, 2>(A, B, Q, R, N);
   EXPECT_FALSE(ret);
-  EXPECT_EQ(ret.error(), frc::DAREError::ACNotDetectable);
+  EXPECT_EQ(ret.error(), wpi::math::DAREError::ACNotDetectable);
 }
 
 TEST(DARETest, QDecomposition) {
@@ -465,12 +483,12 @@ TEST(DARETest, QDecomposition) {
   // (A, C₁) should be detectable pair
   const Eigen::Matrix2d C_1{{0.0, 0.0}, {1.0, 0.0}};
   const Eigen::Matrix2d Q_1 = C_1.transpose() * C_1;
-  auto ret1 = frc::DARE<2, 2>(A, B, Q_1, R);
+  auto ret1 = wpi::math::DARE<2, 2>(A, B, Q_1, R);
   EXPECT_TRUE(ret1);
 
   // (A, C₂) shouldn't be detectable pair
   const Eigen::Matrix2d C_2 = C_1.transpose();
   const Eigen::Matrix2d Q_2 = C_2.transpose() * C_2;
-  auto ret2 = frc::DARE<2, 2>(A, B, Q_2, R);
+  auto ret2 = wpi::math::DARE<2, 2>(A, B, Q_2, R);
   EXPECT_FALSE(ret2);
 }

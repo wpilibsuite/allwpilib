@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "HttpCameraImpl.h"
+#include "HttpCameraImpl.hpp"
 
 #include <memory>
 #include <string>
@@ -10,22 +10,22 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/MemAlloc.h>
-#include <wpi/StringExtras.h>
-#include <wpi/timestamp.h>
-#include <wpinet/TCPConnector.h>
 
-#include "Instance.h"
-#include "JpegUtil.h"
-#include "Log.h"
-#include "Notifier.h"
-#include "Telemetry.h"
-#include "c_util.h"
+#include "Instance.hpp"
+#include "JpegUtil.hpp"
+#include "Log.hpp"
+#include "Notifier.hpp"
+#include "Telemetry.hpp"
+#include "c_util.hpp"
+#include "wpi/net/TCPConnector.h"
+#include "wpi/util/MemAlloc.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/timestamp.h"
 
-using namespace cs;
+using namespace wpi::cs;
 
 HttpCameraImpl::HttpCameraImpl(std::string_view name, CS_HttpCameraKind kind,
-                               wpi::Logger& logger, Notifier& notifier,
+                               wpi::util::Logger& logger, Notifier& notifier,
                                Telemetry& telemetry)
     : SourceImpl{name, logger, notifier, telemetry}, m_kind{kind} {}
 
@@ -123,8 +123,8 @@ void HttpCameraImpl::StreamThreadMain() {
     }
 
     // connect
-    wpi::SmallString<64> boundary;
-    wpi::HttpConnection* conn = DeviceStreamConnect(boundary);
+    wpi::util::SmallString<64> boundary;
+    wpi::net::HttpConnection* conn = DeviceStreamConnect(boundary);
 
     if (!m_active) {
       break;
@@ -150,10 +150,10 @@ void HttpCameraImpl::StreamThreadMain() {
   SetConnected(false);
 }
 
-wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
-    wpi::SmallVectorImpl<char>& boundary) {
+wpi::net::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
+    wpi::util::SmallVectorImpl<char>& boundary) {
   // Build the request
-  wpi::HttpRequest req;
+  wpi::net::HttpRequest req;
   {
     std::scoped_lock lock(m_mutex);
     if (m_locations.empty()) {
@@ -164,20 +164,22 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
     if (m_nextLocation >= m_locations.size()) {
       m_nextLocation = 0;
     }
-    req = wpi::HttpRequest{m_locations[m_nextLocation++], m_streamSettings};
+    req =
+        wpi::net::HttpRequest{m_locations[m_nextLocation++], m_streamSettings};
     m_streamSettingsUpdated = false;
   }
 
   // Try to connect
   auto stream =
-      wpi::TCPConnector::connect(req.host.c_str(), req.port, m_logger, 1);
+      wpi::net::TCPConnector::connect(req.host.c_str(), req.port, m_logger, 1);
 
   if (!m_active || !stream) {
     return nullptr;
   }
 
-  auto connPtr = std::make_unique<wpi::HttpConnection>(std::move(stream), 1);
-  wpi::HttpConnection* conn = connPtr.get();
+  auto connPtr =
+      std::make_unique<wpi::net::HttpConnection>(std::move(stream), 1);
+  wpi::net::HttpConnection* conn = connPtr.get();
 
   // update m_streamConn
   {
@@ -195,8 +197,9 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
   }
 
   // Parse Content-Type header to get the boundary
-  auto [mediaType, contentType] = wpi::split(conn->contentType.str(), ';');
-  mediaType = wpi::trim(mediaType);
+  auto [mediaType, contentType] =
+      wpi::util::split(conn->contentType.str(), ';');
+  mediaType = wpi::util::trim(mediaType);
   if (mediaType != "multipart/x-mixed-replace") {
     SWARNING("\"{}\": unrecognized Content-Type \"{}\"", req.host.str(),
              mediaType);
@@ -209,13 +212,14 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
   boundary.clear();
   while (!contentType.empty()) {
     std::string_view keyvalue;
-    std::tie(keyvalue, contentType) = wpi::split(contentType, ';');
-    contentType = wpi::ltrim(contentType);
-    auto [key, value] = wpi::split(keyvalue, '=');
-    if (wpi::trim(key) == "boundary") {
-      value = wpi::trim(wpi::trim(value), '"');  // value may be quoted
-      if (wpi::starts_with(value, "--")) {
-        value = wpi::substr(value, 2);
+    std::tie(keyvalue, contentType) = wpi::util::split(contentType, ';');
+    contentType = wpi::util::ltrim(contentType);
+    auto [key, value] = wpi::util::split(keyvalue, '=');
+    if (wpi::util::trim(key) == "boundary") {
+      value =
+          wpi::util::trim(wpi::util::trim(value), '"');  // value may be quoted
+      if (wpi::util::starts_with(value, "--")) {
+        value = wpi::util::substr(value, 2);
       }
       boundary.append(value.begin(), value.end());
     }
@@ -232,7 +236,7 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
   return conn;
 }
 
-void HttpCameraImpl::DeviceStream(wpi::raw_istream& is,
+void HttpCameraImpl::DeviceStream(wpi::util::raw_istream& is,
                                   std::string_view boundary) {
   // Stored here so we reuse it from frame to frame
   std::string imageBuf;
@@ -244,7 +248,7 @@ void HttpCameraImpl::DeviceStream(wpi::raw_istream& is,
   // streaming loop
   while (m_active && !is.has_error() && IsEnabled() && numErrors < 3 &&
          !m_streamSettingsUpdated) {
-    if (!FindMultipartBoundary(is, boundary, nullptr)) {
+    if (!wpi::net::FindMultipartBoundary(is, boundary, nullptr)) {
       break;
     }
 
@@ -274,29 +278,29 @@ void HttpCameraImpl::DeviceStream(wpi::raw_istream& is,
   }
 }
 
-bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
+bool HttpCameraImpl::DeviceStreamFrame(wpi::util::raw_istream& is,
                                        std::string& imageBuf) {
   // Read the headers
-  wpi::SmallString<64> contentTypeBuf;
-  wpi::SmallString<64> contentLengthBuf;
-  if (!ParseHttpHeaders(is, &contentTypeBuf, &contentLengthBuf)) {
+  wpi::util::SmallString<64> contentTypeBuf;
+  wpi::util::SmallString<64> contentLengthBuf;
+  if (!wpi::net::ParseHttpHeaders(is, &contentTypeBuf, &contentLengthBuf)) {
     SWARNING("disconnected during headers");
-    PutError("disconnected during headers", wpi::Now());
+    PutError("disconnected during headers", wpi::util::Now());
     return false;
   }
 
   // Check the content type (if present)
   if (!contentTypeBuf.str().empty() &&
-      !wpi::starts_with(contentTypeBuf, "image/jpeg")) {
+      !wpi::util::starts_with(contentTypeBuf, "image/jpeg")) {
     auto errMsg = fmt::format("received unknown Content-Type \"{}\"",
                               contentTypeBuf.str());
     SWARNING("{}", errMsg);
-    PutError(errMsg, wpi::Now());
+    PutError(errMsg, wpi::util::Now());
     return false;
   }
 
   int width, height;
-  if (auto v = wpi::parse_integer<unsigned int>(contentLengthBuf, 10)) {
+  if (auto v = wpi::util::parse_integer<unsigned int>(contentLengthBuf, 10)) {
     // We know how big it is!  Just get a frame of the right size and read
     // the data directly into it.
     unsigned int contentLength = v.value();
@@ -308,21 +312,21 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
     }
     if (!GetJpegSize(image->str(), &width, &height)) {
       SWARNING("did not receive a JPEG image");
-      PutError("did not receive a JPEG image", wpi::Now());
+      PutError("did not receive a JPEG image", wpi::util::Now());
       return false;
     }
     image->width = width;
     image->height = height;
-    PutFrame(std::move(image), wpi::Now());
+    PutFrame(std::move(image), wpi::util::Now());
   } else {
     // Ugh, no Content-Length?  Read the blocks of the JPEG file.
     if (!ReadJpeg(is, imageBuf, &width, &height)) {
       SWARNING("did not receive a JPEG image");
-      PutError("did not receive a JPEG image", wpi::Now());
+      PutError("did not receive a JPEG image", wpi::util::Now());
       return false;
     }
     PutFrame(VideoMode::PixelFormat::kMJPEG, width, height, imageBuf,
-             wpi::Now());
+             wpi::util::Now());
   }
 
   ++m_frameCount;
@@ -340,7 +344,7 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
 
 void HttpCameraImpl::SettingsThreadMain() {
   for (;;) {
-    wpi::HttpRequest req;
+    wpi::net::HttpRequest req;
     {
       std::unique_lock lock(m_mutex);
       m_settingsCond.wait(lock, [=, this] {
@@ -351,7 +355,7 @@ void HttpCameraImpl::SettingsThreadMain() {
       }
 
       // Build the request
-      req = wpi::HttpRequest{m_locations[m_prefLocation], m_settings};
+      req = wpi::net::HttpRequest{m_locations[m_prefLocation], m_settings};
     }
 
     DeviceSendSettings(req);
@@ -360,17 +364,18 @@ void HttpCameraImpl::SettingsThreadMain() {
   SDEBUG("Settings Thread exiting");
 }
 
-void HttpCameraImpl::DeviceSendSettings(wpi::HttpRequest& req) {
+void HttpCameraImpl::DeviceSendSettings(wpi::net::HttpRequest& req) {
   // Try to connect
   auto stream =
-      wpi::TCPConnector::connect(req.host.c_str(), req.port, m_logger, 1);
+      wpi::net::TCPConnector::connect(req.host.c_str(), req.port, m_logger, 1);
 
   if (!m_active || !stream) {
     return;
   }
 
-  auto connPtr = std::make_unique<wpi::HttpConnection>(std::move(stream), 1);
-  wpi::HttpConnection* conn = connPtr.get();
+  auto connPtr =
+      std::make_unique<wpi::net::HttpConnection>(std::move(stream), 1);
+  wpi::net::HttpConnection* conn = connPtr.get();
 
   // update m_settingsConn
   {
@@ -394,7 +399,7 @@ CS_HttpCameraKind HttpCameraImpl::GetKind() const {
 
 bool HttpCameraImpl::SetUrls(std::span<const std::string> urls,
                              CS_Status* status) {
-  std::vector<wpi::HttpLocation> locations;
+  std::vector<wpi::net::HttpLocation> locations;
   for (const auto& url : urls) {
     bool error = false;
     std::string errorMsg;
@@ -573,7 +578,7 @@ bool AxisCameraImpl::CacheProperties(CS_Status* status) const {
   return true;
 }
 
-namespace cs {
+namespace wpi::cs {
 
 CS_Source CreateHttpCamera(std::string_view name, std::string_view url,
                            CS_HttpCameraKind kind, CS_Status* status) {
@@ -645,49 +650,51 @@ std::vector<std::string> GetHttpCameraUrls(CS_Source source,
   return static_cast<HttpCameraImpl&>(*data->source).GetUrls();
 }
 
-}  // namespace cs
+}  // namespace wpi::cs
 
 extern "C" {
 
 CS_Source CS_CreateHttpCamera(const struct WPI_String* name,
                               const struct WPI_String* url,
                               CS_HttpCameraKind kind, CS_Status* status) {
-  return cs::CreateHttpCamera(wpi::to_string_view(name),
-                              wpi::to_string_view(url), kind, status);
+  return wpi::cs::CreateHttpCamera(wpi::util::to_string_view(name),
+                                   wpi::util::to_string_view(url), kind,
+                                   status);
 }
 
 CS_Source CS_CreateHttpCameraMulti(const struct WPI_String* name,
                                    const struct WPI_String* urls, int count,
                                    CS_HttpCameraKind kind, CS_Status* status) {
-  wpi::SmallVector<std::string, 4> vec;
+  wpi::util::SmallVector<std::string, 4> vec;
   vec.reserve(count);
   for (int i = 0; i < count; ++i) {
-    vec.emplace_back(wpi::to_string_view(&urls[i]));
+    vec.emplace_back(wpi::util::to_string_view(&urls[i]));
   }
-  return cs::CreateHttpCamera(wpi::to_string_view(name), vec, kind, status);
+  return wpi::cs::CreateHttpCamera(wpi::util::to_string_view(name), vec, kind,
+                                   status);
 }
 
 CS_HttpCameraKind CS_GetHttpCameraKind(CS_Source source, CS_Status* status) {
-  return cs::GetHttpCameraKind(source, status);
+  return wpi::cs::GetHttpCameraKind(source, status);
 }
 
 void CS_SetHttpCameraUrls(CS_Source source, const struct WPI_String* urls,
                           int count, CS_Status* status) {
-  wpi::SmallVector<std::string, 4> vec;
+  wpi::util::SmallVector<std::string, 4> vec;
   vec.reserve(count);
   for (int i = 0; i < count; ++i) {
-    vec.emplace_back(wpi::to_string_view(&urls[i]));
+    vec.emplace_back(wpi::util::to_string_view(&urls[i]));
   }
-  cs::SetHttpCameraUrls(source, vec, status);
+  wpi::cs::SetHttpCameraUrls(source, vec, status);
 }
 
 WPI_String* CS_GetHttpCameraUrls(CS_Source source, int* count,
                                  CS_Status* status) {
-  auto urls = cs::GetHttpCameraUrls(source, status);
+  auto urls = wpi::cs::GetHttpCameraUrls(source, status);
   WPI_String* out = WPI_AllocateStringArray(urls.size());
   *count = urls.size();
   for (size_t i = 0; i < urls.size(); ++i) {
-    cs::ConvertToC(&out[i], urls[i]);
+    wpi::cs::ConvertToC(&out[i], urls[i]);
   }
   return out;
 }

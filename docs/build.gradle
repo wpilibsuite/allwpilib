@@ -1,15 +1,17 @@
 plugins {
     id 'java'
-    id "org.ysb33r.doxygen" version "1.0.4"
+    id "org.ysb33r.doxygen" version "2.0.0"
 }
 
 evaluationDependsOn(':apriltag')
 evaluationDependsOn(':cameraserver')
+evaluationDependsOn(':commandsv3')
 evaluationDependsOn(':cscore')
 evaluationDependsOn(':epilogue-runtime')
 evaluationDependsOn(':hal')
 evaluationDependsOn(':ntcore')
-evaluationDependsOn(':wpilibNewCommands')
+evaluationDependsOn(':wpiannotations')
+evaluationDependsOn(':commandsv2')
 evaluationDependsOn(':wpilibc')
 evaluationDependsOn(':wpilibj')
 evaluationDependsOn(':wpimath')
@@ -20,12 +22,12 @@ evaluationDependsOn(':romiVendordep')
 evaluationDependsOn(':xrpVendordep')
 
 def baseArtifactIdCpp = 'documentation'
-def artifactGroupIdCpp = 'edu.wpi.first.wpilibc'
-def zipBaseNameCpp = '_GROUP_edu_wpi_first_wpilibc_ID_documentation_CLS'
+def artifactGroupIdCpp = 'org.wpilib.wpilibc'
+def zipBaseNameCpp = '_GROUP_org_wpilib_wpilibc_ID_documentation_CLS'
 
 def baseArtifactIdJava = 'documentation'
-def artifactGroupIdJava = 'edu.wpi.first.wpilibj'
-def zipBaseNameJava = '_GROUP_edu_wpi_first_wpilibj_ID_documentation_CLS'
+def artifactGroupIdJava = 'org.wpilib.wpilibj'
+def zipBaseNameJava = '_GROUP_org_wpilib_wpilibj_ID_documentation_CLS'
 
 def outputsFolder = file("$project.buildDir/outputs")
 
@@ -37,7 +39,7 @@ cppProjectZips.add(project(':cameraserver').cppHeadersZip)
 cppProjectZips.add(project(':cscore').cppHeadersZip)
 cppProjectZips.add(project(':hal').cppHeadersZip)
 cppProjectZips.add(project(':ntcore').cppHeadersZip)
-cppProjectZips.add(project(':wpilibNewCommands').cppHeadersZip)
+cppProjectZips.add(project(':commandsv2').cppHeadersZip)
 cppProjectZips.add(project(':wpilibc').cppHeadersZip)
 cppProjectZips.add(project(':wpimath').cppHeadersZip)
 cppProjectZips.add(project(':wpinet').cppHeadersZip)
@@ -46,28 +48,41 @@ cppProjectZips.add(project(':romiVendordep').cppHeadersZip)
 cppProjectZips.add(project(':xrpVendordep').cppHeadersZip)
 
 doxygen {
-    // Doxygen binaries are only provided for x86_64 platforms
-    // Other platforms will need to provide doxygen via their system
-    // See below maven and https://doxygen.nl/download.html for provided binaries
-    // Ensure theme.css (from https://github.com/jothepro/doxygen-awesome-css) is compatible with
-    // doxygen version when updating
+    // Doxygen binaries are only provided for x86_64 platforms. Other platforms
+    // will need to use a local Doxygen install.
+    //
+    // executeByVersion() fetches Doxygen binaries from
+    // https://frcmaven.wpi.edu/ui/native/generic-release-mirror/doxygen/, which
+    // is a mirror of binaries from https://doxygen.nl/download.html.
+    //
+    // To mirror a new Doxygen version, retrigger the GitHub Actions workflow in
+    // https://github.com/wpilibsuite/doxygen-mirror with the desired version
+    // number as an input.
+    //
+    // Ensure theme.css (from https://github.com/jothepro/doxygen-awesome-css)
+    // is compatible with Doxygen version when updating.
+    executables {
+        doxygen {
+            // Note: has no effect if not on an x86_64 platform - you need to
+            // have a global install available on your PATH for the Doxygen
+            // plugin to run.
+            executableByVersion('1.15.0')
 
-    String arch = System.getProperty("os.arch");
-    if (arch.equals("x86_64") || arch.equals("amd64")) {
-        executables {
-            doxygen {
-                executableByVersion('1.12.0')
+            String arch = System.getProperty("os.arch");
+            if (!(arch.equals("x86_64") || arch.equals("amd64"))) {
+                // Search for a local Doxygen install
+                executableBySearchPath('doxygen')
             }
         }
     }
 }
 
-doxygen {
-    template 'Doxyfile'
+doxygen.sourceSets.main {
+    template = 'Doxyfile'
 
     cppProjectZips.each {
-        dependsOn it
-        source it.source
+        doxygenDox.dependsOn it
+        sources it.source
         it.ext.includeDirs.each {
             cppIncludeRoots.add(it.absolutePath)
         }
@@ -77,78 +92,32 @@ doxygen {
         // apriltag
         exclude 'apriltag_pose.h'
 
-        // Eigen
-        exclude 'Eigen/**'
-        exclude 'unsupported/**'
-
         // LLVM
-        exclude 'wpi/AlignOf.h'
-        exclude 'wpi/Casting.h'
-        exclude 'wpi/Chrono.h'
-        exclude 'wpi/Compiler.h'
-        exclude 'wpi/ConvertUTF.h'
-        exclude 'wpi/DenseMap.h'
-        exclude 'wpi/DenseMapInfo.h'
-        exclude 'wpi/Endian.h'
-        exclude 'wpi/EpochTracker.h'
-        exclude 'wpi/Errc.h'
-        exclude 'wpi/Errno.h'
-        exclude 'wpi/ErrorHandling.h'
-        exclude 'wpi/bit.h'
-        exclude 'wpi/fs.h'
-        exclude 'wpi/FunctionExtras.h'
-        exclude 'wpi/function_ref.h'
-        exclude 'wpi/iterator.h'
-        exclude 'wpi/iterator_range.h'
-        exclude 'wpi/ManagedStatic.h'
-        exclude 'wpi/MathExtras.h'
-        exclude 'wpi/MemAlloc.h'
-        exclude 'wpi/PointerIntPair.h'
-        exclude 'wpi/PointerLikeTypeTraits.h'
-        exclude 'wpi/PointerUnion.h'
-        exclude 'wpi/raw_os_ostream.h'
-        exclude 'wpi/raw_ostream.h'
-        exclude 'wpi/SmallPtrSet.h'
-        exclude 'wpi/SmallSet.h'
-        exclude 'wpi/SmallString.h'
-        exclude 'wpi/SmallVector.h'
-        exclude 'wpi/StringExtras.h'
-        exclude 'wpi/StringMap.h'
-        exclude 'wpi/SwapByteOrder.h'
-        exclude 'wpi/type_traits.h'
-        exclude 'wpi/VersionTuple.h'
-        exclude 'wpi/WindowsError.h'
-
-        // fmtlib
-        exclude 'fmt/**'
+        exclude 'wpi/util/Compiler.hpp'
+        exclude 'wpi/util/ErrorHandling.hpp'
+        exclude 'wpi/util/bit.hpp'
+        exclude 'wpi/util/raw_ostream.hpp'
+        exclude 'wpi/util/SmallVector.hpp'
+        exclude 'wpi/util/StringExtras.hpp'
 
         // libuv
-        exclude 'uv.h'
         exclude 'uv/**'
-        exclude 'wpinet/uv/**'
 
         // json
-        exclude 'wpi/adl_serializer.h'
-        exclude 'wpi/byte_container_with_subtype.h'
-        exclude 'wpi/detail/**'
-        exclude 'wpi/json.h'
-        exclude 'wpi/json_fwd.h'
-        exclude 'wpi/ordered_map.h'
-        exclude 'wpi/thirdparty/**'
+        exclude 'wpi/util/detail/**'
 
         // mpack
-        exclude 'wpi/mpack.h'
+        exclude 'wpi/util/mpack.h'
 
         // units
-        exclude 'units/**'
+        exclude 'wpi/units/**'
     }
 
     exclude '*.pb.h'
 
-    // Save space by excluding protobuf and eigen
+    // Save space by excluding eigen
     exclude 'Eigen/**'
     exclude 'unsupported/**'
-    exclude 'google/protobuf/**'
 
     exclude '**/.clang-tidy'
     exclude '**/.clang-format'
@@ -166,8 +135,9 @@ doxygen {
 
 tasks.register("zipCppDocs", Zip) {
     archiveBaseName = zipBaseNameCpp
+    archiveVersion = ""
     destinationDirectory = outputsFolder
-    dependsOn doxygen
+    dependsOn doxygenDox
     from ("$buildDir/docs/doxygen/html")
     into '/'
 }
@@ -175,7 +145,7 @@ tasks.register("zipCppDocs", Zip) {
 // Java
 configurations {
     javaSource {
-        transitive false
+        transitive = false
     }
 }
 
@@ -186,38 +156,44 @@ task generateJavaDocs(type: Javadoc) {
     options.addStringOption("tag", "pre:a:Pre-Condition")
     options.addBooleanOption("Xdoclint/package:" +
             // TODO: v Document these, then remove them from the list
-            "-edu.wpi.first.hal," +
-            "-edu.wpi.first.hal.simulation," +
+            "-org.wpilib.hardware.hal," +
+            "-org.wpilib.hardware.hal.simulation," +
             // TODO: ^ Document these, then remove them from the list
-            "-edu.wpi.first.math.proto," +
-            "-edu.wpi.first.math.struct," +
-            "-edu.wpi.first.math.controller.proto," +
-            "-edu.wpi.first.math.controller.struct," +
-            "-edu.wpi.first.math.geometry.proto," +
-            "-edu.wpi.first.math.geometry.struct," +
-            "-edu.wpi.first.math.kinematics.proto," +
-            "-edu.wpi.first.math.kinematics.struct," +
-            "-edu.wpi.first.math.spline.proto," +
-            "-edu.wpi.first.math.spline.struct," +
-            "-edu.wpi.first.math.system.proto," +
-            "-edu.wpi.first.math.system.struct," +
-            "-edu.wpi.first.math.system.plant.proto," +
-            "-edu.wpi.first.math.system.plant.struct," +
-            "-edu.wpi.first.math.trajectory.proto," +
+            "-org.wpilib.math.proto," +
+            "-org.wpilib.math.struct," +
+            "-org.wpilib.math.controller.proto," +
+            "-org.wpilib.math.controller.struct," +
+            "-org.wpilib.math.geometry.proto," +
+            "-org.wpilib.math.geometry.struct," +
+            "-org.wpilib.math.kinematics.proto," +
+            "-org.wpilib.math.kinematics.struct," +
+            "-org.wpilib.math.linalg.proto," +
+            "-org.wpilib.math.linalg.struct," +
+            "-org.wpilib.math.spline.proto," +
+            "-org.wpilib.math.spline.struct," +
+            "-org.wpilib.math.system.proto," +
+            "-org.wpilib.math.system.struct," +
+            "-org.wpilib.math.system.plant.proto," +
+            "-org.wpilib.math.system.plant.struct," +
+            "-org.wpilib.math.trajectory.proto," +
+            "-org.wpilib.math.trajectory.struct," +
+            "-org.wpilib.command3.proto," +
             // The .measure package contains generated source files for which automatic javadoc
             // generation is very difficult to do meaningfully.
-            "-edu.wpi.first.units.measure", true)
+            "-org.wpilib.units.measure", true)
     options.addBooleanOption("Xdoclint:html,missing,reference,syntax", true)
     options.addBooleanOption('html5', true)
     options.linkSource(true)
     dependsOn project(':wpilibj').generateJavaVersion
     source project(':apriltag').sourceSets.main.java
     source project(':cameraserver').sourceSets.main.java
+    source project(':commandsv3').sourceSets.main.java
     source project(':cscore').sourceSets.main.java
     source project(':epilogue-runtime').sourceSets.main.java
     source project(':hal').sourceSets.main.java
     source project(':ntcore').sourceSets.main.java
-    source project(':wpilibNewCommands').sourceSets.main.java
+    source project(':wpiannotations').sourceSets.main.java
+    source project(':commandsv2').sourceSets.main.java
     source project(':wpilibj').sourceSets.main.java
     source project(':wpimath').sourceSets.main.java
     source project(':wpinet').sourceSets.main.java
@@ -244,6 +220,7 @@ task generateJavaDocs(type: Javadoc) {
 
 tasks.register("zipJavaDocs", Zip) {
     archiveBaseName = zipBaseNameJava
+    archiveVersion = ""
     destinationDirectory = outputsFolder
     dependsOn generateJavaDocs
     from ("$buildDir/docs/javadoc")
@@ -263,15 +240,15 @@ publishing {
             artifact zipJavaDocs
 
             artifactId = "${baseArtifactIdJava}"
-            groupId artifactGroupIdJava
-            version wpilibVersioning.version.get()
+            groupId = artifactGroupIdJava
+            version = wpilibVersioning.version.get()
         }
         cpp(MavenPublication) {
             artifact zipCppDocs
 
             artifactId = "${baseArtifactIdCpp}"
-            groupId artifactGroupIdCpp
-            version wpilibVersioning.version.get()
+            groupId = artifactGroupIdCpp
+            version = wpilibVersioning.version.get()
         }
     }
 }

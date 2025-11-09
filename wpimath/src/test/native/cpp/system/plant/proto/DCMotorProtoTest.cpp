@@ -3,20 +3,20 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <wpi/SmallVector.h>
 
-#include "frc/system/plant/DCMotor.h"
+#include "wpi/math/system/plant/DCMotor.hpp"
+#include "wpi/util/SmallVector.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
-using ProtoType = wpi::Protobuf<frc::DCMotor>;
+using ProtoType = wpi::util::Protobuf<wpi::math::DCMotor>;
 
 inline constexpr DCMotor kExpectedData =
     DCMotor{1.91_V, 19.1_Nm, 1.74_A, 2.29_A, 2.2_rad_per_s, 2};
 
 TEST(DCMotorProtoTest, Roundtrip) {
-  wpi::ProtobufMessage<decltype(kExpectedData)> message;
-  wpi::SmallVector<uint8_t, 64> buf;
+  wpi::util::ProtobufMessage<decltype(kExpectedData)> message;
+  wpi::util::SmallVector<uint8_t, 64> buf;
 
   ASSERT_TRUE(message.Pack(buf, kExpectedData));
   auto unpacked_data = message.Unpack(buf);

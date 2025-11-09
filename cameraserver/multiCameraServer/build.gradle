@@ -19,7 +19,7 @@ ext {
 apply from: "${rootDir}/shared/opencv.gradle"
 
 application {
-    mainClass = 'edu.wpi.Main'
+    mainClass = 'org.wpilib.Main'
 }
 
 apply plugin: 'com.gradleup.shadow'
@@ -31,7 +31,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'com.google.code.gson:gson:2.13.1'
 
     implementation project(':wpiutil')
     implementation project(':wpinet')

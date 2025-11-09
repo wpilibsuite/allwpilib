@@ -1,0 +1,30 @@
+extra_includes:
+- wpi/driverstation/StadiaController.hpp
+
+classes:
+  wpi::sim::StadiaControllerSim:
+    force_no_trampoline: true
+    methods:
+      StadiaControllerSim:
+        overloads:
+          const StadiaController&:
+          int:
+      SetLeftX:
+      SetRightX:
+      SetLeftY:
+      SetRightY:
+      SetAButton:
+      SetBButton:
+      SetXButton:
+      SetYButton:
+      SetLeftBumperButton:
+      SetRightBumperButton:
+      SetLeftStickButton:
+      SetRightStickButton:
+      SetEllipsesButton:
+      SetHamburgerButton:
+      SetStadiaButton:
+      SetRightTriggerButton:
+      SetLeftTriggerButton:
+      SetGoogleButton:
+      SetFrameButton:

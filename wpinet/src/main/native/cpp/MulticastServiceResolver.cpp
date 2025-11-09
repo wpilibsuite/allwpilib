@@ -2,25 +2,25 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/MulticastServiceResolver.h"
+#include "wpi/net/MulticastServiceResolver.h"
 
 #include <memory>
 #include <utility>
 #include <vector>
 
-#include <wpi/MemAlloc.h>
-
-#include "MulticastHandleManager.h"
+#include "MulticastHandleManager.hpp"
+#include "wpi/util/MemAlloc.hpp"
 
 extern "C" {
 WPI_MulticastServiceResolverHandle WPI_CreateMulticastServiceResolver(
     const char* serviceType)
 
 {
-  auto& manager = wpi::GetMulticastManager();
+  auto& manager = wpi::net::GetMulticastManager();
   std::scoped_lock lock{manager.mutex};
 
-  auto resolver = std::make_unique<wpi::MulticastServiceResolver>(serviceType);
+  auto resolver =
+      std::make_unique<wpi::net::MulticastServiceResolver>(serviceType);
 
   size_t index = manager.handleIds.emplace_back(2);
   manager.resolvers[index] = std::move(resolver);
@@ -30,7 +30,7 @@ WPI_MulticastServiceResolverHandle WPI_CreateMulticastServiceResolver(
 
 void WPI_FreeMulticastServiceResolver(
     WPI_MulticastServiceResolverHandle handle) {
-  auto& manager = wpi::GetMulticastManager();
+  auto& manager = wpi::net::GetMulticastManager();
   std::scoped_lock lock{manager.mutex};
   manager.resolvers[handle] = nullptr;
   manager.handleIds.erase(handle);
@@ -38,7 +38,7 @@ void WPI_FreeMulticastServiceResolver(
 
 void WPI_StartMulticastServiceResolver(
     WPI_MulticastServiceResolverHandle handle) {
-  auto& manager = wpi::GetMulticastManager();
+  auto& manager = wpi::net::GetMulticastManager();
   std::scoped_lock lock{manager.mutex};
   auto& resolver = manager.resolvers[handle];
   resolver->Start();
@@ -46,7 +46,7 @@ void WPI_StartMulticastServiceResolver(
 
 void WPI_StopMulticastServiceResolver(
     WPI_MulticastServiceResolverHandle handle) {
-  auto& manager = wpi::GetMulticastManager();
+  auto& manager = wpi::net::GetMulticastManager();
   std::scoped_lock lock{manager.mutex};
   auto& resolver = manager.resolvers[handle];
   resolver->Stop();
@@ -54,7 +54,7 @@ void WPI_StopMulticastServiceResolver(
 
 int32_t WPI_GetMulticastServiceResolverHasImplementation(
     WPI_MulticastServiceResolverHandle handle) {
-  auto& manager = wpi::GetMulticastManager();
+  auto& manager = wpi::net::GetMulticastManager();
   std::scoped_lock lock{manager.mutex};
   auto& resolver = manager.resolvers[handle];
   return resolver->HasImplementation();
@@ -62,7 +62,7 @@ int32_t WPI_GetMulticastServiceResolverHasImplementation(
 
 WPI_EventHandle WPI_GetMulticastServiceResolverEventHandle(
     WPI_MulticastServiceResolverHandle handle) {
-  auto& manager = wpi::GetMulticastManager();
+  auto& manager = wpi::net::GetMulticastManager();
   std::scoped_lock lock{manager.mutex};
   auto& resolver = manager.resolvers[handle];
   return resolver->GetEventHandle();
@@ -70,9 +70,9 @@ WPI_EventHandle WPI_GetMulticastServiceResolverEventHandle(
 
 WPI_ServiceData* WPI_GetMulticastServiceResolverData(
     WPI_MulticastServiceResolverHandle handle, int32_t* dataCount) {
-  std::vector<wpi::MulticastServiceResolver::ServiceData> allData;
+  std::vector<wpi::net::MulticastServiceResolver::ServiceData> allData;
   {
-    auto& manager = wpi::GetMulticastManager();
+    auto& manager = wpi::net::GetMulticastManager();
     std::scoped_lock lock{manager.mutex};
     auto& resolver = manager.resolvers[handle];
     allData = resolver->GetData();
@@ -100,7 +100,8 @@ WPI_ServiceData* WPI_GetMulticastServiceResolverData(
     allocSize += valuesTotalLength;
   }
 
-  uint8_t* cDataRaw = reinterpret_cast<uint8_t*>(wpi::safe_malloc(allocSize));
+  uint8_t* cDataRaw =
+      reinterpret_cast<uint8_t*>(wpi::util::safe_malloc(allocSize));
   if (!cDataRaw) {
     return nullptr;
   }

@@ -1,0 +1,71 @@
+extra_includes:
+- rpy/ControlWord.h
+- wpi/datalog/DataLog.hpp
+
+classes:
+  wpi::DriverStation:
+    attributes:
+      kJoystickPorts:
+    enums:
+      Alliance:
+      MatchType:
+      POVDirection:
+    methods:
+      GetStickButton:
+      GetStickButtonPressed:
+      GetStickButtonReleased:
+      GetStickAxis:
+      GetStickPOV:
+      GetStickButtons:
+      GetJoystickType:
+      GetJoystickName:
+      IsJoystickConnected:
+      IsEnabled:
+      IsDisabled:
+      IsEStopped:
+      IsAutonomous:
+      IsAutonomousEnabled:
+      IsTeleop:
+      IsTeleopEnabled:
+      IsTest:
+      IsTestEnabled:
+      IsDSAttached:
+      IsFMSAttached:
+      GetGameSpecificMessage:
+      GetEventName:
+      GetMatchType:
+      GetMatchNumber:
+      GetReplayNumber:
+      GetAlliance:
+      GetLocation:
+      GetMatchTime:
+      GetBatteryVoltage:
+      RefreshData:
+      ProvideRefreshedDataEventHandle:
+      RemoveRefreshedDataEventHandle:
+      SilenceJoystickConnectionWarning:
+      IsJoystickConnectionWarningSilenced:
+      StartDataLog:
+      GetAngle:
+      GetJoystickIsGamepad:
+      GetStickButtonIfAvailable:
+      GetStickAxisIfAvailable:
+      GetStickAxesMaximumIndex:
+      GetStickAxesAvailable:
+      GetStickPOVsMaximumIndex:
+      GetStickPOVsAvailable:
+      GetStickButtonsMaximumIndex:
+      GetStickButtonsAvailable:
+    inline_code: |
+      .def("getControlState",
+        [](DriverStation *self) -> std::tuple<bool, bool, bool> {
+          py::gil_scoped_release release;
+          return rpy::GetControlState();
+        },
+        py::doc("More efficient way to determine what state the robot is in.\n"
+                "\n"
+                ":returns: booleans representing enabled, isautonomous, istest\n"
+                "\n"
+                ".. versionadded:: 2019.2.1\n"
+                "\n"
+                ".. note:: This function only exists in RobotPy\n"))

@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/array.h"
+#include "wpi/util/array.hpp"
 
 namespace {
 class MoveOnlyType {
@@ -17,19 +17,20 @@ class MoveOnlyType {
 
 TEST(ArrayTest, CopyableTypeCompiles) {
   [[maybe_unused]]
-  constexpr wpi::array<int, 3> arr1{1, 2, 3};
+  constexpr wpi::util::array<int, 3> arr1{1, 2, 3};
 
   // Test deduction guide
   [[maybe_unused]]
-  constexpr wpi::array arr2{1, 2, 3};
+  constexpr wpi::util::array arr2{1, 2, 3};
 }
 
 TEST(ArrayTest, MoveOnlyTypeCompiles) {
   [[maybe_unused]]
-  constexpr wpi::array<MoveOnlyType, 3> arr1{MoveOnlyType{}, MoveOnlyType{},
-                                             MoveOnlyType{}};
+  constexpr wpi::util::array<MoveOnlyType, 3> arr1{
+      MoveOnlyType{}, MoveOnlyType{}, MoveOnlyType{}};
 
   // Test deduction guide
   [[maybe_unused]]
-  constexpr wpi::array arr2{MoveOnlyType{}, MoveOnlyType{}, MoveOnlyType{}};
+  constexpr wpi::util::array arr2{MoveOnlyType{}, MoveOnlyType{},
+                                  MoveOnlyType{}};
 }

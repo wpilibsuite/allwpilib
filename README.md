@@ -56,7 +56,9 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
     - If the WPILib installer was used, this toolchain is already installed
 - Raspberry Pi toolchain (optional)
     - Run `./gradlew installArm32Toolchain` after cloning this repository
-
+- SystemCore toolchain (required for SystemCore development)
+    - Run `./gradlew installSystemCoreToolchain` after cloning this repository
+    - If the WPILib installer was used, this toolchain is already installed
 
 On macOS ARM, run `softwareupdate --install-rosetta`. This is necessary to be able to use the macOS x86 roboRIO toolchain on ARM.
 
@@ -103,7 +105,7 @@ If opening from a fresh clone, generated java dependencies will not exist. Most 
 - `cscore`
 - `hal`
 - `ntcore`
-- `wpilibNewCommands`
+- `commandsv2`
 - `wpimath`
 - `wpinet`
 - `wpiunits`

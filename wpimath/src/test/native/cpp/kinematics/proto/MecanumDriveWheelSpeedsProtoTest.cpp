@@ -3,11 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <wpi/SmallVector.h>
 
-#include "frc/kinematics/MecanumDriveWheelSpeeds.h"
+#include "wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp"
+#include "wpi/util/SmallVector.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 namespace {
 
@@ -16,8 +16,8 @@ const MecanumDriveWheelSpeeds kExpectedData =
 }  // namespace
 
 TEST(MecanumDriveWheelSpeedsProtoTest, Roundtrip) {
-  wpi::ProtobufMessage<decltype(kExpectedData)> message;
-  wpi::SmallVector<uint8_t, 64> buf;
+  wpi::util::ProtobufMessage<decltype(kExpectedData)> message;
+  wpi::util::SmallVector<uint8_t, 64> buf;
 
   ASSERT_TRUE(message.Pack(buf, kExpectedData));
   auto unpacked_data = message.Unpack(buf);

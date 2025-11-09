@@ -1,0 +1,13 @@
+extra_includes:
+- wpi/util/sendable/SendableBuilder.hpp
+
+classes:
+  wpi::DigitalInput:
+    ignored_bases:
+    - wpi::util::SendableHelper<DigitalInput>
+    methods:
+      DigitalInput:
+      Get:
+      GetChannel:
+      SetSimDevice:
+      InitSendable:

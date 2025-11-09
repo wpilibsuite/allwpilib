@@ -5,7 +5,7 @@
   - any-glob-to-any-file: apriltag/**
 'component: command-based':
 - changed-files:
-  - any-glob-to-any-file: wpilibNewCommands/**
+  - any-glob-to-any-file: commandsv2/**
 'component: cscore':
 - changed-files:
   - any-glob-to-any-file: cscore/**

@@ -1,0 +1,8 @@
+classes:
+  wpi::math::DifferentialDriveWheelPositions:
+    attributes:
+      left:
+      right:
+    methods:
+      operator==:
+      Interpolate:

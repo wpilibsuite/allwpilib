@@ -1,0 +1,42 @@
+classes:
+  wpi::sim::ElevatorSim:
+    typealias:
+    - wpi::math::DCMotor
+    - template <int S, int I, int O> using LinearSystem = wpi::math::LinearSystem<S, I, O>
+    - template <int I> using Vectord = wpi::math::Vectord<I>
+    methods:
+      ElevatorSim:
+        overloads:
+          ? const wpi::math::LinearSystem<2, 1, 2>&, const wpi::math::DCMotor&, wpi::units::meter_t, wpi::units::meter_t, bool, wpi::units::meter_t, const std::array<double, 2>&
+          : param_override:
+              measurementStdDevs:
+                default: std::array<double, 2>{0.0, 0.0}
+          ? const wpi::math::DCMotor&, double, wpi::units::kilogram_t, wpi::units::meter_t, wpi::units::meter_t, wpi::units::meter_t, bool, wpi::units::meter_t, const std::array<double, 2>&
+          : param_override:
+              measurementStdDevs:
+                default: std::array<double, 2>{0.0}
+          ? decltype(1_V/Velocity_t<Distance> (1)), decltype(1_V/Acceleration_t<Distance> (1)), const wpi::math::DCMotor&, wpi::units::meter_t, wpi::units::meter_t, bool, wpi::units::meter_t, const std::array<double, 2>&
+          : ignore: true
+      SetState:
+      WouldHitLowerLimit:
+      WouldHitUpperLimit:
+      HasHitLowerLimit:
+      HasHitUpperLimit:
+      GetPosition:
+      GetVelocity:
+      GetCurrentDraw:
+      SetInputVoltage:
+      UpdateX:
+
+inline_code: |-
+  cls_ElevatorSim
+    .def("getPositionFeet", [](ElevatorSim * self) -> wpi::units::foot_t {
+      return self->GetPosition();
+    })
+    .def("getPositionInches", [](ElevatorSim * self) -> wpi::units::inch_t {
+      return self->GetPosition();
+    })
+    .def("getVelocityFps", [](ElevatorSim * self) -> wpi::units::feet_per_second_t {
+      return self->GetVelocity();
+    })
+  ;

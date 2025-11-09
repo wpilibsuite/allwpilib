@@ -1,0 +1,10 @@
+classes:
+  wpi::math::MecanumDriveWheelPositions:
+    attributes:
+      frontLeft:
+      frontRight:
+      rearLeft:
+      rearRight:
+    methods:
+      operator==:
+      Interpolate:

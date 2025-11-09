@@ -1,0 +1,16 @@
+extra_includes:
+- wpi/util/sendable/SendableBuilder.hpp
+
+classes:
+  wpi::AnalogPotentiometer:
+    ignored_bases:
+    - wpi::util::SendableHelper<AnalogPotentiometer>
+    methods:
+      AnalogPotentiometer:
+        overloads:
+          int, double, double:
+          AnalogInput*, double, double:
+            ignore: true
+          std::shared_ptr<AnalogInput>, double, double:
+      Get:
+      InitSendable:

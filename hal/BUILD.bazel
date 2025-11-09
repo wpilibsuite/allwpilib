@@ -183,7 +183,7 @@ wpilib_jni_java_library(
     name = "hal-java",
     srcs = glob(["src/main/java/**/*.java"]),
     maven_artifact_name = "hal-java",
-    maven_group_id = "edu.wpi.first.hal",
+    maven_group_id = "org.wpilib.hal",
     native_libs = [":wpiHaljni"],
     visibility = ["//visibility:public"],
     deps = [
@@ -221,8 +221,8 @@ cc_binary(
 
 java_binary(
     name = "DevMain-Java",
-    srcs = ["src/dev/java/edu/wpi/first/hal/DevMain.java"],
-    main_class = "edu.wpi.first.hal.DevMain",
+    srcs = ["src/dev/java/org/wpilib/hardware/hal/DevMain.java"],
+    main_class = "org.wpilib.hardware.hal.DevMain",
     deps = [
     ],
 )
@@ -230,5 +230,5 @@ java_binary(
 package_default_jni_project(
     name = "wpiHal",
     maven_artifact_name = "hal-cpp",
-    maven_group_id = "edu.wpi.first.hal",
+    maven_group_id = "org.wpilib.hal",
 )

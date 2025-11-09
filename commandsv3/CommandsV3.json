@@ -1,0 +1,18 @@
+{
+  "fileName": "CommandsV3.json",
+  "name": "Commands v3",
+  "version": "1.0.0",
+  "uuid": "4decdc05-a056-46cf-9561-39449bbb0130",
+  "frcYear": "2027_alpha1",
+  "mavenUrls": [],
+  "jsonUrl": "",
+  "javaDependencies": [
+    {
+      "groupId": "org.wpilib",
+      "artifactId": "commands3-java",
+      "version": "wpilib"
+    }
+  ],
+  "jniDependencies": [],
+  "cppDependencies": []
+}

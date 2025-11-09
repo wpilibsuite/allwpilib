@@ -1,16 +1,16 @@
 apply plugin: 'maven-publish'
 
 def baseArtifactId = 'Glass'
-def artifactGroupId = 'edu.wpi.first.tools'
-def zipBaseName = '_GROUP_edu_wpi_first_tools_ID_Glass_CLS'
+def artifactGroupId = 'org.wpilib.tools'
+def zipBaseName = '_GROUP_org_wpilib_tools_ID_Glass_CLS'
 
 def libBaseArtifactId = 'libglass'
-def libArtifactGroupId = 'edu.wpi.first.glass'
-def libZipBaseName = '_GROUP_edu_wpi_first_glass_ID_libglass_CLS'
+def libArtifactGroupId = 'org.wpilib.glass'
+def libZipBaseName = '_GROUP_org_wpilib_glass_ID_libglass_CLS'
 
 def libntBaseArtifactId = 'libglassnt'
-def libntArtifactGroupId = 'edu.wpi.first.glass'
-def libntZipBaseName = '_GROUP_edu_wpi_first_glass_ID_libglassnt_CLS'
+def libntArtifactGroupId = 'org.wpilib.glass'
+def libntZipBaseName = '_GROUP_org_wpilib_glass_ID_libglassnt_CLS'
 
 def outputsFolder = file("$project.buildDir/outputs")
 
@@ -86,7 +86,7 @@ model {
 
                         // Create the ZIP.
                         def task = project.tasks.create("copyGlassExecutable" + binary.targetPlatform.operatingSystem.name + binary.targetPlatform.architecture.name, Zip) {
-                            description("Copies the Glass executable to the outputs directory.")
+                            description = "Copies the Glass executable to the outputs directory."
                             destinationDirectory = outputsFolder
 
                             archiveBaseName = zipBaseName
@@ -175,7 +175,7 @@ model {
 
                 artifactId = baseArtifactId
                 groupId = artifactGroupId
-                version wpilibVersioning.version.get()
+                version = wpilibVersioning.version.get()
             }
             libglass(MavenPublication) {
                 libGlassTaskList.each { artifact it }
@@ -185,7 +185,7 @@ model {
 
                 artifactId = libBaseArtifactId
                 groupId = libArtifactGroupId
-                version wpilibVersioning.version.get()
+                version = wpilibVersioning.version.get()
             }
             libglassnt(MavenPublication) {
                 libGlassntTaskList.each { artifact it }
@@ -195,7 +195,7 @@ model {
 
                 artifactId = libntBaseArtifactId
                 groupId = libntArtifactGroupId
-                version wpilibVersioning.version.get()
+                version = wpilibVersioning.version.get()
             }
         }
     }

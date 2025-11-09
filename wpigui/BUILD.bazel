@@ -88,5 +88,5 @@ package_static_cc_project(
     name = "wpigui",
     architectures = host_architectures,
     maven_artifact_name = "wpigui-cpp",
-    maven_group_id = "edu.wpi.first.wpigui",
+    maven_group_id = "org.wpilib.wpigui",
 )

@@ -2,23 +2,23 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/CTREPCM.h"
+#include "wpi/hal/CTREPCM.h"
 
 #include <string>
 
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
-#include "hal/Errors.h"
-#include "hal/handles/IndexedHandleResource.h"
 #include "mockdata/CTREPCMDataInternal.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/handles/IndexedHandleResource.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
 namespace {
 struct PCM {
   int32_t module;
-  wpi::mutex lock;
+  wpi::util::mutex lock;
   std::string previousAllocation;
 };
 }  // namespace
@@ -26,30 +26,31 @@ struct PCM {
 static IndexedHandleResource<HAL_CTREPCMHandle, PCM, kNumCTREPCMModules,
                              HAL_HandleEnum::CTREPCM>* pcmHandles;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeCTREPCM() {
   static IndexedHandleResource<HAL_CTREPCMHandle, PCM, kNumCTREPCMModules,
                                HAL_HandleEnum::CTREPCM>
       pH;
   pcmHandles = &pH;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t busId, int32_t module,
                                         const char* allocationLocation,
                                         int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
 
   HAL_CTREPCMHandle handle;
   auto pcm = pcmHandles->Allocate(module, &handle, status);
 
   if (*status != 0) {
     if (pcm) {
-      hal::SetLastErrorPreviouslyAllocated(status, "CTRE PCM", module,
-                                           pcm->previousAllocation);
+      wpi::hal::SetLastErrorPreviouslyAllocated(status, "CTRE PCM", module,
+                                                pcm->previousAllocation);
     } else {
-      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for CTRE PCM", 0,
-                                       kNumCTREPCMModules - 1, module);
+      wpi::hal::SetLastErrorIndexOutOfRange(status,
+                                            "Invalid Index for CTRE PCM", 0,
+                                            kNumCTREPCMModules - 1, module);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
   }

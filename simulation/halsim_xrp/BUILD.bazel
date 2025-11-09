@@ -7,7 +7,7 @@ wpilib_cc_library(
     name = "halsim_xrp",
     srcs = glob([
         "src/main/native/cpp/*",
-        "src/main/native/include/*.h",
+        "src/main/native/include/**/*.hpp",
     ]),
     include_license_files = True,
     includes = ["src/main/native/include"],
@@ -27,7 +27,7 @@ wpilib_cc_library(
     name = "halsim_xrp_static",
     srcs = glob([
         "src/main/native/cpp/*",
-        "src/main/native/include/*.h",
+        "src/main/native/include/**/*.hpp",
     ]),
     copts = [
         "-DHALSIM_InitExtension=HALSIM_InitExtension_XRP",
@@ -81,5 +81,5 @@ package_default_cc_project(
     name = "halsim_xrp",
     architectures = host_architectures,
     maven_artifact_name = "halsim_xrp",
-    maven_group_id = "edu.wpi.first.halsim",
+    maven_group_id = "org.wpilib.halsim",
 )

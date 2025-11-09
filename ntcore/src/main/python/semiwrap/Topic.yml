@@ -1,0 +1,89 @@
+extra_includes:
+- wpi/nt/GenericEntry.hpp
+- wpi/nt/NetworkTableInstance.hpp
+
+classes:
+  wpi::nt::Topic:
+    methods:
+      Topic:
+        overloads:
+          '':
+            ignore: true
+          NT_Topic:
+            ignore: true
+      GetHandle:
+        ignore: true
+      GetInstance:
+      GetName:
+      GetType:
+      GetTypeString:
+      SetPersistent:
+      IsPersistent:
+      SetRetained:
+      IsRetained:
+      SetCached:
+      IsCached:
+      Exists:
+      GetProperty:
+      SetProperty:
+      DeleteProperty:
+      GetProperties:
+      SetProperties:
+      GetInfo:
+      GenericSubscribe:
+        overloads:
+          const PubSubOptions&:
+          std::string_view, const PubSubOptions&:
+      GenericPublish:
+      GenericPublishEx:
+      GetGenericEntry:
+        overloads:
+          const PubSubOptions&:
+          std::string_view, const PubSubOptions&:
+      operator==:
+    inline_code: |
+      .def("__repr__", [](py::handle self) {
+        py::object type_name = self.get_type().attr("__qualname__");
+        std::string name = self.cast<Topic>().GetName();
+        return py::str("<{} {!r}>").format(type_name, name);
+      })
+  wpi::nt::Subscriber:
+    attributes:
+      m_subHandle:
+    methods:
+      GetHandle:
+        ignore: true
+      Exists:
+      GetLastChange:
+      GetTopic:
+      Subscriber:
+        overloads:
+          '':
+            ignore: true
+          NT_Subscriber:
+            ignore: true
+    inline_code: |
+      .def("__repr__", [](py::handle self) {
+        py::object type_name = self.get_type().attr("__qualname__");
+        auto topic = self.cast<const Subscriber&>().GetTopic();
+        return py::str("<{} {!r}>").format(type_name, topic.GetName());
+      })
+  wpi::nt::Publisher:
+    attributes:
+      m_pubHandle:
+    methods:
+      GetHandle:
+        ignore: true
+      GetTopic:
+      Publisher:
+        overloads:
+          '':
+            ignore: true
+          NT_Publisher:
+            ignore: true
+    inline_code: |
+      .def("__repr__", [](py::handle self) {
+        py::object type_name = self.get_type().attr("__qualname__");
+        auto topic = self.cast<const Publisher&>().GetTopic();
+        return py::str("<{} {!r}>").format(type_name, topic.GetName());
+      })

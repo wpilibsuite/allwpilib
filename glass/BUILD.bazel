@@ -18,7 +18,7 @@ wpilib_cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//fieldImages",
+        "//fields",
         "//wpigui",
         "//wpimath",
         "//wpiutil",
@@ -31,7 +31,7 @@ wpilib_cc_static_library(
         "//wpigui:static/wpigui",
         "//wpimath:static/wpimath",
         "//wpiutil:static/wpiutil",
-        "//fieldImages:static/fieldImages",
+        "//fields:static/fields",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -42,7 +42,7 @@ wpilib_cc_static_library(
 wpilib_cc_library(
     name = "glassnt",
     srcs = glob(["src/libnt/native/cpp/*.cpp"]),
-    hdrs = glob(["src/libnt/native/include/**/*.h"]),
+    hdrs = glob(["src/libnt/native/include/**/*.hpp"]),
     hdrs_pkg_root = "src/libnt/native/include",
     include_license_files = True,
     srcs_pkg_root = "src/libnt/native/cpp",
@@ -77,7 +77,7 @@ generate_version_file(
 
 generate_resources(
     name = "generate-resources",
-    namespace = "glass",
+    namespace = "wpi::glass",
     prefix = "GLASS",
     resource_files = glob(["src/app/native/resources/*"]),
 )
@@ -104,20 +104,20 @@ package_static_cc_project(
     name = "glass",
     architectures = host_architectures,
     maven_artifact_name = "libglass",
-    maven_group_id = "edu.wpi.first.glass",
+    maven_group_id = "org.wpilib.glass",
 )
 
 package_static_cc_project(
     name = "glassnt",
     architectures = host_architectures,
     maven_artifact_name = "libglassnt",
-    maven_group_id = "edu.wpi.first.glass",
+    maven_group_id = "org.wpilib.glass",
 )
 
 package_binary_cc_project(
     name = "glassapp",
     maven_artifact_name = "Glass",
-    maven_group_id = "edu.wpi.first.tools",
+    maven_group_id = "org.wpilib.tools",
     renames = {
         "glassapp": "glass",
     },

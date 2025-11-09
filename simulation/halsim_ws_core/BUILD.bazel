@@ -5,7 +5,7 @@ load("//shared/bazel/rules:publishing.bzl", "host_architectures")
 wpilib_cc_library(
     name = "halsim_ws_core",
     srcs = glob(["src/main/native/cpp/*.cpp"]),
-    hdrs = glob(["src/main/native/include/*.h"]),
+    hdrs = glob(["src/main/native/include/**/*.hpp"]),
     include_license_files = True,
     strip_include_prefix = "src/main/native/include",
     target_compatible_with = select({
@@ -52,5 +52,5 @@ package_default_cc_project(
     name = "halsim_ws_core",
     architectures = host_architectures,
     maven_artifact_name = "halsim_ws_core",
-    maven_group_id = "edu.wpi.first.halsim",
+    maven_group_id = "org.wpilib.halsim",
 )

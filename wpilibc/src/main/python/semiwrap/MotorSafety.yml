@@ -1,0 +1,17 @@
+extra_includes:
+- wpi/util/SmallString.hpp
+
+classes:
+  wpi::MotorSafety:
+    methods:
+      MotorSafety:
+      Feed:
+      SetExpiration:
+      GetExpiration:
+      IsAlive:
+      SetSafetyEnabled:
+      IsSafetyEnabled:
+      Check:
+      CheckMotors:
+      StopMotor:
+      GetDescription:

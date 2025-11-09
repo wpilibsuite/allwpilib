@@ -6,9 +6,16 @@
 
   <description>PMD Ruleset for WPILib</description>
 
-  <exclude-pattern>.*/*JNI.*</exclude-pattern>
+  <!-- Generated files -->
+  <exclude-pattern>.*/*EntryImpl\.java</exclude-pattern>
+  <exclude-pattern>.*/*Subscriber\.java</exclude-pattern>
+  <exclude-pattern>.*/Timestamped.*\.java</exclude-pattern>
+  <exclude-pattern>.*/units/measure/.*\.java</exclude-pattern>
+
   <exclude-pattern>.*/*IntegrationTests.*</exclude-pattern>
+  <exclude-pattern>.*/*JNI.*</exclude-pattern>
   <exclude-pattern>.*/math/proto.*</exclude-pattern>
+  <exclude-pattern>.*/command3/proto.*</exclude-pattern>
 
   <rule ref="category/java/bestpractices.xml">
     <exclude name="AccessorClassGeneration" />
@@ -18,18 +25,19 @@
     <exclude name="AvoidReassigningParameters" />
     <exclude name="AvoidUsingHardCodedIP" />
     <exclude name="ConstantsInInterface" />
-    <exclude name="JUnitAssertionsShouldIncludeMessage" />
-    <exclude name="JUnitTestContainsTooManyAsserts" />
-    <exclude name="JUnitTestsShouldIncludeAssert" />
-    <exclude name="JUnit4TestShouldUseAfterAnnotation" />
-    <exclude name="JUnit4TestShouldUseBeforeAnnotation" />
-    <exclude name="JUnit4TestShouldUseTestAnnotation" />
+    <exclude name="ExhaustiveSwitchHasDefault" />
     <exclude name="LooseCoupling" />
+    <exclude name="NonExhaustiveSwitch" />
     <exclude name="PreserveStackTrace" />
     <exclude name="ReplaceHashtableWithMap" />
     <exclude name="ReplaceVectorWithList" />
-    <exclude name="SwitchStmtsShouldHaveDefault" />
     <exclude name="SystemPrintln" />
+    <exclude name="UnitTestAssertionsShouldIncludeMessage" />
+    <exclude name="UnitTestContainsTooManyAsserts" />
+    <exclude name="UnitTestShouldIncludeAssert" />
+    <exclude name="UnitTestShouldUseAfterAnnotation" />
+    <exclude name="UnitTestShouldUseBeforeAnnotation" />
+    <exclude name="UnitTestShouldUseTestAnnotation" />
     <exclude name="UseVarargs" />
   </rule>
   <rule ref="category/java/bestpractices.xml/UnusedPrivateMethod">
@@ -45,8 +53,8 @@
   </rule>
 
   <rule ref="category/java/design.xml">
-    <exclude name="AvoidThrowingRawExceptionTypes" />
     <exclude name="AvoidThrowingNewInstanceOfSameException" />
+    <exclude name="AvoidThrowingRawExceptionTypes" />
     <exclude name="CognitiveComplexity" />
     <exclude name="CouplingBetweenObjects" />
     <exclude name="CyclomaticComplexity" />
@@ -82,6 +90,7 @@
 
   <rule ref="category/java/multithreading.xml">
     <exclude name="AvoidSynchronizedAtMethodLevel" />
+    <exclude name="AvoidSynchronizedStatement" />
     <exclude name="AvoidUsingVolatile" />
     <exclude name="DoNotUseThreads" />
     <exclude name="UseConcurrentHashMap" />
@@ -89,6 +98,12 @@
 
   <rule ref="category/java/performance.xml">
     <exclude name="AvoidInstantiatingObjectsInLoops" />
+    <!--
+      This rule is in place to save three (!) bytecode instructions when initializing a field to its default value.
+      Code that's more readable due to having explicit initial values is more important than reducing class size by a
+      few bytes.
+    -->
+    <exclude name="RedundantFieldInitializer" />
   </rule>
 
   <rule name="UnnecessaryCastRule" language="java"

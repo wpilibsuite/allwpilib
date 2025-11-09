@@ -18,6 +18,9 @@ generatedFileExclude {
   hal/src/main/native/systemcore/rev/
   UsageReporting\.h$
   src/generated/main/native/cpp
+
+  src/main/python/
+  src/test/python/
 }
 
 modifiableFileExclude {
@@ -31,18 +34,13 @@ repoRootNameOverride {
 }
 
 includeOtherLibs {
-  ^FRC_FPGA_ChipObject/
-  ^FRC_NetworkCommunication/
   ^fmt/
   ^gtest/
   ^i2clib/
   ^llvm/
-  ^networktables/
-  ^ntcore
   ^opencv2/
   ^spilib/
   ^support/
-  ^wpi/
 }
 
 includeProject {

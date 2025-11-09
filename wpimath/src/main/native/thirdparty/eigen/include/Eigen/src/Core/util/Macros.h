@@ -17,13 +17,9 @@
 // Eigen version and basic defaults
 //------------------------------------------------------------------------------------------
 
-#define EIGEN_WORLD_VERSION 3
-#define EIGEN_MAJOR_VERSION 4
-#define EIGEN_MINOR_VERSION 90
-
 #define EIGEN_VERSION_AT_LEAST(x, y, z) \
-  (EIGEN_WORLD_VERSION > x ||           \
-   (EIGEN_WORLD_VERSION >= x && (EIGEN_MAJOR_VERSION > y || (EIGEN_MAJOR_VERSION >= y && EIGEN_MINOR_VERSION >= z))))
+  (EIGEN_MAJOR_VERSION > x ||           \
+   (EIGEN_MAJOR_VERSION >= x && (EIGEN_MINOR_VERSION > y || (EIGEN_MINOR_VERSION >= y && EIGEN_PATCH_VERSION >= z))))
 
 #ifdef EIGEN_DEFAULT_TO_ROW_MAJOR
 #define EIGEN_DEFAULT_MATRIX_STORAGE_ORDER_OPTION Eigen::RowMajor
@@ -944,6 +940,18 @@
 #define EIGEN_DEPRECATED
 #endif
 
+#ifndef EIGEN_NO_DEPRECATED_WARNING
+#if EIGEN_COMP_GNUC
+#define EIGEN_DEPRECATED_WITH_REASON(message) __attribute__((deprecated(message)))
+#elif EIGEN_COMP_MSVC
+#define EIGEN_DEPRECATED_WITH_REASON(message) __declspec(deprecated(message))
+#else
+#define EIGEN_DEPRECATED_WITH_REASON(message)
+#endif
+#else
+#define EIGEN_DEPRECATED_WITH_REASON(message)
+#endif
+
 #if EIGEN_COMP_GNUC
 #define EIGEN_UNUSED __attribute__((unused))
 #else
@@ -993,8 +1001,9 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr void ignore_unused_variable(cons
 #endif
 
 #if !defined(EIGEN_OPTIMIZATION_BARRIER)
-#if EIGEN_COMP_GNUC
-   // According to https://gcc.gnu.org/onlinedocs/gcc/Constraints.html:
+// Implement the barrier on GNUC compilers or clang-cl.
+#if EIGEN_COMP_GNUC || (defined(__clang__) && defined(_MSC_VER))
+// According to https://gcc.gnu.org/onlinedocs/gcc/Constraints.html:
 //   X: Any operand whatsoever.
 //   r: A register operand is allowed provided that it is in a general
 //      register.
@@ -1027,37 +1036,37 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr void ignore_unused_variable(cons
 // directly for std::complex<T>, Eigen::half, Eigen::bfloat16. For these,
 // you will need to apply to the underlying POD type.
 #if EIGEN_ARCH_PPC && EIGEN_COMP_GNUC_STRICT
-   // This seems to be broken on clang. Packet4f is loaded into a single
+// This seems to be broken on clang. Packet4f is loaded into a single
 //   register rather than a vector, zeroing out some entries. Integer
 //   types also generate a compile error.
 #if EIGEN_OS_MAC
-   // General, Altivec for Apple (VSX were added in ISA v2.06):
+// General, Altivec for Apple (VSX were added in ISA v2.06):
 #define EIGEN_OPTIMIZATION_BARRIER(X) __asm__("" : "+r,v"(X));
 #else
-   // General, Altivec, VSX otherwise:
+// General, Altivec, VSX otherwise:
 #define EIGEN_OPTIMIZATION_BARRIER(X) __asm__("" : "+r,v,wa"(X));
 #endif
 #elif EIGEN_ARCH_ARM_OR_ARM64
 #ifdef __ARM_FP
-   // General, VFP or NEON.
+// General, VFP or NEON.
 // Clang doesn't like "r",
 //    error: non-trivial scalar-to-vector conversion, possible invalid
 //           constraint for vector typ
 #define EIGEN_OPTIMIZATION_BARRIER(X) __asm__("" : "+g,w"(X));
 #else
-   // Arm without VFP or NEON.
+// Arm without VFP or NEON.
 // "w" constraint will not compile.
 #define EIGEN_OPTIMIZATION_BARRIER(X) __asm__("" : "+g"(X));
 #endif
 #elif EIGEN_ARCH_i386_OR_x86_64
-   // General, SSE.
+// General, SSE.
 #define EIGEN_OPTIMIZATION_BARRIER(X) __asm__("" : "+g,x"(X));
 #else
-   // Not implemented for other architectures.
+// Not implemented for other architectures.
 #define EIGEN_OPTIMIZATION_BARRIER(X)
 #endif
 #else
-   // Not implemented for other compilers.
+// Not implemented for other compilers.
 #define EIGEN_OPTIMIZATION_BARRIER(X)
 #endif
 #endif

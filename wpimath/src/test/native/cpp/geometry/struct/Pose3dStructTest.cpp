@@ -4,13 +4,13 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Pose3d.h"
+#include "wpi/math/geometry/Pose3d.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 namespace {
 
-using StructType = wpi::Struct<frc::Pose3d>;
+using StructType = wpi::util::Struct<wpi::math::Pose3d>;
 const Pose3d kExpectedData{
     Pose3d{Translation3d{1.1_m, 2.2_m, 1.1_m},
            Rotation3d{Quaternion{1.91, 0.3504, 3.3, 1.74}}}};

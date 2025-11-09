@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/WindowManager.h"
+#include "wpi/glass/WindowManager.hpp"
 
 #include <algorithm>
 #include <cstdio>
@@ -10,13 +10,13 @@
 #include <utility>
 
 #include <fmt/format.h>
-#include <wpi/print.h>
-#include <wpigui.h>
 
-#include "glass/Context.h"
-#include "glass/Storage.h"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/Storage.hpp"
+#include "wpi/gui/wpigui.hpp"
+#include "wpi/util/print.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 WindowManager::WindowManager(Storage& storage) : m_storage{storage} {
   storage.SetCustomApply([this] {
@@ -27,14 +27,14 @@ WindowManager::WindowManager(Storage& storage) : m_storage{storage} {
 }
 
 Window* WindowManager::AddWindow(std::string_view id,
-                                 wpi::unique_function<void()> display,
+                                 wpi::util::unique_function<void()> display,
                                  Window::Visibility defaultVisibility) {
   auto win = GetOrAddWindow(id, false, defaultVisibility);
   if (!win) {
     return nullptr;
   }
   if (win->HasView()) {
-    wpi::print(stderr, "GUI: ignoring duplicate window '{}'\n", id);
+    wpi::util::print(stderr, "GUI: ignoring duplicate window '{}'\n", id);
     return nullptr;
   }
   win->SetView(MakeFunctionView(std::move(display)));
@@ -49,7 +49,7 @@ Window* WindowManager::AddWindow(std::string_view id,
     return nullptr;
   }
   if (win->HasView()) {
-    wpi::print(stderr, "GUI: ignoring duplicate window '{}'\n", id);
+    wpi::util::print(stderr, "GUI: ignoring duplicate window '{}'\n", id);
     return nullptr;
   }
   win->SetView(std::move(view));
@@ -64,7 +64,7 @@ Window* WindowManager::GetOrAddWindow(std::string_view id, bool duplicateOk,
       [](const auto& elem, std::string_view s) { return elem->GetId() < s; });
   if (it != m_windows.end() && (*it)->GetId() == id) {
     if (!duplicateOk) {
-      wpi::print(stderr, "GUI: ignoring duplicate window '{}'\n", id);
+      wpi::util::print(stderr, "GUI: ignoring duplicate window '{}'\n", id);
       return nullptr;
     }
     return it->get();

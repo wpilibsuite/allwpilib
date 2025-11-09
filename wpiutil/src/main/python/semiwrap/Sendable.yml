@@ -1,0 +1,12 @@
+extra_includes:
+- wpi/util/sendable/SendableBuilder.hpp
+
+classes:
+  wpi::util::Sendable:
+    methods:
+      InitSendable:
+        virtual_xform: |-
+          [&](py::function fn) {
+            auto builderHandle = py::cast(builder, py::return_value_policy::reference);
+            fn(builderHandle);
+          }

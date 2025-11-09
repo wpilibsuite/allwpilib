@@ -1,0 +1,49 @@
+ext {
+    useJava = true
+    useCpp = false
+    baseId = 'commands3'
+    groupId = 'org.wpilib'
+
+    nativeName = 'commands3'
+    devMain = 'org.wpilib.commands3.DevMain'
+}
+
+apply from: "${rootDir}/shared/java/javacommon.gradle"
+
+evaluationDependsOn(':wpiutil')
+evaluationDependsOn(':ntcore')
+evaluationDependsOn(':hal')
+evaluationDependsOn(':wpimath')
+evaluationDependsOn(':wpilibj')
+
+dependencies {
+    annotationProcessor project(':javacPlugin')
+    implementation project(':wpiannotations')
+    implementation project(':wpiutil')
+    implementation project(':wpinet')
+    implementation project(':ntcore')
+    implementation project(':hal')
+    implementation project(':wpimath')
+    implementation project(':wpilibj')
+    api("us.hebi.quickbuf:quickbuf-runtime:1.4")
+    testAnnotationProcessor project(':javacPlugin')
+    testImplementation 'org.mockito:mockito-core:4.1.0'
+}
+
+sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
+sourceSets.main.resources.srcDir "${projectDir}/src/main/proto"
+
+test {
+    testLogging {
+        outputs.upToDateWhen {false}
+        showStandardStreams = true
+    }
+
+    // For reflective access to the continuation classes
+    jvmArgs += [
+        '--add-opens',
+        'java.base/jdk.internal.vm=ALL-UNNAMED',
+        '--add-opens',
+        'java.base/java.lang=ALL-UNNAMED',
+    ]
+}

@@ -1,0 +1,65 @@
+classes:
+  wpi::IterativeRobotBase:
+    methods:
+      DriverStationConnected:
+      DisabledInit:
+      AutonomousInit:
+      TeleopInit:
+      TestInit:
+      RobotPeriodic:
+      DisabledPeriodic:
+      AutonomousPeriodic:
+      TeleopPeriodic:
+      TestPeriodic:
+      IterativeRobotBase:
+        overloads:
+          double:
+            ignore: true
+          wpi::units::second_t:
+      LoopFunc:
+      SimulationInit:
+        internal: true
+      SimulationPeriodic:
+        internal: true
+      DisabledExit:
+      AutonomousExit:
+      TeleopExit:
+      TestExit:
+      SetNetworkTablesFlushEnabled:
+      GetPeriod:
+      PrintWatchdogEpochs:
+    doc: |
+      IterativeRobotBase implements a specific type of robot program framework,
+      extending the RobotBase class.
+
+      The IterativeRobotBase class does not implement StartCompetition(), so it
+      should not be used by teams directly.
+
+      This class provides the following functions which are called by the main
+      loop, StartCompetition(), at the appropriate times:
+
+      RobotInit() -- provide for initialization at robot power-on
+
+      Init() functions -- each of the following functions is called once when the
+      appropriate mode is entered:
+
+      - DisabledInit() -- called each and every time disabled is entered from another mode
+      - AutonomousInit() -- called each and every time autonomous is entered from another mode
+      - TeleopInit() -- called each and every time teleop is entered from another mode
+      - TestInit() -- called each and every time test is entered from another mode
+
+      Periodic() functions -- each of these functions is called on an interval:
+
+      - RobotPeriodic()
+      - DisabledPeriodic()
+      - AutonomousPeriodic()
+      - TeleopPeriodic()
+      - TestPeriodic()
+
+      Exit() functions -- each of the following functions is called once when the
+      appropriate mode is exited:
+
+      - DisabledExit() -- called each and every time disabled is exited
+      - AutonomousExit() -- called each and every time autonomous is exited
+      - TeleopExit() -- called each and every time teleop is exited
+      - TestExit() -- called each and every time test is exited

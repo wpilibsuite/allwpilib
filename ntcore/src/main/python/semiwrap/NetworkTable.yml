@@ -1,0 +1,178 @@
+extra_includes:
+- wpi/nt/BooleanArrayTopic.hpp
+- wpi/nt/BooleanTopic.hpp
+- wpi/nt/DoubleArrayTopic.hpp
+- wpi/nt/DoubleTopic.hpp
+- wpi/nt/FloatArrayTopic.hpp
+- wpi/nt/FloatTopic.hpp
+- wpi/nt/IntegerArrayTopic.hpp
+- wpi/nt/IntegerTopic.hpp
+- wpi/nt/NetworkTableInstance.hpp
+- wpi/nt/RawTopic.hpp
+- wpi/nt/StringArrayTopic.hpp
+- wpi/nt/StringTopic.hpp
+- wpi/nt/StructArrayTopic.hpp
+- wpi/nt/StructTopic.hpp
+- wpi/nt/Topic.hpp
+- src/py2value.h
+- src/pyentry.h
+- wpystruct.h
+
+classes:
+  wpi::nt::NetworkTable:
+    attributes:
+      PATH_SEPARATOR_CHAR:
+    methods:
+      BasenameKey:
+      NormalizeKey:
+        overloads:
+          std::string_view, bool:
+          std::string_view, wpi::util::SmallVectorImpl<char>&, bool:
+            ignore: true
+      GetHierarchy:
+      NetworkTable:
+        ignore: true
+      GetInstance:
+      GetEntry:
+      GetTopic:
+      GetBooleanTopic:
+      GetIntegerTopic:
+      GetFloatTopic:
+      GetDoubleTopic:
+      GetStringTopic:
+      GetRawTopic:
+      GetBooleanArrayTopic:
+      GetIntegerArrayTopic:
+      GetFloatArrayTopic:
+      GetDoubleArrayTopic:
+      GetStringArrayTopic:
+      GetProtobufTopic:
+        ignore: true
+      GetStructTopic:
+        param_override:
+          info:
+            name: type
+        cpp_code: |
+          [](const NetworkTable &self, std::string_view name, const py::type &t) {
+            WPyStructInfo info(t);
+            return self.GetStructTopic<WPyStruct, WPyStructInfo>(name, info);
+          }
+      GetStructArrayTopic:
+        param_override:
+          info:
+            name: type
+        cpp_code: |
+          [](const NetworkTable &self, std::string_view name, const py::type &t) {
+            WPyStructInfo info(t);
+            return self.GetStructArrayTopic<WPyStruct, WPyStructInfo>(name, info);
+          }
+      GetSubTable:
+      ContainsKey:
+      ContainsSubTable:
+      GetTopicInfo:
+      GetTopics:
+      GetKeys:
+      GetSubTables:
+      SetPersistent:
+      ClearPersistent:
+      IsPersistent:
+      PutNumber:
+      SetDefaultNumber:
+      GetNumber:
+        cpp_code: |
+          [](NetworkTable * table, std::string_view key, py::object defaultValue) -> py::object {
+            wpi::nt::NetworkTableEntry entry;
+            {
+              py::gil_scoped_release release;
+              entry = table->GetEntry(key);
+            }
+            return pyntcore::GetDoubleEntry(entry, defaultValue);
+          }
+      PutString:
+      SetDefaultString:
+      GetString:
+        cpp_code: |
+          [](NetworkTable * table, std::string_view key, py::object defaultValue) -> py::object {
+            wpi::nt::NetworkTableEntry entry;
+            {
+              py::gil_scoped_release release;
+              entry = table->GetEntry(key);
+            }
+            return pyntcore::GetStringEntry(entry, defaultValue);
+          }
+      PutBoolean:
+      SetDefaultBoolean:
+      GetBoolean:
+        cpp_code: |
+          [](NetworkTable * table, std::string_view key, py::object defaultValue) -> py::object {
+            wpi::nt::NetworkTableEntry entry;
+            {
+              py::gil_scoped_release release;
+              entry = table->GetEntry(key);
+            }
+            return pyntcore::GetBooleanEntry(entry, defaultValue);
+          }
+      PutBooleanArray:
+      SetDefaultBooleanArray:
+      GetBooleanArray:
+        cpp_code: |
+          [](NetworkTable * table, std::string_view key, py::object defaultValue) -> py::object {
+            wpi::nt::NetworkTableEntry entry;
+            {
+              py::gil_scoped_release release;
+              entry = table->GetEntry(key);
+            }
+            return pyntcore::GetBooleanArrayEntry(entry, defaultValue);
+          }
+      PutNumberArray:
+      SetDefaultNumberArray:
+      GetNumberArray:
+        cpp_code: |
+          [](NetworkTable * table, std::string_view key, py::object defaultValue) -> py::object {
+            wpi::nt::NetworkTableEntry entry;
+            {
+              py::gil_scoped_release release;
+              entry = table->GetEntry(key);
+            }
+            return pyntcore::GetDoubleArrayEntry(entry, defaultValue);
+          }
+      PutStringArray:
+      SetDefaultStringArray:
+      GetStringArray:
+        cpp_code: |
+          [](NetworkTable * table, std::string_view key, py::object defaultValue) -> py::object {
+            wpi::nt::NetworkTableEntry entry;
+            {
+              py::gil_scoped_release release;
+              entry = table->GetEntry(key);
+            }
+            return pyntcore::GetStringArrayEntry(entry, defaultValue);
+          }
+      PutRaw:
+      SetDefaultRaw:
+      GetRaw:
+        cpp_code: |
+          [](NetworkTable * table, std::string_view key, py::object defaultValue) -> py::object {
+            wpi::nt::NetworkTableEntry entry;
+            {
+              py::gil_scoped_release release;
+              entry = table->GetEntry(key);
+            }
+            return pyntcore::GetRawEntry(entry, defaultValue);
+          }
+      PutValue:
+        ignore: true
+      SetDefaultValue:
+        ignore: true
+      GetValue:
+        ignore: true
+      GetPath:
+      AddListener:
+        overloads:
+          int, TableEventListener:
+          std::string_view, int, TableEventListener:
+      AddSubTableListener:
+      RemoveListener:
+
+inline_code: |
+  #include <src/NetworkTable.cpp.inl>

@@ -1,9 +1,15 @@
 cppHeaderFileInclude {
   \.h$
+  \.hpp$
 }
 
 cppSrcFileInclude {
   \.cpp$
+}
+
+generatedFileExclude {
+  src/main/python/
+  src/test/python/
 }
 
 licenseUpdateExclude {
@@ -21,5 +27,5 @@ repoRootNameOverride {
 includeOtherLibs {
   ^fmt/
   ^gtest/
-  ^wpi/(?!datalog)
+  ^upb/
 }

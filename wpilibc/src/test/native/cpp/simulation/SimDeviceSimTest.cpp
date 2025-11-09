@@ -5,18 +5,18 @@
 #include <string_view>
 
 #include <gtest/gtest.h>
-#include <hal/SimDevice.h>
 
-#include "frc/simulation/SimDeviceSim.h"
+#include "wpi/hal/SimDevice.h"
+#include "wpi/simulation/SimDeviceSim.hpp"
 
-using namespace frc::sim;
+using namespace wpi::sim;
 
 TEST(SimDeviceSimTest, Basic) {
-  hal::SimDevice dev{"test"};
-  hal::SimBoolean devBool = dev.CreateBoolean("bool", false, false);
+  wpi::hal::SimDevice dev{"test"};
+  wpi::hal::SimBoolean devBool = dev.CreateBoolean("bool", false, false);
 
   SimDeviceSim sim{"test"};
-  hal::SimBoolean simBool = sim.GetBoolean("bool");
+  wpi::hal::SimBoolean simBool = sim.GetBoolean("bool");
   EXPECT_FALSE(simBool.Get());
   simBool.Set(true);
   EXPECT_TRUE(devBool.Get());
@@ -25,7 +25,7 @@ TEST(SimDeviceSimTest, Basic) {
 }
 
 TEST(SimDeviceSimTest, EnumerateDevices) {
-  hal::SimDevice dev{"test"};
+  wpi::hal::SimDevice dev{"test"};
 
   bool foundit = false;
   SimDeviceSim::EnumerateDevices(

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "DataLogJNI.h"
+#include "DataLogJNI.hpp"
 
 #include <jni.h>
 
@@ -11,15 +11,15 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/jni_util.h>
 
-#include "edu_wpi_first_datalog_DataLogJNI.h"
-#include "wpi/datalog/DataLog.h"
-#include "wpi/datalog/DataLogBackgroundWriter.h"
-#include "wpi/datalog/DataLogWriter.h"
-#include "wpi/datalog/FileLogger.h"
+#include "org_wpilib_datalog_DataLogJNI.h"
+#include "wpi/datalog/DataLog.hpp"
+#include "wpi/datalog/DataLogBackgroundWriter.hpp"
+#include "wpi/datalog/DataLogWriter.hpp"
+#include "wpi/datalog/FileLogger.hpp"
+#include "wpi/util/jni_util.hpp"
 
-using namespace wpi::java;
+using namespace wpi::util::java;
 using namespace wpi::log;
 
 static bool mockTimeEnabled = false;
@@ -53,12 +53,12 @@ void wpi::ThrowNullPointerException(JNIEnv* env, std::string_view msg) {
 }
 
 namespace {
-class buf_ostream : public wpi::raw_uvector_ostream {
+class buf_ostream : public wpi::util::raw_uvector_ostream {
  private:
   std::vector<uint8_t> data;
 
  public:
-  buf_ostream() : raw_uvector_ostream{data} {}
+  buf_ostream() : wpi::util::raw_uvector_ostream{data} {}
 
   void clear() { data.clear(); }
 };
@@ -94,12 +94,12 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
 }
 
 /*
- * Class:     edu_wpi_first_datalog_DataLogJNI
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    bgCreate
  * Signature: (Ljava/lang/String;Ljava/lang/String;DLjava/lang/String;)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_datalog_DataLogJNI_bgCreate
+Java_org_wpilib_datalog_DataLogJNI_bgCreate
   (JNIEnv* env, jclass, jstring dir, jstring filename, jdouble period,
    jstring extraHeader)
 {
@@ -121,12 +121,12 @@ Java_edu_wpi_first_datalog_DataLogJNI_bgCreate
 }
 
 /*
- * Class:     edu_wpi_first_datalog_DataLogJNI
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    bgSetFilename
  * Signature: (JLjava/lang/String;)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_datalog_DataLogJNI_bgSetFilename
+Java_org_wpilib_datalog_DataLogJNI_bgSetFilename
   (JNIEnv* env, jclass, jlong impl, jstring filename)
 {
   if (impl == 0) {
@@ -142,12 +142,12 @@ Java_edu_wpi_first_datalog_DataLogJNI_bgSetFilename
 }
 
 /*
- * Class:     edu_wpi_first_datalog_DataLogJNI
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    fgCreate
  * Signature: (Ljava/lang/String;Ljava/lang/String;)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_datalog_DataLogJNI_fgCreate
+Java_org_wpilib_datalog_DataLogJNI_fgCreate
   (JNIEnv* env, jclass, jstring filename, jstring extraHeader)
 {
   if (!filename) {
@@ -170,28 +170,28 @@ Java_edu_wpi_first_datalog_DataLogJNI_fgCreate
 }
 
 /*
- * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Class:     org_wpilib_util_WPIUtilJNI
  * Method:    now
  * Signature: ()J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_now
+Java_org_wpilib_util_WPIUtilJNI_now
   (JNIEnv*, jclass)
 {
   if (mockTimeEnabled) {
     return mockNow;
   } else {
-    return wpi::Now();
+    return wpi::util::Now();
   }
 }
 
 /*
- * Class:     edu_wpi_first_datalog_DataLogJNI
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    fgCreateMemory
  * Signature: (Ljava/lang/String;)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_datalog_DataLogJNI_fgCreateMemory
+Java_org_wpilib_datalog_DataLogJNI_fgCreateMemory
   (JNIEnv* env, jclass, jstring extraHeader)
 {
   if (!extraHeader) {
@@ -204,12 +204,12 @@ Java_edu_wpi_first_datalog_DataLogJNI_fgCreateMemory
 }
 
 /*
- * Class:     edu_wpi_first_datalog_DataLogJNI
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    flush
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_datalog_DataLogJNI_flush
+Java_org_wpilib_datalog_DataLogJNI_flush
   (JNIEnv* env, jclass, jlong impl)
 {
   if (impl == 0) {
@@ -220,12 +220,12 @@ Java_edu_wpi_first_datalog_DataLogJNI_flush
 }
 
 /*
- * Class:     edu_wpi_first_datalog_DataLogJNI
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    copyWriteBuffer
  * Signature: (J[BI)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_datalog_DataLogJNI_copyWriteBuffer
+Java_org_wpilib_datalog_DataLogJNI_copyWriteBuffer
   (JNIEnv* env, jclass, jlong impl, jbyteArray buf, jint start)
 {
   if (impl == 0) {
@@ -247,12 +247,12 @@ Java_edu_wpi_first_datalog_DataLogJNI_copyWriteBuffer
 }
 
 /*
- * Class:     edu_wpi_first_datalog_DataLogJNI
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    pause
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_datalog_DataLogJNI_pause
+Java_org_wpilib_datalog_DataLogJNI_pause
   (JNIEnv* env, jclass, jlong impl)
 {
   if (impl == 0) {
@@ -263,12 +263,12 @@ Java_edu_wpi_first_datalog_DataLogJNI_pause
 }
 
 /*
- * Class:     edu_wpi_first_datalog_DataLogJNI
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    resume
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_datalog_DataLogJNI_resume
+Java_org_wpilib_datalog_DataLogJNI_resume
   (JNIEnv* env, jclass, jlong impl)
 {
   if (impl == 0) {
@@ -279,12 +279,12 @@ Java_edu_wpi_first_datalog_DataLogJNI_resume
 }
 
 /*
- * Class:     edu_wpi_first_datalog_DataLogJNI
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    stop
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_datalog_DataLogJNI_stop
+Java_org_wpilib_datalog_DataLogJNI_stop
   (JNIEnv* env, jclass, jlong impl)
 {
   if (impl == 0) {
@@ -295,12 +295,12 @@ Java_edu_wpi_first_datalog_DataLogJNI_stop
 }
 
 /*
- * Class:     edu_wpi_first_datalog_DataLogJNI
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    addSchema
  * Signature: (JLjava/lang/String;Ljava/lang/String;[BJ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_datalog_DataLogJNI_addSchema
+Java_org_wpilib_datalog_DataLogJNI_addSchema
   (JNIEnv* env, jclass, jlong impl, jstring name, jstring type,
    jbyteArray schema, jlong timestamp)
 {
@@ -314,12 +314,12 @@ Java_edu_wpi_first_datalog_DataLogJNI_addSchema
 }
 
 /*
- * Class:     edu_wpi_first_datalog_DataLogJNI
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    addSchemaString
  * Signature: (JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_datalog_DataLogJNI_addSchemaString
+Java_org_wpilib_datalog_DataLogJNI_addSchemaString
   (JNIEnv* env, jclass, jlong impl, jstring name, jstring type, jstring schema,
    jlong timestamp)
 {
@@ -336,12 +336,12 @@ Java_edu_wpi_first_datalog_DataLogJNI_addSchemaString
 }
 
 /*
- * Class:     edu_wpi_first_datalog_DataLogJNI
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    start
  * Signature: (JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;J)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_datalog_DataLogJNI_start
+Java_org_wpilib_datalog_DataLogJNI_start
   (JNIEnv* env, jclass, jlong impl, jstring name, jstring type,
    jstring metadata, jlong timestamp)
 {
@@ -355,12 +355,12 @@ Java_edu_wpi_first_datalog_DataLogJNI_start
 }
 
 /*
- * Class:     edu_wpi_first_datalog_DataLogJNI
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    finish
  * Signature: (JIJ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_datalog_DataLogJNI_finish
+Java_org_wpilib_datalog_DataLogJNI_finish
   (JNIEnv* env, jclass, jlong impl, jint entry, jlong timestamp)
 {
   if (impl == 0) {
@@ -371,12 +371,12 @@ Java_edu_wpi_first_datalog_DataLogJNI_finish
 }
 
 /*
- * Class:     edu_wpi_first_datalog_DataLogJNI
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    setMetadata
  * Signature: (JILjava/lang/String;J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_datalog_DataLogJNI_setMetadata
+Java_org_wpilib_datalog_DataLogJNI_setMetadata
   (JNIEnv* env, jclass, jlong impl, jint entry, jstring metadata,
    jlong timestamp)
 {
@@ -389,24 +389,24 @@ Java_edu_wpi_first_datalog_DataLogJNI_setMetadata
 }
 
 /*
- * Class:     edu_wpi_first_datalog_DataLogJNI
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    close
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_datalog_DataLogJNI_close
+Java_org_wpilib_datalog_DataLogJNI_close
   (JNIEnv*, jclass, jlong impl)
 {
   delete reinterpret_cast<DataLog*>(impl);
 }
 
 /*
- * Class:     edu_wpi_first_datalog_DataLogJNI
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    appendRaw
  * Signature: (JI[BIIJ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_datalog_DataLogJNI_appendRaw
+Java_org_wpilib_datalog_DataLogJNI_appendRaw
   (JNIEnv* env, jclass, jlong impl, jint entry, jbyteArray value, jint start,
    jint length, jlong timestamp)
 {
@@ -437,12 +437,12 @@ Java_edu_wpi_first_datalog_DataLogJNI_appendRaw
 }
 
 /*
- * Class:     edu_wpi_first_datalog_DataLogJNI
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    appendRawBuffer
  * Signature: (JILjava/lang/Object;IIJ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_datalog_DataLogJNI_appendRawBuffer
+Java_org_wpilib_datalog_DataLogJNI_appendRawBuffer
   (JNIEnv* env, jclass, jlong impl, jint entry, jobject value, jint start,
    jint length, jlong timestamp)
 {
@@ -473,12 +473,12 @@ Java_edu_wpi_first_datalog_DataLogJNI_appendRawBuffer
 }
 
 /*
- * Class:     edu_wpi_first_datalog_DataLogJNI
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    appendBoolean
  * Signature: (JIZJ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_datalog_DataLogJNI_appendBoolean
+Java_org_wpilib_datalog_DataLogJNI_appendBoolean
   (JNIEnv* env, jclass, jlong impl, jint entry, jboolean value, jlong timestamp)
 {
   if (impl == 0) {
@@ -489,12 +489,12 @@ Java_edu_wpi_first_datalog_DataLogJNI_appendBoolean
 }
 
 /*
- * Class:     edu_wpi_first_datalog_DataLogJNI
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    appendInteger
  * Signature: (JIJJ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_datalog_DataLogJNI_appendInteger
+Java_org_wpilib_datalog_DataLogJNI_appendInteger
   (JNIEnv* env, jclass, jlong impl, jint entry, jlong value, jlong timestamp)
 {
   if (impl == 0) {
@@ -505,12 +505,12 @@ Java_edu_wpi_first_datalog_DataLogJNI_appendInteger
 }
 
 /*
- * Class:     edu_wpi_first_datalog_DataLogJNI
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    appendFloat
  * Signature: (JIFJ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_datalog_DataLogJNI_appendFloat
+Java_org_wpilib_datalog_DataLogJNI_appendFloat
   (JNIEnv* env, jclass, jlong impl, jint entry, jfloat value, jlong timestamp)
 {
   if (impl == 0) {
@@ -521,12 +521,12 @@ Java_edu_wpi_first_datalog_DataLogJNI_appendFloat
 }
 
 /*
- * Class:     edu_wpi_first_datalog_DataLogJNI
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    appendDouble
  * Signature: (JIDJ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_datalog_DataLogJNI_appendDouble
+Java_org_wpilib_datalog_DataLogJNI_appendDouble
   (JNIEnv* env, jclass, jlong impl, jint entry, jdouble value, jlong timestamp)
 {
   if (impl == 0) {
@@ -537,12 +537,12 @@ Java_edu_wpi_first_datalog_DataLogJNI_appendDouble
 }
 
 /*
- * Class:     edu_wpi_first_datalog_DataLogJNI
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    appendString
  * Signature: (JILjava/lang/String;J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_datalog_DataLogJNI_appendString
+Java_org_wpilib_datalog_DataLogJNI_appendString
   (JNIEnv* env, jclass, jlong impl, jint entry, jstring value, jlong timestamp)
 {
   if (impl == 0) {
@@ -554,12 +554,12 @@ Java_edu_wpi_first_datalog_DataLogJNI_appendString
 }
 
 /*
- * Class:     edu_wpi_first_datalog_DataLogJNI
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    appendBooleanArray
  * Signature: (JI[ZJ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_datalog_DataLogJNI_appendBooleanArray
+Java_org_wpilib_datalog_DataLogJNI_appendBooleanArray
   (JNIEnv* env, jclass, jlong impl, jint entry, jbooleanArray value,
    jlong timestamp)
 {
@@ -576,12 +576,12 @@ Java_edu_wpi_first_datalog_DataLogJNI_appendBooleanArray
 }
 
 /*
- * Class:     edu_wpi_first_datalog_DataLogJNI
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    appendIntegerArray
  * Signature: (JI[JJ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_datalog_DataLogJNI_appendIntegerArray
+Java_org_wpilib_datalog_DataLogJNI_appendIntegerArray
   (JNIEnv* env, jclass, jlong impl, jint entry, jlongArray value,
    jlong timestamp)
 {
@@ -599,7 +599,7 @@ Java_edu_wpi_first_datalog_DataLogJNI_appendIntegerArray
         entry, {reinterpret_cast<const int64_t*>(jarr.data()), jarr.size()},
         timestamp);
   } else {
-    wpi::SmallVector<int64_t, 16> arr;
+    wpi::util::SmallVector<int64_t, 16> arr;
     arr.reserve(jarr.size());
     for (auto v : jarr) {
       arr.push_back(v);
@@ -609,12 +609,12 @@ Java_edu_wpi_first_datalog_DataLogJNI_appendIntegerArray
 }
 
 /*
- * Class:     edu_wpi_first_datalog_DataLogJNI
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    appendFloatArray
  * Signature: (JI[FJ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_datalog_DataLogJNI_appendFloatArray
+Java_org_wpilib_datalog_DataLogJNI_appendFloatArray
   (JNIEnv* env, jclass, jlong impl, jint entry, jfloatArray value,
    jlong timestamp)
 {
@@ -631,12 +631,12 @@ Java_edu_wpi_first_datalog_DataLogJNI_appendFloatArray
 }
 
 /*
- * Class:     edu_wpi_first_datalog_DataLogJNI
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    appendDoubleArray
  * Signature: (JI[DJ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_datalog_DataLogJNI_appendDoubleArray
+Java_org_wpilib_datalog_DataLogJNI_appendDoubleArray
   (JNIEnv* env, jclass, jlong impl, jint entry, jdoubleArray value,
    jlong timestamp)
 {
@@ -653,12 +653,12 @@ Java_edu_wpi_first_datalog_DataLogJNI_appendDoubleArray
 }
 
 /*
- * Class:     edu_wpi_first_datalog_DataLogJNI
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    appendStringArray
  * Signature: (JI[Ljava/lang/Object;J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_datalog_DataLogJNI_appendStringArray
+Java_org_wpilib_datalog_DataLogJNI_appendStringArray
   (JNIEnv* env, jclass, jlong impl, jint entry, jobjectArray value,
    jlong timestamp)
 {
@@ -686,12 +686,12 @@ Java_edu_wpi_first_datalog_DataLogJNI_appendStringArray
   reinterpret_cast<DataLog*>(impl)->AppendStringArray(entry, arr, timestamp);
 }
 /*
- * Class:     edu_wpi_first_datalog_DataLogJNI
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    createFileLogger
  * Signature: (Ljava/lang/String;JLjava/lang/String;)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_datalog_DataLogJNI_createFileLogger
+Java_org_wpilib_datalog_DataLogJNI_createFileLogger
   (JNIEnv* env, jclass, jstring file, jlong log, jstring key)
 {
   if (!file) {
@@ -712,12 +712,12 @@ Java_edu_wpi_first_datalog_DataLogJNI_createFileLogger
 }
 
 /*
- * Class:     edu_wpi_first_datalog_DataLogJNI
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    freeFileLogger
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_datalog_DataLogJNI_freeFileLogger
+Java_org_wpilib_datalog_DataLogJNI_freeFileLogger
   (JNIEnv* env, jclass, jlong fileTail)
 {
   delete reinterpret_cast<wpi::log::FileLogger*>(fileTail);

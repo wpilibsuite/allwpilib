@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Wed, 20 Sep 2023 02:23:10 -0400
-Subject: [PATCH 4/4] Add llvm stream support
+Subject: [PATCH 4/5] Add llvm stream support
 
 ---
  .../detail/output/output_adapters.hpp         | 26 +++++++++++++++++++
@@ -10,14 +10,14 @@ Subject: [PATCH 4/4] Add llvm stream support
  3 files changed, 59 insertions(+), 2 deletions(-)
 
 diff --git a/include/nlohmann/detail/output/output_adapters.hpp b/include/nlohmann/detail/output/output_adapters.hpp
-index 626f7c0c85e35ec51a90baa3bdd12cd8df7ba957..f5f15b241f52cd96a36b885ed10ed7815a0d65ec 100644
+index 626f7c0c85e35ec51a90baa3bdd12cd8df7ba957..2e2e92f9718ec13aaa585955707419f27b2088c6 100644
 --- a/include/nlohmann/detail/output/output_adapters.hpp
 +++ b/include/nlohmann/detail/output/output_adapters.hpp
 @@ -22,6 +22,8 @@
  
  #include <nlohmann/detail/macro_scope.hpp>
  
-+#include <wpi/raw_ostream.h>
++#include <wpi/util/raw_ostream.hpp>
 +
  NLOHMANN_JSON_NAMESPACE_BEGIN
  namespace detail

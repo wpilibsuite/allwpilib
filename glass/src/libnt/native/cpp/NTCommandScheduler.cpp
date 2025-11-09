@@ -2,20 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/networktables/NTCommandScheduler.h"
+#include "wpi/glass/networktables/NTCommandScheduler.hpp"
 
 #include <utility>
 
 #include <fmt/format.h>
-#include <wpi/StringExtras.h>
 
-using namespace glass;
+#include "wpi/util/StringExtras.hpp"
+
+using namespace wpi::glass;
 
 NTCommandSchedulerModel::NTCommandSchedulerModel(std::string_view path)
-    : NTCommandSchedulerModel(nt::NetworkTableInstance::GetDefault(), path) {}
+    : NTCommandSchedulerModel(wpi::nt::NetworkTableInstance::GetDefault(),
+                              path) {}
 
-NTCommandSchedulerModel::NTCommandSchedulerModel(nt::NetworkTableInstance inst,
-                                                 std::string_view path)
+NTCommandSchedulerModel::NTCommandSchedulerModel(
+    wpi::nt::NetworkTableInstance inst, std::string_view path)
     : m_inst{inst},
       m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
       m_commands{inst.GetStringArrayTopic(fmt::format("{}/Names", path))
@@ -24,7 +26,7 @@ NTCommandSchedulerModel::NTCommandSchedulerModel(nt::NetworkTableInstance inst,
           inst.GetIntegerArrayTopic(fmt::format("{}/Ids", path)).Subscribe({})},
       m_cancel{
           inst.GetIntegerArrayTopic(fmt::format("{}/Cancel", path)).Publish()},
-      m_nameValue{wpi::rsplit(path, '/').second} {}
+      m_nameValue{wpi::util::rsplit(path, '/').second} {}
 
 void NTCommandSchedulerModel::CancelCommand(size_t index) {
   if (index < m_idsValue.size()) {

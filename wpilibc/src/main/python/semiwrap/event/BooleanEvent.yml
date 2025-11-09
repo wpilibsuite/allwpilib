@@ -1,0 +1,21 @@
+classes:
+  wpi::BooleanEvent:
+    methods:
+      BooleanEvent:
+      GetAsBoolean:
+      IfHigh:
+        cpp_code: |
+          [](BooleanEvent *self, std::function<void()> action) {
+            self->IfHigh(std::move(action));
+          }
+      CastTo:
+        cpp_code: | # TODO: how to annotate this correctly?
+          [](BooleanEvent *self, py::function constructor) -> py::object {
+            return constructor(self, (std::function<bool()>)*self);
+          }
+        param_override:
+          ctor:
+            no_default: true
+      Rising:
+      Falling:
+      Debounce:

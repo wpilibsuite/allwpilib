@@ -5,13 +5,12 @@
 #include <cstdio>
 #include <memory>
 
-#include <wpi/Logger.h>
-#include <wpi/print.h>
+#include "wpi/net/DsClient.hpp"
+#include "wpi/net/EventLoopRunner.hpp"
+#include "wpi/util/Logger.hpp"
+#include "wpi/util/print.hpp"
 
-#include "wpinet/DsClient.h"
-#include "wpinet/EventLoopRunner.h"
-
-namespace uv = wpi::uv;
+namespace uv = wpi::net::uv;
 
 static void logfunc(unsigned int level, const char* file, unsigned int line,
                     const char* msg) {
@@ -19,15 +18,15 @@ static void logfunc(unsigned int level, const char* file, unsigned int line,
 }
 
 int main() {
-  wpi::Logger logger{logfunc, 0};
+  wpi::util::Logger logger{logfunc, 0};
 
   // Kick off the event loop on a separate thread
-  wpi::EventLoopRunner loop;
-  std::shared_ptr<wpi::DsClient> client;
+  wpi::net::EventLoopRunner loop;
+  std::shared_ptr<wpi::net::DsClient> client;
   loop.ExecAsync([&](uv::Loop& loop) {
-    client = wpi::DsClient::Create(loop, logger);
+    client = wpi::net::DsClient::Create(loop, logger);
     client->setIp.connect(
-        [](std::string_view ip) { wpi::print("got IP: {}\n", ip); });
+        [](std::string_view ip) { wpi::util::print("got IP: {}\n", ip); });
     client->clearIp.connect([] { std::fputs("cleared IP\n", stdout); });
   });
 

@@ -1,0 +1,28 @@
+cppHeaderFileInclude {
+  \.h$
+  \.hpp$
+  \.inc$
+  \.inl$
+}
+
+cppSrcFileInclude {
+  \.cpp$
+}
+
+generatedFileExclude {
+  src/main/native/resources/
+  src/main/native/win/sysid.ico
+  src/main/native/mac/sysid.icns
+}
+
+repoRootNameOverride {
+  sysid
+}
+
+includeOtherLibs {
+  ^GLFW
+  ^fmt/
+  ^gtest/
+  ^imgui
+  ^implot\.h$
+}

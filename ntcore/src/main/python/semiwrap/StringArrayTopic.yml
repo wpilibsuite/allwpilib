@@ -1,0 +1,107 @@
+classes:
+  wpi::nt::StringArraySubscriber:
+    methods:
+      StringArraySubscriber:
+        overloads:
+          '':
+            ignore: true
+          NT_Subscriber, ParamType:
+            ignore: true
+      Get:
+        overloads:
+          '[const]':
+          ParamType [const]:
+      GetAtomic:
+        overloads:
+          '[const]':
+          ParamType [const]:
+      ReadQueue:
+      GetTopic:
+    inline_code: |
+      .def("close", [](StringArraySubscriber *self) {
+        py::gil_scoped_release release;
+        *self = StringArraySubscriber();
+      }, py::doc("Destroys the subscriber"))
+      .def("__enter__", [](StringArraySubscriber *self) {
+        return self;
+      })
+      .def("__exit__", [](StringArraySubscriber *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = StringArraySubscriber();
+      })
+  wpi::nt::StringArrayPublisher:
+    methods:
+      StringArrayPublisher:
+        overloads:
+          '':
+            ignore: true
+          NT_Publisher:
+            ignore: true
+      Set:
+      SetDefault:
+      GetTopic:
+    inline_code: |
+      .def("close", [](StringArrayPublisher *self) {
+        py::gil_scoped_release release;
+        *self = StringArrayPublisher();
+      }, py::doc("Destroys the publisher"))
+      .def("__enter__", [](StringArrayPublisher *self) {
+        return self;
+      })
+      .def("__exit__", [](StringArrayPublisher *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = StringArrayPublisher();
+      })
+  wpi::nt::StringArrayEntry:
+    methods:
+      StringArrayEntry:
+        overloads:
+          '':
+            ignore: true
+          NT_Entry, ParamType:
+            ignore: true
+      GetHandle:
+        ignore: true
+      GetTopic:
+      Unpublish:
+    inline_code: |
+      .def("close", [](StringArrayEntry *self) {
+        py::gil_scoped_release release;
+        *self = StringArrayEntry();
+      }, py::doc("Destroys the entry"))
+      .def("__enter__", [](StringArrayEntry *self) {
+        return self;
+      })
+      .def("__exit__", [](StringArrayEntry *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = StringArrayEntry();
+      })
+  wpi::nt::StringArrayTopic:
+    attributes:
+      kTypeString:
+    methods:
+      StringArrayTopic:
+        overloads:
+          '':
+            ignore: true
+          NT_Topic:
+            ignore: true
+          Topic:
+      Subscribe:
+      SubscribeEx:
+      Publish:
+      PublishEx:
+      GetEntry:
+      GetEntryEx:
+    inline_code: |
+      .def("close", [](StringArrayTopic *self) {
+        py::gil_scoped_release release;
+        *self = StringArrayTopic();
+      }, py::doc("Destroys the topic"))
+      .def("__enter__", [](StringArrayTopic *self) {
+        return self;
+      })
+      .def("__exit__", [](StringArrayTopic *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = StringArrayTopic();
+      })

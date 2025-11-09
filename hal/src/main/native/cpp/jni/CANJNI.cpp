@@ -6,15 +6,14 @@
 
 #include <cassert>
 
-#include <wpi/jni_util.h>
-
 #include "HALUtil.h"
-#include "edu_wpi_first_hal_can_CANJNI.h"
-#include "hal/CAN.h"
-#include "hal/Errors.h"
+#include "org_wpilib_hardware_hal_can_CANJNI.h"
+#include "wpi/hal/CAN.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/util/jni_util.hpp"
 
-using namespace hal;
-using namespace wpi::java;
+using namespace wpi::hal;
+using namespace wpi::util::java;
 
 extern "C" {
 
@@ -49,12 +48,12 @@ static bool PackCANMessage(JNIEnv* env, jbyteArray data, jint dataLength,
 }
 
 /*
- * Class:     edu_wpi_first_hal_can_CANJNI
+ * Class:     org_wpilib_hardware_hal_can_CANJNI
  * Method:    sendMessage
  * Signature: (II[BIII)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_can_CANJNI_sendMessage
+Java_org_wpilib_hardware_hal_can_CANJNI_sendMessage
   (JNIEnv* env, jclass, jint busId, jint messageId, jbyteArray data,
    jint dataLength, jint flags, jint periodMs)
 {
@@ -69,12 +68,12 @@ Java_edu_wpi_first_hal_can_CANJNI_sendMessage
 }
 
 /*
- * Class:     edu_wpi_first_hal_can_CANJNI
+ * Class:     org_wpilib_hardware_hal_can_CANJNI
  * Method:    receiveMessage
  * Signature: (IILjava/lang/Object;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_can_CANJNI_receiveMessage
+Java_org_wpilib_hardware_hal_can_CANJNI_receiveMessage
   (JNIEnv* env, jclass, jint busId, jint messageId, jobject data)
 {
   HAL_CANReceiveMessage message;
@@ -96,12 +95,12 @@ Java_edu_wpi_first_hal_can_CANJNI_receiveMessage
 }
 
 /*
- * Class:     edu_wpi_first_hal_can_CANJNI
+ * Class:     org_wpilib_hardware_hal_can_CANJNI
  * Method:    getCANStatus
  * Signature: (ILjava/lang/Object;)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_can_CANJNI_getCANStatus
+Java_org_wpilib_hardware_hal_can_CANJNI_getCANStatus
   (JNIEnv* env, jclass, jint busId, jobject canStatus)
 {
   float percentBusUtilization = 0;
@@ -123,12 +122,12 @@ Java_edu_wpi_first_hal_can_CANJNI_getCANStatus
 }
 
 /*
- * Class:     edu_wpi_first_hal_can_CANJNI
+ * Class:     org_wpilib_hardware_hal_can_CANJNI
  * Method:    openCANStreamSession
  * Signature: (IIII)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_can_CANJNI_openCANStreamSession
+Java_org_wpilib_hardware_hal_can_CANJNI_openCANStreamSession
   (JNIEnv* env, jclass, jint busId, jint messageId, jint messageIDMask,
    jint maxMessages)
 {
@@ -146,24 +145,24 @@ Java_edu_wpi_first_hal_can_CANJNI_openCANStreamSession
 }
 
 /*
- * Class:     edu_wpi_first_hal_can_CANJNI
+ * Class:     org_wpilib_hardware_hal_can_CANJNI
  * Method:    closeCANStreamSession
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_can_CANJNI_closeCANStreamSession
+Java_org_wpilib_hardware_hal_can_CANJNI_closeCANStreamSession
   (JNIEnv* env, jclass, jint sessionHandle)
 {
   HAL_CAN_CloseStreamSession(static_cast<uint32_t>(sessionHandle));
 }
 
 /*
- * Class:     edu_wpi_first_hal_can_CANJNI
+ * Class:     org_wpilib_hardware_hal_can_CANJNI
  * Method:    readCANStreamSession
  * Signature: (I[Ljava/lang/Object;I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_can_CANJNI_readCANStreamSession
+Java_org_wpilib_hardware_hal_can_CANJNI_readCANStreamSession
   (JNIEnv* env, jclass, jint sessionHandle, jobjectArray messages,
    jint messagesToRead)
 {
@@ -181,7 +180,7 @@ Java_edu_wpi_first_hal_can_CANJNI_readCANStreamSession
   uint32_t handle = static_cast<uint32_t>(sessionHandle);
   uint32_t messagesRead = 0;
 
-  wpi::SmallVector<HAL_CANStreamMessage, 16> messageBuffer;
+  wpi::util::SmallVector<HAL_CANStreamMessage, 16> messageBuffer;
   messageBuffer.resize_for_overwrite(messagesToRead);
 
   int32_t status = 0;

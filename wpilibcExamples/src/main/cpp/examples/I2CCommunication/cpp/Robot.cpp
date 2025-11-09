@@ -2,13 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "Robot.h"
+#include "Robot.hpp"
 
 #include <string>
 
 #include <fmt/format.h>
-#include <frc/DriverStation.h>
-#include <frc/Timer.h>
+
+#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/system/Timer.hpp"
 
 void Robot::RobotPeriodic() {
   // Creates a string to hold current robot state information, including
@@ -22,9 +23,9 @@ void Robot::RobotPeriodic() {
   // alliance, enabled in teleop mode, with 43 seconds left in the match.
 
   std::string allianceString = "U";
-  auto alliance = frc::DriverStation::GetAlliance();
+  auto alliance = wpi::DriverStation::GetAlliance();
   if (alliance.has_value()) {
-    if (alliance == frc::DriverStation::Alliance::kRed) {
+    if (alliance == wpi::DriverStation::Alliance::kRed) {
       allianceString = "R";
     } else {
       allianceString = "B";
@@ -33,15 +34,15 @@ void Robot::RobotPeriodic() {
 
   auto string =
       fmt::format("{}{}{}{:03}", allianceString,
-                  frc::DriverStation::IsEnabled() ? "E" : "D",
-                  frc::DriverStation::IsAutonomous() ? "A" : "T",
-                  static_cast<int>(frc::Timer::GetMatchTime().value()));
+                  wpi::DriverStation::IsEnabled() ? "E" : "D",
+                  wpi::DriverStation::IsAutonomous() ? "A" : "T",
+                  static_cast<int>(wpi::Timer::GetMatchTime().value()));
 
   arduino.WriteBulk(reinterpret_cast<uint8_t*>(string.data()), string.size());
 }
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

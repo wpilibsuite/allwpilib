@@ -1,0 +1,115 @@
+classes:
+  wpi::nt::IntegerArraySubscriber:
+    methods:
+      IntegerArraySubscriber:
+        overloads:
+          '':
+            ignore: true
+          NT_Subscriber, ParamType:
+            ignore: true
+      Get:
+        overloads:
+          '[const]':
+          ParamType [const]:
+          wpi::util::SmallVectorImpl<SmallElemType>& [const]:
+            ignore: true
+          wpi::util::SmallVectorImpl<SmallElemType>&, ParamType [const]:
+            ignore: true
+      GetAtomic:
+        overloads:
+          '[const]':
+          ParamType [const]:
+          wpi::util::SmallVectorImpl<SmallElemType>& [const]:
+            ignore: true
+          wpi::util::SmallVectorImpl<SmallElemType>&, ParamType [const]:
+            ignore: true
+      ReadQueue:
+      GetTopic:
+    inline_code: |
+      .def("close", [](IntegerArraySubscriber *self) {
+        py::gil_scoped_release release;
+        *self = IntegerArraySubscriber();
+      }, py::doc("Destroys the subscriber"))
+      .def("__enter__", [](IntegerArraySubscriber *self) {
+        return self;
+      })
+      .def("__exit__", [](IntegerArraySubscriber *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = IntegerArraySubscriber();
+      })
+  wpi::nt::IntegerArrayPublisher:
+    methods:
+      IntegerArrayPublisher:
+        overloads:
+          '':
+            ignore: true
+          NT_Publisher:
+            ignore: true
+      Set:
+      SetDefault:
+      GetTopic:
+    inline_code: |
+      .def("close", [](IntegerArrayPublisher *self) {
+        py::gil_scoped_release release;
+        *self = IntegerArrayPublisher();
+      }, py::doc("Destroys the publisher"))
+      .def("__enter__", [](IntegerArrayPublisher *self) {
+        return self;
+      })
+      .def("__exit__", [](IntegerArrayPublisher *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = IntegerArrayPublisher();
+      })
+  wpi::nt::IntegerArrayEntry:
+    methods:
+      IntegerArrayEntry:
+        overloads:
+          '':
+            ignore: true
+          NT_Entry, ParamType:
+            ignore: true
+      GetHandle:
+        ignore: true
+      GetTopic:
+      Unpublish:
+    inline_code: |
+      .def("close", [](IntegerArrayEntry *self) {
+        py::gil_scoped_release release;
+        *self = IntegerArrayEntry();
+      }, py::doc("Destroys the entry"))
+      .def("__enter__", [](IntegerArrayEntry *self) {
+        return self;
+      })
+      .def("__exit__", [](IntegerArrayEntry *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = IntegerArrayEntry();
+      })
+  wpi::nt::IntegerArrayTopic:
+    attributes:
+      kTypeString:
+    methods:
+      IntegerArrayTopic:
+        overloads:
+          '':
+            ignore: true
+          NT_Topic:
+            ignore: true
+          Topic:
+      Subscribe:
+      SubscribeEx:
+      Publish:
+      PublishEx:
+      GetEntry:
+      GetEntryEx:
+    inline_code: |
+      .def("close", [](IntegerArrayTopic *self) {
+        py::gil_scoped_release release;
+        *self = IntegerArrayTopic();
+      }, py::doc("Destroys the topic"))
+      .def("__enter__", [](IntegerArrayTopic *self) {
+        return self;
+      })
+      .def("__exit__", [](IntegerArrayTopic *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = IntegerArrayTopic();
+      })

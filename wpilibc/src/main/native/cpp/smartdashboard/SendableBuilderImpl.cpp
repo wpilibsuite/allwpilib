@@ -2,27 +2,27 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/smartdashboard/SendableBuilderImpl.h"
+#include "wpi/smartdashboard/SendableBuilderImpl.hpp"
 
 #include <memory>
 #include <string>
 #include <utility>
 
-#include <networktables/BooleanArrayTopic.h>
-#include <networktables/BooleanTopic.h>
-#include <networktables/DoubleArrayTopic.h>
-#include <networktables/DoubleTopic.h>
-#include <networktables/FloatArrayTopic.h>
-#include <networktables/FloatTopic.h>
-#include <networktables/IntegerArrayTopic.h>
-#include <networktables/IntegerTopic.h>
-#include <networktables/RawTopic.h>
-#include <networktables/StringArrayTopic.h>
-#include <ntcore_cpp.h>
-#include <wpi/SmallVector.h>
-#include <wpi/json.h>
+#include "wpi/nt/BooleanArrayTopic.hpp"
+#include "wpi/nt/BooleanTopic.hpp"
+#include "wpi/nt/DoubleArrayTopic.hpp"
+#include "wpi/nt/DoubleTopic.hpp"
+#include "wpi/nt/FloatArrayTopic.hpp"
+#include "wpi/nt/FloatTopic.hpp"
+#include "wpi/nt/IntegerArrayTopic.hpp"
+#include "wpi/nt/IntegerTopic.hpp"
+#include "wpi/nt/RawTopic.hpp"
+#include "wpi/nt/StringArrayTopic.hpp"
+#include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/json.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 template <typename Topic>
 void SendableBuilderImpl::PropertyImpl<Topic>::Update(bool controllable,
@@ -35,13 +35,14 @@ void SendableBuilderImpl::PropertyImpl<Topic>::Update(bool controllable,
   }
 }
 
-void SendableBuilderImpl::SetTable(std::shared_ptr<nt::NetworkTable> table) {
+void SendableBuilderImpl::SetTable(
+    std::shared_ptr<wpi::nt::NetworkTable> table) {
   m_table = table;
   m_controllablePublisher = table->GetBooleanTopic(".controllable").Publish();
   m_controllablePublisher.SetDefault(false);
 }
 
-std::shared_ptr<nt::NetworkTable> SendableBuilderImpl::GetTable() {
+std::shared_ptr<wpi::nt::NetworkTable> SendableBuilderImpl::GetTable() {
   return m_table;
 }
 
@@ -54,7 +55,7 @@ bool SendableBuilderImpl::IsActuator() const {
 }
 
 void SendableBuilderImpl::Update() {
-  uint64_t time = nt::Now();
+  uint64_t time = wpi::nt::Now();
   for (auto& property : m_properties) {
     property->Update(m_controllable, time);
   }
@@ -84,7 +85,7 @@ void SendableBuilderImpl::ClearProperties() {
 void SendableBuilderImpl::SetSmartDashboardType(std::string_view type) {
   if (!m_typePublisher) {
     m_typePublisher = m_table->GetStringTopic(".type").PublishEx(
-        nt::StringTopic::kTypeString, {{"SmartDashboard", type}});
+        wpi::nt::StringTopic::kTypeString, {{"SmartDashboard", type}});
   }
   m_typePublisher.Set(type);
 }
@@ -97,11 +98,12 @@ void SendableBuilderImpl::SetActuator(bool value) {
   m_actuator = value;
 }
 
-void SendableBuilderImpl::SetUpdateTable(wpi::unique_function<void()> func) {
+void SendableBuilderImpl::SetUpdateTable(
+    wpi::util::unique_function<void()> func) {
   m_updateTables.emplace_back(std::move(func));
 }
 
-nt::Topic SendableBuilderImpl::GetTopic(std::string_view key) {
+wpi::nt::Topic SendableBuilderImpl::GetTopic(std::string_view key) {
   return m_table->GetTopic(key);
 }
 
@@ -259,7 +261,7 @@ void SendableBuilderImpl::AddRawProperty(
     std::function<std::vector<uint8_t>()> getter,
     std::function<void(std::span<const uint8_t>)> setter) {
   auto topic = m_table->GetRawTopic(key);
-  auto prop = std::make_unique<PropertyImpl<nt::RawTopic>>();
+  auto prop = std::make_unique<PropertyImpl<wpi::nt::RawTopic>>();
   if (getter) {
     prop->pub = topic.Publish(typeString);
     prop->updateNetwork = [=](auto& pub, int64_t time) {
@@ -282,7 +284,7 @@ void SendableBuilderImpl::PublishConstRaw(std::string_view key,
                                           std::string_view typeString,
                                           std::span<const uint8_t> value) {
   auto topic = m_table->GetRawTopic(key);
-  auto prop = std::make_unique<PropertyImpl<nt::RawTopic>>();
+  auto prop = std::make_unique<PropertyImpl<wpi::nt::RawTopic>>();
   prop->pub = topic.Publish(typeString);
   prop->pub.Set(value);
   m_properties.emplace_back(std::move(prop));
@@ -296,7 +298,7 @@ void SendableBuilderImpl::AddSmallPropertyImpl(Topic topic, Getter getter,
   if (getter) {
     prop->pub = topic.Publish();
     prop->updateNetwork = [=](auto& pub, int64_t time) {
-      wpi::SmallVector<T, Size> buf;
+      wpi::util::SmallVector<T, Size> buf;
       pub.Set(getter(buf), time);
     };
   }
@@ -314,7 +316,8 @@ void SendableBuilderImpl::AddSmallPropertyImpl(Topic topic, Getter getter,
 
 void SendableBuilderImpl::AddSmallStringProperty(
     std::string_view key,
-    std::function<std::string_view(wpi::SmallVectorImpl<char>& buf)> getter,
+    std::function<std::string_view(wpi::util::SmallVectorImpl<char>& buf)>
+        getter,
     std::function<void(std::string_view)> setter) {
   AddSmallPropertyImpl<char, 128>(m_table->GetStringTopic(key),
                                   std::move(getter), std::move(setter));
@@ -322,7 +325,8 @@ void SendableBuilderImpl::AddSmallStringProperty(
 
 void SendableBuilderImpl::AddSmallBooleanArrayProperty(
     std::string_view key,
-    std::function<std::span<const int>(wpi::SmallVectorImpl<int>& buf)> getter,
+    std::function<std::span<const int>(wpi::util::SmallVectorImpl<int>& buf)>
+        getter,
     std::function<void(std::span<const int>)> setter) {
   AddSmallPropertyImpl<int, 16>(m_table->GetBooleanArrayTopic(key),
                                 std::move(getter), std::move(setter));
@@ -330,7 +334,8 @@ void SendableBuilderImpl::AddSmallBooleanArrayProperty(
 
 void SendableBuilderImpl::AddSmallIntegerArrayProperty(
     std::string_view key,
-    std::function<std::span<const int64_t>(wpi::SmallVectorImpl<int64_t>& buf)>
+    std::function<
+        std::span<const int64_t>(wpi::util::SmallVectorImpl<int64_t>& buf)>
         getter,
     std::function<void(std::span<const int64_t>)> setter) {
   AddSmallPropertyImpl<int64_t, 16>(m_table->GetIntegerArrayTopic(key),
@@ -339,7 +344,8 @@ void SendableBuilderImpl::AddSmallIntegerArrayProperty(
 
 void SendableBuilderImpl::AddSmallFloatArrayProperty(
     std::string_view key,
-    std::function<std::span<const float>(wpi::SmallVectorImpl<float>& buf)>
+    std::function<
+        std::span<const float>(wpi::util::SmallVectorImpl<float>& buf)>
         getter,
     std::function<void(std::span<const float>)> setter) {
   AddSmallPropertyImpl<float, 16>(m_table->GetFloatArrayTopic(key),
@@ -348,7 +354,8 @@ void SendableBuilderImpl::AddSmallFloatArrayProperty(
 
 void SendableBuilderImpl::AddSmallDoubleArrayProperty(
     std::string_view key,
-    std::function<std::span<const double>(wpi::SmallVectorImpl<double>& buf)>
+    std::function<
+        std::span<const double>(wpi::util::SmallVectorImpl<double>& buf)>
         getter,
     std::function<void(std::span<const double>)> setter) {
   AddSmallPropertyImpl<double, 16>(m_table->GetDoubleArrayTopic(key),
@@ -357,8 +364,8 @@ void SendableBuilderImpl::AddSmallDoubleArrayProperty(
 
 void SendableBuilderImpl::AddSmallStringArrayProperty(
     std::string_view key,
-    std::function<
-        std::span<const std::string>(wpi::SmallVectorImpl<std::string>& buf)>
+    std::function<std::span<const std::string>(
+        wpi::util::SmallVectorImpl<std::string>& buf)>
         getter,
     std::function<void(std::span<const std::string>)> setter) {
   AddSmallPropertyImpl<std::string, 16>(m_table->GetStringArrayTopic(key),
@@ -367,15 +374,15 @@ void SendableBuilderImpl::AddSmallStringArrayProperty(
 
 void SendableBuilderImpl::AddSmallRawProperty(
     std::string_view key, std::string_view typeString,
-    std::function<std::span<uint8_t>(wpi::SmallVectorImpl<uint8_t>& buf)>
+    std::function<std::span<uint8_t>(wpi::util::SmallVectorImpl<uint8_t>& buf)>
         getter,
     std::function<void(std::span<const uint8_t>)> setter) {
   auto topic = m_table->GetRawTopic(key);
-  auto prop = std::make_unique<PropertyImpl<nt::RawTopic>>();
+  auto prop = std::make_unique<PropertyImpl<wpi::nt::RawTopic>>();
   if (getter) {
     prop->pub = topic.Publish(typeString);
     prop->updateNetwork = [=](auto& pub, int64_t time) {
-      wpi::SmallVector<uint8_t, 128> buf;
+      wpi::util::SmallVector<uint8_t, 128> buf;
       pub.Set(getter(buf), time);
     };
   }

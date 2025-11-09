@@ -6,19 +6,19 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include <wpi/SpanMatcher.h>
 
-#include "LocalStorage.h"
-#include "MockListenerStorage.h"
-#include "MockLogger.h"
-#include "PubSubOptionsMatcher.h"
-#include "TestPrinters.h"
-#include "ValueMatcher.h"
+#include "LocalStorage.hpp"
+#include "MockListenerStorage.hpp"
+#include "MockLogger.hpp"
+#include "PubSubOptionsMatcher.hpp"
+#include "TestPrinters.hpp"
+#include "ValueMatcher.hpp"
 #include "gmock/gmock.h"
-#include "net/MockMessageHandler.h"
-#include "net/MockNetworkInterface.h"
-#include "ntcore_c.h"
-#include "ntcore_cpp.h"
+#include "net/MockMessageHandler.hpp"
+#include "net/MockNetworkInterface.hpp"
+#include "wpi/nt/ntcore_c.h"
+#include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/SpanMatcher.hpp"
 
 using ::testing::_;
 using ::testing::AllOf;
@@ -28,7 +28,7 @@ using ::testing::IsEmpty;
 using ::testing::Property;
 using ::testing::Return;
 
-namespace nt {
+namespace wpi::nt {
 
 ::testing::Matcher<const PubSubOptionsImpl&> IsPubSubOptions(
     const PubSubOptionsImpl& good) {
@@ -80,8 +80,9 @@ TEST_F(LocalStorageTest, GetEntryEmptyName) {
 }
 
 TEST_F(LocalStorageTest, GetEntryCached) {
-  EXPECT_CALL(network, ClientSubscribe(_, wpi::SpanEq({std::string{"tocache"}}),
-                                       IsDefaultPubSubOptions()));
+  EXPECT_CALL(network,
+              ClientSubscribe(_, wpi::util::SpanEq({std::string{"tocache"}}),
+                              IsDefaultPubSubOptions()));
 
   auto entry1 = storage.GetEntry("tocache");
   EXPECT_EQ(entry1, storage.GetEntry("tocache"));
@@ -109,8 +110,9 @@ TEST_F(LocalStorageTest, DefaultProps) {
   EXPECT_CALL(
       network,
       ClientPublish(_, std::string_view{"foo"}, std::string_view{"boolean"},
-                    wpi::json::object(), IsDefaultPubSubOptions()));
-  storage.Publish(fooTopic, NT_BOOLEAN, "boolean", wpi::json::object(), {});
+                    wpi::util::json::object(), IsDefaultPubSubOptions()));
+  storage.Publish(fooTopic, NT_BOOLEAN, "boolean", wpi::util::json::object(),
+                  {});
 
   EXPECT_FALSE(storage.GetTopicPersistent(fooTopic));
   EXPECT_FALSE(storage.GetTopicRetained(fooTopic));
@@ -121,8 +123,9 @@ TEST_F(LocalStorageTest, PublishNewNoProps) {
   EXPECT_CALL(
       network,
       ClientPublish(_, std::string_view{"foo"}, std::string_view{"boolean"},
-                    wpi::json::object(), IsDefaultPubSubOptions()));
-  storage.Publish(fooTopic, NT_BOOLEAN, "boolean", wpi::json::object(), {});
+                    wpi::util::json::object(), IsDefaultPubSubOptions()));
+  storage.Publish(fooTopic, NT_BOOLEAN, "boolean", wpi::util::json::object(),
+                  {});
 
   auto info = storage.GetTopicInfo(fooTopic);
   EXPECT_EQ(info.properties, "{}");
@@ -132,7 +135,7 @@ TEST_F(LocalStorageTest, PublishNewNoPropsNull) {
   EXPECT_CALL(
       network,
       ClientPublish(_, std::string_view{"foo"}, std::string_view{"boolean"},
-                    wpi::json::object(), IsDefaultPubSubOptions()));
+                    wpi::util::json::object(), IsDefaultPubSubOptions()));
   storage.Publish(fooTopic, NT_BOOLEAN, "boolean", {}, {});
 
   auto info = storage.GetTopicInfo(fooTopic);
@@ -140,7 +143,7 @@ TEST_F(LocalStorageTest, PublishNewNoPropsNull) {
 }
 
 TEST_F(LocalStorageTest, PublishNew) {
-  wpi::json properties = {{"persistent", true}};
+  wpi::util::json properties = {{"persistent", true}};
   EXPECT_CALL(network, ClientPublish(_, std::string_view{"foo"},
                                      std::string_view{"boolean"}, properties,
                                      IsDefaultPubSubOptions()));
@@ -159,14 +162,15 @@ TEST_F(LocalStorageTest, PublishNew) {
 }
 
 TEST_F(LocalStorageTest, SubscribeNoTypeLocalPubPost) {
-  EXPECT_CALL(network, ClientSubscribe(_, wpi::SpanEq({std::string{"foo"}}),
-                                       IsDefaultPubSubOptions()));
+  EXPECT_CALL(network,
+              ClientSubscribe(_, wpi::util::SpanEq({std::string{"foo"}}),
+                              IsDefaultPubSubOptions()));
   auto sub = storage.Subscribe(fooTopic, NT_UNASSIGNED, "", {});
 
   EXPECT_CALL(
       network,
       ClientPublish(_, std::string_view{"foo"}, std::string_view{"boolean"},
-                    wpi::json::object(), IsDefaultPubSubOptions()));
+                    wpi::util::json::object(), IsDefaultPubSubOptions()));
   auto pub = storage.Publish(fooTopic, NT_BOOLEAN, "boolean", {}, {});
 
   auto val = Value::MakeBoolean(true, 5);
@@ -199,15 +203,16 @@ TEST_F(LocalStorageTest, SubscribeNoTypeLocalPubPre) {
   EXPECT_CALL(
       network,
       ClientPublish(_, std::string_view{"foo"}, std::string_view{"boolean"},
-                    wpi::json::object(), IsDefaultPubSubOptions()));
+                    wpi::util::json::object(), IsDefaultPubSubOptions()));
   auto pub = storage.Publish(fooTopic, NT_BOOLEAN, "boolean", {}, {});
 
   auto val = Value::MakeBoolean(true, 5);
   EXPECT_CALL(network, ClientSetValue(Handle{pub}.GetIndex(), val));
   storage.SetEntryValue(pub, val);
 
-  EXPECT_CALL(network, ClientSubscribe(_, wpi::SpanEq({std::string{"foo"}}),
-                                       IsDefaultPubSubOptions()));
+  EXPECT_CALL(network,
+              ClientSubscribe(_, wpi::util::SpanEq({std::string{"foo"}}),
+                              IsDefaultPubSubOptions()));
   auto sub = storage.Subscribe(fooTopic, NT_UNASSIGNED, "", {});
 
   EXPECT_EQ(storage.GetTopicType(fooTopic), NT_BOOLEAN);
@@ -221,8 +226,9 @@ TEST_F(LocalStorageTest, SubscribeNoTypeLocalPubPre) {
 }
 
 TEST_F(LocalStorageTest, EntryNoTypeLocalSet) {
-  EXPECT_CALL(network, ClientSubscribe(_, wpi::SpanEq({std::string{"foo"}}),
-                                       IsDefaultPubSubOptions()));
+  EXPECT_CALL(network,
+              ClientSubscribe(_, wpi::util::SpanEq({std::string{"foo"}}),
+                              IsDefaultPubSubOptions()));
   auto entry = storage.GetEntry(fooTopic, NT_UNASSIGNED, "", {});
 
   // results in a publish and value set
@@ -230,7 +236,7 @@ TEST_F(LocalStorageTest, EntryNoTypeLocalSet) {
   EXPECT_CALL(
       network,
       ClientPublish(_, std::string_view{"foo"}, std::string_view{"boolean"},
-                    wpi::json::object(), IsDefaultPubSubOptions()));
+                    wpi::util::json::object(), IsDefaultPubSubOptions()));
   EXPECT_CALL(network, ClientSetValue(_, val));
   EXPECT_TRUE(storage.SetEntryValue(entry, val));
 
@@ -268,14 +274,15 @@ TEST_F(LocalStorageTest, EntryNoTypeLocalSet) {
 }
 
 TEST_F(LocalStorageTest, PubUnpubPub) {
-  EXPECT_CALL(network, ClientSubscribe(_, wpi::SpanEq({std::string{"foo"}}),
-                                       IsDefaultPubSubOptions()));
+  EXPECT_CALL(network,
+              ClientSubscribe(_, wpi::util::SpanEq({std::string{"foo"}}),
+                              IsDefaultPubSubOptions()));
   auto sub = storage.Subscribe(fooTopic, NT_INTEGER, "int", {});
 
   EXPECT_CALL(
       network,
       ClientPublish(_, std::string_view{"foo"}, std::string_view{"boolean"},
-                    wpi::json::object(), IsDefaultPubSubOptions()));
+                    wpi::util::json::object(), IsDefaultPubSubOptions()));
   EXPECT_CALL(logger,
               Call(NT_LOG_INFO, _, _,
                    std::string_view{
@@ -300,9 +307,10 @@ TEST_F(LocalStorageTest, PubUnpubPub) {
   EXPECT_EQ(storage.GetTopicTypeString(fooTopic), "");
   EXPECT_FALSE(storage.GetTopicExists(fooTopic));
 
-  EXPECT_CALL(network,
-              ClientPublish(_, std::string_view{"foo"}, std::string_view{"int"},
-                            wpi::json::object(), IsDefaultPubSubOptions()));
+  EXPECT_CALL(
+      network,
+      ClientPublish(_, std::string_view{"foo"}, std::string_view{"int"},
+                    wpi::util::json::object(), IsDefaultPubSubOptions()));
   pub = storage.Publish(fooTopic, NT_INTEGER, "int", {}, {});
 
   val = Value::MakeInteger(3, 5);
@@ -320,7 +328,7 @@ TEST_F(LocalStorageTest, LocalPubConflict) {
   EXPECT_CALL(
       network,
       ClientPublish(_, std::string_view{"foo"}, std::string_view{"boolean"},
-                    wpi::json::object(), IsDefaultPubSubOptions()));
+                    wpi::util::json::object(), IsDefaultPubSubOptions()));
   auto pub1 = storage.Publish(fooTopic, NT_BOOLEAN, "boolean", {}, {});
 
   EXPECT_CALL(
@@ -341,9 +349,10 @@ TEST_F(LocalStorageTest, LocalPubConflict) {
 
   // unpublishing pub1 will publish pub2 to the network
   EXPECT_CALL(network, ClientUnpublish(Handle{pub1}.GetIndex()));
-  EXPECT_CALL(network,
-              ClientPublish(_, std::string_view{"foo"}, std::string_view{"int"},
-                            wpi::json::object(), IsDefaultPubSubOptions()));
+  EXPECT_CALL(
+      network,
+      ClientPublish(_, std::string_view{"foo"}, std::string_view{"int"},
+                    wpi::util::json::object(), IsDefaultPubSubOptions()));
   storage.Unpublish(pub1);
 
   EXPECT_EQ(storage.GetTopicType(fooTopic), NT_INTEGER);
@@ -360,11 +369,12 @@ TEST_F(LocalStorageTest, LocalSubConflict) {
   EXPECT_CALL(
       network,
       ClientPublish(_, std::string_view{"foo"}, std::string_view{"boolean"},
-                    wpi::json::object(), IsDefaultPubSubOptions()));
+                    wpi::util::json::object(), IsDefaultPubSubOptions()));
   storage.Publish(fooTopic, NT_BOOLEAN, "boolean", {}, {});
 
-  EXPECT_CALL(network, ClientSubscribe(_, wpi::SpanEq({std::string{"foo"}}),
-                                       IsDefaultPubSubOptions()));
+  EXPECT_CALL(network,
+              ClientSubscribe(_, wpi::util::SpanEq({std::string{"foo"}}),
+                              IsDefaultPubSubOptions()));
   EXPECT_CALL(logger,
               Call(NT_LOG_INFO, _, _,
                    std::string_view{
@@ -377,7 +387,7 @@ TEST_F(LocalStorageTest, RemotePubConflict) {
   EXPECT_CALL(
       network,
       ClientPublish(_, std::string_view{"foo"}, std::string_view{"boolean"},
-                    wpi::json::object(), IsDefaultPubSubOptions()));
+                    wpi::util::json::object(), IsDefaultPubSubOptions()));
 
   storage.Publish(fooTopic, NT_BOOLEAN, "boolean", {}, {});
 
@@ -387,7 +397,7 @@ TEST_F(LocalStorageTest, RemotePubConflict) {
                        "network announce of 'foo' overriding local publish "
                        "(was 'boolean', now 'int')"}));
 
-  auto id = storage.ServerAnnounce("foo", 0, "int", wpi::json::object(),
+  auto id = storage.ServerAnnounce("foo", 0, "int", wpi::util::json::object(),
                                    std::nullopt);
 
   // network overrides local
@@ -398,7 +408,7 @@ TEST_F(LocalStorageTest, RemotePubConflict) {
   EXPECT_CALL(
       network,
       ClientPublish(_, std::string_view{"foo"}, std::string_view{"boolean"},
-                    wpi::json::object(), IsDefaultPubSubOptions()));
+                    wpi::util::json::object(), IsDefaultPubSubOptions()));
 
   storage.ServerUnannounce("foo", id);
 
@@ -409,15 +419,17 @@ TEST_F(LocalStorageTest, RemotePubConflict) {
 
 TEST_F(LocalStorageTest, SubNonExist) {
   // makes sure no warning is emitted
-  EXPECT_CALL(network, ClientSubscribe(_, wpi::SpanEq({std::string{"foo"}}),
-                                       IsDefaultPubSubOptions()));
+  EXPECT_CALL(network,
+              ClientSubscribe(_, wpi::util::SpanEq({std::string{"foo"}}),
+                              IsDefaultPubSubOptions()));
   storage.Subscribe(fooTopic, NT_BOOLEAN, "boolean", {});
 }
 
 TEST_F(LocalStorageTest, SetDefaultSubscribe) {
   // no publish, no value on wire, this is just handled locally
-  EXPECT_CALL(network, ClientSubscribe(_, wpi::SpanEq({std::string{"foo"}}),
-                                       IsDefaultPubSubOptions()));
+  EXPECT_CALL(network,
+              ClientSubscribe(_, wpi::util::SpanEq({std::string{"foo"}}),
+                              IsDefaultPubSubOptions()));
   auto sub = storage.Subscribe(fooTopic, NT_BOOLEAN, "boolean", {});
   EXPECT_TRUE(storage.SetDefaultEntryValue(sub, Value::MakeBoolean(true)));
   auto val = storage.GetEntryValue(sub);
@@ -430,7 +442,7 @@ TEST_F(LocalStorageTest, SetDefaultPublish) {
   EXPECT_CALL(
       network,
       ClientPublish(_, std::string_view{"foo"}, std::string_view{"boolean"},
-                    wpi::json::object(), IsDefaultPubSubOptions()));
+                    wpi::util::json::object(), IsDefaultPubSubOptions()));
   auto pub = storage.Publish(fooTopic, NT_BOOLEAN, "boolean", {}, {});
 
   // expect a value across the wire
@@ -447,15 +459,16 @@ TEST_F(LocalStorageTest, SetDefaultPublish) {
 }
 
 TEST_F(LocalStorageTest, SetDefaultEntry) {
-  EXPECT_CALL(network, ClientSubscribe(_, wpi::SpanEq({std::string{"foo"}}),
-                                       IsDefaultPubSubOptions()));
+  EXPECT_CALL(network,
+              ClientSubscribe(_, wpi::util::SpanEq({std::string{"foo"}}),
+                              IsDefaultPubSubOptions()));
   auto entry = storage.GetEntry(fooTopic, NT_BOOLEAN, "boolean", {});
 
   // expect a publish and value
   EXPECT_CALL(
       network,
       ClientPublish(_, std::string_view{"foo"}, std::string_view{"boolean"},
-                    wpi::json::object(), IsDefaultPubSubOptions()));
+                    wpi::util::json::object(), IsDefaultPubSubOptions()));
   auto expectVal = Value::MakeBoolean(true, 0);
   EXPECT_CALL(network, ClientSetValue(_, expectVal));
   EXPECT_TRUE(storage.SetDefaultEntryValue(entry, Value::MakeBoolean(true)));
@@ -467,15 +480,16 @@ TEST_F(LocalStorageTest, SetDefaultEntry) {
 }
 
 TEST_F(LocalStorageTest, SetDefaultEntryUnassigned) {
-  EXPECT_CALL(network, ClientSubscribe(_, wpi::SpanEq({std::string{"foo"}}),
-                                       IsDefaultPubSubOptions()));
+  EXPECT_CALL(network,
+              ClientSubscribe(_, wpi::util::SpanEq({std::string{"foo"}}),
+                              IsDefaultPubSubOptions()));
   auto entry = storage.GetEntry(fooTopic, NT_UNASSIGNED, "", {});
 
   // expect a publish and value
   EXPECT_CALL(
       network,
       ClientPublish(_, std::string_view{"foo"}, std::string_view{"boolean"},
-                    wpi::json::object(), IsDefaultPubSubOptions()));
+                    wpi::util::json::object(), IsDefaultPubSubOptions()));
   auto expectVal = Value::MakeBoolean(true, 0);
   EXPECT_CALL(network, ClientSetValue(_, expectVal));
   EXPECT_TRUE(storage.SetDefaultEntryValue(entry, Value::MakeBoolean(true)));
@@ -491,7 +505,7 @@ TEST_F(LocalStorageTest, SetDefaultEntryDiffType) {
   EXPECT_CALL(
       network,
       ClientPublish(_, std::string_view{"foo"}, std::string_view{"string"},
-                    wpi::json::object(), IsDefaultPubSubOptions()));
+                    wpi::util::json::object(), IsDefaultPubSubOptions()));
   auto pub = storage.Publish(fooTopic, NT_STRING, "string", {}, {});
 
   EXPECT_FALSE(storage.SetDefaultEntryValue(pub, Value::MakeBoolean(true)));
@@ -502,15 +516,16 @@ TEST_F(LocalStorageTest, SetValueEmptyValue) {
   EXPECT_CALL(
       network,
       ClientPublish(_, std::string_view{"foo"}, std::string_view{"string"},
-                    wpi::json::object(), IsDefaultPubSubOptions()));
+                    wpi::util::json::object(), IsDefaultPubSubOptions()));
   auto pub = storage.Publish(fooTopic, NT_STRING, "string", {}, {});
 
   EXPECT_FALSE(storage.SetEntryValue(pub, {}));
 }
 
 TEST_F(LocalStorageTest, SetValueEmptyUntypedEntry) {
-  EXPECT_CALL(network, ClientSubscribe(_, wpi::SpanEq({std::string{"foo"}}),
-                                       IsDefaultPubSubOptions()));
+  EXPECT_CALL(network,
+              ClientSubscribe(_, wpi::util::SpanEq({std::string{"foo"}}),
+                              IsDefaultPubSubOptions()));
   auto entry = storage.GetEntry(fooTopic, NT_UNASSIGNED, "", {});
   EXPECT_FALSE(storage.SetEntryValue(entry, {}));
 }
@@ -546,15 +561,16 @@ void LocalStorageDuplicatesTest::SetupPubSub(bool keepPub, bool keepSub) {
   EXPECT_CALL(
       network,
       ClientPublish(_, std::string_view{"foo"}, std::string_view{"double"},
-                    wpi::json::object(), IsPubSubOptions(pubOptions)));
+                    wpi::util::json::object(), IsPubSubOptions(pubOptions)));
   pub = storage.Publish(fooTopic, NT_DOUBLE, "double", {},
                         {.keepDuplicates = keepPub});
 
   PubSubOptionsImpl subOptions;
   subOptions.pollStorage = 10;
   subOptions.keepDuplicates = keepSub;
-  EXPECT_CALL(network, ClientSubscribe(_, wpi::SpanEq({std::string{"foo"}}),
-                                       IsPubSubOptions(subOptions)));
+  EXPECT_CALL(network,
+              ClientSubscribe(_, wpi::util::SpanEq({std::string{"foo"}}),
+                              IsPubSubOptions(subOptions)));
   sub = storage.Subscribe(fooTopic, NT_DOUBLE, "double",
                           {.pollStorage = 10, .keepDuplicates = keepSub});
 }
@@ -836,7 +852,7 @@ TEST_F(LocalStorageNumberVariantsTest, GetAtomic) {
 template <typename T, typename U>
 ::testing::Matcher<const T&> TSSpanEq(std::span<U> value, int64_t time) {
   return AllOf(
-      Field("value", &T::value, wpi::SpanEq(std::span<const U>(value))),
+      Field("value", &T::value, wpi::util::SpanEq(std::span<const U>(value))),
       Field("time", &T::time, time));
 }
 
@@ -927,23 +943,23 @@ TEST_F(LocalStorageTest, MultiSubSpecial) {
 
   EXPECT_CALL(
       listenerStorage,
-      Notify(wpi::SpanEq(std::span<const NT_Listener>{{2}}), _, _, _, _));
+      Notify(wpi::util::SpanEq(std::span<const NT_Listener>{{2}}), _, _, _, _));
   storage.SetEntryValue(pubspecial, Value::MakeDouble(1.0, 30));
 
   EXPECT_CALL(
       listenerStorage,
-      Notify(wpi::SpanEq(std::span<const NT_Listener>{{1}}), _, _, _, _));
+      Notify(wpi::util::SpanEq(std::span<const NT_Listener>{{1}}), _, _, _, _));
   EXPECT_CALL(
       listenerStorage,
-      Notify(wpi::SpanEq(std::span<const NT_Listener>{{2}}), _, _, _, _));
+      Notify(wpi::util::SpanEq(std::span<const NT_Listener>{{2}}), _, _, _, _));
   storage.SetEntryValue(pubnormal, Value::MakeDouble(2.0, 40));
 }
 
 TEST_F(LocalStorageTest, NetworkDuplicateDetect) {
   EXPECT_CALL(network, ClientPublish(_, _, _, _, _));
   auto pub = storage.Publish(fooTopic, NT_DOUBLE, "double", {}, {});
-  auto remoteTopic = storage.ServerAnnounce("foo", 0, "double",
-                                            wpi::json::object(), std::nullopt);
+  auto remoteTopic = storage.ServerAnnounce(
+      "foo", 0, "double", wpi::util::json::object(), std::nullopt);
 
   // local set
   EXPECT_CALL(network, ClientSetValue(_, _));
@@ -968,8 +984,8 @@ TEST_F(LocalStorageTest, ReadQueueLocalRemote) {
   auto subRemote =
       storage.Subscribe(fooTopic, NT_DOUBLE, "double", {.disableLocal = true});
   auto pub = storage.Publish(fooTopic, NT_DOUBLE, "double", {}, {});
-  auto remoteTopic = storage.ServerAnnounce("foo", 0, "double",
-                                            wpi::json::object(), std::nullopt);
+  auto remoteTopic = storage.ServerAnnounce(
+      "foo", 0, "double", wpi::util::json::object(), std::nullopt);
 
   // local set
   EXPECT_CALL(network, ClientSetValue(_, _));
@@ -997,8 +1013,8 @@ TEST_F(LocalStorageTest, SubExcludePub) {
   auto subActive = storage.Subscribe(fooTopic, NT_DOUBLE, "double", {});
   auto subExclude = storage.Subscribe(fooTopic, NT_DOUBLE, "double",
                                       {.excludePublisher = pub});
-  auto remoteTopic = storage.ServerAnnounce("foo", 0, "double",
-                                            wpi::json::object(), std::nullopt);
+  auto remoteTopic = storage.ServerAnnounce(
+      "foo", 0, "double", wpi::util::json::object(), std::nullopt);
 
   // local set
   EXPECT_CALL(network, ClientSetValue(_, _));
@@ -1020,8 +1036,8 @@ TEST_F(LocalStorageTest, EntryExcludeSelf) {
 
   auto entry =
       storage.GetEntry(fooTopic, NT_DOUBLE, "double", {.excludeSelf = true});
-  auto remoteTopic = storage.ServerAnnounce("foo", 0, "double",
-                                            wpi::json::object(), std::nullopt);
+  auto remoteTopic = storage.ServerAnnounce(
+      "foo", 0, "double", wpi::util::json::object(), std::nullopt);
 
   // local set
   EXPECT_CALL(network, ClientPublish(_, _, _, _, _));
@@ -1060,8 +1076,8 @@ TEST_F(LocalStorageTest, ReadQueueInitialLocal) {
 TEST_F(LocalStorageTest, ReadQueueInitialRemote) {
   EXPECT_CALL(network, ClientSubscribe(_, _, _)).Times(3);
 
-  auto remoteTopic = storage.ServerAnnounce("foo", 0, "double",
-                                            wpi::json::object(), std::nullopt);
+  auto remoteTopic = storage.ServerAnnounce(
+      "foo", 0, "double", wpi::util::json::object(), std::nullopt);
   storage.ServerSetValue(remoteTopic, Value::MakeDouble(2.0, 60));
 
   auto subBoth =
@@ -1079,4 +1095,4 @@ TEST_F(LocalStorageTest, ReadQueueInitialRemote) {
   EXPECT_THAT(storage.ReadQueue<double>(subLocal), IsEmpty());
 }
 
-}  // namespace nt
+}  // namespace wpi::nt

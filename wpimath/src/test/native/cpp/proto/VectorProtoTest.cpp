@@ -4,11 +4,11 @@
 
 #include <gtest/gtest.h>
 
-#include "../ProtoTestBase.h"
-#include "frc/EigenCore.h"
-#include "frc/proto/VectorProto.h"
+#include "../ProtoTestBase.hpp"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/linalg/proto/VectorProto.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 struct VectorProtoTestData {
   using Type = Vectord<2>;

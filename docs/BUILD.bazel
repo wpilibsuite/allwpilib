@@ -12,8 +12,8 @@ paths = [
     "ntcore/src/main/native/include",
     "romiVendordep/src/generated/main/native/include",
     "romiVendordep/src/main/native/include",
-    "wpilibNewCommands/src/generated/main/native/include",
-    "wpilibNewCommands/src/main/native/include",
+    "commandsv2/src/generated/main/native/include",
+    "commandsv2/src/main/native/include",
     "wpilibc/src/generated/main/native/include",
     "wpilibc/src/main/native/include",
     "wpimath/src/main/native/include",
@@ -60,11 +60,11 @@ doxygen(
         ":third_party_notices",
         "//apriltag:doxygen-files",
         "//cameraserver:doxygen-files",
+        "//commandsv2:doxygen-files",
         "//cscore:doxygen-files",
         "//hal:doxygen-files",
         "//ntcore:doxygen-files",
         "//romiVendordep:doxygen-files",
-        "//wpilibNewCommands:doxygen-files",
         "//wpilibc:doxygen-files",
         "//wpimath:doxygen-files",
         "//wpinet:doxygen-files",
@@ -96,7 +96,7 @@ pkg_zip(
 
 maven_export(
     name = "wpilibc_publish",
-    maven_coordinates = "edu.wpi.first.wpilibc:documentation:$(WPILIB_VERSION)",
+    maven_coordinates = "org.wpilib.wpilibc:documentation:$(WPILIB_VERSION)",
     target = ":doxygen-zip",
     visibility = ["//visibility:public"],
 )
@@ -106,12 +106,13 @@ javadoc(
     deps = [
         "//apriltag:apriltag-java",
         "//cameraserver:cameraserver-java",
+        "//commandsv2:commandsv2-java",
+        "//commandsv3:commandsv3-java",
         "//cscore:cscore-java",
         "//epilogue-runtime:epilogue-java",
         "//hal:hal-java",
         "//ntcore:ntcore-java",
         "//romiVendordep:romiVendordep-java",
-        "//wpilibNewCommands:wpilibNewCommands-java",
         "//wpilibj:wpilibj-java",
         "//wpimath:wpimath-java",
         "//wpinet:wpinet-java",
@@ -129,7 +130,7 @@ copy_file(
 
 maven_export(
     name = "wpilibj_publish",
-    maven_coordinates = "edu.wpi.first.wpilibj:documentation:$(WPILIB_VERSION)",
+    maven_coordinates = "org.wpilib.wpilibj:documentation:$(WPILIB_VERSION)",
     target = ":javadoc-zip",
     visibility = ["//visibility:public"],
 )

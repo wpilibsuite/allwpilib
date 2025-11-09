@@ -4,6 +4,7 @@ cHeaderFileInclude {
 
 cppHeaderFileInclude {
   (?<!_c)\.h$
+  \.hpp$
   \.inc$
   \.inl$
 }
@@ -16,6 +17,9 @@ generatedFileExclude {
   ntcore/doc/
   ntcore/src/generated
   .*\.jinja
+
+  src/main/python/
+  src/test/python/
 }
 
 repoRootNameOverride {
@@ -32,6 +36,4 @@ includeOtherLibs {
   ^fmt/
   ^gtest/
   ^support/
-  ^wpi/
-  ^wpinet/
 }

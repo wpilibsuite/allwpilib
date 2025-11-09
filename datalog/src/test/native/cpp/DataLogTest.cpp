@@ -8,10 +8,10 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include <wpi/Logger.h>
-#include <wpi/raw_ostream.h>
 
-#include "wpi/datalog/DataLogWriter.h"
+#include "wpi/datalog/DataLogWriter.hpp"
+#include "wpi/util/Logger.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
 namespace {
 struct ThingA {
@@ -40,7 +40,7 @@ struct Info2 {
 }  // namespace
 
 template <>
-struct wpi::Struct<ThingA> {
+struct wpi::util::Struct<ThingA> {
   static constexpr std::string_view GetTypeName() { return "ThingA"; }
   static constexpr size_t GetSize() { return 1; }
   static constexpr std::string_view GetSchema() { return "uint8 value"; }
@@ -53,7 +53,7 @@ struct wpi::Struct<ThingA> {
 };
 
 template <>
-struct wpi::Struct<ThingB, Info1> {
+struct wpi::util::Struct<ThingB, Info1> {
   static constexpr std::string_view GetTypeName(const Info1&) {
     return "ThingB";
   }
@@ -70,7 +70,7 @@ struct wpi::Struct<ThingB, Info1> {
 };
 
 template <>
-struct wpi::Struct<ThingC> {
+struct wpi::util::Struct<ThingC> {
   static constexpr std::string_view GetTypeName() { return "ThingC"; }
   static constexpr size_t GetSize() { return 1; }
   static constexpr std::string_view GetSchema() { return "uint8 value"; }
@@ -83,7 +83,7 @@ struct wpi::Struct<ThingC> {
 };
 
 template <>
-struct wpi::Struct<ThingC, Info1> {
+struct wpi::util::Struct<ThingC, Info1> {
   static constexpr std::string_view GetTypeName(const Info1&) {
     return "ThingC";
   }
@@ -100,7 +100,7 @@ struct wpi::Struct<ThingC, Info1> {
 };
 
 template <>
-struct wpi::Struct<ThingC, Info2> {
+struct wpi::util::Struct<ThingC, Info2> {
   static constexpr std::string_view GetTypeName(const Info2&) {
     return "ThingC";
   }
@@ -116,23 +116,23 @@ struct wpi::Struct<ThingC, Info2> {
   }
 };
 
-static_assert(wpi::StructSerializable<ThingA>);
-static_assert(!wpi::StructSerializable<ThingA, Info1>);
+static_assert(wpi::util::StructSerializable<ThingA>);
+static_assert(!wpi::util::StructSerializable<ThingA, Info1>);
 
-static_assert(!wpi::StructSerializable<ThingB>);
-static_assert(wpi::StructSerializable<ThingB, Info1>);
-static_assert(!wpi::StructSerializable<ThingB, Info2>);
+static_assert(!wpi::util::StructSerializable<ThingB>);
+static_assert(wpi::util::StructSerializable<ThingB, Info1>);
+static_assert(!wpi::util::StructSerializable<ThingB, Info2>);
 
-static_assert(wpi::StructSerializable<ThingC>);
-static_assert(wpi::StructSerializable<ThingC, Info1>);
-static_assert(wpi::StructSerializable<ThingC, Info2>);
+static_assert(wpi::util::StructSerializable<ThingC>);
+static_assert(wpi::util::StructSerializable<ThingC, Info1>);
+static_assert(wpi::util::StructSerializable<ThingC, Info2>);
 
 class DataLogTest : public ::testing::Test {
  public:
-  wpi::Logger msglog;
+  wpi::util::Logger msglog;
   std::vector<uint8_t> data;
-  wpi::log::DataLogWriter log{msglog,
-                              std::make_unique<wpi::raw_uvector_ostream>(data)};
+  wpi::log::DataLogWriter log{
+      msglog, std::make_unique<wpi::util::raw_uvector_ostream>(data)};
 };
 
 TEST_F(DataLogTest, SimpleInt) {

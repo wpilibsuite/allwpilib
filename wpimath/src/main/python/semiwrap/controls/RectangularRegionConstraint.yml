@@ -1,0 +1,25 @@
+defaults:
+  subpackage: constraint
+
+extra_includes:
+- PyTrajectoryConstraint.h
+
+classes:
+  wpi::math::RectangularRegionConstraint:
+    template_params:
+    - typename Constraint
+    typealias:
+    - wpi::math::TrajectoryConstraint::MinMax
+    methods:
+      RectangularRegionConstraint:
+        overloads:
+          const Translation2d&, const Translation2d&, const Constraint&:
+          const Rectangle2d&, const Constraint&:
+      MaxVelocity:
+      MinMaxAcceleration:
+
+templates:
+  RectangularRegionConstraint:
+    qualname: wpi::math::RectangularRegionConstraint
+    params:
+    - wpi::math::PyTrajectoryConstraint

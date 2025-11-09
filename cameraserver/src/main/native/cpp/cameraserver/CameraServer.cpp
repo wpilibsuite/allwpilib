@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "cameraserver/CameraServer.h"
+#include "wpi/cameraserver/CameraServer.hpp"
 
 #include <atomic>
 #include <memory>
@@ -11,22 +11,22 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <networktables/BooleanTopic.h>
-#include <networktables/IntegerTopic.h>
-#include <networktables/NetworkTable.h>
-#include <networktables/NetworkTableInstance.h>
-#include <networktables/StringArrayTopic.h>
-#include <networktables/StringTopic.h>
-#include <wpi/DenseMap.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringExtras.h>
-#include <wpi/StringMap.h>
-#include <wpi/mutex.h>
 
-#include "cameraserver/CameraServerShared.h"
-#include "ntcore_cpp.h"
+#include "wpi/cameraserver/CameraServerShared.hpp"
+#include "wpi/nt/BooleanTopic.hpp"
+#include "wpi/nt/IntegerTopic.hpp"
+#include "wpi/nt/NetworkTable.hpp"
+#include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/nt/StringArrayTopic.hpp"
+#include "wpi/nt/StringTopic.hpp"
+#include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/DenseMap.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/StringMap.hpp"
+#include "wpi/util/mutex.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 static constexpr char const* kPublishName = "/CameraPublisher";
 
@@ -61,7 +61,7 @@ struct SourcePublisher {
   nt::StringArrayPublisher streamsPublisher;
   nt::StringEntry modeEntry;
   nt::StringArrayPublisher modesPublisher;
-  wpi::DenseMap<CS_Property, PropertyPublisher> properties;
+  wpi::util::DenseMap<CS_Property, PropertyPublisher> properties;
 };
 
 struct Instance {
@@ -71,13 +71,13 @@ struct Instance {
   std::vector<std::string> GetSourceStreamValues(CS_Source source);
   void UpdateStreamValues();
 
-  wpi::mutex m_mutex;
+  wpi::util::mutex m_mutex;
   std::atomic<int> m_defaultUsbDevice{0};
   std::string m_primarySourceName;
-  wpi::StringMap<cs::VideoSource> m_sources;
-  wpi::StringMap<cs::VideoSink> m_sinks;
-  wpi::DenseMap<CS_Sink, CS_Source> m_fixedSources;
-  wpi::DenseMap<CS_Source, SourcePublisher> m_publishers;
+  wpi::util::StringMap<cs::VideoSource> m_sources;
+  wpi::util::StringMap<cs::VideoSink> m_sinks;
+  wpi::util::DenseMap<CS_Sink, CS_Source> m_fixedSources;
+  wpi::util::DenseMap<CS_Source, SourcePublisher> m_publishers;
   std::shared_ptr<nt::NetworkTable> m_publishTable{
       nt::NetworkTableInstance::GetDefault().GetTable(kPublishName)};
   cs::VideoListener m_videoListener;
@@ -94,7 +94,7 @@ static Instance& GetInstance() {
 }
 
 static std::string_view MakeSourceValue(CS_Source source,
-                                        wpi::SmallVectorImpl<char>& buf) {
+                                        wpi::util::SmallVectorImpl<char>& buf) {
   CS_Status status = 0;
   buf.clear();
   switch (cs::GetSourceKind(source, &status)) {
@@ -282,7 +282,7 @@ PropertyPublisher::PropertyPublisher(nt::NetworkTable& table,
                                      const cs::VideoEvent& event) {
   std::string name;
   std::string infoName;
-  if (wpi::starts_with(event.name, "raw_")) {
+  if (wpi::util::starts_with(event.name, "raw_")) {
     name = fmt::format("RawProperty/{}", event.name);
     infoName = fmt::format("RawPropertyInfo/{}", event.name);
   } else {
@@ -361,9 +361,9 @@ SourcePublisher::SourcePublisher(Instance& inst,
       modeEntry{table->GetStringTopic("mode").GetEntry("")},
       modesPublisher{table->GetStringArrayTopic("modes").Publish()} {
   CS_Status status = 0;
-  wpi::SmallString<64> buf;
+  wpi::util::SmallString<64> buf;
   sourcePublisher.Set(MakeSourceValue(source, buf));
-  wpi::SmallString<64> descBuf;
+  wpi::util::SmallString<64> descBuf;
   descriptionPublisher.Set(cs::GetSourceDescription(source, descBuf, &status));
   connectedPublisher.Set(cs::IsSourceConnected(source, &status));
   streamsPublisher.Set(inst.GetSourceStreamValues(source));
@@ -404,7 +404,7 @@ Instance::Instance() {
           case cs::VideoEvent::kSourceConnected:
             if (auto publisher = GetPublisher(event.sourceHandle)) {
               // update the description too (as it may have changed)
-              wpi::SmallString<64> descBuf;
+              wpi::util::SmallString<64> descBuf;
               publisher->descriptionPublisher.Set(cs::GetSourceDescription(
                   event.sourceHandle, descBuf, &status));
               publisher->connectedPublisher.Set(true);
@@ -543,7 +543,7 @@ cs::CvSink CameraServer::GetVideo() {
 
 cs::CvSink CameraServer::GetVideo(const cs::VideoSource& camera) {
   auto& inst = ::GetInstance();
-  wpi::SmallString<64> name{"opencv_"};
+  wpi::util::SmallString<64> name{"opencv_"};
   name += camera.GetName();
 
   {
@@ -570,7 +570,7 @@ cs::CvSink CameraServer::GetVideo(const cs::VideoSource& camera) {
 cs::CvSink CameraServer::GetVideo(const cs::VideoSource& camera,
                                   cs::VideoMode::PixelFormat pixelFormat) {
   auto& inst = ::GetInstance();
-  wpi::SmallString<64> name{"opencv_"};
+  wpi::util::SmallString<64> name{"opencv_"};
   name += camera.GetName();
 
   {

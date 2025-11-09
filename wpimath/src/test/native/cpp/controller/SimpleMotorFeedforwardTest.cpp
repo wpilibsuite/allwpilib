@@ -6,27 +6,27 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/EigenCore.h"
-#include "frc/controller/LinearPlantInversionFeedforward.h"
-#include "frc/controller/SimpleMotorFeedforward.h"
-#include "units/acceleration.h"
-#include "units/length.h"
-#include "units/time.h"
-#include "units/velocity.h"
+#include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
+#include "wpi/math/controller/SimpleMotorFeedforward.hpp"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 TEST(SimpleMotorFeedforwardTest, Calculate) {
   constexpr auto Ks = 0.5_V;
   constexpr auto Kv = 3_V / 1_mps;
   constexpr auto Ka = 0.6_V / 1_mps_sq;
-  constexpr units::second_t dt = 20_ms;
+  constexpr wpi::units::second_t dt = 20_ms;
 
   constexpr Matrixd<1, 1> A{{-Kv.value() / Ka.value()}};
   constexpr Matrixd<1, 1> B{{1.0 / Ka.value()}};
 
-  frc::LinearPlantInversionFeedforward<1, 1> plantInversion{A, B, dt};
-  frc::SimpleMotorFeedforward<units::meter> simpleMotor{Ks, Kv, Ka};
+  wpi::math::LinearPlantInversionFeedforward<1, 1> plantInversion{A, B, dt};
+  wpi::math::SimpleMotorFeedforward<wpi::units::meter> simpleMotor{Ks, Kv, Ka};
 
   constexpr Vectord<1> r{{2.0}};
   constexpr Vectord<1> nextR{{3.0}};
@@ -46,11 +46,12 @@ TEST(SimpleMotorFeedforwardTest, NegativeGains) {
   constexpr auto Ks = 0.5_V;
   constexpr auto Kv = -3_V / 1_mps;
   constexpr auto Ka = -0.6_V / 1_mps_sq;
-  constexpr units::second_t dt = 0_ms;
-  frc::SimpleMotorFeedforward<units::meter> simpleMotor{Ks, Kv, Ka, dt};
+  constexpr wpi::units::second_t dt = 0_ms;
+  wpi::math::SimpleMotorFeedforward<wpi::units::meter> simpleMotor{Ks, Kv, Ka,
+                                                                   dt};
   EXPECT_EQ(simpleMotor.GetKv().value(), 0);
   EXPECT_EQ(simpleMotor.GetKa().value(), 0);
   EXPECT_EQ(simpleMotor.GetDt().value(), 0.02);
 }
 
-}  // namespace frc
+}  // namespace wpi::math

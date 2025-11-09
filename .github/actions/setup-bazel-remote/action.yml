@@ -1,0 +1,37 @@
+name: 'Setup Bazel Remote cache'
+description: 'Sets up bazel-remote cache using basic auth from GitHub secrets'
+
+inputs:
+  username:
+    description: 'Bazel remote cache username'
+  password:
+    description: 'Bazel remote cache password'
+  remote_url:
+    description: 'Bazel remote cache base URL (no credentials or protocol, e.g. gitlib-bazel.wpi.edu)'
+    default: 'gitlib-bazel.wpi.edu'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup bazel-remote (skip when no creds)
+      env:
+        CACHE_USER: ${{ inputs.username }}
+        CACHE_PASS: ${{ inputs.password }}
+        REMOTE_URL: ${{ inputs.remote_url }}
+      if: ${{ env.CACHE_USER == '' || env.CACHE_PASS == '' }}
+      shell: bash
+      run: |
+        echo "No bazel-remote credentials detected; leaving caching as previously configured"
+        echo "build:ci --config=remote_cache_readonly" >> bazel_auth.rc
+
+    - name: Setup bazel-remote (with creds)
+      env:
+        CACHE_USER: ${{ inputs.username }}
+        CACHE_PASS: ${{ inputs.password }}
+        REMOTE_URL: ${{ inputs.remote_url }}
+      if: ${{ env.CACHE_USER != '' && env.CACHE_PASS != '' }}
+      shell: bash
+      run: |
+        echo "Bazel-remote credentials detected; configuring bazel_auth.rc"
+        URL_WITH_CREDS="grpcs://${CACHE_USER}:${CACHE_PASS}@${REMOTE_URL}"
+        echo "build:remote_cache --remote_cache=${URL_WITH_CREDS}" >> bazel_auth.rc

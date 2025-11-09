@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "Robot.h"
+#include "Robot.hpp"
 
-#include <frc/DriverStation.h>
-#include <frc/internal/DriverStationModeThread.h>
-#include <hal/DriverStation.h>
-#include <networktables/NetworkTable.h>
+#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/hal/DriverStation.h"
+#include "wpi/internal/DriverStationModeThread.hpp"
+#include "wpi/nt/NetworkTable.hpp"
 
 Robot::Robot() {}
 
@@ -20,10 +20,10 @@ void Robot::Teleop() {}
 void Robot::Test() {}
 
 void Robot::StartCompetition() {
-  frc::internal::DriverStationModeThread modeThread;
+  wpi::internal::DriverStationModeThread modeThread;
 
-  wpi::Event event{false, false};
-  frc::DriverStation::ProvideRefreshedDataEventHandle(event.GetHandle());
+  wpi::util::Event event{false, false};
+  wpi::DriverStation::ProvideRefreshedDataEventHandle(event.GetHandle());
 
   // Tell the DS that the robot is ready to be enabled
   HAL_ObserveUserProgramStarting();
@@ -34,28 +34,28 @@ void Robot::StartCompetition() {
       Disabled();
       modeThread.InDisabled(false);
       while (IsDisabled()) {
-        wpi::WaitForObject(event.GetHandle());
+        wpi::util::WaitForObject(event.GetHandle());
       }
     } else if (IsAutonomous()) {
       modeThread.InAutonomous(true);
       Autonomous();
       modeThread.InAutonomous(false);
       while (IsAutonomousEnabled()) {
-        wpi::WaitForObject(event.GetHandle());
+        wpi::util::WaitForObject(event.GetHandle());
       }
     } else if (IsTest()) {
       modeThread.InTest(true);
       Test();
       modeThread.InTest(false);
       while (IsTest() && IsEnabled()) {
-        wpi::WaitForObject(event.GetHandle());
+        wpi::util::WaitForObject(event.GetHandle());
       }
     } else {
       modeThread.InTeleop(true);
       Teleop();
       modeThread.InTeleop(false);
       while (IsTeleopEnabled()) {
-        wpi::WaitForObject(event.GetHandle());
+        wpi::util::WaitForObject(event.GetHandle());
       }
     }
   }
@@ -65,8 +65,8 @@ void Robot::EndCompetition() {
   m_exit = true;
 }
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

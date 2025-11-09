@@ -1,0 +1,42 @@
+extra_includes:
+- gilsafe_object.h
+
+classes:
+  wpi::SendableChooser:
+    template_params:
+    - T
+    methods:
+      SendableChooser:
+      AddOption:
+      SetDefaultOption:
+      GetSelected:
+        # weirdness because return type
+        cpp_code: |
+          [](wpi::SendableChooser<T> * __that) -> py::object {
+            auto v = __that->GetSelected();
+            if (!v) {
+              return py::none();
+            }
+            return v;
+          }
+      OnChange:
+        # more weirdness
+        cpp_code: |
+          [](wpi::SendableChooser<T> *self, std::function<void(T)> fn) {
+            self->OnChange([fn](T v) {
+              py::gil_scoped_acquire lock;
+              if (v) {
+                fn(v);
+              } else {
+                fn(py::none());
+              }
+            });
+          }
+
+      InitSendable:
+
+templates:
+  SendableChooser:
+    qualname: wpi::SendableChooser
+    params:
+    - semiwrap::gilsafe_object

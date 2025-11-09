@@ -2,26 +2,25 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "AnalogInputSimGui.h"
+#include "AnalogInputSimGui.hpp"
 
 #include <memory>
 #include <vector>
 
-#include <glass/View.h>
-#include <glass/hardware/AnalogInput.h>
-#include <hal/Ports.h>
-#include <hal/simulation/AnalogInData.h>
-#include <hal/simulation/SimDeviceData.h>
-
-#include "HALDataSource.h"
-#include "HALSimGui.h"
+#include "wpi/glass/View.hpp"
+#include "wpi/glass/hardware/AnalogInput.hpp"
+#include "wpi/hal/Ports.h"
+#include "wpi/hal/simulation/AnalogInData.h"
+#include "wpi/hal/simulation/SimDeviceData.h"
+#include "wpi/halsim/gui/HALDataSource.hpp"
+#include "wpi/halsim/gui/HALSimGui.hpp"
 
 using namespace halsimgui;
 
 namespace {
 HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(AnalogInVoltage, "AIn");
 
-class AnalogInputSimModel : public glass::AnalogInputModel {
+class AnalogInputSimModel : public wpi::glass::AnalogInputModel {
  public:
   explicit AnalogInputSimModel(int32_t index)
       : m_index{index}, m_voltageData{m_index} {}
@@ -38,7 +37,7 @@ class AnalogInputSimModel : public glass::AnalogInputModel {
     }
   }
 
-  glass::DoubleSource* GetVoltageData() override { return &m_voltageData; }
+  wpi::glass::DoubleSource* GetVoltageData() override { return &m_voltageData; }
 
   void SetVoltage(double val) override {
     HALSIM_SetAnalogInVoltage(m_index, val);
@@ -49,7 +48,7 @@ class AnalogInputSimModel : public glass::AnalogInputModel {
   AnalogInVoltageSource m_voltageData;
 };
 
-class AnalogInputsSimModel : public glass::AnalogInputsModel {
+class AnalogInputsSimModel : public wpi::glass::AnalogInputsModel {
  public:
   AnalogInputsSimModel() : m_models(HAL_GetNumAnalogInputs()) {}
 
@@ -57,9 +56,9 @@ class AnalogInputsSimModel : public glass::AnalogInputsModel {
 
   bool Exists() override { return true; }
 
-  void ForEachAnalogInput(
-      wpi::function_ref<void(glass::AnalogInputModel& model, int index)> func)
-      override;
+  void ForEachAnalogInput(wpi::util::function_ref<
+                          void(wpi::glass::AnalogInputModel& model, int index)>
+                              func) override;
 
  private:
   // indexed by channel
@@ -82,7 +81,9 @@ void AnalogInputsSimModel::Update() {
 }
 
 void AnalogInputsSimModel::ForEachAnalogInput(
-    wpi::function_ref<void(glass::AnalogInputModel& model, int index)> func) {
+    wpi::util::function_ref<void(wpi::glass::AnalogInputModel& model,
+                                 int index)>
+        func) {
   for (int32_t i = 0, iend = static_cast<int32_t>(m_models.size()); i < iend;
        ++i) {
     if (auto model = m_models[i].get()) {
@@ -105,11 +106,12 @@ void AnalogInputSimGui::Initialize() {
   HALSimGui::halProvider->Register(
       "Analog Inputs", AnalogInputsAnyInitialized,
       [] { return std::make_unique<AnalogInputsSimModel>(); },
-      [](glass::Window* win, glass::Model* model) {
+      [](wpi::glass::Window* win, wpi::glass::Model* model) {
         win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
         win->SetDefaultPos(640, 20);
-        return glass::MakeFunctionView([=] {
-          glass::DisplayAnalogInputs(static_cast<AnalogInputsSimModel*>(model));
+        return wpi::glass::MakeFunctionView([=] {
+          wpi::glass::DisplayAnalogInputs(
+              static_cast<AnalogInputsSimModel*>(model));
         });
       });
 }

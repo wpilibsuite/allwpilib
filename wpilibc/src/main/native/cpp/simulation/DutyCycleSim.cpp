@@ -2,17 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/DutyCycleSim.h"
+#include "wpi/simulation/DutyCycleSim.hpp"
 
 #include <memory>
 #include <stdexcept>
 
-#include <hal/simulation/DutyCycleData.h>
+#include "wpi/hal/simulation/DutyCycleData.h"
+#include "wpi/hardware/rotation/DutyCycle.hpp"
 
-#include "frc/DutyCycle.h"
-
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 DutyCycleSim::DutyCycleSim(const DutyCycle& dutyCycle)
     : m_index{dutyCycle.GetSourceChannel()} {}
@@ -47,11 +46,11 @@ std::unique_ptr<CallbackStore> DutyCycleSim::RegisterFrequencyCallback(
   return store;
 }
 
-units::hertz_t DutyCycleSim::GetFrequency() const {
-  return units::hertz_t{HALSIM_GetDutyCycleFrequency(m_index)};
+wpi::units::hertz_t DutyCycleSim::GetFrequency() const {
+  return wpi::units::hertz_t{HALSIM_GetDutyCycleFrequency(m_index)};
 }
 
-void DutyCycleSim::SetFrequency(units::hertz_t frequency) {
+void DutyCycleSim::SetFrequency(wpi::units::hertz_t frequency) {
   HALSIM_SetDutyCycleFrequency(m_index, frequency.value());
 }
 

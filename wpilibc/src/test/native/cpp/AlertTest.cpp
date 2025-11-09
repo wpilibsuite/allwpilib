@@ -11,18 +11,18 @@
 
 #include <fmt/format.h>
 #include <gtest/gtest.h>
-#include <networktables/NetworkTableInstance.h>
-#include <networktables/StringArrayTopic.h>
 
-#include "frc/Alert.h"
-#include "frc/simulation/SimHooks.h"
-#include "frc/smartdashboard/SmartDashboard.h"
+#include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/nt/StringArrayTopic.hpp"
+#include "wpi/simulation/SimHooks.hpp"
+#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/util/Alert.hpp"
 
-using namespace frc;
+using namespace wpi;
 using enum Alert::AlertType;
 class AlertsTest : public ::testing::Test {
  public:
-  ~AlertsTest() {
+  ~AlertsTest() override {
     // test all destructors
     Update();
     EXPECT_EQ(GetSubscriberForType(kError).Get().size(), 0ul);
@@ -52,7 +52,7 @@ class AlertsTest : public ::testing::Test {
            activeAlerts.end();
   }
 
-  void Update() { frc::SmartDashboard::UpdateValues(); }
+  void Update() { wpi::SmartDashboard::UpdateValues(); }
 
  private:
   std::string GetSubtableName(Alert::AlertType type) {
@@ -68,8 +68,9 @@ class AlertsTest : public ::testing::Test {
     }
   }
 
-  const nt::StringArraySubscriber GetSubscriberForType(Alert::AlertType type) {
-    return nt::NetworkTableInstance::GetDefault()
+  const wpi::nt::StringArraySubscriber GetSubscriberForType(
+      Alert::AlertType type) {
+    return wpi::nt::NetworkTableInstance::GetDefault()
         .GetStringArrayTopic(fmt::format("/SmartDashboard/{}/{}",
                                          GetGroupName(), GetSubtableName(type)))
         .Subscribe({});
@@ -158,16 +159,16 @@ TEST_F(AlertsTest, SetTextWhileSet) {
 }
 
 TEST_F(AlertsTest, SetTextDoesNotAffectFirstOrderSort) {
-  frc::sim::PauseTiming();
+  wpi::sim::PauseTiming();
 
   auto a = MakeAlert("A", kError);
   auto b = MakeAlert("B", kError);
   auto c = MakeAlert("C", kError);
 
   a.Set(true);
-  frc::sim::StepTiming(1_s);
+  wpi::sim::StepTiming(1_s);
   b.Set(true);
-  frc::sim::StepTiming(1_s);
+  wpi::sim::StepTiming(1_s);
   c.Set(true);
 
   auto expectedEndState = GetActiveAlerts(kError);
@@ -176,7 +177,7 @@ TEST_F(AlertsTest, SetTextDoesNotAffectFirstOrderSort) {
   b.SetText("AFTER");
 
   EXPECT_STATE(kError, expectedEndState);
-  frc::sim::ResumeTiming();
+  wpi::sim::ResumeTiming();
 }
 
 TEST_F(AlertsTest, MoveAssign) {
@@ -209,42 +210,42 @@ TEST_F(AlertsTest, MoveConstruct) {
 }
 
 TEST_F(AlertsTest, SortOrder) {
-  frc::sim::PauseTiming();
+  wpi::sim::PauseTiming();
   auto a = MakeAlert("A", kInfo);
   auto b = MakeAlert("B", kInfo);
   auto c = MakeAlert("C", kInfo);
   a.Set(true);
   EXPECT_STATE(kInfo, "A");
-  frc::sim::StepTiming(1_s);
+  wpi::sim::StepTiming(1_s);
   b.Set(true);
   EXPECT_STATE(kInfo, "B", "A");
-  frc::sim::StepTiming(1_s);
+  wpi::sim::StepTiming(1_s);
   c.Set(true);
   EXPECT_STATE(kInfo, "C", "B", "A");
 
-  frc::sim::StepTiming(1_s);
+  wpi::sim::StepTiming(1_s);
   c.Set(false);
   EXPECT_STATE(kInfo, "B", "A");
 
-  frc::sim::StepTiming(1_s);
+  wpi::sim::StepTiming(1_s);
   c.Set(true);
   EXPECT_STATE(kInfo, "C", "B", "A");
 
-  frc::sim::StepTiming(1_s);
+  wpi::sim::StepTiming(1_s);
   a.Set(false);
   EXPECT_STATE(kInfo, "C", "B");
 
-  frc::sim::StepTiming(1_s);
+  wpi::sim::StepTiming(1_s);
   b.Set(false);
   EXPECT_STATE(kInfo, "C");
 
-  frc::sim::StepTiming(1_s);
+  wpi::sim::StepTiming(1_s);
   b.Set(true);
   EXPECT_STATE(kInfo, "B", "C");
 
-  frc::sim::StepTiming(1_s);
+  wpi::sim::StepTiming(1_s);
   a.Set(true);
   EXPECT_STATE(kInfo, "A", "B", "C");
 
-  frc::sim::ResumeTiming();
+  wpi::sim::ResumeTiming();
 }

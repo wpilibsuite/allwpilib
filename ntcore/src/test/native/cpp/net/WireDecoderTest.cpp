@@ -5,25 +5,25 @@
 #include <string>
 
 #include <gtest/gtest.h>
-#include <wpi/SmallString.h>
-#include <wpi/raw_ostream.h>
 
-#include "../MockLogger.h"
-#include "../PubSubOptionsMatcher.h"
-#include "../TestPrinters.h"
-#include "MockMessageHandler.h"
-#include "PubSubOptions.h"
+#include "../MockLogger.hpp"
+#include "../PubSubOptionsMatcher.hpp"
+#include "../TestPrinters.hpp"
+#include "MockMessageHandler.hpp"
+#include "PubSubOptions.hpp"
 #include "gmock/gmock.h"
-#include "net/MessageHandler.h"
-#include "net/WireDecoder.h"
-#include "networktables/NetworkTableValue.h"
+#include "net/MessageHandler.hpp"
+#include "net/WireDecoder.hpp"
+#include "wpi/nt/NetworkTableValue.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
 using namespace std::string_view_literals;
 using testing::_;
 using testing::MockFunction;
 using testing::StrictMock;
 
-namespace nt {
+namespace wpi::nt {
 
 class WireDecodeTextClientTest : public ::testing::Test {
  public:
@@ -108,17 +108,19 @@ TEST_F(WireDecodeTextClientTest, ErrorUnknownMethod) {
 }
 
 TEST_F(WireDecodeTextClientTest, PublishPropsEmpty) {
-  EXPECT_CALL(handler, ClientPublish(5, std::string_view{"test"},
-                                     std::string_view{"double"},
-                                     wpi::json::object(), PubSubOptionsEq({})));
+  EXPECT_CALL(
+      handler,
+      ClientPublish(5, std::string_view{"test"}, std::string_view{"double"},
+                    wpi::util::json::object(), PubSubOptionsEq({})));
   net::WireDecodeText(
       "[{\"method\":\"publish\",\"params\":{"
       "\"name\":\"test\",\"properties\":{},\"pubuid\":5,\"type\":\"double\"}}]",
       handler, logger);
 
-  EXPECT_CALL(handler, ClientPublish(5, std::string_view{"test"},
-                                     std::string_view{"double"},
-                                     wpi::json::object(), PubSubOptionsEq({})));
+  EXPECT_CALL(
+      handler,
+      ClientPublish(5, std::string_view{"test"}, std::string_view{"double"},
+                    wpi::util::json::object(), PubSubOptionsEq({})));
   net::WireDecodeText(
       "[{\"method\":\"publish\",\"params\":{"
       "\"name\":\"test\",\"pubuid\":5,\"type\":\"double\"}}]",
@@ -126,7 +128,7 @@ TEST_F(WireDecodeTextClientTest, PublishPropsEmpty) {
 }
 
 TEST_F(WireDecodeTextClientTest, PublishProps) {
-  wpi::json props = {{"k", 6}};
+  wpi::util::json props = {{"k", 6}};
   EXPECT_CALL(handler, ClientPublish(5, std::string_view{"test"},
                                      std::string_view{"double"}, props,
                                      PubSubOptionsEq({})));
@@ -192,4 +194,4 @@ TEST_F(WireDecodeTextClientTest, UnpublishError) {
       logger);
 }
 
-}  // namespace nt
+}  // namespace wpi::nt

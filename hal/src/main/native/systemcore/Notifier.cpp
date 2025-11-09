@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/Notifier.h"
+#include "wpi/hal/Notifier.h"
 
 #include <atomic>
 #include <chrono>
@@ -12,17 +12,16 @@
 #include <string>
 #include <utility>
 
-#include <wpi/SmallVector.h>
-#include <wpi/StringExtras.h>
-#include <wpi/condition_variable.h>
-#include <wpi/mutex.h>
-
 #include "HALInitializer.h"
-#include "hal/Errors.h"
-#include "hal/HALBase.h"
-#include "hal/cpp/fpga_clock.h"
-#include "hal/handles/UnlimitedHandleResource.h"
-#include "hal/simulation/NotifierData.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/HALBase.h"
+#include "wpi/hal/cpp/fpga_clock.h"
+#include "wpi/hal/handles/UnlimitedHandleResource.h"
+#include "wpi/hal/simulation/NotifierData.h"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/condition_variable.hpp"
+#include "wpi/util/mutex.hpp"
 
 namespace {
 struct Notifier {
@@ -30,15 +29,15 @@ struct Notifier {
   uint64_t waitTime = UINT64_MAX;
   bool active = true;
   bool waitTimeValid = false;  // True if waitTime is set and in the future
-  wpi::mutex mutex;
-  wpi::condition_variable cond;
+  wpi::util::mutex mutex;
+  wpi::util::condition_variable cond;
 };
 }  // namespace
 
-using namespace hal;
+using namespace wpi::hal;
 
-static wpi::mutex notifiersWaiterMutex;
-static wpi::condition_variable notifiersWaiterCond;
+static wpi::util::mutex notifiersWaiterMutex;
+static wpi::util::condition_variable notifiersWaiterCond;
 
 class NotifierHandleContainer
     : public UnlimitedHandleResource<HAL_NotifierHandle, Notifier,
@@ -59,17 +58,17 @@ class NotifierHandleContainer
 
 static NotifierHandleContainer* notifierHandles;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeNotifier() {
   static NotifierHandleContainer nH;
   notifierHandles = &nH;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 
 HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
   std::shared_ptr<Notifier> notifier = std::make_shared<Notifier>();
   HAL_NotifierHandle handle = notifierHandles->Allocate(notifier);
   if (handle == HAL_kInvalidHandle) {

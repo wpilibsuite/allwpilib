@@ -3,11 +3,11 @@ apply plugin: 'maven-publish'
 def baseExamplesArtifactId = 'examples'
 def baseTemplatesArtifactId = 'templates'
 def baseCommandsArtifactId = 'commands'
-def artifactGroupId = 'edu.wpi.first.wpilibc'
+def artifactGroupId = 'org.wpilib.wpilibc'
 
-def examplesZipBaseName = '_GROUP_edu_wpi_first_wpilibc_ID_examples_CLS'
-def templatesZipBaseName = '_GROUP_edu_wpi_first_wpilibc_ID_templates_CLS'
-def commandsZipBaseName = '_GROUP_edu_wpi_first_wpilibc_ID_commands_CLS'
+def examplesZipBaseName = '_GROUP_org_wpilib_wpilibc_ID_examples_CLS'
+def templatesZipBaseName = '_GROUP_org_wpilib_wpilibc_ID_templates_CLS'
+def commandsZipBaseName = '_GROUP_org_wpilib_wpilibc_ID_commands_CLS'
 
 def outputsFolder = file("$project.buildDir/outputs")
 
@@ -76,24 +76,24 @@ publishing {
             artifact cppExamplesZip
 
             artifactId = baseExamplesArtifactId
-            groupId artifactGroupId
-            version wpilibVersioning.version.get()
+            groupId = artifactGroupId
+            version = wpilibVersioning.version.get()
         }
 
         templates(MavenPublication) {
             artifact cppTemplatesZip
 
             artifactId = baseTemplatesArtifactId
-            groupId artifactGroupId
-            version wpilibVersioning.version.get()
+            groupId = artifactGroupId
+            version = wpilibVersioning.version.get()
         }
 
         commands(MavenPublication) {
             artifact cppCommandsZip
 
             artifactId = baseCommandsArtifactId
-            groupId artifactGroupId
-            version wpilibVersioning.version.get()
+            groupId = artifactGroupId
+            version = wpilibVersioning.version.get()
         }
     }
 }

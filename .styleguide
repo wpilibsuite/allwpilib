@@ -20,9 +20,16 @@ modifiableFileExclude {
 generatedFileExclude {
   FRCNetComm\.java$
   simulation/gz_msgs/src/include/simulation/gz_msgs/msgs\.h$
-  fieldImages/src/main/native/resources/
+  fields/src/main/native/resources/
   apriltag/src/test/resources/
   wpilibc/src/generated/
+
+  apriltag/src/main/python/
+  apriltag/src/test/python/
+  wpilibc/src/main/python/
+  wpilibc/src/test/python/
+  xrpVendordep/src/main/python/
+  xrpVendordep/src/test/python/
 }
 
 repoRootNameOverride {
@@ -35,21 +42,14 @@ includeOtherLibs {
   ^cscore
   ^fmt/
   ^glass/
-  ^google/
   ^gtest/
-  ^hal/
   ^imgui
   ^implot
   ^mockdata/
-  ^networktables/
-  ^ntcore
   ^opencv2/
   ^support/
   ^units/
   ^unsupported/
+  ^upb/
   ^vision/
-  ^wpi/
-  ^wpigui
-  ^wpimath/
-  ^wpinet/
 }
