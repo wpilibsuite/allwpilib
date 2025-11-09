@@ -121,3 +121,36 @@ jobs:
           name: ${{ matrix.platform }}-bazel-lint-fixes
           path: bazel-lint-fixes.patch
         if: ${{ failure() }}
+
+  robotpy_pregeneration:
+    name: "Robotpy Pregeneration"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+
+      - id: Setup_build_buddy
+        uses: ./.github/actions/setup-build-buddy
+        with:
+          token: ${{ secrets.BUILDBUDDY_API_KEY }}
+
+      # You should ensure the headers are correct before trying to pregen files
+      - name: Test Scan Headers
+        run: bazel test //... -k --test_tag_filters=robotpy_scan_headers --build_tests_only
+        shell: bash
+
+      - name: Run robotpy pregeneration
+        run: bazel run //:write_robotpy_files
+
+      - name: Check Output
+        run: git --no-pager diff --exit-code HEAD
+
+      - name: Generate diff
+        run: git diff HEAD > robotpy-pregeneration.patch
+        if: ${{ failure() }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.platform }}-robotpy-pregeneration-fixes
+          path: robotpy-pregeneration-fixes.patch
+        if: ${{ failure() }}
