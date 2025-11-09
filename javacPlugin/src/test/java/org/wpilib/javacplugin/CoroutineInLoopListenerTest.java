@@ -27,7 +27,7 @@ class CoroutineInLoopListenerTest {
   void noYieldInLoopWithoutCoroutines() {
     String source =
         """
-      package frc.robot;
+      package wpilib.robot;
 
       class Example {
         Runnable lambda = () -> {
@@ -40,7 +40,7 @@ class CoroutineInLoopListenerTest {
     Compilation compilation =
         javac()
             .withOptions(kJavaVersionOptions)
-            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+            .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
   }
@@ -49,7 +49,7 @@ class CoroutineInLoopListenerTest {
   void basicYieldInLoopInLambda() {
     String source =
         """
-      package frc.robot;
+      package wpilib.robot;
 
       import java.util.function.Consumer;
       import org.wpilib.command3.Coroutine;
@@ -68,7 +68,7 @@ class CoroutineInLoopListenerTest {
             .withOptions(kJavaVersionOptions)
             .compile(
                 JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
-                JavaFileObjects.forSourceString("frc.robot.Example", source));
+                JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
   }
@@ -77,7 +77,7 @@ class CoroutineInLoopListenerTest {
   void basicYieldInLoopInMethod() {
     String source =
         """
-      package frc.robot;
+      package wpilib.robot;
 
       import java.util.function.Consumer;
       import org.wpilib.command3.Coroutine;
@@ -96,7 +96,7 @@ class CoroutineInLoopListenerTest {
             .withOptions(kJavaVersionOptions)
             .compile(
                 JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
-                JavaFileObjects.forSourceString("frc.robot.Example", source));
+                JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
   }
@@ -105,7 +105,7 @@ class CoroutineInLoopListenerTest {
   void noYieldInLoopInLambda() {
     String source =
         """
-      package frc.robot;
+      package wpilib.robot;
 
       import java.util.function.Consumer;
       import org.wpilib.command3.Coroutine;
@@ -124,7 +124,7 @@ class CoroutineInLoopListenerTest {
             .withOptions(kJavaVersionOptions)
             .compile(
                 JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
-                JavaFileObjects.forSourceString("frc.robot.Example", source));
+                JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
@@ -136,7 +136,7 @@ class CoroutineInLoopListenerTest {
   void yieldInLoopInRunnableInLambda() {
     String source =
         """
-      package frc.robot;
+      package wpilib.robot;
 
       import java.util.function.Consumer;
       import org.wpilib.command3.Coroutine;
@@ -157,7 +157,7 @@ class CoroutineInLoopListenerTest {
             .withOptions(kJavaVersionOptions)
             .compile(
                 JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
-                JavaFileObjects.forSourceString("frc.robot.Example", source));
+                JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     // TODO: Should we make it an error to yield (or invoke any methods on) a captured coroutine?
     assertThat(compilation).succeededWithoutWarnings();
@@ -167,7 +167,7 @@ class CoroutineInLoopListenerTest {
   void noYieldInMethodWithManyCoroutineParams() {
     String source =
         """
-      package frc.robot;
+      package wpilib.robot;
 
       import java.util.function.Consumer;
       import org.wpilib.command3.Coroutine;
@@ -190,7 +190,7 @@ class CoroutineInLoopListenerTest {
             .withOptions(kJavaVersionOptions)
             .compile(
                 JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
-                JavaFileObjects.forSourceString("frc.robot.Example", source));
+                JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
@@ -208,7 +208,7 @@ class CoroutineInLoopListenerTest {
   void noYieldsInNestedLambda() {
     String source =
         """
-      package frc.robot;
+      package wpilib.robot;
 
       import java.util.function.Consumer;
       import org.wpilib.command3.Coroutine;
@@ -229,7 +229,7 @@ class CoroutineInLoopListenerTest {
             .withOptions(kJavaVersionOptions)
             .compile(
                 JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
-                JavaFileObjects.forSourceString("frc.robot.Example", source));
+                JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
@@ -241,7 +241,7 @@ class CoroutineInLoopListenerTest {
   void nestedLambdaYieldsToOuter() {
     String source =
         """
-      package frc.robot;
+      package wpilib.robot;
 
       import java.util.function.Consumer;
       import org.wpilib.command3.Coroutine;
@@ -262,7 +262,7 @@ class CoroutineInLoopListenerTest {
             .withOptions(kJavaVersionOptions)
             .compile(
                 JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
-                JavaFileObjects.forSourceString("frc.robot.Example", source));
+                JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
 
@@ -277,7 +277,7 @@ class CoroutineInLoopListenerTest {
   void noYieldsInNestedLoops() {
     String source =
         """
-      package frc.robot;
+      package wpilib.robot;
 
       import java.util.function.Consumer;
       import org.wpilib.command3.Coroutine;
@@ -299,7 +299,7 @@ class CoroutineInLoopListenerTest {
             .withOptions(kJavaVersionOptions)
             .compile(
                 JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
-                JavaFileObjects.forSourceString("frc.robot.Example", source));
+                JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(2, compilation.errors().size());
@@ -317,7 +317,7 @@ class CoroutineInLoopListenerTest {
   void noYieldInOuterLoopButYieldInInnerLoop() {
     String source =
         """
-      package frc.robot;
+      package wpilib.robot;
 
       import java.util.function.Consumer;
       import org.wpilib.command3.Coroutine;
@@ -339,7 +339,7 @@ class CoroutineInLoopListenerTest {
             .withOptions(kJavaVersionOptions)
             .compile(
                 JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
-                JavaFileObjects.forSourceString("frc.robot.Example", source));
+                JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
@@ -352,7 +352,7 @@ class CoroutineInLoopListenerTest {
   void noYieldInInnerLoopButYieldInOuterLoop() {
     String source =
         """
-      package frc.robot;
+      package wpilib.robot;
 
       import java.util.function.Consumer;
       import org.wpilib.command3.Coroutine;
@@ -374,7 +374,7 @@ class CoroutineInLoopListenerTest {
             .withOptions(kJavaVersionOptions)
             .compile(
                 JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
-                JavaFileObjects.forSourceString("frc.robot.Example", source));
+                JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
@@ -387,7 +387,7 @@ class CoroutineInLoopListenerTest {
   void noYieldsInDeeplyNestedLoops() {
     String source =
         """
-      package frc.robot;
+      package wpilib.robot;
 
       import java.util.function.Consumer;
       import org.wpilib.command3.Coroutine;
@@ -420,7 +420,7 @@ class CoroutineInLoopListenerTest {
             .withOptions(kJavaVersionOptions)
             .compile(
                 JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
-                JavaFileObjects.forSourceString("frc.robot.Example", source));
+                JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(7, compilation.errors().size());
