@@ -23,13 +23,10 @@ http_archive(
     url = "https://github.com/bazelbuild/rules_cc/releases/download/0.1.4/rules_cc-0.1.4.tar.gz",
 )
 
-# TODO(austinschuh): Update to the next released apple_support once it lands.
-# This needs to contain https://github.com/bazelbuild/apple_support/commit/7009b77c98a67d3fea081c9db4dbcee8effc3b7e and should be the next release after 1.22.1
 http_archive(
     name = "build_bazel_apple_support",
-    sha256 = "7d542be113180bc1da3660e51fe4792a867fb85537c9ef36a0d3366665a76803",
-    strip_prefix = "apple_support-7009b77c98a67d3fea081c9db4dbcee8effc3b7e",
-    url = "https://github.com/bazelbuild/apple_support/archive/7009b77c98a67d3fea081c9db4dbcee8effc3b7e.tar.gz",
+    sha256 = "93456fae59f225693fae7e0fdbb2899433766d7e8c0797ed28e35c6f04b5f255",
+    url = "https://github.com/bazelbuild/apple_support/releases/download/1.24.4/apple_support.1.24.4.tar.gz",
 )
 
 http_archive(
