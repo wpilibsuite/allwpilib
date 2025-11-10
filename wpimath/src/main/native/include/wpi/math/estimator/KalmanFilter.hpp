@@ -262,6 +262,9 @@ class KalmanFilter {
   StateMatrix m_initP;
 };
 
+template <int States, int Inputs, int Outputs>
+using KF = KalmanFilter<States, Inputs, Outputs>;
+
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
     KalmanFilter<1, 1, 1>;
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)

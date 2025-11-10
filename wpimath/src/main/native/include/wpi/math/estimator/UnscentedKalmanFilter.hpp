@@ -496,4 +496,7 @@ class UnscentedKalmanFilter {
   SigmaPoints m_pts;
 };
 
+template <int States, int Inputs, int Outputs, SigmaPoints<States> SigmaPoints>
+using UKF = UnscentedKalmanFilter<States, Inputs, Outputs, SigmaPoints>;
+
 }  // namespace wpi::math

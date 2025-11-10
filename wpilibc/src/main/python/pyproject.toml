@@ -60,9 +60,6 @@ update_init = [
 scan_headers_ignore = [
     "wpi/system/WPILibVersion.hpp",
 
-    # needs a python wrapper
-    "frc/AsynchronousInterrupt.h",
-
     "wpi/system/Filesystem.hpp",
     "wpi/system/Notifier.hpp", # wrapped separately
     "wpi/system/Resource.hpp",
@@ -91,78 +88,62 @@ includes = ["wpilib/src"]
 DYNAMIC_CAMERA_SERVER = 1
 
 [tool.semiwrap.extension_modules."wpilib._wpilib".headers]
-# frc
-ADXL345_I2C = "wpi/hardware/accelerometer/ADXL345_I2C.hpp"
-AddressableLED = "wpi/hardware/led/AddressableLED.hpp"
-Alert = "wpi/util/Alert.hpp"
-AnalogAccelerometer = "wpi/hardware/accelerometer/AnalogAccelerometer.hpp"
-AnalogEncoder = "wpi/hardware/rotation/AnalogEncoder.hpp"
-AnalogInput = "wpi/hardware/discrete/AnalogInput.hpp"
-AnalogPotentiometer = "wpi/hardware/rotation/AnalogPotentiometer.hpp"
-CAN = "wpi/hardware/bus/CAN.hpp"
-Compressor = "wpi/hardware/pneumatic/Compressor.hpp"
-CompressorConfigType = "wpi/hardware/pneumatic/CompressorConfigType.hpp"
-DataLogManager = "wpi/system/DataLogManager.hpp"
-DSControlWord = "wpi/driverstation/DSControlWord.hpp"
-DigitalInput = "wpi/hardware/discrete/DigitalInput.hpp"
-DigitalOutput = "wpi/hardware/discrete/DigitalOutput.hpp"
-DoubleSolenoid = "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
-DriverStation = "wpi/driverstation/DriverStation.hpp"
-DutyCycle = "wpi/hardware/rotation/DutyCycle.hpp"
-DutyCycleEncoder = "wpi/hardware/rotation/DutyCycleEncoder.hpp"
-Encoder = "wpi/hardware/rotation/Encoder.hpp"
-Errors = "wpi/system/Errors.hpp"
+# rpy
+Filesystem = "rpy/Filesystem.h"
+MotorControllerGroup = "rpy/MotorControllerGroup.h"
+Notifier = "rpy/Notifier.h"
+
+# wpi
 ExpansionHub = "wpi/ExpansionHub.hpp"
 ExpansionHubMotor = "wpi/ExpansionHubMotor.hpp"
 ExpansionHubPidConstants = "wpi/ExpansionHubPidConstants.hpp"
 ExpansionHubServo = "wpi/ExpansionHubServo.hpp"
-Filesystem = "rpy/Filesystem.h"
+
+# wpi/driverstation
+DSControlWord = "wpi/driverstation/DSControlWord.hpp"
+DriverStation = "wpi/driverstation/DriverStation.hpp"
 Gamepad = "wpi/driverstation/Gamepad.hpp"
-I2C = "wpi/hardware/bus/I2C.hpp"
-IterativeRobotBase = "wpi/framework/IterativeRobotBase.hpp"
+GenericHID = "wpi/driverstation/GenericHID.hpp"
 Joystick = "wpi/driverstation/Joystick.hpp"
-LEDPattern = "wpi/hardware/led/LEDPattern.hpp"
-MotorSafety = "wpi/hardware/motor/MotorSafety.hpp"
-Notifier = "rpy/Notifier.h"
-OnboardIMU = "wpi/hardware/imu/OnboardIMU.hpp"
 PS4Controller = "wpi/driverstation/PS4Controller.hpp"
 PS5Controller = "wpi/driverstation/PS5Controller.hpp"
-PWM = "wpi/hardware/discrete/PWM.hpp"
-PneumaticHub = "wpi/hardware/pneumatic/PneumaticHub.hpp"
-PneumaticsBase = "wpi/hardware/pneumatic/PneumaticsBase.hpp"
-PneumaticsControlModule = "wpi/hardware/pneumatic/PneumaticsControlModule.hpp"
-PneumaticsModuleType = "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
-PowerDistribution = "wpi/hardware/power/PowerDistribution.hpp"
-Preferences = "wpi/util/Preferences.hpp"
-RobotBase = "wpi/framework/RobotBase.hpp"
-RobotController = "wpi/system/RobotController.hpp"
-RobotState = "wpi/framework/RobotState.hpp"
-RuntimeType = "wpi/system/RuntimeType.hpp"
-SensorUtil = "wpi/util/SensorUtil.hpp"
-SerialPort = "wpi/hardware/bus/SerialPort.hpp"
-SharpIR = "wpi/hardware/range/SharpIR.hpp"
-Solenoid = "wpi/hardware/pneumatic/Solenoid.hpp"
 StadiaController = "wpi/driverstation/StadiaController.hpp"
-SystemServer = "wpi/system/SystemServer.hpp"
-Threads = "wpi/system/Threads.hpp"
-TimedRobot = "wpi/framework/TimedRobot.hpp"
-Timer = "wpi/system/Timer.hpp"
-TimesliceRobot = "wpi/framework/TimesliceRobot.hpp"
-Tracer = "wpi/system/Tracer.hpp"
-Watchdog = "wpi/system/Watchdog.hpp"
 XboxController = "wpi/driverstation/XboxController.hpp"
 
-# frc (interfaces)
+# wpi/framework
+IterativeRobotBase = "wpi/framework/IterativeRobotBase.hpp"
+RobotBase = "wpi/framework/RobotBase.hpp"
+RobotState = "wpi/framework/RobotState.hpp"
+TimedRobot = "wpi/framework/TimedRobot.hpp"
+TimesliceRobot = "wpi/framework/TimesliceRobot.hpp"
+
+# wpi/hardware/accelerometer
+ADXL345_I2C = "wpi/hardware/accelerometer/ADXL345_I2C.hpp"
+AnalogAccelerometer = "wpi/hardware/accelerometer/AnalogAccelerometer.hpp"
+
+# wpi/hardware/bus
+CAN = "wpi/hardware/bus/CAN.hpp"
+I2C = "wpi/hardware/bus/I2C.hpp"
+SerialPort = "wpi/hardware/bus/SerialPort.hpp"
+
+# wpi/hardware/discrete
+AnalogInput = "wpi/hardware/discrete/AnalogInput.hpp"
 CounterBase = "wpi/hardware/discrete/CounterBase.hpp"
-GenericHID = "wpi/driverstation/GenericHID.hpp"
-MotorController = "wpi/hardware/motor/MotorController.hpp"
+DigitalInput = "wpi/hardware/discrete/DigitalInput.hpp"
+DigitalOutput = "wpi/hardware/discrete/DigitalOutput.hpp"
+PWM = "wpi/hardware/discrete/PWM.hpp"
 
-# frc/internal
-DriverStationModeThread = "wpi/internal/DriverStationModeThread.hpp"
+# wpi/hardware/imu
+OnboardIMU = "wpi/hardware/imu/OnboardIMU.hpp"
 
-# frc/motorcontrol
+# wpi/hardware/led
+AddressableLED = "wpi/hardware/led/AddressableLED.hpp"
+LEDPattern = "wpi/hardware/led/LEDPattern.hpp"
+
+# wpi/hardware/motor
 Koors40 = "wpi/hardware/motor/Koors40.hpp"
-MotorControllerGroup = "rpy/MotorControllerGroup.h"
+MotorController = "wpi/hardware/motor/MotorController.hpp"
+MotorSafety = "wpi/hardware/motor/MotorSafety.hpp"
 PWMMotorController = "wpi/hardware/motor/PWMMotorController.hpp"
 PWMSparkFlex = "wpi/hardware/motor/PWMSparkFlex.hpp"
 PWMSparkMax = "wpi/hardware/motor/PWMSparkMax.hpp"
@@ -175,7 +156,33 @@ SparkMini = "wpi/hardware/motor/SparkMini.hpp"
 Talon = "wpi/hardware/motor/Talon.hpp"
 VictorSP = "wpi/hardware/motor/VictorSP.hpp"
 
-# frc/smartdashboard
+# wpi/hardware/pneumatic
+Compressor = "wpi/hardware/pneumatic/Compressor.hpp"
+CompressorConfigType = "wpi/hardware/pneumatic/CompressorConfigType.hpp"
+DoubleSolenoid = "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
+PneumaticHub = "wpi/hardware/pneumatic/PneumaticHub.hpp"
+PneumaticsBase = "wpi/hardware/pneumatic/PneumaticsBase.hpp"
+PneumaticsControlModule = "wpi/hardware/pneumatic/PneumaticsControlModule.hpp"
+PneumaticsModuleType = "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
+Solenoid = "wpi/hardware/pneumatic/Solenoid.hpp"
+
+# wpi/hardware/power
+PowerDistribution = "wpi/hardware/power/PowerDistribution.hpp"
+
+# wpi/hardware/range
+SharpIR = "wpi/hardware/range/SharpIR.hpp"
+
+# wpi/hardware/rotation
+AnalogEncoder = "wpi/hardware/rotation/AnalogEncoder.hpp"
+AnalogPotentiometer = "wpi/hardware/rotation/AnalogPotentiometer.hpp"
+DutyCycle = "wpi/hardware/rotation/DutyCycle.hpp"
+DutyCycleEncoder = "wpi/hardware/rotation/DutyCycleEncoder.hpp"
+Encoder = "wpi/hardware/rotation/Encoder.hpp"
+
+# wpi/internal
+DriverStationModeThread = "wpi/internal/DriverStationModeThread.hpp"
+
+# wpi/smartdashboard
 Field2d = "wpi/smartdashboard/Field2d.hpp"
 FieldObject2d = "wpi/smartdashboard/FieldObject2d.hpp"
 Mechanism2d = "wpi/smartdashboard/Mechanism2d.hpp"
@@ -187,12 +194,26 @@ SendableChooser = "wpi/smartdashboard/SendableChooser.hpp"
 SendableChooserBase = "wpi/smartdashboard/SendableChooserBase.hpp"
 SmartDashboard = "wpi/smartdashboard/SmartDashboard.hpp"
 
-# frc/sysid
+# wpi/sysid
 SysIdRoutineLog = "wpi/sysid/SysIdRoutineLog.hpp"
 
-# frc/util
+# wpi/system
+DataLogManager = "wpi/system/DataLogManager.hpp"
+Errors = "wpi/system/Errors.hpp"
+RobotController = "wpi/system/RobotController.hpp"
+RuntimeType = "wpi/system/RuntimeType.hpp"
+SystemServer = "wpi/system/SystemServer.hpp"
+Threads = "wpi/system/Threads.hpp"
+Timer = "wpi/system/Timer.hpp"
+Tracer = "wpi/system/Tracer.hpp"
+Watchdog = "wpi/system/Watchdog.hpp"
+
+# wpi/util
+Alert = "wpi/util/Alert.hpp"
 Color = "wpi/util/Color.hpp"
 Color8Bit = "wpi/util/Color8Bit.hpp"
+Preferences = "wpi/util/Preferences.hpp"
+SensorUtil = "wpi/util/SensorUtil.hpp"
 
 
 [tool.semiwrap.extension_modules."wpilib.counter._counter"]
@@ -202,7 +223,7 @@ depends = ["wpilib"]
 yaml_path = "semiwrap/counter"
 
 [tool.semiwrap.extension_modules."wpilib.counter._counter".headers]
-# frc/counter
+# wpi/counter
 EdgeConfiguration = "wpi/counter/EdgeConfiguration.hpp"
 Tachometer = "wpi/counter/Tachometer.hpp"
 UpDownCounter = "wpi/counter/UpDownCounter.hpp"
@@ -215,7 +236,7 @@ depends = ["wpilib"]
 yaml_path = "semiwrap/drive"
 
 [tool.semiwrap.extension_modules."wpilib.drive._drive".headers]
-# frc/drive
+# wpi/drive
 DifferentialDrive = "wpi/drive/DifferentialDrive.hpp"
 MecanumDrive = "wpi/drive/MecanumDrive.hpp"
 RobotDriveBase = "wpi/drive/RobotDriveBase.hpp"
@@ -229,7 +250,7 @@ depends = ["wpimath_filter"]
 yaml_path = "semiwrap/event"
 
 [tool.semiwrap.extension_modules."wpilib.event._event".headers]
-# frc/event
+# wpi/event
 BooleanEvent = "wpi/event/BooleanEvent.hpp"
 EventLoop = "wpi/event/EventLoop.hpp"
 NetworkBooleanEvent = "wpi/event/NetworkBooleanEvent.hpp"
@@ -242,7 +263,7 @@ depends = ["wpilib", "wpimath_controls", "wpimath_geometry", "wpimath_kinematics
 yaml_path = "semiwrap/simulation"
 
 [tool.semiwrap.extension_modules."wpilib.simulation._simulation".headers]
-# frc/simulation
+# wpi/simulation
 ADXL345Sim = "wpi/simulation/ADXL345Sim.hpp"
 AddressableLEDSim = "wpi/simulation/AddressableLEDSim.hpp"
 AnalogEncoderSim = "wpi/simulation/AnalogEncoderSim.hpp"

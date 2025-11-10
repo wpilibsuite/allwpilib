@@ -311,6 +311,9 @@ class LinearQuadraticRegulator {
   Matrixd<Inputs, States> m_K;
 };
 
+template <int States, int Inputs>
+using LQR = LinearQuadraticRegulator<States, Inputs>;
+
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
     LinearQuadraticRegulator<1, 1>;
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
