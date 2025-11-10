@@ -89,6 +89,7 @@ http_archive(
 http_archive(
     name = "pybind11",
     build_file = "@pybind11_bazel//:pybind11-BUILD.bazel",
+    integrity = "sha256-wkxQme/TKRS6e0rFedV3IH00zgb8ZsZktnc3HRi9DyU=",
     strip_prefix = "pybind11-dfe7e65b4527eeb11036402aac3a394130960bb2",
     urls = ["https://github.com/pybind/pybind11/archive/dfe7e65b4527eeb11036402aac3a394130960bb2.zip"],
 )
