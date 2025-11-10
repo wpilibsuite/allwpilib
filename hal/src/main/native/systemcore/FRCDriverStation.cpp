@@ -177,7 +177,7 @@ struct SystemServerDriverStation {
         mrc::OpMode{"Test", mrc::OpModeHash::MakeTest(3)});
     testOpModes.Set(staticTestOpModes);
 
-    ntInst.AddListener(
+    controlDataListener = ntInst.AddListener(
         controlDataSubscriber, NT_EVENT_VALUE_REMOTE | NT_EVENT_UNPUBLISH,
         [this](const wpi::nt::Event& event) { HandleListener(event); });
 
