@@ -4,41 +4,11 @@
 
 #include <benchmark/benchmark.h>
 
-#include "wpi/math/geometry/Pose2d.hpp"
-#include "wpi/math/path/TravelingSalesman.hpp"
-#include "wpi/units/angle.hpp"
-#include "wpi/units/length.hpp"
-#include "wpi/util/array.hpp"
+#include "CartPoleBenchmark.hpp"
+#include "TravelingSalesmanBenchmark.hpp"
 
-static constexpr wpi::util::array<wpi::math::Pose2d, 6> poses{
-    wpi::math::Pose2d{-1_m, 1_m, -90_deg}, wpi::math::Pose2d{-1_m, 2_m, 90_deg},
-    wpi::math::Pose2d{0_m, 0_m, 0_deg},    wpi::math::Pose2d{0_m, 3_m, -90_deg},
-    wpi::math::Pose2d{1_m, 1_m, 90_deg},   wpi::math::Pose2d{1_m, 2_m, 90_deg},
-};
-static constexpr int iterations = 100;
-
-void BM_Transform(benchmark::State& state) {
-  wpi::math::TravelingSalesman traveler{[](auto pose1, auto pose2) {
-    auto transform = pose2 - pose1;
-    return wpi::units::math::hypot(transform.X(), transform.Y()).value();
-  }};
-  // NOLINTNEXTLINE(clang-analyzer-deadcode.DeadStores)
-  for (auto _ : state) {
-    traveler.Solve(poses, iterations);
-  }
-}
-BENCHMARK(BM_Transform);
-
-void BM_Twist(benchmark::State& state) {
-  wpi::math::TravelingSalesman traveler{[](auto pose1, auto pose2) {
-    auto twist = (pose2 - pose1).Log();
-    return wpi::units::math::hypot(twist.dx, twist.dy).value();
-  }};
-  // NOLINTNEXTLINE(clang-analyzer-deadcode.DeadStores)
-  for (auto _ : state) {
-    traveler.Solve(poses, iterations);
-  }
-}
-BENCHMARK(BM_Twist);
+BENCHMARK(BM_CartPole);
+BENCHMARK(BM_TravelingSalesman_Transform);
+BENCHMARK(BM_TravelingSalesman_Twist);
 
 BENCHMARK_MAIN();
