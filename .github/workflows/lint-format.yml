@@ -87,9 +87,9 @@ jobs:
       - name: List changed files
         run: ${{ runner.temp }}/wpiformat/bin/wpiformat -list-changed-files
       - name: Run clang-tidy release
-        run: ${{ runner.temp }}/wpiformat/bin/wpiformat -no-format -tidy-changed -compile-commands=build/TargetedCompileCommands/linuxx86-64release -vv
+        run: ${{ runner.temp }}/wpiformat/bin/wpiformat -no-format -tidy-changed -compile-commands=build/TargetedCompileCommands/linuxx86-64release
       - name: Run clang-tidy debug
-        run: ${{ runner.temp }}/wpiformat/bin/wpiformat -no-format -tidy-changed -compile-commands=build/TargetedCompileCommands/linuxx86-64debug -vv
+        run: ${{ runner.temp }}/wpiformat/bin/wpiformat -no-format -tidy-changed -compile-commands=build/TargetedCompileCommands/linuxx86-64debug
   javaformat:
     name: "Java format"
     runs-on: ubuntu-24.04
