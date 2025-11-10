@@ -602,6 +602,8 @@ inline jbooleanArray MakeJBooleanArray(JNIEnv* env, std::span<const bool> arr) {
 WPI_JNI_MAKEJARRAY(jboolean, Boolean)
 WPI_JNI_MAKEJARRAY(jbyte, Byte)
 WPI_JNI_MAKEJARRAY(jshort, Short)
+WPI_JNI_MAKEJARRAY(jint, Int)
+WPI_JNI_MAKEJARRAY(jlong, Long)
 WPI_JNI_MAKEJARRAY(jfloat, Float)
 WPI_JNI_MAKEJARRAY(jdouble, Double)
 
