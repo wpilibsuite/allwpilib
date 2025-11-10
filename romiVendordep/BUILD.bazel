@@ -5,7 +5,7 @@ load("//romiVendordep:robotpy_native_build_info.bzl", "define_native_wrapper")
 load("//romiVendordep:robotpy_pybind_build_info.bzl", "define_pybind_library", "romi_extension")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_library")
-load("//shared/bazel/rules:packaging.bzl", "package_minimal_cc_project")
+load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project")
 load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info", "generate_robotpy_pybind_build_info")
 load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
 
@@ -101,7 +101,7 @@ java_binary(
     ],
 )
 
-package_minimal_cc_project(
+package_default_cc_project(
     name = "romiVendordep",
     maven_artifact_name = "romiVendordep-cpp",
     maven_group_id = "org.wpilib.romiVendordep",

@@ -69,6 +69,7 @@ publish_all(
         "//cameraserver:cameraserver-java_publish.publish",
         "//cscore:cscore-cpp_publish.publish",
         "//cscore:cscore-java_publish.publish",
+        "//cscore:cscorejnicvstatic-cpp_publish.publish",
         "//datalog:datalog-cpp_publish.publish",
         "//datalog:datalog-java_publish.publish",
         "//tools/datalogtool:datalogtool_publish.publish",

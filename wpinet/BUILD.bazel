@@ -5,7 +5,7 @@ load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
-load("//shared/bazel/rules:packaging.bzl", "package_minimal_jni_project")
+load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project")
 load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info", "generate_robotpy_pybind_build_info")
 load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
 load("//wpinet:robotpy_native_build_info.bzl", "define_native_wrapper")
@@ -350,7 +350,7 @@ robotpy_py_test(
     ],
 )
 
-package_minimal_jni_project(
+package_default_jni_project(
     name = "wpinet",
     maven_artifact_name = "wpinet-cpp",
     maven_group_id = "org.wpilib.wpinet",

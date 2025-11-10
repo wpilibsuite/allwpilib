@@ -1,7 +1,7 @@
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test", "wpilib_java_library")
-load("//shared/bazel/rules:packaging.bzl", "package_minimal_cc_project")
+load("//shared/bazel/rules:packaging.bzl", "package_static_cc_project")
 load("//shared/bazel/rules/gen:gen-resources.bzl", "generate_resources")
 
 generate_resources(
@@ -61,7 +61,7 @@ wpilib_java_junit5_test(
     ],
 )
 
-package_minimal_cc_project(
+package_static_cc_project(
     name = "fields",
     maven_artifact_name = "fields-cpp",
     maven_group_id = "org.wpilib.fields",
