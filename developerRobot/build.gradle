@@ -308,7 +308,7 @@ model {
             }
         }
 
-        installSystemCore(Task) {
+        installSystemcore(Task) {
             $.binaries.each {
                 if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore && it.component.name == 'developerRobotCpp') {
                     dependsOn it.tasks.install
@@ -316,7 +316,7 @@ model {
             }
         }
 
-        installSystemCoreStatic(Task) {
+        installSystemcoreStatic(Task) {
             $.binaries.each {
                 if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore && it.component.name == 'developerRobotCppStatic') {
                     dependsOn it.tasks.install

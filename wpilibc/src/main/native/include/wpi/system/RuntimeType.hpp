@@ -15,6 +15,6 @@ enum RuntimeType {
   kRoboRIO2,
   /// Simulation runtime.
   kSimulation,
-  kSystemCore
+  kSystemcore
 };
 }  // namespace wpi

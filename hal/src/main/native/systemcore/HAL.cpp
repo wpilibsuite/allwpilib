@@ -164,7 +164,7 @@ const char* HAL_GetErrorMessage(int32_t code) {
   }
 }
 
-static HAL_RuntimeType runtimeType = HAL_Runtime_SystemCore;
+static HAL_RuntimeType runtimeType = HAL_Runtime_Systemcore;
 
 HAL_RuntimeType HAL_GetRuntimeType(void) {
   return runtimeType;

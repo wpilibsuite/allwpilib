@@ -33,8 +33,8 @@ static_assert(wpi::RuntimeType::kRoboRIO2 ==
               static_cast<wpi::RuntimeType>(HAL_Runtime_RoboRIO2));
 static_assert(wpi::RuntimeType::kSimulation ==
               static_cast<wpi::RuntimeType>(HAL_Runtime_Simulation));
-static_assert(wpi::RuntimeType::kSystemCore ==
-              static_cast<wpi::RuntimeType>(HAL_Runtime_SystemCore));
+static_assert(wpi::RuntimeType::kSystemcore ==
+              static_cast<wpi::RuntimeType>(HAL_Runtime_Systemcore));
 
 using SetCameraServerSharedFP = void (*)(wpi::CameraServerShared*);
 

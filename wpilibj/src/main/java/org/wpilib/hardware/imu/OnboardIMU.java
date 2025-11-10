@@ -9,22 +9,22 @@ import org.wpilib.math.geometry.Quaternion;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Rotation3d;
 
-/** SystemCore onboard IMU. */
+/** Systemcore onboard IMU. */
 public class OnboardIMU {
-  /** A mount orientation of SystemCore. */
+  /** A mount orientation of Systemcore. */
   public enum MountOrientation {
     /** Flat (mounted parallel to the ground). */
     kFlat,
-    /** Landscape (vertically mounted with long edge of SystemCore parallel to the ground). */
+    /** Landscape (vertically mounted with long edge of Systemcore parallel to the ground). */
     kLandscape,
-    /** Portrait (vertically mounted with the short edge of SystemCore parallel to the ground). */
+    /** Portrait (vertically mounted with the short edge of Systemcore parallel to the ground). */
     kPortrait
   }
 
   /**
-   * Constructs a handle to the SystemCore onboard IMU.
+   * Constructs a handle to the Systemcore onboard IMU.
    *
-   * @param mountOrientation the mount orientation of SystemCore to determine yaw.
+   * @param mountOrientation the mount orientation of Systemcore to determine yaw.
    */
   public OnboardIMU(MountOrientation mountOrientation) {
     m_mountOrientation = mountOrientation;

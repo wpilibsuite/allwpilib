@@ -43,7 +43,7 @@ public final class HALUtil extends JNIWrapper {
   /** Simulation runtime. */
   public static final int RUNTIME_SIMULATION = 2;
 
-  /** SystemCore. */
+  /** Systemcore. */
   public static final int RUNTIME_SYSTEMCORE = 3;
 
   /**

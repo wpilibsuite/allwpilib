@@ -37,7 +37,7 @@ static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_ROBORIO2 ==
 static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_SIMULATION ==
               HAL_Runtime_Simulation);
 static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_SYSTEMCORE ==
-              HAL_Runtime_SystemCore);
+              HAL_Runtime_Systemcore);
 
 static JavaVM* jvm = nullptr;
 static JException illegalArgExCls;
