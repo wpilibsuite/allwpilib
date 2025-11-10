@@ -89,22 +89,22 @@ doxygen.sourceSets.main {
     }
 
     if (project.hasProperty('docWarningsAsErrors')) {
-        // apriltag
-        exclude 'apriltag_pose.h'
-
         // LLVM
         exclude 'wpi/util/Compiler.hpp'
         exclude 'wpi/util/ErrorHandling.hpp'
-        exclude 'wpi/util/bit.hpp'
-        exclude 'wpi/util/raw_ostream.hpp'
         exclude 'wpi/util/SmallVector.hpp'
         exclude 'wpi/util/StringExtras.hpp'
+        exclude 'wpi/util/bit.hpp'
+        exclude 'wpi/util/raw_ostream.hpp'
 
-        // libuv
-        exclude 'uv/**'
+        // apriltag
+        exclude 'apriltag_pose.h'
 
         // json
         exclude 'wpi/util/detail/**'
+
+        // libuv
+        exclude 'uv/**'
 
         // mpack
         exclude 'wpi/util/mpack.h'
