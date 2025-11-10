@@ -42,18 +42,18 @@ http_archive(
 
 http_archive(
     name = "rules_pkg",
-    sha256 = "cad05f864a32799f6f9022891de91ac78f30e0fa07dc68abac92a628121b5b11",
+    sha256 = "b7215c636f22c1849f1c3142c72f4b954bb12bb8dcf3cbe229ae6e69cc6479db",
     urls = [
-        "https://github.com/bazelbuild/rules_pkg/releases/download/1.0.0/rules_pkg-1.0.0.tar.gz",
+        "https://github.com/bazelbuild/rules_pkg/releases/download/1.1.0/rules_pkg-1.1.0.tar.gz",
     ],
 )
 
 # Rules Python
 http_archive(
     name = "rules_python",
-    sha256 = "9f9f3b300a9264e4c77999312ce663be5dee9a56e361a1f6fe7ec60e1beef9a3",
-    strip_prefix = "rules_python-1.4.1",
-    url = "https://github.com/bazel-contrib/rules_python/releases/download/1.4.1/rules_python-1.4.1.tar.gz",
+    sha256 = "6b9185460d11d57a32139b103363fce39d81889206561ef582678273b74372ac",
+    strip_prefix = "rules_python-1.7.0-rc5",
+    url = "https://github.com/bazel-contrib/rules_python/releases/download/1.7.0-rc5/rules_python-1.7.0-rc5.tar.gz",
 )
 
 # Download Extra java rules
