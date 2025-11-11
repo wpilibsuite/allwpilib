@@ -21,8 +21,7 @@ jobs:
           - { name: "Linux x86-64 Static", classifier: "linuxx86-64static",               os: ubuntu-24.04, container: "wpilib/systemcore-cross-ubuntu:2027-24.04", action: "test" }
           - { name: "Linux x86-64 Static Debug", classifier: "linuxx86-64staticdebug",        os: ubuntu-24.04, container: "wpilib/systemcore-cross-ubuntu:2027-24.04", action: "test" }
 
-          - { name: "macOS Universal",   classifier: "osxuniversal,osxuniversaldebug,headers,sources",    os: macOS-15, action: "test" }
-          - { name: "macOS Universal Static", classifier: "osxuniversalstatic,osxuniversalstaticdebug",         os: macOS-15, action: "test" }
+          - { name: "macOS", classifier: "osxuniversal,osxuniversaldebug,headers,sources,osxuniversalstatic,osxuniversalstaticdebug,linuxsystemcore,linuxsystemcoredebug,linuxsystemcorestatic,linuxsystemcorestaticdebug", os: macOS-15, action: "test" }
 
           - { name: "Windows x86-64",      classifier: "windowsx86-64,headers,sources",   os: windows-2022, action: "test" }
           - { name: "Windows x86-64 Debug",  classifier: "windowsx86-64debug",              os: windows-2022, action: "test" }
@@ -38,8 +37,6 @@ jobs:
           - { name: "Windows System Core Debug", classifier: "linuxsystemcoredebug", os: windows-2022, action: "build" }
           - { name: "Windows System Core Static", classifier: "linuxsystemcorestatic", os: windows-2022, action: "build" }
           - { name: "Windows System Core Static Debug", classifier: "linuxsystemcorestaticdebug", os: windows-2022, action: "build" }
-          - { name: "macOS System Core", classifier: "linuxsystemcore,linuxsystemcoredebug", os: macOS-15, action: "build" }
-          - { name: "macOS System Core Static", classifier: "linuxsystemcorestatic,linuxsystemcorestaticdebug", os: macOS-15, action: "build" }
 
     name: "${{ matrix.action == 'test' && 'Test' || 'Build' }} ${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
