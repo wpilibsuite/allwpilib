@@ -23,20 +23,14 @@ jobs:
 
           - { name: "macOS", classifier: "osxuniversal,osxuniversaldebug,headers,sources,osxuniversalstatic,osxuniversalstaticdebug,linuxsystemcore,linuxsystemcoredebug,linuxsystemcorestatic,linuxsystemcorestaticdebug", os: macOS-15, action: "test" }
 
-          - { name: "Windows x86-64",      classifier: "windowsx86-64,headers,sources",   os: windows-2022, action: "test" }
-          - { name: "Windows x86-64 Debug",  classifier: "windowsx86-64debug",              os: windows-2022, action: "test" }
-          - { name: "Windows x86-64 Static", classifier: "windowsx86-64static",             os: windows-2022, action: "test" }
-          - { name: "Windows x86-64 Static Debug", classifier: "windowsx86-64staticdebug",        os: windows-2022, action: "test" }
+          - { name: "Windows x86-64",      classifier: "windowsx86-64,windowsx86-64debug,headers,sources",   os: windows-2022, action: "test" }
+          - { name: "Windows x86-64 Static", classifier: "windowsx86-64static,windowsx86-64staticdebug",        os: windows-2022, action: "test" }
 
-          - { name: "Windows ARM64",       classifier: "windowsarm64",                    os: windows-2022, action: "build" }
-          - { name: "Windows ARM64 Debug",   classifier: "windowsarm64debug",               os: windows-2022, action: "build" }
-          - { name: "Windows ARM64 Static",  classifier: "windowsarm64static",              os: windows-2022, action: "build" }
-          - { name: "Windows ARM64 Static Debug",  classifier: "windowsarm64staticdebug",         os: windows-2022, action: "build" }
+          - { name: "Windows ARM64",       classifier: "windowsarm64,windowsarm64debug",                    os: windows-2022, action: "build" }
+          - { name: "Windows ARM64 Static",  classifier: "windowsarm64static,windowsarm64staticdebug",         os: windows-2022, action: "build" }
 
-          - { name: "Windows System Core", classifier: "linuxsystemcore", os: windows-2022, action: "build" }
-          - { name: "Windows System Core Debug", classifier: "linuxsystemcoredebug", os: windows-2022, action: "build" }
-          - { name: "Windows System Core Static", classifier: "linuxsystemcorestatic", os: windows-2022, action: "build" }
-          - { name: "Windows System Core Static Debug", classifier: "linuxsystemcorestaticdebug", os: windows-2022, action: "build" }
+          - { name: "Windows System Core", classifier: "linuxsystemcore,linuxsystemcoredebug", os: windows-2022, action: "build" }
+          - { name: "Windows System Core Static", classifier: "linuxsystemcorestatic,linuxsystemcorestaticdebug", os: windows-2022, action: "build" }
 
     name: "${{ matrix.action == 'test' && 'Test' || 'Build' }} ${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
