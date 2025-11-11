@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_PROCESS_HPP_
-#define WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_PROCESS_HPP_
+#pragma once
 
 #include <initializer_list>
 #include <memory>
@@ -306,5 +305,3 @@ class Process final : public HandleImpl<Process, uv_process_t> {
 };
 
 }  // namespace wpi::net::uv
-
-#endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_PROCESS_HPP_

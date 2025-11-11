@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_WPI_CS_CSCORE_CPP_HPP_
-#define CSCORE_WPI_CS_CSCORE_CPP_HPP_
+#pragma once
 
 #include <stdint.h>
 
@@ -456,5 +455,3 @@ std::vector<std::string> GetNetworkInterfaces();
 // Disable uninitialized variable warnings
 #pragma warning(pop)
 #endif
-
-#endif  // CSCORE_WPI_CS_CSCORE_CPP_HPP_

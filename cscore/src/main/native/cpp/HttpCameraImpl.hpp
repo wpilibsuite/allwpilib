@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_HTTPCAMERAIMPL_HPP_
-#define CSCORE_HTTPCAMERAIMPL_HPP_
+#pragma once
 
 #include <atomic>
 #include <functional>
@@ -159,5 +158,3 @@ class AxisCameraImpl : public HttpCameraImpl {
 };
 
 }  // namespace wpi::cs
-
-#endif  // CSCORE_HTTPCAMERAIMPL_HPP_

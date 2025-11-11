@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef WPIUTIL_WPI_UTIL_NODISCARD_H_
-#define WPIUTIL_WPI_UTIL_NODISCARD_H_
+#pragma once
 
 // This should only be used on APIs that can be compiled as C or C++. If the API
 // is C++ only, use [[nodiscard]] instead.
@@ -17,5 +16,3 @@
 #endif
 
 #endif
-
-#endif  // WPIUTIL_WPI_UTIL_NODISCARD_H_

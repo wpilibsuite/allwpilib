@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_JPEGUTIL_HPP_
-#define CSCORE_JPEGUTIL_HPP_
+#pragma once
 
 #include <string>
 #include <string_view>
@@ -26,5 +25,3 @@ bool ReadJpeg(wpi::util::raw_istream& is, std::string& buf, int* width,
               int* height);
 
 }  // namespace wpi::cs
-
-#endif  // CSCORE_JPEGUTIL_HPP_
