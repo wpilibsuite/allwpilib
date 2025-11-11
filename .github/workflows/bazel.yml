@@ -45,7 +45,7 @@ jobs:
           - { name: "macOS System Core Static", classifier: "linuxsystemcorestatic", os: macOS-15, action: "build" }
           - { name: "macOS System Core Static Debug", classifier: "linuxsystemcorestaticdebug", os: macOS-15, action: "build" }
 
-    name: "Build ${{ matrix.name }}"
+    name: "${{ matrix.action == 'test' && 'Test' || 'Build' }} ${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}
     steps:
