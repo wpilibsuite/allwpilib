@@ -121,12 +121,12 @@ public class AprilTagFieldLayout {
   /**
    * Gets an AprilTag by its ID.
    *
-   * @param ID The ID of the tag.
+   * @param id The ID of the tag.
    * @return The {@link AprilTag AprilTag} corresponding to the ID passed in or an empty optional if
    *     a tag with that ID was not found.
    */
-  public Optional<AprilTag> getTag(int ID) {
-    return Optional.ofNullable(m_apriltags.get(ID));
+  public Optional<AprilTag> getTag(int id) {
+    return Optional.ofNullable(m_apriltags.get(id));
   }
 
   /**
@@ -197,13 +197,13 @@ public class AprilTagFieldLayout {
   /**
    * Gets an AprilTag pose by its ID.
    *
-   * @param ID The ID of the tag.
+   * @param id The ID of the tag.
    * @return The pose corresponding to the ID passed in or an empty optional if a tag with that ID
    *     was not found.
    */
   @SuppressWarnings("ParameterName")
-  public Optional<Pose3d> getTagPose(int ID) {
-    return getTag(ID).map(tag -> tag.pose.relativeTo(m_origin));
+  public Optional<Pose3d> getTagPose(int id) {
+    return getTag(id).map(tag -> tag.pose.relativeTo(m_origin));
   }
 
   /**
