@@ -33,8 +33,8 @@ HAL_ENUM(HAL_RuntimeType) {
   HAL_Runtime_RoboRIO2,
   /** Simulation runtime */
   HAL_Runtime_Simulation,
-  /** SystemCore */
-  HAL_Runtime_SystemCore,
+  /** Systemcore */
+  HAL_Runtime_Systemcore,
 };
 
 #ifdef __cplusplus

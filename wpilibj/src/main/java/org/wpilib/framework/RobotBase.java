@@ -172,7 +172,7 @@ public abstract class RobotBase implements AutoCloseable {
    */
   public static boolean isReal() {
     RuntimeType runtimeType = getRuntimeType();
-    return runtimeType == RuntimeType.kSystemCore;
+    return runtimeType == RuntimeType.kSystemcore;
   }
 
   /**

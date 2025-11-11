@@ -13,27 +13,27 @@
 namespace wpi {
 
 /**
- * SystemCore onboard IMU
+ * Systemcore onboard IMU
  */
 class OnboardIMU {
  public:
   /**
-   * A mount orientation of SystemCore
+   * A mount orientation of Systemcore
    */
   enum MountOrientation {
     /** Flat (mounted parallel to the ground). */
     kFlat,
-    /** Landscape (vertically mounted with long edge of SystemCore parallel to
+    /** Landscape (vertically mounted with long edge of Systemcore parallel to
        the ground). */
     kLandscape,
-    /** Portrait (vertically mounted with the short edge of SystemCore parallel
+    /** Portrait (vertically mounted with the short edge of Systemcore parallel
        to the ground). */
     kPortrait
   };
 
   /**
-   * Constructs a handle to the SystemCore onboard IMU.
-   * @param mountOrientation the mount orientation of SystemCore to determine
+   * Constructs a handle to the Systemcore onboard IMU.
+   * @param mountOrientation the mount orientation of Systemcore to determine
    * yaw.
    */
   explicit OnboardIMU(MountOrientation mountOrientation);
