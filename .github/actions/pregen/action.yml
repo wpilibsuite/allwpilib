@@ -23,6 +23,10 @@ runs:
       run: ./ntcore/generate_topics.py
       shell: bash
 
+    - name: Regenerate mrccomm
+      run: ./hal/generate_nanopb.py
+      shell: bash
+
     - name: Regenerate imgui
       run: |
         ./thirdparty/imgui_suite/generate_fonts.sh
