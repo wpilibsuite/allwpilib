@@ -88,6 +88,16 @@ jobs:
         env:
           WPI_PUBLISH_CLASSIFIER_FILTER: ${{ matrix.classifier }}
 
+      - name: Free Space
+        if: always()
+        shell: bash
+        run: |
+          if [[ "${{ matrix.os }}" == "windows-2022" ]]; then
+            fsutil volume diskfree C:
+          else
+            df -h /
+          fi
+
   buildifier:
     name: "buildifier"
     runs-on: ubuntu-24.04
