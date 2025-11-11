@@ -58,6 +58,14 @@ std::vector<AprilTag> AprilTagFieldLayout::GetTags() const {
   return tags;
 }
 
+std::optional<AprilTag> AprilTagFieldLayout::GetTag(int ID) const {
+  const auto& it = m_apriltags.find(ID);
+  if (it == m_apriltags.end()) {
+    return std::nullopt;
+  }
+  return it->second;
+}
+
 void AprilTagFieldLayout::SetOrigin(OriginPosition origin) {
   switch (origin) {
     case OriginPosition::kBlueAllianceWallRightSide:

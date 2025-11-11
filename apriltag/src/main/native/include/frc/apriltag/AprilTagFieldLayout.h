@@ -95,6 +95,15 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
   std::vector<AprilTag> GetTags() const;
 
   /**
+   * Gets an AprilTag pose by its ID.
+   *
+   * @param ID The ID of the tag.
+   * @return The april tag corresponding to the ID that was passed in or an
+   * empty optional if a tag with that ID is not found.
+   */
+  std::optional<AprilTag> GetTag(int ID) const;
+
+  /**
    * Sets the origin based on a predefined enumeration of coordinate frame
    * origins. The origins are calculated from the field dimensions.
    *

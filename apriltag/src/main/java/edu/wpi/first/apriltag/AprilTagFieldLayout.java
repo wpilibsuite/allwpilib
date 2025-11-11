@@ -119,6 +119,17 @@ public class AprilTagFieldLayout {
   }
 
   /**
+   * Gets an AprilTag by its ID.
+   *
+   * @param ID The ID of the tag.
+   * @return The {@link AprilTag AprilTag} corresponding to the ID passed in or an empty optional if
+   *     a tag with that ID was not found.
+   */
+  public Optional<AprilTag> getTag(int ID) {
+    return Optional.ofNullable(m_apriltags.get(ID));
+  }
+
+  /**
    * Returns the length of the field the layout is representing in meters.
    *
    * @return length, in meters
@@ -192,11 +203,7 @@ public class AprilTagFieldLayout {
    */
   @SuppressWarnings("ParameterName")
   public Optional<Pose3d> getTagPose(int ID) {
-    AprilTag tag = m_apriltags.get(ID);
-    if (tag == null) {
-      return Optional.empty();
-    }
-    return Optional.of(tag.pose.relativeTo(m_origin));
+    return getTag(ID).map(tag -> tag.pose.relativeTo(m_origin));
   }
 
   /**
