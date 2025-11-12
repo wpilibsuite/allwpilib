@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 
 #include "wpi/math/geometry/Ellipse2d.hpp"

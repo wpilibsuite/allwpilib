@@ -1,3 +1,4 @@
+#pragma once
 
 // TODO: this should be in a shared library, but robotpy-build does not support
 // that
