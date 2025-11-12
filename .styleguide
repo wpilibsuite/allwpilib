@@ -66,6 +66,47 @@ generatedFileExclude {
   wpiutil/src/test/native/cpp/llvm/
   wpiutil/src/test/native/cpp/span/
 
+  apriltag/src/main/python/.*\.py$
+  apriltag/src/test/python/.*\.py$
+  datalog/src/main/python/.*\.py$
+  datalog/src/test/python/.*\.py$
+  hal/src/main/python/.*\.py$
+  hal/src/test/python/.*\.py$
+  ntcore/src/main/python/.*\.py$
+  ntcore/src/test/python/.*\.py$
+  romiVendordep/src/main/python/.*\.py$
+  romiVendordep/src/test/python/.*\.py$
+  wpilibc/src/main/python/.*\.py$
+  wpilibc/src/test/python/.*\.py$
+  wpimath/src/main/python/wpimath/_impl/src/type_casters/
+  wpimath/src/main/python/.*\.py$
+  wpimath/src/test/python/.*\.py$
+  wpinet/src/main/python/.*\.py$
+  wpinet/src/test/python/.*\.py$
+  wpiutil/src/main/python/wpiutil/src/type_casters/
+  wpiutil/src/main/python/.*\.py$
+  wpiutil/src/test/python/.*\.py$
+  xrpVendordep/src/main/python/.*\.py$
+  xrpVendordep/src/test/python/.*\.py$
+}
+
+modifiableFileExclude {
+  BUILD.bazel
+  \.patch$
+  datalog/examples/printlog/datalog\.py$
+  gradlew
+  ntcoreffi/src/main/native/include/DataLogManager\.h$
+  objcpp/
+  thirdparty/
+}
+
+licenseUpdateExclude {
+  cscore/src/main/native/cpp/default_init_allocator\.hpp$
+  datalog/examples/printlog
+  wpiutil/src/main/native/cpp/Base64\.cpp$
+  wpiutil/src/main/native/cpp/sha1\.cpp$
+  wpiutil/src/main/native/include/wpi/util/sha1\.hpp$
+
   apriltag/src/main/python/
   apriltag/src/test/python/
   datalog/src/main/python/
@@ -86,22 +127,4 @@ generatedFileExclude {
   wpiutil/src/test/python/
   xrpVendordep/src/main/python/
   xrpVendordep/src/test/python/
-}
-
-modifiableFileExclude {
-  BUILD.bazel
-  \.patch$
-  datalog/examples/printlog/datalog\.py$
-  gradlew
-  ntcoreffi/src/main/native/include/DataLogManager\.h$
-  objcpp/
-  thirdparty/
-}
-
-licenseUpdateExclude {
-  cscore/src/main/native/cpp/default_init_allocator\.hpp$
-  datalog/examples/printlog
-  wpiutil/src/main/native/cpp/Base64\.cpp$
-  wpiutil/src/main/native/cpp/sha1\.cpp$
-  wpiutil/src/main/native/include/wpi/util/sha1\.hpp$
 }
