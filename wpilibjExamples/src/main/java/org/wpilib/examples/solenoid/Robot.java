@@ -10,7 +10,7 @@ import org.wpilib.hardware.pneumatic.Compressor;
 import org.wpilib.hardware.pneumatic.DoubleSolenoid;
 import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
 import org.wpilib.hardware.pneumatic.Solenoid;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
 
 /**
  * This is a sample program showing the use of the solenoid classes during operator control. Three
@@ -44,28 +44,28 @@ public class Robot extends TimedRobot {
   static final int kCompressorButton = 4;
 
   /** Called once at the beginning of the robot program. */
-  public Robot() {
-    // Publish elements to dashboard.
-    SmartDashboard.putData("Single Solenoid", m_solenoid);
-    SmartDashboard.putData("Double Solenoid", m_doubleSolenoid);
-    SmartDashboard.putData("Compressor", m_compressor);
-  }
+  public Robot() {}
 
   @SuppressWarnings("PMD.UnconditionalIfStatement")
   @Override
   public void teleopPeriodic() {
+    // Publish elements to dashboard.
+    Telemetry.log("Single Solenoid", m_solenoid);
+    Telemetry.log("Double Solenoid", m_doubleSolenoid);
+    Telemetry.log("Compressor", m_compressor);
+
     // Publish some raw data
     // Get the pressure (in PSI) from the analog sensor connected to the PH.
     // This function is supported only on the PH!
     // On a PCM, this function will return 0.
-    SmartDashboard.putNumber("PH Pressure [PSI]", m_compressor.getPressure());
+    Telemetry.log("PH Pressure [PSI]", m_compressor.getPressure());
     // Get compressor current draw.
-    SmartDashboard.putNumber("Compressor Current", m_compressor.getCurrent());
+    Telemetry.log("Compressor Current", m_compressor.getCurrent());
     // Get whether the compressor is active.
-    SmartDashboard.putBoolean("Compressor Active", m_compressor.isEnabled());
+    Telemetry.log("Compressor Active", m_compressor.isEnabled());
     // Get the digital pressure switch connected to the PCM/PH.
     // The switch is open when the pressure is over ~120 PSI.
-    SmartDashboard.putBoolean("Pressure Switch", m_compressor.getPressureSwitchValue());
+    Telemetry.log("Pressure Switch", m_compressor.getPressureSwitchValue());
 
     /*
      * The output of GetRawButton is true/false depending on whether

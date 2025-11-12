@@ -10,6 +10,8 @@ evaluationDependsOn(':wpimath')
 evaluationDependsOn(':wpilibc')
 evaluationDependsOn(':cameraserver')
 evaluationDependsOn(':wpilibj')
+evaluationDependsOn(':datalog')
+evaluationDependsOn(':telemetry')
 
 apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
 
@@ -22,7 +24,8 @@ dependencies {
     implementation project(':wpimath')
     implementation project(':wpilibj')
     implementation project(':wpiannotations')
-    api project(':datalog')
+    implementation project(':datalog')
+    implementation project(':telemetry')
     testImplementation 'org.mockito:mockito-core:4.1.0'
     annotationProcessor project(':javacPlugin')
     testAnnotationProcessor project(':javacPlugin')

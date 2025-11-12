@@ -38,6 +38,8 @@ licenseUpdateExclude {
   src/main/native/cpp/Base64\.cpp$
   src/main/native/cpp/sha1\.cpp$
   src/main/native/include/wpi/util/sha1\.hpp$
+  src/main/java/org/wpilib/util/collections/PrefixMap\.java$
+  src/main/java/org/wpilib/util/collections/prefixmap/
 }
 
 repoRootNameOverride {

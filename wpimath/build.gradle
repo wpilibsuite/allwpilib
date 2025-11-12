@@ -75,6 +75,12 @@ model {
     binaries {
         all {
             it.cppCompiler.define 'SLEIPNIR_EXPORTS'
+
+            if (it.component.name == "${nativeName}JNI") {
+                lib project: ':telemetry', library: 'telemetry', linkage: 'static'
+            } else {
+                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+            }
         }
     }
 }
@@ -88,6 +94,7 @@ nativeUtils.exportsConfigs {
 }
 
 dependencies {
+    api project(":telemetry")
     api project(":wpiunits")
     api "org.ejml:ejml-simple:0.44.0"
     api "com.fasterxml.jackson.core:jackson-annotations:2.19.2"

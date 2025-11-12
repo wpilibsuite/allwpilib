@@ -14,11 +14,6 @@
 class Robot : public wpi::TimedRobot {
  public:
   Robot() {
-    wpi::util::SendableRegistry::AddChild(&m_robotDrive, &m_frontLeft);
-    wpi::util::SendableRegistry::AddChild(&m_robotDrive, &m_rearLeft);
-    wpi::util::SendableRegistry::AddChild(&m_robotDrive, &m_frontRight);
-    wpi::util::SendableRegistry::AddChild(&m_robotDrive, &m_rearRight);
-
     // Invert the right side motors. You may need to change or remove this to
     // match your robot.
     m_frontRight.SetInverted(true);

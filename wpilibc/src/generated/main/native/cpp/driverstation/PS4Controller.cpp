@@ -7,7 +7,7 @@
 #include "wpi/driverstation/PS4Controller.hpp"
 
 #include "wpi/hal/UsageReporting.h"
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 #include "wpi/event/BooleanEvent.hpp"
 
@@ -277,27 +277,29 @@ bool PS4Controller::GetTouchpadReleased() {
   return GetRawButtonReleased(Button::kTouchpad);
 }
 
-void PS4Controller::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("HID");
-  builder.PublishConstString("ControllerType", "PS4");
-  builder.AddDoubleProperty("L2 Axis", [this] { return GetL2Axis(); }, nullptr);
-  builder.AddDoubleProperty("R2 Axis", [this] { return GetR2Axis(); }, nullptr);
-  builder.AddDoubleProperty("LeftX", [this] { return GetLeftX(); }, nullptr);
-  builder.AddDoubleProperty("LeftY", [this] { return GetLeftY(); }, nullptr);
-  builder.AddDoubleProperty("RightX", [this] { return GetRightX(); }, nullptr);
-  builder.AddDoubleProperty("RightY", [this] { return GetRightY(); }, nullptr);
-  builder.AddBooleanProperty("Square", [this] { return GetSquareButton(); }, nullptr);
-  builder.AddBooleanProperty("Cross", [this] { return GetCrossButton(); }, nullptr);
-  builder.AddBooleanProperty("Circle", [this] { return GetCircleButton(); }, nullptr);
-  builder.AddBooleanProperty("Triangle", [this] { return GetTriangleButton(); }, nullptr);
-  builder.AddBooleanProperty("L1", [this] { return GetL1Button(); }, nullptr);
-  builder.AddBooleanProperty("R1", [this] { return GetR1Button(); }, nullptr);
-  builder.AddBooleanProperty("L2", [this] { return GetL2Button(); }, nullptr);
-  builder.AddBooleanProperty("R2", [this] { return GetR2Button(); }, nullptr);
-  builder.AddBooleanProperty("Share", [this] { return GetShareButton(); }, nullptr);
-  builder.AddBooleanProperty("Options", [this] { return GetOptionsButton(); }, nullptr);
-  builder.AddBooleanProperty("L3", [this] { return GetL3Button(); }, nullptr);
-  builder.AddBooleanProperty("R3", [this] { return GetR3Button(); }, nullptr);
-  builder.AddBooleanProperty("PS", [this] { return GetPSButton(); }, nullptr);
-  builder.AddBooleanProperty("Touchpad", [this] { return GetTouchpadButton(); }, nullptr);
+std::string_view PS4Controller::GetTelemetryType() const {
+  return "HID:PS4";
+}
+
+void PS4Controller::UpdateTelemetry(wpi::TelemetryTable& table) const {
+  table.Log("L2", GetL2Axis());
+  table.Log("R2", GetR2Axis());
+  table.Log("LeftX", GetLeftX());
+  table.Log("LeftY", GetLeftY());
+  table.Log("RightX", GetRightX());
+  table.Log("RightY", GetRightY());
+  table.Log("Square", GetSquareButton());
+  table.Log("Cross", GetCrossButton());
+  table.Log("Circle", GetCircleButton());
+  table.Log("Triangle", GetTriangleButton());
+  table.Log("L1", GetL1Button());
+  table.Log("R1", GetR1Button());
+  table.Log("L2", GetL2Button());
+  table.Log("R2", GetR2Button());
+  table.Log("Share", GetShareButton());
+  table.Log("Options", GetOptionsButton());
+  table.Log("L3", GetL3Button());
+  table.Log("R3", GetR3Button());
+  table.Log("PS", GetPSButton());
+  table.Log("Touchpad", GetTouchpadButton());
 }

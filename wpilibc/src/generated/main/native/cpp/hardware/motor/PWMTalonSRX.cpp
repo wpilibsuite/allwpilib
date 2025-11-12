@@ -10,7 +10,7 @@
 
 using namespace wpi;
 
-PWMTalonSRX::PWMTalonSRX(int channel) : PWMMotorController("PWMTalonSRX", channel) {
+PWMTalonSRX::PWMTalonSRX(int channel) : PWMMotorController(channel) {
   SetBounds(2.004_ms, 1.52_ms, 1.5_ms, 1.48_ms, 0.997_ms);
   m_pwm.SetOutputPeriod(PWM::kOutputPeriod_5Ms);
   SetSpeed(0.0);
