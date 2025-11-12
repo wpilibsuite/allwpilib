@@ -16,6 +16,8 @@ cppSrcFileInclude {
 generatedFileExclude {
   \.jinja$
   apriltag/src/test/resources/
+  apriltag/src/test/python/.*\.png
+  apriltag/src/test/python/.*\.jpg
   docs/theme\.css$
   fields/src/main/native/resources/
   generated/
