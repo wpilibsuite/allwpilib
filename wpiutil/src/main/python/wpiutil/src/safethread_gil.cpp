@@ -45,7 +45,7 @@ void on_safe_thread_end(void* opaque) {
     return;
   }
 
-  auto* st = (SafeThreadState*)opaque;
+  auto* st = reinterpret_cast<SafeThreadState*>(opaque);
   delete st->release;  // causes GIL to be acquired
   delete st->acquire;  // causes GIL to be released and thread state deleted
   delete st;

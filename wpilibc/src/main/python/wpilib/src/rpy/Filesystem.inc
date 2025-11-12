@@ -6,6 +6,8 @@
 #include <pybind11/eval.h>
 #include <semiwrap.h>
 
+#include <string>
+
 namespace robotpy::filesystem {
 
 static fs::path getMainPath() {

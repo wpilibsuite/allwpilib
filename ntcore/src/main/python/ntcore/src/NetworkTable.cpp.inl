@@ -1,6 +1,9 @@
 
 #pragma once
 
+#include <string>
+#include <utility>
+
 // clang-format off
 cls_NetworkTable
     .def("getValue", [](const NetworkTable &self, std::string_view key, py::object defaultValue) -> py::object {

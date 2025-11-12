@@ -2,6 +2,9 @@
 
 #include <semiwrap.h>
 
+#include <memory>
+#include <utility>
+
 #include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
 
 namespace wpi::math {

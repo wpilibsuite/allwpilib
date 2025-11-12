@@ -3,12 +3,16 @@
 #include <pybind11/stl.h>
 #include <semiwrap.h>
 
+#include <memory>
+#include <string>
+#include <utility>
+
 #include "wpi/util/sendable/SendableBuilder.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
 
 class MySendableBuilder : public wpi::util::SendableBuilder {
  public:
-  MySendableBuilder(py::dict keys) : keys(keys) {}
+  explicit MySendableBuilder(py::dict keys) : keys(keys) {}
 
   ~MySendableBuilder() {
     // leak this so the python interpreter doesn't crash on shutdown

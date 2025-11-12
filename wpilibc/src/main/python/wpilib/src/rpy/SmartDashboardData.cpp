@@ -1,6 +1,8 @@
 
 #include "SmartDashboardData.h"
 
+#include <memory>
+
 namespace rpy {
 
 //

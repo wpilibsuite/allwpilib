@@ -8,7 +8,7 @@
 
 struct ThingA {
   ThingA() = default;
-  ThingA(int x) : x(x) {}
+  explicit ThingA(int x) : x(x) {}
 
   const int x = 0;
 

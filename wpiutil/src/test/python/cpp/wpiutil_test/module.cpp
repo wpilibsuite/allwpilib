@@ -12,6 +12,8 @@
 
 #include <limits>
 #include <functional>
+#include <string>
+#include <vector>
 
 #include <pybind11/functional.h>
 
@@ -154,7 +156,6 @@ void struct_test(py::module &m);
 
 
 PYBIND11_MODULE(module, m) {
-
     sendable_test(m);
     struct_test(m);
 

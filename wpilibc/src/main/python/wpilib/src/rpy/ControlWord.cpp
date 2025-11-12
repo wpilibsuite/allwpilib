@@ -1,5 +1,7 @@
 #include "rpy/ControlWord.h"
 
+#include <tuple>
+
 #include "wpi/hal/DriverStation.h"
 
 namespace rpy {
