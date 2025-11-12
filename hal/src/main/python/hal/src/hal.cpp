@@ -20,6 +20,7 @@ SEMIWRAP_PYBIND11_MODULE(m) {
     .value("INT", HAL_Type::HAL_INT)
     .value("LONG", HAL_Type::HAL_LONG);
 
+  // clang-format off
   // Add this manually because it would be annoying to do otherwise
   py::class_<HAL_Value>(m, "Value")
     .def_readonly("type", &HAL_Value::type)
@@ -57,6 +58,7 @@ SEMIWRAP_PYBIND11_MODULE(m) {
           return "<Value type=invalid>";
         }
     });
+  // clang-format on
 
   initWrapper(m);
 
@@ -67,15 +69,18 @@ SEMIWRAP_PYBIND11_MODULE(m) {
   m.attr("__halplatform__") = "sim";
   m.attr("__hal_simulation__") = true;
 
+  // clang-format off
   m.def("__test_senderr", []() {
     HAL_SendError(1, 2, 0, "\xfa" "badmessage", "location", "callstack", 1);
   }, release_gil());
+  // clang-format on    
 
 #endif
 
   // Redirect stderr to python stderr
   sys_module = py::module_::import("sys");
 
+  // clang-format off
   HAL_SetPrintErrorImpl([](const char *line, size_t size) {
     if (size == 0) {
       return;
@@ -90,7 +95,9 @@ SEMIWRAP_PYBIND11_MODULE(m) {
       py::print(py::reinterpret_steal<py::str>(o), "file"_a=sys_module.attr("stderr"));
     }
   });
+  // clang-format on
 
+  // clang-format off
   // Do cleanup on module unload
   static int unused; // the capsule needs something to reference
   py::capsule cleanup(&unused, [](void *) {
@@ -106,5 +113,6 @@ SEMIWRAP_PYBIND11_MODULE(m) {
       HAL_Shutdown();
     }
   });
+  // clang-format on
   m.add_object("_cleanup", cleanup);
 }
