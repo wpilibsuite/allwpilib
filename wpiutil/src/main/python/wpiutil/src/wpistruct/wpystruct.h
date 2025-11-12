@@ -51,8 +51,7 @@ struct WPyStruct {
   py::object py;
 };
 
-namespace pybind11 {
-namespace detail {
+namespace pybind11::detail {
 
 template <>
 struct type_caster<WPyStruct> {
@@ -73,8 +72,7 @@ struct type_caster<WPyStruct> {
   }
 };
 
-}  // namespace detail
-}  // namespace pybind11
+}  // namespace pybind11::detail
 
 //
 // Struct info class implementation

@@ -29,8 +29,7 @@ struct PyTrajectoryConstraint : public TrajectoryConstraint {
 
 };  // namespace wpi::math
 
-namespace pybind11 {
-namespace detail {
+namespace pybind11::detail {
 
 template <>
 struct type_caster<wpi::math::PyTrajectoryConstraint> {
@@ -59,5 +58,4 @@ struct type_caster<wpi::math::PyTrajectoryConstraint> {
   }
 };
 
-}  // namespace detail
-}  // namespace pybind11
+}  // namespace pybind11::detail

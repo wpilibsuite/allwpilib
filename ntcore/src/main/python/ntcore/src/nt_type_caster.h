@@ -4,8 +4,7 @@
 
 #include <pybind11/pybind11.h>
 
-namespace pybind11 {
-namespace detail {
+namespace pybind11::detail {
 
 // ntcore uses std::vector<uint8_t> anytime there is a raw value, so
 // add this specialization to convert to/from bytes directly
@@ -39,5 +38,4 @@ struct type_caster<std::vector<uint8_t>> {
   }
 };
 
-}  // namespace detail
-}  // namespace pybind11
+}  // namespace pybind11::detail
