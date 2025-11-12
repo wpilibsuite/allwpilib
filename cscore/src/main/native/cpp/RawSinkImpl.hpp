@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_RAWSINKIMPL_HPP_
-#define CSCORE_RAWSINKIMPL_HPP_
+#pragma once
 
 #include <stdint.h>
 
@@ -18,6 +17,7 @@
 #include "wpi/util/condition_variable.hpp"
 
 namespace wpi::cs {
+
 class SourceImpl;
 
 class RawSinkImpl : public SinkImpl {
@@ -48,6 +48,5 @@ class RawSinkImpl : public SinkImpl {
   std::thread m_thread;
   std::function<void(uint64_t time)> m_processFrame;
 };
-}  // namespace wpi::cs
 
-#endif  // CSCORE_RAWSINKIMPL_HPP_
+}  // namespace wpi::cs

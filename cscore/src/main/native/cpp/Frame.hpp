@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_FRAME_HPP_
-#define CSCORE_FRAME_HPP_
+#pragma once
 
 #include <atomic>
 #include <memory>
@@ -251,5 +250,3 @@ class Frame {
 };
 
 }  // namespace wpi::cs
-
-#endif  // CSCORE_FRAME_HPP_
