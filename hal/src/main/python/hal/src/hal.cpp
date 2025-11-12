@@ -1,24 +1,24 @@
 
 
-#include "wpi/hal/HALBase.h"
-#include "wpi/hal/DriverStation.h"
-#include "wpi/hal/Value.h"
 #include <semiwrap_init.hal._wpiHal.hpp>
+
+#include "wpi/hal/DriverStation.h"
+#include "wpi/hal/HALBase.h"
+#include "wpi/hal/Value.h"
 
 using namespace pybind11::literals;
 
 static py::module_ sys_module;
 
 SEMIWRAP_PYBIND11_MODULE(m) {
-
   // Add this manually so it can be used from SimValue
   py::enum_<HAL_Type>(m, "Type")
-    .value("UNASSIGNED", HAL_Type::HAL_UNASSIGNED)
-    .value("BOOLEAN", HAL_Type::HAL_BOOLEAN)
-    .value("DOUBLE", HAL_Type::HAL_DOUBLE)
-    .value("ENUM", HAL_Type::HAL_ENUM)
-    .value("INT", HAL_Type::HAL_INT)
-    .value("LONG", HAL_Type::HAL_LONG);
+      .value("UNASSIGNED", HAL_Type::HAL_UNASSIGNED)
+      .value("BOOLEAN", HAL_Type::HAL_BOOLEAN)
+      .value("DOUBLE", HAL_Type::HAL_DOUBLE)
+      .value("ENUM", HAL_Type::HAL_ENUM)
+      .value("INT", HAL_Type::HAL_INT)
+      .value("LONG", HAL_Type::HAL_LONG);
 
   // clang-format off
   // Add this manually because it would be annoying to do otherwise
@@ -73,7 +73,7 @@ SEMIWRAP_PYBIND11_MODULE(m) {
   m.def("__test_senderr", []() {
     HAL_SendError(1, 2, 0, "\xfa" "badmessage", "location", "callstack", 1);
   }, release_gil());
-  // clang-format on    
+  // clang-format on
 
 #endif
 

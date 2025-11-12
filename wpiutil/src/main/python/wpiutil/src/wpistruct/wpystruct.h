@@ -6,14 +6,14 @@
 #include <string_view>
 
 #include <fmt/format.h>
-#include "wpi/util/struct/Struct.hpp"
-
 #include <pybind11/functional.h>
 #include <pybind11/typing.h>
 #include <semiwrap.h>
 
-static inline std::string pytypename(const py::type &t) {
-  return ((PyTypeObject *)t.ptr())->tp_name;
+#include "wpi/util/struct/Struct.hpp"
+
+static inline std::string pytypename(const py::type& t) {
+  return ((PyTypeObject*)t.ptr())->tp_name;
 }
 
 //
@@ -23,15 +23,14 @@ static inline std::string pytypename(const py::type &t) {
 // This merely holds the python object being operated on, the actual
 // serialization work is done in WPyStructConverter
 struct WPyStruct {
-
   WPyStruct() = default;
 
-  WPyStruct(const WPyStruct &other) {
+  WPyStruct(const WPyStruct& other) {
     py::gil_scoped_acquire gil;
     py = other.py;
   }
 
-  WPyStruct &operator=(const WPyStruct &other) {
+  WPyStruct& operator=(const WPyStruct& other) {
     {
       py::gil_scoped_acquire gil;
       py = other.py;
@@ -39,9 +38,9 @@ struct WPyStruct {
     return *this;
   }
 
-  WPyStruct(WPyStruct &&) = default;
+  WPyStruct(WPyStruct&&) = default;
 
-  WPyStruct(const py::object &py) : py(py) {}
+  WPyStruct(const py::object& py) : py(py) {}
 
   ~WPyStruct() {
     py::gil_scoped_acquire gil;
@@ -54,7 +53,8 @@ struct WPyStruct {
 namespace pybind11 {
 namespace detail {
 
-template <> struct type_caster<WPyStruct> {
+template <>
+struct type_caster<WPyStruct> {
   // TODO: wpiutil.struct.T/TV?
   PYBIND11_TYPE_CASTER(WPyStruct, const_name("object"));
 
@@ -64,7 +64,7 @@ template <> struct type_caster<WPyStruct> {
     return true;
   }
 
-  static handle cast(const WPyStruct &src, py::return_value_policy policy,
+  static handle cast(const WPyStruct& src, py::return_value_policy policy,
                      py::handle parent) {
     py::handle v = src.py;
     v.inc_ref();
@@ -72,8 +72,8 @@ template <> struct type_caster<WPyStruct> {
   }
 };
 
-} // namespace detail
-} // namespace pybind11
+}  // namespace detail
+}  // namespace pybind11
 
 //
 // Struct info class implementation
@@ -88,7 +88,7 @@ struct WPyStructConverter {
 
   virtual std::string_view GetSchema() const = 0;
 
-  virtual void Pack(std::span<uint8_t> data, const WPyStruct &value) const = 0;
+  virtual void Pack(std::span<uint8_t> data, const WPyStruct& value) const = 0;
 
   virtual WPyStruct Unpack(std::span<const uint8_t> data) const = 0;
 
@@ -96,12 +96,13 @@ struct WPyStructConverter {
   //                         std::span<const uint8_t> data) const = 0;
 
   virtual void ForEachNested(
-      const std::function<void(std::string_view, std::string_view)> &fn)
+      const std::function<void(std::string_view, std::string_view)>& fn)
       const = 0;
 };
 
 // static C++ converter
-template <typename T> struct WPyStructCppConverter : WPyStructConverter {
+template <typename T>
+struct WPyStructCppConverter : WPyStructConverter {
   std::string_view GetTypeName() const override {
     return wpi::util::Struct<T>::GetTypeName();
   }
@@ -112,9 +113,9 @@ template <typename T> struct WPyStructCppConverter : WPyStructConverter {
     return wpi::util::Struct<T>::GetSchema();
   }
 
-  void Pack(std::span<uint8_t> data, const WPyStruct &value) const override {
+  void Pack(std::span<uint8_t> data, const WPyStruct& value) const override {
     py::gil_scoped_acquire gil;
-    const T &v = value.py.cast<const T &>();
+    const T& v = value.py.cast<const T&>();
     wpi::util::Struct<T>::Pack(data, v);
   }
 
@@ -131,7 +132,7 @@ template <typename T> struct WPyStructCppConverter : WPyStructConverter {
   // }
 
   void ForEachNested(
-      const std::function<void(std::string_view, std::string_view)> &fn)
+      const std::function<void(std::string_view, std::string_view)>& fn)
       const override {
     if constexpr (wpi::util::HasNestedStruct<T>) {
       wpi::util::Struct<T>::ForEachNested(fn);
@@ -139,13 +140,13 @@ template <typename T> struct WPyStructCppConverter : WPyStructConverter {
   }
 };
 
-template <typename T> void SetupWPyStruct(auto pycls) {
-
-  auto *sptr =
+template <typename T>
+void SetupWPyStruct(auto pycls) {
+  auto* sptr =
       new std::shared_ptr<WPyStructConverter>(new WPyStructCppConverter<T>());
 
-  py::capsule c(sptr, "WPyStruct", [](void *ptr) {
-    delete (std::shared_ptr<WPyStructConverter> *)ptr;
+  py::capsule c(sptr, "WPyStruct", [](void* ptr) {
+    delete (std::shared_ptr<WPyStructConverter>*)ptr;
   });
 
   pycls.def_property_readonly_static("WPIStruct",
@@ -154,7 +155,6 @@ template <typename T> void SetupWPyStruct(auto pycls) {
 
 // dynamic python converter
 struct WPyStructPyConverter : WPyStructConverter {
-
   WPyStructPyConverter(py::object o) {
     m_typename = o.attr("typename").cast<std::string>();
     m_schema = o.attr("schema").cast<std::string>();
@@ -163,7 +163,8 @@ struct WPyStructPyConverter : WPyStructConverter {
     m_pack = py::reinterpret_borrow<py::function>(o.attr("pack"));
     m_packInto = py::reinterpret_borrow<py::function>(o.attr("packInto"));
     m_unpack = py::reinterpret_borrow<py::function>(o.attr("unpack"));
-    // m_unpackInto = py::reinterpret_borrow<py::function>(o.attr("unpackInto"));
+    // m_unpackInto =
+    // py::reinterpret_borrow<py::function>(o.attr("unpackInto"));
     m_forEachNested =
         py::reinterpret_borrow<py::function>(o.attr("forEachNested"));
   }
@@ -177,7 +178,7 @@ struct WPyStructPyConverter : WPyStructConverter {
   py::function m_packInto;
   py::function m_unpack;
   // py::function m_unpackInto;
-  py::function m_forEachNested; // might be none
+  py::function m_forEachNested;  // might be none
 
   std::string_view GetTypeName() const override { return m_typename; }
 
@@ -185,7 +186,7 @@ struct WPyStructPyConverter : WPyStructConverter {
 
   std::string_view GetSchema() const override { return m_schema; }
 
-  void Pack(std::span<uint8_t> data, const WPyStruct &value) const override {
+  void Pack(std::span<uint8_t> data, const WPyStruct& value) const override {
     py::gil_scoped_acquire gil;
     py::bytes result = m_pack(value.py);
     std::string_view rview = result;
@@ -196,13 +197,13 @@ struct WPyStructPyConverter : WPyStructConverter {
       throw py::value_error(msg);
     }
 
-    rview.copy((char *)data.data(), rview.size());
+    rview.copy((char*)data.data(), rview.size());
   }
 
   WPyStruct Unpack(std::span<const uint8_t> data) const override {
     py::gil_scoped_acquire gil;
     auto view =
-        py::memoryview::from_memory((const void *)data.data(), data.size());
+        py::memoryview::from_memory((const void*)data.data(), data.size());
     return WPyStruct(m_unpack(view));
   }
 
@@ -215,7 +216,7 @@ struct WPyStructPyConverter : WPyStructConverter {
   // }
 
   void ForEachNested(
-      const std::function<void(std::string_view, std::string_view)> &fn)
+      const std::function<void(std::string_view, std::string_view)>& fn)
       const override {
     py::gil_scoped_acquire gil;
     if (!m_forEachNested.is_none()) {
@@ -227,9 +228,8 @@ struct WPyStructPyConverter : WPyStructConverter {
 // passed as I... to the wpi::util::Struct methods
 struct WPyStructInfo {
   WPyStructInfo() = default;
-  WPyStructInfo(const py::type &t) {
+  WPyStructInfo(const py::type& t) {
     if (!py::hasattr(t, "WPIStruct")) {
-
       throw py::type_error(
           fmt::format("{} is not struct serializable (does not have WPIStruct)",
                       pytypename(t)));
@@ -238,9 +238,9 @@ struct WPyStructInfo {
     py::object s = t.attr("WPIStruct");
 
     // C++ version
-    void *c = PyCapsule_GetPointer(s.ptr(), "WPyStruct");
+    void* c = PyCapsule_GetPointer(s.ptr(), "WPyStruct");
     if (c != NULL) {
-      cvt = *(std::shared_ptr<WPyStructConverter> *)c;
+      cvt = *(std::shared_ptr<WPyStructConverter>*)c;
       return;
     }
 
@@ -249,7 +249,7 @@ struct WPyStructInfo {
     // Python version
     try {
       cvt = std::make_shared<WPyStructPyConverter>(s);
-    } catch (py::error_already_set &e) {
+    } catch (py::error_already_set& e) {
       std::string msg = fmt::format(
           "{} is not struct serializable (invalid WPIStruct)", pytypename(t));
       py::raise_from(e, PyExc_TypeError, msg.c_str());
@@ -257,10 +257,10 @@ struct WPyStructInfo {
     }
   }
 
-  WPyStructInfo(const WPyStruct &v) : WPyStructInfo(py::type::of(v.py)) {}
+  WPyStructInfo(const WPyStruct& v) : WPyStructInfo(py::type::of(v.py)) {}
 
   const WPyStructConverter* operator->() const {
-    const auto *c = cvt.get();
+    const auto* c = cvt.get();
     if (c == nullptr) {
       // TODO: would be nice to have a better error here, but we don't have
       // a good way to know our current context
@@ -269,27 +269,26 @@ struct WPyStructInfo {
     return c;
   }
 
-private:
+ private:
   // holds something used to do serialization
   std::shared_ptr<WPyStructConverter> cvt;
 };
 
 // Leverages the converter stored in WPyStructInfo to do the actual work
-template <> struct wpi::util::Struct<WPyStruct, WPyStructInfo> {
-  static std::string_view GetTypeName(const WPyStructInfo &info) {
+template <>
+struct wpi::util::Struct<WPyStruct, WPyStructInfo> {
+  static std::string_view GetTypeName(const WPyStructInfo& info) {
     return info->GetTypeName();
   }
 
-  static size_t GetSize(const WPyStructInfo &info) {
-    return info->GetSize();
-  }
+  static size_t GetSize(const WPyStructInfo& info) { return info->GetSize(); }
 
-  static std::string_view GetSchema(const WPyStructInfo &info) {
+  static std::string_view GetSchema(const WPyStructInfo& info) {
     return info->GetSchema();
   }
 
   static WPyStruct Unpack(std::span<const uint8_t> data,
-                          const WPyStructInfo &info) {
+                          const WPyStructInfo& info) {
     return info->Unpack(data);
   }
 
@@ -298,14 +297,14 @@ template <> struct wpi::util::Struct<WPyStruct, WPyStructInfo> {
   //   info->UnpackInto(v, data);
   // }
 
-  static void Pack(std::span<uint8_t> data, const WPyStruct &value,
-                   const WPyStructInfo &info) {
+  static void Pack(std::span<uint8_t> data, const WPyStruct& value,
+                   const WPyStructInfo& info) {
     info->Pack(data, value);
   }
 
-  static void
-  ForEachNested(std::invocable<std::string_view, std::string_view> auto fn,
-                const WPyStructInfo &info) {
+  static void ForEachNested(
+      std::invocable<std::string_view, std::string_view> auto fn,
+      const WPyStructInfo& info) {
     info->ForEachNested(fn);
   }
 };
@@ -314,4 +313,5 @@ static_assert(wpi::util::StructSerializable<WPyStruct, WPyStructInfo>);
 static_assert(wpi::util::HasNestedStruct<WPyStruct, WPyStructInfo>);
 
 // This breaks on readonly structs, so we disable for now
-// static_assert(wpi::util::MutableStructSerializable<WPyStruct, WPyStructInfo>);
+// static_assert(wpi::util::MutableStructSerializable<WPyStruct,
+// WPyStructInfo>);

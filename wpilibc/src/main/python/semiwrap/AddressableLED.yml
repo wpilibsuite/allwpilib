@@ -41,4 +41,3 @@ classes:
         overloads:
           const Color&:
           const Color8Bit&:
-

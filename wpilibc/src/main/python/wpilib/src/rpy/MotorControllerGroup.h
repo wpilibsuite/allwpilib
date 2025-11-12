@@ -5,9 +5,8 @@
 #pragma once
 
 #include <functional>
-#include <vector>
 #include <memory>
-
+#include <vector>
 
 #include "wpi/hardware/motor/MotorController.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
@@ -15,12 +14,14 @@
 
 namespace wpi {
 
-class PyMotorControllerGroup : public wpi::util::Sendable,
-                             public MotorController,
-                             public wpi::util::SendableHelper<PyMotorControllerGroup> {
+class PyMotorControllerGroup
+    : public wpi::util::Sendable,
+      public MotorController,
+      public wpi::util::SendableHelper<PyMotorControllerGroup> {
  public:
-  PyMotorControllerGroup(std::vector<std::shared_ptr<wpi::MotorController>> &&args) :
-    m_motorControllers(args) {}
+  PyMotorControllerGroup(
+      std::vector<std::shared_ptr<wpi::MotorController>>&& args)
+      : m_motorControllers(args) {}
   ~PyMotorControllerGroup() override = default;
 
   PyMotorControllerGroup(PyMotorControllerGroup&&) = default;
@@ -43,4 +44,4 @@ class PyMotorControllerGroup : public wpi::util::Sendable,
   std::vector<std::shared_ptr<wpi::MotorController>> m_motorControllers;
 };
 
-}  // namespace rpy
+}  // namespace wpi

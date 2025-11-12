@@ -11,7 +11,7 @@ void cleanup_safethread_gil();
 
 namespace wpi::util::impl {
 void ResetSendableRegistry();
-} // namespace wpi::util::impl
+}  // namespace wpi::util::impl
 
 void cleanup_sendable_registry() {
   py::gil_scoped_release unlock;
@@ -28,7 +28,7 @@ SEMIWRAP_PYBIND11_MODULE(m) {
   initWrapper(m);
 
   static int unused;
-  py::capsule cleanup(&unused, [](void *) {
+  py::capsule cleanup(&unused, [](void*) {
     cleanup_sendable_registry();
     cleanup_stack_trace_hook();
     cleanup_safethread_gil();

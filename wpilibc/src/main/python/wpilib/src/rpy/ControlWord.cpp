@@ -15,4 +15,4 @@ std::tuple<bool, bool, bool> GetControlState() {
   return std::make_tuple(enable, auton, test);
 }
 
-} // namespace rpy
+}  // namespace rpy
