@@ -1,7 +1,7 @@
 
-#include <semiwrap.h>
-
 #include <string>
+
+#include <semiwrap.h>
 
 #include "wpi/util/StackTrace.hpp"
 

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <pybind11/pybind11.h>
-
 #include <vector>
+
+#include <pybind11/pybind11.h>
 
 namespace pybind11 {
 namespace detail {
@@ -34,7 +34,8 @@ struct type_caster<std::vector<uint8_t>> {
 
   static handle cast(const std::vector<uint8_t>& src,
                      return_value_policy policy, handle parent) {
-    return py::bytes(reinterpret_cast<const char*>(src.data()), src.size()).release();
+    return py::bytes(reinterpret_cast<const char*>(src.data()), src.size())
+        .release();
   }
 };
 
