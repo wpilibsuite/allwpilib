@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/simulation/ElevatorSim.hpp"
+
 #include <gtest/gtest.h>
 
 #include "wpi/hardware/motor/PWMVictorSPX.hpp"
@@ -10,7 +12,6 @@
 #include "wpi/math/system/NumericalIntegration.hpp"
 #include "wpi/math/system/plant/DCMotor.hpp"
 #include "wpi/math/system/plant/LinearSystemId.hpp"
-#include "wpi/simulation/ElevatorSim.hpp"
 #include "wpi/simulation/EncoderSim.hpp"
 #include "wpi/system/RobotController.hpp"
 #include "wpi/units/math.hpp"

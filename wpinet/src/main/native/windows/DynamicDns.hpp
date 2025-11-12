@@ -9,8 +9,7 @@
 #endif
 
 #include <windows.h>
-
-#include <WinDNS.h>
+#include <windns.h>
 
 namespace wpi::net {
 class DynamicDns {

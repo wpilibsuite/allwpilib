@@ -4,9 +4,8 @@
 
 #pragma once
 
+#include <stddef.h>
 #include <stdint.h>
-
-#include <stddef.h>  //NOLINT
 
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/Types.h"

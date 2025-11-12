@@ -32,18 +32,3 @@ modifiableFileExclude {
 repoRootNameOverride {
   hal
 }
-
-includeOtherLibs {
-  ^fmt/
-  ^gtest/
-  ^i2clib/
-  ^llvm/
-  ^opencv2/
-  ^spilib/
-  ^support/
-}
-
-includeProject {
-  ^ctre/
-  ^mockdata/
-}

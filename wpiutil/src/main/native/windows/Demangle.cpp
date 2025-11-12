@@ -4,8 +4,7 @@
 
 #include "wpi/util/Demangle.hpp"
 
-#include <windows.h>  // NOLINT(build/include_order)
-
+#include <windows.h>
 #include <dbghelp.h>
 
 #include <string>

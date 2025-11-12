@@ -23,9 +23,3 @@ includeGuardRoots {
   wpigui/src/main/native/metal/
   wpigui/src/main/native/opengl3/
 }
-
-includeOtherLibs {
-  ^imgui
-  ^implot
-  ^stb
-}

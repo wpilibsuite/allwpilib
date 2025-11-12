@@ -5,10 +5,10 @@
 #ifndef WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_TTY_HPP_
 #define WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_TTY_HPP_
 
-#include <uv.h>
-
 #include <memory>
 #include <utility>
+
+#include <uv.h>
 
 #include "wpi/net/uv/Stream.hpp"
 

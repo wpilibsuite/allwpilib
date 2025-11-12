@@ -4,9 +4,8 @@
 
 #include "wpi/util/Demangle.hpp"
 
-#include <cxxabi.h>
-
 #include <cstdio>
+#include <cxxabi.h>
 #include <string>
 
 #include "wpi/util/SmallString.hpp"

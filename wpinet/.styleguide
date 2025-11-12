@@ -33,9 +33,3 @@ includeGuardRoots {
   wpinet/src/main/native/include/wpinet/
   wpinet/src/test/native/cpp/
 }
-
-includeOtherLibs {
-  ^fmt/
-  ^gmock/
-  ^gtest/
-}

@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "server/ServerImpl.hpp"
+
 #include <stdint.h>
 
 #include <concepts>
@@ -23,7 +25,6 @@
 #include "gmock/gmock.h"
 #include "net/Message.hpp"
 #include "net/WireEncoder.hpp"
-#include "server/ServerImpl.hpp"
 #include "wpi/nt/ntcore_c.h"
 #include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/SpanMatcher.hpp"

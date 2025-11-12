@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/util/Color.hpp"
+
 #include <string>
 
 #include <gtest/gtest.h>
-
-#include "wpi/util/Color.hpp"
 
 TEST(ColorTest, ConstructDefault) {
   constexpr wpi::Color color;

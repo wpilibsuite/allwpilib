@@ -31,9 +31,3 @@ includeGuardRoots {
   ntcore/src/main/native/include/
   ntcore/src/test/native/cpp/
 }
-
-includeOtherLibs {
-  ^fmt/
-  ^gtest/
-  ^support/
-}

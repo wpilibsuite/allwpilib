@@ -4,16 +4,15 @@
 
 #include "WindowsMessagePump.hpp"
 
+#include <windows.h>
+#include <dbt.h>
 #include <ks.h>
 #include <ksmedia.h>
 #include <mfapi.h>
 #include <mfidl.h>
-#include <windows.h>
 #include <windowsx.h>
 
 #include <memory>
-
-#include <Dbt.h>
 
 #pragma comment(lib, "Mfplat.lib")
 #pragma comment(lib, "Mf.lib")

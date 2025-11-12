@@ -13,15 +13,6 @@
 #include <utility>
 
 #include <fmt/format.h>
-#include "wpi/util/DenseMap.hpp"
-#include "wpi/util/MemoryBuffer.hpp"
-#include "wpi/util/SmallString.hpp"
-#include "wpi/util/Signal.h"
-#include "wpi/util/StringMap.hpp"
-#include "wpi/util/fs.hpp"
-#include "wpi/util/json.hpp"
-#include "wpi/util/print.hpp"
-#include "wpi/util/raw_ostream.hpp"
 
 #include "wpi/net/EventLoopRunner.hpp"
 #include "wpi/net/HttpServerConnection.hpp"
@@ -32,6 +23,15 @@
 #include "wpi/net/uv/Stream.hpp"
 #include "wpi/net/uv/Tcp.hpp"
 #include "wpi/net/uv/Timer.hpp"
+#include "wpi/util/DenseMap.hpp"
+#include "wpi/util/MemoryBuffer.hpp"
+#include "wpi/util/Signal.h"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/StringMap.hpp"
+#include "wpi/util/fs.hpp"
+#include "wpi/util/json.hpp"
+#include "wpi/util/print.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
 using namespace wpi::net;
 

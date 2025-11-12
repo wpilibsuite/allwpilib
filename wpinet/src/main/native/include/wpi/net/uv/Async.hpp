@@ -5,13 +5,13 @@
 #ifndef WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_ASYNC_HPP_
 #define WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_ASYNC_HPP_
 
-#include <uv.h>
-
 #include <memory>
 #include <thread>
 #include <tuple>
 #include <utility>
 #include <vector>
+
+#include <uv.h>
 
 #include "wpi/net/uv/Handle.hpp"
 #include "wpi/net/uv/Loop.hpp"

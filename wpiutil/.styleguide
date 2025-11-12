@@ -44,14 +44,6 @@ repoRootNameOverride {
   wpiutil
 }
 
-includeOtherLibs {
-  ^catch2/
-  ^fmt/
-  ^gmock/
-  ^gtest/
-  ^upb/
-}
-
 includeGuardRoots {
   wpiutil/src/main/native/cpp/
   wpiutil/src/main/native/include/

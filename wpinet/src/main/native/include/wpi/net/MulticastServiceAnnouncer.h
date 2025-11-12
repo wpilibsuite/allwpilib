@@ -7,12 +7,15 @@
 #include <stdint.h>
 
 #ifdef __cplusplus
+
 #include <memory>
 #include <span>
 #include <string>
 #include <string_view>
 #include <utility>
+
 namespace wpi::net {
+
 class MulticastServiceAnnouncer {
  public:
   /**
@@ -26,6 +29,7 @@ class MulticastServiceAnnouncer {
   MulticastServiceAnnouncer(
       std::string_view serviceName, std::string_view serviceType, int port,
       std::span<const std::pair<std::string, std::string>> txt);
+
   /**
    * Creates a MulticastServiceAnnouncer.
    *
@@ -37,6 +41,7 @@ class MulticastServiceAnnouncer {
   MulticastServiceAnnouncer(
       std::string_view serviceName, std::string_view serviceType, int port,
       std::span<const std::pair<std::string_view, std::string_view>> txt);
+
   /**
    * Creates a MulticastServiceAnnouncer.
    *
@@ -46,28 +51,36 @@ class MulticastServiceAnnouncer {
    */
   MulticastServiceAnnouncer(std::string_view serviceName,
                             std::string_view serviceType, int port);
+
   ~MulticastServiceAnnouncer() noexcept;
+
   /**
    * Starts multicast service announcer.
    */
   void Start();
+
   /**
    * Stops multicast service announcer.
    */
   void Stop();
+
   /**
    * Returns true if there's a multicast service announcer implementation.
    *
    * @return True if there's a multicast service announcer implementation.
    */
   bool HasImplementation() const;
+
   struct Impl;
 
  private:
   std::unique_ptr<Impl> pImpl;
 };
+
 }  // namespace wpi::net
+
 extern "C" {
+
 #endif
 
 typedef unsigned int WPI_MulticastServiceAnnouncerHandle;  // NOLINT

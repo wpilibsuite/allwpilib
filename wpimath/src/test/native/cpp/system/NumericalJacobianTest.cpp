@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
-
 #include "wpi/math/system/NumericalJacobian.hpp"
+
+#include <gtest/gtest.h>
 
 wpi::math::Matrixd<4, 4> A{
     {1, 2, 4, 1}, {5, 2, 3, 4}, {5, 1, 3, 2}, {1, 1, 3, 7}};

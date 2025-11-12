@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
-
 #include "wpi/sysid/analysis/OLS.hpp"
+
+#include <gtest/gtest.h>
 
 TEST(OLSTest, TwoVariablesTwoPoints) {
   // (1, 3) and (2, 5). Should produce y = 2x + 1.

@@ -33,12 +33,3 @@ includeGuardRoots {
 repoRootNameOverride {
   cscore
 }
-
-includeOtherLibs {
-  ^fmt/
-  ^gtest/
-  ^opencv2/
-  ^imgui
-  ^support/
-  ^tcpsockets/
-}

@@ -2,9 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/filter/SlewRateLimiter.hpp"
+
 #include <gtest/gtest.h>
 
-#include "wpi/math/filter/SlewRateLimiter.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"

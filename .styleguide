@@ -35,21 +35,3 @@ generatedFileExclude {
 repoRootNameOverride {
   wpilib
 }
-
-includeOtherLibs {
-  ^Eigen/
-  ^cameraserver/
-  ^cscore
-  ^fmt/
-  ^glass/
-  ^gtest/
-  ^imgui
-  ^implot
-  ^mockdata/
-  ^opencv2/
-  ^support/
-  ^units/
-  ^unsupported/
-  ^upb/
-  ^vision/
-}

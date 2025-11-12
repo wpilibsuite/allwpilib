@@ -19,11 +19,11 @@
         -- Volker Grabsch <vog@notjusthosting.com>
 */
 
+#include "wpi/util/sha1.hpp"
+
 #include <string>
 
 #include <gtest/gtest.h>
-
-#include "wpi/util/sha1.hpp"
 
 namespace wpi::util {
 

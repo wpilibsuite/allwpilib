@@ -2,10 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/util/StateSpaceUtil.hpp"
+
 #include <gtest/gtest.h>
 
 #include "wpi/math/linalg/EigenCore.hpp"
-#include "wpi/math/util/StateSpaceUtil.hpp"
 
 TEST(StateSpaceUtilTest, CostParameterPack) {
   constexpr wpi::math::Matrixd<3, 3> mat =

@@ -20,14 +20,3 @@ generatedFileExclude {
 repoRootNameOverride {
   wpical
 }
-
-includeOtherLibs {
-  ^GLFW
-  ^ceres/
-  ^fmt/
-  ^gtest/
-  ^imgui
-  ^implot\.h$
-  ^mrcal_wrapper\.h$
-  ^opencv2\.h$
-}

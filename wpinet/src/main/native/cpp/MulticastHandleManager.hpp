@@ -12,6 +12,7 @@
 #include "wpi/util/UidVector.hpp"
 
 namespace wpi::net {
+
 struct MulticastHandleManager {
   wpi::util::mutex mutex;
   wpi::util::UidVector<int, 8> handleIds;
@@ -27,4 +28,5 @@ struct MulticastHandleManager {
 };
 
 MulticastHandleManager& GetMulticastManager();
+
 }  // namespace wpi::net

@@ -5,13 +5,13 @@
 #ifndef WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_HANDLE_HPP_
 #define WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_HANDLE_HPP_
 
-#include <uv.h>
-
 #include <cstdlib>
 #include <functional>
 #include <memory>
 #include <string_view>
 #include <utility>
+
+#include <uv.h>
 
 #include "wpi/net/uv/Buffer.hpp"
 #include "wpi/net/uv/Error.hpp"

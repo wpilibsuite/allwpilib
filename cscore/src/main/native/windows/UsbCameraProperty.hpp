@@ -4,14 +4,13 @@
 
 #pragma once
 
+#include <dshow.h>
 #include <mfapi.h>
 #include <mfidl.h>
 #include <mfreadwrite.h>
 
 #include <memory>
 #include <string_view>
-
-#include <Dshow.h>
 
 #include "PropertyImpl.hpp"
 #include "wpi/util/mutex.hpp"

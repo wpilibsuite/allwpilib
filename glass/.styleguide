@@ -18,15 +18,3 @@ generatedFileExclude {
 repoRootNameOverride {
   glass
 }
-
-includeOtherLibs {
-  ^GLFW
-  ^fmt/
-  ^imgui
-  ^upb/
-}
-
-includeProject {
-  wpi/gui/portable-file-dialogs.h
-  wpi/util/expected
-}

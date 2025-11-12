@@ -12,13 +12,6 @@ repoRootNameOverride {
   cameraserver
 }
 
-includeOtherLibs {
-  ^fmt/
-  ^gtest/
-  ^opencv2/
-  ^support/
-}
-
 includeGuardRoots {
   cameraserver/src/main/native/include/
 }
