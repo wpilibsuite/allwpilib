@@ -11,7 +11,8 @@
 #include "wpimath/protobuf/kinematics.npb.h"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::MecanumDriveWheelAccelerations> {
+struct WPILIB_DLLEXPORT
+    wpi::util::Protobuf<wpi::math::MecanumDriveWheelAccelerations> {
   using MessageStruct = wpi_proto_ProtobufMecanumDriveWheelAccelerations;
   using InputStream =
       wpi::util::ProtoInputStream<wpi::math::MecanumDriveWheelAccelerations>;

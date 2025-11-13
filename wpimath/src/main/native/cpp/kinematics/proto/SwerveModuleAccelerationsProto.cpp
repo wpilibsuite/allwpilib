@@ -8,8 +8,8 @@
 
 #include "wpimath/protobuf/kinematics.npb.h"
 
-std::optional<wpi::math::SwerveModuleAccelerations>
-wpi::util::Protobuf<wpi::math::SwerveModuleAccelerations>::Unpack(InputStream& stream) {
+std::optional<wpi::math::SwerveModuleAccelerations> wpi::util::Protobuf<
+    wpi::math::SwerveModuleAccelerations>::Unpack(InputStream& stream) {
   wpi::util::UnpackCallback<wpi::math::Rotation2d> angle;
   wpi_proto_ProtobufSwerveModuleAccelerations msg{
       .acceleration = 0,

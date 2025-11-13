@@ -8,8 +8,8 @@
 
 #include "wpi/math/kinematics/ChassisAccelerations.hpp"
 
-wpi::math::ChassisAccelerations wpi::util::Struct<wpi::math::ChassisAccelerations>::Unpack(
-    std::span<const uint8_t> data) {
+wpi::math::ChassisAccelerations wpi::util::Struct<
+    wpi::math::ChassisAccelerations>::Unpack(std::span<const uint8_t> data) {
   constexpr size_t kAxOff = 0;
   constexpr size_t kAyOff = kAxOff + 8;
   constexpr size_t kAlphaOff = kAyOff + 8;

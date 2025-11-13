@@ -11,10 +11,13 @@
 #include "wpimath/protobuf/kinematics.npb.h"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::SwerveModuleAccelerations> {
+struct WPILIB_DLLEXPORT
+    wpi::util::Protobuf<wpi::math::SwerveModuleAccelerations> {
   using MessageStruct = wpi_proto_ProtobufSwerveModuleAccelerations;
-  using InputStream = wpi::util::ProtoInputStream<wpi::math::SwerveModuleAccelerations>;
-  using OutputStream = wpi::util::ProtoOutputStream<wpi::math::SwerveModuleAccelerations>;
+  using InputStream =
+      wpi::util::ProtoInputStream<wpi::math::SwerveModuleAccelerations>;
+  using OutputStream =
+      wpi::util::ProtoOutputStream<wpi::math::SwerveModuleAccelerations>;
   static std::optional<wpi::math::SwerveModuleAccelerations> Unpack(
       InputStream& stream);
   static bool Pack(OutputStream& stream,

@@ -28,7 +28,8 @@ wpi::util::Struct<wpi::math::MecanumDriveWheelAccelerations>::Unpack(
 }
 
 void wpi::util::Struct<wpi::math::MecanumDriveWheelAccelerations>::Pack(
-    std::span<uint8_t> data, const wpi::math::MecanumDriveWheelAccelerations& value) {
+    std::span<uint8_t> data,
+    const wpi::math::MecanumDriveWheelAccelerations& value) {
   constexpr size_t kFrontLeftOff = 0;
   constexpr size_t kFrontRightOff = kFrontLeftOff + 8;
   constexpr size_t kRearLeftOff = kFrontRightOff + 8;

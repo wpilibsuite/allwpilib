@@ -14,10 +14,10 @@ template <>
 struct WPILIB_DLLEXPORT
     wpi::util::Protobuf<wpi::math::DifferentialDriveWheelAccelerations> {
   using MessageStruct = wpi_proto_ProtobufDifferentialDriveWheelAccelerations;
-  using InputStream =
-      wpi::util::ProtoInputStream<wpi::math::DifferentialDriveWheelAccelerations>;
-  using OutputStream =
-      wpi::util::ProtoOutputStream<wpi::math::DifferentialDriveWheelAccelerations>;
+  using InputStream = wpi::util::ProtoInputStream<
+      wpi::math::DifferentialDriveWheelAccelerations>;
+  using OutputStream = wpi::util::ProtoOutputStream<
+      wpi::math::DifferentialDriveWheelAccelerations>;
   static std::optional<wpi::math::DifferentialDriveWheelAccelerations> Unpack(
       InputStream& stream);
   static bool Pack(OutputStream& stream,

@@ -10,7 +10,8 @@
 #include "wpi/math/kinematics/MecanumDriveWheelAccelerations.hpp"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::MecanumDriveWheelAccelerations> {
+struct WPILIB_DLLEXPORT
+    wpi::util::Struct<wpi::math::MecanumDriveWheelAccelerations> {
   static constexpr std::string_view GetTypeName() {
     return "MecanumDriveWheelAccelerations";
   }
@@ -26,4 +27,5 @@ struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::MecanumDriveWheelAccelerati
                    const wpi::math::MecanumDriveWheelAccelerations& value);
 };
 
-static_assert(wpi::util::StructSerializable<wpi::math::MecanumDriveWheelAccelerations>);
+static_assert(
+    wpi::util::StructSerializable<wpi::math::MecanumDriveWheelAccelerations>);

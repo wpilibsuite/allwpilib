@@ -22,7 +22,8 @@ std::optional<wpi::math::MecanumDriveWheelAccelerations> wpi::util::Protobuf<
 }
 
 bool wpi::util::Protobuf<wpi::math::MecanumDriveWheelAccelerations>::Pack(
-    OutputStream& stream, const wpi::math::MecanumDriveWheelAccelerations& value) {
+    OutputStream& stream,
+    const wpi::math::MecanumDriveWheelAccelerations& value) {
   wpi_proto_ProtobufMecanumDriveWheelAccelerations msg{
       .front_left = value.frontLeft.value(),
       .front_right = value.frontRight.value(),

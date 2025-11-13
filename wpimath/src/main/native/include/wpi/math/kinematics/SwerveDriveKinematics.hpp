@@ -475,7 +475,8 @@ class SwerveDriveKinematics
    * that corner.
    * @return An array containing the module accelerations.
    */
-  wpi::util::array<SwerveModuleAccelerations, NumModules> ToSwerveModuleAccelerations(
+  wpi::util::array<SwerveModuleAccelerations, NumModules>
+  ToSwerveModuleAccelerations(
       const ChassisAccelerations& chassisAccelerations,
       const units::radians_per_second_t angularVelocity = 0.0_rad_per_s,
       const Translation2d& centerOfRotation = Translation2d{}) const {

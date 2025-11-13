@@ -10,7 +10,8 @@
 #include "wpi/math/kinematics/DifferentialDriveWheelAccelerations.hpp"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::DifferentialDriveWheelAccelerations> {
+struct WPILIB_DLLEXPORT
+    wpi::util::Struct<wpi::math::DifferentialDriveWheelAccelerations> {
   static constexpr std::string_view GetTypeName() {
     return "DifferentialDriveWheelAccelerations";
   }
@@ -25,5 +26,5 @@ struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::DifferentialDriveWheelAccel
                    const wpi::math::DifferentialDriveWheelAccelerations& value);
 };
 
-static_assert(
-    wpi::util::StructSerializable<wpi::math::DifferentialDriveWheelAccelerations>);
+static_assert(wpi::util::StructSerializable<
+              wpi::math::DifferentialDriveWheelAccelerations>);

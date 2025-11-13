@@ -315,7 +315,8 @@ TEST_F(SwerveDriveKinematicsTest, TurnInPlaceInverseAccelerations) {
   ChassisAccelerations accelerations{
       0_mps_sq, 0_mps_sq,
       wpi::units::radians_per_second_squared_t{2 * std::numbers::pi}};
-  wpi::units::radians_per_second_t angularVelocity = 2_rad_per_s * std::numbers::pi;
+  wpi::units::radians_per_second_t angularVelocity =
+      2_rad_per_s * std::numbers::pi;
   auto [flAccel, frAccel, blAccel, brAccel] =
       m_kinematics.ToSwerveModuleAccelerations(accelerations, angularVelocity);
 

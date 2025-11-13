@@ -13,9 +13,12 @@
 template <>
 struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::ChassisAccelerations> {
   using MessageStruct = wpi_proto_ProtobufChassisAccelerations;
-  using InputStream = wpi::util::ProtoInputStream<wpi::math::ChassisAccelerations>;
-  using OutputStream = wpi::util::ProtoOutputStream<wpi::math::ChassisAccelerations>;
-  static std::optional<wpi::math::ChassisAccelerations> Unpack(InputStream& stream);
+  using InputStream =
+      wpi::util::ProtoInputStream<wpi::math::ChassisAccelerations>;
+  using OutputStream =
+      wpi::util::ProtoOutputStream<wpi::math::ChassisAccelerations>;
+  static std::optional<wpi::math::ChassisAccelerations> Unpack(
+      InputStream& stream);
   static bool Pack(OutputStream& stream,
                    const wpi::math::ChassisAccelerations& value);
 };

@@ -6,8 +6,8 @@
 
 #include "wpimath/protobuf/kinematics.npb.h"
 
-std::optional<wpi::math::ChassisAccelerations>
-wpi::util::Protobuf<wpi::math::ChassisAccelerations>::Unpack(InputStream& stream) {
+std::optional<wpi::math::ChassisAccelerations> wpi::util::Protobuf<
+    wpi::math::ChassisAccelerations>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufChassisAccelerations msg;
   if (!stream.Decode(msg)) {
     return {};

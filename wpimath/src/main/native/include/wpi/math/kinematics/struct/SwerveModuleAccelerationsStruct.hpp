@@ -10,7 +10,8 @@
 #include "wpi/math/kinematics/SwerveModuleAccelerations.hpp"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::SwerveModuleAccelerations> {
+struct WPILIB_DLLEXPORT
+    wpi::util::Struct<wpi::math::SwerveModuleAccelerations> {
   static constexpr std::string_view GetTypeName() {
     return "SwerveModuleAccelerations";
   }
@@ -21,7 +22,8 @@ struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::SwerveModuleAccelerations> 
     return "double acceleration;Rotation2d angle";
   }
 
-  static wpi::math::SwerveModuleAccelerations Unpack(std::span<const uint8_t> data);
+  static wpi::math::SwerveModuleAccelerations Unpack(
+      std::span<const uint8_t> data);
   static void Pack(std::span<uint8_t> data,
                    const wpi::math::SwerveModuleAccelerations& value);
   static void ForEachNested(
@@ -30,5 +32,6 @@ struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::SwerveModuleAccelerations> 
   }
 };
 
-static_assert(wpi::util::StructSerializable<wpi::math::SwerveModuleAccelerations>);
+static_assert(
+    wpi::util::StructSerializable<wpi::math::SwerveModuleAccelerations>);
 static_assert(wpi::util::HasNestedStruct<wpi::math::SwerveModuleAccelerations>);

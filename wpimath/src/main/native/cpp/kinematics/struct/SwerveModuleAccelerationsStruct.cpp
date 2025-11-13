@@ -8,8 +8,9 @@
 
 #include "wpi/math/kinematics/SwerveModuleAccelerations.hpp"
 
-wpi::math::SwerveModuleAccelerations wpi::util::Struct<
-    wpi::math::SwerveModuleAccelerations>::Unpack(std::span<const uint8_t> data) {
+wpi::math::SwerveModuleAccelerations
+wpi::util::Struct<wpi::math::SwerveModuleAccelerations>::Unpack(
+    std::span<const uint8_t> data) {
   constexpr size_t kAccelerationOff = 0;
   constexpr size_t kAngleOff = kAccelerationOff + 8;
   return wpi::math::SwerveModuleAccelerations{
@@ -19,7 +20,8 @@ wpi::math::SwerveModuleAccelerations wpi::util::Struct<
 }
 
 void wpi::util::Struct<wpi::math::SwerveModuleAccelerations>::Pack(
-    std::span<uint8_t> data, const wpi::math::SwerveModuleAccelerations& value) {
+    std::span<uint8_t> data,
+    const wpi::math::SwerveModuleAccelerations& value) {
   constexpr size_t kAccelerationOff = 0;
   constexpr size_t kAngleOff = kAccelerationOff + 8;
   wpi::util::PackStruct<kAccelerationOff>(data, value.acceleration.value());
