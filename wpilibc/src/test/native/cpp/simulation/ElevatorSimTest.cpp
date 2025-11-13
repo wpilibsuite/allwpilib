@@ -95,12 +95,12 @@ TEST(ElevatorSimTest, Stability) {
 
 TEST(ElevatorSimTest, CurrentDraw) {
   auto const motor = frc::DCMotor::KrakenX60(2);
-  frc::sim::ElevatorSim sim(motor, 20, 8_kg, 0.1_m, 0_m,
-                            1_m, true, 0_m, {0.01, 0.0});
+  frc::sim::ElevatorSim sim(motor, 20, 8_kg, 0.1_m, 0_m, 1_m, true, 0_m,
+                            {0.01, 0.0});
 
   EXPECT_DOUBLE_EQ(0.0, sim.GetCurrentDraw().value());
   sim.SetInputVoltage(motor.Voltage(motor.Torque(60_A), 0_rad_per_s));
   sim.Update(100_ms);
   // current draw should start at 60 A and decrease as the back emf catches up
-  EXPECT_TRUE(0_A < sim.getCurrentDraw() && sim.GetCurrentDraw() < 60_A);
+  EXPECT_TRUE(0_A < sim.GetCurrentDraw() && sim.GetCurrentDraw() < 60_A);
 }
