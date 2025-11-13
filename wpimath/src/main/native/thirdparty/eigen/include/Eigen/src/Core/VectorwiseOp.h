@@ -146,6 +146,22 @@ struct member_redux {
   const BinaryOp& binaryFunc() const { return m_functor; }
   const BinaryOp m_functor;
 };
+
+template <typename Scalar>
+struct scalar_replace_zero_with_one_op {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar operator()(const Scalar& x) const {
+    return numext::is_exactly_zero(x) ? Scalar(1) : x;
+  }
+  template <typename Packet>
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Packet packetOp(const Packet& x) const {
+    return pselect(pcmp_eq(x, pzero(x)), pset1<Packet>(Scalar(1)), x);
+  }
+};
+template <typename Scalar>
+struct functor_traits<scalar_replace_zero_with_one_op<Scalar>> {
+  enum { Cost = 1, PacketAccess = packet_traits<Scalar>::HasCmp };
+};
+
 }  // namespace internal
 
 /** \class VectorwiseOp
@@ -190,9 +206,7 @@ class VectorwiseOp {
  public:
   typedef typename ExpressionType::Scalar Scalar;
   typedef typename ExpressionType::RealScalar RealScalar;
-  typedef Eigen::Index Index;  ///< \deprecated since Eigen 3.3
-  typedef typename internal::ref_selector<ExpressionType>::non_const_type ExpressionTypeNested;
-  typedef internal::remove_all_t<ExpressionTypeNested> ExpressionTypeNestedCleaned;
+  typedef internal::remove_all_t<ExpressionType> ExpressionTypeCleaned;
 
   template <template <typename OutScalar, typename InputScalar> class Functor, typename ReturnScalar = Scalar>
   struct ReturnType {
@@ -331,7 +345,7 @@ class VectorwiseOp {
 
   typedef typename ReturnType<internal::member_minCoeff>::Type MinCoeffReturnType;
   typedef typename ReturnType<internal::member_maxCoeff>::Type MaxCoeffReturnType;
-  typedef PartialReduxExpr<const CwiseUnaryOp<internal::scalar_abs2_op<Scalar>, const ExpressionTypeNestedCleaned>,
+  typedef PartialReduxExpr<const CwiseUnaryOp<internal::scalar_abs2_op<Scalar>, const ExpressionTypeCleaned>,
                            internal::member_sum<RealScalar, RealScalar>, Direction>
       SquaredNormReturnType;
   typedef CwiseUnaryOp<internal::scalar_sqrt_op<RealScalar>, const SquaredNormReturnType> NormReturnType;
@@ -582,7 +596,7 @@ class VectorwiseOp {
   /** Returns the expression of the sum of the vector \a other to each subvector of \c *this */
   template <typename OtherDerived>
   EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC
-      CwiseBinaryOp<internal::scalar_sum_op<Scalar, typename OtherDerived::Scalar>, const ExpressionTypeNestedCleaned,
+      CwiseBinaryOp<internal::scalar_sum_op<Scalar, typename OtherDerived::Scalar>, const ExpressionTypeCleaned,
                     const typename ExtendedType<OtherDerived>::Type>
       operator+(const DenseBase<OtherDerived>& other) const {
     EIGEN_STATIC_ASSERT_VECTOR_ONLY(OtherDerived)
@@ -593,7 +607,7 @@ class VectorwiseOp {
   /** Returns the expression of the difference between each subvector of \c *this and the vector \a other */
   template <typename OtherDerived>
   EIGEN_DEVICE_FUNC CwiseBinaryOp<internal::scalar_difference_op<Scalar, typename OtherDerived::Scalar>,
-                                  const ExpressionTypeNestedCleaned, const typename ExtendedType<OtherDerived>::Type>
+                                  const ExpressionTypeCleaned, const typename ExtendedType<OtherDerived>::Type>
   operator-(const DenseBase<OtherDerived>& other) const {
     EIGEN_STATIC_ASSERT_VECTOR_ONLY(OtherDerived)
     EIGEN_STATIC_ASSERT_SAME_XPR_KIND(ExpressionType, OtherDerived)
@@ -604,7 +618,7 @@ class VectorwiseOp {
    * by the corresponding subvector of \c *this */
   template <typename OtherDerived>
   EIGEN_DEVICE_FUNC CwiseBinaryOp<internal::scalar_product_op<Scalar, typename OtherDerived::Scalar>,
-                                  const ExpressionTypeNestedCleaned, const typename ExtendedType<OtherDerived>::Type>
+                                  const ExpressionTypeCleaned, const typename ExtendedType<OtherDerived>::Type>
   operator*(const DenseBase<OtherDerived>& other) const {
     EIGEN_STATIC_ASSERT_VECTOR_ONLY(OtherDerived)
     EIGEN_STATIC_ASSERT_ARRAYXPR(ExpressionType)
@@ -616,7 +630,7 @@ class VectorwiseOp {
    * subvector of \c *this by the vector \a other */
   template <typename OtherDerived>
   EIGEN_DEVICE_FUNC CwiseBinaryOp<internal::scalar_quotient_op<Scalar, typename OtherDerived::Scalar>,
-                                  const ExpressionTypeNestedCleaned, const typename ExtendedType<OtherDerived>::Type>
+                                  const ExpressionTypeCleaned, const typename ExtendedType<OtherDerived>::Type>
   operator/(const DenseBase<OtherDerived>& other) const {
     EIGEN_STATIC_ASSERT_VECTOR_ONLY(OtherDerived)
     EIGEN_STATIC_ASSERT_ARRAYXPR(ExpressionType)
@@ -624,18 +638,28 @@ class VectorwiseOp {
     return m_matrix / extendedTo(other.derived());
   }
 
+  using Normalized_NonzeroNormType =
+      CwiseUnaryOp<internal::scalar_replace_zero_with_one_op<Scalar>, const NormReturnType>;
+  using NormalizedReturnType = CwiseBinaryOp<internal::scalar_quotient_op<Scalar>, const ExpressionTypeCleaned,
+                                             const typename OppositeExtendedType<Normalized_NonzeroNormType>::Type>;
+
   /** \returns an expression where each column (or row) of the referenced matrix are normalized.
    * The referenced matrix is \b not modified.
+   *
+   * \warning If the input columns (or rows) are too small (i.e., their norm equals to 0), they remain unchanged in the
+   *          resulting expression.
+   *
    * \sa MatrixBase::normalized(), normalize()
    */
-  EIGEN_DEVICE_FUNC CwiseBinaryOp<internal::scalar_quotient_op<Scalar>, const ExpressionTypeNestedCleaned,
-                                  const typename OppositeExtendedType<NormReturnType>::Type>
-  normalized() const {
-    return m_matrix.cwiseQuotient(extendedToOpposite(this->norm()));
+  EIGEN_DEVICE_FUNC NormalizedReturnType normalized() const {
+    return m_matrix.cwiseQuotient(extendedToOpposite(Normalized_NonzeroNormType(this->norm())));
   }
 
   /** Normalize in-place each row or columns of the referenced matrix.
-   * \sa MatrixBase::normalize(), normalized()
+   *
+   * \warning If the input columns (or rows) are too small (i.e., their norm equals to 0), they are left unchanged.
+   *
+   * \sa MatrixBase::normalized(), normalize()
    */
   EIGEN_DEVICE_FUNC void normalize() { m_matrix = this->normalized(); }
 
@@ -679,7 +703,7 @@ class VectorwiseOp {
 
  protected:
   EIGEN_DEVICE_FUNC Index redux_length() const { return Direction == Vertical ? m_matrix.rows() : m_matrix.cols(); }
-  ExpressionTypeNested m_matrix;
+  ExpressionType& m_matrix;
 };
 
 // const colwise moved to DenseBase.h due to CUDA compiler bug

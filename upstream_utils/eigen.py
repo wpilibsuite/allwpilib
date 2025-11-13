@@ -38,6 +38,10 @@ def eigen_inclusions(dp: Path, f: str):
     if "MKL" in f:
         return False
 
+    # Exclude HIP CUDA support
+    if "GpuHip" in f:
+        return False
+
     # Include architectures we care about by filtering for Core/arch
     if "Core" in dp.parts and "arch" in dp.parts:
         return (
@@ -73,6 +77,7 @@ def eigen_inclusions(dp: Path, f: str):
         "SparseLU",
         "SparseQR",
         "StdVector",
+        "Version",
         "misc",
         "plugins",
     ]
@@ -140,8 +145,7 @@ def copy_upstream_src(wpilib_root: Path):
 def main():
     name = "eigen"
     url = "https://gitlab.com/libeigen/eigen.git"
-    # master on 2025-05-18
-    tag = "d81aa18f4dc56264b2cd7e2f230807d776a2d385"
+    tag = "5.0.0"
 
     eigen = Lib(name, url, tag, copy_upstream_src)
     eigen.main()

@@ -22,6 +22,7 @@ void BM_Transform(benchmark::State& state) {
     auto transform = pose2 - pose1;
     return units::math::hypot(transform.X(), transform.Y()).value();
   }};
+  // NOLINTNEXTLINE(clang-analyzer-deadcode.DeadStores)
   for (auto _ : state) {
     traveler.Solve(poses, iterations);
   }
@@ -33,6 +34,7 @@ void BM_Twist(benchmark::State& state) {
     auto twist = pose1.Log(pose2);
     return units::math::hypot(twist.dx, twist.dy).value();
   }};
+  // NOLINTNEXTLINE(clang-analyzer-deadcode.DeadStores)
   for (auto _ : state) {
     traveler.Solve(poses, iterations);
   }

@@ -846,7 +846,7 @@ struct generic_product_impl<Lhs, Rhs, SelfAdjointShape, DenseShape, ProductTag>
 
   template <typename Dest>
   static EIGEN_DEVICE_FUNC void scaleAndAddTo(Dest& dst, const Lhs& lhs, const Rhs& rhs, const Scalar& alpha) {
-    selfadjoint_product_impl<typename Lhs::MatrixType, Lhs::Mode, false, Rhs, 0, Rhs::IsVectorAtCompileTime>::run(
+    selfadjoint_product_impl<typename Lhs::MatrixType, Lhs::Mode, false, Rhs, 0, Rhs::ColsAtCompileTime == 1>::run(
         dst, lhs.nestedExpression(), rhs, alpha);
   }
 };
@@ -858,7 +858,7 @@ struct generic_product_impl<Lhs, Rhs, DenseShape, SelfAdjointShape, ProductTag>
 
   template <typename Dest>
   static void scaleAndAddTo(Dest& dst, const Lhs& lhs, const Rhs& rhs, const Scalar& alpha) {
-    selfadjoint_product_impl<Lhs, 0, Lhs::IsVectorAtCompileTime, typename Rhs::MatrixType, Rhs::Mode, false>::run(
+    selfadjoint_product_impl<Lhs, 0, Lhs::RowsAtCompileTime == 1, typename Rhs::MatrixType, Rhs::Mode, false>::run(
         dst, lhs, rhs.nestedExpression(), alpha);
   }
 };
@@ -1263,6 +1263,22 @@ struct generic_product_impl<Lhs, Rhs, SkewSymmetricShape, SkewSymmetricShape, Pr
                          ProductTag>::evalTo(dst, lhs, rhs);
   }
 };
+
+template <typename Lhs, typename Rhs, int ProductTag, typename MatrixShape>
+struct generic_product_impl<Lhs, Rhs, MatrixShape, HomogeneousShape, ProductTag>
+    : generic_product_impl<Lhs, typename Rhs::PlainObject, MatrixShape, DenseShape, ProductTag> {};
+
+template <typename Lhs, typename Rhs, int ProductTag, typename MatrixShape>
+struct generic_product_impl<Lhs, Rhs, HomogeneousShape, MatrixShape, ProductTag>
+    : generic_product_impl<typename Lhs::PlainObject, Rhs, DenseShape, MatrixShape, ProductTag> {};
+
+template <typename Lhs, typename Rhs, int ProductTag>
+struct generic_product_impl<Lhs, Rhs, PermutationShape, HomogeneousShape, ProductTag>
+    : generic_product_impl<Lhs, Rhs, PermutationShape, DenseShape, ProductTag> {};
+
+template <typename Lhs, typename Rhs, int ProductTag>
+struct generic_product_impl<Lhs, Rhs, HomogeneousShape, PermutationShape, ProductTag>
+    : generic_product_impl<Lhs, Rhs, DenseShape, PermutationShape, ProductTag> {};
 
 }  // end namespace internal
 

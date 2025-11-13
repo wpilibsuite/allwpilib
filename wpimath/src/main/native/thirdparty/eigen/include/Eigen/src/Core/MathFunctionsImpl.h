@@ -28,7 +28,7 @@ namespace internal {
    2. If a is zero, approx_a_recip must be infinite with the same sign as a.
    3. If a is infinite, approx_a_recip must be zero with the same sign as a.
 
-   If the preconditions are satisfied, which they are for for the _*_rcp_ps
+   If the preconditions are satisfied, which they are for the _*_rcp_ps
    instructions on x86, the result has a maximum relative error of 2 ulps,
    and correctly handles reciprocals of zero, infinity, and NaN.
 */
@@ -66,7 +66,7 @@ struct generic_reciprocal_newton_step<Packet, 0> {
    2. If a is zero, approx_a_recip must be infinite with the same sign as a.
    3. If a is infinite, approx_a_recip must be zero with the same sign as a.
 
-   If the preconditions are satisfied, which they are for for the _*_rcp_ps
+   If the preconditions are satisfied, which they are for the _*_rcp_ps
    instructions on x86, the result has a maximum relative error of 2 ulps,
    and correctly handles zero, infinity, and NaN. Positive denormals are
    treated as zero.
@@ -116,7 +116,7 @@ struct generic_rsqrt_newton_step<Packet, 0> {
    2. If a is zero, approx_rsqrt must be infinite.
    3. If a is infinite, approx_rsqrt must be zero.
 
-   If the preconditions are satisfied, which they are for for the _*_rsqrt_ps
+   If the preconditions are satisfied, which they are for the _*_rsqrt_ps
    instructions on x86, the result has a maximum relative error of 2 ulps,
    and correctly handles zero and infinity, and NaN. Positive denormal inputs
    are treated as zero.
@@ -255,48 +255,6 @@ EIGEN_DEVICE_FUNC ComplexT complex_log(const ComplexT& z) {
   T b = atan2(z.imag(), z.real());
   return ComplexT(numext::log(a), b);
 }
-
-// For generic scalars, use ternary select.
-template <typename Mask>
-struct scalar_select_mask<Mask, /*is_built_in_float*/ false> {
-  static EIGEN_DEVICE_FUNC inline bool run(const Mask& mask) { return numext::is_exactly_zero(mask); }
-};
-
-// For built-in float mask, bitcast the mask to its integer counterpart and use ternary select.
-template <typename Mask>
-struct scalar_select_mask<Mask, /*is_built_in_float*/ true> {
-  using IntegerType = typename numext::get_integer_by_size<sizeof(Mask)>::unsigned_type;
-  static EIGEN_DEVICE_FUNC inline bool run(const Mask& mask) {
-    return numext::is_exactly_zero(numext::bit_cast<IntegerType>(std::abs(mask)));
-  }
-};
-
-template <int Size = sizeof(long double)>
-struct ldbl_select_mask {
-  static constexpr int MantissaDigits = std::numeric_limits<long double>::digits;
-  static constexpr int NumBytes = (MantissaDigits == 64 ? 80 : 128) / CHAR_BIT;
-  static EIGEN_DEVICE_FUNC inline bool run(const long double& mask) {
-    const uint8_t* mask_bytes = reinterpret_cast<const uint8_t*>(&mask);
-    for (Index i = 0; i < NumBytes; i++) {
-      if (mask_bytes[i] != 0) return false;
-    }
-    return true;
-  }
-};
-
-template <>
-struct ldbl_select_mask<sizeof(double)> : scalar_select_mask<double> {};
-
-template <>
-struct scalar_select_mask<long double, true> : ldbl_select_mask<> {};
-
-template <typename RealMask>
-struct scalar_select_mask<std::complex<RealMask>, false> {
-  using impl = scalar_select_mask<RealMask>;
-  static EIGEN_DEVICE_FUNC inline bool run(const std::complex<RealMask>& mask) {
-    return impl::run(numext::real(mask)) && impl::run(numext::imag(mask));
-  }
-};
 
 }  // end namespace internal
 
