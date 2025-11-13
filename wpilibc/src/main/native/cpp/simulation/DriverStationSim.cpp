@@ -2,18 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/DriverStationSim.h"
+#include "wpi/simulation/DriverStationSim.hpp"
 
 #include <memory>
 
-#include <hal/DriverStation.h>
-#include <hal/simulation/DriverStationData.h>
-#include <hal/simulation/MockHooks.h>
+#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/hal/DriverStation.h"
+#include "wpi/hal/simulation/DriverStationData.h"
+#include "wpi/hal/simulation/MockHooks.h"
 
-#include "frc/DriverStation.h"
-
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 std::unique_ptr<CallbackStore> DriverStationSim::RegisterEnabledCallback(
     NotifyCallback callback, bool initialNotify) {
@@ -154,12 +153,12 @@ void DriverStationSim::SetMatchTime(double matchTime) {
 }
 
 void DriverStationSim::NotifyNewData() {
-  wpi::Event waitEvent{true};
+  wpi::util::Event waitEvent{true};
   HAL_ProvideNewDataEventHandle(waitEvent.GetHandle());
   HALSIM_NotifyDriverStationNewData();
-  wpi::WaitForObject(waitEvent.GetHandle());
+  wpi::util::WaitForObject(waitEvent.GetHandle());
   HAL_RemoveNewDataEventHandle(waitEvent.GetHandle());
-  frc::DriverStation::RefreshData();
+  wpi::DriverStation::RefreshData();
 }
 
 void DriverStationSim::SetSendError(bool shouldSend) {
@@ -267,17 +266,17 @@ void DriverStationSim::SetJoystickType(int stick, int type) {
 }
 
 void DriverStationSim::SetJoystickName(int stick, std::string_view name) {
-  auto str = wpi::make_string(name);
+  auto str = wpi::util::make_string(name);
   HALSIM_SetJoystickName(stick, &str);
 }
 
 void DriverStationSim::SetGameSpecificMessage(std::string_view message) {
-  auto str = wpi::make_string(message);
+  auto str = wpi::util::make_string(message);
   HALSIM_SetGameSpecificMessage(&str);
 }
 
 void DriverStationSim::SetEventName(std::string_view name) {
-  auto str = wpi::make_string(name);
+  auto str = wpi::util::make_string(name);
   HALSIM_SetEventName(&str);
 }
 

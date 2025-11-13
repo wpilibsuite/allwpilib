@@ -2,7 +2,7 @@
 
 #include <pybind11/pybind11.h>
 
-#include "hal/DriverStationTypes.h"
+#include "wpi/hal/DriverStationTypes.h"
 
 namespace pybind11 {
 

@@ -16,10 +16,10 @@ py_binary(
 genrule(
     name = "generate_bazel_files_rule",
     srcs = [
-        "src/main/java/edu/wpi/first/wpilibj/commands/commands.json",
-        "src/main/java/edu/wpi/first/wpilibj/examples/examples.json",
-        "src/main/java/edu/wpi/first/wpilibj/snippets/snippets.json",
-        "src/main/java/edu/wpi/first/wpilibj/templates/templates.json",
+        "src/main/java/org/wpilib/commands/commands.json",
+        "src/main/java/org/wpilib/examples/examples.json",
+        "src/main/java/org/wpilib/snippets/snippets.json",
+        "src/main/java/org/wpilib/templates/templates.json",
     ],
     outs = ["gen/example_projects.bzl"],
     cmd = "$(locations :generate_bazel_files) $(OUTS)",
@@ -50,21 +50,21 @@ build_tests()
 
 maven_export(
     name = "examples_publish",
-    maven_coordinates = "edu.wpi.first.wpilibj:examples:$(WPILIB_VERSION)",
+    maven_coordinates = "org.wpilib.wpilibj:examples:$(WPILIB_VERSION)",
     target = ":examples-zip",
     visibility = ["//visibility:public"],
 )
 
 maven_export(
     name = "commands_publish",
-    maven_coordinates = "edu.wpi.first.wpilibj:commands:$(WPILIB_VERSION)",
+    maven_coordinates = "org.wpilib.wpilibj:commands:$(WPILIB_VERSION)",
     target = ":commands-zip",
     visibility = ["//visibility:public"],
 )
 
 maven_export(
     name = "templates_publish",
-    maven_coordinates = "edu.wpi.first.wpilibj:templates:$(WPILIB_VERSION)",
+    maven_coordinates = "org.wpilib.wpilibj:templates:$(WPILIB_VERSION)",
     target = ":templates-zip",
     visibility = ["//visibility:public"],
 )

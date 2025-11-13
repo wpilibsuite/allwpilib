@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/geometry/Pose2d.hpp"
+
 #include <cmath>
 #include <cstdlib>
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Pose2d.h"
-
-using namespace frc;
+using namespace wpi::math;
 
 TEST(Pose2dTest, RotateBy) {
   constexpr auto x = 1_m;

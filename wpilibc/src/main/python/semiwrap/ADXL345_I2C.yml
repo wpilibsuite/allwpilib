@@ -1,12 +1,12 @@
 extra_includes:
-- networktables/NTSendableBuilder.h
+- wpi/nt/NTSendableBuilder.hpp
 
 classes:
-  frc::ADXL345_I2C:
+  wpi::ADXL345_I2C:
     constants:
-    - frc::ADXL345_I2C::Range::kRange_2G
+    - wpi::ADXL345_I2C::Range::kRange_2G
     ignored_bases:
-    - wpi::SendableHelper<ADXL345_I2C>
+    - wpi::util::SendableHelper<ADXL345_I2C>
     enums:
       Axes:
       Range:
@@ -23,7 +23,7 @@ classes:
       GetAcceleration:
       GetAccelerations:
       InitSendable:
-  frc::ADXL345_I2C::AllAxes:
+  wpi::ADXL345_I2C::AllAxes:
     attributes:
       XAxis:
       YAxis:

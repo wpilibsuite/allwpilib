@@ -2,6 +2,7 @@ load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 load("//shared/bazel/rules:publishing.bzl", "publish_all")
+load("//shared/bazel/rules/robotpy:compatibility_select.bzl", "robotpy_compatibility_select")
 
 exports_files([
     "LICENSE.md",
@@ -42,7 +43,7 @@ alias(
 
 # This is a helper to run all of the pregeneration scripts at once.
 write_source_files(
-    name = "write_all",
+    name = "write_pregenerated_files",
     additional_update_targets = [
         "//hal:write_hal",
         "//ntcore:write_ntcore",
@@ -50,7 +51,7 @@ write_source_files(
         "//wpilibcExamples:write_example_project_list",
         "//wpilibj:write_wpilibj",
         "//wpilibjExamples:write_example_project_list",
-        "//wpilibNewCommands:write_wpilib_new_commands",
+        "//commandsv2:write_wpilib_new_commands",
         "//commandsv3:write_commandsv3",
         "//wpimath:write_wpimath",
         "//wpiunits:write_wpiunits",
@@ -68,14 +69,15 @@ publish_all(
         "//cameraserver:cameraserver-java_publish.publish",
         "//cscore:cscore-cpp_publish.publish",
         "//cscore:cscore-java_publish.publish",
+        "//cscore:cscorejnicvstatic-cpp_publish.publish",
         "//datalog:datalog-cpp_publish.publish",
         "//datalog:datalog-java_publish.publish",
-        "//datalogtool:datalogtool_publish.publish",
+        "//tools/datalogtool:datalogtool_publish.publish",
         "//docs:wpilibj_publish.publish",
         "//epilogue-processor:processor-java_publish.publish",
         "//epilogue-runtime:epilogue-java_publish.publish",
-        "//fieldImages:fieldImages-cpp_publish.publish",
-        "//fieldImages:fieldImages-java_publish.publish",
+        "//fields:fields-cpp_publish.publish",
+        "//fields:fields-java_publish.publish",
         "//glass:glass-cpp_publish.publish",
         "//glass:glassapp_publish.publish",
         "//glass:glassnt-cpp_publish.publish",
@@ -84,8 +86,8 @@ publish_all(
         "//ntcore:ntcore-cpp_publish.publish",
         "//ntcore:ntcore-java_publish.publish",
         "//ntcoreffi:ntcoreffi-cpp_publish.publish",
-        "//outlineviewer:outlineviewer_publish.publish",
-        "//processstarter:processstarter_publish.publish",
+        "//tools/outlineviewer:outlineviewer_publish.publish",
+        "//tools/processstarter:processstarter_publish.publish",
         "//romiVendordep:romiVendordep-cpp_publish.publish",
         "//romiVendordep:romiVendordep-java_publish.publish",
         "//simulation/halsim_ds_socket:halsim_ds_socket-cpp_publish.publish",
@@ -94,13 +96,13 @@ publish_all(
         "//simulation/halsim_ws_core:halsim_ws_core-cpp_publish.publish",
         "//simulation/halsim_ws_server:halsim_ws_server-cpp_publish.publish",
         "//simulation/halsim_xrp:halsim_xrp-cpp_publish.publish",
-        "//sysid:sysid_publish.publish",
+        "//tools/sysid:sysid_publish.publish",
         "//thirdparty/googletest:googletest-cpp_publish.publish",
         "//thirdparty/imgui_suite:imguiSuite-cpp_publish.publish",
-        "//wpical:wpical_publish.publish",
+        "//tools/wpical:wpical_publish.publish",
         "//wpigui:wpigui-cpp_publish.publish",
-        "//wpilibNewCommands:wpilibNewCommands-cpp_publish.publish",
-        "//wpilibNewCommands:wpilibNewCommands-java_publish.publish",
+        "//commandsv2:commandsv2-cpp_publish.publish",
+        "//commandsv2:commandsv2-java_publish.publish",
         "//commandsv3:commandsv3-java_publish.publish",
         "//wpilibc:wpilibc-cpp_publish.publish",
         "//wpilibcExamples:commands_publish.publish",
@@ -125,4 +127,136 @@ publish_all(
         ],
         "//conditions:default": [],
     }),
+)
+
+write_source_files(
+    name = "write_robotpy_generated_native_files",
+    additional_update_targets = [
+        "//apriltag:robotpy-native-apriltag-generator.generate_build_info",
+        "//datalog:robotpy-native-datalog-generator.generate_build_info",
+        "//hal:robotpy-native-wpihal-generator.generate_build_info",
+        "//ntcore:robotpy-native-ntcore-generator.generate_build_info",
+        "//romiVendordep:robotpy-native-xrp-generator.generate_build_info",
+        "//wpilibc:robotpy-native-wpilib-generator.generate_build_info",
+        "//wpinet:robotpy-native-wpinet-generator.generate_build_info",
+        "//wpimath:robotpy-native-wpimath-generator.generate_build_info",
+        "//wpiutil:robotpy-native-wpiutil-generator.generate_build_info",
+        "//xrpVendordep:robotpy-native-xrp-generator.generate_build_info",
+    ],
+    tags = [
+        "pregeneration",
+        "robotpy",
+    ],
+    target_compatible_with = robotpy_compatibility_select(),
+)
+
+write_source_files(
+    name = "write_robotpy_generated_pybind_files",
+    additional_update_targets = [
+        "//apriltag:robotpy-apriltag-generator.generate_build_info",
+        "//datalog:robotpy-datalog-generator.generate_build_info",
+        "//hal:robotpy-hal-generator.generate_build_info",
+        "//ntcore:pyntcore-generator.generate_build_info",
+        "//romiVendordep:robotpy-romi-generator.generate_build_info",
+        "//wpilibc:robotpy-wpilib-generator.generate_build_info",
+        "//wpinet:robotpy-wpinet-generator.generate_build_info",
+        "//wpimath:robotpy-wpimath-generator.generate_build_info",
+        "//wpimath:robotpy-wpimath_test-generator.generate_build_info",
+        "//wpiutil:robotpy-wpiutil-generator.generate_build_info",
+        "//xrpVendordep:robotpy-xrp-generator.generate_build_info",
+    ],
+    tags = [
+        "pregeneration",
+        "robotpy",
+    ],
+    target_compatible_with = robotpy_compatibility_select(),
+)
+
+write_source_files(
+    name = "write_robotpy_update_yaml_files",
+    additional_update_targets = [
+        "//apriltag:write_robotpy-apriltag-update-yaml",
+        "//datalog:write_robotpy-wpilog-update-yaml",
+        "//hal:write_robotpy-hal-update-yaml",
+        "//ntcore:write_pyntcore-update-yaml",
+        "//romiVendordep:write_robotpy-romi-update-yaml",
+        "//wpilibc:write_robotpy-wpilib-update-yaml",
+        "//wpinet:write_robotpy-wpinet-update-yaml",
+        "//wpimath:write_robotpy-wpimath-update-yaml",
+        "//wpimath:write_robotpy-wpimath-test-update-yaml",
+        "//wpiutil:write_robotpy-wpiutil-update-yaml",
+        "//xrpVendordep:write_robotpy-xrp-update-yaml",
+    ],
+    tags = [
+        "manual",
+        "pregeneration",
+        "robotpy",
+    ],
+    target_compatible_with = robotpy_compatibility_select(),
+)
+
+write_source_files(
+    name = "write_robotpy_create_imports",
+    additional_update_targets = [
+        "//apriltag:robotpy-apriltag-create-imports",
+        "//datalog:robotpy-wpilog-create-imports",
+        "//hal:robotpy-hal-create-imports",
+        "//ntcore:pyntcore-create-imports",
+        "//romiVendordep:robotpy-romi-create-imports",
+        "//wpilibc:robotpy-wpilib-create-imports",
+        "//wpinet:robotpy-wpinet-create-imports",
+        "//wpimath:robotpy-wpimath-create-imports",
+        "//wpimath:robotpy-wpimath-test-create-imports",
+        "//wpiutil:robotpy-wpiutil-create-imports",
+        "//xrpVendordep:robotpy-xrp-create-imports",
+    ],
+    tags = [
+        "manual",
+        "pregeneration",
+        "robotpy",
+    ],
+    target_compatible_with = robotpy_compatibility_select(),
+)
+
+write_source_files(
+    name = "write_robotpy_files",
+    additional_update_targets = [
+        ":write_robotpy_generated_native_files",
+        ":write_robotpy_generated_pybind_files",
+        ":write_robotpy_update_yaml_files",
+    ],
+    tags = [
+        "manual",
+        "pregeneration",
+    ],
+)
+
+write_source_files(
+    name = "write_all",
+    additional_update_targets = [
+        ":write_pregenerated_files",
+        ":write_robotpy_files",
+    ],
+    tags = [
+        "manual",
+        "pregeneration",
+    ],
+)
+
+# Helper easily run the semiwrap parsing tools on all of the robotpy projects.
+filegroup(
+    name = "robotpy_generated_files",
+    srcs = [
+        "//apriltag:robotpy-apriltag.generated_files",
+        "//datalog:robotpy-wpilog.generated_files",
+        "//hal:robotpy-hal.generated_files",
+        "//ntcore:pyntcore.generated_files",
+        "//wpilibc:robotpy-wpilib.generated_files",
+        "//wpimath:robotpy-wpimath.generated_files",
+        "//wpimath:robotpy-wpimath-test.generated_files",
+        "//wpinet:robotpy-wpinet.generated_files",
+        "//wpiutil:robotpy-wpiutil.generated_files",
+    ],
+    tags = ["manual"],
+    target_compatible_with = robotpy_compatibility_select(),
 )

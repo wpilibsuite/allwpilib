@@ -1,5 +1,5 @@
 classes:
-  frc::EventLoop:
+  wpi::EventLoop:
     force_type_casters:
     - std::function
     methods:

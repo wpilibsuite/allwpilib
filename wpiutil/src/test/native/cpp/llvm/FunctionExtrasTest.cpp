@@ -6,14 +6,14 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/FunctionExtras.h"
-#include "CountCopyAndMove.h"
+#include "wpi/util/FunctionExtras.hpp"
+#include "CountCopyAndMove.hpp"
 #include "gtest/gtest.h"
 
 #include <memory>
 #include <type_traits>
 
-using namespace wpi;
+using namespace wpi::util;
 
 namespace {
 

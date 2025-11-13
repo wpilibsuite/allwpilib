@@ -6,5 +6,5 @@
 #include <gtest/gtest.h>
 
 TEST(DebuggingTest, IsDebuggerPresent) {
-  EXPECT_FALSE(wpi::is_debugger_present());
+  EXPECT_FALSE(wpi::util::is_debugger_present());
 }

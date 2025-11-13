@@ -62,7 +62,7 @@ if(WITH_JAVA)
         apriltag_jar
         SOURCES ${JAVA_SOURCES}
         RESOURCES
-        NAMESPACE "edu/wpi/first/apriltag" ${JAVA_RESOURCES}
+        NAMESPACE "org/wpilib/vision/apriltag" ${JAVA_RESOURCES}
         INCLUDE_JARS
             wpimath_jar
             wpiunits_jar
@@ -107,10 +107,10 @@ if(WITH_JAVA_SOURCE)
 endif()
 
 generate_resources(
-    src/main/native/resources/edu/wpi/first/apriltag
+    src/main/native/resources/org/wpilib/vision/apriltag
     generated/main/cpp
     APRILTAG
-    frc
+    wpi::apriltag
     apriltag_resources_src
 )
 

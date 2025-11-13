@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/Power.h"
+#include "wpi/hal/Power.h"
 
 #include "mockdata/RoboRioDataInternal.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializePower() {}
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 // TODO: Fix the naming in here
 extern "C" {

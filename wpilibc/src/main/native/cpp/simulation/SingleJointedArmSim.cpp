@@ -2,25 +2,25 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/SingleJointedArmSim.h"
+#include "wpi/simulation/SingleJointedArmSim.hpp"
 
 #include <cmath>
 
-#include <units/voltage.h>
-#include <wpi/MathExtras.h>
+#include "wpi/math/system/NumericalIntegration.hpp"
+#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/system/RobotController.hpp"
+#include "wpi/units/voltage.hpp"
+#include "wpi/util/MathExtras.hpp"
 
-#include "frc/RobotController.h"
-#include "frc/system/NumericalIntegration.h"
-#include "frc/system/plant/LinearSystemId.h"
-
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 SingleJointedArmSim::SingleJointedArmSim(
-    const LinearSystem<2, 1, 2>& system, const DCMotor& gearbox, double gearing,
-    units::meter_t armLength, units::radian_t minAngle,
-    units::radian_t maxAngle, bool simulateGravity,
-    units::radian_t startingAngle,
+    const wpi::math::LinearSystem<2, 1, 2>& system,
+    const wpi::math::DCMotor& gearbox, double gearing,
+    wpi::units::meter_t armLength, wpi::units::radian_t minAngle,
+    wpi::units::radian_t maxAngle, bool simulateGravity,
+    wpi::units::radian_t startingAngle,
     const std::array<double, 2>& measurementStdDevs)
     : LinearSystemSim<2, 1, 2>(system, measurementStdDevs),
       m_armLen(armLength),
@@ -33,61 +33,64 @@ SingleJointedArmSim::SingleJointedArmSim(
 }
 
 SingleJointedArmSim::SingleJointedArmSim(
-    const DCMotor& gearbox, double gearing, units::kilogram_square_meter_t moi,
-    units::meter_t armLength, units::radian_t minAngle,
-    units::radian_t maxAngle, bool simulateGravity,
-    units::radian_t startingAngle,
+    const wpi::math::DCMotor& gearbox, double gearing,
+    wpi::units::kilogram_square_meter_t moi, wpi::units::meter_t armLength,
+    wpi::units::radian_t minAngle, wpi::units::radian_t maxAngle,
+    bool simulateGravity, wpi::units::radian_t startingAngle,
     const std::array<double, 2>& measurementStdDevs)
-    : SingleJointedArmSim(
-          LinearSystemId::SingleJointedArmSystem(gearbox, moi, gearing),
-          gearbox, gearing, armLength, minAngle, maxAngle, simulateGravity,
-          startingAngle, measurementStdDevs) {}
+    : SingleJointedArmSim(wpi::math::LinearSystemId::SingleJointedArmSystem(
+                              gearbox, moi, gearing),
+                          gearbox, gearing, armLength, minAngle, maxAngle,
+                          simulateGravity, startingAngle, measurementStdDevs) {}
 
-void SingleJointedArmSim::SetState(units::radian_t angle,
-                                   units::radians_per_second_t velocity) {
-  SetState(Vectord<2>{std::clamp(angle, m_minAngle, m_maxAngle), velocity});
+void SingleJointedArmSim::SetState(wpi::units::radian_t angle,
+                                   wpi::units::radians_per_second_t velocity) {
+  SetState(wpi::math::Vectord<2>{std::clamp(angle, m_minAngle, m_maxAngle),
+                                 velocity});
 }
 
-bool SingleJointedArmSim::WouldHitLowerLimit(units::radian_t armAngle) const {
+bool SingleJointedArmSim::WouldHitLowerLimit(
+    wpi::units::radian_t armAngle) const {
   return armAngle <= m_minAngle;
 }
 
-bool SingleJointedArmSim::WouldHitUpperLimit(units::radian_t armAngle) const {
+bool SingleJointedArmSim::WouldHitUpperLimit(
+    wpi::units::radian_t armAngle) const {
   return armAngle >= m_maxAngle;
 }
 
 bool SingleJointedArmSim::HasHitLowerLimit() const {
-  return WouldHitLowerLimit(units::radian_t{m_y(0)});
+  return WouldHitLowerLimit(wpi::units::radian_t{m_y(0)});
 }
 
 bool SingleJointedArmSim::HasHitUpperLimit() const {
-  return WouldHitUpperLimit(units::radian_t{m_y(0)});
+  return WouldHitUpperLimit(wpi::units::radian_t{m_y(0)});
 }
 
-units::radian_t SingleJointedArmSim::GetAngle() const {
-  return units::radian_t{m_y(0)};
+wpi::units::radian_t SingleJointedArmSim::GetAngle() const {
+  return wpi::units::radian_t{m_y(0)};
 }
 
-units::radians_per_second_t SingleJointedArmSim::GetVelocity() const {
-  return units::radians_per_second_t{m_x(1)};
+wpi::units::radians_per_second_t SingleJointedArmSim::GetVelocity() const {
+  return wpi::units::radians_per_second_t{m_x(1)};
 }
 
-units::ampere_t SingleJointedArmSim::GetCurrentDraw() const {
+wpi::units::ampere_t SingleJointedArmSim::GetCurrentDraw() const {
   // Reductions are greater than 1, so a reduction of 10:1 would mean the motor
   // is spinning 10x faster than the output
-  units::radians_per_second_t motorVelocity{m_x(1) * m_gearing};
-  return m_gearbox.Current(motorVelocity, units::volt_t{m_u(0)}) *
-         wpi::sgn(m_u(0));
+  wpi::units::radians_per_second_t motorVelocity{m_x(1) * m_gearing};
+  return m_gearbox.Current(motorVelocity, wpi::units::volt_t{m_u(0)}) *
+         wpi::util::sgn(m_u(0));
 }
 
-void SingleJointedArmSim::SetInputVoltage(units::volt_t voltage) {
-  SetInput(Vectord<1>{voltage.value()});
-  ClampInput(frc::RobotController::GetBatteryVoltage().value());
+void SingleJointedArmSim::SetInputVoltage(wpi::units::volt_t voltage) {
+  SetInput(wpi::math::Vectord<1>{voltage.value()});
+  ClampInput(wpi::RobotController::GetBatteryVoltage().value());
 }
 
-Vectord<2> SingleJointedArmSim::UpdateX(const Vectord<2>& currentXhat,
-                                        const Vectord<1>& u,
-                                        units::second_t dt) {
+wpi::math::Vectord<2> SingleJointedArmSim::UpdateX(
+    const wpi::math::Vectord<2>& currentXhat, const wpi::math::Vectord<1>& u,
+    wpi::units::second_t dt) {
   // The torque on the arm is given by τ = F⋅r, where F is the force applied by
   // gravity and r the distance from pivot to center of mass. Recall from
   // dynamics that the sum of torques for a rigid body is τ = J⋅α, were τ is
@@ -112,12 +115,12 @@ Vectord<2> SingleJointedArmSim::UpdateX(const Vectord<2>& currentXhat,
   //   f(x, u) = Ax + Bu + [0  α]ᵀ
   //   f(x, u) = Ax + Bu + [0  3/2⋅g⋅cos(θ)/L]ᵀ
 
-  Vectord<2> updatedXhat = RKDP(
-      [&](const auto& x, const auto& u) -> Vectord<2> {
-        Vectord<2> xdot = m_plant.A() * x + m_plant.B() * u;
+  wpi::math::Vectord<2> updatedXhat = wpi::math::RKDP(
+      [&](const auto& x, const auto& u) -> wpi::math::Vectord<2> {
+        wpi::math::Vectord<2> xdot = m_plant.A() * x + m_plant.B() * u;
 
         if (m_simulateGravity) {
-          xdot += Vectord<2>{
+          xdot += wpi::math::Vectord<2>{
               0.0, (3.0 / 2.0 * -9.8 / m_armLen * std::cos(x(0))).value()};
         }
         return xdot;
@@ -125,10 +128,10 @@ Vectord<2> SingleJointedArmSim::UpdateX(const Vectord<2>& currentXhat,
       currentXhat, u, dt);
 
   // Check for collisions.
-  if (WouldHitLowerLimit(units::radian_t{updatedXhat(0)})) {
-    return Vectord<2>{m_minAngle.value(), 0.0};
-  } else if (WouldHitUpperLimit(units::radian_t{updatedXhat(0)})) {
-    return Vectord<2>{m_maxAngle.value(), 0.0};
+  if (WouldHitLowerLimit(wpi::units::radian_t{updatedXhat(0)})) {
+    return wpi::math::Vectord<2>{m_minAngle.value(), 0.0};
+  } else if (WouldHitUpperLimit(wpi::units::radian_t{updatedXhat(0)})) {
+    return wpi::math::Vectord<2>{m_maxAngle.value(), 0.0};
   }
   return updatedXhat;
 }

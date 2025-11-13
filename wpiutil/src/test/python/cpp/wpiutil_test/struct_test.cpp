@@ -15,7 +15,7 @@ struct ThingA {
   bool operator==(const ThingA &other) const { return x == other.x; }
 };
 
-template <> struct wpi::Struct<ThingA> {
+template <> struct wpi::util::Struct<ThingA> {
   static constexpr std::string_view GetTypeName() { return "ThingA"; }
   static constexpr size_t GetSize() { return 1; }
   static constexpr std::string_view GetSchema() { return "uint8 value"; }
@@ -40,26 +40,26 @@ struct Outer {
 };
 
 template <>
-struct wpi::Struct<Outer> {
+struct wpi::util::Struct<Outer> {
   static constexpr std::string_view GetTypeName() { return "Outer"; }
-  static constexpr size_t GetSize() { return wpi::GetStructSize<ThingA>() + 4; }
+  static constexpr size_t GetSize() { return wpi::util::GetStructSize<ThingA>() + 4; }
   static constexpr std::string_view GetSchema() {
     return "ThingA inner; int32 c";
   }
 
   static Outer Unpack(std::span<const uint8_t> data) {
-    constexpr size_t innerSize = wpi::GetStructSize<ThingA>();
-    return {wpi::UnpackStruct<ThingA, 0>(data),
-            wpi::UnpackStruct<int32_t, innerSize>(data)};
+    constexpr size_t innerSize = wpi::util::GetStructSize<ThingA>();
+    return {wpi::util::UnpackStruct<ThingA, 0>(data),
+            wpi::util::UnpackStruct<int32_t, innerSize>(data)};
   }
   static void Pack(std::span<uint8_t> data, const Outer& value) {
-    constexpr size_t innerSize = wpi::GetStructSize<ThingA>();
-    wpi::PackStruct<0>(data, value.inner);
-    wpi::PackStruct<innerSize>(data, value.c);
+    constexpr size_t innerSize = wpi::util::GetStructSize<ThingA>();
+    wpi::util::PackStruct<0>(data, value.inner);
+    wpi::util::PackStruct<innerSize>(data, value.c);
   }
   static void ForEachNested(
       std::invocable<std::string_view, std::string_view> auto fn) {
-    wpi::ForEachStructSchema<ThingA>(fn);
+    wpi::util::ForEachStructSchema<ThingA>(fn);
   }
 };
 

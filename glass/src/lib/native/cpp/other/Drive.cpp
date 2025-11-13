@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/other/Drive.h"
+#include "wpi/glass/other/Drive.hpp"
 
 #include <array>
 #include <cmath>
@@ -11,11 +11,11 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 
-#include "glass/DataSource.h"
+#include "wpi/glass/DataSource.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
-void glass::DisplayDrive(DriveModel* m) {
+void wpi::glass::DisplayDrive(DriveModel* m) {
   // Check if the model exists.
   if (!m->Exists()) {
     ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));

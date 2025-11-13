@@ -2,7 +2,7 @@ extra_includes:
 - wpystruct.h
 
 classes:
-  frc::MecanumDriveKinematics:
+  wpi::math::MecanumDriveKinematics:
     methods:
       MecanumDriveKinematics:
       ToWheelSpeeds:
@@ -47,4 +47,4 @@ classes:
       Interpolate:
 
 inline_code: |
-  SetupWPyStruct<frc::MecanumDriveKinematics>(cls_MecanumDriveKinematics);
+  SetupWPyStruct<wpi::math::MecanumDriveKinematics>(cls_MecanumDriveKinematics);

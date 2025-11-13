@@ -2,17 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "commands/Autos.h"
+#include "commands/Autos.hpp"
 
-#include <frc2/command/Commands.h>
-#include <frc2/command/FunctionalCommand.h>
-
-#include "Constants.h"
+#include "Constants.hpp"
+#include "wpi/commands2/Commands.hpp"
+#include "wpi/commands2/FunctionalCommand.hpp"
 
 using namespace AutoConstants;
 
-frc2::CommandPtr autos::SimpleAuto(DriveSubsystem* drive) {
-  return frc2::FunctionalCommand(
+wpi::cmd::CommandPtr autos::SimpleAuto(DriveSubsystem* drive) {
+  return wpi::cmd::FunctionalCommand(
              // Reset encoders on command start
              [drive] { drive->ResetEncoders(); },
              // Drive forward while the command is executing
@@ -30,11 +29,11 @@ frc2::CommandPtr autos::SimpleAuto(DriveSubsystem* drive) {
       .ToPtr();
 }
 
-frc2::CommandPtr autos::ComplexAuto(DriveSubsystem* drive,
-                                    HatchSubsystem* hatch) {
-  return frc2::cmd::Sequence(
+wpi::cmd::CommandPtr autos::ComplexAuto(DriveSubsystem* drive,
+                                        HatchSubsystem* hatch) {
+  return wpi::cmd::cmd::Sequence(
       // Drive forward the specified distance
-      frc2::FunctionalCommand(
+      wpi::cmd::FunctionalCommand(
           // Reset encoders on command start
           [drive] { drive->ResetEncoders(); },
           // Drive forward while the command is executing
@@ -54,7 +53,7 @@ frc2::CommandPtr autos::ComplexAuto(DriveSubsystem* drive,
       hatch->ReleaseHatchCommand(),
       // Drive backward the specified distance
       // Drive forward the specified distance
-      frc2::FunctionalCommand(
+      wpi::cmd::FunctionalCommand(
           // Reset encoders on command start
           [drive] { drive->ResetEncoders(); },
           // Drive backward while the command is executing

@@ -1,5 +1,5 @@
 classes:
-  frc::LEDPattern:
+  wpi::LEDPattern:
     enums:
       GradientType:
     methods:
@@ -7,17 +7,17 @@ classes:
       LEDPattern:
       ApplyTo:
         overloads:
-          std::span<frc::AddressableLED::LEDData> [const]:
-          LEDReader, std::function<void (int, frc::Color)> [const]:
-          std::span<frc::AddressableLED::LEDData>, std::function<void (int, frc::Color)> [const]:
+          std::span<wpi::AddressableLED::LEDData> [const]:
+          LEDReader, std::function<void (int, wpi::Color)> [const]:
+          std::span<wpi::AddressableLED::LEDData>, std::function<void (int, wpi::Color)> [const]:
       Reversed:
       OffsetBy:
       ScrollAtRelativeSpeed:
       ScrollAtAbsoluteSpeed:
       Blink:
         overloads:
-          units::second_t, units::second_t:
-          units::second_t:
+          wpi::units::second_t, wpi::units::second_t:
+          wpi::units::second_t:
       SynchronizedBlink:
       Breathe:
       OverlayOn:
@@ -38,7 +38,7 @@ classes:
             ignore: true
       Rainbow:
       MapIndex:
-  frc::LEDPattern::LEDReader:
+  wpi::LEDPattern::LEDReader:
     methods:
       LEDReader:
       size:

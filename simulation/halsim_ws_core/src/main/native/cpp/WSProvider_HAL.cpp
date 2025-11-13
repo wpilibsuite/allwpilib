@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "WSProvider_HAL.h"
+#include "wpi/halsim/ws_core/WSProvider_HAL.hpp"
 
 #include <algorithm>
 #include <atomic>
 #include <string_view>
 
-#include <hal/Extensions.h>
-#include <hal/HAL.h>
-#include <hal/Ports.h>
-#include <hal/simulation/MockHooks.h>
-#include <wpi/raw_ostream.h>
+#include "wpi/hal/Extensions.h"
+#include "wpi/hal/HAL.h"
+#include "wpi/hal/Ports.h"
+#include "wpi/hal/simulation/MockHooks.h"
+#include "wpi/util/raw_ostream.hpp"
 
 namespace wpilibws {
 
@@ -52,7 +52,7 @@ void HALSimWSProviderHAL::DoCancelCallbacks() {
   m_simPeriodicAfterCbKey = 0;
 }
 
-void HALSimWSProviderHAL::OnNetValueChanged(const wpi::json& json) {
+void HALSimWSProviderHAL::OnNetValueChanged(const wpi::util::json& json) {
   // no-op. This is all one way
 }
 

@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <vector>
 
-#include "wpi/json.h"
+#include "wpi/util/json.hpp"
 
 #include "pybind11/pybind11.h"
 
@@ -47,7 +47,7 @@ namespace pyjson
     using number_unsigned_t = uint64_t;
     using number_integer_t = int64_t;
 
-    inline py::object from_json(const wpi::json& j)
+    inline py::object from_json(const wpi::util::json& j)
     {
         if (j.is_null())
         {
@@ -85,7 +85,7 @@ namespace pyjson
         else // Object
         {
             py::dict obj;
-            for (wpi::json::const_iterator it = j.cbegin(); it != j.cend(); ++it)
+            for (wpi::util::json::const_iterator it = j.cbegin(); it != j.cend(); ++it)
             {
                 obj[py::str(it.key())] = from_json(it.value());
             }
@@ -93,7 +93,7 @@ namespace pyjson
         }
     }
 
-    inline wpi::json to_json(const py::handle& obj)
+    inline wpi::util::json to_json(const py::handle& obj)
     {
         if (obj.ptr() == nullptr || obj.is_none())
         {
@@ -144,7 +144,7 @@ namespace pyjson
         }
         if (py::isinstance<py::tuple>(obj) || py::isinstance<py::list>(obj))
         {
-            auto out = wpi::json::array();
+            auto out = wpi::util::json::array();
             for (const py::handle value : obj)
             {
                 out.push_back(to_json(value));
@@ -153,7 +153,7 @@ namespace pyjson
         }
         if (py::isinstance<py::dict>(obj))
         {
-            auto out = wpi::json::object();
+            auto out = wpi::util::json::object();
             for (const py::handle key : obj)
             {
                 if (py::isinstance<py::str>(key)) {
@@ -174,7 +174,7 @@ namespace pyjson
 }
 
 // nlohmann_json serializers
-namespace wpi
+namespace wpi::util
 {
     #define MAKE_NLJSON_SERIALIZER_DESERIALIZER(T)         \
     template <>                                            \
@@ -229,10 +229,10 @@ namespace pybind11
 {
     namespace detail
     {
-        template <> struct type_caster<wpi::json>
+        template <> struct type_caster<wpi::util::json>
         {
         public:
-            PYBIND11_TYPE_CASTER(wpi::json, _("wpiutil.json"));
+            PYBIND11_TYPE_CASTER(wpi::util::json, _("wpiutil.json"));
 
             bool load(handle src, bool convert)
             {
@@ -249,7 +249,7 @@ namespace pybind11
                 // }
             }
 
-            static handle cast(wpi::json src, return_value_policy /* policy */, handle /* parent */)
+            static handle cast(wpi::util::json src, return_value_policy /* policy */, handle /* parent */)
             {
                 object obj = pyjson::from_json(src);
                 return obj.release();

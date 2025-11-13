@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpigui_openurl.h"
+#include "wpi/gui/wpigui_openurl.hpp"
 
 #if _WIN32
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN 1
 #endif
-#include <Windows.h>
+#include <windows.h>
 #include <shellapi.h>
 #else
 #include <unistd.h>

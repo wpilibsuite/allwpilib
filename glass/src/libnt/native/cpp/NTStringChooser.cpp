@@ -2,28 +2,29 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/networktables/NTStringChooser.h"
+#include "wpi/glass/networktables/NTStringChooser.hpp"
 
 #include <utility>
 
 #include <fmt/format.h>
-#include <wpi/json.h>
 
-using namespace glass;
+#include "wpi/util/json.hpp"
+
+using namespace wpi::glass;
 
 NTStringChooserModel::NTStringChooserModel(std::string_view path)
-    : NTStringChooserModel{nt::NetworkTableInstance::GetDefault(), path} {}
+    : NTStringChooserModel{wpi::nt::NetworkTableInstance::GetDefault(), path} {}
 
-NTStringChooserModel::NTStringChooserModel(nt::NetworkTableInstance inst,
+NTStringChooserModel::NTStringChooserModel(wpi::nt::NetworkTableInstance inst,
                                            std::string_view path)
     : m_inst{inst},
       m_default{
           m_inst.GetStringTopic(fmt::format("{}/default", path)).Subscribe("")},
       m_selected{m_inst.GetStringTopic(fmt::format("{}/selected", path))
                      .Subscribe("")},
-      m_selectedPub{
-          m_inst.GetStringTopic(fmt::format("{}/selected", path))
-              .PublishEx(nt::StringTopic::kTypeString, {{"retained", true}})},
+      m_selectedPub{m_inst.GetStringTopic(fmt::format("{}/selected", path))
+                        .PublishEx(wpi::nt::StringTopic::kTypeString,
+                                   {{"retained", true}})},
       m_active{
           m_inst.GetStringTopic(fmt::format("{}/active", path)).Subscribe("")},
       m_options{m_inst.GetStringArrayTopic(fmt::format("{}/options", path))

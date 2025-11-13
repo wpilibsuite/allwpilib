@@ -2,17 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
+
 #include <numbers>
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Translation2d.h"
-#include "frc/kinematics/ChassisAccelerations.h"
-#include "frc/kinematics/SwerveDriveKinematics.h"
-#include "frc/kinematics/SwerveModuleAccelerations.h"
-#include "units/angular_velocity.h"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/units/angular_velocity.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 static constexpr double kEpsilon = 0.1;
 
@@ -98,7 +97,7 @@ TEST_F(SwerveDriveKinematicsTest, StraightStrafeForwardKinematicsWithDeltas) {
 
 TEST_F(SwerveDriveKinematicsTest, TurnInPlaceInverseKinematics) {
   ChassisSpeeds speeds{0_mps, 0_mps,
-                       units::radians_per_second_t{2 * std::numbers::pi}};
+                       wpi::units::radians_per_second_t{2 * std::numbers::pi}};
   auto [fl, fr, bl, br] = m_kinematics.ToSwerveModuleStates(speeds);
 
   EXPECT_NEAR(fl.speed.value(), 106.63, kEpsilon);
@@ -114,7 +113,7 @@ TEST_F(SwerveDriveKinematicsTest, TurnInPlaceInverseKinematics) {
 
 TEST_F(SwerveDriveKinematicsTest, ConserveWheelAngle) {
   ChassisSpeeds speeds{0_mps, 0_mps,
-                       units::radians_per_second_t{2 * std::numbers::pi}};
+                       wpi::units::radians_per_second_t{2 * std::numbers::pi}};
   m_kinematics.ToSwerveModuleStates(speeds);
   auto [fl, fr, bl, br] = m_kinematics.ToSwerveModuleStates(ChassisSpeeds{});
 
@@ -176,7 +175,7 @@ TEST_F(SwerveDriveKinematicsTest, TurnInPlaceForwardKinematicsWithDeltas) {
 
 TEST_F(SwerveDriveKinematicsTest, OffCenterCORRotationInverseKinematics) {
   ChassisSpeeds speeds{0_mps, 0_mps,
-                       units::radians_per_second_t{2 * std::numbers::pi}};
+                       wpi::units::radians_per_second_t{2 * std::numbers::pi}};
   auto [fl, fr, bl, br] = m_kinematics.ToSwerveModuleStates(speeds, m_fl);
 
   EXPECT_NEAR(fl.speed.value(), 0.0, kEpsilon);
@@ -268,7 +267,7 @@ TEST_F(SwerveDriveKinematicsTest, Desaturate) {
   SwerveModuleState state3{4.0_mps, 0_deg};
   SwerveModuleState state4{7.0_mps, 0_deg};
 
-  wpi::array<SwerveModuleState, 4> arr{state1, state2, state3, state4};
+  wpi::util::array<SwerveModuleState, 4> arr{state1, state2, state3, state4};
   SwerveDriveKinematics<4>::DesaturateWheelSpeeds(&arr, 5.5_mps);
 
   double kFactor = 5.5 / 7.0;
@@ -285,7 +284,7 @@ TEST_F(SwerveDriveKinematicsTest, DesaturateSmooth) {
   SwerveModuleState state3{4.0_mps, 0_deg};
   SwerveModuleState state4{7.0_mps, 0_deg};
 
-  wpi::array<SwerveModuleState, 4> arr{state1, state2, state3, state4};
+  wpi::util::array<SwerveModuleState, 4> arr{state1, state2, state3, state4};
   SwerveDriveKinematics<4>::DesaturateWheelSpeeds(
       &arr, m_kinematics.ToChassisSpeeds(arr), 5.5_mps, 5.5_mps, 3.5_rad_per_s);
 
@@ -303,7 +302,7 @@ TEST_F(SwerveDriveKinematicsTest, DesaturateNegativeSpeed) {
   SwerveModuleState state3{-2.0_mps, 0_deg};
   SwerveModuleState state4{-2.0_mps, 0_deg};
 
-  wpi::array<SwerveModuleState, 4> arr{state1, state2, state3, state4};
+  wpi::util::array<SwerveModuleState, 4> arr{state1, state2, state3, state4};
   SwerveDriveKinematics<4>::DesaturateWheelSpeeds(&arr, 1.0_mps);
 
   EXPECT_NEAR(arr[0].speed.value(), 0.5, kEpsilon);

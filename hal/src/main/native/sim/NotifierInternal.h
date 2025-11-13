@@ -4,10 +4,10 @@
 
 #pragma once
 
-namespace hal {
+namespace wpi::hal {
 void PauseNotifiers();
 void ResumeNotifiers();
 void WakeupNotifiers();
 void WaitNotifiers();
 void WakeupWaitNotifiers();
-}  // namespace hal
+}  // namespace wpi::hal

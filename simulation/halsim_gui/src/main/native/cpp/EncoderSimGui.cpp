@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "EncoderSimGui.h"
+#include "EncoderSimGui.hpp"
 
 #include <stdint.h>
 
@@ -12,19 +12,19 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <glass/DataSource.h>
-#include <glass/hardware/Encoder.h>
-#include <hal/Ports.h>
-#include <hal/simulation/EncoderData.h>
-#include <hal/simulation/SimDeviceData.h>
 
-#include "HALSimGui.h"
+#include "wpi/glass/DataSource.hpp"
+#include "wpi/glass/hardware/Encoder.hpp"
+#include "wpi/hal/Ports.h"
+#include "wpi/hal/simulation/EncoderData.h"
+#include "wpi/hal/simulation/SimDeviceData.h"
+#include "wpi/halsim/gui/HALSimGui.hpp"
 
 using namespace halsimgui;
 
 namespace {
 
-class EncoderSimModel : public glass::EncoderModel {
+class EncoderSimModel : public wpi::glass::EncoderModel {
  public:
   EncoderSimModel(std::string_view id, int32_t index, int channelA,
                   int channelB)
@@ -88,14 +88,16 @@ class EncoderSimModel : public glass::EncoderModel {
   int GetChannelA() const override { return m_channelA; }
   int GetChannelB() const override { return m_channelB; }
 
-  glass::DoubleSource* GetDistancePerPulseData() override {
+  wpi::glass::DoubleSource* GetDistancePerPulseData() override {
     return &m_distancePerPulse;
   }
-  glass::IntegerSource* GetCountData() override { return &m_count; }
-  glass::DoubleSource* GetPeriodData() override { return &m_period; }
-  glass::BooleanSource* GetDirectionData() override { return &m_direction; }
-  glass::DoubleSource* GetDistanceData() override { return &m_distance; }
-  glass::DoubleSource* GetRateData() override { return &m_rate; }
+  wpi::glass::IntegerSource* GetCountData() override { return &m_count; }
+  wpi::glass::DoubleSource* GetPeriodData() override { return &m_period; }
+  wpi::glass::BooleanSource* GetDirectionData() override {
+    return &m_direction;
+  }
+  wpi::glass::DoubleSource* GetDistanceData() override { return &m_distance; }
+  wpi::glass::DoubleSource* GetRateData() override { return &m_rate; }
 
   double GetMaxPeriod() override { return HALSIM_GetEncoderMaxPeriod(m_index); }
   bool GetReverseDirection() override {
@@ -176,12 +178,12 @@ class EncoderSimModel : public glass::EncoderModel {
     }
   }
 
-  glass::DoubleSource m_distancePerPulse;
-  glass::IntegerSource m_count;
-  glass::DoubleSource m_period;
-  glass::BooleanSource m_direction;
-  glass::DoubleSource m_distance;
-  glass::DoubleSource m_rate;
+  wpi::glass::DoubleSource m_distancePerPulse;
+  wpi::glass::IntegerSource m_count;
+  wpi::glass::DoubleSource m_period;
+  wpi::glass::BooleanSource m_direction;
+  wpi::glass::DoubleSource m_distance;
+  wpi::glass::DoubleSource m_rate;
 
   int32_t m_index;
   int m_channelA;
@@ -192,7 +194,7 @@ class EncoderSimModel : public glass::EncoderModel {
   int32_t m_directionCallback;
 };
 
-class EncodersSimModel : public glass::EncodersModel {
+class EncodersSimModel : public wpi::glass::EncodersModel {
  public:
   EncodersSimModel() : m_models(HAL_GetNumEncoders()) {}
 
@@ -201,8 +203,8 @@ class EncodersSimModel : public glass::EncodersModel {
   bool Exists() override { return true; }
 
   void ForEachEncoder(
-      wpi::function_ref<void(glass::EncoderModel& model, int index)> func)
-      override;
+      wpi::util::function_ref<void(wpi::glass::EncoderModel& model, int index)>
+          func) override;
 
  private:
   std::vector<std::unique_ptr<EncoderSimModel>> m_models;
@@ -224,7 +226,8 @@ void EncodersSimModel::Update() {
 }
 
 void EncodersSimModel::ForEachEncoder(
-    wpi::function_ref<void(glass::EncoderModel& model, int index)> func) {
+    wpi::util::function_ref<void(wpi::glass::EncoderModel& model, int index)>
+        func) {
   for (int32_t i = 0, iend = static_cast<int32_t>(m_models.size()); i < iend;
        ++i) {
     if (auto model = m_models[i].get()) {
@@ -247,16 +250,16 @@ void EncoderSimGui::Initialize() {
   HALSimGui::halProvider->Register(
       "Encoders", EncodersAnyInitialized,
       [] { return std::make_unique<EncodersSimModel>(); },
-      [](glass::Window* win, glass::Model* model) {
+      [](wpi::glass::Window* win, wpi::glass::Model* model) {
         win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
         win->SetDefaultPos(5, 250);
-        return glass::MakeFunctionView(
+        return wpi::glass::MakeFunctionView(
             [=] { DisplayEncoders(static_cast<EncodersSimModel*>(model)); });
       });
 }
 
-glass::EncodersModel& EncoderSimGui::GetEncodersModel() {
+wpi::glass::EncodersModel& EncoderSimGui::GetEncodersModel() {
   static auto model = HALSimGui::halProvider->GetModel("Encoders");
   assert(model);
-  return *static_cast<glass::EncodersModel*>(model);
+  return *static_cast<wpi::glass::EncodersModel*>(model);
 }

@@ -5,13 +5,12 @@
 #include <string>
 #include <utility>
 
-#include <wpi/protobuf/ProtobufCallbacks.h>
+#include "wpi/hal/proto/MatchInfo.h"
+#include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 
-#include "hal/proto/MatchInfo.h"
-
-std::optional<mrc::MatchInfo> wpi::Protobuf<mrc::MatchInfo>::Unpack(
+std::optional<mrc::MatchInfo> wpi::util::Protobuf<mrc::MatchInfo>::Unpack(
     InputStream& Stream) {
-  wpi::UnpackCallback<std::string> NameCb;
+  wpi::util::UnpackCallback<std::string> NameCb;
 
   mrc_proto_ProtobufMatchInfo Msg;
   Msg.EventName = NameCb.Callback();
@@ -36,10 +35,10 @@ std::optional<mrc::MatchInfo> wpi::Protobuf<mrc::MatchInfo>::Unpack(
   return OutputData;
 }
 
-bool wpi::Protobuf<mrc::MatchInfo>::Pack(OutputStream& Stream,
-                                         const mrc::MatchInfo& Value) {
+bool wpi::util::Protobuf<mrc::MatchInfo>::Pack(OutputStream& Stream,
+                                               const mrc::MatchInfo& Value) {
   std::string_view EventNameStr = Value.GetEventName();
-  wpi::PackCallback EventName{&EventNameStr};
+  wpi::util::PackCallback EventName{&EventNameStr};
 
   mrc_proto_ProtobufMatchInfo Msg{
       .EventName = EventName.Callback(),

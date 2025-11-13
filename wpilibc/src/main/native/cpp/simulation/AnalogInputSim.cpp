@@ -2,16 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/AnalogInputSim.h"
+#include "wpi/simulation/AnalogInputSim.hpp"
 
 #include <memory>
 
-#include <hal/simulation/AnalogInData.h>
+#include "wpi/hal/simulation/AnalogInData.h"
+#include "wpi/hardware/discrete/AnalogInput.hpp"
 
-#include "frc/AnalogInput.h"
-
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 AnalogInputSim::AnalogInputSim(const AnalogInput& analogInput)
     : m_index{analogInput.GetChannel()} {}

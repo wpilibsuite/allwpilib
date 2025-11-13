@@ -1,12 +1,12 @@
 extra_includes:
-- wpi/sendable/SendableBuilder.h
+- wpi/util/sendable/SendableBuilder.hpp
 - pybind11/stl.h
 
 classes:
-  frc::PyMotorControllerGroup:
+  wpi::PyMotorControllerGroup:
     rename: MotorControllerGroup
     ignored_bases:
-    - wpi::SendableHelper<PyMotorControllerGroup>
+    - wpi::util::SendableHelper<PyMotorControllerGroup>
     methods:
       PyMotorControllerGroup:
         cpp_code: |

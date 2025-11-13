@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "WSProvider_Joystick.h"
+#include "wpi/halsim/ws_core/WSProvider_Joystick.hpp"
 
 #include <algorithm>
 #include <atomic>
 #include <vector>
 
-#include <hal/Ports.h>
-#include <hal/simulation/DriverStationData.h>
+#include "wpi/hal/Ports.h"
+#include "wpi/hal/simulation/DriverStationData.h"
 
 namespace wpilibws {
 
@@ -30,7 +30,7 @@ void HALSimWSProviderJoystick::RegisterCallbacks() {
         auto provider = static_cast<HALSimWSProviderJoystick*>(param);
 
         // Grab all joystick data and send it at once
-        wpi::json payload;
+        wpi::util::json payload;
 
         // Axes data
         HAL_JoystickAxes axes{};
@@ -93,20 +93,20 @@ void HALSimWSProviderJoystick::DoCancelCallbacks() {
   m_dsNewDataCbKey = 0;
 }
 
-void HALSimWSProviderJoystick::OnNetValueChanged(const wpi::json& json) {
+void HALSimWSProviderJoystick::OnNetValueChanged(const wpi::util::json& json) {
   // ignore if DS connected
   if (gDSSocketConnected && *gDSSocketConnected) {
     return;
   }
 
-  wpi::json::const_iterator it;
+  wpi::util::json::const_iterator it;
   if ((it = json.find(">axes")) != json.end()) {
     HAL_JoystickAxes axes{};
-    wpi::json::size_type axesCount =
+    wpi::util::json::size_type axesCount =
         std::min(it.value().size(),
-                 static_cast<wpi::json::size_type>(HAL_kMaxJoystickAxes));
+                 static_cast<wpi::util::json::size_type>(HAL_kMaxJoystickAxes));
     axes.available = (1 << axesCount) - 1;
-    for (wpi::json::size_type i = 0; i < axesCount; i++) {
+    for (wpi::util::json::size_type i = 0; i < axesCount; i++) {
       axes.axes[i] = it.value()[i];
     }
 
@@ -115,14 +115,14 @@ void HALSimWSProviderJoystick::OnNetValueChanged(const wpi::json& json) {
 
   if ((it = json.find(">buttons")) != json.end()) {
     HAL_JoystickButtons buttons{};
-    wpi::json::size_type buttonsCount =
-        std::min(it.value().size(), static_cast<wpi::json::size_type>(64));
+    wpi::util::json::size_type buttonsCount = std::min(
+        it.value().size(), static_cast<wpi::util::json::size_type>(64));
     if (buttonsCount < 64) {
       buttons.available = (1ULL << buttonsCount) - 1;
     } else {
       buttons.available = (std::numeric_limits<uint64_t>::max)();
     }
-    for (wpi::json::size_type i = 0; i < buttonsCount; i++) {
+    for (wpi::util::json::size_type i = 0; i < buttonsCount; i++) {
       if (it.value()[i]) {
         buttons.buttons |= 1llu << i;
       }
@@ -133,11 +133,11 @@ void HALSimWSProviderJoystick::OnNetValueChanged(const wpi::json& json) {
 
   if ((it = json.find(">povs")) != json.end()) {
     HAL_JoystickPOVs povs{};
-    wpi::json::size_type povsCount =
+    wpi::util::json::size_type povsCount =
         std::min(it.value().size(),
-                 static_cast<wpi::json::size_type>(HAL_kMaxJoystickPOVs));
+                 static_cast<wpi::util::json::size_type>(HAL_kMaxJoystickPOVs));
     povs.available = (1 << povsCount) - 1;
-    for (wpi::json::size_type i = 0; i < povsCount; i++) {
+    for (wpi::util::json::size_type i = 0; i < povsCount; i++) {
       povs.povs[i] = it.value()[i];
     }
 

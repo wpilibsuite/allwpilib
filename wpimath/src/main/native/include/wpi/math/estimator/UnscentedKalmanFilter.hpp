@@ -1,0 +1,502 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#pragma once
+
+#include <functional>
+#include <utility>
+
+#include <Eigen/Cholesky>
+
+#include "wpi/math/estimator/SigmaPoints.hpp"
+#include "wpi/math/estimator/UnscentedTransform.hpp"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/system/Discretization.hpp"
+#include "wpi/math/system/NumericalIntegration.hpp"
+#include "wpi/math/system/NumericalJacobian.hpp"
+#include "wpi/math/util/StateSpaceUtil.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/array.hpp"
+
+namespace wpi::math {
+
+/**
+ * A Kalman filter combines predictions from a model and measurements to give an
+ * estimate of the true system state. This is useful because many states cannot
+ * be measured directly as a result of sensor noise, or because the state is
+ * "hidden".
+ *
+ * This class requires a SigmaPoints template parameter. For convenience, S3UKF
+ * and MerweUKF type aliases are provided to specify a suitable generator for
+ * you. S3UKF is generally preferred over MerweUKF because of its greater
+ * performance while maintaining nearly identical accuracy.
+ *
+ * Kalman filters use a K gain matrix to determine whether to trust the model or
+ * measurements more. Kalman filter theory uses statistics to compute an optimal
+ * K gain which minimizes the sum of squares error in the state estimate. This K
+ * gain is used to correct the state estimate by some amount of the difference
+ * between the actual measurements and the measurements predicted by the model.
+ *
+ * An unscented Kalman filter uses nonlinear state and measurement models. It
+ * propagates the error covariance using sigma points chosen to approximate the
+ * true probability distribution.
+ *
+ * For more on the underlying math, read
+ * https://file.tavsys.net/control/controls-engineering-in-frc.pdf chapter 9
+ * "Stochastic control theory".
+ *
+ * <p> This class implements a square-root-form unscented Kalman filter
+ * (SR-UKF). The main reason for this is to guarantee that the covariance
+ * matrix remains positive definite.
+ * For more information about the SR-UKF, see
+ * https://www.researchgate.net/publication/3908304.
+ *
+ * @tparam States Number of states.
+ * @tparam Inputs Number of inputs.
+ * @tparam Outputs Number of outputs.
+ * @tparam SigmaPoints Type used to generate sigma points and weights.
+ */
+template <int States, int Inputs, int Outputs, SigmaPoints<States> SigmaPoints>
+class UnscentedKalmanFilter {
+ public:
+  static constexpr int NumSigmas = SigmaPoints::NumSigmas;
+
+  using StateVector = Vectord<States>;
+  using InputVector = Vectord<Inputs>;
+  using OutputVector = Vectord<Outputs>;
+
+  using StateArray = wpi::util::array<double, States>;
+  using OutputArray = wpi::util::array<double, Outputs>;
+
+  using StateMatrix = Matrixd<States, States>;
+
+  /**
+   * Constructs an unscented Kalman filter.
+   *
+   * See
+   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices
+   * for how to select the standard deviations.
+   *
+   * @param f                  A vector-valued function of x and u that returns
+   *                           the derivative of the state vector.
+   * @param h                  A vector-valued function of x and u that returns
+   *                           the measurement vector.
+   * @param stateStdDevs       Standard deviations of model states.
+   * @param measurementStdDevs Standard deviations of measurements.
+   * @param dt                 Nominal discretization timestep.
+   */
+  UnscentedKalmanFilter(
+      std::function<StateVector(const StateVector&, const InputVector&)> f,
+      std::function<OutputVector(const StateVector&, const InputVector&)> h,
+      const StateArray& stateStdDevs, const OutputArray& measurementStdDevs,
+      wpi::units::second_t dt)
+      : m_f(std::move(f)), m_h(std::move(h)) {
+    m_contQ = MakeCovMatrix(stateStdDevs);
+    m_contR = MakeCovMatrix(measurementStdDevs);
+    m_meanFuncX = [](const Matrixd<States, NumSigmas>& sigmas,
+                     const Vectord<NumSigmas>& Wm) -> StateVector {
+      return sigmas * Wm;
+    };
+    m_meanFuncY = [](const Matrixd<Outputs, NumSigmas>& sigmas,
+                     const Vectord<NumSigmas>& Wc) -> OutputVector {
+      return sigmas * Wc;
+    };
+    m_residualFuncX = [](const StateVector& a,
+                         const StateVector& b) -> StateVector { return a - b; };
+    m_residualFuncY = [](const OutputVector& a,
+                         const OutputVector& b) -> OutputVector {
+      return a - b;
+    };
+    m_addFuncX = [](const StateVector& a, const StateVector& b) -> StateVector {
+      return a + b;
+    };
+    m_dt = dt;
+
+    Reset();
+  }
+
+  /**
+   * Constructs an Unscented Kalman filter with custom mean, residual, and
+   * addition functions. Using custom functions for arithmetic can be useful if
+   * you have angles in the state or measurements, because they allow you to
+   * correctly account for the modular nature of angle arithmetic.
+   *
+   * See
+   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices
+   * for how to select the standard deviations.
+   *
+   * @param f                  A vector-valued function of x and u that returns
+   *                           the derivative of the state vector.
+   * @param h                  A vector-valued function of x and u that returns
+   *                           the measurement vector.
+   * @param stateStdDevs       Standard deviations of model states.
+   * @param measurementStdDevs Standard deviations of measurements.
+   * @param meanFuncX          A function that computes the mean of 2 * States +
+   *                           1 state vectors using a given set of weights.
+   * @param meanFuncY          A function that computes the mean of 2 * States +
+   *                           1 measurement vectors using a given set of
+   *                           weights.
+   * @param residualFuncX      A function that computes the residual of two
+   *                           state vectors (i.e. it subtracts them.)
+   * @param residualFuncY      A function that computes the residual of two
+   *                           measurement vectors (i.e. it subtracts them.)
+   * @param addFuncX           A function that adds two state vectors.
+   * @param dt                 Nominal discretization timestep.
+   */
+  UnscentedKalmanFilter(
+      std::function<StateVector(const StateVector&, const InputVector&)> f,
+      std::function<OutputVector(const StateVector&, const InputVector&)> h,
+      const StateArray& stateStdDevs, const OutputArray& measurementStdDevs,
+      std::function<StateVector(const Matrixd<States, NumSigmas>&,
+                                const Vectord<NumSigmas>&)>
+          meanFuncX,
+      std::function<OutputVector(const Matrixd<Outputs, NumSigmas>&,
+                                 const Vectord<NumSigmas>&)>
+          meanFuncY,
+      std::function<StateVector(const StateVector&, const StateVector&)>
+          residualFuncX,
+      std::function<OutputVector(const OutputVector&, const OutputVector&)>
+          residualFuncY,
+      std::function<StateVector(const StateVector&, const StateVector&)>
+          addFuncX,
+      wpi::units::second_t dt)
+      : m_f(std::move(f)),
+        m_h(std::move(h)),
+        m_meanFuncX(std::move(meanFuncX)),
+        m_meanFuncY(std::move(meanFuncY)),
+        m_residualFuncX(std::move(residualFuncX)),
+        m_residualFuncY(std::move(residualFuncY)),
+        m_addFuncX(std::move(addFuncX)) {
+    m_contQ = MakeCovMatrix(stateStdDevs);
+    m_contR = MakeCovMatrix(measurementStdDevs);
+    m_dt = dt;
+
+    Reset();
+  }
+
+  /**
+   * Returns the square-root error covariance matrix S.
+   */
+  const StateMatrix& S() const { return m_S; }
+
+  /**
+   * Returns an element of the square-root error covariance matrix S.
+   *
+   * @param i Row of S.
+   * @param j Column of S.
+   */
+  double S(int i, int j) const { return m_S(i, j); }
+
+  /**
+   * Set the current square-root error covariance matrix S.
+   *
+   * @param S The square-root error covariance matrix S.
+   */
+  void SetS(const StateMatrix& S) { m_S = S; }
+
+  /**
+   * Returns the reconstructed error covariance matrix P.
+   */
+  StateMatrix P() const { return m_S * m_S.transpose(); }
+
+  /**
+   * Set the current square-root error covariance matrix S by taking the square
+   * root of P.
+   *
+   * @param P The error covariance matrix P.
+   */
+  void SetP(const StateMatrix& P) { m_S = P.llt().matrixL(); }
+
+  /**
+   * Returns the state estimate x-hat.
+   */
+  const StateVector& Xhat() const { return m_xHat; }
+
+  /**
+   * Returns an element of the state estimate x-hat.
+   *
+   * @param i Row of x-hat.
+   */
+  double Xhat(int i) const { return m_xHat(i); }
+
+  /**
+   * Set initial state estimate x-hat.
+   *
+   * @param xHat The state estimate x-hat.
+   */
+  void SetXhat(const StateVector& xHat) { m_xHat = xHat; }
+
+  /**
+   * Set an element of the initial state estimate x-hat.
+   *
+   * @param i     Row of x-hat.
+   * @param value Value for element of x-hat.
+   */
+  void SetXhat(int i, double value) { m_xHat(i) = value; }
+
+  /**
+   * Resets the observer.
+   */
+  void Reset() {
+    m_xHat.setZero();
+    m_S.setZero();
+    m_sigmasF.setZero();
+  }
+
+  /**
+   * Project the model into the future with a new control input u.
+   *
+   * @param u  New control input from controller.
+   * @param dt Timestep for prediction.
+   */
+  void Predict(const InputVector& u, wpi::units::second_t dt) {
+    m_dt = dt;
+
+    // Discretize Q before projecting mean and covariance forward
+    StateMatrix contA =
+        NumericalJacobianX<States, States, Inputs>(m_f, m_xHat, u);
+    StateMatrix discA;
+    StateMatrix discQ;
+    DiscretizeAQ<States>(contA, m_contQ, m_dt, &discA, &discQ);
+    Eigen::internal::llt_inplace<double, Eigen::Lower>::blocked(discQ);
+
+    // Generate sigma points around the state mean
+    //
+    // equation (17)
+    Matrixd<States, NumSigmas> sigmas =
+        m_pts.SquareRootSigmaPoints(m_xHat, m_S);
+
+    // Project each sigma point forward in time according to the
+    // dynamics f(x, u)
+    //
+    //   sigmas  = 𝒳ₖ₋₁
+    //   sigmasF = 𝒳ₖ,ₖ₋₁ or just 𝒳 for readability
+    //
+    // equation (18)
+    for (int i = 0; i < NumSigmas; ++i) {
+      StateVector x = sigmas.template block<States, 1>(0, i);
+      m_sigmasF.template block<States, 1>(0, i) = RK4(m_f, x, u, dt);
+    }
+
+    // Pass the predicted sigmas (𝒳) through the Unscented Transform
+    // to compute the prior state mean and covariance
+    //
+    // equations (18) (19) and (20)
+    auto [xHat, S] = SquareRootUnscentedTransform<States, NumSigmas>(
+        m_sigmasF, m_pts.Wm(), m_pts.Wc(), m_meanFuncX, m_residualFuncX,
+        discQ.template triangularView<Eigen::Lower>());
+    m_xHat = xHat;
+    m_S = S;
+  }
+
+  /**
+   * Correct the state estimate x-hat using the measurements in y.
+   *
+   * @param u Same control input used in the predict step.
+   * @param y Measurement vector.
+   */
+  void Correct(const InputVector& u, const OutputVector& y) {
+    Correct<Outputs>(u, y, m_h, m_contR, m_meanFuncY, m_residualFuncY,
+                     m_residualFuncX, m_addFuncX);
+  }
+
+  /**
+   * Correct the state estimate x-hat using the measurements in y.
+   *
+   * This is useful for when the measurement noise covariances vary.
+   *
+   * @param u Same control input used in the predict step.
+   * @param y Measurement vector.
+   * @param R Continuous measurement noise covariance matrix.
+   */
+  void Correct(const InputVector& u, const OutputVector& y,
+               const Matrixd<Outputs, Outputs>& R) {
+    Correct<Outputs>(u, y, m_h, R, m_meanFuncY, m_residualFuncY,
+                     m_residualFuncX, m_addFuncX);
+  }
+
+  /**
+   * Correct the state estimate x-hat using the measurements in y.
+   *
+   * This is useful for when the measurements available during a timestep's
+   * Correct() call vary. The h(x, u) passed to the constructor is used if one
+   * is not provided (the two-argument version of this function).
+   *
+   * @param u Same control input used in the predict step.
+   * @param y Measurement vector.
+   * @param h A vector-valued function of x and u that returns the measurement
+   *          vector.
+   * @param R Continuous measurement noise covariance matrix.
+   */
+  template <int Rows>
+  void Correct(
+      const InputVector& u, const Vectord<Rows>& y,
+      std::function<Vectord<Rows>(const StateVector&, const InputVector&)> h,
+      const Matrixd<Rows, Rows>& R) {
+    auto meanFuncY = [](const Matrixd<Outputs, NumSigmas>& sigmas,
+                        const Vectord<NumSigmas>& Wc) -> Vectord<Rows> {
+      return sigmas * Wc;
+    };
+    auto residualFuncX = [](const StateVector& a,
+                            const StateVector& b) -> StateVector {
+      return a - b;
+    };
+    auto residualFuncY = [](const Vectord<Rows>& a,
+                            const Vectord<Rows>& b) -> Vectord<Rows> {
+      return a - b;
+    };
+    auto addFuncX = [](const StateVector& a,
+                       const StateVector& b) -> StateVector { return a + b; };
+    Correct<Rows>(u, y, std::move(h), R, std::move(meanFuncY),
+                  std::move(residualFuncY), std::move(residualFuncX),
+                  std::move(addFuncX));
+  }
+
+  /**
+   * Correct the state estimate x-hat using the measurements in y.
+   *
+   * This is useful for when the measurements available during a timestep's
+   * Correct() call vary. The h(x, u) passed to the constructor is used if one
+   * is not provided (the two-argument version of this function).
+   *
+   * @param u             Same control input used in the predict step.
+   * @param y             Measurement vector.
+   * @param h             A vector-valued function of x and u that returns the
+   *                      measurement vector.
+   * @param R             Continuous measurement noise covariance matrix.
+   * @param meanFuncY     A function that computes the mean of NumSigmas
+   *                      measurement vectors using a given set of weights.
+   * @param residualFuncY A function that computes the residual of two
+   *                      measurement vectors (i.e. it subtracts them.)
+   * @param residualFuncX A function that computes the residual of two state
+   *                      vectors (i.e. it subtracts them.)
+   * @param addFuncX      A function that adds two state vectors.
+   */
+  template <int Rows>
+  void Correct(
+      const InputVector& u, const Vectord<Rows>& y,
+      std::function<Vectord<Rows>(const StateVector&, const InputVector&)> h,
+      const Matrixd<Rows, Rows>& R,
+      std::function<Vectord<Rows>(const Matrixd<Rows, NumSigmas>&,
+                                  const Vectord<NumSigmas>&)>
+          meanFuncY,
+      std::function<Vectord<Rows>(const Vectord<Rows>&, const Vectord<Rows>&)>
+          residualFuncY,
+      std::function<StateVector(const StateVector&, const StateVector&)>
+          residualFuncX,
+      std::function<StateVector(const StateVector&, const StateVector&)>
+          addFuncX) {
+    Matrixd<Rows, Rows> discR = DiscretizeR<Rows>(R, m_dt);
+    Eigen::internal::llt_inplace<double, Eigen::Lower>::blocked(discR);
+
+    // Generate new sigma points from the prior mean and covariance
+    // and transform them into measurement space using h(x, u)
+    //
+    //   sigmas  = 𝒳
+    //   sigmasH = 𝒴
+    //
+    // This differs from equation (22) which uses
+    // the prior sigma points, regenerating them allows
+    // multiple measurement updates per time update
+    Matrixd<Rows, NumSigmas> sigmasH;
+    Matrixd<States, NumSigmas> sigmas =
+        m_pts.SquareRootSigmaPoints(m_xHat, m_S);
+    for (int i = 0; i < NumSigmas; ++i) {
+      sigmasH.template block<Rows, 1>(0, i) =
+          h(sigmas.template block<States, 1>(0, i), u);
+    }
+
+    // Pass the predicted measurement sigmas through the Unscented Transform
+    // to compute the mean predicted measurement and square-root innovation
+    // covariance.
+    //
+    // equations (23) (24) and (25)
+    auto [yHat, Sy] = SquareRootUnscentedTransform<Rows, NumSigmas>(
+        sigmasH, m_pts.Wm(), m_pts.Wc(), meanFuncY, residualFuncY,
+        discR.template triangularView<Eigen::Lower>());
+
+    // Compute cross covariance of the predicted state and measurement sigma
+    // points given as:
+    //
+    //           2n
+    //   P_{xy} = Σ Wᵢ⁽ᶜ⁾[𝒳ᵢ - x̂][𝒴ᵢ - ŷ⁻]ᵀ
+    //           i=0
+    //
+    // equation (26)
+    Matrixd<States, Rows> Pxy;
+    Pxy.setZero();
+    for (int i = 0; i < NumSigmas; ++i) {
+      Pxy +=
+          m_pts.Wc(i) *
+          (residualFuncX(m_sigmasF.template block<States, 1>(0, i), m_xHat)) *
+          (residualFuncY(sigmasH.template block<Rows, 1>(0, i), yHat))
+              .transpose();
+    }
+
+    // Compute the Kalman gain. We use Eigen's QR decomposition to solve. This
+    // is equivalent to MATLAB's \ operator, so we need to rearrange to use
+    // that.
+    //
+    //   K = (P_{xy} / S_{y}ᵀ) / S_{y}
+    //   K = (S_{y} \ P_{xy})ᵀ / S_{y}
+    //   K = (S_{y}ᵀ \ (S_{y} \ P_{xy}ᵀ))ᵀ
+    //
+    // equation (27)
+    Matrixd<States, Rows> K =
+        Sy.transpose()
+            .fullPivHouseholderQr()
+            .solve(Sy.fullPivHouseholderQr().solve(Pxy.transpose()))
+            .transpose();
+
+    // Compute the posterior state mean
+    //
+    //   x̂ = x̂⁻ + K(y − ŷ⁻)
+    //
+    // second part of equation (27)
+    m_xHat = addFuncX(m_xHat, K * residualFuncY(y, yHat));
+
+    // Compute the intermediate matrix U for downdating
+    // the square-root covariance
+    //
+    // equation (28)
+    Matrixd<States, Rows> U = K * Sy;
+
+    // Downdate the posterior square-root state covariance
+    //
+    // equation (29)
+    for (int i = 0; i < Rows; i++) {
+      Eigen::internal::llt_inplace<double, Eigen::Lower>::rankUpdate(
+          m_S, U.template block<States, 1>(0, i), -1);
+    }
+  }
+
+ private:
+  std::function<StateVector(const StateVector&, const InputVector&)> m_f;
+  std::function<OutputVector(const StateVector&, const InputVector&)> m_h;
+  std::function<StateVector(const Matrixd<States, NumSigmas>&,
+                            const Vectord<NumSigmas>&)>
+      m_meanFuncX;
+  std::function<OutputVector(const Matrixd<Outputs, NumSigmas>&,
+                             const Vectord<NumSigmas>&)>
+      m_meanFuncY;
+  std::function<StateVector(const StateVector&, const StateVector&)>
+      m_residualFuncX;
+  std::function<OutputVector(const OutputVector&, const OutputVector&)>
+      m_residualFuncY;
+  std::function<StateVector(const StateVector&, const StateVector&)> m_addFuncX;
+  StateVector m_xHat;
+  StateMatrix m_S;
+  StateMatrix m_contQ;
+  Matrixd<Outputs, Outputs> m_contR;
+  Matrixd<States, NumSigmas> m_sigmasF;
+  wpi::units::second_t m_dt;
+
+  SigmaPoints m_pts;
+};
+
+template <int States, int Inputs, int Outputs, SigmaPoints<States> SigmaPoints>
+using UKF = UnscentedKalmanFilter<States, Inputs, Outputs, SigmaPoints>;
+
+}  // namespace wpi::math

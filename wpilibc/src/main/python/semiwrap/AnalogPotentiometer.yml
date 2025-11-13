@@ -1,10 +1,10 @@
 extra_includes:
-- wpi/sendable/SendableBuilder.h
+- wpi/util/sendable/SendableBuilder.hpp
 
 classes:
-  frc::AnalogPotentiometer:
+  wpi::AnalogPotentiometer:
     ignored_bases:
-    - wpi::SendableHelper<AnalogPotentiometer>
+    - wpi::util::SendableHelper<AnalogPotentiometer>
     methods:
       AnalogPotentiometer:
         overloads:

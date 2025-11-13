@@ -23,13 +23,10 @@ http_archive(
     url = "https://github.com/bazelbuild/rules_cc/releases/download/0.1.4/rules_cc-0.1.4.tar.gz",
 )
 
-# TODO(austinschuh): Update to the next released apple_support once it lands.
-# This needs to contain https://github.com/bazelbuild/apple_support/commit/7009b77c98a67d3fea081c9db4dbcee8effc3b7e and should be the next release after 1.22.1
 http_archive(
     name = "build_bazel_apple_support",
-    sha256 = "7d542be113180bc1da3660e51fe4792a867fb85537c9ef36a0d3366665a76803",
-    strip_prefix = "apple_support-7009b77c98a67d3fea081c9db4dbcee8effc3b7e",
-    url = "https://github.com/bazelbuild/apple_support/archive/7009b77c98a67d3fea081c9db4dbcee8effc3b7e.tar.gz",
+    sha256 = "93456fae59f225693fae7e0fdbb2899433766d7e8c0797ed28e35c6f04b5f255",
+    url = "https://github.com/bazelbuild/apple_support/releases/download/1.24.4/apple_support.1.24.4.tar.gz",
 )
 
 http_archive(
@@ -42,18 +39,18 @@ http_archive(
 
 http_archive(
     name = "rules_pkg",
-    sha256 = "cad05f864a32799f6f9022891de91ac78f30e0fa07dc68abac92a628121b5b11",
+    sha256 = "b7215c636f22c1849f1c3142c72f4b954bb12bb8dcf3cbe229ae6e69cc6479db",
     urls = [
-        "https://github.com/bazelbuild/rules_pkg/releases/download/1.0.0/rules_pkg-1.0.0.tar.gz",
+        "https://github.com/bazelbuild/rules_pkg/releases/download/1.1.0/rules_pkg-1.1.0.tar.gz",
     ],
 )
 
 # Rules Python
 http_archive(
     name = "rules_python",
-    sha256 = "9f9f3b300a9264e4c77999312ce663be5dee9a56e361a1f6fe7ec60e1beef9a3",
-    strip_prefix = "rules_python-1.4.1",
-    url = "https://github.com/bazel-contrib/rules_python/releases/download/1.4.1/rules_python-1.4.1.tar.gz",
+    sha256 = "6b9185460d11d57a32139b103363fce39d81889206561ef582678273b74372ac",
+    strip_prefix = "rules_python-1.7.0-rc5",
+    url = "https://github.com/bazel-contrib/rules_python/releases/download/1.7.0-rc5/rules_python-1.7.0-rc5.tar.gz",
 )
 
 # Download Extra java rules
@@ -89,6 +86,7 @@ http_archive(
 http_archive(
     name = "pybind11",
     build_file = "@pybind11_bazel//:pybind11-BUILD.bazel",
+    integrity = "sha256-wkxQme/TKRS6e0rFedV3IH00zgb8ZsZktnc3HRi9DyU=",
     strip_prefix = "pybind11-dfe7e65b4527eeb11036402aac3a394130960bb2",
     urls = ["https://github.com/pybind/pybind11/archive/dfe7e65b4527eeb11036402aac3a394130960bb2.zip"],
 )

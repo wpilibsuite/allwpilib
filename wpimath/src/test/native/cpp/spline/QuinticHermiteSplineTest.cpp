@@ -2,21 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/spline/QuinticHermiteSpline.hpp"
+
 #include <chrono>
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Pose2d.h"
-#include "frc/geometry/Rotation2d.h"
-#include "frc/spline/QuinticHermiteSpline.h"
-#include "frc/spline/SplineHelper.h"
-#include "frc/spline/SplineParameterizer.h"
-#include "units/angle.h"
-#include "units/length.h"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/spline/SplineHelper.hpp"
+#include "wpi/math/spline/SplineParameterizer.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
-namespace frc {
+namespace wpi::math {
 class QuinticHermiteSplineTest : public ::testing::Test {
  protected:
   static void Run(const Pose2d& a, const Pose2d& b) {
@@ -51,7 +52,7 @@ class QuinticHermiteSplineTest : public ::testing::Test {
                 b.Rotation().Radians().value(), 1E-9);
   }
 };
-}  // namespace frc
+}  // namespace wpi::math
 
 TEST_F(QuinticHermiteSplineTest, StraightLine) {
   Run(Pose2d{}, Pose2d{3_m, 0_m, 0_deg});

@@ -1,5 +1,5 @@
 extra_includes:
-- networktables/NetworkTableType.h
+- wpi/nt/NetworkTableType.hpp
 - src/py2value.h
 
 functions:
@@ -7,7 +7,7 @@ functions:
     ignore: true
 
 classes:
-  nt::Value:
+  wpi::nt::Value:
     methods:
       Value:
         overloads:
@@ -174,7 +174,7 @@ classes:
       .def_static("makeValue", [](py::handle value) {
           return pyntcore::py2ntvalue(value);
         }, py::arg("value"))
-      .def_static("getFactoryByType", [](nt::NetworkTableType type) {
+      .def_static("getFactoryByType", [](wpi::nt::NetworkTableType type) {
         return pyntcore::valueFactoryByType(type);
       }, py::arg("type"))
       .def("__repr__", [](const Value &self) -> py::str {

@@ -2,22 +2,21 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/PWMMotorControllerSim.h"
+#include "wpi/simulation/PWMMotorControllerSim.hpp"
 
-#include <hal/SimDevice.h>
-#include <units/length.h>
+#include "wpi/hal/SimDevice.h"
+#include "wpi/simulation/SimDeviceSim.hpp"
+#include "wpi/units/length.hpp"
 
-#include "frc/simulation/SimDeviceSim.h"
-
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 PWMMotorControllerSim::PWMMotorControllerSim(
     const PWMMotorController& motorctrl)
     : PWMMotorControllerSim(motorctrl.GetChannel()) {}
 
 PWMMotorControllerSim::PWMMotorControllerSim(int channel) {
-  frc::sim::SimDeviceSim deviceSim{"PWMMotorController", channel};
+  wpi::sim::SimDeviceSim deviceSim{"PWMMotorController", channel};
   m_simSpeed = deviceSim.GetDouble("Speed");
 }
 

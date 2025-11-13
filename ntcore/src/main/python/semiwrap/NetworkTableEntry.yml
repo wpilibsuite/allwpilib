@@ -1,13 +1,13 @@
 extra_includes:
-- networktables/NetworkTableInstance.h
-- networktables/Topic.h
+- wpi/nt/NetworkTableInstance.hpp
+- wpi/nt/Topic.hpp
 - src/py2value.h
 - src/pyentry.h
 
 inline_code: |
   #include <src/NetworkTableEntry.cpp.inl>
 classes:
-  nt::NetworkTableEntry:
+  wpi::nt::NetworkTableEntry:
     methods:
       NetworkTableEntry:
         overloads:

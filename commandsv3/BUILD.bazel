@@ -65,7 +65,7 @@ wpilib_java_library(
 
 wpilib_java_junit5_test(
     name = "commandsv3-java-test",
-    srcs = glob(["**/*.java"]),
+    srcs = glob(["src/test/java/**/*.java"]),
     deps = [
         ":commandsv3-java",
         "//hal:hal-java",
@@ -81,8 +81,8 @@ wpilib_java_junit5_test(
 
 java_binary(
     name = "DevMain-Java",
-    srcs = ["src/dev/java/org/wpilib/commands3/DevMain.java"],
-    main_class = "org.wpilib.commands3.DevMain",
+    srcs = ["src/dev/java/org/wpilib/command3/DevMain.java"],
+    main_class = "org.wpilib.command3.DevMain",
     deps = [
         "//hal:hal-java",
         "//ntcore:ntcore-java",

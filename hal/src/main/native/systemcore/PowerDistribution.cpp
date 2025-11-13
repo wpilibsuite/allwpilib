@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/PowerDistribution.h"
+#include "wpi/hal/PowerDistribution.h"
 
 #include <cstring>
 #include <thread>
@@ -11,11 +11,11 @@
 #include "HALInternal.h"
 #include "PortsInternal.h"
 #include "REVPDH.h"
-#include "hal/Errors.h"
-#include "hal/HALBase.h"
-#include "hal/handles/HandlesInternal.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/HALBase.h"
+#include "wpi/hal/handles/HandlesInternal.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
 
@@ -25,12 +25,12 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
   if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_kAutomatic) {
     if (moduleNumber != HAL_DEFAULT_POWER_DISTRIBUTION_MODULE) {
       *status = PARAMETER_OUT_OF_RANGE;
-      hal::SetLastError(
+      wpi::hal::SetLastError(
           status, "Automatic PowerDistributionType must have default module");
       return HAL_kInvalidHandle;
     }
 
-    uint64_t waitTime = hal::GetDSInitializeTime() + 400000;
+    uint64_t waitTime = wpi::hal::GetDSInitializeTime() + 400000;
 
     // Ensure we have been alive for long enough to receive a few Power packets.
     do {
@@ -75,7 +75,7 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
   }
 }
 
-#define IsCtre(handle) ::hal::isHandleType(handle, HAL_HandleEnum::CTREPDP)
+#define IsCtre(handle) ::wpi::hal::isHandleType(handle, HAL_HandleEnum::CTREPDP)
 
 void HAL_CleanPowerDistribution(HAL_PowerDistributionHandle handle) {
   if (IsCtre(handle)) {

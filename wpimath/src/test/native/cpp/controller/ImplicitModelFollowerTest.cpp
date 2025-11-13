@@ -2,15 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/controller/ImplicitModelFollower.hpp"
+
 #include <gtest/gtest.h>
 
-#include "frc/controller/ImplicitModelFollower.h"
-#include "frc/system/plant/LinearSystemId.h"
+#include "wpi/math/system/plant/LinearSystemId.hpp"
 
-namespace frc {
+namespace wpi::math {
 
 TEST(ImplicitModelFollowerTest, SameModel) {
-  constexpr units::second_t dt = 5_ms;
+  constexpr wpi::units::second_t dt = 5_ms;
 
   using Kv_t = decltype(1_V / 1_mps);
   using Ka_t = decltype(1_V / 1_mps_sq);
@@ -54,7 +55,7 @@ TEST(ImplicitModelFollowerTest, SameModel) {
 }
 
 TEST(ImplicitModelFollowerTest, SlowerRefModel) {
-  constexpr units::second_t dt = 5_ms;
+  constexpr wpi::units::second_t dt = 5_ms;
 
   using Kv_t = decltype(1_V / 1_mps);
   using Ka_t = decltype(1_V / 1_mps_sq);
@@ -106,4 +107,4 @@ TEST(ImplicitModelFollowerTest, SlowerRefModel) {
   }
 }
 
-}  // namespace frc
+}  // namespace wpi::math

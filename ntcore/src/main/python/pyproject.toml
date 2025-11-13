@@ -48,13 +48,13 @@ update_init = [
     "ntcore.meta ntcore._ntcore.meta"
 ]
 scan_headers_ignore = [
-    "networktables/ProtobufTopic.h",
-    "networktables/UnitTopic.h",
+    "wpi/nt/ProtobufTopic.hpp",
+    "wpi/nt/UnitTopic.hpp",
 
-    "ntcore.h",
-    "ntcore_c.h",
-    "ntcore_c_types.h",
-    "ntcore_test.h",
+    "wpi/nt/ntcore.h",
+    "wpi/nt/ntcore_c.h",
+    "wpi/nt/ntcore_c_types.h",
+    "wpi/nt/ntcore_test.hpp",
 
     "src/*",
 ]
@@ -67,30 +67,30 @@ depends = ["wpiutil", "wpinet", "wpilog"]
 
 [tool.semiwrap.extension_modules."ntcore._ntcore".headers]
 # networktables
-BooleanArrayTopic = "networktables/BooleanArrayTopic.h"
-BooleanTopic = "networktables/BooleanTopic.h"
-DoubleArrayTopic = "networktables/DoubleArrayTopic.h"
-DoubleTopic = "networktables/DoubleTopic.h"
-FloatArrayTopic = "networktables/FloatArrayTopic.h"
-FloatTopic = "networktables/FloatTopic.h"
-GenericEntry = "networktables/GenericEntry.h"
-IntegerArrayTopic = "networktables/IntegerArrayTopic.h"
-IntegerTopic = "networktables/IntegerTopic.h"
-MultiSubscriber = "networktables/MultiSubscriber.h"
-NTSendable = "networktables/NTSendable.h"
-NTSendableBuilder = "networktables/NTSendableBuilder.h"
-NetworkTable = "networktables/NetworkTable.h"
-NetworkTableEntry = "networktables/NetworkTableEntry.h"
-NetworkTableInstance = "networktables/NetworkTableInstance.h"
-NetworkTableListener = "networktables/NetworkTableListener.h"
-NetworkTableType = "networktables/NetworkTableType.h"
-NetworkTableValue = "networktables/NetworkTableValue.h"
-RawTopic = "networktables/RawTopic.h"
-StructTopic = "networktables/StructTopic.h"
-StructArrayTopic = "networktables/StructArrayTopic.h"
-StringArrayTopic = "networktables/StringArrayTopic.h"
-StringTopic = "networktables/StringTopic.h"
-Topic = "networktables/Topic.h"
+BooleanArrayTopic = "wpi/nt/BooleanArrayTopic.hpp"
+BooleanTopic = "wpi/nt/BooleanTopic.hpp"
+DoubleArrayTopic = "wpi/nt/DoubleArrayTopic.hpp"
+DoubleTopic = "wpi/nt/DoubleTopic.hpp"
+FloatArrayTopic = "wpi/nt/FloatArrayTopic.hpp"
+FloatTopic = "wpi/nt/FloatTopic.hpp"
+GenericEntry = "wpi/nt/GenericEntry.hpp"
+IntegerArrayTopic = "wpi/nt/IntegerArrayTopic.hpp"
+IntegerTopic = "wpi/nt/IntegerTopic.hpp"
+MultiSubscriber = "wpi/nt/MultiSubscriber.hpp"
+NTSendable = "wpi/nt/NTSendable.hpp"
+NTSendableBuilder = "wpi/nt/NTSendableBuilder.hpp"
+NetworkTable = "wpi/nt/NetworkTable.hpp"
+NetworkTableEntry = "wpi/nt/NetworkTableEntry.hpp"
+NetworkTableInstance = "wpi/nt/NetworkTableInstance.hpp"
+NetworkTableListener = "wpi/nt/NetworkTableListener.hpp"
+NetworkTableType = "wpi/nt/NetworkTableType.hpp"
+NetworkTableValue = "wpi/nt/NetworkTableValue.hpp"
+RawTopic = "wpi/nt/RawTopic.hpp"
+StructTopic = "wpi/nt/StructTopic.hpp"
+StructArrayTopic = "wpi/nt/StructArrayTopic.hpp"
+StringArrayTopic = "wpi/nt/StringArrayTopic.hpp"
+StringTopic = "wpi/nt/StringTopic.hpp"
+Topic = "wpi/nt/Topic.hpp"
 
-ntcore_cpp = "ntcore_cpp.h"
-ntcore_cpp_types = "ntcore_cpp_types.h"
+ntcore_cpp = "wpi/nt/ntcore_cpp.hpp"
+ntcore_cpp_types = "wpi/nt/ntcore_cpp_types.hpp"

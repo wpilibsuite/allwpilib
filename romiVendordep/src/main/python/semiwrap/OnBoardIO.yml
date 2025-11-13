@@ -1,5 +1,5 @@
 classes:
-  frc::OnBoardIO:
+  wpi::romi::OnBoardIO:
     attributes:
       kMessageInterval:
       m_nextMessageTime:

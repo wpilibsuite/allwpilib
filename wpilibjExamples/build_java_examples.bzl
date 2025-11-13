@@ -7,16 +7,16 @@ load("//wpilibjExamples:example_projects.bzl", "COMMANDS_V2_FOLDERS", "EXAMPLES_
 def _package_type(package_type):
     pkg_files(
         name = package_type + "-pkg",
-        srcs = native.glob(["src/main/java/edu/wpi/first/wpilibj/" + package_type + "/**"]),
-        strip_prefix = "src/main/java/edu/wpi/first/wpilibj",
+        srcs = native.glob(["src/main/java/org/wpilib/" + package_type + "/**"]),
+        strip_prefix = "src/main/java/org/wpilib",
     )
 
     pkgs = ["//:license_pkg_files", ":" + package_type + "-pkg"]
     if package_type == "examples":
         pkg_files(
             name = package_type + "-tests-pkg",
-            srcs = native.glob(["src/test/java/edu/wpi/first/wpilibj/" + package_type + "/**"]),
-            strip_prefix = "src/test/java/edu/wpi/first/wpilibj/" + package_type,
+            srcs = native.glob(["src/test/java/org/wpilib/" + package_type + "/**"]),
+            strip_prefix = "src/test/java/org/wpilib/" + package_type,
             prefix = "examples_test",
         )
         pkgs.append(package_type + "-tests-pkg")
@@ -33,8 +33,8 @@ def build_examples(halsim_deps):
     for folder in EXAMPLES_FOLDERS:
         java_binary(
             name = folder + "-example",
-            srcs = native.glob(["src/main/java/edu/wpi/first/wpilibj/examples/" + folder + "/**/*.java"]),
-            main_class = "edu/wpi/first/wpilibj/examples/" + folder + "/Main",
+            srcs = native.glob(["src/main/java/org/wpilib/examples/" + folder + "/**/*.java"]),
+            main_class = "org/wpilib/examples/" + folder + "/Main",
             plugins = [
                 "//epilogue-processor:plugin",
             ],
@@ -46,7 +46,7 @@ def build_examples(halsim_deps):
                 "//ntcore:ntcore-java",
                 "//wpimath:wpimath-java",
                 "//wpilibj:wpilibj-java",
-                "//wpilibNewCommands:wpilibNewCommands-java",
+                "//commandsv2:commandsv2-java",
                 "//wpiutil:wpiutil-java",
                 "//romiVendordep:romiVendordep-java",
                 "//xrpVendordep:xrpVendordep-java",
@@ -63,11 +63,11 @@ def build_commands():
     for folder in COMMANDS_V2_FOLDERS:
         java_library(
             name = folder + "-command",
-            srcs = native.glob(["src/main/java/edu/wpi/first/wpilibj/commands/" + folder + "/**/*.java"]),
+            srcs = native.glob(["src/main/java/org/wpilib/commands/" + folder + "/**/*.java"]),
             deps = [
                 "//hal:hal-java",
                 "//wpilibj:wpilibj-java",
-                "//wpilibNewCommands:wpilibNewCommands-java",
+                "//commandsv2:commandsv2-java",
                 "//wpimath:wpimath-java",
             ],
             tags = ["wpi-example"],
@@ -79,7 +79,7 @@ def build_snippets():
     for folder in SNIPPETS_FOLDERS:
         java_library(
             name = folder + "-snippet",
-            srcs = native.glob(["src/main/java/edu/wpi/first/wpilibj/snippets/" + folder + "/**/*.java"]),
+            srcs = native.glob(["src/main/java/org/wpilib/snippets/" + folder + "/**/*.java"]),
             deps = [
                 "//hal:hal-java",
                 "//wpilibj:wpilibj-java",
@@ -94,11 +94,11 @@ def build_templates():
     for folder in TEMPLATES_FOLDERS:
         java_library(
             name = folder + "-template",
-            srcs = native.glob(["src/main/java/edu/wpi/first/wpilibj/templates/" + folder + "/**/*.java"]),
+            srcs = native.glob(["src/main/java/org/wpilib/templates/" + folder + "/**/*.java"]),
             deps = [
                 "//hal:hal-java",
                 "//wpilibj:wpilibj-java",
-                "//wpilibNewCommands:wpilibNewCommands-java",
+                "//commandsv2:commandsv2-java",
                 "//wpimath:wpimath-java",
                 "//wpiutil:wpiutil-java",
                 "//xrpVendordep:xrpVendordep-java",
@@ -110,13 +110,13 @@ def build_tests():
     for folder in TEST_FOLDERS:
         wpilib_java_junit5_test(
             name = folder + "-test",
-            srcs = native.glob(["src/test/java/edu/wpi/first/wpilibj/examples/" + folder + "/**/*.java"]),
+            srcs = native.glob(["src/test/java/org/wpilib/examples/" + folder + "/**/*.java"]),
             deps = [
                 ":" + folder + "-example",
                 "//hal:hal-java",
                 "//ntcore:ntcore-java",
                 "//wpilibj:wpilibj-java",
-                "//wpilibNewCommands:wpilibNewCommands-java",
+                "//commandsv2:commandsv2-java",
                 "//wpimath:wpimath-java",
                 "//wpiutil:wpiutil-java",
             ],

@@ -4,16 +4,16 @@
 
 #if defined(__APPLE__)
 
-#include "ResolverThread.h"
+#include "ResolverThread.hpp"
 
 #include <algorithm>
 #include <memory>
 #include <utility>
 #include <vector>
 
-#include <wpi/mutex.h>
+#include "wpi/util/mutex.hpp"
 
-using namespace wpi;
+using namespace wpi::net;
 
 ResolverThread::ResolverThread(const private_init&) {}
 
@@ -50,7 +50,7 @@ void ResolverThread::RemoveServiceRefInThread(DNSServiceRef serviceRef) {
 WPI_EventHandle ResolverThread::RemoveServiceRefOutsideThread(
     DNSServiceRef serviceRef) {
   std::scoped_lock lock{serviceRefMutex};
-  WPI_EventHandle handle = CreateEvent(true);
+  WPI_EventHandle handle = wpi::util::CreateEvent(true);
   serviceRefsToRemove.push_back({serviceRef, handle});
   return handle;
 }
@@ -62,7 +62,7 @@ bool ResolverThread::CleanupRefs() {
         std::find_if(serviceRefs.begin(), serviceRefs.end(),
                      [=](auto& a) { return a.first == r.first; }));
     DNSServiceRefDeallocate(r.first);
-    wpi::SetEvent(r.second);
+    wpi::util::SetEvent(r.second);
   }
   serviceRefsToRemove.clear();
   return serviceRefs.empty();
@@ -102,7 +102,7 @@ void ResolverThread::ThreadMain() {
   }
 }
 
-static wpi::mutex ThreadLoopLock;
+static wpi::util::mutex ThreadLoopLock;
 static std::weak_ptr<ResolverThread> ThreadLoop;
 
 std::shared_ptr<ResolverThread> ResolverThread::Get() {

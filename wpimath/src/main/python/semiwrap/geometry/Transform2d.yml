@@ -1,21 +1,21 @@
 extra_includes:
-- frc/geometry/Pose2d.h
+- wpi/math/geometry/Pose2d.hpp
 - rpy/geometryToString.h
 - wpystruct.h
 
 classes:
-  frc::Transform2d:
+  wpi::math::Transform2d:
     force_type_casters:
-    - units::foot_t
-    - units::meter_t
-    - units::radian_t
+    - wpi::units::foot_t
+    - wpi::units::meter_t
+    - wpi::units::radian_t
     methods:
       Transform2d:
         overloads:
           const Pose2d&, const Pose2d&:
             keepalive: []
           Translation2d, Rotation2d:
-          units::meter_t, units::meter_t, Rotation2d:
+          wpi::units::meter_t, wpi::units::meter_t, Rotation2d:
           const Eigen::Matrix3d&:
             rename: fromMatrix
             keepalive: []
@@ -34,21 +34,21 @@ classes:
 
 inline_code: |
   cls_Transform2d
-    .def_static("fromFeet", [](units::foot_t x, units::foot_t y, units::radian_t angle){
+    .def_static("fromFeet", [](wpi::units::foot_t x, wpi::units::foot_t y, wpi::units::radian_t angle){
       return std::make_unique<Transform2d>(Translation2d(x, y), Rotation2d(angle));
     }, py::arg("x"), py::arg("y"), py::arg("angle"))
-    .def(py::init([](units::meter_t x, units::meter_t y, units::radian_t angle) {
+    .def(py::init([](wpi::units::meter_t x, wpi::units::meter_t y, wpi::units::radian_t angle) {
       return std::make_unique<Transform2d>(Translation2d(x, y), Rotation2d(angle));
     }), py::arg("x"), py::arg("y"), py::arg("angle"))
     .def_property_readonly("x", &Transform2d::X)
     .def_property_readonly("y", &Transform2d::Y)
-    .def_property_readonly("x_feet", [](Transform2d * self) -> units::foot_t {
+    .def_property_readonly("x_feet", [](Transform2d * self) -> wpi::units::foot_t {
       return self->X();
     })
-    .def_property_readonly("y_feet", [](Transform2d * self) -> units::foot_t {
+    .def_property_readonly("y_feet", [](Transform2d * self) -> wpi::units::foot_t {
       return self->Y();
     })
     .def("__repr__", py::overload_cast<const Transform2d&>(&rpy::toString));
   ;
 
-  SetupWPyStruct<frc::Transform2d>(cls_Transform2d);
+  SetupWPyStruct<wpi::math::Transform2d>(cls_Transform2d);

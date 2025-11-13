@@ -1,6 +1,7 @@
 # THIS FILE IS AUTO GENERATED
 
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("//shared/bazel/rules/gen:gen-version-file.bzl", "generate_version_file")
 load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "create_pybind_library", "robotpy_library")
 load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "publish_casters", "resolve_casters", "run_header_gen")
 load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers", "update_yaml_files")
@@ -11,7 +12,7 @@ def wpiutil_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             class_name = "StackTrace",
             yml_file = "semiwrap/StackTrace.yml",
             header_root = "$(execpath :robotpy-native-wpiutil.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/StackTrace.h",
+            header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/StackTrace.hpp",
             tmpl_class_names = [],
             trampolines = [],
         ),
@@ -19,7 +20,7 @@ def wpiutil_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             class_name = "Synchronization",
             yml_file = "semiwrap/Synchronization.yml",
             header_root = "$(execpath :robotpy-native-wpiutil.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/Synchronization.h",
+            header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/Synchronization.h",
             tmpl_class_names = [],
             trampolines = [],
         ),
@@ -27,7 +28,7 @@ def wpiutil_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             class_name = "RawFrame",
             yml_file = "semiwrap/RawFrame.yml",
             header_root = "$(execpath :robotpy-native-wpiutil.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/RawFrame.h",
+            header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/RawFrame.h",
             tmpl_class_names = [],
             trampolines = [],
         ),
@@ -35,30 +36,30 @@ def wpiutil_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             class_name = "Sendable",
             yml_file = "semiwrap/Sendable.yml",
             header_root = "$(execpath :robotpy-native-wpiutil.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/sendable/Sendable.h",
+            header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/sendable/Sendable.hpp",
             tmpl_class_names = [],
             trampolines = [
-                ("wpi::Sendable", "wpi__Sendable.hpp"),
+                ("wpi::util::Sendable", "wpi__util__Sendable.hpp"),
             ],
         ),
         struct(
             class_name = "SendableBuilder",
             yml_file = "semiwrap/SendableBuilder.yml",
             header_root = "$(execpath :robotpy-native-wpiutil.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/sendable/SendableBuilder.h",
+            header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/sendable/SendableBuilder.hpp",
             tmpl_class_names = [],
             trampolines = [
-                ("wpi::SendableBuilder", "wpi__SendableBuilder.hpp"),
+                ("wpi::util::SendableBuilder", "wpi__util__SendableBuilder.hpp"),
             ],
         ),
         struct(
             class_name = "SendableRegistry",
             yml_file = "semiwrap/SendableRegistry.yml",
             header_root = "$(execpath :robotpy-native-wpiutil.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/sendable/SendableRegistry.h",
+            header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/sendable/SendableRegistry.hpp",
             tmpl_class_names = [],
             trampolines = [
-                ("wpi::SendableRegistry", "wpi__SendableRegistry.hpp"),
+                ("wpi::util::SendableRegistry", "wpi__util__SendableRegistry.hpp"),
             ],
         ),
         struct(
@@ -193,10 +194,17 @@ def define_pybind_library(name, pkgcfgs = []):
         tags = ["manual", "robotpy"],
     )
 
+    generate_version_file(
+        name = "{}.generate_version".format(name),
+        output_file = "src/main/python/wpiutil/version.py",
+        template = "//shared/bazel/rules/robotpy:version_template.in",
+    )
+
     robotpy_library(
         name = name,
         srcs = native.glob(["src/main/python/wpiutil/**/*.py"]) + [
             "src/main/python/wpiutil/_init__wpiutil.py",
+            "{}.generate_version".format(name),
         ],
         data = [
             "{}.generated_pkgcfg_files".format(name),

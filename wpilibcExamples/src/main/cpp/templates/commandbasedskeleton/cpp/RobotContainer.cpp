@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "RobotContainer.h"
+#include "RobotContainer.hpp"
 
-#include <frc2/command/Commands.h>
+#include "wpi/commands2/Commands.hpp"
 
 RobotContainer::RobotContainer() {
   ConfigureBindings();
@@ -12,6 +12,6 @@ RobotContainer::RobotContainer() {
 
 void RobotContainer::ConfigureBindings() {}
 
-frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
-  return frc2::cmd::Print("No autonomous command configured");
+wpi::cmd::CommandPtr RobotContainer::GetAutonomousCommand() {
+  return wpi::cmd::cmd::Print("No autonomous command configured");
 }

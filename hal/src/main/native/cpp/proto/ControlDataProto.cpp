@@ -2,9 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <wpi/protobuf/ProtobufCallbacks.h>
-
-#include "hal/proto/ControlData.h"
+#include "wpi/hal/proto/ControlData.h"
+#include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 
 static_assert(sizeof(mrc::ControlFlags) == sizeof(uint32_t));
 
@@ -61,9 +60,9 @@ constexpr mrc::ControlFlags ToControlWord(uint32_t Word) {
 
 }  // namespace
 
-std::optional<mrc::ControlData> wpi::Protobuf<mrc::ControlData>::Unpack(
+std::optional<mrc::ControlData> wpi::util::Protobuf<mrc::ControlData>::Unpack(
     InputStream& Stream) {
-  wpi::UnpackCallback<mrc::Joystick, MRC_MAX_NUM_JOYSTICKS> JoystickCb;
+  wpi::util::UnpackCallback<mrc::Joystick, MRC_MAX_NUM_JOYSTICKS> JoystickCb;
 
   mrc_proto_ProtobufControlData Msg{
       .ControlWord = 0,
@@ -92,10 +91,10 @@ std::optional<mrc::ControlData> wpi::Protobuf<mrc::ControlData>::Unpack(
   return ControlData;
 }
 
-bool wpi::Protobuf<mrc::ControlData>::Pack(OutputStream& Stream,
-                                           const mrc::ControlData& Value) {
+bool wpi::util::Protobuf<mrc::ControlData>::Pack(
+    OutputStream& Stream, const mrc::ControlData& Value) {
   std::span<const mrc::Joystick> Sticks = Value.Joysticks();
-  wpi::PackCallback Joysticks{Sticks};
+  wpi::util::PackCallback Joysticks{Sticks};
 
   mrc_proto_ProtobufControlData Msg{
       .ControlWord = FromControlWord(Value.ControlWord),
@@ -107,9 +106,9 @@ bool wpi::Protobuf<mrc::ControlData>::Pack(OutputStream& Stream,
   return Stream.Encode(Msg);
 }
 
-std::optional<mrc::Joystick> wpi::Protobuf<mrc::Joystick>::Unpack(
+std::optional<mrc::Joystick> wpi::util::Protobuf<mrc::Joystick>::Unpack(
     InputStream& Stream) {
-  wpi::UnpackCallback<int16_t, MRC_MAX_NUM_AXES> AxesCb;
+  wpi::util::UnpackCallback<int16_t, MRC_MAX_NUM_AXES> AxesCb;
 
   mrc_proto_ProtobufJoystickData Msg{
       .AvailableButtons = 0,
@@ -149,9 +148,9 @@ std::optional<mrc::Joystick> wpi::Protobuf<mrc::Joystick>::Unpack(
   return Joystick;
 }
 
-bool wpi::Protobuf<mrc::Joystick>::Pack(OutputStream& Stream,
-                                        const mrc::Joystick& Value) {
-  wpi::PackCallback AxesCb{Value.Axes.Axes()};
+bool wpi::util::Protobuf<mrc::Joystick>::Pack(OutputStream& Stream,
+                                              const mrc::Joystick& Value) {
+  wpi::util::PackCallback AxesCb{Value.Axes.Axes()};
 
   uint32_t PovsStore = 0;
   for (int i = static_cast<int>(Value.Povs.GetCount()) - 1; i >= 0; i--) {

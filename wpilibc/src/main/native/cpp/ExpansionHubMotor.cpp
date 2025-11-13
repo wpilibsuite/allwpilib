@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/ExpansionHubMotor.h"
+#include "wpi/ExpansionHubMotor.hpp"
 
-#include "frc/Errors.h"
-#include "frc/SystemServer.h"
+#include "wpi/system/Errors.hpp"
+#include "wpi/system/SystemServer.hpp"
 
 static constexpr int kPercentageMode = 0;
 static constexpr int kVoltageMode = 1;
@@ -13,25 +13,26 @@ static constexpr int kPositionMode = 2;
 static constexpr int kVelocityMode = 3;
 static constexpr int kFollowerMode = 4;
 
-using namespace frc;
+using namespace wpi;
 
 ExpansionHubMotor::ExpansionHubMotor(int usbId, int channel)
     : m_hub{usbId},
       m_channel{channel},
       m_velocityPidConstants{usbId, channel, true},
       m_positionPidConstants{usbId, channel, false} {
-  FRC_AssertMessage(channel >= 0 && channel < ExpansionHub::NumMotorPorts,
-                    "ExHub Motor Channel {} out of range", channel);
+  WPILIB_AssertMessage(channel >= 0 && channel < ExpansionHub::NumMotorPorts,
+                       "ExHub Motor Channel {} out of range", channel);
 
   if (!m_hub.CheckAndReserveMotor(channel)) {
-    throw FRC_MakeError(err::ResourceAlreadyAllocated, "Channel {}", channel);
+    throw WPILIB_MakeError(err::ResourceAlreadyAllocated, "Channel {}",
+                           channel);
   }
 
   m_hub.ReportUsage(fmt::format("ExHubServo[{}]", channel), "ExHubServo");
 
   auto systemServer = SystemServer::GetSystemServer();
 
-  nt::PubSubOptions options;
+  wpi::nt::PubSubOptions options;
   options.sendAll = true;
   options.keepDuplicates = true;
   options.periodic = 0.005;
@@ -96,7 +97,7 @@ void ExpansionHubMotor::SetPercentagePower(double power) {
   m_setpointPublisher.Set(power);
 }
 
-void ExpansionHubMotor::SetVoltage(units::volt_t voltage) {
+void ExpansionHubMotor::SetVoltage(wpi::units::volt_t voltage) {
   m_modePublisher.Set(kVoltageMode);
   m_setpointPublisher.Set(voltage.to<double>());
 }
@@ -119,8 +120,8 @@ void ExpansionHubMotor::SetFloatOn0(bool floatOn0) {
   m_floatOn0Publisher.Set(floatOn0);
 }
 
-units::ampere_t ExpansionHubMotor::GetCurrent() const {
-  return units::ampere_t{m_currentSubscriber.Get(0)};
+wpi::units::ampere_t ExpansionHubMotor::GetCurrent() const {
+  return wpi::units::ampere_t{m_currentSubscriber.Get(0)};
 }
 
 void ExpansionHubMotor::SetDistancePerCount(double perCount) {
@@ -153,8 +154,8 @@ ExpansionHubPidConstants& ExpansionHubMotor::GetPositionPidConstants() {
 
 void ExpansionHubMotor::Follow(const ExpansionHubMotor& leader) {
   if (m_hub.GetUsbId() != leader.m_hub.GetUsbId()) {
-    throw FRC_MakeError(err::InvalidParameter,
-                        "Cannot follow motor on different hub");
+    throw WPILIB_MakeError(err::InvalidParameter,
+                           "Cannot follow motor on different hub");
   }
   m_modePublisher.Set(kFollowerMode);
   m_setpointPublisher.Set(leader.m_channel);

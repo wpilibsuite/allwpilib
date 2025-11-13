@@ -4,9 +4,9 @@
 
 #include <numbers>
 
-#include <frc/Encoder.h>
-#include <frc/TimedRobot.h>
-#include <frc/smartdashboard/SmartDashboard.h>
+#include "wpi/framework/TimedRobot.hpp"
+#include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/smartdashboard/SmartDashboard.hpp"
 
 /**
  * Sample program displaying the value of a quadrature encoder on the
@@ -27,7 +27,7 @@
  * distance that the robot drives can be precisely controlled during the
  * autonomous mode.
  */
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   Robot() {
     /* Defines the number of samples to average when determining the rate.
@@ -53,10 +53,10 @@ class Robot : public frc::TimedRobot {
 
   void TeleopPeriodic() override {
     // Retrieve the net displacement of the Encoder since the last Reset.
-    frc::SmartDashboard::PutNumber("Encoder Distance", m_encoder.GetDistance());
+    wpi::SmartDashboard::PutNumber("Encoder Distance", m_encoder.GetDistance());
 
     // Retrieve the current rate of the encoder.
-    frc::SmartDashboard::PutNumber("Encoder Rate", m_encoder.GetRate());
+    wpi::SmartDashboard::PutNumber("Encoder Rate", m_encoder.GetRate());
   }
 
  private:
@@ -76,11 +76,11 @@ class Robot : public frc::TimedRobot {
    * and defaults to k4X. Faster (k4X) encoding gives greater positional
    * precision but more noise in the rate.
    */
-  frc::Encoder m_encoder{1, 2, false, frc::Encoder::k4X};
+  wpi::Encoder m_encoder{1, 2, false, wpi::Encoder::k4X};
 };
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

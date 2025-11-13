@@ -4,78 +4,77 @@
 
 #include <jni.h>
 
-#include <wpi/jni_util.h>
-
 #include "HALUtil.h"
-#include "edu_wpi_first_hal_REVPHJNI.h"
-#include "hal/Ports.h"
-#include "hal/REVPH.h"
-#include "hal/handles/HandlesInternal.h"
+#include "org_wpilib_hardware_hal_REVPHJNI.h"
+#include "wpi/hal/Ports.h"
+#include "wpi/hal/REVPH.h"
+#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/util/jni_util.hpp"
 
 static_assert(
-    edu_wpi_first_hal_REVPHJNI_COMPRESSOR_CONFIG_TYPE_DISABLED ==
+    org_wpilib_hardware_hal_REVPHJNI_COMPRESSOR_CONFIG_TYPE_DISABLED ==
     HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kDisabled);
 static_assert(
-    edu_wpi_first_hal_REVPHJNI_COMPRESSOR_CONFIG_TYPE_DIGITAL ==
+    org_wpilib_hardware_hal_REVPHJNI_COMPRESSOR_CONFIG_TYPE_DIGITAL ==
     HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kDigital);
 static_assert(
-    edu_wpi_first_hal_REVPHJNI_COMPRESSOR_CONFIG_TYPE_ANALOG ==
+    org_wpilib_hardware_hal_REVPHJNI_COMPRESSOR_CONFIG_TYPE_ANALOG ==
     HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kAnalog);
 static_assert(
-    edu_wpi_first_hal_REVPHJNI_COMPRESSOR_CONFIG_TYPE_HYBRID ==
+    org_wpilib_hardware_hal_REVPHJNI_COMPRESSOR_CONFIG_TYPE_HYBRID ==
     HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kHybrid);
 
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_hal_REVPHJNI
+ * Class:     org_wpilib_hardware_hal_REVPHJNI
  * Method:    initialize
  * Signature: (II)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_initialize
+Java_org_wpilib_hardware_hal_REVPHJNI_initialize
   (JNIEnv* env, jclass, jint busId, jint module)
 {
   int32_t status = 0;
-  auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
+  auto stack = wpi::util::java::GetJavaStackTrace(env, "org.wpilib");
   auto handle = HAL_InitializeREVPH(busId, module, stack.c_str(), &status);
   CheckStatusForceThrow(env, status);
   return handle;
 }
 
 /*
- * Class:     edu_wpi_first_hal_REVPHJNI
+ * Class:     org_wpilib_hardware_hal_REVPHJNI
  * Method:    free
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_free
+Java_org_wpilib_hardware_hal_REVPHJNI_free
   (JNIEnv* env, jclass, jint handle)
 {
   HAL_FreeREVPH(handle);
 }
 
 /*
- * Class:     edu_wpi_first_hal_REVPHJNI
+ * Class:     org_wpilib_hardware_hal_REVPHJNI
  * Method:    checkSolenoidChannel
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_checkSolenoidChannel
+Java_org_wpilib_hardware_hal_REVPHJNI_checkSolenoidChannel
   (JNIEnv*, jclass, jint channel)
 {
   return HAL_CheckREVPHSolenoidChannel(channel);
 }
 
 /*
- * Class:     edu_wpi_first_hal_REVPHJNI
+ * Class:     org_wpilib_hardware_hal_REVPHJNI
  * Method:    getCompressor
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_getCompressor
+Java_org_wpilib_hardware_hal_REVPHJNI_getCompressor
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -85,12 +84,12 @@ Java_edu_wpi_first_hal_REVPHJNI_getCompressor
 }
 
 /*
- * Class:     edu_wpi_first_hal_REVPHJNI
+ * Class:     org_wpilib_hardware_hal_REVPHJNI
  * Method:    setCompressorConfig
  * Signature: (IDDZZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_setCompressorConfig
+Java_org_wpilib_hardware_hal_REVPHJNI_setCompressorConfig
   (JNIEnv* env, jclass, jint handle, jdouble minAnalogVoltage,
    jdouble maxAnalogVoltage, jboolean forceDisable, jboolean useDigital)
 {
@@ -105,12 +104,12 @@ Java_edu_wpi_first_hal_REVPHJNI_setCompressorConfig
 }
 
 /*
- * Class:     edu_wpi_first_hal_REVPHJNI
+ * Class:     org_wpilib_hardware_hal_REVPHJNI
  * Method:    setClosedLoopControlDisabled
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_setClosedLoopControlDisabled
+Java_org_wpilib_hardware_hal_REVPHJNI_setClosedLoopControlDisabled
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -119,12 +118,12 @@ Java_edu_wpi_first_hal_REVPHJNI_setClosedLoopControlDisabled
 }
 
 /*
- * Class:     edu_wpi_first_hal_REVPHJNI
+ * Class:     org_wpilib_hardware_hal_REVPHJNI
  * Method:    setClosedLoopControlDigital
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_setClosedLoopControlDigital
+Java_org_wpilib_hardware_hal_REVPHJNI_setClosedLoopControlDigital
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -133,12 +132,12 @@ Java_edu_wpi_first_hal_REVPHJNI_setClosedLoopControlDigital
 }
 
 /*
- * Class:     edu_wpi_first_hal_REVPHJNI
+ * Class:     org_wpilib_hardware_hal_REVPHJNI
  * Method:    setClosedLoopControlAnalog
  * Signature: (IDD)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_setClosedLoopControlAnalog
+Java_org_wpilib_hardware_hal_REVPHJNI_setClosedLoopControlAnalog
   (JNIEnv* env, jclass, jint handle, jdouble minAnalogVoltage,
    jdouble maxAnalogVoltage)
 {
@@ -149,12 +148,12 @@ Java_edu_wpi_first_hal_REVPHJNI_setClosedLoopControlAnalog
 }
 
 /*
- * Class:     edu_wpi_first_hal_REVPHJNI
+ * Class:     org_wpilib_hardware_hal_REVPHJNI
  * Method:    setClosedLoopControlHybrid
  * Signature: (IDD)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_setClosedLoopControlHybrid
+Java_org_wpilib_hardware_hal_REVPHJNI_setClosedLoopControlHybrid
   (JNIEnv* env, jclass, jint handle, jdouble minAnalogVoltage,
    jdouble maxAnalogVoltage)
 {
@@ -165,12 +164,12 @@ Java_edu_wpi_first_hal_REVPHJNI_setClosedLoopControlHybrid
 }
 
 /*
- * Class:     edu_wpi_first_hal_REVPHJNI
+ * Class:     org_wpilib_hardware_hal_REVPHJNI
  * Method:    getCompressorConfig
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_getCompressorConfig
+Java_org_wpilib_hardware_hal_REVPHJNI_getCompressorConfig
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -180,12 +179,12 @@ Java_edu_wpi_first_hal_REVPHJNI_getCompressorConfig
 }
 
 /*
- * Class:     edu_wpi_first_hal_REVPHJNI
+ * Class:     org_wpilib_hardware_hal_REVPHJNI
  * Method:    getPressureSwitch
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_getPressureSwitch
+Java_org_wpilib_hardware_hal_REVPHJNI_getPressureSwitch
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -195,12 +194,12 @@ Java_edu_wpi_first_hal_REVPHJNI_getPressureSwitch
 }
 
 /*
- * Class:     edu_wpi_first_hal_REVPHJNI
+ * Class:     org_wpilib_hardware_hal_REVPHJNI
  * Method:    getAnalogVoltage
  * Signature: (II)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_getAnalogVoltage
+Java_org_wpilib_hardware_hal_REVPHJNI_getAnalogVoltage
   (JNIEnv* env, jclass, jint handle, jint channel)
 {
   int32_t status = 0;
@@ -210,12 +209,12 @@ Java_edu_wpi_first_hal_REVPHJNI_getAnalogVoltage
 }
 
 /*
- * Class:     edu_wpi_first_hal_REVPHJNI
+ * Class:     org_wpilib_hardware_hal_REVPHJNI
  * Method:    getCompressorCurrent
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_getCompressorCurrent
+Java_org_wpilib_hardware_hal_REVPHJNI_getCompressorCurrent
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -225,12 +224,12 @@ Java_edu_wpi_first_hal_REVPHJNI_getCompressorCurrent
 }
 
 /*
- * Class:     edu_wpi_first_hal_REVPHJNI
+ * Class:     org_wpilib_hardware_hal_REVPHJNI
  * Method:    getSolenoids
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_getSolenoids
+Java_org_wpilib_hardware_hal_REVPHJNI_getSolenoids
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -240,12 +239,12 @@ Java_edu_wpi_first_hal_REVPHJNI_getSolenoids
 }
 
 /*
- * Class:     edu_wpi_first_hal_REVPHJNI
+ * Class:     org_wpilib_hardware_hal_REVPHJNI
  * Method:    setSolenoids
  * Signature: (III)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_setSolenoids
+Java_org_wpilib_hardware_hal_REVPHJNI_setSolenoids
   (JNIEnv* env, jclass, jint handle, jint mask, jint value)
 {
   int32_t status = 0;
@@ -254,12 +253,12 @@ Java_edu_wpi_first_hal_REVPHJNI_setSolenoids
 }
 
 /*
- * Class:     edu_wpi_first_hal_REVPHJNI
+ * Class:     org_wpilib_hardware_hal_REVPHJNI
  * Method:    fireOneShot
  * Signature: (III)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_fireOneShot
+Java_org_wpilib_hardware_hal_REVPHJNI_fireOneShot
   (JNIEnv* env, jclass, jint handle, jint index, jint durMs)
 {
   int32_t status = 0;
@@ -268,12 +267,12 @@ Java_edu_wpi_first_hal_REVPHJNI_fireOneShot
 }
 
 /*
- * Class:     edu_wpi_first_hal_REVPHJNI
+ * Class:     org_wpilib_hardware_hal_REVPHJNI
  * Method:    clearStickyFaults
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_clearStickyFaults
+Java_org_wpilib_hardware_hal_REVPHJNI_clearStickyFaults
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -282,12 +281,12 @@ Java_edu_wpi_first_hal_REVPHJNI_clearStickyFaults
 }
 
 /*
- * Class:     edu_wpi_first_hal_REVPHJNI
+ * Class:     org_wpilib_hardware_hal_REVPHJNI
  * Method:    getInputVoltage
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_getInputVoltage
+Java_org_wpilib_hardware_hal_REVPHJNI_getInputVoltage
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -297,12 +296,12 @@ Java_edu_wpi_first_hal_REVPHJNI_getInputVoltage
 }
 
 /*
- * Class:     edu_wpi_first_hal_REVPHJNI
+ * Class:     org_wpilib_hardware_hal_REVPHJNI
  * Method:    get5VVoltage
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_get5VVoltage
+Java_org_wpilib_hardware_hal_REVPHJNI_get5VVoltage
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -312,12 +311,12 @@ Java_edu_wpi_first_hal_REVPHJNI_get5VVoltage
 }
 
 /*
- * Class:     edu_wpi_first_hal_REVPHJNI
+ * Class:     org_wpilib_hardware_hal_REVPHJNI
  * Method:    getSolenoidCurrent
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_getSolenoidCurrent
+Java_org_wpilib_hardware_hal_REVPHJNI_getSolenoidCurrent
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -327,12 +326,12 @@ Java_edu_wpi_first_hal_REVPHJNI_getSolenoidCurrent
 }
 
 /*
- * Class:     edu_wpi_first_hal_REVPHJNI
+ * Class:     org_wpilib_hardware_hal_REVPHJNI
  * Method:    getSolenoidVoltage
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_getSolenoidVoltage
+Java_org_wpilib_hardware_hal_REVPHJNI_getSolenoidVoltage
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -342,12 +341,12 @@ Java_edu_wpi_first_hal_REVPHJNI_getSolenoidVoltage
 }
 
 /*
- * Class:     edu_wpi_first_hal_REVPHJNI
+ * Class:     org_wpilib_hardware_hal_REVPHJNI
  * Method:    getStickyFaultsNative
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_getStickyFaultsNative
+Java_org_wpilib_hardware_hal_REVPHJNI_getStickyFaultsNative
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -362,12 +361,12 @@ Java_edu_wpi_first_hal_REVPHJNI_getStickyFaultsNative
 }
 
 /*
- * Class:     edu_wpi_first_hal_REVPHJNI
+ * Class:     org_wpilib_hardware_hal_REVPHJNI
  * Method:    getFaultsNative
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_getFaultsNative
+Java_org_wpilib_hardware_hal_REVPHJNI_getFaultsNative
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -382,12 +381,12 @@ Java_edu_wpi_first_hal_REVPHJNI_getFaultsNative
 }
 
 /*
- * Class:     edu_wpi_first_hal_REVPHJNI
+ * Class:     org_wpilib_hardware_hal_REVPHJNI
  * Method:    getSolenoidDisabledList
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_getSolenoidDisabledList
+Java_org_wpilib_hardware_hal_REVPHJNI_getSolenoidDisabledList
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -397,12 +396,12 @@ Java_edu_wpi_first_hal_REVPHJNI_getSolenoidDisabledList
 }
 
 /*
- * Class:     edu_wpi_first_hal_REVPHJNI
+ * Class:     org_wpilib_hardware_hal_REVPHJNI
  * Method:    getVersion
  * Signature: (I)Ljava/lang/Object;
  */
 JNIEXPORT jobject JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_getVersion
+Java_org_wpilib_hardware_hal_REVPHJNI_getVersion
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;

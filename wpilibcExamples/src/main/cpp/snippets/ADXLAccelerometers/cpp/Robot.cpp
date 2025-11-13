@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/ADXL345_I2C.h>
-#include <frc/AnalogInput.h>
-#include <frc/I2C.h>
-#include <frc/TimedRobot.h>
+#include "wpi/framework/TimedRobot.hpp"
+#include "wpi/hardware/accelerometer/ADXL345_I2C.hpp"
+#include "wpi/hardware/bus/I2C.hpp"
+#include "wpi/hardware/discrete/AnalogInput.hpp"
 
 /**
  * ADXL346, 362 Accelerometer snippets for frc-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/accelerometers-software.html
  */
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   Robot() {}
 
@@ -27,12 +27,12 @@ class Robot : public frc::TimedRobot {
  private:
   // Creates an ADXL345 accelerometer object on the MXP I2C port
   // with a measurement range from -8 to 8 G's
-  frc::ADXL345_I2C m_accelerometer{frc::I2C::Port::kPort0,
-                                   frc::ADXL345_I2C::Range::kRange_8G};
+  wpi::ADXL345_I2C m_accelerometer{wpi::I2C::Port::kPort0,
+                                   wpi::ADXL345_I2C::Range::kRange_8G};
 };
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

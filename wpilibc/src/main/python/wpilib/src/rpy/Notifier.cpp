@@ -7,16 +7,16 @@
 #include <utility>
 
 #include <fmt/format.h>
-#include <hal/Notifier.h>
-#include <hal/Threads.h>
+#include "wpi/hal/Notifier.h"
+#include "wpi/hal/Threads.h"
 
-#include "frc/Errors.h"
-#include "frc/Timer.h"
+#include "wpi/system/Errors.hpp"
+#include "wpi/system/Timer.hpp"
 
 #include <pybind11/functional.h>
 #include <gilsafe_object.h>
 
-using namespace frc;
+using namespace wpi;
 using namespace pybind11::literals;
 
 // Hang the thread since returning to the caller is going to crash when we try
@@ -33,12 +33,12 @@ static void _hang_thread_if_finalizing() {
 
 PyNotifier::PyNotifier(std::function<void()> handler) {
   if (!handler) {
-    throw FRC_MakeError(err::NullParameter, "handler");
+    throw WPILIB_MakeError(err::NullParameter, "handler");
   }
   m_handler = handler;
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
-  FRC_CheckErrorStatus(status, "InitializeNotifier");
+  WPILIB_CheckErrorStatus(status, "InitializeNotifier");
 
   std::function<void()> target([this] {
     py::gil_scoped_release release;
@@ -99,7 +99,7 @@ PyNotifier::~PyNotifier() {
   // atomically set handle to 0, then clean
   HAL_NotifierHandle handle = m_notifier.exchange(0);
   HAL_StopNotifier(handle, &status);
-  FRC_ReportError(status, "StopNotifier");
+  WPILIB_ReportError(status, "StopNotifier");
 
   // Join the thread to ensure the handler has exited.
   if (m_thread) {
@@ -144,7 +144,7 @@ void PyNotifier::SetCallback(std::function<void()> handler) {
   m_handler = handler;
 }
 
-void PyNotifier::StartSingle(units::second_t delay) {
+void PyNotifier::StartSingle(wpi::units::second_t delay) {
   std::scoped_lock lock(m_processMutex);
   m_periodic = false;
   m_period = delay;
@@ -152,7 +152,7 @@ void PyNotifier::StartSingle(units::second_t delay) {
   UpdateAlarm();
 }
 
-void PyNotifier::StartPeriodic(units::second_t period) {
+void PyNotifier::StartPeriodic(wpi::units::second_t period) {
   std::scoped_lock lock(m_processMutex);
   m_periodic = true;
   m_period = period;
@@ -165,7 +165,7 @@ void PyNotifier::Stop() {
   m_periodic = false;
   int32_t status = 0;
   HAL_CancelNotifierAlarm(m_notifier, &status);
-  FRC_CheckErrorStatus(status, "CancelNotifierAlarm");
+  WPILIB_CheckErrorStatus(status, "CancelNotifierAlarm");
 }
 
 void PyNotifier::UpdateAlarm(uint64_t triggerTime) {
@@ -176,7 +176,7 @@ void PyNotifier::UpdateAlarm(uint64_t triggerTime) {
     return;
   }
   HAL_UpdateNotifierAlarm(notifier, triggerTime, &status);
-  FRC_CheckErrorStatus(status, "UpdateNotifierAlarm");
+  WPILIB_CheckErrorStatus(status, "UpdateNotifierAlarm");
 }
 
 void PyNotifier::UpdateAlarm() {

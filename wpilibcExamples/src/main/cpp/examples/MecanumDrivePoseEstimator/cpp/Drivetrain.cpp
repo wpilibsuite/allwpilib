@@ -2,36 +2,36 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "Drivetrain.h"
+#include "Drivetrain.hpp"
 
-#include <frc/Timer.h>
+#include "ExampleGlobalMeasurementSensor.hpp"
+#include "wpi/system/Timer.hpp"
 
-#include "ExampleGlobalMeasurementSensor.h"
-
-frc::MecanumDriveWheelSpeeds Drivetrain::GetCurrentState() const {
-  return {units::meters_per_second_t{m_frontLeftEncoder.GetRate()},
-          units::meters_per_second_t{m_frontRightEncoder.GetRate()},
-          units::meters_per_second_t{m_backLeftEncoder.GetRate()},
-          units::meters_per_second_t{m_backRightEncoder.GetRate()}};
+wpi::math::MecanumDriveWheelSpeeds Drivetrain::GetCurrentState() const {
+  return {wpi::units::meters_per_second_t{m_frontLeftEncoder.GetRate()},
+          wpi::units::meters_per_second_t{m_frontRightEncoder.GetRate()},
+          wpi::units::meters_per_second_t{m_backLeftEncoder.GetRate()},
+          wpi::units::meters_per_second_t{m_backRightEncoder.GetRate()}};
 }
 
-frc::MecanumDriveWheelPositions Drivetrain::GetCurrentDistances() const {
-  return {units::meter_t{m_frontLeftEncoder.GetDistance()},
-          units::meter_t{m_frontRightEncoder.GetDistance()},
-          units::meter_t{m_backLeftEncoder.GetDistance()},
-          units::meter_t{m_backRightEncoder.GetDistance()}};
+wpi::math::MecanumDriveWheelPositions Drivetrain::GetCurrentDistances() const {
+  return {wpi::units::meter_t{m_frontLeftEncoder.GetDistance()},
+          wpi::units::meter_t{m_frontRightEncoder.GetDistance()},
+          wpi::units::meter_t{m_backLeftEncoder.GetDistance()},
+          wpi::units::meter_t{m_backRightEncoder.GetDistance()}};
 }
 
-void Drivetrain::SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds) {
-  std::function<void(units::meters_per_second_t, const frc::Encoder&,
-                     frc::PIDController&, frc::PWMSparkMax&)>
+void Drivetrain::SetSpeeds(
+    const wpi::math::MecanumDriveWheelSpeeds& wheelSpeeds) {
+  std::function<void(wpi::units::meters_per_second_t, const wpi::Encoder&,
+                     wpi::math::PIDController&, wpi::PWMSparkMax&)>
       calcAndSetSpeeds = [&m_feedforward = m_feedforward](
-                             units::meters_per_second_t speed,
+                             wpi::units::meters_per_second_t speed,
                              const auto& encoder, auto& controller,
                              auto& motor) {
         auto feedforward = m_feedforward.Calculate(speed);
         double output = controller.Calculate(encoder.GetRate(), speed.value());
-        motor.SetVoltage(units::volt_t{output} + feedforward);
+        motor.SetVoltage(wpi::units::volt_t{output} + feedforward);
       };
 
   calcAndSetSpeeds(wheelSpeeds.frontLeft, m_frontLeftEncoder,
@@ -44,11 +44,11 @@ void Drivetrain::SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds) {
                    m_backRightPIDController, m_backRightMotor);
 }
 
-void Drivetrain::Drive(units::meters_per_second_t xSpeed,
-                       units::meters_per_second_t ySpeed,
-                       units::radians_per_second_t rot, bool fieldRelative,
-                       units::second_t period) {
-  frc::ChassisSpeeds chassisSpeeds{xSpeed, ySpeed, rot};
+void Drivetrain::Drive(wpi::units::meters_per_second_t xSpeed,
+                       wpi::units::meters_per_second_t ySpeed,
+                       wpi::units::radians_per_second_t rot, bool fieldRelative,
+                       wpi::units::second_t period) {
+  wpi::math::ChassisSpeeds chassisSpeeds{xSpeed, ySpeed, rot};
   if (fieldRelative) {
     chassisSpeeds = chassisSpeeds.ToRobotRelative(
         m_poseEstimator.GetEstimatedPosition().Rotation());
@@ -68,5 +68,5 @@ void Drivetrain::UpdateOdometry() {
   m_poseEstimator.AddVisionMeasurement(
       ExampleGlobalMeasurementSensor::GetEstimatedGlobalPose(
           m_poseEstimator.GetEstimatedPosition()),
-      frc::Timer::GetTimestamp() - 0.3_s);
+      wpi::Timer::GetTimestamp() - 0.3_s);
 }

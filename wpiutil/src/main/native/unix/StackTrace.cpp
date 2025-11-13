@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/StackTrace.h"
+#include "wpi/util/StackTrace.hpp"
 
 #ifndef __EMSCRIPTEN__
 #include <execinfo.h>
@@ -10,20 +10,20 @@
 
 #include <string>
 
-#include "wpi/Demangle.h"
-#include "wpi/SmallString.h"
-#include "wpi/StringExtras.h"
-#include "wpi/raw_ostream.h"
+#include "wpi/util/Demangle.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
-namespace wpi {
+namespace wpi::util {
 
 std::string GetStackTraceDefault(int offset) {
 #if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
   void* stackTrace[128];
   int stackSize = backtrace(stackTrace, 128);
   char** mangledSymbols = backtrace_symbols(stackTrace, stackSize);
-  wpi::SmallString<1024> buf;
-  wpi::raw_svector_ostream trace(buf);
+  wpi::util::SmallString<1024> buf;
+  wpi::util::raw_svector_ostream trace(buf);
 
   for (int i = offset; i < stackSize; i++) {
     // Only print recursive functions once in a row.
@@ -47,4 +47,4 @@ std::string GetStackTraceDefault(int offset) {
 #endif
 }
 
-}  // namespace wpi
+}  // namespace wpi::util

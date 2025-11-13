@@ -5,9 +5,8 @@
 #include <cstdio>
 #include <memory>
 
-#include <hal/Extensions.h>
-
-#include "HALSimXRPClient.h"
+#include "wpi/hal/Extensions.h"
+#include "wpi/halsim/xrp/HALSimXRPClient.hpp"
 
 #if defined(Win32) || defined(_WIN32)
 #pragma comment(lib, "Ws2_32.lib")

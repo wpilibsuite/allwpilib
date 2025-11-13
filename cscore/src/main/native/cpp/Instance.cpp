@@ -2,22 +2,23 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "Instance.h"
+#include "Instance.hpp"
 
 #include <memory>
 #include <string_view>
 #include <utility>
 
 #include <fmt/format.h>
-#include <wpi/fs.h>
-#include <wpi/print.h>
 
-using namespace cs;
+#include "wpi/util/fs.hpp"
+#include "wpi/util/print.hpp"
+
+using namespace wpi::cs;
 
 static void def_log_func(unsigned int level, const char* file,
                          unsigned int line, const char* msg) {
   if (level == 20) {
-    wpi::print(stderr, "CS: {}\n", msg);
+    wpi::util::print(stderr, "CS: {}\n", msg);
     return;
   }
 
@@ -31,9 +32,9 @@ static void def_log_func(unsigned int level, const char* file,
   } else {
     return;
   }
-  wpi::print(stderr, "CS: {}: {} ({}:{})\n", levelmsg, msg,
-             // NOLINTNEXTLINE(build/include_what_you_use)
-             fs::path{file}.filename().string(), line);
+  wpi::util::print(stderr, "CS: {}: {} ({}:{})\n", levelmsg, msg,
+                   // NOLINTNEXTLINE(build/include_what_you_use)
+                   fs::path{file}.filename().string(), line);
 }
 
 Instance::Instance()

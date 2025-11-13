@@ -14,28 +14,28 @@
 #include <string>
 
 #include <fmt/format.h>
-#include <wpi/SmallVector.h>
-#include <wpi/StringExtras.h>
-#include <wpi/print.h>
-#include <wpi/timestamp.h>
 
-#include "wpinet/raw_uv_ostream.h"
-#include "wpinet/uv/Loop.h"
-#include "wpinet/uv/Pipe.h"
-#include "wpinet/uv/Process.h"
-#include "wpinet/uv/Signal.h"
-#include "wpinet/uv/Tcp.h"
-#include "wpinet/uv/Tty.h"
-#include "wpinet/uv/Udp.h"
-#include "wpinet/uv/util.h"
+#include "wpi/net/raw_uv_ostream.hpp"
+#include "wpi/net/uv/Loop.hpp"
+#include "wpi/net/uv/Pipe.hpp"
+#include "wpi/net/uv/Process.hpp"
+#include "wpi/net/uv/Signal.hpp"
+#include "wpi/net/uv/Tcp.hpp"
+#include "wpi/net/uv/Tty.hpp"
+#include "wpi/net/uv/Udp.hpp"
+#include "wpi/net/uv/util.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/print.hpp"
+#include "wpi/util/timestamp.h"
 
-namespace uv = wpi::uv;
+namespace uv = wpi::net::uv;
 
-static uint64_t startTime = wpi::Now();
+static uint64_t startTime = wpi::util::Now();
 
 static bool NewlineBuffer(std::string& rem, uv::Buffer& buf, size_t len,
-                          wpi::SmallVectorImpl<uv::Buffer>& bufs, bool tcp,
-                          uint16_t tcpSeq) {
+                          wpi::util::SmallVectorImpl<uv::Buffer>& bufs,
+                          bool tcp, uint16_t tcpSeq) {
   // scan for last newline
   std::string_view str(buf.base, len);
   size_t idx = str.rfind('\n');
@@ -46,12 +46,12 @@ static bool NewlineBuffer(std::string& rem, uv::Buffer& buf, size_t len,
   }
 
   // build output
-  wpi::raw_uv_ostream out(bufs, 4096);
-  std::string_view toCopy = wpi::slice(str, 0, idx + 1);
+  wpi::net::raw_uv_ostream out(bufs, 4096);
+  std::string_view toCopy = wpi::util::slice(str, 0, idx + 1);
   if (tcp) {
     // Header is 2 byte len, 1 byte type, 4 byte timestamp, 2 byte sequence num
     uint32_t ts =
-        std::bit_cast<uint32_t, float>((wpi::Now() - startTime) * 1.0e-6);
+        std::bit_cast<uint32_t, float>((wpi::util::Now() - startTime) * 1.0e-6);
     uint16_t len = rem.size() + toCopy.size() + 1 + 4 + 2;
     const uint8_t header[] = {static_cast<uint8_t>((len >> 8) & 0xff),
                               static_cast<uint8_t>(len & 0xff),
@@ -67,7 +67,7 @@ static bool NewlineBuffer(std::string& rem, uv::Buffer& buf, size_t len,
   out << rem << toCopy;
 
   // reset remainder
-  rem = wpi::slice(str, idx + 1, std::string_view::npos);
+  rem = wpi::util::slice(str, idx + 1, std::string_view::npos);
   return true;
 }
 
@@ -89,7 +89,7 @@ static void CopyUdp(uv::Stream& in, std::shared_ptr<uv::Udp> out,
       [rem = std::make_shared<std::string>(), outPtr = out.get(), addr](
           uv::Buffer& buf, size_t len) {
         // build buffers
-        wpi::SmallVector<uv::Buffer, 4> bufs;
+        wpi::util::SmallVector<uv::Buffer, 4> bufs;
         if (!NewlineBuffer(*rem, buf, len, bufs, false, 0)) {
           return;
         }
@@ -113,7 +113,7 @@ static void CopyTcp(uv::Stream& in, std::shared_ptr<uv::Stream> out) {
       [data = std::make_shared<StreamData>(), outPtr = out.get()](
           uv::Buffer& buf, size_t len) {
         // build buffers
-        wpi::SmallVector<uv::Buffer, 4> bufs;
+        wpi::util::SmallVector<uv::Buffer, 4> bufs;
         if (!NewlineBuffer(data->rem, buf, len, bufs, true, data->seq++)) {
           return;
         }
@@ -155,8 +155,8 @@ int main(int argc, char* argv[]) {
       useUdp = true;
       broadcastUdp = true;
     } else {
-      wpi::print(stderr, "unrecognized command line option {}\n",
-                 argv[programArgc]);
+      wpi::util::print(stderr, "unrecognized command line option {}\n",
+                       argv[programArgc]);
       err = true;
     }
     ++programArgc;
@@ -175,8 +175,9 @@ int main(int argc, char* argv[]) {
   uv::Process::DisableStdioInheritance();
 
   auto loop = uv::Loop::Create();
-  loop->error.connect(
-      [](uv::Error err) { wpi::print(stderr, "uv ERROR: {}\n", err.str()); });
+  loop->error.connect([](uv::Error err) {
+    wpi::util::print(stderr, "uv ERROR: {}\n", err.str());
+  });
 
   // create pipes to communicate with child
   auto stdinPipe = uv::Pipe::Create(loop);
@@ -223,7 +224,8 @@ int main(int argc, char* argv[]) {
       }
 
       // close on error
-      tcp->error.connect([s = tcp.get()](wpi::uv::Error err) { s->Close(); });
+      tcp->error.connect(
+          [s = tcp.get()](wpi::net::uv::Error err) { s->Close(); });
 
       // tee stdout and stderr
       CopyTcp(*stdoutPipe, tcp);
@@ -235,7 +237,7 @@ int main(int argc, char* argv[]) {
   }
 
   // build process options
-  wpi::SmallVector<uv::Process::Option, 8> options;
+  wpi::util::SmallVector<uv::Process::Option, 8> options;
 
   // hook up pipes to child
   options.emplace_back(

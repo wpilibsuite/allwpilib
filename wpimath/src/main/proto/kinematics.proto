@@ -4,7 +4,7 @@ package wpi.proto;
 
 import "geometry2d.proto";
 
-option java_package = "edu.wpi.first.math.proto";
+option java_package = "org.wpilib.math.proto";
 
 message ProtobufChassisSpeeds {
   double vx = 1;

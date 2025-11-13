@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "PubSubOptionsMatcher.h"
+#include "PubSubOptionsMatcher.hpp"
 
-#include "TestPrinters.h"
+#include "TestPrinters.hpp"
 
-namespace nt {
+namespace wpi::nt {
 
 bool PubSubOptionsMatcher::MatchAndExplain(
     const PubSubOptionsImpl& val,
@@ -40,4 +40,4 @@ void PubSubOptionsMatcher::DescribeNegationTo(::std::ostream* os) const {
   PrintTo(good, os);
 }
 
-}  // namespace nt
+}  // namespace wpi::nt

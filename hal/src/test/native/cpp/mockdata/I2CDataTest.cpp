@@ -2,14 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/hal/simulation/I2CData.h"
+
 #include <string>
 
 #include <gtest/gtest.h>
 
-#include "hal/I2C.h"
-#include "hal/simulation/I2CData.h"
+#include "wpi/hal/I2C.h"
 
-namespace hal {
+namespace wpi::hal {
 
 std::string gTestI2CCallbackName;
 HAL_Value gTestI2CCallbackValue;
@@ -37,4 +38,4 @@ TEST(I2CSimTest, I2CInitialization) {
   EXPECT_STREQ("Initialized", gTestI2CCallbackName.c_str());
 }
 
-}  // namespace hal
+}  // namespace wpi::hal

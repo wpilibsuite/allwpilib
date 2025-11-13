@@ -5,14 +5,13 @@
 #include <string>
 #include <utility>
 
-#include <wpi/protobuf/ProtobufCallbacks.h>
-
-#include "hal/proto/JoystickDescriptor.h"
+#include "wpi/hal/proto/JoystickDescriptor.h"
+#include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 
 std::optional<mrc::JoystickDescriptor>
-wpi::Protobuf<mrc::JoystickDescriptor>::Unpack(InputStream& Stream) {
-  wpi::UnpackCallback<std::string> JoystickNameCb;
-  wpi::UnpackCallback<uint8_t, MRC_MAX_NUM_AXES> AxisTypesCb;
+wpi::util::Protobuf<mrc::JoystickDescriptor>::Unpack(InputStream& Stream) {
+  wpi::util::UnpackCallback<std::string> JoystickNameCb;
+  wpi::util::UnpackCallback<uint8_t, MRC_MAX_NUM_AXES> AxisTypesCb;
 
   mrc_proto_ProtobufJoystickDescriptor Msg;
   Msg.JoystickName = JoystickNameCb.Callback();
@@ -48,13 +47,13 @@ wpi::Protobuf<mrc::JoystickDescriptor>::Unpack(InputStream& Stream) {
   return OutputData;
 }
 
-bool wpi::Protobuf<mrc::JoystickDescriptor>::Pack(
+bool wpi::util::Protobuf<mrc::JoystickDescriptor>::Pack(
     OutputStream& Stream, const mrc::JoystickDescriptor& Value) {
   std::string_view JoystickName = Value.GetName();
-  wpi::PackCallback JoystickNameCb{&JoystickName};
+  wpi::util::PackCallback JoystickNameCb{&JoystickName};
 
   std::span<const uint8_t> AxisTypes = Value.AxesTypes();
-  wpi::PackCallback AxisTypesCb{AxisTypes};
+  wpi::util::PackCallback AxisTypesCb{AxisTypes};
 
   mrc_proto_ProtobufJoystickDescriptor Msg{
       .JoystickName = JoystickNameCb.Callback(),

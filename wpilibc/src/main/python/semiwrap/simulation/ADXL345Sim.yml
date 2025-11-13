@@ -1,8 +1,8 @@
 extra_includes:
-- frc/ADXL345_I2C.h
+- wpi/hardware/accelerometer/ADXL345_I2C.hpp
 
 classes:
-  frc::sim::ADXL345Sim:
+  wpi::sim::ADXL345Sim:
     methods:
       ADXL345Sim:
         overloads:

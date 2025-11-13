@@ -2,26 +2,26 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "TimingGui.h"
+#include "TimingGui.hpp"
 
 #include <cstdio>
 #include <cstring>
 #include <memory>
 #include <vector>
 
-#include <glass/Model.h>
-#include <glass/View.h>
-#include <hal/HALBase.h>
-#include <hal/simulation/MockHooks.h>
-#include <hal/simulation/NotifierData.h>
 #include <imgui.h>
 
-#include "HALSimGui.h"
+#include "wpi/glass/Model.hpp"
+#include "wpi/glass/View.hpp"
+#include "wpi/hal/HALBase.h"
+#include "wpi/hal/simulation/MockHooks.h"
+#include "wpi/hal/simulation/NotifierData.h"
+#include "wpi/halsim/gui/HALSimGui.hpp"
 
 using namespace halsimgui;
 
 namespace {
-class TimingModel : public glass::Model {
+class TimingModel : public wpi::glass::Model {
  public:
   void Update() override {}
   bool Exists() override { return true; }
@@ -74,11 +74,11 @@ void TimingGui::Initialize() {
   HALSimGui::halProvider->Register(
       "Timing", [] { return true; },
       [] { return std::make_unique<TimingModel>(); },
-      [](glass::Window* win, glass::Model* model) {
+      [](wpi::glass::Window* win, wpi::glass::Model* model) {
         win->DisableRenamePopup();
         win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
         win->SetDefaultPos(5, 150);
-        return glass::MakeFunctionView(DisplayTiming);
+        return wpi::glass::MakeFunctionView(DisplayTiming);
       });
   HALSimGui::halProvider->ShowDefault("Timing");
 }

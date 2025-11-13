@@ -1,24 +1,24 @@
 
 #pragma once
 
-#include <units/time.h>
-#include <units/length.h>
+#include "wpi/units/time.hpp"
+#include "wpi/units/length.hpp"
 
 struct SomeClass {
     static constexpr auto s_constant = 2_s;
     static constexpr auto ms_constant1 = 20_ms;
-    static constexpr units::second_t ms_constant2 = 50_ms;
-    static constexpr units::millisecond_t ms_constant3 = 0.20_s;
+    static constexpr wpi::units::second_t ms_constant2 = 50_ms;
+    static constexpr wpi::units::millisecond_t ms_constant3 = 0.20_s;
 
-    bool checkDefaultByName1(units::second_t period = ms_constant1);
-    bool checkDefaultByName2(units::second_t period = ms_constant2);
-    bool checkDefaultByNum1(units::second_t period = 50_ms);
-    bool checkDefaultByNum2(units::second_t period = 0.5_s);
+    bool checkDefaultByName1(wpi::units::second_t period = ms_constant1);
+    bool checkDefaultByName2(wpi::units::second_t period = ms_constant2);
+    bool checkDefaultByNum1(wpi::units::second_t period = 50_ms);
+    bool checkDefaultByNum2(wpi::units::second_t period = 0.5_s);
 
-    units::second_t ms2s(units::millisecond_t ms);
-    units::millisecond_t s2ms(units::second_t s);
+    wpi::units::second_t ms2s(wpi::units::millisecond_t ms);
+    wpi::units::millisecond_t s2ms(wpi::units::second_t s);
 
-    static constexpr units::foot_t five_ft = 5_ft;
+    static constexpr wpi::units::foot_t five_ft = 5_ft;
 
-    units::meter_t ft2m(units::foot_t f);
+    wpi::units::meter_t ft2m(wpi::units::foot_t f);
 };

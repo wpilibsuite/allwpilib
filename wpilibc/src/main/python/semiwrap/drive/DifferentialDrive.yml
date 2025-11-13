@@ -1,11 +1,11 @@
 extra_includes:
-- wpi/sendable/SendableBuilder.h
-- frc/motorcontrol/MotorController.h
+- wpi/util/sendable/SendableBuilder.hpp
+- wpi/hardware/motor/MotorController.hpp
 
 classes:
-  frc::DifferentialDrive:
+  wpi::DifferentialDrive:
     ignored_bases:
-    - wpi::SendableHelper<DifferentialDrive>
+    - wpi::util::SendableHelper<DifferentialDrive>
     methods:
       DifferentialDrive:
         overloads:
@@ -103,7 +103,7 @@ classes:
       * :meth:`curvatureDrive` is similar in concept to
         ``RobotDrive.drive`` with the addition of a quick turn
         mode. However, it is not designed to give exactly the same response.
-  frc::DifferentialDrive::WheelSpeeds:
+  wpi::DifferentialDrive::WheelSpeeds:
     attributes:
       left:
       right:

@@ -16,11 +16,11 @@ classes:
             param_override:
               ec:
                 ignore: true
-          wpi::Logger&, std::string_view, std::error_code&, std::string_view:
+          wpi::util::Logger&, std::string_view, std::error_code&, std::string_view:
             ignore: true
-          std::unique_ptr<wpi::raw_ostream>, std::string_view:
+          std::unique_ptr<wpi::util::raw_ostream>, std::string_view:
             ignore: true
-          wpi::Logger&, std::unique_ptr<wpi::raw_ostream>, std::string_view:
+          wpi::util::Logger&, std::unique_ptr<wpi::util::raw_ostream>, std::string_view:
             ignore: true
       Flush:
       Stop:

@@ -4,7 +4,7 @@ defaults:
 
 extra_includes:
 - pybind11/stl.h
-- networktables/Topic.h
+- wpi/nt/Topic.hpp
 
 functions:
   RemoveListener:
@@ -28,7 +28,7 @@ functions:
   DecodeClients:
     subpackage: meta
 classes:
-  nt::EventFlags:
+  wpi::nt::EventFlags:
     attributes:
       kNone:
       kImmediate:
@@ -44,7 +44,7 @@ classes:
       kValueAll:
       kLogMessage:
       kTimeSync:
-  nt::TopicInfo:
+  wpi::nt::TopicInfo:
     attributes:
       name:
       type_str:
@@ -57,16 +57,16 @@ classes:
       GetProperties:
     inline_code: |
       .def_property_readonly("topic", [](const TopicInfo &self) {
-        return std::make_shared<nt::Topic>(self.topic);
+        return std::make_shared<wpi::nt::Topic>(self.topic);
       })
       .def_property_readonly("type", [](const TopicInfo &self) {
-        return nt::NetworkTableType(self.type);
+        return wpi::nt::NetworkTableType(self.type);
       })
       .def("__repr__", [](const TopicInfo &self) -> py::str {
         return py::str("<TopicInfo name={} type={}>")
           .format(self.name, self.type_str);
       })
-  nt::ConnectionInfo:
+  wpi::nt::ConnectionInfo:
     attributes:
       remote_id:
       remote_ip:
@@ -79,7 +79,7 @@ classes:
           .format(self.remote_id, self.remote_ip, self.remote_port, 
                   self.last_update, self.protocol_version);
       })
-  nt::ValueEventData:
+  wpi::nt::ValueEventData:
     attributes:
       topic:
         ignore: true
@@ -95,14 +95,14 @@ classes:
             ignore: true
     inline_code: |
       .def_property_readonly("topic", [](const ValueEventData &self) {
-        return std::make_shared<nt::Topic>(self.topic);
+        return std::make_shared<wpi::nt::Topic>(self.topic);
       })
       .def("__repr__", [](const ValueEventData &self) -> py::str {
-        auto topicInfo = nt::GetTopicInfo(self.topic);
+        auto topicInfo = wpi::nt::GetTopicInfo(self.topic);
         return py::str("<ValueEventData topic_name=\"{}\" topic_type={} value={}>")
           .format(topicInfo.name, topicInfo.type_str, self.value);
       })
-  nt::LogMessage:
+  wpi::nt::LogMessage:
     attributes:
       level:
       filename:
@@ -115,7 +115,7 @@ classes:
             ignore: true
           unsigned int, std::string_view, unsigned int, std::string_view:
             ignore: true
-  nt::TimeSyncEventData:
+  wpi::nt::TimeSyncEventData:
     attributes:
       serverTimeOffset:
       rtt2:
@@ -126,7 +126,7 @@ classes:
           '':
             ignore: true
           int64_t, int64_t, bool:
-  nt::Event:
+  wpi::nt::Event:
     attributes:
       listener:
       flags:
@@ -184,14 +184,14 @@ classes:
           '':
             ignore: true
     inline_code: |
-      .def_property_readonly("data", [](nt::Event *self){
+      .def_property_readonly("data", [](wpi::nt::Event *self){
         return self->data;
       })
-      .def("__repr__", [](const nt::Event &self) -> py::str {
+      .def("__repr__", [](const wpi::nt::Event &self) -> py::str {
         return py::str("<Event listener={} flags={} data={}>")
           .format(self.listener, self.flags, self.data);
       })
-  nt::PubSubOptions:
+  wpi::nt::PubSubOptions:
     force_no_default_constructor: true
     attributes:
       kDefaultPeriodic:
@@ -213,7 +213,7 @@ classes:
       .def(py::init([](
         unsigned int pollStorage,
         double periodic,
-        std::optional<std::shared_ptr<nt::Publisher>> excludePublisher,
+        std::optional<std::shared_ptr<wpi::nt::Publisher>> excludePublisher,
         bool sendAll,
         bool topicsOnly,
         bool keepDuplicates,
@@ -222,8 +222,8 @@ classes:
         bool disableLocal,
         bool excludeSelf,
         bool hidden
-      ) -> nt::PubSubOptions {
-        return nt::PubSubOptions{
+      ) -> wpi::nt::PubSubOptions {
+        return wpi::nt::PubSubOptions{
           .pollStorage = pollStorage,
           .periodic = periodic,
           .excludePublisher = excludePublisher.has_value() ? excludePublisher.value()->GetHandle() : 0,
@@ -239,7 +239,7 @@ classes:
       }),
         py::kw_only(),
         py::arg("pollStorage") = 0,
-        py::arg("periodic") = nt::PubSubOptions::kDefaultPeriodic,
+        py::arg("periodic") = wpi::nt::PubSubOptions::kDefaultPeriodic,
         py::arg("excludePublisher") = std::nullopt,
         py::arg("sendAll") = false,
         py::arg("topicsOnly") = false,
@@ -280,36 +280,36 @@ classes:
                                      will not appear in metatopics.
         )"
       )
-  nt::meta::SubscriberOptions:
+  wpi::nt::meta::SubscriberOptions:
     subpackage: meta
     attributes:
       periodic:
       topicsOnly:
       sendAll:
       prefixMatch:
-  nt::meta::TopicPublisher:
+  wpi::nt::meta::TopicPublisher:
     subpackage: meta
     attributes:
       client:
       pubuid:
-  nt::meta::TopicSubscriber:
+  wpi::nt::meta::TopicSubscriber:
     subpackage: meta
     attributes:
       client:
       subuid:
       options:
-  nt::meta::ClientPublisher:
+  wpi::nt::meta::ClientPublisher:
     subpackage: meta
     attributes:
       uid:
       topic:
-  nt::meta::ClientSubscriber:
+  wpi::nt::meta::ClientSubscriber:
     subpackage: meta
     attributes:
       uid:
       topics:
       options:
-  nt::meta::Client:
+  wpi::nt::meta::Client:
     subpackage: meta
     attributes:
       id:

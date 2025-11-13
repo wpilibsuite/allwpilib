@@ -1,20 +1,20 @@
 
 #include <semiwrap.h>
-#include <networktables/NetworkTableValue.h>
-#include <networktables/NetworkTableType.h>
+#include "wpi/nt/NetworkTableValue.hpp"
+#include "wpi/nt/NetworkTableType.hpp"
 #include <fmt/format.h>
 
 namespace pyntcore {
 
 const char * nttype2str(NT_Type type);
 
-py::object ntvalue2py(const nt::Value &ntvalue);
+py::object ntvalue2py(const wpi::nt::Value &ntvalue);
 
-nt::Value py2ntvalue(py::handle h);
+wpi::nt::Value py2ntvalue(py::handle h);
 
-py::function valueFactoryByType(nt::NetworkTableType type);
+py::function valueFactoryByType(wpi::nt::NetworkTableType type);
 
-inline void ensure_value_is(NT_Type expected, nt::Value *v) {
+inline void ensure_value_is(NT_Type expected, wpi::nt::Value *v) {
     if (v->type() != expected) {
         throw py::value_error(fmt::format(
             "Value type is {}, not {}", nttype2str(v->type()), nttype2str(expected)

@@ -2,21 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/simulation/SimDeviceSim.hpp"
+
 #include <string_view>
 
 #include <gtest/gtest.h>
-#include <hal/SimDevice.h>
 
-#include "frc/simulation/SimDeviceSim.h"
+#include "wpi/hal/SimDevice.h"
 
-using namespace frc::sim;
+using namespace wpi::sim;
 
 TEST(SimDeviceSimTest, Basic) {
-  hal::SimDevice dev{"test"};
-  hal::SimBoolean devBool = dev.CreateBoolean("bool", false, false);
+  wpi::hal::SimDevice dev{"test"};
+  wpi::hal::SimBoolean devBool = dev.CreateBoolean("bool", false, false);
 
   SimDeviceSim sim{"test"};
-  hal::SimBoolean simBool = sim.GetBoolean("bool");
+  wpi::hal::SimBoolean simBool = sim.GetBoolean("bool");
   EXPECT_FALSE(simBool.Get());
   simBool.Set(true);
   EXPECT_TRUE(devBool.Get());
@@ -25,7 +26,7 @@ TEST(SimDeviceSimTest, Basic) {
 }
 
 TEST(SimDeviceSimTest, EnumerateDevices) {
-  hal::SimDevice dev{"test"};
+  wpi::hal::SimDevice dev{"test"};
 
   bool foundit = false;
   SimDeviceSim::EnumerateDevices(

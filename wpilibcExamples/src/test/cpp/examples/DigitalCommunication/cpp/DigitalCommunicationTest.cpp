@@ -5,30 +5,30 @@
 #include <string>
 #include <thread>
 
-#include <frc/simulation/DIOSim.h>
-#include <frc/simulation/DriverStationSim.h>
-#include <frc/simulation/SimHooks.h>
 #include <gtest/gtest.h>
-#include <units/time.h>
 
-#include "Robot.h"
+#include "Robot.hpp"
+#include "wpi/simulation/DIOSim.hpp"
+#include "wpi/simulation/DriverStationSim.hpp"
+#include "wpi/simulation/SimHooks.hpp"
+#include "wpi/units/time.hpp"
 
 template <typename T>
 class DigitalCommunicationTest : public testing::TestWithParam<T> {
  public:
-  frc::sim::DIOSim m_allianceOutput{Robot::kAlliancePort};
-  frc::sim::DIOSim m_enabledOutput{Robot::kEnabledPort};
-  frc::sim::DIOSim m_autonomousOutput{Robot::kAutonomousPort};
-  frc::sim::DIOSim m_alertOutput{Robot::kAlertPort};
+  wpi::sim::DIOSim m_allianceOutput{Robot::kAlliancePort};
+  wpi::sim::DIOSim m_enabledOutput{Robot::kEnabledPort};
+  wpi::sim::DIOSim m_autonomousOutput{Robot::kAutonomousPort};
+  wpi::sim::DIOSim m_alertOutput{Robot::kAlertPort};
   Robot m_robot;
   std::optional<std::thread> m_thread;
 
   void SetUp() override {
-    frc::sim::PauseTiming();
-    frc::sim::DriverStationSim::ResetData();
+    wpi::sim::PauseTiming();
+    wpi::sim::DriverStationSim::ResetData();
 
     m_thread = std::thread([&] { m_robot.StartCompetition(); });
-    frc::sim::StepTiming(0.0_ms);
+    wpi::sim::StepTiming(0.0_ms);
     // SimHooks.stepTiming(0.0); // Wait for Notifiers
   }
 
@@ -46,13 +46,13 @@ class AllianceTest : public DigitalCommunicationTest<HAL_AllianceStationID> {};
 
 TEST_P(AllianceTest, Alliance) {
   auto alliance = GetParam();
-  frc::sim::DriverStationSim::SetAllianceStationId(alliance);
-  frc::sim::DriverStationSim::NotifyNewData();
+  wpi::sim::DriverStationSim::SetAllianceStationId(alliance);
+  wpi::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_TRUE(m_allianceOutput.GetInitialized());
   EXPECT_FALSE(m_allianceOutput.GetIsInput());
 
-  frc::sim::StepTiming(20_ms);
+  wpi::sim::StepTiming(20_ms);
 
   bool isRed = false;
   switch (alliance) {
@@ -102,13 +102,13 @@ class EnabledTest : public DigitalCommunicationTest<bool> {};
 
 TEST_P(EnabledTest, Enabled) {
   auto enabled = GetParam();
-  frc::sim::DriverStationSim::SetEnabled(enabled);
-  frc::sim::DriverStationSim::NotifyNewData();
+  wpi::sim::DriverStationSim::SetEnabled(enabled);
+  wpi::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_TRUE(m_enabledOutput.GetInitialized());
   EXPECT_FALSE(m_enabledOutput.GetIsInput());
 
-  frc::sim::StepTiming(20_ms);
+  wpi::sim::StepTiming(20_ms);
 
   EXPECT_EQ(enabled, m_enabledOutput.GetValue());
 }
@@ -120,13 +120,13 @@ class AutonomousTest : public DigitalCommunicationTest<bool> {};
 
 TEST_P(AutonomousTest, Autonomous) {
   auto autonomous = GetParam();
-  frc::sim::DriverStationSim::SetAutonomous(autonomous);
-  frc::sim::DriverStationSim::NotifyNewData();
+  wpi::sim::DriverStationSim::SetAutonomous(autonomous);
+  wpi::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_TRUE(m_autonomousOutput.GetInitialized());
   EXPECT_FALSE(m_autonomousOutput.GetIsInput());
 
-  frc::sim::StepTiming(20_ms);
+  wpi::sim::StepTiming(20_ms);
 
   EXPECT_EQ(autonomous, m_autonomousOutput.GetValue());
 }
@@ -138,13 +138,13 @@ class AlertTest : public DigitalCommunicationTest<double> {};
 
 TEST_P(AlertTest, Alert) {
   auto matchTime = GetParam();
-  frc::sim::DriverStationSim::SetMatchTime(matchTime);
-  frc::sim::DriverStationSim::NotifyNewData();
+  wpi::sim::DriverStationSim::SetMatchTime(matchTime);
+  wpi::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_TRUE(m_alertOutput.GetInitialized());
   EXPECT_FALSE(m_alertOutput.GetIsInput());
 
-  frc::sim::StepTiming(20_ms);
+  wpi::sim::StepTiming(20_ms);
 
   EXPECT_EQ(matchTime <= 30 && matchTime >= 25, m_alertOutput.GetValue());
 }

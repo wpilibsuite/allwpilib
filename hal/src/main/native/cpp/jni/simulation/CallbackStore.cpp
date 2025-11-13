@@ -9,29 +9,28 @@
 #include <cstdio>
 #include <memory>
 
-#include <wpi/jni_util.h>
-
 #include "SimulatorJNI.h"
-#include "hal/Types.h"
-#include "hal/Value.h"
-#include "hal/handles/UnlimitedHandleResource.h"
+#include "wpi/hal/Types.h"
+#include "wpi/hal/Value.h"
+#include "wpi/hal/handles/UnlimitedHandleResource.h"
+#include "wpi/util/jni_util.hpp"
 
-using namespace hal;
-using namespace hal::sim;
-using namespace wpi::java;
+using namespace wpi::hal;
+using namespace wpi::hal::sim;
+using namespace wpi::util::java;
 
-static hal::UnlimitedHandleResource<SIM_JniHandle, CallbackStore,
-                                    hal::HAL_HandleEnum::SimulationJni>*
+static wpi::hal::UnlimitedHandleResource<
+    SIM_JniHandle, CallbackStore, wpi::hal::HAL_HandleEnum::SimulationJni>*
     callbackHandles;
 
-namespace hal::sim {
+namespace wpi::hal::sim {
 void InitializeStore() {
-  static hal::UnlimitedHandleResource<SIM_JniHandle, CallbackStore,
-                                      hal::HAL_HandleEnum::SimulationJni>
+  static wpi::hal::UnlimitedHandleResource<
+      SIM_JniHandle, CallbackStore, wpi::hal::HAL_HandleEnum::SimulationJni>
       cb;
   callbackHandles = &cb;
 }
-}  // namespace hal::sim
+}  // namespace wpi::hal::sim
 
 void CallbackStore::create(JNIEnv* env, jobject obj) {
   m_call = JGlobal<jobject>(env, obj);

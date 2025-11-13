@@ -12,15 +12,14 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/jni_util.h>
-
 #include "SimulatorJNI.h"
-#include "edu_wpi_first_hal_simulation_SimDeviceDataJNI.h"
-#include "hal/handles/UnlimitedHandleResource.h"
-#include "hal/simulation/SimDeviceData.h"
+#include "org_wpilib_hardware_hal_simulation_SimDeviceDataJNI.h"
+#include "wpi/hal/handles/UnlimitedHandleResource.h"
+#include "wpi/hal/simulation/SimDeviceData.h"
+#include "wpi/util/jni_util.hpp"
 
-using namespace hal;
-using namespace wpi::java;
+using namespace wpi::hal;
+using namespace wpi::util::java;
 
 static JClass simDeviceInfoCls;
 static JClass simValueInfoCls;
@@ -106,7 +105,7 @@ class DeviceCallbackStore {
   int32_t getCallbackId() { return callbackId; }
 
  private:
-  wpi::java::JGlobal<jobject> m_call;
+  wpi::util::java::JGlobal<jobject> m_call;
   int32_t callbackId;
 };
 
@@ -120,7 +119,7 @@ class ValueCallbackStore {
   int32_t getCallbackId() { return m_callbackId; }
 
  private:
-  wpi::java::JGlobal<jobject> m_call;
+  wpi::util::java::JGlobal<jobject> m_call;
   int32_t m_callbackId;
 };
 
@@ -194,9 +193,9 @@ void ValueCallbackStore::performCallback(const char* name,
   }
 }
 
-static hal::UnlimitedHandleResource<SIM_JniHandle, DeviceCallbackStore,
-                                    hal::HAL_HandleEnum::SimulationJni>*
-    deviceCallbackHandles;
+static wpi::hal::UnlimitedHandleResource<
+    SIM_JniHandle, DeviceCallbackStore,
+    wpi::hal::HAL_HandleEnum::SimulationJni>* deviceCallbackHandles;
 
 namespace {
 using RegisterDeviceCallbackFunc =
@@ -251,8 +250,8 @@ static void FreeDeviceCallback(JNIEnv* env, SIM_JniHandle handle,
   callback->free(env);
 }
 
-static hal::UnlimitedHandleResource<SIM_JniHandle, ValueCallbackStore,
-                                    hal::HAL_HandleEnum::SimulationJni>*
+static wpi::hal::UnlimitedHandleResource<
+    SIM_JniHandle, ValueCallbackStore, wpi::hal::HAL_HandleEnum::SimulationJni>*
     valueCallbackHandles;
 
 namespace {
@@ -308,23 +307,23 @@ static void FreeValueCallback(JNIEnv* env, SIM_JniHandle handle,
   callback->free(env);
 }
 
-namespace hal::sim {
+namespace wpi::hal::sim {
 
 bool InitializeSimDeviceDataJNI(JNIEnv* env) {
   simDeviceInfoCls = JClass(
-      env, "edu/wpi/first/hal/simulation/SimDeviceDataJNI$SimDeviceInfo");
+      env, "org/wpilib/hardware/hal/simulation/SimDeviceDataJNI$SimDeviceInfo");
   if (!simDeviceInfoCls) {
     return false;
   }
 
-  simValueInfoCls =
-      JClass(env, "edu/wpi/first/hal/simulation/SimDeviceDataJNI$SimValueInfo");
+  simValueInfoCls = JClass(
+      env, "org/wpilib/hardware/hal/simulation/SimDeviceDataJNI$SimValueInfo");
   if (!simValueInfoCls) {
     return false;
   }
 
   simDeviceCallbackCls =
-      JClass(env, "edu/wpi/first/hal/simulation/SimDeviceCallback");
+      JClass(env, "org/wpilib/hardware/hal/simulation/SimDeviceCallback");
   if (!simDeviceCallbackCls) {
     return false;
   }
@@ -336,7 +335,7 @@ bool InitializeSimDeviceDataJNI(JNIEnv* env) {
   }
 
   simValueCallbackCls =
-      JClass(env, "edu/wpi/first/hal/simulation/SimValueCallback");
+      JClass(env, "org/wpilib/hardware/hal/simulation/SimValueCallback");
   if (!simValueCallbackCls) {
     return false;
   }
@@ -347,13 +346,15 @@ bool InitializeSimDeviceDataJNI(JNIEnv* env) {
     return false;
   }
 
-  static hal::UnlimitedHandleResource<SIM_JniHandle, DeviceCallbackStore,
-                                      hal::HAL_HandleEnum::SimulationJni>
+  static wpi::hal::UnlimitedHandleResource<
+      SIM_JniHandle, DeviceCallbackStore,
+      wpi::hal::HAL_HandleEnum::SimulationJni>
       cbDevice;
   deviceCallbackHandles = &cbDevice;
 
-  static hal::UnlimitedHandleResource<SIM_JniHandle, ValueCallbackStore,
-                                      hal::HAL_HandleEnum::SimulationJni>
+  static wpi::hal::UnlimitedHandleResource<
+      SIM_JniHandle, ValueCallbackStore,
+      wpi::hal::HAL_HandleEnum::SimulationJni>
       cbValue;
   valueCallbackHandles = &cbValue;
 
@@ -367,41 +368,41 @@ void FreeSimDeviceDataJNI(JNIEnv* env) {
   simValueCallbackCls.free(env);
 }
 
-}  // namespace hal::sim
+}  // namespace wpi::hal::sim
 
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_SimDeviceDataJNI
  * Method:    setSimDeviceEnabled
  * Signature: (Ljava/lang/String;Z)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_setSimDeviceEnabled
+Java_org_wpilib_hardware_hal_simulation_SimDeviceDataJNI_setSimDeviceEnabled
   (JNIEnv* env, jclass, jstring prefix, jboolean enabled)
 {
   HALSIM_SetSimDeviceEnabled(JStringRef{env, prefix}.c_str(), enabled);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_SimDeviceDataJNI
  * Method:    isSimDeviceEnabled
  * Signature: (Ljava/lang/String;)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_isSimDeviceEnabled
+Java_org_wpilib_hardware_hal_simulation_SimDeviceDataJNI_isSimDeviceEnabled
   (JNIEnv* env, jclass, jstring name)
 {
   return HALSIM_IsSimDeviceEnabled(JStringRef{env, name}.c_str());
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_SimDeviceDataJNI
  * Method:    registerSimDeviceCreatedCallback
  * Signature: (Ljava/lang/String;Ljava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_registerSimDeviceCreatedCallback
+Java_org_wpilib_hardware_hal_simulation_SimDeviceDataJNI_registerSimDeviceCreatedCallback
   (JNIEnv* env, jclass, jstring prefix, jobject callback,
    jboolean initialNotify)
 {
@@ -411,24 +412,24 @@ Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_registerSimDeviceCreatedCallb
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_SimDeviceDataJNI
  * Method:    cancelSimDeviceCreatedCallback
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_cancelSimDeviceCreatedCallback
+Java_org_wpilib_hardware_hal_simulation_SimDeviceDataJNI_cancelSimDeviceCreatedCallback
   (JNIEnv* env, jclass, jint uid)
 {
   FreeDeviceCallback(env, uid, &HALSIM_CancelSimDeviceCreatedCallback);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_SimDeviceDataJNI
  * Method:    registerSimDeviceFreedCallback
  * Signature: (Ljava/lang/String;Ljava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_registerSimDeviceFreedCallback
+Java_org_wpilib_hardware_hal_simulation_SimDeviceDataJNI_registerSimDeviceFreedCallback
   (JNIEnv* env, jclass, jstring prefix, jobject callback,
    jboolean initialNotify)
 {
@@ -438,36 +439,36 @@ Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_registerSimDeviceFreedCallbac
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_SimDeviceDataJNI
  * Method:    cancelSimDeviceFreedCallback
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_cancelSimDeviceFreedCallback
+Java_org_wpilib_hardware_hal_simulation_SimDeviceDataJNI_cancelSimDeviceFreedCallback
   (JNIEnv* env, jclass, jint uid)
 {
   FreeDeviceCallback(env, uid, &HALSIM_CancelSimDeviceFreedCallback);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_SimDeviceDataJNI
  * Method:    getSimDeviceHandle
  * Signature: (Ljava/lang/String;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_getSimDeviceHandle
+Java_org_wpilib_hardware_hal_simulation_SimDeviceDataJNI_getSimDeviceHandle
   (JNIEnv* env, jclass, jstring name)
 {
   return HALSIM_GetSimDeviceHandle(JStringRef{env, name}.c_str());
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_SimDeviceDataJNI
  * Method:    getSimDeviceName
  * Signature: (I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_getSimDeviceName
+Java_org_wpilib_hardware_hal_simulation_SimDeviceDataJNI_getSimDeviceName
   (JNIEnv* env, jclass, jint handle)
 {
   const char* name = HALSIM_GetSimDeviceName(handle);
@@ -478,24 +479,24 @@ Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_getSimDeviceName
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_SimDeviceDataJNI
  * Method:    getSimValueDeviceHandle
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_getSimValueDeviceHandle
+Java_org_wpilib_hardware_hal_simulation_SimDeviceDataJNI_getSimValueDeviceHandle
   (JNIEnv*, jclass, jint handle)
 {
   return HALSIM_GetSimValueDeviceHandle(handle);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_SimDeviceDataJNI
  * Method:    enumerateSimDevices
  * Signature: (Ljava/lang/String;)[Ljava/lang/Object;
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_enumerateSimDevices
+Java_org_wpilib_hardware_hal_simulation_SimDeviceDataJNI_enumerateSimDevices
   (JNIEnv* env, jclass, jstring prefix)
 {
   // get values
@@ -522,12 +523,12 @@ Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_enumerateSimDevices
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_SimDeviceDataJNI
  * Method:    registerSimValueCreatedCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_registerSimValueCreatedCallback
+Java_org_wpilib_hardware_hal_simulation_SimDeviceDataJNI_registerSimValueCreatedCallback
   (JNIEnv* env, jclass, jint device, jobject callback, jboolean initialNotify)
 {
   return AllocateValueCallback(env, static_cast<HAL_SimDeviceHandle>(device),
@@ -536,24 +537,24 @@ Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_registerSimValueCreatedCallba
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_SimDeviceDataJNI
  * Method:    cancelSimValueCreatedCallback
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_cancelSimValueCreatedCallback
+Java_org_wpilib_hardware_hal_simulation_SimDeviceDataJNI_cancelSimValueCreatedCallback
   (JNIEnv* env, jclass, jint uid)
 {
   FreeValueCallback(env, uid, &HALSIM_CancelSimValueCreatedCallback);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_SimDeviceDataJNI
  * Method:    registerSimValueChangedCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_registerSimValueChangedCallback
+Java_org_wpilib_hardware_hal_simulation_SimDeviceDataJNI_registerSimValueChangedCallback
   (JNIEnv* env, jclass, jint handle, jobject callback, jboolean initialNotify)
 {
   return AllocateValueCallback(env, static_cast<HAL_SimValueHandle>(handle),
@@ -562,24 +563,24 @@ Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_registerSimValueChangedCallba
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_SimDeviceDataJNI
  * Method:    cancelSimValueChangedCallback
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_cancelSimValueChangedCallback
+Java_org_wpilib_hardware_hal_simulation_SimDeviceDataJNI_cancelSimValueChangedCallback
   (JNIEnv* env, jclass, jint uid)
 {
   FreeValueCallback(env, uid, &HALSIM_CancelSimValueChangedCallback);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_SimDeviceDataJNI
  * Method:    registerSimValueResetCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_registerSimValueResetCallback
+Java_org_wpilib_hardware_hal_simulation_SimDeviceDataJNI_registerSimValueResetCallback
   (JNIEnv* env, jclass, jint handle, jobject callback, jboolean initialNotify)
 {
   return AllocateValueCallback(env, static_cast<HAL_SimValueHandle>(handle),
@@ -588,36 +589,36 @@ Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_registerSimValueResetCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_SimDeviceDataJNI
  * Method:    cancelSimValueResetCallback
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_cancelSimValueResetCallback
+Java_org_wpilib_hardware_hal_simulation_SimDeviceDataJNI_cancelSimValueResetCallback
   (JNIEnv* env, jclass, jint uid)
 {
   FreeValueCallback(env, uid, &HALSIM_CancelSimValueResetCallback);
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_SimDeviceDataJNI
  * Method:    getSimValueHandle
  * Signature: (ILjava/lang/String;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_getSimValueHandle
+Java_org_wpilib_hardware_hal_simulation_SimDeviceDataJNI_getSimValueHandle
   (JNIEnv* env, jclass, jint device, jstring name)
 {
   return HALSIM_GetSimValueHandle(device, JStringRef{env, name}.c_str());
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_SimDeviceDataJNI
  * Method:    enumerateSimValues
  * Signature: (I)[Ljava/lang/Object;
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_enumerateSimValues
+Java_org_wpilib_hardware_hal_simulation_SimDeviceDataJNI_enumerateSimValues
   (JNIEnv* env, jclass, jint device)
 {
   // get values
@@ -644,12 +645,12 @@ Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_enumerateSimValues
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_SimDeviceDataJNI
  * Method:    getSimValueEnumOptions
  * Signature: (I)[Ljava/lang/Object;
  */
 JNIEXPORT jobjectArray JNICALL
-Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_getSimValueEnumOptions
+Java_org_wpilib_hardware_hal_simulation_SimDeviceDataJNI_getSimValueEnumOptions
   (JNIEnv* env, jclass, jint handle)
 {
   static JClass stringCls{env, "java/lang/String"};
@@ -670,12 +671,12 @@ Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_getSimValueEnumOptions
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_SimDeviceDataJNI
  * Method:    getSimValueEnumDoubleValues
  * Signature: (I)[D
  */
 JNIEXPORT jdoubleArray JNICALL
-Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_getSimValueEnumDoubleValues
+Java_org_wpilib_hardware_hal_simulation_SimDeviceDataJNI_getSimValueEnumDoubleValues
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t numElems = 0;
@@ -684,12 +685,12 @@ Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_getSimValueEnumDoubleValues
 }
 
 /*
- * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
+ * Class:     org_wpilib_hardware_hal_simulation_SimDeviceDataJNI
  * Method:    resetSimDeviceData
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_resetSimDeviceData
+Java_org_wpilib_hardware_hal_simulation_SimDeviceDataJNI_resetSimDeviceData
   (JNIEnv*, jclass)
 {
   HALSIM_ResetSimDeviceData();

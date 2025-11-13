@@ -7,23 +7,22 @@
 #include <cassert>
 #include <cstdio>
 
-#include <wpi/jni_util.h>
-
 #include "HALUtil.h"
-#include "edu_wpi_first_hal_NotifierJNI.h"
-#include "hal/Notifier.h"
+#include "org_wpilib_hardware_hal_NotifierJNI.h"
+#include "wpi/hal/Notifier.h"
+#include "wpi/util/jni_util.hpp"
 
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_hal_NotifierJNI
+ * Class:     org_wpilib_hardware_hal_NotifierJNI
  * Method:    initializeNotifier
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_NotifierJNI_initializeNotifier
+Java_org_wpilib_hardware_hal_NotifierJNI_initializeNotifier
   (JNIEnv* env, jclass)
 {
   int32_t status = 0;
@@ -37,12 +36,12 @@ Java_edu_wpi_first_hal_NotifierJNI_initializeNotifier
 }
 
 /*
- * Class:     edu_wpi_first_hal_NotifierJNI
+ * Class:     org_wpilib_hardware_hal_NotifierJNI
  * Method:    setHALThreadPriority
  * Signature: (ZI)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_NotifierJNI_setHALThreadPriority
+Java_org_wpilib_hardware_hal_NotifierJNI_setHALThreadPriority
   (JNIEnv* env, jclass, jboolean realTime, jint priority)
 {
   int32_t status = 0;
@@ -50,27 +49,27 @@ Java_edu_wpi_first_hal_NotifierJNI_setHALThreadPriority
 }
 
 /*
- * Class:     edu_wpi_first_hal_NotifierJNI
+ * Class:     org_wpilib_hardware_hal_NotifierJNI
  * Method:    setNotifierName
  * Signature: (ILjava/lang/String;)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_NotifierJNI_setNotifierName
+Java_org_wpilib_hardware_hal_NotifierJNI_setNotifierName
   (JNIEnv* env, jclass cls, jint notifierHandle, jstring name)
 {
   int32_t status = 0;
   HAL_SetNotifierName((HAL_NotifierHandle)notifierHandle,
-                      wpi::java::JStringRef{env, name}.c_str(), &status);
+                      wpi::util::java::JStringRef{env, name}.c_str(), &status);
   CheckStatus(env, status);
 }
 
 /*
- * Class:     edu_wpi_first_hal_NotifierJNI
+ * Class:     org_wpilib_hardware_hal_NotifierJNI
  * Method:    stopNotifier
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_NotifierJNI_stopNotifier
+Java_org_wpilib_hardware_hal_NotifierJNI_stopNotifier
   (JNIEnv* env, jclass cls, jint notifierHandle)
 {
   int32_t status = 0;
@@ -79,12 +78,12 @@ Java_edu_wpi_first_hal_NotifierJNI_stopNotifier
 }
 
 /*
- * Class:     edu_wpi_first_hal_NotifierJNI
+ * Class:     org_wpilib_hardware_hal_NotifierJNI
  * Method:    cleanNotifier
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_NotifierJNI_cleanNotifier
+Java_org_wpilib_hardware_hal_NotifierJNI_cleanNotifier
   (JNIEnv* env, jclass, jint notifierHandle)
 {
   if (notifierHandle != HAL_kInvalidHandle) {
@@ -93,12 +92,12 @@ Java_edu_wpi_first_hal_NotifierJNI_cleanNotifier
 }
 
 /*
- * Class:     edu_wpi_first_hal_NotifierJNI
+ * Class:     org_wpilib_hardware_hal_NotifierJNI
  * Method:    updateNotifierAlarm
  * Signature: (IJ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_NotifierJNI_updateNotifierAlarm
+Java_org_wpilib_hardware_hal_NotifierJNI_updateNotifierAlarm
   (JNIEnv* env, jclass cls, jint notifierHandle, jlong triggerTime)
 {
   int32_t status = 0;
@@ -108,12 +107,12 @@ Java_edu_wpi_first_hal_NotifierJNI_updateNotifierAlarm
 }
 
 /*
- * Class:     edu_wpi_first_hal_NotifierJNI
+ * Class:     org_wpilib_hardware_hal_NotifierJNI
  * Method:    cancelNotifierAlarm
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_NotifierJNI_cancelNotifierAlarm
+Java_org_wpilib_hardware_hal_NotifierJNI_cancelNotifierAlarm
   (JNIEnv* env, jclass cls, jint notifierHandle)
 {
   int32_t status = 0;
@@ -122,12 +121,12 @@ Java_edu_wpi_first_hal_NotifierJNI_cancelNotifierAlarm
 }
 
 /*
- * Class:     edu_wpi_first_hal_NotifierJNI
+ * Class:     org_wpilib_hardware_hal_NotifierJNI
  * Method:    waitForNotifierAlarm
  * Signature: (I)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_hal_NotifierJNI_waitForNotifierAlarm
+Java_org_wpilib_hardware_hal_NotifierJNI_waitForNotifierAlarm
   (JNIEnv* env, jclass cls, jint notifierHandle)
 {
   int32_t status = 0;

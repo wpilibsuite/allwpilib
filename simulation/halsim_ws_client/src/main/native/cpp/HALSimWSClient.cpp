@@ -2,30 +2,30 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "HALSimWSClient.h"
+#include "wpi/halsim/ws_client/HALSimWSClient.hpp"
 
 #include <memory>
 
-#include <WSProviderContainer.h>
-#include <WSProvider_AddressableLED.h>
-#include <WSProvider_Analog.h>
-#include <WSProvider_DIO.h>
-#include <WSProvider_DriverStation.h>
-#include <WSProvider_Encoder.h>
-#include <WSProvider_Joystick.h>
-#include <WSProvider_PCM.h>
-#include <WSProvider_PWM.h>
-#include <WSProvider_RoboRIO.h>
-#include <WSProvider_SimDevice.h>
-#include <WSProvider_Solenoid.h>
-#include <WSProvider_dPWM.h>
-#include <wpinet/EventLoopRunner.h>
+#include "wpi/halsim/ws_core/WSProviderContainer.hpp"
+#include "wpi/halsim/ws_core/WSProvider_AddressableLED.hpp"
+#include "wpi/halsim/ws_core/WSProvider_Analog.hpp"
+#include "wpi/halsim/ws_core/WSProvider_DIO.hpp"
+#include "wpi/halsim/ws_core/WSProvider_DriverStation.hpp"
+#include "wpi/halsim/ws_core/WSProvider_Encoder.hpp"
+#include "wpi/halsim/ws_core/WSProvider_Joystick.hpp"
+#include "wpi/halsim/ws_core/WSProvider_PCM.hpp"
+#include "wpi/halsim/ws_core/WSProvider_PWM.hpp"
+#include "wpi/halsim/ws_core/WSProvider_RoboRIO.hpp"
+#include "wpi/halsim/ws_core/WSProvider_SimDevice.hpp"
+#include "wpi/halsim/ws_core/WSProvider_Solenoid.hpp"
+#include "wpi/halsim/ws_core/WSProvider_dPWM.hpp"
+#include "wpi/net/EventLoopRunner.hpp"
 
 using namespace wpilibws;
 
 bool HALSimWSClient::Initialize() {
   bool result = true;
-  runner.ExecSync([&](wpi::uv::Loop& loop) {
+  runner.ExecSync([&](wpi::net::uv::Loop& loop) {
     simws = std::make_shared<HALSimWS>(loop, providers, simDevices);
 
     if (!simws->Initialize()) {

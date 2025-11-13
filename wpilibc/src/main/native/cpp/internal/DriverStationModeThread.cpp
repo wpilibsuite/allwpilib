@@ -2,14 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/internal/DriverStationModeThread.h"
+#include "wpi/internal/DriverStationModeThread.hpp"
 
-#include <hal/DriverStation.h>
-#include <wpi/Synchronization.h>
+#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/hal/DriverStation.h"
+#include "wpi/util/Synchronization.h"
 
-#include "frc/DriverStation.h"
-
-using namespace frc::internal;
+using namespace wpi::internal;
 
 DriverStationModeThread::DriverStationModeThread() {
   m_keepAlive = true;
@@ -40,13 +39,13 @@ void DriverStationModeThread::InTest(bool entering) {
 }
 
 void DriverStationModeThread::Run() {
-  wpi::Event event{false, false};
+  wpi::util::Event event{false, false};
   HAL_ProvideNewDataEventHandle(event.GetHandle());
 
   while (m_keepAlive.load()) {
     bool timedOut = false;
-    wpi::WaitForObject(event.GetHandle(), 0.1, &timedOut);
-    frc::DriverStation::RefreshData();
+    wpi::util::WaitForObject(event.GetHandle(), 0.1, &timedOut);
+    wpi::DriverStation::RefreshData();
     if (m_userInDisabled) {
       HAL_ObserveUserProgramDisabled();
     }
