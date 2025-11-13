@@ -7,7 +7,7 @@ package org.wpilib.math.kinematics;
 import static org.wpilib.units.Units.MetersPerSecondPerSecond;
 import static org.wpilib.units.Units.RadiansPerSecondPerSecond;
 
-import org.wpilib.math.MathUtil;
+import org.wpilib.math.util.MathUtil;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.interpolation.Interpolatable;
