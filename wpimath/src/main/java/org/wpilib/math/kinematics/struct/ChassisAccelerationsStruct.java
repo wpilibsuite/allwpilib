@@ -4,9 +4,9 @@
 
 package org.wpilib.math.kinematics.struct;
 
+import java.nio.ByteBuffer;
 import org.wpilib.math.kinematics.ChassisAccelerations;
 import org.wpilib.util.struct.Struct;
-import java.nio.ByteBuffer;
 
 public class ChassisAccelerationsStruct implements Struct<ChassisAccelerations> {
   @Override

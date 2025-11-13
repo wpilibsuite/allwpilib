@@ -7,17 +7,17 @@ package org.wpilib.math.kinematics;
 import static org.wpilib.units.Units.MetersPerSecondPerSecond;
 import static org.wpilib.units.Units.RadiansPerSecondPerSecond;
 
-import org.wpilib.math.util.MathUtil;
+import java.util.Objects;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.interpolation.Interpolatable;
 import org.wpilib.math.kinematics.proto.ChassisAccelerationsProto;
 import org.wpilib.math.kinematics.struct.ChassisAccelerationsStruct;
+import org.wpilib.math.util.MathUtil;
 import org.wpilib.units.measure.AngularAcceleration;
 import org.wpilib.units.measure.LinearAcceleration;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
-import java.util.Objects;
 
 /**
  * Represents the acceleration of a robot chassis.

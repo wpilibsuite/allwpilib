@@ -4,9 +4,9 @@
 
 package org.wpilib.math.kinematics;
 
-import static org.wpilib.units.Units.MetersPerSecondPerSecond;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.wpilib.units.Units.MetersPerSecondPerSecond;
 
 import org.junit.jupiter.api.Test;
 

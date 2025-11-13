@@ -4,14 +4,14 @@
 
 package org.wpilib.math.kinematics;
 
-import static org.wpilib.units.Units.MetersPerSecondPerSecond;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.wpilib.units.Units.MetersPerSecondPerSecond;
 
-import org.wpilib.math.geometry.Rotation2d;
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.geometry.Rotation2d;
 
 class SwerveModuleAccelerationsTest {
   private static final double kEpsilon = 1E-9;
