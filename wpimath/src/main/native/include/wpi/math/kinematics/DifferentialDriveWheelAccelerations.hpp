@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/util/SymbolExports.hpp>
+#include "wpi/util/SymbolExports.hpp"
 
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/math.hpp"

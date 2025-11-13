@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <wpi/util/SymbolExports.hpp>
-#include <wpi/util/struct/Struct.hpp>
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/struct/Struct.hpp"
 
 #include "wpi/math/kinematics/ChassisAccelerations.hpp"
 
