@@ -9,8 +9,6 @@
 #include <vector>
 
 #include <Eigen/Core>
-#include <wpi/SymbolExports.h>
-#include <wpi/array.h>
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
