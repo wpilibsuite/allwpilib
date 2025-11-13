@@ -128,9 +128,7 @@ class ElevatorSimTest {
   @Test
   void testCurrentDraw() {
     var motor = DCMotor.getKrakenX60(2);
-    var sim =
-        new ElevatorSim(
-            motor, 20, 8.0, 0.1, 0.0, 1.0, true, 0.0, 0.01, 0.0);
+    var sim = new ElevatorSim(motor, 20, 8.0, 0.1, 0.0, 1.0, true, 0.0, 0.01, 0.0);
 
     assertEquals(0.0, sim.getCurrentDrawAmps());
     sim.setInputVoltage(motor.getVoltage(motor.getTorque(60.0), 0.0));
