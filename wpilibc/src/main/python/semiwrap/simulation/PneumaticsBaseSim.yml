@@ -1,0 +1,32 @@
+classes:
+  frc::sim::PneumaticsBaseSim:
+    typealias:
+    - frc::PneumaticsBase
+    attributes:
+      m_index:
+    force_type_casters:
+    - std::function
+    methods:
+      GetForType:
+      GetInitialized:
+      SetInitialized:
+      RegisterInitializedCallback:
+      GetCompressorOn:
+      SetCompressorOn:
+      RegisterCompressorOnCallback:
+      GetSolenoidOutput:
+      SetSolenoidOutput:
+      RegisterSolenoidOutputCallback:
+      GetPressureSwitch:
+      SetPressureSwitch:
+      RegisterPressureSwitchCallback:
+      GetCompressorCurrent:
+      SetCompressorCurrent:
+      RegisterCompressorCurrentCallback:
+      GetAllSolenoidOutputs:
+      SetAllSolenoidOutputs:
+      ResetData:
+      PneumaticsBaseSim:
+        overloads:
+          const PneumaticsBase&:
+          const int:

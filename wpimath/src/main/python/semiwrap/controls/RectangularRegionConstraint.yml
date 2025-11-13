@@ -1,0 +1,25 @@
+defaults:
+  subpackage: constraint
+
+extra_includes:
+- PyTrajectoryConstraint.h
+
+classes:
+  frc::RectangularRegionConstraint:
+    template_params:
+    - typename Constraint
+    typealias:
+    - frc::TrajectoryConstraint::MinMax
+    methods:
+      RectangularRegionConstraint:
+        overloads:
+          const Translation2d&, const Translation2d&, const Constraint&:
+          const Rectangle2d&, const Constraint&:
+      MaxVelocity:
+      MinMaxAcceleration:
+
+templates:
+  RectangularRegionConstraint:
+    qualname: frc::RectangularRegionConstraint
+    params:
+    - frc::PyTrajectoryConstraint

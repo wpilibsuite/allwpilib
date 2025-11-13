@@ -4,8 +4,6 @@
 
 package edu.wpi.first.hal;
 
-import java.nio.ByteBuffer;
-
 /**
  * Driver Station JNI Functions.
  *
@@ -142,6 +140,8 @@ public class DriverStationJNI extends JNIWrapper {
   /** The maximum number of axes. */
   public static final int kMaxJoystickAxes = 12;
 
+  public static final int kMaxJoystickButtons = 64;
+
   /** The maximum number of POVs. */
   public static final int kMaxJoystickPOVs = 8;
 
@@ -149,48 +149,9 @@ public class DriverStationJNI extends JNIWrapper {
   public static final int kMaxJoysticks = 6;
 
   /**
-   * Gets the axes of a specific joystick.
-   *
-   * @param joystickNum the joystick number
-   * @param axesArray the axes values
-   * @return number of joystick axes, or 0 for error
-   * @see "HAL_GetJoystickAxes"
-   */
-  public static native int getJoystickAxes(byte joystickNum, float[] axesArray);
-
-  /**
-   * Gets the axes of a specific joystick.
-   *
-   * @param joystickNum the joystick number
-   * @param rawAxesArray the raw int axes values (-32767-32768)
-   * @return number of joystick axes, or 0 for error
-   * @see "HAL_GetJoystickAxes"
-   */
-  public static native int getJoystickAxesRaw(byte joystickNum, short[] rawAxesArray);
-
-  /**
-   * Gets the POVs of a specific joystick.
-   *
-   * @param joystickNum the joystick number
-   * @param povsArray the POV values
-   * @return number of POVs, or 0 for error
-   * @see "HAL_GetJoystickPOVs"
-   */
-  public static native int getJoystickPOVs(byte joystickNum, byte[] povsArray);
-
-  /**
-   * Gets the buttons of a specific joystick.
-   *
-   * @param joystickNum the joystick number
-   * @param count the count of buttons
-   * @return The joystick button values
-   * @see "HAL_GetJoystickButtons"
-   */
-  public static native int getJoystickButtons(byte joystickNum, ByteBuffer count);
-
-  /**
    * Get all joystick data.
    *
+   * @param stick the joystick to grab
    * @param axesArray all joystick axes
    * @param rawAxesArray all joystick axes as int
    * @param povsArray all povs
@@ -199,7 +160,11 @@ public class DriverStationJNI extends JNIWrapper {
    * @see "HAL_GetAllJoystickData"
    */
   public static native void getAllJoystickData(
-      float[] axesArray, short[] rawAxesArray, byte[] povsArray, long[] buttonsAndMetadata);
+      int stick,
+      float[] axesArray,
+      short[] rawAxesArray,
+      byte[] povsArray,
+      long[] buttonsAndMetadata);
 
   /**
    * Set joystick outputs.
@@ -245,19 +210,6 @@ public class DriverStationJNI extends JNIWrapper {
    * @see "HAL_GetJoystickName"
    */
   public static native String getJoystickName(byte joystickNum);
-
-  /**
-   * Gets the type of a specific joystick axis.
-   *
-   * <p>This is device specific, and different depending on what system input type the joystick
-   * uses.
-   *
-   * @param joystickNum the joystick number
-   * @param axis the axis number
-   * @return the enumerated axis type
-   * @see "HAL_GetJoystickAxisType"
-   */
-  public static native int getJoystickAxisType(byte joystickNum, byte axis);
 
   /**
    * Returns the approximate match time.

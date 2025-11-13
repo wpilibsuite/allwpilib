@@ -1,0 +1,21 @@
+classes:
+  frc::PyNotifier:
+    rename: Notifier
+    methods:
+      PyNotifier:
+        overloads:
+          std::function<void ( )>:
+      SetName:
+      SetCallback:
+      StartSingle:
+        overloads:
+          double:
+            ignore: true
+          units::second_t:
+      StartPeriodic:
+        overloads:
+          double:
+            ignore: true
+          units::second_t:
+      Stop:
+      SetHALThreadPriority:

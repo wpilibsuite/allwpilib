@@ -18,6 +18,9 @@ generatedFileExclude {
   hal/src/main/native/systemcore/rev/
   UsageReporting\.h$
   src/generated/main/native/cpp
+
+  src/main/python/
+  src/test/python/
 }
 
 modifiableFileExclude {

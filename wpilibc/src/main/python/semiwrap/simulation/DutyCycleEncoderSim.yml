@@ -1,0 +1,14 @@
+extra_includes:
+- frc/DutyCycleEncoder.h
+
+classes:
+  frc::sim::DutyCycleEncoderSim:
+    methods:
+      DutyCycleEncoderSim:
+        overloads:
+          const DutyCycleEncoder&:
+          int:
+      Get:
+      Set:
+      IsConnected:
+      SetConnected:

@@ -1,17 +1,11 @@
-apply from: "${rootDir}/shared/resources.gradle"
-
 ext {
     baseId = 'wpinet'
     groupId = 'edu.wpi.first.net'
 
     nativeName = 'wpinet'
     devMain = 'edu.wpi.first.net.DevMain'
-    def generateTask = createGenerateResourcesTask('main', 'WPI', 'wpi', project)
 
     splitSetup = {
-        it.tasks.withType(CppCompile) {
-            dependsOn generateTask
-        }
         it.sources {
             libuvCpp(CppSourceSet) {
                 source {
@@ -29,15 +23,6 @@ ext {
                 }
                 exportedHeaders {
                     srcDirs 'src/main/native/include', 'src/main/native/thirdparty/tcpsockets/include'
-                }
-            }
-            resourcesCpp(CppSourceSet) {
-                source {
-                    srcDirs "$buildDir/generated/main/cpp", "$rootDir/shared/singlelib"
-                    include '*.cpp'
-                }
-                exportedHeaders {
-                    srcDirs 'src/main/native/include'
                 }
             }
         }

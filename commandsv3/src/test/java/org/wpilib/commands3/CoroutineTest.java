@@ -113,6 +113,7 @@ class CoroutineTest extends CommandTestBase {
   }
 
   @Test
+  @SuppressWarnings("CoroutineMayNotBeInScope")
   void usingParentCoroutineInChildThrows() {
     var parent =
         Command.noRequirements()

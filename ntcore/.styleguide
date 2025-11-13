@@ -16,6 +16,9 @@ generatedFileExclude {
   ntcore/doc/
   ntcore/src/generated
   .*\.jinja
+
+  src/main/python/
+  src/test/python/
 }
 
 repoRootNameOverride {

@@ -1,0 +1,18 @@
+extra_includes:
+- wpi/sendable/SendableBuilder.h
+
+classes:
+  frc::AnalogAccelerometer:
+    ignored_bases:
+    - wpi::SendableHelper<AnalogAccelerometer>
+    methods:
+      AnalogAccelerometer:
+        overloads:
+          int:
+          AnalogInput*:
+            ignore: true
+          std::shared_ptr<AnalogInput>:
+      GetAcceleration:
+      SetSensitivity:
+      SetZero:
+      InitSendable:

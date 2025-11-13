@@ -1,0 +1,191 @@
+extra_includes:
+- pybind11/operators.h
+
+classes:
+  frc::Color:
+    force_type_casters:
+    - wpi::ct_string
+    attributes:
+      kDenim:
+      kFirstBlue:
+      kFirstRed:
+      kAliceBlue:
+      kAntiqueWhite:
+      kAqua:
+      kAquamarine:
+      kAzure:
+      kBeige:
+      kBisque:
+      kBlack:
+      kBlanchedAlmond:
+      kBlue:
+      kBlueViolet:
+      kBrown:
+      kBurlywood:
+      kCadetBlue:
+      kChartreuse:
+      kChocolate:
+      kCoral:
+      kCornflowerBlue:
+      kCornsilk:
+      kCrimson:
+      kCyan:
+      kDarkBlue:
+      kDarkCyan:
+      kDarkGoldenrod:
+      kDarkGray:
+      kDarkGreen:
+      kDarkKhaki:
+      kDarkMagenta:
+      kDarkOliveGreen:
+      kDarkOrange:
+      kDarkOrchid:
+      kDarkRed:
+      kDarkSalmon:
+      kDarkSeaGreen:
+      kDarkSlateBlue:
+      kDarkSlateGray:
+      kDarkTurquoise:
+      kDarkViolet:
+      kDeepPink:
+      kDeepSkyBlue:
+      kDimGray:
+      kDodgerBlue:
+      kFirebrick:
+      kFloralWhite:
+      kForestGreen:
+      kFuchsia:
+      kGainsboro:
+      kGhostWhite:
+      kGold:
+      kGoldenrod:
+      kGray:
+      kGreen:
+      kGreenYellow:
+      kHoneydew:
+      kHotPink:
+      kIndianRed:
+      kIndigo:
+      kIvory:
+      kKhaki:
+      kLavender:
+      kLavenderBlush:
+      kLawnGreen:
+      kLemonChiffon:
+      kLightBlue:
+      kLightCoral:
+      kLightCyan:
+      kLightGoldenrodYellow:
+      kLightGray:
+      kLightGreen:
+      kLightPink:
+      kLightSalmon:
+      kLightSeaGreen:
+      kLightSkyBlue:
+      kLightSlateGray:
+      kLightSteelBlue:
+      kLightYellow:
+      kLime:
+      kLimeGreen:
+      kLinen:
+      kMagenta:
+      kMaroon:
+      kMediumAquamarine:
+      kMediumBlue:
+      kMediumOrchid:
+      kMediumPurple:
+      kMediumSeaGreen:
+      kMediumSlateBlue:
+      kMediumSpringGreen:
+      kMediumTurquoise:
+      kMediumVioletRed:
+      kMidnightBlue:
+      kMintcream:
+      kMistyRose:
+      kMoccasin:
+      kNavajoWhite:
+      kNavy:
+      kOldLace:
+      kOlive:
+      kOliveDrab:
+      kOrange:
+      kOrangeRed:
+      kOrchid:
+      kPaleGoldenrod:
+      kPaleGreen:
+      kPaleTurquoise:
+      kPaleVioletRed:
+      kPapayaWhip:
+      kPeachPuff:
+      kPeru:
+      kPink:
+      kPlum:
+      kPowderBlue:
+      kPurple:
+      kRed:
+      kRosyBrown:
+      kRoyalBlue:
+      kSaddleBrown:
+      kSalmon:
+      kSandyBrown:
+      kSeaGreen:
+      kSeashell:
+      kSienna:
+      kSilver:
+      kSkyBlue:
+      kSlateBlue:
+      kSlateGray:
+      kSnow:
+      kSpringGreen:
+      kSteelBlue:
+      kTan:
+      kTeal:
+      kThistle:
+      kTomato:
+      kTurquoise:
+      kViolet:
+      kWheat:
+      kWhite:
+      kWhiteSmoke:
+      kYellow:
+      kYellowGreen:
+      red:
+        access: readonly
+      green:
+        access: readonly
+      blue:
+        access: readonly
+    methods:
+      Color:
+        overloads:
+          '':
+          double, double, double:
+            param_override:
+              r:
+                name: red
+              g:
+                name: green
+              b:
+                name: blue
+          int, int, int:
+          std::string_view:
+      FromHSV:
+      HexString:
+      operator==:
+
+inline_code: |
+  cls_Color
+    .def("__hash__", [](Color *self) -> size_t {
+      size_t h = (size_t)(
+        std::hash<double>{}(self->red)
+        ^ (std::hash<double>{}(self->green) << 1)
+        ^ (std::hash<double>{}(self->blue) << 2)
+      );
+      return h != static_cast<size_t>(-1) ? h : -2;
+    })
+    .def("__repr__", [](Color *self) {
+      return "Color("
+        "red=" + std::to_string(self->red) + ", "
+        "green=" + std::to_string(self->green) + ", "
+        "blue=" + std::to_string(self->blue) + ")";
+    });

@@ -80,6 +80,7 @@ SNIPPETS_FOLDERS = [
     "EncoderHoming",
     "LimitSwitch",
     "OnboardIMU",
+    "ProfiledPIDFeedforward",
 ]
 
 TEMPLATES_FOLDERS = [
