@@ -147,10 +147,10 @@ class SwerveDriveKinematicsTest {
     ChassisSpeeds speeds = new ChassisSpeeds(0, 0, 2 * Math.PI);
     var moduleStates = m_kinematics.toSwerveModuleStates(speeds);
 
-    // The circumference of the wheels about the COR is π * diameter, or 2π * radius
-    // the radius is the √(12²in + 12²in), or 16.9706in, so the circumference the wheels
-    // trace out is 106.629190516in. since we want our robot to rotate at 1 rotation per second,
-    // our wheels must trace out 1 rotation (or 106.63 inches) per second.
+    // The circumference of the wheels about the COR is π * diameter, or 2π * radius. The radius
+    // is the √(12²in + 12²in), or 16.9706in, so the circumference the wheels trace out is
+    // 106.629190516in. Since we want our robot to rotate at 1 rotation per second, our wheels
+    // must trace out 1 rotation (or 106.63 inches) per second.
 
     assertAll(
         () -> assertEquals(106.63, moduleStates[0].speed, 0.1),
@@ -198,14 +198,12 @@ class SwerveDriveKinematicsTest {
     ChassisSpeeds speeds = new ChassisSpeeds(0, 0, 2 * Math.PI);
     var moduleStates = m_kinematics.toSwerveModuleStates(speeds, m_fl);
 
-    // This one is a bit trickier. Because we are rotating about the front-left wheel,
-    // it should be parked at 0 degrees and 0 speed. The front-right and back-left wheels both
-    // travel
-    // an arc with radius 24 (and circumference 150.796), and the back-right wheel travels an arc
-    // with
-    // radius √(24² + 24²) and circumference 213.2584. As for angles, the front-right wheel
-    // should be pointing straight forward, the back-left wheel should be pointing straight right,
-    // and the back-right wheel should be at a -45 degree angle
+    // This one is a bit trickier. Because we are rotating about the front-left wheel, it should
+    // be parked at 0 degrees and 0 speed. The front-right and back-left wheels both travel an arc
+    // with radius 24 (and circumference 150.796), and the back-right wheel travels an arc with
+    // radius √(24² + 24²) and circumference 213.2584. As for angles, the front-right wheel should
+    // be pointing straight forward, the back-left wheel should be pointing straight right, and the
+    // back-right wheel should be at a -45 degree angle.
 
     assertAll(
         () -> assertEquals(0.0, moduleStates[0].speed, 0.1),
@@ -228,12 +226,11 @@ class SwerveDriveKinematicsTest {
     var chassisSpeeds = m_kinematics.toChassisSpeeds(flState, frState, blState, brState);
 
     // We already know that our omega should be 2π from the previous test. Next, we need to
-    // determine
-    // the vx and vy of our chassis center. Because our COR is at a 45 degree angle from the center,
-    // we know that vx and vy must be the same. Furthermore, we know that the center of mass makes
-    // a full revolution about the center of revolution once every second. Therefore, the center of
-    // mass must be moving at 106.629in/sec. Recalling that the ratios of a 45/45/90 triangle are
-    // 1:√(2)/2:√(2)/2, we find that the COM vx is -75.398, and vy is 75.398.
+    // determine the vx and vy of our chassis center. Because our COR is at a 45 degree angle from
+    // the center, we know that vx and vy must be the same. Furthermore, we know that the center of
+    // mass makes a full revolution about the center of revolution once every second. Therefore,
+    // the center of mass must be moving at 106.629in/sec. Recalling that the ratios of a 45/45/90
+    // triangle are 1:√(2)/2:√(2)/2, we find that the COM vx is -75.398, and vy is 75.398.
 
     assertAll(
         () -> assertEquals(75.398, chassisSpeeds.vx, 0.1),
@@ -251,12 +248,11 @@ class SwerveDriveKinematicsTest {
     var twist = m_kinematics.toTwist2d(flDelta, frDelta, blDelta, brDelta);
 
     // We already know that our omega should be 2π from the previous test. Next, we need to
-    // determine
-    // the vx and vy of our chassis center. Because our COR is at a 45 degree angle from the center,
-    // we know that vx and vy must be the same. Furthermore, we know that the center of mass makes
-    // a full revolution about the center of revolution once every second. Therefore, the center of
-    // mass must be moving at 106.629in/sec. Recalling that the ratios of a 45/45/90 triangle are
-    // 1:√(2)/2:√(2)/2, we find that the COM vx is -75.398, and vy is 75.398.
+    // determine the vx and vy of our chassis center. Because our COR is at a 45 degree angle from
+    // the center, we know that vx and vy must be the same. Furthermore, we know that the center of
+    // mass makes a full revolution about the center of revolution once every second. Therefore,
+    // the center of mass must be moving at 106.629in/sec. Recalling that the ratios of a 45/45/90
+    // triangle are 1:√(2)/2:√(2)/2, we find that the COM vx is -75.398, and vy is 75.398.
 
     assertAll(
         () -> assertEquals(75.398, twist.dx, 0.1),
@@ -429,17 +425,13 @@ class SwerveDriveKinematicsTest {
     //                                         = √(106.63² + 668.7²) = 678.4 m/s²
     //
     // For module positions:
-    // FL (12, 12):   radius angle = 135°, tangential = 45°,  centripetal = -135° → total angle =
-    // -144°
-    // FR (12, -12):  radius angle = 45°,  tangential = -45°, centripetal = -135° → total angle =
-    // 126°
-    // BL (-12, 12):  radius angle = 135°, tangential = 45°,  centripetal = 45°   → total angle =
-    // -54°
-    // BR (-12, -12): radius angle = -45°, tangential = 45°,  centripetal = 135°  → total angle =
-    // 36°
+    // FL (12, 12): radius angle = 135°, tangential = 45°, centripetal = -135° → total angle = -144°
+    // FR (12, -12): radius angle = 45°, tangential = -45°, centripetal = -135° → total angle = 126°
+    // BL (-12, 12): radius angle = 135°, tangential = 45°, centripetal = 45° → total angle = -54°
+    // BR (-12, -12): radius angle = -45°, tangential = 45°, centripetal = 135° → total angle = 36°
     //
-    // The acceleration angles are not simply tangential because the centripetal component
-    // from the existing angular velocity dominates and affects the direction.
+    // The acceleration angles are not simply tangential because the centripetal component from the
+    // existing angular velocity dominates and affects the direction.
 
     double centerRadius = m_kinematics.getModules()[0].getNorm();
     double tangentialAccel = centerRadius * accelerations.alpha; // α * r
