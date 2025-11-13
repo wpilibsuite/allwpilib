@@ -4,9 +4,8 @@
 
 #include "wpi/math/kinematics/struct/ChassisAccelerationsStruct.hpp"
 
-#include "wpi/util/struct/Struct.hpp"
-
 #include "wpi/math/kinematics/ChassisAccelerations.hpp"
+#include "wpi/util/struct/Struct.hpp"
 
 wpi::math::ChassisAccelerations wpi::util::Struct<
     wpi::math::ChassisAccelerations>::Unpack(std::span<const uint8_t> data) {

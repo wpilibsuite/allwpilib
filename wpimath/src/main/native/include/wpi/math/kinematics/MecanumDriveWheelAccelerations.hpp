@@ -8,10 +8,9 @@
 #include <array>
 #include <cmath>
 
-#include "wpi/util/SymbolExports.hpp"
-
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/math.hpp"
+#include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
 /**

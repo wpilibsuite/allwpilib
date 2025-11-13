@@ -4,9 +4,8 @@
 
 #include "wpi/math/kinematics/struct/DifferentialDriveWheelAccelerationsStruct.hpp"
 
-#include "wpi/util/struct/Struct.hpp"
-
 #include "wpi/math/kinematics/DifferentialDriveWheelAccelerations.hpp"
+#include "wpi/util/struct/Struct.hpp"
 
 wpi::math::DifferentialDriveWheelAccelerations
 wpi::util::Struct<wpi::math::DifferentialDriveWheelAccelerations>::Unpack(

@@ -4,13 +4,12 @@
 
 #pragma once
 
-#include "wpi/util/SymbolExports.hpp"
-
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angular_acceleration.hpp"
+#include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
 /**

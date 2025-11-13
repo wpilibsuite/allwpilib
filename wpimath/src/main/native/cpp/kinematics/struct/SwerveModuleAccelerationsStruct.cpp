@@ -4,9 +4,8 @@
 
 #include "wpi/math/kinematics/struct/SwerveModuleAccelerationsStruct.hpp"
 
-#include "wpi/util/struct/Struct.hpp"
-
 #include "wpi/math/kinematics/SwerveModuleAccelerations.hpp"
+#include "wpi/util/struct/Struct.hpp"
 
 wpi::math::SwerveModuleAccelerations
 wpi::util::Struct<wpi::math::SwerveModuleAccelerations>::Unpack(
