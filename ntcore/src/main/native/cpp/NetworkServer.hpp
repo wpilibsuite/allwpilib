@@ -7,6 +7,7 @@
 #include <atomic>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -19,6 +20,7 @@
 #include "wpi/net/uv/Idle.hpp"
 #include "wpi/net/uv/Timer.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/net/MulticastServiceAnnouncer.h"
 
 namespace wpi::util {
 class Logger;
@@ -35,9 +37,10 @@ class IConnectionList;
 class NetworkServer {
  public:
   NetworkServer(std::string_view persistentFilename,
-                std::string_view listenAddress, unsigned int port,
-                net::ILocalStorage& localStorage, IConnectionList& connList,
-                wpi::util::Logger& logger, std::function<void()> initDone);
+                std::string_view listenAddress, std::string_view mdnsService,
+                unsigned int port, net::ILocalStorage& localStorage,
+                IConnectionList& connList, wpi::util::Logger& logger,
+                std::function<void(bool)> initDone);
   ~NetworkServer();
 
   void FlushLocal();
@@ -57,13 +60,15 @@ class NetworkServer {
   net::ILocalStorage& m_localStorage;
   IConnectionList& m_connList;
   wpi::util::Logger& m_logger;
-  std::function<void()> m_initDone;
+  std::function<void(bool)> m_initDone;
   std::string m_persistentData;
   std::string m_persistentFilename;
   std::string m_listenAddress;
+  std::string m_mdnsService;
   unsigned int m_port;
 
   // used only from loop
+  std::optional<wpi::net::MulticastServiceAnnouncer> m_mdnsAnnouncer;
   std::shared_ptr<wpi::net::uv::Timer> m_readLocalTimer;
   std::shared_ptr<wpi::net::uv::Timer> m_savePersistentTimer;
   std::shared_ptr<wpi::net::uv::Async<>> m_flushLocal;

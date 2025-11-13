@@ -253,17 +253,19 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
 }
 
 NetworkServer::NetworkServer(std::string_view persistentFilename,
-                             std::string_view listenAddress, unsigned int port,
+                             std::string_view listenAddress,
+                             std::string_view mdnsService, unsigned int port,
                              net::ILocalStorage& localStorage,
                              IConnectionList& connList,
                              wpi::util::Logger& logger,
-                             std::function<void()> initDone)
+                             std::function<void(bool)> initDone)
     : m_localStorage{localStorage},
       m_connList{connList},
       m_logger{logger},
       m_initDone{std::move(initDone)},
       m_persistentFilename{persistentFilename},
       m_listenAddress{wpi::util::trim(listenAddress)},
+      m_mdnsService{wpi::util::trim(mdnsService)},
       m_port{port},
       m_serverImpl{logger},
       m_localQueue{logger},
@@ -462,9 +464,24 @@ void NetworkServer::Init() {
     tcp4->Listen();
   }
 
+  bool announcingmDNS = false;
+  if (!m_mdnsService.empty()) {
+    m_mdnsAnnouncer.emplace(m_mdnsService, "_networktables._tcp", m_port);
+    if (!m_mdnsAnnouncer->HasImplementation()) {
+      WARN("mDNS service announcer not available; cannot announce '{}'",
+           m_mdnsService);
+      m_mdnsAnnouncer.reset();
+    } else {
+      m_mdnsAnnouncer->Start();
+      announcingmDNS = true;
+      INFO("mDNS announcing as service '{}' on port {}", m_mdnsService,
+             m_port);
+    }
+  }
+
   if (m_initDone) {
     DEBUG4("NetworkServer initDone()");
-    m_initDone();
+    m_initDone(announcingmDNS);
     m_initDone = nullptr;
   }
 }
