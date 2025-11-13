@@ -102,5 +102,5 @@ TEST(ElevatorSimTest, CurrentDraw) {
   sim.SetInputVoltage(motor.Voltage(motor.Torque(60_A), 0_rad_per_s));
   sim.Update(100_ms);
   // current draw should start at 60 A and decrease as the back emf catches up
-  EXPECT_TRUE(sim.GetCurrentDraw() < 60_A);
+  EXPECT_TRUE(0_A < sim.getCurrentDraw() && sim.GetCurrentDraw() < 60_A);
 }
