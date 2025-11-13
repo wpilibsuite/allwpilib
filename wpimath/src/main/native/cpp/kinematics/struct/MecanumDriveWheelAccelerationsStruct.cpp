@@ -2,39 +2,39 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/kinematics/struct/MecanumDriveWheelAccelerationsStruct.h"
+#include "wpi/math/kinematics/struct/MecanumDriveWheelAccelerationsStruct.hpp"
 
-#include <wpi/struct/Struct.h>
+#include <wpi/util/struct/Struct.hpp>
 
-#include "frc/kinematics/MecanumDriveWheelAccelerations.h"
+#include "wpi/math/kinematics/MecanumDriveWheelAccelerations.hpp"
 
-frc::MecanumDriveWheelAccelerations
-wpi::Struct<frc::MecanumDriveWheelAccelerations>::Unpack(
+wpi::math::MecanumDriveWheelAccelerations
+wpi::util::Struct<wpi::math::MecanumDriveWheelAccelerations>::Unpack(
     std::span<const uint8_t> data) {
   constexpr size_t kFrontLeftOff = 0;
   constexpr size_t kFrontRightOff = kFrontLeftOff + 8;
   constexpr size_t kRearLeftOff = kFrontRightOff + 8;
   constexpr size_t kRearRightOff = kRearLeftOff + 8;
-  return frc::MecanumDriveWheelAccelerations{
+  return wpi::math::MecanumDriveWheelAccelerations{
       units::meters_per_second_squared_t{
-          wpi::UnpackStruct<double, kFrontLeftOff>(data)},
+          wpi::util::UnpackStruct<double, kFrontLeftOff>(data)},
       units::meters_per_second_squared_t{
-          wpi::UnpackStruct<double, kFrontRightOff>(data)},
+          wpi::util::UnpackStruct<double, kFrontRightOff>(data)},
       units::meters_per_second_squared_t{
-          wpi::UnpackStruct<double, kRearLeftOff>(data)},
+          wpi::util::UnpackStruct<double, kRearLeftOff>(data)},
       units::meters_per_second_squared_t{
-          wpi::UnpackStruct<double, kRearRightOff>(data)},
+          wpi::util::UnpackStruct<double, kRearRightOff>(data)},
   };
 }
 
-void wpi::Struct<frc::MecanumDriveWheelAccelerations>::Pack(
-    std::span<uint8_t> data, const frc::MecanumDriveWheelAccelerations& value) {
+void wpi::util::Struct<wpi::math::MecanumDriveWheelAccelerations>::Pack(
+    std::span<uint8_t> data, const wpi::math::MecanumDriveWheelAccelerations& value) {
   constexpr size_t kFrontLeftOff = 0;
   constexpr size_t kFrontRightOff = kFrontLeftOff + 8;
   constexpr size_t kRearLeftOff = kFrontRightOff + 8;
   constexpr size_t kRearRightOff = kRearLeftOff + 8;
-  wpi::PackStruct<kFrontLeftOff>(data, value.frontLeft.value());
-  wpi::PackStruct<kFrontRightOff>(data, value.frontRight.value());
-  wpi::PackStruct<kRearLeftOff>(data, value.rearLeft.value());
-  wpi::PackStruct<kRearRightOff>(data, value.rearRight.value());
+  wpi::util::PackStruct<kFrontLeftOff>(data, value.frontLeft.value());
+  wpi::util::PackStruct<kFrontRightOff>(data, value.frontRight.value());
+  wpi::util::PackStruct<kRearLeftOff>(data, value.rearLeft.value());
+  wpi::util::PackStruct<kRearRightOff>(data, value.rearRight.value());
 }

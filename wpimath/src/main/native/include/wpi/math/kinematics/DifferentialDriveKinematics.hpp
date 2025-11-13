@@ -7,7 +7,9 @@
 #include <type_traits>
 
 #include "wpi/math/geometry/Twist2d.hpp"
+#include "wpi/math/kinematics/ChassisAccelerations.hpp"
 #include "wpi/math/kinematics/ChassisSpeeds.hpp"
+#include "wpi/math/kinematics/DifferentialDriveWheelAccelerations.hpp"
 #include "wpi/math/kinematics/DifferentialDriveWheelPositions.hpp"
 #include "wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp"
 #include "wpi/math/kinematics/Kinematics.hpp"

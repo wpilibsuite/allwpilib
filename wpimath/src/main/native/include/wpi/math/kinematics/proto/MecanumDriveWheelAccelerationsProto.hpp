@@ -7,18 +7,18 @@
 #include <wpi/util/SymbolExports.hpp>
 #include <wpi/util/protobuf/Protobuf.hpp>
 
-#include "wpi/math/kinematics/MecanumDriveWheelAccelerations.h"
+#include "wpi/math/kinematics/MecanumDriveWheelAccelerations.hpp"
 #include "wpimath/protobuf/kinematics.npb.h"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Protobuf<frc::MecanumDriveWheelAccelerations> {
+struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::MecanumDriveWheelAccelerations> {
   using MessageStruct = wpi_proto_ProtobufMecanumDriveWheelAccelerations;
   using InputStream =
-      wpi::ProtoInputStream<frc::MecanumDriveWheelAccelerations>;
+      wpi::util::ProtoInputStream<wpi::math::MecanumDriveWheelAccelerations>;
   using OutputStream =
-      wpi::ProtoOutputStream<frc::MecanumDriveWheelAccelerations>;
-  static std::optional<frc::MecanumDriveWheelAccelerations> Unpack(
+      wpi::util::ProtoOutputStream<wpi::math::MecanumDriveWheelAccelerations>;
+  static std::optional<wpi::math::MecanumDriveWheelAccelerations> Unpack(
       InputStream& stream);
   static bool Pack(OutputStream& stream,
-                   const frc::MecanumDriveWheelAccelerations& value);
+                   const wpi::math::MecanumDriveWheelAccelerations& value);
 };

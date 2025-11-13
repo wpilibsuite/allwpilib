@@ -2,12 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/kinematics/MecanumDriveWheelAccelerations.hpp"
+
 #include <gtest/gtest.h>
 
-#include "frc/kinematics/MecanumDriveWheelAccelerations.h"
-#include "units/acceleration.h"
+#include "wpi/units/acceleration.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 static constexpr double kEpsilon = 1E-9;
 

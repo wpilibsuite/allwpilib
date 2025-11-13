@@ -11,11 +11,11 @@
 #include "wpimath/protobuf/kinematics.npb.h"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Protobuf<frc::ChassisAccelerations> {
+struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::ChassisAccelerations> {
   using MessageStruct = wpi_proto_ProtobufChassisAccelerations;
-  using InputStream = wpi::ProtoInputStream<frc::ChassisAccelerations>;
-  using OutputStream = wpi::ProtoOutputStream<frc::ChassisAccelerations>;
-  static std::optional<frc::ChassisAccelerations> Unpack(InputStream& stream);
+  using InputStream = wpi::util::ProtoInputStream<wpi::math::ChassisAccelerations>;
+  using OutputStream = wpi::util::ProtoOutputStream<wpi::math::ChassisAccelerations>;
+  static std::optional<wpi::math::ChassisAccelerations> Unpack(InputStream& stream);
   static bool Pack(OutputStream& stream,
-                   const frc::ChassisAccelerations& value);
+                   const wpi::math::ChassisAccelerations& value);
 };

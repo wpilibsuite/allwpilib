@@ -6,13 +6,13 @@
 
 #include <wpi/util/SymbolExports.hpp>
 
-#include "wpi/math/MathUtil.h"
-#include "wpi/math/geometry/Rotation2d.h"
-#include "wpi/math/geometry/Translation2d.h"
-#include "wpi/units/acceleration.h"
-#include "wpi/units/angular_acceleration.h"
+#include "wpi/math/util/MathUtil.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angular_acceleration.hpp"
 
-namespace frc {
+namespace wpi::math {
 /**
  * Represents the acceleration of a robot chassis. Although this struct contains
  * similar members compared to a ChassisSpeeds, they do NOT represent the same
@@ -161,7 +161,7 @@ struct WPILIB_DLLEXPORT ChassisAccelerations {
    */
   constexpr bool operator==(const ChassisAccelerations& other) const = default;
 };
-}  // namespace frc
+}  // namespace wpi::math
 
-#include "frc/kinematics/proto/ChassisAccelerationsProto.h"
-#include "frc/kinematics/struct/ChassisAccelerationsStruct.h"
+#include "wpi/math/kinematics/proto/ChassisAccelerationsProto.hpp"
+#include "wpi/math/kinematics/struct/ChassisAccelerationsStruct.hpp"

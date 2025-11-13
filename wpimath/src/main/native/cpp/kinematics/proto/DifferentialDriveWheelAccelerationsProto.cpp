@@ -2,26 +2,26 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/kinematics/proto/DifferentialDriveWheelAccelerationsProto.h"
+#include "wpi/math/kinematics/proto/DifferentialDriveWheelAccelerationsProto.hpp"
 
 #include "wpimath/protobuf/kinematics.npb.h"
 
-std::optional<frc::DifferentialDriveWheelAccelerations> wpi::Protobuf<
-    frc::DifferentialDriveWheelAccelerations>::Unpack(InputStream& stream) {
+std::optional<wpi::math::DifferentialDriveWheelAccelerations> wpi::util::Protobuf<
+    wpi::math::DifferentialDriveWheelAccelerations>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufDifferentialDriveWheelAccelerations msg;
   if (!stream.Decode(msg)) {
     return {};
   }
 
-  return frc::DifferentialDriveWheelAccelerations{
+  return wpi::math::DifferentialDriveWheelAccelerations{
       units::meters_per_second_squared_t{msg.left},
       units::meters_per_second_squared_t{msg.right},
   };
 }
 
-bool wpi::Protobuf<frc::DifferentialDriveWheelAccelerations>::Pack(
+bool wpi::util::Protobuf<wpi::math::DifferentialDriveWheelAccelerations>::Pack(
     OutputStream& stream,
-    const frc::DifferentialDriveWheelAccelerations& value) {
+    const wpi::math::DifferentialDriveWheelAccelerations& value) {
   wpi_proto_ProtobufDifferentialDriveWheelAccelerations msg{
       .left = value.left.value(),
       .right = value.right.value(),

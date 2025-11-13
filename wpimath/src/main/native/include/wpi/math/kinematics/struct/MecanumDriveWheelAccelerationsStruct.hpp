@@ -7,10 +7,10 @@
 #include <wpi/util/SymbolExports.hpp>
 #include <wpi/util/struct/Struct.hpp>
 
-#include "wpi/math/kinematics/MecanumDriveWheelAccelerations.h"
+#include "wpi/math/kinematics/MecanumDriveWheelAccelerations.hpp"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Struct<frc::MecanumDriveWheelAccelerations> {
+struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::MecanumDriveWheelAccelerations> {
   static constexpr std::string_view GetTypeName() {
     return "MecanumDriveWheelAccelerations";
   }
@@ -20,10 +20,10 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::MecanumDriveWheelAccelerations> {
            "rear_right";
   }
 
-  static frc::MecanumDriveWheelAccelerations Unpack(
+  static wpi::math::MecanumDriveWheelAccelerations Unpack(
       std::span<const uint8_t> data);
   static void Pack(std::span<uint8_t> data,
-                   const frc::MecanumDriveWheelAccelerations& value);
+                   const wpi::math::MecanumDriveWheelAccelerations& value);
 };
 
-static_assert(wpi::StructSerializable<frc::MecanumDriveWheelAccelerations>);
+static_assert(wpi::util::StructSerializable<wpi::math::MecanumDriveWheelAccelerations>);

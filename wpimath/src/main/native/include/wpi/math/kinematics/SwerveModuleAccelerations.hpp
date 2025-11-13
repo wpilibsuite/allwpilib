@@ -10,7 +10,7 @@
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/math.hpp"
 
-namespace frc {
+namespace wpi::math {
 /**
  * Represents the accelerations of one swerve module.
  */
@@ -107,7 +107,7 @@ struct WPILIB_DLLEXPORT SwerveModuleAccelerations {
     return operator*(1.0 / scalar);
   }
 };
-}  // namespace frc
+}  // namespace wpi::math
 
-#include "frc/kinematics/proto/SwerveModuleAccelerationsProto.h"
-#include "frc/kinematics/struct/SwerveModuleAccelerationsStruct.h"
+#include "wpi/math/kinematics/proto/SwerveModuleAccelerationsProto.hpp"
+#include "wpi/math/kinematics/struct/SwerveModuleAccelerationsStruct.hpp"

@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/kinematics/proto/SwerveModuleAccelerationsProto.h"
+#include "wpi/math/kinematics/proto/SwerveModuleAccelerationsProto.hpp"
 
-#include <wpi/protobuf/ProtobufCallbacks.h>
+#include <wpi/util/protobuf/ProtobufCallbacks.hpp>
 
 #include "wpimath/protobuf/kinematics.npb.h"
 
-std::optional<frc::SwerveModuleAccelerations>
-wpi::Protobuf<frc::SwerveModuleAccelerations>::Unpack(InputStream& stream) {
-  wpi::UnpackCallback<frc::Rotation2d> angle;
+std::optional<wpi::math::SwerveModuleAccelerations>
+wpi::util::Protobuf<wpi::math::SwerveModuleAccelerations>::Unpack(InputStream& stream) {
+  wpi::util::UnpackCallback<wpi::math::Rotation2d> angle;
   wpi_proto_ProtobufSwerveModuleAccelerations msg{
       .acceleration = 0,
       .angle = angle.Callback(),
@@ -25,15 +25,15 @@ wpi::Protobuf<frc::SwerveModuleAccelerations>::Unpack(InputStream& stream) {
     return {};
   }
 
-  return frc::SwerveModuleAccelerations{
+  return wpi::math::SwerveModuleAccelerations{
       units::meters_per_second_squared_t{msg.acceleration},
       iangle[0],
   };
 }
 
-bool wpi::Protobuf<frc::SwerveModuleAccelerations>::Pack(
-    OutputStream& stream, const frc::SwerveModuleAccelerations& value) {
-  wpi::PackCallback angle{&value.angle};
+bool wpi::util::Protobuf<wpi::math::SwerveModuleAccelerations>::Pack(
+    OutputStream& stream, const wpi::math::SwerveModuleAccelerations& value) {
+  wpi::util::PackCallback angle{&value.angle};
   wpi_proto_ProtobufSwerveModuleAccelerations msg{
       .acceleration = value.acceleration.value(),
       .angle = angle.Callback(),

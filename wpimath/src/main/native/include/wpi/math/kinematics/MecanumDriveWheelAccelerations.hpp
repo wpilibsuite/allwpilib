@@ -13,7 +13,7 @@
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/math.hpp"
 
-namespace frc {
+namespace wpi::math {
 /**
  * Represents the wheel accelerations for a mecanum drive drivetrain.
  */
@@ -120,7 +120,7 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelAccelerations {
   constexpr bool operator==(const MecanumDriveWheelAccelerations& other) const =
       default;
 };
-}  // namespace frc
+}  // namespace wpi::math
 
-#include "frc/kinematics/proto/MecanumDriveWheelAccelerationsProto.h"
-#include "frc/kinematics/struct/MecanumDriveWheelAccelerationsStruct.h"
+#include "wpi/math/kinematics/proto/MecanumDriveWheelAccelerationsProto.hpp"
+#include "wpi/math/kinematics/struct/MecanumDriveWheelAccelerationsStruct.hpp"

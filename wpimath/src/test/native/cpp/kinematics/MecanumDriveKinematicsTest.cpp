@@ -274,7 +274,7 @@ TEST_F(MecanumDriveKinematicsTest, StrafeForwardAccelerations) {
 TEST_F(MecanumDriveKinematicsTest, RotationInverseAccelerations) {
   ChassisAccelerations accelerations{
       0_mps_sq, 0_mps_sq,
-      units::radians_per_second_squared_t{2 * std::numbers::pi}};
+      wpi::units::radians_per_second_squared_t{2 * std::numbers::pi}};
   auto wheelAccelerations = kinematics.ToWheelAccelerations(accelerations);
 
   EXPECT_NEAR(-150.79645, wheelAccelerations.frontLeft.value(), 0.1);

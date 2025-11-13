@@ -2,15 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/kinematics/ChassisAccelerations.hpp"
+
 #include <numbers>
 
 #include <gtest/gtest.h>
 
-#include "frc/kinematics/ChassisAccelerations.h"
-#include "units/acceleration.h"
-#include "units/angular_acceleration.h"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angular_acceleration.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 static constexpr double kEpsilon = 1E-9;
 

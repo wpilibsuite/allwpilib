@@ -9,6 +9,7 @@
 #include <gtest/gtest.h>
 
 #include "wpi/math/kinematics/ChassisSpeeds.hpp"
+#include "wpi/math/kinematics/ChassisAccelerations.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/velocity.hpp"
@@ -125,7 +126,7 @@ TEST(DifferentialDriveKinematicsTest, InverseAccelerationsForRotateInPlace) {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const ChassisAccelerations chassisAccelerations{
       0.0_mps_sq, 0.0_mps_sq,
-      units::radians_per_second_squared_t{std::numbers::pi}};
+      wpi::units::radians_per_second_squared_t{std::numbers::pi}};
   const auto wheelAccelerations =
       kinematics.ToWheelAccelerations(chassisAccelerations);
 
@@ -138,8 +139,8 @@ TEST(DifferentialDriveKinematicsTest, InverseAccelerationsForRotateInPlace) {
 TEST(DifferentialDriveKinematicsTest, ForwardAccelerationsForRotateInPlace) {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const DifferentialDriveWheelAccelerations wheelAccelerations{
-      units::meters_per_second_squared_t{+0.381 * std::numbers::pi},
-      units::meters_per_second_squared_t{-0.381 * std::numbers::pi}};
+      wpi::units::meters_per_second_squared_t{+0.381 * std::numbers::pi},
+      wpi::units::meters_per_second_squared_t{-0.381 * std::numbers::pi}};
   const auto chassisAccelerations =
       kinematics.ToChassisAccelerations(wheelAccelerations);
 

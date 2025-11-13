@@ -9,7 +9,7 @@
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/math.hpp"
 
-namespace frc {
+namespace wpi::math {
 /**
  * Represents the wheel accelerations for a differential drive drivetrain.
  */
@@ -108,7 +108,7 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelAccelerations {
   constexpr bool operator==(
       const DifferentialDriveWheelAccelerations& other) const = default;
 };
-}  // namespace frc
+}  // namespace wpi::math
 
-#include "frc/kinematics/proto/DifferentialDriveWheelAccelerationsProto.h"
-#include "frc/kinematics/struct/DifferentialDriveWheelAccelerationsStruct.h"
+#include "wpi/math/kinematics/proto/DifferentialDriveWheelAccelerationsProto.hpp"
+#include "wpi/math/kinematics/struct/DifferentialDriveWheelAccelerationsStruct.hpp"

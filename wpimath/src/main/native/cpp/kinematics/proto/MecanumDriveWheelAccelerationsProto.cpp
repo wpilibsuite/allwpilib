@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/kinematics/proto/MecanumDriveWheelAccelerationsProto.h"
+#include "wpi/math/kinematics/proto/MecanumDriveWheelAccelerationsProto.hpp"
 
 #include "wpimath/protobuf/kinematics.npb.h"
 
-std::optional<frc::MecanumDriveWheelAccelerations> wpi::Protobuf<
-    frc::MecanumDriveWheelAccelerations>::Unpack(InputStream& stream) {
+std::optional<wpi::math::MecanumDriveWheelAccelerations> wpi::util::Protobuf<
+    wpi::math::MecanumDriveWheelAccelerations>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufMecanumDriveWheelAccelerations msg;
   if (!stream.Decode(msg)) {
     return {};
   }
 
-  return frc::MecanumDriveWheelAccelerations{
+  return wpi::math::MecanumDriveWheelAccelerations{
       units::meters_per_second_squared_t{msg.front_left},
       units::meters_per_second_squared_t{msg.front_right},
       units::meters_per_second_squared_t{msg.rear_left},
@@ -21,8 +21,8 @@ std::optional<frc::MecanumDriveWheelAccelerations> wpi::Protobuf<
   };
 }
 
-bool wpi::Protobuf<frc::MecanumDriveWheelAccelerations>::Pack(
-    OutputStream& stream, const frc::MecanumDriveWheelAccelerations& value) {
+bool wpi::util::Protobuf<wpi::math::MecanumDriveWheelAccelerations>::Pack(
+    OutputStream& stream, const wpi::math::MecanumDriveWheelAccelerations& value) {
   wpi_proto_ProtobufMecanumDriveWheelAccelerations msg{
       .front_left = value.frontLeft.value(),
       .front_right = value.frontRight.value(),

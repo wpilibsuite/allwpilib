@@ -7,16 +7,16 @@
 #include <wpi/util/SymbolExports.hpp>
 #include <wpi/util/protobuf/Protobuf.hpp>
 
-#include "wpi/math/kinematics/SwerveModuleAccelerations.h"
+#include "wpi/math/kinematics/SwerveModuleAccelerations.hpp"
 #include "wpimath/protobuf/kinematics.npb.h"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Protobuf<frc::SwerveModuleAccelerations> {
+struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::SwerveModuleAccelerations> {
   using MessageStruct = wpi_proto_ProtobufSwerveModuleAccelerations;
-  using InputStream = wpi::ProtoInputStream<frc::SwerveModuleAccelerations>;
-  using OutputStream = wpi::ProtoOutputStream<frc::SwerveModuleAccelerations>;
-  static std::optional<frc::SwerveModuleAccelerations> Unpack(
+  using InputStream = wpi::util::ProtoInputStream<wpi::math::SwerveModuleAccelerations>;
+  using OutputStream = wpi::util::ProtoOutputStream<wpi::math::SwerveModuleAccelerations>;
+  static std::optional<wpi::math::SwerveModuleAccelerations> Unpack(
       InputStream& stream);
   static bool Pack(OutputStream& stream,
-                   const frc::SwerveModuleAccelerations& value);
+                   const wpi::math::SwerveModuleAccelerations& value);
 };

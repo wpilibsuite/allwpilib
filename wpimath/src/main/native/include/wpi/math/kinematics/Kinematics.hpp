@@ -5,6 +5,7 @@
 #pragma once
 
 #include "wpi/math/geometry/Twist2d.hpp"
+#include "wpi/math/kinematics/ChassisAccelerations.hpp"
 #include "wpi/math/kinematics/ChassisSpeeds.hpp"
 #include "wpi/util/SymbolExports.hpp"
 

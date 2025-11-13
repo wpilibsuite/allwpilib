@@ -99,9 +99,10 @@ ChassisAccelerations MecanumDriveKinematics::ToChassisAccelerations(
   Eigen::Vector3d chassisAccelerationsVector =
       m_forwardKinematics.solve(wheelAccelerationsVector);
 
-  return {wpi::units::meters_per_second_squared_t{chassisAccelerationsVector(0)},
-          wpi::units::meters_per_second_squared_t{chassisAccelerationsVector(1)},
-          wpi::units::radians_per_second_squared_t{chassisAccelerationsVector(2)}};
+  return {
+      wpi::units::meters_per_second_squared_t{chassisAccelerationsVector(0)},
+      wpi::units::meters_per_second_squared_t{chassisAccelerationsVector(1)},
+      wpi::units::radians_per_second_squared_t{chassisAccelerationsVector(2)}};
 }
 
 MecanumDriveWheelAccelerations MecanumDriveKinematics::ToWheelAccelerations(

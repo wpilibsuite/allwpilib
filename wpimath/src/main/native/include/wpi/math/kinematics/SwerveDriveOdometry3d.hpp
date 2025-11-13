@@ -30,9 +30,10 @@ namespace wpi::math {
  */
 template <size_t NumModules>
 class SwerveDriveOdometry3d
-    : public Odometry3d<wpi::util::array<SwerveModuleState, NumModules>,
-                        wpi::util::array<SwerveModulePosition, NumModules>,
-                        wpi::util::array<SwerveModuleAccelerations, NumModules>> {
+    : public Odometry3d<
+          wpi::util::array<SwerveModuleState, NumModules>,
+          wpi::util::array<SwerveModulePosition, NumModules>,
+          wpi::util::array<SwerveModuleAccelerations, NumModules>> {
  public:
   /**
    * Constructs a SwerveDriveOdometry3d object.

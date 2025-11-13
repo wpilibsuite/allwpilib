@@ -7,10 +7,10 @@
 #include <wpi/util/SymbolExports.hpp>
 #include <wpi/util/struct/Struct.hpp>
 
-#include "wpi/math/kinematics/DifferentialDriveWheelAccelerations.h"
+#include "wpi/math/kinematics/DifferentialDriveWheelAccelerations.hpp"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Struct<frc::DifferentialDriveWheelAccelerations> {
+struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::DifferentialDriveWheelAccelerations> {
   static constexpr std::string_view GetTypeName() {
     return "DifferentialDriveWheelAccelerations";
   }
@@ -19,11 +19,11 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::DifferentialDriveWheelAccelerations> {
     return "double left;double right";
   }
 
-  static frc::DifferentialDriveWheelAccelerations Unpack(
+  static wpi::math::DifferentialDriveWheelAccelerations Unpack(
       std::span<const uint8_t> data);
   static void Pack(std::span<uint8_t> data,
-                   const frc::DifferentialDriveWheelAccelerations& value);
+                   const wpi::math::DifferentialDriveWheelAccelerations& value);
 };
 
 static_assert(
-    wpi::StructSerializable<frc::DifferentialDriveWheelAccelerations>);
+    wpi::util::StructSerializable<wpi::math::DifferentialDriveWheelAccelerations>);

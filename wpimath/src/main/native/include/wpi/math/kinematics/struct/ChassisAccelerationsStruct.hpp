@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include <wpi/util/SymbolExports.h>
-#include <wpi/util/struct/Struct.h>
+#include <wpi/util/SymbolExports.hpp>
+#include <wpi/util/struct/Struct.hpp>
 
-#include "wpi/math/kinematics/ChassisAccelerations.h"
+#include "wpi/math/kinematics/ChassisAccelerations.hpp"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Struct<frc::ChassisAccelerations> {
+struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::ChassisAccelerations> {
   static constexpr std::string_view GetTypeName() {
     return "ChassisAccelerations";
   }
@@ -19,9 +19,9 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::ChassisAccelerations> {
     return "double ax;double ay;double alpha";
   }
 
-  static frc::ChassisAccelerations Unpack(std::span<const uint8_t> data);
+  static wpi::math::ChassisAccelerations Unpack(std::span<const uint8_t> data);
   static void Pack(std::span<uint8_t> data,
-                   const frc::ChassisAccelerations& value);
+                   const wpi::math::ChassisAccelerations& value);
 };
 
-static_assert(wpi::StructSerializable<frc::ChassisAccelerations>);
+static_assert(wpi::util::StructSerializable<wpi::math::ChassisAccelerations>);

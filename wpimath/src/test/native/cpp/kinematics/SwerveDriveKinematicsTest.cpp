@@ -314,8 +314,8 @@ TEST_F(SwerveDriveKinematicsTest, DesaturateNegativeSpeed) {
 TEST_F(SwerveDriveKinematicsTest, TurnInPlaceInverseAccelerations) {
   ChassisAccelerations accelerations{
       0_mps_sq, 0_mps_sq,
-      units::radians_per_second_squared_t{2 * std::numbers::pi}};
-  units::radians_per_second_t angularVelocity = 2_rad_per_s * std::numbers::pi;
+      wpi::units::radians_per_second_squared_t{2 * std::numbers::pi}};
+  wpi::units::radians_per_second_t angularVelocity = 2_rad_per_s * std::numbers::pi;
   auto [flAccel, frAccel, blAccel, brAccel] =
       m_kinematics.ToSwerveModuleAccelerations(accelerations, angularVelocity);
 
@@ -413,7 +413,7 @@ TEST_F(SwerveDriveKinematicsTest, TurnInPlaceForwardAccelerations) {
 TEST_F(SwerveDriveKinematicsTest, OffCenterRotationInverseAccelerations) {
   ChassisAccelerations accelerations{0_mps_sq, 0_mps_sq, 1_rad_per_s_sq};
   // For this test, assume an angular velocity of 1 rad/s
-  units::radians_per_second_t angularVelocity = 1.0_rad_per_s;
+  wpi::units::radians_per_second_t angularVelocity = 1.0_rad_per_s;
   auto [flAccel, frAccel, blAccel, brAccel] =
       m_kinematics.ToSwerveModuleAccelerations(accelerations, angularVelocity,
                                                m_fl);
