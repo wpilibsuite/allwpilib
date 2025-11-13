@@ -342,12 +342,14 @@ TEST_F(SwerveDriveKinematicsTest, TurnInPlaceInverseAccelerations) {
   //                                         = √(106.63² + 668.7²) = 678.4 m/s²
   //
   // For module positions:
-  // FL (12, 12):   radius angle = 135°, tangential = 45°,  centripetal =
-  // -135° → total angle = -144° FR (12, -12):  radius angle = 45°, tangential =
-  // -45°, centripetal = -135° → total angle = 126° BL (-12, 12):  radius angle
-  // = 135°, tangential = 45°,  centripetal = 45°   → total angle = -54° BR
-  // (-12, -12): radius angle = -45°, tangential = 45°,  centripetal = 135°  →
-  // total angle = 36°
+  // FL (12, 12): radius angle = 135°, tangential = 45°, centripetal = -135° →
+  //              total angle = -144°
+  // FR (12, -12): radius angle = 45°, tangential = -45°, centripetal = -135° →
+  //               total angle = 126°
+  // BL (-12, 12): radius angle = 135°, tangential = 45°, centripetal = 45° →
+  //               total angle = -54°
+  // BR (-12, -12): radius angle = -45°, tangential = 45°, centripetal = 135° →
+  //                total angle = 36°
   //
   // The acceleration angles are not simply tangential because the centripetal
   // component from the existing angular velocity dominates and affects the
