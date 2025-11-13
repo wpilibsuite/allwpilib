@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/path/TravelingSalesman.hpp"
+
 #include <cassert>
 #include <span>
 #include <vector>
@@ -11,7 +13,6 @@
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
-#include "wpi/math/path/TravelingSalesman.hpp"
 #include "wpi/util/array.hpp"
 #include "wpi/util/circular_buffer.hpp"
 

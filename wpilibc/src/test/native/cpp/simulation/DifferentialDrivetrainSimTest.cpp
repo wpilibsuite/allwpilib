@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/simulation/DifferentialDrivetrainSim.hpp"
+
 #include <gtest/gtest.h>
 
 #include "wpi/math/controller/LTVUnicycleController.hpp"
@@ -12,7 +14,6 @@
 #include "wpi/math/system/plant/LinearSystemId.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 #include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
-#include "wpi/simulation/DifferentialDrivetrainSim.hpp"
 #include "wpi/units/current.hpp"
 #include "wpi/units/math.hpp"
 #include "wpi/units/moment_of_inertia.hpp"

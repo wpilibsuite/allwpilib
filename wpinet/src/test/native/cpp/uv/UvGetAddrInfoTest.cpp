@@ -23,7 +23,9 @@
  * IN THE SOFTWARE.
  */
 
-#include "wpi/net/uv/GetAddrInfo.hpp"  // NOLINT(build/include_order)
+// clang-format off
+#include "wpi/net/uv/GetAddrInfo.hpp"
+// clang-format on
 
 #include <gtest/gtest.h>
 

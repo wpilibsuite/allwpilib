@@ -2,16 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_ASYNC_HPP_
-#define WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_ASYNC_HPP_
-
-#include <uv.h>
+#pragma once
 
 #include <memory>
 #include <thread>
 #include <tuple>
 #include <utility>
 #include <vector>
+
+#include <uv.h>
 
 #include "wpi/net/uv/Handle.hpp"
 #include "wpi/net/uv/Loop.hpp"
@@ -197,5 +196,3 @@ class Async<> final : public HandleImpl<Async<>, uv_async_t> {
 };
 
 }  // namespace wpi::net::uv
-
-#endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_ASYNC_HPP_

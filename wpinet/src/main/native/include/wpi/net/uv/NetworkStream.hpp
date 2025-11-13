@@ -2,14 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_NETWORKSTREAM_HPP_
-#define WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_NETWORKSTREAM_HPP_
-
-#include <uv.h>
+#pragma once
 
 #include <cstdlib>
 #include <functional>
 #include <memory>
+
+#include <uv.h>
 
 #include "wpi/net/uv/Stream.hpp"
 #include "wpi/util/Signal.h"
@@ -149,5 +148,3 @@ class NetworkStreamImpl : public NetworkStream {
 };
 
 }  // namespace wpi::net::uv
-
-#endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_UV_NETWORKSTREAM_HPP_

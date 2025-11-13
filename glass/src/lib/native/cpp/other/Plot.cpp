@@ -27,10 +27,6 @@
 #include <imgui_stdlib.h>
 #include <implot.h>
 #include <implot_internal.h>
-#include "wpi/util/Signal.h"
-#include "wpi/util/SmallString.hpp"
-#include "wpi/util/SmallVector.hpp"
-#include "wpi/util/timestamp.h"
 
 #include "wpi/glass/Context.hpp"
 #include "wpi/glass/DataSource.hpp"
@@ -38,6 +34,10 @@
 #include "wpi/glass/support/ColorSetting.hpp"
 #include "wpi/glass/support/EnumSetting.hpp"
 #include "wpi/glass/support/ExtraGuiWidgets.hpp"
+#include "wpi/util/Signal.h"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/timestamp.h"
 
 using namespace wpi::glass;
 

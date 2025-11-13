@@ -8,13 +8,12 @@
 #include <cstring>
 
 #define WPI_RAWFRAME_JNI
-#include "wpi/util/RawFrame.h"
-#include "wpi/util/jni_util.hpp"
-
 #include "org_wpilib_vision_apriltag_jni_AprilTagJNI.h"
 #include "wpi/apriltag/AprilTag.hpp"
 #include "wpi/apriltag/AprilTagDetector.hpp"
 #include "wpi/apriltag/AprilTagPoseEstimator.hpp"
+#include "wpi/util/RawFrame.h"
+#include "wpi/util/jni_util.hpp"
 
 using namespace wpi::apriltag;
 using namespace wpi::util::java;

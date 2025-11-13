@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_RAWSOURCEIMPL_HPP_
-#define CSCORE_RAWSOURCEIMPL_HPP_
+#pragma once
 
 #include <atomic>
 #include <functional>
@@ -33,5 +32,3 @@ class RawSourceImpl : public ConfigurableSourceImpl {
 };
 
 }  // namespace wpi::cs
-
-#endif  // CSCORE_RAWSOURCEIMPL_HPP_

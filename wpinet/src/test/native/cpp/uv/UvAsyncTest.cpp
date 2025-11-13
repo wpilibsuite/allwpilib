@@ -23,7 +23,9 @@
  * IN THE SOFTWARE.
  */
 
-#include "wpi/net/uv/Async.hpp"  // NOLINT(build/include_order)
+// clang-format off
+#include "wpi/net/uv/Async.hpp"
+// clang-format on
 
 #include <atomic>
 #include <functional>

@@ -23,7 +23,9 @@
  * IN THE SOFTWARE.
  */
 
-#include "wpi/net/uv/Loop.hpp"  // NOLINT(build/include_order)
+// clang-format off
+#include "wpi/net/uv/Loop.hpp"
+// clang-format on
 
 #include <gtest/gtest.h>
 

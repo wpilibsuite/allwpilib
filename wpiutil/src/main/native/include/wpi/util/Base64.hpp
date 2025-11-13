@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef WPIUTIL_WPI_UTIL_BASE64_HPP_
-#define WPIUTIL_WPI_UTIL_BASE64_HPP_
+#pragma once
 
 #include <stdint.h>
 
@@ -14,6 +13,7 @@
 #include <vector>
 
 namespace wpi::util {
+
 template <typename T>
 class SmallVectorImpl;
 class raw_ostream;
@@ -45,5 +45,3 @@ std::string_view Base64Encode(std::span<const uint8_t> plain,
                               SmallVectorImpl<char>& buf);
 
 }  // namespace wpi::util
-
-#endif  // WPIUTIL_WPI_UTIL_BASE64_HPP_

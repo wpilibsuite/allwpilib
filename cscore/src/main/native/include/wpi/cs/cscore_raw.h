@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_WPI_CS_CSCORE_RAW_H_
-#define CSCORE_WPI_CS_CSCORE_RAW_H_
+#pragma once
 
 #include <functional>
 
@@ -239,5 +238,3 @@ inline uint64_t RawSink::GrabFrameLastTime(wpi::util::RawFrame& image,
 }  // namespace wpi::cs
 
 #endif
-
-#endif  // CSCORE_WPI_CS_CSCORE_RAW_H_

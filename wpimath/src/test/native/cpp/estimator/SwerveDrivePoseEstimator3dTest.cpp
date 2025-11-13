@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/estimator/SwerveDrivePoseEstimator3d.hpp"
+
 #include <limits>
 #include <random>
 #include <tuple>
@@ -10,7 +12,6 @@
 #include <fmt/format.h>
 #include <gtest/gtest.h>
 
-#include "wpi/math/estimator/SwerveDrivePoseEstimator3d.hpp"
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"

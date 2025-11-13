@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/hal/simulation/AnalogInData.h"
+
 #include <string>
 
 #include <gtest/gtest.h>
@@ -9,7 +11,6 @@
 #include "wpi/hal/AnalogInput.h"
 #include "wpi/hal/HAL.h"
 #include "wpi/hal/handles/HandlesInternal.h"
-#include "wpi/hal/simulation/AnalogInData.h"
 
 namespace wpi::hal {
 

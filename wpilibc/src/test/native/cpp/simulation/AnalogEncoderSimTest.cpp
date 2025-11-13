@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/simulation/AnalogEncoderSim.hpp"
+
 #include <numbers>
 
 #include <gtest/gtest.h>
@@ -9,7 +11,6 @@
 #include "wpi/hal/HAL.h"
 #include "wpi/hardware/discrete/AnalogInput.hpp"
 #include "wpi/hardware/rotation/AnalogEncoder.hpp"
-#include "wpi/simulation/AnalogEncoderSim.hpp"
 #include "wpi/units/math.hpp"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \

@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/util/Alert.hpp"
+
 #include <algorithm>
 #include <chrono>
 #include <map>
@@ -16,7 +18,6 @@
 #include "wpi/nt/StringArrayTopic.hpp"
 #include "wpi/simulation/SimHooks.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
-#include "wpi/util/Alert.hpp"
 
 using namespace wpi;
 using enum Alert::AlertType;

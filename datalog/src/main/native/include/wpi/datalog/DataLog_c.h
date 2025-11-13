@@ -4,8 +4,7 @@
 
 #pragma once
 
-#include <stddef.h>  // NOLINT
-
+#include <stddef.h>
 #include <stdint.h>
 
 #include "wpi/util/string.h"

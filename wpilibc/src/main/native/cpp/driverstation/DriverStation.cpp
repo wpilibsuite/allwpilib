@@ -3,7 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/driverstation/DriverStation.hpp"
-#include "wpi/hal/DriverStation.h"
 
 #include <stdint.h>
 
@@ -17,6 +16,7 @@
 #include <fmt/format.h>
 
 #include "wpi/datalog/DataLog.hpp"
+#include "wpi/hal/DriverStation.h"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/HALBase.h"
 #include "wpi/hal/Power.h"

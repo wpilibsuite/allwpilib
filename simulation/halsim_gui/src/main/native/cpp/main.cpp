@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/hal/Main.h"
+
 #include <cstdio>
 #include <memory>
 #include <string_view>
@@ -26,7 +28,6 @@
 #include "wpi/glass/other/Plot.hpp"
 #include "wpi/gui/wpigui.hpp"
 #include "wpi/hal/Extensions.h"
-#include "wpi/hal/Main.h"
 #include "wpi/halsim/gui/HALSimGui.hpp"
 #include "wpi/halsim/gui/HALSimGuiExt.hpp"
 #include "wpi/halsim/gui/SimDeviceGui.hpp"
