@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <wpi/util/SymbolExports.hpp>
-#include <wpi/util/protobuf/Protobuf.hpp>
+#include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/protobuf/Protobuf.hpp"
 
 #include "wpi/math/kinematics/ChassisAccelerations.hpp"
 #include "wpimath/protobuf/kinematics.npb.h"

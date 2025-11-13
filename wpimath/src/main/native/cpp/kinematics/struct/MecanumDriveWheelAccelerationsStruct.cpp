@@ -4,7 +4,7 @@
 
 #include "wpi/math/kinematics/struct/MecanumDriveWheelAccelerationsStruct.hpp"
 
-#include <wpi/util/struct/Struct.hpp>
+#include "wpi/util/struct/Struct.hpp"
 
 #include "wpi/math/kinematics/MecanumDriveWheelAccelerations.hpp"
 
