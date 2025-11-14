@@ -77,6 +77,12 @@ classes:
 
       Interpolate:
       GetModules:
+      ToSwerveModuleAccelerations:
+      ToWheelAccelerations:
+      ToChassisAccelerations:
+        overloads:
+          ModuleAccelerations&&... [const]:
+          const wpi::util::array<SwerveModuleAccelerations, NumModules>& [const]:
 
     template_inline_code: |
       if constexpr (NumModules == 2) {

@@ -18,6 +18,8 @@ classes:
       ToWheelSpeeds:
       ToTwist2d:
       Interpolate:
+      ToChassisAccelerations:
+      ToWheelAccelerations:
 
 
 templates:

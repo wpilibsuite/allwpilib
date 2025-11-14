@@ -45,6 +45,11 @@ classes:
       GetRearLeft:
       GetRearRight:
       Interpolate:
+      ToChassisAccelerations:
+      ToWheelAccelerations:
+        overloads:
+          const ChassisAccelerations&, const Translation2d& [const]:
+          const ChassisAccelerations& [const]:
 
 inline_code: |
   SetupWPyStruct<wpi::math::MecanumDriveKinematics>(cls_MecanumDriveKinematics);
