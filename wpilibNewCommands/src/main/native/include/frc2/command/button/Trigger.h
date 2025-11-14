@@ -285,6 +285,22 @@ class Trigger {
                        frc::Debouncer::DebounceType::kRising);
 
   /**
+   * Creates a new multi-press trigger from this trigger - it will become active
+   * when this trigger has been activated the required number of times within
+   * the specified time window.
+   *
+   * <p>This is useful for implementing "double-click" style functionality.
+   *
+   * <p>Input for this must be stable, consider using a Debouncer before this to
+   * avoid counting noise as multiple presses.
+   *
+   * @param requiredPresses The number of presses required.
+   * @param windowTime The time in which the presses must occur.
+   * @return The multi-press trigger.
+   */
+  Trigger MultiPress(int requiredPresses, units::second_t windowTime);
+
+  /**
    * Returns the current state of this trigger.
    *
    * @return A bool representing the current state of the trigger.
