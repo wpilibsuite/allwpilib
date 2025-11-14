@@ -45,7 +45,13 @@ public class Trigger implements BooleanSupplier {
   private final BooleanSupplier m_condition;
   private final EventLoop m_loop;
   private final Scheduler m_scheduler;
+
+  /** The value of the signal before the most recent call to {@link #poll()}. May be null. */
   private Signal m_previousSignal;
+
+  /** The value of the signal from the most recent call to {@link #poll()}. May be null. */
+  private Signal m_cachedSignal;
+
   private final Map<BindingType, List<Binding>> m_bindings = new EnumMap<>(BindingType.class);
   private final Runnable m_eventLoopCallback = this::poll;
   private boolean m_isBoundToEventLoop; // used for lazily binding to the event loop
@@ -54,7 +60,7 @@ public class Trigger implements BooleanSupplier {
    * Represents the state of a signal: high or low. Used instead of a boolean for nullity on the
    * first run, when the previous signal value is undefined and unknown.
    */
-  private enum Signal {
+  enum Signal {
     /** The signal is high. */
     HIGH,
     /** The signal is low. */
@@ -177,9 +183,21 @@ public class Trigger implements BooleanSupplier {
     return this;
   }
 
+  /**
+   * Gets the boolean state of the trigger. Because triggers are checked when their event loop is
+   * polled, which by default occurs when {@link Scheduler#run()} is called in user code, but may
+   * differ for custom event loops, the state is only valid immediately after the event loop is
+   * polled. If the underlying signal changes without a subsequent event loop poll, the return value
+   * from {@code getAsBoolean()} may not agree with the result of checking the signal directly.
+   *
+   * <p>Triggers are only bound to an event loop when at least one command has been bound to the
+   * trigger. This method will always return {@code false} before commands have been bound.
+   *
+   * @return The state of the trigger.
+   */
   @Override
   public boolean getAsBoolean() {
-    return m_condition.getAsBoolean();
+    return m_cachedSignal == Signal.HIGH;
   }
 
   /**
@@ -238,20 +256,51 @@ public class Trigger implements BooleanSupplier {
     return new Trigger(m_scheduler, m_loop, () -> debouncer.calculate(m_condition.getAsBoolean()));
   }
 
+  /**
+   * Creates a trigger that activates on a rising edge of this trigger's signal. The rising edge
+   * trigger is active in the same cycle that this trigger's condition is {@code true} while its
+   * condition in the previous cycle was {@code false}. The resulting trigger will only be active
+   * for that single cycle before going inactive again; therefore, {@link #onTrue(Command)} should
+   * be used instead of {@link #whileTrue(Command)}, as commands bound using the latter method will
+   * be immediately canceled after a single scheduler cycle.
+   *
+   * @return A rising edge trigger.
+   */
+  public Trigger risingEdge() {
+    return new Trigger(
+        m_scheduler, m_loop, () -> m_cachedSignal == Signal.HIGH && m_previousSignal == Signal.LOW);
+  }
+
+  /**
+   * Creates a trigger that activates on a falling edge of this trigger's signal. The falling edge
+   * trigger is active in the same cycle that this trigger's condition is {@code false} while its
+   * condition in the previous cycle was {@code true}. The resulting trigger will only be active for
+   * that single cycle before going inactive again; therefore, {@link #onTrue(Command)} should be
+   * used instead of {@link #whileTrue(Command)}, as commands bound using the latter method will be
+   * immediately canceled after a single scheduler cycle.
+   *
+   * @return A falling edge trigger.
+   */
+  public Trigger fallingEdge() {
+    return new Trigger(
+        m_scheduler, m_loop, () -> m_cachedSignal == Signal.LOW && m_previousSignal == Signal.HIGH);
+  }
+
   private void poll() {
     // Clear bindings that no longer need to run
     // This should always be checked, regardless of signal change, since bindings may be scoped
     // and those scopes may become inactive.
     clearStaleBindings();
 
-    var signal = readSignal();
+    m_previousSignal = m_cachedSignal;
+    m_cachedSignal = readSignal();
 
-    if (signal == m_previousSignal) {
+    if (m_cachedSignal == m_previousSignal) {
       // No change in the signal. Nothing to do
       return;
     }
 
-    if (signal == Signal.HIGH) {
+    if (m_cachedSignal == Signal.HIGH) {
       // Signal is now high when it wasn't before - a rising edge
       scheduleBindings(BindingType.SCHEDULE_ON_RISING_EDGE);
       scheduleBindings(BindingType.RUN_WHILE_HIGH);
@@ -259,15 +308,13 @@ public class Trigger implements BooleanSupplier {
       toggleBindings(BindingType.TOGGLE_ON_RISING_EDGE);
     }
 
-    if (signal == Signal.LOW) {
+    if (m_cachedSignal == Signal.LOW) {
       // Signal is now low when it wasn't before - a falling edge
       scheduleBindings(BindingType.SCHEDULE_ON_FALLING_EDGE);
       scheduleBindings(BindingType.RUN_WHILE_LOW);
       cancelBindings(BindingType.RUN_WHILE_HIGH);
       toggleBindings(BindingType.TOGGLE_ON_FALLING_EDGE);
     }
-
-    m_previousSignal = signal;
   }
 
   private Signal readSignal() {
@@ -334,6 +381,26 @@ public class Trigger implements BooleanSupplier {
                 m_scheduler.schedule(binding);
               }
             });
+  }
+
+  /**
+   * Package-private for testing. Reads the signal of the trigger as it was <i>after</i> the most
+   * recent call to {@link #poll()}. May be null.
+   *
+   * @return The most recent signal.
+   */
+  Signal getCachedSignal() {
+    return m_cachedSignal;
+  }
+
+  /**
+   * Package-private for testing. Reads the signal of the trigger as it was <i>before</i> the most
+   * recent call to {@link #poll()}. May be null.
+   *
+   * @return The previous signal.
+   */
+  Signal getPreviousSignal() {
+    return m_previousSignal;
   }
 
   // package-private for testing
