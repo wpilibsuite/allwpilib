@@ -13,6 +13,8 @@ import java.nio.LongBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.InputMismatchException;
 
+import org.wpilib.datalog.DataLogReader.DataLogReaderEntry;
+
 /**
  * A record in the data log. May represent either a control record (entry == 0) or a data record.
  * Used only for reading (e.g. with DataLogReader).
@@ -27,6 +29,23 @@ public class DataLogRecord {
     m_timestamp = timestamp;
     m_data = data;
     m_data.order(ByteOrder.LITTLE_ENDIAN);
+
+    if (isStart()) {
+      var startData = getStartData();
+      m_readerEntry = new DataLogReaderEntry(entry, startData.name, startData.type, startData.metadata);   
+    } else {
+      m_readerEntry = null; // TODO: initialize m_readerEntry properly on non-start records without using a setter because thats nasty
+    }
+  }
+
+  public void setReaderEntry(DataLogReaderEntry entry) {
+    if (m_readerEntry == null) {
+      m_readerEntry = entry;
+    }
+  }
+
+  public DataLogReaderEntry getReaderEntry() {
+    return m_readerEntry;
   }
 
   /**
@@ -427,4 +446,5 @@ public class DataLogRecord {
   private final int m_entry;
   private final long m_timestamp;
   private final ByteBuffer m_data;
+  private DataLogReaderEntry m_readerEntry; // TODO: make m_readerEntry final
 }
