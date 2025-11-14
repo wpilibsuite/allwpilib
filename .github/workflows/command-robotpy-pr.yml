@@ -12,7 +12,7 @@ jobs:
     permissions:
       pull-requests: write
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Comment on PR
         if: github.repository == 'wpilibsuite/allwpilib'
