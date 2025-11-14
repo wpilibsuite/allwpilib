@@ -44,7 +44,8 @@ class InstanceImpl {
   void StartLocal();
   void StopLocal();
   void StartServer(std::string_view persistFilename,
-                   std::string_view listenAddress, std::string_view mdnsService, unsigned int port);
+                   std::string_view listenAddress, std::string_view mdnsService,
+                   unsigned int port);
   void StopServer();
   void StartClient(std::string_view identity);
   void StopClient();
