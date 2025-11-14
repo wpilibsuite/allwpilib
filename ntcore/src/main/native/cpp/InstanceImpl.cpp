@@ -103,15 +103,15 @@ void InstanceImpl::StopLocal() {
 
 void InstanceImpl::StartServer(std::string_view persistFilename,
                                std::string_view listenAddress,
-                                std::string_view mdnsService,
+                               std::string_view mdnsService,
                                unsigned int port) {
   std::scoped_lock lock{m_mutex};
   if (networkMode != NT_NET_MODE_NONE) {
     return;
   }
   m_networkServer = std::make_shared<NetworkServer>(
-      persistFilename, listenAddress, mdnsService, port, localStorage, connectionList,
-      logger, [this] (bool announcingmDNS) {
+      persistFilename, listenAddress, mdnsService, port, localStorage,
+      connectionList, logger, [this](bool announcingmDNS) {
         std::scoped_lock lock{m_mutex};
         networkMode &= ~NT_NET_MODE_STARTING;
         if (announcingmDNS) {
