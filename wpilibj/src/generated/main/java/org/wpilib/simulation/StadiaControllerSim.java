@@ -42,7 +42,7 @@ public class StadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftX(double value) {
-    setRawAxis(StadiaController.Axis.kLeftX.value, value);
+    setRawAxis(StadiaController.Axis.kLeftX, value);
   }
 
   /**
@@ -51,7 +51,7 @@ public class StadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightX(double value) {
-    setRawAxis(StadiaController.Axis.kRightX.value, value);
+    setRawAxis(StadiaController.Axis.kRightX, value);
   }
 
   /**
@@ -60,7 +60,7 @@ public class StadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftY(double value) {
-    setRawAxis(StadiaController.Axis.kLeftY.value, value);
+    setRawAxis(StadiaController.Axis.kLeftY, value);
   }
 
   /**
@@ -69,7 +69,7 @@ public class StadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightY(double value) {
-    setRawAxis(StadiaController.Axis.kRightY.value, value);
+    setRawAxis(StadiaController.Axis.kRightY, value);
   }
 
   /**
@@ -78,7 +78,7 @@ public class StadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setAButton(boolean value) {
-    setRawButton(StadiaController.Button.kA.value, value);
+    setRawButton(StadiaController.Button.kA, value);
   }
 
   /**
@@ -87,7 +87,7 @@ public class StadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setBButton(boolean value) {
-    setRawButton(StadiaController.Button.kB.value, value);
+    setRawButton(StadiaController.Button.kB, value);
   }
 
   /**
@@ -96,7 +96,7 @@ public class StadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setXButton(boolean value) {
-    setRawButton(StadiaController.Button.kX.value, value);
+    setRawButton(StadiaController.Button.kX, value);
   }
 
   /**
@@ -105,7 +105,7 @@ public class StadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setYButton(boolean value) {
-    setRawButton(StadiaController.Button.kY.value, value);
+    setRawButton(StadiaController.Button.kY, value);
   }
 
   /**
@@ -114,7 +114,7 @@ public class StadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftBumperButton(boolean value) {
-    setRawButton(StadiaController.Button.kLeftBumper.value, value);
+    setRawButton(StadiaController.Button.kLeftBumper, value);
   }
 
   /**
@@ -123,7 +123,7 @@ public class StadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightBumperButton(boolean value) {
-    setRawButton(StadiaController.Button.kRightBumper.value, value);
+    setRawButton(StadiaController.Button.kRightBumper, value);
   }
 
   /**
@@ -132,7 +132,7 @@ public class StadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftStickButton(boolean value) {
-    setRawButton(StadiaController.Button.kLeftStick.value, value);
+    setRawButton(StadiaController.Button.kLeftStick, value);
   }
 
   /**
@@ -141,7 +141,7 @@ public class StadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightStickButton(boolean value) {
-    setRawButton(StadiaController.Button.kRightStick.value, value);
+    setRawButton(StadiaController.Button.kRightStick, value);
   }
 
   /**
@@ -150,7 +150,7 @@ public class StadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setEllipsesButton(boolean value) {
-    setRawButton(StadiaController.Button.kEllipses.value, value);
+    setRawButton(StadiaController.Button.kEllipses, value);
   }
 
   /**
@@ -159,7 +159,7 @@ public class StadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setHamburgerButton(boolean value) {
-    setRawButton(StadiaController.Button.kHamburger.value, value);
+    setRawButton(StadiaController.Button.kHamburger, value);
   }
 
   /**
@@ -168,7 +168,7 @@ public class StadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setStadiaButton(boolean value) {
-    setRawButton(StadiaController.Button.kStadia.value, value);
+    setRawButton(StadiaController.Button.kStadia, value);
   }
 
   /**
@@ -177,7 +177,7 @@ public class StadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightTriggerButton(boolean value) {
-    setRawButton(StadiaController.Button.kRightTrigger.value, value);
+    setRawButton(StadiaController.Button.kRightTrigger, value);
   }
 
   /**
@@ -186,7 +186,7 @@ public class StadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftTriggerButton(boolean value) {
-    setRawButton(StadiaController.Button.kLeftTrigger.value, value);
+    setRawButton(StadiaController.Button.kLeftTrigger, value);
   }
 
   /**
@@ -195,7 +195,7 @@ public class StadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setGoogleButton(boolean value) {
-    setRawButton(StadiaController.Button.kGoogle.value, value);
+    setRawButton(StadiaController.Button.kGoogle, value);
   }
 
   /**
@@ -204,6 +204,6 @@ public class StadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setFrameButton(boolean value) {
-    setRawButton(StadiaController.Button.kFrame.value, value);
+    setRawButton(StadiaController.Button.kFrame, value);
   }
 }

@@ -610,6 +610,10 @@ public final class DriverStation {
         isError, code, false, error, locString, traceString.toString(), true);
   }
 
+  public static boolean isNiDs() {
+    return true;
+  }
+
   /**
    * The state of one joystick button.
    *
@@ -652,15 +656,16 @@ public final class DriverStation {
    * @param button The button index.
    * @return The state of the joystick button, or false if the button is not available.
    */
-  public static Optional<Boolean> getStickButtonIfAvailable(final int stick, final int button) {
+  public static Optional<Boolean> getStickButtonIfAvailable(final int stick, final GamepadIndexPair button) {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
-    if (button < 0 || button >= DriverStationJNI.kMaxJoystickButtons) {
+    int buttonValue = isNiDs() ? button.getNiIndex() : button.getSdlIndex();
+    if (buttonValue < 0 || buttonValue >= DriverStationJNI.kMaxJoystickButtons) {
       throw new IllegalArgumentException("Joystick Button is out of range");
     }
 
-    long mask = 1L << button;
+    long mask = 1L << buttonValue;
 
     m_cacheDataMutex.lock();
     try {
@@ -799,20 +804,21 @@ public final class DriverStation {
    * @param axis The analog axis value to read from the joystick.
    * @return The value of the axis on the joystick, or 0 if the axis is not available.
    */
-  public static OptionalDouble getStickAxisIfAvailable(int stick, int axis) {
+  public static OptionalDouble getStickAxisIfAvailable(int stick, GamepadIndexPair axis) {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
-    if (axis < 0 || axis >= DriverStationJNI.kMaxJoystickAxes) {
+    int axisValue = isNiDs() ? axis.getNiIndex() : axis.getSdlIndex();
+    if (axisValue < 0 || axisValue >= DriverStationJNI.kMaxJoystickAxes) {
       throw new IllegalArgumentException("Joystick axis is out of range");
     }
 
-    int mask = 1 << axis;
+    int mask = 1 << axisValue;
 
     m_cacheDataMutex.lock();
     try {
       if ((m_joystickAxes[stick].m_available & mask) != 0) {
-        return OptionalDouble.of(m_joystickAxes[stick].m_axes[axis]);
+        return OptionalDouble.of(m_joystickAxes[stick].m_axes[axisValue]);
       }
     } finally {
       m_cacheDataMutex.unlock();

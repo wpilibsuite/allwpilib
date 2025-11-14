@@ -23,7 +23,7 @@ import org.wpilib.util.sendable.SendableBuilder;
  */
 public class Gamepad extends GenericHID implements Sendable {
   /** Represents a digital button on a Gamepad. */
-  public enum Button {
+  public enum Button implements GamepadIndexPair {
     /** South Face button. */
     kSouthFace(0),
     /** East Face button. */
@@ -97,10 +97,20 @@ public class Gamepad extends GenericHID implements Sendable {
       // Remove leading `k`
       return this.name().substring(1) + "Button";
     }
+
+    @Override
+    public int getNiIndex() {
+      return -1;
+    }
+
+    @Override
+    public int getSdlIndex() {
+      return value;
+    }
   }
 
   /** Represents an axis on an Gamepad. */
-  public enum Axis {
+  public enum Axis implements GamepadIndexPair {
     /** Left X axis. */
     kLeftX(0),
     /** Left Y axis. */
@@ -137,6 +147,16 @@ public class Gamepad extends GenericHID implements Sendable {
       }
       return name;
     }
+
+    @Override
+    public int getNiIndex() {
+      return -1;
+    }
+
+    @Override
+    public int getSdlIndex() {
+      return value;
+    }
   }
 
   /**
@@ -155,7 +175,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The axis value.
    */
   public double getLeftX() {
-    return getRawAxis(Axis.kLeftX.value);
+    return getRawAxis(Axis.kLeftX);
   }
 
   /**
@@ -164,7 +184,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The axis value.
    */
   public double getLeftY() {
-    return getRawAxis(Axis.kLeftY.value);
+    return getRawAxis(Axis.kLeftY);
   }
 
   /**
@@ -173,7 +193,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The axis value.
    */
   public double getRightX() {
-    return getRawAxis(Axis.kRightX.value);
+    return getRawAxis(Axis.kRightX);
   }
 
   /**
@@ -182,7 +202,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The axis value.
    */
   public double getRightY() {
-    return getRawAxis(Axis.kRightY.value);
+    return getRawAxis(Axis.kRightY);
   }
 
   /**
@@ -192,7 +212,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The axis value.
    */
   public double getLeftTriggerAxis() {
-    return getRawAxis(Axis.kLeftTrigger.value);
+    return getRawAxis(Axis.kLeftTrigger);
   }
 
   /**
@@ -206,7 +226,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *     threshold, attached to the given event loop
    */
   public BooleanEvent leftTrigger(double threshold, EventLoop loop) {
-    return axisGreaterThan(Axis.kLeftTrigger.value, threshold, loop);
+    return axisGreaterThan(Axis.kLeftTrigger, threshold, loop);
   }
 
   /**
@@ -228,7 +248,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The axis value.
    */
   public double getRightTriggerAxis() {
-    return getRawAxis(Axis.kRightTrigger.value);
+    return getRawAxis(Axis.kRightTrigger);
   }
 
   /**
@@ -242,7 +262,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *     threshold, attached to the given event loop
    */
   public BooleanEvent rightTrigger(double threshold, EventLoop loop) {
-    return axisGreaterThan(Axis.kRightTrigger.value, threshold, loop);
+    return axisGreaterThan(Axis.kRightTrigger, threshold, loop);
   }
 
   /**
@@ -263,7 +283,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getSouthFaceButton() {
-    return getRawButton(Button.kSouthFace.value);
+    return getRawButton(Button.kSouthFace);
   }
 
   /**
@@ -272,7 +292,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getSouthFaceButtonPressed() {
-    return getRawButtonPressed(Button.kSouthFace.value);
+    return getRawButtonPressed(Button.kSouthFace);
   }
 
   /**
@@ -281,7 +301,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getSouthFaceButtonReleased() {
-    return getRawButtonReleased(Button.kSouthFace.value);
+    return getRawButtonReleased(Button.kSouthFace);
   }
 
   /**
@@ -292,7 +312,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *     given loop.
    */
   public BooleanEvent southFace(EventLoop loop) {
-    return button(Button.kSouthFace.value, loop);
+    return button(Button.kSouthFace, loop);
   }
 
   /**
@@ -301,7 +321,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getEastFaceButton() {
-    return getRawButton(Button.kEastFace.value);
+    return getRawButton(Button.kEastFace);
   }
 
   /**
@@ -310,7 +330,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getEastFaceButtonPressed() {
-    return getRawButtonPressed(Button.kEastFace.value);
+    return getRawButtonPressed(Button.kEastFace);
   }
 
   /**
@@ -319,7 +339,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getEastFaceButtonReleased() {
-    return getRawButtonReleased(Button.kEastFace.value);
+    return getRawButtonReleased(Button.kEastFace);
   }
 
   /**
@@ -330,7 +350,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *     given loop.
    */
   public BooleanEvent eastFace(EventLoop loop) {
-    return button(Button.kEastFace.value, loop);
+    return button(Button.kEastFace, loop);
   }
 
   /**
@@ -339,7 +359,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getWestFaceButton() {
-    return getRawButton(Button.kWestFace.value);
+    return getRawButton(Button.kWestFace);
   }
 
   /**
@@ -348,7 +368,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getWestFaceButtonPressed() {
-    return getRawButtonPressed(Button.kWestFace.value);
+    return getRawButtonPressed(Button.kWestFace);
   }
 
   /**
@@ -357,7 +377,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getWestFaceButtonReleased() {
-    return getRawButtonReleased(Button.kWestFace.value);
+    return getRawButtonReleased(Button.kWestFace);
   }
 
   /**
@@ -368,7 +388,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *     given loop.
    */
   public BooleanEvent westFace(EventLoop loop) {
-    return button(Button.kWestFace.value, loop);
+    return button(Button.kWestFace, loop);
   }
 
   /**
@@ -377,7 +397,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getNorthFaceButton() {
-    return getRawButton(Button.kNorthFace.value);
+    return getRawButton(Button.kNorthFace);
   }
 
   /**
@@ -386,7 +406,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getNorthFaceButtonPressed() {
-    return getRawButtonPressed(Button.kNorthFace.value);
+    return getRawButtonPressed(Button.kNorthFace);
   }
 
   /**
@@ -395,7 +415,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getNorthFaceButtonReleased() {
-    return getRawButtonReleased(Button.kNorthFace.value);
+    return getRawButtonReleased(Button.kNorthFace);
   }
 
   /**
@@ -406,7 +426,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *     given loop.
    */
   public BooleanEvent northFace(EventLoop loop) {
-    return button(Button.kNorthFace.value, loop);
+    return button(Button.kNorthFace, loop);
   }
 
   /**
@@ -415,7 +435,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getBackButton() {
-    return getRawButton(Button.kBack.value);
+    return getRawButton(Button.kBack);
   }
 
   /**
@@ -424,7 +444,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getBackButtonPressed() {
-    return getRawButtonPressed(Button.kBack.value);
+    return getRawButtonPressed(Button.kBack);
   }
 
   /**
@@ -433,7 +453,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getBackButtonReleased() {
-    return getRawButtonReleased(Button.kBack.value);
+    return getRawButtonReleased(Button.kBack);
   }
 
   /**
@@ -444,7 +464,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *     loop.
    */
   public BooleanEvent back(EventLoop loop) {
-    return button(Button.kBack.value, loop);
+    return button(Button.kBack, loop);
   }
 
   /**
@@ -453,7 +473,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getGuideButton() {
-    return getRawButton(Button.kGuide.value);
+    return getRawButton(Button.kGuide);
   }
 
   /**
@@ -462,7 +482,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getGuideButtonPressed() {
-    return getRawButtonPressed(Button.kGuide.value);
+    return getRawButtonPressed(Button.kGuide);
   }
 
   /**
@@ -471,7 +491,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getGuideButtonReleased() {
-    return getRawButtonReleased(Button.kGuide.value);
+    return getRawButtonReleased(Button.kGuide);
   }
 
   /**
@@ -482,7 +502,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *     loop.
    */
   public BooleanEvent guide(EventLoop loop) {
-    return button(Button.kGuide.value, loop);
+    return button(Button.kGuide, loop);
   }
 
   /**
@@ -491,7 +511,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getStartButton() {
-    return getRawButton(Button.kStart.value);
+    return getRawButton(Button.kStart);
   }
 
   /**
@@ -500,7 +520,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getStartButtonPressed() {
-    return getRawButtonPressed(Button.kStart.value);
+    return getRawButtonPressed(Button.kStart);
   }
 
   /**
@@ -509,7 +529,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getStartButtonReleased() {
-    return getRawButtonReleased(Button.kStart.value);
+    return getRawButtonReleased(Button.kStart);
   }
 
   /**
@@ -520,7 +540,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *     loop.
    */
   public BooleanEvent start(EventLoop loop) {
-    return button(Button.kStart.value, loop);
+    return button(Button.kStart, loop);
   }
 
   /**
@@ -529,7 +549,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getLeftStickButton() {
-    return getRawButton(Button.kLeftStick.value);
+    return getRawButton(Button.kLeftStick);
   }
 
   /**
@@ -538,7 +558,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getLeftStickButtonPressed() {
-    return getRawButtonPressed(Button.kLeftStick.value);
+    return getRawButtonPressed(Button.kLeftStick);
   }
 
   /**
@@ -547,7 +567,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getLeftStickButtonReleased() {
-    return getRawButtonReleased(Button.kLeftStick.value);
+    return getRawButtonReleased(Button.kLeftStick);
   }
 
   /**
@@ -558,7 +578,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *     given loop.
    */
   public BooleanEvent leftStick(EventLoop loop) {
-    return button(Button.kLeftStick.value, loop);
+    return button(Button.kLeftStick, loop);
   }
 
   /**
@@ -567,7 +587,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getRightStickButton() {
-    return getRawButton(Button.kRightStick.value);
+    return getRawButton(Button.kRightStick);
   }
 
   /**
@@ -576,7 +596,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getRightStickButtonPressed() {
-    return getRawButtonPressed(Button.kRightStick.value);
+    return getRawButtonPressed(Button.kRightStick);
   }
 
   /**
@@ -585,7 +605,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getRightStickButtonReleased() {
-    return getRawButtonReleased(Button.kRightStick.value);
+    return getRawButtonReleased(Button.kRightStick);
   }
 
   /**
@@ -596,7 +616,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *     given loop.
    */
   public BooleanEvent rightStick(EventLoop loop) {
-    return button(Button.kRightStick.value, loop);
+    return button(Button.kRightStick, loop);
   }
 
   /**
@@ -605,7 +625,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getLeftShoulderButton() {
-    return getRawButton(Button.kLeftShoulder.value);
+    return getRawButton(Button.kLeftShoulder);
   }
 
   /**
@@ -614,7 +634,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getLeftShoulderButtonPressed() {
-    return getRawButtonPressed(Button.kLeftShoulder.value);
+    return getRawButtonPressed(Button.kLeftShoulder);
   }
 
   /**
@@ -623,7 +643,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getLeftShoulderButtonReleased() {
-    return getRawButtonReleased(Button.kLeftShoulder.value);
+    return getRawButtonReleased(Button.kLeftShoulder);
   }
 
   /**
@@ -634,7 +654,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *     the given loop.
    */
   public BooleanEvent leftShoulder(EventLoop loop) {
-    return button(Button.kLeftShoulder.value, loop);
+    return button(Button.kLeftShoulder, loop);
   }
 
   /**
@@ -643,7 +663,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getRightShoulderButton() {
-    return getRawButton(Button.kRightShoulder.value);
+    return getRawButton(Button.kRightShoulder);
   }
 
   /**
@@ -652,7 +672,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getRightShoulderButtonPressed() {
-    return getRawButtonPressed(Button.kRightShoulder.value);
+    return getRawButtonPressed(Button.kRightShoulder);
   }
 
   /**
@@ -661,7 +681,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getRightShoulderButtonReleased() {
-    return getRawButtonReleased(Button.kRightShoulder.value);
+    return getRawButtonReleased(Button.kRightShoulder);
   }
 
   /**
@@ -672,7 +692,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *     the given loop.
    */
   public BooleanEvent rightShoulder(EventLoop loop) {
-    return button(Button.kRightShoulder.value, loop);
+    return button(Button.kRightShoulder, loop);
   }
 
   /**
@@ -681,7 +701,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getDpadUpButton() {
-    return getRawButton(Button.kDpadUp.value);
+    return getRawButton(Button.kDpadUp);
   }
 
   /**
@@ -690,7 +710,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getDpadUpButtonPressed() {
-    return getRawButtonPressed(Button.kDpadUp.value);
+    return getRawButtonPressed(Button.kDpadUp);
   }
 
   /**
@@ -699,7 +719,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getDpadUpButtonReleased() {
-    return getRawButtonReleased(Button.kDpadUp.value);
+    return getRawButtonReleased(Button.kDpadUp);
   }
 
   /**
@@ -710,7 +730,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *     given loop.
    */
   public BooleanEvent dpadUp(EventLoop loop) {
-    return button(Button.kDpadUp.value, loop);
+    return button(Button.kDpadUp, loop);
   }
 
   /**
@@ -719,7 +739,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getDpadDownButton() {
-    return getRawButton(Button.kDpadDown.value);
+    return getRawButton(Button.kDpadDown);
   }
 
   /**
@@ -728,7 +748,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getDpadDownButtonPressed() {
-    return getRawButtonPressed(Button.kDpadDown.value);
+    return getRawButtonPressed(Button.kDpadDown);
   }
 
   /**
@@ -737,7 +757,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getDpadDownButtonReleased() {
-    return getRawButtonReleased(Button.kDpadDown.value);
+    return getRawButtonReleased(Button.kDpadDown);
   }
 
   /**
@@ -748,7 +768,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *     given loop.
    */
   public BooleanEvent dpadDown(EventLoop loop) {
-    return button(Button.kDpadDown.value, loop);
+    return button(Button.kDpadDown, loop);
   }
 
   /**
@@ -757,7 +777,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getDpadLeftButton() {
-    return getRawButton(Button.kDpadLeft.value);
+    return getRawButton(Button.kDpadLeft);
   }
 
   /**
@@ -766,7 +786,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getDpadLeftButtonPressed() {
-    return getRawButtonPressed(Button.kDpadLeft.value);
+    return getRawButtonPressed(Button.kDpadLeft);
   }
 
   /**
@@ -775,7 +795,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getDpadLeftButtonReleased() {
-    return getRawButtonReleased(Button.kDpadLeft.value);
+    return getRawButtonReleased(Button.kDpadLeft);
   }
 
   /**
@@ -786,7 +806,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *     given loop.
    */
   public BooleanEvent dpadLeft(EventLoop loop) {
-    return button(Button.kDpadLeft.value, loop);
+    return button(Button.kDpadLeft, loop);
   }
 
   /**
@@ -795,7 +815,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getDpadRightButton() {
-    return getRawButton(Button.kDpadRight.value);
+    return getRawButton(Button.kDpadRight);
   }
 
   /**
@@ -804,7 +824,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getDpadRightButtonPressed() {
-    return getRawButtonPressed(Button.kDpadRight.value);
+    return getRawButtonPressed(Button.kDpadRight);
   }
 
   /**
@@ -813,7 +833,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getDpadRightButtonReleased() {
-    return getRawButtonReleased(Button.kDpadRight.value);
+    return getRawButtonReleased(Button.kDpadRight);
   }
 
   /**
@@ -824,7 +844,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *     given loop.
    */
   public BooleanEvent dpadRight(EventLoop loop) {
-    return button(Button.kDpadRight.value, loop);
+    return button(Button.kDpadRight, loop);
   }
 
   /**
@@ -833,7 +853,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getMisc1Button() {
-    return getRawButton(Button.kMisc1.value);
+    return getRawButton(Button.kMisc1);
   }
 
   /**
@@ -842,7 +862,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getMisc1ButtonPressed() {
-    return getRawButtonPressed(Button.kMisc1.value);
+    return getRawButtonPressed(Button.kMisc1);
   }
 
   /**
@@ -851,7 +871,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getMisc1ButtonReleased() {
-    return getRawButtonReleased(Button.kMisc1.value);
+    return getRawButtonReleased(Button.kMisc1);
   }
 
   /**
@@ -862,7 +882,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *     the given loop.
    */
   public BooleanEvent misc1(EventLoop loop) {
-    return button(Button.kMisc1.value, loop);
+    return button(Button.kMisc1, loop);
   }
 
   /**
@@ -871,7 +891,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getRightPaddle1Button() {
-    return getRawButton(Button.kRightPaddle1.value);
+    return getRawButton(Button.kRightPaddle1);
   }
 
   /**
@@ -880,7 +900,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getRightPaddle1ButtonPressed() {
-    return getRawButtonPressed(Button.kRightPaddle1.value);
+    return getRawButtonPressed(Button.kRightPaddle1);
   }
 
   /**
@@ -889,7 +909,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getRightPaddle1ButtonReleased() {
-    return getRawButtonReleased(Button.kRightPaddle1.value);
+    return getRawButtonReleased(Button.kRightPaddle1);
   }
 
   /**
@@ -900,7 +920,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *     the given loop.
    */
   public BooleanEvent rightPaddle1(EventLoop loop) {
-    return button(Button.kRightPaddle1.value, loop);
+    return button(Button.kRightPaddle1, loop);
   }
 
   /**
@@ -909,7 +929,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getLeftPaddle1Button() {
-    return getRawButton(Button.kLeftPaddle1.value);
+    return getRawButton(Button.kLeftPaddle1);
   }
 
   /**
@@ -918,7 +938,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getLeftPaddle1ButtonPressed() {
-    return getRawButtonPressed(Button.kLeftPaddle1.value);
+    return getRawButtonPressed(Button.kLeftPaddle1);
   }
 
   /**
@@ -927,7 +947,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getLeftPaddle1ButtonReleased() {
-    return getRawButtonReleased(Button.kLeftPaddle1.value);
+    return getRawButtonReleased(Button.kLeftPaddle1);
   }
 
   /**
@@ -938,7 +958,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *     the given loop.
    */
   public BooleanEvent leftPaddle1(EventLoop loop) {
-    return button(Button.kLeftPaddle1.value, loop);
+    return button(Button.kLeftPaddle1, loop);
   }
 
   /**
@@ -947,7 +967,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getRightPaddle2Button() {
-    return getRawButton(Button.kRightPaddle2.value);
+    return getRawButton(Button.kRightPaddle2);
   }
 
   /**
@@ -956,7 +976,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getRightPaddle2ButtonPressed() {
-    return getRawButtonPressed(Button.kRightPaddle2.value);
+    return getRawButtonPressed(Button.kRightPaddle2);
   }
 
   /**
@@ -965,7 +985,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getRightPaddle2ButtonReleased() {
-    return getRawButtonReleased(Button.kRightPaddle2.value);
+    return getRawButtonReleased(Button.kRightPaddle2);
   }
 
   /**
@@ -976,7 +996,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *     the given loop.
    */
   public BooleanEvent rightPaddle2(EventLoop loop) {
-    return button(Button.kRightPaddle2.value, loop);
+    return button(Button.kRightPaddle2, loop);
   }
 
   /**
@@ -985,7 +1005,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getLeftPaddle2Button() {
-    return getRawButton(Button.kLeftPaddle2.value);
+    return getRawButton(Button.kLeftPaddle2);
   }
 
   /**
@@ -994,7 +1014,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getLeftPaddle2ButtonPressed() {
-    return getRawButtonPressed(Button.kLeftPaddle2.value);
+    return getRawButtonPressed(Button.kLeftPaddle2);
   }
 
   /**
@@ -1003,7 +1023,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getLeftPaddle2ButtonReleased() {
-    return getRawButtonReleased(Button.kLeftPaddle2.value);
+    return getRawButtonReleased(Button.kLeftPaddle2);
   }
 
   /**
@@ -1014,7 +1034,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *     the given loop.
    */
   public BooleanEvent leftPaddle2(EventLoop loop) {
-    return button(Button.kLeftPaddle2.value, loop);
+    return button(Button.kLeftPaddle2, loop);
   }
 
   /**
@@ -1023,7 +1043,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getTouchpadButton() {
-    return getRawButton(Button.kTouchpad.value);
+    return getRawButton(Button.kTouchpad);
   }
 
   /**
@@ -1032,7 +1052,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getTouchpadButtonPressed() {
-    return getRawButtonPressed(Button.kTouchpad.value);
+    return getRawButtonPressed(Button.kTouchpad);
   }
 
   /**
@@ -1041,7 +1061,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getTouchpadButtonReleased() {
-    return getRawButtonReleased(Button.kTouchpad.value);
+    return getRawButtonReleased(Button.kTouchpad);
   }
 
   /**
@@ -1052,7 +1072,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *     given loop.
    */
   public BooleanEvent touchpad(EventLoop loop) {
-    return button(Button.kTouchpad.value, loop);
+    return button(Button.kTouchpad, loop);
   }
 
   /**
@@ -1061,7 +1081,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getMisc2Button() {
-    return getRawButton(Button.kMisc2.value);
+    return getRawButton(Button.kMisc2);
   }
 
   /**
@@ -1070,7 +1090,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getMisc2ButtonPressed() {
-    return getRawButtonPressed(Button.kMisc2.value);
+    return getRawButtonPressed(Button.kMisc2);
   }
 
   /**
@@ -1079,7 +1099,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getMisc2ButtonReleased() {
-    return getRawButtonReleased(Button.kMisc2.value);
+    return getRawButtonReleased(Button.kMisc2);
   }
 
   /**
@@ -1090,7 +1110,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *     the given loop.
    */
   public BooleanEvent misc2(EventLoop loop) {
-    return button(Button.kMisc2.value, loop);
+    return button(Button.kMisc2, loop);
   }
 
   /**
@@ -1099,7 +1119,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getMisc3Button() {
-    return getRawButton(Button.kMisc3.value);
+    return getRawButton(Button.kMisc3);
   }
 
   /**
@@ -1108,7 +1128,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getMisc3ButtonPressed() {
-    return getRawButtonPressed(Button.kMisc3.value);
+    return getRawButtonPressed(Button.kMisc3);
   }
 
   /**
@@ -1117,7 +1137,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getMisc3ButtonReleased() {
-    return getRawButtonReleased(Button.kMisc3.value);
+    return getRawButtonReleased(Button.kMisc3);
   }
 
   /**
@@ -1128,7 +1148,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *     the given loop.
    */
   public BooleanEvent misc3(EventLoop loop) {
-    return button(Button.kMisc3.value, loop);
+    return button(Button.kMisc3, loop);
   }
 
   /**
@@ -1137,7 +1157,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getMisc4Button() {
-    return getRawButton(Button.kMisc4.value);
+    return getRawButton(Button.kMisc4);
   }
 
   /**
@@ -1146,7 +1166,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getMisc4ButtonPressed() {
-    return getRawButtonPressed(Button.kMisc4.value);
+    return getRawButtonPressed(Button.kMisc4);
   }
 
   /**
@@ -1155,7 +1175,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getMisc4ButtonReleased() {
-    return getRawButtonReleased(Button.kMisc4.value);
+    return getRawButtonReleased(Button.kMisc4);
   }
 
   /**
@@ -1166,7 +1186,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *     the given loop.
    */
   public BooleanEvent misc4(EventLoop loop) {
-    return button(Button.kMisc4.value, loop);
+    return button(Button.kMisc4, loop);
   }
 
   /**
@@ -1175,7 +1195,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getMisc5Button() {
-    return getRawButton(Button.kMisc5.value);
+    return getRawButton(Button.kMisc5);
   }
 
   /**
@@ -1184,7 +1204,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getMisc5ButtonPressed() {
-    return getRawButtonPressed(Button.kMisc5.value);
+    return getRawButtonPressed(Button.kMisc5);
   }
 
   /**
@@ -1193,7 +1213,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getMisc5ButtonReleased() {
-    return getRawButtonReleased(Button.kMisc5.value);
+    return getRawButtonReleased(Button.kMisc5);
   }
 
   /**
@@ -1204,7 +1224,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *     the given loop.
    */
   public BooleanEvent misc5(EventLoop loop) {
-    return button(Button.kMisc5.value, loop);
+    return button(Button.kMisc5, loop);
   }
 
   /**
@@ -1213,7 +1233,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getMisc6Button() {
-    return getRawButton(Button.kMisc6.value);
+    return getRawButton(Button.kMisc6);
   }
 
   /**
@@ -1222,7 +1242,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getMisc6ButtonPressed() {
-    return getRawButtonPressed(Button.kMisc6.value);
+    return getRawButtonPressed(Button.kMisc6);
   }
 
   /**
@@ -1231,7 +1251,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getMisc6ButtonReleased() {
-    return getRawButtonReleased(Button.kMisc6.value);
+    return getRawButtonReleased(Button.kMisc6);
   }
 
   /**
@@ -1242,14 +1262,14 @@ public class Gamepad extends GenericHID implements Sendable {
    *     the given loop.
    */
   public BooleanEvent misc6(EventLoop loop) {
-    return button(Button.kMisc6.value, loop);
+    return button(Button.kMisc6, loop);
   }
 
-  private double getAxisForSendable(int axis) {
+  private double getAxisForSendable(GamepadIndexPair axis) {
     return DriverStation.getStickAxisIfAvailable(getPort(), axis).orElse(0.0);
   }
 
-  private boolean getButtonForSendable(int button) {
+  private boolean getButtonForSendable(GamepadIndexPair button) {
     return DriverStation.getStickButtonIfAvailable(getPort(), button).orElse(false);
   }
 
@@ -1258,54 +1278,54 @@ public class Gamepad extends GenericHID implements Sendable {
     builder.setSmartDashboardType("HID");
     builder.publishConstString("ControllerType", "Gamepad");
     builder.addDoubleProperty(
-        "LeftTrigger Axis", () -> getAxisForSendable(Axis.kLeftTrigger.value), null);
+        "LeftTrigger Axis", () -> getAxisForSendable(Axis.kLeftTrigger), null);
     builder.addDoubleProperty(
-        "RightTrigger Axis", () -> getAxisForSendable(Axis.kRightTrigger.value), null);
-    builder.addDoubleProperty("LeftX", () -> getAxisForSendable(Axis.kLeftX.value), null);
-    builder.addDoubleProperty("LeftY", () -> getAxisForSendable(Axis.kLeftY.value), null);
-    builder.addDoubleProperty("RightX", () -> getAxisForSendable(Axis.kRightX.value), null);
-    builder.addDoubleProperty("RightY", () -> getAxisForSendable(Axis.kRightY.value), null);
+        "RightTrigger Axis", () -> getAxisForSendable(Axis.kRightTrigger), null);
+    builder.addDoubleProperty("LeftX", () -> getAxisForSendable(Axis.kLeftX), null);
+    builder.addDoubleProperty("LeftY", () -> getAxisForSendable(Axis.kLeftY), null);
+    builder.addDoubleProperty("RightX", () -> getAxisForSendable(Axis.kRightX), null);
+    builder.addDoubleProperty("RightY", () -> getAxisForSendable(Axis.kRightY), null);
     builder.addBooleanProperty(
-        "SouthFace", () -> getButtonForSendable(Button.kSouthFace.value), null);
+        "SouthFace", () -> getButtonForSendable(Button.kSouthFace), null);
     builder.addBooleanProperty(
-        "EastFace", () -> getButtonForSendable(Button.kEastFace.value), null);
+        "EastFace", () -> getButtonForSendable(Button.kEastFace), null);
     builder.addBooleanProperty(
-        "WestFace", () -> getButtonForSendable(Button.kWestFace.value), null);
+        "WestFace", () -> getButtonForSendable(Button.kWestFace), null);
     builder.addBooleanProperty(
-        "NorthFace", () -> getButtonForSendable(Button.kNorthFace.value), null);
-    builder.addBooleanProperty("Back", () -> getButtonForSendable(Button.kBack.value), null);
-    builder.addBooleanProperty("Guide", () -> getButtonForSendable(Button.kGuide.value), null);
-    builder.addBooleanProperty("Start", () -> getButtonForSendable(Button.kStart.value), null);
+        "NorthFace", () -> getButtonForSendable(Button.kNorthFace), null);
+    builder.addBooleanProperty("Back", () -> getButtonForSendable(Button.kBack), null);
+    builder.addBooleanProperty("Guide", () -> getButtonForSendable(Button.kGuide), null);
+    builder.addBooleanProperty("Start", () -> getButtonForSendable(Button.kStart), null);
     builder.addBooleanProperty(
-        "LeftStick", () -> getButtonForSendable(Button.kLeftStick.value), null);
+        "LeftStick", () -> getButtonForSendable(Button.kLeftStick), null);
     builder.addBooleanProperty(
-        "RightStick", () -> getButtonForSendable(Button.kRightStick.value), null);
+        "RightStick", () -> getButtonForSendable(Button.kRightStick), null);
     builder.addBooleanProperty(
-        "LeftShoulder", () -> getButtonForSendable(Button.kLeftShoulder.value), null);
+        "LeftShoulder", () -> getButtonForSendable(Button.kLeftShoulder), null);
     builder.addBooleanProperty(
-        "RightShoulder", () -> getButtonForSendable(Button.kRightShoulder.value), null);
-    builder.addBooleanProperty("DpadUp", () -> getButtonForSendable(Button.kDpadUp.value), null);
+        "RightShoulder", () -> getButtonForSendable(Button.kRightShoulder), null);
+    builder.addBooleanProperty("DpadUp", () -> getButtonForSendable(Button.kDpadUp), null);
     builder.addBooleanProperty(
-        "DpadDown", () -> getButtonForSendable(Button.kDpadDown.value), null);
+        "DpadDown", () -> getButtonForSendable(Button.kDpadDown), null);
     builder.addBooleanProperty(
-        "DpadLeft", () -> getButtonForSendable(Button.kDpadLeft.value), null);
+        "DpadLeft", () -> getButtonForSendable(Button.kDpadLeft), null);
     builder.addBooleanProperty(
-        "DpadRight", () -> getButtonForSendable(Button.kDpadRight.value), null);
-    builder.addBooleanProperty("Misc1", () -> getButtonForSendable(Button.kMisc1.value), null);
+        "DpadRight", () -> getButtonForSendable(Button.kDpadRight), null);
+    builder.addBooleanProperty("Misc1", () -> getButtonForSendable(Button.kMisc1), null);
     builder.addBooleanProperty(
-        "RightPaddle1", () -> getButtonForSendable(Button.kRightPaddle1.value), null);
+        "RightPaddle1", () -> getButtonForSendable(Button.kRightPaddle1), null);
     builder.addBooleanProperty(
-        "LeftPaddle1", () -> getButtonForSendable(Button.kLeftPaddle1.value), null);
+        "LeftPaddle1", () -> getButtonForSendable(Button.kLeftPaddle1), null);
     builder.addBooleanProperty(
-        "RightPaddle2", () -> getButtonForSendable(Button.kRightPaddle2.value), null);
+        "RightPaddle2", () -> getButtonForSendable(Button.kRightPaddle2), null);
     builder.addBooleanProperty(
-        "LeftPaddle2", () -> getButtonForSendable(Button.kLeftPaddle2.value), null);
+        "LeftPaddle2", () -> getButtonForSendable(Button.kLeftPaddle2), null);
     builder.addBooleanProperty(
-        "Touchpad", () -> getButtonForSendable(Button.kTouchpad.value), null);
-    builder.addBooleanProperty("Misc2", () -> getButtonForSendable(Button.kMisc2.value), null);
-    builder.addBooleanProperty("Misc3", () -> getButtonForSendable(Button.kMisc3.value), null);
-    builder.addBooleanProperty("Misc4", () -> getButtonForSendable(Button.kMisc4.value), null);
-    builder.addBooleanProperty("Misc5", () -> getButtonForSendable(Button.kMisc5.value), null);
-    builder.addBooleanProperty("Misc6", () -> getButtonForSendable(Button.kMisc6.value), null);
+        "Touchpad", () -> getButtonForSendable(Button.kTouchpad), null);
+    builder.addBooleanProperty("Misc2", () -> getButtonForSendable(Button.kMisc2), null);
+    builder.addBooleanProperty("Misc3", () -> getButtonForSendable(Button.kMisc3), null);
+    builder.addBooleanProperty("Misc4", () -> getButtonForSendable(Button.kMisc4), null);
+    builder.addBooleanProperty("Misc5", () -> getButtonForSendable(Button.kMisc5), null);
+    builder.addBooleanProperty("Misc6", () -> getButtonForSendable(Button.kMisc6), null);
   }
 }

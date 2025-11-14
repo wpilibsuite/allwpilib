@@ -60,7 +60,7 @@ public class Command{{ ConsoleName }}Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger {{ button.name }}(EventLoop loop) {
-    return button({{ ConsoleName }}Controller.Button.k{{ capitalize_first(button.name) }}.value, loop);
+    return button({{ ConsoleName }}Controller.Button.k{{ capitalize_first(button.name) }}, loop);
   }
 {% endfor -%}
 {% for trigger in triggers -%}
@@ -76,7 +76,7 @@ public class Command{{ ConsoleName }}Controller extends CommandGenericHID {
    *     threshold, attached to the given event loop
    */
   public Trigger {{ trigger.name }}(double threshold, EventLoop loop) {
-    return axisGreaterThan({{ ConsoleName }}Controller.Axis.k{{ capitalize_first(trigger.name) }}.value, threshold, loop);
+    return axisGreaterThan({{ ConsoleName }}Controller.Axis.k{{ capitalize_first(trigger.name) }}, threshold, loop);
   }
 
   /**
