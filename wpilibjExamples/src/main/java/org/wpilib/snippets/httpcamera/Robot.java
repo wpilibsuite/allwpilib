@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.examples.intermediatevision;
+package org.wpilib.snippets.httpcamera;
 
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -11,12 +11,12 @@ import org.opencv.imgproc.Imgproc;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.vision.camera.CvSink;
 import org.wpilib.vision.camera.CvSource;
-import org.wpilib.vision.camera.UsbCamera;
+import org.wpilib.vision.camera.HttpCamera;
 import org.wpilib.vision.stream.CameraServer;
 
 /**
  * This is a demo program showing the use of OpenCV to do vision processing. The image is acquired
- * from the USB camera, then a rectangle is put on the image and sent to the dashboard. OpenCV has
+ * from an HTTP camera, then a rectangle is put on the image and sent to the dashboard. OpenCV has
  * many methods for different types of processing.
  */
 public class Robot extends TimedRobot {
@@ -27,8 +27,12 @@ public class Robot extends TimedRobot {
     m_visionThread =
         new Thread(
             () -> {
-              // Get the UsbCamera from CameraServer
-              UsbCamera camera = CameraServer.startAutomaticCapture();
+              // Create an HTTP camera. The address will need to be modified to have the correct
+              // team number. The exact path will depend on the source.
+              HttpCamera camera =
+                  new HttpCamera("HTTP Camera", "http://10.x.y.11/video/stream.mjpg");
+              // Start capturing images
+              CameraServer.startAutomaticCapture(camera);
               // Set the resolution
               camera.setResolution(640, 480);
 

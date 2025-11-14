@@ -2,33 +2,36 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.examples.digitalcommunication;
+package org.wpilib.snippets.i2ccommunication;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Duration;
+import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.wpilib.driverstation.DriverStation;
 import org.wpilib.hardware.hal.AllianceStationID;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.RobotMode;
-import org.wpilib.simulation.DIOSim;
+import org.wpilib.simulation.CallbackStore;
 import org.wpilib.simulation.DriverStationSim;
+import org.wpilib.simulation.I2CSim;
 import org.wpilib.simulation.SimHooks;
 
 @ResourceLock("timing")
-class DigitalCommunicationTest {
+class I2CCommunicationTest {
   private Robot m_robot;
   private Thread m_thread;
-  private final DIOSim m_allianceOutput = new DIOSim(Robot.kAlliancePort);
-  private final DIOSim m_enabledOutput = new DIOSim(Robot.kEnabledPort);
-  private final DIOSim m_autonomousOutput = new DIOSim(Robot.kAutonomousPort);
-  private final DIOSim m_alertOutput = new DIOSim(Robot.kAlertPort);
+  private final I2CSim m_i2c = new I2CSim(Robot.kPort.value);
+  private CompletableFuture<String> m_future;
+  private CallbackStore m_callback;
 
   @BeforeEach
   void startThread() {
@@ -36,6 +39,10 @@ class DigitalCommunicationTest {
     SimHooks.pauseTiming();
     SimHooks.setProgramStarted(false);
     DriverStationSim.resetData();
+    m_future = new CompletableFuture<>();
+    m_callback =
+        m_i2c.registerWriteCallback(
+            (name, buffer, count) -> m_future.complete(new String(buffer, 0, count)));
     m_robot = new Robot();
     m_thread = new Thread(m_robot::startCompetition);
     m_thread.start();
@@ -52,10 +59,8 @@ class DigitalCommunicationTest {
       Thread.currentThread().interrupt();
     }
     m_robot.close();
-    m_allianceOutput.resetData();
-    m_enabledOutput.resetData();
-    m_autonomousOutput.resetData();
-    m_alertOutput.resetData();
+    m_callback.close();
+    m_i2c.resetData();
   }
 
   @EnumSource(AllianceStationID.class)
@@ -64,12 +69,17 @@ class DigitalCommunicationTest {
     DriverStationSim.setAllianceStationId(alliance);
     DriverStationSim.notifyNewData();
 
-    assertTrue(m_allianceOutput.getInitialized());
-    assertFalse(m_allianceOutput.getIsInput());
+    assertTrue(m_i2c.getInitialized());
 
     SimHooks.stepTiming(0.02);
 
-    assertEquals(alliance.name().startsWith("Red"), m_allianceOutput.getValue());
+    String str = assertTimeoutPreemptively(Duration.ofMillis(20L), () -> m_future.get());
+    char expected = alliance.name().startsWith("Red") ? 'R' : 'B';
+    if (alliance.name().startsWith("Unknown")) {
+      expected = 'U';
+    }
+
+    assertEquals(expected, str.charAt(0));
   }
 
   @ValueSource(booleans = {true, false})
@@ -78,12 +88,14 @@ class DigitalCommunicationTest {
     DriverStationSim.setEnabled(enabled);
     DriverStationSim.notifyNewData();
 
-    assertTrue(m_enabledOutput.getInitialized());
-    assertFalse(m_enabledOutput.getIsInput());
+    assertTrue(m_i2c.getInitialized());
 
     SimHooks.stepTiming(0.02);
 
-    assertEquals(enabled, m_enabledOutput.getValue());
+    String str = assertTimeoutPreemptively(Duration.ofMillis(20L), () -> m_future.get());
+    char expected = enabled ? 'E' : 'D';
+
+    assertEquals(expected, str.charAt(1));
   }
 
   @ValueSource(booleans = {true, false})
@@ -92,25 +104,28 @@ class DigitalCommunicationTest {
     DriverStationSim.setRobotMode(autonomous ? RobotMode.AUTONOMOUS : RobotMode.TELEOPERATED);
     DriverStationSim.notifyNewData();
 
-    assertTrue(m_autonomousOutput.getInitialized());
-    assertFalse(m_autonomousOutput.getIsInput());
+    assertTrue(m_i2c.getInitialized());
 
     SimHooks.stepTiming(0.02);
 
-    assertEquals(autonomous, m_autonomousOutput.getValue());
+    String str = assertTimeoutPreemptively(Duration.ofMillis(20L), () -> m_future.get());
+    char expected = autonomous ? 'A' : 'T';
+
+    assertEquals(expected, str.charAt(2));
   }
 
-  @ValueSource(doubles = {45.0, 27.0, 23.0})
-  @ParameterizedTest(name = "alert[{index}]: {0}s")
-  void alertTest(double matchTime) {
+  @ValueSource(doubles = {112.0, 45.0, 27.0, 23.0, 3.0})
+  @ParameterizedTest(name = "matchTime[{index}]: {0}s")
+  void matchTimeTest(double matchTime) {
     DriverStationSim.setMatchTime(matchTime);
     DriverStationSim.notifyNewData();
-
-    assertTrue(m_alertOutput.getInitialized());
-    assertFalse(m_alertOutput.getIsInput());
+    assertTrue(m_i2c.getInitialized());
 
     SimHooks.stepTiming(0.02);
 
-    assertEquals(matchTime <= 30 && matchTime >= 25, m_alertOutput.getValue());
+    String str = assertTimeoutPreemptively(Duration.ofMillis(20L), () -> m_future.get());
+    String expected = String.format("%03d", (int) DriverStation.getMatchTime());
+
+    assertEquals(expected, str.substring(3));
   }
 }
