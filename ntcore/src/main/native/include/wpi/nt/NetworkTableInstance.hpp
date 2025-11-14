@@ -607,12 +607,17 @@ class NetworkTableInstance final {
    * @param listen_address    the address to listen on, or an empty string to
    *                          listen on any address. (UTF-8 string, null
    *                          terminated)
+   * @param mdns_service      the mDNS service name to announce, or an empty
+   *                          string to not announce via mDNS (UTF-8 string,
+   *                          null terminated)
    * @param port              port to communicate over
    */
   void StartServer(std::string_view persist_filename = "networktables.json",
-                   const char* listen_address = "", const char* mdns_service = "",
+                   const char* listen_address = "",
+                   const char* mdns_service = "",
                    unsigned int port = kDefaultPort) {
-    ::wpi::nt::StartServer(m_handle, persist_filename, listen_address, mdns_service, port);
+    ::wpi::nt::StartServer(m_handle, persist_filename, listen_address,
+                           mdns_service, port);
   }
 
   /**

@@ -474,8 +474,7 @@ void NetworkServer::Init() {
     } else {
       m_mdnsAnnouncer->Start();
       announcingmDNS = true;
-      INFO("mDNS announcing as service '{}' on port {}", m_mdnsService,
-             m_port);
+      INFO("mDNS announcing as service '{}' on port {}", m_mdnsService, m_port);
     }
   }
 
