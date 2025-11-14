@@ -11,8 +11,12 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
+
+import org.wpilib.datalog.DataLogRecord.StartRecordData;
 
 /** Data log reader (reads logs written by the DataLog class). */
 public class DataLogReader implements Iterable<DataLogRecord> {
@@ -126,7 +130,17 @@ public class DataLogReader implements Iterable<DataLogRecord> {
       ByteBuffer data = m_buf.duplicate();
       data.position(pos + headerLen);
       data.limit(pos + headerLen + size);
-      return new DataLogRecord(entry, timestamp, data.slice());
+      DataLogRecord record = new DataLogRecord(entry, timestamp, data.slice());
+      if (record.isStart()) {
+        m_entriesById.put(entry, record.getReaderEntry());
+      } else {
+        if (m_entriesById.containsKey(entry)) {
+          record.setReaderEntry(m_entriesById.get(entry));
+        } else {
+          throw new NoSuchElementException();
+        }
+      }
+      return record;
     } catch (BufferUnderflowException | IndexOutOfBoundsException ex) {
       throw new NoSuchElementException();
     }
@@ -150,5 +164,20 @@ public class DataLogReader implements Iterable<DataLogRecord> {
     return m_buf.remaining();
   }
 
+  DataLogReaderEntry getEntry(int entry) {
+    return m_entriesById.get(entry);
+  }
+
   private final ByteBuffer m_buf;
+  private HashMap<Integer, DataLogReaderEntry> m_entriesById;
+
+  public static class DataLogReaderEntry extends StartRecordData {
+    public List<DataLogReaderRange> ranges;
+    
+    public DataLogReaderEntry(int entry, String name, String type, String metadata) {
+      super(entry, name, type, metadata);
+    }
+  }
+
+  public record DataLogReaderRange(DataLogIterator begin, DataLogIterator end) {}
 }
