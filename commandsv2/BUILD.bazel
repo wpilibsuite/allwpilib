@@ -7,6 +7,7 @@ load("//commandsv2:generate.bzl", "generate_wpilib_new_commands")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test", "wpilib_java_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project")
+load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
 
 filegroup(
     name = "doxygen-files",
@@ -182,4 +183,22 @@ package_default_cc_project(
     name = "commandsv2",
     maven_artifact_name = "commandsv2-cpp",
     maven_group_id = "org.wpilib.commandsv2",
+)
+
+py_library(
+    name = "commandsv2-py",
+    srcs = glob(["src/main/python/**/*.py"]),
+    imports = ["src/main/python"],
+    deps = [
+        "//wpilibc:robotpy-wpilib",
+    ]
+)
+
+robotpy_py_test(
+    "python_tests",
+    srcs = glob(["src/test/python/**/*.py"]),
+    deps = [
+        ":commandsv2-py",
+        requirement("pytest"),
+    ],
 )
