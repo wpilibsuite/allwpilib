@@ -25,7 +25,6 @@ EXAMPLE_FOLDERS = [
     "HAL",
     "HatchbotInlined",
     "HatchbotTraditional",
-    "HidRumble",
     "HttpCamera",
     "I2CCommunication",
     "IntermediateVision",
@@ -34,7 +33,6 @@ EXAMPLE_FOLDERS = [
     "MecanumDrivePoseEstimator",
     "Mechanism2d",
     "MotorControl",
-    "PotentiometerPID",
     "QuickVision",
     "RapidReactCommandBot",
     "RomiReference",
@@ -100,6 +98,5 @@ TESTS_FOLDERS = [
     "DigitalCommunication",
     "ElevatorSimulation",
     "I2CCommunication",
-    "PotentiometerPID",
     "UnitTest",
 ]

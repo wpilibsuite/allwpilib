@@ -24,7 +24,6 @@ EXAMPLES_FOLDERS = [
     "gyromecanum",
     "hatchbotinlined",
     "hatchbottraditional",
-    "hidrumble",
     "httpcamera",
     "i2ccommunication",
     "intermediatevision",
@@ -33,7 +32,6 @@ EXAMPLES_FOLDERS = [
     "mecanumdriveposeestimator",
     "mechanism2d",
     "motorcontrol",
-    "potentiometerpid",
     "quickvision",
     "rapidreactcommandbot",
     "romireference",
@@ -106,6 +104,5 @@ TEST_FOLDERS = [
     "digitalcommunication",
     "elevatorsimulation",
     "i2ccommunication",
-    "potentiometerpid",
     "unittest",
 ]

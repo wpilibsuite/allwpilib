@@ -63,22 +63,6 @@
     "commandversion": 2
   },
   {
-    "name": "Potentiometer PID",
-    "description": "Maintain elevator position setpoints with a potentiometer and PID control.",
-    "tags": [
-      "Basic Robot",
-      "Analog",
-      "Elevator",
-      "PID",
-      "Joystick"
-    ],
-    "foldername": "potentiometerpid",
-    "gradlebase": "java",
-    "robotclass": "Robot",
-    "commandversion": 2,
-    "hasunittests": true
-  },
-  {
     "name": "Elevator with trapezoid profiled PID",
     "description": "Reach elevator position setpoints with trapezoid profiles and smart motor controller PID.",
     "tags": [
@@ -149,18 +133,6 @@
       "Joystick"
     ],
     "foldername": "gyromecanum",
-    "gradlebase": "java",
-    "robotclass": "Robot",
-    "commandversion": 2
-  },
-  {
-    "name": "HID Rumble",
-    "description": "Make human interface devices (HID) rumble.",
-    "tags": [
-      "Hardware",
-      "Gamepad"
-    ],
-    "foldername": "hidrumble",
     "gradlebase": "java",
     "robotclass": "Robot",
     "commandversion": 2

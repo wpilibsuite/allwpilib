@@ -93,32 +93,6 @@
     "commandversion": 2
   },
   {
-    "name": "HID Rumble",
-    "description": "Make human interface devices (HID) rumble.",
-    "tags": [
-      "Hardware",
-      "Gamepad"
-    ],
-    "foldername": "HidRumble",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
-    "name": "PotentiometerPID",
-    "description": "Maintain elevator position setpoints with a potentiometer and PID control.",
-    "tags": [
-      "Basic Robot",
-      "Analog",
-      "Elevator",
-      "PID",
-      "Joystick"
-    ],
-    "foldername": "PotentiometerPID",
-    "gradlebase": "cpp",
-    "commandversion": 2,
-    "hasunittests": true
-  },
-  {
     "name": "Elevator with exponential profiled PID",
     "description": "Reach elevator position setpoints with exponential profiles and smart motor controller PID.",
     "tags": [
