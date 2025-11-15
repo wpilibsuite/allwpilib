@@ -1029,6 +1029,30 @@ public final class NetworkTableInstance implements AutoCloseable {
   }
 
   /**
+   * Sets server addresses and port for client (without restarting client). Connects using commonly
+   * known robot addresses for the specified team, and an extra address. Changes the port to the
+   * default port.
+   *
+   * @param team team number
+   * @param extraAddress extra server address
+   */
+  public void setServerTeamExtra(int team, String extraAddress) {
+    setServerTeamExtra(team, extraAddress, 0);
+  }
+
+  /**
+   * Sets server addresses and port for client (without restarting client). Connects using commonly
+   * known robot addresses for the specified team, and an extra address.
+   *
+   * @param team team number
+   * @param extraAddress extra server address
+   * @param port port to communicate over (0=default)
+   */
+  public void setServerTeamExtra(int team, String extraAddress, int port) {
+    NetworkTablesJNI.setServerTeamExtra(m_handle, team, extraAddress, port);
+  }
+
+  /**
    * Disconnects the client if it's running and connected. This will automatically start
    * reconnection attempts to the current server list.
    */
@@ -1268,4 +1292,3 @@ public final class NetworkTableInstance implements AutoCloseable {
   private int m_handle;
   private final ConcurrentMap<String, RawPublisher> m_schemas = new ConcurrentHashMap<>();
 }
-
