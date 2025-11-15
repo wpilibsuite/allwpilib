@@ -216,12 +216,6 @@ maven_artifacts = [
         testonly = True,
     ),
     maven.artifact(
-        "com.google.code.gson",
-        "gson",
-        "2.10.1",
-        testonly = False,
-    ),
-    maven.artifact(
         "org.hamcrest",
         "hamcrest-all",
         "1.3",
