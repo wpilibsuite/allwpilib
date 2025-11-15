@@ -8,9 +8,41 @@ The upstream RobotPy repository uses toml configuration files and semiwrap to pr
 Building the robotpy software on top of the standard C++/Java software can result in more than doubling the amount of time it takes to compile. To skip building the robotpy tooling you can add `--config=skip_robotpy` to the command line or to your `user.bazelrc`
 
 # Syncing with robotpy
-NOTE: This process is currently unlanded while robotpy gets the 2027 branch stable
-
 [Copybara](https://github.com/google/copybara) is used to maintin synchronization between the upstream robotpy repositories and the allwpilib mirror. Github actions can be manually run which will create pull requests that will update all of the robotpy files between the two repositories. The ideal process is that the allwpilib mirror is always building in CI, and once a release is created the RobotPy team can run the `wpilib -> robotpy` copybara task, make any fine tuned adjustements and create their release. In the event that additional changes are made on the robotpy side, they can run the `robotpy -> wpilib` task to push the updates back to the mirror. However the goal of the mirroring the software here is to be able to more rapidly test changes and will hopefully overwhelmingly eliminate the need for syncs this direction.
+
+## Creating a user config
+The copybara scripts needs to know information about what repositories it will be pushing the sync'd changes. These can be specified on the command line, or you can create a `shared/bazel/copybara/.copybara.json` config file to save your personalized settings to avoid having to type things out every time. To run the full suite of migrations, you need a fork of [allwpilib](https://github.com/wpilibsuite/allwpilib), a fork of [mostrobotpy](https://github.com/robotpy/mostrobotpy), and a fork of robotpy's [commands-v2](https://github.com/robotpy/robotpy-commands-v2). If you only wish to run a subset of commands (i.e. not sync the commands project), you do not need to include that in your user config.
+
+Example config:
+```
+{
+    "mostrobotpy_local_repo_path": "/home/<username>/git/robotpy/robotpy_monorepo/mostrobotpy",
+
+    "mostrobotpy_fork_repo": "https://github.com/<username>/mostrobotpy.git",
+    "allwpilib_fork_repo": "https://github.com/<username>/allwpilib.git",
+    "robotpy_commandsv2_fork_repo":  "https://github.com/<username>/robotpy-commands-v2.git"
+}
+```
+
+## Running syncs
+- **Pulling changes from mostrobotpy**:
+
+    `python3 shared/bazel/copybara/run_copybara.py mostrobotpy_to_allwpilib`
+
+
+- **Pulling changes from the commands library**:
+
+    `python3 shared/bazel/copybara/run_copybara.py commandsv2_to_allwpilib`
+
+- **Pushing changes to the commands library**:
+
+    `python3 shared/bazel/copybara/run_copybara.py allwpilib_to_commandsv2`
+
+- **Pushing changes to mostrobotpy**:
+
+    This process is slightly more complicated, because you will almost certainly also need to update the maven artifacts that mostrobopy is using. Because of this, you must also specify the version number that has been published to wpilibs maven repository. If you are trying to get an early, non-released development build pushed over, you can also add the `--development_build` flag
+
+    `python3 shared/bazel/copybara/run_copybara.py allwpilib_to_mostrobotpy --wpilib_bin_version=2027.0.0-alpha-3-86-g418b381 --development_build -y`
 
 
 # Debugging Build Errors

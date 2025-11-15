@@ -1,4 +1,5 @@
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@rules_java//java:java_binary.bzl", "java_binary")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 load("//shared/bazel/rules:publishing.bzl", "publish_all")
@@ -39,6 +40,12 @@ alias(
     }),
     tags = ["pregeneration"],
     visibility = ["//visibility:public"],
+)
+
+java_binary(
+    name = "copybara",
+    main_class = "com.google.copybara.Main",
+    runtime_deps = ["@com_github_google_copybara//jar"],
 )
 
 # This is a helper to run all of the pregeneration scripts at once.
