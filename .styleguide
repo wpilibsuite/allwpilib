@@ -68,6 +68,8 @@ generatedFileExclude {
 
   apriltag/src/main/python/
   apriltag/src/test/python/
+  commandsv2/src/main/python/
+  commandsv2/src/test/python/
   datalog/src/main/python/
   datalog/src/test/python/
   hal/src/main/python/
