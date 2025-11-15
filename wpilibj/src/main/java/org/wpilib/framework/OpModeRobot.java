@@ -56,24 +56,47 @@ public abstract class OpModeRobot extends RobotBase {
     DriverStation.reportError("Error adding OpMode " + cls.getSimpleName() + ": " + message, false);
   }
 
-  private OpMode constructOpModeClass(Class<?> cls) {
-    Constructor<?> constructor;
-    boolean hasThis;
-    try {
-      constructor = cls.getConstructor(getClass());
-      hasThis = true;
-    } catch (NoSuchMethodException e) {
-      try {
-        constructor = cls.getConstructor();
-      } catch (NoSuchMethodException e2) {
-        DriverStation.reportError(
-            "Could not instantiate OpMode " + cls.getSimpleName(), e2.getStackTrace());
-        return null;
+  /**
+   * Find a public constructor to instantiate the opmode:
+   * - Prefer a single-arg public constructor whose parameter type is assignable from this.getClass()
+   *   (if multiple, pick the most specific parameter type).
+   * - Otherwise return the public no-arg constructor.
+   * - Return null if neither exists.
+   */
+  private Constructor<?> findOpModeConstructor(Class<?> cls) {
+    Constructor<?> bestCtor = null;
+    Class<?> bestParam = null;
+    for (Constructor<?> ctor : cls.getConstructors()) {
+      Class<?>[] params = ctor.getParameterTypes();
+      if (params.length == 1) {
+        Class<?> param = params[0];
+        if (param.isAssignableFrom(getClass())) {
+          if (bestCtor == null || bestParam.isAssignableFrom(param)) {
+            bestCtor = ctor;
+            bestParam = param;
+          }
+        }
       }
-      hasThis = false;
+    }
+    if (bestCtor != null) {
+      return bestCtor;
     }
     try {
-      if (hasThis) {
+      return cls.getConstructor();
+    } catch (NoSuchMethodException e) {
+      return null;
+    }
+  }
+
+  private OpMode constructOpModeClass(Class<?> cls) {
+    Constructor<?> constructor = findOpModeConstructor(cls);
+    if (constructor == null) {
+      DriverStation.reportError(
+          "No suitable constructor to instantiate OpMode " + cls.getSimpleName(), true);
+      return null;
+    }
+    try {
+      if (constructor.getParameterCount() == 1) {
         return (OpMode) constructor.newInstance(this);
       } else {
         return (OpMode) constructor.newInstance();
@@ -103,18 +126,12 @@ public abstract class OpModeRobot extends RobotBase {
     if (cls.getEnclosingClass() != null && !Modifier.isStatic(modifiers)) {
       throw new IllegalArgumentException("is a non-static inner class");
     }
-    // it must have a public no-arg constructor or a public constructor that accepts this class as
-    // an argument
-    try {
-      cls.getConstructor(getClass());
-    } catch (NoSuchMethodException e) {
-      try {
-        cls.getConstructor();
-      } catch (NoSuchMethodException ex) {
-        throw new IllegalArgumentException(
-            "missing public no-arg constructor or constructor accepting "
-                + getClass().getSimpleName());
-      }
+    // it must have a public no-arg constructor or a public constructor that accepts this class
+    // (or a superclass/interface) as an argument
+    if (findOpModeConstructor(cls) == null) {
+      throw new IllegalArgumentException(
+          "missing public no-arg constructor or constructor accepting "
+              + getClass().getSimpleName());
     }
   }
 
