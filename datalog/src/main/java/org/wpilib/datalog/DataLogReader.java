@@ -11,8 +11,12 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
+import org.wpilib.datalog.DataLogRecord.StartRecordData;
 
 /** Data log reader (reads logs written by the DataLog class). */
 public class DataLogReader implements Iterable<DataLogRecord> {
@@ -24,6 +28,7 @@ public class DataLogReader implements Iterable<DataLogRecord> {
   public DataLogReader(ByteBuffer buffer) {
     m_buf = buffer;
     m_buf.order(ByteOrder.LITTLE_ENDIAN);
+    m_entriesById = new HashMap<>();
   }
 
   /**
@@ -126,7 +131,14 @@ public class DataLogReader implements Iterable<DataLogRecord> {
       ByteBuffer data = m_buf.duplicate();
       data.position(pos + headerLen);
       data.limit(pos + headerLen + size);
-      return new DataLogRecord(entry, timestamp, data.slice());
+      DataLogRecord record = new DataLogRecord(entry, timestamp, data.slice());
+      if (record.isStart()) {
+        var startdata = record.getStartData();
+        m_entriesById.put(
+            entry,
+            new DataLogReaderEntry(entry, startdata.name, startdata.type, startdata.metadata));
+      }
+      return record;
     } catch (BufferUnderflowException | IndexOutOfBoundsException ex) {
       throw new NoSuchElementException();
     }
@@ -150,5 +162,25 @@ public class DataLogReader implements Iterable<DataLogRecord> {
     return m_buf.remaining();
   }
 
+  DataLogReaderEntry getEntry(int entry) {
+    return m_entriesById.get(entry);
+  }
+
   private final ByteBuffer m_buf;
+  private HashMap<Integer, DataLogReaderEntry> m_entriesById;
+
+  public static class DataLogReaderEntry extends StartRecordData {
+    private final List<DataLogReaderRange> m_ranges;
+
+    public List<DataLogReaderRange> getRanges() {
+      return m_ranges;
+    }
+
+    public DataLogReaderEntry(int entry, String name, String type, String metadata) {
+      super(entry, name, type, metadata);
+      m_ranges = new ArrayList<>(); // TODO: determine how this will be used
+    }
+  }
+
+  public record DataLogReaderRange(DataLogIterator begin, DataLogIterator end) {}
 }
