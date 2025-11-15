@@ -364,7 +364,6 @@ public abstract class OpModeRobot extends RobotBase {
   private void addAnnotatedOpModeClass(String name) {
     // trim ".class" from end
     String className = name.replace('/', '.').substring(0, name.length() - 6);
-    System.out.println("adding " + className);
     Class<?> cls;
     try {
       cls = Class.forName(className);
@@ -410,13 +409,11 @@ public abstract class OpModeRobot extends RobotBase {
     String packageName = pkg.getName();
     String packagePath = packageName.replace('.', '/');
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-    System.out.println("Scanning " + packageName + " " + packagePath);
 
     try {
       Enumeration<URL> resources = classLoader.getResources(packagePath);
       while (resources.hasMoreElements()) {
         URL resource = resources.nextElement();
-        System.out.println("resource " + resource);
         if ("jar".equals(resource.getProtocol())) {
           // Get path of JAR file from URL path (format "file:<path_to_jar_file>!/path_to_entry")
           String jarPath = resource.getPath().substring(5, resource.getPath().indexOf('!'));
@@ -424,7 +421,6 @@ public abstract class OpModeRobot extends RobotBase {
             Enumeration<JarEntry> entries = jar.entries();
             while (entries.hasMoreElements()) {
               String name = entries.nextElement().getName();
-              System.out.println(name);
               if (!name.startsWith(packagePath) || !name.endsWith(".class")) {
                 continue;
               }
