@@ -2,8 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "DashboardOpMode.hpp"
+#include "wpi/hal/DashboardOpMode.hpp"
 
+#include <atomic>
 #include <string>
 #include <vector>
 
@@ -24,31 +25,33 @@ using namespace wpi;
 namespace {
 class DashboardOpModeSender {
  public:
-  void Enable(nt::NetworkTableInstance inst, std::string_view tableName) {
-    m_typePub =
-        inst.GetStringTopic(fmt::format("{}/.type", tableName)).Publish();
+  DashboardOpModeSender(nt::NetworkTableInstance inst,
+                        std::string_view tableName)
+      : m_typeTopic{inst.GetStringTopic(fmt::format("{}/.type", tableName))},
+        m_optionsTopic{
+            inst.GetStringArrayTopic(fmt::format("{}/options", tableName))},
+        m_activeTopic{inst.GetStringTopic(fmt::format("{}/active", tableName))},
+        m_selectedSub{inst.GetStringTopic(fmt::format("{}/selected", tableName))
+                          .Subscribe("")},
+        m_selectedListener{nt::NetworkTableListener::CreateListener(
+            m_selectedSub, NT_EVENT_VALUE_ALL | NT_EVENT_IMMEDIATE,
+            [this](const nt::Event& event) {
+              if (auto data = event.GetValueEventData()) {
+                if (data->value.IsString()) {
+                  m_activePub.Set(data->value.GetString());
+                }
+              }
+            })} {}
+
+  void Enable() {
+    m_typePub = m_typeTopic.Publish();
     m_typePub.Set("String Chooser");
 
-    m_optionsPub =
-        inst.GetStringArrayTopic(fmt::format("{}/options", tableName))
-            .Publish();
+    m_optionsPub = m_optionsTopic.Publish();
     m_optionsPub.Set(m_options);
 
-    m_activePub =
-        inst.GetStringTopic(fmt::format("{}/active", tableName)).Publish();
+    m_activePub = m_activeTopic.Publish();
     m_activePub.Set("");
-
-    m_selectedSub = inst.GetStringTopic(fmt::format("{}/selected", tableName))
-                        .Subscribe("");
-    m_selectedListener = nt::NetworkTableListener::CreateListener(
-        m_selectedSub, NT_EVENT_VALUE_ALL | NT_EVENT_IMMEDIATE,
-        [this](const nt::Event& event) {
-          if (auto data = event.GetValueEventData()) {
-            if (data->value.IsString()) {
-              m_activePub.Set(data->value.GetString());
-            }
-          }
-        });
   }
 
   void SetOptions(std::span<const HAL_OpModeOption> options,
@@ -76,16 +79,28 @@ class DashboardOpModeSender {
   }
 
  private:
+  nt::StringTopic m_typeTopic;
   nt::StringPublisher m_typePub;
+
+  nt::StringArrayTopic m_optionsTopic;
   nt::StringArrayPublisher m_optionsPub;
+
+  nt::StringTopic m_activeTopic;
   nt::StringPublisher m_activePub;
+
   nt::StringSubscriber m_selectedSub;
   nt::NetworkTableListener m_selectedListener;
+
   util::StringMap<int64_t> m_optionMap;
   std::vector<std::string> m_options;
 };
 
 struct DashboardOpModeInstance {
+  explicit DashboardOpModeInstance(nt::NetworkTableInstance inst)
+      : autoOpModes{inst, "/SmartDashboard/Auto OpMode"},
+        teleopOpModes{inst, "/SmartDashboard/Teleop OpMode"},
+        testOpModes{inst, "/SmartDashboard/Test OpMode"} {}
+
   util::mutex mutex;
   DashboardOpModeSender autoOpModes;
   DashboardOpModeSender teleopOpModes;
@@ -93,38 +108,43 @@ struct DashboardOpModeInstance {
 };
 }  // namespace
 
-static DashboardOpModeInstance& GetInstance() {
-  static DashboardOpModeInstance inst;
-  return inst;
+static DashboardOpModeInstance* gInstance;
+static std::atomic_flag gEnabled{false};
+
+void hal::InitializeDashboardOpMode() {
+  static DashboardOpModeInstance inst{nt::NetworkTableInstance::GetDefault()};
+  gInstance = &inst;
 }
 
 void hal::SetDashboardOpModeOptions(std::span<const HAL_OpModeOption> options) {
-  auto& inst = GetInstance();
-  std::scoped_lock lock{inst.mutex};
-  inst.autoOpModes.SetOptions(options, HAL_ROBOTMODE_AUTONOMOUS);
-  inst.teleopOpModes.SetOptions(options, HAL_ROBOTMODE_TELEOPERATED);
-  inst.testOpModes.SetOptions(options, HAL_ROBOTMODE_TEST);
+  std::scoped_lock lock{gInstance->mutex};
+  gInstance->autoOpModes.SetOptions(options, HAL_ROBOTMODE_AUTONOMOUS);
+  gInstance->teleopOpModes.SetOptions(options, HAL_ROBOTMODE_TELEOPERATED);
+  gInstance->testOpModes.SetOptions(options, HAL_ROBOTMODE_TEST);
 }
 
 void hal::EnableDashboardOpMode() {
-  auto& inst = GetInstance();
-  std::scoped_lock lock{inst.mutex};
-  auto ntInst = nt::NetworkTableInstance::GetDefault();
-  inst.autoOpModes.Enable(ntInst, "/SmartDashboard/Auto Op Modes");
-  inst.teleopOpModes.Enable(ntInst, "/SmartDashboard/Teleop Op Modes");
-  inst.testOpModes.Enable(ntInst, "/SmartDashboard/Test Op Modes");
+  if (gEnabled.test_and_set()) {
+    return;
+  }
+  std::scoped_lock lock{gInstance->mutex};
+  gInstance->autoOpModes.Enable();
+  gInstance->teleopOpModes.Enable();
+  gInstance->testOpModes.Enable();
 }
 
 int64_t hal::GetDashboardSelectedOpMode(HAL_RobotMode robotMode) {
-  auto& inst = GetInstance();
-  std::scoped_lock lock{inst.mutex};
+  if (!gEnabled.test()) {
+    return 0;
+  }
+  std::scoped_lock lock{gInstance->mutex};
   switch (robotMode) {
     case HAL_ROBOTMODE_AUTONOMOUS:
-      return inst.autoOpModes.GetSelected();
+      return gInstance->autoOpModes.GetSelected();
     case HAL_ROBOTMODE_TELEOPERATED:
-      return inst.teleopOpModes.GetSelected();
+      return gInstance->teleopOpModes.GetSelected();
     case HAL_ROBOTMODE_TEST:
-      return inst.testOpModes.GetSelected();
+      return gInstance->testOpModes.GetSelected();
     default:
       return 0;
   }

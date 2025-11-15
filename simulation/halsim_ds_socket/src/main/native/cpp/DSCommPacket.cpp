@@ -8,6 +8,7 @@
 #include <cstring>
 #include <span>
 
+#include "wpi/hal/DashboardOpMode.hpp"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/hal/simulation/MockHooks.h"
@@ -61,7 +62,8 @@ void DSCommPacket::SetControl(uint8_t control, uint8_t request) {
     robotMode = HAL_ROBOTMODE_TELEOPERATED;
   }
   m_control_word = HAL_MakeControlWord(
-      0, robotMode, (control & kEnabled) != 0, (control & kEmergencyStop) != 0,
+      wpi::hal::GetDashboardSelectedOpMode(robotMode), robotMode,
+      (control & kEnabled) != 0, (control & kEmergencyStop) != 0,
       (control & kFMS_Attached) != 0, (request & kRequestNormalMask) != 0);
 
   m_control_sent = control;

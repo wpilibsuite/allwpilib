@@ -12,6 +12,7 @@
 #include <fmt/format.h>
 
 #include "DriverStationDataInternal.h"
+#include "wpi/hal/DashboardOpMode.hpp"
 #include "wpi/hal/DriverStationTypes.h"
 
 using namespace wpi::hal;
@@ -24,6 +25,7 @@ static void FreeOpModeOption(HAL_OpModeOption& option) {
 
 namespace wpi::hal::init {
 void InitializeDriverStationData() {
+  wpi::hal::InitializeDashboardOpMode();
   static DriverStationData dsd;
   ::wpi::hal::SimDriverStationData = &dsd;
 }
@@ -78,6 +80,7 @@ void DriverStationData::ResetData() {
     // XXX: do not clear options vector as it comes from robot code?
   }
   m_newDataCallbacks.Reset();
+  wpi::hal::SetDashboardOpModeOptions({});
 }
 
 void DriverStationData::SetOpModeOptions(
@@ -102,6 +105,7 @@ void DriverStationData::SetOpModeOptions(
   }
   m_opModeOptionsCallbacks.Invoke(m_opModeOptions.data(),
                                   m_opModeOptions.size());
+  wpi::hal::SetDashboardOpModeOptions(options);
 }
 
 int32_t DriverStationData::RegisterOpModeOptionsCallback(

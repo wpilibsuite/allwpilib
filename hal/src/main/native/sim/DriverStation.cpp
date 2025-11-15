@@ -23,8 +23,6 @@
 #include "wpi/hal/cpp/fpga_clock.h"
 #include "wpi/hal/simulation/MockHooks.h"
 #include "wpi/util/EventVector.hpp"
-#include "wpi/util/StringMap.hpp"
-#include "wpi/util/condition_variable.hpp"
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/string.h"
 

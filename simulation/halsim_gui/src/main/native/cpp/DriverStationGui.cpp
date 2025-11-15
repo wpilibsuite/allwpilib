@@ -24,6 +24,7 @@
 #include "wpi/glass/support/ExtraGuiWidgets.hpp"
 #include "wpi/glass/support/NameSetting.hpp"
 #include "wpi/gui/wpigui.hpp"
+#include "wpi/hal/DashboardOpMode.hpp"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/hal/simulation/MockHooks.h"
@@ -285,6 +286,7 @@ static std::unique_ptr<FMSSimModel> gFMSModel;
 std::unique_ptr<DSManager> DriverStationGui::dsManager;
 
 static bool* gpDisableDS = nullptr;
+static bool* gpDashboardOpModes = nullptr;
 static bool* gpZeroDisconnectedJoysticks = nullptr;
 static bool* gpUseEnableDisableHotkeys = nullptr;
 static bool* gpUseEstopHotkey = nullptr;
@@ -1124,6 +1126,10 @@ static void DriverStationExecute() {
     return;
   }
 
+  if (*gpDashboardOpModes) {
+    wpi::hal::EnableDashboardOpMode();
+  }
+
   double curTime = glfwGetTime();
 
   // update system joysticks
@@ -1202,43 +1208,47 @@ static void DriverStationExecute() {
       DriverStationSetRobotMode(HAL_ROBOTMODE_TEST);
     }
     // OpMode
-    OpModes* modes;
-    switch (robotMode) {
-      case HAL_ROBOTMODE_AUTONOMOUS:
-        modes = &gAutoOpModes;
-        break;
-      case HAL_ROBOTMODE_TELEOPERATED:
-        modes = &gTeleopOpModes;
-        break;
-      case HAL_ROBOTMODE_TEST:
-        modes = &gTestOpModes;
-        break;
-      default:
-        modes = nullptr;
-        break;
-    }
-    if (modes) {
-      std::scoped_lock lock{gOpModeOptionsMutex};
-      auto nameIt = modes->ids.find(opMode);
-      auto name = nameIt != modes->ids.end() ? nameIt->second.c_str() : "";
-      if (ImGui::BeginCombo("OpMode", name)) {
-        for (auto&& [groupName, group] : modes->groups) {
-          if (!groupName.empty()) {
-            ImGui::TextDisabled("%s", groupName.c_str());
-            ImGui::Separator();
-          }
-          for (auto&& mode : group) {
-            bool selected = mode.id == opMode;
-            if (ImGui::Selectable(mode.name.c_str(), selected)) {
-              HALSIM_SetDriverStationOpMode(mode.id);
+    if (*gpDashboardOpModes) {
+      HALSIM_SetDriverStationOpMode(wpi::hal::GetDashboardSelectedOpMode(robotMode));
+    } else {
+      OpModes* modes;
+      switch (robotMode) {
+        case HAL_ROBOTMODE_AUTONOMOUS:
+          modes = &gAutoOpModes;
+          break;
+        case HAL_ROBOTMODE_TELEOPERATED:
+          modes = &gTeleopOpModes;
+          break;
+        case HAL_ROBOTMODE_TEST:
+          modes = &gTestOpModes;
+          break;
+        default:
+          modes = nullptr;
+          break;
+      }
+      if (modes) {
+        std::scoped_lock lock{gOpModeOptionsMutex};
+        auto nameIt = modes->ids.find(opMode);
+        auto name = nameIt != modes->ids.end() ? nameIt->second.c_str() : "";
+        if (ImGui::BeginCombo("OpMode", name)) {
+          for (auto&& [groupName, group] : modes->groups) {
+            if (!groupName.empty()) {
+              ImGui::TextDisabled("%s", groupName.c_str());
+              ImGui::Separator();
+            }
+            for (auto&& mode : group) {
+              bool selected = mode.id == opMode;
+              if (ImGui::Selectable(mode.name.c_str(), selected)) {
+                HALSIM_SetDriverStationOpMode(mode.id);
+              }
             }
           }
+          ImGui::EndCombo();
         }
-        ImGui::EndCombo();
-      }
-    } else {
-      if (ImGui::BeginCombo("OpMode", "")) {
-        ImGui::EndCombo();
+      } else {
+        if (ImGui::BeginCombo("OpMode", "")) {
+          ImGui::EndCombo();
+        }
       }
     }
     // Enable/Disable
@@ -1519,6 +1529,9 @@ void DSManager::DisplayMenu() {
     if (gpDisableDS != nullptr) {
       ImGui::MenuItem("Turn off DS", nullptr, gpDisableDS);
     }
+    if (gpDashboardOpModes != nullptr) {
+      ImGui::MenuItem("Use Dashboard OpModes", nullptr, gpDashboardOpModes);
+    }
     if (gpZeroDisconnectedJoysticks != nullptr) {
       ImGui::MenuItem("Zero disconnected joysticks", nullptr,
                       gpZeroDisconnectedJoysticks);
@@ -1557,6 +1570,7 @@ void DriverStationGui::GlobalInit() {
 
   storageRoot.SetCustomApply([&storageRoot] {
     gpDisableDS = &storageRoot.GetBool("disable", false);
+    gpDashboardOpModes = &storageRoot.GetBool("dashboardOpModes", false);
     gpZeroDisconnectedJoysticks =
         &storageRoot.GetBool("zeroDisconnectedJoysticks", true);
     gpUseEnableDisableHotkeys =

@@ -18,6 +18,7 @@
 #include "HALInitializer.h"
 #include "SystemServerInternal.h"
 #include "mrc/NtNetComm.h"
+#include "wpi/hal/DashboardOpMode.hpp"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/Errors.h"
@@ -219,11 +220,20 @@ void JoystickDataCache::Update(const mrc::ControlData& data) {
   allianceInt += 1;
   allianceStation = static_cast<HAL_AllianceStationID>(allianceInt);
 
-  controlWord = HAL_MakeControlWord(
-      data.CurrentOpMode.ToValue(),
-      static_cast<HAL_RobotMode>(data.ControlWord.RobotMode),
-      data.ControlWord.Enabled, data.ControlWord.EStop,
-      data.ControlWord.FmsConnected, data.ControlWord.DsConnected);
+  if (data.ControlWord.SupportsOpModes) {
+    controlWord = HAL_MakeControlWord(
+        data.CurrentOpMode.ToValue(),
+        static_cast<HAL_RobotMode>(data.ControlWord.RobotMode),
+        data.ControlWord.Enabled, data.ControlWord.EStop,
+        data.ControlWord.FmsConnected, data.ControlWord.DsConnected);
+  } else {
+    wpi::hal::EnableDashboardOpMode();
+    auto robotMode = static_cast<HAL_RobotMode>(data.ControlWord.RobotMode);
+    controlWord = HAL_MakeControlWord(
+        wpi::hal::GetDashboardSelectedOpMode(robotMode), robotMode,
+        data.ControlWord.Enabled, data.ControlWord.EStop,
+        data.ControlWord.FmsConnected, data.ControlWord.DsConnected);
+  }
 
   auto sticks = data.Joysticks();
 
@@ -331,6 +341,7 @@ void TcpCache::Update() {
 
 namespace wpi::hal::init {
 void InitializeFRCDriverStation() {
+  InitializeDashboardOpMode();
   newestControlWord.value = 0;
   static FRCDriverStation ds;
   driverStation = &ds;
@@ -441,11 +452,20 @@ int32_t HAL_GetUncachedControlWord(HAL_ControlWord* controlWord) {
   int64_t dataTime{0};
   bool dataValid = systemServerDs->GetLastControlData(&data, &dataTime);
   if (dataValid && data.ControlWord.DsConnected) {
-    *controlWord = HAL_MakeControlWord(
-        data.CurrentOpMode.ToValue(),
-        static_cast<HAL_RobotMode>(data.ControlWord.RobotMode),
-        data.ControlWord.Enabled, data.ControlWord.EStop,
-        data.ControlWord.FmsConnected, data.ControlWord.DsConnected);
+    if (data.ControlWord.SupportsOpModes) {
+      *controlWord = HAL_MakeControlWord(
+          data.CurrentOpMode.ToValue(),
+          static_cast<HAL_RobotMode>(data.ControlWord.RobotMode),
+          data.ControlWord.Enabled, data.ControlWord.EStop,
+          data.ControlWord.FmsConnected, data.ControlWord.DsConnected);
+    } else {
+      wpi::hal::EnableDashboardOpMode();
+      auto robotMode = static_cast<HAL_RobotMode>(data.ControlWord.RobotMode);
+      *controlWord = HAL_MakeControlWord(
+          wpi::hal::GetDashboardSelectedOpMode(robotMode), robotMode,
+          data.ControlWord.Enabled, data.ControlWord.EStop,
+          data.ControlWord.FmsConnected, data.ControlWord.DsConnected);
+    }
   } else {
     // DS disconnected. Clear the control word
     controlWord->value = 0;
@@ -478,6 +498,8 @@ int32_t HAL_SetOpModeOptions(const struct HAL_OpModeOption* options,
     std::scoped_lock lock{tcpCacheMutex};
     systemServerDs->opModeOptionsPublisher.Set(newOptions);
   }
+
+  wpi::hal::SetDashboardOpModeOptions({options, options + count});
 
   return 0;
 }

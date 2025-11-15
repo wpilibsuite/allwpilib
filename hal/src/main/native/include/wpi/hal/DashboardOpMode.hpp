@@ -10,6 +10,7 @@
 
 namespace wpi::hal {
 
+void InitializeDashboardOpMode();
 void SetDashboardOpModeOptions(std::span<const HAL_OpModeOption> options);
 void EnableDashboardOpMode();
 int64_t GetDashboardSelectedOpMode(HAL_RobotMode robotMode);
