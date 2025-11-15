@@ -50,14 +50,15 @@ class CommandPtr final {
   CommandPtr Repeatedly() &&;
 
   /**
-   * Decorates this command to run repeatedly, restarting until the command runs
-   * for the given number of times. The decorated command can still be canceled.
+   * Decorates this command to run repeatedly, restarting it when it ends,
+   * until this command is run the specified number of times or is interrupted.
+   * The decorated command can still be canceled.
    *
-   * @param times the number of times to run the command
+   * @param repetitions the number of times to run the command
    * @return the decorated command
    */
   [[nodiscard]]
-  CommandPtr Repeatedly(int times) &&;
+  CommandPtr Repeatedly(int repetitions) &&;
 
   /**
    * Decorates this command to run "by proxy" by wrapping it in a ProxyCommand.
