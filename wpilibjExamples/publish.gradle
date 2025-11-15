@@ -19,11 +19,11 @@ task javaExamplesZip(type: Zip) {
         into '/'
     }
 
-    from('src/main/java/edu/wpi/first/wpilibj/examples') {
+    from('src/main/java/org/wpilib/wpilibj/examples') {
         into 'examples'
     }
 
-    from('src/test/java/edu/wpi/first/wpilibj/examples') {
+    from('src/test/java/org/wpilib/wpilibj/examples') {
         into 'examples_test'
     }
 }
@@ -36,11 +36,11 @@ task javaTemplatesZip(type: Zip) {
         into '/'
     }
 
-    from('src/main/java/edu/wpi/first/wpilibj/templates') {
+    from('src/main/java/org/wpilib/wpilibj/templates') {
         into 'templates'
     }
 
-    from('src/test/java/edu/wpi/first/wpilibj/templates') {
+    from('src/test/java/org/wpilib/wpilibj/templates') {
         into 'templates_test'
     }
 }
@@ -53,11 +53,11 @@ task javaCommandsZip(type: Zip) {
         into '/'
     }
 
-    from('src/main/java/edu/wpi/first/wpilibj/commands') {
+    from('src/main/java/org/wpilib/wpilibj/commands') {
         into 'commands'
     }
 
-    from('src/test/java/edu/wpi/first/wpilibj/commands') {
+    from('src/test/java/org/wpilib/wpilibj/commands') {
         into 'commands_test'
     }
 }
