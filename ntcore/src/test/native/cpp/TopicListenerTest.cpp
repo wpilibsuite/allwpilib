@@ -52,7 +52,7 @@ class TopicListenerTest : public ::testing::Test {
 };
 
 void TopicListenerTest::Connect(unsigned int port) {
-  wpi::nt::StartServer(m_serverInst, "topiclistenertest.json", "127.0.0.1",
+  wpi::nt::StartServer(m_serverInst, "topiclistenertest.json", "127.0.0.1", "",
                        port);
   wpi::nt::StartClient(m_clientInst, "client");
   wpi::nt::SetServer(m_clientInst, "127.0.0.1", port);

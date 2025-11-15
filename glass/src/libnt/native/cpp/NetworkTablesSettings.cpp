@@ -80,7 +80,7 @@ void NetworkTablesSettings::Thread::Main() {
       }
     } else if (m_mode == 3) {
       wpi::nt::StartServer(m_inst, m_iniName.c_str(), m_listenAddress.c_str(),
-                           m_port);
+                           "", m_port);
     }
   }
 }

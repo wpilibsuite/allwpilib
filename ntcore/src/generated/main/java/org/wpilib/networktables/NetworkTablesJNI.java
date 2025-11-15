@@ -1404,10 +1404,11 @@ public final class NetworkTablesJNI {
    * @param inst NT instance handle.
    * @param persistFilename the name of the persist file to use
    * @param listenAddress the address to listen on, or empty to listen on any address
+   * @param mdnsService the mDNS service name to advertise, or empty to not advertise
    * @param port port to communicate over
    */
   public static native void startServer(
-      int inst, String persistFilename, String listenAddress, int port);
+      int inst, String persistFilename, String listenAddress, String mdnsService, int port);
 
   /**
    * Stops the server if it is running.

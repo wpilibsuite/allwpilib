@@ -190,9 +190,9 @@ RobotBase::RobotBase() {
   // subscribe to "" to force persistent values to propagate to local
   wpi::nt::SubscribeMultiple(inst.GetHandle(), {{std::string_view{}}});
   if constexpr (!IsSimulation()) {
-    inst.StartServer("/home/systemcore/networktables.json");
+    inst.StartServer("/home/systemcore/networktables.json", "", "robot");
   } else {
-    inst.StartServer();
+    inst.StartServer("networktables.json", "", "robot");
   }
 
   // wait for the NT server to actually start
