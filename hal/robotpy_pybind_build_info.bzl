@@ -331,6 +331,8 @@ def wpihal_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
                 ("HAL_JoystickButtons", "__HAL_JoystickButtons.hpp"),
                 ("HAL_JoystickDescriptor", "__HAL_JoystickDescriptor.hpp"),
                 ("HAL_MatchInfo", "__HAL_MatchInfo.hpp"),
+                ("HAL_OpModeOption", "__HAL_OpModeOption.hpp"),
+                ("wpi::hal::ControlWord", "wpi__hal__ControlWord.hpp"),
             ],
         ),
         struct(
