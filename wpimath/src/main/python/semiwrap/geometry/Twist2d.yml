@@ -22,7 +22,7 @@ inline_code: |
     .def_static("fromFeet", [](wpi::units::foot_t dx, wpi::units::foot_t dy, wpi::units::radian_t dtheta){
       return Twist2d{dx, dy, dtheta};
     }, py::arg("dx") = 0, py::arg("dy") = 0, py::arg("dtheta") = 0)
-    .def_property("dx_feet", 
+    .def_property("dx_feet",
       [](Twist2d * self) -> wpi::units::foot_t {
         return self->dx;
       },
@@ -30,7 +30,7 @@ inline_code: |
         self->dx = dx;
       }
     )
-    .def_property("dy_feet", 
+    .def_property("dy_feet",
       [](Twist2d * self) -> wpi::units::foot_t {
         return self->dy;
       },
@@ -38,7 +38,7 @@ inline_code: |
         self->dy = dy;
       }
     )
-    .def_property("dtheta_degrees", 
+    .def_property("dtheta_degrees",
       [](Twist2d * self) -> wpi::units::degree_t {
         return self->dtheta;
       },

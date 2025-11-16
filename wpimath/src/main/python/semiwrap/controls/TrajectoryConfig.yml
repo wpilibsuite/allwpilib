@@ -44,7 +44,7 @@ inline_code: |-
   "\n"
   ":param kinematics: The swerve drive kinematics.")
     )
-      
+
     .def("setKinematics", static_cast<void (wpi::math::TrajectoryConfig::*)(wpi::math::SwerveDriveKinematics<3>&)>(
   &wpi::math::TrajectoryConfig::SetKinematics<3>),
         py::arg("kinematics"), release_gil(), py::doc(
@@ -53,7 +53,7 @@ inline_code: |-
   "\n"
   ":param kinematics: The swerve drive kinematics.")
     )
-      
+
     .def("setKinematics", static_cast<void (wpi::math::TrajectoryConfig::*)(wpi::math::SwerveDriveKinematics<4>&)>(
   &wpi::math::TrajectoryConfig::SetKinematics<4>),
         py::arg("kinematics"), release_gil(), py::doc(
@@ -62,7 +62,7 @@ inline_code: |-
   "\n"
   ":param kinematics: The swerve drive kinematics.")
     )
-      
+
     .def("setKinematics", static_cast<void (wpi::math::TrajectoryConfig::*)(wpi::math::SwerveDriveKinematics<6>&)>(
   &wpi::math::TrajectoryConfig::SetKinematics<6>),
         py::arg("kinematics"), release_gil(), py::doc(

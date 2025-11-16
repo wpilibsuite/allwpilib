@@ -1,5 +1,7 @@
 #include "rpy/ControlWord.h"
 
+#include <tuple>
+
 #include "wpi/hal/DriverStation.h"
 
 namespace rpy {
@@ -15,4 +17,4 @@ std::tuple<bool, bool, bool> GetControlState() {
   return std::make_tuple(enable, auton, test);
 }
 
-} // namespace rpy
+}  // namespace rpy
