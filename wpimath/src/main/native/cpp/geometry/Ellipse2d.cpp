@@ -20,7 +20,7 @@ Translation2d Ellipse2d::Nearest(const Translation2d& point) const {
 
   // Find nearest point
   {
-    slp::Problem problem;
+    slp::Problem<double> problem;
 
     // Point on ellipse
     auto x = problem.decision_variable();
