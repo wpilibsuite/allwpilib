@@ -10,8 +10,17 @@
 
 #include <fmt/format.h>
 
-#include "wpi/util/SmallVector.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/Endian.hpp"
+
+// FIXME: use dynamic struct decoding
+// Duplicated here from DriverStationTypes.h to avoid HAL dependency
+#define HAL_CONTROLWORD_OPMODE_HASH_MASK 0x00FFFFFFFFFFFFFFLL
+#define HAL_CONTROLWORD_ROBOT_MODE_MASK 0x0300000000000000LL
+#define HAL_CONTROLWORD_ROBOT_MODE_SHIFT 56
+#define HAL_CONTROLWORD_ENABLED_MASK 0x0400000000000000LL
+#define HAL_CONTROLWORD_ESTOP_MASK 0x0800000000000000LL
+#define HAL_CONTROLWORD_FMS_ATTACHED_MASK 0x1000000000000000LL
+#define HAL_CONTROLWORD_DS_ATTACHED_MASK 0x2000000000000000LL
 
 using namespace wpi::glass;
 
@@ -28,15 +37,14 @@ NTFMSModel::NTFMSModel(wpi::nt::NetworkTableInstance inst,
                      .Subscribe(false)},
       m_station{inst.GetIntegerTopic(fmt::format("{}/StationNumber", path))
                     .Subscribe(0)},
-      m_controlWord{inst.GetIntegerTopic(fmt::format("{}/FMSControlData", path))
-                        .Subscribe(0)},
+      m_controlWord{inst.GetRawTopic(fmt::format("{}/ControlWord", path))
+                        .Subscribe("struct:ControlWord", {})},
       m_fmsAttached{fmt::format("NT_FMS:FMSAttached:{}", path)},
       m_dsAttached{fmt::format("NT_FMS:DSAttached:{}", path)},
       m_allianceStationId{fmt::format("NT_FMS:AllianceStationID:{}", path)},
       m_estop{fmt::format("NT_FMS:EStop:{}", path)},
       m_enabled{fmt::format("NT_FMS:RobotEnabled:{}", path)},
-      m_test{fmt::format("NT_FMS:TestMode:{}", path)},
-      m_autonomous{fmt::format("NT_FMS:AutonomousMode:{}", path)},
+      m_robotMode{fmt::format("NT_FMS:RobotMode:{}", path)},
       m_gameSpecificMessageData{
           fmt::format("NT_FMS:GameSpecificMessage:{}", path)} {}
 
@@ -55,14 +63,24 @@ void NTFMSModel::Update() {
     m_allianceStationId.SetValue(v.value - 1 + 3 * (isRed ? 0 : 1), v.time);
   }
   for (auto&& v : m_controlWord.ReadQueue()) {
-    uint32_t controlWord = v.value;
-    // See HAL_ControlWord definition
-    m_enabled.SetValue(((controlWord & 0x01) != 0) ? 1 : 0, v.time);
-    m_autonomous.SetValue(((controlWord & 0x02) != 0) ? 1 : 0, v.time);
-    m_test.SetValue(((controlWord & 0x04) != 0) ? 1 : 0, v.time);
-    m_estop.SetValue(((controlWord & 0x08) != 0) ? 1 : 0, v.time);
-    m_fmsAttached.SetValue(((controlWord & 0x10) != 0) ? 1 : 0, v.time);
-    m_dsAttached.SetValue(((controlWord & 0x20) != 0) ? 1 : 0, v.time);
+    if (v.value.size() != sizeof(uint64_t)) {
+      continue;
+    }
+    uint64_t controlWord = wpi::util::support::endian::read64le(v.value.data());
+    // See wpi::Struct<HAL_ControlWord> definition
+    m_enabled.SetValue(
+        ((controlWord & HAL_CONTROLWORD_ENABLED_MASK) != 0) ? 1 : 0, v.time);
+    m_robotMode.SetValue((controlWord & HAL_CONTROLWORD_ROBOT_MODE_MASK) >>
+                             HAL_CONTROLWORD_ROBOT_MODE_SHIFT,
+                         v.time);
+    m_estop.SetValue(((controlWord & HAL_CONTROLWORD_ESTOP_MASK) != 0) ? 1 : 0,
+                     v.time);
+    m_fmsAttached.SetValue(
+        ((controlWord & HAL_CONTROLWORD_FMS_ATTACHED_MASK) != 0) ? 1 : 0,
+        v.time);
+    m_dsAttached.SetValue(
+        ((controlWord & HAL_CONTROLWORD_DS_ATTACHED_MASK) != 0) ? 1 : 0,
+        v.time);
   }
   for (auto&& v : m_gameSpecificMessage.ReadQueue()) {
     m_gameSpecificMessageData.SetValue(std::move(v.value), v.time);

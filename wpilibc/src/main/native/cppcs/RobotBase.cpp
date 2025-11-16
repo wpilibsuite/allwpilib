@@ -4,6 +4,8 @@
 
 #include "wpi/framework/RobotBase.hpp"
 
+#include <stdint.h>
+
 #ifdef __FRC_SYSTEMCORE__
 #include <dlfcn.h>
 #endif
@@ -140,36 +142,44 @@ static void SetupMathShared() {
       std::make_unique<WPILibMathShared>());
 }
 
-bool RobotBase::IsEnabled() const {
+bool RobotBase::IsEnabled() {
   return DriverStation::IsEnabled();
 }
 
-bool RobotBase::IsDisabled() const {
+bool RobotBase::IsDisabled() {
   return DriverStation::IsDisabled();
 }
 
-bool RobotBase::IsAutonomous() const {
+bool RobotBase::IsAutonomous() {
   return DriverStation::IsAutonomous();
 }
 
-bool RobotBase::IsAutonomousEnabled() const {
+bool RobotBase::IsAutonomousEnabled() {
   return DriverStation::IsAutonomousEnabled();
 }
 
-bool RobotBase::IsTeleop() const {
+bool RobotBase::IsTeleop() {
   return DriverStation::IsTeleop();
 }
 
-bool RobotBase::IsTeleopEnabled() const {
+bool RobotBase::IsTeleopEnabled() {
   return DriverStation::IsTeleopEnabled();
 }
 
-bool RobotBase::IsTest() const {
+bool RobotBase::IsTest() {
   return DriverStation::IsTest();
 }
 
-bool RobotBase::IsTestEnabled() const {
+bool RobotBase::IsTestEnabled() {
   return DriverStation::IsTestEnabled();
+}
+
+int64_t RobotBase::GetOpModeId() {
+  return DriverStation::GetOpModeId();
+}
+
+std::string RobotBase::GetOpMode() {
+  return DriverStation::GetOpMode();
 }
 
 std::thread::id RobotBase::GetThreadId() {

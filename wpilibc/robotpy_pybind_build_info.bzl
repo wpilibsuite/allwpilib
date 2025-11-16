@@ -191,16 +191,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
-            class_name = "DSControlWord",
-            yml_file = "semiwrap/DSControlWord.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/DSControlWord.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::DSControlWord", "wpi__DSControlWord.hpp"),
-            ],
-        ),
-        struct(
             class_name = "DriverStation",
             yml_file = "semiwrap/DriverStation.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
@@ -308,16 +298,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::RobotBase", "wpi__RobotBase.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "RobotState",
-            yml_file = "semiwrap/RobotState.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/framework/RobotState.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::RobotState", "wpi__RobotState.hpp"),
             ],
         ),
         struct(
