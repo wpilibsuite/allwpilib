@@ -176,9 +176,11 @@ Java_org_wpilib_hardware_hal_DriverStationJNI_getAllJoystickData
  */
 JNIEXPORT jint JNICALL
 Java_org_wpilib_hardware_hal_DriverStationJNI_setJoystickRumble
-  (JNIEnv*, jclass, jbyte port, jint leftRumble, jint rightRumble, jint leftTriggerRumble, jint rightTriggerRumble)
+  (JNIEnv*, jclass, jbyte port, jint leftRumble, jint rightRumble,
+   jint leftTriggerRumble, jint rightTriggerRumble)
 {
-  return HAL_SetJoystickRumble(port, leftRumble, rightRumble, leftTriggerRumble, rightTriggerRumble);
+  return HAL_SetJoystickRumble(port, leftRumble, rightRumble, leftTriggerRumble,
+                               rightTriggerRumble);
 }
 
 /*

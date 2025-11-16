@@ -177,8 +177,8 @@ int32_t DriverStationData::RegisterJoystickRumblesCallback(
   if (initialNotify) {
     const auto& outputs = m_joystickData[joystickNum].outputs;
     callback(DriverStationData::GetJoystickRumblesName(), param, joystickNum,
-             outputs.leftRumble, outputs.rightRumble,
-             outputs.leftTriggerRumble, outputs.rightTriggerRumble);
+             outputs.leftRumble, outputs.rightRumble, outputs.leftTriggerRumble,
+             outputs.rightTriggerRumble);
   }
   return uid;
 }
@@ -188,10 +188,10 @@ void DriverStationData::CancelJoystickRumblesCallback(int32_t uid) {
 }
 
 void DriverStationData::GetJoystickRumbles(int32_t joystickNum,
-                                          int32_t* leftRumble,
-                                          int32_t* rightRumble,
-                                          int32_t* leftTriggerRumble,
-                                          int32_t* rightTriggerRumble) {
+                                           int32_t* leftRumble,
+                                           int32_t* rightRumble,
+                                           int32_t* leftTriggerRumble,
+                                           int32_t* rightTriggerRumble) {
   if (joystickNum < 0 || joystickNum >= kNumJoysticks) {
     return;
   }
@@ -204,10 +204,10 @@ void DriverStationData::GetJoystickRumbles(int32_t joystickNum,
 }
 
 void DriverStationData::SetJoystickRumbles(int32_t joystickNum,
-                                          int32_t leftRumble,
-                                          int32_t rightRumble,
-                                          int32_t leftTriggerRumble,
-                                          int32_t rightTriggerRumble) {
+                                           int32_t leftRumble,
+                                           int32_t rightRumble,
+                                           int32_t leftTriggerRumble,
+                                           int32_t rightTriggerRumble) {
   if (joystickNum < 0 || joystickNum >= kNumJoysticks) {
     return;
   }
@@ -482,9 +482,10 @@ DEFINE_CAPI(POVs, povs)
 DEFINE_CAPI(Buttons, buttons)
 DEFINE_CAPI(Descriptor, descriptor)
 
-int32_t HALSIM_RegisterJoystickLedsCallback(
-    int32_t joystickNum, HAL_JoystickLedsCallback callback, void* param,
-    HAL_Bool initialNotify) {
+int32_t HALSIM_RegisterJoystickLedsCallback(int32_t joystickNum,
+                                            HAL_JoystickLedsCallback callback,
+                                            void* param,
+                                            HAL_Bool initialNotify) {
   return SimDriverStationData->RegisterJoystickLedsCallback(
       joystickNum, callback, param, initialNotify);
 }
@@ -513,17 +514,19 @@ void HALSIM_CancelJoystickRumblesCallback(int32_t uid) {
 }
 
 void HALSIM_GetJoystickRumbles(int32_t joystickNum, int32_t* leftRumble,
-                              int32_t* rightRumble, int32_t* leftTriggerRumble,
-                              int32_t* rightTriggerRumble) {
+                               int32_t* rightRumble, int32_t* leftTriggerRumble,
+                               int32_t* rightTriggerRumble) {
   SimDriverStationData->GetJoystickRumbles(joystickNum, leftRumble, rightRumble,
-                                          leftTriggerRumble, rightTriggerRumble);
+                                           leftTriggerRumble,
+                                           rightTriggerRumble);
 }
 
 void HALSIM_SetJoystickRumbles(int32_t joystickNum, int32_t leftRumble,
-                              int32_t rightRumble, int32_t leftTriggerRumble,
-                              int32_t rightTriggerRumble) {
+                               int32_t rightRumble, int32_t leftTriggerRumble,
+                               int32_t rightTriggerRumble) {
   SimDriverStationData->SetJoystickRumbles(joystickNum, leftRumble, rightRumble,
-                                          leftTriggerRumble, rightTriggerRumble);
+                                           leftTriggerRumble,
+                                           rightTriggerRumble);
 }
 
 int32_t HALSIM_RegisterMatchInfoCallback(HAL_MatchInfoCallback callback,

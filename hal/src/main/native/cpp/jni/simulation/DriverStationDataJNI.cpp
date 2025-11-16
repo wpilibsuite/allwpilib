@@ -518,7 +518,8 @@ Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_getJoystickRumble
   int32_t rightRumble = 0;
   int32_t leftTriggerRumble = 0;
   int32_t rightTriggerRumble = 0;
-  HALSIM_GetJoystickRumbles(stick, &leftRumble, &rightRumble, &leftTriggerRumble, &rightTriggerRumble);
+  HALSIM_GetJoystickRumbles(stick, &leftRumble, &rightRumble,
+                            &leftTriggerRumble, &rightTriggerRumble);
   switch (rumbleNum) {
     case 0:
       return leftRumble;
