@@ -12,12 +12,11 @@ enums:
   HAL_MatchType:
     value_prefix: HAL_kMatchType
   HAL_RobotMode:
-    value_prefix: HAL_RobotMode
+    ignore: true
   RobotMode:
 classes:
   HAL_ControlWord:
-    attributes:
-      value:
+    ignore: true
   HAL_JoystickAxes:
     attributes:
       axes:
