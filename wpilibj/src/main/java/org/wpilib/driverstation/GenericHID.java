@@ -97,10 +97,10 @@ public class GenericHID {
   private int m_outputs;
   private int m_leftRumble;
   private int m_rightRumble;
-  private final Map<EventLoop, Map<Integer, BooleanEvent>> m_buttonCache = new HashMap<>();
-  private final Map<EventLoop, Map<Pair<Integer, Double>, BooleanEvent>> m_axisLessThanCache =
+  private final Map<EventLoop, Map<GamepadIndexPair, BooleanEvent>> m_buttonCache = new HashMap<>();
+  private final Map<EventLoop, Map<Pair<GamepadIndexPair, Double>, BooleanEvent>> m_axisLessThanCache =
       new HashMap<>();
-  private final Map<EventLoop, Map<Pair<Integer, Double>, BooleanEvent>> m_axisGreaterThanCache =
+  private final Map<EventLoop, Map<Pair<GamepadIndexPair, Double>, BooleanEvent>> m_axisGreaterThanCache =
       new HashMap<>();
   private final Map<EventLoop, Map<Integer, BooleanEvent>> m_povCache = new HashMap<>();
 
@@ -129,6 +129,16 @@ public class GenericHID {
     return DriverStation.getStickButton(m_port, (byte) button);
   }
 
+  public boolean getRawButton(GamepadIndexPair button) {
+    int index;
+    if (DriverStation.isNiDs()) {
+      index = button.getNiIndex();
+    } else {
+      index = button.getSdlIndex();
+    }
+    return getRawButton(index);
+  }
+
   /**
    * Whether the button was pressed since the last check. Button indexes begin at 1.
    *
@@ -141,6 +151,16 @@ public class GenericHID {
    */
   public boolean getRawButtonPressed(int button) {
     return DriverStation.getStickButtonPressed(m_port, (byte) button);
+  }
+
+  public boolean getRawButtonPressed(GamepadIndexPair button) {
+    int index;
+    if (DriverStation.isNiDs()) {
+      index = button.getNiIndex();
+    } else {
+      index = button.getSdlIndex();
+    }
+    return getRawButtonPressed(index);
   }
 
   /**
@@ -157,14 +177,17 @@ public class GenericHID {
     return DriverStation.getStickButtonReleased(m_port, button);
   }
 
-  /**
-   * Constructs an event instance around this button's digital signal.
-   *
-   * @param button the button index
-   * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the button's digital signal attached to the given loop.
-   */
-  public BooleanEvent button(int button, EventLoop loop) {
+  public boolean getRawButtonReleased(GamepadIndexPair button) {
+    int index;
+    if (DriverStation.isNiDs()) {
+      index = button.getNiIndex();
+    } else {
+      index = button.getSdlIndex();
+    }
+    return getRawButtonReleased(index);
+  }
+
+  public BooleanEvent button(GamepadIndexPair button, EventLoop loop) {
     synchronized (m_buttonCache) {
       var cache = m_buttonCache.computeIfAbsent(loop, k -> new HashMap<>());
       return cache.computeIfAbsent(button, k -> new BooleanEvent(loop, () -> getRawButton(k)));
@@ -179,6 +202,16 @@ public class GenericHID {
    */
   public double getRawAxis(int axis) {
     return DriverStation.getStickAxis(m_port, axis);
+  }
+
+  public double getRawAxis(GamepadIndexPair axis) {
+    int index;
+    if (DriverStation.isNiDs()) {
+      index = axis.getNiIndex();
+    } else {
+      index = axis.getSdlIndex();
+    }
+    return getRawAxis(index);
   }
 
   /**
@@ -336,7 +369,7 @@ public class GenericHID {
    * @param loop the event loop instance to attach the event to.
    * @return an event instance that is true when the axis value is less than the provided threshold.
    */
-  public BooleanEvent axisLessThan(int axis, double threshold, EventLoop loop) {
+  public BooleanEvent axisLessThan(GamepadIndexPair axis, double threshold, EventLoop loop) {
     synchronized (m_axisLessThanCache) {
       var cache = m_axisLessThanCache.computeIfAbsent(loop, k -> new HashMap<>());
       return cache.computeIfAbsent(
@@ -355,7 +388,7 @@ public class GenericHID {
    * @return an event instance that is true when the axis value is greater than the provided
    *     threshold.
    */
-  public BooleanEvent axisGreaterThan(int axis, double threshold, EventLoop loop) {
+  public BooleanEvent axisGreaterThan(GamepadIndexPair axis, double threshold, EventLoop loop) {
     synchronized (m_axisGreaterThanCache) {
       var cache = m_axisGreaterThanCache.computeIfAbsent(loop, k -> new HashMap<>());
       return cache.computeIfAbsent(

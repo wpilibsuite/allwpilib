@@ -5,6 +5,7 @@
 package org.wpilib.simulation;
 
 import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.GamepadIndexPair;
 import org.wpilib.driverstation.GenericHID;
 
 /** Class to control a simulated generic joystick. */
@@ -45,6 +46,16 @@ public class GenericHIDSim {
     DriverStationSim.setJoystickButton(m_port, button, value);
   }
 
+  public void setRawButton(GamepadIndexPair button, boolean value) {
+    int index;
+    if (DriverStation.isNiDs()) {
+      index = button.getNiIndex();
+    } else {
+      index = button.getSdlIndex();
+    }
+    setRawButton(index, value);
+  }
+
   /**
    * Set the value of a given axis.
    *
@@ -53,6 +64,16 @@ public class GenericHIDSim {
    */
   public void setRawAxis(int axis, double value) {
     DriverStationSim.setJoystickAxis(m_port, axis, value);
+  }
+
+  public void setRawAxis(GamepadIndexPair axis, double value) {
+    int index;
+    if (DriverStation.isNiDs()) {
+      index = axis.getNiIndex();
+    } else {
+      index = axis.getSdlIndex();
+    }
+    setRawAxis(index, value);
   }
 
   /**

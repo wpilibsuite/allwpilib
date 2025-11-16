@@ -25,43 +25,47 @@ import org.wpilib.util.sendable.SendableBuilder;
  */
 public class StadiaController extends GenericHID implements Sendable {
   /** Represents a digital button on a StadiaController. */
-  public enum Button {
+  public enum Button implements GamepadIndexPair {
     /** A button. */
-    kA(0),
+    kA(0, 0),
     /** B button. */
-    kB(1),
+    kB(1, 1),
     /** X button. */
-    kX(2),
+    kX(2, 2),
     /** Y button. */
-    kY(3),
+    kY(3, 3),
     /** Left bumper button. */
-    kLeftBumper(4),
+    kLeftBumper(4, 4),
     /** Right bumper button. */
-    kRightBumper(5),
+    kRightBumper(5, 5),
     /** Left stick button. */
-    kLeftStick(6),
+    kLeftStick(6, 6),
     /** Right stick button. */
-    kRightStick(7),
+    kRightStick(7, 7),
     /** Ellipses button. */
-    kEllipses(8),
+    kEllipses(8, 8),
     /** Hamburger button. */
-    kHamburger(9),
+    kHamburger(9, 9),
     /** Stadia button. */
-    kStadia(10),
+    kStadia(10, 10),
     /** Right trigger button. */
-    kRightTrigger(11),
+    kRightTrigger(11, 11),
     /** Left trigger button. */
-    kLeftTrigger(12),
+    kLeftTrigger(12, 12),
     /** Google button. */
-    kGoogle(13),
+    kGoogle(13, 13),
     /** Frame button. */
-    kFrame(14);
+    kFrame(14, 14);
 
-    /** Button value. */
-    public final int value;
+    /** NI DS Button value. */
+    public final int niValue;
 
-    Button(int value) {
-      this.value = value;
+    /** SDL DS Button value. */
+    public final int sdlValue;
+
+    Button(int niValue, int sdlValue) {
+      this.niValue = niValue;
+      this.sdlValue = sdlValue;
     }
 
     /**
@@ -77,24 +81,38 @@ public class StadiaController extends GenericHID implements Sendable {
       // Remove leading `k`
       return this.name().substring(1) + "Button";
     }
+
+    @Override
+    public int getNiIndex() {
+      return niValue;
+    }
+
+    @Override
+    public int getSdlIndex() {
+      return sdlValue;
+    }
   }
 
   /** Represents an axis on an StadiaController. */
-  public enum Axis {
+  public enum Axis implements GamepadIndexPair {
     /** Left X axis. */
-    kLeftX(0),
+    kLeftX(0, 0),
     /** Right X axis. */
-    kRightX(3),
+    kRightX(3, 3),
     /** Left Y axis. */
-    kLeftY(1),
+    kLeftY(1, 1),
     /** Right Y axis. */
-    kRightY(4);
+    kRightY(4, 4);
 
-    /** Axis value. */
-    public final int value;
+    /** NI DS Axis value. */
+    public final int niValue;
 
-    Axis(int value) {
-      this.value = value;
+    /** SDL DS Axis Value. */
+    public final int sdlValue;
+
+    Axis(int niValue, int sdlValue) {
+      this.niValue = niValue;
+      this.sdlValue = sdlValue;
     }
 
     /**
@@ -112,6 +130,16 @@ public class StadiaController extends GenericHID implements Sendable {
         return name + "Axis";
       }
       return name;
+    }
+
+    @Override
+    public int getNiIndex() {
+      return niValue;
+    }
+
+    @Override
+    public int getSdlIndex() {
+      return sdlValue;
     }
   }
 
@@ -131,7 +159,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return The axis value.
    */
   public double getLeftX() {
-    return getRawAxis(Axis.kLeftX.value);
+    return getRawAxis(Axis.kLeftX);
   }
 
   /**
@@ -140,7 +168,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return The axis value.
    */
   public double getRightX() {
-    return getRawAxis(Axis.kRightX.value);
+    return getRawAxis(Axis.kRightX);
   }
 
   /**
@@ -149,7 +177,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return The axis value.
    */
   public double getLeftY() {
-    return getRawAxis(Axis.kLeftY.value);
+    return getRawAxis(Axis.kLeftY);
   }
 
   /**
@@ -158,7 +186,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return The axis value.
    */
   public double getRightY() {
-    return getRawAxis(Axis.kRightY.value);
+    return getRawAxis(Axis.kRightY);
   }
 
   /**
@@ -167,7 +195,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getAButton() {
-    return getRawButton(Button.kA.value);
+    return getRawButton(Button.kA);
   }
 
   /**
@@ -176,7 +204,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getAButtonPressed() {
-    return getRawButtonPressed(Button.kA.value);
+    return getRawButtonPressed(Button.kA);
   }
 
   /**
@@ -185,7 +213,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getAButtonReleased() {
-    return getRawButtonReleased(Button.kA.value);
+    return getRawButtonReleased(Button.kA);
   }
 
   /**
@@ -196,7 +224,7 @@ public class StadiaController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent a(EventLoop loop) {
-    return button(Button.kA.value, loop);
+    return button(Button.kA, loop);
   }
 
   /**
@@ -205,7 +233,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getBButton() {
-    return getRawButton(Button.kB.value);
+    return getRawButton(Button.kB);
   }
 
   /**
@@ -214,7 +242,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getBButtonPressed() {
-    return getRawButtonPressed(Button.kB.value);
+    return getRawButtonPressed(Button.kB);
   }
 
   /**
@@ -223,7 +251,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getBButtonReleased() {
-    return getRawButtonReleased(Button.kB.value);
+    return getRawButtonReleased(Button.kB);
   }
 
   /**
@@ -234,7 +262,7 @@ public class StadiaController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent b(EventLoop loop) {
-    return button(Button.kB.value, loop);
+    return button(Button.kB, loop);
   }
 
   /**
@@ -243,7 +271,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getXButton() {
-    return getRawButton(Button.kX.value);
+    return getRawButton(Button.kX);
   }
 
   /**
@@ -252,7 +280,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getXButtonPressed() {
-    return getRawButtonPressed(Button.kX.value);
+    return getRawButtonPressed(Button.kX);
   }
 
   /**
@@ -261,7 +289,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getXButtonReleased() {
-    return getRawButtonReleased(Button.kX.value);
+    return getRawButtonReleased(Button.kX);
   }
 
   /**
@@ -272,7 +300,7 @@ public class StadiaController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent x(EventLoop loop) {
-    return button(Button.kX.value, loop);
+    return button(Button.kX, loop);
   }
 
   /**
@@ -281,7 +309,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getYButton() {
-    return getRawButton(Button.kY.value);
+    return getRawButton(Button.kY);
   }
 
   /**
@@ -290,7 +318,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getYButtonPressed() {
-    return getRawButtonPressed(Button.kY.value);
+    return getRawButtonPressed(Button.kY);
   }
 
   /**
@@ -299,7 +327,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getYButtonReleased() {
-    return getRawButtonReleased(Button.kY.value);
+    return getRawButtonReleased(Button.kY);
   }
 
   /**
@@ -310,7 +338,7 @@ public class StadiaController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent y(EventLoop loop) {
-    return button(Button.kY.value, loop);
+    return button(Button.kY, loop);
   }
 
   /**
@@ -319,7 +347,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getLeftBumperButton() {
-    return getRawButton(Button.kLeftBumper.value);
+    return getRawButton(Button.kLeftBumper);
   }
 
   /**
@@ -328,7 +356,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getLeftBumperButtonPressed() {
-    return getRawButtonPressed(Button.kLeftBumper.value);
+    return getRawButtonPressed(Button.kLeftBumper);
   }
 
   /**
@@ -337,7 +365,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getLeftBumperButtonReleased() {
-    return getRawButtonReleased(Button.kLeftBumper.value);
+    return getRawButtonReleased(Button.kLeftBumper);
   }
 
   /**
@@ -348,7 +376,7 @@ public class StadiaController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent leftBumper(EventLoop loop) {
-    return button(Button.kLeftBumper.value, loop);
+    return button(Button.kLeftBumper, loop);
   }
 
   /**
@@ -357,7 +385,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getRightBumperButton() {
-    return getRawButton(Button.kRightBumper.value);
+    return getRawButton(Button.kRightBumper);
   }
 
   /**
@@ -366,7 +394,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getRightBumperButtonPressed() {
-    return getRawButtonPressed(Button.kRightBumper.value);
+    return getRawButtonPressed(Button.kRightBumper);
   }
 
   /**
@@ -375,7 +403,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getRightBumperButtonReleased() {
-    return getRawButtonReleased(Button.kRightBumper.value);
+    return getRawButtonReleased(Button.kRightBumper);
   }
 
   /**
@@ -386,7 +414,7 @@ public class StadiaController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent rightBumper(EventLoop loop) {
-    return button(Button.kRightBumper.value, loop);
+    return button(Button.kRightBumper, loop);
   }
 
   /**
@@ -395,7 +423,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getLeftStickButton() {
-    return getRawButton(Button.kLeftStick.value);
+    return getRawButton(Button.kLeftStick);
   }
 
   /**
@@ -404,7 +432,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getLeftStickButtonPressed() {
-    return getRawButtonPressed(Button.kLeftStick.value);
+    return getRawButtonPressed(Button.kLeftStick);
   }
 
   /**
@@ -413,7 +441,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getLeftStickButtonReleased() {
-    return getRawButtonReleased(Button.kLeftStick.value);
+    return getRawButtonReleased(Button.kLeftStick);
   }
 
   /**
@@ -424,7 +452,7 @@ public class StadiaController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent leftStick(EventLoop loop) {
-    return button(Button.kLeftStick.value, loop);
+    return button(Button.kLeftStick, loop);
   }
 
   /**
@@ -433,7 +461,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getRightStickButton() {
-    return getRawButton(Button.kRightStick.value);
+    return getRawButton(Button.kRightStick);
   }
 
   /**
@@ -442,7 +470,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getRightStickButtonPressed() {
-    return getRawButtonPressed(Button.kRightStick.value);
+    return getRawButtonPressed(Button.kRightStick);
   }
 
   /**
@@ -451,7 +479,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getRightStickButtonReleased() {
-    return getRawButtonReleased(Button.kRightStick.value);
+    return getRawButtonReleased(Button.kRightStick);
   }
 
   /**
@@ -462,7 +490,7 @@ public class StadiaController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent rightStick(EventLoop loop) {
-    return button(Button.kRightStick.value, loop);
+    return button(Button.kRightStick, loop);
   }
 
   /**
@@ -471,7 +499,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getEllipsesButton() {
-    return getRawButton(Button.kEllipses.value);
+    return getRawButton(Button.kEllipses);
   }
 
   /**
@@ -480,7 +508,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getEllipsesButtonPressed() {
-    return getRawButtonPressed(Button.kEllipses.value);
+    return getRawButtonPressed(Button.kEllipses);
   }
 
   /**
@@ -489,7 +517,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getEllipsesButtonReleased() {
-    return getRawButtonReleased(Button.kEllipses.value);
+    return getRawButtonReleased(Button.kEllipses);
   }
 
   /**
@@ -500,7 +528,7 @@ public class StadiaController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent ellipses(EventLoop loop) {
-    return button(Button.kEllipses.value, loop);
+    return button(Button.kEllipses, loop);
   }
 
   /**
@@ -509,7 +537,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getHamburgerButton() {
-    return getRawButton(Button.kHamburger.value);
+    return getRawButton(Button.kHamburger);
   }
 
   /**
@@ -518,7 +546,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getHamburgerButtonPressed() {
-    return getRawButtonPressed(Button.kHamburger.value);
+    return getRawButtonPressed(Button.kHamburger);
   }
 
   /**
@@ -527,7 +555,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getHamburgerButtonReleased() {
-    return getRawButtonReleased(Button.kHamburger.value);
+    return getRawButtonReleased(Button.kHamburger);
   }
 
   /**
@@ -538,7 +566,7 @@ public class StadiaController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent hamburger(EventLoop loop) {
-    return button(Button.kHamburger.value, loop);
+    return button(Button.kHamburger, loop);
   }
 
   /**
@@ -547,7 +575,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getStadiaButton() {
-    return getRawButton(Button.kStadia.value);
+    return getRawButton(Button.kStadia);
   }
 
   /**
@@ -556,7 +584,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getStadiaButtonPressed() {
-    return getRawButtonPressed(Button.kStadia.value);
+    return getRawButtonPressed(Button.kStadia);
   }
 
   /**
@@ -565,7 +593,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getStadiaButtonReleased() {
-    return getRawButtonReleased(Button.kStadia.value);
+    return getRawButtonReleased(Button.kStadia);
   }
 
   /**
@@ -576,7 +604,7 @@ public class StadiaController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent stadia(EventLoop loop) {
-    return button(Button.kStadia.value, loop);
+    return button(Button.kStadia, loop);
   }
 
   /**
@@ -585,7 +613,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getRightTriggerButton() {
-    return getRawButton(Button.kRightTrigger.value);
+    return getRawButton(Button.kRightTrigger);
   }
 
   /**
@@ -594,7 +622,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getRightTriggerButtonPressed() {
-    return getRawButtonPressed(Button.kRightTrigger.value);
+    return getRawButtonPressed(Button.kRightTrigger);
   }
 
   /**
@@ -603,7 +631,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getRightTriggerButtonReleased() {
-    return getRawButtonReleased(Button.kRightTrigger.value);
+    return getRawButtonReleased(Button.kRightTrigger);
   }
 
   /**
@@ -614,7 +642,7 @@ public class StadiaController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent rightTrigger(EventLoop loop) {
-    return button(Button.kRightTrigger.value, loop);
+    return button(Button.kRightTrigger, loop);
   }
 
   /**
@@ -623,7 +651,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getLeftTriggerButton() {
-    return getRawButton(Button.kLeftTrigger.value);
+    return getRawButton(Button.kLeftTrigger);
   }
 
   /**
@@ -632,7 +660,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getLeftTriggerButtonPressed() {
-    return getRawButtonPressed(Button.kLeftTrigger.value);
+    return getRawButtonPressed(Button.kLeftTrigger);
   }
 
   /**
@@ -641,7 +669,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getLeftTriggerButtonReleased() {
-    return getRawButtonReleased(Button.kLeftTrigger.value);
+    return getRawButtonReleased(Button.kLeftTrigger);
   }
 
   /**
@@ -652,7 +680,7 @@ public class StadiaController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent leftTrigger(EventLoop loop) {
-    return button(Button.kLeftTrigger.value, loop);
+    return button(Button.kLeftTrigger, loop);
   }
 
   /**
@@ -661,7 +689,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getGoogleButton() {
-    return getRawButton(Button.kGoogle.value);
+    return getRawButton(Button.kGoogle);
   }
 
   /**
@@ -670,7 +698,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getGoogleButtonPressed() {
-    return getRawButtonPressed(Button.kGoogle.value);
+    return getRawButtonPressed(Button.kGoogle);
   }
 
   /**
@@ -679,7 +707,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getGoogleButtonReleased() {
-    return getRawButtonReleased(Button.kGoogle.value);
+    return getRawButtonReleased(Button.kGoogle);
   }
 
   /**
@@ -690,7 +718,7 @@ public class StadiaController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent google(EventLoop loop) {
-    return button(Button.kGoogle.value, loop);
+    return button(Button.kGoogle, loop);
   }
 
   /**
@@ -699,7 +727,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getFrameButton() {
-    return getRawButton(Button.kFrame.value);
+    return getRawButton(Button.kFrame);
   }
 
   /**
@@ -708,7 +736,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getFrameButtonPressed() {
-    return getRawButtonPressed(Button.kFrame.value);
+    return getRawButtonPressed(Button.kFrame);
   }
 
   /**
@@ -717,7 +745,7 @@ public class StadiaController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getFrameButtonReleased() {
-    return getRawButtonReleased(Button.kFrame.value);
+    return getRawButtonReleased(Button.kFrame);
   }
 
   /**
@@ -728,107 +756,38 @@ public class StadiaController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent frame(EventLoop loop) {
-    return button(Button.kFrame.value, loop);
+    return button(Button.kFrame, loop);
+  }
+private double getAxisForSendable(GamepadIndexPair axis) {
+    return DriverStation.getStickAxisIfAvailable(getPort(), axis).orElse(0.0);
   }
 
-  /**
-   * Read the value of the left bumper (LB) button on the controller.
-   *
-   * @return The state of the button.
-   * @deprecated Use {@link getLeftBumperButton} instead. This function is deprecated for removal
-   *     to make function names consistent to allow the HID classes to be automatically generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getLeftBumper() {
-    return getRawButton(Button.kLeftBumper.value);
-  }
-
-  /**
-   * Read the value of the right bumper (RB) button on the controller.
-   *
-   * @return The state of the button.
-   * @deprecated Use {@link getRightBumperButton} instead. This function is deprecated for removal
-   *     to make function names consistent to allow the HID classes to be automatically generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getRightBumper() {
-    return getRawButton(Button.kRightBumper.value);
-  }
-
-  /**
-   * Whether the left bumper (LB) was pressed since the last check.
-   *
-   * @return Whether the button was pressed since the last check.
-   * @deprecated Use {@link getLeftBumperButtonPressed} instead. This function is deprecated for
-   *     removal to make function names consistent to allow the HID classes to be automatically
-   *     generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getLeftBumperPressed() {
-    return getRawButtonPressed(Button.kLeftBumper.value);
-  }
-
-  /**
-   * Whether the right bumper (RB) was pressed since the last check.
-   *
-   * @return Whether the button was pressed since the last check.
-   * @deprecated Use {@link getRightBumperButtonPressed} instead. This function is deprecated for
-   *     removal to make function names consistent to allow the HID classes to be automatically
-   *     generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getRightBumperPressed() {
-    return getRawButtonPressed(Button.kRightBumper.value);
-  }
-
-  /**
-   * Whether the left bumper (LB) was released since the last check.
-   *
-   * @return Whether the button was released since the last check.
-   * @deprecated Use {@link getLeftBumperButtonReleased} instead. This function is deprecated for
-   *     removal to make function names consistent to allow the HID classes to be automatically
-   *     generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getLeftBumperReleased() {
-    return getRawButtonReleased(Button.kLeftBumper.value);
-  }
-
-  /**
-   * Whether the right bumper (RB) was released since the last check.
-   *
-   * @return Whether the button was released since the last check.
-   * @deprecated Use {@link getRightBumperButtonReleased} instead. This function is deprecated for
-   *     removal to make function names consistent to allow the HID classes to be automatically
-   *     generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getRightBumperReleased() {
-    return getRawButtonReleased(Button.kRightBumper.value);
+  private boolean getButtonForSendable(GamepadIndexPair button) {
+    return DriverStation.getStickButtonIfAvailable(getPort(), button).orElse(false);
   }
 
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("HID");
     builder.publishConstString("ControllerType", "Stadia");
-    builder.addDoubleProperty("LeftX", this::getLeftX, null);
-    builder.addDoubleProperty("RightX", this::getRightX, null);
-    builder.addDoubleProperty("LeftY", this::getLeftY, null);
-    builder.addDoubleProperty("RightY", this::getRightY, null);
-    builder.addBooleanProperty("A", this::getAButton, null);
-    builder.addBooleanProperty("B", this::getBButton, null);
-    builder.addBooleanProperty("X", this::getXButton, null);
-    builder.addBooleanProperty("Y", this::getYButton, null);
-    builder.addBooleanProperty("LeftBumper", this::getLeftBumperButton, null);
-    builder.addBooleanProperty("RightBumper", this::getRightBumperButton, null);
-    builder.addBooleanProperty("LeftStick", this::getLeftStickButton, null);
-    builder.addBooleanProperty("RightStick", this::getRightStickButton, null);
-    builder.addBooleanProperty("Ellipses", this::getEllipsesButton, null);
-    builder.addBooleanProperty("Hamburger", this::getHamburgerButton, null);
-    builder.addBooleanProperty("Stadia", this::getStadiaButton, null);
-    builder.addBooleanProperty("RightTrigger", this::getRightTriggerButton, null);
-    builder.addBooleanProperty("LeftTrigger", this::getLeftTriggerButton, null);
-    builder.addBooleanProperty("Google", this::getGoogleButton, null);
-    builder.addBooleanProperty("Frame", this::getFrameButton, null);
+    builder.addDoubleProperty("LeftX", () -> getAxisForSendable(Axis.kLeftX), null);
+    builder.addDoubleProperty("RightX", () -> getAxisForSendable(Axis.kRightX), null);
+    builder.addDoubleProperty("LeftY", () -> getAxisForSendable(Axis.kLeftY), null);
+    builder.addDoubleProperty("RightY", () -> getAxisForSendable(Axis.kRightY), null);
+    builder.addBooleanProperty("A", () -> getButtonForSendable(Button.kA), null);
+    builder.addBooleanProperty("B", () -> getButtonForSendable(Button.kB), null);
+    builder.addBooleanProperty("X", () -> getButtonForSendable(Button.kX), null);
+    builder.addBooleanProperty("Y", () -> getButtonForSendable(Button.kY), null);
+    builder.addBooleanProperty("LeftBumper", () -> getButtonForSendable(Button.kLeftBumper), null);
+    builder.addBooleanProperty("RightBumper", () -> getButtonForSendable(Button.kRightBumper), null);
+    builder.addBooleanProperty("LeftStick", () -> getButtonForSendable(Button.kLeftStick), null);
+    builder.addBooleanProperty("RightStick", () -> getButtonForSendable(Button.kRightStick), null);
+    builder.addBooleanProperty("Ellipses", () -> getButtonForSendable(Button.kEllipses), null);
+    builder.addBooleanProperty("Hamburger", () -> getButtonForSendable(Button.kHamburger), null);
+    builder.addBooleanProperty("Stadia", () -> getButtonForSendable(Button.kStadia), null);
+    builder.addBooleanProperty("RightTrigger", () -> getButtonForSendable(Button.kRightTrigger), null);
+    builder.addBooleanProperty("LeftTrigger", () -> getButtonForSendable(Button.kLeftTrigger), null);
+    builder.addBooleanProperty("Google", () -> getButtonForSendable(Button.kGoogle), null);
+    builder.addBooleanProperty("Frame", () -> getButtonForSendable(Button.kFrame), null);
   }
 }

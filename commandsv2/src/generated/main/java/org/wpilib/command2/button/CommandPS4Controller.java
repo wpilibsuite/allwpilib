@@ -58,7 +58,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger square(EventLoop loop) {
-    return button(PS4Controller.Button.kSquare.value, loop);
+    return button(PS4Controller.Button.kSquare, loop);
   }
 
   /**
@@ -80,7 +80,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger cross(EventLoop loop) {
-    return button(PS4Controller.Button.kCross.value, loop);
+    return button(PS4Controller.Button.kCross, loop);
   }
 
   /**
@@ -102,7 +102,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger circle(EventLoop loop) {
-    return button(PS4Controller.Button.kCircle.value, loop);
+    return button(PS4Controller.Button.kCircle, loop);
   }
 
   /**
@@ -124,7 +124,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger triangle(EventLoop loop) {
-    return button(PS4Controller.Button.kTriangle.value, loop);
+    return button(PS4Controller.Button.kTriangle, loop);
   }
 
   /**
@@ -146,7 +146,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger L1(EventLoop loop) {
-    return button(PS4Controller.Button.kL1.value, loop);
+    return button(PS4Controller.Button.kL1, loop);
   }
 
   /**
@@ -168,7 +168,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger R1(EventLoop loop) {
-    return button(PS4Controller.Button.kR1.value, loop);
+    return button(PS4Controller.Button.kR1, loop);
   }
 
   /**
@@ -190,7 +190,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger L2(EventLoop loop) {
-    return button(PS4Controller.Button.kL2.value, loop);
+    return button(PS4Controller.Button.kL2, loop);
   }
 
   /**
@@ -212,7 +212,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger R2(EventLoop loop) {
-    return button(PS4Controller.Button.kR2.value, loop);
+    return button(PS4Controller.Button.kR2, loop);
   }
 
   /**
@@ -234,7 +234,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger share(EventLoop loop) {
-    return button(PS4Controller.Button.kShare.value, loop);
+    return button(PS4Controller.Button.kShare, loop);
   }
 
   /**
@@ -256,7 +256,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger options(EventLoop loop) {
-    return button(PS4Controller.Button.kOptions.value, loop);
+    return button(PS4Controller.Button.kOptions, loop);
   }
 
   /**
@@ -278,7 +278,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger L3(EventLoop loop) {
-    return button(PS4Controller.Button.kL3.value, loop);
+    return button(PS4Controller.Button.kL3, loop);
   }
 
   /**
@@ -300,7 +300,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger R3(EventLoop loop) {
-    return button(PS4Controller.Button.kR3.value, loop);
+    return button(PS4Controller.Button.kR3, loop);
   }
 
   /**
@@ -322,7 +322,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger PS(EventLoop loop) {
-    return button(PS4Controller.Button.kPS.value, loop);
+    return button(PS4Controller.Button.kPS, loop);
   }
 
   /**
@@ -344,7 +344,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger touchpad(EventLoop loop) {
-    return button(PS4Controller.Button.kTouchpad.value, loop);
+    return button(PS4Controller.Button.kTouchpad, loop);
   }
 
   /**

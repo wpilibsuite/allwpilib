@@ -36,15 +36,20 @@
           "type": "object",
           "required": [
             "name",
-            "value"
+            "niValue",
+            "sdlValue"
           ],
           "properties": {
             "name": {
               "description": "The name in lowerCamelCase",
               "type": "string"
             },
-            "value": {
-              "description": "The button value",
+            "niValue": {
+              "description": "The button value for NI DS",
+              "type": "integer"
+            },
+            "sdlValue": {
+              "description": "The button value for SDL DS",
               "type": "integer"
             },
             "DocName": {
@@ -62,7 +67,8 @@
           "type": "object",
           "required": [
             "NameParts",
-            "value",
+            "niValue",
+            "sdlValue",
             "PositiveDirection"
           ],
           "properties": {
@@ -74,8 +80,12 @@
                 "type": "string"
               }
             },
-            "value": {
-              "description": "The axis value",
+            "niValue": {
+              "description": "The axis value for NI DS",
+              "type": "integer"
+            },
+            "sdlValue": {
+              "description": "The axis value for SDL DS",
               "type": "integer"
             },
             "PositiveDirection": {
@@ -93,7 +103,8 @@
           "type": "object",
           "required": [
             "name",
-            "value",
+            "niValue",
+            "sdlValue",
             "UseThresholdMethods"
           ],
           "properties": {
@@ -101,8 +112,12 @@
               "description": "The name of the trigger to use in code",
               "type": "string"
             },
-            "value": {
-              "description": "The axis value",
+            "niValue": {
+              "description": "The axis value for NI DS",
+              "type": "integer"
+            },
+            "sdlValue": {
+              "description": "The axis value for SDL DS",
               "type": "integer"
             },
             "DocName": {

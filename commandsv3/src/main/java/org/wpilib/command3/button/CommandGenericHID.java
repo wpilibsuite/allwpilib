@@ -9,6 +9,7 @@ import java.util.Map;
 import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.Trigger;
 import org.wpilib.driverstation.DriverStation.POVDirection;
+import org.wpilib.driverstation.GamepadIndexPair;
 import org.wpilib.driverstation.GenericHID;
 import org.wpilib.event.EventLoop;
 import org.wpilib.math.util.Pair;
@@ -21,12 +22,12 @@ import org.wpilib.math.util.Pair;
 public class CommandGenericHID {
   private final Scheduler m_scheduler;
   private final GenericHID m_hid;
-  private final Map<EventLoop, Map<Integer, Trigger>> m_buttonCache = new HashMap<>();
-  private final Map<EventLoop, Map<Pair<Integer, Double>, Trigger>> m_axisLessThanCache =
+  private final Map<EventLoop, Map<GamepadIndexPair, Trigger>> m_buttonCache = new HashMap<>();
+  private final Map<EventLoop, Map<Pair<GamepadIndexPair, Double>, Trigger>> m_axisLessThanCache =
       new HashMap<>();
-  private final Map<EventLoop, Map<Pair<Integer, Double>, Trigger>> m_axisGreaterThanCache =
+  private final Map<EventLoop, Map<Pair<GamepadIndexPair, Double>, Trigger>> m_axisGreaterThanCache =
       new HashMap<>();
-  private final Map<EventLoop, Map<Pair<Integer, Double>, Trigger>>
+  private final Map<EventLoop, Map<Pair<GamepadIndexPair, Double>, Trigger>>
       m_axisMagnitudeGreaterThanCache = new HashMap<>();
   private final Map<EventLoop, Map<Integer, Trigger>> m_povCache = new HashMap<>();
 
@@ -67,7 +68,7 @@ public class CommandGenericHID {
    *     Scheduler#getDefaultEventLoop() default scheduler button loop}.
    * @see #button(int, EventLoop)
    */
-  public Trigger button(int button) {
+  public Trigger button(GamepadIndexPair button) {
     return button(button, m_scheduler.getDefaultEventLoop());
   }
 
@@ -78,7 +79,7 @@ public class CommandGenericHID {
    * @param loop the event loop instance to attach the event to.
    * @return an event instance representing the button's digital signal attached to the given loop.
    */
-  public Trigger button(int button, EventLoop loop) {
+  public Trigger button(GamepadIndexPair button, EventLoop loop) {
     var cache = m_buttonCache.computeIfAbsent(loop, k -> new HashMap<>());
     return cache.computeIfAbsent(
         button, k -> new Trigger(m_scheduler, loop, () -> m_hid.getRawButton(k)));
@@ -220,7 +221,7 @@ public class CommandGenericHID {
    * @return a Trigger instance that is true when the axis value is less than the provided
    *     threshold.
    */
-  public Trigger axisLessThan(int axis, double threshold) {
+  public Trigger axisLessThan(GamepadIndexPair axis, double threshold) {
     return axisLessThan(axis, threshold, m_scheduler.getDefaultEventLoop());
   }
 
@@ -234,7 +235,7 @@ public class CommandGenericHID {
    * @return a Trigger instance that is true when the axis value is less than the provided
    *     threshold.
    */
-  public Trigger axisLessThan(int axis, double threshold, EventLoop loop) {
+  public Trigger axisLessThan(GamepadIndexPair axis, double threshold, EventLoop loop) {
     var cache = m_axisLessThanCache.computeIfAbsent(loop, k -> new HashMap<>());
     return cache.computeIfAbsent(
         Pair.of(axis, threshold),
@@ -250,7 +251,7 @@ public class CommandGenericHID {
    * @return a Trigger instance that is true when the axis value is greater than the provided
    *     threshold.
    */
-  public Trigger axisGreaterThan(int axis, double threshold) {
+  public Trigger axisGreaterThan(GamepadIndexPair axis, double threshold) {
     return axisGreaterThan(axis, threshold, m_scheduler.getDefaultEventLoop());
   }
 
@@ -264,7 +265,7 @@ public class CommandGenericHID {
    * @return a Trigger instance that is true when the axis value is greater than the provided
    *     threshold.
    */
-  public Trigger axisGreaterThan(int axis, double threshold, EventLoop loop) {
+  public Trigger axisGreaterThan(GamepadIndexPair axis, double threshold, EventLoop loop) {
     var cache = m_axisGreaterThanCache.computeIfAbsent(loop, k -> new HashMap<>());
     return cache.computeIfAbsent(
         Pair.of(axis, threshold),
@@ -281,7 +282,7 @@ public class CommandGenericHID {
    * @return a Trigger instance that is true when the axis magnitude value is greater than the
    *     provided threshold.
    */
-  public Trigger axisMagnitudeGreaterThan(int axis, double threshold, EventLoop loop) {
+  public Trigger axisMagnitudeGreaterThan(GamepadIndexPair axis, double threshold, EventLoop loop) {
     var cache = m_axisMagnitudeGreaterThanCache.computeIfAbsent(loop, k -> new HashMap<>());
     return cache.computeIfAbsent(
         Pair.of(axis, threshold),
@@ -297,7 +298,7 @@ public class CommandGenericHID {
    * @param threshold The value above which this trigger should return true.
    * @return a Trigger instance that is true when the deadbanded axis value is active (non-zero).
    */
-  public Trigger axisMagnitudeGreaterThan(int axis, double threshold) {
+  public Trigger axisMagnitudeGreaterThan(GamepadIndexPair axis, double threshold) {
     return axisMagnitudeGreaterThan(axis, threshold, m_scheduler.getDefaultEventLoop());
   }
 
@@ -308,6 +309,10 @@ public class CommandGenericHID {
    * @return The value of the axis.
    */
   public double getRawAxis(int axis) {
+    return m_hid.getRawAxis(axis);
+  }
+
+  public double getRawAxis(GamepadIndexPair axis) {
     return m_hid.getRawAxis(axis);
   }
 

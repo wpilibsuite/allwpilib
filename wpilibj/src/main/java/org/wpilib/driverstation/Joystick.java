@@ -32,7 +32,7 @@ public class Joystick extends GenericHID {
   public static final byte kDefaultThrottleChannel = 3;
 
   /** Represents an analog axis on a joystick. */
-  public enum AxisType {
+  public enum AxisType implements GamepadIndexPair {
     /** X axis. */
     kX(0),
     /** Y axis. */
@@ -50,10 +50,20 @@ public class Joystick extends GenericHID {
     AxisType(int value) {
       this.value = value;
     }
+
+    @Override
+    public int getNiIndex() {
+      return value;
+    }
+
+    @Override
+    public int getSdlIndex() {
+      return value;
+    }
   }
 
   /** Represents a digital button on a joystick. */
-  public enum ButtonType {
+  public enum ButtonType implements GamepadIndexPair {
     /** kTrigger. */
     kTrigger(1),
     /** kTop. */
@@ -64,6 +74,16 @@ public class Joystick extends GenericHID {
 
     ButtonType(int value) {
       this.value = value;
+    }
+
+    @Override
+    public int getNiIndex() {
+      return value;
+    }
+
+    @Override
+    public int getSdlIndex() {
+      return value;
     }
   }
 
@@ -231,7 +251,7 @@ public class Joystick extends GenericHID {
    * @return The state of the trigger.
    */
   public boolean getTrigger() {
-    return getRawButton(ButtonType.kTrigger.value);
+    return getRawButton(ButtonType.kTrigger);
   }
 
   /**
@@ -240,7 +260,7 @@ public class Joystick extends GenericHID {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getTriggerPressed() {
-    return getRawButtonPressed(ButtonType.kTrigger.value);
+    return getRawButtonPressed(ButtonType.kTrigger);
   }
 
   /**
@@ -249,7 +269,7 @@ public class Joystick extends GenericHID {
    * @return Whether the button was released since the last check.
    */
   public boolean getTriggerReleased() {
-    return getRawButtonReleased(ButtonType.kTrigger.value);
+    return getRawButtonReleased(ButtonType.kTrigger);
   }
 
   /**
@@ -260,7 +280,7 @@ public class Joystick extends GenericHID {
    *     given loop.
    */
   public BooleanEvent trigger(EventLoop loop) {
-    return button(ButtonType.kTrigger.value, loop);
+    return button(ButtonType.kTrigger, loop);
   }
 
   /**
@@ -269,7 +289,7 @@ public class Joystick extends GenericHID {
    * @return The state of the top button.
    */
   public boolean getTop() {
-    return getRawButton(ButtonType.kTop.value);
+    return getRawButton(ButtonType.kTop);
   }
 
   /**
@@ -278,7 +298,7 @@ public class Joystick extends GenericHID {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getTopPressed() {
-    return getRawButtonPressed(ButtonType.kTop.value);
+    return getRawButtonPressed(ButtonType.kTop);
   }
 
   /**
@@ -287,7 +307,7 @@ public class Joystick extends GenericHID {
    * @return Whether the button was released since the last check.
    */
   public boolean getTopReleased() {
-    return getRawButtonReleased(ButtonType.kTop.value);
+    return getRawButtonReleased(ButtonType.kTop);
   }
 
   /**
@@ -298,7 +318,7 @@ public class Joystick extends GenericHID {
    *     loop.
    */
   public BooleanEvent top(EventLoop loop) {
-    return button(ButtonType.kTop.value, loop);
+    return button(ButtonType.kTop, loop);
   }
 
   /**

@@ -42,7 +42,7 @@ public class XboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftX(double value) {
-    setRawAxis(XboxController.Axis.kLeftX.value, value);
+    setRawAxis(XboxController.Axis.kLeftX, value);
   }
 
   /**
@@ -51,7 +51,7 @@ public class XboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightX(double value) {
-    setRawAxis(XboxController.Axis.kRightX.value, value);
+    setRawAxis(XboxController.Axis.kRightX, value);
   }
 
   /**
@@ -60,7 +60,7 @@ public class XboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftY(double value) {
-    setRawAxis(XboxController.Axis.kLeftY.value, value);
+    setRawAxis(XboxController.Axis.kLeftY, value);
   }
 
   /**
@@ -69,7 +69,7 @@ public class XboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightY(double value) {
-    setRawAxis(XboxController.Axis.kRightY.value, value);
+    setRawAxis(XboxController.Axis.kRightY, value);
   }
 
   /**
@@ -78,7 +78,7 @@ public class XboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftTriggerAxis(double value) {
-    setRawAxis(XboxController.Axis.kLeftTrigger.value, value);
+    setRawAxis(XboxController.Axis.kLeftTrigger, value);
   }
 
   /**
@@ -87,7 +87,7 @@ public class XboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightTriggerAxis(double value) {
-    setRawAxis(XboxController.Axis.kRightTrigger.value, value);
+    setRawAxis(XboxController.Axis.kRightTrigger, value);
   }
 
   /**
@@ -96,7 +96,7 @@ public class XboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setAButton(boolean value) {
-    setRawButton(XboxController.Button.kA.value, value);
+    setRawButton(XboxController.Button.kA, value);
   }
 
   /**
@@ -105,7 +105,7 @@ public class XboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setBButton(boolean value) {
-    setRawButton(XboxController.Button.kB.value, value);
+    setRawButton(XboxController.Button.kB, value);
   }
 
   /**
@@ -114,7 +114,7 @@ public class XboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setXButton(boolean value) {
-    setRawButton(XboxController.Button.kX.value, value);
+    setRawButton(XboxController.Button.kX, value);
   }
 
   /**
@@ -123,7 +123,7 @@ public class XboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setYButton(boolean value) {
-    setRawButton(XboxController.Button.kY.value, value);
+    setRawButton(XboxController.Button.kY, value);
   }
 
   /**
@@ -132,7 +132,7 @@ public class XboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftBumperButton(boolean value) {
-    setRawButton(XboxController.Button.kLeftBumper.value, value);
+    setRawButton(XboxController.Button.kLeftBumper, value);
   }
 
   /**
@@ -141,7 +141,7 @@ public class XboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightBumperButton(boolean value) {
-    setRawButton(XboxController.Button.kRightBumper.value, value);
+    setRawButton(XboxController.Button.kRightBumper, value);
   }
 
   /**
@@ -150,7 +150,7 @@ public class XboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setBackButton(boolean value) {
-    setRawButton(XboxController.Button.kBack.value, value);
+    setRawButton(XboxController.Button.kBack, value);
   }
 
   /**
@@ -159,7 +159,7 @@ public class XboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setStartButton(boolean value) {
-    setRawButton(XboxController.Button.kStart.value, value);
+    setRawButton(XboxController.Button.kStart, value);
   }
 
   /**
@@ -168,7 +168,7 @@ public class XboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftStickButton(boolean value) {
-    setRawButton(XboxController.Button.kLeftStick.value, value);
+    setRawButton(XboxController.Button.kLeftStick, value);
   }
 
   /**
@@ -177,30 +177,6 @@ public class XboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightStickButton(boolean value) {
-    setRawButton(XboxController.Button.kRightStick.value, value);
-  }
-
-  /**
-   * Change the value of the left bumper on the joystick.
-   *
-   * @param state the new value
-   * @deprecated Use {@link setLeftBumperButton} instead. This function is deprecated for removal
-   *     to make function names consistent to allow the HID classes to be automatically generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public void setLeftBumper(boolean state) {
-    setRawButton(XboxController.Button.kLeftBumper.value, state);
-  }
-
-  /**
-   * Change the value of the right bumper on the joystick.
-   *
-   * @param state the new value
-   * @deprecated Use {@link setRightBumperButton} instead. This function is deprecated for removal
-   *     to make function names consistent to allow the HID classes to be automatically generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public void setRightBumper(boolean state) {
-    setRawButton(XboxController.Button.kRightBumper.value, state);
+    setRawButton(XboxController.Button.kRightStick, value);
   }
 }

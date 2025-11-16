@@ -27,17 +27,21 @@ import org.wpilib.util.sendable.SendableBuilder;
  */
 public class {{ ConsoleName }}Controller extends GenericHID implements Sendable {
   /** Represents a digital button on a {{ ConsoleName }}Controller. */
-  public enum Button {
+  public enum Button implements GamepadIndexPair {
 {%- for button in buttons %}
     /** {{ capitalize_first(button.DocName|default(button.name))  }} button. */
-    k{{ capitalize_first(button.name) }}({{ button.value }}){{ ";" if loop.last else ","}}
+    k{{ capitalize_first(button.name) }}({{ button.niValue }}, {{ button.sdlValue }}){{ ";" if loop.last else ","}}
 {%- endfor %}
 
-    /** Button value. */
-    public final int value;
+    /** NI DS Button value. */
+    public final int niValue;
 
-    Button(int value) {
-      this.value = value;
+    /** SDL DS Button value. */
+    public final int sdlValue;
+
+    Button(int niValue, int sdlValue) {
+      this.niValue = niValue;
+      this.sdlValue = sdlValue;
     }
 
     /**
@@ -53,24 +57,38 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
       // Remove leading `k`
       return this.name().substring(1) + "Button";
     }
+
+    @Override
+    public int getNiIndex() {
+      return niValue;
+    }
+
+    @Override
+    public int getSdlIndex() {
+      return sdlValue;
+    }
   }
 
   /** Represents an axis on an {{ ConsoleName }}Controller. */
-  public enum Axis {
+  public enum Axis implements GamepadIndexPair {
 {%- for stick in sticks %}
     /** {{ stick.NameParts|map("capitalize")|join(" ") }} axis. */
-    k{{ stick.NameParts|map("capitalize")|join }}({{ stick.value }}){{ "," if triggers|length > 0 or not loop.last else ";"}}
+    k{{ stick.NameParts|map("capitalize")|join }}({{ stick.niValue }}, {{ stick.sdlValue }}){{ "," if triggers|length > 0 or not loop.last else ";"}}
 {%- endfor %}
 {%- for trigger in triggers %}
     /** {{ trigger.DocName|capitalize }}. */
-    k{{ capitalize_first(trigger.name) }}({{ trigger.value }}){{ ";" if loop.last else ","}}
+    k{{ capitalize_first(trigger.name) }}({{ trigger.niValue }}, {{ trigger.sdlValue }}){{ ";" if loop.last else ","}}
 {%- endfor %}
 
-    /** Axis value. */
-    public final int value;
+    /** NI DS Axis value. */
+    public final int niValue;
 
-    Axis(int value) {
-      this.value = value;
+    /** SDL DS Axis Value. */
+    public final int sdlValue;
+
+    Axis(int niValue, int sdlValue) {
+      this.niValue = niValue;
+      this.sdlValue = sdlValue;
     }
 
     /**
@@ -88,6 +106,16 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
         return name + "Axis";
       }
       return name;
+    }
+
+    @Override
+    public int getNiIndex() {
+      return niValue;
+    }
+
+    @Override
+    public int getSdlIndex() {
+      return sdlValue;
     }
   }
 
@@ -107,7 +135,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    * @return The axis value.
    */
   public double get{{ stick.NameParts|map("capitalize")|join }}() {
-    return getRawAxis(Axis.k{{ stick.NameParts|map("capitalize")|join }}.value);
+    return getRawAxis(Axis.k{{ stick.NameParts|map("capitalize")|join }});
   }
 {% endfor -%}
 {% for trigger in triggers %}
@@ -118,7 +146,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    * @return The axis value.
    */
   public double get{{ capitalize_first(trigger.name) }}Axis() {
-    return getRawAxis(Axis.k{{ capitalize_first(trigger.name) }}.value);
+    return getRawAxis(Axis.k{{ capitalize_first(trigger.name) }});
   }
 {% if trigger.UseThresholdMethods %}
   /**
@@ -132,7 +160,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    *     threshold, attached to the given event loop
    */
   public BooleanEvent {{ trigger.name }}(double threshold, EventLoop loop) {
-    return axisGreaterThan(Axis.k{{ capitalize_first(trigger.name) }}.value, threshold, loop);
+    return axisGreaterThan(Axis.k{{ capitalize_first(trigger.name) }}, threshold, loop);
   }
 
   /**
@@ -155,7 +183,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    * @return The state of the button.
    */
   public boolean get{{ capitalize_first(button.name) }}Button() {
-    return getRawButton(Button.k{{ capitalize_first(button.name) }}.value);
+    return getRawButton(Button.k{{ capitalize_first(button.name) }});
   }
 
   /**
@@ -164,7 +192,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    * @return Whether the button was pressed since the last check.
    */
   public boolean get{{ capitalize_first(button.name) }}ButtonPressed() {
-    return getRawButtonPressed(Button.k{{ capitalize_first(button.name) }}.value);
+    return getRawButtonPressed(Button.k{{ capitalize_first(button.name) }});
   }
 
   /**
@@ -173,7 +201,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    * @return Whether the button was released since the last check.
    */
   public boolean get{{ capitalize_first(button.name) }}ButtonReleased() {
-    return getRawButtonReleased(Button.k{{ capitalize_first(button.name) }}.value);
+    return getRawButtonReleased(Button.k{{ capitalize_first(button.name) }});
   }
 
   /**
@@ -184,137 +212,30 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    *     attached to the given loop.
    */
   public BooleanEvent {{ button.name }}(EventLoop loop) {
-    return button(Button.k{{ capitalize_first(button.name) }}.value, loop);
+    return button(Button.k{{ capitalize_first(button.name) }}, loop);
   }
 {% endfor -%}
-{% if ConsoleName == "Xbox" or ConsoleName == "Stadia" %}
-  /**
-   * Read the value of the left bumper (LB) button on the controller.
-   *
-   * @return The state of the button.
-   * @deprecated Use {@link getLeftBumperButton} instead. This function is deprecated for removal
-   *     to make function names consistent to allow the HID classes to be automatically generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getLeftBumper() {
-    return getRawButton(Button.kLeftBumper.value);
+
+  private double getAxisForSendable(GamepadIndexPair axis) {
+    return DriverStation.getStickAxisIfAvailable(getPort(), axis).orElse(0.0);
   }
 
-  /**
-   * Read the value of the right bumper (RB) button on the controller.
-   *
-   * @return The state of the button.
-   * @deprecated Use {@link getRightBumperButton} instead. This function is deprecated for removal
-   *     to make function names consistent to allow the HID classes to be automatically generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getRightBumper() {
-    return getRawButton(Button.kRightBumper.value);
+  private boolean getButtonForSendable(GamepadIndexPair button) {
+    return DriverStation.getStickButtonIfAvailable(getPort(), button).orElse(false);
   }
-
-  /**
-   * Whether the left bumper (LB) was pressed since the last check.
-   *
-   * @return Whether the button was pressed since the last check.
-   * @deprecated Use {@link getLeftBumperButtonPressed} instead. This function is deprecated for
-   *     removal to make function names consistent to allow the HID classes to be automatically
-   *     generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getLeftBumperPressed() {
-    return getRawButtonPressed(Button.kLeftBumper.value);
-  }
-
-  /**
-   * Whether the right bumper (RB) was pressed since the last check.
-   *
-   * @return Whether the button was pressed since the last check.
-   * @deprecated Use {@link getRightBumperButtonPressed} instead. This function is deprecated for
-   *     removal to make function names consistent to allow the HID classes to be automatically
-   *     generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getRightBumperPressed() {
-    return getRawButtonPressed(Button.kRightBumper.value);
-  }
-
-  /**
-   * Whether the left bumper (LB) was released since the last check.
-   *
-   * @return Whether the button was released since the last check.
-   * @deprecated Use {@link getLeftBumperButtonReleased} instead. This function is deprecated for
-   *     removal to make function names consistent to allow the HID classes to be automatically
-   *     generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getLeftBumperReleased() {
-    return getRawButtonReleased(Button.kLeftBumper.value);
-  }
-
-  /**
-   * Whether the right bumper (RB) was released since the last check.
-   *
-   * @return Whether the button was released since the last check.
-   * @deprecated Use {@link getRightBumperButtonReleased} instead. This function is deprecated for
-   *     removal to make function names consistent to allow the HID classes to be automatically
-   *     generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getRightBumperReleased() {
-    return getRawButtonReleased(Button.kRightBumper.value);
-  }
-{%- elif ConsoleName == "PS4" or ConsoleName == "PS5" %}
-  /**
-   * Read the value of the touchpad on the controller.
-   *
-   * @return The state of the touchpad.
-   * @deprecated Use {@link getTouchpadButton} instead. This function is deprecated for removal to
-   *     make function names consistent to allow the HID classes to be automatically generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getTouchpad() {
-    return getRawButton(Button.kTouchpad.value);
-  }
-
-  /**
-   * Whether the touchpad was pressed since the last check.
-   *
-   * @return Whether the touchpad was pressed since the last check.
-   * @deprecated Use {@link getTouchpadButtonPressed} instead. This function is deprecated for
-   *     removal to make function names consistent to allow the HID classes to be automatically
-   *     generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getTouchpadPressed() {
-    return getRawButtonPressed(Button.kTouchpad.value);
-  }
-
-  /**
-   * Whether the touchpad was released since the last check.
-   *
-   * @return Whether the touchpad was released since the last check.
-   * @deprecated Use {@link getTouchpadButtonReleased} instead. This function is deprecated for
-   *     removal to make function names consistent to allow the HID classes to be automatically
-   *     generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getTouchpadReleased() {
-    return getRawButtonReleased(Button.kTouchpad.value);
-  }
-{%- endif %}
 
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("HID");
     builder.publishConstString("ControllerType", "{{ ConsoleName }}");
 {%- for trigger in triggers %}
-    builder.addDoubleProperty("{{ capitalize_first(trigger.name) }} Axis", this::get{{ capitalize_first(trigger.name) }}Axis, null);
+    builder.addDoubleProperty("{{ capitalize_first(trigger.name) }} Axis", () -> getAxisForSendable(Axis.k{{ capitalize_first(trigger.name) }}), null);
 {%- endfor -%}
 {% for stick in sticks %}
-    builder.addDoubleProperty("{{ stick.NameParts|map("capitalize")|join }}", this::get{{ stick.NameParts|map("capitalize")|join }}, null);
+    builder.addDoubleProperty("{{ stick.NameParts|map("capitalize")|join }}", () -> getAxisForSendable(Axis.k{{ stick.NameParts|map("capitalize")|join }}), null);
 {%- endfor -%}
 {% for button in buttons %}
-    builder.addBooleanProperty("{{ capitalize_first(button.name) }}", this::get{{ capitalize_first(button.name) }}Button, null);
+    builder.addBooleanProperty("{{ capitalize_first(button.name) }}", () -> getButtonForSendable(Button.k{{ capitalize_first(button.name) }}), null);
 {%- endfor %}
   }
 }

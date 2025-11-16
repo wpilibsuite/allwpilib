@@ -74,7 +74,7 @@ public class CommandXboxController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger a(EventLoop loop) {
-    return button(XboxController.Button.kA.value, loop);
+    return button(XboxController.Button.kA, loop);
   }
 
   /**
@@ -98,7 +98,7 @@ public class CommandXboxController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger b(EventLoop loop) {
-    return button(XboxController.Button.kB.value, loop);
+    return button(XboxController.Button.kB, loop);
   }
 
   /**
@@ -122,7 +122,7 @@ public class CommandXboxController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger x(EventLoop loop) {
-    return button(XboxController.Button.kX.value, loop);
+    return button(XboxController.Button.kX, loop);
   }
 
   /**
@@ -146,7 +146,7 @@ public class CommandXboxController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger y(EventLoop loop) {
-    return button(XboxController.Button.kY.value, loop);
+    return button(XboxController.Button.kY, loop);
   }
 
   /**
@@ -170,7 +170,7 @@ public class CommandXboxController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger leftBumper(EventLoop loop) {
-    return button(XboxController.Button.kLeftBumper.value, loop);
+    return button(XboxController.Button.kLeftBumper, loop);
   }
 
   /**
@@ -194,7 +194,7 @@ public class CommandXboxController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger rightBumper(EventLoop loop) {
-    return button(XboxController.Button.kRightBumper.value, loop);
+    return button(XboxController.Button.kRightBumper, loop);
   }
 
   /**
@@ -218,7 +218,7 @@ public class CommandXboxController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger back(EventLoop loop) {
-    return button(XboxController.Button.kBack.value, loop);
+    return button(XboxController.Button.kBack, loop);
   }
 
   /**
@@ -242,7 +242,7 @@ public class CommandXboxController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger start(EventLoop loop) {
-    return button(XboxController.Button.kStart.value, loop);
+    return button(XboxController.Button.kStart, loop);
   }
 
   /**
@@ -266,7 +266,7 @@ public class CommandXboxController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger leftStick(EventLoop loop) {
-    return button(XboxController.Button.kLeftStick.value, loop);
+    return button(XboxController.Button.kLeftStick, loop);
   }
 
   /**
@@ -290,7 +290,7 @@ public class CommandXboxController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger rightStick(EventLoop loop) {
-    return button(XboxController.Button.kRightStick.value, loop);
+    return button(XboxController.Button.kRightStick, loop);
   }
 
   /**
@@ -304,7 +304,7 @@ public class CommandXboxController extends CommandGenericHID {
    *     threshold, attached to the given event loop
    */
   public Trigger leftTrigger(double threshold, EventLoop loop) {
-    return axisGreaterThan(XboxController.Axis.kLeftTrigger.value, threshold, loop);
+    return axisGreaterThan(XboxController.Axis.kLeftTrigger, threshold, loop);
   }
 
   /**
@@ -346,7 +346,7 @@ public class CommandXboxController extends CommandGenericHID {
    *     threshold, attached to the given event loop
    */
   public Trigger rightTrigger(double threshold, EventLoop loop) {
-    return axisGreaterThan(XboxController.Axis.kRightTrigger.value, threshold, loop);
+    return axisGreaterThan(XboxController.Axis.kRightTrigger, threshold, loop);
   }
 
   /**

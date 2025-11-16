@@ -70,7 +70,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger southFace(EventLoop loop) {
-    return button(Gamepad.Button.kSouthFace.value, loop);
+    return button(Gamepad.Button.kSouthFace, loop);
   }
 
   /**
@@ -94,7 +94,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger eastFace(EventLoop loop) {
-    return button(Gamepad.Button.kEastFace.value, loop);
+    return button(Gamepad.Button.kEastFace, loop);
   }
 
   /**
@@ -118,7 +118,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger westFace(EventLoop loop) {
-    return button(Gamepad.Button.kWestFace.value, loop);
+    return button(Gamepad.Button.kWestFace, loop);
   }
 
   /**
@@ -142,7 +142,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger northFace(EventLoop loop) {
-    return button(Gamepad.Button.kNorthFace.value, loop);
+    return button(Gamepad.Button.kNorthFace, loop);
   }
 
   /**
@@ -166,7 +166,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     loop.
    */
   public Trigger back(EventLoop loop) {
-    return button(Gamepad.Button.kBack.value, loop);
+    return button(Gamepad.Button.kBack, loop);
   }
 
   /**
@@ -190,7 +190,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     loop.
    */
   public Trigger guide(EventLoop loop) {
-    return button(Gamepad.Button.kGuide.value, loop);
+    return button(Gamepad.Button.kGuide, loop);
   }
 
   /**
@@ -214,7 +214,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     loop.
    */
   public Trigger start(EventLoop loop) {
-    return button(Gamepad.Button.kStart.value, loop);
+    return button(Gamepad.Button.kStart, loop);
   }
 
   /**
@@ -238,7 +238,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger leftStick(EventLoop loop) {
-    return button(Gamepad.Button.kLeftStick.value, loop);
+    return button(Gamepad.Button.kLeftStick, loop);
   }
 
   /**
@@ -262,7 +262,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger rightStick(EventLoop loop) {
-    return button(Gamepad.Button.kRightStick.value, loop);
+    return button(Gamepad.Button.kRightStick, loop);
   }
 
   /**
@@ -286,7 +286,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger leftShoulder(EventLoop loop) {
-    return button(Gamepad.Button.kLeftShoulder.value, loop);
+    return button(Gamepad.Button.kLeftShoulder, loop);
   }
 
   /**
@@ -310,7 +310,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger rightShoulder(EventLoop loop) {
-    return button(Gamepad.Button.kRightShoulder.value, loop);
+    return button(Gamepad.Button.kRightShoulder, loop);
   }
 
   /**
@@ -334,7 +334,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger dpadUp(EventLoop loop) {
-    return button(Gamepad.Button.kDpadUp.value, loop);
+    return button(Gamepad.Button.kDpadUp, loop);
   }
 
   /**
@@ -358,7 +358,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger dpadDown(EventLoop loop) {
-    return button(Gamepad.Button.kDpadDown.value, loop);
+    return button(Gamepad.Button.kDpadDown, loop);
   }
 
   /**
@@ -382,7 +382,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger dpadLeft(EventLoop loop) {
-    return button(Gamepad.Button.kDpadLeft.value, loop);
+    return button(Gamepad.Button.kDpadLeft, loop);
   }
 
   /**
@@ -406,7 +406,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger dpadRight(EventLoop loop) {
-    return button(Gamepad.Button.kDpadRight.value, loop);
+    return button(Gamepad.Button.kDpadRight, loop);
   }
 
   /**
@@ -430,7 +430,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger misc1(EventLoop loop) {
-    return button(Gamepad.Button.kMisc1.value, loop);
+    return button(Gamepad.Button.kMisc1, loop);
   }
 
   /**
@@ -454,7 +454,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger rightPaddle1(EventLoop loop) {
-    return button(Gamepad.Button.kRightPaddle1.value, loop);
+    return button(Gamepad.Button.kRightPaddle1, loop);
   }
 
   /**
@@ -478,7 +478,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger leftPaddle1(EventLoop loop) {
-    return button(Gamepad.Button.kLeftPaddle1.value, loop);
+    return button(Gamepad.Button.kLeftPaddle1, loop);
   }
 
   /**
@@ -502,7 +502,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger rightPaddle2(EventLoop loop) {
-    return button(Gamepad.Button.kRightPaddle2.value, loop);
+    return button(Gamepad.Button.kRightPaddle2, loop);
   }
 
   /**
@@ -526,7 +526,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger leftPaddle2(EventLoop loop) {
-    return button(Gamepad.Button.kLeftPaddle2.value, loop);
+    return button(Gamepad.Button.kLeftPaddle2, loop);
   }
 
   /**
@@ -550,7 +550,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger touchpad(EventLoop loop) {
-    return button(Gamepad.Button.kTouchpad.value, loop);
+    return button(Gamepad.Button.kTouchpad, loop);
   }
 
   /**
@@ -574,7 +574,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger misc2(EventLoop loop) {
-    return button(Gamepad.Button.kMisc2.value, loop);
+    return button(Gamepad.Button.kMisc2, loop);
   }
 
   /**
@@ -598,7 +598,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger misc3(EventLoop loop) {
-    return button(Gamepad.Button.kMisc3.value, loop);
+    return button(Gamepad.Button.kMisc3, loop);
   }
 
   /**
@@ -622,7 +622,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger misc4(EventLoop loop) {
-    return button(Gamepad.Button.kMisc4.value, loop);
+    return button(Gamepad.Button.kMisc4, loop);
   }
 
   /**
@@ -646,7 +646,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger misc5(EventLoop loop) {
-    return button(Gamepad.Button.kMisc5.value, loop);
+    return button(Gamepad.Button.kMisc5, loop);
   }
 
   /**
@@ -670,7 +670,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger misc6(EventLoop loop) {
-    return button(Gamepad.Button.kMisc6.value, loop);
+    return button(Gamepad.Button.kMisc6, loop);
   }
 
   /**
@@ -684,7 +684,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     threshold, attached to the given event loop
    */
   public Trigger leftTrigger(double threshold, EventLoop loop) {
-    return axisGreaterThan(Gamepad.Axis.kLeftTrigger.value, threshold, loop);
+    return axisGreaterThan(Gamepad.Axis.kLeftTrigger, threshold, loop);
   }
 
   /**
@@ -725,7 +725,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     threshold, attached to the given event loop
    */
   public Trigger rightTrigger(double threshold, EventLoop loop) {
-    return axisGreaterThan(Gamepad.Axis.kRightTrigger.value, threshold, loop);
+    return axisGreaterThan(Gamepad.Axis.kRightTrigger, threshold, loop);
   }
 
   /**

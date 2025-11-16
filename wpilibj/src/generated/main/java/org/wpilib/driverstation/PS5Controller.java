@@ -25,41 +25,45 @@ import org.wpilib.util.sendable.SendableBuilder;
  */
 public class PS5Controller extends GenericHID implements Sendable {
   /** Represents a digital button on a PS5Controller. */
-  public enum Button {
+  public enum Button implements GamepadIndexPair {
     /** Square button. */
-    kSquare(0),
+    kSquare(0, 0),
     /** Cross button. */
-    kCross(1),
+    kCross(1, 1),
     /** Circle button. */
-    kCircle(2),
+    kCircle(2, 2),
     /** Triangle button. */
-    kTriangle(3),
+    kTriangle(3, 3),
     /** Left trigger 1 button. */
-    kL1(4),
+    kL1(4, 4),
     /** Right trigger 1 button. */
-    kR1(5),
+    kR1(5, 5),
     /** Left trigger 2 button. */
-    kL2(6),
+    kL2(6, 6),
     /** Right trigger 2 button. */
-    kR2(7),
+    kR2(7, 7),
     /** Create button. */
-    kCreate(8),
+    kCreate(8, 8),
     /** Options button. */
-    kOptions(9),
+    kOptions(9, 9),
     /** L3 (left stick) button. */
-    kL3(10),
+    kL3(10, 10),
     /** R3 (right stick) button. */
-    kR3(11),
+    kR3(11, 11),
     /** PlayStation button. */
-    kPS(12),
+    kPS(12, 12),
     /** Touchpad button. */
-    kTouchpad(13);
+    kTouchpad(13, 13);
 
-    /** Button value. */
-    public final int value;
+    /** NI DS Button value. */
+    public final int niValue;
 
-    Button(int value) {
-      this.value = value;
+    /** SDL DS Button value. */
+    public final int sdlValue;
+
+    Button(int niValue, int sdlValue) {
+      this.niValue = niValue;
+      this.sdlValue = sdlValue;
     }
 
     /**
@@ -75,28 +79,42 @@ public class PS5Controller extends GenericHID implements Sendable {
       // Remove leading `k`
       return this.name().substring(1) + "Button";
     }
+
+    @Override
+    public int getNiIndex() {
+      return niValue;
+    }
+
+    @Override
+    public int getSdlIndex() {
+      return sdlValue;
+    }
   }
 
   /** Represents an axis on an PS5Controller. */
-  public enum Axis {
+  public enum Axis implements GamepadIndexPair {
     /** Left X axis. */
-    kLeftX(0),
+    kLeftX(0, 0),
     /** Left Y axis. */
-    kLeftY(1),
+    kLeftY(1, 1),
     /** Right X axis. */
-    kRightX(2),
+    kRightX(2, 2),
     /** Right Y axis. */
-    kRightY(5),
+    kRightY(5, 5),
     /** Left trigger 2. */
-    kL2(3),
+    kL2(3, 3),
     /** Right trigger 2. */
-    kR2(4);
+    kR2(4, 4);
 
-    /** Axis value. */
-    public final int value;
+    /** NI DS Axis value. */
+    public final int niValue;
 
-    Axis(int value) {
-      this.value = value;
+    /** SDL DS Axis Value. */
+    public final int sdlValue;
+
+    Axis(int niValue, int sdlValue) {
+      this.niValue = niValue;
+      this.sdlValue = sdlValue;
     }
 
     /**
@@ -114,6 +132,16 @@ public class PS5Controller extends GenericHID implements Sendable {
         return name + "Axis";
       }
       return name;
+    }
+
+    @Override
+    public int getNiIndex() {
+      return niValue;
+    }
+
+    @Override
+    public int getSdlIndex() {
+      return sdlValue;
     }
   }
 
@@ -133,7 +161,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return The axis value.
    */
   public double getLeftX() {
-    return getRawAxis(Axis.kLeftX.value);
+    return getRawAxis(Axis.kLeftX);
   }
 
   /**
@@ -142,7 +170,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return The axis value.
    */
   public double getLeftY() {
-    return getRawAxis(Axis.kLeftY.value);
+    return getRawAxis(Axis.kLeftY);
   }
 
   /**
@@ -151,7 +179,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return The axis value.
    */
   public double getRightX() {
-    return getRawAxis(Axis.kRightX.value);
+    return getRawAxis(Axis.kRightX);
   }
 
   /**
@@ -160,7 +188,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return The axis value.
    */
   public double getRightY() {
-    return getRawAxis(Axis.kRightY.value);
+    return getRawAxis(Axis.kRightY);
   }
 
   /**
@@ -170,7 +198,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return The axis value.
    */
   public double getL2Axis() {
-    return getRawAxis(Axis.kL2.value);
+    return getRawAxis(Axis.kL2);
   }
 
   /**
@@ -180,7 +208,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return The axis value.
    */
   public double getR2Axis() {
-    return getRawAxis(Axis.kR2.value);
+    return getRawAxis(Axis.kR2);
   }
 
   /**
@@ -189,7 +217,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getSquareButton() {
-    return getRawButton(Button.kSquare.value);
+    return getRawButton(Button.kSquare);
   }
 
   /**
@@ -198,7 +226,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getSquareButtonPressed() {
-    return getRawButtonPressed(Button.kSquare.value);
+    return getRawButtonPressed(Button.kSquare);
   }
 
   /**
@@ -207,7 +235,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getSquareButtonReleased() {
-    return getRawButtonReleased(Button.kSquare.value);
+    return getRawButtonReleased(Button.kSquare);
   }
 
   /**
@@ -218,7 +246,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent square(EventLoop loop) {
-    return button(Button.kSquare.value, loop);
+    return button(Button.kSquare, loop);
   }
 
   /**
@@ -227,7 +255,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getCrossButton() {
-    return getRawButton(Button.kCross.value);
+    return getRawButton(Button.kCross);
   }
 
   /**
@@ -236,7 +264,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getCrossButtonPressed() {
-    return getRawButtonPressed(Button.kCross.value);
+    return getRawButtonPressed(Button.kCross);
   }
 
   /**
@@ -245,7 +273,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getCrossButtonReleased() {
-    return getRawButtonReleased(Button.kCross.value);
+    return getRawButtonReleased(Button.kCross);
   }
 
   /**
@@ -256,7 +284,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent cross(EventLoop loop) {
-    return button(Button.kCross.value, loop);
+    return button(Button.kCross, loop);
   }
 
   /**
@@ -265,7 +293,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getCircleButton() {
-    return getRawButton(Button.kCircle.value);
+    return getRawButton(Button.kCircle);
   }
 
   /**
@@ -274,7 +302,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getCircleButtonPressed() {
-    return getRawButtonPressed(Button.kCircle.value);
+    return getRawButtonPressed(Button.kCircle);
   }
 
   /**
@@ -283,7 +311,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getCircleButtonReleased() {
-    return getRawButtonReleased(Button.kCircle.value);
+    return getRawButtonReleased(Button.kCircle);
   }
 
   /**
@@ -294,7 +322,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent circle(EventLoop loop) {
-    return button(Button.kCircle.value, loop);
+    return button(Button.kCircle, loop);
   }
 
   /**
@@ -303,7 +331,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getTriangleButton() {
-    return getRawButton(Button.kTriangle.value);
+    return getRawButton(Button.kTriangle);
   }
 
   /**
@@ -312,7 +340,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getTriangleButtonPressed() {
-    return getRawButtonPressed(Button.kTriangle.value);
+    return getRawButtonPressed(Button.kTriangle);
   }
 
   /**
@@ -321,7 +349,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getTriangleButtonReleased() {
-    return getRawButtonReleased(Button.kTriangle.value);
+    return getRawButtonReleased(Button.kTriangle);
   }
 
   /**
@@ -332,7 +360,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent triangle(EventLoop loop) {
-    return button(Button.kTriangle.value, loop);
+    return button(Button.kTriangle, loop);
   }
 
   /**
@@ -341,7 +369,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getL1Button() {
-    return getRawButton(Button.kL1.value);
+    return getRawButton(Button.kL1);
   }
 
   /**
@@ -350,7 +378,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getL1ButtonPressed() {
-    return getRawButtonPressed(Button.kL1.value);
+    return getRawButtonPressed(Button.kL1);
   }
 
   /**
@@ -359,7 +387,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getL1ButtonReleased() {
-    return getRawButtonReleased(Button.kL1.value);
+    return getRawButtonReleased(Button.kL1);
   }
 
   /**
@@ -370,7 +398,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent L1(EventLoop loop) {
-    return button(Button.kL1.value, loop);
+    return button(Button.kL1, loop);
   }
 
   /**
@@ -379,7 +407,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getR1Button() {
-    return getRawButton(Button.kR1.value);
+    return getRawButton(Button.kR1);
   }
 
   /**
@@ -388,7 +416,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getR1ButtonPressed() {
-    return getRawButtonPressed(Button.kR1.value);
+    return getRawButtonPressed(Button.kR1);
   }
 
   /**
@@ -397,7 +425,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getR1ButtonReleased() {
-    return getRawButtonReleased(Button.kR1.value);
+    return getRawButtonReleased(Button.kR1);
   }
 
   /**
@@ -408,7 +436,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent R1(EventLoop loop) {
-    return button(Button.kR1.value, loop);
+    return button(Button.kR1, loop);
   }
 
   /**
@@ -417,7 +445,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getL2Button() {
-    return getRawButton(Button.kL2.value);
+    return getRawButton(Button.kL2);
   }
 
   /**
@@ -426,7 +454,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getL2ButtonPressed() {
-    return getRawButtonPressed(Button.kL2.value);
+    return getRawButtonPressed(Button.kL2);
   }
 
   /**
@@ -435,7 +463,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getL2ButtonReleased() {
-    return getRawButtonReleased(Button.kL2.value);
+    return getRawButtonReleased(Button.kL2);
   }
 
   /**
@@ -446,7 +474,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent L2(EventLoop loop) {
-    return button(Button.kL2.value, loop);
+    return button(Button.kL2, loop);
   }
 
   /**
@@ -455,7 +483,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getR2Button() {
-    return getRawButton(Button.kR2.value);
+    return getRawButton(Button.kR2);
   }
 
   /**
@@ -464,7 +492,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getR2ButtonPressed() {
-    return getRawButtonPressed(Button.kR2.value);
+    return getRawButtonPressed(Button.kR2);
   }
 
   /**
@@ -473,7 +501,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getR2ButtonReleased() {
-    return getRawButtonReleased(Button.kR2.value);
+    return getRawButtonReleased(Button.kR2);
   }
 
   /**
@@ -484,7 +512,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent R2(EventLoop loop) {
-    return button(Button.kR2.value, loop);
+    return button(Button.kR2, loop);
   }
 
   /**
@@ -493,7 +521,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getCreateButton() {
-    return getRawButton(Button.kCreate.value);
+    return getRawButton(Button.kCreate);
   }
 
   /**
@@ -502,7 +530,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getCreateButtonPressed() {
-    return getRawButtonPressed(Button.kCreate.value);
+    return getRawButtonPressed(Button.kCreate);
   }
 
   /**
@@ -511,7 +539,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getCreateButtonReleased() {
-    return getRawButtonReleased(Button.kCreate.value);
+    return getRawButtonReleased(Button.kCreate);
   }
 
   /**
@@ -522,7 +550,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent create(EventLoop loop) {
-    return button(Button.kCreate.value, loop);
+    return button(Button.kCreate, loop);
   }
 
   /**
@@ -531,7 +559,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getOptionsButton() {
-    return getRawButton(Button.kOptions.value);
+    return getRawButton(Button.kOptions);
   }
 
   /**
@@ -540,7 +568,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getOptionsButtonPressed() {
-    return getRawButtonPressed(Button.kOptions.value);
+    return getRawButtonPressed(Button.kOptions);
   }
 
   /**
@@ -549,7 +577,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getOptionsButtonReleased() {
-    return getRawButtonReleased(Button.kOptions.value);
+    return getRawButtonReleased(Button.kOptions);
   }
 
   /**
@@ -560,7 +588,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent options(EventLoop loop) {
-    return button(Button.kOptions.value, loop);
+    return button(Button.kOptions, loop);
   }
 
   /**
@@ -569,7 +597,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getL3Button() {
-    return getRawButton(Button.kL3.value);
+    return getRawButton(Button.kL3);
   }
 
   /**
@@ -578,7 +606,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getL3ButtonPressed() {
-    return getRawButtonPressed(Button.kL3.value);
+    return getRawButtonPressed(Button.kL3);
   }
 
   /**
@@ -587,7 +615,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getL3ButtonReleased() {
-    return getRawButtonReleased(Button.kL3.value);
+    return getRawButtonReleased(Button.kL3);
   }
 
   /**
@@ -598,7 +626,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent L3(EventLoop loop) {
-    return button(Button.kL3.value, loop);
+    return button(Button.kL3, loop);
   }
 
   /**
@@ -607,7 +635,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getR3Button() {
-    return getRawButton(Button.kR3.value);
+    return getRawButton(Button.kR3);
   }
 
   /**
@@ -616,7 +644,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getR3ButtonPressed() {
-    return getRawButtonPressed(Button.kR3.value);
+    return getRawButtonPressed(Button.kR3);
   }
 
   /**
@@ -625,7 +653,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getR3ButtonReleased() {
-    return getRawButtonReleased(Button.kR3.value);
+    return getRawButtonReleased(Button.kR3);
   }
 
   /**
@@ -636,7 +664,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent R3(EventLoop loop) {
-    return button(Button.kR3.value, loop);
+    return button(Button.kR3, loop);
   }
 
   /**
@@ -645,7 +673,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getPSButton() {
-    return getRawButton(Button.kPS.value);
+    return getRawButton(Button.kPS);
   }
 
   /**
@@ -654,7 +682,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getPSButtonPressed() {
-    return getRawButtonPressed(Button.kPS.value);
+    return getRawButtonPressed(Button.kPS);
   }
 
   /**
@@ -663,7 +691,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getPSButtonReleased() {
-    return getRawButtonReleased(Button.kPS.value);
+    return getRawButtonReleased(Button.kPS);
   }
 
   /**
@@ -674,7 +702,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent PS(EventLoop loop) {
-    return button(Button.kPS.value, loop);
+    return button(Button.kPS, loop);
   }
 
   /**
@@ -683,7 +711,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getTouchpadButton() {
-    return getRawButton(Button.kTouchpad.value);
+    return getRawButton(Button.kTouchpad);
   }
 
   /**
@@ -692,7 +720,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getTouchpadButtonPressed() {
-    return getRawButtonPressed(Button.kTouchpad.value);
+    return getRawButtonPressed(Button.kTouchpad);
   }
 
   /**
@@ -701,7 +729,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getTouchpadButtonReleased() {
-    return getRawButtonReleased(Button.kTouchpad.value);
+    return getRawButtonReleased(Button.kTouchpad);
   }
 
   /**
@@ -712,70 +740,39 @@ public class PS5Controller extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent touchpad(EventLoop loop) {
-    return button(Button.kTouchpad.value, loop);
+    return button(Button.kTouchpad, loop);
+  }
+private double getAxisForSendable(GamepadIndexPair axis) {
+    return DriverStation.getStickAxisIfAvailable(getPort(), axis).orElse(0.0);
   }
 
-  /**
-   * Read the value of the touchpad on the controller.
-   *
-   * @return The state of the touchpad.
-   * @deprecated Use {@link getTouchpadButton} instead. This function is deprecated for removal to
-   *     make function names consistent to allow the HID classes to be automatically generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getTouchpad() {
-    return getRawButton(Button.kTouchpad.value);
-  }
-
-  /**
-   * Whether the touchpad was pressed since the last check.
-   *
-   * @return Whether the touchpad was pressed since the last check.
-   * @deprecated Use {@link getTouchpadButtonPressed} instead. This function is deprecated for
-   *     removal to make function names consistent to allow the HID classes to be automatically
-   *     generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getTouchpadPressed() {
-    return getRawButtonPressed(Button.kTouchpad.value);
-  }
-
-  /**
-   * Whether the touchpad was released since the last check.
-   *
-   * @return Whether the touchpad was released since the last check.
-   * @deprecated Use {@link getTouchpadButtonReleased} instead. This function is deprecated for
-   *     removal to make function names consistent to allow the HID classes to be automatically
-   *     generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getTouchpadReleased() {
-    return getRawButtonReleased(Button.kTouchpad.value);
+  private boolean getButtonForSendable(GamepadIndexPair button) {
+    return DriverStation.getStickButtonIfAvailable(getPort(), button).orElse(false);
   }
 
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("HID");
     builder.publishConstString("ControllerType", "PS5");
-    builder.addDoubleProperty("L2 Axis", this::getL2Axis, null);
-    builder.addDoubleProperty("R2 Axis", this::getR2Axis, null);
-    builder.addDoubleProperty("LeftX", this::getLeftX, null);
-    builder.addDoubleProperty("LeftY", this::getLeftY, null);
-    builder.addDoubleProperty("RightX", this::getRightX, null);
-    builder.addDoubleProperty("RightY", this::getRightY, null);
-    builder.addBooleanProperty("Square", this::getSquareButton, null);
-    builder.addBooleanProperty("Cross", this::getCrossButton, null);
-    builder.addBooleanProperty("Circle", this::getCircleButton, null);
-    builder.addBooleanProperty("Triangle", this::getTriangleButton, null);
-    builder.addBooleanProperty("L1", this::getL1Button, null);
-    builder.addBooleanProperty("R1", this::getR1Button, null);
-    builder.addBooleanProperty("L2", this::getL2Button, null);
-    builder.addBooleanProperty("R2", this::getR2Button, null);
-    builder.addBooleanProperty("Create", this::getCreateButton, null);
-    builder.addBooleanProperty("Options", this::getOptionsButton, null);
-    builder.addBooleanProperty("L3", this::getL3Button, null);
-    builder.addBooleanProperty("R3", this::getR3Button, null);
-    builder.addBooleanProperty("PS", this::getPSButton, null);
-    builder.addBooleanProperty("Touchpad", this::getTouchpadButton, null);
+    builder.addDoubleProperty("L2 Axis", () -> getAxisForSendable(Axis.kL2), null);
+    builder.addDoubleProperty("R2 Axis", () -> getAxisForSendable(Axis.kR2), null);
+    builder.addDoubleProperty("LeftX", () -> getAxisForSendable(Axis.kLeftX), null);
+    builder.addDoubleProperty("LeftY", () -> getAxisForSendable(Axis.kLeftY), null);
+    builder.addDoubleProperty("RightX", () -> getAxisForSendable(Axis.kRightX), null);
+    builder.addDoubleProperty("RightY", () -> getAxisForSendable(Axis.kRightY), null);
+    builder.addBooleanProperty("Square", () -> getButtonForSendable(Button.kSquare), null);
+    builder.addBooleanProperty("Cross", () -> getButtonForSendable(Button.kCross), null);
+    builder.addBooleanProperty("Circle", () -> getButtonForSendable(Button.kCircle), null);
+    builder.addBooleanProperty("Triangle", () -> getButtonForSendable(Button.kTriangle), null);
+    builder.addBooleanProperty("L1", () -> getButtonForSendable(Button.kL1), null);
+    builder.addBooleanProperty("R1", () -> getButtonForSendable(Button.kR1), null);
+    builder.addBooleanProperty("L2", () -> getButtonForSendable(Button.kL2), null);
+    builder.addBooleanProperty("R2", () -> getButtonForSendable(Button.kR2), null);
+    builder.addBooleanProperty("Create", () -> getButtonForSendable(Button.kCreate), null);
+    builder.addBooleanProperty("Options", () -> getButtonForSendable(Button.kOptions), null);
+    builder.addBooleanProperty("L3", () -> getButtonForSendable(Button.kL3), null);
+    builder.addBooleanProperty("R3", () -> getButtonForSendable(Button.kR3), null);
+    builder.addBooleanProperty("PS", () -> getButtonForSendable(Button.kPS), null);
+    builder.addBooleanProperty("Touchpad", () -> getButtonForSendable(Button.kTouchpad), null);
   }
 }
