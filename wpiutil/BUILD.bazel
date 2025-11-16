@@ -99,6 +99,7 @@ third_party_cc_lib_helper(
     name = "expected",
     include_root = "src/main/native/thirdparty/expected/include",
     visibility = ["//visibility:public"],
+    hdr_exts = [""]
 )
 
 third_party_cc_lib_helper(
@@ -145,6 +146,7 @@ third_party_cc_lib_helper(
     name = "upb",
     include_root = "src/main/native/thirdparty/upb/include",
     src_root = "src/main/native/thirdparty/upb/src",
+    hdr_exts = [".h", ".inc"],
 )
 
 generate_resources(
