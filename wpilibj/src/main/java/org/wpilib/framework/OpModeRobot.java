@@ -57,25 +57,25 @@ public abstract class OpModeRobot extends RobotBase {
   }
 
   /**
-   * Find a public constructor to instantiate the opmode:
-   * - Prefer a single-arg public constructor whose parameter type is assignable from this.getClass()
-   *   (if multiple, pick the most specific parameter type).
-   * - Otherwise return the public no-arg constructor.
-   * - Return null if neither exists.
+   * Find a public constructor to instantiate the opmode. Prefer a single-arg public constructor
+   * whose parameter type is assignable from this.getClass() (if multiple, pick the most specific
+   * parameter type). Otherwise return the public no-arg constructor. Return null if neither exists.
    */
   private Constructor<?> findOpModeConstructor(Class<?> cls) {
     Constructor<?> bestCtor = null;
     Class<?> bestParam = null;
     for (Constructor<?> ctor : cls.getConstructors()) {
       Class<?>[] params = ctor.getParameterTypes();
-      if (params.length == 1) {
-        Class<?> param = params[0];
-        if (param.isAssignableFrom(getClass())) {
-          if (bestCtor == null || bestParam.isAssignableFrom(param)) {
-            bestCtor = ctor;
-            bestParam = param;
-          }
-        }
+      if (params.length != 1) {
+        continue;
+      }
+      Class<?> param = params[0];
+      if (!param.isAssignableFrom(getClass())) {
+        continue;
+      }
+      if (bestCtor == null || bestParam.isAssignableFrom(param)) {
+        bestCtor = ctor;
+        bestParam = param;
       }
     }
     if (bestCtor != null) {
