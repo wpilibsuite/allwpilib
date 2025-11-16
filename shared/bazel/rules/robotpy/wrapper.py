@@ -30,8 +30,8 @@ def print_failure_message(tool, args):
 #########################################################################################
 The scan header test has failed. This likely means that you have removed header
 files that are used by the project or have added new headers that aren't tracked
-(or explicity ignored) by the project. The text printed up above this message
-should tell you want needs to be added / removed from this projects pyproject.toml file.
+(or explicitly ignored) by the project. The text printed up above this message
+should tell you want needs to be added / removed from this project's pyproject.toml file.
 
 Please see this readme for more information:
 {README_LINK}#1-scan-headers
@@ -42,7 +42,7 @@ Please see this readme for more information:
         extra_error_message = f"""
 #########################################################################################
 The 'header to dat file' step has failed. The most probable cause for this is that you
-have yaml files that don't exist or are out of date called out in this projects
+have yaml files that don't exist or are out of date called out in this project's
 pyproject.toml file, and need to be regenerated running a tool that looks like this:
 
 bazel run //<project>:write_<library_name>-update-yaml tool
@@ -54,7 +54,7 @@ Please see this readme for more information:
     elif tool.startswith("semiwrap.cmd.dat"):
         extra_error_message = f"""
 #########################################################################################
-An auto generation error has occured. The most probable cause for this that the bazel
+An auto generation error has occurred. The most probable cause for this that the bazel
 build scripts need to updated, running a tool that looks like this:
 
 bazel run //<project>:<library_name>-generator.generate_build_info tool.
