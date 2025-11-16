@@ -482,6 +482,8 @@ public class GenericHID {
       case kRightRumble -> this.m_rightRumble = rumbleValue;
       case kLeftTriggerRumble -> this.m_leftTriggerRumble = rumbleValue;
       case kRightTriggerRumble -> this.m_rightTriggerRumble = rumbleValue;
+      default -> {
+      }
     }
 
     DriverStationJNI.setJoystickRumble(
