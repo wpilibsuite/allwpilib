@@ -143,12 +143,14 @@ wpilib_cc_library(
     name = "wpimath",
     srcs = glob(
         [
-            "src/main/native/cpp/**",
+            "src/main/native/cpp/**/*.cpp",
             "src/generated/main/native/cpp/**/*.cpp",
         ],
         exclude = ["src/main/native/cpp/jni/**"],
     ),
-    hdrs = glob(["src/main/native/include/**"]),
+    hdrs = glob([
+        "src/main/native/include/**/*.hpp",
+    ]),
     extra_hdr_pkg_files = [":protobuf_hdr_pkg"],
     extra_src_pkg_files = [
         ":wpimath-java-jni-hdrs-pkg",

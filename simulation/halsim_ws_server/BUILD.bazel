@@ -27,7 +27,7 @@ wpilib_cc_library(
 
 wpilib_cc_library(
     name = "halsim_ws_server_static",
-    srcs = glob(["src/main/native/cpp/**"]),
+    srcs = glob(["src/main/native/cpp/**/*.cpp"]),
     copts = [
         "-DHALSIM_InitExtension=HALSIM_InitExtension_WS_SERVER",
     ],

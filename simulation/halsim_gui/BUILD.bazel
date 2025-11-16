@@ -6,8 +6,9 @@ load("//shared/bazel/rules:publishing.bzl", "host_architectures")
 wpilib_cc_library(
     name = "halsim_gui",
     srcs = glob([
-        "src/main/native/cpp/*",
-        "src/main/native/include/**/*.hpp",
+        "src/main/native/cpp/*.cpp",
+        "src/main/native/cpp/*.hpp",
+        "src/main/native/include/**/*.hpp"
     ]),
     include_license_files = True,
     includes = ["src/main/native/include"],
@@ -32,7 +33,8 @@ wpilib_cc_library(
 wpilib_cc_library(
     name = "halsim_gui_static",
     srcs = glob([
-        "src/main/native/cpp/*",
+        "src/main/native/cpp/*.cpp",
+        "src/main/native/cpp/*.hpp",
         "src/main/native/include/**/*.hpp",
     ]),
     copts = [
