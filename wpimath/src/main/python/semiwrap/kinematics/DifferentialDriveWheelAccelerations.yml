@@ -1,0 +1,14 @@
+classes:
+  wpi::math::DifferentialDriveWheelAccelerations:
+    attributes:
+      left:
+      right:
+    methods:
+      operator+:
+      operator-:
+        overloads:
+          const DifferentialDriveWheelAccelerations& [const]:
+          '[const]':
+      operator*:
+      operator/:
+      operator==:

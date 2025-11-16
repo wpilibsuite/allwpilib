@@ -1,0 +1,14 @@
+classes:
+  wpi::math::SwerveModuleAccelerations:
+    attributes:
+      acceleration:
+      angle:
+    methods:
+      operator==:
+      operator+:
+      operator-:
+        overloads:
+          const SwerveModuleAccelerations& [const]:
+          '[const]':
+      operator*:
+      operator/:

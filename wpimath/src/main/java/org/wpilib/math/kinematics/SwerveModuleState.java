@@ -8,6 +8,7 @@ import static org.wpilib.units.Units.MetersPerSecond;
 
 import java.util.Objects;
 import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.interpolation.Interpolatable;
 import org.wpilib.math.kinematics.proto.SwerveModuleStateProto;
 import org.wpilib.math.kinematics.struct.SwerveModuleStateStruct;
 import org.wpilib.units.measure.LinearVelocity;
@@ -16,7 +17,10 @@ import org.wpilib.util.struct.StructSerializable;
 
 /** Represents the state of one swerve module. */
 public class SwerveModuleState
-    implements Comparable<SwerveModuleState>, ProtobufSerializable, StructSerializable {
+    implements Interpolatable<SwerveModuleState>,
+        Comparable<SwerveModuleState>,
+        ProtobufSerializable,
+        StructSerializable {
   /** Speed of the wheel of the module in meters per second. */
   public double speed;
 
@@ -117,6 +121,28 @@ public class SwerveModuleState
     } else {
       return new SwerveModuleState(desiredState.speed, desiredState.angle);
     }
+  }
+
+  /**
+   * Returns the linear interpolation of this SwerveModuleState and another. The angle is
+   * interpolated using the shortest path between the two angles.
+   *
+   * @param endValue The end value for the interpolation.
+   * @param t How far between the two values to interpolate. This is clamped to [0, 1].
+   * @return The interpolated value.
+   */
+  @Override
+  public SwerveModuleState interpolate(SwerveModuleState endValue, double t) {
+    // Clamp t to [0, 1]
+    t = Math.max(0.0, Math.min(1.0, t));
+
+    // Interpolate speed linearly
+    double interpolatedSpeed = speed + t * (endValue.speed - speed);
+
+    // Interpolate angle using the shortest path
+    Rotation2d interpolatedAngle = angle.interpolate(endValue.angle, t);
+
+    return new SwerveModuleState(interpolatedSpeed, interpolatedAngle);
   }
 
   /**
