@@ -8,11 +8,13 @@
 
 #include "wpi/net/MulticastServiceResolver.h"
 
+#include <Windows.h>
+#include <WinDNS.h>
+
 #include <memory>
 #include <string>
 #include <utility>
 
-#include "DynamicDns.hpp"
 #include "wpi/util/ConvertUTF.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/SmallVector.hpp"
@@ -23,7 +25,6 @@
 using namespace wpi::net;
 
 struct MulticastServiceResolver::Impl {
-  wpi::net::DynamicDns& dynamicDns = wpi::net::DynamicDns::GetDynamicDns();
   std::wstring serviceType;
   DNS_SERVICE_CANCEL serviceCancel{nullptr};
 
@@ -38,10 +39,6 @@ MulticastServiceResolver::MulticastServiceResolver(
     std::string_view serviceType) {
   pImpl = std::make_unique<Impl>();
   pImpl->resolver = this;
-
-  if (!pImpl->dynamicDns.CanDnsResolve) {
-    return;
-  }
 
   wpi::util::SmallVector<wchar_t, 128> wideStorage;
 
@@ -61,7 +58,7 @@ MulticastServiceResolver::~MulticastServiceResolver() noexcept {
 }
 
 bool MulticastServiceResolver::HasImplementation() const {
-  return pImpl->dynamicDns.CanDnsResolve;
+  return true;
 }
 
 bool MulticastServiceResolver::SetCopyCallback(
@@ -204,28 +201,20 @@ void MulticastServiceResolver::Start() {
     return;
   }
 
-  if (!pImpl->dynamicDns.CanDnsResolve) {
-    return;
-  }
-
   DNS_SERVICE_BROWSE_REQUEST request = {};
   request.InterfaceIndex = 0;
   request.pQueryContext = pImpl.get();
   request.QueryName = pImpl->serviceType.c_str();
   request.Version = 2;
   request.pBrowseCallbackV2 = DnsCompletion;
-  pImpl->dynamicDns.DnsServiceBrowsePtr(&request, &pImpl->serviceCancel);
+  DnsServiceBrowse(&request, &pImpl->serviceCancel);
 }
 
 void MulticastServiceResolver::Stop() {
-  if (!pImpl->dynamicDns.CanDnsResolve) {
-    return;
-  }
-
   if (pImpl->serviceCancel.reserved == nullptr) {
     return;
   }
 
-  pImpl->dynamicDns.DnsServiceBrowseCancelPtr(&pImpl->serviceCancel);
+  DnsServiceBrowseCancel(&pImpl->serviceCancel);
   pImpl->serviceCancel.reserved = nullptr;
 }
