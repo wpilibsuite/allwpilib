@@ -1209,7 +1209,8 @@ static void DriverStationExecute() {
     }
     // OpMode
     if (*gpDashboardOpModes) {
-      HALSIM_SetDriverStationOpMode(wpi::hal::GetDashboardSelectedOpMode(robotMode));
+      HALSIM_SetDriverStationOpMode(
+          wpi::hal::GetDashboardSelectedOpMode(robotMode));
     } else {
       OpModes* modes;
       switch (robotMode) {
