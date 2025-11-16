@@ -4,13 +4,6 @@
 
 #include "REVPDH.h"
 
-#include <hal/CAN.h>
-#include <hal/CANAPI.h>
-#include <hal/CANAPITypes.h>
-#include <hal/Errors.h>
-#include <hal/handles/HandlesInternal.h>
-#include <hal/handles/IndexedHandleResource.h>
-
 #include <cstring>
 #include <string>
 #include <thread>
@@ -21,8 +14,14 @@
 #include "HALInternal.h"
 #include "PortsInternal.h"
 #include "rev/PDHFrames.h"
+#include "wpi/hal/CAN.h"
+#include "wpi/hal/CANAPI.h"
+#include "wpi/hal/CANAPITypes.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/hal/handles/IndexedHandleResource.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
 static constexpr HAL_CANManufacturer manufacturer =
     HAL_CANManufacturer::HAL_CAN_Man_kREV;
@@ -78,14 +77,14 @@ static constexpr int32_t kPDHFrameStatus4Timeout = 20;
 static IndexedHandleResource<HAL_REVPDHHandle, REV_PDHObj, kNumREVPDHModules,
                              HAL_HandleEnum::REVPDH>* REVPDHHandles;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeREVPDH() {
   static IndexedHandleResource<HAL_REVPDHHandle, REV_PDHObj, kNumREVPDHModules,
                                HAL_HandleEnum::REVPDH>
       rH;
   REVPDHHandles = &rH;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 
@@ -192,11 +191,11 @@ PDH_status_4_t HAL_GetREVPDHStatus4(HAL_REVPDHHandle handle, int32_t* status) {
 HAL_REVPDHHandle HAL_InitializeREVPDH(int32_t busId, int32_t module,
                                       const char* allocationLocation,
                                       int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
   if (!HAL_CheckREVPDHModuleNumber(module)) {
     *status = RESOURCE_OUT_OF_RANGE;
-    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PDH", 1,
-                                     kNumREVPDHModules, module);
+    wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PDH",
+                                          1, kNumREVPDHModules, module);
     return HAL_kInvalidHandle;
   }
 
@@ -205,11 +204,11 @@ HAL_REVPDHHandle HAL_InitializeREVPDH(int32_t busId, int32_t module,
   auto hpdh = REVPDHHandles->Allocate(module - 1, &handle, status);
   if (*status != 0) {
     if (hpdh) {
-      hal::SetLastErrorPreviouslyAllocated(status, "REV PDH", module,
-                                           hpdh->previousAllocation);
+      wpi::hal::SetLastErrorPreviouslyAllocated(status, "REV PDH", module,
+                                                hpdh->previousAllocation);
     } else {
-      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PDH", 1,
-                                       kNumREVPDHModules, module);
+      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PDH",
+                                            1, kNumREVPDHModules, module);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
   }
@@ -242,7 +241,7 @@ void HAL_FreeREVPDH(HAL_REVPDHHandle handle) {
 }
 
 int32_t HAL_GetREVPDHModuleNumber(HAL_REVPDHHandle handle, int32_t* status) {
-  return hal::getHandleIndex(handle);
+  return wpi::hal::getHandleIndex(handle);
 }
 
 HAL_Bool HAL_CheckREVPDHModuleNumber(int32_t module) {

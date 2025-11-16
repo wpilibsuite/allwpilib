@@ -1,9 +1,9 @@
 extra_includes:
-- wpi/sendable/Sendable.h
-- wpi/sendable/SendableBuilder.h
+- wpi/util/sendable/Sendable.hpp
+- wpi/util/sendable/SendableBuilder.hpp
 
 classes:
-  wpi::SendableRegistry:
+  wpi::util::SendableRegistry:
     nodelete: true
     methods:
       Add:

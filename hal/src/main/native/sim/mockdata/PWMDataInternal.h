@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "hal/simulation/PWMData.h"
-#include "hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/PWMData.h"
+#include "wpi/hal/simulation/SimDataValue.h"
 
-namespace hal {
+namespace wpi::hal {
 class PWMData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(PulseMicrosecond)
@@ -24,4 +24,4 @@ class PWMData {
   virtual void ResetData();
 };
 extern PWMData* SimPWMData;
-}  // namespace hal
+}  // namespace wpi::hal

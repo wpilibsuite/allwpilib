@@ -21,27 +21,24 @@ classes:
       fmsAttached:
       dsAttached:
       control_reserved:
+      watchdogEnabled:
   HAL_JoystickAxes:
     attributes:
-      count:
       axes:
       raw:
+      available:
   HAL_JoystickPOVs:
     attributes:
-      count:
       povs:
+      available:
   HAL_JoystickButtons:
     attributes:
       buttons:
-      count:
+      available:
   HAL_JoystickDescriptor:
     attributes:
       type:
       name:
-      axisCount:
-      axisTypes:
-      buttonCount:
-      povCount:
       isGamepad:
   HAL_MatchInfo:
     attributes:

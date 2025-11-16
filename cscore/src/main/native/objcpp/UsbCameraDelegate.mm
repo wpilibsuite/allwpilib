@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#import "UsbCameraDelegate.h"
-#include "UsbCameraImpl.h"
+#import "UsbCameraDelegate.hpp"
+#include "UsbCameraImpl.hpp"
 
-#include <wpi/timestamp.h>
+#include "wpi/util/timestamp.h"
 
 @implementation UsbCameraDelegate
 
@@ -21,7 +21,7 @@
   (void)sampleBuffer;
   (void)connection;
 
-  auto currentTime = wpi::Now();
+  auto currentTime = wpi::util::Now();
 
   auto sharedThis = self.cppImpl.lock();
   if (!sharedThis) {
@@ -51,7 +51,7 @@
     return;
   }
 
-  std::unique_ptr<cs::Image> image = cs::CreateImageFromBGRA(
+  std::unique_ptr<wpi::cs::Image> image = wpi::cs::CreateImageFromBGRA(
       sharedThis.get(), width, height, rowBytes, reinterpret_cast<uint8_t*>(baseaddress));
 
   CVPixelBufferUnlockBaseAddress(imageBuffer, 0);

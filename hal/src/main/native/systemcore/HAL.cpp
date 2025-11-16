@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/HAL.h"
+#include "wpi/hal/HAL.h"
 
 #include <dlfcn.h>
 #include <signal.h>  // linux for kill
@@ -17,31 +17,30 @@
 #include <thread>
 #include <utility>
 
-#include <wpi/MemoryBuffer.h>
-#include <wpi/StringExtras.h>
-#include <wpi/fs.h>
-#include <wpi/mutex.h>
-#include <wpi/print.h>
-#include <wpi/timestamp.h>
-
 #include "CANInternal.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "SystemServerInternal.h"
-#include "hal/DriverStation.h"
-#include "hal/Errors.h"
-#include "hal/Notifier.h"
-#include "hal/handles/HandlesInternal.h"
+#include "wpi/hal/DriverStation.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/Notifier.h"
+#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/util/MemoryBuffer.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/fs.hpp"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/print.hpp"
+#include "wpi/util/timestamp.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
 static uint64_t dsStartTime;
 
 static int32_t teamNumber = -1;
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal {
+namespace wpi::hal {
 void InitializeDriverStation();
 void WaitForInitialPacket();
 namespace init {
@@ -78,7 +77,7 @@ uint64_t GetDSInitializeTime() {
   return dsStartTime;
 }
 
-}  // namespace hal
+}  // namespace wpi::hal
 
 extern "C" {
 
@@ -165,7 +164,7 @@ const char* HAL_GetErrorMessage(int32_t code) {
   }
 }
 
-static HAL_RuntimeType runtimeType = HAL_Runtime_SystemCore;
+static HAL_RuntimeType runtimeType = HAL_Runtime_Systemcore;
 
 HAL_RuntimeType HAL_GetRuntimeType(void) {
   return runtimeType;
@@ -200,9 +199,9 @@ void InitializeTeamNumber(void) {
   // Split string around '-' (max of 2 splits), take the second element
   teamNumber = 0;
   int i = 0;
-  wpi::split(hostname, '-', 2, false, [&](auto part) {
+  wpi::util::split(hostname, '-', 2, false, [&](auto part) {
     if (i == 1) {
-      teamNumber = wpi::parse_integer<int32_t>(part, 10).value_or(0);
+      teamNumber = wpi::util::parse_integer<int32_t>(part, 10).value_or(0);
     }
     ++i;
   });
@@ -216,8 +215,8 @@ int32_t HAL_GetTeamNumber(void) {
 }
 
 uint64_t HAL_GetFPGATime(int32_t* status) {
-  hal::init::CheckInit();
-  return wpi::NowDefault();
+  wpi::hal::init::CheckInit();
+  return wpi::util::NowDefault();
 }
 
 uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status) {
@@ -245,32 +244,32 @@ uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status) {
 }
 
 HAL_Bool HAL_GetSystemActive(int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
   *status = HAL_HANDLE_ERROR;
   return false;
 }
 
 HAL_Bool HAL_GetBrownedOut(int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
   *status = HAL_HANDLE_ERROR;
   return false;
 }
 
 int32_t HAL_GetCommsDisableCount(int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
   *status = HAL_HANDLE_ERROR;
   return 0;
 }
 
 HAL_Bool HAL_GetRSLState(int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
   *status = HAL_HANDLE_ERROR;
   return false;
 }
 
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   static std::atomic_bool initialized{false};
-  static wpi::mutex initializeMutex;
+  static wpi::util::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished
   if (initialized) {
     return true;
@@ -283,18 +282,18 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   }
 
   // Initialize system server first, other things might use it
-  hal::InitializeSystemServer();
+  wpi::hal::InitializeSystemServer();
 
-  hal::init::InitializeHAL();
+  wpi::hal::init::InitializeHAL();
 
-  hal::init::HAL_IsInitialized.store(true);
+  wpi::hal::init::HAL_IsInitialized.store(true);
 
   setlinebuf(stdin);
   setlinebuf(stdout);
 
   prctl(PR_SET_PDEATHSIG, SIGTERM);
 
-  if (!hal::InitializeCanBuses()) {
+  if (!wpi::hal::InitializeCanBuses()) {
     std::printf("Failed to initialize can buses\n");
     return false;
   }
@@ -304,18 +303,18 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   //   return false;
   // }
 
-  // FRC_NetworkCommunication_Reserve(nullptr);
+  // WPILIB_NetworkCommunication_Reserve(nullptr);
 
   int32_t status = 0;
 
-  hal::InitializeDriverStation();
+  wpi::hal::InitializeDriverStation();
 
   dsStartTime = HAL_GetFPGATime(&status);
   if (status != 0) {
     return false;
   }
 
-  hal::WaitForInitialPacket();
+  wpi::hal::WaitForInitialPacket();
 
   initialized = true;
   return true;

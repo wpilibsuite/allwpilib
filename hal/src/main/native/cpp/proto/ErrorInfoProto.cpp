@@ -5,15 +5,14 @@
 #include <string>
 #include <utility>
 
-#include <wpi/protobuf/ProtobufCallbacks.h>
+#include "wpi/hal/proto/ErrorInfo.h"
+#include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 
-#include "hal/proto/ErrorInfo.h"
-
-std::optional<mrc::ErrorInfo> wpi::Protobuf<mrc::ErrorInfo>::Unpack(
+std::optional<mrc::ErrorInfo> wpi::util::Protobuf<mrc::ErrorInfo>::Unpack(
     InputStream& Stream) {
-  wpi::UnpackCallback<std::string> DetailsCb;
-  wpi::UnpackCallback<std::string> LocationCb;
-  wpi::UnpackCallback<std::string> CallStackCb;
+  wpi::util::UnpackCallback<std::string> DetailsCb;
+  wpi::util::UnpackCallback<std::string> LocationCb;
+  wpi::util::UnpackCallback<std::string> CallStackCb;
 
   mrc_proto_ProtobufErrorInfo Msg{
       .IsError = false,
@@ -50,14 +49,14 @@ std::optional<mrc::ErrorInfo> wpi::Protobuf<mrc::ErrorInfo>::Unpack(
   return ToRet;
 }
 
-bool wpi::Protobuf<mrc::ErrorInfo>::Pack(OutputStream& Stream,
-                                         const mrc::ErrorInfo& Value) {
+bool wpi::util::Protobuf<mrc::ErrorInfo>::Pack(OutputStream& Stream,
+                                               const mrc::ErrorInfo& Value) {
   std::string_view DetailsView = Value.GetDetails();
   std::string_view LocationView = Value.GetLocation();
   std::string_view CallStackView = Value.GetCallStack();
-  wpi::PackCallback DetailsCb{&DetailsView};
-  wpi::PackCallback LocationCb{&LocationView};
-  wpi::PackCallback CallStackCb{&CallStackView};
+  wpi::util::PackCallback DetailsCb{&DetailsView};
+  wpi::util::PackCallback LocationCb{&LocationView};
+  wpi::util::PackCallback CallStackCb{&CallStackView};
 
   mrc_proto_ProtobufErrorInfo Msg{
       .IsError = Value.IsError,

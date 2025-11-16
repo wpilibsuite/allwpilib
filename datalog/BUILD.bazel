@@ -1,10 +1,15 @@
+load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_python//python:defs.bzl", "py_binary")
+load("//datalog:robotpy_native_build_info.bzl", "define_native_wrapper")
+load("//datalog:robotpy_pybind_build_info.bzl", "define_pybind_library", "wpilog_extension")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
-load("//shared/bazel/rules:packaging.bzl", "package_minimal_jni_project")
+load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project")
+load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info", "generate_robotpy_pybind_build_info")
+load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
 
 wpilib_cc_library(
     name = "datalog",
@@ -69,7 +74,7 @@ wpilib_jni_java_library(
     name = "datalog-java",
     srcs = glob(["src/main/java/**/*.java"]),
     maven_artifact_name = "datalog-java",
-    maven_group_id = "edu.wpi.first.datalog",
+    maven_group_id = "org.wpilib.datalog",
     native_libs = [":datalogjni"],
     visibility = ["//visibility:public"],
     deps = [
@@ -141,8 +146,53 @@ wpilib_java_junit5_test(
     ],
 )
 
-package_minimal_jni_project(
+package_default_jni_project(
     name = "datalog",
     maven_artifact_name = "datalog-cpp",
-    maven_group_id = "edu.wpi.first.datalog",
+    maven_group_id = "org.wpilib.datalog",
+)
+
+generate_robotpy_native_wrapper_build_info(
+    name = "robotpy-native-datalog-generator",
+    pyproject_toml = "src/main/python/native-pyproject.toml",
+)
+
+define_native_wrapper(
+    name = "robotpy-native-datalog",
+    pyproject_toml = "src/main/python/native-pyproject.toml",
+)
+
+PYBIND_PKGCFG_DEPS = [
+    "//datalog:native/datalog/robotpy-native-datalog.pc",
+    "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
+    "//wpiutil:robotpy-wpiutil.generated_pkgcfg_files",
+]
+
+generate_robotpy_pybind_build_info(
+    name = "robotpy-datalog-generator",
+    additional_srcs = [":robotpy-native-datalog.copy_headers"],
+    package_root_file = "src/main/python/wpilog/__init__.py",
+    pkgcfgs = PYBIND_PKGCFG_DEPS,
+    yaml_files = glob(["src/main/python/semiwrap/*.yml"]),
+)
+
+wpilog_extension(
+    srcs = ["src/main/python/src/main.cpp"],
+    includes = [
+        "src/main/python/datalog/",
+    ],
+)
+
+define_pybind_library(
+    name = "robotpy-wpilog",
+    pkgcfgs = PYBIND_PKGCFG_DEPS,
+)
+
+robotpy_py_test(
+    "datalog_tests",
+    srcs = glob(["src/test/python/**/*.py"]),
+    deps = [
+        ":robotpy-wpilog",
+        requirement("pytest"),
+    ],
 )

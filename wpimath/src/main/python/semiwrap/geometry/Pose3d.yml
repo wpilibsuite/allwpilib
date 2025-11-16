@@ -8,13 +8,13 @@ functions:
   from_json:
     ignore: true
 classes:
-  frc::Pose3d:
+  wpi::math::Pose3d:
     methods:
       Pose3d:
         overloads:
           '':
           Translation3d, Rotation3d:
-          units::meter_t, units::meter_t, units::meter_t, Rotation3d:
+          wpi::units::meter_t, wpi::units::meter_t, wpi::units::meter_t, Rotation3d:
           const Pose2d&:
             keepalive: []
           const Eigen::Matrix4d&:
@@ -44,21 +44,21 @@ classes:
 
 inline_code: |
   cls_Pose3d
-    .def_static("fromFeet", [](units::foot_t x, units::foot_t y, units::foot_t z, Rotation3d r) {
+    .def_static("fromFeet", [](wpi::units::foot_t x, wpi::units::foot_t y, wpi::units::foot_t z, Rotation3d r) {
       return std::make_unique<Pose3d>(x, y, z, r);
     }, py::arg("x"), py::arg("y"), py::arg("z"), py::arg("r"))
     .def_property_readonly("x", &Pose3d::X)
     .def_property_readonly("y", &Pose3d::Y)
     .def_property_readonly("z", &Pose3d::Z)
-    .def_property_readonly("x_feet", [](const Pose3d * self) -> units::foot_t {
+    .def_property_readonly("x_feet", [](const Pose3d * self) -> wpi::units::foot_t {
       return self->X();
     })
-    .def_property_readonly("y_feet", [](const Pose3d * self) -> units::foot_t {
+    .def_property_readonly("y_feet", [](const Pose3d * self) -> wpi::units::foot_t {
       return self->Y();
     })
-    .def_property_readonly("z_feet", [](const Pose3d * self) -> units::foot_t {
+    .def_property_readonly("z_feet", [](const Pose3d * self) -> wpi::units::foot_t {
       return self->Z();
     })
     .def("__repr__", py::overload_cast<const Pose3d&>(&rpy::toString));
 
-  SetupWPyStruct<frc::Pose3d>(cls_Pose3d);
+  SetupWPyStruct<wpi::math::Pose3d>(cls_Pose3d);

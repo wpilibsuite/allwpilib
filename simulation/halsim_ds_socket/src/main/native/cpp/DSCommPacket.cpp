@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "DSCommPacket.h"
+#include "wpi/halsim/ds_socket/DSCommPacket.hpp"
 
 #include <algorithm>
 #include <chrono>
@@ -11,8 +11,8 @@
 #include <thread>
 #include <vector>
 
-#include <hal/simulation/DriverStationData.h>
-#include <hal/simulation/MockHooks.h>
+#include "wpi/hal/simulation/DriverStationData.h"
+#include "wpi/hal/simulation/MockHooks.h"
 
 using namespace halsim;
 
@@ -281,12 +281,12 @@ void DSCommPacket::SendJoysticks(void) {
   }
 }
 
-void DSCommPacket::SetupSendBuffer(wpi::raw_uv_ostream& buf) {
+void DSCommPacket::SetupSendBuffer(wpi::net::raw_uv_ostream& buf) {
   SetupSendHeader(buf);
   SetupJoystickTag(buf);
 }
 
-void DSCommPacket::SetupSendHeader(wpi::raw_uv_ostream& buf) {
+void DSCommPacket::SetupSendHeader(wpi::net::raw_uv_ostream& buf) {
   static constexpr uint8_t kCommVersion = 0x01;
 
   // High low packet index, comm version
@@ -303,7 +303,7 @@ void DSCommPacket::SetupSendHeader(wpi::raw_uv_ostream& buf) {
   buf << static_cast<uint8_t>(0);
 }
 
-void DSCommPacket::SetupJoystickTag(wpi::raw_uv_ostream& buf) {
+void DSCommPacket::SetupJoystickTag(wpi::net::raw_uv_ostream& buf) {
   static constexpr uint8_t kHIDTag = 0x01;
 
   // HID tags are sent 1 per device

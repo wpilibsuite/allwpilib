@@ -2,11 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/uv/Buffer.h"  // NOLINT(build/include_order)
+// clang-format off
+#include "wpi/net/uv/Buffer.hpp"
+// clang-format on
 
 #include <gtest/gtest.h>
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 TEST(UvSimpleBufferPoolTest, ConstructDefault) {
   SimpleBufferPool<> pool;
@@ -45,4 +47,4 @@ TEST(UvSimpleBufferPoolTest, ClearRemaining) {
   ASSERT_EQ(pool.Remaining(), 0u);
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

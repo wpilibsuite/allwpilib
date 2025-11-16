@@ -5,13 +5,13 @@
 #include <string>
 #include <thread>
 
-#include <frc/simulation/DriverStationSim.h>
-#include <frc/simulation/SimHooks.h>
 #include <gtest/gtest.h>
-#include <hal/simulation/I2CData.h>
-#include <units/time.h>
 
-#include "Robot.h"
+#include "Robot.hpp"
+#include "wpi/hal/simulation/I2CData.h"
+#include "wpi/simulation/DriverStationSim.hpp"
+#include "wpi/simulation/SimHooks.hpp"
+#include "wpi/units/time.hpp"
 
 static std::string gString;
 
@@ -31,14 +31,14 @@ class I2CCommunicationTest : public testing::TestWithParam<T> {
 
   void SetUp() override {
     gString = std::string();
-    frc::sim::PauseTiming();
-    frc::sim::DriverStationSim::ResetData();
+    wpi::sim::PauseTiming();
+    wpi::sim::DriverStationSim::ResetData();
     m_port = static_cast<int32_t>(Robot::kPort);
 
     m_callback = HALSIM_RegisterI2CWriteCallback(m_port, &callback, nullptr);
 
     m_thread = std::thread([&] { m_robot.StartCompetition(); });
-    frc::sim::StepTiming(0.0_ms);  // Wait for Notifiers
+    wpi::sim::StepTiming(0.0_ms);  // Wait for Notifiers
   }
 
   void TearDown() override {
@@ -54,12 +54,12 @@ class AllianceTest : public I2CCommunicationTest<HAL_AllianceStationID> {};
 
 TEST_P(AllianceTest, Alliance) {
   auto alliance = GetParam();
-  frc::sim::DriverStationSim::SetAllianceStationId(alliance);
-  frc::sim::DriverStationSim::NotifyNewData();
+  wpi::sim::DriverStationSim::SetAllianceStationId(alliance);
+  wpi::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_TRUE(HALSIM_GetI2CInitialized(m_port));
 
-  frc::sim::StepTiming(20_ms);
+  wpi::sim::StepTiming(20_ms);
 
   char expected = 'U';
   switch (alliance) {
@@ -111,12 +111,12 @@ class EnabledTest : public I2CCommunicationTest<bool> {};
 
 TEST_P(EnabledTest, Enabled) {
   auto enabled = GetParam();
-  frc::sim::DriverStationSim::SetEnabled(enabled);
-  frc::sim::DriverStationSim::NotifyNewData();
+  wpi::sim::DriverStationSim::SetEnabled(enabled);
+  wpi::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_TRUE(HALSIM_GetI2CInitialized(m_port));
 
-  frc::sim::StepTiming(20_ms);
+  wpi::sim::StepTiming(20_ms);
 
   char expected = enabled ? 'E' : 'D';
   EXPECT_EQ(expected, gString.at(1));
@@ -129,12 +129,12 @@ class AutonomousTest : public I2CCommunicationTest<bool> {};
 
 TEST_P(AutonomousTest, Autonomous) {
   auto autonomous = GetParam();
-  frc::sim::DriverStationSim::SetAutonomous(autonomous);
-  frc::sim::DriverStationSim::NotifyNewData();
+  wpi::sim::DriverStationSim::SetAutonomous(autonomous);
+  wpi::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_TRUE(HALSIM_GetI2CInitialized(m_port));
 
-  frc::sim::StepTiming(20_ms);
+  wpi::sim::StepTiming(20_ms);
 
   char expected = autonomous ? 'A' : 'T';
   EXPECT_EQ(expected, gString.at(2));
@@ -147,12 +147,12 @@ class MatchTimeTest : public I2CCommunicationTest<int> {};
 
 TEST_P(MatchTimeTest, Alert) {
   auto matchTime = GetParam();
-  frc::sim::DriverStationSim::SetMatchTime(matchTime);
-  frc::sim::DriverStationSim::NotifyNewData();
+  wpi::sim::DriverStationSim::SetMatchTime(matchTime);
+  wpi::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_TRUE(HALSIM_GetI2CInitialized(m_port));
 
-  frc::sim::StepTiming(20_ms);
+  wpi::sim::StepTiming(20_ms);
 
   std::string expected = fmt::format("{:03}", matchTime);
   EXPECT_EQ(expected, gString.substr(3));

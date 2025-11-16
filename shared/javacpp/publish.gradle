@@ -3,8 +3,8 @@ apply plugin: 'maven-publish'
 def outputsFolder = file("$buildDir/outputs")
 
 def baseArtifactId = nativeName
-def artifactGroupId = "edu.wpi.first.${nativeName}"
-def zipBaseName = "_GROUP_edu_wpi_first_${nativeName}_ID_${nativeName}-cpp_CLS"
+def artifactGroupId = "org.wpilib.${nativeName}"
+def zipBaseName = "_GROUP_org_wpilib_${nativeName}_ID_${nativeName}-cpp_CLS"
 
 def licenseFile = file("$rootDir/license.md")
 

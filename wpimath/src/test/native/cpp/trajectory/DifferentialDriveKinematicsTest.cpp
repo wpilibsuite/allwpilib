@@ -2,17 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+
 #include <memory>
 #include <vector>
 
 #include <gtest/gtest.h>
 
-#include "frc/kinematics/DifferentialDriveKinematics.h"
-#include "frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
-#include "trajectory/TestTrajectory.h"
-#include "units/time.h"
+#include "wpi/math/trajectory/TestTrajectory.hpp"
+#include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
+#include "wpi/units/time.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 TEST(DifferentialDriveKinematicsConstraintTest, Constraint) {
   const auto maxVelocity = 12_fps;
@@ -24,9 +25,9 @@ TEST(DifferentialDriveKinematicsConstraintTest, Constraint) {
 
   auto trajectory = TestTrajectory::GetTrajectory(config);
 
-  units::second_t time = 0_s;
-  units::second_t dt = 20_ms;
-  units::second_t duration = trajectory.TotalTime();
+  wpi::units::second_t time = 0_s;
+  wpi::units::second_t dt = 20_ms;
+  wpi::units::second_t duration = trajectory.TotalTime();
 
   while (time < duration) {
     const Trajectory::State point = trajectory.Sample(time);

@@ -4,11 +4,10 @@
 
 #pragma once
 
-#include <stddef.h>  // NOLINT
-
+#include <stddef.h>
 #include <stdint.h>
 
-#include <wpi/string.h>
+#include "wpi/util/string.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -2,20 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/ExpansionHubPidConstants.h"
+#include "wpi/ExpansionHubPidConstants.hpp"
 
 #include <string>
 
-#include "frc/Errors.h"
-#include "frc/SystemServer.h"
+#include "wpi/system/Errors.hpp"
+#include "wpi/system/SystemServer.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 ExpansionHubPidConstants::ExpansionHubPidConstants(int usbId, int channel,
                                                    bool isVelocityPid) {
   auto systemServer = SystemServer::GetSystemServer();
 
-  nt::PubSubOptions options;
+  wpi::nt::PubSubOptions options;
   options.sendAll = true;
   options.keepDuplicates = true;
   options.periodic = 0.005;

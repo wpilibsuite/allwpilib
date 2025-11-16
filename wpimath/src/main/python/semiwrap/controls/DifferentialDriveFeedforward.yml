@@ -2,13 +2,13 @@ defaults:
   subpackage: controller
 
 classes:
-  frc::DifferentialDriveFeedforward:
+  wpi::math::DifferentialDriveFeedforward:
     force_type_casters:
-    - units::meters_per_second
-    - units::meters_per_second_squared
-    - units::radians_per_second
-    - units::radians_per_second_squared
-    - units::compound_unit
+    - wpi::units::meters_per_second
+    - wpi::units::meters_per_second_squared
+    - wpi::units::radians_per_second
+    - wpi::units::radians_per_second_squared
+    - wpi::units::compound_unit
     attributes:
       m_kVLinear:
       m_kALinear:
@@ -17,10 +17,10 @@ classes:
     methods:
       DifferentialDriveFeedforward:
         overloads:
-          decltype(1_V/1_mps), decltype(1_V/1_mps_sq), decltype(1_V/1_rad_per_s), decltype(1_V/1_rad_per_s_sq), units::meter_t:
+          decltype(1_V/1_mps), decltype(1_V/1_mps_sq), decltype(1_V/1_rad_per_s), decltype(1_V/1_rad_per_s_sq), wpi::units::meter_t:
           decltype(1_V/1_mps), decltype(1_V/1_mps_sq), decltype(1_V/1_mps), decltype(1_V/1_mps_sq):
           # ? decltype ( 1 _V / 1 _mps ), decltype ( 1 _V / 1 _mps_sq ), decltype (
-          #   1 _V / 1 _rad_per_s ), decltype ( 1 _V / 1 _rad_per_s_sq ), units::meter_t
+          #   1 _V / 1 _rad_per_s ), decltype ( 1 _V / 1 _rad_per_s_sq ), wpi::units::meter_t
           # :
           #   param_override:
           #     kVLinear:

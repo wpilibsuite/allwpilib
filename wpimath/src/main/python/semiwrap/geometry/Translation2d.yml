@@ -9,13 +9,13 @@ functions:
   from_json:
     ignore: true
 classes:
-  frc::Translation2d:
+  wpi::math::Translation2d:
     methods:
       Translation2d:
         overloads:
           '':
-          units::meter_t, units::meter_t:
-          units::meter_t, const Rotation2d&:
+          wpi::units::meter_t, wpi::units::meter_t:
+          wpi::units::meter_t, const Rotation2d&:
           const Eigen::Vector2d&:
       Distance:
       X:
@@ -45,24 +45,24 @@ classes:
 
 inline_code: |
   cls_Translation2d
-    .def_static("fromFeet", [](units::foot_t x, units::foot_t y){
+    .def_static("fromFeet", [](wpi::units::foot_t x, wpi::units::foot_t y){
       return std::make_unique<Translation2d>(x, y);
     }, py::arg("x"), py::arg("y"))
-    .def_static("fromFeet", [](units::foot_t distance, const Rotation2d &angle) {
+    .def_static("fromFeet", [](wpi::units::foot_t distance, const Rotation2d &angle) {
       return std::make_unique<Translation2d>(distance, angle);
     }, py::arg("distance"), py::arg("angle"))
     .def_property_readonly("x", &Translation2d::X)
     .def_property_readonly("y", &Translation2d::Y)
-    .def_property_readonly("x_feet", [](Translation2d * self) -> units::foot_t {
+    .def_property_readonly("x_feet", [](Translation2d * self) -> wpi::units::foot_t {
       return self->X();
     })
-    .def_property_readonly("y_feet", [](Translation2d * self) -> units::foot_t {
+    .def_property_readonly("y_feet", [](Translation2d * self) -> wpi::units::foot_t {
       return self->Y();
     })
-    .def("distanceFeet", [](Translation2d * self, const Translation2d &other) -> units::foot_t {
+    .def("distanceFeet", [](Translation2d * self, const Translation2d &other) -> wpi::units::foot_t {
       return self->Distance(other);
     })
-    .def("normFeet", [](Translation2d * self) -> units::foot_t {
+    .def("normFeet", [](Translation2d * self) -> wpi::units::foot_t {
       return self->Norm();
     })
     .def("__abs__", &Translation2d::Norm)
@@ -79,4 +79,4 @@ inline_code: |
     })
     .def("__repr__", py::overload_cast<const Translation2d&>(&rpy::toString));
 
-  SetupWPyStruct<frc::Translation2d>(cls_Translation2d);
+  SetupWPyStruct<wpi::math::Translation2d>(cls_Translation2d);

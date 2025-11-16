@@ -2,40 +2,41 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/hal/Main.h"
+
 #include <cstdio>
 #include <memory>
 #include <string_view>
 
-#include <glass/Context.h>
-#include <glass/Storage.h>
-#include <glass/hardware/Pneumatic.h>
-#include <glass/other/Plot.h>
-#include <hal/Extensions.h>
-#include <hal/Main.h>
 #include <imgui.h>
-#include <wpigui.h>
 
-#include "AddressableLEDGui.h"
-#include "AnalogInputSimGui.h"
-#include "DIOSimGui.h"
-#include "DriverStationGui.h"
-#include "EncoderSimGui.h"
-#include "HALSimGui.h"
-#include "HALSimGuiExt.h"
-#include "NetworkTablesSimGui.h"
-#include "PCMSimGui.h"
-#include "PHSimGui.h"
-#include "PWMSimGui.h"
-#include "PowerDistributionSimGui.h"
-#include "RoboRioSimGui.h"
-#include "SimDeviceGui.h"
-#include "TimingGui.h"
+#include "AddressableLEDGui.hpp"
+#include "AnalogInputSimGui.hpp"
+#include "DIOSimGui.hpp"
+#include "DriverStationGui.hpp"
+#include "EncoderSimGui.hpp"
+#include "NetworkTablesSimGui.hpp"
+#include "PCMSimGui.hpp"
+#include "PHSimGui.hpp"
+#include "PWMSimGui.hpp"
+#include "PowerDistributionSimGui.hpp"
+#include "RoboRioSimGui.hpp"
+#include "TimingGui.hpp"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/Storage.hpp"
+#include "wpi/glass/hardware/Pneumatic.hpp"
+#include "wpi/glass/other/Plot.hpp"
+#include "wpi/gui/wpigui.hpp"
+#include "wpi/hal/Extensions.h"
+#include "wpi/halsim/gui/HALSimGui.hpp"
+#include "wpi/halsim/gui/HALSimGuiExt.hpp"
+#include "wpi/halsim/gui/SimDeviceGui.hpp"
 
 using namespace halsimgui;
 
 namespace gui = wpi::gui;
 
-static std::unique_ptr<glass::PlotProvider> gPlotProvider;
+static std::unique_ptr<wpi::glass::PlotProvider> gPlotProvider;
 
 extern "C" {
 #if defined(WIN32) || defined(_WIN32)
@@ -45,9 +46,9 @@ int HALSIM_InitExtension(void) {
   std::puts("Simulator GUI Initializing.");
 
   gui::CreateContext();
-  glass::CreateContext();
+  wpi::glass::CreateContext();
 
-  glass::SetStorageName("simgui");
+  wpi::glass::SetStorageName("simgui");
 
   gui::AddInit([] { ImGui::GetIO().ConfigDockingWithShift = true; });
 
@@ -64,14 +65,14 @@ int HALSIM_InitExtension(void) {
   HAL_RegisterExtension(
       HALSIMGUI_EXT_GETGUICONTEXT,
       reinterpret_cast<void*>((GetGuiContextFn)&gui::GetCurrentContext));
-  HAL_RegisterExtension(
-      HALSIMGUI_EXT_GETGLASSCONTEXT,
-      reinterpret_cast<void*>((GetGlassContextFn)&glass::GetCurrentContext));
+  HAL_RegisterExtension(HALSIMGUI_EXT_GETGLASSCONTEXT,
+                        reinterpret_cast<void*>(
+                            (GetGlassContextFn)&wpi::glass::GetCurrentContext));
 
   HALSimGui::GlobalInit();
   DriverStationGui::GlobalInit();
-  gPlotProvider = std::make_unique<glass::PlotProvider>(
-      glass::GetStorageRoot().GetChild("Plot"));
+  gPlotProvider = std::make_unique<wpi::glass::PlotProvider>(
+      wpi::glass::GetStorageRoot().GetChild("Plot"));
   gPlotProvider->GlobalInit();
 
   // These need to initialize first
@@ -95,28 +96,28 @@ int HALSIM_InitExtension(void) {
         return PCMSimGui::PCMsAnyInitialized() || PHSimGui::PHsAnyInitialized();
       },
       [] {
-        return std::make_unique<glass::AllPneumaticControlsModel>(
+        return std::make_unique<wpi::glass::AllPneumaticControlsModel>(
             PCMSimGui::GetPCMsModel(), PHSimGui::GetPHsModel());
       });
 
   HALSimGui::halProvider->RegisterView(
       "Solenoids", "AllPneumaticControls",
-      [](glass::Model* model) {
+      [](wpi::glass::Model* model) {
         auto pneumaticModel =
-            static_cast<glass::AllPneumaticControlsModel*>(model);
+            static_cast<wpi::glass::AllPneumaticControlsModel*>(model);
         return PCMSimGui::PCMsAnySolenoids(pneumaticModel->pcms.get()) ||
                PHSimGui::PHsAnySolenoids(pneumaticModel->phs.get());
       },
-      [](glass::Window* win, glass::Model* model) {
+      [](wpi::glass::Window* win, wpi::glass::Model* model) {
         win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
         win->SetDefaultPos(290, 20);
-        return glass::MakeFunctionView([=] {
+        return wpi::glass::MakeFunctionView([=] {
           auto pneumaticModel =
-              static_cast<glass::AllPneumaticControlsModel*>(model);
-          glass::DisplayPneumaticControlsSolenoids(
+              static_cast<wpi::glass::AllPneumaticControlsModel*>(model);
+          wpi::glass::DisplayPneumaticControlsSolenoids(
               pneumaticModel->pcms.get(),
               HALSimGui::halProvider->AreOutputsEnabled());
-          glass::DisplayPneumaticControlsSolenoids(
+          wpi::glass::DisplayPneumaticControlsSolenoids(
               pneumaticModel->phs.get(),
               HALSimGui::halProvider->AreOutputsEnabled());
         });
@@ -169,7 +170,7 @@ int HALSIM_InitExtension(void) {
       nullptr,
       [](void*) {
         gui::Main();
-        glass::DestroyContext();
+        wpi::glass::DestroyContext();
         gui::DestroyContext();
       },
       [](void*) { gui::Exit(); });

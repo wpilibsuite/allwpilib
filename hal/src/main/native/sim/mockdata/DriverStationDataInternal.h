@@ -6,13 +6,12 @@
 
 #include <memory>
 
-#include <wpi/spinlock.h>
+#include "wpi/hal/simulation/DriverStationData.h"
+#include "wpi/hal/simulation/SimCallbackRegistry.h"
+#include "wpi/hal/simulation/SimDataValue.h"
+#include "wpi/util/spinlock.hpp"
 
-#include "hal/simulation/DriverStationData.h"
-#include "hal/simulation/SimCallbackRegistry.h"
-#include "hal/simulation/SimDataValue.h"
-
-namespace hal {
+namespace wpi::hal {
 
 class DriverStationData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Enabled)
@@ -158,11 +157,11 @@ class DriverStationData {
   };
 
   static constexpr int kNumJoysticks = 6;
-  wpi::spinlock m_joystickDataMutex;
+  wpi::util::spinlock m_joystickDataMutex;
   JoystickData m_joystickData[kNumJoysticks];
 
-  wpi::spinlock m_matchInfoMutex;
+  wpi::util::spinlock m_matchInfoMutex;
   HAL_MatchInfo m_matchInfo;
 };
 extern DriverStationData* SimDriverStationData;
-}  // namespace hal
+}  // namespace wpi::hal

@@ -2,12 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/hardware/range/SharpIR.hpp"
+
 #include <gtest/gtest.h>
 
-#include "frc/SharpIR.h"
-#include "frc/simulation/SharpIRSim.h"
+#include "wpi/simulation/SharpIRSim.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 TEST(SharpIRTest, SimDevices) {
   SharpIR s = SharpIR::GP2Y0A02YK0F(1);

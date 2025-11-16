@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/uv/Async.h"
+#include "wpi/net/uv/Async.hpp"
 
 #include <memory>
 
-#include "wpinet/uv/Loop.h"
+#include "wpi/net/uv/Loop.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 Async<>::~Async() noexcept {
   if (auto loop = m_loop.lock()) {
@@ -35,4 +35,4 @@ std::shared_ptr<Async<>> Async<>::Create(const std::shared_ptr<Loop>& loop) {
   return h;
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

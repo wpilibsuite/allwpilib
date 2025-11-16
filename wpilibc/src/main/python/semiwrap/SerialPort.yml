@@ -1,5 +1,5 @@
 classes:
-  frc::SerialPort:
+  wpi::SerialPort:
     enums:
       Parity:
       StopBits:
@@ -12,19 +12,19 @@ classes:
           int, Port, int, Parity, StopBits:
             param_override:
               port:
-                default: frc::SerialPort::Port::kOnboard
+                default: wpi::SerialPort::Port::kOnboard
               parity:
-                default: frc::SerialPort::Parity::kParity_None
+                default: wpi::SerialPort::Parity::kParity_None
               stopBits:
-                default: frc::SerialPort::StopBits::kStopBits_One
+                default: wpi::SerialPort::StopBits::kStopBits_One
           int, std::string_view, Port, int, Parity, StopBits:
             param_override:
               port:
-                default: frc::SerialPort::Port::kOnboard
+                default: wpi::SerialPort::Port::kOnboard
               parity:
-                default: frc::SerialPort::Parity::kParity_None
+                default: wpi::SerialPort::Parity::kParity_None
               stopBits:
-                default: frc::SerialPort::StopBits::kStopBits_One
+                default: wpi::SerialPort::StopBits::kStopBits_One
       SetFlowControl:
       EnableTermination:
         param_override:

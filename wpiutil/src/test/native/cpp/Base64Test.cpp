@@ -2,14 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/util/Base64.hpp"
+
 #include <string>
 
 #include <gtest/gtest.h>
 
-#include "wpi/Base64.h"
-#include "wpi/SmallString.h"
+#include "wpi/util/SmallString.hpp"
 
-namespace wpi {
+namespace wpi::util {
 
 struct Base64TestParam {
   int plain_len;
@@ -102,4 +103,4 @@ static Base64TestParam standard[] = {
 INSTANTIATE_TEST_SUITE_P(Base64StandardTests, Base64Test,
                          ::testing::ValuesIn(standard));
 
-}  // namespace wpi
+}  // namespace wpi::util

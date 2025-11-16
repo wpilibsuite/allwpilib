@@ -5,10 +5,10 @@
 #pragma once
 
 #include "PortsInternal.h"
-#include "hal/handles/HandlesInternal.h"
-#include "hal/handles/LimitedHandleResource.h"
+#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/hal/handles/LimitedHandleResource.h"
 
-namespace hal {
+namespace wpi::hal {
 
 struct Counter {
   uint8_t index;
@@ -17,4 +17,4 @@ struct Counter {
 extern LimitedHandleResource<HAL_CounterHandle, Counter, kNumCounters,
                              HAL_HandleEnum::Counter>* counterHandles;
 
-}  // namespace hal
+}  // namespace wpi::hal

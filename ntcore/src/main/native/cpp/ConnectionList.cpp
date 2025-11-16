@@ -2,25 +2,24 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "ConnectionList.h"
+#include "ConnectionList.hpp"
 
 #include <string>
 #include <vector>
 
-#include <wpi/SmallVector.h>
-#include <wpi/json.h>
-#include <wpi/raw_ostream.h>
+#include "IListenerStorage.hpp"
+#include "wpi/nt/ntcore_c.h"
+#include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/json.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
-#include "IListenerStorage.h"
-#include "ntcore_c.h"
-#include "ntcore_cpp.h"
-
-using namespace nt;
+using namespace wpi::nt;
 
 static std::string ConnInfoToJson(bool connected, const ConnectionInfo& info) {
   std::string str;
-  wpi::raw_string_ostream os{str};
-  wpi::json::serializer s{os, ' ', 0};
+  wpi::util::raw_string_ostream os{str};
+  wpi::util::json::serializer s{os, ' ', 0};
   os << "{\"connected\":" << (connected ? "true" : "false");
   os << ",\"remote_id\":\"";
   s.dump_escaped(info.remote_id, false);
@@ -100,7 +99,7 @@ void ConnectionList::AddListener(NT_Listener listener, unsigned int eventMask) {
   if ((eventMask & (NT_EVENT_CONNECTED | NT_EVENT_IMMEDIATE)) ==
           (NT_EVENT_CONNECTED | NT_EVENT_IMMEDIATE) &&
       !m_connections.empty()) {
-    wpi::SmallVector<const ConnectionInfo*, 16> infos;
+    wpi::util::SmallVector<const ConnectionInfo*, 16> infos;
     infos.reserve(m_connections.size());
     for (auto&& conn : m_connections) {
       infos.emplace_back(&(*conn));

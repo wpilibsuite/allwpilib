@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/DutyCycleSim.h"  // NOLINT(build/include_order)
+#include "wpi/simulation/DutyCycleSim.hpp"
 
 #include <gtest/gtest.h>
-#include <hal/HAL.h>
 
-#include "callback_helpers/TestCallbackHelpers.h"
-#include "frc/DigitalInput.h"
-#include "frc/DutyCycle.h"
+#include "callback_helpers/TestCallbackHelpers.hpp"
+#include "wpi/hal/HAL.h"
+#include "wpi/hardware/discrete/DigitalInput.hpp"
+#include "wpi/hardware/rotation/DutyCycle.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 
 TEST(DutyCycleSimTest, Initialization) {
   HAL_Initialize(500, 0);
@@ -64,4 +64,4 @@ TEST(DutyCycleSimTest, SetOutput) {
   EXPECT_EQ(229.174, callback.GetLastValue());
 }
 
-}  // namespace frc::sim
+}  // namespace wpi::sim

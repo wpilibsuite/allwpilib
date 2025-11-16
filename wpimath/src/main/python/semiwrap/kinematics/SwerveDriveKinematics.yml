@@ -1,7 +1,7 @@
 classes:
-  frc::SwerveDriveKinematics:
+  wpi::math::SwerveDriveKinematics:
     force_type_casters:
-    - wpi::array
+    - wpi::util::array
     template_params:
     - size_t NumModules
     methods:
@@ -9,14 +9,14 @@ classes:
         overloads:
           ModuleTranslations&&...:
             ignore: true
-          const wpi::array<Translation2d, NumModules>&:
+          const wpi::util::array<Translation2d, NumModules>&:
             ignore: true
 
       ResetHeadings:
         overloads:
           ModuleHeadings&&...:
             ignore: true
-          wpi::array<Rotation2d, NumModules>:
+          wpi::util::array<Rotation2d, NumModules>:
 
       ToSwerveModuleStates:
         doc: |
@@ -48,34 +48,42 @@ classes:
         overloads:
           ModuleStates&&... [const]:
             ignore: true
-          const wpi::array<SwerveModuleState, NumModules>& [const]:
+          const wpi::util::array<SwerveModuleState, NumModules>& [const]:
       ToTwist2d:
         overloads:
           ModuleDeltas&&... [const]:
             ignore: true
-          wpi::array<SwerveModulePosition, NumModules> [const]:
-          const wpi::array<SwerveModulePosition, NumModules>&, const wpi::array<SwerveModulePosition, NumModules>& [const]:
+          wpi::util::array<SwerveModulePosition, NumModules> [const]:
+          ? const wpi::util::array<SwerveModulePosition, NumModules>&, const wpi::util::array<SwerveModulePosition, NumModules>& [const]
+          :
       DesaturateWheelSpeeds:
         overloads:
-          wpi::array<SwerveModuleState, NumModules>*, units::meters_per_second_t:
+          wpi::util::array<SwerveModuleState, NumModules>*, wpi::units::meters_per_second_t:
             cpp_code: |
-              [](wpi::array<SwerveModuleState, NumModules> moduleStates, units::meters_per_second_t attainableMaxSpeed) {
-                frc::SwerveDriveKinematics<NumModules>::DesaturateWheelSpeeds(&moduleStates, attainableMaxSpeed);
+              [](wpi::util::array<SwerveModuleState, NumModules> moduleStates, wpi::units::meters_per_second_t attainableMaxSpeed) {
+                wpi::math::SwerveDriveKinematics<NumModules>::DesaturateWheelSpeeds(&moduleStates, attainableMaxSpeed);
                 return moduleStates;
               }
-          ? wpi::array<SwerveModuleState, NumModules>*, ChassisSpeeds, units::meters_per_second_t, units::meters_per_second_t, units::radians_per_second_t
+          ? wpi::util::array<SwerveModuleState, NumModules>*, ChassisSpeeds, wpi::units::meters_per_second_t, wpi::units::meters_per_second_t, wpi::units::radians_per_second_t
           : cpp_code: |
-              [](wpi::array<SwerveModuleState, NumModules> moduleStates,
+              [](wpi::util::array<SwerveModuleState, NumModules> moduleStates,
                   ChassisSpeeds currentChassisSpeed,
-                  units::meters_per_second_t attainableMaxModuleSpeed,
-                  units::meters_per_second_t attainableMaxRobotTranslationSpeed,
-                  units::radians_per_second_t attainableMaxRobotRotationSpeed) {
-                frc::SwerveDriveKinematics<NumModules>::DesaturateWheelSpeeds(&moduleStates, currentChassisSpeed, attainableMaxModuleSpeed, attainableMaxRobotTranslationSpeed, attainableMaxRobotRotationSpeed);
+                  wpi::units::meters_per_second_t attainableMaxModuleSpeed,
+                  wpi::units::meters_per_second_t attainableMaxRobotTranslationSpeed,
+                  wpi::units::radians_per_second_t attainableMaxRobotRotationSpeed) {
+                wpi::math::SwerveDriveKinematics<NumModules>::DesaturateWheelSpeeds(&moduleStates, currentChassisSpeed, attainableMaxModuleSpeed, attainableMaxRobotTranslationSpeed, attainableMaxRobotRotationSpeed);
                 return moduleStates;
               }
 
       Interpolate:
       GetModules:
+      ToSwerveModuleAccelerations:
+      ToWheelAccelerations:
+      ToChassisAccelerations:
+        overloads:
+          ModuleAccelerations&&... [const]:
+            ignore: true
+          const wpi::util::array<SwerveModuleAccelerations, NumModules>& [const]:
 
     template_inline_code: |
       if constexpr (NumModules == 2) {
@@ -91,18 +99,18 @@ classes:
 
 templates:
   SwerveDrive2Kinematics:
-    qualname: frc::SwerveDriveKinematics
+    qualname: wpi::math::SwerveDriveKinematics
     params:
     - 2
   SwerveDrive3Kinematics:
-    qualname: frc::SwerveDriveKinematics
+    qualname: wpi::math::SwerveDriveKinematics
     params:
     - 3
   SwerveDrive4Kinematics:
-    qualname: frc::SwerveDriveKinematics
+    qualname: wpi::math::SwerveDriveKinematics
     params:
     - 4
   SwerveDrive6Kinematics:
-    qualname: frc::SwerveDriveKinematics
+    qualname: wpi::math::SwerveDriveKinematics
     params:
     - 6

@@ -2,22 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/DutyCycleEncoder.h>
-#include <frc/MathUtil.h>
-#include <frc/TimedRobot.h>
-#include <frc/smartdashboard/SmartDashboard.h>
+#include "wpi/framework/TimedRobot.hpp"
+#include "wpi/hardware/rotation/DutyCycleEncoder.hpp"
+#include "wpi/math/util/MathUtil.hpp"
+#include "wpi/smartdashboard/SmartDashboard.hpp"
 
 constexpr double fullRange = 1.3;
 constexpr double expectedZero = 0.0;
 
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
   // 2nd parameter is the range of values. This sensor will output between
   // 0 and the passed in value.
   // 3rd parameter is the the physical value where you want "0" to be. How
   // to measure this is fairly easy. Set the value to 0, place the mechanism
   // where you want "0" to be, and observe the value on the dashboard, That
   // is the value to enter for the 3rd parameter.
-  frc::DutyCycleEncoder m_dutyCycleEncoder{0, fullRange, expectedZero};
+  wpi::DutyCycleEncoder m_dutyCycleEncoder{0, fullRange, expectedZero};
 
  public:
   Robot() {
@@ -56,18 +56,18 @@ class Robot : public frc::TimedRobot {
     // This does not change where "0" is, so no calibration numbers need
     // to be changed.
     double percentOfRange = fullRange * 0.1;
-    double shiftedOutput = frc::InputModulus(output, 0 - percentOfRange,
-                                             fullRange - percentOfRange);
+    double shiftedOutput = wpi::math::InputModulus(output, 0 - percentOfRange,
+                                                   fullRange - percentOfRange);
 
-    frc::SmartDashboard::PutBoolean("Connected", connected);
-    frc::SmartDashboard::PutNumber("Frequency", frequency.value());
-    frc::SmartDashboard::PutNumber("Output", output);
-    frc::SmartDashboard::PutNumber("ShiftedOutput", shiftedOutput);
+    wpi::SmartDashboard::PutBoolean("Connected", connected);
+    wpi::SmartDashboard::PutNumber("Frequency", frequency.value());
+    wpi::SmartDashboard::PutNumber("Output", output);
+    wpi::SmartDashboard::PutNumber("ShiftedOutput", shiftedOutput);
   }
 };
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

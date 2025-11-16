@@ -2,21 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/ExpansionHub.h"
+#include "wpi/ExpansionHub.hpp"
 
 #include <memory>
 
-#include <hal/UsageReporting.h>
-#include <networktables/BooleanTopic.h>
+#include "wpi/ExpansionHubMotor.hpp"
+#include "wpi/ExpansionHubServo.hpp"
+#include "wpi/hal/UsageReporting.h"
+#include "wpi/nt/BooleanTopic.hpp"
+#include "wpi/system/Errors.hpp"
+#include "wpi/system/SystemServer.hpp"
 
-#include "frc/Errors.h"
-#include "frc/ExpansionHubMotor.h"
-#include "frc/ExpansionHubServo.h"
-#include "frc/SystemServer.h"
+using namespace wpi;
 
-using namespace frc;
-
-wpi::mutex ExpansionHub::m_handleLock;
+wpi::util::mutex ExpansionHub::m_handleLock;
 std::weak_ptr<ExpansionHub::DataStore> ExpansionHub::m_storeMap[4];
 
 class ExpansionHub::DataStore {
@@ -34,18 +33,18 @@ class ExpansionHub::DataStore {
   DataStore& operator=(DataStore&) = delete;
   DataStore& operator=(DataStore&&) = delete;
 
-  nt::BooleanSubscriber m_hubConnectedSubscriber;
+  wpi::nt::BooleanSubscriber m_hubConnectedSubscriber;
 
   uint32_t m_reservedMotorMask{0};
   uint32_t m_reservedServoMask{0};
-  wpi::mutex m_reservedLock;
+  wpi::util::mutex m_reservedLock;
 
   int m_usbId;
 };
 
 std::shared_ptr<ExpansionHub::DataStore> ExpansionHub::GetForUsbId(int usbId) {
-  FRC_AssertMessage(usbId >= 0 && usbId < NumUsbPorts, "USB {} out of range",
-                    usbId);
+  WPILIB_AssertMessage(usbId >= 0 && usbId < NumUsbPorts, "USB {} out of range",
+                       usbId);
   std::scoped_lock lock{m_handleLock};
   std::weak_ptr<DataStore>& weakStore = m_storeMap[usbId];
   auto strongStore = weakStore.lock();

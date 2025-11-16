@@ -10,9 +10,9 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/raw_os_ostream.h"
+#include "wpi/util/raw_os_ostream.hpp"
 #include <ostream>
-using namespace wpi;
+using namespace wpi::util;
 
 //===----------------------------------------------------------------------===//
 //  raw_os_ostream

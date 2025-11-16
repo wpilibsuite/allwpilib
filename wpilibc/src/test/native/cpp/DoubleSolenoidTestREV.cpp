@@ -3,16 +3,16 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <hal/HAL.h>
 
-#include "frc/DoubleSolenoid.h"
-#include "frc/PneumaticsControlModule.h"
-#include "frc/Solenoid.h"
+#include "wpi/hal/HAL.h"
+#include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
+#include "wpi/hardware/pneumatic/PneumaticsControlModule.hpp"
+#include "wpi/hardware/pneumatic/Solenoid.hpp"
 
-namespace frc {
+namespace wpi {
 
 TEST(DoubleSolenoidREVTest, ValidInitialization) {
-  DoubleSolenoid solenoid{0, 3, frc::PneumaticsModuleType::CTREPCM, 2, 3};
+  DoubleSolenoid solenoid{0, 3, wpi::PneumaticsModuleType::CTREPCM, 2, 3};
   solenoid.Set(DoubleSolenoid::kReverse);
   EXPECT_EQ(DoubleSolenoid::kReverse, solenoid.Get());
 
@@ -25,29 +25,29 @@ TEST(DoubleSolenoidREVTest, ValidInitialization) {
 
 TEST(DoubleSolenoidREVTest, ThrowForwardPortAlreadyInitialized) {
   // Single solenoid that is reused for forward port
-  Solenoid solenoid{0, 5, frc::PneumaticsModuleType::CTREPCM, 2};
-  EXPECT_THROW(DoubleSolenoid(5, frc::PneumaticsModuleType::CTREPCM, 2, 3),
+  Solenoid solenoid{0, 5, wpi::PneumaticsModuleType::CTREPCM, 2};
+  EXPECT_THROW(DoubleSolenoid(5, wpi::PneumaticsModuleType::CTREPCM, 2, 3),
                std::runtime_error);
 }
 
 TEST(DoubleSolenoidREVTest, ThrowReversePortAlreadyInitialized) {
   // Single solenoid that is reused for forward port
-  Solenoid solenoid{0, 6, frc::PneumaticsModuleType::CTREPCM, 3};
-  EXPECT_THROW(DoubleSolenoid(6, frc::PneumaticsModuleType::CTREPCM, 2, 3),
+  Solenoid solenoid{0, 6, wpi::PneumaticsModuleType::CTREPCM, 3};
+  EXPECT_THROW(DoubleSolenoid(6, wpi::PneumaticsModuleType::CTREPCM, 2, 3),
                std::runtime_error);
 }
 
 TEST(DoubleSolenoidREVTest, ThrowBothPortsAlreadyInitialized) {
   PneumaticsControlModule pcm{0, 6};
   // Single solenoid that is reused for forward port
-  Solenoid solenoid0(0, 6, frc::PneumaticsModuleType::CTREPCM, 2);
-  Solenoid solenoid1(0, 6, frc::PneumaticsModuleType::CTREPCM, 3);
-  EXPECT_THROW(DoubleSolenoid(6, frc::PneumaticsModuleType::CTREPCM, 2, 3),
+  Solenoid solenoid0(0, 6, wpi::PneumaticsModuleType::CTREPCM, 2);
+  Solenoid solenoid1(0, 6, wpi::PneumaticsModuleType::CTREPCM, 3);
+  EXPECT_THROW(DoubleSolenoid(6, wpi::PneumaticsModuleType::CTREPCM, 2, 3),
                std::runtime_error);
 }
 
 TEST(DoubleSolenoidREVTest, Toggle) {
-  DoubleSolenoid solenoid{0, 4, frc::PneumaticsModuleType::CTREPCM, 2, 3};
+  DoubleSolenoid solenoid{0, 4, wpi::PneumaticsModuleType::CTREPCM, 2, 3};
   // Bootstrap it into reverse
   solenoid.Set(DoubleSolenoid::kReverse);
 
@@ -64,12 +64,12 @@ TEST(DoubleSolenoidREVTest, Toggle) {
 }
 
 TEST(DoubleSolenoidREVTest, InvalidForwardPort) {
-  EXPECT_THROW(DoubleSolenoid(0, 0, frc::PneumaticsModuleType::CTREPCM, 100, 1),
+  EXPECT_THROW(DoubleSolenoid(0, 0, wpi::PneumaticsModuleType::CTREPCM, 100, 1),
                std::runtime_error);
 }
 
 TEST(DoubleSolenoidREVTest, InvalidReversePort) {
-  EXPECT_THROW(DoubleSolenoid(0, 0, frc::PneumaticsModuleType::CTREPCM, 0, 100),
+  EXPECT_THROW(DoubleSolenoid(0, 0, wpi::PneumaticsModuleType::CTREPCM, 0, 100),
                std::runtime_error);
 }
-}  // namespace frc
+}  // namespace wpi

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "SimDeviceGui.h"
+#include "wpi/halsim/gui/SimDeviceGui.hpp"
 
 #include <stdint.h>
 
@@ -10,20 +10,20 @@
 #include <utility>
 
 #include <fmt/format.h>
-#include <glass/other/DeviceTree.h>
-#include <hal/SimDevice.h>
-#include <hal/simulation/SimDeviceData.h>
-#include <wpi/DenseMap.h>
-#include <wpi/StringExtras.h>
 
-#include "HALDataSource.h"
-#include "HALSimGui.h"
+#include "wpi/glass/other/DeviceTree.hpp"
+#include "wpi/hal/SimDevice.h"
+#include "wpi/hal/simulation/SimDeviceData.h"
+#include "wpi/halsim/gui/HALDataSource.hpp"
+#include "wpi/halsim/gui/HALSimGui.hpp"
+#include "wpi/util/DenseMap.hpp"
+#include "wpi/util/StringExtras.hpp"
 
 using namespace halsimgui;
 
 namespace {
 #define DEFINE_SIMVALUESOURCE(Type, TYPE, v_type)                          \
-  class Sim##Type##ValueSource : public glass::Type##Source {              \
+  class Sim##Type##ValueSource : public wpi::glass::Type##Source {         \
    public:                                                                 \
     explicit Sim##Type##ValueSource(HAL_SimValueHandle handle,             \
                                     const char* device, const char* name)  \
@@ -51,7 +51,7 @@ namespace {
 DEFINE_SIMVALUESOURCE(Boolean, BOOLEAN, boolean)
 DEFINE_SIMVALUESOURCE(Double, DOUBLE, double)
 
-class SimIntegerValueSource : public glass::IntegerSource {
+class SimIntegerValueSource : public wpi::glass::IntegerSource {
  public:
   explicit SimIntegerValueSource(HAL_SimValueHandle handle, const char* device,
                                  const char* name)
@@ -80,17 +80,18 @@ class SimIntegerValueSource : public glass::IntegerSource {
   int32_t m_callback;
 };
 
-class SimDevicesModel : public glass::Model {
+class SimDevicesModel : public wpi::glass::Model {
  public:
   void Update() override;
   bool Exists() override { return true; }
 
-  glass::DataSource* GetSource(HAL_SimValueHandle handle) {
+  wpi::glass::DataSource* GetSource(HAL_SimValueHandle handle) {
     return m_sources[handle].get();
   }
 
  private:
-  wpi::DenseMap<HAL_SimValueHandle, std::unique_ptr<glass::DataSource>>
+  wpi::util::DenseMap<HAL_SimValueHandle,
+                      std::unique_ptr<wpi::glass::DataSource>>
       m_sources;
 };
 }  // namespace
@@ -150,39 +151,41 @@ static void DisplaySimValue(const char* name, void* data,
   switch (value->type) {
     case HAL_BOOLEAN: {
       bool v = value->data.v_boolean;
-      if (glass::DeviceBoolean(name, direction == HAL_SimValueOutput, &v,
-                               model->GetSource(handle))) {
+      if (wpi::glass::DeviceBoolean(name, direction == HAL_SimValueOutput, &v,
+                                    model->GetSource(handle))) {
         valueCopy.data.v_boolean = v ? 1 : 0;
         HAL_SetSimValue(handle, valueCopy);
       }
       break;
     }
     case HAL_DOUBLE:
-      if (glass::DeviceDouble(name, direction == HAL_SimValueOutput,
-                              &valueCopy.data.v_double,
-                              model->GetSource(handle))) {
+      if (wpi::glass::DeviceDouble(name, direction == HAL_SimValueOutput,
+                                   &valueCopy.data.v_double,
+                                   model->GetSource(handle))) {
         HAL_SetSimValue(handle, valueCopy);
       }
       break;
     case HAL_ENUM: {
       int32_t numOptions = 0;
       const char** options = HALSIM_GetSimValueEnumOptions(handle, &numOptions);
-      if (glass::DeviceEnum(name, direction == HAL_SimValueOutput,
-                            &valueCopy.data.v_enum, options, numOptions,
-                            model->GetSource(handle))) {
+      if (wpi::glass::DeviceEnum(name, direction == HAL_SimValueOutput,
+                                 &valueCopy.data.v_enum, options, numOptions,
+                                 model->GetSource(handle))) {
         HAL_SetSimValue(handle, valueCopy);
       }
       break;
     }
     case HAL_INT:
-      if (glass::DeviceInt(name, direction == HAL_SimValueOutput,
-                           &valueCopy.data.v_int, model->GetSource(handle))) {
+      if (wpi::glass::DeviceInt(name, direction == HAL_SimValueOutput,
+                                &valueCopy.data.v_int,
+                                model->GetSource(handle))) {
         HAL_SetSimValue(handle, valueCopy);
       }
       break;
     case HAL_LONG:
-      if (glass::DeviceLong(name, direction == HAL_SimValueOutput,
-                            &valueCopy.data.v_long, model->GetSource(handle))) {
+      if (wpi::glass::DeviceLong(name, direction == HAL_SimValueOutput,
+                                 &valueCopy.data.v_long,
+                                 model->GetSource(handle))) {
         HAL_SetSimValue(handle, valueCopy);
       }
       break;
@@ -197,49 +200,50 @@ static void DisplaySimDevice(const char* name, void* data,
   if (!gSimDevicesShowPrefix) {
     // only show "Foo" portion of "Accel:Foo"
     std::string_view type;
-    std::tie(type, id) = wpi::split(id, ':');
+    std::tie(type, id) = wpi::util::split(id, ':');
     if (id.empty()) {
       id = type;
     }
   }
-  if (glass::BeginDevice(id.data())) {
+  if (wpi::glass::BeginDevice(id.data())) {
     HALSIM_EnumerateSimValues(handle, data, DisplaySimValue);
-    glass::EndDevice();
+    wpi::glass::EndDevice();
   }
 }
 
 void SimDeviceGui::Initialize() {
   HALSimGui::halProvider->Register(
       "Other Devices", [] { return true; },
-      [] { return std::make_unique<glass::DeviceTreeModel>(); },
-      [](glass::Window* win, glass::Model* model) {
+      [] { return std::make_unique<wpi::glass::DeviceTreeModel>(); },
+      [](wpi::glass::Window* win, wpi::glass::Model* model) {
         win->SetDefaultPos(1025, 20);
         win->SetDefaultSize(250, 695);
         win->DisableRenamePopup();
-        return glass::MakeFunctionView([=] {
+        return wpi::glass::MakeFunctionView([=] {
           if (ImGui::BeginPopupContextItem()) {
             ImGui::Checkbox("Show prefix", &gSimDevicesShowPrefix);
             ImGui::EndPopup();
           }
-          static_cast<glass::DeviceTreeModel*>(model)->Display();
+          static_cast<wpi::glass::DeviceTreeModel*>(model)->Display();
         });
       });
   HALSimGui::halProvider->ShowDefault("Other Devices");
 
   auto model = std::make_unique<SimDevicesModel>();
   gSimDevicesModel = model.get();
-  GetDeviceTree().Add(std::move(model), [](glass::Model* model) {
+  GetDeviceTree().Add(std::move(model), [](wpi::glass::Model* model) {
     HALSIM_EnumerateSimDevices("", static_cast<SimDevicesModel*>(model),
                                DisplaySimDevice);
   });
 }
 
-glass::DataSource* SimDeviceGui::GetValueSource(HAL_SimValueHandle handle) {
+wpi::glass::DataSource* SimDeviceGui::GetValueSource(
+    HAL_SimValueHandle handle) {
   return gSimDevicesModel->GetSource(handle);
 }
 
-glass::DeviceTreeModel& SimDeviceGui::GetDeviceTree() {
+wpi::glass::DeviceTreeModel& SimDeviceGui::GetDeviceTree() {
   static auto model = HALSimGui::halProvider->GetModel("Other Devices");
   assert(model);
-  return *static_cast<glass::DeviceTreeModel*>(model);
+  return *static_cast<wpi::glass::DeviceTreeModel*>(model);
 }

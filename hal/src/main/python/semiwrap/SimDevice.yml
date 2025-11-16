@@ -3,7 +3,7 @@ defaults:
   report_ignored_missing: false
 
 extra_includes:
-- hal/simulation/SimDeviceData.h
+- wpi/hal/simulation/SimDeviceData.h
 
 strip_prefixes:
 - HAL_
@@ -11,7 +11,7 @@ strip_prefixes:
 enums:
   HAL_SimValueDirection:
 classes:
-  hal::SimValue:
+  wpi::hal::SimValue:
     doc: |
       Readonly wrapper around a HAL simulator value.
 
@@ -30,7 +30,7 @@ classes:
         ignore: true
       SetValue:
         ignore: true
-  hal::SimInt:
+  wpi::hal::SimInt:
     doc: |
       Wrapper around a HAL simulator int value handle.
 
@@ -49,7 +49,7 @@ classes:
       Get:
       Set:
       Reset:
-  hal::SimLong:
+  wpi::hal::SimLong:
     doc: |
       Wrapper around a HAL simulator long value handle.
 
@@ -68,7 +68,7 @@ classes:
       Get:
       Set:
       Reset:
-  hal::SimDouble:
+  wpi::hal::SimDouble:
     doc: |
       Wrapper around a HAL simulator double value.
 
@@ -87,7 +87,7 @@ classes:
       Get:
       Set:
       Reset:
-  hal::SimEnum:
+  wpi::hal::SimEnum:
     doc: |
       Wrapper around a HAL simulator enum value.
 
@@ -105,7 +105,7 @@ classes:
                 name: handle
       Get:
       Set:
-  hal::SimBoolean:
+  wpi::hal::SimBoolean:
     doc: |
       Wrapper around a HAL simulator boolean value.
 
@@ -123,7 +123,7 @@ classes:
                 name: handle
       Get:
       Set:
-  hal::SimDevice:
+  wpi::hal::SimDevice:
     doc: |
       Wrapper around a HAL simulation 'device'
 
@@ -133,7 +133,7 @@ classes:
       .. note:: To interact with an existing device use
                 :class:`hal.simulation.SimDeviceSim` instead.
     force_type_casters:
-    - wpi::SmallVector
+    - wpi::util::SmallVector
     enums:
       Direction:
     methods:
@@ -154,8 +154,8 @@ classes:
             ignore: true
           const char*, int32_t, std::span<const char * const>, int32_t:
             cpp_code: |
-              [](SimDevice &self, const char * name, int32_t direction, const wpi::SmallVector<std::string, 8> &options, int32_t initialValue) {
-                wpi::SmallVector<const char *, 8> coptions;
+              [](SimDevice &self, const char * name, int32_t direction, const wpi::util::SmallVector<std::string, 8> &options, int32_t initialValue) {
+                wpi::util::SmallVector<const char *, 8> coptions;
                 coptions.reserve(options.size());
                 for (auto &s: options) {
                   coptions.push_back(s.c_str());
@@ -169,8 +169,8 @@ classes:
             ignore: true
           const char*, int32_t, std::span<const char * const>, std::span<const double>, int32_t:
             cpp_code: |
-              [](SimDevice &self, const char * name, int32_t direction, const wpi::SmallVector<std::string, 8> &options, const wpi::SmallVector<double, 8> &optionValues, int32_t initialValue) {
-                wpi::SmallVector<const char *, 8> coptions;
+              [](SimDevice &self, const char * name, int32_t direction, const wpi::util::SmallVector<std::string, 8> &options, const wpi::util::SmallVector<double, 8> &optionValues, int32_t initialValue) {
+                wpi::util::SmallVector<const char *, 8> coptions;
                 coptions.reserve(options.size());
                 for (auto &s: options) {
                   coptions.push_back(s.c_str());
@@ -185,7 +185,7 @@ classes:
 inline_code: |2
 
   cls_SimValue
-    .def_property_readonly("value", [](const hal::SimValue &self) -> py::object {
+    .def_property_readonly("value", [](const wpi::hal::SimValue &self) -> py::object {
         HAL_Value value;
         {
           py::gil_scoped_release release;
@@ -206,14 +206,14 @@ inline_code: |2
           return py::none();
         }
     })
-    .def_property_readonly("type", [](const hal::SimValue &self) -> HAL_Type {
+    .def_property_readonly("type", [](const wpi::hal::SimValue &self) -> HAL_Type {
       py::gil_scoped_release release;
       return self.GetValue().type;
     })
-    .def("__bool__", [](const hal::SimValue &self) -> bool {
+    .def("__bool__", [](const wpi::hal::SimValue &self) -> bool {
       return (bool)self;
     })
-    .def("__repr__", [](const hal::SimValue &self) -> py::str {
+    .def("__repr__", [](const wpi::hal::SimValue &self) -> py::str {
         if (!self) {
           return "<SimValue (invalid)>";
         }
@@ -258,10 +258,10 @@ inline_code: |2
     });
 
   cls_SimDevice
-    .def("__bool__", [](const hal::SimDevice &self) -> bool {
+    .def("__bool__", [](const wpi::hal::SimDevice &self) -> bool {
       return (bool)self;
     })
-    .def_property_readonly("name", [](const hal::SimDevice &self) -> py::str {
+    .def_property_readonly("name", [](const wpi::hal::SimDevice &self) -> py::str {
       #ifdef __FRC_SYSTEMCORE__
         return "<invalid>";
       #else
@@ -277,7 +277,7 @@ inline_code: |2
         }
       #endif
     })
-    .def("__repr__", [](const hal::SimDevice &self) -> py::str {
+    .def("__repr__", [](const wpi::hal::SimDevice &self) -> py::str {
       #ifdef __FRC_SYSTEMCORE__
         return "<SimDevice (invalid)>";
       #else

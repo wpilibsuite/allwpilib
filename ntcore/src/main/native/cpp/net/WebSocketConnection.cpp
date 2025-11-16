@@ -2,21 +2,21 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "WebSocketConnection.h"
+#include "WebSocketConnection.hpp"
 
 #include <algorithm>
 #include <span>
 
-#include <wpi/Endian.h>
-#include <wpi/Logger.h>
-#include <wpi/SpanExtras.h>
-#include <wpi/raw_ostream.h>
-#include <wpi/timestamp.h>
-#include <wpinet/WebSocket.h>
-#include <wpinet/raw_uv_ostream.h>
+#include "wpi/net/WebSocket.hpp"
+#include "wpi/net/raw_uv_ostream.hpp"
+#include "wpi/util/Endian.hpp"
+#include "wpi/util/Logger.hpp"
+#include "wpi/util/SpanExtras.hpp"
+#include "wpi/util/raw_ostream.hpp"
+#include "wpi/util/timestamp.h"
 
-using namespace nt;
-using namespace nt::net;
+using namespace wpi::nt;
+using namespace wpi::nt::net;
 
 // MTU - assume Ethernet, IPv6, TCP; does not include WS frame header (max 10)
 static constexpr size_t kMTU = 1500 - 40 - 20;
@@ -28,7 +28,7 @@ static constexpr size_t kFlushThresholdFrames = 32;
 static constexpr size_t kFlushThresholdBytes = 16384;
 static constexpr size_t kMaxPoolSize = 32;
 
-class WebSocketConnection::Stream final : public wpi::raw_ostream {
+class WebSocketConnection::Stream final : public wpi::util::raw_ostream {
  public:
   explicit Stream(WebSocketConnection& conn) : m_conn{conn} {
     auto& buf = conn.m_bufs.back();
@@ -60,8 +60,8 @@ void WebSocketConnection::Stream::write_impl(const char* data, size_t len) {
     m_conn.m_written += amt;
     if (!m_disableAlloc) {
 #ifdef NT_ENABLE_WS_FRAG
-      m_conn.m_frames.back().opcode &= ~wpi::WebSocket::kFlagFin;
-      m_conn.StartFrame(wpi::WebSocket::Frame::kFragment);
+      m_conn.m_frames.back().opcode &= ~wpi::net::WebSocket::kFlagFin;
+      m_conn.StartFrame(wpi::net::WebSocket::Frame::kFragment);
 #else
       m_conn.m_bufs.emplace_back(m_conn.AllocBuf());
       m_conn.m_bufs.back().len = 0;
@@ -90,8 +90,8 @@ void WebSocketConnection::Stream::write_impl(const char* data, size_t len) {
     if (buf.len >= kAllocSize && (len > 0 || !m_disableAlloc)) {
 #ifdef NT_ENABLE_WS_FRAG
       // fragment the current frame and start a new one
-      m_conn.m_frames.back().opcode &= ~wpi::WebSocket::kFlagFin;
-      m_conn.StartFrame(wpi::WebSocket::Frame::kFragment);
+      m_conn.m_frames.back().opcode &= ~wpi::net::WebSocket::kFlagFin;
+      m_conn.StartFrame(wpi::net::WebSocket::Frame::kFragment);
 #else
       m_conn.m_bufs.emplace_back(m_conn.AllocBuf());
       m_conn.m_bufs.back().len = 0;
@@ -106,9 +106,9 @@ void WebSocketConnection::Stream::write_impl(const char* data, size_t len) {
   }
 }
 
-WebSocketConnection::WebSocketConnection(wpi::WebSocket& ws,
+WebSocketConnection::WebSocketConnection(wpi::net::WebSocket& ws,
                                          unsigned int version,
-                                         wpi::Logger& logger)
+                                         wpi::util::Logger& logger)
     : m_ws{ws}, m_logger{logger}, m_version{version} {}
 
 WebSocketConnection::~WebSocketConnection() {
@@ -124,7 +124,8 @@ void WebSocketConnection::SendPing(uint64_t time) {
   WPI_DEBUG4(m_logger, "conn: sending ping {}", time);
   auto buf = AllocBuf();
   buf.len = 8;
-  wpi::support::endian::write64<wpi::endianness::native>(buf.base, time);
+  wpi::util::support::endian::write64<wpi::util::endianness::native>(buf.base,
+                                                                     time);
   m_ws.SendPing({buf}, [selfweak = weak_from_this()](auto bufs, auto err) {
     if (auto self = selfweak.lock()) {
       self->m_err = err;
@@ -153,7 +154,8 @@ void WebSocketConnection::FinishText() {
 }
 
 int WebSocketConnection::Write(
-    State kind, wpi::function_ref<void(wpi::raw_ostream& os)> writer) {
+    State kind,
+    wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) {
   bool first = false;
   if (m_state != kind ||
       (m_state == kind && m_framePos >= kNewFrameThresholdBytes)) {
@@ -163,10 +165,10 @@ int WebSocketConnection::Write(
     }
     m_state = kind;
     if (!m_frames.empty()) {
-      m_frames.back().opcode |= wpi::WebSocket::kFlagFin;
+      m_frames.back().opcode |= wpi::net::WebSocket::kFlagFin;
     }
-    StartFrame(m_state == kText ? wpi::WebSocket::Frame::kText
-                                : wpi::WebSocket::Frame::kBinary);
+    StartFrame(m_state == kText ? wpi::net::WebSocket::Frame::kText
+                                : wpi::net::WebSocket::Frame::kBinary);
     m_framePos = 0;
     first = true;
   }
@@ -188,7 +190,7 @@ int WebSocketConnection::Write(
 
 int WebSocketConnection::Flush() {
   WPI_DEBUG4(m_logger, "conn: flushing");
-  m_lastFlushTime = wpi::Now();
+  m_lastFlushTime = wpi::util::Now();
   if (m_state == kEmpty) {
     return 0;
   }
@@ -201,7 +203,7 @@ int WebSocketConnection::Flush() {
   if (m_frames.empty()) {
     return 0;
   }
-  m_frames.back().opcode |= wpi::WebSocket::kFlagFin;
+  m_frames.back().opcode |= wpi::net::WebSocket::kFlagFin;
 
   // convert internal frames into WS frames
   m_ws_frames.clear();
@@ -232,7 +234,7 @@ int WebSocketConnection::Flush() {
 
   int count = 0;
   for (auto&& frame :
-       wpi::take_back(std::span{m_frames}, unsentFrames.size())) {
+       wpi::util::take_back(std::span{m_frames}, unsentFrames.size())) {
     ReleaseBufs(
         std::span{m_bufs}.subspan(frame.start, frame.end - frame.start));
     count += frame.count;
@@ -243,17 +245,18 @@ int WebSocketConnection::Flush() {
 }
 
 void WebSocketConnection::Send(
-    uint8_t opcode, wpi::function_ref<void(wpi::raw_ostream& os)> writer) {
-  wpi::SmallVector<wpi::uv::Buffer, 4> bufs;
-  wpi::raw_uv_ostream os{bufs, [this] { return AllocBuf(); }};
-  if (opcode == wpi::WebSocket::Frame::kText) {
+    uint8_t opcode,
+    wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) {
+  wpi::util::SmallVector<wpi::net::uv::Buffer, 4> bufs;
+  wpi::net::raw_uv_ostream os{bufs, [this] { return AllocBuf(); }};
+  if (opcode == wpi::net::WebSocket::Frame::kText) {
     os << '[';
   }
   writer(os);
-  if (opcode == wpi::WebSocket::Frame::kText) {
+  if (opcode == wpi::net::WebSocket::Frame::kText) {
     os << ']';
   }
-  wpi::WebSocket::Frame frame{opcode, os.bufs()};
+  wpi::net::WebSocket::Frame frame{opcode, os.bufs()};
   WPI_DEBUG4(m_logger, "Send({})", static_cast<uint8_t>(opcode));
   m_ws.SendFrames({{frame}}, [selfweak = weak_from_this()](auto bufs, auto) {
     if (auto self = selfweak.lock()) {
@@ -271,16 +274,16 @@ void WebSocketConnection::Disconnect(std::string_view reason) {
   m_ws.Fail(1001, reason);
 }
 
-wpi::uv::Buffer WebSocketConnection::AllocBuf() {
+wpi::net::uv::Buffer WebSocketConnection::AllocBuf() {
   if (!m_buf_pool.empty()) {
     auto buf = m_buf_pool.back();
     m_buf_pool.pop_back();
     return buf;
   }
-  return wpi::uv::Buffer::Allocate(kAllocSize + 1);  // leave space for ']'
+  return wpi::net::uv::Buffer::Allocate(kAllocSize + 1);  // leave space for ']'
 }
 
-void WebSocketConnection::ReleaseBufs(std::span<wpi::uv::Buffer> bufs) {
+void WebSocketConnection::ReleaseBufs(std::span<wpi::net::uv::Buffer> bufs) {
 #ifdef __SANITIZE_ADDRESS__
   size_t numToPool = 0;
 #else

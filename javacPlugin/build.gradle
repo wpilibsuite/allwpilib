@@ -13,5 +13,5 @@ apply from: "${rootDir}/shared/java/javacommon.gradle"
 dependencies {
     implementation project(':wpiannotations')
     testImplementation 'com.google.testing.compile:compile-testing:+'
-    testImplementation project(':wpilibNewCommands')
+    testImplementation project(':commandsv2')
 }

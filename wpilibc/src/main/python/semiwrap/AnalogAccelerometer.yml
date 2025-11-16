@@ -1,10 +1,10 @@
 extra_includes:
-- wpi/sendable/SendableBuilder.h
+- wpi/util/sendable/SendableBuilder.hpp
 
 classes:
-  frc::AnalogAccelerometer:
+  wpi::AnalogAccelerometer:
     ignored_bases:
-    - wpi::SendableHelper<AnalogAccelerometer>
+    - wpi::util::SendableHelper<AnalogAccelerometer>
     methods:
       AnalogAccelerometer:
         overloads:

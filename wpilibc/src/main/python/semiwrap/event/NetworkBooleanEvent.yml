@@ -1,24 +1,24 @@
 extra_includes:
-- networktables/BooleanTopic.h
-- networktables/NetworkTable.h
-- networktables/NetworkTableInstance.h
+- wpi/nt/BooleanTopic.hpp
+- wpi/nt/NetworkTable.hpp
+- wpi/nt/NetworkTableInstance.hpp
 
 classes:
-  frc::NetworkBooleanEvent:
+  wpi::NetworkBooleanEvent:
     force_no_trampoline: true
     methods:
       NetworkBooleanEvent:
         overloads:
-          EventLoop*, nt::BooleanTopic:
+          EventLoop*, wpi::nt::BooleanTopic:
             cpp_code: |
-              [](EventLoop *loop, nt::BooleanTopic &topic) {
+              [](EventLoop *loop, wpi::nt::BooleanTopic &topic) {
                 return std::make_unique<NetworkBooleanEvent>(loop, std::move(topic));
               }
-          EventLoop*, nt::BooleanSubscriber:
+          EventLoop*, wpi::nt::BooleanSubscriber:
             cpp_code: |
-              [](EventLoop *loop, nt::BooleanSubscriber &sub) {
+              [](EventLoop *loop, wpi::nt::BooleanSubscriber &sub) {
                 return std::make_unique<NetworkBooleanEvent>(loop, std::move(sub));
               }
-          EventLoop*, std::shared_ptr<nt::NetworkTable>, std::string_view:
+          EventLoop*, std::shared_ptr<wpi::nt::NetworkTable>, std::string_view:
           EventLoop*, std::string_view, std::string_view:
-          EventLoop*, nt::NetworkTableInstance, std::string_view, std::string_view:
+          EventLoop*, wpi::nt::NetworkTableInstance, std::string_view, std::string_view:

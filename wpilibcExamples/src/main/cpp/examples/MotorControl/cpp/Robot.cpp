@@ -4,11 +4,11 @@
 
 #include <numbers>
 
-#include <frc/Encoder.h>
-#include <frc/Joystick.h>
-#include <frc/TimedRobot.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc/smartdashboard/SmartDashboard.h>
+#include "wpi/driverstation/Joystick.hpp"
+#include "wpi/framework/TimedRobot.hpp"
+#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/smartdashboard/SmartDashboard.hpp"
 
 /**
  * This sample program shows how to control a motor using a joystick. In the
@@ -21,7 +21,7 @@
  * In addition, the encoder value of an encoder connected to ports 0 and 1 is
  * consistently sent to the Dashboard.
  */
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   void TeleopPeriodic() override { m_motor.Set(m_stick.GetY()); }
 
@@ -30,7 +30,7 @@ class Robot : public frc::TimedRobot {
    * robot mode.
    */
   void RobotPeriodic() override {
-    frc::SmartDashboard::PutNumber("Encoder", m_encoder.GetDistance());
+    wpi::SmartDashboard::PutNumber("Encoder", m_encoder.GetDistance());
   }
 
   Robot() {
@@ -40,13 +40,13 @@ class Robot : public frc::TimedRobot {
   }
 
  private:
-  frc::Joystick m_stick{0};
-  frc::PWMSparkMax m_motor{0};
-  frc::Encoder m_encoder{0, 1};
+  wpi::Joystick m_stick{0};
+  wpi::PWMSparkMax m_motor{0};
+  wpi::Encoder m_encoder{0, 1};
 };
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

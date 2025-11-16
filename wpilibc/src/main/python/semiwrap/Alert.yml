@@ -3,7 +3,7 @@ functions:
     ignore: true
 
 classes:
-  frc::Alert:
+  wpi::Alert:
     enums:
       AlertType:
     methods:
@@ -17,14 +17,14 @@ classes:
       GetText:
       GetType:
     inline_code: |
-      .def("close", [](frc::Alert &self) {
+      .def("close", [](wpi::Alert &self) {
         py::gil_scoped_release release;
         self.Set(false);
       }, py::doc("Disables the alert"))
-      .def("__enter__", [](frc::Alert &self) -> frc::Alert& {
+      .def("__enter__", [](wpi::Alert &self) -> wpi::Alert& {
         return self;
       })
-      .def("__exit__", [](frc::Alert &self, py::args args) {
+      .def("__exit__", [](wpi::Alert &self, py::args args) {
         py::gil_scoped_release release;
         self.Set(false);
       })

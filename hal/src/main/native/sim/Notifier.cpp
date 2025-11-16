@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/Notifier.h"
+#include "wpi/hal/Notifier.h"
 
 #include <atomic>
 #include <chrono>
@@ -12,18 +12,17 @@
 #include <string>
 #include <utility>
 
-#include <wpi/SmallVector.h>
-#include <wpi/StringExtras.h>
-#include <wpi/condition_variable.h>
-#include <wpi/mutex.h>
-
 #include "HALInitializer.h"
 #include "NotifierInternal.h"
-#include "hal/Errors.h"
-#include "hal/HALBase.h"
-#include "hal/cpp/fpga_clock.h"
-#include "hal/handles/UnlimitedHandleResource.h"
-#include "hal/simulation/NotifierData.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/HALBase.h"
+#include "wpi/hal/cpp/fpga_clock.h"
+#include "wpi/hal/handles/UnlimitedHandleResource.h"
+#include "wpi/hal/simulation/NotifierData.h"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/condition_variable.hpp"
+#include "wpi/util/mutex.hpp"
 
 namespace {
 struct Notifier {
@@ -33,15 +32,15 @@ struct Notifier {
   bool waitTimeValid = false;    // True if waitTime is set and in the future
   bool waitingForAlarm = false;  // True if in HAL_WaitForNotifierAlarm()
   uint64_t waitCount = 0;        // Counts calls to HAL_WaitForNotifierAlarm()
-  wpi::mutex mutex;
-  wpi::condition_variable cond;
+  wpi::util::mutex mutex;
+  wpi::util::condition_variable cond;
 };
 }  // namespace
 
-using namespace hal;
+using namespace wpi::hal;
 
-static wpi::mutex notifiersWaiterMutex;
-static wpi::condition_variable notifiersWaiterCond;
+static wpi::util::mutex notifiersWaiterMutex;
+static wpi::util::condition_variable notifiersWaiterCond;
 
 class NotifierHandleContainer
     : public UnlimitedHandleResource<HAL_NotifierHandle, Notifier,
@@ -63,7 +62,7 @@ class NotifierHandleContainer
 static NotifierHandleContainer* notifierHandles;
 static std::atomic<bool> notifiersPaused{false};
 
-namespace hal {
+namespace wpi::hal {
 namespace init {
 void InitializeNotifier() {
   static NotifierHandleContainer nH;
@@ -88,7 +87,7 @@ void WakeupNotifiers() {
 
 void WaitNotifiers() {
   std::unique_lock ulock(notifiersWaiterMutex);
-  wpi::SmallVector<HAL_NotifierHandle, 8> waiters;
+  wpi::util::SmallVector<HAL_NotifierHandle, 8> waiters;
 
   // Wait for all Notifiers to hit HAL_WaitForNotifierAlarm()
   notifierHandles->ForEach([&](HAL_NotifierHandle handle, Notifier* notifier) {
@@ -124,7 +123,7 @@ void WakeupWaitNotifiers() {
   std::unique_lock ulock(notifiersWaiterMutex);
   int32_t status = 0;
   uint64_t curTime = HAL_GetFPGATime(&status);
-  wpi::SmallVector<std::pair<HAL_NotifierHandle, uint64_t>, 8> waiters;
+  wpi::util::SmallVector<std::pair<HAL_NotifierHandle, uint64_t>, 8> waiters;
 
   // Wake up Notifiers that have expired timeouts
   notifierHandles->ForEach([&](HAL_NotifierHandle handle, Notifier* notifier) {
@@ -162,12 +161,12 @@ void WakeupWaitNotifiers() {
     notifiersWaiterCond.wait_for(ulock, std::chrono::duration<double>(1));
   }
 }
-}  // namespace hal
+}  // namespace wpi::hal
 
 extern "C" {
 
 HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
   std::shared_ptr<Notifier> notifier = std::make_shared<Notifier>();
   HAL_NotifierHandle handle = notifierHandles->Allocate(notifier);
   if (handle == HAL_kInvalidHandle) {
@@ -319,9 +318,9 @@ int32_t HALSIM_GetNotifierInfo(struct HALSIM_NotifierInfo* arr, int32_t size) {
     if (num < size) {
       arr[num].handle = handle;
       if (notifier->name.empty()) {
-        wpi::format_to_n_c_str(arr[num].name, sizeof(arr[num].name),
-                               "Notifier{}",
-                               static_cast<int>(getHandleIndex(handle)));
+        wpi::util::format_to_n_c_str(arr[num].name, sizeof(arr[num].name),
+                                     "Notifier{}",
+                                     static_cast<int>(getHandleIndex(handle)));
       } else {
         std::strncpy(arr[num].name, notifier->name.c_str(),
                      sizeof(arr[num].name) - 1);

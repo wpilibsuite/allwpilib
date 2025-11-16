@@ -4,7 +4,7 @@ apply plugin: 'c'
 
 ext {
     nativeName = 'apriltag'
-    devMain = 'edu.wpi.first.apriltag.DevMain'
+    devMain = 'org.wpilib.vision.apriltag.DevMain'
     useJava = true
     useCpp = true
     sharedCvConfigs = [
@@ -12,7 +12,7 @@ ext {
         apriltagTest: []]
     staticCvConfigs = []
 
-    def generateTask = createGenerateResourcesTask('main', 'APRILTAG', 'frc', project)
+    def generateTask = createGenerateResourcesTask('main', 'APRILTAG', 'wpi::apriltag', project)
 
     tasks.withType(CppCompile) {
         dependsOn generateTask

@@ -2,22 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/Watchdog.h"  // NOLINT(build/include_order)
+#include "wpi/system/Watchdog.hpp"
 
 #include <stdint.h>
 
 #include <gtest/gtest.h>
 
-#include "frc/simulation/SimHooks.h"
+#include "wpi/simulation/SimHooks.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 namespace {
 class WatchdogTest : public ::testing::Test {
  protected:
-  void SetUp() override { frc::sim::PauseTiming(); }
+  void SetUp() override { wpi::sim::PauseTiming(); }
 
-  void TearDown() override { frc::sim::ResumeTiming(); }
+  void TearDown() override { wpi::sim::ResumeTiming(); }
 };
 
 }  // namespace
@@ -29,7 +29,7 @@ TEST_F(WatchdogTest, EnableDisable) {
 
   // Run 1
   watchdog.Enable();
-  frc::sim::StepTiming(0.2_s);
+  wpi::sim::StepTiming(0.2_s);
   watchdog.Disable();
 
   EXPECT_EQ(0u, watchdogCounter) << "Watchdog triggered early";
@@ -37,7 +37,7 @@ TEST_F(WatchdogTest, EnableDisable) {
   // Run 2
   watchdogCounter = 0;
   watchdog.Enable();
-  frc::sim::StepTiming(0.4_s);
+  wpi::sim::StepTiming(0.4_s);
   watchdog.Disable();
 
   EXPECT_EQ(1u, watchdogCounter)
@@ -46,7 +46,7 @@ TEST_F(WatchdogTest, EnableDisable) {
   // Run 3
   watchdogCounter = 0;
   watchdog.Enable();
-  frc::sim::StepTiming(1_s);
+  wpi::sim::StepTiming(1_s);
   watchdog.Disable();
 
   EXPECT_EQ(1u, watchdogCounter)
@@ -59,9 +59,9 @@ TEST_F(WatchdogTest, Reset) {
   Watchdog watchdog(0.4_s, [&] { watchdogCounter++; });
 
   watchdog.Enable();
-  frc::sim::StepTiming(0.2_s);
+  wpi::sim::StepTiming(0.2_s);
   watchdog.Reset();
-  frc::sim::StepTiming(0.2_s);
+  wpi::sim::StepTiming(0.2_s);
   watchdog.Disable();
 
   EXPECT_EQ(0u, watchdogCounter) << "Watchdog triggered early";
@@ -73,13 +73,13 @@ TEST_F(WatchdogTest, SetTimeout) {
   Watchdog watchdog(1_s, [&] { watchdogCounter++; });
 
   watchdog.Enable();
-  frc::sim::StepTiming(0.2_s);
+  wpi::sim::StepTiming(0.2_s);
   watchdog.SetTimeout(0.2_s);
 
   EXPECT_EQ(0.2_s, watchdog.GetTimeout());
   EXPECT_EQ(0u, watchdogCounter) << "Watchdog triggered early";
 
-  frc::sim::StepTiming(0.3_s);
+  wpi::sim::StepTiming(0.3_s);
   watchdog.Disable();
 
   EXPECT_EQ(1u, watchdogCounter)
@@ -92,7 +92,7 @@ TEST_F(WatchdogTest, IsExpired) {
   watchdog.Enable();
 
   EXPECT_FALSE(watchdog.IsExpired());
-  frc::sim::StepTiming(0.3_s);
+  wpi::sim::StepTiming(0.3_s);
   EXPECT_TRUE(watchdog.IsExpired());
 
   watchdog.Disable();
@@ -110,9 +110,9 @@ TEST_F(WatchdogTest, Epochs) {
   // Run 1
   watchdog.Enable();
   watchdog.AddEpoch("Epoch 1");
-  frc::sim::StepTiming(0.1_s);
+  wpi::sim::StepTiming(0.1_s);
   watchdog.AddEpoch("Epoch 2");
-  frc::sim::StepTiming(0.1_s);
+  wpi::sim::StepTiming(0.1_s);
   watchdog.AddEpoch("Epoch 3");
   watchdog.Disable();
 
@@ -121,9 +121,9 @@ TEST_F(WatchdogTest, Epochs) {
   // Run 2
   watchdog.Enable();
   watchdog.AddEpoch("Epoch 1");
-  frc::sim::StepTiming(0.2_s);
+  wpi::sim::StepTiming(0.2_s);
   watchdog.Reset();
-  frc::sim::StepTiming(0.2_s);
+  wpi::sim::StepTiming(0.2_s);
   watchdog.AddEpoch("Epoch 2");
   watchdog.Disable();
 
@@ -138,13 +138,13 @@ TEST_F(WatchdogTest, MultiWatchdog) {
   Watchdog watchdog2(0.6_s, [&] { watchdogCounter2++; });
 
   watchdog2.Enable();
-  frc::sim::StepTiming(0.25_s);
+  wpi::sim::StepTiming(0.25_s);
   EXPECT_EQ(0u, watchdogCounter1) << "Watchdog triggered early";
   EXPECT_EQ(0u, watchdogCounter2) << "Watchdog triggered early";
 
   // Sleep enough such that only the watchdog enabled later times out first
   watchdog1.Enable();
-  frc::sim::StepTiming(0.25_s);
+  wpi::sim::StepTiming(0.25_s);
   watchdog1.Disable();
   watchdog2.Disable();
 

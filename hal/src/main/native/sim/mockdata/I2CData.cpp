@@ -5,16 +5,16 @@
 #include "../PortsInternal.h"
 #include "I2CDataInternal.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeI2CData() {
   static I2CData sid[kI2CPorts];
-  ::hal::SimI2CData = sid;
+  ::wpi::hal::SimI2CData = sid;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-I2CData* hal::SimI2CData;
+I2CData* wpi::hal::SimI2CData;
 
 void I2CData::ResetData() {
   initialized.Reset(false);

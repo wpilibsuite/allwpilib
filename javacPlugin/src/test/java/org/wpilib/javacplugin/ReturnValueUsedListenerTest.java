@@ -18,7 +18,7 @@ class ReturnValueUsedListenerTest {
   void nodiscardReturnValueIsUsed() {
     String source =
         """
-        package frc.robot;
+        package wpilib.robot;
 
         import org.wpilib.annotation.NoDiscard;
 
@@ -35,7 +35,7 @@ class ReturnValueUsedListenerTest {
     Compilation compilation =
         javac()
             .withOptions(kJavaVersionOptions)
-            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+            .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
   }
@@ -44,7 +44,7 @@ class ReturnValueUsedListenerTest {
   void nodiscardReturnValueUnused() {
     String source =
         """
-        package frc.robot;
+        package wpilib.robot;
 
         import org.wpilib.annotation.NoDiscard;
 
@@ -61,7 +61,7 @@ class ReturnValueUsedListenerTest {
     Compilation compilation =
         javac()
             .withOptions(kJavaVersionOptions)
-            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+            .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
@@ -73,7 +73,7 @@ class ReturnValueUsedListenerTest {
   void nodiscardOnClass() {
     String source =
         """
-        package frc.robot;
+        package wpilib.robot;
 
         import org.wpilib.annotation.NoDiscard;
 
@@ -90,13 +90,13 @@ class ReturnValueUsedListenerTest {
     Compilation compilation =
         javac()
             .withOptions(kJavaVersionOptions)
-            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+            .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Result of method returning @NoDiscard type frc.robot.Example is ignored",
+        "Result of method returning @NoDiscard type wpilib.robot.Example is ignored",
         error.getMessage(null));
   }
 
@@ -104,7 +104,7 @@ class ReturnValueUsedListenerTest {
   void nodiscardOnClassCustomMessage() {
     String source =
         """
-        package frc.robot;
+        package wpilib.robot;
 
         import org.wpilib.annotation.NoDiscard;
 
@@ -121,7 +121,7 @@ class ReturnValueUsedListenerTest {
     Compilation compilation =
         javac()
             .withOptions(kJavaVersionOptions)
-            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+            .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
@@ -133,7 +133,7 @@ class ReturnValueUsedListenerTest {
   void nodiscardOnClassAndMethod() {
     String source =
         """
-        package frc.robot;
+        package wpilib.robot;
 
         import org.wpilib.annotation.NoDiscard;
 
@@ -151,7 +151,7 @@ class ReturnValueUsedListenerTest {
     Compilation compilation =
         javac()
             .withOptions(kJavaVersionOptions)
-            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+            .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(2, compilation.errors().size());
@@ -159,7 +159,7 @@ class ReturnValueUsedListenerTest {
     var error2 = compilation.errors().get(1);
     assertEquals("Result of @NoDiscard method is ignored", error1.getMessage(null));
     assertEquals(
-        "Result of method returning @NoDiscard type frc.robot.Example is ignored",
+        "Result of method returning @NoDiscard type wpilib.robot.Example is ignored",
         error2.getMessage(null));
   }
 
@@ -167,7 +167,7 @@ class ReturnValueUsedListenerTest {
   void nodiscardOnInheritedClass() {
     String source =
         """
-        package frc.robot;
+        package wpilib.robot;
 
         import org.wpilib.annotation.NoDiscard;
 
@@ -186,7 +186,7 @@ class ReturnValueUsedListenerTest {
     Compilation compilation =
         javac()
             .withOptions(kJavaVersionOptions)
-            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+            .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
@@ -198,7 +198,7 @@ class ReturnValueUsedListenerTest {
   void nodiscardOnSingleInterface() {
     String source =
         """
-        package frc.robot;
+        package wpilib.robot;
 
         import org.wpilib.annotation.NoDiscard;
 
@@ -217,7 +217,7 @@ class ReturnValueUsedListenerTest {
     Compilation compilation =
         javac()
             .withOptions(kJavaVersionOptions)
-            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+            .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
@@ -229,7 +229,7 @@ class ReturnValueUsedListenerTest {
   void nodiscardOnMultipleInterfaces() {
     String source =
         """
-        package frc.robot;
+        package wpilib.robot;
 
         import org.wpilib.annotation.NoDiscard;
 
@@ -251,7 +251,7 @@ class ReturnValueUsedListenerTest {
     Compilation compilation =
         javac()
             .withOptions(kJavaVersionOptions)
-            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+            .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(2, compilation.errors().size());
@@ -265,7 +265,7 @@ class ReturnValueUsedListenerTest {
   void nodiscardCustomMessage() {
     String source =
         """
-        package frc.robot;
+        package wpilib.robot;
 
         import org.wpilib.annotation.NoDiscard;
 
@@ -282,7 +282,7 @@ class ReturnValueUsedListenerTest {
     Compilation compilation =
         javac()
             .withOptions(kJavaVersionOptions)
-            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+            .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
@@ -294,7 +294,7 @@ class ReturnValueUsedListenerTest {
   void nodiscardMessageEmptyString() {
     String source =
         """
-        package frc.robot;
+        package wpilib.robot;
 
         import org.wpilib.annotation.NoDiscard;
 
@@ -311,7 +311,7 @@ class ReturnValueUsedListenerTest {
     Compilation compilation =
         javac()
             .withOptions(kJavaVersionOptions)
-            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+            .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
@@ -323,7 +323,7 @@ class ReturnValueUsedListenerTest {
   void nodiscardOnVoidMethod() {
     String source =
         """
-        package frc.robot;
+        package wpilib.robot;
 
         import org.wpilib.annotation.NoDiscard;
 
@@ -340,7 +340,7 @@ class ReturnValueUsedListenerTest {
     Compilation compilation =
         javac()
             .withOptions(kJavaVersionOptions)
-            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+            .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
   }
@@ -349,7 +349,7 @@ class ReturnValueUsedListenerTest {
   void suppressWarningsOnNoDiscardMethod() {
     String source =
         """
-        package frc.robot;
+        package wpilib.robot;
 
         import org.wpilib.annotation.NoDiscard;
 
@@ -367,7 +367,7 @@ class ReturnValueUsedListenerTest {
     Compilation compilation =
         javac()
             .withOptions(kJavaVersionOptions)
-            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+            .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
   }
@@ -376,7 +376,7 @@ class ReturnValueUsedListenerTest {
   void suppressWarningsAllOnNoDiscardMethod() {
     String source =
         """
-        package frc.robot;
+        package wpilib.robot;
 
         import org.wpilib.annotation.NoDiscard;
 
@@ -394,7 +394,7 @@ class ReturnValueUsedListenerTest {
     Compilation compilation =
         javac()
             .withOptions(kJavaVersionOptions)
-            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+            .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
   }
@@ -403,7 +403,7 @@ class ReturnValueUsedListenerTest {
   void suppressWarningsOnNoDiscardClass() {
     String source =
         """
-        package frc.robot;
+        package wpilib.robot;
 
         import org.wpilib.annotation.NoDiscard;
 
@@ -421,7 +421,7 @@ class ReturnValueUsedListenerTest {
     Compilation compilation =
         javac()
             .withOptions(kJavaVersionOptions)
-            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+            .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
   }
@@ -430,7 +430,7 @@ class ReturnValueUsedListenerTest {
   void suppressWarningsAllOnNoDiscardClass() {
     String source =
         """
-        package frc.robot;
+        package wpilib.robot;
 
         import org.wpilib.annotation.NoDiscard;
 
@@ -448,7 +448,7 @@ class ReturnValueUsedListenerTest {
     Compilation compilation =
         javac()
             .withOptions(kJavaVersionOptions)
-            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+            .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
   }
@@ -457,10 +457,10 @@ class ReturnValueUsedListenerTest {
   void commandsv2CommandFactoryResultIsAssigned() {
     String source =
         """
-        package frc.robot;
+        package wpilib.robot;
 
-        import edu.wpi.first.wpilibj2.command.Command;
-        import edu.wpi.first.wpilibj2.command.Commands;
+        import org.wpilib.command2.Command;
+        import org.wpilib.command2.Commands;
         import org.wpilib.annotation.NoDiscard;
 
         class Example {
@@ -477,7 +477,7 @@ class ReturnValueUsedListenerTest {
     Compilation compilation =
         javac()
             .withOptions(kJavaVersionOptions)
-            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+            .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
   }
@@ -486,10 +486,10 @@ class ReturnValueUsedListenerTest {
   void commandsv2CommandFactoryResultIsPassed() {
     String source =
         """
-        package frc.robot;
+        package wpilib.robot;
 
-        import edu.wpi.first.wpilibj2.command.Command;
-        import edu.wpi.first.wpilibj2.command.Commands;
+        import org.wpilib.command2.Command;
+        import org.wpilib.command2.Commands;
         import org.wpilib.annotation.NoDiscard;
 
         class Example {
@@ -506,7 +506,7 @@ class ReturnValueUsedListenerTest {
     Compilation compilation =
         javac()
             .withOptions(kJavaVersionOptions)
-            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+            .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
   }
@@ -515,10 +515,10 @@ class ReturnValueUsedListenerTest {
   void commandsv2CommandFactoryResultIsChainedAndUsed() {
     String source =
         """
-        package frc.robot;
+        package wpilib.robot;
 
-        import edu.wpi.first.wpilibj2.command.Command;
-        import edu.wpi.first.wpilibj2.command.Commands;
+        import org.wpilib.command2.Command;
+        import org.wpilib.command2.Commands;
         import org.wpilib.annotation.NoDiscard;
 
         class Example {
@@ -535,7 +535,7 @@ class ReturnValueUsedListenerTest {
     Compilation compilation =
         javac()
             .withOptions(kJavaVersionOptions)
-            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+            .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
   }
@@ -544,10 +544,10 @@ class ReturnValueUsedListenerTest {
   void commandsv2CommandFactoryResultNotUsed() {
     String source =
         """
-        package frc.robot;
+        package wpilib.robot;
 
-        import edu.wpi.first.wpilibj2.command.Command;
-        import edu.wpi.first.wpilibj2.command.Commands;
+        import org.wpilib.command2.Command;
+        import org.wpilib.command2.Commands;
         import org.wpilib.annotation.NoDiscard;
 
         class Example {
@@ -564,7 +564,7 @@ class ReturnValueUsedListenerTest {
     Compilation compilation =
         javac()
             .withOptions(kJavaVersionOptions)
-            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+            .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
@@ -577,10 +577,10 @@ class ReturnValueUsedListenerTest {
   void commandsv2CommandFactoryResultIsChainedAndNotUsed() {
     String source =
         """
-        package frc.robot;
+        package wpilib.robot;
 
-        import edu.wpi.first.wpilibj2.command.Command;
-        import edu.wpi.first.wpilibj2.command.Commands;
+        import org.wpilib.command2.Command;
+        import org.wpilib.command2.Commands;
         import org.wpilib.annotation.NoDiscard;
 
         class Example {
@@ -597,7 +597,7 @@ class ReturnValueUsedListenerTest {
     Compilation compilation =
         javac()
             .withOptions(kJavaVersionOptions)
-            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+            .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
@@ -610,11 +610,11 @@ class ReturnValueUsedListenerTest {
   void commandsv2NewCommandInstanceNotUsed() {
     String source =
         """
-        package frc.robot;
+        package wpilib.robot;
 
-        import edu.wpi.first.wpilibj2.command.Command;
-        import edu.wpi.first.wpilibj2.command.Commands;
-        import edu.wpi.first.wpilibj2.command.WaitCommand;
+        import org.wpilib.command2.Command;
+        import org.wpilib.command2.Commands;
+        import org.wpilib.command2.WaitCommand;
         import org.wpilib.annotation.NoDiscard;
 
         class Example {
@@ -627,7 +627,7 @@ class ReturnValueUsedListenerTest {
     Compilation compilation =
         javac()
             .withOptions(kJavaVersionOptions)
-            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+            .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());

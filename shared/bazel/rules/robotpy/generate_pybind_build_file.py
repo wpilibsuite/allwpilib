@@ -384,6 +384,18 @@ def generate_pybind_build_file(
     env.filters["jsonify"] = jsonify
     template = env.from_string(template_contents)
 
+    all_local_native_deps = set()
+    for em in extension_modules:
+        all_local_native_deps.update(em.native_wrapper_dependencies)
+    all_local_native_deps = sorted(all_local_native_deps)
+
+    try:
+        version_file = raw_config["tool"]["hatch"]["build"]["hooks"]["robotpy"][
+            "version_file"
+        ]
+    except:
+        version_file = None
+
     with open(output_file, "w") as f:
         f.write(
             template.render(
@@ -391,11 +403,13 @@ def generate_pybind_build_file(
                 top_level_name=top_level_name,
                 publish_casters_targets=publish_casters_targets,
                 python_deps=sorted(python_deps),
+                all_local_native_deps=all_local_native_deps,
                 stripped_include_prefix=stripped_include_prefix,
                 yml_prefix=yml_prefix,
                 package_root_file=package_root_file,
                 raw_project_config=raw_config["project"],
                 entry_points=entry_points,
+                version_file=version_file,
             )
             + "\n"
         )

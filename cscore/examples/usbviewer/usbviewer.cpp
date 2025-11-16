@@ -13,26 +13,26 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/imgproc.hpp>
-#include <wpi/mutex.h>
-#include <wpi/print.h>
-#include <wpi/spinlock.h>
-#include <wpigui.h>
 
-#include "cscore.h"
-#include "cscore_cv.h"
+#include "wpi/cs/cscore.h"
+#include "wpi/cs/cscore_cv.hpp"
+#include "wpi/gui/wpigui.hpp"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/print.hpp"
+#include "wpi/util/spinlock.hpp"
 
 namespace gui = wpi::gui;
 
 int main() {
-  wpi::spinlock latestFrameMutex;
+  wpi::util::spinlock latestFrameMutex;
   std::unique_ptr<cv::Mat> latestFrame;
-  wpi::mutex freeListMutex;
+  wpi::util::mutex freeListMutex;
   std::vector<std::unique_ptr<cv::Mat>> freeList;
   std::atomic<bool> stopCamera{false};
 
-  cs::UsbCamera camera{"usbcam", 0};
-  camera.SetVideoMode(cs::VideoMode::kMJPEG, 640, 480, 30);
-  cs::CvSink cvsink{"cvsink"};
+  wpi::cs::UsbCamera camera{"usbcam", 0};
+  camera.SetVideoMode(wpi::cs::VideoMode::kMJPEG, 640, 480, 30);
+  wpi::cs::CvSink cvsink{"cvsink"};
   cvsink.SetSource(camera);
 
   std::thread thr([&] {
@@ -41,7 +41,7 @@ int main() {
       // get frame from camera
       uint64_t time = cvsink.GrabFrame(frame);
       if (time == 0) {
-        wpi::print("error: {}\n", cvsink.GetError());
+        wpi::util::print("error: {}\n", cvsink.GetError());
         continue;
       }
 

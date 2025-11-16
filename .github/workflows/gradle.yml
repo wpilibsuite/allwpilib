@@ -20,7 +20,7 @@ jobs:
       matrix:
         include:
           - container: wpilib/systemcore-cross-ubuntu:2027-24.04
-            artifact-name: SystemCore
+            artifact-name: Systemcore
             build-options: "-Ponlylinuxsystemcore"
           - container: wpilib/raspbian-cross-ubuntu:2027-bookworm-24.04
             artifact-name: Arm32

@@ -1,5 +1,5 @@
 classes:
-  frc::DSControlWord:
+  wpi::DSControlWord:
     methods:
       DSControlWord:
       IsEnabled:

@@ -33,8 +33,8 @@ functions:
         - [double]
   SlewRateLimit:
     overloads:
-      const Translation2d&, const Translation2d&, units::second_t, units::meters_per_second_t:
-      const Translation3d&, const Translation3d&, units::second_t, units::meters_per_second_t:
+      const Translation2d&, const Translation2d&, wpi::units::second_t, wpi::units::meters_per_second_t:
+      const Translation3d&, const Translation3d&, wpi::units::second_t, wpi::units::meters_per_second_t:
   CopyDirectionPow:
     overloads:
       T, double, T:

@@ -5,7 +5,7 @@ extra_includes:
 - wpystruct.h
 
 classes:
-  frc::DCMotor:
+  wpi::math::DCMotor:
     attributes:
       nominalVoltage:
       stallTorque:
@@ -19,8 +19,8 @@ classes:
       DCMotor:
       Current:
         overloads:
-          units::radians_per_second_t, units::volt_t [const]:
-          units::newton_meter_t [const]:
+          wpi::units::radians_per_second_t, wpi::units::volt_t [const]:
+          wpi::units::newton_meter_t [const]:
       Torque:
       Voltage:
       Speed:
@@ -41,6 +41,9 @@ classes:
       KrakenX60:
       KrakenX60FOC:
       NeoVortex:
+      KrakenX44:
+      KrakenX44FOC:
+      Minion:
 
 inline_code: |
-  SetupWPyStruct<frc::DCMotor>(cls_DCMotor);
+  SetupWPyStruct<wpi::math::DCMotor>(cls_DCMotor);

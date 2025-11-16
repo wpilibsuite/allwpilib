@@ -2,17 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
+
 #include <numbers>
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Translation2d.h"
-#include "frc/kinematics/ChassisAccelerations.h"
-#include "frc/kinematics/MecanumDriveKinematics.h"
-#include "frc/kinematics/MecanumDriveWheelAccelerations.h"
-#include "units/angular_velocity.h"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/units/angular_velocity.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 class MecanumDriveKinematicsTest : public ::testing::Test {
  protected:
@@ -82,7 +81,7 @@ TEST_F(MecanumDriveKinematicsTest, StrafeForwardKinematicsWithDeltas) {
 
 TEST_F(MecanumDriveKinematicsTest, RotationInverseKinematics) {
   ChassisSpeeds speeds{0_mps, 0_mps,
-                       units::radians_per_second_t{2 * std::numbers::pi}};
+                       wpi::units::radians_per_second_t{2 * std::numbers::pi}};
   auto moduleStates = kinematics.ToWheelSpeeds(speeds);
 
   EXPECT_NEAR(-150.79644737, moduleStates.frontLeft.value(), 0.1);
@@ -275,7 +274,7 @@ TEST_F(MecanumDriveKinematicsTest, StrafeForwardAccelerations) {
 TEST_F(MecanumDriveKinematicsTest, RotationInverseAccelerations) {
   ChassisAccelerations accelerations{
       0_mps_sq, 0_mps_sq,
-      units::radians_per_second_squared_t{2 * std::numbers::pi}};
+      wpi::units::radians_per_second_squared_t{2 * std::numbers::pi}};
   auto wheelAccelerations = kinematics.ToWheelAccelerations(accelerations);
 
   EXPECT_NEAR(-150.79645, wheelAccelerations.frontLeft.value(), 0.1);

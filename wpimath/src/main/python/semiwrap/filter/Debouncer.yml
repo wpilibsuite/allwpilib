@@ -1,12 +1,12 @@
 classes:
-  frc::Debouncer:
+  wpi::math::Debouncer:
     enums:
       DebounceType:
     methods:
       Debouncer:
         param_override:
           type:
-            default: frc::Debouncer::DebounceType::kRising
+            default: wpi::math::Debouncer::DebounceType::kRising
       Calculate:
       SetDebounceTime:
       GetDebounceTime:

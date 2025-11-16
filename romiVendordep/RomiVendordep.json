@@ -8,7 +8,7 @@
   "jsonUrl": "",
   "javaDependencies": [
     {
-      "groupId": "edu.wpi.first.romiVendordep",
+      "groupId": "org.wpilib.romiVendordep",
       "artifactId": "romiVendordep-java",
       "version": "wpilib"
     }
@@ -16,7 +16,7 @@
   "jniDependencies": [],
   "cppDependencies": [
     {
-      "groupId": "edu.wpi.first.romiVendordep",
+      "groupId": "org.wpilib.romiVendordep",
       "artifactId": "romiVendordep-cpp",
       "version": "wpilib",
       "libName": "romiVendordep",

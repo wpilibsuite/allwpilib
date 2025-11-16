@@ -1,12 +1,12 @@
 classes:
-  frc::CANStatus:
+  wpi::CANStatus:
     attributes:
       percentBusUtilization:
       busOffCount:
       txFullCount:
       receiveErrorCount:
       transmitErrorCount:
-  frc::RobotController:
+  wpi::RobotController:
     nodelete: true
     methods:
       GetSerialNumber:

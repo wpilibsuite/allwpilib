@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/PS5Controller.h"  // NOLINT(build/include_order)
+#include "wpi/driverstation/PS5Controller.hpp"
 
 #include <gtest/gtest.h>
 
-#include "JoystickTestMacros.h"
-#include "frc/simulation/PS5ControllerSim.h"
+#include "JoystickTestMacros.hpp"
+#include "wpi/simulation/PS5ControllerSim.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 BUTTON_TEST(PS5Controller, SquareButton)
 BUTTON_TEST(PS5Controller, CrossButton)

@@ -5,16 +5,16 @@
 #include "../PortsInternal.h"
 #include "PowerDistributionDataInternal.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializePowerDistributionData() {
   static PowerDistributionData spd[kNumPDSimModules];
-  ::hal::SimPowerDistributionData = spd;
+  ::wpi::hal::SimPowerDistributionData = spd;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-PowerDistributionData* hal::SimPowerDistributionData;
+PowerDistributionData* wpi::hal::SimPowerDistributionData;
 void PowerDistributionData::ResetData() {
   initialized.Reset(false);
   temperature.Reset(0.0);

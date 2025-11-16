@@ -3,7 +3,7 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include <wpi/SmallVector.h>
+#include "wpi/util/SmallVector.hpp"
 
 namespace pybind11
 {
@@ -11,7 +11,7 @@ namespace detail
 {
 
 
-template <typename Type> struct type_caster<wpi::SmallVectorImpl<Type>> {
+template <typename Type> struct type_caster<wpi::util::SmallVectorImpl<Type>> {
     using value_conv = make_caster<Type>;
   
 // Have to copy/paste PYBIND11_TYPE_CASTER implementation because SmallVectorImpl
@@ -19,10 +19,10 @@ template <typename Type> struct type_caster<wpi::SmallVectorImpl<Type>> {
 //
 // begin PYBIND11_TYPE_CASTER
 protected:
-    wpi::SmallVector<Type, 16> value;
+    wpi::util::SmallVector<Type, 16> value;
 public:
     static constexpr auto name = _("List[") + value_conv::name + _("]");
-    template <typename T_, enable_if_t<std::is_same<wpi::SmallVectorImpl<Type>, remove_cv_t<T_>>::value, int> = 0>
+    template <typename T_, enable_if_t<std::is_same<wpi::util::SmallVectorImpl<Type>, remove_cv_t<T_>>::value, int> = 0>
     static handle cast(T_ *src, return_value_policy policy, handle parent) {
         if (!src) return none().release();
         if (policy == return_value_policy::take_ownership) {
@@ -31,9 +31,9 @@ public:
             return cast(*src, policy, parent);
         }
     }
-    operator wpi::SmallVectorImpl<Type>*() { return &value; }
-    operator wpi::SmallVectorImpl<Type>&() { return value; }
-    operator wpi::SmallVectorImpl<Type>&&() && { return std::move(value); }
+    operator wpi::util::SmallVectorImpl<Type>*() { return &value; }
+    operator wpi::util::SmallVectorImpl<Type>&() { return value; }
+    operator wpi::util::SmallVectorImpl<Type>&&() && { return std::move(value); }
     template <typename T_> using cast_op_type = pybind11::detail::movable_cast_op_type<T_>;
 // end PYBIND11_TYPE_CASTER
 

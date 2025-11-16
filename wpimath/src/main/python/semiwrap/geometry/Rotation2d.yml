@@ -8,7 +8,7 @@ functions:
   from_json:
     ignore: true
 classes:
-  frc::Rotation2d:
+  wpi::math::Rotation2d:
     methods:
       Rotation2d:
         overloads:
@@ -19,9 +19,9 @@ classes:
               :param value: The value of the angle in radians.
             param_override:
               value:
-                x_type: units::radian_t
+                x_type: wpi::units::radian_t
             template_impls:
-            - [units::radian_t]
+            - [wpi::units::radian_t]
           double, double:
           const Eigen::Matrix2d&:
             rename: fromMatrix
@@ -44,12 +44,12 @@ classes:
 
 inline_code: |
   cls_Rotation2d
-    .def_static("fromDegrees", [](units::degree_t value) {
+    .def_static("fromDegrees", [](wpi::units::degree_t value) {
       return std::make_unique<Rotation2d>(value);
     }, py::arg("value"))
-    .def_static("fromRotations", [](units::turn_t value) {
+    .def_static("fromRotations", [](wpi::units::turn_t value) {
       return std::make_unique<Rotation2d>(value);
     })
     .def("__repr__", py::overload_cast<const Rotation2d&>(&rpy::toString));
 
-  SetupWPyStruct<frc::Rotation2d>(cls_Rotation2d);
+  SetupWPyStruct<wpi::math::Rotation2d>(cls_Rotation2d);

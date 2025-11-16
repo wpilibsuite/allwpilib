@@ -7,12 +7,11 @@
 #include <cstddef>
 #include <string>
 
-#include <wpi/spinlock.h>
+#include "wpi/hal/simulation/RoboRioData.h"
+#include "wpi/hal/simulation/SimDataValue.h"
+#include "wpi/util/spinlock.hpp"
 
-#include "hal/simulation/RoboRioData.h"
-#include "hal/simulation/SimDataValue.h"
-
-namespace hal {
+namespace wpi::hal {
 class RoboRioData {
   HAL_SIMDATAVALUE_DEFINE_NAME(VInVoltage)
   HAL_SIMDATAVALUE_DEFINE_NAME(UserVoltage3V3)
@@ -55,10 +54,10 @@ class RoboRioData {
   virtual void ResetData();
 
  private:
-  wpi::spinlock m_serialNumberMutex;
+  wpi::util::spinlock m_serialNumberMutex;
   std::string m_serialNumber;
 
-  wpi::spinlock m_commentsMutex;
+  wpi::util::spinlock m_commentsMutex;
   std::string m_comments;
 
   SimCallbackRegistry<HAL_RoboRioStringCallback, GetSerialNumberName>
@@ -68,4 +67,4 @@ class RoboRioData {
       m_commentsCallbacks;
 };
 extern RoboRioData* SimRoboRioData;
-}  // namespace hal
+}  // namespace wpi::hal

@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "hal/simulation/AnalogInData.h"
-#include "hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/AnalogInData.h"
+#include "wpi/hal/simulation/SimDataValue.h"
 
-namespace hal {
+namespace wpi::hal {
 class AnalogInData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(AverageBits)
@@ -25,4 +25,4 @@ class AnalogInData {
   virtual void ResetData();
 };
 extern AnalogInData* SimAnalogInData;
-}  // namespace hal
+}  // namespace wpi::hal

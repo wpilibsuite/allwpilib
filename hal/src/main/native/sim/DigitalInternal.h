@@ -9,9 +9,9 @@
 #include <string>
 
 #include "PortsInternal.h"
-#include "hal/handles/DigitalHandleResource.h"
+#include "wpi/hal/handles/DigitalHandleResource.h"
 
-namespace hal {
+namespace wpi::hal {
 /**
  * MXP channels when used as digital output PWM are offset from actual value
  */
@@ -57,4 +57,4 @@ int32_t remapMXPChannel(int32_t channel);
 int32_t remapMXPPWMChannel(int32_t channel);
 
 int32_t GetDigitalInputChannel(HAL_DigitalHandle handle, int32_t* status);
-}  // namespace hal
+}  // namespace wpi::hal

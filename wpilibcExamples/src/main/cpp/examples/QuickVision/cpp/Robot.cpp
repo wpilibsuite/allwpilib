@@ -4,8 +4,8 @@
 
 #include <cstdio>
 
-#include <cameraserver/CameraServer.h>
-#include <frc/TimedRobot.h>
+#include "wpi/cameraserver/CameraServer.hpp"
+#include "wpi/framework/TimedRobot.hpp"
 
 /**
  * Uses the CameraServer class to automatically capture video from a USB webcam
@@ -13,11 +13,11 @@
  * the easiest way to get camera images to the dashboard. Just add this to the
  * robot class constructor.
  */
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   Robot() {
 #if defined(__linux__) || defined(_WIN32)
-    frc::CameraServer::StartAutomaticCapture();
+    wpi::CameraServer::StartAutomaticCapture();
 #else
     std::fputs("Vision only available on Linux or Windows.\n", stderr);
     std::fflush(stderr);
@@ -25,8 +25,8 @@ class Robot : public frc::TimedRobot {
   }
 };
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

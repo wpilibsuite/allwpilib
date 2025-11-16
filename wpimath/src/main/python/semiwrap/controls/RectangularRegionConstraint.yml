@@ -5,11 +5,11 @@ extra_includes:
 - PyTrajectoryConstraint.h
 
 classes:
-  frc::RectangularRegionConstraint:
+  wpi::math::RectangularRegionConstraint:
     template_params:
     - typename Constraint
     typealias:
-    - frc::TrajectoryConstraint::MinMax
+    - wpi::math::TrajectoryConstraint::MinMax
     methods:
       RectangularRegionConstraint:
         overloads:
@@ -20,6 +20,6 @@ classes:
 
 templates:
   RectangularRegionConstraint:
-    qualname: frc::RectangularRegionConstraint
+    qualname: wpi::math::RectangularRegionConstraint
     params:
-    - frc::PyTrajectoryConstraint
+    - wpi::math::PyTrajectoryConstraint

@@ -7,10 +7,10 @@
 #include <atomic>
 #include <limits>
 
-#include "hal/simulation/DutyCycleData.h"
-#include "hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/DutyCycleData.h"
+#include "wpi/hal/simulation/SimDataValue.h"
 
-namespace hal {
+namespace wpi::hal {
 class DutyCycleData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(Output)
@@ -26,4 +26,4 @@ class DutyCycleData {
   virtual void ResetData();
 };
 extern DutyCycleData* SimDutyCycleData;
-}  // namespace hal
+}  // namespace wpi::hal

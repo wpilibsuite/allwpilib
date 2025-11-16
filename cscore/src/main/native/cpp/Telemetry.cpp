@@ -2,30 +2,29 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "Telemetry.h"
+#include "Telemetry.hpp"
 
 #include <chrono>
 #include <utility>
 
-#include <wpi/DenseMap.h>
-#include <wpi/timestamp.h>
+#include "Handle.hpp"
+#include "Instance.hpp"
+#include "Notifier.hpp"
+#include "SourceImpl.hpp"
+#include "wpi/util/DenseMap.hpp"
+#include "wpi/util/timestamp.h"
 
-#include "Handle.h"
-#include "Instance.h"
-#include "Notifier.h"
-#include "SourceImpl.h"
+using namespace wpi::cs;
 
-using namespace cs;
-
-class Telemetry::Thread : public wpi::SafeThread {
+class Telemetry::Thread : public wpi::util::SafeThread {
  public:
   explicit Thread(Notifier& notifier) : m_notifier(notifier) {}
 
   void Main() override;
 
   Notifier& m_notifier;
-  wpi::DenseMap<std::pair<CS_Handle, int>, int64_t> m_user;
-  wpi::DenseMap<std::pair<CS_Handle, int>, int64_t> m_current;
+  wpi::util::DenseMap<std::pair<CS_Handle, int>, int64_t> m_user;
+  wpi::util::DenseMap<std::pair<CS_Handle, int>, int64_t> m_current;
   double m_period = 0.0;
   double m_elapsed = 0.0;
   bool m_updated = false;

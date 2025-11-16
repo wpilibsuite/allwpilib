@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "ValueCircularBuffer.h"
+#include "ValueCircularBuffer.hpp"
 
 #include <utility>
 #include <vector>
 
-using namespace nt;
+using namespace wpi::nt;
 
 std::vector<Value> ValueCircularBuffer::ReadValue(unsigned int types) {
   std::vector<Value> rv;

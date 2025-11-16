@@ -1,5 +1,5 @@
 classes:
-  nt::StructArraySubscriber:
+  wpi::nt::StructArraySubscriber:
     template_params:
     - T
     - I
@@ -25,18 +25,18 @@ classes:
       ReadQueue:
       GetTopic:
     inline_code: |
-      .def("close", [](nt::StructArraySubscriber<T, I> *self) {
+      .def("close", [](wpi::nt::StructArraySubscriber<T, I> *self) {
         py::gil_scoped_release release;
-        *self = nt::StructArraySubscriber<T, I>();
+        *self = wpi::nt::StructArraySubscriber<T, I>();
       }, py::doc("Destroys the subscriber"))
-      .def("__enter__", [](nt::StructArraySubscriber<T, I> *self) {
+      .def("__enter__", [](wpi::nt::StructArraySubscriber<T, I> *self) {
         return self;
       })
-      .def("__exit__", [](nt::StructArraySubscriber<T, I> *self, py::args args) {
+      .def("__exit__", [](wpi::nt::StructArraySubscriber<T, I> *self, py::args args) {
         py::gil_scoped_release release;
-        *self = nt::StructArraySubscriber<T, I>();
+        *self = wpi::nt::StructArraySubscriber<T, I>();
       })
-  nt::StructArrayPublisher:
+  wpi::nt::StructArrayPublisher:
     template_params:
     - T
     - I
@@ -59,24 +59,24 @@ classes:
           std::span<const T>:
       GetTopic:
     inline_code: |
-      .def("close", [](nt::StructArrayPublisher<T, I> *self) {
+      .def("close", [](wpi::nt::StructArrayPublisher<T, I> *self) {
         py::gil_scoped_release release;
-        *self = nt::StructArrayPublisher<T, I>();
+        *self = wpi::nt::StructArrayPublisher<T, I>();
       }, py::doc("Destroys the publisher"))
-      .def("__enter__", [](nt::StructArrayPublisher<T, I> *self) {
+      .def("__enter__", [](wpi::nt::StructArrayPublisher<T, I> *self) {
         return self;
       })
-      .def("__exit__", [](nt::StructArrayPublisher<T, I> *self, py::args args) {
+      .def("__exit__", [](wpi::nt::StructArrayPublisher<T, I> *self, py::args args) {
         py::gil_scoped_release release;
-        *self = nt::StructArrayPublisher<T, I>();
+        *self = wpi::nt::StructArrayPublisher<T, I>();
       })
-  nt::StructArrayEntry:
+  wpi::nt::StructArrayEntry:
     template_params:
     - T
     - I
     base_qualnames:
-      StructArraySubscriber: nt::StructArraySubscriber<T, I>
-      StructArrayPublisher: nt::StructArrayPublisher<T, I>
+      StructArraySubscriber: wpi::nt::StructArraySubscriber<T, I>
+      StructArrayPublisher: wpi::nt::StructArrayPublisher<T, I>
     methods:
       StructArrayEntry:
         overloads:
@@ -89,18 +89,18 @@ classes:
       GetTopic:
       Unpublish:
     inline_code: |
-      .def("close", [](nt::StructArrayEntry<T, I> *self) {
+      .def("close", [](wpi::nt::StructArrayEntry<T, I> *self) {
         py::gil_scoped_release release;
-        *self = nt::StructArrayEntry<T, I>();
+        *self = wpi::nt::StructArrayEntry<T, I>();
       }, py::doc("Destroys the entry"))
-      .def("__enter__", [](nt::StructArrayEntry<T, I> *self) {
+      .def("__enter__", [](wpi::nt::StructArrayEntry<T, I> *self) {
         return self;
       })
-      .def("__exit__", [](nt::StructArrayEntry<T, I> *self, py::args args) {
+      .def("__exit__", [](wpi::nt::StructArrayEntry<T, I> *self, py::args args) {
         py::gil_scoped_release release;
-        *self = nt::StructArrayEntry<T, I>();
+        *self = wpi::nt::StructArrayEntry<T, I>();
       })
-  nt::StructArrayTopic:
+  wpi::nt::StructArrayTopic:
     template_params:
     - T
     - I
@@ -118,7 +118,7 @@ classes:
             cpp_code: |
               [](Topic topic, const py::type &t) {
                 WPyStructInfo info(t);
-                return nt::StructArrayTopic<T, I>(topic, info);
+                return wpi::nt::StructArrayTopic<T, I>(topic, info);
               }
       Subscribe:
         overloads:
@@ -133,35 +133,35 @@ classes:
             ignore: true
           std::span<const T>, const PubSubOptions&:
     inline_code: |
-      .def("close", [](nt::StructArrayTopic<T, I> *self) {
+      .def("close", [](wpi::nt::StructArrayTopic<T, I> *self) {
         py::gil_scoped_release release;
-        *self = nt::StructArrayTopic<T, I>();
+        *self = wpi::nt::StructArrayTopic<T, I>();
       }, py::doc("Destroys the topic"))
-      .def("__enter__", [](nt::StructArrayTopic<T, I> *self) {
+      .def("__enter__", [](wpi::nt::StructArrayTopic<T, I> *self) {
         return self;
       })
-      .def("__exit__", [](nt::StructArrayTopic<T, I> *self, py::args args) {
+      .def("__exit__", [](wpi::nt::StructArrayTopic<T, I> *self, py::args args) {
         py::gil_scoped_release release;
-        *self = nt::StructArrayTopic<T, I>();
+        *self = wpi::nt::StructArrayTopic<T, I>();
       })
 templates:
   StructArraySubscriber:
-    qualname: nt::StructArraySubscriber
+    qualname: wpi::nt::StructArraySubscriber
     params:
     - WPyStruct
     - WPyStructInfo
   StructArrayPublisher:
-    qualname: nt::StructArrayPublisher
+    qualname: wpi::nt::StructArrayPublisher
     params:
     - WPyStruct
     - WPyStructInfo
   StructArrayEntry:
-    qualname: nt::StructArrayEntry
+    qualname: wpi::nt::StructArrayEntry
     params:
     - WPyStruct
     - WPyStructInfo
   StructArrayTopic:
-    qualname: nt::StructArrayTopic
+    qualname: wpi::nt::StructArrayTopic
     params:
     - WPyStruct
     - WPyStructInfo

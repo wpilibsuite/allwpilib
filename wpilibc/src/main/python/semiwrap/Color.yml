@@ -2,9 +2,9 @@ extra_includes:
 - pybind11/operators.h
 
 classes:
-  frc::Color:
+  wpi::Color:
     force_type_casters:
-    - wpi::ct_string
+    - wpi::util::ct_string
     attributes:
       kDenim:
       kFirstBlue:

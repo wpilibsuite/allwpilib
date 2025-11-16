@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/simulation/DIOData.h"
+#include "wpi/hal/simulation/DIOData.h"
 
-#include "hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/SimDataValue.h"
 
 extern "C" {
 void HALSIM_ResetDIOData(int32_t index) {}

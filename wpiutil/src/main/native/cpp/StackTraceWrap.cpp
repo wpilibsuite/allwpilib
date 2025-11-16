@@ -5,15 +5,15 @@
 #include <atomic>
 #include <string>
 
-#include "wpi/StackTrace.h"
+#include "wpi/util/StackTrace.hpp"
 
 static std::atomic<std::string (*)(int offset)> gStackTraceImpl{
-    wpi::GetStackTraceDefault};
+    wpi::util::GetStackTraceDefault};
 
-std::string wpi::GetStackTrace(int offset) {
+std::string wpi::util::GetStackTrace(int offset) {
   return (gStackTraceImpl.load())(offset);
 }
 
-void wpi::SetGetStackTraceImpl(std::string (*func)(int offset)) {
-  gStackTraceImpl = func ? func : wpi::GetStackTraceDefault;
+void wpi::util::SetGetStackTraceImpl(std::string (*func)(int offset)) {
+  gStackTraceImpl = func ? func : wpi::util::GetStackTraceDefault;
 }

@@ -4,38 +4,37 @@
 
 #include <jni.h>
 
-#include <wpi/jni_util.h>
-
 #include "HALUtil.h"
-#include "edu_wpi_first_hal_DutyCycleJNI.h"
-#include "hal/DutyCycle.h"
+#include "org_wpilib_hardware_hal_DutyCycleJNI.h"
+#include "wpi/hal/DutyCycle.h"
+#include "wpi/util/jni_util.hpp"
 
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
 /*
- * Class:     edu_wpi_first_hal_DutyCycleJNI
+ * Class:     org_wpilib_hardware_hal_DutyCycleJNI
  * Method:    initialize
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DutyCycleJNI_initialize
+Java_org_wpilib_hardware_hal_DutyCycleJNI_initialize
   (JNIEnv* env, jclass, jint channel)
 {
   int32_t status = 0;
-  auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
+  auto stack = wpi::util::java::GetJavaStackTrace(env, "org.wpilib");
   auto handle = HAL_InitializeDutyCycle(channel, stack.c_str(), &status);
   CheckStatus(env, status);
   return handle;
 }
 
 /*
- * Class:     edu_wpi_first_hal_DutyCycleJNI
+ * Class:     org_wpilib_hardware_hal_DutyCycleJNI
  * Method:    free
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DutyCycleJNI_free
+Java_org_wpilib_hardware_hal_DutyCycleJNI_free
   (JNIEnv*, jclass, jint handle)
 {
   if (handle != HAL_kInvalidHandle) {
@@ -44,12 +43,12 @@ Java_edu_wpi_first_hal_DutyCycleJNI_free
 }
 
 /*
- * Class:     edu_wpi_first_hal_DutyCycleJNI
+ * Class:     org_wpilib_hardware_hal_DutyCycleJNI
  * Method:    getFrequency
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_DutyCycleJNI_getFrequency
+Java_org_wpilib_hardware_hal_DutyCycleJNI_getFrequency
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -60,12 +59,12 @@ Java_edu_wpi_first_hal_DutyCycleJNI_getFrequency
 }
 
 /*
- * Class:     edu_wpi_first_hal_DutyCycleJNI
+ * Class:     org_wpilib_hardware_hal_DutyCycleJNI
  * Method:    getOutput
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_DutyCycleJNI_getOutput
+Java_org_wpilib_hardware_hal_DutyCycleJNI_getOutput
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -76,12 +75,12 @@ Java_edu_wpi_first_hal_DutyCycleJNI_getOutput
 }
 
 /*
- * Class:     edu_wpi_first_hal_DutyCycleJNI
+ * Class:     org_wpilib_hardware_hal_DutyCycleJNI
  * Method:    getHighTime
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DutyCycleJNI_getHighTime
+Java_org_wpilib_hardware_hal_DutyCycleJNI_getHighTime
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;

@@ -52,5 +52,5 @@ depends = ["wpiutil"]
 
 [tool.semiwrap.extension_modules."wpinet._wpinet".headers]
 # wpinet
-PortForwarder = "wpinet/PortForwarder.h"
-WebServer = "wpinet/WebServer.h"
+PortForwarder = "wpi/net/PortForwarder.hpp"
+WebServer = "wpi/net/WebServer.hpp"

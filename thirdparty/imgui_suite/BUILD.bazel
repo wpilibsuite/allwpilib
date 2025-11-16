@@ -4,7 +4,8 @@ load("@rules_pkg//:pkg.bzl", "pkg_zip")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:objectivec_rules.bzl", "wpilib_objc_library")
-load("//shared/bazel/rules:packaging.bzl", "package_minimal_cc_project")
+load("//shared/bazel/rules:packaging.bzl", "package_static_cc_project")
+load("//shared/bazel/rules:publishing.bzl", "host_architectures")
 
 cc_library(
     name = "gl3w",
@@ -486,8 +487,9 @@ pkg_zip(
     ],
 )
 
-package_minimal_cc_project(
+package_static_cc_project(
     name = "imguiSuite",
+    architectures = host_architectures,
     maven_artifact_name = "imguiSuite-cpp",
     maven_group_id = "edu.wpi.first.thirdparty.imguiSuite",
 )

@@ -8,7 +8,7 @@ functions:
   from_json:
     ignore: true
 classes:
-  frc::Quaternion:
+  wpi::math::Quaternion:
     methods:
       Quaternion:
         overloads:
@@ -47,4 +47,4 @@ inline_code: |
   cls_Quaternion
     .def("__repr__", py::overload_cast<const Quaternion&>(&rpy::toString));
 
-  SetupWPyStruct<frc::Quaternion>(cls_Quaternion);
+  SetupWPyStruct<wpi::math::Quaternion>(cls_Quaternion);

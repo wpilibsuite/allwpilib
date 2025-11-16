@@ -1,14 +1,14 @@
 classes:
-  frc::sim::DCMotorSim:
+  wpi::sim::DCMotorSim:
     typealias:
-    - frc::DCMotor
+    - wpi::math::DCMotor
     methods:
       DCMotorSim:
         overloads:
-          const LinearSystem<2, 1, 2>&, const DCMotor&, const std::array<double, 2>&:
+          const wpi::math::LinearSystem<2, 1, 2>&, const wpi::math::DCMotor&, const std::array<double, 2>&:
             param_override:
               plant:
-                x_type: frc::LinearSystem<2,1,2>
+                x_type: wpi::math::LinearSystem<2,1,2>
       SetState:
       GetAngularPosition:
       GetAngularVelocity:
@@ -27,9 +27,9 @@ inline_code: |
   cls_DCMotorSim
     // java API compatibility
     .def("getAngularPositionRotations", [](const DCMotorSim &self) {
-      return units::turn_t{self.GetAngularPosition()};
+      return wpi::units::turn_t{self.GetAngularPosition()};
     }, py::doc("Returns the DC motor position in rotations"))
     .def("getAngularVelocityRPM", [](const DCMotorSim &self) {
-      return units::revolutions_per_minute_t{self.GetAngularVelocity()};
+      return wpi::units::revolutions_per_minute_t{self.GetAngularVelocity()};
     }, py::doc("Returns the DC motor velocity in revolutions per minute"))
   ;

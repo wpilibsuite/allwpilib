@@ -2,7 +2,7 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include <wpi/array.h>
+#include "wpi/util/array.hpp"
 
 namespace pybind11 {
 namespace detail {
@@ -24,15 +24,15 @@ struct wpi_array_name_maker<1> {
 };
 
 template <typename Type, size_t Size>
-struct type_caster<wpi::array<Type, Size>> {
+struct type_caster<wpi::util::array<Type, Size>> {
   using value_conv = make_caster<Type>;
 
-  // Have to copy/paste PYBIND11_TYPE_CASTER implementation because wpi::array
+  // Have to copy/paste PYBIND11_TYPE_CASTER implementation because wpi::util::array
   // is not default constructable
   //
   // begin PYBIND11_TYPE_CASTER
 protected:
-  wpi::array<Type, Size> value{wpi::empty_array_t{}};
+  wpi::util::array<Type, Size> value{wpi::util::empty_array_t{}};
 
   // An empty tuple is pretty useless
   static_assert(Size > 0, "empty array not supported");
@@ -41,7 +41,7 @@ public:
   static constexpr auto name = const_name("Tuple[") + wpi_array_name_maker<Size>::make(value_conv::name) + const_name("]");
   template <
       typename T_,
-      enable_if_t<std::is_same<wpi::array<Type, Size>, remove_cv_t<T_>>::value,
+      enable_if_t<std::is_same<wpi::util::array<Type, Size>, remove_cv_t<T_>>::value,
                   int> = 0>
   static handle cast(T_ *src, return_value_policy policy, handle parent) {
     if (!src)
@@ -54,9 +54,9 @@ public:
       return cast(*src, policy, parent);
     }
   }
-  operator wpi::array<Type, Size> *() { return &value; }
-  operator wpi::array<Type, Size> &() { return value; }
-  operator wpi::array<Type, Size> &&() && { return std::move(value); }
+  operator wpi::util::array<Type, Size> *() { return &value; }
+  operator wpi::util::array<Type, Size> &() { return value; }
+  operator wpi::util::array<Type, Size> &&() && { return std::move(value); }
   template <typename T_>
   using cast_op_type = pybind11::detail::movable_cast_op_type<T_>;
   // end PYBIND11_TYPE_CASTER

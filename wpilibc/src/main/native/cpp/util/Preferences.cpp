@@ -1,0 +1,187 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#include "wpi/util/Preferences.hpp"
+
+#include <memory>
+#include <string>
+#include <vector>
+
+#include <fmt/format.h>
+
+#include "wpi/hal/UsageReporting.h"
+#include "wpi/nt/MultiSubscriber.hpp"
+#include "wpi/nt/NetworkTable.hpp"
+#include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/nt/NetworkTableListener.hpp"
+#include "wpi/nt/StringTopic.hpp"
+#include "wpi/util/json.hpp"
+
+using namespace wpi;
+
+// The Preferences table name
+static constexpr std::string_view kTableName{"Preferences"};
+static constexpr std::string_view kSmartDashboardType = "RobotPreferences";
+namespace {
+struct Instance {
+  Instance();
+
+  std::shared_ptr<wpi::nt::NetworkTable> table{
+      wpi::nt::NetworkTableInstance::GetDefault().GetTable(kTableName)};
+  wpi::nt::StringPublisher typePublisher{
+      table->GetStringTopic(".type").PublishEx(
+          wpi::nt::StringTopic::kTypeString,
+          {{"SmartDashboard", kSmartDashboardType}})};
+  wpi::nt::MultiSubscriber tableSubscriber{
+      wpi::nt::NetworkTableInstance::GetDefault(),
+      {{fmt::format("{}/", table->GetPath())}}};
+  wpi::nt::NetworkTableListener listener;
+};
+}  // namespace
+
+static Instance& GetInstance() {
+  static Instance instance;
+  return instance;
+}
+
+#ifndef __FRC_SYSTEMCORE__
+namespace wpi::impl {
+void ResetPreferencesInstance() {
+  GetInstance() = Instance();
+}
+}  // namespace wpi::impl
+#endif
+
+std::vector<std::string> Preferences::GetKeys() {
+  return ::GetInstance().table->GetKeys();
+}
+
+std::string Preferences::GetString(std::string_view key,
+                                   std::string_view defaultValue) {
+  return ::GetInstance().table->GetEntry(key).GetString(defaultValue);
+}
+
+int Preferences::GetInt(std::string_view key, int defaultValue) {
+  return ::GetInstance().table->GetEntry(key).GetInteger(defaultValue);
+}
+
+double Preferences::GetDouble(std::string_view key, double defaultValue) {
+  return ::GetInstance().table->GetEntry(key).GetDouble(defaultValue);
+}
+
+float Preferences::GetFloat(std::string_view key, float defaultValue) {
+  return ::GetInstance().table->GetEntry(key).GetFloat(defaultValue);
+}
+
+bool Preferences::GetBoolean(std::string_view key, bool defaultValue) {
+  return ::GetInstance().table->GetEntry(key).GetBoolean(defaultValue);
+}
+
+int64_t Preferences::GetLong(std::string_view key, int64_t defaultValue) {
+  return ::GetInstance().table->GetEntry(key).GetInteger(defaultValue);
+}
+
+void Preferences::SetString(std::string_view key, std::string_view value) {
+  auto entry = ::GetInstance().table->GetEntry(key);
+  entry.SetString(value);
+  entry.SetPersistent();
+}
+
+void Preferences::InitString(std::string_view key, std::string_view value) {
+  auto entry = ::GetInstance().table->GetEntry(key);
+  entry.SetDefaultString(value);
+  entry.SetPersistent();
+}
+
+void Preferences::SetInt(std::string_view key, int value) {
+  auto entry = ::GetInstance().table->GetEntry(key);
+  entry.SetInteger(value);
+  entry.SetPersistent();
+}
+
+void Preferences::InitInt(std::string_view key, int value) {
+  auto entry = ::GetInstance().table->GetEntry(key);
+  entry.SetDefaultInteger(value);
+  entry.SetPersistent();
+}
+
+void Preferences::SetDouble(std::string_view key, double value) {
+  auto entry = ::GetInstance().table->GetEntry(key);
+  entry.SetDouble(value);
+  entry.SetPersistent();
+}
+
+void Preferences::InitDouble(std::string_view key, double value) {
+  auto entry = ::GetInstance().table->GetEntry(key);
+  entry.SetDefaultDouble(value);
+  entry.SetPersistent();
+}
+
+void Preferences::SetFloat(std::string_view key, float value) {
+  auto entry = ::GetInstance().table->GetEntry(key);
+  entry.SetFloat(value);
+  entry.SetPersistent();
+}
+
+void Preferences::InitFloat(std::string_view key, float value) {
+  auto entry = ::GetInstance().table->GetEntry(key);
+  entry.SetDefaultFloat(value);
+  entry.SetPersistent();
+}
+
+void Preferences::SetBoolean(std::string_view key, bool value) {
+  auto entry = ::GetInstance().table->GetEntry(key);
+  entry.SetBoolean(value);
+  entry.SetPersistent();
+}
+
+void Preferences::InitBoolean(std::string_view key, bool value) {
+  auto entry = ::GetInstance().table->GetEntry(key);
+  entry.SetDefaultBoolean(value);
+  entry.SetPersistent();
+}
+
+void Preferences::SetLong(std::string_view key, int64_t value) {
+  auto entry = ::GetInstance().table->GetEntry(key);
+  entry.SetInteger(value);
+  entry.SetPersistent();
+}
+
+void Preferences::InitLong(std::string_view key, int64_t value) {
+  auto entry = ::GetInstance().table->GetEntry(key);
+  entry.SetDefaultInteger(value);
+  entry.SetPersistent();
+}
+
+bool Preferences::ContainsKey(std::string_view key) {
+  return ::GetInstance().table->ContainsKey(key);
+}
+
+void Preferences::Remove(std::string_view key) {
+  auto entry = ::GetInstance().table->GetEntry(key);
+  entry.ClearPersistent();
+  entry.Unpublish();
+}
+
+void Preferences::RemoveAll() {
+  for (auto preference : GetKeys()) {
+    if (preference != ".type") {
+      Remove(preference);
+    }
+  }
+}
+
+Instance::Instance() {
+  typePublisher.Set(kSmartDashboardType);
+  listener = wpi::nt::NetworkTableListener::CreateListener(
+      tableSubscriber, NT_EVENT_PUBLISH | NT_EVENT_IMMEDIATE,
+      [typeTopic = typePublisher.GetTopic().GetHandle()](auto& event) {
+        if (auto topicInfo = event.GetTopicInfo()) {
+          if (topicInfo->topic != typeTopic) {
+            wpi::nt::SetTopicPersistent(topicInfo->topic, true);
+          }
+        }
+      });
+  HAL_ReportUsage("Preferences", "");
+}

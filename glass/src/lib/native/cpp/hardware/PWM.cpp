@@ -2,20 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/hardware/PWM.h"
+#include "wpi/glass/hardware/PWM.hpp"
 
 #include <string>
 
 #include <imgui.h>
-#include <wpi/StringExtras.h>
 
-#include "glass/Context.h"
-#include "glass/DataSource.h"
-#include "glass/Storage.h"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/DataSource.hpp"
+#include "wpi/glass/Storage.hpp"
+#include "wpi/util/StringExtras.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
-void glass::DisplayPWM(PWMModel* model, int index, bool outputsEnabled) {
+void wpi::glass::DisplayPWM(PWMModel* model, int index, bool outputsEnabled) {
   auto data = model->GetSpeedData();
   if (!data) {
     return;
@@ -25,9 +25,10 @@ void glass::DisplayPWM(PWMModel* model, int index, bool outputsEnabled) {
   std::string& name = GetStorage().GetString("name");
   char label[128];
   if (!name.empty()) {
-    wpi::format_to_n_c_str(label, sizeof(label), "{} [{}]###name", name, index);
+    wpi::util::format_to_n_c_str(label, sizeof(label), "{} [{}]###name", name,
+                                 index);
   } else {
-    wpi::format_to_n_c_str(label, sizeof(label), "PWM[{}]###name", index);
+    wpi::util::format_to_n_c_str(label, sizeof(label), "PWM[{}]###name", index);
   }
 
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 4);
@@ -38,8 +39,8 @@ void glass::DisplayPWM(PWMModel* model, int index, bool outputsEnabled) {
   }
 }
 
-void glass::DisplayPWMs(PWMsModel* model, bool outputsEnabled,
-                        std::string_view noneMsg) {
+void wpi::glass::DisplayPWMs(PWMsModel* model, bool outputsEnabled,
+                             std::string_view noneMsg) {
   bool hasAny = false;
   bool first = true;
   model->ForEachPWM([&](PWMModel& pwm, int i) {

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/other/Plot.h"
+#include "wpi/glass/other/Plot.hpp"
 
 #include <stdint.h>
 
@@ -16,7 +16,8 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/StringExtras.h>
+
+#include "wpi/util/StringExtras.hpp"
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
@@ -26,19 +27,19 @@
 #include <imgui_stdlib.h>
 #include <implot.h>
 #include <implot_internal.h>
-#include <wpi/Signal.h>
-#include <wpi/SmallString.h>
-#include <wpi/SmallVector.h>
-#include <wpi/timestamp.h>
 
-#include "glass/Context.h"
-#include "glass/DataSource.h"
-#include "glass/Storage.h"
-#include "glass/support/ColorSetting.h"
-#include "glass/support/EnumSetting.h"
-#include "glass/support/ExtraGuiWidgets.h"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/DataSource.hpp"
+#include "wpi/glass/Storage.hpp"
+#include "wpi/glass/support/ColorSetting.hpp"
+#include "wpi/glass/support/EnumSetting.hpp"
+#include "wpi/glass/support/ExtraGuiWidgets.hpp"
+#include "wpi/util/Signal.h"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/timestamp.h"
 
-using namespace glass;
+using namespace wpi::glass;
 
 static constexpr int kAxisCount = 3;
 
@@ -88,8 +89,8 @@ class PlotSeries {
   // source linkage
   DataSource* m_source = nullptr;
   bool m_digitalSource = false;
-  wpi::sig::ScopedConnection m_sourceCreatedConn;
-  wpi::sig::ScopedConnection m_newValueConn;
+  wpi::util::sig::ScopedConnection m_sourceCreatedConn;
+  wpi::util::sig::ScopedConnection m_newValueConn;
   std::string& m_id;
 
   // user settings
@@ -291,7 +292,7 @@ void PlotSeries::SetSource(DataSource* source) {
 }
 
 void PlotSeries::AppendValue(double value, int64_t timeUs) {
-  double time = (timeUs != 0 ? timeUs : wpi::Now()) * 1.0e-6;
+  double time = (timeUs != 0 ? timeUs : wpi::util::Now()) * 1.0e-6;
   if (IsDigital()) {
     if (m_size < kMaxSize) {
       m_data[m_size] = ImPlotPoint{time, value};
@@ -349,8 +350,9 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
   CheckSource();
 
   char label[128];
-  wpi::format_to_n_c_str(label, sizeof(label), "{}###name{}_{}", GetName(),
-                         static_cast<int>(i), static_cast<int>(plotIndex));
+  wpi::util::format_to_n_c_str(label, sizeof(label), "{}###name{}_{}",
+                               GetName(), static_cast<int>(i),
+                               static_cast<int>(plotIndex));
 
   int size = m_size;
   int offset = m_offset;
@@ -617,8 +619,8 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
   }
 
   char label[128];
-  wpi::format_to_n_c_str(label, sizeof(label), "{}###plot{}", m_name,
-                         static_cast<int>(i));
+  wpi::util::format_to_n_c_str(label, sizeof(label), "{}###plot{}", m_name,
+                               static_cast<int>(i));
 
   ImPlotFlags plotFlags = (m_legend ? 0 : ImPlotFlags_NoLegend) |
                           (m_crosshairs ? ImPlotFlags_Crosshairs : 0) |
@@ -864,7 +866,7 @@ void PlotView::Display() {
     }
   }
 
-  double now = wpi::Now() * 1.0e-6;
+  double now = wpi::util::Now() * 1.0e-6;
   for (size_t i = 0; i < m_plots.size(); ++i) {
     ImGui::PushID(i);
     m_plots[i]->EmitPlot(*this, now, m_provider->IsPaused(), i);
@@ -975,15 +977,16 @@ void PlotView::Settings() {
 
     char name[64];
     if (!plot->GetName().empty()) {
-      wpi::format_to_n_c_str(name, sizeof(name), "{}", plot->GetName().c_str());
+      wpi::util::format_to_n_c_str(name, sizeof(name), "{}",
+                                   plot->GetName().c_str());
     } else {
-      wpi::format_to_n_c_str(name, sizeof(name), "Plot {}",
-                             static_cast<int>(i));
+      wpi::util::format_to_n_c_str(name, sizeof(name), "Plot {}",
+                                   static_cast<int>(i));
     }
 
     char label[90];
-    wpi::format_to_n_c_str(label, sizeof(label), "{}###header{}", name,
-                           static_cast<int>(i));
+    wpi::util::format_to_n_c_str(label, sizeof(label), "{}###header{}", name,
+                                 static_cast<int>(i));
 
     bool open = ImGui::CollapsingHeader(label);
 
@@ -1052,7 +1055,8 @@ void PlotProvider::DisplayMenu() {
     char id[32];
     size_t numWindows = m_windows.size();
     for (size_t i = 0; i <= numWindows; ++i) {
-      wpi::format_to_n_c_str(id, sizeof(id), "Plot <{}>", static_cast<int>(i));
+      wpi::util::format_to_n_c_str(id, sizeof(id), "Plot <{}>",
+                                   static_cast<int>(i));
 
       bool match = false;
       for (size_t j = 0; j < numWindows; ++j) {
