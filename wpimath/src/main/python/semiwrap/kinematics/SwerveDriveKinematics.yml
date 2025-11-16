@@ -82,6 +82,7 @@ classes:
       ToChassisAccelerations:
         overloads:
           ModuleAccelerations&&... [const]:
+            ignore: true
           const wpi::util::array<SwerveModuleAccelerations, NumModules>& [const]:
 
     template_inline_code: |

@@ -1,8 +1,11 @@
 extra_includes:
+- wpi/math/kinematics/DifferentialDriveWheelAccelerations.hpp
 - wpi/math/kinematics/DifferentialDriveWheelPositions.hpp
 - wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp
+- wpi/math/kinematics/MecanumDriveWheelAccelerations.hpp
 - wpi/math/kinematics/MecanumDriveWheelPositions.hpp
 - wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp
+- wpi/math/kinematics/SwerveModuleAccelerations.hpp
 - wpi/math/kinematics/SwerveDriveKinematics.hpp
 
 classes:
@@ -10,6 +13,7 @@ classes:
     template_params:
     - WheelSpeeds
     - WheelPositions
+    - WheelAccelerations
     methods:
       Odometry:
       ResetPosition:
@@ -25,28 +29,34 @@ templates:
     params:
     - wpi::math::DifferentialDriveWheelSpeeds
     - wpi::math::DifferentialDriveWheelPositions
+    - wpi::math::DifferentialDriveWheelAccelerations
   MecanumDriveOdometryBase:
     qualname: wpi::math::Odometry
     params:
     - wpi::math::MecanumDriveWheelSpeeds
     - wpi::math::MecanumDriveWheelPositions
+    - wpi::math::MecanumDriveWheelAccelerations
   SwerveDrive2OdometryBase:
     qualname: wpi::math::Odometry
     params:
     - wpi::util::array<wpi::math::SwerveModuleState,2>
     - wpi::util::array<wpi::math::SwerveModulePosition,2>
+    - wpi::util::array<wpi::math::SwerveModuleAccelerations,2>
   SwerveDrive3OdometryBase:
     qualname: wpi::math::Odometry
     params:
     - wpi::util::array<wpi::math::SwerveModuleState,3>
     - wpi::util::array<wpi::math::SwerveModulePosition,3>
+    - wpi::util::array<wpi::math::SwerveModuleAccelerations,3>
   SwerveDrive4OdometryBase:
     qualname: wpi::math::Odometry
     params:
     - wpi::util::array<wpi::math::SwerveModuleState,4>
     - wpi::util::array<wpi::math::SwerveModulePosition,4>
+    - wpi::util::array<wpi::math::SwerveModuleAccelerations,4>
   SwerveDrive6OdometryBase:
     qualname: wpi::math::Odometry
     params:
     - wpi::util::array<wpi::math::SwerveModuleState,6>
     - wpi::util::array<wpi::math::SwerveModulePosition,6>
+    - wpi::util::array<wpi::math::SwerveModuleAccelerations,6>
