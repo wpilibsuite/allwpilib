@@ -137,9 +137,8 @@ void HALSIM_CancelJoystickRumblesCallback(int32_t uid);
 void HALSIM_GetJoystickRumbles(int32_t joystickNum, int32_t* leftRumble,
                                int32_t* rightRumble, int32_t* leftTriggerRumble,
                                int32_t* rightTriggerRumble);
-void HALSIM_SetJoystickOutputs(int32_t joystickNum, int32_t leds,
-                               int32_t leftRumble, int32_t rightRumble,
-                               int32_t leftTriggerRumble,
+void HALSIM_SetJoystickRumbles(int32_t joystickNum, int32_t leftRumble,
+                               int32_t rightRumble, int32_t leftTriggerRumble,
                                int32_t rightTriggerRumble);
 
 int32_t HALSIM_RegisterMatchInfoCallback(HAL_MatchInfoCallback callback,
