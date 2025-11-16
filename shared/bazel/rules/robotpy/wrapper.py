@@ -45,7 +45,7 @@ The 'header to dat file' step has failed. The most probable cause for this is th
 have yaml files that don't exist or are out of date called out in this project's
 pyproject.toml file, and need to be regenerated running a tool that looks like this:
 
-bazel run //<project>:write_<library_name>-update-yaml tool
+bazel run //<project>:write_<library_name>-update-yaml
 
 Please see this readme for more information:
 {README_LINK}#2-update-yaml
@@ -57,7 +57,7 @@ Please see this readme for more information:
 An auto generation error has occurred. The most probable cause for this that the bazel
 build scripts need to updated, running a tool that looks like this:
 
-bazel run //<project>:<library_name>-generator.generate_build_info tool.
+bazel run //<project>:<library_name>-generator.generate_build_info
 
 Please see this readme for more information:
 {README_LINK}#3-generate-build-info
