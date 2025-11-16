@@ -427,6 +427,11 @@ public class GenericHID {
     return HIDType.of(DriverStation.getJoystickGamepadType(m_port));
   }
 
+  /**
+   * Get the supported outputs for the HID.
+   *
+   * @return the supported outputs for the HID.
+   */
   public int getSupportedOutputs() {
     return DriverStation.getJoystickSupportedOutputs(m_port);
   }
