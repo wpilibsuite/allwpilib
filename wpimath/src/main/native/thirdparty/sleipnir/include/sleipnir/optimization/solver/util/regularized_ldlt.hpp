@@ -7,7 +7,7 @@
 #include <Eigen/SparseCholesky>
 #include <Eigen/SparseCore>
 
-#include "optimization/inertia.hpp"
+#include "sleipnir/optimization/solver/util/inertia.hpp"
 
 // See docs/algorithms.md#Works_cited for citation definitions
 
@@ -15,7 +15,10 @@ namespace slp {
 
 /**
  * Solves systems of linear equations using a regularized LDLT factorization.
+ *
+ * @tparam Scalar Scalar type.
  */
+template <typename Scalar>
 class RegularizedLDLT {
  public:
   /**
@@ -43,7 +46,7 @@ class RegularizedLDLT {
    * @param lhs Left-hand side of the system.
    * @return The factorization.
    */
-  RegularizedLDLT& compute(const Eigen::SparseMatrix<double>& lhs) {
+  RegularizedLDLT& compute(const Eigen::SparseMatrix<Scalar>& lhs) {
     // The regularization procedure is based on algorithm B.1 of [1]
 
     // Max density is 50% due to the caller only providing the lower triangle.
@@ -61,7 +64,7 @@ class RegularizedLDLT {
 
       // If the inertia is ideal, don't regularize the system
       if (inertia == ideal_inertia) {
-        m_prev_δ = 0.0;
+        m_prev_δ = Scalar(0);
         return *this;
       }
     }
@@ -70,8 +73,8 @@ class RegularizedLDLT {
     // previous run of compute(), start at small values of δ and γ. Otherwise,
     // attempt a δ and γ half as big as the previous run so δ and γ can trend
     // downwards over time.
-    double δ = m_prev_δ == 0.0 ? 1e-4 : m_prev_δ / 2.0;
-    double γ = 1e-10;
+    Scalar δ = m_prev_δ == Scalar(0) ? Scalar(1e-4) : m_prev_δ / Scalar(2);
+    Scalar γ(1e-10);
 
     while (true) {
       // Regularize lhs by adding a multiple of the identity matrix
@@ -98,27 +101,27 @@ class RegularizedLDLT {
         } else if (inertia.zero > 0) {
           // If there's zero eigenvalues, increase δ and γ by an order of
           // magnitude and try again
-          δ *= 10.0;
-          γ *= 10.0;
+          δ *= Scalar(10);
+          γ *= Scalar(10);
         } else if (inertia.negative > ideal_inertia.negative) {
           // If there's too many negative eigenvalues, increase δ by an order of
           // magnitude and try again
-          δ *= 10.0;
+          δ *= Scalar(10);
         } else if (inertia.positive > ideal_inertia.positive) {
           // If there's too many positive eigenvalues, increase γ by an order of
           // magnitude and try again
-          γ *= 10.0;
+          γ *= Scalar(10);
         }
       } else {
         // If the decomposition failed, increase δ and γ by an order of
         // magnitude and try again
-        δ *= 10.0;
-        γ *= 10.0;
+        δ *= Scalar(10);
+        γ *= Scalar(10);
       }
 
       // If the Hessian perturbation is too high, report failure. This can be
       // caused by ill-conditioning.
-      if (δ > 1e20 || γ > 1e20) {
+      if (δ > Scalar(1e20) || γ > Scalar(1e20)) {
         m_info = Eigen::NumericalIssue;
         return *this;
       }
@@ -132,7 +135,8 @@ class RegularizedLDLT {
    * @return The solution.
    */
   template <typename Rhs>
-  Eigen::VectorXd solve(const Eigen::MatrixBase<Rhs>& rhs) {
+  Eigen::Vector<Scalar, Eigen::Dynamic> solve(
+      const Eigen::MatrixBase<Rhs>& rhs) {
     if (m_is_sparse) {
       return m_sparse_solver.solve(rhs);
     } else {
@@ -147,7 +151,8 @@ class RegularizedLDLT {
    * @return The solution.
    */
   template <typename Rhs>
-  Eigen::VectorXd solve(const Eigen::SparseMatrixBase<Rhs>& rhs) {
+  Eigen::Vector<Scalar, Eigen::Dynamic> solve(
+      const Eigen::SparseMatrixBase<Rhs>& rhs) {
     if (m_is_sparse) {
       return m_sparse_solver.solve(rhs);
     } else {
@@ -160,11 +165,12 @@ class RegularizedLDLT {
    *
    * @return Hessian regularization factor.
    */
-  double hessian_regularization() const { return m_prev_δ; }
+  Scalar hessian_regularization() const { return m_prev_δ; }
 
  private:
-  using SparseSolver = Eigen::SimplicialLDLT<Eigen::SparseMatrix<double>>;
-  using DenseSolver = Eigen::LDLT<Eigen::MatrixXd>;
+  using SparseSolver = Eigen::SimplicialLDLT<Eigen::SparseMatrix<Scalar>>;
+  using DenseSolver =
+      Eigen::LDLT<Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>>;
 
   SparseSolver m_sparse_solver;
   DenseSolver m_dense_solver;
@@ -183,7 +189,7 @@ class RegularizedLDLT {
                         0};
 
   /// The value of δ from the previous run of compute().
-  double m_prev_δ = 0.0;
+  Scalar m_prev_δ{0};
 
   // Number of non-zeros in LHS.
   int m_non_zeros = -1;
@@ -194,7 +200,7 @@ class RegularizedLDLT {
    * @param lhs Matrix to factorize.
    * @return The factorization.
    */
-  SparseSolver& compute_sparse(const Eigen::SparseMatrix<double>& lhs) {
+  SparseSolver& compute_sparse(const Eigen::SparseMatrix<Scalar>& lhs) {
     // Reanalize lhs's sparsity pattern if it changed
     int non_zeros = lhs.nonZeros();
     if (m_non_zeros != non_zeros) {
@@ -214,13 +220,14 @@ class RegularizedLDLT {
    * @param γ The equality constraint Jacobian regularization factor.
    * @return Regularization matrix.
    */
-  Eigen::SparseMatrix<double> regularization(double δ, double γ) {
-    Eigen::VectorXd vec{m_num_decision_variables + m_num_equality_constraints};
+  Eigen::SparseMatrix<Scalar> regularization(Scalar δ, Scalar γ) {
+    Eigen::Vector<Scalar, Eigen::Dynamic> vec{m_num_decision_variables +
+                                              m_num_equality_constraints};
     vec.segment(0, m_num_decision_variables).setConstant(δ);
     vec.segment(m_num_decision_variables, m_num_equality_constraints)
         .setConstant(-γ);
 
-    return Eigen::SparseMatrix<double>{vec.asDiagonal()};
+    return Eigen::SparseMatrix<Scalar>{vec.asDiagonal()};
   }
 };
 

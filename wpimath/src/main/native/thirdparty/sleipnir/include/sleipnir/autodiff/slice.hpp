@@ -47,7 +47,8 @@ class SLEIPNIR_DLLEXPORT Slice {
   /**
    * Constructs a slice.
    */
-  constexpr Slice(slicing::none_t)  // NOLINT
+  // NOLINTNEXTLINE (google-explicit-constructor)
+  constexpr Slice(slicing::none_t)
       : Slice(0, std::numeric_limits<int>::max(), 1) {}
 
   /**
@@ -55,7 +56,8 @@ class SLEIPNIR_DLLEXPORT Slice {
    *
    * @param start Slice start index (inclusive).
    */
-  constexpr Slice(int start) {  // NOLINT
+  // NOLINTNEXTLINE (google-explicit-constructor)
+  constexpr Slice(int start) {
     this->start = start;
     this->stop = (start == -1) ? std::numeric_limits<int>::max() : start + 1;
     this->step = 1;

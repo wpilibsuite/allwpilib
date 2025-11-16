@@ -2,11 +2,13 @@
 
 #pragma once
 
-#ifdef JORMUNGANDR
+#ifdef SLEIPNIR_PYTHON
+
 #include <source_location>
 #include <stdexcept>
 
 #include <fmt/format.h>
+
 /**
  * Throw an exception in Python.
  */
@@ -18,11 +20,15 @@
           "{}:{}: {}: Assertion `{}' failed.", location.file_name(), \
           location.line(), location.function_name(), #condition));   \
     }                                                                \
-  } while (0);
+  } while (0)
+
 #else
+
 #include <cassert>
+
 /**
  * Abort in C++.
  */
 #define slp_assert(condition) assert(condition)
+
 #endif

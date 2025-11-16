@@ -19,7 +19,7 @@ auto Range(T start, T end, T step) {
 TEST(ProblemTest, Quartic) {
   testing::internal::CaptureStdout();
 
-  slp::Problem problem;
+  slp::Problem<double> problem;
 
   auto x = problem.decision_variable();
   x.set_value(20.0);
@@ -47,7 +47,7 @@ TEST(ProblemTest, RosenbrockWithCubicAndLineConstraint) {
   // https://en.wikipedia.org/wiki/Test_functions_for_optimization#Test_functions_for_constrained_optimization
   for (auto x0 : Range(-1.5, 1.5, 0.1)) {
     for (auto y0 : Range(-0.5, 2.5, 0.1)) {
-      slp::Problem problem;
+      slp::Problem<double> problem;
 
       auto x = problem.decision_variable();
       x.set_value(x0);
@@ -88,7 +88,7 @@ TEST(ProblemTest, RosenbrockWithDiskConstraint) {
   // https://en.wikipedia.org/wiki/Test_functions_for_optimization#Test_functions_for_constrained_optimization
   for (auto x0 : Range(-1.5, 1.5, 0.1)) {
     for (auto y0 : Range(-1.5, 1.5, 0.1)) {
-      slp::Problem problem;
+      slp::Problem<double> problem;
 
       auto x = problem.decision_variable();
       x.set_value(x0);
@@ -119,7 +119,7 @@ TEST(ProblemTest, RosenbrockWithDiskConstraint) {
 TEST(ProblemTest, Minimum2DDistanceWithLinearConstraint) {
   testing::internal::CaptureStdout();
 
-  slp::Problem problem;
+  slp::Problem<double> problem;
 
   auto x = problem.decision_variable();
   x.set_value(20.0);
@@ -155,7 +155,7 @@ TEST(ProblemTest, Minimum2DDistanceWithLinearConstraint) {
 TEST(ProblemTest, ConflictingBounds) {
   testing::internal::CaptureStdout();
 
-  slp::Problem problem;
+  slp::Problem<double> problem;
 
   auto x = problem.decision_variable();
   auto y = problem.decision_variable();
@@ -187,7 +187,7 @@ TEST(ProblemTest, WachterAndBieglerLineSearchFailure) {
   // [1] Nocedal, J. and Wright, S. "Numerical Optimization", 2nd. ed., Ch. 19.
   //     Springer, 2006.
 
-  slp::Problem problem;
+  slp::Problem<double> problem;
 
   auto x = problem.decision_variable();
   auto s1 = problem.decision_variable();
