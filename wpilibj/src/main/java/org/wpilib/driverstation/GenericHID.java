@@ -492,7 +492,6 @@ public class GenericHID {
        break;
       default:
         break;
-      }
     }
 
     DriverStationJNI.setJoystickRumble(
