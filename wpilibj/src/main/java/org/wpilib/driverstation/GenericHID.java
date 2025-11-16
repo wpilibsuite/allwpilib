@@ -479,17 +479,17 @@ public class GenericHID {
     int rumbleValue = (int) (value * 65535);
     switch (type) {
       case kLeftRumble:
-       this.m_leftRumble = rumbleValue;
-       break;
+        this.m_leftRumble = rumbleValue;
+        break;
       case kRightRumble:
-       this.m_rightRumble = rumbleValue;
-       break;
+        this.m_rightRumble = rumbleValue;
+        break;
       case kLeftTriggerRumble:
-       this.m_leftTriggerRumble = rumbleValue;
-       break;
+        this.m_leftTriggerRumble = rumbleValue;
+        break;
       case kRightTriggerRumble:
-       this.m_rightTriggerRumble = rumbleValue;
-       break;
+        this.m_rightTriggerRumble = rumbleValue;
+        break;
       default:
         break;
     }
