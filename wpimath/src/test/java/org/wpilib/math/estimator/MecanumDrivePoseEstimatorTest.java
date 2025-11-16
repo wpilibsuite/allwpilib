@@ -7,6 +7,7 @@ package org.wpilib.math.estimator;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.wpilib.units.Units.Seconds;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +23,7 @@ import org.wpilib.math.kinematics.ChassisSpeeds;
 import org.wpilib.math.kinematics.MecanumDriveKinematics;
 import org.wpilib.math.kinematics.MecanumDriveWheelPositions;
 import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.math.trajectory.SplineSample;
 import org.wpilib.math.trajectory.Trajectory;
 import org.wpilib.math.trajectory.TrajectoryConfig;
 import org.wpilib.math.trajectory.TrajectoryGenerator;

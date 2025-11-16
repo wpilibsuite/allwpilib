@@ -7,6 +7,8 @@ package org.wpilib.math.util;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Translation3d;
 import org.wpilib.math.linalg.Vector;
+import org.wpilib.units.Measure;
+import org.wpilib.units.Unit;
 
 /** Math utility functions. */
 public final class MathUtil {

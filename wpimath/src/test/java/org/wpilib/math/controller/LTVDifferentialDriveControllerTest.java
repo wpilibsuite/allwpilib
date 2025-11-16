@@ -6,11 +6,13 @@ package org.wpilib.math.controller;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.wpilib.units.Units.Seconds;
 
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import org.wpilib.math.linalg.MatBuilder;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.linalg.VecBuilder;
@@ -20,6 +22,7 @@ import org.wpilib.math.numbers.N5;
 import org.wpilib.math.system.LinearSystem;
 import org.wpilib.math.system.NumericalIntegration;
 import org.wpilib.math.system.plant.LinearSystemId;
+import org.wpilib.math.trajectory.DifferentialSample;
 import org.wpilib.math.trajectory.TrajectoryConfig;
 import org.wpilib.math.trajectory.TrajectoryGenerator;
 import org.wpilib.math.util.MathUtil;

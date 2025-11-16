@@ -5,8 +5,8 @@
 package org.wpilib.math.interpolation;
 
 import org.wpilib.math.util.MathUtil;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Unit;
+import org.wpilib.units.Measure;
+import org.wpilib.units.Unit;
 
 /**
  * An interpolation function that returns a value interpolated between an upper and lower bound.
