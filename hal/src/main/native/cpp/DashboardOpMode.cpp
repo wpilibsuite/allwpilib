@@ -109,7 +109,7 @@ struct DashboardOpModeInstance {
 }  // namespace
 
 static DashboardOpModeInstance* gInstance;
-static std::atomic_flag gEnabled{false};
+static std::atomic_flag gEnabled{};
 
 void hal::InitializeDashboardOpMode() {
   static DashboardOpModeInstance inst{nt::NetworkTableInstance::GetDefault()};
