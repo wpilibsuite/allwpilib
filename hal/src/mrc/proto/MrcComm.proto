@@ -24,16 +24,23 @@ message ProtobufControlData {
 
 message ProtobufJoystickDescriptor {
     string JoystickName = 1;
-    repeated int32 AxisTypes = 2;
-    bool IsGamepad = 3;
-    int32 JoystickType = 4;
-    int32 ButtonCount = 5;
-    int32 PovCount = 6;
-    int32 RumbleCount = 7;
+    bool IsGamepad = 2;
+    uint32 GamepadType = 3;
+    uint32 SupportedOutputs = 4;
 }
 
-message ProtobufJoystickRumbleData {
-    repeated uint32 Value = 3;
+message ProtobufJoystickDescriptors {
+    repeated ProtobufJoystickDescriptor Descriptors = 1;
+}
+
+message ProtobufJoystickOutput {
+    uint32 LEDs = 1;
+    uint32 Rumble = 2; // 16 bits, left msb, right lsb
+    uint32 TriggerRumble = 3; // 16 bits, left msb, right lsb
+}
+
+message ProtobufJoystickOutputs {
+    repeated ProtobufJoystickOutput Outputs = 1;
 }
 
 message ProtobufMatchInfo {
@@ -58,4 +65,17 @@ message ProtobufOpMode {
 
 message ProtobufAvailableOpModes {
     repeated ProtobufOpMode Modes = 1;
+}
+
+message ProtobufErrorInfoTimestamp {
+    ProtobufErrorInfo ErrorInfo = 1;
+    uint64 Timestamp = 2;
+    int32 SequenceNumber = 3;
+    int32 NumOccurances = 4;
+}
+
+message ProtobufConsoleLineTimestamp {
+    string ConsoleLine = 1;
+    uint64 Timestamp = 2;
+    int32 SequenceNumber = 3;
 }

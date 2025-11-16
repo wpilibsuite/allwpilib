@@ -977,17 +977,31 @@ public final class DriverStation {
   }
 
   /**
-   * Gets the value of type on a joystick.
+   * Gets the value of type on a gamepad.
    *
    * @param stick The joystick port number
    * @return The value of type
    */
-  public static int getJoystickType(int stick) {
+  public static int getJoystickGamepadType(int stick) {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
-    return DriverStationJNI.getJoystickType((byte) stick);
+    return DriverStationJNI.getJoystickGamepadType((byte) stick);
+  }
+
+  /**
+   * Gets the value of supported outputs on a joystick.
+   *
+   * @param stick The joystick port number
+   * @return The value of supported outputs
+   */
+  public static int getJoystickSupportedOutputs(int stick) {
+    if (stick < 0 || stick >= kJoystickPorts) {
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
+    }
+
+    return DriverStationJNI.getJoystickSupportedOutputs((byte) stick);
   }
 
   /**

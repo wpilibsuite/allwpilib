@@ -238,7 +238,7 @@ Joystick data is an input to the robot program and should be updated for each in
 | ``">axes"``         | Array of float   | One array element per axis; value is -1 to 1 range |
 | ``">povs"``         | Array of integer | One array element per POV; value is angle in degrees of the POV (e.g. 0, 90, 315) if pressed, or -1 if the POV is not pressed |
 | ``">buttons"``      | Array of boolean | One array element per button; true if button is pressed, false if button is released |
-| ``"<outputs"``      | Integer          | Bitmask of joystick HID outputs |
+| ``"<leds"``         | Integer          | LED Output Color (0xRRGGBB) |
 | ``"<rumble_left"``  | Float            | Left rumble, value is 0-1 range |
 | ``"<rumble_right"`` | Float            | Right rumble, value is 0-1 range |
 

@@ -11,6 +11,15 @@
 #include "wpi/util/protobuf/Protobuf.hpp"
 
 template <>
+struct wpi::util::Protobuf<mrc::JoystickDescriptors> {
+  using MessageStruct = mrc_proto_ProtobufJoystickDescriptors;
+  using InputStream = wpi::util::ProtoInputStream<mrc::JoystickDescriptors>;
+  using OutputStream = wpi::util::ProtoOutputStream<mrc::JoystickDescriptors>;
+  static std::optional<mrc::JoystickDescriptors> Unpack(InputStream& Stream);
+  static bool Pack(OutputStream& Stream, const mrc::JoystickDescriptors& Value);
+};
+
+template <>
 struct wpi::util::Protobuf<mrc::JoystickDescriptor> {
   using MessageStruct = mrc_proto_ProtobufJoystickDescriptor;
   using InputStream = wpi::util::ProtoInputStream<mrc::JoystickDescriptor>;

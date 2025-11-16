@@ -14,8 +14,7 @@ classes:
           DriverStation::POVDirection:
       SetType:
       SetName:
-      GetOutput:
-      GetOutputs:
+      GetLeds:
       GetRumble:
       SetAxesMaximumIndex:
       SetAxesAvailable:

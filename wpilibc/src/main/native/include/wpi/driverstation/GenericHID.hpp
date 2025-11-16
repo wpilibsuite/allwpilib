@@ -33,8 +33,28 @@ class GenericHID {
     kLeftRumble,
     /// Right rumble motor.
     kRightRumble,
-    /// Both left and right rumble motors.
-    kBothRumble
+    /// Left trigger rumble motor.
+    kLeftTriggerRumble,
+    /// Right trigger rumble motor.
+    kRightTriggerRumble,
+  };
+
+  /**
+   * Represents the various outputs that a HID may support.
+   */
+  enum SupportedOutputs {
+    /// No outputs supported.
+    kNone = 0x0,
+    /// Mono LED support.
+    kMonoLed = 0x1,
+    /// RGB LED support.
+    kRgbLed = 0x2,
+    /// Player LED support.
+    kPlayerLed = 0x4,
+    /// Rumble support.
+    kRumble = 0x8,
+    /// Trigger rumble support.
+    kTriggerRumble = 0x10,
   };
 
   /**
@@ -42,39 +62,27 @@ class GenericHID {
    */
   enum HIDType {
     /// Unknown.
-    kUnknown = -1,
-    /// XInputUnknown.
-    kXInputUnknown = 0,
-    /// XInputGamepad.
-    kXInputGamepad = 1,
-    /// XInputWheel.
-    kXInputWheel = 2,
-    /// XInputArcadeStick.
-    kXInputArcadeStick = 3,
-    /// XInputFlightStick.
-    kXInputFlightStick = 4,
-    /// XInputDancePad.
-    kXInputDancePad = 5,
-    /// XInputGuitar.
-    kXInputGuitar = 6,
-    /// XInputGuitar2.
-    kXInputGuitar2 = 7,
-    /// XInputDrumKit.
-    kXInputDrumKit = 8,
-    /// XInputGuitar3.
-    kXInputGuitar3 = 11,
-    /// XInputArcadePad.
-    kXInputArcadePad = 19,
-    /// HIDJoystick.
-    kHIDJoystick = 20,
-    /// HIDGamepad.
-    kHIDGamepad = 21,
-    /// HIDDriving.
-    kHIDDriving = 22,
-    /// HIDFlight.
-    kHIDFlight = 23,
-    /// HID1stPerson.
-    kHID1stPerson = 24
+    kUnknown = 0,
+    /// Standard HID device.
+    kStandard,
+    /// Xbox 360 controller.
+    kXbox360,
+    /// Xbox One controller.
+    kXboxOne,
+    /// PS3 controller.
+    kPS3,
+    /// PS4 controller.
+    kPS4,
+    /// PS5 controller.
+    kPS5,
+    /// Nintendo Switch Pro controller.
+    kSwitchPro,
+    /// Nintendo Switch Joycon Left controller.
+    kSwitchJoyconLeft,
+    /// Nintendo Switch Joycon Right controller.
+    kSwitchJoyconRight,
+    /// Nintendo Switch Joycon controller pair.
+    kSwitchJoyconPair
   };
 
   explicit GenericHID(int port);
@@ -319,7 +327,14 @@ class GenericHID {
    *
    * @return the type of the HID.
    */
-  GenericHID::HIDType GetType() const;
+  GenericHID::HIDType GetGamepadType() const;
+
+  /**
+   * Get the supported outputs of the HID.
+   *
+   * @return the supported outputs of the HID.
+   */
+  GenericHID::SupportedOutputs GetSupportedOutputs() const;
 
   /**
    * Get the name of the HID.
@@ -336,19 +351,14 @@ class GenericHID {
   int GetPort() const;
 
   /**
-   * Set a single HID output value for the HID.
+   * Set leds on the controller. If only mono is supported, the system will use
+   * the highest value passed in.
    *
-   * @param outputNumber The index of the output to set (1-32)
-   * @param value        The value to set the output to
+   * @param r Red value from 0-255
+   * @param g Green value from 0-255
+   * @param b Blue value from 0-255
    */
-  void SetOutput(int outputNumber, bool value);
-
-  /**
-   * Set all output values for the HID.
-   *
-   * @param value The 32 bit output value (1 bit for each output)
-   */
-  void SetOutputs(int value);
+  void SetLeds(int r, int g, int b);
 
   /**
    * Set the rumble output for the HID.
@@ -362,9 +372,10 @@ class GenericHID {
 
  private:
   int m_port;
-  int m_outputs = 0;
   uint16_t m_leftRumble = 0;
   uint16_t m_rightRumble = 0;
+  uint16_t m_leftTriggerRumble = 0;
+  uint16_t m_rightTriggerRumble = 0;
 };
 
 }  // namespace wpi

@@ -113,7 +113,7 @@ TEST_F(DSCommPacketTest, DescriptorTag) {
     arr[1] = sizeof(arr) - 2;
     auto& data = ReadDescriptorTag(arr);
     ASSERT_EQ(data.descriptor.isGamepad, 1);
-    ASSERT_EQ(data.descriptor.type, 0);
+    ASSERT_EQ(data.descriptor.gamepadType, 0);
     ASSERT_STREQ(data.descriptor.name, "Hello World");
   }
 }

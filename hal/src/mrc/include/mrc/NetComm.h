@@ -81,6 +81,30 @@ struct ControlFlags {
   uint32_t WatchdogActive : 1 = 0;
   uint32_t Alliance : 6 = 0;
   uint32_t Reserved : 19 = 0;
+
+  constexpr bool operator==(const ControlFlags& Other) const {
+    return Enabled == Other.Enabled && Auto == Other.Auto &&
+           Test == Other.Test && EStop == Other.EStop &&
+           FmsConnected == Other.FmsConnected &&
+           DsConnected == Other.DsConnected &&
+           WatchdogActive == Other.WatchdogActive && Alliance == Other.Alliance;
+  }
+
+  constexpr bool operator!=(const ControlFlags& Other) const {
+    return !(*this == Other);
+  }
+
+  constexpr void Reset() {
+    Enabled = 0;
+    Auto = 0;
+    Test = 0;
+    EStop = 0;
+    FmsConnected = 0;
+    DsConnected = 0;
+    WatchdogActive = 0;
+    Alliance = 0;
+    Reserved = 0;
+  }
 };
 
 struct JoystickAxes {
@@ -193,25 +217,41 @@ struct ControlData {
   uint8_t JoystickCount{0};
 };
 
-struct JoystickRumbleData {
+struct JoystickOutput {
  public:
-  std::span<uint16_t> Rumbles() {
-    return std::span{RumbleStore.data(), GetCount()};
+  uint8_t R{0};
+  uint8_t G{0};
+  uint8_t B{0};
+  uint16_t LeftRumble{0};
+  uint16_t RightRumble{0};
+  uint16_t LeftTriggerRumble{0};
+  uint16_t RightTriggerRumble{0};
+
+  bool IsEmpty() const {
+    return R == 0 && G == 0 && B == 0 && LeftRumble == 0 && RightRumble == 0 &&
+           LeftTriggerRumble == 0 && RightTriggerRumble == 0;
+  }
+};
+
+struct JoystickOutputs {
+  std::span<JoystickOutput> Outputs() {
+    return std::span{OutputsStore.data(), GetOutputCount()};
   }
 
-  std::span<const uint16_t> Rumbles() const {
-    return std::span{RumbleStore.data(), GetCount()};
+  std::span<const JoystickOutput> Outputs() const {
+    return std::span{OutputsStore.data(), GetOutputCount()};
   }
 
-  void SetCount(uint8_t NewCount) {
-    Count = (std::min)(NewCount, static_cast<uint8_t>(MRC_MAX_NUM_RUMBLE));
-  }
+  size_t GetOutputCount() const { return OutputCount; }
 
-  size_t GetCount() const { return Count; }
+  void SetOutputCount(uint8_t NewCount) {
+    OutputCount =
+        (std::min)(NewCount, static_cast<uint8_t>(MRC_MAX_NUM_JOYSTICKS));
+  }
 
  private:
-  std::array<uint16_t, MRC_MAX_NUM_RUMBLE> RumbleStore;
-  uint8_t Count{0};
+  std::array<JoystickOutput, MRC_MAX_NUM_JOYSTICKS> OutputsStore;
+  uint8_t OutputCount{0};
 };
 
 enum class MatchType : uint8_t {
@@ -264,36 +304,9 @@ struct MatchInfo {
 
 struct JoystickDescriptor {
  public:
-  bool IsGamepad{0};
-  uint8_t Type{0};
-  uint8_t RumbleCount{0};
-
-  std::span<uint8_t> AxesTypes() {
-    return std::span{AxesTypesStore.data(), GetAxesCount()};
-  }
-
-  std::span<const uint8_t> AxesTypes() const {
-    return std::span{AxesTypesStore.data(), GetAxesCount()};
-  }
-
-  void SetAxesCount(uint8_t NewCount) {
-    AxesCount = (std::min)(NewCount, static_cast<uint8_t>(MRC_MAX_NUM_AXES));
-  }
-
-  size_t GetAxesCount() const { return AxesCount; }
-
-  void SetPovsCount(uint8_t NewCount) {
-    PovCount = (std::min)(NewCount, static_cast<uint8_t>(MRC_MAX_NUM_POVS));
-  }
-
-  size_t GetPovsCount() const { return PovCount; }
-
-  void SetButtonsCount(uint8_t NewCount) {
-    ButtonCount =
-        (std::min)(NewCount, static_cast<uint8_t>(MRC_MAX_NUM_BUTTONS));
-  }
-
-  size_t GetButtonsCount() const { return ButtonCount; }
+  bool IsGamepad{false};
+  uint8_t GamepadType{0};
+  uint8_t SupportedOutputs{0};
 
   void SetName(std::string_view Name) {
     if (Name.size() > MRC_MAX_JOYSTICK_NAME_LEN) {
@@ -322,10 +335,27 @@ struct JoystickDescriptor {
 
  private:
   std::string JoystickName;
-  std::array<uint8_t, MRC_MAX_NUM_AXES> AxesTypesStore;
-  uint8_t AxesCount{0};
-  uint8_t ButtonCount{0};
-  uint8_t PovCount{0};
+};
+
+struct JoystickDescriptors {
+  std::span<JoystickDescriptor> Descriptors() {
+    return std::span{DescriptorsStore.data(), GetDescriptorCount()};
+  }
+
+  std::span<const JoystickDescriptor> Descriptors() const {
+    return std::span{DescriptorsStore.data(), GetDescriptorCount()};
+  }
+
+  size_t GetDescriptorCount() const { return DescriptorCount; }
+
+  void SetDescriptorCount(uint8_t NewCount) {
+    DescriptorCount =
+        (std::min)(NewCount, static_cast<uint8_t>(MRC_MAX_NUM_JOYSTICKS));
+  }
+
+ private:
+  std::array<JoystickDescriptor, MRC_MAX_NUM_JOYSTICKS> DescriptorsStore;
+  uint8_t DescriptorCount{0};
 };
 
 struct ErrorInfo {

@@ -109,7 +109,8 @@ typedef struct HAL_JoystickButtons HAL_JoystickButtons;
 
 struct HAL_JoystickDescriptor {
   uint8_t isGamepad;
-  uint8_t type;
+  uint8_t gamepadType;
+  uint8_t supportedOutputs;
   char name[256];
 };
 typedef struct HAL_JoystickDescriptor HAL_JoystickDescriptor;

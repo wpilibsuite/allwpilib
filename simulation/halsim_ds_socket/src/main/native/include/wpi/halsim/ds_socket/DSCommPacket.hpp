@@ -52,7 +52,6 @@ class DSCommPacket {
   void SetControl(uint8_t control, uint8_t request);
   void SetAlliance(uint8_t station_code);
   void SetupSendHeader(wpi::net::raw_uv_ostream& buf);
-  void SetupJoystickTag(wpi::net::raw_uv_ostream& buf);
   void ReadMatchtimeTag(std::span<const uint8_t> tagData);
   void ReadJoystickTag(std::span<const uint8_t> data, int index);
   void ReadNewMatchInfoTag(std::span<const uint8_t> data);

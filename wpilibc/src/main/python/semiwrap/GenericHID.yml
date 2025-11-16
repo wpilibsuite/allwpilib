@@ -9,6 +9,7 @@ classes:
   wpi::GenericHID:
     enums:
       RumbleType:
+      SupportedOutputs:
       HIDType:
     methods:
       GenericHID:
@@ -34,11 +35,11 @@ classes:
       AxisLessThan:
       AxisGreaterThan:
       IsConnected:
-      GetType:
+      GetGamepadType:
+      GetSupportedOutputs:
       GetName:
       GetPort:
-      SetOutput:
-      SetOutputs:
+      SetLeds:
       SetRumble:
       GetAxesMaximumIndex:
       GetAxesAvailable:

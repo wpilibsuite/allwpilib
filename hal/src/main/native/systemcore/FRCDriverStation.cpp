@@ -22,8 +22,8 @@
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/proto/ControlData.h"
 #include "wpi/hal/proto/ErrorInfo.h"
-#include "wpi/hal/proto/JoystickDescriptor.h"
-#include "wpi/hal/proto/JoystickRumbleData.h"
+#include "wpi/hal/proto/JoystickDescriptors.h"
+#include "wpi/hal/proto/JoystickOutput.h"
 #include "wpi/hal/proto/MatchInfo.h"
 #include "wpi/hal/proto/OpMode.h"
 #include "wpi/nt/BooleanTopic.hpp"
@@ -72,17 +72,16 @@ struct SystemServerDriverStation {
   wpi::nt::ProtobufSubscriber<mrc::MatchInfo> matchInfoSubscriber;
   wpi::nt::StringSubscriber gameSpecificMessageSubscriber;
 
-  std::array<wpi::nt::ProtobufSubscriber<mrc::JoystickDescriptor>,
-             MRC_MAX_NUM_JOYSTICKS>
-      joystickDescriptorTopics;
+  wpi::nt::ProtobufSubscriber<mrc::JoystickDescriptors>
+      joystickDescriptorsTopic;
 
   wpi::nt::StringPublisher versionPublisher;
   wpi::nt::StringPublisher consoleLinePublisher;
   wpi::nt::ProtobufPublisher<mrc::ErrorInfo> errorInfoPublisher;
 
-  std::array<wpi::nt::ProtobufPublisher<mrc::JoystickRumbleData>,
+  std::array<wpi::nt::ProtobufPublisher<mrc::JoystickOutput>,
              MRC_MAX_NUM_JOYSTICKS>
-      joystickRumbleTopics;
+      joystickOutputTopics;
 
   wpi::nt::ProtobufPublisher<std::vector<mrc::OpMode>> teleopOpModes;
   wpi::nt::ProtobufPublisher<std::vector<mrc::OpMode>> autoOpModes;
@@ -95,6 +94,9 @@ struct SystemServerDriverStation {
   wpi::util::ProtobufMessage<mrc::ControlData> controlDataMsg;
   wpi::nt::Value lastValue;
 
+  wpi::util::mutex joystickOutputMutexes[MRC_MAX_NUM_JOYSTICKS];
+  mrc::JoystickOutput joystickOutputs[MRC_MAX_NUM_JOYSTICKS];
+
   explicit SystemServerDriverStation(wpi::nt::NetworkTableInstance inst) {
     ntInst = inst;
 
@@ -106,12 +108,11 @@ struct SystemServerDriverStation {
     hasUserCodeReadyPublisher =
         ntInst.GetBooleanTopic(ROBOT_HAS_USER_CODE_READY_PATH).Publish(options);
 
-    for (size_t count = 0; count < joystickRumbleTopics.size(); count++) {
-      std::string name = ROBOT_JOYSTICK_RUMBLE_PATH;
+    for (size_t count = 0; count < joystickOutputTopics.size(); count++) {
+      std::string name = ROBOT_JOYSTICK_OUTPUTS_PATH;
       name += std::to_string(count);
-      joystickRumbleTopics[count] =
-          ntInst.GetProtobufTopic<mrc::JoystickRumbleData>(name).Publish(
-              options);
+      joystickOutputTopics[count] =
+          ntInst.GetProtobufTopic<mrc::JoystickOutput>(name).Publish(options);
     }
 
     hasUserCodePublisher =
@@ -142,12 +143,10 @@ struct SystemServerDriverStation {
     gameSpecificMessageSubscriber =
         ntInst.GetStringTopic(ROBOT_GAME_SPECIFIC_MESSAGE_PATH).Subscribe({});
 
-    for (size_t count = 0; count < joystickDescriptorTopics.size(); count++) {
-      std::string name = ROBOT_JOYSTICK_DESCRIPTORS_PATH;
-      name += std::to_string(count);
-      joystickDescriptorTopics[count] =
-          ntInst.GetProtobufTopic<mrc::JoystickDescriptor>(name).Subscribe({});
-    }
+    joystickDescriptorsTopic = ntInst
+                                   .GetProtobufTopic<mrc::JoystickDescriptors>(
+                                       ROBOT_JOYSTICK_DESCRIPTORS_PATH)
+                                   .Subscribe({});
 
     teleopOpModes = ntInst
                         .GetProtobufTopic<std::vector<mrc::OpMode>>(
@@ -333,14 +332,17 @@ void TcpCache::Update() {
   }
   matchInfo.gameSpecificMessageSize = gameDataLen;
 
-  for (size_t count = 0;
-       count < systemServerDs->joystickDescriptorTopics.size(); count++) {
-    auto newDesc = systemServerDs->joystickDescriptorTopics[count].Get();
+  const auto descriptorsMsg = systemServerDs->joystickDescriptorsTopic.Get();
+  size_t descriptorCount = descriptorsMsg.GetDescriptorCount();
+
+  for (size_t count = 0; count < descriptorCount; count++) {
+    const auto& newDesc = descriptorsMsg.Descriptors()[count];
 
     auto& desc = descriptors[count];
 
     desc.isGamepad = newDesc.IsGamepad;
-    desc.type = newDesc.Type;
+    desc.supportedOutputs = newDesc.SupportedOutputs;
+    desc.gamepadType = newDesc.GamepadType;
 
     auto joystickName = newDesc.GetName();
     auto joystickNameLen =
@@ -519,12 +521,21 @@ HAL_Bool HAL_GetJoystickIsGamepad(int32_t joystickNum) {
   }
 }
 
-int32_t HAL_GetJoystickType(int32_t joystickNum) {
+int32_t HAL_GetJoystickGamepadType(int32_t joystickNum) {
   HAL_JoystickDescriptor joystickDesc;
   if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {
     return -1;
   } else {
-    return joystickDesc.type;
+    return joystickDesc.gamepadType;
+  }
+}
+
+int32_t HAL_GetJoystickSupportedOutputs(int32_t joystickNum) {
+  HAL_JoystickDescriptor joystickDesc;
+  if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {
+    return -1;
+  } else {
+    return joystickDesc.supportedOutputs;
   }
 }
 
@@ -539,22 +550,37 @@ void HAL_GetJoystickName(struct WPI_String* name, int32_t joystickNum) {
   std::memcpy(write, cName, len);
 }
 
-int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
-                               int32_t leftRumble, int32_t rightRumble) {
+int32_t HAL_SetJoystickRumble(int32_t joystickNum, int32_t leftRumble,
+                              int32_t rightRumble, int32_t leftTriggerRumble,
+                              int32_t rightTriggerRumble) {
   CHECK_JOYSTICK_NUMBER(joystickNum);
 
-  // TODO Update this API
+  std::scoped_lock lock{systemServerDs->joystickOutputMutexes[joystickNum]};
+  systemServerDs->joystickOutputs[joystickNum].LeftRumble =
+      std::clamp(leftRumble, 0, UINT16_MAX);
+  systemServerDs->joystickOutputs[joystickNum].RightRumble =
+      std::clamp(rightRumble, 0, UINT16_MAX);
+  systemServerDs->joystickOutputs[joystickNum].LeftTriggerRumble =
+      std::clamp(leftTriggerRumble, 0, UINT16_MAX);
+  systemServerDs->joystickOutputs[joystickNum].RightTriggerRumble =
+      std::clamp(rightTriggerRumble, 0, UINT16_MAX);
 
-  // mrc::JoystickOutputData outputData{
-  //     .HidOutputs = static_cast<uint32_t>(outputs),
-  //     .LeftRumble = std::clamp(leftRumble, 0, UINT16_MAX) /
-  //                   static_cast<float>(UINT16_MAX),
-  //     .RightRumble = std::clamp(rightRumble, 0, UINT16_MAX) /
-  //                    static_cast<float>(UINT16_MAX),
-  // };
+  systemServerDs->joystickOutputTopics[joystickNum].Set(
+      systemServerDs->joystickOutputs[joystickNum]);
 
-  // systemServerDs->joystickRumbleTopics[joystickNum].Set(outputData);
+  return 0;
+}
 
+int32_t HAL_SetJoystickLeds(int32_t joystickNum, int32_t leds) {
+  CHECK_JOYSTICK_NUMBER(joystickNum);
+
+  std::scoped_lock lock{systemServerDs->joystickOutputMutexes[joystickNum]};
+  systemServerDs->joystickOutputs[joystickNum].R = (leds >> 16) & 0xFF;
+  systemServerDs->joystickOutputs[joystickNum].G = (leds >> 8) & 0xFF;
+  systemServerDs->joystickOutputs[joystickNum].B = leds & 0xFF;
+
+  systemServerDs->joystickOutputTopics[joystickNum].Set(
+      systemServerDs->joystickOutputs[joystickNum]);
   return 0;
 }
 

@@ -261,7 +261,7 @@ void DSCommPacket::ReadJoystickDescriptionTag(std::span<const uint8_t> data) {
   DSCommJoystickPacket& packet = m_joystick_packets[joystickNum];
   packet.ResetTcp();
   packet.descriptor.isGamepad = data[1] != 0 ? 1 : 0;
-  packet.descriptor.type = data[2];
+  packet.descriptor.gamepadType = data[2];
   int nameLength =
       std::min<size_t>(data[3], (sizeof(packet.descriptor.name) - 1));
   for (int i = 0; i < nameLength; i++) {
@@ -283,7 +283,6 @@ void DSCommPacket::SendJoysticks(void) {
 
 void DSCommPacket::SetupSendBuffer(wpi::net::raw_uv_ostream& buf) {
   SetupSendHeader(buf);
-  SetupJoystickTag(buf);
 }
 
 void DSCommPacket::SetupSendHeader(wpi::net::raw_uv_ostream& buf) {
@@ -301,31 +300,6 @@ void DSCommPacket::SetupSendHeader(wpi::net::raw_uv_ostream& buf) {
 
   // Request (Always 0)
   buf << static_cast<uint8_t>(0);
-}
-
-void DSCommPacket::SetupJoystickTag(wpi::net::raw_uv_ostream& buf) {
-  static constexpr uint8_t kHIDTag = 0x01;
-
-  // HID tags are sent 1 per device
-  int64_t outputs;
-  int32_t rightRumble;
-  int32_t leftRumble;
-  for (size_t i = 0; i < m_joystick_packets.size(); i++) {
-    // Length is 9, 1 tag and 8 data.
-    buf << static_cast<uint8_t>(9) << kHIDTag;
-    HALSIM_GetJoystickOutputs(i, &outputs, &leftRumble, &rightRumble);
-    auto op = static_cast<uint32_t>(outputs);
-    auto rr = static_cast<uint16_t>(rightRumble);
-    auto lr = static_cast<uint16_t>(leftRumble);
-    buf.write((op >> 24 & 0xFF));
-    buf.write((op >> 16 & 0xFF));
-    buf.write((op >> 8 & 0xFF));
-    buf.write((op & 0xFF));
-    buf.write((rr >> 8 & 0xFF));
-    buf.write((rr & 0xFF));
-    buf.write((lr >> 8 & 0xFF));
-    buf.write((lr & 0xFF));
-  }
 }
 
 void DSCommPacket::SendUDPToHALSim(void) {

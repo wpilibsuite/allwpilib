@@ -17,7 +17,8 @@ classes:
       GetStickAxis:
       GetStickPOV:
       GetStickButtons:
-      GetJoystickType:
+      GetJoystickGamepadType:
+      GetJoystickSupportedOutputs:
       GetJoystickName:
       IsJoystickConnected:
       IsEnabled:

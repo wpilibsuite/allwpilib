@@ -245,10 +245,21 @@ class DriverStation final {
   /**
    * Returns the type of joystick at a given port.
    *
+   * This maps to SDL_GamepadType
+   *
    * @param stick The joystick port number
    * @return The HID type of joystick at the given port
    */
-  static int GetJoystickType(int stick);
+  static int GetJoystickGamepadType(int stick);
+
+  /**
+   * Returns the number of outputs supported by the joystick at the given
+   * port.
+   *
+   * @param stick The joystick port number
+   * @return The number of outputs supported by the joystick at the given port
+   */
+  static int GetJoystickSupportedOutputs(int stick);
 
   /**
    * Returns the name of the joystick at the given port.

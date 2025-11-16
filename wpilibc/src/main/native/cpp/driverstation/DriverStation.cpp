@@ -471,7 +471,7 @@ bool DriverStation::GetJoystickIsGamepad(int stick) {
   return static_cast<bool>(descriptor.isGamepad);
 }
 
-int DriverStation::GetJoystickType(int stick) {
+int DriverStation::GetJoystickGamepadType(int stick) {
   if (stick < 0 || stick >= kJoystickPorts) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return -1;
@@ -480,7 +480,19 @@ int DriverStation::GetJoystickType(int stick) {
   HAL_JoystickDescriptor descriptor;
   HAL_GetJoystickDescriptor(stick, &descriptor);
 
-  return static_cast<int>(descriptor.type);
+  return static_cast<int>(descriptor.gamepadType);
+}
+
+int DriverStation::GetJoystickSupportedOutputs(int stick) {
+  if (stick < 0 || stick >= kJoystickPorts) {
+    WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
+    return 0;
+  }
+
+  HAL_JoystickDescriptor descriptor;
+  HAL_GetJoystickDescriptor(stick, &descriptor);
+
+  return static_cast<int>(descriptor.supportedOutputs);
 }
 
 std::string DriverStation::GetJoystickName(int stick) {

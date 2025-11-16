@@ -38,7 +38,7 @@ namespace {
 struct HALJoystickData {
   HALJoystickData() {
     std::memset(&desc, 0, sizeof(desc));
-    desc.type = -1;
+    desc.gamepadType = 0;
     std::memset(&axes, 0, sizeof(axes));
     std::memset(&buttons, 0, sizeof(buttons));
     std::memset(&povs, 0, sizeof(povs));
@@ -426,7 +426,7 @@ void GlfwSystemJoystick::GetData(HALJoystickData* data, bool mapGamepad) const {
 
   // copy into HAL structures
   data->desc.isGamepad = m_isGamepad ? 1 : 0;
-  data->desc.type = m_isGamepad ? 21 : 20;
+  data->desc.gamepadType = m_isGamepad ? 21 : 20;
   std::strncpy(data->desc.name, m_name, sizeof(data->desc.name) - 1);
   data->desc.name[sizeof(data->desc.name) - 1] = '\0';
   int axesCount = (std::min)(m_axisCount, HAL_kMaxJoystickAxes);
@@ -555,7 +555,7 @@ KeyboardJoystick::KeyboardJoystick(wpi::glass::Storage& storage, int index)
 
   // init desc structure
   m_data.desc.isGamepad = 0;
-  m_data.desc.type = 20;
+  m_data.desc.gamepadType = 20;
   std::strncpy(m_data.desc.name, m_name, 256);
 }
 
@@ -1328,7 +1328,7 @@ static void DisplayJoysticks() {
       joy.GetHAL(i);
     }
 
-    if ((disableDS && joy.data.desc.type != 0) ||
+    if ((disableDS && joy.data.desc.gamepadType > 0) ||
         (joy.sys && joy.sys->IsPresent())) {
       // update GUI display
       ImGui::PushID(i);
