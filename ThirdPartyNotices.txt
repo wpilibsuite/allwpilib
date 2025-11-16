@@ -31,27 +31,27 @@ CoreUI                wpinet/src/main/native/resources/coreui-*
 Feather Icons         wpinet/src/main/native/resources/feather-*
 jQuery                wpinet/src/main/native/resources/jquery-*
 popper.js             wpinet/src/main/native/resources/popper-*
-units                 wpimath/src/main/native/include/units/
+units                 wpimath/src/main/native/include/wpi/units/
 Eigen                 wpimath/src/main/native/thirdparty/eigen/include/
-Team 254 Library      wpimath/src/main/java/edu/wpi/first/math/spline/SplineParameterizer.java
-                      wpimath/src/main/java/edu/wpi/first/math/trajectory/TrajectoryParameterizer.java
-                      wpimath/src/main/native/include/frc/spline/SplineParameterizer.h
-                      wpimath/src/main/native/include/frc/trajectory/TrajectoryParameterizer.h
+Team 254 Library      wpimath/src/main/java/org/wpilib/math/spline/SplineParameterizer.java
+                      wpimath/src/main/java/org/wpilib/math/trajectory/TrajectoryParameterizer.java
+                      wpimath/src/main/native/include/wpi/math/spline/SplineParameterizer.hpp
+                      wpimath/src/main/native/include/wpi/math/trajectory/TrajectoryParameterizer.hpp
                       wpimath/src/main/native/cpp/trajectory/TrajectoryParameterizer.cpp
-Portable File Dialogs wpigui/src/main/native/include/portable-file-dialogs.h
-V8 export-template    wpiutil/src/main/native/include/wpi/SymbolExports.h
+Portable File Dialogs wpigui/src/main/native/include/wpi/gui/portable-file-dialogs.h
+V8 export-template    wpiutil/src/main/native/include/wpi/SymbolExports.hpp
 GCEM                  wpimath/src/main/native/thirdparty/gcem/include/
 Sleipnir              wpimath/src/main/native/thirdparty/sleipnir
 Debugging             wpiutil/src/main/native/thirdparty/debugging
-argparse              wpiutil/src/main/native/thirdparty/argparse/include/wpi/argparse.h
+argparse              wpiutil/src/main/native/thirdparty/argparse/include/wpi/util/argparse.hpp
 apriltag              apriltag/src/main/native/thirdparty/apriltag
 glfw                  thirdparty/imgui_suite/glfw
 Dear ImGui            thirdparty/imgui_suite/imgui
 implot                thirdparty/imgui_suite/implot
 nanopb                wpiutil/src/main/native/thirdparty/nanopb
 upb                   wpiutil/src/main/native/thirdparty/upb
-mrcal                 wpical/src/main/native/thirdparty/mrcal
-libdogleg             wpical/src/main/native/thirdparty/libdogleg
+mrcal                 tools/wpical/src/main/native/thirdparty/mrcal
+libdogleg             tools/wpical/src/main/native/thirdparty/libdogleg
 Simd                  hal/src/main/native/systemcore/simd
 
 Additionally, glfw and nanopb were modified for use in WPILib.
