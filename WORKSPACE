@@ -58,9 +58,9 @@ RULES_JVM_EXTERNAL_TAG = "6.8"
 
 http_archive(
     name = "rules_jvm_external",
-    strip_prefix = "rules_jvm_external-%s" % RULES_JVM_EXTERNAL_TAG,
     sha256 = "704a0197e4e966f96993260418f2542568198490456c21814f647ae7091f56f2",
-    url = "https://github.com/bazel-contrib/rules_jvm_external/releases/download/{v}/rules_jvm_external-{v}.tar.gz".format(v = RULES_JVM_EXTERNAL_TAG)
+    strip_prefix = "rules_jvm_external-%s" % RULES_JVM_EXTERNAL_TAG,
+    url = "https://github.com/bazel-contrib/rules_jvm_external/releases/download/{v}/rules_jvm_external-{v}.tar.gz".format(v = RULES_JVM_EXTERNAL_TAG),
 )
 
 # Setup aspect lib
