@@ -327,10 +327,14 @@ void HAL_GetJoystickName(struct WPI_String* name, int32_t joystickNum) {
 int32_t HAL_SetJoystickRumble(int32_t joystickNum, int32_t leftRumble,
                               int32_t rightRumble, int32_t leftTriggerRumble,
                               int32_t rightTriggerRumble) {
+  SimDriverStationData->SetJoystickRumbles(joystickNum, leftRumble, rightRumble,
+                                           leftTriggerRumble,
+                                           rightTriggerRumble);
   return 0;
 }
 
 int32_t HAL_SetJoystickLeds(int32_t joystickNum, int32_t leds) {
+  SimDriverStationData->SetJoystickLeds(joystickNum, leds);
   return 0;
 }
 

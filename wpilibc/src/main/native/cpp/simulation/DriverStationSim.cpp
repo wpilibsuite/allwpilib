@@ -180,20 +180,30 @@ void DriverStationSim::SetSendConsoleLine(bool shouldSend) {
   }
 }
 
-int64_t DriverStationSim::GetJoystickOutputs(int stick) {
-  int64_t outputs = 0;
-  int32_t leftRumble;
-  int32_t rightRumble;
-  HALSIM_GetJoystickOutputs(stick, &outputs, &leftRumble, &rightRumble);
-  return outputs;
+int32_t DriverStationSim::GetJoystickLeds(int stick) {
+  int32_t leds = 0;
+  HALSIM_GetJoystickLeds(stick, &leds);
+  return leds;
 }
 
 int DriverStationSim::GetJoystickRumble(int stick, int rumbleNum) {
-  int64_t outputs;
   int32_t leftRumble = 0;
   int32_t rightRumble = 0;
-  HALSIM_GetJoystickOutputs(stick, &outputs, &leftRumble, &rightRumble);
-  return rumbleNum == 0 ? leftRumble : rightRumble;
+  int32_t leftTriggerRumble = 0;
+  int32_t rightTriggerRumble = 0;
+  HALSIM_GetJoystickRumbles(stick, &leftRumble, &rightRumble, &leftTriggerRumble, &rightTriggerRumble);
+  switch (rumbleNum) {
+    case 0:
+      return leftRumble;
+    case 1:
+      return rightRumble;
+    case 2:
+      return leftTriggerRumble;
+    case 3:
+      return rightTriggerRumble;
+    default:
+      return 0;
+  }
 }
 
 void DriverStationSim::SetJoystickButton(int stick, int button, bool state) {

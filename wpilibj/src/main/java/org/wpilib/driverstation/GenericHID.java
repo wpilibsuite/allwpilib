@@ -450,7 +450,8 @@ public class GenericHID {
   }
 
   /**
-   * Set leds on the controller. If only mono is supported, the system will use the highest value passed in.
+   * Set leds on the controller. If only mono is supported, the system will use the highest value
+   * passed in.
    *
    * @param r Red value from 0-255
    * @param g Green value from 0-255
@@ -476,11 +477,14 @@ public class GenericHID {
       case kRightRumble -> this.m_rightRumble = rumbleValue;
       case kLeftTriggerRumble -> this.m_leftTriggerRumble = rumbleValue;
       case kRightTriggerRumble -> this.m_rightTriggerRumble = rumbleValue;
-      default -> {
-      }
+      default -> {}
     }
 
     DriverStationJNI.setJoystickRumble(
-        (byte) this.m_port, this.m_leftRumble, this.m_rightRumble, this.m_leftTriggerRumble, this.m_rightTriggerRumble);
+        (byte) this.m_port,
+        this.m_leftRumble,
+        this.m_rightRumble,
+        this.m_leftTriggerRumble,
+        this.m_rightTriggerRumble);
   }
 }
