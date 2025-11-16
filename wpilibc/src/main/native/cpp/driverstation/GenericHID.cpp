@@ -135,8 +135,13 @@ bool GenericHID::IsConnected() const {
   return DriverStation::IsJoystickConnected(m_port);
 }
 
-GenericHID::HIDType GenericHID::GetType() const {
-  return static_cast<HIDType>(DriverStation::GetJoystickType(m_port));
+GenericHID::HIDType GenericHID::GetGamepadType() const {
+  return static_cast<HIDType>(DriverStation::GetJoystickGamepadType(m_port));
+}
+
+GenericHID::SupportedOutputs GenericHID::GetSupportedOutputs() const {
+  return static_cast<SupportedOutputs>(
+      DriverStation::GetJoystickSupportedOutputs(m_port));
 }
 
 std::string GenericHID::GetName() const {
@@ -147,16 +152,11 @@ int GenericHID::GetPort() const {
   return m_port;
 }
 
-void GenericHID::SetOutput(int outputNumber, bool value) {
-  m_outputs =
-      (m_outputs & ~(1 << (outputNumber - 1))) | (value << (outputNumber - 1));
-
-  HAL_SetJoystickOutputs(m_port, m_outputs, m_leftRumble, m_rightRumble);
-}
-
-void GenericHID::SetOutputs(int value) {
-  m_outputs = value;
-  HAL_SetJoystickOutputs(m_port, m_outputs, m_leftRumble, m_rightRumble);
+void GenericHID::SetLeds(int r, int g, int b) {
+  uint32_t value = (static_cast<uint32_t>(r & 0xFF) << 16) |
+                   (static_cast<uint32_t>(g & 0xFF) << 8) |
+                   static_cast<uint32_t>(b & 0xFF);
+  HAL_SetJoystickLeds(m_port, value);
 }
 
 void GenericHID::SetRumble(RumbleType type, double value) {
@@ -167,10 +167,12 @@ void GenericHID::SetRumble(RumbleType type, double value) {
     m_leftRumble = rumbleValue;
   } else if (type == kRightRumble) {
     m_rightRumble = rumbleValue;
-  } else {
-    m_leftRumble = rumbleValue;
-    m_rightRumble = rumbleValue;
+  } else if (type == kLeftTriggerRumble) {
+    m_leftTriggerRumble = rumbleValue;
+  } else if (type == kRightTriggerRumble) {
+    m_rightTriggerRumble = rumbleValue;
   }
 
-  HAL_SetJoystickOutputs(m_port, m_outputs, m_leftRumble, m_rightRumble);
+  HAL_SetJoystickRumble(m_port, m_leftRumble, m_rightRumble,
+                        m_leftTriggerRumble, m_rightTriggerRumble);
 }

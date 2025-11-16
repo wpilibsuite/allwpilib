@@ -85,7 +85,7 @@ std::optional<mrc::ControlData> wpi::util::Protobuf<mrc::ControlData>::Unpack(
   ControlData.SetJoystickCount(Joysticks.size());
 
   for (size_t i = 0; i < ControlData.GetJoystickCount(); i++) {
-    ControlData.Joysticks()[i] = Joysticks[i];
+    ControlData.Joysticks()[i] = std::move(Joysticks[i]);
   }
 
   return ControlData;

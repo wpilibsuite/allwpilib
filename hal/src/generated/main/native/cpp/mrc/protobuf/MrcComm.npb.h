@@ -47,21 +47,36 @@ typedef struct _mrc_proto_ProtobufJoystickDescriptor {
     static pb_filedesc_t file_descriptor(void) noexcept;
 
     pb_callback_t JoystickName;
-    pb_callback_t AxisTypes;
     bool IsGamepad;
-    int32_t JoystickType;
-    int32_t ButtonCount;
-    int32_t PovCount;
-    int32_t RumbleCount;
+    uint32_t GamepadType;
+    uint32_t SupportedOutputs;
 } mrc_proto_ProtobufJoystickDescriptor;
 
-typedef struct _mrc_proto_ProtobufJoystickRumbleData {
+typedef struct _mrc_proto_ProtobufJoystickDescriptors {
     static const pb_msgdesc_t* msg_descriptor(void) noexcept;
     static std::string_view msg_name(void) noexcept;
     static pb_filedesc_t file_descriptor(void) noexcept;
 
-    pb_callback_t Value;
-} mrc_proto_ProtobufJoystickRumbleData;
+    pb_callback_t Descriptors;
+} mrc_proto_ProtobufJoystickDescriptors;
+
+typedef struct _mrc_proto_ProtobufJoystickOutput {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
+    uint32_t LEDs;
+    uint32_t Rumble; /* 16 bits, left msb, right lsb */
+    uint32_t TriggerRumble; /* 16 bits, left msb, right lsb */
+} mrc_proto_ProtobufJoystickOutput;
+
+typedef struct _mrc_proto_ProtobufJoystickOutputs {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
+    pb_callback_t Outputs;
+} mrc_proto_ProtobufJoystickOutputs;
 
 typedef struct _mrc_proto_ProtobufMatchInfo {
     static const pb_msgdesc_t* msg_descriptor(void) noexcept;
@@ -103,24 +118,53 @@ typedef struct _mrc_proto_ProtobufAvailableOpModes {
     pb_callback_t Modes;
 } mrc_proto_ProtobufAvailableOpModes;
 
+typedef struct _mrc_proto_ProtobufErrorInfoTimestamp {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
+    pb_callback_t ErrorInfo;
+    uint64_t Timestamp;
+    int32_t SequenceNumber;
+    int32_t NumOccurances;
+} mrc_proto_ProtobufErrorInfoTimestamp;
+
+typedef struct _mrc_proto_ProtobufConsoleLineTimestamp {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
+    pb_callback_t ConsoleLine;
+    uint64_t Timestamp;
+    int32_t SequenceNumber;
+} mrc_proto_ProtobufConsoleLineTimestamp;
+
 
 /* Initializer values for message structs */
 #define mrc_proto_ProtobufJoystickData_init_default {0, 0, 0, {{NULL}, NULL}, 0, 0}
 #define mrc_proto_ProtobufControlData_init_default {0, 0, {{NULL}, NULL}, 0}
-#define mrc_proto_ProtobufJoystickDescriptor_init_default {{{NULL}, NULL}, {{NULL}, NULL}, 0, 0, 0, 0, 0}
-#define mrc_proto_ProtobufJoystickRumbleData_init_default {{{NULL}, NULL}}
+#define mrc_proto_ProtobufJoystickDescriptor_init_default {{{NULL}, NULL}, 0, 0, 0}
+#define mrc_proto_ProtobufJoystickDescriptors_init_default {{{NULL}, NULL}}
+#define mrc_proto_ProtobufJoystickOutput_init_default {0, 0, 0}
+#define mrc_proto_ProtobufJoystickOutputs_init_default {{{NULL}, NULL}}
 #define mrc_proto_ProtobufMatchInfo_init_default {{{NULL}, NULL}, 0, 0, 0}
 #define mrc_proto_ProtobufErrorInfo_init_default {0, 0, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}}
 #define mrc_proto_ProtobufOpMode_init_default    {0, {{NULL}, NULL}}
 #define mrc_proto_ProtobufAvailableOpModes_init_default {{{NULL}, NULL}}
+#define mrc_proto_ProtobufErrorInfoTimestamp_init_default {{{NULL}, NULL}, 0, 0, 0}
+#define mrc_proto_ProtobufConsoleLineTimestamp_init_default {{{NULL}, NULL}, 0, 0}
 #define mrc_proto_ProtobufJoystickData_init_zero {0, 0, 0, {{NULL}, NULL}, 0, 0}
 #define mrc_proto_ProtobufControlData_init_zero  {0, 0, {{NULL}, NULL}, 0}
-#define mrc_proto_ProtobufJoystickDescriptor_init_zero {{{NULL}, NULL}, {{NULL}, NULL}, 0, 0, 0, 0, 0}
-#define mrc_proto_ProtobufJoystickRumbleData_init_zero {{{NULL}, NULL}}
+#define mrc_proto_ProtobufJoystickDescriptor_init_zero {{{NULL}, NULL}, 0, 0, 0}
+#define mrc_proto_ProtobufJoystickDescriptors_init_zero {{{NULL}, NULL}}
+#define mrc_proto_ProtobufJoystickOutput_init_zero {0, 0, 0}
+#define mrc_proto_ProtobufJoystickOutputs_init_zero {{{NULL}, NULL}}
 #define mrc_proto_ProtobufMatchInfo_init_zero    {{{NULL}, NULL}, 0, 0, 0}
 #define mrc_proto_ProtobufErrorInfo_init_zero    {0, 0, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}}
 #define mrc_proto_ProtobufOpMode_init_zero       {0, {{NULL}, NULL}}
 #define mrc_proto_ProtobufAvailableOpModes_init_zero {{{NULL}, NULL}}
+#define mrc_proto_ProtobufErrorInfoTimestamp_init_zero {{{NULL}, NULL}, 0, 0, 0}
+#define mrc_proto_ProtobufConsoleLineTimestamp_init_zero {{{NULL}, NULL}, 0, 0}
 
 /* Field tags (for use in manual encoding/decoding) */
 #define mrc_proto_ProtobufJoystickData_AvailableButtons_tag 1
@@ -134,13 +178,14 @@ typedef struct _mrc_proto_ProtobufAvailableOpModes {
 #define mrc_proto_ProtobufControlData_Joysticks_tag 3
 #define mrc_proto_ProtobufControlData_CurrentOpMode_tag 4
 #define mrc_proto_ProtobufJoystickDescriptor_JoystickName_tag 1
-#define mrc_proto_ProtobufJoystickDescriptor_AxisTypes_tag 2
-#define mrc_proto_ProtobufJoystickDescriptor_IsGamepad_tag 3
-#define mrc_proto_ProtobufJoystickDescriptor_JoystickType_tag 4
-#define mrc_proto_ProtobufJoystickDescriptor_ButtonCount_tag 5
-#define mrc_proto_ProtobufJoystickDescriptor_PovCount_tag 6
-#define mrc_proto_ProtobufJoystickDescriptor_RumbleCount_tag 7
-#define mrc_proto_ProtobufJoystickRumbleData_Value_tag 3
+#define mrc_proto_ProtobufJoystickDescriptor_IsGamepad_tag 2
+#define mrc_proto_ProtobufJoystickDescriptor_GamepadType_tag 3
+#define mrc_proto_ProtobufJoystickDescriptor_SupportedOutputs_tag 4
+#define mrc_proto_ProtobufJoystickDescriptors_Descriptors_tag 1
+#define mrc_proto_ProtobufJoystickOutput_LEDs_tag 1
+#define mrc_proto_ProtobufJoystickOutput_Rumble_tag 2
+#define mrc_proto_ProtobufJoystickOutput_TriggerRumble_tag 3
+#define mrc_proto_ProtobufJoystickOutputs_Outputs_tag 1
 #define mrc_proto_ProtobufMatchInfo_EventName_tag 1
 #define mrc_proto_ProtobufMatchInfo_MatchNumber_tag 2
 #define mrc_proto_ProtobufMatchInfo_ReplayNumber_tag 3
@@ -153,6 +198,13 @@ typedef struct _mrc_proto_ProtobufAvailableOpModes {
 #define mrc_proto_ProtobufOpMode_Hash_tag        1
 #define mrc_proto_ProtobufOpMode_Name_tag        2
 #define mrc_proto_ProtobufAvailableOpModes_Modes_tag 1
+#define mrc_proto_ProtobufErrorInfoTimestamp_ErrorInfo_tag 1
+#define mrc_proto_ProtobufErrorInfoTimestamp_Timestamp_tag 2
+#define mrc_proto_ProtobufErrorInfoTimestamp_SequenceNumber_tag 3
+#define mrc_proto_ProtobufErrorInfoTimestamp_NumOccurances_tag 4
+#define mrc_proto_ProtobufConsoleLineTimestamp_ConsoleLine_tag 1
+#define mrc_proto_ProtobufConsoleLineTimestamp_Timestamp_tag 2
+#define mrc_proto_ProtobufConsoleLineTimestamp_SequenceNumber_tag 3
 
 /* Struct field encoding specification for nanopb */
 #define mrc_proto_ProtobufJoystickData_FIELDLIST(X, a) \
@@ -176,19 +228,30 @@ X(a, STATIC,   SINGULAR, FIXED64,  CurrentOpMode,     4)
 
 #define mrc_proto_ProtobufJoystickDescriptor_FIELDLIST(X, a) \
 X(a, CALLBACK, SINGULAR, STRING,   JoystickName,      1) \
-X(a, CALLBACK, REPEATED, INT32,    AxisTypes,         2) \
-X(a, STATIC,   SINGULAR, BOOL,     IsGamepad,         3) \
-X(a, STATIC,   SINGULAR, INT32,    JoystickType,      4) \
-X(a, STATIC,   SINGULAR, INT32,    ButtonCount,       5) \
-X(a, STATIC,   SINGULAR, INT32,    PovCount,          6) \
-X(a, STATIC,   SINGULAR, INT32,    RumbleCount,       7)
+X(a, STATIC,   SINGULAR, BOOL,     IsGamepad,         2) \
+X(a, STATIC,   SINGULAR, UINT32,   GamepadType,       3) \
+X(a, STATIC,   SINGULAR, UINT32,   SupportedOutputs,   4)
 #define mrc_proto_ProtobufJoystickDescriptor_CALLBACK pb_default_field_callback
 #define mrc_proto_ProtobufJoystickDescriptor_DEFAULT NULL
 
-#define mrc_proto_ProtobufJoystickRumbleData_FIELDLIST(X, a) \
-X(a, CALLBACK, REPEATED, UINT32,   Value,             3)
-#define mrc_proto_ProtobufJoystickRumbleData_CALLBACK pb_default_field_callback
-#define mrc_proto_ProtobufJoystickRumbleData_DEFAULT NULL
+#define mrc_proto_ProtobufJoystickDescriptors_FIELDLIST(X, a) \
+X(a, CALLBACK, REPEATED, MESSAGE,  Descriptors,       1)
+#define mrc_proto_ProtobufJoystickDescriptors_CALLBACK pb_default_field_callback
+#define mrc_proto_ProtobufJoystickDescriptors_DEFAULT NULL
+#define mrc_proto_ProtobufJoystickDescriptors_Descriptors_MSGTYPE mrc_proto_ProtobufJoystickDescriptor
+
+#define mrc_proto_ProtobufJoystickOutput_FIELDLIST(X, a) \
+X(a, STATIC,   SINGULAR, UINT32,   LEDs,              1) \
+X(a, STATIC,   SINGULAR, UINT32,   Rumble,            2) \
+X(a, STATIC,   SINGULAR, UINT32,   TriggerRumble,     3)
+#define mrc_proto_ProtobufJoystickOutput_CALLBACK NULL
+#define mrc_proto_ProtobufJoystickOutput_DEFAULT NULL
+
+#define mrc_proto_ProtobufJoystickOutputs_FIELDLIST(X, a) \
+X(a, CALLBACK, REPEATED, MESSAGE,  Outputs,           1)
+#define mrc_proto_ProtobufJoystickOutputs_CALLBACK pb_default_field_callback
+#define mrc_proto_ProtobufJoystickOutputs_DEFAULT NULL
+#define mrc_proto_ProtobufJoystickOutputs_Outputs_MSGTYPE mrc_proto_ProtobufJoystickOutput
 
 #define mrc_proto_ProtobufMatchInfo_FIELDLIST(X, a) \
 X(a, CALLBACK, SINGULAR, STRING,   EventName,         1) \
@@ -219,15 +282,36 @@ X(a, CALLBACK, REPEATED, MESSAGE,  Modes,             1)
 #define mrc_proto_ProtobufAvailableOpModes_DEFAULT NULL
 #define mrc_proto_ProtobufAvailableOpModes_Modes_MSGTYPE mrc_proto_ProtobufOpMode
 
+#define mrc_proto_ProtobufErrorInfoTimestamp_FIELDLIST(X, a) \
+X(a, CALLBACK, OPTIONAL, MESSAGE,  ErrorInfo,         1) \
+X(a, STATIC,   SINGULAR, UINT64,   Timestamp,         2) \
+X(a, STATIC,   SINGULAR, INT32,    SequenceNumber,    3) \
+X(a, STATIC,   SINGULAR, INT32,    NumOccurances,     4)
+#define mrc_proto_ProtobufErrorInfoTimestamp_CALLBACK pb_default_field_callback
+#define mrc_proto_ProtobufErrorInfoTimestamp_DEFAULT NULL
+#define mrc_proto_ProtobufErrorInfoTimestamp_ErrorInfo_MSGTYPE mrc_proto_ProtobufErrorInfo
+
+#define mrc_proto_ProtobufConsoleLineTimestamp_FIELDLIST(X, a) \
+X(a, CALLBACK, SINGULAR, STRING,   ConsoleLine,       1) \
+X(a, STATIC,   SINGULAR, UINT64,   Timestamp,         2) \
+X(a, STATIC,   SINGULAR, INT32,    SequenceNumber,    3)
+#define mrc_proto_ProtobufConsoleLineTimestamp_CALLBACK pb_default_field_callback
+#define mrc_proto_ProtobufConsoleLineTimestamp_DEFAULT NULL
+
 /* Maximum encoded size of messages (where known) */
 /* mrc_proto_ProtobufJoystickData_size depends on runtime parameters */
 /* mrc_proto_ProtobufControlData_size depends on runtime parameters */
 /* mrc_proto_ProtobufJoystickDescriptor_size depends on runtime parameters */
-/* mrc_proto_ProtobufJoystickRumbleData_size depends on runtime parameters */
+/* mrc_proto_ProtobufJoystickDescriptors_size depends on runtime parameters */
+/* mrc_proto_ProtobufJoystickOutputs_size depends on runtime parameters */
 /* mrc_proto_ProtobufMatchInfo_size depends on runtime parameters */
 /* mrc_proto_ProtobufErrorInfo_size depends on runtime parameters */
 /* mrc_proto_ProtobufOpMode_size depends on runtime parameters */
 /* mrc_proto_ProtobufAvailableOpModes_size depends on runtime parameters */
+/* mrc_proto_ProtobufErrorInfoTimestamp_size depends on runtime parameters */
+/* mrc_proto_ProtobufConsoleLineTimestamp_size depends on runtime parameters */
+#define MRC_PROTO_MRCCOMM_NPB_H_MAX_SIZE         mrc_proto_ProtobufJoystickOutput_size
+#define mrc_proto_ProtobufJoystickOutput_size    18
 
 
 #endif

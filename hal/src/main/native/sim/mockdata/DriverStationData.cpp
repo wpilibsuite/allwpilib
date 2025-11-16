@@ -43,7 +43,9 @@ void DriverStationData::ResetData() {
       m_joystickData[i].povs = HAL_JoystickPOVs{};
       m_joystickData[i].buttons = HAL_JoystickButtons{};
       m_joystickData[i].descriptor = HAL_JoystickDescriptor{};
-      m_joystickData[i].descriptor.type = -1;
+      m_joystickData[i].descriptor.gamepadType = 0;
+      m_joystickData[i].descriptor.isGamepad = 0;
+      m_joystickData[i].descriptor.supportedOutputs = 0;
       m_joystickData[i].descriptor.name[0] = '\0';
     }
   }
@@ -333,7 +335,7 @@ void DriverStationData::SetJoystickType(int32_t stick, int32_t type) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
-  m_joystickData[stick].descriptor.type = type;
+  m_joystickData[stick].descriptor.gamepadType = type;
   m_joystickDescriptorCallbacks(stick, &m_joystickData[stick].descriptor);
 }
 

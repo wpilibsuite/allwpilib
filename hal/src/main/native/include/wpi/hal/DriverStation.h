@@ -131,13 +131,20 @@ HAL_Bool HAL_GetJoystickIsGamepad(int32_t joystickNum);
 /**
  * Gets the type of joystick connected.
  *
- * This is device specific, and different depending on what system input type
- * the joystick uses.
+ * This maps to SDL_GamepadType
  *
  * @param joystickNum the joystick number
- * @return the enumerated joystick type
+ * @return the enumerated gamepad type
  */
-int32_t HAL_GetJoystickType(int32_t joystickNum);
+int32_t HAL_GetJoystickGamepadType(int32_t joystickNum);
+
+/**
+ * Gets the supported outputs of a specific joystick.
+ *
+ * @param joystickNum the joystick number
+ * @return bitmask of supported outputs
+ */
+int32_t HAL_GetJoystickSupportedOutputs(int32_t joystickNum);
 
 /**
  * Gets the name of a joystick.
@@ -150,16 +157,26 @@ int32_t HAL_GetJoystickType(int32_t joystickNum);
 void HAL_GetJoystickName(struct WPI_String* name, int32_t joystickNum);
 
 /**
- * Set joystick outputs.
+ * Set joystick rumbles.
  *
  * @param joystickNum the joystick number
- * @param outputs     bitmask of outputs, 1 for on 0 for off
  * @param leftRumble  the left rumble value (0-FFFF)
  * @param rightRumble the right rumble value (0-FFFF)
+ * @param leftTriggerRumble  the left trigger rumble value (0-FFFF)
+ * @param rightTriggerRumble the right trigger rumble value (0-FFFF)
  * @return the error code, or 0 for success
  */
-int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
-                               int32_t leftRumble, int32_t rightRumble);
+int32_t HAL_SetJoystickRumble(int32_t joystickNum, int32_t leftRumble,
+                              int32_t rightRumble, int32_t leftTriggerRumble,
+                              int32_t rightTriggerRumble);
+
+/**
+ * Set joystick LEDs.
+ * @param joystickNum the joystick number
+ * @param leds  the rgb led color value (0xRRGGBB)
+ * @return the error code, or 0 for success
+ */
+int32_t HAL_SetJoystickLeds(int32_t joystickNum, int32_t leds);
 
 /**
  * Return the approximate match time. The FMS does not send an official match

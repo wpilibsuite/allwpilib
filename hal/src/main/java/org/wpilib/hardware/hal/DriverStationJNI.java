@@ -167,17 +167,32 @@ public class DriverStationJNI extends JNIWrapper {
       long[] buttonsAndMetadata);
 
   /**
-   * Set joystick outputs.
+   * Set joystick rumbles.
    *
    * @param joystickNum the joystick number
-   * @param outputs bitmask of outputs, 1 for on 0 for off
    * @param leftRumble the left rumble value (0-FFFF)
    * @param rightRumble the right rumble value (0-FFFF)
+   * @param leftTriggerRumble the left trigger rumble value (0-FFFF)
+   * @param rightTriggerRumble the right trigger rumble value (0-FFFF)
    * @return the error code, or 0 for success
-   * @see "HAL_SetJoystickOutputs"
+   * @see "HAL_SetJoystickRumble"
    */
-  public static native int setJoystickOutputs(
-      byte joystickNum, int outputs, int leftRumble, int rightRumble);
+  public static native int setJoystickRumble(
+      byte joystickNum,
+      int leftRumble,
+      int rightRumble,
+      int leftTriggerRumble,
+      int rightTriggerRumble);
+
+  /**
+   * Sets the LEDs on a specific joystick.
+   *
+   * @param joystickNum the joystick number
+   * @param leds the rgb led color value (0xRRGGBB)
+   * @return the error code, or 0 for success
+   * @see "HAL_SetJoystickLeds"
+   */
+  public static native int setJoystickLeds(byte joystickNum, int leds);
 
   /**
    * Gets whether a specific joystick is considered to be an Gamepad.
@@ -196,9 +211,18 @@ public class DriverStationJNI extends JNIWrapper {
    *
    * @param joystickNum the joystick number
    * @return the enumerated joystick type
-   * @see "HAL_GetJoystickType"
+   * @see "HAL_GetJoystickGamepadType"
    */
-  public static native int getJoystickType(byte joystickNum);
+  public static native int getJoystickGamepadType(byte joystickNum);
+
+  /**
+   * Gets the supported outputs of a specific joystick.
+   *
+   * @param joystickNum the joystick number
+   * @return bitmask of supported outputs
+   * @see "HAL_GetJoystickSupportedOutputs"
+   */
+  public static native int getJoystickSupportedOutputs(byte joystickNum);
 
   /**
    * Gets the name of a joystick.
