@@ -30,7 +30,7 @@ classes:
       NotifyNewData:
       SetSendError:
       SetSendConsoleLine:
-      GetJoystickOutputs:
+      GetJoystickLeds:
       GetJoystickRumble:
       SetJoystickButton:
       SetJoystickAxis:
