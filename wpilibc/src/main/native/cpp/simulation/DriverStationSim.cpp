@@ -272,8 +272,12 @@ void DriverStationSim::SetJoystickIsGamepad(int stick, bool isGamepad) {
   HALSIM_SetJoystickIsGamepad(stick, isGamepad);
 }
 
-void DriverStationSim::SetJoystickType(int stick, int type) {
-  HALSIM_SetJoystickType(stick, type);
+void DriverStationSim::SetJoystickGamepadType(int stick, int type) {
+  HALSIM_SetJoystickGamepadType(stick, type);
+}
+
+void DriverStationSim::SetJoystickSupportedOutputs(int stick, int supportedOutputs) {
+  HALSIM_SetJoystickSupportedOutputs(stick, supportedOutputs);
 }
 
 void DriverStationSim::SetJoystickName(int stick, std::string_view name) {

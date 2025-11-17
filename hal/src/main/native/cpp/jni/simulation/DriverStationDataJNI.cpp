@@ -724,14 +724,26 @@ Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setJoystickIsGamepa
 
 /*
  * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
- * Method:    setJoystickType
+ * Method:    setJoystickGamepadType
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setJoystickType
+Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setJoystickGamepadType
   (JNIEnv*, jclass, jint stick, jint type)
 {
-  HALSIM_SetJoystickType(stick, type);
+  HALSIM_SetJoystickGamepadType(stick, type);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
+ * Method:    setJoystickSupportedOutputs
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setJoystickSupportedOutputs
+  (JNIEnv*, jclass, jint stick, jint supportedOutputs)
+{
+  HALSIM_SetJoystickSupportedOutputs(stick, supportedOutputs);
 }
 
 /*

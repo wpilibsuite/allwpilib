@@ -12,7 +12,8 @@ classes:
         overloads:
           int, DriverStation::POVDirection:
           DriverStation::POVDirection:
-      SetType:
+      SetGamepadType:
+      SetSupportedOutputs:
       SetName:
       GetLeds:
       GetRumble:

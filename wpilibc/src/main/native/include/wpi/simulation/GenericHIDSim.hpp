@@ -102,7 +102,9 @@ class GenericHIDSim {
    *
    * @param type the new device type
    */
-  void SetType(GenericHID::HIDType type);
+  void SetGamepadType(GenericHID::HIDType type);
+
+  void SetSupportedOutputs(GenericHID::SupportedOutputs supportedOutputs);
 
   /**
    * Set the name of this device.

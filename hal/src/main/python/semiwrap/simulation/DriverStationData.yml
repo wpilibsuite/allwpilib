@@ -82,7 +82,8 @@ functions:
   HALSIM_SetJoystickAxis:
   HALSIM_SetJoystickPOV:
   HALSIM_SetJoystickButtonsValue:
-  HALSIM_SetJoystickType:
+  HALSIM_SetJoystickGamepadType:
+  HALSIM_SetJoystickSupportedOutputs:
   HALSIM_SetJoystickName:
     cpp_code: |
       [](int32_t stick, std::string_view sv) {

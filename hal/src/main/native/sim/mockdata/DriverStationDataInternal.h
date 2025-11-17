@@ -115,8 +115,9 @@ class DriverStationData {
                              uint8_t* povsAvailable);
 
   void SetJoystickIsGamepad(int32_t stick, HAL_Bool isGamepad);
-  void SetJoystickType(int32_t stick, int32_t type);
+  void SetJoystickGamepadType(int32_t stick, int32_t type);
   void SetJoystickName(int32_t stick, std::string_view message);
+  void SetJoystickSupportedOutputs(int32_t stick, int32_t supportedOutputs);
 
   void SetGameSpecificMessage(std::string_view message);
   void SetEventName(std::string_view name);

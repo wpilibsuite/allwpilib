@@ -35,7 +35,8 @@ classes:
       SetJoystickButton:
       SetJoystickAxis:
       SetJoystickPOV:
-      SetJoystickType:
+      SetJoystickGamepadType:
+      SetJoystickSupportedOutputs:
       SetJoystickName:
       SetGameSpecificMessage:
       SetEventName:

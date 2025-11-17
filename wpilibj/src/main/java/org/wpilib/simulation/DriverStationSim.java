@@ -450,8 +450,18 @@ public final class DriverStationSim {
    * @param stick The joystick number
    * @param type The value of type
    */
-  public static void setJoystickType(int stick, int type) {
-    DriverStationDataJNI.setJoystickType(stick, type);
+  public static void setJoystickGamepadType(int stick, int type) {
+    DriverStationDataJNI.setJoystickGamepadType(stick, type);
+  }
+
+  /**
+   * Sets the value of supported outputs for a joystick.
+   *
+   * @param stick The joystick number
+   * @param supportedOutputs The value of supported outputs
+   */
+  public static void setJoystickSupportedOutputs(int stick, int supportedOutputs) {
+    DriverStationDataJNI.setJoystickSupportedOutputs(stick, supportedOutputs);
   }
 
   /**

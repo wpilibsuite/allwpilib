@@ -133,8 +133,17 @@ public class GenericHIDSim {
    *
    * @param type the new device type
    */
-  public void setType(GenericHID.HIDType type) {
-    DriverStationSim.setJoystickType(m_port, type.value);
+  public void setGamepadType(GenericHID.HIDType type) {
+    DriverStationSim.setJoystickGamepadType(m_port, type.value);
+  }
+
+  /**
+   * Set the supported outputs of this device.
+   *
+   * @param supportedOutputs the new supported outputs
+   */
+  public void setSupportedOutputs(int supportedOutputs) {
+    DriverStationSim.setJoystickSupportedOutputs(m_port, supportedOutputs);
   }
 
   /**

@@ -382,12 +382,22 @@ void DriverStationData::SetJoystickIsGamepad(int32_t stick,
   m_joystickDescriptorCallbacks(stick, &m_joystickData[stick].descriptor);
 }
 
-void DriverStationData::SetJoystickType(int32_t stick, int32_t type) {
+void DriverStationData::SetJoystickGamepadType(int32_t stick, int32_t type) {
   if (stick < 0 || stick >= kNumJoysticks) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
   m_joystickData[stick].descriptor.gamepadType = type;
+  m_joystickDescriptorCallbacks(stick, &m_joystickData[stick].descriptor);
+}
+
+void DriverStationData::SetJoystickSupportedOutputs(int32_t stick,
+                                                     int32_t supportedOutputs) {
+  if (stick < 0 || stick >= kNumJoysticks) {
+    return;
+  }
+  std::scoped_lock lock(m_joystickDataMutex);
+  m_joystickData[stick].descriptor.supportedOutputs = supportedOutputs;
   m_joystickDescriptorCallbacks(stick, &m_joystickData[stick].descriptor);
 }
 
@@ -601,8 +611,12 @@ void HALSIM_SetJoystickIsGamepad(int32_t stick, HAL_Bool isGamepad) {
   SimDriverStationData->SetJoystickIsGamepad(stick, isGamepad);
 }
 
-void HALSIM_SetJoystickType(int32_t stick, int32_t type) {
-  SimDriverStationData->SetJoystickType(stick, type);
+void HALSIM_SetJoystickGamepadType(int32_t stick, int32_t type) {
+  SimDriverStationData->SetJoystickGamepadType(stick, type);
+}
+
+void HALSIM_SetJoystickSupportedOutputs(int32_t stick, int32_t supportedOutputs) {
+  SimDriverStationData->SetJoystickSupportedOutputs(stick, supportedOutputs);
 }
 
 void HALSIM_SetJoystickName(int32_t stick, const WPI_String* name) {

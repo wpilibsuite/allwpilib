@@ -121,9 +121,11 @@ public class DriverStationDataJNI extends JNIWrapper {
 
   public static native void setJoystickIsGamepad(int stick, boolean isGamepad);
 
-  public static native void setJoystickType(int stick, int type);
+  public static native void setJoystickGamepadType(int stick, int type);
 
   public static native void setJoystickName(int stick, String name);
+
+  public static native void setJoystickSupportedOutputs(int stick, int supportedOutputs);
 
   public static native void setGameSpecificMessage(String message);
 

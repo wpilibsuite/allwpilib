@@ -60,8 +60,12 @@ void GenericHIDSim::SetButtonsAvailable(uint64_t count) {
   DriverStationSim::SetJoystickButtonsAvailable(m_port, count);
 }
 
-void GenericHIDSim::SetType(GenericHID::HIDType type) {
-  DriverStationSim::SetJoystickType(m_port, type);
+void GenericHIDSim::SetGamepadType(GenericHID::HIDType type) {
+  DriverStationSim::SetJoystickGamepadType(m_port, type);
+}
+
+void GenericHIDSim::SetSupportedOutputs(GenericHID::SupportedOutputs supportedOutputs) {
+  DriverStationSim::SetJoystickSupportedOutputs(m_port, supportedOutputs);
 }
 
 void GenericHIDSim::SetName(const char* name) {

@@ -347,7 +347,7 @@ class DriverStationSim {
    * @param stick The joystick number
    * @param type The value of type
    */
-  static void SetJoystickType(int stick, int type);
+  static void SetJoystickGamepadType(int stick, int type);
 
   /**
    * Sets the name of a joystick.
@@ -356,6 +356,14 @@ class DriverStationSim {
    * @param name The value of name
    */
   static void SetJoystickName(int stick, std::string_view name);
+
+  /**
+   * Sets the supported outputs for a joystick.
+   *
+   * @param stick The joystick number
+   * @param supportedOutputs The supported outputs for the joystick
+   */
+  static void SetJoystickSupportedOutputs(int stick, int supportedOutputs);
 
   /**
    * Sets the game specific message.
