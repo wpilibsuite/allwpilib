@@ -43,9 +43,10 @@ DEFINE_CAPI(POVs, povs)
 DEFINE_CAPI(Buttons, buttons)
 DEFINE_CAPI(Descriptor, descriptor)
 
-int32_t HALSIM_RegisterJoystickLedsCallback(
-    int32_t joystickNum, HAL_JoystickLedsCallback callback, void* param,
-    HAL_Bool initialNotify) {
+int32_t HALSIM_RegisterJoystickLedsCallback(int32_t joystickNum,
+                                            HAL_JoystickLedsCallback callback,
+                                            void* param,
+                                            HAL_Bool initialNotify) {
   return 0;
 }
 
@@ -64,12 +65,12 @@ int32_t HALSIM_RegisterJoystickRumblesCallback(
 void HALSIM_CancelJoystickRumblesCallback(int32_t uid) {}
 
 void HALSIM_GetJoystickRumbles(int32_t joystickNum, int32_t* leftRumble,
-                              int32_t* rightRumble, int32_t* leftTriggerRumble,
-                              int32_t* rightTriggerRumble) {}
+                               int32_t* rightRumble, int32_t* leftTriggerRumble,
+                               int32_t* rightTriggerRumble) {}
 
 void HALSIM_SetJoystickRumbles(int32_t joystickNum, int32_t leftRumble,
-                              int32_t rightRumble, int32_t leftTriggerRumble,
-                              int32_t rightTriggerRumble) {}
+                               int32_t rightRumble, int32_t leftTriggerRumble,
+                               int32_t rightTriggerRumble) {}
 
 int32_t HALSIM_RegisterMatchInfoCallback(HAL_MatchInfoCallback callback,
                                          void* param, HAL_Bool initialNotify) {

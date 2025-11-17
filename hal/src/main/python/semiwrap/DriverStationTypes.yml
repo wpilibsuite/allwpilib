@@ -37,7 +37,8 @@ classes:
       available:
   HAL_JoystickDescriptor:
     attributes:
-      type:
+      supportedOutputs:
+      gamepadType:
       name:
       isGamepad:
   HAL_MatchInfo:

@@ -257,7 +257,8 @@ class DriverStationSim {
    * Gets the joystick rumble.
    *
    * @param stick The joystick number
-   * @param rumbleNum Rumble to get (0=left, 1=right, 2=left trigger, 3=right trigger)
+   * @param rumbleNum Rumble to get (0=left, 1=right, 2=left trigger, 3=right
+   * trigger)
    * @return The joystick rumble value
    */
   static int GetJoystickRumble(int stick, int rumbleNum);

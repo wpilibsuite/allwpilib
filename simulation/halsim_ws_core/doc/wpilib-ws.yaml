@@ -450,7 +450,7 @@ components:
               maximum: 1.0
             <outputs:
               type: integer
-              description: "Bitmask of joystick HID outputs"
+              description: "LED Output Color (0xRRGGBB)"
 
     pcmData:
       type: object

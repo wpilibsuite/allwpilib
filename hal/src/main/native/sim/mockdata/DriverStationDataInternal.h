@@ -72,8 +72,8 @@ class DriverStationData {
                              const HAL_JoystickDescriptor* descriptor);
 
   int32_t RegisterJoystickLedsCallback(int32_t joystickNum,
-                                          HAL_JoystickLedsCallback callback,
-                                          void* param, HAL_Bool initialNotify);
+                                       HAL_JoystickLedsCallback callback,
+                                       void* param, HAL_Bool initialNotify);
   void CancelJoystickLedsCallback(int32_t uid);
   void GetJoystickLeds(int32_t joystickNum, int32_t* leds);
   void SetJoystickLeds(int32_t joystickNum, int32_t leds);
