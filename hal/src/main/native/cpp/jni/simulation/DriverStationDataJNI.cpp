@@ -493,18 +493,16 @@ Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setJoystickButtons
 
 /*
  * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
- * Method:    getJoystickOutputs
- * Signature: (I)J
+ * Method:    getJoystickLeds
+ * Signature: (I)I
  */
-JNIEXPORT jlong JNICALL
-Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_getJoystickOutputs
+JNIEXPORT jint JNICALL
+Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_getJoystickLeds
   (JNIEnv* env, jclass, jint stick)
 {
-  int64_t outputs = 0;
-  int32_t leftRumble;
-  int32_t rightRumble;
-  HALSIM_GetJoystickOutputs(stick, &outputs, &leftRumble, &rightRumble);
-  return outputs;
+  int32_t leds = 0;
+  HALSIM_GetJoystickLeds(stick, &leds);
+  return leds;
 }
 
 /*
@@ -516,11 +514,24 @@ JNIEXPORT jint JNICALL
 Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_getJoystickRumble
   (JNIEnv* env, jclass, jint stick, jint rumbleNum)
 {
-  int64_t outputs;
   int32_t leftRumble = 0;
   int32_t rightRumble = 0;
-  HALSIM_GetJoystickOutputs(stick, &outputs, &leftRumble, &rightRumble);
-  return rumbleNum == 0 ? leftRumble : rightRumble;
+  int32_t leftTriggerRumble = 0;
+  int32_t rightTriggerRumble = 0;
+  HALSIM_GetJoystickRumbles(stick, &leftRumble, &rightRumble,
+                            &leftTriggerRumble, &rightTriggerRumble);
+  switch (rumbleNum) {
+    case 0:
+      return leftRumble;
+    case 1:
+      return rightRumble;
+    case 2:
+      return leftTriggerRumble;
+    case 3:
+      return rightTriggerRumble;
+    default:
+      return 0;
+  }
 }
 
 /*
@@ -713,14 +724,26 @@ Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setJoystickIsGamepa
 
 /*
  * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
- * Method:    setJoystickType
+ * Method:    setJoystickGamepadType
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setJoystickType
+Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setJoystickGamepadType
   (JNIEnv*, jclass, jint stick, jint type)
 {
-  HALSIM_SetJoystickType(stick, type);
+  HALSIM_SetJoystickGamepadType(stick, type);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
+ * Method:    setJoystickSupportedOutputs
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setJoystickSupportedOutputs
+  (JNIEnv*, jclass, jint stick, jint supportedOutputs)
+{
+  HALSIM_SetJoystickSupportedOutputs(stick, supportedOutputs);
 }
 
 /*

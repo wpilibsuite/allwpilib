@@ -63,11 +63,16 @@ functions:
   HALSIM_CancelJoystickDescriptorCallback:
   HALSIM_GetJoystickDescriptor:
   HALSIM_SetJoystickDescriptor:
-  HALSIM_RegisterJoystickOutputsCallback:
+  HALSIM_RegisterJoystickLedsCallback:
     ignore: true
-  HALSIM_CancelJoystickOutputsCallback:
-  HALSIM_GetJoystickOutputs:
-  HALSIM_SetJoystickOutputs:
+  HALSIM_CancelJoystickLedsCallback:
+  HALSIM_GetJoystickLeds:
+  HALSIM_SetJoystickLeds:
+  HALSIM_RegisterJoystickRumblesCallback:
+    ignore: true
+  HALSIM_CancelJoystickRumblesCallback:
+  HALSIM_GetJoystickRumbles:
+  HALSIM_SetJoystickRumbles:
   HALSIM_RegisterMatchInfoCallback:
     ignore: true
   HALSIM_CancelMatchInfoCallback:
@@ -77,7 +82,8 @@ functions:
   HALSIM_SetJoystickAxis:
   HALSIM_SetJoystickPOV:
   HALSIM_SetJoystickButtonsValue:
-  HALSIM_SetJoystickType:
+  HALSIM_SetJoystickGamepadType:
+  HALSIM_SetJoystickSupportedOutputs:
   HALSIM_SetJoystickName:
     cpp_code: |
       [](int32_t stick, std::string_view sv) {

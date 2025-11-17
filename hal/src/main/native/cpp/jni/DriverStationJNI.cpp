@@ -171,14 +171,28 @@ Java_org_wpilib_hardware_hal_DriverStationJNI_getAllJoystickData
 
 /*
  * Class:     org_wpilib_hardware_hal_DriverStationJNI
- * Method:    setJoystickOutputs
- * Signature: (BIII)I
+ * Method:    setJoystickRumble
+ * Signature: (BIIII)I
  */
 JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_DriverStationJNI_setJoystickOutputs
-  (JNIEnv*, jclass, jbyte port, jint outputs, jint leftRumble, jint rightRumble)
+Java_org_wpilib_hardware_hal_DriverStationJNI_setJoystickRumble
+  (JNIEnv*, jclass, jbyte port, jint leftRumble, jint rightRumble,
+   jint leftTriggerRumble, jint rightTriggerRumble)
 {
-  return HAL_SetJoystickOutputs(port, outputs, leftRumble, rightRumble);
+  return HAL_SetJoystickRumble(port, leftRumble, rightRumble, leftTriggerRumble,
+                               rightTriggerRumble);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
+ * Method:    setJoystickLeds
+ * Signature: (BI)I
+ */
+JNIEXPORT jint JNICALL
+Java_org_wpilib_hardware_hal_DriverStationJNI_setJoystickLeds
+  (JNIEnv*, jclass, jbyte port, jint leds)
+{
+  return HAL_SetJoystickLeds(port, leds);
 }
 
 /*
@@ -195,14 +209,26 @@ Java_org_wpilib_hardware_hal_DriverStationJNI_getJoystickIsGamepad
 
 /*
  * Class:     org_wpilib_hardware_hal_DriverStationJNI
- * Method:    getJoystickType
+ * Method:    getJoystickSupportedOutputs
  * Signature: (B)I
  */
 JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_DriverStationJNI_getJoystickType
+Java_org_wpilib_hardware_hal_DriverStationJNI_getJoystickSupportedOutputs
   (JNIEnv*, jclass, jbyte port)
 {
-  return HAL_GetJoystickType(port);
+  return HAL_GetJoystickSupportedOutputs(port);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
+ * Method:    getJoystickGamepadType
+ * Signature: (B)I
+ */
+JNIEXPORT jint JNICALL
+Java_org_wpilib_hardware_hal_DriverStationJNI_getJoystickGamepadType
+  (JNIEnv*, jclass, jbyte port)
+{
+  return HAL_GetJoystickGamepadType(port);
 }
 
 /*

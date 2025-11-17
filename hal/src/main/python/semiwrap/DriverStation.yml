@@ -13,7 +13,8 @@ functions:
   HAL_GetJoystickButtons:
   HAL_GetAllJoystickData:
   HAL_GetJoystickDescriptor:
-  HAL_GetJoystickType:
+  HAL_GetJoystickGamepadType:
+  HAL_GetJoystickSupportedOutputs:
   HAL_GetJoystickName:
     param_override:
       name:
@@ -26,7 +27,8 @@ functions:
         WPI_FreeString(&name);
         return sname;
       }
-  HAL_SetJoystickOutputs:
+  HAL_SetJoystickLeds:
+  HAL_SetJoystickRumble:
   HAL_GetMatchTime:
   HAL_GetOutputsEnabled:
   HAL_GetMatchInfo:

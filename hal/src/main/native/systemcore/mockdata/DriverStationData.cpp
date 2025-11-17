@@ -43,19 +43,34 @@ DEFINE_CAPI(POVs, povs)
 DEFINE_CAPI(Buttons, buttons)
 DEFINE_CAPI(Descriptor, descriptor)
 
-int32_t HALSIM_RegisterJoystickOutputsCallback(
-    int32_t joystickNum, HAL_JoystickOutputsCallback callback, void* param,
+int32_t HALSIM_RegisterJoystickLedsCallback(int32_t joystickNum,
+                                            HAL_JoystickLedsCallback callback,
+                                            void* param,
+                                            HAL_Bool initialNotify) {
+  return 0;
+}
+
+void HALSIM_CancelJoystickLedsCallback(int32_t uid) {}
+
+void HALSIM_GetJoystickLeds(int32_t joystickNum, int32_t* leds) {}
+
+void HALSIM_SetJoystickLeds(int32_t joystickNum, int32_t leds) {}
+
+int32_t HALSIM_RegisterJoystickRumblesCallback(
+    int32_t joystickNum, HAL_JoystickRumblesCallback callback, void* param,
     HAL_Bool initialNotify) {
   return 0;
 }
 
-void HALSIM_CancelJoystickOutputsCallback(int32_t uid) {}
+void HALSIM_CancelJoystickRumblesCallback(int32_t uid) {}
 
-void HALSIM_GetJoystickOutputs(int32_t joystickNum, int64_t* outputs,
-                               int32_t* leftRumble, int32_t* rightRumble) {}
+void HALSIM_GetJoystickRumbles(int32_t joystickNum, int32_t* leftRumble,
+                               int32_t* rightRumble, int32_t* leftTriggerRumble,
+                               int32_t* rightTriggerRumble) {}
 
-void HALSIM_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
-                               int32_t leftRumble, int32_t rightRumble) {}
+void HALSIM_SetJoystickRumbles(int32_t joystickNum, int32_t leftRumble,
+                               int32_t rightRumble, int32_t leftTriggerRumble,
+                               int32_t rightTriggerRumble) {}
 
 int32_t HALSIM_RegisterMatchInfoCallback(HAL_MatchInfoCallback callback,
                                          void* param, HAL_Bool initialNotify) {
@@ -102,9 +117,12 @@ void HALSIM_GetJoystickAvailables(int32_t stick, uint16_t* axesAvailable,
 
 void HALSIM_SetJoystickIsGamepad(int32_t stick, HAL_Bool isGamepad) {}
 
-void HALSIM_SetJoystickType(int32_t stick, int32_t type) {}
+void HALSIM_SetJoystickGamepadType(int32_t stick, int32_t type) {}
 
 void HALSIM_SetJoystickName(int32_t stick, const struct WPI_String* name) {}
+
+void HALSIM_SetJoystickSupportedOutputs(int32_t stick,
+                                        int32_t supportedOutputs) {}
 
 void HALSIM_SetGameSpecificMessage(const struct WPI_String* message) {}
 

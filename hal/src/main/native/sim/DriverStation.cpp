@@ -295,12 +295,21 @@ HAL_Bool HAL_GetJoystickIsGamepad(int32_t joystickNum) {
   }
 }
 
-int32_t HAL_GetJoystickType(int32_t joystickNum) {
+int32_t HAL_GetJoystickGamepadType(int32_t joystickNum) {
   HAL_JoystickDescriptor joystickDesc;
   if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {
     return -1;
   } else {
-    return joystickDesc.type;
+    return joystickDesc.gamepadType;
+  }
+}
+
+int32_t HAL_GetJoystickSupportedOutputs(int32_t joystickNum) {
+  HAL_JoystickDescriptor joystickDesc;
+  if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {
+    return -1;
+  } else {
+    return joystickDesc.supportedOutputs;
   }
 }
 
@@ -315,10 +324,17 @@ void HAL_GetJoystickName(struct WPI_String* name, int32_t joystickNum) {
   std::memcpy(write, cName, len);
 }
 
-int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
-                               int32_t leftRumble, int32_t rightRumble) {
-  SimDriverStationData->SetJoystickOutputs(joystickNum, outputs, leftRumble,
-                                           rightRumble);
+int32_t HAL_SetJoystickRumble(int32_t joystickNum, int32_t leftRumble,
+                              int32_t rightRumble, int32_t leftTriggerRumble,
+                              int32_t rightTriggerRumble) {
+  SimDriverStationData->SetJoystickRumbles(joystickNum, leftRumble, rightRumble,
+                                           leftTriggerRumble,
+                                           rightTriggerRumble);
+  return 0;
+}
+
+int32_t HAL_SetJoystickLeds(int32_t joystickNum, int32_t leds) {
+  SimDriverStationData->SetJoystickLeds(joystickNum, leds);
   return 0;
 }
 

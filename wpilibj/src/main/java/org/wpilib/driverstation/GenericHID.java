@@ -26,46 +26,36 @@ public class GenericHID {
     kLeftRumble,
     /** Right rumble motor. */
     kRightRumble,
-    /** Both left and right rumble motors. */
-    kBothRumble
+    /** Left trigger rumble motor. */
+    kLeftTriggerRumble,
+    /** Right trigger rumble motor. */
+    kRightTriggerRumble,
   }
 
   /** USB HID interface type. */
   public enum HIDType {
     /** Unknown. */
-    kUnknown(-1),
-    /** XInputUnknown. */
-    kXInputUnknown(0),
-    /** XInputGamepad. */
-    kXInputGamepad(1),
-    /** XInputWheel. */
-    kXInputWheel(2),
-    /** XInputArcadeStick. */
-    kXInputArcadeStick(3),
-    /** XInputFlightStick. */
-    kXInputFlightStick(4),
-    /** XInputDancePad. */
-    kXInputDancePad(5),
-    /** XInputGuitar. */
-    kXInputGuitar(6),
-    /** XInputGuitar2. */
-    kXInputGuitar2(7),
-    /** XInputDrumKit. */
-    kXInputDrumKit(8),
-    /** XInputGuitar3. */
-    kXInputGuitar3(11),
-    /** XInputArcadePad. */
-    kXInputArcadePad(19),
-    /** HIDJoystick. */
-    kHIDJoystick(20),
-    /** HIDGamepad. */
-    kHIDGamepad(21),
-    /** HIDDriving. */
-    kHIDDriving(22),
-    /** HIDFlight. */
-    kHIDFlight(23),
-    /** HID1stPerson. */
-    kHID1stPerson(24);
+    kUnknown(0),
+    /** Standard. */
+    kStandard(1),
+    /** Xbox 360. */
+    kXbox360(2),
+    /** Xbox One. */
+    kXboxOne(3),
+    /** PS3. */
+    kPS3(4),
+    /** PS4. */
+    kPS4(5),
+    /** PS5. */
+    kPS5(6),
+    /** Switch Pro. */
+    kSwitchPro(7),
+    /** Switch Joycon Left. */
+    kSwitchJoyconLeft(8),
+    /** Switch Joycon Right. */
+    kSwitchJoyconRight(9),
+    /** Switch Joycon Pair. */
+    kSwitchJoyconPair(10);
 
     /** HIDType value. */
     public final int value;
@@ -94,9 +84,10 @@ public class GenericHID {
   }
 
   private final int m_port;
-  private int m_outputs;
   private int m_leftRumble;
   private int m_rightRumble;
+  private int m_leftTriggerRumble;
+  private int m_rightTriggerRumble;
   private final Map<EventLoop, Map<Integer, BooleanEvent>> m_buttonCache = new HashMap<>();
   private final Map<EventLoop, Map<Pair<Integer, Double>, BooleanEvent>> m_axisLessThanCache =
       new HashMap<>();
@@ -432,8 +423,17 @@ public class GenericHID {
    *
    * @return the type of the HID.
    */
-  public HIDType getType() {
-    return HIDType.of(DriverStation.getJoystickType(m_port));
+  public HIDType getGamepadType() {
+    return HIDType.of(DriverStation.getJoystickGamepadType(m_port));
+  }
+
+  /**
+   * Get the supported outputs for the HID.
+   *
+   * @return the supported outputs for the HID.
+   */
+  public int getSupportedOutputs() {
+    return DriverStation.getJoystickSupportedOutputs(m_port);
   }
 
   /**
@@ -455,24 +455,16 @@ public class GenericHID {
   }
 
   /**
-   * Set a single HID output value for the HID.
+   * Set leds on the controller. If only mono is supported, the system will use the highest value
+   * passed in.
    *
-   * @param outputNumber The index of the output to set (1-32)
-   * @param value The value to set the output to
+   * @param r Red value from 0-255
+   * @param g Green value from 0-255
+   * @param b Blue value from 0-255
    */
-  public void setOutput(int outputNumber, boolean value) {
-    m_outputs = (m_outputs & ~(1 << (outputNumber - 1))) | ((value ? 1 : 0) << (outputNumber - 1));
-    DriverStationJNI.setJoystickOutputs((byte) m_port, m_outputs, m_leftRumble, m_rightRumble);
-  }
-
-  /**
-   * Set all HID output values for the HID.
-   *
-   * @param value The 32 bit output value (1 bit for each output)
-   */
-  public void setOutputs(int value) {
-    m_outputs = value;
-    DriverStationJNI.setJoystickOutputs((byte) m_port, m_outputs, m_leftRumble, m_rightRumble);
+  public void setLeds(int r, int g, int b) {
+    int value = ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | (b & 0xFF);
+    DriverStationJNI.setJoystickLeds((byte) m_port, value);
   }
 
   /**
@@ -486,15 +478,27 @@ public class GenericHID {
     value = Math.clamp(value, 0, 1);
     int rumbleValue = (int) (value * 65535);
     switch (type) {
-      case kLeftRumble -> this.m_leftRumble = rumbleValue;
-      case kRightRumble -> this.m_rightRumble = rumbleValue;
-      default -> {
+      case kLeftRumble:
         this.m_leftRumble = rumbleValue;
+        break;
+      case kRightRumble:
         this.m_rightRumble = rumbleValue;
-      }
+        break;
+      case kLeftTriggerRumble:
+        this.m_leftTriggerRumble = rumbleValue;
+        break;
+      case kRightTriggerRumble:
+        this.m_rightTriggerRumble = rumbleValue;
+        break;
+      default:
+        break;
     }
 
-    DriverStationJNI.setJoystickOutputs(
-        (byte) this.m_port, this.m_outputs, this.m_leftRumble, this.m_rightRumble);
+    DriverStationJNI.setJoystickRumble(
+        (byte) this.m_port,
+        this.m_leftRumble,
+        this.m_rightRumble,
+        this.m_leftTriggerRumble,
+        this.m_rightTriggerRumble);
   }
 }
