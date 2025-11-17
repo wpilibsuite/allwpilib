@@ -68,7 +68,7 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
     this.rOhms = nominalVoltageVolts / this.stallCurrentAmps;
     this.KvRadPerSecPerVolt =
         freeSpeedRadPerSec / (nominalVoltageVolts - rOhms * this.freeCurrentAmps);
-    this.KtNMPerAmp = this.stallTorqueNewtonMeters / this.stallCurrentAmps;
+    this.KtNMPerAmp = this.stallTorqueNewtonMeters / (this.stallCurrentAmps - this.freeCurrentAmps);
   }
 
   /**
@@ -89,7 +89,7 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
    * @return The current drawn by the motor.
    */
   public double getCurrent(double torqueNm) {
-    return torqueNm / KtNMPerAmp;
+    return torqueNm / KtNMPerAmp + freeCurrentAmps;
   }
 
   /**
@@ -99,7 +99,7 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
    * @return The torque output.
    */
   public double getTorque(double currentAmpere) {
-    return currentAmpere * KtNMPerAmp;
+    return (currentAmpere - freeCurrentAmps) * KtNMPerAmp;
   }
 
   /**
@@ -110,7 +110,7 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
    * @return The voltage of the motor.
    */
   public double getVoltage(double torqueNm, double speedRadiansPerSec) {
-    return 1.0 / KvRadPerSecPerVolt * speedRadiansPerSec + 1.0 / KtNMPerAmp * rOhms * torqueNm;
+    return 1.0 / KvRadPerSecPerVolt * speedRadiansPerSec + 1.0 / KtNMPerAmp * rOhms * torqueNm + freeCurrentAmps * rOhms;
   }
 
   /**
@@ -122,7 +122,7 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
    */
   public double getSpeed(double torqueNm, double voltageInputVolts) {
     return voltageInputVolts * KvRadPerSecPerVolt
-        - 1.0 / KtNMPerAmp * torqueNm * rOhms * KvRadPerSecPerVolt;
+        - 1.0 / KtNMPerAmp * torqueNm * rOhms * KvRadPerSecPerVolt - KvRadPerSecPerVolt * freeCurrentAmps * rOhms;
   }
 
   /**
