@@ -76,7 +76,7 @@ classes:
     inline_code: |
       .def("__repr__", [](const ConnectionInfo &self) -> py::str {
         return py::str("<ConnectionInfo id={} addr={}:{} last_update={} protocol={}>")
-          .format(self.remote_id, self.remote_ip, self.remote_port, 
+          .format(self.remote_id, self.remote_ip, self.remote_port,
                   self.last_update, self.protocol_version);
       })
   wpi::nt::ValueEventData:
@@ -250,8 +250,8 @@ classes:
         py::arg("excludeSelf") = false,
         py::arg("hidden") = false,
         R"(
-            
-            
+
+
             :param pollStorage:      Polling storage size for a subscription. Specifies the maximum number of
                                      updates NetworkTables should store between calls to the subscriber's
                                      ReadQueue() function. If zero, defaults to 1 if sendAll is false, 20 if

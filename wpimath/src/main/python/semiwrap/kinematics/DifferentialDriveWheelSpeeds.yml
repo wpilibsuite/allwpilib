@@ -35,7 +35,7 @@ inline_code: |
         self->left = left;
       }
     )
-    .def_property("right_fps", 
+    .def_property("right_fps",
       [](DifferentialDriveWheelSpeeds * self) -> wpi::units::feet_per_second_t {
         return self->right;
       },
@@ -50,4 +50,3 @@ inline_code: |
   ;
 
   SetupWPyStruct<wpi::math::DifferentialDriveWheelSpeeds>(cls_DifferentialDriveWheelSpeeds);
-

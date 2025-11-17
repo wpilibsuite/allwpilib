@@ -46,7 +46,7 @@ inline_code: |
         self->frontLeft = fps;
       }
     )
-    .def_property("frontRight_fps", 
+    .def_property("frontRight_fps",
       [](MecanumDriveWheelSpeeds * self) -> wpi::units::feet_per_second_t {
         return self->frontRight;
       },
@@ -62,7 +62,7 @@ inline_code: |
         self->rearLeft = fps;
       }
     )
-    .def_property("rearRight_fps", 
+    .def_property("rearRight_fps",
       [](MecanumDriveWheelSpeeds * self) -> wpi::units::feet_per_second_t {
         return self->rearRight;
       },
