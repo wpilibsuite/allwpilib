@@ -6,50 +6,60 @@
     "buttons": [
       {
         "name": "a",
-        "value": 0,
+        "niValue": 0,
+        "sdlValue": 0,
         "DocName": "A"
       },
       {
         "name": "b",
-        "value": 1,
+        "niValue": 1,
+        "sdlValue": 1,
         "DocName": "B"
       },
       {
         "name": "x",
-        "value": 2,
+        "niValue": 2,
+        "sdlValue": 2,
         "DocName": "X"
       },
       {
         "name": "y",
-        "value": 3,
+        "niValue": 3,
+        "sdlValue": 3,
         "DocName": "Y"
       },
       {
         "name": "leftBumper",
-        "value": 4,
+        "niValue": 4,
+        "sdlValue": 4,
         "DocName": "left bumper"
       },
       {
         "name": "rightBumper",
-        "value": 5,
+        "niValue": 5,
+        "sdlValue": 5,
         "DocName": "right bumper"
       },
       {
         "name": "back",
-        "value": 6
+        "niValue": 6,
+        "sdlValue": 6
       },
       {
         "name": "start",
-        "value": 7
+        "niValue": 7,
+        "sdlValue": 7
       },
       {
         "name": "leftStick",
-        "value": 8,
+        "niValue": 8,
+        "sdlValue": 8,
         "DocName": "left stick"
       },
       {
         "name": "rightStick",
-        "value": 9,
+        "niValue": 9,
+        "sdlValue": 9,
         "DocName": "right stick"
       }
     ],
@@ -59,7 +69,8 @@
           "left",
           "X"
         ],
-        "value": 0,
+        "niValue": 0,
+        "sdlValue": 0,
         "PositiveDirection": "Right"
       },
       {
@@ -67,7 +78,8 @@
           "right",
           "X"
         ],
-        "value": 4,
+        "niValue": 4,
+        "sdlValue": 4,
         "PositiveDirection": "Right"
       },
       {
@@ -75,7 +87,8 @@
           "left",
           "Y"
         ],
-        "value": 1,
+        "niValue": 1,
+        "sdlValue": 1,
         "PositiveDirection": "Back"
       },
       {
@@ -83,20 +96,23 @@
           "right",
           "Y"
         ],
-        "value": 5,
+        "niValue": 5,
+        "sdlValue": 5,
         "PositiveDirection": "Back"
       }
     ],
     "triggers": [
       {
         "name": "leftTrigger",
-        "value": 2,
+        "niValue": 2,
+        "sdlValue": 2,
         "DocName": "left trigger",
         "UseThresholdMethods": true
       },
       {
         "name": "rightTrigger",
-        "value": 3,
+        "niValue": 3,
+        "sdlValue": 3,
         "DocName": "right trigger",
         "UseThresholdMethods": true
       }
@@ -109,66 +125,80 @@
     "buttons": [
       {
         "name": "square",
-        "value": 0
+        "niValue": 0,
+        "sdlValue": 0
       },
       {
         "name": "cross",
-        "value": 1
+        "niValue": 1,
+        "sdlValue": 1
       },
       {
         "name": "circle",
-        "value": 2
+        "niValue": 2,
+        "sdlValue": 2
       },
       {
         "name": "triangle",
-        "value": 3
+        "niValue": 3,
+        "sdlValue": 3
       },
       {
         "name": "L1",
-        "value": 4,
+        "niValue": 4,
+        "sdlValue": 4,
         "DocName": "left trigger 1"
       },
       {
         "name": "R1",
-        "value": 5,
+        "niValue": 5,
+        "sdlValue": 5,
         "DocName": "right trigger 1"
       },
       {
         "name": "L2",
-        "value": 6,
+        "niValue": 6,
+        "sdlValue": 6,
         "DocName": "left trigger 2"
       },
       {
         "name": "R2",
-        "value": 7,
+        "niValue": 7,
+        "sdlValue": 7,
         "DocName": "right trigger 2"
       },
       {
         "name": "share",
-        "value": 8
+        "niValue": 8,
+        "sdlValue": 8
       },
       {
         "name": "options",
-        "value": 9
+        "niValue": 9,
+        "sdlValue": 9
       },
       {
         "name": "L3",
-        "value": 10,
+        "niValue": 10,
+        "sdlValue": 10,
         "DocName": "L3 (left stick)"
       },
       {
         "name": "R3",
-        "value": 11,
+        "niValue": 11,
+        "sdlValue": 11,
         "DocName": "R3 (right stick)"
       },
       {
         "name": "PS",
-        "value": 12,
+        "niValue": 12,
+        "sdlValue": 12,
         "DocName": "PlayStation"
       },
       {
         "name": "touchpad",
-        "value": 13
+        "niValue": 13,
+        "sdlValue": 13
       }
     ],
     "sticks": [
@@ -177,7 +207,8 @@
           "left",
           "X"
         ],
-        "value": 0,
+        "niValue": 0,
+        "sdlValue": 0,
         "PositiveDirection": "Right"
       },
       {
@@ -185,7 +216,8 @@
           "left",
           "Y"
         ],
-        "value": 1,
+        "niValue": 1,
+        "sdlValue": 1,
         "PositiveDirection": "Back"
       },
       {
@@ -193,7 +225,8 @@
           "right",
           "X"
         ],
-        "value": 2,
+        "niValue": 2,
+        "sdlValue": 2,
         "PositiveDirection": "Right"
       },
       {
@@ -201,20 +234,23 @@
           "right",
           "Y"
         ],
-        "value": 5,
+        "niValue": 5,
+        "sdlValue": 5,
         "PositiveDirection": "Back"
       }
     ],
     "triggers": [
       {
         "name": "L2",
-        "value": 3,
+        "niValue": 3,
+        "sdlValue": 3,
         "DocName": "left trigger 2",
         "UseThresholdMethods": false
       },
       {
         "name": "R2",
-        "value": 4,
+        "niValue": 4,
+        "sdlValue": 4,
         "DocName": "right trigger 2",
         "UseThresholdMethods": false
       }
@@ -227,66 +263,80 @@
     "buttons": [
       {
         "name": "square",
-        "value": 0
+        "niValue": 0,
+        "sdlValue": 0
       },
       {
         "name": "cross",
-        "value": 1
+        "niValue": 1,
+        "sdlValue": 1
       },
       {
         "name": "circle",
-        "value": 2
+        "niValue": 2,
+        "sdlValue": 2
       },
       {
         "name": "triangle",
-        "value": 3
+        "niValue": 3,
+        "sdlValue": 3
       },
       {
         "name": "L1",
-        "value": 4,
+        "niValue": 4,
+        "sdlValue": 4,
         "DocName": "left trigger 1"
       },
       {
         "name": "R1",
-        "value": 5,
+        "niValue": 5,
+        "sdlValue": 5,
         "DocName": "right trigger 1"
       },
       {
         "name": "L2",
-        "value": 6,
+        "niValue": 6,
+        "sdlValue": 6,
         "DocName": "left trigger 2"
       },
       {
         "name": "R2",
-        "value": 7,
+        "niValue": 7,
+        "sdlValue": 7,
         "DocName": "right trigger 2"
       },
       {
         "name": "create",
-        "value": 8
+        "niValue": 8,
+        "sdlValue": 8
       },
       {
         "name": "options",
-        "value": 9
+        "niValue": 9,
+        "sdlValue": 9
       },
       {
         "name": "L3",
-        "value": 10,
+        "niValue": 10,
+        "sdlValue": 10,
         "DocName": "L3 (left stick)"
       },
       {
         "name": "R3",
-        "value": 11,
+        "niValue": 11,
+        "sdlValue": 11,
         "DocName": "R3 (right stick)"
       },
       {
         "name": "PS",
-        "value": 12,
+        "niValue": 12,
+        "sdlValue": 12,
         "DocName": "PlayStation"
       },
       {
         "name": "touchpad",
-        "value": 13
+        "niValue": 13,
+        "sdlValue": 13
       }
     ],
     "sticks": [
@@ -295,7 +345,8 @@
           "left",
           "X"
         ],
-        "value": 0,
+        "niValue": 0,
+        "sdlValue": 0,
         "PositiveDirection": "Right"
       },
       {
@@ -303,7 +354,8 @@
           "left",
           "Y"
         ],
-        "value": 1,
+        "niValue": 1,
+        "sdlValue": 1,
         "PositiveDirection": "Back"
       },
       {
@@ -311,7 +363,8 @@
           "right",
           "X"
         ],
-        "value": 2,
+        "niValue": 2,
+        "sdlValue": 2,
         "PositiveDirection": "Right"
       },
       {
@@ -319,20 +372,23 @@
           "right",
           "Y"
         ],
-        "value": 5,
+        "niValue": 5,
+        "sdlValue": 5,
         "PositiveDirection": "Back"
       }
     ],
     "triggers": [
       {
         "name": "L2",
-        "value": 3,
+        "niValue": 3,
+        "sdlValue": 3,
         "DocName": "left trigger 2",
         "UseThresholdMethods": false
       },
       {
         "name": "R2",
-        "value": 4,
+        "niValue": 4,
+        "sdlValue": 4,
         "DocName": "right trigger 2",
         "UseThresholdMethods": false
       }
@@ -345,73 +401,88 @@
     "buttons": [
       {
         "name": "a",
-        "value": 0,
+        "niValue": 0,
+        "sdlValue": 0,
         "DocName": "A"
       },
       {
         "name": "b",
-        "value": 1,
+        "niValue": 1,
+        "sdlValue": 1,
         "DocName": "B"
       },
       {
         "name": "x",
-        "value": 2,
+        "niValue": 2,
+        "sdlValue": 2,
         "DocName": "X"
       },
       {
         "name": "y",
-        "value": 3,
+        "niValue": 3,
+        "sdlValue": 3,
         "DocName": "Y"
       },
       {
         "name": "leftBumper",
-        "value": 4,
+        "niValue": 4,
+        "sdlValue": 4,
         "DocName": "left bumper"
       },
       {
         "name": "rightBumper",
-        "value": 5,
+        "niValue": 5,
+        "sdlValue": 5,
         "DocName": "right bumper"
       },
       {
         "name": "leftStick",
-        "value": 6,
+        "niValue": 6,
+        "sdlValue": 6,
         "DocName": "left stick"
       },
       {
         "name": "rightStick",
-        "value": 7,
+        "niValue": 7,
+        "sdlValue": 7,
         "DocName": "right stick"
       },
       {
         "name": "ellipses",
-        "value": 8
+        "niValue": 8,
+        "sdlValue": 8
       },
       {
         "name": "hamburger",
-        "value": 9
+        "niValue": 9,
+        "sdlValue": 9
       },
       {
         "name": "stadia",
-        "value": 10
+        "niValue": 10,
+        "sdlValue": 10
       },
       {
         "name": "rightTrigger",
-        "value": 11,
+        "niValue": 11,
+        "sdlValue": 11,
         "DocName": "right trigger"
       },
       {
         "name": "leftTrigger",
-        "value": 12,
+        "niValue": 12,
+        "sdlValue": 12,
         "DocName": "left trigger"
       },
       {
         "name": "google",
-        "value": 13
+        "niValue": 13,
+        "sdlValue": 13
       },
       {
         "name": "frame",
-        "value": 14
+        "niValue": 14,
+        "sdlValue": 14
       }
     ],
     "sticks": [
@@ -420,7 +491,8 @@
           "left",
           "X"
         ],
-        "value": 0,
+        "niValue": 0,
+        "sdlValue": 0,
         "PositiveDirection": "Right"
       },
       {
@@ -428,7 +500,8 @@
           "right",
           "X"
         ],
-        "value": 3,
+        "niValue": 3,
+        "sdlValue": 3,
         "PositiveDirection": "Right"
       },
       {
@@ -436,7 +509,8 @@
           "left",
           "Y"
         ],
-        "value": 1,
+        "niValue": 1,
+        "sdlValue": 1,
         "PositiveDirection": "Back"
       },
       {
@@ -444,7 +518,8 @@
           "right",
           "Y"
         ],
-        "value": 4,
+        "niValue": 4,
+        "sdlValue": 4,
         "PositiveDirection": "Back"
       }
     ]

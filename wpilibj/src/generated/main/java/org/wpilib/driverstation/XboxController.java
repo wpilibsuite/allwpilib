@@ -25,33 +25,37 @@ import org.wpilib.util.sendable.SendableBuilder;
  */
 public class XboxController extends GenericHID implements Sendable {
   /** Represents a digital button on a XboxController. */
-  public enum Button {
+  public enum Button implements GamepadIndexPair {
     /** A button. */
-    kA(0),
+    kA(0, 0),
     /** B button. */
-    kB(1),
+    kB(1, 1),
     /** X button. */
-    kX(2),
+    kX(2, 2),
     /** Y button. */
-    kY(3),
+    kY(3, 3),
     /** Left bumper button. */
-    kLeftBumper(4),
+    kLeftBumper(4, 4),
     /** Right bumper button. */
-    kRightBumper(5),
+    kRightBumper(5, 5),
     /** Back button. */
-    kBack(6),
+    kBack(6, 6),
     /** Start button. */
-    kStart(7),
+    kStart(7, 7),
     /** Left stick button. */
-    kLeftStick(8),
+    kLeftStick(8, 8),
     /** Right stick button. */
-    kRightStick(9);
+    kRightStick(9, 9);
 
-    /** Button value. */
-    public final int value;
+    /** NI DS Button value. */
+    public final int niValue;
 
-    Button(int value) {
-      this.value = value;
+    /** SDL DS Button value. */
+    public final int sdlValue;
+
+    Button(int niValue, int sdlValue) {
+      this.niValue = niValue;
+      this.sdlValue = sdlValue;
     }
 
     /**
@@ -67,28 +71,42 @@ public class XboxController extends GenericHID implements Sendable {
       // Remove leading `k`
       return this.name().substring(1) + "Button";
     }
+
+    @Override
+    public int getNiIndex() {
+      return niValue;
+    }
+
+    @Override
+    public int getSdlIndex() {
+      return sdlValue;
+    }
   }
 
   /** Represents an axis on an XboxController. */
-  public enum Axis {
+  public enum Axis implements GamepadIndexPair {
     /** Left X axis. */
-    kLeftX(0),
+    kLeftX(0, 0),
     /** Right X axis. */
-    kRightX(4),
+    kRightX(4, 4),
     /** Left Y axis. */
-    kLeftY(1),
+    kLeftY(1, 1),
     /** Right Y axis. */
-    kRightY(5),
+    kRightY(5, 5),
     /** Left trigger. */
-    kLeftTrigger(2),
+    kLeftTrigger(2, 2),
     /** Right trigger. */
-    kRightTrigger(3);
+    kRightTrigger(3, 3);
 
-    /** Axis value. */
-    public final int value;
+    /** NI DS Axis value. */
+    public final int niValue;
 
-    Axis(int value) {
-      this.value = value;
+    /** SDL DS Axis Value. */
+    public final int sdlValue;
+
+    Axis(int niValue, int sdlValue) {
+      this.niValue = niValue;
+      this.sdlValue = sdlValue;
     }
 
     /**
@@ -106,6 +124,16 @@ public class XboxController extends GenericHID implements Sendable {
         return name + "Axis";
       }
       return name;
+    }
+
+    @Override
+    public int getNiIndex() {
+      return niValue;
+    }
+
+    @Override
+    public int getSdlIndex() {
+      return sdlValue;
     }
   }
 
@@ -125,7 +153,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return The axis value.
    */
   public double getLeftX() {
-    return getRawAxis(Axis.kLeftX.value);
+    return getRawAxis(Axis.kLeftX);
   }
 
   /**
@@ -134,7 +162,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return The axis value.
    */
   public double getRightX() {
-    return getRawAxis(Axis.kRightX.value);
+    return getRawAxis(Axis.kRightX);
   }
 
   /**
@@ -143,7 +171,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return The axis value.
    */
   public double getLeftY() {
-    return getRawAxis(Axis.kLeftY.value);
+    return getRawAxis(Axis.kLeftY);
   }
 
   /**
@@ -152,7 +180,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return The axis value.
    */
   public double getRightY() {
-    return getRawAxis(Axis.kRightY.value);
+    return getRawAxis(Axis.kRightY);
   }
 
   /**
@@ -162,7 +190,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return The axis value.
    */
   public double getLeftTriggerAxis() {
-    return getRawAxis(Axis.kLeftTrigger.value);
+    return getRawAxis(Axis.kLeftTrigger);
   }
 
   /**
@@ -176,7 +204,7 @@ public class XboxController extends GenericHID implements Sendable {
    *     threshold, attached to the given event loop
    */
   public BooleanEvent leftTrigger(double threshold, EventLoop loop) {
-    return axisGreaterThan(Axis.kLeftTrigger.value, threshold, loop);
+    return axisGreaterThan(Axis.kLeftTrigger, threshold, loop);
   }
 
   /**
@@ -198,7 +226,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return The axis value.
    */
   public double getRightTriggerAxis() {
-    return getRawAxis(Axis.kRightTrigger.value);
+    return getRawAxis(Axis.kRightTrigger);
   }
 
   /**
@@ -212,7 +240,7 @@ public class XboxController extends GenericHID implements Sendable {
    *     threshold, attached to the given event loop
    */
   public BooleanEvent rightTrigger(double threshold, EventLoop loop) {
-    return axisGreaterThan(Axis.kRightTrigger.value, threshold, loop);
+    return axisGreaterThan(Axis.kRightTrigger, threshold, loop);
   }
 
   /**
@@ -233,7 +261,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getAButton() {
-    return getRawButton(Button.kA.value);
+    return getRawButton(Button.kA);
   }
 
   /**
@@ -242,7 +270,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getAButtonPressed() {
-    return getRawButtonPressed(Button.kA.value);
+    return getRawButtonPressed(Button.kA);
   }
 
   /**
@@ -251,7 +279,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getAButtonReleased() {
-    return getRawButtonReleased(Button.kA.value);
+    return getRawButtonReleased(Button.kA);
   }
 
   /**
@@ -262,7 +290,7 @@ public class XboxController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent a(EventLoop loop) {
-    return button(Button.kA.value, loop);
+    return button(Button.kA, loop);
   }
 
   /**
@@ -271,7 +299,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getBButton() {
-    return getRawButton(Button.kB.value);
+    return getRawButton(Button.kB);
   }
 
   /**
@@ -280,7 +308,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getBButtonPressed() {
-    return getRawButtonPressed(Button.kB.value);
+    return getRawButtonPressed(Button.kB);
   }
 
   /**
@@ -289,7 +317,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getBButtonReleased() {
-    return getRawButtonReleased(Button.kB.value);
+    return getRawButtonReleased(Button.kB);
   }
 
   /**
@@ -300,7 +328,7 @@ public class XboxController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent b(EventLoop loop) {
-    return button(Button.kB.value, loop);
+    return button(Button.kB, loop);
   }
 
   /**
@@ -309,7 +337,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getXButton() {
-    return getRawButton(Button.kX.value);
+    return getRawButton(Button.kX);
   }
 
   /**
@@ -318,7 +346,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getXButtonPressed() {
-    return getRawButtonPressed(Button.kX.value);
+    return getRawButtonPressed(Button.kX);
   }
 
   /**
@@ -327,7 +355,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getXButtonReleased() {
-    return getRawButtonReleased(Button.kX.value);
+    return getRawButtonReleased(Button.kX);
   }
 
   /**
@@ -338,7 +366,7 @@ public class XboxController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent x(EventLoop loop) {
-    return button(Button.kX.value, loop);
+    return button(Button.kX, loop);
   }
 
   /**
@@ -347,7 +375,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getYButton() {
-    return getRawButton(Button.kY.value);
+    return getRawButton(Button.kY);
   }
 
   /**
@@ -356,7 +384,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getYButtonPressed() {
-    return getRawButtonPressed(Button.kY.value);
+    return getRawButtonPressed(Button.kY);
   }
 
   /**
@@ -365,7 +393,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getYButtonReleased() {
-    return getRawButtonReleased(Button.kY.value);
+    return getRawButtonReleased(Button.kY);
   }
 
   /**
@@ -376,7 +404,7 @@ public class XboxController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent y(EventLoop loop) {
-    return button(Button.kY.value, loop);
+    return button(Button.kY, loop);
   }
 
   /**
@@ -385,7 +413,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getLeftBumperButton() {
-    return getRawButton(Button.kLeftBumper.value);
+    return getRawButton(Button.kLeftBumper);
   }
 
   /**
@@ -394,7 +422,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getLeftBumperButtonPressed() {
-    return getRawButtonPressed(Button.kLeftBumper.value);
+    return getRawButtonPressed(Button.kLeftBumper);
   }
 
   /**
@@ -403,7 +431,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getLeftBumperButtonReleased() {
-    return getRawButtonReleased(Button.kLeftBumper.value);
+    return getRawButtonReleased(Button.kLeftBumper);
   }
 
   /**
@@ -414,7 +442,7 @@ public class XboxController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent leftBumper(EventLoop loop) {
-    return button(Button.kLeftBumper.value, loop);
+    return button(Button.kLeftBumper, loop);
   }
 
   /**
@@ -423,7 +451,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getRightBumperButton() {
-    return getRawButton(Button.kRightBumper.value);
+    return getRawButton(Button.kRightBumper);
   }
 
   /**
@@ -432,7 +460,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getRightBumperButtonPressed() {
-    return getRawButtonPressed(Button.kRightBumper.value);
+    return getRawButtonPressed(Button.kRightBumper);
   }
 
   /**
@@ -441,7 +469,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getRightBumperButtonReleased() {
-    return getRawButtonReleased(Button.kRightBumper.value);
+    return getRawButtonReleased(Button.kRightBumper);
   }
 
   /**
@@ -452,7 +480,7 @@ public class XboxController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent rightBumper(EventLoop loop) {
-    return button(Button.kRightBumper.value, loop);
+    return button(Button.kRightBumper, loop);
   }
 
   /**
@@ -461,7 +489,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getBackButton() {
-    return getRawButton(Button.kBack.value);
+    return getRawButton(Button.kBack);
   }
 
   /**
@@ -470,7 +498,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getBackButtonPressed() {
-    return getRawButtonPressed(Button.kBack.value);
+    return getRawButtonPressed(Button.kBack);
   }
 
   /**
@@ -479,7 +507,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getBackButtonReleased() {
-    return getRawButtonReleased(Button.kBack.value);
+    return getRawButtonReleased(Button.kBack);
   }
 
   /**
@@ -490,7 +518,7 @@ public class XboxController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent back(EventLoop loop) {
-    return button(Button.kBack.value, loop);
+    return button(Button.kBack, loop);
   }
 
   /**
@@ -499,7 +527,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getStartButton() {
-    return getRawButton(Button.kStart.value);
+    return getRawButton(Button.kStart);
   }
 
   /**
@@ -508,7 +536,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getStartButtonPressed() {
-    return getRawButtonPressed(Button.kStart.value);
+    return getRawButtonPressed(Button.kStart);
   }
 
   /**
@@ -517,7 +545,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getStartButtonReleased() {
-    return getRawButtonReleased(Button.kStart.value);
+    return getRawButtonReleased(Button.kStart);
   }
 
   /**
@@ -528,7 +556,7 @@ public class XboxController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent start(EventLoop loop) {
-    return button(Button.kStart.value, loop);
+    return button(Button.kStart, loop);
   }
 
   /**
@@ -537,7 +565,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getLeftStickButton() {
-    return getRawButton(Button.kLeftStick.value);
+    return getRawButton(Button.kLeftStick);
   }
 
   /**
@@ -546,7 +574,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getLeftStickButtonPressed() {
-    return getRawButtonPressed(Button.kLeftStick.value);
+    return getRawButtonPressed(Button.kLeftStick);
   }
 
   /**
@@ -555,7 +583,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getLeftStickButtonReleased() {
-    return getRawButtonReleased(Button.kLeftStick.value);
+    return getRawButtonReleased(Button.kLeftStick);
   }
 
   /**
@@ -566,7 +594,7 @@ public class XboxController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent leftStick(EventLoop loop) {
-    return button(Button.kLeftStick.value, loop);
+    return button(Button.kLeftStick, loop);
   }
 
   /**
@@ -575,7 +603,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getRightStickButton() {
-    return getRawButton(Button.kRightStick.value);
+    return getRawButton(Button.kRightStick);
   }
 
   /**
@@ -584,7 +612,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getRightStickButtonPressed() {
-    return getRawButtonPressed(Button.kRightStick.value);
+    return getRawButtonPressed(Button.kRightStick);
   }
 
   /**
@@ -593,7 +621,7 @@ public class XboxController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getRightStickButtonReleased() {
-    return getRawButtonReleased(Button.kRightStick.value);
+    return getRawButtonReleased(Button.kRightStick);
   }
 
   /**
@@ -604,104 +632,35 @@ public class XboxController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent rightStick(EventLoop loop) {
-    return button(Button.kRightStick.value, loop);
+    return button(Button.kRightStick, loop);
+  }
+private double getAxisForSendable(GamepadIndexPair axis) {
+    return DriverStation.getStickAxisIfAvailable(getPort(), axis).orElse(0.0);
   }
 
-  /**
-   * Read the value of the left bumper (LB) button on the controller.
-   *
-   * @return The state of the button.
-   * @deprecated Use {@link getLeftBumperButton} instead. This function is deprecated for removal
-   *     to make function names consistent to allow the HID classes to be automatically generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getLeftBumper() {
-    return getRawButton(Button.kLeftBumper.value);
-  }
-
-  /**
-   * Read the value of the right bumper (RB) button on the controller.
-   *
-   * @return The state of the button.
-   * @deprecated Use {@link getRightBumperButton} instead. This function is deprecated for removal
-   *     to make function names consistent to allow the HID classes to be automatically generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getRightBumper() {
-    return getRawButton(Button.kRightBumper.value);
-  }
-
-  /**
-   * Whether the left bumper (LB) was pressed since the last check.
-   *
-   * @return Whether the button was pressed since the last check.
-   * @deprecated Use {@link getLeftBumperButtonPressed} instead. This function is deprecated for
-   *     removal to make function names consistent to allow the HID classes to be automatically
-   *     generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getLeftBumperPressed() {
-    return getRawButtonPressed(Button.kLeftBumper.value);
-  }
-
-  /**
-   * Whether the right bumper (RB) was pressed since the last check.
-   *
-   * @return Whether the button was pressed since the last check.
-   * @deprecated Use {@link getRightBumperButtonPressed} instead. This function is deprecated for
-   *     removal to make function names consistent to allow the HID classes to be automatically
-   *     generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getRightBumperPressed() {
-    return getRawButtonPressed(Button.kRightBumper.value);
-  }
-
-  /**
-   * Whether the left bumper (LB) was released since the last check.
-   *
-   * @return Whether the button was released since the last check.
-   * @deprecated Use {@link getLeftBumperButtonReleased} instead. This function is deprecated for
-   *     removal to make function names consistent to allow the HID classes to be automatically
-   *     generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getLeftBumperReleased() {
-    return getRawButtonReleased(Button.kLeftBumper.value);
-  }
-
-  /**
-   * Whether the right bumper (RB) was released since the last check.
-   *
-   * @return Whether the button was released since the last check.
-   * @deprecated Use {@link getRightBumperButtonReleased} instead. This function is deprecated for
-   *     removal to make function names consistent to allow the HID classes to be automatically
-   *     generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public boolean getRightBumperReleased() {
-    return getRawButtonReleased(Button.kRightBumper.value);
+  private boolean getButtonForSendable(GamepadIndexPair button) {
+    return DriverStation.getStickButtonIfAvailable(getPort(), button).orElse(false);
   }
 
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("HID");
     builder.publishConstString("ControllerType", "Xbox");
-    builder.addDoubleProperty("LeftTrigger Axis", this::getLeftTriggerAxis, null);
-    builder.addDoubleProperty("RightTrigger Axis", this::getRightTriggerAxis, null);
-    builder.addDoubleProperty("LeftX", this::getLeftX, null);
-    builder.addDoubleProperty("RightX", this::getRightX, null);
-    builder.addDoubleProperty("LeftY", this::getLeftY, null);
-    builder.addDoubleProperty("RightY", this::getRightY, null);
-    builder.addBooleanProperty("A", this::getAButton, null);
-    builder.addBooleanProperty("B", this::getBButton, null);
-    builder.addBooleanProperty("X", this::getXButton, null);
-    builder.addBooleanProperty("Y", this::getYButton, null);
-    builder.addBooleanProperty("LeftBumper", this::getLeftBumperButton, null);
-    builder.addBooleanProperty("RightBumper", this::getRightBumperButton, null);
-    builder.addBooleanProperty("Back", this::getBackButton, null);
-    builder.addBooleanProperty("Start", this::getStartButton, null);
-    builder.addBooleanProperty("LeftStick", this::getLeftStickButton, null);
-    builder.addBooleanProperty("RightStick", this::getRightStickButton, null);
+    builder.addDoubleProperty("LeftTrigger Axis", () -> getAxisForSendable(Axis.kLeftTrigger), null);
+    builder.addDoubleProperty("RightTrigger Axis", () -> getAxisForSendable(Axis.kRightTrigger), null);
+    builder.addDoubleProperty("LeftX", () -> getAxisForSendable(Axis.kLeftX), null);
+    builder.addDoubleProperty("RightX", () -> getAxisForSendable(Axis.kRightX), null);
+    builder.addDoubleProperty("LeftY", () -> getAxisForSendable(Axis.kLeftY), null);
+    builder.addDoubleProperty("RightY", () -> getAxisForSendable(Axis.kRightY), null);
+    builder.addBooleanProperty("A", () -> getButtonForSendable(Button.kA), null);
+    builder.addBooleanProperty("B", () -> getButtonForSendable(Button.kB), null);
+    builder.addBooleanProperty("X", () -> getButtonForSendable(Button.kX), null);
+    builder.addBooleanProperty("Y", () -> getButtonForSendable(Button.kY), null);
+    builder.addBooleanProperty("LeftBumper", () -> getButtonForSendable(Button.kLeftBumper), null);
+    builder.addBooleanProperty("RightBumper", () -> getButtonForSendable(Button.kRightBumper), null);
+    builder.addBooleanProperty("Back", () -> getButtonForSendable(Button.kBack), null);
+    builder.addBooleanProperty("Start", () -> getButtonForSendable(Button.kStart), null);
+    builder.addBooleanProperty("LeftStick", () -> getButtonForSendable(Button.kLeftStick), null);
+    builder.addBooleanProperty("RightStick", () -> getButtonForSendable(Button.kRightStick), null);
   }
 }

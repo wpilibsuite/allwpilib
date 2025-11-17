@@ -74,7 +74,7 @@ public class CommandStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger a(EventLoop loop) {
-    return button(StadiaController.Button.kA.value, loop);
+    return button(StadiaController.Button.kA, loop);
   }
 
   /**
@@ -98,7 +98,7 @@ public class CommandStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger b(EventLoop loop) {
-    return button(StadiaController.Button.kB.value, loop);
+    return button(StadiaController.Button.kB, loop);
   }
 
   /**
@@ -122,7 +122,7 @@ public class CommandStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger x(EventLoop loop) {
-    return button(StadiaController.Button.kX.value, loop);
+    return button(StadiaController.Button.kX, loop);
   }
 
   /**
@@ -146,7 +146,7 @@ public class CommandStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger y(EventLoop loop) {
-    return button(StadiaController.Button.kY.value, loop);
+    return button(StadiaController.Button.kY, loop);
   }
 
   /**
@@ -170,7 +170,7 @@ public class CommandStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger leftBumper(EventLoop loop) {
-    return button(StadiaController.Button.kLeftBumper.value, loop);
+    return button(StadiaController.Button.kLeftBumper, loop);
   }
 
   /**
@@ -194,7 +194,7 @@ public class CommandStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger rightBumper(EventLoop loop) {
-    return button(StadiaController.Button.kRightBumper.value, loop);
+    return button(StadiaController.Button.kRightBumper, loop);
   }
 
   /**
@@ -218,7 +218,7 @@ public class CommandStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger leftStick(EventLoop loop) {
-    return button(StadiaController.Button.kLeftStick.value, loop);
+    return button(StadiaController.Button.kLeftStick, loop);
   }
 
   /**
@@ -242,7 +242,7 @@ public class CommandStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger rightStick(EventLoop loop) {
-    return button(StadiaController.Button.kRightStick.value, loop);
+    return button(StadiaController.Button.kRightStick, loop);
   }
 
   /**
@@ -266,7 +266,7 @@ public class CommandStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger ellipses(EventLoop loop) {
-    return button(StadiaController.Button.kEllipses.value, loop);
+    return button(StadiaController.Button.kEllipses, loop);
   }
 
   /**
@@ -290,7 +290,7 @@ public class CommandStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger hamburger(EventLoop loop) {
-    return button(StadiaController.Button.kHamburger.value, loop);
+    return button(StadiaController.Button.kHamburger, loop);
   }
 
   /**
@@ -314,7 +314,7 @@ public class CommandStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger stadia(EventLoop loop) {
-    return button(StadiaController.Button.kStadia.value, loop);
+    return button(StadiaController.Button.kStadia, loop);
   }
 
   /**
@@ -338,7 +338,7 @@ public class CommandStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger rightTrigger(EventLoop loop) {
-    return button(StadiaController.Button.kRightTrigger.value, loop);
+    return button(StadiaController.Button.kRightTrigger, loop);
   }
 
   /**
@@ -362,7 +362,7 @@ public class CommandStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger leftTrigger(EventLoop loop) {
-    return button(StadiaController.Button.kLeftTrigger.value, loop);
+    return button(StadiaController.Button.kLeftTrigger, loop);
   }
 
   /**
@@ -386,7 +386,7 @@ public class CommandStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger google(EventLoop loop) {
-    return button(StadiaController.Button.kGoogle.value, loop);
+    return button(StadiaController.Button.kGoogle, loop);
   }
 
   /**
@@ -410,7 +410,7 @@ public class CommandStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger frame(EventLoop loop) {
-    return button(StadiaController.Button.kFrame.value, loop);
+    return button(StadiaController.Button.kFrame, loop);
   }
 
   /**

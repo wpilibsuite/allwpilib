@@ -42,7 +42,7 @@ public class PS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftX(double value) {
-    setRawAxis(PS5Controller.Axis.kLeftX.value, value);
+    setRawAxis(PS5Controller.Axis.kLeftX, value);
   }
 
   /**
@@ -51,7 +51,7 @@ public class PS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftY(double value) {
-    setRawAxis(PS5Controller.Axis.kLeftY.value, value);
+    setRawAxis(PS5Controller.Axis.kLeftY, value);
   }
 
   /**
@@ -60,7 +60,7 @@ public class PS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightX(double value) {
-    setRawAxis(PS5Controller.Axis.kRightX.value, value);
+    setRawAxis(PS5Controller.Axis.kRightX, value);
   }
 
   /**
@@ -69,7 +69,7 @@ public class PS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightY(double value) {
-    setRawAxis(PS5Controller.Axis.kRightY.value, value);
+    setRawAxis(PS5Controller.Axis.kRightY, value);
   }
 
   /**
@@ -78,7 +78,7 @@ public class PS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setL2Axis(double value) {
-    setRawAxis(PS5Controller.Axis.kL2.value, value);
+    setRawAxis(PS5Controller.Axis.kL2, value);
   }
 
   /**
@@ -87,7 +87,7 @@ public class PS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setR2Axis(double value) {
-    setRawAxis(PS5Controller.Axis.kR2.value, value);
+    setRawAxis(PS5Controller.Axis.kR2, value);
   }
 
   /**
@@ -96,7 +96,7 @@ public class PS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setSquareButton(boolean value) {
-    setRawButton(PS5Controller.Button.kSquare.value, value);
+    setRawButton(PS5Controller.Button.kSquare, value);
   }
 
   /**
@@ -105,7 +105,7 @@ public class PS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setCrossButton(boolean value) {
-    setRawButton(PS5Controller.Button.kCross.value, value);
+    setRawButton(PS5Controller.Button.kCross, value);
   }
 
   /**
@@ -114,7 +114,7 @@ public class PS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setCircleButton(boolean value) {
-    setRawButton(PS5Controller.Button.kCircle.value, value);
+    setRawButton(PS5Controller.Button.kCircle, value);
   }
 
   /**
@@ -123,7 +123,7 @@ public class PS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setTriangleButton(boolean value) {
-    setRawButton(PS5Controller.Button.kTriangle.value, value);
+    setRawButton(PS5Controller.Button.kTriangle, value);
   }
 
   /**
@@ -132,7 +132,7 @@ public class PS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setL1Button(boolean value) {
-    setRawButton(PS5Controller.Button.kL1.value, value);
+    setRawButton(PS5Controller.Button.kL1, value);
   }
 
   /**
@@ -141,7 +141,7 @@ public class PS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setR1Button(boolean value) {
-    setRawButton(PS5Controller.Button.kR1.value, value);
+    setRawButton(PS5Controller.Button.kR1, value);
   }
 
   /**
@@ -150,7 +150,7 @@ public class PS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setL2Button(boolean value) {
-    setRawButton(PS5Controller.Button.kL2.value, value);
+    setRawButton(PS5Controller.Button.kL2, value);
   }
 
   /**
@@ -159,7 +159,7 @@ public class PS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setR2Button(boolean value) {
-    setRawButton(PS5Controller.Button.kR2.value, value);
+    setRawButton(PS5Controller.Button.kR2, value);
   }
 
   /**
@@ -168,7 +168,7 @@ public class PS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setCreateButton(boolean value) {
-    setRawButton(PS5Controller.Button.kCreate.value, value);
+    setRawButton(PS5Controller.Button.kCreate, value);
   }
 
   /**
@@ -177,7 +177,7 @@ public class PS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setOptionsButton(boolean value) {
-    setRawButton(PS5Controller.Button.kOptions.value, value);
+    setRawButton(PS5Controller.Button.kOptions, value);
   }
 
   /**
@@ -186,7 +186,7 @@ public class PS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setL3Button(boolean value) {
-    setRawButton(PS5Controller.Button.kL3.value, value);
+    setRawButton(PS5Controller.Button.kL3, value);
   }
 
   /**
@@ -195,7 +195,7 @@ public class PS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setR3Button(boolean value) {
-    setRawButton(PS5Controller.Button.kR3.value, value);
+    setRawButton(PS5Controller.Button.kR3, value);
   }
 
   /**
@@ -204,7 +204,7 @@ public class PS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setPSButton(boolean value) {
-    setRawButton(PS5Controller.Button.kPS.value, value);
+    setRawButton(PS5Controller.Button.kPS, value);
   }
 
   /**
@@ -213,18 +213,6 @@ public class PS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setTouchpadButton(boolean value) {
-    setRawButton(PS5Controller.Button.kTouchpad.value, value);
-  }
-
-  /**
-   * Change the value of the touchpad button on the controller.
-   *
-   * @param value the new value
-   * @deprecated Use {@link setTouchpadButton} instead. This function is deprecated for removal to
-   *     make function names consistent to allow the HID classes to be automatically generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public void setTouchpad(boolean value) {
-    setRawButton(PS5Controller.Button.kTouchpad.value, value);
+    setRawButton(PS5Controller.Button.kTouchpad, value);
   }
 }

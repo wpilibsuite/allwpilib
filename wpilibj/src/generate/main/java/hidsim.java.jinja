@@ -44,7 +44,7 @@ public class {{ ConsoleName }}ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void set{{ stick.NameParts|map("capitalize")|join }}(double value) {
-    setRawAxis({{ ConsoleName }}Controller.Axis.k{{ stick.NameParts|map("capitalize")|join }}.value, value);
+    setRawAxis({{ ConsoleName }}Controller.Axis.k{{ stick.NameParts|map("capitalize")|join }}, value);
   }
 {% endfor -%}
 {% for trigger in triggers %}
@@ -54,7 +54,7 @@ public class {{ ConsoleName }}ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void set{{ capitalize_first(trigger.name) }}Axis(double value) {
-    setRawAxis({{ ConsoleName }}Controller.Axis.k{{ capitalize_first(trigger.name) }}.value, value);
+    setRawAxis({{ ConsoleName }}Controller.Axis.k{{ capitalize_first(trigger.name) }}, value);
   }
 {% endfor -%}
 {% for button in buttons %}
@@ -64,56 +64,7 @@ public class {{ ConsoleName }}ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void set{{ capitalize_first(button.name) }}Button(boolean value) {
-    setRawButton({{ ConsoleName }}Controller.Button.k{{ capitalize_first(button.name) }}.value, value);
+    setRawButton({{ ConsoleName }}Controller.Button.k{{ capitalize_first(button.name) }}, value);
   }
 {% endfor -%}
-{% if ConsoleName == "Xbox" %}
-  /**
-   * Change the value of the left bumper on the joystick.
-   *
-   * @param state the new value
-   * @deprecated Use {@link setLeftBumperButton} instead. This function is deprecated for removal
-   *     to make function names consistent to allow the HID classes to be automatically generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public void setLeftBumper(boolean state) {
-    setRawButton(XboxController.Button.kLeftBumper.value, state);
-  }
-
-  /**
-   * Change the value of the right bumper on the joystick.
-   *
-   * @param state the new value
-   * @deprecated Use {@link setRightBumperButton} instead. This function is deprecated for removal
-   *     to make function names consistent to allow the HID classes to be automatically generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public void setRightBumper(boolean state) {
-    setRawButton(XboxController.Button.kRightBumper.value, state);
-  }
-{% elif ConsoleName == "PS4" %}
-  /**
-   * Change the value of the touchpad button on the controller.
-   *
-   * @param value the new value
-   * @deprecated Use {@link setTouchpadButton} instead. This function is deprecated for removal to
-   *     make function names consistent to allow the HID classes to be automatically generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public void setTouchpad(boolean value) {
-    setRawButton(PS4Controller.Button.kTouchpad.value, value);
-  }
-{% elif ConsoleName == "PS5" %}
-  /**
-   * Change the value of the touchpad button on the controller.
-   *
-   * @param value the new value
-   * @deprecated Use {@link setTouchpadButton} instead. This function is deprecated for removal to
-   *     make function names consistent to allow the HID classes to be automatically generated.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public void setTouchpad(boolean value) {
-    setRawButton(PS5Controller.Button.kTouchpad.value, value);
-  }
-{% endif -%}
 }
