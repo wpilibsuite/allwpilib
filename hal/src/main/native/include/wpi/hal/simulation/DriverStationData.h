@@ -161,7 +161,8 @@ void HALSIM_GetJoystickAvailables(int32_t stick, uint16_t* axesAvailable,
 void HALSIM_SetJoystickIsGamepad(int32_t stick, HAL_Bool isGamepad);
 void HALSIM_SetJoystickGamepadType(int32_t stick, int32_t type);
 void HALSIM_SetJoystickName(int32_t stick, const struct WPI_String* name);
-void HALSIM_SetJoystickSupportedOutputs(int32_t stick, int32_t supportedOutputs);
+void HALSIM_SetJoystickSupportedOutputs(int32_t stick,
+                                        int32_t supportedOutputs);
 
 void HALSIM_SetGameSpecificMessage(const struct WPI_String* message);
 void HALSIM_SetEventName(const struct WPI_String* name);

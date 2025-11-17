@@ -392,7 +392,7 @@ void DriverStationData::SetJoystickGamepadType(int32_t stick, int32_t type) {
 }
 
 void DriverStationData::SetJoystickSupportedOutputs(int32_t stick,
-                                                     int32_t supportedOutputs) {
+                                                    int32_t supportedOutputs) {
   if (stick < 0 || stick >= kNumJoysticks) {
     return;
   }
@@ -615,7 +615,8 @@ void HALSIM_SetJoystickGamepadType(int32_t stick, int32_t type) {
   SimDriverStationData->SetJoystickGamepadType(stick, type);
 }
 
-void HALSIM_SetJoystickSupportedOutputs(int32_t stick, int32_t supportedOutputs) {
+void HALSIM_SetJoystickSupportedOutputs(int32_t stick,
+                                        int32_t supportedOutputs) {
   SimDriverStationData->SetJoystickSupportedOutputs(stick, supportedOutputs);
 }
 

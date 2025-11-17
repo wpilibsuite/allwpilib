@@ -64,7 +64,8 @@ void GenericHIDSim::SetGamepadType(GenericHID::HIDType type) {
   DriverStationSim::SetJoystickGamepadType(m_port, type);
 }
 
-void GenericHIDSim::SetSupportedOutputs(GenericHID::SupportedOutputs supportedOutputs) {
+void GenericHIDSim::SetSupportedOutputs(
+    GenericHID::SupportedOutputs supportedOutputs) {
   DriverStationSim::SetJoystickSupportedOutputs(m_port, supportedOutputs);
 }
 

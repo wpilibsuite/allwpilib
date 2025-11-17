@@ -276,7 +276,8 @@ void DriverStationSim::SetJoystickGamepadType(int stick, int type) {
   HALSIM_SetJoystickGamepadType(stick, type);
 }
 
-void DriverStationSim::SetJoystickSupportedOutputs(int stick, int supportedOutputs) {
+void DriverStationSim::SetJoystickSupportedOutputs(int stick,
+                                                   int supportedOutputs) {
   HALSIM_SetJoystickSupportedOutputs(stick, supportedOutputs);
 }
 
