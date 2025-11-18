@@ -176,3 +176,13 @@ void GenericHID::SetRumble(RumbleType type, double value) {
   HAL_SetJoystickRumble(m_port, m_leftRumble, m_rightRumble,
                         m_leftTriggerRumble, m_rightTriggerRumble);
 }
+
+bool GenericHID::GetTouchpadFingerAvailable(int touchpad, int finger) const {
+  return DriverStation::GetStickTouchpadFingerAvailable(m_port, touchpad,
+                                                        finger);
+}
+
+DriverStation::TouchpadFinger GenericHID::GetTouchpadFinger(int touchpad,
+                                                            int finger) const {
+  return DriverStation::GetStickTouchpadFinger(m_port, touchpad, finger);
+}

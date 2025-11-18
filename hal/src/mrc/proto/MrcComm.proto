@@ -4,6 +4,16 @@ package mrc.proto;
 
 option java_package = "com.mrc.proto";
 
+message ProtobufFingerData {
+    uint32 X = 1;
+    uint32 Y = 2;
+    bool Down = 3;
+}
+
+message ProtobufTouchpadData {
+    repeated ProtobufFingerData Fingers = 1;
+}
+
 message ProtobufJoystickData {
     uint64 AvailableButtons = 1;
     uint64 Buttons = 2;
@@ -13,6 +23,7 @@ message ProtobufJoystickData {
     // We can fit 8 in here.
     uint32 POVCount = 5;
     uint32 POVs = 6;
+    repeated ProtobufTouchpadData Touchpads = 7;
 }
 
 message ProtobufControlData {

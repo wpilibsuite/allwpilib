@@ -42,6 +42,7 @@ struct JoystickDataCache {
   HAL_JoystickAxes axes[kJoystickPorts];
   HAL_JoystickPOVs povs[kJoystickPorts];
   HAL_JoystickButtons buttons[kJoystickPorts];
+  HAL_JoystickTouchpads touchpads[kJoystickPorts];
   HAL_AllianceStationID allianceStation;
   double matchTime;
   HAL_ControlWord controlWord;
@@ -64,6 +65,7 @@ void JoystickDataCache::Update() {
     SimDriverStationData->GetJoystickAxes(i, &axes[i]);
     SimDriverStationData->GetJoystickPOVs(i, &povs[i]);
     SimDriverStationData->GetJoystickButtons(i, &buttons[i]);
+    SimDriverStationData->GetJoystickTouchpads(i, &touchpads[i]);
   }
   allianceStation = SimDriverStationData->allianceStationId;
   matchTime = SimDriverStationData->matchTime;
@@ -266,9 +268,21 @@ int32_t HAL_GetJoystickButtons(int32_t joystickNum,
   return 0;
 }
 
+int32_t HAL_GetJoystickTouchpads(int32_t joystickNum,
+                                 HAL_JoystickTouchpads* touchpads) {
+  if (gShutdown) {
+    return INCOMPATIBLE_STATE;
+  }
+  CHECK_JOYSTICK_NUMBER(joystickNum);
+  std::scoped_lock lock{driverStation->cacheMutex};
+  *touchpads = currentRead->touchpads[joystickNum];
+  return 0;
+}
+
 void HAL_GetAllJoystickData(int32_t joystickNum, HAL_JoystickAxes* axes,
                             HAL_JoystickPOVs* povs,
-                            HAL_JoystickButtons* buttons) {
+                            HAL_JoystickButtons* buttons,
+                            HAL_JoystickTouchpads* touchpads) {
   if (gShutdown) {
     return;
   }
@@ -276,6 +290,7 @@ void HAL_GetAllJoystickData(int32_t joystickNum, HAL_JoystickAxes* axes,
   *axes = currentRead->axes[joystickNum];
   *povs = currentRead->povs[joystickNum];
   *buttons = currentRead->buttons[joystickNum];
+  *touchpads = currentRead->touchpads[joystickNum];
 }
 
 int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,

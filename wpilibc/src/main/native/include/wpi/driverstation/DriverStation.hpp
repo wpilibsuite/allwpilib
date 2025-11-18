@@ -72,6 +72,12 @@ class DriverStation final {
     kUpLeft = HAL_JoystickPOV_kLeftUp,
   };
 
+  struct TouchpadFinger final {
+    bool down = false;
+    float x = 0.0f;
+    float y = 0.0f;
+  };
+
   /**
    * Gets the angle of a POVDirection.
    *
@@ -158,6 +164,28 @@ class DriverStation final {
    * @return The value of the axis on the joystick.
    */
   static double GetStickAxis(int stick, int axis);
+
+  /**
+   * Get the finger data of a touchpad on a joystick, if available.
+   *
+   * @param stick         The joystick to read.
+   * @param touchpad The touchpad index to read from the joystick.
+   * @param finger   The finger index to read from the touchpad.
+   * @return The finger data of the touchpad on the joystick.
+   */
+  static TouchpadFinger GetStickTouchpadFinger(int stick, int touchpad,
+                                               int finger);
+
+  /**
+   * Whether a finger on a touchpad is available.
+   *
+   *  @param stick         The joystick to read.
+   * @param touchpad The touchpad index to read from the joystick.
+   * @param finger   The finger index to read from the touchpad.
+   * @return True if the finger data is available.
+   */
+  static bool GetStickTouchpadFingerAvailable(int stick, int touchpad,
+                                              int finger);
 
   /**
    * Get the value of the axis on a joystick, if available.

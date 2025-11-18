@@ -41,6 +41,7 @@ DEFINE_CAPI(double, MatchTime, 0)
 DEFINE_CAPI(Axes, axes)
 DEFINE_CAPI(POVs, povs)
 DEFINE_CAPI(Buttons, buttons)
+DEFINE_CAPI(Touchpads, touchpads)
 DEFINE_CAPI(Descriptor, descriptor)
 
 int32_t HALSIM_RegisterJoystickLedsCallback(int32_t joystickNum,
@@ -114,6 +115,14 @@ void HALSIM_GetJoystickAvailables(int32_t stick, uint16_t* axesAvailable,
   *buttonsAvailable = 0;
   *povsAvailable = 0;
 }
+
+void HALSIM_SetJoystickTouchpadCounts(int32_t stick, uint8_t touchpadCount,
+                                      const uint8_t* fingerCount) {
+}
+
+void HALSIM_SetJoystickTouchpadFinger(int32_t stick, int32_t touchpad,
+                                      int32_t finger, HAL_Bool down, double x,
+                                      double y) {}
 
 void HALSIM_SetJoystickIsGamepad(int32_t stick, HAL_Bool isGamepad) {}
 

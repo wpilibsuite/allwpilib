@@ -28,6 +28,7 @@ class DriverStationData {
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(JoystickDescriptor)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(JoystickLeds)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(JoystickRumbles)
+  HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(JoystickTouchpads)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(MatchInfo)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(NewData)
 
@@ -61,6 +62,15 @@ class DriverStationData {
   void GetJoystickButtons(int32_t joystickNum, HAL_JoystickButtons* buttons);
   void SetJoystickButtons(int32_t joystickNum,
                           const HAL_JoystickButtons* buttons);
+
+  int32_t RegisterJoystickTouchpadsCallback(
+      int32_t joystickNum, HAL_JoystickTouchpadsCallback callback, void* param,
+      HAL_Bool initialNotify);
+  void CancelJoystickTouchpadsCallback(int32_t uid);
+  void GetJoystickTouchpads(int32_t joystickNum,
+                            HAL_JoystickTouchpads* touchpads);
+  void SetJoystickTouchpads(int32_t joystickNum,
+                            const HAL_JoystickTouchpads* touchpads);
 
   int32_t RegisterJoystickDescriptorCallback(
       int32_t joystickNum, HAL_JoystickDescriptorCallback callback, void* param,
@@ -113,6 +123,11 @@ class DriverStationData {
   void GetJoystickAvailables(int32_t stick, uint16_t* axesAvailable,
                              uint64_t* buttonsAvailable,
                              uint8_t* povsAvailable);
+  void SetJoystickTouchpadCounts(int32_t stick, uint8_t touchpadCount,
+                                 const uint8_t* fingerCount);
+  void SetJoystickTouchpadFinger(int32_t stick, int32_t touchpad,
+                                 int32_t finger, HAL_Bool down, double x,
+                                 double y);
 
   void SetJoystickIsGamepad(int32_t stick, HAL_Bool isGamepad);
   void SetJoystickGamepadType(int32_t stick, int32_t type);
@@ -144,6 +159,8 @@ class DriverStationData {
       m_joystickPOVsCallbacks;
   SimCallbackRegistry<HAL_JoystickButtonsCallback, GetJoystickButtonsName>
       m_joystickButtonsCallbacks;
+  SimCallbackRegistry<HAL_JoystickTouchpadsCallback, GetJoystickTouchpadsName>
+      m_joystickTouchpadsCallbacks;
   SimCallbackRegistry<HAL_JoystickLedsCallback, GetJoystickLedsName>
       m_joystickLedsCallbacks;
   SimCallbackRegistry<HAL_JoystickRumblesCallback, GetJoystickRumblesName>
@@ -166,6 +183,7 @@ class DriverStationData {
     HAL_JoystickAxes axes;
     HAL_JoystickPOVs povs;
     HAL_JoystickButtons buttons;
+    HAL_JoystickTouchpads touchpads;
     JoystickOutputStore outputs;
     HAL_JoystickDescriptor descriptor;
   };

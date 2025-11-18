@@ -51,6 +51,20 @@ HAL_ENUM(HAL_MatchType) {
 };
 
 /**
+ * The maximum number of touchpads that will be stored in a single
+ * HAL_JoystickTouchpads struct. This is used for allocating buffers, not
+ * bounds checking, since there are usually less touchpads in practice.
+ */
+#define HAL_kMaxJoystickTouchpads 2
+
+/**
+ * The maximum number of fingers that will be stored in a single
+ * HAL_JoystickTouchpad struct. This is used for allocating buffers, not
+ * bounds checking, since there are usually less fingers in practice.
+ */
+#define HAL_kMaxJoystickTouchpadFingers 2
+
+/**
  * The maximum number of axes that will be stored in a single HAL_JoystickAxes
  * struct. This is used for allocating buffers, not bounds checking, since there
  * are usually less axes in practice.
@@ -106,6 +120,25 @@ struct HAL_JoystickButtons {
   uint64_t available;
 };
 typedef struct HAL_JoystickButtons HAL_JoystickButtons;
+
+struct HAL_JoystickTouchpadFinger {
+  uint8_t down;
+  float x;
+  float y;
+};
+typedef struct HAL_JoystickTouchpadFinger HAL_JoystickTouchpadFinger;
+
+struct HAL_JoystickTouchpad {
+  uint8_t count;
+  HAL_JoystickTouchpadFinger fingers[HAL_kMaxJoystickTouchpadFingers];
+};
+typedef struct HAL_JoystickTouchpad HAL_JoystickTouchpad;
+
+struct HAL_JoystickTouchpads {
+  uint8_t count;
+  HAL_JoystickTouchpad touchpads[HAL_kMaxJoystickTouchpads];
+};
+typedef struct HAL_JoystickTouchpads HAL_JoystickTouchpads;
 
 struct HAL_JoystickDescriptor {
   uint8_t isGamepad;

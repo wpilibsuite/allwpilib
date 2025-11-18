@@ -119,6 +119,11 @@ public class DriverStationDataJNI extends JNIWrapper {
 
   public static native void setJoystickButtonsAvailable(int stick, long available);
 
+  public static native void setTouchpadCounts(int stick, int touchpadCount, int[] fingerCounts);
+
+  public static native void setTouchpadFinger(
+      int stick, int touchpadIndex, int fingerIndex, boolean down, float x, float y);
+
   public static native void setJoystickIsGamepad(int stick, boolean isGamepad);
 
   public static native void setJoystickGamepadType(int stick, int type);

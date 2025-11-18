@@ -100,9 +100,28 @@ int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs);
 int32_t HAL_GetJoystickButtons(int32_t joystickNum,
                                HAL_JoystickButtons* buttons);
 
+/**
+ * Gets the touchpads of a specific joystick.
+ * @param joystickNum the joystick number
+ * @param touchpads   the touchpad values (output)
+ * @return the error code, or 0 for success
+ */
+int32_t HAL_GetJoystickTouchpads(int32_t joystickNum,
+                                 HAL_JoystickTouchpads* touchpads);
+
+/**
+ * Gets all the data of a specific joystick.
+ *
+ * @param joystickNum the joystick number
+ * @param axes        the axes values (output)
+ * @param povs        the POV values (output)
+ * @param buttons     the button values (output)
+ * @param touchpads   the touchpad values (output)
+ */
 void HAL_GetAllJoystickData(int32_t joystickNum, HAL_JoystickAxes* axes,
                             HAL_JoystickPOVs* povs,
-                            HAL_JoystickButtons* buttons);
+                            HAL_JoystickButtons* buttons,
+                            HAL_JoystickTouchpads* touchpads);
 
 /**
  * Retrieves the Joystick Descriptor for particular slot.

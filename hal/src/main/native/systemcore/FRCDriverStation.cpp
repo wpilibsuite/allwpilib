@@ -45,6 +45,8 @@ static_assert(sizeof(int32_t) >= sizeof(int),
 static_assert(MRC_MAX_NUM_AXES == HAL_kMaxJoystickAxes);
 static_assert(MRC_MAX_NUM_POVS == HAL_kMaxJoystickPOVs);
 static_assert(MRC_MAX_NUM_JOYSTICKS == HAL_kMaxJoysticks);
+static_assert(MRC_MAX_NUM_TOUCHPADS == HAL_kMaxJoystickTouchpads);
+static_assert(MRC_MAX_NUM_TOUCHPAD_FINGERS == HAL_kMaxJoystickTouchpadFingers);
 
 namespace {
 struct JoystickDataCache {
@@ -54,6 +56,7 @@ struct JoystickDataCache {
   HAL_JoystickAxes axes[HAL_kMaxJoysticks];
   HAL_JoystickPOVs povs[HAL_kMaxJoysticks];
   HAL_JoystickButtons buttons[HAL_kMaxJoysticks];
+  HAL_JoystickTouchpads touchpads[HAL_kMaxJoysticks];
   HAL_AllianceStationID allianceStation;
   float matchTime;
   HAL_ControlWord controlWord;
@@ -275,6 +278,19 @@ void JoystickDataCache::Update(const mrc::ControlData& data) {
 
     buttons[count].available = newStick.Buttons.GetAvailable();
     buttons[count].buttons = newStick.Buttons.Buttons;
+
+    touchpads[count].count = newStick.Touchpads.GetTouchpadCount();
+    const auto& newTouchpads = newStick.Touchpads.Touchpads();
+    for (size_t i = 0; i < newTouchpads.size(); i++) {
+      const auto& touchpadFingers = newTouchpads[i].Fingers();
+      touchpads[count].touchpads[i].count = touchpadFingers.size();
+      for (size_t j = 0; j < touchpadFingers.size(); j++) {
+        auto& finger = touchpadFingers[j];
+        touchpads[count].touchpads[i].fingers[j].down = finger.Down ? 1 : 0;
+        touchpads[count].touchpads[i].fingers[j].x = finger.X;
+        touchpads[count].touchpads[i].fingers[j].y = finger.Y;
+      }
+    }
   }
 }
 
@@ -484,13 +500,23 @@ int32_t HAL_GetJoystickButtons(int32_t joystickNum,
   return 0;
 }
 
+int32_t HAL_GetJoystickTouchpads(int32_t joystickNum,
+                                 HAL_JoystickTouchpads* touchpads) {
+  CHECK_JOYSTICK_NUMBER(joystickNum);
+  std::scoped_lock lock{cacheMutex};
+  *touchpads = currentRead->touchpads[joystickNum];
+  return 0;
+}
+
 void HAL_GetAllJoystickData(int32_t joystickNum, HAL_JoystickAxes* axes,
                             HAL_JoystickPOVs* povs,
-                            HAL_JoystickButtons* buttons) {
+                            HAL_JoystickButtons* buttons,
+                            HAL_JoystickTouchpads* touchpads) {
   std::scoped_lock lock{cacheMutex};
   *axes = currentRead->axes[joystickNum];
   *povs = currentRead->povs[joystickNum];
   *buttons = currentRead->buttons[joystickNum];
+  *touchpads = currentRead->touchpads[joystickNum];
 }
 
 int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
