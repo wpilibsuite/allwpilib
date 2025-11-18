@@ -208,6 +208,7 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::DriverStation", "wpi__DriverStation.hpp"),
+                ("wpi::DriverStation::TouchpadFinger", "wpi__DriverStation__TouchpadFinger.hpp"),
             ],
         ),
         struct(
