@@ -375,8 +375,8 @@ void DriverStationData::GetJoystickAvailables(int32_t stick,
 }
 
 void DriverStationData::SetJoystickTouchpadCounts(int32_t stick,
-                                                    uint8_t touchpadCount,
-                                                    const uint8_t* fingerCount) {
+                                                  uint8_t touchpadCount,
+                                                  const uint8_t* fingerCount) {
   if (stick < 0 || stick >= kNumJoysticks) {
     return;
   }
@@ -390,9 +390,8 @@ void DriverStationData::SetJoystickTouchpadCounts(int32_t stick,
 
 void DriverStationData::SetJoystickTouchpadFinger(int32_t stick,
                                                   int32_t touchpad,
-                                                  int32_t finger,
-                                                  HAL_Bool down, double x,
-                                                  double y) {
+                                                  int32_t finger, HAL_Bool down,
+                                                  double x, double y) {
   if (stick < 0 || stick >= kNumJoysticks) {
     return;
   }
@@ -654,8 +653,8 @@ void HALSIM_SetJoystickTouchpadCounts(int32_t stick, uint8_t touchpadCount,
 }
 
 void HALSIM_SetJoystickTouchpadFinger(int32_t stick, int32_t touchpad,
-                                      int32_t finger, HAL_Bool down,
-                                      double x, double y) {
+                                      int32_t finger, HAL_Bool down, double x,
+                                      double y) {
   SimDriverStationData->SetJoystickTouchpadFinger(stick, touchpad, finger, down,
                                                   x, y);
 }

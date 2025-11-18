@@ -116,7 +116,7 @@ void HALSIM_GetJoystickButtons(int32_t joystickNum,
 void HALSIM_SetJoystickButtons(int32_t joystickNum,
                                const HAL_JoystickButtons* buttons);
 
-                               int32_t HALSIM_RegisterJoystickTouchpadsCallback(
+int32_t HALSIM_RegisterJoystickTouchpadsCallback(
     int32_t joystickNum, HAL_JoystickTouchpadsCallback callback, void* param,
     HAL_Bool initialNotify);
 void HALSIM_CancelJoystickTouchpadsCallback(int32_t uid);

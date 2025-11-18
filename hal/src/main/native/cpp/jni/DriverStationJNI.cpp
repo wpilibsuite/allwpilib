@@ -38,8 +38,9 @@ static_assert(org_wpilib_hardware_hal_DriverStationJNI_kMaxJoysticks ==
               HAL_kMaxJoysticks);
 static_assert(org_wpilib_hardware_hal_DriverStationJNI_kMaxJoystickTouchpads ==
               HAL_kMaxJoystickTouchpads);
-static_assert(org_wpilib_hardware_hal_DriverStationJNI_kMaxJoystickTouchpadFingers ==
-              HAL_kMaxJoystickTouchpadFingers);
+static_assert(
+    org_wpilib_hardware_hal_DriverStationJNI_kMaxJoystickTouchpadFingers ==
+    HAL_kMaxJoystickTouchpadFingers);
 
 using namespace wpi::hal;
 using namespace wpi::util::java;
@@ -146,8 +147,8 @@ Java_org_wpilib_hardware_hal_DriverStationJNI_nativeGetAllianceStation
 JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_DriverStationJNI_getAllJoystickData
   (JNIEnv* env, jclass cls, jint stick, jfloatArray axesArray,
-   jshortArray rawAxesArray, jbyteArray povsArray, jfloatArray touchpadFingersData,
-   jlongArray buttonsAndMetadataArray)
+   jshortArray rawAxesArray, jbyteArray povsArray,
+   jfloatArray touchpadFingersData, jlongArray buttonsAndMetadataArray)
 {
   HAL_JoystickAxes axes;
   HAL_JoystickPOVs povs;
@@ -165,7 +166,8 @@ Java_org_wpilib_hardware_hal_DriverStationJNI_getAllJoystickData
   static_assert(sizeof(jAxes[0]) == sizeof(axes.axes[0]));
   static_assert(sizeof(jRawAxes[0]) == sizeof(axes.raw[0]));
   static_assert(sizeof(jPovs[0]) == sizeof(povs.povs[0]));
-  static_assert(sizeof(jTouchpadFingers[0]) == sizeof(touchpads.touchpads[0].fingers[0].x));
+  static_assert(sizeof(jTouchpadFingers[0]) ==
+                sizeof(touchpads.touchpads[0].fingers[0].x));
 
   std::memcpy(&jAxes[0], axes.axes, sizeof(axes.axes));
   std::memcpy(&jRawAxes[0], axes.raw, sizeof(axes.raw));
@@ -183,8 +185,12 @@ Java_org_wpilib_hardware_hal_DriverStationJNI_getAllJoystickData
   jButtons[2] = buttons.available;
   jButtons[3] = buttons.buttons;
   jButtons[4] = touchpads.count;
-  jButtons[5] = (touchpads.touchpads[0].fingers[0].down ? 1 : 0) | (touchpads.touchpads[0].fingers[1].down ? 2 : 0) | (touchpads.touchpads[0].count << 2);
-  jButtons[6] = (touchpads.touchpads[1].fingers[0].down ? 1 : 0) | (touchpads.touchpads[1].fingers[1].down ? 2 : 0) | (touchpads.touchpads[1].count << 2);
+  jButtons[5] = (touchpads.touchpads[0].fingers[0].down ? 1 : 0) |
+                (touchpads.touchpads[0].fingers[1].down ? 2 : 0) |
+                (touchpads.touchpads[0].count << 2);
+  jButtons[6] = (touchpads.touchpads[1].fingers[0].down ? 1 : 0) |
+                (touchpads.touchpads[1].fingers[1].down ? 2 : 0) |
+                (touchpads.touchpads[1].count << 2);
 }
 
 /*

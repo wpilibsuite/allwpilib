@@ -384,8 +384,8 @@ class GenericHID {
    * @param finger The finger to read.
    * @return The touchpad finger data.
    */
-  DriverStation::TouchpadFinger GetTouchpadFinger(
-      int touchpad, int finger) const;
+  DriverStation::TouchpadFinger GetTouchpadFinger(int touchpad,
+                                                  int finger) const;
 
  private:
   int m_port;

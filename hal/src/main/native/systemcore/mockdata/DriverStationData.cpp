@@ -117,8 +117,7 @@ void HALSIM_GetJoystickAvailables(int32_t stick, uint16_t* axesAvailable,
 }
 
 void HALSIM_SetJoystickTouchpadCounts(int32_t stick, uint8_t touchpadCount,
-                                      const uint8_t* fingerCount) {
-}
+                                      const uint8_t* fingerCount) {}
 
 void HALSIM_SetJoystickTouchpadFinger(int32_t stick, int32_t touchpad,
                                       int32_t finger, HAL_Bool down, double x,

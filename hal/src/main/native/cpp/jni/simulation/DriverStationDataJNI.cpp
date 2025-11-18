@@ -735,9 +735,11 @@ Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setTouchpadCounts
  */
 JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setTouchpadFinger
-  (JNIEnv*, jclass, jint stick, jint touchpadIndex, jint fingerIndex, jboolean down, jfloat x, jfloat y)
+  (JNIEnv*, jclass, jint stick, jint touchpadIndex, jint fingerIndex,
+   jboolean down, jfloat x, jfloat y)
 {
-  HALSIM_SetJoystickTouchpadFinger(stick, touchpadIndex, fingerIndex, down, x, y);
+  HALSIM_SetJoystickTouchpadFinger(stick, touchpadIndex, fingerIndex, down, x,
+                                   y);
 }
 
 /*

@@ -350,8 +350,8 @@ double DriverStation::GetStickAxis(int stick, int axis) {
   return axes.axes[axis];
 }
 
-DriverStation::TouchpadFinger
-DriverStation::GetStickTouchpadFinger(int stick, int touchpad, int finger) {
+DriverStation::TouchpadFinger DriverStation::GetStickTouchpadFinger(
+    int stick, int touchpad, int finger) {
   if (stick < 0 || stick >= kJoystickPorts) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return TouchpadFinger{false, 0.0f, 0.0f};

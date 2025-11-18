@@ -72,7 +72,6 @@ public final class DriverStation {
   }
 
   private static class HALJoystickTouchpads {
-
     public final HALJoystickTouchpad[] m_touchpads =
         new HALJoystickTouchpad[DriverStationJNI.kMaxJoystickTouchpads];
     public int m_count;

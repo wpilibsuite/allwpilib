@@ -503,11 +503,23 @@ public class GenericHID {
         this.m_rightTriggerRumble);
   }
 
-  public boolean getTouchpadFingerAvailable(int touchpadIndex, int fingerIndex) {
-    return DriverStation.getStickTouchpadFingerAvailable(m_port, touchpadIndex, fingerIndex);
+  /**
+   * Check if a touchpad finger is available.
+   * @param touchpad The touchpad to check.
+   * @param finger The finger to check.
+   * @return true if the touchpad finger is available.
+   */
+  public boolean getTouchpadFingerAvailable(int touchpad, int finger) {
+    return DriverStation.getStickTouchpadFingerAvailable(m_port, touchpad, finger);
   }
 
-  public TouchpadFinger getTouchpadFinger(int touchpadIndex, int fingerIndex) {
-    return DriverStation.getStickTouchpadFinger(m_port, touchpadIndex, fingerIndex);
+  /**
+   * Get the touchpad finger data.
+   * @param touchpad The touchpad to read.
+   * @param finger The finger to read.
+   * @return The touchpad finger data.
+   */
+  public TouchpadFinger getTouchpadFinger(int touchpad, int finger) {
+    return DriverStation.getStickTouchpadFinger(m_port, touchpad, finger);
   }
 }
