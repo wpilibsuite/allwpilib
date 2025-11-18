@@ -62,8 +62,6 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
 
 On macOS ARM, run `softwareupdate --install-rosetta`. This is necessary to be able to use the macOS x86 roboRIO toolchain on ARM.
 
-On linux, run `sudo apt install gfortran`. This is necessary to be able to build WPIcal on linux platforms.
-
 On linux, run `sudo apt install libx11-dev libgl-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev` to be able to build things depending on glfw.
 
 ## Setup
