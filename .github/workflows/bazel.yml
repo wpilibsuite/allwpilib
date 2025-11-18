@@ -147,6 +147,6 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.platform }}-robotpy-pregeneration-fixes
+          name: robotpy-pregeneration-fixes
           path: robotpy-pregeneration.patch
         if: ${{ failure() }}

@@ -47,6 +47,8 @@ classes:
       GetPOVsAvailable:
       GetButtonsMaximumIndex:
       GetButtonsAvailable:
+      GetTouchpadFingerAvailable:
+      GetTouchpadFinger:
 
 inline_code: |
   cls_GenericHID
