@@ -35,7 +35,10 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [validation]
     steps:
-      - name: Free Disk Space
+      - name: Check disk free space pre-cleanup
+        run: df -h
+
+      - name: Free disk space
         uses: jlumbroso/free-disk-space@main
         with:
           tool-cache: false
@@ -45,6 +48,10 @@ jobs:
           large-packages: false
           docker-images: false
           swap-storage: false
+
+      - name: Check disk free space post-cleanup
+        run: df -h
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -52,20 +59,23 @@ jobs:
         run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
         if: startsWith(github.ref, 'refs/tags/v2027')
       - name: Build with Gradle
+        # main on 2021-05-30, to include addnab/docker-run-action/pull/17
         uses: addnab/docker-run-action@3e77f186b7a929ef010f183a9e24c0f9955ea609
         with:
           image: ${{ matrix.container }}
           options: -v ${{ github.workspace }}:/work -w /work -e ARTIFACTORY_PUBLISH_USERNAME -e ARTIFACTORY_PUBLISH_PASSWORD -e GITHUB_REF -e CI
-          run: df . && echo $GITHUB_REF && ./gradlew build --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
+          run: ./gradlew build --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
         env:
           ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
-      - name: Check free disk space
-        run: df .
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact-name }}
           path: build/allOutputs
+
+      - name: Check disk free space
+        if: always()
+        run: df -h
 
   build-host:
     env:
@@ -113,6 +123,22 @@ jobs:
     runs-on: ${{ matrix.os }}
     needs: [validation]
     steps:
+      - name: Check disk free space pre-cleanup
+        run: df -h
+
+      - name: Free disk space (macOS)
+        # CodeQL: 5G
+        # go: 748M
+        # Android: 12G
+        run: |
+          rm -rf /Users/runner/hostedtoolcache/CodeQL
+          rm -rf /Users/runner/hostedtoolcache/go
+          rm -rf /Users/runner/Library/Android
+        if: startsWith(matrix.os, 'macOS')
+
+      - name: Check disk free space post-cleanup
+        run: df -h
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -139,24 +165,6 @@ jobs:
         run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
         shell: bash
         if: startsWith(github.ref, 'refs/tags/v2027')
-      - name: Check disk free space (Windows)
-        run: wmic logicaldisk get caption, freespace
-        if: matrix.os == 'windows-2022'
-      - name: Check disk free space pre-cleanup (macOS)
-        run: df -h .
-        if: matrix.os == 'macOS-15'
-      - name: Cleanup disk space
-        # CodeQL: 5G
-        # go: 748M
-        # Android: 12G
-        run: |
-          rm -rf /Users/runner/hostedtoolcache/CodeQL
-          rm -rf /Users/runner/hostedtoolcache/go
-          rm -rf /Users/runner/Library/Android
-        if: matrix.os == 'macOS-15'
-      - name: Check disk free space post-cleanup (macOS)
-        run: df -h .
-        if: matrix.os == 'macOS-15'
       - name: Build with Gradle
         run: ./gradlew ${{ matrix.task }} --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
         env:
@@ -167,16 +175,14 @@ jobs:
         if: |
           matrix.artifact-name == 'macOS' && (github.repository == 'wpilibsuite/allwpilib' &&
           (github.ref == 'refs/heads/2027' || startsWith(github.ref, 'refs/tags/v2027')))
-      - name: Check disk free space (Windows)
-        run: wmic logicaldisk get caption, freespace
-        if: matrix.os == 'windows-2022'
-      - name: Check disk free space (macOS)
-        run: df -h .
-        if: matrix.os == 'macOS-15'
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact-name }}
           path: ${{ matrix.outputs }}
+
+      - name: Check disk free space
+        if: always()
+        run: df -h
 
   build-documentation:
     name: "Build - Documentation"
@@ -275,7 +281,7 @@ jobs:
     needs: [build-docker, build-host, build-documentation]
     runs-on: ubuntu-24.04
     steps:
-      - name: Free Disk Space
+      - name: Free disk space
         if: |
           github.repository == 'wpilibsuite/allwpilib' &&
           (github.ref == 'refs/heads/2027' || startsWith(github.ref, 'refs/tags/v2027'))
@@ -288,6 +294,7 @@ jobs:
           large-packages: false
           docker-images: false
           swap-storage: false
+
       - uses: actions/checkout@v4
         if: |
           github.repository == 'wpilibsuite/allwpilib' &&
