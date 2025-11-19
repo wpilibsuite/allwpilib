@@ -135,8 +135,11 @@ jobs:
         run: bazel test //... -k --test_tag_filters=robotpy_scan_headers --build_tests_only
         shell: bash
 
-      - name: Run robotpy pregeneration
-        run: bazel run //:write_robotpy_files
+      - name: Run yaml file generation
+        run: bazel run //:write_robotpy_update_yaml_files
+
+      - name: Run build file generation
+        run: bazel run //:write_robotpy_generated_pybind_files
 
       - name: Check Output
         run: git --no-pager diff --exit-code HEAD
