@@ -164,8 +164,8 @@ public class DriverStationJNI extends JNIWrapper {
    * @param touchpadFingersArray all touchpad fingers
    * @param buttonsAndMetadata array of long joystick axes count, long joystick povs count, long
    *     joystick buttons count, long joystick buttons values, long joystick touchpad count,
-   *     long pad 0 finger0 down 0x1, finger1 down 0x2, fingerCount 0xC,
-   *     long pad 1 finger0 down 0x1, finger1 down 0x2, fingerCount 0xC
+   *     long pad 0 finger0 down 0x1, finger1 down 0x2, fingerCount 0xC, long pad 1 finger0 down 0x1,
+   *     finger1 down 0x2, fingerCount 0xC
    * @see "HAL_GetAllJoystickData"
    */
   public static native void getAllJoystickData(
