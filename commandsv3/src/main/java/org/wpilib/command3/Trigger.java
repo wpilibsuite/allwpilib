@@ -53,8 +53,6 @@ public class Trigger implements BooleanSupplier {
   private Signal m_cachedSignal;
 
   private final Map<BindingType, List<Binding>> m_bindings = new EnumMap<>(BindingType.class);
-  private final Runnable m_eventLoopCallback = this::poll;
-  private boolean m_isBoundToEventLoop; // used for lazily binding to the event loop
 
   /**
    * Represents the state of a signal: high or low. Used instead of a boolean for nullity on the
@@ -75,9 +73,10 @@ public class Trigger implements BooleanSupplier {
    * @param condition the condition represented by this trigger
    */
   public Trigger(Scheduler scheduler, BooleanSupplier condition) {
-    m_scheduler = requireNonNullParam(scheduler, "scheduler", "Trigger");
-    m_loop = scheduler.getDefaultEventLoop();
-    m_condition = requireNonNullParam(condition, "condition", "Trigger");
+    this(
+        requireNonNullParam(scheduler, "scheduler", "Trigger"),
+        scheduler.getDefaultEventLoop(),
+        requireNonNullParam(condition, "condition", "Trigger"));
   }
 
   /**
@@ -103,6 +102,8 @@ public class Trigger implements BooleanSupplier {
     m_scheduler = requireNonNullParam(scheduler, "scheduler", "Trigger");
     m_loop = requireNonNullParam(loop, "loop", "Trigger");
     m_condition = requireNonNullParam(condition, "condition", "Trigger");
+
+    m_loop.bind(this::poll);
   }
 
   /**
@@ -410,11 +411,6 @@ public class Trigger implements BooleanSupplier {
     m_bindings
         .computeIfAbsent(bindingType, _k -> new ArrayList<>())
         .add(new Binding(scope, bindingType, command, new Throwable().getStackTrace()));
-
-    if (!m_isBoundToEventLoop) {
-      m_loop.bind(m_eventLoopCallback);
-      m_isBoundToEventLoop = true;
-    }
   }
 
   private void addBinding(BindingType bindingType, Command command) {

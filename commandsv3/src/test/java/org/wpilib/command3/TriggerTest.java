@@ -248,15 +248,9 @@ class TriggerTest extends CommandTestBase {
 
   @Test
   void risingEdge() {
-    var command = new NullCommand();
-
     var signal = new AtomicBoolean(false);
     var baseTrigger = new Trigger(m_scheduler, signal::get);
     var risingEdgeTrigger = baseTrigger.risingEdge();
-
-    // Ensure bindings. Triggers aren't polled when no bindings have been added.
-    baseTrigger.addBinding(BindingScope.global(), BindingType.RUN_WHILE_HIGH, command);
-    risingEdgeTrigger.addBinding(BindingScope.global(), BindingType.RUN_WHILE_HIGH, command);
 
     assertAll(
         "Signals start null",
@@ -305,15 +299,9 @@ class TriggerTest extends CommandTestBase {
 
   @Test
   void fallingEdge() {
-    var command = new NullCommand();
-
     var signal = new AtomicBoolean(false);
     var baseTrigger = new Trigger(m_scheduler, signal::get);
     var fallingEdgeTrigger = baseTrigger.fallingEdge();
-
-    // Ensure bindings. Triggers aren't polled when no bindings have been added.
-    baseTrigger.addBinding(BindingScope.global(), BindingType.RUN_WHILE_HIGH, command);
-    fallingEdgeTrigger.addBinding(BindingScope.global(), BindingType.RUN_WHILE_HIGH, command);
 
     assertAll(
         "Signals start null",
