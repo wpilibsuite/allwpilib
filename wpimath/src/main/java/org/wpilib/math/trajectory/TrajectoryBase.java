@@ -8,8 +8,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Transform2d;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +15,8 @@ import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Transform2d;
 
 /** A base trajectory class for general-purpose trajectory following. */
 public class TrajectoryBase extends Trajectory<TrajectorySample.Base> {

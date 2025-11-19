@@ -6,12 +6,12 @@ package org.wpilib.math.trajectory;
 
 import static org.wpilib.units.Units.Seconds;
 
-import org.wpilib.math.util.MathUtil;
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Transform2d;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Transform2d;
+import org.wpilib.math.util.MathUtil;
 
 /** A trajectory for spline-based path following. */
 public class SplineTrajectory extends Trajectory<SplineSample> {

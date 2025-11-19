@@ -4,11 +4,14 @@
 
 package org.wpilib.math.trajectory;
 
-import static org.wpilib.math.util.Units.feetToMeters;
-import static org.wpilib.units.Units.Seconds;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.wpilib.math.util.Units.feetToMeters;
+import static org.wpilib.units.Units.Seconds;
 
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Transform2d;
@@ -20,9 +23,6 @@ import org.wpilib.math.kinematics.MecanumDriveKinematics;
 import org.wpilib.math.kinematics.MecanumDriveWheelSpeeds;
 import org.wpilib.math.kinematics.SwerveDriveKinematics;
 import org.wpilib.math.kinematics.SwerveModuleState;
-import java.util.ArrayList;
-import java.util.List;
-import org.junit.jupiter.api.Test;
 
 class DrivetrainTrajectoryConversionTest {
   private static final double kEpsilon = 1e-6;

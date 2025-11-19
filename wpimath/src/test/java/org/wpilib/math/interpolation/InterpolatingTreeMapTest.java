@@ -6,9 +6,9 @@ package org.wpilib.math.interpolation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.wpilib.units.Units;
 import org.wpilib.units.measure.Distance;
-import org.junit.jupiter.api.Test;
 
 class InterpolatingTreeMapTest {
   @Test

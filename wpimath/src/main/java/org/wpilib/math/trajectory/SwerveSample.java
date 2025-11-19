@@ -6,6 +6,7 @@ package org.wpilib.math.trajectory;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Arrays;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.kinematics.ChassisAccelerations;
@@ -13,7 +14,6 @@ import org.wpilib.math.kinematics.ChassisSpeeds;
 import org.wpilib.math.kinematics.SwerveDriveKinematics;
 import org.wpilib.math.kinematics.SwerveModuleState;
 import org.wpilib.units.measure.Time;
-import java.util.Arrays;
 
 public class SwerveSample extends TrajectorySample<SwerveSample> {
   /**

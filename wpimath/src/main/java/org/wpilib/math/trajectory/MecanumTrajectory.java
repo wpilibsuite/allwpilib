@@ -8,15 +8,15 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Transform2d;
-import org.wpilib.math.kinematics.MecanumDriveKinematics;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.stream.Stream;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Transform2d;
+import org.wpilib.math.kinematics.MecanumDriveKinematics;
 
 /** A trajectory for mecanum drive robots with drivetrain-specific interpolation. */
 public class MecanumTrajectory extends Trajectory<MecanumSample> {

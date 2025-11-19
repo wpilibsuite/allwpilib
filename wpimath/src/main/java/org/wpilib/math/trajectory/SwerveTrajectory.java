@@ -8,15 +8,15 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Transform2d;
-import org.wpilib.math.kinematics.SwerveDriveKinematics;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.stream.Stream;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Transform2d;
+import org.wpilib.math.kinematics.SwerveDriveKinematics;
 
 /** A trajectory for swerve drive robots with drivetrain-specific interpolation. */
 public class SwerveTrajectory extends Trajectory<SwerveSample> {

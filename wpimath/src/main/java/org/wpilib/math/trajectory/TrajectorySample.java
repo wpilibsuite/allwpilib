@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import org.wpilib.math.util.MathUtil;
+import java.util.Objects;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Transform2d;
@@ -18,9 +18,9 @@ import org.wpilib.math.geometry.Twist2d;
 import org.wpilib.math.kinematics.ChassisAccelerations;
 import org.wpilib.math.kinematics.ChassisSpeeds;
 import org.wpilib.math.trajectory.struct.TrajectorySampleStruct;
+import org.wpilib.math.util.MathUtil;
 import org.wpilib.units.measure.Time;
 import org.wpilib.util.struct.StructSerializable;
-import java.util.Objects;
 
 /** Represents a single sample in a trajectory. */
 @JsonPropertyOrder({"timestamp", "pose", "velocity", "acceleration"})
@@ -198,7 +198,8 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
       super(timestamp, pose, velocity, acceleration);
     }
 
-    public Base(Time timestamp, Pose2d pose, ChassisSpeeds velocity, ChassisAccelerations acceleration) {
+    public Base(
+        Time timestamp, Pose2d pose, ChassisSpeeds velocity, ChassisAccelerations acceleration) {
       super(timestamp, pose, velocity, acceleration);
     }
 

@@ -4,10 +4,10 @@
 
 package org.wpilib.math.estimator;
 
-import static org.wpilib.units.Units.Seconds;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.wpilib.units.Units.Seconds;
 
 import java.util.ArrayList;
 import java.util.Collections;

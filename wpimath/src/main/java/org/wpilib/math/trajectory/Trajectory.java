@@ -7,17 +7,17 @@ package org.wpilib.math.trajectory;
 import static org.wpilib.units.Units.Seconds;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.wpilib.math.util.MathUtil;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.interpolation.InterpolatingTreeMap;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import org.wpilib.math.kinematics.MecanumDriveKinematics;
 import org.wpilib.math.kinematics.SwerveDriveKinematics;
+import org.wpilib.math.util.MathUtil;
 import org.wpilib.units.measure.Time;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
 
 /**
  * Represents a trajectory consisting of a list of {@link TrajectorySample}s, kinematically
