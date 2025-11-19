@@ -67,9 +67,8 @@ public class DataLogReader implements Iterable<DataLogRecord> {
   /**
    * Gets the data log version. Returns 0 if data log is invalid.
    *
-   * @return Version number; most significant byte is major, least significant is
-   *         minor (so version
-   *         1.0 will be 0x0100)
+   * @return Version number; most significant byte is major, least significant is minor (so version
+   *     1.0 will be 0x0100)
    */
   public short getVersion() {
     if (m_buf.remaining() < 12) {
@@ -138,16 +137,16 @@ public class DataLogReader implements Iterable<DataLogRecord> {
       if (record.isStart()) {
         StartRecordData startData = record.getStartData();
         boolean isNew = m_entriesByName.containsKey(startData.name);
-        DataLogReaderEntry readerEntry = new DataLogReaderEntry(entry, startData.name,
-            startData.type, startData.metadata);
+        DataLogReaderEntry readerEntry =
+            new DataLogReaderEntry(entry, startData.name, startData.type, startData.metadata);
         if (isNew) {
-          readerEntry.m_ranges.add(new DataLogReaderRange(new DataLogIterator(this, pos),
-              new DataLogIterator(this, pos + m_buf.remaining())));
+          readerEntry.m_ranges.add(
+              new DataLogReaderRange(
+                  new DataLogIterator(this, pos),
+                  new DataLogIterator(this, pos + m_buf.remaining())));
         }
         m_entriesByName.put(startData.name, readerEntry);
-        m_entriesById.put(
-            entry,
-            readerEntry);
+        m_entriesById.put(entry, readerEntry);
       } else if (record.isFinish()) {
         // update range
         List<DataLogReaderRange> ranges = m_entriesById.get(record.getEntry()).m_ranges;
@@ -183,10 +182,22 @@ public class DataLogReader implements Iterable<DataLogRecord> {
     return m_buf.remaining();
   }
 
+  /**
+   * Fetches the entry with the given id.
+   *
+   * @param entry Id number of the desired entry, which is associated with all of its records.
+   * @return The DataLogReaderEntry associated with that entry id.
+   */
   DataLogReaderEntry getEntry(int entry) {
     return m_entriesById.get(entry);
   }
 
+  /**
+   * Fetches the entry with the given name.
+   *
+   * @param name Name string of an entry.
+   * @return The DataLogReaderEntry associated with that name.
+   */
   DataLogReaderEntry getEntry(String name) {
     return m_entriesByName.get(name);
   }
@@ -195,9 +206,18 @@ public class DataLogReader implements Iterable<DataLogRecord> {
   private HashMap<Integer, DataLogReaderEntry> m_entriesById;
   private HashMap<String, DataLogReaderEntry> m_entriesByName;
 
+  /**
+   * DataLogReader Entry class, which associates an entry's ID with its name, type, and metadata in
+   * a persistent way.
+   */
   public static class DataLogReaderEntry extends StartRecordData {
     private final List<DataLogReaderRange> m_ranges;
 
+    /**
+     * Returns the list of ranges for which this entry is valid.
+     *
+     * @return List of DataLogReaderRange for which this entry is valid
+     */
     public List<DataLogReaderRange> getRanges() {
       return m_ranges;
     }
@@ -208,6 +228,6 @@ public class DataLogReader implements Iterable<DataLogRecord> {
     }
   }
 
-  public record DataLogReaderRange(DataLogIterator begin, DataLogIterator end) {
-  }
+  /** Range of records during which an entry is valid. */
+  public record DataLogReaderRange(DataLogIterator begin, DataLogIterator end) {}
 }
