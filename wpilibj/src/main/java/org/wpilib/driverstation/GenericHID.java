@@ -505,6 +505,7 @@ public class GenericHID {
 
   /**
    * Check if a touchpad finger is available.
+   *
    * @param touchpad The touchpad to check.
    * @param finger The finger to check.
    * @return true if the touchpad finger is available.
@@ -515,6 +516,7 @@ public class GenericHID {
 
   /**
    * Get the touchpad finger data.
+   *
    * @param touchpad The touchpad to read.
    * @param finger The finger to read.
    * @return The touchpad finger data.
