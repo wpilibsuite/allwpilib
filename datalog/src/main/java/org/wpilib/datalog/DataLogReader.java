@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
+import org.wpilib.datalog.DataLogRecord.MetadataRecordData;
 import org.wpilib.datalog.DataLogRecord.StartRecordData;
 
 /** Data log reader (reads logs written by the DataLog class). */
@@ -29,6 +30,7 @@ public class DataLogReader implements Iterable<DataLogRecord> {
     m_buf = buffer;
     m_buf.order(ByteOrder.LITTLE_ENDIAN);
     m_entriesById = new HashMap<>();
+    m_entriesByName = new HashMap<>();
   }
 
   /**
@@ -65,8 +67,9 @@ public class DataLogReader implements Iterable<DataLogRecord> {
   /**
    * Gets the data log version. Returns 0 if data log is invalid.
    *
-   * @return Version number; most significant byte is major, least significant is minor (so version
-   *     1.0 will be 0x0100)
+   * @return Version number; most significant byte is major, least significant is
+   *         minor (so version
+   *         1.0 will be 0x0100)
    */
   public short getVersion() {
     if (m_buf.remaining() < 12) {
@@ -133,10 +136,28 @@ public class DataLogReader implements Iterable<DataLogRecord> {
       data.limit(pos + headerLen + size);
       DataLogRecord record = new DataLogRecord(entry, timestamp, data.slice());
       if (record.isStart()) {
-        var startdata = record.getStartData();
+        StartRecordData startData = record.getStartData();
+        boolean isNew = m_entriesByName.containsKey(startData.name);
+        DataLogReaderEntry readerEntry = new DataLogReaderEntry(entry, startData.name,
+            startData.type, startData.metadata);
+        if (isNew) {
+          readerEntry.m_ranges.add(new DataLogReaderRange(new DataLogIterator(this, pos),
+              new DataLogIterator(this, pos + m_buf.remaining())));
+        }
+        m_entriesByName.put(startData.name, readerEntry);
         m_entriesById.put(
             entry,
-            new DataLogReaderEntry(entry, startdata.name, startdata.type, startdata.metadata));
+            readerEntry);
+      } else if (record.isFinish()) {
+        // update range
+        List<DataLogReaderRange> ranges = m_entriesById.get(record.getEntry()).m_ranges;
+        DataLogReaderRange range = ranges.getLast();
+        range = new DataLogReaderRange(range.begin, new DataLogIterator(this, pos));
+        ranges.set(ranges.size() - 1, range);
+        m_entriesById.remove(entry);
+      } else if (record.isSetMetadata()) {
+        MetadataRecordData mrd = record.getSetMetadataData();
+        m_entriesById.get(mrd.entry).metadata = mrd.metadata;
       }
       return record;
     } catch (BufferUnderflowException | IndexOutOfBoundsException ex) {
@@ -166,8 +187,13 @@ public class DataLogReader implements Iterable<DataLogRecord> {
     return m_entriesById.get(entry);
   }
 
+  DataLogReaderEntry getEntry(String name) {
+    return m_entriesByName.get(name);
+  }
+
   private final ByteBuffer m_buf;
   private HashMap<Integer, DataLogReaderEntry> m_entriesById;
+  private HashMap<String, DataLogReaderEntry> m_entriesByName;
 
   public static class DataLogReaderEntry extends StartRecordData {
     private final List<DataLogReaderRange> m_ranges;
@@ -178,9 +204,10 @@ public class DataLogReader implements Iterable<DataLogRecord> {
 
     public DataLogReaderEntry(int entry, String name, String type, String metadata) {
       super(entry, name, type, metadata);
-      m_ranges = new ArrayList<>(); // TODO: determine how this will be used
+      m_ranges = new ArrayList<>();
     }
   }
 
-  public record DataLogReaderRange(DataLogIterator begin, DataLogIterator end) {}
+  public record DataLogReaderRange(DataLogIterator begin, DataLogIterator end) {
+  }
 }

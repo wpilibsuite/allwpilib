@@ -143,7 +143,7 @@ public class DataLogRecord {
     public final String type;
 
     /** Initial metadata. */
-    public final String metadata;
+    public String metadata;
   }
 
   /**
