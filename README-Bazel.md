@@ -20,8 +20,8 @@ Examples:
 - `build -c opt` - Always build optimized targets. The default compiler flags were chosen to build as fast as possible, and thus don't contain many optimizations
 - `build -k` - `-k` is analogous to the MAKE flag `--keep-going`, so the build will not stop on the first error.
 - ```
-  build --local_ram_resources=HOST_RAM*.5 # Don't use more than half my RAM when building
-  build --local_cpu_resources=HOST_CPUS-1 # Leave one core alone
+  build --local_resources=memory=HOST_RAM*.5 # Don't use more than half my RAM when building
+  build --local_resources=cpu=HOST_CPUS-1 # Leave one core alone
   ```
 
 The default settings build all the release artifact variants relevant for your platform.  The overall list of options ends up being, essentially, all the variants of (linux, osx, windows) x (debug, release) x (static, shared) x (aarch64, x86).  OSX and Windows are hard to compile for from any other OS, so we by default build for your local OS and the system core, with all the variants.
