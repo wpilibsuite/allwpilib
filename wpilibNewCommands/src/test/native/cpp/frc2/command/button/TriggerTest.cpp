@@ -250,20 +250,17 @@ TEST_F(TriggerTest, Debounce) {
 
 TEST_F(TriggerTest, UntilTrigger) {
   auto& scheduler = CommandScheduler::GetInstance();
+  bool pressed = false;
 
-  bool triggerActive = false;
-  Trigger trigger([&triggerActive] { return triggerActive; });
-
+  Trigger trigger([&pressed] { return pressed; });
   CommandPtr command = cmd::Idle().Until(trigger);
 
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(command));
-
   scheduler.Schedule(command);
   scheduler.Run();
   EXPECT_TRUE(scheduler.IsScheduled(command));
-
-  triggerActive = true;
+  pressed = true;
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(command));
 }
