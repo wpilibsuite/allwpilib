@@ -89,7 +89,7 @@ public final class AngularMomentumUnit extends MultUnit<LinearMomentumUnit, Dist
   public MomentOfInertiaUnit per(AngularVelocityUnit omega) {
     return MomentOfInertiaUnit.combine(this, omega);
   }
-  
+
   /**
    * Creates a ratio unit between this unit and an arbitrary other unit.
    *
