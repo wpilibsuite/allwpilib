@@ -103,12 +103,12 @@ public final class AngularMomentumUnit extends MultUnit<LinearMomentumUnit, Dist
   }
 
   /**
-   * Multiplies this angular momentum by an angular velocity to yield a unit of moment of inertia.
+   * Combines this angular momentum by an angular velocity to yield a unit of moment of inertia.
    *
    * @param omega the unit of angular velocity
    * @return the moment of inertia unit
    */
-  public MomentOfInertiaUnit mult(AngularVelocityUnit omega) {
+  public MomentOfInertiaUnit per(AngularVelocityUnit omega) {
     return MomentOfInertiaUnit.combine(this, omega);
   }
 }

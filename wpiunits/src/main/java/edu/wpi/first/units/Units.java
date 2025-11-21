@@ -378,7 +378,7 @@ public final class Units {
 
   /** The standard SI unit for moment of inertia. */
   public static final MomentOfInertiaUnit KilogramSquareMeters =
-    MomentOfInertiaUnit.combine(KilogramMetersSquaredPerSecond, RadiansPerSecond);
+    KilogramMetersSquaredPerSecond.per(RadiansPerSecond);
 
   // VoltageUnit
   /** The base unit of electric potential. */
