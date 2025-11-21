@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package org.wpilib.datalog;
 
 import java.util.ArrayList;
@@ -7,19 +11,28 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
-
 import org.wpilib.datalog.DataLogRecord.MetadataRecordData;
 import org.wpilib.datalog.DataLogRecord.StartRecordData;
 
+/**
+ * DataLogReaderThread reads logs on a background thread via {@link DataLogReader} in order to
+ * associate human-readable metadata with log records.
+ */
 public class DataLogReaderThread implements AutoCloseable {
-  private Thread m_thread;
-  private ReentrantLock m_mutex;
-  private DataLogReader m_reader;
-  private AtomicBoolean m_done = new AtomicBoolean(false);
-  private AtomicBoolean m_active = new AtomicBoolean(true);
-  private AtomicInteger m_numRecords = new AtomicInteger(0);
+  private final Thread m_thread;
+  private final ReentrantLock m_mutex;
+  private final DataLogReader m_reader;
+  private final AtomicBoolean m_done = new AtomicBoolean(false);
+  private final AtomicBoolean m_active = new AtomicBoolean(true);
+  private final AtomicInteger m_numRecords = new AtomicInteger(0);
 
+  /**
+   * Creates a new DataLogReaderThread.
+   *
+   * @param reader A DataLogReader instance for the log file that should be read.
+   */
   public DataLogReaderThread(DataLogReader reader) {
+    m_mutex = new ReentrantLock();
     m_reader = reader;
     m_entriesById = new HashMap<>();
     m_entriesByName = new HashMap<>();
@@ -45,10 +58,11 @@ public class DataLogReaderThread implements AutoCloseable {
           boolean isNew = m_entriesByName.containsKey(data.name);
           m_entriesByName.put(data.name, data);
           if (isNew) {
-            data.m_ranges.add(new DataLogReaderRange(m_reader.iterator(), new DataLogIterator(m_reader, Integer.MAX_VALUE)));
+            data.m_ranges.add(
+                new DataLogReaderRange(
+                    m_reader.iterator(), new DataLogIterator(m_reader, Integer.MAX_VALUE)));
           }
-          oldEntry = data; // is this needed?
-          // if (data.type.equals("structschema") || 
+          // if (data.type.equals("structschema") ||
           //     data.type.equals("proto:FileDescriptorProto")) {
           //
           //   // TODO: figure out schema entries
@@ -91,10 +105,20 @@ public class DataLogReaderThread implements AutoCloseable {
     m_done.set(true);
   }
 
+  /**
+   * Returns the number of records contained in the given DataLog.
+   *
+   * @return The number of records in this DataLog.
+   */
   public int getNumRecords() {
     return m_numRecords.get();
   }
 
+  /**
+   * Returns the number of distinct entries in the DataLog.
+   *
+   * @return The number of distinct entries in the DataLog.
+   */
   public int getNumEntries() {
     m_mutex.lock();
     try {
@@ -104,6 +128,12 @@ public class DataLogReaderThread implements AutoCloseable {
     }
   }
 
+  /**
+   * Executes a user-provided function on the each uniquely-named entry from the DataLog.
+   *
+   * @param func A function that accepts a <code>DataLogReaderEntry</code> that will be called on
+   *     every entry with a unique name.
+   */
   public void forEachEntryName(Consumer<DataLogReaderEntry> func) {
     m_mutex.lock();
     try {
@@ -134,7 +164,9 @@ public class DataLogReaderThread implements AutoCloseable {
     try {
       if (m_entriesById.containsKey(entry)) {
         return m_entriesById.get(entry);
-      } else return null;
+      } else {
+        return null;
+      }
     } finally {
       m_mutex.unlock();
     }
@@ -151,14 +183,16 @@ public class DataLogReaderThread implements AutoCloseable {
     try {
       if (m_entriesByName.containsKey(name)) {
         return m_entriesByName.get(name);
-      } else return null;
+      } else {
+        return null;
+      }
     } finally {
       m_mutex.unlock();
     }
   }
 
-  private HashMap<Integer, DataLogReaderEntry> m_entriesById;
-  private HashMap<String, DataLogReaderEntry> m_entriesByName;
+  private final HashMap<Integer, DataLogReaderEntry> m_entriesById;
+  private final HashMap<String, DataLogReaderEntry> m_entriesByName;
 
   /**
    * DataLogReader Entry class, which associates an entry's ID with its name, type, and metadata in
@@ -180,7 +214,7 @@ public class DataLogReaderThread implements AutoCloseable {
       super(entry, name, type, metadata);
       m_ranges = new ArrayList<>();
     }
-    
+
     public DataLogReaderEntry(StartRecordData startData) {
       super(startData.entry, startData.name, startData.type, startData.metadata);
       m_ranges = new ArrayList<>();
@@ -198,6 +232,7 @@ public class DataLogReaderThread implements AutoCloseable {
     }
   }
 
+  @Override
   public void close() {
     m_active.set(false);
     try {
