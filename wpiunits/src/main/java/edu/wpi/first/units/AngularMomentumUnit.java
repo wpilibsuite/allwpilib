@@ -111,5 +111,4 @@ public final class AngularMomentumUnit extends MultUnit<LinearMomentumUnit, Dist
   public double convertFrom(double magnitude, AngularMomentumUnit otherUnit) {
     return fromBaseUnits(otherUnit.toBaseUnits(magnitude));
   }
-
 }
