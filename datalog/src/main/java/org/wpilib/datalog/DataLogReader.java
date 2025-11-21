@@ -11,13 +11,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
-import org.wpilib.datalog.DataLogRecord.MetadataRecordData;
-import org.wpilib.datalog.DataLogRecord.StartRecordData;
 
 /** Data log reader (reads logs written by the DataLog class). */
 public class DataLogReader implements Iterable<DataLogRecord> {
@@ -29,8 +24,6 @@ public class DataLogReader implements Iterable<DataLogRecord> {
   public DataLogReader(ByteBuffer buffer) {
     m_buf = buffer;
     m_buf.order(ByteOrder.LITTLE_ENDIAN);
-    m_entriesById = new HashMap<>();
-    m_entriesByName = new HashMap<>();
   }
 
   /**
@@ -133,32 +126,7 @@ public class DataLogReader implements Iterable<DataLogRecord> {
       ByteBuffer data = m_buf.duplicate();
       data.position(pos + headerLen);
       data.limit(pos + headerLen + size);
-      DataLogRecord record = new DataLogRecord(entry, timestamp, data.slice());
-      if (record.isStart()) {
-        StartRecordData startData = record.getStartData();
-        boolean isNew = m_entriesByName.containsKey(startData.name);
-        DataLogReaderEntry readerEntry =
-            new DataLogReaderEntry(entry, startData.name, startData.type, startData.metadata);
-        if (isNew) {
-          readerEntry.m_ranges.add(
-              new DataLogReaderRange(
-                  new DataLogIterator(this, pos),
-                  new DataLogIterator(this, pos + m_buf.remaining())));
-        }
-        m_entriesByName.put(startData.name, readerEntry);
-        m_entriesById.put(entry, readerEntry);
-      } else if (record.isFinish()) {
-        // update range
-        List<DataLogReaderRange> ranges = m_entriesById.get(record.getEntry()).m_ranges;
-        DataLogReaderRange range = ranges.getLast();
-        range = new DataLogReaderRange(range.begin, new DataLogIterator(this, pos));
-        ranges.set(ranges.size() - 1, range);
-        m_entriesById.remove(entry);
-      } else if (record.isSetMetadata()) {
-        MetadataRecordData mrd = record.getSetMetadataData();
-        m_entriesById.get(mrd.entry).metadata = mrd.metadata;
-      }
-      return record;
+      return new DataLogRecord(entry, timestamp, data.slice());
     } catch (BufferUnderflowException | IndexOutOfBoundsException ex) {
       throw new NoSuchElementException();
     }
@@ -182,52 +150,5 @@ public class DataLogReader implements Iterable<DataLogRecord> {
     return m_buf.remaining();
   }
 
-  /**
-   * Fetches the entry with the given id.
-   *
-   * @param entry Id number of the desired entry, which is associated with all of its records.
-   * @return The DataLogReaderEntry associated with that entry id.
-   */
-  DataLogReaderEntry getEntry(int entry) {
-    return m_entriesById.get(entry);
-  }
-
-  /**
-   * Fetches the entry with the given name.
-   *
-   * @param name Name string of an entry.
-   * @return The DataLogReaderEntry associated with that name.
-   */
-  DataLogReaderEntry getEntry(String name) {
-    return m_entriesByName.get(name);
-  }
-
   private final ByteBuffer m_buf;
-  private HashMap<Integer, DataLogReaderEntry> m_entriesById;
-  private HashMap<String, DataLogReaderEntry> m_entriesByName;
-
-  /**
-   * DataLogReader Entry class, which associates an entry's ID with its name, type, and metadata in
-   * a persistent way.
-   */
-  public static class DataLogReaderEntry extends StartRecordData {
-    private final List<DataLogReaderRange> m_ranges;
-
-    /**
-     * Returns the list of ranges for which this entry is valid.
-     *
-     * @return List of DataLogReaderRange for which this entry is valid
-     */
-    public List<DataLogReaderRange> getRanges() {
-      return m_ranges;
-    }
-
-    public DataLogReaderEntry(int entry, String name, String type, String metadata) {
-      super(entry, name, type, metadata);
-      m_ranges = new ArrayList<>();
-    }
-  }
-
-  /** Range of records during which an entry is valid. */
-  public record DataLogReaderRange(DataLogIterator begin, DataLogIterator end) {}
 }
