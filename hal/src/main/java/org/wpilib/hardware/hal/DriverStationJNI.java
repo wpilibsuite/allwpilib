@@ -148,6 +148,12 @@ public class DriverStationJNI extends JNIWrapper {
   /** The maximum number of joysticks. */
   public static final int kMaxJoysticks = 6;
 
+  /** The maximum number of touchpads. */
+  public static final int kMaxJoystickTouchpads = 2;
+
+  /** The maximum number of fingers per touchpad. */
+  public static final int kMaxJoystickTouchpadFingers = 2;
+
   /**
    * Get all joystick data.
    *
@@ -155,8 +161,11 @@ public class DriverStationJNI extends JNIWrapper {
    * @param axesArray all joystick axes
    * @param rawAxesArray all joystick axes as int
    * @param povsArray all povs
+   * @param touchpadFingersArray all touchpad fingers
    * @param buttonsAndMetadata array of long joystick axes count, long joystick povs count, long
-   *     joystick buttons count, long joystick buttons values
+   *     joystick buttons count, long joystick buttons values, long joystick touchpad count, long
+   *     pad 0 finger0 down 0x1, finger1 down 0x2, fingerCount 0xC, long pad 1 finger0 down 0x1,
+   *     finger1 down 0x2, fingerCount 0xC
    * @see "HAL_GetAllJoystickData"
    */
   public static native void getAllJoystickData(
@@ -164,6 +173,7 @@ public class DriverStationJNI extends JNIWrapper {
       float[] axesArray,
       short[] rawAxesArray,
       byte[] povsArray,
+      float[] touchpadFingersArray,
       long[] buttonsAndMetadata);
 
   /**

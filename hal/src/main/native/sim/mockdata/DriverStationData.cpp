@@ -44,6 +44,7 @@ void DriverStationData::ResetData() {
       m_joystickData[i].povs = HAL_JoystickPOVs{};
       m_joystickData[i].buttons = HAL_JoystickButtons{};
       m_joystickData[i].descriptor = HAL_JoystickDescriptor{};
+      m_joystickData[i].touchpads = HAL_JoystickTouchpads{};
       m_joystickData[i].outputs.leds = 0;
       m_joystickData[i].outputs.leftRumble = 0;
       m_joystickData[i].outputs.rightRumble = 0;
@@ -105,6 +106,7 @@ void DriverStationData::ResetData() {
 DEFINE_CPPAPI(Axes, axes, )
 DEFINE_CPPAPI(POVs, povs, )
 DEFINE_CPPAPI(Buttons, buttons, )
+DEFINE_CPPAPI(Touchpads, touchpads, )
 
 DEFINE_CPPAPI_CALLBACKS(Descriptor, descriptor, )
 
@@ -372,6 +374,42 @@ void DriverStationData::GetJoystickAvailables(int32_t stick,
   *povsAvailable = m_joystickData[stick].povs.available;
 }
 
+void DriverStationData::SetJoystickTouchpadCounts(int32_t stick,
+                                                  uint8_t touchpadCount,
+                                                  const uint8_t* fingerCount) {
+  if (stick < 0 || stick >= kNumJoysticks) {
+    return;
+  }
+  std::scoped_lock lock(m_joystickDataMutex);
+  m_joystickData[stick].touchpads.count = touchpadCount;
+  for (uint8_t i = 0; i < touchpadCount; i++) {
+    m_joystickData[stick].touchpads.touchpads[i].count = fingerCount[i];
+  }
+  m_joystickTouchpadsCallbacks(stick, &m_joystickData[stick].touchpads);
+}
+
+void DriverStationData::SetJoystickTouchpadFinger(int32_t stick,
+                                                  int32_t touchpad,
+                                                  int32_t finger, HAL_Bool down,
+                                                  double x, double y) {
+  if (stick < 0 || stick >= kNumJoysticks) {
+    return;
+  }
+  if (touchpad < 0 || touchpad >= HAL_kMaxJoystickTouchpads) {
+    return;
+  }
+  if (finger < 0 || finger >= HAL_kMaxJoystickTouchpadFingers) {
+    return;
+  }
+  std::scoped_lock lock(m_joystickDataMutex);
+  HAL_JoystickTouchpad& tp =
+      m_joystickData[stick].touchpads.touchpads[touchpad];
+  tp.fingers[finger].down = down;
+  tp.fingers[finger].x = x;
+  tp.fingers[finger].y = y;
+  m_joystickTouchpadsCallbacks(stick, &m_joystickData[stick].touchpads);
+}
+
 void DriverStationData::SetJoystickIsGamepad(int32_t stick,
                                              HAL_Bool isGamepad) {
   if (stick < 0 || stick >= kNumJoysticks) {
@@ -490,6 +528,7 @@ DEFINE_CAPI(double, MatchTime, matchTime)
 DEFINE_CAPI(Axes, axes)
 DEFINE_CAPI(POVs, povs)
 DEFINE_CAPI(Buttons, buttons)
+DEFINE_CAPI(Touchpads, touchpads)
 DEFINE_CAPI(Descriptor, descriptor)
 
 int32_t HALSIM_RegisterJoystickLedsCallback(int32_t joystickNum,
@@ -605,6 +644,19 @@ void HALSIM_GetJoystickAvailables(int32_t stick, uint16_t* axesAvailable,
                                   uint8_t* povsAvailable) {
   SimDriverStationData->GetJoystickAvailables(stick, axesAvailable,
                                               buttonsAvailable, povsAvailable);
+}
+
+void HALSIM_SetJoystickTouchpadCounts(int32_t stick, uint8_t touchpadCount,
+                                      const uint8_t* fingerCount) {
+  SimDriverStationData->SetJoystickTouchpadCounts(stick, touchpadCount,
+                                                  fingerCount);
+}
+
+void HALSIM_SetJoystickTouchpadFinger(int32_t stick, int32_t touchpad,
+                                      int32_t finger, HAL_Bool down, double x,
+                                      double y) {
+  SimDriverStationData->SetJoystickTouchpadFinger(stick, touchpad, finger, down,
+                                                  x, y);
 }
 
 void HALSIM_SetJoystickIsGamepad(int32_t stick, HAL_Bool isGamepad) {

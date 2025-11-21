@@ -7,6 +7,7 @@ package org.wpilib.driverstation;
 import java.util.HashMap;
 import java.util.Map;
 import org.wpilib.driverstation.DriverStation.POVDirection;
+import org.wpilib.driverstation.DriverStation.TouchpadFinger;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
 import org.wpilib.hardware.hal.DriverStationJNI;
@@ -500,5 +501,27 @@ public class GenericHID {
         this.m_rightRumble,
         this.m_leftTriggerRumble,
         this.m_rightTriggerRumble);
+  }
+
+  /**
+   * Check if a touchpad finger is available.
+   *
+   * @param touchpad The touchpad to check.
+   * @param finger The finger to check.
+   * @return true if the touchpad finger is available.
+   */
+  public boolean getTouchpadFingerAvailable(int touchpad, int finger) {
+    return DriverStation.getStickTouchpadFingerAvailable(m_port, touchpad, finger);
+  }
+
+  /**
+   * Get the touchpad finger data.
+   *
+   * @param touchpad The touchpad to read.
+   * @param finger The finger to read.
+   * @return The touchpad finger data.
+   */
+  public TouchpadFinger getTouchpadFinger(int touchpad, int finger) {
+    return DriverStation.getStickTouchpadFinger(m_port, touchpad, finger);
   }
 }

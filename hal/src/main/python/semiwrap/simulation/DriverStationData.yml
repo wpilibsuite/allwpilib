@@ -116,3 +116,10 @@ functions:
   HALSIM_SetJoystickPOVsAvailable:
   HALSIM_SetJoystickButtonsAvailable:
   HALSIM_GetJoystickAvailables:
+  HALSIM_RegisterJoystickTouchpadsCallback:
+    ignore: true
+  HALSIM_CancelJoystickTouchpadsCallback:
+  HALSIM_GetJoystickTouchpads:
+  HALSIM_SetJoystickTouchpads:
+  HALSIM_SetJoystickTouchpadCounts:
+  HALSIM_SetJoystickTouchpadFinger:

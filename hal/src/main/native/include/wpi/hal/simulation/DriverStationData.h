@@ -20,6 +20,9 @@ typedef void (*HAL_JoystickPOVsCallback)(const char* name, void* param,
 typedef void (*HAL_JoystickButtonsCallback)(const char* name, void* param,
                                             int32_t joystickNum,
                                             const HAL_JoystickButtons* buttons);
+typedef void (*HAL_JoystickTouchpadsCallback)(
+    const char* name, void* param, int32_t joystickNum,
+    const HAL_JoystickTouchpads* touchpads);
 typedef void (*HAL_JoystickDescriptorCallback)(
     const char* name, void* param, int32_t joystickNum,
     const HAL_JoystickDescriptor* descriptor);
@@ -113,6 +116,15 @@ void HALSIM_GetJoystickButtons(int32_t joystickNum,
 void HALSIM_SetJoystickButtons(int32_t joystickNum,
                                const HAL_JoystickButtons* buttons);
 
+int32_t HALSIM_RegisterJoystickTouchpadsCallback(
+    int32_t joystickNum, HAL_JoystickTouchpadsCallback callback, void* param,
+    HAL_Bool initialNotify);
+void HALSIM_CancelJoystickTouchpadsCallback(int32_t uid);
+void HALSIM_GetJoystickTouchpads(int32_t joystickNum,
+                                 HAL_JoystickTouchpads* touchpads);
+void HALSIM_SetJoystickTouchpads(int32_t joystickNum,
+                                 const HAL_JoystickTouchpads* touchpads);
+
 int32_t HALSIM_RegisterJoystickDescriptorCallback(
     int32_t joystickNum, HAL_JoystickDescriptorCallback callback, void* param,
     HAL_Bool initialNotify);
@@ -157,6 +169,11 @@ void HALSIM_SetJoystickButtonsAvailable(int32_t stick, uint64_t available);
 void HALSIM_GetJoystickAvailables(int32_t stick, uint16_t* axesAvailable,
                                   uint64_t* buttonsAvailable,
                                   uint8_t* povsAvailable);
+void HALSIM_SetJoystickTouchpadCounts(int32_t stick, uint8_t touchpadCount,
+                                      const uint8_t* fingerCount);
+void HALSIM_SetJoystickTouchpadFinger(int32_t stick, int32_t touchpad,
+                                      int32_t finger, HAL_Bool down, double x,
+                                      double y);
 
 void HALSIM_SetJoystickIsGamepad(int32_t stick, HAL_Bool isGamepad);
 void HALSIM_SetJoystickGamepadType(int32_t stick, int32_t type);

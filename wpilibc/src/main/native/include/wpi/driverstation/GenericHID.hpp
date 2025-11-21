@@ -370,6 +370,23 @@ class GenericHID {
    */
   void SetRumble(RumbleType type, double value);
 
+  /**
+   * Check if a touchpad finger is available.
+   * @param touchpad The touchpad to check.
+   * @param finger The finger to check.
+   * @return true if the touchpad finger is available.
+   */
+  bool GetTouchpadFingerAvailable(int touchpad, int finger) const;
+
+  /**
+   * Get the touchpad finger data.
+   * @param touchpad The touchpad to read.
+   * @param finger The finger to read.
+   * @return The touchpad finger data.
+   */
+  DriverStation::TouchpadFinger GetTouchpadFinger(int touchpad,
+                                                  int finger) const;
+
  private:
   int m_port;
   uint16_t m_leftRumble = 0;

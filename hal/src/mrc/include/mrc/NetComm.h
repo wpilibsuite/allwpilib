@@ -186,10 +186,60 @@ struct JoystickButtons {
   uint8_t Count{0};
 };
 
+struct TouchpadFinger {
+  bool Down{false};
+  uint16_t X{0};
+  uint16_t Y{0};
+};
+
+struct Touchpad {
+  std::span<TouchpadFinger> Fingers() {
+    return std::span{FingersStore.data(), GetFingerCount()};
+  }
+
+  std::span<const TouchpadFinger> Fingers() const {
+    return std::span{FingersStore.data(), GetFingerCount()};
+  }
+
+  size_t GetFingerCount() const { return FingerCount; }
+
+  void SetFingerCount(uint8_t NewCount) {
+    FingerCount =
+        (std::min)(NewCount,
+                   static_cast<uint8_t>(MRC_MAX_NUM_TOUCHPAD_FINGERS));
+  }
+
+ private:
+  std::array<TouchpadFinger, MRC_MAX_NUM_TOUCHPAD_FINGERS> FingersStore{};
+  uint8_t FingerCount{0};
+};
+
+struct JoystickTouchpads {
+  std::span<Touchpad> Touchpads() {
+    return std::span{TouchpadsStore.data(), GetTouchpadCount()};
+  }
+
+  std::span<const Touchpad> Touchpads() const {
+    return std::span{TouchpadsStore.data(), GetTouchpadCount()};
+  }
+
+  size_t GetTouchpadCount() const { return TouchpadCount; }
+
+  void SetTouchpadCount(uint8_t NewCount) {
+    TouchpadCount =
+        (std::min)(NewCount, static_cast<uint8_t>(MRC_MAX_NUM_TOUCHPADS));
+  }
+
+ private:
+  std::array<Touchpad, MRC_MAX_NUM_TOUCHPADS> TouchpadsStore{};
+  uint8_t TouchpadCount{0};
+};
+
 struct Joystick {
   JoystickAxes Axes;
   JoystickPovs Povs;
   JoystickButtons Buttons;
+  JoystickTouchpads Touchpads;
 };
 
 struct ControlData {

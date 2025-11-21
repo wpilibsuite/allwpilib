@@ -34,7 +34,8 @@ public final class DriverStation {
   /** Number of Joystick ports. */
   public static final int kJoystickPorts = 6;
 
-  private static final long[] m_metadataCache = new long[4];
+  private static final long[] m_metadataCache = new long[7];
+  private static final float[] m_touchpadFingersCache = new float[8];
 
   private static int availableToCount(long available) {
     // Top bit has to be set
@@ -50,6 +51,36 @@ public final class DriverStation {
       available >>= 1;
     }
     return count;
+  }
+
+  private static final class HALJoystickTouchpadFinger {
+    public float m_x;
+    public float m_y;
+    public boolean m_down;
+  }
+
+  private static class HALJoystickTouchpad {
+    public final HALJoystickTouchpadFinger[] m_fingers =
+        new HALJoystickTouchpadFinger[DriverStationJNI.kMaxJoystickTouchpadFingers];
+    public int m_count;
+
+    HALJoystickTouchpad() {
+      for (int i = 0; i < m_fingers.length; i++) {
+        m_fingers[i] = new HALJoystickTouchpadFinger();
+      }
+    }
+  }
+
+  private static class HALJoystickTouchpads {
+    public final HALJoystickTouchpad[] m_touchpads =
+        new HALJoystickTouchpad[DriverStationJNI.kMaxJoystickTouchpads];
+    public int m_count;
+
+    HALJoystickTouchpads() {
+      for (int i = 0; i < m_touchpads.length; i++) {
+        m_touchpads[i] = new HALJoystickTouchpad();
+      }
+    }
   }
 
   private static final class HALJoystickButtons {
@@ -107,6 +138,32 @@ public final class DriverStation {
     Qualification,
     /** Elimination. */
     Elimination
+  }
+
+  /** Represents a finger on a touchpad. */
+  @SuppressWarnings("MemberName")
+  public static class TouchpadFinger {
+    /** Whether the finger is touching the touchpad. */
+    public final boolean down;
+
+    /** The x position of the finger. 0 is at top left. */
+    public final float x;
+
+    /** The y position of the finger. 0 is at top left. */
+    public final float y;
+
+    /**
+     * Creates a TouchpadFinger object.
+     *
+     * @param down Whether the finger is touching the touchpad.
+     * @param x The x position of the finger.
+     * @param y The y position of the finger.
+     */
+    public TouchpadFinger(boolean down, float x, float y) {
+      this.x = x;
+      this.y = y;
+      this.down = down;
+    }
   }
 
   /** A controller POV direction. */
@@ -480,6 +537,8 @@ public final class DriverStation {
   private static HALJoystickAxesRaw[] m_joystickAxesRaw = new HALJoystickAxesRaw[kJoystickPorts];
   private static HALJoystickPOVs[] m_joystickPOVs = new HALJoystickPOVs[kJoystickPorts];
   private static HALJoystickButtons[] m_joystickButtons = new HALJoystickButtons[kJoystickPorts];
+  private static HALJoystickTouchpads[] m_joystickTouchpads =
+      new HALJoystickTouchpads[kJoystickPorts];
   private static MatchInfoData m_matchInfo = new MatchInfoData();
   private static ControlWord m_controlWord = new ControlWord();
   private static EventVector m_refreshEvents = new EventVector();
@@ -491,6 +550,8 @@ public final class DriverStation {
   private static HALJoystickPOVs[] m_joystickPOVsCache = new HALJoystickPOVs[kJoystickPorts];
   private static HALJoystickButtons[] m_joystickButtonsCache =
       new HALJoystickButtons[kJoystickPorts];
+  private static HALJoystickTouchpads[] m_joystickTouchpadsCache =
+      new HALJoystickTouchpads[kJoystickPorts];
   private static MatchInfoData m_matchInfoCache = new MatchInfoData();
   private static ControlWord m_controlWordCache = new ControlWord();
 
@@ -521,11 +582,13 @@ public final class DriverStation {
       m_joystickAxes[i] = new HALJoystickAxes(DriverStationJNI.kMaxJoystickAxes);
       m_joystickAxesRaw[i] = new HALJoystickAxesRaw(DriverStationJNI.kMaxJoystickAxes);
       m_joystickPOVs[i] = new HALJoystickPOVs(DriverStationJNI.kMaxJoystickPOVs);
+      m_joystickTouchpads[i] = new HALJoystickTouchpads();
 
       m_joystickButtonsCache[i] = new HALJoystickButtons();
       m_joystickAxesCache[i] = new HALJoystickAxes(DriverStationJNI.kMaxJoystickAxes);
       m_joystickAxesRawCache[i] = new HALJoystickAxesRaw(DriverStationJNI.kMaxJoystickAxes);
       m_joystickPOVsCache[i] = new HALJoystickPOVs(DriverStationJNI.kMaxJoystickPOVs);
+      m_joystickTouchpadsCache[i] = new HALJoystickTouchpads();
     }
 
     m_matchDataSender = new MatchDataSender();
@@ -789,6 +852,87 @@ public final class DriverStation {
             + stick
             + " not available, check if controller is plugged in");
     return 0.0;
+  }
+
+  /**
+   * Get the state of a touchpad finger on the joystick.
+   *
+   * @param stick The joystick to read.
+   * @param touchpad The touchpad to read.
+   * @param finger The finger to read.
+   * @return the state of the touchpad finger.
+   */
+  public static TouchpadFinger getStickTouchpadFinger(int stick, int touchpad, int finger) {
+    if (stick < 0 || stick >= kJoystickPorts) {
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
+    }
+    if (touchpad < 0 || touchpad >= DriverStationJNI.kMaxJoystickTouchpads) {
+      throw new IllegalArgumentException("Joystick touchpad is out of range");
+    }
+    if (finger < 0 || finger >= DriverStationJNI.kMaxJoystickTouchpadFingers) {
+      throw new IllegalArgumentException("Joystick touchpad finger is out of range");
+    }
+
+    int touchpadCount;
+    m_cacheDataMutex.lock();
+    try {
+      touchpadCount = m_joystickTouchpads[stick].m_count;
+      if (touchpad < touchpadCount) {
+        HALJoystickTouchpad tp = m_joystickTouchpads[stick].m_touchpads[touchpad];
+        if (finger < tp.m_count) {
+          return new TouchpadFinger(
+              tp.m_fingers[finger].m_down, tp.m_fingers[finger].m_x, tp.m_fingers[finger].m_y);
+        }
+      }
+    } finally {
+      m_cacheDataMutex.unlock();
+    }
+
+    reportJoystickUnpluggedWarning(
+        "Joystick touchpad finger "
+            + finger
+            + " on touchpad "
+            + touchpad
+            + " on port "
+            + stick
+            + " not available, check if controller is plugged in");
+    return new TouchpadFinger(false, 0.0f, 0.0f);
+  }
+
+  /**
+   * Get whether a touchpad finger on the joystick is available.
+   *
+   * @param stick The joystick to read.
+   * @param touchpad The touchpad to read.
+   * @param finger The finger to read.
+   * @return whether the touchpad finger is available.
+   */
+  public static boolean getStickTouchpadFingerAvailable(int stick, int touchpad, int finger) {
+    if (stick < 0 || stick >= kJoystickPorts) {
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
+    }
+    if (touchpad < 0 || touchpad >= DriverStationJNI.kMaxJoystickTouchpads) {
+      throw new IllegalArgumentException("Joystick touchpad is out of range");
+    }
+    if (finger < 0 || finger >= DriverStationJNI.kMaxJoystickTouchpadFingers) {
+      throw new IllegalArgumentException("Joystick touchpad finger is out of range");
+    }
+
+    int touchpadCount;
+    m_cacheDataMutex.lock();
+    try {
+      touchpadCount = m_joystickTouchpads[stick].m_count;
+      if (touchpad < touchpadCount) {
+        HALJoystickTouchpad tp = m_joystickTouchpads[stick].m_touchpads[touchpad];
+        if (finger < tp.m_count) {
+          return true;
+        }
+      }
+    } finally {
+      m_cacheDataMutex.unlock();
+    }
+
+    return false;
   }
 
   /**
@@ -1399,12 +1543,26 @@ public final class DriverStation {
           m_joystickAxesCache[stick].m_axes,
           m_joystickAxesRawCache[stick].m_axes,
           m_joystickPOVsCache[stick].m_povs,
+          m_touchpadFingersCache,
           m_metadataCache);
       m_joystickAxesCache[stick].m_available = (int) m_metadataCache[0];
       m_joystickAxesRawCache[stick].m_available = (int) m_metadataCache[0];
       m_joystickPOVsCache[stick].m_available = (int) m_metadataCache[1];
       m_joystickButtonsCache[stick].m_available = m_metadataCache[2];
       m_joystickButtonsCache[stick].m_buttons = m_metadataCache[3];
+      m_joystickTouchpadsCache[stick].m_count = (int) m_metadataCache[4];
+      for (int i = 0; i < m_joystickTouchpadsCache[stick].m_count; i++) {
+        long metadata = m_metadataCache[5 + i];
+        m_joystickTouchpadsCache[stick].m_touchpads[i].m_fingers[0].m_down = (metadata & 0x1) != 0;
+        m_joystickTouchpadsCache[stick].m_touchpads[i].m_fingers[1].m_down = (metadata & 0x2) != 0;
+        m_joystickTouchpadsCache[stick].m_touchpads[i].m_count = (int) (metadata >> 2 & 0x3);
+        for (int j = 0; j < m_joystickTouchpadsCache[stick].m_touchpads[i].m_count; j++) {
+          m_joystickTouchpadsCache[stick].m_touchpads[i].m_fingers[j].m_x =
+              m_touchpadFingersCache[i * 4 + j * 2 + 0];
+          m_joystickTouchpadsCache[stick].m_touchpads[i].m_fingers[j].m_y =
+              m_touchpadFingersCache[i * 4 + j * 2 + 1];
+        }
+      }
     }
 
     DriverStationJNI.getMatchInfo(m_matchInfoCache);
@@ -1441,6 +1599,10 @@ public final class DriverStation {
       HALJoystickPOVs[] currentPOVs = m_joystickPOVs;
       m_joystickPOVs = m_joystickPOVsCache;
       m_joystickPOVsCache = currentPOVs;
+
+      HALJoystickTouchpads[] currentTouchpads = m_joystickTouchpads;
+      m_joystickTouchpads = m_joystickTouchpadsCache;
+      m_joystickTouchpadsCache = currentTouchpads;
 
       MatchInfoData currentInfo = m_matchInfo;
       m_matchInfo = m_matchInfoCache;

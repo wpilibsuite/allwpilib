@@ -350,6 +350,71 @@ double DriverStation::GetStickAxis(int stick, int axis) {
   return axes.axes[axis];
 }
 
+DriverStation::TouchpadFinger DriverStation::GetStickTouchpadFinger(
+    int stick, int touchpad, int finger) {
+  if (stick < 0 || stick >= kJoystickPorts) {
+    WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
+    return TouchpadFinger{false, 0.0f, 0.0f};
+  }
+  if (touchpad < 0 || touchpad >= HAL_kMaxJoystickTouchpads) {
+    WPILIB_ReportError(warn::BadJoystickAxis, "touchpad {} out of range",
+                       touchpad);
+    return TouchpadFinger{false, 0.0f, 0.0f};
+  }
+  if (finger < 0 || finger >= HAL_kMaxJoystickTouchpadFingers) {
+    WPILIB_ReportError(warn::BadJoystickAxis, "finger {} out of range", finger);
+    return TouchpadFinger{false, 0.0f, 0.0f};
+  }
+
+  HAL_JoystickTouchpads touchpads;
+  HAL_GetJoystickTouchpads(stick, &touchpads);
+
+  auto touchpadCount = touchpads.count;
+  if (touchpad < touchpadCount) {
+    if (finger < touchpads.touchpads[touchpad].count) {
+      return TouchpadFinger{
+          touchpads.touchpads[touchpad].fingers[finger].down != 0,
+          touchpads.touchpads[touchpad].fingers[finger].x,
+          touchpads.touchpads[touchpad].fingers[finger].y};
+    }
+  }
+
+  ReportJoystickUnpluggedWarning(
+      "Joystick Touchpad Finger {} missing, check if all controllers are "
+      "plugged in",
+      touchpad);
+  return TouchpadFinger{false, 0.0f, 0.0f};
+}
+
+bool DriverStation::GetStickTouchpadFingerAvailable(int stick, int touchpad,
+                                                    int finger) {
+  if (stick < 0 || stick >= kJoystickPorts) {
+    WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
+    return false;
+  }
+  if (touchpad < 0 || touchpad >= HAL_kMaxJoystickTouchpads) {
+    WPILIB_ReportError(warn::BadJoystickAxis, "touchpad {} out of range",
+                       touchpad);
+    return false;
+  }
+  if (finger < 0 || finger >= HAL_kMaxJoystickTouchpadFingers) {
+    WPILIB_ReportError(warn::BadJoystickAxis, "finger {} out of range", finger);
+    return false;
+  }
+
+  HAL_JoystickTouchpads touchpads;
+  HAL_GetJoystickTouchpads(stick, &touchpads);
+
+  auto touchpadCount = touchpads.count;
+  if (touchpad < touchpadCount) {
+    if (finger < touchpads.touchpads[touchpad].count) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 std::optional<double> DriverStation::GetStickAxisIfAvailable(int stick,
                                                              int axis) {
   if (stick < 0 || stick >= kJoystickPorts) {

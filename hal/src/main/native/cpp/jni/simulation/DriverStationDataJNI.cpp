@@ -712,6 +712,38 @@ Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setJoystickButtonsA
 
 /*
  * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
+ * Method:    setTouchpadCounts
+ * Signature: (II[I)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setTouchpadCounts
+  (JNIEnv* env, jclass, jint stick, jint touchpadCount, jintArray fingerCounts)
+{
+  JSpan<const jint> jArrayRef(env, fingerCounts);
+  uint8_t fingerCountsLocal[2];
+  size_t toCopy = (std::min)(jArrayRef.size(), static_cast<size_t>(2));
+  for (size_t i = 0; i < toCopy; ++i) {
+    fingerCountsLocal[i] = static_cast<uint8_t>(jArrayRef[i]);
+  }
+  HALSIM_SetJoystickTouchpadCounts(stick, touchpadCount, fingerCountsLocal);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
+ * Method:    setTouchpadFinger
+ * Signature: (IIIZFF)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setTouchpadFinger
+  (JNIEnv*, jclass, jint stick, jint touchpadIndex, jint fingerIndex,
+   jboolean down, jfloat x, jfloat y)
+{
+  HALSIM_SetJoystickTouchpadFinger(stick, touchpadIndex, fingerIndex, down, x,
+                                   y);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
  * Method:    setJoystickIsGamepad
  * Signature: (IZ)V
  */
