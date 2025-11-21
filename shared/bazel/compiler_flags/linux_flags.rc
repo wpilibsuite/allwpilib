@@ -25,7 +25,7 @@ build:linux --host_cxxopt=-Wno-attributes
 # Ignore potential issues in third party code on the host
 build:linux --host_cxxopt=-Wno-pedantic
 build:linux --host_cxxopt=-Wno-format-nonliteral
-build:linux --host_cxxopt=-Wno-missing-requires
+#build:linux --host_cxxopt=-Wno-missing-requires
 build:linux --host_cxxopt=-Wno-implicit-fallthrough
 
 build:linux --host_per_file_copt=external/zlib/.*\.c@-Wno-deprecated-non-prototype

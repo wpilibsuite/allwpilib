@@ -78,6 +78,14 @@ http_archive(
     url = "https://github.com/wpilibsuite/rules_bzlmodrio_toolchains/releases/download/2025-1.bcr6/rules_bzlmodrio_toolchains-2025-1.bcr6.tar.gz",
 )
 
+# TODO(davo): update version after the next release of toolchains_llvm after 1.5.0
+http_archive(
+    name = "toolchains_llvm",
+    integrity = "sha256-Ht0UsdgsySFX+H7AU3TS992uZr8nV5TP60lADgKeP7s=",
+    strip_prefix = "toolchains_llvm-cebf1ed19db1521bcaae489a40dd736d50e9302f",
+    url = "https://github.com/bazel-contrib/toolchains_llvm/archive/cebf1ed19db1521bcaae489a40dd736d50e9302f.tar.gz",
+)
+
 http_archive(
     name = "pybind11_bazel",
     integrity = "sha256-iwRj1wuX2pDS6t6DqiCfhIXisv4y+7CvxSJtZoSAzGw=",
@@ -128,9 +136,85 @@ load("@bazel_features//:deps.bzl", "bazel_features_deps")
 
 bazel_features_deps()
 
+load("@toolchains_llvm//toolchain:deps.bzl", "bazel_toolchain_dependencies")
+
+bazel_toolchain_dependencies()
+
 load("@build_bazel_apple_support//lib:repositories.bzl", "apple_support_dependencies")
 
 apple_support_dependencies()
+
+load("@toolchains_llvm//toolchain:rules.bzl", "llvm_toolchain")
+
+COMMON_EXTRA_COMPILE_FLAGS = [
+    "-Wextra",
+    "-Werror",
+    "-pedantic",
+    "-Wno-unused-parameter",
+    "-fPIC",
+]
+
+LINUX_EXTRA_COMPILE_FLAGS = COMMON_EXTRA_COMPILE_FLAGS + ["-gz=zlib"]
+
+MACOS_EXTRA_COMPILE_FLAGS = COMMON_EXTRA_COMPILE_FLAGS + [
+    "-Wno-shorten-64-to-32",
+    "-Wno-gcc-compat",
+    "-Wno-missing-field-initializers",
+    "-Wno-unused-private-field",
+]
+
+COMMON_EXTRA_CXX_FLAGS = [
+    "-Wformat=2",
+    "-Wno-unused-parameter",
+    "-pthread",
+    "-Wno-deprecated-enum-enum-conversion",
+]
+
+LINUX_EXTRA_CXX_FLAGS = COMMON_EXTRA_CXX_FLAGS + ["-Wno-psabi"]
+
+MACOS_EXTRA_CXX_FLAGS = COMMON_EXTRA_CXX_FLAGS + [
+    "-Wno-unused-const-variable",
+    "-Wno-error=c11-extensions",
+    "-Wno-deprecated-anon-enum-enum-conversion",
+]
+
+LINUX_EXTRA_LINK_FLAGS = ["-Wl,-rpath,$ORIGIN"]
+
+MACOS_EXTRA_LINK_FLAGS = ["-Wl,-rpath,@loader_path"]
+
+llvm_toolchain(
+    name = "llvm_toolchain",
+    cxx_standard = {"": "c++20"},
+    extra_compile_flags = {
+        "linux-aarch64": LINUX_EXTRA_COMPILE_FLAGS,
+        "linux-x86_64": LINUX_EXTRA_COMPILE_FLAGS,
+        "macos-aarch64": MACOS_EXTRA_COMPILE_FLAGS,
+        "macos-x86_64": MACOS_EXTRA_COMPILE_FLAGS,
+    },
+    extra_cxx_flags = {
+        "linux-aarch64": LINUX_EXTRA_CXX_FLAGS,
+        "linux-x86_64": LINUX_EXTRA_CXX_FLAGS,
+        "macos-aarch64": MACOS_EXTRA_CXX_FLAGS,
+        "macos-x86_64": MACOS_EXTRA_CXX_FLAGS,
+    },
+    extra_link_flags = {
+        "linux-aarch64": LINUX_EXTRA_LINK_FLAGS,
+        "linux-x86_64": LINUX_EXTRA_LINK_FLAGS,
+        "macos-aarch64": MACOS_EXTRA_LINK_FLAGS,
+        "macos-x86_64": MACOS_EXTRA_LINK_FLAGS,
+    },
+    llvm_version = "19.1.7",
+    stdlib = {
+        "linux-aarch64": "stdc++",
+        "linux-x86_64": "stdc++",
+        "macos-aarch64": "builtin-libc++",
+        "macos-x86_64": "builtin-libc++",
+    },
+)
+
+load("@llvm_toolchain//:toolchains.bzl", "llvm_register_toolchains")
+
+llvm_register_toolchains()
 
 load("@rules_cc//cc:repositories.bzl", "rules_cc_toolchains")
 
