@@ -168,7 +168,7 @@ classes:
               b:
                 name: blue
           int, int, int:
-          std::string_view:
+      FromString:
       FromHSV:
       HexString:
       operator==:

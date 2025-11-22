@@ -5,6 +5,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cstdint>
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -774,37 +775,63 @@ class Color {
   constexpr Color(int r, int g, int b)
       : Color(r / 255.0, g / 255.0, b / 255.0) {}
 
+  constexpr bool operator==(const Color&) const = default;
+
   /**
-   * Constructs a Color from a hex string.
+   * Makes a Color from a string.
    *
-   * @param hexString a string of the format <tt>\#RRGGBB</tt>
+   * @param str a string of the format `#RRGGBB` or `rgb(R, G, B)`
+   * @return the Color
    * @throws std::invalid_argument if the hex string is invalid.
    */
-  explicit constexpr Color(std::string_view hexString) {
-    if (hexString.length() != 7 || !hexString.starts_with("#") ||
-        !wpi::util::isHexDigit(hexString[1]) ||
-        !wpi::util::isHexDigit(hexString[2]) ||
-        !wpi::util::isHexDigit(hexString[3]) ||
-        !wpi::util::isHexDigit(hexString[4]) ||
-        !wpi::util::isHexDigit(hexString[5]) ||
-        !wpi::util::isHexDigit(hexString[6])) {
+  static constexpr Color FromString(std::string_view str) {
+    if (str.empty()) {
       throw std::invalid_argument(
-          fmt::format("Invalid hex string for Color \"{}\"", hexString));
+          fmt::format("Invalid color string \"{}\"", str));
     }
 
-    int r = wpi::util::hexDigitValue(hexString[1]) * 16 +
-            wpi::util::hexDigitValue(hexString[2]);
-    int g = wpi::util::hexDigitValue(hexString[3]) * 16 +
-            wpi::util::hexDigitValue(hexString[4]);
-    int b = wpi::util::hexDigitValue(hexString[5]) * 16 +
-            wpi::util::hexDigitValue(hexString[6]);
+    // #RRGGBB style
+    if (str[0] == '#') {
+      if (str.length() != 7 || !str.starts_with("#") ||
+          !wpi::util::isHexDigit(str[1]) || !wpi::util::isHexDigit(str[2]) ||
+          !wpi::util::isHexDigit(str[3]) || !wpi::util::isHexDigit(str[4]) ||
+          !wpi::util::isHexDigit(str[5]) || !wpi::util::isHexDigit(str[6])) {
+        throw std::invalid_argument(
+            fmt::format("Invalid hex string \"{}\"", str));
+      }
 
-    red = r / 255.0;
-    green = g / 255.0;
-    blue = b / 255.0;
+      int r = wpi::util::hexDigitValue(str[1]) * 16 +
+              wpi::util::hexDigitValue(str[2]);
+      int g = wpi::util::hexDigitValue(str[3]) * 16 +
+              wpi::util::hexDigitValue(str[4]);
+      int b = wpi::util::hexDigitValue(str[5]) * 16 +
+              wpi::util::hexDigitValue(str[6]);
+
+      return Color(r, g, b);
+    }
+
+    // RGB style
+    if (str.starts_with("rgb(") && str.ends_with(")")) {
+      auto [redStr, gbStr] =
+          wpi::util::split(wpi::util::slice(str, 4, str.length() - 1), ',');
+      auto [greenStr, blueStr] = wpi::util::split(gbStr, ',');
+      if (blueStr.empty()) {
+        throw std::invalid_argument(
+            fmt::format("Invalid RGB string \"{}\"", str));
+      }
+      auto r = wpi::util::parse_integer<uint8_t>(wpi::util::trim(redStr), 10);
+      auto g = wpi::util::parse_integer<uint8_t>(wpi::util::trim(greenStr), 10);
+      auto b = wpi::util::parse_integer<uint8_t>(wpi::util::trim(blueStr), 10);
+      if (!r || !g || !b) {
+        throw std::invalid_argument(
+            fmt::format("Invalid RGB string \"{}\"", str));
+      }
+      return Color(*r, *g, *b);
+    }
+
+    throw std::invalid_argument(
+        fmt::format("Invalid color string \"{}\"", str));
   }
-
-  constexpr bool operator==(const Color&) const = default;
 
   /**
    * Creates a Color from HSV values.

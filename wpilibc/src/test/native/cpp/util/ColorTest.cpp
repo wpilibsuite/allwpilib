@@ -43,21 +43,43 @@ TEST(ColorTest, ConstructFromInts) {
   EXPECT_NEAR(0.25, color.blue, 1e-2);
 }
 
-TEST(ColorTest, ConstructFromHexString) {
-  constexpr wpi::Color color{"#FF8040"};
+TEST(ColorTest, FromHexString) {
+  constexpr wpi::Color color = wpi::Color::FromString("#FF8040");
 
   EXPECT_NEAR(1.0, color.red, 1e-2);
   EXPECT_NEAR(0.5, color.green, 1e-2);
   EXPECT_NEAR(0.25, color.blue, 1e-2);
 
   // No leading #
-  EXPECT_THROW(wpi::Color{"112233"}, std::invalid_argument);
+  EXPECT_THROW(wpi::Color::FromString("112233"), std::invalid_argument);
 
   // Too long
-  EXPECT_THROW(wpi::Color{"#11223344"}, std::invalid_argument);
+  EXPECT_THROW(wpi::Color::FromString("#11223344"), std::invalid_argument);
 
   // Invalid hex characters
-  EXPECT_THROW(wpi::Color{"#$$$$$$"}, std::invalid_argument);
+  EXPECT_THROW(wpi::Color::FromString("#$$$$$$"), std::invalid_argument);
+}
+
+TEST(ColorTest, FromRGBString) {
+  constexpr wpi::Color color = wpi::Color::FromString("rgb(255, 128, 64)");
+
+  EXPECT_NEAR(1.0, color.red, 1e-2);
+  EXPECT_NEAR(0.5, color.green, 1e-2);
+  EXPECT_NEAR(0.25, color.blue, 1e-2);
+
+  // Missing rgb()
+  EXPECT_THROW(wpi::Color::FromString("255, 128, 64"), std::invalid_argument);
+
+  // Too few components
+  EXPECT_THROW(wpi::Color::FromString("rgb(255, 128)"), std::invalid_argument);
+
+  // Too many components
+  EXPECT_THROW(wpi::Color::FromString("rgb(255, 128, 64, 32)"),
+               std::invalid_argument);
+
+  // Non-integer component
+  EXPECT_THROW(wpi::Color::FromString("rgb(255, abc, 64)"),
+               std::invalid_argument);
 }
 
 TEST(ColorTest, FromHSV) {

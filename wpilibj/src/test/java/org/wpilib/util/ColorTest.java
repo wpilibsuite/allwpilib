@@ -55,21 +55,55 @@ class ColorTest {
   }
 
   @Test
-  void testConstructFromHexString() {
-    var color = new Color("#FF8040");
+  void testFromHexString() {
+    var color = Color.fromString("#FF8040");
 
     assertEquals(1.0, color.red, 1e-2);
     assertEquals(0.5, color.green, 1e-2);
     assertEquals(0.25, color.blue, 1e-2);
 
     // No leading #
-    assertThrows(IllegalArgumentException.class, () -> new Color("112233"));
+    assertThrows(IllegalArgumentException.class, () -> Color.fromString("112233"));
 
     // Too long
-    assertThrows(IllegalArgumentException.class, () -> new Color("#11223344"));
+    assertThrows(IllegalArgumentException.class, () -> Color.fromString("#11223344"));
 
     // Invalid hex characters
-    assertThrows(IllegalArgumentException.class, () -> new Color("#$$$$$$"));
+    assertThrows(IllegalArgumentException.class, () -> Color.fromString("#$$$$$$"));
+  }
+
+  @Test
+  void testFromRGBString() {
+    var color = Color.fromString("rgb(255,128,64)");
+
+    assertEquals(1.0, color.red, 1e-2);
+    assertEquals(0.5, color.green, 1e-2);
+    assertEquals(0.25, color.blue, 1e-2);
+
+    // Wrong number of components
+    assertThrows(IllegalArgumentException.class, () -> Color.fromString("rgb(255,128)"));
+
+    // Invalid integer
+    assertThrows(IllegalArgumentException.class, () -> Color.fromString("rgb(255,xx,64)"));
+  }
+
+  @Test
+  void testFromConstantName() {
+    var color = Color.fromString("red");
+
+    assertEquals(1.0, color.red, 1e-2);
+    assertEquals(0.0, color.green, 1e-2);
+    assertEquals(0.0, color.blue, 1e-2);
+
+    // with k prefix
+    color = Color.fromString("kRed");
+
+    assertEquals(1.0, color.red, 1e-2);
+    assertEquals(0.0, color.green, 1e-2);
+    assertEquals(0.0, color.blue, 1e-2);
+
+    // Unknown name
+    assertThrows(IllegalArgumentException.class, () -> Color.fromString("unknowncolor"));
   }
 
   @Test
