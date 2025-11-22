@@ -163,6 +163,8 @@ MACOS_EXTRA_COMPILE_FLAGS = COMMON_EXTRA_COMPILE_FLAGS + [
     "-Wno-unused-private-field",
 ]
 
+CONLY_FLAGS = ["-Wno-c23-extensions"]
+
 COMMON_EXTRA_CXX_FLAGS = [
     "-Wformat=2",
     "-Wno-unused-parameter",
@@ -185,6 +187,12 @@ MACOS_EXTRA_LINK_FLAGS = ["-Wl,-rpath,@loader_path"]
 
 llvm_toolchain(
     name = "llvm_toolchain",
+    conly_flags = {
+        "darwin-aarch64": CONLY_FLAGS,
+        "darwin-x86_64": CONLY_FLAGS,
+        "linux-aarch64": CONLY_FLAGS,
+        "linux-x86_64": CONLY_FLAGS,
+    },
     cxx_standard = {"": "c++20"},
     extra_compile_flags = {
         "darwin-aarch64": MACOS_EXTRA_COMPILE_FLAGS,
