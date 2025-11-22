@@ -85,7 +85,7 @@ osx_copts = unix_copts
 
 copts = select({
     "@platforms//os:linux": unix_copts + [
-        # "-Wno-maybe-uninitialized",
+        "-Wno-sometimes-uninitialized",
     ],
     "@platforms//os:osx": osx_copts,
     "@platforms//os:windows": [
