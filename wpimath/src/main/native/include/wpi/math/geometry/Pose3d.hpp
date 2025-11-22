@@ -314,7 +314,7 @@ constexpr Transform3d Pose3d::operator-(const Pose3d& other) const {
 }
 
 constexpr Pose3d Pose3d::TransformBy(const Transform3d& other) const {
-  return {m_translation + (other.Translation().RotateBy(m_rotation)),
+  return {m_translation + other.Translation().RotateBy(m_rotation),
           other.Rotation() + m_rotation};
 }
 
