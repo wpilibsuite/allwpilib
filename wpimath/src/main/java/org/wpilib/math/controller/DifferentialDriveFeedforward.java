@@ -9,7 +9,7 @@ import org.wpilib.math.controller.struct.DifferentialDriveFeedforwardStruct;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N2;
 import org.wpilib.math.system.LinearSystem;
-import org.wpilib.math.system.plant.LinearSystemId;
+import org.wpilib.math.system.Models;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
 
@@ -41,7 +41,7 @@ public class DifferentialDriveFeedforward implements ProtobufSerializable, Struc
    */
   public DifferentialDriveFeedforward(
       double kVLinear, double kALinear, double kVAngular, double kAAngular, double trackwidth) {
-    // See LinearSystemId.identifyDrivetrainSystem(double, double, double, double, double)
+    // See Models.differentialDriveFromSysId(double, double, double, double, double)
     this(kVLinear, kALinear, kVAngular * 2.0 / trackwidth, kAAngular * 2.0 / trackwidth);
   }
 
@@ -55,7 +55,7 @@ public class DifferentialDriveFeedforward implements ProtobufSerializable, Struc
    */
   public DifferentialDriveFeedforward(
       double kVLinear, double kALinear, double kVAngular, double kAAngular) {
-    m_plant = LinearSystemId.identifyDrivetrainSystem(kVLinear, kALinear, kVAngular, kAAngular);
+    m_plant = Models.differentialDriveFromSysId(kVLinear, kALinear, kVAngular, kAAngular);
     m_kVLinear = kVLinear;
     m_kALinear = kALinear;
     m_kVAngular = kVAngular;

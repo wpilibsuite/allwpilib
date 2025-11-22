@@ -7,8 +7,8 @@
 #include <utility>
 
 #include "wpi/math/random/Normal.hpp"
+#include "wpi/math/system/Models.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
 #include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/system/RobotController.hpp"
 #include "wpi/util/MathExtras.hpp"
@@ -39,7 +39,7 @@ DifferentialDrivetrainSim::DifferentialDrivetrainSim(
     wpi::units::meter_t wheelRadius, wpi::units::meter_t trackwidth,
     const std::array<double, 7>& measurementStdDevs)
     : DifferentialDrivetrainSim(
-          wpi::math::LinearSystemId::DrivetrainVelocitySystem(
+          wpi::math::Models::DifferentialDriveFromPhysicalConstants(
               driveMotor, mass, wheelRadius, trackwidth / 2.0, J, gearing),
           trackwidth, driveMotor, gearing, wheelRadius, measurementStdDevs) {}
 

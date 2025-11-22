@@ -16,7 +16,7 @@ import org.wpilib.math.util.Nat;
  * Filters the provided voltages to limit a differential drive's linear and angular acceleration.
  *
  * <p>The differential drive model can be created via the functions in {@link
- * org.wpilib.math.system.plant.LinearSystemId}.
+ * org.wpilib.math.system.Models}.
  */
 public class DifferentialDriveAccelerationLimiter {
   private final LinearSystem<N2, N2, N2> m_system;

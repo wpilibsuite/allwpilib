@@ -13,10 +13,10 @@ import org.wpilib.math.estimator.KalmanFilter;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N2;
+import org.wpilib.math.system.DCMotor;
 import org.wpilib.math.system.LinearSystem;
 import org.wpilib.math.system.LinearSystemLoop;
-import org.wpilib.math.system.plant.DCMotor;
-import org.wpilib.math.system.plant.LinearSystemId;
+import org.wpilib.math.system.Models;
 import org.wpilib.math.trajectory.TrapezoidProfile;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Units;
@@ -58,7 +58,7 @@ public class Robot extends TimedRobot {
   This elevator is driven by two NEO motors.
    */
   private final LinearSystem<N2, N1, N2> m_elevatorPlant =
-      LinearSystemId.createElevatorSystem(
+      Models.elevatorFromPhysicalConstants(
           DCMotor.getNEO(2), kCarriageMass, kDrumRadius, kElevatorGearing);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.

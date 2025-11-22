@@ -1,5 +1,5 @@
 defaults:
-  subpackage: plant
+  subpackage: system
 
 extra_includes:
 - wpystruct.h

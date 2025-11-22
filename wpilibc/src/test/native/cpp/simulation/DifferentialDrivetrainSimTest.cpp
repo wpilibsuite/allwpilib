@@ -9,9 +9,9 @@
 #include "wpi/math/controller/LTVUnicycleController.hpp"
 #include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+#include "wpi/math/system/DCMotor.hpp"
+#include "wpi/math/system/Models.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
-#include "wpi/math/system/plant/DCMotor.hpp"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 #include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
 #include "wpi/units/current.hpp"
@@ -20,7 +20,7 @@
 
 TEST(DifferentialDrivetrainSimTest, Convergence) {
   auto motor = wpi::math::DCMotor::NEO(2);
-  auto plant = wpi::math::LinearSystemId::DrivetrainVelocitySystem(
+  auto plant = wpi::math::Models::DifferentialDriveFromPhysicalConstants(
       motor, 50_kg, 2_in, 12_in, 0.5_kg_sq_m, 1.0);
 
   wpi::math::DifferentialDriveKinematics kinematics{24_in};
@@ -73,7 +73,7 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
 
 TEST(DifferentialDrivetrainSimTest, Current) {
   auto motor = wpi::math::DCMotor::NEO(2);
-  auto plant = wpi::math::LinearSystemId::DrivetrainVelocitySystem(
+  auto plant = wpi::math::Models::DifferentialDriveFromPhysicalConstants(
       motor, 50_kg, 2_in, 12_in, 0.5_kg_sq_m, 1.0);
 
   wpi::math::DifferentialDriveKinematics kinematics{24_in};
@@ -100,7 +100,7 @@ TEST(DifferentialDrivetrainSimTest, Current) {
 
 TEST(DifferentialDrivetrainSimTest, ModelStability) {
   auto motor = wpi::math::DCMotor::NEO(2);
-  auto plant = wpi::math::LinearSystemId::DrivetrainVelocitySystem(
+  auto plant = wpi::math::Models::DifferentialDriveFromPhysicalConstants(
       motor, 50_kg, 2_in, 12_in, 2_kg_sq_m, 5.0);
 
   wpi::math::DifferentialDriveKinematics kinematics{24_in};
