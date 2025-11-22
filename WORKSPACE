@@ -186,29 +186,29 @@ llvm_toolchain(
     name = "llvm_toolchain",
     cxx_standard = {"": "c++20"},
     extra_compile_flags = {
+        "darwin-aarch64": MACOS_EXTRA_COMPILE_FLAGS,
+        "darwin-x86_64": MACOS_EXTRA_COMPILE_FLAGS,
         "linux-aarch64": LINUX_EXTRA_COMPILE_FLAGS,
         "linux-x86_64": LINUX_EXTRA_COMPILE_FLAGS,
-        "macos-aarch64": MACOS_EXTRA_COMPILE_FLAGS,
-        "macos-x86_64": MACOS_EXTRA_COMPILE_FLAGS,
     },
     extra_cxx_flags = {
+        "darwin-aarch64": MACOS_EXTRA_CXX_FLAGS,
+        "darwin-x86_64": MACOS_EXTRA_CXX_FLAGS,
         "linux-aarch64": LINUX_EXTRA_CXX_FLAGS,
         "linux-x86_64": LINUX_EXTRA_CXX_FLAGS,
-        "macos-aarch64": MACOS_EXTRA_CXX_FLAGS,
-        "macos-x86_64": MACOS_EXTRA_CXX_FLAGS,
     },
     extra_link_flags = {
+        "darwin-aarch64": MACOS_EXTRA_LINK_FLAGS,
+        "darwin-x86_64": MACOS_EXTRA_LINK_FLAGS,
         "linux-aarch64": LINUX_EXTRA_LINK_FLAGS,
         "linux-x86_64": LINUX_EXTRA_LINK_FLAGS,
-        "macos-aarch64": MACOS_EXTRA_LINK_FLAGS,
-        "macos-x86_64": MACOS_EXTRA_LINK_FLAGS,
     },
     llvm_version = "20.1.7",
     stdlib = {
+        "darwin-aarch64": "builtin-libc++",
+        "darwin-x86_64": "builtin-libc++",
         "linux-aarch64": "stdc++",
         "linux-x86_64": "stdc++",
-        "macos-aarch64": "builtin-libc++",
-        "macos-x86_64": "builtin-libc++",
     },
 )
 
