@@ -44,6 +44,10 @@ jobs:
           username: ${{ secrets.BAZEL_CACHE_USERNAME }}
           password: ${{ secrets.BAZEL_CACHE_PASSWORD }}
 
+      - name: Install apt dependencies
+        if: matrix.os == 'ubuntu-24.04'
+        run: sudo apt-get install -y libgl1-mesa-dev libx11-dev libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev
+
       - if: matrix.os == 'ubuntu-24.04'
         uses: bazel-contrib/setup-bazel@0.15.0
         with:
@@ -63,12 +67,7 @@ jobs:
       - name: Free Space
         if: always()
         shell: bash
-        run: |
-          if [[ "${{ matrix.os }}" == "windows-2022" ]]; then
-            fsutil volume diskfree C:
-          else
-            df -h /
-          fi
+        run: df -h
 
   buildifier:
     name: "buildifier"
