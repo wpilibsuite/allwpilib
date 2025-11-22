@@ -207,7 +207,7 @@ public class DataLogReaderThread implements AutoCloseable {
      * @return List of DataLogReaderRange for which this entry is valid
      */
     public List<DataLogReaderRange> getRanges() {
-      return m_ranges;
+      return List.copyOf(m_ranges);
     }
 
     public DataLogReaderEntry(int entry, String name, String type, String metadata) {
@@ -222,7 +222,7 @@ public class DataLogReaderThread implements AutoCloseable {
   }
 
   /** Range of records during which an entry is valid. */
-  public class DataLogReaderRange {
+  public static class DataLogReaderRange {
     DataLogIterator m_begin;
     DataLogIterator m_end;
 
