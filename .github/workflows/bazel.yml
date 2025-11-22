@@ -35,6 +35,18 @@ jobs:
     name: "${{ matrix.action == 'test' && 'Test' || 'Build' }} ${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Free disk space (Linux)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          docker-images: false
+          swap-storage: false
+        if: startsWith(matrix.os, 'ubuntu')
+
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
 
