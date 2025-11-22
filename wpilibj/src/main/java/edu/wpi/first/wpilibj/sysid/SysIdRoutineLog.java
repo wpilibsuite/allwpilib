@@ -7,11 +7,20 @@ package edu.wpi.first.wpilibj.sysid;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
+import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.AngularAccelerationUnit;
+import edu.wpi.first.units.AngularVelocityUnit;
+import edu.wpi.first.units.CurrentUnit;
+import edu.wpi.first.units.DistanceUnit;
+import edu.wpi.first.units.LinearAccelerationUnit;
+import edu.wpi.first.units.LinearVelocityUnit;
+import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -111,53 +120,120 @@ public class SysIdRoutineLog {
     }
 
     /**
-     * Log the voltage applied to the motor.
+     * Log the voltage applied to the motor(in volts).
      *
      * @param voltage The voltage to record.
      * @return The motor log (for call chaining).
      */
     public MotorLog voltage(Voltage voltage) {
-      return value("voltage", voltage.in(Volts), Volts.name());
+      return voltage(voltage, Volts);
+    }
+
+    /**
+     * Log the voltage applied to the motor.
+     *
+     * @param voltage The voltage to record.
+     * @param unit The unit to log the voltage in.
+     * @return The motor log (for call chaining).
+     */
+    public MotorLog voltage(Voltage voltage, VoltageUnit unit) {
+      return value("voltage", voltage.in(unit), unit.name());
+    }
+
+    /**
+     * Log the linear position of the motor(in meters).
+     *
+     * @param position The linear position to record.
+     * @return The motor log (for call chaining).
+     */
+    public MotorLog linearPosition(Distance position) {
+      return linearPosition(position, Meters);
     }
 
     /**
      * Log the linear position of the motor.
      *
      * @param position The linear position to record.
+     * @param unit The unit to log the position in.
      * @return The motor log (for call chaining).
      */
-    public MotorLog linearPosition(Distance position) {
-      return value("position", position.in(Meters), Meters.name());
+    public MotorLog linearPosition(Distance position, DistanceUnit unit) {
+      return value("position", position.in(unit), unit.name());
+    }
+
+    /**
+     * Log the angular position of the motor(in rotations).
+     *
+     * @param position The angular position to record.
+     * @return The motor log (for call chaining).
+     */
+    public MotorLog angularPosition(Angle position) {
+      return angularPosition(position, Rotations);
     }
 
     /**
      * Log the angular position of the motor.
      *
      * @param position The angular position to record.
+     * @param unit The unit to log the position in.
      * @return The motor log (for call chaining).
      */
-    public MotorLog angularPosition(Angle position) {
-      return value("position", position.in(Rotations), Rotations.name());
+    public MotorLog angularPosition(Angle position, AngleUnit unit) {
+      return value("position", position.in(unit), unit.name());
+    }
+
+    /**
+     * Log the linear velocity of the motor(in meters per second).
+     *
+     * @param velocity The linear velocity to record.
+     * @return The motor log (for call chaining).
+     */
+    public MotorLog linearVelocity(LinearVelocity velocity) {
+      return linearVelocity(velocity, MetersPerSecond);
     }
 
     /**
      * Log the linear velocity of the motor.
      *
      * @param velocity The linear velocity to record.
+     * @param unit The unit to log the velocity in.
      * @return The motor log (for call chaining).
      */
-    public MotorLog linearVelocity(LinearVelocity velocity) {
-      return value("velocity", velocity.in(MetersPerSecond), MetersPerSecond.name());
+    public MotorLog linearVelocity(LinearVelocity velocity, LinearVelocityUnit unit) {
+      return value("velocity", velocity.in(unit), unit.name());
+    }
+
+    /**
+     * Log the angular velocity of the motor(in rotations per second).
+     *
+     * @param velocity The angular velocity to record.
+     * @return The motor log (for call chaining).
+     */
+    public MotorLog angularVelocity(AngularVelocity velocity) {
+      return angularVelocity(velocity, RotationsPerSecond);
     }
 
     /**
      * Log the angular velocity of the motor.
      *
      * @param velocity The angular velocity to record.
+     * @param unit The unit to log the velocity in.
      * @return The motor log (for call chaining).
      */
-    public MotorLog angularVelocity(AngularVelocity velocity) {
-      return value("velocity", velocity.in(RotationsPerSecond), RotationsPerSecond.name());
+    public MotorLog angularVelocity(AngularVelocity velocity, AngularVelocityUnit unit) {
+      return value("velocity", velocity.in(unit), unit.name());
+    }
+
+    /**
+     * Log the linear acceleration of the motor(in meters per second squared).
+     *
+     * <p>This is optional; SysId can perform an accurate fit without it.
+     *
+     * @param acceleration The linear acceleration to record.
+     * @return The motor log (for call chaining).
+     */
+    public MotorLog linearAcceleration(LinearAcceleration acceleration) {
+      return linearAcceleration(acceleration, MetersPerSecondPerSecond);
     }
 
     /**
@@ -166,13 +242,24 @@ public class SysIdRoutineLog {
      * <p>This is optional; SysId can perform an accurate fit without it.
      *
      * @param acceleration The linear acceleration to record.
+     * @param unit The unit to log the acceleration in.
      * @return The motor log (for call chaining).
      */
-    public MotorLog linearAcceleration(LinearAcceleration acceleration) {
-      return value(
-          "acceleration",
-          acceleration.in(MetersPerSecond.per(Second)),
-          MetersPerSecond.per(Second).name());
+    public MotorLog linearAcceleration(
+        LinearAcceleration acceleration, LinearAccelerationUnit unit) {
+      return value("acceleration", acceleration.in(unit), unit.name());
+    }
+
+    /**
+     * Log the angular acceleration of the motor(in rotations per second squared).
+     *
+     * <p>This is optional; SysId can perform an accurate fit without it.
+     *
+     * @param acceleration The angular acceleration to record.
+     * @return The motor log (for call chaining).
+     */
+    public MotorLog angularAcceleration(AngularAcceleration acceleration) {
+      return angularAcceleration(acceleration, RotationsPerSecondPerSecond);
     }
 
     /**
@@ -181,13 +268,24 @@ public class SysIdRoutineLog {
      * <p>This is optional; SysId can perform an accurate fit without it.
      *
      * @param acceleration The angular acceleration to record.
+     * @param unit The unit to log the acceleration in.
      * @return The motor log (for call chaining).
      */
-    public MotorLog angularAcceleration(AngularAcceleration acceleration) {
-      return value(
-          "acceleration",
-          acceleration.in(RotationsPerSecond.per(Second)),
-          RotationsPerSecond.per(Second).name());
+    public MotorLog angularAcceleration(
+        AngularAcceleration acceleration, AngularAccelerationUnit unit) {
+      return value("acceleration", acceleration.in(unit), unit.name());
+    }
+
+    /**
+     * Log the current applied to the motor(in amps).
+     *
+     * <p>This is optional; SysId can perform an accurate fit without it.
+     *
+     * @param current The current to record.
+     * @return The motor log (for call chaining).
+     */
+    public MotorLog current(Current current) {
+      return current(current, Amps);
     }
 
     /**
@@ -196,11 +294,11 @@ public class SysIdRoutineLog {
      * <p>This is optional; SysId can perform an accurate fit without it.
      *
      * @param current The current to record.
+     * @param unit The unit to log the current in.
      * @return The motor log (for call chaining).
      */
-    public MotorLog current(Current current) {
-      value("current", current.in(Amps), Amps.name());
-      return this;
+    public MotorLog current(Current current, CurrentUnit unit) {
+      return value("current", current.in(unit), unit.name());
     }
   }
 
