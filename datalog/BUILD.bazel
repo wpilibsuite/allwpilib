@@ -120,6 +120,23 @@ java_binary(
     ],
 )
 
+java_binary(
+    name = "DevMain-java",
+    srcs = ["src/dev/java/org/wpilib/datalog/DevMain.java"],
+    main_class = "org.wpilib.datalog.DevMain",
+    deps = [
+        ":datalog-java"
+    ]
+)
+
+cc_binary(
+    name = "DevMain-cpp",
+    srcs = ["src/dev/native/cpp/main.cpp"],
+    deps = [
+        ":datalog"
+    ]
+)
+
 cc_test(
     name = "datalog-cpp-test",
     size = "small",
