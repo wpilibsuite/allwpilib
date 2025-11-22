@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
@@ -17,6 +18,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj.RobotController;
 
 /** Represents a simulated DC motor mechanism. */
@@ -29,6 +31,30 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
 
   // The moment of inertia for the DC motor mechanism.
   private final double m_jKgMetersSquared;
+
+  // The current limit of the motor; 0 represents no current limit.
+  private double m_currentLimit;
+
+  // Applies a current limit to a requested voltage.
+  private double applyCurrentLimit(double volts) {
+    if (m_currentLimit == 0.0) {
+      return volts;
+    }
+    double rawVelocity = getAngularVelocityRadPerSec() * m_gearing;
+    double appliedCurrent = m_gearbox.getCurrent(rawVelocity, volts);
+    double limitedVolts = volts;
+    if (Math.abs(appliedCurrent) > m_currentLimit) {
+      limitedVolts =
+          m_gearbox.getVoltage(
+              m_gearbox.getTorque(Math.copySign(m_currentLimit, appliedCurrent)), rawVelocity);
+    }
+    // ensure the current limit doesn't cause an increase to output voltage
+    if (Math.abs(limitedVolts) < Math.abs(volts)) {
+      return limitedVolts;
+    } else {
+      return volts;
+    }
+  }
 
   /**
    * Creates a simulated DC motor mechanism.
@@ -66,6 +92,27 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
     //   J = GKₜ/(RB)
     m_gearing = -gearbox.KvRadPerSecPerVolt * plant.getA(1, 1) / plant.getB(1, 0);
     m_jKgMetersSquared = m_gearing * gearbox.KtNMPerAmp / (gearbox.rOhms * plant.getB(1, 0));
+  }
+
+  /**
+   * Adds a predictive current limit to this sim.
+   *
+   * @param currentLimitAmps The new current limit in amps.
+   */
+  public void setCurrentLimit(double currentLimitAmps) {
+    if (currentLimitAmps <= 0) {
+      throw new IllegalArgumentException("current limit must be greater than zero");
+    }
+    m_currentLimit = currentLimitAmps;
+  }
+
+  /**
+   * Adds a predictive current limit to this sim.
+   *
+   * @param currentLimit The new current limit.
+   */
+  public void setCurrentLimit(Current currentLimit) {
+    setCurrentLimit(currentLimit.in(Amps));
   }
 
   /**
@@ -233,7 +280,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    * @param volts The input voltage.
    */
   public void setInputVoltage(double volts) {
-    setInput(volts);
+    setInput(applyCurrentLimit(volts));
     clampInput(RobotController.getBatteryVoltage());
   }
 }
