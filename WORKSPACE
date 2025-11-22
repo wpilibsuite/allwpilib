@@ -203,7 +203,7 @@ llvm_toolchain(
         "macos-aarch64": MACOS_EXTRA_LINK_FLAGS,
         "macos-x86_64": MACOS_EXTRA_LINK_FLAGS,
     },
-    llvm_version = "19.1.7",
+    llvm_version = "20.1.7",
     stdlib = {
         "linux-aarch64": "stdc++",
         "linux-x86_64": "stdc++",
