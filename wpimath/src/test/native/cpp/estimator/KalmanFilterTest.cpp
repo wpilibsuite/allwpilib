@@ -10,14 +10,14 @@
 #include <Eigen/Core>
 #include <gtest/gtest.h>
 
-#include "wpi/math/system/plant/DCMotor.hpp"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/math/system/DCMotor.hpp"
+#include "wpi/math/system/Models.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
 #include "wpi/units/time.hpp"
 
 TEST(KalmanFilterTest, Flywheel) {
   auto motor = wpi::math::DCMotor::NEO();
   auto flywheel =
-      wpi::math::LinearSystemId::FlywheelSystem(motor, 1_kg_sq_m, 1.0);
+      wpi::math::Models::FlywheelFromPhysicalConstants(motor, 1_kg_sq_m, 1.0);
   wpi::math::KalmanFilter<1, 1, 1> kf{flywheel, {1}, {1}, 5_ms};
 }

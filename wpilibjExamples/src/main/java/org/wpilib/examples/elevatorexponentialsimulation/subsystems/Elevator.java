@@ -9,7 +9,7 @@ import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.ElevatorFeedforward;
 import org.wpilib.math.controller.PIDController;
-import org.wpilib.math.system.plant.DCMotor;
+import org.wpilib.math.system.DCMotor;
 import org.wpilib.math.trajectory.ExponentialProfile;
 import org.wpilib.math.util.Units;
 import org.wpilib.simulation.BatterySim;

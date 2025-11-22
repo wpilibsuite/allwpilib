@@ -1,0 +1,14 @@
+classes:
+  wpi::math::Models:
+    methods:
+      FlywheelFromPhysicalConstants:
+      FlywheelFromSysId:
+      ElevatorFromPhysicalConstants:
+      ElevatorFromSysId:
+      SingleJointedArmFromPhysicalConstants:
+      SingleJointedArmFromSysId:
+      DifferentialDriveFromPhysicalConstants:
+      DifferentialDriveFromSysId:
+        overloads:
+          decltype(1_V/1_mps), decltype(1_V/1_mps_sq), decltype(1_V/1_mps), decltype(1_V/1_mps_sq):
+          decltype(1_V/1_mps), decltype(1_V/1_mps_sq), decltype(1_V/1_rad_per_s), decltype(1_V/1_rad_per_s_sq), wpi::units::meter_t:

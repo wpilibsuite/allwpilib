@@ -6,7 +6,7 @@
 
 #include "wpi/math/controller/DifferentialDriveWheelVoltages.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/math/system/Models.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angular_acceleration.hpp"
 #include "wpi/units/angular_velocity.hpp"
@@ -42,7 +42,7 @@ class WPILIB_DLLEXPORT DifferentialDriveFeedforward {
       decltype(1_V / 1_mps) kVLinear, decltype(1_V / 1_mps_sq) kALinear,
       decltype(1_V / 1_rad_per_s) kVAngular,
       decltype(1_V / 1_rad_per_s_sq) kAAngular, wpi::units::meter_t trackwidth)
-      // See LinearSystemId::IdentifyDrivetrainSystem(decltype(1_V / 1_mps),
+      // See Models::DifferentialDriveFromSysId(decltype(1_V / 1_mps),
       // decltype(1_V / 1_mps_sq), decltype(1_V / 1_rad_per_s), decltype(1_V /
       // 1_rad_per_s_sq))
       : DifferentialDriveFeedforward{kVLinear, kALinear,
@@ -64,7 +64,7 @@ class WPILIB_DLLEXPORT DifferentialDriveFeedforward {
                                          decltype(1_V / 1_mps_sq) kALinear,
                                          decltype(1_V / 1_mps) kVAngular,
                                          decltype(1_V / 1_mps_sq) kAAngular)
-      : m_plant{wpi::math::LinearSystemId::IdentifyDrivetrainSystem(
+      : m_plant{wpi::math::Models::DifferentialDriveFromSysId(
             kVLinear, kALinear, kVAngular, kAAngular)},
         m_kVLinear{kVLinear},
         m_kALinear{kALinear},

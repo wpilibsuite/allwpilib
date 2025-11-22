@@ -12,10 +12,10 @@ import org.wpilib.math.controller.LinearQuadraticRegulator;
 import org.wpilib.math.estimator.KalmanFilter;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
+import org.wpilib.math.system.DCMotor;
 import org.wpilib.math.system.LinearSystem;
 import org.wpilib.math.system.LinearSystemLoop;
-import org.wpilib.math.system.plant.DCMotor;
-import org.wpilib.math.system.plant.LinearSystemId;
+import org.wpilib.math.system.Models;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Units;
 
@@ -42,7 +42,7 @@ public class Robot extends TimedRobot {
   // Inputs (what we can "put in"): [voltage], in volts.
   // Outputs (what we can measure): [velocity], in radians per second.
   private final LinearSystem<N1, N1, N1> m_flywheelPlant =
-      LinearSystemId.createFlywheelSystem(
+      Models.flywheelFromPhysicalConstants(
           DCMotor.getNEO(2), kFlywheelMomentOfInertia, kFlywheelGearing);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.

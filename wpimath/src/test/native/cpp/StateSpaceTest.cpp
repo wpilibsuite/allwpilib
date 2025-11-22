@@ -11,10 +11,10 @@
 #include "wpi/math/controller/LinearQuadraticRegulator.hpp"
 #include "wpi/math/estimator/KalmanFilter.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/system/DCMotor.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/math/system/LinearSystemLoop.hpp"
-#include "wpi/math/system/plant/DCMotor.hpp"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/math/system/Models.hpp"
 #include "wpi/units/time.hpp"
 
 namespace wpi::math {
@@ -36,7 +36,8 @@ class StateSpaceTest : public testing::Test {
     // Gear ratio
     constexpr double G = 40.0 / 40.0;
 
-    return wpi::math::LinearSystemId::ElevatorSystem(motors, m, r, G).Slice(0);
+    return wpi::math::Models::ElevatorFromPhysicalConstants(motors, m, r, G)
+        .Slice(0);
   }();
   LinearQuadraticRegulator<2, 1> controller{plant, {0.02, 0.4}, {12.0}, kDt};
   KalmanFilter<2, 1, 1> observer{plant, {0.05, 1.0}, {0.0001}, kDt};

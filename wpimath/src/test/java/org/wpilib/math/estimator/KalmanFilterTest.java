@@ -19,9 +19,9 @@ import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N2;
 import org.wpilib.math.numbers.N3;
 import org.wpilib.math.numbers.N6;
+import org.wpilib.math.system.DCMotor;
 import org.wpilib.math.system.LinearSystem;
-import org.wpilib.math.system.plant.DCMotor;
-import org.wpilib.math.system.plant.LinearSystemId;
+import org.wpilib.math.system.Models;
 import org.wpilib.math.trajectory.TrajectoryConfig;
 import org.wpilib.math.trajectory.TrajectoryGenerator;
 import org.wpilib.math.util.Nat;
@@ -41,7 +41,7 @@ class KalmanFilterTest {
     var m = 5.0;
     var r = 0.0181864;
     var G = 1.0;
-    elevatorPlant = LinearSystemId.createElevatorSystem(motors, m, r, G);
+    elevatorPlant = Models.elevatorFromPhysicalConstants(motors, m, r, G);
   }
 
   // A swerve drive system where the states are [x, y, theta, vx, vy, vTheta]ᵀ,

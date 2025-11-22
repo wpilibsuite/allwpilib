@@ -12,14 +12,14 @@ import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N2;
-import org.wpilib.math.system.plant.LinearSystemId;
+import org.wpilib.math.system.Models;
 
 class ImplicitModelFollowerTest {
   @Test
   void testSameModel() {
     final double dt = 0.005;
 
-    var plant = LinearSystemId.identifyDrivetrainSystem(1.0, 1.0, 1.0, 1.0);
+    var plant = Models.differentialDriveFromSysId(1.0, 1.0, 1.0, 1.0);
 
     var imf = new ImplicitModelFollower<>(plant, plant);
 
@@ -61,10 +61,10 @@ class ImplicitModelFollowerTest {
   void testSlowerRefModel() {
     final double dt = 0.005;
 
-    var plant = LinearSystemId.identifyDrivetrainSystem(1.0, 1.0, 1.0, 1.0);
+    var plant = Models.differentialDriveFromSysId(1.0, 1.0, 1.0, 1.0);
 
     // Linear acceleration is slower, but angular acceleration is the same
-    var plantRef = LinearSystemId.identifyDrivetrainSystem(1.0, 2.0, 1.0, 1.0);
+    var plantRef = Models.differentialDriveFromSysId(1.0, 2.0, 1.0, 1.0);
 
     var imf = new ImplicitModelFollower<>(plant, plantRef);
 

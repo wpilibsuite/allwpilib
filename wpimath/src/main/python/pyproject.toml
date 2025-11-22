@@ -1560,16 +1560,14 @@ SplineHelper = "wpi/math/spline/SplineHelper.hpp"
 SplineParameterizer = "wpi/math/spline/SplineParameterizer.hpp"
 
 # wpi/math/system
+DCMotor = "wpi/math/system/DCMotor.hpp"
 # Discretization = "wpi/math/system/Discretization.hpp"
 LinearSystem = "wpi/math/system/LinearSystem.hpp"
 LinearSystemLoop = "wpi/math/system/LinearSystemLoop.hpp"
 # LinearSystemUtil = "wpi/math/system/LinearSystemUtil.hpp"
+Models = "wpi/math/system/Models.hpp"
 # NumericalIntegration = "wpi/math/system/NumericalIntegration.hpp"
 # NumericalJacobian = "wpi/math/system/NumericalJacobian.hpp"
-
-# wpi/math/system/plant
-DCMotor = "wpi/math/system/plant/DCMotor.hpp"
-LinearSystemId = "wpi/math/system/plant/LinearSystemId.hpp"
 
 # wpi/math/trajectory
 ExponentialProfile = "wpi/math/trajectory/ExponentialProfile.hpp"
