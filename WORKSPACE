@@ -168,6 +168,7 @@ COMMON_EXTRA_CXX_FLAGS = [
     "-Wno-unused-parameter",
     "-pthread",
     "-Wno-deprecated-enum-enum-conversion",
+    "-Wno-nontrivial-memcall",  # warning in imgui.h inline functions
 ]
 
 LINUX_EXTRA_CXX_FLAGS = COMMON_EXTRA_CXX_FLAGS + ["-Wno-psabi"]
