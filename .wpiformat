@@ -4,13 +4,8 @@ cHeaderFileInclude {
 
 cppHeaderFileInclude {
   (?<!_c)\.h$
-  \.hpp$
   \.inc$
   \.inl$
-}
-
-cppSrcFileInclude {
-  \.cpp$
 }
 
 generatedFileExclude {
