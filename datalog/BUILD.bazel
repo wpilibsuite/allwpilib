@@ -121,7 +121,7 @@ java_binary(
 )
 
 java_binary(
-    name = "DevMain-java",
+    name = "DevMain-Java",
     srcs = ["src/dev/java/org/wpilib/datalog/DevMain.java"],
     main_class = "org.wpilib.datalog.DevMain",
     deps = [
@@ -130,7 +130,7 @@ java_binary(
 )
 
 cc_binary(
-    name = "DevMain-cpp",
+    name = "DevMain-Cpp",
     srcs = ["src/dev/native/cpp/main.cpp"],
     deps = [
         ":datalog",
