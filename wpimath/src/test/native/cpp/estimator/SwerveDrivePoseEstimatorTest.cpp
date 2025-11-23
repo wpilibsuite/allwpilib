@@ -430,10 +430,19 @@ TEST(SwerveDrivePoseEstimatorTest, TestReset) {
   EXPECT_DOUBLE_EQ(
       0, estimator.GetEstimatedPosition().Rotation().Radians().value());
 
+  // Add a vision measurement with a different translation
+  estimator.AddVisionMeasurement(frc::Pose2d{3_m, 0_m, frc::Rotation2d{}},
+      wpi::math::MathSharedStore::GetTimestamp());
+
+  EXPECT_DOUBLE_EQ(2.5, estimator.GetEstimatedPosition().X().value());
+  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_DOUBLE_EQ(
+      0, estimator.GetEstimatedPosition().Rotation().Radians().value());
+
   // Test reset rotation
   estimator.ResetRotation(frc::Rotation2d{90_deg});
 
-  EXPECT_DOUBLE_EQ(2, estimator.GetEstimatedPosition().X().value());
+  EXPECT_DOUBLE_EQ(2.5, estimator.GetEstimatedPosition().X().value());
   EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
   EXPECT_DOUBLE_EQ(
       std::numbers::pi / 2,
@@ -446,10 +455,20 @@ TEST(SwerveDrivePoseEstimatorTest, TestReset) {
                                          modulePosition, modulePosition});
   }
 
-  EXPECT_DOUBLE_EQ(2, estimator.GetEstimatedPosition().X().value());
+  EXPECT_DOUBLE_EQ(2.5, estimator.GetEstimatedPosition().X().value());
   EXPECT_DOUBLE_EQ(1, estimator.GetEstimatedPosition().Y().value());
   EXPECT_DOUBLE_EQ(
       std::numbers::pi / 2,
+      estimator.GetEstimatedPosition().Rotation().Radians().value());
+
+  // Add a vision measurement with a different rotation
+  estimator.AddVisionMeasurement(frc::Pose2d{2.5_m, 1_m, frc::Rotation2d{180_deg}},
+      wpi::math::MathSharedStore::GetTimestamp());
+
+  EXPECT_DOUBLE_EQ(2.5, estimator.GetEstimatedPosition().X().value());
+  EXPECT_DOUBLE_EQ(1, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_DOUBLE_EQ(
+      std::numbers::pi * 3.0 / 4,
       estimator.GetEstimatedPosition().Rotation().Radians().value());
 
   // Test reset translation
@@ -458,7 +477,7 @@ TEST(SwerveDrivePoseEstimatorTest, TestReset) {
   EXPECT_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().X().value());
   EXPECT_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().Y().value());
   EXPECT_DOUBLE_EQ(
-      std::numbers::pi / 2,
+      std::numbers::pi * 3.0 / 4,
       estimator.GetEstimatedPosition().Rotation().Radians().value());
 
   // Test reset pose
