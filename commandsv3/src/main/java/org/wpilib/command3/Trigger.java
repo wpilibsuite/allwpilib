@@ -8,6 +8,8 @@ import static org.wpilib.units.Units.Seconds;
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +55,9 @@ public class Trigger implements BooleanSupplier {
   private Signal m_cachedSignal;
 
   private final Map<BindingType, List<Binding>> m_bindings = new EnumMap<>(BindingType.class);
+  private final Runnable m_eventLoopCallback = this::poll;
+  private boolean m_isBoundToEventLoop; // used for lazily binding to the event loop
+  private final Collection<Trigger> m_dependencyTriggers = new ArrayList<>();
 
   /**
    * Represents the state of a signal: high or low. Used instead of a boolean for nullity on the
@@ -102,8 +107,23 @@ public class Trigger implements BooleanSupplier {
     m_scheduler = requireNonNullParam(scheduler, "scheduler", "Trigger");
     m_loop = requireNonNullParam(loop, "loop", "Trigger");
     m_condition = requireNonNullParam(condition, "condition", "Trigger");
+  }
 
-    m_loop.bind(this::poll);
+  /**
+   * Creates a new trigger based on the given condition. Trigger dependencies are optionally added
+   * in order to ensure intermediate unbound triggers can still fire in cases like {@code
+   * baseTrigger.and(otherTrigger.fallingEdge()).onTrue(someCommand)}, where an intermediate trigger
+   * is used to qualify a condition but is not bound to a command itself.
+   *
+   * @param scheduler The scheduler that should execute triggered commands.
+   * @param loop The event loop to poll the trigger.
+   * @param condition the condition represented by this trigger
+   * @param dependencies Optional dependencies of this trigger.
+   */
+  public Trigger(
+      Scheduler scheduler, EventLoop loop, BooleanSupplier condition, Trigger... dependencies) {
+    this(scheduler, loop, condition);
+    m_dependencyTriggers.addAll(Arrays.asList(dependencies));
   }
 
   /**
@@ -208,8 +228,17 @@ public class Trigger implements BooleanSupplier {
    * @return A trigger which is active when both component triggers are active.
    */
   public Trigger and(BooleanSupplier trigger) {
+    Trigger[] dependencies;
+    if (trigger instanceof Trigger t) {
+      dependencies = new Trigger[] {this, t};
+    } else {
+      dependencies = new Trigger[] {this};
+    }
     return new Trigger(
-        m_scheduler, m_loop, () -> m_condition.getAsBoolean() && trigger.getAsBoolean());
+        m_scheduler,
+        m_loop,
+        () -> m_condition.getAsBoolean() && trigger.getAsBoolean(),
+        dependencies);
   }
 
   /**
@@ -219,8 +248,17 @@ public class Trigger implements BooleanSupplier {
    * @return A trigger which is active when either component trigger is active.
    */
   public Trigger or(BooleanSupplier trigger) {
+    Trigger[] dependencies;
+    if (trigger instanceof Trigger t) {
+      dependencies = new Trigger[] {this, t};
+    } else {
+      dependencies = new Trigger[] {this};
+    }
     return new Trigger(
-        m_scheduler, m_loop, () -> m_condition.getAsBoolean() || trigger.getAsBoolean());
+        m_scheduler,
+        m_loop,
+        () -> m_condition.getAsBoolean() || trigger.getAsBoolean(),
+        dependencies);
   }
 
   /**
@@ -230,7 +268,7 @@ public class Trigger implements BooleanSupplier {
    * @return the negated trigger
    */
   public Trigger negate() {
-    return new Trigger(m_scheduler, m_loop, () -> !m_condition.getAsBoolean());
+    return new Trigger(m_scheduler, m_loop, () -> !m_condition.getAsBoolean(), this);
   }
 
   /**
@@ -254,7 +292,8 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger debounce(Time duration, Debouncer.DebounceType type) {
     var debouncer = new Debouncer(duration.in(Seconds), type);
-    return new Trigger(m_scheduler, m_loop, () -> debouncer.calculate(m_condition.getAsBoolean()));
+    return new Trigger(
+        m_scheduler, m_loop, () -> debouncer.calculate(m_condition.getAsBoolean()), this);
   }
 
   /**
@@ -269,7 +308,10 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger risingEdge() {
     return new Trigger(
-        m_scheduler, m_loop, () -> m_cachedSignal == Signal.HIGH && m_previousSignal == Signal.LOW);
+        m_scheduler,
+        m_loop,
+        () -> m_cachedSignal == Signal.HIGH && m_previousSignal == Signal.LOW,
+        this);
   }
 
   /**
@@ -284,7 +326,10 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger fallingEdge() {
     return new Trigger(
-        m_scheduler, m_loop, () -> m_cachedSignal == Signal.LOW && m_previousSignal == Signal.HIGH);
+        m_scheduler,
+        m_loop,
+        () -> m_cachedSignal == Signal.LOW && m_previousSignal == Signal.HIGH,
+        this);
   }
 
   private void poll() {
@@ -404,6 +449,24 @@ public class Trigger implements BooleanSupplier {
     return m_previousSignal;
   }
 
+  /** Ensures that this trigger and all triggers it depends on are bound. */
+  private void ensureBound() {
+    if (m_isBoundToEventLoop) {
+      // nothing to do
+      return;
+    }
+
+    // Ensure dependencies are bound BEFORE binding this trigger so that the event loop polls
+    // dependencies first. This guarantees that composite triggers (e.g., rising/falling edge)
+    // observe up-to-date base trigger signals within the same scheduler cycle.
+    for (var trigger : m_dependencyTriggers) {
+      trigger.ensureBound();
+    }
+
+    m_loop.bind(m_eventLoopCallback);
+    m_isBoundToEventLoop = true;
+  }
+
   // package-private for testing
   void addBinding(BindingScope scope, BindingType bindingType, Command command) {
     // Note: we use a throwable here instead of Thread.currentThread().getStackTrace() for easier
@@ -411,6 +474,7 @@ public class Trigger implements BooleanSupplier {
     m_bindings
         .computeIfAbsent(bindingType, _k -> new ArrayList<>())
         .add(new Binding(scope, bindingType, command, new Throwable().getStackTrace()));
+    ensureBound();
   }
 
   private void addBinding(BindingType bindingType, Command command) {
