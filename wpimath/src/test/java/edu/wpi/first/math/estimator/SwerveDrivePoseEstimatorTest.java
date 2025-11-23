@@ -483,7 +483,8 @@ class SwerveDrivePoseEstimatorTest {
             assertEquals(0, estimator.getEstimatedPosition().getRotation().getRadians(), kEpsilon));
 
     // Add a vision measurement with a different translation
-    estimator.addVisionMeasurement(new Pose2d(3, 0, Rotation2d.kZero), MathSharedStore.getTimestamp());
+    estimator.addVisionMeasurement(
+        new Pose2d(3, 0, Rotation2d.kZero), MathSharedStore.getTimestamp());
 
     assertAll(
         () -> assertEquals(2.5, estimator.getEstimatedPosition().getX(), kEpsilon),
@@ -523,7 +524,8 @@ class SwerveDrivePoseEstimatorTest {
                 kEpsilon));
 
     // Add a vision measurement with a different rotation
-    estimator.addVisionMeasurement(new Pose2d(2.5, 1, Rotation2d.kPi), MathSharedStore.getTimestamp());
+    estimator.addVisionMeasurement(
+        new Pose2d(2.5, 1, Rotation2d.kPi), MathSharedStore.getTimestamp());
 
     assertAll(
         () -> assertEquals(2.5, estimator.getEstimatedPosition().getX(), kEpsilon),

@@ -432,7 +432,7 @@ TEST(SwerveDrivePoseEstimatorTest, TestReset) {
 
   // Add a vision measurement with a different translation
   estimator.AddVisionMeasurement(frc::Pose2d{3_m, 0_m, frc::Rotation2d{}},
-      wpi::math::MathSharedStore::GetTimestamp());
+                                 wpi::math::MathSharedStore::GetTimestamp());
 
   EXPECT_DOUBLE_EQ(2.5, estimator.GetEstimatedPosition().X().value());
   EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
@@ -462,7 +462,8 @@ TEST(SwerveDrivePoseEstimatorTest, TestReset) {
       estimator.GetEstimatedPosition().Rotation().Radians().value());
 
   // Add a vision measurement with a different rotation
-  estimator.AddVisionMeasurement(frc::Pose2d{2.5_m, 1_m, frc::Rotation2d{180_deg}},
+  estimator.AddVisionMeasurement(
+      frc::Pose2d{2.5_m, 1_m, frc::Rotation2d{180_deg}},
       wpi::math::MathSharedStore::GetTimestamp());
 
   EXPECT_DOUBLE_EQ(2.5, estimator.GetEstimatedPosition().X().value());

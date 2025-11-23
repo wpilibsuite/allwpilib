@@ -511,8 +511,8 @@ class SwerveDrivePoseEstimator3dTest {
         () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
 
     // Add a vision measurement with a different translation
-    estimator.addVisionMeasurement(new Pose3d(3, 0, 0, Rotation3d.kZero),
-        MathSharedStore.getTimestamp());
+    estimator.addVisionMeasurement(
+        new Pose3d(3, 0, 0, Rotation3d.kZero), MathSharedStore.getTimestamp());
 
     assertAll(
         () -> assertEquals(2.5, estimator.getEstimatedPosition().getX(), kEpsilon),
@@ -556,8 +556,8 @@ class SwerveDrivePoseEstimator3dTest {
                 Math.PI / 2, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
 
     // Add a vision measurement with a different rotation
-    estimator.addVisionMeasurement(new Pose3d(2.5, 1, 0, new Rotation3d(Rotation2d.k180deg)),
-        MathSharedStore.getTimestamp());
+    estimator.addVisionMeasurement(
+        new Pose3d(2.5, 1, 0, new Rotation3d(Rotation2d.kPi)), MathSharedStore.getTimestamp());
 
     assertAll(
         () -> assertEquals(2.5, estimator.getEstimatedPosition().getX(), kEpsilon),
@@ -567,7 +567,9 @@ class SwerveDrivePoseEstimator3dTest {
         () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
         () ->
             assertEquals(
-                Math.PI * 3.0 / 4, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
+                Math.PI * 3.0 / 4,
+                estimator.getEstimatedPosition().getRotation().getZ(),
+                kEpsilon));
 
     // Test reset translation
     estimator.resetTranslation(new Translation3d(-1, -1, -1));
@@ -580,7 +582,9 @@ class SwerveDrivePoseEstimator3dTest {
         () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
         () ->
             assertEquals(
-                Math.PI * 3.0 / 4, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
+                Math.PI * 3.0 / 4,
+                estimator.getEstimatedPosition().getRotation().getZ(),
+                kEpsilon));
 
     // Test reset pose
     estimator.resetPose(Pose3d.kZero);
