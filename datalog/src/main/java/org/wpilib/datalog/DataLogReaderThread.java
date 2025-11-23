@@ -223,8 +223,8 @@ public class DataLogReaderThread implements AutoCloseable {
 
   /** Range of records during which an entry is valid. */
   public static class DataLogReaderRange {
-    DataLogIterator m_begin;
-    DataLogIterator m_end;
+    public DataLogIterator m_begin;
+    public DataLogIterator m_end;
 
     public DataLogReaderRange(DataLogIterator begin, DataLogIterator end) {
       m_begin = begin;
