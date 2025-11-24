@@ -2,7 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <cmath>
 #include <numbers>
 
 #include <gtest/gtest.h>
@@ -13,26 +12,26 @@ using namespace wpi::math;
 
 TEST(Twist3dTest, StraightX) {
   const Twist3d straight{5_m, 0_m, 0_m, 0_rad, 0_rad, 0_rad};
-  const auto straightPose = straight.Exp();
+  const auto straightTransform = straight.Exp();
 
   Transform3d expected{5_m, 0_m, 0_m, Rotation3d{}};
-  EXPECT_EQ(expected, straightPose);
+  EXPECT_EQ(expected, straightTransform);
 }
 
 TEST(Twist3dTest, StraightY) {
   const Twist3d straight{0_m, 5_m, 0_m, 0_rad, 0_rad, 0_rad};
-  const auto straightPose = straight.Exp();
+  const auto straightTransform = straight.Exp();
 
   Transform3d expected{0_m, 5_m, 0_m, Rotation3d{}};
-  EXPECT_EQ(expected, straightPose);
+  EXPECT_EQ(expected, straightTransform);
 }
 
 TEST(Twist3dTest, StraightZ) {
   const Twist3d straight{0_m, 0_m, 5_m, 0_rad, 0_rad, 0_rad};
-  const auto straightPose = straight.Exp();
+  const auto straightTransform = straight.Exp();
 
   Transform3d expected{0_m, 0_m, 5_m, Rotation3d{}};
-  EXPECT_EQ(expected, straightPose);
+  EXPECT_EQ(expected, straightTransform);
 }
 
 TEST(Twist3dTest, QuarterCircle) {
@@ -44,18 +43,18 @@ TEST(Twist3dTest, QuarterCircle) {
                               0_rad,
                               0_rad,
                               wpi::units::radian_t{std::numbers::pi / 2.0}};
-  const auto quarterCirclePose = quarterCircle.Exp();
+  const auto quarterCircleTransform = quarterCircle.Exp();
 
   Transform3d expected{5_m, 5_m, 0_m, Rotation3d{zAxis, 90_deg}};
-  EXPECT_EQ(expected, quarterCirclePose);
+  EXPECT_EQ(expected, quarterCircleTransform);
 }
 
 TEST(Twist3dTest, DiagonalNoDtheta) {
   const Twist3d diagonal{2_m, 2_m, 0_m, 0_rad, 0_rad, 0_rad};
-  const auto diagonalPose = diagonal.Exp();
+  const auto diagonalTransform = diagonal.Exp();
 
   Transform3d expected{2_m, 2_m, 0_m, Rotation3d{}};
-  EXPECT_EQ(expected, diagonalPose);
+  EXPECT_EQ(expected, diagonalTransform);
 }
 
 TEST(Twist3dTest, Equality) {
