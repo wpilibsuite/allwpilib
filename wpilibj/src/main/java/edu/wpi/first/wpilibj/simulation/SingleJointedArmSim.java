@@ -13,7 +13,13 @@ import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.wpilibj.RobotController;
+
+import static edu.wpi.first.units.Units.*;
 
 /** Represents a simulated single jointed arm mechanism. */
 public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
@@ -110,6 +116,82 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
+   * Creates a simulated arm mechanism.
+   *
+   * @param plant The linear system that represents the arm. This system can be created with {@link
+   *     edu.wpi.first.math.system.plant.LinearSystemId#createSingleJointedArmSystem(DCMotor,
+   *     double, double)}.
+   * @param gearbox The type of and number of motors in the arm gearbox.
+   * @param gearing The gearing of the arm (numbers greater than 1 represent reductions).
+   * @param armLength The length of the arm.
+   * @param minAngle  The minimum angle that the arm is capable of.
+   * @param maxAngle  The maximum angle that the arm is capable of.
+   * @param simulateGravity Whether gravity should be simulated or not.
+   * @param startingAngle  The initial position of the Arm simulation.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
+   *     noise is desired. If present must have 1 element for position.
+   */
+  @SuppressWarnings("this-escape")
+  public SingleJointedArmSim(
+          LinearSystem<N2, N1, N2> plant,
+          DCMotor gearbox,
+          double gearing,
+          Distance armLength,
+          Angle minAngle,
+          Angle maxAngle,
+          boolean simulateGravity,
+          Angle startingAngle,
+          double... measurementStdDevs) {
+    this(
+            plant,
+            gearbox,
+            gearing,
+            armLength.in(Meters),
+            minAngle.in(Radians),
+            maxAngle.in(Radians),
+            simulateGravity,
+            startingAngle.in(Radians),
+            measurementStdDevs
+    );
+  }
+
+  /**
+   * Creates a simulated arm mechanism.
+   *
+   * @param gearbox The type of and number of motors in the arm gearbox.
+   * @param gearing The gearing of the arm (numbers greater than 1 represent reductions).
+   * @param moi The moment of inertia of the arm; can be calculated from CAD software.
+   * @param armLength The length of the arm.
+   * @param minAngle  The minimum angle that the arm is capable of.
+   * @param maxAngle  The maximum angle that the arm is capable of.
+   * @param simulateGravity Whether gravity should be simulated or not.
+   * @param startingAngle  The initial position of the Arm simulation.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
+   *     noise is desired. If present must have 1 element for position.
+   */
+  public SingleJointedArmSim(
+          DCMotor gearbox,
+          double gearing,
+          MomentOfInertia moi,
+          Distance armLength,
+          Angle minAngle,
+          Angle maxAngle,
+          boolean simulateGravity,
+          Angle startingAngle,
+          double... measurementStdDevs) {
+    this(
+            gearbox,
+            gearing,
+            moi.in(KilogramSquareMeters),
+            armLength.in(Meters),
+            minAngle.in(Radians),
+            maxAngle.in(Radians),
+            simulateGravity,
+            startingAngle.in(Radians),
+            measurementStdDevs);
+  }
+
+  /**
    * Sets the arm's state. The new angle will be limited between the minimum and maximum allowed
    * limits.
    *
@@ -119,6 +201,17 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
   public final void setState(double angleRadians, double velocityRadPerSec) {
     setState(
         VecBuilder.fill(MathUtil.clamp(angleRadians, m_minAngle, m_maxAngle), velocityRadPerSec));
+  }
+
+  /**
+   * Sets the arm's state. The new angle will be limited between the minimum and maximum allowed
+   * limits.
+   *
+   * @param angle The new angle.
+   * @param velocity The new angular velocity.
+   */
+  public final void setState(Angle angle, AngularVelocity velocity) {
+    setState(angle.in(Radians), velocity.in(RadiansPerSecond));
   }
 
   /**
@@ -187,6 +280,24 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
     // spinning 10x faster than the output
     var motorVelocity = m_x.get(1, 0) * m_gearing;
     return m_gearbox.getCurrent(motorVelocity, m_u.get(0, 0)) * Math.signum(m_u.get(0, 0));
+  }
+
+  /**
+   * Returns the current arm angle.
+   *
+   * @return The current arm angle.
+   */
+  public Angle getAngle() {
+    return Radians.of(getAngleRads());
+  }
+
+  /**
+   * Returns the current arm velocity.
+   *
+   * @return The current arm velocity.
+   */
+  public AngularVelocity getVelocity() {
+    return RadiansPerSecond.of(getVelocityRadPerSec());
   }
 
   /**
