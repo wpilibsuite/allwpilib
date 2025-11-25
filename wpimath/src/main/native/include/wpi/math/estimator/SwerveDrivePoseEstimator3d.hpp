@@ -37,7 +37,7 @@ class SwerveDrivePoseEstimator3d
     : public PoseEstimator3d<
           wpi::util::array<SwerveModuleState, NumModules>,
           wpi::util::array<SwerveModulePosition, NumModules>,
-          wpi::util::array<SwerveModuleAccelerations, NumModules>> {
+          wpi::util::array<SwerveModuleAcceleration, NumModules>> {
  public:
   /**
    * Constructs a SwerveDrivePoseEstimator3d with default standard deviations

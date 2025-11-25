@@ -4,21 +4,21 @@
 
 #pragma once
 
-#include "wpi/math/kinematics/SwerveModuleAccelerations.hpp"
+#include "wpi/math/kinematics/SwerveModuleAcceleration.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
 #include "wpimath/protobuf/kinematics.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT
-    wpi::util::Protobuf<wpi::math::SwerveModuleAccelerations> {
+    wpi::util::Protobuf<wpi::math::SwerveModuleAcceleration> {
   using MessageStruct = wpi_proto_ProtobufSwerveModuleAccelerations;
   using InputStream =
-      wpi::util::ProtoInputStream<wpi::math::SwerveModuleAccelerations>;
+      wpi::util::ProtoInputStream<wpi::math::SwerveModuleAcceleration>;
   using OutputStream =
-      wpi::util::ProtoOutputStream<wpi::math::SwerveModuleAccelerations>;
-  static std::optional<wpi::math::SwerveModuleAccelerations> Unpack(
+      wpi::util::ProtoOutputStream<wpi::math::SwerveModuleAcceleration>;
+  static std::optional<wpi::math::SwerveModuleAcceleration> Unpack(
       InputStream& stream);
   static bool Pack(OutputStream& stream,
-                   const wpi::math::SwerveModuleAccelerations& value);
+                   const wpi::math::SwerveModuleAcceleration& value);
 };

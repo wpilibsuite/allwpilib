@@ -9,16 +9,16 @@ import static org.wpilib.units.Units.MetersPerSecondPerSecond;
 import java.util.Objects;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.interpolation.Interpolatable;
-import org.wpilib.math.kinematics.proto.SwerveModuleAccelerationsProto;
-import org.wpilib.math.kinematics.struct.SwerveModuleAccelerationsStruct;
+import org.wpilib.math.kinematics.proto.SwerveModuleAccelerationProto;
+import org.wpilib.math.kinematics.struct.SwerveModuleAccelerationStruct;
 import org.wpilib.units.measure.LinearAcceleration;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
 
 /** Represents the accelerations of one swerve module. */
-public class SwerveModuleAccelerations
-    implements Interpolatable<SwerveModuleAccelerations>,
-        Comparable<SwerveModuleAccelerations>,
+public class SwerveModuleAcceleration
+    implements Interpolatable<SwerveModuleAcceleration>,
+        Comparable<SwerveModuleAcceleration>,
         ProtobufSerializable,
         StructSerializable {
   /** Acceleration of the wheel of the module in meters per second squared. */
@@ -28,14 +28,14 @@ public class SwerveModuleAccelerations
   public Rotation2d angle = new Rotation2d();
 
   /** SwerveModuleAccelerations protobuf for serialization. */
-  public static final SwerveModuleAccelerationsProto proto = new SwerveModuleAccelerationsProto();
+  public static final SwerveModuleAccelerationProto proto = new SwerveModuleAccelerationProto();
 
   /** SwerveModuleAccelerations struct for serialization. */
-  public static final SwerveModuleAccelerationsStruct struct =
-      new SwerveModuleAccelerationsStruct();
+  public static final SwerveModuleAccelerationStruct struct =
+      new SwerveModuleAccelerationStruct();
 
   /** Constructs a SwerveModuleAccelerations with zeros for acceleration and angle. */
-  public SwerveModuleAccelerations() {}
+  public SwerveModuleAcceleration() {}
 
   /**
    * Constructs a SwerveModuleAccelerations.
@@ -43,7 +43,7 @@ public class SwerveModuleAccelerations
    * @param acceleration The acceleration of the wheel of the module in meters per second squared.
    * @param angle The angle of the acceleration vector.
    */
-  public SwerveModuleAccelerations(double acceleration, Rotation2d angle) {
+  public SwerveModuleAcceleration(double acceleration, Rotation2d angle) {
     this.acceleration = acceleration;
     this.angle = angle;
   }
@@ -54,7 +54,7 @@ public class SwerveModuleAccelerations
    * @param acceleration The acceleration of the wheel of the module.
    * @param angle The angle of the acceleration vector.
    */
-  public SwerveModuleAccelerations(LinearAcceleration acceleration, Rotation2d angle) {
+  public SwerveModuleAcceleration(LinearAcceleration acceleration, Rotation2d angle) {
     this(acceleration.in(MetersPerSecondPerSecond), angle);
   }
 
@@ -66,18 +66,18 @@ public class SwerveModuleAccelerations
    * @return The interpolated value.
    */
   @Override
-  public SwerveModuleAccelerations interpolate(SwerveModuleAccelerations endValue, double t) {
+  public SwerveModuleAcceleration interpolate(SwerveModuleAcceleration endValue, double t) {
     // Clamp t to [0, 1]
     t = Math.max(0.0, Math.min(1.0, t));
 
-    return new SwerveModuleAccelerations(
+    return new SwerveModuleAcceleration(
         acceleration + t * (endValue.acceleration - acceleration),
         angle.interpolate(endValue.angle, t));
   }
 
   @Override
   public boolean equals(Object obj) {
-    return obj instanceof SwerveModuleAccelerations other
+    return obj instanceof SwerveModuleAcceleration other
         && Math.abs(other.acceleration - acceleration) < 1E-9
         && angle.equals(other.angle);
   }
@@ -95,7 +95,7 @@ public class SwerveModuleAccelerations
    * @return 1 if this is greater, 0 if both are equal, -1 if other is greater.
    */
   @Override
-  public int compareTo(SwerveModuleAccelerations other) {
+  public int compareTo(SwerveModuleAcceleration other) {
     return Double.compare(this.acceleration, other.acceleration);
   }
 

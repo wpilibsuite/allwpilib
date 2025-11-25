@@ -19,7 +19,7 @@ import us.hebi.quickbuf.RepeatedByte;
 import us.hebi.quickbuf.RepeatedMessage;
 
 public final class Kinematics {
-  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(4186,
+  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(4185,
     "ChBraW5lbWF0aWNzLnByb3RvEgl3cGkucHJvdG8aEGdlb21ldHJ5MmQucHJvdG8iTQoVUHJvdG9idWZD" + 
     "aGFzc2lzU3BlZWRzEg4KAnZ4GAEgASgBUgJ2eBIOCgJ2eRgCIAEoAVICdnkSFAoFb21lZ2EYAyABKAFS" + 
     "BW9tZWdhIlQKHFByb3RvYnVmQ2hhc3Npc0FjY2VsZXJhdGlvbnMSDgoCYXgYASABKAFSAmF4Eg4KAmF5" + 
@@ -47,49 +47,49 @@ public final class Kinematics {
     "ZVBvc2l0aW9uEhoKCGRpc3RhbmNlGAEgASgBUghkaXN0YW5jZRIzCgVhbmdsZRgCIAEoCzIdLndwaS5w" + 
     "cm90by5Qcm90b2J1ZlJvdGF0aW9uMmRSBWFuZ2xlImYKGVByb3RvYnVmU3dlcnZlTW9kdWxlU3RhdGUS" + 
     "FAoFc3BlZWQYASABKAFSBXNwZWVkEjMKBWFuZ2xlGAIgASgLMh0ud3BpLnByb3RvLlByb3RvYnVmUm90" + 
-    "YXRpb24yZFIFYW5nbGUifAohUHJvdG9idWZTd2VydmVNb2R1bGVBY2NlbGVyYXRpb25zEiIKDGFjY2Vs" + 
-    "ZXJhdGlvbhgBIAEoAVIMYWNjZWxlcmF0aW9uEjMKBWFuZ2xlGAIgASgLMh0ud3BpLnByb3RvLlByb3Rv" + 
-    "YnVmUm90YXRpb24yZFIFYW5nbGVCFwoVb3JnLndwaWxpYi5tYXRoLnByb3RvStYSCgYSBAAAVAEKCAoB" + 
-    "DBIDAAASCggKAQISAwIAEgoJCgIDABIDBAAaCggKAQgSAwYALgoJCgIIARIDBgAuCgoKAgQAEgQIAAwB" + 
-    "CgoKAwQAARIDCAgdCgsKBAQAAgASAwkCEAoMCgUEAAIABRIDCQIICgwKBQQAAgABEgMJCQsKDAoFBAAC" + 
-    "AAMSAwkODwoLCgQEAAIBEgMKAhAKDAoFBAACAQUSAwoCCAoMCgUEAAIBARIDCgkLCgwKBQQAAgEDEgMK" + 
-    "Dg8KCwoEBAACAhIDCwITCgwKBQQAAgIFEgMLAggKDAoFBAACAgESAwsJDgoMCgUEAAICAxIDCxESCgoK" + 
-    "AgQBEgQOABIBCgoKAwQBARIDDggkCgsKBAQBAgASAw8CEAoMCgUEAQIABRIDDwIICgwKBQQBAgABEgMP" + 
-    "CQsKDAoFBAECAAMSAw8ODwoLCgQEAQIBEgMQAhAKDAoFBAECAQUSAxACCAoMCgUEAQIBARIDEAkLCgwK" + 
-    "BQQBAgEDEgMQDg8KCwoEBAECAhIDEQITCgwKBQQBAgIFEgMRAggKDAoFBAECAgESAxEJDgoMCgUEAQIC" + 
-    "AxIDERESCgoKAgQCEgQUABYBCgoKAwQCARIDFAgrCgsKBAQCAgASAxUCGAoMCgUEAgIABRIDFQIICgwK" + 
-    "BQQCAgABEgMVCRMKDAoFBAICAAMSAxUWFwoKCgIEAxIEGAAbAQoKCgMEAwESAxgILAoLCgQEAwIAEgMZ" + 
-    "AhIKDAoFBAMCAAUSAxkCCAoMCgUEAwIAARIDGQkNCgwKBQQDAgADEgMZEBEKCwoEBAMCARIDGgITCgwK",
-    "BQQDAgEFEgMaAggKDAoFBAMCAQESAxoJDgoMCgUEAwIBAxIDGhESCgoKAgQEEgQdACABCgoKAwQEARID" + 
-    "HQgzCgsKBAQEAgASAx4CEgoMCgUEBAIABRIDHgIICgwKBQQEAgABEgMeCQ0KDAoFBAQCAAMSAx4QEQoL" + 
-    "CgQEBAIBEgMfAhMKDAoFBAQCAQUSAx8CCAoMCgUEBAIBARIDHwkOCgwKBQQEAgEDEgMfERIKCgoCBAUS" + 
-    "BCIAJQEKCgoDBAUBEgMiCC8KCwoEBAUCABIDIwISCgwKBQQFAgAFEgMjAggKDAoFBAUCAAESAyMJDQoM" + 
-    "CgUEBQIAAxIDIxARCgsKBAQFAgESAyQCEwoMCgUEBQIBBRIDJAIICgwKBQQFAgEBEgMkCQ4KDAoFBAUC" + 
-    "AQMSAyQREgoKCgIEBhIEJwAsAQoKCgMEBgESAycIJgoLCgQEBgIAEgMoAicKDAoFBAYCAAYSAygCFwoM" + 
-    "CgUEBgIAARIDKBgiCgwKBQQGAgADEgMoJSYKCwoEBAYCARIDKQIoCgwKBQQGAgEGEgMpAhcKDAoFBAYC" + 
-    "AQESAykYIwoMCgUEBgIBAxIDKSYnCgsKBAQGAgISAyoCJgoMCgUEBgICBhIDKgIXCgwKBQQGAgIBEgMq" + 
-    "GCEKDAoFBAYCAgMSAyokJQoLCgQEBgIDEgMrAicKDAoFBAYCAwYSAysCFwoMCgUEBgIDARIDKxgiCgwK" + 
-    "BQQGAgMDEgMrJSYKCgoCBAcSBC4AMwEKCgoDBAcBEgMuCCoKCwoEBAcCABIDLwIYCgwKBQQHAgAFEgMv" + 
-    "AggKDAoFBAcCAAESAy8JEwoMCgUEBwIAAxIDLxYXCgsKBAQHAgESAzACGQoMCgUEBwIBBRIDMAIICgwK" + 
-    "BQQHAgEBEgMwCRQKDAoFBAcCAQMSAzAXGAoLCgQEBwICEgMxAhcKDAoFBAcCAgUSAzECCAoMCgUEBwIC" + 
-    "ARIDMQkSCgwKBQQHAgIDEgMxFRYKCwoEBAcCAxIDMgIYCgwKBQQHAgMFEgMyAggKDAoFBAcCAwESAzIJ" + 
-    "EwoMCgUEBwIDAxIDMhYXCgoKAgQIEgQ1ADoBCgoKAwQIARIDNQgnCgsKBAQIAgASAzYCGAoMCgUECAIA" + 
-    "BRIDNgIICgwKBQQIAgABEgM2CRMKDAoFBAgCAAMSAzYWFwoLCgQECAIBEgM3AhkKDAoFBAgCAQUSAzcC" + 
-    "CAoMCgUECAIBARIDNwkUCgwKBQQIAgEDEgM3FxgKCwoEBAgCAhIDOAIXCgwKBQQIAgIFEgM4AggKDAoF" + 
-    "BAgCAgESAzgJEgoMCgUECAICAxIDOBUWCgsKBAQIAgMSAzkCGAoMCgUECAIDBRIDOQIICgwKBQQIAgMB" + 
-    "EgM5CRMKDAoFBAgCAwMSAzkWFwoKCgIECRIEPABBAQoKCgMECQESAzwILgoLCgQECQIAEgM9AhgKDAoF" + 
-    "BAkCAAUSAz0CCAoMCgUECQIAARIDPQkTCgwKBQQJAgADEgM9FhcKCwoEBAkCARIDPgIZCgwKBQQJAgEF" + 
-    "EgM+AggKDAoFBAkCAQESAz4JFAoMCgUECQIBAxIDPhcYCgsKBAQJAgISAz8CFwoMCgUECQICBRIDPwII",
-    "CgwKBQQJAgIBEgM/CRIKDAoFBAkCAgMSAz8VFgoLCgQECQIDEgNAAhgKDAoFBAkCAwUSA0ACCAoMCgUE" + 
-    "CQIDARIDQAkTCgwKBQQJAgMDEgNAFhcKCgoCBAoSBEMARQEKCgoDBAoBEgNDCCUKCwoEBAoCABIDRAIt" + 
-    "CgwKBQQKAgAEEgNEAgoKDAoFBAoCAAYSA0QLIAoMCgUECgIAARIDRCEoCgwKBQQKAgADEgNEKywKCgoC" + 
-    "BAsSBEcASgEKCgoDBAsBEgNHCCQKCwoEBAsCABIDSAIWCgwKBQQLAgAFEgNIAggKDAoFBAsCAAESA0gJ" + 
-    "EQoMCgUECwIAAxIDSBQVCgsKBAQLAgESA0kCHwoMCgUECwIBBhIDSQIUCgwKBQQLAgEBEgNJFRoKDAoF" + 
-    "BAsCAQMSA0kdHgoKCgIEDBIETABPAQoKCgMEDAESA0wIIQoLCgQEDAIAEgNNAhMKDAoFBAwCAAUSA00C" + 
-    "CAoMCgUEDAIAARIDTQkOCgwKBQQMAgADEgNNERIKCwoEBAwCARIDTgIfCgwKBQQMAgEGEgNOAhQKDAoF" + 
-    "BAwCAQESA04VGgoMCgUEDAIBAxIDTh0eCgoKAgQNEgRRAFQBCgoKAwQNARIDUQgpCgsKBAQNAgASA1IC" + 
-    "GgoMCgUEDQIABRIDUgIICgwKBQQNAgABEgNSCRUKDAoFBA0CAAMSA1IYGQoLCgQEDQIBEgNTAh8KDAoF" + 
-    "BA0CAQYSA1MCFAoMCgUEDQIBARIDUxUaCgwKBQQNAgEDEgNTHR5iBnByb3RvMw==");
+    "YXRpb24yZFIFYW5nbGUiewogUHJvdG9idWZTd2VydmVNb2R1bGVBY2NlbGVyYXRpb24SIgoMYWNjZWxl" + 
+    "cmF0aW9uGAEgASgBUgxhY2NlbGVyYXRpb24SMwoFYW5nbGUYAiABKAsyHS53cGkucHJvdG8uUHJvdG9i" + 
+    "dWZSb3RhdGlvbjJkUgVhbmdsZUIXChVvcmcud3BpbGliLm1hdGgucHJvdG9K1hIKBhIEAABUAQoICgEM" + 
+    "EgMAABIKCAoBAhIDAgASCgkKAgMAEgMEABoKCAoBCBIDBgAuCgkKAggBEgMGAC4KCgoCBAASBAgADAEK" + 
+    "CgoDBAABEgMICB0KCwoEBAACABIDCQIQCgwKBQQAAgAFEgMJAggKDAoFBAACAAESAwkJCwoMCgUEAAIA" + 
+    "AxIDCQ4PCgsKBAQAAgESAwoCEAoMCgUEAAIBBRIDCgIICgwKBQQAAgEBEgMKCQsKDAoFBAACAQMSAwoO" + 
+    "DwoLCgQEAAICEgMLAhMKDAoFBAACAgUSAwsCCAoMCgUEAAICARIDCwkOCgwKBQQAAgIDEgMLERIKCgoC" + 
+    "BAESBA4AEgEKCgoDBAEBEgMOCCQKCwoEBAECABIDDwIQCgwKBQQBAgAFEgMPAggKDAoFBAECAAESAw8J" + 
+    "CwoMCgUEAQIAAxIDDw4PCgsKBAQBAgESAxACEAoMCgUEAQIBBRIDEAIICgwKBQQBAgEBEgMQCQsKDAoF" + 
+    "BAECAQMSAxAODwoLCgQEAQICEgMRAhMKDAoFBAECAgUSAxECCAoMCgUEAQICARIDEQkOCgwKBQQBAgID" + 
+    "EgMRERIKCgoCBAISBBQAFgEKCgoDBAIBEgMUCCsKCwoEBAICABIDFQIYCgwKBQQCAgAFEgMVAggKDAoF" + 
+    "BAICAAESAxUJEwoMCgUEAgIAAxIDFRYXCgoKAgQDEgQYABsBCgoKAwQDARIDGAgsCgsKBAQDAgASAxkC" + 
+    "EgoMCgUEAwIABRIDGQIICgwKBQQDAgABEgMZCQ0KDAoFBAMCAAMSAxkQEQoLCgQEAwIBEgMaAhMKDAoF",
+    "BAMCAQUSAxoCCAoMCgUEAwIBARIDGgkOCgwKBQQDAgEDEgMaERIKCgoCBAQSBB0AIAEKCgoDBAQBEgMd" + 
+    "CDMKCwoEBAQCABIDHgISCgwKBQQEAgAFEgMeAggKDAoFBAQCAAESAx4JDQoMCgUEBAIAAxIDHhARCgsK" + 
+    "BAQEAgESAx8CEwoMCgUEBAIBBRIDHwIICgwKBQQEAgEBEgMfCQ4KDAoFBAQCAQMSAx8REgoKCgIEBRIE" + 
+    "IgAlAQoKCgMEBQESAyIILwoLCgQEBQIAEgMjAhIKDAoFBAUCAAUSAyMCCAoMCgUEBQIAARIDIwkNCgwK" + 
+    "BQQFAgADEgMjEBEKCwoEBAUCARIDJAITCgwKBQQFAgEFEgMkAggKDAoFBAUCAQESAyQJDgoMCgUEBQIB" + 
+    "AxIDJBESCgoKAgQGEgQnACwBCgoKAwQGARIDJwgmCgsKBAQGAgASAygCJwoMCgUEBgIABhIDKAIXCgwK" + 
+    "BQQGAgABEgMoGCIKDAoFBAYCAAMSAyglJgoLCgQEBgIBEgMpAigKDAoFBAYCAQYSAykCFwoMCgUEBgIB" + 
+    "ARIDKRgjCgwKBQQGAgEDEgMpJicKCwoEBAYCAhIDKgImCgwKBQQGAgIGEgMqAhcKDAoFBAYCAgESAyoY" + 
+    "IQoMCgUEBgICAxIDKiQlCgsKBAQGAgMSAysCJwoMCgUEBgIDBhIDKwIXCgwKBQQGAgMBEgMrGCIKDAoF" + 
+    "BAYCAwMSAyslJgoKCgIEBxIELgAzAQoKCgMEBwESAy4IKgoLCgQEBwIAEgMvAhgKDAoFBAcCAAUSAy8C" + 
+    "CAoMCgUEBwIAARIDLwkTCgwKBQQHAgADEgMvFhcKCwoEBAcCARIDMAIZCgwKBQQHAgEFEgMwAggKDAoF" + 
+    "BAcCAQESAzAJFAoMCgUEBwIBAxIDMBcYCgsKBAQHAgISAzECFwoMCgUEBwICBRIDMQIICgwKBQQHAgIB" + 
+    "EgMxCRIKDAoFBAcCAgMSAzEVFgoLCgQEBwIDEgMyAhgKDAoFBAcCAwUSAzICCAoMCgUEBwIDARIDMgkT" + 
+    "CgwKBQQHAgMDEgMyFhcKCgoCBAgSBDUAOgEKCgoDBAgBEgM1CCcKCwoEBAgCABIDNgIYCgwKBQQIAgAF" + 
+    "EgM2AggKDAoFBAgCAAESAzYJEwoMCgUECAIAAxIDNhYXCgsKBAQIAgESAzcCGQoMCgUECAIBBRIDNwII" + 
+    "CgwKBQQIAgEBEgM3CRQKDAoFBAgCAQMSAzcXGAoLCgQECAICEgM4AhcKDAoFBAgCAgUSAzgCCAoMCgUE" + 
+    "CAICARIDOAkSCgwKBQQIAgIDEgM4FRYKCwoEBAgCAxIDOQIYCgwKBQQIAgMFEgM5AggKDAoFBAgCAwES" + 
+    "AzkJEwoMCgUECAIDAxIDORYXCgoKAgQJEgQ8AEEBCgoKAwQJARIDPAguCgsKBAQJAgASAz0CGAoMCgUE" + 
+    "CQIABRIDPQIICgwKBQQJAgABEgM9CRMKDAoFBAkCAAMSAz0WFwoLCgQECQIBEgM+AhkKDAoFBAkCAQUS" + 
+    "Az4CCAoMCgUECQIBARIDPgkUCgwKBQQJAgEDEgM+FxgKCwoEBAkCAhIDPwIXCgwKBQQJAgIFEgM/AggK",
+    "DAoFBAkCAgESAz8JEgoMCgUECQICAxIDPxUWCgsKBAQJAgMSA0ACGAoMCgUECQIDBRIDQAIICgwKBQQJ" + 
+    "AgMBEgNACRMKDAoFBAkCAwMSA0AWFwoKCgIEChIEQwBFAQoKCgMECgESA0MIJQoLCgQECgIAEgNEAi0K" + 
+    "DAoFBAoCAAQSA0QCCgoMCgUECgIABhIDRAsgCgwKBQQKAgABEgNEISgKDAoFBAoCAAMSA0QrLAoKCgIE" + 
+    "CxIERwBKAQoKCgMECwESA0cIJAoLCgQECwIAEgNIAhYKDAoFBAsCAAUSA0gCCAoMCgUECwIAARIDSAkR" + 
+    "CgwKBQQLAgADEgNIFBUKCwoEBAsCARIDSQIfCgwKBQQLAgEGEgNJAhQKDAoFBAsCAQESA0kVGgoMCgUE" + 
+    "CwIBAxIDSR0eCgoKAgQMEgRMAE8BCgoKAwQMARIDTAghCgsKBAQMAgASA00CEwoMCgUEDAIABRIDTQII" + 
+    "CgwKBQQMAgABEgNNCQ4KDAoFBAwCAAMSA00REgoLCgQEDAIBEgNOAh8KDAoFBAwCAQYSA04CFAoMCgUE" + 
+    "DAIBARIDThUaCgwKBQQMAgEDEgNOHR4KCgoCBA0SBFEAVAEKCgoDBA0BEgNRCCgKCwoEBA0CABIDUgIa" + 
+    "CgwKBQQNAgAFEgNSAggKDAoFBA0CAAESA1IJFQoMCgUEDQIAAxIDUhgZCgsKBAQNAgESA1MCHwoMCgUE" + 
+    "DQIBBhIDUwIUCgwKBQQNAgEBEgNTFRoKDAoFBA0CAQMSA1MdHmIGcHJvdG8z");
 
   static final Descriptors.FileDescriptor descriptor = Descriptors.FileDescriptor.internalBuildGeneratedFileFrom("kinematics.proto", "wpi.proto", descriptorData, Geometry2D.getDescriptor());
 
@@ -119,7 +119,7 @@ public final class Kinematics {
 
   static final Descriptors.Descriptor wpi_proto_ProtobufSwerveModuleState_descriptor = descriptor.internalContainedType(1532, 102, "ProtobufSwerveModuleState", "wpi.proto.ProtobufSwerveModuleState");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufSwerveModuleAccelerations_descriptor = descriptor.internalContainedType(1636, 124, "ProtobufSwerveModuleAccelerations", "wpi.proto.ProtobufSwerveModuleAccelerations");
+  static final Descriptors.Descriptor wpi_proto_ProtobufSwerveModuleAcceleration_descriptor = descriptor.internalContainedType(1636, 123, "ProtobufSwerveModuleAcceleration", "wpi.proto.ProtobufSwerveModuleAcceleration");
 
   /**
    * @return this proto file's descriptor.
@@ -5310,9 +5310,9 @@ public final class Kinematics {
   }
 
   /**
-   * Protobuf type {@code ProtobufSwerveModuleAccelerations}
+   * Protobuf type {@code ProtobufSwerveModuleAcceleration}
    */
-  public static final class ProtobufSwerveModuleAccelerations extends ProtoMessage<ProtobufSwerveModuleAccelerations> implements Cloneable {
+  public static final class ProtobufSwerveModuleAcceleration extends ProtoMessage<ProtobufSwerveModuleAcceleration> implements Cloneable {
     private static final long serialVersionUID = 0L;
 
     /**
@@ -5325,14 +5325,14 @@ public final class Kinematics {
      */
     private final Geometry2D.ProtobufRotation2d angle = Geometry2D.ProtobufRotation2d.newInstance();
 
-    private ProtobufSwerveModuleAccelerations() {
+    private ProtobufSwerveModuleAcceleration() {
     }
 
     /**
-     * @return a new empty instance of {@code ProtobufSwerveModuleAccelerations}
+     * @return a new empty instance of {@code ProtobufSwerveModuleAcceleration}
      */
-    public static ProtobufSwerveModuleAccelerations newInstance() {
-      return new ProtobufSwerveModuleAccelerations();
+    public static ProtobufSwerveModuleAcceleration newInstance() {
+      return new ProtobufSwerveModuleAcceleration();
     }
 
     /**
@@ -5347,7 +5347,7 @@ public final class Kinematics {
      * <code>optional double acceleration = 1;</code>
      * @return this
      */
-    public ProtobufSwerveModuleAccelerations clearAcceleration() {
+    public ProtobufSwerveModuleAcceleration clearAcceleration() {
       bitField0_ &= ~0x00000001;
       acceleration = 0D;
       return this;
@@ -5366,7 +5366,7 @@ public final class Kinematics {
      * @param value the acceleration to set
      * @return this
      */
-    public ProtobufSwerveModuleAccelerations setAcceleration(final double value) {
+    public ProtobufSwerveModuleAcceleration setAcceleration(final double value) {
       bitField0_ |= 0x00000001;
       acceleration = value;
       return this;
@@ -5384,7 +5384,7 @@ public final class Kinematics {
      * <code>optional .wpi.proto.ProtobufRotation2d angle = 2;</code>
      * @return this
      */
-    public ProtobufSwerveModuleAccelerations clearAngle() {
+    public ProtobufSwerveModuleAcceleration clearAngle() {
       bitField0_ &= ~0x00000002;
       angle.clear();
       return this;
@@ -5423,15 +5423,14 @@ public final class Kinematics {
      * @param value the angle to set
      * @return this
      */
-    public ProtobufSwerveModuleAccelerations setAngle(final Geometry2D.ProtobufRotation2d value) {
+    public ProtobufSwerveModuleAcceleration setAngle(final Geometry2D.ProtobufRotation2d value) {
       bitField0_ |= 0x00000002;
       angle.copyFrom(value);
       return this;
     }
 
     @Override
-    public ProtobufSwerveModuleAccelerations copyFrom(
-        final ProtobufSwerveModuleAccelerations other) {
+    public ProtobufSwerveModuleAcceleration copyFrom(final ProtobufSwerveModuleAcceleration other) {
       cachedSize = other.cachedSize;
       if ((bitField0_ | other.bitField0_) != 0) {
         bitField0_ = other.bitField0_;
@@ -5442,8 +5441,8 @@ public final class Kinematics {
     }
 
     @Override
-    public ProtobufSwerveModuleAccelerations mergeFrom(
-        final ProtobufSwerveModuleAccelerations other) {
+    public ProtobufSwerveModuleAcceleration mergeFrom(
+        final ProtobufSwerveModuleAcceleration other) {
       if (other.isEmpty()) {
         return this;
       }
@@ -5458,7 +5457,7 @@ public final class Kinematics {
     }
 
     @Override
-    public ProtobufSwerveModuleAccelerations clear() {
+    public ProtobufSwerveModuleAcceleration clear() {
       if (isEmpty()) {
         return this;
       }
@@ -5470,7 +5469,7 @@ public final class Kinematics {
     }
 
     @Override
-    public ProtobufSwerveModuleAccelerations clearQuick() {
+    public ProtobufSwerveModuleAcceleration clearQuick() {
       if (isEmpty()) {
         return this;
       }
@@ -5485,10 +5484,10 @@ public final class Kinematics {
       if (o == this) {
         return true;
       }
-      if (!(o instanceof ProtobufSwerveModuleAccelerations)) {
+      if (!(o instanceof ProtobufSwerveModuleAcceleration)) {
         return false;
       }
-      ProtobufSwerveModuleAccelerations other = (ProtobufSwerveModuleAccelerations) o;
+      ProtobufSwerveModuleAcceleration other = (ProtobufSwerveModuleAcceleration) o;
       return bitField0_ == other.bitField0_
         && (!hasAcceleration() || ProtoUtil.isEqual(acceleration, other.acceleration))
         && (!hasAngle() || angle.equals(other.angle));
@@ -5520,7 +5519,7 @@ public final class Kinematics {
 
     @Override
     @SuppressWarnings("fallthrough")
-    public ProtobufSwerveModuleAccelerations mergeFrom(final ProtoSource input) throws IOException {
+    public ProtobufSwerveModuleAcceleration mergeFrom(final ProtoSource input) throws IOException {
       // Enabled Fall-Through Optimization (QuickBuffers)
       int tag = input.readTag();
       while (true) {
@@ -5570,7 +5569,7 @@ public final class Kinematics {
     }
 
     @Override
-    public ProtobufSwerveModuleAccelerations mergeFrom(final JsonSource input) throws IOException {
+    public ProtobufSwerveModuleAcceleration mergeFrom(final JsonSource input) throws IOException {
       if (!input.beginObject()) {
         return this;
       }
@@ -5609,8 +5608,8 @@ public final class Kinematics {
     }
 
     @Override
-    public ProtobufSwerveModuleAccelerations clone() {
-      return new ProtobufSwerveModuleAccelerations().copyFrom(this);
+    public ProtobufSwerveModuleAcceleration clone() {
+      return new ProtobufSwerveModuleAcceleration().copyFrom(this);
     }
 
     @Override
@@ -5618,41 +5617,41 @@ public final class Kinematics {
       return ((bitField0_) == 0);
     }
 
-    public static ProtobufSwerveModuleAccelerations parseFrom(final byte[] data) throws
+    public static ProtobufSwerveModuleAcceleration parseFrom(final byte[] data) throws
         InvalidProtocolBufferException {
-      return ProtoMessage.mergeFrom(new ProtobufSwerveModuleAccelerations(), data).checkInitialized();
+      return ProtoMessage.mergeFrom(new ProtobufSwerveModuleAcceleration(), data).checkInitialized();
     }
 
-    public static ProtobufSwerveModuleAccelerations parseFrom(final ProtoSource input) throws
+    public static ProtobufSwerveModuleAcceleration parseFrom(final ProtoSource input) throws
         IOException {
-      return ProtoMessage.mergeFrom(new ProtobufSwerveModuleAccelerations(), input).checkInitialized();
+      return ProtoMessage.mergeFrom(new ProtobufSwerveModuleAcceleration(), input).checkInitialized();
     }
 
-    public static ProtobufSwerveModuleAccelerations parseFrom(final JsonSource input) throws
+    public static ProtobufSwerveModuleAcceleration parseFrom(final JsonSource input) throws
         IOException {
-      return ProtoMessage.mergeFrom(new ProtobufSwerveModuleAccelerations(), input).checkInitialized();
+      return ProtoMessage.mergeFrom(new ProtobufSwerveModuleAcceleration(), input).checkInitialized();
     }
 
     /**
-     * @return factory for creating ProtobufSwerveModuleAccelerations messages
+     * @return factory for creating ProtobufSwerveModuleAcceleration messages
      */
-    public static MessageFactory<ProtobufSwerveModuleAccelerations> getFactory() {
-      return ProtobufSwerveModuleAccelerationsFactory.INSTANCE;
+    public static MessageFactory<ProtobufSwerveModuleAcceleration> getFactory() {
+      return ProtobufSwerveModuleAccelerationFactory.INSTANCE;
     }
 
     /**
      * @return this type's descriptor.
      */
     public static Descriptors.Descriptor getDescriptor() {
-      return Kinematics.wpi_proto_ProtobufSwerveModuleAccelerations_descriptor;
+      return Kinematics.wpi_proto_ProtobufSwerveModuleAcceleration_descriptor;
     }
 
-    private enum ProtobufSwerveModuleAccelerationsFactory implements MessageFactory<ProtobufSwerveModuleAccelerations> {
+    private enum ProtobufSwerveModuleAccelerationFactory implements MessageFactory<ProtobufSwerveModuleAcceleration> {
       INSTANCE;
 
       @Override
-      public ProtobufSwerveModuleAccelerations create() {
-        return ProtobufSwerveModuleAccelerations.newInstance();
+      public ProtobufSwerveModuleAcceleration create() {
+        return ProtobufSwerveModuleAcceleration.newInstance();
       }
     }
 

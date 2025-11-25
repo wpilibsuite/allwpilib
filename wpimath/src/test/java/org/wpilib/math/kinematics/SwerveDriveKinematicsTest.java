@@ -491,14 +491,14 @@ class SwerveDriveKinematicsTest {
 
   @Test
   void testTurnInPlaceForwardAccelerations() {
-    SwerveModuleAccelerations flAccel =
-        new SwerveModuleAccelerations(106.629, Rotation2d.fromDegrees(135));
-    SwerveModuleAccelerations frAccel =
-        new SwerveModuleAccelerations(106.629, Rotation2d.fromDegrees(45));
-    SwerveModuleAccelerations blAccel =
-        new SwerveModuleAccelerations(106.629, Rotation2d.fromDegrees(-135));
-    SwerveModuleAccelerations brAccel =
-        new SwerveModuleAccelerations(106.629, Rotation2d.fromDegrees(-45));
+    SwerveModuleAcceleration flAccel =
+        new SwerveModuleAcceleration(106.629, Rotation2d.fromDegrees(135));
+    SwerveModuleAcceleration frAccel =
+        new SwerveModuleAcceleration(106.629, Rotation2d.fromDegrees(45));
+    SwerveModuleAcceleration blAccel =
+        new SwerveModuleAcceleration(106.629, Rotation2d.fromDegrees(-135));
+    SwerveModuleAcceleration brAccel =
+        new SwerveModuleAcceleration(106.629, Rotation2d.fromDegrees(-45));
 
     var chassisAccelerations =
         m_kinematics.toChassisAccelerations(flAccel, frAccel, blAccel, brAccel);

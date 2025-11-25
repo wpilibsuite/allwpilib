@@ -79,7 +79,7 @@ message ProtobufSwerveModuleState {
   ProtobufRotation2d angle = 2;
 }
 
-message ProtobufSwerveModuleAccelerations {
+message ProtobufSwerveModuleAcceleration {
   double acceleration = 1;
   ProtobufRotation2d angle = 2;
 }

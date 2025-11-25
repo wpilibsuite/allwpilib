@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include "wpi/math/kinematics/SwerveModuleAccelerations.hpp"
+#include "wpi/math/kinematics/SwerveModuleAcceleration.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/struct/Struct.hpp"
 
 template <>
 struct WPILIB_DLLEXPORT
-    wpi::util::Struct<wpi::math::SwerveModuleAccelerations> {
+    wpi::util::Struct<wpi::math::SwerveModuleAcceleration> {
   static constexpr std::string_view GetTypeName() {
     return "SwerveModuleAccelerations";
   }
@@ -21,10 +21,10 @@ struct WPILIB_DLLEXPORT
     return "double acceleration;Rotation2d angle";
   }
 
-  static wpi::math::SwerveModuleAccelerations Unpack(
+  static wpi::math::SwerveModuleAcceleration Unpack(
       std::span<const uint8_t> data);
   static void Pack(std::span<uint8_t> data,
-                   const wpi::math::SwerveModuleAccelerations& value);
+                   const wpi::math::SwerveModuleAcceleration& value);
   static void ForEachNested(
       std::invocable<std::string_view, std::string_view> auto fn) {
     wpi::util::ForEachStructSchema<wpi::math::Rotation2d>(fn);
@@ -32,5 +32,5 @@ struct WPILIB_DLLEXPORT
 };
 
 static_assert(
-    wpi::util::StructSerializable<wpi::math::SwerveModuleAccelerations>);
-static_assert(wpi::util::HasNestedStruct<wpi::math::SwerveModuleAccelerations>);
+    wpi::util::StructSerializable<wpi::math::SwerveModuleAcceleration>);
+static_assert(wpi::util::HasNestedStruct<wpi::math::SwerveModuleAcceleration>);

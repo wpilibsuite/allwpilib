@@ -31,7 +31,7 @@ template <size_t NumModules>
 class SwerveDriveOdometry
     : public Odometry<wpi::util::array<SwerveModuleState, NumModules>,
                       wpi::util::array<SwerveModulePosition, NumModules>,
-                      wpi::util::array<SwerveModuleAccelerations, NumModules>> {
+                      wpi::util::array<SwerveModuleAcceleration, NumModules>> {
  public:
   /**
    * Constructs a SwerveDriveOdometry object.

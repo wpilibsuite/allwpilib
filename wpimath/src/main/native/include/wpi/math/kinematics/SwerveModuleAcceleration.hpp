@@ -13,7 +13,7 @@ namespace wpi::math {
 /**
  * Represents the accelerations of one swerve module.
  */
-struct WPILIB_DLLEXPORT SwerveModuleAccelerations {
+struct WPILIB_DLLEXPORT SwerveModuleAcceleration {
   /**
    * Acceleration of the wheel of the module.
    */
@@ -30,7 +30,7 @@ struct WPILIB_DLLEXPORT SwerveModuleAccelerations {
    * @param other The other object.
    * @return Whether the two objects are equal.
    */
-  constexpr bool operator==(const SwerveModuleAccelerations& other) const {
+  constexpr bool operator==(const SwerveModuleAcceleration& other) const {
     return units::math::abs(acceleration - other.acceleration) < 1E-9_mps_sq &&
            angle == other.angle;
   }
@@ -42,8 +42,8 @@ struct WPILIB_DLLEXPORT SwerveModuleAccelerations {
    * @param other The SwerveModuleAccelerations to add.
    * @return The sum of the SwerveModuleAccelerations.
    */
-  SwerveModuleAccelerations operator+(
-      const SwerveModuleAccelerations& other) const {
+  SwerveModuleAcceleration operator+(
+      const SwerveModuleAcceleration& other) const {
     // Convert to Cartesian coordinates, add, then convert back
     auto thisX = acceleration * angle.Cos();
     auto thisY = acceleration * angle.Sin();
@@ -66,8 +66,8 @@ struct WPILIB_DLLEXPORT SwerveModuleAccelerations {
    * @param other The SwerveModuleAccelerations to subtract.
    * @return The difference between the two SwerveModuleAccelerations.
    */
-  SwerveModuleAccelerations operator-(
-      const SwerveModuleAccelerations& other) const {
+  SwerveModuleAcceleration operator-(
+      const SwerveModuleAcceleration& other) const {
     return *this + (-other);
   }
 
@@ -77,7 +77,7 @@ struct WPILIB_DLLEXPORT SwerveModuleAccelerations {
    *
    * @return The inverse of the current SwerveModuleAccelerations.
    */
-  constexpr SwerveModuleAccelerations operator-() const {
+  constexpr SwerveModuleAcceleration operator-() const {
     return {acceleration, angle + Rotation2d{180_deg}};
   }
 
@@ -88,7 +88,7 @@ struct WPILIB_DLLEXPORT SwerveModuleAccelerations {
    * @param scalar The scalar to multiply by.
    * @return The scaled SwerveModuleAccelerations.
    */
-  constexpr SwerveModuleAccelerations operator*(double scalar) const {
+  constexpr SwerveModuleAcceleration operator*(double scalar) const {
     if (scalar < 0) {
       return {-scalar * acceleration, angle + Rotation2d{180_deg}};
     }
@@ -102,11 +102,11 @@ struct WPILIB_DLLEXPORT SwerveModuleAccelerations {
    * @param scalar The scalar to divide by.
    * @return The scaled SwerveModuleAccelerations.
    */
-  constexpr SwerveModuleAccelerations operator/(double scalar) const {
+  constexpr SwerveModuleAcceleration operator/(double scalar) const {
     return operator*(1.0 / scalar);
   }
 };
 }  // namespace wpi::math
 
-#include "wpi/math/kinematics/proto/SwerveModuleAccelerationsProto.hpp"
-#include "wpi/math/kinematics/struct/SwerveModuleAccelerationsStruct.hpp"
+#include "wpi/math/kinematics/proto/SwerveModuleAccelerationProto.hpp"
+#include "wpi/math/kinematics/struct/SwerveModuleAccelerationStruct.hpp"
