@@ -21,8 +21,7 @@ TEST(SwerveModuleAccelerationsTest, DefaultConstructor) {
 }
 
 TEST(SwerveModuleAccelerationsTest, ParameterizedConstructor) {
-  SwerveModuleAcceleration moduleAccelerations{2.5_mps_sq,
-                                                Rotation2d{1.5_rad}};
+  SwerveModuleAcceleration moduleAccelerations{2.5_mps_sq, Rotation2d{1.5_rad}};
 
   EXPECT_NEAR(moduleAccelerations.acceleration.value(), 2.5, kEpsilon);
   EXPECT_NEAR(moduleAccelerations.angle.Radians().value(), 1.5, kEpsilon);
@@ -30,11 +29,11 @@ TEST(SwerveModuleAccelerationsTest, ParameterizedConstructor) {
 
 TEST(SwerveModuleAccelerationsTest, Equals) {
   SwerveModuleAcceleration moduleAccelerations1{2.0_mps_sq,
-                                                 Rotation2d{1.5_rad}};
+                                                Rotation2d{1.5_rad}};
   SwerveModuleAcceleration moduleAccelerations2{2.0_mps_sq,
-                                                 Rotation2d{1.5_rad}};
+                                                Rotation2d{1.5_rad}};
   SwerveModuleAcceleration moduleAccelerations3{2.1_mps_sq,
-                                                 Rotation2d{1.5_rad}};
+                                                Rotation2d{1.5_rad}};
 
   EXPECT_EQ(moduleAccelerations1, moduleAccelerations2);
   EXPECT_NE(moduleAccelerations1, moduleAccelerations3);

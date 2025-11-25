@@ -498,8 +498,7 @@ public class SwerveDriveKinematics
       double linearAcceleration = Math.hypot(x, y);
 
       if (linearAcceleration <= 1e-6) {
-        moduleAccelerations[i] =
-            new SwerveModuleAcceleration(linearAcceleration, Rotation2d.kZero);
+        moduleAccelerations[i] = new SwerveModuleAcceleration(linearAcceleration, Rotation2d.kZero);
       } else {
         moduleAccelerations[i] =
             new SwerveModuleAcceleration(linearAcceleration, new Rotation2d(x, y));

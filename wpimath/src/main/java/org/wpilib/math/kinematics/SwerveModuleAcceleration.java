@@ -31,8 +31,7 @@ public class SwerveModuleAcceleration
   public static final SwerveModuleAccelerationProto proto = new SwerveModuleAccelerationProto();
 
   /** SwerveModuleAccelerations struct for serialization. */
-  public static final SwerveModuleAccelerationStruct struct =
-      new SwerveModuleAccelerationStruct();
+  public static final SwerveModuleAccelerationStruct struct = new SwerveModuleAccelerationStruct();
 
   /** Constructs a SwerveModuleAccelerations with zeros for acceleration and angle. */
   public SwerveModuleAcceleration() {}

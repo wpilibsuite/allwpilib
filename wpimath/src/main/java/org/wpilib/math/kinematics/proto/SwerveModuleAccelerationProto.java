@@ -6,12 +6,12 @@ package org.wpilib.math.kinematics.proto;
 
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.kinematics.SwerveModuleAcceleration;
-import org.wpilib.math.proto.Kinematics.ProtobufSwerveModuleAccelerations;
+import org.wpilib.math.proto.Kinematics.ProtobufSwerveModuleAcceleration;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
 public class SwerveModuleAccelerationProto
-    implements Protobuf<SwerveModuleAcceleration, ProtobufSwerveModuleAccelerations> {
+    implements Protobuf<SwerveModuleAcceleration, ProtobufSwerveModuleAcceleration> {
   @Override
   public Class<SwerveModuleAcceleration> getTypeClass() {
     return SwerveModuleAcceleration.class;
@@ -19,22 +19,22 @@ public class SwerveModuleAccelerationProto
 
   @Override
   public Descriptor getDescriptor() {
-    return ProtobufSwerveModuleAccelerations.getDescriptor();
+    return ProtobufSwerveModuleAcceleration.getDescriptor();
   }
 
   @Override
-  public ProtobufSwerveModuleAccelerations createMessage() {
-    return ProtobufSwerveModuleAccelerations.newInstance();
+  public ProtobufSwerveModuleAcceleration createMessage() {
+    return ProtobufSwerveModuleAcceleration.newInstance();
   }
 
   @Override
-  public SwerveModuleAcceleration unpack(ProtobufSwerveModuleAccelerations msg) {
+  public SwerveModuleAcceleration unpack(ProtobufSwerveModuleAcceleration msg) {
     return new SwerveModuleAcceleration(
         msg.getAcceleration(), Rotation2d.proto.unpack(msg.getAngle()));
   }
 
   @Override
-  public void pack(ProtobufSwerveModuleAccelerations msg, SwerveModuleAcceleration value) {
+  public void pack(ProtobufSwerveModuleAcceleration msg, SwerveModuleAcceleration value) {
     msg.setAcceleration(value.acceleration);
     Rotation2d.proto.pack(msg.getAngle(), value.angle);
   }

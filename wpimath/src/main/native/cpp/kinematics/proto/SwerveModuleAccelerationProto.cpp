@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/math/kinematics/proto/SwerveModuleAccelerationProto.hpp"
+
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 #include "wpimath/protobuf/kinematics.npb.h"
 

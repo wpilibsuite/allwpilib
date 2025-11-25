@@ -9,8 +9,7 @@
 #include "wpi/util/struct/Struct.hpp"
 
 template <>
-struct WPILIB_DLLEXPORT
-    wpi::util::Struct<wpi::math::SwerveModuleAcceleration> {
+struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::SwerveModuleAcceleration> {
   static constexpr std::string_view GetTypeName() {
     return "SwerveModuleAccelerations";
   }
