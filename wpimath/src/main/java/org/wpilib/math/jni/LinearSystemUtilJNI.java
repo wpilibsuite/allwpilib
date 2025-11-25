@@ -4,8 +4,8 @@
 
 package org.wpilib.math.jni;
 
-/** StateSpaceUtil JNI. */
-public final class StateSpaceUtilJNI extends WPIMathJNI {
+/** LinearSystemUtil JNI. */
+public final class LinearSystemUtilJNI extends WPIMathJNI {
   /**
    * Returns true if (A, B) is a stabilizable pair.
    *
@@ -22,5 +22,5 @@ public final class StateSpaceUtilJNI extends WPIMathJNI {
   public static native boolean isStabilizable(int states, int inputs, double[] A, double[] B);
 
   /** Utility class. */
-  private StateSpaceUtilJNI() {}
+  private LinearSystemUtilJNI() {}
 }

@@ -8,9 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import org.junit.jupiter.api.Test;
 
-public class StateSpaceUtilJNITest {
+public class LinearSystemUtilJNITest {
   @Test
   public void testLink() {
-    assertDoesNotThrow(StateSpaceUtilJNI::forceLoad);
+    assertDoesNotThrow(LinearSystemUtilJNI::forceLoad);
   }
 }

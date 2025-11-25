@@ -93,8 +93,8 @@ class UnscentedKalmanFilter {
       const StateArray& stateStdDevs, const OutputArray& measurementStdDevs,
       wpi::units::second_t dt)
       : m_f(std::move(f)), m_h(std::move(h)) {
-    m_contQ = MakeCovMatrix(stateStdDevs);
-    m_contR = MakeCovMatrix(measurementStdDevs);
+    m_contQ = CovarianceMatrix(stateStdDevs);
+    m_contR = CovarianceMatrix(measurementStdDevs);
     m_meanFuncX = [](const Matrixd<States, NumSigmas>& sigmas,
                      const Vectord<NumSigmas>& Wm) -> StateVector {
       return sigmas * Wm;
@@ -169,8 +169,8 @@ class UnscentedKalmanFilter {
         m_residualFuncX(std::move(residualFuncX)),
         m_residualFuncY(std::move(residualFuncY)),
         m_addFuncX(std::move(addFuncX)) {
-    m_contQ = MakeCovMatrix(stateStdDevs);
-    m_contR = MakeCovMatrix(measurementStdDevs);
+    m_contQ = CovarianceMatrix(stateStdDevs);
+    m_contR = CovarianceMatrix(measurementStdDevs);
     m_dt = dt;
 
     Reset();

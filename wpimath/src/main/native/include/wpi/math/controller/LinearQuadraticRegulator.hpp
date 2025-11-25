@@ -81,8 +81,8 @@ class LinearQuadraticRegulator {
                            const Matrixd<States, Inputs>& B,
                            const StateArray& Qelems, const InputArray& Relems,
                            wpi::units::second_t dt)
-      : LinearQuadraticRegulator(A, B, MakeCostMatrix(Qelems),
-                                 MakeCostMatrix(Relems), dt) {}
+      : LinearQuadraticRegulator(A, B, CostMatrix(Qelems), CostMatrix(Relems),
+                                 dt) {}
 
   /**
    * Constructs a controller with the given coefficients and plant.
