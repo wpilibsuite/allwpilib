@@ -1547,7 +1547,7 @@ SwerveDriveOdometry = "wpi/math/kinematics/SwerveDriveOdometry.hpp"
 SwerveDriveOdometry3d = "wpi/math/kinematics/SwerveDriveOdometry3d.hpp"
 SwerveModulePosition = "wpi/math/kinematics/SwerveModulePosition.hpp"
 SwerveModuleState = "wpi/math/kinematics/SwerveModuleState.hpp"
-SwerveModuleAccelerations = "wpi/math/kinematics/SwerveModuleAccelerations.hpp"
+SwerveModuleAcceleration = "wpi/math/kinematics/SwerveModuleAcceleration.hpp"
 
 
 [tool.semiwrap.extension_modules."wpimath.spline._spline"]

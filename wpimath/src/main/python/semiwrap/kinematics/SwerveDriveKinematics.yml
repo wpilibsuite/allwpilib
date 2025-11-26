@@ -83,7 +83,7 @@ classes:
         overloads:
           ModuleAccelerations&&... [const]:
             ignore: true
-          const wpi::util::array<SwerveModuleAccelerations, NumModules>& [const]:
+          const wpi::util::array<SwerveModuleAcceleration, NumModules>& [const]:
 
     template_inline_code: |
       if constexpr (NumModules == 2) {
