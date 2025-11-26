@@ -389,15 +389,18 @@ public abstract class RobotBase implements AutoCloseable {
             break;
           }
         } catch (ClassNotFoundException e) {
-          DriverStation.reportError(
-              "Could not find class from stack trace? This should not happen.\n"
-                  + "If simulating in VS Code, try opening the Command Palette "
-                  + "and running Clean Java Language Server Workspace.\n"
-                  + "If this is on a real robot, try redeploying. If this is persistent, "
-                  + "report this on https://github.com/wpilibsuite/allwpilib/issues/new?template=bug_report.md. Error: "
-                  + throwable,
-              elements);
+          // This should never happen!
         }
+      }
+      if ("Unknown".equals(robotName)) {
+        DriverStation.reportError(
+            "Could not find class from stack trace? This should not happen.\n"
+                + "If simulating in VS Code, try opening the Command Palette "
+                + "and running Clean Java Language Server Workspace.\n"
+                + "If this is on a real robot, try redeploying. If this is persistent, "
+                + "report this on https://github.com/wpilibsuite/allwpilib/issues/new?template=bug_report.md. Error: "
+                + throwable,
+            elements);
       }
       DriverStation.reportError(
           "Unhandled exception instantiating robot " + robotName + " " + throwable, elements);
