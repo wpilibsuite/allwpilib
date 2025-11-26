@@ -12,11 +12,11 @@ import org.wpilib.math.interpolation.Interpolator;
  * chassis accelerations into wheel accelerations. Robot code should not use this directly- Instead,
  * use the particular type for your drivetrain (e.g., {@link DifferentialDriveKinematics}).
  *
+ * @param <P> The type of the wheel positions.
  * @param <S> The type of the wheel speeds.
  * @param <A> The type of the wheel accelerations.
- * @param <P> The type of the wheel positions.
  */
-public interface Kinematics<S, A, P> extends Interpolator<P> {
+public interface Kinematics<P, S, A> extends Interpolator<P> {
   /**
    * Performs forward kinematics to return the resulting chassis speed from the wheel speeds. This
    * method is often used for odometry -- determining the robot's position on the field using data

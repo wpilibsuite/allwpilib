@@ -35,7 +35,7 @@ import org.wpilib.util.struct.StructSerializable;
  */
 public class MecanumDriveKinematics
     implements Kinematics<
-            MecanumDriveWheelSpeeds, MecanumDriveWheelAccelerations, MecanumDriveWheelPositions>,
+            MecanumDriveWheelPositions, MecanumDriveWheelSpeeds, MecanumDriveWheelAccelerations>,
         ProtobufSerializable,
         StructSerializable {
   private final SimpleMatrix m_inverseKinematics;

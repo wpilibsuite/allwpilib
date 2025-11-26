@@ -12,7 +12,7 @@
 template <>
 struct WPILIB_DLLEXPORT
     wpi::util::Protobuf<wpi::math::SwerveModuleAcceleration> {
-  using MessageStruct = wpi_proto_ProtobufSwerveModuleAccelerations;
+  using MessageStruct = wpi_proto_ProtobufSwerveModuleAcceleration;
   using InputStream =
       wpi::util::ProtoInputStream<wpi::math::SwerveModuleAcceleration>;
   using OutputStream =

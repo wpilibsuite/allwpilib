@@ -26,7 +26,7 @@ namespace wpi::math {
  * @tparam WheelPositions Wheel positions type.
  * @tparam WheelAccelerations Wheel accelerations type.
  */
-template <typename WheelSpeeds, typename WheelPositions,
+template <typename WheelPositions, typename WheelSpeeds,
           typename WheelAccelerations>
 class WPILIB_DLLEXPORT Odometry {
  public:
@@ -38,7 +38,7 @@ class WPILIB_DLLEXPORT Odometry {
    * @param wheelPositions The current distances measured by each wheel.
    * @param initialPose The starting position of the robot on the field.
    */
-  explicit Odometry(const Kinematics<WheelSpeeds, WheelPositions,
+  explicit Odometry(const Kinematics<WheelPositions, WheelSpeeds,
                                      WheelAccelerations>& kinematics,
                     const Rotation2d& gyroAngle,
                     const WheelPositions& wheelPositions,
@@ -134,7 +134,7 @@ class WPILIB_DLLEXPORT Odometry {
   }
 
  private:
-  const Kinematics<WheelSpeeds, WheelPositions, WheelAccelerations>&
+  const Kinematics<WheelPositions, WheelSpeeds, WheelAccelerations>&
       m_kinematics;
   Pose2d m_pose;
 

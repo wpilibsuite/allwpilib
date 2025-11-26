@@ -43,7 +43,7 @@ import org.wpilib.util.struct.StructSerializable;
  */
 @SuppressWarnings("overrides")
 public class SwerveDriveKinematics
-    implements Kinematics<SwerveModuleState[], SwerveModuleAcceleration[], SwerveModulePosition[]>,
+    implements Kinematics<SwerveModulePosition[], SwerveModuleState[], SwerveModuleAcceleration[]>,
         ProtobufSerializable,
         StructSerializable {
   private final SimpleMatrix m_firstOrderInverseKinematics;
@@ -225,7 +225,7 @@ public class SwerveDriveKinematics
     for (int i = 0; i < m_numModules; i++) {
       var module = moduleDeltas[i];
       moduleDeltaMatrix.set(i * 2, 0, module.distance * module.angle.getCos());
-      moduleDeltaMatrix.set(i * 2 + 1, module.distance * module.angle.getSin());
+      moduleDeltaMatrix.set(i * 2 + 1, 0, module.distance * module.angle.getSin());
     }
 
     var chassisDeltaVector = m_firstOrderForwardKinematics.mult(moduleDeltaMatrix);

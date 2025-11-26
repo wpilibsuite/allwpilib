@@ -30,8 +30,8 @@ namespace wpi::math {
  * never call it, then this class will behave like regular encoder odometry.
  */
 class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator
-    : public PoseEstimator<DifferentialDriveWheelSpeeds,
-                           DifferentialDriveWheelPositions,
+    : public PoseEstimator<DifferentialDriveWheelPositions,
+                           DifferentialDriveWheelSpeeds,
                            DifferentialDriveWheelAccelerations> {
  public:
   /**
