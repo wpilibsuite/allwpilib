@@ -62,11 +62,6 @@ public class DataLogReaderThread implements AutoCloseable {
                 new DataLogReaderRange(
                     m_reader.iterator(), new DataLogIterator(m_reader, Integer.MAX_VALUE)));
           }
-          // if (data.type.equals("structschema") ||
-          //     data.type.equals("proto:FileDescriptorProto")) {
-          //
-          //   // TODO: figure out schema entries
-          // }
         } finally {
           m_mutex.unlock();
         }
