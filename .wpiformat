@@ -9,95 +9,37 @@ cppHeaderFileInclude {
 }
 
 generatedFileExclude {
-  \.jinja$
-  apriltag/src/test/resources/
+  assets/
   docs/theme\.css$
-  fields/src/main/native/resources/
   generated/
-  glass/src/app/native/mac/glass\.icns$
-  glass/src/app/native/resources/
-  glass/src/app/native/win/glass\.ico$
-  hal/src/main/native/athena/ctre/
-  hal/src/main/native/athena/frccansae/
-  hal/src/main/native/athena/rev/
-  hal/src/main/native/athena/visa/
-  hal/src/main/native/include/ctre/
-  hal/src/main/native/include/wpi/hal/UsageReporting\.h$
-  hal/src/main/native/systemcore/ctre/
   hal/src/main/native/systemcore/rev/
-  ntcore/doc/
-  tools/datalogtool/src/main/native/mac/datalogtool\.icns$
-  tools/datalogtool/src/main/native/resources/
-  tools/datalogtool/src/main/native/win/datalogtool\.ico$
-  tools/outlineviewer/src/main/native/mac/ov\.icns$
-  tools/outlineviewer/src/main/native/resources/
-  tools/outlineviewer/src/main/native/win/outlineviewer\.ico$
-  tools/sysid/src/main/native/mac/sysid\.icns$
-  tools/sysid/src/main/native/resources/
-  tools/sysid/src/main/native/win/sysid\.ico$
-  tools/wpical/src/main/native/assets/
-  tools/wpical/src/main/native/mac/wpical\.icns$
-  tools/wpical/src/main/native/resources/
-  tools/wpical/src/main/native/thirdparty/
-  tools/wpical/src/main/native/win/wpical\.ico$
+  python/
+  resources/
+  thirdparty/
   wpigui/src/main/native/cpp/portable-file-dialogs\.cpp$
   wpigui/src/main/native/include/wpi/gui/portable-file-dialogs\.h$
   wpimath/src/main/native/include/wpi/units/base\.hpp$
-  wpimath/src/main/native/include/wpi/units/units\.hpp$
-  wpimath/src/main/native/thirdparty/
-  wpimath/src/test/native/cpp/UnitsTest\.cpp$
   wpinet/src/main/native/cpp/http_parser\.cpp$
   wpinet/src/main/native/include/wpi/net/http_parser\.hpp$
-  wpinet/src/main/native/linux/AvahiClient\.cpp$
-  wpinet/src/main/native/linux/AvahiClient\.hpp$
-  wpinet/src/main/native/resources/
-  wpinet/src/main/native/thirdparty/
-  wpiutil/src/main/native/cpp/fs\.cpp$
   wpiutil/src/main/native/include/wpi/util/FastQueue\.hpp$
-  wpiutil/src/main/native/include/wpi/util/fs\.hpp$
-  wpiutil/src/main/native/resources/
-  wpiutil/src/main/native/thirdparty/
   wpiutil/src/test/native/cpp/json/
   wpiutil/src/test/native/cpp/llvm/
   wpiutil/src/test/native/cpp/span/
-
-  apriltag/src/main/python/
-  apriltag/src/test/python/
-  commandsv2/src/main/python/
-  commandsv2/src/test/python/
-  datalog/src/main/python/
-  datalog/src/test/python/
-  hal/src/main/python/
-  hal/src/test/python/
-  ntcore/src/main/python/
-  ntcore/src/test/python/
-  romiVendordep/src/main/python/
-  romiVendordep/src/test/python/
-  wpilibc/src/main/python/
-  wpilibc/src/test/python/
-  wpimath/src/main/python/
-  wpimath/src/test/python/
-  wpinet/src/main/python/
-  wpinet/src/test/python/
-  wpiutil/src/main/python/
-  wpiutil/src/test/python/
-  xrpVendordep/src/main/python/
-  xrpVendordep/src/test/python/
 }
 
 modifiableFileExclude {
-  BUILD.bazel
-  \.patch$
-  datalog/examples/printlog/datalog\.py$
+  \.icns$
+  \.ico$
+  \.jinja$
   gradlew
-  ntcoreffi/src/main/native/include/DataLogManager\.h$
   objcpp/
-  thirdparty/
+  wpimath/src/test/native/cpp/UnitsTest\.cpp$
+  wpiutil/src/main/native/cpp/fs\.cpp$
+  wpiutil/src/main/native/include/wpi/util/fs\.hpp$
 }
 
 licenseUpdateExclude {
   cscore/src/main/native/cpp/default_init_allocator\.hpp$
-  datalog/examples/printlog
   wpiutil/src/main/native/cpp/Base64\.cpp$
   wpiutil/src/main/native/cpp/sha1\.cpp$
   wpiutil/src/main/native/include/wpi/util/sha1\.hpp$

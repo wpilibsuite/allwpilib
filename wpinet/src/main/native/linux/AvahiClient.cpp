@@ -4,11 +4,10 @@
 
 #include "AvahiClient.hpp"
 
-#include "wpi/util/mutex.hpp"
-
-#include <thread>
+#include <memory>
 
 #include "dlfcn.h"
+#include "wpi/util/mutex.hpp"
 
 using namespace wpi::net;
 
