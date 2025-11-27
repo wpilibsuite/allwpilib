@@ -138,13 +138,13 @@ Java_org_wpilib_hardware_hal_simulation_SimulatorJNI_waitForProgramStart
 /*
  * Class:     org_wpilib_hardware_hal_simulation_SimulatorJNI
  * Method:    setProgramStarted
- * Signature: ()V
+ * Signature: (Z)V
  */
 JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_simulation_SimulatorJNI_setProgramStarted
-  (JNIEnv*, jclass)
+  (JNIEnv*, jclass, jboolean started)
 {
-  HALSIM_SetProgramStarted();
+  HALSIM_SetProgramStarted(started);
 }
 
 /*

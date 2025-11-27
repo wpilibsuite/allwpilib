@@ -24,9 +24,13 @@ public final class SimHooks {
     SimulatorJNI.waitForProgramStart();
   }
 
-  /** Sets that the user program has started. */
-  public static void setProgramStarted() {
-    SimulatorJNI.setProgramStarted();
+  /**
+   * Sets flag that indicates if the user program has started.
+   *
+   * @param started true if started
+   */
+  public static void setProgramStarted(boolean started) {
+    SimulatorJNI.setProgramStarted(started);
   }
 
   /**

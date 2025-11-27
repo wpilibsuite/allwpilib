@@ -18,10 +18,23 @@ namespace wpi::sim {
  */
 void SetRuntimeType(HAL_RuntimeType type);
 
+/**
+ * Waits until the user program has started.
+ */
 void WaitForProgramStart();
 
-void SetProgramStarted();
+/**
+ * Sets flag that indicates if the user program has started.
+ *
+ * @param started true if started
+ */
+void SetProgramStarted(bool started);
 
+/**
+ * Returns true if the user program has started.
+ *
+ * @return True if the user program has started.
+ */
 bool GetProgramStarted();
 
 /**
