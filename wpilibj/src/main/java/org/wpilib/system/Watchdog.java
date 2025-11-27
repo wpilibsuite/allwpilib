@@ -10,8 +10,10 @@ import java.io.Closeable;
 import java.util.PriorityQueue;
 import java.util.concurrent.locks.ReentrantLock;
 import org.wpilib.driverstation.DriverStation;
+import org.wpilib.hardware.hal.HALUtil;
 import org.wpilib.hardware.hal.NotifierJNI;
 import org.wpilib.units.measure.Time;
+import org.wpilib.util.WPIUtilJNI;
 
 /**
  * A class that's a wrapper around a watchdog timer.
@@ -42,7 +44,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   private static int m_notifier;
 
   static {
-    m_notifier = NotifierJNI.initializeNotifier();
+    m_notifier = NotifierJNI.createNotifier();
     NotifierJNI.setNotifierName(m_notifier, "Watchdog");
     startDaemonThread(Watchdog::schedulerFunc);
   }
@@ -225,8 +227,8 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     if (m_watchdogs.isEmpty()) {
       NotifierJNI.cancelNotifierAlarm(m_notifier);
     } else {
-      NotifierJNI.updateNotifierAlarm(
-          m_notifier, (long) (m_watchdogs.peek().m_expirationTime * 1e6));
+      NotifierJNI.setNotifierAlarm(
+          m_notifier, (long) (m_watchdogs.peek().m_expirationTime * 1e6), 0, true);
     }
   }
 
@@ -239,10 +241,13 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
 
   private static void schedulerFunc() {
     while (!Thread.currentThread().isInterrupted()) {
-      long curTime = NotifierJNI.waitForNotifierAlarm(m_notifier);
-      if (curTime == 0) {
+      try {
+        WPIUtilJNI.waitForObject(m_notifier);
+      } catch (InterruptedException ex) {
+        Thread.currentThread().interrupt();
         break;
       }
+      long curTime = HALUtil.getFPGATime();
 
       m_queueMutex.lock();
       try {
@@ -273,6 +278,8 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
         m_queueMutex.lock();
 
         updateAlarm();
+
+        NotifierJNI.acknowledgeNotifierAlarm(m_notifier);
       } finally {
         m_queueMutex.unlock();
       }
