@@ -119,7 +119,7 @@ class TimedRobot : public IterativeRobotBase {
     }
   };
 
-  wpi::hal::Handle<HAL_NotifierHandle, HAL_CleanNotifier> m_notifier;
+  wpi::hal::Handle<HAL_NotifierHandle, HAL_DestroyNotifier> m_notifier;
   std::chrono::microseconds m_startTime;
   uint64_t m_loopStartTimeUs = 0;
 

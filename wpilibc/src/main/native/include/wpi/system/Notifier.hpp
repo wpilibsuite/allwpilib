@@ -131,6 +131,16 @@ class Notifier {
   void Stop();
 
   /**
+   * Gets the overrun count.
+   *
+   * An overrun occurs when a notifier's alarm is not serviced before the next
+   * scheduled alarm time.
+   *
+   * @return overrun count
+   */
+  int32_t GetOverrun() const;
+
+  /**
    * Sets the HAL notifier thread priority.
    *
    * The HAL notifier thread is responsible for managing the FPGA's notifier
@@ -148,18 +158,6 @@ class Notifier {
   static bool SetHALThreadPriority(bool realTime, int32_t priority);
 
  private:
-  /**
-   * Update the HAL alarm time.
-   *
-   * @param triggerTime the time at which the next alarm will be triggered
-   */
-  void UpdateAlarm(uint64_t triggerTime);
-
-  /**
-   * Update the HAL alarm time based on m_expirationTime.
-   */
-  void UpdateAlarm();
-
   // The thread waiting on the HAL alarm
   std::thread m_thread;
 
@@ -171,17 +169,6 @@ class Notifier {
 
   // The user-provided callback
   std::function<void()> m_callback;
-
-  // The time at which the callback should be called. Has the same zero as
-  // Timer::GetFPGATimestamp().
-  wpi::units::second_t m_expirationTime = 0_s;
-
-  // If periodic, stores the callback period; if single, stores the time until
-  // the callback call.
-  wpi::units::second_t m_period = 0_s;
-
-  // True if the callback is periodic
-  bool m_periodic = false;
 };
 
 }  // namespace wpi
