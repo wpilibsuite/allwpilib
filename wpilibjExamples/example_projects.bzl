@@ -83,18 +83,18 @@ SNIPPETS_FOLDERS = [
 ]
 
 TEMPLATES_FOLDERS = [
-    "commandbased",
-    "commandbasedskeleton",
+    "commandv2",
+    "commandv2skeleton",
     "educational",
     "robotbaseskeleton",
-    "romicommandbased",
+    "romicommandv2",
     "romieducational",
     "romitimed",
     "timed",
     "timedskeleton",
     "timeslice",
     "timesliceskeleton",
-    "xrpcommandbased",
+    "xrpcommandv2",
     "xrpeducational",
     "xrptimed",
 ]

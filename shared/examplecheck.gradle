@@ -24,30 +24,12 @@ def fileCheck = { parsedJson, folder ->
     }
 }
 
-task checkTemplates(type: Task) {
-    doLast {
-        def parsedJson = new groovy.json.JsonSlurper().parseText(templateFile.text)
-        fileCheck(parsedJson, templateDirectory)
-        parsedJson.each {
-            assert it.name != null
-            assert it.description != null
-            assert it.tags != null
-            assert it.foldername != null
-            assert it.gradlebase != null
-            assert it.commandversion != null
-            if (it.gradlebase == 'java') {
-                assert it.mainclass != null
-            }
-        }
-    }
-}
-
 def tagList = [
         /* --- Categories --- */
         // On-RIO image processing
-        "Vision",
+        "Vision",  "AprilTags",
         // Command-based
-        "Command-based",
+        "Commandv2", "Commandv3",
         // Romi
         "Romi",
         // XRP
@@ -79,10 +61,32 @@ def tagList = [
         /* --- HID --- */
         "XboxController", "PS4Controller", "PS5Controller", "Joystick",
 
+        /* --- RobotBase --- */
+        "Timed", "Timeslice", "RobotBase", "Educational",
+
         /* --- Misc --- */
         /* (try to keep this section minimal) */
-        "EventLoop", "AprilTags", "Mechanism2d", "Preferences",
+        "EventLoop", "Mechanism2d", "Preferences", "Skeleton"
 ]
+
+task checkTemplates(type: Task) {
+    doLast {
+        def parsedJson = new groovy.json.JsonSlurper().parseText(templateFile.text)
+        fileCheck(parsedJson, templateDirectory)
+        parsedJson.each {
+            assert it.name != null
+            assert it.description != null
+            assert it.tags != null
+            assert it.tags.findAll { !tagList.contains(it) }.empty
+            assert it.foldername != null
+            assert it.gradlebase != null
+            assert it.commandversion != null
+            if (it.gradlebase == 'java') {
+                assert it.mainclass != null
+            }
+        }
+    }
+}
 
 task checkExamples(type: Task) {
     doLast {
