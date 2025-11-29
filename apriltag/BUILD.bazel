@@ -33,10 +33,9 @@ cc_library(
     srcs = glob(["src/main/native/thirdparty/apriltag/src/**"]),
     hdrs = glob(["src/main/native/thirdparty/apriltag/include/**"]),
     copts = select({
-        "@platforms//os:osx": [
+        "@bazel_tools//tools/cpp:gcc": [
             "-Wno-format-nonliteral",
-            "-Wno-gnu-zero-variadic-macro-arguments",
-            "-Wno-uninitialized",
+            "-Wno-maybe-uninitialized",
             "-Wno-sign-compare",
             "-Wno-type-limits",
         ],
@@ -47,9 +46,10 @@ cc_library(
             "/wd4267",
             "/wd4996",
         ],
-        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": [
+        "//conditions:default": [
             "-Wno-format-nonliteral",
-            "-Wno-maybe-uninitialized",
+            "-Wno-gnu-zero-variadic-macro-arguments",
+            "-Wno-uninitialized",
             "-Wno-sign-compare",
             "-Wno-type-limits",
         ],

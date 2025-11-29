@@ -12,14 +12,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: "Linux System Core", classifier: "linuxsystemcore",                 os: ubuntu-24.04, container: "wpilib/systemcore-cross-ubuntu:2027-24.04", action: "build" }
-          - { name: "Linux System Core Debug", classifier: "linuxsystemcoredebug",            os: ubuntu-24.04, container: "wpilib/systemcore-cross-ubuntu:2027-24.04", action: "build" }
-          - { name: "Linux System Core Static", classifier: "linuxsystemcorestatic",           os: ubuntu-24.04, container: "wpilib/systemcore-cross-ubuntu:2027-24.04", action: "build" }
-          - { name: "Linux System Core Static Debug", classifier: "linuxsystemcorestaticdebug",    os: ubuntu-24.04, container: "wpilib/systemcore-cross-ubuntu:2027-24.04", action: "build" }
-          - { name: "Linux x86-64",      classifier: "linuxx86-64,headers,sources",     os: ubuntu-24.04, container: "wpilib/systemcore-cross-ubuntu:2027-24.04", action: "test" }
-          - { name: "Linux x86-64 Debug",  classifier: "linuxx86-64debug",                os: ubuntu-24.04, container: "wpilib/systemcore-cross-ubuntu:2027-24.04", action: "test" }
-          - { name: "Linux x86-64 Static", classifier: "linuxx86-64static",               os: ubuntu-24.04, container: "wpilib/systemcore-cross-ubuntu:2027-24.04", action: "test" }
-          - { name: "Linux x86-64 Static Debug", classifier: "linuxx86-64staticdebug",        os: ubuntu-24.04, container: "wpilib/systemcore-cross-ubuntu:2027-24.04", action: "test" }
+          - { name: "Linux System Core", classifier: "linuxsystemcore",                 os: ubuntu-24.04, action: "build" }
+          - { name: "Linux System Core Debug", classifier: "linuxsystemcoredebug",            os: ubuntu-24.04, action: "build" }
+          - { name: "Linux System Core Static", classifier: "linuxsystemcorestatic",           os: ubuntu-24.04, action: "build" }
+          - { name: "Linux System Core Static Debug", classifier: "linuxsystemcorestaticdebug",    os: ubuntu-24.04, action: "build" }
+          - { name: "Linux x86-64",      classifier: "linuxx86-64,headers,sources",     os: ubuntu-24.04, action: "test" }
+          - { name: "Linux x86-64 Debug",  classifier: "linuxx86-64debug",                os: ubuntu-24.04, action: "test" }
+          - { name: "Linux x86-64 Static", classifier: "linuxx86-64static",               os: ubuntu-24.04, action: "test" }
+          - { name: "Linux x86-64 Static Debug", classifier: "linuxx86-64staticdebug",        os: ubuntu-24.04, action: "test" }
 
           - { name: "macOS", classifier: "osxuniversal,osxuniversaldebug,headers,sources,osxuniversalstatic,osxuniversalstaticdebug,linuxsystemcore,linuxsystemcoredebug,linuxsystemcorestatic,linuxsystemcorestaticdebug", os: macOS-15, action: "test" }
 
@@ -34,8 +34,19 @@ jobs:
 
     name: "${{ matrix.action == 'test' && 'Test' || 'Build' }} ${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
-    container: ${{ matrix.container }}
     steps:
+      - name: Free disk space (Linux)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          docker-images: false
+          swap-storage: false
+        if: startsWith(matrix.os, 'ubuntu')
+
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
 
@@ -44,6 +55,10 @@ jobs:
         with:
           username: ${{ secrets.BAZEL_CACHE_USERNAME }}
           password: ${{ secrets.BAZEL_CACHE_PASSWORD }}
+
+      - name: Install apt dependencies
+        if: matrix.os == 'ubuntu-24.04'
+        run: sudo apt-get install -y libgl1-mesa-dev libx11-dev libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev
 
       - if: matrix.os == 'ubuntu-24.04'
         uses: bazel-contrib/setup-bazel@0.15.0
@@ -70,12 +85,7 @@ jobs:
       - name: Free Space
         if: always()
         shell: bash
-        run: |
-          if [[ "${{ matrix.os }}" == "windows-2022" ]]; then
-            fsutil volume diskfree C:
-          else
-            df -h /
-          fi
+        run: df -h
 
   buildifier:
     name: "buildifier"
