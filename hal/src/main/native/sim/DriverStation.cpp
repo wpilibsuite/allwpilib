@@ -22,7 +22,6 @@
 #include "wpi/hal/cpp/fpga_clock.h"
 #include "wpi/hal/simulation/MockHooks.h"
 #include "wpi/util/EventVector.hpp"
-#include "wpi/util/condition_variable.hpp"
 #include "wpi/util/mutex.hpp"
 
 static wpi::util::mutex msgMutex;
@@ -368,7 +367,7 @@ int32_t HAL_GetMatchInfo(HAL_MatchInfo* info) {
 }
 
 void HAL_ObserveUserProgramStarting(void) {
-  HALSIM_SetProgramStarted();
+  HALSIM_SetProgramStarted(true);
 }
 
 void HAL_ObserveUserProgramDisabled(void) {

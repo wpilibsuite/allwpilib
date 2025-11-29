@@ -25,11 +25,11 @@ class DigitalCommunicationTest : public testing::TestWithParam<T> {
 
   void SetUp() override {
     wpi::sim::PauseTiming();
+    wpi::sim::SetProgramStarted(false);
     wpi::sim::DriverStationSim::ResetData();
 
     m_thread = std::thread([&] { m_robot.StartCompetition(); });
-    wpi::sim::StepTiming(0.0_ms);
-    // SimHooks.stepTiming(0.0); // Wait for Notifiers
+    wpi::sim::WaitForProgramStart();
   }
 
   void TearDown() override {

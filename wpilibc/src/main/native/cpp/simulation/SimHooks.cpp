@@ -16,8 +16,8 @@ void WaitForProgramStart() {
   HALSIM_WaitForProgramStart();
 }
 
-void SetProgramStarted() {
-  HALSIM_SetProgramStarted();
+void SetProgramStarted(bool started) {
+  HALSIM_SetProgramStarted(started);
 }
 
 bool GetProgramStarted() {

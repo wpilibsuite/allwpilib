@@ -68,8 +68,8 @@ double GetFPGATimestamp() {
   return GetFPGATime() * 1.0e-6;
 }
 
-void SetProgramStarted() {
-  programStarted = true;
+void SetProgramStarted(bool started) {
+  programStarted = started;
 }
 bool GetProgramStarted() {
   return programStarted;
@@ -83,13 +83,15 @@ void HALSIM_WaitForProgramStart(void) {
   int count = 0;
   while (!programStarted) {
     count++;
-    wpi::util::print("Waiting for program start signal: {}\n", count);
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    if (count % 10 == 0) {
+      wpi::util::print("Waiting for program start signal: {}\n", count);
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 }
 
-void HALSIM_SetProgramStarted(void) {
-  SetProgramStarted();
+void HALSIM_SetProgramStarted(HAL_Bool started) {
+  SetProgramStarted(started);
 }
 
 HAL_Bool HALSIM_GetProgramStarted(void) {
