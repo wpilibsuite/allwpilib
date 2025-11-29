@@ -6,8 +6,8 @@
 
 #include <Eigen/Core>
 
-#include "org_wpilib_math_jni_StateSpaceUtilJNI.h"
-#include "wpi/math/util/StateSpaceUtil.hpp"
+#include "org_wpilib_math_jni_LinearSystemUtilJNI.h"
+#include "wpi/math/system/LinearSystemUtil.hpp"
 #include "wpi/util/jni_util.hpp"
 
 using namespace wpi::util::java;
@@ -15,12 +15,12 @@ using namespace wpi::util::java;
 extern "C" {
 
 /*
- * Class:     org_wpilib_math_jni_StateSpaceUtilJNI
+ * Class:     org_wpilib_math_jni_LinearSystemUtilJNI
  * Method:    isStabilizable
  * Signature: (II[D[D)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_org_wpilib_math_jni_StateSpaceUtilJNI_isStabilizable
+Java_org_wpilib_math_jni_LinearSystemUtilJNI_isStabilizable
   (JNIEnv* env, jclass, jint states, jint inputs, jdoubleArray aSrc,
    jdoubleArray bSrc)
 {

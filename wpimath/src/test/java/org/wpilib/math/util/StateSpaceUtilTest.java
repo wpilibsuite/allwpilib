@@ -5,19 +5,13 @@
 package org.wpilib.math.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.wpilib.UtilityClassTest;
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.linalg.MatBuilder;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.linalg.VecBuilder;
-import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N2;
 
 class StateSpaceUtilTest extends UtilityClassTest<StateSpaceUtil> {
@@ -27,7 +21,7 @@ class StateSpaceUtilTest extends UtilityClassTest<StateSpaceUtil> {
 
   @Test
   void testCostArray() {
-    var mat = StateSpaceUtil.makeCostMatrix(VecBuilder.fill(1.0, 2.0, 3.0));
+    var mat = StateSpaceUtil.costMatrix(VecBuilder.fill(1.0, 2.0, 3.0));
 
     assertEquals(1.0, mat.get(0, 0), 1e-3);
     assertEquals(0.0, mat.get(0, 1), 1e-3);
@@ -42,7 +36,7 @@ class StateSpaceUtilTest extends UtilityClassTest<StateSpaceUtil> {
 
   @Test
   void testCovArray() {
-    var mat = StateSpaceUtil.makeCovarianceMatrix(Nat.N3(), VecBuilder.fill(1.0, 2.0, 3.0));
+    var mat = StateSpaceUtil.covarianceMatrix(Nat.N3(), VecBuilder.fill(1.0, 2.0, 3.0));
 
     assertEquals(1.0, mat.get(0, 0), 1e-3);
     assertEquals(0.0, mat.get(0, 1), 1e-3);
@@ -53,89 +47,6 @@ class StateSpaceUtilTest extends UtilityClassTest<StateSpaceUtil> {
     assertEquals(0.0, mat.get(0, 2), 1e-3);
     assertEquals(0.0, mat.get(1, 2), 1e-3);
     assertEquals(9.0, mat.get(2, 2), 1e-3);
-  }
-
-  @Test
-  void testIsStabilizable() {
-    Matrix<N2, N2> A;
-    Matrix<N2, N1> B = VecBuilder.fill(0, 1);
-
-    // First eigenvalue is uncontrollable and unstable.
-    // Second eigenvalue is controllable and stable.
-    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 1.2, 0, 0, 0.5);
-    assertFalse(StateSpaceUtil.isStabilizable(A, B));
-
-    // First eigenvalue is uncontrollable and marginally stable.
-    // Second eigenvalue is controllable and stable.
-    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 1, 0, 0, 0.5);
-    assertFalse(StateSpaceUtil.isStabilizable(A, B));
-
-    // First eigenvalue is uncontrollable and stable.
-    // Second eigenvalue is controllable and stable.
-    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.2, 0, 0, 0.5);
-    assertTrue(StateSpaceUtil.isStabilizable(A, B));
-
-    // First eigenvalue is uncontrollable and stable.
-    // Second eigenvalue is controllable and unstable.
-    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.2, 0, 0, 1.2);
-    assertTrue(StateSpaceUtil.isStabilizable(A, B));
-  }
-
-  @Test
-  void testIsDetectable() {
-    Matrix<N2, N2> A;
-    Matrix<N1, N2> C = MatBuilder.fill(Nat.N1(), Nat.N2(), 0, 1);
-
-    // First eigenvalue is unobservable and unstable.
-    // Second eigenvalue is observable and stable.
-    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 1.2, 0, 0, 0.5);
-    assertFalse(StateSpaceUtil.isDetectable(A, C));
-
-    // First eigenvalue is unobservable and marginally stable.
-    // Second eigenvalue is observable and stable.
-    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 1, 0, 0, 0.5);
-    assertFalse(StateSpaceUtil.isDetectable(A, C));
-
-    // First eigenvalue is unobservable and stable.
-    // Second eigenvalue is observable and stable.
-    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.2, 0, 0, 0.5);
-    assertTrue(StateSpaceUtil.isDetectable(A, C));
-
-    // First eigenvalue is unobservable and stable.
-    // Second eigenvalue is observable and unstable.
-    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.2, 0, 0, 1.2);
-    assertTrue(StateSpaceUtil.isDetectable(A, C));
-  }
-
-  @Test
-  void testMakeWhiteNoiseVector() {
-    var firstData = new ArrayList<Double>();
-    var secondData = new ArrayList<Double>();
-    for (int i = 0; i < 1000; i++) {
-      var noiseVec = StateSpaceUtil.makeWhiteNoiseVector(VecBuilder.fill(1.0, 2.0));
-      firstData.add(noiseVec.get(0, 0));
-      secondData.add(noiseVec.get(1, 0));
-    }
-    assertEquals(1.0, calculateStandardDeviation(firstData), 0.2);
-    assertEquals(2.0, calculateStandardDeviation(secondData), 0.2);
-  }
-
-  private double calculateStandardDeviation(List<Double> numArray) {
-    double sum = 0.0;
-    double standardDeviation = 0.0;
-    int length = numArray.size();
-
-    for (double num : numArray) {
-      sum += num;
-    }
-
-    double mean = sum / length;
-
-    for (double num : numArray) {
-      standardDeviation += Math.pow(num - mean, 2);
-    }
-
-    return Math.sqrt(standardDeviation / length);
   }
 
   @Test
@@ -156,12 +67,20 @@ class StateSpaceUtilTest extends UtilityClassTest<StateSpaceUtil> {
   }
 
   @Test
-  @SuppressWarnings("removal")
-  void testPoseToVector() {
-    Pose2d pose = new Pose2d(1, 2, new Rotation2d(3));
-    var vector = StateSpaceUtil.poseToVector(pose);
-    assertEquals(pose.getTranslation().getX(), vector.get(0, 0), 1e-6);
-    assertEquals(pose.getTranslation().getY(), vector.get(1, 0), 1e-6);
-    assertEquals(pose.getRotation().getRadians(), vector.get(2, 0), 1e-6);
+  void testDesaturateInputVector() {
+    final var vec1 = MatBuilder.fill(Nat.N2(), Nat.N1(), 10.0, 12.0);
+    assertEquals(vec1, StateSpaceUtil.desaturateInputVector(vec1, 12.0));
+    assertEquals(
+        MatBuilder.fill(Nat.N2(), Nat.N1(), 25.0 / 3.0, 10.0),
+        StateSpaceUtil.desaturateInputVector(vec1, 10.0));
+
+    final var vec2 = MatBuilder.fill(Nat.N2(), Nat.N1(), 10.0, -12.0);
+    assertEquals(vec2, StateSpaceUtil.desaturateInputVector(vec2, 12.0));
+    assertEquals(
+        MatBuilder.fill(Nat.N2(), Nat.N1(), 25.0 / 3.0, -10.0),
+        StateSpaceUtil.desaturateInputVector(vec2, 10.0));
+
+    final var vec3 = MatBuilder.fill(Nat.N2(), Nat.N1(), 0.0, 0.0);
+    assertEquals(vec3, StateSpaceUtil.desaturateInputVector(vec3, 12.0));
   }
 }

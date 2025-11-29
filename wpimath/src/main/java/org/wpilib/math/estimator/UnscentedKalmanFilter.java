@@ -167,8 +167,8 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
 
     m_dt = nominalDt;
 
-    m_contQ = StateSpaceUtil.makeCovarianceMatrix(states, stateStdDevs);
-    m_contR = StateSpaceUtil.makeCovarianceMatrix(outputs, measurementStdDevs);
+    m_contQ = StateSpaceUtil.covarianceMatrix(states, stateStdDevs);
+    m_contR = StateSpaceUtil.covarianceMatrix(outputs, measurementStdDevs);
 
     m_pts = pts;
 

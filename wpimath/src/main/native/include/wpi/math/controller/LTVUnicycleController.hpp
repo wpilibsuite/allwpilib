@@ -56,8 +56,8 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
   LTVUnicycleController(const wpi::util::array<double, 3>& Qelems,
                         const wpi::util::array<double, 2>& Relems,
                         wpi::units::second_t dt)
-      : m_Q{wpi::math::MakeCostMatrix(Qelems)},
-        m_R{wpi::math::MakeCostMatrix(Relems)},
+      : m_Q{wpi::math::CostMatrix(Qelems)},
+        m_R{wpi::math::CostMatrix(Relems)},
         m_dt{dt} {}
 
   /**

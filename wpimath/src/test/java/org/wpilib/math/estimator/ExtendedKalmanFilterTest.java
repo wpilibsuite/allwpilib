@@ -17,6 +17,7 @@ import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N2;
 import org.wpilib.math.numbers.N3;
 import org.wpilib.math.numbers.N5;
+import org.wpilib.math.random.Normal;
 import org.wpilib.math.system.NumericalIntegration;
 import org.wpilib.math.system.NumericalJacobian;
 import org.wpilib.math.system.plant.DCMotor;
@@ -89,7 +90,7 @@ class ExtendedKalmanFilterTest {
           observer.correct(u, localY);
 
           var globalY = getGlobalMeasurementModel(observer.getXhat(), u);
-          var R = StateSpaceUtil.makeCostMatrix(VecBuilder.fill(0.01, 0.01, 0.0001, 0.5, 0.5));
+          var R = StateSpaceUtil.costMatrix(VecBuilder.fill(0.01, 0.01, 0.0001, 0.5, 0.5));
           observer.correct(
               Nat.N5(), u, globalY, ExtendedKalmanFilterTest::getGlobalMeasurementModel, R);
         });
@@ -154,8 +155,7 @@ class ExtendedKalmanFilterTest {
       nextR.set(4, 0, vr);
 
       var localY = getLocalMeasurementModel(groundTruthX, u);
-      var whiteNoiseStdDevs = VecBuilder.fill(0.0001, 0.5, 0.5);
-      observer.correct(u, localY.plus(StateSpaceUtil.makeWhiteNoiseVector(whiteNoiseStdDevs)));
+      observer.correct(u, localY.plus(Normal.normal(VecBuilder.fill(0.0001, 0.5, 0.5))));
 
       Matrix<N5, N1> rdot = nextR.minus(r).div(dt);
       u = new Matrix<>(B.solve(rdot.minus(getDynamics(r, new Matrix<>(Nat.N2(), Nat.N1())))));
@@ -172,7 +172,7 @@ class ExtendedKalmanFilterTest {
     observer.correct(u, localY);
 
     var globalY = getGlobalMeasurementModel(observer.getXhat(), u);
-    var R = StateSpaceUtil.makeCostMatrix(VecBuilder.fill(0.01, 0.01, 0.0001, 0.5, 0.5));
+    var R = StateSpaceUtil.costMatrix(VecBuilder.fill(0.01, 0.01, 0.0001, 0.5, 0.5));
     observer.correct(Nat.N5(), u, globalY, ExtendedKalmanFilterTest::getGlobalMeasurementModel, R);
 
     var finalPosition = trajectory.sample(trajectory.getTotalTime());
