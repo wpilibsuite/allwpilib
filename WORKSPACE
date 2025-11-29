@@ -315,16 +315,6 @@ register_toolchains(
 setup_legacy_setup_jdk_dependencies()
 
 http_archive(
-    name = "bzlmodrio-ni",
-    sha256 = "fff62c3cb3e83f9a0d0a01f1739477c9ca5e9a6fac05be1ad59dafcd385801f7",
-    url = "https://github.com/wpilibsuite/bzlmodRio-ni/releases/download/2025.2.0/bzlmodRio-ni-2025.2.0.tar.gz",
-)
-
-load("@bzlmodrio-ni//:maven_cpp_deps.bzl", "setup_legacy_bzlmodrio_ni_cpp_dependencies")
-
-setup_legacy_bzlmodrio_ni_cpp_dependencies()
-
-http_archive(
     name = "bzlmodrio-opencv",
     sha256 = "867ec3e90b7efc30ff6eb68d14050e7f1e800656d390505b135069f080c5cd91",
     url = "https://github.com/wpilibsuite/bzlmodRio-opencv/releases/download/2025.4.10.0-3.bcr5/bzlmodRio-opencv-2025.4.10.0-3.bcr5.tar.gz",
