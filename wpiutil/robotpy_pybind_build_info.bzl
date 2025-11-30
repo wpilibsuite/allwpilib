@@ -15,7 +15,7 @@ def wpiutil_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/Color.hpp",
             tmpl_class_names = [],
             trampolines = [
-                ("wpi::util::Color", "wpi__Color.hpp"),
+                ("wpi::util::Color", "wpi__util__Color.hpp"),
             ],
         ),
         struct(
@@ -25,7 +25,7 @@ def wpiutil_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/Color8Bit.hpp",
             tmpl_class_names = [],
             trampolines = [
-                ("wpi::util::Color8Bit", "wpi__Color8Bit.hpp"),
+                ("wpi::util::Color8Bit", "wpi__util__Color8Bit.hpp"),
             ],
         ),
         struct(
