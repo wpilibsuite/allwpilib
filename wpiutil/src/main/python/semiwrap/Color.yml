@@ -173,6 +173,12 @@ classes:
       HexString:
       operator==:
 
+functions:
+  ceil_int:
+    ignore
+  ceil:
+    ignore
+
 inline_code: |
   cls_Color
     .def("__hash__", [](Color *self) -> size_t {
