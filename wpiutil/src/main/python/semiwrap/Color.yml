@@ -175,9 +175,9 @@ classes:
 
 functions:
   ceil_int:
-    ignore
+    ignore: true
   ceil:
-    ignore
+    ignore: true
 
 inline_code: |
   cls_Color
