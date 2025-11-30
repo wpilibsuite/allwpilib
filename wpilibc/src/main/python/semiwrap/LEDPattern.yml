@@ -29,7 +29,7 @@ classes:
       Steps:
         overloads:
           std::span<const std::pair<double, wpi::util::Color>>:
-            std::initializer_list<std::pair<double, wpi::util::Color>>:
+          std::initializer_list<std::pair<double, wpi::util::Color>>:
             ignore: true
       Gradient:
         overloads:
