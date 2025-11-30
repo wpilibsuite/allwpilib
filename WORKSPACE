@@ -283,17 +283,6 @@ load("@rules_bzlmodrio_toolchains//toolchains:load_toolchains.bzl", "load_toolch
 
 load_toolchains()
 
-#
-http_archive(
-    name = "rules_bzlmodrio_jdk",
-    sha256 = "623b8bcdba1c3140f56e940365f011d2e5d90d74c7a30ace6a8817c037c1dd61",
-    url = "https://github.com/wpilibsuite/rules_bzlmodRio_jdk/releases/download/17.0.12-7.bcr1/rules_bzlmodrio_jdk-17.0.12-7.bcr1.tar.gz",
-)
-
-load("@rules_bzlmodrio_jdk//:maven_deps.bzl", "setup_legacy_setup_jdk_dependencies")
-
-setup_legacy_setup_jdk_dependencies()
-
 register_toolchains(
     "@local_roborio//:macos",
     "@local_roborio//:linux",
@@ -311,8 +300,6 @@ register_toolchains(
     "@local_bookworm_64//:linux",
     "@local_bookworm_64//:windows",
 )
-
-setup_legacy_setup_jdk_dependencies()
 
 http_archive(
     name = "bzlmodrio-opencv",
