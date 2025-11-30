@@ -75,5 +75,5 @@ void AddressableLED::SetGlobalData(int start, ColorOrder colorOrder,
 }
 
 void AddressableLED::LEDData::SetHSV(int h, int s, int v) {
-  SetLED(Color::FromHSV(h, s, v));
+  SetLED(wpi::util::Color::FromHSV(h, s, v));
 }

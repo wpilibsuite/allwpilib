@@ -15,7 +15,7 @@
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/ct_string.hpp"
 
-namespace wpi {
+namespace wpi::util {
 
 /**
  * Represents colors that can be used with Addressable LEDs.
@@ -131,4 +131,4 @@ class Color8Bit {
   int blue = 0;
 };
 
-}  // namespace wpi
+}  // namespace wpi::util

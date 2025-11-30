@@ -2,7 +2,7 @@ extra_includes:
 - pybind11/operators.h
 
 classes:
-  wpi::Color:
+  wpi::util::Color:
     force_type_casters:
     - wpi::util::ct_string
     attributes:
@@ -172,6 +172,12 @@ classes:
       FromHSV:
       HexString:
       operator==:
+
+functions:
+  ceil_int:
+    ignore: true
+  ceil:
+    ignore: true
 
 inline_code: |
   cls_Color

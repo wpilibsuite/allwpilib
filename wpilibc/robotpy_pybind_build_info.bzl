@@ -985,26 +985,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
-            class_name = "Color",
-            yml_file = "semiwrap/Color.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/util/Color.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::Color", "wpi__Color.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "Color8Bit",
-            yml_file = "semiwrap/Color8Bit.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/util/Color8Bit.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::Color8Bit", "wpi__Color8Bit.hpp"),
-            ],
-        ),
-        struct(
             class_name = "Preferences",
             yml_file = "semiwrap/Preferences.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
