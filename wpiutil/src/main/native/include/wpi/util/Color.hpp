@@ -11,12 +11,29 @@
 #include <string_view>
 
 #include <fmt/format.h>
-#include <gcem.hpp>
 
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/ct_string.hpp"
 
-namespace wpi {
+namespace wpi::util {
+
+// replicate ceil from gcem to avoid gcem dependency here
+namespace detail {
+constexpr double ceil_int(double x, double x_whole) noexcept {
+  return (x_whole + ((x > 0) && (x > x_whole)));
+}
+
+constexpr double ceil(double x) noexcept {
+  if (std::is_constant_evaluated()) {
+    return (
+        (x < 0.0 ? -x : x) >= 4503599627370496.
+            ? x
+            : ceil_int(x, static_cast<double>(static_cast<long long int>(x))));
+  } else {
+    return std::ceil(x);
+  }
+}
+}  // namespace detail
 
 /**
  * Represents colors that can be used with Addressable LEDs.
@@ -906,7 +923,7 @@ class Color {
 
  private:
   static constexpr double roundAndClamp(double value) {
-    return std::clamp(gcem::ceil(value * (1 << 12)) / (1 << 12), 0.0, 1.0);
+    return std::clamp(detail::ceil(value * (1 << 12)) / (1 << 12), 0.0, 1.0);
   }
 };
 
@@ -1083,4 +1100,4 @@ inline constexpr Color Color::kWhiteSmoke{0.9607843f, 0.9607843f, 0.9607843f};
 inline constexpr Color Color::kYellow{1.0f, 1.0f, 0.0f};
 inline constexpr Color Color::kYellowGreen{0.6039216f, 0.8039216f, 0.19607843f};
 
-}  // namespace wpi
+}  // namespace wpi::util

@@ -8,8 +8,8 @@ classes:
       ApplyTo:
         overloads:
           std::span<wpi::AddressableLED::LEDData> [const]:
-          LEDReader, std::function<void (int, wpi::Color)> [const]:
-          std::span<wpi::AddressableLED::LEDData>, std::function<void (int, wpi::Color)> [const]:
+          LEDReader, std::function<void (int, wpi::util::Color)> [const]:
+          std::span<wpi::AddressableLED::LEDData>, std::function<void (int, wpi::util::Color)> [const]:
       Reversed:
       OffsetBy:
       ScrollAtRelativeSpeed:
@@ -28,13 +28,13 @@ classes:
       ProgressMaskLayer:
       Steps:
         overloads:
-          std::span<const std::pair<double, Color>>:
-          std::initializer_list<std::pair<double, Color>>:
+          std::span<const std::pair<double, wpi::util::Color>>:
+            std::initializer_list<std::pair<double, wpi::util::Color>>:
             ignore: true
       Gradient:
         overloads:
-          GradientType, std::span<const Color>:
-          GradientType, std::initializer_list<Color>:
+          GradientType, std::span<const wpi::util::Color>:
+          GradientType, std::initializer_list<wpi::util::Color>:
             ignore: true
       Rainbow:
       MapIndex:
