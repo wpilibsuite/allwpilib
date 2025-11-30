@@ -5,7 +5,6 @@
 package org.wpilib.util;
 
 import java.util.Objects;
-import org.wpilib.math.util.MathUtil;
 
 /**
  * Represents colors.
@@ -197,6 +196,10 @@ public class Color {
     return Math.clamp(Math.ceil(value * (1 << 12)) / (1 << 12), 0.0, 1.0);
   }
 
+  private static int lerp(int a, int b, double t) {
+    return (int) (a + (b - a) * t);
+  }
+
   // Helper methods
 
   /**
@@ -369,10 +372,7 @@ public class Color {
    * @return the interpolated color, packed in a 32-bit integer
    */
   public static int lerpRGB(int r1, int g1, int b1, int r2, int g2, int b2, double t) {
-    return packRGB(
-        (int) MathUtil.lerp(r1, r2, t),
-        (int) MathUtil.lerp(g1, g2, t),
-        (int) MathUtil.lerp(b1, b2, t));
+    return packRGB(lerp(r1, r2, t), lerp(g1, g2, t), lerp(b1, b2, t));
   }
 
   /*
