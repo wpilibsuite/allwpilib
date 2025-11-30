@@ -296,10 +296,10 @@
   },
   {
     "name": "'Traditional' Hatchbot",
-    "description": "A fully-functional command-based hatchbot for the 2019 game, written in the 'traditional' style, i.e. commands are given their own classes.",
+    "description": "A fully-functional Commandv2 hatchbot for the 2019 game, written in the 'traditional' style, i.e. commands are given their own classes.",
     "tags": [
       "Complete Robot",
-      "Command-based",
+      "Commandv2",
       "Differential Drive",
       "Encoder",
       "Sendable",
@@ -313,10 +313,10 @@
   },
   {
     "name": "'Inlined' Hatchbot",
-    "description": "A fully-functional command-based hatchbot for the 2019 game, written in the 'inlined' style, i.e. many commands are defined inline with lambdas.",
+    "description": "A fully-functional Commandv2 hatchbot for the 2019 game, written in the 'inlined' style, i.e. many commands are defined inline with lambdas.",
     "tags": [
       "Complete Robot",
-      "Command-based",
+      "Commandv2",
       "Differential Drive",
       "Encoder",
       "Sendable",
@@ -330,10 +330,10 @@
   },
   {
     "name": "Rapid React Command Bot",
-    "description": "A fully-functional command-based fender bot for the 2022 game, written in the 'inlined' style, i.e. many commands are defined inline with lambdas.",
+    "description": "A fully-functional Commandv2 fender bot for the 2022 game, written in the 'inlined' style, i.e. many commands are defined inline with lambdas.",
     "tags": [
       "Complete Robot",
-      "Command-based",
+      "Commandv2",
       "Differential Drive",
       "Intake",
       "Flywheel",
@@ -353,7 +353,7 @@
     "name": "Select Command Example",
     "description": "Use SelectCommand to select an autonomous routine.",
     "tags": [
-      "Command-based"
+      "Commandv2"
     ],
     "foldername": "SelectCommand",
     "gradlebase": "cpp",
@@ -466,7 +466,7 @@
     "name": "DriveDistanceOffboard",
     "description": "Drive a differential drivetrain a set distance using TrapezoidProfile and smart motor controller PID.",
     "tags": [
-      "Command-based",
+      "Commandv2",
       "Differential Drive",
       "Trapezoid Profile",
       "Smart Motor Controller",
@@ -478,10 +478,10 @@
   },
   {
     "name": "RomiReference",
-    "description": "An example command-based robot program that can be used with the Romi reference robot design.",
+    "description": "An example Commandv2 robot program that can be used with the Romi reference robot design.",
     "tags": [
       "Romi",
-      "Command-based",
+      "Commandv2",
       "Differential Drive",
       "Digital Input",
       "Joystick"
@@ -495,10 +495,10 @@
   },
   {
     "name": "XRP Reference",
-    "description": "An example command-based robot program that can be used with the XRP reference robot design.",
+    "description": "An example Commandv2 robot program that can be used with the XRP reference robot design.",
     "tags": [
       "XRP",
-      "Command-based",
+      "Commandv2",
       "Differential Drive",
       "Digital Input",
       "Joystick"
@@ -662,7 +662,7 @@
   },
   {
     "name": "SimpleDifferentialDriveSimulation",
-    "description": "Simulate a differential drivetrain and follow trajectories with LTVUnicycleController (non-command-based).",
+    "description": "Simulate a differential drivetrain and follow trajectories with LTVUnicycleController (non-Commandv2).",
     "tags": [
       "Differential Drive",
       "State-Space",
@@ -706,10 +706,10 @@
   },
   {
     "name": "SysIdRoutine",
-    "description": "A sample command-based robot demonstrating use of the SysIdRoutine command factory",
+    "description": "A sample Commandv2 robot demonstrating use of the SysIdRoutine command factory",
     "tags": [
       "SysId",
-      "Command-based",
+      "Commandv2",
       "DataLog"
     ],
     "foldername": "SysIdRoutine",
