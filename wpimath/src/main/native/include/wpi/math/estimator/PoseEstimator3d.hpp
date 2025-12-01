@@ -43,8 +43,8 @@ namespace wpi::math {
  * AddVisionMeasurement() can be called as infrequently as you want; if you
  * never call it, then this class will behave like regular encoder odometry.
  *
- * @tparam WheelSpeeds Wheel speeds type.
  * @tparam WheelPositions Wheel positions type.
+ * @tparam WheelSpeeds Wheel speeds type.
  * @tparam WheelAccelerations Wheel accelerations type.
  */
 template <typename WheelPositions, typename WheelSpeeds,

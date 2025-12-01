@@ -22,8 +22,8 @@ namespace wpi::math {
  * path following. Furthermore, odometry can be used for latency compensation
  * when using computer-vision systems.
  *
- * @tparam WheelSpeeds Wheel speeds type.
  * @tparam WheelPositions Wheel positions type.
+ * @tparam WheelSpeeds Wheel speeds type.
  * @tparam WheelAccelerations Wheel accelerations type.
  */
 template <typename WheelPositions, typename WheelSpeeds,
