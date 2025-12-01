@@ -86,7 +86,7 @@ public class DriverStationDataJNI extends JNIWrapper {
   public static native void setJoystickButtons(
       byte joystickNum, long buttons, long availableButtons);
 
-  public static native long getJoystickOutputs(int stick);
+  public static native int getJoystickLeds(int stick);
 
   public static native int getJoystickRumble(int stick, int rumbleNum);
 
@@ -119,11 +119,18 @@ public class DriverStationDataJNI extends JNIWrapper {
 
   public static native void setJoystickButtonsAvailable(int stick, long available);
 
+  public static native void setTouchpadCounts(int stick, int touchpadCount, int[] fingerCounts);
+
+  public static native void setTouchpadFinger(
+      int stick, int touchpadIndex, int fingerIndex, boolean down, float x, float y);
+
   public static native void setJoystickIsGamepad(int stick, boolean isGamepad);
 
-  public static native void setJoystickType(int stick, int type);
+  public static native void setJoystickGamepadType(int stick, int type);
 
   public static native void setJoystickName(int stick, String name);
+
+  public static native void setJoystickSupportedOutputs(int stick, int supportedOutputs);
 
   public static native void setGameSpecificMessage(String message);
 

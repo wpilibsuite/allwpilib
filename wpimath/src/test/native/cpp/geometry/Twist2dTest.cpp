@@ -2,7 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <cmath>
 #include <numbers>
 
 #include <gtest/gtest.h>
@@ -13,30 +12,30 @@ using namespace wpi::math;
 
 TEST(Twist2dTest, Straight) {
   const Twist2d straight{5_m, 0_m, 0_rad};
-  const auto straightPose = straight.Exp();
+  const auto straightTransform = straight.Exp();
 
-  EXPECT_DOUBLE_EQ(5.0, straightPose.X().value());
-  EXPECT_DOUBLE_EQ(0.0, straightPose.Y().value());
-  EXPECT_DOUBLE_EQ(0.0, straightPose.Rotation().Radians().value());
+  EXPECT_DOUBLE_EQ(5.0, straightTransform.X().value());
+  EXPECT_DOUBLE_EQ(0.0, straightTransform.Y().value());
+  EXPECT_DOUBLE_EQ(0.0, straightTransform.Rotation().Radians().value());
 }
 
 TEST(Twist2dTest, QuarterCircle) {
   const Twist2d quarterCircle{5_m / 2.0 * std::numbers::pi, 0_m,
                               wpi::units::radian_t{std::numbers::pi / 2.0}};
-  const auto quarterCirclePose = quarterCircle.Exp();
+  const auto quarterCircleTransform = quarterCircle.Exp();
 
-  EXPECT_DOUBLE_EQ(5.0, quarterCirclePose.X().value());
-  EXPECT_DOUBLE_EQ(5.0, quarterCirclePose.Y().value());
-  EXPECT_DOUBLE_EQ(90.0, quarterCirclePose.Rotation().Degrees().value());
+  EXPECT_DOUBLE_EQ(5.0, quarterCircleTransform.X().value());
+  EXPECT_DOUBLE_EQ(5.0, quarterCircleTransform.Y().value());
+  EXPECT_DOUBLE_EQ(90.0, quarterCircleTransform.Rotation().Degrees().value());
 }
 
 TEST(Twist2dTest, DiagonalNoDtheta) {
   const Twist2d diagonal{2_m, 2_m, 0_deg};
-  const auto diagonalPose = diagonal.Exp();
+  const auto diagonalTransform = diagonal.Exp();
 
-  EXPECT_DOUBLE_EQ(2.0, diagonalPose.X().value());
-  EXPECT_DOUBLE_EQ(2.0, diagonalPose.Y().value());
-  EXPECT_DOUBLE_EQ(0.0, diagonalPose.Rotation().Degrees().value());
+  EXPECT_DOUBLE_EQ(2.0, diagonalTransform.X().value());
+  EXPECT_DOUBLE_EQ(2.0, diagonalTransform.Y().value());
+  EXPECT_DOUBLE_EQ(0.0, diagonalTransform.Rotation().Degrees().value());
 }
 
 TEST(Twist2dTest, Equality) {

@@ -64,8 +64,8 @@ public class LTVUnicycleController {
    * @param dt Discretization timestep in seconds.
    */
   public LTVUnicycleController(Vector<N3> qelems, Vector<N2> relems, double dt) {
-    m_Q = StateSpaceUtil.makeCostMatrix(qelems);
-    m_R = StateSpaceUtil.makeCostMatrix(relems);
+    m_Q = StateSpaceUtil.costMatrix(qelems);
+    m_R = StateSpaceUtil.costMatrix(relems);
     m_dt = dt;
   }
 

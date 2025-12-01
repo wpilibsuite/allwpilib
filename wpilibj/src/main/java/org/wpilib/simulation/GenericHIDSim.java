@@ -133,8 +133,17 @@ public class GenericHIDSim {
    *
    * @param type the new device type
    */
-  public void setType(GenericHID.HIDType type) {
-    DriverStationSim.setJoystickType(m_port, type.value);
+  public void setGamepadType(GenericHID.HIDType type) {
+    DriverStationSim.setJoystickGamepadType(m_port, type.value);
+  }
+
+  /**
+   * Set the supported outputs of this device.
+   *
+   * @param supportedOutputs the new supported outputs
+   */
+  public void setSupportedOutputs(int supportedOutputs) {
+    DriverStationSim.setJoystickSupportedOutputs(m_port, supportedOutputs);
   }
 
   /**
@@ -147,23 +156,12 @@ public class GenericHIDSim {
   }
 
   /**
-   * Read the output of a button.
+   * Get the led color set.
    *
-   * @param outputNumber the button number
-   * @return the value of the button (true = pressed)
+   * @return the led color set
    */
-  public boolean getOutput(int outputNumber) {
-    long outputs = getOutputs();
-    return (outputs & (1L << (outputNumber - 1))) != 0;
-  }
-
-  /**
-   * Get the encoded 16-bit integer that passes button values.
-   *
-   * @return the button values
-   */
-  public long getOutputs() {
-    return DriverStationSim.getJoystickOutputs(m_port);
+  public int getLeds() {
+    return DriverStationSim.getJoystickLeds(m_port);
   }
 
   /**
@@ -173,9 +171,24 @@ public class GenericHIDSim {
    * @return the rumble value
    */
   public double getRumble(GenericHID.RumbleType type) {
-    int value =
-        DriverStationSim.getJoystickRumble(
-            m_port, type == GenericHID.RumbleType.kLeftRumble ? 0 : 1);
+    int intType = 0;
+    switch (type) {
+      case kLeftRumble:
+        intType = 0;
+        break;
+      case kRightRumble:
+        intType = 1;
+        break;
+      case kLeftTriggerRumble:
+        intType = 2;
+        break;
+      case kRightTriggerRumble:
+        intType = 3;
+        break;
+      default:
+        return 0.0;
+    }
+    int value = DriverStationSim.getJoystickRumble(m_port, intType);
     return value / 65535.0;
   }
 }

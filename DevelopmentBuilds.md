@@ -13,13 +13,12 @@ This article contains instructions on building projects using a development buil
 
 Development builds are the per-commit build hosted every time a commit is pushed to the [allwpilib](https://github.com/wpilibsuite/allwpilib/) repository. These builds are then hosted on [artifactory](https://frcmaven.wpi.edu/artifactory/webapp/#/home).
 
-To build a project using a development build, find the build.gradle file and open it. Then, add the following code below the plugin section and replace YEAR with the year of the development version. It is also necessary to use a 2025 GradleRIO version, ie `2025.1.1-beta-1`
+To build a project using a development build, find the build.gradle file and open it. Then, add the following code below the plugin section and replace YEAR with the year of the development version. It is also necessary to use a 2027 GradleRIO version, ie `2027.0.0-alpha-3`
 
 ```groovy
 wpi.maven.useLocal = false
 wpi.maven.useDevelopment = true
 wpi.versions.wpilibVersion = 'YEAR.+'
-wpi.versions.wpimathVersion = 'YEAR.+'
 ```
 
 The top of your ``build.gradle`` file should now look similar to the code below. Ignore any differences in versions.
@@ -28,13 +27,12 @@ Java
 ```groovy
 plugins {
   id "java"
-  id "edu.wpi.first.GradleRIO" version "2025.1.1-beta-1"
+  id "edu.wpi.first.GradleRIO" version "2027.0.0-alpha-3"
 }
 
 wpi.maven.useLocal = false
 wpi.maven.useDevelopment = true
-wpi.versions.wpilibVersion = '2025.+'
-wpi.versions.wpimathVersion = '2025.+'
+wpi.versions.wpilibVersion = '2027.+'
 ```
 
 C++
@@ -42,13 +40,12 @@ C++
 plugins {
   id "cpp"
   id "google-test-test-suite"
-  id "edu.wpi.first.GradleRIO" version "2025.1.1-beta-1"
+  id "edu.wpi.first.GradleRIO" version "2027.0.0-alpha-3"
 }
 
 wpi.maven.useLocal = false
 wpi.maven.useDevelopment = true
-wpi.versions.wpilibVersion = '2025.+'
-wpi.versions.wpimathVersion = '2025.+'
+wpi.versions.wpilibVersion = '2027.+'
 ```
 
 ### Development Build Documentation
@@ -64,13 +61,12 @@ Java
 ```groovy
 plugins {
   id "java"
-  id "edu.wpi.first.GradleRIO" version "2025.1.1-beta-1"
+  id "edu.wpi.first.GradleRIO" version "2027.0.0-alpha-3"
 }
 
 wpi.maven.useLocal = false
 wpi.maven.useFrcMavenLocalDevelopment = true
 wpi.versions.wpilibVersion = 'YEAR.424242.+'
-wpi.versions.wpimathVersion = 'YEAR.424242.+'
 ```
 
 C++
@@ -78,15 +74,14 @@ C++
 plugins {
   id "cpp"
   id "google-test-test-suite"
-  id "edu.wpi.first.GradleRIO" version "2025.1.1-beta-1"
+  id "edu.wpi.first.GradleRIO" version "2027.0.0-alpha-3"
 }
 
 wpi.maven.useLocal = false
 wpi.maven.useFrcMavenLocalDevelopment = true
 wpi.versions.wpilibVersion = 'YEAR.424242.+'
-wpi.versions.wpimathVersion = 'YEAR.424242.+'
 ```
 
-# roboRIO Development
+# Systemcore Development
 
 See the [developerRobot](developerRobot/README.md) subproject.

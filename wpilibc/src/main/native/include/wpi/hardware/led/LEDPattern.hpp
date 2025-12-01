@@ -41,12 +41,13 @@ class LEDPattern {
     size_t m_size;
   };
 
-  explicit LEDPattern(std::function<void(wpi::LEDPattern::LEDReader,
-                                         std::function<void(int, wpi::Color)>)>
-                          impl);
+  explicit LEDPattern(
+      std::function<void(wpi::LEDPattern::LEDReader,
+                         std::function<void(int, wpi::util::Color)>)>
+          impl);
 
   void ApplyTo(LEDReader reader,
-               std::function<void(int, wpi::Color)> writer) const;
+               std::function<void(int, wpi::util::Color)> writer) const;
 
   /**
    * Writes the pattern to an LED buffer. Dynamic animations should be called
@@ -62,7 +63,7 @@ class LEDPattern {
    * @param writer data writer for setting new LED colors on the LED strip
    */
   void ApplyTo(std::span<wpi::AddressableLED::LEDData> data,
-               std::function<void(int, wpi::Color)> writer) const;
+               std::function<void(int, wpi::util::Color)> writer) const;
 
   /**
    * Writes the pattern to an LED buffer. Dynamic animations should be called
@@ -199,8 +200,8 @@ class LEDPattern {
 
   /**
    * Creates a pattern that plays this pattern overlaid on another. Anywhere
-   * this pattern sets an LED to off (or {@link wpi::Color::kBlack}), the base
-   * pattern will be displayed instead.
+   * this pattern sets an LED to off (or {@link wpi::util::Color::kBlack}), the
+   * base pattern will be displayed instead.
    *
    * @param base the base pattern to overlay on top of
    * @return the combined overlay pattern
@@ -256,10 +257,10 @@ class LEDPattern {
    *
    * <pre>
    *   // Solid red, but at 50% brightness
-   *   wpi::LEDPattern::Solid(wpi::Color::kRed).AtBrightness(0.5);
+   *   wpi::LEDPattern::Solid(wpi::util::Color::kRed).AtBrightness(0.5);
    *
    *   // Solid white, but at only 10% (i.e. ~0.5V)
-   *   wpi::LEDPattern::Solid(frc:Color::kWhite).AtBrightness(0.1);
+   *   wpi::LEDPattern::Solid(wpi::util::Color::kWhite).AtBrightness(0.1);
    * </pre>
    *
    * @param relativeBrightness the multiplier to apply to all channels to modify
@@ -279,7 +280,7 @@ class LEDPattern {
    * @param color the color to display
    * @return the pattern
    */
-  static LEDPattern Solid(const Color color);
+  static LEDPattern Solid(const wpi::util::Color color);
 
   /**
    * Creates a pattern that works as a mask layer for {@link
@@ -296,8 +297,8 @@ class LEDPattern {
    *
    * <pre>
    * wpi::LEDPattern basePattern =
-   *   wpi::LEDPattern::Gradient(wpi::Color::kRed, wpi::Color::kBlue);
-   * wpi::LEDPattern progressPattern =
+   *   wpi::LEDPattern::Gradient(wpi::util::Color::kRed,
+   * wpi::util::Color::kBlue); wpi::LEDPattern progressPattern =
    *   basePattern.Mask(wpi::LEDPattern::ProgressMaskLayer([&]() {
    *     return elevator.GetHeight() / elevator.MaxHeight();
    *   });
@@ -322,7 +323,8 @@ class LEDPattern {
    * position along the LED strip
    * @return a motionless step pattern
    */
-  static LEDPattern Steps(std::span<const std::pair<double, Color>> steps);
+  static LEDPattern Steps(
+      std::span<const std::pair<double, wpi::util::Color>> steps);
 
   /**
    * Display a set of colors in steps across the length of the LED strip. No
@@ -337,7 +339,7 @@ class LEDPattern {
    * @return a motionless step pattern
    */
   static LEDPattern Steps(
-      std::initializer_list<std::pair<double, Color>> steps);
+      std::initializer_list<std::pair<double, wpi::util::Color>> steps);
 
   /** Types of gradients. */
   enum GradientType {
@@ -368,7 +370,8 @@ class LEDPattern {
    * @param colors the colors to display in the gradient
    * @return a motionless gradient pattern
    */
-  static LEDPattern Gradient(GradientType type, std::span<const Color> colors);
+  static LEDPattern Gradient(GradientType type,
+                             std::span<const wpi::util::Color> colors);
 
   /**
    * Creates a pattern that displays a non-animated gradient of colors across
@@ -384,7 +387,7 @@ class LEDPattern {
    * @return a motionless gradient pattern
    */
   static LEDPattern Gradient(GradientType type,
-                             std::initializer_list<Color> colors);
+                             std::initializer_list<wpi::util::Color> colors);
 
   /**
    * Creates an LED pattern that displays a rainbow across the color wheel. The
@@ -398,7 +401,7 @@ class LEDPattern {
 
  private:
   std::function<void(wpi::LEDPattern::LEDReader,
-                     std::function<void(int, wpi::Color)>)>
+                     std::function<void(int, wpi::util::Color)>)>
       m_impl;
 };
 }  // namespace wpi

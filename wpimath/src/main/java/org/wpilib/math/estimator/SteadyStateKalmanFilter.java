@@ -72,8 +72,8 @@ public class SteadyStateKalmanFilter<States extends Num, Inputs extends Num, Out
 
     this.m_plant = plant;
 
-    var contQ = StateSpaceUtil.makeCovarianceMatrix(states, stateStdDevs);
-    var contR = StateSpaceUtil.makeCovarianceMatrix(outputs, measurementStdDevs);
+    var contQ = StateSpaceUtil.covarianceMatrix(states, stateStdDevs);
+    var contR = StateSpaceUtil.covarianceMatrix(outputs, measurementStdDevs);
 
     var pair = Discretization.discretizeAQ(plant.getA(), contQ, dt);
     var discA = pair.getFirst();

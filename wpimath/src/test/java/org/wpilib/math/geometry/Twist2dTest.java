@@ -13,28 +13,28 @@ class Twist2dTest {
   @Test
   void testStraight() {
     var straight = new Twist2d(5.0, 0.0, 0.0);
-    var straightPose = straight.exp();
+    var straightTransform = straight.exp();
 
     var expected = new Transform2d(5.0, 0.0, Rotation2d.kZero);
-    assertEquals(expected, straightPose);
+    assertEquals(expected, straightTransform);
   }
 
   @Test
   void testQuarterCircle() {
     var quarterCircle = new Twist2d(5.0 / 2.0 * Math.PI, 0, Math.PI / 2.0);
-    var quarterCirclePose = quarterCircle.exp();
+    var quarterCircleTransform = quarterCircle.exp();
 
     var expected = new Transform2d(5.0, 5.0, Rotation2d.kCCW_Pi_2);
-    assertEquals(expected, quarterCirclePose);
+    assertEquals(expected, quarterCircleTransform);
   }
 
   @Test
   void testDiagonalNoDtheta() {
     var diagonal = new Twist2d(2.0, 2.0, 0.0);
-    var diagonalPose = diagonal.exp();
+    var diagonalTransform = diagonal.exp();
 
     var expected = new Transform2d(2.0, 2.0, Rotation2d.kZero);
-    assertEquals(expected, diagonalPose);
+    assertEquals(expected, diagonalTransform);
   }
 
   @Test

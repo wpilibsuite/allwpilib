@@ -210,8 +210,6 @@ Watchdog = "wpi/system/Watchdog.hpp"
 
 # wpi/util
 Alert = "wpi/util/Alert.hpp"
-Color = "wpi/util/Color.hpp"
-Color8Bit = "wpi/util/Color8Bit.hpp"
 Preferences = "wpi/util/Preferences.hpp"
 SensorUtil = "wpi/util/SensorUtil.hpp"
 
