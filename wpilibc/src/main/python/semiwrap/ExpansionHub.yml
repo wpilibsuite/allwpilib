@@ -1,6 +1,6 @@
 extra_includes:
-- wpi/ExpansionHubMotor.hpp
-- wpi/ExpansionHubServo.hpp
+- wpi/hardware/expansionhub/ExpansionHubMotor.hpp
+- wpi/hardware/expansionhub/ExpansionHubServo.hpp
 
 classes:
   wpi::ExpansionHub:
