@@ -426,7 +426,7 @@ void GlfwSystemJoystick::GetData(HALJoystickData* data, bool mapGamepad) const {
 
   // copy into HAL structures
   data->desc.isGamepad = m_isGamepad ? 1 : 0;
-  data->desc.gamepadType = m_isGamepad ? 21 : 20;
+  data->desc.gamepadType = 1;  // Standard
   std::strncpy(data->desc.name, m_name, sizeof(data->desc.name) - 1);
   data->desc.name[sizeof(data->desc.name) - 1] = '\0';
   int axesCount = (std::min)(m_axisCount, HAL_kMaxJoystickAxes);
@@ -555,7 +555,7 @@ KeyboardJoystick::KeyboardJoystick(wpi::glass::Storage& storage, int index)
 
   // init desc structure
   m_data.desc.isGamepad = 0;
-  m_data.desc.gamepadType = 20;
+  m_data.desc.gamepadType = 1;  // Standard
   std::strncpy(m_data.desc.name, m_name, 256);
 }
 
