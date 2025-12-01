@@ -8,7 +8,7 @@ extra_includes:
 - wpi/math/kinematics/MecanumDriveWheelAccelerations.hpp
 - wpi/math/kinematics/MecanumDriveWheelPositions.hpp
 - wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp
-- wpi/math/kinematics/SwerveModuleAccelerations.hpp
+- wpi/math/kinematics/SwerveModuleAcceleration.hpp
 - wpi/math/kinematics/SwerveDriveKinematics.hpp
 
 classes:
@@ -52,22 +52,22 @@ templates:
     params:
     - wpi::util::array<wpi::math::SwerveModulePosition,2>
     - wpi::util::array<wpi::math::SwerveModuleState,2>
-    - wpi::util::array<wpi::math::SwerveModuleAccelerations,2>
+    - wpi::util::array<wpi::math::SwerveModuleAcceleration,2>
   SwerveDrive3PoseEstimator3dBase:
     qualname: wpi::math::PoseEstimator3d
     params:
     - wpi::util::array<wpi::math::SwerveModulePosition,3>
     - wpi::util::array<wpi::math::SwerveModuleState,3>
-    - wpi::util::array<wpi::math::SwerveModuleAccelerations,3>
+    - wpi::util::array<wpi::math::SwerveModuleAcceleration,3>
   SwerveDrive4PoseEstimator3dBase:
     qualname: wpi::math::PoseEstimator3d
     params:
     - wpi::util::array<wpi::math::SwerveModulePosition,4>
     - wpi::util::array<wpi::math::SwerveModuleState,4>
-    - wpi::util::array<wpi::math::SwerveModuleAccelerations,4>
+    - wpi::util::array<wpi::math::SwerveModuleAcceleration,4>
   SwerveDrive6PoseEstimator3dBase:
     qualname: wpi::math::PoseEstimator3d
     params:
     - wpi::util::array<wpi::math::SwerveModulePosition,6>
     - wpi::util::array<wpi::math::SwerveModuleState,6>
-    - wpi::util::array<wpi::math::SwerveModuleAccelerations,6>
+    - wpi::util::array<wpi::math::SwerveModuleAcceleration,6>
