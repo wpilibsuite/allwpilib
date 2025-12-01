@@ -154,7 +154,7 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             class_name = "ExpansionHub",
             yml_file = "semiwrap/ExpansionHub.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/ExpansionHub.hpp",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/expansionhub/ExpansionHub.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::ExpansionHub", "wpi__ExpansionHub.hpp"),
@@ -164,7 +164,7 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             class_name = "ExpansionHubMotor",
             yml_file = "semiwrap/ExpansionHubMotor.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/ExpansionHubMotor.hpp",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/expansionhub/ExpansionHubMotor.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::ExpansionHubMotor", "wpi__ExpansionHubMotor.hpp"),
@@ -174,7 +174,7 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             class_name = "ExpansionHubPidConstants",
             yml_file = "semiwrap/ExpansionHubPidConstants.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/ExpansionHubPidConstants.hpp",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/expansionhub/ExpansionHubPidConstants.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::ExpansionHubPidConstants", "wpi__ExpansionHubPidConstants.hpp"),
@@ -184,7 +184,7 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             class_name = "ExpansionHubServo",
             yml_file = "semiwrap/ExpansionHubServo.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/ExpansionHubServo.hpp",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/expansionhub/ExpansionHubServo.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::ExpansionHubServo", "wpi__ExpansionHubServo.hpp"),

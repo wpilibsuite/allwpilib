@@ -93,12 +93,6 @@ Filesystem = "rpy/Filesystem.h"
 MotorControllerGroup = "rpy/MotorControllerGroup.h"
 Notifier = "rpy/Notifier.h"
 
-# wpi
-ExpansionHub = "wpi/ExpansionHub.hpp"
-ExpansionHubMotor = "wpi/ExpansionHubMotor.hpp"
-ExpansionHubPidConstants = "wpi/ExpansionHubPidConstants.hpp"
-ExpansionHubServo = "wpi/ExpansionHubServo.hpp"
-
 # wpi/driverstation
 DSControlWord = "wpi/driverstation/DSControlWord.hpp"
 DriverStation = "wpi/driverstation/DriverStation.hpp"
@@ -132,6 +126,12 @@ CounterBase = "wpi/hardware/discrete/CounterBase.hpp"
 DigitalInput = "wpi/hardware/discrete/DigitalInput.hpp"
 DigitalOutput = "wpi/hardware/discrete/DigitalOutput.hpp"
 PWM = "wpi/hardware/discrete/PWM.hpp"
+
+# wpi/hardware/expansionhub
+ExpansionHub = "wpi/hardware/expansionhub/ExpansionHub.hpp"
+ExpansionHubMotor = "wpi/hardware/expansionhub/ExpansionHubMotor.hpp"
+ExpansionHubPidConstants = "wpi/hardware/expansionhub/ExpansionHubPidConstants.hpp"
+ExpansionHubServo = "wpi/hardware/expansionhub/ExpansionHubServo.hpp"
 
 # wpi/hardware/imu
 OnboardIMU = "wpi/hardware/imu/OnboardIMU.hpp"
