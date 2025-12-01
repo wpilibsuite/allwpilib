@@ -347,6 +347,8 @@ bool ListenerStorage::WaitForListenerQueue(double timeout) {
 }
 
 void ListenerStorage::Reset() {
+  Stop();  // If a callback is currently running, wait for it to complete.
+
   std::scoped_lock lock{m_mutex};
   m_pollers.clear();
   m_listeners.clear();
@@ -355,9 +357,19 @@ void ListenerStorage::Reset() {
   m_valueListeners.clear();
   m_logListeners.clear();
   m_timeSyncListeners.clear();
-  if (m_thread) {
-    m_thread.Stop();
+}
+
+void ListenerStorage::Stop() {
+  {
+    std::scoped_lock lock{m_mutex};
+    if (auto thr = m_thread.GetThread()) {
+      thr->m_waitQueueWakeup.Set();
+    } else {
+      return;
+    }
   }
+
+  m_thread.Join();
 }
 
 std::vector<std::pair<NT_Listener, unsigned int>>
