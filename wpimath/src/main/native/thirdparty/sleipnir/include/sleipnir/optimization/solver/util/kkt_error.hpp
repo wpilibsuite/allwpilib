@@ -12,20 +12,23 @@ namespace slp {
 /**
  * Returns the KKT error for Newton's method.
  *
+ * @tparam Scalar Scalar type.
  * @param g Gradient of the cost function ∇f.
  */
-inline double kkt_error(const Eigen::VectorXd& g) {
+template <typename Scalar>
+Scalar kkt_error(const Eigen::Vector<Scalar, Eigen::Dynamic>& g) {
   // Compute the KKT error as the 1-norm of the KKT conditions from equations
   // (19.5a) through (19.5d) of [1].
   //
   //   ∇f = 0
 
-  return g.lpNorm<1>();
+  return g.template lpNorm<1>();
 }
 
 /**
  * Returns the KKT error for Sequential Quadratic Programming.
  *
+ * @tparam Scalar Scalar type.
  * @param g Gradient of the cost function ∇f.
  * @param A_e The problem's equality constraint Jacobian Aₑ(x) evaluated at the
  *   current iterate.
@@ -33,21 +36,25 @@ inline double kkt_error(const Eigen::VectorXd& g) {
  *   iterate.
  * @param y Equality constraint dual variables.
  */
-inline double kkt_error(const Eigen::VectorXd& g,
-                        const Eigen::SparseMatrix<double>& A_e,
-                        const Eigen::VectorXd& c_e, const Eigen::VectorXd& y) {
+template <typename Scalar>
+Scalar kkt_error(const Eigen::Vector<Scalar, Eigen::Dynamic>& g,
+                 const Eigen::SparseMatrix<Scalar>& A_e,
+                 const Eigen::Vector<Scalar, Eigen::Dynamic>& c_e,
+                 const Eigen::Vector<Scalar, Eigen::Dynamic>& y) {
   // Compute the KKT error as the 1-norm of the KKT conditions from equations
   // (19.5a) through (19.5d) of [1].
   //
   //   ∇f − Aₑᵀy = 0
   //   cₑ = 0
 
-  return (g - A_e.transpose() * y).lpNorm<1>() + c_e.lpNorm<1>();
+  return (g - A_e.transpose() * y).template lpNorm<1>() +
+         c_e.template lpNorm<1>();
 }
 
 /**
  * Returns the KKT error for the interior-point method.
  *
+ * @tparam Scalar Scalar type.
  * @param g Gradient of the cost function ∇f.
  * @param A_e The problem's equality constraint Jacobian Aₑ(x) evaluated at the
  *   current iterate.
@@ -62,13 +69,15 @@ inline double kkt_error(const Eigen::VectorXd& g,
  * @param z Inequality constraint dual variables.
  * @param μ Barrier parameter.
  */
-inline double kkt_error(const Eigen::VectorXd& g,
-                        const Eigen::SparseMatrix<double>& A_e,
-                        const Eigen::VectorXd& c_e,
-                        const Eigen::SparseMatrix<double>& A_i,
-                        const Eigen::VectorXd& c_i, const Eigen::VectorXd& s,
-                        const Eigen::VectorXd& y, const Eigen::VectorXd& z,
-                        double μ) {
+template <typename Scalar>
+Scalar kkt_error(const Eigen::Vector<Scalar, Eigen::Dynamic>& g,
+                 const Eigen::SparseMatrix<Scalar>& A_e,
+                 const Eigen::Vector<Scalar, Eigen::Dynamic>& c_e,
+                 const Eigen::SparseMatrix<Scalar>& A_i,
+                 const Eigen::Vector<Scalar, Eigen::Dynamic>& c_i,
+                 const Eigen::Vector<Scalar, Eigen::Dynamic>& s,
+                 const Eigen::Vector<Scalar, Eigen::Dynamic>& y,
+                 const Eigen::Vector<Scalar, Eigen::Dynamic>& z, Scalar μ) {
   // Compute the KKT error as the 1-norm of the KKT conditions from equations
   // (19.5a) through (19.5d) of [1].
   //
@@ -78,10 +87,12 @@ inline double kkt_error(const Eigen::VectorXd& g,
   //   cᵢ − s = 0
 
   const auto S = s.asDiagonal();
-  const Eigen::VectorXd μe = Eigen::VectorXd::Constant(s.rows(), μ);
+  const Eigen::Vector<Scalar, Eigen::Dynamic> μe =
+      Eigen::Vector<Scalar, Eigen::Dynamic>::Constant(s.rows(), μ);
 
-  return (g - A_e.transpose() * y - A_i.transpose() * z).lpNorm<1>() +
-         (S * z - μe).lpNorm<1>() + c_e.lpNorm<1>() + (c_i - s).lpNorm<1>();
+  return (g - A_e.transpose() * y - A_i.transpose() * z).template lpNorm<1>() +
+         (S * z - μe).template lpNorm<1>() + c_e.template lpNorm<1>() +
+         (c_i - s).template lpNorm<1>();
 }
 
 }  // namespace slp

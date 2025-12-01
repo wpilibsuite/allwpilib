@@ -5,8 +5,8 @@
 #include <concepts>
 #include <utility>
 
-#include "util/setup_profiler.hpp"
-#include "util/solve_profiler.hpp"
+#include "sleipnir/util/setup_profiler.hpp"
+#include "sleipnir/util/solve_profiler.hpp"
 
 namespace slp {
 
