@@ -30,12 +30,12 @@ public class SwerveModuleAccelerationProto
   @Override
   public SwerveModuleAcceleration unpack(ProtobufSwerveModuleAcceleration msg) {
     return new SwerveModuleAcceleration(
-        msg.getAcceleration(), Rotation2d.proto.unpack(msg.getMutableAngle()));
+        msg.getAcceleration(), Rotation2d.proto.unpack(msg.getAngle()));
   }
 
   @Override
   public void pack(ProtobufSwerveModuleAcceleration msg, SwerveModuleAcceleration value) {
     msg.setAcceleration(value.acceleration);
-    Rotation2d.proto.pack(msg.getAngle(), value.angle);
+    Rotation2d.proto.pack(msg.getMutableAngle(), value.angle);
   }
 }
