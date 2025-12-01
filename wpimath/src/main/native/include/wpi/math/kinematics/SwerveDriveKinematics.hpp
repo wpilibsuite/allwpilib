@@ -98,14 +98,15 @@ class SwerveDriveKinematics
       : m_modules{modules}, m_moduleHeadings(wpi::util::empty_array) {
     for (size_t i = 0; i < NumModules; i++) {
       // clang-format off
-      m_firstOrderInverseKinematics.template block<2, 3>(i * 2, 0) = Eigen::Matrix<double, 2, 3>{
-              {1, 0, -m_modules[i].Y().value()},
-              {0, 1, m_modules[i].X().value()}};
+      m_firstOrderInverseKinematics.template block<2, 3>(i * 2, 0) <<
+        1, 0, (-m_modules[i].Y()).value(),
+        0, 1, (+m_modules[i].X()).value();
 
-      m_secondOrderInverseKinematics.template block<2, 4>(i * 2, 0) = Eigen::Matrix<double, 2, 4>{
-              {1, 0, (-m_modules[i].X()).value(), (-m_modules[i].Y()).value()},
-              {0, 1, (-m_modules[i].Y()).value(), (+m_modules[i].X()).value()}};
+      m_secondOrderInverseKinematics.template block<2, 4>(i * 2, 0) <<
+        1, 0, (-m_modules[i].X()).value(), (-m_modules[i].Y()).value(),
+        0, 1, (-m_modules[i].Y()).value(), (+m_modules[i].X()).value();
       // clang-format on
+    }
 
     m_firstOrderForwardKinematics =
         m_firstOrderInverseKinematics.householderQr();

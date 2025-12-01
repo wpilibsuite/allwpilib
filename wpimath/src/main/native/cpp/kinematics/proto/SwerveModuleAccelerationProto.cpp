@@ -10,7 +10,7 @@
 std::optional<wpi::math::SwerveModuleAcceleration> wpi::util::Protobuf<
     wpi::math::SwerveModuleAcceleration>::Unpack(InputStream& stream) {
   wpi::util::UnpackCallback<wpi::math::Rotation2d> angle;
-  wpi_proto_ProtobufSwerveModuleAccelerations msg{
+  wpi_proto_ProtobufSwerveModuleAcceleration msg{
       .acceleration = 0,
       .angle = angle.Callback(),
   };
@@ -33,7 +33,7 @@ std::optional<wpi::math::SwerveModuleAcceleration> wpi::util::Protobuf<
 bool wpi::util::Protobuf<wpi::math::SwerveModuleAcceleration>::Pack(
     OutputStream& stream, const wpi::math::SwerveModuleAcceleration& value) {
   wpi::util::PackCallback angle{&value.angle};
-  wpi_proto_ProtobufSwerveModuleAccelerations msg{
+  wpi_proto_ProtobufSwerveModuleAcceleration msg{
       .acceleration = value.acceleration.value(),
       .angle = angle.Callback(),
   };
