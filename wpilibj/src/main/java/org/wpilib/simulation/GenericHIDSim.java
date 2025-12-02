@@ -171,18 +171,13 @@ public class GenericHIDSim {
    * @return the rumble value
    */
   public double getRumble(GenericHID.RumbleType type) {
-    int intType;
-    switch (type) {
-      case kLeftRumble -> intType = 0;
-      case kRightRumble -> intType = 1;
-      case kLeftTriggerRumble -> intType = 2;
-      case kRightTriggerRumble -> intType = 3;
-      default -> {
-        // Return statements are not allowed in switch expressions, so instead use a switch
-        // statement
-        return 0.0;
-      }
-    }
+    int intType =
+        switch (type) {
+          case kLeftRumble -> 0;
+          case kRightRumble -> 1;
+          case kLeftTriggerRumble -> 2;
+          case kRightTriggerRumble -> 3;
+        };
     int value = DriverStationSim.getJoystickRumble(m_port, intType);
     return value / 65535.0;
   }
