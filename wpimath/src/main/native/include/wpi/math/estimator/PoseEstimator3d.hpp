@@ -45,8 +45,10 @@ namespace wpi::math {
  *
  * @tparam WheelSpeeds Wheel speeds type.
  * @tparam WheelPositions Wheel positions type.
+ * @tparam WheelAccelerations Wheel accelerations type.
  */
-template <typename WheelSpeeds, typename WheelPositions>
+template <typename WheelSpeeds, typename WheelPositions,
+          typename WheelAccelerations>
 class WPILIB_DLLEXPORT PoseEstimator3d {
  public:
   /**
@@ -66,10 +68,11 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
    * in meters, and angle in radians). Increase these numbers to trust the
    * vision pose measurement less.
    */
-  PoseEstimator3d(Kinematics<WheelSpeeds, WheelPositions>& kinematics,
-                  Odometry3d<WheelSpeeds, WheelPositions>& odometry,
-                  const wpi::util::array<double, 4>& stateStdDevs,
-                  const wpi::util::array<double, 4>& visionMeasurementStdDevs)
+  PoseEstimator3d(
+      Kinematics<WheelSpeeds, WheelPositions, WheelAccelerations>& kinematics,
+      Odometry3d<WheelSpeeds, WheelPositions, WheelAccelerations>& odometry,
+      const wpi::util::array<double, 4>& stateStdDevs,
+      const wpi::util::array<double, 4>& visionMeasurementStdDevs)
       : m_odometry(odometry) {
     for (size_t i = 0; i < 4; ++i) {
       m_q[i] = stateStdDevs[i] * stateStdDevs[i];
@@ -441,7 +444,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
 
   static constexpr wpi::units::second_t kBufferDuration = 1.5_s;
 
-  Odometry3d<WheelSpeeds, WheelPositions>& m_odometry;
+  Odometry3d<WheelSpeeds, WheelPositions, WheelAccelerations>& m_odometry;
   wpi::util::array<double, 4> m_q{wpi::util::empty_array};
   wpi::math::Matrixd<6, 6> m_visionK = wpi::math::Matrixd<6, 6>::Zero();
 

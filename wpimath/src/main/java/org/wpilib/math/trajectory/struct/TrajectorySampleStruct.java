@@ -1,0 +1,57 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package org.wpilib.math.trajectory.struct;
+
+import static org.wpilib.units.Units.Seconds;
+
+import java.nio.ByteBuffer;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.kinematics.ChassisAccelerations;
+import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.trajectory.TrajectorySample;
+import org.wpilib.units.measure.Time;
+import org.wpilib.util.struct.Struct;
+
+public class TrajectorySampleStruct implements Struct<TrajectorySample.Base> {
+  @Override
+  public Class<TrajectorySample.Base> getTypeClass() {
+    return TrajectorySample.Base.class;
+  }
+
+  @Override
+  public String getTypeName() {
+    return "TrajectorySample.Base";
+  }
+
+  @Override
+  public int getSize() {
+    return kSizeDouble
+        + Pose2d.struct.getSize()
+        + ChassisSpeeds.struct.getSize()
+        + ChassisAccelerations.struct.getSize();
+  }
+
+  @Override
+  public String getSchema() {
+    return "double timestamp;Pose2d pose;ChassisSpeeds vel;ChassisAccelerations accel";
+  }
+
+  @Override
+  public TrajectorySample.Base unpack(ByteBuffer bb) {
+    Time timestamp = Seconds.of(bb.getDouble());
+    Pose2d pose = Pose2d.struct.unpack(bb);
+    ChassisSpeeds vel = ChassisSpeeds.struct.unpack(bb);
+    ChassisAccelerations accel = ChassisAccelerations.struct.unpack(bb);
+    return new TrajectorySample.Base(timestamp, pose, vel, accel);
+  }
+
+  @Override
+  public void pack(ByteBuffer bb, TrajectorySample.Base value) {
+    bb.putDouble(value.timestamp.in(Seconds));
+    Pose2d.struct.pack(bb, value.pose);
+    ChassisSpeeds.struct.pack(bb, value.velocity);
+    ChassisAccelerations.struct.pack(bb, value.acceleration);
+  }
+}
