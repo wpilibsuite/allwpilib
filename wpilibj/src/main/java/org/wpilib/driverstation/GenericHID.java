@@ -479,20 +479,11 @@ public class GenericHID {
     value = Math.clamp(value, 0, 1);
     int rumbleValue = (int) (value * 65535);
     switch (type) {
-      case kLeftRumble:
-        this.m_leftRumble = rumbleValue;
-        break;
-      case kRightRumble:
-        this.m_rightRumble = rumbleValue;
-        break;
-      case kLeftTriggerRumble:
-        this.m_leftTriggerRumble = rumbleValue;
-        break;
-      case kRightTriggerRumble:
-        this.m_rightTriggerRumble = rumbleValue;
-        break;
-      default:
-        break;
+      case kLeftRumble -> this.m_leftRumble = rumbleValue;
+      case kRightRumble -> this.m_rightRumble = rumbleValue;
+      case kLeftTriggerRumble -> this.m_leftTriggerRumble = rumbleValue;
+      case kRightTriggerRumble -> this.m_rightTriggerRumble = rumbleValue;
+      default -> {}
     }
 
     DriverStationJNI.setJoystickRumble(
