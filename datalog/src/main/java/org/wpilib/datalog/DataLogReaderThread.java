@@ -41,7 +41,6 @@ public class DataLogReaderThread implements AutoCloseable {
   }
 
   private void readMain() {
-    // HashMap<Integer, Entry<DataLogReaderEntry, List<Character>>> schemaEntries = new HashMap<>();
     for (DataLogRecord record : m_reader) {
       if (!m_active.get()) {
         break;
@@ -62,20 +61,18 @@ public class DataLogReaderThread implements AutoCloseable {
                 new DataLogReaderRange(
                     m_reader.iterator(), new DataLogIterator(m_reader, Integer.MAX_VALUE)));
           }
-          // TODO: support struct schema database
         } finally {
           m_mutex.unlock();
         }
       } else if (record.isFinish()) {
-        int entry = record.getFinishEntry(); // can we not just use record.entry?
         m_mutex.lock();
         try {
-          var readerEntry = m_entriesById.get(entry);
+          var readerEntry = m_entriesById.get(record.getEntry());
           if (readerEntry == null) {
             System.out.println("...ID not found");
           } else {
             readerEntry.m_ranges.getLast().m_end = m_reader.iterator();
-            m_entriesById.remove(entry);
+            m_entriesById.remove(record.getEntry());
           }
         } finally {
           m_mutex.unlock();
@@ -141,10 +138,20 @@ public class DataLogReaderThread implements AutoCloseable {
     }
   }
 
+  /**
+   * Checks if the background thread has finished processing the entire log.
+   *
+   * @return A boolean representing if the background thread has finished processing the entire log.
+   */
   public boolean isDone() {
     return m_done.get();
   }
 
+  /**
+   * Returns the <code>DataLogReader</code> object associated with the log.
+   *
+   * @return The <code>DataLogReader</code> object associated with the log.
+   */
   public DataLogReader getReader() {
     return m_reader;
   }
