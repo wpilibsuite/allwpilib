@@ -570,6 +570,12 @@ void NT_SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
   nt::SetServerTeam(inst, team, port);
 }
 
+void NT_SetServerTeamExtra(NT_Inst inst, unsigned int team,
+                           const struct WPI_String* extraAddress,
+                           unsigned int port) {
+  nt::SetServerTeamExtra(inst, team, wpi::to_string_view(extraAddress), port);
+}
+
 void NT_Disconnect(NT_Inst inst) {
   nt::Disconnect(inst);
 }
