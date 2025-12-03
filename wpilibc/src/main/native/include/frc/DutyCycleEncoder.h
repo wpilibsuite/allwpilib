@@ -24,9 +24,9 @@ class DigitalSource;
  *
  * @warning By default, position readings from Get() will be inaccurate for up
  * to 2 seconds after this object is initialized. Setting the frequency of the
- * encoder's output using {@link #setAssumedFrequency(double)} can be used to
- * mitigate this, though users should verify the true frequency of the specific
- * encoder in use as it can vary between devices.
+ * encoder's output using SetAssumedFrequency() can be used to mitigate this,
+ * though users should verify the true frequency of the specific encoder in use
+ * as it can vary between devices.
  */
 class DutyCycleEncoder : public wpi::Sendable,
                          public wpi::SendableHelper<DutyCycleEncoder> {
