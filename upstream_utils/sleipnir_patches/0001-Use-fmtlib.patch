@@ -4,41 +4,41 @@ Date: Wed, 29 May 2024 16:29:55 -0700
 Subject: [PATCH 1/8] Use fmtlib
 
 ---
- include/.styleguide              |  1 +
- include/sleipnir/util/assert.hpp |  5 +++--
- include/sleipnir/util/print.hpp  | 31 ++++++++++++++++++-------------
- src/.styleguide                  |  1 +
- src/optimization/problem.cpp     |  1 +
- 5 files changed, 24 insertions(+), 15 deletions(-)
+ include/sleipnir/optimization/problem.hpp |  1 +
+ include/sleipnir/util/assert.hpp          |  5 ++--
+ include/sleipnir/util/print.hpp           | 31 +++++++++++++----------
+ 3 files changed, 22 insertions(+), 15 deletions(-)
 
-diff --git a/include/.styleguide b/include/.styleguide
-index 1b6652d3d5886cf8c9eca0d855c21031775bad7c..4f4c76204071f90bf49eddb8c2aceb583b5e09ba 100644
---- a/include/.styleguide
-+++ b/include/.styleguide
-@@ -8,5 +8,6 @@ cppSrcFileInclude {
+diff --git a/include/sleipnir/optimization/problem.hpp b/include/sleipnir/optimization/problem.hpp
+index 3185466605b6604068e2807e461d07d8c856c505..95a33952a5a368c7c81491dbe849a8096357dc38 100644
+--- a/include/sleipnir/optimization/problem.hpp
++++ b/include/sleipnir/optimization/problem.hpp
+@@ -15,6 +15,7 @@
  
- includeOtherLibs {
-   ^Eigen/
-+  ^fmt/
-   ^gch/
- }
+ #include <Eigen/Core>
+ #include <Eigen/SparseCore>
++#include <fmt/chrono.h>
+ #include <gch/small_vector.hpp>
+ 
+ #include "sleipnir/autodiff/expression_type.hpp"
 diff --git a/include/sleipnir/util/assert.hpp b/include/sleipnir/util/assert.hpp
-index 75d8ffca32accbf66ffce30f073de1db2f42469b..53de01928b929793fa77885ec4a6d1a928bdc5a9 100644
+index 0846928c3da7a6047a3c271dd2d377a3b755eeab..5d432608def05b6dee6b7cbdb9a0b91a6ab5e1c2 100644
 --- a/include/sleipnir/util/assert.hpp
 +++ b/include/sleipnir/util/assert.hpp
-@@ -3,9 +3,10 @@
- #pragma once
+@@ -4,10 +4,11 @@
  
- #ifdef JORMUNGANDR
+ #ifdef SLEIPNIR_PYTHON
+ 
 -#include <format>
  #include <source_location>
  #include <stdexcept>
-+
+ 
 +#include <fmt/format.h>
++
  /**
   * Throw an exception in Python.
   */
-@@ -13,7 +14,7 @@
+@@ -15,7 +16,7 @@
    do {                                                               \
      if (!(condition)) {                                              \
        auto location = std::source_location::current();               \
@@ -48,7 +48,7 @@ index 75d8ffca32accbf66ffce30f073de1db2f42469b..53de01928b929793fa77885ec4a6d1a9
            location.line(), location.function_name(), #condition));   \
      }                                                                \
 diff --git a/include/sleipnir/util/print.hpp b/include/sleipnir/util/print.hpp
-index fe430352dabf4cd6a890dc8007237c7a261dfd4b..055d5c9fa246201f1d8ae7ddca00b1159aeb2a57 100644
+index 797df849f63d960cf10eaf847415595961868ab0..a89b7d4f9864965443405a8e79cddd8dbfc54ad3 100644
 --- a/include/sleipnir/util/print.hpp
 +++ b/include/sleipnir/util/print.hpp
 @@ -4,10 +4,15 @@
@@ -76,8 +76,8 @@ index fe430352dabf4cd6a890dc8007237c7a261dfd4b..055d5c9fa246201f1d8ae7ddca00b115
 + * Wrapper around fmt::print() that squelches write failure exceptions.
   */
  template <typename... T>
--inline void print(std::format_string<T...> fmt, T&&... args) {
-+inline void print(fmt::format_string<T...> fmt, T&&... args) {
+-void print(std::format_string<T...> fmt, T&&... args) {
++void print(fmt::format_string<T...> fmt, T&&... args) {
    try {
 -    std::print(fmt, std::forward<T>(args)...);
 +    fmt::print(fmt, std::forward<T>(args)...);
@@ -90,8 +90,8 @@ index fe430352dabf4cd6a890dc8007237c7a261dfd4b..055d5c9fa246201f1d8ae7ddca00b115
 + * Wrapper around fmt::print() that squelches write failure exceptions.
   */
  template <typename... T>
--inline void print(std::FILE* f, std::format_string<T...> fmt, T&&... args) {
-+inline void print(std::FILE* f, fmt::format_string<T...> fmt, T&&... args) {
+-void print(std::FILE* f, std::format_string<T...> fmt, T&&... args) {
++void print(std::FILE* f, fmt::format_string<T...> fmt, T&&... args) {
    try {
 -    std::print(f, fmt, std::forward<T>(args)...);
 +    fmt::print(f, fmt, std::forward<T>(args)...);
@@ -104,8 +104,8 @@ index fe430352dabf4cd6a890dc8007237c7a261dfd4b..055d5c9fa246201f1d8ae7ddca00b115
 + * Wrapper around fmt::println() that squelches write failure exceptions.
   */
  template <typename... T>
--inline void println(std::format_string<T...> fmt, T&&... args) {
-+inline void println(fmt::format_string<T...> fmt, T&&... args) {
+-void println(std::format_string<T...> fmt, T&&... args) {
++void println(fmt::format_string<T...> fmt, T&&... args) {
    try {
 -    std::println(fmt, std::forward<T>(args)...);
 +    fmt::println(fmt, std::forward<T>(args)...);
@@ -118,34 +118,11 @@ index fe430352dabf4cd6a890dc8007237c7a261dfd4b..055d5c9fa246201f1d8ae7ddca00b115
 + * Wrapper around fmt::println() that squelches write failure exceptions.
   */
  template <typename... T>
--inline void println(std::FILE* f, std::format_string<T...> fmt, T&&... args) {
-+inline void println(std::FILE* f, fmt::format_string<T...> fmt, T&&... args) {
+-void println(std::FILE* f, std::format_string<T...> fmt, T&&... args) {
++void println(std::FILE* f, fmt::format_string<T...> fmt, T&&... args) {
    try {
 -    std::println(f, fmt, std::forward<T>(args)...);
 +    fmt::println(f, fmt, std::forward<T>(args)...);
    } catch (const std::system_error&) {
    }
  }
-diff --git a/src/.styleguide b/src/.styleguide
-index 1b6652d3d5886cf8c9eca0d855c21031775bad7c..4f4c76204071f90bf49eddb8c2aceb583b5e09ba 100644
---- a/src/.styleguide
-+++ b/src/.styleguide
-@@ -8,5 +8,6 @@ cppSrcFileInclude {
- 
- includeOtherLibs {
-   ^Eigen/
-+  ^fmt/
-   ^gch/
- }
-diff --git a/src/optimization/problem.cpp b/src/optimization/problem.cpp
-index c3331197e2365934273f57422b79fa18c2b78a5b..09828cdb6d7cddff692b9d17603dc0c11cd5a3ec 100644
---- a/src/optimization/problem.cpp
-+++ b/src/optimization/problem.cpp
-@@ -11,6 +11,7 @@
- 
- #include <Eigen/Core>
- #include <Eigen/SparseCore>
-+#include <fmt/chrono.h>
- #include <gch/small_vector.hpp>
- 
- #include "optimization/bounds.hpp"

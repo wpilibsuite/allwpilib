@@ -6,8 +6,8 @@
 
 #include <memory>
 
-#include "wpi/ExpansionHub.hpp"
-#include "wpi/ExpansionHubPidConstants.hpp"
+#include "wpi/hardware/expansionhub/ExpansionHub.hpp"
+#include "wpi/hardware/expansionhub/ExpansionHubPidConstants.hpp"
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/DoubleTopic.hpp"
 #include "wpi/nt/IntegerTopic.hpp"
