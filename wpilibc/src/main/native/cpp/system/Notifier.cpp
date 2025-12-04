@@ -46,7 +46,7 @@ Notifier::Notifier(std::function<void()> callback) {
       }
 
       // Ack notifier
-      HAL_AcknowledgeNotifierAlarm(notifier, &status);
+      HAL_AcknowledgeNotifierAlarm(notifier, false, 0, 0, false, &status);
       WPILIB_CheckErrorStatus(status, "AcknowledgeNotifier");
     }
   });
@@ -99,7 +99,7 @@ Notifier::Notifier(int priority, std::function<void()> callback) {
       }
 
       // Ack notifier
-      HAL_AcknowledgeNotifierAlarm(notifier, &status);
+      HAL_AcknowledgeNotifierAlarm(notifier, false, 0, 0, false, &status);
       WPILIB_CheckErrorStatus(status, "AcknowledgeNotifier");
     }
   });

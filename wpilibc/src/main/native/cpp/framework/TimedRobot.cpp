@@ -35,16 +35,14 @@ void TimedRobot::StartCompetition() {
     auto callback = m_callbacks.pop();
 
     int32_t status = 0;
-    HAL_SetNotifierAlarm(m_notifier, callback.expirationTime.count(), 0, true,
-                         &status);
-    WPILIB_CheckErrorStatus(status, "UpdateNotifierAlarm");
-
-    // Acknowledge previous alarm after setting the next one to avoid a race
-    // against getting the next notifier timeout in HALSIM StepTiming.
     if (first) {
       first = false;
+      HAL_SetNotifierAlarm(m_notifier, callback.expirationTime.count(), 0, true,
+                           &status);
+      WPILIB_CheckErrorStatus(status, "SetNotifierAlarm");
     } else {
-      HAL_AcknowledgeNotifierAlarm(m_notifier, &status);
+      HAL_AcknowledgeNotifierAlarm(
+          m_notifier, true, callback.expirationTime.count(), 0, true, &status);
       WPILIB_CheckErrorStatus(status, "AcknowledgeNotifierAlarm");
     }
 

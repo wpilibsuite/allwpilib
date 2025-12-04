@@ -39,6 +39,10 @@ class NotifierThread : public wpi::util::SafeThread {
  public:
   void Main() override;
 
+  void SetAlarm(HAL_NotifierHandle notifierHandle,
+                std::shared_ptr<Notifier>& notifier, uint64_t alarmTime,
+                uint64_t intervalTime, bool absolute, int32_t* status);
+
   void ProcessAlarms();
 
   UnlimitedHandleResource<HAL_NotifierHandle, Notifier,
@@ -94,6 +98,30 @@ void NotifierThread::Main() {
     }
 
     ProcessAlarms();
+  }
+}
+
+void NotifierThread::SetAlarm(HAL_NotifierHandle notifierHandle,
+                              std::shared_ptr<Notifier>& notifier,
+                              uint64_t alarmTime, uint64_t intervalTime,
+                              bool absolute, int32_t* status) {
+  if (!absolute) {
+    alarmTime += HAL_GetFPGATime(status);
+  }
+
+  uint64_t prevWakeup = UINT64_MAX;
+  if (!m_alarmQueue.empty()) {
+    prevWakeup = m_alarmQueue.top().notifier->alarmTime;
+    m_alarmQueue.remove({notifierHandle, notifier});
+  }
+  notifier->alarmTime = alarmTime;
+  notifier->intervalTime = intervalTime;
+  notifier->overrunCount = 0;
+  m_alarmQueue.push({notifierHandle, notifier});
+
+  // wake up notifier thread if needed
+  if (alarmTime < prevWakeup) {
+    m_cond.notify_all();
   }
 }
 
@@ -182,25 +210,8 @@ void HAL_SetNotifierAlarm(HAL_NotifierHandle notifierHandle, uint64_t alarmTime,
   if (!notifier) {
     return;
   }
-
-  if (!absolute) {
-    alarmTime += HAL_GetFPGATime(status);
-  }
-
-  uint64_t prevWakeup = UINT64_MAX;
-  if (!thr->m_alarmQueue.empty()) {
-    prevWakeup = thr->m_alarmQueue.top().notifier->alarmTime;
-    thr->m_alarmQueue.remove({notifierHandle, notifier});
-  }
-  notifier->alarmTime = alarmTime;
-  notifier->intervalTime = intervalTime;
-  notifier->overrunCount = 0;
-  thr->m_alarmQueue.push({notifierHandle, notifier});
-
-  // wake up notifier thread if needed
-  if (alarmTime < prevWakeup) {
-    thr->m_cond.notify_all();
-  }
+  thr->SetAlarm(notifierHandle, notifier, alarmTime, intervalTime, absolute,
+                status);
 }
 
 void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle,
@@ -213,16 +224,23 @@ void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle,
 
   thr->m_alarmQueue.remove({notifierHandle, notifier});
   notifier->alarmTime = UINT64_MAX;
+  notifier->handlerSignaled.clear();
 }
 
 void HAL_AcknowledgeNotifierAlarm(HAL_NotifierHandle notifierHandle,
+                                  HAL_Bool setAlarm, uint64_t alarmTime,
+                                  uint64_t intervalTime, HAL_Bool absolute,
                                   int32_t* status) {
-  auto notifier =
-      notifierInstance->owner.GetThread()->m_handles.Get(notifierHandle);
+  auto thr = notifierInstance->owner.GetThread();
+  auto notifier = thr->m_handles.Get(notifierHandle);
   if (!notifier) {
     return;
   }
   notifier->handlerSignaled.clear();
+  if (setAlarm) {
+    thr->SetAlarm(notifierHandle, notifier, alarmTime, intervalTime, absolute,
+                  status);
+  }
 }
 
 int32_t HAL_GetNotifierOverrun(HAL_NotifierHandle notifierHandle,

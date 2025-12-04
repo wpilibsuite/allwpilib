@@ -113,14 +113,18 @@ Java_org_wpilib_hardware_hal_NotifierJNI_cancelNotifierAlarm
 /*
  * Class:     org_wpilib_hardware_hal_NotifierJNI
  * Method:    acknowledgeNotifierAlarm
- * Signature: (I)V
+ * Signature: (IZJJZ)V
  */
 JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_NotifierJNI_acknowledgeNotifierAlarm
-  (JNIEnv* env, jclass cls, jint notifierHandle)
+  (JNIEnv* env, jclass cls, jint notifierHandle, jboolean setAlarm,
+   jlong alarmTime, jlong intervalTime, jboolean absolute)
 {
   int32_t status = 0;
-  HAL_AcknowledgeNotifierAlarm((HAL_NotifierHandle)notifierHandle, &status);
+  HAL_AcknowledgeNotifierAlarm((HAL_NotifierHandle)notifierHandle, setAlarm,
+                               static_cast<uint64_t>(alarmTime),
+                               static_cast<uint64_t>(intervalTime), absolute,
+                               &status);
 
   CheckStatus(env, status);
 }
