@@ -1,0 +1,328 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joseph Eng <91924258+KangarooKoala@users.noreply.github.com>
+Date: Wed, 3 Dec 2025 17:56:23 -0800
+Subject: [PATCH 1/9] Add more units
+
+---
+ include/units/angular_acceleration.h | 71 ++++++++++++++++++++++++++++
+ include/units/angular_jerk.h         | 69 +++++++++++++++++++++++++++
+ include/units/angular_velocity.h     |  1 +
+ include/units/core.h                 |  2 +
+ include/units/curvature.h            | 57 ++++++++++++++++++++++
+ include/units/moment_of_inertia.h    | 57 ++++++++++++++++++++++
+ 6 files changed, 257 insertions(+)
+ create mode 100644 include/units/angular_acceleration.h
+ create mode 100644 include/units/angular_jerk.h
+ create mode 100644 include/units/curvature.h
+ create mode 100644 include/units/moment_of_inertia.h
+
+diff --git a/include/units/angular_acceleration.h b/include/units/angular_acceleration.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..17d1737380d73408782b8d604c2d65e7c3f6edcd
+--- /dev/null
++++ b/include/units/angular_acceleration.h
+@@ -0,0 +1,71 @@
++//--------------------------------------------------------------------------------------------------
++//
++//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
++//
++//--------------------------------------------------------------------------------------------------
++//
++// The MIT License (MIT)
++//
++// Permission is hereby granted, free of charge, to any person obtaining a copy of this software
++// and associated documentation files (the "Software"), to deal in the Software without
++// restriction, including without limitation the rights to use, copy, modify, merge, publish,
++// distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
++// Software is furnished to do so, subject to the following conditions:
++//
++// The above copyright notice and this permission notice shall be included in all copies or
++// substantial portions of the Software.
++//
++// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
++// BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
++// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
++// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
++// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
++//
++//--------------------------------------------------------------------------------------------------
++//
++// Copyright (c) 2016 Nic Holthaus
++//
++//--------------------------------------------------------------------------------------------------
++//
++// ATTRIBUTION:
++// Parts of this work have been adapted from:
++// http://stackoverflow.com/questions/35069778/create-comparison-trait-for-template-classes-whose-parameters-are-in-a-different
++// http://stackoverflow.com/questions/28253399/check-traits-for-all-variadic-template-arguments/28253503
++// http://stackoverflow.com/questions/36321295/rational-approximation-of-square-root-of-stdratio-at-compile-time?noredirect=1#comment60266601_36321295
++// https://github.com/swatanabe/cppnow17-units
++//
++//--------------------------------------------------------------------------------------------------
++//
++/// @file	units/angular_acceleration.h
++/// @brief	units representing angular acceleration values
++//
++//--------------------------------------------------------------------------------------------------
++
++#pragma once
++
++#ifndef units_angular_acceleration_h_
++#define units_angular_acceleration_h_
++
++#include <units/angular_velocity.h>
++#include <units/time.h>
++
++namespace units
++{
++	/**
++	 * @namespace	units::angular_acceleration
++	 * @brief		namespace for unit types and containers representing angular acceleration values
++	 * @details		The SI unit for angular acceleration is `radians_per_second_squared`, and the corresponding `dimension`
++	 *dimension is `angular_acceleration_unit`.
++	 * @anchor		angularAccelerationContainers
++	 * @sa			See unit for more information on unit type containers.
++	 */
++	UNIT_ADD(angular_acceleration, radians_per_second_squared, rad_per_s_sq, conversion_factor<std::ratio<1>, dimension::angular_acceleration>)
++	UNIT_ADD(angular_acceleration, degrees_per_second_squared, deg_per_s_sq, compound_conversion_factor<degrees_, inverse<squared<seconds_>>>)
++	UNIT_ADD(angular_acceleration, turns_per_second_squared, tr_per_s_sq, compound_conversion_factor<turns_, inverse<squared<seconds_>>>)
++	UNIT_ADD(angular_acceleration, revolutions_per_minute_squared, rev_per_m_sq, compound_conversion_factor<turns_, inverse<squared<minutes_>>>)
++	UNIT_ADD(angular_acceleration, revolutions_per_minute_per_second, rev_per_m_per_s, compound_conversion_factor<turns_, inverse<minutes_>, inverse<seconds_>>)
++
++	UNIT_ADD_DIMENSION_TRAIT(angular_acceleration)
++} // namespace units
++
++#endif // units_angular_acceleration_h_
+diff --git a/include/units/angular_jerk.h b/include/units/angular_jerk.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..ed1f8d6e704ec9d61a1f2058ad8dac7758e75fb9
+--- /dev/null
++++ b/include/units/angular_jerk.h
+@@ -0,0 +1,69 @@
++//--------------------------------------------------------------------------------------------------
++//
++//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
++//
++//--------------------------------------------------------------------------------------------------
++//
++// The MIT License (MIT)
++//
++// Permission is hereby granted, free of charge, to any person obtaining a copy of this software
++// and associated documentation files (the "Software"), to deal in the Software without
++// restriction, including without limitation the rights to use, copy, modify, merge, publish,
++// distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
++// Software is furnished to do so, subject to the following conditions:
++//
++// The above copyright notice and this permission notice shall be included in all copies or
++// substantial portions of the Software.
++//
++// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
++// BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
++// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
++// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
++// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
++//
++//--------------------------------------------------------------------------------------------------
++//
++// Copyright (c) 2016 Nic Holthaus
++//
++//--------------------------------------------------------------------------------------------------
++//
++// ATTRIBUTION:
++// Parts of this work have been adapted from:
++// http://stackoverflow.com/questions/35069778/create-comparison-trait-for-template-classes-whose-parameters-are-in-a-different
++// http://stackoverflow.com/questions/28253399/check-traits-for-all-variadic-template-arguments/28253503
++// http://stackoverflow.com/questions/36321295/rational-approximation-of-square-root-of-stdratio-at-compile-time?noredirect=1#comment60266601_36321295
++// https://github.com/swatanabe/cppnow17-units
++//
++//--------------------------------------------------------------------------------------------------
++//
++/// @file	units/angular_jerk.h
++/// @brief	units representing angular jerk values
++//
++//--------------------------------------------------------------------------------------------------
++
++#pragma once
++
++#ifndef units_angular_jerk_h_
++#define units_angular_jerk_h_
++
++#include <units/angle.h>
++#include <units/time.h>
++
++namespace units
++{
++	/**
++	 * @namespace	units::angular_jerk
++	 * @brief		namespace for unit types and containers representing angular jerk values
++	 * @details		The SI unit for angular jerk is `radians_per_second_squared`, and the corresponding `dimension`
++	 *dimension is `angular_jerk_unit`.
++	 * @anchor		angularJerkContainers
++	 * @sa			See unit for more information on unit type containers.
++	 */
++	UNIT_ADD(angular_jerk, radians_per_second_cubed, rad_per_s_cu, conversion_factor<std::ratio<1>, dimension::angular_jerk>)
++	UNIT_ADD(angular_jerk, degrees_per_second_cubed, deg_per_s_cu, compound_conversion_factor<degrees_, inverse<cubed<seconds_>>>)
++	UNIT_ADD(angular_jerk, turns_per_second_cubed, tr_per_s_cu, compound_conversion_factor<turns_, inverse<cubed<seconds_>>>)
++
++	UNIT_ADD_DIMENSION_TRAIT(angular_jerk)
++} // namespace units
++
++#endif // units_jerk_h_
+diff --git a/include/units/angular_velocity.h b/include/units/angular_velocity.h
+index 904527ce689fd65dd63734da8b666f6ad71545f0..0973322de3a0bda5ac737fd06101a68903127304 100644
+--- a/include/units/angular_velocity.h
++++ b/include/units/angular_velocity.h
+@@ -61,6 +61,7 @@ namespace units
+ 	 */
+ 	UNIT_ADD(angular_velocity, radians_per_second, rad_per_s, conversion_factor<std::ratio<1>, dimension::angular_velocity>)
+ 	UNIT_ADD(angular_velocity, degrees_per_second, deg_per_s, compound_conversion_factor<degrees_, inverse<seconds_>>)
++	UNIT_ADD(angular_velocity, turns_per_second, tps, compound_conversion_factor<turns_, inverse<seconds_>>)
+ 	UNIT_ADD(angular_velocity, revolutions_per_minute, rpm, conversion_factor<std::ratio<2, 60>, radians_per_second_, std::ratio<1>>)
+ 	UNIT_ADD(angular_velocity, revolutions_per_second, rps, conversion_factor<std::ratio<2, 1>, radians_per_second<>, std::ratio<1>>)
+ 	UNIT_ADD(angular_velocity, milliarcseconds_per_year, mas_per_yr, compound_conversion_factor<milliarcseconds<>, inverse<years<>>>)
+diff --git a/include/units/core.h b/include/units/core.h
+index 4b438d520f6ad3ea1c0035b9de2fd42518f7c47d..c94d390e36e68312a8f1c9cc02a688534732427e 100644
+--- a/include/units/core.h
++++ b/include/units/core.h
+@@ -1067,6 +1067,7 @@ namespace units
+ 		using velocity                = dimension_divide<length, time>;                                                     ///< Represents an SI derived unit of velocity
+ 		using angular_velocity        = dimension_divide<angle, time>;                                                      ///< Represents an SI derived unit of angular velocity
+ 		using acceleration            = dimension_divide<velocity, time>;                                                   ///< Represents an SI derived unit of acceleration
++		using angular_acceleration    = dimension_divide<angular_velocity, time>;                                           ///< Represents an SI derived unit of angular acceleration
+ 		using force                   = dimension_multiply<mass, acceleration>;                                             ///< Represents an SI derived unit of force
+ 		using area                    = dimension_pow<length, std::ratio<2>>;                                               ///< Represents an SI derived unit of area
+ 		using volume                  = dimension_pow<length, std::ratio<3>>;                                               ///< Represents an SI derived unit of volume
+@@ -1097,6 +1098,7 @@ namespace units
+ 
+ 		// OTHER UNIT TYPES
+ 		using jerk               = make_dimension<length, std::ratio<1>, time, std::ratio<-3>>;   ///< Represents an SI derived unit of jerk
++		using angular_jerk       = make_dimension<angle, std::ratio<1>, time, std::ratio<-3>>;    ///< Represents an SI derived unit of angular jerk
+ 		using torque             = dimension_multiply<force, length>;                             ///< Represents an SI derived unit of torque
+ 		using density            = dimension_divide<mass, volume>;                                ///< Represents an SI derived unit of density
+ 		using energy_density     = make_dimension<energy, std::ratio<1>, volume, std::ratio<-1>>; ///< Represents an SI derived unit of energy density
+diff --git a/include/units/curvature.h b/include/units/curvature.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..8dcd7451a6ef5db0e47df6c9e7438f397fdc6794
+--- /dev/null
++++ b/include/units/curvature.h
+@@ -0,0 +1,57 @@
++//--------------------------------------------------------------------------------------------------
++//
++//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
++//
++//--------------------------------------------------------------------------------------------------
++//
++// The MIT License (MIT)
++//
++// Permission is hereby granted, free of charge, to any person obtaining a copy of this software
++// and associated documentation files (the "Software"), to deal in the Software without
++// restriction, including without limitation the rights to use, copy, modify, merge, publish,
++// distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
++// Software is furnished to do so, subject to the following conditions:
++//
++// The above copyright notice and this permission notice shall be included in all copies or
++// substantial portions of the Software.
++//
++// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
++// BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
++// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
++// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
++// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
++//
++//--------------------------------------------------------------------------------------------------
++//
++// Copyright (c) 2016 Nic Holthaus
++//
++//--------------------------------------------------------------------------------------------------
++//
++// ATTRIBUTION:
++// Parts of this work have been adapted from:
++// http://stackoverflow.com/questions/35069778/create-comparison-trait-for-template-classes-whose-parameters-are-in-a-different
++// http://stackoverflow.com/questions/28253399/check-traits-for-all-variadic-template-arguments/28253503
++// http://stackoverflow.com/questions/36321295/rational-approximation-of-square-root-of-stdratio-at-compile-time?noredirect=1#comment60266601_36321295
++// https://github.com/swatanabe/cppnow17-units
++//
++//--------------------------------------------------------------------------------------------------
++//
++/// @file	units/curvature.h
++/// @brief	units representing curvature values
++//
++//--------------------------------------------------------------------------------------------------
++
++#pragma once
++
++#ifndef units_curvature_h_
++#define units_curvature_h_
++
++#include <units/angle.h>
++#include <units/length.h>
++
++namespace units
++{
++using curvature_t = unit<compound_conversion_factor<radians_, inverse<meters_>>>;
++} // namespace units
++
++#endif // units_curvature_h_
+diff --git a/include/units/moment_of_inertia.h b/include/units/moment_of_inertia.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..60d80d19c5f7e9baa32e5d6549b73c50c6f5c53f
+--- /dev/null
++++ b/include/units/moment_of_inertia.h
+@@ -0,0 +1,57 @@
++//--------------------------------------------------------------------------------------------------
++//
++//	UnitConversion: A compile-time c++14 unit conversion library with no dependencies
++//
++//--------------------------------------------------------------------------------------------------
++//
++// The MIT License (MIT)
++//
++// Permission is hereby granted, free of charge, to any person obtaining a copy of this software
++// and associated documentation files (the "Software"), to deal in the Software without
++// restriction, including without limitation the rights to use, copy, modify, merge, publish,
++// distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
++// Software is furnished to do so, subject to the following conditions:
++//
++// The above copyright notice and this permission notice shall be included in all copies or
++// substantial portions of the Software.
++//
++// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
++// BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
++// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
++// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
++// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
++//
++//--------------------------------------------------------------------------------------------------
++//
++// Copyright (c) 2016 Nic Holthaus
++//
++//--------------------------------------------------------------------------------------------------
++//
++// ATTRIBUTION:
++// Parts of this work have been adapted from:
++// http://stackoverflow.com/questions/35069778/create-comparison-trait-for-template-classes-whose-parameters-are-in-a-different
++// http://stackoverflow.com/questions/28253399/check-traits-for-all-variadic-template-arguments/28253503
++// http://stackoverflow.com/questions/36321295/rational-approximation-of-square-root-of-stdratio-at-compile-time?noredirect=1#comment60266601_36321295
++// https://github.com/swatanabe/cppnow17-units
++//
++//--------------------------------------------------------------------------------------------------
++//
++/// @file	units/moment_of_inertia.h
++/// @brief	units representing moment_of_inertia values
++//
++//--------------------------------------------------------------------------------------------------
++
++#pragma once
++
++#ifndef units_moment_of_inertia_h_
++#define units_moment_of_inertia_h_
++
++#include <units/area.h>
++#include <units/mass.h>
++
++namespace units
++{
++	UNIT_ADD(moment_of_inertia, kilogram_square_meters, kg_sq_m, compound_conversion_factor<kilograms_, square_meters_>)
++} // namespace units
++
++#endif // units_moment_of_inertia_h_

@@ -36,37 +36,22 @@
 //
 //--------------------------------------------------------------------------------------------------
 //
-/// @file	units/angular_velocity.h
-/// @brief	units representing angular velocity values
+/// @file	units/moment_of_inertia.h
+/// @brief	units representing moment_of_inertia values
 //
 //--------------------------------------------------------------------------------------------------
 
 #pragma once
 
-#ifndef units_angular_velocity_h_
-#define units_angular_velocity_h_
+#ifndef units_moment_of_inertia_h_
+#define units_moment_of_inertia_h_
 
-#include <wpi/units/angle.h>
-#include <wpi/units/time.h>
+#include <wpi/units/area.h>
+#include <wpi/units/mass.h>
 
 namespace wpi::units
 {
-	/**
-	 * @namespace	wpi::units::angular_velocity
-	 * @brief		namespace for unit types and containers representing angular velocity values
-	 * @details		The SI unit for angular velocity is `radians_per_second`, and the corresponding `dimension`
-	 *				dimension is `angular_velocity_unit`.
-	 * @anchor		angularVelocityContainers
-	 * @sa			See unit for more information on unit type containers.
-	 */
-	UNIT_ADD(angular_velocity, radians_per_second, rad_per_s, conversion_factor<std::ratio<1>, dimension::angular_velocity>)
-	UNIT_ADD(angular_velocity, degrees_per_second, deg_per_s, compound_conversion_factor<degrees_, inverse<seconds_>>)
-	UNIT_ADD(angular_velocity, turns_per_second, tps, compound_conversion_factor<turns_, inverse<seconds_>>)
-	UNIT_ADD(angular_velocity, revolutions_per_minute, rpm, conversion_factor<std::ratio<2, 60>, radians_per_second_, std::ratio<1>>)
-	UNIT_ADD(angular_velocity, revolutions_per_second, rps, conversion_factor<std::ratio<2, 1>, radians_per_second<>, std::ratio<1>>)
-	UNIT_ADD(angular_velocity, milliarcseconds_per_year, mas_per_yr, compound_conversion_factor<milliarcseconds<>, inverse<years<>>>)
-
-	UNIT_ADD_DIMENSION_TRAIT(angular_velocity)
+	UNIT_ADD(moment_of_inertia, kilogram_square_meters, kg_sq_m, compound_conversion_factor<kilograms_, square_meters_>)
 } // namespace wpi::units
 
-#endif // units_angular_velocity_h_
+#endif // units_moment_of_inertia_h_

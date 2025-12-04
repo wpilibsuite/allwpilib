@@ -36,15 +36,15 @@
 //
 //--------------------------------------------------------------------------------------------------
 //
-/// @file	units/angular_velocity.h
-/// @brief	units representing angular velocity values
+/// @file	units/angular_jerk.h
+/// @brief	units representing angular jerk values
 //
 //--------------------------------------------------------------------------------------------------
 
 #pragma once
 
-#ifndef units_angular_velocity_h_
-#define units_angular_velocity_h_
+#ifndef units_angular_jerk_h_
+#define units_angular_jerk_h_
 
 #include <wpi/units/angle.h>
 #include <wpi/units/time.h>
@@ -52,21 +52,18 @@
 namespace wpi::units
 {
 	/**
-	 * @namespace	wpi::units::angular_velocity
-	 * @brief		namespace for unit types and containers representing angular velocity values
-	 * @details		The SI unit for angular velocity is `radians_per_second`, and the corresponding `dimension`
-	 *				dimension is `angular_velocity_unit`.
-	 * @anchor		angularVelocityContainers
+	 * @namespace	wpi::units::angular_jerk
+	 * @brief		namespace for unit types and containers representing angular jerk values
+	 * @details		The SI unit for angular jerk is `radians_per_second_squared`, and the corresponding `dimension`
+	 *dimension is `angular_jerk_unit`.
+	 * @anchor		angularJerkContainers
 	 * @sa			See unit for more information on unit type containers.
 	 */
-	UNIT_ADD(angular_velocity, radians_per_second, rad_per_s, conversion_factor<std::ratio<1>, dimension::angular_velocity>)
-	UNIT_ADD(angular_velocity, degrees_per_second, deg_per_s, compound_conversion_factor<degrees_, inverse<seconds_>>)
-	UNIT_ADD(angular_velocity, turns_per_second, tps, compound_conversion_factor<turns_, inverse<seconds_>>)
-	UNIT_ADD(angular_velocity, revolutions_per_minute, rpm, conversion_factor<std::ratio<2, 60>, radians_per_second_, std::ratio<1>>)
-	UNIT_ADD(angular_velocity, revolutions_per_second, rps, conversion_factor<std::ratio<2, 1>, radians_per_second<>, std::ratio<1>>)
-	UNIT_ADD(angular_velocity, milliarcseconds_per_year, mas_per_yr, compound_conversion_factor<milliarcseconds<>, inverse<years<>>>)
+	UNIT_ADD(angular_jerk, radians_per_second_cubed, rad_per_s_cu, conversion_factor<std::ratio<1>, dimension::angular_jerk>)
+	UNIT_ADD(angular_jerk, degrees_per_second_cubed, deg_per_s_cu, compound_conversion_factor<degrees_, inverse<cubed<seconds_>>>)
+	UNIT_ADD(angular_jerk, turns_per_second_cubed, tr_per_s_cu, compound_conversion_factor<turns_, inverse<cubed<seconds_>>>)
 
-	UNIT_ADD_DIMENSION_TRAIT(angular_velocity)
+	UNIT_ADD_DIMENSION_TRAIT(angular_jerk)
 } // namespace wpi::units
 
-#endif // units_angular_velocity_h_
+#endif // units_jerk_h_

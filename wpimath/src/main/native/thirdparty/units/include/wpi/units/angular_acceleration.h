@@ -36,37 +36,36 @@
 //
 //--------------------------------------------------------------------------------------------------
 //
-/// @file	units/angular_velocity.h
-/// @brief	units representing angular velocity values
+/// @file	units/angular_acceleration.h
+/// @brief	units representing angular acceleration values
 //
 //--------------------------------------------------------------------------------------------------
 
 #pragma once
 
-#ifndef units_angular_velocity_h_
-#define units_angular_velocity_h_
+#ifndef units_angular_acceleration_h_
+#define units_angular_acceleration_h_
 
-#include <wpi/units/angle.h>
+#include <wpi/units/angular_velocity.h>
 #include <wpi/units/time.h>
 
 namespace wpi::units
 {
 	/**
-	 * @namespace	wpi::units::angular_velocity
-	 * @brief		namespace for unit types and containers representing angular velocity values
-	 * @details		The SI unit for angular velocity is `radians_per_second`, and the corresponding `dimension`
-	 *				dimension is `angular_velocity_unit`.
-	 * @anchor		angularVelocityContainers
+	 * @namespace	wpi::units::angular_acceleration
+	 * @brief		namespace for unit types and containers representing angular acceleration values
+	 * @details		The SI unit for angular acceleration is `radians_per_second_squared`, and the corresponding `dimension`
+	 *dimension is `angular_acceleration_unit`.
+	 * @anchor		angularAccelerationContainers
 	 * @sa			See unit for more information on unit type containers.
 	 */
-	UNIT_ADD(angular_velocity, radians_per_second, rad_per_s, conversion_factor<std::ratio<1>, dimension::angular_velocity>)
-	UNIT_ADD(angular_velocity, degrees_per_second, deg_per_s, compound_conversion_factor<degrees_, inverse<seconds_>>)
-	UNIT_ADD(angular_velocity, turns_per_second, tps, compound_conversion_factor<turns_, inverse<seconds_>>)
-	UNIT_ADD(angular_velocity, revolutions_per_minute, rpm, conversion_factor<std::ratio<2, 60>, radians_per_second_, std::ratio<1>>)
-	UNIT_ADD(angular_velocity, revolutions_per_second, rps, conversion_factor<std::ratio<2, 1>, radians_per_second<>, std::ratio<1>>)
-	UNIT_ADD(angular_velocity, milliarcseconds_per_year, mas_per_yr, compound_conversion_factor<milliarcseconds<>, inverse<years<>>>)
+	UNIT_ADD(angular_acceleration, radians_per_second_squared, rad_per_s_sq, conversion_factor<std::ratio<1>, dimension::angular_acceleration>)
+	UNIT_ADD(angular_acceleration, degrees_per_second_squared, deg_per_s_sq, compound_conversion_factor<degrees_, inverse<squared<seconds_>>>)
+	UNIT_ADD(angular_acceleration, turns_per_second_squared, tr_per_s_sq, compound_conversion_factor<turns_, inverse<squared<seconds_>>>)
+	UNIT_ADD(angular_acceleration, revolutions_per_minute_squared, rev_per_m_sq, compound_conversion_factor<turns_, inverse<squared<minutes_>>>)
+	UNIT_ADD(angular_acceleration, revolutions_per_minute_per_second, rev_per_m_per_s, compound_conversion_factor<turns_, inverse<minutes_>, inverse<seconds_>>)
 
-	UNIT_ADD_DIMENSION_TRAIT(angular_velocity)
+	UNIT_ADD_DIMENSION_TRAIT(angular_acceleration)
 } // namespace wpi::units
 
-#endif // units_angular_velocity_h_
+#endif // units_angular_acceleration_h_

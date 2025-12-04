@@ -1,0 +1,196 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joseph Eng <91924258+KangarooKoala@users.noreply.github.com>
+Date: Thu, 11 Dec 2025 15:43:39 -0800
+Subject: [PATCH 3/9] Add fmt support
+
+---
+ include/units/core.h | 133 +++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 129 insertions(+), 4 deletions(-)
+
+diff --git a/include/units/core.h b/include/units/core.h
+index 0e5b187ac1f32edfc8711abb07926d5ec4383852..57043f35da894a3b1faaf34335996fc2e6a3d7ef 100644
+--- a/include/units/core.h
++++ b/include/units/core.h
+@@ -68,7 +68,11 @@
+ #include <type_traits>
+ #include <utility>
+ 
+-#if defined(UNIT_LIB_ENABLE_IOSTREAM)
++#if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
++#include <fmt/format.h>
++#endif // __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
++
++#if defined(UNIT_LIB_ENABLE_IOSTREAM) || __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
+ #include <clocale>
+ #include <string>
+ 
+@@ -100,7 +104,7 @@ namespace units::detail
+ 	}
+ } // namespace units::detail
+ 
+-#endif // defined(UNIT_LIB_ENABLE_IOSTREAM)
++#endif // defined(UNIT_LIB_ENABLE_IOSTREAM) || __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
+ 
+ //------------------------------
+ //	FORWARD DECLARATIONS
+@@ -2628,7 +2632,14 @@ namespace units
+ 		}
+ 		else
+ 		{
+-			os << std::conditional_t<detail::is_losslessly_convertible_unit<std::decay_t<decltype(obj)>, BaseUnit>, BaseUnit, PromotedBaseUnit>(obj).raw();
++			if constexpr (detail::is_losslessly_convertible_unit<std::decay_t<decltype(obj)>, BaseUnit>)
++			{
++				os << BaseUnit(obj).raw();
++			}
++			else
++			{
++				os << PromotedBaseUnit(obj).raw();
++			}
+ 
+ 			using DimType = traits::dimension_of_t<ConversionFactor>;
+ 			if constexpr (!DimType::empty)
+@@ -2639,7 +2650,9 @@ namespace units
+ 
+ 		return os;
+ 	}
++#endif // defined(UNIT_LIB_ENABLE_IOSTREAM)
+ 
++#if defined(UNIT_LIB_ENABLE_IOSTREAM) || __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
+ 	//----------------------------
+ 	//  to_string
+ 	//----------------------------
+@@ -2669,7 +2682,7 @@ namespace units
+ 			return s;
+ 		}
+ 	}
+-#endif
++#endif // defined(UNIT_LIB_ENABLE_IOSTREAM) || __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
+ 
+ 	//------------------------------
+ 	//	std::ratio helpers
+@@ -2687,6 +2700,102 @@ namespace units
+ 	/** @endcond */ // END DOXYGEN IGNORE
+ } // end namespace units
+ 
++#if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
++
++//-----------------------------
++//	FMT SUPPORT
++//-----------------------------
++
++template<class D, class E>
++struct fmt::formatter<units::dim<D, E>>
++{
++	template <typename ParseContext>
++	constexpr auto parse(ParseContext& ctx)
++	{
++		return ctx.begin();
++	}
++
++	template <typename FmtContext>
++	auto format(const units::dim<D, E>& obj, FmtContext& ctx) const
++	{
++		auto out = ctx.out();
++
++		if constexpr (E::num != 0)
++		{
++			out = fmt::format_to(out, " {}", D::abbreviation);
++		}
++		if constexpr (E::num != 0 && E::num != 1)
++		{
++			out = fmt::format_to(out, "^{}", E::num);
++		}
++		if constexpr (E::den != 1)
++		{
++			out = fmt::format_to(out, "/{}", E::den);
++		}
++
++		return out;
++	}
++};
++
++template<class... Dims>
++struct fmt::formatter<units::dimension_t<Dims...>>
++{
++	template <typename ParseContext>
++	constexpr auto parse(ParseContext& ctx)
++	{
++		return ctx.begin();
++	}
++
++	template <typename FmtContext>
++	auto format(const units::dimension_t<Dims...>&, FmtContext& ctx) const
++	{
++		auto out = ctx.out();
++		((out = fmt::format_to(out, "{}", Dims{})), ...);
++		return out;
++	}
++};
++
++template <units::ConversionFactorType ConversionFactor, units::ArithmeticType T, units::NumericalScaleType<T> NumericalScale>
++struct fmt::formatter<units::unit<ConversionFactor, T, NumericalScale>> : fmt::formatter<double>
++{
++	template <typename FmtContext>
++	auto format(const units::unit<ConversionFactor, T, NumericalScale>& obj, FmtContext& ctx) const
++	{
++		using BaseConversion   = units::conversion_factor<std::ratio<1>, typename ConversionFactor::dimension_type>;
++		using BaseUnit         = units::unit<BaseConversion, T, NumericalScale>;
++		using PromotedBaseUnit = units::unit<BaseConversion, units::detail::floating_point_promotion_t<T>, NumericalScale>;
++
++		auto out = ctx.out();
++
++		if constexpr (units::unit_abbreviation_v<units::unit<ConversionFactor, T, NumericalScale>>)
++		{
++			out = formatter<double>::format(obj.raw(), ctx);
++			out = fmt::format_to(out, " {}", obj.abbreviation());
++		}
++		else
++		{
++			if constexpr (units::detail::is_losslessly_convertible_unit<std::decay_t<decltype(obj)>, BaseUnit>)
++			{
++				out = formatter<double>::format(BaseUnit(obj).raw(), ctx);
++			}
++			else
++			{
++				out = formatter<double>::format(PromotedBaseUnit(obj).raw(), ctx);
++			}
++
++			using DimType = units::traits::dimension_of_t<ConversionFactor>;
++			if constexpr (!DimType::empty)
++			{
++				out = fmt::format_to(out, "{}", DimType{});
++			}
++		}
++
++		return out;
++	}
++};
++
++#endif // __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
++
+ //------------------------------
+ //	std::common_type
+ //------------------------------
+@@ -4012,6 +4121,22 @@ namespace units
+ 	}
+ } // end namespace units
+ 
++#if __has_include(<fmt/format.h>) && !defined(UNITS_LIB_DISABLE_FMT)
++
++template<class Underlying>
++struct fmt::formatter<units::decibels<Underlying>> : fmt::formatter<double>
++{
++	template <typename FmtContext>
++	auto format(const units::decibels<Underlying>& obj, FmtContext& ctx) const
++	{
++		auto out = formatter<double>::format(obj.raw(), ctx);
++		out = fmt::format_to(out, " dB");
++		return out;
++	}
++};
++
++#endif // __has_include(<fmt/format.h>) && !defined(UNITS_LIB_DISABLE_FMT)
++
+ //----------------------------------------------------------------------------------------------------------------------
+ //      STD Namespace extensions
+ //----------------------------------------------------------------------------------------------------------------------

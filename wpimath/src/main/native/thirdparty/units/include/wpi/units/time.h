@@ -49,14 +49,16 @@
 #include <wpi/units/core.h>
 
 /**
- * @def			UNIT_ADD_WITH_PLURAL_TAG(namespaceName, namePlural, abbreviation, definition)
- * @brief		Like `UNIT_ADD`, but the abbreviated unit is plural, e.g. `5_min` would have type `unit<mins>`
+ * @def			UNIT_ADD_WITH_PLURAL_CONSTANT(namespaceName, namePlural, abbreviation, definition)
+ * @brief		Like `UNIT_ADD`, but the constant name is plural, e.g. `5 * mins`
  * @sa			`UNIT_ADD`
  */
-#define UNIT_ADD_WITH_PLURAL_TAG(namespaceName, namePlural, abbreviation, /*definition*/...)                                                                   \
+#define UNIT_ADD_WITH_PLURAL_CONSTANT(namespaceName, namePlural, abbreviation, /*definition*/...)                                                              \
+	UNIT_ADD_STRONG_CONVERSION_FACTOR(namespaceName, namePlural, __VA_ARGS__)                                                                                  \
 	UNIT_ADD_UNIT_DEFINITION(namespaceName, namePlural, __VA_ARGS__)                                                                                           \
 	UNIT_ADD_NAME(namespaceName, namePlural, abbreviation)                                                                                                     \
-	UNIT_ADD_LITERALS(namespaceName, namePlural, abbreviation)
+	UNIT_ADD_LITERALS(namespaceName, namePlural, abbreviation)                                                                                                 \
+	UNIT_ADD_CONSTANT(namespaceName, namePlural, abbreviation##s)
 
 namespace wpi::units
 {
@@ -69,7 +71,7 @@ namespace wpi::units
 	 * @sa			See unit for more information on unit type containers.
 	 */
 	UNIT_ADD_WITH_METRIC_PREFIXES(time, seconds, s, conversion_factor<std::ratio<1>, dimension::time>)
-	UNIT_ADD_WITH_PLURAL_TAG(time, minutes, min, conversion_factor<std::ratio<60>, seconds_>)
+	UNIT_ADD_WITH_PLURAL_CONSTANT(time, minutes, min, conversion_factor<std::ratio<60>, seconds_>)
 	UNIT_ADD(time, hours, hr, conversion_factor<std::ratio<60>, minutes<>>)
 	UNIT_ADD(time, days, d, conversion_factor<std::ratio<24>, hours_>)
 	UNIT_ADD(time, weeks, wk, conversion_factor<std::ratio<7>, days_>)

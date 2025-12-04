@@ -1,0 +1,420 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joseph Eng <91924258+KangarooKoala@users.noreply.github.com>
+Date: Tue, 16 Dec 2025 14:52:27 -0800
+Subject: [PATCH 7/9] Use gcem for C++20 constexpr support
+
+---
+ include/units/angle.h | 56 ++++++++++++++--------------
+ include/units/core.h  | 86 +++++++++++++++++++++++++++++++++----------
+ 2 files changed, 96 insertions(+), 46 deletions(-)
+
+diff --git a/include/units/angle.h b/include/units/angle.h
+index 77bcd9311444f98e548ccefcc25150615350606a..263ff34ca8c60ef25f570a928434ff3fa7949694 100644
+--- a/include/units/angle.h
++++ b/include/units/angle.h
+@@ -46,6 +46,8 @@
+ #ifndef units_angle_h_
+ #define units_angle_h_
+ 
++#include <gcem.hpp>
++
+ #include <units/core.h>
+ 
+ namespace units
+@@ -85,9 +87,9 @@ namespace units
+ 	 * @returns		Returns the cosine of <i>angle</i>
+ 	 */
+ 	template<class AngleUnit, std::enable_if_t<traits::is_angle_unit_v<AngleUnit>, int> = 0>
+-	dimensionless<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>> cos(const AngleUnit angle) noexcept
++	constexpr dimensionless<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>> cos(const AngleUnit angle) noexcept
+ 	{
+-		return std::cos(convert<radians<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>>>(angle).value());
++		return gcem::cos(convert<radians<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>>>(angle).value());
+ 	}
+ 
+ 	/**
+@@ -99,9 +101,9 @@ namespace units
+ 	 * @returns		Returns the sine of <i>angle</i>
+ 	 */
+ 	template<class AngleUnit, std::enable_if_t<traits::is_angle_unit_v<AngleUnit>, int> = 0>
+-	dimensionless<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>> sin(const AngleUnit angle) noexcept
++	constexpr dimensionless<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>> sin(const AngleUnit angle) noexcept
+ 	{
+-		return std::sin(convert<radians<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>>>(angle).value());
++		return gcem::sin(convert<radians<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>>>(angle).value());
+ 	}
+ 	/**
+ 	 * @ingroup		UnitMath
+@@ -112,9 +114,9 @@ namespace units
+ 	 * @returns		Returns the tangent of <i>angle</i>
+ 	 */
+ 	template<class AngleUnit, std::enable_if_t<traits::is_angle_unit_v<AngleUnit>, int> = 0>
+-	dimensionless<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>> tan(const AngleUnit angle) noexcept
++	constexpr dimensionless<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>> tan(const AngleUnit angle) noexcept
+ 	{
+-		return std::tan(convert<radians<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>>>(angle).value());
++		return gcem::tan(convert<radians<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>>>(angle).value());
+ 	}
+ 
+ 	/**
+@@ -125,10 +127,10 @@ namespace units
+ 	 * @returns		Principal arc cosine of x, in the interval [0,pi] radians.
+ 	 */
+ 	template<class dimensionlessUnit, std::enable_if_t<traits::is_dimensionless_unit_v<dimensionlessUnit>, int> = 0>
+-	radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>> acos(const dimensionlessUnit x) noexcept
++	constexpr radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>> acos(const dimensionlessUnit x) noexcept
+ 	{
+ 		return radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>>(
+-			std::acos(x.template to<typename dimensionlessUnit::underlying_type>()));
++			gcem::acos(x.template to<typename dimensionlessUnit::underlying_type>()));
+ 	}
+ 
+ 	/**
+@@ -139,10 +141,10 @@ namespace units
+ 	 * @returns		Principal arc sine of x, in the interval [-pi/2,+pi/2] radians.
+ 	 */
+ 	template<class dimensionlessUnit, std::enable_if_t<traits::is_dimensionless_unit_v<dimensionlessUnit>, int> = 0>
+-	radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>> asin(const dimensionlessUnit x) noexcept
++	constexpr radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>> asin(const dimensionlessUnit x) noexcept
+ 	{
+ 		return radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>>(
+-			std::asin(x.template to<typename dimensionlessUnit::underlying_type>()));
++			gcem::asin(x.template to<typename dimensionlessUnit::underlying_type>()));
+ 	}
+ 
+ 	/**
+@@ -157,10 +159,10 @@ namespace units
+ 	 * @returns		Principal arc tangent of x, in the interval [-pi/2,+pi/2] radians.
+ 	 */
+ 	template<class dimensionlessUnit, std::enable_if_t<traits::is_dimensionless_unit_v<dimensionlessUnit>, int> = 0>
+-	radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>> atan(const dimensionlessUnit x) noexcept
++	constexpr radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>> atan(const dimensionlessUnit x) noexcept
+ 	{
+ 		return radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>>(
+-			std::atan(x.template to<typename dimensionlessUnit::underlying_type>()));
++			gcem::atan(x.template to<typename dimensionlessUnit::underlying_type>()));
+ 	}
+ 
+ 	/**
+@@ -173,12 +175,12 @@ namespace units
+ 	 * @returns		Returns the principal value of the arc tangent of <i>y/x</i>, expressed in radians.
+ 	 */
+ 	template<class Y, class X, std::enable_if_t<traits::is_dimensionless_unit_v<decltype(std::declval<Y>() / std::declval<X>())>, int> = 0>
+-	radians<detail::floating_point_promotion_t<std::common_type_t<typename X::underlying_type, typename Y::underlying_type>>> atan2(
++	constexpr radians<detail::floating_point_promotion_t<std::common_type_t<typename X::underlying_type, typename Y::underlying_type>>> atan2(
+ 		const Y y, const X x) noexcept
+ 	{
+ 		using CommonUnit = std::common_type_t<X, Y>;
+ 		// X and Y could be different length units, so normalize them
+-		return radians<detail::floating_point_promotion_t<typename CommonUnit::underlying_type>>(std::atan2(CommonUnit(y).value(), CommonUnit(x).value()));
++		return radians<detail::floating_point_promotion_t<typename CommonUnit::underlying_type>>(gcem::atan2(CommonUnit(y).value(), CommonUnit(x).value()));
+ 	}
+ 
+ 	//----------------------------------
+@@ -194,9 +196,9 @@ namespace units
+ 	 * @returns		Returns the hyperbolic cosine of <i>angle</i>
+ 	 */
+ 	template<class AngleUnit, std::enable_if_t<traits::is_angle_unit_v<AngleUnit>, int> = 0>
+-	dimensionless<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>> cosh(const AngleUnit angle) noexcept
++	constexpr dimensionless<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>> cosh(const AngleUnit angle) noexcept
+ 	{
+-		return std::cosh(convert<radians<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>>>(angle).value());
++		return gcem::cosh(convert<radians<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>>>(angle).value());
+ 	}
+ 
+ 	/**
+@@ -208,9 +210,9 @@ namespace units
+ 	 * @returns		Returns the hyperbolic sine of <i>angle</i>
+ 	 */
+ 	template<class AngleUnit, std::enable_if_t<traits::is_angle_unit_v<AngleUnit>, int> = 0>
+-	dimensionless<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>> sinh(const AngleUnit angle) noexcept
++	constexpr dimensionless<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>> sinh(const AngleUnit angle) noexcept
+ 	{
+-		return std::sinh(convert<radians<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>>>(angle).value());
++		return gcem::sinh(convert<radians<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>>>(angle).value());
+ 	}
+ 
+ 	/**
+@@ -222,9 +224,9 @@ namespace units
+ 	 * @returns		Returns the hyperbolic tangent of <i>angle</i>
+ 	 */
+ 	template<class AngleUnit, std::enable_if_t<traits::is_angle_unit_v<AngleUnit>, int> = 0>
+-	dimensionless<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>> tanh(const AngleUnit angle) noexcept
++	constexpr dimensionless<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>> tanh(const AngleUnit angle) noexcept
+ 	{
+-		return std::tanh(convert<radians<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>>>(angle).value());
++		return gcem::tanh(convert<radians<detail::floating_point_promotion_t<typename AngleUnit::underlying_type>>>(angle).value());
+ 	}
+ 
+ 	/**
+@@ -236,10 +238,10 @@ namespace units
+ 	 * @returns		Nonnegative arc hyperbolic cosine of x, in the interval [0,+INFINITY] radians.
+ 	 */
+ 	template<class dimensionlessUnit, std::enable_if_t<traits::is_dimensionless_unit_v<dimensionlessUnit>, int> = 0>
+-	radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>> acosh(const dimensionlessUnit x) noexcept
++	constexpr radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>> acosh(const dimensionlessUnit x) noexcept
+ 	{
+ 		return radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>>(
+-			std::acosh(x.template to<typename dimensionlessUnit::underlying_type>()));
++			gcem::acosh(x.template to<typename dimensionlessUnit::underlying_type>()));
+ 	}
+ 
+ 	/**
+@@ -250,10 +252,10 @@ namespace units
+ 	 * @returns		Arc hyperbolic sine of x, in radians.
+ 	 */
+ 	template<class dimensionlessUnit, std::enable_if_t<traits::is_dimensionless_unit_v<dimensionlessUnit>, int> = 0>
+-	radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>> asinh(const dimensionlessUnit x) noexcept
++	constexpr radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>> asinh(const dimensionlessUnit x) noexcept
+ 	{
+ 		return radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>>(
+-			std::asinh(x.template to<typename dimensionlessUnit::underlying_type>()));
++			gcem::asinh(x.template to<typename dimensionlessUnit::underlying_type>()));
+ 	}
+ 
+ 	/**
+@@ -266,11 +268,11 @@ namespace units
+ 	 * @returns		units::angle::radian
+ 	 */
+ 	template<class dimensionlessUnit, std::enable_if_t<traits::is_dimensionless_unit_v<dimensionlessUnit>, int> = 0>
+-	radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>> atanh(const dimensionlessUnit x) noexcept
++	constexpr radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>> atanh(const dimensionlessUnit x) noexcept
+ 	{
+ 		return radians<detail::floating_point_promotion_t<typename dimensionlessUnit::underlying_type>>(
+-			std::atanh(x.template to<typename dimensionlessUnit::underlying_type>()));
++			gcem::atanh(x.template to<typename dimensionlessUnit::underlying_type>()));
+ 	}
+ } // namespace units
+ 
+-#endif // units_angle_h_
+\ No newline at end of file
++#endif // units_angle_h_
+diff --git a/include/units/core.h b/include/units/core.h
+index 1462de86731e3ceb491d41fc53eb9b7e298ad4e5..b2a325a50e778f8480e3bdc6508a61598b2a2954 100644
+--- a/include/units/core.h
++++ b/include/units/core.h
+@@ -72,6 +72,8 @@
+ #include <fmt/format.h>
+ #endif // __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
+ 
++#include <gcem.hpp>
++
+ #if defined(UNIT_LIB_ENABLE_IOSTREAM) || __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
+ #include <clocale>
+ #include <string>
+@@ -3742,7 +3744,7 @@ namespace units
+ 	template<DimensionlessUnitType UnitType>
+ 	constexpr dimensionless<detail::floating_point_promotion_t<typename UnitType::underlying_type>> exp(const UnitType x) noexcept
+ 	{
+-		return std::exp(x.value());
++		return gcem::exp(x.value());
+ 	}
+ 
+ 	/**
+@@ -3757,7 +3759,7 @@ namespace units
+ 	template<DimensionlessUnitType UnitType>
+ 	constexpr dimensionless<detail::floating_point_promotion_t<typename UnitType::underlying_type>> log(const UnitType x) noexcept
+ 	{
+-		return std::log(x.value());
++		return gcem::log(x.value());
+ 	}
+ 
+ 	/**
+@@ -3771,7 +3773,7 @@ namespace units
+ 	template<DimensionlessUnitType UnitType>
+ 	constexpr dimensionless<detail::floating_point_promotion_t<typename UnitType::underlying_type>> log10(const UnitType x) noexcept
+ 	{
+-		return std::log10(x.value());
++		return gcem::log10(x.value());
+ 	}
+ 
+ 	/**
+@@ -3818,7 +3820,7 @@ namespace units
+ 	template<DimensionlessUnitType UnitType>
+ 	constexpr dimensionless<detail::floating_point_promotion_t<typename UnitType::underlying_type>> expm1(const UnitType x) noexcept
+ 	{
+-		return std::expm1(x.value());
++		return gcem::expm1(x.value());
+ 	}
+ 
+ 	/**
+@@ -3833,7 +3835,7 @@ namespace units
+ 	template<DimensionlessUnitType UnitType>
+ 	constexpr dimensionless<detail::floating_point_promotion_t<typename UnitType::underlying_type>> log1p(const UnitType x) noexcept
+ 	{
+-		return std::log1p(x.value());
++		return gcem::log1p(x.value());
+ 	}
+ 
+ 	/**
+@@ -3847,7 +3849,7 @@ namespace units
+ 	template<DimensionlessUnitType UnitType>
+ 	constexpr dimensionless<detail::floating_point_promotion_t<typename UnitType::underlying_type>> log2(const UnitType x) noexcept
+ 	{
+-		return std::log2(x.value());
++		return gcem::log2(x.value());
+ 	}
+ 
+ 	//----------------------------------
+@@ -3890,7 +3892,7 @@ namespace units
+ 	constexpr detail::floating_point_promotion_t<std::common_type_t<UnitTypeLhs, UnitTypeRhs>> hypot(const UnitTypeLhs& x, const UnitTypeRhs& y)
+ 	{
+ 		using CommonUnit = decltype(units::hypot(x, y));
+-		return CommonUnit(std::hypot(CommonUnit(x).value(), CommonUnit(y).value()));
++		return CommonUnit(gcem::hypot(CommonUnit(x).value(), CommonUnit(y).value()));
+ 	}
+ 
+ 	//----------------------------------
+@@ -3907,7 +3909,7 @@ namespace units
+ 	template<UnitType UnitType>
+ 	constexpr detail::floating_point_promotion_t<UnitType> ceil(const UnitType x) noexcept
+ 	{
+-		return detail::floating_point_promotion_t<UnitType>(std::ceil(x.value()));
++		return detail::floating_point_promotion_t<UnitType>(gcem::ceil(x.value()));
+ 	}
+ 
+ 	/**
+@@ -3920,7 +3922,7 @@ namespace units
+ 	template<UnitType UnitType>
+ 	constexpr detail::floating_point_promotion_t<UnitType> floor(const UnitType x) noexcept
+ 	{
+-		return detail::floating_point_promotion_t<UnitType>(std::floor(x.value()));
++		return detail::floating_point_promotion_t<UnitType>(gcem::floor(x.value()));
+ 	}
+ 
+ 	/**
+@@ -3936,7 +3938,7 @@ namespace units
+ 	constexpr detail::floating_point_promotion_t<std::common_type_t<UnitTypeLhs, UnitTypeRhs>> fmod(const UnitTypeLhs numer, const UnitTypeRhs denom) noexcept
+ 	{
+ 		using CommonUnit = decltype(units::fmod(numer, denom));
+-		return CommonUnit(std::fmod(CommonUnit(numer).value(), CommonUnit(denom).value()));
++		return CommonUnit(gcem::fmod(CommonUnit(numer).value(), CommonUnit(denom).value()));
+ 	}
+ 
+ 	/**
+@@ -3950,7 +3952,7 @@ namespace units
+ 	template<UnitType UnitType>
+ 	constexpr detail::floating_point_promotion_t<UnitType> trunc(const UnitType x) noexcept
+ 	{
+-		return detail::floating_point_promotion_t<UnitType>(std::trunc(x.value()));
++		return detail::floating_point_promotion_t<UnitType>(gcem::trunc(x.value()));
+ 	}
+ 
+ 	/**
+@@ -3964,7 +3966,7 @@ namespace units
+ 	template<UnitType UnitType>
+ 	constexpr detail::floating_point_promotion_t<UnitType> round(const UnitType x) noexcept
+ 	{
+-		return detail::floating_point_promotion_t<UnitType>(std::round(x.value()));
++		return detail::floating_point_promotion_t<UnitType>(gcem::round(x.value()));
+ 	}
+ 
+ 	//----------------------------------
+@@ -3983,14 +3985,14 @@ namespace units
+ 	template<UnitType UnitTypeLhs, UnitType UnitTypeRhs>
+ 	constexpr detail::floating_point_promotion_t<UnitTypeLhs> copysign(const UnitTypeLhs x, const UnitTypeRhs y) noexcept
+ 	{
+-		return detail::floating_point_promotion_t<UnitTypeLhs>(std::copysign(x.value(), y.value())); // no need for conversion to get the correct sign.
++		return detail::floating_point_promotion_t<UnitTypeLhs>(gcem::copysign(x.value(), y.value())); // no need for conversion to get the correct sign.
+ 	}
+ 
+ 	/// Overload to copy the sign from a raw double
+ 	template<UnitType UnitTypeLhs, ArithmeticType T>
+ 	constexpr detail::floating_point_promotion_t<UnitTypeLhs> copysign(const UnitTypeLhs x, const T& y) noexcept
+ 	{
+-		return detail::floating_point_promotion_t<UnitTypeLhs>(std::copysign(x.value(), y));
++		return detail::floating_point_promotion_t<UnitTypeLhs>(gcem::copysign(x.value(), y));
+ 	}
+ 
+ 	//----------------------------------
+@@ -4026,7 +4028,31 @@ namespace units
+ 	constexpr detail::floating_point_promotion_t<std::common_type_t<UnitTypeLhs, UnitTypeRhs>> fmax(const UnitTypeLhs x, const UnitTypeRhs y) noexcept
+ 	{
+ 		using CommonUnit = decltype(units::fmax(x, y));
+-		return CommonUnit(std::fmax(CommonUnit(x).value(), CommonUnit(y).value()));
++		if (std::is_constant_evaluated())
++		{
++			using UnderlyingType = CommonUnit::underlying_type;
++			UnderlyingType xval = CommonUnit(x).value();
++			UnderlyingType yval = CommonUnit(y).value();
++			// x is NaN, return y (whether or not y is NaN)
++			if (xval != xval)
++			{
++				return CommonUnit(yval);
++			}
++			// y is NaN, return x
++			else if (yval != yval)
++			{
++				return CommonUnit(xval);
++			}
++			// non-NaN values, safe to use normal max
++			else
++			{
++				return CommonUnit(gcem::max(xval, yval));
++			}
++		}
++		else
++		{
++			return CommonUnit(std::fmax(CommonUnit(x).value(), CommonUnit(y).value()));
++		}
+ 	}
+ 
+ 	/**
+@@ -4043,7 +4069,29 @@ namespace units
+ 	constexpr detail::floating_point_promotion_t<std::common_type_t<UnitTypeLhs, UnitTypeRhs>> fmin(const UnitTypeLhs x, const UnitTypeRhs y) noexcept
+ 	{
+ 		using CommonUnit = decltype(units::fmin(x, y));
+-		return CommonUnit(std::fmin(CommonUnit(x).value(), CommonUnit(y).value()));
++		if (std::is_constant_evaluated()) {
++			using UnderlyingType = CommonUnit::underlying_type;
++			UnderlyingType xval = CommonUnit(x).value();
++			UnderlyingType yval = CommonUnit(y).value();
++			// x is NaN, return y (whether or not y is NaN)
++			if (xval != xval)
++			{
++				return CommonUnit(yval);
++			}
++			// y is NaN, return x
++			else if (yval != yval)
++			{
++				return CommonUnit(xval);
++			}
++			// non-NaN values, safe to use normal min
++			{
++				return CommonUnit(gcem::min(xval, yval));
++			}
++		}
++		else
++		{
++			return CommonUnit(std::fmin(CommonUnit(x).value(), CommonUnit(y).value()));
++		}
+ 	}
+ 
+ 	//----------------------------------
+@@ -4060,7 +4108,7 @@ namespace units
+ 	template<UnitType UnitType>
+ 	constexpr detail::floating_point_promotion_t<UnitType> fabs(const UnitType x) noexcept
+ 	{
+-		return detail::floating_point_promotion_t<UnitType>(std::fabs(x.value()));
++		return detail::floating_point_promotion_t<UnitType>(gcem::fabs(x.value()));
+ 	}
+ 
+ 	/**
+@@ -4073,7 +4121,7 @@ namespace units
+ 	template<UnitType UnitType>
+ 	constexpr UnitType abs(const UnitType x) noexcept
+ 	{
+-		return UnitType(std::abs(x.value()));
++		return UnitType(gcem::abs(x.value()));
+ 	}
+ 
+ 	/**
+@@ -4252,7 +4300,7 @@ namespace std
+ 	template<units::ConversionFactorType ConversionFactor, units::ArithmeticType T, units::NumericalScaleType<T> NonLinearScale>
+ 	constexpr bool signbit(const units::unit<ConversionFactor, T, NonLinearScale>& x)
+ 	{
+-		return std::signbit(x());
++		return gcem::signbit(x());
+ 	}
+ } // namespace std
+ 

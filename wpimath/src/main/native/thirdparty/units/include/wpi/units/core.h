@@ -68,7 +68,13 @@
 #include <type_traits>
 #include <utility>
 
-#if !defined(UNIT_LIB_DISABLE_IOSTREAM)
+#if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
+#include <fmt/format.h>
+#endif // __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
+
+#include <gcem.hpp>
+
+#if defined(UNIT_LIB_ENABLE_IOSTREAM) || __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
 #include <clocale>
 #include <string>
 
@@ -100,7 +106,7 @@ namespace wpi::units::detail
 	}
 } // namespace wpi::units::detail
 
-#endif // !defined(UNIT_LIB_DISABLE_IOSTREAM)
+#endif // defined(UNIT_LIB_ENABLE_IOSTREAM) || __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
 
 //------------------------------
 //	FORWARD DECLARATIONS
@@ -319,11 +325,11 @@ namespace wpi::units
  */
 
 #define UNIT_ADD_DIMENSION_TRAIT(unitdimension)                                                                                                                                                        \
-	/** @ingroup	TypeTraits*/                                                                                                                                                                          \
-	/** @brief		`UnaryTypeTrait` for querying whether `T` represents a unit of unitdimension*/                                                                                                         \
-	/** @details	The base characteristic is a specialization of the template `std::bool_constant`.*/                                                                                                   \
-	/**				Use `is_ ## unitdimension ## _unit_v<T>` to test the unit represents a unitdimension quantity.*/                                                                                            \
-	/** @tparam		T	type to test*/                                                                                                                                                                      \
+	/** @ingroup	TypeTraits*/                                                                                                                                                                       \
+	/** @brief		`UnaryTypeTrait` for querying whether `T` represents a unit of unitdimension*/                                                                                                     \
+	/** @details	The base characteristic is a specialization of the template `std::bool_constant`.*/                                                                                                \
+	/**				Use `is_ ## unitdimension ## _unit_v<T>` to test the unit represents a unitdimension quantity.*/                                                                                   \
+	/** @tparam		T	type to test*/                                                                                                                                                                 \
 	namespace traits                                                                                                                                                                                   \
 	{                                                                                                                                                                                                  \
 		template<typename T>                                                                                                                                                                           \
@@ -332,7 +338,9 @@ namespace wpi::units
 		};                                                                                                                                                                                             \
 		template<typename T>                                                                                                                                                                           \
 		inline constexpr bool is_##unitdimension##_unit_v = is_##unitdimension##_unit<T>::value;                                                                                                       \
-	}
+	}                                                                                                                                                                                                  \
+	template<typename T>                                                                                                                                                                               \
+	concept unitdimension##_unit = traits::is_##unitdimension##_unit_v<T>;
 
 /**
  * @def			UNIT_ADD_WITH_METRIC_PREFIXES(namespaceName, namePlural, abbreviation, definition)
@@ -411,13 +419,19 @@ namespace wpi::units
 	//----------------------------------
 
 	/**
+	 * @defgroup	Units Unit API
+	 */
+
+	/**
 	 * @defgroup	UnitTypes Unit Types
+	 * @ingroup		Units
 	 * @brief		Defines a series of classes which contain dimensioned values. Unit types
 	 *				store a value, and support various arithmetic operations.
 	 */
 
 	/**
 	 * @defgroup	UnitManipulators Unit Manipulators
+	 * @ingroup		Units
 	 * @brief		Defines a series of classes used to manipulate unit types, such as `inverse<>`, `squared<>`, and
 	 *				metric prefixes. Unit manipulators can be chained together, e.g.
 	 *				`inverse<squared<pico<time::seconds>>>` to represent picoseconds^-2.
@@ -425,22 +439,26 @@ namespace wpi::units
 
 	/**
 	 * @defgroup	UnitMath Unit Math
+	 * @ingroup		Units
 	 * @brief		Defines a collection of unit-enabled, strongly-typed versions of `<cmath>` functions.
 	 * @details		Includes most c++11 extensions.
 	 */
 
 	/**
 	 * @defgroup	Conversion Explicit Conversion
+	 * @ingroup		Units
 	 * @brief		Functions used to convert values of one logical type to another.
 	 */
 
 	/**
 	 * @defgroup	TypeTraits Type Traits
+	 * @ingroup		Units
 	 * @brief		Defines a series of classes to obtain unit type information at compile-time.
 	 */
 
 	/**
 	 * @defgroup	STDTypeTraits Standard Type Traits Specializations
+	 * @ingroup		Units
 	 * @brief		Specialization of `std::common_type` for unit types.
 	 */
 
@@ -1067,6 +1085,7 @@ namespace wpi::units
 		using velocity                = dimension_divide<length, time>;                                                     ///< Represents an SI derived unit of velocity
 		using angular_velocity        = dimension_divide<angle, time>;                                                      ///< Represents an SI derived unit of angular velocity
 		using acceleration            = dimension_divide<velocity, time>;                                                   ///< Represents an SI derived unit of acceleration
+		using angular_acceleration    = dimension_divide<angular_velocity, time>;                                           ///< Represents an SI derived unit of angular acceleration
 		using force                   = dimension_multiply<mass, acceleration>;                                             ///< Represents an SI derived unit of force
 		using area                    = dimension_pow<length, std::ratio<2>>;                                               ///< Represents an SI derived unit of area
 		using volume                  = dimension_pow<length, std::ratio<3>>;                                               ///< Represents an SI derived unit of volume
@@ -1097,6 +1116,7 @@ namespace wpi::units
 
 		// OTHER UNIT TYPES
 		using jerk               = make_dimension<length, std::ratio<1>, time, std::ratio<-3>>;   ///< Represents an SI derived unit of jerk
+		using angular_jerk       = make_dimension<angle, std::ratio<1>, time, std::ratio<-3>>;    ///< Represents an SI derived unit of angular jerk
 		using torque             = dimension_multiply<force, length>;                             ///< Represents an SI derived unit of torque
 		using density            = dimension_divide<mass, volume>;                                ///< Represents an SI derived unit of density
 		using energy_density     = make_dimension<energy, std::ratio<1>, volume, std::ratio<-1>>; ///< Represents an SI derived unit of energy density
@@ -2037,7 +2057,7 @@ namespace wpi::units
 
 	namespace traits
 	{
-#ifdef FOR_DOXYGEN_PURPOSOES_ONLY
+#ifdef FOR_DOXYGEN_PURPOSES_ONLY
 		/**
 		 * @ingroup		TypeTraits
 		 * @brief		Trait for accessing the publicly defined types of `wpi::units::unit`
@@ -2583,7 +2603,7 @@ namespace wpi::units
 		return UnitType(value);
 	}
 
-#if !defined(UNIT_LIB_DISABLE_IOSTREAM)
+#if defined(UNIT_LIB_ENABLE_IOSTREAM)
 
 	//-----------------------------------------
 	//	OSTREAM OPERATOR FOR EPHEMERAL UNITS
@@ -2626,7 +2646,14 @@ namespace wpi::units
 		}
 		else
 		{
-			os << std::conditional_t<detail::is_losslessly_convertible_unit<std::decay_t<decltype(obj)>, BaseUnit>, BaseUnit, PromotedBaseUnit>(obj).raw();
+			if constexpr (detail::is_losslessly_convertible_unit<std::decay_t<decltype(obj)>, BaseUnit>)
+			{
+				os << BaseUnit(obj).raw();
+			}
+			else
+			{
+				os << PromotedBaseUnit(obj).raw();
+			}
 
 			using DimType = traits::dimension_of_t<ConversionFactor>;
 			if constexpr (!DimType::empty)
@@ -2637,7 +2664,9 @@ namespace wpi::units
 
 		return os;
 	}
+#endif // defined(UNIT_LIB_ENABLE_IOSTREAM)
 
+#if defined(UNIT_LIB_ENABLE_IOSTREAM) || __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
 	//----------------------------
 	//  to_string
 	//----------------------------
@@ -2667,7 +2696,7 @@ namespace wpi::units
 			return s;
 		}
 	}
-#endif
+#endif // defined(UNIT_LIB_ENABLE_IOSTREAM) || __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
 
 	//------------------------------
 	//	std::ratio helpers
@@ -2684,6 +2713,102 @@ namespace wpi::units
 	} // namespace detail
 	/** @endcond */ // END DOXYGEN IGNORE
 } // end namespace wpi::units
+
+#if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
+
+//-----------------------------
+//	FMT SUPPORT
+//-----------------------------
+
+template<class D, class E>
+struct fmt::formatter<wpi::units::dim<D, E>>
+{
+	template <typename ParseContext>
+	constexpr auto parse(ParseContext& ctx)
+	{
+		return ctx.begin();
+	}
+
+	template <typename FmtContext>
+	auto format(const wpi::units::dim<D, E>& obj, FmtContext& ctx) const
+	{
+		auto out = ctx.out();
+
+		if constexpr (E::num != 0)
+		{
+			out = fmt::format_to(out, " {}", D::abbreviation);
+		}
+		if constexpr (E::num != 0 && E::num != 1)
+		{
+			out = fmt::format_to(out, "^{}", E::num);
+		}
+		if constexpr (E::den != 1)
+		{
+			out = fmt::format_to(out, "/{}", E::den);
+		}
+
+		return out;
+	}
+};
+
+template<class... Dims>
+struct fmt::formatter<wpi::units::dimension_t<Dims...>>
+{
+	template <typename ParseContext>
+	constexpr auto parse(ParseContext& ctx)
+	{
+		return ctx.begin();
+	}
+
+	template <typename FmtContext>
+	auto format(const wpi::units::dimension_t<Dims...>&, FmtContext& ctx) const
+	{
+		auto out = ctx.out();
+		((out = fmt::format_to(out, "{}", Dims{})), ...);
+		return out;
+	}
+};
+
+template <wpi::units::ConversionFactorType ConversionFactor, wpi::units::ArithmeticType T, wpi::units::NumericalScaleType<T> NumericalScale>
+struct fmt::formatter<wpi::units::unit<ConversionFactor, T, NumericalScale>> : fmt::formatter<double>
+{
+	template <typename FmtContext>
+	auto format(const wpi::units::unit<ConversionFactor, T, NumericalScale>& obj, FmtContext& ctx) const
+	{
+		using BaseConversion   = wpi::units::conversion_factor<std::ratio<1>, typename ConversionFactor::dimension_type>;
+		using BaseUnit         = wpi::units::unit<BaseConversion, T, NumericalScale>;
+		using PromotedBaseUnit = wpi::units::unit<BaseConversion, wpi::units::detail::floating_point_promotion_t<T>, NumericalScale>;
+
+		auto out = ctx.out();
+
+		if constexpr (wpi::units::unit_abbreviation_v<wpi::units::unit<ConversionFactor, T, NumericalScale>>)
+		{
+			out = formatter<double>::format(obj.raw(), ctx);
+			out = fmt::format_to(out, " {}", obj.abbreviation());
+		}
+		else
+		{
+			if constexpr (wpi::units::detail::is_losslessly_convertible_unit<std::decay_t<decltype(obj)>, BaseUnit>)
+			{
+				out = formatter<double>::format(BaseUnit(obj).raw(), ctx);
+			}
+			else
+			{
+				out = formatter<double>::format(PromotedBaseUnit(obj).raw(), ctx);
+			}
+
+			using DimType = wpi::units::traits::dimension_of_t<ConversionFactor>;
+			if constexpr (!DimType::empty)
+			{
+				out = fmt::format_to(out, "{}", DimType{});
+			}
+		}
+
+		return out;
+	}
+};
+
+#endif // __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
 
 //------------------------------
 //	std::common_type
@@ -3496,7 +3621,7 @@ namespace wpi::units
 	UNIT_ADD_SCALED_UNIT_DEFINITION(decibels, ::wpi::units::decibel_scale, dimensionless_)
 	template<class Underlying>
 	using decibels = unit<dimensionless_, Underlying, decibel_scale>;
-#if !defined(UNIT_LIB_DISABLE_IOSTREAM)
+#if defined(UNIT_LIB_ENABLE_IOSTREAM)
 	template<class Underlying>
 	std::ostream& operator<<(std::ostream& os, const decibels<Underlying>& obj)
 	{
@@ -3619,7 +3744,7 @@ namespace wpi::units
 	template<DimensionlessUnitType UnitType>
 	constexpr dimensionless<detail::floating_point_promotion_t<typename UnitType::underlying_type>> exp(const UnitType x) noexcept
 	{
-		return std::exp(x.value());
+		return gcem::exp(x.value());
 	}
 
 	/**
@@ -3634,7 +3759,7 @@ namespace wpi::units
 	template<DimensionlessUnitType UnitType>
 	constexpr dimensionless<detail::floating_point_promotion_t<typename UnitType::underlying_type>> log(const UnitType x) noexcept
 	{
-		return std::log(x.value());
+		return gcem::log(x.value());
 	}
 
 	/**
@@ -3648,7 +3773,7 @@ namespace wpi::units
 	template<DimensionlessUnitType UnitType>
 	constexpr dimensionless<detail::floating_point_promotion_t<typename UnitType::underlying_type>> log10(const UnitType x) noexcept
 	{
-		return std::log10(x.value());
+		return gcem::log10(x.value());
 	}
 
 	/**
@@ -3695,7 +3820,7 @@ namespace wpi::units
 	template<DimensionlessUnitType UnitType>
 	constexpr dimensionless<detail::floating_point_promotion_t<typename UnitType::underlying_type>> expm1(const UnitType x) noexcept
 	{
-		return std::expm1(x.value());
+		return gcem::expm1(x.value());
 	}
 
 	/**
@@ -3710,7 +3835,7 @@ namespace wpi::units
 	template<DimensionlessUnitType UnitType>
 	constexpr dimensionless<detail::floating_point_promotion_t<typename UnitType::underlying_type>> log1p(const UnitType x) noexcept
 	{
-		return std::log1p(x.value());
+		return gcem::log1p(x.value());
 	}
 
 	/**
@@ -3724,7 +3849,7 @@ namespace wpi::units
 	template<DimensionlessUnitType UnitType>
 	constexpr dimensionless<detail::floating_point_promotion_t<typename UnitType::underlying_type>> log2(const UnitType x) noexcept
 	{
-		return std::log2(x.value());
+		return gcem::log2(x.value());
 	}
 
 	//----------------------------------
@@ -3767,7 +3892,7 @@ namespace wpi::units
 	constexpr detail::floating_point_promotion_t<std::common_type_t<UnitTypeLhs, UnitTypeRhs>> hypot(const UnitTypeLhs& x, const UnitTypeRhs& y)
 	{
 		using CommonUnit = decltype(wpi::units::hypot(x, y));
-		return CommonUnit(std::hypot(CommonUnit(x).value(), CommonUnit(y).value()));
+		return CommonUnit(gcem::hypot(CommonUnit(x).value(), CommonUnit(y).value()));
 	}
 
 	//----------------------------------
@@ -3784,7 +3909,7 @@ namespace wpi::units
 	template<UnitType UnitType>
 	constexpr detail::floating_point_promotion_t<UnitType> ceil(const UnitType x) noexcept
 	{
-		return detail::floating_point_promotion_t<UnitType>(std::ceil(x.value()));
+		return detail::floating_point_promotion_t<UnitType>(gcem::ceil(x.value()));
 	}
 
 	/**
@@ -3797,7 +3922,7 @@ namespace wpi::units
 	template<UnitType UnitType>
 	constexpr detail::floating_point_promotion_t<UnitType> floor(const UnitType x) noexcept
 	{
-		return detail::floating_point_promotion_t<UnitType>(std::floor(x.value()));
+		return detail::floating_point_promotion_t<UnitType>(gcem::floor(x.value()));
 	}
 
 	/**
@@ -3813,7 +3938,7 @@ namespace wpi::units
 	constexpr detail::floating_point_promotion_t<std::common_type_t<UnitTypeLhs, UnitTypeRhs>> fmod(const UnitTypeLhs numer, const UnitTypeRhs denom) noexcept
 	{
 		using CommonUnit = decltype(wpi::units::fmod(numer, denom));
-		return CommonUnit(std::fmod(CommonUnit(numer).value(), CommonUnit(denom).value()));
+		return CommonUnit(gcem::fmod(CommonUnit(numer).value(), CommonUnit(denom).value()));
 	}
 
 	/**
@@ -3827,7 +3952,7 @@ namespace wpi::units
 	template<UnitType UnitType>
 	constexpr detail::floating_point_promotion_t<UnitType> trunc(const UnitType x) noexcept
 	{
-		return detail::floating_point_promotion_t<UnitType>(std::trunc(x.value()));
+		return detail::floating_point_promotion_t<UnitType>(gcem::trunc(x.value()));
 	}
 
 	/**
@@ -3841,7 +3966,7 @@ namespace wpi::units
 	template<UnitType UnitType>
 	constexpr detail::floating_point_promotion_t<UnitType> round(const UnitType x) noexcept
 	{
-		return detail::floating_point_promotion_t<UnitType>(std::round(x.value()));
+		return detail::floating_point_promotion_t<UnitType>(gcem::round(x.value()));
 	}
 
 	//----------------------------------
@@ -3860,14 +3985,14 @@ namespace wpi::units
 	template<UnitType UnitTypeLhs, UnitType UnitTypeRhs>
 	constexpr detail::floating_point_promotion_t<UnitTypeLhs> copysign(const UnitTypeLhs x, const UnitTypeRhs y) noexcept
 	{
-		return detail::floating_point_promotion_t<UnitTypeLhs>(std::copysign(x.value(), y.value())); // no need for conversion to get the correct sign.
+		return detail::floating_point_promotion_t<UnitTypeLhs>(gcem::copysign(x.value(), y.value())); // no need for conversion to get the correct sign.
 	}
 
 	/// Overload to copy the sign from a raw double
 	template<UnitType UnitTypeLhs, ArithmeticType T>
 	constexpr detail::floating_point_promotion_t<UnitTypeLhs> copysign(const UnitTypeLhs x, const T& y) noexcept
 	{
-		return detail::floating_point_promotion_t<UnitTypeLhs>(std::copysign(x.value(), y));
+		return detail::floating_point_promotion_t<UnitTypeLhs>(gcem::copysign(x.value(), y));
 	}
 
 	//----------------------------------
@@ -3903,7 +4028,31 @@ namespace wpi::units
 	constexpr detail::floating_point_promotion_t<std::common_type_t<UnitTypeLhs, UnitTypeRhs>> fmax(const UnitTypeLhs x, const UnitTypeRhs y) noexcept
 	{
 		using CommonUnit = decltype(wpi::units::fmax(x, y));
-		return CommonUnit(std::fmax(CommonUnit(x).value(), CommonUnit(y).value()));
+		if (std::is_constant_evaluated())
+		{
+			using UnderlyingType = CommonUnit::underlying_type;
+			UnderlyingType xval = CommonUnit(x).value();
+			UnderlyingType yval = CommonUnit(y).value();
+			// x is NaN, return y (whether or not y is NaN)
+			if (xval != xval)
+			{
+				return CommonUnit(yval);
+			}
+			// y is NaN, return x
+			else if (yval != yval)
+			{
+				return CommonUnit(xval);
+			}
+			// non-NaN values, safe to use normal max
+			else
+			{
+				return CommonUnit(gcem::max(xval, yval));
+			}
+		}
+		else
+		{
+			return CommonUnit(std::fmax(CommonUnit(x).value(), CommonUnit(y).value()));
+		}
 	}
 
 	/**
@@ -3920,7 +4069,29 @@ namespace wpi::units
 	constexpr detail::floating_point_promotion_t<std::common_type_t<UnitTypeLhs, UnitTypeRhs>> fmin(const UnitTypeLhs x, const UnitTypeRhs y) noexcept
 	{
 		using CommonUnit = decltype(wpi::units::fmin(x, y));
-		return CommonUnit(std::fmin(CommonUnit(x).value(), CommonUnit(y).value()));
+		if (std::is_constant_evaluated()) {
+			using UnderlyingType = CommonUnit::underlying_type;
+			UnderlyingType xval = CommonUnit(x).value();
+			UnderlyingType yval = CommonUnit(y).value();
+			// x is NaN, return y (whether or not y is NaN)
+			if (xval != xval)
+			{
+				return CommonUnit(yval);
+			}
+			// y is NaN, return x
+			else if (yval != yval)
+			{
+				return CommonUnit(xval);
+			}
+			// non-NaN values, safe to use normal min
+			{
+				return CommonUnit(gcem::min(xval, yval));
+			}
+		}
+		else
+		{
+			return CommonUnit(std::fmin(CommonUnit(x).value(), CommonUnit(y).value()));
+		}
 	}
 
 	//----------------------------------
@@ -3937,7 +4108,7 @@ namespace wpi::units
 	template<UnitType UnitType>
 	constexpr detail::floating_point_promotion_t<UnitType> fabs(const UnitType x) noexcept
 	{
-		return detail::floating_point_promotion_t<UnitType>(std::fabs(x.value()));
+		return detail::floating_point_promotion_t<UnitType>(gcem::fabs(x.value()));
 	}
 
 	/**
@@ -3950,7 +4121,7 @@ namespace wpi::units
 	template<UnitType UnitType>
 	constexpr UnitType abs(const UnitType x) noexcept
 	{
-		return UnitType(std::abs(x.value()));
+		return UnitType(gcem::abs(x.value()));
 	}
 
 	/**
@@ -4009,6 +4180,22 @@ namespace wpi::units
 		return std::isunordered(lhs.value(), rhs.value());
 	}
 } // end namespace wpi::units
+
+#if __has_include(<fmt/format.h>) && !defined(UNITS_LIB_DISABLE_FMT)
+
+template<class Underlying>
+struct fmt::formatter<wpi::units::decibels<Underlying>> : fmt::formatter<double>
+{
+	template <typename FmtContext>
+	auto format(const wpi::units::decibels<Underlying>& obj, FmtContext& ctx) const
+	{
+		auto out = formatter<double>::format(obj.raw(), ctx);
+		out = fmt::format_to(out, " dB");
+		return out;
+	}
+};
+
+#endif // __has_include(<fmt/format.h>) && !defined(UNITS_LIB_DISABLE_FMT)
 
 //----------------------------------------------------------------------------------------------------------------------
 //      STD Namespace extensions
@@ -4113,7 +4300,7 @@ namespace std
 	template<wpi::units::ConversionFactorType ConversionFactor, wpi::units::ArithmeticType T, wpi::units::NumericalScaleType<T> NonLinearScale>
 	constexpr bool signbit(const wpi::units::unit<ConversionFactor, T, NonLinearScale>& x)
 	{
-		return std::signbit(x());
+		return gcem::signbit(x());
 	}
 } // namespace std
 
@@ -4193,6 +4380,11 @@ namespace wpi::units
 	}
 } // namespace wpi::units
 #endif
+#endif
+
+#ifndef UNIT_NO_LITERAL_SUPPORT
+namespace wpi::units::literals {}
+using namespace wpi::units::literals;
 #endif
 
 #endif // UNIT_CORE_H

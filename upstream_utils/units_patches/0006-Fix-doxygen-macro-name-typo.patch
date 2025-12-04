@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joseph Eng <91924258+KangarooKoala@users.noreply.github.com>
+Date: Fri, 12 Dec 2025 15:08:27 -0800
+Subject: [PATCH 6/9] Fix doxygen macro name typo
+
+---
+ include/units/core.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/units/core.h b/include/units/core.h
+index 98ab921a65ea5b81bd83eca3a13b5e522c0ea86b..1462de86731e3ceb491d41fc53eb9b7e298ad4e5 100644
+--- a/include/units/core.h
++++ b/include/units/core.h
+@@ -2055,7 +2055,7 @@ namespace units
+ 
+ 	namespace traits
+ 	{
+-#ifdef FOR_DOXYGEN_PURPOSOES_ONLY
++#ifdef FOR_DOXYGEN_PURPOSES_ONLY
+ 		/**
+ 		 * @ingroup		TypeTraits
+ 		 * @brief		Trait for accessing the publicly defined types of `units::unit`

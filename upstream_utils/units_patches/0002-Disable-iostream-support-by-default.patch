@@ -1,0 +1,49 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joseph Eng <91924258+KangarooKoala@users.noreply.github.com>
+Date: Wed, 3 Dec 2025 17:52:35 -0800
+Subject: [PATCH 2/9] Disable iostream support by default
+
+---
+ include/units/core.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/include/units/core.h b/include/units/core.h
+index c94d390e36e68312a8f1c9cc02a688534732427e..0e5b187ac1f32edfc8711abb07926d5ec4383852 100644
+--- a/include/units/core.h
++++ b/include/units/core.h
+@@ -68,7 +68,7 @@
+ #include <type_traits>
+ #include <utility>
+ 
+-#if !defined(UNIT_LIB_DISABLE_IOSTREAM)
++#if defined(UNIT_LIB_ENABLE_IOSTREAM)
+ #include <clocale>
+ #include <string>
+ 
+@@ -100,7 +100,7 @@ namespace units::detail
+ 	}
+ } // namespace units::detail
+ 
+-#endif // !defined(UNIT_LIB_DISABLE_IOSTREAM)
++#endif // defined(UNIT_LIB_ENABLE_IOSTREAM)
+ 
+ //------------------------------
+ //	FORWARD DECLARATIONS
+@@ -2585,7 +2585,7 @@ namespace units
+ 		return UnitType(value);
+ 	}
+ 
+-#if !defined(UNIT_LIB_DISABLE_IOSTREAM)
++#if defined(UNIT_LIB_ENABLE_IOSTREAM)
+ 
+ 	//-----------------------------------------
+ 	//	OSTREAM OPERATOR FOR EPHEMERAL UNITS
+@@ -3498,7 +3498,7 @@ namespace units
+ 	UNIT_ADD_SCALED_UNIT_DEFINITION(decibels, ::units::decibel_scale, dimensionless_)
+ 	template<class Underlying>
+ 	using decibels = unit<dimensionless_, Underlying, decibel_scale>;
+-#if !defined(UNIT_LIB_DISABLE_IOSTREAM)
++#if defined(UNIT_LIB_ENABLE_IOSTREAM)
+ 	template<class Underlying>
+ 	std::ostream& operator<<(std::ostream& os, const decibels<Underlying>& obj)
+ 	{

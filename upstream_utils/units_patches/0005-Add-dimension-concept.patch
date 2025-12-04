@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joseph Eng <91924258+KangarooKoala@users.noreply.github.com>
+Date: Thu, 11 Dec 2025 21:10:03 -0800
+Subject: [PATCH 5/9] Add dimension concept
+
+---
+ include/units/core.h | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/include/units/core.h b/include/units/core.h
+index e640b29825b1b319dfec91176eb6015e9c1a08ac..98ab921a65ea5b81bd83eca3a13b5e522c0ea86b 100644
+--- a/include/units/core.h
++++ b/include/units/core.h
+@@ -323,11 +323,11 @@ namespace units
+  */
+ 
+ #define UNIT_ADD_DIMENSION_TRAIT(unitdimension)                                                                                                                                                        \
+-	/** @ingroup	TypeTraits*/                                                                                                                                                                          \
+-	/** @brief		`UnaryTypeTrait` for querying whether `T` represents a unit of unitdimension*/                                                                                                         \
+-	/** @details	The base characteristic is a specialization of the template `std::bool_constant`.*/                                                                                                   \
+-	/**				Use `is_ ## unitdimension ## _unit_v<T>` to test the unit represents a unitdimension quantity.*/                                                                                            \
+-	/** @tparam		T	type to test*/                                                                                                                                                                      \
++	/** @ingroup	TypeTraits*/                                                                                                                                                                       \
++	/** @brief		`UnaryTypeTrait` for querying whether `T` represents a unit of unitdimension*/                                                                                                     \
++	/** @details	The base characteristic is a specialization of the template `std::bool_constant`.*/                                                                                                \
++	/**				Use `is_ ## unitdimension ## _unit_v<T>` to test the unit represents a unitdimension quantity.*/                                                                                   \
++	/** @tparam		T	type to test*/                                                                                                                                                                 \
+ 	namespace traits                                                                                                                                                                                   \
+ 	{                                                                                                                                                                                                  \
+ 		template<typename T>                                                                                                                                                                           \
+@@ -336,7 +336,9 @@ namespace units
+ 		};                                                                                                                                                                                             \
+ 		template<typename T>                                                                                                                                                                           \
+ 		inline constexpr bool is_##unitdimension##_unit_v = is_##unitdimension##_unit<T>::value;                                                                                                       \
+-	}
++	}                                                                                                                                                                                                  \
++	template<typename T>                                                                                                                                                                               \
++	concept unitdimension##_unit = traits::is_##unitdimension##_unit_v<T>;
+ 
+ /**
+  * @def			UNIT_ADD_WITH_METRIC_PREFIXES(namespaceName, namePlural, abbreviation, definition)
