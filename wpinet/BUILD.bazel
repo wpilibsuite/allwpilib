@@ -126,12 +126,15 @@ cc_library(
 wpilib_cc_library(
     name = "wpinet",
     srcs = glob(
-        ["src/main/native/cpp/**"],
+        ["src/main/native/cpp/**/*.cpp"],
         exclude = ["src/main/native/cpp/jni/**"],
     ) + [
         ":libuv-srcs",
     ] + ["native-srcs"],
-    hdrs = glob(["src/main/native/include/**/*"]),
+    hdrs = glob([
+        "src/main/native/include/**/*.h",
+        "src/main/native/include/**/*.hpp",
+    ]),
     extra_hdr_pkg_files = [":thirdparty-libuv-hdr-pkg"],
     extra_src_pkg_files = [
         ":wpinet-java-jni-hdrs-pkg",
