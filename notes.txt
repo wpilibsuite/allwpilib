@@ -1,0 +1,107 @@
+Our changes:
+ * Add copyright header, move into wpi namespace
+ * Disable iostream by default (https://github.com/wpilibsuite/allwpilib/pull/3481)
+ * Add curvature_t
+ * Add angular acceleration
+ * Add helper variables for traits?
+ * Constexprify unary operators?
+ * Add macro to disable fmtlib
+ * Add formatter? (Account for fmtlib 11.0.0 update)
+ * Group units doxygen modules?
+ * Add angular jerk
+ * Assume UNIT_HAS_VARIADIC_TEMPLATE_SUPPORT
+ * Define unit cateogry concept in UNIT_ADD_IS_UNIT_CATEGORY_TRAIT
+ * Make units math functions (and max and min) constexpr
+ * Define default #define for ADD_UNIT_IO
+ * Replace inline with constexpr
+ * Fix doxygen macro name typo
+ * Fix unit_t conversion constructor overload resolution
+
+Upstream changes:
+ * Format to_string() definition
+ * Move forward declaration section to top and add to it
+ * Replace UNIT_ADD_UNIT_TAGS with UNIT_ADD_STRONG_CONVERSION_FACTOR
+ * Change UNIT_ADD_UNIT_DEFINITION semantics
+ * Change from UNIT_LITERAL_SUPPORT to UNIT_NO_LITERAL_SUPPORT
+ * Add UNIT_ADD_CONSTANT
+ * Some other macro changes
+ * Remove UnitContainers and CompileTimeUnitManipulators doxygen groups
+ * Add STDTypeTraits doxygen group
+ * Add units::literals doc comment
+ * Add detection idiom section
+ * Match against std::ratio in is_ratio_v instead of duck type with num and den
+ * Remove void_t, bool_pack, and all_true
+ * Rename unit traits section to conversion factor traits section
+   * Rename unit_traits to conversion_factor_traits
+   * Rename unit_traits::base_unit_type to conversion_factor_traits::dimension_type
+ * Adjust wording of various doc comments
+ * Remove meter_ratio
+ * Add traits::invocable_scale and traits::is_numerical_scale[_v]
+ * Add concepts for various traits
+ * Add strong and strong_t
+ * Use concepts on template parameters instead of static_asserts
+ * Add constexpr math functions
+ * Add numeric limits specializations
+ * Add std::hash
+ * unit_t:
+   * Rename unit_t to unit
+   * Rename non_linear_scale to numerical_scale
+   * Remove constructor that forwards arguments to nls
+   * Add raw()
+   * Have .value() remove scaling factor for dimensionless units
+   * toLinearized() -> to_linearized()
+   * Add convert<>() to different underlying type
+   * Add linearized_type member
+
+TODO:
+ * DONE: Disable iostream by default
+ * DONE: Add curvature_t
+   * TODO Clarification about if we have both nholthaus and WPILib copyright headers
+ * DONE: Add angular acceleration
+   * TODO: Check if we should use sq or 2
+ * ~~Add helper variables for traits~~
+ * ~~Constexprify unary operators~~
+ * DONE: Add macro to disable fmtlib
+ * DONE: Add formatter (Account for fmtlib 11.0.0 update)
+ * DONE: Group units doxygen modules
+ * DONE: Add angular jerk
+   * TODO: Check if we should use cu or 3
+ * ~~Assume UNIT_HAS_VARIADIC_TEMPLATE_SUPPORT~~
+ * DONE: Define unit category concept in UNIT_ADD_IS_UNIT_CATEGORY_TRAIT
+ * ~~Make units math functions (and max and min) constexpr~~
+ * ~~Define default #define for ADD_UNIT_IO~~
+ * ~~Replace inline with constexpr~~
+ * DONE: Fix doxygen macro name typo
+ * ~~Fix unit_t conversion constructor overload resolution~~
+
+Only C++23 constexpr:
+ * modf (previously left non-constexpr)
+ * exp2 (previously left non-constexpr)
+ * fdim (previously left non-constexpr)
+ * fma (previously left non-constexpr)
+ * isnan (not previously provided)
+ * isinf (not previously provided)
+ * isfinite (not previously provided)
+ * isnormal (not previously provided)
+ * isunordered (not previously provided)
+
+Notes:
+ * units::meter_t -> units::meters<> (with CTAD to allow units::meters x;)
+ * astronoicalUnit -> astronomical_units (and similar for other length units)
+ * mbars -> millibars
+ * rads -> radiation_absorbed_dose
+ * mins has plural tag
+   * Seems like an old change that didn't get properly updated and eventually reverted as it should have
+ * cu_m to m3 (et al.)
+ * No more metric_tons (instead tonnes)
+ * name() is now plural
+ * name() for derived units now returns nullptr (instead of compiler error from undefined function)
+ * Check int literals
+
+TODO:
+ * Upstream some of our patches
+ * Investigate new v3.3.0 release
+ * Check IWYU issues
+ * Compile full list of changes to base.hpp/core.h
+ * Clean up git history
+ * Run format
