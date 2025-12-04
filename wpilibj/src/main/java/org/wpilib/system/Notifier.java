@@ -95,7 +95,7 @@ public class Notifier implements AutoCloseable {
                 }
 
                 // Acknowledge the alarm
-                NotifierJNI.acknowledgeNotifierAlarm(notifier);
+                NotifierJNI.acknowledgeNotifierAlarm(notifier, false, 0, 0, false);
               }
             });
     m_thread.setName("Notifier");

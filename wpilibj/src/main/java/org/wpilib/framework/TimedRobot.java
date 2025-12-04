@@ -139,14 +139,11 @@ public class TimedRobot extends IterativeRobotBase {
       // at the end of the loop.
       var callback = m_callbacks.poll();
 
-      NotifierJNI.setNotifierAlarm(m_notifier, callback.expirationTime, 0, true);
-
-      // Acknowledge previous alarm after setting the next one to avoid a race
-      // against getting the next notifier timeout in HALSIM StepTiming.
       if (first) {
         first = false;
+        NotifierJNI.setNotifierAlarm(m_notifier, callback.expirationTime, 0, true);
       } else {
-        NotifierJNI.acknowledgeNotifierAlarm(m_notifier);
+        NotifierJNI.acknowledgeNotifierAlarm(m_notifier, true, callback.expirationTime, 0, true);
       }
 
       try {

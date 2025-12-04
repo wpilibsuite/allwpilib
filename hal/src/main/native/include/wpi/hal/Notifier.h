@@ -103,13 +103,28 @@ void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle,
                              int32_t* status);
 
 /**
- * Indicates the notifier alarm has been serviced. This must be called before
- * waiting for the next alarm.
+ * Indicates the notifier alarm has been serviced and optionally sets a new
+ * alarm time. This must be called before waiting for the next alarm.
+ *
+ * The alarmTime is an absolute time (using the WPI_Now() time base) if
+ * absolute is true, or relative to the current time if absolute is false.
+ *
+ * If intervalTime is non-zero, the notifier will alarm periodically following
+ * alarmTime at the given interval.
+ *
+ * If an absolute alarmTime is in the past, the notifier will alarm immediately.
  *
  * @param[in] notifierHandle the notifier handle
+ * @param[in] setAlarm       true to set a new alarm time, false to leave the
+ *                           alarm unchanged
+ * @param[in] alarmTime      the first alarm time (in microseconds)
+ * @param[in] intervalTime   the periodic interval time (in microseconds)
+ * @param[in] absolute       true if the alarm time is absolute
  * @param[out] status Error status variable. 0 on success.
  */
 void HAL_AcknowledgeNotifierAlarm(HAL_NotifierHandle notifierHandle,
+                                  HAL_Bool setAlarm, uint64_t alarmTime,
+                                  uint64_t intervalTime, HAL_Bool absolute,
                                   int32_t* status);
 
 /**

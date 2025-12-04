@@ -120,7 +120,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
       m_watchdogs.remove(this);
       m_expirationTime = m_startTime + m_timeout;
       m_watchdogs.add(this);
-      updateAlarm();
+      updateAlarm(false);
     } finally {
       m_queueMutex.unlock();
     }
@@ -194,7 +194,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
       m_watchdogs.remove(this);
       m_expirationTime = m_startTime + m_timeout;
       m_watchdogs.add(this);
-      updateAlarm();
+      updateAlarm(false);
     } finally {
       m_queueMutex.unlock();
     }
@@ -205,7 +205,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     m_queueMutex.lock();
     try {
       m_watchdogs.remove(this);
-      updateAlarm();
+      updateAlarm(false);
     } finally {
       m_queueMutex.unlock();
     }
@@ -223,9 +223,12 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   }
 
   @SuppressWarnings("resource")
-  private static void updateAlarm() {
+  private static void updateAlarm(boolean acknowledge) {
     if (m_watchdogs.isEmpty()) {
       NotifierJNI.cancelNotifierAlarm(m_notifier);
+    } else if (acknowledge) {
+      NotifierJNI.acknowledgeNotifierAlarm(
+          m_notifier, true, (long) (m_watchdogs.peek().m_expirationTime * 1e6), 0, true);
     } else {
       NotifierJNI.setNotifierAlarm(
           m_notifier, (long) (m_watchdogs.peek().m_expirationTime * 1e6), 0, true);
@@ -277,9 +280,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
         watchdog.m_callback.run();
         m_queueMutex.lock();
 
-        updateAlarm();
-
-        NotifierJNI.acknowledgeNotifierAlarm(m_notifier);
+        updateAlarm(true);
       } finally {
         m_queueMutex.unlock();
       }

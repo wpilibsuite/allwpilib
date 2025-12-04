@@ -39,7 +39,7 @@ class Watchdog::Impl {
                             DerefGreater<Watchdog*>>
       m_watchdogs;
 
-  void UpdateAlarm();
+  void UpdateAlarm(bool acknowledge = false);
 
  private:
   void Main();
@@ -67,7 +67,7 @@ Watchdog::Impl::~Impl() {
   }
 }
 
-void Watchdog::Impl::UpdateAlarm() {
+void Watchdog::Impl::UpdateAlarm(bool acknowledge) {
   int32_t status = 0;
   // Return if we are being destructed, or were not created successfully
   auto notifier = m_notifier.load();
@@ -76,6 +76,12 @@ void Watchdog::Impl::UpdateAlarm() {
   }
   if (m_watchdogs.empty()) {
     HAL_CancelNotifierAlarm(notifier, &status);
+  } else if (acknowledge) {
+    HAL_AcknowledgeNotifierAlarm(
+        notifier, true,
+        static_cast<uint64_t>(m_watchdogs.top()->m_expirationTime.value() *
+                              1e6),
+        0, true, &status);
   } else {
     HAL_SetNotifierAlarm(notifier,
                          static_cast<uint64_t>(
@@ -125,9 +131,7 @@ void Watchdog::Impl::Main() {
     watchdog->m_callback();
     lock.lock();
 
-    UpdateAlarm();
-
-    HAL_AcknowledgeNotifierAlarm(notifier, &status);
+    UpdateAlarm(true);
   }
 }
 
