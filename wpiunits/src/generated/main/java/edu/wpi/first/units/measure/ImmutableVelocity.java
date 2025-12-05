@@ -9,7 +9,7 @@ package edu.wpi.first.units.measure;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 
-@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle"})
 public record ImmutableVelocity<D extends Unit>(double magnitude, double baseUnitMagnitude, VelocityUnit<D> unit) implements Velocity<D> {
   @Override
   public Velocity<D> copy() {

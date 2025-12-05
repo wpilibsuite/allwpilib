@@ -25,8 +25,7 @@ namespace frc2 {
  * std::unique_ptr<Command>, use CommandPtr::Unwrap to convert.
  * CommandPtr::UnwrapVector does the same for vectors.
  */
-class [[nodiscard]]
-CommandPtr final {
+class [[nodiscard]] CommandPtr final {
  public:
   explicit CommandPtr(std::unique_ptr<Command>&& command);
 
@@ -277,7 +276,10 @@ CommandPtr final {
 
   /**
    * Schedules this command.
+   *
+   * @deprecated Use CommandScheduler::GetInstance().Schedule() instead
    */
+  [[deprecated("Use CommandScheduler::GetInstance().Schedule() instead.")]]
   void Schedule() const&;
 
   // Prevent calls on a temporary, as the returned pointer would be invalid

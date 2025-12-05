@@ -244,8 +244,8 @@ bool XboxController::GetRightBumperReleased() {
 void XboxController::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("HID");
   builder.PublishConstString("ControllerType", "Xbox");
-  builder.AddDoubleProperty("LeftTrigger", [this] { return GetLeftTriggerAxis(); }, nullptr);
-  builder.AddDoubleProperty("RightTrigger", [this] { return GetRightTriggerAxis(); }, nullptr);
+  builder.AddDoubleProperty("LeftTrigger Axis", [this] { return GetLeftTriggerAxis(); }, nullptr);
+  builder.AddDoubleProperty("RightTrigger Axis", [this] { return GetRightTriggerAxis(); }, nullptr);
   builder.AddDoubleProperty("LeftX", [this] { return GetLeftX(); }, nullptr);
   builder.AddDoubleProperty("RightX", [this] { return GetRightX(); }, nullptr);
   builder.AddDoubleProperty("LeftY", [this] { return GetLeftY(); }, nullptr);

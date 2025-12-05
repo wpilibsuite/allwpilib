@@ -8,5 +8,6 @@ java_library(
         "//ntcore:networktables-java",
         "//wpiunits",
         "//wpiutil:wpiutil-java",
+        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
 )

@@ -53,7 +53,7 @@ class Config {
          std::optional<units::volt_t> stepVoltage,
          std::optional<units::second_t> timeout,
          std::function<void(frc::sysid::State)> recordState)
-      : m_recordState{recordState} {
+      : m_recordState{std::move(recordState)} {
     if (rampRate) {
       m_rampRate = rampRate.value();
     }

@@ -47,8 +47,10 @@ task cppHeadersZip(type: Zip) {
 }
 
 artifacts {
-    archives cppHeadersZip
-    archives cppSourcesZip
+    tasks.named("assemble") {
+        dependsOn(cppHeadersZip)
+        dependsOn(cppSourcesZip)
+    }
 }
 
 addTaskToCopyAllOutputs(cppSourcesZip)
@@ -67,8 +69,8 @@ model {
                 artifact cppSourcesZip
 
                 artifactId = "${baseArtifactId}-cpp"
-                groupId artifactGroupId
-                version wpilibVersioning.version.get()
+                groupId = artifactGroupId
+                version = wpilibVersioning.version.get()
             }
         }
     }

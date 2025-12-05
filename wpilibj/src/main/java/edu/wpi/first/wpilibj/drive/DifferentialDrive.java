@@ -265,8 +265,8 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
     // Square the inputs (while preserving the sign) to increase fine control
     // while permitting full power.
     if (squareInputs) {
-      xSpeed = Math.copySign(xSpeed * xSpeed, xSpeed);
-      zRotation = Math.copySign(zRotation * zRotation, zRotation);
+      xSpeed = MathUtil.copyDirectionPow(xSpeed, 2);
+      zRotation = MathUtil.copyDirectionPow(zRotation, 2);
     }
 
     double leftSpeed = xSpeed - zRotation;
@@ -340,8 +340,8 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
     // Square the inputs (while preserving the sign) to increase fine control
     // while permitting full power.
     if (squareInputs) {
-      leftSpeed = Math.copySign(leftSpeed * leftSpeed, leftSpeed);
-      rightSpeed = Math.copySign(rightSpeed * rightSpeed, rightSpeed);
+      leftSpeed = MathUtil.copyDirectionPow(leftSpeed, 2);
+      rightSpeed = MathUtil.copyDirectionPow(rightSpeed, 2);
     }
 
     return new WheelSpeeds(leftSpeed, rightSpeed);

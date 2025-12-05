@@ -435,7 +435,6 @@ public final class StructGenerator {
     }
 
     int size = 0;
-    boolean failed = false;
 
     for (final E constant : enumVariants) {
       final String name = constant.name();
@@ -451,6 +450,8 @@ public final class StructGenerator {
         List.of(allEnumFields).stream()
             .filter(f -> !f.isEnumConstant() && !Modifier.isStatic(f.getModifiers()))
             .toList();
+
+    boolean failed = false;
 
     for (final Field field : enumFields) {
       final Class<?> type = field.getType();

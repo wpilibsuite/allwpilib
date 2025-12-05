@@ -7,7 +7,6 @@
 package edu.wpi.first.networktables;
 
 /** NetworkTables timestamped Boolean. */
-@SuppressWarnings("PMD.ArrayIsStoredDirectly")
 public final class TimestampedBoolean {
   /**
    * Create a timestamped value.

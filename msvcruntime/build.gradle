@@ -1,6 +1,5 @@
 import org.gradle.nativeplatform.toolchain.internal.msvcpp.VisualStudioLocator
 import org.gradle.internal.os.OperatingSystem
-import org.gradle.util.VersionNumber
 
 plugins {
     id 'cpp'
@@ -69,8 +68,8 @@ if (OperatingSystem.current().isWindows()) {
                     artifact x64ZipTask
 
                     artifactId = "${baseArtifactId}"
-                    groupId artifactGroupId
-                    version wpilibVersioning.version.get()
+                    groupId = artifactGroupId
+                    version = wpilibVersioning.version.get()
                 }
             }
         }

@@ -177,6 +177,7 @@ static_assert(ValidType<uint8_t[]>);
 static_assert(ValidType<std::vector<uint8_t>>);
 
 template <ValidType T, NT_Type type>
+// NOLINTNEXTLINE(google-readability-casting)
 constexpr bool IsNTType = TypeInfo<std::remove_cvref_t<T>>::kType == type;
 
 static_assert(IsNTType<bool, NT_BOOLEAN>);

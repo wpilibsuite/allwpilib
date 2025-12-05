@@ -152,9 +152,10 @@ public class AprilTagFieldLayout {
     var pose =
         switch (origin) {
           case kBlueAllianceWallRightSide -> Pose3d.kZero;
-          case kRedAllianceWallRightSide -> new Pose3d(
-              new Translation3d(m_fieldDimensions.fieldLength, m_fieldDimensions.fieldWidth, 0),
-              new Rotation3d(0, 0, Math.PI));
+          case kRedAllianceWallRightSide ->
+              new Pose3d(
+                  new Translation3d(m_fieldDimensions.fieldLength, m_fieldDimensions.fieldWidth, 0),
+                  new Rotation3d(0, 0, Math.PI));
         };
     setOrigin(pose);
   }

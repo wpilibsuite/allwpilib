@@ -11,14 +11,11 @@
 
 int main() {
   auto inst = nt::GetDefaultInstance();
-  nt::AddLogger(
-      inst,
-      [](const nt::LogMessage& msg) {
-        std::fputs(msg.message.c_str(), stderr);
-        std::fputc('\n', stderr);
-      },
-      0, UINT_MAX);
-  nt::StartServer(inst, "persistent.ini", "", 10000);
+  nt::AddLogger(inst, 0, UINT_MAX, [](const nt::Event& event) {
+    std::fputs(event.GetLogMessage()->message.c_str(), stderr);
+    std::fputc('\n', stderr);
+  });
+  nt::StartServer(inst, "persistent.ini", "", 10000, 10001);
   std::this_thread::sleep_for(std::chrono::seconds(1));
 
   auto foo = nt::GetEntry(inst, "/foo");

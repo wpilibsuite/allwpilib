@@ -21,7 +21,9 @@ dependencies {
     implementation project(':hal')
     implementation project(':wpimath')
     implementation project(':wpilibj')
+    implementation project(':wpiannotations')
     testImplementation 'org.mockito:mockito-core:4.1.0'
+    annotationProcessor project(':javacPlugin')
 }
 
 sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"

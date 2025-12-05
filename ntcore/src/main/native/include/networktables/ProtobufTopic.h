@@ -7,9 +7,7 @@
 #include <stdint.h>
 
 #include <atomic>
-#include <concepts>
 #include <span>
-#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -207,7 +205,7 @@ class ProtobufPublisher : public Publisher {
   ProtobufPublisher(ProtobufPublisher&& rhs)
       : Publisher{std::move(rhs)},
         m_msg{std::move(rhs.m_msg)},
-        m_schemaPublished{rhs.m_schemaPublished} {}
+        m_schemaPublished{rhs.m_schemaPublished.load()} {}
 
   ProtobufPublisher& operator=(ProtobufPublisher&& rhs) {
     Publisher::operator=(std::move(rhs));

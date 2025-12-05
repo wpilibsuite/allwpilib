@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id "org.ysb33r.doxygen" version "1.0.4"
+    id "org.ysb33r.doxygen" version "2.0.0"
 }
 
 evaluationDependsOn(':apriltag')
@@ -9,6 +9,7 @@ evaluationDependsOn(':cscore')
 evaluationDependsOn(':epilogue-runtime')
 evaluationDependsOn(':hal')
 evaluationDependsOn(':ntcore')
+evaluationDependsOn(':wpiannotations')
 evaluationDependsOn(':wpilibNewCommands')
 evaluationDependsOn(':wpilibc')
 evaluationDependsOn(':wpilibj')
@@ -46,28 +47,41 @@ cppProjectZips.add(project(':romiVendordep').cppHeadersZip)
 cppProjectZips.add(project(':xrpVendordep').cppHeadersZip)
 
 doxygen {
-    // Doxygen binaries are only provided for x86_64 platforms
-    // Other platforms will need to provide doxygen via their system
-    // See below maven and https://doxygen.nl/download.html for provided binaries
-    // Ensure theme.css (from https://github.com/jothepro/doxygen-awesome-css) is compatible with
-    // doxygen version when updating
+    // Doxygen binaries are only provided for x86_64 platforms. Other platforms
+    // will need to use a local Doxygen install.
+    //
+    // executeByVersion() fetches Doxygen binaries from
+    // https://frcmaven.wpi.edu/ui/native/generic-release-mirror/doxygen/, which
+    // is a mirror of binaries from https://doxygen.nl/download.html.
+    //
+    // To mirror a new Doxygen version, retrigger the GitHub Actions workflow in
+    // https://github.com/wpilibsuite/doxygen-mirror with the desired version
+    // number as an input.
+    //
+    // Ensure theme.css (from https://github.com/jothepro/doxygen-awesome-css)
+    // is compatible with Doxygen version when updating.
+    executables {
+        doxygen {
+            // Note: has no effect if not on an x86_64 platform - you need to
+            // have a global install available on your PATH for the Doxygen
+            // plugin to run.
+            executableByVersion('1.12.0')
 
-    String arch = System.getProperty("os.arch");
-    if (arch.equals("x86_64") || arch.equals("amd64")) {
-        executables {
-            doxygen {
-                executableByVersion('1.12.0')
+            String arch = System.getProperty("os.arch");
+            if (!(arch.equals("x86_64") || arch.equals("amd64"))) {
+                // Search for a local Doxygen install
+                executableBySearchPath('doxygen')
             }
         }
     }
 }
 
-doxygen {
-    template 'Doxyfile'
+doxygen.sourceSets.main {
+    template = 'Doxyfile'
 
     cppProjectZips.each {
-        dependsOn it
-        source it.source
+        doxygenDox.dependsOn it
+        sources it.source
         it.ext.includeDirs.each {
             cppIncludeRoots.add(it.absolutePath)
         }
@@ -77,69 +91,19 @@ doxygen {
         // apriltag
         exclude 'apriltag_pose.h'
 
-        // Eigen
-        exclude 'Eigen/**'
-        exclude 'unsupported/**'
-
         // LLVM
-        exclude 'wpi/AlignOf.h'
-        exclude 'wpi/Casting.h'
-        exclude 'wpi/Chrono.h'
         exclude 'wpi/Compiler.h'
-        exclude 'wpi/ConvertUTF.h'
-        exclude 'wpi/DenseMap.h'
-        exclude 'wpi/DenseMapInfo.h'
-        exclude 'wpi/Endian.h'
-        exclude 'wpi/EpochTracker.h'
-        exclude 'wpi/Errc.h'
-        exclude 'wpi/Errno.h'
         exclude 'wpi/ErrorHandling.h'
         exclude 'wpi/bit.h'
-        exclude 'wpi/fs.h'
-        exclude 'wpi/FunctionExtras.h'
-        exclude 'wpi/function_ref.h'
-        exclude 'wpi/Hashing.h'
-        exclude 'wpi/iterator.h'
-        exclude 'wpi/iterator_range.h'
-        exclude 'wpi/ManagedStatic.h'
-        exclude 'wpi/MapVector.h'
-        exclude 'wpi/MathExtras.h'
-        exclude 'wpi/MemAlloc.h'
-        exclude 'wpi/PointerIntPair.h'
-        exclude 'wpi/PointerLikeTypeTraits.h'
-        exclude 'wpi/PointerUnion.h'
-        exclude 'wpi/raw_os_ostream.h'
         exclude 'wpi/raw_ostream.h'
-        exclude 'wpi/SmallPtrSet.h'
-        exclude 'wpi/SmallSet.h'
-        exclude 'wpi/SmallString.h'
         exclude 'wpi/SmallVector.h'
         exclude 'wpi/StringExtras.h'
-        exclude 'wpi/StringMap.h'
-        exclude 'wpi/SwapByteOrder.h'
-        exclude 'wpi/type_traits.h'
-        exclude 'wpi/VersionTuple.h'
-        exclude 'wpi/WindowsError.h'
-
-        // fmtlib
-        exclude 'fmt/**'
 
         // libuv
-        exclude 'uv.h'
         exclude 'uv/**'
-        exclude 'wpinet/uv/**'
 
         // json
-        exclude 'wpi/adl_serializer.h'
-        exclude 'wpi/byte_container_with_subtype.h'
         exclude 'wpi/detail/**'
-        exclude 'wpi/json.h'
-        exclude 'wpi/json_fwd.h'
-        exclude 'wpi/ordered_map.h'
-        exclude 'wpi/thirdparty/**'
-
-        // memory
-        exclude 'wpi/memory/**'
 
         // mpack
         exclude 'wpi/mpack.h'
@@ -171,8 +135,9 @@ doxygen {
 
 tasks.register("zipCppDocs", Zip) {
     archiveBaseName = zipBaseNameCpp
+    archiveVersion = ""
     destinationDirectory = outputsFolder
-    dependsOn doxygen
+    dependsOn doxygenDox
     from ("$buildDir/docs/doxygen/html")
     into '/'
 }
@@ -180,7 +145,7 @@ tasks.register("zipCppDocs", Zip) {
 // Java
 configurations {
     javaSource {
-        transitive false
+        transitive = false
     }
 }
 
@@ -209,6 +174,7 @@ task generateJavaDocs(type: Javadoc) {
             "-edu.wpi.first.math.system.plant.proto," +
             "-edu.wpi.first.math.system.plant.struct," +
             "-edu.wpi.first.math.trajectory.proto," +
+            "-edu.wpi.first.math.trajectory.struct," +
             // The .measure package contains generated source files for which automatic javadoc
             // generation is very difficult to do meaningfully.
             "-edu.wpi.first.units.measure", true)
@@ -222,6 +188,7 @@ task generateJavaDocs(type: Javadoc) {
     source project(':epilogue-runtime').sourceSets.main.java
     source project(':hal').sourceSets.main.java
     source project(':ntcore').sourceSets.main.java
+    source project(':wpiannotations').sourceSets.main.java
     source project(':wpilibNewCommands').sourceSets.main.java
     source project(':wpilibj').sourceSets.main.java
     source project(':wpimath').sourceSets.main.java
@@ -249,6 +216,7 @@ task generateJavaDocs(type: Javadoc) {
 
 tasks.register("zipJavaDocs", Zip) {
     archiveBaseName = zipBaseNameJava
+    archiveVersion = ""
     destinationDirectory = outputsFolder
     dependsOn generateJavaDocs
     from ("$buildDir/docs/javadoc")
@@ -268,15 +236,15 @@ publishing {
             artifact zipJavaDocs
 
             artifactId = "${baseArtifactIdJava}"
-            groupId artifactGroupIdJava
-            version wpilibVersioning.version.get()
+            groupId = artifactGroupIdJava
+            version = wpilibVersioning.version.get()
         }
         cpp(MavenPublication) {
             artifact zipCppDocs
 
             artifactId = "${baseArtifactIdCpp}"
-            groupId artifactGroupIdCpp
-            version wpilibVersioning.version.get()
+            groupId = artifactGroupIdCpp
+            version = wpilibVersioning.version.get()
         }
     }
 }

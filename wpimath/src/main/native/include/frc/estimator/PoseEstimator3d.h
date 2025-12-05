@@ -14,9 +14,10 @@
 #include <wpi/array.h>
 
 #include "frc/EigenCore.h"
-#include "frc/geometry/Pose2d.h"
-#include "frc/geometry/Rotation2d.h"
-#include "frc/geometry/Translation2d.h"
+#include "frc/geometry/Pose3d.h"
+#include "frc/geometry/Rotation3d.h"
+#include "frc/geometry/Transform3d.h"
+#include "frc/geometry/Translation3d.h"
 #include "frc/interpolation/TimeInterpolatableBuffer.h"
 #include "frc/kinematics/Kinematics.h"
 #include "frc/kinematics/Odometry3d.h"
@@ -270,26 +271,32 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
       return;
     }
 
-    // Step 4: Measure the twist between the old pose estimate and the vision
-    // pose.
-    auto twist = visionSample.value().Log(visionRobotPose);
+    // Step 4: Measure the transform between the old pose estimate and the
+    // vision pose.
+    auto transform = visionRobotPose - visionSample.value();
 
-    // Step 5: We should not trust the twist entirely, so instead we scale this
-    // twist by a Kalman gain matrix representing how much we trust vision
-    // measurements compared to our current pose.
-    frc::Vectord<6> k_times_twist =
-        m_visionK * frc::Vectord<6>{twist.dx.value(), twist.dy.value(),
-                                    twist.dz.value(), twist.rx.value(),
-                                    twist.ry.value(), twist.rz.value()};
+    // Step 5: We should not trust the transform entirely, so instead we scale
+    // this transform by a Kalman gain matrix representing how much we trust
+    // vision measurements compared to our current pose.
+    frc::Vectord<6> k_times_transform =
+        m_visionK * frc::Vectord<6>{transform.X().value(),
+                                    transform.Y().value(),
+                                    transform.Z().value(),
+                                    transform.Rotation().X().value(),
+                                    transform.Rotation().Y().value(),
+                                    transform.Rotation().Z().value()};
 
-    // Step 6: Convert back to Twist3d.
-    Twist3d scaledTwist{
-        units::meter_t{k_times_twist(0)},  units::meter_t{k_times_twist(1)},
-        units::meter_t{k_times_twist(2)},  units::radian_t{k_times_twist(3)},
-        units::radian_t{k_times_twist(4)}, units::radian_t{k_times_twist(5)}};
+    // Step 6: Convert back to Transform3d.
+    Transform3d scaledTransform{
+        units::meter_t{k_times_transform(0)},
+        units::meter_t{k_times_transform(1)},
+        units::meter_t{k_times_transform(2)},
+        Rotation3d{units::radian_t{k_times_transform(3)},
+                   units::radian_t{k_times_transform(4)},
+                   units::radian_t{k_times_transform(5)}}};
 
     // Step 7: Calculate and record the vision update.
-    VisionUpdate visionUpdate{visionSample->Exp(scaledTwist), *odometrySample};
+    VisionUpdate visionUpdate{*visionSample + scaledTransform, *odometrySample};
     m_visionUpdates[timestamp] = visionUpdate;
 
     // Step 8: Remove later vision measurements. (Matches previous behavior)

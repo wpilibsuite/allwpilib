@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
+import org.wpilib.annotation.NoDiscard;
 
 /**
  * A state machine representing a complete action to be performed by the robot. Commands are run by
@@ -27,6 +28,7 @@ import java.util.function.BooleanSupplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
+@NoDiscard("Commands must be used! Did you mean to bind it to a trigger?")
 public abstract class Command implements Sendable {
   /** Requirements set. */
   private final Set<Subsystem> m_requirements = new HashSet<>();
@@ -533,7 +535,12 @@ public abstract class Command implements Sendable {
         });
   }
 
-  /** Schedules this command. */
+  /**
+   * Schedules this command.
+   *
+   * @deprecated Use CommandScheduler.getInstance().schedule(Command...) instead
+   */
+  @Deprecated(since = "2025", forRemoval = true)
   public void schedule() {
     CommandScheduler.getInstance().schedule(this);
   }
@@ -610,7 +617,7 @@ public abstract class Command implements Sendable {
         value -> {
           if (value) {
             if (!isScheduled()) {
-              schedule();
+              CommandScheduler.getInstance().schedule(this);
             }
           } else {
             if (isScheduled()) {

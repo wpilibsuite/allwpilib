@@ -251,17 +251,17 @@ OLSResult CalculateFeedforwardGains(const Storage& data,
 
     if (type == analysis::kArm) {
       // dx/dt = -Kv/Ka x + 1/Ka u - Ks/Ka sgn(x)
-      //           - Kg/Ka cos(offset) cos(angle)                   NOLINT
-      //           + Kg/Ka sin(offset) sin(angle)                   NOLINT
-      // dx/dt = αx + βu + γ sgn(x) + δ cos(angle) + ε sin(angle)   NOLINT
+      //           - Kg/Ka cos(offset) cos(angle)
+      //           + Kg/Ka sin(offset) sin(angle)
+      // dx/dt = αx + βu + γ sgn(x) + δ cos(angle) + ε sin(angle)
 
       // δ = -Kg/Ka cos(offset)
       // ε = Kg/Ka sin(offset)
       double δ = ols.coeffs[3];
       double ε = ols.coeffs[4];
 
-      // Kg = hypot(δ, ε)/β      NOLINT
-      // offset = atan2(ε, -δ)   NOLINT
+      // Kg = hypot(δ, ε)/β
+      // offset = atan2(ε, -δ)
       gains.emplace_back(std::hypot(δ, ε) / β);
       gains.emplace_back(std::atan2(ε, -δ));
     }

@@ -20,7 +20,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 // CHECKSTYLE.OFF: EmptyCatchBlock
 
 /** This class is for the ADIS16470 IMU that connects to the RoboRIO SPI port. */
-@SuppressWarnings("PMD.RedundantFieldInitializer")
+@SuppressWarnings({"PMD.RedundantFieldInitializer", "PMD.UnusedPrivateField"})
 public class ADIS16470_IMU implements AutoCloseable, Sendable {
   /* ADIS16470 Register Map Declaration */
   private static final int FLASH_CNT = 0x00; // Flash memory write count

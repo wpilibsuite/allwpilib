@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include <algorithm>
+#include <initializer_list>
+#include <span>
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
@@ -429,8 +432,8 @@ constexpr Pose3d Pose3d::Exp(const Twist3d& twist) const {
       B = 1 / 2.0 - thetaSq / 24 + thetaSq * thetaSq / 720;
       C = 1 / 6.0 - thetaSq / 120 + thetaSq * thetaSq / 5040;
     } else {
-      // A = std::sin(θ)/θ
-      // B = (1 - std::cos(θ)) / θ²
+      // A = sin(θ)/θ
+      // B = (1 - cos(θ)) / θ²
       // C = (1 - A) / θ²
       A = gcem::sin(theta) / theta;
       B = (1 - gcem::cos(theta)) / thetaSq;
@@ -488,8 +491,8 @@ constexpr Twist3d Pose3d::Log(const Pose3d& end) const {
       // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5B1-Divide%5BDivide%5Bsin%5C%2840%29x%5C%2841%29%2Cx%5D%2C2Divide%5B1-cos%5C%2840%29x%5C%2841%29%2CPower%5Bx%2C2%5D%5D%5D%2CPower%5Bx%2C2%5D%5D+at+x%3D0
       C = 1 / 12.0 + thetaSq / 720 + thetaSq * thetaSq / 30240;
     } else {
-      // A = std::sin(θ)/θ
-      // B = (1 - std::cos(θ)) / θ²
+      // A = sin(θ)/θ
+      // B = (1 - cos(θ)) / θ²
       // C = (1 - A/(2*B)) / θ²
       double A = gcem::sin(theta) / theta;
       double B = (1 - gcem::cos(theta)) / thetaSq;

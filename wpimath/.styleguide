@@ -19,8 +19,6 @@ generatedFileExclude {
   src/main/native/include/unsupported/
   src/main/native/thirdparty/
   src/test/native/cpp/UnitsTest\.cpp$
-  src/test/native/cpp/drake/
-  src/test/native/include/drake/
   src/generated/main/java/edu/wpi/first/math/proto
   src/generated/main/native/cpp
 }
@@ -41,6 +39,7 @@ includeOtherLibs {
   ^gcem/
   ^google/
   ^gtest/
+  ^sleipnir/
   ^unsupported/
   ^wpi/
 }

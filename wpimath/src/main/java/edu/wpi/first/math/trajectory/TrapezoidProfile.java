@@ -6,6 +6,7 @@ package edu.wpi.first.math.trajectory;
 
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
+import edu.wpi.first.math.trajectory.struct.TrapezoidProfileStateStruct;
 import java.util.Objects;
 
 /**
@@ -60,10 +61,14 @@ public class TrapezoidProfile {
     /**
      * Constructs constraints for a TrapezoidProfile.
      *
-     * @param maxVelocity maximum velocity
-     * @param maxAcceleration maximum acceleration
+     * @param maxVelocity Maximum velocity, must be non-negative.
+     * @param maxAcceleration Maximum acceleration, must be non-negative.
      */
     public Constraints(double maxVelocity, double maxAcceleration) {
+      if (maxVelocity < 0.0 || maxAcceleration < 0.0) {
+        throw new IllegalArgumentException("Constraints must be non-negative");
+      }
+
       this.maxVelocity = maxVelocity;
       this.maxAcceleration = maxAcceleration;
       MathSharedStore.reportUsage(MathUsageId.kTrajectory_TrapezoidProfile, 1);
@@ -72,6 +77,9 @@ public class TrapezoidProfile {
 
   /** Profile state. */
   public static class State {
+    /** The struct used to serialize this class. */
+    public static final TrapezoidProfileStateStruct struct = new TrapezoidProfileStateStruct();
+
     /** The position at this state. */
     public double position;
 
@@ -128,8 +136,8 @@ public class TrapezoidProfile {
     m_current = direct(current);
     goal = direct(goal);
 
-    if (m_current.velocity > m_constraints.maxVelocity) {
-      m_current.velocity = m_constraints.maxVelocity;
+    if (Math.abs(m_current.velocity) > m_constraints.maxVelocity) {
+      m_current.velocity = Math.copySign(m_constraints.maxVelocity, m_current.velocity);
     }
 
     // Deal with a possibly truncated motion profile (with nonzero initial or
