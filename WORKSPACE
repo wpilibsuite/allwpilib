@@ -1,4 +1,4 @@
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file", "http_jar")
 load("//thirdparty/ceres:repositories.bzl", "ceres_repositories")
 
 ceres_repositories()
@@ -412,4 +412,10 @@ doxygen_repository(
         "1.15.0",
         "1.15.0",
     ],
+)
+
+http_jar(
+    name = "com_github_google_copybara",
+    integrity = "sha256-IHW6y6WXJFjX9RYD+IwVAMwAbEo36fLqonIKR+FaqpQ=",
+    urls = ["https://github.com/google/copybara/releases/download/v20251027/copybara_deploy.jar"],
 )
