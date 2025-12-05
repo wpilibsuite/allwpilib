@@ -103,9 +103,9 @@ public abstract class RobotBase implements AutoCloseable {
     // subscribe to "" to force persistent values to propagate to local
     m_suball = new MultiSubscriber(inst, new String[] {""});
     if (!isSimulation()) {
-      inst.startServer("/home/systemcore/networktables.json");
+      inst.startServer("/home/systemcore/networktables.json", "", "robot");
     } else {
-      inst.startServer();
+      inst.startServer("networktables.json", "", "robot");
     }
 
     // wait for the NT server to actually start

@@ -37,7 +37,7 @@ class TimeSyncTest {
     try (var poller = new NetworkTableListenerPoller(m_inst)) {
       poller.addTimeSyncListener(false);
 
-      m_inst.startServer("timesynctest.json", "127.0.0.1", 10030);
+      m_inst.startServer("timesynctest.json", "127.0.0.1", "", 10030);
       var offset = m_inst.getServerTimeOffset();
       assertTrue(offset.isPresent());
       assertEquals(0L, offset.getAsLong());
