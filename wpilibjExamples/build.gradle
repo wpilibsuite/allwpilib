@@ -22,10 +22,13 @@ dependencies {
     implementation project(':cscore')
     implementation project(':cameraserver')
     implementation project(':commandsv2')
+    implementation project(':commandsv3')
     implementation project(':romiVendordep')
     implementation project(':xrpVendordep')
     implementation project(':epilogue-runtime')
     annotationProcessor project(':epilogue-processor')
+    annotationProcessor project(':javacPlugin')
+    annotationProcessor project(':wpiannotations')
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.13.4'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
