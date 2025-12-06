@@ -16,6 +16,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.wpilib.hardware.hal.AllianceStationID;
 import org.wpilib.hardware.hal.HAL;
+import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.simulation.DIOSim;
 import org.wpilib.simulation.DriverStationSim;
 import org.wpilib.simulation.SimHooks;
@@ -88,7 +89,7 @@ class DigitalCommunicationTest {
   @ValueSource(booleans = {true, false})
   @ParameterizedTest(name = "autonomous[{index}]: {0}")
   void autonomousTest(boolean autonomous) {
-    DriverStationSim.setAutonomous(autonomous);
+    DriverStationSim.setRobotMode(autonomous ? RobotMode.AUTONOMOUS : RobotMode.TELEOPERATED);
     DriverStationSim.notifyNewData();
 
     assertTrue(m_autonomousOutput.getInitialized());

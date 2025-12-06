@@ -164,6 +164,7 @@ task generateJavaDocs(type: Javadoc) {
             "-org.wpilib.hardware.hal," +
             "-org.wpilib.hardware.hal.simulation," +
             // TODO: ^ Document these, then remove them from the list
+            "-org.wpilib.hardware.hal.struct," +
             "-org.wpilib.math.proto," +
             "-org.wpilib.math.struct," +
             "-org.wpilib.math.controller.proto," +

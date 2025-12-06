@@ -8,6 +8,7 @@
 #include <gtest/gtest.h>
 
 #include "Robot.hpp"
+#include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/simulation/I2CData.h"
 #include "wpi/simulation/DriverStationSim.hpp"
 #include "wpi/simulation/SimHooks.hpp"
@@ -130,7 +131,8 @@ class AutonomousTest : public I2CCommunicationTest<bool> {};
 
 TEST_P(AutonomousTest, Autonomous) {
   auto autonomous = GetParam();
-  wpi::sim::DriverStationSim::SetAutonomous(autonomous);
+  wpi::sim::DriverStationSim::SetRobotMode(
+      autonomous ? HAL_ROBOTMODE_AUTONOMOUS : HAL_ROBOTMODE_TELEOPERATED);
   wpi::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_TRUE(HALSIM_GetI2CInitialized(m_port));

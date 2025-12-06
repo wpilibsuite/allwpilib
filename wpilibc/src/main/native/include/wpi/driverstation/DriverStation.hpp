@@ -6,7 +6,9 @@
 
 #include <optional>
 #include <string>
+#include <string_view>
 
+#include "wpi/hal/DriverStation.h"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/units/time.hpp"
@@ -16,7 +18,13 @@ namespace wpi::log {
 class DataLog;
 }  // namespace wpi::log
 
+namespace wpi::util {
+class Color;
+}  // namespace wpi::util
+
 namespace wpi {
+
+using wpi::hal::RobotMode;
 
 /**
  * Provide access to the network communication data to / from the Driver
@@ -313,28 +321,41 @@ class DriverStation final {
    *
    * @return True if the robot is enabled and the DS is connected
    */
-  static bool IsEnabled();
+  static bool IsEnabled() {
+    hal::ControlWord controlWord = GetControlWord();
+    return controlWord.IsEnabled() && controlWord.IsDSAttached();
+  }
 
   /**
    * Check if the robot is disabled.
    *
    * @return True if the robot is explicitly disabled or the DS is not connected
    */
-  static bool IsDisabled();
+  static bool IsDisabled() { return !IsEnabled(); }
 
   /**
    * Check if the robot is e-stopped.
    *
    * @return True if the robot is e-stopped
    */
-  static bool IsEStopped();
+  static bool IsEStopped() { return GetControlWord().IsEStopped(); }
+
+  /**
+   * Gets the current robot mode.
+   *
+   * <p>Note that this does not indicate whether the robot is enabled or
+   * disabled.
+   *
+   * @return robot mode
+   */
+  static RobotMode GetRobotMode() { return GetControlWord().GetRobotMode(); }
 
   /**
    * Check if the DS is commanding autonomous mode.
    *
    * @return True if the robot is being commanded to be in autonomous mode
    */
-  static bool IsAutonomous();
+  static bool IsAutonomous() { return GetControlWord().IsAutonomous(); }
 
   /**
    * Check if the DS is commanding autonomous mode and if it has enabled the
@@ -343,14 +364,16 @@ class DriverStation final {
    * @return True if the robot is being commanded to be in autonomous mode and
    * enabled.
    */
-  static bool IsAutonomousEnabled();
+  static bool IsAutonomousEnabled() {
+    return GetControlWord().IsAutonomousEnabled();
+  }
 
   /**
    * Check if the DS is commanding teleop mode.
    *
    * @return True if the robot is being commanded to be in teleop mode
    */
-  static bool IsTeleop();
+  static bool IsTeleop() { return GetControlWord().IsTeleop(); }
 
   /**
    * Check if the DS is commanding teleop mode and if it has enabled the robot.
@@ -358,14 +381,14 @@ class DriverStation final {
    * @return True if the robot is being commanded to be in teleop mode and
    * enabled.
    */
-  static bool IsTeleopEnabled();
+  static bool IsTeleopEnabled() { return GetControlWord().IsTeleopEnabled(); }
 
   /**
    * Check if the DS is commanding test mode.
    *
    * @return True if the robot is being commanded to be in test mode
    */
-  static bool IsTest();
+  static bool IsTest() { return GetControlWord().IsTest(); }
 
   /**
    * Check if the DS is commanding Test mode and if it has enabled the robot.
@@ -373,14 +396,112 @@ class DriverStation final {
    * @return True if the robot is being commanded to be in Test mode and
    * enabled.
    */
-  static bool IsTestEnabled();
+  static bool IsTestEnabled() { return GetControlWord().IsTestEnabled(); }
+
+  /**
+   * Adds an operating mode option. It's necessary to call PublishOpModes() to
+   * make the added modes visible to the driver station.
+   *
+   * @param mode robot mode
+   * @param name name of the operating mode
+   * @param group group of the operating mode
+   * @param description description of the operating mode
+   * @param textColor text color
+   * @param backgroundColor background color
+   * @return unique ID used to later identify the operating mode; if a blank
+   * name is passed, 0 is returned; identical names for the same robot
+   * mode result in a 0 return value
+   */
+  static int64_t AddOpMode(RobotMode mode, std::string_view name,
+                           std::string_view group, std::string_view description,
+                           const wpi::util::Color& textColor,
+                           const wpi::util::Color& backgroundColor);
+
+  /**
+   * Adds an operating mode option. It's necessary to call PublishOpModes() to
+   * make the added modes visible to the driver station.
+   *
+   * @param mode robot mode
+   * @param name name of the operating mode
+   * @param group group of the operating mode
+   * @param description description of the operating mode
+   * @return unique ID used to later identify the operating mode; if a blank
+   * name is passed, 0 is returned; identical names for the same robot
+   * mode result in a 0 return value
+   */
+  static int64_t AddOpMode(RobotMode mode, std::string_view name,
+                           std::string_view group = {},
+                           std::string_view description = {});
+
+  /**
+   * Removes an operating mode option. It's necessary to call PublishOpModes()
+   * to make the removed mode no longer visible to the driver station.
+   *
+   * @param mode robot mode
+   * @param name name of the operating mode
+   * @return unique ID for the opmode, or 0 if not found
+   */
+  static int64_t RemoveOpMode(RobotMode mode, std::string_view name);
+
+  /**
+   * Publishes the operating mode options to the driver station.
+   */
+  static void PublishOpModes();
+
+  /**
+   * Clears all operating mode options and publishes an empty list to the driver
+   * station.
+   */
+  static void ClearOpModes();
+
+  /**
+   * Gets the operating mode selected on the driver station. Note this does not
+   * mean the robot is enabled; use IsEnabled() for that. In a match, this will
+   * indicate the operating mode selected for auto before the match starts
+   * (i.e., while the robot is disabled in auto mode); after the auto period
+   * ends, this will change to reflect the operating mode selected for teleop.
+   *
+   * @return the unique ID provided by the AddOpMode() function; may return 0 or
+   * a unique ID not added, so callers should be prepared to handle that case
+   */
+  static int64_t GetOpModeId() { return GetControlWord().GetOpModeId(); }
+
+  /**
+   * Gets the operating mode selected on the driver station. Note this does not
+   * mean the robot is enabled; use IsEnabled() for that. In a match, this will
+   * indicate the operating mode selected for auto before the match starts
+   * (i.e., while the robot is disabled in auto mode); after the auto period
+   * ends, this will change to reflect the operating mode selected for teleop.
+   *
+   * @return Operating mode string; may return a string not in the list of
+   * options, so callers should be prepared to handle that case
+   */
+  static std::string GetOpMode();
+
+  /**
+   * Check to see if the selected operating mode is a particular value. Note
+   * this does not mean the robot is enabled; use IsEnabled() for that.
+   *
+   * @param id operating mode unique ID
+   * @return True if that mode is the current mode
+   */
+  static bool IsOpMode(int64_t id) { return GetOpModeId() == id; }
+
+  /**
+   * Check to see if the selected operating mode is a particular value. Note
+   * this does not mean the robot is enabled; use IsEnabled() for that.
+   *
+   * @param mode operating mode
+   * @return True if that mode is the current mode
+   */
+  static bool IsOpMode(std::string_view mode) { return GetOpMode() == mode; }
 
   /**
    * Check if the DS is attached.
    *
    * @return True if the DS is connected to the robot
    */
-  static bool IsDSAttached();
+  static bool IsDSAttached() { return GetControlWord().IsDSAttached(); }
 
   /**
    * Is the driver station attached to a Field Management System?
@@ -388,7 +509,7 @@ class DriverStation final {
    * @return True if the robot is competing on a field being controlled by a
    *         Field Management System
    */
-  static bool IsFMSAttached();
+  static bool IsFMSAttached() { return GetControlWord().IsFMSAttached(); }
 
   /**
    * Returns the game specific message provided by the FMS.
@@ -481,6 +602,13 @@ class DriverStation final {
    * @return The battery voltage in Volts.
    */
   static double GetBatteryVoltage();
+
+  /**
+   * Get the current control word.
+   *
+   * @return control word
+   */
+  static hal::ControlWord GetControlWord() { return hal::GetControlWord(); }
 
   /**
    * Copy data from the DS task for the user. If no new data exists, it will

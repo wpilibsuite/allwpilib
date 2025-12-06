@@ -5,6 +5,8 @@
 #include <jni.h>
 
 #include <cassert>
+#include <utility>
+#include <vector>
 
 #include <fmt/format.h>
 
@@ -61,68 +63,77 @@ Java_org_wpilib_hardware_hal_DriverStationJNI_observeUserProgramStarting
 
 /*
  * Class:     org_wpilib_hardware_hal_DriverStationJNI
- * Method:    observeUserProgramDisabled
- * Signature: ()V
+ * Method:    observeUserProgram
+ * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_DriverStationJNI_observeUserProgramDisabled
-  (JNIEnv*, jclass)
+Java_org_wpilib_hardware_hal_DriverStationJNI_observeUserProgram
+  (JNIEnv*, jclass, jlong word)
 {
-  HAL_ObserveUserProgramDisabled();
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_DriverStationJNI
- * Method:    observeUserProgramAutonomous
- * Signature: ()V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_DriverStationJNI_observeUserProgramAutonomous
-  (JNIEnv*, jclass)
-{
-  HAL_ObserveUserProgramAutonomous();
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_DriverStationJNI
- * Method:    observeUserProgramTeleop
- * Signature: ()V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_DriverStationJNI_observeUserProgramTeleop
-  (JNIEnv*, jclass)
-{
-  HAL_ObserveUserProgramTeleop();
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_DriverStationJNI
- * Method:    observeUserProgramTest
- * Signature: ()V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_DriverStationJNI_observeUserProgramTest
-  (JNIEnv*, jclass)
-{
-  HAL_ObserveUserProgramTest();
+  HAL_ObserveUserProgram({.value = word});
 }
 
 /*
  * Class:     org_wpilib_hardware_hal_DriverStationJNI
  * Method:    nativeGetControlWord
- * Signature: ()I
+ * Signature: ()J
  */
-JNIEXPORT jint JNICALL
+JNIEXPORT jlong JNICALL
 Java_org_wpilib_hardware_hal_DriverStationJNI_nativeGetControlWord
   (JNIEnv*, jclass)
 {
-  static_assert(sizeof(HAL_ControlWord) == sizeof(jint),
+  static_assert(sizeof(HAL_ControlWord) == sizeof(jlong),
                 "Java int must match the size of control word");
   HAL_ControlWord controlWord;
   HAL_GetControlWord(&controlWord);
-  jint retVal = 0;
-  std::memcpy(&retVal, &controlWord, sizeof(HAL_ControlWord));
-  return retVal;
+  return controlWord.value;
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
+ * Method:    nativeGetUncachedControlWord
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL
+Java_org_wpilib_hardware_hal_DriverStationJNI_nativeGetUncachedControlWord
+  (JNIEnv*, jclass)
+{
+  static_assert(sizeof(HAL_ControlWord) == sizeof(jlong),
+                "Java int must match the size of control word");
+  HAL_ControlWord controlWord;
+  HAL_GetUncachedControlWord(&controlWord);
+  return controlWord.value;
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
+ * Method:    setOpModeOptions
+ * Signature: ([Ljava/lang/Object;)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_DriverStationJNI_setOpModeOptions
+  (JNIEnv* env, jclass, jobjectArray options)
+{
+  std::vector<HAL_OpModeOption> coptions;
+  if (options != nullptr) {
+    jsize length = env->GetArrayLength(options);
+    coptions.reserve(length);
+    for (jsize i = 0; i < length; i++) {
+      JLocal<jobject> option{env, env->GetObjectArrayElement(options, i)};
+      if (!option) {
+        ThrowIllegalArgumentException(env, "Null OpModeOption passed in array");
+        return;
+      }
+      auto coption = CreateOpModeOptionFromJava(env, option);
+      if (coption.id == 0) {
+        // exception thrown
+        return;
+      }
+      coptions.emplace_back(std::move(coption));
+    }
+  }
+  int32_t status = HAL_SetOpModeOptions(coptions.data(), coptions.size());
+  CheckStatusForceThrow(env, status);
 }
 
 /*

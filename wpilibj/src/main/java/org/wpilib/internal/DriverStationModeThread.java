@@ -5,101 +5,61 @@
 package org.wpilib.internal;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import org.wpilib.driverstation.DriverStation;
+import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.util.WPIUtilJNI;
 
 /** For internal use only. */
 public class DriverStationModeThread implements AutoCloseable {
-  private final AtomicBoolean m_keepAlive = new AtomicBoolean();
+  private final AtomicBoolean m_keepAlive = new AtomicBoolean(true);
+  private final AtomicLong m_userControlWord;
+  private final int m_handle = WPIUtilJNI.createEvent(false, false);
   private final Thread m_thread;
 
-  private boolean m_userInDisabled;
-  private boolean m_userInAutonomous;
-  private boolean m_userInTeleop;
-  private boolean m_userInTest;
-
-  /** Internal use only. */
-  public DriverStationModeThread() {
-    m_keepAlive.set(true);
+  /**
+   * Internal use only.
+   *
+   * @param word control word
+   */
+  public DriverStationModeThread(ControlWord word) {
+    m_userControlWord = new AtomicLong(word.getNative());
+    DriverStationJNI.provideNewDataEventHandle(m_handle);
     m_thread = new Thread(this::run, "DriverStationMode");
     m_thread.start();
   }
 
   private void run() {
-    int handle = WPIUtilJNI.createEvent(false, false);
-    DriverStationJNI.provideNewDataEventHandle(handle);
-
-    while (m_keepAlive.get()) {
+    while (true) {
       try {
-        WPIUtilJNI.waitForObjectTimeout(handle, 0.1);
+        WPIUtilJNI.waitForObjectTimeout(m_handle, 0.1);
       } catch (InterruptedException e) {
-        DriverStationJNI.removeNewDataEventHandle(handle);
-        WPIUtilJNI.destroyEvent(handle);
         Thread.currentThread().interrupt();
         return;
       }
+      if (!m_keepAlive.get()) {
+        return;
+      }
       DriverStation.refreshData();
-      if (m_userInDisabled) {
-        DriverStationJNI.observeUserProgramDisabled();
-      }
-      if (m_userInAutonomous) {
-        DriverStationJNI.observeUserProgramAutonomous();
-      }
-      if (m_userInTeleop) {
-        DriverStationJNI.observeUserProgramTeleop();
-      }
-      if (m_userInTest) {
-        DriverStationJNI.observeUserProgramTest();
-      }
+      DriverStationJNI.observeUserProgram(m_userControlWord.get());
     }
-
-    DriverStationJNI.removeNewDataEventHandle(handle);
-    WPIUtilJNI.destroyEvent(handle);
   }
 
   /**
    * Only to be used to tell the Driver Station what code you claim to be executing for diagnostic
    * purposes only.
    *
-   * @param entering If true, starting disabled code; if false, leaving disabled code
+   * @param word control word
    */
-  public void inDisabled(boolean entering) {
-    m_userInDisabled = entering;
-  }
-
-  /**
-   * Only to be used to tell the Driver Station what code you claim to be executing for diagnostic
-   * purposes only.
-   *
-   * @param entering If true, starting autonomous code; if false, leaving autonomous code
-   */
-  public void inAutonomous(boolean entering) {
-    m_userInAutonomous = entering;
-  }
-
-  /**
-   * Only to be used to tell the Driver Station what code you claim to be executing for diagnostic
-   * purposes only.
-   *
-   * @param entering If true, starting teleop code; if false, leaving teleop code
-   */
-  public void inTeleop(boolean entering) {
-    m_userInTeleop = entering;
-  }
-
-  /**
-   * Only to be used to tell the Driver Station what code you claim to be executing for diagnostic
-   * purposes only.
-   *
-   * @param entering If true, starting test code; if false, leaving test code
-   */
-  public void inTest(boolean entering) {
-    m_userInTest = entering;
+  public void inControl(ControlWord word) {
+    m_userControlWord.set(word.getNative());
   }
 
   @Override
   public void close() {
+    DriverStationJNI.removeNewDataEventHandle(m_handle);
+    WPIUtilJNI.destroyEvent(m_handle);
     m_keepAlive.set(false);
     try {
       m_thread.join();

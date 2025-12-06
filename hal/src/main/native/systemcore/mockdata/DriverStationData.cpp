@@ -4,6 +4,7 @@
 
 #include "wpi/hal/simulation/DriverStationData.h"
 
+#include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/simulation/SimDataValue.h"
 
 extern "C" {
@@ -14,14 +15,30 @@ void HALSIM_ResetDriverStationData(void) {}
                                      RETURN)
 
 DEFINE_CAPI(HAL_Bool, Enabled, false)
-DEFINE_CAPI(HAL_Bool, Autonomous, false)
-DEFINE_CAPI(HAL_Bool, Test, false)
+DEFINE_CAPI(HAL_RobotMode, RobotMode, HAL_ROBOTMODE_UNKNOWN)
 DEFINE_CAPI(HAL_Bool, EStop, false)
 DEFINE_CAPI(HAL_Bool, FmsAttached, false)
 DEFINE_CAPI(HAL_Bool, DsAttached, false)
 DEFINE_CAPI(HAL_AllianceStationID, AllianceStationId,
             HAL_AllianceStationID_kRed1)
 DEFINE_CAPI(double, MatchTime, 0)
+DEFINE_CAPI(int64_t, OpMode, 0)
+
+int32_t HALSIM_RegisterOpModeOptionsCallback(HAL_OpModeOptionsCallback callback,
+                                             void* param,
+                                             HAL_Bool initialNotify) {
+  return 0;
+}
+
+void HALSIM_CancelOpModeOptionsCallback(int32_t uid) {}
+
+struct HAL_OpModeOption* HALSIM_GetOpModeOptions(int32_t* len) {
+  *len = 0;
+  return nullptr;
+}
+
+void HALSIM_FreeOpModeOptionsArray(struct HAL_OpModeOption* arr,
+                                   size_t length) {}
 
 #undef DEFINE_CAPI
 #define DEFINE_CAPI(name, data)                                                \
