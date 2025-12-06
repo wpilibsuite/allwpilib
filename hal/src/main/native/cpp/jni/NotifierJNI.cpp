@@ -90,10 +90,9 @@ Java_org_wpilib_hardware_hal_NotifierJNI_setNotifierAlarm
    jlong intervalTime, jboolean absolute, jboolean ack)
 {
   int32_t status = 0;
-  HAL_SetNotifierAlarm((HAL_NotifierHandle)notifierHandle,
-                       static_cast<uint64_t>(alarmTime),
-                       static_cast<uint64_t>(intervalTime), absolute, ack,
-                       &status);
+  HAL_SetNotifierAlarm(
+      (HAL_NotifierHandle)notifierHandle, static_cast<uint64_t>(alarmTime),
+      static_cast<uint64_t>(intervalTime), absolute, ack, &status);
   CheckStatus(env, status);
 }
 

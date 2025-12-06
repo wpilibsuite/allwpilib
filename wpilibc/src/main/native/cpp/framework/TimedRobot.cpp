@@ -34,7 +34,7 @@ void TimedRobot::StartCompetition() {
 
     int32_t status = 0;
     HAL_SetNotifierAlarm(m_notifier, callback.expirationTime.count(), 0, true,
-                          true, &status);
+                         true, &status);
     WPILIB_CheckErrorStatus(status, "SetNotifierAlarm");
 
     if (WPI_WaitForObject(m_notifier) == 0) {
