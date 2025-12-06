@@ -23,7 +23,7 @@ LEDPattern::LEDPattern(std::function<void(frc::LEDPattern::LEDReader,
                                           std::function<void(int, frc::Color)>)>
                            impl)
     : m_impl(std::move(impl)) {
-  HAL_Report(HALUsageReporting::kResourceType_LEDPattern, 0);
+  HAL_Report(HALUsageReporting::kResourceType_LEDPattern, 1);
 }
 
 void LEDPattern::ApplyTo(LEDPattern::LEDReader reader,
