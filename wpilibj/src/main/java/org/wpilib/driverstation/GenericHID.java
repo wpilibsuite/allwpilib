@@ -469,8 +469,8 @@ public class GenericHID {
   }
 
   /**
-   * Set the rumble output for the HID. The DS currently supports 2 rumble values, left rumble and
-   * right rumble.
+   * Set the rumble output for the HID. The DS currently supports 4 rumble values: left rumble,
+   * right rumble, left trigger rumble, and right trigger rumble.
    *
    * @param type Which rumble value to set
    * @param value The normalized value (0 to 1) to set the rumble to
@@ -479,20 +479,13 @@ public class GenericHID {
     value = Math.clamp(value, 0, 1);
     int rumbleValue = (int) (value * 65535);
     switch (type) {
-      case kLeftRumble:
-        this.m_leftRumble = rumbleValue;
-        break;
-      case kRightRumble:
-        this.m_rightRumble = rumbleValue;
-        break;
-      case kLeftTriggerRumble:
-        this.m_leftTriggerRumble = rumbleValue;
-        break;
-      case kRightTriggerRumble:
-        this.m_rightTriggerRumble = rumbleValue;
-        break;
-      default:
-        break;
+      case kLeftRumble -> this.m_leftRumble = rumbleValue;
+      case kRightRumble -> this.m_rightRumble = rumbleValue;
+      case kLeftTriggerRumble -> this.m_leftTriggerRumble = rumbleValue;
+      case kRightTriggerRumble -> this.m_rightTriggerRumble = rumbleValue;
+      default -> {
+        // no-op
+      }
     }
 
     DriverStationJNI.setJoystickRumble(
