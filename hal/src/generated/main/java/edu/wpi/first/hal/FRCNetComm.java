@@ -287,10 +287,10 @@ public final class FRCNetComm {
     public static final int kResourceType_PoseEstimator3d = 132;
     /** kResourceType_LinearSystemLoop = 133. */
     public static final int kResourceType_LinearSystemLoop = 133;
-    /** kResourceType_LumenLabs_ConnectorX = 134. */
-    public static final int kResourceType_LumenLabs_ConnectorX = 134;
-    /** kResourceType_LumenLabs_ConnectorXLED = 135. */
-    public static final int kResourceType_LumenLabs_ConnectorXLED = 135;
+    /** kResourceType_LumynLabs_ConnectorX = 134. */
+    public static final int kResourceType_LumynLabs_ConnectorX = 134;
+    /** kResourceType_LumynLabs_ConnectorXAnimate = 135. */
+    public static final int kResourceType_LumynLabs_ConnectorXAnimate = 135;
   }
 
   /**
