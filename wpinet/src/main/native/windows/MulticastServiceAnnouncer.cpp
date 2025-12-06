@@ -22,6 +22,8 @@
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/StringExtras.hpp"
 
+#pragma comment(lib, "dnsapi")
+
 using namespace wpi::net;
 
 struct ImplBase {
