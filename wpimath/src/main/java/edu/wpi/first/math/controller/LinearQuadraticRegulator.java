@@ -127,7 +127,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
 
     reset();
     MathSharedStore.getMathShared()
-        .reportUsage(MathUsageId.kController_LinearQuadraticRegulator, 0);
+        .reportUsage(MathUsageId.kController_LinearQuadraticRegulator, 1);
   }
 
   /**
