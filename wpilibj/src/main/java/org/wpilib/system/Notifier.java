@@ -95,7 +95,7 @@ public class Notifier implements AutoCloseable {
                 }
 
                 // Acknowledge the alarm
-                NotifierJNI.acknowledgeNotifierAlarm(notifier, false, 0, 0, false);
+                NotifierJNI.acknowledgeNotifierAlarm(notifier);
               }
             });
     m_thread.setName("Notifier");
@@ -148,7 +148,7 @@ public class Notifier implements AutoCloseable {
    * @param delay Time in seconds to wait before the callback is called.
    */
   public void startSingle(double delay) {
-    NotifierJNI.setNotifierAlarm(m_notifier.get(), (long) (delay * 1e6), 0, false);
+    NotifierJNI.setNotifierAlarm(m_notifier.get(), (long) (delay * 1e6), 0, false, false);
   }
 
   /**
@@ -171,7 +171,7 @@ public class Notifier implements AutoCloseable {
    */
   public void startPeriodic(double period) {
     long periodMicroS = (long) (period * 1e6);
-    NotifierJNI.setNotifierAlarm(m_notifier.get(), periodMicroS, periodMicroS, false);
+    NotifierJNI.setNotifierAlarm(m_notifier.get(), periodMicroS, periodMicroS, false, false);
   }
 
   /**
@@ -205,12 +205,9 @@ public class Notifier implements AutoCloseable {
    *
    * <p>No further periodic callbacks will occur. Single invocations will also be cancelled if they
    * haven't yet occurred.
-   *
-   * <p>If a callback invocation is in progress, this function will block until the callback is
-   * complete.
    */
   public void stop() {
-    NotifierJNI.cancelNotifierAlarm(m_notifier.get());
+    NotifierJNI.cancelNotifierAlarm(m_notifier.get(), false);
   }
 
   /**

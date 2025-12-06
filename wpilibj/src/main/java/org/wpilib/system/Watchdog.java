@@ -225,13 +225,10 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   @SuppressWarnings("resource")
   private static void updateAlarm(boolean acknowledge) {
     if (m_watchdogs.isEmpty()) {
-      NotifierJNI.cancelNotifierAlarm(m_notifier);
-    } else if (acknowledge) {
-      NotifierJNI.acknowledgeNotifierAlarm(
-          m_notifier, true, (long) (m_watchdogs.peek().m_expirationTime * 1e6), 0, true);
+      NotifierJNI.cancelNotifierAlarm(m_notifier, acknowledge);
     } else {
       NotifierJNI.setNotifierAlarm(
-          m_notifier, (long) (m_watchdogs.peek().m_expirationTime * 1e6), 0, true);
+          m_notifier, (long) (m_watchdogs.peek().m_expirationTime * 1e6), 0, true, acknowledge);
     }
   }
 
