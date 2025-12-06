@@ -126,6 +126,16 @@ public abstract class RobotBase implements AutoCloseable {
                   HAL.report(tResourceType.kResourceType_BangBangController, count);
               case kTrajectory_PathWeaver ->
                   HAL.report(tResourceType.kResourceType_PathWeaverTrajectory, count);
+              case kController_LinearQuadraticRegulator ->
+                  HAL.report(tResourceType.kResourceType_LinearQuadraticRegulator, count);
+              case kEstimator_KalmanFilter ->
+                  HAL.report(tResourceType.kResourceType_KalmanFilter, count);
+              case kEstimator_PoseEstimator ->
+                  HAL.report(tResourceType.kResourceType_PoseEstimator, count);
+              case kEstimator_PoseEstimator3d ->
+                  HAL.report(tResourceType.kResourceType_PoseEstimator3d, count);
+              case kSystem_LinearSystemLoop ->
+                  HAL.report(tResourceType.kResourceType_LinearSystemLoop, count);
               default -> {
                 // NOP
               }

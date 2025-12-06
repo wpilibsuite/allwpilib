@@ -4,6 +4,8 @@
 
 package edu.wpi.first.math.estimator;
 
+import edu.wpi.first.math.MathSharedStore;
+import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
@@ -163,6 +165,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     m_pts = new MerweScaledSigmaPoints<>(states);
 
     reset();
+    MathSharedStore.getMathShared().reportUsage(MathUsageId.kEstimator_KalmanFilter, 3);
   }
 
   static <S extends Num, C extends Num>
