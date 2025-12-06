@@ -1,0 +1,184 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Mon, 3 Nov 2025 19:48:09 -0500
+Subject: [PATCH 17/34] HAND FIXES: Fixup remaining rename issues
+
+---
+ cameraserver/multiCameraServer/BUILD.bazel    |  4 +-
+ cameraserver/multiCameraServer/build.gradle   |  2 +-
+ .../java/{edu/wpi => org/wpilib}/Main.java    |  2 +-
+ .../javax.annotation.processing.Processor     |  2 +-
+ ntcore/BUILD.bazel                            |  4 +-
+ ntcore/build.gradle                           |  2 +-
+ .../wpilib/networktables}/DevMain.java        |  3 +-
+ .../org/wpilib/opmode/TimesliceRobot.java     |  5 ++-
+ .../edu/wpi/first/math/util/ColorTest.java    | 45 -------------------
+ 9 files changed, 12 insertions(+), 57 deletions(-)
+ rename cameraserver/multiCameraServer/src/main/java/{edu/wpi => org/wpilib}/Main.java (99%)
+ rename ntcore/src/dev/java/{edu/wpi/first/ntcore => org/wpilib/networktables}/DevMain.java (87%)
+ delete mode 100644 wpilibj/src/test/java/edu/wpi/first/math/util/ColorTest.java
+
+diff --git a/cameraserver/multiCameraServer/BUILD.bazel b/cameraserver/multiCameraServer/BUILD.bazel
+index 9716e1bb4474b4973564b1ee4e4845c6e26098c9..bcc2105da50745f735c795346b83bc566808434f 100644
+--- a/cameraserver/multiCameraServer/BUILD.bazel
++++ b/cameraserver/multiCameraServer/BUILD.bazel
+@@ -2,8 +2,8 @@ load("@rules_java//java:defs.bzl", "java_binary")
+ 
+ java_binary(
+     name = "multiCameraServer-java",
+-    srcs = ["src/main/java/edu/wpi/Main.java"],
+-    main_class = "edu.wpi.Main",
++    srcs = ["src/main/java/org/wpilib/Main.java"],
++    main_class = "org.wpilib.Main",
+     deps = [
+         "//cameraserver:cameraserver-java",
+         "//cscore:cscore-java",
+diff --git a/cameraserver/multiCameraServer/build.gradle b/cameraserver/multiCameraServer/build.gradle
+index 4173396371f801610acc0e12752afc31baac5010..3412f0e964deda81ced8efc21baba993f17eba96 100644
+--- a/cameraserver/multiCameraServer/build.gradle
++++ b/cameraserver/multiCameraServer/build.gradle
+@@ -19,7 +19,7 @@ ext {
+ apply from: "${rootDir}/shared/opencv.gradle"
+ 
+ application {
+-    mainClass = 'edu.wpi.Main'
++    mainClass = 'org.wpilib.Main'
+ }
+ 
+ apply plugin: 'com.gradleup.shadow'
+diff --git a/cameraserver/multiCameraServer/src/main/java/edu/wpi/Main.java b/cameraserver/multiCameraServer/src/main/java/org/wpilib/Main.java
+similarity index 99%
+rename from cameraserver/multiCameraServer/src/main/java/edu/wpi/Main.java
+rename to cameraserver/multiCameraServer/src/main/java/org/wpilib/Main.java
+index 7cad5b4611cbe05fd8a486fdb04ed899a7530452..0bb8293daf846571fa579be06776f40bd3b89a6c 100644
+--- a/cameraserver/multiCameraServer/src/main/java/edu/wpi/Main.java
++++ b/cameraserver/multiCameraServer/src/main/java/org/wpilib/Main.java
+@@ -2,7 +2,7 @@
+ // Open Source Software; you can modify and/or share it under the terms of
+ // the WPILib BSD license file in the root directory of this project.
+ 
+-package edu.wpi;
++package org.wpilib;
+ 
+ import com.google.gson.Gson;
+ import com.google.gson.GsonBuilder;
+diff --git a/epilogue-processor/src/main/resources/META-INF/services/javax.annotation.processing.Processor b/epilogue-processor/src/main/resources/META-INF/services/javax.annotation.processing.Processor
+index 517389600ea6416d7ab885017ee1ec2ea3b4ad7c..0a303b352b3e677549d1b7ed0d08d885774f45bf 100644
+--- a/epilogue-processor/src/main/resources/META-INF/services/javax.annotation.processing.Processor
++++ b/epilogue-processor/src/main/resources/META-INF/services/javax.annotation.processing.Processor
+@@ -1 +1 @@
+-edu.wpi.first.epilogue.processor.AnnotationProcessor
++org.wpilib.epilogue.processor.AnnotationProcessor
+diff --git a/ntcore/BUILD.bazel b/ntcore/BUILD.bazel
+index d279e644f55d1c59bf2f554feb00a7929961744a..d57ee8f658f02613ffe10ba9b7570d6997cd3ace 100644
+--- a/ntcore/BUILD.bazel
++++ b/ntcore/BUILD.bazel
+@@ -211,8 +211,8 @@ cc_binary(
+ 
+ java_binary(
+     name = "DevMain-Java",
+-    srcs = ["src/dev/java/edu/wpi/first/ntcore/DevMain.java"],
+-    main_class = "edu.wpi.first.ntcore.DevMain",
++    srcs = ["src/dev/java/org/wpilib/networktables/DevMain.java"],
++    main_class = "org.wpilib.networktables.DevMain",
+     deps = [
+         "ntcore-java",
+         "//wpiutil:wpiutil-java",
+diff --git a/ntcore/build.gradle b/ntcore/build.gradle
+index d4ec0ab3e41b6a4e2d90324d66b43f4b2c1a6000..49a1d4a57afa57e66ad4fb8494040b24ddb87315 100644
+--- a/ntcore/build.gradle
++++ b/ntcore/build.gradle
+@@ -10,7 +10,7 @@ ext {
+     }
+ 
+     nativeName = 'ntcore'
+-    devMain = 'edu.wpi.first.ntcore.DevMain'
++    devMain = 'org.wpilib.networktables.DevMain'
+     generatedSources = "$projectDir/src/generated/main/native/cpp"
+     generatedHeaders = "$projectDir/src/generated/main/native/include"
+     jniSplitSetup = {
+diff --git a/ntcore/src/dev/java/edu/wpi/first/ntcore/DevMain.java b/ntcore/src/dev/java/org/wpilib/networktables/DevMain.java
+similarity index 87%
+rename from ntcore/src/dev/java/edu/wpi/first/ntcore/DevMain.java
+rename to ntcore/src/dev/java/org/wpilib/networktables/DevMain.java
+index 8d998e9b1dc3cc6a786727aceab73c0669f841dc..c7b834c8ba2733c93a654e59baf096ede7c4f353 100644
+--- a/ntcore/src/dev/java/edu/wpi/first/ntcore/DevMain.java
++++ b/ntcore/src/dev/java/org/wpilib/networktables/DevMain.java
+@@ -2,9 +2,8 @@
+ // Open Source Software; you can modify and/or share it under the terms of
+ // the WPILib BSD license file in the root directory of this project.
+ 
+-package edu.wpi.first.ntcore;
++package org.wpilib.networktables;
+ 
+-import org.wpilib.networktables.NetworkTablesJNI;
+ import org.wpilib.util.runtime.CombinedRuntimeLoader;
+ 
+ public final class DevMain {
+diff --git a/wpilibj/src/main/java/org/wpilib/opmode/TimesliceRobot.java b/wpilibj/src/main/java/org/wpilib/opmode/TimesliceRobot.java
+index d9c79d24ac2599d8315cfd66c6d2f46c395405dd..06d27319a9051633474a9dee6e4b449f84f60f24 100644
+--- a/wpilibj/src/main/java/org/wpilib/opmode/TimesliceRobot.java
++++ b/wpilibj/src/main/java/org/wpilib/opmode/TimesliceRobot.java
+@@ -63,8 +63,9 @@ package org.wpilib.opmode;
+  *
+  * <p>If the robot periodic functions and the controller periodic functions have a lot of scheduling
+  * jitter that cause them to occasionally overlap with later timeslices, consider giving the main
+- * robot thread a real-time priority using {@link Threads#setCurrentThreadPriority(boolean,int)}. An
+- * RT priority of 15 is a reasonable choice.
++ * robot thread a real-time priority using {@link
++ * org.wpilib.system.Threads#setCurrentThreadPriority(boolean,int)}. An RT priority of 15 is a
++ * reasonable choice.
+  *
+  * <p>If you do enable RT though, <i>make sure your periodic functions do not block</i>. If they do,
+  * the operating system will lock up, and you'll have to boot the roboRIO into safe mode and delete
+diff --git a/wpilibj/src/test/java/edu/wpi/first/math/util/ColorTest.java b/wpilibj/src/test/java/edu/wpi/first/math/util/ColorTest.java
+deleted file mode 100644
+index 2e215fa708fdc477b25f6f1278dfeaf9554096b1..0000000000000000000000000000000000000000
+--- a/wpilibj/src/test/java/edu/wpi/first/math/util/ColorTest.java
++++ /dev/null
+@@ -1,45 +0,0 @@
+-// Copyright (c) FIRST and other WPILib contributors.
+-// Open Source Software; you can modify and/or share it under the terms of
+-// the WPILib BSD license file in the root directory of this project.
+-
+-package org.wpilib.math.util;
+-
+-import static org.junit.jupiter.api.Assertions.assertAll;
+-import static org.junit.jupiter.api.Assertions.assertEquals;
+-import static org.junit.jupiter.params.provider.Arguments.arguments;
+-
+-import java.util.stream.Stream;
+-import org.junit.jupiter.params.ParameterizedTest;
+-import org.junit.jupiter.params.provider.Arguments;
+-import org.junit.jupiter.params.provider.MethodSource;
+-import org.wpilib.util.Color;
+-
+-class ColorTest {
+-  private static final double kEpsilon = 1e-3;
+-
+-  void assertColorMatches(double red, double green, double blue, Color color) {
+-    assertAll(
+-        () -> assertEquals(red, color.red, kEpsilon),
+-        () -> assertEquals(green, color.green, kEpsilon),
+-        () -> assertEquals(blue, color.blue, kEpsilon));
+-  }
+-
+-  @ParameterizedTest
+-  @MethodSource("staticColorProvider")
+-  void staticColorTest(double red, double green, double blue, Color color) {
+-    assertColorMatches(red, green, blue, color);
+-  }
+-
+-  @ParameterizedTest
+-  @MethodSource("staticColorProvider")
+-  void colorEqualsTest(double red, double green, double blue, Color color) {
+-    assertEquals(color, new Color(red, green, blue));
+-  }
+-
+-  static Stream<Arguments> staticColorProvider() {
+-    return Stream.of(
+-        arguments(0.0823529412, 0.376470589, 0.7411764706, Color.kDenim),
+-        arguments(0.0, 0.4, 0.7019607844, Color.kFirstBlue),
+-        arguments(0.9294117648, 0.1098039216, 0.1411764706, Color.kFirstRed));
+-  }
+-}

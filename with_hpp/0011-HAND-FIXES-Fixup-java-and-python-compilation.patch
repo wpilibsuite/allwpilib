@@ -1,0 +1,724 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Mon, 3 Nov 2025 19:46:30 -0500
+Subject: [PATCH 11/34] HAND FIXES: Fixup java and python compilation
+
+---
+ wpilibj/src/main/java/org/wpilib/ExpansionHub.java          | 1 +
+ wpilibj/src/main/java/org/wpilib/ExpansionHubMotor.java     | 1 +
+ .../src/main/java/org/wpilib/ExpansionHubPidConstants.java  | 1 +
+ wpilibj/src/main/java/org/wpilib/ExpansionHubServo.java     | 1 +
+ .../main/java/org/wpilib/driverstation/DSControlWord.java   | 1 +
+ .../main/java/org/wpilib/driverstation/DriverStation.java   | 1 +
+ .../java/org/wpilib/hardware/accelerometer/ADXL345_I2C.java | 1 +
+ .../wpilib/hardware/accelerometer/AnalogAccelerometer.java  | 1 +
+ .../java/org/wpilib/hardware/discrete/DigitalInput.java     | 1 +
+ .../java/org/wpilib/hardware/discrete/DigitalOutput.java    | 1 +
+ wpilibj/src/main/java/org/wpilib/hardware/discrete/PWM.java | 1 +
+ .../src/main/java/org/wpilib/hardware/led/LEDPattern.java   | 2 ++
+ .../main/java/org/wpilib/hardware/motor/MotorSafety.java    | 3 +++
+ .../java/org/wpilib/hardware/pneumatic/PneumaticHub.java    | 1 +
+ .../java/org/wpilib/hardware/pneumatic/PneumaticsBase.java  | 2 ++
+ .../wpilib/hardware/pneumatic/PneumaticsControlModule.java  | 1 +
+ .../src/main/java/org/wpilib/hardware/range/SharpIR.java    | 1 +
+ .../java/org/wpilib/hardware/rotation/AnalogEncoder.java    | 2 ++
+ .../org/wpilib/hardware/rotation/AnalogPotentiometer.java   | 2 ++
+ .../src/main/java/org/wpilib/hardware/rotation/Encoder.java | 1 +
+ .../src/main/java/org/wpilib/opmode/IterativeRobotBase.java | 3 +++
+ wpilibj/src/main/java/org/wpilib/opmode/RobotBase.java      | 6 +++++-
+ wpilibj/src/main/java/org/wpilib/opmode/RobotState.java     | 2 ++
+ wpilibj/src/main/java/org/wpilib/opmode/TimedRobot.java     | 1 +
+ wpilibj/src/main/java/org/wpilib/system/DataLogManager.java | 2 ++
+ wpilibj/src/main/java/org/wpilib/system/Filesystem.java     | 1 +
+ wpilibj/src/main/java/org/wpilib/system/Notifier.java       | 2 ++
+ wpilibj/src/main/java/org/wpilib/system/Timer.java          | 1 +
+ wpilibj/src/main/java/org/wpilib/system/Tracer.java         | 1 +
+ wpilibj/src/main/java/org/wpilib/system/Watchdog.java       | 1 +
+ wpilibj/src/main/java/org/wpilib/util/Alert.java            | 1 +
+ .../test/java/org/wpilib/hardware/led/LEDPatternTest.java   | 1 +
+ .../wpilib/hardware/rotation/AnalogPotentiometerTest.java   | 1 +
+ .../test/java/org/wpilib/system/RobotControllerTest.java    | 2 ++
+ wpimath/src/dev/java/org/wpilib/math/DevMain.java           | 2 ++
+ .../math/interpolation/InterpolatingMatrixTreeMap.java      | 2 ++
+ wpimath/src/main/java/org/wpilib/math/linalg/DARE.java      | 1 +
+ .../src/main/java/org/wpilib/math/linalg/MatBuilder.java    | 2 ++
+ wpimath/src/main/java/org/wpilib/math/linalg/Matrix.java    | 2 ++
+ .../src/main/java/org/wpilib/math/linalg/VecBuilder.java    | 2 ++
+ wpimath/src/main/java/org/wpilib/math/linalg/Vector.java    | 2 ++
+ wpimath/src/main/java/org/wpilib/math/util/MathUtil.java    | 1 +
+ .../src/main/java/org/wpilib/math/util/StateSpaceUtil.java  | 2 ++
+ wpimath/src/test/java/org/wpilib/math/linalg/DARETest.java  | 2 ++
+ .../src/test/java/org/wpilib/math/linalg/MatrixTest.java    | 1 +
+ .../src/test/java/org/wpilib/math/util/MathUtilTest.java    | 1 +
+ .../test/java/org/wpilib/math/util/StateSpaceUtilTest.java  | 3 +++
+ wpiutil/src/dev/java/org/wpilib/util/DevMain.java           | 2 ++
+ wpiutil/src/main/java/org/wpilib/util/WPIUtilJNI.java       | 1 +
+ .../main/java/org/wpilib/util/concurrent/EventVector.java   | 1 +
+ wpiutil/src/main/native/cpp/jni/WPIUtilJNI.cpp              | 2 +-
+ 51 files changed, 78 insertions(+), 2 deletions(-)
+
+diff --git a/wpilibj/src/main/java/org/wpilib/ExpansionHub.java b/wpilibj/src/main/java/org/wpilib/ExpansionHub.java
+index d99003566d9fac62646571d5b9074ae05261c6f9..4b58366aaffa2b5272e9a6ca63b2628b4c051379 100644
+--- a/wpilibj/src/main/java/org/wpilib/ExpansionHub.java
++++ b/wpilibj/src/main/java/org/wpilib/ExpansionHub.java
+@@ -7,6 +7,7 @@ package org.wpilib;
+ import org.wpilib.hardware.hal.HAL;
+ import org.wpilib.networktables.BooleanSubscriber;
+ import org.wpilib.networktables.NetworkTableInstance;
++import org.wpilib.system.SystemServer;
+ 
+ /** This class controls a REV ExpansionHub plugged in over USB to Systemcore. */
+ public class ExpansionHub implements AutoCloseable {
+diff --git a/wpilibj/src/main/java/org/wpilib/ExpansionHubMotor.java b/wpilibj/src/main/java/org/wpilib/ExpansionHubMotor.java
+index 95a90f025a3cd07f130c0541d9c819ed4212e51f..2228c730d0d979b8554e548e42b21e2a9e2c06b5 100644
+--- a/wpilibj/src/main/java/org/wpilib/ExpansionHubMotor.java
++++ b/wpilibj/src/main/java/org/wpilib/ExpansionHubMotor.java
+@@ -15,6 +15,7 @@ import org.wpilib.networktables.DoubleSubscriber;
+ import org.wpilib.networktables.IntegerPublisher;
+ import org.wpilib.networktables.NetworkTableInstance;
+ import org.wpilib.networktables.PubSubOption;
++import org.wpilib.system.SystemServer;
+ import org.wpilib.units.measure.Current;
+ import org.wpilib.units.measure.Voltage;
+ 
+diff --git a/wpilibj/src/main/java/org/wpilib/ExpansionHubPidConstants.java b/wpilibj/src/main/java/org/wpilib/ExpansionHubPidConstants.java
+index c95faecd929fecf311b56ab2bbf2c6539e255b89..0cbcd2bb9bc49263e834efc7b274c2c5c45911fa 100644
+--- a/wpilibj/src/main/java/org/wpilib/ExpansionHubPidConstants.java
++++ b/wpilibj/src/main/java/org/wpilib/ExpansionHubPidConstants.java
+@@ -8,6 +8,7 @@ import org.wpilib.networktables.BooleanPublisher;
+ import org.wpilib.networktables.DoublePublisher;
+ import org.wpilib.networktables.NetworkTableInstance;
+ import org.wpilib.networktables.PubSubOption;
++import org.wpilib.system.SystemServer;
+ 
+ /** This class contains PID constants for an ExpansionHub motor. */
+ public class ExpansionHubPidConstants {
+diff --git a/wpilibj/src/main/java/org/wpilib/ExpansionHubServo.java b/wpilibj/src/main/java/org/wpilib/ExpansionHubServo.java
+index 59aec0cc364ca445e9dc03ed47139716c629b4ac..50aa4952871e75e08b6d69a7ce2e7cf9ae81d9f4 100644
+--- a/wpilibj/src/main/java/org/wpilib/ExpansionHubServo.java
++++ b/wpilibj/src/main/java/org/wpilib/ExpansionHubServo.java
+@@ -12,6 +12,7 @@ import org.wpilib.networktables.BooleanPublisher;
+ import org.wpilib.networktables.IntegerPublisher;
+ import org.wpilib.networktables.NetworkTableInstance;
+ import org.wpilib.networktables.PubSubOption;
++import org.wpilib.system.SystemServer;
+ import org.wpilib.units.measure.Angle;
+ import org.wpilib.units.measure.Time;
+ 
+diff --git a/wpilibj/src/main/java/org/wpilib/driverstation/DSControlWord.java b/wpilibj/src/main/java/org/wpilib/driverstation/DSControlWord.java
+index 0b68001c0f6567cce5beaab86d01f5c179a33f5b..0a70aacfd41334449afa57c6b5a81413964d1b96 100644
+--- a/wpilibj/src/main/java/org/wpilib/driverstation/DSControlWord.java
++++ b/wpilibj/src/main/java/org/wpilib/driverstation/DSControlWord.java
+@@ -4,6 +4,7 @@
+ 
+ package org.wpilib.driverstation;
+ 
++import org.wpilib.driverstation.DriverStation;
+ import org.wpilib.hardware.hal.ControlWord;
+ 
+ /** A wrapper around Driver Station control word. */
+diff --git a/wpilibj/src/main/java/org/wpilib/driverstation/DriverStation.java b/wpilibj/src/main/java/org/wpilib/driverstation/DriverStation.java
+index e78fd086eb702b0bb845eb2bd9c2d497cf05ae12..fcb94c391ed0e2f1ba60a69d1e11f578941d8886 100644
+--- a/wpilibj/src/main/java/org/wpilib/driverstation/DriverStation.java
++++ b/wpilibj/src/main/java/org/wpilib/driverstation/DriverStation.java
+@@ -21,6 +21,7 @@ import org.wpilib.networktables.NetworkTableInstance;
+ import org.wpilib.networktables.StringPublisher;
+ import org.wpilib.networktables.StringTopic;
+ import org.wpilib.util.concurrent.EventVector;
++import org.wpilib.system.Timer;
+ import org.wpilib.util.WPIUtilJNI;
+ import java.util.Map;
+ import java.util.Optional;
+diff --git a/wpilibj/src/main/java/org/wpilib/hardware/accelerometer/ADXL345_I2C.java b/wpilibj/src/main/java/org/wpilib/hardware/accelerometer/ADXL345_I2C.java
+index ccb36cee51c9866b1d5bed0a73cbd8f69aed3643..2aae25ff2bd46590bc13d021ce94f8d9fe875369 100644
+--- a/wpilibj/src/main/java/org/wpilib/hardware/accelerometer/ADXL345_I2C.java
++++ b/wpilibj/src/main/java/org/wpilib/hardware/accelerometer/ADXL345_I2C.java
+@@ -4,6 +4,7 @@
+ 
+ package org.wpilib.hardware.accelerometer;
+ 
++import org.wpilib.hardware.bus.I2C;
+ import org.wpilib.hardware.hal.HAL;
+ import org.wpilib.hardware.hal.SimDevice;
+ import org.wpilib.hardware.hal.SimDouble;
+diff --git a/wpilibj/src/main/java/org/wpilib/hardware/accelerometer/AnalogAccelerometer.java b/wpilibj/src/main/java/org/wpilib/hardware/accelerometer/AnalogAccelerometer.java
+index 30a6a78fe8147b03fc173e8025a6b343cc795239..1dbc46b4c9699a7c8ef2a7b6458a926c67b45955 100644
+--- a/wpilibj/src/main/java/org/wpilib/hardware/accelerometer/AnalogAccelerometer.java
++++ b/wpilibj/src/main/java/org/wpilib/hardware/accelerometer/AnalogAccelerometer.java
+@@ -6,6 +6,7 @@ package org.wpilib.hardware.accelerometer;
+ 
+ import static org.wpilib.util.ErrorMessages.requireNonNullParam;
+ 
++import org.wpilib.hardware.discrete.AnalogInput;
+ import org.wpilib.hardware.hal.HAL;
+ import org.wpilib.util.sendable.Sendable;
+ import org.wpilib.util.sendable.SendableBuilder;
+diff --git a/wpilibj/src/main/java/org/wpilib/hardware/discrete/DigitalInput.java b/wpilibj/src/main/java/org/wpilib/hardware/discrete/DigitalInput.java
+index 5438273e823d1034a4fd191060cbc7acd14e8214..73efff3b040e1c180e3b3f59b9dbb1221d4533ce 100644
+--- a/wpilibj/src/main/java/org/wpilib/hardware/discrete/DigitalInput.java
++++ b/wpilibj/src/main/java/org/wpilib/hardware/discrete/DigitalInput.java
+@@ -4,6 +4,7 @@
+ 
+ package org.wpilib.hardware.discrete;
+ 
++import org.wpilib.system.SensorUtil;
+ import org.wpilib.hardware.hal.DIOJNI;
+ import org.wpilib.hardware.hal.HAL;
+ import org.wpilib.hardware.hal.SimDevice;
+diff --git a/wpilibj/src/main/java/org/wpilib/hardware/discrete/DigitalOutput.java b/wpilibj/src/main/java/org/wpilib/hardware/discrete/DigitalOutput.java
+index 73b017d90448919f2ca4fbff58f9e1a0e2c994c7..ff90b81e92b85105ce525d0dc12c239858b87e44 100644
+--- a/wpilibj/src/main/java/org/wpilib/hardware/discrete/DigitalOutput.java
++++ b/wpilibj/src/main/java/org/wpilib/hardware/discrete/DigitalOutput.java
+@@ -4,6 +4,7 @@
+ 
+ package org.wpilib.hardware.discrete;
+ 
++import org.wpilib.system.SensorUtil;
+ import org.wpilib.hardware.hal.DIOJNI;
+ import org.wpilib.hardware.hal.HAL;
+ import org.wpilib.hardware.hal.SimDevice;
+diff --git a/wpilibj/src/main/java/org/wpilib/hardware/discrete/PWM.java b/wpilibj/src/main/java/org/wpilib/hardware/discrete/PWM.java
+index 6b3df259e502534032ad25b0419663df20c2256d..1638e3cf9087a384313095bc5621447d06eab9f0 100644
+--- a/wpilibj/src/main/java/org/wpilib/hardware/discrete/PWM.java
++++ b/wpilibj/src/main/java/org/wpilib/hardware/discrete/PWM.java
+@@ -4,6 +4,7 @@
+ 
+ package org.wpilib.hardware.discrete;
+ 
++import org.wpilib.system.SensorUtil;
+ import org.wpilib.hardware.hal.HAL;
+ import org.wpilib.hardware.hal.PWMJNI;
+ import org.wpilib.hardware.hal.SimDevice;
+diff --git a/wpilibj/src/main/java/org/wpilib/hardware/led/LEDPattern.java b/wpilibj/src/main/java/org/wpilib/hardware/led/LEDPattern.java
+index f6adb95ef620f60c7501aad600ba7650a60cc0a9..04f068b907fa08a27fe0e12caea7bfd2e276725f 100644
+--- a/wpilibj/src/main/java/org/wpilib/hardware/led/LEDPattern.java
++++ b/wpilibj/src/main/java/org/wpilib/hardware/led/LEDPattern.java
+@@ -9,6 +9,8 @@ import static org.wpilib.units.Units.Microsecond;
+ import static org.wpilib.units.Units.Microseconds;
+ import static org.wpilib.units.Units.Value;
+ 
++import org.wpilib.driverstation.DriverStation;
++import org.wpilib.system.RobotController;
+ import org.wpilib.units.collections.LongToObjectHashMap;
+ import org.wpilib.units.measure.Dimensionless;
+ import org.wpilib.units.measure.Distance;
+diff --git a/wpilibj/src/main/java/org/wpilib/hardware/motor/MotorSafety.java b/wpilibj/src/main/java/org/wpilib/hardware/motor/MotorSafety.java
+index 8c69bcbccf687b1b9dbea2ed807382ea3f204005..b08499611f2cbdceb629d43efe11e348677c9a1a 100644
+--- a/wpilibj/src/main/java/org/wpilib/hardware/motor/MotorSafety.java
++++ b/wpilibj/src/main/java/org/wpilib/hardware/motor/MotorSafety.java
+@@ -4,8 +4,11 @@
+ 
+ package org.wpilib.hardware.motor;
+ 
++import org.wpilib.driverstation.DriverStation;
+ import org.wpilib.hardware.hal.ControlWord;
+ import org.wpilib.hardware.hal.DriverStationJNI;
++import org.wpilib.opmode.RobotState;
++import org.wpilib.system.Timer;
+ import org.wpilib.util.WPIUtilJNI;
+ import java.util.LinkedHashSet;
+ import java.util.Set;
+diff --git a/wpilibj/src/main/java/org/wpilib/hardware/pneumatic/PneumaticHub.java b/wpilibj/src/main/java/org/wpilib/hardware/pneumatic/PneumaticHub.java
+index 119b77155a773629d65b86f9122b22199ec8cc6e..a95cfd9296c9c86e2e4d33e1b018dff1b4a516b0 100644
+--- a/wpilibj/src/main/java/org/wpilib/hardware/pneumatic/PneumaticHub.java
++++ b/wpilibj/src/main/java/org/wpilib/hardware/pneumatic/PneumaticHub.java
+@@ -4,6 +4,7 @@
+ 
+ package org.wpilib.hardware.pneumatic;
+ 
++import org.wpilib.system.SensorUtil;
+ import org.wpilib.hardware.hal.HAL;
+ import org.wpilib.hardware.hal.PortsJNI;
+ import org.wpilib.hardware.hal.REVPHFaults;
+diff --git a/wpilibj/src/main/java/org/wpilib/hardware/pneumatic/PneumaticsBase.java b/wpilibj/src/main/java/org/wpilib/hardware/pneumatic/PneumaticsBase.java
+index 238d829bf03ec1222d998f098138344ef602c793..301626693613e01d9457f1e5a8b822b39fc85ed5 100644
+--- a/wpilibj/src/main/java/org/wpilib/hardware/pneumatic/PneumaticsBase.java
++++ b/wpilibj/src/main/java/org/wpilib/hardware/pneumatic/PneumaticsBase.java
+@@ -4,6 +4,8 @@
+ 
+ package org.wpilib.hardware.pneumatic;
+ 
++import org.wpilib.system.SensorUtil;
++
+ /** Interface for pneumatics devices. */
+ public interface PneumaticsBase extends AutoCloseable {
+   /**
+diff --git a/wpilibj/src/main/java/org/wpilib/hardware/pneumatic/PneumaticsControlModule.java b/wpilibj/src/main/java/org/wpilib/hardware/pneumatic/PneumaticsControlModule.java
+index 18cdced3286e968597132ad38a6b38a232ea1597..61b4607bccfd0aebae5294ed3e5ebba0507637ce 100644
+--- a/wpilibj/src/main/java/org/wpilib/hardware/pneumatic/PneumaticsControlModule.java
++++ b/wpilibj/src/main/java/org/wpilib/hardware/pneumatic/PneumaticsControlModule.java
+@@ -4,6 +4,7 @@
+ 
+ package org.wpilib.hardware.pneumatic;
+ 
++import org.wpilib.system.SensorUtil;
+ import org.wpilib.hardware.hal.CTREPCMJNI;
+ import org.wpilib.hardware.hal.HAL;
+ import org.wpilib.hardware.hal.PortsJNI;
+diff --git a/wpilibj/src/main/java/org/wpilib/hardware/range/SharpIR.java b/wpilibj/src/main/java/org/wpilib/hardware/range/SharpIR.java
+index 2ff50acad53cb40e2bb5b062a2d6073f88072fa3..311b3e08a620b93abe80fb3df1a2a96a040a5106 100644
+--- a/wpilibj/src/main/java/org/wpilib/hardware/range/SharpIR.java
++++ b/wpilibj/src/main/java/org/wpilib/hardware/range/SharpIR.java
+@@ -4,6 +4,7 @@
+ 
+ package org.wpilib.hardware.range;
+ 
++import org.wpilib.hardware.discrete.AnalogInput;
+ import org.wpilib.hardware.hal.HAL;
+ import org.wpilib.hardware.hal.SimDevice;
+ import org.wpilib.hardware.hal.SimDevice.Direction;
+diff --git a/wpilibj/src/main/java/org/wpilib/hardware/rotation/AnalogEncoder.java b/wpilibj/src/main/java/org/wpilib/hardware/rotation/AnalogEncoder.java
+index 5c3cd834c129a82e3aa5c9f46e2e3aacb960c175..ab50915913b3bb259d92cb67143fbd4c579e07bb 100644
+--- a/wpilibj/src/main/java/org/wpilib/hardware/rotation/AnalogEncoder.java
++++ b/wpilibj/src/main/java/org/wpilib/hardware/rotation/AnalogEncoder.java
+@@ -4,11 +4,13 @@
+ 
+ package org.wpilib.hardware.rotation;
+ 
++import org.wpilib.hardware.discrete.AnalogInput;
+ import org.wpilib.hardware.hal.HAL;
+ import org.wpilib.hardware.hal.SimDevice;
+ import org.wpilib.hardware.hal.SimDevice.Direction;
+ import org.wpilib.hardware.hal.SimDouble;
+ import org.wpilib.math.util.MathUtil;
++import org.wpilib.system.RobotController;
+ import org.wpilib.util.sendable.Sendable;
+ import org.wpilib.util.sendable.SendableBuilder;
+ import org.wpilib.util.sendable.SendableRegistry;
+diff --git a/wpilibj/src/main/java/org/wpilib/hardware/rotation/AnalogPotentiometer.java b/wpilibj/src/main/java/org/wpilib/hardware/rotation/AnalogPotentiometer.java
+index 1dc366d9dce2eb7aa6a795fd13726d274ec762d1..8c4fea2fc24d2c047f5d4397a4bcb002eb123d34 100644
+--- a/wpilibj/src/main/java/org/wpilib/hardware/rotation/AnalogPotentiometer.java
++++ b/wpilibj/src/main/java/org/wpilib/hardware/rotation/AnalogPotentiometer.java
+@@ -4,6 +4,8 @@
+ 
+ package org.wpilib.hardware.rotation;
+ 
++import org.wpilib.hardware.discrete.AnalogInput;
++import org.wpilib.system.RobotController;
+ import org.wpilib.util.sendable.Sendable;
+ import org.wpilib.util.sendable.SendableBuilder;
+ import org.wpilib.util.sendable.SendableRegistry;
+diff --git a/wpilibj/src/main/java/org/wpilib/hardware/rotation/Encoder.java b/wpilibj/src/main/java/org/wpilib/hardware/rotation/Encoder.java
+index 11b690f3aea125b11e712109336fa41d7ef754de..b1935080b103e4bc38d0942f80228b2cc24b4825 100644
+--- a/wpilibj/src/main/java/org/wpilib/hardware/rotation/Encoder.java
++++ b/wpilibj/src/main/java/org/wpilib/hardware/rotation/Encoder.java
+@@ -6,6 +6,7 @@ package org.wpilib.hardware.rotation;
+ 
+ import static org.wpilib.util.ErrorMessages.requireNonNullParam;
+ 
++import org.wpilib.hardware.discrete.CounterBase;
+ import org.wpilib.hardware.hal.EncoderJNI;
+ import org.wpilib.hardware.hal.HAL;
+ import org.wpilib.hardware.hal.SimDevice;
+diff --git a/wpilibj/src/main/java/org/wpilib/opmode/IterativeRobotBase.java b/wpilibj/src/main/java/org/wpilib/opmode/IterativeRobotBase.java
+index b39912323d50efda24149a864147cbfe88b064a2..2fddd0295f6ac4ea1cc14b5deb04f31ecf6d87b5 100644
+--- a/wpilibj/src/main/java/org/wpilib/opmode/IterativeRobotBase.java
++++ b/wpilibj/src/main/java/org/wpilib/opmode/IterativeRobotBase.java
+@@ -4,10 +4,13 @@
+ 
+ package org.wpilib.opmode;
+ 
++import org.wpilib.driverstation.DSControlWord;
++import org.wpilib.driverstation.DriverStation;
+ import org.wpilib.hardware.hal.DriverStationJNI;
+ import org.wpilib.hardware.hal.HAL;
+ import org.wpilib.networktables.NetworkTableInstance;
+ import org.wpilib.smartdashboard.SmartDashboard;
++import org.wpilib.system.Watchdog;
+ 
+ /**
+  * IterativeRobotBase implements a specific type of robot program framework, extending the RobotBase
+diff --git a/wpilibj/src/main/java/org/wpilib/opmode/RobotBase.java b/wpilibj/src/main/java/org/wpilib/opmode/RobotBase.java
+index 2cf19c60051d70164a034c77050db715b6c8d571..5f72ab655dcf3ff502481a840ebe067797d85a9d 100644
+--- a/wpilibj/src/main/java/org/wpilib/opmode/RobotBase.java
++++ b/wpilibj/src/main/java/org/wpilib/opmode/RobotBase.java
+@@ -6,6 +6,9 @@ package org.wpilib.opmode;
+ 
+ import org.wpilib.vision.stream.CameraServerShared;
+ import org.wpilib.vision.stream.CameraServerSharedStore;
++import org.wpilib.system.Notifier;
++import org.wpilib.system.RuntimeType;
++import org.wpilib.driverstation.DriverStation;
+ import org.wpilib.hardware.hal.HAL;
+ import org.wpilib.hardware.hal.HALUtil;
+ import org.wpilib.math.util.MathShared;
+@@ -13,8 +16,9 @@ import org.wpilib.math.util.MathSharedStore;
+ import org.wpilib.networktables.MultiSubscriber;
+ import org.wpilib.networktables.NetworkTableEvent;
+ import org.wpilib.networktables.NetworkTableInstance;
++import org.wpilib.system.Timer;
+ import org.wpilib.util.WPIUtilJNI;
+-import org.wpilib.util.WPILibVersion;
++import org.wpilib.system.WPILibVersion;
+ import java.util.concurrent.locks.ReentrantLock;
+ import java.util.function.Supplier;
+ 
+diff --git a/wpilibj/src/main/java/org/wpilib/opmode/RobotState.java b/wpilibj/src/main/java/org/wpilib/opmode/RobotState.java
+index 978ed5bf2248415ba48abd5c8c70210dfebe7cd4..568721af60f0dc23c2768771f3ba4d886bb44dbf 100644
+--- a/wpilibj/src/main/java/org/wpilib/opmode/RobotState.java
++++ b/wpilibj/src/main/java/org/wpilib/opmode/RobotState.java
+@@ -4,6 +4,8 @@
+ 
+ package org.wpilib.opmode;
+ 
++import org.wpilib.driverstation.DriverStation;
++
+ /** Robot state utility functions. */
+ public final class RobotState {
+   /**
+diff --git a/wpilibj/src/main/java/org/wpilib/opmode/TimedRobot.java b/wpilibj/src/main/java/org/wpilib/opmode/TimedRobot.java
+index eb7ba305fac590de6402757cd6779d462688f0b9..72f14ce6e01801dbe05c1a95eb7163df7d1ba36b 100644
+--- a/wpilibj/src/main/java/org/wpilib/opmode/TimedRobot.java
++++ b/wpilibj/src/main/java/org/wpilib/opmode/TimedRobot.java
+@@ -9,6 +9,7 @@ import static org.wpilib.units.Units.Seconds;
+ import org.wpilib.hardware.hal.DriverStationJNI;
+ import org.wpilib.hardware.hal.HAL;
+ import org.wpilib.hardware.hal.NotifierJNI;
++import org.wpilib.system.RobotController;
+ import org.wpilib.units.measure.Frequency;
+ import org.wpilib.units.measure.Time;
+ import java.util.PriorityQueue;
+diff --git a/wpilibj/src/main/java/org/wpilib/system/DataLogManager.java b/wpilibj/src/main/java/org/wpilib/system/DataLogManager.java
+index c6d844661cedca4e884454c3a5379ee0b9c8f0e8..606b5ef28c9c7c5d88fcfcf8c557cbe651095a01 100644
+--- a/wpilibj/src/main/java/org/wpilib/system/DataLogManager.java
++++ b/wpilibj/src/main/java/org/wpilib/system/DataLogManager.java
+@@ -9,8 +9,10 @@ import org.wpilib.datalog.DataLogBackgroundWriter;
+ import org.wpilib.datalog.FileLogger;
+ import org.wpilib.datalog.IntegerLogEntry;
+ import org.wpilib.datalog.StringLogEntry;
++import org.wpilib.driverstation.DriverStation;
+ import org.wpilib.hardware.hal.HAL;
+ import org.wpilib.networktables.NetworkTableInstance;
++import org.wpilib.opmode.RobotBase;
+ import org.wpilib.util.WPIUtilJNI;
+ import org.wpilib.util.concurrent.Event;
+ import java.io.File;
+diff --git a/wpilibj/src/main/java/org/wpilib/system/Filesystem.java b/wpilibj/src/main/java/org/wpilib/system/Filesystem.java
+index f413d3764c17ea74da1a6526a295906d2d598779..2167a63ad2119b04b73aaf16e3cc24a48d7dffc0 100644
+--- a/wpilibj/src/main/java/org/wpilib/system/Filesystem.java
++++ b/wpilibj/src/main/java/org/wpilib/system/Filesystem.java
+@@ -5,6 +5,7 @@
+ package org.wpilib.system;
+ 
+ import java.io.File;
++import org.wpilib.opmode.RobotBase;
+ 
+ /**
+  * Class for interacting with the Filesystem, particularly, interacting with FRC-related paths on
+diff --git a/wpilibj/src/main/java/org/wpilib/system/Notifier.java b/wpilibj/src/main/java/org/wpilib/system/Notifier.java
+index 54e147b56d4c8ad91be4b52a8cbe93cd3371af92..4602917e501dbeb9273fbd8f92b58911b7fc1617 100644
+--- a/wpilibj/src/main/java/org/wpilib/system/Notifier.java
++++ b/wpilibj/src/main/java/org/wpilib/system/Notifier.java
+@@ -7,9 +7,11 @@ package org.wpilib.system;
+ import static org.wpilib.units.Units.Seconds;
+ import static org.wpilib.util.ErrorMessages.requireNonNullParam;
+ 
++import org.wpilib.driverstation.DriverStation;
+ import org.wpilib.hardware.hal.NotifierJNI;
+ import org.wpilib.units.measure.Frequency;
+ import org.wpilib.units.measure.Time;
++import org.wpilib.system.RobotController;
+ import java.util.concurrent.atomic.AtomicInteger;
+ import java.util.concurrent.locks.ReentrantLock;
+ 
+diff --git a/wpilibj/src/main/java/org/wpilib/system/Timer.java b/wpilibj/src/main/java/org/wpilib/system/Timer.java
+index d583347dfd51b0d9dcb4f4ca7c985d50f9323b4e..7f5b47ffc13df1ccffe54a1debd95f2c30e93bbb 100644
+--- a/wpilibj/src/main/java/org/wpilib/system/Timer.java
++++ b/wpilibj/src/main/java/org/wpilib/system/Timer.java
+@@ -7,6 +7,7 @@ package org.wpilib.system;
+ import static org.wpilib.units.Units.Seconds;
+ 
+ import org.wpilib.units.measure.Time;
++import org.wpilib.driverstation.DriverStation;
+ 
+ /**
+  * A timer class.
+diff --git a/wpilibj/src/main/java/org/wpilib/system/Tracer.java b/wpilibj/src/main/java/org/wpilib/system/Tracer.java
+index 234d85104fee52758f9e3804629aec1832aea072..b28387a374ba6e625a710c1446b989b00f33ea2e 100644
+--- a/wpilibj/src/main/java/org/wpilib/system/Tracer.java
++++ b/wpilibj/src/main/java/org/wpilib/system/Tracer.java
+@@ -7,6 +7,7 @@ package org.wpilib.system;
+ import java.util.HashMap;
+ import java.util.Map;
+ import java.util.function.Consumer;
++import org.wpilib.driverstation.DriverStation;
+ 
+ /**
+  * A class for keeping track of how much time it takes for different parts of code to execute. This
+diff --git a/wpilibj/src/main/java/org/wpilib/system/Watchdog.java b/wpilibj/src/main/java/org/wpilib/system/Watchdog.java
+index 568c4e3452c15ea9a4da9ea45ae8a55ccb14a565..63c1068359f6d70b9cdfc9ac9c0687d38422a763 100644
+--- a/wpilibj/src/main/java/org/wpilib/system/Watchdog.java
++++ b/wpilibj/src/main/java/org/wpilib/system/Watchdog.java
+@@ -6,6 +6,7 @@ package org.wpilib.system;
+ 
+ import static org.wpilib.units.Units.Seconds;
+ 
++import org.wpilib.driverstation.DriverStation;
+ import org.wpilib.hardware.hal.NotifierJNI;
+ import org.wpilib.units.measure.Time;
+ import java.io.Closeable;
+diff --git a/wpilibj/src/main/java/org/wpilib/util/Alert.java b/wpilibj/src/main/java/org/wpilib/util/Alert.java
+index f38a478da61127634c1ed3ec03d8f44904010c1a..3b3bbcfa9112d9e193e2fae2f08fa373144e5f97 100644
+--- a/wpilibj/src/main/java/org/wpilib/util/Alert.java
++++ b/wpilibj/src/main/java/org/wpilib/util/Alert.java
+@@ -4,6 +4,7 @@
+ 
+ package org.wpilib.util;
+ 
++import org.wpilib.system.RobotController;
+ import org.wpilib.util.sendable.Sendable;
+ import org.wpilib.util.sendable.SendableBuilder;
+ import org.wpilib.smartdashboard.SmartDashboard;
+diff --git a/wpilibj/src/test/java/org/wpilib/hardware/led/LEDPatternTest.java b/wpilibj/src/test/java/org/wpilib/hardware/led/LEDPatternTest.java
+index e1da19afd1a445ced83b9980fcd89a142a8ad41d..68a9df80e1002974a476bfb232febfdeef4f9c0b 100644
+--- a/wpilibj/src/test/java/org/wpilib/hardware/led/LEDPatternTest.java
++++ b/wpilibj/src/test/java/org/wpilib/hardware/led/LEDPatternTest.java
+@@ -27,6 +27,7 @@ import static org.wpilib.util.Color.kYellow;
+ import static org.junit.jupiter.api.Assertions.assertEquals;
+ import static org.junit.jupiter.api.Assertions.fail;
+ 
++import org.wpilib.system.RobotController;
+ import org.wpilib.util.Color;
+ import org.wpilib.util.Color8Bit;
+ import java.util.Map;
+diff --git a/wpilibj/src/test/java/org/wpilib/hardware/rotation/AnalogPotentiometerTest.java b/wpilibj/src/test/java/org/wpilib/hardware/rotation/AnalogPotentiometerTest.java
+index d28de281b94747985a9e1dff907f68eff28de7c6..51b7945eab8849bea5e5a4886f9a397700ce34c7 100644
+--- a/wpilibj/src/test/java/org/wpilib/hardware/rotation/AnalogPotentiometerTest.java
++++ b/wpilibj/src/test/java/org/wpilib/hardware/rotation/AnalogPotentiometerTest.java
+@@ -6,6 +6,7 @@ package org.wpilib.hardware.rotation;
+ 
+ import static org.junit.jupiter.api.Assertions.assertEquals;
+ 
++import org.wpilib.hardware.discrete.AnalogInput;
+ import org.wpilib.hardware.hal.HAL;
+ import org.wpilib.simulation.AnalogInputSim;
+ import org.wpilib.simulation.RoboRioSim;
+diff --git a/wpilibj/src/test/java/org/wpilib/system/RobotControllerTest.java b/wpilibj/src/test/java/org/wpilib/system/RobotControllerTest.java
+index 4b297ec72003a7c8eb6ec207ff232ad97d43334e..cb9ac73777a365099d03a4a101f7173fc877b7c6 100644
+--- a/wpilibj/src/test/java/org/wpilib/system/RobotControllerTest.java
++++ b/wpilibj/src/test/java/org/wpilib/system/RobotControllerTest.java
+@@ -4,6 +4,8 @@
+ 
+ package org.wpilib.system;
+ 
++import org.wpilib.UtilityClassTest;
++
+ @SuppressWarnings("PMD.TestClassWithoutTestCases")
+ class RobotControllerTest extends UtilityClassTest<RobotController> {
+   RobotControllerTest() {
+diff --git a/wpimath/src/dev/java/org/wpilib/math/DevMain.java b/wpimath/src/dev/java/org/wpilib/math/DevMain.java
+index 78f2f9edb894d353deb600ac9f7067bd55d5c422..743bdc2c7f4e7f135cd43989033fde953d1db3cc 100644
+--- a/wpimath/src/dev/java/org/wpilib/math/DevMain.java
++++ b/wpimath/src/dev/java/org/wpilib/math/DevMain.java
+@@ -4,6 +4,8 @@
+ 
+ package org.wpilib.math;
+ 
++import org.wpilib.math.util.MathUtil;
++
+ public final class DevMain {
+   /** Main entry point. */
+   public static void main(String[] args) {
+diff --git a/wpimath/src/main/java/org/wpilib/math/interpolation/InterpolatingMatrixTreeMap.java b/wpimath/src/main/java/org/wpilib/math/interpolation/InterpolatingMatrixTreeMap.java
+index 88ed520c850cfa7bb57a2e42583654b9abde4c52..d220fbd4a9a3cfb6d82df35826279933f8c2fa59 100644
+--- a/wpimath/src/main/java/org/wpilib/math/interpolation/InterpolatingMatrixTreeMap.java
++++ b/wpimath/src/main/java/org/wpilib/math/interpolation/InterpolatingMatrixTreeMap.java
+@@ -5,6 +5,8 @@
+ package org.wpilib.math.interpolation;
+ 
+ import java.util.TreeMap;
++import org.wpilib.math.linalg.Matrix;
++import org.wpilib.math.util.Num;
+ 
+ /**
+  * Interpolating Tree Maps are used to get values at points that are not defined by making a guess
+diff --git a/wpimath/src/main/java/org/wpilib/math/linalg/DARE.java b/wpimath/src/main/java/org/wpilib/math/linalg/DARE.java
+index 6edaa64fca955477f83fb0026a8519b484756abd..cdb7b42d5dea886a8ea8f19ab1bd32caead7d3fa 100644
+--- a/wpimath/src/main/java/org/wpilib/math/linalg/DARE.java
++++ b/wpimath/src/main/java/org/wpilib/math/linalg/DARE.java
+@@ -6,6 +6,7 @@ package org.wpilib.math.linalg;
+ 
+ import org.wpilib.math.jni.DAREJNI;
+ import org.ejml.simple.SimpleMatrix;
++import org.wpilib.math.util.Num;
+ 
+ /** DARE solver utility functions. */
+ public final class DARE {
+diff --git a/wpimath/src/main/java/org/wpilib/math/linalg/MatBuilder.java b/wpimath/src/main/java/org/wpilib/math/linalg/MatBuilder.java
+index 75c619e1d6400e683c4ae2fa1d7980aa47acf06d..89690a36e11994a1aee6dcb5b48e9cead0ae153b 100644
+--- a/wpimath/src/main/java/org/wpilib/math/linalg/MatBuilder.java
++++ b/wpimath/src/main/java/org/wpilib/math/linalg/MatBuilder.java
+@@ -6,6 +6,8 @@ package org.wpilib.math.linalg;
+ 
+ import java.util.Objects;
+ import org.ejml.simple.SimpleMatrix;
++import org.wpilib.math.util.Nat;
++import org.wpilib.math.util.Num;
+ 
+ /** A class for constructing arbitrary RxC matrices. */
+ public final class MatBuilder {
+diff --git a/wpimath/src/main/java/org/wpilib/math/linalg/Matrix.java b/wpimath/src/main/java/org/wpilib/math/linalg/Matrix.java
+index c2c7e77db082b106e78b3955c55b9f0a08a103be..d88d145a79b082aa74cd8c28b89a07c8f658bcec 100644
+--- a/wpimath/src/main/java/org/wpilib/math/linalg/Matrix.java
++++ b/wpimath/src/main/java/org/wpilib/math/linalg/Matrix.java
+@@ -8,6 +8,8 @@ import org.wpilib.math.jni.EigenJNI;
+ import org.wpilib.math.numbers.N1;
+ import org.wpilib.math.linalg.proto.MatrixProto;
+ import org.wpilib.math.linalg.struct.MatrixStruct;
++import org.wpilib.math.util.Nat;
++import org.wpilib.math.util.Num;
+ import org.wpilib.util.protobuf.Protobuf;
+ import org.wpilib.util.protobuf.ProtobufSerializable;
+ import org.wpilib.util.struct.Struct;
+diff --git a/wpimath/src/main/java/org/wpilib/math/linalg/VecBuilder.java b/wpimath/src/main/java/org/wpilib/math/linalg/VecBuilder.java
+index e0290c35c2a6acad608f901772de1ab4cd3d5cb3..9f7240f332e3c17d190431534bc92e2ea93fb607 100644
+--- a/wpimath/src/main/java/org/wpilib/math/linalg/VecBuilder.java
++++ b/wpimath/src/main/java/org/wpilib/math/linalg/VecBuilder.java
+@@ -14,6 +14,8 @@ import org.wpilib.math.numbers.N6;
+ import org.wpilib.math.numbers.N7;
+ import org.wpilib.math.numbers.N8;
+ import org.wpilib.math.numbers.N9;
++import org.wpilib.math.util.Nat;
++import org.wpilib.math.util.Num;
+ import java.util.Objects;
+ import org.ejml.simple.SimpleMatrix;
+ 
+diff --git a/wpimath/src/main/java/org/wpilib/math/linalg/Vector.java b/wpimath/src/main/java/org/wpilib/math/linalg/Vector.java
+index 364cfcbd2f04dcdb7e7d0af3521f6efba8ee685a..2e5e849e8f13d230c340becd162f92f206183d9f 100644
+--- a/wpimath/src/main/java/org/wpilib/math/linalg/Vector.java
++++ b/wpimath/src/main/java/org/wpilib/math/linalg/Vector.java
+@@ -8,6 +8,8 @@ import org.wpilib.math.numbers.N1;
+ import org.wpilib.math.numbers.N3;
+ import org.wpilib.math.linalg.proto.VectorProto;
+ import org.wpilib.math.linalg.struct.VectorStruct;
++import org.wpilib.math.util.Nat;
++import org.wpilib.math.util.Num;
+ import org.wpilib.util.protobuf.Protobuf;
+ import org.wpilib.util.protobuf.ProtobufSerializable;
+ import org.wpilib.util.struct.Struct;
+diff --git a/wpimath/src/main/java/org/wpilib/math/util/MathUtil.java b/wpimath/src/main/java/org/wpilib/math/util/MathUtil.java
+index e9a1eb64596bd80c27b1945396d3e8ec683b29c5..fd4df6e3ff021f56bae2a91658a594529e456d0d 100644
+--- a/wpimath/src/main/java/org/wpilib/math/util/MathUtil.java
++++ b/wpimath/src/main/java/org/wpilib/math/util/MathUtil.java
+@@ -6,6 +6,7 @@ package org.wpilib.math.util;
+ 
+ import org.wpilib.math.geometry.Translation2d;
+ import org.wpilib.math.geometry.Translation3d;
++import org.wpilib.math.linalg.Vector;
+ 
+ /** Math utility functions. */
+ public final class MathUtil {
+diff --git a/wpimath/src/main/java/org/wpilib/math/util/StateSpaceUtil.java b/wpimath/src/main/java/org/wpilib/math/util/StateSpaceUtil.java
+index ddf239fae0577be501f8c01990d5b94b8a6ead46..3209c0e6dc50694bc4d4076965b20f5b9899614f 100644
+--- a/wpimath/src/main/java/org/wpilib/math/util/StateSpaceUtil.java
++++ b/wpimath/src/main/java/org/wpilib/math/util/StateSpaceUtil.java
+@@ -6,6 +6,8 @@ package org.wpilib.math.util;
+ 
+ import org.wpilib.math.geometry.Pose2d;
+ import org.wpilib.math.jni.StateSpaceUtilJNI;
++import org.wpilib.math.linalg.Matrix;
++import org.wpilib.math.linalg.VecBuilder;
+ import org.wpilib.math.numbers.N1;
+ import org.wpilib.math.numbers.N3;
+ import org.wpilib.math.numbers.N4;
+diff --git a/wpimath/src/test/java/org/wpilib/math/linalg/DARETest.java b/wpimath/src/test/java/org/wpilib/math/linalg/DARETest.java
+index f0c2758488b26a64481c02a207e089bb916b62a6..7a2b12b186c8313520259191f1034f6b9a804d32 100644
+--- a/wpimath/src/test/java/org/wpilib/math/linalg/DARETest.java
++++ b/wpimath/src/test/java/org/wpilib/math/linalg/DARETest.java
+@@ -11,6 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
+ import org.wpilib.UtilityClassTest;
+ import org.ejml.simple.SimpleMatrix;
+ import org.junit.jupiter.api.Test;
++import org.wpilib.math.util.Nat;
++import org.wpilib.math.util.Num;
+ 
+ class DARETest extends UtilityClassTest<DARE> {
+   DARETest() {
+diff --git a/wpimath/src/test/java/org/wpilib/math/linalg/MatrixTest.java b/wpimath/src/test/java/org/wpilib/math/linalg/MatrixTest.java
+index b54c82883a6910e6e4c233ae395902fc2ad83338..7c04c97353258303e0f1138adaa6924d397b53b3 100644
+--- a/wpimath/src/test/java/org/wpilib/math/linalg/MatrixTest.java
++++ b/wpimath/src/test/java/org/wpilib/math/linalg/MatrixTest.java
+@@ -12,6 +12,7 @@ import org.wpilib.math.numbers.N1;
+ import org.wpilib.math.numbers.N2;
+ import org.wpilib.math.numbers.N3;
+ import org.wpilib.math.numbers.N4;
++import org.wpilib.math.util.Nat;
+ import org.ejml.data.SingularMatrixException;
+ import org.junit.jupiter.api.Test;
+ 
+diff --git a/wpimath/src/test/java/org/wpilib/math/util/MathUtilTest.java b/wpimath/src/test/java/org/wpilib/math/util/MathUtilTest.java
+index 039effa5c4bcbd9ce85cf040778f6ac5b744ba54..cdfcab78ef9f411a703ff38a01bbf22633408b80 100644
+--- a/wpimath/src/test/java/org/wpilib/math/util/MathUtilTest.java
++++ b/wpimath/src/test/java/org/wpilib/math/util/MathUtilTest.java
+@@ -12,6 +12,7 @@ import org.wpilib.math.geometry.Translation2d;
+ import org.wpilib.math.geometry.Translation3d;
+ import org.wpilib.UtilityClassTest;
+ import org.junit.jupiter.api.Test;
++import org.wpilib.math.linalg.VecBuilder;
+ 
+ class MathUtilTest extends UtilityClassTest<MathUtil> {
+   MathUtilTest() {
+diff --git a/wpimath/src/test/java/org/wpilib/math/util/StateSpaceUtilTest.java b/wpimath/src/test/java/org/wpilib/math/util/StateSpaceUtilTest.java
+index a9d0b8efb9d1fcefa1d0d122b2038154460baf0e..189474e04945e5ab4b9dcab4ae6072c4cebe9cac 100644
+--- a/wpimath/src/test/java/org/wpilib/math/util/StateSpaceUtilTest.java
++++ b/wpimath/src/test/java/org/wpilib/math/util/StateSpaceUtilTest.java
+@@ -10,6 +10,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
+ 
+ import org.wpilib.math.geometry.Pose2d;
+ import org.wpilib.math.geometry.Rotation2d;
++import org.wpilib.math.linalg.MatBuilder;
++import org.wpilib.math.linalg.Matrix;
++import org.wpilib.math.linalg.VecBuilder;
+ import org.wpilib.math.numbers.N1;
+ import org.wpilib.math.numbers.N2;
+ import org.wpilib.UtilityClassTest;
+diff --git a/wpiutil/src/dev/java/org/wpilib/util/DevMain.java b/wpiutil/src/dev/java/org/wpilib/util/DevMain.java
+index 00fd2459968679e6d0adfb6e9375988de544ddf3..58da26088bb08a7c3fc3b274b6b376f01a7cb422 100644
+--- a/wpiutil/src/dev/java/org/wpilib/util/DevMain.java
++++ b/wpiutil/src/dev/java/org/wpilib/util/DevMain.java
+@@ -4,6 +4,8 @@
+ 
+ package org.wpilib.util;
+ 
++import org.wpilib.util.runtime.CombinedRuntimeLoader;
++
+ public final class DevMain {
+   /** Main entry point. */
+   public static void main(String[] args) {
+diff --git a/wpiutil/src/main/java/org/wpilib/util/WPIUtilJNI.java b/wpiutil/src/main/java/org/wpilib/util/WPIUtilJNI.java
+index 0560785875a7fd46a9a0d9cf91ca8f95115e8e64..de473521a455d69440d520378c9623a1e91d3a53 100644
+--- a/wpiutil/src/main/java/org/wpilib/util/WPIUtilJNI.java
++++ b/wpiutil/src/main/java/org/wpilib/util/WPIUtilJNI.java
+@@ -7,6 +7,7 @@ package org.wpilib.util;
+ import java.io.IOException;
+ import java.nio.ByteBuffer;
+ import java.util.concurrent.atomic.AtomicBoolean;
++import org.wpilib.util.runtime.RuntimeLoader;
+ 
+ /** WPIUtil JNI. */
+ public class WPIUtilJNI {
+diff --git a/wpiutil/src/main/java/org/wpilib/util/concurrent/EventVector.java b/wpiutil/src/main/java/org/wpilib/util/concurrent/EventVector.java
+index 94afa96e2484dcecdf42521b47478d289ae50c94..7c4b4d2b1f552a3526c7c0a43fb34d877b4e9ccf 100644
+--- a/wpiutil/src/main/java/org/wpilib/util/concurrent/EventVector.java
++++ b/wpiutil/src/main/java/org/wpilib/util/concurrent/EventVector.java
+@@ -7,6 +7,7 @@ package org.wpilib.util.concurrent;
+ import java.util.ArrayList;
+ import java.util.List;
+ import java.util.concurrent.locks.ReentrantLock;
++import org.wpilib.util.WPIUtilJNI;
+ 
+ /** A thread-safe container for handling events. */
+ public class EventVector {
+diff --git a/wpiutil/src/main/native/cpp/jni/WPIUtilJNI.cpp b/wpiutil/src/main/native/cpp/jni/WPIUtilJNI.cpp
+index 58e619ff2f82ae5e5a6099b5eb2b47ec945af9af..9d0c20874a857a443424e48be302c3412955d0f8 100644
+--- a/wpiutil/src/main/native/cpp/jni/WPIUtilJNI.cpp
++++ b/wpiutil/src/main/native/cpp/jni/WPIUtilJNI.cpp
+@@ -32,7 +32,7 @@ static const JExceptionInit exceptions[] = {
+     {"java/lang/InterruptedException", &interruptedEx},
+     {"java/io/IOException", &ioEx},
+     {"java/lang/NullPointerException", &nullPointerEx},
+-    {"org/wpilib/util/MsvcRuntimeException", &msvcRuntimeEx}};
++    {"org/wpilib/util/runtime/MsvcRuntimeException", &msvcRuntimeEx}};
+ 
+ void wpi::ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg) {
+   illegalArgEx.Throw(env, msg);
