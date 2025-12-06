@@ -185,8 +185,8 @@ namespace HALUsageReporting {
     kResourceType_PoseEstimator = 131,
     kResourceType_PoseEstimator3d = 132,
     kResourceType_LinearSystemLoop = 133,
-    kResourceType_LumenLabs_ConnectorX = 134,
-    kResourceType_LumenLabs_ConnectorXLED = 135,
+    kResourceType_LumynLabs_ConnectorX = 134,
+    kResourceType_LumynLabs_ConnectorXAnimate = 135,
   };
   enum tInstances : int32_t {
     kLanguage_LabVIEW = 1,
