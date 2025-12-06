@@ -25,7 +25,8 @@ namespace wpi::math {
  * when using computer-vision systems.
  */
 class WPILIB_DLLEXPORT MecanumDriveOdometry
-    : public Odometry<MecanumDriveWheelSpeeds, MecanumDriveWheelPositions> {
+    : public Odometry<MecanumDriveWheelPositions, MecanumDriveWheelSpeeds,
+                      MecanumDriveWheelAccelerations> {
  public:
   /**
    * Constructs a MecanumDriveOdometry object.

@@ -149,4 +149,55 @@ class SwerveModuleStateTest {
         () -> assertEquals(Math.sqrt(2.0), refL.speed, kEpsilon),
         () -> assertEquals(45.0, refL.angle.getDegrees(), kEpsilon));
   }
+
+  @Test
+  void testInterpolate() {
+    // Test basic interpolation with simple angles
+    final var start = new SwerveModuleState(1.0, Rotation2d.fromDegrees(0.0));
+    final var end = new SwerveModuleState(5.0, Rotation2d.fromDegrees(90.0));
+
+    // Test interpolation at t=0 (should return start)
+    final var atStart = start.interpolate(end, 0.0);
+    assertAll(
+        () -> assertEquals(1.0, atStart.speed, kEpsilon),
+        () -> assertEquals(0.0, atStart.angle.getDegrees(), kEpsilon));
+
+    // Test interpolation at t=1 (should return end)
+    final var atEnd = start.interpolate(end, 1.0);
+    assertAll(
+        () -> assertEquals(5.0, atEnd.speed, kEpsilon),
+        () -> assertEquals(90.0, atEnd.angle.getDegrees(), kEpsilon));
+
+    // Test interpolation at t=0.5 (should return midpoint)
+    final var atMidpoint = start.interpolate(end, 0.5);
+    assertAll(
+        () -> assertEquals(3.0, atMidpoint.speed, kEpsilon),
+        () -> assertEquals(45.0, atMidpoint.angle.getDegrees(), kEpsilon));
+
+    // Test interpolation at t=0.25
+    final var atQuarter = start.interpolate(end, 0.25);
+    assertAll(
+        () -> assertEquals(2.0, atQuarter.speed, kEpsilon),
+        () -> assertEquals(22.5, atQuarter.angle.getDegrees(), kEpsilon));
+
+    // Test clamping: t < 0 should clamp to 0
+    final var belowRange = start.interpolate(end, -0.5);
+    assertAll(
+        () -> assertEquals(1.0, belowRange.speed, kEpsilon),
+        () -> assertEquals(0.0, belowRange.angle.getDegrees(), kEpsilon));
+
+    // Test clamping: t > 1 should clamp to 1
+    final var aboveRange = start.interpolate(end, 1.5);
+    assertAll(
+        () -> assertEquals(5.0, aboveRange.speed, kEpsilon),
+        () -> assertEquals(90.0, aboveRange.angle.getDegrees(), kEpsilon));
+
+    // Test angle wrapping with crossing 180/-180 boundary
+    final var startWrap = new SwerveModuleState(2.0, Rotation2d.fromDegrees(170.0));
+    final var endWrap = new SwerveModuleState(4.0, Rotation2d.fromDegrees(-170.0));
+    final var midpointWrap = startWrap.interpolate(endWrap, 0.5);
+    assertAll(
+        () -> assertEquals(3.0, midpointWrap.speed, kEpsilon),
+        () -> assertEquals(180.0, Math.abs(midpointWrap.angle.getDegrees()), kEpsilon));
+  }
 }

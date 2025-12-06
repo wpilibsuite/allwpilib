@@ -20,7 +20,7 @@ import org.wpilib.math.geometry.Translation2d;
  * @param <T> Wheel positions type.
  */
 public class Odometry<T> {
-  private final Kinematics<?, T> m_kinematics;
+  private final Kinematics<T, ?, ?> m_kinematics;
   private Pose2d m_pose;
 
   private Rotation2d m_gyroOffset;
@@ -36,7 +36,7 @@ public class Odometry<T> {
    * @param initialPose The starting position of the robot on the field.
    */
   public Odometry(
-      Kinematics<?, T> kinematics, Rotation2d gyroAngle, T wheelPositions, Pose2d initialPose) {
+      Kinematics<T, ?, ?> kinematics, Rotation2d gyroAngle, T wheelPositions, Pose2d initialPose) {
     m_kinematics = kinematics;
     m_pose = initialPose;
     m_gyroOffset = m_pose.getRotation().minus(gyroAngle);

@@ -74,7 +74,7 @@ public class PoseEstimator3d<T> {
    */
   @SuppressWarnings("PMD.UnusedFormalParameter")
   public PoseEstimator3d(
-      Kinematics<?, T> kinematics,
+      Kinematics<T, ?, ?> kinematics,
       Odometry3d<T> odometry,
       Matrix<N4, N1> stateStdDevs,
       Matrix<N4, N1> visionMeasurementStdDevs) {

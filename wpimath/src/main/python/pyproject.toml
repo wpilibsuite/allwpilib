@@ -1529,17 +1529,20 @@ yaml_path = "semiwrap/kinematics"
 [tool.semiwrap.extension_modules."wpimath.kinematics._kinematics".headers]
 # wpi/math/kinematics
 ChassisSpeeds = "wpi/math/kinematics/ChassisSpeeds.hpp"
+ChassisAccelerations = "wpi/math/kinematics/ChassisAccelerations.hpp"
 DifferentialDriveKinematics = "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 DifferentialDriveOdometry3d = "wpi/math/kinematics/DifferentialDriveOdometry3d.hpp"
 DifferentialDriveOdometry = "wpi/math/kinematics/DifferentialDriveOdometry.hpp"
 DifferentialDriveWheelPositions = "wpi/math/kinematics/DifferentialDriveWheelPositions.hpp"
 DifferentialDriveWheelSpeeds = "wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp"
+DifferentialDriveWheelAccelerations = "wpi/math/kinematics/DifferentialDriveWheelAccelerations.hpp"
 Kinematics = "wpi/math/kinematics/Kinematics.hpp"
 MecanumDriveKinematics = "wpi/math/kinematics/MecanumDriveKinematics.hpp"
 MecanumDriveOdometry = "wpi/math/kinematics/MecanumDriveOdometry.hpp"
 MecanumDriveOdometry3d = "wpi/math/kinematics/MecanumDriveOdometry3d.hpp"
 MecanumDriveWheelPositions = "wpi/math/kinematics/MecanumDriveWheelPositions.hpp"
 MecanumDriveWheelSpeeds = "wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp"
+MecanumDriveWheelAccelerations = "wpi/math/kinematics/MecanumDriveWheelAccelerations.hpp"
 Odometry = "wpi/math/kinematics/Odometry.hpp"
 Odometry3d = "wpi/math/kinematics/Odometry3d.hpp"
 SwerveDriveKinematics = "wpi/math/kinematics/SwerveDriveKinematics.hpp"
@@ -1547,6 +1550,7 @@ SwerveDriveOdometry = "wpi/math/kinematics/SwerveDriveOdometry.hpp"
 SwerveDriveOdometry3d = "wpi/math/kinematics/SwerveDriveOdometry3d.hpp"
 SwerveModulePosition = "wpi/math/kinematics/SwerveModulePosition.hpp"
 SwerveModuleState = "wpi/math/kinematics/SwerveModuleState.hpp"
+SwerveModuleAcceleration = "wpi/math/kinematics/SwerveModuleAcceleration.hpp"
 
 
 [tool.semiwrap.extension_modules."wpimath.spline._spline"]

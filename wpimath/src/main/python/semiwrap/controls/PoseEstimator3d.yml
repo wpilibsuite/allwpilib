@@ -2,17 +2,21 @@ defaults:
   subpackage: estimator
 
 extra_includes:
+- wpi/math/kinematics/DifferentialDriveWheelAccelerations.hpp
 - wpi/math/kinematics/DifferentialDriveWheelPositions.hpp
 - wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp
+- wpi/math/kinematics/MecanumDriveWheelAccelerations.hpp
 - wpi/math/kinematics/MecanumDriveWheelPositions.hpp
 - wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp
+- wpi/math/kinematics/SwerveModuleAcceleration.hpp
 - wpi/math/kinematics/SwerveDriveKinematics.hpp
 
 classes:
   wpi::math::PoseEstimator3d:
     template_params:
-    - WheelSpeeds
     - WheelPositions
+    - WheelSpeeds
+    - WheelAccelerations
     methods:
       PoseEstimator3d:
       SetVisionMeasurementStdDevs:
@@ -34,30 +38,36 @@ templates:
   DifferentialDrivePoseEstimator3dBase:
     qualname: wpi::math::PoseEstimator3d
     params:
-    - wpi::math::DifferentialDriveWheelSpeeds
     - wpi::math::DifferentialDriveWheelPositions
+    - wpi::math::DifferentialDriveWheelSpeeds
+    - wpi::math::DifferentialDriveWheelAccelerations
   MecanumDrivePoseEstimator3dBase:
     qualname: wpi::math::PoseEstimator3d
     params:
-    - wpi::math::MecanumDriveWheelSpeeds
     - wpi::math::MecanumDriveWheelPositions
+    - wpi::math::MecanumDriveWheelSpeeds
+    - wpi::math::MecanumDriveWheelAccelerations
   SwerveDrive2PoseEstimator3dBase:
     qualname: wpi::math::PoseEstimator3d
     params:
-    - wpi::util::array<wpi::math::SwerveModuleState,2>
     - wpi::util::array<wpi::math::SwerveModulePosition,2>
+    - wpi::util::array<wpi::math::SwerveModuleState,2>
+    - wpi::util::array<wpi::math::SwerveModuleAcceleration,2>
   SwerveDrive3PoseEstimator3dBase:
     qualname: wpi::math::PoseEstimator3d
     params:
-    - wpi::util::array<wpi::math::SwerveModuleState,3>
     - wpi::util::array<wpi::math::SwerveModulePosition,3>
+    - wpi::util::array<wpi::math::SwerveModuleState,3>
+    - wpi::util::array<wpi::math::SwerveModuleAcceleration,3>
   SwerveDrive4PoseEstimator3dBase:
     qualname: wpi::math::PoseEstimator3d
     params:
-    - wpi::util::array<wpi::math::SwerveModuleState,4>
     - wpi::util::array<wpi::math::SwerveModulePosition,4>
+    - wpi::util::array<wpi::math::SwerveModuleState,4>
+    - wpi::util::array<wpi::math::SwerveModuleAcceleration,4>
   SwerveDrive6PoseEstimator3dBase:
     qualname: wpi::math::PoseEstimator3d
     params:
-    - wpi::util::array<wpi::math::SwerveModuleState,6>
     - wpi::util::array<wpi::math::SwerveModulePosition,6>
+    - wpi::util::array<wpi::math::SwerveModuleState,6>
+    - wpi::util::array<wpi::math::SwerveModuleAcceleration,6>

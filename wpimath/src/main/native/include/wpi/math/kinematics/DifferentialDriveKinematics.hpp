@@ -7,7 +7,9 @@
 #include <type_traits>
 
 #include "wpi/math/geometry/Twist2d.hpp"
+#include "wpi/math/kinematics/ChassisAccelerations.hpp"
 #include "wpi/math/kinematics/ChassisSpeeds.hpp"
+#include "wpi/math/kinematics/DifferentialDriveWheelAccelerations.hpp"
 #include "wpi/math/kinematics/DifferentialDriveWheelPositions.hpp"
 #include "wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp"
 #include "wpi/math/kinematics/Kinematics.hpp"
@@ -26,8 +28,9 @@ namespace wpi::math {
  * component velocities into a linear and angular chassis speed.
  */
 class WPILIB_DLLEXPORT DifferentialDriveKinematics
-    : public Kinematics<DifferentialDriveWheelSpeeds,
-                        DifferentialDriveWheelPositions> {
+    : public Kinematics<DifferentialDriveWheelPositions,
+                        DifferentialDriveWheelSpeeds,
+                        DifferentialDriveWheelAccelerations> {
  public:
   /**
    * Constructs a differential drive kinematics object.
@@ -96,6 +99,23 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
       const DifferentialDriveWheelPositions& start,
       const DifferentialDriveWheelPositions& end, double t) const override {
     return start.Interpolate(end, t);
+  }
+
+  constexpr ChassisAccelerations ToChassisAccelerations(
+      const DifferentialDriveWheelAccelerations& wheelAccelerations)
+      const override {
+    return {(wheelAccelerations.left + wheelAccelerations.right) / 2.0,
+            0_mps_sq,
+            (wheelAccelerations.right - wheelAccelerations.left) / trackwidth *
+                1_rad};
+  }
+
+  constexpr DifferentialDriveWheelAccelerations ToWheelAccelerations(
+      const ChassisAccelerations& chassisAccelerations) const override {
+    return {chassisAccelerations.ax -
+                trackwidth / 2 * chassisAccelerations.alpha / 1_rad,
+            chassisAccelerations.ax +
+                trackwidth / 2 * chassisAccelerations.alpha / 1_rad};
   }
 
   /// Differential drive trackwidth.

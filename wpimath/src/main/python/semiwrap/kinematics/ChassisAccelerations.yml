@@ -1,0 +1,17 @@
+classes:
+  wpi::math::ChassisAccelerations:
+    attributes:
+      ax:
+      ay:
+      alpha:
+    methods:
+      ToRobotRelative:
+      ToFieldRelative:
+      operator+:
+      operator-:
+        overloads:
+          const ChassisAccelerations& [const]:
+          '[const]':
+      operator*:
+      operator/:
+      operator==:

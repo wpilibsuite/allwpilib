@@ -23,7 +23,10 @@ import org.wpilib.util.struct.StructSerializable;
  * chassis speed.
  */
 public class DifferentialDriveKinematics
-    implements Kinematics<DifferentialDriveWheelSpeeds, DifferentialDriveWheelPositions>,
+    implements Kinematics<
+            DifferentialDriveWheelPositions,
+            DifferentialDriveWheelSpeeds,
+            DifferentialDriveWheelAccelerations>,
         ProtobufSerializable,
         StructSerializable {
   /** Differential drive trackwidth in meters. */
@@ -86,6 +89,23 @@ public class DifferentialDriveKinematics
     return new DifferentialDriveWheelSpeeds(
         chassisSpeeds.vx - trackwidth / 2 * chassisSpeeds.omega,
         chassisSpeeds.vx + trackwidth / 2 * chassisSpeeds.omega);
+  }
+
+  @Override
+  public ChassisAccelerations toChassisAccelerations(
+      DifferentialDriveWheelAccelerations wheelAccelerations) {
+    return new ChassisAccelerations(
+        (wheelAccelerations.left + wheelAccelerations.right) / 2,
+        0.0,
+        (wheelAccelerations.right - wheelAccelerations.left) / trackwidth);
+  }
+
+  @Override
+  public DifferentialDriveWheelAccelerations toWheelAccelerations(
+      ChassisAccelerations chassisAccelerations) {
+    return new DifferentialDriveWheelAccelerations(
+        chassisAccelerations.ax - trackwidth / 2 * chassisAccelerations.alpha,
+        chassisAccelerations.ax + trackwidth / 2 * chassisAccelerations.alpha);
   }
 
   @Override
