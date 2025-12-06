@@ -70,6 +70,8 @@ class WPILIB_DLLEXPORT PoseEstimator {
     }
 
     SetVisionMeasurementStdDevs(visionMeasurementStdDevs);
+    wpi::math::MathSharedStore::ReportUsage(
+        wpi::math::MathUsageId::kEstimator_PoseEstimator, 1);
   }
 
   /**

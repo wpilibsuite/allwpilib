@@ -135,6 +135,8 @@ class LinearQuadraticRegulator {
     }
 
     Reset();
+    wpi::math::MathSharedStore::ReportUsage(
+        wpi::math::MathUsageId::kController_LinearQuadraticRegulator, 1);
   }
 
   /**
@@ -194,6 +196,8 @@ class LinearQuadraticRegulator {
     }
 
     Reset();
+    wpi::math::MathSharedStore::ReportUsage(
+        wpi::math::MathUsageId::kController_LinearQuadraticRegulator, 1);
   }
 
   LinearQuadraticRegulator(LinearQuadraticRegulator&&) = default;

@@ -107,6 +107,8 @@ class UnscentedKalmanFilter {
     m_dt = dt;
 
     Reset();
+    wpi::math::MathSharedStore::ReportUsage(
+        wpi::math::MathUsageId::kEstimator_KalmanFilter, 3);
   }
 
   /**
@@ -166,6 +168,8 @@ class UnscentedKalmanFilter {
     m_dt = dt;
 
     Reset();
+    wpi::math::MathSharedStore::ReportUsage(
+        wpi::math::MathUsageId::kEstimator_KalmanFilter, 3);
   }
 
   /**

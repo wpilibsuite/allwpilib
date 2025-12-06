@@ -4,6 +4,8 @@
 
 package edu.wpi.first.math.system;
 
+import edu.wpi.first.math.MathSharedStore;
+import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.StateSpaceUtil;
@@ -132,6 +134,7 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num, Outputs ex
 
     m_nextR = new Matrix<>(new SimpleMatrix(controller.getK().getNumCols(), 1));
     reset(m_nextR);
+    MathSharedStore.getMathShared().reportUsage(MathUsageId.kSystem_LinearSystemLoop, 1);
   }
 
   /**

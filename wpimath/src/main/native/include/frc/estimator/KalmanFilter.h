@@ -118,6 +118,8 @@ class KalmanFilter {
     }
 
     Reset();
+    wpi::math::MathSharedStore::ReportUsage(
+        wpi::math::MathUsageId::kEstimator_KalmanFilter, 1);
   }
 
   /**
