@@ -7,7 +7,7 @@ package org.wpilib.javacplugin;
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.wpilib.javacplugin.CompileTestOptions.kJavaVersionOptions;
+import static org.wpilib.javacplugin.CompileTestUtils.kJavaVersionOptions;
 
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
