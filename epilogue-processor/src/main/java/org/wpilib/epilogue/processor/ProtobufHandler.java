@@ -62,8 +62,7 @@ public class ProtobufHandler extends ElementHandler {
     // implementations such as `SchedulerProto implements Protobuf<Scheduler, ProtobufScheduler>`.
     // Note: Using `ProtoMessage` raw as the upper bound causes assignability to fail; we must use
     // `ProtoMessage<?>` as the bound, then wrap that with an extends wildcard.
-    var protoMessageElement =
-        m_elementUtils.getTypeElement("us.hebi.quickbuf.ProtoMessage");
+    var protoMessageElement = m_elementUtils.getTypeElement("us.hebi.quickbuf.ProtoMessage");
     var protoMessageWildcard =
         m_typeUtils.getDeclaredType(protoMessageElement, m_typeUtils.getWildcardType(null, null));
     var boundedProtoMessageWildcard = m_typeUtils.getWildcardType(protoMessageWildcard, null);
