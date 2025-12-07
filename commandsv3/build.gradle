@@ -27,7 +27,9 @@ dependencies {
     implementation project(':wpilibj')
     api("us.hebi.quickbuf:quickbuf-runtime:1.4")
     testAnnotationProcessor project(':javacPlugin')
+    testAnnotationProcessor project(':epilogue-processor')
     testImplementation 'org.mockito:mockito-core:4.1.0'
+    testImplementation project(':epilogue-runtime')
 }
 
 sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
