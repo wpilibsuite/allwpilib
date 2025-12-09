@@ -1,5 +1,11 @@
+extra_includes:
+- wpystruct.h
+
 classes:
   wpi::math::ChassisAccelerations:
+    force_no_default_constructor: true
+    force_type_casters:
+    - wpi::units::meters_per_second_squared
     attributes:
       ax:
       ay:
@@ -15,3 +21,16 @@ classes:
       operator*:
       operator/:
       operator==:
+
+inline_code: |
+  cls_ChassisAccelerations
+    .def(
+      py::init<
+        wpi::units::meters_per_second_squared_t, wpi::units::meters_per_second_squared_t,
+        wpi::units::radians_per_second_squared_t
+      >(),
+      py::arg("ax") = 0, py::arg("ay") = 0, py::arg("alpha") = 0
+    )
+  ;
+
+  SetupWPyStruct<wpi::math::ChassisAccelerations>(cls_ChassisAccelerations);
