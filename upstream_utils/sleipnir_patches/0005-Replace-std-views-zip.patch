@@ -1,18 +1,18 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Sat, 8 Feb 2025 13:42:36 -0800
-Subject: [PATCH 5/8] Replace std::views::zip()
+Subject: [PATCH 5/9] Replace std::views::zip()
 
 ---
- include/sleipnir/autodiff/adjoint_expression_graph.hpp | 5 ++++-
- include/sleipnir/optimization/problem.hpp              | 8 +++++---
+ include/sleipnir/autodiff/gradient_expression_graph.hpp | 5 ++++-
+ include/sleipnir/optimization/problem.hpp               | 8 +++++---
  2 files changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/include/sleipnir/autodiff/adjoint_expression_graph.hpp b/include/sleipnir/autodiff/adjoint_expression_graph.hpp
-index 16bea7efeeca78d25b34b0b1242ca19cbd05a482..a77323eee9277fc3c77a11ab57ab5003d9ed4543 100644
---- a/include/sleipnir/autodiff/adjoint_expression_graph.hpp
-+++ b/include/sleipnir/autodiff/adjoint_expression_graph.hpp
-@@ -171,7 +171,10 @@ class AdjointExpressionGraph {
+diff --git a/include/sleipnir/autodiff/gradient_expression_graph.hpp b/include/sleipnir/autodiff/gradient_expression_graph.hpp
+index 414b98971580a6e3209eabfffd082de1dd5711c7..d21c1b5ad1b2f79ac4ec4e525e9b7fe7789a0461 100644
+--- a/include/sleipnir/autodiff/gradient_expression_graph.hpp
++++ b/include/sleipnir/autodiff/gradient_expression_graph.hpp
+@@ -161,7 +161,10 @@ class GradientExpressionGraph {
          }
        }
      } else {
@@ -25,10 +25,10 @@ index 16bea7efeeca78d25b34b0b1242ca19cbd05a482..a77323eee9277fc3c77a11ab57ab5003
          if (col != -1 && node->adjoint != Scalar(0)) {
            triplets.emplace_back(row, col, node->adjoint);
 diff --git a/include/sleipnir/optimization/problem.hpp b/include/sleipnir/optimization/problem.hpp
-index d20777a5b1912754dda5504313549197e867d34b..5256d08e5f9d8642049d8bb8323d76c7b3bbbef7 100644
+index 22e7cdaa945648e2b9effcc30533d6602c839c22..70955fdc7148e5af737d3094a5602024df790b3d 100644
 --- a/include/sleipnir/optimization/problem.hpp
 +++ b/include/sleipnir/optimization/problem.hpp
-@@ -726,9 +726,11 @@ class Problem {
+@@ -675,9 +675,11 @@ class Problem {
            for (const auto& constraint : constraints) {
              ++counts[static_cast<uint8_t>(constraint.type())];
            }

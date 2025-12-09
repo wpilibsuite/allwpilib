@@ -16,45 +16,38 @@
 
 namespace slp::detail {
 
-/**
- * This class is an adaptor type that performs value updates of an expression's
- * adjoint graph.
- *
- * @tparam Scalar Scalar type.
- */
+/// This class is an adapter type that performs value updates of an expression
+/// graph, generates a gradient tree, or appends gradient triplets for creating
+/// a sparse matrix of gradients.
+///
+/// @tparam Scalar Scalar type.
 template <typename Scalar>
-class AdjointExpressionGraph {
+class GradientExpressionGraph {
  public:
-  /**
-   * Generates the adjoint graph for the given expression.
-   *
-   * @param root The root node of the expression.
-   */
-  explicit AdjointExpressionGraph(const Variable<Scalar>& root)
+  /// Generates the gradient graph for the given expression.
+  ///
+  /// @param root The root node of the expression.
+  explicit GradientExpressionGraph(const Variable<Scalar>& root)
       : m_top_list{topological_sort(root.expr)} {
     for (const auto& node : m_top_list) {
       m_col_list.emplace_back(node->col);
     }
   }
 
-  /**
-   * Update the values of all nodes in this adjoint graph based on the values of
-   * their dependent nodes.
-   */
+  /// Update the values of all nodes in this graph based on the values of their
+  /// dependent nodes.
   void update_values() { detail::update_values(m_top_list); }
 
-  /**
-   * Returns the variable's gradient tree.
-   *
-   * This function lazily allocates variables, so elements of the returned
-   * VariableMatrix will be empty if the corresponding element of wrt had no
-   * adjoint. Ensure Variable::expr isn't nullptr before calling member
-   * functions.
-   *
-   * @param wrt Variables with respect to which to compute the gradient.
-   * @return The variable's gradient tree.
-   */
-  VariableMatrix<Scalar> generate_gradient_tree(
+  /// Returns the variable's gradient tree.
+  ///
+  /// This function lazily allocates variables, so elements of the returned
+  /// VariableMatrix will be empty if the corresponding element of wrt had no
+  /// adjoint. Ensure Variable::expr isn't nullptr before calling member
+  /// functions.
+  ///
+  /// @param wrt Variables with respect to which to compute the gradient.
+  /// @return The variable's gradient tree.
+  VariableMatrix<Scalar> generate_tree(
       const VariableMatrix<Scalar>& wrt) const {
     slp_assert(wrt.cols() == 1);
 
@@ -104,18 +97,15 @@ class AdjointExpressionGraph {
     return grad;
   }
 
-  /**
-   * Updates the adjoints in the expression graph (computes the gradient) then
-   * appends the adjoints of wrt to the sparse matrix triplets.
-   *
-   * @param triplets The sparse matrix triplets.
-   * @param row The row of wrt.
-   * @param wrt Vector of variables with respect to which to compute the
-   *   Jacobian.
-   */
-  void append_gradient_triplets(
-      gch::small_vector<Eigen::Triplet<Scalar>>& triplets, int row,
-      const VariableMatrix<Scalar>& wrt) const {
+  /// Updates the adjoints in the expression graph (computes the gradient) then
+  /// appends the adjoints of wrt to the sparse matrix triplets.
+  ///
+  /// @param triplets The sparse matrix triplets.
+  /// @param row The row of wrt.
+  /// @param wrt Vector of variables with respect to which to compute the
+  ///     Jacobian.
+  void append_triplets(gch::small_vector<Eigen::Triplet<Scalar>>& triplets,
+                       int row, const VariableMatrix<Scalar>& wrt) const {
     slp_assert(wrt.cols() == 1);
 
     // Read docs/algorithms.md#Reverse_accumulation_automatic_differentiation

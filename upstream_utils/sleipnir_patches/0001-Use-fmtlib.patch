@@ -1,16 +1,56 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Wed, 29 May 2024 16:29:55 -0700
-Subject: [PATCH 1/8] Use fmtlib
+Subject: [PATCH 1/9] Use fmtlib
 
 ---
- include/sleipnir/optimization/problem.hpp |  1 +
- include/sleipnir/util/assert.hpp          |  5 ++--
- include/sleipnir/util/print.hpp           | 31 +++++++++++++----------
- 3 files changed, 22 insertions(+), 15 deletions(-)
+ include/sleipnir/autodiff/expression_type.hpp |  9 ++++---
+ include/sleipnir/optimization/problem.hpp     |  1 +
+ .../optimization/solver/exit_status.hpp       |  9 ++++---
+ include/sleipnir/util/assert.hpp              |  5 ++--
+ include/sleipnir/util/print.hpp               | 27 ++++++++++---------
+ 5 files changed, 28 insertions(+), 23 deletions(-)
 
+diff --git a/include/sleipnir/autodiff/expression_type.hpp b/include/sleipnir/autodiff/expression_type.hpp
+index 200324a2c38c58dbe07e96c061658c9e65aacce6..2fde6bdf3cf72f46fb633b72e29e66209e9f6a83 100644
+--- a/include/sleipnir/autodiff/expression_type.hpp
++++ b/include/sleipnir/autodiff/expression_type.hpp
+@@ -4,9 +4,10 @@
+ 
+ #include <stdint.h>
+ 
+-#include <format>
+ #include <utility>
+ 
++#include <fmt/base.h>
++
+ namespace slp {
+ 
+ /// Expression type.
+@@ -29,12 +30,12 @@ enum class ExpressionType : uint8_t {
+ 
+ /// Formatter for ExpressionType.
+ template <>
+-struct std::formatter<slp::ExpressionType> {
++struct fmt::formatter<slp::ExpressionType> {
+   /// Parse format string.
+   ///
+   /// @param ctx Format parse context.
+   /// @return Format parse context iterator.
+-  constexpr auto parse(std::format_parse_context& ctx) {
++  constexpr auto parse(fmt::format_parse_context& ctx) {
+     return m_underlying.parse(ctx);
+   }
+ 
+@@ -65,5 +66,5 @@ struct std::formatter<slp::ExpressionType> {
+   }
+ 
+  private:
+-  std::formatter<const char*> m_underlying;
++  fmt::formatter<const char*> m_underlying;
+ };
 diff --git a/include/sleipnir/optimization/problem.hpp b/include/sleipnir/optimization/problem.hpp
-index 3185466605b6604068e2807e461d07d8c856c505..95a33952a5a368c7c81491dbe849a8096357dc38 100644
+index 59acc732dbc5bfe520745089abd156da9a8a2e51..ba45ead1500b45616b74e1d108959127484cf4d6 100644
 --- a/include/sleipnir/optimization/problem.hpp
 +++ b/include/sleipnir/optimization/problem.hpp
 @@ -15,6 +15,7 @@
@@ -21,24 +61,60 @@ index 3185466605b6604068e2807e461d07d8c856c505..95a33952a5a368c7c81491dbe849a809
  #include <gch/small_vector.hpp>
  
  #include "sleipnir/autodiff/expression_type.hpp"
+diff --git a/include/sleipnir/optimization/solver/exit_status.hpp b/include/sleipnir/optimization/solver/exit_status.hpp
+index e17f4490cc0f6704f0b5d29340ec6dfbbcbb8aee..c1e4d319c197bdad2ace19500fb3a0426060e87b 100644
+--- a/include/sleipnir/optimization/solver/exit_status.hpp
++++ b/include/sleipnir/optimization/solver/exit_status.hpp
+@@ -4,9 +4,10 @@
+ 
+ #include <stdint.h>
+ 
+-#include <format>
+ #include <utility>
+ 
++#include <fmt/base.h>
++
+ namespace slp {
+ 
+ /// Solver exit status. Negative values indicate failure.
+@@ -43,12 +44,12 @@ enum class ExitStatus : int8_t {
+ 
+ /// Formatter for ExitStatus.
+ template <>
+-struct std::formatter<slp::ExitStatus> {
++struct fmt::formatter<slp::ExitStatus> {
+   /// Parse format string.
+   ///
+   /// @param ctx Format parse context.
+   /// @return Format parse context iterator.
+-  constexpr auto parse(std::format_parse_context& ctx) {
++  constexpr auto parse(fmt::format_parse_context& ctx) {
+     return m_underlying.parse(ctx);
+   }
+ 
+@@ -92,5 +93,5 @@ struct std::formatter<slp::ExitStatus> {
+   }
+ 
+  private:
+-  std::formatter<const char*> m_underlying;
++  fmt::formatter<const char*> m_underlying;
+ };
 diff --git a/include/sleipnir/util/assert.hpp b/include/sleipnir/util/assert.hpp
-index 0846928c3da7a6047a3c271dd2d377a3b755eeab..5d432608def05b6dee6b7cbdb9a0b91a6ab5e1c2 100644
+index dd479f11080d67b03dbe72475be974908e96fc2f..4f0203a4b8df2f86e1e15cf1102a51c340665722 100644
 --- a/include/sleipnir/util/assert.hpp
 +++ b/include/sleipnir/util/assert.hpp
-@@ -4,10 +4,11 @@
+@@ -3,16 +3,17 @@
+ #pragma once
  
  #ifdef SLEIPNIR_PYTHON
- 
 -#include <format>
  #include <source_location>
  #include <stdexcept>
  
 +#include <fmt/format.h>
 +
- /**
-  * Throw an exception in Python.
-  */
-@@ -15,7 +16,7 @@
+ /// Throw an exception in Python.
+ #define slp_assert(condition)                                        \
    do {                                                               \
      if (!(condition)) {                                              \
        auto location = std::source_location::current();               \
@@ -48,33 +124,26 @@ index 0846928c3da7a6047a3c271dd2d377a3b755eeab..5d432608def05b6dee6b7cbdb9a0b91a
            location.line(), location.function_name(), #condition));   \
      }                                                                \
 diff --git a/include/sleipnir/util/print.hpp b/include/sleipnir/util/print.hpp
-index 797df849f63d960cf10eaf847415595961868ab0..a89b7d4f9864965443405a8e79cddd8dbfc54ad3 100644
+index d436bf297b85cf84fad642fa43aa97063e7d6ebb..b2920580eea0297fc387b5168df78a1515a5dd60 100644
 --- a/include/sleipnir/util/print.hpp
 +++ b/include/sleipnir/util/print.hpp
-@@ -4,10 +4,15 @@
+@@ -4,47 +4,48 @@
  
  #ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
  #include <cstdio>
 -#include <print>
  #include <system_error>
  #include <utility>
- 
-+#if __has_include(<fmt/base.h>)
-+#include <fmt/base.h>
-+#else
-+#include <fmt/core.h>
-+#endif
 +
++#include <fmt/base.h>
  #endif
  
  namespace slp {
-@@ -15,45 +20,45 @@ namespace slp {
+ 
  #ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
  
- /**
-- * Wrapper around std::print() that squelches write failure exceptions.
-+ * Wrapper around fmt::print() that squelches write failure exceptions.
-  */
+-/// Wrapper around std::print() that squelches write failure exceptions.
++/// Wrapper around fmt::print() that squelches write failure exceptions.
  template <typename... T>
 -void print(std::format_string<T...> fmt, T&&... args) {
 +void print(fmt::format_string<T...> fmt, T&&... args) {
@@ -85,10 +154,8 @@ index 797df849f63d960cf10eaf847415595961868ab0..a89b7d4f9864965443405a8e79cddd8d
    }
  }
  
- /**
-- * Wrapper around std::print() that squelches write failure exceptions.
-+ * Wrapper around fmt::print() that squelches write failure exceptions.
-  */
+-/// Wrapper around std::print() that squelches write failure exceptions.
++/// Wrapper around fmt::print() that squelches write failure exceptions.
  template <typename... T>
 -void print(std::FILE* f, std::format_string<T...> fmt, T&&... args) {
 +void print(std::FILE* f, fmt::format_string<T...> fmt, T&&... args) {
@@ -99,10 +166,8 @@ index 797df849f63d960cf10eaf847415595961868ab0..a89b7d4f9864965443405a8e79cddd8d
    }
  }
  
- /**
-- * Wrapper around std::println() that squelches write failure exceptions.
-+ * Wrapper around fmt::println() that squelches write failure exceptions.
-  */
+-/// Wrapper around std::println() that squelches write failure exceptions.
++/// Wrapper around fmt::println() that squelches write failure exceptions.
  template <typename... T>
 -void println(std::format_string<T...> fmt, T&&... args) {
 +void println(fmt::format_string<T...> fmt, T&&... args) {
@@ -113,10 +178,8 @@ index 797df849f63d960cf10eaf847415595961868ab0..a89b7d4f9864965443405a8e79cddd8d
    }
  }
  
- /**
-- * Wrapper around std::println() that squelches write failure exceptions.
-+ * Wrapper around fmt::println() that squelches write failure exceptions.
-  */
+-/// Wrapper around std::println() that squelches write failure exceptions.
++/// Wrapper around fmt::println() that squelches write failure exceptions.
  template <typename... T>
 -void println(std::FILE* f, std::format_string<T...> fmt, T&&... args) {
 +void println(std::FILE* f, fmt::format_string<T...> fmt, T&&... args) {
