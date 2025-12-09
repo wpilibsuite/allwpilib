@@ -1,0 +1,16 @@
+classes:
+  wpi::math::MecanumDriveWheelAccelerations:
+    attributes:
+      frontLeft:
+      frontRight:
+      rearLeft:
+      rearRight:
+    methods:
+      operator+:
+      operator-:
+        overloads:
+          const MecanumDriveWheelAccelerations& [const]:
+          '[const]':
+      operator*:
+      operator/:
+      operator==:

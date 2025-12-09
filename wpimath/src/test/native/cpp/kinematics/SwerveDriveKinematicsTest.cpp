@@ -310,3 +310,183 @@ TEST_F(SwerveDriveKinematicsTest, DesaturateNegativeSpeed) {
   EXPECT_NEAR(arr[2].speed.value(), -1.0, kEpsilon);
   EXPECT_NEAR(arr[3].speed.value(), -1.0, kEpsilon);
 }
+
+TEST_F(SwerveDriveKinematicsTest, TurnInPlaceInverseAccelerations) {
+  ChassisAccelerations accelerations{
+      0_mps_sq, 0_mps_sq,
+      wpi::units::radians_per_second_squared_t{2 * std::numbers::pi}};
+  wpi::units::radians_per_second_t angularVelocity =
+      2_rad_per_s * std::numbers::pi;
+  auto [flAccel, frAccel, blAccel, brAccel] =
+      m_kinematics.ToSwerveModuleAccelerations(accelerations, angularVelocity);
+
+  // For turn-in-place with angular acceleration of 2π rad/s² and angular
+  // velocity of 2π rad/s, each module has both tangential acceleration (from
+  // angular acceleration) and centripetal acceleration (from angular velocity).
+  // The total acceleration magnitude is approximately 678.4.
+  //
+  // For each swerve module at position (x, y) relative to the robot center:
+  // - Distance from center: r = √(x² + y²) = √(12² + 12²) = 16.97 m
+  // - Current tangential velocity: v_t = ω × r = 2π × 16.97 = 106.63 m/s
+  //
+  // Two acceleration components:
+  // 1) Tangential acceleration (from angular acceleration α = 2π rad/s²):
+  //    a_tangential = α × r = 2π × 16.97 = 106.63 m/s²
+  //    Direction: perpendicular to radius vector
+  //
+  // 2) Centripetal acceleration (from angular velocity ω = 2π rad/s):
+  //    a_centripetal = ω² × r = (2π)² × 16.97 = 668.7 m/s²
+  //    Direction: toward center of rotation
+  //
+  // Total acceleration magnitude: |a_total| = √(a_tangential² + a_centripetal²)
+  //                                         = √(106.63² + 668.7²) = 678.4 m/s²
+  //
+  // For module positions:
+  // FL (12, 12): radius angle = 135°, tangential = 45°, centripetal = -135° →
+  //              total angle = -144°
+  // FR (12, -12): radius angle = 45°, tangential = -45°, centripetal = -135° →
+  //               total angle = 126°
+  // BL (-12, 12): radius angle = 135°, tangential = 45°, centripetal = 45° →
+  //               total angle = -54°
+  // BR (-12, -12): radius angle = -45°, tangential = 45°, centripetal = 135° →
+  //                total angle = 36°
+  //
+  // The acceleration angles are not simply tangential because the centripetal
+  // component from the existing angular velocity dominates and affects the
+  // direction.
+
+  double centerRadius = m_kinematics.GetModules()[0].Norm().value();
+  double tangentialAccel = centerRadius * accelerations.alpha.value();  // α * r
+  double centripetalAccel = centerRadius * angularVelocity.value() *
+                            angularVelocity.value();  // ω² * r
+  double totalAccel = std::hypot(tangentialAccel, centripetalAccel);
+
+  std::array<Rotation2d, 4> expectedAngles;
+  for (size_t i = 0; i < 4; i++) {
+    Rotation2d radiusAngle = m_kinematics.GetModules()[i].Angle();
+
+    // Tangential acceleration: perpendicular to radius (90° CCW from radius)
+    Rotation2d tangentialDirection = radiusAngle + Rotation2d{90_deg};
+    double tangentialX = tangentialAccel * tangentialDirection.Cos();
+    double tangentialY = tangentialAccel * tangentialDirection.Sin();
+
+    // Centripetal acceleration: toward center (opposite of radius)
+    Rotation2d centripetalDirection = radiusAngle + Rotation2d{180_deg};
+    double centripetalX = centripetalAccel * centripetalDirection.Cos();
+    double centripetalY = centripetalAccel * centripetalDirection.Sin();
+
+    // Vector sum of tangential and centripetal accelerations
+    double totalX = tangentialX + centripetalX;
+    double totalY = tangentialY + centripetalY;
+
+    expectedAngles[i] = Rotation2d{totalX, totalY};
+  }
+
+  EXPECT_NEAR(totalAccel, flAccel.acceleration.value(), kEpsilon);
+  EXPECT_NEAR(totalAccel, frAccel.acceleration.value(), kEpsilon);
+  EXPECT_NEAR(totalAccel, blAccel.acceleration.value(), kEpsilon);
+  EXPECT_NEAR(totalAccel, brAccel.acceleration.value(), kEpsilon);
+  EXPECT_NEAR(expectedAngles[0].Degrees().value(),
+              flAccel.angle.Degrees().value(), kEpsilon);
+  EXPECT_NEAR(expectedAngles[1].Degrees().value(),
+              frAccel.angle.Degrees().value(), kEpsilon);
+  EXPECT_NEAR(expectedAngles[2].Degrees().value(),
+              blAccel.angle.Degrees().value(), kEpsilon);
+  EXPECT_NEAR(expectedAngles[3].Degrees().value(),
+              brAccel.angle.Degrees().value(), kEpsilon);
+}
+
+TEST_F(SwerveDriveKinematicsTest, TurnInPlaceForwardAccelerations) {
+  SwerveModuleAcceleration flAccel{106.629_mps_sq, 135_deg};
+  SwerveModuleAcceleration frAccel{106.629_mps_sq, 45_deg};
+  SwerveModuleAcceleration blAccel{106.629_mps_sq, -135_deg};
+  SwerveModuleAcceleration brAccel{106.629_mps_sq, -45_deg};
+
+  auto chassisAccelerations =
+      m_kinematics.ToChassisAccelerations(flAccel, frAccel, blAccel, brAccel);
+
+  EXPECT_NEAR(0.0, chassisAccelerations.ax.value(), kEpsilon);
+  EXPECT_NEAR(0.0, chassisAccelerations.ay.value(), kEpsilon);
+  EXPECT_NEAR(2 * std::numbers::pi, chassisAccelerations.alpha.value(),
+              kEpsilon);
+}
+
+TEST_F(SwerveDriveKinematicsTest, OffCenterRotationInverseAccelerations) {
+  ChassisAccelerations accelerations{0_mps_sq, 0_mps_sq, 1_rad_per_s_sq};
+  // For this test, assume an angular velocity of 1 rad/s
+  wpi::units::radians_per_second_t angularVelocity = 1.0_rad_per_s;
+  auto [flAccel, frAccel, blAccel, brAccel] =
+      m_kinematics.ToSwerveModuleAccelerations(accelerations, angularVelocity,
+                                               m_fl);
+
+  // When rotating about the front-left module position with both angular
+  // acceleration (1 rad/s²) and angular velocity (1 rad/s), each module
+  // experiences both tangential and centripetal accelerations that combine
+  // vectorially.
+  //
+  // Center of rotation: FL module at (12, 12) inches
+  // Module positions relative to center of rotation:
+  // - FL: (0, 0) - at center of rotation
+  // - FR: (0, -24) - 24 m south of center
+  // - BL: (-24, 0) - 24 m west of center
+  // - BR: (-24, -24) - distance = √(24² + 24²) = 33.94 m southwest
+  //
+  // For each module at distance r from center of rotation:
+  // 1) Tangential acceleration: a_t = α × r = 1 × r
+  //    Direction: perpendicular to radius vector (90° CCW from radius)
+  //
+  // 2) Centripetal acceleration: a_c = ω² × r = 1² × r = r
+  //    Direction: toward center of rotation
+
+  std::array<double, 4> expectedAccelerations;
+  std::array<Rotation2d, 4> expectedAngles;
+
+  for (size_t i = 0; i < 4; i++) {
+    Translation2d relativePos = m_kinematics.GetModules()[i] - m_fl;
+    double r = relativePos.Norm().value();
+
+    if (r < 1e-9) {
+      expectedAccelerations[i] = 0.0;  // No acceleration at center of rotation
+      expectedAngles[i] =
+          Rotation2d{};  // Angle is undefined at center of rotation
+    } else {
+      double tangentialAccel =
+          r * accelerations.alpha.value();  // α * r = 1 * r
+      double centripetalAccel = r * angularVelocity.value() *
+                                angularVelocity.value();  // ω² * r = 1 * r
+      expectedAccelerations[i] = std::hypot(tangentialAccel, centripetalAccel);
+
+      Rotation2d radiusAngle{(relativePos.X().value()),
+                             (relativePos.Y().value())};
+
+      // Tangential acceleration: perpendicular to radius (90° CCW from radius)
+      Rotation2d tangentialDirection = radiusAngle + Rotation2d{90_deg};
+      double tangentialX = tangentialDirection.Cos() * r;  // α * r = 1 * r
+      double tangentialY = tangentialDirection.Sin() * r;
+
+      // Centripetal acceleration: toward center (opposite of radius)
+      Rotation2d centripetalDirection = radiusAngle + Rotation2d{180_deg};
+      double centripetalX = centripetalDirection.Cos() * r;  // ω² * r = 1 * r
+      double centripetalY = centripetalDirection.Sin() * r;
+
+      // Vector sum of tangential and centripetal accelerations
+      double totalX = tangentialX + centripetalX;
+      double totalY = tangentialY + centripetalY;
+
+      expectedAngles[i] = Rotation2d{totalX, totalY};
+    }
+  }
+
+  EXPECT_NEAR(expectedAccelerations[0], flAccel.acceleration.value(), kEpsilon);
+  EXPECT_NEAR(expectedAccelerations[1], frAccel.acceleration.value(), kEpsilon);
+  EXPECT_NEAR(expectedAccelerations[2], blAccel.acceleration.value(), kEpsilon);
+  EXPECT_NEAR(expectedAccelerations[3], brAccel.acceleration.value(), kEpsilon);
+  EXPECT_NEAR(expectedAngles[0].Degrees().value(),
+              flAccel.angle.Degrees().value(), kEpsilon);
+  EXPECT_NEAR(expectedAngles[1].Degrees().value(),
+              frAccel.angle.Degrees().value(), kEpsilon);
+  EXPECT_NEAR(expectedAngles[2].Degrees().value(),
+              blAccel.angle.Degrees().value(), kEpsilon);
+  EXPECT_NEAR(expectedAngles[3].Degrees().value(),
+              brAccel.angle.Degrees().value(), kEpsilon);
+}
