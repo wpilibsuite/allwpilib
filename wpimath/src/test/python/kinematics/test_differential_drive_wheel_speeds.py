@@ -1,12 +1,11 @@
 import pytest
 
 from wpimath.kinematics import DifferentialDriveWheelSpeeds
-from wpimath.units import meters_per_second
 
 
 def test_plus():
-    left = DifferentialDriveWheelSpeeds(meters_per_second(1.0), meters_per_second(0.5))
-    right = DifferentialDriveWheelSpeeds(meters_per_second(2.0), meters_per_second(1.5))
+    left = DifferentialDriveWheelSpeeds(left=1.0, right=0.5)
+    right = DifferentialDriveWheelSpeeds(left=2.0, right=1.5)
 
     result = left + right
 
@@ -15,8 +14,8 @@ def test_plus():
 
 
 def test_minus():
-    left = DifferentialDriveWheelSpeeds(meters_per_second(1.0), meters_per_second(0.5))
-    right = DifferentialDriveWheelSpeeds(meters_per_second(2.0), meters_per_second(0.5))
+    left = DifferentialDriveWheelSpeeds(left=1.0, right=0.5)
+    right = DifferentialDriveWheelSpeeds(left=2.0, right=0.5)
 
     result = left - right
 
@@ -25,7 +24,7 @@ def test_minus():
 
 
 def test_unary_minus():
-    speeds = DifferentialDriveWheelSpeeds(meters_per_second(1.0), meters_per_second(0.5))
+    speeds = DifferentialDriveWheelSpeeds(left=1.0, right=0.5)
 
     result = -speeds
 
@@ -34,7 +33,7 @@ def test_unary_minus():
 
 
 def test_multiplication():
-    speeds = DifferentialDriveWheelSpeeds(meters_per_second(1.0), meters_per_second(0.5))
+    speeds = DifferentialDriveWheelSpeeds(left=1.0, right=0.5)
 
     result = speeds * 2
 
@@ -43,7 +42,7 @@ def test_multiplication():
 
 
 def test_division():
-    speeds = DifferentialDriveWheelSpeeds(meters_per_second(1.0), meters_per_second(0.5))
+    speeds = DifferentialDriveWheelSpeeds(left=1.0, right=0.5)
 
     result = speeds / 2
 

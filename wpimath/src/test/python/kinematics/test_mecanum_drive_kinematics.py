@@ -7,18 +7,17 @@ from wpimath.kinematics import (
     MecanumDriveWheelSpeeds,
     MecanumDriveWheelPositions,
 )
-from wpimath.geometry import Translation2d
-from wpimath.units import meters, meters_per_second, radians_per_second, radians
+from wpimath.geometry import Rotation2d, Translation2d
 
 
 @pytest.fixture
 def kinematics_test():
     class MecanumDriveKinematicsTest:
         def __init__(self):
-            self.m_fl = Translation2d(meters(12), meters(12))
-            self.m_fr = Translation2d(meters(12), meters(-12))
-            self.m_bl = Translation2d(meters(-12), meters(12))
-            self.m_br = Translation2d(meters(-12), meters(-12))
+            self.m_fl = Translation2d(x=12, y=12)
+            self.m_fr = Translation2d(x=12, y=-12)
+            self.m_bl = Translation2d(x=-12, y=12)
+            self.m_br = Translation2d(x=-12, y=-12)
             self.kinematics = MecanumDriveKinematics(
                 self.m_fl, self.m_fr, self.m_bl, self.m_br
             )
@@ -27,7 +26,7 @@ def kinematics_test():
 
 
 def test_straight_line_inverse_kinematics(kinematics_test):
-    speeds = ChassisSpeeds(meters_per_second(5), meters_per_second(0), radians_per_second(0))
+    speeds = ChassisSpeeds(vx=5, vy=0, omega=0)
     module_states = kinematics_test.kinematics.toWheelSpeeds(speeds)
 
     assert module_states.frontLeft == pytest.approx(5.0, abs=0.1)
@@ -38,7 +37,7 @@ def test_straight_line_inverse_kinematics(kinematics_test):
 
 def test_straight_line_forward_kinematics(kinematics_test):
     wheel_speeds = MecanumDriveWheelSpeeds(
-        meters_per_second(5), meters_per_second(5), meters_per_second(5), meters_per_second(5)
+        frontLeft=5, frontRight=5, rearLeft=5, rearRight=5
     )
     chassis_speeds = kinematics_test.kinematics.toChassisSpeeds(wheel_speeds)
 
@@ -49,7 +48,7 @@ def test_straight_line_forward_kinematics(kinematics_test):
 
 def test_straight_line_forward_kinematics_with_deltas(kinematics_test):
     wheel_deltas = MecanumDriveWheelPositions(
-        meters(5), meters(5), meters(5), meters(5)
+        frontLeft=5, frontRight=5, rearLeft=5, rearRight=5
     )
     twist = kinematics_test.kinematics.toTwist2d(wheel_deltas)
 
@@ -59,7 +58,7 @@ def test_straight_line_forward_kinematics_with_deltas(kinematics_test):
 
 
 def test_strafe_inverse_kinematics(kinematics_test):
-    speeds = ChassisSpeeds(meters_per_second(0), meters_per_second(4), radians_per_second(0))
+    speeds = ChassisSpeeds(vx=0, vy=4, omega=0)
     module_states = kinematics_test.kinematics.toWheelSpeeds(speeds)
 
     assert module_states.frontLeft == pytest.approx(-4.0, abs=0.1)
@@ -70,7 +69,7 @@ def test_strafe_inverse_kinematics(kinematics_test):
 
 def test_strafe_forward_kinematics(kinematics_test):
     wheel_speeds = MecanumDriveWheelSpeeds(
-        meters_per_second(-5), meters_per_second(5), meters_per_second(5), meters_per_second(-5)
+        frontLeft=-5, frontRight=5, rearLeft=5, rearRight=-5
     )
     chassis_speeds = kinematics_test.kinematics.toChassisSpeeds(wheel_speeds)
 
@@ -81,7 +80,7 @@ def test_strafe_forward_kinematics(kinematics_test):
 
 def test_strafe_forward_kinematics_with_deltas(kinematics_test):
     wheel_deltas = MecanumDriveWheelPositions(
-        meters(-5), meters(5), meters(5), meters(-5)
+        frontLeft=-5, frontRight=5, rearLeft=5, rearRight=-5
     )
     twist = kinematics_test.kinematics.toTwist2d(wheel_deltas)
 
@@ -92,7 +91,7 @@ def test_strafe_forward_kinematics_with_deltas(kinematics_test):
 
 def test_rotation_inverse_kinematics(kinematics_test):
     speeds = ChassisSpeeds(
-        meters_per_second(0), meters_per_second(0), radians_per_second(2 * math.pi)
+        vx=0, vy=0, omega=2 * math.pi
     )
     module_states = kinematics_test.kinematics.toWheelSpeeds(speeds)
 
@@ -104,10 +103,10 @@ def test_rotation_inverse_kinematics(kinematics_test):
 
 def test_rotation_forward_kinematics(kinematics_test):
     wheel_speeds = MecanumDriveWheelSpeeds(
-        meters_per_second(-150.79644737),
-        meters_per_second(150.79644737),
-        meters_per_second(-150.79644737),
-        meters_per_second(150.79644737),
+        frontLeft=-150.79644737,
+        frontRight=150.79644737,
+        rearLeft=-150.79644737,
+        rearRight=150.79644737,
     )
     chassis_speeds = kinematics_test.kinematics.toChassisSpeeds(wheel_speeds)
 
@@ -118,7 +117,7 @@ def test_rotation_forward_kinematics(kinematics_test):
 
 def test_rotation_forward_kinematics_with_deltas(kinematics_test):
     wheel_deltas = MecanumDriveWheelPositions(
-        meters(-150.79644737), meters(150.79644737), meters(-150.79644737), meters(150.79644737)
+        frontLeft=-150.79644737, frontRight=150.79644737, rearLeft=-150.79644737, rearRight=150.79644737
     )
     twist = kinematics_test.kinematics.toTwist2d(wheel_deltas)
 
@@ -128,7 +127,7 @@ def test_rotation_forward_kinematics_with_deltas(kinematics_test):
 
 
 def test_mixed_rotation_translation_inverse_kinematics(kinematics_test):
-    speeds = ChassisSpeeds(meters_per_second(2), meters_per_second(3), radians_per_second(1))
+    speeds = ChassisSpeeds(vx=2, vy=3, omega=1)
     module_states = kinematics_test.kinematics.toWheelSpeeds(speeds)
 
     assert module_states.frontLeft == pytest.approx(-25.0, abs=0.1)
@@ -139,10 +138,10 @@ def test_mixed_rotation_translation_inverse_kinematics(kinematics_test):
 
 def test_mixed_rotation_translation_forward_kinematics(kinematics_test):
     wheel_speeds = MecanumDriveWheelSpeeds(
-        meters_per_second(-17.677670),
-        meters_per_second(20.506097),
-        meters_per_second(-13.435),
-        meters_per_second(16.26),
+        frontLeft=-17.677670,
+        frontRight=20.506097,
+        rearLeft=-13.435,
+        rearRight=16.26,
     )
 
     chassis_speeds = kinematics_test.kinematics.toChassisSpeeds(wheel_speeds)
@@ -154,7 +153,7 @@ def test_mixed_rotation_translation_forward_kinematics(kinematics_test):
 
 def test_mixed_rotation_translation_forward_kinematics_with_deltas(kinematics_test):
     wheel_deltas = MecanumDriveWheelPositions(
-        meters(-17.677670), meters(20.506097), meters(-13.435), meters(16.26)
+        frontLeft=-17.677670, frontRight=20.506097, rearLeft=-13.435, rearRight=16.26
     )
 
     twist = kinematics_test.kinematics.toTwist2d(wheel_deltas)
@@ -165,7 +164,7 @@ def test_mixed_rotation_translation_forward_kinematics_with_deltas(kinematics_te
 
 
 def test_off_center_rotation_inverse_kinematics(kinematics_test):
-    speeds = ChassisSpeeds(meters_per_second(0), meters_per_second(0), radians_per_second(1))
+    speeds = ChassisSpeeds(vx=0, vy=0, omega=1)
     module_states = kinematics_test.kinematics.toWheelSpeeds(speeds, kinematics_test.m_fl)
 
     assert module_states.frontLeft == pytest.approx(0, abs=0.1)
@@ -176,10 +175,10 @@ def test_off_center_rotation_inverse_kinematics(kinematics_test):
 
 def test_off_center_rotation_forward_kinematics(kinematics_test):
     wheel_speeds = MecanumDriveWheelSpeeds(
-        meters_per_second(0),
-        meters_per_second(16.971),
-        meters_per_second(-16.971),
-        meters_per_second(33.941),
+        frontLeft=0,
+        frontRight=16.971,
+        rearLeft=-16.971,
+        rearRight=33.941,
     )
     chassis_speeds = kinematics_test.kinematics.toChassisSpeeds(wheel_speeds)
 
@@ -190,7 +189,7 @@ def test_off_center_rotation_forward_kinematics(kinematics_test):
 
 def test_off_center_rotation_forward_kinematics_with_deltas(kinematics_test):
     wheel_deltas = MecanumDriveWheelPositions(
-        meters(0), meters(16.971), meters(-16.971), meters(33.941)
+        frontLeft=0, frontRight=16.971, rearLeft=-16.971, rearRight=33.941
     )
     twist = kinematics_test.kinematics.toTwist2d(wheel_deltas)
 
@@ -200,7 +199,7 @@ def test_off_center_rotation_forward_kinematics_with_deltas(kinematics_test):
 
 
 def test_off_center_translation_rotation_inverse_kinematics(kinematics_test):
-    speeds = ChassisSpeeds(meters_per_second(5), meters_per_second(2), radians_per_second(1))
+    speeds = ChassisSpeeds(vx=5, vy=2, omega=1)
     module_states = kinematics_test.kinematics.toWheelSpeeds(speeds, kinematics_test.m_fl)
 
     assert module_states.frontLeft == pytest.approx(3.0, abs=0.1)
@@ -211,10 +210,10 @@ def test_off_center_translation_rotation_inverse_kinematics(kinematics_test):
 
 def test_off_center_translation_rotation_forward_kinematics(kinematics_test):
     wheel_speeds = MecanumDriveWheelSpeeds(
-        meters_per_second(2.12),
-        meters_per_second(21.92),
-        meters_per_second(-12.02),
-        meters_per_second(36.06),
+        frontLeft=2.12,
+        frontRight=21.92,
+        rearLeft=-12.02,
+        rearRight=36.06,
     )
     chassis_speeds = kinematics_test.kinematics.toChassisSpeeds(wheel_speeds)
 
@@ -225,7 +224,7 @@ def test_off_center_translation_rotation_forward_kinematics(kinematics_test):
 
 def test_off_center_translation_rotation_forward_kinematics_with_deltas(kinematics_test):
     wheel_deltas = MecanumDriveWheelPositions(
-        meters(2.12), meters(21.92), meters(-12.02), meters(36.06)
+        frontLeft=2.12, frontRight=21.92, rearLeft=-12.02, rearRight=36.06
     )
     twist = kinematics_test.kinematics.toTwist2d(wheel_deltas)
 
@@ -236,8 +235,8 @@ def test_off_center_translation_rotation_forward_kinematics_with_deltas(kinemati
 
 def test_desaturate(kinematics_test):
     wheel_speeds = MecanumDriveWheelSpeeds(
-        meters_per_second(5), meters_per_second(6), meters_per_second(4), meters_per_second(7)
-    ).desaturate(meters_per_second(5.5))
+        frontLeft=5, frontRight=6, rearLeft=4, rearRight=7
+    ).desaturate(5.5)
 
     k_factor = 5.5 / 7.0
 
@@ -249,11 +248,11 @@ def test_desaturate(kinematics_test):
 
 def test_desaturate_negative_speeds(kinematics_test):
     wheel_speeds = MecanumDriveWheelSpeeds(
-        meters_per_second(-5),
-        meters_per_second(6),
-        meters_per_second(4),
-        meters_per_second(-7),
-    ).desaturate(meters_per_second(5.5))
+        frontLeft=-5,
+        frontRight=6,
+        rearLeft=4,
+        rearRight=-7,
+    ).desaturate(5.5)
 
     k_factor = 5.5 / 7.0
 

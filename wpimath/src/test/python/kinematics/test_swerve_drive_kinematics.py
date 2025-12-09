@@ -8,8 +8,6 @@ from wpimath.kinematics import (
     SwerveModulePosition,
 )
 from wpimath.geometry import Translation2d, Rotation2d
-from wpimath.units import meters, meters_per_second, radians_per_second
-from wpimath.units import seconds
 
 kEpsilon = 0.1
 
@@ -18,10 +16,10 @@ kEpsilon = 0.1
 def kinematics_test():
     class SwerveDriveKinematicsTest:
         def __init__(self):
-            self.m_fl = Translation2d(meters(12), meters(12))
-            self.m_fr = Translation2d(meters(12), meters(-12))
-            self.m_bl = Translation2d(meters(-12), meters(12))
-            self.m_br = Translation2d(meters(-12), meters(-12))
+            self.m_fl = Translation2d(x=12, y=12)
+            self.m_fr = Translation2d(x=12, y=-12)
+            self.m_bl = Translation2d(x=-12, y=12)
+            self.m_br = Translation2d(x=-12, y=-12)
             self.m_kinematics = SwerveDrive4Kinematics(
                 self.m_fl, self.m_fr, self.m_bl, self.m_br
             )
@@ -30,7 +28,7 @@ def kinematics_test():
 
 
 def test_straight_line_inverse_kinematics(kinematics_test):
-    speeds = ChassisSpeeds(meters_per_second(5.0), meters_per_second(0.0), radians_per_second(0.0))
+    speeds = ChassisSpeeds(vx=5.0, vy=0.0, omega=0.0)
     states = kinematics_test.m_kinematics.toSwerveModuleStates(speeds)
 
     fl, fr, bl, br = states
@@ -47,7 +45,7 @@ def test_straight_line_inverse_kinematics(kinematics_test):
 
 
 def test_straight_line_forward_kinematics(kinematics_test):
-    state = SwerveModuleState(meters_per_second(5.0), Rotation2d.fromDegrees(0))
+    state = SwerveModuleState(speed=5.0, angle=Rotation2d.fromDegrees(0))
     chassis_speeds = kinematics_test.m_kinematics.toChassisSpeeds(
         (state, state, state, state)
     )
@@ -58,7 +56,7 @@ def test_straight_line_forward_kinematics(kinematics_test):
 
 
 def test_straight_line_forward_kinematics_with_deltas(kinematics_test):
-    delta = SwerveModulePosition(meters(5.0), Rotation2d.fromDegrees(0))
+    delta = SwerveModulePosition(distance=5.0, angle=Rotation2d.fromDegrees(0))
     twist = kinematics_test.m_kinematics.toTwist2d((delta, delta, delta, delta))
 
     assert twist.dx == pytest.approx(5.0, abs=kEpsilon)
@@ -67,7 +65,7 @@ def test_straight_line_forward_kinematics_with_deltas(kinematics_test):
 
 
 def test_straight_strafe_inverse_kinematics(kinematics_test):
-    speeds = ChassisSpeeds(meters_per_second(0), meters_per_second(5), radians_per_second(0))
+    speeds = ChassisSpeeds(vx=0, vy=5, omega=0)
     states = kinematics_test.m_kinematics.toSwerveModuleStates(speeds)
 
     fl, fr, bl, br = states
@@ -84,7 +82,7 @@ def test_straight_strafe_inverse_kinematics(kinematics_test):
 
 
 def test_straight_strafe_forward_kinematics(kinematics_test):
-    state = SwerveModuleState(meters_per_second(5), Rotation2d.fromDegrees(90))
+    state = SwerveModuleState(speed=5, angle=Rotation2d.fromDegrees(90))
     chassis_speeds = kinematics_test.m_kinematics.toChassisSpeeds(
         (state, state, state, state)
     )
@@ -95,7 +93,7 @@ def test_straight_strafe_forward_kinematics(kinematics_test):
 
 
 def test_straight_strafe_forward_kinematics_with_deltas(kinematics_test):
-    delta = SwerveModulePosition(meters(5), Rotation2d.fromDegrees(90))
+    delta = SwerveModulePosition(distance=5, angle=Rotation2d.fromDegrees(90))
     twist = kinematics_test.m_kinematics.toTwist2d((delta, delta, delta, delta))
 
     assert twist.dx == pytest.approx(0.0, abs=kEpsilon)
@@ -104,7 +102,7 @@ def test_straight_strafe_forward_kinematics_with_deltas(kinematics_test):
 
 
 def test_turn_in_place_inverse_kinematics(kinematics_test):
-    speeds = ChassisSpeeds(meters_per_second(0), meters_per_second(0), radians_per_second(2 * math.pi))
+    speeds = ChassisSpeeds(vx=0, vy=0, omega=2 * math.pi)
     states = kinematics_test.m_kinematics.toSwerveModuleStates(speeds)
 
     fl, fr, bl, br = states
@@ -121,7 +119,7 @@ def test_turn_in_place_inverse_kinematics(kinematics_test):
 
 
 def test_conserve_wheel_angle(kinematics_test):
-    speeds = ChassisSpeeds(meters_per_second(0), meters_per_second(0), radians_per_second(2 * math.pi))
+    speeds = ChassisSpeeds(vx=0, vy=0, omega=2 * math.pi)
     kinematics_test.m_kinematics.toSwerveModuleStates(speeds)
     states = kinematics_test.m_kinematics.toSwerveModuleStates(ChassisSpeeds())
 
@@ -160,10 +158,10 @@ def test_reset_wheel_angle(kinematics_test):
 
 
 def test_turn_in_place_forward_kinematics(kinematics_test):
-    fl = SwerveModuleState(meters_per_second(106.629), Rotation2d.fromDegrees(135))
-    fr = SwerveModuleState(meters_per_second(106.629), Rotation2d.fromDegrees(45))
-    bl = SwerveModuleState(meters_per_second(106.629), Rotation2d.fromDegrees(-135))
-    br = SwerveModuleState(meters_per_second(106.629), Rotation2d.fromDegrees(-45))
+    fl = SwerveModuleState(speed=106.629, angle=Rotation2d.fromDegrees(135))
+    fr = SwerveModuleState(speed=106.629, angle=Rotation2d.fromDegrees(45))
+    bl = SwerveModuleState(speed=106.629, angle=Rotation2d.fromDegrees(-135))
+    br = SwerveModuleState(speed=106.629, angle=Rotation2d.fromDegrees(-45))
 
     chassis_speeds = kinematics_test.m_kinematics.toChassisSpeeds((fl, fr, bl, br))
 
@@ -173,10 +171,10 @@ def test_turn_in_place_forward_kinematics(kinematics_test):
 
 
 def test_turn_in_place_forward_kinematics_with_deltas(kinematics_test):
-    fl = SwerveModulePosition(meters(106.629), Rotation2d.fromDegrees(135))
-    fr = SwerveModulePosition(meters(106.629), Rotation2d.fromDegrees(45))
-    bl = SwerveModulePosition(meters(106.629), Rotation2d.fromDegrees(-135))
-    br = SwerveModulePosition(meters(106.629), Rotation2d.fromDegrees(-45))
+    fl = SwerveModulePosition(distance=106.629, angle=Rotation2d.fromDegrees(135))
+    fr = SwerveModulePosition(distance=106.629, angle=Rotation2d.fromDegrees(45))
+    bl = SwerveModulePosition(distance=106.629, angle=Rotation2d.fromDegrees(-135))
+    br = SwerveModulePosition(distance=106.629, angle=Rotation2d.fromDegrees(-45))
 
     twist = kinematics_test.m_kinematics.toTwist2d((fl, fr, bl, br))
 
@@ -186,7 +184,7 @@ def test_turn_in_place_forward_kinematics_with_deltas(kinematics_test):
 
 
 def test_off_center_cor_rotation_inverse_kinematics(kinematics_test):
-    speeds = ChassisSpeeds(meters_per_second(0), meters_per_second(0), radians_per_second(2 * math.pi))
+    speeds = ChassisSpeeds(0, 0, 2 * math.pi)
     states = kinematics_test.m_kinematics.toSwerveModuleStates(
         speeds, kinematics_test.m_fl
     )
@@ -205,10 +203,10 @@ def test_off_center_cor_rotation_inverse_kinematics(kinematics_test):
 
 
 def test_off_center_cor_rotation_forward_kinematics(kinematics_test):
-    fl = SwerveModuleState(meters_per_second(0.0), Rotation2d.fromDegrees(0))
-    fr = SwerveModuleState(meters_per_second(150.796), Rotation2d.fromDegrees(0))
-    bl = SwerveModuleState(meters_per_second(150.796), Rotation2d.fromDegrees(-90))
-    br = SwerveModuleState(meters_per_second(213.258), Rotation2d.fromDegrees(-45))
+    fl = SwerveModuleState(speed=0.0, angle=Rotation2d.fromDegrees(0))
+    fr = SwerveModuleState(speed=150.796, angle=Rotation2d.fromDegrees(0))
+    bl = SwerveModuleState(speed=150.796, angle=Rotation2d.fromDegrees(-90))
+    br = SwerveModuleState(speed=213.258, angle=Rotation2d.fromDegrees(-45))
 
     chassis_speeds = kinematics_test.m_kinematics.toChassisSpeeds((fl, fr, bl, br))
 
@@ -218,10 +216,10 @@ def test_off_center_cor_rotation_forward_kinematics(kinematics_test):
 
 
 def test_off_center_cor_rotation_forward_kinematics_with_deltas(kinematics_test):
-    fl = SwerveModulePosition(meters(0.0), Rotation2d.fromDegrees(0))
-    fr = SwerveModulePosition(meters(150.796), Rotation2d.fromDegrees(0))
-    bl = SwerveModulePosition(meters(150.796), Rotation2d.fromDegrees(-90))
-    br = SwerveModulePosition(meters(213.258), Rotation2d.fromDegrees(-45))
+    fl = SwerveModulePosition(distance=0.0, angle=Rotation2d.fromDegrees(0))
+    fr = SwerveModulePosition(distance=150.796, angle=Rotation2d.fromDegrees(0))
+    bl = SwerveModulePosition(distance=150.796, angle=Rotation2d.fromDegrees(-90))
+    br = SwerveModulePosition(distance=213.258, angle=Rotation2d.fromDegrees(-45))
 
     twist = kinematics_test.m_kinematics.toTwist2d((fl, fr, bl, br))
 
@@ -231,9 +229,9 @@ def test_off_center_cor_rotation_forward_kinematics_with_deltas(kinematics_test)
 
 
 def test_off_center_cor_rotation_and_translation_inverse_kinematics(kinematics_test):
-    speeds = ChassisSpeeds(meters_per_second(0), meters_per_second(3.0), radians_per_second(1.5))
+    speeds = ChassisSpeeds(0, 3.0, 1.5)
     states = kinematics_test.m_kinematics.toSwerveModuleStates(
-        speeds, Translation2d(meters(24), meters(0))
+        speeds, Translation2d(x=24, y=0)
     )
 
     fl, fr, bl, br = states
@@ -250,10 +248,10 @@ def test_off_center_cor_rotation_and_translation_inverse_kinematics(kinematics_t
 
 
 def test_off_center_cor_rotation_and_translation_forward_kinematics(kinematics_test):
-    fl = SwerveModuleState(meters_per_second(23.43), Rotation2d.fromDegrees(-140.19))
-    fr = SwerveModuleState(meters_per_second(23.43), Rotation2d.fromDegrees(-39.81))
-    bl = SwerveModuleState(meters_per_second(54.08), Rotation2d.fromDegrees(-109.44))
-    br = SwerveModuleState(meters_per_second(54.08), Rotation2d.fromDegrees(-70.56))
+    fl = SwerveModuleState(speed=23.43, angle=Rotation2d.fromDegrees(-140.19))
+    fr = SwerveModuleState(speed=23.43, angle=Rotation2d.fromDegrees(-39.81))
+    bl = SwerveModuleState(speed=54.08, angle=Rotation2d.fromDegrees(-109.44))
+    br = SwerveModuleState(speed=54.08, angle=Rotation2d.fromDegrees(-70.56))
 
     chassis_speeds = kinematics_test.m_kinematics.toChassisSpeeds((fl, fr, bl, br))
 
@@ -265,10 +263,10 @@ def test_off_center_cor_rotation_and_translation_forward_kinematics(kinematics_t
 def test_off_center_cor_rotation_and_translation_forward_kinematics_with_deltas(
     kinematics_test,
 ):
-    fl = SwerveModulePosition(meters(23.43), Rotation2d.fromDegrees(-140.19))
-    fr = SwerveModulePosition(meters(23.43), Rotation2d.fromDegrees(-39.81))
-    bl = SwerveModulePosition(meters(54.08), Rotation2d.fromDegrees(-109.44))
-    br = SwerveModulePosition(meters(54.08), Rotation2d.fromDegrees(-70.56))
+    fl = SwerveModulePosition(distance=23.43, angle=Rotation2d.fromDegrees(-140.19))
+    fr = SwerveModulePosition(distance=23.43, angle=Rotation2d.fromDegrees(-39.81))
+    bl = SwerveModulePosition(distance=54.08, angle=Rotation2d.fromDegrees(-109.44))
+    br = SwerveModulePosition(distance=54.08, angle=Rotation2d.fromDegrees(-70.56))
 
     twist = kinematics_test.m_kinematics.toTwist2d((fl, fr, bl, br))
 
@@ -278,13 +276,13 @@ def test_off_center_cor_rotation_and_translation_forward_kinematics_with_deltas(
 
 
 def test_desaturate(kinematics_test):
-    state1 = SwerveModuleState(meters_per_second(5.0), Rotation2d.fromDegrees(0))
-    state2 = SwerveModuleState(meters_per_second(6.0), Rotation2d.fromDegrees(0))
-    state3 = SwerveModuleState(meters_per_second(4.0), Rotation2d.fromDegrees(0))
-    state4 = SwerveModuleState(meters_per_second(7.0), Rotation2d.fromDegrees(0))
+    state1 = SwerveModuleState(speed=5.0, angle=Rotation2d.fromDegrees(0))
+    state2 = SwerveModuleState(speed=6.0, angle=Rotation2d.fromDegrees(0))
+    state3 = SwerveModuleState(speed=4.0, angle=Rotation2d.fromDegrees(0))
+    state4 = SwerveModuleState(speed=7.0, angle=Rotation2d.fromDegrees(0))
 
     arr = [state1, state2, state3, state4]
-    arr = kinematics_test.m_kinematics.desaturateWheelSpeeds(arr, meters_per_second(5.5))
+    arr = kinematics_test.m_kinematics.desaturateWheelSpeeds(arr, 5.5)
 
     k_factor = 5.5 / 7.0
 
@@ -295,17 +293,17 @@ def test_desaturate(kinematics_test):
 
 
 def test_desaturate_smooth(kinematics_test):
-    state1 = SwerveModuleState(meters_per_second(5.0), Rotation2d(0))
-    state2 = SwerveModuleState(meters_per_second(6.0), Rotation2d(0))
-    state3 = SwerveModuleState(meters_per_second(4.0), Rotation2d(0))
-    state4 = SwerveModuleState(meters_per_second(7.0), Rotation2d(0))
+    state1 = SwerveModuleState(speed=5.0, angle=Rotation2d(0))
+    state2 = SwerveModuleState(speed=6.0, angle=Rotation2d(0))
+    state3 = SwerveModuleState(speed=4.0, angle=Rotation2d(0))
+    state4 = SwerveModuleState(speed=7.0, angle=Rotation2d(0))
 
     arr = [state1, state2, state3, state4]
     chassis_speeds = kinematics_test.m_kinematics.toChassisSpeeds(
         (arr[0], arr[1], arr[2], arr[3])
     )
     arr = kinematics_test.m_kinematics.desaturateWheelSpeeds(
-        arr, chassis_speeds, meters_per_second(5.5), meters_per_second(5.5), radians_per_second(3.5)
+        arr, chassis_speeds, 5.5, 5.5, 3.5
     )
 
     k_factor = 5.5 / 7.0
@@ -317,13 +315,13 @@ def test_desaturate_smooth(kinematics_test):
 
 
 def test_desaturate_negative_speed(kinematics_test):
-    state1 = SwerveModuleState(meters_per_second(1.0), Rotation2d(0))
-    state2 = SwerveModuleState(meters_per_second(1.0), Rotation2d(0))
-    state3 = SwerveModuleState(meters_per_second(-2.0), Rotation2d(0))
-    state4 = SwerveModuleState(meters_per_second(-2.0), Rotation2d(0))
+    state1 = SwerveModuleState(speed=1.0, angle=Rotation2d(0))
+    state2 = SwerveModuleState(speed=1.0, angle=Rotation2d(0))
+    state3 = SwerveModuleState(speed=-2.0, angle=Rotation2d(0))
+    state4 = SwerveModuleState(speed=-2.0, angle=Rotation2d(0))
 
     arr = [state1, state2, state3, state4]
-    arr = kinematics_test.m_kinematics.desaturateWheelSpeeds(arr, meters_per_second(1.0))
+    arr = kinematics_test.m_kinematics.desaturateWheelSpeeds(arr, 1.0)
 
     assert arr[0].speed == pytest.approx(0.5, abs=kEpsilon)
     assert arr[1].speed == pytest.approx(0.5, abs=kEpsilon)

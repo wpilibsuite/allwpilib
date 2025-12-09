@@ -1,21 +1,20 @@
 import pytest
 
 from wpimath.kinematics import MecanumDriveWheelSpeeds
-from wpimath.units import meters_per_second
 
 
 def test_plus():
     left = MecanumDriveWheelSpeeds(
-        meters_per_second(1.0),
-        meters_per_second(0.5),
-        meters_per_second(2.0),
-        meters_per_second(1.5),
+        frontLeft=1.0,
+        frontRight=0.5,
+        rearLeft=2.0,
+        rearRight=1.5,
     )
     right = MecanumDriveWheelSpeeds(
-        meters_per_second(2.0),
-        meters_per_second(1.5),
-        meters_per_second(0.5),
-        meters_per_second(1.0),
+        frontLeft=2.0,
+        frontRight=1.5,
+        rearLeft=0.5,
+        rearRight=1.0,
     )
 
     result = left + right
@@ -28,16 +27,16 @@ def test_plus():
 
 def test_minus():
     left = MecanumDriveWheelSpeeds(
-        meters_per_second(1.0),
-        meters_per_second(0.5),
-        meters_per_second(2.0),
-        meters_per_second(1.5),
+        frontLeft=1.0,
+        frontRight=0.5,
+        rearLeft=2.0,
+        rearRight=1.5,
     )
     right = MecanumDriveWheelSpeeds(
-        meters_per_second(2.0),
-        meters_per_second(1.5),
-        meters_per_second(0.5),
-        meters_per_second(1.0),
+        frontLeft=2.0,
+        frontRight=1.5,
+        rearLeft=0.5,
+        rearRight=1.0,
     )
 
     result = left - right
@@ -50,10 +49,10 @@ def test_minus():
 
 def test_unary_minus():
     speeds = MecanumDriveWheelSpeeds(
-        meters_per_second(1.0),
-        meters_per_second(0.5),
-        meters_per_second(2.0),
-        meters_per_second(1.5),
+        frontLeft=1.0,
+        frontRight=0.5,
+        rearLeft=2.0,
+        rearRight=1.5,
     )
 
     result = -speeds
@@ -66,10 +65,10 @@ def test_unary_minus():
 
 def test_multiplication():
     speeds = MecanumDriveWheelSpeeds(
-        meters_per_second(1.0),
-        meters_per_second(0.5),
-        meters_per_second(2.0),
-        meters_per_second(1.5),
+        frontLeft=1.0,
+        frontRight=0.5,
+        rearLeft=2.0,
+        rearRight=1.5,
     )
 
     result = speeds * 2
@@ -82,10 +81,10 @@ def test_multiplication():
 
 def test_division():
     speeds = MecanumDriveWheelSpeeds(
-        meters_per_second(1.0),
-        meters_per_second(0.5),
-        meters_per_second(2.0),
-        meters_per_second(1.5),
+        frontLeft=1.0,
+        frontRight=0.5,
+        rearLeft=2.0,
+        rearRight=1.5,
     )
 
     result = speeds / 2

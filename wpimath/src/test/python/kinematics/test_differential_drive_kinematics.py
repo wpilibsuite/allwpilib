@@ -7,16 +7,11 @@ from wpimath.kinematics import (
     DifferentialDriveKinematics,
     DifferentialDriveWheelSpeeds,
 )
-from wpimath.units import (
-    meters,
-    meters_per_second,
-    radians,
-    radians_per_second,
-)
+from wpimath.geometry import Rotation2d
 
 
 def test_inverse_kinematics_from_zero():
-    kinematics = DifferentialDriveKinematics(meters(0.381 * 2))
+    kinematics = DifferentialDriveKinematics(trackwidth=0.381 * 2)
     chassis_speeds = ChassisSpeeds()
     wheel_speeds = kinematics.toWheelSpeeds(chassis_speeds)
 
@@ -25,7 +20,7 @@ def test_inverse_kinematics_from_zero():
 
 
 def test_forward_kinematics_from_zero():
-    kinematics = DifferentialDriveKinematics(meters(0.381 * 2))
+    kinematics = DifferentialDriveKinematics(trackwidth=0.381 * 2)
     wheel_speeds = DifferentialDriveWheelSpeeds()
     chassis_speeds = kinematics.toChassisSpeeds(wheel_speeds)
 
@@ -35,8 +30,8 @@ def test_forward_kinematics_from_zero():
 
 
 def test_inverse_kinematics_for_straight_line():
-    kinematics = DifferentialDriveKinematics(meters(0.381 * 2))
-    chassis_speeds = ChassisSpeeds(meters_per_second(3.0), meters_per_second(0), radians_per_second(0))
+    kinematics = DifferentialDriveKinematics(trackwidth=(0.381 * 2))
+    chassis_speeds = ChassisSpeeds(vx=3.0, vy=0, omega=0)
     wheel_speeds = kinematics.toWheelSpeeds(chassis_speeds)
 
     assert wheel_speeds.left == pytest.approx(3, abs=1e-9)
@@ -44,8 +39,8 @@ def test_inverse_kinematics_for_straight_line():
 
 
 def test_forward_kinematics_for_straight_line():
-    kinematics = DifferentialDriveKinematics(meters(0.381 * 2))
-    wheel_speeds = DifferentialDriveWheelSpeeds(meters_per_second(3.0), meters_per_second(3.0))
+    kinematics = DifferentialDriveKinematics(trackwidth=0.381 * 2)
+    wheel_speeds = DifferentialDriveWheelSpeeds(left=3.0, right=3.0)
     chassis_speeds = kinematics.toChassisSpeeds(wheel_speeds)
 
     assert chassis_speeds.vx == pytest.approx(3, abs=1e-9)
@@ -54,9 +49,9 @@ def test_forward_kinematics_for_straight_line():
 
 
 def test_inverse_kinematics_for_rotate_in_place():
-    kinematics = DifferentialDriveKinematics(meters(0.381 * 2))
+    kinematics = DifferentialDriveKinematics(trackwidth=0.381 * 2)
     chassis_speeds = ChassisSpeeds(
-        meters_per_second(0.0), meters_per_second(0.0), radians_per_second(math.pi)
+        vx=0.0, vy=0.0, omega=math.pi
     )
     wheel_speeds = kinematics.toWheelSpeeds(chassis_speeds)
 
@@ -65,9 +60,9 @@ def test_inverse_kinematics_for_rotate_in_place():
 
 
 def test_forward_kinematics_for_rotate_in_place():
-    kinematics = DifferentialDriveKinematics(meters(0.381 * 2))
+    kinematics = DifferentialDriveKinematics(trackwidth=0.381 * 2)
     wheel_speeds = DifferentialDriveWheelSpeeds(
-        meters_per_second(0.381 * math.pi), meters_per_second(-0.381 * math.pi)
+        left=0.381 * math.pi, right=-0.381 * math.pi
     )
     chassis_speeds = kinematics.toChassisSpeeds(wheel_speeds)
 

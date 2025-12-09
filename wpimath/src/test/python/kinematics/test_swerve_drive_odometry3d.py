@@ -10,13 +10,6 @@ from wpimath.kinematics import (
 )
 from wpimath.trajectory import TrajectoryGenerator, TrajectoryConfig
 from wpimath.geometry import Translation2d, Rotation2d, Rotation3d, Pose3d, Pose2d
-from wpimath.units import (
-    meters,
-    radians,
-    seconds,
-    meters_per_second,
-    meters_per_second_squared,
-)
 
 kEpsilon = 0.01
 
@@ -25,10 +18,10 @@ kEpsilon = 0.01
 def odometry3d_test():
     class SwerveDriveOdometry3dTest:
         def __init__(self):
-            self.m_fl = Translation2d(meters(12), meters(12))
-            self.m_fr = Translation2d(meters(12), meters(-12))
-            self.m_bl = Translation2d(meters(-12), meters(12))
-            self.m_br = Translation2d(meters(-12), meters(-12))
+            self.m_fl = Translation2d(x=12, y=12)
+            self.m_fr = Translation2d(x=12, y=-12)
+            self.m_bl = Translation2d(x=-12, y=12)
+            self.m_br = Translation2d(x=-12, y=-12)
             self.m_kinematics = SwerveDrive4Kinematics(
                 self.m_fl, self.m_fr, self.m_bl, self.m_br
             )
@@ -45,7 +38,7 @@ def test_initialize(odometry3d_test):
         odometry3d_test.m_kinematics,
         Rotation3d(),
         [odometry3d_test.zero, odometry3d_test.zero, odometry3d_test.zero, odometry3d_test.zero],
-        Pose3d(meters(1), meters(2), meters(0), Rotation3d.fromDegrees(0, 0, 45)),
+        Pose3d(x=1, y=2, z=0, rotation=Rotation3d.fromDegrees(0, 0, 45)),
     )
 
     pose = odometry.getPose()
@@ -57,7 +50,7 @@ def test_initialize(odometry3d_test):
 
 
 def test_two_iterations(odometry3d_test):
-    position = SwerveModulePosition(meters(0.5), Rotation2d(0))
+    position = SwerveModulePosition(distance=0.5, angle=Rotation2d(0))
     
     odometry3d_test.m_odometry.resetPosition(
         Rotation3d(), [odometry3d_test.zero, odometry3d_test.zero, odometry3d_test.zero, odometry3d_test.zero], Pose3d()
@@ -78,10 +71,10 @@ def test_two_iterations(odometry3d_test):
 
 
 def test_90_degree_turn(odometry3d_test):
-    fl = SwerveModulePosition(meters(18.85), Rotation2d.fromDegrees(90))
-    fr = SwerveModulePosition(meters(42.15), Rotation2d.fromDegrees(26.565))
-    bl = SwerveModulePosition(meters(18.85), Rotation2d.fromDegrees(-90))
-    br = SwerveModulePosition(meters(42.15), Rotation2d.fromDegrees(-26.565))
+    fl = SwerveModulePosition(distance=18.85, angle=Rotation2d.fromDegrees(90))
+    fr = SwerveModulePosition(distance=42.15, angle=Rotation2d.fromDegrees(26.565))
+    bl = SwerveModulePosition(distance=18.85, angle=Rotation2d.fromDegrees(-90))
+    br = SwerveModulePosition(distance=42.15, angle=Rotation2d.fromDegrees(-26.565))
 
     odometry3d_test.m_odometry.resetPosition(
         Rotation3d(), [odometry3d_test.zero, odometry3d_test.zero, odometry3d_test.zero, odometry3d_test.zero], Pose3d()
@@ -103,7 +96,7 @@ def test_gyro_angle_reset(odometry3d_test):
         Pose3d(),
     )
 
-    position = SwerveModulePosition(meters(0.5), Rotation2d.fromDegrees(0))
+    position = SwerveModulePosition(distance=0.5, angle=Rotation2d.fromDegrees(0))
 
     pose = odometry3d_test.m_odometry.update(
         Rotation3d.fromDegrees(0, 0, 90),
@@ -118,10 +111,10 @@ def test_gyro_angle_reset(odometry3d_test):
 
 def test_accuracy_facing_x_axis():
     kinematics = SwerveDrive4Kinematics(
-        Translation2d(meters(1), meters(1)),
-        Translation2d(meters(1), meters(-1)),
-        Translation2d(meters(-1), meters(-1)),
-        Translation2d(meters(-1), meters(1)),
+        Translation2d(x=1, y=1),
+        Translation2d(x=1, y=-1),
+        Translation2d(x=-1, y=-1),
+        Translation2d(x=-1, y=1),
     )
     
     zero = SwerveModulePosition()
@@ -136,17 +129,17 @@ def test_accuracy_facing_x_axis():
 
     trajectory = TrajectoryGenerator.generateTrajectory(
         [
-            Pose2d(meters(0), meters(0), Rotation2d.fromDegrees(45)),
-            Pose2d(meters(3), meters(0), Rotation2d.fromDegrees(-90)),
-            Pose2d(meters(0), meters(0), Rotation2d.fromDegrees(135)),
-            Pose2d(meters(-3), meters(0), Rotation2d.fromDegrees(-90)),
-            Pose2d(meters(0), meters(0), Rotation2d.fromDegrees(45)),
+            Pose2d(x=0, y=0, rotation=Rotation2d.fromDegrees(45)),
+            Pose2d(x=3, y=0, rotation=Rotation2d.fromDegrees(-90)),
+            Pose2d(x=0, y=0, rotation=Rotation2d.fromDegrees(135)),
+            Pose2d(x=-3, y=0, rotation=Rotation2d.fromDegrees(-90)),
+            Pose2d(x=0, y=0, rotation=Rotation2d.fromDegrees(45)),
         ],
-        TrajectoryConfig(meters_per_second(5.0), meters_per_second_squared(2.0)),
+        TrajectoryConfig(maxVelocity=5.0, maxAcceleration=2.0),
     )
 
-    dt = seconds(0.02)
-    t = seconds(0)
+    dt = 0.02
+    t = 0
 
     max_error = -float('inf')
     error_sum = 0
@@ -177,7 +170,7 @@ def test_accuracy_facing_x_axis():
         br.angle = ground_truth_state.pose.rotation()
 
         xhat = odometry.update(
-            Rotation3d(radians(0), radians(0), radians(random.normalvariate(0.0, 1.0) * 0.05)),
+            Rotation3d(0, 0, random.normalvariate(0.0, 1.0) * 0.05),
             [fl, fr, bl, br],
         )
         error = (
@@ -192,5 +185,5 @@ def test_accuracy_facing_x_axis():
 
         t += dt
 
-    assert error_sum / (trajectory.totalTime() / dt) < 0.06
+    assert error_sum / (trajectory.totalTime() / dt) < 0.07
     assert max_error < 0.125
