@@ -29,7 +29,7 @@ import org.wpilib.math.geometry.Twist3d;
  * @param <T> Wheel positions type.
  */
 public class Odometry3d<T> {
-  private final Kinematics<?, ?, T> m_kinematics;
+  private final Kinematics<T, ?, ?> m_kinematics;
   private Pose3d m_pose;
 
   private Rotation3d m_gyroOffset;
@@ -45,7 +45,7 @@ public class Odometry3d<T> {
    * @param initialPose The starting position of the robot on the field.
    */
   public Odometry3d(
-      Kinematics<?, ?, T> kinematics, Rotation3d gyroAngle, T wheelPositions, Pose3d initialPose) {
+      Kinematics<T, ?, ?> kinematics, Rotation3d gyroAngle, T wheelPositions, Pose3d initialPose) {
     m_kinematics = kinematics;
     m_pose = initialPose;
     m_gyroOffset = m_pose.getRotation().minus(gyroAngle);

@@ -38,7 +38,8 @@ class function_ref<R(Args...)> {
   template <typename F>
     requires(!std::is_same_v<std::decay_t<F>, function_ref> &&
              std::is_invocable_r_v<R, F &&, Args...>)
-  constexpr function_ref(F&& f) noexcept  // NOLINT(google-explicit-constructor)
+  // NOLINTNEXTLINE (google-explicit-constructor)
+  constexpr function_ref(F&& f) noexcept
       : obj_(const_cast<void*>(
             reinterpret_cast<const void*>(std::addressof(f)))) {
     callback_ = [](void* obj, Args... args) -> R {

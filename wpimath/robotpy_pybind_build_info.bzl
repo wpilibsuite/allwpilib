@@ -823,13 +823,13 @@ def wpimath_kinematics_extension(srcs = [], header_to_dat_deps = [], extra_hdrs 
             ],
         ),
         struct(
-            class_name = "SwerveModuleAccelerations",
-            yml_file = "semiwrap/kinematics/SwerveModuleAccelerations.yml",
+            class_name = "SwerveModuleAcceleration",
+            yml_file = "semiwrap/kinematics/SwerveModuleAcceleration.yml",
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/kinematics/SwerveModuleAccelerations.hpp",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/kinematics/SwerveModuleAcceleration.hpp",
             tmpl_class_names = [],
             trampolines = [
-                ("wpi::math::SwerveModuleAccelerations", "wpi__math__SwerveModuleAccelerations.hpp"),
+                ("wpi::math::SwerveModuleAcceleration", "wpi__math__SwerveModuleAcceleration.hpp"),
             ],
         ),
     ]

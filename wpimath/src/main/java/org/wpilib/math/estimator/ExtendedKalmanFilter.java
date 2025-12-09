@@ -9,6 +9,7 @@ import org.wpilib.math.linalg.DARE;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.system.Discretization;
+import org.wpilib.math.system.LinearSystemUtil;
 import org.wpilib.math.system.NumericalIntegration;
 import org.wpilib.math.system.NumericalJacobian;
 import org.wpilib.math.util.Nat;
@@ -137,8 +138,8 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
     m_residualFuncY = residualFuncY;
     m_addFuncX = addFuncX;
 
-    m_contQ = StateSpaceUtil.makeCovarianceMatrix(states, stateStdDevs);
-    m_contR = StateSpaceUtil.makeCovarianceMatrix(outputs, measurementStdDevs);
+    m_contQ = StateSpaceUtil.covarianceMatrix(states, stateStdDevs);
+    m_contR = StateSpaceUtil.covarianceMatrix(outputs, measurementStdDevs);
     m_dt = dt;
 
     reset();
@@ -156,7 +157,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
 
     final var discR = Discretization.discretizeR(m_contR, dt);
 
-    if (StateSpaceUtil.isDetectable(discA, C) && outputs.getNum() <= states.getNum()) {
+    if (LinearSystemUtil.isDetectable(discA, C) && outputs.getNum() <= states.getNum()) {
       m_initP = DARE.dare(discA.transpose(), C.transpose(), discQ, discR);
     } else {
       m_initP = new Matrix<>(states, states);

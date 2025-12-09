@@ -56,8 +56,8 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
     this(
         plant.getA(),
         plant.getB(),
-        StateSpaceUtil.makeCostMatrix(qelms),
-        StateSpaceUtil.makeCostMatrix(relms),
+        StateSpaceUtil.costMatrix(qelms),
+        StateSpaceUtil.costMatrix(relms),
         dt);
   }
 
@@ -81,7 +81,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
       Vector<States> qelms,
       Vector<Inputs> relms,
       double dt) {
-    this(A, B, StateSpaceUtil.makeCostMatrix(qelms), StateSpaceUtil.makeCostMatrix(relms), dt);
+    this(A, B, StateSpaceUtil.costMatrix(qelms), StateSpaceUtil.costMatrix(relms), dt);
   }
 
   /**

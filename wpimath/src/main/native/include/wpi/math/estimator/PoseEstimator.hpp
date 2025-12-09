@@ -37,11 +37,11 @@ namespace wpi::math {
  * AddVisionMeasurement() can be called as infrequently as you want; if you
  * never call it, then this class will behave like regular encoder odometry.
  *
- * @tparam WheelSpeeds Wheel speeds type.
  * @tparam WheelPositions Wheel positions type.
+ * @tparam WheelSpeeds Wheel speeds type.
  * @tparam WheelAccelerations Wheel accelerations type.
  */
-template <typename WheelSpeeds, typename WheelPositions,
+template <typename WheelPositions, typename WheelSpeeds,
           typename WheelAccelerations>
 class WPILIB_DLLEXPORT PoseEstimator {
  public:
@@ -63,8 +63,8 @@ class WPILIB_DLLEXPORT PoseEstimator {
    *     less.
    */
   PoseEstimator(
-      Kinematics<WheelSpeeds, WheelPositions, WheelAccelerations>& kinematics,
-      Odometry<WheelSpeeds, WheelPositions, WheelAccelerations>& odometry,
+      Kinematics<WheelPositions, WheelSpeeds, WheelAccelerations>& kinematics,
+      Odometry<WheelPositions, WheelSpeeds, WheelAccelerations>& odometry,
       const wpi::util::array<double, 3>& stateStdDevs,
       const wpi::util::array<double, 3>& visionMeasurementStdDevs)
       : m_odometry(odometry) {
@@ -429,7 +429,7 @@ class WPILIB_DLLEXPORT PoseEstimator {
 
   static constexpr wpi::units::second_t kBufferDuration = 1.5_s;
 
-  Odometry<WheelSpeeds, WheelPositions, WheelAccelerations>& m_odometry;
+  Odometry<WheelPositions, WheelSpeeds, WheelAccelerations>& m_odometry;
   wpi::util::array<double, 3> m_q{wpi::util::empty_array};
   Eigen::Matrix3d m_visionK = Eigen::Matrix3d::Zero();
 

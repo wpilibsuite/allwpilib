@@ -66,7 +66,8 @@ class Robot : public wpi::TimedRobot {
       m_root->Append<wpi::MechanismLigament2d>("elevator", 1, 90_deg);
   wpi::MechanismLigament2d* m_wrist =
       m_elevator->Append<wpi::MechanismLigament2d>(
-          "wrist", 0.5, 90_deg, 6, wpi::Color8Bit{wpi::Color::kPurple});
+          "wrist", 0.5, 90_deg, 6,
+          wpi::util::Color8Bit{wpi::util::Color::kPurple});
 };
 
 #ifndef RUNNING_WPILIB_TESTS

@@ -6,6 +6,7 @@
 
 #include <utility>
 
+#include "wpi/math/random/Normal.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
 #include "wpi/math/system/plant/LinearSystemId.hpp"
 #include "wpi/math/util/StateSpaceUtil.hpp"
@@ -61,7 +62,7 @@ void DifferentialDrivetrainSim::SetGearing(double newGearing) {
 void DifferentialDrivetrainSim::Update(wpi::units::second_t dt) {
   m_x = wpi::math::RKDP([this](auto& x, auto& u) { return Dynamics(x, u); },
                         m_x, m_u, dt);
-  m_y = m_x + wpi::math::MakeWhiteNoiseVector<7>(m_measurementStdDevs);
+  m_y = m_x + wpi::math::Normal<7>(m_measurementStdDevs);
 }
 
 double DifferentialDrivetrainSim::GetGearing() const {

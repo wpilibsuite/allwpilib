@@ -24,9 +24,9 @@ import org.wpilib.util.struct.StructSerializable;
  */
 public class DifferentialDriveKinematics
     implements Kinematics<
+            DifferentialDriveWheelPositions,
             DifferentialDriveWheelSpeeds,
-            DifferentialDriveWheelAccelerations,
-            DifferentialDriveWheelPositions>,
+            DifferentialDriveWheelAccelerations>,
         ProtobufSerializable,
         StructSerializable {
   /** Differential drive trackwidth in meters. */

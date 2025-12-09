@@ -16,7 +16,7 @@
 #include "wpi/math/kinematics/ChassisAccelerations.hpp"
 #include "wpi/math/kinematics/ChassisSpeeds.hpp"
 #include "wpi/math/kinematics/Kinematics.hpp"
-#include "wpi/math/kinematics/SwerveModuleAccelerations.hpp"
+#include "wpi/math/kinematics/SwerveModuleAcceleration.hpp"
 #include "wpi/math/kinematics/SwerveModulePosition.hpp"
 #include "wpi/math/kinematics/SwerveModuleState.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
@@ -53,9 +53,9 @@ namespace wpi::math {
 template <size_t NumModules>
 class SwerveDriveKinematics
     : public Kinematics<
-          wpi::util::array<SwerveModuleState, NumModules>,
           wpi::util::array<SwerveModulePosition, NumModules>,
-          wpi::util::array<SwerveModuleAccelerations, NumModules>> {
+          wpi::util::array<SwerveModuleState, NumModules>,
+          wpi::util::array<SwerveModuleAcceleration, NumModules>> {
  public:
   /**
    * Constructs a swerve drive kinematics object. This takes in a variable
@@ -475,7 +475,7 @@ class SwerveDriveKinematics
    * that corner.
    * @return An array containing the module accelerations.
    */
-  wpi::util::array<SwerveModuleAccelerations, NumModules>
+  wpi::util::array<SwerveModuleAcceleration, NumModules>
   ToSwerveModuleAccelerations(
       const ChassisAccelerations& chassisAccelerations,
       const units::radians_per_second_t angularVelocity = 0.0_rad_per_s,
@@ -484,7 +484,7 @@ class SwerveDriveKinematics
     // Kinematics" by FRC Team 449 - The Blair Robot Project, Rafi Pedersen
     // https://www.chiefdelphi.com/uploads/short-url/qzj4k2LyBs7rLxAem0YajNIlStH.pdf
 
-    wpi::util::array<SwerveModuleAccelerations, NumModules> moduleAccelerations(
+    wpi::util::array<SwerveModuleAcceleration, NumModules> moduleAccelerations(
         wpi::util::empty_array);
 
     if (chassisAccelerations.ax == 0.0_mps_sq &&
@@ -539,7 +539,7 @@ class SwerveDriveKinematics
    * @param chassisAccelerations The desired chassis accelerations.
    * @return An array containing the module accelerations.
    */
-  wpi::util::array<SwerveModuleAccelerations, NumModules> ToWheelAccelerations(
+  wpi::util::array<SwerveModuleAcceleration, NumModules> ToWheelAccelerations(
       const ChassisAccelerations& chassisAccelerations) const override {
     return ToSwerveModuleAccelerations(chassisAccelerations);
   }
@@ -556,12 +556,12 @@ class SwerveDriveKinematics
    * @return The resulting chassis accelerations.
    */
   template <
-      std::convertible_to<SwerveModuleAccelerations>... ModuleAccelerations>
+      std::convertible_to<SwerveModuleAcceleration>... ModuleAccelerations>
     requires(sizeof...(ModuleAccelerations) == NumModules)
   ChassisAccelerations ToChassisAccelerations(
       ModuleAccelerations&&... moduleAccelerations) const {
     return this->ToChassisAccelerations(
-        wpi::util::array<SwerveModuleAccelerations, NumModules>{
+        wpi::util::array<SwerveModuleAcceleration, NumModules>{
             moduleAccelerations...});
   }
 
@@ -577,7 +577,7 @@ class SwerveDriveKinematics
    * @return The resulting chassis accelerations.
    */
   ChassisAccelerations ToChassisAccelerations(
-      const wpi::util::array<SwerveModuleAccelerations, NumModules>&
+      const wpi::util::array<SwerveModuleAcceleration, NumModules>&
           moduleAccelerations) const override {
     // Derivation for second-order kinematics from "Swerve Drive Second Order
     // Kinematics" by FRC Team 449 - The Blair Robot Project, Rafi Pedersen
@@ -586,7 +586,7 @@ class SwerveDriveKinematics
     Matrixd<NumModules * 2, 1> moduleAccelerationsMatrix;
 
     for (size_t i = 0; i < NumModules; i++) {
-      SwerveModuleAccelerations module = moduleAccelerations[i];
+      SwerveModuleAcceleration module = moduleAccelerations[i];
 
       moduleAccelerationsMatrix(i * 2 + 0, 0) =
           module.acceleration.value() * module.angle.Cos();

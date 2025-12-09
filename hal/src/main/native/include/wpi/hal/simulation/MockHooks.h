@@ -10,7 +10,7 @@
 extern "C" {
 void HALSIM_SetRuntimeType(HAL_RuntimeType type);
 void HALSIM_WaitForProgramStart(void);
-void HALSIM_SetProgramStarted(void);
+void HALSIM_SetProgramStarted(HAL_Bool started);
 HAL_Bool HALSIM_GetProgramStarted(void);
 void HALSIM_RestartTiming(void);
 void HALSIM_PauseTiming(void);

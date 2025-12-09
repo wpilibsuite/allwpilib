@@ -25,11 +25,11 @@ namespace wpi::math {
  * path following. Furthermore, odometry can be used for latency compensation
  * when using computer-vision systems.
  *
- * @tparam WheelSpeeds Wheel speeds type.
  * @tparam WheelPositions Wheel positions type.
+ * @tparam WheelSpeeds Wheel speeds type.
  * @tparam WheelAccelerations Wheel accelerations type.
  */
-template <typename WheelSpeeds, typename WheelPositions,
+template <typename WheelPositions, typename WheelSpeeds,
           typename WheelAccelerations>
 class WPILIB_DLLEXPORT Odometry3d {
  public:
@@ -41,7 +41,7 @@ class WPILIB_DLLEXPORT Odometry3d {
    * @param wheelPositions The current distances measured by each wheel.
    * @param initialPose The starting position of the robot on the field.
    */
-  explicit Odometry3d(const Kinematics<WheelSpeeds, WheelPositions,
+  explicit Odometry3d(const Kinematics<WheelPositions, WheelSpeeds,
                                        WheelAccelerations>& kinematics,
                       const Rotation3d& gyroAngle,
                       const WheelPositions& wheelPositions,
@@ -143,7 +143,7 @@ class WPILIB_DLLEXPORT Odometry3d {
   }
 
  private:
-  const Kinematics<WheelSpeeds, WheelPositions, WheelAccelerations>&
+  const Kinematics<WheelPositions, WheelSpeeds, WheelAccelerations>&
       m_kinematics;
   Pose3d m_pose;
 

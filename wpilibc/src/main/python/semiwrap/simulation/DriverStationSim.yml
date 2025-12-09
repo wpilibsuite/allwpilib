@@ -30,12 +30,13 @@ classes:
       NotifyNewData:
       SetSendError:
       SetSendConsoleLine:
-      GetJoystickOutputs:
+      GetJoystickLeds:
       GetJoystickRumble:
       SetJoystickButton:
       SetJoystickAxis:
       SetJoystickPOV:
-      SetJoystickType:
+      SetJoystickGamepadType:
+      SetJoystickSupportedOutputs:
       SetJoystickName:
       SetGameSpecificMessage:
       SetEventName:

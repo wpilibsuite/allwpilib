@@ -5,37 +5,37 @@ Subject: [PATCH 2/8] Use wpi::SmallVector
 
 ---
  include/sleipnir/autodiff/expression.hpp      | 4 ++--
- include/sleipnir/autodiff/variable.hpp        | 5 ++---
+ include/sleipnir/autodiff/variable.hpp        | 4 ++--
  include/sleipnir/autodiff/variable_matrix.hpp | 4 ++--
- 3 files changed, 6 insertions(+), 7 deletions(-)
+ 3 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/include/sleipnir/autodiff/expression.hpp b/include/sleipnir/autodiff/expression.hpp
-index bb4d8c5641a5b3d633d372674e0a35f857889cd4..53a5f6d68d3153537840c4ff45fe5e5d8b0076b7 100644
+index f5919de6c9c0be044335ce7764ded545215f0486..46814576a3db9f472329b880b94b1ab98d218867 100644
 --- a/include/sleipnir/autodiff/expression.hpp
 +++ b/include/sleipnir/autodiff/expression.hpp
-@@ -30,7 +30,7 @@ inline constexpr bool USE_POOL_ALLOCATOR = true;
- struct Expression;
- 
- inline constexpr void inc_ref_count(Expression* expr);
--inline constexpr void dec_ref_count(Expression* expr);
-+inline void dec_ref_count(Expression* expr);
+@@ -33,7 +33,7 @@ struct Expression;
+ template <typename Scalar>
+ constexpr void inc_ref_count(Expression<Scalar>* expr);
+ template <typename Scalar>
+-constexpr void dec_ref_count(Expression<Scalar>* expr);
++void dec_ref_count(Expression<Scalar>* expr);
  
  /**
   * Typedef for intrusive shared pointer to Expression.
-@@ -733,7 +733,7 @@ inline constexpr void inc_ref_count(Expression* expr) {
-  *
+@@ -801,7 +801,7 @@ constexpr void inc_ref_count(Expression<Scalar>* expr) {
   * @param expr The shared pointer's managed object.
   */
--inline constexpr void dec_ref_count(Expression* expr) {
-+inline void dec_ref_count(Expression* expr) {
+ template <typename Scalar>
+-constexpr void dec_ref_count(Expression<Scalar>* expr) {
++void dec_ref_count(Expression<Scalar>* expr) {
    // If a deeply nested tree is being deallocated all at once, calling the
    // Expression destructor when expr's refcount reaches zero can cause a stack
    // overflow. Instead, we iterate over its children to decrement their
 diff --git a/include/sleipnir/autodiff/variable.hpp b/include/sleipnir/autodiff/variable.hpp
-index f60236811eba45c67a9638e90d5101d877ecc2d0..264f0950f293c67d6e6c7e729887090c050e40e2 100644
+index c78af7224b2ef93ad50b238117583e01940c53ce..0a55b906130d7506c80eb150644ac44c222d1368 100644
 --- a/include/sleipnir/autodiff/variable.hpp
 +++ b/include/sleipnir/autodiff/variable.hpp
-@@ -47,7 +47,7 @@ class SLEIPNIR_DLLEXPORT Variable {
+@@ -61,7 +61,7 @@ class Variable : public SleipnirBase {
    /**
     * Constructs an empty Variable.
     */
@@ -43,35 +43,34 @@ index f60236811eba45c67a9638e90d5101d877ecc2d0..264f0950f293c67d6e6c7e729887090c
 +  explicit Variable(std::nullptr_t) : expr{nullptr} {}
  
    /**
-    * Constructs a Variable from a floating point type.
-@@ -77,8 +77,7 @@ class SLEIPNIR_DLLEXPORT Variable {
+    * Constructs a Variable from a scalar type.
+@@ -116,7 +116,7 @@ class Variable : public SleipnirBase {
     *
     * @param expr The autodiff variable.
     */
--  explicit constexpr Variable(detail::ExpressionPtr&& expr)
--      : expr{std::move(expr)} {}
-+  explicit Variable(detail::ExpressionPtr&& expr) : expr{std::move(expr)} {}
+-  explicit constexpr Variable(detail::ExpressionPtr<Scalar>&& expr)
++  explicit Variable(detail::ExpressionPtr<Scalar>&& expr)
+       : expr{std::move(expr)} {}
  
    /**
-    * Assignment operator for double.
 diff --git a/include/sleipnir/autodiff/variable_matrix.hpp b/include/sleipnir/autodiff/variable_matrix.hpp
-index e1a419ca5356660b3c1c27230d1cb2a86977fb65..349a1550235516f9853609b61feded834ef2894b 100644
+index bb66bebc01413a291242886366ce329bb5f4b70a..7ddf02c0e2f66aff8da422b874cbe9772f9fd00d 100644
 --- a/include/sleipnir/autodiff/variable_matrix.hpp
 +++ b/include/sleipnir/autodiff/variable_matrix.hpp
-@@ -1120,14 +1120,14 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+@@ -1281,14 +1281,14 @@ class VariableMatrix : public SleipnirBase {
     *
-    * @return Begin iterator.
+    * @return Const begin iterator.
     */
 -  const_iterator cbegin() const { return const_iterator{m_storage.cbegin()}; }
 +  const_iterator cbegin() const { return const_iterator{m_storage.begin()}; }
  
    /**
-    * Returns end iterator.
+    * Returns const end iterator.
     *
-    * @return End iterator.
+    * @return Const end iterator.
     */
 -  const_iterator cend() const { return const_iterator{m_storage.cend()}; }
 +  const_iterator cend() const { return const_iterator{m_storage.end()}; }
  
    /**
-    * Returns number of elements in matrix.
+    * Returns reverse begin iterator.

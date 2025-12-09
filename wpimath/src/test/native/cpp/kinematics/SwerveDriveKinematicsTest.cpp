@@ -397,10 +397,10 @@ TEST_F(SwerveDriveKinematicsTest, TurnInPlaceInverseAccelerations) {
 }
 
 TEST_F(SwerveDriveKinematicsTest, TurnInPlaceForwardAccelerations) {
-  SwerveModuleAccelerations flAccel{106.629_mps_sq, 135_deg};
-  SwerveModuleAccelerations frAccel{106.629_mps_sq, 45_deg};
-  SwerveModuleAccelerations blAccel{106.629_mps_sq, -135_deg};
-  SwerveModuleAccelerations brAccel{106.629_mps_sq, -45_deg};
+  SwerveModuleAcceleration flAccel{106.629_mps_sq, 135_deg};
+  SwerveModuleAcceleration frAccel{106.629_mps_sq, 45_deg};
+  SwerveModuleAcceleration blAccel{106.629_mps_sq, -135_deg};
+  SwerveModuleAcceleration brAccel{106.629_mps_sq, -45_deg};
 
   auto chassisAccelerations =
       m_kinematics.ToChassisAccelerations(flAccel, frAccel, blAccel, brAccel);

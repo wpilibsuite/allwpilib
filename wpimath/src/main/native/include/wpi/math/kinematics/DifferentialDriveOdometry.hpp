@@ -26,8 +26,8 @@ namespace wpi::math {
  * Any subsequent pose resets also require the encoders to be reset to zero.
  */
 class WPILIB_DLLEXPORT DifferentialDriveOdometry
-    : public Odometry<DifferentialDriveWheelSpeeds,
-                      DifferentialDriveWheelPositions,
+    : public Odometry<DifferentialDriveWheelPositions,
+                      DifferentialDriveWheelSpeeds,
                       DifferentialDriveWheelAccelerations> {
  public:
   /**

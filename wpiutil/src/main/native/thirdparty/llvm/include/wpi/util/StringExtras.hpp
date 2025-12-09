@@ -23,7 +23,6 @@
 #include <optional>
 #include <string>
 #include <string_view>
-#include <type_traits>
 #include <utility>
 
 #include <fmt/format.h>
@@ -363,7 +362,8 @@ inline bool contains_lower(std::string_view str, const char* other) noexcept {
  * starts with the prefix. If the string does not start with the prefix, return
  * an empty optional.
  */
-constexpr std::optional<std::string_view> remove_prefix(std::string_view str, std::string_view prefix) noexcept {
+constexpr std::optional<std::string_view> remove_prefix(
+    std::string_view str, std::string_view prefix) noexcept {
   if (str.starts_with(prefix)) {
     str.remove_prefix(prefix.size());
     return str;
@@ -376,7 +376,8 @@ constexpr std::optional<std::string_view> remove_prefix(std::string_view str, st
  * string ends with the suffix. If the string does not end with the suffix,
  * return an empty optional.
  */
-constexpr std::optional<std::string_view> remove_suffix(std::string_view str, std::string_view suffix) noexcept {
+constexpr std::optional<std::string_view> remove_suffix(
+    std::string_view str, std::string_view suffix) noexcept {
   if (str.ends_with(suffix)) {
     str.remove_suffix(suffix.size());
     return str;
@@ -687,17 +688,144 @@ constexpr std::string_view trim(
 }
 
 namespace detail {
-bool GetAsUnsignedInteger(
-    std::string_view str, unsigned radix,
-    unsigned long long& result) noexcept;  // NOLINT(runtime/int)
-bool GetAsSignedInteger(std::string_view str, unsigned radix,
-                        long long& result) noexcept;  // NOLINT(runtime/int)
+constexpr unsigned GetAutoSenseRadix(std::string_view& str) noexcept {
+  if (str.empty()) {
+    return 10;
+  }
 
-bool ConsumeUnsignedInteger(
+  if (wpi::util::starts_with(str, "0x") || wpi::util::starts_with(str, "0X")) {
+    str.remove_prefix(2);
+    return 16;
+  }
+
+  if (wpi::util::starts_with(str, "0b") || wpi::util::starts_with(str, "0B")) {
+    str.remove_prefix(2);
+    return 2;
+  }
+
+  if (wpi::util::starts_with(str, "0o")) {
+    str.remove_prefix(2);
+    return 8;
+  }
+
+  if (str[0] == '0' && str.size() > 1 && wpi::util::isDigit(str[1])) {
+    str.remove_prefix(1);
+    return 8;
+  }
+
+  return 10;
+}
+
+constexpr bool ConsumeUnsignedInteger(
     std::string_view& str, unsigned radix,
-    unsigned long long& result) noexcept;  // NOLINT(runtime/int)
-bool ConsumeSignedInteger(std::string_view& str, unsigned radix,
-                          long long& result) noexcept;  // NOLINT(runtime/int)
+    unsigned long long& result) noexcept {  // NOLINT(runtime/int)
+  // Autosense radix if not specified.
+  if (radix == 0) {
+    radix = GetAutoSenseRadix(str);
+  }
+
+  // Empty strings (after the radix autosense) are invalid.
+  if (str.empty()) {
+    return true;
+  }
+
+  // Parse all the bytes of the string given this radix.  Watch for overflow.
+  std::string_view str2 = str;
+  result = 0;
+  while (!str2.empty()) {
+    unsigned charVal;
+    if (str2[0] >= '0' && str2[0] <= '9') {
+      charVal = str2[0] - '0';
+    } else if (str2[0] >= 'a' && str2[0] <= 'z') {
+      charVal = str2[0] - 'a' + 10;
+    } else if (str2[0] >= 'A' && str2[0] <= 'Z') {
+      charVal = str2[0] - 'A' + 10;
+    } else {
+      break;
+    }
+
+    // If the parsed value is larger than the integer radix, we cannot
+    // consume any more characters.
+    if (charVal >= radix) {
+      break;
+    }
+
+    // Add in this character.
+    unsigned long long prevResult = result;  // NOLINT(runtime/int)
+    result = result * radix + charVal;
+
+    // Check for overflow by shifting back and seeing if bits were lost.
+    if (result / radix < prevResult) {
+      return true;
+    }
+
+    str2.remove_prefix(1);
+  }
+
+  // We consider the operation a failure if no characters were consumed
+  // successfully.
+  if (str.size() == str2.size()) {
+    return true;
+  }
+
+  str = str2;
+  return false;
+}
+
+constexpr bool ConsumeSignedInteger(
+    std::string_view& str, unsigned radix,
+    long long& result) noexcept {  // NOLINT(runtime/int)
+  unsigned long long ullVal;       // NOLINT(runtime/int)
+
+  // Handle positive strings first.
+  if (str.empty() || str.front() != '-') {
+    if (ConsumeUnsignedInteger(str, radix, ullVal) ||
+        // Check for value so large it overflows a signed value.
+        static_cast<long long>(ullVal) < 0) {  // NOLINT(runtime/int)
+      return true;
+    }
+    result = ullVal;
+    return false;
+  }
+
+  // Get the positive part of the value.
+  std::string_view str2 = wpi::util::drop_front(str);
+  if (ConsumeUnsignedInteger(str2, radix, ullVal) ||
+      // Reject values so large they'd overflow as negative signed, but allow
+      // "-0".  This negates the unsigned so that the negative isn't undefined
+      // on signed overflow.
+      static_cast<long long>(-ullVal) > 0) {  // NOLINT(runtime/int)
+    return true;
+  }
+
+  str = str2;
+  result = -ullVal;
+  return false;
+}
+
+constexpr bool GetAsUnsignedInteger(
+    std::string_view str, unsigned radix,
+    unsigned long long& result) noexcept {  // NOLINT(runtime/int)
+  if (ConsumeUnsignedInteger(str, radix, result)) {
+    return true;
+  }
+
+  // For getAsUnsignedInteger, we require the whole string to be consumed or
+  // else we consider it a failure.
+  return !str.empty();
+}
+
+constexpr bool GetAsSignedInteger(
+    std::string_view str, unsigned radix,
+    long long& result) noexcept {  // NOLINT(runtime/int)
+  if (wpi::util::detail::ConsumeSignedInteger(str, radix, result)) {
+    return true;
+  }
+
+  // For getAsSignedInteger, we require the whole string to be consumed or else
+  // we consider it a failure.
+  return !str.empty();
+}
 }  // namespace detail
 
 /**
@@ -709,10 +837,10 @@ bool ConsumeSignedInteger(std::string_view& str, unsigned radix,
  * this returns nullopt to signify the error.  The string is considered
  * erroneous if empty or if it overflows T.
  */
-template <typename T,
-          std::enable_if_t<std::numeric_limits<T>::is_signed, bool> = true>
-inline std::optional<T> parse_integer(std::string_view str,
-                                      unsigned radix) noexcept {
+template <typename T>
+  requires std::numeric_limits<T>::is_signed
+constexpr std::optional<T> parse_integer(std::string_view str,
+                                         unsigned radix) noexcept {
   long long val;  // NOLINT(runtime/int)
   if (detail::GetAsSignedInteger(str, radix, val) ||
       static_cast<T>(val) != val) {
@@ -721,10 +849,10 @@ inline std::optional<T> parse_integer(std::string_view str,
   return val;
 }
 
-template <typename T,
-          std::enable_if_t<!std::numeric_limits<T>::is_signed, bool> = true>
-inline std::optional<T> parse_integer(std::string_view str,
-                                      unsigned radix) noexcept {
+template <typename T>
+  requires(!std::numeric_limits<T>::is_signed)
+constexpr std::optional<T> parse_integer(std::string_view str,
+                                         unsigned radix) noexcept {
   using Int = unsigned long long;  // NOLINT(runtime/int)
   Int val;
   // The additional cast to unsigned long long is required to avoid the
@@ -748,10 +876,10 @@ inline std::optional<T> parse_integer(std::string_view str,
  * The portion of the string representing the discovered numeric value
  * is removed from the beginning of the string.
  */
-template <typename T,
-          std::enable_if_t<std::numeric_limits<T>::is_signed, bool> = true>
-inline std::optional<T> consume_integer(std::string_view* str,
-                                        unsigned radix) noexcept {
+template <typename T>
+  requires std::numeric_limits<T>::is_signed
+constexpr std::optional<T> consume_integer(std::string_view* str,
+                                           unsigned radix) noexcept {
   using Int = long long;  // NOLINT(runtime/int)
   Int val;
   if (detail::ConsumeSignedInteger(*str, radix, val) ||
@@ -761,10 +889,10 @@ inline std::optional<T> consume_integer(std::string_view* str,
   return val;
 }
 
-template <typename T,
-          std::enable_if_t<!std::numeric_limits<T>::is_signed, bool> = true>
-inline std::optional<T> consume_integer(std::string_view* str,
-                                        unsigned radix) noexcept {
+template <typename T>
+  requires(!std::numeric_limits<T>::is_signed)
+constexpr std::optional<T> consume_integer(std::string_view* str,
+                                           unsigned radix) noexcept {
   using Int = unsigned long long;  // NOLINT(runtime/int)
   Int val;
   if (detail::ConsumeUnsignedInteger(*str, radix, val) ||

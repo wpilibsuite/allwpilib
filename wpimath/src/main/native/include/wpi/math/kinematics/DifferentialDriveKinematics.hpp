@@ -28,8 +28,8 @@ namespace wpi::math {
  * component velocities into a linear and angular chassis speed.
  */
 class WPILIB_DLLEXPORT DifferentialDriveKinematics
-    : public Kinematics<DifferentialDriveWheelSpeeds,
-                        DifferentialDriveWheelPositions,
+    : public Kinematics<DifferentialDriveWheelPositions,
+                        DifferentialDriveWheelSpeeds,
                         DifferentialDriveWheelAccelerations> {
  public:
   /**

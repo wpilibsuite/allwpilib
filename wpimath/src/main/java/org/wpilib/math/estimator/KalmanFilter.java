@@ -71,8 +71,8 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
 
     this.m_plant = plant;
 
-    m_contQ = StateSpaceUtil.makeCovarianceMatrix(states, stateStdDevs);
-    m_contR = StateSpaceUtil.makeCovarianceMatrix(outputs, measurementStdDevs);
+    m_contQ = StateSpaceUtil.covarianceMatrix(states, stateStdDevs);
+    m_contR = StateSpaceUtil.covarianceMatrix(outputs, measurementStdDevs);
     m_dt = dt;
 
     // Find discrete A and Q

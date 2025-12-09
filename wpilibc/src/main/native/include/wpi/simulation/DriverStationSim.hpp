@@ -251,13 +251,14 @@ class DriverStationSim {
    * @param stick The joystick number
    * @return The joystick outputs
    */
-  static int64_t GetJoystickOutputs(int stick);
+  static int32_t GetJoystickLeds(int stick);
 
   /**
    * Gets the joystick rumble.
    *
    * @param stick The joystick number
-   * @param rumbleNum Rumble to get (0=left, 1=right)
+   * @param rumbleNum Rumble to get (0=left, 1=right, 2=left trigger, 3=right
+   * trigger)
    * @return The joystick rumble value
    */
   static int GetJoystickRumble(int stick, int rumbleNum);
@@ -346,7 +347,7 @@ class DriverStationSim {
    * @param stick The joystick number
    * @param type The value of type
    */
-  static void SetJoystickType(int stick, int type);
+  static void SetJoystickGamepadType(int stick, int type);
 
   /**
    * Sets the name of a joystick.
@@ -355,6 +356,14 @@ class DriverStationSim {
    * @param name The value of name
    */
   static void SetJoystickName(int stick, std::string_view name);
+
+  /**
+   * Sets the supported outputs for a joystick.
+   *
+   * @param stick The joystick number
+   * @param supportedOutputs The supported outputs for the joystick
+   */
+  static void SetJoystickSupportedOutputs(int stick, int supportedOutputs);
 
   /**
    * Sets the game specific message.

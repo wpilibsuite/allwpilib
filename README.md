@@ -50,7 +50,7 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
 - C++ compiler
     - On Linux, install GCC 11 or greater
     - On Windows, install [Visual Studio Community 2022](https://visualstudio.microsoft.com/vs/community/) and select the C++ programming language during installation (Gradle can't use the build tools for Visual Studio)
-    - On macOS 13.3 or newer, install Xcode 14 or later (the command-line build tools are insufficient).
+    - On macOS, install the Xcode command-line build tools via `xcode-select --install`. Xcode 14 or later is required.
 - ARM compiler toolchain
     - Run `./gradlew installRoboRioToolchain` after cloning this repository
     - If the WPILib installer was used, this toolchain is already installed
@@ -61,8 +61,6 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
     - If the WPILib installer was used, this toolchain is already installed
 
 On macOS ARM, run `softwareupdate --install-rosetta`. This is necessary to be able to use the macOS x86 roboRIO toolchain on ARM.
-
-On linux, run `sudo apt install gfortran`. This is necessary to be able to build WPIcal on linux platforms.
 
 On linux, run `sudo apt install libx11-dev libgl-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev` to be able to build things depending on glfw.
 

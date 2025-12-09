@@ -43,7 +43,7 @@ import org.wpilib.util.struct.StructSerializable;
  */
 @SuppressWarnings("overrides")
 public class SwerveDriveKinematics
-    implements Kinematics<SwerveModuleState[], SwerveModuleAccelerations[], SwerveModulePosition[]>,
+    implements Kinematics<SwerveModulePosition[], SwerveModuleState[], SwerveModuleAcceleration[]>,
         ProtobufSerializable,
         StructSerializable {
   private final SimpleMatrix m_firstOrderInverseKinematics;
@@ -225,7 +225,7 @@ public class SwerveDriveKinematics
     for (int i = 0; i < m_numModules; i++) {
       var module = moduleDeltas[i];
       moduleDeltaMatrix.set(i * 2, 0, module.distance * module.angle.getCos());
-      moduleDeltaMatrix.set(i * 2 + 1, module.distance * module.angle.getSin());
+      moduleDeltaMatrix.set(i * 2 + 1, 0, module.distance * module.angle.getSin());
     }
 
     var chassisDeltaVector = m_firstOrderForwardKinematics.mult(moduleDeltaMatrix);
@@ -455,7 +455,7 @@ public class SwerveDriveKinematics
    *     component, the robot will rotate around that corner.
    * @return An array containing the module accelerations.
    */
-  public SwerveModuleAccelerations[] toSwerveModuleAccelerations(
+  public SwerveModuleAcceleration[] toSwerveModuleAccelerations(
       ChassisAccelerations chassisAccelerations,
       double angularVelocity,
       Translation2d centerOfRotation) {
@@ -463,13 +463,13 @@ public class SwerveDriveKinematics
     // by FRC Team 449 - The Blair Robot Project, Rafi Pedersen
     // https://www.chiefdelphi.com/uploads/short-url/qzj4k2LyBs7rLxAem0YajNIlStH.pdf
 
-    var moduleAccelerations = new SwerveModuleAccelerations[m_numModules];
+    var moduleAccelerations = new SwerveModuleAcceleration[m_numModules];
 
     if (chassisAccelerations.ax == 0.0
         && chassisAccelerations.ay == 0.0
         && chassisAccelerations.alpha == 0.0) {
       for (int i = 0; i < m_numModules; i++) {
-        moduleAccelerations[i] = new SwerveModuleAccelerations(0.0, Rotation2d.kZero);
+        moduleAccelerations[i] = new SwerveModuleAcceleration(0.0, Rotation2d.kZero);
       }
       return moduleAccelerations;
     }
@@ -498,11 +498,10 @@ public class SwerveDriveKinematics
       double linearAcceleration = Math.hypot(x, y);
 
       if (linearAcceleration <= 1e-6) {
-        moduleAccelerations[i] =
-            new SwerveModuleAccelerations(linearAcceleration, Rotation2d.kZero);
+        moduleAccelerations[i] = new SwerveModuleAcceleration(linearAcceleration, Rotation2d.kZero);
       } else {
         moduleAccelerations[i] =
-            new SwerveModuleAccelerations(linearAcceleration, new Rotation2d(x, y));
+            new SwerveModuleAcceleration(linearAcceleration, new Rotation2d(x, y));
       }
     }
 
@@ -517,13 +516,13 @@ public class SwerveDriveKinematics
    * @param angularVelocity The desired robot angular velocity.
    * @return An array containing the module accelerations.
    */
-  public SwerveModuleAccelerations[] toSwerveModuleAccelerations(
+  public SwerveModuleAcceleration[] toSwerveModuleAccelerations(
       ChassisAccelerations chassisAccelerations, double angularVelocity) {
     return toSwerveModuleAccelerations(chassisAccelerations, angularVelocity, Translation2d.kZero);
   }
 
   @Override
-  public SwerveModuleAccelerations[] toWheelAccelerations(
+  public SwerveModuleAcceleration[] toWheelAccelerations(
       ChassisAccelerations chassisAccelerations) {
     return toSwerveModuleAccelerations(chassisAccelerations, 0.0);
   }
@@ -541,7 +540,7 @@ public class SwerveDriveKinematics
    */
   @Override
   public ChassisAccelerations toChassisAccelerations(
-      SwerveModuleAccelerations... moduleAccelerations) {
+      SwerveModuleAcceleration... moduleAccelerations) {
     // Derivation for second-order kinematics from "Swerve Drive Second Order Kinematics"
     // by FRC Team 449 - The Blair Robot Project, Rafi Pedersen
     // https://www.chiefdelphi.com/uploads/short-url/qzj4k2LyBs7rLxAem0YajNIlStH.pdf

@@ -43,7 +43,7 @@ namespace wpi::math {
  * the robot on the field using encoders and a gyro.
  */
 class WPILIB_DLLEXPORT MecanumDriveKinematics
-    : public Kinematics<MecanumDriveWheelSpeeds, MecanumDriveWheelPositions,
+    : public Kinematics<MecanumDriveWheelPositions, MecanumDriveWheelSpeeds,
                         MecanumDriveWheelAccelerations> {
  public:
   /**

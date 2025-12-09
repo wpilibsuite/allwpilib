@@ -19,7 +19,7 @@ namespace wpi::math {
  * Inverse kinematics converts a desired chassis speed into wheel speeds whereas
  * forward kinematics converts wheel speeds into chassis speed.
  */
-template <typename WheelSpeeds, typename WheelPositions,
+template <typename WheelPositions, typename WheelSpeeds,
           typename WheelAccelerations>
   requires std::copy_constructible<WheelPositions> &&
            std::assignable_from<WheelPositions&, const WheelPositions&>
