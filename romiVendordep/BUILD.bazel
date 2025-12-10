@@ -25,7 +25,7 @@ java_library(
 )
 
 cc_test(
-    name = "romi-test",
+    name = "romi-cpp-test",
     size = "small",
     srcs = glob(["src/test/native/cpp/**"]),
     deps = [
