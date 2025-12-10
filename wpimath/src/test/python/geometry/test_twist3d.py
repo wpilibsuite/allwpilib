@@ -3,11 +3,10 @@ import math
 import numpy as np
 
 from wpimath.geometry import Twist2d, Pose2d
-from wpimath.units import meters, radians
 
 
 def test_straight():
-    straight = Twist2d(meters(5), meters(0), radians(0))
+    straight = Twist2d(dx=5, dy=0, dtheta=0)
     straight_pose = straight.exp()
 
     assert straight_pose.x == pytest.approx(5.0)
@@ -17,7 +16,7 @@ def test_straight():
 
 def test_quarter_circle():
     quarter_circle = Twist2d(
-        meters(5) / 2.0 * math.pi, meters(0), radians(math.pi / 2.0)
+        dx=5 / 2.0 * math.pi, dy=0, dtheta=math.pi / 2.0
     )
     quarter_circle_pose = quarter_circle.exp()
 
@@ -27,7 +26,7 @@ def test_quarter_circle():
 
 
 def test_diagonal_no_dtheta():
-    diagonal = Twist2d(meters(2), meters(2), math.radians(0))
+    diagonal = Twist2d(dx=2, dy=2, dtheta=math.radians(0))
     diagonal_pose = diagonal.exp()
 
     assert diagonal_pose.x == pytest.approx(2.0)
@@ -36,25 +35,25 @@ def test_diagonal_no_dtheta():
 
 
 def test_equality():
-    one = Twist2d(meters(5), meters(1), radians(3))
-    two = Twist2d(meters(5), meters(1), radians(3))
+    one = Twist2d(dx=5, dy=1, dtheta=3)
+    two = Twist2d(dx=5, dy=1, dtheta=3)
     assert one == two
 
 
 def test_inequality():
-    one = Twist2d(meters(5), meters(1), radians(3))
-    two = Twist2d(meters(5), meters(1.2), radians(3))
+    one = Twist2d(dx=5, dy=1, dtheta=3)
+    two = Twist2d(dx=5, dy=1.2, dtheta=3)
     assert one != two
 
 
 def test_pose2d_log():
-    end = Pose2d(meters(5), meters(5), math.radians(90))
+    end = Pose2d(x=5, y=5, angle=math.radians(90))
     start = Pose2d()
 
     twist = (end - start).log()
 
     expected = Twist2d(
-        meters(5.0 / 2.0 * math.pi), meters(0), radians(math.pi / 2.0)
+        dx=5.0 / 2.0 * math.pi, dy=0, dtheta=math.pi / 2.0
     )
     assert expected == twist
 
@@ -64,7 +63,7 @@ def test_pose2d_log():
 
 def test_constexpr():
     default_ctor = Twist2d()
-    component_ctor = Twist2d(meters(1), meters(2), radians(3))
+    component_ctor = Twist2d(dx=1, dy=2, dtheta=3)
     multiplied = component_ctor * 2
 
     assert default_ctor.dx == pytest.approx(0.0)

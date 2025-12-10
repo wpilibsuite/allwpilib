@@ -9,7 +9,6 @@ from wpimath.geometry import (
     Translation3d,
     Rotation3d,
 )
-from wpimath.units import meters, degrees
 
 
 def check_pose3d_convert(pose_from, pose_to, coord_from, coord_to):
@@ -49,9 +48,9 @@ def check_transform3d_convert(transform_from, transform_to, coord_from, coord_to
 def test_pose3d_edn_to_nwu():
     # No rotation from EDN to NWU
     check_pose3d_convert(
-        Pose3d(meters(1), meters(2), meters(3), Rotation3d()),
+        Pose3d(x=1, y=2, z=3, rotation=Rotation3d()),
         Pose3d(
-            meters(3), meters(-1), meters(-2), Rotation3d.fromDegrees(-90, 0, -90)
+            x=3, y=-1, z=-2, rotation=Rotation3d.fromDegrees(-90, 0, -90)
         ),
         CoordinateSystem.EDN(),
         CoordinateSystem.NWU(),
@@ -59,9 +58,9 @@ def test_pose3d_edn_to_nwu():
 
     # 45° roll from EDN to NWU
     check_pose3d_convert(
-        Pose3d(meters(1), meters(2), meters(3), Rotation3d.fromDegrees(45, 0, 0)),
+        Pose3d(x=1, y=2, z=3, rotation=Rotation3d.fromDegrees(45, 0, 0)),
         Pose3d(
-            meters(3), meters(-1), meters(-2), Rotation3d.fromDegrees(-45, 0, -90)
+            x=3, y=-1, z=-2, rotation=Rotation3d.fromDegrees(-45, 0, -90)
         ),
         CoordinateSystem.EDN(),
         CoordinateSystem.NWU(),
@@ -69,9 +68,9 @@ def test_pose3d_edn_to_nwu():
 
     # 45° pitch from EDN to NWU
     check_pose3d_convert(
-        Pose3d(meters(1), meters(2), meters(3), Rotation3d.fromDegrees(0, 45, 0)),
+        Pose3d(x=1, y=2, z=3, rotation=Rotation3d.fromDegrees(0, 45, 0)),
         Pose3d(
-            meters(3), meters(-1), meters(-2), Rotation3d.fromDegrees(-90, 0, -135)
+            x=3, y=-1, z=-2, rotation=Rotation3d.fromDegrees(-90, 0, -135)
         ),
         CoordinateSystem.EDN(),
         CoordinateSystem.NWU(),
@@ -79,9 +78,9 @@ def test_pose3d_edn_to_nwu():
 
     # 45° yaw from EDN to NWU
     check_pose3d_convert(
-        Pose3d(meters(1), meters(2), meters(3), Rotation3d.fromDegrees(0, 0, 45)),
+        Pose3d(x=1, y=2, z=3, rotation=Rotation3d.fromDegrees(0, 0, 45)),
         Pose3d(
-            meters(3), meters(-1), meters(-2), Rotation3d.fromDegrees(-90, 45, -90)
+            x=3, y=-1, z=-2, rotation=Rotation3d.fromDegrees(-90, 45, -90)
         ),
         CoordinateSystem.EDN(),
         CoordinateSystem.NWU(),
@@ -91,32 +90,32 @@ def test_pose3d_edn_to_nwu():
 def test_pose3d_edn_to_ned():
     # No rotation from EDN to NED
     check_pose3d_convert(
-        Pose3d(meters(1), meters(2), meters(3), Rotation3d()),
-        Pose3d(meters(3), meters(1), meters(2), Rotation3d.fromDegrees(90, 0, 90)),
+        Pose3d(x=1, y=2, z=3, rotation=Rotation3d()),
+        Pose3d(x=3, y=1, z=2, rotation=Rotation3d.fromDegrees(90, 0, 90)),
         CoordinateSystem.EDN(),
         CoordinateSystem.NED(),
     )
 
     # 45° roll from EDN to NED
     check_pose3d_convert(
-        Pose3d(meters(1), meters(2), meters(3), Rotation3d.fromDegrees(45, 0, 0)),
-        Pose3d(meters(3), meters(1), meters(2), Rotation3d.fromDegrees(135, 0, 90)),
+        Pose3d(x=1, y=2, z=3, rotation=Rotation3d.fromDegrees(45, 0, 0)),
+        Pose3d(x=3, y=1, z=2, rotation=Rotation3d.fromDegrees(135, 0, 90)),
         CoordinateSystem.EDN(),
         CoordinateSystem.NED(),
     )
 
     # 45° pitch from EDN to NED
     check_pose3d_convert(
-        Pose3d(meters(1), meters(2), meters(3), Rotation3d.fromDegrees(0, 45, 0)),
-        Pose3d(meters(3), meters(1), meters(2), Rotation3d.fromDegrees(90, 0, 135)),
+        Pose3d(x=1, y=2, z=3, rotation=Rotation3d.fromDegrees(0, 45, 0)),
+        Pose3d(x=3, y=1, z=2, rotation=Rotation3d.fromDegrees(90, 0, 135)),
         CoordinateSystem.EDN(),
         CoordinateSystem.NED(),
     )
 
     # 45° yaw from EDN to NED
     check_pose3d_convert(
-        Pose3d(meters(1), meters(2), meters(3), Rotation3d.fromDegrees(0, 0, 45)),
-        Pose3d(meters(3), meters(1), meters(2), Rotation3d.fromDegrees(90, -45, 90)),
+        Pose3d(x=1, y=2, z=3, rotation=Rotation3d.fromDegrees(0, 0, 45)),
+        Pose3d(x=3, y=1, z=2, rotation=Rotation3d.fromDegrees(90, -45, 90)),
         CoordinateSystem.EDN(),
         CoordinateSystem.NED(),
     )
@@ -125,8 +124,8 @@ def test_pose3d_edn_to_ned():
 def test_transform3d_edn_to_nwu():
     # No rotation from EDN to NWU
     check_transform3d_convert(
-        Transform3d(Translation3d(meters(1), meters(2), meters(3)), Rotation3d()),
-        Transform3d(Translation3d(meters(3), meters(-1), meters(-2)), Rotation3d()),
+        Transform3d(Translation3d(x=1, y=2, z=3), rotation=Rotation3d()),
+        Transform3d(Translation3d(x=3, y=-1, z=-2), rotation=Rotation3d()),
         CoordinateSystem.EDN(),
         CoordinateSystem.NWU(),
     )
@@ -134,11 +133,11 @@ def test_transform3d_edn_to_nwu():
     # 45° roll from EDN to NWU
     check_transform3d_convert(
         Transform3d(
-            Translation3d(meters(1), meters(2), meters(3)),
+            Translation3d(x=1, y=2, z=3),
             Rotation3d.fromDegrees(45, 0, 0),
         ),
         Transform3d(
-            Translation3d(meters(3), meters(-1), meters(-2)),
+            Translation3d(x=3, y=-1, z=-2),
             Rotation3d.fromDegrees(0, -45, 0),
         ),
         CoordinateSystem.EDN(),
@@ -148,11 +147,11 @@ def test_transform3d_edn_to_nwu():
     # 45° pitch from EDN to NWU
     check_transform3d_convert(
         Transform3d(
-            Translation3d(meters(1), meters(2), meters(3)),
+            Translation3d(x=1, y=2, z=3),
             Rotation3d.fromDegrees(0, 45, 0),
         ),
         Transform3d(
-            Translation3d(meters(3), meters(-1), meters(-2)),
+            Translation3d(x=3, y=-1, z=-2),
             Rotation3d.fromDegrees(0, 0, -45),
         ),
         CoordinateSystem.EDN(),
@@ -162,11 +161,11 @@ def test_transform3d_edn_to_nwu():
     # 45° yaw from EDN to NWU
     check_transform3d_convert(
         Transform3d(
-            Translation3d(meters(1), meters(2), meters(3)),
+            Translation3d(x=1, y=2, z=3),
             Rotation3d.fromDegrees(0, 0, 45),
         ),
         Transform3d(
-            Translation3d(meters(3), meters(-1), meters(-2)),
+            Translation3d(x=3, y=-1, z=-2),
             Rotation3d.fromDegrees(45, 0, 0),
         ),
         CoordinateSystem.EDN(),
@@ -177,8 +176,8 @@ def test_transform3d_edn_to_nwu():
 def test_transform3d_edn_to_ned():
     # No rotation from EDN to NED
     check_transform3d_convert(
-        Transform3d(Translation3d(meters(1), meters(2), meters(3)), Rotation3d()),
-        Transform3d(Translation3d(meters(3), meters(1), meters(2)), Rotation3d()),
+        Transform3d(Translation3d(x=1, y=2, z=3), rotation=Rotation3d()),
+        Transform3d(Translation3d(x=3, y=1, z=2), rotation=Rotation3d()),
         CoordinateSystem.EDN(),
         CoordinateSystem.NED(),
     )
@@ -186,11 +185,11 @@ def test_transform3d_edn_to_ned():
     # 45° roll from EDN to NED
     check_transform3d_convert(
         Transform3d(
-            Translation3d(meters(1), meters(2), meters(3)),
+            Translation3d(x=1, y=2, z=3),
             Rotation3d.fromDegrees(45, 0, 0),
         ),
         Transform3d(
-            Translation3d(meters(3), meters(1), meters(2)),
+            Translation3d(x=3, y=1, z=2),
             Rotation3d.fromDegrees(0, 45, 0),
         ),
         CoordinateSystem.EDN(),
@@ -200,11 +199,11 @@ def test_transform3d_edn_to_ned():
     # 45° pitch from EDN to NED
     check_transform3d_convert(
         Transform3d(
-            Translation3d(meters(1), meters(2), meters(3)),
+            Translation3d(x=1, y=2, z=3),
             Rotation3d.fromDegrees(0, 45, 0),
         ),
         Transform3d(
-            Translation3d(meters(3), meters(1), meters(2)),
+            Translation3d(x=3, y=1, z=2),
             Rotation3d.fromDegrees(0, 0, 45),
         ),
         CoordinateSystem.EDN(),
@@ -214,11 +213,11 @@ def test_transform3d_edn_to_ned():
     # 45° yaw from EDN to NED
     check_transform3d_convert(
         Transform3d(
-            Translation3d(meters(1), meters(2), meters(3)),
+            Translation3d(x=1, y=2, z=3),
             Rotation3d.fromDegrees(0, 0, 45),
         ),
         Transform3d(
-            Translation3d(meters(3), meters(1), meters(2)),
+            Translation3d(x=3, y=1, z=2),
             Rotation3d.fromDegrees(45, 0, 0),
         ),
         CoordinateSystem.EDN(),

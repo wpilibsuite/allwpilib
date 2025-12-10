@@ -12,13 +12,13 @@ from wpimath.units import meters
 
 
 def test_to_matrix():
-    before = Transform2d(meters(1), meters(2), math.radians(20))
+    before = Transform2d(x=1, y=2, rotation=Rotation2d.fromDegrees(20))
     after = Transform2d.fromMatrix(before.toMatrix())
     assert before == after
 
 
 def test_inverse():
-    initial = Pose2d(meters(1), meters(2), math.radians(45))
+    initial = Pose2d(x=1, y=2, rotation=Rotation2d.fromDegrees(45))
     transform = Transform2d(Translation2d(meters(5), meters(0)), Rotation2d.fromDegrees(5))
 
     transformed = initial + transform
@@ -27,9 +27,9 @@ def test_inverse():
 
 
 def test_composition():
-    initial = Pose2d(meters(1), meters(2), math.radians(45))
-    transform1 = Transform2d(Translation2d(meters(5), meters(0)), Rotation2d.fromDegrees(5))
-    transform2 = Transform2d(Translation2d(meters(0), meters(2)), Rotation2d.fromDegrees(5))
+    initial = Pose2d(x=1, y=2, rotation=Rotation2d.fromDegrees(45))
+    transform1 = Transform2d(Translation2d(x=5, y=0), rotation=Rotation2d.fromDegrees(5))
+    transform2 = Transform2d(Translation2d(x=0, y=2), rotation=Rotation2d.fromDegrees(5))
 
     transformed_separate = initial + transform1 + transform2
     transformed_combined = initial + (transform1 + transform2)
