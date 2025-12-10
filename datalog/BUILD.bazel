@@ -206,7 +206,7 @@ define_pybind_library(
 )
 
 robotpy_py_test(
-    "datalog_tests",
+    "datalog-python-test",
     srcs = glob(["src/test/python/**/*.py"]),
     deps = [
         ":robotpy-wpilog",

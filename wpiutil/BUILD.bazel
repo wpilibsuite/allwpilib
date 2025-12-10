@@ -427,7 +427,7 @@ py_library(
 )
 
 robotpy_py_test(
-    "wpiutil_tests",
+    "wpiutil-python-test",
     srcs = glob(
         ["src/test/python/**/*.py"],
         exclude = ["src/test/python/cpp/**"],

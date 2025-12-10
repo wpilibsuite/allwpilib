@@ -258,7 +258,7 @@ define_pybind_library(
 )
 
 robotpy_py_test(
-    "python_tests",
+    "apriltag-python-test",
     srcs = glob(["src/test/python/**/*.py"]),
     data = glob([
         "src/test/python/*.png",

@@ -109,7 +109,7 @@ def build_templates():
 def build_tests():
     for folder in TEST_FOLDERS:
         wpilib_java_junit5_test(
-            name = folder + "-test",
+            name = folder + "-java-test",
             srcs = native.glob(["src/test/java/org/wpilib/examples/" + folder + "/**/*.java"]),
             deps = [
                 ":" + folder + "-example",

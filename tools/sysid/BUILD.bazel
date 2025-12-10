@@ -45,7 +45,7 @@ cc_binary(
 )
 
 cc_test(
-    name = "sysid-test",
+    name = "sysid-cpp-test",
     size = "medium",
     srcs = glob(["src/test/native/cpp/**"]),
     tags = [

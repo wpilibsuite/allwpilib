@@ -151,7 +151,7 @@ define_pybind_library(
 )
 
 robotpy_py_test(
-    "python_tests",
+    "xrp-python-test",
     srcs = glob(["src/test/python/*.py"]),
     deps = [
         ":robotpy-xrp",

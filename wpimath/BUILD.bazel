@@ -447,7 +447,7 @@ define_test_pybind_library(
 )
 
 robotpy_py_test(
-    "python_tests",
+    "wpimath-python-test",
     srcs = glob(
         ["src/test/python/**/*.py"],
         exclude = ["src/test/python/cpp/**"],

@@ -80,7 +80,7 @@ cc_library(
 )
 
 cc_test(
-    name = "halsim_ws_server-test",
+    name = "halsim_ws_server-cpp-test",
     size = "small",
     srcs = glob(["src/test/native/**/*.cpp"]),
     tags = [

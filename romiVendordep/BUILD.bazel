@@ -73,7 +73,7 @@ wpilib_java_library(
 )
 
 cc_test(
-    name = "romi-test",
+    name = "romi-cpp-test",
     size = "small",
     srcs = glob(["src/test/native/cpp/**"]),
     deps = [
@@ -153,7 +153,7 @@ define_pybind_library(
 )
 
 robotpy_py_test(
-    "python_tests",
+    "romi-python-test",
     srcs = glob(["src/test/python/**/*.py"]),
     deps = [
         ":robotpy-romi",

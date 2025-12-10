@@ -217,7 +217,7 @@ cc_binary(
 )
 
 cc_test(
-    name = "wpical_test",
+    name = "wpical-cpp-test",
     size = "medium",
     srcs = glob(["src/test/native/**"]),
     copts = copts,
