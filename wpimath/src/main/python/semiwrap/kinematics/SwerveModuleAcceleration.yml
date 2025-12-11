@@ -27,6 +27,21 @@ inline_code: |
       >(),
       py::arg("acceleration") = 0, py::arg("angle") = wpi::math::Rotation2d()
     )
+    .def_static("fromFpsSq", [](wpi::units::feet_per_second_squared_t acceleration, wpi::math::Rotation2d angle){
+      return SwerveModuleAcceleration{acceleration, angle};
+    }, py::arg("acceleration") = 0, py::arg("angle") = wpi::math::Rotation2d())
+    .def_property("acceleration_fpss",
+      [](SwerveModuleAcceleration * self) -> wpi::units::feet_per_second_squared_t {
+        return self->acceleration;
+      },
+      [](SwerveModuleAcceleration * self, wpi::units::feet_per_second_squared_t acceleration) {
+        self->acceleration = acceleration;
+      }
+    )
+    .def("__repr__", [](const SwerveModuleAcceleration &sma) -> std::string {
+      return "SwerveModuleAcceleration(acceleration=" + std::to_string(sma.acceleration()) + ", "
+                                      "angle=" + std::to_string(sma.angle.Radians()()) + ")";
+    })
   ;
 
   SetupWPyStruct<wpi::math::SwerveModuleAcceleration>(cls_SwerveModuleAcceleration);
