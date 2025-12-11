@@ -6,7 +6,7 @@ from wpimath.kinematics import (
     SwerveDrive4Kinematics,
     SwerveDrive4Odometry3d,
     SwerveModulePosition,
-    ChassisSpeeds
+    ChassisSpeeds,
 )
 from wpimath.trajectory import TrajectoryGenerator, TrajectoryConfig
 from wpimath.geometry import Translation2d, Rotation2d, Rotation3d, Pose3d, Pose2d
@@ -27,7 +27,9 @@ def odometry3d_test():
             )
             self.zero = SwerveModulePosition()
             self.m_odometry = SwerveDrive4Odometry3d(
-                self.m_kinematics, Rotation3d(), [self.zero, self.zero, self.zero, self.zero]
+                self.m_kinematics,
+                Rotation3d(),
+                [self.zero, self.zero, self.zero, self.zero],
             )
 
     return SwerveDriveOdometry3dTest()
@@ -37,7 +39,12 @@ def test_initialize(odometry3d_test):
     odometry = SwerveDrive4Odometry3d(
         odometry3d_test.m_kinematics,
         Rotation3d(),
-        [odometry3d_test.zero, odometry3d_test.zero, odometry3d_test.zero, odometry3d_test.zero],
+        [
+            odometry3d_test.zero,
+            odometry3d_test.zero,
+            odometry3d_test.zero,
+            odometry3d_test.zero,
+        ],
         Pose3d(x=1, y=2, z=0, rotation=Rotation3d.fromDegrees(0, 0, 45)),
     )
 
@@ -51,13 +58,26 @@ def test_initialize(odometry3d_test):
 
 def test_two_iterations(odometry3d_test):
     position = SwerveModulePosition(distance=0.5, angle=Rotation2d(0))
-    
+
     odometry3d_test.m_odometry.resetPosition(
-        Rotation3d(), [odometry3d_test.zero, odometry3d_test.zero, odometry3d_test.zero, odometry3d_test.zero], Pose3d()
+        Rotation3d(),
+        [
+            odometry3d_test.zero,
+            odometry3d_test.zero,
+            odometry3d_test.zero,
+            odometry3d_test.zero,
+        ],
+        Pose3d(),
     )
 
     odometry3d_test.m_odometry.update(
-        Rotation3d(), [odometry3d_test.zero, odometry3d_test.zero, odometry3d_test.zero, odometry3d_test.zero]
+        Rotation3d(),
+        [
+            odometry3d_test.zero,
+            odometry3d_test.zero,
+            odometry3d_test.zero,
+            odometry3d_test.zero,
+        ],
     )
 
     pose = odometry3d_test.m_odometry.update(
@@ -77,7 +97,14 @@ def test_90_degree_turn(odometry3d_test):
     br = SwerveModulePosition(distance=42.15, angle=Rotation2d.fromDegrees(-26.565))
 
     odometry3d_test.m_odometry.resetPosition(
-        Rotation3d(), [odometry3d_test.zero, odometry3d_test.zero, odometry3d_test.zero, odometry3d_test.zero], Pose3d()
+        Rotation3d(),
+        [
+            odometry3d_test.zero,
+            odometry3d_test.zero,
+            odometry3d_test.zero,
+            odometry3d_test.zero,
+        ],
+        Pose3d(),
     )
     pose = odometry3d_test.m_odometry.update(
         Rotation3d.fromDegrees(0, 0, 90), [fl, fr, bl, br]
@@ -92,7 +119,12 @@ def test_90_degree_turn(odometry3d_test):
 def test_gyro_angle_reset(odometry3d_test):
     odometry3d_test.m_odometry.resetPosition(
         Rotation3d.fromDegrees(0, 0, 90),
-        [odometry3d_test.zero, odometry3d_test.zero, odometry3d_test.zero, odometry3d_test.zero],
+        [
+            odometry3d_test.zero,
+            odometry3d_test.zero,
+            odometry3d_test.zero,
+            odometry3d_test.zero,
+        ],
         Pose3d(),
     )
 
@@ -116,7 +148,7 @@ def test_accuracy_facing_x_axis():
         Translation2d(x=-1, y=-1),
         Translation2d(x=-1, y=1),
     )
-    
+
     zero = SwerveModulePosition()
     odometry = SwerveDrive4Odometry3d(
         kinematics, Rotation3d(), [zero, zero, zero, zero]
@@ -138,10 +170,12 @@ def test_accuracy_facing_x_axis():
         TrajectoryConfig(maxVelocity=5.0, maxAcceleration=2.0),
     )
 
+    random.seed(4915)
+
     dt = 0.02
     t = 0
 
-    max_error = -float('inf')
+    max_error = -float("inf")
     error_sum = 0
 
     while t < trajectory.totalTime():
@@ -170,13 +204,11 @@ def test_accuracy_facing_x_axis():
         br.angle = ground_truth_state.pose.rotation()
 
         xhat = odometry.update(
-            Rotation3d(0, 0, random.normalvariate(0.0, 1.0) * 0.05),
+            Rotation3d(0, 0, random.gauss(0.0, 1.0) * 0.05),
             [fl, fr, bl, br],
         )
-        error = (
-            ground_truth_state.pose.translation()
-            .distance(xhat.translation().toTranslation2d())
-            
+        error = ground_truth_state.pose.translation().distance(
+            xhat.translation().toTranslation2d()
         )
 
         if error > max_error:
@@ -185,5 +217,5 @@ def test_accuracy_facing_x_axis():
 
         t += dt
 
-    assert error_sum / (trajectory.totalTime() / dt) < 0.07
+    assert error_sum / (trajectory.totalTime() / dt) < 0.06
     assert max_error < 0.125

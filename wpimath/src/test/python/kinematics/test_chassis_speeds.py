@@ -28,8 +28,9 @@ def test_discretize():
 
 
 def test_to_robot_relative():
-    chassis_speeds = ChassisSpeeds(vx=1, vy=0, omega=0.5).toRobotRelative(Rotation2d.fromDegrees(-90))
-        
+    chassis_speeds = ChassisSpeeds(vx=1, vy=0, omega=0.5).toRobotRelative(
+        Rotation2d.fromDegrees(-90)
+    )
 
     assert chassis_speeds.vx == pytest.approx(0.0, abs=1e-9)
     assert chassis_speeds.vy == pytest.approx(1.0, abs=1e-9)
@@ -37,8 +38,10 @@ def test_to_robot_relative():
 
 
 def test_to_field_relative():
-    chassis_speeds = ChassisSpeeds(vx=1, vy=0, omega=0.5).toFieldRelative(Rotation2d.fromDegrees(45))
-    
+    chassis_speeds = ChassisSpeeds(vx=1, vy=0, omega=0.5).toFieldRelative(
+        Rotation2d.fromDegrees(45)
+    )
+
     assert chassis_speeds.vx == pytest.approx(1.0 / math.sqrt(2.0), abs=1e-9)
     assert chassis_speeds.vy == pytest.approx(1.0 / math.sqrt(2.0), abs=1e-9)
     assert chassis_speeds.omega == pytest.approx(0.5, abs=1e-9)

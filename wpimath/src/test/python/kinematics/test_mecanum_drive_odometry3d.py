@@ -26,7 +26,9 @@ def odometry3d_test():
             self.kinematics = MecanumDriveKinematics(
                 self.m_fl, self.m_fr, self.m_bl, self.m_br
             )
-            self.odometry = MecanumDriveOdometry3d(self.kinematics, Rotation3d(), self.zero)
+            self.odometry = MecanumDriveOdometry3d(
+                self.kinematics, Rotation3d(), self.zero
+            )
 
     return MecanumDriveOdometry3dTest()
 
@@ -59,7 +61,9 @@ def test_multiple_consecutive_updates(odometry3d_test):
     assert second_pose.x == pytest.approx(0.0, abs=0.01)
     assert second_pose.y == pytest.approx(0.0, abs=0.01)
     assert second_pose.z == pytest.approx(0.0, abs=0.01)
-    assert second_pose.rotation().toRotation2d().radians() == pytest.approx(0.0, abs=0.01)
+    assert second_pose.rotation().toRotation2d().radians() == pytest.approx(
+        0.0, abs=0.01
+    )
 
 
 def test_two_iterations(odometry3d_test):
@@ -83,7 +87,9 @@ def test_90_degree_turn(odometry3d_test):
         frontLeft=-13.328, frontRight=39.986, rearLeft=-13.329, rearRight=39.986
     )
     odometry3d_test.odometry.update(Rotation3d(), MecanumDriveWheelPositions())
-    pose = odometry3d_test.odometry.update(Rotation3d.fromDegrees(0, 0, 90), wheel_deltas)
+    pose = odometry3d_test.odometry.update(
+        Rotation3d.fromDegrees(0, 0, 90), wheel_deltas
+    )
 
     assert pose.x == pytest.approx(8.4855, abs=0.01)
     assert pose.y == pytest.approx(8.4855, abs=0.01)
@@ -92,13 +98,17 @@ def test_90_degree_turn(odometry3d_test):
 
 
 def test_gyro_angle_reset(odometry3d_test):
-    odometry3d_test.odometry.resetPosition(Rotation3d.fromDegrees(0, 0, 90), odometry3d_test.zero, Pose3d())
+    odometry3d_test.odometry.resetPosition(
+        Rotation3d.fromDegrees(0, 0, 90), odometry3d_test.zero, Pose3d()
+    )
 
     wheel_deltas = MecanumDriveWheelPositions(
         frontLeft=0.3536, frontRight=0.3536, rearLeft=0.3536, rearRight=0.3536
     )
 
-    pose = odometry3d_test.odometry.update(Rotation3d.fromDegrees(0, 0, 90), wheel_deltas)
+    pose = odometry3d_test.odometry.update(
+        Rotation3d.fromDegrees(0, 0, 90), wheel_deltas
+    )
 
     assert pose.x == pytest.approx(0.3536, abs=0.01)
     assert pose.y == pytest.approx(0.0, abs=0.01)
@@ -129,6 +139,8 @@ def test_accuracy_facing_trajectory():
         TrajectoryConfig(maxVelocity=5.0, maxAcceleration=2.0),
     )
 
+    random.seed(4915)
+
     dt = 0.02
     t = 0
 
@@ -146,10 +158,10 @@ def test_accuracy_facing_trajectory():
             )
         )
 
-        wheel_speeds.frontLeft += random.normalvariate(0.0, 1.0) * 0.1
-        wheel_speeds.frontRight += random.normalvariate(0.0, 1.0) * 0.1
-        wheel_speeds.rearLeft += random.normalvariate(0.0, 1.0) * 0.1
-        wheel_speeds.rearRight += random.normalvariate(0.0, 1.0) * 0.1
+        wheel_speeds.frontLeft += random.gauss(0.0, 1.0) * 0.1
+        wheel_speeds.frontRight += random.gauss(0.0, 1.0) * 0.1
+        wheel_speeds.rearLeft += random.gauss(0.0, 1.0) * 0.1
+        wheel_speeds.rearRight += random.gauss(0.0, 1.0) * 0.1
 
         wheel_positions.frontLeft += wheel_speeds.frontLeft * dt
         wheel_positions.frontRight += wheel_speeds.frontRight * dt
@@ -159,15 +171,13 @@ def test_accuracy_facing_trajectory():
         xhat = odometry.update(
             Rotation3d(
                 ground_truth_state.pose.rotation()
-                + Rotation2d(random.normalvariate(0.0, 1.0) * 0.05)
+                + Rotation2d(random.gauss(0.0, 1.0) * 0.05)
             ),
             wheel_positions,
         )
 
-        error = (
-            ground_truth_state.pose.translation()
-            .distance(xhat.translation().toTranslation2d())
-            
+        error = ground_truth_state.pose.translation().distance(
+            xhat.translation().toTranslation2d()
         )
         if error > max_error:
             max_error = error
@@ -202,6 +212,8 @@ def test_accuracy_facing_x_axis():
         TrajectoryConfig(maxVelocity=5.0, maxAcceleration=2.0),
     )
 
+    random.seed(4915)
+
     dt = 0.02
     t = 0
 
@@ -219,10 +231,10 @@ def test_accuracy_facing_x_axis():
             )
         )
 
-        wheel_speeds.frontLeft += random.normalvariate(0.0, 1.0) * 0.1
-        wheel_speeds.frontRight += random.normalvariate(0.0, 1.0) * 0.1
-        wheel_speeds.rearLeft += random.normalvariate(0.0, 1.0) * 0.1
-        wheel_speeds.rearRight += random.normalvariate(0.0, 1.0) * 0.1
+        wheel_speeds.frontLeft += random.gauss(0.0, 1.0) * 0.1
+        wheel_speeds.frontRight += random.gauss(0.0, 1.0) * 0.1
+        wheel_speeds.rearLeft += random.gauss(0.0, 1.0) * 0.1
+        wheel_speeds.rearRight += random.gauss(0.0, 1.0) * 0.1
 
         wheel_positions.frontLeft += wheel_speeds.frontLeft * dt
         wheel_positions.frontRight += wheel_speeds.frontRight * dt
@@ -230,14 +242,12 @@ def test_accuracy_facing_x_axis():
         wheel_positions.rearRight += wheel_speeds.rearRight * dt
 
         xhat = odometry.update(
-            Rotation3d(0, 0, random.normalvariate(0.0, 1.0) * 0.05),
+            Rotation3d(0, 0, random.gauss(0.0, 1.0) * 0.05),
             wheel_positions,
         )
 
-        error = (
-            ground_truth_state.pose.translation()
-            .distance(xhat.translation().toTranslation2d())
-            
+        error = ground_truth_state.pose.translation().distance(
+            xhat.translation().toTranslation2d()
         )
         if error > max_error:
             max_error = error
@@ -245,5 +255,5 @@ def test_accuracy_facing_x_axis():
 
         t += dt
 
-    assert error_sum / (trajectory.totalTime() / dt) < 0.07
+    assert error_sum / (trajectory.totalTime() / dt) < 0.06
     assert max_error < 0.125

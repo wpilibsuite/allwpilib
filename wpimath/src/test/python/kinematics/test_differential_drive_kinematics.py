@@ -50,9 +50,7 @@ def test_forward_kinematics_for_straight_line():
 
 def test_inverse_kinematics_for_rotate_in_place():
     kinematics = DifferentialDriveKinematics(trackwidth=0.381 * 2)
-    chassis_speeds = ChassisSpeeds(
-        vx=0.0, vy=0.0, omega=math.pi
-    )
+    chassis_speeds = ChassisSpeeds(vx=0.0, vy=0.0, omega=math.pi)
     wheel_speeds = kinematics.toWheelSpeeds(chassis_speeds)
 
     assert wheel_speeds.left == pytest.approx(-0.381 * math.pi, abs=1e-9)

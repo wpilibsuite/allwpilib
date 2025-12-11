@@ -90,9 +90,7 @@ def test_strafe_forward_kinematics_with_deltas(kinematics_test):
 
 
 def test_rotation_inverse_kinematics(kinematics_test):
-    speeds = ChassisSpeeds(
-        vx=0, vy=0, omega=2 * math.pi
-    )
+    speeds = ChassisSpeeds(vx=0, vy=0, omega=2 * math.pi)
     module_states = kinematics_test.kinematics.toWheelSpeeds(speeds)
 
     assert module_states.frontLeft == pytest.approx(-150.79644737, abs=0.1)
@@ -117,7 +115,10 @@ def test_rotation_forward_kinematics(kinematics_test):
 
 def test_rotation_forward_kinematics_with_deltas(kinematics_test):
     wheel_deltas = MecanumDriveWheelPositions(
-        frontLeft=-150.79644737, frontRight=150.79644737, rearLeft=-150.79644737, rearRight=150.79644737
+        frontLeft=-150.79644737,
+        frontRight=150.79644737,
+        rearLeft=-150.79644737,
+        rearRight=150.79644737,
     )
     twist = kinematics_test.kinematics.toTwist2d(wheel_deltas)
 
@@ -165,7 +166,9 @@ def test_mixed_rotation_translation_forward_kinematics_with_deltas(kinematics_te
 
 def test_off_center_rotation_inverse_kinematics(kinematics_test):
     speeds = ChassisSpeeds(vx=0, vy=0, omega=1)
-    module_states = kinematics_test.kinematics.toWheelSpeeds(speeds, kinematics_test.m_fl)
+    module_states = kinematics_test.kinematics.toWheelSpeeds(
+        speeds, kinematics_test.m_fl
+    )
 
     assert module_states.frontLeft == pytest.approx(0, abs=0.1)
     assert module_states.frontRight == pytest.approx(24.0, abs=0.1)
@@ -200,7 +203,9 @@ def test_off_center_rotation_forward_kinematics_with_deltas(kinematics_test):
 
 def test_off_center_translation_rotation_inverse_kinematics(kinematics_test):
     speeds = ChassisSpeeds(vx=5, vy=2, omega=1)
-    module_states = kinematics_test.kinematics.toWheelSpeeds(speeds, kinematics_test.m_fl)
+    module_states = kinematics_test.kinematics.toWheelSpeeds(
+        speeds, kinematics_test.m_fl
+    )
 
     assert module_states.frontLeft == pytest.approx(3.0, abs=0.1)
     assert module_states.frontRight == pytest.approx(31.0, abs=0.1)
@@ -222,7 +227,9 @@ def test_off_center_translation_rotation_forward_kinematics(kinematics_test):
     assert chassis_speeds.omega == pytest.approx(0.707, abs=0.1)
 
 
-def test_off_center_translation_rotation_forward_kinematics_with_deltas(kinematics_test):
+def test_off_center_translation_rotation_forward_kinematics_with_deltas(
+    kinematics_test,
+):
     wheel_deltas = MecanumDriveWheelPositions(
         frontLeft=2.12, frontRight=21.92, rearLeft=-12.02, rearRight=36.06
     )

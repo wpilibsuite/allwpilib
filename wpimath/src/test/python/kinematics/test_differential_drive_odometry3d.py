@@ -10,7 +10,7 @@ def test_initialize():
         Rotation3d.fromDegrees(0, 0, 90),
         0,
         0,
-        Pose3d(x=1, y=2, z=0, rotation=Rotation3d.fromDegrees(0, 0, 45))
+        Pose3d(x=1, y=2, z=0, rotation=Rotation3d.fromDegrees(0, 0, 45)),
     )
 
     pose = odometry.getPose()
@@ -22,13 +22,9 @@ def test_initialize():
 
 
 def test_encoder_distances():
-    odometry = DifferentialDriveOdometry3d(
-        Rotation3d.fromDegrees(0, 0, 45), 0, 0
-    )
+    odometry = DifferentialDriveOdometry3d(Rotation3d.fromDegrees(0, 0, 45), 0, 0)
 
-    pose = odometry.update(
-        Rotation3d.fromDegrees(0, 0, 135), 0, 5 * math.pi
-    )
+    pose = odometry.update(Rotation3d.fromDegrees(0, 0, 135), 0, 5 * math.pi)
 
     assert pose.x == pytest.approx(5.0, abs=1e-9)
     assert pose.y == pytest.approx(5.0, abs=1e-9)
