@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 import shutil
 from pathlib import Path
 
@@ -7,7 +8,8 @@ from upstream_utils import Lib, has_prefix, walk_cwd_and_copy_if
 
 
 def copy_upstream_src(wpilib_root: Path):
-    wpimath = wpilib_root / "wpimath"
+    upstream_root: Path = Path(".").absolute()
+    wpimath: Path = wpilib_root / "wpimath"
 
     # Delete old install
     for d in [
@@ -16,10 +18,24 @@ def copy_upstream_src(wpilib_root: Path):
         shutil.rmtree(wpimath / d, ignore_errors=True)
 
     # Copy units include files into allwpilib
-    walk_cwd_and_copy_if(
-        lambda dp, f: has_prefix(dp, Path("include/units")),
-        wpimath / "src/main/native/thirdparty/units",
+    os.chdir(upstream_root / "include")
+    wpi_files: list[Path] = walk_cwd_and_copy_if(
+        lambda dp, f: has_prefix(dp, Path("units")),
+        wpimath / "src/main/native/thirdparty/units/include/wpi",
     )
+
+    # Perform namespace renames
+    for wpi_file in wpi_files:
+        content: str
+        with open(wpi_file) as f:
+            content = f.read()
+
+        content = content.replace("units::", "wpi::units::")
+        content = content.replace("namespace units", "namespace wpi::units")
+        content = content.replace("#include <units/", "#include <wpi/units/")
+
+        with open(wpi_file, "w") as f:
+            f.write(content)
 
 
 def main():
