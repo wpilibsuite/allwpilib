@@ -8,7 +8,6 @@ from wpimath.geometry import (
     Translation2d,
     Pose2d
 )
-from wpimath.units import meters
 
 
 def test_to_matrix():
@@ -19,7 +18,7 @@ def test_to_matrix():
 
 def test_inverse():
     initial = Pose2d(x=1, y=2, rotation=Rotation2d.fromDegrees(45))
-    transform = Transform2d(Translation2d(meters(5), meters(0)), Rotation2d.fromDegrees(5))
+    transform = Transform2d(Translation2d(x=5, y=0), Rotation2d.fromDegrees(5))
 
     transformed = initial + transform
     untransformed = transformed + transform.inverse()

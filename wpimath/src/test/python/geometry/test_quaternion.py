@@ -3,7 +3,6 @@ import math
 import numpy as np
 
 from wpimath.geometry import Quaternion, Rotation3d
-from wpimath.units import radians as rad
 
 
 def test_init():

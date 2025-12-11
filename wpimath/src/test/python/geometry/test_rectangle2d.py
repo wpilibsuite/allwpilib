@@ -8,7 +8,6 @@ from wpimath.geometry import (
     Rotation2d,
     Rectangle2d
 )
-from wpimath.units import meters
 
 
 def test_new_with_corners():

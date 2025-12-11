@@ -3,33 +3,32 @@ import math
 import numpy as np
 
 from wpimath.geometry import Rotation3d, Rotation2d, Quaternion
-from wpimath.units import radians
 
 
 def test_gimbal_lock_accuracy():
-    rot1 = Rotation3d(0, 0, radians(math.pi / 2))
-    rot2 = Rotation3d(radians(math.pi), 0, 0)
-    rot3 = Rotation3d(radians(-math.pi / 2), 0, 0)
+    rot1 = Rotation3d(roll=0, pitch=0, yaw=math.pi / 2)
+    rot2 = Rotation3d(roll=math.pi, pitch=0, yaw=0)
+    rot3 = Rotation3d(roll=-math.pi / 2, pitch=0, yaw=0)
     result1 = rot1 + rot2 + rot3
-    expected1 = Rotation3d(0, -radians(math.pi / 2), radians(math.pi / 2))
+    expected1 = Rotation3d(roll=0, pitch=-math.pi / 2, yaw=math.pi / 2)
     assert expected1 == result1
     assert (result1.x + result1.z) == pytest.approx(math.pi / 2)
     assert result1.y == pytest.approx(-math.pi / 2, abs=1e-7)
 
-    rot1 = Rotation3d(0, 0, radians(math.pi / 2))
-    rot2 = Rotation3d(radians(-math.pi), 0, 0)
-    rot3 = Rotation3d(radians(math.pi / 2), 0, 0)
+    rot1 = Rotation3d(roll=0, pitch=0, yaw=math.pi / 2)
+    rot2 = Rotation3d(roll=-math.pi, pitch=0, yaw=0)
+    rot3 = Rotation3d(roll=math.pi / 2, pitch=0, yaw=0)
     result2 = rot1 + rot2 + rot3
-    expected2 = Rotation3d(0, radians(math.pi / 2), radians(math.pi / 2))
+    expected2 = Rotation3d(roll=0, pitch=math.pi / 2, yaw=math.pi / 2)
     assert expected2 == result2
     assert (result2.z - result2.x) == pytest.approx(math.pi / 2)
     assert result2.y == pytest.approx(math.pi / 2, abs=1e-7)
 
-    rot1 = Rotation3d(0, 0, radians(math.pi / 2))
-    rot2 = Rotation3d(0, radians(math.pi / 3), 0)
-    rot3 = Rotation3d(radians(-math.pi / 2), 0, 0)
+    rot1 = Rotation3d(roll=0, pitch=0, yaw=math.pi / 2)
+    rot2 = Rotation3d(roll=0, pitch=math.pi / 3, yaw=0)
+    rot3 = Rotation3d(roll=-math.pi / 2, pitch=0, yaw=0)
     result3 = rot1 + rot2 + rot3
-    expected3 = Rotation3d(0, radians(math.pi / 2), radians(math.pi / 6))
+    expected3 = Rotation3d(roll=0, pitch=math.pi / 2, yaw=math.pi / 6)
     assert expected3 == result3
     assert (result3.z - result3.x) == pytest.approx(math.pi / 6)
     assert result3.y == pytest.approx(math.pi / 2)
@@ -37,22 +36,22 @@ def test_gimbal_lock_accuracy():
 
 def test_init_axis_angle_and_roll_pitch_yaw():
     x_axis = np.array([1.0, 0.0, 0.0])
-    rot1 = Rotation3d(x_axis, radians(math.pi / 3))
-    rot2 = Rotation3d(radians(math.pi / 3), 0, 0)
+    rot1 = Rotation3d(x_axis, math.pi / 3)
+    rot2 = Rotation3d(roll=math.pi / 3, pitch=0, yaw=0)
     rvec1 = Rotation3d(x_axis * (math.pi / 3))
     assert rot1 == rot2
     assert rot1 == rvec1
 
     y_axis = np.array([0.0, 1.0, 0.0])
-    rot3 = Rotation3d(y_axis, radians(math.pi / 3))
-    rot4 = Rotation3d(0, radians(math.pi / 3), 0)
+    rot3 = Rotation3d(y_axis, math.pi / 3)
+    rot4 = Rotation3d(roll=0, pitch=math.pi / 3, yaw=0)
     rvec2 = Rotation3d(y_axis * (math.pi / 3))
     assert rot3 == rot4
     assert rot3 == rvec2
 
     z_axis = np.array([0.0, 0.0, 1.0])
-    rot5 = Rotation3d(z_axis, radians(math.pi / 3))
-    rot6 = Rotation3d(0, 0, radians(math.pi / 3))
+    rot5 = Rotation3d(z_axis, math.pi / 3)
+    rot6 = Rotation3d(roll=0, pitch=0, yaw=math.pi / 3)
     rvec3 = Rotation3d(z_axis * (math.pi / 3))
     assert rot5 == rot6
     assert rot5 == rvec3
@@ -70,7 +69,7 @@ def test_init_rotation_matrix():
     R2[:, 1] = [-1.0, 0.0, 0.0]
     R2[:, 2] = [0.0, 0.0, 1.0]
     rot2 = Rotation3d(R2)
-    expected2 = Rotation3d(math.radians(0), math.radians(0), math.radians(90))
+    expected2 = Rotation3d(roll=0, pitch=0, yaw=math.radians(90))
     assert expected2 == rot2
 
     # Matrix that isn't orthogonal
@@ -91,12 +90,12 @@ def test_init_two_vector():
 
     # 90 degree CW rotation around y-axis
     rot1 = Rotation3d(x_axis, z_axis)
-    expected1 = Rotation3d(y_axis, radians(-math.pi / 2.0))
+    expected1 = Rotation3d(y_axis, -math.pi / 2.0)
     assert expected1 == rot1
 
     # 45 degree CCW rotation around z-axis
     rot2 = Rotation3d(x_axis, np.array([1.0, 1.0, 0.0]))
-    expected2 = Rotation3d(z_axis, radians(math.pi / 4.0))
+    expected2 = Rotation3d(z_axis, math.pi / 4.0)
     assert expected2 == rot2
 
     # 0 degree rotation of x-axes
@@ -137,12 +136,12 @@ def test_init_two_vector():
 def test_radians_to_degrees():
     z_axis = np.array([0.0, 0.0, 1.0])
 
-    rot1 = Rotation3d(z_axis, radians(math.pi / 3))
+    rot1 = Rotation3d(z_axis, math.pi / 3)
     assert rot1.x == pytest.approx(0.0)
     assert rot1.y == pytest.approx(0.0)
     assert rot1.z == pytest.approx(math.radians(60))
 
-    rot2 = Rotation3d(z_axis, radians(math.pi / 4))
+    rot2 = Rotation3d(z_axis, math.pi / 4)
     assert rot2.x == pytest.approx(0.0)
     assert rot2.y == pytest.approx(0.0)
     assert rot2.z == pytest.approx(math.radians(45))
