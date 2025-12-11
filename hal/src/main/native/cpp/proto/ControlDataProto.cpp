@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <utility>
+
 #include "wpi/hal/proto/ControlData.h"
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 
@@ -85,7 +87,7 @@ std::optional<mrc::ControlData> wpi::util::Protobuf<mrc::ControlData>::Unpack(
   ControlData.SetJoystickCount(Joysticks.size());
 
   for (size_t i = 0; i < ControlData.GetJoystickCount(); i++) {
-    ControlData.Joysticks()[i] = Joysticks[i];
+    ControlData.Joysticks()[i] = std::move(Joysticks[i]);
   }
 
   return ControlData;
@@ -109,6 +111,7 @@ bool wpi::util::Protobuf<mrc::ControlData>::Pack(
 std::optional<mrc::Joystick> wpi::util::Protobuf<mrc::Joystick>::Unpack(
     InputStream& Stream) {
   wpi::util::UnpackCallback<int16_t, MRC_MAX_NUM_AXES> AxesCb;
+  wpi::util::UnpackCallback<mrc::Touchpad, MRC_MAX_NUM_TOUCHPADS> TouchpadCb;
 
   mrc_proto_ProtobufJoystickData Msg{
       .AvailableButtons = 0,
@@ -117,6 +120,7 @@ std::optional<mrc::Joystick> wpi::util::Protobuf<mrc::Joystick>::Unpack(
       .Axes = AxesCb.Callback(),
       .POVCount = 0,
       .POVs = 0,
+      .Touchpads = TouchpadCb.Callback(),
   };
 
   if (!Stream.Decode(Msg)) {
@@ -124,6 +128,7 @@ std::optional<mrc::Joystick> wpi::util::Protobuf<mrc::Joystick>::Unpack(
   }
 
   auto Axes = AxesCb.Items();
+  auto Touchpads = TouchpadCb.Items();
 
   mrc::Joystick Joystick;
   Joystick.Axes.SetAvailable(Msg.AvailableAxes);
@@ -145,12 +150,18 @@ std::optional<mrc::Joystick> wpi::util::Protobuf<mrc::Joystick>::Unpack(
     Joystick.Povs.Povs()[i] = Val;
   }
 
+  Joystick.Touchpads.SetTouchpadCount(static_cast<uint8_t>(Touchpads.size()));
+  for (size_t i = 0; i < Joystick.Touchpads.GetTouchpadCount(); i++) {
+    Joystick.Touchpads.Touchpads()[i] = std::move(Touchpads[i]);
+  }
+
   return Joystick;
 }
 
 bool wpi::util::Protobuf<mrc::Joystick>::Pack(OutputStream& Stream,
                                               const mrc::Joystick& Value) {
   wpi::util::PackCallback AxesCb{Value.Axes.Axes()};
+  wpi::util::PackCallback TouchpadCb{Value.Touchpads.Touchpads()};
 
   uint32_t PovsStore = 0;
   for (int i = static_cast<int>(Value.Povs.GetCount()) - 1; i >= 0; i--) {
@@ -165,6 +176,72 @@ bool wpi::util::Protobuf<mrc::Joystick>::Pack(OutputStream& Stream,
       .Axes = AxesCb.Callback(),
       .POVCount = static_cast<uint32_t>(Value.Povs.GetCount()),
       .POVs = PovsStore,
+      .Touchpads = TouchpadCb.Callback(),
+  };
+
+  return Stream.Encode(Msg);
+}
+
+std::optional<mrc::TouchpadFinger>
+wpi::util::Protobuf<mrc::TouchpadFinger>::Unpack(InputStream& Stream) {
+  mrc_proto_ProtobufFingerData Msg{
+      .X = 0,
+      .Y = 0,
+      .Down = false,
+  };
+
+  if (!Stream.Decode(Msg)) {
+    return {};
+  }
+
+  return mrc::TouchpadFinger{
+      .Down = Msg.Down,
+      .X = static_cast<uint16_t>(Msg.X),
+      .Y = static_cast<uint16_t>(Msg.Y),
+  };
+}
+
+bool wpi::util::Protobuf<mrc::TouchpadFinger>::Pack(
+    OutputStream& Stream, const mrc::TouchpadFinger& Value) {
+  mrc_proto_ProtobufFingerData Msg{
+      .X = Value.X,
+      .Y = Value.Y,
+      .Down = Value.Down,
+  };
+
+  return Stream.Encode(Msg);
+}
+
+std::optional<mrc::Touchpad> wpi::util::Protobuf<mrc::Touchpad>::Unpack(
+    InputStream& Stream) {
+  wpi::util::UnpackCallback<mrc::TouchpadFinger, MRC_MAX_NUM_TOUCHPAD_FINGERS>
+      FingersCb;
+
+  mrc_proto_ProtobufTouchpadData Msg{
+      .Fingers = FingersCb.Callback(),
+  };
+
+  if (!Stream.Decode(Msg)) {
+    return {};
+  }
+
+  auto Fingers = FingersCb.Items();
+
+  mrc::Touchpad Touchpad;
+  Touchpad.SetFingerCount(Fingers.size());
+  for (size_t i = 0; i < Touchpad.GetFingerCount(); i++) {
+    Touchpad.Fingers()[i] = Fingers[i];
+  }
+
+  return Touchpad;
+}
+
+bool wpi::util::Protobuf<mrc::Touchpad>::Pack(OutputStream& Stream,
+                                              const mrc::Touchpad& Value) {
+  wpi::util::PackCallback FingersCb{Value.Fingers()};
+
+  mrc_proto_ProtobufTouchpadData Msg{
+      .Fingers = FingersCb.Callback(),
   };
 
   return Stream.Encode(Msg);

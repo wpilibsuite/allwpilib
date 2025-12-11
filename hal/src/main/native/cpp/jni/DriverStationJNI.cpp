@@ -36,6 +36,11 @@ static_assert(org_wpilib_hardware_hal_DriverStationJNI_kMaxJoystickPOVs ==
               HAL_kMaxJoystickPOVs);
 static_assert(org_wpilib_hardware_hal_DriverStationJNI_kMaxJoysticks ==
               HAL_kMaxJoysticks);
+static_assert(org_wpilib_hardware_hal_DriverStationJNI_kMaxJoystickTouchpads ==
+              HAL_kMaxJoystickTouchpads);
+static_assert(
+    org_wpilib_hardware_hal_DriverStationJNI_kMaxJoystickTouchpadFingers ==
+    HAL_kMaxJoystickTouchpadFingers);
 
 using namespace wpi::hal;
 using namespace wpi::util::java;
@@ -137,48 +142,81 @@ Java_org_wpilib_hardware_hal_DriverStationJNI_nativeGetAllianceStation
 /*
  * Class:     org_wpilib_hardware_hal_DriverStationJNI
  * Method:    getAllJoystickData
- * Signature: (I[F[S[B[J)V
+ * Signature: (I[F[S[B[F[J)V
  */
 JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_DriverStationJNI_getAllJoystickData
   (JNIEnv* env, jclass cls, jint stick, jfloatArray axesArray,
    jshortArray rawAxesArray, jbyteArray povsArray,
-   jlongArray buttonsAndMetadataArray)
+   jfloatArray touchpadFingersData, jlongArray buttonsAndMetadataArray)
 {
   HAL_JoystickAxes axes;
   HAL_JoystickPOVs povs;
   HAL_JoystickButtons buttons;
+  HAL_JoystickTouchpads touchpads;
 
-  HAL_GetAllJoystickData(stick, &axes, &povs, &buttons);
+  HAL_GetAllJoystickData(stick, &axes, &povs, &buttons, &touchpads);
 
   CriticalJSpan<jfloat> jAxes(env, axesArray);
   CriticalJSpan<jshort> jRawAxes(env, rawAxesArray);
   CriticalJSpan<jbyte> jPovs(env, povsArray);
+  CriticalJSpan<jfloat> jTouchpadFingers(env, touchpadFingersData);
   CriticalJSpan<jlong> jButtons(env, buttonsAndMetadataArray);
 
   static_assert(sizeof(jAxes[0]) == sizeof(axes.axes[0]));
   static_assert(sizeof(jRawAxes[0]) == sizeof(axes.raw[0]));
   static_assert(sizeof(jPovs[0]) == sizeof(povs.povs[0]));
+  static_assert(sizeof(jTouchpadFingers[0]) ==
+                sizeof(touchpads.touchpads[0].fingers[0].x));
 
   std::memcpy(&jAxes[0], axes.axes, sizeof(axes.axes));
   std::memcpy(&jRawAxes[0], axes.raw, sizeof(axes.raw));
   std::memcpy(&jPovs[0], povs.povs, sizeof(povs.povs));
+  jTouchpadFingers[0] = touchpads.touchpads[0].fingers[0].x;
+  jTouchpadFingers[1] = touchpads.touchpads[0].fingers[0].y;
+  jTouchpadFingers[2] = touchpads.touchpads[0].fingers[1].x;
+  jTouchpadFingers[3] = touchpads.touchpads[0].fingers[1].y;
+  jTouchpadFingers[4] = touchpads.touchpads[1].fingers[0].x;
+  jTouchpadFingers[5] = touchpads.touchpads[1].fingers[0].y;
+  jTouchpadFingers[6] = touchpads.touchpads[1].fingers[1].x;
+  jTouchpadFingers[7] = touchpads.touchpads[1].fingers[1].y;
   jButtons[0] = axes.available;
   jButtons[1] = povs.available;
   jButtons[2] = buttons.available;
   jButtons[3] = buttons.buttons;
+  jButtons[4] = touchpads.count;
+  jButtons[5] = (touchpads.touchpads[0].fingers[0].down ? 1 : 0) |
+                (touchpads.touchpads[0].fingers[1].down ? 2 : 0) |
+                (touchpads.touchpads[0].count << 2);
+  jButtons[6] = (touchpads.touchpads[1].fingers[0].down ? 1 : 0) |
+                (touchpads.touchpads[1].fingers[1].down ? 2 : 0) |
+                (touchpads.touchpads[1].count << 2);
 }
 
 /*
  * Class:     org_wpilib_hardware_hal_DriverStationJNI
- * Method:    setJoystickOutputs
- * Signature: (BIII)I
+ * Method:    setJoystickRumble
+ * Signature: (BIIII)I
  */
 JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_DriverStationJNI_setJoystickOutputs
-  (JNIEnv*, jclass, jbyte port, jint outputs, jint leftRumble, jint rightRumble)
+Java_org_wpilib_hardware_hal_DriverStationJNI_setJoystickRumble
+  (JNIEnv*, jclass, jbyte port, jint leftRumble, jint rightRumble,
+   jint leftTriggerRumble, jint rightTriggerRumble)
 {
-  return HAL_SetJoystickOutputs(port, outputs, leftRumble, rightRumble);
+  return HAL_SetJoystickRumble(port, leftRumble, rightRumble, leftTriggerRumble,
+                               rightTriggerRumble);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
+ * Method:    setJoystickLeds
+ * Signature: (BI)I
+ */
+JNIEXPORT jint JNICALL
+Java_org_wpilib_hardware_hal_DriverStationJNI_setJoystickLeds
+  (JNIEnv*, jclass, jbyte port, jint leds)
+{
+  return HAL_SetJoystickLeds(port, leds);
 }
 
 /*
@@ -195,14 +233,26 @@ Java_org_wpilib_hardware_hal_DriverStationJNI_getJoystickIsGamepad
 
 /*
  * Class:     org_wpilib_hardware_hal_DriverStationJNI
- * Method:    getJoystickType
+ * Method:    getJoystickSupportedOutputs
  * Signature: (B)I
  */
 JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_DriverStationJNI_getJoystickType
+Java_org_wpilib_hardware_hal_DriverStationJNI_getJoystickSupportedOutputs
   (JNIEnv*, jclass, jbyte port)
 {
-  return HAL_GetJoystickType(port);
+  return HAL_GetJoystickSupportedOutputs(port);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
+ * Method:    getJoystickGamepadType
+ * Signature: (B)I
+ */
+JNIEXPORT jint JNICALL
+Java_org_wpilib_hardware_hal_DriverStationJNI_getJoystickGamepadType
+  (JNIEnv*, jclass, jbyte port)
+{
+  return HAL_GetJoystickGamepadType(port);
 }
 
 /*

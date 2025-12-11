@@ -571,6 +571,11 @@ class JacobiSVD : public SVDBase<JacobiSVD<MatrixType_, Options_> > {
     compute_impl(matrix, internal::get_computation_options(Options));
   }
 
+  template <typename Derived>
+  explicit JacobiSVD(const TriangularBase<Derived>& matrix) {
+    compute_impl(matrix, internal::get_computation_options(Options));
+  }
+
   /** \brief Constructor performing the decomposition of given matrix using specified options
    *         for computing unitaries.
    *
@@ -598,6 +603,11 @@ class JacobiSVD : public SVDBase<JacobiSVD<MatrixType_, Options_> > {
    */
   template <typename Derived>
   JacobiSVD& compute(const MatrixBase<Derived>& matrix) {
+    return compute_impl(matrix, m_computationOptions);
+  }
+
+  template <typename Derived>
+  JacobiSVD& compute(const TriangularBase<Derived>& matrix) {
     return compute_impl(matrix, m_computationOptions);
   }
 
@@ -639,6 +649,8 @@ class JacobiSVD : public SVDBase<JacobiSVD<MatrixType_, Options_> > {
 
  private:
   template <typename Derived>
+  JacobiSVD& compute_impl(const TriangularBase<Derived>& matrix, unsigned int computationOptions);
+  template <typename Derived>
   JacobiSVD& compute_impl(const MatrixBase<Derived>& matrix, unsigned int computationOptions);
 
  protected:
@@ -675,6 +687,13 @@ class JacobiSVD : public SVDBase<JacobiSVD<MatrixType_, Options_> > {
       m_qr_precond_morerows;
   WorkMatrixType m_workMatrix;
 };
+
+template <typename MatrixType, int Options>
+template <typename Derived>
+JacobiSVD<MatrixType, Options>& JacobiSVD<MatrixType, Options>::compute_impl(const TriangularBase<Derived>& matrix,
+                                                                             unsigned int computationOptions) {
+  return compute_impl(matrix.toDenseMatrix(), computationOptions);
+}
 
 template <typename MatrixType, int Options>
 template <typename Derived>

@@ -16,6 +16,7 @@
 #include "wpi/math/system/Discretization.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
 #include "wpi/math/system/NumericalJacobian.hpp"
+#include "wpi/math/util/MathShared.hpp"
 #include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/array.hpp"
@@ -79,8 +80,8 @@ class ExtendedKalmanFilter {
       const StateArray& stateStdDevs, const OutputArray& measurementStdDevs,
       wpi::units::second_t dt)
       : m_f(std::move(f)), m_h(std::move(h)) {
-    m_contQ = MakeCovMatrix(stateStdDevs);
-    m_contR = MakeCovMatrix(measurementStdDevs);
+    m_contQ = CovarianceMatrix(stateStdDevs);
+    m_contR = CovarianceMatrix(measurementStdDevs);
     m_residualFuncY = [](const OutputVector& a,
                          const OutputVector& b) -> OutputVector {
       return a - b;
@@ -170,8 +171,8 @@ class ExtendedKalmanFilter {
         m_h(std::move(h)),
         m_residualFuncY(std::move(residualFuncY)),
         m_addFuncX(std::move(addFuncX)) {
-    m_contQ = MakeCovMatrix(stateStdDevs);
-    m_contR = MakeCovMatrix(measurementStdDevs);
+    m_contQ = CovarianceMatrix(stateStdDevs);
+    m_contR = CovarianceMatrix(measurementStdDevs);
     m_dt = dt;
 
     StateMatrix contA = NumericalJacobianX<States, States, Inputs>(

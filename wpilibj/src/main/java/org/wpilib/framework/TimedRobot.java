@@ -13,6 +13,7 @@ import org.wpilib.hardware.hal.NotifierJNI;
 import org.wpilib.system.RobotController;
 import org.wpilib.units.measure.Frequency;
 import org.wpilib.units.measure.Time;
+import org.wpilib.util.WPIUtilJNI;
 
 /**
  * TimedRobot implements the IterativeRobotBase robot program framework.
@@ -69,7 +70,7 @@ public class TimedRobot extends IterativeRobotBase {
 
   // The C pointer to the notifier object. We don't use it directly, it is
   // just passed to the JNI bindings.
-  private final int m_notifier = NotifierJNI.initializeNotifier();
+  private final int m_notifier = NotifierJNI.createNotifier();
 
   private long m_startTimeUs;
   private long m_loopStartTimeUs;
@@ -115,8 +116,7 @@ public class TimedRobot extends IterativeRobotBase {
 
   @Override
   public void close() {
-    NotifierJNI.stopNotifier(m_notifier);
-    NotifierJNI.cleanNotifier(m_notifier);
+    NotifierJNI.destroyNotifier(m_notifier);
   }
 
   /** Provide an alternate "main loop" via startCompetition(). */
@@ -130,6 +130,8 @@ public class TimedRobot extends IterativeRobotBase {
     System.out.println("********** Robot program startup complete **********");
     DriverStationJNI.observeUserProgramStarting();
 
+    boolean first = true;
+
     // Loop forever, calling the appropriate mode-dependent function
     while (true) {
       // We don't have to check there's an element in the queue first because
@@ -137,14 +139,22 @@ public class TimedRobot extends IterativeRobotBase {
       // at the end of the loop.
       var callback = m_callbacks.poll();
 
-      NotifierJNI.updateNotifierAlarm(m_notifier, callback.expirationTime);
+      if (first) {
+        first = false;
+        NotifierJNI.setNotifierAlarm(m_notifier, callback.expirationTime, 0, true);
+      } else {
+        NotifierJNI.acknowledgeNotifierAlarm(m_notifier, true, callback.expirationTime, 0, true);
+      }
 
-      long currentTime = NotifierJNI.waitForNotifierAlarm(m_notifier);
-      if (currentTime == 0) {
+      try {
+        WPIUtilJNI.waitForObject(m_notifier);
+      } catch (InterruptedException ex) {
+        Thread.currentThread().interrupt();
         break;
       }
 
-      m_loopStartTimeUs = RobotController.getFPGATime();
+      long currentTime = RobotController.getFPGATime();
+      m_loopStartTimeUs = currentTime;
 
       callback.func.run();
 
@@ -174,7 +184,7 @@ public class TimedRobot extends IterativeRobotBase {
   /** Ends the main loop in startCompetition(). */
   @Override
   public void endCompetition() {
-    NotifierJNI.stopNotifier(m_notifier);
+    NotifierJNI.destroyNotifier(m_notifier);
   }
 
   /**

@@ -65,16 +65,20 @@ void HALSimWSProviderJoystick::RegisterCallbacks() {
         }
 
         // Rumble data
-        int64_t outputs = 0;
+        int32_t leds = 0;
         int32_t leftRumble = 0;
         int32_t rightRumble = 0;
-        HALSIM_GetJoystickOutputs(provider->GetChannel(), &outputs, &leftRumble,
-                                  &rightRumble);
+        int32_t leftTriggerRumble = 0;
+        int32_t rightTriggerRumble = 0;
+        HALSIM_GetJoystickRumbles(provider->GetChannel(), &leftRumble,
+                                  &rightRumble, &leftTriggerRumble,
+                                  &rightTriggerRumble);
+        HALSIM_GetJoystickLeds(provider->GetChannel(), &leds);
 
         payload[">axes"] = axesValues;
         payload[">povs"] = povsValues;
         payload[">buttons"] = buttonsValues;
-        payload["<outputs"] = outputs;
+        payload["<leds"] = leds;
         payload["<rumble_left"] = leftRumble;
         payload["<rumble_right"] = rightRumble;
 

@@ -12,7 +12,7 @@ public class SimulatorJNI extends JNIWrapper {
 
   public static native void waitForProgramStart();
 
-  public static native void setProgramStarted();
+  public static native void setProgramStarted(boolean started);
 
   public static native boolean getProgramStarted();
 

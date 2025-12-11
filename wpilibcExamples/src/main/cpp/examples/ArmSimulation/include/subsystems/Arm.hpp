@@ -61,7 +61,9 @@ class Arm {
   wpi::MechanismRoot2d* m_armBase = m_mech2d.GetRoot("ArmBase", 30, 30);
   wpi::MechanismLigament2d* m_armTower =
       m_armBase->Append<wpi::MechanismLigament2d>(
-          "Arm Tower", 30, -90_deg, 6, wpi::Color8Bit{wpi::Color::kBlue});
+          "Arm Tower", 30, -90_deg, 6,
+          wpi::util::Color8Bit{wpi::util::Color::kBlue});
   wpi::MechanismLigament2d* m_arm = m_armBase->Append<wpi::MechanismLigament2d>(
-      "Arm", 30, m_armSim.GetAngle(), 6, wpi::Color8Bit{wpi::Color::kYellow});
+      "Arm", 30, m_armSim.GetAngle(), 6,
+      wpi::util::Color8Bit{wpi::util::Color::kYellow});
 };

@@ -4,51 +4,43 @@ Date: Tue, 28 Jan 2025 22:19:31 -0800
 Subject: [PATCH 4/8] Replace std::to_underlying()
 
 ---
- src/optimization/problem.cpp   | 9 ++++-----
- src/util/print_diagnostics.hpp | 6 +++---
- 2 files changed, 7 insertions(+), 8 deletions(-)
+ include/sleipnir/optimization/problem.hpp   | 8 ++++----
+ include/sleipnir/util/print_diagnostics.hpp | 6 +++---
+ 2 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/src/optimization/problem.cpp b/src/optimization/problem.cpp
-index 09828cdb6d7cddff692b9d17603dc0c11cd5a3ec..886de24cc0532d31f1e186150da79e925f212556 100644
---- a/src/optimization/problem.cpp
-+++ b/src/optimization/problem.cpp
-@@ -7,7 +7,6 @@
- #include <memory>
- #include <optional>
- #include <ranges>
--#include <utility>
+diff --git a/include/sleipnir/optimization/problem.hpp b/include/sleipnir/optimization/problem.hpp
+index 95a33952a5a368c7c81491dbe849a8096357dc38..d20777a5b1912754dda5504313549197e867d34b 100644
+--- a/include/sleipnir/optimization/problem.hpp
++++ b/include/sleipnir/optimization/problem.hpp
+@@ -708,11 +708,11 @@ class Problem {
+     // Print problem structure
+     slp::println("\nProblem structure:");
+     slp::println("  ↳ {} cost function",
+-                 types[std::to_underlying(cost_function_type())]);
++                 types[static_cast<uint8_t>(cost_function_type())]);
+     slp::println("  ↳ {} equality constraints",
+-                 types[std::to_underlying(equality_constraint_type())]);
++                 types[static_cast<uint8_t>(equality_constraint_type())]);
+     slp::println("  ↳ {} inequality constraints",
+-                 types[std::to_underlying(inequality_constraint_type())]);
++                 types[static_cast<uint8_t>(inequality_constraint_type())]);
  
- #include <Eigen/Core>
- #include <Eigen/SparseCore>
-@@ -350,11 +349,11 @@ void Problem::print_problem_analysis() {
-   // Print problem structure
-   slp::println("\nProblem structure:");
-   slp::println("  ↳ {} cost function",
--               types[std::to_underlying(cost_function_type())]);
-+               types[static_cast<uint8_t>(cost_function_type())]);
-   slp::println("  ↳ {} equality constraints",
--               types[std::to_underlying(equality_constraint_type())]);
-+               types[static_cast<uint8_t>(equality_constraint_type())]);
-   slp::println("  ↳ {} inequality constraints",
--               types[std::to_underlying(inequality_constraint_type())]);
-+               types[static_cast<uint8_t>(inequality_constraint_type())]);
- 
-   if (m_decision_variables.size() == 1) {
-     slp::print("\n1 decision variable\n");
-@@ -366,7 +365,7 @@ void Problem::print_problem_analysis() {
-       [](const gch::small_vector<Variable>& constraints) {
-         std::array<size_t, 5> counts{};
-         for (const auto& constraint : constraints) {
--          ++counts[std::to_underlying(constraint.type())];
-+          ++counts[static_cast<uint8_t>(constraint.type())];
-         }
-         for (const auto& [count, name] :
-              std::views::zip(counts, std::array{"empty", "constant", "linear",
-diff --git a/src/util/print_diagnostics.hpp b/src/util/print_diagnostics.hpp
-index fde36957c0258f6e3cd435ef6224d60407012ff7..82e0e082b0e40153dcb2fcd2c655a412a8a9540a 100644
---- a/src/util/print_diagnostics.hpp
-+++ b/src/util/print_diagnostics.hpp
-@@ -238,9 +238,9 @@ void print_iteration_diagnostics(int iterations, IterationType type,
+     if (m_decision_variables.size() == 1) {
+       slp::print("\n1 decision variable\n");
+@@ -724,7 +724,7 @@ class Problem {
+         [](const gch::small_vector<Variable<Scalar>>& constraints) {
+           std::array<size_t, 5> counts{};
+           for (const auto& constraint : constraints) {
+-            ++counts[std::to_underlying(constraint.type())];
++            ++counts[static_cast<uint8_t>(constraint.type())];
+           }
+           for (const auto& [count, name] :
+                std::views::zip(counts, std::array{"empty", "constant", "linear",
+diff --git a/include/sleipnir/util/print_diagnostics.hpp b/include/sleipnir/util/print_diagnostics.hpp
+index 9c1f9eb71b9417e138b95fd4d2d678cfb54595d1..032be8fb7b5e4196ff401c77ae9e91f1c966cde6 100644
+--- a/include/sleipnir/util/print_diagnostics.hpp
++++ b/include/sleipnir/util/print_diagnostics.hpp
+@@ -252,9 +252,9 @@ void print_iteration_diagnostics(int iterations, IterationType type,
    slp::println(
        "│{:4} {:4} {:9.3f} {:12e} {:13e} {:12e} {:12e} {:.2e} {:<5} {:.2e} "
        "{:.2e} {:2d}│",

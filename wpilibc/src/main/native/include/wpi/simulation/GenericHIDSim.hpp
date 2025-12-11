@@ -102,7 +102,9 @@ class GenericHIDSim {
    *
    * @param type the new device type
    */
-  void SetType(GenericHID::HIDType type);
+  void SetGamepadType(GenericHID::HIDType type);
+
+  void SetSupportedOutputs(GenericHID::SupportedOutputs supportedOutputs);
 
   /**
    * Set the name of this device.
@@ -112,19 +114,11 @@ class GenericHIDSim {
   void SetName(const char* name);
 
   /**
-   * Read the output of a button.
+   * Get the value of set LEDs.
    *
-   * @param outputNumber the button number
-   * @return the value of the button (true = pressed)
+   * @return the led color
    */
-  bool GetOutput(int outputNumber);
-
-  /**
-   * Get the encoded 16-bit integer that passes button values.
-   *
-   * @return the button values
-   */
-  int64_t GetOutputs();
+  int32_t GetLeds();
 
   /**
    * Get the joystick rumble.

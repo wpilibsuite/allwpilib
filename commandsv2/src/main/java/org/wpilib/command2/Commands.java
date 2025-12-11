@@ -125,7 +125,7 @@ public final class Commands {
    * @return the command
    * @see WaitCommand
    */
-  public static Command wait(double time) {
+  public static Command waitSeconds(double time) {
     return new WaitCommand(time);
   }
 

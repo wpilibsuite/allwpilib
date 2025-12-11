@@ -1,8 +1,8 @@
 *.adoc text eol=lf
 *.c text eol=lf
-*.cmake text eol=lf
 *.clang-format text eol=lf
 *.clang-tidy text eol=lf
+*.cmake text eol=lf
 *.cpp text eol=lf
 *.gradle text eol=lf
 *.groovy text eol=lf
@@ -20,8 +20,9 @@
 *.plist text eol=lf
 *.proto text eol=lf
 *.py text eol=lf
-*.styleguide text eol=lf
 *.txt text eol=lf
+*.wpiformat text eol=lf
+*.wpiformat-license text eol=lf
 *.xml text eol=lf
 *.yaml text eol=lf
 *.yml text eol=lf

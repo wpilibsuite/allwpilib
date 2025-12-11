@@ -65,7 +65,6 @@ template <typename EssentialPart>
 EIGEN_DEVICE_FUNC void MatrixBase<Derived>::makeHouseholder(EssentialPart& essential, Scalar& tau,
                                                             RealScalar& beta) const {
   using numext::conj;
-  using numext::sqrt;
 
   EIGEN_STATIC_ASSERT_VECTOR_ONLY(EssentialPart)
   VectorBlock<const Derived, EssentialPart::SizeAtCompileTime> tail(derived(), 1, size() - 1);
@@ -79,7 +78,7 @@ EIGEN_DEVICE_FUNC void MatrixBase<Derived>::makeHouseholder(EssentialPart& essen
     beta = numext::real(c0);
     essential.setZero();
   } else {
-    beta = sqrt(numext::abs2(c0) + tailSqNorm);
+    beta = numext::sqrt(numext::abs2(c0) + tailSqNorm);
     if (numext::real(c0) >= RealScalar(0)) beta = -beta;
     essential = tail / (c0 - beta);
     tau = conj((beta - c0) / beta);

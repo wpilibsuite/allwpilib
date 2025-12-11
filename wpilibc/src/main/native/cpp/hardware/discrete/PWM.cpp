@@ -102,6 +102,6 @@ void PWM::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.AddDoubleProperty(
       "Value", [=, this] { return GetPulseTime().value(); },
       [=, this](double value) {
-        SetPulseTime(wpi::units::millisecond_t{value});
+        SetPulseTime(wpi::units::microsecond_t{value});
       });
 }

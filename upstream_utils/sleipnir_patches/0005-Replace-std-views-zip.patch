@@ -5,14 +5,14 @@ Subject: [PATCH 5/8] Replace std::views::zip()
 
 ---
  include/sleipnir/autodiff/adjoint_expression_graph.hpp | 5 ++++-
- src/optimization/problem.cpp                           | 9 +++++----
- 2 files changed, 9 insertions(+), 5 deletions(-)
+ include/sleipnir/optimization/problem.hpp              | 8 +++++---
+ 2 files changed, 9 insertions(+), 4 deletions(-)
 
 diff --git a/include/sleipnir/autodiff/adjoint_expression_graph.hpp b/include/sleipnir/autodiff/adjoint_expression_graph.hpp
-index 33b6eee615141a1d6472f116842d62052ef54dd9..b333aebd3e59fa23eed6046c13d736c3d2eccac7 100644
+index 16bea7efeeca78d25b34b0b1242ca19cbd05a482..a77323eee9277fc3c77a11ab57ab5003d9ed4543 100644
 --- a/include/sleipnir/autodiff/adjoint_expression_graph.hpp
 +++ b/include/sleipnir/autodiff/adjoint_expression_graph.hpp
-@@ -158,7 +158,10 @@ class AdjointExpressionGraph {
+@@ -171,7 +171,10 @@ class AdjointExpressionGraph {
          }
        }
      } else {
@@ -22,32 +22,24 @@ index 33b6eee615141a1d6472f116842d62052ef54dd9..b333aebd3e59fa23eed6046c13d736c3
 +        const auto& node = m_top_list[i];
 +
          // Append adjoints of wrt to sparse matrix triplets
-         if (col != -1 && node->adjoint != 0.0) {
+         if (col != -1 && node->adjoint != Scalar(0)) {
            triplets.emplace_back(row, col, node->adjoint);
-diff --git a/src/optimization/problem.cpp b/src/optimization/problem.cpp
-index 886de24cc0532d31f1e186150da79e925f212556..e32481e9314c9ef472843adb5bedbd993627d5d9 100644
---- a/src/optimization/problem.cpp
-+++ b/src/optimization/problem.cpp
-@@ -6,7 +6,6 @@
- #include <cmath>
- #include <memory>
- #include <optional>
--#include <ranges>
- 
- #include <Eigen/Core>
- #include <Eigen/SparseCore>
-@@ -367,9 +366,11 @@ void Problem::print_problem_analysis() {
-         for (const auto& constraint : constraints) {
-           ++counts[static_cast<uint8_t>(constraint.type())];
-         }
--        for (const auto& [count, name] :
--             std::views::zip(counts, std::array{"empty", "constant", "linear",
--                                                "quadratic", "nonlinear"})) {
-+        for (size_t i = 0; i < counts.size(); ++i) {
-+          constexpr std::array names{"empty", "constant", "linear", "quadratic",
-+                                     "nonlinear"};
-+          const auto& count = counts[i];
-+          const auto& name = names[i];
-           if (count > 0) {
-             slp::println("  ↳ {} {}", count, name);
+diff --git a/include/sleipnir/optimization/problem.hpp b/include/sleipnir/optimization/problem.hpp
+index d20777a5b1912754dda5504313549197e867d34b..5256d08e5f9d8642049d8bb8323d76c7b3bbbef7 100644
+--- a/include/sleipnir/optimization/problem.hpp
++++ b/include/sleipnir/optimization/problem.hpp
+@@ -726,9 +726,11 @@ class Problem {
+           for (const auto& constraint : constraints) {
+             ++counts[static_cast<uint8_t>(constraint.type())];
            }
+-          for (const auto& [count, name] :
+-               std::views::zip(counts, std::array{"empty", "constant", "linear",
+-                                                  "quadratic", "nonlinear"})) {
++          for (size_t i = 0; i < counts.size(); ++i) {
++            constexpr std::array names{"empty", "constant", "linear",
++                                       "quadratic", "nonlinear"};
++            const auto& count = counts[i];
++            const auto& name = names[i];
+             if (count > 0) {
+               slp::println("  ↳ {} {}", count, name);
+             }

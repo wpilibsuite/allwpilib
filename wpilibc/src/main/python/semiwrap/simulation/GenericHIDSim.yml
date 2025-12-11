@@ -12,10 +12,10 @@ classes:
         overloads:
           int, DriverStation::POVDirection:
           DriverStation::POVDirection:
-      SetType:
+      SetGamepadType:
+      SetSupportedOutputs:
       SetName:
-      GetOutput:
-      GetOutputs:
+      GetLeds:
       GetRumble:
       SetAxesMaximumIndex:
       SetAxesAvailable:

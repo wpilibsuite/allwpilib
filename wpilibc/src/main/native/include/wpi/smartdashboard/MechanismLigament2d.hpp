@@ -27,21 +27,21 @@ class MechanismLigament2d : public MechanismObject2d {
  public:
   MechanismLigament2d(std::string_view name, double length,
                       wpi::units::degree_t angle, double lineWidth = 6,
-                      const wpi::Color8Bit& color = {235, 137, 52});
+                      const wpi::util::Color8Bit& color = {235, 137, 52});
 
   /**
    * Set the ligament color.
    *
    * @param color the color of the line
    */
-  void SetColor(const Color8Bit& color);
+  void SetColor(const wpi::util::Color8Bit& color);
 
   /**
    * Get the ligament color.
    *
    * @return the color of the line
    */
-  Color8Bit GetColor();
+  wpi::util::Color8Bit GetColor();
 
   /**
    * Set the ligament's length.

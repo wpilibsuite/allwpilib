@@ -33,9 +33,10 @@ class ElevatorSimulationTest : public testing::Test {
  public:
   void SetUp() override {
     wpi::sim::PauseTiming();
+    wpi::sim::SetProgramStarted(false);
 
     m_thread = std::thread([&] { m_robot.StartCompetition(); });
-    wpi::sim::StepTiming(0.0_ms);  // Wait for Notifiers
+    wpi::sim::WaitForProgramStart();
   }
 
   void TearDown() override {
