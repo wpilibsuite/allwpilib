@@ -118,7 +118,7 @@ class PyNotifier {
    */
   static bool SetHALThreadPriority(bool realTime, int32_t priority);
 
-private:
+ private:
   // The thread waiting on the HAL alarm
   py::object m_thread;
 

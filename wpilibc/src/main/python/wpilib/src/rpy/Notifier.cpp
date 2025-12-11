@@ -7,6 +7,8 @@
 #include <utility>
 
 #include <fmt/format.h>
+#include <gilsafe_object.h>
+#include <pybind11/functional.h>
 
 #include "wpi/hal/Notifier.h"
 #include "wpi/hal/Threads.h"

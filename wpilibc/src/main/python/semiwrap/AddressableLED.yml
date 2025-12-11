@@ -41,4 +41,3 @@ classes:
         overloads:
           const wpi::util::Color&:
           const wpi::util::Color8Bit&:
-
