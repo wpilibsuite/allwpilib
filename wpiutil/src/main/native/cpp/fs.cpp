@@ -15,8 +15,8 @@
 
 #ifdef _WIN32
 #include <fcntl.h>
-#include <io.h>
 #include <sys/types.h>
+#include <io.h>
 // Require at least Windows 7 API.
 #define _WIN32_WINNT 0x0601
 #define _WIN32_IE 0x0800  // MinGW at it again. FIXME: verify if still needed.
@@ -28,11 +28,10 @@
 #define WIN32_NO_STATUS
 #include <windows.h>
 #undef WIN32_NO_STATUS
-#include <winternl.h>
 #include <ntstatus.h>
-
 #include <shellapi.h>
 #include <shlobj.h>
+#include <winternl.h>
 
 #include "wpi/util/WindowsError.hpp"
 

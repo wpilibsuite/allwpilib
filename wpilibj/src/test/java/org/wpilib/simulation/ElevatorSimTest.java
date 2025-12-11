@@ -124,4 +124,16 @@ class ElevatorSimTest {
         sim.getPosition(),
         0.01);
   }
+
+  @Test
+  void testCurrentDraw() {
+    var motor = DCMotor.getKrakenX60(2);
+    var sim = new ElevatorSim(motor, 20, 8.0, 0.1, 0.0, 1.0, true, 0.0, 0.01, 0.0);
+
+    assertEquals(0.0, sim.getCurrentDraw());
+    sim.setInputVoltage(motor.getVoltage(motor.getTorque(60.0), 0.0));
+    sim.update(0.100);
+    // Current draw should start at 60 A and decrease as the back-EMF catches up
+    assertTrue(0.0 < sim.getCurrentDraw() && sim.getCurrentDraw() < 60.0);
+  }
 }

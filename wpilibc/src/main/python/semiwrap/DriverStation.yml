@@ -17,7 +17,8 @@ classes:
       GetStickAxis:
       GetStickPOV:
       GetStickButtons:
-      GetJoystickType:
+      GetJoystickGamepadType:
+      GetJoystickSupportedOutputs:
       GetJoystickName:
       IsJoystickConnected:
       IsEnabled:
@@ -56,6 +57,8 @@ classes:
       GetStickPOVsAvailable:
       GetStickButtonsMaximumIndex:
       GetStickButtonsAvailable:
+      GetStickTouchpadFinger:
+      GetStickTouchpadFingerAvailable:
     inline_code: |
       .def("getControlState",
         [](DriverStation *self) -> std::tuple<bool, bool, bool> {
@@ -69,3 +72,8 @@ classes:
                 ".. versionadded:: 2019.2.1\n"
                 "\n"
                 ".. note:: This function only exists in RobotPy\n"))
+  wpi::DriverStation::TouchpadFinger:
+    attributes:
+      down:
+      x:
+      y:

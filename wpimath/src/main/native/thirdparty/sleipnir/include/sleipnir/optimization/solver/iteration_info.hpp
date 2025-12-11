@@ -9,25 +9,28 @@ namespace slp {
 
 /**
  * Solver iteration information exposed to an iteration callback.
+ *
+ * @tparam Scalar Scalar type.
  */
+template <typename Scalar>
 struct IterationInfo {
   /// The solver iteration.
   int iteration;
 
   /// The decision variables.
-  const Eigen::VectorXd& x;
+  const Eigen::Vector<Scalar, Eigen::Dynamic>& x;
 
   /// The gradient of the cost function.
-  const Eigen::SparseVector<double>& g;
+  const Eigen::SparseVector<Scalar>& g;
 
   /// The Hessian of the Lagrangian.
-  const Eigen::SparseMatrix<double>& H;
+  const Eigen::SparseMatrix<Scalar>& H;
 
   /// The equality constraint Jacobian.
-  const Eigen::SparseMatrix<double>& A_e;
+  const Eigen::SparseMatrix<Scalar>& A_e;
 
   /// The inequality constraint Jacobian.
-  const Eigen::SparseMatrix<double>& A_i;
+  const Eigen::SparseMatrix<Scalar>& A_i;
 };
 
 }  // namespace slp

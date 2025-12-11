@@ -39,5 +39,6 @@ classes:
       SetHSV:
       SetLED:
         overloads:
-          const Color&:
-          const Color8Bit&:
+          const wpi::util::Color&:
+          const wpi::util::Color8Bit&:
+

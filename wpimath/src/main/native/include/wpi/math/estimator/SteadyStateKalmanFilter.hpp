@@ -76,8 +76,8 @@ class SteadyStateKalmanFilter {
                           wpi::units::second_t dt) {
     m_plant = &plant;
 
-    auto contQ = MakeCovMatrix(stateStdDevs);
-    auto contR = MakeCovMatrix(measurementStdDevs);
+    auto contQ = CovarianceMatrix(stateStdDevs);
+    auto contR = CovarianceMatrix(measurementStdDevs);
 
     Matrixd<States, States> discA;
     Matrixd<States, States> discQ;

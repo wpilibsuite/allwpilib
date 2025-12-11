@@ -22,7 +22,6 @@
 #include "wpi/hal/cpp/fpga_clock.h"
 #include "wpi/hal/simulation/MockHooks.h"
 #include "wpi/util/EventVector.hpp"
-#include "wpi/util/condition_variable.hpp"
 #include "wpi/util/mutex.hpp"
 
 static wpi::util::mutex msgMutex;
@@ -42,6 +41,7 @@ struct JoystickDataCache {
   HAL_JoystickAxes axes[kJoystickPorts];
   HAL_JoystickPOVs povs[kJoystickPorts];
   HAL_JoystickButtons buttons[kJoystickPorts];
+  HAL_JoystickTouchpads touchpads[kJoystickPorts];
   HAL_AllianceStationID allianceStation;
   double matchTime;
   HAL_ControlWord controlWord;
@@ -64,6 +64,7 @@ void JoystickDataCache::Update() {
     SimDriverStationData->GetJoystickAxes(i, &axes[i]);
     SimDriverStationData->GetJoystickPOVs(i, &povs[i]);
     SimDriverStationData->GetJoystickButtons(i, &buttons[i]);
+    SimDriverStationData->GetJoystickTouchpads(i, &touchpads[i]);
   }
   allianceStation = SimDriverStationData->allianceStationId;
   matchTime = SimDriverStationData->matchTime;
@@ -266,9 +267,21 @@ int32_t HAL_GetJoystickButtons(int32_t joystickNum,
   return 0;
 }
 
+int32_t HAL_GetJoystickTouchpads(int32_t joystickNum,
+                                 HAL_JoystickTouchpads* touchpads) {
+  if (gShutdown) {
+    return INCOMPATIBLE_STATE;
+  }
+  CHECK_JOYSTICK_NUMBER(joystickNum);
+  std::scoped_lock lock{driverStation->cacheMutex};
+  *touchpads = currentRead->touchpads[joystickNum];
+  return 0;
+}
+
 void HAL_GetAllJoystickData(int32_t joystickNum, HAL_JoystickAxes* axes,
                             HAL_JoystickPOVs* povs,
-                            HAL_JoystickButtons* buttons) {
+                            HAL_JoystickButtons* buttons,
+                            HAL_JoystickTouchpads* touchpads) {
   if (gShutdown) {
     return;
   }
@@ -276,6 +289,7 @@ void HAL_GetAllJoystickData(int32_t joystickNum, HAL_JoystickAxes* axes,
   *axes = currentRead->axes[joystickNum];
   *povs = currentRead->povs[joystickNum];
   *buttons = currentRead->buttons[joystickNum];
+  *touchpads = currentRead->touchpads[joystickNum];
 }
 
 int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
@@ -295,12 +309,21 @@ HAL_Bool HAL_GetJoystickIsGamepad(int32_t joystickNum) {
   }
 }
 
-int32_t HAL_GetJoystickType(int32_t joystickNum) {
+int32_t HAL_GetJoystickGamepadType(int32_t joystickNum) {
   HAL_JoystickDescriptor joystickDesc;
   if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {
     return -1;
   } else {
-    return joystickDesc.type;
+    return joystickDesc.gamepadType;
+  }
+}
+
+int32_t HAL_GetJoystickSupportedOutputs(int32_t joystickNum) {
+  HAL_JoystickDescriptor joystickDesc;
+  if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {
+    return -1;
+  } else {
+    return joystickDesc.supportedOutputs;
   }
 }
 
@@ -315,10 +338,17 @@ void HAL_GetJoystickName(struct WPI_String* name, int32_t joystickNum) {
   std::memcpy(write, cName, len);
 }
 
-int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
-                               int32_t leftRumble, int32_t rightRumble) {
-  SimDriverStationData->SetJoystickOutputs(joystickNum, outputs, leftRumble,
-                                           rightRumble);
+int32_t HAL_SetJoystickRumble(int32_t joystickNum, int32_t leftRumble,
+                              int32_t rightRumble, int32_t leftTriggerRumble,
+                              int32_t rightTriggerRumble) {
+  SimDriverStationData->SetJoystickRumbles(joystickNum, leftRumble, rightRumble,
+                                           leftTriggerRumble,
+                                           rightTriggerRumble);
+  return 0;
+}
+
+int32_t HAL_SetJoystickLeds(int32_t joystickNum, int32_t leds) {
+  SimDriverStationData->SetJoystickLeds(joystickNum, leds);
   return 0;
 }
 
@@ -337,7 +367,7 @@ int32_t HAL_GetMatchInfo(HAL_MatchInfo* info) {
 }
 
 void HAL_ObserveUserProgramStarting(void) {
-  HALSIM_SetProgramStarted();
+  HALSIM_SetProgramStarted(true);
 }
 
 void HAL_ObserveUserProgramDisabled(void) {

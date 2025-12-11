@@ -14,7 +14,7 @@ void HALSIM_ResetGlobalHandles() {
     HALSIM_GetNotifierInfo(info, sz);
 
     for (int i = 0; i < sz; i++) {
-      HAL_CleanNotifier(info->handle);
+      HAL_DestroyNotifier(info->handle);
     }
   }
 

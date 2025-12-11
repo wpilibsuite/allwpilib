@@ -151,46 +151,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
-            class_name = "ExpansionHub",
-            yml_file = "semiwrap/ExpansionHub.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/ExpansionHub.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::ExpansionHub", "wpi__ExpansionHub.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "ExpansionHubMotor",
-            yml_file = "semiwrap/ExpansionHubMotor.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/ExpansionHubMotor.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::ExpansionHubMotor", "wpi__ExpansionHubMotor.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "ExpansionHubPidConstants",
-            yml_file = "semiwrap/ExpansionHubPidConstants.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/ExpansionHubPidConstants.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::ExpansionHubPidConstants", "wpi__ExpansionHubPidConstants.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "ExpansionHubServo",
-            yml_file = "semiwrap/ExpansionHubServo.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/ExpansionHubServo.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::ExpansionHubServo", "wpi__ExpansionHubServo.hpp"),
-            ],
-        ),
-        struct(
             class_name = "DSControlWord",
             yml_file = "semiwrap/DSControlWord.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
@@ -208,6 +168,7 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::DriverStation", "wpi__DriverStation.hpp"),
+                ("wpi::DriverStation::TouchpadFinger", "wpi__DriverStation__TouchpadFinger.hpp"),
             ],
         ),
         struct(
@@ -439,6 +400,46 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::PWM", "wpi__PWM.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "ExpansionHub",
+            yml_file = "semiwrap/ExpansionHub.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/expansionhub/ExpansionHub.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::ExpansionHub", "wpi__ExpansionHub.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "ExpansionHubMotor",
+            yml_file = "semiwrap/ExpansionHubMotor.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/expansionhub/ExpansionHubMotor.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::ExpansionHubMotor", "wpi__ExpansionHubMotor.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "ExpansionHubPidConstants",
+            yml_file = "semiwrap/ExpansionHubPidConstants.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/expansionhub/ExpansionHubPidConstants.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::ExpansionHubPidConstants", "wpi__ExpansionHubPidConstants.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "ExpansionHubServo",
+            yml_file = "semiwrap/ExpansionHubServo.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/expansionhub/ExpansionHubServo.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::ExpansionHubServo", "wpi__ExpansionHubServo.hpp"),
             ],
         ),
         struct(
@@ -981,26 +982,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::Alert", "wpi__Alert.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "Color",
-            yml_file = "semiwrap/Color.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/util/Color.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::Color", "wpi__Color.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "Color8Bit",
-            yml_file = "semiwrap/Color8Bit.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/util/Color8Bit.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::Color8Bit", "wpi__Color8Bit.hpp"),
             ],
         ),
         struct(

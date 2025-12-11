@@ -60,6 +60,7 @@ scan_headers_ignore = [
     "wpi/math/linalg/ct_matrix.hpp",
     "wpi/math/linalg/DARE.hpp",
     "wpi/math/linalg/EigenCore.hpp",
+    "wpi/math/system/LinearSystemUtil.hpp",
     "wpi/math/util/StateSpaceUtil.hpp",
 
     "wpi/math/fmt/Eigen.hpp",
@@ -76,6 +77,8 @@ scan_headers_ignore = [
     "wpi/math/estimator/UnscentedTransform.hpp",
 
     "wpi/math/geometry/detail/RotationVectorToMatrix.hpp",
+
+    "wpi/math/random/Normal.hpp",
 
     "wpi/math/system/Discretization.hpp",
     "wpi/math/system/NumericalIntegration.hpp",
@@ -1526,17 +1529,20 @@ yaml_path = "semiwrap/kinematics"
 [tool.semiwrap.extension_modules."wpimath.kinematics._kinematics".headers]
 # wpi/math/kinematics
 ChassisSpeeds = "wpi/math/kinematics/ChassisSpeeds.hpp"
+ChassisAccelerations = "wpi/math/kinematics/ChassisAccelerations.hpp"
 DifferentialDriveKinematics = "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 DifferentialDriveOdometry3d = "wpi/math/kinematics/DifferentialDriveOdometry3d.hpp"
 DifferentialDriveOdometry = "wpi/math/kinematics/DifferentialDriveOdometry.hpp"
 DifferentialDriveWheelPositions = "wpi/math/kinematics/DifferentialDriveWheelPositions.hpp"
 DifferentialDriveWheelSpeeds = "wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp"
+DifferentialDriveWheelAccelerations = "wpi/math/kinematics/DifferentialDriveWheelAccelerations.hpp"
 Kinematics = "wpi/math/kinematics/Kinematics.hpp"
 MecanumDriveKinematics = "wpi/math/kinematics/MecanumDriveKinematics.hpp"
 MecanumDriveOdometry = "wpi/math/kinematics/MecanumDriveOdometry.hpp"
 MecanumDriveOdometry3d = "wpi/math/kinematics/MecanumDriveOdometry3d.hpp"
 MecanumDriveWheelPositions = "wpi/math/kinematics/MecanumDriveWheelPositions.hpp"
 MecanumDriveWheelSpeeds = "wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp"
+MecanumDriveWheelAccelerations = "wpi/math/kinematics/MecanumDriveWheelAccelerations.hpp"
 Odometry = "wpi/math/kinematics/Odometry.hpp"
 Odometry3d = "wpi/math/kinematics/Odometry3d.hpp"
 SwerveDriveKinematics = "wpi/math/kinematics/SwerveDriveKinematics.hpp"
@@ -1544,6 +1550,7 @@ SwerveDriveOdometry = "wpi/math/kinematics/SwerveDriveOdometry.hpp"
 SwerveDriveOdometry3d = "wpi/math/kinematics/SwerveDriveOdometry3d.hpp"
 SwerveModulePosition = "wpi/math/kinematics/SwerveModulePosition.hpp"
 SwerveModuleState = "wpi/math/kinematics/SwerveModuleState.hpp"
+SwerveModuleAcceleration = "wpi/math/kinematics/SwerveModuleAcceleration.hpp"
 
 
 [tool.semiwrap.extension_modules."wpimath.spline._spline"]
@@ -1605,6 +1612,9 @@ SwerveDrivePoseEstimator3d = "wpi/math/estimator/SwerveDrivePoseEstimator3d.hpp"
 # wpi/math/optimization
 SimulatedAnnealing = "wpi/math/optimization/SimulatedAnnealing.hpp"
 
+# wpi/math/random
+# Normal = "wpi/math/random/Normal.hpp"
+
 # wpi/math/path
 TravelingSalesman = "wpi/math/path/TravelingSalesman.hpp"
 
@@ -1612,6 +1622,7 @@ TravelingSalesman = "wpi/math/path/TravelingSalesman.hpp"
 # Discretization = "wpi/math/system/Discretization.hpp"
 LinearSystem = "wpi/math/system/LinearSystem.hpp"
 LinearSystemLoop = "wpi/math/system/LinearSystemLoop.hpp"
+# LinearSystemUtil = "wpi/math/system/LinearSystemUtil.hpp"
 # NumericalIntegration = "wpi/math/system/NumericalIntegration.hpp"
 # NumericalJacobian = "wpi/math/system/NumericalJacobian.hpp"
 

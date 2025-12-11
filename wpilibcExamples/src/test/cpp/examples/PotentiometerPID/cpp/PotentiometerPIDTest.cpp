@@ -68,6 +68,7 @@ class PotentiometerPIDTest : public testing::Test {
 
   void SetUp() override {
     wpi::sim::PauseTiming();
+    wpi::sim::SetProgramStarted(false);
     wpi::sim::DriverStationSim::ResetData();
 
     m_joystickSim.SetButtonsMaximumIndex(12);
@@ -76,7 +77,7 @@ class PotentiometerPIDTest : public testing::Test {
         HALSIM_RegisterSimPeriodicBeforeCallback(CallSimPeriodicBefore, this);
 
     m_thread = std::thread([&] { m_robot.StartCompetition(); });
-    wpi::sim::StepTiming(0.0_ms);  // Wait for Notifiers
+    wpi::sim::WaitForProgramStart();
   }
 
   void TearDown() override {

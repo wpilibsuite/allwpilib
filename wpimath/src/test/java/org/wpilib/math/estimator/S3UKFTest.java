@@ -22,6 +22,7 @@ import org.wpilib.math.numbers.N2;
 import org.wpilib.math.numbers.N3;
 import org.wpilib.math.numbers.N4;
 import org.wpilib.math.numbers.N5;
+import org.wpilib.math.random.Normal;
 import org.wpilib.math.system.Discretization;
 import org.wpilib.math.system.NumericalIntegration;
 import org.wpilib.math.system.NumericalJacobian;
@@ -100,7 +101,7 @@ class S3UKFTest {
 
           var globalY = driveGlobalMeasurementModel(observer.getXhat(), u);
           var R =
-              StateSpaceUtil.makeCovarianceMatrix(
+              StateSpaceUtil.covarianceMatrix(
                   Nat.N5(), VecBuilder.fill(0.01, 0.01, 0.0001, 0.01, 0.01));
           observer.correct(
               Nat.N5(),
@@ -181,7 +182,7 @@ class S3UKFTest {
           driveLocalMeasurementModel(trueXhat, new Matrix<>(Nat.N2(), Nat.N1()));
       var noiseStdDev = VecBuilder.fill(0.0001, 0.5, 0.5);
 
-      observer.correct(u, localY.plus(StateSpaceUtil.makeWhiteNoiseVector(noiseStdDev)));
+      observer.correct(u, localY.plus(Normal.normal(noiseStdDev)));
 
       var rdot = nextR.minus(r).div(dt);
       u = new Matrix<>(B.solve(rdot.minus(driveDynamics(r, new Matrix<>(Nat.N2(), Nat.N1())))));
@@ -197,8 +198,7 @@ class S3UKFTest {
 
     var globalY = driveGlobalMeasurementModel(trueXhat, u);
     var R =
-        StateSpaceUtil.makeCovarianceMatrix(
-            Nat.N5(), VecBuilder.fill(0.01, 0.01, 0.0001, 0.5, 0.5));
+        StateSpaceUtil.covarianceMatrix(Nat.N5(), VecBuilder.fill(0.01, 0.01, 0.0001, 0.5, 0.5));
     observer.correct(
         Nat.N5(),
         u,
@@ -358,9 +358,7 @@ class S3UKFTest {
       measurements.set(
           i,
           motorMeasurementModel(states.get(i + 1), inputs.get(i))
-              .plus(
-                  StateSpaceUtil.makeWhiteNoiseVector(
-                      VecBuilder.fill(pos_stddev, vel_stddev, accel_stddev))));
+              .plus(Normal.normal(VecBuilder.fill(pos_stddev, vel_stddev, accel_stddev))));
     }
 
     var P0 =
