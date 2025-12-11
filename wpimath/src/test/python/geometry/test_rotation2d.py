@@ -57,6 +57,13 @@ def test_unary_minus() -> None:
     assert math.isclose(-20.0, (-rot).degrees())
 
 
+def test_multiply():
+    rot = Rotation2d.fromDegrees(10)
+
+    assert (rot * 3.0).degrees() == pytest.approx(30.0)
+    assert (rot * 41.0).degrees() == pytest.approx(50.0)
+
+
 def test_equality() -> None:
     rot1 = Rotation2d.fromDegrees(43.0)
     rot2 = Rotation2d.fromDegrees(43.0)
