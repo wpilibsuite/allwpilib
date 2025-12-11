@@ -73,7 +73,11 @@ def test_init_rotation_matrix():
     assert expected2 == rot2
 
     # Matrix that isn't orthogonal
-    R3 = np.array([[1.0, 0.0, 0.0], [1.0, 0.0, 0.0], [1.0, 0.0, 0.0]])
+    R3 = np.array([
+        [1.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0]
+    ])
     with pytest.raises(ValueError):
         Rotation3d(R3)
 

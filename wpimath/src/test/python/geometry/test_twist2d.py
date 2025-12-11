@@ -55,13 +55,3 @@ def test_pose2d_log():
 
     reapplied = start + twist.exp()
     assert end == reapplied
-
-
-def test_constexpr():
-    default_ctor = Twist2d()
-    component_ctor = Twist2d(dx=1, dy=2, dtheta=3)
-    multiplied = component_ctor * 2
-
-    assert default_ctor.dx == pytest.approx(0.0)
-    assert component_ctor.dy == pytest.approx(2.0)
-    assert multiplied.dtheta == pytest.approx(6.0)

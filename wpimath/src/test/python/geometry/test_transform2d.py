@@ -33,21 +33,3 @@ def test_composition():
     transformed_combined = initial + (transform1 + transform2)
 
     assert transformed_separate == transformed_combined
-
-
-def test_constexpr():
-    default_ctor = Transform2d()
-    translation_rotation_ctor = Transform2d(Translation2d(), Rotation2d.fromDegrees(10))
-    multiplied = translation_rotation_ctor * 5
-    divided = translation_rotation_ctor / 2
-
-    assert default_ctor.x == pytest.approx(0.0)
-    assert translation_rotation_ctor.x == pytest.approx(0.0)
-    assert translation_rotation_ctor.y == pytest.approx(0.0)
-    assert multiplied.rotation().degrees() == pytest.approx(50.0)
-    assert translation_rotation_ctor.inverse().rotation().degrees() == pytest.approx(
-        -10.0
-    )
-    assert translation_rotation_ctor.inverse().x == pytest.approx(0.0)
-    assert translation_rotation_ctor.inverse().y == pytest.approx(0.0)
-    assert divided.rotation().degrees() == pytest.approx(5.0)

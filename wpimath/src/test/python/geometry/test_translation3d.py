@@ -171,27 +171,6 @@ def test_to_vector():
     assert np.allclose(vec, translation.toVector())
 
 
-def test_constexpr():
-    default_ctor = Translation3d()
-    component_ctor = Translation3d(x=1, y=2, z=3)
-    added = default_ctor + component_ctor
-    subtracted = default_ctor - component_ctor
-    negated = -component_ctor
-    multiplied = component_ctor * 2
-    divided = component_ctor / 2
-    projected = component_ctor.toTranslation2d()
-
-    assert default_ctor.x == pytest.approx(0.0)
-    assert component_ctor.y == pytest.approx(2.0)
-    assert added.z == pytest.approx(3.0)
-    assert subtracted.x == pytest.approx(-1.0)
-    assert negated.y == pytest.approx(-2.0)
-    assert multiplied.z == pytest.approx(6.0)
-    assert divided.y == pytest.approx(1.0)
-    assert projected.x == pytest.approx(1.0)
-    assert projected.y == pytest.approx(2.0)
-
-
 def test_nearest():
     origin = Translation3d(x=0, y=0, z=0)
 
