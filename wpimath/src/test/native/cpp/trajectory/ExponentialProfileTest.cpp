@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/math/trajectory/ExponentialProfile.hpp"  // NOLINT(build/include_order)
+#include "wpi/math/trajectory/ExponentialProfile.hpp"
 
 #include <chrono>
 #include <cmath>

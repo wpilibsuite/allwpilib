@@ -10,5 +10,6 @@ classes:
     attributes:
       handle:
       name:
-      timeout:
-      waitTimeValid:
+      alarmTime:
+      intervalTime:
+      overrunCount:

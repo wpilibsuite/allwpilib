@@ -4,11 +4,11 @@
 
 #include "wpi/halsim/ws_server/HALSimHttpConnection.hpp"
 
-#include <uv.h>
-
 #include <cstdio>
 #include <string>
 #include <string_view>
+
+#include <uv.h>
 
 #include "wpi/net/MimeTypes.hpp"
 #include "wpi/net/UrlParser.hpp"

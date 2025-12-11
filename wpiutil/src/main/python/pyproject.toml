@@ -67,6 +67,8 @@ depends = ["wpiutil-casters"]
 
 [tool.semiwrap.extension_modules."wpiutil._wpiutil".headers]
 # wpi
+Color = "wpi/util/Color.hpp"
+Color8Bit = "wpi/util/Color8Bit.hpp"
 StackTrace = "wpi/util/StackTrace.hpp"
 Synchronization = "wpi/util/Synchronization.h"
 RawFrame = "wpi/util/RawFrame.h"

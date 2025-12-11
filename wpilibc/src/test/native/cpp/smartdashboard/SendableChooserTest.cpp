@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/smartdashboard/SendableChooser.hpp"
+
 #include <string>
 
 #include <fmt/format.h>
@@ -10,7 +12,6 @@
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/StringTopic.hpp"
 #include "wpi/simulation/SendableChooserSim.hpp"
-#include "wpi/smartdashboard/SendableChooser.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
 
 class SendableChooserTest : public ::testing::TestWithParam<int> {};

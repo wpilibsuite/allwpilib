@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "net/WireEncoder.hpp"
+
 #include <span>
 #include <string>
 #include <string_view>
@@ -14,7 +16,6 @@
 #include "PubSubOptions.hpp"
 #include "gmock/gmock-matchers.h"
 #include "net/Message.hpp"
-#include "net/WireEncoder.hpp"
 #include "wpi/nt/NetworkTableValue.hpp"
 #include "wpi/util/SpanMatcher.hpp"
 #include "wpi/util/json.hpp"

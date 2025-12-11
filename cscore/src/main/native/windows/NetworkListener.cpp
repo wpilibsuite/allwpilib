@@ -4,17 +4,12 @@
 
 #include "NetworkListener.hpp"
 
-#include <winsock2.h>  // NOLINT(build/include_order)
-
-#include <windows.h>  // NOLINT(build/include_order)
-
-#include <ws2def.h>  // NOLINT(build/include_order)
-
-#include <ws2ipdef.h>  // NOLINT(build/include_order)
-
-#include <iphlpapi.h>  // NOLINT(build/include_order)
-
-#include <netioapi.h>  // NOLINT(build/include_order)
+#include <winsock2.h>
+#include <windows.h>
+#include <ws2def.h>
+#include <ws2ipdef.h>
+#include <iphlpapi.h>
+#include <netioapi.h>
 
 #include "Instance.hpp"
 #include "Log.hpp"

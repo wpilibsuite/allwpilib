@@ -37,7 +37,8 @@ classes:
       available:
   HAL_JoystickDescriptor:
     attributes:
-      type:
+      supportedOutputs:
+      gamepadType:
       name:
       isGamepad:
   HAL_MatchInfo:
@@ -48,3 +49,16 @@ classes:
       replayNumber:
       gameSpecificMessage:
       gameSpecificMessageSize:
+  HAL_JoystickTouchpadFinger:
+    attributes:
+      down:
+      x:
+      y:
+  HAL_JoystickTouchpad:
+    attributes:
+      count:
+      fingers:
+  HAL_JoystickTouchpads:
+    attributes:
+      count:
+      touchpads:

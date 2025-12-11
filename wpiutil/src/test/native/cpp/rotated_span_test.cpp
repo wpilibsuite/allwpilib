@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/util/rotated_span.hpp"  // NOLINT(build/include_order)
+#include "wpi/util/rotated_span.hpp"
 
 #include <array>
 #include <vector>
@@ -25,7 +25,7 @@ static std::array<int, 10> sarr_values = {{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}};
 static int arr_values[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 static std::vector<int> vec_values{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
-TEST(CircularSpanTest, Constexpr) {
+TEST(RotatedSpanTest, Constexpr) {
   {
     constexpr wpi::util::rotated_span<const int, 10> sp{cesarr_values};
     static_assert(sp[5] == cesarr_values[5]);
@@ -36,7 +36,7 @@ TEST(CircularSpanTest, Constexpr) {
   }
 }
 
-TEST(CircularSpanTest, ConstructConst) {
+TEST(RotatedSpanTest, ConstructConst) {
   {
     wpi::util::rotated_span<const int, 10> sp{csarr_values};
     EXPECT_EQ(sp[5], sarr_values[5]);
@@ -65,7 +65,7 @@ TEST(CircularSpanTest, ConstructConst) {
   }
 }
 
-TEST(CircularSpanTest, ConstructNonConst) {
+TEST(RotatedSpanTest, ConstructNonConst) {
   {
     wpi::util::rotated_span<int, 10> sp{sarr_values};
     EXPECT_EQ(sp[5], sarr_values[5]);
@@ -92,7 +92,7 @@ TEST(CircularSpanTest, ConstructNonConst) {
   }
 }
 
-TEST(CircularSpanTest, ConstructRotated) {
+TEST(RotatedSpanTest, ConstructRotated) {
   {
     constexpr wpi::util::rotated_span<const int, 10> sp{cesarr_values, 1};
     static_assert(sp[5] == cesarr_values[6]);
@@ -128,7 +128,7 @@ TEST(CircularSpanTest, ConstructRotated) {
   }
 }
 
-TEST(CircularSpanTest, Rotate) {
+TEST(RotatedSpanTest, Rotate) {
   constexpr wpi::util::rotated_span<const int, 10> sp{cesarr_values, 1};
   static_assert(sp[5] == cesarr_values[6]);
   static_assert(sp.rotate(2)[5] == cesarr_values[8]);
@@ -147,7 +147,7 @@ void const_unsized_func(wpi::util::rotated_span<const int>) {}
 void sized_func(wpi::util::rotated_span<int, 10>) {}
 void const_sized_func(wpi::util::rotated_span<const int, 10>) {}
 
-TEST(CircularSpanTest, Implicit) {
+TEST(RotatedSpanTest, Implicit) {
   // unsized_func(csarr_values);  // error
   const_unsized_func(csarr_values);
   // sized_func(csarr_values);  // error
@@ -169,7 +169,7 @@ TEST(CircularSpanTest, Implicit) {
   const_sized_func(arr_values);
 }
 
-TEST(CircularSpanTest, IteratorConst) {
+TEST(RotatedSpanTest, IteratorConst) {
   wpi::util::rotated_span<const int> sp_sarr{csarr_values};
 
   // iterator
@@ -187,7 +187,7 @@ TEST(CircularSpanTest, IteratorConst) {
   }
 }
 
-TEST(CircularSpanTest, IteratorNonConst) {
+TEST(RotatedSpanTest, IteratorNonConst) {
   wpi::util::rotated_span<int> sp_sarr{sarr_values};
 
   // iterator

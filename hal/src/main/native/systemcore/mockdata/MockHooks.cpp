@@ -10,7 +10,7 @@ void HALSIM_SetRuntimeType(HAL_RuntimeType type) {}
 
 void HALSIM_WaitForProgramStart(void) {}
 
-void HALSIM_SetProgramStarted(void) {}
+void HALSIM_SetProgramStarted(HAL_Bool started) {}
 
 HAL_Bool HALSIM_GetProgramStarted(void) {
   return false;

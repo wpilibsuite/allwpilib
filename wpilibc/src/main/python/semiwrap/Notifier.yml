@@ -18,4 +18,5 @@ classes:
             ignore: true
           wpi::units::second_t:
       Stop:
+      GetOverrun:
       SetHALThreadPriority:

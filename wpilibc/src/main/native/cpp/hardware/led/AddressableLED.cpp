@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/hal/AddressableLED.h"
 #include "wpi/hardware/led/AddressableLED.hpp"
 
 #include <algorithm>
 
+#include "wpi/hal/AddressableLED.h"
 #include "wpi/hal/HALBase.h"
 #include "wpi/hal/PWM.h"
 #include "wpi/hal/Ports.h"
@@ -75,5 +75,5 @@ void AddressableLED::SetGlobalData(int start, ColorOrder colorOrder,
 }
 
 void AddressableLED::LEDData::SetHSV(int h, int s, int v) {
-  SetLED(Color::FromHSV(h, s, v));
+  SetLED(wpi::util::Color::FromHSV(h, s, v));
 }

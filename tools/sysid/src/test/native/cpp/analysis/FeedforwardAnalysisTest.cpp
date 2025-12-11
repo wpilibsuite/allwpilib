@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/sysid/analysis/FeedforwardAnalysis.hpp"
+
 #include <stdint.h>
 
 #include <bitset>
@@ -14,7 +16,6 @@
 #include "wpi/sysid/analysis/AnalysisType.hpp"
 #include "wpi/sysid/analysis/ArmSim.hpp"
 #include "wpi/sysid/analysis/ElevatorSim.hpp"
-#include "wpi/sysid/analysis/FeedforwardAnalysis.hpp"
 #include "wpi/sysid/analysis/SimpleMotorSim.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/voltage.hpp"

@@ -2,13 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/kinematics/SwerveDriveOdometry3d.hpp"
+
 #include <limits>
 #include <random>
 
 #include <gtest/gtest.h>
 
 #include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
-#include "wpi/math/kinematics/SwerveDriveOdometry3d.hpp"
 #include "wpi/math/trajectory/Trajectory.hpp"
 #include "wpi/math/trajectory/TrajectoryConfig.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"

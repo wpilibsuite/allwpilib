@@ -53,11 +53,12 @@ jobs:
         with:
           fetch-depth: 0
       - name: Build with Gradle
-        uses: addnab/docker-run-action@v3
+        # main on 2021-05-30, to include addnab/docker-run-action/pull/17
+        uses: addnab/docker-run-action@3e77f186b7a929ef010f183a9e24c0f9955ea609
         with:
           image: ${{ matrix.container }}
           options: -v ${{ github.workspace }}:/work -w /work -e GITHUB_REF -e CI
-          run: df . && rm -f semicolon_delimited_script && echo $GITHUB_REF && ./gradlew build -PbuildServer -PskipJavaFormat ${{ matrix.build-options }}
+          run: ./gradlew build -PbuildServer -PskipJavaFormat ${{ matrix.build-options }}
       - name: Check free disk space
         run: df .
       - uses: actions/upload-artifact@v4

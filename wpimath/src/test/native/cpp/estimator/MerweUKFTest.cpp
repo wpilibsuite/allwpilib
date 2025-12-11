@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/estimator/MerweUKF.hpp"
+
 #include <algorithm>
 #include <cmath>
 #include <numbers>
@@ -11,15 +13,14 @@
 #include <gtest/gtest.h>
 
 #include "wpi/math/estimator/AngleStatistics.hpp"
-#include "wpi/math/estimator/MerweUKF.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/random/Normal.hpp"
 #include "wpi/math/system/Discretization.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
 #include "wpi/math/system/NumericalJacobian.hpp"
 #include "wpi/math/system/plant/DCMotor.hpp"
 #include "wpi/math/system/plant/LinearSystemId.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
-#include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
 
 namespace {
@@ -89,7 +90,7 @@ TEST(MerweUKFTest, DriveInit) {
   observer.Correct(u, localY);
 
   auto globalY = DriveGlobalMeasurementModel(observer.Xhat(), u);
-  auto R = wpi::math::MakeCovMatrix(0.01, 0.01, 0.0001, 0.01, 0.01);
+  auto R = wpi::math::CovarianceMatrix(0.01, 0.01, 0.0001, 0.01, 0.01);
   observer.Correct<5>(
       u, globalY, DriveGlobalMeasurementModel, R,
       wpi::math::AngleMean<5, 2 * 5 + 1>(2), wpi::math::AngleResidual<5>(2),
@@ -145,8 +146,7 @@ TEST(MerweUKFTest, DriveConvergence) {
 
     auto localY =
         DriveLocalMeasurementModel(trueXhat, wpi::math::Vectord<2>::Zero());
-    observer.Correct(
-        u, localY + wpi::math::MakeWhiteNoiseVector(0.0001, 0.5, 0.5));
+    observer.Correct(u, localY + wpi::math::Normal(0.0001, 0.5, 0.5));
 
     wpi::math::Vectord<5> rdot = (nextR - r) / dt.value();
     u = B.householderQr().solve(
@@ -162,7 +162,7 @@ TEST(MerweUKFTest, DriveConvergence) {
   observer.Correct(u, localY);
 
   auto globalY = DriveGlobalMeasurementModel(trueXhat, u);
-  auto R = wpi::math::MakeCovMatrix(0.01, 0.01, 0.0001, 0.5, 0.5);
+  auto R = wpi::math::CovarianceMatrix(0.01, 0.01, 0.0001, 0.5, 0.5);
   observer.Correct<5>(u, globalY, DriveGlobalMeasurementModel, R,
                       wpi::math::AngleMean<5, 2 * 5 + 1>(2),
                       wpi::math::AngleResidual<5>(2),
@@ -295,9 +295,8 @@ TEST(MerweUKFTest, MotorConvergence) {
   for (int i = 0; i < steps; ++i) {
     inputs[i] = MotorControlInput(i * dt.value());
     states[i + 1] = discA * states[i] + discB * inputs[i];
-    measurements[i] =
-        MotorMeasurementModel(states[i + 1], inputs[i]) +
-        wpi::math::MakeWhiteNoiseVector(pos_stddev, vel_stddev, accel_stddev);
+    measurements[i] = MotorMeasurementModel(states[i + 1], inputs[i]) +
+                      wpi::math::Normal(pos_stddev, vel_stddev, accel_stddev);
   }
 
   wpi::math::Vectord<4> P0{0.001, 0.001, 10, 10};

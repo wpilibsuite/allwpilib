@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/linalg/DARE.hpp"
+
 #include <stdexcept>
 
 #include <Eigen/Core>
@@ -9,7 +11,6 @@
 #include <gtest/gtest.h>
 
 #include "wpi/math/fmt/Eigen.hpp"
-#include "wpi/math/linalg/DARE.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/util/expected"
 #include "wpi/util/print.hpp"

@@ -10,7 +10,7 @@
 #include <vector>
 
 #ifdef _WIN32
-#include <Windows.h>
+#include <windows.h>
 #pragma comment(lib, "Winmm.lib")
 #pragma comment(lib, "ntdll.lib")
 extern "C" NTSYSAPI NTSTATUS NTAPI NtSetTimerResolution(

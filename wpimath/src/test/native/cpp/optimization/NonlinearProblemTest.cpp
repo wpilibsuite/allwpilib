@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <concepts>
 #include <ranges>
 
+#include <fmt/base.h>
 #include <gtest/gtest.h>
 #include <sleipnir/autodiff/expression_type.hpp>
 #include <sleipnir/optimization/problem.hpp>
@@ -17,7 +17,9 @@ auto Range(T start, T end, T step) {
 }
 
 TEST(ProblemTest, Quartic) {
-  slp::Problem problem;
+  testing::internal::CaptureStdout();
+
+  slp::Problem<double> problem;
 
   auto x = problem.decision_variable();
   x.set_value(20.0);
@@ -33,13 +35,19 @@ TEST(ProblemTest, Quartic) {
   EXPECT_EQ(problem.solve({.diagnostics = true}), slp::ExitStatus::SUCCESS);
 
   EXPECT_NEAR(x.value(), 1.0, 1e-6);
+
+  if (auto output = testing::internal::GetCapturedStdout(); HasFailure()) {
+    fmt::println("{}", output);
+  }
 }
 
 TEST(ProblemTest, RosenbrockWithCubicAndLineConstraint) {
+  testing::internal::CaptureStdout();
+
   // https://en.wikipedia.org/wiki/Test_functions_for_optimization#Test_functions_for_constrained_optimization
   for (auto x0 : Range(-1.5, 1.5, 0.1)) {
     for (auto y0 : Range(-0.5, 2.5, 0.1)) {
-      slp::Problem problem;
+      slp::Problem<double> problem;
 
       auto x = problem.decision_variable();
       x.set_value(x0);
@@ -68,13 +76,19 @@ TEST(ProblemTest, RosenbrockWithCubicAndLineConstraint) {
       EXPECT_TRUE((near(0.0, y.value(), 1e-2) || near(1.0, y.value(), 1e-2)));
     }
   }
+
+  if (auto output = testing::internal::GetCapturedStdout(); HasFailure()) {
+    fmt::println("{}", output);
+  }
 }
 
 TEST(ProblemTest, RosenbrockWithDiskConstraint) {
+  testing::internal::CaptureStdout();
+
   // https://en.wikipedia.org/wiki/Test_functions_for_optimization#Test_functions_for_constrained_optimization
   for (auto x0 : Range(-1.5, 1.5, 0.1)) {
     for (auto y0 : Range(-1.5, 1.5, 0.1)) {
-      slp::Problem problem;
+      slp::Problem<double> problem;
 
       auto x = problem.decision_variable();
       x.set_value(x0);
@@ -96,10 +110,16 @@ TEST(ProblemTest, RosenbrockWithDiskConstraint) {
       EXPECT_NEAR(y.value(), 1.0, 1e-3);
     }
   }
+
+  if (auto output = testing::internal::GetCapturedStdout(); HasFailure()) {
+    fmt::println("{}", output);
+  }
 }
 
 TEST(ProblemTest, Minimum2DDistanceWithLinearConstraint) {
-  slp::Problem problem;
+  testing::internal::CaptureStdout();
+
+  slp::Problem<double> problem;
 
   auto x = problem.decision_variable();
   x.set_value(20.0);
@@ -126,10 +146,16 @@ TEST(ProblemTest, Minimum2DDistanceWithLinearConstraint) {
 
   EXPECT_NEAR(x.value(), 2.5, 1e-2);
   EXPECT_NEAR(y.value(), 2.5, 1e-2);
+
+  if (auto output = testing::internal::GetCapturedStdout(); HasFailure()) {
+    fmt::println("{}", output);
+  }
 }
 
 TEST(ProblemTest, ConflictingBounds) {
-  slp::Problem problem;
+  testing::internal::CaptureStdout();
+
+  slp::Problem<double> problem;
 
   auto x = problem.decision_variable();
   auto y = problem.decision_variable();
@@ -147,15 +173,21 @@ TEST(ProblemTest, ConflictingBounds) {
 
   EXPECT_EQ(problem.solve({.diagnostics = true}),
             slp::ExitStatus::GLOBALLY_INFEASIBLE);
+
+  if (auto output = testing::internal::GetCapturedStdout(); HasFailure()) {
+    fmt::println("{}", output);
+  }
 }
 
 TEST(ProblemTest, WachterAndBieglerLineSearchFailure) {
+  testing::internal::CaptureStdout();
+
   // See example 19.2 of [1]
   //
   // [1] Nocedal, J. and Wright, S. "Numerical Optimization", 2nd. ed., Ch. 19.
   //     Springer, 2006.
 
-  slp::Problem problem;
+  slp::Problem<double> problem;
 
   auto x = problem.decision_variable();
   auto s1 = problem.decision_variable();
@@ -183,4 +215,8 @@ TEST(ProblemTest, WachterAndBieglerLineSearchFailure) {
   // EXPECT_EQ(x.value(), 1.0);
   // EXPECT_EQ(s1.value(), 0.0);
   // EXPECT_EQ(s2.value(), 0.5);
+
+  if (auto output = testing::internal::GetCapturedStdout(); HasFailure()) {
+    fmt::println("{}", output);
+  }
 }

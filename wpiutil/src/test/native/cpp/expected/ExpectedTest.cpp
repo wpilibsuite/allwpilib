@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/util/expected"
+
 #include <initializer_list>
 #include <tuple>
 #include <utility>
 #include <vector>
 
 #include <gtest/gtest.h>
-
-#include "wpi/util/expected"
 
 namespace {
 struct TakesInitAndVariadic {

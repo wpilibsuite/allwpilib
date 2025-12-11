@@ -2,13 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/system/Discretization.hpp"
+
 #include <functional>
 
 #include <Eigen/Eigenvalues>
 #include <gtest/gtest.h>
 
 #include "wpi/math/linalg/EigenCore.hpp"
-#include "wpi/math/system/Discretization.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
 
 // Check that for a simple second-order system that we can easily analyze

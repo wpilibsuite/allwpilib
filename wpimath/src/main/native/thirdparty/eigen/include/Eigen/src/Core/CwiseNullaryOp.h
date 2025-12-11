@@ -94,7 +94,7 @@ class CwiseNullaryOp : public internal::dense_xpr_base<CwiseNullaryOp<NullaryOp,
  * the returned matrix. Must be compatible with this MatrixBase type.
  *
  * This variant is meant to be used for dynamic-size matrix types. For fixed-size types,
- * it is redundant to pass \a rows and \a cols as arguments, so Zero() should be used
+ * it is redundant to pass \a rows and \a cols as arguments, so NullaryExpr(const CustomNullaryOp&) should be used
  * instead.
  *
  * The template parameter \a CustomNullaryOp is the type of the functor.
@@ -121,7 +121,7 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
  * \only_for_vectors
  *
  * This variant is meant to be used for dynamic-size vector types. For fixed-size types,
- * it is redundant to pass \a size as argument, so Zero() should be used
+ * it is redundant to pass \a size as argument, so NullaryExpr(const CustomNullaryOp&) should be used
  * instead.
  *
  * The template parameter \a CustomNullaryOp is the type of the functor.
@@ -174,7 +174,7 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
  * the returned matrix. Must be compatible with this DenseBase type.
  *
  * This variant is meant to be used for dynamic-size matrix types. For fixed-size types,
- * it is redundant to pass \a rows and \a cols as arguments, so Zero() should be used
+ * it is redundant to pass \a rows and \a cols as arguments, so Constant(const Scalar&) should be used
  * instead.
  *
  * The template parameter \a CustomNullaryOp is the type of the functor.
@@ -195,7 +195,7 @@ DenseBase<Derived>::Constant(Index rows, Index cols, const Scalar& value) {
  * \only_for_vectors
  *
  * This variant is meant to be used for dynamic-size vector types. For fixed-size types,
- * it is redundant to pass \a size as argument, so Zero() should be used
+ * it is redundant to pass \a size as argument, so Constant(const Scalar&) should be used
  * instead.
  *
  * The template parameter \a CustomNullaryOp is the type of the functor.

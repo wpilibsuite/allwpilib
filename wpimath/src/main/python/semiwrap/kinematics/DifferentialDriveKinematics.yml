@@ -14,6 +14,8 @@ classes:
           const wpi::units::meter_t, const wpi::units::meter_t [const]:
           const DifferentialDriveWheelPositions&, const DifferentialDriveWheelPositions& [const]:
       Interpolate:
+      ToChassisAccelerations:
+      ToWheelAccelerations:
 
 inline_code: |
   SetupWPyStruct<wpi::math::DifferentialDriveKinematics>(cls_DifferentialDriveKinematics);

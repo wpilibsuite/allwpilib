@@ -2,13 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/net/WebSocket.hpp"  // NOLINT(build/include_order)
-
-#include "WebSocketTest.hpp"
+#include "wpi/net/WebSocket.hpp"
 
 #include <utility>
 #include <vector>
 
+#include "WebSocketTest.hpp"
 #include "wpi/net/HttpParser.hpp"
 #include "wpi/util/StringExtras.hpp"
 

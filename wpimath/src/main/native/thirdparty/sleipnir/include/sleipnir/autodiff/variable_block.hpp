@@ -8,9 +8,11 @@
 
 #include <Eigen/Core>
 
+#include "sleipnir/autodiff/sleipnir_base.hpp"
 #include "sleipnir/autodiff/slice.hpp"
 #include "sleipnir/autodiff/variable.hpp"
 #include "sleipnir/util/assert.hpp"
+#include "sleipnir/util/empty.hpp"
 #include "sleipnir/util/function_ref.hpp"
 
 namespace slp {
@@ -21,8 +23,13 @@ namespace slp {
  * @tparam Mat The type of the matrix whose storage this class points to.
  */
 template <typename Mat>
-class VariableBlock {
+class VariableBlock : public SleipnirBase {
  public:
+  /**
+   * Scalar type alias.
+   */
+  using Scalar = typename Mat::Scalar;
+
   /**
    * Copy constructor.
    */
@@ -98,12 +105,8 @@ class VariableBlock {
    *
    * @param mat The matrix to which to point.
    */
-  VariableBlock(Mat& mat)  // NOLINT
-      : m_mat{&mat},
-        m_row_slice{0, mat.rows(), 1},
-        m_row_slice_length{m_row_slice.adjust(mat.rows())},
-        m_col_slice{0, mat.cols(), 1},
-        m_col_slice_length{m_col_slice.adjust(mat.cols())} {}
+  // NOLINTNEXTLINE (google-explicit-constructor)
+  VariableBlock(Mat& mat) : VariableBlock{mat, 0, 0, mat.rows(), mat.cols()} {}
 
   /**
    * Constructs a Variable block pointing to a subset of the given matrix.
@@ -142,7 +145,7 @@ class VariableBlock {
         m_col_slice_length{col_slice_length} {}
 
   /**
-   * Assigns a double to the block.
+   * Assigns a scalar to the block.
    *
    * This only works for blocks with one row and one column.
    *
@@ -158,13 +161,13 @@ class VariableBlock {
   }
 
   /**
-   * Assigns a double to the block.
+   * Assigns a scalar to the block.
    *
    * This only works for blocks with one row and one column.
    *
    * @param value Value to assign.
    */
-  void set_value(double value) {
+  void set_value(Scalar value) {
     slp_assert(rows() == 1 && cols() == 1);
 
     (*this)(0, 0).set_value(value);
@@ -195,7 +198,7 @@ class VariableBlock {
    * @param values Eigen matrix of values.
    */
   template <typename Derived>
-    requires std::same_as<typename Derived::Scalar, double>
+    requires std::same_as<typename Derived::Scalar, Scalar>
   void set_value(const Eigen::MatrixBase<Derived>& values) {
     slp_assert(rows() == values.rows() && cols() == values.cols());
 
@@ -247,7 +250,7 @@ class VariableBlock {
    * @param col The scalar subblock's column.
    * @return A scalar subblock at the given row and column.
    */
-  Variable& operator()(int row, int col)
+  Variable<Scalar>& operator()(int row, int col)
     requires(!std::is_const_v<Mat>)
   {
     slp_assert(row >= 0 && row < rows());
@@ -263,7 +266,7 @@ class VariableBlock {
    * @param col The scalar subblock's column.
    * @return A scalar subblock at the given row and column.
    */
-  const Variable& operator()(int row, int col) const {
+  const Variable<Scalar>& operator()(int row, int col) const {
     slp_assert(row >= 0 && row < rows());
     slp_assert(col >= 0 && col < cols());
     return (*m_mat)(m_row_slice.start + row * m_row_slice.step,
@@ -271,27 +274,27 @@ class VariableBlock {
   }
 
   /**
-   * Returns a scalar subblock at the given row.
+   * Returns a scalar subblock at the given index.
    *
-   * @param row The scalar subblock's row.
-   * @return A scalar subblock at the given row.
+   * @param index The scalar subblock's index.
+   * @return A scalar subblock at the given index.
    */
-  Variable& operator[](int row)
+  Variable<Scalar>& operator[](int index)
     requires(!std::is_const_v<Mat>)
   {
-    slp_assert(row >= 0 && row < rows() * cols());
-    return (*this)(row / cols(), row % cols());
+    slp_assert(index >= 0 && index < rows() * cols());
+    return (*this)(index / cols(), index % cols());
   }
 
   /**
-   * Returns a scalar subblock at the given row.
+   * Returns a scalar subblock at the given index.
    *
-   * @param row The scalar subblock's row.
-   * @return A scalar subblock at the given row.
+   * @param index The scalar subblock's index.
+   * @return A scalar subblock at the given index.
    */
-  const Variable& operator[](int row) const {
-    slp_assert(row >= 0 && row < rows() * cols());
-    return (*this)(row / cols(), row % cols());
+  const Variable<Scalar>& operator[](int index) const {
+    slp_assert(index >= 0 && index < rows() * cols());
+    return (*this)(index / cols(), index % cols());
   }
 
   /**
@@ -342,14 +345,7 @@ class VariableBlock {
   VariableBlock<Mat> operator()(Slice row_slice, Slice col_slice) {
     int row_slice_length = row_slice.adjust(m_row_slice_length);
     int col_slice_length = col_slice.adjust(m_col_slice_length);
-    return VariableBlock{
-        *m_mat,
-        {m_row_slice.start + row_slice.start * m_row_slice.step,
-         m_row_slice.start + row_slice.stop, m_row_slice.step * row_slice.step},
-        row_slice_length,
-        {m_col_slice.start + col_slice.start * m_col_slice.step,
-         m_col_slice.start + col_slice.stop, m_col_slice.step * col_slice.step},
-        col_slice_length};
+    return (*this)(row_slice, row_slice_length, col_slice, col_slice_length);
   }
 
   /**
@@ -363,14 +359,7 @@ class VariableBlock {
                                             Slice col_slice) const {
     int row_slice_length = row_slice.adjust(m_row_slice_length);
     int col_slice_length = col_slice.adjust(m_col_slice_length);
-    return VariableBlock{
-        *m_mat,
-        {m_row_slice.start + row_slice.start * m_row_slice.step,
-         m_row_slice.start + row_slice.stop, m_row_slice.step * row_slice.step},
-        row_slice_length,
-        {m_col_slice.start + col_slice.start * m_col_slice.step,
-         m_col_slice.start + col_slice.stop, m_col_slice.step * col_slice.step},
-        col_slice_length};
+    return (*this)(row_slice, row_slice_length, col_slice, col_slice_length);
   }
 
   /**
@@ -390,10 +379,12 @@ class VariableBlock {
     return VariableBlock{
         *m_mat,
         {m_row_slice.start + row_slice.start * m_row_slice.step,
-         m_row_slice.start + row_slice.stop, m_row_slice.step * row_slice.step},
+         m_row_slice.start + row_slice.stop * m_row_slice.step,
+         row_slice.step * m_row_slice.step},
         row_slice_length,
         {m_col_slice.start + col_slice.start * m_col_slice.step,
-         m_col_slice.start + col_slice.stop, m_col_slice.step * col_slice.step},
+         m_col_slice.start + col_slice.stop * m_col_slice.step,
+         col_slice.step * m_col_slice.step},
         col_slice_length};
   }
 
@@ -416,10 +407,12 @@ class VariableBlock {
     return VariableBlock{
         *m_mat,
         {m_row_slice.start + row_slice.start * m_row_slice.step,
-         m_row_slice.start + row_slice.stop, m_row_slice.step * row_slice.step},
+         m_row_slice.start + row_slice.stop * m_row_slice.step,
+         row_slice.step * m_row_slice.step},
         row_slice_length,
         {m_col_slice.start + col_slice.start * m_col_slice.step,
-         m_col_slice.start + col_slice.stop, m_col_slice.step * col_slice.step},
+         m_col_slice.start + col_slice.stop * m_col_slice.step,
+         col_slice.step * m_col_slice.step},
         col_slice_length};
   }
 
@@ -431,8 +424,9 @@ class VariableBlock {
    * @return A segment of the variable vector.
    */
   VariableBlock<Mat> segment(int offset, int length) {
-    slp_assert(offset >= 0 && offset < rows() * cols());
-    slp_assert(length >= 0 && length <= rows() * cols() - offset);
+    slp_assert(cols() == 1);
+    slp_assert(offset >= 0 && offset < rows());
+    slp_assert(length >= 0 && length <= rows() - offset);
     return block(offset, 0, length, 1);
   }
 
@@ -444,8 +438,9 @@ class VariableBlock {
    * @return A segment of the variable vector.
    */
   const VariableBlock<Mat> segment(int offset, int length) const {
-    slp_assert(offset >= 0 && offset < rows() * cols());
-    slp_assert(length >= 0 && length <= rows() * cols() - offset);
+    slp_assert(cols() == 1);
+    slp_assert(offset >= 0 && offset < rows());
+    slp_assert(length >= 0 && length <= rows() - offset);
     return block(offset, 0, length, 1);
   }
 
@@ -504,7 +499,7 @@ class VariableBlock {
 
     for (int i = 0; i < rows(); ++i) {
       for (int j = 0; j < rhs.cols(); ++j) {
-        Variable sum;
+        Variable sum{Scalar(0)};
         for (int k = 0; k < cols(); ++k) {
           sum += (*this)(i, k) * rhs(k, j);
         }
@@ -640,7 +635,8 @@ class VariableBlock {
   /**
    * Implicit conversion operator from 1x1 VariableBlock to Variable.
    */
-  operator Variable() const {  // NOLINT
+  // NOLINTNEXTLINE (google-explicit-constructor)
+  operator Variable<Scalar>() const {
     slp_assert(rows() == 1 && cols() == 1);
     return (*this)(0, 0);
   }
@@ -651,7 +647,7 @@ class VariableBlock {
    * @return The transpose of the variable matrix.
    */
   std::remove_cv_t<Mat> T() const {
-    std::remove_cv_t<Mat> result{Mat::empty, cols(), rows()};
+    std::remove_cv_t<Mat> result{detail::empty, cols(), rows()};
 
     for (int row = 0; row < rows(); ++row) {
       for (int col = 0; col < cols(); ++col) {
@@ -683,21 +679,15 @@ class VariableBlock {
    * @param col The column of the element to return.
    * @return An element of the variable matrix.
    */
-  double value(int row, int col) {
-    slp_assert(row >= 0 && row < rows());
-    slp_assert(col >= 0 && col < cols());
-    return (*m_mat)(m_row_slice.start + row * m_row_slice.step,
-                    m_col_slice.start + col * m_col_slice.step)
-        .value();
-  }
+  Scalar value(int row, int col) { return (*this)(row, col).value(); }
 
   /**
-   * Returns a row of the variable column vector.
+   * Returns an element of the variable block.
    *
    * @param index The index of the element to return.
-   * @return A row of the variable column vector.
+   * @return An element of the variable block.
    */
-  double value(int index) {
+  Scalar value(int index) {
     slp_assert(index >= 0 && index < rows() * cols());
     return value(index / cols(), index % cols());
   }
@@ -707,8 +697,9 @@ class VariableBlock {
    *
    * @return The contents of the variable matrix.
    */
-  Eigen::MatrixXd value() {
-    Eigen::MatrixXd result{rows(), cols()};
+  Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> value() {
+    Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> result{rows(),
+                                                                 cols()};
 
     for (int row = 0; row < rows(); ++row) {
       for (int col = 0; col < cols(); ++col) {
@@ -726,8 +717,9 @@ class VariableBlock {
    * @return Result of the unary operator.
    */
   std::remove_cv_t<Mat> cwise_transform(
-      function_ref<Variable(const Variable& x)> unary_op) const {
-    std::remove_cv_t<Mat> result{Mat::empty, rows(), cols()};
+      function_ref<Variable<Scalar>(const Variable<Scalar>& x)> unary_op)
+      const {
+    std::remove_cv_t<Mat> result{detail::empty, rows(), cols()};
 
     for (int row = 0; row < rows(); ++row) {
       for (int col = 0; col < cols(); ++col) {
@@ -742,11 +734,11 @@ class VariableBlock {
 
   class iterator {
    public:
-    using iterator_category = std::forward_iterator_tag;
-    using value_type = Variable;
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type = Variable<Scalar>;
     using difference_type = std::ptrdiff_t;
-    using pointer = Variable*;
-    using reference = Variable&;
+    using pointer = Variable<Scalar>*;
+    using reference = Variable<Scalar>&;
 
     constexpr iterator() noexcept = default;
 
@@ -764,6 +756,17 @@ class VariableBlock {
       return retval;
     }
 
+    constexpr iterator& operator--() noexcept {
+      --m_index;
+      return *this;
+    }
+
+    constexpr iterator operator--(int) noexcept {
+      iterator retval = *this;
+      --(*this);
+      return retval;
+    }
+
     constexpr bool operator==(const iterator&) const noexcept = default;
 
     constexpr reference operator*() const noexcept { return (*m_mat)[m_index]; }
@@ -775,11 +778,11 @@ class VariableBlock {
 
   class const_iterator {
    public:
-    using iterator_category = std::forward_iterator_tag;
-    using value_type = Variable;
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type = Variable<Scalar>;
     using difference_type = std::ptrdiff_t;
-    using pointer = Variable*;
-    using const_reference = const Variable&;
+    using pointer = Variable<Scalar>*;
+    using const_reference = const Variable<Scalar>&;
 
     constexpr const_iterator() noexcept = default;
 
@@ -797,6 +800,17 @@ class VariableBlock {
       return retval;
     }
 
+    constexpr const_iterator& operator--() noexcept {
+      --m_index;
+      return *this;
+    }
+
+    constexpr const_iterator operator--(int) noexcept {
+      iterator retval = *this;
+      --(*this);
+      return retval;
+    }
+
     constexpr bool operator==(const const_iterator&) const noexcept = default;
 
     constexpr const_reference operator*() const noexcept {
@@ -807,6 +821,9 @@ class VariableBlock {
     const VariableBlock<Mat>* m_mat = nullptr;
     int m_index = 0;
   };
+
+  using reverse_iterator = std::reverse_iterator<iterator>;
+  using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
 #endif  // DOXYGEN_SHOULD_SKIP_THIS
 
@@ -839,18 +856,68 @@ class VariableBlock {
   const_iterator end() const { return const_iterator(this, rows() * cols()); }
 
   /**
-   * Returns begin iterator.
+   * Returns const begin iterator.
    *
-   * @return Begin iterator.
+   * @return Const begin iterator.
    */
   const_iterator cbegin() const { return const_iterator(this, 0); }
 
   /**
-   * Returns end iterator.
+   * Returns const end iterator.
    *
-   * @return End iterator.
+   * @return Const end iterator.
    */
   const_iterator cend() const { return const_iterator(this, rows() * cols()); }
+
+  /**
+   * Returns reverse begin iterator.
+   *
+   * @return Reverse begin iterator.
+   */
+  reverse_iterator rbegin() { return reverse_iterator{end()}; }
+
+  /**
+   * Returns reverse end iterator.
+   *
+   * @return Reverse end iterator.
+   */
+  reverse_iterator rend() { return reverse_iterator{begin()}; }
+
+  /**
+   * Returns const reverse begin iterator.
+   *
+   * @return Const reverse begin iterator.
+   */
+  const_reverse_iterator rbegin() const {
+    return const_reverse_iterator{end()};
+  }
+
+  /**
+   * Returns const reverse end iterator.
+   *
+   * @return Const reverse end iterator.
+   */
+  const_reverse_iterator rend() const {
+    return const_reverse_iterator{begin()};
+  }
+
+  /**
+   * Returns const reverse begin iterator.
+   *
+   * @return Const reverse begin iterator.
+   */
+  const_reverse_iterator crbegin() const {
+    return const_reverse_iterator{cend()};
+  }
+
+  /**
+   * Returns const reverse end iterator.
+   *
+   * @return Const reverse end iterator.
+   */
+  const_reverse_iterator crend() const {
+    return const_reverse_iterator{cbegin()};
+  }
 
   /**
    * Returns number of elements in matrix.

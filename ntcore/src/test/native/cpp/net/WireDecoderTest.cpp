@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "net/WireDecoder.hpp"
+
 #include <string>
 
 #include <gtest/gtest.h>
@@ -13,7 +15,6 @@
 #include "PubSubOptions.hpp"
 #include "gmock/gmock.h"
 #include "net/MessageHandler.hpp"
-#include "net/WireDecoder.hpp"
 #include "wpi/nt/NetworkTableValue.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/raw_ostream.hpp"

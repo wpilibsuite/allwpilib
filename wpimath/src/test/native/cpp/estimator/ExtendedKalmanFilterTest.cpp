@@ -2,18 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/estimator/ExtendedKalmanFilter.hpp"
+
 #include <cmath>
 #include <vector>
 
 #include <Eigen/QR>
 #include <gtest/gtest.h>
 
-#include "wpi/math/estimator/ExtendedKalmanFilter.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/random/Normal.hpp"
 #include "wpi/math/system/NumericalJacobian.hpp"
 #include "wpi/math/system/plant/DCMotor.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
-#include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
 
 namespace {
@@ -78,7 +79,7 @@ TEST(ExtendedKalmanFilterTest, Init) {
   observer.Correct(u, localY);
 
   auto globalY = GlobalMeasurementModel(observer.Xhat(), u);
-  auto R = wpi::math::MakeCovMatrix(0.01, 0.01, 0.0001, 0.01, 0.01);
+  auto R = wpi::math::CovarianceMatrix(0.01, 0.01, 0.0001, 0.01, 0.01);
   observer.Correct<5>(u, globalY, GlobalMeasurementModel, R);
 }
 
@@ -122,8 +123,7 @@ TEST(ExtendedKalmanFilterTest, Convergence) {
         ref.pose.Rotation().Radians().value(), vl.value(), vr.value()};
 
     auto localY = LocalMeasurementModel(nextR, wpi::math::Vectord<2>::Zero());
-    observer.Correct(
-        u, localY + wpi::math::MakeWhiteNoiseVector(0.0001, 0.5, 0.5));
+    observer.Correct(u, localY + wpi::math::Normal(0.0001, 0.5, 0.5));
 
     wpi::math::Vectord<5> rdot = (nextR - r) / dt.value();
     u = B.householderQr().solve(rdot -
@@ -138,7 +138,7 @@ TEST(ExtendedKalmanFilterTest, Convergence) {
   observer.Correct(u, localY);
 
   auto globalY = GlobalMeasurementModel(observer.Xhat(), u);
-  auto R = wpi::math::MakeCovMatrix(0.01, 0.01, 0.0001, 0.5, 0.5);
+  auto R = wpi::math::CovarianceMatrix(0.01, 0.01, 0.0001, 0.5, 0.5);
   observer.Correct<5>(u, globalY, GlobalMeasurementModel, R);
 
   auto finalPosition = trajectory.Sample(trajectory.TotalTime());

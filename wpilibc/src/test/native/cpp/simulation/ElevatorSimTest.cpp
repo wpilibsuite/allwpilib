@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/simulation/ElevatorSim.hpp"
+
 #include <gtest/gtest.h>
 
 #include "wpi/hardware/motor/PWMVictorSPX.hpp"
@@ -10,7 +12,6 @@
 #include "wpi/math/system/NumericalIntegration.hpp"
 #include "wpi/math/system/plant/DCMotor.hpp"
 #include "wpi/math/system/plant/LinearSystemId.hpp"
-#include "wpi/simulation/ElevatorSim.hpp"
 #include "wpi/simulation/EncoderSim.hpp"
 #include "wpi/system/RobotController.hpp"
 #include "wpi/units/math.hpp"
@@ -98,4 +99,16 @@ TEST(ElevatorSimTest, Stability) {
                         wpi::math::Vectord<2>{0.0, 0.0},
                         wpi::math::Vectord<1>{12.0}, 20_ms * 50)(0)},
                     sim.GetPosition(), 1_cm);
+}
+
+TEST(ElevatorSimTest, CurrentDraw) {
+  constexpr auto motor = wpi::math::DCMotor::KrakenX60(2);
+  wpi::sim::ElevatorSim sim(motor, 20, 8_kg, 0.1_m, 0_m, 1_m, true, 0_m,
+                            {0.01, 0.0});
+
+  EXPECT_DOUBLE_EQ(0.0, sim.GetCurrentDraw().value());
+  sim.SetInputVoltage(motor.Voltage(motor.Torque(60_A), 0_rad_per_s));
+  sim.Update(100_ms);
+  // Current draw should start at 60 A and decrease as the back-EMF catches up
+  EXPECT_TRUE(0_A < sim.GetCurrentDraw() && sim.GetCurrentDraw() < 60_A);
 }

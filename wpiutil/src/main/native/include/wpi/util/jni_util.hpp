@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef WPIUTIL_WPI_UTIL_JNI_UTIL_HPP_
-#define WPIUTIL_WPI_UTIL_JNI_UTIL_HPP_
+#pragma once
 
 #include <jni.h>
 
@@ -602,6 +601,8 @@ inline jbooleanArray MakeJBooleanArray(JNIEnv* env, std::span<const bool> arr) {
 WPI_JNI_MAKEJARRAY(jboolean, Boolean)
 WPI_JNI_MAKEJARRAY(jbyte, Byte)
 WPI_JNI_MAKEJARRAY(jshort, Short)
+WPI_JNI_MAKEJARRAY(jint, Int)
+WPI_JNI_MAKEJARRAY(jlong, Long)
 WPI_JNI_MAKEJARRAY(jfloat, Float)
 WPI_JNI_MAKEJARRAY(jdouble, Double)
 
@@ -976,5 +977,3 @@ struct JExceptionInit {
 };
 
 }  // namespace wpi::util::java
-
-#endif  // WPIUTIL_WPI_UTIL_JNI_UTIL_HPP_

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/framework/TimesliceRobot.hpp"  // NOLINT(build/include_order)
+#include "wpi/framework/TimesliceRobot.hpp"
 
 #include <stdint.h>
 
@@ -19,7 +19,10 @@ using namespace wpi;
 namespace {
 class TimesliceRobotTest : public ::testing::Test {
  protected:
-  void SetUp() override { wpi::sim::PauseTiming(); }
+  void SetUp() override {
+    wpi::sim::PauseTiming();
+    wpi::sim::SetProgramStarted(false);
+  }
 
   void TearDown() override { wpi::sim::ResumeTiming(); }
 };
@@ -51,10 +54,10 @@ TEST_F(TimesliceRobotTest, Schedule) {
   robot.Schedule([&] { callbackCount2++; }, 1_ms);
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
+  wpi::sim::WaitForProgramStart();
 
   wpi::sim::DriverStationSim::SetEnabled(false);
   wpi::sim::DriverStationSim::NotifyNewData();
-  wpi::sim::StepTiming(0_ms);  // Wait for Notifiers
 
   // Functions scheduled with addPeriodic() are delayed by one period before
   // their first run (5 ms for this test's callbacks here and 20 ms for

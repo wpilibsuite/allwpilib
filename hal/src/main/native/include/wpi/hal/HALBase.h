@@ -9,9 +9,7 @@
 #ifdef __cplusplus
 #include <cstddef>
 #else
-
-#include <stddef.h>  // NOLINT(build/include_order)
-
+#include <stddef.h>
 #endif
 
 #include "wpi/hal/Types.h"

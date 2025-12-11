@@ -2,13 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/geometry/Transform2d.hpp"
+
 #include <cmath>
 
 #include <gtest/gtest.h>
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
-#include "wpi/math/geometry/Transform2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
 
 using namespace wpi::math;

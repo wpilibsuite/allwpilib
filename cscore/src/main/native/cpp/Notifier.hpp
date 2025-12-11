@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_NOTIFIER_HPP_
-#define CSCORE_NOTIFIER_HPP_
+#pragma once
 
 #include <functional>
 #include <utility>
@@ -89,5 +88,3 @@ class Notifier
 };
 
 }  // namespace wpi::cs
-
-#endif  // CSCORE_NOTIFIER_HPP_

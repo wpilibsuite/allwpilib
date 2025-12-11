@@ -54,11 +54,13 @@ http_archive(
 )
 
 # Download Extra java rules
+RULES_JVM_EXTERNAL_TAG = "6.8"
+
 http_archive(
     name = "rules_jvm_external",
-    sha256 = "4f55980c25d0783b9fe43b049362018d8d79263476b5340a5491893ffcc06ab6",
-    strip_prefix = "rules_jvm_external-30899314873b6ec69dc7d02c4457fbe52a6e535d",
-    url = "https://github.com/bazel-contrib/rules_jvm_external/archive/30899314873b6ec69dc7d02c4457fbe52a6e535d.tar.gz",
+    sha256 = "704a0197e4e966f96993260418f2542568198490456c21814f647ae7091f56f2",
+    strip_prefix = "rules_jvm_external-%s" % RULES_JVM_EXTERNAL_TAG,
+    url = "https://github.com/bazel-contrib/rules_jvm_external/releases/download/{v}/rules_jvm_external-{v}.tar.gz".format(v = RULES_JVM_EXTERNAL_TAG),
 )
 
 # Setup aspect lib
@@ -216,12 +218,6 @@ maven_artifacts = [
         testonly = True,
     ),
     maven.artifact(
-        "com.google.code.gson",
-        "gson",
-        "2.10.1",
-        testonly = False,
-    ),
-    maven.artifact(
         "org.hamcrest",
         "hamcrest-all",
         "1.3",
@@ -287,17 +283,6 @@ load("@rules_bzlmodrio_toolchains//toolchains:load_toolchains.bzl", "load_toolch
 
 load_toolchains()
 
-#
-http_archive(
-    name = "rules_bzlmodrio_jdk",
-    sha256 = "623b8bcdba1c3140f56e940365f011d2e5d90d74c7a30ace6a8817c037c1dd61",
-    url = "https://github.com/wpilibsuite/rules_bzlmodRio_jdk/releases/download/17.0.12-7.bcr1/rules_bzlmodrio_jdk-17.0.12-7.bcr1.tar.gz",
-)
-
-load("@rules_bzlmodrio_jdk//:maven_deps.bzl", "setup_legacy_setup_jdk_dependencies")
-
-setup_legacy_setup_jdk_dependencies()
-
 register_toolchains(
     "@local_roborio//:macos",
     "@local_roborio//:linux",
@@ -315,18 +300,6 @@ register_toolchains(
     "@local_bookworm_64//:linux",
     "@local_bookworm_64//:windows",
 )
-
-setup_legacy_setup_jdk_dependencies()
-
-http_archive(
-    name = "bzlmodrio-ni",
-    sha256 = "fff62c3cb3e83f9a0d0a01f1739477c9ca5e9a6fac05be1ad59dafcd385801f7",
-    url = "https://github.com/wpilibsuite/bzlmodRio-ni/releases/download/2025.2.0/bzlmodRio-ni-2025.2.0.tar.gz",
-)
-
-load("@bzlmodrio-ni//:maven_cpp_deps.bzl", "setup_legacy_bzlmodrio_ni_cpp_dependencies")
-
-setup_legacy_bzlmodrio_ni_cpp_dependencies()
 
 http_archive(
     name = "bzlmodrio-opencv",

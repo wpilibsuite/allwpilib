@@ -2,12 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/commands2/ConditionalCommand.hpp"
+
 #include <memory>
 #include <utility>
 
 #include "CommandTestBase.hpp"
 #include "wpi/commands2/Commands.hpp"
-#include "wpi/commands2/ConditionalCommand.hpp"
 #include "wpi/commands2/InstantCommand.hpp"
 
 using namespace wpi::cmd;

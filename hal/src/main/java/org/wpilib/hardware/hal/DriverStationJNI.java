@@ -148,6 +148,12 @@ public class DriverStationJNI extends JNIWrapper {
   /** The maximum number of joysticks. */
   public static final int kMaxJoysticks = 6;
 
+  /** The maximum number of touchpads. */
+  public static final int kMaxJoystickTouchpads = 2;
+
+  /** The maximum number of fingers per touchpad. */
+  public static final int kMaxJoystickTouchpadFingers = 2;
+
   /**
    * Get all joystick data.
    *
@@ -155,8 +161,11 @@ public class DriverStationJNI extends JNIWrapper {
    * @param axesArray all joystick axes
    * @param rawAxesArray all joystick axes as int
    * @param povsArray all povs
+   * @param touchpadFingersArray all touchpad fingers
    * @param buttonsAndMetadata array of long joystick axes count, long joystick povs count, long
-   *     joystick buttons count, long joystick buttons values
+   *     joystick buttons count, long joystick buttons values, long joystick touchpad count, long
+   *     pad 0 finger0 down 0x1, finger1 down 0x2, fingerCount 0xC, long pad 1 finger0 down 0x1,
+   *     finger1 down 0x2, fingerCount 0xC
    * @see "HAL_GetAllJoystickData"
    */
   public static native void getAllJoystickData(
@@ -164,20 +173,36 @@ public class DriverStationJNI extends JNIWrapper {
       float[] axesArray,
       short[] rawAxesArray,
       byte[] povsArray,
+      float[] touchpadFingersArray,
       long[] buttonsAndMetadata);
 
   /**
-   * Set joystick outputs.
+   * Set joystick rumbles.
    *
    * @param joystickNum the joystick number
-   * @param outputs bitmask of outputs, 1 for on 0 for off
    * @param leftRumble the left rumble value (0-FFFF)
    * @param rightRumble the right rumble value (0-FFFF)
+   * @param leftTriggerRumble the left trigger rumble value (0-FFFF)
+   * @param rightTriggerRumble the right trigger rumble value (0-FFFF)
    * @return the error code, or 0 for success
-   * @see "HAL_SetJoystickOutputs"
+   * @see "HAL_SetJoystickRumble"
    */
-  public static native int setJoystickOutputs(
-      byte joystickNum, int outputs, int leftRumble, int rightRumble);
+  public static native int setJoystickRumble(
+      byte joystickNum,
+      int leftRumble,
+      int rightRumble,
+      int leftTriggerRumble,
+      int rightTriggerRumble);
+
+  /**
+   * Sets the LEDs on a specific joystick.
+   *
+   * @param joystickNum the joystick number
+   * @param leds the rgb led color value (0xRRGGBB)
+   * @return the error code, or 0 for success
+   * @see "HAL_SetJoystickLeds"
+   */
+  public static native int setJoystickLeds(byte joystickNum, int leds);
 
   /**
    * Gets whether a specific joystick is considered to be an Gamepad.
@@ -196,9 +221,18 @@ public class DriverStationJNI extends JNIWrapper {
    *
    * @param joystickNum the joystick number
    * @return the enumerated joystick type
-   * @see "HAL_GetJoystickType"
+   * @see "HAL_GetJoystickGamepadType"
    */
-  public static native int getJoystickType(byte joystickNum);
+  public static native int getJoystickGamepadType(byte joystickNum);
+
+  /**
+   * Gets the supported outputs of a specific joystick.
+   *
+   * @param joystickNum the joystick number
+   * @return bitmask of supported outputs
+   * @see "HAL_GetJoystickSupportedOutputs"
+   */
+  public static native int getJoystickSupportedOutputs(byte joystickNum);
 
   /**
    * Gets the name of a joystick.

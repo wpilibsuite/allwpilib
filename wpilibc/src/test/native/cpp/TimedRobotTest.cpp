@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/framework/TimedRobot.hpp"  // NOLINT(build/include_order)
+#include "wpi/framework/TimedRobot.hpp"
 
 #include <stdint.h>
 
@@ -21,7 +21,10 @@ inline constexpr auto kPeriod = 20_ms;
 namespace {
 class TimedRobotTest : public ::testing::Test {
  protected:
-  void SetUp() override { wpi::sim::PauseTiming(); }
+  void SetUp() override {
+    wpi::sim::PauseTiming();
+    wpi::sim::SetProgramStarted(false);
+  }
 
   void TearDown() override { wpi::sim::ResumeTiming(); }
 };
@@ -84,10 +87,10 @@ TEST_F(TimedRobotTest, DisabledMode) {
   MockRobot robot;
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
+  wpi::sim::WaitForProgramStart();
 
   wpi::sim::DriverStationSim::SetEnabled(false);
   wpi::sim::DriverStationSim::NotifyNewData();
-  wpi::sim::StepTiming(0_ms);  // Wait for Notifiers
 
   EXPECT_EQ(1u, robot.m_simulationInitCount);
   EXPECT_EQ(0u, robot.m_disabledInitCount);
@@ -155,12 +158,12 @@ TEST_F(TimedRobotTest, AutonomousMode) {
   MockRobot robot;
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
+  wpi::sim::WaitForProgramStart();
 
   wpi::sim::DriverStationSim::SetEnabled(true);
   wpi::sim::DriverStationSim::SetAutonomous(true);
   wpi::sim::DriverStationSim::SetTest(false);
   wpi::sim::DriverStationSim::NotifyNewData();
-  wpi::sim::StepTiming(0_ms);  // Wait for Notifiers
 
   EXPECT_EQ(1u, robot.m_simulationInitCount);
   EXPECT_EQ(0u, robot.m_disabledInitCount);
@@ -228,12 +231,12 @@ TEST_F(TimedRobotTest, TeleopMode) {
   MockRobot robot;
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
+  wpi::sim::WaitForProgramStart();
 
   wpi::sim::DriverStationSim::SetEnabled(true);
   wpi::sim::DriverStationSim::SetAutonomous(false);
   wpi::sim::DriverStationSim::SetTest(false);
   wpi::sim::DriverStationSim::NotifyNewData();
-  wpi::sim::StepTiming(0_ms);  // Wait for Notifiers
 
   EXPECT_EQ(1u, robot.m_simulationInitCount);
   EXPECT_EQ(0u, robot.m_disabledInitCount);
@@ -300,12 +303,12 @@ TEST_F(TimedRobotTest, TeleopMode) {
 TEST_F(TimedRobotTest, TestMode) {
   MockRobot robot;
   std::thread robotThread{[&] { robot.StartCompetition(); }};
+  wpi::sim::WaitForProgramStart();
 
   wpi::sim::DriverStationSim::SetEnabled(true);
   wpi::sim::DriverStationSim::SetAutonomous(false);
   wpi::sim::DriverStationSim::SetTest(true);
   wpi::sim::DriverStationSim::NotifyNewData();
-  wpi::sim::StepTiming(0_ms);  // Wait for Notifiers
 
   EXPECT_EQ(1u, robot.m_simulationInitCount);
   EXPECT_EQ(0u, robot.m_disabledInitCount);
@@ -397,13 +400,13 @@ TEST_F(TimedRobotTest, ModeChange) {
   MockRobot robot;
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
+  wpi::sim::WaitForProgramStart();
 
   // Start in disabled
   wpi::sim::DriverStationSim::SetEnabled(false);
   wpi::sim::DriverStationSim::SetAutonomous(false);
   wpi::sim::DriverStationSim::SetTest(false);
   wpi::sim::DriverStationSim::NotifyNewData();
-  wpi::sim::StepTiming(0_ms);  // Wait for Notifiers
 
   EXPECT_EQ(0u, robot.m_disabledInitCount);
   EXPECT_EQ(0u, robot.m_autonomousInitCount);
@@ -510,10 +513,10 @@ TEST_F(TimedRobotTest, AddPeriodic) {
   robot.AddPeriodic([&] { callbackCount++; }, kPeriod / 2.0);
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
+  wpi::sim::WaitForProgramStart();
 
   wpi::sim::DriverStationSim::SetEnabled(false);
   wpi::sim::DriverStationSim::NotifyNewData();
-  wpi::sim::StepTiming(0_ms);  // Wait for Notifiers
 
   EXPECT_EQ(0u, robot.m_disabledInitCount);
   EXPECT_EQ(0u, robot.m_disabledPeriodicCount);
@@ -549,10 +552,10 @@ TEST_F(TimedRobotTest, AddPeriodicWithOffset) {
   //    2p |    1.25p
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
+  wpi::sim::WaitForProgramStart();
 
   wpi::sim::DriverStationSim::SetEnabled(false);
   wpi::sim::DriverStationSim::NotifyNewData();
-  wpi::sim::StepTiming(0_ms);  // Wait for Notifiers
 
   EXPECT_EQ(0u, robot.m_disabledInitCount);
   EXPECT_EQ(0u, robot.m_disabledPeriodicCount);

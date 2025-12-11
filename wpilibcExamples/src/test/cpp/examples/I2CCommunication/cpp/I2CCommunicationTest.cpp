@@ -32,13 +32,14 @@ class I2CCommunicationTest : public testing::TestWithParam<T> {
   void SetUp() override {
     gString = std::string();
     wpi::sim::PauseTiming();
+    wpi::sim::SetProgramStarted(false);
     wpi::sim::DriverStationSim::ResetData();
     m_port = static_cast<int32_t>(Robot::kPort);
 
     m_callback = HALSIM_RegisterI2CWriteCallback(m_port, &callback, nullptr);
 
     m_thread = std::thread([&] { m_robot.StartCompetition(); });
-    wpi::sim::StepTiming(0.0_ms);  // Wait for Notifiers
+    wpi::sim::WaitForProgramStart();
   }
 
   void TearDown() override {

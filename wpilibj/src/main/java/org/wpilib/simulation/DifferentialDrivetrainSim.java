@@ -11,6 +11,7 @@ import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N2;
 import org.wpilib.math.numbers.N7;
+import org.wpilib.math.random.Normal;
 import org.wpilib.math.system.LinearSystem;
 import org.wpilib.math.system.NumericalIntegration;
 import org.wpilib.math.system.plant.DCMotor;
@@ -146,7 +147,7 @@ public class DifferentialDrivetrainSim {
     m_x = NumericalIntegration.rkdp(this::getDynamics, m_x, m_u, dt);
     m_y = m_x;
     if (m_measurementStdDevs != null) {
-      m_y = m_y.plus(StateSpaceUtil.makeWhiteNoiseVector(m_measurementStdDevs));
+      m_y = m_y.plus(Normal.normal(m_measurementStdDevs));
     }
   }
 
