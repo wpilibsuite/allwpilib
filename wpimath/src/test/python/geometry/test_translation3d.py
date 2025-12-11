@@ -149,9 +149,7 @@ def test_inequality():
 def test_polar_constructor():
     z_axis = np.array([0.0, 0.0, 1.0])
 
-    one = Translation3d(
-        math.sqrt(2) * 1, Rotation3d(z_axis, math.radians(45))
-    )
+    one = Translation3d(math.sqrt(2) * 1, Rotation3d(z_axis, math.radians(45)))
     assert one.x == pytest.approx(1.0, abs=1e-9)
     assert one.y == pytest.approx(1.0, abs=1e-9)
     assert one.z == pytest.approx(0.0, abs=1e-9)

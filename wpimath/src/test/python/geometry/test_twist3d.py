@@ -15,9 +15,7 @@ def test_straight():
 
 
 def test_quarter_circle():
-    quarter_circle = Twist2d(
-        dx=5 / 2.0 * math.pi, dy=0, dtheta=math.pi / 2.0
-    )
+    quarter_circle = Twist2d(dx=5 / 2.0 * math.pi, dy=0, dtheta=math.pi / 2.0)
     quarter_circle_pose = quarter_circle.exp()
 
     assert quarter_circle_pose.x == pytest.approx(5.0)
@@ -52,9 +50,7 @@ def test_pose2d_log():
 
     twist = (end - start).log()
 
-    expected = Twist2d(
-        dx=5.0 / 2.0 * math.pi, dy=0, dtheta=math.pi / 2.0
-    )
+    expected = Twist2d(dx=5.0 / 2.0 * math.pi, dy=0, dtheta=math.pi / 2.0)
     assert expected == twist
 
     reapplied = start + twist.exp()

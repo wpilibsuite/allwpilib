@@ -33,9 +33,7 @@ def test_rotate_by():
     assert rotated.z == pytest.approx(0.0)
     assert rotated.rotation().x == pytest.approx(0.0)
     assert rotated.rotation().y == pytest.approx(0.0)
-    assert rotated.rotation().z == pytest.approx(
-        initial.rotation().z + rotation.z
-    )
+    assert rotated.rotation().z == pytest.approx(initial.rotation().z + rotation.z)
 
 
 def test_test_transform_by_rotations():
@@ -46,9 +44,11 @@ def test_test_transform_by_rotations():
     transform2 = Transform3d(Translation3d(), Rotation3d.fromDegrees(-90, 0, 0))
     transform3 = Transform3d(Translation3d(), Rotation3d.fromDegrees(0, -45, 0))
 
-    final_pose = initial_pose.transformBy(transform1) \
-        .transformBy(transform2) \
+    final_pose = (
+        initial_pose.transformBy(transform1)
+        .transformBy(transform2)
         .transformBy(transform3)
+    )
 
     assert final_pose.rotation().x == pytest.approx(
         initial_pose.rotation().x, abs=k_epsilon
@@ -65,7 +65,9 @@ def test_transform_by():
     z_axis = np.array([0.0, 0.0, 1.0])
 
     initial = Pose3d(x=1, y=2, z=0, rotation=Rotation3d(z_axis, math.radians(45.0)))
-    transform = Transform3d(Translation3d(x=5, y=0, z=0), rotation=Rotation3d(z_axis, math.radians(5)))
+    transform = Transform3d(
+        Translation3d(x=5, y=0, z=0), rotation=Rotation3d(z_axis, math.radians(5))
+    )
 
     transformed = initial + transform
 
@@ -110,7 +112,9 @@ def test_inequality():
     z_axis = np.array([0.0, 0.0, 1.0])
 
     a = Pose3d(x=0, y=5, z=0, rotation=Rotation3d(z_axis, math.radians(43)))
-    b = Pose3d(x=0, y=feetToMeters(5), z=0, rotation=Rotation3d(z_axis, math.radians(43)))
+    b = Pose3d(
+        x=0, y=feetToMeters(5), z=0, rotation=Rotation3d(z_axis, math.radians(43))
+    )
     assert a != b
 
 
@@ -241,9 +245,7 @@ def test_twist_nan():
             y=4.12,
             z=0.00,
             rotation=Rotation3d(
-                Quaternion(
-                    -0.9999999999999999, 0.0, 0.0, 1.9208309264993548e-08
-                )
+                Quaternion(-0.9999999999999999, 0.0, 0.0, 1.9208309264993548e-08)
             ),
         ),
         Pose3d(
@@ -251,9 +253,7 @@ def test_twist_nan():
             y=2.95,
             z=0.00,
             rotation=Rotation3d(
-                Quaternion(
-                    0.9999999999999793, 0.0, 0.0, 2.0352360299846772e-07
-                )
+                Quaternion(0.9999999999999793, 0.0, 0.0, 2.0352360299846772e-07)
             ),
         ),
     ]
@@ -264,9 +264,7 @@ def test_twist_nan():
             y=4.15,
             z=0.00,
             rotation=Rotation3d(
-                Quaternion(
-                    -0.9999999999999999, 0.0, 0.0, 2.416890209039172e-08
-                )
+                Quaternion(-0.9999999999999999, 0.0, 0.0, 2.416890209039172e-08)
             ),
         ),
         Pose3d(
@@ -274,9 +272,7 @@ def test_twist_nan():
             y=2.93,
             z=0.00,
             rotation=Rotation3d(
-                Quaternion(
-                    0.9999999999999782, 0.0, 0.0, 2.0859477994905617e-07
-                )
+                Quaternion(0.9999999999999782, 0.0, 0.0, 2.0859477994905617e-07)
             ),
         ),
     ]
@@ -368,9 +364,9 @@ def test_nearest():
     complex_pose2 = Pose3d(translation, Rotation3d.fromDegrees(90, 45, 90))
     complex_pose3 = Pose3d(translation, Rotation3d.fromDegrees(10, 15, 20))
 
-    complex_result = Pose3d(x=0, y=0, z=0, rotation=Rotation3d.fromDegrees(5, 10, 15)).nearest(
-        [complex_pose1, complex_pose2, complex_pose3]
-    )
+    complex_result = Pose3d(
+        x=0, y=0, z=0, rotation=Rotation3d.fromDegrees(5, 10, 15)
+    ).nearest([complex_pose1, complex_pose2, complex_pose3])
     assert complex_result.rotation().x == pytest.approx(complex_pose3.rotation().x)
     assert complex_result.rotation().y == pytest.approx(complex_pose3.rotation().y)
     assert complex_result.rotation().z == pytest.approx(complex_pose3.rotation().z)

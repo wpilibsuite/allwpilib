@@ -2,12 +2,7 @@ import pytest
 import math
 import numpy as np
 
-from wpimath.geometry import (
-    Rotation2d,
-    Transform2d,
-    Translation2d,
-    Pose2d
-)
+from wpimath.geometry import Rotation2d, Transform2d, Translation2d, Pose2d
 
 
 def test_to_matrix():
@@ -27,8 +22,12 @@ def test_inverse():
 
 def test_composition():
     initial = Pose2d(x=1, y=2, rotation=Rotation2d.fromDegrees(45))
-    transform1 = Transform2d(Translation2d(x=5, y=0), rotation=Rotation2d.fromDegrees(5))
-    transform2 = Transform2d(Translation2d(x=0, y=2), rotation=Rotation2d.fromDegrees(5))
+    transform1 = Transform2d(
+        Translation2d(x=5, y=0), rotation=Rotation2d.fromDegrees(5)
+    )
+    transform2 = Transform2d(
+        Translation2d(x=0, y=2), rotation=Rotation2d.fromDegrees(5)
+    )
 
     transformed_separate = initial + transform1 + transform2
     transformed_combined = initial + (transform1 + transform2)
@@ -46,7 +45,9 @@ def test_constexpr():
     assert translation_rotation_ctor.x == pytest.approx(0.0)
     assert translation_rotation_ctor.y == pytest.approx(0.0)
     assert multiplied.rotation().degrees() == pytest.approx(50.0)
-    assert translation_rotation_ctor.inverse().rotation().degrees() == pytest.approx(-10.0)
+    assert translation_rotation_ctor.inverse().rotation().degrees() == pytest.approx(
+        -10.0
+    )
     assert translation_rotation_ctor.inverse().x == pytest.approx(0.0)
     assert translation_rotation_ctor.inverse().y == pytest.approx(0.0)
     assert divided.rotation().degrees() == pytest.approx(5.0)

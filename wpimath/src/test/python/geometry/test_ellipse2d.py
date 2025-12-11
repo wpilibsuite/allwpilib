@@ -53,9 +53,7 @@ def test_distance():
     assert ellipse.distance(point3) == pytest.approx(0, abs=k_epsilon)
 
     point4 = Translation2d(x=-1, y=2.5)
-    assert ellipse.distance(point4) == pytest.approx(
-        0.19210128384806818, abs=k_epsilon
-    )
+    assert ellipse.distance(point4) == pytest.approx(0.19210128384806818, abs=k_epsilon)
 
 
 def test_nearest():

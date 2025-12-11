@@ -102,8 +102,12 @@ def test_multiply():
     assert actual.z == pytest.approx(expected.z, abs=1e-9)
 
     # Identity
-    q = Quaternion(0.72760687510899891, 0.29104275004359953, 0.38805700005813276,
-                   0.48507125007266594)
+    q = Quaternion(
+        0.72760687510899891,
+        0.29104275004359953,
+        0.38805700005813276,
+        0.48507125007266594,
+    )
     actual = q * q.inverse()
     assert actual.w == pytest.approx(1.0, abs=1e-9)
     assert actual.x == pytest.approx(0.0, abs=1e-9)
@@ -112,8 +116,12 @@ def test_multiply():
 
 
 def test_conjugate():
-    q = Quaternion(0.72760687510899891, 0.29104275004359953, 0.38805700005813276,
-                   0.48507125007266594)
+    q = Quaternion(
+        0.72760687510899891,
+        0.29104275004359953,
+        0.38805700005813276,
+        0.48507125007266594,
+    )
     conj = q.conjugate()
 
     assert conj.w == pytest.approx(q.w)
@@ -123,8 +131,12 @@ def test_conjugate():
 
 
 def test_inverse():
-    q = Quaternion(0.72760687510899891, 0.29104275004359953, 0.38805700005813276,
-                   0.48507125007266594)
+    q = Quaternion(
+        0.72760687510899891,
+        0.29104275004359953,
+        0.38805700005813276,
+        0.48507125007266594,
+    )
     norm = q.norm()
 
     inv = q.inverse()
@@ -144,8 +156,9 @@ def test_norm():
 
 def test_exponential():
     q = Quaternion(1.1, 2.2, 3.3, 4.4)
-    expect = Quaternion(2.81211398529184, -0.392521193481878, -0.588781790222817,
-                        -0.785042386963756)
+    expect = Quaternion(
+        2.81211398529184, -0.392521193481878, -0.588781790222817, -0.785042386963756
+    )
 
     q_exp = q.exp()
 
@@ -154,8 +167,9 @@ def test_exponential():
 
 def test_logarithm():
     q = Quaternion(1.1, 2.2, 3.3, 4.4)
-    expect = Quaternion(1.7959088706354, 0.515190292664085, 0.772785438996128,
-                        1.03038058532817)
+    expect = Quaternion(
+        1.7959088706354, 0.515190292664085, 0.772785438996128, 1.03038058532817
+    )
 
     q_log = q.log()
 
@@ -201,7 +215,9 @@ def test_dot_product():
     q = Quaternion(1.1, 2.2, 3.3, 4.4)
     p = Quaternion(5.5, 6.6, 7.7, 8.8)
 
-    assert q.dot(p) == pytest.approx(q.w * p.w + q.x * p.x + q.y * p.y + q.z * p.z, abs=1e-9)
+    assert q.dot(p) == pytest.approx(
+        q.w * p.w + q.x * p.x + q.y * p.y + q.z * p.z, abs=1e-9
+    )
 
 
 def test_dot_product_as_equality():

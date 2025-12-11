@@ -41,9 +41,7 @@ def test_relative_to():
 
     final_relative_to_initial = final.relativeTo(initial)
 
-    assert final_relative_to_initial.x == pytest.approx(
-        5.0 * math.sqrt(2.0), abs=1e-9
-    )
+    assert final_relative_to_initial.x == pytest.approx(5.0 * math.sqrt(2.0), abs=1e-9)
     assert final_relative_to_initial.y == pytest.approx(0.0, abs=1e-9)
     assert final_relative_to_initial.rotation().degrees() == pytest.approx(
         0.0, abs=1e-9
@@ -87,38 +85,35 @@ def test_minus():
 def test_nearest():
     origin = Pose2d(x=0, y=0, rotation=Rotation2d.fromDegrees(0))
 
-    pose1 = Pose2d(Translation2d(distance=1.0, angle=Rotation2d.fromDegrees((45))), Rotation2d.fromDegrees(0))
-    pose2 = Pose2d(Translation2d(distance=2.0, angle=Rotation2d.fromDegrees((90))), Rotation2d.fromDegrees(0))
-    pose3 = Pose2d(Translation2d(distance=3.0, angle=Rotation2d.fromDegrees((135))), Rotation2d.fromDegrees(0))
-    pose4 = Pose2d(Translation2d(distance=4.0, angle=Rotation2d.fromDegrees((180))), Rotation2d.fromDegrees(0))
-    pose5 = Pose2d(Translation2d(distance=5.0, angle=Rotation2d.fromDegrees((270))), Rotation2d.fromDegrees(0))
-
-    assert (
-        origin.nearest([pose5, pose3, pose4]).x
-        == pytest.approx(pose3.x)
+    pose1 = Pose2d(
+        Translation2d(distance=1.0, angle=Rotation2d.fromDegrees((45))),
+        Rotation2d.fromDegrees(0),
     )
-    assert (
-        origin.nearest([pose5, pose3, pose4]).y
-        == pytest.approx(pose3.y)
+    pose2 = Pose2d(
+        Translation2d(distance=2.0, angle=Rotation2d.fromDegrees((90))),
+        Rotation2d.fromDegrees(0),
     )
-
-    assert (
-        origin.nearest([pose1, pose2, pose3]).x
-        == pytest.approx(pose1.x)
+    pose3 = Pose2d(
+        Translation2d(distance=3.0, angle=Rotation2d.fromDegrees((135))),
+        Rotation2d.fromDegrees(0),
     )
-    assert (
-        origin.nearest([pose1, pose2, pose3]).y
-        == pytest.approx(pose1.y)
+    pose4 = Pose2d(
+        Translation2d(distance=4.0, angle=Rotation2d.fromDegrees((180))),
+        Rotation2d.fromDegrees(0),
+    )
+    pose5 = Pose2d(
+        Translation2d(distance=5.0, angle=Rotation2d.fromDegrees((270))),
+        Rotation2d.fromDegrees(0),
     )
 
-    assert (
-        origin.nearest([pose4, pose2, pose3]).x
-        == pytest.approx(pose2.x)
-    )
-    assert (
-        origin.nearest([pose4, pose2, pose3]).y
-        == pytest.approx(pose2.y)
-    )
+    assert origin.nearest([pose5, pose3, pose4]).x == pytest.approx(pose3.x)
+    assert origin.nearest([pose5, pose3, pose4]).y == pytest.approx(pose3.y)
+
+    assert origin.nearest([pose1, pose2, pose3]).x == pytest.approx(pose1.x)
+    assert origin.nearest([pose1, pose2, pose3]).y == pytest.approx(pose1.y)
+
+    assert origin.nearest([pose4, pose2, pose3]).x == pytest.approx(pose2.x)
+    assert origin.nearest([pose4, pose2, pose3]).y == pytest.approx(pose2.y)
 
     # Rotation component sort (when distance is the same)
     # Use the same translation because using different angles at the same
@@ -131,46 +126,21 @@ def test_nearest():
     pose_d = Pose2d(translation, Rotation2d.fromDegrees(90))
     pose_e = Pose2d(translation, Rotation2d.fromDegrees(-180))
 
-    assert (
-        Pose2d(x=0, y=0, rotation=Rotation2d.fromDegrees(360))
-        .nearest([pose_a, pose_b, pose_d])
-        .rotation()
-        .degrees()
-        
-        == pytest.approx(pose_a.rotation().degrees())
-    )
-    assert (
-        Pose2d(x=0, y=0, rotation=Rotation2d.fromDegrees(-335))
-        .nearest([pose_b, pose_c, pose_d])
-        .rotation()
-        .degrees()
-        
-        == pytest.approx(pose_b.rotation().degrees())
-    )
-    assert (
-        Pose2d(x=0, y=0, rotation=Rotation2d.fromDegrees(-120))
-        .nearest([pose_b, pose_c, pose_d])
-        .rotation()
-        .degrees()
-        
-        == pytest.approx(pose_c.rotation().degrees())
-    )
-    assert (
-        Pose2d(x=0, y=0, rotation=Rotation2d.fromDegrees(85))
-        .nearest([pose_a, pose_c, pose_d])
-        .rotation()
-        .degrees()
-        
-        == pytest.approx(pose_d.rotation().degrees())
-    )
-    assert (
-        Pose2d(x=0, y=0, rotation=Rotation2d.fromDegrees(170))
-        .nearest([pose_a, pose_d, pose_e])
-        .rotation()
-        .degrees()
-        
-        == pytest.approx(pose_e.rotation().degrees())
-    )
+    assert Pose2d(x=0, y=0, rotation=Rotation2d.fromDegrees(360)).nearest(
+        [pose_a, pose_b, pose_d]
+    ).rotation().degrees() == pytest.approx(pose_a.rotation().degrees())
+    assert Pose2d(x=0, y=0, rotation=Rotation2d.fromDegrees(-335)).nearest(
+        [pose_b, pose_c, pose_d]
+    ).rotation().degrees() == pytest.approx(pose_b.rotation().degrees())
+    assert Pose2d(x=0, y=0, rotation=Rotation2d.fromDegrees(-120)).nearest(
+        [pose_b, pose_c, pose_d]
+    ).rotation().degrees() == pytest.approx(pose_c.rotation().degrees())
+    assert Pose2d(x=0, y=0, rotation=Rotation2d.fromDegrees(85)).nearest(
+        [pose_a, pose_c, pose_d]
+    ).rotation().degrees() == pytest.approx(pose_d.rotation().degrees())
+    assert Pose2d(x=0, y=0, rotation=Rotation2d.fromDegrees(170)).nearest(
+        [pose_a, pose_d, pose_e]
+    ).rotation().degrees() == pytest.approx(pose_e.rotation().degrees())
 
 
 def test_to_matrix():

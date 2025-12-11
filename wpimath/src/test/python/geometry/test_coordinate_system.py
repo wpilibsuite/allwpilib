@@ -36,22 +36,24 @@ def check_transform3d_convert(transform_from, transform_to, coord_from, coord_to
     assert transform_to.translation() == CoordinateSystem.convert(
         transform_from.translation(), coord_from, coord_to
     )
-    assert transform_to == CoordinateSystem.convert(transform_from, coord_from, coord_to)
+    assert transform_to == CoordinateSystem.convert(
+        transform_from, coord_from, coord_to
+    )
 
     # "to" to "from"
     assert transform_from.translation() == CoordinateSystem.convert(
         transform_to.translation(), coord_to, coord_from
     )
-    assert transform_from == CoordinateSystem.convert(transform_to, coord_to, coord_from)
+    assert transform_from == CoordinateSystem.convert(
+        transform_to, coord_to, coord_from
+    )
 
 
 def test_pose3d_edn_to_nwu():
     # No rotation from EDN to NWU
     check_pose3d_convert(
         Pose3d(x=1, y=2, z=3, rotation=Rotation3d()),
-        Pose3d(
-            x=3, y=-1, z=-2, rotation=Rotation3d.fromDegrees(-90, 0, -90)
-        ),
+        Pose3d(x=3, y=-1, z=-2, rotation=Rotation3d.fromDegrees(-90, 0, -90)),
         CoordinateSystem.EDN(),
         CoordinateSystem.NWU(),
     )
@@ -59,9 +61,7 @@ def test_pose3d_edn_to_nwu():
     # 45° roll from EDN to NWU
     check_pose3d_convert(
         Pose3d(x=1, y=2, z=3, rotation=Rotation3d.fromDegrees(45, 0, 0)),
-        Pose3d(
-            x=3, y=-1, z=-2, rotation=Rotation3d.fromDegrees(-45, 0, -90)
-        ),
+        Pose3d(x=3, y=-1, z=-2, rotation=Rotation3d.fromDegrees(-45, 0, -90)),
         CoordinateSystem.EDN(),
         CoordinateSystem.NWU(),
     )
@@ -69,9 +69,7 @@ def test_pose3d_edn_to_nwu():
     # 45° pitch from EDN to NWU
     check_pose3d_convert(
         Pose3d(x=1, y=2, z=3, rotation=Rotation3d.fromDegrees(0, 45, 0)),
-        Pose3d(
-            x=3, y=-1, z=-2, rotation=Rotation3d.fromDegrees(-90, 0, -135)
-        ),
+        Pose3d(x=3, y=-1, z=-2, rotation=Rotation3d.fromDegrees(-90, 0, -135)),
         CoordinateSystem.EDN(),
         CoordinateSystem.NWU(),
     )
@@ -79,9 +77,7 @@ def test_pose3d_edn_to_nwu():
     # 45° yaw from EDN to NWU
     check_pose3d_convert(
         Pose3d(x=1, y=2, z=3, rotation=Rotation3d.fromDegrees(0, 0, 45)),
-        Pose3d(
-            x=3, y=-1, z=-2, rotation=Rotation3d.fromDegrees(-90, 45, -90)
-        ),
+        Pose3d(x=3, y=-1, z=-2, rotation=Rotation3d.fromDegrees(-90, 45, -90)),
         CoordinateSystem.EDN(),
         CoordinateSystem.NWU(),
     )
