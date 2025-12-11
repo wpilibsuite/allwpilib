@@ -57,7 +57,7 @@ def checkout_branch(auto_delete_branch: bool, branch_name: str):
         if not auto_delete_branch:
             ans = input(f"Delete local branch {branch_name}?")
             if ans.lower() != "y":
-                raise Execption(
+                raise Exception(
                     f"You must delete your local copy of {branch_name} before the script can finish"
                 )
 
@@ -121,7 +121,8 @@ def allwpilib_to_commandsv2(copybara_file: pathlib.Path, allwpilib_fork):
 
 
 def load_user_config() -> CopybaraConfig:
-    user_config_file = ".copybara.json"
+    script_dir = pathlib.Path(__file__).parent
+    user_config_file = script_dir / ".copybara.json"
     if os.path.exists(user_config_file):
         print(f"Loading user config from '{user_config_file}'")
         with open(user_config_file, "r") as f:
