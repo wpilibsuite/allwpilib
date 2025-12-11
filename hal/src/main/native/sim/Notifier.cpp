@@ -259,6 +259,7 @@ void HAL_SetNotifierAlarm(HAL_NotifierHandle notifierHandle, uint64_t alarmTime,
 
   if (ack) {
     notifier->handlerSignaled.clear();
+    wpi::util::ResetSignalObject(notifierHandle);
   }
 
   if (!absolute) {
@@ -291,6 +292,7 @@ void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle, HAL_Bool ack,
 
   if (ack) {
     notifier->handlerSignaled.clear();
+    wpi::util::ResetSignalObject(notifierHandle);
   }
 
   thr->m_alarmQueue.remove({notifierHandle, notifier});
@@ -305,6 +307,7 @@ void HAL_AcknowledgeNotifierAlarm(HAL_NotifierHandle notifierHandle,
     return;
   }
   notifier->handlerSignaled.clear();
+  wpi::util::ResetSignalObject(notifierHandle);
 }
 
 int32_t HAL_GetNotifierOverrun(HAL_NotifierHandle notifierHandle,
