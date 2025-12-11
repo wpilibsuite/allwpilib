@@ -74,40 +74,31 @@ public class NotifierJNI extends JNIWrapper {
    * @param alarmTime the first alarm time (in microseconds)
    * @param intervalTime the periodic interval time (in microseconds)
    * @param absolute true if the alarm time is absolute
+   * @param ack true to acknowledge any prior alarm
    * @see "HAL_SetNotifierAlarm"
    */
   public static native void setNotifierAlarm(
-      int notifierHandle, long alarmTime, long intervalTime, boolean absolute);
+      int notifierHandle, long alarmTime, long intervalTime, boolean absolute, boolean ack);
 
   /**
    * Cancels all future notifier alarms for a notifier.
    *
    * @param notifierHandle the notifier handle
+   * @param ack true to acknowledge any prior alarm
    * @see "HAL_CancelNotifierAlarm"
    */
-  public static native void cancelNotifierAlarm(int notifierHandle);
+  public static native void cancelNotifierAlarm(int notifierHandle, boolean ack);
 
   /**
-   * Indicates the notifier alarm has been serviced and optionally sets a new alarm time. This must
-   * be called before waiting for the next alarm.
+   * Indicates the notifier alarm has been serviced. Makes no change to future alarms.
    *
-   * <p>The alarmTime is an absolute time (using the WPI now() time base) if absolute is true, or
-   * relative to the current time if absolute is false.
-   *
-   * <p>If intervalTime is non-zero, the notifier will alarm periodically following alarmTime at the
-   * given interval.
-   *
-   * <p>If an absolute alarmTime is in the past, the notifier will alarm immediately.
+   * <p>One of setNotifierAlarm (with ack=true), cancelNotifierAlarm (with ack=true), or this
+   * function must be called before waiting for the next alarm.
    *
    * @param notifierHandle the notifier handle
-   * @param setAlarm true to set a new alarm time, false to leave the alarm unchanged
-   * @param alarmTime the first alarm time (in microseconds)
-   * @param intervalTime the periodic interval time (in microseconds)
-   * @param absolute true if the alarm time is absolute
    * @see "HAL_AcknowledgeNotifierAlarm"
    */
-  public static native void acknowledgeNotifierAlarm(
-      int notifierHandle, boolean setAlarm, long alarmTime, long intervalTime, boolean absolute);
+  public static native void acknowledgeNotifierAlarm(int notifierHandle);
 
   /**
    * Gets the overrun count for a notifier.

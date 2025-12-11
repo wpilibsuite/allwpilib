@@ -130,8 +130,6 @@ public class TimedRobot extends IterativeRobotBase {
     System.out.println("********** Robot program startup complete **********");
     DriverStationJNI.observeUserProgramStarting();
 
-    boolean first = true;
-
     // Loop forever, calling the appropriate mode-dependent function
     while (true) {
       // We don't have to check there's an element in the queue first because
@@ -139,12 +137,7 @@ public class TimedRobot extends IterativeRobotBase {
       // at the end of the loop.
       var callback = m_callbacks.poll();
 
-      if (first) {
-        first = false;
-        NotifierJNI.setNotifierAlarm(m_notifier, callback.expirationTime, 0, true);
-      } else {
-        NotifierJNI.acknowledgeNotifierAlarm(m_notifier, true, callback.expirationTime, 0, true);
-      }
+      NotifierJNI.setNotifierAlarm(m_notifier, callback.expirationTime, 0, true, true);
 
       try {
         WPIUtilJNI.waitForObject(m_notifier);

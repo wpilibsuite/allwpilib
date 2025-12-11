@@ -68,7 +68,7 @@ PyNotifier::PyNotifier(std::function<void()> handler) {
         }
 
         // Ack notifier
-        HAL_AcknowledgeNotifierAlarm(notifier, false, 0, 0, false, &status);
+        HAL_AcknowledgeNotifierAlarm(notifier, &status);
         WPILIB_CheckErrorStatus(status, "AcknowledgeNotifier");
       }
     } catch (...) {
@@ -117,6 +117,7 @@ PyNotifier& PyNotifier::operator=(PyNotifier&& rhs) {
 void PyNotifier::SetName(std::string_view name) {
   int32_t status = 0;
   HAL_SetNotifierName(m_notifier, name, &status);
+  WPILIB_CheckErrorStatus(status, "SetNotifierName");
 }
 
 void PyNotifier::SetCallback(std::function<void()> handler) {
@@ -127,18 +128,21 @@ void PyNotifier::SetCallback(std::function<void()> handler) {
 void PyNotifier::StartSingle(wpi::units::second_t delay) {
   int32_t status = 0;
   HAL_SetNotifierAlarm(m_notifier, static_cast<uint64_t>(delay * 1e6), 0, false,
-                       &status);
+                       false, &status);
+  WPILIB_CheckErrorStatus(status, "SetNotifierAlarm");
 }
 
 void PyNotifier::StartPeriodic(wpi::units::second_t period) {
   int32_t status = 0;
   HAL_SetNotifierAlarm(m_notifier, static_cast<uint64_t>(period * 1e6),
-                       static_cast<uint64_t>(period * 1e6), false, &status);
+                       static_cast<uint64_t>(period * 1e6), false, false,
+                       &status);
+  WPILIB_CheckErrorStatus(status, "SetNotifierAlarm");
 }
 
 void PyNotifier::Stop() {
   int32_t status = 0;
-  HAL_CancelNotifierAlarm(m_notifier, &status);
+  HAL_CancelNotifierAlarm(m_notifier, false, &status);
   WPILIB_CheckErrorStatus(status, "CancelNotifierAlarm");
 }
 

@@ -75,18 +75,12 @@ void Watchdog::Impl::UpdateAlarm(bool acknowledge) {
     return;
   }
   if (m_watchdogs.empty()) {
-    HAL_CancelNotifierAlarm(notifier, &status);
-  } else if (acknowledge) {
-    HAL_AcknowledgeNotifierAlarm(
-        notifier, true,
-        static_cast<uint64_t>(m_watchdogs.top()->m_expirationTime.value() *
-                              1e6),
-        0, true, &status);
+    HAL_CancelNotifierAlarm(notifier, acknowledge, &status);
   } else {
     HAL_SetNotifierAlarm(notifier,
                          static_cast<uint64_t>(
                              m_watchdogs.top()->m_expirationTime.value() * 1e6),
-                         0, true, &status);
+                         0, true, acknowledge, &status);
   }
   WPILIB_CheckErrorStatus(status, "updating watchdog notifier alarm");
 }
