@@ -34,7 +34,10 @@ class OpModeRobot(OpModeRobotBase):
         """
         Adds an operating mode option. It's necessary to call PublishOpModes() to
         make the added modes visible to the driver station.
-        
+
+        The textColor and backgroundColor parameters are optional, but setting
+        only one has no effect (if only one is provided, it will be ignored).
+
         :param opmodeCls: opmode class; must be a public, non-abstract subclass of OpMode
                           with a constructor that either takes no arguments or accepts a
                           single argument of this class's type (the latter is preferred).
