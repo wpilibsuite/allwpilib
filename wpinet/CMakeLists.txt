@@ -128,6 +128,21 @@ target_compile_features(wpinet PUBLIC cxx_std_20)
 wpilib_target_warnings(wpinet)
 target_link_libraries(wpinet PUBLIC wpiutil)
 
+if(USE_LINKED_AVAHI)
+    find_library(AVAHI_COMMON REQUIRED NAMES avahi-common)
+    if (AVAHI_COMMON)
+        message(STATUS "Found avahi common: ${AVAHI_COMMON}")
+    endif()
+
+    find_library(AVAHI_CLIENT REQUIRED NAMES avahi-client)
+    if (AVAHI_CLIENT)
+        message(STATUS "Found avahi client: ${AVAHI_CLIENT}")
+    endif()
+
+    target_link_libraries(wpinet PUBLIC ${AVAHI_COMMON} ${AVAHI_CLIENT})
+    target_compile_definitions(wpinet PRIVATE DIRECT_LINK_AVAHI)
+endif()
+
 if(NOT USE_SYSTEM_LIBUV)
     target_sources(wpinet PRIVATE ${uv_native_src})
     install(
