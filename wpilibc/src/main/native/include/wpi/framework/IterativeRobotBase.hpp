@@ -226,9 +226,7 @@ class IterativeRobotBase : public RobotBase {
   void LoopFunc();
 
  private:
-  enum class Mode { kNone, kDisabled, kAutonomous, kTeleop, kTest };
-
-  Mode m_lastMode = Mode::kNone;
+  int m_lastMode = -1;
   wpi::units::second_t m_period;
   Watchdog m_watchdog;
   bool m_ntFlushEnabled = true;

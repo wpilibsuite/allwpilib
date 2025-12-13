@@ -1,6 +1,5 @@
 extra_includes:
 - wpi/driverstation/DriverStation.hpp
-- rpy/ControlWord.h
 
 functions:
   # TODO
@@ -36,6 +35,8 @@ classes:
       IsReal:
       IsSimulation:
       RobotBase:
+      GetOpModeId:
+      GetOpMode:
     inline_code: |
       .def_static("main",
         [](py::object robot_cls) -> py::object {
@@ -43,20 +44,7 @@ classes:
           auto starter = start.attr("RobotStarter")();
           return starter.attr("run")(robot_cls);
         },
-        py::arg("robot_cls"), py::doc("Starting point for the application"))
-      .def(
-        "getControlState",
-        [](RobotBase *self) -> std::tuple<bool, bool, bool> {
-          py::gil_scoped_release release;
-          return rpy::GetControlState();
-        },
-        py::doc("More efficient way to determine what state the robot is in.\n"
-                "\n"
-                ":returns: booleans representing enabled, isautonomous, istest\n"
-                "\n"
-                ".. versionadded:: 2019.2.1\n"
-                "\n"
-                ".. note:: This function only exists in RobotPy\n"));
+        py::arg("robot_cls"), py::doc("Starting point for the application"));
 
       auto logger = py::module::import("logging").attr("getLogger")("robot");
       cls_RobotBase.attr("logger") = logger;

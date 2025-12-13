@@ -5,6 +5,7 @@
 #pragma once
 
 #include <chrono>
+#include <string>
 #include <thread>
 
 #include "wpi/hal/DriverStation.h"
@@ -148,14 +149,14 @@ class RobotBase {
    *
    * @return True if the Robot is currently enabled by the Driver Station.
    */
-  bool IsEnabled() const;
+  static bool IsEnabled();
 
   /**
    * Determine if the Robot is currently disabled.
    *
    * @return True if the Robot is currently disabled by the Driver Station.
    */
-  bool IsDisabled() const;
+  static bool IsDisabled();
 
   /**
    * Determine if the robot is currently in Autonomous mode.
@@ -163,7 +164,7 @@ class RobotBase {
    * @return True if the robot is currently operating Autonomously as determined
    *         by the Driver Station.
    */
-  bool IsAutonomous() const;
+  static bool IsAutonomous();
 
   /**
    * Determine if the robot is currently in Autonomous mode and enabled.
@@ -171,7 +172,7 @@ class RobotBase {
    * @return True if the robot us currently operating Autonomously while enabled
    * as determined by the Driver Station.
    */
-  bool IsAutonomousEnabled() const;
+  static bool IsAutonomousEnabled();
 
   /**
    * Determine if the robot is currently in Operator Control mode.
@@ -179,7 +180,7 @@ class RobotBase {
    * @return True if the robot is currently operating in Tele-Op mode as
    *         determined by the Driver Station.
    */
-  bool IsTeleop() const;
+  static bool IsTeleop();
 
   /**
    * Determine if the robot is current in Operator Control mode and enabled.
@@ -187,7 +188,7 @@ class RobotBase {
    * @return True if the robot is currently operating in Tele-Op mode while
    * enabled as determined by the Driver Station.
    */
-  bool IsTeleopEnabled() const;
+  static bool IsTeleopEnabled();
 
   /**
    * Determine if the robot is currently in Test mode.
@@ -195,7 +196,7 @@ class RobotBase {
    * @return True if the robot is currently running in Test mode as determined
    * by the Driver Station.
    */
-  bool IsTest() const;
+  static bool IsTest();
 
   /**
    * Determine if the robot is current in Test mode and enabled.
@@ -203,7 +204,26 @@ class RobotBase {
    * @return True if the robot is currently operating in Test mode while
    * enabled as determined by the Driver Station.
    */
-  bool IsTestEnabled() const;
+  static bool IsTestEnabled();
+
+  /**
+   * Gets the currently selected operating mode of the driver station. Note this
+   * does not mean the robot is enabled; use IsEnabled() for that.
+   *
+   * @return the unique ID provided by the DriverStation::AddOpMode() function;
+   * may return 0 or a unique ID not added, so callers should be prepared to
+   * handle that case
+   */
+  static int64_t GetOpModeId();
+
+  /**
+   * Gets the currently selected operating mode of the driver station. Note this
+   * does not mean the robot is enabled; use IsEnabled() for that.
+   *
+   * @return Operating mode string; may return a string not in the list of
+   * options, so callers should be prepared to handle that case
+   */
+  static std::string GetOpMode();
 
   /**
    * Returns the main thread ID.

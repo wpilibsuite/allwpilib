@@ -5,12 +5,11 @@
 #include "wpi/halsim/ds_socket/DSCommPacket.hpp"
 
 #include <algorithm>
-#include <chrono>
 #include <cstring>
 #include <span>
-#include <thread>
-#include <vector>
 
+#include "wpi/hal/DashboardOpMode.hpp"
+#include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/hal/simulation/MockHooks.h"
 
@@ -54,13 +53,18 @@ DSCommPacket::DSCommPacket() {
 **--------------------------------------------------------------------------*/
 
 void DSCommPacket::SetControl(uint8_t control, uint8_t request) {
-  std::memset(&m_control_word, 0, sizeof(m_control_word));
-  m_control_word.enabled = (control & kEnabled) != 0;
-  m_control_word.autonomous = (control & kAutonomous) != 0;
-  m_control_word.test = (control & kTest) != 0;
-  m_control_word.eStop = (control & kEmergencyStop) != 0;
-  m_control_word.fmsAttached = (control & kFMS_Attached) != 0;
-  m_control_word.dsAttached = (request & kRequestNormalMask) != 0;
+  HAL_RobotMode robotMode;
+  if ((control & kAutonomous) != 0) {
+    robotMode = HAL_ROBOTMODE_AUTONOMOUS;
+  } else if ((control & kTest) != 0) {
+    robotMode = HAL_ROBOTMODE_TEST;
+  } else {
+    robotMode = HAL_ROBOTMODE_TELEOPERATED;
+  }
+  m_control_word = HAL_MakeControlWord(
+      wpi::hal::GetDashboardSelectedOpMode(robotMode), robotMode,
+      (control & kEnabled) != 0, (control & kEmergencyStop) != 0,
+      (control & kFMS_Attached) != 0, (request & kRequestNormalMask) != 0);
 
   m_control_sent = control;
 }
@@ -305,17 +309,19 @@ void DSCommPacket::SetupSendHeader(wpi::net::raw_uv_ostream& buf) {
 void DSCommPacket::SendUDPToHALSim(void) {
   SendJoysticks();
 
-  if (!m_control_word.enabled) {
+  if (!HAL_ControlWord_IsEnabled(m_control_word)) {
     m_match_time = -1;
   }
 
   HALSIM_SetDriverStationMatchTime(m_match_time);
-  HALSIM_SetDriverStationEnabled(m_control_word.enabled);
-  HALSIM_SetDriverStationAutonomous(m_control_word.autonomous);
-  HALSIM_SetDriverStationTest(m_control_word.test);
-  HALSIM_SetDriverStationEStop(m_control_word.eStop);
-  HALSIM_SetDriverStationFmsAttached(m_control_word.fmsAttached);
-  HALSIM_SetDriverStationDsAttached(m_control_word.dsAttached);
+  HALSIM_SetDriverStationEnabled(HAL_ControlWord_IsEnabled(m_control_word));
+  HALSIM_SetDriverStationRobotMode(
+      HAL_ControlWord_GetRobotMode(m_control_word));
+  HALSIM_SetDriverStationEStop(HAL_ControlWord_IsEStopped(m_control_word));
+  HALSIM_SetDriverStationFmsAttached(
+      HAL_ControlWord_IsFMSAttached(m_control_word));
+  HALSIM_SetDriverStationDsAttached(
+      HAL_ControlWord_IsDSAttached(m_control_word));
   HALSIM_SetDriverStationAllianceStationId(m_alliance_station);
 
   HALSIM_NotifyDriverStationNewData();
