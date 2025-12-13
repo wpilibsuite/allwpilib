@@ -3,12 +3,12 @@ import javax.inject.Inject;
 
 import org.gradle.api.Project;
 
-import edu.wpi.first.deployutils.deploy.CommandDeployResult;
-import edu.wpi.first.deployutils.deploy.artifact.MavenArtifact;
-import edu.wpi.first.deployutils.deploy.context.DeployContext;
-import edu.wpi.first.deployutils.deploy.target.RemoteTarget;
-import edu.wpi.first.deployutils.PredicateWrapper;
-import edu.wpi.first.deployutils.ActionWrapper;
+import org.wpilib.deployutils.deploy.CommandDeployResult;
+import org.wpilib.deployutils.deploy.artifact.MavenArtifact;
+import org.wpilib.deployutils.deploy.context.DeployContext;
+import org.wpilib.deployutils.deploy.target.RemoteTarget;
+import org.wpilib.deployutils.PredicateWrapper;
+import org.wpilib.deployutils.ActionWrapper;
 
 @CompileStatic
 public class WPIJREArtifact extends MavenArtifact {

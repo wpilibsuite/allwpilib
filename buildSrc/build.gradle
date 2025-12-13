@@ -9,5 +9,5 @@ repositories {
     }
 }
 dependencies {
-    implementation "edu.wpi.first:native-utils:2026.0.0"
+    implementation "org.wpilib:native-utils:2027.1.0"
 }

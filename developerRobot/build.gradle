@@ -1,6 +1,6 @@
-import edu.wpi.first.deployutils.deploy.target.RemoteTarget
-import edu.wpi.first.deployutils.deploy.target.location.SshDeployLocation
-import edu.wpi.first.deployutils.deploy.artifact.*
+import org.wpilib.deployutils.deploy.target.RemoteTarget
+import org.wpilib.deployutils.deploy.target.location.SshDeployLocation
+import org.wpilib.deployutils.deploy.artifact.*
 import org.gradle.internal.os.OperatingSystem
 
 plugins {
@@ -10,8 +10,8 @@ plugins {
     id 'visual-studio'
 }
 
-apply plugin: 'edu.wpi.first.NativeUtils'
-apply plugin: 'edu.wpi.first.DeployUtils'
+apply plugin: 'org.wpilib.NativeUtils'
+apply plugin: 'org.wpilib.DeployUtils'
 
 apply from: "${rootDir}/shared/config.gradle"
 

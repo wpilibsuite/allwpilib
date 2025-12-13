@@ -1,6 +1,6 @@
-import edu.wpi.first.deployutils.deploy.target.RemoteTarget
-import edu.wpi.first.deployutils.deploy.target.location.SshDeployLocation
-import edu.wpi.first.deployutils.deploy.artifact.*
+import org.wpilib.deployutils.deploy.target.RemoteTarget
+import org.wpilib.deployutils.deploy.target.location.SshDeployLocation
+import org.wpilib.deployutils.deploy.artifact.*
 import org.gradle.internal.os.OperatingSystem
 
 plugins {
@@ -10,8 +10,8 @@ plugins {
     id 'visual-studio'
 }
 
-apply plugin: 'edu.wpi.first.NativeUtils'
-apply plugin: 'edu.wpi.first.DeployUtils'
+apply plugin: 'org.wpilib.NativeUtils'
+apply plugin: 'org.wpilib.DeployUtils'
 
 apply from: "${rootDir}/shared/config.gradle"
 
@@ -206,10 +206,10 @@ model {
                 }
             }
             binaries.all { binary ->
-                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
                     if (binary.buildType.name == 'debug') {
-                        deploy.targets.roborio.artifacts.benchmarkCpp.binary = binary
-                        deploy.targets.roborio.artifacts.benchmarkCppJava.binary = binary
+                        deploy.targets.systemcore.artifacts.benchmarkCpp.binary = binary
+                        deploy.targets.systemcore.artifacts.benchmarkCppJava.binary = binary
                     }
                 }
                 lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
@@ -228,9 +228,6 @@ model {
                 lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
-                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                    nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
-                }
                 if (binary.targetPlatform.operatingSystem.isWindows()) {
                     // Shlwapi.lib is needed for SHGetValueA() inside thirdparty benchmark
                     binary.linker.args << "Shlwapi.lib"
@@ -265,9 +262,9 @@ model {
                 }
             }
             binaries.all { binary ->
-                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
                     if (binary.buildType.name == 'debug') {
-                        deploy.targets.roborio.artifacts.benchmarkCppStatic.binary = binary
+                        deploy.targets.systemcore.artifacts.benchmarkCppStatic.binary = binary
                     }
                 }
                 lib project: ':apriltag', library: 'apriltag', linkage: 'static'
@@ -280,9 +277,6 @@ model {
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
-                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                    nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
-                }
                 if (binary.targetPlatform.operatingSystem.isWindows()) {
                     // Shlwapi.lib is needed for SHGetValueA() inside thirdparty benchmark
                     binary.linker.args << "Shlwapi.lib"
@@ -327,14 +321,14 @@ model {
         }
         installAthena(Task) {
             $.binaries.each {
-                if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio && it.component.name == 'benchmarkCpp') {
+                if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore && it.component.name == 'benchmarkCpp') {
                     dependsOn it.tasks.install
                 }
             }
         }
         installAthenaStatic(Task) {
             $.binaries.each {
-                if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio && it.component.name == 'benchmarkCppStatic') {
+                if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore && it.component.name == 'benchmarkCppStatic') {
                     dependsOn it.tasks.install
                 }
             }
