@@ -139,24 +139,70 @@ class WPILIB_DLLEXPORT PoseEstimator {
    *
    * @param translation The pose to translation to.
    */
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif  // defined(__GNUC__) && !defined(__clang__)
   void ResetTranslation(const Translation2d& translation) {
     m_odometry.ResetTranslation(translation);
+
+    const std::optional<std::pair<units::second_t, VisionUpdate>>
+        latestVisionUpdate =
+            m_visionUpdates.empty() ? std::nullopt
+                                    : std::optional{*m_visionUpdates.crbegin()};
     m_odometryPoseBuffer.Clear();
     m_visionUpdates.clear();
-    m_poseEstimate = m_odometry.GetPose();
+
+    if (latestVisionUpdate) {
+      // apply vision compensation to the pose rotation
+      const VisionUpdate visionUpdate{
+          Pose2d{translation, latestVisionUpdate->second.visionPose.Rotation()},
+          Pose2d{translation,
+                 latestVisionUpdate->second.odometryPose.Rotation()}};
+      m_visionUpdates[latestVisionUpdate->first] = visionUpdate;
+      m_poseEstimate = visionUpdate.Compensate(m_odometry.GetPose());
+    } else {
+      m_poseEstimate = m_odometry.GetPose();
+    }
   }
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif  // defined(__GNUC__) && !defined(__clang__)
 
   /**
    * Resets the robot's rotation.
    *
    * @param rotation The rotation to reset to.
    */
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif  // defined(__GNUC__) && !defined(__clang__)
   void ResetRotation(const Rotation2d& rotation) {
     m_odometry.ResetRotation(rotation);
+
+    const std::optional<std::pair<units::second_t, VisionUpdate>>
+        latestVisionUpdate =
+            m_visionUpdates.empty() ? std::nullopt
+                                    : std::optional{*m_visionUpdates.crbegin()};
     m_odometryPoseBuffer.Clear();
     m_visionUpdates.clear();
-    m_poseEstimate = m_odometry.GetPose();
+
+    if (latestVisionUpdate) {
+      // apply vision compensation to the pose translation
+      const VisionUpdate visionUpdate{
+          Pose2d{latestVisionUpdate->second.visionPose.Translation(), rotation},
+          Pose2d{latestVisionUpdate->second.odometryPose.Translation(),
+                 rotation}};
+      m_visionUpdates[latestVisionUpdate->first] = visionUpdate;
+      m_poseEstimate = visionUpdate.Compensate(m_odometry.GetPose());
+    } else {
+      m_poseEstimate = m_odometry.GetPose();
+    }
   }
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif  // defined(__GNUC__) && !defined(__clang__)
 
   /**
    * Gets the estimated robot pose.
@@ -436,7 +482,9 @@ class WPILIB_DLLEXPORT PoseEstimator {
   TimeInterpolatableBuffer<Pose2d> m_odometryPoseBuffer{kBufferDuration};
   // Maps timestamps to vision updates
   // Always contains one entry before the oldest entry in m_odometryPoseBuffer,
-  // unless there have been no vision measurements after the last reset
+  // unless there have been no vision measurements after the last reset. May
+  // contain one entry while m_odometryPoseBuffer is empty to correct for
+  // translation/rotation after a call to ResetRotation/ResetTranslation.
   std::map<units::second_t, VisionUpdate> m_visionUpdates;
 
   Pose2d m_poseEstimate;

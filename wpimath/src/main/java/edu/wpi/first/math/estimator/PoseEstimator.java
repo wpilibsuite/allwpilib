@@ -49,7 +49,9 @@ public class PoseEstimator<T> {
       TimeInterpolatableBuffer.createBuffer(kBufferDuration);
   // Maps timestamps to vision updates
   // Always contains one entry before the oldest entry in m_odometryPoseBuffer, unless there have
-  // been no vision measurements after the last reset
+  // been no vision measurements after the last reset. May contain one entry while
+  // m_odometryPoseBuffer is empty to correct for translation/rotation after a call to
+  // ResetRotation/ResetTranslation.
   private final NavigableMap<Double, VisionUpdate> m_visionUpdates = new TreeMap<>();
 
   private Pose2d m_poseEstimate;
@@ -147,9 +149,22 @@ public class PoseEstimator<T> {
    */
   public void resetTranslation(Translation2d translation) {
     m_odometry.resetTranslation(translation);
+
+    final var latestVisionUpdate = m_visionUpdates.lastEntry();
     m_odometryPoseBuffer.clear();
     m_visionUpdates.clear();
-    m_poseEstimate = m_odometry.getPoseMeters();
+
+    if (latestVisionUpdate != null) {
+      // apply vision compensation to the pose rotation
+      final var visionUpdate =
+          new VisionUpdate(
+              new Pose2d(translation, latestVisionUpdate.getValue().visionPose.getRotation()),
+              new Pose2d(translation, latestVisionUpdate.getValue().odometryPose.getRotation()));
+      m_visionUpdates.put(latestVisionUpdate.getKey(), visionUpdate);
+      m_poseEstimate = visionUpdate.compensate(m_odometry.getPoseMeters());
+    } else {
+      m_poseEstimate = m_odometry.getPoseMeters();
+    }
   }
 
   /**
@@ -159,9 +174,22 @@ public class PoseEstimator<T> {
    */
   public void resetRotation(Rotation2d rotation) {
     m_odometry.resetRotation(rotation);
+
+    final var latestVisionUpdate = m_visionUpdates.lastEntry();
     m_odometryPoseBuffer.clear();
     m_visionUpdates.clear();
-    m_poseEstimate = m_odometry.getPoseMeters();
+
+    if (latestVisionUpdate != null) {
+      // apply vision compensation to the pose translation
+      final var visionUpdate =
+          new VisionUpdate(
+              new Pose2d(latestVisionUpdate.getValue().visionPose.getTranslation(), rotation),
+              new Pose2d(latestVisionUpdate.getValue().odometryPose.getTranslation(), rotation));
+      m_visionUpdates.put(latestVisionUpdate.getKey(), visionUpdate);
+      m_poseEstimate = visionUpdate.compensate(m_odometry.getPoseMeters());
+    } else {
+      m_poseEstimate = m_odometry.getPoseMeters();
+    }
   }
 
   /**
