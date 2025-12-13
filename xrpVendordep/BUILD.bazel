@@ -71,7 +71,7 @@ wpilib_java_library(
 )
 
 cc_test(
-    name = "cpp-test",
+    name = "gtest-test",
     size = "small",
     srcs = glob(["src/test/native/cpp/**"]),
     deps = [

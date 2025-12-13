@@ -217,7 +217,7 @@ cc_binary(
 )
 
 cc_test(
-    name = "cpp-test",
+    name = "gtest-test",
     size = "medium",
     srcs = glob(["src/test/native/**"]),
     copts = copts,
@@ -241,7 +241,7 @@ cc_test(
 
 test_suite(
     name = "test",
-    tests = ["cpp-test"],
+    tests = ["gtest-test"],
 )
 
 package_binary_cc_project(

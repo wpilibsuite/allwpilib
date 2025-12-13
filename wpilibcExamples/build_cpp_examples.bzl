@@ -100,7 +100,7 @@ def build_tests():
         example_src_folder = "src/main/cpp/examples/" + folder
         example_test_folder = "src/test/cpp/examples/" + folder
         cc_test(
-            name = folder + "-cpp-test",
+            name = folder + "-gtest-test",
             size = "small",
             srcs = native.glob([example_test_folder + "/**/*.cpp", example_src_folder + "/cpp/**/*.cpp", example_src_folder + "/c/**/*.c"], allow_empty = True),
             deps = [
@@ -113,5 +113,5 @@ def build_tests():
         )
         test_suite(
             name = folder + "-test",
-            tests = [folder + "-cpp-test"],
+            tests = [folder + "-gtest-test"],
         )

@@ -293,7 +293,7 @@ CATCH2_SRCS = [
 ]
 
 cc_test(
-    name = "gtest-cpp-test",
+    name = "gtest-test",
     size = "small",
     srcs = glob(
         [
@@ -314,7 +314,7 @@ cc_test(
 )
 
 cc_test(
-    name = "catch2-cpp-test",
+    name = "catch2-test",
     size = "small",
     srcs = CATCH2_SRCS,
     linkstatic = True,
