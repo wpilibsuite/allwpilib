@@ -11,6 +11,7 @@
 
 #include <gtest/gtest.h>
 
+#include "wpi/hal/DriverStationTypes.h"
 #include "wpi/simulation/DriverStationSim.hpp"
 #include "wpi/simulation/SimHooks.hpp"
 
@@ -161,8 +162,7 @@ TEST_F(TimedRobotTest, AutonomousMode) {
   wpi::sim::WaitForProgramStart();
 
   wpi::sim::DriverStationSim::SetEnabled(true);
-  wpi::sim::DriverStationSim::SetAutonomous(true);
-  wpi::sim::DriverStationSim::SetTest(false);
+  wpi::sim::DriverStationSim::SetRobotMode(HAL_ROBOTMODE_AUTONOMOUS);
   wpi::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_EQ(1u, robot.m_simulationInitCount);
@@ -234,8 +234,7 @@ TEST_F(TimedRobotTest, TeleopMode) {
   wpi::sim::WaitForProgramStart();
 
   wpi::sim::DriverStationSim::SetEnabled(true);
-  wpi::sim::DriverStationSim::SetAutonomous(false);
-  wpi::sim::DriverStationSim::SetTest(false);
+  wpi::sim::DriverStationSim::SetRobotMode(HAL_ROBOTMODE_TELEOPERATED);
   wpi::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_EQ(1u, robot.m_simulationInitCount);
@@ -306,8 +305,7 @@ TEST_F(TimedRobotTest, TestMode) {
   wpi::sim::WaitForProgramStart();
 
   wpi::sim::DriverStationSim::SetEnabled(true);
-  wpi::sim::DriverStationSim::SetAutonomous(false);
-  wpi::sim::DriverStationSim::SetTest(true);
+  wpi::sim::DriverStationSim::SetRobotMode(HAL_ROBOTMODE_TEST);
   wpi::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_EQ(1u, robot.m_simulationInitCount);
@@ -369,8 +367,6 @@ TEST_F(TimedRobotTest, TestMode) {
   EXPECT_EQ(0u, robot.m_testExitCount);
 
   wpi::sim::DriverStationSim::SetEnabled(false);
-  wpi::sim::DriverStationSim::SetAutonomous(false);
-  wpi::sim::DriverStationSim::SetTest(false);
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(20_ms);  // Wait for Notifiers
 
@@ -404,8 +400,6 @@ TEST_F(TimedRobotTest, ModeChange) {
 
   // Start in disabled
   wpi::sim::DriverStationSim::SetEnabled(false);
-  wpi::sim::DriverStationSim::SetAutonomous(false);
-  wpi::sim::DriverStationSim::SetTest(false);
   wpi::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_EQ(0u, robot.m_disabledInitCount);
@@ -432,8 +426,7 @@ TEST_F(TimedRobotTest, ModeChange) {
 
   // Transition to autonomous
   wpi::sim::DriverStationSim::SetEnabled(true);
-  wpi::sim::DriverStationSim::SetAutonomous(true);
-  wpi::sim::DriverStationSim::SetTest(false);
+  wpi::sim::DriverStationSim::SetRobotMode(HAL_ROBOTMODE_AUTONOMOUS);
   wpi::sim::DriverStationSim::NotifyNewData();
 
   wpi::sim::StepTiming(kPeriod);
@@ -450,8 +443,7 @@ TEST_F(TimedRobotTest, ModeChange) {
 
   // Transition to teleop
   wpi::sim::DriverStationSim::SetEnabled(true);
-  wpi::sim::DriverStationSim::SetAutonomous(false);
-  wpi::sim::DriverStationSim::SetTest(false);
+  wpi::sim::DriverStationSim::SetRobotMode(HAL_ROBOTMODE_TELEOPERATED);
   wpi::sim::DriverStationSim::NotifyNewData();
 
   wpi::sim::StepTiming(kPeriod);
@@ -468,8 +460,7 @@ TEST_F(TimedRobotTest, ModeChange) {
 
   // Transition to test
   wpi::sim::DriverStationSim::SetEnabled(true);
-  wpi::sim::DriverStationSim::SetAutonomous(false);
-  wpi::sim::DriverStationSim::SetTest(true);
+  wpi::sim::DriverStationSim::SetRobotMode(HAL_ROBOTMODE_TEST);
   wpi::sim::DriverStationSim::NotifyNewData();
 
   wpi::sim::StepTiming(kPeriod);
@@ -486,8 +477,6 @@ TEST_F(TimedRobotTest, ModeChange) {
 
   // Transition to disabled
   wpi::sim::DriverStationSim::SetEnabled(false);
-  wpi::sim::DriverStationSim::SetAutonomous(false);
-  wpi::sim::DriverStationSim::SetTest(false);
   wpi::sim::DriverStationSim::NotifyNewData();
 
   wpi::sim::StepTiming(kPeriod);

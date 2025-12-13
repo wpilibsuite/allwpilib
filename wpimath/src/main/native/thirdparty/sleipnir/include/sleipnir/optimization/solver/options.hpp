@@ -9,9 +9,7 @@
 
 namespace slp {
 
-/**
- * Solver options.
- */
+/// Solver options.
 struct SLEIPNIR_DLLEXPORT Options {
   /// The solver will stop once the error is below this tolerance.
   double tolerance = 1e-8;
