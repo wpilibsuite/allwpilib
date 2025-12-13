@@ -177,7 +177,7 @@ wpilib_jni_java_library(
 )
 
 cc_test(
-    name = "ntcore-cpp-test",
+    name = "cpp-test",
     size = "small",
     srcs = glob([
         "src/test/native/**/*.cpp",
@@ -196,7 +196,7 @@ cc_test(
 )
 
 wpilib_java_junit5_test(
-    name = "ntcore-java-test",
+    name = "java-test",
     srcs = glob(["src/test/java/**/*.java"]),
     tags = ["exclusive"],
     deps = [
@@ -274,7 +274,7 @@ define_pybind_library(
 )
 
 robotpy_py_test(
-    "ntcore-python-test",
+    "python-test",
     srcs = glob(["src/test/python/**/*.py"]),
     deps = [
         ":pyntcore",

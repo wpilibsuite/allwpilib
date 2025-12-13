@@ -175,7 +175,7 @@ cc_library(
 )
 
 cc_test(
-    name = "wpilibc-cpp-test",
+    name = "cpp-test",
     size = "small",
     srcs = glob(["src/test/native/cpp/**"]),
     tags = [
@@ -289,7 +289,7 @@ define_pybind_library(
 )
 
 robotpy_py_test(
-    "wpilibc-python-test",
+    "python-test",
     srcs = glob(["src/test/python/**/*.py"]),
     deps = [
         ":robotpy-wpilib",

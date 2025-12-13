@@ -68,7 +68,7 @@ wpilib_java_library(
 )
 
 cc_test(
-    name = "cameraserver-cpp-test",
+    name = "cpp-test",
     size = "small",
     srcs = glob(["src/test/native/**"]),
     deps = [

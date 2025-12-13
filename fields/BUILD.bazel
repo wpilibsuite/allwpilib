@@ -54,7 +54,7 @@ pkg_files(
 )
 
 wpilib_java_junit5_test(
-    name = "fields-java-test",
+    name = "java-test",
     srcs = glob(["src/test/java/**/*.java"]),
     deps = [
         ":fields-java",

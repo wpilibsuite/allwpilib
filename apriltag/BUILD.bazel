@@ -160,7 +160,7 @@ pkg_files(
 )
 
 cc_test(
-    name = "apriltag-cpp-test",
+    name = "cpp-test",
     size = "small",
     srcs = glob(["src/test/native/cpp/**"]),
     tags = [
@@ -173,7 +173,7 @@ cc_test(
 )
 
 wpilib_java_junit5_test(
-    name = "apriltag-java-test",
+    name = "java-test",
     srcs = glob(["src/test/java/**/*.java"]),
     resource_strip_prefix = "apriltag/src/test/resources",
     resources = glob(["src/test/resources/**"]),
@@ -258,7 +258,7 @@ define_pybind_library(
 )
 
 robotpy_py_test(
-    "apriltag-python-test",
+    "python-test",
     srcs = glob(["src/test/python/**/*.py"]),
     data = glob([
         "src/test/python/*.png",

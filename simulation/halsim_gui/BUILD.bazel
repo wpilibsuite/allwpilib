@@ -118,7 +118,7 @@ wpilib_cc_static_library(
 )
 
 cc_test(
-    name = "halsim_gui-cpp-test",
+    name = "cpp-test",
     size = "small",
     srcs = glob(["src/test/native/**/*.cpp"]),
     tags = [

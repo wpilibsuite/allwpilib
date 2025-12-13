@@ -217,7 +217,7 @@ wpilib_jni_java_library(
 )
 
 cc_test(
-    name = "wpinet-cpp-test",
+    name = "cpp-test",
     size = "small",
     srcs = glob([
         "src/test/native/**/*.cpp",
@@ -232,7 +232,7 @@ cc_test(
 )
 
 wpilib_java_junit5_test(
-    name = "wpinet-java-test",
+    name = "java-test",
     srcs = glob(["src/test/java/**/*.java"]),
     deps = [
         ":wpinet-java",
@@ -342,7 +342,7 @@ define_pybind_library(
 )
 
 robotpy_py_test(
-    "wpinet-python-test",
+    "python-test",
     srcs = glob(["src/test/python/**/*.py"]),
     deps = [
         ":robotpy-wpinet",

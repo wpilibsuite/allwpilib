@@ -40,7 +40,7 @@ wpilib_java_library(
 )
 
 wpilib_java_junit5_test(
-    name = "wpiunits-java-test",
+    name = "java-test",
     srcs = glob(["src/test/java/**/*.java"]),
     deps = [
         ":wpiunits-java",

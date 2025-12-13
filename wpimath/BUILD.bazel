@@ -264,7 +264,7 @@ cc_library(
 )
 
 cc_test(
-    name = "wpimath-cpp-test",
+    name = "cpp-test",
     size = "small",
     srcs = glob([
         "src/test/native/cpp/**/*.cpp",
@@ -281,7 +281,7 @@ cc_test(
 )
 
 wpilib_java_junit5_test(
-    name = "wpimath-java-test",
+    name = "java-test",
     srcs = glob(["src/test/java/**/*.java"]),
     deps = [
         ":wpimath-java",
@@ -447,7 +447,7 @@ define_test_pybind_library(
 )
 
 robotpy_py_test(
-    "wpimath-python-test",
+    "python-test",
     srcs = glob(
         ["src/test/python/**/*.py"],
         exclude = ["src/test/python/cpp/**"],
