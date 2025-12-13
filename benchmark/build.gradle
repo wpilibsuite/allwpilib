@@ -67,33 +67,33 @@ tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {
 
 deploy {
     targets {
-        roborio(RemoteTarget) {
-            directory = '/home/lvuser'
+        systemcore(RemoteTarget) {
+            directory = '/home/systemcore'
             maxChannels = 4
             locations {
-                ssh(SshDeployLocation) {
-                    address = "172.22.11.2"
-                    user = 'admin'
-                    password = ''
+                mdns(SshDeployLocation) {
+                    address = "robot.local"
+                    user = 'systemcore'
+                    password = 'systemcore'
+                    ipv6 = false
+                }
+                usb(SshDeployLocation) {
+                    address = "172.26.0.1"
+                    user = 'systemcore'
+                    password = 'systemcore'
                     ipv6 = false
                 }
             }
 
-            def remote = it
+            timeout = 7
 
-            artifacts.registerFactory(WPIJREArtifact) {
-                return objects.newInstance(WPIJREArtifact, it, remote)
-            }
+            def remote = it
 
             artifacts {
                 all {
-                    predeploy << { ctx ->
-                        ctx.execute('. /etc/profile.d/natinst-path.sh; /usr/local/frc/bin/frcKillRobot.sh -t 2> /dev/null')
-                        ctx.execute("sed -i -e 's/\"exec /\"/' /usr/local/frc/bin/frcRunRobot.sh")
-                    }
                     postdeploy << { ctx ->
                         ctx.execute("sync")
-                        ctx.execute("ldconfig")
+                        ctx.execute("sudo ldconfig /home/systemcore/frc/third-party/lib")
                     }
                 }
 
@@ -127,9 +127,6 @@ deploy {
                     excludes.add('**/*.so.*.debug')
                 }
 
-                jre(WPIJREArtifact) {
-                }
-
                 benchmarkJava(JavaArtifact) {
                     jarTask = shadowJar
                     postdeploy << { ctx ->
@@ -157,23 +154,23 @@ eclipse {
 
 tasks.register('deployJava') {
     try {
-        dependsOn tasks.named('deployjreroborio')
-        dependsOn tasks.named('deploybenchmarkJavaroborio')
-        dependsOn tasks.named('deploybenchmarkCppJavaroborio') // Deploying shared C++ is how to get the Java shared libraries.
+        dependsOn tasks.named('deployjresystemcore')
+        dependsOn tasks.named('deploybenchmarkJavasystemcore')
+        dependsOn tasks.named('deploybenchmarkCppJavasystemcore') // Deploying shared C++ is how to get the Java shared libraries.
     } catch (ignored) {
     }
 }
 
 tasks.register('deployShared') {
     try {
-        dependsOn tasks.named('deploybenchmarkCpproborio')
+        dependsOn tasks.named('deploybenchmarkCppsystemcore')
     } catch (ignored) {
     }
 }
 
 tasks.register('deployStatic') {
     try {
-        dependsOn tasks.named('deploybenchmarkCppStaticroborio')
+        dependsOn tasks.named('deploybenchmarkCppStaticsystemcore')
     } catch (ignored) {
     }
 }

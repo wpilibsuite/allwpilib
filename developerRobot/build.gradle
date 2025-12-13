@@ -78,7 +78,7 @@ deploy {
                     ipv6 = false
                 }
                 usb(SshDeployLocation) {
-                    address = "172.28.0.1"
+                    address = "172.26.0.1"
                     user = 'systemcore'
                     password = 'systemcore'
                     ipv6 = false
