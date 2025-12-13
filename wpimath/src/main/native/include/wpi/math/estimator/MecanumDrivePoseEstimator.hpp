@@ -32,8 +32,8 @@ namespace wpi::math {
  * odometry.
  */
 class WPILIB_DLLEXPORT MecanumDrivePoseEstimator
-    : public PoseEstimator<MecanumDriveWheelSpeeds,
-                           MecanumDriveWheelPositions> {
+    : public PoseEstimator<MecanumDriveWheelPositions, MecanumDriveWheelSpeeds,
+                           MecanumDriveWheelAccelerations> {
  public:
   /**
    * Constructs a MecanumDrivePoseEstimator with default standard deviations

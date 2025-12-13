@@ -33,17 +33,16 @@ void TimedRobot::StartCompetition() {
     auto callback = m_callbacks.pop();
 
     int32_t status = 0;
-    HAL_UpdateNotifierAlarm(m_notifier, callback.expirationTime.count(),
-                            &status);
-    WPILIB_CheckErrorStatus(status, "UpdateNotifierAlarm");
+    HAL_SetNotifierAlarm(m_notifier, callback.expirationTime.count(), 0, true,
+                         true, &status);
+    WPILIB_CheckErrorStatus(status, "SetNotifierAlarm");
 
-    std::chrono::microseconds currentTime{
-        HAL_WaitForNotifierAlarm(m_notifier, &status)};
-    if (currentTime.count() == 0 || status != 0) {
+    if (WPI_WaitForObject(m_notifier) == 0) {
       break;
     }
 
     m_loopStartTimeUs = RobotController::GetFPGATime();
+    std::chrono::microseconds currentTime{m_loopStartTimeUs};
 
     callback.func();
 
@@ -71,8 +70,8 @@ void TimedRobot::StartCompetition() {
 }
 
 void TimedRobot::EndCompetition() {
-  int32_t status = 0;
-  HAL_StopNotifier(m_notifier, &status);
+  HAL_DestroyNotifier(m_notifier);
+  m_notifier = HAL_kInvalidHandle;
 }
 
 TimedRobot::TimedRobot(wpi::units::second_t period)
@@ -81,7 +80,7 @@ TimedRobot::TimedRobot(wpi::units::second_t period)
   AddPeriodic([=, this] { LoopFunc(); }, period);
 
   int32_t status = 0;
-  m_notifier = HAL_InitializeNotifier(&status);
+  m_notifier = HAL_CreateNotifier(&status);
   WPILIB_CheckErrorStatus(status, "InitializeNotifier");
   HAL_SetNotifierName(m_notifier, "TimedRobot", &status);
 
@@ -93,9 +92,7 @@ TimedRobot::TimedRobot(wpi::units::hertz_t frequency)
 
 TimedRobot::~TimedRobot() {
   if (m_notifier != HAL_kInvalidHandle) {
-    int32_t status = 0;
-    HAL_StopNotifier(m_notifier, &status);
-    WPILIB_ReportError(status, "StopNotifier");
+    HAL_DestroyNotifier(m_notifier);
   }
 }
 

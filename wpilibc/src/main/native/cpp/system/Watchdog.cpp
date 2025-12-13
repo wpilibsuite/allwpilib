@@ -11,9 +11,11 @@
 
 #include <fmt/format.h>
 
+#include "wpi/hal/HALBase.h"
 #include "wpi/hal/Notifier.h"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/Timer.hpp"
+#include "wpi/util/Synchronization.h"
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/priority_queue.hpp"
 
@@ -37,7 +39,7 @@ class Watchdog::Impl {
                             DerefGreater<Watchdog*>>
       m_watchdogs;
 
-  void UpdateAlarm();
+  void UpdateAlarm(bool acknowledge = false);
 
  private:
   void Main();
@@ -47,7 +49,7 @@ class Watchdog::Impl {
 
 Watchdog::Impl::Impl() {
   int32_t status = 0;
-  m_notifier = HAL_InitializeNotifier(&status);
+  m_notifier = HAL_CreateNotifier(&status);
   WPILIB_CheckErrorStatus(status, "starting watchdog notifier");
   HAL_SetNotifierName(m_notifier, "Watchdog", &status);
 
@@ -55,21 +57,17 @@ Watchdog::Impl::Impl() {
 }
 
 Watchdog::Impl::~Impl() {
-  int32_t status = 0;
   // atomically set handle to 0, then clean
   HAL_NotifierHandle handle = m_notifier.exchange(0);
-  HAL_StopNotifier(handle, &status);
-  WPILIB_ReportError(status, "stopping watchdog notifier");
+  HAL_DestroyNotifier(handle);
 
   // Join the thread to ensure the handler has exited.
   if (m_thread.joinable()) {
     m_thread.join();
   }
-
-  HAL_CleanNotifier(handle);
 }
 
-void Watchdog::Impl::UpdateAlarm() {
+void Watchdog::Impl::UpdateAlarm(bool acknowledge) {
   int32_t status = 0;
   // Return if we are being destructed, or were not created successfully
   auto notifier = m_notifier.load();
@@ -77,13 +75,12 @@ void Watchdog::Impl::UpdateAlarm() {
     return;
   }
   if (m_watchdogs.empty()) {
-    HAL_CancelNotifierAlarm(notifier, &status);
+    HAL_CancelNotifierAlarm(notifier, acknowledge, &status);
   } else {
-    HAL_UpdateNotifierAlarm(
-        notifier,
-        static_cast<uint64_t>(m_watchdogs.top()->m_expirationTime.value() *
-                              1e6),
-        &status);
+    HAL_SetNotifierAlarm(notifier,
+                         static_cast<uint64_t>(
+                             m_watchdogs.top()->m_expirationTime.value() * 1e6),
+                         0, true, acknowledge, &status);
   }
   WPILIB_CheckErrorStatus(status, "updating watchdog notifier alarm");
 }
@@ -95,10 +92,10 @@ void Watchdog::Impl::Main() {
     if (notifier == 0) {
       break;
     }
-    uint64_t curTime = HAL_WaitForNotifierAlarm(notifier, &status);
-    if (curTime == 0 || status != 0) {
+    if (WPI_WaitForObject(notifier) == 0) {
       break;
     }
+    uint64_t curTime = HAL_GetFPGATime(&status);
 
     std::unique_lock lock(m_mutex);
 
@@ -128,7 +125,7 @@ void Watchdog::Impl::Main() {
     watchdog->m_callback();
     lock.lock();
 
-    UpdateAlarm();
+    UpdateAlarm(true);
   }
 }
 

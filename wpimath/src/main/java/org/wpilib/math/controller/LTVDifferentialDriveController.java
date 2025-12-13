@@ -74,8 +74,8 @@ public class LTVDifferentialDriveController {
     m_trackwidth = trackwidth;
     m_A = plant.getA();
     m_B = plant.getB();
-    m_Q = StateSpaceUtil.makeCostMatrix(qelems);
-    m_R = StateSpaceUtil.makeCostMatrix(relems);
+    m_Q = StateSpaceUtil.costMatrix(qelems);
+    m_R = StateSpaceUtil.costMatrix(relems);
     m_dt = dt;
   }
 

@@ -14,23 +14,23 @@ package org.wpilib.hardware.hal;
  */
 public class NotifierJNI extends JNIWrapper {
   /**
-   * Initializes a notifier.
+   * Creates a notifier.
    *
-   * <p>A notifier is an FPGA controller timer that triggers at requested intervals based on the
-   * FPGA time. This can be used to make precise control loops.
+   * <p>A notifier is an timer that alarms at an initial and (optionally) repeated intervals. This
+   * can be used to make precise control loops.
    *
    * @return the created notifier
-   * @see "HAL_InitializeNotifier"
+   * @see "HAL_CreateNotifier"
    */
-  public static native int initializeNotifier();
+  public static native int createNotifier();
 
   /**
    * Sets the HAL notifier thread priority.
    *
-   * <p>The HAL notifier thread is responsible for managing the FPGA's notifier interrupt and waking
-   * up user's Notifiers when it's their time to run. Giving the HAL notifier thread real-time
-   * priority helps ensure the user's real-time Notifiers, if any, are notified to run in a timely
-   * manner.
+   * <p>The HAL notifier thread is responsible for managing the system's notifier interrupt and
+   * waking up user's Notifiers when it's their time to run. Giving the HAL notifier thread
+   * real-time priority helps ensure the user's real-time Notifiers, if any, are notified to run in
+   * a timely manner.
    *
    * @param realTime Set to true to set a real-time priority, false for standard priority.
    * @param priority Priority to set the thread to. For real-time, this is 1-99 with 99 being
@@ -50,57 +50,66 @@ public class NotifierJNI extends JNIWrapper {
   public static native void setNotifierName(int notifierHandle, String name);
 
   /**
-   * Stops a notifier from running.
+   * Destroys a notifier.
    *
-   * <p>This will cause any call into waitForNotifierAlarm to return with time = 0.
+   * <p>Destruction wakes up any waiters.
    *
    * @param notifierHandle the notifier handle
-   * @see "HAL_StopNotifier"
+   * @see "HAL_DestroyNotifier"
    */
-  public static native void stopNotifier(int notifierHandle);
+  public static native void destroyNotifier(int notifierHandle);
 
   /**
-   * Cleans a notifier.
+   * Updates the initial and interval alarm times for a notifier.
    *
-   * <p>Note this also stops a notifier if it is already running.
+   * <p>The alarmTime is an absolute time (using the WPI now() time base) if absolute is true, or
+   * relative to the current time if absolute is false.
+   *
+   * <p>If intervalTime is non-zero, the notifier will alarm periodically following alarmTime at the
+   * given interval.
+   *
+   * <p>If an absolute alarmTime is in the past, the notifier will alarm immediately.
    *
    * @param notifierHandle the notifier handle
-   * @see "HAL_CleanNotifier"
+   * @param alarmTime the first alarm time (in microseconds)
+   * @param intervalTime the periodic interval time (in microseconds)
+   * @param absolute true if the alarm time is absolute
+   * @param ack true to acknowledge any prior alarm
+   * @see "HAL_SetNotifierAlarm"
    */
-  public static native void cleanNotifier(int notifierHandle);
+  public static native void setNotifierAlarm(
+      int notifierHandle, long alarmTime, long intervalTime, boolean absolute, boolean ack);
 
   /**
-   * Updates the trigger time for a notifier.
-   *
-   * <p>Note that this time is an absolute time relative to getFPGATime()
+   * Cancels all future notifier alarms for a notifier.
    *
    * @param notifierHandle the notifier handle
-   * @param triggerTime the updated trigger time
-   * @see "HAL_UpdateNotifierAlarm"
-   */
-  public static native void updateNotifierAlarm(int notifierHandle, long triggerTime);
-
-  /**
-   * Cancels the next notifier alarm.
-   *
-   * <p>This does not cause waitForNotifierAlarm to return.
-   *
-   * @param notifierHandle the notifier handle
+   * @param ack true to acknowledge any prior alarm
    * @see "HAL_CancelNotifierAlarm"
    */
-  public static native void cancelNotifierAlarm(int notifierHandle);
+  public static native void cancelNotifierAlarm(int notifierHandle, boolean ack);
 
   /**
-   * Waits for the next alarm for the specific notifier.
+   * Indicates the notifier alarm has been serviced. Makes no change to future alarms.
    *
-   * <p>This is a blocking call until either the time elapses or stopNotifier gets called. If the
-   * latter occurs, this function will return zero and any loops using this function should exit.
-   * Failing to do so can lead to use-after-frees.
+   * <p>One of setNotifierAlarm (with ack=true), cancelNotifierAlarm (with ack=true), or this
+   * function must be called before waiting for the next alarm.
    *
    * @param notifierHandle the notifier handle
-   * @return the FPGA time the notifier returned
+   * @see "HAL_AcknowledgeNotifierAlarm"
    */
-  public static native long waitForNotifierAlarm(int notifierHandle);
+  public static native void acknowledgeNotifierAlarm(int notifierHandle);
+
+  /**
+   * Gets the overrun count for a notifier.
+   *
+   * <p>An overrun occurs when a notifier's alarm is not serviced before the next scheduled alarm
+   * time.
+   *
+   * @param notifierHandle the notifier handle
+   * @return overrun count
+   */
+  public static native int getNotifierOverrun(int notifierHandle);
 
   /** Utility class. */
   private NotifierJNI() {}

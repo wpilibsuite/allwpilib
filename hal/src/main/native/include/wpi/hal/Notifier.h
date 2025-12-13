@@ -6,8 +6,12 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+#include <string_view>
+#endif
+
 #include "wpi/hal/Types.h"
-#include "wpi/util/nodiscard.h"
+#include "wpi/util/string.h"
 
 /**
  * @defgroup hal_notifier Notifier Functions
@@ -20,20 +24,20 @@ extern "C" {
 #endif
 
 /**
- * Initializes a notifier.
+ * Creates a notifier.
  *
- * A notifier is an FPGA controller timer that triggers at requested intervals
- * based on the FPGA time. This can be used to make precise control loops.
+ * A notifier is an timer that alarms at an initial and (optionally) repeated
+ * intervals. This can be used to make precise control loops.
  *
  * @param[out] status Error status variable. 0 on success.
  * @return the created notifier
  */
-HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status);
+HAL_NotifierHandle HAL_CreateNotifier(int32_t* status);
 
 /**
  * Sets the HAL notifier thread priority.
  *
- * The HAL notifier thread is responsible for managing the FPGA's notifier
+ * The HAL notifier thread is responsible for managing the system's notifier
  * interrupt and waking up user's Notifiers when it's their time to run.
  * Giving the HAL notifier thread real-time priority helps ensure the user's
  * real-time Notifiers, if any, are notified to run in a timely manner.
@@ -56,69 +60,92 @@ HAL_Bool HAL_SetNotifierThreadPriority(HAL_Bool realTime, int32_t priority,
  * @param[in] name name
  * @param[out] status Error status variable. 0 on success.
  */
-void HAL_SetNotifierName(HAL_NotifierHandle notifierHandle, const char* name,
-                         int32_t* status);
+void HAL_SetNotifierName(HAL_NotifierHandle notifierHandle,
+                         const struct WPI_String* name, int32_t* status);
 
 /**
- * Stops a notifier from running.
+ * Destroys a notifier.
  *
- * This will cause any call into HAL_WaitForNotifierAlarm to return with time =
- * 0.
- *
- * @param[in] notifierHandle the notifier handle
- * @param[out] status Error status variable. 0 on success.
- */
-void HAL_StopNotifier(HAL_NotifierHandle notifierHandle, int32_t* status);
-
-/**
- * Cleans a notifier.
- *
- * Note this also stops a notifier if it is already running.
+ * Destruction wakes up any waiters.
  *
  * @param[in] notifierHandle the notifier handle
  */
-void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle);
+void HAL_DestroyNotifier(HAL_NotifierHandle notifierHandle);
 
 /**
- * Updates the trigger time for a notifier.
+ * Updates the initial and interval alarm times for a notifier.
  *
- * Note that this time is an absolute time relative to HAL_GetFPGATime()
+ * The alarmTime is an absolute time (using the WPI_Now() time base) if
+ * absolute is true, or relative to the current time if absolute is false.
+ *
+ * If intervalTime is non-zero, the notifier will alarm periodically following
+ * alarmTime at the given interval.
+ *
+ * If an absolute alarmTime is in the past, the notifier will alarm immediately.
  *
  * @param[in] notifierHandle the notifier handle
- * @param[in] triggerTime    the updated trigger time
+ * @param[in] alarmTime      the first alarm time (in microseconds)
+ * @param[in] intervalTime   the periodic interval time (in microseconds)
+ * @param[in] absolute       true if the alarm time is absolute
+ * @param[in] ack            true to acknowledge any prior alarm
  * @param[out] status        Error status variable. 0 on success.
  */
-void HAL_UpdateNotifierAlarm(HAL_NotifierHandle notifierHandle,
-                             uint64_t triggerTime, int32_t* status);
+void HAL_SetNotifierAlarm(HAL_NotifierHandle notifierHandle, uint64_t alarmTime,
+                          uint64_t intervalTime, HAL_Bool absolute,
+                          HAL_Bool ack, int32_t* status);
 
 /**
- * Cancels the next notifier alarm.
- *
- * This does not cause HAL_WaitForNotifierAlarm to return.
+ * Cancels all future notifier alarms for a notifier.
  *
  * @param[in] notifierHandle the notifier handle
+ * @param[in] ack            true to acknowledge any prior alarm
  * @param[out] status Error status variable. 0 on success.
  */
-void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle,
+void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle, HAL_Bool ack,
                              int32_t* status);
 
 /**
- * Waits for the next alarm for the specific notifier.
+ * Indicates the notifier alarm has been serviced. Makes no change to future
+ * alarms.
  *
- * This is a blocking call until either the time elapses or HAL_StopNotifier
- * gets called. If the latter occurs, this function will return zero and any
- * loops using this function should exit. Failing to do so can lead to
- * use-after-frees.
+ * One of HAL_SetNotifierAlarm (with ack=true), HAL_CancelNotifierAlarm (with
+ * ack=true), or this function must be called before waiting for the next alarm.
  *
  * @param[in] notifierHandle the notifier handle
- * @param[out] status        Error status variable. 0 on success.
- * @return the FPGA time the notifier returned
+ * @param[out] status Error status variable. 0 on success.
  */
-WPI_NODISCARD
-uint64_t HAL_WaitForNotifierAlarm(HAL_NotifierHandle notifierHandle,
+void HAL_AcknowledgeNotifierAlarm(HAL_NotifierHandle notifierHandle,
                                   int32_t* status);
+
+/**
+ * Gets the overrun count for a notifier.
+ *
+ * An overrun occurs when a notifier's alarm is not serviced before the next
+ * scheduled alarm time.
+ *
+ * @param[in] notifierHandle the notifier handle
+ * @param[out] status Error status variable. 0 on success.
+ * @return overrun count
+ */
+int32_t HAL_GetNotifierOverrun(HAL_NotifierHandle notifierHandle,
+                               int32_t* status);
 
 #ifdef __cplusplus
 }  // extern "C"
 #endif
 /** @} */
+
+#ifdef __cplusplus
+/**
+ * Sets the name of a notifier.
+ *
+ * @param[in] notifierHandle the notifier handle
+ * @param[in] name name
+ * @param[out] status Error status variable. 0 on success.
+ */
+inline void HAL_SetNotifierName(HAL_NotifierHandle notifierHandle,
+                                std::string_view name, int32_t* status) {
+  WPI_String nameStr = wpi::util::make_string(name);
+  HAL_SetNotifierName(notifierHandle, &nameStr, status);
+}
+#endif

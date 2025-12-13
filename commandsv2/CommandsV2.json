@@ -6,6 +6,13 @@
   "frcYear": "2027_alpha1",
   "mavenUrls": [],
   "jsonUrl": "",
+  "conflictsWith": [
+    {
+      "uuid": "4decdc05-a056-46cf-9561-39449bbb01306",
+      "errorMessage": "Users can not have both Commands v2 and Commands v3 vendordeps in their robot program.",
+      "offlineFileName": "CommandsV3.json"
+    }
+  ],
   "javaDependencies": [
     {
       "groupId": "org.wpilib.commandsv2",

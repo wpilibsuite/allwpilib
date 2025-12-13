@@ -39,7 +39,8 @@ class IntrusiveSharedPtr {
   /**
    * Constructs an empty intrusive shared pointer.
    */
-  constexpr IntrusiveSharedPtr(std::nullptr_t) noexcept {}  // NOLINT
+  // NOLINTNEXTLINE (google-explicit-constructor)
+  constexpr IntrusiveSharedPtr(std::nullptr_t) noexcept {}
 
   /**
    * Constructs an intrusive shared pointer from the given pointer and takes
@@ -78,8 +79,8 @@ class IntrusiveSharedPtr {
    */
   template <typename U>
     requires(!std::same_as<T, U> && std::convertible_to<U*, T*>)
-  constexpr IntrusiveSharedPtr(  // NOLINT
-      const IntrusiveSharedPtr<U>& rhs) noexcept
+  // NOLINTNEXTLINE (google-explicit-constructor)
+  constexpr IntrusiveSharedPtr(const IntrusiveSharedPtr<U>& rhs) noexcept
       : m_ptr{rhs.m_ptr} {
     if (m_ptr != nullptr) {
       inc_ref_count(m_ptr);
@@ -92,7 +93,8 @@ class IntrusiveSharedPtr {
    * @param rhs The other intrusive shared pointer.
    * @return This intrusive shared pointer.
    */
-  constexpr IntrusiveSharedPtr<T>& operator=(  // NOLINT
+  // NOLINTNEXTLINE (google-explicit-constructor)
+  constexpr IntrusiveSharedPtr<T>& operator=(
       const IntrusiveSharedPtr<T>& rhs) noexcept {
     if (m_ptr == rhs.m_ptr) {
       return *this;
@@ -119,7 +121,8 @@ class IntrusiveSharedPtr {
    */
   template <typename U>
     requires(!std::same_as<T, U> && std::convertible_to<U*, T*>)
-  constexpr IntrusiveSharedPtr<T>& operator=(  // NOLINT
+  // NOLINTNEXTLINE (google-explicit-constructor)
+  constexpr IntrusiveSharedPtr<T>& operator=(
       const IntrusiveSharedPtr<U>& rhs) noexcept {
     if (m_ptr == rhs.m_ptr) {
       return *this;
@@ -153,8 +156,8 @@ class IntrusiveSharedPtr {
    */
   template <typename U>
     requires(!std::same_as<T, U> && std::convertible_to<U*, T*>)
-  constexpr IntrusiveSharedPtr(  // NOLINT
-      IntrusiveSharedPtr<U>&& rhs) noexcept
+  // NOLINTNEXTLINE (google-explicit-constructor)
+  constexpr IntrusiveSharedPtr(IntrusiveSharedPtr<U>&& rhs) noexcept
       : m_ptr{std::exchange(rhs.m_ptr, nullptr)} {}
 
   /**

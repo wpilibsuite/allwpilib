@@ -32,6 +32,7 @@ class ElevatorSimulationTest {
   void startThread() {
     HAL.initialize(500, 0);
     SimHooks.pauseTiming();
+    SimHooks.setProgramStarted(false);
     DriverStationSim.resetData();
     m_robot = new Robot();
     m_thread = new Thread(m_robot::startCompetition);
@@ -40,7 +41,7 @@ class ElevatorSimulationTest {
     m_joystickSim = new JoystickSim(Constants.kJoystickPort);
 
     m_thread.start();
-    SimHooks.stepTiming(0.0); // Wait for Notifiers
+    SimHooks.waitForProgramStart();
   }
 
   @AfterEach

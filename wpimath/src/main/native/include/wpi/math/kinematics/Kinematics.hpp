@@ -5,6 +5,7 @@
 #pragma once
 
 #include "wpi/math/geometry/Twist2d.hpp"
+#include "wpi/math/kinematics/ChassisAccelerations.hpp"
 #include "wpi/math/kinematics/ChassisSpeeds.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
@@ -18,7 +19,8 @@ namespace wpi::math {
  * Inverse kinematics converts a desired chassis speed into wheel speeds whereas
  * forward kinematics converts wheel speeds into chassis speed.
  */
-template <typename WheelSpeeds, typename WheelPositions>
+template <typename WheelPositions, typename WheelSpeeds,
+          typename WheelAccelerations>
   requires std::copy_constructible<WheelPositions> &&
            std::assignable_from<WheelPositions&, const WheelPositions&>
 class WPILIB_DLLEXPORT Kinematics {
@@ -74,5 +76,29 @@ class WPILIB_DLLEXPORT Kinematics {
   virtual WheelPositions Interpolate(const WheelPositions& start,
                                      const WheelPositions& end,
                                      double t) const = 0;
+
+  /**
+   * Performs forward kinematics to return the resulting chassis accelerations
+   * from the wheel accelerations. This method is often used for dynamics
+   * calculations -- determining the robot's acceleration on the field using
+   * data from the real-world acceleration of each wheel on the robot.
+   *
+   * @param wheelAccelerations The accelerations of the wheels.
+   * @return The chassis accelerations.
+   */
+  virtual ChassisAccelerations ToChassisAccelerations(
+      const WheelAccelerations& wheelAccelerations) const = 0;
+
+  /**
+   * Performs inverse kinematics to return the wheel accelerations from a
+   * desired chassis acceleration. This method is often used for dynamics
+   * calculations -- converting desired robot accelerations into individual
+   * wheel accelerations.
+   *
+   * @param chassisAccelerations The desired chassis accelerations.
+   * @return The wheel accelerations.
+   */
+  virtual WheelAccelerations ToWheelAccelerations(
+      const ChassisAccelerations& chassisAccelerations) const = 0;
 };
 }  // namespace wpi::math

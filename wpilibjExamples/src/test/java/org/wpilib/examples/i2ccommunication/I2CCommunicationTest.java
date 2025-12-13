@@ -36,6 +36,7 @@ class I2CCommunicationTest {
   void startThread() {
     HAL.initialize(500, 0);
     SimHooks.pauseTiming();
+    SimHooks.setProgramStarted(false);
     DriverStationSim.resetData();
     m_future = new CompletableFuture<>();
     m_callback =
@@ -44,7 +45,7 @@ class I2CCommunicationTest {
     m_robot = new Robot();
     m_thread = new Thread(m_robot::startCompetition);
     m_thread.start();
-    SimHooks.stepTiming(0.0); // Wait for Notifiers
+    SimHooks.waitForProgramStart();
   }
 
   @AfterEach

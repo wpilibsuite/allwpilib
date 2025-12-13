@@ -72,6 +72,12 @@ class DriverStation final {
     kUpLeft = HAL_JoystickPOV_kLeftUp,
   };
 
+  struct TouchpadFinger final {
+    bool down = false;
+    float x = 0.0f;
+    float y = 0.0f;
+  };
+
   /**
    * Gets the angle of a POVDirection.
    *
@@ -160,6 +166,28 @@ class DriverStation final {
   static double GetStickAxis(int stick, int axis);
 
   /**
+   * Get the finger data of a touchpad on a joystick, if available.
+   *
+   * @param stick         The joystick to read.
+   * @param touchpad The touchpad index to read from the joystick.
+   * @param finger   The finger index to read from the touchpad.
+   * @return The finger data of the touchpad on the joystick.
+   */
+  static TouchpadFinger GetStickTouchpadFinger(int stick, int touchpad,
+                                               int finger);
+
+  /**
+   * Whether a finger on a touchpad is available.
+   *
+   *  @param stick         The joystick to read.
+   * @param touchpad The touchpad index to read from the joystick.
+   * @param finger   The finger index to read from the touchpad.
+   * @return True if the finger data is available.
+   */
+  static bool GetStickTouchpadFingerAvailable(int stick, int touchpad,
+                                              int finger);
+
+  /**
    * Get the value of the axis on a joystick, if available.
    *
    * This depends on the mapping of the joystick connected to the specified
@@ -245,10 +273,21 @@ class DriverStation final {
   /**
    * Returns the type of joystick at a given port.
    *
+   * This maps to SDL_GamepadType
+   *
    * @param stick The joystick port number
    * @return The HID type of joystick at the given port
    */
-  static int GetJoystickType(int stick);
+  static int GetJoystickGamepadType(int stick);
+
+  /**
+   * Returns the number of outputs supported by the joystick at the given
+   * port.
+   *
+   * @param stick The joystick port number
+   * @return The number of outputs supported by the joystick at the given port
+   */
+  static int GetJoystickSupportedOutputs(int stick);
 
   /**
    * Returns the name of the joystick at the given port.

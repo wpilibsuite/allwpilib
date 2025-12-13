@@ -15,11 +15,13 @@ namespace slp::detail {
  *
  * https://en.wikipedia.org/wiki/Topological_sorting
  *
+ * @tparam Scalar Scalar type.
  * @param root The root node of the expression.
  */
-inline gch::small_vector<Expression*> topological_sort(
-    const ExpressionPtr& root) {
-  gch::small_vector<Expression*> list;
+template <typename Scalar>
+gch::small_vector<Expression<Scalar>*> topological_sort(
+    const ExpressionPtr<Scalar>& root) {
+  gch::small_vector<Expression<Scalar>*> list;
 
   // If the root type is constant, updates are a no-op, so return an empty list
   if (root == nullptr || root->type() == ExpressionType::CONSTANT) {
@@ -27,7 +29,7 @@ inline gch::small_vector<Expression*> topological_sort(
   }
 
   // Stack of nodes to explore
-  gch::small_vector<Expression*> stack;
+  gch::small_vector<Expression<Scalar>*> stack;
 
   // Enumerate incoming edges for each node via depth-first search
   stack.emplace_back(root.get());
@@ -72,20 +74,18 @@ inline gch::small_vector<Expression*> topological_sort(
  * Update the values of all nodes in this graph based on the values of
  * their dependent nodes.
  *
+ * @tparam Scalar Scalar type.
  * @param list Topological sort of graph from parent to child.
  */
-inline void update_values(const gch::small_vector<Expression*>& list) {
+template <typename Scalar>
+void update_values(const gch::small_vector<Expression<Scalar>*>& list) {
   // Traverse graph from child to parent and update values
   for (auto& node : list | std::views::reverse) {
     auto& lhs = node->args[0];
     auto& rhs = node->args[1];
 
     if (lhs != nullptr) {
-      if (rhs != nullptr) {
-        node->val = node->value(lhs->val, rhs->val);
-      } else {
-        node->val = node->value(lhs->val, 0.0);
-      }
+      node->val = node->value(lhs->val, rhs ? rhs->val : Scalar(0));
     }
   }
 }

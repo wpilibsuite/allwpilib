@@ -18,8 +18,7 @@ def copy_upstream_src(wpilib_root: Path):
 
     # Copy Sleipnir files into allwpilib
     walk_cwd_and_copy_if(
-        lambda dp, f: (has_prefix(dp, Path("include")) or has_prefix(dp, Path("src")))
-        and f not in [".styleguide", ".styleguide-license"],
+        lambda dp, f: (has_prefix(dp, Path("include")) or has_prefix(dp, Path("src"))),
         wpimath / "src/main/native/thirdparty/sleipnir",
     )
 
@@ -49,8 +48,7 @@ using small_vector = wpi::util::SmallVector<T>;
 def main():
     name = "sleipnir"
     url = "https://github.com/SleipnirGroup/Sleipnir"
-    # main on 2025-09-19
-    tag = "7f89d5547702a09e3617bc31fe5bafe6add04fab"
+    tag = "v0.3.2"
 
     sleipnir = Lib(name, url, tag, copy_upstream_src)
     sleipnir.main()

@@ -322,15 +322,15 @@ public final class DriverStationSim {
    * @param stick The joystick number
    * @return The joystick outputs
    */
-  public static long getJoystickOutputs(int stick) {
-    return DriverStationDataJNI.getJoystickOutputs(stick);
+  public static int getJoystickLeds(int stick) {
+    return DriverStationDataJNI.getJoystickLeds(stick);
   }
 
   /**
    * Gets the joystick rumble.
    *
    * @param stick The joystick number
-   * @param rumbleNum Rumble to get (0=left, 1=right)
+   * @param rumbleNum Rumble to get (0=left, 1=right, 2=left trigger, 3=right trigger)
    * @return The joystick rumble value
    */
   public static int getJoystickRumble(int stick, int rumbleNum) {
@@ -450,8 +450,18 @@ public final class DriverStationSim {
    * @param stick The joystick number
    * @param type The value of type
    */
-  public static void setJoystickType(int stick, int type) {
-    DriverStationDataJNI.setJoystickType(stick, type);
+  public static void setJoystickGamepadType(int stick, int type) {
+    DriverStationDataJNI.setJoystickGamepadType(stick, type);
+  }
+
+  /**
+   * Sets the value of supported outputs for a joystick.
+   *
+   * @param stick The joystick number
+   * @param supportedOutputs The value of supported outputs
+   */
+  public static void setJoystickSupportedOutputs(int stick, int supportedOutputs) {
+    DriverStationDataJNI.setJoystickSupportedOutputs(stick, supportedOutputs);
   }
 
   /**

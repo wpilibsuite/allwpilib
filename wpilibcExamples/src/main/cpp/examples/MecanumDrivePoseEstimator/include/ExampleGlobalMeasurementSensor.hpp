@@ -5,7 +5,7 @@
 #pragma once
 
 #include "wpi/math/geometry/Pose2d.hpp"
-#include "wpi/math/util/StateSpaceUtil.hpp"
+#include "wpi/math/random/Normal.hpp"
 
 /**
  * This dummy class represents a global measurement sensor, such as a computer
@@ -15,7 +15,7 @@ class ExampleGlobalMeasurementSensor {
  public:
   static wpi::math::Pose2d GetEstimatedGlobalPose(
       const wpi::math::Pose2d& estimatedRobotPose) {
-    auto randVec = wpi::math::MakeWhiteNoiseVector(0.1, 0.1, 0.1);
+    auto randVec = wpi::math::Normal(0.1, 0.1, 0.1);
     return wpi::math::Pose2d{
         estimatedRobotPose.X() + wpi::units::meter_t{randVec(0)},
         estimatedRobotPose.Y() + wpi::units::meter_t{randVec(1)},

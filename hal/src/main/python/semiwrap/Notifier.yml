@@ -2,11 +2,15 @@ strip_prefixes:
 - HAL_
 
 functions:
-  HAL_InitializeNotifier:
+  HAL_CreateNotifier:
   HAL_SetNotifierName:
-  HAL_StopNotifier:
-  HAL_CleanNotifier:
-  HAL_UpdateNotifierAlarm:
+    overloads:
+      HAL_NotifierHandle, const struct WPI_String*, int32_t*:
+        ignore: true
+      HAL_NotifierHandle, std::string_view, int32_t*:
+  HAL_DestroyNotifier:
+  HAL_SetNotifierAlarm:
   HAL_CancelNotifierAlarm:
-  HAL_WaitForNotifierAlarm:
+  HAL_GetNotifierOverrun:
+  HAL_AcknowledgeNotifierAlarm:
   HAL_SetNotifierThreadPriority:
