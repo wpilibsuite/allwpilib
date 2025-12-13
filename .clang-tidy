@@ -69,3 +69,4 @@ Checks:
   modernize-use-using,
   readability-braces-around-statements'
 FormatStyle: file
+IgnoreExternC: true
