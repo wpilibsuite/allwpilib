@@ -130,12 +130,12 @@ target_link_libraries(wpinet PUBLIC wpiutil)
 
 if(USE_LINKED_AVAHI)
     find_library(AVAHI_COMMON REQUIRED NAMES avahi-common)
-    if (AVAHI_COMMON)
+    if(AVAHI_COMMON)
         message(STATUS "Found avahi common: ${AVAHI_COMMON}")
     endif()
 
     find_library(AVAHI_CLIENT REQUIRED NAMES avahi-client)
-    if (AVAHI_CLIENT)
+    if(AVAHI_CLIENT)
         message(STATUS "Found avahi client: ${AVAHI_CLIENT}")
     endif()
 

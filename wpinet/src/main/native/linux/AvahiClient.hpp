@@ -9,16 +9,16 @@
 #include <memory>
 
 #ifdef DIRECT_LINK_AVAHI
-#include "avahi-common/thread-watch.h"
-#include "avahi-common/strlst.h"
-#include "avahi-common/address.h"
-#include "avahi-common/error.h"
 #include "avahi-client/client.h"
 #include "avahi-client/lookup.h"
 #include "avahi-client/publish.h"
-#include "avahi-common/malloc.h"
+#include "avahi-common/address.h"
 #include "avahi-common/alternative.h"
 #include "avahi-common/domain.h"
+#include "avahi-common/error.h"
+#include "avahi-common/malloc.h"
+#include "avahi-common/strlst.h"
+#include "avahi-common/thread-watch.h"
 
 #else
 
@@ -243,7 +243,7 @@ namespace wpi::net {
 class AvahiFunctionTable {
  public:
 #define AvahiFunction(CapName, RetType, Parameters) \
-  using CapName##_func = RetType(*) Parameters; \
+  using CapName##_func = RetType(*) Parameters;     \
   CapName##_func CapName = nullptr
 
   AvahiFunction(threaded_poll_new, AvahiThreadedPoll*, (void));
