@@ -38,6 +38,9 @@ allprojects {
     } else {
         wpilibRepositories.addAllDevelopmentRepositories(it)
     }
+    tasks.withType(AbstractTestTask).configureEach {
+        failOnNoDiscoveredTests = false
+    }
 }
 
 develocity {
