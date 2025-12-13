@@ -9,5 +9,5 @@ repositories {
     }
 }
 dependencies {
-    implementation "org.wpilib:native-utils:2027.1.0"
+    implementation "org.wpilib:native-utils:2027.1.1"
 }

@@ -18,6 +18,14 @@ nativeUtils {
     }
 }
 
+if (project.hasProperty('onlylinuxarm64')) {
+    nativeUtils.crossCompilers.getByName(org.wpilib.toolchain.NativePlatforms.linuxarm64).optional = false
+}
+
+if (project.hasProperty('onlylinuxsystemcore')) {
+    nativeUtils.crossCompilers.getByName(org.wpilib.toolchain.NativePlatforms.systemcore).optional = false
+}
+
 nativeUtils.wpi.addWarnings()
 nativeUtils.wpi.addWarningsAsErrors()
 
