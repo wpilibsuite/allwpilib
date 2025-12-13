@@ -84,8 +84,8 @@ struct ControlFlags {
   uint32_t DsConnected : 1 = 0;
   uint32_t WatchdogActive : 1 = 0;
   uint32_t SupportsOpModes : 1 = 0;
-  uint32_t Alliance : 6 = 0;
-  uint32_t Reserved : 18 = 0;
+  uint32_t Alliance : 4 = 0;
+  uint32_t Reserved : 20 = 0;
 
   constexpr bool operator==(const ControlFlags& Other) const {
     return Enabled == Other.Enabled && RobotMode == Other.RobotMode &&
